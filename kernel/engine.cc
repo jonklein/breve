@@ -40,13 +40,12 @@ void brEngineUnlock(brEngine *e) {
     first step in starting a breve simulation.
 */
 
-brEngine *brEngineNew() {
+brEngine *brEngineNew(void) {
 	brEngine *e;
 	char *envpath, *dir;
 	int n = 0;
 
 #ifdef MINGW
-	// windows requires that we do some initialization before using threads.  bitches.
 	pthread_win32_process_attach_np();
 #endif
 

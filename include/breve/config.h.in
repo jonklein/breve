@@ -5,9 +5,6 @@
    */
 #undef CRAY_STACKSEG_END
 
-/* Cygwin */
-#undef CYGWIN
-
 /* Define to 1 if using `alloca.c'. */
 #undef C_ALLOCA
 
@@ -51,6 +48,9 @@
 /* Define to 1 if you have the `avcodec' library (-lavcodec). */
 #undef HAVE_LIBAVCODEC
 
+/* Define to 1 if you have the `c_r' library (-lc_r). */
+#undef HAVE_LIBC_R
+
 /* Define to 1 if you have the `enet' library (-lenet). */
 #undef HAVE_LIBENET
 
@@ -60,23 +60,20 @@
 /* Define to 1 if you have the `gsl' library (-lgsl). */
 #undef HAVE_LIBGSL
 
-/* Define to 1 if you have the `gslblasnative' library (-lgslblasnative). */
-#undef HAVE_LIBGSLBLASNATIVE
-
 /* Define to 1 if you have the `gslcblas' library (-lgslcblas). */
 #undef HAVE_LIBGSLCBLAS
 
 /* Define to 1 if you have the `history' library (-lhistory). */
 #undef HAVE_LIBHISTORY
 
-/* Define to 1 if you have the `java' library (-ljava). */
+/* JVM library for JNI */
 #undef HAVE_LIBJAVA
 
 /* Define to 1 if you have the `jpeg' library (-ljpeg). */
 #undef HAVE_LIBJPEG
 
-/* Define to 1 if you have the `l' library (-ll). */
-#undef HAVE_LIBL
+/* Define to 1 if you have the `m' library (-lm). */
+#undef HAVE_LIBM
 
 /* Define to 1 if you have the `ncurses' library (-lncurses). */
 #undef HAVE_LIBNCURSES
@@ -122,6 +119,9 @@
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `mkstemp' function. */
+#undef HAVE_MKSTEMP
 
 /* Define to 1 if you have the <netdb.h> header file. */
 #undef HAVE_NETDB_H
@@ -205,9 +205,6 @@
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
 
-/* Linux */
-#undef LINUX
-
 /* Define to 1 if `lstat' dereferences a symlink specified with a trailing
    slash. */
 #undef LSTAT_FOLLOWS_SLASHED_SYMLINK
@@ -252,6 +249,9 @@
 
 /* Windows */
 #undef WINDOWS
+
+/* Define to 1 if the X Window System is missing or not being used. */
+#undef X_DISPLAY_MISSING
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */

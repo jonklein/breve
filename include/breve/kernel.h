@@ -52,10 +52,6 @@
 
 #include "util.h"
 
-#ifdef MINGW
-#include <winsock2.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
@@ -65,8 +61,6 @@
 #include <sys/stat.h>
 #include <sys/param.h>
 #include <sys/types.h>
-
-// #include "timeval.h"
 
 #include <fcntl.h>
 

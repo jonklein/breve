@@ -8,7 +8,7 @@ YACC	= @YACC@
 
 @SET_MAKE@
 
-CPPFLAGS	= @CPPFLAGS@ -Iinclude/breve @JAVAINCS@ @DEFS@
+CPPFLAGS	= @CPPFLAGS@ -Iinclude/breve @DEFS@
 LDFLAGS		= @LDFLAGS@
 
 EXTRACFLAGS	= -g
@@ -44,16 +44,16 @@ OBJ	:= $(SRC:.cc=.o)
 OBJ	:= $(OBJ:.c=.o)
 
 bin/breve@EXE_SUFFIX@: bin/breve.o $(OBJ)
-	$(CXX) -o $@ $(LDFLAGS) @PLUGINIMP@ $^ @LIBS@ @GLLIBS@ @AUDIOLIBS@
+	$(CXX) -o $@ $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@
 
 bin/breve_cli@EXE_SUFFIX@: bin/breve_cli.o $(OBJ)
-	$(CXX) -o $@ $(LDFLAGS) $^ @LIBS@ @GLLIBS@ @AUDIOLIBS@
+	$(CXX) -o $@ $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@
 
 bin/graphTest@EXE_SUFFIX@: graph/graphTest.o $(OBJ)
-	$(CXX) -o $@ $(LDFLAGS) $^ @LIBS@ @GLLIBS@ @AUDIOLIBS@
+	$(CXX) -o $@ $(LDFLAGS) $^ @LIBS@
 
 breve.dll: $(OBJ)
-	$(CXX) -shared -o $@ @PLUGINIMP@ $^ @LIBS@ @GLLIBS@ @AUDIOLIBS@
+	$(CXX) @PLUGINFLAGS@ -o $@ @PLUGINIMP@ $^ @LIBS@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $< $(CPPFLAGS) 
@@ -94,11 +94,12 @@ lib/libbreve.a: $(OBJ)
 .PHONY: clean OSX_build OSX_clean OSX_release CLI_release plugin_API install
 
 clean:
-	rm -f bin/breve bin/breve_cli bin/graphTest lib/*.a
+	rm -f bin/breve@EXE_SUFFIX@ bin/breve_cli@EXE_SUFFIX@
+	rm -f .depend bin/graphTest@EXE_SUFFIX@
 	rm -f steve/format.c steve/stevelex.c
 	rm -f steve/steveparse.tab.c steve/steveparse.tab.h
 	rm -f java/*.class lib/classes/*.jar
-	rm -f breve.dll breve.def lib/plugin.def .depend
+	rm -f breve.dll breve.def lib/*.a lib/plugin.def
 	rm -rf docs docBuild/docs OSX/build
 	find . -name '.DS_Store' -exec rm -f {} \;
 	find . -name 'core' -exec rm -f {} \;

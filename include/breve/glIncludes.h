@@ -24,24 +24,19 @@
 #import <OpenGL/gl.h>
 #import <OpenGL/glu.h>
 #import <OpenGL/glext.h>
-#else /* NOT MACOSX */
 
-#ifdef WINDOWS
-
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
-
-#else /* NOT CYGWIN */
+#else
 
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+
+#ifndef WINDOWS
 #include <GL/glext.h>
 #include <GL/glx.h>
+#endif
 
 #endif /* MACOSX */
-#endif /* CYGWIN */
 
 #ifdef HAVE_LIBOSMESA
 #include <GL/osmesa.h>

@@ -24,19 +24,15 @@
 #include <pthread.h>
 
 #include "simulation.h"
+#include "timeval.h"
 
 #ifdef __cplusplus
 #include <vector>
 #include <map>
 #include <string>
 #include <algorithm>
-#include "timeval.h"
 #endif
 
-#ifdef WINDOWS
-// #include <winsock2.h>
-#endif
- 
 // the maximum error size 
 
 #define BR_ERROR_TEXT_SIZE 4096

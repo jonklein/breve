@@ -1,3 +1,0 @@
-EXPORTS
-JNI_CreateJavaVM@12
-JNI_GetDefaultJavaVMInitArgs@4

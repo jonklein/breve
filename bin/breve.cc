@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
 
 	srandom(time(NULL));
 
-#ifdef WINDOWS
+#ifdef MINGW
 	pthread_win32_process_attach_np();
 #endif
 

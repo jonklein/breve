@@ -61,8 +61,8 @@ extern char *interfaceID;
 
 breveFrontend *frontend;
 
-int activateContext();
-void renderContext(slWorld *w, slCamera *c);
+int activateContext(void);
+void renderContext(slWorld *, slCamera *);
 
 int main(int argc, char **argv) {
 	int index;
@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
 	double nextNotify;
 	char wd[MAXPATHLEN];
 
-#ifdef WINDOWS
+#ifdef MINGW
 	pthread_win32_process_attach_np();
 #endif
 
