@@ -784,6 +784,7 @@ int stXMLRunDearchiveMethods(stXMLParserState *s) {
 			ri.instance = ii->second;
 			ri.type = ri.instance->type;
 
+			r = stCallMethodByName(&ri, "post-dearchive-set-controller", &result);
 			r = stCallMethodByName(&ri, "dearchive", &result);
 
 			if(r != EC_OK || BRINT(&result) != 1) {

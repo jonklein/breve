@@ -205,6 +205,12 @@ NULL : Object (aka Objects) [version 2.1] {
 
 		removeDependency(theObject).
 
+	- to post-dearchive-set-controller:
+		% Used internally to set the controller instance for this variable.  
+		% Used after object dearchiving.
+
+		controller = (self get-controller).
+
 	+ to dearchive:
 		return 1.
 
