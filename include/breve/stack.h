@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 
 /*!
 	\brief A simple stack-like data structure.
@@ -35,6 +36,10 @@ struct slStack {
 		maxCount = 0;
 	}
 
+	~slStack() {
+		if(data) free(data);
+	}
+
     void **data;
     unsigned int count;
     unsigned int maxCount;
@@ -43,7 +48,6 @@ struct slStack {
 
 slStack *slStackNew(void);
 slStack *slStackNewWithSize(unsigned int);
-void slStackFree(slStack *);
 int slStackPush(slStack *, void *);
 
 #define slStackClear(s)	((s)->count = 0)

@@ -14,7 +14,6 @@ extern "C" {
 
 #include "gc.h"
 
-#include "expression.h"
 #include "evaluation.h"
 
 #include "stringexp.h"

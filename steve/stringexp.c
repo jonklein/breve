@@ -26,6 +26,7 @@
 
 #include <ctype.h>
 #include "steve.h"
+#include "expression.h"
 
 /*!
 	\brief Preprocesses a string for runtime formating and printing.
@@ -35,16 +36,11 @@
 	Does terrible things to theString.  Too horrible to discuss here.
 */
 
-stExp *stNewStringExp(char *theString, stMethod *m, stObject *o, char *file, int line) {
-	stStringExp *se;
+stStringExp::stStringExp(char *theString, stMethod *m, stObject *o, char *file, int line) : stExp(file, line) {
 	char *s;
 	char sym, prev = 0;
 	char *varstart, *varend, *varname;
 	stSubstringExp *sub;
-
-	se = new stStringExp;
-
-	se->baseSize = 0;
 
 	s = theString;
 
@@ -67,8 +63,8 @@ stExp *stNewStringExp(char *theString, stMethod *m, stObject *o, char *file, int
 				strncpy(varname, varstart, (varend - varstart));
 				varname[varend - varstart] = 0;
 
-				sub = new stSubstringExp;
-			   	sub->offset = se->baseSize;
+				sub = new stSubstringExp(file, line);
+			   	sub->offset = baseSize;
 
 				// is this an array or list? 
 
@@ -87,15 +83,15 @@ stExp *stNewStringExp(char *theString, stMethod *m, stObject *o, char *file, int
 						number[numend - (varend + 1)] = 0;
 						offset = atoi(number);
 
-						index = stNewIntExp(offset, file, line);
+						index = new stIntExp(offset, file, line);
 						delete[] number;
 
 						if(*varend == '{') {
-							stExp *listExp = stNewLoadExp(m, o, varname, file, line);
+							stExp *listExp = new stLoadExp(m, o, varname, file, line);
 
-							sub->loadExp = stNewListIndexExp(listExp, index, file, line);
+							sub->loadExp = new stListIndexExp(listExp, index, file, line);
 						} else {
-							sub->loadExp = stNewArrayIndexExp(m, o, varname, index, file, line);
+							sub->loadExp = new stArrayIndexExp(m, o, varname, index, file, line);
 						}
 
 						s = numend + 1;
@@ -104,17 +100,16 @@ stExp *stNewStringExp(char *theString, stMethod *m, stObject *o, char *file, int
 					// it's a regular variable.  but is it a special case or self or super?
 
 					if(!strcmp(varname, "super") || !strcmp(varname, "self")) {
-						sub->loadExp = stExpNew(NULL, ET_SELF, file, line);
+						sub->loadExp = new stSelfExp(file, line);
 					} else {
-						sub->loadExp = stNewLoadExp(m, o, varname, file, line);
+						sub->loadExp = new stLoadExp(m, o, varname, file, line);
 					}
 				}
 
-				se->substrings.push_back( sub);
+				substrings.push_back( sub);
 				
 				if(!sub->loadExp) {
 					stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Error locating variable \"%s\" while parsing string", varname);
-					return NULL;
 				}
 
 				delete[] varname;
@@ -123,7 +118,7 @@ stExp *stNewStringExp(char *theString, stMethod *m, stObject *o, char *file, int
 			/* if we find a \n, then replace the previous char (\) */
 			/* with a newline */
 
-			theString[se->baseSize - 1] = '\n';
+			theString[baseSize - 1] = '\n';
 
 			s++;
 			prev = '\n';
@@ -131,7 +126,7 @@ stExp *stNewStringExp(char *theString, stMethod *m, stObject *o, char *file, int
 			/* if we find a \t, then replace the previous char (\) */
 			/* with a tab */
 
-			theString[se->baseSize - 1] = '\t';
+			theString[baseSize - 1] = '\t';
 
 			s++;
 			prev = '\t';
@@ -139,7 +134,7 @@ stExp *stNewStringExp(char *theString, stMethod *m, stObject *o, char *file, int
 			/* if we find a \", then replace the previous char (\) */
 			/* with a quote mark */
 
-			theString[se->baseSize - 1] = '\"';
+			theString[baseSize - 1] = '\"';
 
 			s++;
 			prev = '\"';
@@ -153,18 +148,18 @@ stExp *stNewStringExp(char *theString, stMethod *m, stObject *o, char *file, int
 
 			prev = 0;
 		} else {
-			theString[se->baseSize++] = sym;
+			theString[baseSize++] = sym;
 
 			s++;
 			prev = sym;
 		}
 	}
 
-	theString[se->baseSize] = 0;
+	theString[baseSize] = 0;
 
-	se->string = slStrdup(theString);
+	string = slStrdup(theString);
 
-	return stExpNew(se, ET_STRING, file, line);
+	type = ET_STRING;
 }
 
 /*!
@@ -234,18 +229,17 @@ int stProcessString(stStringExp *s, stRunInstance *i, brEval *target) {
 	\brief Frees a steve string expression.
 */
 
-void stFreeStringExp(stStringExp *s) {
+stStringExp::~stStringExp() {
 	unsigned int n;
 	stSubstringExp *ss;
 
-	for(n=0;n<s->substrings.size();n++) {
-		ss = s->substrings[n];
-		stExpFree(ss->loadExp);
+	for(n=0;n<substrings.size();n++) {
+		ss = substrings[n];
+		delete ss->loadExp;
 		delete ss;
 	}
 
-	slFree(s->string);
-	delete s;
+	slFree(string);
 }
 
 /*!

@@ -25,6 +25,7 @@
 */
 
 #include "steve.h"
+#include "expression.h"
 
 /*!
 	\brief A simple one-point crossover between two instances, storing the output in a third instance.

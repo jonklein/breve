@@ -20,6 +20,7 @@
 
 #include "steve.h"
 #include "xml.h"
+#include "expression.h"
 
 enum states {
 	XP_ENGINE = 1,

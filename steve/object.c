@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "steve.h"
+#include "expression.h"
 
 extern stSteveData *gSteveData;
 
@@ -462,7 +463,7 @@ stKeywordEntry *stNewKeywordEntry(char *keyword, stVar *v, brEval *defValue) {
 	if(defValue) {
 		copy = new brEval;
 		memcpy(copy, defValue, sizeof(brEval));
-		e->defaultKey = stNewKeyword(keyword, stExpNew(copy, ET_ST_EVAL, NULL, 0));
+		e->defaultKey = new stKeyword(keyword, new stEvalExp(copy, NULL, 0));
 	}
 
 	return e;
@@ -476,7 +477,7 @@ void stFreeKeywordEntry(stKeywordEntry *k) {
 	slFree(k->keyword);
 	stFreeStVar(k->var);
 
-	if(k->defaultKey) stFreeKeyword(k->defaultKey);
+	if(k->defaultKey) delete k->defaultKey;
 
 	delete k;
 }
@@ -534,7 +535,7 @@ void stFreeMethod(stMethod *meth) {
 	std::vector< stVar* >::iterator vi;
 	unsigned int n;
 
-	for(n=0;n<meth->code.size();n++) stExpFree(meth->code[n]);
+	for(n=0;n<meth->code.size();n++) delete meth->code[n];
 	for(n=0;n<meth->keywords.size();n++) stFreeKeywordEntry(meth->keywords[n]);
 
 	slFree(meth->filename);
@@ -892,5 +893,59 @@ void stRemoveFromInstanceLists(stInstance *i) {
 		if(ii != type->allInstances.end()) type->allInstances.erase( ii);
 
 		type = type->super;
+	}
+}
+
+/*!
+	\brief Returns the required alignment for a given stVarType.
+
+	Intended for aligning 8-byte variables (doubles or 64-bit pointers).  
+*/
+
+int stAlign(stVarType *var) {
+	if(var->type == AT_ARRAY) return stAlignAtomic(var->arrayType);
+	return stAlignAtomic(var->type);
+}
+
+/*!
+	\brief Returns the required alignment for a given atomic type.
+
+	Called by \ref stAlign.
+*/
+
+int stAlignAtomic(int type) {
+	switch(type) {
+		case AT_INT:
+			return sizeof(int);
+			break;
+		case AT_DOUBLE:
+			return sizeof(double);
+			break;
+		case AT_VECTOR:
+			return sizeof(double);
+			break;
+		case AT_INSTANCE:
+			return sizeof(stObject*);
+			break;
+		case AT_HASH:
+			return sizeof(brEvalHash*);
+			break;
+		case AT_DATA:
+		case AT_POINTER:
+			return sizeof(void*);
+			break;
+		case AT_STRING:
+			return sizeof(char*);
+			break;
+		case AT_LIST:
+			return sizeof(brEvalList*);
+			break;
+		case AT_MATRIX:
+			return sizeof(double);
+			break;
+		default:
+			slMessage(DEBUG_ALL, "INTERNAL ERROR: stAlign: unknown type %d\n", type);
+			return 0;
+			break;
 	}
 }

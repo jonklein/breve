@@ -66,10 +66,11 @@ int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
 	r = stExpEval(sd->singleStatement, &ri, &target, NULL);
 
 	stGCCollectStack(i->gcStack);
-	slStackFree(i->gcStack);
+	delete i->gcStack;
+
 	i->gcStack = NULL;
 
-	stExpFree(sd->singleStatement);
+	delete sd->singleStatement;
 	delete[] fixedStatement;
 
 	return r;

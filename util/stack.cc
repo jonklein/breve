@@ -62,20 +62,6 @@ slStack *slStackNewWithSize(unsigned int size) {
 }
 
 /*!
-	\brief Frees the stack structure.
-
-	Does not free any data you may have pushed onto the stack.  You have to 
-	do that yourself, you lazy git!
-*/
-
-void slStackFree(slStack *s) {
-	if(!s) return;
-
-	if(s->data) slFree(s->data);
-	delete s;
-}
-
-/*!
 	\brief Pushes data onto a stack.
 */
 

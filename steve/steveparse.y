@@ -31,6 +31,7 @@
 */
 
 #include "steve.h"
+#include "expression.h"
 
 #include <vector>
 
@@ -318,9 +319,9 @@ vector_value
 		e = new brEval;
 		e->type = AT_VECTOR;
 
-		BRVECTOR(e).x = stDoubleFromIntOrDoubleExp($2); stExpFree($2);
-		BRVECTOR(e).y = stDoubleFromIntOrDoubleExp($4); stExpFree($4);
-		BRVECTOR(e).z = stDoubleFromIntOrDoubleExp($6); stExpFree($6);
+		BRVECTOR(e).x = stDoubleFromIntOrDoubleExp($2); delete $2;
+		BRVECTOR(e).y = stDoubleFromIntOrDoubleExp($4); delete $4;
+		BRVECTOR(e).z = stDoubleFromIntOrDoubleExp($6); delete $6;
 
 		$$ = e;
 	}
@@ -333,17 +334,17 @@ matrix_value
 		e = new brEval;
 		e->type = AT_MATRIX;
 
-		BRMATRIX(e)[0][0] = stDoubleFromIntOrDoubleExp($3); stExpFree($3);
-		BRMATRIX(e)[0][1] = stDoubleFromIntOrDoubleExp($5); stExpFree($5);
-		BRMATRIX(e)[0][2] = stDoubleFromIntOrDoubleExp($7); stExpFree($7);
+		BRMATRIX(e)[0][0] = stDoubleFromIntOrDoubleExp($3); delete $3;
+		BRMATRIX(e)[0][1] = stDoubleFromIntOrDoubleExp($5); delete $5;
+		BRMATRIX(e)[0][2] = stDoubleFromIntOrDoubleExp($7); delete $7;
 		
-		BRMATRIX(e)[1][0] = stDoubleFromIntOrDoubleExp($11); stExpFree($11);
-		BRMATRIX(e)[1][1] = stDoubleFromIntOrDoubleExp($13); stExpFree($13);
-		BRMATRIX(e)[1][2] = stDoubleFromIntOrDoubleExp($15); stExpFree($15);
+		BRMATRIX(e)[1][0] = stDoubleFromIntOrDoubleExp($11); delete $11;
+		BRMATRIX(e)[1][1] = stDoubleFromIntOrDoubleExp($13); delete $13;
+		BRMATRIX(e)[1][2] = stDoubleFromIntOrDoubleExp($15); delete $15;
 
-		BRMATRIX(e)[2][0] = stDoubleFromIntOrDoubleExp($19); stExpFree($19);
-		BRMATRIX(e)[2][1] = stDoubleFromIntOrDoubleExp($21); stExpFree($21);
-		BRMATRIX(e)[2][2] = stDoubleFromIntOrDoubleExp($23); stExpFree($23);
+		BRMATRIX(e)[2][0] = stDoubleFromIntOrDoubleExp($19); delete $19;
+		BRMATRIX(e)[2][1] = stDoubleFromIntOrDoubleExp($21); delete $21;
+		BRMATRIX(e)[2][2] = stDoubleFromIntOrDoubleExp($23); delete $23;
 	}
 ;
 
@@ -504,7 +505,7 @@ default_value
 		brEval *e = new brEval;
 		e->type = AT_DOUBLE;
 
-		BRDOUBLE(e) = stDoubleFromIntOrDoubleExp($2); stExpFree($2);
+		BRDOUBLE(e) = stDoubleFromIntOrDoubleExp($2); delete $2;
 
 		$$ = e;
 	}
@@ -627,7 +628,7 @@ method_code
 
 compound_statement
 : '{' code '}' { 
-		$$ = stExpNew($2, ET_CODE_ARRAY, yyfile, lineno);
+		$$ = new stCodeArrayExp($2, yyfile, lineno);
 	}
 ;
 
@@ -647,7 +648,7 @@ statement
 | control_statement { $$ = $1; }
 | simple_statement END { $$ = $1; }
 | simple_statement error { 
-		if($1) stExpFree($1);
+		if($1) delete $1;
 
 		if(brGetError(parseEngine)) YYABORT;
 
@@ -668,7 +669,7 @@ statement
 
 control_statement
 : FOREACH WORD_VALUE WORD_VALUE expression ':' statement {
-		stExp *ae = stNewAssignExp(currentMethod, currentObject, $2, NULL, yyfile, lineno);
+		stAssignExp *ae = new stAssignExp(currentMethod, currentObject, $2, NULL, yyfile, lineno);
 		slFree($2);
 
 		if(strcmp($3, "in")) {
@@ -678,29 +679,28 @@ control_statement
 		slFree($3);
 
 		if(ae) {
-			$$ = stNewForeachExp((stAssignExp*)ae->values.pValue, $4, $6, yyfile, lineno);
-			slFree(ae);
+			$$ = new stForeachExp(ae, $4, $6, yyfile, lineno);
 		} else {
-			stExpFree($4);
-			stExpFree($6);
+			delete $4;
+			delete $6;
 			$$ = NULL;
 		}
 
 	}
 | WHILE expression ':' statement {
-		$$ = stNewWhileExp($2, $4, yyfile, lineno);
+		$$ = new stWhileExp($2, $4, yyfile, lineno);
 	}
 | IF expression ':' statement {
-		$$ = stNewIfExp($2, $4, NULL, yyfile, lineno);
+		$$ = new stIfExp($2, $4, NULL, yyfile, lineno);
 	}
 | IF expression ':' statement else statement {
-		$$ = stNewIfExp($2, $4, $6, yyfile, lineno);
+		$$ = new stIfExp($2, $4, $6, yyfile, lineno);
 	}
 | IF expression ':' EMPTY_LIST else statement {
-		$$ = stNewIfExp($2, NULL, $6, yyfile, lineno);
+		$$ = new stIfExp($2, NULL, $6, yyfile, lineno);
 	}
 | FOR expression ',' expression ',' expression ':' statement {
-		$$ = stNewForExp($2, $4, $6, $8, yyfile, lineno);
+		$$ = new stForExp($2, $4, $6, $8, yyfile, lineno);
 	}
 ;
 
@@ -712,29 +712,29 @@ else
 simple_statement
 : method_call 		{ $$ = $1; }
 | PRINT exp_list { 
-		$$ = stNewPrintExp($2, 1, yyfile, lineno); 
+		$$ = new stPrintExp($2, 1, yyfile, lineno); 
 	}
 | PRINTF exp_list { 
-		$$ = stNewPrintExp($2, 0, yyfile, lineno); 
+		$$ = new stPrintExp($2, 0, yyfile, lineno); 
 	}
 | DIE { 
 		stParseError(parseEngine, PE_SYNTAX, "'die' requires an error message string");
 	}
-| DIE expression	{ $$ = stExpNew($2, ET_DIE, yyfile, lineno); }
+| DIE expression	{ $$ = new stDieExp($2, yyfile, lineno); }
 | expression		{ $$ = $1; }
 | RETURN expression { 
-		$$ = stExpNew($2, ET_RETURN, yyfile, lineno); 
+		$$ = new stReturnExp($2, yyfile, lineno); 
 	}
 | RETURN {
-		$$ = stExpNew(NULL, ET_RETURN, yyfile, lineno); 
+		$$ = new stReturnExp(NULL, yyfile, lineno); 
 	}
 | FREE expression { 
-		$$ = stExpNew($2, ET_FREE, yyfile, lineno); 
+		$$ = new stFreeExp($2, yyfile, lineno); 
 	}
 | WORD_VALUE '=' method_call {
-		$$ = stNewAssignExp(currentMethod, currentObject, $1, $3, yyfile, lineno);
+		$$ = new stAssignExp(currentMethod, currentObject, $1, $3, yyfile, lineno);
 
-		if(!$$) stExpFree($3);
+		if(!$$) delete $3;
 		
 		slFree($1);
 	}
@@ -753,21 +753,14 @@ exp_list
 
 method_call
 : atomic_expression WORD_VALUE keyword_list { 
-		stMethodExp *m;
-
-		m = stNewMethodCall(currentObject, $1, $2, $3);
-		if(m) $$ = stExpNew(m, ET_METHOD, yyfile, lineno);
-		else $$ = NULL;
+		$$ = new stMethodExp($1, $2, $3, yyfile, lineno);
 
 		slFree($2);
 	}
 | atomic_expression WORD_VALUE {
-		stMethodExp *m;
 		std::vector< stKeyword* > keywords;
 
-		m = stNewMethodCall(currentObject, $1, $2, &keywords);
-		if(m) $$ = stExpNew(m, ET_METHOD, yyfile, lineno);
-		else $$ = NULL;
+		$$ = new stMethodExp($1, $2, &keywords, yyfile, lineno);
 
 		slFree($2);
 	}
@@ -776,12 +769,12 @@ method_call
 keyword_list 
 : WORD_VALUE expression {
 		$$ = new std::vector< stKeyword* >();
-		$$->push_back(stNewKeyword((char *)$1, (stExp*)$2));
+		$$->push_back(new stKeyword((char *)$1, (stExp*)$2));
 
 		slFree($1);
 	}
 | keyword_list WORD_VALUE expression {
-		$$->push_back( stNewKeyword($2, (stExp*)$3));
+		$$->push_back(new stKeyword($2, (stExp*)$3));
 
 		slFree($2);
 	}
@@ -792,74 +785,72 @@ expression
 | WORD_VALUE math_assign_operator expression {
 		stExp *loadExp, *binExp;
 
-		loadExp = stNewLoadExp(currentMethod, currentObject, $1, yyfile, lineno);
+		loadExp = new stLoadExp(currentMethod, currentObject, $1, yyfile, lineno);
 
-		binExp = stNewBinaryExp($2, loadExp, $3, yyfile, lineno);
+		binExp = new stBinaryExp($2, loadExp, $3, yyfile, lineno);
 
-		$$ = stNewAssignExp(currentMethod, currentObject, $1, binExp, yyfile, lineno);
+		$$ = new stAssignExp(currentMethod, currentObject, $1, binExp, yyfile, lineno);
 
 		slFree($1);
 	}
 | WORD_VALUE '=' expression {
-		$$ = stNewAssignExp(currentMethod, currentObject, $1, $3, yyfile, lineno);
+		$$ = new stAssignExp(currentMethod, currentObject, $1, $3, yyfile, lineno);
 
-		if(!$$) {
-			stExpFree($3);
-		}
+		if(!$$) delete $3;
 
 		slFree($1);
 	}
 | WORD_VALUE PLUSPLUS {
-		stExp *var = stNewLoadExp(currentMethod, currentObject, $1, yyfile, lineno);
-		stExp *one = stNewIntExp(1, yyfile, lineno);
-		stExp *newExp = stNewBinaryExp(BT_ADD, var, one, yyfile, lineno); 
+		stExp *var = new stLoadExp(currentMethod, currentObject, $1, yyfile, lineno);
+		stExp *one = new stIntExp(1, yyfile, lineno);
+		stExp *newExp = new stBinaryExp(BT_ADD, var, one, yyfile, lineno); 
 
-		$$ = stNewAssignExp(currentMethod, currentObject, $1, newExp, yyfile, lineno);
+		$$ = new stAssignExp(currentMethod, currentObject, $1, newExp, yyfile, lineno);
 
 		slFree($1);
 	}
 | WORD_VALUE MINUSMINUS {
-		stExp *var = stNewLoadExp(currentMethod, currentObject, $1, yyfile, lineno);
-		stExp *one = stNewIntExp(1, yyfile, lineno);
-		stExp *newExp = stNewBinaryExp(BT_SUB, var, one, yyfile, lineno); 
+		stExp *var = new stLoadExp(currentMethod, currentObject, $1, yyfile, lineno);
+		stExp *one = new stIntExp(1, yyfile, lineno);
+		stExp *newExp = new stBinaryExp(BT_SUB, var, one, yyfile, lineno); 
 
-		$$ = stNewAssignExp(currentMethod, currentObject, $1, newExp, yyfile, lineno);
+		$$ = new stAssignExp(currentMethod, currentObject, $1, newExp, yyfile, lineno);
 
 		slFree($1);
 	}
 | atomic_expression vector_element '=' expression {
-		$$ = stNewVectorElementAssignExp($1, $4, $2, yyfile, lineno);
+		$$ = new stVectorElementAssignExp($1, $4, $2, yyfile, lineno);
 	}
 | atomic_expression vector_element math_assign_operator expression {
-		stExp *element = stNewVectorElementExp(stNewDuplicateExp($1, yyfile, lineno), $2, yyfile, lineno);
-		stExp *binaryExp = stNewBinaryExp($3, element, $4, yyfile, lineno);
+		stExp *element = new stVectorElementExp(new stDuplicateExp($1, yyfile, lineno), $2, yyfile, lineno);
+		stExp *binaryExp = new stBinaryExp($3, element, $4, yyfile, lineno);
 
-		$$ = stNewVectorElementAssignExp($1, binaryExp, $2, yyfile, lineno);
+		$$ = new stVectorElementAssignExp($1, binaryExp, $2, yyfile, lineno);
 	}
 | atomic_expression '{' expression'}' '=' expression {
-		$$ = stNewListIndexAssignExp($1, $3, $6, yyfile, lineno);
+		$$ = new stListIndexAssignExp($1, $3, $6, yyfile, lineno);
 	}
 | atomic_expression '{' expression'}' math_assign_operator expression {
 		stExp *loadExp, *binExp;
 
-		loadExp = stNewListIndexExp($1, $3, yyfile, lineno);
-		binExp = stNewBinaryExp($5, loadExp, $6, yyfile, lineno);
+		loadExp = new stListIndexExp($1, $3, yyfile, lineno);
+		binExp = new stBinaryExp($5, loadExp, $6, yyfile, lineno);
 
 		// we're reusing $1 and $3 -- so we have to "duplicate" them
 
-		$$ = stNewListIndexAssignExp(stNewDuplicateExp($1, yyfile, lineno), stNewDuplicateExp($3, yyfile, lineno), binExp, yyfile, lineno);
+		$$ = new stListIndexAssignExp(new stDuplicateExp($1, yyfile, lineno), new stDuplicateExp($3, yyfile, lineno), binExp, yyfile, lineno);
 	}
 | WORD_VALUE '[' expression']' '=' expression {
-		$$ = stNewArrayIndexAssignExp(currentMethod, currentObject, $1, $3, $6, yyfile, lineno);
+		$$ = new stArrayIndexAssignExp(currentMethod, currentObject, $1, $3, $6, yyfile, lineno);
 		slFree($1);
 	}
 | WORD_VALUE '[' expression']' math_assign_operator expression {
 		stExp *loadExp, *binExp;
 
-		loadExp = stNewArrayIndexExp(currentMethod, currentObject, $1, $3, yyfile, lineno);
-		binExp = stNewBinaryExp($5, loadExp, $6, yyfile, lineno);
+		loadExp = new stArrayIndexExp(currentMethod, currentObject, $1, $3, yyfile, lineno);
+		binExp = new stBinaryExp($5, loadExp, $6, yyfile, lineno);
 
-		$$ = stNewArrayIndexAssignExp(currentMethod, currentObject, $1, stNewDuplicateExp($3, yyfile, lineno), binExp, yyfile, lineno);
+		$$ = new stArrayIndexAssignExp(currentMethod, currentObject, $1, new stDuplicateExp($3, yyfile, lineno), binExp, yyfile, lineno);
 
 		slFree($1);
 	}
@@ -876,85 +867,85 @@ math_assign_operator
 
 log_expression
 : log_expression LOR log_expression { 
-		$$ = stNewBinaryExp(BT_LOR, $1, $3, yyfile, lineno); 
+		$$ = new stBinaryExp(BT_LOR, $1, $3, yyfile, lineno); 
 	}
 | land_expression
 ;
 
 land_expression
 : land_expression LAND land_expression { 
-		$$ = stNewBinaryExp(BT_LAND, $1, $3, yyfile, lineno);
+		$$ = new stBinaryExp(BT_LAND, $1, $3, yyfile, lineno);
 	}
 | comp_expression
 ; 
 
 comp_expression
 : comp_expression EQ comp_expression { 
-		$$ = stNewBinaryExp(BT_EQ, $1, $3, yyfile, lineno); 
+		$$ = new stBinaryExp(BT_EQ, $1, $3, yyfile, lineno); 
 	}
 | comp_expression NE comp_expression { 
-		$$ = stNewBinaryExp(BT_NE, $1, $3, yyfile, lineno); 
+		$$ = new stBinaryExp(BT_NE, $1, $3, yyfile, lineno); 
 	}
 | comp_expression GE comp_expression { 
-		$$ = stNewBinaryExp(BT_GE, $1, $3, yyfile, lineno); 
+		$$ = new stBinaryExp(BT_GE, $1, $3, yyfile, lineno); 
 	}
 | comp_expression GT comp_expression { 
-		$$ = stNewBinaryExp(BT_GT, $1, $3, yyfile, lineno); 
+		$$ = new stBinaryExp(BT_GT, $1, $3, yyfile, lineno); 
 	}
 | comp_expression LE comp_expression { 
-		$$ = stNewBinaryExp(BT_LE, $1, $3, yyfile, lineno); 
+		$$ = new stBinaryExp(BT_LE, $1, $3, yyfile, lineno); 
 	}
 | comp_expression LT comp_expression { 
-		$$ = stNewBinaryExp(BT_LT, $1, $3, yyfile, lineno); 
+		$$ = new stBinaryExp(BT_LT, $1, $3, yyfile, lineno); 
 	}
 | add_expression
 ;
 
 add_expression 
 : add_expression '+' add_expression { 
-		$$ = stNewBinaryExp(BT_ADD, $1, $3, yyfile, lineno); 
+		$$ = new stBinaryExp(BT_ADD, $1, $3, yyfile, lineno); 
 	}
 | add_expression '-' add_expression { 
-		$$ = stNewBinaryExp(BT_SUB, $1, $3, yyfile, lineno); 
+		$$ = new stBinaryExp(BT_SUB, $1, $3, yyfile, lineno); 
 	}
 | mul_expression			{ $$ = $1; }
 ;
 
 mul_expression
 : mul_expression '*' mul_expression { 
-		$$ = stNewBinaryExp(BT_MUL, $1, $3, yyfile, lineno); 
+		$$ = new stBinaryExp(BT_MUL, $1, $3, yyfile, lineno); 
 	}
 | mul_expression '/' mul_expression { 
-		$$ = stNewBinaryExp(BT_DIV, $1, $3, yyfile, lineno); 
+		$$ = new stBinaryExp(BT_DIV, $1, $3, yyfile, lineno); 
 	}
 | mul_expression '%' mul_expression { 
-		$$ = stNewBinaryExp(BT_MOD, $1, $3, yyfile, lineno); 
+		$$ = new stBinaryExp(BT_MOD, $1, $3, yyfile, lineno); 
 	}
 | mul_expression '^' mul_expression { 
-		$$ = stNewBinaryExp(BT_POW, $1, $3, yyfile, lineno); 
+		$$ = new stBinaryExp(BT_POW, $1, $3, yyfile, lineno); 
 	}
 | unary_expression			{ $$ = $1; }
 ;
 
 unary_expression 
-: '!' unary_expression	{ $$ = stNewUnaryExp(UT_NOT, $2, yyfile, lineno); }
-| '-' unary_expression	{ $$ = stNewUnaryExp(UT_MINUS, $2, yyfile, lineno); }
+: '!' unary_expression	{ $$ = new stUnaryExp(UT_NOT, $2, yyfile, lineno); }
+| '-' unary_expression	{ $$ = new stUnaryExp(UT_MINUS, $2, yyfile, lineno); }
 | atomic_expression 	{ $$ = $1; }
 | POP atomic_expression {
-		$$ = stNewListRemoveExp($2, NULL, yyfile, lineno);
+		$$ = new stListRemoveExp($2, NULL, yyfile, lineno);
 	}
 | UNPREPEND atomic_expression {
-		$$ = stNewListRemoveExp($2, stNewIntExp(0, yyfile, lineno), yyfile, lineno);
+		$$ = new stListRemoveExp($2, new stIntExp(0, yyfile, lineno), yyfile, lineno);
 	}
 | PUSH expression WORD_VALUE atomic_expression {
 		if(strcmp($3, "onto")) {
 			stParseError(parseEngine, PE_SYNTAX, "Expecting \"onto <expression>\" after \"push\" operator");
 			slFree($3);
-			stExpFree($2);
-			stExpFree($4);
+			delete $2;
+			delete $4;
 			$$ = NULL;
 		} else {
-			$$ = stNewListInsertExp($4, $2, NULL, yyfile, lineno);
+			$$ = new stListInsertExp($4, $2, NULL, yyfile, lineno);
 			slFree($3);
 		}
 	}
@@ -962,11 +953,11 @@ unary_expression
 		if(strcmp($3, "onto")) {
 			stParseError(parseEngine, PE_SYNTAX, "Expecting \"onto <expression>\" after \"append\" operator");
 			slFree($3);
-			stExpFree($2);
-			stExpFree($4);
+			delete $2;
+			delete $4;
 			$$ = NULL;
 		} else {
-			$$ = stNewListInsertExp($4, $2, stNewIntExp(1, yyfile, lineno), yyfile, lineno);
+			$$ = new stListInsertExp($4, $2, new stIntExp(1, yyfile, lineno), yyfile, lineno);
 			slFree($3);
 		}
 	}
@@ -974,82 +965,79 @@ unary_expression
 		if(strcmp($3, "at")) {
 			stParseError(parseEngine, PE_SYNTAX, "Expecting \"at <expression>\" after \"insert\" operator");
 			slFree($3);
-			stExpFree($2);
-			stExpFree($4);
-			stExpFree($6);
+			delete $2;
+			delete $4;
+			delete $6;
 		} else {
-			$$ = stNewListInsertExp($4, $2, $6, yyfile, lineno);
+			$$ = new stListInsertExp($4, $2, $6, yyfile, lineno);
 			slFree($3);
 		}
 	}
 | REMOVE atomic_expression '{' expression '}' {
-		$$ = stNewListRemoveExp($2, $4, yyfile, lineno);
+		$$ = new stListRemoveExp($2, $4, yyfile, lineno);
 	}
 | SORT atomic_expression WORD_VALUE WORD_VALUE {
 		if(strcmp($3, "with")) {
 			stParseError(parseEngine, DEBUG_ALL, "Expecting \"with <method_name>\" after \"sort\" operator");
 			slFree($3);
 			slFree($4);
-			stExpFree($2);
+			delete $2;
 			$$ = NULL;
 		} else {
-			$$ = stNewSortExp($2, $4, yyfile, lineno);
+			$$ = new stSortExp($2, $4, yyfile, lineno);
 			slFree($3);
 			slFree($4);
 		}
 	}
 | COPYLIST atomic_expression {
-	$$ = stExpNew($2, ET_COPYLIST, yyfile, lineno);
+	$$ = new stCopyListExp($2, yyfile, lineno);
 }
 ;
 
 atomic_expression
 : literal_value
-| atomic_expression vector_element { $$ = stNewVectorElementExp($1, $2, yyfile, lineno); }
+| atomic_expression vector_element { $$ = new stVectorElementExp($1, $2, yyfile, lineno); }
 | '|' expression '|' { 
-		$$ = stExpNew($2, ET_LENGTH, yyfile, lineno); 
+		$$ = new stLengthExp($2, yyfile, lineno); 
 	}
-| ST_EVAL		{ $$ = stNewStEvalExp($1, yyfile, lineno); }
+| ST_EVAL		{ $$ = new stEvalExp($1, yyfile, lineno); }
 | atomic_expression '{' expression '}' { 
-		$$ = stNewListIndexExp($1, $3, yyfile, lineno); 
+		$$ = new stListIndexExp($1, $3, yyfile, lineno); 
 	}
 | WORD_VALUE '[' expression ']' {
-		$$ = stNewArrayIndexExp(currentMethod, currentObject, $1, $3, yyfile, lineno);
+		$$ = new stArrayIndexExp(currentMethod, currentObject, $1, $3, yyfile, lineno);
 
 		slFree($1);
 
-		if(!$$) {
-			/* this parse error is handled by stNewLoadExp */
-			stExpFree($3);
-		}
+		if(!$$) delete $3;
 	}
 | WORD_VALUE { 
-		$$ = stNewLoadExp(currentMethod, currentObject, $1, yyfile, lineno);
+		$$ = new stLoadExp(currentMethod, currentObject, $1, yyfile, lineno);
 
 		slFree($1);
 
 		if(!$$) {
-			/* this parse error is handled by stNewLoadExp */
+			/* this parse error is handled by new stLoadExp */
 		}
 	}
 | SUPER {
-		$$ = stExpNew(NULL, ET_SUPER, yyfile, lineno);
+		$$ = new stSuperExp(yyfile, lineno);
 	}
 | SELF {
-		$$ = stExpNew(NULL, ET_SELF, yyfile, lineno);
+		$$ = new stSelfExp(yyfile, lineno);
 	}
 | NEW WORD_VALUE { 
-		$$ = stInstanceNewExp($2, stNewIntExp(1, yyfile, lineno), yyfile, lineno); 
+		$$ = new stInstanceExp($2, new stIntExp(1, yyfile, lineno), yyfile, lineno); 
 		slFree($2);
 	}
 | NEW STRING_VALUE { 
 		char *unquoted = slDequote($2);;
-		$$ = stInstanceNewExp(unquoted, stNewIntExp(1, yyfile, lineno), yyfile, lineno); 
+		$$ = new stInstanceExp(unquoted, new stIntExp(1, yyfile, lineno), yyfile, lineno); 
 		slFree($2);
 		slFree(unquoted);
 	}
 | atomic_expression NEW WORD_VALUE { 
-		$$ = stInstanceNewExp($3, $1, yyfile, lineno); 
+		$$ = new stInstanceExp($3, $1, yyfile, lineno); 
 		slFree($3);
 	}
 | '(' expression ')'		{ $$ = $2; }
@@ -1059,13 +1047,13 @@ atomic_expression
 	}
 | '(' method_call ')'		{ $$ = $2; }
 | RANDOM '[' expression	']' { 
-		$$ = stExpNew($3, ET_RANDOM, yyfile, lineno); 
+		$$ = new stRandomExp($3, yyfile, lineno); 
 	}
 | '{' exp_list '}' {
-		$$ = stExpNew($2, ET_LIST, yyfile, lineno);
+		$$ = new stListExp($2, yyfile, lineno);
 	}
 | EMPTY_LIST {
-		$$ = stExpNew(NULL, ET_LIST, yyfile, lineno);
+		$$ = new stListExp(NULL, yyfile, lineno);
 	}
 | WORD_VALUE '(' exp_list ')' { 
 		brInternalFunction *func = brEngineInternalFunctionLookup(parseEngine, $1);
@@ -1074,13 +1062,13 @@ atomic_expression
 			unsigned int n;
 			stParseError(parseEngine, PE_UNKNOWN_FUNCTION, "Internal function \"%s\" not found", $1);
 
-			for(n=0; n < $3->size(); n++) stExpFree((*$3)[n]);
+			for(n=0; n < $3->size(); n++) delete (*$3)[n];
 
 			delete $3;
 			slFree($1);
 			$$ = NULL;
 		} else {
-			$$ = stNewCCallExp(parseEngine, func, $3, yyfile, lineno); 
+			$$ = new stCCallExp(parseEngine, func, $3, yyfile, lineno); 
 			slFree($1);
 		}
 	}
@@ -1092,17 +1080,17 @@ atomic_expression
 			slFree($1);
 			$$ = NULL;
 		} else {
-			$$ = stNewCCallExp(parseEngine, func, NULL, yyfile, lineno); 
+			$$ = new stCCallExp(parseEngine, func, NULL, yyfile, lineno); 
 
 			slFree($1);
 
 			if(!$$) {
-				/* this error is handled by stNewCCallExp */
+				/* this error is handled by new stCCallExp */
 			}
 		}
 	}
 | ALL WORD_VALUE {
-		$$ = stNewAllExp($2, yyfile, lineno);
+		$$ = new stAllExp($2, yyfile, lineno);
 		slFree($2);
 	}
 | WORD_VALUE '.' WORD_VALUE '(' exp_list ')' {
@@ -1120,13 +1108,13 @@ literal_value
 
 matrix
 : '[' '(' expression ',' expression ',' expression ')' ',' '(' expression ',' expression ',' expression ')' ',' '(' expression ',' expression ',' expression ')' ']' {
-		$$ = stNewMatrixExp($3, $5, $7, $11, $13, $15, $19, $21, $23, yyfile, lineno);
+		$$ = new stMatrixExp($3, $5, $7, $11, $13, $15, $19, $21, $23, yyfile, lineno);
 	}
 ;
 
 vector
 : '(' expression ',' expression ',' expression ')' { 
-		$$ = stNewVectorExp($2, $4, $6, yyfile, lineno); 
+		$$ = new stVectorExp($2, $4, $6, yyfile, lineno); 
 	}
 ;
 
@@ -1139,23 +1127,19 @@ vector_element
 string
 : STRING_VALUE { 
 		char *unquoted = slDequote($1);
-		$$ = stNewStringExp(unquoted, currentMethod, currentObject, yyfile, lineno);
+		$$ = new stStringExp(unquoted, currentMethod, currentObject, yyfile, lineno);
 
 		slFree($1);
 		slFree(unquoted);
 
 		if(!$$) {
-			// this error is handled by stNewStringExp 
+			// this error is handled by new stStringExp 
 		}
 	}
 ;
 
 type
 : '(' TYPE ')' {
-		// int type = stGetTypeForString($2);
-		// slFree($2);
-		// $$ = stVarTypeNew(type, AT_NULL, 0, NULL);
-
 		$$ = stVarTypeNew($2, AT_NULL, 0, NULL);
 	}
 | '(' WORD_VALUE TYPE ')' {
@@ -1182,8 +1166,8 @@ type
 ;
 
 number
-: INT_VALUE	 		{ $$ = stNewIntExp($1, yyfile, lineno); }
-| FLOAT_VALUE	   		{ $$ = stNewDoubleExp($1, yyfile, lineno); }
+: INT_VALUE	 		{ $$ = new stIntExp($1, yyfile, lineno); }
+| FLOAT_VALUE	   		{ $$ = new stDoubleExp($1, yyfile, lineno); }
 ;
 
 %%
@@ -1207,8 +1191,8 @@ void stParseSetSteveData(stSteveData *data) {
 }
 
 double stDoubleFromIntOrDoubleExp(stExp *e) {
-	if(e->type == ET_DOUBLE) return e->values.dValue;
-	if(e->type == ET_INT) return (double)e->values.iValue;
+	if(e->type == ET_DOUBLE) return ((stDoubleExp*)e)->doubleValue;
+	if(e->type == ET_INT) return (double)((stIntExp*)e)->intValue;
 
 	return 0.0;
 }

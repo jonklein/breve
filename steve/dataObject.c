@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "steve.h"
+#include "expression.h"
 
 int brDataCopyObject(stInstance *src, stInstance *dst) {
 	std::map< std::string, stVar* >::iterator vi;

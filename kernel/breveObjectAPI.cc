@@ -415,7 +415,7 @@ void brObjectFree(brObject *o) {
 		delete h;
 	}
 
-	slStackFree(o->collisionHandlers);
+	delete o->collisionHandlers;
 	slFree(o->name);
 	delete o;
 }
@@ -473,7 +473,7 @@ void brInstanceFree(brInstance *i) {
 		delete menu;
     }
 
-	slStackFree(i->menus);
+	delete i->menus;
 
 	if(i->iterate) brMethodFree(i->iterate);
 	if(i->postIterate) brMethodFree(i->postIterate);

@@ -246,7 +246,8 @@ int brParseArgs(int argc, char **argv) {
 				break;
 			case 'n':
 				gNotify = atof(optarg);
-				printf("notification every %f seconds\n", gNotify);
+				if(gNotify) printf("Notification every %f seconds\n", gNotify);
+				else printf("Notifications disabled\n");
 				break;
 			case 't':
 				gSimMax = atof(optarg);

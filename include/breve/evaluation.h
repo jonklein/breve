@@ -69,8 +69,9 @@ if (_loadExp) { \
 
 int brEvalCopy(brEval *s, brEval *d);
 
-inline int stEvalFree(stExp *, stRunInstance *, brEval *);
-inline int stEvalArray(std::vector< stExp* > *, stRunInstance *, brEval *);
+inline int stEvalFree(stFreeExp *, stRunInstance *, brEval *);
+inline int stEvalCodeArray(stCodeArrayExp *a, stRunInstance *, brEval *);
+inline int stEvalExpVector(std::vector< stExp* > *a, stRunInstance *, brEval *);
 inline int stEvalMethodCall(stMethodExp *, stRunInstance *, brEval *);
 inline int stRealEvalMethodCall(stMethodExp *, stRunInstance *, stRunInstance *, brEval *);
 int stEvalForeignMethodCall(stMethodExp *, brInstance *, stRunInstance *, brEval *);
@@ -79,7 +80,7 @@ inline int stEvalCallFunc(stCCallExp *, stRunInstance *, brEval *);
 
 inline int stEvalAssignment(stAssignExp *, stRunInstance *, brEval *);
 
-inline int stEvalListExp(slList *, stRunInstance *, brEval *);
+inline int stEvalListExp(stListExp *, stRunInstance *, brEval *);
 
 inline int stPointerForExp(stExp *, stRunInstance *, void **, int *);
 inline int stEvalLoadPointer(stLoadExp *, stRunInstance *, void **, int *);
@@ -91,7 +92,7 @@ inline int stEvalArrayIndexAssign(stArrayIndexAssignExp *, stRunInstance *, brEv
 inline int stEvalArrayIndex(stArrayIndexExp *, stRunInstance *, brEval *);
 
 inline int stEvalPrint(stPrintExp *, stRunInstance *, brEval *);
-inline int stEvalRandExp(stExp *, stRunInstance *, brEval *);
+inline int stEvalRandExp(stRandomExp *, stRunInstance *, brEval *);
 
 inline int stToDouble(brEval *, brEval *, stRunInstance *);
 inline int stToInt(brEval *, brEval *, stRunInstance *);
