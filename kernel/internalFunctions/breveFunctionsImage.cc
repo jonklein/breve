@@ -93,6 +93,9 @@ int brIImageSetValueAtCoordinates(brEval args[], brEval *result, brInstance *i) 
 	int y = BRINT(&args[2]);
 	int value = 255 * BRDOUBLE(&args[3]);
 
+	if(value > 255) value = 255;
+	else if(value < 0) value = 0;
+
 	if(x < 0 || x >= (dm->x * 4) || y < 0 || y >= dm->y) {
 		slMessage(DEBUG_ALL, "data matrix access (%d, %d) out of bounds (%d, %d)\n", x, y, dm->x, dm->y);
 		return EC_OK;
@@ -169,7 +172,7 @@ int brIImageUpdateTexture(brEval args[], brEval *result, brInstance *i) {
 
 	if(image->textureNumber == -1) image->textureNumber = slTextureNew(i->engine->camera);
 
-   	slUpdateTexture(i->engine->world, image->textureNumber, image->data, image->x, image->y, GL_RGBA);
+   	slUpdateTexture(i->engine->camera, image->textureNumber, image->data, image->x, image->y, GL_RGBA);
 
 	BRINT(result) = image->textureNumber;
 
@@ -272,7 +275,6 @@ int brIImageDataFree(brEval args[], brEval *result, brInstance *i) {
 
 	return EC_OK;
 }
-
 /*@}*/
 
 void breveInitImageFunctions(brNamespace *n) {

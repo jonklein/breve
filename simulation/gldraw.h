@@ -23,7 +23,7 @@
 // options passed to slRenderObjects to control how objects are rendered. 
 
 enum drawOptions {
-    /* control what types of objects are drawn */
+    // control what types of objects are drawn 
 
     DO_NO_STATIONARY			= 0x000001,
     DO_NO_LINK					= 0x000002,
@@ -43,9 +43,13 @@ enum drawOptions {
     DO_NO_ALPHA					= 0x001000,
     DO_ONLY_ALPHA				= 0x002000,
 
+	// load names for selections
+
+    DO_LOAD_NAMES				= 0x004000,
+
     // recompile flag 
 
-    DO_RECOMPILE				= 0x004000
+    DO_RECOMPILE				= 0x008000
 };
 
 #ifdef __cplusplus 
@@ -54,8 +58,8 @@ extern "C" {
 void slInitGL(slWorld *w, slCamera *c);
 unsigned int slTextureNew(slCamera *c);
 void slTextureFree(slCamera *c, unsigned int texture);
-int slUpdateTexture(slWorld *w, GLuint texNum, unsigned char *pixels, int width, int height, int p);
-void slRenderScene(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor);
+int slUpdateTexture(slCamera *c, GLuint texNum, unsigned char *pixels, int width, int height, int p);
+void slRenderScene(slWorld *w, slCamera *c, int crosshair);
 int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y, slVector *dragVector);
 int slGlSelect(slWorld *w, slCamera *c, int x, int y);
 
@@ -70,7 +74,7 @@ void slMatrixGLMult(double m[3][3]);
 
 void slCompileCubeDrawList(int l);
 
-void slRenderWorld(slWorld *w, slCamera *c, int recompile, int render_mode, int crosshair, int scissor);
+void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor);
 void slRenderWorldToBuffer(slWorld *w, slCamera *c, char *r, char *g, char *b, char *temp);
 
 void slDrawBackground(slCamera *c, slWorld *w);
@@ -81,7 +85,7 @@ void slShadowPass(slWorld *w, slCamera *c);
 
 void slRenderLabels(slWorld *w);
 
-void slRenderObjects(slWorld *w, slCamera *c, int loadNames, int flags);
+void slRenderObjects(slWorld *w, slCamera *c, unsigned int flags);
 void slRenderLines(slWorld *w, slCamera *c);
 
 void slRenderText(slWorld *w, slCamera *c, slVector *loc, slVector *target, int crosshair);

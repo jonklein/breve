@@ -1,7 +1,7 @@
 
-                    breve source code release - version 2.0
+                  - breve source code release - version 2.1 -
                          http://www.spiderland.org/breve
-                                jk@spiderland.org
+                              jk@spiderland.org
 
                              -- INTRODUCTION --
 
@@ -98,6 +98,8 @@ Optional:
   libffmpeg
   libpush
   libenet
+  libgsl
+  libgslcblas (or other BLAS library)
 
 
                     --- REQUIRED LIBRARIES: DETAILS ---
@@ -178,6 +180,23 @@ Optional:
   http://enet.cubik.org/
 
   Very optional.  Not yet used for any release-quality features.
+
++ [optional] libgsl, GNU scientific library
+  http://www.gnu.org
+
+  Provides support for the Matrix and Random Number Generation classes.
+  If libgsl is present, libgslblas or another BLAS library must also be 
+  present.
+
++ [optional] libgslblas, or other Basic Linear Algebra Subroutines library
+  http://www.gnu.org
+
+  A library of subroutines required by libgsl.  Distributed with GSL. 
+  This library may be replaced by other implementations of the BLAS 
+  library.
+
+  On Mac OS X, the System vecLib framework is used, which provides AltiVec
+  hardware acceleration on supported chips.
 
 
                                 -- License --

@@ -39,10 +39,10 @@ int breveMovieCreate(brEval args[], brEval *result, brInstance *i) {
 	return EC_OK;
 }
 
-int breveMovieAddGLFrame(brEval args[], brEval *result, brInstance *i) {
+int breveMovieAddWorldFrame(brEval args[], brEval *result, brInstance *i) {
 	slMovie *movie = BRPOINTER(&args[0]);
 
-	BRINT(result) = slMovieAddGLFrame(movie, i->engine->camera);
+	BRINT(result) = slMovieAddWorldFrame(movie, i->engine->world, i->engine->camera);
 
 	return EC_OK;
 }
@@ -74,7 +74,7 @@ int breveSnapshot(brEval args[], brEval *result, brInstance *i) {
 	slRenderWorld(i->engine->world, i->engine->camera, 0, GL_RENDER, 0, 0);
 #endif /* HAVE_LIBOSMESA */
 
-	BRINT(result) = slPNGSnapshot(c, path);
+	BRINT(result) = slPNGSnapshot(i->engine->world, c, path);
 	slFree(path);
 
 	return EC_OK;
@@ -107,7 +107,7 @@ int breveSnapshotUnsupported(brEval args[], brEval *result, brInstance *i) {
 void breveInitMovieFunctions(brNamespace *n) {
 #ifdef HAVE_LIBAVCODEC
 	brNewBreveCall(n, "movieCreate", breveMovieCreate, AT_POINTER, AT_STRING, 0);
-	brNewBreveCall(n, "movieAddGLFrame", breveMovieAddGLFrame, AT_INT, AT_POINTER, 0);
+	brNewBreveCall(n, "movieAddWorldFrame", breveMovieAddWorldFrame, AT_INT, AT_POINTER, 0);
 	brNewBreveCall(n, "movieClose", breveMovieClose, AT_INT, AT_POINTER, 0);
 #else 
 	brNewBreveCall(n, "movieCreate", breveMovieUnsupported, AT_POINTER, AT_STRING, 0);

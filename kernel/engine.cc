@@ -261,7 +261,7 @@ void brEngineFree(brEngine *e) {
 
 	slListFree(e->freedInstances);
 
-	brNamespaceFreeWithFunction(e->internalMethods, (void(*)(void*))brFreeInternalFunction);
+	brNamespaceFreeWithFunction(e->internalMethods, (void(*)(void*))brFreeBreveCall);
 	brFreeObjectSpace(e->objects);
 
 	brFreeSearchPath(e);
@@ -532,7 +532,7 @@ char *brFindFile(brEngine *e, char *file, struct stat *st) {
 */
 
 void brEngineRenderWorld(brEngine *e, int crosshair) {
-    slRenderScene(e->world, e->camera, 0, GL_RENDER, crosshair, 0);
+    slRenderScene(e->world, e->camera, crosshair);
 }
 
 /*@}*/
@@ -613,19 +613,6 @@ void brEventFree(brEvent *e) {
 void brMakeiTunesData(brEngine *e) {
 	e->iTunesData = slMalloc(sizeof(briTunesData));
 	e->iTunesData->data = NULL;
-}
-
-/*!
-	\brief Frees memory associated with an internal function.
-	
-	Used internally when the brEngine struct is destroyed.
-*/
-
-void brFreeInternalFunction(void *d) {
-	brInternalFunction *i = d;
-
-	slFree(i->name);
-	slFree(i);
 }
 
 /*!

@@ -172,7 +172,8 @@ struct slCamera {
 
 	double fov;
 
-	void (*activateContextCallback)();
+	int (*activateContextCallback)();
+	int (*renderContextCallback)(slWorld *w, slCamera *c);
 };
 
 void slCameraUpdateFrustum(slCamera *c);

@@ -265,8 +265,8 @@ void brEngineRemoveInstanceObserver(brInstance *i, brInstance *observerInstance,
 int brInstanceAddDependency(brInstance *i, brInstance *dependency) {
     if(!i || !dependency) return 0;
 
-    if(!slInList(i->dependencies, dependency)) i->dependencies = slListAppend(i->dependencies, dependency);
-    if(!slInList(dependency->dependents, i)) dependency->dependents = slListAppend(dependency->dependents, i);
+    if(!slInList(i->dependencies, dependency)) i->dependencies = slListPrepend(i->dependencies, dependency);
+    if(!slInList(dependency->dependents, i)) dependency->dependents = slListPrepend(dependency->dependents, i);
 
     return 1;
 }

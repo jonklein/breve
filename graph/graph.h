@@ -18,6 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _GRAPH_H
+#define _GRAPH_H
+
 #include "util.h"
 #include "glIncludes.h"
 
@@ -85,3 +88,5 @@ void slGraphAddLineValue(slGraph *graph, int ln, float x, float y);
 void slGraphLineFree(slGraphLine *graphLine);
 
 #include "draw.h"
+
+#endif

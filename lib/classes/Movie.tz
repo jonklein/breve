@@ -29,7 +29,7 @@ Abstract : Movie {
 	- to add-frame-from-display:
 		% Add a frame from the current simulation display.
 
-		if moviePointer: movieAddGLFrame(moviePointer).
+		if moviePointer: movieAddWorldFrame(moviePointer).
 
 	+ to destroy:
 		self close.

@@ -71,6 +71,20 @@ int stXMLAssignIndices(brEngine *e) {
 	return top;
 }
 
+stInstance *stXMLFindDearchivedInstance(slList *l, int n) {
+	stInstance *i;
+
+	while(l) {
+		i = l->data;
+
+		if(i->index == n) return i;
+
+		l = l->next;
+	}
+
+	return NULL;
+}
+
 int stXMLWriteObjectToFile(stInstance *i, char *filename, int isDataObject) {
 	FILE *file;
 	int r;
@@ -181,7 +195,7 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 
 	o = i->type;
 
-	record->instances = slListAppend(record->instances, i);
+	record->instances = slListPrepend(record->instances, i);
 
 	// make sure the dependencies are archived first
 
@@ -672,7 +686,7 @@ stInstance *stXMLDearchiveObjectFromString(brEngine *e, char *buffer) {
 
 	dearchivedInstance = stXMLFindDearchivedInstance(parserState.instances, parserState.archiveIndex);
 
-	stXMLRunDearchiveMethods(parserState.instances);
+	result = stXMLRunDearchiveMethods(parserState.instances);
 
 	if(parserState.error) result = -1;
 
@@ -858,6 +872,7 @@ void stXMLObjectStartElementHandler(stXMLParserState *userData, const XML_Char *
 	const char *objectName = NULL;
 	int controllerIndex = 0, index = 0, archiveIndex = 0;
 	brNamespaceSymbol *symbol;
+	stInstance *steveInstance;
 
 	if(userData->error != 0) return;
 
@@ -911,7 +926,14 @@ void stXMLObjectStartElementHandler(stXMLParserState *userData, const XML_Char *
 		case XP_OBJECT:
 			// we don't see the character data for this one 
 			state->eval.type = AT_INSTANCE;
-			STINSTANCE(&state->eval) = stXMLFindDearchivedInstance(userData->instances, index);
+
+			steveInstance = stXMLFindDearchivedInstance(userData->instances, index);
+			if(steveInstance) {
+				BRINSTANCE(&state->eval) = steveInstance->breveInstance;
+			} else {
+				BRINSTANCE(&state->eval) = NULL;
+			}
+
 			break;
 		case XP_POINTER:
 			BRINSTANCE(&state->eval) = 0;
@@ -1101,7 +1123,7 @@ void stXMLObjectEndElementHandler(stXMLParserState *userData, const XML_Char *na
 				state->arrayIndex++;
 				break;
 			case XP_DEPENDENCIES:
-				brInstanceAddDependency(userData->currentInstance->breveInstance, STINSTANCE(&lastState->eval)->breveInstance);
+				brInstanceAddDependency(userData->currentInstance->breveInstance, BRINSTANCE(&lastState->eval));
 				break;
 		} 
 	}
@@ -1154,20 +1176,6 @@ void stPrintXMLError(XML_Parser p) {
 	int col = XML_GetCurrentColumnNumber(p);
 
 	slMessage(DEBUG_ALL, "Error at line %d (character %d) of saved simulation file: %s\n", line, col, XML_ErrorString(XML_GetErrorCode(p)));
-}
-
-stInstance *stXMLFindDearchivedInstance(slList *l, int n) {
-	stInstance *i;
-
-	while(l) {
-		i = l->data;
-
-		if(i->index == n) return i;
-
-		l = l->next;
-	}
-
-	return NULL;
 }
 
 /*!

@@ -1,3 +1,6 @@
+#ifndef _BREVEOBJECTAPI_H
+#define _BREVEOBJECTAPI_H
+
 enum allocStatus { 
 	AS_DEARCHIVING = -2,        // allocated, but not ready for use
 	AS_RELEASED,                // still allocated, but ready to be freed
@@ -131,6 +134,9 @@ struct brObserver {
 
 /*@}*/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 // registering a new object type
 
 void brEngineRegisterObjectType(brEngine *e, brObjectType *t);
@@ -176,3 +182,8 @@ void brInstanceRelease(brInstance *i);
 void brObjectFree(brObject *o);
 void brInstanceFree(brInstance *i);
 void brMethodFree(brMethod *i);
+#ifdef __cplusplus
+}
+#endif
+
+#endif

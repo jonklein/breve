@@ -18,6 +18,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _KERNEL_H
+#define _KERNEL_H
+
+
 /*!
 	\mainpage The breve Simulation Environment: source documentation
 
@@ -72,6 +76,8 @@
 
 #include "kernelTypedefs.h"
 
+#include "internal.h"
+
 #include "engine.h"
 
 #include "breveObjectAPI.h"
@@ -88,7 +94,6 @@
 
 #include "evalListCopy.h"
 
-#include "internal.h"
 #include "callback.h"
 
 #include "plugins.h"
@@ -101,3 +106,5 @@
 
 #include "format.h"
 #include "interface.h"
+
+#endif /* _KERNEL_H */

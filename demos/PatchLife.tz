@@ -1,10 +1,19 @@
 # 
+# PatchLife -- Game of Life simulation
+# jon klein <jk@spiderland.org>
+#
 # This demos uses the "patches" to implement Conway's classic "Game of Life" 
 # simulation.  This file demonstrates how patches can be used to partition 
 # space into smaller areas.  These patches can be used to implement cellular
 # automata (as in this simulation), or to associate certain areas of space 
 # with different values (like temperature, or chemical concentrations).
 #
+# When the simulation is running, the following keys can control the state
+# of the simulation:
+# 	C -- clear all the cells and set their states to "off"
+#   R -- randomize the states of all of the cells
+#   G -- make a glider, a pattern of cells which moves itself over the grid
+# 
 
 @include "Control.tz"
 @include "PatchToroid.tz"
@@ -22,6 +31,15 @@ Control : PatchLife {
 
 	+ to init:
 		patches = (new PatchToroid init-with patch-size (.5, .5, .5) with-x-count X_SIZE with-y-count Y_SIZE with-z-count 1 with-patch-class "LifePatch").
+
+		# since we're using patches with discrete timesteps, we can set the 
+		# timescale to 1.0 for each iteration.  because the patches update
+		# once for each iterate method, these timesteps have no real effect
+		# on the speed of the simulation -- the change only affects the 
+		# "accounting" of the simulation.
+
+		self set-integration-step to 1.0.
+		self set-iteration-step to 1.0.
 
 		self set-background-color to (0, 0, 0).
 

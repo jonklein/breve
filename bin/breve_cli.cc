@@ -50,6 +50,9 @@ extern char *interfaceID;
 
 breveFrontend *frontend;
 
+int activateContext();
+void renderContext(slWorld *w, slCamera *c);
+
 int main(int argc, char **argv) {
 	int index;
 	char *text;
@@ -94,6 +97,8 @@ int main(int argc, char **argv) {
 
 	frontend->engine->camera = slNewCamera(400, 400, GL_POLYGON);
 	frontend->engine->camera->enabled = CM_DISABLED;
+	frontend->engine->camera->activateContextCallback = activateContext;
+	frontend->engine->camera->renderContextCallback = renderContext;
 
 	frontend->engine->argc = argc - 1;
 	frontend->engine->argv = argv + 1;
@@ -348,4 +353,23 @@ char *getLoadname(void *data) {
 	fgets(name, 1023, stdin);
 	if(strlen(name) > 0) name[strlen(name) - 1] = 0;
 	return name;
+}
+
+int activateContext() {
+#ifdef HAVE_LIBOSMESA
+	if(!OSMesaMakeCurrent(frontend->engine->osContext, frontend->engine->osBuffer, GL_UNSIGNED_BYTE, OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE)) {
+		slMessage(DEBUG_ALL, "Could not activate offscreen rendering context\n");
+		return -1;
+	}
+
+	return 0;
+#endif
+
+	return -1;
+}
+
+void renderContext(slWorld *w, slCamera *c) {
+#ifdef HAVE_LIBOSMESA
+	slRenderWorld(w, c, 0);	
+#endif
 }

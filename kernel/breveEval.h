@@ -18,6 +18,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _BREVEEVAL_H
+#define _BREVEEVAL_H
+
+#include "util.h"
+
 enum evaluationCodes {
 	EC_ERROR_HANDLED = -2,
 	EC_ERROR,
@@ -85,3 +90,5 @@ struct brEval {
 int brEvalCopy(brEval *s, brEval *d);
 
 int brEvalPointer(brEval *s, void **pointer);
+
+#endif /* _BREVEEVAL_H */

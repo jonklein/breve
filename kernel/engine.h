@@ -18,15 +18,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _ENGINE_H
+#define _ENGINE_H
+
+#include "simulation.h"
+#include "graph.h"
+
 #ifdef WINDOWS
 // #include <winsock2.h>
 #endif
  
-/* the maximum error size */
+// the maximum error size 
 
 #define BR_ERROR_TEXT_SIZE 4096
 
-/* the size of the steve runtime evaluation stack */
+// the size of the steve runtime evaluation stack 
 
 #define ST_STACK_SIZE   0x4000
 
@@ -358,3 +364,5 @@ void brEngineRenderWorld(brEngine *e, int crosshair);
 void brFreeInternalFunction(void *d);
 
 void brEvalError(brEngine *e, int type, char *proto, ...);
+
+#endif

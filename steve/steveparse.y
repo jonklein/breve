@@ -60,6 +60,8 @@ int yylex();
 
 double stDoubleFromIntOrDoubleExp(stExp *e);
 
+int stGetTypeForString(char *name);
+
 %}
 
 /*
@@ -112,9 +114,9 @@ double stDoubleFromIntOrDoubleExp(stExp *e);
 %token <number> FLOAT_VALUE
 %token <string> STRING_VALUE WORD_VALUE
 %token <eval> ST_EVAL 
-%token <integer> INT_VALUE TYPE PLURAL_TYPE
+%token <integer> INT_VALUE TYPE PLURAL_TYPE TYPE
 %token TO_PRIVATE TO_PUBLIC TO_PROTECTED
-%token TYPE PLURAL_TYPE VARIABLES DEFINE
+%token VARIABLES DEFINE
 %token IF ELSE WHILE FOREACH ST_IN FOR
 %token NEW FREE DIE PRINT PRINTF END RANDOM RETURN
 %token GT GE LT LE EQ NE LAND LOR PLUSPLUS MINUSMINUS
@@ -122,18 +124,15 @@ double stDoubleFromIntOrDoubleExp(stExp *e);
 %token INCLUDE USE PATH X_ELEMENT Y_ELEMENT Z_ELEMENT 
 %token COPYLIST PREPEND UNPREPEND
 %token CONTROLLER VERSION AKA
-%token INSERT REMOVE PUSH POP SORT ONTO SUPER SELF 
-%token NIB_FILE PLUGIN END_OF_FILE ALL
-%token SYNCHRONIZED
+%token INSERT REMOVE PUSH POP SORT SUPER SELF 
+%token NIB_FILE PLUGIN ALL
 %token EMPTY_LIST
-%token ISA
 
 %token DEBUG
 
 %left GT GE LT LE EQ NE LAND LOR
 %left '-' '+'
 %left '^' '*' '/' '%'
-%left UMINUS
 
 /* we expect 1 error: the dangling else error */
 
@@ -531,8 +530,8 @@ variable_list
 ;
 
 variable
-: WORD_VALUE '(' type ')' END {
-		stVar *var = stVarNew($1, $3);
+: WORD_VALUE type END {
+		stVar *var = stVarNew($1, $2);
 
 		slFree($1);
 
@@ -598,8 +597,8 @@ keyword_and_variable_list
 ;
 
 keyword_and_variable
-: WORD_VALUE WORD_VALUE default_value '(' type ')' {
-		stVar *v = stVarNew($2, $5);
+: WORD_VALUE WORD_VALUE default_value type {
+		stVar *v = stVarNew($2, $4);
 
 		$$ = stNewKeywordEntry($1, v, $3);
 
@@ -607,8 +606,8 @@ keyword_and_variable
 		slFree($2);
 		slFree($3);
 	}
-| WORD_VALUE WORD_VALUE '(' type ')' {
-		stVar *v = stVarNew($2, $4);
+| WORD_VALUE WORD_VALUE type {
+		stVar *v = stVarNew($2, $3);
 
 		$$ = stNewKeywordEntry($1, v, NULL);
 
@@ -878,12 +877,6 @@ expression
 		$$ = stNewArrayIndexAssignExp(thisMethod, thisObject, $1, stNewDuplicateExp($3, yyfile, lineno), binExp, yyfile, lineno);
 
 		slFree($1);
-	}
-| log_expression ISA WORD_VALUE {
-		$$ = NULL;
-	}
-| log_expression ISA type {
-		$$ = NULL;
 	}
 ;
 
@@ -1182,28 +1175,32 @@ string
 ;
 
 type
-: TYPE {
-		$$ = stVarTypeNew($1, AT_NULL, 0, NULL);
+: '(' TYPE ')' {
+		// int type = stGetTypeForString($2);
+		// slFree($2);
+		// $$ = stVarTypeNew(type, AT_NULL, 0, NULL);
+
+		$$ = stVarTypeNew($2, AT_NULL, 0, NULL);
 	}
-| WORD_VALUE TYPE {
-		if($2 != AT_INSTANCE) {
+| '(' WORD_VALUE TYPE ')' {
+		if($3 != AT_INSTANCE) {
 			stParseError(parseEngine, PE_SYNTAX, "Expected \"object\" after class name");
-			slFree($1);
+			slFree($2);
 		} else {
-			$$ = stVarTypeNew($2, AT_NULL, 0, $1);
-			slFree($1);
+			$$ = stVarTypeNew($3, AT_NULL, 0, $2);
+			slFree($2);
 		}
 	}
-| INT_VALUE PLURAL_TYPE {
-		$$ = stVarTypeNew(AT_ARRAY, $2, $1, NULL);
+| '(' INT_VALUE PLURAL_TYPE ')' {
+		$$ = stVarTypeNew(AT_ARRAY, $3, $2, NULL);
 	}
-| INT_VALUE WORD_VALUE PLURAL_TYPE {
-		if($3 != AT_INSTANCE) {
+| '(' INT_VALUE WORD_VALUE PLURAL_TYPE ')' {
+		if($4 != AT_INSTANCE) {
 			stParseError(parseEngine, PE_SYNTAX, "Expected \"objects\" after class name");
-			slFree($2);
+			slFree($3);
 		} else {
-			$$ = stVarTypeNew(AT_ARRAY, $3, $1, $2);
-			slFree($2);
+			$$ = stVarTypeNew(AT_ARRAY, $4, $2, $3);
+			slFree($3);
 		}
 	}
 ;
@@ -1238,4 +1235,20 @@ double stDoubleFromIntOrDoubleExp(stExp *e) {
 	if(e->type == ET_INT) return (double)e->values.iValue;
 
 	return 0.0;
+}
+
+int stGetTypeForString(char *type) {
+	if(!strcmp(type, "int")) return AT_INT;
+	if(!strcmp(type, "double")) return AT_DOUBLE;
+	if(!strcmp(type, "float")) return AT_DOUBLE;
+	if(!strcmp(type, "vector")) return AT_VECTOR;
+	if(!strcmp(type, "matrix")) return AT_MATRIX;
+	if(!strcmp(type, "object")) return AT_INSTANCE;
+	if(!strcmp(type, "pointer")) return AT_POINTER;
+	if(!strcmp(type, "list")) return AT_LIST;
+	if(!strcmp(type, "hash")) return AT_HASH;
+	if(!strcmp(type, "string")) return AT_STRING;
+	if(!strcmp(type, "data")) return AT_STRING;
+
+	return NULL;
 }

@@ -18,6 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _SIMULATION_H
+#define _SIMULATION_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -48,6 +51,7 @@ extern "C" {
 #endif
 
 #include "simulationTypedefs.h"
+
 #include "movie.h"
 #include "image.h"
 #include "integrate.h"
@@ -67,3 +71,5 @@ extern "C" {
 #include "joint.h"
 #include "volInt.h"
 #include "terrain.h"
+
+#endif /* _SIMULATION_H */

@@ -130,8 +130,12 @@ int slMovieAddFrame(slMovie *m, int flip) {
 	\brief Reads from the current OpenGL context to add a frame to a movie.
 */
 
-int slMovieAddGLFrame(slMovie *m, slCamera *c) {
-	if(c->activateContextCallback) c->activateContextCallback();
+int slMovieAddWorldFrame(slMovie *m, slWorld *w, slCamera *c) {
+	if(c->activateContextCallback && c->activateContextCallback() != 0) {
+		slMessage(DEBUG_ALL, "Cannot add frame to movie: no OpenGL context available\n");
+		return -1;
+	}
+	if(c->renderContextCallback) c->renderContextCallback(w, c);
 
 	glReadPixels(0, 0, m->context->width, m->context->height, GL_RGB, GL_UNSIGNED_BYTE, m->RGBpictureBuffer);
 	return slMovieAddFrame(m, 1);

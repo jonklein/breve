@@ -18,6 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _BREVETYPEDEFS_H
+#define _BREVETYPEDEFS_H
+
 /* yeeeeeeeeeeeeeeeeeeeeeehaw! look at 'em all! */
 
 typedef struct brEngine brEngine;
@@ -57,3 +60,5 @@ typedef struct brNetworkClientData brNetworkClientData;
 typedef struct brNetworkServerData brNetworkServerData;
 typedef struct brNetworkRequest brNetworkRequest;
 typedef struct brStringHeader brStringHeader;
+
+#endif

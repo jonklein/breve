@@ -1,4 +1,7 @@
 #
+# DLA -- diffusion limited aggregation
+# jon klein <jk@spiderland.org>
+# 
 # DLA stands for diffusion limited aggregation--a decentralized model of 
 # fractal growth.  The rules are simple: starting with a single frozen 
 # particle, allow other particles to float in randomly from any direction.
@@ -14,8 +17,7 @@
 # code cannot possibly keep up.  We thus disable the requirement that
 # every frame be drawn (using the method disable-draw-every-frame). 
 # This makes it difficult to see exactly what is happening in the 
-# simulation, but it ultimately allows the structure to grow more 
-# quickly.
+# simulation, but it allows the structure to grow much more quickly.
 #
 
 @include "Stationary.tz"
@@ -69,6 +71,7 @@ Control : DLA {
 		sphereShape = (new Sphere init-with radius 1).
 
 		self enable-lighting. 
+		self enable-shadow-volumes.
 
 		# Place the "seed" object at the origin by simulating a collision there
 

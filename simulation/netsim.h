@@ -1,3 +1,5 @@
+#ifndef _NETSIM_H
+#define _NETSIM_H
 
 #ifdef __cplusplus
 #include <vector>
@@ -17,15 +19,6 @@ class slNetsimRemoteHostData {
 		ENetPeer *peer;
 };
 
-class slNetsimData {
-	public:
-		int isMaster;
-		slNetsimServerData *server;
-		slNetsimServerData *slave;
-
-		std::vector<slNetsimRemoteHostData*> remoteHosts;
-};
-
 class slNetsimServerData {
 	public:
 		slNetsimServerData(slWorld *w);
@@ -33,6 +26,15 @@ class slNetsimServerData {
 		ENetHost *host;
 		slWorld *world;
 		int terminate;
+};
+
+class slNetsimData {
+	public:
+		int isMaster;
+		slNetsimServerData *server;
+		slNetsimServerData *slave;
+
+		std::vector<slNetsimRemoteHostData*> remoteHosts;
 };
 
 class slNetsimClientData {
@@ -77,3 +79,5 @@ void slDrawNetsimBounds(slWorld *w);
 
 #endif
 #endif
+
+#endif /* _NETSIM_H */

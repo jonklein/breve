@@ -19,7 +19,11 @@ PatchGrid : PatchToroid (aka PatchTorroid) [version 1.8] {
 	% <p>
 	% Use METHOD(init-with) or METHOD(init-at) the create a PatchToroid.
 
-	+ to init-at location gridCenter (vector) with-patch-size pSize (vector) with-x-count x (int) with-y-count y (int) with-z-count z (int) with-patch-class class (string):
+	+ to init-at location gridCenter = (0, 0, 0) (vector) 
+		with-patch-size pSize = (1, 1, 1) (vector) 
+		with-x-count x (int) with-y-count y (int) 
+		with-z-count z (int) with-patch-class class (string):
+
 		% Creates a PatchGrid in which each OBJECT(Patch) is a member of 
 		% class and is the size pSize and in which the total grid 
 		% dimensions are x by y by z.  

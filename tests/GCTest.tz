@@ -73,8 +73,7 @@ Object : GCTesterI {
 	+ to init:
 		print "creating $self".
 		self enable-auto-free.
-		@@DEBUG@@(new GCTesterII).
-		print "xxx".
+		new GCTesterII.
 
 	+ to destroy:
 		print "destroying $self".

@@ -6,7 +6,7 @@
 prefix = @prefix@
 exec_prefix = @exec_prefix@
 
-OPTFLAGS	=-O4 @DEFS@
+OPTFLAGS	=-O3 @DEFS@
 
 CFLAGS		=-g -Wall -Winline @DEFS@
 

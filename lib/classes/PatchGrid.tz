@@ -16,12 +16,23 @@ Abstract : PatchGrid [version 1.9] {
 		location, patchSize (vector).
 		xSize, ySize, zSize (int).
 
-	+ to init-with patch-size pSize (vector) with-x-count x (int) with-y-count y (int) with-z-count z (int) with-patch-class class (string):
+	- to init-with patch-size pSize = (1, 1, 1) (vector) 
+		with-x-count x (int) 
+		with-y-count y (int) 
+		with-z-count z (int) 
+		with-patch-class class = "Patch" (string):
+
 		% Like METHOD(init-at), but centers the patch grid at the origin of the world.
 
 		return (self init-at location (0, 0, 0) with-patch-size pSize with-x-count x with-y-count y with-z-count z with-patch-class class).
 
-	+ to init-at location gridCenter (vector) with-patch-size pSize (vector) with-x-count x (int) with-y-count y (int) with-z-count z (int) with-patch-class class (string):
+	+ to init-at location gridCenter = (0, 0, 0) (vector) 
+		with-patch-size pSize = (1, 1, 1) (vector) 
+		with-x-count x (int) 
+		with-y-count y (int) 
+		with-z-count z (int) 
+		with-patch-class class (string):
+
 		% Creates a PatchGrid in which each OBJECT(Patch) is a member of 
 		% class and is the size pSize and in which the total grid 
 		% dimensions are x by y by z.  

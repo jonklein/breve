@@ -39,9 +39,9 @@ Object : PushGP {
 
 		bestOfGen (object).
 		totalSize (int).
+		totalErrors (double).
 
 		generation (int).
-		input (float).
 
 		inited (int).
 
@@ -50,6 +50,8 @@ Object : PushGP {
 		populationSize (int).
 		currentIndividual (int).
 		generationLimit (int).
+
+		
 
   + section "Setting and Retrieving GP Parameters"
 
@@ -129,8 +131,8 @@ Object : PushGP {
 		if pop1: free pop1.
 		if pop2: free pop2.
 
-		pop1 = populationSize new Individuals.
-		pop2 = populationSize new Individuals.
+		pop1 = populationSize new PushGPIndividuals.
+		pop2 = populationSize new PushGPIndividuals.
 
 		pop1 set-interpreter to interpreter.
 		pop2 set-interpreter to interpreter.
@@ -158,8 +160,14 @@ Object : PushGP {
 			next = pop2.
 		}
 
-	- to run-tournament:
-		% Used internally.
+	+ to run-tournament:
+		% Runs a tournament selection from the population.  Used internally during
+		% reproduction uses the tournament size set with 
+		% METHOD(set-tournament-size).
+		% <P>
+		% This method may be overridden to implement a custom tournament selection
+		% if desired, though the default implementation should suffice in most 
+		% situations.
 
 		n, test (int).
 		best (object).
@@ -187,11 +195,10 @@ Object : PushGP {
 
 		fitness, newFitness (float).
 		newProgram (object).
-		n (int).
 
 		fitness = (self compute-fitness for-program p).
 
-		newProgram = new PushProgram.
+		newProgram = new PushGPIndividual.
 
 		newProgram copy-from program p.
 
@@ -240,12 +247,6 @@ Object : PushGP {
 			print ";; Solution found at generation $generation:", 
 					(current{ currentIndividual }  get-string).
 
-			for n=0,n<1000,n++: {
-				self auto-simplify program current{ currentIndividual }.
-			}
-
-			print ";; Simplifies to:", (current{ currentIndividual }  get-string).
-
 			self examine program current{ currentIndividual }.
 
 			controller end-simulation.
@@ -254,6 +255,7 @@ Object : PushGP {
 		if !bestOfGen || (fitness < (bestOfGen get-fitness)): bestOfGen = current{ currentIndividual }.
 
 		totalSize += (current{ currentIndividual } get-size).
+		totalErrors += fitness.
 
 		current{ currentIndividual } set-fitness to fitness.
 
@@ -267,6 +269,7 @@ Object : PushGP {
 			generation++.
 			bestOfGen = 0.
 			totalSize = 0.
+			totalErrors = 0.
 
 			if generation > generationLimit: {
 				print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;".
@@ -275,13 +278,8 @@ Object : PushGP {
 			}
 		}
 
-	+ to examine program p (object):
-		% This method is called when a solution is found.  You should override 
-		% this method to preform any additional analysis you'd like.  Typically
-		% this involves examining the program for generalization.
-
 	- to compute-fitness for-program p (object):
-		n, invalid (int).
+		n (int).
 		errors (list).
 
 		for n=0, n < (self count-fitness-cases), n++: {
@@ -299,9 +297,25 @@ Object : PushGP {
 			}
 		}
 
+		p set-errors to errors.
+
 		return (self compute-error-vector-fitness for-errors errors).
 
 	+ section "Methods Overridden by the User To Set Up PushGP Experiments"
+
+	+ to examine program p (object):
+		% This method is called when a solution is found.  You should override 
+		% this method to preform any additional analysis you'd like.  Typically
+		% this involves examining the program for generalization.
+		% <P>
+		% The default implementation simplifies the program p for 1000 iteration
+		% using METHOD(auto-simplify) and prints out the result.
+	
+		n (int).
+
+		for n=0,n<1000,n++: self auto-simplify program p.
+
+		print ";; Simplifies to:", (current{ currentIndividual }  get-string).
 
 	+ to compute-error-vector-fitness for-errors errorList (list):
 		% This method takes a list of errors returned by METHOD(compute-error) for all 
@@ -357,18 +371,25 @@ Object : PushGP {
 		% Logs information to the output at every generation.  This method 
 		% may be overridden to provide more (or less) output data.
 
-		n, size (int).
 		bestFitness (float).
+		errors (list).
 
 		totalSize /= populationSize.
+		totalErrors /= populationSize.
 
 		bestFitness = (bestOfGen get-fitness).
+		errors = (bestOfGen get-errors).
 
 		print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;".
-		print ";; Generation: $generation".
-		print ";; Average program size: $totalSize".
-		print ";; Best error: $bestFitness".
-		print ";; Best Individual: ", (bestOfGen get-string).
+		print ";; -*- Report at generation $generation".
+		print ";; Best Individual: ".
+		print (bestOfGen get-string).
+		print ";; Errors for best individual: ", errors.
+		print ";; Total errors for best individual: $bestFitness".
+		print ";; Size of best individual (points):", (bestOfGen get-size).
+		print ";;".
+		print ";; Average total errors in population: $totalErrors".
+		print ";; Average program size in population (points): $totalSize".
 		print "".
 
 		controller set-display-message with-number 2 at-x -0.9 at-y -0.9 to "Best Fitness: $bestFitness".
@@ -401,17 +422,24 @@ Object : PushGP {
 		}
 }
 
-PushProgram : Individual (aka Individuals) {
+PushProgram : PushGPIndividual (aka PushGPIndividuals) {
 	% A class used by OBJECT(PushGP), this is a single individual
 	% in a PushGP run.  It is not typically used directly by the user.
 
 	+ variables:
 		interpreter (object).
 		fitness (double).
+		errors (list).
 
 	- to set-interpreter to newInterpreter (object):
 		interpreter = newInterpreter.
 		self make-random-code with-interpreter interpreter.
+
+	- to set-errors to errorList (list):
+		errors = errorList.
+
+	+ to get-errors:
+		return errors.
 
 	+ to set-fitness to newFitness (double):
 		% Sets the fitness of this object to newFitness.  You 
@@ -530,18 +558,19 @@ PushGP : PushClusterGP {
 }
 
 Object : PushProgramTransporter {
-	% Used by OBJECT(PushClusterGP).
+	% Used by OBJECT(PushClusterGP) to send Push programs over the network.
+	% No user-level methods are provided for this class.
 
 	+ variables:
 		programStrings (list).
 
-	+ to add program p (object):
+	- to add program p (object):
 		push (p get-string) onto programStrings.
 
-	+ to clear:
+	- to clear:
 		programStrings = { }.
 
-	+ to parse-programs with-interpreter i (object):
+	- to parse-programs with-interpreter i (object):
 		code (string).
 		program (object).
 		result (list).
@@ -554,7 +583,7 @@ Object : PushProgramTransporter {
 
 		return result.
 
-	+ to get-program number n (int): 
+	- to get-program number n (int): 
 		code (object).
 		code = new PushProgram.
 

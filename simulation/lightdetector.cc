@@ -38,6 +38,11 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	sun = &w->lightExposureSource;
 	target = &w->lightExposureTarget;
 
+	if(c->activateContextCallback && c->activateContextCallback() != 0) {
+		slMessage(DEBUG_ALL, "Cannot simulate light exposure: no OpenGL context available\n");
+		return;
+	}
+
 	if(sun->y < target->y) {
 		// no exposure -- zero out the existing values
 		for(wi = w->objects.begin(); wi != w->objects.end(); wi++ )

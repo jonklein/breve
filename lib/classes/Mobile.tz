@@ -61,9 +61,8 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 		if !(theShape get-pointer): 
 			die "attempt to register Mobile object with uninitialized shape ($theShape)".
 
-		if worldObjectShape: {
+		if worldObjectShape: 
 			self remove-dependency on worldObjectShape.
-		}
 
 		worldObjectShape = theShape.
 		self add-dependency on worldObjectShape.

@@ -150,7 +150,7 @@ void slGISData::draw(slCamera *c) {
 
 	for(ci = _chains.begin(); ci != _chains.end(); ci++ ) {
 		if( ci->second._type < 60 ) {
-			slVector start, end;
+			slVector start;
 
 			float w = 4.0 - (double)((int)ci->second._type / 10);
 

@@ -1,4 +1,7 @@
 #
+# Gatherers -- a decentralized food gathering simulation
+# jon klein <jk@spiderland.org>
+# 
 # This demo simulates a decentralized food gathering algorithm.  The
 # critters in the simulation move around randomly with two simple rules:
 # if they run into food and they're not carrying any, pick it up; if 

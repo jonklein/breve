@@ -22,6 +22,8 @@
 #include <vector>
 #include <algorithm>
 
+#include "simulation.h"
+
 /*!
 	\brief A logical collection of attached links.
 */

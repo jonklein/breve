@@ -33,7 +33,7 @@ extern "C" {
 #endif
 slMovie *slMovieCreate(char *filename, int width, int height, int framerate, float quality);
 int slMovieAddFrame(slMovie *m, int flip);
-int slMovieAddGLFrame(slMovie *m, slCamera *c);
+int slMovieAddWorldFrame(slMovie *m, slWorld *w, slCamera *c);
 int slMovieFinish(slMovie *m);
 #ifdef __cplusplus
 }

@@ -713,7 +713,7 @@ brNamespaceSymbol *stInstanceNewVar(stVar *v, stObject *object) {
 	v->offset = object->varSize;
 
 	object->varSize += stSizeof(v->type);
-	object->variableList = slListAppend(object->variableList, v);
+	object->variableList = slListPrepend(object->variableList, v);
 
 	return brNamespaceStore(object->keywords, v->name, ST_VAR, v);
 }
@@ -940,7 +940,7 @@ int stStoreInstanceMethod(stObject *o, char *word, stMethod *method) {
 
 	if(symbol && symbol->type != ST_METHODS) return -1;
 
-	if(symbol) slListAppend((slList*)symbol->data, method);
+	if(symbol) symbol->data = slListPrepend((slList*)symbol->data, method);
 	else brNamespaceStore(o->keywords, word, ST_METHODS, slListPrepend(NULL, method));
 
 	return 0;

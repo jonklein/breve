@@ -30,7 +30,7 @@ slShape *slSphereNew(double radius, double mass) {
 	s = new slSphere(radius);
 	s->mass = mass;
 
-	// slVectorSet(&s->max, radius, radius, radius);
+	slVectorSet(&s->max, radius, radius, radius);
 
 	slSphereInertiaMatrix(radius, mass, s->inertia);
 
@@ -114,9 +114,9 @@ slShape *slShapeInitNeighbors(slShape *s, double density) {
 
 		// now check to see if it's a maximum for the shape 
 
-		// if(p->vertex.x > s->max.x) s->max.x = p->vertex.x;
-		// if(p->vertex.y > s->max.y) s->max.y = p->vertex.y;
-		// if(p->vertex.z > s->max.z) s->max.z = p->vertex.z;
+		if(p->vertex.x > s->max.x) s->max.x = p->vertex.x;
+		if(p->vertex.y > s->max.y) s->max.y = p->vertex.y;
+		if(p->vertex.z > s->max.z) s->max.z = p->vertex.z;
 
 		// reset edgeCount to 0 so it can act as a counter 
 		// as the actual edges are added below
@@ -275,7 +275,6 @@ slFace *slAddFace(slShape *s, slVector **points, int nPoints) {
 	slVectorSub(points[1], points[0], &x); 
 	slVectorSub(points[2], points[1], &y); 
 	slVectorCross(&x, &y, &f->plane.normal);
-
 	slVectorNormalize(&f->plane.normal);
 
 	slVectorCopy(points[1], &f->plane.vertex);
@@ -285,8 +284,6 @@ slFace *slAddFace(slShape *s, slVector **points, int nPoints) {
 	// uhoh, screwy plane, reverse-o!
 
 	if(slPlaneDistance(&f->plane, &origin) > 0.0) {
-		slVectorMul(&f->plane.normal, -1, &f->plane.normal);
-
 		rpoints = new slVector*[nPoints];
 
 		for(n=0;n<nPoints;n++) rpoints[n] = points[(nPoints - 1) - n];
@@ -295,6 +292,12 @@ slFace *slAddFace(slShape *s, slVector **points, int nPoints) {
 		delete[] rpoints;
 
 		slVectorCopy(points[1], &f->plane.vertex);
+		slVectorSub(points[1], points[0], &x); 
+		slVectorSub(points[2], points[1], &y); 
+		slVectorCross(&x, &y, &f->plane.normal);
+		slVectorNormalize(&f->plane.normal);
+
+		printf("reversed: %f\n", slPlaneDistance(&f->plane, &origin));
 	}
 
 	for(n=0;n<nPoints;n++) f->points[n] = slAddPoint(s, points[n]);
@@ -884,7 +887,7 @@ slSerializedShapeHeader *slShape::serialize(int *length) {
 	slMatrixCopy(inertia, header->inertia);
 	header->density = density;
 	header->mass = mass;
-	// slVectorCopy(&s->max, &header->max);
+	slVectorCopy(&max, &header->max);
 
 	/* skip over the header */
 

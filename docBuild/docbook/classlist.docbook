@@ -68,16 +68,16 @@
 <ulink url="../classes/Image.html">Image</ulink></para>
 </listitem>
 <listitem><para>
-<indexterm><primary>Individual class</primary></indexterm>
-<ulink url="../classes/Individual.html">Individual</ulink></para>
-</listitem>
-<listitem><para>
 <indexterm><primary>Joint class</primary></indexterm>
 <ulink url="../classes/Joint.html">Joint</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>Link class</primary></indexterm>
 <ulink url="../classes/Link.html">Link</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>Matrix2D class</primary></indexterm>
+<ulink url="../classes/Matrix2D.html">Matrix2D</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>MenuItem class</primary></indexterm>
@@ -142,6 +142,10 @@
 <listitem><para>
 <indexterm><primary>PushGP class</primary></indexterm>
 <ulink url="../classes/PushGP.html">PushGP</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>PushGPIndividual class</primary></indexterm>
+<ulink url="../classes/PushGPIndividual.html">PushGPIndividual</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>PushInterpreter class</primary></indexterm>

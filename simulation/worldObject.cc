@@ -1,5 +1,9 @@
 #include "simulation.h"
 
+void slWorldObject::draw(slCamera *camera) {
+	if(shape) slDrawShape(camera, shape, &position, textureScale, drawMode, 0);
+}
+
 void slWorldObjectSetCallbackData(slWorldObject *wo, void *data) {
 	wo->userData = data;
 }

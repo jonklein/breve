@@ -18,7 +18,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include "ode/ode.h"
+#ifndef _LINK_H
+#define _LINK_H
+
+// #include "util.h"
+// #include "worldObject.h"
+// #include "ode/ode.h"
+
+// class slMultibody;
+// class slJoint;
 
 #define slLinkSwapConfig(r)		((r)->currentState = !(r)->currentState)
 
@@ -53,26 +61,7 @@ struct slLinkIntegrationPosition {
 
 class slLink: public slWorldObject {
 	public:
-		slLink(slWorld *w) : slWorldObject() {
-    		odeBodyID = dBodyCreate(w->odeWorldID);
-
-		    simulate = 0;
-			currentState = 0;
-			mobile = 0;
-
-			bzero(&stateVector[0], sizeof(slLinkIntegrationPosition));
-			bzero(&stateVector[1], sizeof(slLinkIntegrationPosition));
-
-		    slQuatIdentity(&stateVector[0].rotQuat);
-		    slQuatIdentity(&stateVector[1].rotQuat);
-
-			multibody = NULL;
-
-			slsVectorZero(&acceleration);
-			slsVectorZero(&velocity);
-
-			slVectorZero(&externalForce);
-		}
+		slLink(slWorld *w);
 
 		~slLink();
 
@@ -164,3 +153,5 @@ void slLinkSetForce(slLink *l, slVector *force);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* LINK_H */

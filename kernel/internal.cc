@@ -41,7 +41,6 @@
 
 /*@{*/
 
-#include "kernel.h"
 #include "internal.h"
 
 /*!
@@ -94,38 +93,13 @@ int brNewBreveCall(brNamespace *n, char *name, int (*f)(brEval *a, brEval *r, br
 	return 0;
 }
 
-/*!
-	\brief Identical to \ref brNewBreveCall.
+void brFreeBreveCall(void *d) {
+	brInternalFunction *i = d;
 
-	Provided for backward-compatibility for plugins only.
-*/
-
-int stNewSteveCall(brNamespace *n, char *name, int (*f)(brEval *a, brEval *r, brInstance *i), int rtype, ...) {
-	brInternalFunction *c;
-	va_list ap;
-	int value;
-
-	c = slMalloc(sizeof(brInternalFunction));
-
-	c->call = f;
-	c->rtype = rtype;
-	c->name = slStrdup(name);
-
-	va_start(ap, rtype);
-
-	c->nargs = 0;
-
-	while((value = va_arg(ap, int)) != 0) c->argtypes[c->nargs++] = value;
-
-	va_end(ap);
-
-	if(!brNamespaceStore(n, name, ST_FUNC, c)) {
-		slMessage(DEBUG_ALL, "failed to initialize internal function \"%s\"\n", name);
-		return -1;
-	}
-
-	return 0;
+	slFree(i->name);
+	slFree(i);
 }
+
 /*!
 	\brief Returns a FILE pointer associated with the output log.
 

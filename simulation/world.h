@@ -18,13 +18,23 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _WORLD_H
+#define _WORLD_H
+
 #include "ode/ode.h"
+#include "worldObject.h"
+#include "netsim.h"
 
 #ifdef __cplusplus
 #include <vector>
 #include <algorithm> 
 #include <stdexcept>
+
+class slPatchGrid;
+class slSpring;
+class slVclipData;
 #endif
+
 
 #define DV_VECTOR_COUNT	10
 
@@ -64,99 +74,6 @@ enum collisionCallbackTypes {
 */
 
 #ifdef __cplusplus
-template <class T> class safe_ptr {
-		T* ptr;
-	public:
-		explicit safe_ptr(T* p = 0) : ptr(p) {}
-		~safe_ptr()                 {delete ptr;}
-		T& operator*()              {return *ptr;}
-		T* operator->()             {return ptr;}
-};
-
-class slWorldObject {
-	public:
-		slWorldObject() {
-			drawMode = 0;
-			texture = 0;
-			textureMode = 0;
-			textureScale = 16;
-			simulate = 0;
-
-			shape = NULL;
-
-			proximityRadius = 0.00001;
-			neighbors = slStackNew();
-
-			billboardRotation = 0;
-			alpha = 1.0;
-
-			e = 0.4;
-			eT = 0.2;
-			mu = 0.15;
-
-			slVectorSet(&color, 1, 1, 1);
-
-			slMatrixIdentity(position.rotation);
-			slVectorSet(&position.location, 0, 0, 0);
-		}
-
-		virtual ~slWorldObject() {
-			if(shape) slShapeFree(shape);
-			slStackFree(neighbors);
-		}
-
-		virtual void draw(slCamera *camera) {
-			if(shape) slDrawShape(camera, shape, &position, textureScale, drawMode, 0);
-		};
-
-		virtual void step(slWorld *world, double step) {};
-
-		slShape *shape;
-
-		char *label;
-
-		unsigned char simulate;
-		unsigned char update;
-
-		slPosition position;
-
-		// type is one of the slWorldObjectTypes -- a stationary or a multibody
-		// the data pointer is thus a pointer to the corresponding structure.
-
-		unsigned char type;
-
-		slVector color;
-
-		int lightExposure;
-
-		int texture;
-		char textureMode;
-		unsigned char drawMode;
-		float billboardRotation;
-		float alpha;
-	
-		float textureScale;
-
-		// bounding box information here is used for "proximity" data
-	
-		slVector neighborMax;
-		slVector neighborMin;
-		slVector max;
-		slVector min;
-	
-		double e;
-		double eT;
-		double mu;
-
-		double proximityRadius;
-		slStack *neighbors;
-
-		// the list of lines that this object makes to other objects
-
-		std::vector<slObjectLine*> lines;
-
-		void *userData;
-};
 
 /*!
 	\brief A stationary object in the simulated world.
@@ -168,25 +85,6 @@ class slStationary: public slWorldObject {
 
 typedef safe_ptr<slWorldObject> slWorldObjectPointer;
 
-class slObjectConnection {
-	public:
-		virtual void draw() = 0;
-
-		slWorldObject *_src;
-		slWorldObject *_dst;
-};
-
-/*!
-	\brief A line drawn from one object to another.
-*/
-
-class slObjectLine: public slObjectConnection {
-	public:
-		void draw() {};
-
-		slVector _color;
-		int _stipple;
-};
 #endif
 
 /*!
@@ -197,8 +95,8 @@ class slObjectLine: public slObjectConnection {
 class slGISData;
 
 struct slWorld {
-	/* when objects are added or removed from the world, this flag must be */
-	/* set to 0 so that vclip structures are reinitialized.				*/
+	// when objects are added or removed from the world, this flag must be 
+	// set to 0 so that vclip structures are reinitialized.
 
 	unsigned char initialized;
 	unsigned char odeStepMode;
@@ -347,3 +245,5 @@ int slWorldLoadTigerFile(slWorld *w, char *f);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* _WORLD_H */

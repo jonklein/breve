@@ -108,7 +108,8 @@ void slSphere::drawShadowVolume(slCamera *c, slPosition *p) {
 	double diff;
 	int divisions;
 
-	slVectorCopy(&c->lights[0].location, &light);
+	slVectorSub(&c->lights[0].location, &p->location, &light);
+	// slVectorCopy(&c->lights[0].location, &light);
 
 	slVectorCopy(&light, &lNormal);
 	slVectorNormalize(&lNormal);
@@ -214,7 +215,7 @@ void slRenderShadowVolume(slWorld *w, slCamera *c) {
 	// draw the scene again, with lighting, only where the value is 0 
 	
 	// glColor3f(1, 0, 0);
-	slRenderObjects(w, c, 0, DO_NO_ALPHA);
+	slRenderObjects(w, c, DO_NO_ALPHA);
 
 	// transparent objects cause problems, since they cannot simply 
 	// be "drawn over" the way we do with the rest of the scene.  
@@ -223,14 +224,14 @@ void slRenderShadowVolume(slWorld *w, slCamera *c) {
 	// 1) do not render the alphas at all for the first pass
 	// 2) render the unlit alphas where the stencil != 0 
 
-	slRenderObjects(w, c, 0, DO_ONLY_ALPHA);
+	slRenderObjects(w, c, DO_ONLY_ALPHA);
 	if(c->billboardCount) slRenderBillboards(c, 0);
 
 	glStencilFunc(GL_NOTEQUAL, 0, 0xffffffff);
 	if(c->billboardCount) slRenderBillboards(c, 0);
 	
 	slDrawLights(c, 1);
-	slRenderObjects(w, c, 0, DO_ONLY_ALPHA);
+	slRenderObjects(w, c, DO_ONLY_ALPHA);
 
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_LIGHTING);

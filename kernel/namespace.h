@@ -18,6 +18,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _NAMESPACE_H
+#define _NAMESPACE_H
+#include "util.h"
+
 enum symbolTypes {
     ST_METHODS = 1,
     ST_OBJECT,
@@ -65,3 +69,4 @@ void brNamespaceSymbolFreeWithFunction(brNamespaceSymbol *s, void (*symFree)(voi
 int brNamespaceHashSymbol(char *string);
 
 slList *brNamespaceSymbolList(brNamespace *space);
+#endif

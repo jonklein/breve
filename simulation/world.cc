@@ -212,7 +212,7 @@ void slRenderWorldCameras(slWorld *w) {
 	std::vector<slCamera*>::iterator ci;
 
 	for(ci = w->cameras.begin(); ci != w->cameras.end(); ci++)
-		slRenderWorld(w, *ci, 0, GL_RENDER, 0, 1);
+		slRenderWorld(w, *ci, 0, 1);
 }
 
 /*!

@@ -87,7 +87,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 		return pushStep(pushInterpreterPointer, steps).
 
-	- to run-with-exec-stack-dump program codeObject (object) for-steps steps = -1 (int):
+	+ to run-with-exec-stack-dump program codeObject (object) for-steps steps = -1 (int):
 		% Dumps out the exec stack at every instruction step.  Extremely 
 		% verbose.  For debugging only.
 

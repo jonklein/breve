@@ -42,7 +42,7 @@ NSString *movieQualityStrings[] = {
 	@"Lossless quality, zero compression"
 };
 
-void slMakeCurrentContext();
+int slMakeCurrentContext();
 
 char *interfaceID = "aqua/1.2";
 
@@ -545,8 +545,9 @@ void renderWindowCallback(void *data) {
     [movieQualityMessageText setStringValue: movieQualityStrings[selection]];
 }
 
-void slMakeCurrentContext() {
+int slMakeCurrentContext() {
 	[gDisplayView activateContext];
+	return 0;
 }
 
 @end

@@ -81,10 +81,6 @@ float/{WORDBREAK} 		{ yylval.integer = AT_DOUBLE; return TYPE; }
 data/{WORDBREAK} 		{ yylval.integer = AT_DATA; return TYPE; }
 hash/{WORDBREAK} 		{ yylval.integer = AT_HASH; return TYPE; }
 
-XXXis[\t\ ]a(n?)			{ return ISA; }
-
-synchronized 			{ return SYNCHRONIZED; }
-
 ints/{WORDBREAK}		{ yylval.integer = AT_INT; return PLURAL_TYPE; }
 doubles/{WORDBREAK}		{ yylval.integer = AT_DOUBLE; return PLURAL_TYPE; }
 vectors/{WORDBREAK}		{ yylval.integer = AT_VECTOR; return PLURAL_TYPE; }
@@ -134,7 +130,6 @@ die						{ return DIE; }
 print					{ return PRINT; }
 printf					{ return PRINTF; }
 random					{ return RANDOM; }
-
 all						{ return ALL; }
 
 use						{ return USE; }

@@ -1,3 +1,9 @@
+#
+# This demo shows a swarm of agents painting a picture, based on a 
+# an input image file.  The brush shaped agents move around the surface
+# of the image, picking up the color of the nearest pixel as they move.
+# 
+
 @path "classes"
 @path "lib/classes"
 
@@ -5,11 +11,7 @@
 @use Control.
 @use Image.
 
-# tell the engine the name of the controller
-
 Controller myController.
-
-# implment the controller object
 
 Control : myController {
 	+ variables:
@@ -18,13 +20,10 @@ Control : myController {
 		zoom (double).
 		blur (double).
 		file (string).
-
 		vel, acc, radius (double).
 
 	+ to init:
 		brush (object).
-
-		brush = (new Image load from "images/brush.png").
 
 		self disable-text.
 
@@ -52,6 +51,7 @@ Control : myController {
 
 		shape = new Sphere init-with radius radius.
 
+		brush = (new Image load from "images/brush.png").
 		200 new Painters set-bitmap-image to brush.
 
 		zoom = (image get-width) + 10.
@@ -88,7 +88,6 @@ Mobile : Painter (aka Painters) {
 	+ variables:
 		image (object).
 		w, h (int).
-		factor (int).
 		vel, acc (double).
 
 	+ to init:
@@ -113,7 +112,7 @@ Mobile : Painter (aka Painters) {
 
 	+ to set-color:
 		x, y, z (int).
-		location, velocity, color (vector).
+		location, color (vector).
 
 		location = (self get-location).
 		x = location::x.
@@ -130,9 +129,6 @@ Mobile : Painter (aka Painters) {
 		x += w/2.
 		y += h/2.
 
-		# self set-color to (image get-rgb-pixel at-x x at-y y) / (RADIUS).
-		# self set-color to (image get-rgb-pixel at-x x at-y y) + random[(.1, .1, .1)].
-
 		color = (image get-rgb-pixel at-x x at-y y).
 		self set-color to color.
 
@@ -140,7 +136,6 @@ Mobile : Painter (aka Painters) {
 		velocity (vector).
 
 		if random[20] == 0: self reset.
-		# if random[10] == 0: self set-color.
 
 		velocity = (self get-velocity).
 		if |velocity|: velocity /= | velocity |.

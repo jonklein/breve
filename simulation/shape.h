@@ -18,6 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _SHAPE_H
+#define _SHAPE_H
+
 enum shapeTypes {
 	ST_NORMAL,
 	ST_SPHERE
@@ -73,6 +76,10 @@ typedef struct slSerializedShapeHeader slSerializedShapeHeader;
 
 #ifdef __cplusplus
 #include <vector>
+
+class slPoint;
+class slFace;
+class slEdge;
 
 class slFeature {
 	public:
@@ -293,3 +300,5 @@ double slShapeGetDensity(slShape *shape);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* _SHAPE_H */

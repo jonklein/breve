@@ -137,7 +137,7 @@ int brILoadTexture(brEval args[], brEval *target, brInstance *i) {
 	}
 
 	BRINT(target) = slTextureNew(i->engine->camera);
-	slUpdateTexture(i->engine->world, BRINT(target), pixels, w, h, GL_RGBA);
+	slUpdateTexture(i->engine->camera, BRINT(target), pixels, w, h, GL_RGBA);
 
 	slFree(pixels);
 

@@ -173,8 +173,6 @@
 */
 
 - (void)setEngine:(brEngine*)e fullscreen:(BOOL)f {
-	slVector *c;
-
 	viewEngine = e;
 
 	if(!e || !e->world || !e->camera) return;
@@ -245,7 +243,7 @@
 
 	if(viewEngine) {
 	   	if(!fullScreen) {
-			slRenderScene(viewEngine->world, viewEngine->camera, 0, GL_RENDER, drawCrosshair, 0);
+			slRenderScene(viewEngine->world, viewEngine->camera, drawCrosshair);
 			if(theMovie) [theMovie addFrameFromRGBAPixels: [self RGBAPixels]];
 		}
 	} else {
@@ -268,9 +266,10 @@
 		if(firstFullScreen) {
 			glClearColor(0, 0, 0, 1.0);
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+			viewEngine->camera->recompile = 1;
 		}
 
-		slRenderScene(viewEngine->world, viewEngine->camera, firstFullScreen, GL_RENDER, drawCrosshair, 0);
+		slRenderScene(viewEngine->world, viewEngine->camera, drawCrosshair);
 		firstFullScreen = 0;
 		CGLFlushDrawable([fullScreenView context]);
 		pthread_mutex_unlock(&viewEngine->lock);
@@ -416,8 +415,6 @@
 	NSRect bounds = [self bounds];
 
 	if(!pixelBuffer || !tempPixelBuffer) [self updateSize: self];
-
-	printf("reading %f x %f [%p]\n", bounds.size.width, bounds.size.height, tempPixelBuffer);
 
 	glReadPixels(0, 0, bounds.size.width, bounds.size.height, GL_RGBA, GL_UNSIGNED_BYTE, tempPixelBuffer);
 

@@ -4,9 +4,9 @@ LIBO	= javaObjectType.o javaFunctions.o javaTypes.o
 
 install: all
 
-all: libbrjava.a 
+all: ../lib/libbrjava.a 
 
-libbrjava.a: MethodFinder.jar $(LIBO)
+../lib/libbrjava.a: MethodFinder.jar $(LIBO)
 	$(AR) -crv libbrjava.a $(LIBO)
 	cp libbrjava.a ../lib
 	cp *.h ../include/breve

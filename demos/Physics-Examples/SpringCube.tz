@@ -1,0 +1,121 @@
+
+#
+# Construct a cube array of nodes separated by mass springs.  Change 
+# NUMPOINTSONSIDE to vary size
+#
+# Written by Tom Busey of Indiana University based on code from jon klein
+# Thanks go to jon for implimenting mass springs in Breve
+#
+
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use PhysicalControl.
+@use Link.
+@use Spring.
+@use Stationary.
+
+@define STRENGTH 5.
+@define LENGTH 9.
+@define NUMPOINTSONSIDE 3.
+@define HEIGHTTODROP 60.
+
+Controller SpringController.
+
+PhysicalControl : SpringController {
+    + variables: 
+        NODES (int).
+        nodes (list).
+
+    + to init:
+        x (int).
+        y (int).
+        z (int).
+        startblock(int).
+        endblock(int).
+        numsprings(int).
+        NUMEDGESONSIDE(int).
+
+        p1 (int).
+        p2 (int).
+        xoff1 (int).
+        yoff1 (int).
+        zoff1 (int).
+        xoff2 (int).
+        yoff2 (int).
+        zoff2 (int).
+        complength (double).
+
+        NUMEDGESONSIDE = NUMPOINTSONSIDE - 1.
+
+        NODES = NUMPOINTSONSIDE * NUMPOINTSONSIDE * NUMPOINTSONSIDE.
+
+        self set-background-color to (.7, .7, .7).
+        self point-camera at (0, 10, 0) from (70, 20, 70).
+
+        nodes = (NODES new Nodes).
+        nodes enable-physics.
+
+		for x=0,x< NUMPOINTSONSIDE,x++: {
+			for y = 0, y< NUMPOINTSONSIDE , y++:{
+				for z = 0, z< NUMPOINTSONSIDE, z++:{
+					startblock = (x + y * NUMPOINTSONSIDE + z * NUMPOINTSONSIDE * NUMPOINTSONSIDE).
+					nodes{startblock} move to ((x * LENGTH)-(NUMPOINTSONSIDE/2)*LENGTH, y * LENGTH + HEIGHTTODROP, z * LENGTH-(NUMPOINTSONSIDE/2)*LENGTH).
+				}
+			}
+		}
+
+        self set-gravity to (0, -9.8, 0).
+
+        new Stationary register with-shape (new Cube init-with size (1200, 1, 1200)).
+
+        for x=0,x< NUMEDGESONSIDE,x++: {
+            for y = 0, y< NUMEDGESONSIDE, y++:{
+                for z = 0, z< NUMEDGESONSIDE, z++:{
+                    for p1 = 0, p1<7, p1++:{
+                        for p2 = p1+1, p2<8, p2++:{    
+                            xoff1 = p1 % 2.
+                            yoff1 =((p1/2)% 2).
+
+                            if p1 <4 : {zoff1 =0.}
+                            else { zoff1 = 1.}
+
+                            xoff2 =(p2 % 2).
+                            yoff2 =((p2/2)% 2).
+
+                            if p2 <4 : {zoff2 =0.}
+                            else { zoff2 = 1.}
+
+                            complength = sqrt(((xoff1 - xoff2)^2) + ((yoff1 - yoff2)^2) + ((zoff1 - zoff2)^2) ) * LENGTH.
+
+                            if complength > 0: {
+                                startblock = ((x + xoff1) + (y + yoff1) * NUMPOINTSONSIDE + (z + zoff1) * NUMPOINTSONSIDE * NUMPOINTSONSIDE).
+                                endblock = ((x + xoff2) + (y + yoff2) * NUMPOINTSONSIDE + (z + zoff2) * NUMPOINTSONSIDE * NUMPOINTSONSIDE).
+
+                                new Spring connect from nodes{startblock} to nodes{endblock} from-point (0,0,0) to-point (0,0,0) with-length complength with-strength STRENGTH.
+                                numsprings = numsprings + 1.
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+		nodes{0} set-velocity to (100, 0, 0).
+
+        print "NumSprings = $numsprings".
+
+}
+
+Link : Node (aka Nodes) {
+    + to init:
+        self set-shape to (new Cube init-with size (.5, .5, .5)).
+
+    + to iterate:
+        # breve does not simulate air resistance (yet), so nodes suspended in
+        # the air will continue to rotate forever.  the following will damp
+        # and eventually stop the rotation.
+
+        self set-rotational-velocity to .95 * (self get-rotational-velocity).
+}

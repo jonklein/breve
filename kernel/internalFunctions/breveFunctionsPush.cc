@@ -4,12 +4,17 @@
 	This file was generated automatically by the script /Users/jk/dev/breve/tools/apiwrap.pl.
 */
 
-#include "kernel.h"
+#include "internal.h"
+#include "util.h"
+
+void breveInitPushFunctions(brNamespace *n);
 
 /*@{*/
 /*! \addtogroup InternalFunctions */
-#ifdef HAVE_LIBPUSH
 #include "pushC.h"
+
+#ifdef HAVE_LIBPUSH
+
 /*!
 	\brief A breve API function wrapper for the C-function \ref pushEnvironmentNew.
 
@@ -32,9 +37,7 @@ int breveFunctionPushEnvironmentNew(brEval arguments[], brEval *result, brInstan
 
 int breveFunctionPushEnvironmentFree(brEval arguments[], brEval *result, brInstance *instance) {
 	PushEnvironment *environment = BRPOINTER(&arguments[0]);
-
 	pushEnvironmentFree(environment);
-
 	return EC_OK;
 }
 

@@ -626,15 +626,16 @@ int slPNGWrite(char *name, int width, int height, unsigned char *buffer, int cha
 	\brief Takes a PNG snapshot of the current screen output and writes it to a file.
 */
 
-int slPNGSnapshot(slCamera *c, char *file) {
+int slPNGSnapshot(slWorld *w, slCamera *c, char *file) {
 	unsigned char *buffer;
 	int r;
 
-	if(c->enabled == CM_DISABLED) return -1;
+	if(c->activateContextCallback && c->activateContextCallback()) {
+		slMessage(DEBUG_ALL, "Cannot generate PNG snapshot: no OpenGL context available\n");
+		return -1;
+	}
 
-	// if(c->enabled == CM_NOT_UPDATED) slMessage(DEBUG_ALL, "warning: world must be redrawn before taking PNG snapshot\n");
-
-	if(c->activateContextCallback) c->activateContextCallback();
+	if(c->renderContextCallback) c->renderContextCallback(w, c);
 
 	buffer = new unsigned char[c->x * c->y * 3];
 

@@ -273,7 +273,7 @@ void slUpdateCamera(slCamera *c) {
 	
 	slVectorMul(&c->location, c->zoom, &c->location);
 
-	slCameraUpdateFrustum(c);
+	// slCameraUpdateFrustum(c);
 }
 
 /*!

@@ -58,6 +58,7 @@ char *slAtomicTypeStrings[] = {
 	"double",
 	"string",
 	"object",
+	"bridge-object",	// unused
 	"pointer",
 	"vector",
 	"matrix",

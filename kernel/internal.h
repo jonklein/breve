@@ -1,44 +1,63 @@
-/*****************************************************************************
- *                                                                           *
- * The breve Simulation Environment                                          *
- * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
- *                                                                           *
- * This program is free software; you can redistribute it and/or modify      *
- * it under the terms of the GNU General Public License as published by      *
- * the Free Software Foundation; either version 2 of the License, or         *
- * (at your option) any later version.                                       *
- *                                                                           *
- * This program is distributed in the hope that it will be useful,           *
- * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
- * GNU General Public License for more details.                              *
- *                                                                           *
- * You should have received a copy of the GNU General Public License         *
- * along with this program; if not, write to the Free Software               *
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
- *****************************************************************************/
+#include "kernelTypedefs.h"
+#include "breveEval.h"
+#include "engine.h"
+#include "breveObjectAPI.h"
+#include "namespace.h"
+#include <stdio.h>
+#include <stdarg.h>
 
-#define ST_CMAX_ARGS 16
+#ifdef __cplusplus
+extern "C" {
+#endif
+void breveInitCameraFunctions(brNamespace *n);
+void breveInitControlFunctions(brNamespace *n);
+void breveInitFileFunctions(brNamespace *n);
+void breveInitGraphFunctions(brNamespace *n);
+void breveInitImageFunctions(brNamespace *n);
+void breveInitLinkFunctions(brNamespace *n);
+void breveInitMathFunctions(brNamespace *n);
+void breveInitMenuFunctions(brNamespace *n);
+void breveInitMovieFunctions(brNamespace *n);
+void breveInitMultibodyFunctions(brNamespace *n);
+void breveInitNetworkFunctions(brNamespace *n);
+void breveInitNeuralFunctions(brNamespace *n);
+void breveInitObjectFunctions(brNamespace *n);
+void breveInitPatchFunctions(brNamespace *n);
+void breveInitPhysicsFunctions(brNamespace *n);
+void breveInitShapeFunctions(brNamespace *n);
+void breveInitStationaryFunctions(brNamespace *n);
+void breveInitSoundFunctions(brNamespace *n);
+void breveInitTerrainFunctions(brNamespace *n);
+void breveInitWorldFunctions(brNamespace *n);
+void breveInitPushFunctions(brNamespace *n);
+void breveInitPushCallbackFunctions(brNamespace *n);
+void breveInitSpringFunctions(brNamespace *n);
+void breveInitMatrixFunctions(brNamespace *n);
 
 int brNewBreveCall(brNamespace *n, char *name, int (*call)(brEval *a, brEval *r, brInstance *i), int rtype, ...);
 
 FILE *slGetLogFilePointer(brInstance *i);
+#ifdef __cplusplus
+}
+#endif
 
 void brLoadInternalFunctions(brEngine *e);
+void brFreeBreveCall(void *d);
+
 
 /*!
-	\brief A function call in the breve internal function interface.
+	\brief An internal function provided by breve.
 */
 
-struct brInternalFunction {
-	unsigned char nargs; 
+#define ST_CMAX_ARGS 16
 
+struct brInternalFunction {
+	unsigned char nargs;
+    
 	unsigned char argtypes[ST_CMAX_ARGS];
 	unsigned char rtype;
-
+    
 	int (*call)(brEval *args, brEval *result, brInstance *i);
-
+    
 	char *name;
 };
-
-

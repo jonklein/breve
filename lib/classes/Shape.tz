@@ -158,7 +158,6 @@ Abstract : Shape (aka Shapes) [version 2.0] {
 
 	+ to dearchive:
 		shapePointer = shapeForData(shapeData).
-		print "dearchived $shapePointer".
 		return (super dearchive).
 }
 

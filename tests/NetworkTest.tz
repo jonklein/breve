@@ -36,6 +36,7 @@ Control : myController {
 		print "received upload of $theObject from $host".
 
 		if ((theObject get-sub) get-list-string) == "cat": {
+			print "Upload of subordinate object successful".
 			self end-simulation.
 		} else {
 			die "Error dearchiving networked object".

@@ -57,6 +57,9 @@ Object : Spring (aka Springs) {
 		return 0.
 
 	+ to get-length:
+		% This method returns the natural length of the spring.  See also
+		% METHOD(get-current-length) which returns the current (stretched
+		% or compressed) length of the spring.
 		return length.
 
 	+ to set-length to newLength (double):

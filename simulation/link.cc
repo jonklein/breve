@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "simulation.h"
+#include "world.h"
 
 /*!
 	\brief Creates a new link struct.
@@ -26,6 +27,27 @@
 
 slLink *slLinkNew(slWorld *w) {
 	return new slLink(w);
+}
+
+slLink::slLink(slWorld *w) : slWorldObject() {
+	odeBodyID = dBodyCreate(w->odeWorldID);
+
+	simulate = 0;
+	currentState = 0;
+	mobile = 0;
+
+	bzero(&stateVector[0], sizeof(slLinkIntegrationPosition));
+	bzero(&stateVector[1], sizeof(slLinkIntegrationPosition));
+
+	slQuatIdentity(&stateVector[0].rotQuat);
+	slQuatIdentity(&stateVector[1].rotQuat);
+
+	multibody = NULL;
+
+	slsVectorZero(&acceleration);
+	slsVectorZero(&velocity);
+
+	slVectorZero(&externalForce);
 }
 
 slLink::~slLink() {
