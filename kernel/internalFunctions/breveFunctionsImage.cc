@@ -107,10 +107,12 @@ int brIImageSetValueAtCoordinates(brEval args[], brEval *result, brInstance *i) 
 	int y = BRINT(&args[2]);
 	int value = (int)(255.0 * BRDOUBLE(&args[3]));
 
-	if(value > 255) value = 255;
-	else if(value < 0) value = 0;
+	if (value > 255)
+		value = 255;
+	else if (value < 0)
+		value = 0;
 
-	if(x < 0 || x >= (dm->x * 4) || y < 0 || y >= dm->y) {
+	if (x < 0 || x >= (dm->x * 4) || y < 0 || y >= dm->y) {
 		slMessage(DEBUG_ALL, "data matrix access (%d, %d) out of bounds (%d, %d)\n", x, y, dm->x, dm->y);
 		return EC_OK;
 	}
@@ -231,11 +233,27 @@ int brIImageWriteToFile(brEval args[], brEval *result, brInstance *i) {
 
 	slFree(file);
 #else
-	slMessage(DEBUG_ALL, "This version of breve was built without support for PNG export\n");
+	slMessage(DEBUG_ALL, "This version of breve was built without support for image export\n");
 #endif
 
 	return EC_OK;
 
+}
+
+int brISnapshot(brEval args[], brEval *result, brInstance *i) {
+#if HAVE_LIBPNG
+	char *f;
+
+	f = brOutputPath(i->engine, BRSTRING(&args[0]));
+	BRINT(result) = slPNGSnapshot(i->engine->world, i->engine->camera, f);
+	slFree(f);
+
+	return EC_OK;
+#else
+	slMessage(DEBUG_ALL, "This version of breve was built without support for image export\n");
+
+	return EC_ERROR;
+#endif
 }
 
 /*!
@@ -297,4 +315,5 @@ void breveInitImageFunctions(brNamespace *n) {
 	brNewBreveCall(n, "imageDataInit", brIImageDataInit, AT_POINTER, AT_INT, AT_INT, 0);
 	brNewBreveCall(n, "imageUpdateTexture", brIImageUpdateTexture, AT_INT, AT_POINTER, 0);
 	brNewBreveCall(n, "imageReadPixels", brIImageReadPixels, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
+	brNewBreveCall(n, "snapshot", brISnapshot, AT_INT, AT_STRING, 0);
 }

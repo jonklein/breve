@@ -6,3 +6,5 @@ config.log
 config.status
 docs
 Makefile
+simulation.mpeg
+simulation.png

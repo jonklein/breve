@@ -20,101 +20,182 @@
 
 #include "simulation.h"
 
-#if HAVE_LIBAVCODEC
+#if HAVE_LIBAVFORMAT
 
-static void initYUVLookupTable(void);
-static void RGB2YUV420(int, int, unsigned char *, unsigned char *, unsigned char *, unsigned char *, int);
+static int slMovieEncodeFrame(slMovie *m);
 
 /*!
 	\brief Opens a movie file for writing.
 */
 
-slMovie *slMovieCreate(char *filename, int width, int height, int framerate, float quality) {
+slMovie *slMovieCreate(char *filename, int width, int height, int rate, int b) {
+	AVCodecContext *c;
+	AVCodec *codec;
+	AVStream *st;
 	slMovie *m;
+	int n;
 
 	height &= ~1;
 	width &= ~1;
 
-	if (width < 1 || height < 1 || framerate < 1) {
+	if (width < 1 || height < 1) {
 		slMessage(DEBUG_ALL, "invalid parameters for new movie\n");
 		return NULL;
 	}
 
-	initYUVLookupTable();
-
-	avcodec_init();
-	avcodec_register_all();
-
 	m = new slMovie;
 
-	if (!(m->codec = avcodec_find_encoder(CODEC_ID_MPEG1VIDEO))) {
-		slMessage(DEBUG_ALL, "Could not find MPEG-1 video encoder\n");
+	if (!(m->context = av_alloc_format_context()) ||
+	    !(m->context->oformat = guess_format("mpeg", NULL, NULL)) ||
+	    !(st = m->context->streams[0] = av_new_stream(m->context, 0))) {
+		slMessage(DEBUG_ALL, "Could allocate lavf context\n");
+		delete m;
 		return NULL;
 	}
-	if (!(m->file = fopen(filename, "wb"))) {
+
+	n = snprintf(m->context->filename, sizeof(m->context->filename), "%s", filename);
+	if (n < 0 || (size_t)n >= sizeof(m->context->filename))
+		slMessage(DEBUG_WARN, "Could not set lavf output filename\n");
+
+	if (url_fopen(&m->context->pb, filename, URL_WRONLY) < 0) {
 		slMessage(DEBUG_ALL, "Could not open file \"%s\" for writing: %s\n", filename, strerror(errno));
+		av_free(st);
+		delete m;
 		return NULL;
 	}
 
-	m->context = avcodec_alloc_context();
-	m->picture = avcodec_alloc_frame();
+	c = &st->codec;
 
-	m->context->width = width;
-	m->context->height = height;
-	m->context->frame_rate = framerate;
-	m->context->frame_rate_base = 1;
+	c->codec_id = CODEC_ID_MPEG1VIDEO;
+	c->codec_type = CODEC_TYPE_VIDEO;
 
-	m->context->bit_rate = 800000;
-	m->context->flags = CODEC_FLAG_TRELLIS_QUANT | CODEC_FLAG_NORMALIZE_AQP;
-	m->context->gop_size = 15;
-	m->context->max_b_frames = 1;
-	m->context->me_method = ME_EPZS;
-	m->context->rc_qsquish = 1.0f;
-	m->context->sample_aspect_ratio = av_d2q(1.0, 1);
-	m->context->qblur = 0.0f;
-	m->context->qcompress = 1.0f;
+	if (!(codec = avcodec_find_encoder(c->codec_id))) {
+		slMessage(DEBUG_ALL, "Could not find MPEG-1 encoder\n");
+		av_free(st);
+		delete m;
+		return NULL;
+	}
+	c->pix_fmt = codec->pix_fmts[0];
 
-	if (avcodec_open(m->context, m->codec) < 0) {
-		slMessage(DEBUG_ALL, "error opening movie output codec\n");
+	c->width = width;
+	c->height = height;
+	c->frame_rate = rate;
+	c->frame_rate_base = b;
+
+	/* use lavc ratecontrol to get 1-pass constant bit-rate */
+
+	c->rc_max_rate = c->rc_min_rate = c->bit_rate = 800 * 1000;
+
+	c->bit_rate_tolerance = c->bit_rate * 10;
+	c->rc_buffer_aggressivity = 1.0f;
+	c->rc_buffer_size = 224 * 1024;
+	c->rc_strategy = 2;
+	c->rc_qsquish = 1.0f;
+
+	c->flags = CODEC_FLAG_TRELLIS_QUANT;
+	c->gop_size = 15;
+	c->max_b_frames = 1;
+
+	/* Give the muxer the magic numbers. */
+
+	m->context->max_delay = (int)(0.7 * AV_TIME_BASE);
+	m->context->mux_rate = 1411200;
+	m->context->packet_size = 2324;
+	m->context->preload = (int)(0.44 * AV_TIME_BASE);
+
+	if (av_set_parameters(m->context, NULL) < 0 ||
+	    avcodec_open(c, codec) < 0) {
+		slMessage(DEBUG_ALL, "error opening video output codec\n");
+		av_free(st);
+		delete m;
+		return NULL;
+	}
+	if (!(m->rgb_pic = avcodec_alloc_frame()) ||
+	    !(m->yuv_pic = avcodec_alloc_frame())) {
+		slMessage(DEBUG_ALL, "Could not allocate lavc frame\n");
+		avcodec_close(c);
+		av_free(st);
+		delete m;
 		return NULL;
 	}
 
-	m->bufferSize = height * width * 3;
+	/*
+	 * enc_buf holds the encoded frame, so enc_len must be at least
+	 * a reasonable estimate of the size of the largest I-frame.
+	 */
 
-	m->buffer = new unsigned char[m->bufferSize];
-	m->RGBpictureBuffer = new unsigned char[m->bufferSize];
-	m->YUVpictureBuffer = new unsigned char[m->bufferSize / 2];
-	m->vvBuffer = new unsigned char[height * width];
-	m->uuBuffer = new unsigned char[height * width];
+	m->enc_len = width * height * 3;
+	m->enc_buf = new uint8_t[m->enc_len];
 
-	m->picture->data[0] = m->YUVpictureBuffer;
-	m->picture->data[1] = m->picture->data[0] + (height * width);
-	m->picture->data[2] = m->picture->data[1] + (height * width) / 4;
-	m->picture->linesize[0] = width;
-	m->picture->linesize[1] = width / 2;
-	m->picture->linesize[2] = width / 2;
-	m->picture->quality = 0;
+	/* rgb_buf holds the unencoded frame in packed RGB from OpenGL. */
+
+	m->rgb_len = avpicture_get_size(PIX_FMT_RGB24, width, height);
+	m->rgb_buf = new uint8_t[m->rgb_len];
+	avpicture_fill((AVPicture *)m->rgb_pic, m->rgb_buf, PIX_FMT_RGB24,
+	    width, height);
+
+	/* yuv_buf holds the unencoded frame in codec's native pixel format. */
+
+	m->yuv_len = avpicture_get_size(c->pix_fmt, width, height);
+	m->yuv_buf = new uint8_t[m->yuv_len];
+	avpicture_fill((AVPicture *)m->yuv_pic, m->yuv_buf, c->pix_fmt,
+	    width, height);
+
+	m->line = new uint8_t[width * 3]; /* one line of packed RGB pixels */
+
+	av_write_header(m->context);
 
 	return m;
 }
 
 /*!
-	\brief Adds a frame to a movie from pixel data.
+	\brief Encodes a frame and potentially writes it to the movie file.
 */
 
 
-int slMovieAddFrame(slMovie *m, int flip) {
+int slMovieEncodeFrame(slMovie *m) {
+	AVCodecContext *c;
+	AVStream *st;
 	int size;
 
 	if (!m)
 		return -1;
 
-	RGB2YUV420(m->context->width, m->context->height, m->uuBuffer, m->vvBuffer, m->RGBpictureBuffer, m->YUVpictureBuffer, flip);
+	st = m->context->streams[0];
+	c = &st->codec;
 
-	if (!(size = avcodec_encode_video(m->context, m->buffer, m->bufferSize, m->picture)))
-		return -1;
+	/*
+	 * Colorspace conversion from RGB to codec's format (likely YUV420P).
+	 * OpenGL's RGB pixel format is RGB24 in lavc.
+	 */
 
-	fwrite(m->buffer, size, 1, m->file);
+	img_convert((AVPicture *)m->yuv_pic, c->pix_fmt,
+	    (AVPicture *)m->rgb_pic, PIX_FMT_RGB24, c->width, c->height);
+
+	/* Encode the frame yuv_pic storing the output in enc_buf. */
+
+	size = avcodec_encode_video(c, m->enc_buf, m->enc_len, m->yuv_pic);
+
+	/*
+	 * If size is 0, the frame is buffered internally by lavc to
+	 * allow B-frames to be properly reordered.
+	 */
+
+	if (size) {
+		AVPacket pkt;
+
+		av_init_packet(&pkt);
+
+		pkt.data = m->enc_buf;
+		pkt.size = size;
+		pkt.stream_index = st->index;
+
+		if (c->coded_frame->key_frame)
+			pkt.flags |= PKT_FLAG_KEY;
+		pkt.pts = c->coded_frame->pts;
+
+		av_write_frame(m->context, &pkt);
+	}
 
 	return 0;
 }
@@ -123,17 +204,35 @@ int slMovieAddFrame(slMovie *m, int flip) {
 	\brief Reads from the current OpenGL context to add a frame to a movie.
 */
 
-int slMovieAddWorldFrame(slMovie *m, slWorld *w, slCamera *c) {
-	if (c->activateContextCallback && c->activateContextCallback()) {
+int slMovieAddWorldFrame(slMovie *m, slWorld *w, slCamera *cam) {
+	AVCodecContext *c = &m->context->streams[0]->codec;
+	unsigned char *a, *b, *tmp;
+	size_t len;
+	int y;
+
+	if (cam->activateContextCallback && cam->activateContextCallback()) {
 		slMessage(DEBUG_ALL, "Cannot add frame to movie: no OpenGL context available\n");
 		return -1;
 	}
-	if (c->renderContextCallback)
-		c->renderContextCallback(w, c);
+	if (cam->renderContextCallback)
+		cam->renderContextCallback(w, cam);
 
-	glReadPixels(0, 0, m->context->width, m->context->height, GL_RGB, GL_UNSIGNED_BYTE, m->RGBpictureBuffer);
+	glReadPixels(0, 0, c->width, c->height, GL_RGB, GL_UNSIGNED_BYTE, m->rgb_buf);
 
-	return slMovieAddFrame(m, 1);
+	/* OpenGL reads bottom-to-top, but encoder expects top-to-bottom. */
+
+	len = c->width * 3;
+	tmp = (unsigned char *)m->line;
+	for (y = 0; y < c->height >> 1; ++y) {
+		a = (unsigned char *)&m->rgb_buf[y * len];
+		b = (unsigned char *)&m->rgb_buf[(c->height - y) * len];
+
+		memcpy(tmp, a, len);
+		memcpy(a, b, len);
+		memcpy(b, tmp, len);
+	}
+
+	return slMovieEncodeFrame(m);
 }
 
 /*!
@@ -141,132 +240,55 @@ int slMovieAddWorldFrame(slMovie *m, slWorld *w, slCamera *c) {
 */
 
 int slMovieFinish(slMovie *m) {
-	int size;
-	char outbuf[4];
+	AVPacket pkt;
+	AVCodecContext *c;
+	AVStream *st;
+	int n;
 
 	if (!m)
 		return -1;
 
-	while ((size = avcodec_encode_video(m->context, m->buffer, m->bufferSize, NULL)))
-		fwrite(m->buffer, size, 1, m->file);
+	st = m->context->streams[0];
+	c = &st->codec;
 
-	outbuf[0] = 0x00;
-	outbuf[1] = 0x00;
-	outbuf[2] = 0x01;
-	outbuf[3] = 0xb7;
-	fwrite(outbuf, 4, 1, m->file);
-	fclose(m->file);
+	/* Flush any frames left in lavc buffer by encoding a NULL frame. */
 
-	avcodec_close(m->context);
+	for (int i = 0; i <= c->max_b_frames; ++i) {
+		n = avcodec_encode_video(c, m->enc_buf, m->enc_len, NULL);
+
+		if (!n)
+			continue;
+
+		av_init_packet(&pkt);
+
+		pkt.data = m->enc_buf;
+		pkt.size = n;
+		pkt.stream_index = st->index;
+
+		if (c->coded_frame->key_frame)
+			pkt.flags |= PKT_FLAG_KEY;
+		pkt.pts = c->coded_frame->pts;
+
+		av_write_frame(m->context, &pkt);
+	}
+
+	av_write_trailer(m->context);
+	url_fclose(&m->context->pb);
+
+	avcodec_close(c);
+	av_free(st);
 	av_free(m->context);
-	av_free(m->picture);
+	av_free(m->rgb_pic);
+	av_free(m->yuv_pic);
 
-	delete[] m->buffer;
-	delete[] m->YUVpictureBuffer;
-	delete[] m->RGBpictureBuffer;
-	delete[] m->vvBuffer;
-	delete[] m->uuBuffer;
+	delete[] m->enc_buf;
+	delete[] m->rgb_buf;
+	delete[] m->yuv_buf;
+	delete[] m->line;
 
 	delete m;
 
 	return 0;
-}
-
-/*!
-	\brief Translate from RGB to YUV.
-
-	I have no freakin' clue.  I found this on the net somewhere.  I also
-	found about six different verions of the same thing, and this is the 
-	only thing that worked.
-*/
-
-static int RGB2YUV_YR[256], RGB2YUV_YG[256], RGB2YUV_YB[256];
-static int RGB2YUV_UR[256], RGB2YUV_UG[256], RGB2YUV_UBVR[256];
-static int RGB2YUV_VG[256], RGB2YUV_VB[256];
-
-void RGB2YUV420(int x_dim, int y_dim, unsigned char *uu, unsigned char *vv, unsigned char *bmp, unsigned char *yuv, int flip) {
-	unsigned char *r, *g, *b;
-	unsigned char *y, *u, *v;
-	unsigned char *pu1, *pu2,*pu3,*pu4;
-	unsigned char *pv1, *pv2,*pv3,*pv4;
-	int i, j, row;
-
-	y = yuv;
-	u = uu;
-	v = vv;
-
-	for (i = 0; i < y_dim; ++i) {
-		if (flip)
-			row = ((y_dim - 1) - i);
-		else
-			row = i;
-
-		r = bmp + 3 * x_dim * row;
-		g = r + 1;
-		b = r + 2;
-
-		for (j = 0; j < x_dim; ++j) {
-
-			*y++ = ( RGB2YUV_YR[*r]  + RGB2YUV_YG[*g] + RGB2YUV_YB[*b] + 1048576) >> 16;
-			*u++ = (-RGB2YUV_UR[*r]  - RGB2YUV_UG[*g] + RGB2YUV_UBVR[*b] + 8388608) >> 16;
-			*v++ = ( RGB2YUV_UBVR[*r]- RGB2YUV_VG[*g] - RGB2YUV_VB[*b] + 8388608) >> 16;
-
-			r += 3;
-			g += 3;
-			b += 3;
-		}
-	}
-
-	//dimension reduction for U and V components
-	u = yuv + x_dim * y_dim;
-	v = u + x_dim * y_dim / 4;
-
-	pu1 = uu;
-	pu2 = pu1 + 1;
-	pu3 = pu1 + x_dim;
-	pu4 = pu3 + 1;
-
-	pv1 = vv;
-	pv2 = pv1 + 1;
-	pv3 = pv1 + x_dim;
-	pv4 = pv3 + 1;
-
-	for (i = 0; i < y_dim; i += 2) {
-		for (j = 0; j < x_dim; j += 2) {
-			*u++ = ((int)*pu1 + *pu2 + *pu3 + *pu4) >> 2;
-			*v++ = ((int)*pv1 + *pv2 + *pv3 + *pv4) >> 2;
-			pu1 += 2;
-			pu2 += 2;
-			pu3 += 2;
-			pu4 += 2;
-			pv1 += 2;
-			pv2 += 2;
-			pv3 += 2;
-			pv4 += 2;
-		}
-
-		pu1 += x_dim;
-		pu2 += x_dim;
-		pu3 += x_dim;
-		pu4 += x_dim;
-		pv1 += x_dim;
-		pv2 += x_dim;
-		pv3 += x_dim;
-		pv4 += x_dim;
-	}
-}
-
-void initYUVLookupTable() {
-	int i;
-
-	for (i = 0; i < 256; i++) RGB2YUV_YR[i] = (int)(65.481f * (i << 8));
-	for (i = 0; i < 256; i++) RGB2YUV_YG[i] = (int)(128.553f * (i << 8));
-	for (i = 0; i < 256; i++) RGB2YUV_YB[i] = (int)(24.966f * (i << 8));
-	for (i = 0; i < 256; i++) RGB2YUV_UR[i] = (int)(37.797f * (i << 8));
-	for (i = 0; i < 256; i++) RGB2YUV_UG[i] = (int)(74.203f * (i << 8));
-	for (i = 0; i < 256; i++) RGB2YUV_VG[i] = (int)(93.786f * (i << 8));
-	for (i = 0; i < 256; i++) RGB2YUV_VB[i] = (int)(18.214f * (i << 8));
-	for (i = 0; i < 256; i++) RGB2YUV_UBVR[i] = (int)(112.0f * (i << 8));
 }
 
 #endif

@@ -25,26 +25,34 @@
 
 #define BRMOVIEPOINTER(p)  ((slMovie*)BRPOINTER(p))
 
-#if HAVE_LIBAVCODEC
 int breveMovieCreate(brEval args[], brEval *result, brInstance *i) {
+#if HAVE_LIBAVFORMAT
 	char *path;
 	slMovie *movie;
 	slCamera *camera = i->engine->camera;
 
 	path = brOutputPath(i->engine, BRSTRING(&args[0]));
 
-	movie = slMovieCreate(path, camera->x, camera->y, 30, 1.0);
+	movie = slMovieCreate(path, camera->x, camera->y, 30000, 1001);
 	slFree(path);
 
-	BRMOVIEPOINTER(result) = movie;
+	BRPOINTER(result) = movie;
 
 	return EC_OK;
+#else
+	slMessage(DEBUG_ALL, "This version of breve was built without support for movie export\n");
+
+	return EC_ERROR;
+#endif
 }
 
 int breveMovieAddWorldFrame(brEval args[], brEval *result, brInstance *i) {
 	slMovie *movie = BRMOVIEPOINTER(&args[0]);
 
-	BRINT(result) = slMovieAddWorldFrame(movie, i->engine->world, i->engine->camera);
+	if (!movie)
+		slMessage(DEBUG_ALL, "warning: attempt to add frame to null movie pointer\n");
+	else
+		BRINT(result) = slMovieAddWorldFrame(movie, i->engine->world, i->engine->camera);
 
 	return EC_OK;
 }
@@ -53,69 +61,16 @@ int breveMovieClose(brEval args[], brEval *result, brInstance *i) {
 	slMovie *movie = BRMOVIEPOINTER(&args[0]);
 
 	if (!movie)
-		slMessage(DEBUG_ALL, "warning: attempt to close uninitialized movie pointer\n");
+		slMessage(DEBUG_ALL, "warning: attempt to close null movie pointer\n");
 	else
 		slMovieFinish(movie);
 
 	return EC_OK;
 
 }
-#endif
-
-#if HAVE_LIBPNG
-int breveSnapshot(brEval args[], brEval *result, brInstance *i) {
-	// this doesn't really belong here
-	char *path;
-	slCamera *c = i->engine->camera;
-
-	path = brOutputPath(i->engine, BRSTRING(&args[0]));
-
-	BRINT(result) = slPNGSnapshot(i->engine->world, c, path);
-	slFree(path);
-
-	return EC_OK;
-}
-#endif
-
-/*!
-	\brief Called if this version of breve is built without movie export support.
-
-	Prints an error message.
-*/
-
-int breveMovieUnsupported(brEval args[], brEval *result, brInstance *i) {
-	slMessage(DEBUG_ALL, "This version of breve was built without support for movie export\n");
-
-	return EC_ERROR;
-}
-
-/*!
-	\brief Called if this version of breve is built without image export support.
-
-	Prints an error message.
-*/
-
-int breveSnapshotUnsupported(brEval args[], brEval *result, brInstance *i) {
-	slMessage(DEBUG_ALL, "This version of breve was built without support for image export\n");
-
-	return EC_ERROR;
-}
-/*@}*/
 
 void breveInitMovieFunctions(brNamespace *n) {
-#if HAVE_LIBAVCODEC
 	brNewBreveCall(n, "movieCreate", breveMovieCreate, AT_POINTER, AT_STRING, 0);
 	brNewBreveCall(n, "movieAddWorldFrame", breveMovieAddWorldFrame, AT_INT, AT_POINTER, 0);
 	brNewBreveCall(n, "movieClose", breveMovieClose, AT_INT, AT_POINTER, 0);
-#else 
-	brNewBreveCall(n, "movieCreate", breveMovieUnsupported, AT_POINTER, AT_STRING, 0);
-	brNewBreveCall(n, "movieAddWorldFrame", breveMovieUnsupported, AT_INT, AT_POINTER, 0);
-	brNewBreveCall(n, "movieClose", breveMovieUnsupported, AT_INT, AT_POINTER, 0);
-#endif
-
-#if HAVE_LIBPNG
-	brNewBreveCall(n, "snapshot", breveSnapshot, AT_INT, AT_STRING, 0);
-#else
-	brNewBreveCall(n, "snapshot", breveSnapshotUnsupported, AT_INT, AT_STRING, 0);
-#endif
 }

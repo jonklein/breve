@@ -28,67 +28,58 @@
 #include "steve.h"
 #include "breve.h"
 
+static void brInterrupt(brEngine *);
+static void graphDisplay(void);
+static void *workerThread(void *);
+
+static void *newWindowCallback(char *, void *);
+static void freeWindowCallback(void *);
+static void renderWindowCallback(void *);
+
 #if MINGW
 extern char *optarg;
 extern int optind;
 #endif
 
-extern char *interfaceID, **gErrorNames;
+static int contextMenu, mainMenu;
 
-extern int gPaused;
+static int height = 400, width = 400;
+static int xpos = 0, ypos = 0;
 
-int gSlave = 0, gMaster = 0;
-char *gSlaveHost;
+static breveFrontend *frontend;
 
-int gWaiting = 0;
+static char keyDown[256];
 
-int contextMenu, mainMenu;
+static int gPaused = 1;
+static int gWaiting = 0;
 
-int height = 400, width = 400;
-int xpos = 0, ypos = 0;
+static int gThreadShouldExit = 0;
 
-brInstance *gSelected = NULL;
+static pthread_mutex_t gEngineMutex;
+static pthread_mutex_t gThreadMutex;
+static pthread_cond_t gThreadPaused;
 
-char keyDown[256];
+static char *gOptionArchiveFile = NULL;
+static int gOptionFormat = 0;
+static int gOptionFull = 0;
+static int gOptionStdin = 0;
 
-void *workerThread(void *);
+static int gMotionCrosshair = 0;
 
-void brInterrupt(brEngine *);
-void *newWindowCallback(char *, void *);
-void freeWindowCallback(void *);
-void renderWindowCallback(void *);
+static int gLastX, gLastY, gMods, gSpecial;
+static double gStartCamX;
 
-void graphDisplay();
+static brInstance *gSelected = NULL;
 
-pthread_mutex_t gEngineMutex;
-pthread_mutex_t gThreadMutex;
-pthread_cond_t gThreadPaused;
+static int gSlave = 0, gMaster = 0;
+static char *gSlaveHost;
 
-int gThreadShouldExit = 0;
-int gThreadRunning = 0; 
-
-// Options set when the command line is parsed.
-
-int gOptionFull = 0;
-int gOptionFormat = 0;
-int gOptionStdin = 0;
-char *gOptionArchiveFile = NULL;
-
-breveFrontend *frontend;
-
-std::map<int, void*> gWindowMap;
-
-int gLastX, gLastY, gMods, gSpecial;
-double gStartCamX;
-
-int gPaused = 1;
-
-int gMotionCrosshair = 0;
+static std::map<int, void*> gWindowMap;
 
 int main(int argc, char **argv) {
 	pthread_t thread;
-	int index;
 	char *text, *simulationFile;
+	int index;
 	char wd[MAXPATHLEN];
 
 	interfaceID = "glut/2.0";
@@ -156,11 +147,9 @@ int main(int argc, char **argv) {
 	slInitGlut(argc, argv, simulationFile);
 
 	if (gOptionArchiveFile) {
-		if (breveFrontendLoadSavedSimulation(frontend, text,
-		    simulationFile, gOptionArchiveFile) != EC_OK)
+		if (breveFrontendLoadSavedSimulation(frontend, text, simulationFile, gOptionArchiveFile) != EC_OK)
 			brQuit(frontend->engine);
-	} else if (breveFrontendLoadSimulation(frontend, text, simulationFile)
-		    != EC_OK)
+	} else if (breveFrontendLoadSimulation(frontend, text, simulationFile) != EC_OK)
 		brQuit(frontend->engine);
 
 	slFree(text);
@@ -180,6 +169,10 @@ int main(int argc, char **argv) {
 		slFree(gSlaveHost);
 	}
 
+#if HAVE_LIBAVFORMAT
+	av_register_all();
+#endif
+
 	if (gOptionFull)
 		glutFullScreen();
 
@@ -189,18 +182,18 @@ int main(int argc, char **argv) {
 }
 
 void *workerThread(void *data) {
-	gThreadRunning = 1;
-
-	while(1) {
+	for (;;) {
 		pthread_mutex_lock(&gThreadMutex);
 
 		if ((!gPaused && !frontend->engine->drawEveryFrame) ||
 		    !pthread_cond_wait(&gThreadPaused, &gThreadMutex)) {
-   		 	if (gThreadShouldExit ||
-			    brEngineIterate(frontend->engine) != EC_OK) {
-				brQuit(frontend->engine);
+   		 	if (gThreadShouldExit) {
 				pthread_mutex_unlock(&gThreadMutex);
 				return NULL;
+			}
+			else if (brEngineIterate(frontend->engine) != EC_OK) {
+				pthread_mutex_unlock(&gThreadMutex);
+				brQuit(frontend->engine);
 			}
 		}
 
@@ -208,7 +201,7 @@ void *workerThread(void *data) {
 	}
 }
 
-void brGlutLoop(void) {
+void brGlutLoop() {
 	static int oldD = 1;
 	int newD = frontend->engine->drawEveryFrame;
 
@@ -231,6 +224,8 @@ void brGlutLoop(void) {
 }
 
 void brGlutMenuUpdate(brInstance *i) {
+	brMenuEntry *menu;
+	char *message;
 	unsigned int n, total;
 
 	if (i != frontend->engine->controller)
@@ -240,13 +235,10 @@ void brGlutMenuUpdate(brInstance *i) {
 
 	total = glutGet(GLUT_MENU_NUM_ITEMS);
 
-	for(n = 0; n < total; ++n)
+	for (n = 0; n < total; ++n)
 		glutRemoveMenuItem(1);
 
-	for(n = 0; n < i->menus->count; ++n) {
-		brMenuEntry *menu;
-		char *message;
-
+	for (n = 0; n < i->menus->count; ++n) {
 		menu = (brMenuEntry *)i->menus->data[n];
 
 		if (menu->enabled) {
@@ -269,7 +261,7 @@ void brGlutMenuUpdate(brInstance *i) {
 void brQuit(brEngine *e) {
 	double diff, age;
 
-	if (gThreadRunning && !gPaused && !frontend->engine->drawEveryFrame) {
+	if (!gPaused && !frontend->engine->drawEveryFrame) {
 		gThreadShouldExit = 1;
 		pthread_mutex_lock(&gThreadMutex);
 	}
@@ -421,7 +413,6 @@ void brPrintUsage(char *name) {
 	fprintf(stderr, "http://www.spiderland.org/breve\n\n");
 	exit(1);
 }
-
 
 void slInitGlut(int argc, char **argv, char *title) {
 	glutInitWindowSize(width, height);

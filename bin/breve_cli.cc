@@ -43,13 +43,11 @@ char *gSlaveHost;
 
 int gShouldQuit = 0;
 
-extern char *interfaceID;
-
 breveFrontend *frontend;
 
-int activateContext(void);
-void brCatchSignal(int);
-void renderContext(slWorld *, slCamera *);
+static int activateContext(void);
+static void brCatchSignal(int);
+static void renderContext(slWorld *, slCamera *);
 
 int main(int argc, char **argv) {
 	int index;

@@ -551,43 +551,42 @@ unsigned char *slReadPNGImage(char *name, int *width, int *height, int *componen
 */
 
 int slPNGWrite(char *name, int width, int height, unsigned char *buffer, int channels, int reversed) {
-	FILE *fp = fopen(name, "wb");
+	FILE *fp;
 	png_structp png_ptr;
 	png_infop info_ptr;
 	png_bytepp rowPtrs;
 	int n;
 
-	if (!fp) {
+	if (!(fp = fopen(name, "wb"))) {
 		slMessage(DEBUG_ALL, "Could not open image file \"%s\" for writing: %s\n", name, strerror(errno));
 		return -1;
 	}
-
-	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-
-    if (!png_ptr) {
+	if (!(png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL))) {
 		slMessage(DEBUG_ALL, "Error writing PNG file \"%s\"\n", name);
+		fclose(fp);
 		return -1;
 	}
-
-	info_ptr = png_create_info_struct(png_ptr);
-
-	if(!info_ptr) {
+	if (!(info_ptr = png_create_info_struct(png_ptr))) {
 		png_destroy_write_struct(&png_ptr, NULL);
 		slMessage(DEBUG_ALL, "Error writing PNG file \"%s\"\n", name);
+		fclose(fp);
 		return -1;
 	}
-
 	if (setjmp(png_jmpbuf(png_ptr))) {
 		slMessage(DEBUG_ALL, "Error writing PNG file \"%s\"\n", name);
 		png_destroy_write_struct(&png_ptr, &info_ptr);
 		fclose(fp);
 		return -1;
-    }
+	}
 
 	rowPtrs = new png_bytep[height];
 
-	if(!reversed) for(n=0;n<height;n++) rowPtrs[n] = &buffer[n * (width * channels)];
-	else for(n=0;n<height;n++) rowPtrs[height - (n + 1)] = &buffer[n * (width * channels)];
+	if (!reversed)
+		for (n = 0; n < height; n++)
+			rowPtrs[n] = &buffer[n * (width * channels)];
+	else
+		for (n = 0; n < height; n++)
+			rowPtrs[height - (n + 1)] = &buffer[n * (width * channels)];
 
 	png_init_io(png_ptr, fp);
 
@@ -628,23 +627,23 @@ int slPNGWrite(char *name, int width, int height, unsigned char *buffer, int cha
 */
 
 int slPNGSnapshot(slWorld *w, slCamera *c, char *file) {
-	unsigned char *buffer;
+	unsigned char *buf;
 	int r;
 
-	if(c->activateContextCallback && c->activateContextCallback()) {
+	if (c->activateContextCallback && c->activateContextCallback()) {
 		slMessage(DEBUG_ALL, "Cannot generate PNG snapshot: no OpenGL context available\n");
 		return -1;
 	}
+	if (c->renderContextCallback)
+		c->renderContextCallback(w, c);
 
-	if(c->renderContextCallback) c->renderContextCallback(w, c);
+	buf = new unsigned char[c->x * c->y * 3];
 
-	buffer = new unsigned char[c->x * c->y * 3];
+	glReadPixels(c->ox, c->oy, c->x, c->y, GL_RGB, GL_UNSIGNED_BYTE, buf);
 
-	glReadPixels(c->ox, c->oy, c->x, c->y, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+	r = slPNGWrite(file, c->x, c->y, buf, 3, 1);
 
-	r = slPNGWrite(file, c->x, c->y, buffer, 3, 1);
-
-	delete[] buffer;
+	delete[] buf;
 
 	return r;
 }
@@ -660,10 +659,7 @@ int slPNGSnapshot(slWorld *w, slCamera *c, char *file) {
 */
 
 void slReversePixelBuffer(unsigned char *source, unsigned char *dest, int width, int height) {
-	int n;
-
-	for(n = 0; n < height; n++)
-		memmove(&dest[(height - (n + 1)) * width],
-			&source[n * width],
-			width);
+	for (int n = 0; n < height; ++n)
+		memcpy(&dest[(height - (n + 1)) * width],
+		    &source[n * width], width);
 }

@@ -226,6 +226,7 @@ fi
 
 AC_CHECK_LIB([gsl], [gsl_rng_alloc])
 AC_CHECK_LIB([avcodec], [avcodec_init])
+AC_CHECK_LIB([avformat], [av_write_frame])
 AC_CHECK_LIB([OSMesa], [OSMesaCreateContext])
 
 AC_CHECK_FUNCS([getopt_long gettimeofday iswspace mkstemp strdup vasprintf])
@@ -315,8 +316,8 @@ if test "$ac_cv_lib_sndfile_sf_open" != yes; then
 	AC_MSG_WARN([libsndfile not found. building without audio support.])
 fi
 
-if test "$ac_cv_lib_avcodec_avcodec_init" != yes; then
-	AC_MSG_WARN([libavcodec not found. building without movie export support.])
+if test "$ac_cv_lib_avformat_av_write_frame" != yes; then
+	AC_MSG_WARN([libavformat not found. building without MPEG support.])
 fi
 
 if test "x$_have_jvm" = x ; then

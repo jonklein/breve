@@ -1,41 +1,22 @@
-#include <stdio.h>
+#if HAVE_LIBAVFORMAT
 
-#if HAVE_LIBAVCODEC
-#include "ffmpeg/avcodec.h"
+#include <ffmpeg/avformat.h>
 
 /*!
-	\brief A struct used to export breve movie.
+	\brief A class used to export breve movie.
 */
 
-#ifdef __cplusplus
 class slMovie {
 	public:
-		AVCodec *codec;	
-		AVCodecContext *context;
-		AVFrame *picture;
+		AVFormatContext *context;
+		AVFrame *rgb_pic, *yuv_pic;
 
-		unsigned char *buffer;
-		int bufferSize;
-
-		unsigned char *YUVpictureBuffer;
-		unsigned char *RGBpictureBuffer;
-		unsigned char *vvBuffer;
-		unsigned char *uuBuffer;
-
-		FILE *file;
+		uint8_t *enc_buf, *rgb_buf, *yuv_buf, *line;
+		unsigned int enc_len, rgb_len, yuv_len;
 };
-#endif
 
-typedef struct slMovie slMovie;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-slMovie *slMovieCreate(char *, int, int, int, float);
-int slMovieAddFrame(slMovie *, int);
+slMovie *slMovieCreate(char *, int, int, int, int);
 int slMovieAddWorldFrame(slMovie *, slWorld *, slCamera *);
 int slMovieFinish(slMovie *);
-#ifdef __cplusplus
-}
-#endif
+
 #endif

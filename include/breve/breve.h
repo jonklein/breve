@@ -99,3 +99,6 @@ char *getSavename(void);
 char *getLoadname(void);
 int soundCallback(void);
 int pauseCallback(void);
+
+extern char **gErrorNames;
+extern char *interfaceID;
