@@ -269,3 +269,5 @@ void breveInitMatrixFunctions(brNamespace *n) {
 	brNewBreveCall(n, "matrixCopyToImage", brIMatrixCopyToImage, AT_NULL, AT_POINTER, AT_POINTER, AT_INT, AT_DOUBLE, 0);
 #endif
 }
+
+

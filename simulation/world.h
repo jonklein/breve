@@ -33,6 +33,7 @@
 class slPatchGrid;
 class slSpring;
 class slVclipData;
+class slDrawCommandList;
 #endif
 
 
@@ -142,6 +143,7 @@ struct slWorld {
 	std::vector<slPatchGrid*> patches;
 	std::vector<slCamera*> cameras;
 	std::vector<slObjectConnection*> connections;
+	std::vector<slDrawCommandList*> drawings;
 
 	// we have one slVclipData for the regular collision detection
 	// and one which will be used to answer "proximity" questions:

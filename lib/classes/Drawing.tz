@@ -1,0 +1,83 @@
+@use Object.
+
+Abstract : Drawing {
+	% A basic class to draw custom images using polygons and lines.
+
+	+ variables:
+		drawPointer (pointer).
+
+	+ to init:
+		drawPointer = drawListNew().
+
+	+ section "Managing the list of drawing instructions"
+
+	+ to get-size:
+		% Returns the current number of instructions in the drawing.
+
+		drawListGetCommandCount(drawPointer).
+
+	+ to clear:
+		% Clears the drawing by removing all of its instructions.
+
+		drawListClear(drawPointer).
+
+	+ to set-instruction-limit to limit (int):
+		% Limits to limit the number of instructions that may be added to the 
+		% drawing.  When instructions are added beyond the instruction limit, 
+		% instructions will be removed from the beginning of the instruction list.
+		% <p>
+		% This may be useful in creating drawings which act as arbitrarily long 
+		% trails on objects.  If no limit were used, the trail would consume 
+		% more and more resources.
+		
+		drawListSetCommandLimit(drawPointer, limit).
+
+	+ to move to location (vector):
+		% Moves the entire drawing to location.  Additional points and polygon
+		% vertices added to the drawing are still interpreted as relative to 
+		% the drawing's origin.
+
+	+ to add-polygon-point at polygonPoint (vector):
+		% Adds a polygon vertex at polygonPoint.  Repeated calls to this method add 
+		% vertices to the same polygon until no new points are added, or until the 
+		% method METHOD(end-polygon) or the method METHOD(draw-line) is called.
+		% <P>
+		% In order to accurately render a polygon, all of the points on the polygon
+		% must be coplanar.  If the points do not lie on the same plane, visual 
+		% artifacts may occur.
+
+		drawListDrawVertex(drawPointer, polygonPoint).
+
+	+ to set-line-style to lineStyle (string):
+		% lineStyle is a string of 16 spaces and/or dashes which specify the line 
+		% pattern to be drawn.  A dotted line, for example, would use the pattern 
+		% "- - - - - - - - ".  A thickly dashed line would use the pattern 
+		% "--------        ".  
+
+		drawListSetLineStyle(drawPointer, lineStyle).
+
+	+ to set-line-width to lineWidth (double):
+		% Specifies the width of the line to be drawn.
+
+		drawListSetLineWidth(drawPointer, lineWidth).
+
+	+ to end-polygon:
+		% This method ends the polygon currently being drawn.  
+
+		drawListEndPolygon(drawPointer).
+
+	+ to draw-line from startPoint (vector) to endPoint (vector):
+		% Adds a line segment from startPoint to endPoint.  
+
+		drawListDrawLine(drawPointer, startPoint, endPoint).
+
+	+ to set-color to newColor (vector) with-transparency transparencyValue = 1.0 (float):
+		% Changes this drawing's current color to newColor.  The optional value
+		% transparencyValue specifies the transparency level between 0.0 (fully transparent)
+		% and 1.0 (fully opaque).
+
+		drawListSetColor(drawPointer, newColor, transparencyValue).
+
+	+ to destroy:
+		drawListFree(drawPointer).
+}

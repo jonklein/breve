@@ -1275,7 +1275,7 @@ inline int stEvalListIndexPointer(stListIndexExp *l, stRunInstance *i, void **po
 		}
 
 		if(stDoEvalListIndexPointer(BRPOINTER(&list), BRINT(&index), &target)) {
-			stEvalError(i->instance->type->engine, EE_BOUNDS, "list index \"%d\" out of bounds in list element evaluation", BRINT(&index));
+			stEvalError(i->instance->type->engine, EE_BOUNDS, "list index \"%d\" out of bounds", BRINT(&index));
 			return EC_ERROR;
 		}
 
@@ -1302,16 +1302,33 @@ inline int stEvalListIndex(stListIndexExp *l, stRunInstance *i, brEval *t) {
 
 	if(list.type == AT_LIST) {
 		if(index.type != AT_INT && stToInt(&index, &index, i) == EC_ERROR) {
-			stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"int\" in list element evaluation (index component)");
+			stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"int\" in list index");
 			return EC_ERROR;
 		}
 
 		if(stDoEvalListIndex(BRPOINTER(&list), BRINT(&index), t)) {
-			stEvalError(i->instance->type->engine, EE_BOUNDS, "list index \"%d\" out of bounds in list element evaluation", BRINT(&index));
+			stEvalError(i->instance->type->engine, EE_BOUNDS, "list index \"%d\" out of bounds", BRINT(&index));
 			return EC_ERROR;
 		}
 	} else if(list.type == AT_HASH) {
 		brEvalHashLookup(BRHASH(&list), &index, t);
+	} else if(list.type == AT_STRING) {
+		char *newstring, *oldstring;
+
+		oldstring = BRSTRING(&list);
+
+		if(strlen(oldstring) <= BRINT(&index)) {
+			stEvalError(i->instance->type->engine, EE_BOUNDS, "string index \"%d\" out of bounds", BRINT(&index));
+			return EC_ERROR;
+		}
+
+		newstring = slMalloc(2);
+
+		newstring[0] = oldstring[BRINT(&index)];
+		newstring[1] = 0;
+
+		BRSTRING(t) = newstring;
+		t->type = AT_STRING;
 	} else {
 		stEvalError(i->instance->type->engine, EE_TYPE, "expected list or hash in lookup expression");
 		return EC_ERROR;
@@ -1337,12 +1354,12 @@ inline int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, brEv
 
 	if(list.type == AT_LIST) {
 		if(index.type != AT_INT && stToInt(&index, &index, i) == EC_ERROR) {
-			stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"int\" in list element assignment evaluation (index component)");
+			stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"int\" for list element assignment index");
 			return EC_ERROR;
 		}
 
 		if(stDoEvalListIndexAssign(BRLIST(&list), BRINT(&index), t, i)) {
-			stEvalError(i->instance->type->engine, EE_BOUNDS, "list index \"%d\" out of bounds in list element assignment evaluation", BRINT(&index));
+			stEvalError(i->instance->type->engine, EE_BOUNDS, "list index \"%d\" out of bounds", BRINT(&index));
 			return EC_ERROR;
 		}
 	} else if(list.type == AT_HASH) {
@@ -1351,8 +1368,42 @@ inline int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, brEv
 		brEvalHashStore(BRHASH(&list), &index, t, &old);
 
 		stGCUnretainAndCollect(&old);
+	} else if(list.type == AT_STRING) {
+		char **stringptr, *newstring, *oldstring, *substring;
+		int n, type;
+
+		n = BRINT(&index);
+
+		result = stPointerForExp(l->listExp, i, &stringptr, &type);
+
+		oldstring = *stringptr;
+
+		if(!oldstring || n < 0 || n > strlen(oldstring) + 1) {
+			stEvalError(i->instance->type->engine, EE_BOUNDS, "string index \"%d\" out of bounds", BRINT(&index));
+			return EC_ERROR;
+		}
+
+		if(t->type != AT_STRING) {
+			stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"string\" for string index assignment", BRINT(&index));
+			return EC_ERROR;
+		}
+
+		substring = BRSTRING(t);
+
+		newstring = slMalloc(strlen(oldstring) + strlen(substring) + 1);
+
+		strncpy(newstring, oldstring, n);
+		strcpy(&newstring[n], substring);
+
+		if(n != strlen(oldstring) + 1) 
+			strcpy(&newstring[n + strlen(substring)], &oldstring[n + 1]);
+
+		if(*stringptr) slFree(*stringptr);
+		*stringptr = newstring;
+
+		BRSTRING(t) = slStrdup(newstring);
 	} else {
-		stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"list\" in list element assignment evaluation (list component)");
+		stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"list\" or \"hash\" in index assignment");
 		return EC_ERROR;
 	}
 
@@ -2632,17 +2683,14 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *target, stObject **tClass) {
 			if(result != EC_OK) result = result;
 
 			switch(target->type) {
-				brEvalListHead *l;
-
 				case AT_VECTOR:
 					target->type = AT_DOUBLE;
 					BRDOUBLE(target) = slVectorLength(&BRVECTOR(target));
 					result = EC_OK;
 					break;
 				case AT_LIST:
-					l = BRLIST(target);
 					target->type = AT_INT;
-					BRINT(target) = l->count;
+					BRINT(target) = BRLIST(target)->count;
 					result = EC_OK;
 					break;
 				case AT_INT:
@@ -2655,6 +2703,12 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *target, stObject **tClass) {
 					BRDOUBLE(target) = fabs(BRDOUBLE(target));
 					result = EC_OK;
 					break;
+				case AT_STRING:
+					target->type = AT_INT;
+					if(!BRSTRING(target)) BRINT(target) = 0;
+					else BRINT(target) = strlen(BRSTRING(target));
+					break;
+
 				default:
 					stEvalError(i->instance->type->engine, EE_TYPE, "Cannot give magnitude of %s expression", slAtomicTypeStrings[target->type]);
 					return EC_ERROR;

@@ -40,7 +40,7 @@ if test "x$JAVAPREFIX" = x; then
 else
         test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, javac$EXEEXT "gcj$EXEEXT -C" "egcj -C" guavac$EXEEXT jikes$EXEEXT, $JAVAPREFIX)
 fi
-test "x$JAVAC" = x && AC_MSG_ERROR([no acceptable Java compiler found in \$PATH])
+test "x$JAVAC" = x && AC_MSG_WARN([no acceptable Java compiler found in \$PATH])
 AC_PROG_JAVAC_WORKS
 AC_PROVIDE([$0])dnl
 ])
@@ -52,7 +52,7 @@ if test "x$JAVAPREFIX" = x; then
 else
         test "x$JAR" = x && AC_CHECK_PROGS(JAR, jar ejar, $JAVAPREFIX)
 fi
-test "x$JAR" = x && AC_MSG_ERROR([no acceptable jar program found in \$PATH])
+test "x$JAR" = x && AC_MSG_WARN([no acceptable jar program found in \$PATH])
 AC_PROVIDE([$0])dnl
 ])
 
@@ -140,7 +140,6 @@ AC_SUBST(JAVALIBS)
 AC_SUBST(JAVAINCS)
 AC_SUBST(PLUGINFLAGS)
 AC_SUBST(QUICKTIMEFLAGS)
-AC_SUBST(EXTRALDFLAGS)
 AC_SUBST(LDFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(VERSION)

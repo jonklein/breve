@@ -460,7 +460,6 @@ void slRenderScene(slWorld *w, slCamera *c, int crosshair) {
 void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 	slVector cam;
 	int flags = 0;
-	std::vector<slPatchGrid*>::iterator pi;
 
 	if(!w || !c) return;
 
@@ -546,8 +545,9 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 		slRenderBillboards(c, flags);
 	}
 
+	std::vector<slPatchGrid*>::iterator pi;
 	for(pi = w->patches.begin(); pi != w->patches.end(); pi++) (*pi)->draw(c);
-	
+
 	if(c->drawLights) {
 		// do the shadows
 		if(c->drawShadowVolumes) slRenderShadowVolume(w, c);
@@ -563,6 +563,9 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 #ifdef HAVE_LIBENET
 	slDrawNetsimBounds(w);
 #endif
+
+	std::vector<slDrawCommandList*>::iterator di;
+	for(di = w->drawings.begin(); di != w->drawings.end(); di++) (*di)->draw(c);
 
 	if(w->gisData) w->gisData->draw(c);
 

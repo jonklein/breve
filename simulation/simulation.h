@@ -65,5 +65,6 @@
 #include "joint.h"
 #include "volInt.h"
 #include "terrain.h"
+#include "drawcommand.h"
 
 #endif /* _SIMULATION_H */

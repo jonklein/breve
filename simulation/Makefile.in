@@ -6,8 +6,9 @@
 # 
 
 LIBO	= multibody.o link.o shape.o integrate.o joint.o \
-		camera.o world.o worldObject.o vclip.o vclipData.o patch.o gldraw.o netsim.o \
-		shadow.o terrain.o volInt.o image.o movie.o lightdetector.o springs.o tiger.o
+		camera.o world.o worldObject.o vclip.o vclipData.o patch.o \
+		gldraw.o netsim.o shadow.o terrain.o volInt.o image.o movie.o \
+		lightdetector.o springs.o drawcommand.o tiger.o
 
 LIBS	+=-L../lib -lutil
 
