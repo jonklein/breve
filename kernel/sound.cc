@@ -24,11 +24,13 @@
 brSoundMixer *brNewSoundMixer() {
 	brSoundMixer *mixer;
 	int error;
+	int n;
 
 	mixer = slMalloc(sizeof(brSoundMixer));
 	mixer->nPlayers = 0;
 	mixer->maxPlayers = 8;
-	mixer->players = slMalloc(mixer->maxPlayers * sizeof(brSoundPlayer));
+	mixer->players = slMalloc(mixer->maxPlayers * sizeof(brSoundPlayer*));
+	for(n=0;n<mixer->maxPlayers;n++) mixer->players[n] = slMalloc(sizeof(brSoundPlayer));
 	mixer->streamShouldEnd = 0;
 
 	error = Pa_OpenDefaultStream(&mixer->stream, 0, 2, paInt32, MIXER_SAMPLE_RATE, 256, 0, brPASoundCallback, mixer);
@@ -44,6 +46,7 @@ brSoundMixer *brNewSoundMixer() {
 }
 
 void brFreeSoundMixer(brSoundMixer *mixer) {
+	int n;
 	mixer->streamShouldEnd = 1;
 
 	// printf("waiting for %p (%p) to finish\n", mixer, mixer->stream);
@@ -54,28 +57,15 @@ void brFreeSoundMixer(brSoundMixer *mixer) {
 
 	if(mixer->stream) Pa_CloseStream(mixer->stream);
 	
+	for(n=0;n<mixer->maxPlayers;n++) slFree(mixer->players[n]);
 	slFree(mixer->players);
 	slFree(mixer);
 }
 
 brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency) {
-	brSoundPlayer *player = NULL;
-	int n;
+	brSoundPlayer *player;
 	
-	for(n=0;n<mixer->nPlayers;n++) {
-		if(mixer->players[n].finished) player = &mixer->players[n];
-	}
-
-	if(!player) {
-		if(mixer->nPlayers == mixer->maxPlayers) {
-			mixer->maxPlayers *= 2;
-			mixer->players = slRealloc(mixer->players, mixer->maxPlayers * sizeof(brSoundPlayer));
-		}
-
-		player = &mixer->players[mixer->nPlayers];
-
-		mixer->nPlayers++;
-	}
+	player = brNextPlayer(mixer);
 
 	player->isSinewave = 1;
 	player->frequency = frequency;
@@ -87,24 +77,35 @@ brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency) {
 	return player;
 }
 
-brSoundPlayer *brNewPlayer(brSoundMixer *mixer, brSoundData *data) {
+brSoundPlayer *brNextPlayer(brSoundMixer *mixer) {
 	brSoundPlayer *player = NULL;
 	int n;
 
 	for(n=0;n<mixer->nPlayers;n++) {
-		if(mixer->players[n].finished) player = &mixer->players[n];
+		if(mixer->players[n]->finished) player = mixer->players[n];
 	}
 
 	if(!player) {
 		if(mixer->nPlayers == mixer->maxPlayers) {
+			int oldMax = mixer->maxPlayers;
 			mixer->maxPlayers *= 2;
-			mixer->players = slRealloc(mixer->players, mixer->maxPlayers * sizeof(brSoundPlayer));
+			mixer->players = slRealloc(mixer->players, mixer->maxPlayers * sizeof(brSoundPlayer*));
+
+			for(n=oldMax;n<mixer->maxPlayers;n++) mixer->players[n] = slMalloc(sizeof(brSoundPlayer));
 		}
 
-		player = &mixer->players[mixer->nPlayers];
+		player = mixer->players[mixer->nPlayers];
 
 		mixer->nPlayers++;
 	}
+
+	return player;
+}
+
+brSoundPlayer *brNewPlayer(brSoundMixer *mixer, brSoundData *data) {
+	brSoundPlayer *player = NULL;
+
+	player = brNextPlayer(mixer);
 
 	player->isSinewave = 0;
 	player->sound = data;
@@ -187,22 +188,27 @@ int brPASoundCallback(void *ibuf, void *obuf, unsigned long fbp, PaTimestamp out
 
 		if(mixer->nPlayers) {
 			for(p=0;p<mixer->nPlayers;p++) {
-				player = &mixer->players[p];
+				player = mixer->players[p];
 
 				if(player->isSinewave) {
-					// printf("mixin the sine %d\n", mixer->nPlayers);
-					total += (0x7fffffff * sin(player->phase) * player->volume / (int)mixer->nPlayers);
+					if(!player->finished) {
+						total += (0x7fffffff * sin(player->phase) * player->volume / (int)mixer->nPlayers);
 
-					// last channel -- update the phase 
-					if(channel) player->phase += player->frequency;
-				} else if(!player->finished) {
-					total += (player->sound->data[player->offset++] / (int)mixer->nPlayers);
+						// last channel -- update the phase 
+						if(channel) player->phase += player->frequency;
+					}
+				} else { 
+					if(!player->finished) {
+						total += (player->sound->data[player->offset++] / (int)mixer->nPlayers);
 
-					if(player->offset >= player->sound->length) player->finished = 1;
-				} else if(p == mixer->nPlayers - 1) {
-					/* the player is finished, and is the last one */
+						if(player->offset >= player->sound->length) player->finished = 1;
+					}
+				}
+
+				if(player->finished && p == mixer->nPlayers - 1) {
+						/* the player is finished, and is the last one */
 					
-					mixer->nPlayers--;
+						mixer->nPlayers--;
 				}
 			}
 

@@ -220,6 +220,7 @@ void slCenterPixelsInSquareBuffer(unsigned char *pixels, int width, int height, 
 
 unsigned int slTextureNew() {
 	GLuint texture;
+	if(!glActive) return 0;
 	glGenTextures(1, &texture);
 	return texture;
 }

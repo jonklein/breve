@@ -26,7 +26,7 @@
 #define MIXER_SAMPLE_RATE 44100
 
 struct brSoundMixer {
-	brSoundPlayer *players;
+	brSoundPlayer **players;
 	int nPlayers;
 	int maxPlayers;
 	PortAudioStream *stream;
@@ -53,6 +53,8 @@ int *brSampleUp(int *in, long frames);
 
 brSoundMixer *brNewSoundMixer();
 void brFreeSoundMixer(brSoundMixer *mixer);
+
+brSoundPlayer *brNextPlayer(brSoundMixer *mixer);
 
 brSoundPlayer *brNewPlayer(brSoundMixer *mixer, brSoundData *data);
 brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency);
