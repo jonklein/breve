@@ -29,6 +29,7 @@
     brEval eval;
     int offset;
     stInstance *instance;
+	stObject *class;
 
     BOOL canExpand;
     int childCount;
@@ -52,8 +53,6 @@
 - (NSString*)getName;
 - (NSString*)getValue;
 - (void)getEval:(brEval*)eval;
-- (void*)getPointer;
-- (stInstance*)getInstance;
 - (void)setInstance:(stInstance*)i;
 
 - (void)updateChildCount:(int)newChildCount;

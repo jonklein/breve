@@ -1,9 +1,9 @@
                       The breve Simulation Environment
 
                       http://www.spiderland.org/breve
-                          release 2.0b - 09.28.2004
+                          release 2.0 - 10.13.2004
              command line version for Mac OS X, Linux and Windows
-                           jklein@spiderland.org 
+                          jklein@spiderland.org 
 
                               -= INTRODUCTION =-
 
@@ -72,14 +72,14 @@ the file.
 
 This software is provided with the hope that it will be useful--the only way 
 for me to make the software more useful is to hear your feedback.  You can 
-send me mail directly at jklein@spiderland.org.  Please let me know how you 
+send me mail directly at jk@spiderland.org.  Please let me know how you 
 use the software and how it could be improved. 
 
 If you have any cool or useful simulations or classes that should be included 
 with future releases, mail them as well. 
 
 If you would like to join the breve users mailing list, you can subscribe at 
-http://www.spiderland.org/mailman/listinfo/breve .
+http://lists.spiderland.org/mailman/listinfo/breve .
 
                                  -= LICENSE =-
 

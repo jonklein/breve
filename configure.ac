@@ -100,8 +100,6 @@ AC_PROG_LEX
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
-
-
 # Checks for libraries.
 AC_CHECK_LIB([z], [gzopen],,AC_MSG_FAILURE([Missing zlib library -- see http://www.zlib.org]))
 AC_CHECK_LIB([expat], [XML_ParserCreate],,AC_MSG_FAILURE([Missing expat library -- see http://www.jclark.com/xml/expat.html]))

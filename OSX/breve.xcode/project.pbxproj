@@ -877,7 +877,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# This is a shell script that attempts to complete the entire\n# breve build process for Mac OS X, including the configure\n# step, the building of the breve libraries, and the building \n# of the final breve.app with the proper external libraries.\n\n### first do the configure, if neccessary\n\nif [ ! -f \"ConfigureLibraryList\" ]; then\n\techo \"ConfigureLibraryList not found!  Running configure...\"\n\t(cd ..; ./configure)\nfi\n\n### now build the breve engine libraries\n\n(cd ..; make optimize)\n\n### use the libraries provided by \"configure\" to build the \n### OS X application using xcodebuild\n\nexport LIBS=`cat ConfigureLibraryList`\n\nxcodebuild -target real_breve.app";
+			shellScript = "# This is a shell script that attempts to complete the entire\n# breve build process for Mac OS X, including the configure\n# step, the building of the breve libraries, and the building \n# of the final breve.app with the proper external libraries.\n\n### first do the configure, if neccessary\n\nif [ ! -f \"ConfigureLibraryList\" ]; then\n\techo \"ConfigureLibraryList not found!  Running configure...\"\n\t(cd ..; ./configure)\nfi\n\n### now build the breve engine libraries\n\n(cd ..; make optimize)\n\n### use the libraries provided by \"configure\" to build the \n### OS X application using xcodebuild\n\nexport LIBS=`cat ConfigureLibraryList`\n\nxcodebuild -activebuildstyle -target real_breve.app";
 		};
 		480F31AA071472AD00E71420 = {
 			buildPhases = (

@@ -26,7 +26,7 @@ BraitenbergControl : AggressorController {
 	+ variables:
 		leftSensor, rightSensor (object).
 		leftWheel, rightWheel (object).
-		light, vehicle (object).
+		vehicle (object).
 
 		n (int).
 

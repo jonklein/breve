@@ -16,7 +16,7 @@ PhysicalControl : BraitenbergControl {
 	+ variables:
 		floor (object).
 		floorShape (object).
-		cloudTexture (int).
+		cloudTexture (object).
 
 	+ to init:
 		self enable-lighting.
@@ -34,9 +34,9 @@ PhysicalControl : BraitenbergControl {
 		self enable-shadows.
 		self enable-reflections.
 
-		cloudTexture = (self load-image from "images/clouds.png"). 
+		cloudTexture = (new Image load from "images/clouds.png"). 
 		self set-background-color to (.4, .6, .9).
-		self set-background-texture to cloudTexture.
+		self set-background-texture-image to cloudTexture.
 }
 
 MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
@@ -132,10 +132,6 @@ MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
 		return sensor.
 
 	+ to destroy:
-		free bodyLink.
-		free wheels.
-		free sensors.
-
 		free sensorShape.
 		free wheelShape.
 		free bodyShape.

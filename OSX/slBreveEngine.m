@@ -83,13 +83,14 @@ char *interfaceID = "aqua/1.2";
 }
 
 - (void)initEngine {
-	NSString *bundlePath;
-	char *classPath; 
+	NSString *bundlePath; 
+	char *classPath, *pluginPath;
 
 	if(engine) return;
 
 	bundlePath = [[NSBundle mainBundle] resourcePath];
 	classPath = (char*)[[NSString stringWithFormat: @"%@/classes", bundlePath] cString];
+	pluginPath = (char*)[[NSString stringWithFormat: @"%@/plugins", bundlePath] cString];
 
 	frontend = breveFrontendInit(0, NULL);
 	frontend->data = breveFrontendInitData(frontend->engine);
@@ -118,6 +119,7 @@ char *interfaceID = "aqua/1.2";
 	engine->pauseCallback = pauseCallback;
 
 	brAddSearchPath(engine, classPath);
+	brAddSearchPath(engine, pluginPath);
 	brAddSearchPath(engine, (char*)[bundlePath cString]);
 	brAddSearchPath(engine, (char*)[NSHomeDirectory() cString]);
 }

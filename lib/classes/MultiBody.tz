@@ -93,6 +93,16 @@ Object : MultiBody (aka MultiBodies) [version 2.0] {
 
 		(self get-all-connected-links) set-color to newColor.
 
+	+ to set-texture-image to texture (object):
+		% Sets the texture for all links.
+
+		(self get-all-connected-links) set-texture-image to texture.
+
+	+ to set-texture-scale to textureScale (float):
+		% Sets the texture scale for all links.
+
+		(self get-all-connected-links) set-texture-scale to textureScale.
+
 	+ to show-axis:
 		% Enables the axis for all connected links.
 

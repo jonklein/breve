@@ -96,11 +96,11 @@ int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
 			for(index=0;index<var->type->arrayCount;index++) {
 				int offset = var->offset + (var->type->arrayCount * stSizeofAtomic(var->type->arrayType));
 
-				stLoadVariable(&a->variables[offset], var->type->type, &value, NULL);
-				stSetVariable(&child->variables[offset], var->type->type, NULL, &value, NULL);
+				stLoadVariable(&a->variables[offset], var->type->arrayType, &value, NULL);
+				stSetVariable(&child->variables[offset], var->type->arrayType, NULL, &value, NULL);
 			}
 
-			varCount += (var->type->arrayCount - 1);
+			n += (var->type->arrayCount - 1);
 		} else {
 			stLoadVariable(&a->variables[var->offset], var->type->type, &value, NULL);
 			stSetVariable(&child->variables[var->offset], var->type->type, NULL, &value, NULL);

@@ -159,7 +159,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 118789984;
+			PBXPerProjectTemplateStateSaveDate = 119196880;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -716,11 +716,7 @@
 				PBXModuleWindowStatusBarHidden = YES;
 				RubberWindowFrame = "267 380 745 408 0 0 1280 832 ";
 			};
-			PBXWorkspaceStateSaveDate = 118789984;
-		};
-		perUserProjectItems = {
-			480F252E0714991A008625C0 = 480F252E0714991A008625C0;
-			480F25310714991C008625C0 = 480F25310714991C008625C0;
+			PBXWorkspaceStateSaveDate = 119196880;
 		};
 		sourceControlManager = 48E065B3055C318700C40B45;
 		userBuildSettings = {
@@ -779,23 +775,6 @@
 		);
 		sourceDirectories = (
 		);
-	};
-	480F252E0714991A008625C0 = {
-		fRef = F5BD20AE0397BEC801980AE4;
-		isa = PBXTextBookmark;
-		rLen = 1;
-		rLoc = 86;
-		rType = 1;
-	};
-	480F25310714991C008625C0 = {
-		fRef = F5BD20AE0397BEC801980AE4;
-		isa = PBXTextBookmark;
-		name = ".\t\t\t\t\t;\n";
-		rLen = 8;
-		rLoc = 2515;
-		rType = 0;
-		vrLen = 76;
-		vrLoc = 2451;
 	};
 	480F31AA071472AD00E71420 = {
 		activeExec = 0;
@@ -918,9 +897,10 @@
 	};
 	F5BD20C50397BFC001980AE4 = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {974, 7727}}";
-			sepNavSelRange = "{7287, 0}";
-			sepNavVisRect = "{{0, 4083}, {974, 137}}";
+			sepNavIntBoundsRect = "{{0, 0}, {812, 7755}}";
+			sepNavSelRange = "{3904, 0}";
+			sepNavVisRect = "{{0, 1391}, {711, 428}}";
+			sepNavWindowFrame = "{{15, 269}, {750, 558}}";
 		};
 	};
 	F5BD20C60397BFC001980AE4 = {

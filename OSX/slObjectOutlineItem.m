@@ -45,8 +45,6 @@
     int c;
     stInstance *evalInstance;
 
-    canExpand = 1;
-
     theEvalList = NULL;
     theIndex = 0;
 
@@ -54,7 +52,7 @@
 
     if(!n) name = [[NSString stringWithCString: "(null)"] retain];
     else name = n;
-
+	
     if(stv && stv->type->type == AT_ARRAY) {
         isArray = YES;
         arrayType = stv->type->arrayType;
@@ -63,11 +61,13 @@
 
     instance = i;
 
-    canExpand = 1;
+    [self setCanExpand: YES];
 
     if([self getExpandable] && eval.type == AT_INSTANCE) {
 		evalInstance = STINSTANCE(&eval);
-        childCount = slListCount(evalInstance->type->variableList);
+		class = evalInstance->type;
+       	if(class) childCount = slListCount(class->variableList) + 1;
+		else childCount = 0;
     } else if([self getExpandable] && eval.type == AT_LIST) {
         childCount = BRLIST(&eval)->count;
     } else if([self getExpandable] && isArray) {
@@ -83,6 +83,23 @@
     }
 
     return self;
+}
+
+- (void)setEvalClass:(stObject*)c {
+	// This is a bit of a hack.  In the past, parent objects were actually 
+	// distinct instances.  So there would be an actual stInstance for the 
+	// superclass of an instance.  Now, there is just the base class.  So
+	// if they're inspecting a parent class, t
+
+	class = c;
+
+	if(class) {
+		[self setCanExpand: YES];
+		[self updateChildCount: slListCount(class->variableList) + 1];
+	} else {
+		[self setCanExpand: NO];
+		[self updateChildCount: 0];
+	}
 }
 
 - (void)updateChildCount:(int)newChildCount {
@@ -117,19 +134,20 @@
 
 - (void)getEval:(brEval*)e {
     int n;
-	stRunInstance ri;
-	
-	ri.instance = instance;
-	ri.type = instance->type;
 
     if(isArray) {
         e->type = NULL;
     } else if(instance && instance->status == AS_ACTIVE && offset != -1) {
+		stRunInstance ri;
+	
+		ri.instance = instance;
+		ri.type = instance->type;
+
         stLoadVariable(&instance->variables[offset], eval.type, e, &ri);
     } else if(theEvalList) {
         stDoEvalListIndex(theEvalList, theIndex, e);
     } else {
-		e->type = NULL;
+		bcopy(&eval, e, sizeof(brEval));
 	}
 
 	if(!isArray && eval.type == AT_LIST) {
@@ -142,20 +160,10 @@
 			[self updateChildCount: 0];
 		}
 
-        for(n=0;n<childCount;n++) {
-            if(childObjects[n]) [childObjects[n] setInstance: STINSTANCE(e)];
-        }
+		e->type = AT_INSTANCE;
+
+        for(n=0;n<childCount;n++) if(childObjects[n]) [childObjects[n] setInstance: STINSTANCE(e)];
     }
-}
-
-- (void*)getPointer {
-    if(!instance || offset == -1) return NULL;
-
-    return &instance->variables[offset];
-}
-
-- (stInstance*)getInstance{
-    return instance;
 }
 
 - (void)setInstance:(stInstance*)i {
@@ -165,7 +173,7 @@
 - (BOOL)getExpandable {
     if(isArray) return YES;
 
-    return((eval.type == AT_INSTANCE || eval.type == AT_LIST) && BRPOINTER(&eval) != NULL && canExpand);
+    return(((eval.type == AT_INSTANCE) || eval.type == AT_LIST) && BRPOINTER(&eval) != NULL && canExpand);
 }
 
 - (void)setCanExpand:(BOOL)e {
@@ -202,8 +210,8 @@
             break;
         case AT_INSTANCE:
             o = STINSTANCE(&eval);
-            if(o && o->status == AS_ACTIVE) return [NSString stringWithFormat: @"%p [instance of \"%s\"]", o, o->type->name];
-            else if(o) return [NSString stringWithFormat: @"%p [freed instance of \"%s\"]", o, o->type->name];
+            if(class && o && o->status == AS_ACTIVE) return [NSString stringWithFormat: @"%p [instance of \"%s\"]", o, class->name];
+            else if(class) return [NSString stringWithFormat: @"%p [freed instance of \"%s\"]", o, class->name];
             else return [NSString stringWithFormat: @"%p [object]", o];
             break;
         case AT_POINTER:
@@ -255,7 +263,6 @@
 
     if(childObjects[index]) {
         if(eval.type == AT_INSTANCE) [childObjects[index] setInstance: STINSTANCE(&eval)];
-
         return childObjects[index];
     }
 
@@ -269,22 +276,31 @@
     /* depending on what kind of object WE are, we have different */
     /* ways to reference our children */
     if(eval.type == AT_INSTANCE) {
-        vars = evalInstance->type->variableList;
-        while(vars && i--) vars = vars->next;
+        vars = class->variableList;
 
-        if(!vars) return NULL;
+		if(index == slListCount(vars)) {
+			// is this the parent?
 
-        var = vars->data;
+			newEval.type = AT_INSTANCE;
+			newEval.values.instanceValue = STINSTANCE(&eval);
+        	childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: @"super" withVar: NULL withOffset: -1 instance: NULL];
+			[childObjects[index] setEvalClass: class->super];
+		} else {
+        	while(vars && i--) vars = vars->next;
 
-        newTitle = [[NSString stringWithCString: var->name] retain];
+	        if(!vars) return NULL;
 
-        if(var->type->type != AT_ARRAY) {
-            stLoadVariable(&evalInstance->variables[var->offset], var->type->type, &newEval, &ri);
-        } else {
-            newEval.type = AT_ARRAY;
-        }
+	   	     var = vars->data;
 
-        childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: newTitle withVar: var withOffset: var->offset instance: evalInstance];
+			newTitle = [[NSString stringWithCString: var->name] retain];
+
+	        if(var->type->type != AT_ARRAY)
+				stLoadVariable(&evalInstance->variables[var->offset], var->type->type, &newEval, &ri);
+			else 
+				newEval.type = AT_ARRAY;
+
+	        childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: newTitle withVar: var withOffset: var->offset instance: evalInstance];
+		}
     } else if(eval.type == AT_LIST) {
         stDoEvalListIndex(BRLIST(&eval), index, &newEval);
 
@@ -307,9 +323,8 @@
     // this is to avoid obvious loops--don't let us expand our own parents or ourselves. 
     // there are ways to get around this of course, but...
 
-    if((newEval.type == AT_INSTANCE && STINSTANCE(&newEval)) && 			// it's an instance 
-			(STINSTANCE(&newEval) == evalInstance ||						// it's the same as the current instance 
-			(STINSTANCE(&newEval)->status != AS_ACTIVE))) 					// it's not active
+    if((newEval.type == AT_INSTANCE && STINSTANCE(&newEval)) && // it's an instance 
+			(STINSTANCE(&newEval)->status != AS_ACTIVE)) 		// it's not active
 				[childObjects[index] setCanExpand: NO];
 
     return childObjects[index];

@@ -66,8 +66,7 @@ Control : DLA {
 		# Initialize the sphereShape--we use it every time a collision
 		# occurs.
 
-		sphereShape = new Shape.
-		sphereShape init-with-sphere radius 1.
+		sphereShape = (new Sphere init-with radius 1).
 
 		self enable-lighting. 
 
@@ -94,7 +93,6 @@ Control : DLA {
 		# Setting texture to -1 turns off texturing.  We'll give it a 
 		# color similar to the object it hit.
 
-		newParticle set-texture to -1.
 		newParticle set-color to c + (random[(.2, .2, .2)] - (.1, .1, .1)).
 
 		# move the Diffuser agent to a random location in space, but not 
@@ -119,8 +117,7 @@ Mobile : Diffuser {
 		maxDist = max.
 
 	+ to init:
-		sphereShape = new Shape.
-		sphereShape init-with-sphere radius 1.
+		sphereShape = new Sphere init-with radius 1.
 
 		self set-shape to sphereShape.
 
@@ -132,7 +129,8 @@ Mobile : Diffuser {
 		self move to random[(10, 10, 10)] - (5, 5, 5).
 
 	+ to iterate:
-		if |(self get-location)| > maxDist + 10: self offset-from-center by maxDist + 2.
+		if |(self get-location)| > maxDist + 10: 
+			self offset-from-center by maxDist + 2.
 
 		self set-velocity to random[(1.2, 1.2, 1.2)] - (.6, .6, .6).
 
@@ -150,7 +148,9 @@ Mobile : Diffuser {
 		# we've handled the collision.  During the next timestep, when
 		# iterate is called, the roaming flag is turned back on.
 
-		if roaming: (self get-controller) hit at (self get-location) color (group get-color) with-agent self.
+		if roaming: (self get-controller) hit at (self get-location) 
+				color (group get-color) with-agent self.
+
 		roaming = 0.
 
 	+ to offset-from-center by offset (float):
