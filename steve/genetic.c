@@ -35,9 +35,9 @@
 */
 
 int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
-    int crossoverCount = 0;
+    int crossoverCount = 0, n;
     int varCount = 0;
-    int startPoint, endPoint, crossoverPoint = 0;
+    int startPoint, endPoint;
     slList *list;
     stVar *var;
 
@@ -60,21 +60,20 @@ int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
 
     list = a->type->variableList;
 
-    /* skip the "super" variable */
+    // skip the "super" variable
 
     list = list->next;
 
-    /* this has become a little complicated now that we have "array" variables */
-    /* they only appear internally as a single variable, but may contain more */
-    /* than one piece of information, and naturally we want to be able to     */
-    /* crossover in the middle. */
+    // this has become a little complicated now that we have "array" variables */
+    // they only appear internally as a single variable, but may contain more */
+    // than one piece of information, and naturally we want to be able to     */
+    // crossover in the middle. */
 
     while(list) {
         var = list->data;
 
-        if(var->type->type == AT_ARRAY) {
-            varCount += var->type->arrayCount; 
-        } else varCount += 1;
+        if(var->type->type == AT_ARRAY) varCount += var->type->arrayCount; 
+        else varCount++;
 
         list = list->next;
     }
@@ -86,34 +85,29 @@ int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
 
     crossoverCount = random() % (varCount + 1);
 
-    if(crossoverCount == 0) {
-        bcopy(&a->variables[startPoint], &child->variables[startPoint], endPoint - startPoint);
+	for(n=0;n<varCount;n++) {
+		brEval value;
 
-    } else if(crossoverCount == varCount) {
-        bcopy(&b->variables[startPoint], &child->variables[startPoint], endPoint - startPoint);
-    } else {
-        while(list && crossoverCount) {
-            var = list->data;
+		if(n == crossoverCount) b = a;
 
-            if(var->type->type == AT_ARRAY) {
-                if(crossoverCount <= var->type->arrayCount) {
-                    crossoverPoint = var->offset + (crossoverCount * stSizeofAtomic(var->type->arrayType));
-                    crossoverCount = 0;
-                } else {
-                    crossoverCount -= var->type->arrayCount; 
-                }
-            } else {
-                crossoverCount -= 1;
+		if(var->type->type == AT_ARRAY) {
+			int index;
 
-                if(crossoverCount == 0) crossoverPoint = var->offset;
-            }
+			for(index=0;index<var->type->arrayCount;index++) {
+				int offset = var->offset + (var->type->arrayCount * stSizeofAtomic(var->type->arrayType));
 
-            list = list->next;
-        }
+				stLoadVariable(&a->variables[offset], var->type->type, &value, NULL);
+				stSetVariable(&child->variables[offset], var->type->type, NULL, &value, NULL);
+			}
 
-        bcopy(&a->variables[startPoint], &child->variables[startPoint], crossoverPoint - startPoint);
-        bcopy(&b->variables[crossoverPoint], &child->variables[crossoverPoint], endPoint - crossoverPoint);
-    }
+			varCount += (var->type->arrayCount - 1);
+		} else {
+			stLoadVariable(&a->variables[var->offset], var->type->type, &value, NULL);
+			stSetVariable(&child->variables[var->offset], var->type->type, NULL, &value, NULL);
+		}
+
+		list = list->next;
+	}
 
     return 0;
 }

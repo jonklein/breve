@@ -495,7 +495,7 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 
 	if(!noRetain) {
 		stGCRetain(e);
-		stGCUnmark(i->instance, e);
+		if(i) stGCUnmark(i->instance, e);
 	}
 
 #ifdef MULTITHREAD
