@@ -11,16 +11,23 @@ This chapter discusses customizing graphics and sound in a breve simulation.
 </para>
 <para>
 The first section, Lighting (<xref linkend="lighting">) shows how to enable 
-and use lighting.  The section Shadows and Reflections (<xref linkend="shadows_and_relections">)
-shows how graphics can be enhanced with shadows and reflections.  The section on Loading Images
-(<xref linkend="loading_images">) shows how to load images into a simulation.  These images 
-can be used to display an agent as an image (<xref linkend="bitmapping">), texture an object 
-(<xref linkend="texturing">) or display an object as a translucent "lightmap" 
-(<xref linkend="lightmapping">).
+and use lighting.  (<xref linkend="shadows_and_relections">) 
+shows how shadows and reflections can be added to simulated objects.  
 </para>
 <para>
-Finally, the section on Sounds (<xref linkend="sounds">) shows how sound files
-can be loaded and played as part of a breve simulation.
+(<xref linkend="loading_images">) shows how to load images into a simulation.  Once
+an object has been loaded into a simulation, it can be used to display an agent as 
+an image (<xref linkend="bitmapping">), to texture an object (<xref linkend="texturing">) 
+or to display an object as a translucent "lightmap" (<xref linkend="lightmapping">).  
+In addition, the image data may be accessed and manipulated, as described in (<xref linkend="imageclass">).
+</para>
+<para>
+Users can also create custom drawings in the world which are not associated with simulated
+objects.  This feature is described in (<xref linkend="drawing">).
+</para>
+<para>
+Finally, (<xref linkend="sounds">) describes how sound files can be loaded and played as 
+part of a breve simulation.
 </para>
 
 <sect1 id="lighting">
@@ -361,6 +368,44 @@ should reuse the same Image object.  An example of this is shown in
 <xref linkend="bitmapping">.
 </para>
 
+</sect1>
+
+<sect1 id="imageclass"><title>Using the "Image" Class</title>
+<para>
+Once an image file has been loaded in to an Image object 
+(as described in <xref linkend="loading_images">), the image data can be 
+accessed or manipulated directly via methods in the class 
+<ulink url="../classes/Image.html">Image.tz</ulink>.
+</para>
+<para>
+The Image class method 
+<ulink url="../classes/Image.html#set-pixel">set-pixel</ulink> (and related 
+methods for setting red, green, blue and alpha pixel values individually)
+can be used to modify an image dynamically.  This will dynamically alter 
+the appearence of any objects using the image as a texture, bitmap or 
+lightmap.  The demo "DynamicTexture" shows an example of how image textures
+can be dynamically modified.
+</para>
+<para>
+The Image class method 
+<ulink url="../classes/Image.html#get-pixel">get-pixel</ulink> (and related 
+methods for getting red, green, blue and alpha pixel values individually)
+can be used to read individual pixel data from an Image.  This allows the 
+image data to be used as simulation input.  The demo "Painter" shows an
+example of how an Image file can be used as input data for a simulation.
+</para>
+</sect1>
+
+<sect1 id="drawing"><title>Custom Drawings with the "Drawing" Class</title>
+<para>
+It is sometimes desirable to draw lines or polygons directly into the simulated 
+world.  Custom drawings can be created by using class
+<ulink url="../classes/Drawing.html">Drawing.tz</ulink>.  After creating an
+instance of the Drawing class, individual drawing instructions are added to 
+create line segments and polygons, or to change color and transparency values.
+More information on creating drawings can be found in the documentation for 
+the class <ulink url="../classes/Drawing.html">Drawing.tz</ulink>
+</para>
 </sect1>
 
 <sect1 id="sounds"><title>Playing Sound Effects</title>

@@ -26,11 +26,11 @@
 <book>
 <bookinfo>
 <mediaobject role="online">
-<imageobject><imagedata fileref="docs/images/breve_icon.gif" align="center"></imageobject>
+<imageobject><imagedata fileref="docs/images/breve_icon.jpg" align="center"></imageobject>
 </mediaobject>
 <date>2004-08-01</date>
 <title>breve Documentation</title>
-<subtitle>version 2.1d</subtitle>
+<subtitle>version 2.1b</subtitle>
 </bookinfo>
 
 <toc>

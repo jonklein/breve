@@ -23,7 +23,9 @@ docbook: classes
 		openjade -t sgml -d breve.dsl breve.docbook
 	mv docBuild/docbook/index.html docBuild/docbook/docs docs/
 	mkdir docs/docs/images
-	ln -f docBuild/docbook/images/*.jpg docs/docs/images/
+	cp docBuild/docbook/images/*.jpg docs/docs/images/
+	cp docBuild/docbook/images/*.gif docs/docs/images/
+	cp docBuild/docbook/images/*.eps docs/docs/images/
 
 source:
 	mkdir -p ../docs/source

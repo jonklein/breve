@@ -1,6 +1,6 @@
 <!--
     The breve Simulation Environment documentation
-    Copyright (C) 2003 Jonathan Klein
+    Copyright (C) 2005 Jonathan Klein
 -->
 
 <chapter id="physics">
@@ -67,6 +67,47 @@ robot or simulated animal.  You should be aware of the pros and cons of
 true physical simulation and consider using your own "pseudo-physics" instead.  
 </para>
 
+</sect1>
+
+<sect1 id="enabling_physics">
+<title>Enabling Physical Simulation</title>
+<para>
+To write a simulation with physical simulation, your controller object
+should be a subclass of the class 
+<ulink url="../classes/PhysicalControl.html">PhysicalControl</ulink>.  
+This class sets certain simulation parameters to values sensible for 
+physical simulation, such as integration step, gravity, etc.
+</para>
+
+<para>
+Physics must be enabled for <ulink url="../classes/Mobile.html">Mobile</ulink>
+objects on an object by object basis using the method
+<ulink url="../classes/Mobile.html#enable-physics">enable-physics</ulink>.  
+When dealing with physical simulations, however, it is often preferable to 
+use the Mobile subclass <ulink url="../classes/Link.html">Link</ulink> for
+which physical simulation is automatically enabled.
+</para>
+</sect1>
+
+<sect1 id="fast_physics">
+<title>Fast Physical Simulation</title>
+<para>
+The ODE simulation library supports an accelerated physics simulation which 
+offers great improvements in simulation speed and memory usage, at the expense 
+of some accuracy.  The fast physics algorithm scales better than the normal 
+physics algorithm as the number of interacting physical bodies increases.  With a 
+small number of interacting physical bodies, there may not be a great difference 
+between the two.  As the number increases, however, the benefits of fast physics
+will become much greater.
+</para>
+<para>
+Fast physics may be enabled using the method
+<ulink url="../classes/PhysicalControl.html#enable-fast-physics">enable-fast-physics</ulink>.  
+An additional iterations parameter can be set using the method 
+<ulink url="../classes/PhysicalControl.html#set-fast-physics-iterations">set-fast-physics-iterations</ulink>.
+The default value of 40 should give good results, but the number may be adjusted upwards for more 
+accuracy, or downwards for better performance.
+</para>
 </sect1>
 
 <sect1 id="stable_simulations">

@@ -349,6 +349,8 @@ void slTerrain::draw(slCamera *camera) {
 
 	quadtree->cull(camera);
 
+	glShadeModel(GL_SMOOTH);
+
 	glPushAttrib(GL_ENABLE_BIT);
 	glDisable(GL_CULL_FACE);
 	quadtree->draw(camera);

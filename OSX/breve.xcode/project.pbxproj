@@ -310,7 +310,7 @@
 				HEADER_SEARCH_PATHS = "../include/breve /usr/local/include /sw/include";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = /Applications;
-				LIBRARY_SEARCH_PATHS = "../lib /usr/local/lib /Users/jk/dev/breve/lib /Users/jk/dev/breve_new/lib /usr/lib/gcc/darwin/3.3";
+				LIBRARY_SEARCH_PATHS = "../lib /usr/local/lib /Users/jk/dev/breve/lib  /usr/lib/gcc/darwin/3.3";
 				MACOSX_DEPLOYMENT_TARGET = 10.1;
 				OTHER_CFLAGS = "$(CPPFLAGS)";
 				OTHER_LDFLAGS = "$(LIBS) /usr/local/lib/libdl.a";
