@@ -43,7 +43,7 @@ memory_debug:
 	make CFLAGS+='-DMEMORY_DEBUG'
 
 clean:
-	rm -rf docs OSX/build
+	rm -rf OSX/build
 	-cd util; $(MAKE) -f Makefile clean
 	-cd simulation; $(MAKE) -f Makefile clean
 	-cd kernel; $(MAKE) -f Makefile clean

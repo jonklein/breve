@@ -624,7 +624,7 @@ void brInterrupt(brEngine *engine) {
 
 	if(*line && line[0] != '\n') stRunSingleStatement(frontend->data, engine, line);
 
-	free(line);
+	if(line && line != staticLine) free(line);
 
 	if(gFull) glutFullScreen();
 
