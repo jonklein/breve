@@ -203,6 +203,7 @@ if test "$ac_cv_c_compiler_gnu" = yes; then
 	MKDEP="$CC -MM"
 elif test ! -z "$MKDEP"; then
 	AC_MSG_RESULT(mkdep)
+	MKDEP="$MKDEP -f -"
 elif test ! -z "$MAKEDEPEND"; then
 	AC_MSG_RESULT(makedepend)
 	MKDEP="$MAKEDEPEND -f-"

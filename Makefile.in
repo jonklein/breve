@@ -5,7 +5,7 @@ LEX	= @LEX@
 RANLIB	= @RANLIB@
 YACC	= @YACC@
 
-CPPFLAGS	= @CPPFLAGS@ @JAVAINCS@ @DEFS@
+CPPFLAGS	= @CPPFLAGS@ -Iinclude/breve @JAVAINCS@ @DEFS@
 LDFLAGS		= @LDFLAGS@
 
 EXTRACFLAGS	= -g
@@ -20,8 +20,6 @@ LPLATFORM	= $(shell echo $(PLATFORM) | tr '[A-Z]' '[a-z]')
 DMG_FILE	= breve_@VERSION@.dmg
 CLI_FOLDER	= breve_@VERSION@
 
-INCLUDE	= -Iinclude/breve
-
 all: bin/breve@EXE_SUFFIX@ bin/breve_cli@EXE_SUFFIX@ bin/graphTest@EXE_SUFFIX@ \
 	lib/classes/MethodFinder.jar
 
@@ -35,6 +33,7 @@ include steve/Makefile
 include util/Makefile
 include .depend
 
+DEPS	:= $(SRC) bin/breve.cc bin/breve_cli.cc graph/graphTest.cc
 OBJ	:= $(SRC:.cc=.o)
 OBJ	:= $(OBJ:.c=.o)
 
@@ -48,12 +47,10 @@ bin/graphTest@EXE_SUFFIX@: graph/graphTest.o $(OBJ)
 	$(CXX) -o $@ $(LDFLAGS) $^ @LIBS@ @GLLIBS@
 
 %.o: %.c
-	$(CC) -c -o $@ $(CPPFLAGS) $(INCLUDE) $(CFLAGS) $<
+	$(CC) -c -o $@ $(CPPFLAGS) $(CFLAGS) $<
 
 %.o: %.cc
-	$(CXX) -c -o $@ $(CPPFLAGS) $(INCLUDE) $(CXXFLAGS) $<
-
-%.h: .includes
+	$(CXX) -c -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 %.tab.c: %.y
 	$(YACC) $(YFLAGS) -o $@ $<
@@ -70,27 +67,20 @@ optimize_debug:
 profile:
 	$(MAKE) EXTRACFLAGS='-pg -O3'
 
-.includes: $(HEADERS)
-	cp -p $(HEADERS) include/breve/
-	touch .includes
-
-.depend: $(SRC) .includes
-	@MKDEP@ $(CPPFLAGS) $(INCLUDE) $(SRC) bin/breve.cc bin/breve_cli.cc \
-		graph/graphTest.cc > .depend
+.depend: $(DEPS)
+	@for i in $(DEPS); do echo -n `dirname $$i`/ >> .depend; \
+		@MKDEP@ $(CPPFLAGS) $$i >> .depend; done
 
 .PHONY: clean OSX_build OSX_clean OSX_release CLI_release plugin_API install
 
 clean:
 	rm -f bin/breve bin/breve_cli bin/graphTest
-	rm -f steve/format.c steve/stevelex.c steve/steveparse.tab.c
+	rm -f steve/format.c steve/stevelex.c
+	rm -f steve/steveparse.tab.c steve/steveparse.tab.h
 	rm -f java/*.class lib/classes/*.jar
 	rm -rf docBuild/docs docs
 	rm -rf OSX/build
-	-mv include/breve/config.h include/breve/config.h.bak
-	rm -f include/breve/*.h
-	-mv include/breve/config.h.bak include/breve/config.h
-	rm .depend .includes
-	touch .depend
+	echo -n > .depend
 	find . -name '.DS_Store' -exec rm -f {} \;
 	find . -name 'core' -exec rm -f {} \;
 	find . -name '.gdb*' -exec rm -f {} \;

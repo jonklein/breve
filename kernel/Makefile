@@ -1,10 +1,3 @@
-HEADERS += kernel/breveEval.h kernel/breveObjectAPI.h kernel/callback.h \
-		kernel/color.h kernel/engine.h kernel/errorText.h \
-		kernel/evalData.h kernel/evalHash.h kernel/evalList.h \
-		kernel/frontendAPI.h kernel/interface.h kernel/internal.h \
-		kernel/kernel.h kernel/kernelTypedefs.h kernel/multithread.h \
-		kernel/namespace.h kernel/network.h kernel/plugins.h \
-		kernel/sound.h
 SRC	+= kernel/breveEval.cc kernel/breveObjectAPI.cc kernel/callback.cc \
 		kernel/color.cc kernel/engine.cc kernel/evalData.cc \
 		kernel/evalHash.cc kernel/evalList.cc kernel/frontendAPI.cc \

@@ -8119,6 +8119,7 @@ echo "${ECHO_T}$CC -MM" >&6
 elif test ! -z "$MKDEP"; then
 	echo "$as_me:$LINENO: result: mkdep" >&5
 echo "${ECHO_T}mkdep" >&6
+	MKDEP="$MKDEP -f -"
 elif test ! -z "$MAKEDEPEND"; then
 	echo "$as_me:$LINENO: result: makedepend" >&5
 echo "${ECHO_T}makedepend" >&6
