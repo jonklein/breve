@@ -103,13 +103,31 @@ int brEvalListInsert(brEvalListHead *head, int index, brEval *value) {
 
 	// were moving elements -- update the index top
 
-	if(head->indexTop >= index) head->indexTop = index - 1;
+	if(head->indexTop < index) {
+		// skip to the highest indexed element
 
-	while(index--) {
-		if(!start) return -1;
+		int skip = index;
 
-		start = start->next;
+		if(head->indexTop > 0) {
+			start = head->index[ head->indexTop];
+			skip -= head->indexTop;
+		}
+
+		int n = head->indexTop;
+
+		// and now step through the list, updating the index because we can
+
+		while(skip--) {
+			if(!start) return -1;
+
+			head->index[ n++ ] = start;
+			start = start->next;
+		}
+	} else {
+		start = head->index[ index];
 	}
+
+	head->indexTop = index - 1;
 
 	head->count++;
 
