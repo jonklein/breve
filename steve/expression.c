@@ -78,9 +78,11 @@ int stExpFree(stExp *e) {
 		case ET_DUPLICATE:
 			break;
 
-		/* these elements have only static buffers allocated */
-
 		case ET_ST_EVAL:
+			stGCCollect(e->values.pValue);
+			slFree(e->values.pValue);
+			break;
+
 		case ET_LOAD:
 			slFree(e->values.pValue);
 			break;

@@ -195,10 +195,10 @@ void slRenderShadowVolume(slWorld *w, slCamera *c) {
 	glStencilFunc(GL_ALWAYS, 1, 0xffffffff);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
 
-	/* stencil up shadow volume front faces to 1 */
+	// stencil up shadow volume front faces to 1 
 	slRenderObjects(w, c, 0, DO_NO_LIGHTING|DO_SHADOW_VOLUME|DO_NO_TERRAIN|DO_NO_REFLECT|DO_NO_STENCIL);
 	
-	/* stencil down shadow volume back faces to 0 */
+	// stencil down shadow volume back faces to 0
 
 	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
 	glCullFace(GL_FRONT);
@@ -225,19 +225,17 @@ void slRenderShadowVolume(slWorld *w, slCamera *c) {
 	// once we've drawn it the first time, it's there to stay.
 	// what I think we should do here:
 	// 1) do not render the alphas at all for the first pass
-	// 2) render the lit alphas where the stencil = 0 ... i need to think about this!
-	// 2) render the unlit alphas where the stencil != 0 ... i need to think about this!
+	// 2) render the unlit alphas where the stencil != 0 
 
 	slRenderObjects(w, c, 0, DO_ONLY_ALPHA);
-	if(c->billboardCount) slRenderBillboards(w, c, 0);
+	if(c->billboardCount) slRenderBillboards(c, 0);
 
 	glStencilFunc(GL_NOTEQUAL, 0, 0xffffffff);
-	if(c->billboardCount) slRenderBillboards(w, c, 0);
+	if(c->billboardCount) slRenderBillboards(c, 0);
 	
 	slDrawLights(c, 1);
 	slRenderObjects(w, c, 0, DO_ONLY_ALPHA);
 
 	glDisable(GL_STENCIL_TEST);
-	// glDisable(GL_POLYGON_OFFSET_FILL);
 	glDisable(GL_LIGHTING);
 }

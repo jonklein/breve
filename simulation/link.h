@@ -72,7 +72,13 @@ class slLink: public slWorldObject {
 			slVectorZero(&externalForce);
 		}
 
-		~slLink();
+		~slLink() {
+			dBodyDestroy(odeBodyID);
+		}
+
+		void draw() {
+
+		}
 
 		slMultibody *multibody;
 

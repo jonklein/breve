@@ -41,9 +41,9 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	target = &w->lightExposureTarget;
 
 	if(sun->y < target->y) {
-		for(wi = w->objects.begin(); wi != w->objects.end(); wi++ ) {
+		// no exposure -- zero out the existing values
+		for(wi = w->objects.begin(); wi != w->objects.end(); wi++ )
 			(*wi)->lightExposure = 0;
-		}
 
 		return;
 	}
@@ -96,7 +96,7 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 		wo = *wi;
 		wo->lightExposure = 0;
 
-		if(wo->shape && sun->y > 0) slDrawShape(w, c, wo->shape, &wo->position, &color, 0, 0, 0, 0, DO_NO_LIGHTING|DO_NO_COLOR|DO_NO_TEXTURE, 0, 1.0);
+		if(wo->shape) slDrawShape(c, wo->shape, &wo->position, &color, 0, 0, 0, 0, DO_NO_LIGHTING|DO_NO_COLOR|DO_NO_TEXTURE, 0, 1.0);
 	}
 
 	glPopMatrix();

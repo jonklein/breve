@@ -66,12 +66,14 @@ Patch : LifePatch {
 		return state.
 
 	+ to set-state to value (int):
-		self set-color to (xIndex / 10.0, yIndex / 10.0, 0).
-		self set-transparency to 1.0 - value.
+		self set-color to (1.0, 0, 0).
 		state = value.
 
+		if state: self set-transparency to 0.3.
+		else self set-transparency to 1.0.
+
 	+ to init-patch:
-		state = random[1].
+		self set-state to random[1].
 
 		neighbors[0] = (self get-patch-to-left).
 		neighbors[1] = (self get-patch-to-right).
@@ -81,12 +83,6 @@ Patch : LifePatch {
 		neighbors[5] = (self get-patch-to-lower-right).
 		neighbors[6] = (self get-patch-to-upper-left).
 		neighbors[7] = (self get-patch-to-upper-right).
-
-		# we set the color now according to the location in the patchgrid, 
-		# but we'll change the transparency depending on whether we're on
-		# or off.
-
-		self set-color to (xIndex / 10.0, yIndex / 10.0, 0.0).
 
 	+ to iterate:
 		count, n (int).

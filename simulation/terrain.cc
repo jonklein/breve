@@ -316,33 +316,34 @@ slTerrain::~slTerrain() {
 	delete[] matrix;
 }
 
-void slDrawTerrain(slWorld *w, slCamera *c, slTerrain *l, int texture, double textureScale, int drawMode, int flags) {
-	int x, y;
-	double size;
+void slTerrain::draw(slCamera *camera) {
+	slDrawTerrain(this, texture, textureScale, drawMode, 0);
+}
 
-
+void slDrawTerrain(slTerrain *l, int texture, double textureScale, int drawMode, int flags) {
 	if(l->repeating) {
-		int xoff, yoff;
-
-		size = l->side * l->xscale;
-
-		xoff = (int)(c->target.x/size);
-		yoff = (int)(c->target.z/size);
-
-		for(x=xoff-1;x<xoff+2;x++) {
-			for(y=yoff-1;y<yoff+2;y++) {
-				glPushMatrix();
-				glTranslatef(size * x, 0, size * y);
-				slDrawTerrainSide(w, l, texture, textureScale, drawMode, flags, 0);
-				glPopMatrix();
-			}
-		}
+		// int x, y;
+		// double size;
+		// int xoff, yoff;
+		// size = l->side * l->xscale;
+		//
+		// xoff = (int)(c->target.x/size);
+		// yoff = (int)(c->target.z/size);
+		//
+		// for(x=xoff-1;x<xoff+2;x++) {
+		//	for(y=yoff-1;y<yoff+2;y++) {
+		//		glPushMatrix();
+		//		glTranslatef(size * x, 0, size * y);
+		//		slDrawTerrainSide(l, texture, textureScale, drawMode, flags, 0);
+		//		glPopMatrix();
+		//	}
+		// }
 	} else {
-		slDrawTerrainSide(w, l, texture, textureScale, drawMode, flags, 0);
+		slDrawTerrainSide(l, texture, textureScale, drawMode, flags, 0);
 	}
 }
 
-void slDrawTerrainSide(slWorld *w, slTerrain *l, int texture, double textureScale, int drawMode, int flags, int bottom) {
+void slDrawTerrainSide(slTerrain *l, int texture, double textureScale, int drawMode, int flags, int bottom) {
 	int i, j;
 	slVector *norm, cdelta;
 
@@ -387,8 +388,6 @@ void slDrawTerrainSide(slWorld *w, slTerrain *l, int texture, double textureScal
 
 	glDisable(GL_CULL_FACE);
 
-	if(!(flags & DO_NO_LIGHTING)) glEnable(GL_LIGHTING);
-
 	glColor4f(1, 1, 1, 1.0);
 
 	glEnable(GL_COLOR_MATERIAL);
@@ -419,12 +418,9 @@ void slDrawTerrainSide(slWorld *w, slTerrain *l, int texture, double textureScal
 				ambientColor[2] += (l->matrix[i+1][j] - l->heightMin) * cdelta.z / l->heightDelta;
 			}
 
-			if(!(flags & DO_NO_LIGHTING)) {
-				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambientColor);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ambientColor);
-			} else {
-				glColor3f(ambientColor[0], ambientColor[1], ambientColor[2]);
-			}
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambientColor);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ambientColor);
+			glColor3f(ambientColor[0], ambientColor[1], ambientColor[2]);
 
 			norm = &l->vnormals[i+DRAW_SKIP][j];
 
@@ -446,12 +442,9 @@ void slDrawTerrainSide(slWorld *w, slTerrain *l, int texture, double textureScal
 				ambientColor[2] += (l->matrix[i][j] - l->heightMin) * cdelta.z / l->heightDelta;
 			}
 
-			if(!(flags & DO_NO_LIGHTING)) {
-				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambientColor);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ambientColor);
-			} else {
-				glColor3f(ambientColor[0], ambientColor[1], ambientColor[2]);
-			}
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambientColor);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ambientColor);
+			glColor3f(ambientColor[0], ambientColor[1], ambientColor[2]);
 
 			norm = &l->vnormals[i][j];
 

@@ -20,10 +20,7 @@
 
 #include "glIncludes.h"
 
-#define SG_MAX_TEXTURES	128
-
-/* these options can be passed to slRenderObjects to control */
-/* how objects are rendered. */
+// options passed to slRenderObjects to control how objects are rendered. 
 
 enum drawOptions {
     /* control what types of objects are drawn */
@@ -58,21 +55,17 @@ enum drawOptions {
     DO_RECOMPILE				= 0x200000
 };
 
-enum linkDrawOptions {
-	LD_BOUND					= 0x01,
-	LD_HIGHLIGHT				= 0x02,
-	LD_INVISIBLE				= 0x04
-};
-
 #ifdef __cplusplus 
 extern "C" {
 #endif
 void slInitGL(slWorld *w);
 unsigned int slTextureNew();
 int slUpdateTexture(slWorld *w, GLuint texNum, unsigned char *pixels, int width, int height, int p);
-void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor);
+void slRenderScene(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor);
 int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y, slVector *dragVector);
 int slGlSelect(slWorld *w, slCamera *c, int x, int y);
+
+void slReversePixelBuffer(unsigned char *source, unsigned char *dest, int width, int height);
 
 #ifdef __cplusplus 
 }
@@ -80,12 +73,10 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y);
 
 void slCompileCubeDrawList();
 
-void slDrawWorld(slWorld *w, slCamera *c, int recompile, int render_mode, int crosshair, int scissor);
+void slRenderWorld(slWorld *w, slCamera *c, int recompile, int render_mode, int crosshair, int scissor);
+void slRenderWorldToBuffer(slWorld *w, slCamera *c, char *r, char *g, char *b, char *temp);
 
-void slDrawWorldToBuffer(slWorld *w, slCamera *c, char *r, char *g, char *b, char *temp);
 void slDrawBackground(slCamera *c, slWorld *w);
-
-void slDrawPatches(slPatchGrid *patches, slVector *cam, slVector *target);
 
 void slStencilFloor(slWorld *w, slCamera *c);
 void slReflectionPass(slWorld *w, slCamera *c);
@@ -93,7 +84,7 @@ void slShadowPass(slWorld *w, slCamera *c);
 
 void slRenderLabels(slWorld *w);
 
-int slRenderObjects(slWorld *w, slCamera *c, int loadNames, int flags);
+void slRenderObjects(slWorld *w, slCamera *c, int loadNames, int flags);
 void slRenderLines(slWorld *w, slCamera *c, int flags);
 
 void slRenderText(slWorld *w, slCamera *c, slVector *loc, slVector *target, int crosshair);
@@ -104,14 +95,14 @@ void slStrokeText(double x, double y, char *string, double scale, void *font);
 void slDrawLights(slCamera *c, int noDiff);
 void slShadowMatrix(GLfloat shadowMat[4][4], slPlane *plane, slVector *light);
 
-void slDrawShape(slWorld *w, slCamera *c, slShape *s, slPosition *pos, slVector *color, int texture, double textureScale, int tmode, int mode, int flags, float bbRot, float alpha);
+void slDrawShape(slCamera *c, slShape *s, slPosition *pos, slVector *color, int texture, double textureScale, int tmode, int mode, int flags, float bbRot, float alpha);
 
-int slCompileShape(slWorld *w, slShape *s, int drawMode, int texture, double textureScale, int flags);
-void slRenderShape(slWorld *w, slShape *s, int drawMode, int texture, double textureScale, int flags);
+int slCompileShape(slShape *s, int drawMode, int texture, double textureScale, int flags);
+void slRenderShape(slShape *s, int drawMode, int texture, double textureScale, int flags);
 void slDrawAxis(double x, double y);
 void slComputeBillboardVectors(slWorld *w, slCamera *c);
-void slRenderBillboards(slWorld *w, slCamera *c, int flags);
-void slProcessBillboard(slWorld *w, slCamera *c, slVector *color, slVector *loc, int bitmap, int mode, float size, float bbAngle, float alpha, unsigned char selected);
+void slRenderBillboards(slCamera *c, int flags);
+void slProcessBillboard(slCamera *c, slVector *color, slVector *loc, int bitmap, int mode, float size, float bbAngle, float alpha, unsigned char selected);
 void slDrawFace(slFace *f, int drawMode, int texture, double textureScale, int flags);
 
 int slBreakdownFace(slFace *f, int texture, double textureScale);
@@ -126,8 +117,6 @@ int slClearGLErrors(char *e);
 void slFreeGL(slWorld *w, slCamera *c);
 
 void slDeleteMbGLLists(slMultibody *m);
-
-void slReversePixelBuffer(unsigned char *source, unsigned char *dest, int width, int height);
 
 void slTransposeGLMatrix(GLfloat *m);
 

@@ -222,6 +222,7 @@ void brEngineFree(brEngine *e) {
 	slStackFree(e->instances);
 	slStackFree(e->iterationInstances);
 	slStackFree(e->postIterationInstances);
+	slStackFree(e->objectTypes);
 
 	if(e->path) slFree(e->path);
 	if(e->controllerName) slFree(e->controllerName);
@@ -531,7 +532,7 @@ char *brFindFile(brEngine *e, char *file, struct stat *st) {
 */
 
 void brEngineRenderWorld(brEngine *e, int crosshair) {
-    slRenderWorld(e->world, e->camera, 0, GL_RENDER, crosshair, 0);
+    slRenderScene(e->world, e->camera, 0, GL_RENDER, crosshair, 0);
 }
 
 /*@}*/

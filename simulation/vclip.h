@@ -61,8 +61,7 @@ enum boundListTypeFlags {
 */
 
 struct slBoundSort {
-	int number;
-	slBoundSort *previousLeft;
+	unsigned int number;
 	char type;
 	char infnan;	// is this a fucked up entry?
 	double *value;

@@ -98,15 +98,11 @@ slShape *slNewNGonCone(int count, double radius, double height, double density) 
 */
 
 void slShapeFree(slShape *s) {
-	std::vector<slPoint*>::iterator pi;
-	std::vector<slEdge*>::iterator ei;
-	std::vector<slFace*>::iterator fi;
+	std::vector<slFeature*>::iterator fi;
 
 	if(--s->referenceCount) return;
 
-	for(pi = s->points.begin() ; pi != s->points.end(); pi++ ) delete *pi;
-	for(ei = s->edges.begin() ; ei != s->edges.end(); ei++ ) delete *ei;
-	for(fi = s->faces.begin() ; fi != s->faces.end(); fi++ ) delete *fi;
+	for(fi = s->features.begin() ; fi != s->features.end(); fi++ ) delete *fi;
 
 	if(s->drawList) glDeleteLists(s->drawList, 1);
 

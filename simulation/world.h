@@ -96,10 +96,12 @@ class slWorldObject {
 			slVectorSet(&position.location, 0, 0, 0);
 		}
 
-		~slWorldObject() {
+		virtual ~slWorldObject() {
 			if(shape) slShapeFree(shape);
 			slStackFree(neighbors);
 		}
+
+		virtual void draw(slCamera *camera) {};
 
 		slShape *shape;
 

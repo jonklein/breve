@@ -35,14 +35,19 @@ typedef struct slPatch slPatch;
 	\brief A grid of \ref slPatch objects.
 */
 
-struct slPatchGrid {
-	int xSize, ySize, zSize;
+#ifdef __cplusplus
+class slPatchGrid {
+	public:
+		void draw(slCamera *camera);
 
-	slVector startPosition;
-	slVector patchSize;
+		int xSize, ySize, zSize;
 
-	slPatch ***patches;
+		slVector startPosition;
+		slVector patchSize;
+
+		slPatch ***patches;
 };
+#endif
 
 typedef struct slPatchGrid slPatchGrid;
 
@@ -54,6 +59,15 @@ void slPatchGridFree(slPatchGrid *g);
 void slInitPatch(slPatch *p);
 void slPatchSetData(slPatch *p, void *data);
 slPatch *slPatchForLocation(slPatchGrid *g, slVector *location);
+
+void slDrawPatches(slPatchGrid *patches, slVector *cam, slVector *target);
+slPatch *slPatchAtIndex(slPatchGrid *patches, int x, int y, int z);
+
+void *slPatchGetDataAtIndex(slPatchGrid *grid, int x, int y, int z);
+
+void slPatchSetDataAtIndex(slPatchGrid *grid, int x, int y, int z, void *data);
+
 #ifdef __cplusplus
 }
 #endif
+

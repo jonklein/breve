@@ -33,7 +33,6 @@ void slVclipDataInit(slWorld *w) {
 	slStationary *st;
 	slLink *link;
 	unsigned int x, y;
-	slTerrain *terrain;
 
 	w->initialized = 1;
 
@@ -56,30 +55,18 @@ void slVclipDataInit(slWorld *w) {
 	for(x=0;x<w->objects.size();x++) {
 		switch(w->objects[x]->type) {
 			case WO_LINK:
-				link = w->objects[x];
+				link = (slLink*)w->objects[x];
 				link->clipNumber = x;
-
 				slLinkUpdateBoundingBox(link);
-				slAddBoundingBoxForVectors(w->clipData, x, &link->min, &link->max);
 
 				break;
 			case WO_STATIONARY:
-				st = w->objects[x];
-
+				st = (slStationary*)w->objects[x];
 				slShapeBounds(st->shape, &st->position, &st->min, &st->max);
-				slAddBoundingBoxForVectors(w->clipData, x, &st->min, &st->max);
-
-				break;
-			case WO_TERRAIN:
-				terrain = w->objects[x];
-
-				slAddBoundingBoxForVectors(w->clipData, x, &terrain->min, &terrain->max);
-
-				break;
-			default:
-				slMessage(DEBUG_ALL, "unknown object type in vclipData init\n");
 				break;
 		}
+
+		slAddBoundingBoxForVectors(w->clipData, x, &w->objects[x]->min, &w->objects[x]->max);
 	}
 
 	for(x=0;x<w->objects.size();x++) {
@@ -253,9 +240,6 @@ void slAddBoundingBoxForVectors(slVclipData *data, int offset, slVector *min, sl
 	minB.type = BT_MIN;
 	maxB.type = BT_MAX;
 
-	minB.previousLeft = NULL;
-	maxB.previousLeft = NULL;
-	
 	minB.number = offset;
 	maxB.number = offset;
 

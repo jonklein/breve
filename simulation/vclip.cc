@@ -198,24 +198,16 @@ slCollisionEntry *slNextCollisionEntry(slVclipData *v) {
 	2-dimensional simulations--when the objects don't leave a certain
 	plane, we do *n^2 iterations*.
 
-	So what we do is to remember the list element to the left of us.  If 
-	we are equal to the element on the left and it is the same one that was
-	there previously, then we don't have to move it to the left because
-	the flags will already be set.
+	To break ties, we rely on the number field of the bound entry.
 */
 
 void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, unsigned int size, char boundTypeFlag) {
 	unsigned int n, current;
 	slPairEntry *pe;
 	slBoundSort *tempList;
-	int x, y, skippedSwap;
+	int x, y;
 
-	if(size == 0) return;
-
-	if(isnan(*list[0]->value)) list[0]->infnan = 1;
-	else list[0]->infnan = 0;
-
-	for(n=1;n<size;n++) {
+	for(n=0;n<size;n++) {
 		current = n;
 
 		x = list[n]->number; 
@@ -223,20 +215,16 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, unsigned int size,
 		if(isnan(*list[n]->value)) list[n]->infnan = 1;
 		else list[n]->infnan = 0;
 
-		/* if we are equal to the left neighbor and it was the */
-		/* same one we had last time, then we don't have to	*/
-		/* do any switching. */
+		// Keep moving to the left; until:
+		// 1) there are no more entries to the left
+		// 2) this entry is greater than the entry to the left 
+		// 3) this entry is equal to the entry on the left AND has a larger number
 
-		skippedSwap = 0;
+		while(current > 0 &&
+			(((*(list[current]->value) < *(list[current-1]->value)) ||
+			(*(list[current]->value) == *(list[current-1]->value) && list[current]->number < list[current-1]->number) ||
+			list[current]->infnan))) {
 
-		if(*(list[current]->value) == *(list[current-1]->value)) {
-			if(list[current]->previousLeft == list[current-1]) {
-				current = 0;
-				skippedSwap = 1;
-			}
-		} 
-
-		while(current > 0 && (*(list[current]->value) <= *(list[current-1]->value) || list[current]->infnan)) {
 			// NaN used to flip out an entire simulation because the bounding box 
 			// lists wouldn't get sorted properly and then collisions wouldn't get 
 			// detected, and so forth.  So now, we give NaNs a place in the list 
@@ -273,16 +261,6 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, unsigned int size,
 			list[current] = tempList;
 			
 			current--;
-		}
-
-		if(!skippedSwap) {
-			if(current < (size-1)) {
-				if(*(list[current]->value) == *(list[current+1]->value)) {
-					list[current+1]->previousLeft = list[current];
-				} else {
-					list[current+1]->previousLeft = NULL;   
-				}
-			}
 		}
 	}
 }

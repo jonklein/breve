@@ -60,7 +60,7 @@ class slFeature {
 		int type;
 		slPlane *voronoi;	
 
-		~slFeature() {
+		virtual ~slFeature() {
 		    delete[] voronoi;
 		}
 };
@@ -146,7 +146,7 @@ class slFace : public slFeature {
 	\brief A shape in the simulated world.
 */
 
-struct slShape {
+class slShape {
 	public:
 		int referenceCount;
 
@@ -170,11 +170,13 @@ struct slShape {
 
 		std::vector<slFeature*> features;
 
-		int firstPoint;
-
 		std::vector<slFace*> faces;
 		std::vector<slEdge*> edges;
 		std::vector<slPoint*> points;
+};
+
+class slSphere : public slShape {
+
 };
 #endif
 

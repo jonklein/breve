@@ -20,6 +20,8 @@
 
 #include "simulation.h"
 
+extern int gCubeDrawList;
+
 slPatchGrid *slPatchGridNew(slVector *center, slVector *patchSize, int x, int y, int z) {
 	struct slPatchGrid *grid;
 	int a, b, c;
@@ -70,6 +72,80 @@ slPatch *slPatchForLocation(slPatchGrid *g, slVector *location) {
 	return &g->patches[z][y][x];
 }
 
+/*!
+	\brief Draws a set of patches.
+*/
+
+void slPatchGrid::draw(slCamera *camera) {
+	int z, y, x;
+	int zVal, yVal, xVal;
+	int zMid = 0, yMid = 0, xMid = 0;
+	slPatch *patch;
+	slVector translation, origin;
+
+	// we want to always draw from back to front for the 
+	// alpha blending to work.  figure out the points
+	// closest to the camera.
+
+	slVectorAdd(&camera->location, &camera->target, &origin);
+
+	xMid = (int)((origin.x - startPosition.x) / patchSize.x);
+	if(xMid < 0) xMid = 0;
+	if(xMid > xSize) xMid = xSize - 1;
+
+	yMid = (int)((origin.y - startPosition.y) / patchSize.y);
+	if(yMid < 0) yMid = 0;
+	if(yMid > ySize) yMid = ySize - 1;
+
+	zMid = (int)((origin.z - startPosition.z) / patchSize.z);
+	if(zMid < 0) zMid = 0;
+	if(zMid > zSize) zMid = zSize - 1;
+
+	glEnable(GL_BLEND);
+
+	glPushMatrix();
+
+	for(z=0;z<zSize;z++) {
+		if(z < zMid) zVal = z;
+		else zVal = (zSize - 1) - (z - zMid);
+
+		for(y=0;y<ySize;y++) {
+			if(y < yMid) yVal = y;
+			else yVal = (ySize - 1) - (y - yMid);
+
+			for(x=0;x<xSize;x++) {
+				if(x < xMid) xVal = x;
+				else xVal = (xSize - 1) - (x - xMid);
+
+				patch = &patches[zVal][yVal][xVal];
+
+				if(patch->transparency != 1.0) {
+					glPushMatrix();
+
+					translation.x = startPosition.x + patchSize.x * xVal;
+					translation.y = startPosition.y + patchSize.y * yVal;
+					translation.z = startPosition.z + patchSize.z * zVal;
+
+					glColor4f(patch->color.x, patch->color.y, patch->color.z, 1.0 - patch->transparency);
+
+					glTranslatef(translation.x, translation.y, translation.z);
+
+					glScalef(patchSize.x, patchSize.y, patchSize.z);
+
+					glCallList(gCubeDrawList);
+					glPopMatrix();
+				}
+			}
+		}
+	}
+
+	glPopMatrix();
+}
+
+/*!
+	\brief Picks an object for selection based on a click at the given coordinates.
+*/
+
 void slPatchGridFree(slPatchGrid *g) {
 	int a, b, c;
 
@@ -97,4 +173,25 @@ void slInitPatch(slPatch *p) {
 
 void slPatchSetData(slPatch *p, void *data) {
 	p->data = data;
+}
+
+slPatch *slPatchAtIndex(slPatchGrid *grid, int x, int y, int z) {
+	if(x < 0 || x >= grid->xSize) return NULL;
+	if(y < 0 || y >= grid->ySize) return NULL;
+	if(z < 0 || z >= grid->zSize) return NULL;
+	return &grid->patches[z][y][x];
+}
+
+void *slPatchGetDataAtIndex(slPatchGrid *grid, int x, int y, int z) {
+	if(x < 0 || x >= grid->xSize) return NULL;
+	if(y < 0 || y >= grid->ySize) return NULL;
+	if(z < 0 || z >= grid->zSize) return NULL;
+	return grid->patches[z][y][x].data;
+}
+
+void slPatchSetDataAtIndex(slPatchGrid *grid, int x, int y, int z, void *data) {
+	if(x < 0 || x >= grid->xSize) return;
+	if(y < 0 || y >= grid->ySize) return;
+	if(z < 0 || z >= grid->zSize) return;
+	grid->patches[z][y][x].data = data;
 }

@@ -41,6 +41,8 @@ class slTerrain: public slWorldObject {
 		slTerrain() : slWorldObject() {}
 		~slTerrain();
 
+		void draw(slCamera *camera);
+
 		float **matrix;
 		slVector **fnormals[2];
 		slVector **vnormals;
@@ -100,8 +102,8 @@ double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollisionE
 
 int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosition *position, slPlane *facePlane, slCollisionEntry *ce);
 
-void slDrawTerrain(slWorld *w, slCamera *c, slTerrain *l, int texture, double textureScale, int drawMode, int flags);
-void slDrawTerrainSide(slWorld *w, slTerrain *l, int texture, double textureScale, int drawMode, int flags, int bottom);
+void slDrawTerrain(slTerrain *l, int texture, double textureScale, int drawMode, int flags);
+void slDrawTerrainSide(slTerrain *l, int texture, double textureScale, int drawMode, int flags, int bottom);
 
 int slPointIn2DTriangle(slVector *vertex, slVector *a, slVector *b, slVector *c);
 

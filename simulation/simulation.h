@@ -56,13 +56,13 @@ extern "C"{
 #endif
 
 #include "image.h"
-#include "patch.h"
 #include "integrate.h"
 #include "shape.h"
 #include "netsim.h"
+#include "gldraw.h"
+#include "patch.h"
 #include "world.h"
 #include "link.h"
-#include "gldraw.h"
 #include "lightdetector.h"
 #include "vclip.h"
 #include "vclipData.h"
