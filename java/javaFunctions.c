@@ -26,20 +26,21 @@ extern brJavaBridgeData *gJavaBridge;
 
 brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	JavaVMInitArgs vm_args;
-	JavaVMOption options[1];
+	JavaVMOption options[2];
+	brJavaObject *finderObject;
 	jint res;
 	jmethodID method;
 	char args[JAVA_MAX_ARGS];
 	char *optstr;
 	char *finder;
-	char *env;
+	char *classPath;
 
 	brJavaBridgeData *bridge;
 
 	finder = brFindFile(e, "MethodFinder.jar", NULL);
 
 	if(!finder) {
-		slMessage(DEBUG_ALL, "Cannot locate the breve Java archive files\n");
+		slMessage(DEBUG_ALL, "Java loading failed: cannot locate the breve Java archive files\n");
 		return NULL;
 	}
 
@@ -48,23 +49,25 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	bridge->objectHash = slNewHash(1027, slHashPointer, slCompPointer);
 	bridge->objectHash = slNewHash(1027, slHashString, slCompString);
 
-	env = getenv("BREVE_CLASS_PATH");
+	classPath = getenv("BREVE_CLASS_PATH");
 
-	if(!env) env = "";
+	if(!classPath) classPath = "";
 
-	optstr = malloc(strlen(finder) + strlen(env) + strlen("-Djava.object.path=") + 1024);
+	optstr = malloc(strlen(finder) + strlen(classPath) + strlen("-Djava.object.path=") + 1024);
 
-	sprintf(optstr, "-Djava.object.path=%s:%s:%s", finder, env, getenv("BREVE_CLASS_PATH"));
+	sprintf(optstr, "-Djava.object.path=%s:%s", classPath, finder);
+	printf("%s\n", optstr);
 
 	JNI_GetDefaultJavaVMInitArgs(&vm_args);
 
 	options[0].optionString = optstr;
+	options[1].optionString = "-verbose:jni,class";
 	vm_args.version = JNI_VERSION_1_2;
 	vm_args.options = options;
-	vm_args.nOptions = 1;
+	vm_args.nOptions = 2;
 	vm_args.ignoreUnrecognized = JNI_FALSE;
 
-	/* Create the Java VM */
+	// Create the Java VM 
 	res = JNI_CreateJavaVM(&bridge->jvm, (void**)&bridge->env, &vm_args);
 
 	free(optstr);
@@ -75,20 +78,24 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 		return NULL;
 	}
 
-	bridge->methodFinder = brJavaInstanceNew(bridge, "MethodFinder", NULL);
+	finderObject = brJavaObjectFind(bridge, "MethodFinder");
+
+	if(!finderObject) {
+		slMessage(DEBUG_ALL, "Cannot instantiate MethodFinder class\n");
+		return NULL;
+	}
+
+	bridge->methodFinder = brJavaBootstrapMethodFinder(finderObject);
 
 	if(!bridge->methodFinder) {
-		slMessage(DEBUG_ALL, "Can't find breve MethodFinder object\n");
+		slMessage(DEBUG_ALL, "Cannot instantiate MethodFinder class\n");
 		slFree(bridge);
 		return NULL;
 	}
 
 	// method finder
 
-	args[0] = 'O';
-	args[1] = 'O';
-	args[2] = 'I';
-	args[3] = 'O';
+	args[0] = 'O'; args[1] = 'O'; args[2] = 'I'; args[3] = 'O';
 	method = (*bridge->env)->GetMethodID(bridge->env, bridge->methodFinder->object->object, METHFIND_NAME, METHFIND_SIGNATURE);
 	if(!method) {
 		slMessage(DEBUG_ALL, "Cannot locate Java method \"%s\" for Java bridge\n", METHFIND_NAME);
@@ -114,8 +121,7 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	}
 	bridge->rettypeMethod = brJavaMakeMethodData(RETTYPE_NAME, method, 'C', args, 2);
 
-	args[0] = 'O';
-	args[1] = 'I';
+	args[0] = 'O'; args[1] = 'I';
 	method = (*bridge->env)->GetMethodID(bridge->env, bridge->methodFinder->object->object, ARGTYPES_NAME, ARGTYPES_SIGNATURE);
 	if(!method) {
 		slMessage(DEBUG_ALL, "Cannot locate Java method \"%s\" for Java bridge\n", ARGTYPES_NAME);
@@ -152,7 +158,7 @@ void brFreeJavaClassData(brJavaObject *data) {
 	slFree(data);
 }
 
-brJavaMethodData *brJavaMakeMethod(brJavaBridgeData *bridge, brJavaObject *object, char *name, unsigned char *types, int nargs) {
+brJavaMethod *brJavaMethodFind(brJavaBridgeData *bridge, brJavaObject *object, char *name, unsigned char *types, int nargs) {
 	char returnType, argumentTypes[JAVA_MAX_ARGS];
 	jmethodID methodID;
 	int count, error;
@@ -210,11 +216,11 @@ brJavaMethodData *brJavaMakeMethod(brJavaBridgeData *bridge, brJavaObject *objec
 	return brJavaMakeMethodData(name, methodID, returnType, argumentTypes, nargs);
 }
 
-brJavaMethodData *brJavaMakeMethodData(char *name, jmethodID method, char returnType, char *argumentTypes, int nargs) {
-	brJavaMethodData *data;
+brJavaMethod *brJavaMakeMethodData(char *name, jmethodID method, char returnType, char *argumentTypes, int nargs) {
+	brJavaMethod *data;
 	int n;
 
-	data = slMalloc(sizeof(brJavaMethodData));
+	data = slMalloc(sizeof(brJavaMethod));
 
 	data->method = method;
 	data->argumentCount = nargs;
@@ -226,7 +232,7 @@ brJavaMethodData *brJavaMakeMethodData(char *name, jmethodID method, char return
 	return data;
 }
 
-int brJavaMethodCall(brJavaBridgeData *bridge, brJavaInstance *instance, brJavaMethodData *method, jvalue *jargs, brEval *result) {
+int brJavaMethodCall(brJavaBridgeData *bridge, brJavaInstance *instance, brJavaMethod *method, jvalue *jargs, brEval *result) {
 	jvalue returnValue;
 
 	switch(method->returnType) {
@@ -302,48 +308,7 @@ int brJavaMethodCall(brJavaBridgeData *bridge, brJavaInstance *instance, brJavaM
 	return EC_OK;
 }
 
-brInstance *brJavaObjectWrapper(brEngine *e, jobject object) {
-	brJavaBridgeData *bridge = gJavaBridge;
-	brJavaInstance *objectData;
-	brObject *o = brObjectFind(e, JAVA_BRIDGE_CLASS_NAME);
-	brInstance *i;
-	jvalue jargs[JAVA_MAX_ARGS];
-	brEval eval;
-
-	if(!o) {
-		slMessage(DEBUG_ALL, "Cannot locate Java bridge object \"%s\"\n", JAVA_BRIDGE_CLASS_NAME);
-		return NULL;
-	}
-	
-	if((i = slDehashData(bridge->objectHash, object))) return i;
-
-	jargs[0].l = object;
-
-	if(brJavaMethodCall(bridge, bridge->methodFinder, bridge->objectnameMethod, jargs, &eval)) return NULL;
-
-	printf("new object is of object %s\n", BRSTRING(&eval));
-
-	objectData = slMalloc(sizeof(brJavaInstance));
-
-	objectData->object = brJavaFindObject(bridge, BRSTRING(&eval));
-	
-	if(!objectData->object) {
-		slFree(object);
-		return NULL;
-	}
-	
-	// i = brEngineAddInstance(e, o, 
-	// i = brInstanceNew(o);
-
-	i->pointer = objectData;
-
-	slHashData(bridge->objectHash, object, i);
-	
-	return i;
-
-}
-
-brJavaObject *brJavaFindObject(brJavaBridgeData *bridge, char *name) {
+brJavaObject *brJavaObjectFind(brJavaBridgeData *bridge, char *name) {
 	brJavaObject *object;
 
 	if(!(object = slDehashData(bridge->objectHash, name))) {
@@ -355,27 +320,38 @@ brJavaObject *brJavaFindObject(brJavaBridgeData *bridge, char *name) {
 			slMessage(DEBUG_ALL, "Cannot locate Java object \"%s\"\n", name);
 			return NULL;
 		}
+
+		object->bridge = bridge;
 	}
 
 	return object;
 }
 
-int brJFreeObject(brEval *args, brEval *target, brInstance *i) {
-	brJavaInstance *object = i->pointer;
+int brJavaInstanceFree(brInstance *i) {
+	brJavaInstance *instance = i->pointer;
 
-	slFree(object);
+	slFree(i);
 
 	return EC_OK;
 }
 
+brJavaInstance *brJavaBootstrapMethodFinder(brJavaObject *object) {
+	brJavaInstance *instance = slMalloc(sizeof(brJavaInstance));
+
+	jmethodID method = (*object->bridge->env)->GetMethodID(object->bridge->env, object->object, "<init>", "()V"); 
+
+	instance->object = object;
+	instance->instance = (*object->bridge->env)->NewObjectA(object->bridge->env, object->object, method, NULL);
+
+	return instance;
+}
+
 brJavaInstance *brJavaInstanceNew(brJavaObject *object, brEval **args, int argCount) {
 	brJavaInstance *instance;
-	jmethodID constructor;
 	jvalue jargs[JAVA_MAX_ARGS];
-	brJavaMethodData *methodData;
-	brEvalList *list, *start;
-	int n = 0, argCount;
+	brJavaMethod *method;
 	unsigned char types[JAVA_MAX_ARGS];
+	int n;
 
 	instance = slMalloc(sizeof(brJavaInstance));
 
@@ -383,18 +359,16 @@ brJavaInstance *brJavaInstanceNew(brJavaObject *object, brEval **args, int argCo
 
 	for(n=0;n<argCount;n++) types[n] = args[n]->type;
 
-	methodData = brJavaFindMethod(object->bridge, instance->object, "<init>", types, argCount);
+	method = brJavaMethodFind(object->bridge, instance->object, "<init>", types, argCount);
 
 	for(n=0;n<argCount;n++) {
-		if(brEvalToJValue(object->bridge, args[n], &jargs[n], methodData->argumentTypes[n]) != EC_OK) {
+		if(brEvalToJValue(object->bridge, args[n], &jargs[n], method->argumentTypes[n]) != EC_OK) {
 			slMessage(DEBUG_ALL, "Error converting breve type to native Java type\n");
 			return NULL;
 		}
 	}
 
-	constructor = methodData->method;
-
-	instance->instance = (*bridge->env)->NewObjectA(bridge->env, instance->object->object, constructor, jargs);
+	instance->instance = (*object->bridge->env)->NewObjectA(object->bridge->env, object->object, method->method, jargs);
 
 	if(!instance->instance) {
 		slFree(instance);
@@ -492,7 +466,7 @@ char *brReadJavaString(brJavaBridgeData *bridge, jstring string) {
 	return result;
 }
 
-void brFreeJavaMethodData(brJavaMethodData *method) {
+void brFreeJavaMethodData(brJavaMethod *method) {
 	slFree(method->name);
 	slFree(method);
 }

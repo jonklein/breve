@@ -87,13 +87,16 @@ stObject *stObjectNew(brEngine *engine, stSteveData *sdata, char *name, char *al
 */
 
 stInstance *stInstanceCreateAndRegister(brEngine *e, brObject *object) {
-	stInstance *newi;
+	stInstance *newi = NULL;
+	brInstance *bi;
 
-	newi = stInstanceNew(object->pointer);
+	bi = brEngineInstantiate(e, object, NULL, 0);
 
-	newi->breveInstance = brEngineAddInstance(e, object, newi);
-
-	stInstanceInit(newi);
+	if(bi->object->type == &gSteveData->steveObjectType) {
+		newi = bi->pointer;
+		newi->breveInstance = bi;
+		stInstanceInit(newi);
+	}
 
 	return newi;
 }

@@ -46,7 +46,7 @@ public class MethodFinder {
 			}
 		}
 
-		System.out.println("Method " + name + " not found");
+		System.out.println("Method \"" + name + "\" not found");
 
 		throw new NoSuchMethodException();
 	}

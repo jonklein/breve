@@ -153,11 +153,11 @@ AC_CONFIG_FILES([Makefile
                  kernel/Makefile
                  kernel/internalFunctions/Makefile
                  util/Makefile
-                 steve/Makefile
                  simulation/Makefile
+                 java/Makefile
+                 steve/Makefile
                  bin/Makefile
                  plugins/slDigitizerPlugin/Makefile
-                 plugins/slJavaPlugin/Makefile
                  plugins/slQTMusicPlugin/Makefile
                  plugins/slRegexPlugin/Makefile
                  plugins/slURLPlugin/Makefile

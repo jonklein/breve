@@ -36,7 +36,7 @@
 
 typedef struct brJavaBridgeData brJavaBridgeData;
 typedef struct brJavaObject brJavaObject;
-typedef struct brJavaMethodData brJavaMethodData;
+typedef struct brJavaMethod brJavaMethod;
 typedef struct brJavaInstance brJavaInstance;
 
 struct brJavaObject {
@@ -49,7 +49,7 @@ struct brJavaInstance {
 	jobject instance;
 };
 
-struct brJavaMethodData {
+struct brJavaMethod {
 	char *name;
 	jmethodID method;
 	char returnType;
@@ -62,12 +62,12 @@ struct brJavaBridgeData {
 
 	brJavaInstance *methodFinder;
 
-	brJavaMethodData *methfindMethod;
-	brJavaMethodData *methsigMethod;
-	brJavaMethodData *argtypesMethod;
-	brJavaMethodData *argcountMethod;
-	brJavaMethodData *rettypeMethod;
-	brJavaMethodData *objectnameMethod;
+	brJavaMethod *methfindMethod;
+	brJavaMethod *methsigMethod;
+	brJavaMethod *argtypesMethod;
+	brJavaMethod *argcountMethod;
+	brJavaMethod *rettypeMethod;
+	brJavaMethod *objectnameMethod;
 
 	slHash *objectHash;
 
@@ -75,11 +75,13 @@ struct brJavaBridgeData {
 	JNIEnv *env;
 };
 
+brJavaInstance *brJavaBootstrapMethodFinder(brJavaObject *object);
+
 void brFreeJavaClassData(brJavaObject *data);
 void brFreeJavaBridgeData(brJavaBridgeData *data);
-void brFreeJavaMethodData(brJavaMethodData *data);
+void brFreeJavaMethodData(brJavaMethod *data);
 
-brJavaInstance *brJavaInstanceNew(brJavaBridgeData *bridge, char *name, brEvalListHead *args);
+brJavaInstance *brJavaInstanceNew(brJavaObject *o, brEval **args, int argCount);
 
 int brJavaCallMethod(brInstance *i, brMethod *m, brEval **args, brEval *result);
 
@@ -88,13 +90,12 @@ void brDetachJavaVM(brJavaBridgeData *bridge);
 
 void brInitJavaFuncs(brNamespace *n);
 
-brJavaMethodData *brJavaFindMethod(brJavaBridgeData *bridge, brJavaObject *object, char *name, unsigned char *types, int nargs);
-brJavaMethodData *brJavaMakeMethod(brJavaBridgeData *bridge, brJavaObject *object, char *name, unsigned char *types, int nargs);
-brJavaMethodData *brJavaMakeMethodData(char *name, jmethodID method, char returnType, char *argumentTypes, int nargs);
+brJavaMethod *brJavaMakeMethod(brJavaBridgeData *bridge, brJavaObject *object, char *name, unsigned char *types, int nargs);
+brJavaMethod *brJavaMakeMethodData(char *name, jmethodID method, char returnType, char *argumentTypes, int nargs);
 
 int brEvalToJValue(brJavaBridgeData *bridge, brEval *e, jvalue *v, char javaType);
 
-brJavaObject *brJavaFindObject(brJavaBridgeData *bridge, char *name);
+brJavaObject *brJavaObjectFind(brJavaBridgeData *bridge, char *name);
 
 char *brReadJavaString(brJavaBridgeData *bridge, jstring string);
 jstring brMakeJavaString(brJavaBridgeData *bridge, char *string);

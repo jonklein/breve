@@ -156,6 +156,8 @@ struct brEngine {
 	slWorld *world;
 	slCamera *camera;
 
+	slStack *objectTypes;
+
 	char simulationWillStop;
 
 	brSoundMixer *soundMixer;

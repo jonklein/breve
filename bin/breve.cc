@@ -168,6 +168,8 @@ int main(int argc, char **argv) {
 	frontend->engine->freeWindowCallback = freeWindowCallback;
 	frontend->engine->renderWindowCallback = renderWindowCallback;
 
+	brJavaInit(frontend->engine);
+
 	slInitGlut(argc, argv, simulationFile);
 
 	if(gArchiveFile) {

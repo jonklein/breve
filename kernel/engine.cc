@@ -51,6 +51,8 @@ brEngine *brEngineNew() {
 
 	e->simulationWillStop = 0;
 
+	e->objectTypes = slStackNew();
+
 #if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
 	e->soundMixer = brNewSoundMixer();
 #endif

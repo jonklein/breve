@@ -14,7 +14,7 @@ typedef struct brObjectType brObjectType;
 	\brief A type of object, required for each frontend language.
 
 	brObjectType is an interface that allows breve to preform common tasks
-	for a variety of frontent languages.  It contains function pointers 
+	for a variety of fronten: languages.  It contains function pointers 
 	that allow breve to create and destroy instances, call methods, etc.
 
 	If you create a new frontend, you'll need to create a brObjectType and
@@ -24,8 +24,10 @@ typedef struct brObjectType brObjectType;
 struct brObjectType {
 	int (*callMethod)(brInstance *instance, brMethod *method, brEval **arguments, brEval *result);
 	void *(*findMethod)(brObject *object, char *name, unsigned char *types, int nargs);
+	void *(*findObject)(brObjectType *type, char *name);
 	int (*isSubclass)(brObject *class1, brObject *class2);
-	void (*instantiate)(brObject *class, brEval **constructorArgs, int argCount);
+	void *(*instantiate)(brObject *class, brEval **constructorArgs, int argCount);
+	void (*destroyInstance)(brInstance *instance);
 
 	void *data;
 };
@@ -120,12 +122,17 @@ struct brObserver {
 
 /*@}*/
 
+// registering a new object type
+
+void brEngineRegisterObjectType(brEngine *e, brObjectType *t);
+
 // locating objects and methods within objects
 
 brMethod *brMethodFind(brObject *type, char *name, int argCount);
 brMethod *brMethodFindWithArgRange(brObject *o, char *name, int min, int max);
 
 brObject *brObjectFind(brEngine *n, char *name);
+brObject *brUnknownObjectFind(brEngine *e, char *name);
 
 // functions for calling methods with breve instances
 
@@ -138,8 +145,8 @@ int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, int cou
 brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *pointer);
 void brEngineAddObjectAlias(brEngine *e, char *name, brObject *o);
 brInstance *brEngineAddInstance(brEngine *e, brObject *o, void *pointer);
+brInstance *brEngineInstantiate(brEngine *e, brObject *o, brEval **args, int argCount);
 void brEngineRemoveInstance(brEngine *e, brInstance *i);
-
 
 int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *name);
 

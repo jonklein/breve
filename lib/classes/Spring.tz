@@ -1,0 +1,58 @@
+@use Object.
+
+Object : Spring (aka Springs) {
+	% A Spring is used to create an elastic connection between two OBJECT(Real) 
+	% objects.  Springs define only a connection between objects and are not 
+	% physical objects themselves.  Thus, <b>Springs can pass through each other 
+	% without colliding</b>.  
+	% <P>
+	% A number of paramters can be specified for springs.  The length parameter
+	% specifies the length of the spring when it is completely relaxed.  The 
+	% spring will always apply a force to attempt to expand or contract to the	
+	% specified length.  The strength parameter specifies the amount of force
+	% that is applied to try to attain the spring's natural length.  Finally,
+	% the damping parameter specifies the friction or damping proportional to
+	% the spring's velocity.
+	% <P>
+	% If physical realism is important, springs should be used with caution.
+	% As the strength and damping constants of the spring increase, springs 
+	% can generate enormous forces that will cause numerical overflows or 
+	% other undesirable behavior.  Keep spring strength and damping constants
+	% as low as possible to avoid this behavior.
+	% <P>
+	% The Spring class is new in version 2.1 and is considered experimental.
+
+	+ variables:
+		springPointer (pointer).
+
+	+ to connect from link1 (object) to link2 (object) 
+				from-point point1 = (0, 0, 0) (vector) 
+				to-point point2 = (0, 0, 0) (vector)
+				with-length length (float)
+				with-strength strength (float)
+				with-damping damping = 0.2 (float):
+
+		% Connects the spring from link1 to link2.  
+		% <p>
+		% The optional arguments point1 and point2 specify the locations
+		% on the objects to which the springs are attached.  The default
+		% values are (0, 0, 0).
+
+		if link1 == link2: return.
+
+		springPointer = springNew((link1 get-link-pointer), 
+				(link2 get-link-pointer), 
+				point1, point2, length, strength, damping).
+
+	+ to set-length to newLength (double):
+		% Sets the spring's length to newLength.
+		if springPointer: springSetLength(springPointer, newLength).
+
+	+ to set-strength to newStrength (double):
+		% Sets the spring's strength to newStrength.
+		if springPointer: springSetStrength(springPointer, newStrength).
+
+	+ to set-damping to newDamping (double):
+		% Sets the spring's damping to newDamping.
+		if springPointer: springSetDamping(springPointer, newDamping).
+}

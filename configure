@@ -6902,7 +6902,7 @@ fi
 done
 
 
-                                                                                                                                                                          ac_config_files="$ac_config_files Makefile docBuild/Makefile docBuild/docbook/Makefile graph/Makefile neural/Makefile kernel/Makefile kernel/internalFunctions/Makefile util/Makefile steve/Makefile simulation/Makefile bin/Makefile plugins/slDigitizerPlugin/Makefile plugins/slJavaPlugin/Makefile plugins/slQTMusicPlugin/Makefile plugins/slRegexPlugin/Makefile plugins/slURLPlugin/Makefile OSX/ConfigureLibraryList"
+                                                                                                                                                                          ac_config_files="$ac_config_files Makefile docBuild/Makefile docBuild/docbook/Makefile graph/Makefile neural/Makefile kernel/Makefile kernel/internalFunctions/Makefile util/Makefile simulation/Makefile java/Makefile steve/Makefile bin/Makefile plugins/slDigitizerPlugin/Makefile plugins/slQTMusicPlugin/Makefile plugins/slRegexPlugin/Makefile plugins/slURLPlugin/Makefile OSX/ConfigureLibraryList"
 
 
 if test "$ac_cv_lib_png_png_create_write_struct" != yes; then
@@ -7461,11 +7461,11 @@ do
   "kernel/Makefile" ) CONFIG_FILES="$CONFIG_FILES kernel/Makefile" ;;
   "kernel/internalFunctions/Makefile" ) CONFIG_FILES="$CONFIG_FILES kernel/internalFunctions/Makefile" ;;
   "util/Makefile" ) CONFIG_FILES="$CONFIG_FILES util/Makefile" ;;
-  "steve/Makefile" ) CONFIG_FILES="$CONFIG_FILES steve/Makefile" ;;
   "simulation/Makefile" ) CONFIG_FILES="$CONFIG_FILES simulation/Makefile" ;;
+  "java/Makefile" ) CONFIG_FILES="$CONFIG_FILES java/Makefile" ;;
+  "steve/Makefile" ) CONFIG_FILES="$CONFIG_FILES steve/Makefile" ;;
   "bin/Makefile" ) CONFIG_FILES="$CONFIG_FILES bin/Makefile" ;;
   "plugins/slDigitizerPlugin/Makefile" ) CONFIG_FILES="$CONFIG_FILES plugins/slDigitizerPlugin/Makefile" ;;
-  "plugins/slJavaPlugin/Makefile" ) CONFIG_FILES="$CONFIG_FILES plugins/slJavaPlugin/Makefile" ;;
   "plugins/slQTMusicPlugin/Makefile" ) CONFIG_FILES="$CONFIG_FILES plugins/slQTMusicPlugin/Makefile" ;;
   "plugins/slRegexPlugin/Makefile" ) CONFIG_FILES="$CONFIG_FILES plugins/slRegexPlugin/Makefile" ;;
   "plugins/slURLPlugin/Makefile" ) CONFIG_FILES="$CONFIG_FILES plugins/slURLPlugin/Makefile" ;;

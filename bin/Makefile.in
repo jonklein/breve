@@ -15,7 +15,7 @@ BREVE_CLI_BINARY	= breve_cli@EXE_SUFFIX@
 
 LANGUAGE_FRONTEND_LIBRARY	= -lbrsteve
 
-LIBS 	+=-L../lib @LDFLAGS@ $(LANGUAGE_FRONTEND_LIBRARY) -lbrkernel -lbrsimulation -lbrutil -lbrneural -lbrgraph @EXTRALDFLAGS@ @LIBS@ -lstdc++
+LIBS 	+=-L../lib @LDFLAGS@ $(LANGUAGE_FRONTEND_LIBRARY) -lbrkernel -lbrsimulation -lbrutil -lbrneural -lbrgraph -lbrjava @EXTRALDFLAGS@ @LIBS@ @JAVALIBS@ -lstdc++
 
 INCLUDE	+= -I../include/breve @CPPFLAGS@
 
@@ -24,12 +24,12 @@ all: $(BREVE_CLI_BINARY) $(BREVE_BINARY)
 %.o: %.c
 	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
 
-breve@EXE_SUFFIX@: $(BREVEO) ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a ../lib/libbrsteve.a
+breve@EXE_SUFFIX@: $(BREVEO) ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a ../lib/libbrsteve.a ../lib/libbrjava.a
 	$(CC) -o $(BREVE_BINARY) $(CFLAGS) $(BREVEO) $(LIBS) @GLLIBS@ @AUDIOLIBS@
 	# strip -s ../lib/loadable-symbols breve
 	# strip breve
 
-breve_cli@EXE_SUFFIX@: $(BREVECLIO) ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a ../lib/libbrsteve.a
+breve_cli@EXE_SUFFIX@: $(BREVECLIO) ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a ../lib/libbrsteve.a ../lib/libbrjava.a
 	$(CC) -o $(BREVE_CLI_BINARY) $(CFLAGS) $(BREVECLIO) $(LIBS) @GLLIBS@ @AUDIOLIBS@
 	# strip ../lib/loadable-symbols breve_cli
 	# strip breve_cli

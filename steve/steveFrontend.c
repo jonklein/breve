@@ -61,6 +61,14 @@ int stCallMethodBreveCallback(brInstance *i, brMethod *method, brEval **argument
 }
 
 /*!
+	\brief The steve callback to create a new instance.
+*/
+
+void *stInstanceNewCallback(brObject *object, brEval **constructorArgs, int argCount) {
+	return stInstanceNew(object->pointer);
+}
+
+/*!
 	\brief The breve callback to find a method.
 */
 
@@ -87,6 +95,9 @@ stSteveData *stSteveInit(brEngine *engine) {
 	gSteveData->steveObjectType.callMethod = stCallMethodBreveCallback;
 	gSteveData->steveObjectType.findMethod = stFindMethodBreveCallback;
 	gSteveData->steveObjectType.isSubclass = stSubclassCallback;
+	gSteveData->steveObjectType.instantiate = stInstanceNewCallback;
+
+	gSteveData->steveObjectType.findObject = NULL;
 
 	gSteveData->retainFreedInstances = 1;
 	gSteveData->freedInstances = NULL;

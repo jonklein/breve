@@ -1073,6 +1073,12 @@ atomic_expression
 		$$ = stInstanceNewExp($2, stNewIntExp(1, yyfile, lineno), yyfile, lineno); 
 		slFree($2);
 	}
+| NEW STRING_VALUE { 
+		char *unquoted = slDequote($2);;
+		$$ = stInstanceNewExp(unquoted, stNewIntExp(1, yyfile, lineno), yyfile, lineno); 
+		slFree($2);
+		slFree(unquoted);
+	}
 | atomic_expression NEW WORD_VALUE { 
 		$$ = stInstanceNewExp($3, $1, yyfile, lineno); 
 		slFree($3);

@@ -28,6 +28,7 @@ all:
 	cd neural; $(MAKE) -f Makefile install
 	cd graph; $(MAKE) -f Makefile install
 	cd kernel; $(MAKE) -f Makefile install
+	cd java; $(MAKE) -f Makefile install
 	cd steve; $(MAKE) -f Makefile install
 	cd bin; $(MAKE) -f Makefile install
 

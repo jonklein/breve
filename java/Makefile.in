@@ -1,16 +1,24 @@
-INCLUDES = -I../../include
+INCLUDES = -I../include/breve
 
-all: MethodFinder.jar javaPlugin.o
+LIBO	= javaObjectType.o javaFunctions.o 
 
-javaPlugin.o: javaFunctions.o
-	$(CC) @PLUGINFLAGS@ -o javaPlugin.o javaFunctions.o @JAVALIBS@
+install: all
+
+all: libbrjava.a 
+
+libbrjava.a: MethodFinder.jar $(LIBO)
+	$(AR) -crv libbrjava.a $(LIBO)
+	cp libbrjava.a ../lib
+	cp *.h ../include/breve
+	cp *.jar ../lib/classes
+	$(RANLIB) ../lib/libbrjava.a
 
 clean:
-	-rm -f *.o
+	-rm -f *.o *.jar
 
 .c.o:
 	$(CC) -g -c $*.c $(INCLUDES) @JAVAINCS@
 
 MethodFinder.jar: MethodFinder.java
-	-javac MethodFinder.java 
-	-jar cf MethodFinder.jar MethodFinder.class
+	-javac *.java
+	-jar cf MethodFinder.jar *.class

@@ -11,6 +11,14 @@
 /*@{*/
 
 /*!
+	\brief Registers a new object type with the engine.
+*/
+
+void brEngineRegisterObjectType(brEngine *e, brObjectType *t) {
+	slStackPush(e->objectTypes, t);
+}
+
+/*!
 	\brief Finds a method in an object.
 
 	Given an object type, a name, and an argument count, this function
@@ -69,11 +77,32 @@ brObject *brObjectFind(brEngine *e, char *name) {
 
 	nameSymbol = brNamespaceLookup(e->objects, name);
 
-	if(!nameSymbol) return NULL;
+	if(!nameSymbol) return brUnknownObjectFind(e, name);
 
 	if(nameSymbol->type != ST_OBJECT && nameSymbol->type != ST_OBJECT_ALIAS) return NULL;
 
 	return nameSymbol->data;
+}
+
+/*!
+	\brief Looks up an unknown object and adds it to the engine.
+*/
+
+brObject *brUnknownObjectFind(brEngine *e, char *name) {
+	int n;
+
+	for(n=0;n<e->objectTypes->count;n++) {
+		brObjectType *type = e->objectTypes->data[n];
+		void *pointer = NULL;
+
+		if(type->findObject) {
+			pointer = type->findObject(type, name);
+
+			if(pointer) return brEngineAddObject(e, type, name, pointer);
+		}
+	}
+
+	return NULL;
 }
 
 /*!
@@ -284,6 +313,12 @@ void brEngineAddObjectAlias(brEngine *e, char *name, brObject *o) {
 brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
 	brMethod *imethod, *pmethod;
 	brInstance *i;
+	int n;
+
+	for(n=0;n<e->instances->count;n++) {
+		i = e->instances->data[n];
+		if(i->pointer == pointer) return NULL;
+	}
 
     i = slMalloc(sizeof(brInstance));
     i->engine = e;
@@ -319,6 +354,9 @@ brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
 	return i;
 }
 
+brInstance *brEngineInstantiate(brEngine *e, brObject *o, brEval **args, int argCount) {
+	return brEngineAddInstance(e, o, o->type->instantiate(o, args, argCount));
+}
 
 /*!
 	\brief Marks a \ref brInstance as released, so that it can be removed
