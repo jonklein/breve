@@ -1,18 +1,68 @@
 #include "kernel.h"
+
+#ifdef HAVE_LIBGSL
+
 #include <gsl/gsl_matrix_float.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_blas.h>
 
 #include "breveFunctionsImage.h"
 
-#ifdef HAVE_LIBGSL
-
 #define GSL_MATRIX_POINTER(p)	((gsl_matrix_float*)(BRPOINTER(p)))
+
+class brMatrix {
+	public:
+		float *_data;
+		unsigned int _size;
+};
+
+class brMatrix3D: public brMatrix {
+	public:
+		brMatrix3D(int x, int y, int z) {
+			_sizex = x;
+			_sizey = y;
+			_sizez = z;
+			_size = x * y * z;
+			_data = new float[ _size];
+		}
+
+		~brMatrix3D() {
+			delete[] _data;
+		}
+
+		inline float get(int x, int y, int z) {
+			return _data[ (x * _sizey * _sizez) + (y * _sizez) + z ];
+		}
+
+		inline void set(int x, int y, int z, float value) {
+			_data[ (x * _sizey * _sizez) + (y * _sizez) + z ] = value;
+		}
+
+		unsigned int _sizex, _sizey, _sizez;
+};
+
+class brMatrix2D: public brMatrix {
+	public:
+		brMatrix2D(int x, int y) {
+			_sizex = x;
+			_sizey = y;
+			_size = x * y;
+			_data = new float[ _size];
+		}
+
+		~brMatrix2D() {
+			delete[] _data;
+		}
+
+		unsigned int _sizex, _sizey;
+};
 
 int brIMatrixNew(brEval args[], brEval *target, brInstance *i) {
 	gsl_matrix_float *m;
 
 	GSL_MATRIX_POINTER(target) = m = gsl_matrix_float_alloc(BRINT(&args[0]), BRINT(&args[1]));
+
+	new brMatrix2D(BRINT(&args[0]), BRINT(&args[1]));
 
 	if(!m) {
 		slMessage(DEBUG_ALL, "Could not create matrix: gsl_matrix_float_alloc failed\n");
