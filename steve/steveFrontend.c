@@ -1,6 +1,6 @@
 #include "steve.h"
 #include "xml.h"
-
+#include "evaluation.h"
 #include "errorText.h"
 
 #include "breveFunctionsSteveDataObject.h"

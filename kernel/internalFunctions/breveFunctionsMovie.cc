@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "kernel.h"
+#include "movie.h"
 
 /*! \addtogroup InternalFunctions */
 /*@{*/

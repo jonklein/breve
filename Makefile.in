@@ -72,9 +72,6 @@ optimize:
 optimize_debug:
 	$(MAKE) EXTRACFLAGS='-g $(OPTFLAGS)'
 
-profile:
-	$(MAKE) EXTRACFLAGS='-pg $(OPTFLAGS)'
-
 lib/libbreve.a: $(OBJ)
 	$(AR) -cr $@ $(OBJ)
 	$(RANLIB) $@

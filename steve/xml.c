@@ -21,6 +21,7 @@
 #include "steve.h"
 #include "xml.h"
 #include "expression.h"
+#include "evaluation.h"
 
 enum states {
 	XP_ENGINE = 1,

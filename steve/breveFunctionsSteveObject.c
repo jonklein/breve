@@ -21,6 +21,7 @@
 #include "steve.h"
 #include "xml.h"
 #include "breveFunctionsSteveObject.h"
+#include "evaluation.h"
 
 #if !MINGW
 #include <sys/socket.h>

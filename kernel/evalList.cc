@@ -108,19 +108,21 @@ int brEvalListInsert(brEvalListHead *head, int index, brEval *value) {
 
 		int skip = index;
 
+		int newIndex = 0;
+
 		if(head->indexTop > 0) {
 			start = head->index[ head->indexTop];
 			skip -= head->indexTop;
+			newIndex = head->indexTop;
 		}
 
-		int n = head->indexTop;
 
 		// and now step through the list, updating the index because we can
 
 		while(skip--) {
 			if(!start) return -1;
 
-			head->index[ n++ ] = start;
+			head->index[ newIndex++ ] = start;
 			start = start->next;
 		}
 	} else {

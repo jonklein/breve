@@ -82,3 +82,19 @@ int slStackPush(slStack *s, void *data) {
 
 	return s->count;
 }
+
+/*!
+	\brief Returns an element from the stack.
+*/
+
+void *slStackGet(slStack *s, int index) {
+	return s->data[index];
+}
+
+/*!
+	\brief Returns the number of elements in the stack.
+*/
+
+int slStackSize(slStack *s) {
+	return s->count;
+}

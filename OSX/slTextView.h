@@ -20,7 +20,6 @@
 
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
-#import "steve.h"
 
 @interface slTextView : NSTextView {
     id findText;

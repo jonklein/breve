@@ -21,15 +21,18 @@
 #import <Cocoa/Cocoa.h>
 #import <Foundation/Foundation.h>
 
-#import "steve.h"
-#import "engine.h"
+#import "kernelTypedefs.h"
+#import "breveEval.h"
+#import "evalList.h"
+#import "evalHash.h"
+#import "breveObjectAPI.h"
 
 @interface slObjectOutlineItem : NSObject {
     NSString *name;
     brEval eval;
     int offset;
-    stInstance *instance;
-	stObject *object;
+    struct stInstance *instance;
+	struct stObject *object;
 
     int childCount;
 
@@ -43,17 +46,16 @@
 
     int theIndex;
     brEvalListHead *theEvalList;
-
 }
 
-- (id)initWithEval:(brEval*)e name: (NSString*)name withVar:(stVar*)v withOffset: (int)offset instance:(stInstance*)i;
+- (id)initWithEval:(brEval*)e name: (NSString*)name withVar:(struct stVar*)v withOffset: (int)offset instance:(struct stInstance*)i;
 
-- (void)setEvalObject:(stObject*)c;
+- (void)setEvalObject:(struct stObject*)c;
 
 - (NSString*)getName;
 - (NSString*)getValue;
 - (void)getEval:(brEval*)eval;
-- (void)setInstance:(stInstance*)i;
+- (void)setInstance:(struct stInstance*)i;
 
 - (void)updateChildCount:(int)newChildCount;
 

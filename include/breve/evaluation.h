@@ -23,7 +23,7 @@
 	(ie, which superclass is active).
 
 	This structure is used to keep track of the current instance, as well
-	as which superclass of the instance is being used for variable and 
+	as which superclass of the instance is being used for variable and
 	method lookups.
 */
 
@@ -31,6 +31,7 @@ struct stRunInstance {
 	stInstance *instance;
 	stObject *type;
 };
+
 
 /*!
 	\brief Holds information about a function-frame of steve execution.

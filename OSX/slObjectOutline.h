@@ -23,7 +23,6 @@
 
 #import "slObjectOutlineItem.h"
 
-#import "steve.h"
 #import "engine.h"
 
 @interface slObjectOutline : NSObject {
@@ -32,7 +31,7 @@
     BOOL allowChanges;
 
     brEngine *engine;
-    stInstance *instance;
+    brInstance *instance;
 
     slList *allocList;
 
@@ -41,7 +40,7 @@
 
 - (void)setOutlineView:(NSOutlineView*)v;
 
-- (void)setEngine:(brEngine*)e instance:(stInstance*)i;
+- (void)setEngine:(brEngine*)e instance:(brInstance*)i;
 - (void)checkInstance;
 
 - (id)outlineView:(NSOutlineView *)view child:(int)index ofItem:(id)item;

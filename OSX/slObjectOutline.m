@@ -39,7 +39,7 @@
 
 /* associate the data source with a certain instance to display */
 
-- (void)setEngine:(brEngine*)e instance:(stInstance*)i {
+- (void)setEngine:(brEngine*)e instance:(brInstance*)i {
     brEval newEval;
 
 	// return;
@@ -58,7 +58,7 @@
     // if this is a valid and active instance, create a data item for it
 
     if(i && i->status == AS_ACTIVE) {
-		BRINSTANCE(&newEval) = i->breveInstance;
+		BRINSTANCE(&newEval) = i;
         newEval.type = AT_INSTANCE;
         instance = i;
         root = [[slObjectOutlineItem alloc] initWithEval: &newEval name: NULL withVar: NULL withOffset: NULL instance: i];

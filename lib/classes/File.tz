@@ -90,15 +90,18 @@ Abstract : File (aka Files) [version 2.0] {
 
   + section "Writing to an Open File"
 
-	+ to write text t (string):
-		% Writes the string theText to the file.
+	+ to write text theText (string):
+		% Writes the string theText to the file.  This method does not write
+		% a newline character to the end of the string.  See METHOD(write-line)
+		% for writing a string with a newline character.
 
-		writeString(filePointer, t).
+		writeString(filePointer, theText).
 
-	+ to write-line text t (string):
-		% Like METHOD(write), but appends a new line at the end of the string.
+	+ to write-line text theText (string):
+		% Writes the string theText to the file, with a newline character at 
+		% the end.  Like METHOD(write), but includes a newline character.
 
-		writeString(filePointer, "$t\n").
+		writeString(filePointer, "$theText\n").
 
   + section "Closing a File".
 

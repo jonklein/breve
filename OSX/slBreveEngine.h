@@ -30,7 +30,6 @@
 #import "slTextView.h"
 #import "slMovieRecord.h"
 
-#import "steve.h"
 #import "engine.h"
 
 enum {
@@ -98,7 +97,7 @@ enum {
 - (void)runWorld:sender;
 - (BOOL)startMovie;
 - (void)stopMovie;
-- (stInstance*)getSelectedInstance;
+- (brInstance*)getSelectedInstance;
 
 - (int)runCommand:(char*)command;
 

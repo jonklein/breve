@@ -22,8 +22,11 @@
 	\brief A steve object type.
 */
 
+#ifdef __cplusplus
+
 #include <vector>
 #include <set>
+#include <map>
 
 struct stInstanceCompare {
 	bool operator()(const stInstance* s1, const stInstance* s2) const {
@@ -93,6 +96,9 @@ struct stMethod {
 
 	int stackOffset;
 };
+#endif
+
+
 
 /*!
 	\brief Holds the type of a variable.

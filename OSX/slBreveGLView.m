@@ -211,7 +211,7 @@
 */
 
 - menuForEvent:(NSEvent*)theEvent {
-	stInstance *i;
+	brInstance *i;
 	NSString *title;
 	NSPoint p;
 	id item;
@@ -227,7 +227,7 @@
 
 	if(!i) return NULL;
 
-	title = [NSString stringWithFormat: @"%s (0x%x)", i->type->name, i];
+	title = [NSString stringWithFormat: @"%s (0x%x)", i->object->name, i];
 
 	selectionMenu = [[NSMenu alloc] init];
 	[selectionMenu setAutoenablesItems: NO];
@@ -471,16 +471,16 @@
 }
 
 
-- (void)updateContextualMenu:(id)menu withInstance:(stInstance*)i {
+- (void)updateContextualMenu:(id)menu withInstance:(brInstance*)i {
 	id menuItem;
 	unsigned int n;
 
-	if(i->breveInstance->menus->count == 0) return;
+	if(slStackSize(i->menus) == 0) return;
 
 	[selectionMenu addItem: [NSMenuItem separatorItem]];
 
-	for(n=0;n<i->breveInstance->menus->count;n++) {
-		brMenuEntry *menuEntry = (brMenuEntry*)i->breveInstance->menus->data[n];
+	for(n=0;n<slStackSize(i->menus);n++) {
+		brMenuEntry *menuEntry = (brMenuEntry*)slStackGet(i->menus, n);
 
 		if(!strcmp(menuEntry->title, "")) {
 			[menu addItem: [NSMenuItem separatorItem]];

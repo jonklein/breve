@@ -121,20 +121,23 @@ void slPatchGrid::draw(slCamera *camera) {
 				patch = &patches[zVal][yVal][xVal];
 
 				if(patch->transparency != 1.0) {
-					glPushMatrix();
-
 					translation.x = startPosition.x + patchSize.x * xVal;
 					translation.y = startPosition.y + patchSize.y * yVal;
 					translation.z = startPosition.z + patchSize.z * zVal;
 
-					glColor4f(patch->color.x, patch->color.y, patch->color.z, 1.0 - patch->transparency);
+					if(camera->pointInFrustum(&translation)) {
+						glPushMatrix();
 
-					glTranslatef(translation.x, translation.y, translation.z);
+						glColor4f(patch->color.x, patch->color.y, patch->color.z, 1.0 - patch->transparency);
 
-					glScalef(patchSize.x, patchSize.y, patchSize.z);
+						glTranslatef(translation.x, translation.y, translation.z);
 
-					glCallList(camera->cubeDrawList);
-					glPopMatrix();
+						glScalef(patchSize.x, patchSize.y, patchSize.z);
+
+						glCallList(camera->cubeDrawList);
+
+						glPopMatrix();
+					}
 				}
 			}
 		}

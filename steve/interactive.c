@@ -1,5 +1,6 @@
 #include "steve.h"
 #include "expression.h"
+#include "evaluation.h"
 
 void stSetParseObjectAndMethod(stObject *o, stMethod *m);
 

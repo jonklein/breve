@@ -23,6 +23,8 @@
 
 #define RTC_INLINE
 
+#include <vector>
+
 enum stExpTypes {
 	// basic expression types 
 
@@ -153,7 +155,7 @@ enum stRtcFlags {
 	RTC_EVAL_ARG_3	= 0x1,
 	RTC_EVAL_ARG_4	= 0x2,
 };
-	
+
 typedef struct stRtcCodeBlock_t {
 	unsigned char	type;
 	unsigned char	flags;

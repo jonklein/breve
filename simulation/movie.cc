@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "simulation.h"
+#include "movie.h"
 
 #if HAVE_LIBAVFORMAT
 

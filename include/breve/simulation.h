@@ -45,7 +45,6 @@
 
 #include "simulationTypedefs.h"
 
-#include "movie.h"
 #include "image.h"
 #include "integrate.h"
 #include "gldraw.h"

@@ -26,6 +26,8 @@
 #import <sys/types.h>
 #import <sys/dir.h>
 
+#import "kernel.h"
+
 #import "slBreveEngine.h"
 #import "slBreveGLView.h"
 #import "slObjectOutline.h"
@@ -35,9 +37,6 @@
 #import "slDemoMenu.h"
 #import "slFullScreen.h"
 #import "slBreveSourceDocument.h"
-
-#import "steve.h"
-#import "engine.h"
 
 enum {
 	BS_STOP,
@@ -124,7 +123,7 @@ enum {
 - (IBAction)toggleFullScreen:sender;
 - (void)setFullScreen:(BOOL)s;
 
-- (stInstance*)getSelectedInstance;
+- (brInstance*)getSelectedInstance;
 
 - (void)showWelcomeMessage;
 
@@ -151,7 +150,7 @@ enum {
 - (void)doKeyEvent:(char)key isDown:(int)d;
 - (void)doSelectionAt:(NSPoint)p;
 
-- (void)doMenuCallbackForInstance:(stInstance*)i item:(int)n;
+- (void)doMenuCallbackForInstance:(brInstance*)i item:(int)n;
 
 - (void)clearSimulationMenu;
 - (void)setSimulationMenuEnabled:(BOOL)state;

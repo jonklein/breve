@@ -33,6 +33,7 @@
 */
 
 #import "slBreve.h"
+#import "util.h"
 
 extern BOOL engineWillPause;
 
@@ -422,12 +423,12 @@ static NSRecursiveLock *gLogLock;
 	[breveEngine doKeyEvent: key isDown: d];
 }
 
-- (stInstance*)getSelectedInstance {
+- (brInstance*)getSelectedInstance {
 	return [breveEngine getSelectedInstance];
 }
 
 - (void)updateObjectSelection {
-	stInstance *i = NULL;
+	brInstance *i = NULL;
 	brEngine *engine = [breveEngine getEngine];
 	brInstance *controller;
 	
@@ -441,11 +442,11 @@ static NSRecursiveLock *gLogLock;
 		[selectionText setStringValue: 
 			[NSString stringWithFormat: @"No Selection (%s [%p])", controller->object->name, controller]];
 
-		[editorData setEngine: engine instance: controller->userData];
+		[editorData setEngine: engine instance: controller];
 	} else {
 		[editorData setEngine: engine instance: i];
 
-		[selectionText setStringValue: [NSString stringWithFormat: @"%s (%p)", i->type->name, i]];
+		[selectionText setStringValue: [NSString stringWithFormat: @"%s (%p)", i->object->name, i]];
 	}
 
 	[variableOutlineView reloadData];
@@ -486,19 +487,19 @@ static NSRecursiveLock *gLogLock;
 - (IBAction)simMenu:sender {
 	brEngine *e = [breveEngine getEngine];
 	brInstance *controller = brEngineGetController(e);
-	[self doMenuCallbackForInstance: controller->userData item: [sender tag]];
+	[self doMenuCallbackForInstance: controller item: [sender tag]];
 }
 
 - (IBAction)contextualMenu:sender {
 	[self doMenuCallbackForInstance: [breveEngine getSelectedInstance] item: [sender tag]];
 }
 
-- (void)doMenuCallbackForInstance:(stInstance*)i item:(int)n {
+- (void)doMenuCallbackForInstance:(brInstance*)i item:(int)n {
 	int result;
 	brEngine *e = [breveEngine getEngine];
 
 	if([breveEngine getRunState] == BX_RUN) [breveEngine lock];
-	result = brMenuCallback(e, i->breveInstance, n);
+	result = brMenuCallback(e, i, n);
 
 	if(result != EC_OK) {
 		[self runErrorWindow];
@@ -742,8 +743,8 @@ void updateMenu(brInstance *i) {
 
 	[gSelf clearSimulationMenu];
 
-	for(n=0;n<i->menus->count;n++) {
-		brMenuEntry *entry = i->menus->data[n];
+	for(n=0;n<slStackSize(i->menus);n++) {
+		brMenuEntry *entry = slStackGet(i->menus, n);
 
 		if(!strcmp(entry->title, "")) {
 			[gSimMenu addItem: [NSMenuItem separatorItem]];

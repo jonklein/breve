@@ -1227,9 +1227,8 @@
 		};
 		F5BD20AD0397BEC801980AE4 = {
 			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.objc;
-			name = slObjectOutlineItem.m;
-			path = ../OSX/slObjectOutlineItem.m;
+			lastKnownFileType = sourcecode.cpp.objcpp;
+			path = slObjectOutlineItem.mm;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};

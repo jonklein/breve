@@ -27,6 +27,7 @@
 #include <ctype.h>
 #include "steve.h"
 #include "expression.h"
+#include "evaluation.h"
 
 /*!
 	\brief Preprocesses a string for runtime formating and printing.

@@ -426,7 +426,7 @@ int slMakeCurrentContext();
 }
 
 
-- (stInstance*)getSelectedInstance {
+- (brInstance*)getSelectedInstance {
 	brMethod *method;
 	brEval result;
 	brInstance *i, *controller;
@@ -442,7 +442,7 @@ int slMakeCurrentContext();
 			if(result.type = AT_INSTANCE) {
 				i = BRINSTANCE(&result);
 
-				if(i && i->status == AS_ACTIVE) return i->userData;
+				if(i && i->status == AS_ACTIVE) return i;
 			}
 		} 
 	}

@@ -20,7 +20,18 @@
 
 #import "slObjectOutlineItem.h"
 
+#import "steveTypedefs.h"
+#import "expression.h"
+#import "evaluation.h"
+#import "steveFrontend.h"
+#import "object.h"
+
 @implementation slObjectOutlineItem;
+
+- (id)initWithArrayType:(int)at withOffset:(int)off {
+	isArray = YES;
+	return self;
+}
 
 - (id)initWithEval:(brEval*)e name:(NSString*)n withVar:(stVar*)stv withOffset:(int)off instance:(stInstance*)i {
     int c;
@@ -28,6 +39,8 @@
 
     theEvalList = NULL;
     theIndex = 0;
+
+	isArray = NO;
 
     bcopy(e, &eval, sizeof(brEval));
 
@@ -37,13 +50,13 @@
     if(stv && stv->type->type == AT_ARRAY) {
         isArray = YES;
         arrayType = stv->type->arrayType;
-        arrayOffset = stv->offset;
+        arrayOffset = off;
     } else offset = off;
 
     instance = i;
 
     if([self getExpandable] && eval.type == AT_INSTANCE) {
-		evalInstance = BRINSTANCE(&eval)->userData;
+		evalInstance = (stInstance*)BRINSTANCE(&eval)->userData;
 		[self setEvalObject: evalInstance->type];
     } else if([self getExpandable] && eval.type == AT_LIST) {
         childCount = BRLIST(&eval)->count;
@@ -72,7 +85,7 @@
 	object = c;
 
 	if(object) {
-		[self updateChildCount: slListCount(object->variableList) + 1];
+		[self updateChildCount: object->variables.size() + 1];
 	} else {
 		[self updateChildCount: 0];
 	}
@@ -205,7 +218,7 @@
     // effect the children of this object 
 
     if(childObjects[index]) {
-        if(eval.type == AT_INSTANCE) [childObjects[index] setInstance: BRINSTANCE(&eval)->userData];
+        if(eval.type == AT_INSTANCE) [childObjects[index] setInstance: (stInstance*)BRINSTANCE(&eval)->userData];
         return childObjects[index];
     }
 
@@ -215,9 +228,9 @@
 
 
     if(eval.type == AT_INSTANCE) {
-        vars = object->variableList;
+		vars = NULL;
 
-		if(index == slListCount(vars)) {
+		if(index == object->variables.size() ) {
 			// is this the parent?
 			newEval.type = AT_INSTANCE;
 			BRINSTANCE(&newEval) = BRINSTANCE(&eval);
@@ -236,10 +249,10 @@
 
 			newTitle = [[NSString stringWithCString: var->name] retain];
 
-	        if(var->type->type != AT_ARRAY)
-				stLoadVariable(&evalInstance->variables[var->offset], var->type->type, &newEval, &ri);
-			else 
-				newEval.type = AT_ARRAY;
+	        // if(var->type->type != AT_ARRAY)
+			// 	stLoadVariable(&evalInstance->variables[var->offset], var->type->type, &newEval, &ri);
+			// else 
+			// 	newEval.type = AT_ARRAY;
 
 	        childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: newTitle withVar: var withOffset: var->offset instance: evalInstance];
 		}
@@ -258,7 +271,7 @@
 
         off = arrayOffset + index * stSizeofAtomic(arrayType);
     
-        stLoadVariable(&instance->variables[off], arrayType, &newEval, &ri); 
+        // stLoadVariable(&instance->variables[off], arrayType, &newEval, &ri); 
         
         newTitle = [[NSString stringWithFormat: @"array index %d", index] retain];
     

@@ -9352,7 +9352,7 @@ _ACEOF
 fi
 
 
-                                                                                ac_config_files="$ac_config_files Makefile plugins/slDigitizerPlugin/Makefile plugins/slQTMusicPlugin/Makefile plugins/slRegexPlugin/Makefile plugins/slURLPlugin/Makefile plugins/samples/Makefile OSX/ConfigureLibraryList Qt/breve.pro"
+                                                                                          ac_config_files="$ac_config_files Makefile plugins/slDigitizerPlugin/Makefile plugins/slQTMusicPlugin/Makefile plugins/slRegexPlugin/Makefile plugins/slURLPlugin/Makefile plugins/samples/Makefile OSX/ConfigureLibraryList Qt/breve.pro wx/Makefile"
 
 
 if test "$ac_cv_lib_png_png_create_write_struct" != yes; then
@@ -9916,6 +9916,7 @@ do
   "plugins/samples/Makefile" ) CONFIG_FILES="$CONFIG_FILES plugins/samples/Makefile" ;;
   "OSX/ConfigureLibraryList" ) CONFIG_FILES="$CONFIG_FILES OSX/ConfigureLibraryList" ;;
   "Qt/breve.pro" ) CONFIG_FILES="$CONFIG_FILES Qt/breve.pro" ;;
+  "wx/Makefile" ) CONFIG_FILES="$CONFIG_FILES wx/Makefile" ;;
   "include/breve/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/breve/config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}

@@ -298,6 +298,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/samples/Makefile
 		 OSX/ConfigureLibraryList
 		 Qt/breve.pro
+		 wx/Makefile
 ])
 
 if test "$ac_cv_lib_png_png_create_write_struct" != yes; then

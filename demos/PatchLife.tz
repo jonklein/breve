@@ -76,7 +76,7 @@ Control : PatchLife {
 
 Patch : LifePatch {
 	+ variables:
-		state, nextstate (int).
+		state (int).
 		neighbors (list).
 		onCount (int).
 		liveNeighbors (int).

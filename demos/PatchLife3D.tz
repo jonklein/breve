@@ -16,9 +16,9 @@
 
 Controller PatchLife.
 
-@define X_SIZE 12.
-@define Y_SIZE 12.
-@define Z_SIZE 12.
+@define X_SIZE 20.
+@define Y_SIZE 20.
+@define Z_SIZE 20.
 
 Control : PatchLife {
 	+ variables:
@@ -71,7 +71,7 @@ Control : PatchLife {
 
 Patch : LifePatch {
 	+ variables:
-		state, nextstate (int).
+		state (int).
 		neighbors (list).
 		onCount (int).
 		liveNeighbors (int).

@@ -20,6 +20,7 @@
 
 #include "steve.h"
 #include "expression.h"
+#include "evaluation.h"
 
 extern stSteveData *gSteveData;
 

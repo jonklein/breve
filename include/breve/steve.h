@@ -13,8 +13,6 @@ extern "C" {
 
 #include "gc.h"
 
-#include "evaluation.h"
-
 #include "stringexp.h"
 #include "dataObject.h"
 #include "genetic.h"

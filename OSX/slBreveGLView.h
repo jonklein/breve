@@ -26,8 +26,7 @@
 #import "slBreve.h"
 #import "slFullScreen.h"
 
-#import "steve.h"
-#import "engine.h"
+#import "kernel.h"
 
 @interface slBreveGLView : NSOpenGLView
 {
@@ -80,7 +79,7 @@
 - (int)snapshotToFile:(NSString*)filename;
 
 - (void)setContextMenuEnabled:(BOOL)c;
-- (void)updateContextualMenu:(id)menu withInstance:(stInstance*)i;
+- (void)updateContextualMenu:(id)menu withInstance:(brInstance*)i;
 
 - (BOOL)startFullScreen;
 - (void)stopFullScreen;

@@ -27,6 +27,7 @@
 
 #include "steve.h"
 #include "breve.h"
+#include "movie.h"
 
 static void brInterrupt(brEngine *);
 static void graphDisplay(void);
