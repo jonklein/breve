@@ -42,7 +42,7 @@ __inline const char *dlerror() {
 }
 #endif /* MINGW */
 
-extern int errno;
+#include <errno.h>
 
 /*!
 	\brief Opens a plugin and loads it into the engine.

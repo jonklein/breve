@@ -207,7 +207,11 @@ int brIImageWriteToFile(brEval args[], brEval *result, brInstance *i) {
 
 	file = brOutputPath(i->engine, BRSTRING(&args[1]));
 
+#ifdef HAVE_LIBPNG
 	BRINT(result) = slWritePNGImage(file, dm->x, dm->y, dm->data, 4, 1);
+#else
+	slMessage(DEBUG_ALL, "This version of breve was built without support for image export\n");
+#endif
 
 	slFree(file);
 

@@ -30,8 +30,7 @@ case "${host_os}" in
 
 	linux* )
 		dnl Linux configuration
-		GLLIBS="-Xlinker -Bdynamic -L$x_libraries -lglut -lGL -lGLU -lXmu -lXt -lSM -lICE -lX11 -lXi -lXext"
-		EXTRALDFLAGS="-Xlinker -Bstatic"
+		GLLIBS="-L$x_libraries -lglut -lGL -lGLU -lXmu -lXt -lSM -lICE -lX11 -lXi -lXext"
 		PLUGINFLAGS="-shared"
 		AC_DEFINE([LINUX], [], [Linux])
 		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E"
