@@ -1,5 +1,4 @@
-
-#define STINSTANCE(x)	((stInstance*)(BRPOINTER(x)))
+#define STINSTANCE(x)	((stInstance *)(BRPOINTER(x)))
 
 #include "util.h"
 #include "kernel.h"

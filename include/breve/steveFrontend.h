@@ -7,8 +7,8 @@ struct stSteveData {
 
 	char *controllerName;
 
-    stExp *singleStatement;
-    stMethod *singleStatementMethod;
+	stExp *singleStatement;
+	stMethod *singleStatementMethod;
 
 	std::vector< stObject* > objects;
 	std::vector< std::string > filesSeen;

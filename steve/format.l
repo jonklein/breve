@@ -7,8 +7,8 @@ int tlevel = 0;
 char *result = NULL;
 unsigned int length = 0;
 
-void slFormatAppend(char *text, int tlevel);
-char *slFormatText();
+void slFormatAppend(char *, int);
+char *slFormatText(void);
 
 char *slFormatParseBuffer;
 int slFormatParseLength;

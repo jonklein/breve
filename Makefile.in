@@ -1,6 +1,5 @@
 CC	= @CC@
 CXX	= @CXX@
-DLLTOOL = @DLLTOOL@
 JAR	= @JAR@
 JAVAC	= @JAVAC@
 LEX	= @LEX@
@@ -126,30 +125,27 @@ OSX_release: OSX_clean
 	cp -R OSX/build/breve.app breve_image_folder
 	cp OSX/README.html breve_image_folder
 	cp OSX/Documentation.txt breve_image_folder
-	cp Changes.html breve_image_folder
+	cp Changes.html GPL.txt breve_image_folder
 	mkdir breve_image_folder/plugins
-	cp -R plugins/samples plugins/slBrevePluginAPI.h plugins/README.txt breve_image_folder/plugins
+	cp -R plugins/samples breve_image_folder/plugins
+	cp plugins/slBrevePluginAPI.h plugins/README.txt breve_image_folder/plugins
 	make_dmg.sh $(DMG_FILE) breve_image_folder/*
 	rm -rf breve_image_folder
 
 CLI_release: clean
-	# $(MAKE) documentation
-	-mkdir docs
 	$(MAKE) optimize
 	rm -rf $(CLI_FOLDER)
-	mkdir $(CLI_FOLDER)
-	mkdir $(CLI_FOLDER)/bin
+	mkdir -p $(CLI_FOLDER)/bin
 	mkdir $(CLI_FOLDER)/lib
-	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin/
-	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin/
-	cp -R lib $(CLI_FOLDER)/
-	cp -R docs $(CLI_FOLDER)/
-	cp -R demos $(CLI_FOLDER)/
-	mkdir $(CLI_FOLDER)/plugins
-	cp -R plugins/samples plugins/slBrevePluginAPI.h plugins/README.txt $(CLI_FOLDER)/plugins
+	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin
+	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin
+	cp -R lib $(CLI_FOLDER)
+	cp -R demos $(CLI_FOLDER)
 	rm -rf $(CLI_FOLDER)/demos/Music
-	cp README.txt $(CLI_FOLDER)/
-	cp Changes.html $(CLI_FOLDER)/
+	mkdir $(CLI_FOLDER)/plugins
+	cp -R plugins/samples $(CLI_FOLDER)/plugins
+	cp plugins/slBrevePluginAPI.h plugins/README.txt $(CLI_FOLDER)/plugins
+	cp Changes.html GPL.txt README.txt $(CLI_FOLDER)
 	find $(CLI_FOLDER) -name CVS -prune -exec rm -rf {} \;
 	find $(CLI_FOLDER) -name '.cvsignore' -prune -exec rm -rf {} \;
 	rm -f breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@
@@ -158,8 +154,7 @@ CLI_release: clean
 plugin_API:
 	rm -rf breve_plugin_API
 	mkdir breve_plugin_API
-	cp plugins/slBrevePluginAPI.h breve_plugin_API
-	cp plugins/README.html breve_plugin_API
+	cp plugins/slBrevePluginAPI.h plugins/README.txt breve_plugin_API
 	@ARCHIVER@ breve_plugin_API.@ARCHIVE_SUFFIX@ breve_plugin_API
 	rm -rf breve_plugin_API
 

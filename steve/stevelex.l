@@ -24,8 +24,6 @@
 
 #include <string.h>
 
-#include <vector>
-
 #include "steve.h"
 
 #include "steveparse.tab.h"
@@ -44,7 +42,7 @@ int gErrorLine = 0;
 extern brEngine *parseEngine;
 extern stSteveData *gSteveData;
 
-void yyerror(char *c);
+void yyerror(char *);
 
 FILE *docHandle = NULL;
 

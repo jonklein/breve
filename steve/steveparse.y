@@ -33,8 +33,6 @@
 #include "steve.h"
 #include "expression.h"
 
-#include <vector>
-
 brEngine *parseEngine = NULL;
 
 stObject *currentObject = NULL;
@@ -50,20 +48,20 @@ extern char *yyfile;
 
 int gReparse;
 
-void stStartParse();
-void stEndParse();
-void stParseSetSteveData(stSteveData *d);
-void stParseSetEngine(brEngine *e);
-void stParseSetObject(stObject *o);
-void stParseSetObjectAndMethod(stObject *o, stMethod *m);
+void stStartParse(void);
+void stEndParse(void);
+void stParseSetSteveData(stSteveData *);
+void stParseSetEngine(brEngine *);
+void stParseSetObject(stObject *);
+void stParseSetObjectAndMethod(stObject *, stMethod *);
 
-void yyerror(char *c);
+void yyerror(char *);
 
-int yylex();
+int yylex(void);
 
-double stDoubleFromIntOrDoubleExp(stExp *e);
+double stDoubleFromIntOrDoubleExp(stExp *);
 
-int stGetTypeForString(char *name);
+int stGetTypeForString(char *);
 
 %}
 
