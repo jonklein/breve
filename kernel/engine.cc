@@ -191,11 +191,6 @@ void brEngineFree(brEngine *e) {
 	Pa_Terminate();
 #endif
 
-#ifdef HAVE_LIBOSMESA
-	slFree(e->osBuffer);
-	OSMesaDestroyContext(e->osContext);
-#endif
-
 	for(bi = e->instances.begin(); bi != e->instances.end(); bi++ )
 		brInstanceRelease(*bi);
 
@@ -224,6 +219,11 @@ void brEngineFree(brEngine *e) {
 	for(bi = e->freedInstances.begin(); bi != e->freedInstances.end(); bi++ ) {
 		slFree( *bi);
 	}
+
+#ifdef HAVE_LIBOSMESA
+	slFree(e->osBuffer);
+	OSMesaDestroyContext(e->osContext);
+#endif
 
 	brNamespaceFreeWithFunction(e->internalMethods, (void(*)(void*))brFreeBreveCall);
 	brEngineFreeObjects(e);
