@@ -126,7 +126,8 @@ OSX_release: OSX_clean
 	rm -rf breve_image_folder
 
 CLI_release: clean
-	$(MAKE) documentation
+	# $(MAKE) documentation
+	-mkdir docs
 	$(MAKE) optimize
 	rm -rf $(CLI_FOLDER)
 	mkdir $(CLI_FOLDER)
