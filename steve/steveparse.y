@@ -690,6 +690,8 @@ control_statement
 			stParseError(parseEngine, PE_PARSE, "Expected \"in\" after list expression of \"foreach\" statement");
 		}
 
+		slFree($3);
+
 		if(ae) {
 			$$ = stNewForeachExp(ae->values.pValue, $4, $6, yyfile, lineno);
 			slFree(ae);
@@ -698,6 +700,7 @@ control_statement
 			stExpFree($6);
 			$$ = NULL;
 		}
+
 	}
 | WHILE expression ':' statement {
 		$$ = stNewWhileExp($2, $4, yyfile, lineno);
