@@ -209,7 +209,7 @@ typedef struct stRtcCodeBlock_t {
 		int (*stEvalMatrixExp)(stMatrixExp *v, stRunInstance *i, brEval *target);
 		int (*stEvalNewInstance)(stInstanceExp *ie, stRunInstance *i, brEval *t);
 		int (*stEvalBinaryEvalListExp)(char op, brEval *l, brEval *r, brEval *target, stRunInstance *i);
-	};
+	} calls;
 
 	unsigned int	code[0];
 } stRtcCodeBlock;

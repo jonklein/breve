@@ -82,7 +82,7 @@ stRtcCodeBlock *stNewRtcBlock()
 	stRtcCodeBlock	*block = (stRtcCodeBlock *)malloc(CODE_BLOCK_SIZE);
 	
 	block->length	= CODE_BLOCK_SIZE;
-	block->ptr		= block->code;
+	block->calls.ptr		= block->code;
 	
 	return block;
 }
@@ -110,11 +110,11 @@ inline void stFlushBlock(stRtcCodeBlock *block) {
 
 /*!
 	\brief Get space from the current block (or add additional space)
-
 */
+
 inline unsigned int *stAllocInstSpace(stRtcCodeBlock *block, unsigned int word_count)
 {
-	if ((block->ptr + word_count) > (block->code + block->length))
+	if ((block->calls.ptr + word_count) > (block->code + block->length))
 	{
 		stUpdateBlockSize(block);
 		
@@ -124,7 +124,7 @@ inline unsigned int *stAllocInstSpace(stRtcCodeBlock *block, unsigned int word_c
 			return stAllocInstSpace(block, word_count);
 	}
 	
-	return block->ptr;
+	return block->calls.ptr;
 }
 
 /*!
@@ -1672,7 +1672,7 @@ RTC_INLINE int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, 
 
 		n = BRINT(&index);
 
-		resultCode = stPointerForExp(l->listExp, i, (void *)&stringptr, &type);
+		resultCode = stPointerForExp(l->listExp, i, (void **)&stringptr, &type);
 
 		oldstring = stringptr;
 
@@ -1776,7 +1776,7 @@ RTC_INLINE int stEvalVectorElementAssignExp(stVectorElementAssignExp *s, stRunIn
 	slVector *vector;
 	int type;
 
-	resultCode = stPointerForExp(s->exp, i, (void *)&vector, &type);
+	resultCode = stPointerForExp(s->exp, i, (void **)&vector, &type);
 
 	if(resultCode != EC_OK) return EC_ERROR;
 
@@ -2863,7 +2863,7 @@ RTC_INLINE int stEvalNewInstance(stInstanceExp *ie, stRunInstance *i, brEval *t)
 }
 
 int stExpEval3(stExp *s, stRunInstance *i, brEval *result) {
-	if (s->block) return s->block->stRtcEval3(s->values.pValue, i, result);
+	if (s->block) return s->block->calls.stRtcEval3(s->values.pValue, i, result);
 
 	return stExpEval(s, i, result, NULL);
 }
@@ -2888,7 +2888,7 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *result, stObject **tClass) {
 		if(s->debug == 1) slDebug("debug called from within steve evaluation\n");
 
 		if (s->block) {
-			return s->block->stRtcEval3(s->values.pValue, i, result);
+			return s->block->calls.stRtcEval3(s->values.pValue, i, result);
 		}
 	} else {
 		// we don't allow execution with freed instances, unless it's a return
@@ -2912,7 +2912,7 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *result, stObject **tClass) {
 	if(s->debug == 1) slDebug("debug called from within steve evaluation\n");
 
 	if (s->block) {
-		return s->block->stRtcEval3(s->values.pValue, i, result);
+		return s->block->calls.stRtcEval3(s->values.pValue, i, result);
 	}
 	
 	switch(s->type) {

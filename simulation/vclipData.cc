@@ -194,7 +194,7 @@ void slVclipDataRealloc(slVclipData *v, unsigned int count) {
 	while(v->count > v->maxCount) v->maxCount *= 2;
 
 	delete[] v->pairList;
-	v->pairList = new unsigned char[(v->maxCount * v->maxCount)];
+	v->pairList = new unsigned char[v->maxCount * v->maxCount];
 
 	memset(v->pairList, (BT_CHECK | BT_UNKNOWN), (v->maxCount * v->maxCount));
 }

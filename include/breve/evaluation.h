@@ -52,13 +52,13 @@ struct stStackRecord {
 #if USE_RTC
 #define EVAL_RTC_CALL_3(_s, _call, _arg0, _arg1, _arg2) \
 						(_s->block = stNewRtcBlock(), \
-						_s->block->_call = _call, \
+						_s->block->calls._call = _call, \
 						_s->block->flags |= RTC_EVAL_ARG_3, \
-						_s->block->_call(_arg0, _arg1, _arg2))
+						_s->block->calls._call(_arg0, _arg1, _arg2))
 
 #define RTC_SET_LOAD_ROUTINE(_loadExp, _call, _type, _variable) \
 if (_loadExp) { \
-	_loadExp->stEvalLoadFunc = _call; \
+	_loadExp->calls.stEvalLoadFunc = _call; \
 	_loadExp->type           = _type; \
 	_loadExp->variable       = _variable; \
 }
