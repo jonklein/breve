@@ -405,7 +405,9 @@ int slObjectSortFunc(const void *a, const void *b) {
 
 double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 	double total = 0.0;
+#ifdef HAVE_LIBENET
 	static int lastSecond = 0;
+#endif
 
 	*error = 0;
 

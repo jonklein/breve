@@ -49,12 +49,10 @@ unsigned int brPushCallbackFunction(void *environment, brPushCallbackData *data)
 void brPushFreeData(void *d) {
 	brPushCallbackData *data = d;
 
-	printf("%p freed\n", d);
-
 	brMethodFree(data->method);
 	slFree(data);
 }
-#endif */ HAVE_LIBPUSH */
+#endif /* HAVE_LIBPUSH */
 
 /*@}*/
 
