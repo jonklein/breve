@@ -74,13 +74,13 @@ profile:
 .PHONY: clean OSX_build OSX_clean OSX_release CLI_release plugin_API install
 
 clean:
-	rm -f bin/breve bin/breve_cli bin/graphTest
+	rm -f bin/breve bin/breve_cli bin/graphTest lib/*.a
 	rm -f steve/format.c steve/stevelex.c
 	rm -f steve/steveparse.tab.c steve/steveparse.tab.h
 	rm -f java/*.class lib/classes/*.jar
 	rm -rf docBuild/docs docs
 	rm -rf OSX/build
-	echo -n > .depend
+	rm -f .depend
 	find . -name '.DS_Store' -exec rm -f {} \;
 	find . -name 'core' -exec rm -f {} \;
 	find . -name '.gdb*' -exec rm -f {} \;
@@ -89,7 +89,7 @@ clean:
 
 lib/libbreve.a: $(OBJ)
 	$(AR) -crv lib/libbreve.a $(OBJ)
-	ranlib lib/libbreve.a
+	$(RANLIB) lib/libbreve.a
 
 OSX_build: optimize lib/libbreve.a
 	-mkdir docs
