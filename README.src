@@ -45,7 +45,11 @@ For the OS X application:
 
 If these commands fail it's likely that you will need to install some
 of the libraries required by breve.  See the section "REQUIRED LIBRARIES"
-below.
+below.  NOTE: On MacOS X the configure command may fail indicating a missing
+library even when the Libra is correctly installed.  If you know the library is
+installed and can be found (you've included any relevant path includes and
+exported the environment vars) you probably need to run 'ranlib libxxx.a' on
+the library in question.  Read the man pages for more information.
 
                        --- NOTES ON THIS RELEASE ---
 
@@ -67,7 +71,11 @@ at jklein@spiderland.org.
                           --- REQUIRED LIBRARIES ---
 
 It's always a drag to have to download another set of libraries to get 
-something working.  Sorry.
+something working.  Sorry.  Make sure to include the libraries and the include
+header files in your environment before running configure.  Use LDFLAGS to
+include the library dirs and CPPFLAGS to include the include dirs. 
+Example: export LDFLAGS='-L/opt/local/lib' CPPFLAGS='-I/opt/local/include'
+
 
 * OpenGL and GLUT libraries
 
@@ -140,11 +148,11 @@ something working.  Sorry.
 * PHYSICS SUPPORT & GROWING PAINS
 
   Since moving from a homegrown Featherstone based physics engine to ODE, 
-  there have been a number of paridigmatic changes to concepts like 
+  there have been a number of paradigmatic changes to concepts like 
   Links, MultiBodies, Joints, etc.  Ultimately, there are now a lot
   more features, but some aspects are undeniably "weird" because 
-  of the code needed to accomidate the new engine, while offering 
-  conceptual backwards compatibility.
+  of the code needed to accommodate the new engine, while offering 
+  conceptual backward compatibility.
 
   Specifically, a "MultiBody" was a very natural concept for the 
   Featherstone algorithm and natural for thought as well--but it is 
