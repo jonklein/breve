@@ -18,8 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include "steve.h"
 #include "javaFunctions.h"
+
+stJavaBridgeData *gJavaBridge;
 
 #define USER_CLASSPATH "."
 
@@ -53,7 +54,7 @@ stJavaBridgeData *stAttachJavaVM(brEngine *e) {
 
 	optstr = malloc(strlen(finder) + strlen(env) + strlen("-Djava.class.path=") + 1024);
 
-	sprintf(optstr, "-Djava.class.path=%s:%s:%s", finder, env, e->userJavaClassPath);
+	sprintf(optstr, "-Djava.class.path=%s:%s:%s", finder, env, getenv("BREVE_CLASS_PATH"));
 
 	JNI_GetDefaultJavaVMInitArgs(&vm_args);
 
@@ -318,7 +319,6 @@ int stJavaCallMethod(stJavaBridgeData *bridge, stJavaObjectData *object, stJavaM
 			returnValue.l = (*bridge->env)->CallObjectMethodA(bridge->env, object->object, method->method, jargs);
 			result->type = AT_STRING;
 			BRSTRING(result) = stReadJavaString(bridge, returnValue.l);
-			result->retain = 0;
 			break;
 		case 'O':
 			// 'O' is breve's code for an object
@@ -342,11 +342,11 @@ int stJavaCallMethod(stJavaBridgeData *bridge, stJavaObjectData *object, stJavaM
 	return EC_OK;
 }
 
-stInstance *stJavaObjectWrapper(brEngine *e, jobject object) {
-	stJavaBridgeData *bridge = e->javaBridge;
+brInstance *stJavaObjectWrapper(brEngine *e, jobject object) {
+	stJavaBridgeData *bridge = gJavaBridge;
 	stJavaObjectData *objectData;
-	stObject *o = stObjectFind(e->objects, JAVA_BRIDGE_CLASS_NAME);
-	stInstance *i;
+	brObject *o = stObjectFind(e->objects, JAVA_BRIDGE_CLASS_NAME);
+	brInstance *i;
 	jvalue jargs[JAVA_MAX_ARGS];
 	brEval eval;
 
@@ -433,8 +433,8 @@ stJavaClassData *stJavaFindClass(stJavaBridgeData *bridge, char *name) {
 	return class;
 }
 
-int stJNewObject(brEval args[], brEval *target, stInstance *i) {
-	stJavaBridgeData *bridge = i->type->engine->javaBridge;
+int stJNewObject(brEval args[], brEval *target, brInstance *i) {
+	stJavaBridgeData *bridge = gJavaBridge;
 	char *classname = BRSTRING(&args[0]);
 	brEvalListHead *head = BRLIST(&args[1]);
 	int n = 0;
@@ -442,7 +442,7 @@ int stJNewObject(brEval args[], brEval *target, stInstance *i) {
 	for(n=0;n<strlen(classname);n++) if(classname[n] == '.') classname[n] = '/';
 
 	if(!bridge) {
-		bridge = i->type->engine->javaBridge = stAttachJavaVM(i->type->engine);
+		bridge = gJavaBridge = stAttachJavaVM(i->type->engine);
 		if(!bridge) {
 			slMessage(DEBUG_ALL, "Cannot initialize Java virtual machine\n");
 			return EC_ERROR;
@@ -461,7 +461,7 @@ int stJNewObject(brEval args[], brEval *target, stInstance *i) {
 	return EC_OK;
 }
 
-int stJFreeObject(brEval *args, brEval *target, stInstance *i) {
+int stJFreeObject(brEval *args, brEval *target, brInstance *i) {
 	stJavaObjectData *object = i->bridgeData;
 
 	slFree(object);
@@ -530,8 +530,8 @@ stJavaObjectData *stNewJavaObject(stJavaBridgeData *bridge, char *name, brEvalLi
 	return object;
 }
 
-int stJCallMethod(brEval *args, brEval *target, stInstance *i) {
-	stJavaBridgeData *bridge = i->type->engine->javaBridge;
+int stJCallMethod(brEval *args, brEval *target, brInstance *i) {
+	stJavaBridgeData *bridge = gJavaBridge;
 	stJavaObjectData *object = i->bridgeData; 
 	char *method = BRSTRING(&args[0]);
 	brEvalListHead *arguments = BRLIST(&args[1]);
@@ -543,7 +543,7 @@ int stJCallMethod(brEval *args, brEval *target, stInstance *i) {
 	
 
 	if(!bridge) {
-		bridge = i->type->engine->javaBridge = stAttachJavaVM(i->type->engine);
+		bridge = gJavaBridge = stAttachJavaVM(i->type->engine);
 		if(!bridge) {
 			slMessage(DEBUG_ALL, "Cannot initialize Java virtual machine\n");
 			return EC_ERROR;
@@ -691,7 +691,7 @@ void stFreeJavaBridgeData(stJavaBridgeData *bridge) {
 	slFree(bridge);
 }
 
-void stInitJavaFuncs(stNamespace *n) {
+void brInitJavaFuncs(brNamespace *n) {
 	brNewBreveCall(n, "newJavaObject", stJNewObject, AT_NULL, AT_STRING, AT_LIST, 0);
 	brNewBreveCall(n, "freeJavaObject", stJFreeObject, AT_NULL, 0);
 	brNewBreveCall(n, "callJavaMethod", stJCallMethod, AT_UNDEFINED, AT_STRING, AT_LIST, 0);

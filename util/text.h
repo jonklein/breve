@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 char *slStrdup(char *o);
+char *slStrdupAndFree(char *str);
 
 char *slSplit(char *start, char *substr, int n);
 
@@ -42,3 +43,4 @@ char *slDequote(char *q);
 char *slStrcatM(char *start, char *end);
 
 char *slFgets(char *str, int size, FILE *stream);
+

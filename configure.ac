@@ -19,8 +19,6 @@ case "${host_os}" in
 		QUICKTIMEFLAGS="-framework QuickTime -framework Carbon"
 		AC_DEFINE([MACOSX], [], [Mac OS X])
 
-		AC_CHECK_FILE("/usr/local/lib/libdl.a")
-
 		;;
 
 	linux* )

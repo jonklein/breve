@@ -162,7 +162,9 @@ __EOT__
 
 	$return_function = "$name($function_arguments)";
 
-	if($return_type eq "char *") { $return_function = "slStrdup($return_function)"; }
+	if($return_type eq "char *") { 
+		$return_function = "slStrdupAndFree($return_function)"; 
+	}
 
 	if(eval("defined \&$name;")) {
 		eval("${name}(\\\@accessors, \$return_result, \$return_function);");

@@ -18,19 +18,31 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+/*
+			the breve simulation environment plugin API version 2.0
+
+	Documentation on using the breve plugin API is included in
+	the documentation distributed with breve.
+*/
+
+// These are depreciated symbol names, 
+// included here for backwards compatability
+
+#define stNewBreveCall brNewBreveCall
+#define stEval brEval
+#define stHash brEvalHash
+#define stEvalList brEvalList
+#define stEvalListHead brEvalListHead
+#define stNewEvalList brEvalListNew
+
+#define stEvalListAppend(list, element) brEvalListInsert((list), (list)->count, (element))
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
-/*
-	the breve simulation environment plugin API version 2.0
-
-	Documentation on using the breve plugin API is included in
-	the documentation distributed with breve.
-*/
 
 typedef struct slVector slVector;
 typedef struct brEval brEval;
@@ -39,13 +51,14 @@ typedef struct brEvalList brEvalList;
 typedef struct brEvalHash brEvalHash;
 typedef struct brData brData;
 typedef struct stInstance stInstance;
+typedef struct brInstance brInstance;
 
-/* breve output error codes */
+// breve output error codes 
 
 #define EC_ERROR -1		/* causes the simulation to terminate */
 #define EC_OK 1			/* normal output--simulation continues */
 
-/* these entries appear in the brEval field */ 
+// these entries appear in the brEval type field
 
 enum atomicTypes {
 	AT_UNDEFINED = 0,
@@ -54,6 +67,7 @@ enum atomicTypes {
     AT_DOUBLE,
 	AT_STRING,
 	AT_INSTANCE,
+	AT_BRIDGE_INSTANCE,
 	AT_POINTER,
 	AT_VECTOR,
 	AT_MATRIX,
@@ -71,21 +85,20 @@ struct slVector {
 };
 
 struct brEval {
-	unsigned char type;
-	unsigned char retain;
+    union {
+        double doubleValue;
+        int intValue;
+        slVector vectorValue;
+        double matrixValue[3][3];
+        void *pointerValue;
+        char *stringValue;
+        brEvalHash *hashValue;
+        brData *dataValue;
+        brInstance *instanceValue;
+        brEvalListHead *listValue;
+    } values;
 
-	union {
-		double doubleValue;
-		int intValue;
-		slVector vectorValue;
-		double matrixValue[3][3];
-		void *pointerValue;
-		char *stringValue;
-		brEvalHash *hashValue;
-		brData *dataValue;
-		stInstance *instanceValue;
-		brEvalListHead *listValue;
-	} values;
+    unsigned char type;
 };
 
 /*
@@ -96,24 +109,21 @@ struct brEval {
 */
 
 struct brEvalListHead {
-	int count;
-	int retainCount; 
-	brEvalList *start;
-	brEvalList *end;
+    int count;
+    int retainCount;
+    brEvalList *start;
+    brEvalList *end;
 
-    brEvalList *lastAccess;
-    int lastAccessIndex;
+    int indexSize;
+    int indexTop;
+    brEvalList **index;
 };
 
-struct brEvalList { 
-	int number;
- 
-	double sortValue;
- 
-	brEval eval;
- 
-	brEvalList *next;
-	brEvalList *previous;
+struct brEvalList {
+    brEval eval;
+
+    brEvalList *next;
+    brEvalList *previous;
 };
 
 /*
@@ -154,6 +164,18 @@ brEval *brEvalListAppend(brEvalListHead *a, brEval *eval);
 #define BRDATA(e)       ((e)->values.dataValue)
 #define BRHASH(e)       ((e)->values.hashValue)
 #define BRLIST(e)       ((e)->values.listValue)
+
+#define STINT		BRINT
+#define STFLOAT		BRFLOAT
+#define STDOUBLE	BRDOUBLE
+#define STSTRING	BRSTRING
+#define STVECTOR	BRVECTOR
+#define STMATRIX	BRMATRIX
+#define STINSTANCE	BRINSTANCE
+#define STPOINTER	BRPOINTER
+#define STDATA		BRDATA
+#define STHASH		BRHASH
+#define STLIST		BRLIST
 
 int brNewBreveCall(void *n, char *name, int (*call)(brEval *argumentArray, brEval *returnValue, void *callingInstance), int rtype, ...);
 

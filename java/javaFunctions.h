@@ -3,6 +3,8 @@
 
 #include <jni.h>
 
+#include "kernel.h"
+
 #define JAVA_MAX_ARGS	32
 
 #define JAVA_BRIDGE_CLASS_NAME	"JavaObject"
@@ -36,10 +38,14 @@ struct stJavaClassData {
 	slHash *methodHash;
 };
 
+typedef struct stJavaClassData stJavaClassData;
+
 struct stJavaObjectData {
 	stJavaClassData *class;
 	jobject object;
 };
+
+typedef struct stJavaObjectData stJavaObjectData;
 
 struct stJavaMethodData {
 	char *name;
@@ -48,6 +54,8 @@ struct stJavaMethodData {
 	char argumentTypes[JAVA_MAX_ARGS];
 	int argumentCount;
 };
+
+typedef struct stJavaMethodData stJavaMethodData;
 
 struct stJavaBridgeData {
 	stJavaObjectData *methodFinder;
@@ -66,6 +74,8 @@ struct stJavaBridgeData {
 	JNIEnv *env;
 };
 
+typedef struct stJavaBridgeData stJavaBridgeData;
+
 void stFreeJavaClassData(stJavaClassData *data);
 void stFreeJavaBridgeData(stJavaBridgeData *data);
 void stFreeJavaMethodData(stJavaMethodData *data);
@@ -76,7 +86,7 @@ int stJavaCallMethod(stJavaBridgeData *bridge, stJavaObjectData *object, stJavaM
 stJavaBridgeData *stAttachJavaVM(brEngine *e);
 void stDetachJavaVM(stJavaBridgeData *bridge);
 
-void stInitJavaFuncs(stNamespace *n);
+void brInitJavaFuncs(brNamespace *n);
 
 stJavaMethodData *stJavaFindMethod(stJavaBridgeData *bridge, stJavaClassData *class, char *name, unsigned char *types, int nargs);
 stJavaMethodData *stJavaMakeMethod(stJavaBridgeData *bridge, stJavaClassData *class, char *name, unsigned char *types, int nargs);
@@ -89,6 +99,6 @@ stJavaClassData *stJavaFindClass(stJavaBridgeData *bridge, char *name);
 char *stReadJavaString(stJavaBridgeData *bridge, jstring string);
 jstring stMakeJavaString(stJavaBridgeData *bridge, char *string);
 
-stInstance *stJavaObjectWrapper(brEngine *e, jobject object);
+brInstance *stJavaObjectWrapper(brEngine *e, jobject object);
 
 char stJTypeForType(unsigned char breve_type);

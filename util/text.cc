@@ -56,6 +56,17 @@ char *slStrdup(char *str) {
 }
 
 /*!
+	\brief Takes a malloc'd string and turns it into an slMalloc'd string
+	by duplicating and freeing the original.
+*/
+
+char *slStrdupAndFree(char *str) {
+	char *copy = slStrdup(str);
+	free(str);
+	return copy;
+}
+
+/*!
 	\brief Splits a string into several smaller strings based on a 
 	delimiter substring.
 
