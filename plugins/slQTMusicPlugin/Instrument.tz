@@ -15,57 +15,58 @@ Abstract : Instrument {
     + to init-as-piano:
         % If not already initialized, sets this instrument to be a piano.
 
-        instrumentInfo = newInstrument(1).
+        instrumentInfo = instrumentNew(1).
         return self.
 
     + to init-as-violin:
         % If not already initialized, sets this instrument to be a violin.
 
-        instrumentInfo = newInstrument(41).
+        instrumentInfo = instrumentNew(41).
         return self.
 
     + to init-as-cello:
         % If not already initialized, sets this instrument to be a cello.
 
-        instrumentInfo = newInstrument(43).
+        instrumentInfo = instrumentNew(43).
         return self.
 
     + to init-as-vibraphone:
         % If not already initialized, sets this instrument to be a vibraphone.
 
-        instrumentInfo = newInstrument(12).
+        instrumentInfo = instrumentNew(12).
         return self.
 
     + to init-as-instrument number n (int):
-        instrumentInfo = newInstrument(n).
+        instrumentInfo = instrumentNew(n).
         return self.
 
-    + to play-note number n (int) for-duration duration (double):
-        playNote(instrumentInfo, n, 80, duration).
+    + to play-note number n (int) for-duration duration (double) with-volume v = 80 (int):
+        instrumentPlayNote(instrumentInfo, n, v, duration).
 
-    + to volume-play-note number n (int) for-duration duration (double) with-volume vol (int):
-        playNote(instrumentInfo, n, vol, duration).
+    + to play-chord with-notes notes (list) for-duration duration (double) with-volume v = 80 (int):
+        instrumentPlayChord(instrumentInfo, notes, v, duration).
 
-    + to play-chord with-notes notes (list) for-duration duration (double):
-        playChord(instrumentInfo, notes, 80, duration).
-
-    + to volume-play-chord with-notes notes (list) for-duration duration (double) with-volume vol (int):
-        playChord(instrumentInfo, notes, vol, duration).
-
-    + to start-note number n (int):
-        if lastNote != -1 && autoStop: stopNote(instrumentInfo, lastNote).
-        startNote(instrumentInfo, n, 80).
-        lastNote = n.
-
-    + to volume-start-note number n (int) with-volume vol (int):
-        if lastNote != -1 && autoStop: stopNote(instrumentInfo, lastNote).
-        startNote(instrumentInfo, n, vol).
+    + to start-note number n (int) with-volume v = 80 (int):
+        if lastNote != -1 && autoStop: instrumentStopNote(instrumentInfo, lastNote).
+        instrumentStartNote(instrumentInfo, n, v).
         lastNote = n.
 
     + to stop-last-note:
-        if lastNote != -1: stopNote(instrumentInfo, lastNote).
+        if lastNote != -1: instrumentStopNote(instrumentInfo, lastNote).
         lastNote = -1.
 
+	+ to set-pitch-bend to value (double):
+		instrumentSetController(instrumentInfo, 32, value * 128).
+
+	+ to set-modulation to value (double):
+		instrumentSetController(instrumentInfo, 1, value * 512).
+
+	+ to set-balance to value (double):
+		instrumentSetController(instrumentInfo, 10, 256 + (value * 256)).
+
+	+ to set-midi-controller number n (int) to value (int):
+		instrumentSetController(instrumentInfo, n, value).
+
     + to destroy:
-        if instrumentInfo: freeInstrument(instrumentInfo).
+        if instrumentInfo: instrumentFree(instrumentInfo).
 }

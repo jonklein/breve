@@ -86,7 +86,7 @@ int brNewBreveCall(brNamespace *n, char *name, int (*f)(brEval *a, brEval *r, br
 	va_end(ap);
 
 	if(!brNamespaceStore(n, name, 0, c)) {
-		slMessage(DEBUG_ALL, "failed to initialize internal function \"%s\"\n", name);
+		slMessage(DEBUG_ALL, "Internal error: internal function \"%s\" redefined\n", name);
 		return -1;
 	}
 

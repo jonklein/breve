@@ -593,7 +593,7 @@ static int stEvalLoadString(stLoadExp *e, stRunInstance *i, brEval *target) {
 	if (!(*(char **)pointer))
 		*(char **)pointer = slStrdup("");
 
-	BRSTRING(target) = *(char **)pointer;
+	BRSTRING(target) = slStrdup(*(char **)pointer);
 
 	return EC_OK;
 }

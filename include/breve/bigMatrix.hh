@@ -223,6 +223,8 @@ class slBigMatrix2D : public slBigMatrix {
         virtual float get(const int x, const int y) const = 0;
 
         virtual void set(const int x, const int y, const float value) = 0;
+
+        virtual void setAll(const float value) = 0;
 */
 /* ************* These methods will be implemented in the next release or sooner
         virtual slBigMatrix2D& inPlaceConvolve(const slBigMatrix2D& kernel) = 0;
@@ -259,6 +261,8 @@ class slBigMatrix3D : public slBigMatrix {
         virtual float get(int x, int y, int z) const = 0;
 
         virtual void set(int x, int y, int z, float value) = 0;
+
+        virtual void setAll(float value) = 0;
 */
 /* ************* These methods will be implemented in the next release or sooner
         virtual slBigMatrix3D& inPlaceConvolve(const slBigMatrix3D& kernel) = 0;
@@ -446,6 +450,10 @@ class slBigMatrix2DGSL : public slBigMatrix2D, public slVectorViewGSL {
 
         void set(const int x, const int y, const float value);
 
+        void setAll(const float value);
+
+        void clamp(const float low, const float high);
+
 /*        
         slBigMatrix2DGSL& inPlaceConvolve(const slBigMatrix2D& kernel);
 
@@ -480,6 +488,8 @@ class slBigMatrix3DGSL : public slBigMatrix3D, public slVectorViewGSL {
         float get(const int x, const int y, const int z) const;
 
         void set(const int x, const int y, const int z, const float value);
+
+        void setAll (const float value);
 
 /*        
         slBigMatrix3DGSL& convolve(const slBigMatrix3D& kernel);

@@ -75,6 +75,18 @@ int brIMatrix2DSet(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+int brIMatrix2DSetAll(brEval args[], brEval *target, brInstance *i) {
+	BRBIGMATRIX2D(&args[0])->setAll(float(BRDOUBLE(&args[1])));
+
+	return EC_OK;
+}
+
+int brIMatrix2DClamp(brEval args[], brEval *target, brInstance *i) {
+	BRBIGMATRIX2D(&args[0])->clamp(float(BRDOUBLE(&args[1])), float(BRDOUBLE(&args[2])));
+
+	return EC_OK;
+}
+
 int brIMatrix2DCopy(brEval args[], brEval *target, brInstance *i) {
 
 	static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[1]))->copy(*static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0])));
@@ -321,6 +333,12 @@ int brIMatrix3DGet(brEval args[], brEval *target, brInstance *i) {
 
 int brIMatrix3DSet(brEval args[], brEval *target, brInstance *i) {
 	BRBIGMATRIX3D(&args[0])->set(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]), float(BRDOUBLE(&args[4])));
+
+	return EC_OK;
+}
+
+int brIMatrix3DSetAll(brEval args[], brEval *target, brInstance *i) {
+	BRBIGMATRIX3D(&args[0])->setAll(float(BRDOUBLE(&args[1])));
 
 	return EC_OK;
 }
@@ -575,6 +593,8 @@ void breveInitMatrixFunctions(brNamespace *n) {
 	brNewBreveCall(n, "matrix2DFree", brIMatrix2DFree, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "matrix2DGet", brIMatrix2DGet, AT_DOUBLE, AT_POINTER, AT_INT, AT_INT, 0);
 	brNewBreveCall(n, "matrix2DSet", brIMatrix2DSet, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_DOUBLE, 0);
+	brNewBreveCall(n, "matrix2DSetAll", brIMatrix2DSetAll, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
+	brNewBreveCall(n, "matrix2DClamp", brIMatrix2DClamp, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix2DCopy", brIMatrix2DCopy, AT_NULL, AT_POINTER, AT_POINTER, 0);
 	brNewBreveCall(n, "matrix2DDiffusePeriodic", brIMatrix2DDiffusePeriodic, AT_NULL, AT_POINTER, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix2DDiffuse", brIMatrix2DDiffuse, AT_NULL, AT_POINTER, AT_POINTER, AT_DOUBLE, 0);
@@ -590,6 +610,7 @@ void breveInitMatrixFunctions(brNamespace *n) {
 	brNewBreveCall(n, "matrix3DFree", brIMatrix3DFree, AT_NULL, AT_POINTER, 0);	
 	brNewBreveCall(n, "matrix3DGet", brIMatrix3DGet, AT_DOUBLE, AT_POINTER, AT_INT, AT_INT, AT_INT, 0);
 	brNewBreveCall(n, "matrix3DSet", brIMatrix3DSet, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_INT, AT_DOUBLE, 0);
+	brNewBreveCall(n, "matrix3DSetAll", brIMatrix3DSetAll, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix3DCopy", brIMatrix3DCopy, AT_NULL, AT_POINTER, AT_POINTER, 0);
 	brNewBreveCall(n, "matrix3DDiffusePeriodic", brIMatrix3DDiffusePeriodic, AT_NULL, AT_POINTER, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix3DCopyToImage", brIMatrix3DCopyToImage, AT_NULL, AT_POINTER, AT_INT, AT_POINTER, AT_INT, AT_DOUBLE, 0);

@@ -21,7 +21,7 @@ breveFrontend *breveFrontendInit(int argc, char **argv) {
 	// initialize frontend languages below:
 
 #if HAVE_LIBJAVA
-	brJavaInit(frontend->engine);
+	// brJavaInit(frontend->engine);
 #endif
 
 	return frontend;

@@ -64,18 +64,21 @@ brSoundPlayer *brNextPlayer(brSoundMixer *mixer) {
 	if(!mixer) return NULL;
 
 	for(n=0;n<mixer->players.size();n++) {
-		if(mixer->players[n].finished) {
-			player = &mixer->players[n];
+		if(mixer->players[n]->finished) {
+			player = mixer->players[n];
 			break;
 		}
 	}
 
 	if(!player) {
-		brSoundPlayer p;
+		brSoundPlayer *p = new brSoundPlayer;
+
+		p->finished = 1;
+		p->sound = NULL;
 	
 		mixer->players.push_back(p);
 
-		player = &mixer->players[ mixer->players.size() - 1];
+		player = p;
 	}
 
 	player->finished = 1;
@@ -90,14 +93,14 @@ brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency) {
 
 	player = brNextPlayer(mixer);
 
+	player->sound = NULL;
+
 	player->isSinewave = 1;
 	player->frequency = frequency;
 	player->volume = 1;
 	player->balance = .5;
 	player->phase = 0;
 	player->finished = 0;
-
-	// mixer->playerV.push_back(player);
 
 	return player;
 }
@@ -189,10 +192,10 @@ int brPASoundCallback(void *ibuf, void *obuf, unsigned long fbp, PaTimestamp out
 	for(n=0;n<fbp;n++) {
 		total = 0;
 
-		channel = n | 1;
+		channel = (n & 1);
 
 		for(p=0;p<mixer->players.size();p++) {
-			player = &mixer->players[p];
+			player = mixer->players[p];
 
 			if(player->isSinewave) {
 				if(!player->finished) {

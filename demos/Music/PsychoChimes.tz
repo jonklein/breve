@@ -86,7 +86,7 @@ Mobile : Bell {
 		if instrument: instrument stop-last-note.
 
 	+ to init:
-		self register with-shape (new Sphere init-with radius .2).
+		self set-shape to (new Sphere init-with radius .2).
 		self observe instance controller for-notification "reset" with-method "stop-bouncing".
 
 	+ to ask-if-bouncing:

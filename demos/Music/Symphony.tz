@@ -11,10 +11,12 @@
 # 3) Repeat!
 #
 
-@include "Mobile.tz"
-@include "Control.tz"
-@include "Instrument.tz"
-@include "Genome.tz"
+@define TUNE_LENGTH 16.
+
+@use Mobile.
+@use Control.
+@use Instrument.
+@use Genome.
 
 Controller Symphony.
 
@@ -112,7 +114,7 @@ Mobile : Musician (aka Musicians) {
 		self add-menu named "Select" for-method "select".
 
 	+ to build:
-		self register with-shape (new PolygonDisk init-with
+		self set-shape to (new PolygonDisk init-with
 			 radius (genome get-radius) 
 			 sides (genome get-sides) 
 			 height (genome get-height)).
@@ -145,8 +147,8 @@ Mobile : Musician (aka Musicians) {
 
 Genome : Music {
 	+ variables: 
-		tune (16 ints).
-		durations (16 doubles).
+		tune (list).
+		durations (list).
 		color (vector).
 		sides (int).
 		radius (double).
@@ -158,9 +160,9 @@ Genome : Music {
 	+ to randomize:
 		counter (int).
 		
-		while counter < 16: {
-			tune[counter] = random[16] + 60.
-			durations[counter] = random[.3].
+		while counter < TUNE_LENGTH: {
+			tune{counter} = random[16] + 60.
+			durations{counter} = random[.3].
 			counter+=1.
 		}
 
@@ -183,8 +185,8 @@ Genome : Music {
 
 	+ to play with-instrument instrument (object):
 		counter (int).
-		while counter < 16: {
-			instrument play-note number tune[counter] for-duration durations[counter].
+		while counter < TUNE_LENGTH: {
+			instrument play-note number tune{counter} for-duration durations{counter}.
 			counter+=1.
 		}
 
@@ -201,13 +203,13 @@ Genome : Music {
 
 		color += random[(.2, .2, .2)] - (.1, .1, .1).
 
-	if |color| > 1.0: color /= |color|.
+		if |color| > 1.0: color /= |color|.
 
-		tune[random[15]] += random[16] - 8.
-		tune[random[15]] += random[16] - 8.
-		tune[random[15]] += random[16] - 8.
+		tune{random[TUNE_LENGTH - 1]} += random[16] - 8.
+		tune{random[TUNE_LENGTH - 1]} += random[16] - 8.
+		tune{random[TUNE_LENGTH - 1]} += random[16] - 8.
 
-		durations[random[15]] += random[.3] - .15.
-		durations[random[15]] += random[.3] - .15.
-		durations[random[15]] += random[.3] - .15.
+		durations{random[TUNE_LENGTH - 1]} += random[.3] - .15.
+		durations{random[TUNE_LENGTH - 1]} += random[.3] - .15.
+		durations{random[TUNE_LENGTH - 1]} += random[.3] - .15.
 }

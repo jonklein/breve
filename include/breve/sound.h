@@ -28,7 +28,7 @@
 #ifdef __cplusplus
 class brSoundMixer {
 	public:
-		std::vector<brSoundPlayer> players;
+		std::vector< brSoundPlayer* > players;
 		PortAudioStream *stream;
 		int streamShouldEnd;
 };

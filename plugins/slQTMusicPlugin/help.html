@@ -63,24 +63,27 @@ Initializes the Instrument object as the QuickTime instrument identified
 by number.
 </blockquote>
 <p>
-<b>+ to play-note number n (int) for-duration duration (double):</b>
+<b>+ to play-note number n (int) for-duration duration (double) with-volume volume = 80 (int):</b>
 <p>
 <blockquote>
 Plays a note, given as a MIDI note number, for a certain duration, in seconds.
+The optional argument volume specifies the volume of the note to be played.
 </blockquote>
 <p>
-<b>+ to play-chord with-notes notes (list) for-duration duration (double):</b>
+<b>+ to play-chord with-notes notes (list) for-duration duration (double) with-volume volume = 80 (int):</b>
 <p>
 <blockquote>
 Plays a chord, given as list MIDI note number, for a certain duration, in 
 seconds.
+The optional argument volume specifies the volume of the chord to be played.
 </blockquote>
 <p>
-<b>+ to start-note number n (int):</b>
+<b>+ to start-note number n (int) with-volume volume = 80 (int):</b>
 <p>
 <blockquote>
 Starts playing a note, with the given MIDI note number.  The note will
 continue to be played until stop-last-note is called.
+The optional argument volume specifies the volume of the note to be played.
 </blockquote>
 <p>
 <b>+ to stop-last-note:</b>

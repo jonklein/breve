@@ -88,11 +88,14 @@ int brINewSinewave(brEval args[], brEval *target, brInstance *i) {
 
 int brIFreeSinewave(brEval args[], brEval *target, brInstance *i) {
 	brSoundPlayer *p = BRSOUNDPLAYERPOINTER(&args[0]);
+
+	if(!p) return EC_OK;
+
 	p->finished = 1;
 	return EC_OK;
 }
 
-/*
+/*!
 	\brief Changes the frequency of a sinewave.
 
 	void (brSoundPlayer pointer, int).
@@ -101,12 +104,14 @@ int brIFreeSinewave(brEval args[], brEval *target, brInstance *i) {
 int brISetFrequency(brEval args[], brEval *target, brInstance *i) {
 	brSoundPlayer *p = BRSOUNDPLAYERPOINTER(&args[0]);
 
+	if(!p) return EC_OK;
+
 	p->frequency = BRINT(&args[1]) * 2. * 3.14159265359 / MIXER_SAMPLE_RATE;
 
 	return EC_OK;
 }
 
-/*
+/*!
 	\brief Changes the volumne of a sinewave.
 
 	void setVolume(brSoundPlayer pointer, double).
@@ -116,11 +121,13 @@ int brISetFrequency(brEval args[], brEval *target, brInstance *i) {
 
 int brISetVolume(brEval args[], brEval *target, brInstance *i) {
 	brSoundPlayer *p = BRSOUNDPLAYERPOINTER(&args[0]);
+
+	if(!p) return EC_OK;
 	p->volume = BRDOUBLE(&args[1]);
 	return EC_OK;
 }
 
-/*
+/*!
 	\brief Changes the volumne of a sinewave.
 
 	void setBalance(brSoundPlayer pointer, double).
@@ -130,12 +137,14 @@ int brISetVolume(brEval args[], brEval *target, brInstance *i) {
 
 int brISetBalance(brEval args[], brEval *target, brInstance *i) {
 	brSoundPlayer *p = BRSOUNDPLAYERPOINTER(&args[0]);
+
+	if(!p) return EC_OK;
 	p->balance = BRDOUBLE(&args[1]);
 	return EC_OK;
 }
 #endif 
 
-/*
+/*!
 	\brief Prints an error message when sound functions are not available.
 
 	Used only when breve is compiled without support for sound.

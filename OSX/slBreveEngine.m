@@ -374,7 +374,7 @@ int slMakeCurrentContext();
 }
 
 - (void)doKeyEvent:(char)key isDown:(int)d {
-	if(!frontend->engine) return;
+	if(!frontend || !frontend->engine) return;
 
 	if(runState == BX_RUN) [engineLock lock];
 	brKeyCallback(frontend->engine, key, d);

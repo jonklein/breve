@@ -1,10 +1,12 @@
-@include "Object.tz"
+@use Object.
 
-Abstract : Tone {
+Abstract : Tone (aka Tones) {
 	% A Tone is an object which plays a constant tone.  You can set 
 	% the volume, frequency and left-right balance of the tone.  Creating
 	% the object will automatically start playing the tone.  Deleting the 
 	% object will cause the tone to stop playing.
+	% <p>
+	% A tone can also be effectively stopped by setting its volume to 0.
 
     + variables:
         tonePointer (pointer).
@@ -18,21 +20,22 @@ Abstract : Tone {
 		% plays the tone completely on the right channel and 0.0 plays
 		% the tone entirely on the left channel.
 
-		setBalance(tonePointer, newBalance).
+		if tonePointer: setBalance(tonePointer, newBalance).
 
     + to set-volume to newVolume (double):
-		% Sets the volume of the tone to newVolume.
+		% Sets the volume of the tone to newVolume.  Volume is specified
+		% on a scale from 0.0 to 1.0.
 
 		if newVolume > 1.0: newVolume = 1.0.
 		else if newVolume < 0.0: newVolume = 0.0.
 
-		setVolume(tonePointer, newVolume).
+		if tonePointer: setVolume(tonePointer, newVolume).
 
     + to set-frequency to newFrequency (double):
 		% Sets the frequency of the tone to newFrequency.
 
-		setFrequency(tonePointer, newFrequency).
+		if tonePointer: setFrequency(tonePointer, newFrequency).
 
 	+ to destroy:
-		freeSinewave(tonePointer).
+		if tonePointer: freeSinewave(tonePointer).
 }

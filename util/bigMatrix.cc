@@ -327,6 +327,38 @@ float slBigMatrix2DGSL::get(const int x, const int y) const
     _matrix->data[x * _matrix->tda + y] = value;
 }
 
+/**
+ *  set(x, y) - sets the matrix element at x,y without range checking
+ *
+ *  The basic slBigMatrix classes do not implement range checking.  When used
+ *  in steve code, the range checking should occur there.  In the future a
+ *  subclass with range checking can be provided.
+ */ 
+//inline
+ void slBigMatrix2DGSL::setAll(const float value)
+{
+	gsl_matrix_float_set_all( _matrix, value);
+}
+
+void slBigMatrix2DGSL::clamp(const float low, const float high) {
+	int x, y;
+
+	for(x = 0; x < _xdim; x++ ) {
+		for(y = 0; y < _ydim; y++ ) {
+			if( _matrix->data[x * _matrix->tda + y] > high) {
+			 	_matrix->data[x * _matrix->tda + y] = high;
+			} 
+
+			// 	_matrix->data[x * _matrix->tda + y] = low;
+			// }
+
+			if( _matrix->data[x * _matrix->tda + y] < low) {
+				_matrix->data[x * _matrix->tda + y] = 0.0;
+			}
+		}
+	}
+}
+
 /*
 slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceConvolve(const slBigMatrix2D& kernel)
 {
@@ -507,6 +539,12 @@ float slBigMatrix3DGSL::get(const int x, const int y, const int z) const
 void slBigMatrix3DGSL::set(const int x, const int y, const int z, const float value)
 {
     (_matrix[z])->data[x * (_matrix[z])->tda + y] = value;
+}
+
+//inline 
+void slBigMatrix3DGSL::setAll(const float value)
+{
+	for( unsigned int n = 0; n < _zdim; n++ ) gsl_matrix_float_set_all( _matrix[n], value);
 }
 
 //slBigMatrix3DGSL& slBigMatrix3DGSL::convolve(const slBigMatrix3D& kernel) {}

@@ -30,22 +30,6 @@ struct slQTInstrumentInfo {
 
 typedef struct slQTInstrumentInfo slQTInstrumentInfo;
 
-int slRPlayNote(brEval args[], brEval *result, void *i);
-int slRStartNote(brEval args[], brEval *result, void *i);
-int slRStopNote(brEval args[], brEval *result, void *i);
-int slRPlayChord(brEval args[], brEval *result, void *i);
-int slRNewInstrument(brEval args[], brEval *result, void *i);
-int slRFreeInstrument(brEval args[], brEval *result, void *i);
-
-void slInitQTInstrumentFuncs(void *n) {
-    brNewBreveCall(n, "newInstrument", slRNewInstrument, AT_POINTER, AT_INT, 0);
-    brNewBreveCall(n, "freeInstrument", slRFreeInstrument, AT_NULL, AT_POINTER, 0);
-    brNewBreveCall(n, "playNote", slRPlayNote, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_DOUBLE, 0);
-    brNewBreveCall(n, "startNote", slRStartNote, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
-    brNewBreveCall(n, "stopNote", slRStopNote, AT_NULL, AT_POINTER, AT_INT, 0);
-    brNewBreveCall(n, "playChord", slRPlayChord, AT_NULL, AT_POINTER, AT_LIST, AT_INT, AT_DOUBLE, 0);
-}
-
 slQTInstrumentInfo *slQTNewInstrumentInfo(int instrument) {
     ComponentResult componentError;
     slQTInstrumentInfo *i;
@@ -80,21 +64,23 @@ slQTInstrumentInfo *slQTNewInstrumentInfo(int instrument) {
     return i;
 }
 
-int slRFreeInstrument(brEval args[], brEval *result, void *i) {
+int brQTInstrumentFree(brEval args[], brEval *result, void *i) {
     slQTInstrumentInfo *info = BRPOINTER(&args[0]);
+
+	printf("freeing %p and %p\n", info->channel, info->allocator);
     if (info->channel) NADisposeNoteChannel(info->allocator, info->channel);
     if (info->allocator) CloseComponent(info->allocator);
 
     return EC_OK;
 }
 
-int slRNewInstrument(brEval args[], brEval *result, void *i) {
+int brQTInstrumentNew(brEval args[], brEval *result, void *i) {
     BRPOINTER(result) = slQTNewInstrumentInfo(BRINT(&args[0]));
 
     return EC_OK;
 }
 
-int slRPlayNote(brEval args[], brEval *result, void *i) {
+int brQTInstrumentPlayNote(brEval args[], brEval *result, void *i) {
     slQTInstrumentInfo *info = BRPOINTER(&args[0]);
 
     if(BRDOUBLE(&args[3]) <= 0.0) return EC_OK;
@@ -108,7 +94,19 @@ int slRPlayNote(brEval args[], brEval *result, void *i) {
     return EC_OK;
 }
 
-int slRPlayChord(brEval args[], brEval *result, void *i) {
+int brQTInstrumentSetController(brEval args[], brEval *result, void *i) {
+    slQTInstrumentInfo *info = BRPOINTER(&args[0]);
+	long number = BRINT(&args[1]);
+	long value = BRINT(&args[2]);
+
+	printf("setting %d for %d\n", value, number);
+	
+	NASetController(info->allocator, info->channel, number, value);
+
+	return EC_OK;
+}
+
+int brQTInstrumentPlayChord(brEval args[], brEval *result, void *i) {
     slQTInstrumentInfo *info = BRPOINTER(&args[0]);
     brEvalList *list, *head = BRLIST(&args[1])->start;
 
@@ -136,7 +134,7 @@ int slRPlayChord(brEval args[], brEval *result, void *i) {
     return EC_OK;
 }
 
-int slRStartNote(brEval args[], brEval *result, void *i) {
+int brQTInstrumentStartNote(brEval args[], brEval *result, void *i) {
     slQTInstrumentInfo *info = BRPOINTER(&args[0]);
 
     if(info->allocator && info->channel) {
@@ -146,7 +144,7 @@ int slRStartNote(brEval args[], brEval *result, void *i) {
     return EC_OK;
 }
 
-int slRStopNote(brEval args[], brEval *result, void *i) {
+int brQTInstrumentStopNote(brEval args[], brEval *result, void *i) {
     slQTInstrumentInfo *info = BRPOINTER(&args[0]);
 
     if(info->allocator && info->channel) {
@@ -155,3 +153,14 @@ int slRStopNote(brEval args[], brEval *result, void *i) {
 
     return EC_OK;
 }
+
+void slInitQTInstrumentFuncs(void *n) {
+    brNewBreveCall(n, "instrumentNew", brQTInstrumentNew, AT_POINTER, AT_INT, 0);
+    brNewBreveCall(n, "instrumentFree", brQTInstrumentFree, AT_NULL, AT_POINTER, 0);
+    brNewBreveCall(n, "instrumentPlayNote", brQTInstrumentPlayNote, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_DOUBLE, 0);
+    brNewBreveCall(n, "instrumentStartNote", brQTInstrumentStartNote, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
+    brNewBreveCall(n, "instrumentStopNote", brQTInstrumentStopNote, AT_NULL, AT_POINTER, AT_INT, 0);
+    brNewBreveCall(n, "instrumentPlayChord", brQTInstrumentPlayChord, AT_NULL, AT_POINTER, AT_LIST, AT_INT, AT_DOUBLE, 0);
+    brNewBreveCall(n, "instrumentSetController", brQTInstrumentSetController, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
+}
+

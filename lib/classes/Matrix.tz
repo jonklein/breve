@@ -30,7 +30,7 @@ Object : Matrix (aka Matricies) {
 Matrix : Matrix2D (aka Matrices2D) {
 
 	+ to init:
-		matrixPointer = matrix2DNew(10, 10).
+		matrixPointer = matrix2DNew(32, 32).
 
 	+ to set-size x xSize (int) y ySize (int):
 		% Sets the size of this matrix to (xSize, ySize).
@@ -40,6 +40,11 @@ Matrix : Matrix2D (aka Matrices2D) {
 
 	- to get-matrix-pointer:
 		return matrixPointer.
+
+	+ to set-all-values to value (float):
+		% Sets all of the values in the matrix to value.
+
+		matrix2DSetAll(matrixPointer, value).
 
 	+ to get-absolute-sum:
 		% Returns the sum of the absolute values of all elements in this 
@@ -116,9 +121,9 @@ Matrix : Matrix2D (aka Matrices2D) {
 		% This is done by sampling each concentration's local neighborhood 
 		% according to the following matrix:
 		% <pre>
-		% 0 1 0
-		% 1 4 1
-		% 0 1 0
+		% 0  1  0
+		% 1 -4  1
+		% 0  1  0
 		% </pre>
 		% <P>
 		% chemicalMatrix is assumed to have periodic boundary conditions so that 	
@@ -189,7 +194,7 @@ Matrix : Matrix3D (aka Matrices3D) {
 		matrixPointer (pointer).
 
 	+ to init:
-		matrixPointer = matrix3DNew(10, 10, 10).
+		matrixPointer = matrix3DNew(32, 32, 32).
 
 	+ to set-size x xSize (int) y ySize (int) z zSize (int):
 		% Sets the size of this matrix to (xSize, ySize, zSize).
@@ -224,6 +229,11 @@ Matrix : Matrix3D (aka Matrices3D) {
 		% Sets the matrix value at position (x, y, z).
 
 		return matrix3DSet(matrixPointer, x, y, z, value).
+
+	+ to set-all-values to value (float):
+		% Sets all of the values in the matrix to value.
+
+		matrix2DSetAll(matrixPointer, value).
 
 	+ to add-scalar value scalarValue (double):
 		% Adds the number scalarValue to each element in the matrix.
@@ -275,9 +285,9 @@ Matrix : Matrix3D (aka Matrices3D) {
 		% This is done by sampling each concentration's local neighborhood 
 		% according to the following matrix:
 		% <pre>
-		% 0 0 0  0 1 0  0 0 0
-		% 0 1 0  1-6 1  0 1 0
-		% 0 0 0  0 1 0  0 0 0
+		% 0  0  0    0  1  0    0  0  0
+		% 0  1  0    1 -6  1    0  1  0
+		% 0  0  0    0  1  0    0  0  0
 		% </pre>
 		% <P>
 		% chemicalMatrix is assumed to have periodic boundary conditions so that 	
