@@ -15,7 +15,6 @@ Control : JavaTestController {
 		# put initialization code here which creates objects
 		# and sets up the simulation
 
-		test = new "java.lang.Object".
 		test = new "JavaTest".
 
 		print "Int test: ", (test intTest with-number random[10]).
