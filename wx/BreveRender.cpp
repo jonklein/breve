@@ -40,11 +40,6 @@
 
 IMPLEMENT_CLASS( BreveRender, wxFrame )
 
-#if !wxUSE_TOGGLEBTN
-    #define wxToggleButton wxCheckBox
-    #define EVT_TOGGLEBUTTON EVT_CHECKBOX
-#endif
-
 BEGIN_EVENT_TABLE( BreveRender, wxFrame )
     EVT_BUTTON( ID_RENDER_RUN, BreveRender::OnRenderRunClick )
     EVT_BUTTON( ID_RENDER_STOP, BreveRender::OnRenderStopClick )

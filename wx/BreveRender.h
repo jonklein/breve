@@ -16,9 +16,15 @@
 #pragma interface "BreveRender.cpp"
 #endif
 
-#include "wx/frame.h"
+#include <wx/frame.h>
+#include <wx/checkbox.h>
 #include "BreveCanvas.h"
 #include "LogWindow.h"
+
+#if !wxUSE_TOGGLEBTN
+    #define wxToggleButton wxCheckBox
+    #define EVT_TOGGLEBUTTON EVT_CHECKBOX
+#endif
 
 #define ID_FRAME 10000
 #define SYMBOL_BREVERENDER_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
