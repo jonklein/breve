@@ -24,7 +24,7 @@ int breveFunctionPushCallbackNew(brEval arguments[], brEval *result, brInstance 
 
 	brPushCallbackData *data;
 
-	data = slMalloc(sizeof(brPushCallbackData));
+	data = new brPushCallbackData;
 	data->instance = callbackInstance;
 	data->method = brMethodFind(callbackInstance->object, methodName, NULL, 0);
 
@@ -61,7 +61,7 @@ void brPushFreeData(void *d) {
 	brPushCallbackData *data = d;
 
 	brMethodFree(data->method);
-	slFree(data);
+	delete data;
 }
 #endif /* HAVE_LIBPUSH */
 

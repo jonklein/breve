@@ -1,0 +1,106 @@
+#
+# GrayScott -- the Gray Scott reaction diffusion model
+# jon klein <jk@spiderland.org>
+#
+# This is a simulation of a chemical reaction/diffusion model.
+#
+
+@use Control.
+@use Mobile.
+@use Matrix.
+
+@define F 0.01.
+@define K 0.04.
+@define RU .088.
+@define RV .022.
+
+@define TIMESTEP 1.0.
+
+@define SIZE 128.
+
+Controller GS.
+
+Control : GS {
+    + variables:
+        U (object).
+        V (object).
+        tempreact, temp, inflow (object).
+        texture (object).
+        cube (object).
+
+    + to init:
+        m, n (int).
+
+        self set-background-color to (0, 0, 0).
+
+        self set-iteration-step to TIMESTEP.
+        self set-integration-step to TIMESTEP.
+
+        self point-camera at (0, 0, 0) from (0, 0, 70).
+
+		U = new Matrix2D.
+		V = new Matrix2D.
+		inflow = new Matrix2D.
+		temp = new Matrix2D.
+		tempreact = new Matrix2D.
+
+		U set-size x SIZE y SIZE.
+		V set-size x SIZE y SIZE.
+		temp set-size x SIZE y SIZE.
+		tempreact set-size x SIZE y SIZE.
+		inflow set-size x SIZE y SIZE.
+
+        texture = new MatrixImage.
+        texture init-with width SIZE height SIZE.
+        texture set-vp to V.
+        texture set-up to U.
+
+        cube = new Mobile.
+        cube set-shape to (new Cube init-with size (400, 400, 1)).
+        cube set-texture-image to texture.
+        cube set-texture-scale to 40.
+
+        for n=0,n<SIZE,n++:
+            for m=0,m<SIZE,m++: {
+				U set-value to (0.5 + sqrt(|0.25 - F*(1.0 + K/F)*(1.0 + K/F)|) + 0.01*(random[1.0] - 0.5)) at-x m at-y n.
+                V set-value to (1.0 - matrixGet((U get-matrix-pointer), m, n))/(1.0 + K/F) + 0.01*(random[1.0] - 0.5) at-x m at-y n.
+
+				inflow set-value to F at-x n at-y m.
+            }
+
+    + to iterate:
+		tempreact copy from U.
+		tempreact multiply-with-values of V.
+		tempreact multiply-with-values of V.
+
+		temp compute-diffusion-matrix from U with-scale RU.
+
+		temp add-values of tempreact scaled-by -1.0.
+		temp add-values of U scaled-by -F.
+		temp add-values of inflow.
+		U add-values of temp scaled-by TIMESTEP.
+
+		temp compute-diffusion-matrix from V with-scale RV.
+
+		temp add-values of tempreact.
+		temp add-values of V scaled-by -(K + F).
+		V add-values of temp scaled-by TIMESTEP.
+		
+        super iterate.
+}
+
+Image : MatrixImage {
+    + variables:
+        vp (object).
+        up (object).
+        n (int).
+
+    + to set-vp to m (object): vp = m.
+    + to set-up to m (object): up = m.
+
+    + to iterate:
+		vp copy-to-red-channel of-image self with-scale 2.0.
+		up copy-to-blue-channel of-image self with-scale 2.0.
+        super iterate.
+}
+

@@ -306,7 +306,7 @@ static NSRecursiveLock *gLogLock;
 
 	[runWindow makeKeyAndOrderFront: self];
 
-	if(mode == BX_STOP) {
+	if(mode == BX_STOPPED) {
 		[self startSimulation];
 		[runSimMenuItem setTitle: @"Stop Simulation"];
 		[runButton setState: NSOnState];
@@ -322,7 +322,7 @@ static NSRecursiveLock *gLogLock;
 
 	mode = [breveEngine getRunState];
 
-	if(mode == BX_STOP) [self startSimulation];
+	if(mode == BX_STOPPED) [self startSimulation];
 	if(mode == BX_RUN) [breveEngine pauseSimulation];
 	if(mode == BX_PAUSE) [breveEngine unpauseSimulation];
 
@@ -332,10 +332,13 @@ static NSRecursiveLock *gLogLock;
 	NSString *file;
 	char *buffer = NULL;
 	char *name = NULL;
+	int mode;
 
-	int mode = [breveEngine getRunState];
+	[breveEngine lock];
+	mode = [breveEngine getRunState];
+	[breveEngine unlock];
 
-	if(mode != BX_STOP) return;
+	if(mode != BX_STOPPED) return;
 
 	if(!currentDocument) {
 		[runButton setState: NSOffState];
@@ -384,7 +387,7 @@ static NSRecursiveLock *gLogLock;
 - (IBAction)stopSimulation:sender {
 	int mode = [breveEngine getRunState];
 
-	if(mode == BX_STOP) return;
+	if(mode == BX_STOPPED) return;
 
 	if(movieRecording) [self toggleMovieRecord: self];
 

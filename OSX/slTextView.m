@@ -31,6 +31,8 @@ char *slStripSpaces(char *text);
 
 @implementation slTextView
 
+int slYylex();
+
 /*
     + slTextView.m
     = is a subclass of NSTextView which we use to add a few custom features:
@@ -486,7 +488,7 @@ char *slStripSpaces(char *text);
 }
 
 - (void)insertTab:id {
-    int n;
+    unsigned int n;
 
     if(!shouldUseSpaces) {
         [super insertTab: self];

@@ -140,6 +140,7 @@
 
 - (void)updateSize:sender {
 	NSRect bounds;
+	int x, y;
 
 	bounds = [self bounds];
 
@@ -154,17 +155,17 @@
 	if(!viewEngine) return;
 
 	if(fullScreen) {
-		camera->x = [fullScreenView width];
-		camera->y = [fullScreenView height];
+		x = [fullScreenView width];
+		y = [fullScreenView height];
 	} else {
+		x = bounds.size.width;
+		y = bounds.size.height;
 		[[self openGLContext] makeCurrentContext];
-		camera->x = bounds.size.width;
-		camera->y = bounds.size.height;
 	}
 
-	camera->fov = (double)camera->x/(double)camera->y;
+	slCameraSetBounds(camera, x, y);
 
-	glViewport(0, 0, camera->x, camera->y);
+	glViewport(0, 0, x, y);
 }
 
 /*!
@@ -245,7 +246,6 @@
 
 - (void)drawRect:(NSRect)r {
 	brEngineLock(viewEngine);
-	// [drawLock lock];
 
 	[[self openGLContext] makeCurrentContext];
 
@@ -265,7 +265,6 @@
 
 	drawing = 0;
 
-	// [drawLock unlock];
 	brEngineUnlock(viewEngine);
 }
 
@@ -277,7 +276,7 @@
 		if(firstFullScreen) {
 			glClearColor(0, 0, 0, 1.0);
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-			camera->recompile = 1;
+			slCameraSetRecompile(camera);
 		}
 
 		slRenderScene(world, camera, drawCrosshair);
@@ -305,7 +304,7 @@
 	static NSPoint d;
 	int mode;
 	BOOL firstTime = YES;
-	double startCamX;
+	double startCamX, startCamY;
 
 	if(!viewEngine) return;
 
@@ -314,8 +313,8 @@
 		lastp = [theEvent locationInWindow];
 	}
 
-	startCamX = camera->rx;
-	
+	slCameraGetRotation(camera, &startCamX, &startCamY);
+
 	mode = [motionSelector selectedColumn];
 
 	do {
@@ -352,8 +351,11 @@
 					firstTime = NO;
 					drawCrosshair = 0;
 				} else {
+					int x, y;
+
 					[drawLock lock];
-					brDragCallback(viewEngine, (int)p.x, (int)(camera->y - p.y));
+					slCameraGetBounds(camera, &x, &y);
+					brDragCallback(viewEngine, (int)p.x, (int)(y - p.y));
 					[drawLock unlock];
 				}
 

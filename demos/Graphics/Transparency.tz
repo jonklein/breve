@@ -1,4 +1,6 @@
+#
 # This demo shows the use of transparency and textures.
+#
 
 @path "classes"
 @path "lib/classes"

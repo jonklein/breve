@@ -196,6 +196,15 @@ int slBillboardSortFunc(const void *a, const void *b);
 void slRotateCameraWithMouseMovement(slCamera *c, double dx, double dy, double scamx);
 void slMoveCameraWithMouseMovement(slCamera *c, double dx, double dy);
 void slZoomCameraWithMouseMovement(slCamera *c, double dx, double dy);
+
+void slCameraSetBounds(slCamera *c, unsigned int x, unsigned int y);
+void slCameraGetBounds(slCamera *c, unsigned int *x, unsigned int *y);
+
+void slCameraGetRotation(slCamera *c, double *x, double *y);
+
+void slCameraSetRecompile(slCamera *c);
+
+void slCameraSetActivateContextCallback(slCamera *c, int (*f)());
 #ifdef __cplusplus
 }
 #endif

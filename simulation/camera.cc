@@ -435,3 +435,29 @@ void slZoomCameraWithMouseMovement(slCamera *camera, double dx, double dy) {
 		slUpdateCamera(camera);
 	} 
 }
+
+void slCameraSetBounds(slCamera *c, unsigned int x, unsigned int y) {
+	c->x = x;
+	c->y = y;
+	c->fov = (double)c->x/(double)c->y;
+}
+
+void slCameraGetBounds(slCamera *c, unsigned int *x, unsigned int *y) {
+	*x = c->x;	
+	*y = c->y;	
+}
+
+void slCameraGetRotation(slCamera *c, double *x, double *y) {
+	*x = c->rx;
+	*y = c->ry;
+}
+
+void slCameraSetRecompile(slCamera *c) {
+	c->recompile = 1;
+}
+
+void slCameraSetActivateContextCallback(slCamera *c, int (*f)()) {
+	c->activateContextCallback = f;
+}
+
+

@@ -52,7 +52,7 @@ int slMakeCurrentContext();
 
 	engineWillPause = NO;
 
-	runState = BX_STOP;
+	runState = BX_STOPPED;
 	mySelf = self;
 	return self;
 
@@ -103,7 +103,7 @@ int slMakeCurrentContext();
 	// engine->renderWindowCallback = renderWindowCallback;
 
 	camera = brEngineGetCamera(engine);
-	camera->activateContextCallback = slMakeCurrentContext;
+	slCameraSetActivateContextCallback(camera, slMakeCurrentContext);
 
 	if(outputPath) brEngineSetIOPath(engine, outputPath);
 
@@ -146,7 +146,7 @@ int slMakeCurrentContext();
 - (int)startSimulationWithText:(char*)buffer withFilename:(char*)name withSavedSimulationFile:(char*)saved fullscreen:(BOOL)full {
 	[engineLock lock];
 
-	if(runState != BX_STOP) return -1;
+	if(runState != BX_STOPPED) return -1;
 
 	[self initEngine];
 
@@ -234,23 +234,25 @@ int slMakeCurrentContext();
 		simNib = NULL;
 	}
 
-	runState = BX_STOP;
+	runState = BX_STOPPING;
 
-	/* is this necessary? */
+	// is this necessary? 
 
 	[engineLock lock];
 	[engineLock unlock];
 
-	/* wait for the thread to be truely exited before continuing */
+	// wait for the thread to be truely exited before continuing 
 
 	[threadLock lock];
 	[threadLock unlock];
 
 	[displayView setEngine: NULL fullscreen: NO];
+
+	runState = BX_STOPPED;
 }
 
 - (int)runCommand:(char*)command {
-	if(!engine || runState == BX_STOP) return -1;
+	if(!engine || runState == BX_STOPPED || runState == BX_STOPPING) return -1;
 
 	if(runState == BX_RUN) [engineLock lock];
 	slMessage(DEBUG_ALL, "> %s\n", command);
@@ -292,10 +294,10 @@ int slMakeCurrentContext();
 
 	pool = [[NSAutoreleasePool alloc] init];
 
-	while(runState != BX_STOP) {
+	while(runState != BX_STOPPING) {
 		[engineLock lock];
 
-		if(runState != BX_STOP) {
+		if(runState == BX_RUN) {
 			if(1) {
 				NSPoint mouse = [NSEvent mouseLocation];
 
@@ -364,13 +366,15 @@ int slMakeCurrentContext();
 
 - (void)doSelectionAt:(NSPoint)p {
 	slCamera *c;
+	int x, y;
 
 	if(!engine) return;
 
 	c = brEngineGetCamera(engine);
 
 	if(runState == BX_RUN) [engineLock lock];
-	brClickAtLocation(engine, p.x, c->y - p.y);
+	slCameraGetBounds(c, &x, &y);
+	brClickAtLocation(engine, p.x, y - p.y);
 	[interfaceController updateObjectSelection];
 	if(runState == BX_RUN) [engineLock unlock];
 }

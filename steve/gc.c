@@ -95,6 +95,7 @@ void stGCRetainPointer(void *pointer, int type) {
 
 	switch(type) {
 		case AT_INSTANCE:
+			if(((brInstance*)pointer)->status != AS_ACTIVE) return;
 			stInstanceRetain(((brInstance*)pointer)->userData);
 			break;
 		case AT_LIST:
@@ -132,6 +133,7 @@ void stGCUnretainPointer(void *pointer, int type) {
 
 	switch(type) {
 		case AT_INSTANCE:
+			if(((brInstance*)pointer)->status != AS_ACTIVE) return;
 			stInstanceUnretain(((brInstance*)pointer)->userData);
 			break;
 		case AT_LIST:
@@ -168,7 +170,8 @@ inline void stGCCollectPointer(void *pointer, int type) {
 
 	switch(type) {
 		case AT_INSTANCE:
-			if(((brInstance*)pointer)->userData) stInstanceCollect(((brInstance*)pointer)->userData);
+			if(((brInstance*)pointer)->status != AS_ACTIVE) return;
+			stInstanceCollect(((brInstance*)pointer)->userData);
 			break;
 		case AT_LIST:
 			brEvalListCollect(pointer);
@@ -254,6 +257,7 @@ inline void stGCMarkPointer(stInstance *i, void *pointer, int type) {
 		case AT_LIST:
 			break;
 		case AT_INSTANCE:
+			if(((brInstance*)pointer)->status != AS_ACTIVE) return;
 			collect = ((brInstance*)pointer)->userData;
 			if(!collect->gc) return;
 			break;
