@@ -105,8 +105,18 @@ bool BreveRender::Create( wxWindow* parent, wxWindowID id, const wxString& capti
     GetSizer()->SetSizeHints(this);
     //Centre();
 
-    logwindow = new LogWindow(this);
-    inspector = new Inspector(this);
+    Move(0, 0);
+
+    {
+	wxRect m;
+
+	m = GetRect();
+
+	logwindow = new LogWindow(this);
+	logwindow->Move(m.x, m.y + m.height + 30);
+	inspector = new Inspector(this);
+	inspector->Move(m.x + m.width + 10, m.y);
+    }
 
     Show(TRUE);
 
@@ -638,7 +648,10 @@ void BreveRender::LoadSimFile(wxString ffile)
 		text.Append(buf);
 	    }
 
-	    LoadSimulation(fileloc, filename + '.' + fileext, text);
+	    if (!fileext.IsEmpty())
+		filename << '.' << fileext;
+
+	    LoadSimulation(fileloc, filename, text);
 	}
     }
 }

@@ -52,7 +52,13 @@ public:
 	return BreveDir;
     }
 
+    wxArrayString * GetSearchPathArray()
+    {
+	return &SearchPathArray;
+    }
+
     private:
+	wxArrayString SearchPathArray;
 	BreveRender * renderwindow;
 	wxString AppDir;
 	wxString LocalDir;

@@ -21,33 +21,43 @@
 #include "SimInstance.h"
 #include "BDialog.h"
 
-BreveInterface::BreveInterface(char * simfile, char * text)
+BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text)
 {
-    char wd[10240];
-    static char * buf[1];
-
-    buf[0] = '\0';
+    char buf[2048];
+    wxString str;
+    int i = 0;
 
     this->simulationfile = simfile;
     this->text = text;
-
     this->next = NULL;
 
-    frontend = breveFrontendInit(1, (char**)&buf);
+    // frontend = breveFrontendInit(0, NULL);
+    // Due to the annoying java error I'm unable to track down, it isn't safe
+    // to call this function.  It calls brJavaInit, which doesn't actually
+    // do anything when using the directory layout of the CVS tree.  However,
+    // if you happen to have breveIDE living in a directory with lib/classes,
+    // brJavaInit will attempt to create a VM - failing due to searchpaths
+    // not yet being setup.  We don't want that - it'll eventually cause
+    // the client to crash.  Note that even if searchpaths are configured
+    // correctly before brJavaInit is called, java will still eventually
+    // crash the client due to some internal error.  I have no idea how to
+    // resolve this.
+
+    frontend = new breveFrontend;
+    frontend->engine = brEngineNew();
+    frontend->engine->argc = 0;
+    frontend->engine->argv = NULL;
+
     frontend->data = breveFrontendInitData(frontend->engine);
 
-    brEngineSetIOPath(frontend->engine, getcwd(wd, 10239));
-
-    frontend->engine->argc = 1;
-    frontend->engine->argv = buf;
-    // Gotta love hacky stuff
+    strncpy(buf, app->GetLocalDir(), 2047);
+    buf[2047] = '\0';
+    brAddSearchPath(frontend->engine, (char*)&buf);
 
     this->simmenu = new wxMenu;
-
     paused = 1;
     valid = 1;
     initialized = 0;
-
     x = 400;
     y = 300;
 
@@ -64,34 +74,31 @@ BreveInterface::BreveInterface(char * simfile, char * text)
 
     slSetMessageCallbackFunction(::messageCallback);
 
+    for (i = 0; i < app->GetSearchPathArray()->Count(); i++)
     {
-	char buf[2048];
-	wxString str;
-
-	str = app->GetBreveDir();
-
-	str << "plugins";
-
-	strncpy(buf, str, 2048);
-
-	brAddSearchPath(frontend->engine, (char*)&buf);
-
-	str = app->GetBreveDir();
-
-	str << "lib" << FILE_SEP_PATH << "classes";
-
-	strncpy(buf, str, 2048);
-
-	brAddSearchPath(frontend->engine, (char*)&buf);
-
-	str = app->GetBreveDir();
-
-	str << "java";
-
-	strncpy(buf, str, 2048);
-
+	strncpy(buf, app->GetSearchPathArray()->Item(i), 2047);
+	buf[2047] = '\0';
 	brAddSearchPath(frontend->engine, (char*)&buf);
     }
+
+    if (!simdir.IsEmpty())
+    {
+	strncpy(buf, simdir, 2047);
+	buf[2047] = '\0';
+	brAddSearchPath(frontend->engine, (char*)&buf);
+    }
+
+    strncpy(buf, app->GetBreveDir(), 2047);
+    buf[2047] = '\0';
+    brAddSearchPath(frontend->engine, (char*)&buf);
+
+    strncpy(buf, app->GetBreveDir() + "plugins" + FILE_SEP_PATH, 2047);
+    buf[2047] = '\0';
+    brAddSearchPath(frontend->engine, (char*)&buf);
+
+    strncpy(buf, app->GetBreveDir() + "java" + FILE_SEP_PATH, 2047);
+    buf[2047] = '\0';
+    brAddSearchPath(frontend->engine, (char*)&buf);
 }
 
 BreveInterface::~BreveInterface()

@@ -32,7 +32,7 @@ SimInstance::SimInstance(wxString simdir, wxString simfile, wxString text)
     next = NULL;
     selected = NULL;
     iroot = NULL;
-    binterface = new BreveInterface(strdup(simulationfile), strdup(text));
+    binterface = new BreveInterface(strdup(simulationfile), simdir, strdup(text));
     codewindow = new CodeWindow(this, simfile, simdir, text);
 }
 
@@ -72,7 +72,7 @@ void SimInstance::RegenSim()
     
     delete binterface;
 
-    binterface = new BreveInterface(strdup(simulationfile), strdup(text));
+    binterface = new BreveInterface(strdup(simulationfile), simdir, strdup(text));
 
     if (i > -1)
 	breverender->ResetSim(i);

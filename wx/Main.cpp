@@ -106,47 +106,63 @@ bool BCTestApp::OnInit()
     }
 
     {
-	wxString str, sep;
-	bool hasenv = FALSE, manual = FALSE;
-
-#ifdef __WXCOCOA__
-	wxSetEnv("BREVE_CLASS_PATH", AppDir << FILE_SEP_PATH << ".." << FILE_SEP_PATH << "Resources");
-#endif
+	wxString str;
+	int i, count;
+	int found = 0;
 
 	if (wxGetEnv("BREVE_CLASS_PATH", &str) && !str.IsEmpty())
 	{
-	    hasenv = TRUE;
+	    wxString xstr;
 
+	    while (!str.IsEmpty())
+	    {
+		xstr = str.BeforeFirst(':');
+		str = str.AfterFirst(':');
+
+		if (xstr.Last() != FILE_SEP_PATH)
+		    xstr << FILE_SEP_PATH;
+
+		SearchPathArray.Add(xstr);
+	    }
+	}
+
+	if (config->Read("BreveClassPath", &str))
+	{
 	    if (str.Last() != FILE_SEP_PATH)
 		str << FILE_SEP_PATH;
-	}
-	else if (config->Read("BreveClassPath", &str))
-	{
-	    manual = TRUE;
 
-	    if (str.Last() != FILE_SEP_PATH)
-		str << FILE_SEP_PATH;
+	    SearchPathArray.Add(str);
+	}
 
-	    wxSetEnv("BREVE_CLASS_PATH", str);
-	}
-	else if (wxDirExists(AppDir + "lib" + FILE_SEP_PATH + "classes"))
+#ifdef __WXCOCOA__
+	SearchPathArray.Add(AppDir + FILE_SEP_PATH + ".." + FILE_SEP_PATH + "Resources" + FILE_SEP_PATH);
+#endif
+
+	SearchPathArray.Add(AppDir);
+	SearchPathArray.Add(LocalDir);
+
+	count = SearchPathArray.GetCount();
+
+	str = "";
+	str << "lib" << FILE_SEP_PATH << "classes";
+
+	for (i = 0; i < count; i++)
 	{
-	    manual = TRUE;
-	    str = AppDir + "lib" + FILE_SEP_PATH + "classes";
+	    if (wxDirExists(SearchPathArray[i] + str))
+	    {
+		found = 1;
+		SearchPathArray.Add(SearchPathArray[i] + "lib" + FILE_SEP_PATH + "classes" + FILE_SEP_PATH);
+	    }
+	    else if (SearchPathArray[i].Contains(str))
+		found = 1;
 	}
-	else if (wxDirExists(LocalDir + "lib" + FILE_SEP_PATH + "classes"))
-	{
-	    manual = TRUE;
-	    str = LocalDir + "lib" + FILE_SEP_PATH + "classes";
-	}
-	else
+
+	if (found == 0)
 	{
 	    wxDirDialog d(NULL, "Select the directory containing Breve classes (usually breve/lib/classes)", AppDir);
 
 	    if (d.ShowModal() == wxID_OK)
 	    {
-		wxSetEnv("BREVE_CLASS_PATH", d.GetPath());
-
 		str = d.GetPath();
 
 		if (str.Last() != FILE_SEP_PATH)
@@ -154,12 +170,13 @@ bool BCTestApp::OnInit()
 
 		config->Write("BreveClassPath", str);
 
-		wxSetEnv("BREVE_CLASS_PATH", str);
-
-		manual = TRUE;
+		SearchPathArray.Add(str);
 	    }
 	    else
+	    {
 		wxMessageBox("The Breve engine will not function properly until a class path is defined.");
+		found = -1;
+	    }
 	}
 
 	BreveDir = "";
@@ -173,41 +190,45 @@ bool BCTestApp::OnInit()
 		BreveDir = "";
 	}
 
-	if (BreveDir.IsEmpty() && (manual || hasenv))
+	if (BreveDir.IsEmpty())
 	{
 	    wxString tmp, xstr;
 
-	    xstr = str;
-
-	    while (!xstr.IsEmpty())
+	    for (i = 0; i < SearchPathArray.GetCount(); i++)
 	    {
-		tmp = xstr.BeforeLast(FILE_SEP_PATH);
-		xstr = tmp;
+		xstr = SearchPathArray[i];
 
-		if (!tmp.IsEmpty())
+		while (!xstr.IsEmpty())
 		{
-		    tmp << FILE_SEP_PATH << "lib";
+		    tmp = xstr.BeforeLast(FILE_SEP_PATH);
+		    xstr = tmp;
 
-		    if (wxDirExists(tmp))
+		    if (!tmp.IsEmpty())
 		    {
-			tmp = xstr;
 			tmp << FILE_SEP_PATH << "demos";
 
 			if (wxDirExists(tmp))
-			    break;
+			{
+			    tmp = xstr;
+			    tmp << FILE_SEP_PATH << "plugins";
+
+			    if (wxDirExists(tmp))
+				break;
+			}
 		    }
 		}
-	    }
 
-	    if (!xstr.IsEmpty())
-	    {
-		xstr << FILE_SEP_PATH;
+		if (!xstr.IsEmpty())
+		{
+		    xstr << FILE_SEP_PATH;
 
-		BreveDir = xstr;
+		    BreveDir = xstr;
+		    break;
+		}
 	    }
 	}
 
-	if (BreveDir.IsEmpty() && (manual || hasenv))
+	if (BreveDir.IsEmpty() && found != -1)
 	{
 	    wxDirDialog d(NULL, "Select the directory containing Breve resources (demos directory, plugins directory, etc)", AppDir);
 
@@ -229,7 +250,7 @@ bool BCTestApp::OnInit()
 	    }
 	}
 
-	if (BreveDir.IsEmpty() && (manual || hasenv))
+	if (BreveDir.IsEmpty() && found != -1)
 	    wxMessageBox("Unable to locate Breve resources.  The Breve engine will not work properly until a proper path is specified.");
     }
 

@@ -11,7 +11,7 @@ struct brInstance;
 class BreveInterface
 {
     public:
-	BreveInterface(char * simfile, char * text);
+	BreveInterface(char * simfile, wxString simdir, char * text);
 	~BreveInterface();
 
 	bool Initialize();
