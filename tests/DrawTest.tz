@@ -1,0 +1,46 @@
+# include some frequently used classes and specify common classpaths
+
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use Stationary.
+@use Drawing.
+
+# tell the engine the name of the controller
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+	+ variables:
+		point (vector).
+		drawing (object).
+
+	+ to init:
+		drawing = new Drawing.
+
+		print | "12345" |.
+
+		drawing set-color to (0, 1, 0) with-transparency 0.7.
+		drawing add-polygon-point at (0, 0, 0).
+		drawing add-polygon-point at (0, 10, 0).
+		drawing add-polygon-point at (10, 10, 0).
+		drawing add-polygon-point at (5, 8, 0).
+		drawing add-polygon-point at (10, 0, 0).
+		drawing set-color to (0, 0, 0) with-transparency 0.3.
+
+		drawing set-instruction-limit to 100.
+
+	+ to iterate:
+		point1 (vector).
+
+		point1 = point.
+
+		point += random[(1, 1, 1)] - (0.5, 0.5, 0.5).
+		drawing draw-line from point1 to point.
+
+}
+

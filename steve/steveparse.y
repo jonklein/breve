@@ -114,7 +114,7 @@ int stGetTypeForString(char *name);
 %token <number> FLOAT_VALUE
 %token <string> STRING_VALUE WORD_VALUE
 %token <eval> ST_EVAL 
-%token <integer> INT_VALUE TYPE PLURAL_TYPE TYPE
+%token <integer> INT_VALUE TYPE PLURAL_TYPE
 %token TO_PRIVATE TO_PUBLIC TO_PROTECTED
 %token VARIABLES DEFINE
 %token IF ELSE WHILE FOREACH ST_IN FOR

@@ -1,0 +1,60 @@
+# include some frequently used classes and specify common classpaths
+
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use Stationary.
+@use Drawing.
+
+# tell the engine the name of the controller
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+	+ to init:
+		drawing (object).
+		m (string).
+
+		m = "guppy".
+
+		if m{ 2 } != "p": die "reading string index 2 failed".
+
+		print m{ 2 }.
+
+		m{ 0 } = "p".
+		print m.
+
+		if m != "puppy": die "replacing string index 0 failed".
+
+		m{ 5 } = "dog".
+		print m.
+
+		if m != "puppydog": die "replacing string index 0 failed".
+
+		m{ 8 } = "s are awesome".
+		print m.
+
+		if m != "puppydogs are awesome": die "replacing string index 9 failed".
+
+		m = (self replace letter "p" with-text "Pp" in-text m).
+		print m.
+
+		self end-simulation.
+
+
+	+ to replace letter l (string) with-text replacement (string) in-text t (string):
+		length, n (int).
+
+		length = | t | - 1.
+
+		for n=length, n > -1, n--: {
+			if t{ n } == l: t{ n } = replacement.
+		}
+
+		return t.
+}
+
