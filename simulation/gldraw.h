@@ -68,7 +68,7 @@ void slInitGL(slWorld *w);
 void slCompileCubeDrawList();
 
 int slLoadTexture(slWorld *w);
-int slAddTexture(slWorld *w, int texNum, unsigned char *pixels, int width, int height, int p);
+int slAddTexture(slWorld *w, GLuint texNum, unsigned char *pixels, int width, int height, int p);
 int slAddMipmap(slWorld *w, unsigned char *pixels, int width, int height, int p);
 
 void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor);

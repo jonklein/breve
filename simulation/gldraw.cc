@@ -39,7 +39,12 @@ void slDrawFog(slWorld *w, slCamera *c);
 
 void slMatrixToGLMatrix(double m[3][3]);
 
-/* calls glMultMatrix with 3x3 orientation slMatrix */
+/*!
+	\brief Calls glMultMatrix with 3x3 orientation slMatrix.
+
+	Swaps the rows and columns of the matrix (since GL matrices
+	are the opposite of SL matrices).
+*/
 
 inline void slMatrixToGLMatrix(double m[3][3]) {
 	double d[4][4];
@@ -210,7 +215,7 @@ void slCenterPixelsInSquareBuffer(char *pixels, int width, int height, char *buf
 	Returns 0 if there was space, or -1 if all texture positions are used.
 */
 
-int slAddTexture(slWorld *w, int texture, unsigned char *pixels, int width, int height, int format) {
+int slAddTexture(slWorld *w, GLuint texture, unsigned char *pixels, int width, int height, int format) {
 	char *newpixels;
 	int newheight, newwidth;
 
@@ -314,6 +319,10 @@ void slDrawPatches(slPatchGrid *patches, slVector *camera, slVector *target) {
 
 	glPopMatrix();
 }
+
+/*!
+	\brief Picks an object for selection based on a click at the given coordinates.
+*/
 
 int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 	GLuint selection_buffer[BUFFER_SIZE], *selections;

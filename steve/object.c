@@ -32,7 +32,7 @@ extern stSteveData *gSteveData;
 	 Requires = the engine, the object name and the super object.
 */
 
-stObject *stObjectNew(brEngine *engine, char *name, char *alias, stObject *super, float version) {
+stObject *stObjectNew(brEngine *engine, stSteveData *sdata, char *name, char *alias, stObject *super, float version) {
 	stObject *o;
 	brObject *bo;
 
@@ -71,11 +71,11 @@ stObject *stObjectNew(brEngine *engine, char *name, char *alias, stObject *super
 
 	// save this object in the engine's object namespace
 
-	bo = brAddObjectToEngine(engine, &gSteveData->steveObjectType, name, o);
+	bo = brAddObjectToEngine(engine, &sdata->steveObjectType, name, o);
 	
 	if(alias) brAddObjectAlias(engine, alias, bo);
 
-	gSteveData->allObjects = slListPrepend(gSteveData->allObjects, o);
+	sdata->allObjects = slListPrepend(sdata->allObjects, o);
 
 	return o;
 }

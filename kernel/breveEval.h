@@ -32,6 +32,7 @@ enum atomicTypes {
 	AT_DOUBLE,
 	AT_STRING,
 	AT_INSTANCE,
+	AT_BRIDGE_INSTANCE,
 	AT_POINTER,
 	AT_VECTOR,
 	AT_MATRIX,
@@ -75,6 +76,7 @@ struct brEval {
 #define BRVECTOR(e)		((e)->values.vectorValue)
 #define BRMATRIX(e)		((e)->values.matrixValue)
 #define BRINSTANCE(e)	((e)->values.instanceValue)
+#define BRBRIDGEINSTANCE(e)	((e)->values.instanceValue)
 #define BRPOINTER(e)	((e)->values.pointerValue)
 #define BRDATA(e)		((e)->values.dataValue)
 #define BRHASH(e)		((e)->values.hashValue)

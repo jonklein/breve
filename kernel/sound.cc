@@ -23,6 +23,7 @@
 #if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
 brSoundMixer *brNewSoundMixer() {
 	brSoundMixer *mixer;
+	int error;
 
 	mixer = slMalloc(sizeof(brSoundMixer));
 	mixer->nPlayers = 0;
@@ -30,7 +31,13 @@ brSoundMixer *brNewSoundMixer() {
 	mixer->players = slMalloc(mixer->maxPlayers * sizeof(brSoundPlayer));
 	mixer->streamShouldEnd = 0;
 
-	Pa_OpenDefaultStream(&mixer->stream, 0, 2, paInt32, MIXER_SAMPLE_RATE, 256, 0, brPASoundCallback, mixer);
+	error = Pa_OpenDefaultStream(&mixer->stream, 0, 2, paInt32, MIXER_SAMPLE_RATE, 256, 0, brPASoundCallback, mixer);
+
+	if(error) {
+		slMessage(DEBUG_ALL, "Error (%d) opening new sound stream!\n", error);
+		return NULL;
+	}
+
 	if(!Pa_StreamActive(mixer->stream)) Pa_StartStream(mixer->stream);
 
 	return mixer;
@@ -39,9 +46,13 @@ brSoundMixer *brNewSoundMixer() {
 void brFreeSoundMixer(brSoundMixer *mixer) {
 	mixer->streamShouldEnd = 1;
 
+	// printf("waiting for %p (%p) to finish\n", mixer, mixer->stream);
+	// while(mixer->stream && Pa_StreamActive(mixer->stream));
+
+	Pa_StopStream(mixer->stream);
 	while(mixer->stream && Pa_StreamActive(mixer->stream));
 
-	Pa_CloseStream(mixer->stream);
+	if(mixer->stream) Pa_CloseStream(mixer->stream);
 	
 	slFree(mixer->players);
 	slFree(mixer);

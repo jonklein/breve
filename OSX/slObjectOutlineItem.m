@@ -66,7 +66,7 @@
     canExpand = 1;
 
     if([self getExpandable] && eval.type == AT_INSTANCE) {
-		evalInstance = BRPOINTER(&eval);
+		evalInstance = STINSTANCE(&eval);
         childCount = slCountList(evalInstance->type->variableList);
     } else if([self getExpandable] && eval.type == AT_LIST) {
         childCount = brEvalListCount(BRLIST(&eval));
@@ -137,7 +137,7 @@
 	}
 
     if(!isArray && eval.type == AT_INSTANCE) {
-		if(BRINSTANCE(&eval) && BRINSTANCE(&eval)->status != AS_ACTIVE) {
+		if(STINSTANCE(&eval) && STINSTANCE(&eval)->status != AS_ACTIVE) {
 			[self setCanExpand: NO];
 			[self updateChildCount: 0];
 		}
@@ -211,15 +211,19 @@
             return [NSString stringWithFormat: @"%p [pointer]", BRPOINTER(&eval)];
             break;
         case AT_STRING:
-            result = [NSString stringWithCString: BRSTRING(&eval)];
-            return result;
+            return [NSString stringWithCString: BRSTRING(&eval)];
             break;
         case AT_VECTOR:
             return [NSString stringWithFormat: @"(%.2f, %.2f, %.2f)", BRVECTOR(&eval).x, BRVECTOR(&eval).y, BRVECTOR(&eval).z];
             break;
         case AT_LIST:
-            result = [NSString stringWithFormat: @"%p [list]", BRPOINTER(&eval)];
-            return result;
+            return [NSString stringWithFormat: @"%p [list]", BRPOINTER(&eval)];
+            break;
+        case AT_HASH:
+            return [NSString stringWithFormat: @"%p [hash]", BRPOINTER(&eval)];
+            break;
+		case AT_DATA:
+            return [NSString stringWithFormat: @"%p [data]", BRPOINTER(&eval)];
             break;
     }
 
@@ -301,10 +305,13 @@
     
     }
 
-    /* this is to avoid obvious loops--don't let us expand our own parents or ourselves.  */
-    /* there are ways to get around this of course, but... */
+    // this is to avoid obvious loops--don't let us expand our own parents or ourselves. 
+    // there are ways to get around this of course, but...
 
-    if(newEval.type == AT_INSTANCE && (STINSTANCE(&newEval) == evalInstance || ((STINSTANCE(&newEval) && STINSTANCE(&newEval)->status != AS_ACTIVE)))) [childObjects[index] setCanExpand: NO];
+    if((newEval.type == AT_INSTANCE && STINSTANCE(&newEval)) && 			// it's an instance 
+			(STINSTANCE(&newEval) == evalInstance ||						// it's the same as the current instance 
+			(STINSTANCE(&newEval)->status != AS_ACTIVE))) 					// it's not active
+				[childObjects[index] setCanExpand: NO];
 
     return childObjects[index];
 }

@@ -37,8 +37,8 @@ int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
     sd->singleStatement = NULL;
 
     stSetParseString(fixedStatement, strlen(fixedStatement));
-    stSetParseObjectAndMethod((stObject*)engine->controller->class->pointer, sd->singleStatementMethod);
-    stSetParseEngine(engine);
+    stParseSetObjectAndMethod((stObject*)engine->controller->class->pointer, sd->singleStatementMethod);
+    stParseSetEngine(engine);
 
     engine->error.type = 0;
 
@@ -52,7 +52,13 @@ int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
 	ri.instance = i;
 	ri.type = i->type;
 
+	i->gcStack = slStackNew(); 
+
     r = stExpEval(sd->singleStatement, &ri, &target, NULL);
+
+	stGCCollectStack(i->gcStack);
+	slStackFree(i->gcStack);
+	i->gcStack = NULL;
 
     stExpFree(sd->singleStatement);
     slFree(fixedStatement);

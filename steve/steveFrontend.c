@@ -368,7 +368,8 @@ int stParseBuffer(stSteveData *s, brEngine *engine, char *buffer, char *filename
 	/* the REAL parse--set the parse engine so the parser knows */
 	/* what to do with the info it parses */
 
-	stSetParseEngine(engine);
+	stParseSetEngine(engine);
+	stParseSetSteveData(s);
 
 	engine->error.type = 0;
 	if(yyparse()) return BPE_SIM_ERROR;

@@ -142,7 +142,7 @@ struct stKeywordEntry {
 	brEval *defaultValue;
 };
 
-stObject *stObjectNew(brEngine *e, char *name, char *alias, stObject *super, float version);
+stObject *stObjectNew(brEngine *e, stSteveData *data, char *name, char *alias, stObject *super, float version);
 stObject *stObjectFind(brNamespace *n, char *name);
 
 stInstance *stFindInstanceIndex(stInstance *i, int index);
