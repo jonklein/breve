@@ -41,6 +41,12 @@ int brIGraphNew(brEval args[], brEval *target, brInstance *i) {
 
 	graph = slGraphNew(&color, 0, 0, 200, 200);
 
+	if(!i->engine->newWindowCallback) {
+		slMessage(DEBUG_ALL, "cannot create new window\n");
+		BRGRAPHPOINTER(target) = NULL;
+		return EC_OK;
+	}
+
 	p = i->engine->newWindowCallback(BRSTRING(&args[0]), graph);
 
 	if(!p) {

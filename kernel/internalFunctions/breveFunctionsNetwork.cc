@@ -310,7 +310,7 @@ void *brHandleConnection(void *p) {
 				brMethodFree(method);	
 			}
 
-			delete buffer;
+			delete[] buffer;
 
 			pthread_mutex_unlock(&data->engine->lock);
 			break;

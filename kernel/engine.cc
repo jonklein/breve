@@ -574,7 +574,7 @@ void brPrintVersion() {
 */
 
 void brEventFree(brEvent *e) {
-	delete[] e->name;
+	slFree(e->name);
 	delete e;
 }
 
