@@ -91,7 +91,8 @@ char *interfaceID = "aqua/1.2";
 	bundlePath = [[NSBundle mainBundle] resourcePath];
 	classPath = (char*)[[NSString stringWithFormat: @"%@/classes", bundlePath] cString];
 
-	frontend = breveFrontendInit(0, NULL);
+	frontend = brFrontendInit(0, NULL);
+	frontend->data = breveFrontendInitData(frontend->engine);
 	engine = frontend->engine;
 
 	engine->speedFactor = speedFactor;
@@ -126,7 +127,9 @@ char *interfaceID = "aqua/1.2";
 
 	while([displayView drawing]);
 
-	brEngineFree(engine);
+	breveFrontendCleanupData(frontend->data);
+	brEngineFree(frontend->engine);
+	slFree(frontend);
 
 	if(slMemoryAllocated()) {
 		slMemoryReport();

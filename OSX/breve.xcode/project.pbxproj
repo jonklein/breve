@@ -64,8 +64,7 @@
 			sourceTree = "<group>";
 		};
 		1058C7A7FEA54F5311CA2CBB = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = Cocoa.framework;
 			path = /System/Library/Frameworks/Cocoa.framework;
@@ -288,8 +287,6 @@
 //483
 //484
 		4802D7F905616080008198B9 = {
-			buildRules = (
-			);
 			buildSettings = {
 			};
 			isa = PBXBuildStyle;
@@ -318,13 +315,13 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "../include/breve ../ode/include /usr/local/include /sw/include";
+				HEADER_SEARCH_PATHS = "../include/breve /usr/local/include /sw/include";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = "../lib /usr/local/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.1;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = /usr/local/lib/libdl.a;
+				OTHER_CFLAGS = "$(CPPFLAGS)";
+				OTHER_LDFLAGS = "$(LDFLAGS) /usr/local/lib/libdl.a";
 				PRODUCT_NAME = breve;
 				SECTORDER_FLAGS = "";
 				UNSTRIPPED_PRODUCT = YES;
@@ -981,7 +978,7 @@
 		};
 		482D168A055989F800230BBF = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.xml;
 			name = English;
 			path = English.lproj/breve.scriptTerminology;
 			refType = 4;
@@ -1004,14 +1001,13 @@
 		};
 		485C2C350559830F005859E4 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.xml;
 			path = breve.scriptSuite;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		48807AA104DF1DB800A8D232 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = CoreAudio.framework;
 			path = /System/Library/Frameworks/CoreAudio.framework;
@@ -1019,8 +1015,7 @@
 			sourceTree = "<absolute>";
 		};
 		48807AB004DF1E2C00A8D232 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = AudioToolbox.framework;
 			path = /System/Library/Frameworks/AudioToolbox.framework;
@@ -1124,8 +1119,6 @@
 //4A3
 //4A4
 		4A9504D0FFE6A4CB11CA0CBA = {
-			buildRules = (
-			);
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1139,8 +1132,6 @@
 			name = Development;
 		};
 		4A9504D1FFE6A4CB11CA0CBA = {
-			buildRules = (
-			);
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -1454,8 +1445,7 @@
 			sourceTree = SOURCE_ROOT;
 		};
 		F5BD20F20397BFE301980AE4 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = GLUT.framework;
 			path = /System/Library/Frameworks/GLUT.framework;
@@ -1463,8 +1453,7 @@
 			sourceTree = "<absolute>";
 		};
 		F5BD20F30397BFE301980AE4 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = OpenGL.framework;
 			path = /System/Library/Frameworks/OpenGL.framework;
@@ -1472,8 +1461,7 @@
 			sourceTree = "<absolute>";
 		};
 		F5BD20F40397BFE301980AE4 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = QuickTime.framework;
 			path = /System/Library/Frameworks/QuickTime.framework;
@@ -1513,8 +1501,7 @@
 			sourceTree = SOURCE_ROOT;
 		};
 		F5BD21540397C2DA01980AE4 = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = Carbon.framework;
 			path = /System/Library/Frameworks/Carbon.framework;
@@ -1610,9 +1597,8 @@
 			sourceTree = "<group>";
 		};
 		F5BD220A0397C57D01980AE4 = {
-			fallbackIsa = PBXFileReference;
 			includeInIndex = 1;
-			isa = PBXFolderReference;
+			isa = PBXFileReference;
 			lastKnownFileType = folder;
 			name = docs;
 			path = ../docs;
@@ -1620,9 +1606,8 @@
 			sourceTree = SOURCE_ROOT;
 		};
 		F5BD223E0397C59E01980AE4 = {
-			fallbackIsa = PBXFileReference;
 			includeInIndex = 1;
-			isa = PBXFolderReference;
+			isa = PBXFileReference;
 			lastKnownFileType = folder;
 			name = demos;
 			path = ../demos;
@@ -1638,9 +1623,8 @@
 		};
 		F5F64877039868A20154B402 = {
 			explicitFileType = folder;
-			fallbackIsa = PBXFileReference;
 			includeInIndex = 1;
-			isa = PBXFolderReference;
+			isa = PBXFileReference;
 			name = classes;
 			path = ../lib/classes;
 			refType = 2;

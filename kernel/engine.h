@@ -194,22 +194,20 @@ struct brEngine {
 
 	brMenuList menu;
 
-	/* runtime error info */
+	// runtime error info 
 
 	brErrorInfo error;
 
 	char *outputPath;
 	char *path;
 
-	char *nibInterface;
-
-	/* plugin, plugins, plugins! */
+	// plugin, plugins, plugins!
 
 	slList *dlPlugins;
 
-	/* the drawEveryFrame flag is a hint to the display engine--if set, */
-	/* the application attempts to draw a frame with every iteration of */
-	/* the breve engine. */
+	// the drawEveryFrame flag is a hint to the display engine--if set,
+	// the application attempts to draw a frame with every iteration of 
+	// the breve engine. 
 
 	unsigned char drawEveryFrame;
 
@@ -227,62 +225,22 @@ struct brEngine {
 
 	int lastScheduled;
 
-	/* the callback data will be passed to all callbacks and can be set by the user */
-
-	void *callbackData;
-
-	/* callback to run save and load dialogs */
-
-	char *(*getSavename)(void *data);
-	char *(*getLoadname)(void *data);
-
-	int (*dialogCallback)(void *data, char *title, char *message, char *b1, char *b2);
-	int (*loadLibraryCallback)(void *data, char *filename, brNamespace *functions);
-
-	/* callback to load a sound, play a sound by reference number */
-
-	int (*loadSoundCallback)(void *data, char *filename);
-	int (*soundCallback)(void *data);
-
-	/* returns the string identifying the implementation */
-
-	char *(*interfaceTypeCallback)(void *data);
-
-	/* the interfaceSetStringCallback gets called when the simulation wants to change */
-	/* the state of an interface element.  under OSX, this is just the setStringValue: */
-	/* method, but under another system, this callback may have to decide how to translate */
-	/* the string into a value of the interface item.  is that totally unclear, or what? */
-
-	int (*interfaceSetStringCallback)(char *string, int number);
-	void (*interfaceSetNibCallback)(char *file);
-
-	/* keypress callback */
-
-	int (*keyCallback)(void *data, char key);
-
-	int (*pauseCallback)(void *data);
-	int (*snapshotCallback)(void *data, char *name);
-
-	void *(*newWindowCallback)(char *name, slGraph *graph);
-	void (*freeWindowCallback)(void *g);
-	void (*renderWindowCallback)(void *g);
-
 	slList *windows;
 
 	slList *searchPath;
 
-	/* a list of events and the date of the next event */
+	// a list of events and the date of the next event
 
 	slList *events;
 	double nextEvent;
 
-	/* the stack pointer and memory for running steve code */
+	// the stack pointer and memory for running steve code 
 
 	char stackBase[ST_STACK_SIZE];
 	char *stack;
 	stStackRecord *stackRecord;
 
-	/* evalList sort data... */
+	// evalList sort data... 
 
 	void **sortVector;
 	int sortVectorLength;
@@ -290,9 +248,50 @@ struct brEngine {
 	int evalListSortError;
 	brInstance *sortObject;
 
-	/* iTunes plugin data */
+	// iTunes plugin data
 
 	briTunesData *iTunesData;
+
+	//
+	// CALLBACK FUNCTIONS AND RELATED DATA FOR THE APPLICATION FRONTEND
+	//
+
+	void *callbackData;
+
+	// callback to run save and load dialogs 
+
+	char *(*getSavename)(void *data);
+	char *(*getLoadname)(void *data);
+
+	// callback to show a generic dialog
+
+	int (*dialogCallback)(void *data, char *title, char *message, 
+									char *button1, char *button2);
+
+	// callback to play a beep sound
+
+	int (*soundCallback)(void *data);
+
+	// returns the string identifying the implementation
+
+	char *(*interfaceTypeCallback)(void *data);
+
+	// callback to setup and use the OS X interface features
+
+	int (*interfaceSetStringCallback)(char *string, int number);
+	void (*interfaceSetNibCallback)(char *file);
+
+	// keypress callback 
+
+	int (*keyCallback)(void *data, char key);
+
+	// pause callback
+
+	int (*pauseCallback)(void *data);
+
+	void *(*newWindowCallback)(char *name, slGraph *graph);
+	void (*freeWindowCallback)(void *g);
+	void (*renderWindowCallback)(void *g);
 };
 
 enum versionRequiermentOperators {

@@ -247,22 +247,21 @@ header
 	}
 | '@' NIB_FILE STRING_VALUE END {
 		char *unquoted = slDequote($3);
-		char *nib = slMalloc(strlen(unquoted) + 5);
+		char *fullnib, *nib = slMalloc(strlen(unquoted) + 5);
 		sprintf(nib, "%s.nib", unquoted);
 
-		if(parseEngine->nibInterface) {
-			stParseError(parseEngine, PE_REDEFINITION, "Redifinition of \"nib\" file");
-		} else {
-			parseEngine->nibInterface = brFindFile(parseEngine, nib, NULL);
+		fullnib = brFindFile(parseEngine, nib, NULL);
 
-			if(!parseEngine->nibInterface) {
-				slMessage(DEBUG_ALL, "warning: unable to locate nib file \"%s\"\n", nib);
-			}
+		if(!fullnib) {
+			slMessage(DEBUG_ALL, "warning: unable to locate nib file \"%s\"\n", nib);
+		} else {
+			if(parseEngine->interfaceSetNibCallback) parseEngine->interfaceSetNibCallback(fullnib);
 		}
 	
 		slFree($3);
 		slFree(unquoted);
 		slFree(nib);
+		slFree(fullnib);
 	}
 | '@' DEFINE WORD_VALUE STRING_VALUE END {
 		brEval *e;

@@ -66,7 +66,7 @@
 
 <indexentry>
   <primaryie>@plugin,
-    <ulink url="../docs/using_plugins.html" role="AEN2623">Using Plugins in Simulations</ulink>
+    <ulink url="../docs/using_plugins.html" role="AEN2631">Using Plugins in Simulations</ulink>
   </primaryie>
 </indexentry>
 
@@ -81,7 +81,7 @@
 
 <indexentry>
   <primaryie>Abstract class,
-    <ulink url="../docs/classes.html" role="AEN2715">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2784">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -206,7 +206,7 @@
 <indexentry>
   <primaryie>BallJoint class,
     <ulink url="../docs/physical_simulation_parts.html#JOINTS" role="AEN1931">The Joint Class and its Subclasses</ulink>,
-    <ulink url="../docs/classes.html" role="AEN2720">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2789">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -218,55 +218,55 @@
 
 <indexentry>
   <primaryie>BraitenbergControl class,
-    <ulink url="../docs/classes.html" role="AEN2725">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2794">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>BraitenbergLight class,
-    <ulink url="../docs/classes.html" role="AEN2730">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2799">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>BraitenbergSensor class,
-    <ulink url="../docs/classes.html" role="AEN2735">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2804">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>BraitenbergVehicle class,
-    <ulink url="../docs/classes.html" role="AEN2740">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2809">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>BraitenbergWheel class,
-    <ulink url="../docs/classes.html" role="AEN2745">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2814">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>BRBRRING plugin macro,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2389">Writing C Wrapper Functions Around Existing Code</ulink>
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2397">Writing C Wrapper Functions Around Existing Code</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>BRDATA plugin macro,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2401">Writing C Wrapper Functions Around Existing Code</ulink>
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2409">Writing C Wrapper Functions Around Existing Code</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>brData structure,
-    <ulink url="../docs/archiving_data.html" role="AEN2601">Archiving Plugin Data With The data Type</ulink>
+    <ulink url="../docs/archiving_data.html" role="AEN2609">Archiving Plugin Data With The data Type</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>BRDOUBLE plugin macro,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2377">Writing C Wrapper Functions Around Existing Code</ulink>
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2385">Writing C Wrapper Functions Around Existing Code</ulink>
   </primaryie>
 </indexentry>
 
@@ -284,103 +284,103 @@
 
 <indexentry>
   <primaryie>BRHASH plugin macro,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2405">Writing C Wrapper Functions Around Existing Code</ulink>
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2413">Writing C Wrapper Functions Around Existing Code</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>BRINT plugin macro,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2373">Writing C Wrapper Functions Around Existing Code</ulink>
-  </primaryie>
-</indexentry>
-
-<indexentry>
-  <primaryie>BRLIST plugin macro,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2409">Writing C Wrapper Functions Around Existing Code</ulink>
-  </primaryie>
-</indexentry>
-
-<indexentry>
-  <primaryie>BRMATRIX plugin macro,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2385">Writing C Wrapper Functions Around Existing Code</ulink>
-  </primaryie>
-</indexentry>
-
-<indexentry>
-  <primaryie>BROBJECT plugin macro,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2393">Writing C Wrapper Functions Around Existing Code</ulink>
-  </primaryie>
-</indexentry>
-
-<indexentry>
-  <primaryie>BRPOINTER plugin macro,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2397">Writing C Wrapper Functions Around Existing Code</ulink>
-  </primaryie>
-</indexentry>
-
-<indexentry>
-  <primaryie>BRVECTOR plugin macro,
     <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2381">Writing C Wrapper Functions Around Existing Code</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
+  <primaryie>BRLIST plugin macro,
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2417">Writing C Wrapper Functions Around Existing Code</ulink>
+  </primaryie>
+</indexentry>
+
+<indexentry>
+  <primaryie>BRMATRIX plugin macro,
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2393">Writing C Wrapper Functions Around Existing Code</ulink>
+  </primaryie>
+</indexentry>
+
+<indexentry>
+  <primaryie>BROBJECT plugin macro,
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2401">Writing C Wrapper Functions Around Existing Code</ulink>
+  </primaryie>
+</indexentry>
+
+<indexentry>
+  <primaryie>BRPOINTER plugin macro,
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2405">Writing C Wrapper Functions Around Existing Code</ulink>
+  </primaryie>
+</indexentry>
+
+<indexentry>
+  <primaryie>BRVECTOR plugin macro,
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2389">Writing C Wrapper Functions Around Existing Code</ulink>
+  </primaryie>
+</indexentry>
+
+<indexentry>
   <primaryie>BR_BRRING plugin constant,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2391">Writing C Wrapper Functions Around Existing Code</ulink>
-  </primaryie>
-</indexentry>
-
-<indexentry>
-  <primaryie>BR_DATA plugin constant,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2403">Writing C Wrapper Functions Around Existing Code</ulink>
-  </primaryie>
-</indexentry>
-
-<indexentry>
-  <primaryie>BR_DOUBLE plugin constant,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2379">Writing C Wrapper Functions Around Existing Code</ulink>
-  </primaryie>
-</indexentry>
-
-<indexentry>
-  <primaryie>BR_HASH constant,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2407">Writing C Wrapper Functions Around Existing Code</ulink>
-  </primaryie>
-</indexentry>
-
-<indexentry>
-  <primaryie>BR_INT plugin constant,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2375">Writing C Wrapper Functions Around Existing Code</ulink>
-  </primaryie>
-</indexentry>
-
-<indexentry>
-  <primaryie>BR_LIBR constant,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2411">Writing C Wrapper Functions Around Existing Code</ulink>
-  </primaryie>
-</indexentry>
-
-<indexentry>
-  <primaryie>BR_MATRIX plugin constant,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2387">Writing C Wrapper Functions Around Existing Code</ulink>
-  </primaryie>
-</indexentry>
-
-<indexentry>
-  <primaryie>BR_OBJECT plugin constant,
-    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2395">Writing C Wrapper Functions Around Existing Code</ulink>
-  </primaryie>
-</indexentry>
-
-<indexentry>
-  <primaryie>BR_POINTER plugin constant,
     <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2399">Writing C Wrapper Functions Around Existing Code</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
-  <primaryie>BR_VECTOR plugin constant,
+  <primaryie>BR_DATA plugin constant,
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2411">Writing C Wrapper Functions Around Existing Code</ulink>
+  </primaryie>
+</indexentry>
+
+<indexentry>
+  <primaryie>BR_DOUBLE plugin constant,
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2387">Writing C Wrapper Functions Around Existing Code</ulink>
+  </primaryie>
+</indexentry>
+
+<indexentry>
+  <primaryie>BR_HASH constant,
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2415">Writing C Wrapper Functions Around Existing Code</ulink>
+  </primaryie>
+</indexentry>
+
+<indexentry>
+  <primaryie>BR_INT plugin constant,
     <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2383">Writing C Wrapper Functions Around Existing Code</ulink>
+  </primaryie>
+</indexentry>
+
+<indexentry>
+  <primaryie>BR_LIBR constant,
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2419">Writing C Wrapper Functions Around Existing Code</ulink>
+  </primaryie>
+</indexentry>
+
+<indexentry>
+  <primaryie>BR_MATRIX plugin constant,
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2395">Writing C Wrapper Functions Around Existing Code</ulink>
+  </primaryie>
+</indexentry>
+
+<indexentry>
+  <primaryie>BR_OBJECT plugin constant,
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2403">Writing C Wrapper Functions Around Existing Code</ulink>
+  </primaryie>
+</indexentry>
+
+<indexentry>
+  <primaryie>BR_POINTER plugin constant,
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2407">Writing C Wrapper Functions Around Existing Code</ulink>
+  </primaryie>
+</indexentry>
+
+<indexentry>
+  <primaryie>BR_VECTOR plugin constant,
+    <ulink url="../docs/plugins.html#C_WRAPPERS" role="AEN2391">Writing C Wrapper Functions Around Existing Code</ulink>
   </primaryie>
 </indexentry>
 
@@ -389,7 +389,7 @@
 
 <indexentry>
   <primaryie>Camera class,
-    <ulink url="../docs/classes.html" role="AEN2750">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2819">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -449,7 +449,7 @@
 
 <indexentry>
   <primaryie>Control class,
-    <ulink url="../docs/classes.html" role="AEN2755">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2824">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -485,13 +485,13 @@
 
 <indexentry>
   <primaryie>Cube class,
-    <ulink url="../docs/classes.html" role="AEN2760">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2829">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>CustomShape class,
-    <ulink url="../docs/classes.html" role="AEN2765">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2834">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -506,13 +506,13 @@
 
 <indexentry>
   <primaryie>data archiving,
-    <ulink url="../docs/archiving_data.html" role="AEN2599">Archiving Plugin Data With The data Type</ulink>
+    <ulink url="../docs/archiving_data.html" role="AEN2607">Archiving Plugin Data With The data Type</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>Data class,
-    <ulink url="../docs/classes.html" role="AEN2770">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2839">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -657,14 +657,14 @@
 
 <indexentry>
   <primaryie>File class,
-    <ulink url="../docs/classes.html" role="AEN2775">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2844">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>FixedJoint class,
     <ulink url="../docs/physical_simulation_parts.html#JOINTS" role="AEN1923">The Joint Class and its Subclasses</ulink>,
-    <ulink url="../docs/classes.html" role="AEN2780">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2849">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -709,7 +709,7 @@
 
 <indexentry>
   <primaryie>Genome class,
-    <ulink url="../docs/classes.html" role="AEN2785">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2854">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -733,7 +733,7 @@
 
 <indexentry>
   <primaryie>Graph class,
-    <ulink url="../docs/classes.html" role="AEN2790">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2859">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -793,7 +793,7 @@
 
 <indexentry>
   <primaryie>Image class,
-    <ulink url="../docs/classes.html" role="AEN2795">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2864">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -874,14 +874,14 @@
 
 <indexentry>
   <primaryie>JavaObject class,
-    <ulink url="../docs/classes.html" role="AEN2800">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2869">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>Joint class,
     <ulink url="../docs/physical_simulation_parts.html#JOINTS" role="AEN1921">The Joint Class and its Subclasses</ulink>,
-    <ulink url="../docs/classes.html" role="AEN2805">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2874">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -924,14 +924,14 @@
 <indexentry>
   <primaryie>Link class,
     <ulink url="../docs/physical_simulation_parts.html#LINKS" role="AEN1911">The Link Class</ulink>,
-    <ulink url="../docs/classes.html" role="AEN2810">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2879">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>Linux,
     <ulink url="../docs/install_command_line.html" role="AEN172">Installing and Running Command-Line breve on Mac OS X, Linux and Windows</ulink>,
-    <ulink url="../docs/building_plugins.html#AEN2569" role="AEN2572">Building Plugins With Linux</ulink>
+    <ulink url="../docs/building_plugins.html#AEN2577" role="AEN2580">Building Plugins With Linux</ulink>
   </primaryie>
 </indexentry>
 
@@ -993,7 +993,7 @@
     <ulink url="../docs/install_os_x.html" role="AEN113">Installing and Running the breve Application on Mac OS X</ulink>,
     <ulink url="../docs/install_command_line.html" role="AEN170">Installing and Running Command-Line breve on Mac OS X, Linux and Windows</ulink>,
     <ulink url="../docs/nib_files.html" role="AEN2109">Loading ".nib" Files for Customized Interfaces</ulink>,
-    <ulink url="../docs/building_plugins.html#AEN2554" role="AEN2557">Building Plugins With Mac OS X</ulink>
+    <ulink url="../docs/building_plugins.html#AEN2562" role="AEN2565">Building Plugins With Mac OS X</ulink>
   </primaryie>
 </indexentry>
 
@@ -1075,7 +1075,7 @@
 
 <indexentry>
   <primaryie>MenuItem class,
-    <ulink url="../docs/classes.html" role="AEN2815">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2884">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1105,7 +1105,7 @@
 
 <indexentry>
   <primaryie>Mobile class,
-    <ulink url="../docs/classes.html" role="AEN2820">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2889">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1124,7 +1124,7 @@
 <indexentry>
   <primaryie>Movie class,
     <ulink url="../docs/movies.html" role="AEN2176">Saving Movies and Snapshots</ulink>,
-    <ulink url="../docs/classes.html" role="AEN2825">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2894">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1155,7 +1155,7 @@
 <indexentry>
   <primaryie>MultiBody class,
     <ulink url="../docs/physical_simulation_parts.html#MULTIBODIES" role="AEN1956">The MultiBody class</ulink>,
-    <ulink url="../docs/classes.html" role="AEN2830">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2899">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1182,13 +1182,13 @@
 
 <indexentry>
   <primaryie>NetworkServer class,
-    <ulink url="../docs/classes.html" role="AEN2835">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2904">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>NeuralNetwork class,
-    <ulink url="../docs/classes.html" role="AEN2840">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2909">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1222,7 +1222,7 @@
 
 <indexentry>
   <primaryie>Object class,
-    <ulink url="../docs/classes.html" role="AEN2845">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2914">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1285,19 +1285,19 @@
 
 <indexentry>
   <primaryie>Patch class,
-    <ulink url="../docs/classes.html" role="AEN2850">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2919">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>PatchGrid class,
-    <ulink url="../docs/classes.html" role="AEN2855">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2924">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>PatchToroid class,
-    <ulink url="../docs/classes.html" role="AEN2860">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2929">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1315,7 +1315,7 @@
 
 <indexentry>
   <primaryie>PhysicalControl class,
-    <ulink url="../docs/classes.html" role="AEN2865">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2934">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1328,7 +1328,7 @@
 
 <indexentry>
   <primaryie>plugins,
-    <ulink url="../docs/plugins.html" role="AEN2331">Plugins</ulink>
+    <ulink url="../docs/plugins.html" role="AEN2339">Plugins</ulink>
   </primaryie>
 </indexentry>
 
@@ -1352,13 +1352,13 @@
 
 <indexentry>
   <primaryie>PolygonCone class,
-    <ulink url="../docs/classes.html" role="AEN2870">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2939">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>PolygonDisk class,
-    <ulink url="../docs/classes.html" role="AEN2875">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2944">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1383,7 +1383,7 @@
 <indexentry>
   <primaryie>PrismaticJoint class,
     <ulink url="../docs/physical_simulation_parts.html#JOINTS" role="AEN1925">The Joint Class and its Subclasses</ulink>,
-    <ulink url="../docs/classes.html" role="AEN2880">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2949">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1416,7 +1416,7 @@
 
 <indexentry>
   <primaryie>Real class,
-    <ulink url="../docs/classes.html" role="AEN2885">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2954">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1429,7 +1429,7 @@
 <indexentry>
   <primaryie>RevoluteJoint class,
     <ulink url="../docs/physical_simulation_parts.html#JOINTS" role="AEN1927">The Joint Class and its Subclasses</ulink>,
-    <ulink url="../docs/classes.html" role="AEN2890">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2959">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1542,7 +1542,7 @@
 
 <indexentry>
   <primaryie>Shape class,
-    <ulink url="../docs/classes.html" role="AEN2895">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2964">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1579,7 +1579,7 @@
 <indexentry>
   <primaryie>Sound class,
     <ulink url="../docs/sounds.html" role="AEN1713">Playing Sound Effects</ulink>,
-    <ulink url="../docs/classes.html" role="AEN2900">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2969">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1603,7 +1603,7 @@
 
 <indexentry>
   <primaryie>Sphere class,
-    <ulink url="../docs/classes.html" role="AEN2905">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2974">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1627,7 +1627,7 @@
 
 <indexentry>
   <primaryie>Stationary class,
-    <ulink url="../docs/classes.html" role="AEN2910">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2979">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1672,13 +1672,13 @@
 
 <indexentry>
   <primaryie>Terrain class,
-    <ulink url="../docs/classes.html" role="AEN2915">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2984">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
 <indexentry>
   <primaryie>Tone class,
-    <ulink url="../docs/classes.html" role="AEN2920">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2989">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1700,7 +1700,7 @@
 <indexentry>
   <primaryie>UniversalJoint class,
     <ulink url="../docs/physical_simulation_parts.html#JOINTS" role="AEN1929">The Joint Class and its Subclasses</ulink>,
-    <ulink url="../docs/classes.html" role="AEN2925">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2994">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1742,7 +1742,7 @@
 
 <indexentry>
   <primaryie>Wanderer class,
-    <ulink url="../docs/classes.html" role="AEN2930">breve Class Documentation</ulink>
+    <ulink url="../docs/classes.html" role="AEN2999">breve Class Documentation</ulink>
   </primaryie>
 </indexentry>
 
@@ -1773,7 +1773,7 @@
 <indexentry>
   <primaryie>Windows,
     <ulink url="../docs/install_command_line.html" role="AEN174">Installing and Running Command-Line breve on Mac OS X, Linux and Windows</ulink>,
-    <ulink url="../docs/building_plugins.html#AEN2580" role="AEN2583">Building Plugins With Windows</ulink>
+    <ulink url="../docs/building_plugins.html#AEN2588" role="AEN2591">Building Plugins With Windows</ulink>
   </primaryie>
 </indexentry>
 

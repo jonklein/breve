@@ -1,28 +1,9 @@
-/*****************************************************************************
- *                                                                           *
- * The breve Simulation Environment                                          *
- * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
- *                                                                           *
- * This program is free software; you can redistribute it and/or modify      *
- * it under the terms of the GNU General Public License as published by      *
- * the Free Software Foundation; either version 2 of the License, or         *
- * (at your option) any later version.                                       *
- *                                                                           *
- * This program is distributed in the hope that it will be useful,           *
- * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
- * GNU General Public License for more details.                              *
- *                                                                           *
- * You should have received a copy of the GNU General Public License         *
- * along with this program; if not, write to the Free Software               *
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
- *****************************************************************************/
 
                     breve source code release - version 2.0
                          http://www.spiderland.org/breve
-                              jklein@spiderland.org
+                                jk@spiderland.org
 
-                                 -- INTRO --
+                               -- INTRODUCTION --
 
 breve is a free simulation environment designed for multi-agent simulation.  
 breve allows users to define the behaviors of autonomous agents in a 
@@ -45,11 +26,14 @@ For the OS X application:
 
 If these commands fail it's likely that you will need to install some
 of the libraries required by breve.  See the section "REQUIRED LIBRARIES"
-below.  NOTE: On MacOS X the configure command may fail indicating a missing
-library even when the Libra is correctly installed.  If you know the library is
-installed and can be found (you've included any relevant path includes and
-exported the environment vars) you probably need to run 'ranlib libxxx.a' on
-the library in question.  Read the man pages for more information.
+below.  
+
+NOTE: On Mac OS X the configure command may fail indicating a missing
+library even when the library is correctly installed.  If you know the 
+library is installed and can be found (you've included any relevant path 
+includes and exported the environment vars) you may need to run 
+"ranlib libxxx.a" on the library in question.  See the man page for 
+"ranlib" for more information.
 
                        --- NOTES ON THIS RELEASE ---
 
@@ -58,7 +42,7 @@ breve is actively developed and maintained on three platforms:
 	Linux (x86)
 	MinGW (Windows)
 
-breve has compiled successfully in the past on other platforms 
+breve has compiled successfully in the past on these other platforms 
 as well, though some work may be required:
 	Irix
 	Solaris
@@ -66,20 +50,23 @@ as well, though some work may be required:
 	Microsoft Visual C++
 
 Please report successful ports and the changes required back to the author 
-at jklein@spiderland.org.
+at jk@spiderland.org.
 
                           --- REQUIRED LIBRARIES ---
 
 It's always a drag to have to download another set of libraries to get 
 something working.  Sorry.  Make sure to include the libraries and the include
-header files in your environment before running configure.  Use LDFLAGS to
-include the library dirs and CPPFLAGS to include the include dirs. 
-Example: export LDFLAGS='-L/opt/local/lib' CPPFLAGS='-I/opt/local/include'
+header files in your environment before running configure.  
+
+Use LDFLAGS to include the library dirs and CPPFLAGS to include the include dirs. 
+Example: 
+
+	export LDFLAGS='-L/opt/local/lib' CPPFLAGS='-I/opt/local/include'
 
 
-* OpenGL and GLUT libraries
+- OpenGL and GLUT libraries [required]
 
-* ODE, physical simulation library
+- ODE, physical simulation library [required]
 
   http://www.ode.org
 
@@ -89,83 +76,60 @@ Example: export LDFLAGS='-L/opt/local/lib' CPPFLAGS='-I/opt/local/include'
   For this reason, official builds of breve use a modified version of 
   the ODE source.
 
-* libdl, dynamic loading compatibility library (required for pre-10.3 
+- libdl, dynamic loading compatibility library (required for pre-10.3 
   OS X only)
 
   part of "fink", http://fink.sourceforge.net/
 
-* expat, XML parsing library
+- expat, XML parsing library [required]
 
   http://expat.sourceforge.net/
 
-* libjpeg, JPEG I/O library
+- libjpeg, JPEG I/O library [optional]
+
+  Provides support for loading JPG images.  This library is optional.  If it 
+  is not available, JPG import will not be supported.
 
   http://www.ijg.org/
 
-* libpng, PNG I/O library
+- libpng, PNG I/O library [optional]
+
+  Provides support for loading and saving PNG images.  This library is optional.  
+  If it is not available, PNG import and export will not be supported.
 
   http://www.libpng.org/pub/png/libpng.html
 
-* libportaudio, portable sound APIs
+- libportaudio, portable sound APIs [optional]
+
+  Provides support for playing soundfiles.  This library is optional.  If 
+  it is not available, sound support will not be available.
 
   http://www.portaudio.com/
 
-* libsndfile, portable sound file I/O library
+- libsndfile, portable sound file I/O library [optional]
+
+  Provides support for loading soundfiles.  This library is optional.  If 
+  it is not available, sound support will not be available.
 
   http://www.zip.com.au/~erikd/libsndfile/
 
-* libffmpeg, mpeg movie export library
+- libffmpeg, mpeg movie export library [optional]
+
+  Provides support for exporting MPEG movies of simulations.  This library
+  is optional.  If it is not available, movie export will not be supported.
 
   http://ffmpeg.sourceforge.net/
 
-                              -- ABOUT THE SOURCE --
-
-* NAMING CONVENTION: currently, all functions in the util and physics modules
-  use the prefix "sl", as in "slNewWorld".  All functions in the steve module
-  use the prefix "st" and all functions in the neural module use the prefix
-  "sn".  Please adhere to this convention.  New modules should use a similar
-  convention starting with the letter "s".
-
-* PROGRAMMING STYLE: this project uses C with the goal of being as portable
-  as possible.  Though the project does not use an OO language, it still
-  uses a somewhat OO approach of allocating data structures and then passing
-  them to functions.
-
-* TYPEDEFS: each module has its own "typedefs" file containing 
-  all the typedefs for a certain module.  this is so that pointers to 
-  a specific type can be defined in a function or data structure
-  definition even if the include file hasn't seen the corresponding
-  include file yet.  Do not put #typedefs in the header files.
-
-* MEMORY DEBUGGING: enabling the flag MALLOC_DEBUG in the Makefile enables
-  the util libraries built in memory tracking.  This can help you to discover
-  leaks or memory errors (freeing unalloc'd pointers, freeing freed pointers,
-  etc).  If used in conjunction with plugins, however, there will be some 
-  spurious errors due to the way plugins allocate and use memory--these can 
-  be ignored.  Under Mac OS X, MALLOC_DEBUG can also preform stack traces 
-  upon memory errors and leaks.
-
-* PHYSICS SUPPORT & GROWING PAINS
-
-  Since moving from a homegrown Featherstone based physics engine to ODE, 
-  there have been a number of paradigmatic changes to concepts like 
-  Links, MultiBodies, Joints, etc.  Ultimately, there are now a lot
-  more features, but some aspects are undeniably "weird" because 
-  of the code needed to accommodate the new engine, while offering 
-  conceptual backward compatibility.
-
-  Specifically, a "MultiBody" was a very natural concept for the 
-  Featherstone algorithm and natural for thought as well--but it is 
-  not a feature of the ODE engine.  So there is a great deal of code
-  which accounts for this.  Likewise, the MultiBody paradigm has 
-  disadvantages as well, so additional code is then needed to make
-  sure that all of the features of ODE can be accessed if desired.
-
-  See the documentation for details on how these issues are resolved
-  from the user's perspective.
+- libpush, push language libary [optional]
 
 
-== Building With Mesa3D Support ==
+- libenet, networking library [optional]
+
+  Optional.  Not yet used for any release-quality features.
+
+  http://enet.cubik.org/
+
+                       -- Building With Mesa3D Support --
 
 Official builds of breve use standard OpenGL libraries, which do not support
 rendering into offscreen buffers.  The official non-graphical version of breve 
@@ -176,3 +140,27 @@ taking snapshots, making movies, "visions" and light exposure detection
 The OpenGL-like library Mesa3D, however, does support offscreen rendering.
 If breve is built with Mesa3D support, these features can be used with
 breve_cli.
+
+
+
+
+
+/*****************************************************************************
+ *                                                                           *
+ * The breve Simulation Environment                                          *
+ * Copyright (C) 2000-2004 Jonathan Klein                                    *
+ *                                                                           *
+ * This program is free software; you can redistribute it and/or modify      *
+ * it under the terms of the GNU General Public License as published by      *
+ * the Free Software Foundation; either version 2 of the License, or         *
+ * (at your option) any later version.                                       *
+ *                                                                           *
+ * This program is distributed in the hope that it will be useful,           *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+ * GNU General Public License for more details.                              *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License         *
+ * along with this program; if not, write to the Free Software               *
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
+ *****************************************************************************/

@@ -1,0 +1,42 @@
+<chapter id="Push">
+<title>The "Push" Language</title>
+
+<para>
+This chapter describes genetic programming, and describes how use genetic 
+programming in breve simulations using an evolvable language called "Push".
+</para>
+
+<para>
+Many artificial life simulations are designed around the concept of evolving
+agents: agents in a simulated world use evolution in order to find better and 
+better solutions to some task such as locomotion, survival or some sort of 
+"intelligent" behavior.
+</para>
+
+<para>
+Evolution of agent behaviors is typically accomplished in one of two ways:
+optimizing a set of parameters, a technique known as "genetic algorithms" (GA); 
+or by developing evolved computer programs, a technique known as 
+"genetic programming".
+</para>
+
+<para>
+Genetic programming involves random crossover and mutation of computer programs.
+Most computer languages designed for people are picky about syntax and are not 
+well suited to evolution&mdash;most random crossovers and mutations would 
+produce code that simply does not compile.
+</para>
+
+<para>
+The "Push" language is designed specifically for genetic programming and 
+other evolutionary computational applications.  Push is designed to avoid 
+most of the complications that can arise when evolving code.  In fact, Push 
+code is almost never written by hand.  This chapter is intended as a short 
+introduction to using Push in a breve simulation and is not a definitive 
+overview of Push or its features.  More information about Push and how it 
+is being used can be found on 
+<ulink url="http://hampshire.edu/lspector/Push.html">this page</ulink>.
+</para>
+
+</chapter>
+

@@ -19,6 +19,7 @@
 <!ENTITY index SYSTEM "index.docbook">
 <!ENTITY movie SYSTEM "movie.docbook">
 <!ENTITY network SYSTEM "network.docbook">
+<!ENTITY push SYSTEM "push.docbook">
 <!ENTITY source SYSTEM "source.docbook">
 <!ENTITY version_2.0 SYSTEM "version_2.0.docbook">
 ]>
@@ -48,6 +49,7 @@
 &movie;
 &archiving;
 &network;
+&push;
 &plugins;
 &source;
 

@@ -40,7 +40,7 @@ void stParseError(brEngine *e, int type, char *proto, ...);
 
 stSteveData *stSteveInit();
 
-void stSteveCleanup(stSteveData *steveData, brEngine *engine);
+void stSteveCleanup(stSteveData *steveData);
 
 int stPreprocess(stSteveData *steveData, brEngine *engine, char *line);
 

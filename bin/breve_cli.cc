@@ -88,7 +88,8 @@ int main(int argc, char **argv) {
 
 	signal(SIGINT, brCatchSignal);
 
-    frontend = breveFrontendInit(argc, argv);
+    frontend = brFrontendInit(argc, argv);
+    frontend->data = breveFrontendInitData(frontend->engine);
 
 	brEngineSetIOPath(frontend->engine, getcwd(wd, 10239));
 
@@ -271,7 +272,9 @@ void brQuit(brEngine *e) {
         printf("%f simulated/real\n", e->world->age/diff);
     }
 
-    breveFrontendCleanup(frontend);
+    breveFrontendCleanupData(frontend->data);
+	brEngineFree(frontend->engine);
+	slFree(frontend);
 
 #ifdef MEMORY_DEBUG
     slMemoryReport();

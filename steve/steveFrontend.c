@@ -7,20 +7,12 @@ extern int lineno;
 
 stSteveData *gSteveData;
 
-brFrontend *breveFrontendInit(int argc, char** argv) {
-	brFrontend *frontend = slMalloc(sizeof(brFrontend));
-	
-	frontend->engine = brEngineNew();
-	frontend->data = stSteveInit(frontend->engine);
-	frontend->engine->argc = argc;
-	frontend->engine->argv = argv;
-
-	return frontend;
+void *breveFrontendInitData(brEngine *engine) {
+	return stSteveInit(engine);
 }
 
-void breveFrontendCleanup(brFrontend *frontend) {
-	stSteveCleanup(frontend->data, frontend->engine);
-	slFree(frontend);
+void breveFrontendCleanupData(void *data) {
+	stSteveCleanup(data);
 }
 
 int breveFrontendLoadSimulation(brFrontend *frontend, char *code, char *file) {
@@ -104,10 +96,11 @@ stSteveData *stSteveInit(brEngine *engine) {
 /*!
 	\brief Cleanup after steve.
 
-	Free all instances, objects, freed instance lists, controller name, defines and the engine.
+	Free all instances, objects, freed instance lists, controller name, 
+	defines and the engine.
 */
 
-void stSteveCleanup(stSteveData *d, brEngine *engine) {
+void stSteveCleanup(stSteveData *d) {
 	slList *o;
 
 	// free all the instances.
@@ -144,8 +137,6 @@ void stSteveCleanup(stSteveData *d, brEngine *engine) {
 	stFreeParseTrack(d);
 
 	if(d->defines) brNamespaceFreeWithFunction(d->defines, (void(*)(void*))stFreeDefine);
-
-	brEngineFree(engine);
 
 	slFree(d);
 }
@@ -208,10 +199,6 @@ int stLoadFiles(stSteveData *sdata, brEngine *engine, char *code, char *file) {
 	if(!sdata->controllerName) {
 		stParseError(engine, PE_NO_CONTROLLER, "No \"Controller\" object has been defined");
 		return EC_ERROR;
-	}
-	
-	if(engine->nibInterface && engine->interfaceSetNibCallback) {
-		engine->interfaceSetNibCallback(engine->nibInterface);
 	}
 	
 	controller = brObjectFind(engine, sdata->controllerName);

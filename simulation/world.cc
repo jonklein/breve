@@ -518,7 +518,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 void slNeighborCheck(slWorld *w) {
 	int n;
 	double dist;
-	slVector *location, diff, *l1, *l2;
+	slVector *location, diff, *l1 = NULL, *l2 = NULL;
 	slStationary *st;
 	slPairEntry *pe;
 	slWorldObject *o1, *o2;

@@ -1484,427 +1484,427 @@ significance NORMAL
 PRIMARY sending objects
 /INDEXTERM
 INDEXTERM ../docs/plugins.html
-INDEXPOINT ../docs/plugins.html#AEN2331
+INDEXPOINT ../docs/plugins.html#AEN2339
 TITLE Plugins
 significance NORMAL
 PRIMARY plugins
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2373
+INDEXPOINT ../docs/plugins.html#AEN2381
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BRINT plugin macro
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2375
+INDEXPOINT ../docs/plugins.html#AEN2383
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BR_INT plugin constant
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2377
+INDEXPOINT ../docs/plugins.html#AEN2385
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BRDOUBLE plugin macro
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2379
+INDEXPOINT ../docs/plugins.html#AEN2387
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BR_DOUBLE plugin constant
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2381
+INDEXPOINT ../docs/plugins.html#AEN2389
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BRVECTOR plugin macro
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2383
+INDEXPOINT ../docs/plugins.html#AEN2391
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BR_VECTOR plugin constant
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2385
+INDEXPOINT ../docs/plugins.html#AEN2393
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BRMATRIX plugin macro
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2387
+INDEXPOINT ../docs/plugins.html#AEN2395
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BR_MATRIX plugin constant
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2389
+INDEXPOINT ../docs/plugins.html#AEN2397
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BRBRRING plugin macro
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2391
+INDEXPOINT ../docs/plugins.html#AEN2399
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BR_BRRING plugin constant
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2393
+INDEXPOINT ../docs/plugins.html#AEN2401
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BROBJECT plugin macro
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2395
+INDEXPOINT ../docs/plugins.html#AEN2403
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BR_OBJECT plugin constant
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2397
+INDEXPOINT ../docs/plugins.html#AEN2405
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BRPOINTER plugin macro
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2399
+INDEXPOINT ../docs/plugins.html#AEN2407
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BR_POINTER plugin constant
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2401
+INDEXPOINT ../docs/plugins.html#AEN2409
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BRDATA plugin macro
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2403
+INDEXPOINT ../docs/plugins.html#AEN2411
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BR_DATA plugin constant
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2405
+INDEXPOINT ../docs/plugins.html#AEN2413
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BRHASH plugin macro
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2407
+INDEXPOINT ../docs/plugins.html#AEN2415
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BR_HASH constant
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2409
+INDEXPOINT ../docs/plugins.html#AEN2417
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BRLIST plugin macro
 /INDEXTERM
 INDEXTERM ../docs/plugins.html#C_WRAPPERS
-INDEXPOINT ../docs/plugins.html#AEN2411
+INDEXPOINT ../docs/plugins.html#AEN2419
 TITLE Writing C Wrapper Functions Around Existing Code
 significance NORMAL
 PRIMARY BR_LIBR constant
 /INDEXTERM
-INDEXTERM ../docs/building_plugins.html#AEN2554
-INDEXPOINT ../docs/building_plugins.html#AEN2557
+INDEXTERM ../docs/building_plugins.html#AEN2562
+INDEXPOINT ../docs/building_plugins.html#AEN2565
 TITLE Building Plugins With Mac OS X
 significance NORMAL
 PRIMARY Mac OS X
 /INDEXTERM
-INDEXTERM ../docs/building_plugins.html#AEN2569
-INDEXPOINT ../docs/building_plugins.html#AEN2572
+INDEXTERM ../docs/building_plugins.html#AEN2577
+INDEXPOINT ../docs/building_plugins.html#AEN2580
 TITLE Building Plugins With Linux
 significance NORMAL
 PRIMARY Linux
 /INDEXTERM
-INDEXTERM ../docs/building_plugins.html#AEN2580
-INDEXPOINT ../docs/building_plugins.html#AEN2583
+INDEXTERM ../docs/building_plugins.html#AEN2588
+INDEXPOINT ../docs/building_plugins.html#AEN2591
 TITLE Building Plugins With Windows
 significance NORMAL
 PRIMARY Windows
 /INDEXTERM
 INDEXTERM ../docs/archiving_data.html
-INDEXPOINT ../docs/archiving_data.html#AEN2599
+INDEXPOINT ../docs/archiving_data.html#AEN2607
 TITLE Archiving Plugin Data With The data Type
 significance NORMAL
 PRIMARY data archiving
 /INDEXTERM
 INDEXTERM ../docs/archiving_data.html
-INDEXPOINT ../docs/archiving_data.html#AEN2601
+INDEXPOINT ../docs/archiving_data.html#AEN2609
 TITLE Archiving Plugin Data With The data Type
 significance NORMAL
 PRIMARY brData structure
 /INDEXTERM
 INDEXTERM ../docs/using_plugins.html
-INDEXPOINT ../docs/using_plugins.html#AEN2623
+INDEXPOINT ../docs/using_plugins.html#AEN2631
 TITLE Using Plugins in Simulations
 significance NORMAL
 PRIMARY @plugin
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2715
+INDEXPOINT ../docs/classes.html#AEN2784
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Abstract class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2720
+INDEXPOINT ../docs/classes.html#AEN2789
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY BallJoint class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2725
+INDEXPOINT ../docs/classes.html#AEN2794
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY BraitenbergControl class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2730
+INDEXPOINT ../docs/classes.html#AEN2799
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY BraitenbergLight class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2735
+INDEXPOINT ../docs/classes.html#AEN2804
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY BraitenbergSensor class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2740
+INDEXPOINT ../docs/classes.html#AEN2809
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY BraitenbergVehicle class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2745
+INDEXPOINT ../docs/classes.html#AEN2814
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY BraitenbergWheel class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2750
+INDEXPOINT ../docs/classes.html#AEN2819
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Camera class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2755
+INDEXPOINT ../docs/classes.html#AEN2824
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Control class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2760
+INDEXPOINT ../docs/classes.html#AEN2829
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Cube class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2765
+INDEXPOINT ../docs/classes.html#AEN2834
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY CustomShape class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2770
+INDEXPOINT ../docs/classes.html#AEN2839
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Data class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2775
+INDEXPOINT ../docs/classes.html#AEN2844
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY File class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2780
+INDEXPOINT ../docs/classes.html#AEN2849
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY FixedJoint class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2785
+INDEXPOINT ../docs/classes.html#AEN2854
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Genome class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2790
+INDEXPOINT ../docs/classes.html#AEN2859
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Graph class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2795
+INDEXPOINT ../docs/classes.html#AEN2864
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Image class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2800
+INDEXPOINT ../docs/classes.html#AEN2869
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY JavaObject class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2805
+INDEXPOINT ../docs/classes.html#AEN2874
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Joint class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2810
+INDEXPOINT ../docs/classes.html#AEN2879
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Link class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2815
+INDEXPOINT ../docs/classes.html#AEN2884
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY MenuItem class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2820
+INDEXPOINT ../docs/classes.html#AEN2889
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Mobile class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2825
+INDEXPOINT ../docs/classes.html#AEN2894
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Movie class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2830
+INDEXPOINT ../docs/classes.html#AEN2899
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY MultiBody class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2835
+INDEXPOINT ../docs/classes.html#AEN2904
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY NetworkServer class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2840
+INDEXPOINT ../docs/classes.html#AEN2909
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY NeuralNetwork class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2845
+INDEXPOINT ../docs/classes.html#AEN2914
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Object class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2850
+INDEXPOINT ../docs/classes.html#AEN2919
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Patch class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2855
+INDEXPOINT ../docs/classes.html#AEN2924
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY PatchGrid class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2860
+INDEXPOINT ../docs/classes.html#AEN2929
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY PatchToroid class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2865
+INDEXPOINT ../docs/classes.html#AEN2934
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY PhysicalControl class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2870
+INDEXPOINT ../docs/classes.html#AEN2939
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY PolygonCone class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2875
+INDEXPOINT ../docs/classes.html#AEN2944
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY PolygonDisk class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2880
+INDEXPOINT ../docs/classes.html#AEN2949
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY PrismaticJoint class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2885
+INDEXPOINT ../docs/classes.html#AEN2954
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Real class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2890
+INDEXPOINT ../docs/classes.html#AEN2959
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY RevoluteJoint class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2895
+INDEXPOINT ../docs/classes.html#AEN2964
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Shape class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2900
+INDEXPOINT ../docs/classes.html#AEN2969
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Sound class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2905
+INDEXPOINT ../docs/classes.html#AEN2974
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Sphere class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2910
+INDEXPOINT ../docs/classes.html#AEN2979
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Stationary class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2915
+INDEXPOINT ../docs/classes.html#AEN2984
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Terrain class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2920
+INDEXPOINT ../docs/classes.html#AEN2989
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Tone class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2925
+INDEXPOINT ../docs/classes.html#AEN2994
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY UniversalJoint class
 /INDEXTERM
 INDEXTERM ../docs/classes.html
-INDEXPOINT ../docs/classes.html#AEN2930
+INDEXPOINT ../docs/classes.html#AEN2999
 TITLE breve Class Documentation
 significance NORMAL
 PRIMARY Wanderer class

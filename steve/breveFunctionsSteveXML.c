@@ -68,7 +68,9 @@ int stCDearchiveXMLObject(brEval args[], brEval *target, brInstance *i) {
 */
 
 int stCDearchiveXMLObjectFromString(brEval args[], brEval *target, brInstance *i) {
-    STINSTANCE(target) = stXMLDearchiveObjectFromString(i->engine, BRSTRING(&args[0]));
+	stInstance *si = stXMLDearchiveObjectFromString(i->engine, BRSTRING(&args[0]));
+
+    STINSTANCE(target) = si->breveInstance;
 
     return EC_OK;
 }

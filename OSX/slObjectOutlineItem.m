@@ -69,7 +69,7 @@
 		evalInstance = STINSTANCE(&eval);
         childCount = slCountList(evalInstance->type->variableList);
     } else if([self getExpandable] && eval.type == AT_LIST) {
-        childCount = brEvalListCount(BRLIST(&eval));
+        childCount = BRLIST(&eval)->count;
     } else if([self getExpandable] && isArray) {
         childCount = stv->type->arrayCount;
     } else {
@@ -133,7 +133,7 @@
 	}
 
 	if(!isArray && eval.type == AT_LIST) {
-		[self updateChildCount: brEvalListCount(BRLIST(&eval))];
+		[self updateChildCount: BRLIST(&eval)->count];
 	}
 
     if(!isArray && eval.type == AT_INSTANCE) {
@@ -188,7 +188,6 @@
 
 - (NSString*)getValue {
     stInstance *o;
-    NSString *result;
 
     if(isArray) return [NSString stringWithFormat: @"%p [array]", &instance->variables[offset]];
 

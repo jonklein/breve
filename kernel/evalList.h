@@ -55,8 +55,6 @@ struct brEvalList {
 
 void brEmptyEvalList(brEvalListHead *lh);
 
-int stCountEvalList(brEvalListHead *a);
-
 void brEvalListFree(brEvalListHead *a);
 
 int brEvalListCompare(const void *a, const void *b);

@@ -47,6 +47,8 @@
 #include "engine.h"
 
 #include "breveObjectAPI.h"
+#include "frontendAPI.h"
+
 #include "breveEval.h"
 
 #include "multithread.h"
@@ -71,8 +73,6 @@
 
 #include "format.h"
 #include "interface.h"
-
-#include "frontend.h"
 
 int yyparse(void);
 char *slFormatText(char *text);

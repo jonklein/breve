@@ -227,7 +227,8 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 
 		linkSetForce(linkPointer, newForce).
 
-	# + to set-force at-point location (vector):
+	# + to set-force at-point location (vector) to newForce (vector):
+
 
 	+ to set-torque to newTorque (vector):
 		% Sets the torque acting on the object to newTorque.  This 

@@ -6,27 +6,38 @@
 <chapter id="source">
 <title>The breve Source Code</title>
 <para>
-This chapter describes the breve source implementation, and how it can be extended.
+This chapter describes the breve source implementation, and how it can be 
+extended.  This documentation describes only key API features for extending
+certain aspects of breve functionality.  For more detailed documentation of 
+the source code, see the <ulink url="../source">full breve source code 
+documentation</ulink>.
+</para>
 
+<sect1 id="source_structure"><title>The basic structure of the breve source code</title>
+<para>
 The following image shows the basic structure of the breve source code:
 <mediaobject><imageobject><imagedata align="center" fileref="images/breve_structure.jpg"></imageobject></mediaobject>
 
-The bottom layer, world simulation, is found in the <function>world</function> directory of the source.  
-
+The text in bold for each layer indicates the source code directory where the 
+source code for that layer is found.
 </para>
+</sect1>
 
-<sect1 id="frontends"><title>Adding a front-end language to the breve engine: the breve object API</title>
+<sect1 id="language_frontend"><title>Adding a front-end language to the breve engine: the breve object API</title>
+
 <para>
-This section describes how to incorporate another front-end language with breve.  Using 
-this information, you'll be able to use the breve engine from any language which can 
-interface a C library.
+This section describes how to incorporate another front-end language with breve.  
+Using this information, you'll be able to use the breve engine from any language 
+which can interface a C library.
 </para>
+
 <para>
 The following steps are required to set up a language front-end in breve.
 <itemizedlist>
 <listitem><para>Write special callbacks for the language front-end (<xref linkend="breve_object_callbacks">).</para></listitem>
 <listitem><para>Construct a new breve object type, and add classes to the breve engine (<xref linkend="breve_object_type">).</para></listitem>
 <listitem><para>Add instances to the breve engine (<xref linkend="breve_object_api">).</para></listitem>
+<listitem><para>Connect the language frontend to an application frontend.</para></listitem>
 </itemizedlist>
 </para>
 
@@ -103,14 +114,16 @@ This callback is given two breve object pointers, and must return 1 if
 
 </sect2>
 
-<sect2 id="breve_object_type"><title>Specifying a new breve object type, and registering objects</title>
+<sect2 id="breve_object_type"><title>Specifying a new breve object type, and 
+registering objects</title>
 <para>
-Every object in a front-end language that will have instances in the breve engine must be registered
-with the breve engine.  Moreoever, when an object is added to the breve engine, it must also tell the
-engine what "type" of object it is.  Each object "type" corresponds to a different language front-end
-and a different set of callbacks, so for each language front-end one creates, one must also create
-a <function>brObjectType</function> structure which contains the proper callbacks.  The structure 
-is shown below.
+Every object in a front-end language that will have instances in the breve engine 
+must be registered with the breve engine.  Moreoever, when an object is added 
+to the breve engine, it must also tell the engine what "type" of object it is.  
+Each object "type" corresponds to a different language front-end and a different 
+set of callbacks, so for each language front-end one creates, one must also create 
+a <function>brObjectType</function> structure which contains the proper callbacks.  
+The structure is shown below.
 <screen>
 struct brObjectType {
 	int (*callMethod)(brInstance *instancePointer, brMethod *method, brEval **arguments, brEval *result);
@@ -189,7 +202,117 @@ struct brMethod {
 </screen>
 </para>
 </sect2>
+</sect1>
 
+<sect1 id="application_frontend"><title>Linking With the Existing breve Application Frontend</title>
+<para>
+Once you've written a language frontend to interface with a new programming 
+language, you'll need an <firstterm>application frontend</firstterm>.  The 
+application frontend is the program that a user runs to start a breve 
+simulation.  It can be either a standalone program, like the existing breve 
+frontends, or it can be any other application which creates and uses a breve 
+engine.  This section describes using the existing breve application 
+frontends with your own custom language frontend.  If you instead wish to 
+implement your own custom application frontend, you'll need to use the 
+functions described in <xref linkend="breve_engine">.
+</para>
+
+<para>
+To use the existing breve application frontends, you'll need to implement the 
+functions described below, and then link the breve executables against your 
+own language frontend and application frontend functions.  </para>
+
+<sect2><title>The <function>brFrontend</function> structure</title>
+<para>
+The application frontend function you'll need to implement make use of a
+<function>brFrontend</function> structure.  You'll use this structure 
+to access the breve engine and to access your own custom data structure.
+<screen>
+struct brFrontend {
+	brEngine *engine;
+	void *data;
+};
+</screen>
+</para>
+
+<para>
+If you wish to use the existing breve application frontends, you'll need 
+to implement the methods listed below.  You'll then need to link breve 
+against your language frontend library.
+</para>
+</sect2>
+
+<sect2><title><function>breveFrontendInitData</function></title>
+<para>
+The language-frontend must provide a <function>breveFrontendInitData</function> function:
+<screen>
+void *breveFrontendInitData(brEngine *engine);
+</screen>
+This method initializes and returns a structure to be used by your languge-frontend.
+The data returned will be stored in the <function>brFrontend</function> field 
+<function>data</function> and will be used in the functions below.
+</para>
+</sect2>
+
+<sect2><title><function>breveFrontendLoadSimulation</function></title>
+<para>
+The language-frontend must provide a <function>breveFrontendLoadSimulation</function> function:
+<screen>
+int breveFrontendLoadSimulation(brFrontend *d, char *code, char *file);
+</screen>
+</para>
+</sect2>
+
+<sect2><title><function>breveFrontendLoadSavedSimulation</function></title>
+<para>
+The language-frontend must provide a <function>breveFrontendLoadSavedSimulation</function> function:
+<screen>
+int breveFrontendLoadSavedSimulation(brFrontend *d, char *code, char *file, char *xmlFile);
+</screen>
+This function uses the language frontend data (found in the brFrontend field data) to load 
+an archived simulation.  The simulation archive is given as the xmlFile.  The file containing
+the original simulation code is provided as the file argument, with the text of that file in 
+the code argument.
+</para>
+</sect2>
+
+<sect2><title><function>breveFrontendCleanupData</function></title>
+<para>
+The language-frontend must provide a <function>breveFrontendCleanupData</function> function:
+<screen>
+void breveFrontendCleanupData(void *data);
+</screen>
+This function should free all memory associated with the structure that was returned earlier
+by <function>breveFrontendInitData</function>.
+</para>
+</sect2>
+
+<sect2><title>Linking your language-frontend with the application frontend</title>
+<para>
+The last step in preparing the breve binaries with a custom language frontend
+is to link the breve and breve_cli programs against your own language frontend
+and application frontend functions.  To do so, edit the file 
+<function>bin/Makefile</function> and change the variable 
+<function>LANGUAGE_FRONTEND_LIBRARY</function> to the libraries containing your
+own frontend functions.
+<screen>
+LANGUAGE_FRONTEND_LIBRARY   = -l<replaceable>myFrontendLibrary</replaceable>
+</screen>
+After running <function>make</function>, the binaries 
+<function>bin/breve</function> and <function>bin/breve_cli</function> should
+run your custom language frontend.
+</para>
+</sect2>
+
+</sect1>
+
+<sect1><title>Implementing a Custom Application Frontend</title>
+<para>
+To implement a custom application frontend, or to use breve 
+simulations as part of another program, you'll need to familiarize 
+yourself with functions relating to the breve engine structure
+<function>brEngine</function>.
+</para>
 </sect1>
 
 </chapter>

@@ -170,8 +170,6 @@ brEngine *brEngineNew() {
 
 	e->dlPlugins = NULL;
 
-	e->nibInterface = NULL;
-
 	getcwd(e->path, MAXPATHLEN);
 
 	e->world = slWorldNew();
@@ -322,7 +320,6 @@ void brEngineFree(brEngine *e) {
 	if(e->camera) slCameraFree(e->camera);
 	if(e->world) slWorldFree(e->world);
 	if(e->outputPath) slFree(e->outputPath);
-	if(e->nibInterface) slFree(e->nibInterface);
 	if(e->iTunesData) slFree(e->iTunesData);
 
 	l = e->events;

@@ -68,3 +68,4 @@
 #include "shadow.h"
 
 #include "movie.h"
+#include "netsim.h"

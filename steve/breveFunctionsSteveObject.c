@@ -65,7 +65,7 @@ extern stSteveData *gSteveData;
 */
 
 int stSSetFreedInstanceProtection(brEval args[], brEval *target, brInstance *i) {
-	stSteveData *data = i->class->type;
+	stSteveData *data = i->class->type->data;
 
     data->retainFreedInstances = BRINT(&args[0]);
     return EC_OK;
