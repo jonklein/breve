@@ -616,15 +616,20 @@ void brInterrupt(brEngine *engine) {
 
 	brPauseTimer(engine);
 
+	fflush(stdin);
+	fpurge(stdin);
 	printf("\n\nSimulation interupted.  Type a steve command, 'x' to quit, or hit enter to continue\n");
 	fflush(stdout);
 
-	line = readline("> ");
-	if(*line) add_history(line);
+	line = readline("breve> ");
 
-	if(line[0] == 'x') brQuit(engine);
+	if(line && *line) add_history(line);
+
+	if(!line || line[0] == 'x') brQuit(engine);
 
 	if(*line && line[0] != '\n') stRunSingleStatement(frontend->data, engine, line);
+
+	free(line);
 
 	if(gFull) glutFullScreen();
 

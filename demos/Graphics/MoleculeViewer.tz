@@ -1,0 +1,76 @@
+
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use File.
+@use Control.
+@use Stationary.
+
+# tell the engine the name of the controller
+
+Controller PDBViewer.
+
+# implment the controller object
+
+Control : PDBViewer {
+    + variables:
+        file (object).
+        location (vector).
+        atom (object).
+
+        hShape (object).
+
+    + to init:
+        fields (list).
+        average (vector).
+		atomString (string).
+
+        self set-background-color to (0, 0, 0).
+
+        hShape = new Sphere init-with radius .3.
+
+        file = new File.
+
+		if (self get-argument-count) > 1: {
+        	file open-for-reading with-file (self get-argument at-index 1).
+		} else {
+        	file open-for-reading with-file "DNA.pdb".
+		}
+
+        while | fields = (file read-line-as-whitespace-delimited-list) | != 0: {
+            if fields{0} == "ATOM": {
+				if | fields | == 10: {
+					# the old pdb format [?]
+					atomString = fields{9}.
+                	location = (fields{5}, fields{6}, fields{7}).
+				} else {
+					# the new pdb
+					atomString = fields{11}.
+                	location = (fields{6}, fields{7}, fields{8}).
+				}
+
+                average += location.
+
+                atom = new Mobile.
+
+                atom move to location.
+
+                if atomString == "C": atom set-color to (0, 0, 0).
+                if atomString == "O": atom set-color to (0, 0, 1).
+                if atomString == "N": atom set-color to (0, 1, 0).
+                if atomString == "P": atom set-color to (1, 0, 0).
+                if atomString == "H": atom set-shape to hShape.
+            }
+        }
+
+        average /= | all Mobiles |.
+
+        self point-camera at average from average + (30, 0, 30).
+        self move-light to average + (30, 0, 30).
+        self enable-lighting.
+
+    + to iterate:
+        self pivot-camera y 0.03 x 0.0.
+        super iterate.
+}

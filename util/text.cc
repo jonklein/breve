@@ -164,11 +164,9 @@ char *slUtilReadFile(char *path) {
 	int total = 0, n;
 
 	if(stat(path, &st)) {
-		/* unable to stat */
-
+		// unable to stat 
 		return NULL;
 	}
-
 
 	if(!(fp = gzopen(path, "r"))) {
 		slMessage(DEBUG_ALL, "error opening file \"%s\": %s\n", path, strerror(errno));

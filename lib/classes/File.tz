@@ -1,16 +1,22 @@
 @use Abstract.
 
-Abstract : File (aka Files) [version 1.8] {
+Abstract : File (aka Files) [version 2.0] {
 	% A File is an object used for creating textual output of your breve 
-	% simulation.
+	% simulation, or for reading in data from text files.
 	% <p>
-	% File is not meant as a tool for archiving and dearchiving data--for 
-	% a discussion of archiving and dearchiving objects, see the 
+	% Though some File methods can be used to encode or decode simulation
+	% objects, it is not the preferred method for archiving and dearchiving 
+	% objects--for a discussion of archiving and dearchiving objects, see the 
 	% <a href="http://www.spiderland.org/breve/docs/docs/archiving.html">Archiving and Dearchiving section</a>
 	% of the breve documentation.
 
 	+ variables:
 		filePointer (pointer).
+
+	+ to is-end-of-file:
+		% Returns whether the file pointer is at the end of the file.
+
+		return fileEOF(filePointer).
 
   + section "Opening Files"
 
@@ -62,9 +68,21 @@ Abstract : File (aka Files) [version 1.8] {
 
 	+ to read-line:
 		% Reads a single line of text from the file (ending with a newline).
-		% The size of the line read is limited to 10239
+		% The size of the line read is limited to 10239.
 
 		return readLine(filePointer).
+
+	+ to read-line-as-whitespace-delimited-list:
+		% The size of the line read is limited to 10239.
+
+		l (list).
+
+		return readWhitespaceDelimitedList(filePointer).
+
+		return l.
+
+	+ to read-line-as-list with-delimiter delimiterString (string):
+		% The size of the line read is limited to 10239.
 
   + section "Writing to an Open File"
 

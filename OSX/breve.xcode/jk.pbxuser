@@ -133,7 +133,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 114964643;
+			PBXPerProjectTemplateStateSaveDate = 115010053;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -690,11 +690,7 @@
 				PBXModuleWindowStatusBarHidden = YES;
 				RubberWindowFrame = "267 380 745 408 0 0 1280 832 ";
 			};
-			PBXWorkspaceStateSaveDate = 114964643;
-		};
-		perUserProjectItems = {
-			485594B106D28A1C0036EAAD = 485594B106D28A1C0036EAAD;
-			485594E206D2988C0036EAAD = 485594E206D2988C0036EAAD;
+			PBXWorkspaceStateSaveDate = 115010053;
 		};
 		sourceControlManager = 48E065B3055C318700C40B45;
 		userBuildSettings = {
@@ -753,23 +749,6 @@
 		);
 		sourceDirectories = (
 		);
-	};
-	485594B106D28A1C0036EAAD = {
-		fRef = F5BD20C50397BFC001980AE4;
-		isa = PBXTextBookmark;
-		rLen = 1;
-		rLoc = 296;
-		rType = 1;
-	};
-	485594E206D2988C0036EAAD = {
-		fRef = F5BD20C50397BFC001980AE4;
-		isa = PBXTextBookmark;
-		name = "slBreveEngine.m: 297";
-		rLen = 0;
-		rLoc = 7287;
-		rType = 0;
-		vrLen = 327;
-		vrLoc = 7161;
 	};
 	48BB5D1405C9659B007C7301 = {
 		fileReference = 2A37F4ACFDCFA73011CA2CEA;

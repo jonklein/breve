@@ -110,6 +110,7 @@ int brIOpenFileForReading(brEval args[], brEval *target, brInstance *i) {
 	if(!file) {
 		slMessage(DEBUG_ALL, "Could not locate file \"%s\"\n", BRSTRING(&args[0]));
 		BRPOINTER(target) = 0;
+		return EC_OK;
 	}
 
 	p = slMalloc(sizeof(brFilePointer));
@@ -171,13 +172,93 @@ int brIReadLine(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slFgets(&line[0], 10240, p->file);
-
-	line[strlen(line) - 1] = 0;
+	slFgets(&line[0], 10239 , p->file);
 
 	BRSTRING(target) = slStrdup(line);
 
     return EC_OK;
+}
+
+/*!
+	\brief Reads list data delimited with a specified string.
+*/
+
+int brIReadDelimitedList(brEval args[], brEval *target, brInstance *i) {
+	brEvalListHead *head;
+	brFilePointer *p;
+	char line[10240];
+	brEval eval;
+	int n = 0;
+
+	p = BRPOINTER(&args[0]);
+
+	BRLIST(target) = head = brEvalListNew();
+
+	if(!p || !p->file) {
+		slMessage(DEBUG_ALL, "readDelimitedList called with uninitialized file\n");
+		return EC_ERROR;
+	}
+
+	slFgets(line, 10239, p->file);
+
+	eval.type = AT_STRING;
+
+	while((BRSTRING(&eval) = slSplit(line, BRSTRING(&args[1]), n++)))
+		brEvalListInsert(head, head->count, &eval);
+
+
+	return EC_OK;
+}
+
+/*!
+	\brief Reads space delimited data into a list.
+*/
+
+int brIReadWhitespaceDelimitedList(brEval args[], brEval *target, brInstance *i) {
+	brFilePointer *p;
+	brEvalListHead *head;
+	char line[10240];
+	char field[10240];
+	brEval eval;
+	int n = 0, start;
+
+	p = BRPOINTER(&args[0]);
+
+	BRLIST(target) = head = brEvalListNew();
+
+	if(!p || !p->file) {
+		slMessage(DEBUG_ALL, "readWhitespaceDelimitedList called with uninitialized file\n");
+		return EC_ERROR;
+	}
+
+	slFgets(line, 10239, p->file);
+
+	start = 0;
+
+	eval.type = AT_STRING;
+
+	while(line[n]) {
+		if(iswspace(line[n])) {
+			// if we're at a space, we've found the end of the field.
+
+			strncpy(field, &line[start], n - start);
+			field[n - start] = 0;
+
+			// continue to the next field data.
+
+			while(line[n] && iswspace(line[n])) n++;
+
+			BRSTRING(&eval) = field;
+
+			brEvalListInsert(head, head->count, &eval);
+
+			start = n;
+		} else {
+			n++;
+		}
+	}
+
+	return EC_OK;
 }
 
 /*!
@@ -263,6 +344,23 @@ int brICloseFile(brEval args[], brEval *target, brInstance *i) {
 
     return EC_OK;
 }
+
+/*!
+	\brief Checks a file for EOF.
+*/
+
+int brIFileEOF(brEval args[], brEval *target, brInstance *i) {
+	brFilePointer *p = BRPOINTER(&args[0]);
+
+	if(!p || !p->file) {
+		slMessage(DEBUG_ALL, "closeFile called with uninitialized file\n");
+		return EC_ERROR;
+	}
+
+	BRINT(target) = feof(p->file);
+
+	return EC_OK;
+}
 /*@}*/
 
 void breveInitFileFunctions(brNamespace *n) {
@@ -270,9 +368,12 @@ void breveInitFileFunctions(brNamespace *n) {
     brNewBreveCall(n, "openFileForWriting", brIOpenFileForWriting, AT_POINTER, AT_STRING, 0);
     brNewBreveCall(n, "openFileForReading", brIOpenFileForReading, AT_POINTER, AT_STRING, 0);
     brNewBreveCall(n, "readLine", brIReadLine, AT_STRING, AT_POINTER, 0);
+    brNewBreveCall(n, "readDelimitedList", brIReadWhitespaceDelimitedList, AT_LIST, AT_POINTER, AT_STRING, 0);
+    brNewBreveCall(n, "readWhitespaceDelimitedList", brIReadWhitespaceDelimitedList, AT_LIST, AT_POINTER, 0);
     brNewBreveCall(n, "readFileAsString", brIReadFileAsString, AT_STRING, AT_POINTER, 0);
     brNewBreveCall(n, "readFileAsData", brIReadFileAsData, AT_DATA, AT_POINTER, 0);
     brNewBreveCall(n, "writeString", brIWriteString, AT_NULL, AT_POINTER, AT_STRING, 0);
     brNewBreveCall(n, "writeData", brIWriteData, AT_NULL, AT_POINTER, AT_DATA, 0);
     brNewBreveCall(n, "closeFile", brICloseFile, AT_NULL, AT_POINTER, 0);
+    brNewBreveCall(n, "fileEOF", brIFileEOF, AT_INT, AT_POINTER, 0);
 }
