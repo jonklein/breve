@@ -42,6 +42,7 @@ int brIQProgramAddInstruction(brEval args[], brEval *target, brInstance *i) {
 		program->addInstruction(BRSTRING(&args[1]));
 		BRINT(target) = 0;
 	} catch(qgame::Error e) {
+		slMessage("error adding QGAME instruction: %s\n", e.s.c_str());
 		BRINT(target) = 1;
 	}
 
@@ -92,7 +93,18 @@ int brIQSysTestProgram(brEval args[], brEval *target, brInstance *i) {
 		start = start->next;
 	}
 
-	qgame::Result result = sys->testProgram(BRINT(&args[3]), prog, cases, qb, BRDOUBLE(&args[5]));
+	qgame::Result result;
+
+	try { 
+		result = sys->testProgram(BRINT(&args[3]), prog, cases, qb, BRDOUBLE(&args[5]));
+	} catch (qgame::Error e) {
+ 		slMessage(DEBUG_ALL, "error executing QGAME program: %s\n", e.s.c_str());
+ 		result.misses = -1;
+ 		result.maxError = -1;
+ 		result.avgError = -1;
+ 		result.maxExpOracles = -1;
+ 		result.avgExpOracles = -1;
+ 	}
 
 	list = brEvalListNew();
 
