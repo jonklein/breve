@@ -4,7 +4,7 @@ enum networkRequests {
     NR_XML
 };
 
-struct brNetworkServerData {
+struct brNetworkServer {
     brEngine *engine;
 	brInstance *recipient;
     char *index;

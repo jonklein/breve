@@ -36,7 +36,7 @@
 @include "Push.tz"
 
 # Simulation parameters. Additional parameters defined as controller variables, below.
-@define MAX_RANDOM_CODE_SIZE 30.
+@define MAX_RANDOM_CODE_SIZE 80.
 @define MAX_CODE_SIZE 50.
 @define MAX_MUTATION_NEW_CODE_SIZE 15.
 @define PUSH_EXECUTION_LIMIT 50.
@@ -744,6 +744,8 @@ Mobile : Bird (aka Birds) {
 
     + to initialize-randomly:        
         pushCode make-random-code max-length MAX_RANDOM_CODE_SIZE with-interpreter pushInterpreter.
+
+		# print (pushCode get-string).
 
         self move to random[(10, 0, 10)] - (5, 3, 5).
         self set-velocity to (0, 0, 0).

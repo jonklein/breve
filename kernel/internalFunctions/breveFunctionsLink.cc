@@ -72,7 +72,7 @@ int brILinkAddToWorld(brEval args[], brEval *target, brInstance *i) {
 
 int brILinkSetShape(brEval args[], brEval *target, brInstance *i) {
 	slLink *l = BRLINKPOINTER(&args[0]);
-	slShape *s = BRPOINTER(&args[1]);
+	slShape *s = (slShape*)BRPOINTER(&args[1]);
 
 	slLinkSetShape(l, s);
 

@@ -30,6 +30,8 @@
 #include <wininet.h>
 #endif /* MINGW */
 
+#define BRNETWORKSERVERPOINTER(p)	((brNetworkServer*)BRPOINTER(p))
+
 /*!
 	\brief Data about a network client, passed off to the function which
 	handles the connection.
@@ -37,7 +39,7 @@
 
 struct brNetworkClientData {
 	brEngine *engine;
-	brNetworkServerData *server;
+	brNetworkServer *server;
 	int socket;
 	struct sockaddr_in addr;
 };
@@ -46,7 +48,7 @@ struct brNetworkClientData {
 /*@{*/
 
 int brINetworkSetRecipient(brEval args[], brEval *target, brInstance *i) {
-	brNetworkServerData *data = BRPOINTER(&args[0]);
+	brNetworkServer *data = BRNETWORKSERVERPOINTER(&args[0]);
 	data->recipient = BRINSTANCE(&args[1]);
 
 	return EC_OK;
@@ -55,11 +57,11 @@ int brINetworkSetRecipient(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Shuts down a network server.
 
-	void closeServer(brNetworkServerData pointer).
+	void closeServer(brNetworkServer pointer).
 */
 
 int brICloseServer(brEval args[], brEval *target, brInstance *i) {
-	brNetworkServerData *data = BRPOINTER(&args[0]);
+	brNetworkServer *data = BRNETWORKSERVERPOINTER(&args[0]);
 
 	if(!data) {
 		slMessage(DEBUG_ALL, "closeServer called with invalid data\n");
@@ -81,11 +83,11 @@ int brICloseServer(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Sets the HTML index page of a server.
 
-	void setIndexPage(brNetworkServerData pointer, string).
+	void setIndexPage(brNetworkServer pointer, string).
 */
 
 int brISetIndexPage(brEval args[], brEval *target, brInstance *i) {
-	brNetworkServerData *data = BRPOINTER(&args[0]);
+	brNetworkServer *data = BRNETWORKSERVERPOINTER(&args[0]);
 
 	if(data->index) slFree(data->index);
 
@@ -97,11 +99,11 @@ int brISetIndexPage(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Gets the URL required to connect to the given server.
 
-	string getServerURL(brNetworkServerData pointer).
+	string getServerURL(brNetworkServer pointer).
 */
 
 int brIGetServerURL(brEval args[], brEval *target, brInstance *i) {
-	brNetworkServerData *data = BRPOINTER(&args[0]);
+	brNetworkServer *data = BRNETWORKSERVERPOINTER(&args[0]);
 	char hostname[1024], url[1024];
 	int l = 1024;
 
@@ -117,7 +119,7 @@ int brIGetServerURL(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Starts a network server listening on the given port.
 
-	brNetworkServerData pointer listenOnPort(int).
+	brNetworkServer pointer listenOnPort(int).
 */
 
 int brIListenOnPort(brEval args[], brEval *target, brInstance *i) {
@@ -148,10 +150,10 @@ char *brHostnameFromAddr(struct in_addr *addr) {
 	struct hostent *h;
 	static char numeric[256];
 
-	h = gethostbyaddr((const void*)addr, 4, AF_INET);
+	h = gethostbyaddr((const char*)addr, 4, AF_INET);
 
 	if(!h) {
-		unsigned char *address = (void*)addr;
+		unsigned char *address = (unsigned char*)addr;
 
 		sprintf(numeric, "%d.%d.%d.%d", address[0], address[1], address[2], address[3]);
 
@@ -165,9 +167,9 @@ char *brHostnameFromAddr(struct in_addr *addr) {
 	\brief Starts a network server on a given port.
 */
 
-brNetworkServerData *brListenOnPort(int port, brEngine *engine) {
+brNetworkServer *brListenOnPort(int port, brEngine *engine) {
 	int ssock;
-	brNetworkServerData *serverData;
+	brNetworkServer *serverData;
 	char hostname[1024];
 	int l = 1024;
 	struct sockaddr_in saddr;
@@ -177,7 +179,7 @@ brNetworkServerData *brListenOnPort(int port, brEngine *engine) {
 		return NULL;
 	}
 
-	serverData = malloc(sizeof(brNetworkServerData));
+	serverData = new brNetworkServer;
 
 	saddr.sin_family = AF_INET;
 	saddr.sin_port = htons(port);
@@ -199,7 +201,7 @@ brNetworkServerData *brListenOnPort(int port, brEngine *engine) {
 	serverData->port = port;
 	serverData->socket = ssock;
 	serverData->terminate = 0;
-	pthread_create(&serverData->thread, NULL, (void*)brListenOnSocket, serverData);
+	pthread_create(&serverData->thread, NULL, brListenOnSocket, serverData);
 
 	gethostname(hostname, l);
 
@@ -210,23 +212,26 @@ brNetworkServerData *brListenOnPort(int port, brEngine *engine) {
 	\brief Listens for connection on a socket.
 */
 
-void *brListenOnSocket(brNetworkServerData *serverData) {
-	brNetworkClientData *clientData;
+void *brListenOnSocket(void *data) {
+	brNetworkServer *serverData = (brNetworkServer*)data;
+
 	int caddr_size = sizeof(struct sockaddr_in);
 
 	while(!serverData->terminate) {
-		clientData = malloc(sizeof(brNetworkClientData));
+		brNetworkClientData clientData;
 
-		clientData->engine = serverData->engine;
-		clientData->server = serverData;
-		clientData->socket = accept(serverData->socket, (struct sockaddr*)&clientData->addr, &caddr_size);
+		clientData.engine = serverData->engine;
+		clientData.server = serverData;
+		clientData.socket = accept(serverData->socket, (struct sockaddr*)&clientData.addr, &caddr_size);
 
-		if(clientData->socket != -1) {
+		if(clientData.socket != -1) {
 			// fcntl(clientData->socket, F_SETFL, O_NONBLOCK);
-			brHandleConnection(clientData);
-			close(clientData->socket);
+			brHandleConnection(&clientData);
+			close(clientData.socket);
 		}
 	}
+
+	delete serverData;
 
 	return NULL;
 }
@@ -236,7 +241,7 @@ void *brListenOnSocket(brNetworkServerData *serverData) {
 */
 
 void *brHandleConnection(void *p) {
-	brNetworkClientData *data = p;	
+	brNetworkClientData *data = (brNetworkClientData*)p;	
 	brNetworkRequest request;
 	char *hostname, *buffer;
 	brStringHeader header;
@@ -280,7 +285,7 @@ void *brHandleConnection(void *p) {
 			slUtilRead(data->socket, &header, sizeof(brStringHeader));
 			length = header.length;
 			// slMessage(DEBUG_ALL, "received XML message of length %d from host %s\n", length, hostname); 
-			buffer = slMalloc(length+1);
+			buffer = new char[length+1];
 			slUtilRead(data->socket, buffer, length);
 			buffer[length] = 0;
 			pthread_mutex_lock(&data->engine->lock);
@@ -305,7 +310,7 @@ void *brHandleConnection(void *p) {
 				brMethodFree(method);	
 			}
 
-			slFree(buffer);
+			delete buffer;
 
 			pthread_mutex_unlock(&data->engine->lock);
 			break;
@@ -453,8 +458,8 @@ void brSendPage(brNetworkClientData *data, char *page) {
 	\brief Reads an HTTP request until no more data is found.
 */
 
-int brHTTPReadLine(int socket, void *buffer, size_t size ) {
-    int n, readcount = 0;
+int brHTTPReadLine(int socket, char *buffer, size_t size ) {
+    unsigned int n, readcount = 0;
 
     while(readcount < size) {
         n = read(socket, buffer + readcount, size - readcount);

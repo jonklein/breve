@@ -27,11 +27,11 @@ int slUtilGzread(char *ptr, int count, gzFile stream);
 int slUtilGzwrite(void *ptr, size_t size, size_t nmemb, gzFile stream);
 
 int slUtilFread(void *ptr, size_t size, size_t nmemb, FILE *stream);
-int slUtilFwrite(void *ptr, size_t size, size_t nmemb, FILE *stream);
+int slUtilFwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
 
 int slUtilRead(int socket, void *buffer, size_t size);
 int slUtilRecv(int socket, void *buffer, size_t size);
-int slUtilWrite(int socket, void *buffer, size_t size);
+int slUtilWrite(int socket, const void *buffer, size_t size);
 
 char *slUtilReadFile(char *path);
 int slUtilWriteFile(char *path, char *text);

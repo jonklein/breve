@@ -36,8 +36,8 @@ void breveInitNetworkFuncs(brNamespace *n);
 
 void *brHandleConnection(void *data);
 
-brNetworkServerData *brListenOnPort(int port, brEngine *engine);
-void *brListenOnSocket(brNetworkServerData *serverData);
+brNetworkServer *brListenOnPort(int port, brEngine *engine);
+void *brListenOnSocket(void *serverData);
 
 int brIListenOnPort(brEval args[], brEval *target, brInstance *i);
 int brICloseServer(brEval args[], brEval *target, brInstance *i);
@@ -51,7 +51,7 @@ void brSendPage(brNetworkClientData *data, char *page);
 
 int brHandleHTTPConnection(brNetworkClientData *data, char *request);
 
-int brHTTPReadLine(int socket, void *buffer, size_t size );
+int brHTTPReadLine(int socket, char *buffer, size_t size );
 
 #define SL_NET_404  "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\
 <HTML><HEAD> \

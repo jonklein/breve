@@ -111,7 +111,7 @@ char *slSplit(char *start, char *substr, int n) {
 	read before returning.
 */
 
-int slUtilFwrite(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+int slUtilFwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream) {
 	unsigned int n, written = 0;
 
 	while(written < nmemb) {
@@ -302,7 +302,7 @@ int slUtilRead(int socket, void *buffer, size_t size ) {
 	before returning.
 */
 
-int slUtilWrite(int socket, void *buffer, size_t size ) {
+int slUtilWrite(int socket, const void *buffer, size_t size ) {
 	int n, writecount = 0; 
   
 	while(writecount < size) {

@@ -57,7 +57,7 @@ typedef struct brDlPlugin brDlPlugin;
 typedef struct stThreadData stThreadData;
 
 typedef struct brNetworkClientData brNetworkClientData;
-typedef struct brNetworkServerData brNetworkServerData;
+typedef struct brNetworkServer brNetworkServer;
 typedef struct brNetworkRequest brNetworkRequest;
 typedef struct brStringHeader brStringHeader;
 

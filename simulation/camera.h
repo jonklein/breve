@@ -84,13 +84,6 @@ struct slCamera {
 
 	slWorldObject *shadowCatcher;
 
-	// this flag specifies whether the data in this camera is 
-	// automatically being rendered.  In the normal graphical
-	// breve, we can go a glReadPixels whenever we want, and 
-	// we know that we're getting an up-to-date image.  In 
-	// non GUI versions, we may have to update the camera 
-	// ourselves.
-
 	int flags;
 
 	double zClip;
@@ -101,6 +94,10 @@ struct slCamera {
 	int billboardCount;
 	int maxBillboards;
 	int billboardDrawList;
+
+	slVector billboardX;
+	slVector billboardY;
+	slVector billboardZ;
 
 	int cubeDrawList;
 

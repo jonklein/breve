@@ -507,18 +507,6 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 		glDisable(GL_LIGHTING);
 	}
 
-	// render the stationary objects in the simulation
-
-	// slRenderObjects(w, c, flags|DO_NO_LINK|DO_NO_TERRAIN);
-
-	slClearGLErrors("drew stationary");
-
-	if(c->drawLights && c->drawShadow) {
-		glEnable(GL_STENCIL_TEST);
-		glStencilFunc(GL_ALWAYS, 0, 0xffffffff);
-		glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
-	}
-
 	// render the mobile objects
 
 	slRenderObjects(w, c, flags|DO_NO_ALPHA);
@@ -532,9 +520,10 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 	slRenderObjects(w, c, flags|DO_ONLY_ALPHA);
 	glDepthMask(GL_TRUE);
 
-	if(!(flags & DO_BILLBOARDS_AS_SPHERES)) slProcessBillboards(w, c);
-
-	if(!(flags & DO_BILLBOARDS_AS_SPHERES)) slRenderBillboards(c, flags);
+	if(!(flags & DO_BILLBOARDS_AS_SPHERES)) {
+		slProcessBillboards(w, c);
+		slRenderBillboards(c, flags);
+	}
 
 	for(pi = w->patches.begin(); pi != w->patches.end(); pi++) (*pi)->draw(c);
 	
@@ -732,12 +721,13 @@ void slShadowPass(slWorld *w, slCamera *c) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glColor4f(0.0, 0.0, 0.0, 0.3);
+	// glColor4f(1.0, 0.0, 0.0, 1.0);
 
 	glPushMatrix();
 	glMultMatrixf((GLfloat*)shadowMatrix);
 	slRenderObjects(w, c, DO_NO_COLOR|DO_NO_TEXTURE|DO_NO_STATIONARY|DO_NO_BOUND|DO_NO_AXIS|DO_NO_TERRAIN);
 	glDisable(GL_LIGHTING);
-	glDisable(GL_CULL_FACE);
+	// glDisable(GL_CULL_FACE);
 	slRenderBillboards(c, DO_NO_COLOR|DO_NO_BOUND);
 	glPopMatrix();
 
@@ -872,49 +862,18 @@ void slRenderLabels(slWorld *w) {
 void slRenderBillboards(slCamera *c, int flags) {
 	slBillboardEntry *b;
 	GLfloat matrix[16];
+	slVector normal;
 	int n;
 	int lastTexture = -1;
-	slVector normal, billboardX, billboardY, billboardZ;
-
-	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-
-	billboardX.x = matrix[0];
-	billboardX.y = matrix[4];
-	billboardX.z = matrix[8];
-
-	billboardY.x = matrix[1];
-	billboardY.y = matrix[5];
-	billboardY.z = matrix[9];
-
-	billboardZ.x = matrix[2];
-	billboardZ.y = matrix[6];
-	billboardZ.z = matrix[10];
 
 	slVectorCopy(&c->location, &normal);
 	slVectorNormalize(&normal);
-
-	if(c->billboardDrawList == 0) c->billboardDrawList = glGenLists(1);
 
 	if(!(flags & DO_NO_TEXTURE)) {
 		glPushAttrib(GL_LIGHTING_BIT|GL_TRANSFORM_BIT|GL_TEXTURE_BIT|GL_COLOR_BUFFER_BIT);
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
 	}
-
-	glNewList(c->billboardDrawList, GL_COMPILE);
-
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(1.0, 1.0); 
-		glVertex3f(billboardX.x + billboardY.x, billboardX.y + billboardY.y, billboardX.z + billboardY.z);
-		glTexCoord2f(0.0, 1.0);
-		glVertex3f(-billboardX.x + billboardY.x, -billboardX.y + billboardY.y, -billboardX.z + billboardY.z);
-		glTexCoord2f(1.0, 0.0); 
-		glVertex3f(billboardX.x - billboardY.x, billboardX.y - billboardY.y, billboardX.z - billboardY.z);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(-billboardX.x - billboardY.x, -billboardX.y - billboardY.y, -billboardX.z - billboardY.z);
-	glEnd();
-
-	glEndList();
 
 	// we do want to have a depth test against other objects in the world. 
 	// but we do our own back-to-front billboard sort and we do not want  
@@ -964,10 +923,10 @@ void slRenderBillboards(slCamera *c, int flags) {
 			glScalef(1.1, 1.1, 1.1);
 			glColor4f(0.0, 0.0, 0.0, 1.0);
 			glBegin(GL_LINE_LOOP);
-				glVertex3f(billboardX.x + billboardY.x, billboardX.y + billboardY.y, billboardX.z + billboardY.z);
-				glVertex3f(-billboardX.x + billboardY.x, -billboardX.y + billboardY.y, -billboardX.z + billboardY.z);
-				glVertex3f(-billboardX.x - billboardY.x, -billboardX.y - billboardY.y, -billboardX.z - billboardY.z);
-				glVertex3f(billboardX.x - billboardY.x, billboardX.y - billboardY.y, billboardX.z - billboardY.z);
+				glVertex3f(c->billboardX.x + c->billboardY.x, c->billboardX.y + c->billboardY.y, c->billboardX.z + c->billboardY.z);
+				glVertex3f(-c->billboardX.x + c->billboardY.x, -c->billboardX.y + c->billboardY.y, -c->billboardX.z + c->billboardY.z);
+				glVertex3f(-c->billboardX.x - c->billboardY.x, -c->billboardX.y - c->billboardY.y, -c->billboardX.z - c->billboardY.z);
+				glVertex3f(c->billboardX.x - c->billboardY.x, c->billboardX.y - c->billboardY.y, c->billboardX.z - c->billboardY.z);
 			glEnd();
 			glPopMatrix();
 			if(!(flags & DO_NO_TEXTURE)) glEnable(GL_TEXTURE_2D);
@@ -1168,6 +1127,7 @@ void slProcessBillboards(slWorld *w, slCamera *c) {
 	GLfloat matrix[16];
 	slSphere *ss;
 	std::vector<slWorldObject*>::iterator wi;
+	slVector normal;
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 
@@ -1188,6 +1148,35 @@ void slProcessBillboards(slWorld *w, slCamera *c) {
 	}
 
 	slSortBillboards(c);
+
+	c->billboardX.x = matrix[0];
+	c->billboardX.y = matrix[4];
+	c->billboardX.z = matrix[8];
+
+	c->billboardY.x = matrix[1];
+	c->billboardY.y = matrix[5];
+	c->billboardY.z = matrix[9];
+
+	c->billboardZ.x = matrix[2];
+	c->billboardZ.y = matrix[6];
+	c->billboardZ.z = matrix[10];
+
+	if(c->billboardDrawList == 0) c->billboardDrawList = glGenLists(1);
+
+	glNewList(c->billboardDrawList, GL_COMPILE);
+
+	glBegin(GL_TRIANGLE_STRIP);
+		glTexCoord2f(1.0, 1.0); 
+		glVertex3f(c->billboardX.x + c->billboardY.x, c->billboardX.y + c->billboardY.y, c->billboardX.z + c->billboardY.z);
+		glTexCoord2f(0.0, 1.0);
+		glVertex3f(-c->billboardX.x + c->billboardY.x, -c->billboardX.y + c->billboardY.y, -c->billboardX.z + c->billboardY.z);
+		glTexCoord2f(1.0, 0.0); 
+		glVertex3f(c->billboardX.x - c->billboardY.x, c->billboardX.y - c->billboardY.y, c->billboardX.z - c->billboardY.z);
+		glTexCoord2f(0.0, 0.0);
+		glVertex3f(-c->billboardX.x - c->billboardY.x, -c->billboardX.y - c->billboardY.y, -c->billboardX.z - c->billboardY.z);
+	glEnd();
+
+	glEndList();
 }
 
 /*! 
