@@ -30,8 +30,10 @@
 #include <stdio.h>
 #include <signal.h>
 
+#ifdef HAVE_LIBREADLINE
 #include <readline/readline.h>
 #include <readline/history.h>
+#endif
 
 #include "steve.h"
 #include "breve.h"
