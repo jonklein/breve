@@ -222,6 +222,11 @@ Abstract : Control (aka Controls) [version 1.9] {
 		
 		simStep = timeStep.
 
+	+ to get-integration-step:
+		% Returns the current integration step size.
+		
+		return simStep.
+
 	+ to set-iteration-step to timeStep (float):
 		% Sets the iteration stepsize to timeStep.  The iteration stepsize
 		% is simply the number of simulated seconds run between calling the 
@@ -241,6 +246,11 @@ Abstract : Control (aka Controls) [version 1.9] {
 		simTime = timeStep.
 
 		if simStep > simTime: simTime = simStep.
+#
+	+ to get-iteration-step:
+		% Returns the current iteration step size.
+		
+		return simTime.
 
   + section "Setting the Random Seed"
 
