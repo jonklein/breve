@@ -20,8 +20,6 @@
 
 #include "neural.h"
 
-#include <math.h>
-
 #define AC 1
 #define LC .45
 #define MC .45
