@@ -137,7 +137,9 @@ CLI_release: clean
 	mkdir $(CLI_FOLDER)/lib
 	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin
 	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin
-	cp bin/glut32.dll $(IDE_FOLDER)
+ifeq ($(PLATFORM),windows)
+	cp bin/glut32.dll $(CLI_FOLDER)
+endif
 	cp -R lib $(CLI_FOLDER)
 	cp -R demos $(CLI_FOLDER)
 	rm -rf $(CLI_FOLDER)/demos/Music
@@ -152,12 +154,14 @@ CLI_release: clean
 	@ARCHIVER@ breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@ $(CLI_FOLDER)
 
 WX_release: clean
-	# $(MAKE) optimize
+	$(MAKE) optimize
 	cd wx; make
 	mkdir $(IDE_FOLDER)
 	mkdir $(IDE_FOLDER)/lib
 	cp wx/breveIDE@EXE_SUFFIX@ $(IDE_FOLDER)
+ifeq ($(PLATFORM),windows)
 	cp bin/glut32.dll $(IDE_FOLDER)
+endif
 	cp -R lib/classes $(IDE_FOLDER)/lib
 	cp -R demos $(IDE_FOLDER)
 	rm -rf $(IDE_FOLDER)/demos/Music
