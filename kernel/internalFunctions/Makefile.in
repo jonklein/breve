@@ -2,7 +2,7 @@ INTERNALO = $(shell ls *.c | sed s/\.c$$/\.o/)
 
 all: $(INTERNALO)
 
-INCLUDE	+= -I.. -I../../include/breve
+INCLUDE	+= -I.. -I../../include/breve @CPPFLAGS@
 
 %.o: %.c
 	$(CC) $(PLATFORM_OPT_FLAGS) $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
