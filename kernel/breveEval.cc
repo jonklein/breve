@@ -150,11 +150,11 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 				}
 
 				if(desc) {
-					result = slMalloc(strlen(pi->object->name) + (sizeof(void*)*2) + 6 + strlen(desc));
+					result = (char*)slMalloc(strlen(pi->object->name) + (sizeof(void*)*2) + 6 + strlen(desc));
 					sprintf(result, "%s (%p) %s", pi->object->name, pi, desc);
 					return result;
 				} else {
-					result = slMalloc(strlen(pi->object->name) + (sizeof(void*)*2) + 6);
+					result = (char*)slMalloc(strlen(pi->object->name) + (sizeof(void*)*2) + 6);
 					sprintf(result, "%s (%p)", pi->object->name, pi);
 					return result;
 				}

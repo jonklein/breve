@@ -279,7 +279,7 @@ void slUpdateCamera(slCamera *c) {
 */
 
 void slSetCameraText(slCamera *c, int n, char *string, float x, float y, slVector *v) {
-	if((unsignedf int)n >= c->text.size() || n < 0) {
+	if((unsigned int)n >= c->text.size() || n < 0) {
 	    slMessage(DEBUG_ALL, "out of bounds text position %d in slSetCameraText\n", n);
 	    return;
 	}

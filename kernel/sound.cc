@@ -26,12 +26,14 @@ brSoundMixer *brNewSoundMixer() {
 	int error;
 
 	mixer = new brSoundMixer;
+
 	mixer->streamShouldEnd = 0;
 
 	error = Pa_OpenDefaultStream(&mixer->stream, 0, 2, paInt32, MIXER_SAMPLE_RATE, 256, 0, brPASoundCallback, mixer);
 
 	if(error) {
 		slMessage(DEBUG_ALL, "Error (%d) opening new sound stream!\n", error);
+		delete mixer;
 		return NULL;
 	}
 
@@ -41,9 +43,9 @@ brSoundMixer *brNewSoundMixer() {
 }
 
 void brFreeSoundMixer(brSoundMixer *mixer) {
-	mixer->streamShouldEnd = 1;
-
 	if(!mixer) return;
+
+	mixer->streamShouldEnd = 1;
 
 	Pa_StopStream(mixer->stream);
 	while(mixer->stream && Pa_StreamActive(mixer->stream));
@@ -58,6 +60,8 @@ void brFreeSoundMixer(brSoundMixer *mixer) {
 brSoundPlayer *brNextPlayer(brSoundMixer *mixer) {
 	brSoundPlayer *player = NULL;
 	unsigned int n = 0;
+
+	if(!mixer) return NULL;
 
 	for(n=0;n<mixer->players.size();n++) {
 		if(mixer->players[n].finished) {
@@ -100,6 +104,8 @@ brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency) {
 
 brSoundPlayer *brNewPlayer(brSoundMixer *mixer, brSoundData *data) {
 	brSoundPlayer *player = NULL;
+
+	if(!mixer) return NULL;
 
 	player = brNextPlayer(mixer);
 

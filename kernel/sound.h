@@ -26,10 +26,11 @@
 #define MIXER_SAMPLE_RATE 44100
 
 #ifdef __cplusplus
-struct brSoundMixer {
-	std::vector<brSoundPlayer> players;
-	PortAudioStream *stream;
-	int streamShouldEnd;
+class brSoundMixer {
+	public:
+		std::vector<brSoundPlayer> players;
+		PortAudioStream *stream;
+		int streamShouldEnd;
 };
 
 struct brSoundData {
