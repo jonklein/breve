@@ -35,6 +35,7 @@ Matrix : Matrix2D (aka Matrices2D) {
 	+ to set-size x xSize (int) y ySize (int):
 		% Sets the size of this matrix to (xSize, ySize).
         
+        matrix2DFree(matrixPointer).
 		matrixPointer = matrix2DNew(xSize, ySize).
 
 	- to get-matrix-pointer:
@@ -193,6 +194,7 @@ Matrix : Matrix3D (aka Matrices3D) {
 	+ to set-size x xSize (int) y ySize (int) z zSize (int):
 		% Sets the size of this matrix to (xSize, ySize, zSize).
 
+        matrix2DFree(matrixPointer).
 		matrixPointer = matrix3DNew(xSize, ySize, zSize).
 
 	- to get-matrix-pointer:

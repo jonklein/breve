@@ -58,7 +58,7 @@ int brIMatrix2DNew(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrix2DFree(brEval args[], brEval *target, brInstance *i) {
-	delete BRBIGMATRIX2D(target);
+	if (BRBIGMATRIX2D(&args[0])) delete BRBIGMATRIX2D(&args[0]);
 
 	return EC_OK;
 }
@@ -307,7 +307,8 @@ int brIMatrix3DNew(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrix3DFree(brEval args[], brEval *target, brInstance *i) {
-	delete BRBIGMATRIX3D(target);
+    if (BRBIGMATRIX3D(&args[0]))
+    	delete BRBIGMATRIX3D(&args[0]);
 
 	return EC_OK;
 }
