@@ -30,6 +30,7 @@
 #include <map>
 #include <string>
 #include <algorithm>
+#include "timeval.h"
 #endif
 
 #ifdef WINDOWS
