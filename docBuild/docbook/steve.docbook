@@ -495,9 +495,9 @@ Below is an example of a method defined with a set of optional arguments.
 	# Create a new agent, with some default values.
 
 	+ to create-new-agent with-color color = (1, 0, 0) (vector) 
-							with-energy energy = 100 (int)
-							with-radius radius = 10 (int) 
-							with-name name = "agent" (string):
+		with-energy energy = 100 (int)
+		with-radius radius = 10 (int) 
+		with-name name = "agent" (string):
 </screen>
 </para>
 <para>
@@ -512,9 +512,9 @@ excluding each of the arguments:
 
 	# all of the arguments
 	self create-new-agent with-color (1, 1, 1) 
-							with-energy 100
-							with-radius 20
-							with-name "Robert".
+		with-energy 100
+		with-radius 20
+		with-name "Robert".
 </screen>
 </para>
 </sect2>

@@ -28,7 +28,7 @@ int midline = 0;
 
 #.*					{ slFormatAppend(yytext, tlevel); }
 
-[+-][\t\ ]*to.*		{ tlevel = 1; slFormatAppend(yytext, tlevel); tlevel++; }
+[+-][\t\ ]*to.*				{ tlevel = 1; slFormatAppend(yytext, tlevel); tlevel++; }
 [+-][\t\ ]*variables.*		{ tlevel = 1; slFormatAppend(yytext, tlevel); tlevel++; }
 
 \{[\t\ ]*			{ 

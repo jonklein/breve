@@ -1,0 +1,300 @@
+@include "Object.tz"
+
+Object : PushInterpreter (aka PushInterpreters) {
+	% The PushInterpreter object is used to setup and run programs in the 
+	% Push programming language, a language developed specifically
+	% for evolutionary computation.
+	% <P>
+	% Push is useful in breve for evolving evolved agent behaviors.  The 
+	% steve language, in which users write simulations, is a high level
+	% language which is not well suited for evolutionary computation.  
+	% The Push language, on the other hand, is designed from the ground
+	% up for evolutionary computation.
+	% <P>
+	% More information about Push is available
+	% <a href="http://hampshire.edu/lspector/push.html">here</a>.
+
+	+ variables:
+		pushInterpreterPointer (pointer).
+		evaluationLimit (int).
+
+	+ to init:
+		pushInterpreterPointer = pushEnvironmentNew(random[2000000000]).
+		evaluationLimit = 100.
+
+	+ to add-instruction named instructionName (string) for-instance targetInstance (object) for-method methodName (string):
+		% Adds a custom callback instruction named instructionName to the push interpreter.  
+		% When instructionName is called, it will trigger the method methodName in targetInstance.
+
+		pushCallbackNew(pushInterpreterPointer, instructionName, methodName, targetInstance).
+
+	+ to clear-stacks:	
+		% Clears the stacks of the Push interpreter.
+		pushClearStacks(pushInterpreterPointer).
+
+	+ to read-config from-file configFile (string):
+		% Reads the push configuration file configFile.
+
+		pushEnvironmentReadConfigFile(pushInterpreterPointer, findFile(configFile)).
+
+	+ to run code codeObject (object) for-steps steps = -1 (int):
+		% Runs the specified push code.  If the steps variable is provided, 
+		% evaluation will only run for the specified number of instructions.
+		% Otherwise, evaluation will run for the evaluation limit, which is 
+		% set with METHOD(set-evaluation-limit).
+
+		if steps == -1: steps = evaluationLimit.
+
+		pushRun(pushInterpreterPointer, (codeObject get-code-pointer), steps).
+
+	+ to set-list-limit to newLimit (int):
+		% CURRENTLY UNIMPLEMENTED.
+		% Sets the size limit of lists constructed in push.  
+		pushEnvironmentSetListLimit(pushInterpreterPointer, newLimit).	
+
+	+ to set-evaluation-limit to newLimit (int):
+		% Sets the evaluation limit to newLimit.  This specifies the number of 
+		% instructions to run when the METHOD(run) is called.  The default value
+		% for a new interpreter is 100.
+
+		evaluationLimit = newLimit.
+
+	+ to print-config:
+		% Prints out the current push configuration, including a list of the 
+		% active instructions.  Useful for debugging.
+		print pushGetConfigString(pushInterpreterPointer).
+
+	+ to print-stacks:
+		% Prints out the current contents of the stacks.  Useful for debugging.
+		print pushGetStacksString(pushInterpreterPointer).
+
+	- to get-interpreter-pointer:
+		% Used internally.
+		return pushInterpreterPointer.
+
+	+ section "Pushing Values onto Push Stacks"
+
+	+ to push-code value codeObject (object):
+		% Pushes the code codeObject onto the code stack.
+
+		pushCodeStackPush(pushInterpreterPointer, (codeObject get-code-pointer)).
+
+	+ to push-float value floatValue (float):
+		% Pushes the float floatValue onto the float stack.
+
+		pushFloatStackPush(pushInterpreterPointer, floatValue).
+
+	+ to push-integer value integerValue (int):
+		% Pushes the integer integerValue onto the integer stack.
+
+		pushIntStackPush(pushInterpreterPointer, integerValue).
+
+	+ to push-boolean value booleanValue (int):
+		% Pushes the boolean booleanValue (an integer in breve, where 0 is false
+		% and all other values are true) onto the boolean stack.
+
+		pushBoolStackPush(pushInterpreterPointer, booleanValue).
+
+	+ to push-vector value vectorValue (vector):
+		% Pushes the vector vectorValue onto the vector stack.
+
+		pushVectorStackPush(pushInterpreterPointer, vectorValue).
+
+	+ section "Getting the Sizes of Push Stacks"
+
+	+ to get-float-stack-size:
+		% Returns the size of the float stack.
+		return pushBoolStackSize(pushInterpreterPointer).
+
+	+ to get-integer-stack-size:
+		% Returns the size of the integer stack.
+		return pushIntStackSize(pushInterpreterPointer).
+
+	+ to get-boolean-stack-size:
+		% Returns the size of the boolean stack.
+		return pushBoolStackSize(pushInterpreterPointer).
+
+	+ to get-code-stack-size:
+		% Returns the size of the code stack.
+		return pushCodeStackSize(pushInterpreterPointer).
+
+	+ to get-vector-stack-size:
+		% Returns the size of the vector stack.
+		return pushVectorStackSize(pushInterpreterPointer).
+
+	+ section "Getting Values From the Top of Push Stacks"
+
+	+ to get-float-stack-top:
+		% Returns the top of the float stack.
+		% If the float stack is empty, the method returns 0.0.
+		% Use METHOD(get-float-stack-size) to determine whether the 
+		% boolean stack is empty or not.
+
+		return pushFloatStackTop(pushInterpreterPointer).
+
+	+ to get-boolean-stack-top:
+		% Returns the top of the boolean stack.
+		% If the boolean stack is empty, the method returns 0 (false).
+		% Use METHOD(get-boolean-stack-size) to determine whether the 
+		% boolean stack is empty or not.
+
+		return pushBoolStackTop(pushInterpreterPointer).
+
+	+ to get-integer-stack-top:
+		% Returns the top of the interger stack.
+		% If the integer stack is empty, the method returns 0.
+		% Use METHOD(get-integer-stack-size) to determine whether the 
+		% integer stack is empty or not.
+
+		return pushIntStackTop(pushInterpreterPointer).
+
+	+ to get-vector-stack-top:
+		% Returns the top of the vector stack.  
+		% If the vector stack is empty, the method returns (0, 0, 0).
+		% Use METHOD(get-vector-stack-size) to determine whether the 
+		% vector stack is empty or not.
+
+		return pushVectorStackTop(pushInterpreterPointer, (0, 0, 0)).
+
+	+ to copy-code-stack-top to program (object):
+		% Copies the top of the code stack to an existing program.
+		% Use METHOD(get-code-stack-size) to determine whether the 
+		% code stack is empty or not.
+	
+		program set-code-pointer to pushCodeStackTop(pushInterpreterPointer).
+
+	+ section "Popping the Push Stacks"
+
+	+ to pop-float-stack:
+		% Pops the float stack.  If the float stack is empty, this 
+		% method has no effect.
+		pushFloatStackPop(pushInterpreterPointer).
+
+	+ to pop-boolean-stack:
+		% Pops the boolean stack.  If the boolean stack is empty, this
+		% method has no effect.
+		pushFloatStackPop(pushInterpreterPointer).
+
+	+ to pop-integer-stack:
+		% Pops the integer stack.  If the integer stack is empty, this 
+		% method has no effect.
+
+		pushIntStackPop(pushInterpreterPointer).
+
+	+ to pop-vector-stack:
+		% Pops the vector stack.  If the vector stack is empty, this 
+		% method has no effect.
+
+		pushVectorStackPop(pushInterpreterPointer).
+
+	+ to pop-code-stack:
+		% Pops the code stack.  If the code stack is empty, this 
+		% method has no effect.
+
+		pushCodeStackPop(pushInterpreterPointer).
+
+	+ to archive:
+
+	+ to dearchive:
+
+	+ to destroy:
+		pushEnvironmentFree(pushInterpreterPointer).
+}
+
+Object : PushProgram {
+	% A PushProgram object is a program in the Push programming language.  To 
+	% be used in conjunction with the class OBJECT(PushInterpreter).
+
+	+ variables:
+		codePointer (pointer).
+
+    + to read from fileName (string):
+		% Reads a push program from a text file.
+
+		f (object).
+
+        f = new File.
+        f open-for-reading with-file fileName.
+    
+        self parse code (f read-as-string).
+
+        free f.
+
+	+ to write to fileName (string):
+		% Writes this push program to a text file.
+
+		f (object).
+
+        f = new File.
+        f open-for-writing with-file fileName.
+		
+		f write text (f get-string).
+
+		free f.
+
+	- to get-code-pointer:
+		% Used internally.
+		return codePointer.
+
+	- to set-code-pointer to newCodePointer (pointer):
+		% Used internally.
+		if codePointer: pushCodeFree(codePointer).
+
+		if !newCodePointer: self parse program "()".
+		else codePointer = newCodePointer.		
+
+		return self.
+
+	+ to make-random-code max-length size = 100 (int) with-interpreter interpreter (object): 
+		% Makes a random push program of length size.  Size is an optional argument
+		% with a default value of 100.   The interpreter provided specifies the instruction
+		% set used to generate the random code. 
+
+		if size < 1: size = 1.
+
+		self set-code-pointer to pushCodeRandom((interpreter get-interpreter-pointer), size).
+
+	+ to mutate with-max-new-code-size treeSize = 50 (int) with-interpreter interpreter (object):
+		% Mutates this code object by adding a new subtree.  The maximum size of the
+		% subtree is specified in the optional argument treeSize, which has a default
+		% value of 50.  The interpreter provided determines the instruction
+		% set used to generate the random code.  
+
+		self set-code-pointer to pushCodeSubtreeMutate((interpreter get-interpreter-pointer), codePointer, treeSize).
+
+	+ to crossover from-parent1 p1 (object) from-parent2 p2 (object):
+		% Sets this object to a genetic crossover of p1 and p2.
+		self set-code-pointer to pushCodeCrossover((p1 get-code-pointer), (p2 get-code-pointer)).
+
+	+ to copy-from program otherProgram (object):
+		self parse program (otherProgram get-string).
+
+	+ to parse program codeString (string):
+		% Sets the content of this code to the newly parsed string.
+		% The with-interpreter keyword is no longer required.
+
+		self set-code-pointer to pushParse(codeString).
+		return self.
+
+	+ to get-string:
+		% Returns the string representation of this push program.
+		if !codePointer: return "()".
+
+		return pushCodeGetString(codePointer).
+
+	+ to get-size:
+		% Returns the size of this push program.
+		return pushCodeSize(codePointer).
+
+	+ to destroy:
+		if codePointer: pushCodeFree(codePointer).
+
+	+ to compute-discrepancy from otherProgram (object):
+		% CURRENTLY UNIMPLEMENTED.  Returns the point discrepency between this 
+		% program and otherProgram.  
+		% <P>The point discrepency between programs p1 and p2 is the number of 
+		% points (which includes both terminals and subtrees) unique to p1 plus 
+		% the number of points unique to p2.
+
+		return 0.
+}

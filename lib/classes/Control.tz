@@ -910,10 +910,11 @@ Abstract : Control (aka Controls) [version 1.9] {
 
 		image = new Image.
 
-		if !(image load from file): {
-			print "error loading texture $file".
-		} else {
+		if (image load from file): {
 			loadedImages{ loadedImages } = file.
+		} else {
+			free image.
+			return.
 		}
 
 		return (image get-texture-number) - 1.

@@ -1,4 +1,6 @@
 #include "kernel.h"
+
+#ifdef HAVE_LIBPUSH
 #include "pushC.h"
 
 struct brPushCallbackData {
@@ -14,7 +16,6 @@ void brPushFreeData(void *d);
 /*@{*/
 /*! \addtogroup InternalFunctions */
 
-#ifdef HAVE_LIBPUSH
 int breveFunctionPushCallbackNew(brEval arguments[], brEval *result, brInstance *instance) {
 	void *environment = BRPOINTER(&arguments[0]);
 	char *name = BRSTRING(&arguments[1]);

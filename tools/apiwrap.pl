@@ -69,11 +69,11 @@ print CFILE<<__EOT__;
 */
 
 #include "kernel.h"
-#include "$ARGV[1]"
 
 /*\@{*/
 /*! \\addtogroup InternalFunctions */
 #ifdef HAVE_LIB${libraryname}
+#include "$ARGV[1]"
 __EOT__
 
 foreach $line (<FILE>) {

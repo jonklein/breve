@@ -136,12 +136,12 @@
 <ulink url="../classes/PrismaticJoint.html">PrismaticJoint</ulink></para>
 </listitem>
 <listitem><para>
-<indexterm><primary>PushCode class</primary></indexterm>
-<ulink url="../classes/PushCode.html">PushCode</ulink></para>
-</listitem>
-<listitem><para>
 <indexterm><primary>PushInterpreter class</primary></indexterm>
 <ulink url="../classes/PushInterpreter.html">PushInterpreter</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>PushProgram class</primary></indexterm>
+<ulink url="../classes/PushProgram.html">PushProgram</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>Real class</primary></indexterm>

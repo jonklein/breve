@@ -5,11 +5,11 @@
 */
 
 #include "kernel.h"
-#include "pushC.h"
 
 /*@{*/
 /*! \addtogroup InternalFunctions */
 #ifdef HAVE_LIBPUSH
+#include "pushC.h"
 /*!
 	\brief A breve API function wrapper for the C-function \ref pushEnvironmentNew.
 
@@ -17,7 +17,9 @@
 */
 
 int breveFunctionPushEnvironmentNew(brEval arguments[], brEval *result, brInstance *instance) {
-	BRPOINTER(result) = pushEnvironmentNew();
+	int seed = BRINT(&arguments[0]);
+
+	BRPOINTER(result) = pushEnvironmentNew(seed);
 
 	return EC_OK;
 }
@@ -585,7 +587,7 @@ int breveFunctionPushCodeRandom(brEval arguments[], brEval *result, brInstance *
 
 void breveInitPushFunctions(brNamespace *namespace) {
 #ifdef HAVE_LIBPUSH
-	brNewBreveCall(namespace, "pushEnvironmentNew", breveFunctionPushEnvironmentNew, AT_POINTER,  0);
+	brNewBreveCall(namespace, "pushEnvironmentNew", breveFunctionPushEnvironmentNew, AT_POINTER, AT_INT, 0);
  	brNewBreveCall(namespace, "pushEnvironmentFree", breveFunctionPushEnvironmentFree, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(namespace, "pushEnvironmentReadConfigFile", breveFunctionPushEnvironmentReadConfigFile, AT_NULL, AT_POINTER, AT_STRING, 0);
  	brNewBreveCall(namespace, "pushRun", breveFunctionPushRun, AT_INT, AT_POINTER, AT_POINTER, AT_INT, 0);

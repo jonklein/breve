@@ -22,9 +22,12 @@ or by developing evolved computer programs, a technique known as
 
 <para>
 Genetic programming involves random crossover and mutation of computer programs.
-Most computer languages designed for people are picky about syntax and are not 
-well suited to evolution&mdash;most random crossovers and mutations would 
-produce code that simply does not compile.
+Most computer languages designed for people are picky about syntax and variable 
+types and are not well suited to evolution&mdash;most random crossovers and 
+mutations would produce code that simply does not compile 
+(like <function>x = y + =;</function>), or code which does
+compile, but which semantically does not make sense 
+(like <function>x = sqrt( "puppydog" );</function>).
 </para>
 
 <para>
@@ -35,26 +38,122 @@ code is almost never written by hand.  This chapter is intended as a short
 introduction to using Push in a breve simulation and is not a definitive 
 overview of Push or its features.  More information about Push and how it 
 is being used can be found on 
-<ulink url="http://hampshire.edu/lspector/Push.html">this page</ulink>.
+<ulink url="http://hampshire.edu/lspector/push.html">this page</ulink>.
 </para>
 
 <sect1><title>A Brief Introduction to Push</title>
 <para>
+The Push language is well suited for evolution because of its extremely
+simple syntax, and its stack-based typing system.  The simple syntax
+helps to ensure that any kind of genetic operator (including the 
+commonly used crossover and mutation) will produce a syntactically 
+valid individual.  The stack-based typing system&mdash;in which 
+instructions look for operators on typed stacks&mdash;ensures that 
+all push programs are semantically valid.
+</para>
+<para>
+Arguments are passed to instructions using a set of stacks, one for
+each variable type.  When an instruction is executed, it reads and
+removes argument values from the tops of the relevant stacks, it 
+preforms a computation, and then it pushes any output values onto
+the relevant stacks.  If a stack is empty and cannot provide input
+values for an instruction, the instruction preforms a "NOOP" and 
+does nothing.  This scheme ensures that instructions are always 
+provided with input data of the correct type.
+</para>
+<para>
+The version of push built into breve 2.0 provides support for the 
+following types: integer, float, name, vector, code, 
+</para>
+<para>
+A Push program is made up lists of the following elements: instructions, 
+literal values, and sublists of these elements.  Execution of a Push 
+program begins by placing the entire expression onto the code stack
+and proceeds recursively as follows:
+<screen>
+	To execute program P:
+		If P is a single instruction then execute it.
+		Else if P is a literal then push it onto the appropriate stack.
+		Else (P must be a list) sequentially execute each of the Push programs in P.
+</screen>
+</para>
+<para>
+Here's a sample Push program which does some mathematical and logical 
+computations:
+<screen>
+( 2 3 INTEGER.* 4.1 5.2 FLOAT.+ TRUE FALSE BOOLEAN.OR )
+</screen>
+After execution of the program, the stacks are left in the following states:
+<screen>
+	# the program we started with
+	CODE STACK: ( ( 2 3 INTEGER.* 4.1 5.2 FLOAT.+ TRUE FALSE BOOLEAN.OR ) )
+
+	# the result of the code TRUE FALSE BOOLEAN.OR
+	BOOLEAN STACK: ( TRUE )
+
+	# the result of the code 4.1 5.2 FLOAT.+
+	FLOAT STACK: ( 9.3 )
+
+	# the result of the code 2 3 INTEGER.*
+	INTEGER STACK: ( 6 )
+</screen>
+</para>
+<para>
+Real push programs are far more complex: instructions are provided to allow
+push programs to modify their own code, preform logical and program flow 
+control operations.  and even create and run new programs on-the-fly 
+(automatically providing support for elements which resemble macros and 
+"automatically defined functions").  For a full list of Push instructions
+and features, see
+<ulink url="http://hampshire.edu/lspector/push.html">this page</ulink>.
 </para>
 </sect1>
 
 <sect1><title>Creating and Configuring Push Environments</title>
 <para>
+To create a new push interpreter, simply create a new instance of the 
+class PushInterpreter.
 </para>
 </sect1>
 
-<sect1><title>Adding Callback Functions to the Push Environment</title>
+<sect1><title>Interacting with the Simulated World Using Callback Instructions</title>
 <para>
+Push includes a variety of instructions for preforming computation on
+the native Push types, but does not provide instructions for interacting 
+with the the simulated world or simulated agents.  If you plan to evolve 
+behaviors for simulated agents, you will need to provide instructions by
+which Push programs can read input data from the world ("sensors") and 
+other output instructions by which the programs can modify the agent's 
+behavior ("actuators").
+<para>
+</para>
+Instructions are added to a PushInterpreter with the method 
+<ulink url="../classes/Push.html#add-instruction">add-instruction</a>. 
+The method is passed a name for the new instruction, the name of the
+"callback" method, and the breve instance which is to receive the 
+method call.  When the newly created instruction is called, the specified 
+method will be called for the specified instance.
+</para>
+<para>
+An input callback instruction ("sensor") will typically read values from 
+the world from an agent's perspective and push the values onto a Push stack 
+so that they can be used for computation.  A "find-food" instruction, for example,
+may find the closest food object to an agent, and push onto the vector
+stack a vector towards the food object.
+</para>
+<para>
+An output callback instruction ("actuator") will typically take values 
+from the Push interpreter's stack and use those values to preform an
+action in the world.  A "move-towards" instruction, for example, might 
+read a vector value from the vector stack, and then use the breve method
+"set-velocity" to direct the agent towards the Push-computed location.
 </para>
 </sect1>
 
-<sect1><title>Using Push Programs for Evaluation and Evolution</title>
+<sect1><title>Running and Evolving Push Programs</title>
 <para>
+A program in the Push language is stored in a 
+<ulink url="../classes/Push.tz">PushProgram</ulink> object.
 </para>
 </sect1>
 

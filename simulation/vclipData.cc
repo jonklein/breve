@@ -40,7 +40,10 @@ void slVclipDataInit(slWorld *w) {
 
 	if(w->objectCount > 1) qsort(w->objects, w->objectCount, sizeof(slWorldObject*), slObjectSortFunc);
 
-	if(w->proximityData) slInitProximityData(w);
+	if(w->proximityData) {
+		slInitProximityData(w);
+		slInitBoundSort(w->proximityData);
+	}
 	
 	// allocate the right amount of space for the current set of collisions
 
@@ -268,6 +271,10 @@ void slVclipDataRealloc(slVclipData *v, int count) {
 	while(v->count > v->maxCount) v->maxCount *= 2;
 
 	listSize = v->maxCount * 2;
+
+	// get rid of the previous candidates
+
+	v->candidateCount = 0;
 
 	// init the bound lists and bound list pointers 
 
