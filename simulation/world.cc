@@ -87,8 +87,6 @@ slWorld *slWorldNew() {
 
 	w->clipData = slVclipDataNew();
 
-	w->netsimData.isMaster = 0;
-
 	slVectorSet(&g, 0.0, -9.81, 0.0);
 	slWorldSetGravity(w, &g);
 
@@ -422,7 +420,7 @@ double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 	w->age += total;
 
 #ifdef HAVE_LIBENET
-	if(w->netsimData.isMaster && (int)w->age >= lastSecond) {
+	if(w->netsimData.server && w->netsimData.isMaster && (int)w->age >= lastSecond) {
 		lastSecond = w->age + 1;
 
 		slNetsimBroadcastSyncMessage(w->netsimData.server, w->age);

@@ -121,8 +121,8 @@ void slCameraFree(slCamera *c) {
 
 	Used to update the camera's internal state after changes have been made
 	to the rotation or zoom settings.
-
 */
+
 void slUpdateCamera(slCamera *c) {
 	double m[3][3], n[3][3];
 	slVector yaxis, xaxis, unit;
