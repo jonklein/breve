@@ -27,10 +27,7 @@
 
 #ifdef __cplusplus
 struct brSoundMixer {
-	brSoundPlayer **players;
-	std::vector<brSoundPlayer*> playerV;
-	int nPlayers;
-	int maxPlayers;
+	std::vector<brSoundPlayer> players;
 	PortAudioStream *stream;
 	int streamShouldEnd;
 };

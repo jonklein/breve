@@ -638,8 +638,6 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 						return CT_PENETRATE;
 					} 
 
-					printf("%p, %p\n", *feat, f->neighbors[0]);
-
 					*feat = f->neighbors[0];
 				} else { 
 					*feat = f->neighbors[update];

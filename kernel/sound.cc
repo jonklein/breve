@@ -24,13 +24,8 @@
 brSoundMixer *brNewSoundMixer() {
 	brSoundMixer *mixer;
 	int error;
-	int n;
 
 	mixer = new brSoundMixer;
-	mixer->nPlayers = 0;
-	mixer->maxPlayers = 8;
-	mixer->players = slMalloc(mixer->maxPlayers * sizeof(brSoundPlayer*));
-	for(n=0;n<mixer->maxPlayers;n++) mixer->players[n] = slMalloc(sizeof(brSoundPlayer));
 	mixer->streamShouldEnd = 0;
 
 	error = Pa_OpenDefaultStream(&mixer->stream, 0, 2, paInt32, MIXER_SAMPLE_RATE, 256, 0, brPASoundCallback, mixer);
@@ -46,7 +41,6 @@ brSoundMixer *brNewSoundMixer() {
 }
 
 void brFreeSoundMixer(brSoundMixer *mixer) {
-	int n;
 	mixer->streamShouldEnd = 1;
 
 	if(!mixer) return;
@@ -56,32 +50,28 @@ void brFreeSoundMixer(brSoundMixer *mixer) {
 
 	if(mixer->stream) Pa_CloseStream(mixer->stream);
 	
-	for(n=0;n<mixer->maxPlayers;n++) slFree(mixer->players[n]);
-	slFree(mixer->players);
+	mixer->players.clear();
 
 	delete mixer;
 }
 
 brSoundPlayer *brNextPlayer(brSoundMixer *mixer) {
 	brSoundPlayer *player = NULL;
-	int n = 0;
+	unsigned int n = 0;
 
-	for(n=0;n<mixer->nPlayers;n++) {
-		if(!player && mixer->players[n]->finished) player = mixer->players[n];
+	for(n=0;n<mixer->players.size();n++) {
+		if(mixer->players[n].finished) {
+			player = &mixer->players[n];
+			break;
+		}
 	}
 
 	if(!player) {
-		if(mixer->nPlayers == mixer->maxPlayers) {
-			int oldMax = mixer->maxPlayers;
-			mixer->maxPlayers *= 2;
-			mixer->players = slRealloc(mixer->players, mixer->maxPlayers * sizeof(brSoundPlayer*));
+		brSoundPlayer p;
+	
+		mixer->players.push_back(p);
 
-			for(n=oldMax;n<mixer->maxPlayers;n++) mixer->players[n] = slMalloc(sizeof(brSoundPlayer));
-		}
-
-		player = mixer->players[mixer->nPlayers];
-
-		mixer->nPlayers++;
+		player = &mixer->players[ mixer->players.size() - 1];
 	}
 
 	player->finished = 1;
@@ -175,12 +165,13 @@ void brFreeSoundData(brSoundData *data) {
 }
 
 int brPASoundCallback(void *ibuf, void *obuf, unsigned long fbp, PaTimestamp outTime, void *data) {
-	brSoundMixer *mixer = data;
+	brSoundMixer *mixer = (brSoundMixer*)data;
 	brSoundPlayer *player;
 	unsigned int n, p;
-	int *out = obuf;
+	int *out = (int*)obuf;
 	int total;
 	int channel;
+	unsigned int size = mixer->players.size();
 
 	fbp *= 2;
 
@@ -192,32 +183,29 @@ int brPASoundCallback(void *ibuf, void *obuf, unsigned long fbp, PaTimestamp out
 	for(n=0;n<fbp;n++) {
 		total = 0;
 
-		channel = n & 1;
+		channel = n | 1;
 
-		if(mixer->nPlayers) {
-			for(p=0;p<mixer->nPlayers;p++) {
-				player = mixer->players[p];
+		for(p=0;p<mixer->players.size();p++) {
+			player = &mixer->players[p];
 
-				if(player->isSinewave) {
-					if(!player->finished) {
-						total += (int)(0x7fffffff * sin(player->phase) * player->volume / (int)mixer->nPlayers);
+			if(player->isSinewave) {
+				if(!player->finished) {
+					total += (int)(0x7fffffff * sin(player->phase) * player->volume / (int)size);
 
-						// last channel -- update the phase 
-						if(channel) player->phase += player->frequency;
-					}
-				} else { 
-					if(!player->finished) {
-						total += (player->sound->data[player->offset++] / (int)mixer->nPlayers);
+					// last channel -- update the phase 
+					if(channel) player->phase += player->frequency;
+				}
+			} else { 
+				if(!player->finished) {
+					total += (player->sound->data[player->offset++] / (int)size);
 
-						if(player->offset >= player->sound->length) player->finished = 1;
-					}
+					if(player->offset >= player->sound->length) player->finished = 1;
 				}
 			}
 
-			*out++ = total;
-		} else {
-			*out++ = 0;
-		}
+		} 
+
+		*out++ = total;
 	}
 
 	return 0;
