@@ -28,6 +28,8 @@
     = but they are outdated and potentially non-functional.
 */
 
+typedef double slMatrix[3][3];
+
 #define slMatrixZero(x)         bzero(x, 9 * sizeof(double))
 #define slMatrixIdentity(x)     (bzero(x, 9 * sizeof(double)),(x)[0][0] = (x)[1][1] = (x)[2][2] = 1.0)
 #define slMatrixCopy(a, b)      bcopy((a), (b), 9 * sizeof(double))

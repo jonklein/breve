@@ -534,7 +534,7 @@ int stXMLReadObjectFromStream(stInstance *i, FILE *file) {
 	return result;
 }
 
-int stXMLReadObjectFromString(stInstance *i, char * buffer) {
+int stXMLReadObjectFromString(stInstance *i, char *buffer) {
   	XML_Parser parser;
 	stXMLParserState parserState;
 	int result = 0;

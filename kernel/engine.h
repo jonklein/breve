@@ -169,6 +169,10 @@ struct brEngine {
 	unsigned char useOSMesa;
 #endif 
 
+	int useMouse;
+	int mouseX;
+	int mouseY;
+
 	double iterationStepSize;
 
 	int evalStats[100];

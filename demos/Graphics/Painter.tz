@@ -30,7 +30,7 @@ Control : myController {
 
 		vel = 1.0 + random[9].
 		acc = random[1000].
-		radius = .1 + random[2].
+		radius = 1.0 + random[5].
 
 		if (self get-argument-count) == 2: {
 			file = (self get-argument at-index 1).

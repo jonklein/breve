@@ -22,7 +22,7 @@ Control : Fountain {
 		self set-iteration-step to .1.
 		self set-background-color to (0, 0, 0). 
 
-		self set-blur-factor to 0.75.
+		self set-blur-factor to 0.65.
 		self disable-text.
 		self enable-blur.
 

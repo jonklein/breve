@@ -27,6 +27,24 @@
 #include "kernel.h"
 
 /*!
+	\brief Gets the mouse x-coordinate.
+*/
+
+int brIGetMouseX(brEval args[], brEval *target, brInstance *i) {
+	BRINT(target) = i->engine->mouseX;
+	return EC_OK;
+}
+
+/*!
+	\brief Gets the mouse y-coordinate.
+*/
+
+int brIGetMouseY(brEval args[], brEval *target, brInstance *i) {
+	BRINT(target) = i->engine->mouseY;
+	return EC_OK;
+}
+
+/*!
 	\brief Causes the simulation to stop gracefully at the end of the iteration
 	step.
 
@@ -517,4 +535,7 @@ void breveInitControlFunctions(brNamespace *n) {
 
     brNewBreveCall(n, "setBlur", brISetBlur, AT_NULL, AT_INT, 0);
     brNewBreveCall(n, "setBlurFactor", brISetBlurFactor, AT_NULL, AT_DOUBLE, 0);
+
+    brNewBreveCall(n, "getMouseX", brIGetMouseX, AT_INT, 0);
+    brNewBreveCall(n, "getMouseY", brIGetMouseY, AT_INT, 0);
 }

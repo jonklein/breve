@@ -68,7 +68,7 @@ Control : Swarm {
         floor (object).
 
 		vision = new Camera.
-		vision set-size with-width 240 with-height 100.
+		vision set-size with-width 200 with-height 200.
 		vision set-position with-x 0 with-y 0.
 
         # Set up menus to modify the type of movement allowed.

@@ -81,6 +81,8 @@ void *newWindowCallback(char *name, slGraph *graph);
 void freeWindowCallback(void *w);
 void renderWindowCallback(void *w);
 
+void *passiveMotionCallback = NULL;
+
 void graphDisplay();
 
 pthread_mutex_t gEngineMutex;
@@ -448,6 +450,7 @@ void slInitGlut(int argc, char **argv, char *title) {
 
 	glutMouseFunc(slDemoMouse);
 	glutMotionFunc(slDemoMotion);
+	glutPassiveMotionFunc(slDemoPassiveMotion);
 	glutDisplayFunc(slDemoDisplay);
 	glutKeyboardFunc(slDemoKeyboard);
 	glutSpecialFunc(slDemoSpecial);
@@ -504,6 +507,11 @@ void slDemoMouse(int button, int state, int x, int y) {
 	gMods = glutGetModifiers();
 
 	slDemoDisplay();
+}
+
+void slDemoPassiveMotion(int x, int y) {
+	frontend->engine->mouseX = x;
+	frontend->engine->mouseY = frontend->engine->camera->y - y;
 }
 
 void slDemoMotion(int x, int y) {

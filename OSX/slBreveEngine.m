@@ -289,6 +289,19 @@ char *interfaceID = "aqua/1.2";
 		[engineLock lock];
 
 		if(runState != BX_STOP) {
+			if(1 || engine->useMouse) {
+				NSPoint mouse = [NSEvent mouseLocation];
+				NSRect bounds = [displayView frame];
+
+				if(![displayView isFullScreen]) {
+					mouse = [[displayView window] convertScreenToBase: mouse];
+					mouse = [[[displayView window] contentView] convertPoint: mouse toView: displayView];
+				}
+
+				engine->mouseX = mouse.x;
+				engine->mouseY = mouse.y;
+			}
+
 			if((result = brEngineIterate(engine)) != EC_OK) {
 				[engineLock unlock];
 

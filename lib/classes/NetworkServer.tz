@@ -88,5 +88,5 @@ Abstract : NetworkServer (aka NetworkServers) [version 1.9] {
 		setIndexPage(serverData, indexPage).
 
     + to destroy:
-        closeServer(serverData).
+        if serverData: closeServer(serverData).
 }

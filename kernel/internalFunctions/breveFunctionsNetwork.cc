@@ -223,11 +223,9 @@ void *brListenOnSocket(brNetworkServerData *serverData) {
 		clientData->server = serverData;
 		clientData->socket = accept(serverData->socket, (struct sockaddr*)&clientData->addr, &caddr_size);
 
-		// fcntl(clientData->socket, F_SETFL, O_NONBLOCK);
-
 		if(clientData->socket != -1) {
+			fcntl(clientData->socket, F_SETFL, O_NONBLOCK);
 			brHandleConnection(clientData);
-			shutdown(clientData->socket, 2);
 			close(clientData->socket);
 		}
 	}
@@ -249,7 +247,7 @@ void *brHandleConnection(void *p) {
   
 	hostname = brHostnameFromAddr(&data->addr.sin_addr);
 
-	slMessage(DEBUG_ALL, "network connection from %s\n", hostname);
+	// slMessage(DEBUG_ALL, "network connection from %s\n", hostname);
 
 	count = slUtilRead(data->socket, &request, sizeof(brNetworkRequest));
 
@@ -282,7 +280,7 @@ void *brHandleConnection(void *p) {
 		case NR_XML:
 			slUtilRead(data->socket, &header, sizeof(brStringHeader));
 			length = header.length;
-			slMessage(DEBUG_ALL, "received XML message of length %d from host %s\n", length, hostname); 
+			// slMessage(DEBUG_ALL, "received XML message of length %d from host %s\n", length, hostname); 
 			buffer = slMalloc(length+1);
 			slUtilRead(data->socket, buffer, length);
 			buffer[length] = 0;
@@ -438,7 +436,7 @@ void brSendPage(brNetworkClientData *data, char *page) {
 
 	text = slUtilReadFile(file);
 
-	slMessage(DEBUG_ALL, "network request for file: %s\n", page);
+	// slMessage(DEBUG_ALL, "network request for file: %s\n", page);
 	slUtilWrite(data->socket, text, strlen(text));
 
 	slFree(file);

@@ -832,6 +832,24 @@ Abstract : Control (aka Controls) [version 1.9] {
 
 		cameraSetText(theString, messageNumber, xLoc, yLoc, textColor).
 
+  + section "Interacting with the User Interface"
+
+	+ to get-mouse-x-coordinate:
+		% Returns the X-coordinate of the mouse relative to the simulation window.
+		% The value may be negative if the mouse is to the left of the simulation
+		% view.
+		% See also METHOD(get-mouse-y-coordinate).
+
+		return getMouseX().
+
+	+ to get-mouse-y-coordinate:
+		% Returns the Y-coordinate of the mouse.
+		% The value may be negative if the mouse is outside of the simulation
+		% view, towards the bottom of the screen.  
+		% See also METHOD(get-mouse-x-coordinate).
+
+		return getMouseY().
+
 	+ to add-menu named menuName (string) for-method theMethod (string):
 		% Adds a menu named menuName to the application which will result
 		% in a call to theMethod for the calling instance.

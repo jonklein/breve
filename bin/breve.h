@@ -39,6 +39,7 @@ void slDemoReshape(int x, int y);
 void slDemoDisplay();
 void slDemoMouse(int button, int state, int x, int y);
 void slDemoMotion(int x, int y);
+void slDemoPassiveMotion(int x, int y);
 void slDemoSpecial(int key, int x, int y);
 void slDemoSpecialUp(int key, int x, int y);
 void slDemoKeyboard(unsigned char key, int x, int y);

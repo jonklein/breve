@@ -67,7 +67,7 @@ WHITE	[\t\ \n]*
 
 #.*							;
 
-{WORD}{WHITE}:{WHITE}{WORD}{WHITE}/.*\{	{ slObjectParseText = yytext; BEGIN(OBJECT); slQPLevel = 0; return TZ_OBJECT; }
+{WORD}{WHITE}:{WHITE}{WORD}{WHITE}/\{	{ slObjectParseText = yytext; BEGIN(OBJECT); slQPLevel = 0; return TZ_OBJECT; }
 
 <OBJECT>\{				{ yytext = NULL; slQPLevel++; return TZ_NOTHING; }
 
