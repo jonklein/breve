@@ -5440,7 +5440,6 @@ _ACEOF
 
 fi
 
-
 as_ac_Lib=`echo "ac_cv_lib_$JAVALIBRARY''_JNI_CreateJavaVM" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for JNI_CreateJavaVM in -l$JAVALIBRARY" >&5
 echo $ECHO_N "checking for JNI_CreateJavaVM in -l$JAVALIBRARY... $ECHO_C" >&6
@@ -5497,11 +5496,9 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Lib'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_Lib'}'`" >&6
 if test `eval echo '${'$as_ac_Lib'}'` = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define `echo "HAVE_LIB$JAVALIBRARY" | $as_tr_cpp` 1
+  cat >>confdefs.h <<\_ACEOF
+#define HAVA_LIBJAVA 1
 _ACEOF
-
-  LIBS="-l$JAVALIBRARY $LIBS"
 
 fi
 
