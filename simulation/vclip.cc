@@ -594,7 +594,8 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 	slPosition *p1 = vc->positions[x];
 	slPosition *p2 = vc->positions[y];
 
-	if(!*feat) f = *feat = s2->features[0];
+	if(!*feat) *feat = s2->features[0];
+	minFeature = s2->faces[0];
 
 	while(n < s2->features.size()) {
 		switch((*feat)->type) {
