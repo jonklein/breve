@@ -156,6 +156,7 @@ endif
 WX_release: clean
 	$(MAKE) optimize
 	cd wx; make
+	rm -rf $(IDE_FOLDER)
 	mkdir $(IDE_FOLDER)
 	mkdir $(IDE_FOLDER)/lib
 	cp wx/breveIDE@EXE_SUFFIX@ $(IDE_FOLDER)
