@@ -506,7 +506,7 @@ int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *nam
 	method = brMethodFindWithArgRange(handler, name, types, 0, 1);
 
 	if(!method) {
-		slMessage(DEBUG_ALL, "Error adding collision handler: cannot locate method \"%s\" for class \"%s\"\n", handler->name, name);
+		slMessage(DEBUG_ALL, "Error adding collision handler: cannot locate method \"%s\" for class \"%s\"\n", name, handler->name);
 		return EC_ERROR;
     }
 

@@ -5,6 +5,7 @@ Abstract : Drawing {
 
 	+ variables:
 		drawPointer (pointer).
+		currentPoint (vector).
 
 	+ to init:
 		drawPointer = drawListNew().
@@ -70,6 +71,14 @@ Abstract : Drawing {
 		% Adds a line segment from startPoint to endPoint.  
 
 		drawListDrawLine(drawPointer, startPoint, endPoint).
+		currentPoint = endPoint.
+
+	+ to add-line-point at endPoint (vector):
+		% Adds a line segment from the last point defined (by METHOD(draw-line) 
+		% or METHOD(add-line-point) to endPoint.
+
+		drawListDrawLine(drawPointer, currentPoint, endPoint).
+		currentPoint = endPoint.
 
 	+ to set-color to newColor (vector) with-transparency transparencyValue = 1.0 (float):
 		% Changes this drawing's current color to newColor.  The optional value

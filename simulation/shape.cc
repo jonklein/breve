@@ -114,6 +114,8 @@ void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, 
 slShape *slSphereNew(double radius, double density) {
 	slSphere *s;
 
+	if(radius <= 0.0 || density <= 0.0) return NULL;
+
 	s = new slSphere(radius);
 	s->density = density;
 	s->mass = density * M_PI * radius * radius * radius * 4.0/3.0;
@@ -128,6 +130,8 @@ slShape *slSphereNew(double radius, double density) {
 slShape *slNewCube(slVector *size, double density) {
 	slShape *s;
 
+	if(density < 0.0 || slVectorLength(size) <= 0.0) return NULL;
+
 	s = slShapeNew();
 
 	if(!slSetCube(s, size, density)) {
@@ -141,6 +145,8 @@ slShape *slNewCube(slVector *size, double density) {
 slShape *slNewNGonDisc(int count, double radius, double height, double density) {
 	slShape *s;
 
+	if(radius <= 0.0 || height <= 0.0 || density <= 0.0 || count < 3) return NULL;
+
 	s = slShapeNew();
 
 	if(!slSetNGonDisc(s, count, radius, height, density)) {
@@ -153,6 +159,8 @@ slShape *slNewNGonDisc(int count, double radius, double height, double density) 
 
 slShape *slNewNGonCone(int count, double radius, double height, double density) {
 	slShape *s;
+
+	if(radius <= 0.0 || height <= 0.0 || density <= 0.0 || count < 3) return NULL;
 
 	s = slShapeNew();
 

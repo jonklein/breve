@@ -65,6 +65,7 @@ int stXMLAssignIndices(brEngine *e, std::map< stInstance*, int > &instanceToInde
 	unsigned int n;
 
 	for(n=0; n<e->instances.size(); n++) instanceToIndexMap[ (stInstance*)e->instances[n]->userData ] = n;
+	for(n=0; n<e->instancesToAdd.size(); n++) instanceToIndexMap[ (stInstance*)e->instancesToAdd[n]->userData ] = n;
 
 	return n;
 }
@@ -1067,7 +1068,7 @@ void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
 
 						stSetVariable(&parserState->currentInstance->variables[var->offset], var->type->type, NULL, &lastState->eval, &ri);	
 
-						stGCCollect(&lastState->eval);
+						// stGCCollect(&lastState->eval);
 					}
 				}
 				break;

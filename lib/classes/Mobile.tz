@@ -212,7 +212,7 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 		return linkGetRotation(linkPointer).
 
 	+ to offset by amount (vector):
-		% Moves this object by amount.
+		% Moves this object by amount, relative to its current position.
 
 		linkSetLocation(linkPointer, (self get-location) + amount).
 

@@ -358,7 +358,7 @@ int stParseBuffer(stSteveData *s, brEngine *engine, char *buffer, char *filename
 
 	/* preprocess changes the yyfile and lineno globals -- reset them */
 
-	yyfile = thisFile;
+	yyfile = strdup(thisFile);
 	lineno = 1;
 
 	stSetParseString(buffer, strlen(buffer));
