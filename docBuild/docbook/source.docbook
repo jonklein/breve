@@ -36,15 +36,15 @@ The following steps are required to set up a language frontend in breve.
 <itemizedlist>
 <listitem><para>Write special callbacks for the language frontend (<xref linkend="breve_object_callbacks">).</para></listitem>
 <listitem><para>Construct a new breve object type, and add classes to the breve engine (<xref linkend="breve_object_type">).</para></listitem>
-<listitem><para>Add instances to the breve engine (<xref linkend="breve_object_api">).</para></listitem>
-<listitem><para>Connect the language frontend to an application frontend (<xref linkend="application_frontend">) or write your own customized frontend (<xref linkend="custom_application_frontend">).</para></listitem>
+<listitem><para>Test the language frontend using the existing breve program (<xref linkend="object_frontend_testing">).</para></listitem>
+<listitem><para>If desired, connect the language frontend to an application frontend (<xref linkend="application_frontend">) or write your own customized frontend (<xref linkend="custom_application_frontend">).</para></listitem>
 </itemizedlist>
 </para>
 
 <sect2 id="breve_object_structs"><title>Structures used by the breve Object API</title>
 <para>
 The following structures are used by the breve Object API.  These structures are passed
-to the frontend language callback functions.  See the file "breveObjectAPI.h" and its 
+to the frontend language callback functions.  See the file <function>kernel/breveObjectAPI.h</function> and its 
 documentation for a full description of these structs.
 <itemizedlist>
 <listitem><para><function>brObjectType</function>: information and callbacks for a language frontend</para></listitem>
@@ -223,8 +223,9 @@ function:
 void brEngineRegisterObjectType(brEngine *engine, brObjectType *type);
 </screen>
 </para>
+</sect2>
 
-<sect2>
+<sect2 id="object_frontend_testing">
 <title>Testing and using the object frontend</title>
 <para>
 Once you have written code to setup and register your new breve object type, you'll
@@ -239,9 +240,13 @@ To add your frontend object type to the breve engine, edit the file
 call this function to create a breve engine.  At the bottom of this function,
 you can create and register your custom language frontend.  
 <screen>
-brEngineRegisterObjectType(frontend->engine, </replaceable>>functionToCreateLanguageFrontend</replaceable>());
+brEngineRegisterObjectType(frontend->engine, <replaceable>>functionToCreateLanguageFrontend</replaceable>());
 </screen>
-
+</para>
+<para>
+After recompiling breve with this change, it should be possible to instantiate 
+an object from your new language frontend from directly within a steve simulation.
+See the Java example <function>java/JavaTest.tz</function> for more information.
 </para>
 
 </sect2>
