@@ -602,7 +602,7 @@ void brInterrupt(brEngine *engine) {
 #else
 	printf("breve> ");
 	fflush(stdout);
-	line = gets(staticLine);
+	line = fgets(staticLine, 10239, stdin);
 #endif
 
 	if(!line || line[0] == 'x') brQuit(engine);

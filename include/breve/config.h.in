@@ -57,11 +57,17 @@
 /* Define to 1 if you have the `expat' library (-lexpat). */
 #undef HAVE_LIBEXPAT
 
+/* Define to 1 if you have the `history' library (-lhistory). */
+#undef HAVE_LIBHISTORY
+
 /* Define to 1 if you have the `jpeg' library (-ljpeg). */
 #undef HAVE_LIBJPEG
 
 /* Define to 1 if you have the `l' library (-ll). */
 #undef HAVE_LIBL
+
+/* Define to 1 if you have the `ncurses' library (-lncurses). */
+#undef HAVE_LIBNCURSES
 
 /* Define to 1 if you have the `ode' library (-lode). */
 #undef HAVE_LIBODE
@@ -86,6 +92,9 @@
 
 /* Define to 1 if you have the `sndfile' library (-lsndfile). */
 #undef HAVE_LIBSNDFILE
+
+/* Define to 1 if you have the `termcap' library (-ltermcap). */
+#undef HAVE_LIBTERMCAP
 
 /* Define to 1 if you have the `z' library (-lz). */
 #undef HAVE_LIBZ
