@@ -61,7 +61,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 
   + section "Running a Push program"
 	- to run code codeObject (object):
-		self run program codeObject for-steps -1.
+		return (self run program codeObject for-steps -1).
 
 	+ to run program codeObject (object) for-steps steps = -1 (int):
 		% Runs the specified push code.  If the steps variable is provided, 

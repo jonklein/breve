@@ -64,29 +64,12 @@ void brFreeSoundMixer(brSoundMixer *mixer) {
 	slFree(mixer);
 }
 
-brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency) {
-	brSoundPlayer *player;
-	
-	if(!mixer) return;
-
-	player = brNextPlayer(mixer);
-
-	player->isSinewave = 1;
-	player->frequency = frequency;
-	player->volume = 1;
-	player->balance = .5;
-	player->phase = 0;
-	player->finished = 0;
-
-	return player;
-}
-
 brSoundPlayer *brNextPlayer(brSoundMixer *mixer) {
 	brSoundPlayer *player = NULL;
-	int n;
+	int n = 0;
 
 	for(n=0;n<mixer->nPlayers;n++) {
-		if(mixer->players[n]->finished) player = mixer->players[n];
+		if(!player && mixer->players[n]->finished) player = mixer->players[n];
 	}
 
 	if(!player) {
@@ -102,6 +85,25 @@ brSoundPlayer *brNextPlayer(brSoundMixer *mixer) {
 
 		mixer->nPlayers++;
 	}
+
+	player->finished = 1;
+
+	return player;
+}
+
+brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency) {
+	brSoundPlayer *player;
+	
+	if(!mixer) return NULL;
+
+	player = brNextPlayer(mixer);
+
+	player->isSinewave = 1;
+	player->frequency = frequency;
+	player->volume = 1;
+	player->balance = .5;
+	player->phase = 0;
+	player->finished = 0;
 
 	return player;
 }
@@ -207,12 +209,6 @@ int brPASoundCallback(void *ibuf, void *obuf, unsigned long fbp, PaTimestamp out
 
 						if(player->offset >= player->sound->length) player->finished = 1;
 					}
-				}
-
-				if(player->finished && p == mixer->nPlayers - 1) {
-						/* the player is finished, and is the last one */
-					
-						mixer->nPlayers--;
 				}
 			}
 

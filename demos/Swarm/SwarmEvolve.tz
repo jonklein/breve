@@ -572,7 +572,11 @@ Mobile : Feeders {
         if energy > 1: energy = 1.
 
         radius = sqrt(energy).
-        newScale = ((radius * 2) + 0.00001) / lastScale.
+        newScale = ((radius * 2) + 0.00001).
+
+		if newScale == lastScale: return.
+
+		newScale /= lastScale.
         shape scale by (newScale, newScale, newScale).
         lastScale = (radius * 2)  + 0.00001.
 
