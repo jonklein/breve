@@ -20,7 +20,7 @@
 
 #include <errno.h>
 
-#include "config.h"
+#include "kernel.h"
 
 #if !MINGW
 #include <dlfcn.h>
@@ -43,9 +43,7 @@ inline const char *dlerror(void) {
 
 	return message;
 }
-#endif /* MINGW */
-
-#include "kernel.h"
+#endif
 
 /*!
 	\brief Opens a plugin and loads it into the engine.

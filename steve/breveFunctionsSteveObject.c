@@ -22,14 +22,14 @@
 #include "xml.h"
 #include "breveFunctionsSteveObject.h"
 
-#ifndef MINGW
+#if !MINGW
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #else
 #include <winsock2.h>
 #include <wininet.h>
-#endif /* MINGW */
+#endif
 
 #define NETWORK_MAGIC   0x0b00b1e5
 #define NETWORK_VERSION 1

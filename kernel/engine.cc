@@ -56,7 +56,7 @@ brEngine *brEngineNew(void) {
 	char *envpath, *dir;
 	int n = 0;
 
-#ifdef MINGW
+#if MINGW
 	pthread_win32_process_attach_np();
 #endif
 

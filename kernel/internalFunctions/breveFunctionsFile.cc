@@ -21,16 +21,16 @@
 /*! \addtogroup InternalFunctions */
 /*@{*/
 
+#include <unistd.h>
+
 #include "kernel.h"
 #include "breveFunctionsFile.h"
 
-#include <unistd.h>
-
-#ifdef HAVE_WCTYPE_H
+#if HAVE_WCTYPE_H
 #include <wctype.h>
 #endif
 
-#ifndef HAVE_ISWSPACE
+#if !HAVE_ISWSPACE
 #define iswspace(c) ((c)==' '||(c)=='\f'||(c)=='\n'||(c)=='\r'||(c)=='\t'||(c)=='\v')
 #endif
 

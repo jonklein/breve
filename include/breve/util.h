@@ -26,7 +26,7 @@
 
 #include "config.h"
 
-#ifdef WINDOWS
+#if WINDOWS
 #define DLLEXPORT __declspec(dllexport)
 #elif defined(__GNUC__) && (__GNUC__ >= 4)
 #define DLLEXPORT __attribute__ ((visibility("default")))
@@ -34,17 +34,16 @@
 #define DLLEXPORT
 #endif
 
-#ifdef MINGW
-
+#if MINGW
 #define usleep(x) _sleep((unsigned int)((x) / 1000.0))
 #define random rand
 #define srandom srand
-
-#endif /* MINGW */
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 #include "utilTypedefs.h"
 
 #include "list.h"
@@ -61,6 +60,7 @@ extern "C" {
 #include "error.h"
 
 #include "stringstream.h"
+
 #ifdef __cplusplus
 }
 #endif

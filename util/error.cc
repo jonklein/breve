@@ -26,10 +26,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifdef MINGW
-#include <malloc.h>
-#endif
-
 #include "util.h"
 
 static int gDebugLevel;
@@ -132,14 +128,22 @@ void slMessage(int level, const char *format, ...) {
 	if (level > gDebugLevel || !gMessageOutputFunction)
 		return;
 
-	char queueMessage[1024 + strlen(format) * 10];
 	va_list vp;   
+	char *queueMessage;
 
 	va_start(vp, format);
-	vsnprintf(queueMessage, sizeof(queueMessage), format, vp);
+#if HAVE_VASPRINTF
+	if (vasprintf(&queueMessage, format, vp) == -1)
+		return;
+#else
+	const size_t len = 1024 + strlen(format) * 10;
+	queueMessage = (char *)malloc(len);
+	vsnprintf(queueMessage, len, format, vp);
+#endif
 	va_end(vp);
 
 	gMessageOutputFunction(queueMessage);
+	free(queueMessage);
 }
 
 /*!

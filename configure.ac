@@ -152,14 +152,11 @@ AC_SUBST(RANLIB)
 AC_SUBST(REGEXLIB)
 AC_SUBST(VERSION)
 
-AC_HEADER_STDC
-AC_HEADER_STDBOOL
 AC_HEADER_TIME
-AC_CHECK_HEADERS([fcntl.h float.h limits.h netdb.h netinet/in.h sys/file.h sys/param.h sys/socket.h sys/time.h wctype.h])
+AC_CHECK_HEADERS([sys/time.h wctype.h])
 
 AC_C_CONST
 AC_C_INLINE
-AC_TYPE_SIGNAL
 AC_TYPE_SIZE_T
 
 AC_CHECK_LIB([m], [isnan])
@@ -232,10 +229,7 @@ AC_CHECK_LIB([gsl], [gsl_rng_alloc])
 AC_CHECK_LIB([avcodec], [avcodec_init])
 AC_CHECK_LIB([OSMesa], [OSMesaCreateContext])
 
-AC_FUNC_ALLOCA
-AC_FUNC_STAT
-AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([floor getcwd gethostbyaddr gethostbyname gettimeofday mkstemp pow regcomp socket sqrt strcasecmp strchr strdup strerror strstr iswspace])
+AC_CHECK_FUNCS([gettimeofday iswspace mkstemp strdup vasprintf])
 
 AC_MSG_CHECKING([for JVM library])
 
@@ -257,7 +251,7 @@ LIBS="-ljvm -ljava ${_old_libs}"
 AC_LINK_IFELSE([AC_LANG_CALL([],[JNI_CreateJavaVM])],[_have_jvm=yes])
 fi
 
-case "${host_os}" in linux*) ;; *)
+case "${host_os}" in linux*)
 if test "x$_have_jvm" = x ; then
 CPPFLAGS="-I/usr/local/linux-sun-jdk1.4.2/include -I/usr/local/linux-sun-jdk1.4.2/include/linux ${_old_cppflags}"
 LDFLAGS="${_old_ldflags} -L/usr/local/linux-sun-jdk1.4.2/jre/lib/i386 -L/usr/local/linux-sun-jdk1.4.2/jre/lib/i386/server -Wl,-rpath-link -Wl,/usr/local/linux-sun-jdk1.4.2/jre/lib/i386:/compat/linux/lib:/compat/linux/usr/lib"

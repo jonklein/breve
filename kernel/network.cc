@@ -1,13 +1,13 @@
 #include "kernel.h"
 
-#ifndef MINGW
+#if !MINGW
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #else
 #include <winsock2.h>
 #include <wininet.h>
-#endif /* MINGW */
+#endif
 
 /*!
 	\brief Get an address from a hostname.

@@ -21,7 +21,7 @@
 #include "kernel.h"
 #include "breveFunctionsNetwork.h"
 
-#ifndef MINGW
+#if !MINGW
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -29,7 +29,7 @@
 #include <wininet.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#endif /* MINGW */
+#endif
 
 #define BRNETWORKSERVERPOINTER(p)	((brNetworkServer*)BRPOINTER(p))
 

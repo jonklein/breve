@@ -21,7 +21,7 @@
 
 #if ! HAVE_GETTIMEOFDAY || MINGW
 
-#ifdef WINDOWS
+#if WINDOWS
 #include <windows.h>
 #include <winsock2.h>
 #else

@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os JAVAC JAR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE RANLIB ac_ct_RANLIB YACC DLLTOOL ac_ct_DLLTOOL MKDEP MAKEDEPEND CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS ARCHIVER ARCHIVE_SUFFIX EXE_SUFFIX PLATFORM PLUGINFLAGS PLUGINIMP PLUGINLIB QUICKTIMEFLAGS REGEXLIB VERSION EGREP ALLOCA LIBOBJS CXXCPP LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os JAVAC JAR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE RANLIB ac_ct_RANLIB YACC DLLTOOL ac_ct_DLLTOOL MKDEP MAKEDEPEND CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS ARCHIVER ARCHIVE_SUFFIX EXE_SUFFIX PLATFORM PLUGINFLAGS PLUGINIMP PLUGINLIB QUICKTIMEFLAGS REGEXLIB VERSION EGREP CXXCPP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -4808,6 +4808,62 @@ esac
 
 
 
+echo "$as_me:$LINENO: checking whether time.h and sys/time.h may both be included" >&5
+echo $ECHO_N "checking whether time.h and sys/time.h may both be included... $ECHO_C" >&6
+if test "${ac_cv_header_time+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <sys/types.h>
+#include <sys/time.h>
+#include <time.h>
+
+int
+main ()
+{
+if ((struct tm *) 0)
+return 0;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_header_time=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_header_time=no
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_header_time" >&5
+echo "${ECHO_T}$ac_cv_header_time" >&6
+if test $ac_cv_header_time = yes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define TIME_WITH_SYS_TIME 1
+_ACEOF
+
+fi
+
 echo "$as_me:$LINENO: checking for egrep" >&5
 echo $ECHO_N "checking for egrep... $ECHO_C" >&6
 if test "${ac_cv_prog_egrep+set}" = set; then
@@ -5046,213 +5102,9 @@ fi
 done
 
 
-echo "$as_me:$LINENO: checking for stdbool.h that conforms to C99" >&5
-echo $ECHO_N "checking for stdbool.h that conforms to C99... $ECHO_C" >&6
-if test "${ac_cv_header_stdbool_h+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-#include <stdbool.h>
-#ifndef bool
-# error bool is not defined
-#endif
-#ifndef false
-# error false is not defined
-#endif
-#if false
-# error false is not 0
-#endif
-#ifndef true
-# error true is not defined
-#endif
-#if true != 1
-# error true is not 1
-#endif
-#ifndef __bool_true_false_are_defined
-# error __bool_true_false_are_defined is not defined
-#endif
-
-        struct s { _Bool s: 1; _Bool t; } s;
-
-        char a[true == 1 ? 1 : -1];
-        char b[false == 0 ? 1 : -1];
-        char c[__bool_true_false_are_defined == 1 ? 1 : -1];
-        char d[(bool) -0.5 == true ? 1 : -1];
-        bool e = &s;
-        char f[(_Bool) -0.0 == false ? 1 : -1];
-        char g[true];
-        char h[sizeof (_Bool)];
-        char i[sizeof s.t];
-
-int
-main ()
-{
- return !a + !b + !c + !d + !e + !f + !g + !h + !i;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest.$ac_objext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_header_stdbool_h=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_header_stdbool_h=no
-fi
-rm -f conftest.$ac_objext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: $ac_cv_header_stdbool_h" >&5
-echo "${ECHO_T}$ac_cv_header_stdbool_h" >&6
-echo "$as_me:$LINENO: checking for _Bool" >&5
-echo $ECHO_N "checking for _Bool... $ECHO_C" >&6
-if test "${ac_cv_type__Bool+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-$ac_includes_default
-int
-main ()
-{
-if ((_Bool *) 0)
-  return 0;
-if (sizeof (_Bool))
-  return 0;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest.$ac_objext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_type__Bool=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_type__Bool=no
-fi
-rm -f conftest.$ac_objext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: $ac_cv_type__Bool" >&5
-echo "${ECHO_T}$ac_cv_type__Bool" >&6
-if test $ac_cv_type__Bool = yes; then
-
-cat >>confdefs.h <<_ACEOF
-#define HAVE__BOOL 1
-_ACEOF
 
 
-fi
-
-if test $ac_cv_header_stdbool_h = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_STDBOOL_H 1
-_ACEOF
-
-fi
-
-echo "$as_me:$LINENO: checking whether time.h and sys/time.h may both be included" >&5
-echo $ECHO_N "checking whether time.h and sys/time.h may both be included... $ECHO_C" >&6
-if test "${ac_cv_header_time+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <sys/types.h>
-#include <sys/time.h>
-#include <time.h>
-
-int
-main ()
-{
-if ((struct tm *) 0)
-return 0;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest.$ac_objext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_header_time=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_header_time=no
-fi
-rm -f conftest.$ac_objext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: $ac_cv_header_time" >&5
-echo "${ECHO_T}$ac_cv_header_time" >&6
-if test $ac_cv_header_time = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define TIME_WITH_SYS_TIME 1
-_ACEOF
-
-fi
-
-
-
-
-
-
-
-
-
-
-
-for ac_header in fcntl.h float.h limits.h netdb.h netinet/in.h sys/file.h sys/param.h sys/socket.h sys/time.h wctype.h
+for ac_header in sys/time.h wctype.h
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if eval "test \"\${$as_ac_Header+set}\" = set"; then
@@ -5549,66 +5401,6 @@ _ACEOF
 _ACEOF
  ;;
 esac
-
-echo "$as_me:$LINENO: checking return type of signal handlers" >&5
-echo $ECHO_N "checking return type of signal handlers... $ECHO_C" >&6
-if test "${ac_cv_type_signal+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <sys/types.h>
-#include <signal.h>
-#ifdef signal
-# undef signal
-#endif
-#ifdef __cplusplus
-extern "C" void (*signal (int, void (*)(int)))(int);
-#else
-void (*signal ()) ();
-#endif
-
-int
-main ()
-{
-int i;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest.$ac_objext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_type_signal=void
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_type_signal=int
-fi
-rm -f conftest.$ac_objext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: $ac_cv_type_signal" >&5
-echo "${ECHO_T}$ac_cv_type_signal" >&6
-
-cat >>confdefs.h <<_ACEOF
-#define RETSIGTYPE $ac_cv_type_signal
-_ACEOF
-
 
 echo "$as_me:$LINENO: checking for size_t" >&5
 echo $ECHO_N "checking for size_t... $ECHO_C" >&6
@@ -6284,31 +6076,31 @@ main ()
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if( status ) return status;
+	if(status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if( status ) return status;
-	status = pthread_create( &t, &attr, task, NULL );
+	if(status ) return status;
+	status = pthread_create(&t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #endif
-	if( status ) return status;
+	if(status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create( &t, pthread_attr_default, task, NULL );
-	if( status ) return errno;
+	status = pthread_create(&t, pthread_attr_default, task, NULL );
+	if(status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep( 1 );
+	sleep(1 );
 
-	status = pthread_detach( &t );
-	if( status ) return errno;
+	status = pthread_detach(&t );
+	if(status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -6383,31 +6175,31 @@ int main(argc, argv)
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if( status ) return status;
+	if(status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if( status ) return status;
-	status = pthread_create( &t, &attr, task, NULL );
+	if(status ) return status;
+	status = pthread_create(&t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #endif
-	if( status ) return status;
+	if(status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create( &t, pthread_attr_default, task, NULL );
-	if( status ) return errno;
+	status = pthread_create(&t, pthread_attr_default, task, NULL );
+	if(status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep( 1 );
+	sleep(1 );
 
-	status = pthread_detach( &t );
-	if( status ) return errno;
+	status = pthread_detach(&t );
+	if(status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -6503,31 +6295,31 @@ main ()
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if( status ) return status;
+	if(status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if( status ) return status;
-	status = pthread_create( &t, &attr, task, NULL );
+	if(status ) return status;
+	status = pthread_create(&t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #endif
-	if( status ) return status;
+	if(status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create( &t, pthread_attr_default, task, NULL );
-	if( status ) return errno;
+	status = pthread_create(&t, pthread_attr_default, task, NULL );
+	if(status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep( 1 );
+	sleep(1 );
 
-	status = pthread_detach( &t );
-	if( status ) return errno;
+	status = pthread_detach(&t );
+	if(status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -6602,31 +6394,31 @@ int main(argc, argv)
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if( status ) return status;
+	if(status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if( status ) return status;
-	status = pthread_create( &t, &attr, task, NULL );
+	if(status ) return status;
+	status = pthread_create(&t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #endif
-	if( status ) return status;
+	if(status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create( &t, pthread_attr_default, task, NULL );
-	if( status ) return errno;
+	status = pthread_create(&t, pthread_attr_default, task, NULL );
+	if(status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep( 1 );
+	sleep(1 );
 
-	status = pthread_detach( &t );
-	if( status ) return errno;
+	status = pthread_detach(&t );
+	if(status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -6727,31 +6519,31 @@ main ()
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if( status ) return status;
+	if(status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if( status ) return status;
-	status = pthread_create( &t, &attr, task, NULL );
+	if(status ) return status;
+	status = pthread_create(&t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #endif
-	if( status ) return status;
+	if(status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create( &t, pthread_attr_default, task, NULL );
-	if( status ) return errno;
+	status = pthread_create(&t, pthread_attr_default, task, NULL );
+	if(status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep( 1 );
+	sleep(1 );
 
-	status = pthread_detach( &t );
-	if( status ) return errno;
+	status = pthread_detach(&t );
+	if(status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -6826,31 +6618,31 @@ int main(argc, argv)
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if( status ) return status;
+	if(status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if( status ) return status;
-	status = pthread_create( &t, &attr, task, NULL );
+	if(status ) return status;
+	status = pthread_create(&t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #endif
-	if( status ) return status;
+	if(status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create( &t, pthread_attr_default, task, NULL );
-	if( status ) return errno;
+	status = pthread_create(&t, pthread_attr_default, task, NULL );
+	if(status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep( 1 );
+	sleep(1 );
 
-	status = pthread_detach( &t );
-	if( status ) return errno;
+	status = pthread_detach(&t );
+	if(status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -6951,31 +6743,31 @@ main ()
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if( status ) return status;
+	if(status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if( status ) return status;
-	status = pthread_create( &t, &attr, task, NULL );
+	if(status ) return status;
+	status = pthread_create(&t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #endif
-	if( status ) return status;
+	if(status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create( &t, pthread_attr_default, task, NULL );
-	if( status ) return errno;
+	status = pthread_create(&t, pthread_attr_default, task, NULL );
+	if(status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep( 1 );
+	sleep(1 );
 
-	status = pthread_detach( &t );
-	if( status ) return errno;
+	status = pthread_detach(&t );
+	if(status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -7050,31 +6842,31 @@ int main(argc, argv)
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if( status ) return status;
+	if(status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if( status ) return status;
-	status = pthread_create( &t, &attr, task, NULL );
+	if(status ) return status;
+	status = pthread_create(&t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #endif
-	if( status ) return status;
+	if(status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create( &t, pthread_attr_default, task, NULL );
-	if( status ) return errno;
+	status = pthread_create(&t, pthread_attr_default, task, NULL );
+	if(status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep( 1 );
+	sleep(1 );
 
-	status = pthread_detach( &t );
-	if( status ) return errno;
+	status = pthread_detach(&t );
+	if(status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -7175,31 +6967,31 @@ main ()
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if( status ) return status;
+	if(status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if( status ) return status;
-	status = pthread_create( &t, &attr, task, NULL );
+	if(status ) return status;
+	status = pthread_create(&t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #endif
-	if( status ) return status;
+	if(status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create( &t, pthread_attr_default, task, NULL );
-	if( status ) return errno;
+	status = pthread_create(&t, pthread_attr_default, task, NULL );
+	if(status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep( 1 );
+	sleep(1 );
 
-	status = pthread_detach( &t );
-	if( status ) return errno;
+	status = pthread_detach(&t );
+	if(status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -7274,31 +7066,31 @@ int main(argc, argv)
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if( status ) return status;
+	if(status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if( status ) return status;
-	status = pthread_create( &t, &attr, task, NULL );
+	if(status ) return status;
+	status = pthread_create(&t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #endif
-	if( status ) return status;
+	if(status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create( &t, pthread_attr_default, task, NULL );
-	if( status ) return errno;
+	status = pthread_create(&t, pthread_attr_default, task, NULL );
+	if(status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep( 1 );
+	sleep(1 );
 
-	status = pthread_detach( &t );
-	if( status ) return errno;
+	status = pthread_detach(&t );
+	if(status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -7399,31 +7191,31 @@ main ()
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if( status ) return status;
+	if(status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if( status ) return status;
-	status = pthread_create( &t, &attr, task, NULL );
+	if(status ) return status;
+	status = pthread_create(&t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #endif
-	if( status ) return status;
+	if(status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create( &t, pthread_attr_default, task, NULL );
-	if( status ) return errno;
+	status = pthread_create(&t, pthread_attr_default, task, NULL );
+	if(status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep( 1 );
+	sleep(1 );
 
-	status = pthread_detach( &t );
-	if( status ) return errno;
+	status = pthread_detach(&t );
+	if(status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -7498,31 +7290,31 @@ int main(argc, argv)
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if( status ) return status;
+	if(status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if( status ) return status;
-	status = pthread_create( &t, &attr, task, NULL );
+	if(status ) return status;
+	status = pthread_create(&t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if( status < 0 ) status = errno;
+	if(status < 0 ) status = errno;
 #endif
-	if( status ) return status;
+	if(status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create( &t, pthread_attr_default, task, NULL );
-	if( status ) return errno;
+	status = pthread_create(&t, pthread_attr_default, task, NULL );
+	if(status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep( 1 );
+	sleep(1 );
 
-	status = pthread_detach( &t );
-	if( status ) return errno;
+	status = pthread_detach(&t );
+	if(status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -8673,645 +8465,12 @@ _ACEOF
 fi
 
 
-# The Ultrix 4.2 mips builtin alloca declared by alloca.h only works
-# for constant arguments.  Useless!
-echo "$as_me:$LINENO: checking for working alloca.h" >&5
-echo $ECHO_N "checking for working alloca.h... $ECHO_C" >&6
-if test "${ac_cv_working_alloca_h+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <alloca.h>
-int
-main ()
-{
-char *p = (char *) alloca (2 * sizeof (int));
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_working_alloca_h=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_cv_working_alloca_h=no
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: $ac_cv_working_alloca_h" >&5
-echo "${ECHO_T}$ac_cv_working_alloca_h" >&6
-if test $ac_cv_working_alloca_h = yes; then
 
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_ALLOCA_H 1
-_ACEOF
 
-fi
 
-echo "$as_me:$LINENO: checking for alloca" >&5
-echo $ECHO_N "checking for alloca... $ECHO_C" >&6
-if test "${ac_cv_func_alloca_works+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#ifdef __GNUC__
-# define alloca __builtin_alloca
-#else
-# ifdef _MSC_VER
-#  include <malloc.h>
-#  define alloca _alloca
-# else
-#  if HAVE_ALLOCA_H
-#   include <alloca.h>
-#  else
-#   ifdef _AIX
- #pragma alloca
-#   else
-#    ifndef alloca /* predefined by HP cc +Olibcalls */
-char *alloca ();
-#    endif
-#   endif
-#  endif
-# endif
-#endif
 
-int
-main ()
-{
-char *p = (char *) alloca (1);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_func_alloca_works=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_func_alloca_works=no
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: $ac_cv_func_alloca_works" >&5
-echo "${ECHO_T}$ac_cv_func_alloca_works" >&6
-
-if test $ac_cv_func_alloca_works = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_ALLOCA 1
-_ACEOF
-
-else
-  # The SVR3 libPW and SVR4 libucb both contain incompatible functions
-# that cause trouble.  Some versions do not even contain alloca or
-# contain a buggy version.  If you still want to use their alloca,
-# use ar to extract alloca.o from them instead of compiling alloca.c.
-
-ALLOCA=alloca.$ac_objext
-
-cat >>confdefs.h <<\_ACEOF
-#define C_ALLOCA 1
-_ACEOF
-
-
-echo "$as_me:$LINENO: checking whether \`alloca.c' needs Cray hooks" >&5
-echo $ECHO_N "checking whether \`alloca.c' needs Cray hooks... $ECHO_C" >&6
-if test "${ac_cv_os_cray+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#if defined(CRAY) && ! defined(CRAY2)
-webecray
-#else
-wenotbecray
-#endif
-
-_ACEOF
-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
-  $EGREP "webecray" >/dev/null 2>&1; then
-  ac_cv_os_cray=yes
-else
-  ac_cv_os_cray=no
-fi
-rm -f conftest*
-
-fi
-echo "$as_me:$LINENO: result: $ac_cv_os_cray" >&5
-echo "${ECHO_T}$ac_cv_os_cray" >&6
-if test $ac_cv_os_cray = yes; then
-  for ac_func in _getb67 GETB67 getb67; do
-    as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $ac_func" >&5
-echo $ECHO_N "checking for $ac_func... $ECHO_C" >&6
-if eval "test \"\${$as_ac_var+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char $ac_func (); below.
-    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-    <limits.h> exists even on freestanding compilers.  */
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char $ac_func ();
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined (__stub_$ac_func) || defined (__stub___$ac_func)
-choke me
-#else
-char (*f) () = $ac_func;
-#endif
-#ifdef __cplusplus
-}
-#endif
-
-int
-main ()
-{
-return f != $ac_func;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  eval "$as_ac_var=yes"
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-eval "$as_ac_var=no"
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_var'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_var'}'`" >&6
-if test `eval echo '${'$as_ac_var'}'` = yes; then
-
-cat >>confdefs.h <<_ACEOF
-#define CRAY_STACKSEG_END $ac_func
-_ACEOF
-
-    break
-fi
-
-  done
-fi
-
-echo "$as_me:$LINENO: checking stack direction for C alloca" >&5
-echo $ECHO_N "checking stack direction for C alloca... $ECHO_C" >&6
-if test "${ac_cv_c_stack_direction+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test "$cross_compiling" = yes; then
-  ac_cv_c_stack_direction=0
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-int
-find_stack_direction ()
-{
-  static char *addr = 0;
-  auto char dummy;
-  if (addr == 0)
-    {
-      addr = &dummy;
-      return find_stack_direction ();
-    }
-  else
-    return (&dummy > addr) ? 1 : -1;
-}
-
-int
-main ()
-{
-  exit (find_stack_direction () < 0);
-}
-_ACEOF
-rm -f conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_c_stack_direction=1
-else
-  echo "$as_me: program exited with status $ac_status" >&5
-echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-( exit $ac_status )
-ac_cv_c_stack_direction=-1
-fi
-rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_c_stack_direction" >&5
-echo "${ECHO_T}$ac_cv_c_stack_direction" >&6
-
-cat >>confdefs.h <<_ACEOF
-#define STACK_DIRECTION $ac_cv_c_stack_direction
-_ACEOF
-
-
-fi
-
-echo "$as_me:$LINENO: checking whether lstat dereferences a symlink specified with a trailing slash" >&5
-echo $ECHO_N "checking whether lstat dereferences a symlink specified with a trailing slash... $ECHO_C" >&6
-if test "${ac_cv_func_lstat_dereferences_slashed_symlink+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  rm -f conftest.sym conftest.file
-echo >conftest.file
-if test "$as_ln_s" = "ln -s" && ln -s conftest.file conftest.sym; then
-  if test "$cross_compiling" = yes; then
-  ac_cv_func_lstat_dereferences_slashed_symlink=no
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-$ac_includes_default
-int
-main ()
-{
-struct stat sbuf;
-     /* Linux will dereference the symlink and fail.
-        That is better in the sense that it means we will not
-        have to compile and use the lstat wrapper.  */
-     exit (lstat ("conftest.sym/", &sbuf) ? 0 : 1);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_func_lstat_dereferences_slashed_symlink=yes
-else
-  echo "$as_me: program exited with status $ac_status" >&5
-echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-( exit $ac_status )
-ac_cv_func_lstat_dereferences_slashed_symlink=no
-fi
-rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
-fi
-else
-  # If the `ln -s' command failed, then we probably don't even
-  # have an lstat function.
-  ac_cv_func_lstat_dereferences_slashed_symlink=no
-fi
-rm -f conftest.sym conftest.file
-
-fi
-echo "$as_me:$LINENO: result: $ac_cv_func_lstat_dereferences_slashed_symlink" >&5
-echo "${ECHO_T}$ac_cv_func_lstat_dereferences_slashed_symlink" >&6
-
-test $ac_cv_func_lstat_dereferences_slashed_symlink = yes &&
-
-cat >>confdefs.h <<_ACEOF
-#define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
-_ACEOF
-
-
-if test $ac_cv_func_lstat_dereferences_slashed_symlink = no; then
-  LIBOBJS="$LIBOBJS lstat.$ac_objext"
-fi
-
-echo "$as_me:$LINENO: checking whether stat accepts an empty string" >&5
-echo $ECHO_N "checking whether stat accepts an empty string... $ECHO_C" >&6
-if test "${ac_cv_func_stat_empty_string_bug+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test "$cross_compiling" = yes; then
-  ac_cv_func_stat_empty_string_bug=yes
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-$ac_includes_default
-int
-main ()
-{
-struct stat sbuf;
-  exit (stat ("", &sbuf) ? 1 : 0);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_func_stat_empty_string_bug=yes
-else
-  echo "$as_me: program exited with status $ac_status" >&5
-echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-( exit $ac_status )
-ac_cv_func_stat_empty_string_bug=no
-fi
-rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
-fi
-fi
-echo "$as_me:$LINENO: result: $ac_cv_func_stat_empty_string_bug" >&5
-echo "${ECHO_T}$ac_cv_func_stat_empty_string_bug" >&6
-if test $ac_cv_func_stat_empty_string_bug = yes; then
-  LIBOBJS="$LIBOBJS stat.$ac_objext"
-
-cat >>confdefs.h <<_ACEOF
-#define HAVE_STAT_EMPTY_STRING_BUG 1
-_ACEOF
-
-fi
-
-
-for ac_func in vprintf
-do
-as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $ac_func" >&5
-echo $ECHO_N "checking for $ac_func... $ECHO_C" >&6
-if eval "test \"\${$as_ac_var+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char $ac_func (); below.
-    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-    <limits.h> exists even on freestanding compilers.  */
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char $ac_func ();
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined (__stub_$ac_func) || defined (__stub___$ac_func)
-choke me
-#else
-char (*f) () = $ac_func;
-#endif
-#ifdef __cplusplus
-}
-#endif
-
-int
-main ()
-{
-return f != $ac_func;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  eval "$as_ac_var=yes"
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-eval "$as_ac_var=no"
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_var'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_var'}'`" >&6
-if test `eval echo '${'$as_ac_var'}'` = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define `echo "HAVE_$ac_func" | $as_tr_cpp` 1
-_ACEOF
-
-echo "$as_me:$LINENO: checking for _doprnt" >&5
-echo $ECHO_N "checking for _doprnt... $ECHO_C" >&6
-if test "${ac_cv_func__doprnt+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char _doprnt (); below.
-    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-    <limits.h> exists even on freestanding compilers.  */
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char _doprnt ();
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined (__stub__doprnt) || defined (__stub____doprnt)
-choke me
-#else
-char (*f) () = _doprnt;
-#endif
-#ifdef __cplusplus
-}
-#endif
-
-int
-main ()
-{
-return f != _doprnt;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_func__doprnt=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_func__doprnt=no
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: $ac_cv_func__doprnt" >&5
-echo "${ECHO_T}$ac_cv_func__doprnt" >&6
-if test $ac_cv_func__doprnt = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_DOPRNT 1
-_ACEOF
-
-fi
-
-fi
-done
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-for ac_func in floor getcwd gethostbyaddr gethostbyname gettimeofday mkstemp pow regcomp socket sqrt strcasecmp strchr strdup strerror strstr iswspace
+for ac_func in gettimeofday iswspace mkstemp strdup vasprintf
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ac_func" >&5
@@ -9498,7 +8657,7 @@ fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
 fi
 
-case "${host_os}" in linux*) ;; *)
+case "${host_os}" in linux*)
 if test "x$_have_jvm" = x ; then
 CPPFLAGS="-I/usr/local/linux-sun-jdk1.4.2/include -I/usr/local/linux-sun-jdk1.4.2/include/linux ${_old_cppflags}"
 LDFLAGS="${_old_ldflags} -L/usr/local/linux-sun-jdk1.4.2/jre/lib/i386 -L/usr/local/linux-sun-jdk1.4.2/jre/lib/i386/server -Wl,-rpath-link -Wl,/usr/local/linux-sun-jdk1.4.2/jre/lib/i386:/compat/linux/lib:/compat/linux/usr/lib"
@@ -10903,9 +10062,8 @@ s,@QUICKTIMEFLAGS@,$QUICKTIMEFLAGS,;t t
 s,@REGEXLIB@,$REGEXLIB,;t t
 s,@VERSION@,$VERSION,;t t
 s,@EGREP@,$EGREP,;t t
-s,@ALLOCA@,$ALLOCA,;t t
-s,@LIBOBJS@,$LIBOBJS,;t t
 s,@CXXCPP@,$CXXCPP,;t t
+s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
 

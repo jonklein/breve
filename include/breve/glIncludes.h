@@ -18,26 +18,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#ifdef MACOSX
-
+#if MACOSX
 #include <GLUT/glut.h>
 #import <OpenGL/gl.h>
 #import <OpenGL/glu.h>
 #import <OpenGL/glext.h>
-
 #else
-
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-
-#ifndef WINDOWS
+#if ! WINDOWS
 #include <GL/glext.h>
 #include <GL/glx.h>
 #endif
+#endif
 
-#endif /* MACOSX */
-
-#ifdef HAVE_LIBOSMESA
+#if HAVE_LIBOSMESA
 #include <GL/osmesa.h>
 #endif
