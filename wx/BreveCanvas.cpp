@@ -122,9 +122,21 @@ void BreveCanvas::OnIdle(wxIdleEvent&event)
     }
 }
 
+
+//
+// the current WXCOCOA implementation seems to be missing the 
+// regular constructor?
+//
+
+#ifdef __WXCOCOA__
+BreveCanvas::BreveCanvas(BreveRender *parent)
+    : wxGLCanvas(parent, (wxGLCanvas*) NULL, -1, wxDefaultPosition, 
+		wxDefaultSize, 0, "breve canvas" )
+#else 
 BreveCanvas::BreveCanvas(BreveRender*parent)
     : wxGLCanvas(parent, -1, wxDefaultPosition, wxDefaultSize, 0,
-		       "Breve Canvas", (int*)&canvas_attrib, wxNullPalette)
+		"breve canvas", (int*)&canvas_attrib, wxNullPalette)
+#endif
 {
     wxSize size(400,300);
 
