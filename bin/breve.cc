@@ -139,9 +139,7 @@ int main(int argc, char **argv) {
 	brEngineSetIOPath(frontend->engine, getcwd(wd, 10239));
 
 	frontend->engine->camera = slNewCamera(width, height, GL_POLYGON);
-	frontend->engine->camera->enabled = 1;
-
-	frontend->engine->camera->updated = 1;
+	frontend->engine->camera->enabled = CM_UPDATED;
 
 	frontend->engine->argc = argc - 1;
 	frontend->engine->argv = argv + 1;

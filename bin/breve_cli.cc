@@ -99,8 +99,7 @@ int main(int argc, char **argv) {
 	brEngineSetIOPath(frontend->engine, getcwd(wd, 10239));
 
 	frontend->engine->camera = slNewCamera(400, 400, GL_POLYGON);
-	frontend->engine->camera->enabled = 0;
-	frontend->engine->camera->updated = 0;
+	frontend->engine->camera->enabled = CM_DISABLED;
 
 	frontend->engine->argc = argc - 1;
 	frontend->engine->argv = argv + 1;
@@ -113,13 +112,14 @@ int main(int argc, char **argv) {
 #ifdef HAVE_LIBOSMESA
 	frontend->engine->osBuffer = slMalloc(OSMESA_WINDOW_SIZE * OSMESA_WINDOW_SIZE * 4 * sizeof(GLubyte));
 	frontend->engine->osContext = OSMesaCreateContext(OSMESA_RGBA, NULL);
-	frontend->engine->useOSMesa = 1;
 
 	if(!OSMesaMakeCurrent(frontend->engine->osContext, steveData->engine->osBuffer, GL_UNSIGNED_BYTE, OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE)) 
 		slMessage(DEBUG_ALL, "Could not activate offscreen rendering context\n");
 
 	frontend->engine->camera->x = OSMESA_WINDOW_SIZE;
 	frontend->engine->camera->y = OSMESA_WINDOW_SIZE;
+
+	frontend->engine->camera->enabled = CM_NOT_UPDATED;
 #endif
 
 	text = slUtilReadFile(argv[1]);
