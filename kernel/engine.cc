@@ -184,6 +184,10 @@ brEngine *brEngineNew() {
 		pthread_create(&data->thread, NULL, stIterationThread, data);
 	}
 
+#ifdef HAVE_LIBJAVA
+	brJavaInit(e);
+#endif
+
 	return e;
 }
 
