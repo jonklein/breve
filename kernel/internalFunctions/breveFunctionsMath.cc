@@ -35,6 +35,7 @@ double stEmRandomGamma(int ithEvent);
 
 int brIRandomGauss(brEval arguments[], brEval *result, brInstance *instance) {
 	BRDOUBLE(result)  = stEmRandomGauss();
+	// BRDOUBLE(result) = gsl_ran_gaussian( RNG, 1.0);
 	return EC_OK; 
 }
 
@@ -46,6 +47,7 @@ int brIRandomGauss(brEval arguments[], brEval *result, brInstance *instance) {
 
 int brIRandomExponential(brEval arguments[], brEval *result, brInstance *instance) {
 	BRDOUBLE(result)  = stEmRandomExponential();
+	// BRDOUBLE(result)  = stEmRandomExponential(RNG);
 	return EC_OK; 
 }
 
@@ -58,6 +60,7 @@ int brIRandomExponential(brEval arguments[], brEval *result, brInstance *instanc
 int brIRandomGamma(brEval arguments[], brEval *result, brInstance *instance) {
 	int ithEvent = BRINT(&arguments[0]);
 	BRDOUBLE(result)  = stEmRandomGamma(ithEvent);
+	// BRDOUBLE(result) = gsl_ran_gamma(RNG, A, B);
   
 	return EC_OK; 
 }
@@ -328,6 +331,7 @@ void breveInitMathFunctions(brNamespace *n) {
 	brNewBreveCall(n, "asin", brIAsin, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "acos", brIAcos, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "atan", brIAtan, AT_DOUBLE, AT_DOUBLE, 0);
+	brNewBreveCall(n, "atan2", brIAtan2, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "sqrt", brISqrt, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "angle", brIAngle, AT_DOUBLE, AT_VECTOR, AT_VECTOR, 0);
 	brNewBreveCall(n, "cross", brICross, AT_VECTOR, AT_VECTOR, AT_VECTOR, 0);

@@ -20,7 +20,7 @@ Control : myController {
 
 		print "simulation started".
 
-		30 new myAgents.
+		(30 new myAgents) make-invisible.
 
 	+ to iterate:
 		# place code that should be called during every 

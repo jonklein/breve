@@ -1,6 +1,9 @@
 @use Object.
 
 Object : QSystem {
+	% The main interface to the qgame++ Quantum Gate And Measurement Emulator, 
+	% a simulator for quantum computing.
+
 	+ variables:
 		systemPointer (pointer).
 
@@ -14,6 +17,9 @@ Object : QSystem {
 }
 
 Object : QProgram {
+	% A program in qgame++ Quantum Gate And Measurement Emulator, a
+	% simulator for quantum computing.
+
 	+ variables:
 		programPointer (pointer).
 
