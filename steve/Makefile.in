@@ -27,7 +27,7 @@ stevelex.c: stevelex.l
 	mv lex.yy.c stevelex.c
 
 steveparse.tab.c: steveparse.y
-	bison -d -v steveparse.y
+	@YACC@ -b steveparse -d -v steveparse.y
 
 libbrsteve.a: $(LIBO)
 	$(AR) -crv libbrsteve.a $(LIBO) 
@@ -39,4 +39,3 @@ clean:
 	rm -f *.o stevelex.c steveparse.output steveparse.tab.[ch] libbrsteve.a
 
 install: all
-

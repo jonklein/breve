@@ -165,6 +165,11 @@ void slCameraUpdateFrustum(slCamera *c) {
 	slVectorNormalize(&c->frustumPlanes[1].normal);
 	slVectorNormalize(&c->frustumPlanes[2].normal);
 	slVectorNormalize(&c->frustumPlanes[3].normal);
+
+	slVectorPrint(&c->frustumPlanes[0].normal);
+	slVectorPrint(&c->frustumPlanes[1].normal);
+	slVectorPrint(&c->frustumPlanes[2].normal);
+	slVectorPrint(&c->frustumPlanes[3].normal);
 }
 
 int slCameraFrustumTest(slCamera *c, slVector *test) {
@@ -180,6 +185,7 @@ int slCameraFrustumTest(slCamera *c, slVector *test) {
 int slCameraFrustumPolygonTest(slCamera *c, slVector *test, int n) {
 	int x;
 	char violations[4] = { 0, 0, 0, 0 };
+	int v = 0;
 
 	for(x=0;x<n;x++) {
 		int plane;
@@ -187,16 +193,17 @@ int slCameraFrustumPolygonTest(slCamera *c, slVector *test, int n) {
 		for(plane=0;plane<4;plane++) {
 			if(slPlaneDistance(&c->frustumPlanes[plane], &test[x]) < 0.0) {
 				violations[plane] = 1;
-			} else return 0;
+				v++;
+				plane = 4;
+			} 
 		}
 	}
 
-	if(violations[0] && violations[1]) return 2;
-	if(violations[2] && violations[3]) return 2;
+	if(v == 0) return 0;
 
-	if(violations[0] || violations[1] || violations[2] || violations[3]) return 1;
+	if((v == n) && violations[0] + violations[1] + violations[2] + violations[3] == 1) return 1;
 
-	return 0;
+	return 2;
 }
 
 /*!

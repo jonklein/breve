@@ -17,7 +17,7 @@ INTERNALO = $(shell ls internalFunctions/*.o | sed s/.c$$/.o/)
 all: internal libbrkernel.a
 
 internal:
-	cd internalFunctions; make
+	cd internalFunctions; $(MAKE)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<

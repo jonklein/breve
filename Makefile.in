@@ -37,16 +37,16 @@ documentation:
 	cd docBuild; $(MAKE) -f Makefile install
 
 profile:
-	make CFLAGS='-pg $(OPTFLAGS)'
+	$(MAKE) CFLAGS='-pg $(OPTFLAGS)'
 
 optimize:
-	make CFLAGS='$(OPTFLAGS)'
+	$(MAKE) CFLAGS='$(OPTFLAGS)'
 
 optimize_debug:
-	make CFLAGS+='-g $(OPTFLAGS)'
+	$(MAKE) CFLAGS+='-g $(OPTFLAGS)'
 
 memory_debug:
-	make CFLAGS+='-DMEMORY_DEBUG'
+	$(MAKE) CFLAGS+='-DMEMORY_DEBUG'
 
 clean:
 	rm -rf OSX/build
@@ -56,7 +56,6 @@ clean:
 	-cd steve; $(MAKE) -f Makefile clean
 	-cd graph; $(MAKE) -f Makefile clean
 	-cd neural; $(MAKE) -f Makefile clean
-	-cd java; $(MAKE) -f Makefile clean
 	-cd docBuild; $(MAKE) -f Makefile clean
 	-cd bin; $(MAKE) -f Makefile clean
 
@@ -69,14 +68,14 @@ clean:
 
 OSX_build:
 	-mkdir docs
-	make -f Makefile optimize
-	cd plugins; make
+	$(MAKE) -f Makefile optimize
+	cd plugins; $(MAKE)
 	cd OSX ; xcodebuild -buildstyle Deployment CC= LIBS='@LDFLAGS@ @LIBS@'
 
 OSX_clean:
 	rm -f $(DMG_FILE)
-	make -f Makefile clean
-	cd plugins; make clean
+	$(MAKE) -f Makefile clean
+	cd plugins; $(MAKE) clean
 	cd OSX; xcodebuild clean
 	rm -rf OSX/build plugins/*/build
 
@@ -94,12 +93,12 @@ OSX_release: OSX_clean documentation OSX_build
 	rm -rf breve_image_folder
 
 CLI_release:
-	make -f Makefile clean
+	$(MAKE) -f Makefile clean
 	rm -rf $(CLI_FOLDER)
 	mkdir $(CLI_FOLDER)
 	mkdir $(CLI_FOLDER)/bin
 	mkdir $(CLI_FOLDER)/lib
-	make -f Makefile optimize
+	$(MAKE) -f Makefile optimize
 	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin/
 	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin/
 	cp -r lib/classes $(CLI_FOLDER)/lib/

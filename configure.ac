@@ -72,6 +72,14 @@ case "${host_os}" in
 
 		;;
 
+	
+	openbsd* )
+		GLLIBS="-lglut -lGL -lGLU -lXmu -lm -lutf8"
+		CPPFLAGS="$(CPPFLAGS) -I/usr/local/include -I/usr/X11R6/include"
+		LDFLAGS="$(LDFLAGS) -L/usr/local/lib -L/usr/X11R6/lib"
+
+		;;
+
 	*)
 		dnl Unix OSS configuration
 

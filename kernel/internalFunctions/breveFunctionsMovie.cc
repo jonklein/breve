@@ -42,9 +42,6 @@ int breveMovieCreate(brEval args[], brEval *result, brInstance *i) {
 int breveMovieAddGLFrame(brEval args[], brEval *result, brInstance *i) {
 	slMovie *movie = BRPOINTER(&args[0]);
 
-#ifdef HAVE_LIBOSMESA
-	slRenderWorld(i->engine->world, i->engine->camera, 0, GL_RENDER, 0, 0);
-#endif /* HAVE_LIBOSMESA */
 	BRINT(result) = slMovieAddGLFrame(movie, i->engine->camera);
 
 	return EC_OK;

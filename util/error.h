@@ -34,7 +34,7 @@ enum debugLevels {
     DEBUG_GEN   = 100   /* waaaaay too much information */
 };
 
-#define slDebug(format, ...)	{ slMessage(0, "Error at source file \"%s\", line %d:\n", __FILE__, __LINE__); slMessage(0, format, ## __VA_ARGS__); }
+#define slDebug(format, args...)	{ slMessage(0, "Error at source file \"%s\", line %d:\n", __FILE__, __LINE__); slMessage(0, format, ##args ); }
 
 void slSetDebugLevel(int level);
 

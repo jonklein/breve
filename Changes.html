@@ -31,6 +31,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <H2>version 2.1 [11/XX/2004]</H2>
 <P>
 <ul>
+<li>New feature: physical Springs.
 <li>Physical collisions may now be disabled between specific object types.
 <li>Introduced fully transparent steve to Java bridge.
 <li>Fixed network server starting on wrong port on x86 machines
@@ -40,9 +41,8 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <li>Fixed bug in Mobile method "set-label".
 <li>Various improvements to the Push programming language.
 <li>Changes to Push programming language to match the Lisp implementation
-<li>New feature: Springs.
 <li>Different patterns can be drawn for lines.
-<li>Improved "Go to method..." popup menu.
+<li>Improved "Go to method..." popup menu (OS X only).
 <li>Fixed incorrect rendering when bitmaps rendered after transparencies.
 </ul>
 <P>breve Object API Changes</P>
@@ -51,8 +51,10 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <li>The brObjectType findMethod function pointer now takes an additional argument: the method argument types. 
 <li>The "class" fields of structs have been changed to be called "object", to avoid conflicts with C++ compilers.
 <li>brObjectTypes now require a few additional function callbacks.
-
-<li>The simulation backend library has been partially converted to C++ and cleaned up significantly.
+</ul>
+<ul>
+<P>Source Code Changes</P>
+<li>The simulation backend library has been partially converted to C++ and cleaned up significantly, though work remains.  The changes so far have allowed for some major optimizations.
 </ul>
 
 <p>

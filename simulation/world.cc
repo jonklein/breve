@@ -706,6 +706,10 @@ void slWorldSetLightExposureDetection(slWorld *w, int n) {
 	w->detectLightExposure = n;
 }
 
+int slWorldGetLightExposureDetection(slWorld *w) {
+	return w->detectLightExposure;
+}
+
 void slWorldSetLightExposureSource(slWorld *w, slVector *v) {
 	slVectorCopy(v, &w->lightExposureSource);
 }

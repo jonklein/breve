@@ -33,7 +33,7 @@
 }
 
 - (void)initGL {
-	if(viewEngine) slInitGL(viewEngine->world);
+	if(viewEngine) slInitGL(viewEngine->world, viewEngine->camera);
 
 	/* no padding when we get gl pixels */
 

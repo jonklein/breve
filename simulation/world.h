@@ -334,6 +334,7 @@ void slWorldSetBackgroundTexture(slWorld *w, int n, int mode);
 
 void slWorldSetLightExposureDetection(slWorld *w, int n);
 void slWorldSetLightExposureSource(slWorld *w, slVector *v);
+int slWorldGetLightExposureDetection(slWorld *w);
 
 void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*, int t), int (*collide)(void*, void*, int t));
 

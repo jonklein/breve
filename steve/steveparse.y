@@ -880,10 +880,10 @@ expression
 		slFree($1);
 	}
 | log_expression ISA WORD_VALUE {
-		$$ = NULL
+		$$ = NULL;
 	}
 | log_expression ISA type {
-		$$ = NULL
+		$$ = NULL;
 	}
 ;
 

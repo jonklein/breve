@@ -1,6 +1,11 @@
 #include "simulation.h"
 #include "tiger.h"
 
+//
+// This is some simple code to read rudimentary data from
+// Tiger/Line files
+//
+
 slGISData::slGISData(char *file) {
 	std::string rt1(file);
 	std::string rt2(file);
@@ -17,7 +22,7 @@ int slGISData::parseRT1File(std::string rt1) {
 	std::fstream fs;
 	double totalLat = 0, totalLon = 0;
 
-	fs.open(rt1.c_str());
+	fs.open(rt1.c_str(), std::ios::in);
 
 	while(!fs.eof()) {
 		char name[31], tlid[11], type[5], clas[4], slat[11], slon[11], elat[11], elon[11];
@@ -95,7 +100,7 @@ int slGISData::parseRT2File(std::string rt2) {
 	slGISChain *chain;
 	int offset;
 
-	fs.open(rt2.c_str());
+	fs.open(rt2.c_str(), std::ios::in);
 
 	while(!fs.eof()) {
 		double lat, lon;

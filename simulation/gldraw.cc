@@ -92,7 +92,7 @@ void slMakeLightTexture(GLubyte *lTexture, GLubyte *dlTexture) {
 	}
 }
   
-void slInitGL(slWorld *w) {
+void slInitGL(slWorld *w, slCamera *c) {
 	GLubyte lt[LIGHTSIZE * LIGHTSIZE * 2];
 	GLubyte glt[LIGHTSIZE * LIGHTSIZE * 2];
 
@@ -102,10 +102,10 @@ void slInitGL(slWorld *w) {
 
 	slMakeLightTexture(&lt[0], &glt[0]);
 
-	slUpdateTexture(w, slTextureNew(), gBrickImage, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA);
-	slUpdateTexture(w, slTextureNew(), gPlaid, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA);
-	slUpdateTexture(w, slTextureNew(), lt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA);
-	slUpdateTexture(w, slTextureNew(), glt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA);
+	slUpdateTexture(w, slTextureNew(c), gBrickImage, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA);
+	slUpdateTexture(w, slTextureNew(c), gPlaid, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA);
+	slUpdateTexture(w, slTextureNew(c), lt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA);
+	slUpdateTexture(w, slTextureNew(c), glt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA);
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -206,16 +206,22 @@ void slCenterPixelsInSquareBuffer(unsigned char *pixels, int width, int height, 
 	\brief Allocates space for a new texture.
 */
 
-unsigned int slTextureNew() {
+unsigned int slTextureNew(slCamera *c) {
 	GLuint texture;
 
 	if(!glActive) return 0;
+
+	if(c->activateContextCallback) c->activateContextCallback();
+
 	glGenTextures(1, &texture);
 	return texture;
 }
 
-void slTextureFree(unsigned int n) {
+void slTextureFree(slCamera *c, unsigned int n) {
 	if(!glActive) return;
+
+	if(c->activateContextCallback) c->activateContextCallback();
+
 	glDeleteTextures(1, &n);
 }
 
@@ -1381,7 +1387,6 @@ void slRenderObjects(slWorld *w, slCamera *camera, int loadNames, int flags) {
 				default:
 					if(!(flags & DO_NO_LINK)) slDrawShape(camera, wo->shape, &wo->position, &wo->color, texture, wo->textureScale, textureMode, wo->drawMode, flags, wo->billboardRotation, wo->alpha);
 
-					// if(slCameraFrustumTest(camera, &wo->position.location)) printf("%p out of sight\n", wo);
 					break;
 			}
 		}

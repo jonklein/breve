@@ -117,21 +117,21 @@ class slTerrainQuadtree {
 
 			_clip = slCameraFrustumPolygonTest(c, _points, 4);
 
-			if(_clip != 1) {
-				for(m=0;m<4;m++) {
-					slVector toCamera;
-					double distance;
+			if(_clip == 1) return _culled;
 
-					if(_children[m]) _children[m]->cull(c);
+			_culled = false;
 
-					slVectorAdd(&c->target, &c->location, &toCamera);
-					slVectorSub(&toCamera, &_points[m], &toCamera);
-					distance = slVectorLength(&toCamera);
-				
-					if(distance < _minDist) _minDist = distance;
-				}
+			for(m=0;m<4;m++) {
+				slVector toCamera;
+				double distance;
 
-				_culled = false;
+				if(_children[m]) _children[m]->cull(c);
+
+				slVectorAdd(&c->target, &c->location, &toCamera);
+				slVectorSub(&toCamera, &_points[m], &toCamera);
+				distance = slVectorLength(&toCamera);
+			
+				if(distance < _minDist) _minDist = distance;
 			}
 
 			return _culled;
@@ -140,9 +140,9 @@ class slTerrainQuadtree {
 		inline int draw(slCamera *c) {
 			int m;
 
-			if(_culled) return 0;
+			// if(_culled) return 0;
 
-			if((_clip == 2 || _minDist < 100) && _children[0]) {
+			if(!_culled && ((_clip == 0 && _minDist < 50.0) || _clip == 2) && _children[0]) {
 				int drawn = 0;
 				for(m=0;m<4;m++) drawn += _children[m]->draw(c);
 				return drawn;
@@ -150,7 +150,9 @@ class slTerrainQuadtree {
 
 			glDisable(GL_BLEND);
 
-			glColor4f(0, (_points[0].y - _terrain->heightMin) / _terrain->heightDelta, 0, 0.8);
+			if(_culled) glColor4f(0, 0, 0, 1);
+			else glColor4f(0, _minDist / 100.0, 0, 0.8);
+
 			glBegin(GL_LINE_LOOP);
 			glVertex3f(_points[0].x, _points[0].y, _points[0].z);
 			glVertex3f(_points[1].x, _points[1].y, _points[1].z);

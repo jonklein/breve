@@ -167,7 +167,7 @@ int brIImageUpdateTexture(brEval args[], brEval *result, brInstance *i) {
 		return EC_OK;
 	}
 
-	if(image->textureNumber == -1) image->textureNumber = slTextureNew();
+	if(image->textureNumber == -1) image->textureNumber = slTextureNew(i->engine->camera);
 
    	slUpdateTexture(i->engine->world, image->textureNumber, image->data, image->x, image->y, GL_RGBA);
 
@@ -264,9 +264,7 @@ int brIImageDataFree(brEval args[], brEval *result, brInstance *i) {
 	if(dm->textureNumber != -1) {
 		GLuint texture = dm->textureNumber;
 
-		if(i->engine->camera->activateContextCallback) i->engine->camera->activateContextCallback();
-
-		slTextureFree(texture);
+		slTextureFree(i->engine->camera, texture);
 	}
 
 	slFree(dm->data);

@@ -25,7 +25,7 @@
 void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	slWorldObject *wo;
 	std::vector<slWorldObject*>::iterator wi;
-	unsigned int n;
+	unsigned int n = 0;
 	int x;
 
 	static int bufferSize = 0;
@@ -95,6 +95,8 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 		wo->lightExposure = 0;
 
 		if(wo->shape) slDrawShape(c, wo->shape, &wo->position, &color, 0, 0, 0, 0, DO_NO_LIGHTING|DO_NO_COLOR|DO_NO_TEXTURE, 0, 1.0);
+
+		n++;
 	}
 
 	glPopMatrix();
