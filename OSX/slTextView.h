@@ -21,6 +21,8 @@
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 
+#import "util.h"
+
 @interface slTextView : NSTextView {
     id findText;
     id findCaseSwitch;

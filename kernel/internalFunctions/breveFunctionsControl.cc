@@ -185,30 +185,6 @@ int brISetDrawSmooth(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
-    \brief Sets OpenGL smoothing for the main camera.  
-
-	void setDrawBlur(int blur).
-*/
-
-int brISetBlur(brEval args[], brEval *target, brInstance *i) {
-    i->engine->camera->blur = BRINT(&args[0]);
-    i->engine->camera->recompile = 1;
-    return EC_OK;
-}
-
-/*!
-    \brief Sets OpenGL smoothing for the main camera.  
-
-	void setBlurFactor(double factor).
-*/
-
-int brISetBlurFactor(brEval args[], brEval *target, brInstance *i) {
-    i->engine->camera->blurFactor = BRDOUBLE(&args[0]);
-    i->engine->camera->recompile = 1;
-    return EC_OK;
-}
-
-/*!
     \brief Sets OpenGL fog for the main camera.  
 	
 	void setDrawFog(int fog).
@@ -588,9 +564,6 @@ void breveInitControlFunctions(brNamespace *n) {
     brNewBreveCall(n, "uniqueColor", brIUniqueColor, AT_VECTOR, AT_INT, 0);
     brNewBreveCall(n, "RGBtoHSV", brIRGBtoHSV, AT_VECTOR, AT_VECTOR, 0);
     brNewBreveCall(n, "HSVtoRGB", brIHSVtoRGB, AT_VECTOR, AT_VECTOR, 0);
-
-    brNewBreveCall(n, "setBlur", brISetBlur, AT_NULL, AT_INT, 0);
-    brNewBreveCall(n, "setBlurFactor", brISetBlurFactor, AT_NULL, AT_DOUBLE, 0);
 
     brNewBreveCall(n, "getMouseX", brIGetMouseX, AT_INT, 0);
     brNewBreveCall(n, "getMouseY", brIGetMouseY, AT_INT, 0);

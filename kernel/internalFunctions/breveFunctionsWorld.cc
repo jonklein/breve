@@ -537,7 +537,10 @@ int brISetColor(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
-
+int brIGetMainCameraPointer(brEval args[], brEval *target, brInstance *i) {
+	BRPOINTER(target) = i->engine->camera;
+	return EC_OK;
+}
 
 int brICameraSetTarget(brEval args[], brEval *target, brInstance *i) {
 	slVector *tar = &BRVECTOR(&args[0]);
@@ -964,6 +967,7 @@ void breveInitWorldFunctions(brNamespace *n) {
 
 	brNewBreveCall(n, "loadTexture", brILoadTexture, AT_INT, AT_STRING, AT_INT, 0);
 
+	brNewBreveCall(n, "getMainCameraPointer", brIGetMainCameraPointer, AT_POINTER, 0);
 	brNewBreveCall(n, "cameraSetOffset", brICameraSetOffset, AT_NULL, AT_VECTOR, 0);
 	brNewBreveCall(n, "cameraSetTarget", brICameraSetTarget, AT_NULL, AT_VECTOR, 0);
 

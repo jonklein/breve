@@ -52,6 +52,9 @@ void slObjectParseCountNewlines(char *text);
 #define YY_INPUT(buf,result,max_size) \
     result = ((slObjectParseLocation == slObjectParseLength) ? YY_NULL : (buf[0] = slObjectParseBuffer[slObjectParseLocation++], 1))
 
+#include <string.h>
+#include <stdlib.h>
+
 %}
 
 

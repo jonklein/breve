@@ -51,6 +51,22 @@ int brICameraSetDrawSmooth(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
+	\brief Clears the camera with the background color.
+*/
+
+int brICameraClear(brEval args[], brEval *target, brInstance *i) {
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
+	slWorld *w = i->engine->world;
+	
+	if(camera->activateContextCallback) camera->activateContextCallback();
+	
+	glClearColor(w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+
+	return EC_OK;
+}
+
+/*!
 	\brief Sets OpenGL smoothing for a camera.
 
 	void cameraSetDrawBlur(int blur).
@@ -58,7 +74,11 @@ int brICameraSetDrawSmooth(brEval args[], brEval *target, brInstance *i) {
 
 int brICameraSetBlur(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->blur = BRINT(&args[0]);
+
+	if(camera->activateContextCallback) camera->activateContextCallback();
+	slClear(i->engine->world, camera);
+
+	camera->blur = BRINT(&args[1]);
 	camera->recompile = 1;
 	return EC_OK;
 }
@@ -71,7 +91,7 @@ int brICameraSetBlur(brEval args[], brEval *target, brInstance *i) {
 
 int brICameraSetBlurFactor(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->blurFactor = BRDOUBLE(&args[0]);
+	camera->blurFactor = BRDOUBLE(&args[1]);
 	camera->recompile = 1;
 	return EC_OK;
 }
@@ -212,6 +232,9 @@ void breveInitCameraFunctions(brNamespace *n) {
 	brNewBreveCall(n, "cameraPositionDisplay", brICameraPositionDisplay, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
 	brNewBreveCall(n, "cameraResizeDisplay", brICameraResizeDisplay, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
 	brNewBreveCall(n, "cameraNew", brICameraNew, AT_POINTER, 0);
+	brNewBreveCall(n, "cameraSetBlur", brICameraSetBlur, AT_NULL, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "cameraClear", brICameraClear, AT_NULL, AT_POINTER, 0);
+	brNewBreveCall(n, "cameraSetBlurFactor", brICameraSetBlurFactor, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "cameraFree", brICameraFree, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "cameraPosition", brICameraPosition, AT_NULL, AT_POINTER, AT_VECTOR, AT_VECTOR, 0);
 	brNewBreveCall(n, "cameraSetEnabled", brICameraSetEnabled, AT_NULL, AT_POINTER, AT_INT, 0);

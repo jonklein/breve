@@ -247,9 +247,17 @@ inline void stGCMarkPointer(stInstance *i, void *pointer, int type) {
 	stGCRecord *r;
 	stInstance *collect;
 
-	if(type == AT_NULL || !pointer) return;
+	if(!pointer) return;
 
 	switch(type) {
+		case AT_NULL:
+		case AT_INT:
+		case AT_DOUBLE:
+		case AT_VECTOR:
+		case AT_MATRIX:
+		case AT_POINTER:
+			return;
+			break;
 		case AT_INSTANCE:
 			if(((brInstance*)pointer)->status != AS_ACTIVE) return;
 			collect = (stInstance*)((brInstance*)pointer)->userData;

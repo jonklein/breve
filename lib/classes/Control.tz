@@ -85,6 +85,8 @@ Abstract : Control (aka Controls) [version 2.0] {
 		movie (object).
 		movieMenu (object).
 
+		cameraPointer (pointer).
+
 	+ to init:
 		% Initializes the Control object by setting up default values for 
 		% variables such as the size of the integration timestep.  Subclasses
@@ -103,6 +105,8 @@ Abstract : Control (aka Controls) [version 2.0] {
 
 		xRot = 0.0.
 		yRot = 0.0.
+
+		cameraPointer = getMainCameraPointer().
 
 		self move-light to (0, 0, 0).		
 		self point-camera at (0, 0, 0) from (0, 0, 30).
@@ -800,7 +804,7 @@ Abstract : Control (aka Controls) [version 2.0] {
 		% totally erasing the previous frame. 
 
 		blurFlag = 1.
-		setBlur(1).
+		cameraSetBlur(cameraPointer, 1).
 		blurMenu check.
 
 	+ to disable-blur:
@@ -808,7 +812,7 @@ Abstract : Control (aka Controls) [version 2.0] {
 		% information.
 
 		blurFlag = 0.
-		setBlur(0).
+		cameraSetBlur(cameraPointer, 0).
 		blurMenu uncheck.
 
 	+ to set-blur-factor to factor (float):
@@ -821,7 +825,14 @@ Abstract : Control (aka Controls) [version 2.0] {
 		% method METHOD(disable-blur).
 
 		blurFactor = factor.
-		setBlurFactor(factor).
+		cameraSetBlurFactor(cameraPointer, factor).
+
+	+ to clear-camera:
+		% Clears the camera to the current background color.  This 
+		% method only has an effect when camera blur is enabled 
+		% with METHOD(enable-blur).
+
+		cameraClear(cameraPointer).
 
 	+ to set-fog-limits with-start fogStart (float) with-end fogEnd (float):
 		% The calculation which calculates fog needs to know where the fog 

@@ -117,6 +117,7 @@ stArrayIndexExp::stArrayIndexExp(stMethod *m, stObject *o, char *word, stExp *i,
 
 		if(!var) {
 			stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name);
+			return;
 		}
 
 		local = 0;
@@ -124,6 +125,7 @@ stArrayIndexExp::stArrayIndexExp(stMethod *m, stObject *o, char *word, stExp *i,
 
 	if(var->type->type != AT_ARRAY) {
 		stParseError(o->engine, PE_TYPE, "Variable \"%s\" is not an array", word);
+		return;
 	}
 
 	offset = var->offset;
@@ -154,6 +156,7 @@ stArrayIndexAssignExp::stArrayIndexAssignExp(stMethod *m, stObject *o, char *wor
 
 		if(!var) {
 			stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name);
+			return;
 		}
 
 		local = 0;
@@ -161,6 +164,7 @@ stArrayIndexAssignExp::stArrayIndexAssignExp(stMethod *m, stObject *o, char *wor
 
 	if(var->type->type != AT_ARRAY) {
 		stParseError(o->engine, PE_TYPE, "Variable \"%s\" is not an array");
+		return;
 	}
 
 	offset = var->offset;
@@ -189,6 +193,7 @@ stLoadExp::stLoadExp(stMethod *m, stObject *o, char *word, char *file, int line)
 
 		if(!var) {
 			stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name);
+			return;
 		}
 
 		local = 0;
@@ -225,6 +230,7 @@ stAssignExp::stAssignExp(stMethod *m, stObject *o, char *word, stExp *r, char *f
 
 		if(!var) {
 			stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name);
+			return;
 		}
 
 		local = 0;
@@ -326,6 +332,7 @@ stCCallExp::stCCallExp(brEngine *e, brInternalFunction *s, std::vector< stExp* >
 
 	if(function->nargs != arguments.size()) {
 		stParseError(e, PE_PROTOTYPE, "invalid number of arguments to internal method \"%s\": expected %d, got %d", s->name, function->nargs, arguments.size()); 
+		return;
 	}
 
 	type = ET_FUNC;
