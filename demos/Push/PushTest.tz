@@ -35,13 +35,19 @@ Object : myPushAgent (aka myPushAgents) {
 		interpreter add-instruction named "CALLBACK-TEST" for-method "callback" for-instance self.
 
 	+ to go:
+		interpreter push-integer value 100.
 		interpreter clear-stacks.
-		code = (new PushProgram parse program "( CALLBACK-TEST )").
+
+		code = (new PushProgram parse program "( 1 2 3 4 5 6 CALLBACK-TEST )").
 
 		interpreter run code code.
 
 		interpreter print-stacks.
 		interpreter print-config.
+
+		print (interpreter get-integer-stack-top).
+		interpreter clear-stacks.
+		print (interpreter get-integer-stack-top).
 
 		print "Should free the interpreter now.".
 		free interpreter.

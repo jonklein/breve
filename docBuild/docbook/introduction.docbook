@@ -275,7 +275,7 @@ is running, the following controls can be useful:
 <listitem><para>F1: run simulation forward one iteration step</para></listitem>
 <listitem><para>Left mouse: rotate simulation and select objects (described below)</para></listitem>
 <listitem><para>Right mouse click: display the simulation menu (described below)</para></listitem>
-<listitem><para>Middle mouse click: display a contextual menu for the currently selected object (described below)</para></listitem>
+<listitem><para>Right mouse click (when an object is selected): display a contextual menu for the object (described below)</para></listitem>
 <listitem><para>Control (or F2) + left mouse: zoom in and out of the simulation</para></listitem>
 <listitem><para>Alt (or F3) + left mouse: move the camera</para></listitem>
 <listitem><para>Shift (or F4) + left mouse: select and drag objects in the simulation</para></listitem>
@@ -297,10 +297,11 @@ prompt, and will be executed in the simulation's controller object.  The steve l
 <title>The Simulation Menu and Object Contextual Menus</title>
 <para>
 Users can also interact with a running simulation via the 
-<firstterm>simulation menu</firstterm>, which is accessed from the right mouse button, and through the
-contextual menus associated with objects in a simulation.  To access a 
-contextual menu for an object in the simulation, use the middle mouse button to click on the 
-object in the simulation display.
+<firstterm>simulation menu</firstterm> and through the
+contextual menus associated with specific objects, both accessed via the right mouse button.  
+To access the simulation menu, be certain that no object in the simulation is selected, and 
+click the right mouse button.  To access a contextual menu for an object in the simulation, 
+use the right mouse button while an object is selected.
 </para>
 <para>
 By default, the simulation menu and contextual menus are mostly empty.  As 

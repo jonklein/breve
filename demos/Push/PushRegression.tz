@@ -14,6 +14,7 @@ PushGP : RegressionGP {
 
 	+ to init:
 		self read-interpreter-config from-file "PushRegression.config".
+		self set-population-size to 5000.
 
 		# PushGP regression problems are helped by being able to retrieve 
 		# the input values with an instruction.  Adding this callback is 

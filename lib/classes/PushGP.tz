@@ -9,6 +9,9 @@ Object : PushGP {
 	% solutions to a wide variety of problems.  For more 
 	% information on Push and PushGP, see the class OBJECT(Push).
 	% <p>
+	% This class is appropriate for evolving Push programs which
+	% are only run once per fitness case.
+	% <p>
 	% To implement a PushGP experiment you will need to setup
 	% a PushGP object which overrides two methods:
 	% METHOD(setup-fitness-test), which sets up a fitness test
