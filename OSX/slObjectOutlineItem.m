@@ -22,26 +22,7 @@
 
 @implementation slObjectOutlineItem;
 
-/*
-    + slObjectOutlineItem.m
-    = part of the variable browser outline view, we handle a specific entry
-    = in the view and can give the number of children of the object, whether
-    = it's expandable, it's display string, and so forth.
-    =
-    = the biggest complication is that not all variables are stored the same 
-    = way.  for example, regular variables are always in the instance variable
-    = array, while array variables can be stored anywhere and may even change
-    = as values are removed and inserted into the array.
-    =
-    = so with regular variables, we can just dereference a constant pointer 
-    = to get the value, while with the arrays we need to look up the pointer
-    = everytime.
-    =
-    = this will be a big issue when adding "set variable" functionality as 
-    = well.
-*/
-
-- (id)initWithEval:(brEval*)e name:(NSString*)n withVar:(stVar*)stv withOffset:(int)off instance: (stInstance*)i {
+- (id)initWithEval:(brEval*)e name:(NSString*)n withVar:(stVar*)stv withOffset:(int)off instance:(stInstance*)i {
     int c;
     stInstance *evalInstance;
 
@@ -61,13 +42,9 @@
 
     instance = i;
 
-    [self setCanExpand: YES];
-
     if([self getExpandable] && eval.type == AT_INSTANCE) {
-		evalInstance = STINSTANCE(&eval);
-		class = evalInstance->type;
-       	if(class) childCount = slListCount(class->variableList) + 1;
-		else childCount = 0;
+		evalInstance = BRINSTANCE(&eval)->userData;
+		[self setEvalObject: evalInstance->type];
     } else if([self getExpandable] && eval.type == AT_LIST) {
         childCount = BRLIST(&eval)->count;
     } else if([self getExpandable] && isArray) {
@@ -85,19 +62,16 @@
     return self;
 }
 
-- (void)setEvalClass:(stObject*)c {
+- (void)setEvalObject:(stObject*)c {
 	// This is a bit of a hack.  In the past, parent objects were actually 
 	// distinct instances.  So there would be an actual stInstance for the 
-	// superclass of an instance.  Now, there is just the base class.  So
-	// if they're inspecting a parent class, t
+	// superclass of an instance.  Now, there is just the base class.  
 
-	class = c;
+	object = c;
 
-	if(class) {
-		[self setCanExpand: YES];
-		[self updateChildCount: slListCount(class->variableList) + 1];
+	if(object) {
+		[self updateChildCount: slListCount(object->variableList) + 1];
 	} else {
-		[self setCanExpand: NO];
 		[self updateChildCount: 0];
 	}
 }
@@ -137,7 +111,10 @@
 
     if(isArray) {
         e->type = NULL;
-    } else if(instance && instance->status == AS_ACTIVE && offset != -1) {
+		return;
+    } 
+
+	if(instance && instance->status == AS_ACTIVE && offset != -1) {
 		stRunInstance ri;
 	
 		ri.instance = instance;
@@ -155,14 +132,13 @@
 	}
 
     if(!isArray && eval.type == AT_INSTANCE) {
-		if(STINSTANCE(&eval) && STINSTANCE(&eval)->status != AS_ACTIVE) {
-			[self setCanExpand: NO];
+		if(BRINSTANCE(&eval) && BRINSTANCE(&eval)->status != AS_ACTIVE) {
 			[self updateChildCount: 0];
 		}
 
 		e->type = AT_INSTANCE;
 
-        for(n=0;n<childCount;n++) if(childObjects[n]) [childObjects[n] setInstance: STINSTANCE(e)];
+        for(n=0;n<childCount;n++) if(childObjects[n]) [childObjects[n] setInstance: BRINSTANCE(e)->userData];
     }
 }
 
@@ -173,68 +149,36 @@
 - (BOOL)getExpandable {
     if(isArray) return YES;
 
-    return(((eval.type == AT_INSTANCE) || eval.type == AT_LIST) && BRPOINTER(&eval) != NULL && canExpand);
+    return(((eval.type == AT_INSTANCE) || eval.type == AT_LIST) && BRPOINTER(&eval) != NULL);
 }
 
-- (void)setCanExpand:(BOOL)e {
-    canExpand = e;
-}
-
-/*
-    + getChildCount
-    = return the child count we computed earlier... 
+/*!
+    \brief Return the child count computed earlier. 
 */
 
 - (int)getChildCount {
     return childCount;
 }
 
-/*
-    + getValue
-    = format this object's eval as a string.
+/*!
+    \brief Format this object's eval as a string.
 */
 
+
 - (NSString*)getValue {
-    stInstance *o;
+    NSString *result;
+	brEval evaluation;
+    char *cstr;
+	
+	[self getEval: &evaluation];
 
-    if(isArray) return [NSString stringWithFormat: @"%p [array]", &instance->variables[offset]];
+    cstr = brFormatEvaluation(&evaluation, NULL);
 
-    [self getEval: &eval];
+    result = [NSString stringWithCString: cstr];
 
-    switch(eval.type) {
-        case AT_INT:
-            return [NSString stringWithFormat: @"%d", BRINT(&eval)];
-            break;
-        case AT_DOUBLE:
-            return [NSString stringWithFormat: @"%f", BRDOUBLE(&eval)];
-            break;
-        case AT_INSTANCE:
-            o = STINSTANCE(&eval);
-            if(class && o && o->status == AS_ACTIVE) return [NSString stringWithFormat: @"%p [instance of \"%s\"]", o, class->name];
-            else if(class) return [NSString stringWithFormat: @"%p [freed instance of \"%s\"]", o, class->name];
-            else return [NSString stringWithFormat: @"%p [object]", o];
-            break;
-        case AT_POINTER:
-            return [NSString stringWithFormat: @"%p [pointer]", BRPOINTER(&eval)];
-            break;
-        case AT_STRING:
-            return [NSString stringWithCString: BRSTRING(&eval)];
-            break;
-        case AT_VECTOR:
-            return [NSString stringWithFormat: @"(%.2f, %.2f, %.2f)", BRVECTOR(&eval).x, BRVECTOR(&eval).y, BRVECTOR(&eval).z];
-            break;
-        case AT_LIST:
-            return [NSString stringWithFormat: @"%p [list]", BRPOINTER(&eval)];
-            break;
-        case AT_HASH:
-            return [NSString stringWithFormat: @"%p [hash]", BRPOINTER(&eval)];
-            break;
-		case AT_DATA:
-            return [NSString stringWithFormat: @"%p [data]", BRPOINTER(&eval)];
-            break;
-    }
+    slFree(cstr);
 
-    return NULL;
+    return result;
 }
 
 /*
@@ -246,46 +190,44 @@
 - (id)childAtIndex:(int)index {
     NSString *newTitle;
     stInstance *evalInstance;
-	stRunInstance ri;
     brEval newEval;
     slList *vars;
     stVar *var;
     int i, off;
 
-    /* make sure the child request is within the bounds of the number of children */
+    // make sure the child request is within the bounds of the number of children 
 
     if(index > childCount) return NULL;
 
-    /* if we've found this child previously, we can just return the object.     */
-    /* of course, we should also update the child's parent object in case       */
-    /* this instance has been changed.  a change to this object would obviously */
-    /* effect the children of this object */
+    // if we've found this child previously, we can just return the object.  
+    // of course, we should also update the child's parent object in case       
+    // this instance has been changed.  a change to this object would obviously 
+    // effect the children of this object 
 
     if(childObjects[index]) {
-        if(eval.type == AT_INSTANCE) [childObjects[index] setInstance: STINSTANCE(&eval)];
+        if(eval.type == AT_INSTANCE) [childObjects[index] setInstance: BRINSTANCE(&eval)->userData];
         return childObjects[index];
     }
 
     i = index;
 
-    evalInstance = STINSTANCE(&eval);
+    evalInstance = BRINSTANCE(&eval)->userData;
 
-	ri.instance = instance;
-	ri.type = instance->type;
 
-    /* depending on what kind of object WE are, we have different */
-    /* ways to reference our children */
     if(eval.type == AT_INSTANCE) {
-        vars = class->variableList;
+        vars = object->variableList;
 
 		if(index == slListCount(vars)) {
 			// is this the parent?
-
 			newEval.type = AT_INSTANCE;
-			newEval.values.instanceValue = STINSTANCE(&eval);
-        	childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: @"super" withVar: NULL withOffset: -1 instance: NULL];
-			[childObjects[index] setEvalClass: class->super];
+			BRINSTANCE(&newEval) = BRINSTANCE(&eval);
+        	childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: @"super" withVar: NULL withOffset: -1 instance: instance];
+			[childObjects[index] setEvalObject: object->super];
 		} else {
+			stRunInstance ri;
+			ri.instance = instance;
+			ri.type = instance->type;
+
         	while(vars && i--) vars = vars->next;
 
 	        if(!vars) return NULL;
@@ -304,28 +246,25 @@
     } else if(eval.type == AT_LIST) {
         stDoEvalListIndex(BRLIST(&eval), index, &newEval);
 
-        newTitle = [[NSString stringWithFormat: @"#%d", index] retain];
+        newTitle = [[NSString stringWithFormat: @"list index %d", index] retain];
 
-        childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: newTitle withVar: NULL withOffset: -1 instance: evalInstance];
+        childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: newTitle withVar: NULL withOffset: -1 instance: instance];
 
         [childObjects[index] setList: BRLIST(&eval) index: index];
     } else if(eval.type == AT_ARRAY) {
+		stRunInstance ri;
+		ri.instance = instance;
+		ri.type = instance->type;
+
         off = arrayOffset + index * stSizeofAtomic(arrayType);
     
         stLoadVariable(&instance->variables[off], arrayType, &newEval, &ri); 
         
-        newTitle = [[NSString stringWithFormat: @"#%d", index] retain];
+        newTitle = [[NSString stringWithFormat: @"array index %d", index] retain];
     
         childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: newTitle withVar: NULL withOffset: off instance: instance];
     
     }
-
-    // this is to avoid obvious loops--don't let us expand our own parents or ourselves. 
-    // there are ways to get around this of course, but...
-
-    if((newEval.type == AT_INSTANCE && STINSTANCE(&newEval)) && // it's an instance 
-			(STINSTANCE(&newEval)->status != AS_ACTIVE)) 		// it's not active
-				[childObjects[index] setCanExpand: NO];
 
     return childObjects[index];
 }

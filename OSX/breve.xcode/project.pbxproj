@@ -111,6 +111,7 @@
 		};
 		2A37F4AAFDCFA73011CA2CEA = {
 			children = (
+				48924DB2073719C300C7050E,
 				48ECC16B071C13D200596F93,
 				2A37F4ABFDCFA73011CA2CEA,
 				2A37F4B8FDCFA73011CA2CEA,
@@ -798,6 +799,7 @@
 				48619FB8071475A500E0A1B6,
 				48619FB9071475A500E0A1B6,
 				48619FBF071475F100E0A1B6,
+				48924DB3073719C300C7050E,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -991,6 +993,20 @@
 			path = /System/Library/Frameworks/AudioToolbox.framework;
 			refType = 0;
 			sourceTree = "<absolute>";
+		};
+		48924DB2073719C300C7050E = {
+			isa = PBXFileReference;
+			lastKnownFileType = archive.ar;
+			name = libbrjava.a;
+			path = /Users/jk/dev/breve/lib/libbrjava.a;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		48924DB3073719C300C7050E = {
+			fileRef = 48924DB2073719C300C7050E;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 		48D1C0BC04632D760093F8AA = {
 			fileEncoding = 4;

@@ -56,7 +56,7 @@
     /* if this is a valid and active instance, create a data item for it */
 
     if(i && i->status == AS_ACTIVE) {
-		BRPOINTER(&newEval) = i;
+		BRINSTANCE(&newEval) = i->breveInstance;
         newEval.type = AT_INSTANCE;
         instance = i;
         root = [[slObjectOutlineItem alloc] initWithEval: &newEval name: NULL withVar: NULL withOffset: NULL instance: i];

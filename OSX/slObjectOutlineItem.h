@@ -29,9 +29,8 @@
     brEval eval;
     int offset;
     stInstance *instance;
-	stObject *class;
+	stObject *object;
 
-    BOOL canExpand;
     int childCount;
 
     BOOL isArray;
@@ -45,7 +44,6 @@
     int theIndex;
     brEvalListHead *theEvalList;
 
-
 }
 
 - (id)initWithEval:(brEval*)e name: (NSString*)name withVar:(stVar*)v withOffset: (int)offset instance:(stInstance*)i;
@@ -58,8 +56,6 @@
 - (void)updateChildCount:(int)newChildCount;
 
 - (void)setList:(brEvalListHead*)e index:(int)index;
-
-- (void)setCanExpand:(BOOL)e;
 
 - (int)getChildCount;
 - (BOOL)getExpandable;

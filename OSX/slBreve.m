@@ -435,7 +435,7 @@ static NSRecursiveLock *gLogLock;
 		[selectionText setStringValue: 
 			[NSString stringWithFormat: @"No Selection (%s [%p])", engine->controller->object->name, engine->controller]];
 
-		[editorData setEngine: engine instance: engine->controller->pointer];
+		[editorData setEngine: engine instance: engine->controller->userData];
 	} else {
 		[editorData setEngine: engine instance: i];
 
@@ -479,7 +479,7 @@ static NSRecursiveLock *gLogLock;
 
 - (IBAction)simMenu:sender {
 	brEngine *e = [breveEngine getEngine];
-	[self doMenuCallbackForInstance: e->controller->pointer item: [sender tag]];
+	[self doMenuCallbackForInstance: e->controller->userData item: [sender tag]];
 }
 
 - (IBAction)contextualMenu:sender {

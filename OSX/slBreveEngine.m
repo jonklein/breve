@@ -431,14 +431,14 @@ char *interfaceID = "aqua/1.2";
 
 	if(!engine || !engine->controller) return NULL;
 
-	method = brMethodFind(engine->controller->object, "get-selection", 0);
+	method = brMethodFind(engine->controller->object, "get-selection", NULL, 0);
  
 	if(method) {
 		if(brMethodCall(engine->controller, method, NULL, &result) == EC_OK) {
 			if(result.type = AT_INSTANCE) {
 				i = BRINSTANCE(&result);
 
-				if(i && i->status == AS_ACTIVE) return i->pointer;
+				if(i && i->status == AS_ACTIVE) return i->userData;
 			}
 		} 
 	}

@@ -186,7 +186,7 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 			return brDataHexEncode(BRDATA(e));
 			break;
 		default:
-			brEvalError(i->engine, EE_INTERNAL, "unknown atomic type %d in slFormatEvaluation\n", e->type);
+			if(i) brEvalError(i->engine, EE_INTERNAL, "unknown atomic type %d in slFormatEvaluation\n", e->type);
 			return slStrdup("");
 	}
 }

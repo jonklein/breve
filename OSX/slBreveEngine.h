@@ -27,7 +27,6 @@
 #import <sys/dir.h>
 
 #import "slBreveGLView.h"
-#import "slObjectOutline.h"
 #import "slTextView.h"
 #import "slMovieRecord.h"
 
