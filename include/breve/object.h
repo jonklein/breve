@@ -27,6 +27,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <string>
 
 struct stInstanceCompare {
 	bool operator()(const stInstance* s1, const stInstance* s2) const {

@@ -38,7 +38,6 @@
 
     BOOL isArray;
     int arrayType;
-    int arrayOffset;
 
     BOOL isList;
 
@@ -65,5 +64,43 @@
 - (BOOL)getExpandable;
 
 - (id)childAtIndex:(int)index;
+
+@end
+
+@interface slObjectOutlineEvaluation : NSObject {
+
+}
+
+@end
+
+@interface slObjectOutlineObject : slObjectOutlineEvaluation {
+	struct stInstance *instance;
+	struct stObject *object;
+}
+
+- initWithInstance:(struct stInstance*)i object:(struct stObject*)o;
+
+@end
+
+@interface slObjectOutlineVariable : slObjectOutlineEvaluation {
+	struct stInstance *instance;
+	int type;
+	int offset;
+}
+
+- initWithInstance:(struct stInstance*)i type:(int)t offset:(int)o name:(NSString*)name;
+
+@end
+
+@interface slObjectOutlineListIndex : slObjectOutlineEvaluation {
+	brEvalListHead *list;
+	int index;
+}
+
+@end
+
+@interface slObjectOutlineHashIndex : slObjectOutlineEvaluation {
+	brEvalHash *hash;
+}
 
 @end

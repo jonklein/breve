@@ -62,6 +62,8 @@
         newEval.type = AT_INSTANCE;
         instance = i;
         root = [[slObjectOutlineItem alloc] initWithEval: &newEval name: NULL withVar: NULL withOffset: NULL instance: i];
+
+		// root = [[slObjectOutlineObject alloc] initWithInstance: i object: i->object];
     } else {
         root = NULL;
         instance = NULL;

@@ -174,7 +174,7 @@ bool BCTestApp::OnInit()
 	    }
 	    else
 	    {
-		wxMessageBox("The Breve engine will not function properly until a class path is defined.");
+		wxMessageBox("breve will not function properly until a class path is defined.");
 		found = -1;
 	    }
 	}
@@ -230,7 +230,7 @@ bool BCTestApp::OnInit()
 
 	if (BreveDir.IsEmpty() && found != -1)
 	{
-	    wxDirDialog d(NULL, "Select the directory containing Breve resources (demos directory, plugins directory, etc)", AppDir);
+	    wxDirDialog d(NULL, "Select the directory containing breve resources (demos directory, plugins directory, etc)", AppDir);
 
 	    while (d.ShowModal() == wxID_OK)
 	    {
@@ -246,12 +246,12 @@ bool BCTestApp::OnInit()
 		    break;
 		}
 
-		wxMessageBox("The selected directory doesn't seem to contain Breve resources.  At the very least,\na demos directory and a plugins directory are expected.");
+		wxMessageBox("The selected directory doesn't seem to contain breve resources.  At the very least,\na demos directory and a plugins directory are expected.");
 	    }
 	}
 
 	if (BreveDir.IsEmpty() && found != -1)
-	    wxMessageBox("Unable to locate Breve resources.  The Breve engine will not work properly until a proper path is specified.");
+	    wxMessageBox("Unable to locate breve resources.  breve will not work properly until a proper path is specified.");
     }
 
     config->Flush();

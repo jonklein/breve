@@ -142,7 +142,9 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 
 		desc = brObjectDescription(pi);
 
-		len = strlen(pi->object->name) + strlen(desc) + sizeof(void *) * 2 + 5;
+		// allocate enough room for the object name, pointer, spaces and description.
+
+		len = strlen(pi->object->name) + strlen(desc) + (sizeof(void*) * 2 + 2) + 20;
 
 		result = (char *)slMalloc(len);
 		snprintf(result, len, "%s (%p) %s", pi->object->name, pi, desc);

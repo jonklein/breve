@@ -827,10 +827,11 @@ Abstract : Control (aka Controls) [version 2.0] {
 		blurFactor = factor.
 		cameraSetBlurFactor(cameraPointer, factor).
 
-	+ to clear-camera:
+	+ to clear-screen:
 		% Clears the camera to the current background color.  This 
-		% method only has an effect when camera blur is enabled 
-		% with METHOD(enable-blur).
+		% method clears blurred artifacts which are drawn after 
+		% enabling METHOD(enable-blur).  If blurring has not been
+		% enabled, this method has no visual effect.
 
 		cameraClear(cameraPointer).
 
