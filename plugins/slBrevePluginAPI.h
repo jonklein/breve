@@ -29,6 +29,7 @@
    included here for backwards compatability */
 
 #define stNewBreveCall brNewBreveCall
+#define stNewSteveCall brNewBreveCall
 #define stEval brEval
 #define stHash brEvalHash
 #define stEvalList brEvalList
