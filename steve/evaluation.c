@@ -497,7 +497,7 @@ static int stEvalLoadInt(stLoadExp *e, stRunInstance *i, brEval *target) {
 static int stEvalLoadDouble(stLoadExp *e, stRunInstance *i, brEval *target) {
 	void *pointer;
 	
-	target->type = e->loadType;
+	target->type = AT_DOUBLE;
 
 	if (e->local)
 		pointer = &i->instance->type->steveData->stack[e->offset];
@@ -527,7 +527,7 @@ static int stEvalLoadIndirect(stLoadExp *e, stRunInstance *i, brEval *target) {
 static int stEvalLoadVector(stLoadExp *e, stRunInstance *i, brEval *target) {
 	void *pointer;
 	
-	target->type = e->loadType;
+	target->type = AT_VECTOR;
 
 	if (e->local)
 		pointer = &i->instance->type->steveData->stack[e->offset];
@@ -542,7 +542,7 @@ static int stEvalLoadVector(stLoadExp *e, stRunInstance *i, brEval *target) {
 static int stEvalLoadList(stLoadExp *e, stRunInstance *i, brEval *target) {
 	void *pointer;
 	
-	target->type = e->loadType;
+	target->type = AT_LIST;
 
 	if (e->local)
 		pointer = &i->instance->type->steveData->stack[e->offset];
@@ -562,7 +562,7 @@ static int stEvalLoadList(stLoadExp *e, stRunInstance *i, brEval *target) {
 static int stEvalLoadHash(stLoadExp *e, stRunInstance *i, brEval *target) {
 	void *pointer;
 	
-	target->type = e->loadType;
+	target->type = AT_HASH;
 
 	if (e->local)
 		pointer = &i->instance->type->steveData->stack[e->offset];
@@ -585,7 +585,7 @@ static int stEvalLoadHash(stLoadExp *e, stRunInstance *i, brEval *target) {
 static int stEvalLoadString(stLoadExp *e, stRunInstance *i, brEval *target) {
 	void *pointer;
 	
-	target->type = e->loadType;
+	target->type = AT_STRING;
 
 	if (e->local)
 		pointer = &i->instance->type->steveData->stack[e->offset];
@@ -603,7 +603,7 @@ static int stEvalLoadString(stLoadExp *e, stRunInstance *i, brEval *target) {
 static int stEvalLoadMatrix(stLoadExp *e, stRunInstance *i, brEval *target) {
 	void *pointer;
 	
-	target->type = e->loadType;
+	target->type = AT_MATRIX;
 
 	if (e->local)
 		pointer = &i->instance->type->steveData->stack[e->offset];
@@ -3194,7 +3194,7 @@ int stDoEvalListIndexAssign(brEvalListHead *l, int n, brEval *newVal, stRunInsta
 	// if this is a new entry at the end, append it instead
 
 	if (n == l->count || n < 0) {
-		if (brEvalListInsert(l, l->count, newVal))
+		if (brEvalListInsert(l, l->count, newVal) > -1)
 			return 0;
 		else
 			return -1;
