@@ -34,7 +34,6 @@ Control : Tunnel{
 
 Mobile : Particle (aka Particles) {
 	+ variables:
-		range (double).
 		shape (object).
 		
 	+ to iterate:

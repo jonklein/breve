@@ -100,7 +100,7 @@ Control : Swarm {
 
         self flock-normally.
 
-        self set-background-texture to cloudTexture.
+        self set-background-texture-image to cloudTexture.
 
         self offset-camera by (5, 1.5, 6).
 

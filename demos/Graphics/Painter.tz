@@ -137,6 +137,8 @@ Mobile : Painter (aka Painters) {
 		self set-color to color.
 
 	+ to iterate:
+		velocity (vector).
+
 		if random[20] == 0: self reset.
 		# if random[10] == 0: self set-color.
 

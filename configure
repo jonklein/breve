@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP AUDIOLIBS CXX RANLIB GLLIBS JAVALIBS JAVAINCS PLUGINFLAGS QUICKTIMEFLAGS EXTRALDFLAGS ARCHIVER ARCHIVE_SUFFIX EXE_SUFFIX PLATFORM YACC CXXFLAGS ac_ct_CXX LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE ac_ct_RANLIB ALLOCA EGREP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP AUDIOLIBS CXX RANLIB GLLIBS JAVALIBS JAVAINCS PLUGINFLAGS QUICKTIMEFLAGS EXTRALDFLAGS VERSION ARCHIVER ARCHIVE_SUFFIX EXE_SUFFIX PLATFORM YACC CXXFLAGS ac_ct_CXX LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE ac_ct_RANLIB ALLOCA EGREP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -2700,6 +2700,8 @@ echo "${ECHO_T}libraries $x_libraries, headers $x_includes" >&6
 fi
 
 
+VERSION="2.0"
+
 case "${host_os}" in
 	darwin* )
 
@@ -2785,6 +2787,7 @@ _ACEOF
 
 		;;
 esac
+
 
 
 
@@ -7578,6 +7581,7 @@ s,@JAVAINCS@,$JAVAINCS,;t t
 s,@PLUGINFLAGS@,$PLUGINFLAGS,;t t
 s,@QUICKTIMEFLAGS@,$QUICKTIMEFLAGS,;t t
 s,@EXTRALDFLAGS@,$EXTRALDFLAGS,;t t
+s,@VERSION@,$VERSION,;t t
 s,@ARCHIVER@,$ARCHIVER,;t t
 s,@ARCHIVE_SUFFIX@,$ARCHIVE_SUFFIX,;t t
 s,@EXE_SUFFIX@,$EXE_SUFFIX,;t t

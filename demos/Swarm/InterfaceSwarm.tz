@@ -47,10 +47,9 @@ Control : Swarm {
     + variables:
         birds (list).
         item (object).
-        breveTexture (int).
-        cloudTexture (int).
+        birdImage (object).
         selection (object).
-		cameraControl (int).
+	cameraControl (int).
 
         # the menu items corresponding to different flocking behaviors
 
@@ -96,8 +95,6 @@ Control : Swarm {
         self enable-lighting.
         self move-light to (0, 20, 20).
 
-        breveTexture = (self load-image from "images/breve.png").
-        cloudTexture = (self load-image from "images/clouds.png").
 
         # Add a huge floor.
 
@@ -107,13 +104,14 @@ Control : Swarm {
 
         birds = SWARM_SIZE new Birds.
 
-	birds set-bitmap to breveTexture.
+	birdImage = (new Image load from "images/breve.png").
+	birds set-bitmap-image to birdImage.
 
         # we'll call this method to set up the initial bird behavior.
 
         self flock-normally.
 
-        self set-background-texture to cloudTexture.
+        self set-background-texture-image to (new Image load from "images/clouds.png").
 
         self offset-camera by (5, 1.5, 6).
 
@@ -126,10 +124,6 @@ Control : Swarm {
         topDiff (double).
         highLoc (vector).
  
-        red (double).
-        green (double).
-        blue (double).
-
         self update-neighbors.
 
         # get the average location, and point the camera at it.
@@ -214,7 +208,7 @@ Mobile : Bird (aka Birds) {
     + to init:
         # register the object, set the initial location, velocity and color.
 
-        self register with-shape (new Sphere init-with radius .1). 
+        self set-shape to (new Sphere init-with radius .1). 
         self move to random[(10, 10, 10)] - (5, -5, 5).
         self set-velocity to random[(20, 20, 20)] - (10, 10, 10).
         self set-color to random[(1, 1, 1)].
