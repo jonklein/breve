@@ -26,18 +26,18 @@ typedef struct brCollisionHandler brCollisionHandler;
 */
 
 struct brObjectType {
-	void *(*findMethod)(void *objectData, char *name, unsigned char *types, int nargs);
-	void *(*findObject)(void *typeData, char *name);
-	void *(*instantiate)(void *objectData, brEval **constructorArgs, int argCount);
+	void *(*findMethod)(void *, char *, unsigned char *, int);
+	void *(*findObject)(void *, char *);
+	void *(*instantiate)(void *, brEval **, int);
 
-	int (*callMethod)(void *instanceData, void *methodData, brEval **arguments, brEval *result);
+	int (*callMethod)(void *, void *, brEval **, brEval *);
 
-	int (*isSubclass)(void *classData1, void *classData2);
+	int (*isSubclass)(void *, void *);
 
-	void (*destroyObject)(void *objectData);
-	void (*destoryMethod)(void *methodData);
-	void (*destroyInstance)(void *instanceData);
-	void (*destroyObjectType)(void *objectTypeData);
+	void (*destroyObject)(void *);
+	void (*destoryMethod)(void *);
+	void (*destroyInstance)(void *);
+	void (*destroyObjectType)(void *);
 
 	void *userData;
 };

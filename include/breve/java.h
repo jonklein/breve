@@ -101,6 +101,15 @@ void brInitJavaFuncs(brNamespace *);
 brJavaMethod *brJavaMakeMethod(brJavaBridgeData *, brJavaObject *, char *, unsigned char *, int);
 brJavaMethod *brJavaMakeMethodData(char *, jmethodID, char, char *, int);
 
+int brJavaMethodCall(brJavaBridgeData *, brJavaInstance *, brJavaMethod *, jvalue *, brEval *);
+
+brJavaMethod *brJavaMethodFindCallback(void *, char *, unsigned char *, int);
+brJavaObject *brJavaObjectFindCallback(void *, char *);
+brJavaInstance *brJavaInstanceNewCallback(void *, brEval **, int);
+int brJavaMethodCallCallback(void *, void *, brEval **, brEval *);
+brJavaMethod *brJavaIsSubclassCallback(brObject *, brObject *);
+void brJavaInstanceDestroyCallback(void *);
+
 int brEvalToJValue(brJavaBridgeData *, brEval *, jvalue *, char);
 
 brJavaObject *brJavaObjectFind(brJavaBridgeData *bridge, char *name);

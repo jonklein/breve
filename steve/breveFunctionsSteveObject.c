@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "steve.h"
+#include "xml.h"
 #include "breveFunctionsSteveObject.h"
 
 #ifndef MINGW

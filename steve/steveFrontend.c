@@ -1,4 +1,5 @@
 #include "steve.h"
+#include "xml.h"
 
 #include "errorText.h"
 

@@ -98,7 +98,8 @@ void brJavaInit(brEngine *e) {
 
 	javaObjectType->userData = brAttachJavaVM(e);
 
-	if(javaObjectType->userData) brEngineRegisterObjectType(e, javaObjectType);
+	if(javaObjectType->userData)
+	    brEngineRegisterObjectType(e, javaObjectType);
 }
 
 void brJavaFree(brEngine *e) {

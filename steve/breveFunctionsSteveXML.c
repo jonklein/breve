@@ -1,4 +1,5 @@
 #include "steve.h"
+#include "xml.h"
 
 /*!
 	\brief Archives an entire simulation to a file.
