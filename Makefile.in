@@ -44,7 +44,7 @@ bin/breve_cli@EXE_SUFFIX@: bin/breve_cli.o $(OBJ)
 	$(CXX) -o $@ $(LDFLAGS) $^ @LIBS@ @GLLIBS@ @AUDIOLIBS@
 
 bin/graphTest@EXE_SUFFIX@: graph/graphTest.o $(OBJ)
-	$(CXX) -o $@ $(LDFLAGS) $^ @LIBS@ @GLLIBS@
+	$(CXX) -o $@ $(LDFLAGS) $^ @LIBS@ @GLLIBS@ @AUDIOLIBS@
 
 %.o: %.c
 	$(CC) -c -o $@ $(CPPFLAGS) $(CFLAGS) $<

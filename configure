@@ -3976,8 +3976,10 @@ done
 test -n "$JAVAC" || JAVAC="$JAVAPREFIX"
 
 fi
-test "x$JAVAC" = x && { echo "$as_me:$LINENO: WARNING: no acceptable Java compiler found in \$PATH" >&5
+if test "x$JAVAC" = x; then
+	{ echo "$as_me:$LINENO: WARNING: no acceptable Java compiler found in \$PATH" >&5
 echo "$as_me: WARNING: no acceptable Java compiler found in \$PATH" >&2;}
+else
 
 echo "$as_me:$LINENO: checking if $JAVAC works" >&5
 echo $ECHO_N "checking if $JAVAC works... $ECHO_C" >&6
@@ -3988,7 +3990,7 @@ else
 JAVA_TEST=Test.java
 CLASS_TEST=Test.class
 cat << \EOF > $JAVA_TEST
-/* #line 3991 "configure" */
+/* #line 3993 "configure" */
 public class Test {
 }
 EOF
@@ -4012,6 +4014,7 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_prog_javac_works" >&5
 echo "${ECHO_T}$ac_cv_prog_javac_works" >&6
 
+fi
 
 for ac_prog in flex lex
 do
