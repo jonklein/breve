@@ -1480,6 +1480,8 @@ inline int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *target) {
 		}
 	}
 
+	bzero(target, sizeof(brEval));
+
 #ifdef MULTITHREAD
 	pthread_mutex_lock(&(i->instance->lock));
 #endif
