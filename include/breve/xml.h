@@ -18,7 +18,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <expat.h>
+#ifdef __cplusplus
+}
+#endif
 
 enum parserModes {
 	PARSE_INSTANCE,

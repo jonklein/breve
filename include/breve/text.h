@@ -18,6 +18,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifdef WINDOWS
+#define bcopy(x, y, z) memcpy((y), (x), z)
+#endif
+
 char *slStrdup(char *);
 char *slStrdupAndFree(char *);
 

@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include <float.h>
 #include <limits.h>
-#include <unistd.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
@@ -50,10 +49,10 @@
 #include "image.h"
 #include "integrate.h"
 #include "gldraw.h"
-#include "netsim.h"
 #include "shape.h"
 #include "patch.h"
 #include "world.h"
+#include "netsim.h"
 #include "link.h"
 #include "lightdetector.h"
 #include "vclip.h"

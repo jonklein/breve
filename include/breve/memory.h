@@ -21,6 +21,10 @@
 #ifndef _MEMORY_H
 #define _MEMORY_H
 
+#ifdef WINDOWS
+#define bzero(p, l) memset((p), 0, (l))
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "memory.h"
+#include "util.h"
 
 /*!
     memory.c defines a set of malloc wrappers -- mostly obsolete except for the 

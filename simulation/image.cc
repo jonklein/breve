@@ -28,31 +28,29 @@
 #include <png.h>
 #endif 
 
-#include <setjmp.h>
-
 #ifdef HAVE_LIBJPEG
-
 #ifdef __cplusplus      // make jpeglib C++ safe
-extern "C"{
+extern "C" {
 #endif
-#include<jpeglib.h>
+#include <jpeglib.h>
 #ifdef __cplusplus
 }
 #endif
-
-void slJPEGErrorExit(j_common_ptr cinfo);
-
-/*!
-	\brief An error structure for the JPEG library.
-*/
 
 struct slJPEGError {
 	struct jpeg_error_mgr pub;    /* "public" fields */
 	jmp_buf setjmp_buffer;    /* for return to caller */
 };
 
-typedef struct slJPEGError slJPEGError;
+void slJPEGErrorExit(j_common_ptr cinfo);
+
 #endif
+
+#include <setjmp.h>
+
+/*!
+	\brief An error structure for the JPEG library.
+*/
 
 /*
 	+ slReadImage

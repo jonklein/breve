@@ -24,9 +24,11 @@
 #include <unistd.h>
 #ifdef HAVE_WCTYPE_H
 #include <wctype.h>
-#else
-#define iswspace(c) ((c)==' '||(c)=='\f'||(c)=='\n'||(c)=='\r'||(c)=='\t'||(c)=='\v')
 #endif
+
+// #else
+// #define iswspace(c) ((c)==' '||(c)=='\f'||(c)=='\n'||(c)=='\r'||(c)=='\t'||(c)=='\v')
+
 #include "kernel.h"
 #include "breveFunctionsFile.h"
 

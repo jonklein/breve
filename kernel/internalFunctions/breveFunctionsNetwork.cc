@@ -26,9 +26,10 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #else
-#include <winsock2.h>
-#include <wininet.h>
 #endif /* MINGW */
+
+#include <wininet.h>
+#include <winsock2.h>
 
 #define BRNETWORKSERVERPOINTER(p)	((brNetworkServer*)BRPOINTER(p))
 
@@ -218,7 +219,8 @@ brNetworkServer *brListenOnPort(int port, brEngine *engine) {
 void *brListenOnSocket(void *data) {
 	brNetworkServer *serverData = (brNetworkServer*)data;
 
-	socklen_t caddr_size = sizeof(struct sockaddr_in);
+	// socklen_t caddr_size = sizeof(struct sockaddr_in);
+	int caddr_size = sizeof(struct sockaddr_in);
 
 	while(!serverData->terminate) {
 		brNetworkClientData clientData;

@@ -25,6 +25,7 @@
 
 #include <unistd.h>
 #include "kernel.h"
+#include "timeval.h"
 
 /*!
 	\brief Gets all the keys pressed down.

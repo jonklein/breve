@@ -47,10 +47,10 @@ bin/graphTest@EXE_SUFFIX@: graph/graphTest.o $(OBJ)
 	$(CXX) -o $@ $(LDFLAGS) $^ @LIBS@ @GLLIBS@ @AUDIOLIBS@
 
 %.o: %.c
-	$(CC) -c -o $@ $(CPPFLAGS) $(CFLAGS) $<
+	$(CC) $(CFLAGS) -c -o $@ $< $(CPPFLAGS) 
 
 %.o: %.cc
-	$(CXX) -c -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+	$(CXX) $(CXXFLAGS) -c -o $@ $< $(CPPFLAGS) 
 
 %.tab.c: %.y
 	$(YACC) $(YFLAGS) -o $@ $<
