@@ -604,7 +604,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 					if(dist > MC_TOLERANCE) {
 						// if(ce) ce->distance = dist;
 						return CT_DISJOINT;
-					} else {
+					} else if(dist > -s1->_radius) {
 						if(!ce) return CT_PENETRATE;
 
 						slVectorCopy(&transformedPlane.normal, &ce->normal);
@@ -617,8 +617,9 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 						ce->points.push_back(tempV1);
 						ce->depths.push_back(dist);
 
-						/* now take the sphere location + the offset to find the collision */
-						/* point in world coordinates, and then translate into shape coord */
+						// now take the sphere location + the offset to find the 
+						// collision point in world coordinates, and then 
+						// translate into shape coord 
 
 						slVectorAdd(&tempV1, &p1->location, &tempV1);
 						slVectorSub(&tempV1, &p2->location, &tempV1);
@@ -636,9 +637,13 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 
 						return CT_PENETRATE;
 					} 
-				} 
 
-				*feat = f->neighbors[update];
+					printf("%p, %p\n", *feat, f->neighbors[0]);
+
+					*feat = f->neighbors[0];
+				} else { 
+					*feat = f->neighbors[update];
+				}
 
 				if(centerDist < minDist) {
 					minDist = centerDist;
@@ -650,7 +655,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 			case FT_EDGE:
 				e = (slEdge*)*feat;
 
-				included = slClipPoint(&p1->location, e->voronoi, p2, 4, &update, NULL);
+				included = slClipPointMax(&p1->location, e->voronoi, p2, 4, &update);
 
 				if(included) {
 					start = e->points[0];
@@ -740,7 +745,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 		}
 
 		n++;
-	} 
+	}
 
 	// oh crap!  we're inside the sphere.  that's not a metaphor  
 	// or anything like "in the zone", or something--i mean, we're
@@ -1826,7 +1831,7 @@ int slFaceFaceCollisionPoints(slCollision *ce, slShape *s1, slPosition *p1, slFa
 		}
 	}
 
-	/* for face2, it's a bit easier--we're only interested in the vertices */
+	// for face2, it's a bit easier--we're only interested in the vertices 
 
 	for(n=0;n<face2->edgeCount;n++) {
 		thePoint = face2->points[n];
@@ -1898,7 +1903,7 @@ double slPointLineDist(slVector *p1, slVector *p2, slVector *src, slVector *i) {
 
 	u = top / bottom;
 
-	/* find where i is based on scalar u */
+	// find where i is based on scalar u 
 
 	slVectorMul(&p2m1, u, i);
 
