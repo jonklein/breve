@@ -135,6 +135,8 @@ int brIGraphAddLineValue(brEval args[], brEval *target, brInstance *i) {
 	unsigned int line = BRINT(&args[1]);
 	double yValue = BRDOUBLE(&args[2]);
 
+	if(!g) return EC_OK;
+
 	if(line >= g->lines.size()) {
 		/* error message */
 		return EC_OK;
