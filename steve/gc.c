@@ -251,9 +251,6 @@ inline void stGCMarkPointer(stInstance *i, void *pointer, int type) {
 	if(type == AT_NULL || !pointer) return;
 
 	switch(type) {
-		case AT_HASH:
-		case AT_STRING:
-		case AT_DATA:
 		case AT_LIST:
 			break;
 		case AT_INSTANCE:
@@ -265,6 +262,7 @@ inline void stGCMarkPointer(stInstance *i, void *pointer, int type) {
 			return;
 			break;
 	}
+
 
 	r = slMalloc(sizeof(stGCRecord));
 	r->pointer = pointer;

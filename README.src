@@ -100,7 +100,7 @@ Optional:
   libenet
   libgsl
   libgslcblas (or other BLAS library)
-
+  libqgame++
 
                     --- EXTERNAL LIBRARIES: DETAILS ---
 
@@ -198,6 +198,10 @@ Optional:
   On Mac OS X, the System vecLib framework is used, which provides AltiVec
   hardware acceleration on supported chips.
 
++ [optional] libqgame++, Quantum Gate and Measurement Emulator
+  http://hampshire.edu/lspector/qgame++
+
+  A library for simulating quantum computing.
 
                                 -- License --
 

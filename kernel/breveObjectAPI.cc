@@ -506,6 +506,8 @@ void brInstanceFree(brInstance *i) {
 		delete menu;
     }
 
+	slStackFree(i->menus);
+
 	if(i->iterate) brMethodFree(i->iterate);
 	if(i->postIterate) brMethodFree(i->postIterate);
 

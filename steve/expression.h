@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 enum stExpTypes {
-	/* basic expression types */
+	// basic expression types 
 
 	ET_INT = 1,
 	ET_ST_EVAL,

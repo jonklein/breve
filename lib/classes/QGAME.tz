@@ -2,7 +2,7 @@
 
 Object : QSystem {
 	% The main interface to the qgame++ Quantum Gate And Measurement Emulator, 
-	% a simulator for quantum computing.
+	% a quantum computing simulator.
 
 	+ variables:
 		systemPointer (pointer).
@@ -10,15 +10,27 @@ Object : QSystem {
 	+ to init:
 		systemPointer = qsysNew().
 
-	+ to test program theProgram (object) with-cases testCases (list):
-		% Runs a series of test cases, specified by testCases, on theProgram.
+	+ to test program theProgram (object) 
+		cases testCases (list) threshold t (double) qubits qb (int) measurement-qubits finalQB (list):
+		% Runs a series of test cases using qb qubits, specified by testCases, 
+		% on theProgram with qb qubits and a threshold of t.
+		% <P>
+		% This call returns a list of 5 items, which are to be interpreted as:
+		% <li> Number of misses
+		% <li> Maximum error
+		% <li> Average error
+		% <li> Maximum number of oracle calls
+		% <li> Average number of oracle calls
 
-		qsysTestProgram(systemPointer, (theProgram get-program-pointer), testCases, 0).
+		return qsysTestProgram(systemPointer, (theProgram get-program-pointer), testCases, qb, finalQB, t).
+
+	+ to destroy:
+		qsysFree(systemPointer).
 }
 
 Object : QProgram {
-	% A program in qgame++ Quantum Gate And Measurement Emulator, a
-	% simulator for quantum computing.
+	% An interface to a quantum program in qgame++ Quantum Gate And Measurement Emulator, 
+	% a quantum computing simulator.  To be used in conjunction with OBJECT(QSystem).
 
 	+ variables:
 		programPointer (pointer).
@@ -30,7 +42,11 @@ Object : QProgram {
 		return programPointer.
 
 	+ to add-instruction with-string instructionString (string): 
-		% Adds an instruction to the program parsed from instructionString.
+		% Adds an instruction to the program parsed from instructionString. 
 
-		qprogramAddInstruction(programPointer, instructionString).
+		if qprogramAddInstruction(programPointer, instructionString): 
+			print "warning: error adding QProgram instruction \"$instructionString\"".
+
+	+ to destroy:
+		qprogramFree(programPointer).
 }
