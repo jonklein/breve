@@ -139,7 +139,7 @@ brInstance *brClickCallback(brEngine *e, int n) {
 
 	brMethodFree(method);
 
-	return BRINSTANCE(&theArg);
+	return o->userData;
 }
 
 /*!

@@ -978,7 +978,7 @@ Abstract : Control (aka Controls) [version 2.0] {
 			loadedImages{ loadedImages } = file.
 		} else {
 			free image.
-			return.
+			return -1.
 		}
 
 		return (image get-texture-number) - 1.
