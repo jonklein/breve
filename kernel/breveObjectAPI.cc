@@ -373,7 +373,11 @@ brInstance *brObjectInstantiate(brEngine *e, brObject *o, brEval **args, int arg
 void brInstanceRelease(brInstance *i) {
 	if(!i) return;
 
+	printf("adding %p for removal\n", i);
+
 	i->engine->instancesToRemove.push_back(i);
+	brInstanceFree(i);
+
 	i->status = AS_RELEASED;
 }
 

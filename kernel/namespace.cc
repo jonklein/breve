@@ -33,7 +33,6 @@ void brNamespaceFreeWithFunction(brNamespace *ns, void (*symFree)(void *s)) {
 
 	for(mi = ns->map.begin(); mi != ns->map.end(); mi++) {
 		if(mi->second) brNamespaceSymbolFreeWithFunction(mi->second, symFree);
-		else slMessage(DEBUG_ALL, "warning: namespace entry %s empty\n", mi->first.c_str());
 	}
 
 	delete ns;

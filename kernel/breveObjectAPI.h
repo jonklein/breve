@@ -96,13 +96,11 @@ struct brInstance {
 	Keeps track of what methods are used to handle collisions between objects.
 */
 
-#ifdef __cplusplus
 struct brCollisionHandler {
     brObject *object;
     brMethod *method;
 	unsigned char ignore;
 };
-#endif
 
 /*!
 	\brief A reference to a native method.

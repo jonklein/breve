@@ -40,7 +40,7 @@ int brCheckCollisionCallback(brInstance *o1, brInstance *o2, int type) {
 	unsigned int n;
 	brCollisionHandler *h;
 
-	if(!o1 || !o2) return NULL;
+	if(!o1 || !o2) return 0;
 
 	/* check all of the collision handlers for both instances */
 	/* to see if there exists code to collide with eachother  */

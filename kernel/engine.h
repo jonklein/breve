@@ -164,49 +164,50 @@ struct briTunesData {
 */
 
 #ifdef __cplusplus
-struct brEngine {
-	slWorld *world;
-	slCamera *camera;
+class brEngine {
+	public:
+		slWorld *world;
+		slCamera *camera;
 
-	slStack *objectTypes;
+		slStack *objectTypes;
 
-	char simulationWillStop;
+		char simulationWillStop;
 
-	brSoundMixer *soundMixer;
+		brSoundMixer *soundMixer;
 
-	std::vector<brInstance*> freedInstances;
+		std::vector<brInstance*> freedInstances;
 
 #ifdef HAVE_LIBAVCODEC
-	slMovie *movie;
+		slMovie *movie;
 #endif
 
 #ifdef HAVE_LIBOSMESA
-	GLubyte *osBuffer;
-	OSMesaContext osContext;
+		GLubyte *osBuffer;
+		OSMesaContext osContext;
 #endif 
 
-	int useMouse;
-	int mouseX;
-	int mouseY;
+		int useMouse;
+		int mouseX;
+		int mouseY;
 
-	double iterationStepSize;
+		double iterationStepSize;
 
-	int evalStats[100];
-	double speedFactor;
+		int evalStats[100];
+		double speedFactor;
 
-	FILE *logFile;
+		FILE *logFile;
 
-	slStack *drawContexts;
+		slStack *drawContexts;
 
-	brInstance *controller;
+		brInstance *controller;
 
-	brNamespace *objects;
-	brNamespace *internalMethods;
+		brNamespace *objects;
+		brNamespace *internalMethods;
 
-	std::vector<brInstance*> postIterationInstances;
-	std::vector<brInstance*> iterationInstances;
-	std::vector<brInstance*> instances;
-
+		std::vector<brInstance*> postIterationInstances;
+		std::vector<brInstance*> iterationInstances;
+		std::vector<brInstance*> instances;
+	
 	std::vector<brInstance*> instancesToAdd;
 	std::vector<brInstance*> instancesToRemove;
 

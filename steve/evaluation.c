@@ -1488,7 +1488,7 @@ inline int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *target) {
 	pthread_mutex_unlock(&(i->instance->lock));
 #endif
 
-	// special case--if the define type is undefined, any type may be returned. */
+	// special case--if the define type is undefined, any type may be returned.
 
 	if(result != EC_OK) target->type = AT_NULL;
 	else if(c->function->rtype != AT_UNDEFINED) target->type = c->function->rtype;

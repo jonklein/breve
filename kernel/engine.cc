@@ -422,10 +422,10 @@ int brEngineIterate(brEngine *e) {
 	e->instancesToAdd.clear();
 
 	for(bi = e->instancesToRemove.begin(); bi != e->instancesToRemove.end(); bi++ ) {
-		i = *bi;
+		 i = *bi;
 
 		brEngineRemoveInstance(e, i);
-		brInstanceFree(i);
+		// brInstanceFree(i);
 	}
 
 	e->instancesToRemove.clear();
