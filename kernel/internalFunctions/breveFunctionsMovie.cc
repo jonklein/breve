@@ -23,7 +23,9 @@
 /*! \addtogroup InternalFunctions */
 /*@{*/
 
+#if HAVE_LIBAVFORMAT
 #define BRMOVIEPOINTER(p)  ((slMovie*)BRPOINTER(p))
+#endif
 
 int breveMovieCreate(brEval args[], brEval *result, brInstance *i) {
 #if HAVE_LIBAVFORMAT
@@ -47,23 +49,27 @@ int breveMovieCreate(brEval args[], brEval *result, brInstance *i) {
 }
 
 int breveMovieAddWorldFrame(brEval args[], brEval *result, brInstance *i) {
+#if HAVE_LIBAVFORMAT
 	slMovie *movie = BRMOVIEPOINTER(&args[0]);
 
 	if (!movie)
 		slMessage(DEBUG_ALL, "warning: attempt to add frame to null movie pointer\n");
 	else
 		BRINT(result) = slMovieAddWorldFrame(movie, i->engine->world, i->engine->camera);
+#endif
 
 	return EC_OK;
 }
 
 int breveMovieClose(brEval args[], brEval *result, brInstance *i) {
+#if HAVE_LIBAVFORMAT
 	slMovie *movie = BRMOVIEPOINTER(&args[0]);
 
 	if (!movie)
 		slMessage(DEBUG_ALL, "warning: attempt to close null movie pointer\n");
 	else
 		slMovieFinish(movie);
+#endif
 
 	return EC_OK;
 

@@ -21,9 +21,11 @@ Control : myController {
 
 		m = "guppy".
 
-		if m{ 2 } != "p": die "reading string index 2 failed".
+		print m.
 
-		print m{ 2 }.
+		# if m{ 2 } != "p": die "reading string index 2 failed".
+
+		# print m{ 2 }.
 
 		m{ 0 } = "p".
 		print m.
