@@ -51,20 +51,6 @@ int breveFunctionPushEnvironmentReadConfigFile(brEval arguments[], brEval *resul
 }
 
 /*!
-	\brief A breve API function wrapper for the C-function \ref pushCallbackInstructionFree.
-
-	See the documentation for \ref pushCallbackInstructionFree for more details.
-*/
-
-int breveFunctionPushCallbackInstructionFree(brEval arguments[], brEval *result, brInstance *instance) {
-	PushCustomInstruction *callback = BRPOINTER(&arguments[0]);
-
-	pushCallbackInstructionFree(callback);
-
-	return EC_OK;
-}
-
-/*!
 	\brief A breve API function wrapper for the C-function \ref pushRun.
 
 	See the documentation for \ref pushRun for more details.
@@ -596,7 +582,6 @@ void breveInitPushFunctions(brNamespace *namespace) {
 	brNewBreveCall(namespace, "pushEnvironmentNew", breveFunctionPushEnvironmentNew, AT_POINTER,  0);
  	brNewBreveCall(namespace, "pushEnvironmentFree", breveFunctionPushEnvironmentFree, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(namespace, "pushEnvironmentReadConfigFile", breveFunctionPushEnvironmentReadConfigFile, AT_NULL, AT_POINTER, AT_STRING, 0);
- 	brNewBreveCall(namespace, "pushCallbackInstructionFree", breveFunctionPushCallbackInstructionFree, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(namespace, "pushRun", breveFunctionPushRun, AT_INT, AT_POINTER, AT_POINTER, AT_INT, 0);
  	brNewBreveCall(namespace, "pushGetConfigString", breveFunctionPushGetConfigString, AT_STRING, AT_POINTER, 0);
  	brNewBreveCall(namespace, "pushGetStacksString", breveFunctionPushGetStacksString, AT_STRING, AT_POINTER, 0);

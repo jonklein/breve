@@ -19,3 +19,5 @@ void breveInitStationaryFunctions(brNamespace *n);
 void breveInitSoundFunctions(brNamespace *n);
 void breveInitTerrainFunctions(brNamespace *n);
 void breveInitWorldFunctions(brNamespace *n);
+void breveInitPushFunctions(brNamespace *n);
+void breveInitPushCallbackFunctions(brNamespace *n);

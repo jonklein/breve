@@ -238,8 +238,8 @@ struct stMethodExp {
 	char *methodName;
 	stMethod *method;
 
-	slArray *args;
-	slStack *arguments;
+	slArray *arguments;
+	slStack *positionedArguments;
 
 	stObject *objectCache;
 	stObject *objectTypeCache;

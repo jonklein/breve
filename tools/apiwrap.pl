@@ -32,7 +32,6 @@ if($#ARGV == 3) {
 }
 
 open(CFILE, ">breveFunctions${filename}.c") || die "Cannot open breveFunctions${filename}.c for writing: $!\n";
-open(TZFILE, ">${filename}.tz") || die "Cannot open ${filename}.tz for writing: $!\n";
 
 # Some recursive regular expressions for parsing out a function definition
 
@@ -186,7 +185,6 @@ void breveInit${filename}Functions(brNamespace *namespace) {
 __EOT__
 
 close(CFILE);
-close(TZFILE);
 
 exit(0);
 

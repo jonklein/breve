@@ -851,7 +851,7 @@ int slMultibodyCheckSelfPenetration(slWorld *world, slMultibody *m) {
 				if(x > y) pe = &vc->pairList[x][y];
 				else pe = &vc->pairList[y][x];
 
-				printf("flags [%d][%d] %p %x\n", x, y, pe, pe->flags);
+				// printf("flags [%d][%d] %p %x\n", x, y, pe, pe->flags);
 
 				if(pe->flags == BT_ALL && slVclipTestPair(vc, pe, NULL)) return 1;
 			}

@@ -152,20 +152,10 @@ path					{ return PATH; }
 		brNamespaceSymbol *symbol = brNamespaceLookup(gSteveData->defines, yytext);
 
 		if(symbol) {
-			brEval *e = symbol->data;
+			brEval *copy = slMalloc(sizeof(brEval));
 
-			if(e->type == AT_STRING) {
-				yylval.string = slStrdup(BRSTRING(e));
-				return STRING_VALUE;
-			} else if(e->type == AT_DOUBLE) {
-				yylval.number = BRDOUBLE(e);
-				return FLOAT_VALUE;
-			} else if(e->type == AT_INT) {
-				yylval.integer = BRINT(e);
-				return INT_VALUE;
-			}
-
-			yylval.eval = e;
+			brEvalCopy(symbol->data, copy);
+			yylval.eval = copy;
 
 			return ST_EVAL;
 		}

@@ -446,8 +446,8 @@ stMethodExp *stNewMethodCall(stObject *o, stExp *callingObject, char *method, sl
 	m->methodName = slStrdup(method);
 	m->method = NULL;
 	m->objectExp = callingObject;
-	m->args = args;
-	m->arguments = slStackNew();
+	m->arguments = args;
+	m->positionedArguments = slStackNew();
 
 	return m;
 }
@@ -455,8 +455,8 @@ stMethodExp *stNewMethodCall(stObject *o, stExp *callingObject, char *method, sl
 void stFreeMethodExp(stMethodExp *m) {
 	slFree(m->methodName);
 	stExpFree(m->objectExp);
-	stFreeKeywordArray(m->args);
-	slStackFree(m->arguments);
+	stFreeKeywordArray(m->arguments);
+	slStackFree(m->positionedArguments);
 	slFree(m);
 }
 

@@ -789,7 +789,7 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 		stMethod *method;
 		stObject *newType;
 
-		method = stFindInstanceMethodWithMinArgs(caller->type, mexp->methodName, mexp->args->count, &newType);
+		method = stFindInstanceMethodWithMinArgs(caller->type, mexp->methodName, mexp->arguments->count, &newType);
 
 		caller->type = newType;
 
@@ -798,10 +798,10 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 
 			char *kstring = "keywords";
 
-			if(mexp->args && mexp->args->count == 1) kstring = "keyword";
+			if(mexp->arguments && mexp->arguments->count == 1) kstring = "keyword";
 
 			caller->type = caller->instance->type;
-			stEvalError(caller->type->engine, EE_UNKNOWN_METHOD, "object type \"%s\" does not respond to method \"%s\" with %d %s", caller->type->name, mexp->methodName, mexp->args->count, kstring);
+			stEvalError(caller->type->engine, EE_UNKNOWN_METHOD, "object type \"%s\" does not respond to method \"%s\" with %d %s", caller->type->name, mexp->methodName, mexp->arguments->count, kstring);
 			mexp->objectCache = NULL;
 			return EC_ERROR;
 		}
@@ -813,14 +813,14 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 		if(mexp->method->keywords) keyCount = mexp->method->keywords->count;
 		else keyCount = 0;
 
-		if(mexp->args) argCount = mexp->args->count;
+		if(mexp->arguments) argCount = mexp->arguments->count;
 		else argCount = 0;
 
 		// we have to lookup the order of the keywords.  initialize them to -1 first.
 
-		for(n=0;n<argCount;n++) ((stKeyword*)mexp->args->data[n])->position = -1;
+		for(n=0;n<argCount;n++) ((stKeyword*)mexp->arguments->data[n])->position = -1;
 
-		slStackClear(mexp->arguments);
+		slStackClear(mexp->positionedArguments);
 
 		for(n=0;n<keyCount;n++) {
 			// look for the method's Nth keyword
@@ -829,9 +829,9 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 			keyEntry = mexp->method->keywords->data[n];
 
 			for(m=0;m<argCount;m++) {
-				// go through all the args, checking what was passed in.
+				// go through all the arguments, checking what was passed in.
 
-				tmpkey = mexp->args->data[m];
+				tmpkey = mexp->arguments->data[m];
 				if(tmpkey->position == -1 && !strcmp(tmpkey->word, keyEntry->keyword)) {
 					tmpkey->position = n;
 					m = keyCount;
@@ -847,12 +847,12 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 				return EC_ERROR;
 			}
 
-			slStackPush(mexp->arguments, key);
+			slStackPush(mexp->positionedArguments, key);
 		}
 
 		for(n=0;n<argCount;n++) {
-			if(((stKeyword*)mexp->args->data[n])->position == -1) {
-				tmpkey = mexp->args->data[n];
+			if(((stKeyword*)mexp->arguments->data[n])->position == -1) {
+				tmpkey = mexp->arguments->data[n];
 
 				stEvalError(caller->type->engine, EE_UNKNOWN_KEYWORD, "unknown keyword \"%s\" in call to method \"%s\"", tmpkey->word, mexp->method->name);
 				mexp->objectCache = NULL;
@@ -910,7 +910,7 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 	}
 
 	for(n=0;n<keyCount;n++) {
-		key = mexp->arguments->data[n];
+		key = mexp->positionedArguments->data[n];
 
 		if(!key) {
 			slMessage(DEBUG_ALL, "Missing keyword for method \"%s\"\n", mexp->method->name);

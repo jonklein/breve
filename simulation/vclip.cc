@@ -713,7 +713,7 @@ int slSphereShapeCheck(slVclipData *vc, slShape *s1, slPosition *p1, slShape *s2
 		   
 					dist = slPointLineDist(&tStart, &tEnd, &p1->location, &shPoint) - s1->radius;
 
-					if(dist < MC_TOLERANCE) {
+					if(dist <= MC_TOLERANCE) {
 						if(!ce) return CT_PENETRATE;
 
 						ce->distance = dist;
@@ -763,7 +763,7 @@ int slSphereShapeCheck(slVclipData *vc, slShape *s1, slPosition *p1, slShape *s2
 
 					dist = slVectorLength(&vertex) - s1->radius;
 
-					if(dist < MC_TOLERANCE) {
+					if(dist <= MC_TOLERANCE) {
 						if(!ce) return CT_PENETRATE;
 
 						ce->distance = dist;
@@ -912,7 +912,7 @@ int slEdgeFaceClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf2
 
 		slVectorCopy(&transformedPlane.normal, &ce->normal);
 
-		if(sD > MC_TOLERANCE) {
+		if(sD >= MC_TOLERANCE) {
 			*nf1 = e->neighbors[1];
 			slVectorCopy(&eLambda, &theVertex);
 		} else {
@@ -1373,7 +1373,7 @@ int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf
 		return CT_DISJOINT;
 	}
 
-	/* handle local minima code */
+	// handle local minima code 
 
 	/* check sidedness of the point against each slFace in the slShape... */
 	/* if all values are negative then there is penetration		   */
@@ -1402,7 +1402,7 @@ int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf
 
 	/* we'll end up here if there's nothing above zero */
 
-	if(max < MC_TOLERANCE) { 
+	if(max <= MC_TOLERANCE) { 
 		if(!ce) return CT_PENETRATE;
 
 		*nf2 = fs->features[maxFeature];
@@ -1852,7 +1852,7 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 				slDebug("point depth less than 1!\n");
 			}
 
-			if(distance < MC_TOLERANCE && distance > maxDepth) {
+			if(distance <= MC_TOLERANCE && distance > maxDepth) {
 				slNextCollisionPoint(ce);
 
 				ce->pointDepths[ce->pointCount - 1] = distance;
@@ -1880,7 +1880,7 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 				slDebug("depth less than 1!\n");
 			}
 
-			if(distance < MC_TOLERANCE && distance > maxDepth) {
+			if(distance <= MC_TOLERANCE && distance > maxDepth) {
 				slNextCollisionPoint(ce);
 
 				ce->pointDepths[ce->pointCount - 1] = distance;
@@ -1907,7 +1907,7 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 				slDebug("depth less than 10!\n");
 			}
 
-			if(distance < MC_TOLERANCE && distance > maxDepth) {
+			if(distance <= MC_TOLERANCE && distance > maxDepth) {
 				slNextCollisionPoint(ce);
 
 				ce->pointDepths[ce->pointCount - 1] = distance;
@@ -1924,7 +1924,7 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 
 		distance = slPlaneDistance(&plane1, &point);
 
-		if(distance < MC_TOLERANCE) {
+		if(distance <= MC_TOLERANCE) {
 			included = slClipPoint(&point, face1->voronoi, p1, face1->edgeCount, &update1, &distance);
 
 			if(included) {
@@ -2048,7 +2048,7 @@ int slCollidingFaceForPoint(slVector *p, slShape *shape, slPosition *pos) {
 
 			dist = slPlaneDistance(&plane, p);
 
-			if(dist < MC_TOLERANCE && dist > bestDist) {
+			if(dist <= MC_TOLERANCE && dist > bestDist) {
 				bestDist = dist;
 				bestFeature = n;
 			}
