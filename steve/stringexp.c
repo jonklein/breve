@@ -216,8 +216,6 @@ int stProcessString(stStringExp *s, stRunInstance *i, brEval *target) {
 		ss->string = NULL;
 	}
 
-	printf("length = %d\n", length);
-
 	strcat(newstr, &s->string[currentPosition]);
 
 	BRSTRING(target) = newstr;

@@ -99,8 +99,8 @@ case ${host_os} in
 	cygwin* | mingw* )
 		LIBS="-lglut32 -lglu32 -lopengl32 -lws2_32 -lwinmm ${LIBS}"
 		PLUGINFLAGS="-shared"
-		PLUGINIMP="-Wl,--out-implib -Wl,lib/plugin.a"
-		PLUGINLIB="\$(BREVEDIR)/lib/plugin.a"
+		PLUGINIMP="-Wl,--out-implib -Wl,lib/brevePlugin.a"
+		PLUGINLIB="\$(BREVEDIR)/lib/brevePlugin.a"
 		ARCHIVER="zip -r"
 		ARCHIVE_SUFFIX="zip"
 		EXE_SUFFIX=".exe"

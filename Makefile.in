@@ -90,7 +90,7 @@ lib/libbreve.a: $(OBJ)
 .depend::
 	@echo -n
 
-.PHONY: clean OSX_build OSX_clean OSX_release CLI_release plugin_API install
+.PHONY: clean OSX_build OSX_clean OSX_release CLI_release install
 
 clean:
 	rm -f bin/breve@EXE_SUFFIX@ bin/breve_cli@EXE_SUFFIX@
@@ -139,6 +139,7 @@ CLI_release: clean
 	mkdir $(CLI_FOLDER)/lib
 	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin
 	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin
+	-cp lib/brevePlugin.a $(CLI_FOLDER)/lib/
 	cp -R lib $(CLI_FOLDER)
 	cp -R demos $(CLI_FOLDER)
 	rm -rf $(CLI_FOLDER)/demos/Music
@@ -150,13 +151,6 @@ CLI_release: clean
 	find $(CLI_FOLDER) -name '.cvsignore' -prune -exec rm -rf {} \;
 	rm -f breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@
 	@ARCHIVER@ breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@ $(CLI_FOLDER)
-
-plugin_API:
-	rm -rf breve_plugin_API
-	mkdir breve_plugin_API
-	cp plugins/slBrevePluginAPI.h plugins/README.txt breve_plugin_API
-	@ARCHIVER@ breve_plugin_API.@ARCHIVE_SUFFIX@ breve_plugin_API
-	rm -rf breve_plugin_API
 
 install: optimize
 	mkdir -p @bindir@

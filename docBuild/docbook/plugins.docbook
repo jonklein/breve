@@ -505,8 +505,19 @@ the plugin in a directory where breve will find it (either a directory in your
 class path, or in a directory specified with a "@path" line).  Then simply load
 the plugin using a "@plugin" line at the top of your simulation file:
 <screen>
-@plugin "<replaceable>pluginName.o</replaceable>" (<replaceable>pluginEntryFunction</replaceable>).
+@plugin "<replaceable>pluginName</replaceable>" (<replaceable>pluginEntryFunction</replaceable>).
 </screen>
+</para>
+<para>
+The plugin file specified with <function>@plugin</function> does not always 
+have the extension ".o".  The specific type of file expected by the 
+<function>@plugin</function> directive varies by platform.  On Linux, the file 
+is normally a shared object file (<replaceable>pluginName.so</replaceable>).  
+On Mac OS X, plugins are OS X "bundle" files
+(<replaceable>pluginName.o</replaceable> or <replaceable>pluginName.bundle</replaceable>).
+On Windows, the plugin file is a DLL (<replaceable>pluginName.dll</replaceable>).
+</para>
+<para>
 Assuming that breve is able to locate and load your plugin file and the 
 corresponding class files, you should now be able to use the plugin classes
 in your simulation.

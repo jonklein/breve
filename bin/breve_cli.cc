@@ -213,9 +213,9 @@ int brParseArgs(int argc, char **argv) {
 	const char *optstring = "a:d:hn:r:t:vMS:";
 
 #if HAVE_GETOPT_LONG
-	while((r = getopt_long(argc, argv, optstring, gCLIOptions, NULL)) != -1)
+	while((r = getopt_long(argc, argv, optstring, gCLIOptions, NULL)) != -1) 
 #else 
-	while((r = getopt(argc, argv, optstring)) != -1) {
+	while((r = getopt(argc, argv, optstring)) != -1) 
 #endif
 	{
 		switch(r) {

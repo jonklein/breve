@@ -326,7 +326,7 @@ Object : PushProgram (aka PushPrograms) {
         f = new File.
         f open-for-writing with-file fileName.
 		
-		f write text (f get-string).
+		f write text (self get-string).
 
 		free f.
 

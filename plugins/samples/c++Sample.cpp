@@ -24,8 +24,8 @@ asm(".ascii \"-export:cppSampleLoadFunctions\"");
 
 class cppSampleTestClass {
 	public:
-		int setI(int i) { _i = i; }
-		int setJ(int j) { _j = j; }
+		void setI(int i) { _i = i; }
+		void setJ(int j) { _j = j; }
 		int getSum() { return _i + _j; }
 
 	private:
