@@ -367,7 +367,7 @@ inline int stToInt(brEval *e, brEval *t, stRunInstance *i) {
 	\brief Convert an evaluation a double in steve.
 */
 
-inline int stToDouble(brEval *e, brEval *t, stRunInstance *i) {
+int stToDouble(brEval *e, brEval *t, stRunInstance *i) {
 	char *str;
 	brEvalListHead *theList;
 	double resultCode;

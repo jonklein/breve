@@ -95,6 +95,7 @@ case ${host_os} in
 		ARCHIVE_SUFFIX="tar.gz"
 		PLATFORM="macosx"
 		AC_DEFINE([MACOSX], [1], [Mac OS X])
+		EXTRAOPTFLAGS="-mdynamic-no-pic -falign-loops=16"
 		;;
 
 	cygwin* | mingw* )
@@ -151,6 +152,7 @@ AC_SUBST(QUICKTIMEFLAGS)
 AC_SUBST(RANLIB)
 AC_SUBST(REGEXLIB)
 AC_SUBST(VERSION)
+AC_SUBST(EXTRAOPTFLAGS)
 
 AC_HEADER_TIME
 AC_CHECK_HEADERS([sys/time.h wctype.h])

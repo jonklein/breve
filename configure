@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os JAVAC JAR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE RANLIB ac_ct_RANLIB YACC DLLTOOL ac_ct_DLLTOOL MKDEP MAKEDEPEND CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS ARCHIVER ARCHIVE_SUFFIX EXE_SUFFIX PLATFORM PLUGINFLAGS PLUGINIMP PLUGINLIB QUICKTIMEFLAGS REGEXLIB VERSION EGREP CXXCPP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os JAVAC JAR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE RANLIB ac_ct_RANLIB YACC DLLTOOL ac_ct_DLLTOOL MKDEP MAKEDEPEND CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS ARCHIVER ARCHIVE_SUFFIX EXE_SUFFIX PLATFORM PLUGINFLAGS PLUGINIMP PLUGINLIB QUICKTIMEFLAGS REGEXLIB VERSION EXTRAOPTFLAGS EGREP CXXCPP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -4743,6 +4743,7 @@ cat >>confdefs.h <<\_ACEOF
 #define MACOSX 1
 _ACEOF
 
+		EXTRAOPTFLAGS="-mdynamic-no-pic -falign-loops=16"
 		;;
 
 	cygwin* | mingw* )
@@ -4790,6 +4791,7 @@ _ACEOF
 
 		;;
 esac
+
 
 
 
@@ -6076,31 +6078,31 @@ main ()
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if(status ) return status;
+	if( status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if(status ) return status;
-	status = pthread_create(&t, &attr, task, NULL );
+	if( status ) return status;
+	status = pthread_create( &t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #endif
-	if(status ) return status;
+	if( status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create(&t, pthread_attr_default, task, NULL );
-	if(status ) return errno;
+	status = pthread_create( &t, pthread_attr_default, task, NULL );
+	if( status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep(1 );
+	sleep( 1 );
 
-	status = pthread_detach(&t );
-	if(status ) return errno;
+	status = pthread_detach( &t );
+	if( status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -6175,31 +6177,31 @@ int main(argc, argv)
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if(status ) return status;
+	if( status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if(status ) return status;
-	status = pthread_create(&t, &attr, task, NULL );
+	if( status ) return status;
+	status = pthread_create( &t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #endif
-	if(status ) return status;
+	if( status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create(&t, pthread_attr_default, task, NULL );
-	if(status ) return errno;
+	status = pthread_create( &t, pthread_attr_default, task, NULL );
+	if( status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep(1 );
+	sleep( 1 );
 
-	status = pthread_detach(&t );
-	if(status ) return errno;
+	status = pthread_detach( &t );
+	if( status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -6295,31 +6297,31 @@ main ()
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if(status ) return status;
+	if( status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if(status ) return status;
-	status = pthread_create(&t, &attr, task, NULL );
+	if( status ) return status;
+	status = pthread_create( &t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #endif
-	if(status ) return status;
+	if( status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create(&t, pthread_attr_default, task, NULL );
-	if(status ) return errno;
+	status = pthread_create( &t, pthread_attr_default, task, NULL );
+	if( status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep(1 );
+	sleep( 1 );
 
-	status = pthread_detach(&t );
-	if(status ) return errno;
+	status = pthread_detach( &t );
+	if( status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -6394,31 +6396,31 @@ int main(argc, argv)
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if(status ) return status;
+	if( status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if(status ) return status;
-	status = pthread_create(&t, &attr, task, NULL );
+	if( status ) return status;
+	status = pthread_create( &t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #endif
-	if(status ) return status;
+	if( status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create(&t, pthread_attr_default, task, NULL );
-	if(status ) return errno;
+	status = pthread_create( &t, pthread_attr_default, task, NULL );
+	if( status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep(1 );
+	sleep( 1 );
 
-	status = pthread_detach(&t );
-	if(status ) return errno;
+	status = pthread_detach( &t );
+	if( status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -6519,31 +6521,31 @@ main ()
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if(status ) return status;
+	if( status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if(status ) return status;
-	status = pthread_create(&t, &attr, task, NULL );
+	if( status ) return status;
+	status = pthread_create( &t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #endif
-	if(status ) return status;
+	if( status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create(&t, pthread_attr_default, task, NULL );
-	if(status ) return errno;
+	status = pthread_create( &t, pthread_attr_default, task, NULL );
+	if( status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep(1 );
+	sleep( 1 );
 
-	status = pthread_detach(&t );
-	if(status ) return errno;
+	status = pthread_detach( &t );
+	if( status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -6618,31 +6620,31 @@ int main(argc, argv)
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if(status ) return status;
+	if( status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if(status ) return status;
-	status = pthread_create(&t, &attr, task, NULL );
+	if( status ) return status;
+	status = pthread_create( &t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #endif
-	if(status ) return status;
+	if( status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create(&t, pthread_attr_default, task, NULL );
-	if(status ) return errno;
+	status = pthread_create( &t, pthread_attr_default, task, NULL );
+	if( status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep(1 );
+	sleep( 1 );
 
-	status = pthread_detach(&t );
-	if(status ) return errno;
+	status = pthread_detach( &t );
+	if( status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -6743,31 +6745,31 @@ main ()
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if(status ) return status;
+	if( status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if(status ) return status;
-	status = pthread_create(&t, &attr, task, NULL );
+	if( status ) return status;
+	status = pthread_create( &t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #endif
-	if(status ) return status;
+	if( status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create(&t, pthread_attr_default, task, NULL );
-	if(status ) return errno;
+	status = pthread_create( &t, pthread_attr_default, task, NULL );
+	if( status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep(1 );
+	sleep( 1 );
 
-	status = pthread_detach(&t );
-	if(status ) return errno;
+	status = pthread_detach( &t );
+	if( status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -6842,31 +6844,31 @@ int main(argc, argv)
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if(status ) return status;
+	if( status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if(status ) return status;
-	status = pthread_create(&t, &attr, task, NULL );
+	if( status ) return status;
+	status = pthread_create( &t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #endif
-	if(status ) return status;
+	if( status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create(&t, pthread_attr_default, task, NULL );
-	if(status ) return errno;
+	status = pthread_create( &t, pthread_attr_default, task, NULL );
+	if( status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep(1 );
+	sleep( 1 );
 
-	status = pthread_detach(&t );
-	if(status ) return errno;
+	status = pthread_detach( &t );
+	if( status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -6967,31 +6969,31 @@ main ()
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if(status ) return status;
+	if( status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if(status ) return status;
-	status = pthread_create(&t, &attr, task, NULL );
+	if( status ) return status;
+	status = pthread_create( &t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #endif
-	if(status ) return status;
+	if( status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create(&t, pthread_attr_default, task, NULL );
-	if(status ) return errno;
+	status = pthread_create( &t, pthread_attr_default, task, NULL );
+	if( status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep(1 );
+	sleep( 1 );
 
-	status = pthread_detach(&t );
-	if(status ) return errno;
+	status = pthread_detach( &t );
+	if( status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -7066,31 +7068,31 @@ int main(argc, argv)
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if(status ) return status;
+	if( status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if(status ) return status;
-	status = pthread_create(&t, &attr, task, NULL );
+	if( status ) return status;
+	status = pthread_create( &t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #endif
-	if(status ) return status;
+	if( status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create(&t, pthread_attr_default, task, NULL );
-	if(status ) return errno;
+	status = pthread_create( &t, pthread_attr_default, task, NULL );
+	if( status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep(1 );
+	sleep( 1 );
 
-	status = pthread_detach(&t );
-	if(status ) return errno;
+	status = pthread_detach( &t );
+	if( status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -7191,31 +7193,31 @@ main ()
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if(status ) return status;
+	if( status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if(status ) return status;
-	status = pthread_create(&t, &attr, task, NULL );
+	if( status ) return status;
+	status = pthread_create( &t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #endif
-	if(status ) return status;
+	if( status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create(&t, pthread_attr_default, task, NULL );
-	if(status ) return errno;
+	status = pthread_create( &t, pthread_attr_default, task, NULL );
+	if( status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep(1 );
+	sleep( 1 );
 
-	status = pthread_detach(&t );
-	if(status ) return errno;
+	status = pthread_detach( &t );
+	if( status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -7290,31 +7292,31 @@ int main(argc, argv)
 	pthread_attr_t attr;
 
 	status = pthread_attr_init(&attr);
-	if(status ) return status;
+	if( status ) return status;
 
 #if HAVE_PTHREADS < 7
 	status = pthread_attr_setdetachstate(&attr, &detach);
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #else
 	status = pthread_attr_setdetachstate(&attr, detach);
 #endif
-	if(status ) return status;
-	status = pthread_create(&t, &attr, task, NULL );
+	if( status ) return status;
+	status = pthread_create( &t, &attr, task, NULL );
 #if HAVE_PTHREADS < 7
-	if(status < 0 ) status = errno;
+	if( status < 0 ) status = errno;
 #endif
-	if(status ) return status;
+	if( status ) return status;
 #else
 	/* Draft 4 pthreads */
-	status = pthread_create(&t, pthread_attr_default, task, NULL );
-	if(status ) return errno;
+	status = pthread_create( &t, pthread_attr_default, task, NULL );
+	if( status ) return errno;
 
 	/* give thread a chance to complete */
 	/* it should remain joinable and hence detachable */
-	sleep(1 );
+	sleep( 1 );
 
-	status = pthread_detach(&t );
-	if(status ) return errno;
+	status = pthread_detach( &t );
+	if( status ) return errno;
 #endif
 
 #ifdef HAVE_LINUX_THREADS
@@ -10061,6 +10063,7 @@ s,@PLUGINLIB@,$PLUGINLIB,;t t
 s,@QUICKTIMEFLAGS@,$QUICKTIMEFLAGS,;t t
 s,@REGEXLIB@,$REGEXLIB,;t t
 s,@VERSION@,$VERSION,;t t
+s,@EXTRAOPTFLAGS@,$EXTRAOPTFLAGS,;t t
 s,@EGREP@,$EGREP,;t t
 s,@CXXCPP@,$CXXCPP,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t

@@ -94,7 +94,7 @@ inline int stEvalArrayIndex(stArrayIndexExp *, stRunInstance *, brEval *);
 inline int stEvalPrint(stPrintExp *, stRunInstance *, brEval *);
 inline int stEvalRandExp(stRandomExp *, stRunInstance *, brEval *);
 
-inline int stToDouble(brEval *, brEval *, stRunInstance *);
+int stToDouble(brEval *, brEval *, stRunInstance *);
 inline int stToInt(brEval *, brEval *, stRunInstance *);
 inline int stToType(brEval *, int, brEval *, stRunInstance *);
 
