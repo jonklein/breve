@@ -13,7 +13,6 @@ LDFLAGS		= @LDFLAGS@
 
 EXTRACFLAGS	= -g
 
-CFLAGS		= $(EXTRACFLAGS) -pipe -Wall
 CXXFLAGS	= $(EXTRACFLAGS) -pipe -Wall -fpermissive
 YFLAGS		= -d
 
@@ -53,7 +52,7 @@ breve.dll: $(OBJ)
 	$(CXX) @PLUGINFLAGS@ -o $@ @PLUGINIMP@ $^ @LIBS@
 
 %.o: %.c
-	$(CXX) $(CFLAGS) -c -o $@ $< $(CPPFLAGS) 
+	$(CXX) $(CXXFLAGS) -c -o $@ $< $(CPPFLAGS) 
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(CPPFLAGS) 

@@ -678,7 +678,7 @@ control_statement
 		slFree($3);
 
 		if(ae) {
-			$$ = stNewForeachExp(ae->values.pValue, $4, $6, yyfile, lineno);
+			$$ = stNewForeachExp((stAssignExp*)ae->values.pValue, $4, $6, yyfile, lineno);
 			slFree(ae);
 		} else {
 			stExpFree($4);

@@ -22,6 +22,7 @@
 	\brief A steve object type.
 */
 
+#include <vector>
 #include <set>
 
 struct stInstanceCompare {
