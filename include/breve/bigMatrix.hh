@@ -452,7 +452,7 @@ class slBigMatrix2DGSL : public slBigMatrix2D, public slVectorViewGSL {
 
         void setAll(const float value);
 
-        void clamp(const float low, const float high);
+        void clamp(const float low, const float tolerance, const float high);
 
 /*        
         slBigMatrix2DGSL& inPlaceConvolve(const slBigMatrix2D& kernel);

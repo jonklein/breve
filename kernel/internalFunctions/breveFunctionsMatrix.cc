@@ -82,7 +82,7 @@ int brIMatrix2DSetAll(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrix2DClamp(brEval args[], brEval *target, brInstance *i) {
-	BRBIGMATRIX2D(&args[0])->clamp(float(BRDOUBLE(&args[1])), float(BRDOUBLE(&args[2])));
+	BRBIGMATRIX2D(&args[0])->clamp(float(BRDOUBLE(&args[1])), float(BRDOUBLE(&args[2])), float(BRDOUBLE(&args[3])));
 
 	return EC_OK;
 }
@@ -177,19 +177,16 @@ int brIMatrix2DDiffuse(brEval args[], brEval *target, brInstance *i) {
 	float scale = BRDOUBLE(&args[2]);
 	float* diffData = diffTarget->getGSLVector()->data;
 	float* chemData = chemSource->getGSLVector()->data;	
-	float newVal = 0.0;
-	unsigned int diffTDA = diffTarget->xDim(); // proxy for tda
-	unsigned int chemTDA = chemSource->xDim(); // proxy for tda
 	unsigned int xDim = chemSource->xDim();
 	unsigned int yDim = chemSource->yDim();    
+	unsigned int diffTDA = diffTarget->xDim(); // proxy for tda
+	unsigned int chemTDA = chemSource->xDim(); // proxy for tda
 	unsigned int x = 0, y = 0;
-	int xp, xm, yp, ym;
 
     // this will get moved to a seperate util class later
     // and will be converted to iterators when we migrate to gslmm based code
     
     ///// VERY TEMP local optimization
-#ifdef MACOS
 #if(0)
        // f3x3 is an altivec optimized convolution, but does not handle periodic
        // boundaries.  
@@ -200,76 +197,32 @@ int brIMatrix2DDiffuse(brEval args[], brEval *target, brInstance *i) {
        kernel[3] = scale; kernel[4] = scale * -4; kernel[5] = scale;
        kernel[6] = 0; kernel[7] = scale; kernel[8] = 0;
 
-       f3x3(m->data, m->tda, m->size2, kernel, n->data);
+       f3x3(chemData, chemTDA, yDim, kernel, diffData);
 
        return EC_OK;
 #endif
-#endif
 
-    x = 0;
-	for (y = 0; y < yDim ; y++)
-	{
-			xp = (x + 1);
-			yp = (y + 1);
-			ym = (y - 1);
-			newVal = scale * ((-4.0f * chemData[x * chemTDA + y]) +
-			    chemData[xp * chemTDA + y] + 
-			    chemData[x  * chemTDA + ym] + chemData[x * chemTDA + yp]);
+	for(x=0; x < xDim; x++) {
+	    for(y=0; y < yDim; y++) {
+            double dt, db, dl, dr;
 
-			diffData[x * diffTDA + y] = newVal;
+			if(x - 1 >= 0) dl = chemData[ chemTDA * (x - 1) + y ];
+			else dl = 0.0;
+
+			if(x + 1 < xDim) dr = chemData[ chemTDA * (x + 1) + y ];
+			else dr = 0.0;
+
+			if(y - 1 >= 0) dt = chemData[ chemTDA * x + (y - 1) ];
+			else dt = 0.0;
+
+			if(y + 1 < yDim) db = chemData[ chemTDA * x + (y + 1) ];
+			else db = 0.0;
+
+            diffData[diffTDA * x + y] = scale * ((-4.0 * chemData[ chemTDA * x + y]) + dl + dr + dt + db);
+        }
     }
-    x = xDim;
-	for (y = 0; y < yDim; y++)
-	{
-			yp = (y + 1);
-			xm = (x - 1);
-			ym = (y - 1);
-			newVal = scale * ((-4.0f * chemData[x * chemTDA + y]) +
-			    chemData[xm * chemTDA + y] + 
-			    chemData[x  * chemTDA + ym] + chemData[x * chemTDA + yp]);
 
-			diffData[x * diffTDA + y] = newVal;
-	}
-	y = 0;
-	for (x = 1; x < yDim - 1; x++)
-	{
-			xp = (x + 1);
-			yp = (y + 1);
-			xm = (x - 1);
-			newVal = scale * ((-4.0f * chemData[x * chemTDA + y]) +
-			    chemData[xm * chemTDA + y] + chemData[xp * chemTDA + y] + 
-			    chemData[x * chemTDA + yp]);
-
-			diffData[x * diffTDA + y] = newVal;
-	}
-	y = yDim;
-	for (x = 1; x < yDim - 1; x++)
-	{
-			xp = (x + 1);
-			xm = (x - 1);
-			ym = (y - 1);
-			newVal = scale * ((-4.0f * chemData[x * chemTDA + y]) +
-			    chemData[xm * chemTDA + y] + chemData[xp * chemTDA + y] + 
-			    chemData[x  * chemTDA + ym]);
-
-			diffData[x * diffTDA + y] = newVal;
-    }
-	
-	for (y = 1; y < yDim - 1; y++)
-		for (x = 1; x < xDim - 1; x++) {
-			xp = (x + 1);
-			yp = (y + 1);
-			xm = (x - 1);
-			ym = (y - 1);
-
-			newVal = scale * ((-4.0f * chemData[x * chemTDA + y]) +
-			    chemData[xm * chemTDA + y] + chemData[xp * chemTDA + y] + 
-			    chemData[x  * chemTDA + ym] + chemData[x * chemTDA + yp]);
-
-			diffData[x * diffTDA + y] = newVal;
-		}
-
-	return EC_OK;
+    return EC_OK;
 }
 
 int brIMatrix2DCopyToImage(brEval args[], brEval *result, brInstance *i) {
@@ -594,7 +547,7 @@ void breveInitMatrixFunctions(brNamespace *n) {
 	brNewBreveCall(n, "matrix2DGet", brIMatrix2DGet, AT_DOUBLE, AT_POINTER, AT_INT, AT_INT, 0);
 	brNewBreveCall(n, "matrix2DSet", brIMatrix2DSet, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix2DSetAll", brIMatrix2DSetAll, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
-	brNewBreveCall(n, "matrix2DClamp", brIMatrix2DClamp, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0);
+	brNewBreveCall(n, "matrix2DClamp", brIMatrix2DClamp, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix2DCopy", brIMatrix2DCopy, AT_NULL, AT_POINTER, AT_POINTER, 0);
 	brNewBreveCall(n, "matrix2DDiffusePeriodic", brIMatrix2DDiffusePeriodic, AT_NULL, AT_POINTER, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix2DDiffuse", brIMatrix2DDiffuse, AT_NULL, AT_POINTER, AT_POINTER, AT_DOUBLE, 0);

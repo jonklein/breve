@@ -340,20 +340,23 @@ float slBigMatrix2DGSL::get(const int x, const int y) const
 	gsl_matrix_float_set_all( _matrix, value);
 }
 
-void slBigMatrix2DGSL::clamp(const float low, const float high) {
+/**
+ * 
+ * clamp(low, tolerance, high)
+ *
+ * Clamps the values in the matrix to be between low and high.  If the value is below 
+ * tolerance, then it is set to low.
+ */
+
+void slBigMatrix2DGSL::clamp(const float low, const float tolerance, const float high) {
 	int x, y;
 
 	for(x = 0; x < _xdim; x++ ) {
 		for(y = 0; y < _ydim; y++ ) {
 			if( _matrix->data[x * _matrix->tda + y] > high) {
 			 	_matrix->data[x * _matrix->tda + y] = high;
-			} 
-
-			// 	_matrix->data[x * _matrix->tda + y] = low;
-			// }
-
-			if( _matrix->data[x * _matrix->tda + y] < low) {
-				_matrix->data[x * _matrix->tda + y] = 0.0;
+			} else if( _matrix->data[x * _matrix->tda + y] < tolerance) {
+				_matrix->data[x * _matrix->tda + y] = low;
 			}
 		}
 	}

@@ -2,6 +2,7 @@
 #include "xml.h"
 #include "evaluation.h"
 #include "errorText.h"
+#include "java.h"
 
 #include "breveFunctionsSteveDataObject.h"
 #include "breveFunctionsSteveObject.h"
@@ -11,6 +12,10 @@ extern char *yyfile;
 extern int lineno;
 
 void *breveFrontendInitData(brEngine *engine) {
+#if HAVE_LIBJAVA
+	brJavaInit(engine);
+#endif
+
 	return stSteveInit(engine);
 }
 
