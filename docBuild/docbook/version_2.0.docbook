@@ -52,7 +52,7 @@ are discussed below.
 
 <itemizedlist> 
 <listitem><para>MultiBody functionality has been changed <xref linkend="multibody_changes"></para></listitem>
-<listitem><para>Arrays are now depreciated <xref linkend="array_depreciated"></para></listitem> 
+<listitem><para>Arrays are now deprecated <xref linkend="array_depreciated"></para></listitem> 
 <listitem><para>The Data class has been removed <xref linkend="data_removed"></para></listitem> 
 <listitem><para>The Vision class has been removed <xref linkend="visions_removed"></para></listitem>
 <listitem><para>Texture loading has been changed <xref linkend="texture_changes"></para></listitem> 
@@ -97,7 +97,7 @@ need to modify your simulation to account for the changes described
 above.</para> </sect2>
 
 <sect2 id="array_depreciated"> <title>Arrays Are Now
-Decpreciated</title> <para>The use of arrays has now been depreciated
+Decprecated</title> <para>The use of arrays has now been deprecated
 and will be removed from a future release of breve: use lists
 instead</para>
 
@@ -114,7 +114,7 @@ to ensure compatibility in the future.</para> </sect2>
 <sect2 id="data_removed">
 <title>The Data Class is Now Obsolete</title>
 
-<para>The Data class has been depreciated and will be removed from a
+<para>The Data class has been deprecated and will be removed from a
 future release of breve.</para>
 
 <para>Because archiving and networking has been improved and allows for
@@ -153,10 +153,10 @@ breve, it will need to use the Camera and Image objects to preform the
 same functionality in the current version of breve.</para></sect2>
 
 <sect2 id="texture_changes">
-<title>Loading Textures From the Controller Class is Now Depreciated</title>
+<title>Loading Textures From the Controller Class is Now Deprecated</title>
 
 <para>Obtaining a "texture number" by loading an image from the Control
-class is now depreciated, as is using a texture number to set a texture,
+class is now deprecated, as is using a texture number to set a texture,
 bitmap or lightmap.  You should now load an image using the Image class,
 and use the Real object methods set-texture-image, set-bitmap-image and
 set-lightmap-image to apply textures, bitmaps and images.</para>

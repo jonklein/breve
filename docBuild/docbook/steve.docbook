@@ -1066,7 +1066,7 @@ Archiving Plugin Data With The <function>data</function> Type (<xref linkend="ar
 <para>
 <indexterm><primary>arrays</primary></indexterm>
 Arrays can be used to group several variables of the same type.  Use of arrays is now 
-depreciated: use lists (<xref linkend="list">) instead.
+deprecated: use lists (<xref linkend="list">) instead.
 </para>
 </sect2>
 </sect1>
