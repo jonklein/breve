@@ -3,10 +3,10 @@ BREVEDIR	=	../..
 all: URLPlugin.o
 
 URLPlugin.o: URLFunctions.o
-	$(CC) @PLUGINFLAGS@ -o URLPlugin.o URLFunctions.o -lcurl
+	$(CC) @PLUGINFLAGS@ @LDFLAGS@ -o URLPlugin.o URLFunctions.o -lcurl
 
 .c.o:
-	$(CC) -g -c $*.c -I.. 
+	$(CC) -g @CPPFLAGS@ -c $*.c -I.. 
 
 clean:
 	-rm -f *.o

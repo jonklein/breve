@@ -115,6 +115,7 @@ case "${host_os}" in
 		GLLIBS="-lglut -lGL -lGLU -lXmu -lXi -lm"
 		CPPFLAGS="${CPPFLAGS} -I/usr/local/include -I/usr/X11R6/include"
 		LDFLAGS="${LDFLAGS} -L/usr/local/lib -L/usr/X11R6/lib"
+		PLUGINFLAGS="-shared"
 
 		;;
 esac

@@ -76,7 +76,7 @@ windows_dlls: clean
 		@MKDEP@ $(CPPFLAGS) $$i >> .depend; done
 
 # this rule is a no-op to avoid updating .depend needlessly
-# it have commands and no prerequisites and must not touch .depend
+# it must have commands and no prerequisites and must not touch .depend
 .depend::
 	@echo -n
 

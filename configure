@@ -2796,6 +2796,7 @@ _ACEOF
 		GLLIBS="-lglut -lGL -lGLU -lXmu -lXi -lm"
 		CPPFLAGS="${CPPFLAGS} -I/usr/local/include -I/usr/X11R6/include"
 		LDFLAGS="${LDFLAGS} -L/usr/local/lib -L/usr/X11R6/lib"
+		PLUGINFLAGS="-shared"
 
 		;;
 esac
@@ -3990,7 +3991,7 @@ else
 JAVA_TEST=Test.java
 CLASS_TEST=Test.class
 cat << \EOF > $JAVA_TEST
-/* #line 3993 "configure" */
+/* #line 3994 "configure" */
 public class Test {
 }
 EOF

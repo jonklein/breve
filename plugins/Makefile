@@ -1,11 +1,11 @@
 all: 
-	-(cd slQTMusicPlugin && make)
-	-(cd slDigitizerPlugin && make)
-	-(cd slRegexPlugin && make)
-	-(cd slURLPlugin && make)
+	-(cd slQTMusicPlugin && $(MAKE))
+	-(cd slDigitizerPlugin && $(MAKE))
+	-(cd slRegexPlugin && $(MAKE))
+	-(cd slURLPlugin && $(MAKE))
 
 clean: 
-	-(cd slQTMusicPlugin && make clean)
-	-(cd slDigitizerPlugin && make clean)
-	-(cd slRegexPlugin && make clean)
-	-(cd slURLPlugin && make clean)
+	-(cd slQTMusicPlugin && $(MAKE) clean)
+	-(cd slDigitizerPlugin && $(MAKE) clean)
+	-(cd slRegexPlugin && $(MAKE) clean)
+	-(cd slURLPlugin && $(MAKE) clean)
