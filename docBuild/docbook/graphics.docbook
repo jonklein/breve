@@ -191,7 +191,7 @@ formats.</para>
 <para>
 <emphasis>PNG is the preferred image format&mdash;it allows more control
 over how the image is loaded into a texture</emphasis>. Support for
-the SGI format is provided for backwards compatibility. Support for
+the SGI format is provided for backward compatibility. Support for
 the JPEG format is provided because it is somewhat more common than
 PNG.</para>
 <para>
@@ -271,7 +271,7 @@ objects.
 </para>
 <para>
 Also note that loading multiple textures use up a lot of memory
-and hurt preformance, <emphasis>even if you are loading the same
+and hurt performance, <emphasis>even if you are loading the same
 texture multiple times</emphasis>.  It is therefore preferable to
 share the same texture image among many agents when possible.
 This may require the controller to load the texture and pass it 

@@ -118,7 +118,7 @@ This callback is given two breve object pointers, and must return 1 if
 registering objects</title>
 <para>
 Every object in a front-end language that will have instances in the breve engine 
-must be registered with the breve engine.  Moreoever, when an object is added 
+must be registered with the breve engine.  Moreover, when an object is added 
 to the breve engine, it must also tell the engine what "type" of object it is.  
 Each object "type" corresponds to a different language front-end and a different 
 set of callbacks, so for each language front-end one creates, one must also create 
@@ -249,7 +249,7 @@ The language-frontend must provide a <function>breveFrontendInitData</function> 
 <screen>
 void *breveFrontendInitData(brEngine *engine);
 </screen>
-This method initializes and returns a structure to be used by your languge-frontend.
+This method initializes and returns a structure to be used by your language-frontend.
 The data returned will be stored in the <function>brFrontend</function> field 
 <function>data</function> and will be used in the functions below.
 </para>

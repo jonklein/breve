@@ -90,7 +90,7 @@ may request an HTML page.
 <para>
 To execute a method in the controller instance, simply append the
 method name to the end of the URL.  If you wish to pass in either
-int or float arguments, they can be added afterwards, delimited by
+int or float arguments, they can be added afterwords, delimited by
 underscores.  Other types may currently not be passed via the web
 interface.  Here are some examples:
 <screen>
@@ -124,7 +124,7 @@ above (<xref linkend="web_method_execution">).
 <para>
 Additionally, you can set an "index" page that will be served to
 the web-browser when they send a request to your server without 
-an actual page or method request, for exampe, http://myserver:33333.
+an actual page or method request, for example, http://myserver:33333.
 This index page can be set using the method
 <ulink url="../classes/NetworkServer.html#set-index-page">set-index-page</ulink>.  
 </para>

@@ -78,7 +78,7 @@ breve is capable of realistic <firstterm>physical simulation</firstterm>.  This
 means that agents in the simulated world can be configured to behave just as 
 real objects do, according to the laws of physics.  If a ball is placed in 
 the air above a floor, for example, physical simulation can be used to 
-make the ball realistically fall towards the floor and bounce.  Among other 
+make the ball realistically fall toward the floor and bounce.  Among other 
 things, physical simulation can be used for realistic simulation of robots, 
 vehicles and animals.
 </para>
@@ -266,7 +266,7 @@ breve distribution directory, you can try out the "ArrowSwarm" demo by typing:
 # Linux & OSX
 	% ./bin/breve ./demos/Swarm/ArrowSwarm.tz
 
-# Windos
+# Windows
 	> bin\breve.exe demos\Swarm\ArrowSwarm.tz
 </screen>
 </para>

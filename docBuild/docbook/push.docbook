@@ -115,7 +115,7 @@ To create a new push interpreter, simply create a new instance of the
 class <ulink url="../classes/PushInterpreter.html">PushInterpreter</ulink>.
 </para>
 <para>
-An important decission in creating a PushGP experiment is deciding what
+An important decision in creating a PushGP experiment is deciding what
 Push instructions will be available to evolution.  It is important to 
 choose instructions that will give evolving programs the right tools to 
 solve the problems they are given.  
@@ -211,7 +211,7 @@ An input callback instruction ("sensor") will typically read values from
 the world from an agent's perspective and push the values onto a Push stack 
 so that they can be used for computation.  A "find-food" instruction, for example,
 may find the closest food object to an agent, and push onto the vector
-stack a vector towards the food object.
+stack a vector toward the food object.
 </para>
 <para>
 An output callback instruction ("actuator") will typically take values 

@@ -3,9 +3,9 @@
                       http://www.spiderland.org/breve
                           release 2.0 - 10.13.2004
              command line version for Mac OS X, Linux and Windows
-                          jklein@spiderland.org 
+                         jklein@spiderland.org 
 
-                              -= INTRODUCTION =-
+                           -= INTRODUCTION =-
 
 breve is a simulation environment which allows users to define the behaviors 
 and interactions of different types of agents in a simulated 3D world and 

@@ -35,9 +35,9 @@ build simple plugins for Mac OS X, Linux and Windows.
 </para>
 <para>
 A number of the names and symbols have been changed from versions of the breve plugin API
-prior to version 2.0, though the older symbols should be preserved for backwards
-compatability.  Still, you will most likely have to rebuild your plugin using 
-the 2.0 header file to ensure continued compatability.
+prior to version 2.0, though the older symbols should be preserved for backward
+compatibility.  Still, you will most likely have to rebuild your plugin using 
+the 2.0 header file to ensure continued compatibility.
 </para>
 </note>
 <para>
@@ -184,7 +184,7 @@ arguments and output types.  The "AT" prefix stands for "atomic type".
 <para>
 Your wrapper function should use these macros to extract data from the arguments
 array, and to store the result.  The return value of your wrapper function
-should be <function>EC_OK</function> in the event of sucessful execution, or <function>EC_ERROR</function> in the event of 
+should be <function>EC_OK</function> in the event of successful execution, or <function>EC_ERROR</function> in the event of 
 a fatal error.  Returning <function>EC_ERROR</function> will cause the simulation to stop, so you 
 should generally not return this value.  In many cases it is better to indicate 
 the error using a special return value of the internal function (that is to say, 
@@ -443,7 +443,7 @@ void brDataFree(brData *data);
 </screen>
 </para>
 <para>
-To archive and dearchive data from a plugin ojbect, you'll need one internal 
+To archive and dearchive data from a plugin object, you'll need one internal 
 function to serialize and encode the state of your plugin object and another to 
 deserialize and decode the object.  For instance, consider a plugin which deals
 with large matrices, say 100x100 doubles.  When the simulation is to be archived, the matrix needs 

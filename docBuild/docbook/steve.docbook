@@ -125,7 +125,7 @@ the agents will move in a random direction.
 # can be used as a skeleton for more complex simulations.
 #
 
-# include some requiresd breve class files
+# include some required breve class files
 @use Control.
 @use Mobile.
 
@@ -363,7 +363,7 @@ Variables are listed in the format
 <function><replaceable>variable_name</replaceable> (<replaceable>variable_type</replaceable>).</function>
 </para>
 <para>
-The variable name must start with a letter, but afterwards may contain any alphanumeric characters, as well as the characters _ and -. 
+The variable name must start with a letter, but afterwords may contain any alphanumeric characters, as well as the characters _ and -. 
 </para>
 <para>
 Multiple variables of the same type can also be declared on the same line: 
@@ -490,7 +490,7 @@ in steve.
 </para>
 <para>
 To make an argument optional, you need to provide it with a default value.  To do so,
-you'll need to modify the argument defintion to include the text <function>= <replaceable>value</replaceable></function>
+you'll need to modify the argument definition to include the text <function>= <replaceable>value</replaceable></function>
 after the argument name.  For example, a variable called <function>theHeight</function> with keyword
 <function>with-height</function> could be given a default value like this: <function>with-height theHeight = 100 (int)</function>.
 Default values for optional arguments must be literal values (and not expressions or variables).
@@ -1044,7 +1044,7 @@ Archiving Plugin Data With The <function>data</function> Type (<xref linkend="ar
 <sect2 id="array"><title>Arrays of other types</title>
 <para>
 <indexterm><primary>arrays</primary></indexterm>
-Arrays can be used to group several variabels of the same type.  Use of arrays is now 
+Arrays can be used to group several variables of the same type.  Use of arrays is now 
 depreciated: use lists (<xref linkend="list">) instead.
 </para>
 </sect2>
@@ -1748,7 +1748,7 @@ breve's garbage collection is slightly complicated by the fact that objects
 do not need to be referenced in memory to be "in use".  An unreferened object
 may, for example, "come back to life" because of an all (<xref linkend="all">) 
 expression.  Furthermore, objects in the simulated world (members of subclasses 
-of the class "Real") may physically interact even without referencing eac hother
+of the class "Real") may physically interact even without referencing each other
 in their variables.  Because of these complications, garbage collection cannot be 
 automatically enabled for all objects in a simulation.
 </para>
