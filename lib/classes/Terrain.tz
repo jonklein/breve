@@ -6,12 +6,12 @@ Real : Terrain {
 	+ variables:
 		location (vector).
 		peakColor, valleyColor (vector).
-		# heightData (data).
 
 	+ to init:
 		realWorldPointer = newTerrain(1).
 		self set-peak-color to (1, 1, 1).
-		self set-valley-color to (0, 1, .2).
+		self set-valley-color to (0, .8, .1).
+		self set-texture-image to (new Image load from "images/grass.jpg").
 
 	+ to set-scale to value (double):
 		% Changes the size of a single tile in the terrain.
@@ -51,6 +51,9 @@ Real : Terrain {
 		% world location of points on the terrain.
 
 		return getTerrainHeight(realWorldPointer, xCoordinate, yCoordinate).
+
+	+ to get-real-height:
+		% ...
 
 	+ to set-peak-color to color (vector):
 		% Sets the color of the highest regions of the terrain to color.

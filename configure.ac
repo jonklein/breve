@@ -124,6 +124,7 @@ AC_CHECK_LIB([readline], [readline])
 AC_CHECK_LIB([java], [JNI_CreateJavaVM],,,$JAVALIBS)
 AC_CHECK_LIB([gslcblas], [cblas_ccopy])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc])
+AC_CHECK_LIB([tiff], [TIFFOpen])
 
 case "${host_os}" in
 	darwin* )

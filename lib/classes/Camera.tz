@@ -50,7 +50,9 @@ Abstract : Camera (aka Cameras) [version 2.0] {
 		cameraPositionDisplay(cameraPointer, newX, newY).
 
 	+ to look at target (vector) from position (vector):
-		% Move to position and aim at target.
+		% Moves the camera to position and aims it at target.  target is
+		% is the target's location <b>relative to the camera</b>, not the
+		% target's "real-world" location.
 
 		cameraPosition(cameraPointer, position, target).
 

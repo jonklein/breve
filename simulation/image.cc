@@ -646,4 +646,4 @@ int slPNGSnapshot(slCamera *c, char *file) {
 
 	return r;
 }
-#endif /* NO_LIBPNG */
+#endif /* HAVW_LIBPNG */

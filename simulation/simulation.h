@@ -31,8 +31,6 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include "ode/ode.h"
-
 // M_PI not defined on some platforms?  bastards.
 
 #ifndef M_PI

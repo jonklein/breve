@@ -60,6 +60,9 @@
 /* Define to 1 if you have the `gsl' library (-lgsl). */
 #undef HAVE_LIBGSL
 
+/* Define to 1 if you have the `gslcblas' library (-lgslcblas). */
+#undef HAVE_LIBGSLCBLAS
+
 /* Define to 1 if you have the `history' library (-lhistory). */
 #undef HAVE_LIBHISTORY
 
@@ -101,6 +104,9 @@
 
 /* Define to 1 if you have the `termcap' library (-ltermcap). */
 #undef HAVE_LIBTERMCAP
+
+/* Define to 1 if you have the `tiff' library (-ltiff). */
+#undef HAVE_LIBTIFF
 
 /* Define to 1 if you have the `z' library (-lz). */
 #undef HAVE_LIBZ

@@ -22,8 +22,6 @@
 
 #define WHITE_PIXEL	0x00ffffff
 
-// ( pssst.  i can't believe this crap works! )
-
 void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	slWorldObject *wo;
 	std::vector<slWorldObject*>::iterator wi;

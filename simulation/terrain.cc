@@ -20,6 +20,12 @@
 
 #include "simulation.h"
 
+namespace tiff {
+using namespace tiff;
+#include "xtiffio.h"
+}
+using namespace tiff;
+
 /* based on tutorial and code from Paul E. Martz */
 
 /*
@@ -70,10 +76,24 @@ slTerrain *slTerrainNew(int res, double xscale, void *data) {
 
 	l->initialized = 0;
 
+	l->quadtree = new slTerrainQuadtree(0, 0, l->side - 1, l->side - 1, l);
+
 	slVectorSet(&location, 0, 0, 0);
+
 	slTerrainSetLocation(l, &location);
 
 	return l;
+}
+
+/*!
+	\brief Resizes the terrain to be able to hold at least side x side points.  
+	The actual size will be the next power of two above side.
+*/
+
+void slTerrain::resize(int side) {
+	side = slNextPowerOfTwo(side);
+
+	initialized = 0;
 }
 
 void slGenerateFractalTerrain(slTerrain *l, double h, double height) {
@@ -115,6 +135,8 @@ void slTerrainInitialize(slTerrain *l) {
 
 	l->initialized = 1;
 	l->repeating = 0;
+
+	l->quadtree->update();
 }
 
 void slTerrainBoundingBox(slTerrain *l) {
@@ -275,7 +297,7 @@ void slTerrainMakeNormals(slTerrain *l) {
 }
 
 float slAverageDiamondValues(slTerrain *l, int x, int y, int jump) {
-	/* sideminus is the zero based array offset of side */
+	// sideminus is the zero based array offset of side 
 
 	int sideminus = l->side - 1;
 
@@ -317,7 +339,9 @@ slTerrain::~slTerrain() {
 }
 
 void slTerrain::draw(slCamera *camera) {
-	slDrawTerrain(this, texture, textureScale, drawMode, 0);
+	quadtree->cull(camera);
+	printf("%d polygons\n", quadtree->draw(camera));
+	// slDrawTerrain(this, texture, textureScale, drawMode, 0);
 }
 
 void slDrawTerrain(slTerrain *l, int texture, double textureScale, int drawMode, int flags) {
@@ -388,7 +412,7 @@ void slDrawTerrainSide(slTerrain *l, int texture, double textureScale, int drawM
 
 	glDisable(GL_CULL_FACE);
 
-	glColor4f(1, 1, 1, 1.0);
+	glColor4f(0, 0, 0, 0.5);
 
 	glEnable(GL_COLOR_MATERIAL);
 
@@ -401,10 +425,11 @@ void slDrawTerrainSide(slTerrain *l, int texture, double textureScale, int drawM
 		glBindTexture(GL_TEXTURE_2D, texture);
 	}
 
-#define DRAW_SKIP 2
+#define DRAW_SKIP 1
 
 	for(i=0;i<l->side-1;i+=DRAW_SKIP) {
 		glBegin(GL_TRIANGLE_STRIP);
+		// glBegin(GL_LINE_STRIP);
 
 		for(j=0;j<l->side;j+=DRAW_SKIP) {
 			if(l->drawMode) ambientColor[0] = ambientColor[1] = ambientColor[2] = 0.0;
@@ -413,9 +438,9 @@ void slDrawTerrainSide(slTerrain *l, int texture, double textureScale, int drawM
 				ambientColor[1] = l->bottomColor.y;
 				ambientColor[2] = l->bottomColor.z;
 					
-				ambientColor[0] += (l->matrix[i+1][j] - l->heightMin) * cdelta.x / l->heightDelta;
-				ambientColor[1] += (l->matrix[i+1][j] - l->heightMin) * cdelta.y / l->heightDelta;
-				ambientColor[2] += (l->matrix[i+1][j] - l->heightMin) * cdelta.z / l->heightDelta;
+				ambientColor[0] += (l->matrix[i+DRAW_SKIP][j] - l->heightMin) * cdelta.x / l->heightDelta;
+				ambientColor[1] += (l->matrix[i+DRAW_SKIP][j] - l->heightMin) * cdelta.y / l->heightDelta;
+				ambientColor[2] += (l->matrix[i+DRAW_SKIP][j] - l->heightMin) * cdelta.z / l->heightDelta;
 			}
 
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambientColor);
@@ -545,9 +570,8 @@ void slTerrainFacesUnderRange(slTerrain *l,
 	else *lateEnd = 1;
 }
 
-/*
-	+ slTerrainPlaneUnderPoint
-	= takes a point, finds the area on the landscape underneath that point
+/*!
+	\brief Takes a point, finds the X, Z and Quad location on the terrain for this point.
 */
 
 int slTerrainAreaUnderPoint(slTerrain *l, slVector *origpoint, int *x, int *z, int *quad) {
@@ -556,11 +580,11 @@ int slTerrainAreaUnderPoint(slTerrain *l, slVector *origpoint, int *x, int *z, i
 	slVector point;
 	int result = 0;
 
-	/* transform this point into the terrain's coordinates */
+	// transform this point into the terrain's coordinates 
 
 	slVectorSub(origpoint, &l->position.location, &point);
 
-	/* scale down by l->xscale on both x and z axes */
+	// scale down by l->xscale on both x and z axes 
 
 	xpos = point.x / l->xscale;
 	zpos = point.z / l->xscale;
@@ -790,16 +814,18 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 	return CT_PENETRATE;
 }
 
-/*
-	+ slPointIn2DTriangle
-	= IGNORES THE Y COORDINATE to say whether vertex's 2D projection lies 
-	= in the projection of the triangle defined by t1, t2, t3 WHICH MUST
-	= define the triangle in a clockwise fashion.
+/*!
+	\brief Determines whether the vertex projection lies in the *projection* 
+	of the triangle defined by t1, t2, t3 WHICH MUST define the triangle in 
+	a clockwise fashion.  Ignores the Y coordinate of the point.
 
-	= returns 0 upon success.
+	Returns 0 upon success.
 
-	= upon failure, returns the lines violated, in this form:
-	= 0x01 = AB, 0x02 = BC, 0x04 = CA
+	Upon failure, returns an integer with the lines violated encoded as the
+	following bits:
+		- 0x01 = AB
+		- 0x02 = BC
+		- 0x04 = CA
 */
 
 int slPointIn2DTriangle(slVector *vertex, slVector *a, slVector *b, slVector *c) {
@@ -1043,10 +1069,8 @@ int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosit
 	return 1;
 }
 
-/*
-	+ slPointTerrainClip
-	= returns the distance from the point p at position pp to the 
-	= terrain.  also gives the terrain x, z & quad of the point.
+/*!
+	\brief Returns the distance from the a point to the terrain. 
 */
 
 double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollision *ce) {
@@ -1055,6 +1079,9 @@ double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollision 
 	slPlane landPlane;
 
 	slPositionVertex(pp, &p->vertex, &tp);
+
+	// if slTerrainAreaUnderPoint doesn't return 0, then the result is outside the 
+	// terrain
 	
 	if(slTerrainAreaUnderPoint(t, &tp, &p->terrainX, &p->terrainZ, &p->terrainQuad)) {
 		return 1.0;
@@ -1113,4 +1140,56 @@ void slTerrainSetTopColor(slTerrain *t, slVector *color) {
 
 void slTerrainSetBottomColor(slTerrain *t, slVector *color) {
 	slVectorCopy(color, &t->bottomColor);
+}
+
+int slTerrainLoadGeoTIFF(slTerrain *t, char *file) {
+	int height, width, x, y;
+	unsigned short depth, samples;
+	float *row;
+	TIFF* tif = TIFFOpen(file, "r");
+
+	if(!tif) return -1;
+
+	TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width);
+	TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height);
+	TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &depth);
+	TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples);
+
+	printf("%d x %d x %d x %d\n", height, width, depth, samples);
+
+	t->resize(width);
+
+	row = new float[width];
+
+	if(width > t->side) width = t->side;
+	if(height > t->side) height = t->side;
+
+	for(x=0;x<height;x++) {
+		TIFFReadScanline(tif, row, x, 0);
+
+		for(y=0;y<width;y++) {
+			t->matrix[x][y] = (float)row[y];
+			// printf("t->matrix[%d][%d]  = %f\n", x, y, t->matrix[x][y] );
+		}
+	}
+
+	delete row;
+	
+	slTerrainInitialize(t);
+
+	TIFFClose(tif);
+
+	return 0;
+}
+
+double slTerrainGetHeightAtLocation(slTerrain *t, double x, double z) {
+	slVector point;
+	int xoff, zoff, quad;
+
+	point.x = x;
+	point.z = z;
+
+	slTerrainAreaUnderPoint(t, &point, &xoff, &zoff, &quad);
+
+	return t->matrix[xoff][zoff];
 }

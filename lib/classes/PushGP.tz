@@ -301,16 +301,21 @@ Object : PushGP {
 
 		return (self compute-error-vector-fitness for-errors errors).
 
+	+ section "Methods Overridden by the User To Set Up PushGP Experiments"
+
 	+ to compute-error-vector-fitness for-errors errorList (list):
+		% This method takes a list of errors returned by METHOD(compute-error) for all 
+		% fitness cases, and produces a fitness value.  The default implementation of 
+		% this method computes the fitness by summing the absolute values of the errors,
+		% which should suffice for most applications.
+		% <P>
+		% Overriding this method is optional.
+
 		fitness, value (double).
 
-		# return stddev( errorList ).
-		
 		foreach value in errorList: fitness += | value |.
 
 		return fitness.
-
-	+ section "Methods Overridden by the User To Set Up PushGP Experiments"
 
 	+ to setup-fitness-test for-fitness-case n (int) 
 		with-interpreter interpreter (object):
@@ -441,6 +446,7 @@ PushGP : PushClusterGP {
 		transfer (object).
 		server (object).
 		lastTransfer (object).
+		port (int).
 
 	+ to init:
 		server = new NetworkServer.
@@ -449,6 +455,8 @@ PushGP : PushClusterGP {
 		emmigrationPercent = 3.
 
 		transfer = new PushProgramTransporter.
+
+		port = PUSHGP_SERVER_PORT.
 
 	- to accept-upload of immigrants (object) from h (string):
 		free lastTransfer.

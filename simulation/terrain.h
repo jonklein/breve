@@ -36,10 +36,21 @@ struct slSerializedTerrain {
 */
 
 #ifdef __cplusplus
+
+class slTerrainQuadtree;
+
 class slTerrain: public slWorldObject {
 	public:
 		slTerrain() : slWorldObject() {}
 		~slTerrain();
+
+		inline void terrainPoint(int x, int z, slVector *point) {
+			point->x = x * xscale + position.location.x;
+			point->y = matrix[x][z] +  position.location.y;
+			point->z = z * xscale + position.location.z;
+		}
+
+		void resize(int side);
 
 		void draw(slCamera *camera);
 
@@ -67,7 +78,108 @@ class slTerrain: public slWorldObject {
 
 		slVector bottomColor;
 		slVector topColor;
+
+		slTerrainQuadtree *quadtree;
 };
+
+class slTerrainQuadtree {
+	public:
+		slTerrainQuadtree(int xmin, int ymin, int xmax, int ymax, slTerrain *t) {
+			_xmin = xmin;
+			_xmax = xmax;
+			_ymin = ymin;
+			_ymax = ymax;
+			
+			_x = (xmax + xmin) / 2;
+			_y = (ymax + ymin) / 2;
+
+			_terrain = t;	
+
+			if(_xmax - _xmin <= 1 || _ymax - _ymin <= 1) {
+				_children[0] = NULL;
+				_children[1] = NULL;
+				_children[2] = NULL;
+				_children[3] = NULL;
+				return;
+			}
+
+			_children[0] = new slTerrainQuadtree(xmin, ymin, _x, _y, t);
+			_children[1] = new slTerrainQuadtree(_x, ymin, xmax, _y, t);
+			_children[2] = new slTerrainQuadtree(xmin, _y, _x, ymax, t);
+			_children[3] = new slTerrainQuadtree(_x, _y, xmax, ymax, t);
+		}
+		
+		int cull(slCamera *c) {
+			int m;
+
+			_minDist = 100000;
+			_culled = true;
+
+			_clip = slCameraFrustumPolygonTest(c, _points, 4);
+
+			if(_clip != 1) {
+				for(m=0;m<4;m++) {
+					slVector toCamera;
+					double distance;
+
+					if(_children[m]) _children[m]->cull(c);
+
+					slVectorAdd(&c->target, &c->location, &toCamera);
+					slVectorSub(&toCamera, &_points[m], &toCamera);
+					distance = slVectorLength(&toCamera);
+				
+					if(distance < _minDist) _minDist = distance;
+				}
+
+				_culled = false;
+			}
+
+			return _culled;
+		}
+
+		inline int draw(slCamera *c) {
+			int m;
+
+			if(_culled) return 0;
+
+			if((_clip == 2 || _minDist < 100) && _children[0]) {
+				int drawn = 0;
+				for(m=0;m<4;m++) drawn += _children[m]->draw(c);
+				return drawn;
+			}
+
+			glDisable(GL_BLEND);
+
+			glColor4f(0, (_points[0].y - _terrain->heightMin) / _terrain->heightDelta, 0, 0.8);
+			glBegin(GL_LINE_LOOP);
+			glVertex3f(_points[0].x, _points[0].y, _points[0].z);
+			glVertex3f(_points[1].x, _points[1].y, _points[1].z);
+			glVertex3f(_points[2].x, _points[2].y, _points[2].z);
+			glVertex3f(_points[3].x, _points[3].y, _points[3].z);
+			glEnd();
+
+			return 1;
+		}
+
+		void update() {
+			int m;
+			_terrain->terrainPoint(_xmin, _ymin, &_points[0]);
+			_terrain->terrainPoint(_xmin, _ymax, &_points[1]);
+			_terrain->terrainPoint(_xmax, _ymax, &_points[2]);
+			_terrain->terrainPoint(_xmax, _ymin, &_points[3]);
+			if(_children[0]) for(m=0;m<4;m++) _children[m]->update();
+		}
+
+		bool _culled;
+		int _clip;
+		double _minDist;
+		int _x, _y;
+		int _xmin, _xmax, _ymin, _ymax;
+		slTerrainQuadtree *_children[4];
+		slTerrain *_terrain;
+		slVector _points[4];
+};
+
 #endif
 
 #ifdef __cplusplus
@@ -114,6 +226,11 @@ double slTerrainGetHeight(slTerrain *t, int x, int y);
 
 void slTerrainSetTopColor(slTerrain *t, slVector *color);
 void slTerrainSetBottomColor(slTerrain *t, slVector *color);
+
+double slTerrainGetHeightAtLocation(slTerrain *t, double x, double z);
+
+int slTerrainLoadGeoTIFF(slTerrain *t, char *file);
+
 #ifdef __cplusplus
 }
 #endif

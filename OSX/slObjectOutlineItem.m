@@ -169,9 +169,11 @@
     NSString *result;
 	brEval evaluation;
     char *cstr;
-	
+
 	[self getEval: &evaluation];
 
+	return @"empty";
+	
     cstr = brFormatEvaluation(&evaluation, NULL);
 
     result = [NSString stringWithCString: cstr];

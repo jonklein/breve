@@ -171,6 +171,8 @@ struct slCamera {
 	slVector xAxis;
 	slVector yAxis;
 
+	slPlane frustumPlanes[6];
+
 	// camera size 
 	
 	int x;
@@ -185,6 +187,10 @@ struct slCamera {
 
 	void (*activateContextCallback)();
 };
+
+void slCameraUpdateFrustum(slCamera *c);
+int slCameraFrustumTest(slCamera *c, slVector *test);
+int slCameraFrustumPolygonTest(slCamera *c, slVector *test, int n);
 
 #ifdef __cplusplus
 extern "C" {

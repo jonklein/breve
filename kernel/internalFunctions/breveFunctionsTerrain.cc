@@ -26,7 +26,8 @@
 int brITerrainNew(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t;
 
-	t = slTerrainNew(5, BRDOUBLE(&args[0]), i);
+	// t = slTerrainNew(5, BRDOUBLE(&args[0]), i);
+	t = slTerrainNew(8, BRDOUBLE(&args[0]), i);
 
 	slWorldAddObject(i->engine->world, t, WO_TERRAIN);
 
@@ -113,6 +114,21 @@ int brISetValleyColor(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+int brILoadGeoTIFF(brEval args[], brEval *target, brInstance *i) {
+	slTerrain *t = BRPOINTER(&args[0]);
+	char *file = brFindFile(i->engine, BRSTRING(&args[1]), NULL);
+	
+	if(!file) {
+		slMessage(DEBUG_ALL, "Cannot locate file \"%s\"\n", file);
+		return EC_OK;
+	}
+
+	slTerrainLoadGeoTIFF(t, file);
+	slFree(file);
+	
+	return EC_OK;
+}
+
 /*@}*/
 
 void breveInitTerrainFunctions(brNamespace *n) {
@@ -124,4 +140,5 @@ void breveInitTerrainFunctions(brNamespace *n) {
     brNewBreveCall(n, "setTerrainScale", brISetTerrainScale, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
     brNewBreveCall(n, "setTerrainHeight", brISetTerrainHeight, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_DOUBLE, 0);
     brNewBreveCall(n, "getTerrainHeight", brIGetTerrainHeight, AT_DOUBLE, AT_POINTER, AT_INT, AT_INT, 0);
+    brNewBreveCall(n, "loadGeoTIFF", brILoadGeoTIFF, AT_INT, AT_POINTER, AT_STRING, 0);
 }

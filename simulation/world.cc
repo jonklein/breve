@@ -586,10 +586,10 @@ int slRemoveObjectLine(slWorld *w, slWorldObject *src, slWorldObject *dst) {
 
 		if(line->_dst == dst) {
 			linep = find(src->lines.begin(), src->lines.end(), line);
-			src->lines.erase(linep);
+			if(linep != src->lines.end()) src->lines.erase(linep);
 
 			linep = find(dst->lines.begin(), dst->lines.end(), line);
-			dst->lines.erase(linep);
+			if(linep != dst->lines.end()) dst->lines.erase(linep);
 
 			w->connections.erase(li);
 

@@ -22,15 +22,10 @@
 
 #define RADTODEG(x)	((x)*180.0/M_PI)
 
-int slSvdcmp(double *a, int m, int n, double *w, double *v);
+int slNextPowerOfTwo(int n);
 
 double slPythag(double a, double b);
 
-int slGaussj(double *a, int n);
-
-void slPseudoInverse(double m[3][3], double i[3][3]);
 int slQuadratic(double a, double b, double c, double *s1, double *s2);
-
-int slInverseHaywood6Array(double m[]);
 
 int slIsinf(double d);

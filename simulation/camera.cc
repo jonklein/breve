@@ -92,6 +92,113 @@ slCamera *slNewCamera(int x, int y, int drawMode) {
 	return c;
 }
 
+void slCameraUpdateFrustum(slCamera *c) {
+	slVector loc;
+	float proj[16], frust[16], modl[16];
+
+	glGetFloatv( GL_PROJECTION_MATRIX, proj );
+	glGetFloatv( GL_MODELVIEW_MATRIX, modl );
+
+	// combine the two matrices (multiply projection by modelview) 
+	frust[ 0] = modl[ 0] * proj[ 0] + modl[ 1] * proj[ 4] + modl[ 2] * proj[ 8] + modl[ 3] * proj[12];
+	frust[ 1] = modl[ 0] * proj[ 1] + modl[ 1] * proj[ 5] + modl[ 2] * proj[ 9] + modl[ 3] * proj[13];
+	frust[ 2] = modl[ 0] * proj[ 2] + modl[ 1] * proj[ 6] + modl[ 2] * proj[10] + modl[ 3] * proj[14];
+	frust[ 3] = modl[ 0] * proj[ 3] + modl[ 1] * proj[ 7] + modl[ 2] * proj[11] + modl[ 3] * proj[15];
+
+	frust[ 4] = modl[ 4] * proj[ 0] + modl[ 5] * proj[ 4] + modl[ 6] * proj[ 8] + modl[ 7] * proj[12];
+	frust[ 5] = modl[ 4] * proj[ 1] + modl[ 5] * proj[ 5] + modl[ 6] * proj[ 9] + modl[ 7] * proj[13];
+	frust[ 6] = modl[ 4] * proj[ 2] + modl[ 5] * proj[ 6] + modl[ 6] * proj[10] + modl[ 7] * proj[14];
+	frust[ 7] = modl[ 4] * proj[ 3] + modl[ 5] * proj[ 7] + modl[ 6] * proj[11] + modl[ 7] * proj[15];
+
+	frust[ 8] = modl[ 8] * proj[ 0] + modl[ 9] * proj[ 4] + modl[10] * proj[ 8] + modl[11] * proj[12];
+	frust[ 9] = modl[ 8] * proj[ 1] + modl[ 9] * proj[ 5] + modl[10] * proj[ 9] + modl[11] * proj[13];
+	frust[10] = modl[ 8] * proj[ 2] + modl[ 9] * proj[ 6] + modl[10] * proj[10] + modl[11] * proj[14];
+	frust[11] = modl[ 8] * proj[ 3] + modl[ 9] * proj[ 7] + modl[10] * proj[11] + modl[11] * proj[15];
+
+	frust[12] = modl[12] * proj[ 0] + modl[13] * proj[ 4] + modl[14] * proj[ 8] + modl[15] * proj[12];
+	frust[13] = modl[12] * proj[ 1] + modl[13] * proj[ 5] + modl[14] * proj[ 9] + modl[15] * proj[13];
+	frust[14] = modl[12] * proj[ 2] + modl[13] * proj[ 6] + modl[14] * proj[10] + modl[15] * proj[14];
+	frust[15] = modl[12] * proj[ 3] + modl[13] * proj[ 7] + modl[14] * proj[11] + modl[15] * proj[15];
+
+	/* 
+		But why doesn't this code work? 
+
+		printf("%f %f %f %f\n", frust[0], frust[1], frust[2], frust[3]);
+
+		glPushMatrix();
+
+		glMatrixMode(GL_MODELVIEW);
+
+		glGetFloatv(GL_PROJECTION_MATRIX, proj);
+	
+		glMultMatrixf(proj);
+	
+		glGetFloatv(GL_MODELVIEW_MATRIX, frust);
+
+		glPopMatrix();
+		printf("%f %f %f %f\n", frust[0], frust[1], frust[2], frust[3]);
+	*/
+
+	slVectorAdd(&c->target, &c->location, &loc);
+	slVectorCopy(&loc, &c->frustumPlanes[0].vertex);
+	slVectorCopy(&loc, &c->frustumPlanes[1].vertex);
+	slVectorCopy(&loc, &c->frustumPlanes[2].vertex);
+	slVectorCopy(&loc, &c->frustumPlanes[3].vertex);
+
+	c->frustumPlanes[0].normal.x = frust[3 ] - frust[0];
+	c->frustumPlanes[0].normal.y = frust[7 ] - frust[4];
+	c->frustumPlanes[0].normal.z = frust[11] - frust[8];
+
+	c->frustumPlanes[1].normal.x = frust[3 ] + frust[0];
+	c->frustumPlanes[1].normal.y = frust[7 ] + frust[4];
+	c->frustumPlanes[1].normal.z = frust[11] + frust[8];
+
+	c->frustumPlanes[2].normal.x = frust[3 ] - frust[1];
+	c->frustumPlanes[2].normal.y = frust[7 ] - frust[5];
+	c->frustumPlanes[2].normal.z = frust[11] - frust[9];
+
+	c->frustumPlanes[3].normal.x = frust[3 ] + frust[1];
+	c->frustumPlanes[3].normal.y = frust[7 ] + frust[5];
+	c->frustumPlanes[3].normal.z = frust[11] + frust[9];
+
+	slVectorNormalize(&c->frustumPlanes[0].normal);
+	slVectorNormalize(&c->frustumPlanes[1].normal);
+	slVectorNormalize(&c->frustumPlanes[2].normal);
+	slVectorNormalize(&c->frustumPlanes[3].normal);
+}
+
+int slCameraFrustumTest(slCamera *c, slVector *test) {
+	int n;
+
+	for(n=0;n<4;n++) {
+		if(slPlaneDistance(&c->frustumPlanes[n], test) < 0.0) return 1;
+	}
+
+	return 0;
+}
+
+int slCameraFrustumPolygonTest(slCamera *c, slVector *test, int n) {
+	int x;
+	char violations[4] = { 0, 0, 0, 0 };
+
+	for(x=0;x<n;x++) {
+		int plane;
+
+		for(plane=0;plane<4;plane++) {
+			if(slPlaneDistance(&c->frustumPlanes[plane], &test[x]) < 0.0) {
+				violations[plane] = 1;
+			} else return 0;
+		}
+	}
+
+	if(violations[0] && violations[1]) return 2;
+	if(violations[2] && violations[3]) return 2;
+
+	if(violations[0] || violations[1] || violations[2] || violations[3]) return 1;
+
+	return 0;
+}
+
 /*!
 	\brief Resizes the camera.
 */
@@ -151,11 +258,11 @@ void slUpdateCamera(slCamera *c) {
 
 	slMatrixMulMatrix(m, n, c->rotation);
 
-	/* preform the rotation around the unit vector */
+	// preform the rotation around the unit vector 
 
 	slVectorXform(c->rotation, &unit, &c->location);
 
-	/* apply the zoom */
+	// apply the zoom
 	
 	slVectorMul(&c->location, c->zoom, &c->location);
 }
@@ -207,8 +314,7 @@ void slSetShadowCatcher(slCamera *c, slStationary *s, slVector *normal) {
 	}
 
 	if(!bestFace) {
-	    /* this shouldn't happen */
-
+	    // this shouldn't happen 
 	    c->drawShadow = 0;
 	    return;
 	}

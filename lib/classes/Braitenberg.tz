@@ -258,7 +258,7 @@ Link : BraitenbergSensor (aka BraitenbergSensors) {
 		% <p>
 		% Your activation function should be defined as:
 		% <pre>
-		%     + to <i>activation-function-name</i> with-sensor-strength s (int):
+		%     + to <i>activation-function-name</i> with-sensor-strength s (float):
 		% </pre>
 		% <p>
 		% The default activation method is linear, but more complex vehicles

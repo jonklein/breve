@@ -143,8 +143,8 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 				txtlist = slListPrepend(txtlist, newString);
 
 				count += strlen(newString);
-				count++; /* for the space character */
-				count++; /* for the comma character */
+				count++; // for the space 
+				count++; // for the comma 
 
 				list = list->previous;
 			}

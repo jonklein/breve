@@ -185,21 +185,6 @@ void slCompileCubeDrawList() {
 }
 
 /*!
-	\brief Returns the closest power of two which is greater than or equal to 
-	the input.
-
-	Used to round up for non-power-of-two textures.
-*/
-
-int slNextPowerOfTwo(int n) {
-	int power = 1;
-
-	while(power < n) power <<= 1;
-
-	return power;
-}
-
-/*!
 	\brief Center the given pixels in a square buffer.
 
 	Used for textures, which must be powers of two.
@@ -554,7 +539,7 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 		// draw once to make sure the draw lists are good...
 
 		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-		slRenderObjects(w, c, 0, flags|DO_RECOMPILE|DO_NO_LINK|DO_NO_STENCIL);
+		slRenderObjects(w, c, 0, flags|DO_RECOMPILE|DO_NO_LINK|DO_NO_TERRAIN|DO_NO_STENCIL);
 		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 		
 		if(!c->stationaryDrawList) c->stationaryDrawList = glGenLists(1);
@@ -605,6 +590,8 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 		return;
 	}
 
+	slCameraUpdateFrustum(c);
+
 	if(c->drawFog && !(flags & DO_NO_FOG)) slDrawFog(w, c);
 	else glDisable(GL_FOG);
 
@@ -614,8 +601,8 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 		if(c->billboardCount) slSortBillboards(c);
 	}
 
-	/* do a pass through to grab all the billboards--we want to sort them */
-	/* so that they can be rendered back to front and blended correctly */
+	// do a pass through to grab all the billboards--we want to sort them 
+	// so that they can be rendered back to front and blended correctly
 
 	if(c->drawLights) {
 		slVector toCam;
@@ -661,7 +648,7 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 
 	if(w->gisData) w->gisData->draw();
 
-	slRenderObjects(w, c, 0, flags|DO_NO_STATIONARY|DO_NO_TERRAIN|DO_NO_ALPHA);
+	slRenderObjects(w, c, 0, flags|DO_NO_STATIONARY|DO_NO_ALPHA);
 	slRenderLines(w, c, 0);
 	slClearGLErrors("drew multibodies and lines");
 
@@ -991,7 +978,6 @@ void slRenderLabels(slWorld *w) {
 
 void slRenderBillboards(slCamera *c, int flags) {
 	slBillboardEntry *b;
-	float modelview[16];
 
 	int n;
 	int lastTexture = -1;
@@ -1387,13 +1373,15 @@ void slRenderObjects(slWorld *w, slCamera *camera, int loadNames, int flags) {
 
 			switch(wo->type) {
 				case WO_TERRAIN:
-					wo->draw(camera);
+					if(!(flags & DO_NO_TERRAIN)) {
+						glBindTexture(GL_TEXTURE_2D, texture);
+						wo->draw(camera);
+					}
 					break;
 				default:
 					if(!(flags & DO_NO_LINK)) slDrawShape(camera, wo->shape, &wo->position, &wo->color, texture, wo->textureScale, textureMode, wo->drawMode, flags, wo->billboardRotation, wo->alpha);
-					break;
-				case WO_STATIONARY:
-					if(!(flags & DO_NO_STATIONARY)) slDrawShape(camera, wo->shape, &wo->position, &wo->color, texture, wo->textureScale, textureMode, wo->drawMode, flags, 0, wo->alpha);
+
+					// if(slCameraFrustumTest(camera, &wo->position.location)) printf("%p out of sight\n", wo);
 					break;
 			}
 		}
@@ -1851,3 +1839,4 @@ void slReversePixelBuffer(unsigned char *source, unsigned char *dest, int width,
 	for(n=0;n<height;n++)
 		bcopy(&source[n * width], &dest[(height - (n + 1)) * width], width);
 }
+
