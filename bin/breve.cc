@@ -83,6 +83,7 @@ slGLUTWindow *gWindows[1024];
 
 int main(int argc, char **argv) {
 	char wd[10240];
+	pthread_t thread;
 	int index;
 	int n;
 	char *text;
@@ -178,7 +179,7 @@ int main(int argc, char **argv) {
 	for(n=0;n<256;n++) keyDown[n] = 0;
 
 	pthread_mutex_lock(&gThreadMutex);
-	// pthread_create(&thread, NULL, workerThread, NULL);
+	pthread_create(&thread, NULL, workerThread, NULL);
 
 	if(gMaster) slWorldStartNetsimServer(frontend->engine->world);
 

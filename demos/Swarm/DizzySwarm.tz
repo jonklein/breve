@@ -97,8 +97,6 @@ Control : Swarm {
 
     + to iterate:
         location (vector).
-        velocity (vector).
-        birdLocation (vector).
         topDiff (double).
         highLoc (vector).
  
@@ -107,7 +105,7 @@ Control : Swarm {
         # get the average location, and point the camera at it.
 
         foreach item in birds: {
-            item fly with-flock birds.
+            item fly.
             location += (item get-location).
 
 			if | (item get-location) | > | highLoc |: highLoc = (item get-location).
@@ -270,7 +268,7 @@ Mobile : Bird (aka Birds) {
 
         return landed.
 
-    + to fly with-flock flock (list):
+    + to fly:
         # This is the method which does it all.
 
         bird (object).

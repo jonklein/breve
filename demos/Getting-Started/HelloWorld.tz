@@ -5,4 +5,5 @@ Controller HelloWorld.
 Control : HelloWorld {
     + to iterate:
         print "Hello, world!".
+	super iterate.
 }

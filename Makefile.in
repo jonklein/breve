@@ -20,8 +20,6 @@ export
 
 all: 
 	-mkdir docs
-	-mkdir include
-	-mkdir bin
 	cd util; $(MAKE) -f Makefile install
 	cd simulation; $(MAKE) -f Makefile install
 	cd neural; $(MAKE) -f Makefile install
