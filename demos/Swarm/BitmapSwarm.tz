@@ -209,17 +209,6 @@ Mobile : Bird (aka Birds) {
 		maxAcceleration = 15.
 		cruiseDistance = .4.
 
-	+ to flock-normally-old:
-		wanderConstant = 6.0.
-		worldCenterConstant = 5.0.
-		centerConstant = 2.0.
-		velocityConstant = 4.0.
-		spacingConstant = 5.0.
-
-		maxVelocity = 20.
-		maxAcceleration = 12.
-		cruiseDistance = .4.
-
 	+ to flock-obediently:
 		# The obedient flocking has a lower maxAcceleration, which means that 
 		# the objects don't react as quickly.  This has a calming effect on the 

@@ -67,7 +67,7 @@ breve.dll: $(OBJ)
 debug: all
 
 optimize:
-	$(MAKE) EXTRACFLAGS=$(OPTFLAGS)
+	$(MAKE) EXTRACFLAGS='$(OPTFLAGS)'
 
 optimize_debug:
 	$(MAKE) EXTRACFLAGS='-g $(OPTFLAGS)'

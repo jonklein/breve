@@ -64,7 +64,7 @@ Control : GS {
         for n=0,n<SIZE,n++:
             for m=0,m<SIZE,m++: {
 				U set-value to (0.5 + sqrt(|0.25 - F*(1.0 + K/F)*(1.0 + K/F)|) + 0.01*(random[1.0] - 0.5)) at-x m at-y n.
-                V set-value to (1.0 - matrixGet((U get-matrix-pointer), m, n))/(1.0 + K/F) + 0.01*(random[1.0] - 0.5) at-x m at-y n.
+                V set-value to (1.0 - (U get-value at-x m at-y n))/(1.0 + K/F) + 0.01*(random[1.0] - 0.5) at-x m at-y n.
 
 				inflow set-value to F at-x n at-y m.
             }
