@@ -174,7 +174,7 @@ void brqtMainWindow::toggleSimulation()
 
     breveFrontendLoadSimulation(frontend, w->getString(), "<untitled>");
 
-    new brqtEngine(frontend->engine, breveGLWidget1);
+    currentEngine = new brqtEngine(frontend->engine, breveGLWidget1);
     
 }
 
@@ -187,4 +187,13 @@ void brqtMainWindow::loadDemo(int n)
     w->show();		
     
     gW = w;
+}
+
+
+void brqtMainWindow::stopSimulation()
+{
+    if (currentEngine) {
+	delete currentEngine;
+	currentEngine = NULL;
+    }
 }

@@ -1,4 +1,7 @@
 
+#ifndef BRQTENGINE
+#define BRQTENGINE
+
 #include "kernel.h"
 #include "breveGLWidget.h"
 
@@ -26,3 +29,4 @@ public:
     pthread_t _thread;
     bool _stop;
 };
+#endif
