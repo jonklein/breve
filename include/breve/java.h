@@ -76,6 +76,11 @@ struct brJavaBridgeData {
 	JNIEnv *env;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+void brJavaInit(brEngine *e);
+
 brJavaInstance *brJavaBootstrapMethodFinder(brJavaObject *);
 
 brJavaMethod *brJavaMethodFind(brJavaBridgeData *, brJavaObject *, char *, unsigned char *, int);
@@ -106,4 +111,7 @@ jstring brMakeJavaString(brJavaBridgeData *, char *);
 brInstance *brJavaObjectWrapper(brEngine *, jobject);
 
 char brJTypeForType(unsigned char);
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -2524,7 +2524,7 @@ inline int stEvalNewInstance(stInstanceExp *ie, stRunInstance *i, brEval *t) {
 	object = brObjectFind(i->instance->type->engine, ie->name);
 
 	if(!object) {
-		stEvalError(i->instance->type->engine, EE_UNKNOWN_OBJECT, "unknown object type \"%s\" during new instance evaluation\n", ie->name);
+		stEvalError(i->instance->type->engine, EE_UNKNOWN_OBJECT, "unknown object type \"%s\" during new instance evaluation", ie->name);
 		return EC_ERROR;
 	}
 
@@ -2533,7 +2533,7 @@ inline int stEvalNewInstance(stInstanceExp *ie, stRunInstance *i, brEval *t) {
 	stExpEval(ie->count, i, &count, NULL);
 
 	if(count.type != AT_INT) {
-		stEvalError(i->instance->type->engine, EE_TYPE, "expected integer count for \"new\" expression\n");
+		stEvalError(i->instance->type->engine, EE_TYPE, "expected integer count for \"new\" expression");
 		return EC_ERROR;
 	}
 

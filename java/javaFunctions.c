@@ -57,6 +57,8 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 
 	sprintf(optstr, "-Djava.class.path=%s:%s:.", finder, classPath);
 
+	// printf("opts: %s\n", optstr);
+
 	JNI_GetDefaultJavaVMInitArgs(&vm_args);
 
 	options[0].optionString = optstr;
@@ -80,7 +82,7 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	finderObject = brJavaObjectFind(bridge, "MethodFinder");
 
 	if(!finderObject) {
-		slMessage(DEBUG_ALL, "Cannot instantiate MethodFinder class\n");
+		slMessage(DEBUG_ALL, "Cannot locate MethodFinder class\n");
 		return NULL;
 	}
 
@@ -332,7 +334,13 @@ brJavaObject *brJavaObjectFind(brJavaBridgeData *bridge, char *name) {
 		object->object = (*bridge->env)->FindClass(bridge->env, name);
 
 		if(!object->object) {
-			slMessage(DEBUG_ALL, "Cannot locate Java object \"%s\"\n", name);
+			// slMessage(DEBUG_ALL, "Cannot locate Java object \"%s\"\n", name);
+
+			if ((*bridge->env)->ExceptionOccurred(bridge->env)) {
+				// (*bridge->env)->ExceptionDescribe(bridge->env);
+				(*bridge->env)->ExceptionClear(bridge->env);
+			}
+
 			return NULL;
 		}
 
