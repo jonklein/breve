@@ -66,6 +66,8 @@ slTerrain *slTerrainNew(int res, double xscale, void *data) {
 	for(n=0;n<l->side;n++) {
 		l->vnormals[n] = new slVector[l->side];
 		l->matrix[n] = new float[l->side];
+		// bzero(l->matrix[n], sizeof(float) * l->side);
+		// printf("[%d] 0: %f\n", n, l->matrix[0][0]);
 	}
 
 	l->xscale = xscale;
@@ -256,8 +258,8 @@ void slTerrainMakeNormals(slTerrain *l) {
 			slVectorCross(&v2, &v1, &l->fnormals[1][x][z]);
 			slVectorNormalize(&l->fnormals[1][x][z]);
 
-		if(l->matrix[x][z] < l->heightMin) l->heightMin = l->matrix[x][z];
-		if(l->matrix[x][z] > max) max = l->matrix[x][z];
+			if(l->matrix[x][z] < l->heightMin) l->heightMin = l->matrix[x][z];
+			if(l->matrix[x][z] > max) max = l->matrix[x][z];
 		}
 	}
 
@@ -740,8 +742,8 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 							slVectorMul(&landPlane.normal, ss->_radius, &toSphere);
 							slVectorSub(&sp->location, &toSphere, &terrainPoint);
 
-							if(dist < VC_WARNING_TOLERANCE)
-								slMessage(DEBUG_ALL, "deep plane collision (%f) in terrain/sphere clip\n", dist);
+							// if(dist < VC_WARNING_TOLERANCE)
+							// 	slMessage(DEBUG_ALL, "deep plane collision (%f) in terrain/sphere clip\n", dist);
 
 							ce->depths.push_back(dist);
 							ce->points.push_back(terrainPoint);

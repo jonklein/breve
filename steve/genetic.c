@@ -19,9 +19,9 @@
  *****************************************************************************/
 
 /*
-    + genetic.c
-    = functions (well, right now only one) which deal with "genetic crossover"
-    = of objects variables.  kind of hacky.
+	+ genetic.c
+	= functions (well, right now only one) which deal with "genetic crossover"
+	= of objects variables.  kind of hacky.
 */
 
 #include "steve.h"
@@ -29,61 +29,92 @@
 /*!
 	\brief A simple one-point crossover between two instances, storing the output in a third instance.
 
-    Note that the crossover happens only to the "base" class of the 
-    instance, not to it's ancestors.  The ancestor crossovers would
-    thus be called explicitly if desired.
+	Note that the crossover happens only to the "base" class of the 
+	instance, not to it's ancestors.  The ancestor crossovers would
+	thus be called explicitly if desired.
 */
 
 int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
-    int crossoverCount = 0, n;
-    int varCount = 0;
-    slList *list;
-    stVar *var;
+	int crossoverCount = 0, n;
+	int varCount = 0;
+	slList *list;
+	stVar *var;
+	stInstance *source;
 
-    stInstance *temp;
+	if(a->type != b->type || b->type != child->type) {
+		slMessage(DEBUG_ALL, "Crossover instances must be of same class\n");
+		return -1;
+	}
 
-    if(a->type != b->type || b->type != child->type) {
-        slMessage(DEBUG_ALL, "Crossover instances must be of same class\n");
-        return -1;
-    }
+	// we don't always want to use the first half of the first argument
+	// passed.  we sometimes want to take the first half of the second 
+	// argument... 
 
-    /* we don't always want to use the first half of the first argument */
-    /* passed.  we sometimes want to take the first half of the second  */
-    /* argument ... */
+	if(random() % 2) {
+		stInstance *temp = a;
 
-    if(random() % 2) {
-        temp = a;
-        a = b;
-        b = temp;
-    }
+		a = b;
+		b = temp;
+	}
 
-    list = a->type->variableList;
+	source = a;
 
-    // this has become a little complicated now that we have "array" variables */
-    // they only appear internally as a single variable, but may contain more */
-    // than one piece of information, and naturally we want to be able to     */
-    // crossover in the middle. */
+	list = a->type->variableList;
 
-    while(list) {
-		int offset;
-		int index;
+	// this has become a little complicated now that we have "array" variables 
+	// they only appear internally as a single variable, but may contain more
+	// than one piece of information, and naturally we want to be able to
+	// crossover in the middle.
+
+	while(list) {
+		var = list->data;
+
+		if(var->type->type == AT_ARRAY) varCount += var->type->arrayCount;
+		else varCount++;
+
+		list = list->next;
+	}
+
+	list = a->type->variableList;
+
+	crossoverCount = random() % (varCount + 1);
+
+	source = a;
+
+	// while(list) {
+	for(n=0;n<varCount;n++) {
 		brEval value;
 
-        var = list->data;
+		var = list->data;
 
-        if(var->type->type == AT_ARRAY) {
+		if(n >= crossoverCount) source = b;
+
+		if(var->type->type == AT_ARRAY) {
+			int index;
+
 			for(index=0;index<var->type->arrayCount;index++) {
-				var->offset + (var->type->arrayCount * stSizeofAtomic(var->type->arrayType));
+				int offset = var->offset + (n * stSizeofAtomic(var->type->arrayType));
+
+				stLoadVariable(&source->variables[offset], var->type->arrayType, &value, NULL);
+
+				// if(var->type->type == AT_LIST) BRLIST(&value) = brEvalListCopy(&value);
+
+				stSetVariable(&child->variables[offset], var->type->arrayType, NULL, &value, NULL);
 			}
 
+			n += (var->type->arrayCount - 1);
 		} else {
+			stLoadVariable(&source->variables[var->offset], var->type->type, &value, NULL);
 
+			// if(var->type->type == AT_LIST) BRLIST(&value) = brEvalListCopy(&value);
+
+			stSetVariable(&child->variables[var->offset], var->type->type, NULL, &value, NULL);
 		}
 
-        list = list->next;
-    }
+		list = list->next;
+	}
 
-    crossoverCount = random() % (varCount + 1);
-
-    return 0;
+	return 0;
 }
+
+

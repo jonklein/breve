@@ -332,7 +332,7 @@ int stLoadVariable(void *variable, unsigned char type, brEval *e, stRunInstance 
 		case AT_STRING:
 			if(!(*(char**)variable)) *(char**)variable = slStrdup("");
 
-			BRSTRING(e) = *(char**)variable;
+			BRSTRING(e) = slStrdup(*(char**)variable);
 
 			break;
 		case AT_MATRIX:
