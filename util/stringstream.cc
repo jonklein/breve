@@ -12,6 +12,7 @@
 */
 
 #include <stdlib.h>
+#include <unistd.h>
 
 slStringStream *slOpenStringStream() {
 	slStringStream *stream;

@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #ifdef MINGW
 #include <malloc.h>

@@ -61,6 +61,7 @@
 #include <strings.h>
 #include <string.h>
 #include <pthread.h>
+#include <inttypes.h>
 #include <sys/stat.h>
 #include <sys/param.h>
 #include <sys/types.h>

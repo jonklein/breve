@@ -28,8 +28,7 @@
 
 #ifdef MINGW
 
-#define usleep(x) _sleep((x) / 1000.0)
-#define bcopy(x, y, z) memcpy((y), (x), z)
+#define usleep(x) _sleep((unsigned int)((x) / 1000.0))
 #define random rand
 #define srandom srand
 
