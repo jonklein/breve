@@ -132,16 +132,16 @@ by using the popup menu located at the bottom of the simulation window.
 <indexterm><primary>rotate-tool</primary></indexterm>
 <indexterm><primary>selection-tool</primary></indexterm>
 <indexterm><primary>dragging objects</primary></indexterm>
-On the right hand side of the simulation window is a small palette of tools.
+On the bottom of the simulation window is a small palette of tools.
 <mediaobject><imageobject><imagedata align="center" fileref="images/tools.jpg"></imageobject></mediaobject>
 </para>
 <para>
-The top tool is the rotation tool.  Use it to rotate the simulation view.
+The first tool is the rotation tool.  Use it to rotate the simulation view.
 The focal point of the simulation will remain the same, while the viewing 
 angle is changed.
 </para>
 <para>
-The second tool is the zoom tool.  Use this tool to zoom in and out.  As 
+The next tool is the zoom tool.  Use this tool to zoom in and out.  As 
 with the rotation tool, the focal point of the simulation stays the same.
 </para>
 <para>
@@ -261,9 +261,13 @@ You may freely move around the files in the breve distribution (to install them 
 <para>
 Once your <function>BREVE_CLASS_PATH</function> environment variable is configured, you can get started by 
 running breve with one of the included simulation files.  Assuming that you are in the 
-breve distribution directory, you can type:
+breve distribution directory, you can try out the "ArrowSwarm" demo by typing:
 <screen>
-% ./bin/breve ./demos/Swarm/ArrowSwarm.tz
+# Linux & OSX
+	% ./bin/breve ./demos/Swarm/ArrowSwarm.tz
+
+# Windos
+	> bin\breve.exe demos\Swarm\ArrowSwarm.tz
 </screen>
 </para>
 <para>
@@ -281,6 +285,8 @@ is running, the following controls can be useful:
 <listitem><para>Shift (or F4) + left mouse: select and drag objects in the simulation</para></listitem>
 <listitem><para>Escape: to quit the simulation, or access the breve command prompt</para></listitem>
 </itemizedlist>
+</para>
+<para>
 The keys F2, F3 and F4 can be used instead of control, alt and shift, respectively, to allow 
 for easier use on platforms which emulate middle and right mouse buttons using the control,
 alt or shift keys.

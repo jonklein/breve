@@ -75,12 +75,18 @@ Abstract : File (aka Files) [version 2.0] {
 		return readLine(filePointer).
 
 	+ to read-line-as-whitespace-delimited-list:
+		% Reads a line from the file and returns the results as a list
+		% of elements delimited by whitespace.
 		% The size of the line read is limited to 10239.
 
 		return readWhitespaceDelimitedList(filePointer).
 
 	+ to read-line-as-list with-delimiter delimiterString (string):
+		% Reads a line from the file and returns the results as a list
+		% of elements delimited by delimiterString.
 		% The size of the line read is limited to 10239.
+
+		return readDelimitedList(filePointer, delimiterString).
 
   + section "Writing to an Open File"
 

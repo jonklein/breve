@@ -1,4 +1,5 @@
-@include "Object.tz"
+@use Object.
+@use File.
 
 Object : PushInterpreter (aka PushInterpreters) {
 	% The PushInterpreter object is used to setup and run programs in the 
@@ -246,7 +247,7 @@ Object : PushProgram (aka PushPrograms) {
         f = new File.
         f open-for-reading with-file fileName.
     
-        self parse code (f read-as-string).
+        self parse program (f read-as-string).
 
         free f.
 

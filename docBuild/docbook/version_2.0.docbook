@@ -1,18 +1,53 @@
 <chapter id="version-2.0"> <title>What's New In Version 2.0</title>
 
-<sect1 id="new-features"> <title>New Features in Version 2.0</title>
+<para>
+breve version 2.0 introduces several new features and changes.  <xref linkend="new_features"> gives a list of the 
+major new features in breve 2.0.  <xref linkend="upgrading_simulations"> describes changes that may affect simulations
+upgraded from previous versions of breve.
+</para>
+
+<sect1 id="new_features"> <title>New Features in Version 2.0</title>
 <para>
 
+Below are some of the major new features found in breve 2.0.  For a full list of new features, see the "Changes" file that is included with the breve distribution.
+
 <itemizedlist>
-  <listitem><para>Textures may now be any size</para></listitem>
-  <listitem><para>The Image class is now used for assigning textures</para></listitem>
-  <listitem><para>New list operators: <replaceable>insert</replaceable> and <replaceable>remove</replaceable></para></listitem>
+  <listitem><para>
+    Full integration of the <ulink url="http://hampshire.edu/lspector/push.html">"Push"</ulink> programming language for evolutionary computation (<xref linkend="push">).
+  </para></listitem>
+
+  <listitem><para>
+    New breve Object API allows programmers to interface with breve from other programming languages (<xref linkend="language_frontend">).
+  </para></listitem>
+
+  <listitem><para>
+    Method arguments can now be given default values to indicate that they are optional (<xref linkend="optional_arguments">).
+  </para></listitem>
+
+  <listitem><para>
+    Totally revamped garbage collection system allows garbage collection of objects on a per-object basis (<xref linkend="garbage_collection">).
+  </para></listitem>
+
+  <listitem><para>
+    Multiple perspectives can be viewed in a simulation using the "Camera" class (<xref linkend="classes">).
+  </para></listitem>
+
+  <listitem><para>
+    The Image class is now used for assigning and modifying textures of any size and in real time (<xref linkend="classes">).
+  </para></listitem>
+
+  <listitem><para>
+    New list operators: <replaceable>insert</replaceable> and <replaceable>remove</replaceable> (<xref linkend="list_operators">).
+  </para></listitem>
+
+  <listitem><para>
+    Source code now documented with doxygen.
+  </para></listitem>
 </itemizedlist> 
 
 </para> </sect1>
 
-<sect1 id="upgrading-simulations"> <title>Upgrading Simulations From
-Version 1.x</title>
+<sect1 id="upgrading_simulations"> <title>Upgrading Simulations From Version 1.x</title>
 
 <para>In addition to the new features listed above, version 2.0 also
 introduces some changes to existing features, which may require changes
@@ -34,8 +69,7 @@ to simulations written in previous versions of breve.
 <para>MultiBodies are now optional.  Some MultiBody functionality has
 changed, and some MultiBody methods have been removed. </para> 
 
-<para>
-The MultiBody class is used to manage a logical collection of connected
+<para>The MultiBody class is used to manage a logical collection of connected
 links.  Prior to version 2.0, all physically connected objects were
 required to be part of a MultiBody.  This lead to complications when
 multiple MultiBodies would merge to form a single body, or when a single
@@ -121,8 +155,8 @@ containing interleaved red, green, blue and alpha pixels.</para>
 breve, it will need to use the Camera and Image objects to preform the
 same functionality in the current version of breve.</para></sect2>
 
-<sect2 id="texture_changes"><title>Loading Textures From the Controller Class is Now
-Depreciated</title>
+<sect2 id="texture_changes">
+<title>Loading Textures From the Controller Class is Now Depreciated</title>
 
 <para>Obtaining a "texture number" by loading an image from the Control
 class is now depreciated, as is using a texture number to set a texture,

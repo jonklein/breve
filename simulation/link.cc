@@ -582,22 +582,22 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 
 	switch(jointType) {
 		case JT_BALL:
-			// slVectorCross(&tp, &tn, &axis2);
-			// slVectorNormalize(&axis2);
-			// dJointSetBallAnchor(joint->odeJointID, tp.x + position.x, tp.y + position.y, tp.z + position.z);
-
-			// dJointSetAMotorNumAxes(joint->odeMotorID, 3);
-			// dJointSetAMotorAxis(joint->odeMotorID, 0, 1, 1, 0, 0);
-			// dJointSetAMotorAxis(joint->odeMotorID, 1, 1, 0, 1, 0);
-			// dJointSetAMotorAxis(joint->odeMotorID, 2, 1, 0, 0, 1);
-
 			slVectorCross(&tp, &tn, &axis2);
 			slVectorNormalize(&axis2);
-
 			dJointSetBallAnchor(joint->odeJointID, tp.x + position.x, tp.y + position.y, tp.z + position.z);
 
-			dJointSetAMotorAxis(joint->odeMotorID, 0, 1, tn.x, tn.y, tn.z);
-			dJointSetAMotorAxis(joint->odeMotorID, 2, 2, axis2.x, axis2.y, axis2.z);
+			dJointSetAMotorNumAxes(joint->odeMotorID, 3);
+			dJointSetAMotorAxis(joint->odeMotorID, 0, 1, 1, 0, 0);
+			dJointSetAMotorAxis(joint->odeMotorID, 1, 1, 0, 1, 0);
+			dJointSetAMotorAxis(joint->odeMotorID, 2, 1, 0, 0, 1);
+
+			// slVectorCross(&tp, &tn, &axis2);
+			// slVectorNormalize(&axis2);
+
+			// dJointSetBallAnchor(joint->odeJointID, tp.x + position.x, tp.y + position.y, tp.z + position.z);
+
+			// dJointSetAMotorAxis(joint->odeMotorID, 0, 1, tn.x, tn.y, tn.z);
+			// dJointSetAMotorAxis(joint->odeMotorID, 2, 2, axis2.x, axis2.y, axis2.z);
 			break;
 		case JT_UNIVERSAL:
 			slVectorCross(&tp, &tn, &axis2);

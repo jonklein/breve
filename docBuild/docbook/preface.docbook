@@ -10,7 +10,7 @@
 <title>The Origin of breve</title>
 <para>
 The simulation software described in this document, breve, was initiated 
-by <ulink url="mailto:jklein@spiderland.org">jon klein</ulink> as a thesis 
+by <ulink url="mailto:jk [at] spiderland.org">jon klein</ulink> as a thesis 
 project at <ulink url="http://www.hampshire.edu">Hampshire College</ulink> 
 and was developed further into a Master's thesis at 
 <ulink url="http://www.chalmers.se">Chalmers University</ulink>.  The 
@@ -28,8 +28,8 @@ This documentation aims to supersede all previous breve documentation
 by collecting it and organizing it into a single document.
 </para>
 <para>
-This document is a work in progress.  See the section on getting
-help with breve (<xref linkend="getting_help">) if this document fails to 
+This document is a work in progress.  See the section on "Getting
+Help With breve" (<xref linkend="getting_help">) if this document fails to 
 adequately describe any features or techniques.
 </para>
 </sect1>
@@ -40,7 +40,7 @@ adequately describe any features or techniques.
 <itemizedlist>
 <listitem><para>Read the class documentation for more detailed information about each class.  These class files are listed in <xref linkend="classes">.</para></listitem> 
 <listitem><para>Join the breve mailing list at 
-<ulink url="http://www.spiderland.org/mailman/listinfo/breve">http://www.spiderland.org/mailman/listinfo/breve</ulink>.</para></listitem>
+<ulink url="http://lists.spiderland.org/mailman/listinfo/breve">http://www.spiderland.org/mailman/listinfo/breve</ulink>.</para></listitem>
 <listitem><para>Mail the author at <ulink url="mailto:jk [at] spiderland.org">jk [at] spiderland.org</ulink></para></listitem>
 </itemizedlist>
 </para>
@@ -54,7 +54,7 @@ Thanks are due to (in no particular order):
 <itemizedlist>
 
 <listitem><para>
-Lee and Kristian for allowing breve development to be my day job.
+Lee and Kristian for allowing breve development to be part of my day job.
 </para></listitem>
 
 <listitem><para>
@@ -66,15 +66,7 @@ Laurie, for contributions to the breve-object and frontend APIs.
 </para></listitem>
 
 <listitem><para>
-Jeff for design, testing, icons and enthusiasm.
-</para></listitem>
-
-<listitem><para>
-Joshua for reasons I cannot explain or understand.
-</para></listitem>
-
-<listitem><para>
-Evan, Keith and all the other beta testers.
+Jeff for design, testing and icons.
 </para></listitem>
 
 <listitem><para>

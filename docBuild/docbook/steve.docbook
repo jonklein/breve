@@ -785,7 +785,7 @@ myList = { 1, "a", { "dog", "cow" } }.  # a list with a nested list
 </screen>
 </para>
 
-<sect3><title><function>list</function> Operators</title>
+<sect3 id="list_operators"><title><function>list</function> Operators</title>
 <indexterm><primary>operators</primary><secondary>list</secondary></indexterm> 
 <indexterm><primary>list operators</primary><secondary>push</secondary></indexterm> 
 <indexterm><primary>list operators</primary><secondary>pop</secondary></indexterm> 
