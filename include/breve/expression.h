@@ -137,7 +137,7 @@ enum stVectorElements {
 enum stRtcBlockType	{
 	FRAG,		// code fragment
 	FUNC,		// function
-	PROC,		// procedure
+	PROCEDURE,	// procedure
 	LEAF_FUNC,	// function with no stack frame
 	LEAF_PROC	// procedure with no stack frame
 };

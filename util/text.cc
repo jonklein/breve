@@ -25,7 +25,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifndef WINDOWS
+#include "config.h"
+
+#if !WINDOWS
 #include <sys/socket.h>
 #endif
 

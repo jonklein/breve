@@ -20,9 +20,12 @@
 
 #include <errno.h>
 
-#ifndef MINGW
+#include "config.h"
+
+#if !MINGW
 #include <dlfcn.h>
 #else 
+#include <windows.h>
 #define dlopen(P,G) (void*)LoadLibrary(P)
 #define dlsym(D,F) (void*)GetProcAddress((HMODULE)D, F)
 #define dlclose(D) FreeLibrary((HMODULE)D)

@@ -25,7 +25,7 @@ slStringStream *slOpenStringStream(void) {
 	sprintf(nameTemplate, "/tmp/breve_temp.XXXXXXXXXX");
 	fd = mkstemp(nameTemplate);
 #else
-	sprintf(nameTemplate, "breve_temp.%ul", (unsigned long)random() % 10000000);
+	sprintf(nameTemplate, "breve_temp.%lu", (unsigned long)random() % 10000000);
 	fd = open(nameTemplate, O_CREAT | O_EXCL | O_WRONLY, 0600);
 #endif
 
