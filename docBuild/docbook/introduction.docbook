@@ -275,8 +275,9 @@ is running, the following controls can be useful:
 <listitem><para>F1: run simulation forward one iteration</para></listitem>
 <listitem><para>Left mouse: rotate simulation, and select objects (described below)</para></listitem>
 <listitem><para>Right mouse: simulation menu, or contextual menu for currently selected object (described below)</para></listitem>
-<listitem><para>Shift + left mouse: select and drag objects in the simulation</para></listitem>
-<listitem><para>F2 + left mouse: zoom in and out of the simulation</para></listitem>
+<listitem><para>Control (or F2) + left mouse: zoom in and out of the simulation</para></listitem>
+<listitem><para>Alt (or F3) + left mouse: move the camera</para></listitem>
+<listitem><para>Shift (or F4) + left mouse: select and drag objects in the simulation</para></listitem>
 <listitem><para>Escape: to quit the simulation, or access the breve command prompt</para></listitem>
 </itemizedlist>
 </para>
@@ -292,10 +293,10 @@ prompt, and will be executed in the simulation's controller object.  The steve l
 <title>The Simulation Menu and Object Contextual Menus</title>
 <para>
 Users can also interact with a running simulation via the 
-<firstterm>simulation menu</firstterm>, which is accessed from the left mouse button, and through the
+<firstterm>simulation menu</firstterm>, which is accessed from the right mouse button, and through the
 contextual menus associated with objects in a simulation.  To access a 
-contextual menu for an object in the simulation, right-click on the object in 
-the simulation display.
+contextual menu for an object in the simulation, use the middle mouse button to click on the 
+object in the simulation display.
 </para>
 <para>
 By default, the simulation menu and contextual menus are mostly empty.  As 

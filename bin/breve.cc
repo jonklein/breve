@@ -81,6 +81,15 @@ breveFrontend *frontend;
 
 slGLUTWindow *gWindows[1024];
 
+int gLastX, gLastY, gMods, gSpecial;
+double gStartCamX;
+
+int gPaused = 1;
+
+int gMotionCrosshair = 0;
+
+// int gFrameNo, gRecording;
+
 int main(int argc, char **argv) {
 	char wd[10240];
 	pthread_t thread;
@@ -421,14 +430,6 @@ void brPrintUsage(char *name) {
 	exit(1);
 }
 
-int gLastX, gLastY, gMods, gSpecial;
-double gStartCamX;
-
-int gPaused = 1;
-
-int gMotionCrosshair = 0;
-
-int gFrameNo, gClipNo, gRecording;
 
 void slInitGlut(int argc, char **argv, char *title) {
 	glutInitWindowSize(width, height);
@@ -487,6 +488,7 @@ void slDemoMouse(int button, int state, int x, int y) {
 		gStartCamX = frontend->engine->camera->rx;
 
 		brClick(slGlSelect(frontend->engine->world, frontend->engine->camera, x, y));
+		brGLMainMenuUpdate(frontend->engine->controller);
 
 		gMotionCrosshair = 1;
 	} else { 
@@ -496,6 +498,7 @@ void slDemoMouse(int button, int state, int x, int y) {
 	}
 
 	gMods = glutGetModifiers();
+	printf("%x are the mods\n", gMods);
 
 	slDemoDisplay();
 }
@@ -507,11 +510,11 @@ void slDemoPassiveMotion(int x, int y) {
 
 void slDemoMotion(int x, int y) {
 	if(gLastX || gLastY) {
-		if(gMods & GLUT_ACTIVE_SHIFT) { 
+		if((gMods & GLUT_ACTIVE_SHIFT) || (gSpecial == GLUT_KEY_F4)) { 
 			brDragCallback(frontend->engine, x, y);
-		} else if(gSpecial == GLUT_KEY_F2) {
+		} else if((gMods & GLUT_ACTIVE_ALT) || (gSpecial == GLUT_KEY_F2)) {
 			slZoomCameraWithMouseMovement(frontend->engine->camera, x - gLastX, y - gLastY);
-		} else if(gSpecial == GLUT_KEY_F3) {
+		} else if((gMods & GLUT_ACTIVE_CTRL) || (gSpecial == GLUT_KEY_F3)) {
 			slMoveCameraWithMouseMovement(frontend->engine->camera, x - gLastX, y - gLastY);
 		} else {
 			slRotateCameraWithMouseMovement(frontend->engine->camera, x - gLastX, y - gLastY, gStartCamX);
