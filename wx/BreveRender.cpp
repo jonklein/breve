@@ -38,6 +38,10 @@
 #include "SimInstance.h"
 #include "Inspector.h"
 
+#include "images/stop.xpm"
+#include "images/play.xpm"
+#include "images/pause.xpm"
+
 IMPLEMENT_CLASS( BreveRender, wxFrame )
 
 BEGIN_EVENT_TABLE( BreveRender, wxFrame )
@@ -166,10 +170,9 @@ void BreveRender::CreateControls()
 	itemBoxSizer4->Add(selectbutton, 0, wxFIXED_MINSIZE|wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
     }
 
-    if (!pausebitmap.LoadFile(app->GetImageDir() + "pause.tiff", wxBITMAP_TYPE_TIF) ||
-	!playbitmap.LoadFile(app->GetImageDir() + "play.tiff", wxBITMAP_TYPE_TIF) ||
-	!stopbitmap.LoadFile(app->GetImageDir() + "stop.tiff", wxBITMAP_TYPE_TIF))
-	wxMessageBox("Failed to load icon images");
+    pausebitmap = wxBitmap(pause_xpm);
+    playbitmap = wxBitmap(play_xpm);
+    stopbitmap = wxBitmap(stop_xpm);
 
     wxBitmapButton* itemButton6 = new wxBitmapButton( itemFrame1, ID_RENDER_STOP, stopbitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _("Stop") );
     itemBoxSizer4->Add(itemButton6, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 5);

@@ -20,6 +20,7 @@
 #include "BreveRender.h"
 
 class BCTestApp;
+class wxFileConfig;
 
 extern BreveRender * breverender;
 extern BCTestApp * app;
@@ -41,11 +42,6 @@ public:
 	return AppDir;
     }
 
-    wxString GetImageDir()
-    {
-	return ImageDir;
-    }
-
     wxString GetLocalDir()
     {
 	return LocalDir;
@@ -59,9 +55,9 @@ public:
     private:
 	BreveRender * renderwindow;
 	wxString AppDir;
-	wxString ImageDir;
 	wxString LocalDir;
 	wxString BreveDir;
+	wxFileConfig * config;
 };
 
 DECLARE_APP(BCTestApp)

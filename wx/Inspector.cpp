@@ -29,6 +29,9 @@
 #include "SimInstance.h"
 #include "Inspector.h"
 
+#include "images/expanded.xpm"
+#include "images/play.xpm"
+
 IMPLEMENT_CLASS( Inspector, wxFrame )
 
 BEGIN_EVENT_TABLE( Inspector, wxFrame )
@@ -96,9 +99,8 @@ void Inspector::CreateControls()
 
     imagelist = new wxImageList(10, 10, TRUE, 2);
 
-    if (!expandbitmap.LoadFile(app->GetImageDir() + "play.tiff", wxBITMAP_TYPE_TIF) ||
-	!expandedbitmap.LoadFile(app->GetImageDir() + "expanded.tiff", wxBITMAP_TYPE_TIF))
-	wxMessageBox("Failed to load bitmaps");
+    expandbitmap = wxBitmap(play_xpm);
+    expandedbitmap = wxBitmap(expanded_xpm);
 
     empty.Create(10, 10);
 

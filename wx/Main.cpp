@@ -28,6 +28,8 @@
 #include "BreveRender.h"
 #include "BreveInterface.h"
 
+#include <wx/confbase.h>
+#include <wx/fileconf.h>
 #include <wx/filename.h>
 
 IMPLEMENT_APP( BCTestApp )
@@ -63,7 +65,9 @@ bool BCTestApp::OnInit()
     wxImage::AddHandler( new wxGIFHandler );
 #endif
 
-    wxImage::AddHandler( new wxTIFFHandler );
+    config = new wxFileConfig("breveIDE");
+
+    wxConfigBase::Set(config);
 
     // Absolute path code from http://www.wxwidgets.org/technote/install.htm
     {
@@ -103,20 +107,71 @@ bool BCTestApp::OnInit()
 
     {
 	wxString str, sep;
-	bool hasenv = FALSE;
+	bool hasenv = FALSE, manual = FALSE;
 
 #ifdef __WXCOCOA__
 	wxSetEnv("BREVE_CLASS_PATH", AppDir << FILE_SEP_PATH << ".." << FILE_SEP_PATH << "Resources");
 #endif
 
-	if (wxGetEnv("BREVE_CLASS_PATH", &str))
+	if (wxGetEnv("BREVE_CLASS_PATH", &str) && !str.IsEmpty())
 	{
-	    wxString tmp, xstr;
-
 	    hasenv = TRUE;
 
 	    if (str.Last() != FILE_SEP_PATH)
 		str << FILE_SEP_PATH;
+	}
+	else if (config->Read("BreveClassPath", &str))
+	{
+	    manual = TRUE;
+
+	    if (str.Last() != FILE_SEP_PATH)
+		str << FILE_SEP_PATH;
+	}
+	else if (wxDirExists(AppDir + "lib" + FILE_SEP_PATH + "classes"))
+	{
+	    manual = TRUE;
+	    str = AppDir + "lib" + FILE_SEP_PATH + "classes";
+	}
+	else if (wxDirExists(LocalDir + "lib" + FILE_SEP_PATH + "classes"))
+	{
+	    manual = TRUE;
+	    str = LocalDir + "lib" + FILE_SEP_PATH + "classes";
+	}
+	else
+	{
+	    wxDirDialog d(NULL, "Select the directory containing Breve classes (usually breve/lib/classes)", AppDir);
+
+	    if (d.ShowModal() == wxID_OK)
+	    {
+		wxSetEnv("BREVE_CLASS_PATH", d.GetPath());
+
+		str = d.GetPath();
+
+		if (str.Last() != FILE_SEP_PATH)
+		    str << FILE_SEP_PATH;
+
+		config->Write("BreveClassPath", str);
+
+		manual = TRUE;
+	    }
+	    else
+		wxMessageBox("The Breve engine will not function properly until a class path is defined.");
+	}
+
+	BreveDir = "";
+
+	if (config->Read("BreveAppPath", &BreveDir))
+	{
+	    if (BreveDir.Last() != FILE_SEP_PATH)
+		BreveDir << FILE_SEP_PATH;
+
+	    if (!wxDirExists(BreveDir + "demos") || !wxDirExists(BreveDir + "plugins"))
+		BreveDir = "";
+	}
+
+	if (BreveDir.IsEmpty() && (manual || hasenv))
+	{
+	    wxString tmp, xstr;
 
 	    xstr = str;
 
@@ -127,7 +182,7 @@ bool BCTestApp::OnInit()
 
 		if (!tmp.IsEmpty())
 		{
-		    tmp << FILE_SEP_PATH << "lib" << FILE_SEP_PATH;
+		    tmp << FILE_SEP_PATH << "lib";
 
 		    if (wxDirExists(tmp))
 		    {
@@ -148,89 +203,33 @@ bool BCTestApp::OnInit()
 	    }
 	}
 
+	if (BreveDir.IsEmpty() && (manual || hasenv))
 	{
-	    wxString tmp;
+	    wxDirDialog d(NULL, "Select the directory containing Breve resources (demos directory, plugins directory, etc)", AppDir);
 
-	    tmp = AppDir + "play.tiff";
-
-	    if (wxFileExists(tmp))
-		ImageDir = AppDir;
-	    else
-		ImageDir = LocalDir;
-	}
-
-	/* Though functional, this is ugly - clean up at some point */
-
-	if (BreveDir.IsEmpty())
-	{
-	    wxString tmp;
-
-	    tmp = AppDir;
-
-	    tmp << "lib" << FILE_SEP_PATH << "classes";
-
-	    if (wxDirExists(tmp))
+	    while (d.ShowModal() == wxID_OK)
 	    {
-		BreveDir = AppDir;
+		str = d.GetPath();
 
-		if (!hasenv)
-		    wxSetEnv("BREVE_CLASS_PATH", tmp);
-	    }
-	    else
-	    {
-		tmp = AppDir;
+		if (str.Last() != FILE_SEP_PATH)
+		    str << FILE_SEP_PATH;
 
-		tmp << "breve_source" << FILE_SEP_PATH << "lib" << FILE_SEP_PATH << "classes";
-
-		if (wxDirExists(tmp))
+		if (wxDirExists(str + "demos") && wxDirExists(str + "plugins"))
 		{
-		    BreveDir = AppDir;
-		    BreveDir << "breve_source" << FILE_SEP_PATH;
-
-		    if (!hasenv)
-			wxSetEnv("BREVE_CLASS_PATH", tmp);
+		    BreveDir = str;
+		    config->Write("BreveAppPath", BreveDir);
+		    break;
 		}
-		else
-		{
-		    wxString tmp;
 
-		    tmp = LocalDir;
-
-		    tmp << "lib" << FILE_SEP_PATH << "classes";
-
-		    if (wxDirExists(tmp))
-		    {
-			BreveDir = LocalDir;
-
-			if (!hasenv)
-			    wxSetEnv("BREVE_CLASS_PATH", tmp);
-		    }
-		    else
-		    {
-			tmp = LocalDir;
-
-			tmp << "breve_source" << FILE_SEP_PATH << "lib" << FILE_SEP_PATH << "classes";
-
-			if (wxDirExists(tmp))
-			{
-			    BreveDir = LocalDir;
-			    BreveDir << "breve_source" << FILE_SEP_PATH;
-
-			    if (!hasenv)
-				wxSetEnv("BREVE_CLASS_PATH", tmp);
-			}
-			else
-			{
-			    wxMessageBox("BREVE_CLASS_PATH environmental variable isn't specified,\nand I couldn't figure it out on my own.\nThings aren't going to work properly.");
-			}
-		    }
-		}
+		wxMessageBox("The selected directory doesn't seem to contain Breve resources.  At the very least,\na demos directory and a plugins directory are expected.");
 	    }
 	}
+
+	if (BreveDir.IsEmpty() && (manual || hasenv))
+	    wxMessageBox("Unable to locate Breve resources.  The Breve engine will not work properly until a proper path is specified.");
     }
 
-    if (!BreveDir.IsEmpty() && BreveDir.Last() != FILE_SEP_PATH)
-	BreveDir << FILE_SEP_PATH;
+    config->Flush();
 
     renderwindow = new BreveRender(NULL, -1, "breve");
 
@@ -251,6 +250,10 @@ bool BCTestApp::OnInit()
 
 int BCTestApp::OnExit()
 {    
+    wxConfigBase::Set(NULL);
+
+    delete config;
+
     return wxApp::OnExit();
 }
 
