@@ -1080,11 +1080,13 @@ void stXMLObjectEndElementHandler(stXMLParserState *userData, const XML_Char *na
 					brEvalHashStore(BRHASH(&state->eval), &state->key, &lastState->eval, NULL);
 				}
 
+				stGCRetain(&lastState->eval);
 				stGCCollect(&lastState->eval);
 
 				break;
 			case XP_LIST:
 				brEvalListInsert(BRLIST(&state->eval), BRLIST(&state->eval)->count, &lastState->eval);
+				stGCRetain(&lastState->eval);
 				stGCCollect(&lastState->eval);
 
 				break;
