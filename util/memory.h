@@ -18,6 +18,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _MEMORY_H
+#define _MEMORY_H
 #include <stdio.h>
 
 enum mallocStatus {
@@ -69,3 +71,4 @@ void slPrintIfString(char *pointer, int length, int maxlen);
 
 unsigned int slUtilPointerCompare(void *a, void *b);
 unsigned int slUtilPointerHash(void *a, unsigned int n);
+#endif

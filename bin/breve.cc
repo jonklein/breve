@@ -617,7 +617,6 @@ void brInterrupt(brEngine *engine) {
 	brPauseTimer(engine);
 
 	fflush(stdin);
-	fpurge(stdin);
 	printf("\n\nSimulation interupted.  Type a steve command, 'x' to quit, or hit enter to continue\n");
 	fflush(stdout);
 
