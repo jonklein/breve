@@ -1,7 +1,7 @@
 @use Abstract.
 @use Patch.
 
-Abstract : PatchGrid [version 1.9] {
+Abstract : PatchGrid [version 2.2] {
 	% OBJECT(PatchGrid) is a class which allows you to create "patches".  
 	% A OBJECT(Patch) is a non-physical object which is associated with 
 	% a specific area in the 3D world.  This allows you to associate 

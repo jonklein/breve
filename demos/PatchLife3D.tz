@@ -22,15 +22,16 @@
 
 Controller PatchLife.
 
-@define X_SIZE 40.
-@define Y_SIZE 40.
+@define X_SIZE 15.
+@define Y_SIZE 15.
+@define Z_SIZE 15.
 
 Control : PatchLife {
 	+ variables:
 		patches (object).
 
 	+ to init:
-		patches = (new PatchToroid init-with patch-size (.5, .5, .5) with-x-count X_SIZE with-y-count Y_SIZE with-z-count 1 with-patch-class "LifePatch").
+		patches = (new PatchToroid init-with with-x-count X_SIZE with-y-count Y_SIZE with-z-count Z_SIZE with-patch-class "LifePatch").
 
 		# since we're using patches with discrete timesteps, we can set the 
 		# timescale to 1.0 for each iteration.  because the patches update
@@ -87,22 +88,23 @@ Patch : LifePatch {
 		self set-color to (1.0, 0, 0).
 		state = value.
 
-		if state: self set-transparency to 0.3.
+		if state: self set-transparency to 0.8.
 		else self set-transparency to 1.0.
 
 	+ to init-patch:
-		self set-state to random[1].
+		if random[5] == 0: self set-state to 1.
+		else self set-state to 0.
 
-		neighbors = (self get-moore-neighborhood).
+		neighbors = (self get-3d-moore-neighborhood).
 
 	+ to iterate:
 		count, n (int).
 
-		for n=0, n<8, n=n+1: {
+		for n=0, n<26, n=n+1: {
 			if neighbors{n}: {
 				count += (neighbors{n} get-state).
 
-				if count > 3: {
+				if count > 4: {
 					self set-transparency to 1.0.
 					nextstate = 0.
 					onCount = 0.
@@ -111,8 +113,8 @@ Patch : LifePatch {
 			}
 		}
 
-		if count == 3 || (count == 2 && state == 1): {
-			self set-transparency to 0.3.
+		if (state == 0 && count == 4) || ((state == 1) && (count == 4 || count == 6)): {
+			self set-transparency to 0.8.
 			nextstate = 1.
 
 			self set-color to (1.0 - (onCount / 20.0), onCount / 20.0, 0).

@@ -1,7 +1,7 @@
-@include "Abstract.tz"
-@include "PatchGrid.tz"
+@use Abstract.
+@use PatchGrid.
 
-Abstract : Patch (aka Patches) [version 2.0] {
+Abstract : Patch (aka Patches) [version 2.2] {
 	% A patch is a non-physical object which is associated with a specific 
 	% location in space.  A patch can hold information about the state of
 	% the world in that location, such as the presence of a nutrient, for
@@ -70,6 +70,8 @@ Abstract : Patch (aka Patches) [version 2.0] {
 		yIndex = y.
 		zIndex = z.
 
+	+ section "Getting Information About a Patch"
+
 	+ to get-location:
 		% Returns the location of the patch.
 
@@ -89,6 +91,8 @@ Abstract : Patch (aka Patches) [version 2.0] {
 		% Returns the z index of the patch.
 
 		return zIndex.
+
+	+ section "Methods to Initialize Patches"
 
 	+ to init-patch:
 		% This method does nothing in its default implementation.  You can implement your
@@ -145,65 +149,6 @@ Abstract : Patch (aka Patches) [version 2.0] {
 		minusXminusYplusZpatch = (grid get-patch-at x minusX y minusY z plusZ).
 		minusXminusYminusZpatch = (grid get-patch-at x minusX y minusY z minusZ).
 
-	- to init-toroidal-neighbors:
-		% Used internally by CLASS(PatchToroid).
-
-		xsize, ysize, zsize (int).
-		plusX, minusX, plusY, minusY, plusZ, minusZ (int).
-
-		self init-neighbors.
-
-		xsize = (grid get-x-count).
-		ysize = (grid get-y-count).
-		zsize = (grid get-z-count).
-
-		plusX = xIndex + 1.
-		plusY = yIndex + 1.
-		plusZ = zIndex + 1.
-		minusX = xIndex - 1.
-		minusY = yIndex - 1.
-		minusZ = zIndex - 1.
-
-		if minusX == -1: minusX = xsize - 1.
-		if minusY == -1: minusY = ysize - 1.
-		if minusZ == -1: minusZ = zsize - 1.
-		if plusX == xsize: plusX = 0.
-		if plusY == ysize: plusY = 0.
-		if plusZ == zsize: plusZ = 0.
-
-		# the six caridnal directions
-
-		plusXpatch = (grid get-patch-at x plusX y yIndex z zIndex).
-		plusYpatch = (grid get-patch-at x xIndex y plusY z zIndex).
-		plusZpatch = (grid get-patch-at x xIndex y yIndex z plusZ).
-		minusXpatch = (grid get-patch-at x minusX y yIndex z zIndex).
-		minusYpatch = (grid get-patch-at x xIndex y minusY z zIndex).
-		minusZpatch = (grid get-patch-at x xIndex y yIndex z minusZ).
-
-		plusXplusYpatch = (grid get-patch-at x plusX y plusY z zIndex).
-		plusXminusYpatch = (grid get-patch-at x plusX y minusY z zIndex).
-		minusXminusYpatch = (grid get-patch-at x minusX y minusY z zIndex).
-		minusXplusYpatch = (grid get-patch-at x minusX y plusY z zIndex).
-
-		plusXplusZpatch = (grid get-patch-at x plusX y yIndex z plusZ).
-		plusXminusZpatch = (grid get-patch-at x plusX y yIndex z minusZ).
-		minusXminusZpatch = (grid get-patch-at x minusX y yIndex z minusZ).
-		minusXplusZpatch = (grid get-patch-at x minusX y yIndex z plusZ).
-
-		plusYplusZpatch = (grid get-patch-at x xIndex y plusY z plusZ).
-		plusYminusZpatch = (grid get-patch-at x xIndex y plusY z minusZ).
-		minusYminusZpatch = (grid get-patch-at x xIndex y minusY z minusZ).
-		minusYplusZpatch = (grid get-patch-at x xIndex y minusY z plusZ).
-
-		plusXplusYplusZpatch = (grid get-patch-at x plusX y plusY z plusZ).
-		plusXplusYminusZpatch = (grid get-patch-at x plusX y plusY z minusZ).
-		plusXminusYplusZpatch = (grid get-patch-at x plusX y minusY z plusZ).
-		plusXminusYminusZpatch = (grid get-patch-at x plusX y minusY z minusZ).
-		minusXplusYplusZpatch = (grid get-patch-at x minusX y plusY z plusZ).
-		minusXplusYminusZpatch = (grid get-patch-at x minusX y plusY z minusZ).
-		minusXminusYplusZpatch = (grid get-patch-at x minusX y minusY z plusZ).
-		minusXminusYminusZpatch = (grid get-patch-at x minusX y minusY z minusZ).
-
 	- to set-patch-pointer to p (pointer):
 		% Used internally when setting up the patches.  Do not call
 		% this method.
@@ -211,34 +156,7 @@ Abstract : Patch (aka Patches) [version 2.0] {
 		patchPointer = p.
 		self set-transparency to 0.
 
-	+ to get-moore-neighborhood: 
-		% Returns a list of the 2D Moore neighborhood, using the X/Y plane.
-		% If you intend to use the neighborhood frequently, you should 
-		% call this method once and keep a copy of the list.
-
-		result (list).
-
-		result = (self get-von-neumann-neighborhood).
-		if (self get-patch-to-upper-left): push (self get-patch-to-upper-left) onto result.
-		if (self get-patch-to-upper-right): push (self get-patch-to-upper-right) onto result.
-		if (self get-patch-to-lower-left): push (self get-patch-to-lower-left) onto result.
-		if (self get-patch-to-lower-right): push (self get-patch-to-lower-right) onto result.
-
-		return result.
-
-	+ to get-von-neumann-neighborhood: 
-		% Returns a list of the 2D Von Neumann neighborhood, using the X/Y plane.
-		% If you intend to use the neighborhood frequently, you should 
-		% call this method once and keep a copy of the list.
-
-		result (list).
-
-		if (self get-patch-above): push (self get-patch-above) onto result.
-		if (self get-patch-to-right): push (self get-patch-to-right) onto result.
-		if (self get-patch-below): push (self get-patch-below) onto result.
-		if (self get-patch-to-left): push (self get-patch-to-left) onto result.
-
-		return result.
+	+ section "Changing the Appearence of Patches"
 
 	+ to set-color to newColor (vector):
 		% Sets the color of the patch to newColor.  Bear in mind that you'll also 
@@ -270,6 +188,83 @@ Abstract : Patch (aka Patches) [version 2.0] {
 
 		transparency = theTransparency.
 		setPatchTransparency(patchPointer, theTransparency).
+
+	+ section "Getting Groups of Neighbor Patches"
+
+	+ to get-3d-moore-neighborhood:
+		% Returns a list of the 3D Moore neighbors of this patch.  The 
+		% 3D Moore neighborhood consists of the 26 patches 
+		% adjacent to this patch, including diagonally, in three dimensions.
+		% <P>
+		% If you intend to use the neighborhood frequently, you should 
+		% call this method once and keep a copy of the list.
+
+		result (list).
+		x, y, z (int).
+		patch (object).
+
+		for x=-1, x<=1, x++: {
+			for y=-1, y<=1, y++: {
+				for z=-1, z<=1, z++: {
+					patch = (grid get-patch-at x x+xIndex y y+yIndex z z+zIndex).
+					if patch && patch != self: push patch onto result.
+				}
+			}
+		}
+
+		return result.
+
+	+ to get-3d-von-neumann-neighborhood:
+		% Returns a list of the 3D Von Neumann neighbors of this patch.  The 
+		% 3D Von Neumann neighborhood consists of the 6 patches directly
+		% adjacent to the faces of this patch, in three dimensions.
+		% <P>
+		% If you intend to use the neighborhood frequently, you should 
+		% call this method once and keep a copy of the list.
+
+		result (list).
+
+		result = (self get-von-neumann-neighborhood).
+
+		if (self get-patch-towards-plus-z): push (self get-patch-towards-plus-z) onto result.
+		if (self get-patch-towards-minus-z): push (self get-patch-towards-minus-z) onto result.
+
+	+ to get-moore-neighborhood: 
+		% Returns a list of the 2D Moore neighbors of this patch.  The
+		% 2D Moore neighbors are the 8 patches adjacent to this patch,
+		% including diagonally, on the X/Y plane.
+		% <P>
+		% If you intend to use the neighborhood frequently, you should 
+		% call this method once and keep a copy of the list.
+
+		result (list).
+
+		result = (self get-von-neumann-neighborhood).
+		if (self get-patch-to-upper-left): push (self get-patch-to-upper-left) onto result.
+		if (self get-patch-to-upper-right): push (self get-patch-to-upper-right) onto result.
+		if (self get-patch-to-lower-left): push (self get-patch-to-lower-left) onto result.
+		if (self get-patch-to-lower-right): push (self get-patch-to-lower-right) onto result.
+
+		return result.
+
+	+ to get-von-neumann-neighborhood: 
+		% Returns a list of the 2D Von Neumann neighbors of this patch.  The
+		% 2D Von Neumann neighbors are the 8 patches located above, below, 
+		% to the left of and to the right of this patch on the X/Y plane.
+		% <P>
+		% If you intend to use the neighborhood frequently, you should 
+		% call this method once and keep a copy of the list.
+
+		result (list).
+
+		if (self get-patch-above): push (self get-patch-above) onto result.
+		if (self get-patch-to-right): push (self get-patch-to-right) onto result.
+		if (self get-patch-below): push (self get-patch-below) onto result.
+		if (self get-patch-to-left): push (self get-patch-to-left) onto result.
+
+		return result.
+
+	+ section "Getting Specific Patch Neighbors"
 
 	+ to get-patch-to-north:
 		% Assumes that the patches are being observed from an XZ-plane.
