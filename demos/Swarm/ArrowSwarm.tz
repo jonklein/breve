@@ -43,7 +43,7 @@ Control : Swarm {
     + variables:
         birds (list).
         item (object).
-        cloudTexture (int).
+        cloudTexture (object).
         selection (object).
 
         # the menu items corresponding to different flocking behaviors
@@ -74,7 +74,7 @@ Control : Swarm {
         self enable-lighting.
         self move-light to (0, 20, 20).
 
-        cloudTexture = (self load-image from "images/clouds.png").
+        cloudTexture = (new Image load from "images/clouds.png").
 
         # Add a huge floor.
 
@@ -88,7 +88,7 @@ Control : Swarm {
 
         self flock-normally.
 
-        self set-background-texture to cloudTexture.
+        self set-background-texture-image to cloudTexture.
 
         self offset-camera by (5, 1.5, 6).
 
@@ -104,7 +104,7 @@ Control : Swarm {
         # get the average location, and point the camera at it.
 
         foreach item in birds: {
-            item fly with-flock birds.
+            item fly.
             location += (item get-location).
 
 			if | (item get-location) | > | highLoc |: highLoc = (item get-location).
@@ -264,7 +264,7 @@ Mobile : Bird (aka Birds) {
 
         return landed.
 
-    + to fly with-flock flock (list):
+    + to fly:
         # This is the method which does it all.
 
         bird (object).
@@ -364,19 +364,19 @@ Mobile : Bird (aka Birds) {
     + to get-velocity-urge with flock (list):
         item (object).
         count (float).
-        velocity (vector).
+        aveVelocity (vector).
 
         # get the average velocity of all the visible birds in the flock.        
         foreach item in flock: {
             count += 1.
-            velocity += (item get-velocity).
+            aveVelocity += (item get-velocity).
         }
 
         if count == 0: return (0, 0, 0).
 
-        velocity /= count.
+        aveVelocity /= count.
 
-        return velocity - (self get-velocity).
+        return aveVelocity - (self get-velocity).
 
     + to get-center-urge with flock (list):
         item (object).

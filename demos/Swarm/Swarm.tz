@@ -368,19 +368,19 @@ Mobile : Bird (aka Birds) {
 	+ to get-velocity-urge with flock (list):
 		item (object).
 		count (float).
-		velocity (vector).
+		aveVelocity (vector).
 
 		# get the average velocity of all the visible birds in the flock.		
 		foreach item in flock: {
 			count += 1.
-			velocity += (item get-velocity).
+			aveVelocity += (item get-velocity).
 		}
 
 		if count == 0: return (0, 0, 0).
 
-		velocity /= count.
+		aveVelocity /= count.
 
-		return velocity - (self get-velocity).
+		return aveVelocity - (self get-velocity).
 
 	+ to get-center-urge with flock (list):
 		item (object).

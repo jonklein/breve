@@ -43,8 +43,7 @@ Control : Swarm {
     + variables:
         birds (list).
         item (object).
-        breveTexture (int).
-        cloudTexture (int).
+        cloudTexture (object).
         selection (object).
 
         # the menu items corresponding to different flocking behaviors
@@ -75,8 +74,7 @@ Control : Swarm {
         self enable-lighting.
         self move-light to (0, 20, 20).
 
-        breveTexture = (self load-image from "images/breve.png").
-        cloudTexture = (self load-image from "images/clouds.png").
+        cloudTexture = (new Image load from "images/clouds.png").
 
         # Add a huge floor.
 
@@ -90,7 +88,7 @@ Control : Swarm {
 
         self flock-normally.
 
-        self set-background-texture to cloudTexture.
+        self set-background-texture-image to cloudTexture.
 
         self offset-camera by (5, 1.5, 6).
 
@@ -104,10 +102,6 @@ Control : Swarm {
         topDiff (double).
         highLoc (vector).
  
-        red (double).
-        green (double).
-        blue (double).
-
         self update-neighbors.
 
         # get the average location, and point the camera at it.
@@ -170,8 +164,6 @@ Control : Swarm {
 
 Mobile : Bird (aka Birds) {
     + variables: 
-        myVelocity (vector).
-
         landed (int).
 
         # These are all parameters that can change the way the flock
@@ -378,19 +370,20 @@ Mobile : Bird (aka Birds) {
     + to get-velocity-urge with flock (list):
         item (object).
         count (float).
-        velocity (vector).
+        aveVelocity (vector).
 
         # get the average velocity of all the visible birds in the flock.        
+
         foreach item in flock: {
             count += 1.
-            velocity += (item get-velocity).
+            aveVelocity += (item get-velocity).
         }
 
         if count == 0: return (0, 0, 0).
 
-        velocity /= count.
+        aveVelocity /= count.
 
-        return velocity - (self get-velocity).
+        return aveVelocity - (self get-velocity).
 
     + to get-center-urge with flock (list):
         item (object).

@@ -254,10 +254,9 @@ int brIImageDataInit(brEval args[], brEval *result, brInstance *i) {
 
 int brIImageDataFree(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm = BRPOINTER(&args[0]);
-	GLuint texture = dm->textureNumber;
 
 	if(dm->textureNumber != -1) {
-		// slMessage("deleting texture %d\n", (unsigned int)texture);
+		GLuint texture = dm->textureNumber;
 		glDeleteTextures(1, &texture);
 	}
 

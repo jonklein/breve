@@ -2358,7 +2358,6 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 	// unretain it, and make it the caller's problem.
 
 	if(new->instance->gcStack) {
-		slMessage("RAN %s\n", method->name);
 		if(target->type != AT_NULL) stGCUnretain(target);
 		if(old) stGCMark(old->instance, target);
 	}

@@ -17,11 +17,11 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 		worldObjectShape (object).
 		linkPointer (pointer).
 
-		location (vector).
-		rotation (matrix).
-		velocity (vector).
-		rvelocity (vector).
-		acceleration (vector).
+		archiveLocation (vector).
+		archiveRotation (matrix).
+		archiveVelocity (vector).
+		archiveRvelocity (vector).
+		archiveAcceleration (vector).
 
 	+ to init:
 		e = .2.
@@ -44,6 +44,8 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 
 	- to register with-shape theShape (object):
 		% Depreciated.  Don't use.
+		print "warning: the method \"register\" of Mobile is depreciated, use the method \"set\" instead".
+
 		self set-shape to theShape.
 
 	- to set shape theShape (object):
@@ -285,22 +287,22 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 		linkRemoveLabel(linkPointer).
 
 	- to archive:
-		location = (self get-location).
-		rotation = (self get-rotation).
-		velocity = (self get-velocity).
-		rvelocity = (self get-rotational-velocity).
-		acceleration = (self get-acceleration).
+		archiveLocation = (self get-location).
+		archiveRotation = (self get-rotation).
+		archiveVelocity = (self get-velocity).
+		archiveRvelocity = (self get-rotational-velocity).
+		archiveAcceleration = (self get-acceleration).
 		return (super archive).
 
 	- to dearchive:
 		linkPointer = linkNew().
 		realWorldPointer = linkAddToWorld(linkPointer).
 		self set-shape to worldObjectShape.
-		self move to location.
-		self set-rotation to rotation.
-		self set-velocity to velocity.
-		self set-rotational-velocity to rvelocity.
-		self set-acceleration to acceleration.
+		self move to archiveLocation.
+		self set-rotation to archiveRotation.
+		self set-velocity to archiveVelocity.
+		self set-rotational-velocity to archiveRvelocity.
+		self set-acceleration to archiveAcceleration.
 		self set-color to color.
 		return (super dearchive).
 

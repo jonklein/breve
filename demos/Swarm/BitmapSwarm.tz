@@ -45,7 +45,7 @@ Control : Swarm {
 	+ variables:
 		birds (list).
 		item (object).
-		agentTexture, cloudTexture (object).
+		agentImage, cloudTexture (object).
 		selection (object).
 
 		# the menu items corresponding to different flocking behaviors
@@ -77,7 +77,7 @@ Control : Swarm {
 		self enable-smooth-drawing.
 		self move-light to (0, 20, 20).
 
-		agentTexture = (new Image load from "images/jon.png").
+		agentImage = (new Image load from "images/arrow.png").
 		cloudTexture = (new Image load from "images/clouds.png").
 
 		# Add a huge floor.
@@ -87,7 +87,7 @@ Control : Swarm {
 		floor catch-shadows.
 
 		birds = SWARM_SIZE new Birds.
-		birds set-bitmap-image to agentTexture.
+		birds set-bitmap-image to agentImage.
 		birds set-color to random[(1, 1, 1)].
 
 		# we'll call this method to set up the initial bird behavior.

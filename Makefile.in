@@ -67,7 +67,7 @@ OSX_build:
 	-mkdir docs
 	make -f Makefile optimize
 	cd plugins; make
-	cd OSX ; xcodebuild -activebuildstyle CC= LIBS='@LDFLAGS@ @LIBS@'
+	cd OSX ; xcodebuild -buildstyle Deployment CC= LIBS='@LDFLAGS@ @LIBS@'
 
 OSX_clean:
 	rm -f breve.dmg

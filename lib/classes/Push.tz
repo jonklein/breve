@@ -305,15 +305,6 @@ Object : PushProgram (aka PushPrograms) {
 		% Returns the size of this push program.
 		return pushCodeSize(codePointer).
 
-	+ to compute-discrepancy from otherProgram (object):
-		% CURRENTLY UNIMPLEMENTED.  Returns the point discrepency between this 
-		% program and otherProgram.  
-		% <P>The point discrepency between programs p1 and p2 is the number of 
-		% points (which includes both terminals and subtrees) unique to p1 plus 
-		% the number of points unique to p2.
-
-		return 0.
-
 	+ to get-string:
 		% Returns the string representation of this push program.
 		if !codePointer: return "()".

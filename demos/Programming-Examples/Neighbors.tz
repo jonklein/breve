@@ -7,17 +7,17 @@
 #   1) set the neighbor size for the Mobile objects 
 #  	   (in the init method of object Things).
 #   2) call update-neighbors for the controller object at each iteration
-#      (in the iterate method of object Gatherers).
+#      (in the iterate method of object NeighborDemo).
 #   3) get the neighbor list from the Mobile objects using get-neighbors 
-#      (the click method of object Gatherers).
+#      (the click method of object NeighborDemo).
 #
 
 @include "Mobile.tz"
 @include "Control.tz"
 
-Controller Gatherers.
+Controller NeighborDemo.
 
-Control : Gatherers {
+Control : NeighborDemo {
 	+ to init:
 		t (list).
 
@@ -73,14 +73,14 @@ Control : Gatherers {
 		super iterate.
 }
 
-Mobile : Things {
+Mobile : Thing (aka Things) {
 	# the Things object is pretty simple--it doesn't do anything.  we 
 	# create the object as a Sphere, set the color, and then set the 
 	# neighborhood size telling the engine how much space should be 
 	# examined in the neighbor check.
 
 	+ to init:
-		self register with-shape ((new Shape) init-with-sphere radius .3 + random[.9]).
+		self set-shape to ((new Sphere) init-with radius .3 + random[.9]).
 		self set-color to random [(1.0, 1.0, 1.0)].
 		self move to random[(30, 30, 30)] - (15, 15, 15).
 		self set-neighborhood-size to 10.0.

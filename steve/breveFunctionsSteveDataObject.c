@@ -83,7 +83,7 @@ int stDDataCheckVariables(brEval *args, brEval *result, brInstance *bi) {
 
 int stDDataCopyObject(brEval *args, brEval *result, brInstance *bi) {
 	stInstance *i = bi->pointer;
-    stInstance *otherObject = STINSTANCE(&args[0]);
+    stInstance *otherObject = BRINSTANCE(&args[0])->pointer;
 
 	if(!otherObject) {
         BRINT(result) = -1;

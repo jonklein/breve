@@ -556,7 +556,7 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 		case JT_BALL:
 			joint->odeJointID = dJointCreateBall(world->odeWorldID, world->odeJointGroupID);
 			joint->odeMotorID = dJointCreateAMotor(world->odeWorldID, world->odeJointGroupID);
-			dJointSetAMotorMode(joint->odeMotorID, dAMotorEuler);
+			// dJointSetAMotorMode(joint->odeMotorID, dAMotorEuler);
 			dJointAttach(joint->odeMotorID, cBodyID, pBodyID);
 			break;
 		case JT_UNIVERSAL:

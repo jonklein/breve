@@ -111,6 +111,7 @@
 		};
 		2A37F4AAFDCFA73011CA2CEA = {
 			children = (
+				48ECC16B071C13D200596F93,
 				2A37F4ABFDCFA73011CA2CEA,
 				2A37F4B8FDCFA73011CA2CEA,
 				2A37F4C3FDCFA73011CA2CEA,
@@ -288,6 +289,7 @@
 		4802DC1A05616137008198B9 = {
 			buildPhases = (
 				4802DC1B05616137008198B9,
+				48ECC160071C137300596F93,
 				4802DC3005616137008198B9,
 				4802DC4B05616137008198B9,
 				480F316807146AFB00E71420,
@@ -1029,6 +1031,89 @@
 			path = ../lib/libbrgraph.a;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
+		};
+		48ECC160071C137300596F93 = {
+			buildActionMask = 2147483647;
+			dstPath = plugins;
+			dstSubfolderSpec = 7;
+			files = (
+				48ECC165071C13C100596F93,
+				48ECC166071C13C100596F93,
+				48ECC170071C13F400596F93,
+				48ECC171071C13F400596F93,
+			);
+			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		48ECC163071C13C100596F93 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = Digitizer.tz;
+			path = /Users/jk/dev/breve/plugins/slDigitizerPlugin/Digitizer.tz;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		48ECC164071C13C100596F93 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "compiled.mach-o.bundle";
+			name = DigitizerPlugin.o;
+			path = /Users/jk/dev/breve/plugins/slDigitizerPlugin/DigitizerPlugin.o;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		48ECC165071C13C100596F93 = {
+			fileRef = 48ECC163071C13C100596F93;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		48ECC166071C13C100596F93 = {
+			fileRef = 48ECC164071C13C100596F93;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		48ECC16B071C13D200596F93 = {
+			children = (
+				48ECC16E071C13F400596F93,
+				48ECC16F071C13F400596F93,
+				48ECC163071C13C100596F93,
+				48ECC164071C13C100596F93,
+			);
+			isa = PBXGroup;
+			name = Plugins;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		48ECC16E071C13F400596F93 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = Instrument.tz;
+			path = /Users/jk/dev/breve/plugins/slQTMusicPlugin/Instrument.tz;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		48ECC16F071C13F400596F93 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "compiled.mach-o.bundle";
+			name = QTInstrumentPlugin.o;
+			path = /Users/jk/dev/breve/plugins/slQTMusicPlugin/QTInstrumentPlugin.o;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		48ECC170071C13F400596F93 = {
+			fileRef = 48ECC16E071C13F400596F93;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		48ECC171071C13F400596F93 = {
+			fileRef = 48ECC16F071C13F400596F93;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 //480
 //481

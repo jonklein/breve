@@ -1,4 +1,4 @@
-
+#
 # SwarmEvolve.tz
 # SwarmEvolve, Version 2.0
 # Code for evolving swarms of goal-directed agents
@@ -69,7 +69,6 @@ Control : Swarm {
         feeders (list).
 
         # interface-related variables
-        cloudTexture (int).
         selection (object).
         autoCameraMode (int).
         autoCameraMenu (object).
@@ -107,9 +106,6 @@ Control : Swarm {
         servos (int). 
 
         runID (string).
-
-        # generic variables
-        item (object).
 
         # debug
         print-velocities-var (int).
@@ -304,9 +300,10 @@ Control : Swarm {
         skipFramesIfNecessaryMenu = (self add-menu named "Skip Frames if Necessary" for-method "set-skipFramesIfNecessaryMenu").
         drawEveryFrameMenu check.
         skipFramesIfNecessaryMenu uncheck.
+
         # Set up the background.
-        cloudTexture = (self load-image from "images/clouds.png").
-        self set-background-texture to cloudTexture.
+        self set-background-texture-image to (new Image load from "images/clouds.png").
+
         # Set some camera/display options.
         self offset-camera by (5, 1.5, 6).
         cameraHasBeenAimed = 0.
@@ -481,6 +478,7 @@ Control : Swarm {
 
     + to adjust-camera with-location location (vector):
         topDiff (float).
+		item (object).
 
         topDiff = 0.0.
         foreach item in all Birds: {
@@ -531,7 +529,7 @@ Mobile : Feeders {
 
     + to init:
         shape = ((new Shape) init-with-sphere radius 0.3).
-        self register with-shape shape.
+        self set-shape to shape.
         self move to random[(30, 0, 30)] - (15, 0, 15).
         self set-velocity to (0, 0, 0).
         energy = 1.
@@ -597,7 +595,7 @@ Mobile : Corpse {
         age (int).
         landed (int).
     + to init:
-        self register with-shape (controller get-corpseShape). 
+        self set-shape to (controller get-corpseShape). 
         self handle-collisions with-type "Stationary" with-method "land".
         self set-color to (0.2, 0.2, 0.2).
         age = 0.
@@ -668,7 +666,7 @@ Mobile : Bird (aka Birds) {
     + to init:
         # register the object, set the initial location, velocity and color.
         shape = ((new Shape) init-with-polygon-cone radius .1 sides 5 height .2).
-        self register with-shape shape.
+        self set-shape to shape.
 
         self handle-collisions with-type "Stationary" with-method "land".
         self handle-collisions with-type "Feeders" with-method "eat".
@@ -844,21 +842,6 @@ Mobile : Bird (aka Birds) {
 
         bird = (self closest-friend).
 
-        # log the (attempted) feeding event
-        controller increment-friendFeedings.
-
-        mode = (controller get-share-mode).
-
-        # mode #4 is the "noop" feeding -- just return
-        if mode == 4: return.
-
-        # modes #2 (mutual-feeding) and #3 (mutual-feeding + kin) both require 
-        # that the recipient is a friend
-        if (mode == 2 || mode == 3) && !(bird ask-if-friend-feeder): return.
-
-        # mode #3 requires that a certain level of kinship is met
-        if mode == 3 && ((bird get-pushCode) compute-discrepancy from pushCode) > 9: return.
-
         if (bird get-energy) < energy: {
             self adjust-energy delta -0.01.
 
@@ -902,21 +885,6 @@ Mobile : Bird (aka Birds) {
         otherFeeder = 1.
 
         bird = (self closest-other).
-
-        # log the (attempted) feeding event
-        controller increment-otherFeedings.
-
-        mode = (controller get-share-mode).
-
-        # mode #4 is the "noop" feeding -- just return
-        if mode == 4: return.
-
-        # modes #2 (mutual-feeding) and #3 (mutual-feeding + kin) both require 
-        # that the recipient is a friend
-        if (mode == 2 || mode == 3) && !(bird ask-if-other-feeder): return.
-
-        # mode #3 requires that a certain level of kinship is met
-        if mode == 3 && ((bird get-pushCode) compute-discrepancy from pushCode) > 9: return.
 
         if (bird get-energy) < energy: {
             self adjust-energy delta -0.01.
@@ -998,7 +966,7 @@ Mobile : Bird (aka Birds) {
                 temp-code mutate with-max-new-code-size MAX_MUTATION_NEW_CODE_SIZE with-interpreter pushInterpreter.
                 controller increment-reproMutations.
             }
-            controller increment-discrepancies by (temp-code compute-discrepancy from pushCode).
+            # controller increment-discrepancies by (temp-code compute-discrepancy from pushCode).
             (child get-pushCode) parse program (temp-code get-string).
             free(temp-code). 
         }
@@ -1167,7 +1135,6 @@ Mobile : Bird (aka Birds) {
         return angle((self get-velocity), tempVector).
 
     + to fly:
-        bird (object).
         acceleration (vector).
         newVelocity (vector).
         take-off (int).
