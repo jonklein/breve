@@ -152,6 +152,7 @@ CLI_release: clean
 	cp README.txt $(CLI_FOLDER)/
 	cp Changes.html $(CLI_FOLDER)/
 	find $(CLI_FOLDER) -name CVS -prune -exec rm -rf {} \;
+	find $(CLI_FOLDER) -name '.cvsignore' -prune -exec rm -rf {} \;
 	rm -f breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@
 	@ARCHIVER@ breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@ $(CLI_FOLDER)
 
