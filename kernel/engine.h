@@ -169,7 +169,6 @@ struct brEngine {
 #ifdef HAVE_LIBOSMESA
 	GLubyte *osBuffer;
 	OSMesaContext osContext;
-	unsigned char useOSMesa;
 #endif 
 
 	int useMouse;
@@ -251,7 +250,6 @@ struct brEngine {
 
 	void **sortVector;
 	int sortVectorLength;
-	// stMethod *sortMethod;
 	int evalListSortError;
 	brInstance *sortObject;
 

@@ -605,6 +605,7 @@ void slDemoKeyboard(unsigned char key, int x, int y) {
 
 void brInterrupt(brEngine *engine) {
 	char *line;
+	char staticLine[10240];	
 
 	gWaiting = 1;
 
@@ -620,9 +621,12 @@ void brInterrupt(brEngine *engine) {
 	printf("\n\nSimulation interupted.  Type a steve command, 'x' to quit, or hit enter to continue\n");
 	fflush(stdout);
 
+#ifdef HAVE_LIBREADLINE
 	line = readline("breve> ");
-
 	if(line && *line) add_history(line);
+#else
+	line = gets(staticLine);
+#endif
 
 	if(!line || line[0] == 'x') brQuit(engine);
 

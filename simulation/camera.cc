@@ -30,7 +30,7 @@ slCamera *slNewCamera(int x, int y, int drawMode) {
 
 	c = slMalloc(sizeof(slCamera));
 
-	c->enabled = 1;
+	c->enabled = CM_NOT_UPDATED;
 
 	c->text = slMalloc(sizeof(slCameraText) * 8);
 	c->maxText = 8;

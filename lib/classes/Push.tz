@@ -20,7 +20,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 	+ to init:
 		pushInterpreterPointer = pushEnvironmentNew(random[2000000000]).
-		evaluationLimit = 100.
+		evaluationLimit = 200.
 		self set-list-limit to 200.
 
 	+ to add-instruction named instructionName (string) for-instance targetInstance (object) for-method methodName (string):

@@ -18,6 +18,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+enum cameraEnablingModes {
+	CM_DISABLED = 0,
+	CM_UPDATED,
+	CM_NOT_UPDATED
+};
+
 enum billboardType {
 	BBT_NONE = 0,
 	BBT_BITMAP,
@@ -94,8 +100,6 @@ struct slCamera {
 	// we know that we're getting an up-to-date image.  In 
 	// non GUI versions, we may have to update the camera 
 	// ourselves.
-
-	unsigned char updated;
 
 	int flags;
 

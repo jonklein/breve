@@ -58,7 +58,6 @@ brEngine *brEngineNew() {
 #ifdef HAVE_LIBOSMESA
 	e->osBuffer = NULL;
 	e->osContext = NULL;
-	e->useOSMesa = 0;
 #endif
 
 	e->nThreads = 1;

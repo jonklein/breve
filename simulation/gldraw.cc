@@ -35,6 +35,8 @@ double gReflectionAlpha;
 
 int gCubeDrawList;
 
+int glActive = 0;
+
 void slDrawFog(slWorld *w, slCamera *c);
 
 void slMatrixToGLMatrix(double m[3][3]);
@@ -90,6 +92,8 @@ void slMakeLightTexture(GLubyte *lTexture, GLubyte *dlTexture) {
 void slInitGL(slWorld *w) {
 	GLubyte lt[LIGHTSIZE * LIGHTSIZE * 2];
 	GLubyte glt[LIGHTSIZE * LIGHTSIZE * 2];
+
+	glActive = 1;
 
 	gReflectionAlpha = REFLECTION_ALPHA;
 
@@ -218,6 +222,8 @@ void slCenterPixelsInSquareBuffer(char *pixels, int width, int height, char *buf
 int slAddTexture(slWorld *w, GLuint texture, unsigned char *pixels, int width, int height, int format) {
 	char *newpixels;
 	int newheight, newwidth;
+
+	if(!glActive) return -1;
 
 	if(texture == -1) glGenTextures(1, &texture);
 
@@ -585,7 +591,7 @@ void slDrawWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair
 		flags |= DO_BILLBOARDS_AS_SPHERES;
 	} else glClearColor(w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 1.0);
 
-	if(!c->enabled) return;
+	if(c->enabled == CM_DISABLED) return;
 
 	c->billboardCount = 0;
 

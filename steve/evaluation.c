@@ -2327,7 +2327,7 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 		}
 	}
 
-	// if we used lists or strings as local variables, they must be unretained
+	// unretain the local variables
 
 	if(method->variables) {
 		slList *variables = method->variables;
@@ -2537,7 +2537,9 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *target, stObject **tClass) {
 				result = EC_STOP;
 			}
 
-			result = stExpEval(s->values.pValue, i, target, NULL);
+			result = stExpEval(s->values.pValue, i, &t, NULL);
+
+			brEvalCopy(&t, target);
 
 			if(result != EC_OK) result = result;
 			result = EC_STOP;

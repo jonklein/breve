@@ -8,7 +8,7 @@ exec_prefix = @exec_prefix@
 
 OPTFLAGS	=-O4 @DEFS@
 
-CFLAGS		=-g -Wall -Winline -DMEMORY_DEBUG @DEFS@
+CFLAGS		=-g -Wall -Winline @DEFS@
 
 PLATFORM	= $(shell uname)
 LPLATFORM	= $(shell echo ${PLATFORM} | tr '[A-Z]' '[a-z]')

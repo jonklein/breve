@@ -26,14 +26,12 @@
 
 #include "steve.h"
 
-/*
-    + stObjectSimpleCrossover
-    = a simple one-point crossover between two instances, storing the 
-    = output in a third instance.
-    =
-    = note that the crossover happens only to the "base" class of the 
-    = instance, not to it's ancestors.  the ancestor crossovers would
-    = thus be called explicitly if desired.
+/*!
+	\brief A simple one-point crossover between two instances, storing the output in a third instance.
+
+    Note that the crossover happens only to the "base" class of the 
+    instance, not to it's ancestors.  The ancestor crossovers would
+    thus be called explicitly if desired.
 */
 
 int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
@@ -44,8 +42,6 @@ int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
     stVar *var;
 
     stInstance *temp;
-
-    /* naturally. */
 
     if(a->type != b->type || b->type != child->type) {
         slMessage(DEBUG_ALL, "Crossover instances must be of same class\n");

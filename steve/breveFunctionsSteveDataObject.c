@@ -347,16 +347,16 @@ int stReadObject(stInstance *i, char *filename) {
 }
 
 int stCSimpleCrossover(brEval *args, brEval *target, brInstance *i) {
-    stInstance *a = STINSTANCE(&args[0]);
-    stInstance *b = STINSTANCE(&args[1]);
-    stInstance *child = STINSTANCE(&args[2]);
+    brInstance *a = BRINSTANCE(&args[0]);
+    brInstance *b = BRINSTANCE(&args[1]);
+    brInstance *child = BRINSTANCE(&args[2]);
     
     if(!a || !b) {
         slMessage(DEBUG_ALL, "uninitialized object passed to simpleCrossover\n");
         return EC_ERROR;
     }
     
-    if(stObjectSimpleCrossover(a, b, child)) return EC_ERROR;
+    if(stObjectSimpleCrossover(a->pointer, b->pointer, child->pointer)) return EC_ERROR;
 
     return EC_OK;
 }   

@@ -619,6 +619,10 @@ int slPNGSnapshot(slCamera *c, char *file) {
 	char *buffer;
 	int r;
 
+	if(c->enabled == CM_DISABLED) return -1;
+
+	if(c->enabled == CM_NOT_UPDATED) slMessage(DEBUG_ALL, "warning: world must be redrawn before taking PNG snapshot\n");
+
 	if(c->activateContextCallback) c->activateContextCallback();
 
 	buffer = slMalloc(c->x * c->y * 3);
