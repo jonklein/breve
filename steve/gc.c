@@ -146,7 +146,6 @@ void stGCUnretainPointer(void *pointer, int type) {
 			brDataUnretain((brData*)pointer);
 			break;
 		case AT_STRING:
-			// slFree(pointer);
 			break;
 		default:
 			break;

@@ -19,32 +19,12 @@
  *****************************************************************************/
 
 /*
-	+ expression.c
-	=
-	= "The book of love if long and boring..." - Magnetic Fields
-	= 
-	= This file is long and boring.  The basic idea is that parse trees 
-	= are made up of the structures defined in expression.h, and this
-	= file just gives "constructor" (and destructor) functions for all of 
-	= them.  So when the parser finds a binary expression, it calls 
-	= stNewBinaryExp(blah, blah, blah).  These is very little processing
-	= done in this file, with the exception of the occasional symbol
-	= lookup in order to fill out a field in one of the structures.
-	=
-	= The only thing remotely interesting here is the stSizeof and stAlign
-	= functions which deal with the size of steve types.  They're at the
-	= very bottom.
-	=
-	= Very few comments here.
-	=
-	= A few notes:
-	=   * all expression structures are held within an stExp struct 
-	=	 which stores the structure pointer, as well as it's file
-	=	 and location.  the last line of most of these functions
-	=	 is thus something to the effect of: 
-	=	   return stExpNew(exp, type, file, line);
-	=   * some expression types don't need a seperate structure
-	=	 in the stExp structure, they just use a simple data type.
+	"The book of love if long and boring..." - Magnetic Fields
+	
+	This file is long and boring.  
+
+	But it used to be worse.  It now contains C++ constructors and 
+	destructors for all of the steve parse trees.
 */
 
 #include "steve.h"
@@ -305,10 +285,9 @@ stSortExp::stSortExp(stExp *list, char *method, char *file, int lineno) : stExp(
 }
 
 stSortExp::~stSortExp() {
-	delete (listExp);
+	delete listExp;
 
 	slFree(methodName);
-	if (block) free(block);
 }
 
 stListIndexExp::stListIndexExp(stExp *list, stExp *index, char *file, int lineno) : stExp(file, lineno) {
@@ -422,9 +401,9 @@ stIfExp::~stIfExp() {
 	delete cond;
 }
 
-stPrintExp::stPrintExp(std::vector< stExp* > *e, int newline, char *file, int lineno) : stExp(file, lineno) {
+stPrintExp::stPrintExp(std::vector< stExp* > *e, int n, char *file, int lineno) : stExp(file, lineno) {
 	expressions = *e;
-	newline = newline;
+	newline = n;
 
 	type = ET_PRINT;
 }
@@ -490,10 +469,10 @@ stVectorElementExp::~stVectorElementExp() {
 	delete exp;
 }
 
-stVectorElementAssignExp::stVectorElementAssignExp(stExp *v, stExp *rvalue, char element, char *file, int line) : stExp(file, line) {
+stVectorElementAssignExp::stVectorElementAssignExp(stExp *v, stExp *r, char e, char *file, int line) : stExp(file, line) {
 	exp = v;
-	element = element;
-	assignExp = rvalue;
+	element = e;
+	assignExp = r;
 
 	type = ET_VECTOR_ELEMENT_ASSIGN;
 }

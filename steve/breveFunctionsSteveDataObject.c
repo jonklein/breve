@@ -136,7 +136,7 @@ int stWriteObject(stInstance *i, char *filename) {
 
     package = stPackObject(i, &length);
     result = slUtilFwrite(package, 1, length, fp);
-    slFree(package);
+    delete package;
 
     fclose(fp);
 
@@ -151,7 +151,7 @@ char *stPackObject(stInstance *i, int *length) {
 
     *length = sizeof(brDataObjectHeader) + (i->type->varSize - i->type->varOffset) + strlen(i->type->name);
 
-    package = (char*)slMalloc(*length);
+    package = new char[*length];
     header = (brDataObjectHeader*)&package[0];
   
     header->varSize = i->type->varSize - i->type->varOffset;

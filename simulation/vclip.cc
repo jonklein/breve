@@ -56,6 +56,9 @@ void slAddCollisionCandidate(slVclipData *vc, slPairFlags flags, int x, int y) {
 	slCollisionCandidate c;
 
 	if(flags & BT_UNKNOWN) {
+		// the UNKNOWN flag indicates that we have not yet preformed a callback to 
+		// determine whether further collision detection is necessary.
+
 		slVclipDataInitPairFlags(vc->world, x, y);
 		flags = *slVclipPairFlags(vc, x, y);
 	}
@@ -94,6 +97,12 @@ void slRemoveCollisionCandidate(slVclipData *vc, int x, int y) {
 	}
 
 	vc->candidates.erase( std::pair<int, int>(x, y));
+}
+
+bool slBoundSortCompare(const slBoundSort *a, const slBoundSort *b) {
+	if(*a->value == *b->value) return (a->number < b->number);
+
+	return (*a->value < *b->value);
 }
 
 /*!
@@ -201,6 +210,7 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, char boundTypeFlag
 	for(currentI = list.begin() + 1; currentI != list.end(); currentI++) {
 		const slBoundSort *currentSort = *currentI;
 		slBoundSort *leftSort; 
+		const int currentSortType = currentSort->type;
 
 		x = currentSort->number; 
 
@@ -222,22 +232,28 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, char boundTypeFlag
 		while(leftI > list.begin() && ((*currentSort->value < *leftSort->value) ||
 			(*currentSort->value == *leftSort->value && currentSort->number < leftSort->number))) {
 
-			slPairFlags *flags;
-
 			y = leftSort->number;
 
-			flags = slVclipPairFlags(d, x, y);
+			if(currentSortType != leftSort->type && x != y) {
+				slPairFlags *flags = slVclipPairFlags(d, x, y);
 
-			if(x != y && (*flags & BT_CHECK)) {
-				if(currentSort->type == BT_MIN && leftSort->type == BT_MAX) {
+				if(currentSortType == BT_MIN && *flags & BT_CHECK) {
+					// the min moving to the left a max -- overlap, turn on the flag.
+
+#ifdef DEBUG
 					if((*flags & boundTypeFlag) && *currentSort->value != *leftSort->value) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already on]!\n");
+#endif DEBUG
 
 					*flags |= boundTypeFlag;
 
 					if(slVclipFlagsShouldTest(*flags)) slAddCollisionCandidate(d, *flags, x, y);
 
-				} else if(currentSort->type == BT_MAX && leftSort->type == BT_MIN && *currentSort->value != *leftSort->value) {
+				} else if(currentSortType == BT_MAX && *flags & BT_CHECK && *currentSort->value != *leftSort->value) {
+					// the max moving to the left a min -- no overlap, turn off the flag.
+
+#ifdef DEBUG
 					if(!(*flags & boundTypeFlag)) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already off]!\n");
+#endif
 
 					if(slVclipFlagsShouldTest(*flags)) slRemoveCollisionCandidate(d, x, y);
 
@@ -255,12 +271,6 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, char boundTypeFlag
 			}
 		}
 	}
-}
-
-bool slBoundSortCompare(const slBoundSort *a, const slBoundSort *b) {
-	if(*a->value == *b->value) return (a->number < b->number);
-
-	return (*a->value < *b->value);
 }
 
 /* 

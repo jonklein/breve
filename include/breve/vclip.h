@@ -21,7 +21,8 @@
 #define MC_TOLERANCE	0.00
 #define VC_WARNING_TOLERANCE -0.1
 
-#define slVclipPairFlags(pe, x, y)		((x)>(y)?(&(pe)->pairList[(x)*(pe)->count + (y)]):(&(pe)->pairList[(y)*(pe)->count + (x)]))
+#define slVclipPairFlags(pe, x, y)		((x)>(y)?(&(pe)->pairArray[(x)][(y)]):(&(pe)->pairArray[(y)][(x)]))
+#define slVclipPairFlagValue(pe, x, y)		((x)>(y)?((pe)->pairArray[(x)][(y)]):((pe)->pairArray[(y)][(x)]))
 
 enum collisionTypes {
 	CC_SIMULATE,
@@ -127,7 +128,7 @@ class slVclipData {
 
 		std::vector<slCollision> collisions;
 
-		slPairFlags *pairList;
+		slPairFlags **pairArray;
 
 		std::map< std::pair< int, int>, slCollisionCandidate > candidates;
 

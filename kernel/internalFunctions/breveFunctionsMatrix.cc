@@ -8,6 +8,10 @@
 
 #include "breveFunctionsImage.h"
 
+#ifdef MACOSX 
+#include <vecLib/vDSP.h>
+#endif
+
 #define GSL_MATRIX_POINTER(p)	((gsl_matrix_float*)(BRPOINTER(p)))
 
 class brMatrix {
@@ -189,6 +193,21 @@ int brIMatrixDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 	unsigned int x, y;
 	int xp, xm, yp, ym;
 
+#if(0)
+	// f3x3 is an altivec optimized convolution, but does not handle periodic
+	// boundaries.  
+
+	float kernel[9];
+
+	kernel[0] = 0; kernel[1] = scale; kernel[2] = 0;
+	kernel[3] = scale; kernel[4] = scale * -4; kernel[5] = scale;
+	kernel[6] = 0; kernel[7] = scale; kernel[8] = 0;
+
+	f3x3(m->data, m->tda, m->size2, kernel, n->data);
+
+	return EC_OK;
+#endif
+
 	for(y=0;y<m->size1;y++) {
 		for(x=0;x<m->size2;x++) {
 			xp = x+1; yp = y+1;
@@ -214,7 +233,7 @@ int brIMatrixCopyToImage(brEval args[], brEval *result, brInstance *i) {
 	gsl_matrix_float *m = GSL_MATRIX_POINTER(&args[0]);
 	brImageData *d = (brImageData*)BRPOINTER(&args[1]);
 	int offset = BRINT(&args[2]);
-	double scale = BRDOUBLE(&args[3]);
+	double scale = 255.0 * BRDOUBLE(&args[3]);
 	int r;
 
 	unsigned char *pdata;
@@ -233,7 +252,7 @@ int brIMatrixCopyToImage(brEval args[], brEval *result, brInstance *i) {
 
 	for(y=0;y<ymax;y++) {
 	 	for(x=0;x<xmax;x++) {
-			r = (int)(*mdata * scale * 255.0);
+			r = (int)(*mdata * scale);
 			if(r > 255) *pdata = 255;
 			else *pdata = r;
 			pdata += 4;

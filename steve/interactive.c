@@ -1,4 +1,5 @@
 #include "steve.h"
+#include "expression.h"
 
 void stSetParseObjectAndMethod(stObject *o, stMethod *m);
 

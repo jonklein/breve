@@ -34,8 +34,6 @@
 #define NETWORK_MAGIC   0x0b00b1e5
 #define NETWORK_VERSION 1
 
-extern stSteveData *gSteveData;
-
 /*  
 	+ steveFuncsObject.c 
 	= defines various internal functions relating to the "Object" root 
@@ -66,9 +64,8 @@ extern stSteveData *gSteveData;
 */
 
 int stSSetFreedInstanceProtection(brEval args[], brEval *target, brInstance *i) {
-	stSteveData *data = (stSteveData*)i->object->type->userData;
-
-    data->retainFreedInstances = BRINT(&args[0]);
+	stInstance *si = (stInstance*)i->userData;
+    si->type->steveData->retainFreedInstances = BRINT(&args[0]);
     return EC_OK;
 }
 

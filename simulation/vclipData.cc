@@ -70,8 +70,6 @@ void slVclipDataInit(slWorld *w) {
 		slAddBoundingBoxForVectors(w->clipData, x, &w->objects[x]->min, &w->objects[x]->max);
 	}
 
-	memset(w->clipData->pairList, (BT_CHECK | BT_UNKNOWN), (w->clipData->maxCount * w->clipData->maxCount));
-
 	for(x=0;x<w->objects.size();x++) {
 	 	if(w->objects[x]->type == WO_LINK) {
 			std::vector<slJoint*>::iterator ji;
@@ -173,9 +171,13 @@ slVclipData *slVclipDataNew() {
 	v->count = 0;
 	v->maxCount = 32;
 
-	v->pairList = new unsigned char[(v->maxCount * v->maxCount)];
+	v->pairArray = new unsigned char*[v->maxCount];
 
-	memset(v->pairList, (BT_CHECK | BT_UNKNOWN), (v->maxCount * v->maxCount));
+	for(unsigned int n=0; n < v->maxCount; n++) {
+		v->pairArray[n] = new unsigned char[v->maxCount];
+		memset(v->pairArray[n], (BT_CHECK | BT_UNKNOWN), v->maxCount);
+	}
+
 
 	return v;
 }
@@ -183,7 +185,9 @@ slVclipData *slVclipDataNew() {
 /*!
 	\brief Reallocates slVclipData to hold the specified number of objects.
 
-	vclipData never shrinks, it only grows when neccessary.
+	vclipData never shrinks, it only grows when neccessary.  This function
+	can be used to reserve arbitrarily large collision structures to ensure
+	that no runtime reallocation is required.
 */
 
 void slVclipDataRealloc(slVclipData *v, unsigned int count) {
@@ -193,10 +197,12 @@ void slVclipDataRealloc(slVclipData *v, unsigned int count) {
 
 	while(v->count > v->maxCount) v->maxCount *= 2;
 
-	delete[] v->pairList;
-	v->pairList = new unsigned char[v->maxCount * v->maxCount];
+	v->pairArray = new unsigned char*[v->maxCount];
 
-	memset(v->pairList, (BT_CHECK | BT_UNKNOWN), (v->maxCount * v->maxCount));
+	for(unsigned int n=0; n < v->maxCount; n++) {
+		v->pairArray[n] = new unsigned char[v->maxCount];
+		memset(v->pairArray[n], (BT_CHECK | BT_UNKNOWN), v->maxCount);
+	}
 }
 
 /*!
@@ -269,7 +275,9 @@ void slFreeClipData(slVclipData *v) {
 		return;
 	}
 
-	delete[] v->pairList;
+	for(unsigned int n = 0; n < v->maxCount; n++) delete[] v->pairArray[n];
+
+	delete[] v->pairArray;
 
 	delete v;
 }

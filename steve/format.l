@@ -15,8 +15,8 @@ int slFormatParseLength;
 int slFormatParseLocation;
 int midline = 0;
 
-#define YY_INPUT(buf,result,max_size) \
-	result = ((slFormatParseLocation == slFormatParseLength) ? YY_NULL : (buf[0] = slFormatParseBuffer[slFormatParseLocation++], 1))
+#define YY_INPUT(buf,res,max_size) \
+	res = ((slFormatParseLocation == slFormatParseLength) ? YY_NULL : (buf[0] = slFormatParseBuffer[slFormatParseLocation++], 1))
 %}
 
 %option noyywrap

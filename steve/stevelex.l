@@ -155,9 +155,9 @@ path					{ return PATH; }
 		defineEval = gSteveData->defines[ yytext];
 
 		if(defineEval) {
-			brEval *copy = (brEval*)slMalloc(sizeof(brEval));
+			brEval *copy = new brEval;
 
-			brEvalCopy((brEval*)defineEval, copy);
+			brEvalCopy(defineEval, copy);
 			yylval.eval = copy;
 
 			return ST_EVAL;
