@@ -588,7 +588,6 @@ void slPrintLog(char *text) {
 	[logText insertText: gLogString];
 	[gLogString setString: @""];
 
-	//[logText setSelectable: YES];
 	[logLock unlock];
 
 	return 1;
@@ -609,8 +608,8 @@ void slPrintLog(char *text) {
 	if(engine->error.file) {
 		simpleFilename = (char*)[[[NSString stringWithCString: engine->error.file] lastPathComponent] cString];
 	} else {
-		/* this shouldn't happen, but it happened once and caused a crash, so I'm */
-		/* fixing the symptom instead of the disease */
+		// this shouldn't happen, but it happened once and caused a crash, so I'm
+		// fixing the symptom instead of the disease
 
 		simpleFilename = "(untitled)";
 	}
@@ -621,9 +620,10 @@ void slPrintLog(char *text) {
 		if([doc fileName]) {
 			currentCName = (char*)[[[doc fileName] lastPathComponent] cString];
 
-			if(!strcmp(currentCName, simpleFilename)) [[doc text] goToLine: engine->error.line];
-
-			[[doc window] makeKeyAndOrderFront: self];
+			if(!strcmp(currentCName, simpleFilename)) {
+				[[doc text] goToLine: engine->error.line];
+				[[doc window] makeKeyAndOrderFront: self];
+			}
 		}
 	}
 
@@ -654,13 +654,13 @@ void slPrintLog(char *text) {
 	[errorWindowErrorMessage sizeToFit];
 	bounds = [errorWindowErrorMessage bounds];
 
-	/* the following values are determined from IB */
+	// the following values are determined from IB 
 
 	origin.x = 120;
 	origin.y = 60;
 
-	bounds.size.height += 80; /* 80 is the space for the border and button as determined from IB */
-	bounds.size.width += 140; /* 120 is the space for the border determined from IB */
+	bounds.size.height += 80; // 80 is the space for the border/button from IB 
+	bounds.size.width += 140; // 120 is the space for the border from IB 
 
 	[errorWindowErrorMessage setFrameOrigin: origin];
 	[errorWindow setContentSize: bounds.size];

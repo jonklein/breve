@@ -57,6 +57,7 @@ void slObjectParseCountNewlines(char *text);
 
 WORD	[_a-zA-Z][\-_a-zA-Z0-9]*
 WHITE	[\t\ \n]*
+AKA		\({WHITE}*aka{WHITE}+{WORD}{WHITE}*\)
 
 %x OBJECT
 
@@ -67,7 +68,9 @@ WHITE	[\t\ \n]*
 
 #.*							;
 
-{WORD}{WHITE}:{WHITE}{WORD}{WHITE}/\{	{ slObjectParseText = yytext; BEGIN(OBJECT); slQPLevel = 0; return TZ_OBJECT; }
+
+
+{WORD}{WHITE}:{WHITE}{WORD}{WHITE}{AKA}?{WHITE}/\{	{ slObjectParseText = yytext; BEGIN(OBJECT); slQPLevel = 0; return TZ_OBJECT; }
 
 <OBJECT>\{				{ yytext = NULL; slQPLevel++; return TZ_NOTHING; }
 

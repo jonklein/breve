@@ -227,7 +227,7 @@ Control : Swarm {
         #if selection: selection hide-neighbor-lines.
         #if item: item show-neighbor-lines.
         selection = item.
-        if item && (item is a "Bird"): (item get-pushCode) dump.
+        if item && (item is a "Bird"): print ((item get-pushCode) get-string).
         super click on item.
 
         ######################################################################

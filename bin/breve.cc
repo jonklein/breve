@@ -82,7 +82,6 @@ breveFrontend *frontend;
 slGLUTWindow *gWindows[1024];
 
 int main(int argc, char **argv) {
-	pthread_t thread;
 	char wd[10240];
 	int index;
 	int n;
@@ -511,21 +510,6 @@ void slDemoPassiveMotion(int x, int y) {
 }
 
 void slDemoMotion(int x, int y) {
-	slVector yaxis, xaxis, tempV;
-	double m[3][3], n[3][3], o[3][3];
-
-	slVectorSet(&yaxis, 0, 1, 0);
-	slVectorSet(&xaxis, 1, 0, 0);
-
-	slRotationMatrix(&yaxis, frontend->engine->camera->rx, m);
-	slRotationMatrix(&xaxis, frontend->engine->camera->ry, n);
-	slMatrixMulMatrix(m, n, o);
-
-	slVectorXform(o, &yaxis, &tempV);
-	slVectorCopy(&tempV, &yaxis);
-	slVectorXform(o, &xaxis, &tempV);
-	slVectorCopy(&tempV, &xaxis);
-
 	if(gLastX || gLastY) {
 		if(gMods & GLUT_ACTIVE_SHIFT) { 
 			brDragCallback(frontend->engine, x, y);

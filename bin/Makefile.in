@@ -22,10 +22,10 @@ all: breve_cli breve
 	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
 
 breve: $(BREVEO) ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a
-	$(CC) -o breve $(CFLAGS) $(BREVEO) $(LIBS) -Xlinker -Bdynamic @GLLIBS@ @AUDIOLIBS@
+	$(CC) -o breve $(CFLAGS) $(BREVEO) $(LIBS) @GLLIBS@ @AUDIOLIBS@
 
 breve_cli: $(BREVECLIO) ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a
-	$(CC) -o breve_cli $(CFLAGS) $(BREVECLIO) $(LIBS) -Xlinker -Bdynamic @GLLIBS@ @AUDIOLIBS@
+	$(CC) -o breve_cli $(CFLAGS) $(BREVECLIO) $(LIBS) @GLLIBS@ @AUDIOLIBS@
 
 clean:
 	-rm -f breve breve_cli *.o

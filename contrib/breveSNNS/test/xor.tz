@@ -1,0 +1,81 @@
+@include "Object.tz"
+@include "Control.tz"
+
+@plugin "../breveSNNS.so.1.o"	(breveSNNSLoadFunctions).
+
+Controller XORController.
+
+Control : XORController {
+    + variables:
+	networkFile (string).
+	networkName (string).
+	int1, int2 (int).
+	input1 (double).
+	input2 (double).
+	output (list).
+	iterCount (int).
+	nodeNumberOfInput1, nodeNumberOfInput2, nodeNumberOfOutput (int).
+	totalUnits (int).
+	stateName1, stateName2 (string).
+
++ to init:
+	stateName1 = "ONE".
+	stateName2 = "TWO".
+	iterCount = 0.
+	networkFile = "test/xor.net".
+	print "Attempting to load network file: $networkFile".
+	print "Attempting to load network file: $networkFile".
+	print "Attempting to load network file: $networkFile".
+	networkName = snns_loadNet(networkFile).
+	print "Successfully loaded network: $networkName".
+	print "Input nodes: $nodeNumberOfInput1, $nodeNumberOfInput2.".
+	print "Output node: $nodeNumberOfOutput.".
+	totalUnits = snns_getNoOfUnits().
+	print "Total units: $totalUnits.".
+	print "Saving first xor.net ($stateName1)".
+	snns_saveState(stateName1).
+	print "Reloading network...".
+	networkName = snns_loadNet(networkFile).
+        print "Successfully loaded network: $networkName".
+        print "Input nodes: $nodeNumberOfInput1, $nodeNumberOfInput2.".
+        print "Output node: $nodeNumberOfOutput.".
+        totalUnits = snns_getNoOfUnits().
+        print "Total units: $totalUnits.".
+	print "Saving second xor.net ($stateName2)".
+	snns_saveState(stateName2).
+
+    + to iterate:
+        # Present a random input to the network every 50 ticks and display the output.
+	if (iterCount > 50000): {
+	  # Network 1
+	  print "About to load state with name: $stateName1.".
+	  snns_loadState(stateName1).
+	  int1 = random[1].
+	  int2 = random[1].
+	  input1 = int1.
+	  input2 = int2.
+	  self show-input-and-propagate.
+	  print "RESULT: $input1 XOR $input2 = $output".
+	  snns_saveState(stateName1).
+	  # Network 2
+	  print "About to load state with name: $stateName2.".
+	  snns_loadState(stateName2).
+          int1 = random[1].
+          int2 = random[1].
+          input1 = int1.
+          input2 = int2.
+          self show-input-and-propagate.
+          print "RESULT FROM RELOADED STATE $stateName2 = $output".
+	  snns_saveState(stateName2).
+	  iterCount = 0.
+	}
+	else iterCount++.
+
+    + to show-input-and-propagate:
+	params (list).
+	inputList (list).
+
+	inputList = { input1, input2 }.
+        print "Showing input $inputList".
+	output = snns_process(inputList, params, 0).
+}
