@@ -1381,7 +1381,7 @@ _ACEOF
 
 	linux* )
 				GLLIBS="-L/usr/X11R6/lib -lglut -lGL -lGLU -lXmu -lXt -lSM -lICE -lX11 -lXi -lXext"
-		EXTRALDFLAGS="-Xlinker -Bdynamic"
+		EXTRALDFLAGS="-Xlinker -Bstatic"
 		PLUGINFLAGS="-shared"
 
 cat >>confdefs.h <<\_ACEOF

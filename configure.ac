@@ -24,7 +24,7 @@ case "${host_os}" in
 	linux* )
 		dnl Linux configuration
 		GLLIBS="-L/usr/X11R6/lib -lglut -lGL -lGLU -lXmu -lXt -lSM -lICE -lX11 -lXi -lXext"
-		EXTRALDFLAGS="-Xlinker -Bdynamic"
+		EXTRALDFLAGS="-Xlinker -Bstatic"
 		PLUGINFLAGS="-shared"
 		AC_DEFINE([LINUX], [], [Linux])
 		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E"
