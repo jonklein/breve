@@ -140,11 +140,11 @@ brSoundData *brLoadSound(char *file) {
 	if(info.channels == 1) upsample *= 2;
 
 	while(upsample != 1) {
-		int *realData;
+		int *newData;
 
-		realData = brSampleUp(data->data, data->length);
-		slFree(data->data);
-		data->data = realData;
+		newData = brSampleUp(data->data, data->length);
+		delete[] data->data;
+		data->data = newData;
 		data->length *= 2;
 
 		upsample /= 2;
@@ -156,7 +156,7 @@ brSoundData *brLoadSound(char *file) {
 }
 
 int *brSampleUp(int *in, long frames) {
-	int *out = slMalloc(frames * 2 * sizeof(int));
+	int *out = new int[frames * 2 * sizeof(int)];
 	int n;
 
 	for(n=0;n<frames;n++) {

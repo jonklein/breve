@@ -1265,5 +1265,5 @@ int stGetTypeForString(char *type) {
 	if(!strcmp(type, "string")) return AT_STRING;
 	if(!strcmp(type, "data")) return AT_STRING;
 
-	return NULL;
+	return AT_UNDEFINED;
 }
