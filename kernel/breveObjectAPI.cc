@@ -371,7 +371,7 @@ brInstance *brObjectInstantiate(brEngine *e, brObject *o, brEval **args, int arg
 */
 
 void brInstanceRelease(brInstance *i) {
-	if(!i) return;
+	if(!i || i->status != AS_ACTIVE) return;
 
 	printf("adding %p for removal\n", i);
 
