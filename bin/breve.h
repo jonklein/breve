@@ -23,7 +23,7 @@
 #include <sys/param.h>
 #include <pthread.h>
 
-#ifdef HAVE_LIBREADLINE
+#if defined(HAVE_LIBREADLINE) && defined(HAVE_LIBHISTORY)
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif

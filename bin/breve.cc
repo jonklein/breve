@@ -596,7 +596,7 @@ void brInterrupt(brEngine *engine) {
 	printf("\n\nSimulation interupted.  Type a steve command, 'x' to quit, or hit enter to continue\n");
 	fflush(stdout);
 
-#ifdef HAVE_LIBREADLINE
+#if defined(HAVE_LIBREADLINE) && defined(HAVE_LIBHISTORY)
 	line = readline("breve> ");
 	if(line && *line) add_history(line);
 #else

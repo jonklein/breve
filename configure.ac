@@ -97,6 +97,7 @@ AC_CHECK_LIB([sndfile], [sf_open])
 AC_CHECK_LIB([OSMesa], [OSMesaCreateContext],,,$GLLIBS)
 AC_CHECK_LIB([termcap], [tputs])
 AC_CHECK_LIB([ncurses], [tputs])
+AC_CHECK_LIB([history], [add_history])
 AC_CHECK_LIB([readline], [readline])
 
 AC_LANG([C++])

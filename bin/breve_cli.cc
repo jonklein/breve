@@ -21,19 +21,13 @@
 /*
 	+ breve.c
 	= this is a hack-ish wrapper around the breve engine for a command line
-	= based GLUT version of breve.  this version is used mainly just for 
-	= testing of the engine without dealing with the whole OSX app.
+	= based GLUT version of breve.  
 */
 
 #define OSMESA_WINDOW_SIZE 300
 
 #include <stdio.h>
 #include <signal.h>
-
-#ifdef HAVE_LIBREADLINE
-#include <readline/readline.h>
-#include <readline/history.h>
-#endif
 
 #include "steve.h"
 #include "breve.h"
@@ -190,7 +184,7 @@ void brCatchSignal(int signal) {
 	printf("\n\nSimulation interupted.  Type a steve command, 'x' to quit, or hit enter to continue\n");
 	fflush(stdout);
 
-#ifdef HAVE_LIBREADLINE
+#if defined(HAVE_LIBREADLINE) && defined(HAVE_LIBHISTORY)
 	line = readline("breve> ");
 	if(*line) add_history(line);
 #else 
