@@ -126,7 +126,7 @@ inline void stGCUnretain(brEval *e) {
 */
 
 inline void stGCUnretainPointer(void *pointer, int type) {
-	if(!pointer) return;
+	if(type == AT_NULL || !pointer) return;
 
 	switch(type) {
 		case AT_INSTANCE:
@@ -272,7 +272,7 @@ void stGCUnmark(stInstance *i, brEval *collect) {
 	int n;
 	stGCRecord *r;
 
-	if(!i->gcStack || !collect->values.pointerValue) return;
+	if(!i->gcStack || collect->type == AT_NULL || !collect->values.pointerValue) return;
 
 	for(n=0;n<i->gcStack->count;n++) {
 		r = i->gcStack->data[n];

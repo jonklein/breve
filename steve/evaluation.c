@@ -879,7 +879,7 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 
 		// unmark the return value -- we'll make it the current instance's problem
 
-		stGCUnmark(caller->instance, t);
+		if(t->type != AT_NULL) stGCUnmark(caller->instance, t);
 
 		// collect and reset the gcStack
 
@@ -2313,7 +2313,7 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 	// this will keep it alive through the releasing stage.
 	
 	if(new->instance->gcStack) {
-		stGCUnmark(new->instance, target);
+		if(target->type != AT_NULL) stGCUnmark(new->instance, target);
 		stGCRetain(target);
 	}
 
@@ -2358,7 +2358,8 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 	// unretain it, and make it the caller's problem.
 
 	if(new->instance->gcStack) {
-		stGCUnretain(target);
+		slMessage("RAN %s\n", method->name);
+		if(target->type != AT_NULL) stGCUnretain(target);
 		if(old) stGCMark(old->instance, target);
 	}
 

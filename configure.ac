@@ -23,7 +23,7 @@ case "${host_os}" in
 
 	linux* )
 		dnl Linux configuration
-		GLLIBS="-L/usr/X11R6/lib -lglut -lGL -lGLU -lXmu -lXt -lSM -lICE -lX11 -lXi -lXext"
+		GLLIBS="-Xlinker -Bdynamic -L/usr/X11R6/lib -lglut -lGL -lGLU -lXmu -lXt -lSM -lICE -lX11 -lXi -lXext"
 		EXTRALDFLAGS="-Xlinker -Bstatic"
 		PLUGINFLAGS="-shared"
 		AC_DEFINE([LINUX], [], [Linux])
@@ -61,12 +61,15 @@ case "${host_os}" in
 esac
 
 AC_SUBST(AUDIOLIBS)
+AC_SUBST(CC)
+AC_SUBST(CXX)
 AC_SUBST(GLLIBS)
 AC_SUBST(JAVALIBS)
 AC_SUBST(JAVAINCS)
 AC_SUBST(PLUGINFLAGS)
 AC_SUBST(QUICKTIMEFLAGS)
 AC_SUBST(EXTRALDFLAGS)
+AC_SUBST(LDFLAGS)
 AC_SUBST(CPPFLAGS)
 
 # Checks for programs.
