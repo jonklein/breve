@@ -3180,6 +3180,7 @@ int stDoEvalListIndex(brEvalListHead *l, int n, brEval *newLoc) {
 	}
     
 	brEvalCopy(eval, newLoc);
+	stGCRetain(newLoc);
     
 	return 0;
 }
