@@ -1551,8 +1551,6 @@ inline int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *result) {
 	if(resultCode != EC_OK) result->type = AT_NULL;
 	else if(c->function->rtype != AT_UNDEFINED) result->type = c->function->rtype;
 
-	// if(c->function->rtype == AT_UNDEFINED)  printf("undefined function return\n");
-
 	stGCMark(i->instance, result);
 
 	return resultCode;
@@ -2429,15 +2427,14 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 
 	// unretain the input arguments
 
-	if(method->keywords) {
-		for(n=0;n<method->keywords->count;n++) {
-			keyEntry = method->keywords->data[n];
+	for(n=0;n<argcount;n++) {
+		keyEntry = method->keywords->data[n];
 
-			if(caller && caller->instance->gcStack) {
-				stGCUnretainPointer(*(void**)&newStStack[keyEntry->var->offset], keyEntry->var->type->type);
-			} else {
-				stGCUnretainAndCollectPointer(*(void**)&newStStack[keyEntry->var->offset], keyEntry->var->type->type);
-			}
+		if(caller && caller->instance->gcStack) {
+			stGCUnretainPointer(*(void**)&newStStack[keyEntry->var->offset], keyEntry->var->type->type);
+			if(keyEntry->var->type->type == AT_STRING) slFree(*(void**)&newStStack[keyEntry->var->offset]);
+		} else {
+			stGCUnretainAndCollectPointer(*(void**)&newStStack[keyEntry->var->offset], keyEntry->var->type->type);
 		}
 	}
 
@@ -2626,10 +2623,10 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *result, stObject **tClass) {
 				resultCode = EC_STOP;
 			}
 
-			resultCode = stExpEval(s->values.pValue, i, &t, NULL);
+			resultCode = stExpEval(s->values.pValue, i, result, NULL);
 
-			if(resultCode != EC_OK) resultCode = resultCode;
-			else brEvalCopy(&t, result);
+			// if(resultCode != EC_OK) resultCode = resultCode;
+			// else brEvalCopy(&t, result);
 
 			resultCode = EC_STOP;
 			break;
