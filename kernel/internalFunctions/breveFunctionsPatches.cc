@@ -33,11 +33,11 @@
 	and z sizes of the grid.
 */
 
-int brINewPatchGrid(brEval args[], brEval *target, brInstance *i) {
+int brIPatchGridNew(brEval args[], brEval *target, brInstance *i) {
 	slVector center;
 	slVectorSet(&center, 0, 0, 0);
 
-	BRPOINTER(target) = slAddPatchGrid(i->engine->world, &BRVECTOR(&args[0]), &BRVECTOR(&args[1]), BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]));
+	BRPOINTER(target) = slPatchGridAdd(i->engine->world, &BRVECTOR(&args[0]), &BRVECTOR(&args[1]), BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]));
 
     return EC_OK;
 }
@@ -48,8 +48,8 @@ int brINewPatchGrid(brEval args[], brEval *target, brInstance *i) {
 	void freePatchGrid(slPatchGrid pointer).
 */
 
-int brIFreePatchGrid(brEval args[], brEval *target, brInstance *i) {
-	slFreePatchGrid(BRPOINTER(&args[0]));
+int brIPatchGridFree(brEval args[], brEval *target, brInstance *i) {
+	slPatchGridFree(BRPOINTER(&args[0]));
 
 	return EC_OK;
 }
@@ -192,8 +192,8 @@ int brISetPatchTransparency(brEval args[], brEval *target, brInstance *i) {
 /*@}*/
 
 void breveInitPatchFunctions(brNamespace *n) {
-    brNewBreveCall(n, "newPatchGrid", brINewPatchGrid, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_INT, AT_INT, AT_INT, 0);
-    brNewBreveCall(n, "freePatchGrid", brIFreePatchGrid, AT_NULL, AT_POINTER, 0);
+    brNewBreveCall(n, "newPatchGrid", brIPatchGridNew, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_INT, AT_INT, AT_INT, 0);
+    brNewBreveCall(n, "freePatchGrid", brIPatchGridFree, AT_NULL, AT_POINTER, 0);
     brNewBreveCall(n, "setPatchObjectAtIndex", brISetObjectAtIndex, AT_NULL, AT_POINTER, AT_INSTANCE, AT_INT, AT_INT, AT_INT, 0);
     brNewBreveCall(n, "patchObjectAtIndex", brIObjectAtIndex, AT_INSTANCE, AT_POINTER, AT_INT, AT_INT, AT_INT, 0);
     brNewBreveCall(n, "objectAtLocation", brIObjectAtLocation, AT_INSTANCE, AT_POINTER, AT_VECTOR, 0);

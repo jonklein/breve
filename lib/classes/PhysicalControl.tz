@@ -8,7 +8,6 @@ Control : PhysicalControl [version 1.8] {
 
     + variables:
         gravityMenu (4 objects).
-		collisionResolution (int).
 
     + to init:
         self set-integration-step to .004.

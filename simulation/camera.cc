@@ -191,21 +191,19 @@ void slSetCameraText(slCamera *c, int n, char *string, float x, float y, slVecto
 */
 
 void slSetShadowCatcher(slCamera *c, slShape *s, slVector *normal, slPosition *pos) {
-	int n;
 	slFace *face, *bestFace = NULL;
 	double best = 0.0, dot;
+	std::vector<slFace*>::iterator fi;
 
-	for(n=0;n<s->featureCount;n++) {
-	    if(s->features[n]->type == FT_FACE) {
-	        face = s->features[n]->data;
+	for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
+        face = *fi;
 
-	        dot = slVectorDot(&face->plane.normal, normal);
+        dot = slVectorDot(&face->plane.normal, normal);
 
-	        if(dot > best) {
-	            bestFace = face;
-	            best = dot;
-	        }
-	    }
+        if(dot > best) {
+            bestFace = face;
+            best = dot;
+        }
 	}
 
 	if(!bestFace) {
@@ -264,6 +262,7 @@ void slAddBillboard(slCamera *c, slVector *color, slVector *loc, float size, flo
 */
 
 void slSortBillboards(slCamera *c) {
+	//std::sort(&c->billboards[0], &c->billboards[c->billboardCount + 1]);
 	qsort(&c->billboards[0], c->billboardCount, sizeof(slBillboardEntry*), slBillboardSortFunc);
 }
 
@@ -272,7 +271,7 @@ void slSortBillboards(slCamera *c) {
 */
 
 int slBillboardSortFunc(const void *a, const void *b) {
-	slBillboardEntry **ah = (void*)a, **bh = (void*)b;
+	slBillboardEntry **ah = (slBillboardEntry**)a, **bh = (slBillboardEntry**)b;
 
 	if((*ah)->z > (*bh)->z) return 1;
 	if((*ah)->z < (*bh)->z) return -1;

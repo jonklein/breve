@@ -44,6 +44,12 @@ Object : Spring (aka Springs) {
 				(link2 get-link-pointer), 
 				point1, point2, length, strength, damping).
 
+	+ to get-current-length:
+		% This method returns the <i>current</i> (stretched or compressed) 
+		% length of the spring, as opposed to the "natural" length.
+		if springPointer: return springGetCurrentLength(springPointer).
+		return 0.
+
 	+ to set-length to newLength (double):
 		% Sets the spring's length to newLength.
 		if springPointer: springSetLength(springPointer, newLength).

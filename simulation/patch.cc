@@ -20,15 +20,15 @@
 
 #include "simulation.h"
 
-slPatchGrid *slNewPatchGrid(slVector *center, slVector *patchSize, int x, int y, int z) {
+slPatchGrid *slPatchGridNew(slVector *center, slVector *patchSize, int x, int y, int z) {
 	struct slPatchGrid *grid;
 	int a, b, c;
 
 	if(x < 1 || y < 1 || z < 1) return NULL;
 
-	grid = slMalloc(sizeof(slPatchGrid));
+	grid = new slPatchGrid;
 
-	grid->patches = slMalloc(sizeof(slPatch**) * z);
+	grid->patches = new slPatch**[z];
 	grid->xSize = x;
 	grid->ySize = y;
 	grid->zSize = z;
@@ -40,10 +40,10 @@ slPatchGrid *slNewPatchGrid(slVector *center, slVector *patchSize, int x, int y,
 	grid->startPosition.z = (-(patchSize->z * z) / 2) + center->z;
 
 	for(c=0;c<z;c++) {
-		grid->patches[c] = slMalloc(sizeof(slPatch*) * y);
+		grid->patches[c] = new slPatch*[y];
 
 		for(b=0;b<y;b++) {
-			grid->patches[c][b] = slMalloc(sizeof(slPatch) * x);
+			grid->patches[c][b] = new slPatch[x];
 		
 			for(a=0;a<x;a++) {
 				slInitPatch(&grid->patches[c][b][a]);
@@ -70,7 +70,7 @@ slPatch *slPatchForLocation(slPatchGrid *g, slVector *location) {
 	return &g->patches[z][y][x];
 }
 
-void slFreePatchGrid(slPatchGrid *g) {
+void slPatchGridFree(slPatchGrid *g) {
 	int a, b, c;
 
 	for(c=0;c<g->zSize;c++) {
@@ -79,14 +79,15 @@ void slFreePatchGrid(slPatchGrid *g) {
 
 			}
 
-			slFree(g->patches[c][b]);
+			delete g->patches[c][b];
 		}
 
-		slFree(g->patches[c]);
+		delete g->patches[c];
 	}
 
-	slFree(g->patches);
-	slFree(g);
+	delete[] g->patches;
+
+	delete g;
 }
 
 void slInitPatch(slPatch *p) {

@@ -32,8 +32,8 @@
 void slVclipDataInit(slWorld *w) {
 	slStationary *st;
 	slLink *link;
-	int n;
-	int x, y;
+	unsigned int n;
+	unsigned int x, y;
 	slTerrain *terrain;
 
 	w->initialized = 1;
@@ -58,8 +58,8 @@ void slVclipDataInit(slWorld *w) {
 				link = w->objects[n]->data;
 				link->clipNumber = n;
 
-				w->clipData->shapePositions[n] = &link->position;
-				w->clipData->shapeList[n] = link->shape;
+				w->clipData->positions[n] = &link->position;
+				w->clipData->shapes[n] = link->shape;
 
 				slLinkUpdateBoundingBox(link);
 				slAddBoundingBoxForVectors(w, n, &link->min, &link->max);
@@ -67,8 +67,8 @@ void slVclipDataInit(slWorld *w) {
 				break;
 			case WO_STATIONARY:
 				st = w->objects[n]->data;
-				w->clipData->shapePositions[n] = &st->position;
-				w->clipData->shapeList[n] = st->shape;
+				w->clipData->positions[n] = &st->position;
+				w->clipData->shapes[n] = st->shape;
 
 				slShapeBounds(st->shape, &st->position, &st->min, &st->max);
 				slAddBoundingBoxForVectors(w, n, &st->min, &st->max);
@@ -76,8 +76,8 @@ void slVclipDataInit(slWorld *w) {
 				break;
 			case WO_TERRAIN:
 				terrain = w->objects[n]->data;
-				w->clipData->shapePositions[n] = NULL;
-				w->clipData->shapeList[n] = NULL;
+				w->clipData->positions[n] = NULL;
+				w->clipData->shapes[n] = NULL;
 
 				slAddBoundingBoxForVectors(w, n, &terrain->min, &terrain->max);
 
@@ -89,9 +89,7 @@ void slVclipDataInit(slWorld *w) {
 	}
 
 	for(x=1;x<w->objects.size();x++) {
-		for(y=0;y<x;y++) {
-			slVclipDataAddPairEntry(w, x, y);
-		}
+		for(y=0;y<x;y++) slVclipDataAddPairEntry(w, x, y);
 	}
 
 	for(n=0;n<w->objects.size();n++) {
@@ -133,8 +131,8 @@ void slVclipDataAddPairEntry(slWorld *w, int x, int y) {
 	o1 = w->objects[x];
 	o2 = w->objects[y];
 
-	if(w->clipData->shapeList[x]) pe->f1 = w->clipData->shapeList[x]->features[0];
-	if(w->clipData->shapeList[y]) pe->f2 = w->clipData->shapeList[y]->features[0];
+	if(w->clipData->shapes[x]->type == ST_NORMAL) pe->f1 = w->clipData->shapes[x]->features[0];
+	if(w->clipData->shapes[y]->type == ST_NORMAL) pe->f2 = w->clipData->shapes[y]->features[0];
 
 	t1 = w->objects[x]->type;
 	t2 = w->objects[y]->type;
@@ -195,13 +193,7 @@ slVclipData *slVclipDataNew() {
 
 	listSize = v->maxCount * 2;
 
-	/* init the collision candidates */
-
-	v->maxCandidates = 8; 
-	v->candidateCount = 0;
-	v->collisionCandidates = slMalloc(sizeof(slPairEntry*) * v->maxCandidates);
-
-	/* init the collisions */
+	// init the collisions 
 
 	v->maxCollisions = 8;
 	v->collisionCount = 0;
@@ -240,8 +232,8 @@ slVclipData *slVclipDataNew() {
 		for(m=0;m<n;m++) v->pairList[n][m].flags = BT_CHECK;
 	}
 
-	v->shapeList = slMalloc(sizeof(slShape*) * v->maxCount);
-	v->shapePositions = slMalloc(sizeof(slPosition*) * v->maxCount);
+	v->shapes = slMalloc(sizeof(slShape*) * v->maxCount);
+	v->positions = slMalloc(sizeof(slPosition*) * v->maxCount);
 
 	return v;
 }
@@ -265,10 +257,6 @@ void slVclipDataRealloc(slVclipData *v, int count) {
 	while(v->count > v->maxCount) v->maxCount *= 2;
 
 	listSize = v->maxCount * 2;
-
-	// get rid of the previous candidates
-
-	v->candidateCount = 0;
 
 	// init the bound lists and bound list pointers 
 
@@ -298,8 +286,8 @@ void slVclipDataRealloc(slVclipData *v, int count) {
 		for(m=0;m<n;m++) v->pairList[n][m].flags = BT_CHECK;
 	}
 
-	v->shapeList = slRealloc(v->shapeList, sizeof(slShape*) * v->maxCount);
-	v->shapePositions = slRealloc(v->shapePositions, sizeof(slPosition*) * v->maxCount);
+	v->shapes = slRealloc(v->shapes, sizeof(slShape*) * v->maxCount);
+	v->positions = slRealloc(v->positions, sizeof(slPosition*) * v->maxCount);
 }
 
 /*!
@@ -364,7 +352,7 @@ void slSetBoundsOnlyCollisionDetection(slWorld *w, int b) {
 }
 
 void slInitProximityData(slWorld *w) {
-	int n, x, y;
+	unsigned int n, x, y;
 	slPairEntry *pe;
 
 	slVclipDataRealloc(w->proximityData, w->objects.size());
@@ -462,8 +450,8 @@ void slFreeClipData(slVclipData *v) {
 		return;
 	}
 
-	if(v->shapeList) slFree(v->shapeList);
-	if(v->shapePositions) slFree(v->shapePositions);
+	if(v->shapes) slFree(v->shapes);
+	if(v->positions) slFree(v->positions);
 
 	for(n=1;n<v->maxCount;n++) slFree(v->pairList[n]);
 	if(v->pairList) slFree(v->pairList);
@@ -478,8 +466,6 @@ void slFreeClipData(slVclipData *v) {
 	}
 
 	if(v->collisions) slFree(v->collisions);
-
-	if(v->collisionCandidates) slFree(v->collisionCandidates);
 
 	if(v->xList) slFree(v->xList);
 	if(v->yList) slFree(v->yList);

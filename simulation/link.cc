@@ -51,7 +51,7 @@ slLink *slLinkNew(slWorld *w) {
 */
 
 void slLinkSetShape(slLink *l, slShape *s) {
-	if(l->shape) slFreeShape(l->shape);
+	if(l->shape) slShapeFree(l->shape);
 
 	l->shape = s;
 	s->referenceCount++;
@@ -257,7 +257,7 @@ void slLinkFree(slLink *l) {
 
 	dBodyDestroy(l->odeBodyID);
 
-	slFreeShape(l->shape);
+	slShapeFree(l->shape);
 
 	delete l;
 }

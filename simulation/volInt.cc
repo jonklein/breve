@@ -46,139 +46,77 @@ static double T0, T1[3], T2[3], TP[3];
 */
 
 int slConvertShapeToPolyhedron(slShape *s, slMPPolyhedron *p) {
-    int feature, edge, pointNumber;
+    int edge, pointNumber;
     slPoint *thePoint;
     slFace *theFace;
     slEdge *theEdge;
+	std::vector<slPoint*>::iterator pi;
+	std::vector<slFace*>::iterator fi;
 
     /* first get all the points... */
 
     p->numVerts = 0;
     p->numFaces = 0;
 
-    for(feature=0;feature<s->featureCount;feature++) {
-        if(s->features[feature]->type == FT_POINT) {
-            thePoint = s->features[feature]->data;
+	for(pi = s->points.begin(); pi != s->points.end(); pi++ ) {
+		thePoint = *pi;
 
-            p->verts[p->numVerts][X] = thePoint->vertex.x;
-            p->verts[p->numVerts][Y] = thePoint->vertex.y;
-            p->verts[p->numVerts][Z] = thePoint->vertex.z;
-            p->numVerts++;
+		p->verts[p->numVerts][X] = thePoint->vertex.x;
+		p->verts[p->numVerts][Y] = thePoint->vertex.y;
+		p->verts[p->numVerts][Z] = thePoint->vertex.z;
+		p->numVerts++;
 
-            if(p->numVerts >= MAX_VERTS) return -1;
-        }
+		if(p->numVerts >= MAX_VERTS) return -1;
     }
 
-    for(feature=0;feature<s->featureCount;feature++) {
-        if(s->features[feature]->type == FT_FACE) {
-            theFace = s->features[feature]->data;
+	for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
+		theFace = *fi;
 
-            p->faces[p->numFaces].poly = p;
+		p->faces[p->numFaces].poly = p;
 
-            p->faces[p->numFaces].norm[X] = theFace->plane.normal.x;
-            p->faces[p->numFaces].norm[Y] = theFace->plane.normal.y;
-            p->faces[p->numFaces].norm[Z] = theFace->plane.normal.z;
+		p->faces[p->numFaces].norm[X] = theFace->plane.normal.x;
+		p->faces[p->numFaces].norm[Y] = theFace->plane.normal.y;
+		p->faces[p->numFaces].norm[Z] = theFace->plane.normal.z;
 
-            theEdge = theFace->neighbors[0]->data;
-            thePoint = theEdge->neighbors[0]->data;
+		theEdge = theFace->neighbors[0];
+		thePoint = theEdge->neighbors[0];
 
-            p->faces[p->numFaces].w = -slVectorDot(&theFace->plane.normal, &thePoint->vertex);
+		p->faces[p->numFaces].w = -slVectorDot(&theFace->plane.normal, &thePoint->vertex);
 
-            p->faces[p->numFaces].numVerts = 0;
+		p->faces[p->numFaces].numVerts = 0;
 
-            for(edge=0;edge<theFace->edgeCount;edge++) {
-                slPoint *thePoint = theFace->points[edge]->data;
+		for(edge=0;edge<theFace->edgeCount;edge++) {
+			slPoint *thePoint = theFace->points[edge];
 
-                pointNumber = slFindPointNumber(s, thePoint);
+			pointNumber = slFindPointNumber(s, thePoint);
 
-                if(pointNumber == -1) return -1;
+			if(pointNumber == -1) return -1;
 
-                /* add the vertex, increment the vertex counter */
+			/* add the vertex, increment the vertex counter */
 
-                p->faces[p->numFaces].verts[p->faces[p->numFaces].numVerts++] = pointNumber;
+			p->faces[p->numFaces].verts[p->faces[p->numFaces].numVerts++] = pointNumber;
 
-                if(p->faces[p->numFaces].numVerts >= MAX_POLYGON_SZ) return -1;
-            }            
+			if(p->faces[p->numFaces].numVerts >= MAX_POLYGON_SZ) return -1;
+		}            
 
-			/*
-			for(edge=0;edge<theFace->edgeCount;edge++) {
-                printf("face %d edge %d: %d\n", p->numFaces, edge, p->faces[p->numFaces].verts[edge]);
-                printf("X: %f\n", p->verts[p->faces[p->numFaces].verts[edge]][X]);
-                printf("Y: %f\n", p->verts[p->faces[p->numFaces].verts[edge]][Y]);
-                printf("Z: %f\n", p->verts[p->faces[p->numFaces].verts[edge]][Z]);
-			}
-			*/
+		p->numFaces++;
 
-            p->numFaces++;
-
-            if(p->numFaces >= MAX_FACES) return -1;
-        }
-    }
+		if(p->numFaces >= MAX_FACES) return -1;
+	}
 
     return 0;
 }
 
 int slFindPointNumber(slShape *s, slPoint *p) {
-    int n;
+    unsigned int n;
     int number = 0;
 
-    for(n=0;n<s->featureCount;n++) {
-        if(s->features[n]->data == p) return number;
+    for(n=0;n<s->features.size();n++) {
+        if(s->features[n] == p) return number;
         if(s->features[n]->type == FT_POINT) number++;
     }
 
     return -1;
-}
-
-void readPolyhedron(char *name, slMPPolyhedron *p)
-{
-  FILE *fp;
-  int i, j;
-  double dx1, dy1, dz1, dx2, dy2, dz2, nx, ny, nz, len;
-  slMPFace *f;
-
-  
-  if (!(fp = fopen(name, "r"))) {
-    printf("i/o error\n");
-    exit(1);
-  }
-  
-  fscanf(fp, "%d", &p->numVerts);
-  printf("Reading in %d vertices\n", p->numVerts);
-  for (i = 0; i < p->numVerts; i++)
-    fscanf(fp, "%lf %lf %lf", 
-	   &p->verts[i][X], &p->verts[i][Y], &p->verts[i][Z]);
-
-  fscanf(fp, "%d", &p->numFaces);
-  printf("Reading in %d faces\n", p->numFaces);
-  for (i = 0; i < p->numFaces; i++) {
-    f = &p->faces[i];
-    f->poly = p;
-    fscanf(fp, "%d", &f->numVerts);
-    for (j = 0; j < f->numVerts; j++) fscanf(fp, "%d", &f->verts[j]);
-
-    /* compute face normal and offset w from first 3 vertices */
-    dx1 = p->verts[f->verts[1]][X] - p->verts[f->verts[0]][X];
-    dy1 = p->verts[f->verts[1]][Y] - p->verts[f->verts[0]][Y];
-    dz1 = p->verts[f->verts[1]][Z] - p->verts[f->verts[0]][Z];
-    dx2 = p->verts[f->verts[2]][X] - p->verts[f->verts[1]][X];
-    dy2 = p->verts[f->verts[2]][Y] - p->verts[f->verts[1]][Y];
-    dz2 = p->verts[f->verts[2]][Z] - p->verts[f->verts[1]][Z];
-    nx = dy1 * dz2 - dy2 * dz1;
-    ny = dz1 * dx2 - dz2 * dx1;
-    nz = dx1 * dy2 - dx2 * dy1;
-    len = sqrt(nx * nx + ny * ny + nz * nz);
-    f->norm[X] = nx / len;
-    f->norm[Y] = ny / len;
-    f->norm[Z] = nz / len;
-    f->w = - f->norm[X] * p->verts[f->verts[0]][X]
-           - f->norm[Y] * p->verts[f->verts[0]][Y]
-           - f->norm[Z] * p->verts[f->verts[0]][Z];
-
-  }
-
-  fclose(fp);
-
 }
 
 /*

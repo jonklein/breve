@@ -27,6 +27,20 @@ void slWorldApplySpringForces(slWorld *w) {
 	}
 }
 
+double slSpringGetCurrentLength(slSpring *spring) {
+	slVector pos1, pos2, toV1;
+	slPositionVertex(&spring->link1->position, &spring->point1, &pos1);
+	slPositionVertex(&spring->link2->position, &spring->point2, &pos2);
+
+	slVectorSub(&pos1, &pos2, &toV1);
+
+	return slVectorLength(&toV1);
+}
+
+double slSpringGetLength(slSpring *spring) {
+	return spring->length;
+}
+
 /*!
 	\brief Applies the spring forces between two bodies.
 */

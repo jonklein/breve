@@ -100,14 +100,15 @@ void slUtilPause() {
     \brief A stub to break on during debugging.
 */
 
-void slDebug(char *text) {
-    /* this is just a way to catch a common debug point in the debugger */
-    /* we always break on slDebug, so we can put a call there during    */
-    /* errors. */
+void slDebugFunction(char *file, int line, char *text, ...) {
+    va_list vp;   
 
-#ifdef MEMORY_DEBUG
-	slMessage(0, text);
-#endif
+    va_start(vp, text);
+
+	slMessage(0 , text, vp);
+	slMessage(0, "error at line %d of source file \"%s\"\n", line, file);
+
+    va_end(vp);
 }
 
 /*!

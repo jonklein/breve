@@ -65,6 +65,7 @@ struct slCameraText {
 	to front and then finally draw them.
 */
 
+#ifdef __cplusplus
 struct slBillboardEntry {
 	slVector location;
 
@@ -80,6 +81,7 @@ struct slBillboardEntry {
 	float z;
 	float alpha;
 };
+#endif
 
 /*!
 	\brief The camera for the graphical display.
@@ -184,6 +186,9 @@ struct slCamera {
 	void (*activateContextCallback)();
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 slCamera *slNewCamera(int x, int y, int drawMode);
 void slUpdateCamera(slCamera *c);
 
@@ -203,3 +208,6 @@ int slBillboardSortFunc(const void *a, const void *b);
 void slRotateCameraWithMouseMovement(slCamera *c, double dx, double dy, double scamx);
 void slMoveCameraWithMouseMovement(slCamera *c, double dx, double dy);
 void slZoomCameraWithMouseMovement(slCamera *c, double dx, double dy);
+#ifdef __cplusplus
+}
+#endif

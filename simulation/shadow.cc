@@ -21,9 +21,9 @@
 #include "simulation.h"
 
 int slShadowVolumeForShape(slCamera *c, slShape *s, slPosition *p) {
+	std::vector<slEdge*>::iterator ei;
 	slVector light;
 	slVector lNormal;
-	int n;
 
 	if(s->type == ST_SPHERE) return slShadowVolumeForSphere(c, s, p);
 
@@ -34,73 +34,69 @@ int slShadowVolumeForShape(slCamera *c, slShape *s, slPosition *p) {
 
 	glBegin(GL_QUADS);
 
-	for(n=0;n<s->featureCount;n++) {
-		// for each edge we find in the shape...
+	for(ei = s->edges.begin(); ei != s->edges.end(); ei++ ) {
+		slEdge *e = *ei;
+		double d1, d2;
+		slFace *f1, *f2;
+		slVector n1, n2;
+		slVector tv;
 
-		if(s->features[n]->type == FT_EDGE) {
-			double d1, d2;
-			slEdge *e = s->features[n]->data;
-			slFace *f1, *f2;
-			slVector n1, n2;
-			slVector tv;
+		f1 = e->neighbors[2];
+		f2 = e->neighbors[3];
 
-			f1 = e->neighbors[2]->data;
-			f2 = e->neighbors[3]->data;
+		// look at this edge's faces, and calculate the dot product
+		// with the light's vector.
 
-			// look at this edge's faces, and calculate the dot product
-			// with the light's vector.
+		slVectorXform(p->rotation, &f1->plane.normal, &n1);
+		slVectorXform(p->rotation, &f2->plane.normal, &n2);
 
-			slVectorXform(p->rotation, &f1->plane.normal, &n1);
-			slVectorXform(p->rotation, &f2->plane.normal, &n2);
+		d1 = slVectorDot(&n1, &lNormal);
+		d2 = slVectorDot(&n2, &lNormal);
 
-			d1 = slVectorDot(&n1, &lNormal);
-			d2 = slVectorDot(&n2, &lNormal);
+		// are we at a critical edge, in which one face is facing
+		// towards the light, and the other is facing away?
 
-			// are we at a critical edge, in which one face is facing
-			// towards the light, and the other is facing away?
+		if(d1 * d2 < 0.0 || (d1 * d2 == 0.0 && (d1 + d2) > 0.0)) {
+			slVector *v, ts, te, sBottom, eBottom;
+			slFace *topFace;
+			int n;
+			int flip = 0;
 
-			if(d1 * d2 < 0.0 || (d1 * d2 == 0.0 && (d1 + d2) > 0.0)) {
-				slVector *v, ts, te, sBottom, eBottom;
-				slFace *topFace;
-				int n;
-				int flip = 0;
+			if(d1 > 0.0) topFace = f1;
+			else topFace = f2;
 
-				if(d1 > 0.0) topFace = f1;
-				else topFace = f2;
-
-				for(n=0;n<topFace->edgeCount;n++) {
-					if(topFace->neighbors[n]->data == e) {
-						if(e->neighbors[0]->data == topFace->points[n]->data) flip = 1;
-						n = topFace->edgeCount;
-					}
+			for(n=0;n<topFace->edgeCount;n++) {
+				if(topFace->neighbors[n] == e) {
+					if(e->neighbors[0] == topFace->points[n]) flip = 1;
+					n = topFace->edgeCount;
 				}
-
-				if(!flip) {
-					slVector tv;
-
-					v = &((slPoint*)e->neighbors[0]->data)->vertex;
-					slVectorMul(v, 1.01, &tv);
-					slPositionVertex(p, &tv, &ts);
-					v = &((slPoint*)e->neighbors[1]->data)->vertex;
-					slVectorMul(v, 1.01, &tv);
-					slPositionVertex(p, &tv, &te);
-				} else {
-					v = &((slPoint*)e->neighbors[1]->data)->vertex;
-					slVectorMul(v, 1.01, &tv);
-					slPositionVertex(p, &tv, &ts);
-					v = &((slPoint*)e->neighbors[0]->data)->vertex;
-					slVectorMul(v, 1.01, &tv);
-					slPositionVertex(p, &tv, &te);
-				}
-
-				slVectorSub(&ts, &light, &sBottom);
-				slVectorSub(&te, &light, &eBottom);
-
-				glVertex3f(te.x, te.y, te.z);
-				glVertex3f(eBottom.x, eBottom.y, eBottom.z);
-				glVertex3f(sBottom.x, sBottom.y, sBottom.z);
-				glVertex3f(ts.x, ts.y, ts.z);
 			}
+
+			if(!flip) {
+				slVector tv;
+
+				v = &((slPoint*)e->neighbors[0])->vertex;
+				slVectorMul(v, 1.01, &tv);
+				slPositionVertex(p, &tv, &ts);
+				v = &((slPoint*)e->neighbors[1])->vertex;
+				slVectorMul(v, 1.01, &tv);
+				slPositionVertex(p, &tv, &te);
+			} else {
+				v = &((slPoint*)e->neighbors[1])->vertex;
+				slVectorMul(v, 1.01, &tv);
+				slPositionVertex(p, &tv, &ts);
+				v = &((slPoint*)e->neighbors[0])->vertex;
+				slVectorMul(v, 1.01, &tv);
+				slPositionVertex(p, &tv, &te);
+			}
+
+			slVectorSub(&ts, &light, &sBottom);
+			slVectorSub(&te, &light, &eBottom);
+
+			glVertex3f(te.x, te.y, te.z);
+			glVertex3f(eBottom.x, eBottom.y, eBottom.z);
+			glVertex3f(sBottom.x, sBottom.y, sBottom.z);
+			glVertex3f(ts.x, ts.y, ts.z);
 		}
 	}
 

@@ -100,20 +100,20 @@ void slDefaultLighting();
 void slDrawLights(slCamera *c, int noDiff);
 void slShadowMatrix(GLfloat shadowMat[4][4], slPlane *plane, slVector *light);
 
-void slDrawStationary(slWorld *w, slStationary *m, slCamera *c, slVector *color, int texture, int textureScale, int textureMode, float alpha, int mode, int flags);
-inline void slDrawMultibody(slWorld *w, slMultibody *m, slCamera *c, slVector *color, int texture, int textureScale, int billboard, float bbRot, float bbAlpha, int mode, int flags);
-void slDrawShape(slWorld *w, slCamera *c, slShape *s, slPosition *pos, slVector *color, int texture, int textureScale, int tmode, int mode, int flags, float bbRot, float alpha);
+void slDrawStationary(slWorld *w, slStationary *m, slCamera *c, slVector *color, int texture, double textureScale, int textureMode, float alpha, int mode, int flags);
+inline void slDrawMultibody(slWorld *w, slMultibody *m, slCamera *c, slVector *color, int texture, double textureScale, int billboard, float bbRot, float bbAlpha, int mode, int flags);
+void slDrawShape(slWorld *w, slCamera *c, slShape *s, slPosition *pos, slVector *color, int texture, double textureScale, int tmode, int mode, int flags, float bbRot, float alpha);
 
-int slCompileShape(slWorld *w, slShape *s, int drawMode, int texture, int textureScale, int flags);
-void slRenderShape(slWorld *w, slShape *s, int drawMode, int texture, int textureScale, int flags);
+int slCompileShape(slWorld *w, slShape *s, int drawMode, int texture, double textureScale, int flags);
+void slRenderShape(slWorld *w, slShape *s, int drawMode, int texture, double textureScale, int flags);
 void slDrawAxis(double x, double y);
 void slComputeBillboardVectors(slWorld *w, slCamera *c);
 void slRenderBillboards(slWorld *w, slCamera *c, int flags);
 void slProcessBillboard(slWorld *w, slCamera *c, slVector *color, slVector *loc, int bitmap, int mode, float size, float bbAngle, float alpha, unsigned char selected);
-void slDrawFace(slFace *f, int drawMode, int texture, int textureScale, int flags);
+void slDrawFace(slFace *f, int drawMode, int texture, double textureScale, int flags);
 
-int slBreakdownFace(slFace *f, int texture, int textureScale);
-void slBreakdownTriangle(slVector *v, int texture, int textureScale, int level, slVector *xaxis, slVector *yaxis);
+int slBreakdownFace(slFace *f, int texture, double textureScale);
+void slBreakdownTriangle(slVector *v, int texture, double textureScale, int level, slVector *xaxis, slVector *yaxis);
 
 int slGlSelect(slWorld *w, slCamera *c, int x, int y);
 int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y, slVector *dragVector);

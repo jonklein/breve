@@ -31,8 +31,7 @@ void slInitBoundSort(slVclipData *d) {
 	int listSize = d->count * 2;
 	int x, y;
 
-	for(x=0;x<d->maxCandidates;x++) d->collisionCandidates[x] = NULL;
-	d->candidateCount = 0;
+	d->candidates.clear();
 
 	for(x=1;x<d->count;x++) {
 		for(y=0;y<x;y++) {
@@ -62,27 +61,16 @@ void slInitBoundSort(slVclipData *d) {
 */
 
 void slAddCollisionCandidate(slVclipData *vc, slPairEntry *pair) {
-	int location;
-
 	if(!(pair->flags & BT_CHECK)) return;
 
 	if(pair->candidateNumber != -1) {
-		if(vc->collisionCandidates[pair->candidateNumber] == pair) return;
+		if(vc->candidates[pair->candidateNumber] == pair) return;
 
-		slMessage(DEBUG_ALL, "warning: collision candidate mismatch for pair, candidate #%d\n", pair->candidateNumber);	
+		slDebug("vclip candidate inconsistancy -- mismatch for candidate pair %d\n", pair->candidateNumber);	
 	}
 
-	location = vc->candidateCount;
-
-	vc->candidateCount++;
-
-	if(vc->candidateCount >= vc->maxCandidates) {
-		vc->maxCandidates *= 2;
-		vc->collisionCandidates = slRealloc(vc->collisionCandidates, sizeof(slPairEntry*) * vc->maxCandidates);
-	}
-
-	pair->candidateNumber = location;
-	vc->collisionCandidates[location] = pair;
+	pair->candidateNumber = vc->candidates.size();
+	vc->candidates.push_back(pair);
 }
 
 /*! 
@@ -90,15 +78,21 @@ void slAddCollisionCandidate(slVclipData *vc, slPairEntry *pair) {
 */
 
 void slRemoveCollisionCandidate(slVclipData *vc, slPairEntry *pair) {
-	if(pair->candidateNumber != -1) {
-		if(vc->candidateCount > 0) {
-			vc->collisionCandidates[pair->candidateNumber] = vc->collisionCandidates[vc->candidateCount - 1];
-			vc->collisionCandidates[pair->candidateNumber]->candidateNumber = pair->candidateNumber;
-		}
-
-		vc->candidateCount--;
-		pair->candidateNumber = -1;
+	if(pair->candidateNumber < 0) {
+		// slDebug("vclip candidate inconsistancy -- removing missing candidate\n");
+		return;
 	}
+
+	if(vc->candidates.size() < 1) {
+		slDebug("vclip candidate inconsistancy -- removing from empty candidate list\n");
+		return;
+	}
+
+	vc->candidates[pair->candidateNumber] = vc->candidates[vc->candidates.size() - 1];
+	vc->candidates[pair->candidateNumber]->candidateNumber = pair->candidateNumber;
+
+	vc->candidates.pop_back();
+	pair->candidateNumber = -1;
 }
 
 /*!
@@ -113,11 +107,10 @@ void slRemoveCollisionCandidate(slVclipData *vc, slPairEntry *pair) {
 */
 
 int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly) {
-	int x;
 	int result;
 	slCollisionEntry *ce;
-	
 	slPairEntry *pe;
+	std::vector<slPairEntry*>::iterator ci;
 
 	slIsort(d, d->xListPointers, d->count * 2, BT_XAXIS);
 	slIsort(d, d->yListPointers, d->count * 2, BT_YAXIS);
@@ -133,16 +126,16 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 	ce = slNextCollisionEntry(d);
 
 	if(boundingBoxOnly) {
-		for(x=0;x<d->candidateCount;x++) {
-			if(d->collisionCandidates[x]) {
-				pe = d->collisionCandidates[x];
+		for(ci = d->candidates.begin(); ci != d->candidates.end(); ci++ ) {
+			pe = *ci;
 
-				if(d->objects[pe->x] && d->objects[pe->y] && pe->x != pe->y) {
-					ce->n1 = pe->x;
-					ce->n2 = pe->y;
+			if(!pe) slDebug("missing collision candidate!\n");
 
-					ce = slNextCollisionEntry(d);
-				}
+			if(d->objects[pe->x] && d->objects[pe->y] && pe->x != pe->y) {
+				ce->n1 = pe->x;
+				ce->n2 = pe->y;
+
+				ce = slNextCollisionEntry(d);
 			}
 		}
 
@@ -151,21 +144,17 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 		return d->collisionCount;
 	}
 
-	for(x=0;x<d->candidateCount;x++) {
-		if(d->collisionCandidates[x]) {
-			pe = d->collisionCandidates[x];
+	for(ci = d->candidates.begin(); ci != d->candidates.end(); ci++ ) {
+		pe = *ci;
 
-			result = slVclipTestPair(d, pe, ce);
+		result = slVclipTestPair(d, pe, ce);
 
-			// printf("testing pair (%d, %d) [%d]\n", pe->x, pe->y, result);
-
-			if(result == CT_ERROR) return -1;
-			if(result == CT_PENETRATE) ce = slNextCollisionEntry(d);
-		}
+		if(result == CT_ERROR) return -1;
+		if(result == CT_PENETRATE) ce = slNextCollisionEntry(d);
 	}
 
-	/* d->collisionCount is pointing to the next empty collision */
-	/* in other words, 1 + the actual number of collisions */
+	// d->collisionCount is pointing to the next empty collision 
+	// in other words, 1 + the actual number of collisions
 
 	d->collisionCount--;
 
@@ -278,9 +267,8 @@ void slIsort(slVclipData *d, slBoundSort **list, int size, char boundTypeFlag) {
 
 					pe->flags |= boundTypeFlag;
 
-					if(slVclipFlagsShouldTest(pe->flags)) {
-						slAddCollisionCandidate(d, pe);
-					}
+					if(slVclipFlagsShouldTest(pe->flags)) slAddCollisionCandidate(d, pe);
+
 				} else if(list[current]->type == BT_MAX && list[current - 1]->type == BT_MIN && 
 						*(list[current]->value) != *(list[current - 1]->value)) {
 
@@ -333,7 +321,7 @@ void slInitBoundSortList(slBoundSort **list, int size, slVclipData *v, char boun
 	int n, extend;
 	unsigned char *pair;
 	slPairEntry *pe;
-	int x, y, candCount = 0;
+	int x, y;
 	int otherSide;
 
 	int finished;
@@ -355,9 +343,7 @@ void slInitBoundSortList(slBoundSort **list, int size, slVclipData *v, char boun
 		}
 	}
 
-	for(x=0;x<v->candidateCount;x++) if(v->collisionCandidates[x]) candCount++;
-
-	if(candCount != 0) slMessage(DEBUG_ALL, "%d candidates remaining\n", candCount);
+	if(v->candidates.size() != 0) slDebug("%d candidates remaining\n", v->candidates.size());
 	
 	for(n=0;n<size;n++) {
 		if(list[n]->type == BT_MIN) {
@@ -389,9 +375,7 @@ void slInitBoundSortList(slBoundSort **list, int size, slVclipData *v, char boun
 
 						*pair |= boundTypeFlag;
 
-						if(slVclipFlagsShouldTest(*pair)) {
-							slAddCollisionCandidate(v, pe);
-						}
+						if(slVclipFlagsShouldTest(*pair)) slAddCollisionCandidate(v, pe);
 					} 
 				}
 
@@ -442,11 +426,11 @@ int slVclipTestPair(slVclipData *vc, slPairEntry *e, slCollisionEntry *ce) {
 		checker is expecting.
 	*/
 
-	s1 = vc->shapeList[x];
-	s2 = vc->shapeList[y];
+	s1 = vc->shapes[x];
+	s2 = vc->shapes[y];
 
-	p1 = vc->shapePositions[x];
-	p2 = vc->shapePositions[y];
+	p1 = vc->positions[x];
+	p2 = vc->positions[y];
 
 	if(!s1 || !s2) {
 		return slTerrainTestPair(vc->objects[x], vc->objects[y], s1, s2, p1, p2, x, y, ce);
@@ -455,18 +439,18 @@ int slVclipTestPair(slVclipData *vc, slPairEntry *e, slCollisionEntry *ce) {
 	f1 = &e->f1;
 	f2 = &e->f2;
 
-	limit = 2 * ((s1->featureCount * s2->featureCount) + 1);
+	limit = 2 * ((s1->features.size() * s2->features.size()) + 1);
 
 	if(ce) {
 		ce->pointCount = 0;
 	}
 
 	if(s1->type == ST_SPHERE && s2->type == ST_SPHERE) {
-		result = slSphereSphereCheck(vc, s1, p1, s2, p2, x, y, ce);
+		result = slSphereSphereCheck(vc, x, y, ce);
 	} else if(s1->type == ST_SPHERE && s2->type == ST_NORMAL) {
-		result = slSphereShapeCheck(vc, s1, p1, s2, p2, f2, 0, x, y, ce);
+		result = slSphereShapeCheck(vc, f2, 0, x, y, ce);
 	} else if(s1->type == ST_NORMAL && s2->type == ST_SPHERE) {
-		result = slSphereShapeCheck(vc, s2, p2, s1, p1, f1, 1, y, x, ce);
+		result = slSphereShapeCheck(vc, f1, 1, y, x, ce);
 	} else {
 		do {
 			if(iterations == limit) {
@@ -490,9 +474,9 @@ int slVclipTestPair(slVclipData *vc, slPairEntry *e, slCollisionEntry *ce) {
 			} else if(((*f1)->type == FT_EDGE) && ((*f2)->type == FT_EDGE)) {
 				result = slEdgeEdgeClip(f1, p1, s1, f2, p2, s2, ce);
 			} else if(((*f1)->type == FT_EDGE) && ((*f2)->type == FT_FACE)) {
-				result = slEdgeFaceClip(f1, p1, s1, f2, p2, s2, vc, 0, x, y, ce);
+				result = slEdgeFaceClip(f1, f2, vc, 0, x, y, ce);
 			} else if(((*f1)->type == FT_FACE) && ((*f2)->type == FT_EDGE)) {
-				result = slEdgeFaceClip(f2, p2, s2, f1, p1, s1, vc, 1, y, x, ce);
+				result = slEdgeFaceClip(f2, f1, vc, 1, y, x, ce);
 			} else if(((*f1)->type == FT_FACE) && ((*f2)->type == FT_FACE)) {
 				result = slFaceFaceClip(f1, p1, s1, f2, p2, s2, vc, x, y);
 			} else {
@@ -523,11 +507,11 @@ int slVclipTestPair(slVclipData *vc, slPairEntry *e, slCollisionEntry *ce) {
 */
 
 int slVclipTestPairAllFeatures(slVclipData *vc, slPairEntry *e, slCollisionEntry *ce) {
-	int m, n;
 	int result;
 	slPosition *p1, *p2;
 	slShape *s1, *s2;
 	slFeature **f1, **f2, *fp1, *fp2;
+	std::vector<slFeature*>::iterator fi1, fi2;
 
 	int x, y;
 	
@@ -536,19 +520,19 @@ int slVclipTestPairAllFeatures(slVclipData *vc, slPairEntry *e, slCollisionEntry
 
 	if(!vc->objects[x] || !vc->objects[y]) return 0;
 
-	s1 = vc->shapeList[x];
-	s2 = vc->shapeList[y];
+	s1 = vc->shapes[x];
+	s2 = vc->shapes[y];
 
-	p1 = vc->shapePositions[x];
-	p2 = vc->shapePositions[y];
+	p1 = vc->positions[x];
+	p2 = vc->positions[y];
 
 	f1 = &fp1;
 	f2 = &fp2;
 
-	for(n=0;n<s1->featureCount;n++) {
-		for(m=0;m<s2->featureCount;m++) {
-			fp1 = s1->features[n];
-			fp2 = s2->features[m];
+	for(fi1 = s1->features.begin(); fi1 != s1->features.end(); fi1++ ) {
+		for(fi2 = s1->features.begin(); fi2 != s1->features.end(); fi2++ ) {
+			fp1 = *fi1;
+			fp2 = *fi2;
 
 			if(((*f1)->type == FT_POINT) && ((*f2)->type == FT_POINT)) {
 				result = slPointPointClip(f1, p1, s1, f2, p2, s2, ce);
@@ -563,9 +547,9 @@ int slVclipTestPairAllFeatures(slVclipData *vc, slPairEntry *e, slCollisionEntry
 			} else if(((*f1)->type == FT_EDGE) && ((*f2)->type == FT_EDGE)) {
 				result = slEdgeEdgeClip(f1, p1, s1, f2, p2, s2, ce);
 			} else if(((*f1)->type == FT_EDGE) && ((*f2)->type == FT_FACE)) {
-				result = slEdgeFaceClip(f1, p1, s1, f2, p2, s2, vc, 0, x, y, ce);
+				result = slEdgeFaceClip(f1, f2, vc, 0, x, y, ce);
 			} else if(((*f1)->type == FT_FACE) && ((*f2)->type == FT_EDGE)) {
-				result = slEdgeFaceClip(f2, p2, s2, f1, p1, s1, vc, 1, y, x, ce);
+				result = slEdgeFaceClip(f2, f1, vc, 1, y, x, ce);
 			} else if(((*f1)->type == FT_FACE) && ((*f2)->type == FT_FACE)) {
 				/* this is not currently implemented and would only print an error, so skip it */
 
@@ -583,9 +567,14 @@ int slVclipTestPairAllFeatures(slVclipData *vc, slPairEntry *e, slCollisionEntry
 	return CT_DISJOINT;
 }
 
-int slSphereSphereCheck(slVclipData *vc, slShape *s1, slPosition *p1, slShape *s2, slPosition *p2, int x, int y, slCollisionEntry *ce) {
+int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollisionEntry *ce) {
 	slVector diff, tempV1;
 	double totalLen, depth;
+
+	slShape *s1 = vc->shapes[x];
+	slShape *s2 = vc->shapes[y];
+	slPosition *p1 = vc->positions[x];
+	slPosition *p2 = vc->positions[y];
 
 	slVectorSub(&p2->location, &p1->location, &diff);
 
@@ -620,12 +609,12 @@ int slSphereSphereCheck(slVclipData *vc, slShape *s1, slPosition *p1, slShape *s
 	return CT_PENETRATE;
 }
 
-int slSphereShapeCheck(slVclipData *vc, slShape *s1, slPosition *p1, slShape *s2, slPosition *p2, slFeature **feat, int flip, int x, int y, slCollisionEntry *ce) {
-	int n = 0, included, update, minFeature = 0;
+int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y, slCollisionEntry *ce) {
+	unsigned int n = 0;
+	int included, update;
+	slFeature *minFeature = 0;
 
 	slVector vertex, tempV1, spPoint, shPoint, tStart, tEnd;
-
-	slPoint sp;
 
 	slPoint *p, *start, *end;
 	slEdge *e;
@@ -635,14 +624,17 @@ int slSphereShapeCheck(slVclipData *vc, slShape *s1, slPosition *p1, slShape *s2
 
 	slPlane transformedPlane;
 
-	slVectorSet(&sp.vertex, 0, 0, 0);
+	slShape *s1 = vc->shapes[x];
+	slShape *s2 = vc->shapes[y];
+	slPosition *p1 = vc->positions[x];
+	slPosition *p2 = vc->positions[y];
 
 	if(!*feat) *feat = s2->features[0];
 
 	do {
 		switch((*feat)->type) {
 			case FT_FACE:
-				f = (*feat)->data;
+				f = *feat;
 
 				included = slClipPoint(&p1->location, f->voronoi, p2, f->edgeCount, &update, NULL);
 
@@ -694,19 +686,19 @@ int slSphereShapeCheck(slVclipData *vc, slShape *s1, slPosition *p1, slShape *s2
 
 				if(centerDist < minDist) {
 					minDist = centerDist;
-					minFeature = n;
+					minFeature = f;
 				}
 
 				break;
 
 			case FT_EDGE:
-				e = (*feat)->data;
+				e = *feat;
 
 				included = slClipPoint(&p1->location, e->voronoi, p2, 4, &update, NULL);
 
 				if(included) {
-					start = e->neighbors[0]->data;
-					end = e->neighbors[1]->data;
+					start = e->points[0];
+					end = e->points[1];
 
 					slPositionVertex(p2, &start->vertex, &tStart);
 					slPositionVertex(p2, &end->vertex, &tEnd);
@@ -753,7 +745,7 @@ int slSphereShapeCheck(slVclipData *vc, slShape *s1, slPosition *p1, slShape *s2
 				break;
 
 			case FT_POINT:
-				p = (*feat)->data;
+				p = *feat;
 
 				included = slClipPoint(&p1->location, p->voronoi, p2, p->edgeCount, &update, NULL);
 
@@ -801,13 +793,13 @@ int slSphereShapeCheck(slVclipData *vc, slShape *s1, slPosition *p1, slShape *s2
 		}
 
 		n++;
-	} while(n < s2->featureCount);
+	} while(n < s2->features.size());
 
 	// oh crap!  we're inside the sphere.  that's not a metaphor  
 	// or anything like "in the zone", or something--i mean, we're
 	// inside the sphere, or the sphere is inside us.
 
-	f = s2->features[minFeature]->data;
+	f = minFeature;
 
 	slPositionPlane(p2, &f->plane, &transformedPlane);
 
@@ -838,8 +830,8 @@ int slPointPointClip(slFeature **nf1, slPosition *p1p, slShape *s1, slFeature **
 	int update;
 	slVector v1, v2, dist;
    
-	slPoint *p1 = (*nf1)->data;
-	slPoint *p2 = (*nf2)->data;
+	slPoint *p1 = (*nf1);
+	slPoint *p2 = (*nf2);
 
 	slPositionVertex(p1p, &p1->vertex, &v1);
 
@@ -863,7 +855,7 @@ int slPointPointClip(slFeature **nf1, slPosition *p1p, slShape *s1, slFeature **
 	return CT_DISJOINT;
 }
 
-int slEdgeFaceClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf2, slPosition *fp, slShape *s2, slVclipData *v, int pairFlip, int x, int y, slCollisionEntry *ce) {
+int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int pairFlip, int x, int y, slCollisionEntry *ce) {
 	int update1, update2, startEdge, total, included, n;
 	double l1, l2, eD, sD;
 	slVector edgeVector, tempV1, eLambda, sLambda, transEdgeVector, eStart;
@@ -874,16 +866,21 @@ int slEdgeFaceClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf2
 	slFace *f;
 	slEdge *e, *newEdge;
 
+	slPosition *ep = v->positions[x];
+	slPosition *fp = v->positions[y];
+	slShape *s1 = v->shapes[x];
+	slShape *s2 = v->shapes[y];
+
 	double maxIncDist;
 	slFeature *maxIncFeat;
 	double maxDist;
 	slFeature *maxFeat;
    
-	f = (*nf2)->data;
-	e = (*nf1)->data;
+	f = *nf2;
+	e = *nf1;
 
-	start = e->neighbors[0]->data;
-	end = e->neighbors[1]->data;
+	start = e->points[0];
+	end = e->points[1];
 
 	slVectorSub(&start->vertex, &end->vertex, &edgeVector);
 	slVectorXform(ep->rotation, &edgeVector, &transEdgeVector);
@@ -907,6 +904,7 @@ int slEdgeFaceClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf2
 	if(included && (eD <= MC_TOLERANCE || sD <= MC_TOLERANCE) && (sD > MC_TOLERANCE || eD > MC_TOLERANCE)) {
 		slVector theVertex;
 		double dist, maxDist = -DBL_MAX;
+		std::vector<slFace*>::iterator fi;
 
 		if(!ce) return CT_PENETRATE;
 
@@ -920,21 +918,19 @@ int slEdgeFaceClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf2
 			slVectorCopy(&sLambda, &theVertex);
 		}
 
-		/* find the shallowest penetration plane for this point */
+		// find the shallowest penetration plane for this point 
 
-		for(n=0;n<s2->featureCount;n++) {
-			if(s2->features[n]->type == FT_FACE) {
-				slFace *face = s2->features[n]->data;
-				slPlane p;
+		for(fi = s2->faces.begin(); fi != s2->faces.end(); fi++ ) {
+			slFace *face = *fi;
+			slPlane p;
 
-				slPositionPlane(fp, &face->plane, &p);
+			slPositionPlane(fp, &face->plane, &p);
 
-				dist = slPlaneDistance(&p, &theVertex);
+			dist = slPlaneDistance(&p, &theVertex);
 
-				if(dist > maxDist) {
-					maxDist = dist;
-					*nf2 = s2->features[n];
-				}
+			if(dist > maxDist) {
+				maxDist = dist;
+				*nf2 = *fi;
 			}
 		}
 
@@ -970,7 +966,7 @@ int slEdgeFaceClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf2
 
 		/* the transformed beginning of the edge... */
 		
-		slPositionVertex(ep, &((slPoint*)e->neighbors[0]->data)->vertex, &eStart);
+		slPositionVertex(ep, &((slPoint*)e->neighbors[0])->vertex, &eStart);
 
 		slPositionVertex(ep, &start->vertex, &tStart);
 		slPositionVertex(ep, &end->vertex, &tEnd);
@@ -980,8 +976,8 @@ int slEdgeFaceClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf2
 		maxFeat = f->neighbors[0];
 
 		while(total++ < f->edgeCount + 1) {
-			newEdge = f->neighbors[n]->data;
-			start = newEdge->neighbors[0]->data;
+			newEdge = f->neighbors[n];
+			start = newEdge->points[0];
 
 			slPositionVertex(fp, &start->vertex, &tPoint);
 			included = slClipPoint(&tPoint, e->voronoi, ep, 2, &update1, &eD);
@@ -991,12 +987,12 @@ int slEdgeFaceClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf2
 
 				if(eD < maxIncDist) {
 					maxIncDist = eD;
-					maxIncFeat = newEdge->neighbors[0];
+					maxIncFeat = start;
 				}
 			} else {
 				if(eD > maxDist) {
 					maxDist = eD;
-					maxFeat = newEdge->neighbors[0];
+					maxFeat = start;
 				}
 			}
 
@@ -1043,8 +1039,8 @@ int slEdgePointClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf
 
 	slVector tStart, tEnd, tPoint, linePoint;
 
-	slEdge *e = (*nf1)->data;
-	slPoint *p = (*nf2)->data;
+	slEdge *e = (*nf1);
+	slPoint *p = (*nf2);
 
 	slPositionVertex(pp, &p->vertex, &tPoint);
 	
@@ -1055,8 +1051,8 @@ int slEdgePointClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf
 	
 	included = slClipEdge(e, ep, p->voronoi, pp, p->edgeCount, &update1, &update2, &l1, &l2);
 
-	start = e->neighbors[0]->data;
-	end = e->neighbors[1]->data;
+	start = e->points[0];
+	end = e->points[1];
 
 	if(!included) {
 		slVectorSub(&start->vertex, &end->vertex, &edgeVector);
@@ -1120,8 +1116,8 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 
 	slEdge *e1, *e2;
 
-	e1 = (*nf1)->data;
-	e2 = (*nf2)->data;
+	e1 = *nf1;
+	e2 = *nf2;
 
 	/* we clip the voronoi planes two at a time... first the vertex planes, then the slFace planes */
 	
@@ -1133,8 +1129,8 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 			return CT_CONTINUE;
 		}
 		
-		start = e2->neighbors[0]->data;
-		end = e2->neighbors[1]->data;
+		start = e2->points[0];
+		end = e2->points[1];
 		
 		slVectorSub(&start->vertex, &end->vertex, &edgeVector);
 		slVectorXform(p2->rotation, &edgeVector, &transEdgeVector);
@@ -1146,7 +1142,7 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 			slVectorAdd(&end->vertex, &eLambda, &tempV1);
 			slPositionVertex(p2, &tempV1, &eLambda);
 
-			slPositionVertex(p1, &((slPoint*)neighbor->data)->vertex, &transPoint);
+			slPositionVertex(p1, &((slPoint*)neighbor)->vertex, &transPoint);
 			slVectorSub(&eLambda, &transPoint, &eLambda);
 
 			if(slVectorDot(&transEdgeVector, &eLambda) > 0) {
@@ -1164,7 +1160,7 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 			slVectorAdd(&end->vertex, &eLambda, &tempV1);
 			slPositionVertex(p2, &tempV1, &eLambda);
 
-			slPositionVertex(p1, &((slPoint*)neighbor->data)->vertex, &transPoint);
+			slPositionVertex(p1, &((slPoint*)neighbor)->vertex, &transPoint);
 			slVectorSub(&eLambda, &transPoint, &eLambda);
 
 			if(slVectorDot(&transEdgeVector, &eLambda) < 0) {
@@ -1182,14 +1178,14 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 			return CT_CONTINUE;
 		}
 		
-		start = e2->neighbors[0]->data;
-		end = e2->neighbors[1]->data;
+		start = e2->points[0];
+		end = e2->points[1];
 
 		slVectorSub(&start->vertex, &end->vertex, &edgeVector);
 		slVectorXform(p2->rotation, &edgeVector, &transEdgeVector);
 
 		if(update2 != -1) {
-			neighborFace = ((slFace*)e1->neighbors[update2 + 2]->data);
+			neighborFace = ((slFace*)e1->neighbors[update2 + 2]);
 		
 			slVectorMul(&edgeVector, l2, &eLambda);
 			slVectorAdd(&end->vertex, &eLambda, &tempV1);
@@ -1204,7 +1200,7 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 		}		
 
 		if(update1 != -1) {
-			neighborFace = ((slFace*)e1->neighbors[update1 + 2]->data);
+			neighborFace = ((slFace*)e1->neighbors[update1 + 2]);
 		
 			slVectorMul(&edgeVector, l1, &eLambda);
 			slVectorAdd(&end->vertex, &eLambda, &tempV1);
@@ -1228,8 +1224,8 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 			return CT_CONTINUE;
 		}
  
-		start = e1->neighbors[0]->data;
-		end = e1->neighbors[1]->data;
+		start = e1->points[0];
+		end = e1->points[1];
 
 		slVectorSub(&start->vertex, &end->vertex, &edgeVector);
 		slVectorXform(p1->rotation, &edgeVector, &transEdgeVector);
@@ -1241,7 +1237,7 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 			slVectorAdd(&end->vertex, &eLambda, &tempV1);
 			slPositionVertex(p1, &tempV1, &eLambda);
 
-			slPositionVertex(p2, &((slPoint*)neighbor->data)->vertex, &transPoint);
+			slPositionVertex(p2, &((slPoint*)neighbor)->vertex, &transPoint);
 			slVectorSub(&eLambda, &transPoint, &eLambda);
 
 			if(slVectorDot(&transEdgeVector, &eLambda) > 0) {
@@ -1257,7 +1253,7 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 			slVectorAdd(&end->vertex, &eLambda, &tempV1);
 			slPositionVertex(p1, &tempV1, &eLambda);
 
-			slPositionVertex(p2, &((slPoint*)neighbor->data)->vertex, &transPoint);
+			slPositionVertex(p2, &((slPoint*)neighbor)->vertex, &transPoint);
 			slVectorSub(&eLambda, &transPoint, &eLambda);
 
 			if(slVectorDot(&transEdgeVector, &eLambda) < 0) {
@@ -1275,14 +1271,14 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 			return CT_CONTINUE;
 		}
  
-		start = e1->neighbors[0]->data;
-		end = e1->neighbors[1]->data;
+		start = e1->points[0];
+		end = e1->points[1];
 		
 		slVectorSub(&start->vertex, &end->vertex, &edgeVector);
 		slVectorXform(p1->rotation, &edgeVector, &transEdgeVector);
 
 		if(update2 != -1) {
-			neighborFace = ((slFace*)e2->neighbors[update2 + 2]->data);
+			neighborFace = ((slFace*)e2->neighbors[update2 + 2]);
 		
 			slVectorMul(&edgeVector, l2, &eLambda);
 			slVectorAdd(&end->vertex, &eLambda, &tempV1);
@@ -1297,7 +1293,7 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 		}		
 
 		if(update1 != -1) {
-			neighborFace = ((slFace*)e2->neighbors[update1 + 2]->data);
+			neighborFace = ((slFace*)e2->neighbors[update1 + 2]);
 		
 			slVectorMul(&edgeVector, l1, &eLambda);
 			slVectorAdd(&end->vertex, &eLambda, &tempV1);
@@ -1328,8 +1324,10 @@ int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf
 	slFace *newFace;
 	slPlane transformedPlane;
 
-	slFace *f = (*nf2)->data;
-	slPoint *p = (*nf1)->data;
+	slFace *f = *nf2;
+	slPoint *p = *nf1;
+
+	std::vector<slFace*>::iterator fi;
 	
 	slPositionVertex(pp, &p->vertex, &tPoint);
 
@@ -1343,15 +1341,15 @@ int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf
 	sD = slPlaneDistance(&transformedPlane, &tPoint);
 	asD = fabs(sD);
 
-	/* go through each of this points edges, checking to see if the other */
-	/* end of any of the edges is closer to the plane... */
+	// go through each of this points edges, checking to see if the other 
+	// end of any of the edges is closer to the plane... 
 
 	for(n=0;n<p->edgeCount;n++) {
-		endPoint = ((slEdge*)p->neighbors[n]->data)->neighbors[0]->data;
+		endPoint = p->neighbors[n]->neighbors[0];
 
 		/* we may have gotten the end we already have */
 
-		if(endPoint == p) endPoint = (((slEdge*)p->neighbors[n]->data)->neighbors[1])->data;
+		if(endPoint == p) endPoint = p->neighbors[n]->neighbors[1];
 		
 		slPositionVertex(pp, &endPoint->vertex, &tEnd);
 
@@ -1381,23 +1379,21 @@ int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf
 	/* i think the original code i had is backwards--we want to be	*/
 	/* finding the minimum above zero, not the max					*/
 
-	/* for the love of god, check this code!!! */
+	// for the love of god, check this code!!! 
 
 	max = -DBL_MAX;
 
-	for(n=0;n<fs->featureCount;n++) {
-		if(fs->features[n]->type == FT_FACE) {
-			newFace = fs->features[n]->data;
+	for(fi = fs->faces.begin(); fi != fs->faces.end(); fi++ ) {
+		newFace = *fi;
 
-			slPositionPlane(fp, &newFace->plane, &transformedPlane); 
+		slPositionPlane(fp, &newFace->plane, &transformedPlane); 
 
-			sD = slPlaneDistance(&transformedPlane, &tPoint);
+		sD = slPlaneDistance(&transformedPlane, &tPoint);
 
-			if(sD > max) {
-				maxFeature = n;
-				max = sD;
-			} 
-		}
+		if(sD > max) {
+			maxFeature = n;
+			max = sD;
+		} 
 	}
 
 	/* we'll end up here if there's nothing above zero */
@@ -1521,8 +1517,8 @@ int slClipEdge(slEdge *e, slPosition *ep, slPlane *voronoi, slPosition *vp, int 
 	slVector transformedStart, transformedEnd;
 	slPoint *start, *end;
 	
-	start = e->neighbors[0]->data;
-	end = e->neighbors[1]->data;
+	start = e->points[0];
+	end = e->points[1];
 
 	slPositionVertex(ep, &start->vertex, &transformedStart);
 	slPositionVertex(ep, &end->vertex, &transformedEnd);
@@ -1621,7 +1617,8 @@ int slClipEdgePoints(slVector *transformedStart, slVector *transformedEnd, slPla
 
 void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape *s2, slPosition *p2, slFeature **f2p) {
 	int count1, count2, x, y;
-	slFeature *f1, *f2, **faces1, **faces2;
+	slFeature *f1, *f2;
+	slFace **faces1, **faces2;
 	double best2depth = -DBL_MAX, best1depth = -DBL_MAX;
 	slFace *face1, *face2;
 	slPlane plane1, plane2;
@@ -1632,60 +1629,58 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 	// for each feature, get a pointer to the faces to check and the number of faces 
 
 	if(f1->type == FT_POINT) {
-		count1 = ((slPoint*)f1->data)->edgeCount;
-		faces1 = ((slPoint*)f1->data)->faces;
+		count1 = ((slPoint*)f1)->edgeCount;
+		faces1 = ((slPoint*)f1)->faces;
 	} else if(f1->type == FT_EDGE) {
 		count1 = 2;
-		faces1 = &((slEdge*)f1->data)->neighbors[2];
+		faces1 = &((slEdge*)f1)->neighbors[2];
 	} else {
-		count1 = ((slFace*)f1->data)->edgeCount + 1;
-		faces1 = ((slFace*)f1->data)->faces;
+		count1 = ((slFace*)f1)->edgeCount + 1;
+		faces1 = ((slFace*)f1)->faces;
 	}
 
 	if(f2->type == FT_POINT) {
-		count2 = ((slPoint*)f2->data)->edgeCount;
-		faces2 = ((slPoint*)f2->data)->faces;
+		count2 = ((slPoint*)f2)->edgeCount;
+		faces2 = ((slPoint*)f2)->faces;
 	} else if(f2->type == FT_EDGE) {
 		count2 = 2;
-		faces2 = &((slEdge*)f2->data)->neighbors[2];
+		faces2 = &((slEdge*)f2)->neighbors[2];
 	} else {
-		count2 = ((slFace*)f2->data)->edgeCount + 1;
-		faces2 = ((slFace*)f2->data)->faces;
+		count2 = ((slFace*)f2)->edgeCount + 1;
+		faces2 = ((slFace*)f2)->faces;
 	}
 
 	for(x=0;x<count1;x++) {
 		double d1, d2;
 
-		face1 = faces1[x]->data;
+		face1 = faces1[x];
 		slPositionPlane(p1, &face1->plane, &plane1);
 
 		d1 = slPlaneDistance(&plane1, &p2->location);
 
 		if(d1 > 0.0) {
 			for(y=0;y<count2;y++) {
-				face2 = faces2[y]->data;
+				face2 = faces2[y];
 				slPositionPlane(p2, &face2->plane, &plane2);
 
 				d2 = slPlaneDistance(&plane2, &p1->location);
 
 				if(d2 > 0.0) {
-					int f;
 					slPoint *point;
 					slVector tv;
 					double dist;
 					double p1depths = 0, p2depths = 0;
 					int pC = 0;
+					std::vector<slPoint*>::iterator pi;
 
-					for(f=s1->firstPoint;f<s1->featureCount;f++) {
-						if(s1->features[f]->type == FT_POINT) {
-							point = s1->features[f]->data;
-							slPositionVertex(p1, &point->vertex, &tv);
-							dist = slPlaneDistance(&plane2, &tv);
+					for(pi = s1->points.begin(); pi != s1->points.end(); pi++ ) {
+						point = *pi;
+						slPositionVertex(p1, &point->vertex, &tv);
+						dist = slPlaneDistance(&plane2, &tv);
 
-							if(dist < 0.0) {
-								pC++;
-								p2depths += dist;
-							}
+						if(dist < 0.0) {
+							pC++;
+							p2depths += dist;
 						}
 					}
 
@@ -1700,16 +1695,14 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 
 					pC = 0;
 
-					for(f=s2->firstPoint;f<s2->featureCount;f++) {
-						if(s2->features[f]->type == FT_POINT) {
-							point = s2->features[f]->data;
-							slPositionVertex(p2, &point->vertex, &tv);
-							dist = slPlaneDistance(&plane1, &tv);
+					for(pi = s1->points.begin(); pi != s1->points.end(); pi++ ) {
+						point = *pi;
+						slPositionVertex(p2, &point->vertex, &tv);
+						dist = slPlaneDistance(&plane1, &tv);
 
-							if(dist < 0.0) {
-								pC++;
-								p1depths += dist;
-							}
+						if(dist < 0.0) {
+							pC++;
+							p1depths += dist;
 						}
 					}
 
@@ -1732,27 +1725,25 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 	if((*f1p)->type == FT_FACE && (*f2p)->type == FT_FACE) return;
 
 	for(x=0;x<count1;x++) {
-		face1 = faces1[x]->data;
+		face1 = faces1[x];
 		slPositionPlane(p1, &face1->plane, &plane1);
 
 		for(y=0;y<count2;y++) {
-			int f;
 			slPoint *point;
 			slVector tv;
 			double dist;
 			double p1depths = 0, p2depths = 0;
+			std::vector<slPoint*>::iterator pi;
 
-			face2 = faces2[y]->data;
+			face2 = faces2[y];
 			slPositionPlane(p2, &face2->plane, &plane2);
 
-			for(f=s1->firstPoint;f<s1->featureCount;f++) {
-				if(s1->features[f]->type == FT_POINT) {
-					point = s1->features[f]->data;
-					slPositionVertex(p1, &point->vertex, &tv);
-					dist = slPlaneDistance(&plane2, &tv);
+			for(pi = s1->points.begin(); pi != s1->points.end(); pi++ ) {
+				point = *pi;
+				slPositionVertex(p1, &point->vertex, &tv);
+				dist = slPlaneDistance(&plane2, &tv);
 
-					if(dist < 0.0) p2depths += dist;
-				}
+				if(dist < 0.0) p2depths += dist;
 			}
 
 			if(p2depths < 0.0 && p2depths > best2depth) {
@@ -1762,14 +1753,12 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 				// slVectorPrint(&plane2.normal);
 			}
 
-			for(f=s2->firstPoint;f<s2->featureCount;f++) {
-				if(s2->features[f]->type == FT_POINT) {
-					point = s2->features[f]->data;
-					slPositionVertex(p2, &point->vertex, &tv);
-					dist = slPlaneDistance(&plane1, &tv);
+			for(pi = s1->points.begin(); pi != s1->points.end(); pi++ ) {
+				point = *pi;
+				slPositionVertex(p2, &point->vertex, &tv);
+				dist = slPlaneDistance(&plane1, &tv);
 
-					if(dist < 0.0) p1depths += dist;
-				}
+				if(dist < 0.0) p1depths += dist;
 			}
 
 			if(p1depths < 0.0 && p1depths > best1depth) {
@@ -1816,8 +1805,8 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
         return -1;
     }
 
-	face1 = f1->data;
-	face2 = f2->data;
+	face1 = f1;
+	face2 = f2;
 
 	slPositionPlane(p1, &face1->plane, &plane1);
 	slPositionPlane(p2, &face2->plane, &plane2);
@@ -1825,17 +1814,17 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 	maxDepth = -fabs(slVectorDot(&face2->plane.normal, &face2->plane.vertex));
 
 	for(n=0;n<face1->edgeCount;n++) {
-		theEdge = face1->neighbors[n]->data;
+		theEdge = face1->neighbors[n];
 		included = slClipEdge(theEdge, p1, face2->voronoi, p2, face2->edgeCount, &update1, &update2, &l1, &l2);
 
 		/* if either side of the edge is included, *and* that side has the point */
 		/* matching the current point number (so that we don't do repeats), then */
 		/* it gets tested. */
 
-		if(update1 == -1 && theEdge->neighbors[0] == face1->points[n]) {
-			thePoint = theEdge->neighbors[0]->data;
-		} else if(update2 == -1 && theEdge->neighbors[1] == face1->points[n]) {
-			thePoint = theEdge->neighbors[1]->data;
+		if(update1 == -1 && theEdge->points[0] == face1->points[n]) {
+			thePoint = theEdge->points[0];
+		} else if(update2 == -1 && theEdge->points[1] == face1->points[n]) {
+			thePoint = theEdge->points[1];
 		} else {
 			thePoint = NULL;
 		}
@@ -1862,8 +1851,8 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 		}
 
 		if(included && update1 != -1) {
-			front = &((slPoint*)theEdge->neighbors[0]->data)->vertex;
-			back = &((slPoint*)theEdge->neighbors[1]->data)->vertex;
+			front = &((slPoint*)theEdge->neighbors[0])->vertex;
+			back = &((slPoint*)theEdge->neighbors[1])->vertex;
 
 			/* there is a point on one end of this edge which enters the suspect plane */
 
@@ -1889,8 +1878,8 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 		}
 
 		if(included && update2 != -1) {
-			front = &((slPoint*)theEdge->neighbors[0]->data)->vertex;
-			back = &((slPoint*)theEdge->neighbors[1]->data)->vertex;
+			front = &((slPoint*)theEdge->neighbors[0])->vertex;
+			back = &((slPoint*)theEdge->neighbors[1])->vertex;
 
 			/* there is a point on the other end of this edge which enters the suspect plane */
 
@@ -1919,7 +1908,7 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 	/* for face2, it's a bit easier--we're only interested in the vertices */
 
 	for(n=0;n<face2->edgeCount;n++) {
-		thePoint = face2->points[n]->data;
+		thePoint = face2->points[n];
 		slPositionVertex(p2, &thePoint->vertex, &point);
 
 		distance = slPlaneDistance(&plane1, &point);
@@ -2039,19 +2028,18 @@ int slCollidingFaceForPoint(slVector *p, slShape *shape, slPosition *pos) {
 	slPlane plane;
 	double dist, bestDist = -DBL_MAX;
 	int bestFeature = -1;
+	std::vector<slFace*>::iterator fi;
 
-	for(n=0;n<shape->featureCount;n++) {
-		if(shape->features[n]->type == FT_FACE) {
-			face = shape->features[n]->data;
+	for(fi = shape->faces.begin(); fi != shape->faces.end(); fi++ ) {
+		face = *fi;
 
-			slPositionPlane(pos, &face->plane, &plane);
+		slPositionPlane(pos, &face->plane, &plane);
 
-			dist = slPlaneDistance(&plane, p);
+		dist = slPlaneDistance(&plane, p);
 
-			if(dist <= MC_TOLERANCE && dist > bestDist) {
-				bestDist = dist;
-				bestFeature = n;
-			}
+		if(dist <= MC_TOLERANCE && dist > bestDist) {
+			bestDist = dist;
+			bestFeature = n;
 		}
 	}
 

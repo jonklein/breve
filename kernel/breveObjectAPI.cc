@@ -424,7 +424,7 @@ void brObjectFree(brObject *o) {
 	for(n=0;n<o->collisionHandlers->count;n++) {
 		brCollisionHandler *h = o->collisionHandlers->data[n];
 
-		brMethodFree(h->method);
+		if(h->method) brMethodFree(h->method);
 		slFree(h);
 	}
 

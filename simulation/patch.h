@@ -46,8 +46,8 @@ struct slPatchGrid {
 
 typedef struct slPatchGrid slPatchGrid;
 
-slPatchGrid *slNewPatchGrid(slVector *center, slVector *size, int x, int y, int z);
-void slFreePatchGrid(slPatchGrid *g);
+slPatchGrid *slPatchGridNew(slVector *center, slVector *size, int x, int y, int z);
+void slPatchGridFree(slPatchGrid *g);
 void slInitPatch(slPatch *p);
 void slPatchSetData(slPatch *p, void *data);
 

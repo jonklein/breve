@@ -62,11 +62,6 @@ slWorld *slWorldNew() {
 
 	w->initialized = 0;
 
-	w->cameras = slStackNew();
-
-	w->patchGridObjects = slStackNew();
-	w->springObjects = slStackNew();
-
 	w->age = 0.0;
 
 	w->detectCollisions = 1;
@@ -143,18 +138,17 @@ int slWorldStartNetsimSlave(slWorld *w, char *host) {
 */
 
 void slWorldFree(slWorld *w) {
-	int n;
 	std::vector<slWorldObject*>::iterator wi;
+	std::vector<slPatchGrid*>::iterator pi;
 
 	for( wi = w->objects.begin(); wi != w->objects.end(); wi++ ) 
 		slWorldFreeObject( *wi );
 
-	for(n=0;n<w->patchGridObjects->count;n++) slFreePatchGrid(w->patchGridObjects->data[n]);
+	for( pi = w->patches.begin(); pi != w->patches.end(); pi++ ) 
+		slPatchGridFree( *pi );
 
 	if(w->clipData) slFreeClipData(w->clipData);
 	if(w->proximityData) slFreeClipData(w->proximityData);
-	if(w->patchGridObjects) slStackFree(w->patchGridObjects);
-	if(w->cameras) slStackFree(w->cameras);
 
 	dWorldDestroy(w->odeWorldID);
 	dJointGroupDestroy(w->odeCollisionGroupID);
@@ -174,7 +168,7 @@ void slWorldFree(slWorld *w) {
 */
 
 void slWorldAddCamera(slWorld *w, slCamera *camera) {
-	slStackPush(w->cameras, camera);
+	w->cameras.push_back(camera);
 }
 
 /*!
@@ -182,7 +176,11 @@ void slWorldAddCamera(slWorld *w, slCamera *camera) {
 */
 
 void slWorldRemoveCamera(slWorld *w, slCamera *camera) {
-	slStackRemove(w->cameras, camera);
+	std::vector<slCamera*>::iterator ci;
+
+	ci = std::find(w->cameras.begin(), w->cameras.end(), camera);
+
+	w->cameras.erase(ci);
 }
 
 /*!
@@ -190,12 +188,10 @@ void slWorldRemoveCamera(slWorld *w, slCamera *camera) {
 */
 
 void slRenderWorldCameras(slWorld *w) {
-	int n;
+	std::vector<slCamera*>::iterator ci;
 
-	for(n=0;n<w->cameras->count;n++) {
-		slCamera *c = w->cameras->data[n];
-		slDrawWorld(w, c, 0, GL_RENDER, 0, 1);
-	}
+	for(ci = w->cameras.begin(); ci != w->cameras.end(); ci++)
+		slDrawWorld(w, *ci, 0, GL_RENDER, 0, 1);
 }
 
 /*!
@@ -211,15 +207,15 @@ void slWorldFreeObject(slWorldObject *o) {
 	switch(o->type) {
 		case WO_STATIONARY:
 			if(o->data) {
-				slFreeShape(((slStationary*)o->data)->shape);
-				slFree(o->data);
+				slShapeFree(((slStationary*)o->data)->shape);
+				delete o->data;
 			}
 			break;
 		case WO_LINK:
 			if(o->data) slLinkFree(o->data);
 			break;
 		case WO_TERRAIN:
-			if(o->data) slFreeTerrain(o->data);
+			if(o->data) slTerrainFree(o->data);
 			break;
 		default:
 			slMessage(DEBUG_ALL, "slWorldFreeObject called with unknown object type [%d]: %p\n", o->type, o);
@@ -259,12 +255,10 @@ slWorldObject *slWorldAddObject(slWorld *w, void *p, int type) {
 	return no;
 }
 
-slPatchGrid *slAddPatchGrid(slWorld *w, slVector *center, slVector *patchSize, int x, int y, int z) {
-	slPatchGrid *g = slNewPatchGrid(center, patchSize, x, y, z);
+slPatchGrid *slPatchGridAdd(slWorld *w, slVector *center, slVector *patchSize, int x, int y, int z) {
+	slPatchGrid *g = slPatchGridNew(center, patchSize, x, y, z);
 
-	// not used yet.
-
-	slStackPush(w->patchGridObjects, g);
+	w->patches.push_back(g);
 
 	return g;
 }
@@ -353,7 +347,7 @@ slStationary *slNewStationary(slShape *s, slVector *loc, double rot[3][3]) {
 
 	s->referenceCount++;
  
-	so = slMalloc(sizeof(slStationary));
+	so = new slStationary;
 
 	so->shape = s;
 	slVectorCopy(loc, &so->position.location);
@@ -404,7 +398,7 @@ double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 
 #ifdef HAVE_LIBENET
 	if(w->netsimData.server && w->netsimData.isMaster && (int)w->age >= lastSecond) {
-		lastSecond = w->age + 1;
+		lastSecond = (int)w->age + 1;
 
 		slNetsimBroadcastSyncMessage(w->netsimData.server, w->age);
 	}
@@ -435,7 +429,8 @@ double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 */
 
 double slWorldStep(slWorld *w, double stepSize, int *error) {
-	int n, result, simulated = 0;
+	unsigned int n, simulated = 0;
+	int result;
 
 	n = 0;
 
@@ -594,12 +589,13 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 }
 
 void slNeighborCheck(slWorld *w) {
-	int n;
+	unsigned int n;
 	double dist;
 	slVector *location, diff, *l1 = NULL, *l2 = NULL;
 	slStationary *st;
 	slPairEntry *pe;
 	slWorldObject *o1, *o2;
+	std::vector<slPairEntry*>::iterator ci;
 
 	if(!w->initialized) slVclipDataInit(w);
 
@@ -642,8 +638,9 @@ void slNeighborCheck(slWorld *w) {
 
 	slVclip(w->proximityData, 0.0, 1, 0);
 
-	for(n=0;n<w->proximityData->candidateCount;n++) {
-		pe = w->proximityData->collisionCandidates[n];
+	for(ci = w->proximityData->candidates.begin(); 
+		ci != w->proximityData->candidates.end(); ci++) {
+		pe = *ci;
 
 		if(pe) {
 			o1 = w->objects[pe->x];
@@ -699,7 +696,7 @@ slObjectLine *slWorldAddObjectLine(slWorldObject *src, slWorldObject *dst, int s
 		return line;
 	}
 
-	line = slMalloc(sizeof(slObjectLine));
+	line = new slObjectLine;
 
 	line->stipple = stipple;
 	line->destination = dst;
@@ -723,7 +720,7 @@ int slRemoveObjectLine(slWorldObject *src, slWorldObject *dst) {
 			src->outLines = slListRemoveData(src->outLines, line);
 			dst->inLines = slListRemoveData(dst->inLines, src);
 
-			slFree(line);
+			delete line;
 
 			return 0;
 		}
@@ -753,7 +750,7 @@ int slRemoveAllObjectLines(slWorldObject *src) {
 		src->outLines = slListRemoveData(src->outLines, line);
 		dst->inLines = slListRemoveData(dst->inLines, src);
 
-		slFree(line);
+		delete line;
 
 		duplicate = duplicate->next;
 	}
@@ -842,8 +839,7 @@ void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*), int (*
 	w->collisionCheckCallback = check;
 }
 
-slWorldObject *slWorldGetObject(slWorld *w, int n) {
+slWorldObject *slWorldGetObject(slWorld *w, unsigned int n) {
 	if(n > w->objects.size()) return NULL;
 	return w->objects[n];
 }
-

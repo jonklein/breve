@@ -23,26 +23,15 @@
 slShape *slNewShape() {
 	slShape *s;
 
-	s = slMalloc(sizeof(slShape));
-	s->featureCount = 0;
+	s = new slShape;
 	s->drawList = 0;
 	s->type = ST_NORMAL;
 
 	s->referenceCount = 1;
 
-	s->maxFeatures = 8;
-	s->features = slMalloc(s->maxFeatures * sizeof(slFeature*)); 
-
 	slVectorSet(&s->max, 0, 0, 0);
 
 	return s;
-}
-
-void slNextFeature(slShape *s) {
-	if(s->featureCount == s->maxFeatures) {
-		s->maxFeatures *= 2;
-		s->features = slRealloc(s->features, s->maxFeatures * sizeof(slFeature*)); 
-	}
 }
 
 slShape *slNewSphere(double radius, double mass) {
@@ -70,7 +59,7 @@ slShape *slNewCube(slVector *size, double density) {
 	s = slNewShape();
 
 	if(!slSetCube(s, size, density)) {
-		slFreeShape(s);
+		slShapeFree(s);
 		return NULL;
 	}
 
@@ -83,7 +72,7 @@ slShape *slNewNGonDisc(int count, double radius, double height, double density) 
 	s = slNewShape();
 
 	if(!slSetNGonDisc(s, count, radius, height, density)) {
-		slFreeShape(s);
+		slShapeFree(s);
 		return NULL;
 	}
 
@@ -96,7 +85,7 @@ slShape *slNewNGonCone(int count, double radius, double height, double density) 
 	s = slNewShape();
 
 	if(!slSetNGonCone(s, count, radius, height, density)) {
-		slFreeShape(s);
+		slShapeFree(s);
 		return NULL;
 	}
 
@@ -107,172 +96,137 @@ slShape *slNewNGonCone(int count, double radius, double height, double density) 
 	\brief Decrement a shapes reference count, freeing if the count reaches 0.
 */
 
-void slFreeShape(slShape *s) {
-	int n;
+void slShapeFree(slShape *s) {
+	unsigned int n;
 
 	if(--s->referenceCount) return;
 
-	for(n=0;n<s->featureCount;n++) slFreeFeature(s->features[n]);
+	for(n=0;n<s->features.size();n++) delete s->features[n];
 
 	if(s->drawList) glDeleteLists(s->drawList, 1);
 
-	slFree(s->features);
-
-	slFree(s);
+	delete s;
 }
 
 slShape *slInitNeighbors(slShape *s, double density) {
-	int n, m, o, faceCount;
+	int m, o, faceCount;
 	slPoint *p, *start, *end;
 	slEdge *e;
-	slFeature *f;
 	slFace *face;
 	slVector normal;
 	int edges = 0, en;
+	std::vector<slEdge*>::iterator ei;
+	std::vector<slPoint*>::iterator pi;
+	std::vector<slFace*>::iterator fi;
 
 	s->density = density;
 
-	for(n=0;n<s->featureCount;n++) {
-		if(s->features[n]->type == FT_POINT) {
-			p = s->features[n]->data;
+	for(pi = s->points.begin(); pi != s->points.end(); pi++ ) {
+		p = *pi;
 
-			p->neighbors = slMalloc(sizeof(slFeature*) * p->edgeCount);
-			p->faces = slMalloc(sizeof(slFeature*) * p->edgeCount);
-			p->voronoi = slMalloc(sizeof(slPlane) * p->edgeCount);
+		p->neighbors = new slEdge*[p->edgeCount];
+		p->faces = new slFace*[p->edgeCount];
+		p->voronoi = new slPlane[p->edgeCount];
 
-			if(!p->neighbors) {
-				slFreeShape(s);
-				return NULL;
-			}
+		// now check to see if it's a maximum for the shape 
 
-			/* now check to see if it's a maximum for the shape */
+		if(p->vertex.x > s->max.x) s->max.x = p->vertex.x;
+		if(p->vertex.y > s->max.y) s->max.y = p->vertex.y;
+		if(p->vertex.z > s->max.z) s->max.z = p->vertex.z;
 
-			if(p->vertex.x > s->max.x) s->max.x = p->vertex.x;
-			if(p->vertex.y > s->max.y) s->max.y = p->vertex.y;
-			if(p->vertex.z > s->max.z) s->max.z = p->vertex.z;
-
-			/* reset edgeCount to 0 so it can act as a counter as the 
-			   actual edges are added below */
-		
-			p->edgeCount = 0;
-		}
+		// reset edgeCount to 0 so it can act as a counter 
+		// as the actual edges are added below
+	
+		p->edgeCount = 0;
 	}
 
 	/* for each edge, add the edge as a neighbor to the point on each side */
 
-	for(n=0;n<s->featureCount;n++) {
-		if(s->features[n]->type == FT_EDGE) {
-			f = s->features[n];
-			e = f->data;
+	for(ei = s->edges.begin(); ei != s->edges.end(); ei++ ) {
+		e = *ei;
 			
-			/* left point... */			
-			
-			start = e->neighbors[0]->data;
-			end = e->neighbors[1]->data;
-			
-			start->neighbors[start->edgeCount] = f;
-			end->neighbors[end->edgeCount] = f;
+		// left point... 
+		
+		start = e->points[0];
+		end = e->points[1];
+		
+		start->neighbors[start->edgeCount] = e;
+		end->neighbors[end->edgeCount] = e;
 
-			slVectorSub(&start->vertex, &end->vertex, &normal);
-			slVectorNormalize(&normal);
-			slSetPlane(&start->voronoi[start->edgeCount], &normal, &start->vertex);
-			
-			slVectorSub(&end->vertex, &start->vertex, &normal);
-			slVectorNormalize(&normal);
-			slSetPlane(&end->voronoi[end->edgeCount], &normal, &end->vertex);
-			
-			start->edgeCount++;
-			end->edgeCount++;
+		slVectorSub(&start->vertex, &end->vertex, &normal);
+		slVectorNormalize(&normal);
+		slSetPlane(&start->voronoi[start->edgeCount], &normal, &start->vertex);
+		
+		slVectorSub(&end->vertex, &start->vertex, &normal);
+		slVectorNormalize(&normal);
+		slSetPlane(&end->voronoi[end->edgeCount], &normal, &end->vertex);
+		
+		start->edgeCount++;
+		end->edgeCount++;
 
-			edges++;
+		edges++;
 
-			for(en=0;en<4;en++) {
-				if(!e->neighbors[en]) {
-					slMessage(DEBUG_ALL, "error initializing shape neighbors: edge %p is missing adjacent features\n", e);
-					return NULL;
-				}
+		for(en=0;en<4;en++) {
+			if(!e->neighbors[en]) {
+				slMessage(DEBUG_ALL, "error initializing shape neighbors: edge %p is missing adjacent features\n", e);
+				return NULL;
 			}
 		}
 	}
 
-	// Sort so that the points are all the way to the left.
-	// We use this when computing the bounding box.
+	// add the face neighbors for the all the faces 
 
-	qsort(s->features, s->featureCount, sizeof(slFeature*), slFeatureSort);
+	for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
+		face = *fi;
 
-	/* add the face neighbors for the all the faces */
+		for(m=0;m<face->edgeCount;m++) {
+			slVector *eStart, *eFinish, edgeVector, normal;
 
-	for(n=0;n<s->featureCount;n++) {
-		if(s->features[n]->type == FT_FACE) {
-			face = s->features[n]->data;
+			/* grab the edge its vertices */
 
-			for(m=0;m<face->edgeCount;m++) {
-				slVector *eStart, *eFinish, edgeVector, normal;
+			e = face->neighbors[m];
+			eStart = &((slPoint*)e->neighbors[0])->vertex;
+			eFinish = &((slPoint*)e->neighbors[1])->vertex;
 
-				/* grab the edge its vertices */
+			if(e->neighbors[2] != face) face->faces[m] = e->faces[0];
+			else face->faces[m] = e->faces[1];
 
-				e = face->neighbors[m]->data;
-				eStart = &((slPoint*)e->neighbors[0]->data)->vertex;
-				eFinish = &((slPoint*)e->neighbors[1]->data)->vertex;
+			/* set the voronoi plane for this edge */
 
-				if(e->neighbors[2]->data != face) face->faces[m] = e->neighbors[2];
-				else face->faces[m] = e->neighbors[3];
+			slVectorSub(eStart, eFinish, &edgeVector);
+			slVectorCross(&face->plane.normal, &edgeVector, &normal);
 
-				/* set the voronoi plane for this edge */
+			if(slVectorDot(&normal, eStart) > 0.0) slVectorMul(&normal, -1, &normal);
 
-				slVectorSub(eStart, eFinish, &edgeVector);
-				slVectorCross(&face->plane.normal, &edgeVector, &normal);
-
-				if(slVectorDot(&normal, eStart) > 0.0) slVectorMul(&normal, -1, &normal);
-
-				slSetPlane(&face->voronoi[m], &normal, eFinish);
-			}
-
-			face->faces[face->edgeCount] = s->features[n];
+			slSetPlane(&face->voronoi[m], &normal, eFinish);
 		}
 
+		face->faces[face->edgeCount] = *fi;
 	}
  
-	/* find the first point in the feature list */
+	// update the neighbors for the points 
 
-	for(n=0;n<s->featureCount;n++) {
-		if(s->features[n]->type == FT_POINT) {
-			s->firstPoint = n;
-			n = s->featureCount;
-		}
-	}
+	for(pi = s->points.begin(); pi != s->points.end(); pi++ ) {
+		p = *pi;
 
-	/* update the neighbors for the points */
+		faceCount = 0;
 
-	for(n=0;n<s->featureCount;n++) {
-		if(s->features[n]->type == FT_POINT) {
-			p = s->features[n]->data;
+		for(m=0;m<p->edgeCount;m++) {
+			int found2 = 0, found3 = 0;
+			e = p->neighbors[m];
 
-			faceCount = 0;
+			// if one of the faces on this edge has not already 
+			// been added to this point, add it
 
-			for(m=0;m<p->edgeCount;m++) {
-				int found2 = 0, found3 = 0;
-				e = p->neighbors[m]->data;
+			for(o=0;o<faceCount;o++) if(p->faces[o] == e->neighbors[2]) found2 = 1;
+			for(o=0;o<faceCount;o++) if(p->faces[o] == e->neighbors[3]) found3 = 1;
 
-				for(o=0;o<faceCount;o++) if(p->faces[o] == e->neighbors[2]) found2 = 1;
-				for(o=0;o<faceCount;o++) if(p->faces[o] == e->neighbors[3]) found3 = 1;
-
-				if(!found2) p->faces[faceCount++] = e->neighbors[2];
-				if(!found3) p->faces[faceCount++] = e->neighbors[3];
-			}
+			if(!found2) p->faces[faceCount++] = e->faces[0];
+			if(!found3) p->faces[faceCount++] = e->faces[1];
 		}
 	}
 
 	if(slSetMassProperties(s, density)) return NULL;
-
-	/*
-	if(s->mass < 0.1) {
-		density = 0.1 / (s->mass/density);
-		slMessage(DEBUG_ALL, "shape mass < 0.1, resetting density to %f\n", s->mass, density);
-
-		if(slSetMassProperties(s, density)) return NULL;
-	}
-	*/
 
 	return s;
 }
@@ -315,32 +269,24 @@ void slShapeSetDensity(slShape *shape, double density) {
 	The last point given is assumed to connect to the first point.
 */
 
-slFeature *slAddFace(slShape *s, slVector **points, int nPoints) {
+slFace *slAddFace(slShape *s, slVector **points, int nPoints) {
 	int n;
 	slVector x, y, origin;
 	slFace *f;
-	slFeature *thisFeature;
 	slVector **rpoints = NULL;
    
 	if(nPoints < 3) return NULL;
 
-	f = slMalloc(sizeof(slFace));
-	if(!f) return NULL;
+	f = new slFace;
+	f->type = FT_FACE;
    
 	f->edgeCount = 0;
-	f->neighbors = slMalloc(sizeof(slEdge*) * nPoints);
-	f->voronoi = slMalloc(sizeof(slPlane) * nPoints);
-	f->points = slMalloc(sizeof(slFeature*) * nPoints);
-	f->faces = slMalloc(sizeof(slFeature*) * (nPoints + 1));
+	f->neighbors = new slEdge*[nPoints];
+	f->voronoi = new slPlane[nPoints];
+	f->points = new slPoint*[nPoints];
+	f->faces = new slFace*[(nPoints + 1)];
 
 	f->drawFlags = 0;
-
-	thisFeature = slNewFeature(FT_FACE, f);
-
-	if(!f->neighbors) {
-		slFree(f);
-		return NULL;
-	}
 
 	slVectorSub(points[1], points[0], &x); 
 	slVectorSub(points[2], points[1], &y); 
@@ -352,17 +298,17 @@ slFeature *slAddFace(slShape *s, slVector **points, int nPoints) {
 
 	slVectorSet(&origin, 0, 0, 0);
 
-	/* uhoh, screwy plane, reverse-o! */
+	// uhoh, screwy plane, reverse-o!
 
 	if(slPlaneDistance(&f->plane, &origin) > 0.0) {
 		slVectorMul(&f->plane.normal, -1, &f->plane.normal);
 
-		rpoints = slMalloc(sizeof(slVector*) * nPoints);
+		rpoints = new slVector*[nPoints];
 
 		for(n=0;n<nPoints;n++) rpoints[n] = points[(nPoints - 1) - n];
 		for(n=0;n<nPoints;n++) points[n] = rpoints[n];
 	
-		slFree(rpoints);
+		delete rpoints;
 
 		slVectorCopy(points[1], &f->plane.vertex);
 	}
@@ -372,10 +318,10 @@ slFeature *slAddFace(slShape *s, slVector **points, int nPoints) {
 	f->edgeCount = nPoints;
 
 	for(n=0;n<nPoints - 1;n++) { 
-		f->neighbors[n] = slAddEdge(s, thisFeature, points[n], points[n + 1]);
+		f->neighbors[n] = slAddEdge(s, f, points[n], points[n + 1]);
 				
-		/* z is normal to the voronoi slPlane--that means it's parallel to the slFace */
-		/* of the slPlane and perpendicular to the edge we're looking at			*/
+		// z is normal to the voronoi slPlane--that means it's parallel to the 
+		// slFace of the slPlane and perpendicular to the edge we're looking at
 	
 		slVectorSub(points[n + 1], points[n], &x);
 		slVectorCross(&f->plane.normal, &x, &y);
@@ -384,7 +330,7 @@ slFeature *slAddFace(slShape *s, slVector **points, int nPoints) {
 		slSetPlane(&f->voronoi[n], &y, points[n]); 
 	}
 
-	f->neighbors[n] = slAddEdge(s, thisFeature, points[n], points[0]);
+	f->neighbors[n] = slAddEdge(s, f, points[n], points[0]);
 
 	slVectorSub(points[0], points[nPoints - 1], &x);
 	slVectorCross(&f->plane.normal, &x, &y);
@@ -392,11 +338,10 @@ slFeature *slAddFace(slShape *s, slVector **points, int nPoints) {
 	slVectorNormalize(&y);
 	slSetPlane(&f->voronoi[nPoints - 1], &y, points[nPoints - 1]); 
 
-	slNextFeature(s);
+	s->faces.push_back(f);
+	s->features.push_back(f);
 
-	s->features[s->featureCount] = thisFeature;
-
-	return s->features[s->featureCount++];
+	return f;
 }
 
 /*!
@@ -407,59 +352,52 @@ slFeature *slAddFace(slShape *s, slVector **points, int nPoints) {
 	towards the normal (the "top" of the slPlane).
 */
 
-slFeature *slAddEdge(slShape *s, slFeature *theFace, slVector *start, slVector *end) {
+slEdge *slAddEdge(slShape *s, slFace *f, slVector *start, slVector *end) {
 	slEdge *e, *originalEdge = NULL;
-	slFeature *pf1, *pf2; // point slFeatures 1 and 2...
-	slPoint *p1, *p2; // and the points they slFeature.  haw haw haw
+	slPoint *p1, *p2; 
 	slVector lineSegment, vNorm;
-	int n, sameEdge;
-	slFace *f;
+	int sameEdge;
+	std::vector<slEdge*>::iterator ei;
 	
-	if(theFace->type != FT_FACE) return NULL;
-	
-	f = theFace->data;
- 
-	pf1 = slAddPoint(s, start);
-	pf2 = slAddPoint(s, end);
+	p1 = slAddPoint(s, start);
+	p2 = slAddPoint(s, end);
 
-	p1 = pf1->data;
-	p2 = pf2->data;
-	
 	slVectorSub(start, end, &lineSegment);
 	slVectorCross(&f->plane.normal, &lineSegment, &vNorm); 
 
-	/* see if the point already exists */
+	// see if the edge already exists 
 
-	for(n=0;n<s->featureCount;n++) {
-		if(s->features[n]->type == FT_EDGE) {
-			e = (slEdge*)s->features[n]->data;
+	for(ei = s->edges.begin() ; ei != s->edges.end(); ei++ ) {
+		e = *ei;
 
-			/* if we've been here before, we're seeing the second slFace */
+		// if we've been here before, we're seeing the second slFace 
 
-			sameEdge = (e->neighbors[0]->data == p1 && e->neighbors[1]->data == p2);
+		sameEdge = ((e->neighbors[0] == p1 && e->neighbors[1] == p2) || 
+					(e->neighbors[1] == p1 && e->neighbors[0] == p2));
 
-			if(sameEdge || (e->neighbors[1]->data == p1 && e->neighbors[0]->data == p2)) {
-				originalEdge = e;
+		if(sameEdge) {
+			originalEdge = e;
 
-				/* the first slFace is already there... */
-				   
-				originalEdge->neighbors[3] = theFace;
-				   
-				/* and the other 3 voroni slPlanes have been added */
-				   
-				slVectorNormalize(&vNorm);
-				slSetPlane(&originalEdge->voronoi[3], &vNorm, start);
+			// the first face is already there... 
+			   
+			originalEdge->faces[1] = f;
+			originalEdge->neighbors[3] = f;
+			   
+			/* and the other 3 voroni slPlanes have been added */
+			   
+			slVectorNormalize(&vNorm);
+			slSetPlane(&originalEdge->voronoi[3], &vNorm, start);
 
-				return s->features[n];
-			}
+			return e;
 		}
 	}
 
-	e = slMalloc(sizeof(slEdge));
+	e = new slEdge;
+	e->type = FT_EDGE;
 
-	/* if this is the mirror of another edge, copy in the neighbors */
-	/* and voronoi slPlanes, bearing in mind that the order of the	*/
-	/* neighboring points is reversed */
+	// if this is the mirror of another edge, copy in the neighbors 
+	// and voronoi slPlanes, bearing in mind that the order of the
+	// neighboring points is reversed 
 
 	if(originalEdge) {
 		e->neighbors[1] = originalEdge->neighbors[0];
@@ -467,16 +405,27 @@ slFeature *slAddEdge(slShape *s, slFeature *theFace, slVector *start, slVector *
 		e->neighbors[2] = originalEdge->neighbors[2];
 		e->neighbors[3] = originalEdge->neighbors[3];
 
+		e->points[0] = originalEdge->points[1];
+		e->points[1] = originalEdge->points[0];
+
+		e->faces[0] = originalEdge->faces[1];
+		e->faces[1] = originalEdge->faces[0];
+
 		bcopy(&originalEdge->voronoi[0], &e->voronoi[1], sizeof(slPlane));
 		bcopy(&originalEdge->voronoi[1], &e->voronoi[0], sizeof(slPlane));
 		bcopy(&originalEdge->voronoi[2], &e->voronoi[2], sizeof(slPlane));
 		bcopy(&originalEdge->voronoi[3], &e->voronoi[3], sizeof(slPlane));
 	} else {
-		e->neighbors[0] = pf1;
-		e->neighbors[1] = pf2;
-		e->neighbors[2] = theFace;
+		e->faces[0] = f;
 
-		/* first add the voronois for the ends */
+		e->points[0] = p1;
+		e->points[1] = p2;
+
+		e->neighbors[0] = p1;
+		e->neighbors[1] = p2;
+		e->neighbors[2] = f;
+
+		// first add the voronois for the ends
    
 		slVectorNormalize(&lineSegment);
 		slSetPlane(&e->voronoi[1], &lineSegment, end);
@@ -484,20 +433,18 @@ slFeature *slAddEdge(slShape *s, slFeature *theFace, slVector *start, slVector *
 		slVectorMul(&lineSegment, -1, &lineSegment);
 		slSetPlane(&e->voronoi[0], &lineSegment, start);
 
-		/* and now for the first slFace */
-
-		/* how are we assured that this is traveling away from the slFace? */
+		// and now for the first slFace 
 
 		slVectorNormalize(&vNorm);
 		slSetPlane(&e->voronoi[2], &vNorm, start);
 
-		/* the final slFace slPlane is added later */
+		// the final face slPlane is added later 
 	}
 
-	slNextFeature(s);
+	s->edges.push_back(e);
+	s->features.push_back(e);
 	
-	s->features[s->featureCount] = slNewFeature(FT_EDGE, e);
-	return s->features[s->featureCount++];
+	return e;
 }
 
 /*!
@@ -506,34 +453,37 @@ slFeature *slAddEdge(slShape *s, slFeature *theFace, slVector *start, slVector *
 	Called as part of slAddEdge and slAddFace, not typically called manually.
 */
 
-slFeature *slAddPoint(slShape *s, slVector *vertex) {
+slPoint *slAddPoint(slShape *s, slVector *vertex) {
 	slPoint *p;
-	int n;
+	std::vector<slPoint*>::iterator pi;
 
-	/* see if the point already exists */
+	// see if the point already exists 
 
-	for(n=0;n<s->featureCount;n++) {
-		if(s->features[n]->type == FT_POINT) {
-			p = s->features[n]->data;
+	for(pi = s->points.begin(); pi != s->points.end(); pi++ ) {
+		p = *pi;
 
-			if(!slVectorCompare(vertex, &p->vertex)) { 
-				p->edgeCount++;
-				return s->features[n];
-			}			
+		if(!slVectorCompare(vertex, &p->vertex)) { 
+			p->edgeCount++;
+	
+			std::vector<slFeature*>::iterator fi;
+
+			return p;
 		}
 	}
 
-	p = slMalloc(sizeof(slPoint));
+	p = new slPoint;
+	p->type = FT_POINT;
+
 	if(!p) return NULL;
 
 	slVectorCopy(vertex, &p->vertex);
 	p->edgeCount = 1;
 	p->neighbors = NULL;
 
-	slNextFeature(s);
+	s->points.push_back(p);
+	s->features.push_back(p);
 
-	s->features[s->featureCount] = slNewFeature(FT_POINT, p);
-	return s->features[s->featureCount++];
+	return p;
 }
 
 /*!
@@ -548,46 +498,17 @@ slPlane *slSetPlane(slPlane *p, slVector *normal, slVector *vertex) {
 	return p; 
 }
 
-/*!
-	\brief Allocates an slFeature struct.
-*/
-
-slFeature *slNewFeature(int type, void *data) {
-	slFeature *f;
-	
-	f = slMalloc(sizeof(slFeature));
-	if(!f) return NULL;
-
-	f->type = type;
-	f->data = data;
-
-	return f;
+slFace::~slFace() {
+	delete[] neighbors;
+	delete[] voronoi;
+	delete[] faces;
+	delete[] points;
 }
 
-/*!
-	\brief Frees an slFeature.
-*/
-
-void slFreeFeature(slFeature *f) {
-	switch(f->type) {
-		case FT_POINT:
-			slFree(((slPoint*)f->data)->neighbors);
-			slFree(((slPoint*)f->data)->voronoi);
-			slFree(((slPoint*)f->data)->faces);
-			break;
-		case FT_EDGE:
-			break;
-		case FT_FACE:
-			slFree(((slFace*)f->data)->neighbors);
-			slFree(((slFace*)f->data)->voronoi);
-			slFree(((slFace*)f->data)->faces);
-			slFree(((slFace*)f->data)->points);
-			break;
-	}
-
-	slFree(f->data);
-
-	slFree(f);
+slPoint::~slPoint() {
+	delete[] neighbors;
+	delete[] voronoi;
+	delete[] faces;
 }
 
 /*!
@@ -676,10 +597,10 @@ slShape *slSetNGonDisc(slShape *s, int sideCount, double radius, double height, 
 
 	if(sideCount < 3) return NULL;
 
-	tops = slMalloc(sizeof(slVector) * (sideCount + 1));
-	bottoms = slMalloc(sizeof(slVector) * (sideCount + 1));
-	topP = slMalloc(sizeof(slVector*) * (sideCount + 1));
-	bottomP = slMalloc(sizeof(slVector*) * (sideCount + 1));
+	tops = new slVector[sideCount + 1];
+	bottoms = new slVector[sideCount + 1];
+	topP = new slVector*[sideCount + 1];
+	bottomP = new slVector*[sideCount + 1];
 
 	for(n=0;n<sideCount;n++) {
 		topP[sideCount - (n + 1)] = &tops[n];
@@ -715,10 +636,10 @@ slShape *slSetNGonDisc(slShape *s, int sideCount, double radius, double height, 
 		slAddFace(s, sideP, 4);
 	}
 
-	slFree(tops);
-	slFree(bottoms);
-	slFree(topP);
-	slFree(bottomP);
+	delete[] tops;
+	delete[] bottoms;
+	delete[] topP;
+	delete[] bottomP;
 
 	return slInitNeighbors(s, density);
 }
@@ -735,8 +656,8 @@ slShape *slSetNGonCone(slShape *s, int sideCount, double radius, double height, 
 
 	if(sideCount < 3) return NULL;
 
-	bottoms = slMalloc(sizeof(slVector) * (sideCount + 1));
-	bottomP = slMalloc(sizeof(slVector*) * (sideCount + 1));
+	bottoms = new slVector[sideCount + 1];
+	bottomP = new slVector*[sideCount + 1];
 
 	slVectorSet(&top, 0, height, 0);
 
@@ -765,28 +686,10 @@ slShape *slSetNGonCone(slShape *s, int sideCount, double radius, double height, 
 		slAddFace(s, sideP, 3);
 	}
 
-	slFree(bottoms);
-	slFree(bottomP);
+	delete[] bottoms;
+	delete[] bottomP;
 
 	return slInitNeighbors(s, density);
-}
-
-/*!
-	\brief qsort callback to sort the points all the way to the left.
-
-	Used when computing the shape's bounding box.
-*/
-
-int slFeatureSort(const void *a, const void *b) {
-	slFeature *fa, *fb;
-
-	fa = *(slFeature**)a;
-	fb = *(slFeature**)b;
-
-	if(fa->type == FT_POINT) return -1;
-	if(fb->type == FT_POINT) return 1;
-
-	return 0;
 }
 
 void slCubeInertiaMatrix(slVector *c, double mass, double i[3][3]) {
@@ -840,6 +743,7 @@ int slPointOnShape(slShape *s, slVector *dir, slVector *point) {
 	slPosition pos;
 	int update, result, planes = 0;
 	double distance;
+	std::vector<slFace*>::iterator fi;
 
 	slVectorSet(point, 0.0, 0.0, 0.0);
 
@@ -853,45 +757,42 @@ int slPointOnShape(slShape *s, slVector *dir, slVector *point) {
 		return 0;
 	} 
 
-	for(n=0;n<s->featureCount;n++) {
-		/* go through all of the faces */
+	for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
+		slFace *f = *fi;
 
-		if(s->features[n]->type == FT_FACE) {
-			slFace *f = s->features[n]->data;
-			planes++;
+		planes++;
 
-			D = slVectorDot(&f->plane.normal, &f->plane.vertex);
+		D = slVectorDot(&f->plane.normal, &f->plane.vertex);
 
-			// printf("d = %f\n", D);
+		// printf("d = %f\n", D);
 
-			X = f->plane.normal.x * dir->x;
-			Y = f->plane.normal.y * dir->y;
-			Z = f->plane.normal.z * dir->z;
+		X = f->plane.normal.x * dir->x;
+		Y = f->plane.normal.y * dir->y;
+		Z = f->plane.normal.z * dir->z;
 
-			k = D/(X+Y+Z);
+		k = D/(X+Y+Z);
 
-			// printf("%p: k = %f [%d]\n", s->features[n], k, (!slIsinf(k) && k > 0.0));
+		// printf("%p: k = %f [%d]\n", s->features[n], k, (!slIsinf(k) && k > 0.0));
 
-			if(!slIsinf(k) && k > 0.0) {
-				/* we have the length of the matching vector on the plane of this */
-				/* face. */
+		if(!slIsinf(k) && k > 0.0) {
+			/* we have the length of the matching vector on the plane of this */
+			/* face. */
 
-				slVectorMul(dir, k, &pointOnPlane);
+			slVectorMul(dir, k, &pointOnPlane);
 
-				// distance = slPlaneDistance(&f->plane, &pointOnPlane);
+			// distance = slPlaneDistance(&f->plane, &pointOnPlane);
 
-				/* now figure out if the point in question is within the face */
+			/* now figure out if the point in question is within the face */
 
-				result = slClipPoint(&pointOnPlane, f->voronoi, &pos, f->edgeCount, &update, &distance);
+			result = slClipPoint(&pointOnPlane, f->voronoi, &pos, f->edgeCount, &update, &distance);
 
-				/* if this point is within the voronoi region of the plane, it must be */
-				/* on the face */
+			/* if this point is within the voronoi region of the plane, it must be */
+			/* on the face */
 
-				if(result == 1) {
-					slVectorCopy(&pointOnPlane, point);
-					return n;
-				} 
-			}
+			if(result == 1) {
+				slVectorCopy(&pointOnPlane, point);
+				return n;
+			} 
 		}
 	}
 
@@ -899,9 +800,10 @@ int slPointOnShape(slShape *s, slVector *dir, slVector *point) {
 }
 
 void slScaleShape(slShape *s, slVector *scale) {
+	std::vector<slFace*>::iterator fi;
+	std::vector<slPoint*>::iterator pi;
 	slPoint *p;
 	slFace *f;
-	int n;
 
 	slVector v;
 	double m[3][3];
@@ -919,39 +821,45 @@ void slScaleShape(slShape *s, slVector *scale) {
 		return;
 	}
 
-	for(n=0;n<s->featureCount;n++) {
-		if(s->features[n]->type == FT_POINT) {
-			p = s->features[n]->data;
+	for(pi = s->points.begin(); pi != s->points.end(); pi++ ) {
+		p = *pi;
 
-			slFree(p->neighbors);
-			slFree(p->faces);
-			slFree(p->voronoi);
+		delete[] p->neighbors;
+		delete[] p->faces;
+		delete[] p->voronoi;
 
-			slVectorCopy(&p->vertex, &v);
-			slVectorXform(m, &v, &p->vertex);
-		}
+		slVectorCopy(&p->vertex, &v);
+		slVectorXform(m, &v, &p->vertex);
+	}
 
-		if(s->features[n]->type == FT_FACE) {
-			f = s->features[n]->data;
-			slVectorCopy(&f->plane.vertex, &v);
-			slVectorXform(m, &v, &f->plane.vertex);
-		}
+	for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
+		f = *fi;
+
+		slVectorCopy(&f->plane.vertex, &v);
+		slVectorXform(m, &v, &f->plane.vertex);
 	}
 
 	slInitNeighbors(s, s->density);
 }
 
+/*!
+	\brief Serializes a shape and returns data that can later be deserialized.
+
+	This function returns an slMalloc'd pointer.
+*/
+
 slSerializedShapeHeader *slSerializeShape(slShape *s, int *length) {
-	int n, p, faceCount = 0, facePointCount = 0;
+	int p, faceCount = 0, facePointCount = 0;
 	slSerializedShapeHeader *header;
 	slSerializedFaceHeader *fhead;
 	slFace *face;
 	char *data, *position;
 	slVector *v;
+	std::vector<slFace*>::iterator fi;
 
 	if(s->type == ST_SPHERE) { 
 		*length = sizeof(slSerializedShapeHeader);
-		header = slMalloc(*length);
+		header = (slSerializedShapeHeader*)slMalloc(sizeof(slSerializedShapeHeader));
 
 		header->type = ST_SPHERE;
 		header->radius = s->radius;
@@ -963,15 +871,14 @@ slSerializedShapeHeader *slSerializeShape(slShape *s, int *length) {
 
 	/* count the different points and faces we have to add */
 
-	for(n=0;n<s->featureCount;n++) {
-		if(s->features[n]->type == FT_FACE) {
-			face = s->features[n]->data;
-			faceCount++;
+	for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
+		face = *fi;
 
-			/* the number of edges on the face == number of points */
+		faceCount++;
 
-			facePointCount += face->edgeCount;
-		}
+		// the number of edges on the face == number of points 
+
+		facePointCount += face->edgeCount;
 	}
 
 	/* figure out the total length of the data */
@@ -980,7 +887,7 @@ slSerializedShapeHeader *slSerializeShape(slShape *s, int *length) {
               (faceCount * sizeof(slSerializedFaceHeader)) + 		/* the face headers  */
               (facePointCount * sizeof(slVector));					/* the face vertices */
 
-	data = slMalloc(*length);
+	data = (char*)slMalloc(*length);
 	header = (slSerializedShapeHeader*)data;
 
 	/* fill in the header */
@@ -996,21 +903,19 @@ slSerializedShapeHeader *slSerializeShape(slShape *s, int *length) {
 
 	position = data + sizeof(slSerializedShapeHeader);
 
-	for(n=0;n<s->featureCount;n++) {
-		if(s->features[n]->type == FT_FACE) {
-			face = s->features[n]->data;
-			fhead = (slSerializedFaceHeader*)position;
+	for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
+		face = *fi;
+		fhead = (slSerializedFaceHeader*)position;
 
-			fhead->vertexCount = face->edgeCount;
+		fhead->vertexCount = face->edgeCount;
 
-			position += sizeof(slSerializedFaceHeader);
+		position += sizeof(slSerializedFaceHeader);
 
-			for(p=0;p<face->edgeCount;p++) {
-				v = (slVector*)position;
+		for(p=0;p<face->edgeCount;p++) {
+			v = (slVector*)position;
 
-				slVectorCopy(&((slPoint*)face->points[p]->data)->vertex, v);
-				position += sizeof(slVector);
-			}
+			slVectorCopy(&((slPoint*)face->points[p])->vertex, v);
+			position += sizeof(slVector);
 		}
 	}
 
@@ -1028,13 +933,15 @@ slShape *slDeserializeShape(slSerializedShapeHeader *header, int length) {
 
 	s = slNewShape();
 
-	p = (void*)header + sizeof(slSerializedShapeHeader);
+	// offset the pointer to the endge of the header
+
+	p = (char*)header + sizeof(slSerializedShapeHeader);
 
 	for(n=0;n<header->faceCount;n++) {
 		face = (slSerializedFaceHeader*)p;
 
-		vectors = slMalloc(sizeof(slVector) * face->vertexCount);
-		vectorp = slMalloc(sizeof(slVector*) * face->vertexCount);
+		vectors = new slVector[face->vertexCount];
+		vectorp = new slVector*[face->vertexCount];
 
 		p += sizeof(slSerializedFaceHeader);
 
@@ -1050,8 +957,8 @@ slShape *slDeserializeShape(slSerializedShapeHeader *header, int length) {
 
 		slAddFace(s, vectorp, face->vertexCount);
 
-		slFree(vectors);
-		slFree(vectorp);
+		delete[] vectors;
+		delete[] vectorp;
 	}
 
 	slInitNeighbors(s, header->density);
@@ -1060,7 +967,7 @@ slShape *slDeserializeShape(slSerializedShapeHeader *header, int length) {
 }
 
 void slShapeBounds(slShape *shape, slPosition *position, slVector *min, slVector *max) {
-	int n;
+	std::vector<slPoint*>::iterator pi;
 
 	slVectorSet(max, INT_MIN, INT_MIN, INT_MIN);
 	slVectorSet(min, INT_MAX, INT_MAX, INT_MAX);
@@ -1073,21 +980,27 @@ void slShapeBounds(slShape *shape, slPosition *position, slVector *min, slVector
         min->x = position->location.x - (shape->radius);
         min->y = position->location.y - (shape->radius);
         min->z = position->location.z - (shape->radius);
-    } else for(n=0;n<shape->featureCount;n++) {
-        slFeature *f = shape->features[n];
+    } else for(pi = shape->points.begin(); pi != shape->points.end(); pi++ ) {
+        slPoint *p = *pi;
 		slVector loc;
 
-        if(f->type == FT_POINT) {
-            slVectorXform(position->rotation, &((slPoint*)f->data)->vertex, &loc);
-            slVectorAdd(&loc, &position->location, &loc);
+		slVectorXform(position->rotation, &p->vertex, &loc);
+		slVectorAdd(&loc, &position->location, &loc);
 
-            if(loc.x > max->x) max->x = loc.x;
-            if(loc.y > max->y) max->y = loc.y;
-            if(loc.z > max->z) max->z = loc.z;
+		if(loc.x > max->x) max->x = loc.x;
+		if(loc.y > max->y) max->y = loc.y;
+		if(loc.z > max->z) max->z = loc.z;
 
-            if(loc.x < min->x) min->x = loc.x;
-            if(loc.y < min->y) min->y = loc.y;
-            if(loc.z < min->z) min->z = loc.z;
-        } else n = shape->featureCount;
+		if(loc.x < min->x) min->x = loc.x;
+		if(loc.y < min->y) min->y = loc.y;
+		if(loc.z < min->z) min->z = loc.z;
     }
+}
+
+double slShapeGetMass(slShape *shape) {
+	return shape->mass;
+}
+
+double slShapeGetDensity(slShape *shape) {
+	return shape->density;
 }

@@ -36,32 +36,32 @@
 #define INFINITY 0xffffffff
 #endif
 
-slTerrain *slNewTerrain(int res, double xscale) {
+slTerrain *slTerrainNew(int res, double xscale) {
 	int n;
 	slVector location;
 	slTerrain *l;
 
-	l = slMalloc(sizeof(slTerrain));
+	l = new slTerrain;
 
-	l->side = pow(2, res) + 1;
+	l->side = (int)pow(2, res) + 1;
 
-	l->matrix = slMalloc(sizeof(float*) * l->side);
+	l->matrix = new float*[l->side];
 
-	l->fnormals[0] = slMalloc(sizeof(slVector*) * (l->side - 1));
-	l->fnormals[1] = slMalloc(sizeof(slVector*) * (l->side - 1));
+	l->fnormals[0] = new slVector*[l->side - 1];
+	l->fnormals[1] = new slVector*[l->side - 1];
 
-	l->vnormals = slMalloc(sizeof(slVector*) * (l->side));
+	l->vnormals = new slVector*[l->side];
 
 	l->drawList = 0;
 
 	for(n=0;n<l->side - 1;n++) {
-		l->fnormals[0][n] = slMalloc(sizeof(slVector) * (l->side - 1));
-		l->fnormals[1][n] = slMalloc(sizeof(slVector) * (l->side - 1));
+		l->fnormals[0][n] = new slVector[l->side - 1];
+		l->fnormals[1][n] = new slVector[l->side - 1];
 	}
 
 	for(n=0;n<l->side;n++) {
-		l->vnormals[n] = slMalloc(sizeof(slVector) * l->side);
-		l->matrix[n] = slMalloc(sizeof(float) * l->side);
+		l->vnormals[n] = new slVector[l->side];
+		l->matrix[n] = new float[l->side];
 	}
 
 	l->xscale = xscale;
@@ -295,25 +295,25 @@ float slAverageDiamondValues(slTerrain *l, int x, int y, int jump) {
 	}
 }
 
-void slFreeTerrain(slTerrain *l) {
+void slTerrainFree(slTerrain *l) {
 	int n;
 
 	for(n=0;n<l->side - 1;n++) {
-		slFree(l->fnormals[0][n]);
-		slFree(l->fnormals[1][n]);
+		delete[] l->fnormals[0][n];
+		delete[] l->fnormals[1][n];
 	}
 
 	for(n=0;n<l->side;n++) {
-		slFree(l->vnormals[n]);
-		slFree(l->matrix[n]);
+		delete[] l->vnormals[n];
+		delete[] l->matrix[n];
 	}
 
-	slFree(l->fnormals[0]);
-	slFree(l->fnormals[1]);
-	slFree(l->vnormals);
-	slFree(l->matrix);
+	delete[] l->fnormals[0];
+	delete[] l->fnormals[1];
+	delete[] l->vnormals;
+	delete[] l->matrix;
 
-	slFree(l);
+	delete[] l;
 }
 
 void slDrawTerrain(slWorld *w, slCamera *c, slTerrain *l, int texture, double textureScale, int drawMode, int flags) {
@@ -326,8 +326,8 @@ void slDrawTerrain(slWorld *w, slCamera *c, slTerrain *l, int texture, double te
 
 		size = l->side * l->xscale;
 
-		xoff = c->target.x/size;
-		yoff = c->target.z/size;
+		xoff = (int)(c->target.x/size);
+		yoff = (int)(c->target.z/size);
 
 		for(x=xoff-1;x<xoff+2;x++) {
 			for(y=yoff-1;y<yoff+2;y++) {
@@ -539,13 +539,13 @@ void slTerrainFacesUnderRange(slTerrain *l,
 	if(maxZ > (l->side - 2)) *endZ = l->side - 2;
 	else *endZ = (int)maxZ;
 
-	localX = fmod(minX, 1.0);
-	localZ = fmod(minZ, 1.0);
+	localX = (int)fmod(minX, 1.0);
+	localZ = (int)fmod(minZ, 1.0);
 	if((localX + localZ) < 1.0) *earlyStart = 1;
 	else *earlyStart= 0;
 
-	localX = fmod(minX, 1.0);
-	localZ = fmod(maxZ, 1.0);
+	localX = (int)fmod(minX, 1.0);
+	localZ = (int)fmod(maxZ, 1.0);
 	if((localX + localZ) < 1.0) *lateEnd = 0;
 	else *lateEnd = 1;
 }
@@ -620,9 +620,8 @@ int slTerrainTestPair(slWorldObject *w1, slWorldObject *w2, slShape *s1, slShape
 	return CT_DISJOINT;
 }
 
-/*
-	+ slTerrainSphereClip
-	= check for a collision of a sphere against a landscape.
+/*!
+	\brief Check for a collision of a sphere against a landscape.
 */
 
 int slTerrainSphereClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int obY, slCollisionEntry *ce, int flip) {
@@ -826,144 +825,137 @@ int slPointIn2DTriangle(slVector *vertex, slVector *a, slVector *b, slVector *c)
 */
 
 int slTerrainShapeClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int obY, slCollisionEntry *ce, int flip) {
-	int n;
+	std::vector<slPoint*>::iterator pi;
+	std::vector<slFace*>::iterator fi;
 
 	slVectorSet(&ce->normal, 0, 0, 0);
 
-	for(n=ss->firstPoint;n<ss->featureCount;n++) {
-		slFeature *f = ss->features[n];
-
-		if(f->type == FT_POINT) {
-			slPoint *p = f->data;
-			slPointTerrainClip(l, sp, p, ce);
-		}
+	for(pi = ss->points.begin(); pi != ss->points.end(); pi++) {
+		slPoint *p = *pi;
+		slPointTerrainClip(l, sp, p, ce);
 	}
 
-	for(n=0;n<ss->featureCount;n++) {
-		slFeature *f = ss->features[n];
+	for(fi = ss->faces.begin(); fi != ss->faces.end(); fi++ ) {
+		slFace *face = *fi;
+		slPlane facePlane;
+		slVector y;
+		int np;
 
-		if(f->type == FT_FACE) {
-			slFace *face = f->data;
-			slPlane facePlane;
-			slVector y;
-			int np;
+		slVectorSet(&y, 0, -1, 0);
 
-			slVectorSet(&y, 0, -1, 0);
+		slPositionPlane(sp, &face->plane, &facePlane);
 
-			slPositionPlane(sp, &face->plane, &facePlane);
+		/* is the plane well oriented towards the terrain?  since the shape is	*/
+		/* convex, and the terrain cannot be more than 90 degrees from (0, 1, 0)  */
+		/* then if we're more than 90 from (0, -1, 0), then there exists a better */
+		/* plane containing the same edge that we should use instead. */
 
-			/* is the plane well oriented towards the terrain?  since the shape is	*/
-			/* convex, and the terrain cannot be more than 90 degrees from (0, 1, 0)  */
-			/* then if we're more than 90 from (0, -1, 0), then there exists a better */
-			/* plane containing the same edge that we should use instead. */
+		if(slVectorDot(&y, &facePlane.normal) > 0.0) {
+			int minX = l->side, minZ = l->side, maxX = 0, maxZ = 0;
+			int earlyStart = 0, lateEnd = 0;
+			int x, z;
 
-			if(slVectorDot(&y, &facePlane.normal) > 0.0) {
-				int minX = l->side, minZ = l->side, maxX = 0, maxZ = 0;
-				int earlyStart = 0, lateEnd = 0;
-				int x, z;
+			for(np=0;np<face->edgeCount;np++) {
+				slPoint *facePoint = face->points[np];
 
-				for(np=0;np<face->edgeCount;np++) {
-					slPoint *facePoint = face->points[np]->data;
+				/* find the min/max range for the edges we'l need to test */
 
-					/* find the min/max range for the edges we'l need to test */
+				if(facePoint->terrainX > maxX) maxX = facePoint->terrainX;
 
-					if(facePoint->terrainX > maxX) maxX = facePoint->terrainX;
+				if(facePoint->terrainX < minX) minX = facePoint->terrainX;
 
-					if(facePoint->terrainX < minX) minX = facePoint->terrainX;
-
-					if(facePoint->terrainZ > maxZ) {
-						maxZ = facePoint->terrainZ;
-						lateEnd = facePoint->terrainQuad;
-					}
-
-					if(facePoint->terrainZ < minZ) {
-						minZ = facePoint->terrainZ;
-						earlyStart = !facePoint->terrainQuad;
-					}
+				if(facePoint->terrainZ > maxZ) {
+					maxZ = facePoint->terrainZ;
+					lateEnd = facePoint->terrainQuad;
 				}
 
-				for(x=minX;x<=maxX;x++) {
-					for(z=minZ;z<=maxZ;z++) {
-						int skip = 0;
+				if(facePoint->terrainZ < minZ) {
+					minZ = facePoint->terrainZ;
+					earlyStart = !facePoint->terrainQuad;
+				}
+			}
 
-						/*
-							 v1 ---- v3
-								|\ |			points v1, v2 and v3 for each of the squares 
-								| \|
- 								---- v2
+			for(x=minX;x<=maxX;x++) {
+				for(z=minZ;z<=maxZ;z++) {
+					int skip = 0;
 
-							we'll check edges: v13, v32, v21 for collisions
+					/*
+						 v1 ---- v3
+							|\ |			points v1, v2 and v3 for each of the squares 
+							| \|
+ 							---- v2
 
-							note that a terrain point piercing a face will have
-							multiple edges colliding with the face as the point
-							where the edges meet.  therefore, we will only count
-							collisions on the "leading" point.
+						we'll check edges: v13, v32, v21 for collisions
 
-							note that the exception is when we're on the bottom or 
-							left edge of the terrain (minX or minZ == -1).
-						*/
+						note that a terrain point piercing a face will have
+						multiple edges colliding with the face as the point
+						where the edges meet.  therefore, we will only count
+						collisions on the "leading" point.
 
-					
-						slVector v1, v2, v3;
+						note that the exception is when we're on the bottom or 
+						left edge of the terrain (minX or minZ == -1).
+					*/
 
-						if(x != -1 && z != -1) {
-							v2.z = z * l->xscale;
-							v1.z = v3.z = (z + 1) * l->xscale;	
+				
+					slVector v1, v2, v3;
 
-							v1.x = x * l->xscale;
-							v2.x = v3.x = (x + 1) * l->xscale;	
+					if(x != -1 && z != -1) {
+						v2.z = z * l->xscale;
+						v1.z = v3.z = (z + 1) * l->xscale;	
 
-							v1.y = l->matrix[x][z + 1];
-							v2.y = l->matrix[x + 1][z];
-							v3.y = l->matrix[x + 1][z + 1];
-						} else if(x == -1) {
-							v2.z = z * l->xscale;
-							v1.z = v3.z = (z + 1) * l->xscale;	
+						v1.x = x * l->xscale;
+						v2.x = v3.x = (x + 1) * l->xscale;	
 
-							v1.x = 0;
-							v2.x = v3.x = l->xscale;	
+						v1.y = l->matrix[x][z + 1];
+						v2.y = l->matrix[x + 1][z];
+						v3.y = l->matrix[x + 1][z + 1];
+					} else if(x == -1) {
+						v2.z = z * l->xscale;
+						v1.z = v3.z = (z + 1) * l->xscale;	
 
-							v1.y = l->matrix[0][z + 1];
-							v2.y = l->matrix[1][z];
-							v3.y = l->matrix[1][z + 1];
-						} else {
-							v2.z = 0;
-							v1.z = v3.z = l->xscale;	
+						v1.x = 0;
+						v2.x = v3.x = l->xscale;	
 
-							v1.x = x * l->xscale;
-							v2.x = v3.x = (x + 1) * l->xscale;	
+						v1.y = l->matrix[0][z + 1];
+						v2.y = l->matrix[1][z];
+						v3.y = l->matrix[1][z + 1];
+					} else {
+						v2.z = 0;
+						v1.z = v3.z = l->xscale;	
 
-							v1.y = l->matrix[x][1];
-							v2.y = l->matrix[x + 1][0];
-							v3.y = l->matrix[x + 1][1];
-						}
+						v1.x = x * l->xscale;
+						v2.x = v3.x = (x + 1) * l->xscale;	
 
-						slVectorAdd(&v1, &l->position, &v1);
-						slVectorAdd(&v2, &l->position, &v2);
-						slVectorAdd(&v3, &l->position, &v3);
+						v1.y = l->matrix[x][1];
+						v2.y = l->matrix[x + 1][0];
+						v3.y = l->matrix[x + 1][1];
+					}
 
-						/* in the last square, we don't test the upper and right edge */
+					slVectorAdd(&v1, &l->position, &v1);
+					slVectorAdd(&v2, &l->position, &v2);
+					slVectorAdd(&v3, &l->position, &v3);
 
-						if(z != maxZ && x != maxX) {
-							/* PART 1: v1, v3 */
+					/* in the last square, we don't test the upper and right edge */
 
-							slTerrainEdgePlaneClip(&v1, &v3, face, sp, &facePlane, ce);
+					if(z != maxZ && x != maxX) {
+						/* PART 1: v1, v3 */
 
-							/* PART 2: v3, v2 */
+						slTerrainEdgePlaneClip(&v1, &v3, face, sp, &facePlane, ce);
 
-							slTerrainEdgePlaneClip(&v3, &v2, face, sp, &facePlane, ce);
-						}
+						/* PART 2: v3, v2 */
 
-						if((x == minX && z == minZ && !earlyStart) || (x == maxX && z == maxZ && !lateEnd)) skip = 1;
+						slTerrainEdgePlaneClip(&v3, &v2, face, sp, &facePlane, ce);
+					}
 
-						/* in the frist and last squares, we don't test the diagonal, */
-						/* unless earlyStart and lateEnd have been set. */
+					if((x == minX && z == minZ && !earlyStart) || (x == maxX && z == maxZ && !lateEnd)) skip = 1;
 
-						if(!skip) {
-							/* PART 3: v2, v1 */
+					/* in the frist and last squares, we don't test the diagonal, */
+					/* unless earlyStart and lateEnd have been set. */
 
-							slTerrainEdgePlaneClip(&v2, &v1, face, sp, &facePlane, ce);
-						}
+					if(!skip) {
+						/* PART 3: v2, v1 */
+
+						slTerrainEdgePlaneClip(&v2, &v1, face, sp, &facePlane, ce);
 					}
 				}
 			}

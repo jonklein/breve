@@ -67,7 +67,7 @@ struct slTerrain {
 	slVector topColor;
 };
 
-slTerrain *slNewTerrain(int res, double xscale);
+slTerrain *slTerrainNew(int res, double xscale);
 void slGenerateFractalTerrain(slTerrain *l, double h, double height);
 
 void slTerrainSetLocation(slTerrain *l, slVector *location);
@@ -79,7 +79,7 @@ float slAverageDiamondValues(slTerrain *l, int x, int y, int jump);
 
 void slTerrainInitialize(slTerrain *l);
 
-void slFreeTerrain(slTerrain *l);
+void slTerrainFree(slTerrain *l);
 void slTerrainMakeNormals(slTerrain *l);
 
 int slTerrainTestPair(slWorldObject *w1, slWorldObject *w2, 

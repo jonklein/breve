@@ -160,13 +160,8 @@ struct slWorld {
 	unsigned char drawLightExposure;
 	slVector lightExposureSource;
 
-	// patches 
-
-	// slPatchGrid *patches;
 
 	// visions are rendered from certain perspectives in the world
-
-	slStack *cameras;
 
 	// integration vectors -- DV_VECTOR_COUNT depends on the requirements
 	// of the integration algorithm we're using... mbEuler requires only 
@@ -194,17 +189,16 @@ struct slWorld {
 
 	double age;
 
-	std::vector<slWorldObject*> objects;
-
 	// these structures will replace the standard objects above in the 
 	// near future -- OR WILL THEY?!
 
 	slStack *stationaryObjects;
 	slStack *mobileObjects;
-	slStack *patchGridObjects;
-	slStack *springObjects;
 
+	std::vector<slWorldObject*> objects;
+	std::vector<slPatchGrid*> patches;
 	std::vector<slSpring*> springs;
+	std::vector<slCamera*> cameras;
 
 	// we have one slVclipData for the regular collision detection
 	// and one which will be used to answer "proximity" questions:
@@ -246,7 +240,7 @@ int slWorldStartNetsimSlave(slWorld *w, char *host);
 void slWorldAddCamera(slWorld *w, slCamera *camera);
 void slWorldRemoveCamera(slWorld *w, slCamera *camera);
 
-slPatchGrid *slAddPatchGrid(slWorld *w, slVector *center, slVector *patchSize, int x, int y, int z);
+slPatchGrid *slPatchGridAdd(slWorld *w, slVector *center, slVector *patchSize, int x, int y, int z);
 
 void slWorldFree(slWorld *w);
 void slWorldFreeObject(slWorldObject *o);
@@ -301,7 +295,7 @@ void slWorldSetLightExposureSource(slWorld *w, slVector *v);
 
 void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*), int (*collide)(void*, void*, int type));
 
-slWorldObject *slWorldGetObject(slWorld *w, int n);
+slWorldObject *slWorldGetObject(slWorld *w, unsigned int n);
 
 #ifdef __cplusplus
 }

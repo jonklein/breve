@@ -133,6 +133,9 @@ Optional:
 + [required] zlib, gzip compression library
   http://www.gzip.org/zlib/
 
++ [optional] libgsl, The GNU Scientific Library
+  http://www.gnu.org/software/gsl/
+
 + [optional] libjpeg, JPEG I/O library 
   http://www.ijg.org/
 

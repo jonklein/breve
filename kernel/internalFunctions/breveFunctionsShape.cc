@@ -150,7 +150,7 @@ int brINewNGonCone(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIFreeShape(brEval args[], brEval *target, brInstance *i) {
-	slFreeShape(BRPOINTER(&args[0]));
+	slShapeFree(BRPOINTER(&args[0]));
 
 	return EC_OK;
 }
@@ -203,7 +203,7 @@ int brIGetMass(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	BRDOUBLE(target) = s->mass;
+	BRDOUBLE(target) = slShapeGetMass(s);
 
 	return EC_OK;
 }
@@ -216,7 +216,7 @@ int brIGetDensity(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	BRDOUBLE(target) = s->density;
+	BRDOUBLE(target) = slShapeGetDensity(s);
 
 	return EC_OK;
 }

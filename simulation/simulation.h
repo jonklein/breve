@@ -51,23 +51,17 @@ extern "C"{
 
 #include "netsim.h"
 
-#include "shape.h"
-#include "volInt.h"
-
 #include "springs.h"
 
 #include "patch.h"
 
 #include "terrain.h"
-#include "camera.h"
 #include "integrate.h"
 
 #include "gldraw.h"
 
 #include "image.h"
 #include "lightdetector.h"
-
-#include "shadow.h"
 
 #include "movie.h"
 
@@ -76,9 +70,13 @@ extern "C"{
 #endif
 
 #include "vclip.h"
-
+#include "shape.h"
+#include "shadow.h"
+#include "camera.h"
 #include "vclipData.h"
 #include "link.h"
 #include "multibody.h"
 #include "world.h"
 #include "joint.h"
+#include "volInt.h"
+

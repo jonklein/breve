@@ -64,7 +64,6 @@ int brIRotationMatrix(brEval args[], brEval *target, brInstance *i) {
 
 int brIJointApplyTorque(brEval args[], brEval *target, brInstance *i) {
 	slJoint *j = BRPOINTER(&args[0]);
-	slVector *tVector = &BRVECTOR(&args[1]);
 
 	// I think this is somewhat broken.
 
@@ -73,7 +72,7 @@ int brIJointApplyTorque(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slJointApplyTorque(BRPOINTER(&args[0]), &BRVECTOR(&args[1]));
+	slJointApplyTorque(j, &BRVECTOR(&args[1]));
 
 	return EC_OK;
 }

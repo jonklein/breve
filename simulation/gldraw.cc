@@ -18,6 +18,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#include <vector>
+
 #define MAX(x, y) ((x)>(y)?(x):(y))
 
 #define BUFFER_SIZE 512
@@ -232,7 +234,7 @@ unsigned int slTextureNew() {
 */
 
 int slUpdateTexture(slWorld *w, GLuint texture, unsigned char *pixels, int width, int height, int format) {
-	char *newpixels;
+	unsigned char *newpixels;
 	int newheight, newwidth;
 
 	if(!glActive) return -1;
@@ -243,7 +245,7 @@ int slUpdateTexture(slWorld *w, GLuint texture, unsigned char *pixels, int width
 	newwidth = newheight = MAX(newwidth, newheight);
 
 	if(newwidth != width || newheight != height) {
-		newpixels = slMalloc(newwidth * newheight * 4);
+		newpixels = new unsigned char[newwidth * newheight * 4];
 		bzero(newpixels, newwidth * newheight * 4);
 
 		slCenterPixelsInSquareBuffer(pixels, width, height, newpixels, newwidth, newheight);
@@ -261,7 +263,7 @@ int slUpdateTexture(slWorld *w, GLuint texture, unsigned char *pixels, int width
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	if(newwidth != width || newheight != height) slFree(newpixels);
+	if(newwidth != width || newheight != height) delete[] newpixels;
 
 	if(slClearGLErrors("error adding texture")) return -1;
 
@@ -283,15 +285,15 @@ void slDrawPatches(slPatchGrid *patches, slVector *camera, slVector *target) {
 	// alpha blending to work.  figure out the points
 	// closest to the camera.
 
-	xMid = (camera->x - patches->startPosition.x) / patches->patchSize.x;
+	xMid = (int)((camera->x - patches->startPosition.x) / patches->patchSize.x);
 	if(xMid < 0) xMid = 0;
 	if(xMid > patches->xSize) xMid = patches->xSize - 1;
 
-	yMid = (camera->y - patches->startPosition.y) / patches->patchSize.y;
+	yMid = (int)((camera->y - patches->startPosition.y) / patches->patchSize.y);
 	if(yMid < 0) yMid = 0;
 	if(yMid > patches->ySize) yMid = patches->ySize - 1;
 
-	zMid = (camera->z - patches->startPosition.z) / patches->patchSize.z;
+	zMid = (int)((camera->z - patches->startPosition.z) / patches->patchSize.z);
 	if(zMid < 0) zMid = 0;
 	if(zMid > patches->zSize) zMid = patches->zSize - 1;
 
@@ -523,12 +525,13 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 
 	slDrawWorld(w, c, recompile, mode, crosshair, scissor);
 
-	if(w->cameras->count) slRenderWorldCameras(w);
+	if(w->cameras.size() != 0) slRenderWorldCameras(w);
 }
 
 void slDrawNetsimBounds(slWorld *w) {
 #ifdef HAVE_LIBENET
-	int n;
+	std::vector<slNetsimRemoteHostData*>::iterator hosti;
+	unsigned int n;
 
 	if(!w->netsimData.remoteHosts) return;
 
@@ -572,8 +575,8 @@ void slDrawNetsimBounds(slWorld *w) {
 void slDrawWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor) {
 	slVector cam;
 	int flags = 0;
-	int n;
 	int labels;
+	std::vector<slPatchGrid*>::iterator pi;
 
 	// camera locataion and target 
 
@@ -737,9 +740,9 @@ void slDrawWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair
 
 	// patches too are blended.
 
-	for(n=0;n<w->patchGridObjects->count;n++) slDrawPatches(w->patchGridObjects->data[n], &cam, t);
-
-
+	for(pi = w->patches.begin(); pi != w->patches.end(); pi++) 
+		slDrawPatches( *pi, &cam, t );
+	
 	if(c->drawLights) {
 		// do the shadows
 		if(c->drawShadowVolumes) slRenderShadowVolume(w, c);
@@ -1029,7 +1032,7 @@ void slDrawBackground(slCamera *c, slWorld *w) {
 void slRenderLabels(slWorld *w) {
 	slMultibody *m;
 	slVector *l;
-	int n;
+	unsigned int n;
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -1280,7 +1283,7 @@ void slShadowMatrix(GLfloat matrix[4][4], slPlane *p, slVector *light) {
 	\brief Draws a shape by setting up its transformations and calling its drawlist.
 */
 
-void slDrawShape(slWorld *w, slCamera *c, slShape *s, slPosition *pos, slVector *color, int texture, int textureScale, int textureMode, int mode, int flags, float bbRot, float alpha) {
+void slDrawShape(slWorld *w, slCamera *c, slShape *s, slPosition *pos, slVector *color, int texture, double textureScale, int textureMode, int mode, int flags, float bbRot, float alpha) {
 	GLfloat specularColor[4] = { 0.2, 0.2, 0.2, 0.0 };
 	unsigned char bound, axis;
 
@@ -1417,7 +1420,7 @@ void slDrawShape(slWorld *w, slCamera *c, slShape *s, slPosition *pos, slVector 
 	\brief Renders a stationary object.
 */
 
-void slDrawStationary(slWorld *w, slStationary *s, slCamera *c, slVector *color, int texture, int textureScale, int textureMode, float alpha, int mode, int flags) {
+void slDrawStationary(slWorld *w, slStationary *s, slCamera *c, slVector *color, int texture, double textureScale, int textureMode, float alpha, int mode, int flags) {
 	slDrawShape(w, c, s->shape, &s->position, color, texture, textureScale, textureMode, mode, flags, 0, alpha);
 }
 
@@ -1427,7 +1430,8 @@ void slDrawStationary(slWorld *w, slStationary *s, slCamera *c, slVector *color,
 */
 
 int slRenderObjects(slWorld *w, slCamera *c, int loadNames, int flags) {
-	int n, texture, textureMode;
+	unsigned int n;
+	int texture, textureMode;
 	slLink *m;
 	slWorldObject *wo;
 
@@ -1603,7 +1607,7 @@ void slDrawAxis(double x, double y) {
 	The draw list is generated or updated as needed.
 */
 
-int slCompileShape(slWorld *w, slShape *s, int drawMode, int texture, int textureScale, int flags) {
+int slCompileShape(slWorld *w, slShape *s, int drawMode, int texture, double textureScale, int flags) {
 	if(s->drawList == 0) s->drawList = glGenLists(1);
 	s->recompile = 0;
 
@@ -1661,14 +1665,9 @@ void slProcessBillboard(slWorld *w, slCamera *c, slVector *color, slVector *loc,
 	the actual rendering.
 */
 
-void slRenderShape(slWorld *w, slShape *s, int drawMode, int texture, int textureScale, int flags) {
-	int n, divisions;
+void slRenderShape(slWorld *w, slShape *s, int drawMode, int texture, double textureScale, int flags) {
+	int divisions;
 	GLUquadricObj *quad;
-
-	//if(texture && !(flags & DO_OUTLINE)) {
-	//	glEnable(GL_TEXTURE_2D);
-	//	glBindTexture(GL_TEXTURE_2D, texture);
-	//}
 
 	if(s->type == ST_SPHERE) {
 		if(s->radius < 16) divisions = 16;
@@ -1685,14 +1684,12 @@ void slRenderShape(slWorld *w, slShape *s, int drawMode, int texture, int textur
 
 		gluDeleteQuadric(quad);
 	} else {
-		for(n=0;n<s->featureCount;n++) {
+		std::vector<slFace*>::iterator fi;
 
-			if(s->features[n]->type == FT_FACE)
-				slDrawFace(s->features[n]->data, drawMode, texture, textureScale, flags);
+		for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
+			slDrawFace(*fi, drawMode, texture, textureScale, flags);
 		}
 	}
-
-	//if(texture && !(flags & DO_OUTLINE)) glDisable(GL_TEXTURE_2D);
 }
 
 /*!
@@ -1722,7 +1719,7 @@ void slPerpendicularVectors(slVector *v, slVector *p1, slVector *p2) {
 	\brief Draws a face, breaking it down into smaller triangles if necessary.
 */
 
-void slDrawFace(slFace *f, int drawMode, int texture, int textureScale, int flags) {
+void slDrawFace(slFace *f, int drawMode, int texture, double textureScale, int flags) {
 	slVector *v, *norm, xaxis, yaxis;
 	slPoint *p;
 	int edgeCount;
@@ -1753,7 +1750,7 @@ void slDrawFace(slFace *f, int drawMode, int texture, int textureScale, int flag
 		glBegin(drawMode);
 	
 		for(edgeCount=0;edgeCount<f->edgeCount;edgeCount++) {
-			p = (slPoint*)f->points[edgeCount]->data;
+			p = (slPoint*)f->points[edgeCount];
 
 			v = &((slPoint*)p)->vertex;
 	
@@ -1777,7 +1774,7 @@ void slDrawFace(slFace *f, int drawMode, int texture, int textureScale, int flag
 	the quality of lighting and other effects.
 */
 
-int slBreakdownFace(slFace *f, int texture, int textureScale) {
+int slBreakdownFace(slFace *f, int texture, double textureScale) {
 	slVector diff, total, subv[3], middle;
 	slVector *v1, *v2;
 	slVector xaxis, yaxis;
@@ -1792,10 +1789,10 @@ int slBreakdownFace(slFace *f, int texture, int textureScale) {
 		n2 = n+1;
 		if(n2 == f->edgeCount) n2 = 0;
 	
-		p = (slPoint*)f->points[n]->data;
-		v1 = &((slPoint*)p)->vertex;
-		p = (slPoint*)f->points[n2]->data;
-		v2 = &((slPoint*)p)->vertex;
+		p = f->points[n];
+		v1 = &p->vertex;
+		p = f->points[n2];
+		v2 = &p->vertex;
 	
 		slVectorSub(v1, v2, &diff);
 		slVectorAdd(v1, &total, &total);
@@ -1813,10 +1810,10 @@ int slBreakdownFace(slFace *f, int texture, int textureScale) {
 		n2 = n+1;
 		if(n2 == f->edgeCount) n2 = 0;
 	
-		p = (slPoint*)f->points[n]->data;
-		v1 = &((slPoint*)p)->vertex;
-		p = (slPoint*)f->points[n2]->data;
-		v2 = &((slPoint*)p)->vertex;
+		p = f->points[n];
+		v1 = &p->vertex;
+		p = f->points[n2];
+		v2 = &p->vertex;
 
 		slVectorSub(v2, v1, &diff);
 		slVectorMul(&diff, .5, &diff);
@@ -1847,7 +1844,7 @@ int slBreakdownFace(slFace *f, int texture, int textureScale) {
 	in order to improve the quality of lighting and other effects.
 */
 
-void slBreakdownTriangle(slVector *v, int texture, int textureScale, int level, slVector *xaxis, slVector *yaxis) {
+void slBreakdownTriangle(slVector *v, int texture, double textureScale, int level, slVector *xaxis, slVector *yaxis) {
 	slVector subv[3];
 	slVector mids[3];
 	slVector diff;
@@ -1923,7 +1920,7 @@ int slClearGLErrors(char *id) {
 */
 
 void slFreeGL(slWorld *w, slCamera *c) {
-	int n;
+	unsigned int n;
 	slStationary *so;
 	slLink *link;
 

@@ -23,11 +23,11 @@
 
 #include "kernel.h"
 
-int brINewTerrain(brEval args[], brEval *target, brInstance *i) {
+int brITerrainNew(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t;
 	slWorldObject *wo;
 
-	t = slNewTerrain(5, BRDOUBLE(&args[0]));
+	t = slTerrainNew(5, BRDOUBLE(&args[0]));
 
 	wo = slWorldAddObject(i->engine->world, t, WO_TERRAIN);
 
@@ -148,7 +148,7 @@ int brISetValleyColor(brEval args[], brEval *target, brInstance *i) {
 /*@}*/
 
 void breveInitTerrainFunctions(brNamespace *n) {
-    brNewBreveCall(n, "newTerrain", brINewTerrain, AT_POINTER, AT_DOUBLE, 0);
+    brNewBreveCall(n, "newTerrain", brITerrainNew, AT_POINTER, AT_DOUBLE, 0);
     brNewBreveCall(n, "setPeakColor", brISetPeakColor, AT_NULL, AT_POINTER, AT_VECTOR, 0);
     brNewBreveCall(n, "setValleyColor", brISetValleyColor, AT_NULL, AT_POINTER, AT_VECTOR, 0);
     brNewBreveCall(n, "generateFractalTerrain", brIGenerateFractalTerrain, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0);

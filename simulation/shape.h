@@ -35,15 +35,6 @@ enum shapeDraw {
 };
 
 /*!
-	\brief A feature in a shape.
-*/
-
-struct slFeature {
-	int type;
-	void *data;
-};
-
-/*!
 	\brief A struct containing rotation and location information.
 */
 
@@ -61,28 +52,46 @@ struct slPlane {
 	slVector vertex;
 };
 
+#ifdef __cplusplus
+#include <vector>
+
+class slFeature {
+	public:
+		int type;
+};
+
 /*!
 	\brief A point on a shape.
 */
 
-struct slPoint {
-	slVector vertex;
+class slPoint : public slFeature {
+	public:
+		slVector vertex;
 
-	/* the voronoi planes defining this point and the number of planes */
+		// the voronoi planes defining this point and the number of planes 
 
-	slPlane *voronoi;
-	int edgeCount;
+		slPlane *voronoi;
+		int edgeCount;
 
-	/* temp data for terrain collisions :( */
+		/* temp data for terrain collisions :( */
 
-	int terrainX;
-	int terrainZ;
-	int terrainQuad;
+		int terrainX;
+		int terrainZ;
+		int terrainQuad;
 	
-	/* we need to know of the edge neighbors, as well as the face neighbors */
+		// all official neighbors are edges, but we need to know the faces 
+		// as well
 
-	slFeature **neighbors;
-	slFeature **faces;
+		slEdge **neighbors;
+		slFace **faces;
+
+		slPoint() {
+			voronoi = NULL;
+			faces = NULL;
+			neighbors = NULL;
+		}
+
+		~slPoint();
 };
 
 /*!
@@ -91,27 +100,35 @@ struct slPoint {
 	The endpoints of the edge are the vertex neighbors 0 and 1.
 */
 
-struct slEdge {
-	slPlane voronoi[4];
-	slFeature *neighbors[4];
+class slEdge : public slFeature {
+	public:
+		slPlane voronoi[4];
+		slFeature *neighbors[4];
+		slFace *faces[2];
+		slPoint *points[2];
+
+		~slEdge();
 };
 
 /*!
 	\brief A face on a shape.
 */
 
-struct slFace {
-	int edgeCount;
+class slFace : public slFeature {
+	public:
+		int edgeCount;
 
-	slPlane plane;
+		slPlane plane;
 
-	slPlane *voronoi;	
+		slPlane *voronoi;	
 
-	slFeature **neighbors;	// neighbor edges
-	slFeature **points;		// connected points 
-	slFeature **faces;		// connected faces
+		slEdge **neighbors;		// neighbor edges
+		slPoint **points;		// connected points 
+		slFace **faces;			// connected faces
 
-	char drawFlags;
+		char drawFlags;
+
+		~slFace();
 };
 
 /*!
@@ -139,12 +156,15 @@ struct slShape {
 	int type;
 	double radius;
 
-	slFeature **features;
-	int featureCount;
-	int maxFeatures;
+	std::vector<slFeature*> features;
 
 	int firstPoint;
+
+	std::vector<slFace*> faces;
+	std::vector<slEdge*> edges;
+	std::vector<slPoint*> points;
 };
+#endif
 
 /*!
 	\brief A header used when serializing shape data.
@@ -177,6 +197,9 @@ struct slSerializedFaceHeader {
 
 typedef struct slSerializedFaceHeader slSerializedFaceHeader;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 slShape *slNewShape(void);
 
 slShape *slNewCube(slVector *size, double density);
@@ -184,15 +207,12 @@ slShape *slNewNGonDisc(int count, double radius, double height, double density);
 slShape *slNewNGonCone(int count, double radius, double height, double density);
 slShape *slNewSphere(double radius, double density);
 
-slFeature *slAddFace(slShape *v, slVector **points, int vCount);
-slFeature *slAddEdge(slShape *s, slFeature *theFace, slVector *start, slVector *end);
+slFace *slAddFace(slShape *v, slVector **points, int vCount);
+slEdge *slAddEdge(slShape *s, slFace *theFace, slVector *start, slVector *end);
 
-slFeature *slAddPoint(slShape *v, slVector *start);
+slPoint *slAddPoint(slShape *v, slVector *start);
 
-slFeature *slNewFeature(int type, void *data);
-
-void slFreeShape(slShape *s);
-void slFreeFeature(slFeature *f);
+void slShapeFree(slShape *s);
 
 slShape *slSetCube(slShape *s, slVector *a, double density);
 slShape *slSetPyramid(slShape *s, double len, double density);
@@ -223,3 +243,9 @@ slSerializedShapeHeader *slSerializeShape(slShape *s, int *length);
 slShape *slDeserializeShape(slSerializedShapeHeader *header, int length);
 void slShapeBounds(slShape *shape, slPosition *position, slVector *min, slVector *max);
 
+double slShapeGetMass(slShape *shape);
+double slShapeGetDensity(slShape *shape);
+
+#ifdef __cplusplus
+}
+#endif
