@@ -126,6 +126,10 @@ int main(int argc, char **argv) {
 		exit(0);
 	}
 
+#if HAVE_LIBAVFORMAT
+	av_register_all();
+#endif
+
 	frontend = breveFrontendInit(argc, argv);
 	frontend->data = breveFrontendInitData(frontend->engine);
 
@@ -168,10 +172,6 @@ int main(int argc, char **argv) {
 		slWorldStartNetsimSlave(frontend->engine->world, gSlaveHost);
 		slFree(gSlaveHost);
 	}
-
-#if HAVE_LIBAVFORMAT
-	av_register_all();
-#endif
 
 	if (gOptionFull)
 		glutFullScreen();
