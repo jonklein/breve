@@ -205,7 +205,7 @@ if test $ac_cv_header_pthread_h = yes ; then
 	OL_PTHREAD_TRY([-lc_r],		[ol_cv_pthread_lc_r])
 	OL_PTHREAD_TRY([-lpthreads],	[ol_cv_pthread_lib_lpthreads])
 
-	LIBS="$LIBS $ol_link_pthreads"
+	LIBS="$ol_link_pthreads $LIBS"
 fi
 
 AC_CHECK_LIB([z], [gzopen],,AC_MSG_FAILURE([Missing zlib library -- see http://www.zlib.org]))
