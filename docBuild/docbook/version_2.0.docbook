@@ -19,11 +19,11 @@ introduces some changes to existing features, which may require changes
 to simulations written in previous versions of breve.
 
 <itemizedlist> 
-<listitem><para>MultiBody functionality has been changed <xref linkend="multibody_changes"/></para></listitem>
-<listitem><para>Arrays are now depreciated <xref linkend="array_depreciated"/></para></listitem> 
-<listitem><para>The Data class has been removed <xref linkend="data_removed"/></para></listitem> 
-<listitem><para>The Vision class has been removed <xref linkend="visions_removed"/></para></listitem>
-<listitem><para>Texture loading has been changed <xref linkend="texture_changes"/></para></listitem> 
+<listitem><para>MultiBody functionality has been changed <xref linkend="multibody_changes"></para></listitem>
+<listitem><para>Arrays are now depreciated <xref linkend="array_depreciated"></para></listitem> 
+<listitem><para>The Data class has been removed <xref linkend="data_removed"></para></listitem> 
+<listitem><para>The Vision class has been removed <xref linkend="visions_removed"></para></listitem>
+<listitem><para>Texture loading has been changed <xref linkend="texture_changes"></para></listitem> 
 </itemizedlist> 
 
 </para>

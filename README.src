@@ -76,8 +76,8 @@ Example:
   For this reason, official builds of breve use a modified version of 
   the ODE source.
 
-- libdl, dynamic loading compatibility library (required for pre-10.3 
-  OS X only)
+- libdl, dynamic loading compatibility library [required when building 
+  on or for pre-10.3 OS X only]
 
   part of "fink", http://fink.sourceforge.net/
 

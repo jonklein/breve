@@ -44,8 +44,8 @@
          attributes: (list (list "TYPE" "text/css"))
          (literal "BODY, P, LI {
 	color: black;
-	font-family: Geneva,Arial,Helvetica,Swiss,SunSans-Regular;
-	font-size: 95%;
+	font-family: Verdana, Arial, sans-serif;
+	font-size: small;
 }
 
 BODY {
