@@ -227,7 +227,7 @@ int slMakeCurrentContext();
 		simNib = NULL;
 	}
 
-	runState = BX_STOPPING;
+	runState = BX_STOPPED;
 
 	// is this necessary? 
 
@@ -245,7 +245,7 @@ int slMakeCurrentContext();
 }
 
 - (int)runCommand:(char*)command {
-	if(!engine || runState == BX_STOPPED || runState == BX_STOPPING) return -1;
+	if(!engine || runState == BX_STOPPED) return -1;
 
 	if(runState == BX_RUN) [engineLock lock];
 	slMessage(DEBUG_ALL, "> %s\n", command);
@@ -287,7 +287,7 @@ int slMakeCurrentContext();
 
 	pool = [[NSAutoreleasePool alloc] init];
 
-	while(runState != BX_STOPPING) {
+	while(runState != BX_STOPPED) {
 		[engineLock lock];
 
 		if(runState == BX_RUN) {

@@ -32,14 +32,15 @@ Object : myPushAgent (aka myPushAgents) {
 
 		interpreter read-config from-file "PushTest.config".
 
+		interpreter add-instruction named "CALLBACK2-TEST" for-method "callback2" for-instance self.
 		interpreter add-instruction named "CALLBACK-TEST" for-method "callback" for-instance self.
 
 	+ to go:
 		interpreter push-integer value 100.
 		interpreter clear-stacks.
 
-		code = (new PushProgram parse program "( 1 2 3 4 5 6 CALLBACK-TEST )").
-		code2 = (new PushProgram parse program "( 1 2 3 4 8 4 CALLBACK-TEST )").
+		code = (new PushProgram parse program "( 1 2 3 4 5 6 CALLBACK2-TEST CALLBACK-TEST CALLBACK2-TEST CALLBACK-TEST 0 0 )").
+		code2 = (new PushProgram parse program "( 1 2 3 4 8 4 CALLBACK-TEST CALLBACK2-TEST )").
 
 		print "Discrepancy", (code get-discrepancy from code2).
 		print "Top level diff", (code get-top-level-difference from code2).
@@ -61,4 +62,8 @@ Object : myPushAgent (aka myPushAgents) {
 	+ to callback:
 		print "$self is calling the breve callback function, pushing 7, ".
 		interpreter push-integer value 7.
+
+	+ to callback2:
+		print "$self is calling the breve callback2 function, pushing 8, ".
+		interpreter push-integer value 8.
 }

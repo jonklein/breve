@@ -48,6 +48,10 @@
 <ulink url="../classes/Data.html">Data</ulink></para>
 </listitem>
 <listitem><para>
+<indexterm><primary>Drawing class</primary></indexterm>
+<ulink url="../classes/Drawing.html">Drawing</ulink></para>
+</listitem>
+<listitem><para>
 <indexterm><primary>File class</primary></indexterm>
 <ulink url="../classes/File.html">File</ulink></para>
 </listitem>

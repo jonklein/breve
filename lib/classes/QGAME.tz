@@ -41,11 +41,20 @@ Object : QProgram {
 	- to get-program-pointer:
 		return programPointer.
 
+	+ to get-string:
+		% Returns the text for this program.
+
+		return qprogramGetString(programPointer).
+
 	+ to add-instruction with-string instructionString (string): 
 		% Adds an instruction to the program parsed from instructionString. 
 
 		if qprogramAddInstruction(programPointer, instructionString): 
 			print "warning: error adding QProgram instruction \"$instructionString\"".
+
+	+ to clear:
+		% Removes all instructions from this program.
+		qprogramClear(programPointer).
 
 	+ to destroy:
 		qprogramFree(programPointer).

@@ -255,7 +255,7 @@ void brEngineFreeObjects(brEngine *e) {
 
 int brEngineSetController(brEngine *e, brInstance *instance) {
 	if(e->controller) {
-		slMessage(DEBUG_ALL, "Error: redefinition of \"Controller\" object");
+		slMessage(DEBUG_ALL, "Error: redefinition of \"Controller\" object\n");
 		return -1;
 	}
 
@@ -384,7 +384,6 @@ int brEngineIterate(brEngine *e) {
 	brEval result;
 	int rcode;
 	brEvent *event;
-	slList *eventList;
 	std::vector<brInstance*>::iterator bi;
 	int n = 0;
 
@@ -452,7 +451,6 @@ int brEngineIterate(brEngine *e) {
 			rcode = brMethodCallByName(event->instance, event->name, &result);
 
 			brEventFree(event);
-			slListFreeHead(eventList);
 
 			slWorldSetAge(e->world, oldAge);
 

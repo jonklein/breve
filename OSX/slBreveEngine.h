@@ -34,8 +34,7 @@
 #import "engine.h"
 
 enum {
-    BX_STOPPING = 0,
-    BX_STOPPED,
+    BX_STOPPED = 1,
     BX_RUN,
     BX_PAUSE
 };

@@ -1,0 +1,41 @@
+#
+# A basic test of the Quantum Gate and Measurement Emulator (QGAME).
+# 01/02/2004 jon klein <jk@spiderland.org>
+# 
+
+@use Object.
+@use QGAME.
+@use Control.
+
+Controller QGTest.
+
+Control : QGTest {
+    + variables:
+        system, program (object).
+
+    + to init:
+        program = new QProgram.
+        system = new QSystem.
+
+        program add-instruction with-string "INSTRUCTION TEST -- SHOULD GIVE AN ERROR".
+        program add-instruction with-string "(HADAMARD 0)".
+        program add-instruction with-string "(LIMITED-ORACLE 1 ORACLE-TT 0 1)".
+        program add-instruction with-string "(HADAMARD 0)".
+        program add-instruction with-string "(U-THETA 1 5.96143477)".
+        program add-instruction with-string "(MEASURE 0)".
+        program add-instruction with-string "(HADAMARD 1)".
+        program add-instruction with-string "(U-THETA 1 5.96143477)".
+
+        print (system test 
+                program program 
+                qubits 2
+                cases { "00-0", "01-1", "10-1", "11-1" }
+                threshold 0.48
+                measurement-qubits { 1 } ).
+
+		print (program get-string).
+		program clear.
+		print "cleared program: ", (program get-string).
+
+       self end-simulation.
+}

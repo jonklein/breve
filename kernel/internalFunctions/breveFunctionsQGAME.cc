@@ -48,6 +48,24 @@ int brIQProgramAddInstruction(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+int brIQProgramGetString(brEval args[], brEval *target, brInstance *i) {
+	qgame::QProgram *program = (qgame::QProgram*)BRPOINTER(&args[0]);
+	std::ostringstream os;
+
+	os << *program;
+	BRSTRING(target) = slStrdup(os.str().c_str());
+
+	return EC_OK;
+}
+
+int brIQProgramClear(brEval args[], brEval *target, brInstance *i) {
+	qgame::QProgram *program = (qgame::QProgram*)BRPOINTER(&args[0]);
+
+	program->clear();
+
+	return EC_OK;
+}
+
 int brIQSysTestProgram(brEval args[], brEval *target, brInstance *i) {
 	qgame::QSys *sys = (qgame::QSys*)BRPOINTER(&args[0]);
 	qgame::QProgram *prog = (qgame::QProgram*)BRPOINTER(&args[1]);
@@ -113,6 +131,8 @@ void breveInitQGAMEFunctions(brNamespace *n) {
 	brNewBreveCall(n, "qsysRunProgram", brIQSysRunProgram, AT_NULL, AT_POINTER, AT_POINTER, 0);
 	brNewBreveCall(n, "qsysTestProgram", brIQSysTestProgram, AT_LIST, AT_POINTER, AT_POINTER, AT_LIST, AT_INT, AT_LIST, AT_DOUBLE, 0);
 	brNewBreveCall(n, "qprogramNew", brIQProgramNew, AT_POINTER, 0);
+	brNewBreveCall(n, "qprogramGetString", brIQProgramGetString, AT_STRING, AT_POINTER, 0);
+	brNewBreveCall(n, "qprogramClear", brIQProgramClear, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "qprogramFree", brIQProgramFree, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "qprogramAddInstruction", brIQProgramAddInstruction, AT_INT, AT_POINTER, AT_STRING, 0);
 #endif

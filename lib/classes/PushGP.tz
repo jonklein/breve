@@ -263,7 +263,7 @@ Object : PushGP {
 
 		if currentIndividual == populationSize: {
 			self reproduce.
-			self report.
+			self report with-best bestOfGen.
 			self swap-current.
 			currentIndividual = 0.
 			generation++.
@@ -374,9 +374,13 @@ Object : PushGP {
 
 		die "The method compute-fitness must be overridden by the user -- see the class documentation for PushGPControl for more information".
 
-	+ to report:
+	+ to report with-best bestIndividual (object):
 		% Logs information to the output at every generation.  This method 
-		% may be overridden to provide more (or less) output data.
+		% may be overridden to provide more (or less) output data.  
+		% <P>
+		% The argument bestIndividual is the best individual in the population
+		% and is provided so that it may be inspected by the user if this method
+		% is overridden.
 
 		bestFitness (float).
 		errors (list).
@@ -384,16 +388,16 @@ Object : PushGP {
 		totalSize /= populationSize.
 		totalErrors /= populationSize.
 
-		bestFitness = (bestOfGen get-fitness).
-		errors = (bestOfGen get-errors).
+		bestFitness = (bestIndividual get-fitness).
+		errors = (bestIndividual get-errors).
 
 		print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;".
 		print ";; -*- Report at generation $generation".
 		print ";; Best Individual: ".
-		print (bestOfGen get-string).
+		print (bestIndividual get-string).
 		print ";; Errors for best individual: ", errors.
 		print ";; Total errors for best individual: $bestFitness".
-		print ";; Size of best individual (points):", (bestOfGen get-size).
+		print ";; Size of best individual (points):", (bestIndividual get-size).
 		print ";;".
 		print ";; Average total errors in population: $totalErrors".
 		print ";; Average program size in population (points): $totalSize".
