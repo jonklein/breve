@@ -115,7 +115,6 @@ inline int stEvalLoadPointer(stLoadExp *e, stRunInstance *i, void **pointer, int
 
 inline int stToInt(brEval *e, brEval *t, stRunInstance *i) {
 	char *str;
-	brEvalListHead *theList;
 	int result;
 
 	switch(e->type) {
@@ -131,12 +130,7 @@ inline int stToInt(brEval *e, brEval *t, stRunInstance *i) {
 			else result = 0;
 			break;
 		case AT_LIST:
-			/* copy the list to a local variable, so that we can free it */
-			/* after assigning to the target (and possibly overwriting   */
-			/* the original when e == t) */
-
-			theList = BRLIST(e);
-			result = theList->count;
+			result = BRLIST(e)->count;
 			break;
 		case AT_VECTOR:
 			stEvalError(i->instance->type->engine, EE_CONVERT, "cannot convert type \"vector\" to type \"int\"");
@@ -254,9 +248,6 @@ inline int stToType(brEval *e, int type, brEval *t, stRunInstance *i) {
 				return EC_OK;
 			}
 
-			// little hack to get rid of any potential error from stToInt--we want to handle the error here
-
-			i->instance->type->engine->error.type = 0;
 			stEvalError(i->instance->type->engine, EE_CONVERT, "cannot convert type \"%s\" to type \"object\"", slAtomicTypeStrings[e->type]);
 			return EC_ERROR;
 			break;
@@ -908,9 +899,13 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 		slStackFree(caller->instance->gcStack);
 		caller->instance->gcStack = oldStack;
 
-		// mark the return value for the caller's GC
+		// mark the return value for the caller's GC, if it exists
 
-		if(i->instance->gcStack) stGCMark(i->instance, t);
+		if(i->instance->gcStack) {
+			stGCMark(i->instance, t);
+		} else {
+			// stGCUnretainAndCollect(t);
+		}
 
 		if(result == EC_STOP) return EC_OK;
 	
@@ -1065,8 +1060,6 @@ inline int stEvalForeach(stForeachExp *w, stRunInstance *i, brEval *target) {
 
 		if((result = brEvalCopy(&el->eval, &eval)) != EC_OK) return result;
 
-		// this does a retain
-
         if(assignExp->objectName && !assignExp->objectType)
 			assignExp->objectType = stObjectFind(i->instance->type->engine->objects, assignExp->objectName);
 
@@ -1172,8 +1165,8 @@ inline int stEvalListRemove(stListRemoveExp *l, stRunInstance *i, brEval *target
 
 	brEvalListRemove(BRLIST(&listEval), BRINT(&index), target);
 
-	// this is unretained when we pop it from the list, but we cannot collect 
-	// it immediately, since we're returning it.
+	// this is unretained when we pop it from the list, but we cannot 
+	// collect it immediately, since we're returning it.
 
 	stGCUnretain(target);
 	stGCMark(i->instance, target);
@@ -2376,9 +2369,11 @@ int stCallMethod(stRunInstance *old, stRunInstance *newI, stMethod *method, brEv
 	// remember when we retained the return value before?
 	// unretain it, and make it the caller's problem.
 
-	if(newI->instance->gcStack) {
-		if(target->type != AT_NULL) stGCUnretain(target);
-		if(old) stGCMark(old->instance, target);
+	if(old && old->instance->gcStack) {
+		stGCUnretain(target);
+		stGCMark(old->instance, target);
+	} else {
+		stGCUnretainAndCollect(target);
 	}
 
 	// restore the previous stack and stack records
@@ -2461,7 +2456,7 @@ inline int stEvalNewInstance(stInstanceExp *ie, stRunInstance *i, brEval *t) {
 		return EC_ERROR;
 	}
 
-	/* how many instances are we creating? */
+	// how many instances are we creating? 
 
 	stExpEval(ie->count, i, &count, NULL);
 

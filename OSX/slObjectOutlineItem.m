@@ -172,8 +172,8 @@
 
 	[self getEval: &evaluation];
 
-	return @"empty";
-	
+	// if(evaluation.type == AT_LIST) return @"list";
+
     cstr = brFormatEvaluation(&evaluation, NULL);
 
     result = [NSString stringWithCString: cstr];

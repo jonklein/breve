@@ -194,6 +194,8 @@ class slShape {
 
 		virtual void drawShadowVolume(slCamera *camera, slPosition *position);
 
+		void draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags);
+
 		int drawList;
 
 		unsigned char recompile;

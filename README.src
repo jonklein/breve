@@ -15,7 +15,7 @@ easy-to-use scripting language.
 
 1) Confirm that you have all of the required libraries installed.
 
-  See the sections on "REQUIRED LIBRARIES" below for more information
+  See the sections on "EXTERNAL LIBRARIES" below for more information
   on the libraries required to build breve.
 
 2) Specify paths of external library and header files, if required
@@ -70,7 +70,7 @@ as well, though some work may be required:
 Please report successful ports and the changes required back to the author 
 at jk@spiderland.org.
 
-                    --- REQUIRED LIBRARIES: SUMMARY ---
+                    --- EXTERNAL LIBRARIES: SUMMARY ---
 
 It's always a drag to have to download another set of libraries to get 
 something working.  Sorry.  Below is a summary of libraries which breve
@@ -102,14 +102,14 @@ Optional:
   libgslcblas (or other BLAS library)
 
 
-                    --- REQUIRED LIBRARIES: DETAILS ---
+                    --- EXTERNAL LIBRARIES: DETAILS ---
 
 + [required] OpenGL, graphics libraries 
   Platform specific -- consult your OS vendor for more information.
 
 + [required] GLUT, OpenGL Utility Library
   http://www.opengl.org/resources/libraries/glut.html
- 
+
   Windows users can obtain the DLL from:
     http://www.xmission.com/~nate/glut.html.
 
@@ -174,7 +174,7 @@ Optional:
 
   Provides support for the Push programming language for evolutionary
   computation.  This library is optional.  If it is not available, the 
-  Push language will not be supported.  Requires GCC 3.3
+  Push language will not be supported.  Requires GCC 3.3 or higher.
 
 + [optional] libenet, networking library 
   http://enet.cubik.org/

@@ -10,6 +10,8 @@ char *brObjectDescription(brInstance *i) {
 	int r;
 	brEval result;
 
+	return slStrdup("");
+
 	if(!i || i->status != AS_ACTIVE) return slStrdup("");
 
 	r = brMethodCallByName(i, "get-description", &result);
@@ -190,4 +192,3 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 			return slStrdup("");
 	}
 }
-

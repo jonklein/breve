@@ -14,7 +14,7 @@ OFILES	= graph.o draw.o
 all: libbrgraph.a graphTest
 
 graphTest: libbrgraph.a graphTest.c
-	$(CC) $(CFLAGS) -o graphTest graphTest.c $(INCLUDE) -L. -lbrgraph $(LIBS) @GLLIBS@ @DEFS@
+	$(CXX) $(CFLAGS) -o graphTest graphTest.c $(INCLUDE) -L. -lbrgraph $(LIBS) @GLLIBS@ @DEFS@
 	
 libbrgraph.a: $(OFILES)
 	$(AR) crv libbrgraph.a $(OFILES)
@@ -26,7 +26,7 @@ libbrgraph.a: $(OFILES)
 install: all
 
 .c.o: $(CFILES)
-	$(CC) $(CFLAGS) -c $*.c $(DEFINES) $(INCLUDE) 
+	$(CXX) -fpermissive $(CFLAGS) -c $*.c $(DEFINES) $(INCLUDE) 
 
 clean:
 	-rm *.o libbrgraph.a graphTest

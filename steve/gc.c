@@ -91,7 +91,7 @@ void stGCRetain(brEval *e) {
 */
 
 void stGCRetainPointer(void *pointer, int type) {
-	if(!pointer) return;
+	if(type == AT_NULL || !pointer) return;
 
 	switch(type) {
 		case AT_INSTANCE:
@@ -164,7 +164,7 @@ void stGCCollect(brEval *e) {
 */
 
 inline void stGCCollectPointer(void *pointer, int type) {
-	if(!pointer) return;
+	if(type == AT_NULL || !pointer) return;
 
 	switch(type) {
 		case AT_INSTANCE:
@@ -233,7 +233,7 @@ void stGCCollectStack(slStack *gc) {
 */
 
 void stGCMark(stInstance *i, brEval *collect) {
-	stGCMarkPointer(i, collect->values.pointerValue, collect->type);
+	stGCMarkPointer(i, BRPOINTER(collect), collect->type);
 }
 
 /*!
@@ -243,6 +243,9 @@ void stGCMark(stInstance *i, brEval *collect) {
 
 inline void stGCMarkPointer(stInstance *i, void *pointer, int type) {
 	stGCRecord *r;
+	stInstance *collect;
+
+	if(type == AT_NULL || !pointer) return;
 
 	switch(type) {
 		case AT_HASH:
@@ -251,7 +254,8 @@ inline void stGCMarkPointer(stInstance *i, void *pointer, int type) {
 		case AT_LIST:
 			break;
 		case AT_INSTANCE:
-			if(!i->gc) return;
+			collect = ((brInstance*)pointer)->userData;
+			if(!collect->gc) return;
 			break;
 		default:
 			return;

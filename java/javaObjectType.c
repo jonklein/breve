@@ -100,4 +100,8 @@ void brJavaInit(brEngine *e) {
 
 	if(javaObjectType->userData) brEngineRegisterObjectType(e, javaObjectType);
 }
+
+void brJavaFree(brEngine *e) {
+
+}
 #endif

@@ -182,10 +182,7 @@ void stInstanceUnretain(stInstance *i) {
 */
 
 void stInstanceCollect(stInstance *i) {
-	if(i->gc && i->retainCount < 1) {
-		// printf("now would be the time to release %p (%d)\n", i, i->retainCount);
-		stInstanceFree(i);
-	}
+	if(i->gc && i->retainCount < 1) brInstanceRelease(i->breveInstance);
 }
 
 /*!

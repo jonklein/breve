@@ -22,6 +22,16 @@
 #define _MEMORY_H
 #include <stdio.h>
 
+#ifdef MEMORY_DEBUG
+#define slFree(p)		slDebugFree((p), __LINE__, __FILE__)
+#define slMalloc(p) 	slDebugMalloc((p), __LINE__, __FILE__)
+#define slRealloc(p, s) slDebugRealloc((p), (s), __LINE__, __FILE__)
+#else
+#define slFree(p) free(p)
+#define slMalloc(p) slNormalMalloc(p)
+#define slRealloc(p, s) realloc(p, s)
+#endif /* MEMORY_DEBUG */
+
 enum mallocStatus {
     MS_NULL = 0,
     MS_MALLOC,
@@ -39,15 +49,20 @@ struct slMallocData {
     int size;
 
     char status;
+
+	int line;
+	char *file;
 };
 
-void *slMalloc(int n);
-void *slRealloc(void *p, int n);
-void slFree(void *p);
+void *slNormalMalloc(int n);
+
+void *slDebugMalloc(int n, int line, char *file);
+void *slDebugRealloc(void *p, int n, int line, char *file);
+void slDebugFree(void *p, int line, char *file);
 
 int slMallocHash(void *hash, void *p, slMallocData *d);
 slMallocData *slMallocLookup(void *hash, void *p);
-slMallocData *slNewUtilMallocData(void *p, int size);
+slMallocData *slNewUtilMallocData(void *p, int size, int line, char *file);
 
 int slUtilMemoryUnfreed();
 void slUtilMemoryFreeAll();

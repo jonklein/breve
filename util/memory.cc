@@ -65,17 +65,18 @@ slHash *slInitUtilMallocHash() {
 	functions that track memory usage).
 */
 
-void *slMalloc(int n) {
+void *slNormalMalloc(int n) {
+	void *m = malloc(n);
+	bzero(m, n);
+	return m;
+}
+
+void *slDebugMalloc(int n, int line, char *file) {
     void *m;
     slMallocData *d;
 
-#ifndef MEMORY_DEBUG
     m = malloc(n);
-    bzero(m, n);
-    return m;
-#endif
-
-    m = malloc(n);
+	bzero(m, n);
 
     if(!gUtilMallocHash) gUtilMallocHash = slInitUtilMallocHash();
 
@@ -93,28 +94,21 @@ void *slMalloc(int n) {
         d->size = n; 
         d->status = MS_MALLOC;
     } else {
-        d = slHashData(gUtilMallocHash, m, slNewUtilMallocData(m, n));
+        d = slHashData(gUtilMallocHash, m, slNewUtilMallocData(m, n, line, file));
     }
 
     gMallocBytes += n;
 
-    bzero(m, n);
-
     return m;
 }
 
-void *slRealloc(void *p, int n) {
+// void *slRealloc(void *p, int n) {
+//   return realloc(p, n);
+// }
+
+void *slDebugRealloc(void *p, int n, int line, char *file) {
     void *m;
     slMallocData *d;
-
-#ifndef MEMORY_DEBUG
-    return realloc(p, n);
-#endif
-
-    if(!p) {
-        fprintf(stderr, "realloc of unallocated pointer: caling malloc instead\n");
-        return slMalloc(n);
-    }
 
     if(!gUtilMallocHash) slInitUtilMallocHash();
 
@@ -123,17 +117,17 @@ void *slRealloc(void *p, int n) {
     d = slDehashData(gUtilMallocHash, p);
 
     if(!d) {
-        fprintf(stderr, "attempting to reallocate unknown pointer: %p\n", p);
+        fprintf(stderr, "attempting to reallocate unknown pointer %p at line %d of file \"%s\"\n", p, line, file);
 		slStackTrace();
         return slMalloc(n);
     }
 
     if(d->status == MS_FREE) {
-        fprintf(stderr, "attempt to reallocate a freed pointer: %p\n", p);
+        fprintf(stderr, "attempt to reallocate a freed pointer %p at line %d of file \"%s\"\n", p, line, file);
 		slStackTrace();
         return slMalloc(n);
     } else if(d->status == MS_REALLOC) {
-        fprintf(stderr, "attempt to reallocate a reallocated pointer: %p\n", p);
+        fprintf(stderr, "attempt to reallocate a reallocated pointer %p at line %d of file \"%s\"\n", p, line, file);
 		slStackTrace();
         return slMalloc(n);
     }
@@ -149,8 +143,8 @@ void *slRealloc(void *p, int n) {
 
     gMallocBytes += (n - d->size);
 
-    /* if we get the same pointer back, change the size */
-    /* otherwise, change the status of the old, and create a new entry */
+    // if we get the same pointer back, change the size 
+    // otherwise, change the status of the old, and create a new entry 
 
     if(m == p) {
         d->size = n;
@@ -162,34 +156,36 @@ void *slRealloc(void *p, int n) {
         if(d) {
             d->status = MS_MALLOC;
             d->size = n;
-        } else d = slHashData(gUtilMallocHash, m, slNewUtilMallocData(m, n));
+			d->line = line;
+			d->file = file;
+        } else d = slHashData(gUtilMallocHash, m, slNewUtilMallocData(m, n, line, file));
     }
 
     return m;
 }
 
-void slFree(void *p) {
-    slMallocData *d;
+// void slFree(void *p) {
+//   free(p);
+//    return;
+// }
 
-#ifndef MEMORY_DEBUG
-    free(p);
-    return;
-#endif
+void slDebugFree(void *p, int line, char *file) {
+    slMallocData *d;
 
     d = slDehashData(gUtilMallocHash, p);
 
     if(!d) {
-        fprintf(stderr, "attempt to free an unallocated pointer: %p\n", p);
+        fprintf(stderr, "attempt to free an unallocated pointer %p at line %d of file \"%s\"\n", p, line, file);
 		slStackTrace();
         return;
     }
 
     if(d->status == MS_FREE) {
-        fprintf(stderr, "attempt to free a freed pointer: %p\n", p);
+        fprintf(stderr, "attempt to free a freed pointer %p at line %d of file \"%s\"\n", p, line, file);
 		slStackTrace();
         return;
     } else if (d->status == MS_REALLOC) {
-        fprintf(stderr, "attempt to free a reallocateded pointer: %p\n", p);
+        fprintf(stderr, "attempt to free a reallocateded pointer %p at line %d of file \"%s\"\n", p, line, file);
 		slStackTrace();
         return;
 	}
@@ -246,7 +242,7 @@ int slUtilMemoryUnfreed() {
             if(d->status == MS_MALLOC) {
 				char command[1024];
 
-                slMessage(DEBUG_ALL, "%p: %d bytes still allocated ", d->pointer, d->size);
+                slMessage(DEBUG_ALL, "%p: %d bytes still allocated at line %d of file \"%s\" ", d->pointer, d->size, d->line, d->file);
 				slPrintIfString(d->pointer, 30, d->size);
 				slMessage(DEBUG_ALL, "\n");
 
@@ -302,7 +298,7 @@ void slPrintIfString(char *pointer, int length, int maxlen) {
 	of a single allocation.
 */
 
-slMallocData *slNewUtilMallocData(void *p, int size) {
+slMallocData *slNewUtilMallocData(void *p, int size, int line, char *file) {
     slMallocData *d;
 
     d = malloc(sizeof(slMallocData));
@@ -310,6 +306,8 @@ slMallocData *slNewUtilMallocData(void *p, int size) {
     d->pointer = p;
     d->size = size;
     d->status = MS_MALLOC;
+    d->line = line;
+    d->file = file;
 
     return d;
 }

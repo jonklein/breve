@@ -45,7 +45,7 @@ int glActive = 0;
 	are the opposite of SL matrices).
 */
 
-inline void slMatrixGLMult(double m[3][3]) {
+void slMatrixGLMult(double m[3][3]) {
 	double d[4][4];
 
 	d[0][0] = m[0][0]; d[0][1] = m[1][0]; d[0][2] = m[2][0]; d[0][3] = 0;

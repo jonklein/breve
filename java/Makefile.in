@@ -17,7 +17,7 @@ clean:
 	-rm -f *.o *.jar
 
 .c.o:
-	$(CC) -g -c $*.c $(INCLUDE) @JAVAINCS@
+	$(CC) $(CFLAGS) -c $*.c $(INCLUDE) @JAVAINCS@
 
 MethodFinder.jar: MethodFinder.java
 	-javac *.java

@@ -1,13 +1,16 @@
 @use Control.
 
-Controller GCTest.
+Controller ListTest.
 
-Control : GCTest {
-	+ variables:
-		l (list).
-
+Control : ListTest {
 	+ to init:
-		print (self make-list).
+		newlist (list).
+
+		newlist = (self make-list).
+
+		if | newlist | != 2: die "Wrong number of elements in $newlist".
+
+		self end-simulation.
 
 	+ to make-list:
 		local (list).

@@ -6,6 +6,7 @@ Control : GCTest {
 	+ variables:
 		gh (hash).
 		gl (list).
+		n (int).
 	
 	+ to init:
 		self test-argument-allocations with-list { new GCTesterI, { 2, 3, "dog" } }.
@@ -23,6 +24,11 @@ Control : GCTest {
 
 	+ to iterate:
 		ti, tii (int).
+		
+		if !n: {
+			n = 1.
+			return.
+		}
 
 		ti = |(all GCTesterI)|.
 		tii = |(all GCTesterII)|.
@@ -70,21 +76,31 @@ Control : GCTest {
 }
 
 Object : GCTesterI {
+	+ variables:
+		label (int).
+		test2 (object).
+
 	+ to init:
-		print "creating $self".
 		self enable-auto-free.
-		new GCTesterII.
+		# label = | all Objects |.
+		label = random[1000].
+		print "creating $self (#$label)".
+		test2 = new GCTesterII.
 
 	+ to destroy:
-		print "destroying $self".
+		print "destroying $self (#$label)".
 }
 
 Object : GCTesterII {
+	+ variables:
+		label (int).
+
 	+ to init:
-		print "creating $self".
+		# label = | all Objects |.
+		label = random[1000].
+		print "creating $self (#$label)".
 		self enable-auto-free.
-		print (self get-retain-count).
 
 	+ to destroy:
-		print "destroying $self".
+		print "destroying $self (#$label)".
 }
