@@ -126,6 +126,8 @@ bool BCTestApp::OnInit()
 
 	    if (str.Last() != FILE_SEP_PATH)
 		str << FILE_SEP_PATH;
+
+	    wxSetEnv("BREVE_CLASS_PATH", str);
 	}
 	else if (wxDirExists(AppDir + "lib" + FILE_SEP_PATH + "classes"))
 	{
@@ -151,6 +153,8 @@ bool BCTestApp::OnInit()
 		    str << FILE_SEP_PATH;
 
 		config->Write("BreveClassPath", str);
+
+		wxSetEnv("BREVE_CLASS_PATH", str);
 
 		manual = TRUE;
 	    }
