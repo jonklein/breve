@@ -33,7 +33,7 @@ int breveMovieCreate(brEval args[], brEval *result, brInstance *i) {
 
 	path = brOutputPath(i->engine, BRSTRING(&args[0]));
 
-	movie = slMovieCreate(path, camera->x, camera->y, 30000, 1001);
+	movie = slMovieCreate(path, camera->x, camera->y);
 	slFree(path);
 
 	BRPOINTER(result) = movie;

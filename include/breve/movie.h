@@ -15,7 +15,7 @@ class slMovie {
 		unsigned int enc_len, rgb_len, yuv_len;
 };
 
-slMovie *slMovieCreate(char *, int, int, int, int);
+slMovie *slMovieCreate(char *, int, int);
 int slMovieAddWorldFrame(slMovie *, slWorld *, slCamera *);
 int slMovieFinish(slMovie *);
 

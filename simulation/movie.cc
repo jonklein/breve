@@ -28,7 +28,7 @@ static int slMovieEncodeFrame(slMovie *m);
 	\brief Opens a movie file for writing.
 */
 
-slMovie *slMovieCreate(char *filename, int width, int height, int rate, int b) {
+slMovie *slMovieCreate(char *filename, int width, int height) {
 	AVCodecContext *c;
 	AVCodec *codec;
 	AVStream *st;
@@ -51,16 +51,14 @@ slMovie *slMovieCreate(char *filename, int width, int height, int rate, int b) {
 	if (!(m->context = av_alloc_format_context()) ||
 #endif
 	    !(st = av_new_stream(m->context, 0))) {
-		slMessage(DEBUG_ALL, "Could allocate lavf context\n");
+		slMessage(DEBUG_ALL, "Could not allocate lavf context\n");
 		delete m;
 		return NULL;
 	}
 
-	n = snprintf(m->context->filename, sizeof(m->context->filename), "%s", filename);
-	if (n < 0 || (size_t)n >= sizeof(m->context->filename))
-		slMessage(DEBUG_WARN, "Could not set lavf output filename\n");
-
-	if (url_fopen(&m->context->pb, filename, URL_WRONLY) < 0) {
+	n = snprintf(m->context->filename, sizeof(m->context->filename), "file:%s", filename);
+	if (n < 0 || (size_t)n >= sizeof(m->context->filename) ||
+	    url_fopen(&m->context->pb, m->context->filename, URL_WRONLY) < 0) {
 		slMessage(DEBUG_ALL, "Could not open file \"%s\" for writing: %s\n", filename, strerror(errno));
 		av_free(st);
 		av_free(m->context);
@@ -95,8 +93,8 @@ slMovie *slMovieCreate(char *filename, int width, int height, int rate, int b) {
 
 	c->width = width;
 	c->height = height;
-	c->frame_rate = rate;
-	c->frame_rate_base = b;
+	c->frame_rate = 30000; /* NTSC */
+	c->frame_rate_base = 1001;
 
 	/* Use lavc ratecontrol to get 1-pass constant bit-rate. */
 
