@@ -121,7 +121,7 @@ int slWorldStartNetsimServer(slWorld *w) {
 */
 
 int slWorldStartNetsimSlave(slWorld *w, char *host) {
-#ifdef HAS_LIBENET
+#ifdef HAVE_LIBENET
 	enet_initialize();
 
 	w->netsimData.isMaster = 0;
