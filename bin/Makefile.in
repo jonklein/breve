@@ -23,9 +23,11 @@ all: breve_cli breve
 
 breve: $(BREVEO) ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a
 	$(CC) -o breve $(CFLAGS) $(BREVEO) $(LIBS) @GLLIBS@ @AUDIOLIBS@
+	strip -u -s ../lib/loadable-symbols breve
 
 breve_cli: $(BREVECLIO) ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a
 	$(CC) -o breve_cli $(CFLAGS) $(BREVECLIO) $(LIBS) @GLLIBS@ @AUDIOLIBS@
+	strip -u -s ../lib/loadable-symbols breve_cli
 
 clean:
 	-rm -f breve breve_cli *.o

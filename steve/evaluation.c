@@ -2608,7 +2608,7 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *target, stObject **tClass) {
 					break;
 				case AT_INT:
 					target->type = AT_INT;
-					if(BRINT(target) < 0) BRINT(target) *= -1;
+					BRINT(target) = abs(BRINT(target));
 					result = EC_OK;
 					break;
 				case AT_DOUBLE:

@@ -3093,9 +3093,9 @@ _ACEOF
   LIBS="-lz $LIBS"
 
 else
-  { { echo "$as_me:$LINENO: error: Missing zlib library
+  { { echo "$as_me:$LINENO: error: Missing zlib library -- see http://www.zlib.org
 See \`config.log' for more details." >&5
-echo "$as_me: error: Missing zlib library
+echo "$as_me: error: Missing zlib library -- see http://www.zlib.org
 See \`config.log' for more details." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -3959,7 +3959,7 @@ if test "${ac_cv_lib_ode_dWorldStep+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lstdc++ -lsupc++ -lode -lgcc $LIBS"
+LIBS="-lode -lstdc++ $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -5916,7 +5916,7 @@ fi
 done
 
 
-                                                                                                                                                                ac_config_files="$ac_config_files Makefile docBuild/Makefile docBuild/docbook/Makefile graph/Makefile neural/Makefile kernel/Makefile kernel/internalFunctions/Makefile util/Makefile steve/Makefile simulation/Makefile bin/Makefile plugins/slDigitizerPlugin/Makefile plugins/slJavaPlugin/Makefile plugins/slQTMusicPlugin/Makefile plugins/slRegexPlugin/Makefile plugins/slURLPlugin/Makefile"
+                                                                                                                                                                          ac_config_files="$ac_config_files Makefile docBuild/Makefile docBuild/docbook/Makefile graph/Makefile neural/Makefile kernel/Makefile kernel/internalFunctions/Makefile util/Makefile steve/Makefile simulation/Makefile bin/Makefile plugins/slDigitizerPlugin/Makefile plugins/slJavaPlugin/Makefile plugins/slQTMusicPlugin/Makefile plugins/slRegexPlugin/Makefile plugins/slURLPlugin/Makefile OSX/ConfigureLibraryList"
 
 
 if test "$ac_cv_lib_png_png_create_write_struct" != yes; then
@@ -6483,6 +6483,7 @@ do
   "plugins/slQTMusicPlugin/Makefile" ) CONFIG_FILES="$CONFIG_FILES plugins/slQTMusicPlugin/Makefile" ;;
   "plugins/slRegexPlugin/Makefile" ) CONFIG_FILES="$CONFIG_FILES plugins/slRegexPlugin/Makefile" ;;
   "plugins/slURLPlugin/Makefile" ) CONFIG_FILES="$CONFIG_FILES plugins/slURLPlugin/Makefile" ;;
+  "OSX/ConfigureLibraryList" ) CONFIG_FILES="$CONFIG_FILES OSX/ConfigureLibraryList" ;;
   "include/breve/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/breve/config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}

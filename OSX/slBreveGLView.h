@@ -31,6 +31,8 @@
 
 @interface slBreveGLView : NSOpenGLView
 {
+	id printView;
+
     brEngine *viewEngine;
 
     id motionSelector;
@@ -91,5 +93,8 @@
 - (void)drawFullScreen;
 
 - (void)activateContext;
+
+- (NSBitmapImageRep*)makeImageRep;
+
 
 @end

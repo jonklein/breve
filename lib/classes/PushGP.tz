@@ -223,10 +223,16 @@ Object : PushGP {
 				with-interpreter interpreter).
 		}
 
+		if fitness < 0.0: {
+			# this indicates an error -- give it an arbitrarily bad fitness
+			print "warning: error value lower than 0 for GP individual".
+			fitness = 100000000.
+		}
+
 		if fitness < 0.001: {
 			print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;".
-			print ";; Solution found at generation $generation:".
-			print (current{ currentIndividual } get-string).
+			print ";; Solution found at generation $generation:", 
+					(current{ currentIndividual } get-string).
 			controller end-simulation.
 		}
 

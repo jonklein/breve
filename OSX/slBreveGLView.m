@@ -142,9 +142,17 @@
 - (void)updateSize:sender {
 	NSRect bounds;
 
-	if(!viewEngine) return;
-
 	bounds = [self bounds];
+
+	if(!pixelBuffer || !tempPixelBuffer) {
+		pixelBuffer = malloc(bounds.size.width * bounds.size.height * 4);
+		tempPixelBuffer = malloc(bounds.size.width * bounds.size.height * 4);
+	} else {
+		pixelBuffer = realloc(pixelBuffer, bounds.size.width * bounds.size.height * 4);
+		tempPixelBuffer = realloc(tempPixelBuffer, bounds.size.width * bounds.size.height * 4);
+	}
+
+	if(!viewEngine) return;
 
 	if(fullScreen) {
 		viewEngine->camera->x = [fullScreenView width];
@@ -156,14 +164,6 @@
 	}
 
 	viewEngine->camera->fov = (double)viewEngine->camera->x/(double)viewEngine->camera->y;
-
-	if(!pixelBuffer || !tempPixelBuffer) {
-		pixelBuffer = malloc(viewEngine->camera->x * viewEngine->camera->y * 4);
-		tempPixelBuffer = malloc(viewEngine->camera->x * viewEngine->camera->y * 4);
-	} else {
-		pixelBuffer = realloc(pixelBuffer, viewEngine->camera->x * viewEngine->camera->y * 4);
-		tempPixelBuffer = realloc(tempPixelBuffer, viewEngine->camera->x * viewEngine->camera->y * 4);
-	}
 
 	glViewport(0, 0, viewEngine->camera->x, viewEngine->camera->y);
 }
@@ -419,6 +419,10 @@
 - (char*)RGBAPixels {
 	NSRect bounds = [self bounds];
 
+	if(!pixelBuffer || !tempPixelBuffer) [self updateSize: self];
+
+	printf("reading %f x %f [%p]\n", bounds.size.width, bounds.size.height, tempPixelBuffer);
+
 	glReadPixels(0, 0, bounds.size.width, bounds.size.height, GL_RGBA, GL_UNSIGNED_BYTE, tempPixelBuffer);
 
 	slReversePixelBuffer(tempPixelBuffer, pixelBuffer, bounds.size.width * 4, bounds.size.height);
@@ -427,72 +431,54 @@
 }
 
 - (int)snapshotToFile:(NSString*)filename {
-	NSBitmapImageRep *i;
+	NSBitmapImageRep *i = [self makeImageRep];
 	NSData *image;
+
+	image = [i TIFFRepresentationUsingCompression: NSTIFFCompressionNone factor: 0.0];
+
+	if(!image) {
+		[i release];
+		return -1;
+	}
+
+	[image writeToFile: filename atomically: NO];
+	[i release];
+
+	return 0;
+}
+
+- (NSBitmapImageRep*)makeImageRep {
+	NSBitmapImageRep *i;
 	NSRect bounds;
-	unsigned char *planes[3];
-	unsigned char *temp;
 	int x, y;
-	int returnCode = 0;
 
 	bounds = [self bounds];
 
 	x = bounds.size.width;
 	y = bounds.size.height;
 
-	planes[0] = slMalloc(x * y);
-	planes[1] = slMalloc(x * y);
-	planes[2] = slMalloc(x * y);
-	temp = slMalloc(x * y);
-
-	/* OpenGL returns the pixels from the bottom row up, while */
-	/* NSBitmapImageRep expects them from the top--we have to  */
-	/* reverse the directions of each of the buffers */
-
-	glReadPixels(0, 0, x, y, GL_RED, GL_UNSIGNED_BYTE, temp);
-	slReversePixelBuffer(temp, planes[0], x, y);
-
-	glReadPixels(0, 0, x, y, GL_GREEN, GL_UNSIGNED_BYTE, temp);
-	slReversePixelBuffer(temp, planes[1], x, y);
-
-	glReadPixels(0, 0, x, y, GL_BLUE, GL_UNSIGNED_BYTE, temp);
-	slReversePixelBuffer(temp, planes[2], x, y);
-
 	i = [NSBitmapImageRep alloc];
 
-	[i initWithBitmapDataPlanes: planes
+	[self RGBAPixels];
+
+	[i initWithBitmapDataPlanes: &pixelBuffer
 	   pixelsWide: x
 	   pixelsHigh: y
 	   bitsPerSample: 8
-	   samplesPerPixel: 3
-	   hasAlpha: NO
-	   isPlanar: YES
+	   samplesPerPixel: 4
+	   hasAlpha: YES
+	   isPlanar: NO 
 	   colorSpaceName: @"NSDeviceRGBColorSpace"
 	   bytesPerRow: 0
-	   bitsPerPixel: 0];
+		bitsPerPixel: 0];
 
-	image = [i TIFFRepresentationUsingCompression: NSTIFFCompressionNone factor: 0.0];
-
-	if(image) {
-		[image writeToFile: filename atomically: NO];
-		returnCode = 0;
-	} else {
-		returnCode = -1;		
-	}
-
-	[i release];
-
-	slFree(planes[0]);
-	slFree(planes[1]);
-	slFree(planes[2]);
-	slFree(temp);
-
-	return returnCode;
+	return i;
 }
 
 - (void)setContextMenuEnabled:(BOOL)c {
 	contextEnabled = c;
 }
+
 
 - (void)updateContextualMenu:(id)menu withInstance:(stInstance*)i {
 	id menuItem;
@@ -525,5 +511,47 @@
 	[fullScreenView release];
 }
 
+- (void)print:(id)sender {
+    NSBitmapImageRep *r = [self makeImageRep];
+    NSData *imageData;
+    NSImage *image;
+    NSRect b;
+
+    if(!r) return;
+
+    imageData = [r TIFFRepresentationUsingCompression: NSTIFFCompressionNone factor: 0.0];
+
+    image = [[NSImage alloc] initWithData: imageData];
+
+    b = [self bounds];
+    b.origin.x = -b.size.width - 100;
+    b.origin.y = -b.size.height - 100;
+
+	// for some reason, the printView size isn't getting set 
+	// correctly the first time.
+
+    [printView setBounds: b];
+    [printView setFrame: b];
+    [printView setImage: image];
+    [printView setImageScaling: NSScaleNone];
+    [printView setNeedsDisplay: YES];
+    [printView setBounds: b];
+    [printView setFrame: b];
+
+	b = [printView bounds];
+
+    [printView lockFocus];
+    [image lockFocus];
+    [image drawAtPoint: NSMakePoint(0, 0) fromRect: [self bounds] operation: NSCompositeCopy fraction: 1.0];
+    [image unlockFocus];
+    [printView unlockFocus];
+
+    [[NSPrintInfo sharedPrintInfo] setHorizontalPagination: NSAutoPagination];
+    [[NSPrintInfo sharedPrintInfo] setVerticalPagination: NSAutoPagination];
+
+    [printView print: sender];
+    [r release];
+    [image release];
+}
 
 @end

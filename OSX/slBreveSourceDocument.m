@@ -136,5 +136,21 @@
     // NSLog(@"got double\n");
 }
 
+- (void)printShowingPrintPanel:(BOOL)showPanels {
+    // Construct the print operation and setup Print panel
+
+    NSPrintOperation *op = [NSPrintOperation
+                printOperationWithView: steveText
+                printInfo:[self printInfo]];
+
+    [op setShowPanels:showPanels];
+
+    // Run operation, which shows the Print panel if showPanels was YES
+
+    [self runModalPrintOperation:op
+                delegate:nil
+                didRunSelector:NULL
+                contextInfo:NULL];
+}
 
 @end

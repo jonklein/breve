@@ -48,6 +48,11 @@ OS X Note #2: if a library is installed, but cannot be found with the
 configure script, you may have to run "ranlib" on the library before
 it can be found.  See the ranlib manpage for more information.
 
+OS X Note #3: the Xcode build targets breve.app is a simple shell script 
+wrapper to build real_breve.app using the correct libraries from the 
+configure script.  Building real_breve.app directly will fail, because 
+it is missing these library settings.
+
                            --- PLATFORMS ---
 
 breve is actively developed and maintained on three platforms:

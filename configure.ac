@@ -80,7 +80,7 @@ AC_PROG_RANLIB
 
 
 # Checks for libraries.
-AC_CHECK_LIB([z], [gzopen],,AC_MSG_FAILURE([Missing zlib library]))
+AC_CHECK_LIB([z], [gzopen],,AC_MSG_FAILURE([Missing zlib library -- see http://www.zlib.org]))
 AC_CHECK_LIB([expat], [XML_ParserCreate],,AC_MSG_FAILURE([Missing expat library -- see http://www.jclark.com/xml/expat.html]))
 AC_CHECK_LIB([pthread], [pthread_create],,AC_MSG_FAILURE([Missing pthread library]),$PTHREADLIBS)
 AC_CHECK_LIB([avcodec], [avcodec_init])
@@ -134,6 +134,7 @@ AC_CONFIG_FILES([Makefile
                  plugins/slQTMusicPlugin/Makefile
                  plugins/slRegexPlugin/Makefile
                  plugins/slURLPlugin/Makefile
+                 OSX/ConfigureLibraryList
 ])
 
 if test "$ac_cv_lib_png_png_create_write_struct" != yes; then

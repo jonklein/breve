@@ -90,7 +90,13 @@
             ACTIONS = {updateSize = id; }; 
             CLASS = slBreveGLView; 
             LANGUAGE = ObjC; 
-            OUTLETS = {motionSelector = id; theController = id; }; 
+            OUTLETS = {
+                motionSelector = id; 
+                printView = id; 
+                selectionMenu = id; 
+                theController = id; 
+                theMovie = id; 
+            }; 
             SUPERCLASS = NSOpenGLView; 
         }, 
         {
