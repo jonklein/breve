@@ -136,7 +136,7 @@ int brICameraNew(brEval args[], brEval *target, brInstance *i) {
 	slVectorSet(&camera->target, 1, 0, 0);
 	slVectorSet(&camera->location, 0, 0, 0);
 
-	BRCAMERAPOINTER(target) = camera;
+	BRPOINTER(target) = camera;
 
 	slWorldAddCamera(i->engine->world, camera);
 

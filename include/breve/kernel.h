@@ -52,17 +52,16 @@
 
 #include "util.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <strings.h>
-#include <string.h>
-#include <pthread.h>
-#include <inttypes.h>
 #include <sys/stat.h>
 #include <sys/param.h>
 #include <sys/types.h>
 
-#include <fcntl.h>
+#include <inttypes.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
 
 #include "simulation.h"
 

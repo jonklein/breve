@@ -36,7 +36,7 @@ void slVclipDataInit(slWorld *w) {
 
 	w->initialized = 1;
 
-	if(w->proximityData) {
+	if (w->proximityData) {
 		slInitProximityData(w);
 		slInitBoundSort(w->proximityData);
 	}
@@ -53,16 +53,16 @@ void slVclipDataInit(slWorld *w) {
 	w->clipData->boundLists[1].clear();
 	w->clipData->boundLists[2].clear();
 
-	for(x=0;x<w->objects.size();x++) {
+	for(x = 0; x < w->objects.size(); ++x) {
 		switch(w->objects[x]->type) {
 			case WO_LINK:
-				link = (slLink*)w->objects[x];
+				link = (slLink *)w->objects[x];
 				link->clipNumber = x;
 				slLinkUpdateBoundingBox(link);
 
 				break;
 			case WO_STATIONARY:
-				st = (slStationary*)w->objects[x];
+				st = (slStationary *)w->objects[x];
 				st->shape->bounds(&st->position, &st->min, &st->max);
 				break;
 		}
@@ -70,14 +70,14 @@ void slVclipDataInit(slWorld *w) {
 		slAddBoundingBoxForVectors(w->clipData, x, &w->objects[x]->min, &w->objects[x]->max);
 	}
 
-	for(x=0;x<w->clipData->maxCount;x++) 
+	for (x = 0; x < w->clipData->maxCount; ++x) 
 		memset(w->clipData->pairArray[x], (BT_CHECK | BT_UNKNOWN), w->clipData->maxCount);
 
-	for(x=0;x<w->objects.size();x++) {
-	 	if(w->objects[x]->type == WO_LINK) {
+	for(x = 0; x < w->objects.size(); ++x) {
+	 	if (w->objects[x]->type == WO_LINK) {
 			std::vector<slJoint*>::iterator ji;
 
-	 		link = (slLink*)w->objects[x];
+	 		link = (slLink *)w->objects[x];
 	 
 			for(ji = link->outJoints.begin(); ji != link->outJoints.end(); ji++ ) {
 				slPairFlags *flags;
@@ -85,14 +85,15 @@ void slVclipDataInit(slWorld *w) {
 
 				flags = slVclipPairFlags(w->clipData, link->clipNumber, link2->clipNumber);
 
-				if(*flags & BT_CHECK) *flags ^= BT_CHECK;
+				*flags &= ~BT_CHECK;
 			}
 
-	 		if(link->multibody) slMultibodyInitCollisionFlags(link->multibody, w->clipData);
+	 		if (link->multibody)
+				slMultibodyInitCollisionFlags(link->multibody, w->clipData);
 		}
 	}
 
-	if(w->detectCollisions) {
+	if (w->detectCollisions) {
 		slInitBoundSort(w->clipData);
 		slVclip(w->clipData, 0.0, 0, w->boundingBoxOnly);
 	}
@@ -119,15 +120,15 @@ void slVclipDataInitPairFlags(slWorld *w, int x, int y) {
 
 	flags = slVclipPairFlags(w->clipData, x, y);
 
-	if(*flags & BT_UNKNOWN) *flags ^= BT_UNKNOWN;
+	*flags &= ~BT_UNKNOWN;
 
 	t1 = w->objects[x]->type;
 	t2 = w->objects[y]->type;
 
 	// collision detection is never turned on for 2 non-link objects.
 	   
-	if(t1 != WO_LINK && t2 != WO_LINK) {
-		if(*flags & BT_CHECK) *flags ^= BT_CHECK;
+	if (t1 != WO_LINK && t2 != WO_LINK) {
+		*flags &= ~BT_CHECK;
 		return;
 	}
 	
@@ -139,25 +140,29 @@ void slVclipDataInitPairFlags(slWorld *w, int x, int y) {
 
 	// see if simulation is enabled for both of these objects 
 
-	if(t1 == WO_LINK) sim1 = ((slLink*)w->objects[x])->simulate;
-	if(t2 == WO_LINK) sim2 = ((slLink*)w->objects[y])->simulate;
+	if (t1 == WO_LINK)
+		sim1 = ((slLink *)w->objects[x])->simulate;
+	if (t2 == WO_LINK)
+		sim2 = ((slLink *)w->objects[y])->simulate;
 
 	// see if the user wants to simulate them and/or callback for them
 
-	if(c1 && c2 && w->collisionCheckCallback) {
-		if(sim1 && sim2) simulate = w->collisionCheckCallback(c1, c2, CC_SIMULATE);
+	if (c1 && c2 && w->collisionCheckCallback) {
+		if (sim1 && sim2)
+			simulate = w->collisionCheckCallback(c1, c2, CC_SIMULATE);
 		callback = w->collisionCheckCallback(c1, c2, CC_CALLBACK);
 	}
 
-	if(simulate || callback) {
+	if (simulate || callback) {
 		w->detectCollisions = 1;
 		*flags |= BT_CHECK;
 
-		if(simulate) *flags |= BT_SIMULATE;
-		if(callback) *flags |= BT_CALLBACK;
-	} else if(*flags & BT_CHECK) {
-		*flags ^= BT_CHECK;
-	}
+		if (simulate)
+			*flags |= BT_SIMULATE;
+		if (callback)
+			*flags |= BT_CALLBACK;
+	} else
+		*flags &= ~BT_CHECK;
 }
 
 /* 
@@ -176,9 +181,8 @@ slVclipData *slVclipDataNew() {
 
 	v->pairArray = new unsigned char*[v->maxCount];
 
-	for(unsigned int n=0; n < v->maxCount; n++) {
+	for (unsigned int n = 0; n < v->maxCount; ++n)
 		v->pairArray[n] = new unsigned char[v->maxCount];
-	}
 
 
 	return v;
@@ -195,15 +199,16 @@ slVclipData *slVclipDataNew() {
 void slVclipDataRealloc(slVclipData *v, unsigned int count) {
 	v->count = count;
 
-	if(v->count < v->maxCount) return;
+	if (v->count < v->maxCount)
+		return;
 
-	while(v->count >= v->maxCount) v->maxCount *= 2;
+	while (v->count >= v->maxCount)
+		v->maxCount *= 2;
 
 	v->pairArray = new unsigned char*[v->maxCount];
 
-	for(unsigned int n=0; n < v->maxCount; n++) {
+	for (unsigned int n = 0; n < v->maxCount; ++n)
 		v->pairArray[n] = new unsigned char[v->maxCount];
-	}
 }
 
 /*!
@@ -251,10 +256,10 @@ void slInitProximityData(slWorld *w) {
 	w->proximityData->boundLists[1].clear();
 	w->proximityData->boundLists[2].clear();
 
-	for(n=0;n<w->proximityData->maxCount;n++) 
+	for(n = 0; n < w->proximityData->maxCount; ++n) 
 		memset(w->proximityData->pairArray[n], (BT_CHECK | BT_UNKNOWN), w->proximityData->maxCount);
 
-	for(n=0;n < w->objects.size(); n++) {
+	for(n = 0; n < w->objects.size(); ++n) {
 		slWorldObject *wo = w->objects[n];
 
 		slAddBoundingBoxForVectors(w->proximityData, n, &wo->neighborMin, &wo->neighborMax);
@@ -273,13 +278,14 @@ void slInitProximityData(slWorld *w) {
 */
 
 void slFreeClipData(slVclipData *v) {
-	if(!v->maxCount) {
+	if (!v->maxCount) {
 		// everything is uninitialized and empty
 		delete v;
 		return;
 	}
 
-	for(unsigned int n = 0; n < v->maxCount; n++) delete[] v->pairArray[n];
+	for (unsigned int n = 0; n < v->maxCount; ++n)
+		delete[] v->pairArray[n];
 
 	delete[] v->pairArray;
 

@@ -1,6 +1,6 @@
 #include "kernel.h"
 
-#ifdef HAVE_LIBQGAME__
+#if HAVE_LIBQGAME__
 
 // WARNING: some unknown header is defining 'Complex' on Linux
 // and messing up the qgame header import -- this is a temporary
@@ -10,13 +10,15 @@
 #include <qgame++.h>
 
 int brIQSysNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = (void*)new qgame::QSys;
+	BRPOINTER(target) = (void *)new qgame::QSys;
+
 	return EC_OK;
 }
 
 int brIQSysFree(brEval args[], brEval *target, brInstance *i) {
-	qgame::QSys *sys = (qgame::QSys*)BRPOINTER(&args[0]);
+	qgame::QSys *sys = (qgame::QSys *)BRPOINTER(&args[0]);
 	delete sys;
+
 	return EC_OK;
 }
 
@@ -25,18 +27,20 @@ int brIQSysRunProgram(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIQProgramNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = (void*)new qgame::QProgram;
+	BRPOINTER(target) = (void *)new qgame::QProgram;
+
 	return EC_OK;
 }
 
 int brIQProgramFree(brEval args[], brEval *target, brInstance *i) {
-	qgame::QProgram *program = (qgame::QProgram*)BRPOINTER(&args[0]);
+	qgame::QProgram *program = (qgame::QProgram *)BRPOINTER(&args[0]);
 	delete program;
+
 	return EC_OK;
 }
 
 int brIQProgramAddInstruction(brEval args[], brEval *target, brInstance *i) {
-	qgame::QProgram *program = (qgame::QProgram*)BRPOINTER(&args[0]);
+	qgame::QProgram *program = (qgame::QProgram *)BRPOINTER(&args[0]);
 	std::string s = BRSTRING(&args[1]);
 
 	try {
@@ -51,18 +55,18 @@ int brIQProgramAddInstruction(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIQProgramGetString(brEval args[], brEval *target, brInstance *i) {
-	qgame::QProgram *program = (qgame::QProgram*)BRPOINTER(&args[0]);
+	qgame::QProgram *program = (qgame::QProgram *)BRPOINTER(&args[0]);
 	std::ostringstream os;
 
 	os << *program;
 
-	BRSTRING(target) = slStrdup((char*)os.str().c_str());
+	BRSTRING(target) = slStrdup((char *)os.str().c_str());
 
 	return EC_OK;
 }
 
 int brIQProgramClear(brEval args[], brEval *target, brInstance *i) {
-	qgame::QProgram *program = (qgame::QProgram*)BRPOINTER(&args[0]);
+	qgame::QProgram *program = (qgame::QProgram *)BRPOINTER(&args[0]);
 
 	program->clear();
 
@@ -70,8 +74,8 @@ int brIQProgramClear(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIQSysTestProgram(brEval args[], brEval *target, brInstance *i) {
-	qgame::QSys *sys = (qgame::QSys*)BRPOINTER(&args[0]);
-	qgame::QProgram *prog = (qgame::QProgram*)BRPOINTER(&args[1]);
+	qgame::QSys *sys = (qgame::QSys *)BRPOINTER(&args[0]);
+	qgame::QProgram *prog = (qgame::QProgram *)BRPOINTER(&args[1]);
 	std::vector<qgame::TestCase> cases;
 	qgame::QubitList qb;
 
@@ -80,7 +84,7 @@ int brIQSysTestProgram(brEval args[], brEval *target, brInstance *i) {
 	brEvalListHead *list = BRLIST(&args[4]);
 	brEvalList *start = list->start;
 
-	while(start) {
+	while (start) {
 		qb.append( BRINT(&start->eval) );
 		start = start->next;
 	}
@@ -98,9 +102,11 @@ int brIQSysTestProgram(brEval args[], brEval *target, brInstance *i) {
 	qgame::Result result;
 
 	try { 
-		result = sys->testProgram(BRINT(&args[3]), prog, cases, qb, BRDOUBLE(&args[5]));
+		result = sys->testProgram(BRINT(&args[3]), prog, cases, qb,
+		    BRDOUBLE(&args[5]));
 	} catch (qgame::Error e) {
- 		slMessage(DEBUG_ALL, "error executing QGAME program: %s\n", e.s.c_str());
+ 		slMessage(DEBUG_ALL, "error executing QGAME program: %s\n",
+		    e.s.c_str());
  		result.misses = -1;
  		result.maxError = -1;
  		result.avgError = -1;
@@ -139,7 +145,7 @@ int brIQSysTestProgram(brEval args[], brEval *target, brInstance *i) {
 #endif
 
 void breveInitQGAMEFunctions(brNamespace *n) {
-#ifdef HAVE_LIBQGAME__
+#if HAVE_LIBQGAME__
 	brNewBreveCall(n, "qsysNew", brIQSysNew, AT_POINTER, 0);
 	brNewBreveCall(n, "qsysFree", brIQSysFree, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "qsysRunProgram", brIQSysRunProgram, AT_NULL, AT_POINTER, AT_POINTER, 0);

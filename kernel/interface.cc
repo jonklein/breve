@@ -214,37 +214,41 @@ int brDragCallback(brEngine *e, int x, int y) {
 */
 
 int brKeyCallback(brEngine *e, unsigned char keyCode, int isDown) {
-	char mname[128];
-	brMethod *method;
 	brEval eval;
+	brMethod *method;
 	int r;
+	char mname[128];
 
-	if(isDown) e->keys[keyCode] = 5;
+	if (isDown)
+		e->keys[keyCode] = 5;
 
-	/* call catch-key-X-down or catch-key-X-up, depending on isDown.  we */
-	/* look for both the character and the ascii code, dvs, both		 */
-	/* catch-key-A-down and catch-key-0x41-down.  */
+	/*
+	 * call catch-key-X-down or catch-key-X-up, depending on isDown.
+	 * we look for both the character and the ascii code, dvs, both
+	 * catch-key-A-down and catch-key-0x41-down.
+	 */
 
-	if(isDown) {
-		sprintf(mname, "catch-key-%c-down", keyCode);
+	if (isDown) {
+		snprintf(mname, sizeof(mname), "catch-key-%c-down", keyCode);
 		method = brMethodFind(e->controller->object, mname, NULL, 0);
 
-		if(!method) {
-			sprintf(mname, "catch-key-0x%X-down", keyCode);
+		if (!method) {
+			snprintf(mname, sizeof(mname), "catch-key-0x%X-down", keyCode);
 			method = brMethodFind(e->controller->object, mname, NULL, 0);
 		}
 	} else {
-		sprintf(mname , "catch-key-%c-up", keyCode);
+		snprintf(mname, sizeof(mname), "catch-key-%c-up", keyCode);
 
 		method = brMethodFind(e->controller->object, mname, NULL, 0);
 
-		if(!method) {
-			sprintf(mname, "catch-key-0x%X-up", keyCode);
+		if (!method) {
+			snprintf(mname, sizeof(mname), "catch-key-0x%X-up", keyCode);
 			method = brMethodFind(e->controller->object, mname, NULL, 0);
 		}
 	}
 
-	if(!method) return EC_OK;
+	if (!method)
+		return EC_OK;
 
 	r = brMethodCall(e->controller, method, NULL, &eval);
 
@@ -261,21 +265,22 @@ int brKeyCallback(brEngine *e, unsigned char keyCode, int isDown) {
 */
 
 int brInterfaceCallback(brEngine *e, int interfaceID, char *string) {
-	brEval eval, *args, a;
-	char mname[128];
+	brEval eval, a, *args;
 	brMethod *method;
-	unsigned char types[] = { AT_UNDEFINED };
 	int r;
+	unsigned char types[] = { AT_UNDEFINED };
+	char mname[128];
 
 	args = &a;
 	BRSTRING(args) = string;
 	args->type = AT_STRING;
 
-	sprintf(mname, "catch-interface-id-%d", interfaceID);
+	snprintf(mname, sizeof(mname), "catch-interface-id-%d", interfaceID);
 
 	method = brMethodFind(e->controller->object, mname, types, 1);
 
-	if(!method) return EC_OK;
+	if (!method)
+		return EC_OK;
 
 	r = brMethodCall(e->controller, method, &args, &eval);
 

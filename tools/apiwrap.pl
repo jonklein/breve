@@ -72,7 +72,7 @@ print CFILE<<__EOT__;
 
 /*\@{*/
 /*! \\addtogroup InternalFunctions */
-#ifdef HAVE_LIB${libraryname}
+#if HAVE_LIB${libraryname}
 #include "$ARGV[1]"
 __EOT__
 
@@ -188,7 +188,7 @@ print CFILE<<__EOT__;
 /*@}*/
 
 void breveInit${outputname}Functions(brNamespace *namespace) {
-#ifdef HAVE_LIB$libraryname
+#if HAVE_LIB$libraryname
 @newcalls#endif /* HAVE_LIB$libraryname */
 }
 __EOT__

@@ -56,64 +56,68 @@ static stInstance *gSortObject = NULL;
 */
 
 int stSortEvalList(brEvalListHead *head, stInstance *caller, stMethod *method) {
-    int n, length = head->count;
-    brEvalList *l = head->start;
+	brEvalList *l = head->start;
+	int n, length = head->count;
 
-    if(head->count < 2) return EC_OK;
+	if (head->count < 2)
+		return EC_OK;
 
-    /* extend the vector if needed */
+	/* extend the vector if needed */
 
-    if(gSortVectorLength < length) {
-        if(gSortVector) gSortVector = slRealloc(gSortVector, sizeof(brEvalList*) * length);
-        else gSortVector = slMalloc(sizeof(brEvalList*) * length);
+	if (gSortVectorLength < length) {
+		if (gSortVector)
+			gSortVector = (brEvalList **)slRealloc(gSortVector, sizeof(brEvalList *) * length);
+        	else
+			gSortVector = (brEvalList **)slMalloc(sizeof(brEvalList *) * length);
 
-        gSortVectorLength = length;
-    }
+		gSortVectorLength = length;
+	}
 
-    /* load the evalList into the sort vector */
+	/* load the evalList into the sort vector */
 
-    for(n=0;n<length;n++) {
-        gSortVector[n] = l;
-        l = l->next;
-    }
+	for (n = 0; n < length; ++n) {
+		gSortVector[n] = l;
+		l = l->next;
+	}
 
-    gEvalListSortError = 0;
+	gEvalListSortError = 0;
 
-    /* set the global method and object pointers and call qsort */
+	/* set the global method and object pointers and call qsort */
 
-    gSortObject = caller;
-    gSortMethod = method;
-    qsort(gSortVector, length, sizeof(brEvalList*), brEvalListCompare);
-    gSortObject = NULL;
-    gSortMethod = NULL;
+	gSortObject = caller;
+	gSortMethod = method;
+	qsort(gSortVector, length, sizeof(brEvalList *), brEvalListCompare);
+	gSortObject = NULL;
+	gSortMethod = NULL;
 
-    /* now reload the sortVector back into the list structure */
+	/* now reload the sortVector back into the list structure */
 
-    head->start = gSortVector[0];
-    head->end = gSortVector[length - 1];
+	head->start = gSortVector[0];
+	head->end = gSortVector[length - 1];
 
-    gSortVector[0]->previous = NULL;
-    gSortVector[0]->next = gSortVector[1];
+	gSortVector[0]->previous = NULL;
+	gSortVector[0]->next = gSortVector[1];
 
-    gSortVector[length - 1]->previous = gSortVector[length - 2];
-    gSortVector[length - 1]->next = NULL;
+	gSortVector[length - 1]->previous = gSortVector[length - 2];
+	gSortVector[length - 1]->next = NULL;
 
 	head->index[0] = head->start;
 	head->index[length - 1] = head->end;
 
-    for(n=1;n<length - 1;n++) {
-        gSortVector[n]->previous = gSortVector[n - 1];
-        gSortVector[n]->next = gSortVector[n + 1];
+	for (n = 1; n < length - 1; ++n) {
+		gSortVector[n]->previous = gSortVector[n - 1];
+		gSortVector[n]->next = gSortVector[n + 1];
 		head->index[n] = gSortVector[n];
-    }
+	}
 
 	head->indexTop = length - 1;
 
-    if(gEvalListSortError) return EC_ERROR;
+	if (gEvalListSortError)
+		return EC_ERROR;
 
-    /* victoire! */
+	/* victoire! */
 
-    return EC_OK;
+	return EC_OK;
 }
 
 /*
@@ -126,47 +130,51 @@ int stSortEvalList(brEvalListHead *head, stInstance *caller, stMethod *method) {
 
 int brEvalListCompare(const void *a, const void *b) {
 	stRunInstance ri;
-    brEval result;
-    int rcode;
+	brEval result;
+	brEval *args[2];
+	int rcode;
 
-    brEval *args[2];
+	/* get the two brEvalList elements */
 
-    /* get the two brEvalList elements */
+	brEvalList *al = *(brEvalList **)a;
+	brEvalList *bl = *(brEvalList **)b;
 
-    brEvalList *al = *(brEvalList**)a;
-    brEvalList *bl = *(brEvalList**)b;
+	args[0] = &al->eval;
+	args[1] = &bl->eval;
 
-    args[0] = &al->eval;
-    args[1] = &bl->eval;
+	// if we encounted an error at a previous iteration, no need to continue
 
-    /* if we encounted an error at a previous iteration, no need to continue */
+	if (gEvalListSortError)
+		return 0;
 
-    if(gEvalListSortError) return 0;
+	/* pass the two evals as arguments to the sort method */
 
-    /* pass the two evals as arguments to the sort method */
-
-    result.type = AT_NULL;
+	result.type = AT_NULL;
 	
 	ri.instance = gSortObject;
 	ri.type = gSortObject->type;
 
-    rcode = stCallMethod(&ri, &ri, gSortMethod, args, 2, &result);
+	rcode = stCallMethod(&ri, &ri, gSortMethod, args, 2, &result);
 
-    if(rcode == EC_ERROR) gEvalListSortError = 1;
+	if (rcode == EC_ERROR)
+		gEvalListSortError = 1;
 
-    /* convert the answer to an AT_DOUBLE */
+	/* convert the answer to an AT_DOUBLE */
 
-    if(result.type != AT_DOUBLE) {
-        rcode = stToDouble(&result, &result, &ri);
-        if(rcode == EC_ERROR) gEvalListSortError = 1;
-    }
+	if (result.type != AT_DOUBLE) {
+		rcode = stToDouble(&result, &result, &ri);
+		if (rcode == EC_ERROR)
+			gEvalListSortError = 1;
+	}
 
-    /* return the value of the method call */
+	/* return the value of the method call */
 
-    if (BRDOUBLE(&result) > 0.0) return 1;
-    if (BRDOUBLE(&result) < 0.0) return -1;
+	if (BRDOUBLE(&result) > 0.0)
+		return 1;
+	if (BRDOUBLE(&result) < 0.0)
+		return -1;
 
-    return 0;
+	return 0;
 }
 
 /*
@@ -174,9 +182,9 @@ int brEvalListCompare(const void *a, const void *b) {
 */
 
 void brEvalListFreeSortVars() {
-    if(gSortVector) {
-        slFree(gSortVector);
-        gSortVectorLength = 0;
-        gSortVector = NULL;
-    }
+	if (gSortVector) {
+		slFree(gSortVector);
+		gSortVectorLength = 0;
+		gSortVector = NULL;
+	}
 }

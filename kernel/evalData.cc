@@ -83,19 +83,15 @@ void brDataCollect(brData *d) {
 */
 
 char *brDataHexEncode(brData *d) {
-    char *string;
-    int n;
+	if (!d || d->length < 1)
+		return slStrdup("");
 
-    if(!d || d->length < 1) return slStrdup("");
+	char *string = (char *)slMalloc((d->length * 2) + 1);
 
-    string = (char*)slMalloc((d->length * 2) + 1);
+	for (int n = 0; n < d->length; ++n)
+		snprintf(&string[n * 2], 3, "%02x", ((unsigned char *)d->data)[n]);
 
-    for(n=0;n<d->length;n++)
-        sprintf(&string[n*2], "%02x", ((unsigned char*)d->data)[n]);
-
-    string[(d->length * 2)] = 0;
-
-    return string;
+	return string;
 }
 
 /*!

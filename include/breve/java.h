@@ -4,7 +4,7 @@
 #include "kernel.h"
 #include "util.h"
 
-#ifdef HAVE_LIBJAVA
+#if HAVE_LIBJAVA
 #include <jni.h>
 
 #define JAVA_MAX_ARGS	32
@@ -79,15 +79,15 @@ struct brJavaBridgeData {
 #ifdef __cplusplus
 extern "C" {
 #endif
-void brJavaInit(brEngine *e);
+void brJavaInit(brEngine *);
 
 brJavaInstance *brJavaBootstrapMethodFinder(brJavaObject *);
 
 brJavaMethod *brJavaMethodFind(brJavaBridgeData *, brJavaObject *, char *, unsigned char *, unsigned int);
 
-void brFreeJavaClassData(brJavaObject *data);
-void brFreeJavaBridgeData(brJavaBridgeData *data);
-void brFreeJavaMethodData(brJavaMethod *data);
+void brFreeJavaClassData(brJavaObject *);
+void brFreeJavaBridgeData(brJavaBridgeData *);
+void brFreeJavaMethodData(brJavaMethod *);
 
 brJavaInstance *brJavaInstanceNew(brJavaObject *, brEval **, int);
 

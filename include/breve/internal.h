@@ -1,10 +1,10 @@
 #include <stdio.h>
-#include <stdarg.h>
 
 #include "kernelTypedefs.h"
+
 #include "breveEval.h"
-#include "engine.h"
 #include "breveObjectAPI.h"
+#include "engine.h"
 #include "namespace.h"
 
 #ifdef __cplusplus
@@ -61,7 +61,7 @@ struct brInternalFunction {
 	unsigned char argtypes[ST_CMAX_ARGS];
 	unsigned char rtype;
     
-	int (*call)(brEval *args, brEval *result, brInstance *i);
+	int (*call)(brEval *, brEval *, brInstance *);
     
 	char *name;
 };

@@ -488,23 +488,24 @@ void brAddSearchPath(brEngine *e, char *path) {
 */
 
 char *brFindFile(brEngine *e, char *file, struct stat *st) {
-	char path[4096];
-	struct stat localStat, *sp;
+	struct stat localStat;
 	std::vector<char*>::iterator pi;
+	char path[MAXPATHLEN];
 
-	if(!file || !*file) return NULL;
+	if (!file || *file == '\0')
+		return NULL;
 
-	if(st) sp = st;
-	else sp = &localStat;
+	if (!st)
+		st = &localStat;
 
-	// first try the file as an absolute path 
+	if (*file == '/')
+		return stat(file, st) ? NULL : slStrdup(file);
 
-	if(!stat(file, sp)) return slStrdup(file);
-
-	for(pi = e->searchPath.begin(); pi != e->searchPath.end(); pi++ ) {
+	for (pi = e->searchPath.begin(); pi != e->searchPath.end(); pi++ ) {
 		snprintf(path, sizeof(path), "%s/%s", *pi, file);   
 
-		if(!stat(path, sp)) return slStrdup(path);
+		if (!stat(path, st))
+			return slStrdup(path);
 	}
 
 	return NULL;
@@ -517,7 +518,7 @@ char *brFindFile(brEngine *e, char *file, struct stat *st) {
 */
 
 void brEngineRenderWorld(brEngine *e, int crosshair) {
-    slRenderScene(e->world, e->camera, crosshair);
+	slRenderScene(e->world, e->camera, crosshair);
 }
 
 /*@}*/
@@ -531,7 +532,8 @@ void brEngineRenderWorld(brEngine *e, int crosshair) {
 void brFreeSearchPath(brEngine *e) {
 	std::vector<char*>::iterator pi;
 
-	for(pi = e->searchPath.begin(); pi != e->searchPath.end(); pi++ ) slFree(*pi); 
+	for (pi = e->searchPath.begin(); pi != e->searchPath.end(); pi++ )
+		slFree(*pi); 
 }
 
 /*!
@@ -566,26 +568,26 @@ void brMakeiTunesData(brEngine *e) {
 */
 
 void brEvalError(brEngine *e, int type, char *proto, ...) {
-    va_list vp;
-    char localMessage[BR_ERROR_TEXT_SIZE];
+	va_list vp;
+	char localMessage[BR_ERROR_TEXT_SIZE];
 
-    if(e->error.type == 0) {
-        e->error.type = type;
+	if (e->error.type == 0) {
+		e->error.type = type;
 
-        va_start(vp, proto);
-        vsnprintf(e->error.message, BR_ERROR_TEXT_SIZE, proto, vp);
-        va_end(vp);
+		va_start(vp, proto);
+		vsnprintf(e->error.message, BR_ERROR_TEXT_SIZE, proto, vp);
+		va_end(vp);
 
-        slMessage(DEBUG_ALL, e->error.message);
-    } else {
-        va_start(vp, proto);
-        vsnprintf(localMessage, BR_ERROR_TEXT_SIZE, proto, vp);
-        va_end(vp);
+		slMessage(DEBUG_ALL, e->error.message);
+	} else {
+		va_start(vp, proto);
+		vsnprintf(localMessage, BR_ERROR_TEXT_SIZE, proto, vp);
+		va_end(vp);
 
-        slMessage(DEBUG_ALL, localMessage);
-    }
+		slMessage(DEBUG_ALL, localMessage);
+	}
 
-    slMessage(DEBUG_ALL, "\n");
+	slMessage(DEBUG_ALL, "\n");
 }
 
 void brClearError(brEngine *e) {
@@ -608,8 +610,8 @@ int brGetError(brEngine *e) {
 
 int brFileLogWrite(void *m, const char *buffer, int length) {
 	char *s = (char*)alloca(length + 1);
-	strncpy(s, buffer, length);
 
+	strncpy(s, buffer, length);
 	s[length] = 0;
 
 	slMessage(DEBUG_ALL, s);
@@ -622,9 +624,11 @@ int brFileLogWrite(void *m, const char *buffer, int length) {
 */
 
 int brEngineSetInterface(brEngine *e, char *name) {
-	if(!e->interfaceSetCallback) return -1;
+	if (!e->interfaceSetCallback)
+		return -1;
 
 	e->interfaceSetCallback(name);
+
 	return 0;
 }
 
@@ -660,7 +664,7 @@ brNamespace *brEngineGetInternalMethods(brEngine *e) {
 	return e->internalMethods;
 }
 
-void brEngineSetSoundCallback(brEngine *e, int (*callback)()) {
+void brEngineSetSoundCallback(brEngine *e, int (*callback)(void)) {
 	e->soundCallback = callback;
 }
 
@@ -668,35 +672,34 @@ void brEngineSetDialogCallback(brEngine *e, int (*callback)(char *, char *, char
 	e->dialogCallback = callback;
 }
 
-void brEngineSetGetSavenameCallback(brEngine *e, char *(*callback)()) {
+void brEngineSetGetSavenameCallback(brEngine *e, char *(*callback)(void)) {
 	e->getSavename = callback;
 }
 
-void brEngineSetGetLoadnameCallback(brEngine *e, char *(*callback)()) {
+void brEngineSetGetLoadnameCallback(brEngine *e, char *(*callback)(void)) {
 	e->getLoadname = callback;
 }
 
-void brEngineSetPauseCallback(brEngine *e, int (callback)()) {
+void brEngineSetPauseCallback(brEngine *e, int (callback)(void)) {
 	e->pauseCallback = callback;
 }
 
-void brEngineSetInterfaceInterfaceTypeCallback(brEngine *e, char *(*callback)()) {
+void brEngineSetInterfaceInterfaceTypeCallback(brEngine *e, char *(*callback)(void)) {
 	e->interfaceTypeCallback = callback;
 }
 
-void brEngineSetInterfaceSetStringCallback(brEngine *e, int (*callback)(char*, int)) {
+void brEngineSetInterfaceSetStringCallback(brEngine *e, int (*callback)(char *, int)) {
 	e->interfaceSetStringCallback = callback;
 }
 
-void brEngineSetInterfaceSetNibCallback(brEngine *e, void (*callback)(char*)) {
+void brEngineSetInterfaceSetNibCallback(brEngine *e, void (*callback)(char *)) {
 	e->interfaceSetCallback = callback;
 }
 
-void brEngineSetUpdateMenuCallback(brEngine *e, void (*updateMenu)(brInstance *l)) {
+void brEngineSetUpdateMenuCallback(brEngine *e, void (*updateMenu)(brInstance *)) {
 	e->updateMenu = updateMenu;
 }
 
 int brEngineGetDrawEveryFrame(brEngine *e) {
 	return e->drawEveryFrame;
 }
-

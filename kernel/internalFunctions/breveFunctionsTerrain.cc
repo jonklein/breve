@@ -33,7 +33,7 @@ int brITerrainNew(brEval args[], brEval *target, brInstance *i) {
 
 	slWorldAddObject(i->engine->world, t, WO_TERRAIN);
 
-	BRTERRAINPOINTER(target) = t;
+	BRPOINTER(target) = t;
 
 	return EC_OK;
 }
@@ -52,7 +52,8 @@ int brISetTerrainScale(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 	double x = BRDOUBLE(&args[1]);
 
-	if(x < 0.01) return EC_OK;
+	if (x < 0.01)
+		return EC_OK;
 
 	slTerrainSetScale(t, x);
 
@@ -65,7 +66,8 @@ int brISetTerrainHeight(brEval args[], brEval *target, brInstance *i) {
 	int y = BRINT(&args[2]);
 	double h = BRDOUBLE(&args[3]);
 
-	if(!t) return EC_OK;
+	if (!t)
+		return EC_OK;
 
 	slTerrainSetHeight(t, x, y, h);
 
@@ -79,7 +81,8 @@ int brIGetTerrainHeight(brEval args[], brEval *target, brInstance *i) {
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
-	if(!t) return EC_OK;
+	if (!t)
+		return EC_OK;
 
 	BRDOUBLE(target) = slTerrainGetHeight(t, x, y);
 
@@ -91,7 +94,8 @@ int brIGetTerrainHeightAtLocation(brEval args[], brEval *target, brInstance *i) 
 	double x = BRDOUBLE(&args[1]);
 	double y = BRDOUBLE(&args[2]);
 
-	if(!t) return EC_OK;
+	if (!t)
+		return EC_OK;
 
 	BRDOUBLE(target) = slTerrainGetHeightAtLocation(t, x, y);
 
@@ -105,7 +109,8 @@ int brIGetTerrainSlope(brEval args[], brEval *target, brInstance *i) {
 	double x2 = BRDOUBLE(&args[3]);
 	double y2 = BRDOUBLE(&args[4]);
 
-	if(!t) return EC_OK;
+	if (!t)
+		return EC_OK;
 
 	slTerrainGetSlope(t, x1, y1, x2, y2, &BRVECTOR(target));
 
@@ -115,7 +120,8 @@ int brIGetTerrainSlope(brEval args[], brEval *target, brInstance *i) {
 int brISetTerrainPosition(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 
-	if(!t) return EC_OK;
+	if (!t)
+		return EC_OK;
 
 	slTerrainSetLocation(t, &BRVECTOR(&args[1]));
 
@@ -125,7 +131,8 @@ int brISetTerrainPosition(brEval args[], brEval *target, brInstance *i) {
 int brISetPeakColor(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 
-	if(!t) return EC_OK;
+	if (!t)
+		return EC_OK;
 
 	slTerrainSetTopColor(t, &BRVECTOR(&args[1]));
 
@@ -135,7 +142,8 @@ int brISetPeakColor(brEval args[], brEval *target, brInstance *i) {
 int brISetValleyColor(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 
-	if(!t) return EC_OK;
+	if (!t)
+		return EC_OK;
 
 	slTerrainSetBottomColor(t, &BRVECTOR(&args[1]));
 
@@ -144,9 +152,9 @@ int brISetValleyColor(brEval args[], brEval *target, brInstance *i) {
 
 int brILoadGeoTIFF(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t = BRTERRAINPOINTER(&args[0]);
-	char *file = brFindFile(i->engine, BRSTRING(&args[1]), NULL);
-	
-	if(!file) {
+	char *file;
+
+	if (!(file = brFindFile(i->engine, BRSTRING(&args[1]), NULL))) {
 		slMessage(DEBUG_ALL, "Cannot locate file \"%s\"\n", file);
 		return EC_OK;
 	}

@@ -20,14 +20,10 @@
 
 #include "simulation.h"
 
-#ifdef HAVE_LIBAVCODEC
+#if HAVE_LIBAVCODEC
 
-#define COMPUTE_Y(R, G, B) (unsigned char)((R) *  .299 + (G) *  .587 + (B) *  .114)
-#define COMPUTE_U(R, G, B) (unsigned char)((B - COMPUTE_Y(R, G, B)) * .565)
-#define COMPUTE_V(R, G, B) (unsigned char)((R - COMPUTE_Y(R, G, B)) * .713)
-
-void slInitYUVLookupTable();
-int slRGB2YUV420(int x_dim, int y_dim, unsigned char *uu, unsigned char *yy, unsigned char *bmp, unsigned char *yuv, int flip);
+static void initYUVLookupTable(void);
+static void RGB2YUV420(int, int, unsigned char *, unsigned char *, unsigned char *, unsigned char *, int);
 
 /*!
 	\brief Opens a movie file for writing.
@@ -36,71 +32,68 @@ int slRGB2YUV420(int x_dim, int y_dim, unsigned char *uu, unsigned char *yy, uns
 slMovie *slMovieCreate(char *filename, int width, int height, int framerate, float quality) {
 	slMovie *m;
 
+	height &= ~1;
+	width &= ~1;
+
 	if (width < 1 || height < 1 || framerate < 1) {
 		slMessage(DEBUG_ALL, "invalid parameters for new movie\n");
 		return NULL;
 	}
 
-	slInitYUVLookupTable();
+	initYUVLookupTable();
 
 	avcodec_init();
 	avcodec_register_all();
 
-	height &= ~1;
-	width &= ~1;
-
 	m = new slMovie;
 
-	// MPEG 2 video not working with QuickTime [?!]
-	// if(!(m->codec = avcodec_find_encoder(CODEC_ID_MPEG2VIDEO)) &&
-
-	if( !(m->codec = avcodec_find_encoder(CODEC_ID_MPEG1VIDEO))) {
-		slMessage(DEBUG_ALL, "cannot locate video encoding codec\n");
+	if (!(m->codec = avcodec_find_encoder(CODEC_ID_MPEG1VIDEO))) {
+		slMessage(DEBUG_ALL, "Could not find MPEG-1 video encoder\n");
+		return NULL;
+	}
+	if (!(m->file = fopen(filename, "wb"))) {
+		slMessage(DEBUG_ALL, "Could not open file \"%s\" for writing: %s\n", filename, strerror(errno));
 		return NULL;
 	}
 
 	m->context = avcodec_alloc_context();
 	m->picture = avcodec_alloc_frame();
 
-	m->context->bit_rate = 800000;
 	m->context->width = width;
 	m->context->height = height;
 	m->context->frame_rate = framerate;
 	m->context->frame_rate_base = 1;
-	m->context->gop_size = 10;
+
+	m->context->bit_rate = 800000;
+	m->context->flags = CODEC_FLAG_TRELLIS_QUANT | CODEC_FLAG_NORMALIZE_AQP;
+	m->context->gop_size = 15;
 	m->context->max_b_frames = 1;
-	m->context->global_quality = 0;
-	m->context->qblur = 1;
-	m->context->qcompress = 1;
-	m->context->flags = CODEC_FLAG_NORMALIZE_AQP;
+	m->context->me_method = ME_EPZS;
+	m->context->rc_qsquish = 1.0f;
+	m->context->sample_aspect_ratio = av_d2q(1.0, 1);
+	m->context->qblur = 0.0f;
+	m->context->qcompress = 1.0f;
 
 	if (avcodec_open(m->context, m->codec) < 0) {
 		slMessage(DEBUG_ALL, "error opening movie output codec\n");
 		return NULL;
 	}
 
-	m->bufferSize = m->context->height * m->context->width * 3;
+	m->bufferSize = height * width * 3;
 
 	m->buffer = new unsigned char[m->bufferSize];
 	m->RGBpictureBuffer = new unsigned char[m->bufferSize];
 	m->YUVpictureBuffer = new unsigned char[m->bufferSize / 2];
-	m->vvBuffer = new unsigned char[m->context->height * m->context->width];
-	m->uuBuffer = new unsigned char[m->context->height * m->context->width];
+	m->vvBuffer = new unsigned char[height * width];
+	m->uuBuffer = new unsigned char[height * width];
 
 	m->picture->data[0] = m->YUVpictureBuffer;
-	m->picture->data[1] = m->picture->data[0] + (m->context->height * m->context->width);
-	m->picture->data[2] = m->picture->data[1] + (m->context->height * m->context->width) / 4;
-	m->picture->linesize[0] = m->context->width;
-	m->picture->linesize[1] = m->context->width / 2;
-	m->picture->linesize[2] = m->context->width / 2;
+	m->picture->data[1] = m->picture->data[0] + (height * width);
+	m->picture->data[2] = m->picture->data[1] + (height * width) / 4;
+	m->picture->linesize[0] = width;
+	m->picture->linesize[1] = width / 2;
+	m->picture->linesize[2] = width / 2;
 	m->picture->quality = 0;
-
-	m->file = fopen(filename, "wb");
-
-	if(!m->file) {
-		slMessage(DEBUG_ALL, "Could not open file \"%s\" for writing: %s\n", filename, strerror(errno));
-		return NULL;
-	}
 
 	return m;
 }
@@ -112,17 +105,16 @@ slMovie *slMovieCreate(char *filename, int width, int height, int framerate, flo
 
 int slMovieAddFrame(slMovie *m, int flip) {
 	int size;
-	if(!m) return -1;
 
-	// Z S M Q Q 7 I U P P R G B Y U V 4 2 0 Q T T P X R 9 0 ! B X Q Q F T
+	if (!m)
+		return -1;
 
-	slRGB2YUV420(m->context->width, m->context->height, m->uuBuffer, m->vvBuffer, m->RGBpictureBuffer, m->YUVpictureBuffer, flip);
+	RGB2YUV420(m->context->width, m->context->height, m->uuBuffer, m->vvBuffer, m->RGBpictureBuffer, m->YUVpictureBuffer, flip);
 
-	size = avcodec_encode_video(m->context, m->buffer, m->bufferSize, m->picture);
+	if (!(size = avcodec_encode_video(m->context, m->buffer, m->bufferSize, m->picture)))
+		return -1;
 
-	if(size == 0) return -1;
-
-	fwrite(m->buffer, 1, size, m->file);
+	fwrite(m->buffer, size, 1, m->file);
 
 	return 0;
 }
@@ -132,13 +124,15 @@ int slMovieAddFrame(slMovie *m, int flip) {
 */
 
 int slMovieAddWorldFrame(slMovie *m, slWorld *w, slCamera *c) {
-	if(c->activateContextCallback && c->activateContextCallback() != 0) {
+	if (c->activateContextCallback && c->activateContextCallback()) {
 		slMessage(DEBUG_ALL, "Cannot add frame to movie: no OpenGL context available\n");
 		return -1;
 	}
-	if(c->renderContextCallback) c->renderContextCallback(w, c);
+	if (c->renderContextCallback)
+		c->renderContextCallback(w, c);
 
 	glReadPixels(0, 0, m->context->width, m->context->height, GL_RGB, GL_UNSIGNED_BYTE, m->RGBpictureBuffer);
+
 	return slMovieAddFrame(m, 1);
 }
 
@@ -147,27 +141,25 @@ int slMovieAddWorldFrame(slMovie *m, slWorld *w, slCamera *c) {
 */
 
 int slMovieFinish(slMovie *m) {
-	char outbuf[4];
 	int size;
+	char outbuf[4];
 
-	if(!m) return -1;
+	if (!m)
+		return -1;
 
-	// write out the rest of the frames...
-
-	while((size = avcodec_encode_video(m->context, m->buffer, m->bufferSize, NULL))) {
-		fwrite(m->buffer, 1, size, m->file);
-	}
+	while ((size = avcodec_encode_video(m->context, m->buffer, m->bufferSize, NULL)))
+		fwrite(m->buffer, size, 1, m->file);
 
 	outbuf[0] = 0x00;
 	outbuf[1] = 0x00;
 	outbuf[2] = 0x01;
 	outbuf[3] = 0xb7;
-	fwrite(outbuf, 1, 4, m->file);
+	fwrite(outbuf, 4, 1, m->file);
 	fclose(m->file);
 
 	avcodec_close(m->context);
-	free(m->context);
-	free(m->picture);
+	av_free(m->context);
+	av_free(m->picture);
 
 	delete[] m->buffer;
 	delete[] m->YUVpictureBuffer;
@@ -192,31 +184,32 @@ static int RGB2YUV_YR[256], RGB2YUV_YG[256], RGB2YUV_YB[256];
 static int RGB2YUV_UR[256], RGB2YUV_UG[256], RGB2YUV_UBVR[256];
 static int RGB2YUV_VG[256], RGB2YUV_VB[256];
 
-int slRGB2YUV420 (int x_dim, int y_dim, unsigned char *uu, unsigned char *vv, unsigned char *bmp, unsigned char *yuv, int flip) {
-	int i, j;
+void RGB2YUV420(int x_dim, int y_dim, unsigned char *uu, unsigned char *vv, unsigned char *bmp, unsigned char *yuv, int flip) {
 	unsigned char *r, *g, *b;
 	unsigned char *y, *u, *v;
 	unsigned char *pu1, *pu2,*pu3,*pu4;
 	unsigned char *pv1, *pv2,*pv3,*pv4;
+	int i, j, row;
 
-	y=yuv;
-	u=uu;
-	v=vv;
-	for (i=0;i<y_dim;i++) {
-		int row;
+	y = yuv;
+	u = uu;
+	v = vv;
 
-		if(flip) row = ((y_dim - 1) - i);
-		else row = i;
+	for (i = 0; i < y_dim; ++i) {
+		if (flip)
+			row = ((y_dim - 1) - i);
+		else
+			row = i;
 
-		r = bmp + 3*x_dim*row;
+		r = bmp + 3 * x_dim * row;
 		g = r + 1;
 		b = r + 2;
 
-		for (j=0;j<x_dim;j++) {
+		for (j = 0; j < x_dim; ++j) {
 
-			*y++=( RGB2YUV_YR[*r]  +RGB2YUV_YG[*g]+RGB2YUV_YB[*b]+1048576)>>16;
-			*u++=(-RGB2YUV_UR[*r]  -RGB2YUV_UG[*g]+RGB2YUV_UBVR[*b]+8388608)>>16;
-			*v++=( RGB2YUV_UBVR[*r]-RGB2YUV_VG[*g]-RGB2YUV_VB[*b]+8388608)>>16;
+			*y++ = ( RGB2YUV_YR[*r]  + RGB2YUV_YG[*g] + RGB2YUV_YB[*b] + 1048576) >> 16;
+			*u++ = (-RGB2YUV_UR[*r]  - RGB2YUV_UG[*g] + RGB2YUV_UBVR[*b] + 8388608) >> 16;
+			*v++ = ( RGB2YUV_UBVR[*r]- RGB2YUV_VG[*g] - RGB2YUV_VB[*b] + 8388608) >> 16;
 
 			r += 3;
 			g += 3;
@@ -225,57 +218,55 @@ int slRGB2YUV420 (int x_dim, int y_dim, unsigned char *uu, unsigned char *vv, un
 	}
 
 	//dimension reduction for U and V components
-	u=yuv+x_dim*y_dim;
-	v=u+x_dim*y_dim/4;
+	u = yuv + x_dim * y_dim;
+	v = u + x_dim * y_dim / 4;
 
-	pu1=uu;
-	pu2=pu1+1;
-	pu3=pu1+x_dim;
-	pu4=pu3+1;
+	pu1 = uu;
+	pu2 = pu1 + 1;
+	pu3 = pu1 + x_dim;
+	pu4 = pu3 + 1;
 
-	pv1=vv;
-	pv2=pv1+1;
-	pv3=pv1+x_dim;
-	pv4=pv3+1;
-	for(i=0;i<y_dim;i+=2) {
-		for(j=0;j<x_dim;j+=2) {
-			*u++=((int)*pu1+*pu2+*pu3+*pu4)>>2;
-			*v++=((int)*pv1+*pv2+*pv3+*pv4)>>2;
-			pu1+=2;
-			pu2+=2;
-			pu3+=2;
-			pu4+=2;
-			pv1+=2;
-			pv2+=2;
-			pv3+=2;
-			pv4+=2;
+	pv1 = vv;
+	pv2 = pv1 + 1;
+	pv3 = pv1 + x_dim;
+	pv4 = pv3 + 1;
+
+	for (i = 0; i < y_dim; i += 2) {
+		for (j = 0; j < x_dim; j += 2) {
+			*u++ = ((int)*pu1 + *pu2 + *pu3 + *pu4) >> 2;
+			*v++ = ((int)*pv1 + *pv2 + *pv3 + *pv4) >> 2;
+			pu1 += 2;
+			pu2 += 2;
+			pu3 += 2;
+			pu4 += 2;
+			pv1 += 2;
+			pv2 += 2;
+			pv3 += 2;
+			pv4 += 2;
 		}
 
-		pu1+=x_dim;
-		pu2+=x_dim;
-		pu3+=x_dim;
-		pu4+=x_dim;
-		pv1+=x_dim;
-		pv2+=x_dim;
-		pv3+=x_dim;
-		pv4+=x_dim;
+		pu1 += x_dim;
+		pu2 += x_dim;
+		pu3 += x_dim;
+		pu4 += x_dim;
+		pv1 += x_dim;
+		pv2 += x_dim;
+		pv3 += x_dim;
+		pv4 += x_dim;
 	}
-
-	return 0;
 }
 
-void slInitYUVLookupTable() {
+void initYUVLookupTable() {
 	int i;
 
-	for (i = 0; i < 256; i++) RGB2YUV_YR[i] = (int)((float)65.481 * (i<<8));
-	for (i = 0; i < 256; i++) RGB2YUV_YG[i] = (int)((float)128.553 * (i<<8));
-	for (i = 0; i < 256; i++) RGB2YUV_YB[i] = (int)((float)24.966 * (i<<8));
-	for (i = 0; i < 256; i++) RGB2YUV_UR[i] = (int)((float)37.797 * (i<<8));
-	for (i = 0; i < 256; i++) RGB2YUV_UG[i] = (int)((float)74.203 * (i<<8));
-	for (i = 0; i < 256; i++) RGB2YUV_VG[i] = (int)((float)93.786 * (i<<8));
-	for (i = 0; i < 256; i++) RGB2YUV_VB[i] = (int)((float)18.214 * (i<<8));
-	for (i = 0; i < 256; i++) RGB2YUV_UBVR[i] = (int)((float)112 * (i<<8));
+	for (i = 0; i < 256; i++) RGB2YUV_YR[i] = (int)(65.481f * (i << 8));
+	for (i = 0; i < 256; i++) RGB2YUV_YG[i] = (int)(128.553f * (i << 8));
+	for (i = 0; i < 256; i++) RGB2YUV_YB[i] = (int)(24.966f * (i << 8));
+	for (i = 0; i < 256; i++) RGB2YUV_UR[i] = (int)(37.797f * (i << 8));
+	for (i = 0; i < 256; i++) RGB2YUV_UG[i] = (int)(74.203f * (i << 8));
+	for (i = 0; i < 256; i++) RGB2YUV_VG[i] = (int)(93.786f * (i << 8));
+	for (i = 0; i < 256; i++) RGB2YUV_VB[i] = (int)(18.214f * (i << 8));
+	for (i = 0; i < 256; i++) RGB2YUV_UBVR[i] = (int)(112.0f * (i << 8));
 }
 
 #endif
-

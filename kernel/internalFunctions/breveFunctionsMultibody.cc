@@ -57,7 +57,7 @@ int brIMultibodyNew(brEval args[], brEval *target, brInstance *i) {
 	mb = slMultibodyNew(i->engine->world);
 	slMultibodySetCallbackData(mb, i);
 
-	BRMULTIBODYPOINTER(target) = mb;
+	BRPOINTER(target) = mb;
 
 	return EC_OK;
 }
@@ -71,21 +71,20 @@ int brIMultibodyNew(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIMultibodyAllObjects(brEval args[], brEval *target, brInstance *i) {
-	slList *l, *start;
+	brEval e;
 	brEvalListHead *all;
+	slList *l, *start;
 
 	all = brEvalListNew();
 
-	start = l = slMultibodyAllCallbackData(BRMULTIBODYPOINTER(&args[0]));
+	start = slMultibodyAllCallbackData(BRMULTIBODYPOINTER(&args[0]));
 
-	while(l) {
-		brEval e;
-
+	for (l = start; l; l = l->next) {
 		e.type = AT_INSTANCE;
-		BRINSTANCE(&e) = (brInstance*)l->data;
+		BRINSTANCE(&e) = (brInstance *)l->data;
 
-		if(l->data) brEvalListInsert(all, 0, &e);
-		l = l->next;
+		if (l->data)
+			brEvalListInsert(all, 0, &e);
 	}
 
 	slListFree(start);
@@ -108,7 +107,8 @@ int brIMultibodyFree(brEval args[], brEval *target, brInstance *i) {
 
 	slWorldSetUninitialized(i->engine->world);
 
-	if(m) slMultibodyFree(m);
+	if (m)
+		slMultibodyFree(m);
 
 	return EC_OK;
 }
@@ -133,8 +133,8 @@ int brIMultibodySetLocation(brEval args[], brEval *target, brInstance *i) {
 
 	void multibodySetLocation(slMultibody pointer, vector, double).
 
-	Rotates about the given vector by the given double amount.  Rotation occurs 
-	about the centerpoint of the root object.
+	Rotates about the given vector by the given double amount.  Rotation
+	occurs about the centerpoint of the root object.
 */
 
 int brIMultibodySetRotation(brEval args[], brEval *target, brInstance *i) {
@@ -171,7 +171,7 @@ int brIMultibodyRotateRelative(brEval args[], brEval *target, brInstance *i) {
 	double len = BRDOUBLE(&args[2]);
 	double rotation[3][3];
 
-	if(!mb) {
+	if (!mb) {
 		slMessage(DEBUG_ALL, "null pointer passed to multibodyRotateRelative\n");
 		return EC_ERROR;
 	}
@@ -191,9 +191,8 @@ int brIMultibodyRotateRelative(brEval args[], brEval *target, brInstance *i) {
 int brIMultibodySetHandleSelfCollisions(brEval args[], brEval *target, brInstance *i) { 
 	slMultibody *m = BRMULTIBODYPOINTER(&args[0]);
 
-	if(!m) return EC_OK;
-
-	slMultibodySetHandleSelfCollisions(m, BRINT(&args[1]));
+	if (m)
+		slMultibodySetHandleSelfCollisions(m, BRINT(&args[1]));
    
 	return EC_OK;
 }
@@ -207,9 +206,8 @@ int brIMultibodySetHandleSelfCollisions(brEval args[], brEval *target, brInstanc
 int brIMultibodyCheckSelfPenetration(brEval args[], brEval *target, brInstance *i) { 
 	slMultibody *m = BRMULTIBODYPOINTER(&args[0]);
 
-	if(!m) return EC_OK;
-
-	BRINT(target) = slMultibodyCheckSelfPenetration(i->engine->world, m);
+	if (m)
+		BRINT(target) = slMultibodyCheckSelfPenetration(i->engine->world, m);
    
 	return EC_OK;
 }

@@ -138,22 +138,16 @@ inline unsigned int *stAllocInstSpace(stRtcCodeBlock *block, unsigned int word_c
 
 inline int stPointerForExp(stExp *expression, stRunInstance *i, void **pointer, int *type) {
 	switch(expression->type) {
-		case ET_LOAD:
-			return stEvalLoadPointer(expression, i, pointer, type);
-			break;
-		case ET_ARRAY_INDEX:
-			return stEvalArrayIndexPointer(expression, i, pointer, type);
-			break;
-		case ET_LIST_INDEX:
-			return stEvalListIndexPointer(expression, i, pointer, type);
-			break;
-		default:
-			slMessage(DEBUG_ALL, "Invalid value for left-hand side of assignment expression");
-			return EC_ERROR;
-			break;
+	case ET_LOAD:
+		return stEvalLoadPointer((stLoadExp *)expression, i, pointer, type);
+	case ET_ARRAY_INDEX:
+		return stEvalArrayIndexPointer((stArrayIndexExp *)expression, i, pointer, type);
+	case ET_LIST_INDEX:
+		return stEvalListIndexPointer((stListIndexExp *)expression, i, pointer, type);
+	default:
+		slMessage(DEBUG_ALL, "Invalid value for left-hand side of assignment expression");
+		return EC_ERROR;
 	}
-
-	return EC_ERROR;
 }
 
 typedef struct stRtcVar_t {
@@ -489,10 +483,12 @@ static int stEvalLoadInt(stLoadExp *e, stRunInstance *i, brEval *target) {
 	
 	target->type = e->loadType;
 
-	if(e->local) pointer = &i->instance->type->steveData->stack[e->offset];
-	else pointer = &i->instance->variables[e->offset];
+	if (e->local)
+		pointer = &i->instance->type->steveData->stack[e->offset];
+	else
+		pointer = &i->instance->variables[e->offset];
 	
-	BRINT(target) = *(int*)pointer;
+	BRINT(target) = *(int *)pointer;
 
 	return EC_OK;
 }
@@ -502,10 +498,12 @@ static int stEvalLoadDouble(stLoadExp *e, stRunInstance *i, brEval *target) {
 	
 	target->type = e->loadType;
 
-	if(e->local) pointer = &i->instance->type->steveData->stack[e->offset];
-	else pointer = &i->instance->variables[e->offset];
+	if (e->local)
+		pointer = &i->instance->type->steveData->stack[e->offset];
+	else
+		pointer = &i->instance->variables[e->offset];
 	
-	BRDOUBLE(target) = *(double*)pointer;
+	BRDOUBLE(target) = *(double *)pointer;
 
 	return EC_OK;
 }
@@ -515,10 +513,12 @@ static int stEvalLoadIndirect(stLoadExp *e, stRunInstance *i, brEval *target) {
 	
 	target->type = e->loadType;
 
-	if(e->local) pointer = &i->instance->type->steveData->stack[e->offset];
-	else pointer = &i->instance->variables[e->offset];
+	if (e->local)
+		pointer = &i->instance->type->steveData->stack[e->offset];
+	else
+		pointer = &i->instance->variables[e->offset];
 	
-	BRPOINTER(target) = *(void**)pointer;
+	BRPOINTER(target) = *(void **)pointer;
 
 	return EC_OK;
 }
@@ -528,10 +528,12 @@ static int stEvalLoadVector(stLoadExp *e, stRunInstance *i, brEval *target) {
 	
 	target->type = e->loadType;
 
-	if(e->local) pointer = &i->instance->type->steveData->stack[e->offset];
-	else pointer = &i->instance->variables[e->offset];
+	if (e->local)
+		pointer = &i->instance->type->steveData->stack[e->offset];
+	else
+		pointer = &i->instance->variables[e->offset];
 	
-	slVectorCopy((slVector*)pointer, &BRVECTOR(target));
+	slVectorCopy((slVector *)pointer, &BRVECTOR(target));
 
 	return EC_OK;
 }
@@ -541,15 +543,17 @@ static int stEvalLoadList(stLoadExp *e, stRunInstance *i, brEval *target) {
 	
 	target->type = e->loadType;
 
-	if(e->local) pointer = &i->instance->type->steveData->stack[e->offset];
-	else pointer = &i->instance->variables[e->offset];
+	if (e->local)
+		pointer = &i->instance->type->steveData->stack[e->offset];
+	else
+		pointer = &i->instance->variables[e->offset];
 	
-	if(!*(brEvalListHead**)pointer) {
-		*(brEvalListHead**)pointer = brEvalListNew();
-		stGCRetainPointer(*(void**)pointer, AT_LIST);
+	if (!*(brEvalListHead **)pointer) {
+		*(brEvalListHead **)pointer = brEvalListNew();
+		stGCRetainPointer(*(void **)pointer, AT_LIST);
 	}
 
-	BRLIST(target) = *(brEvalListHead**)pointer;
+	BRLIST(target) = *(brEvalListHead **)pointer;
 
 	return EC_OK;
 }
@@ -559,18 +563,20 @@ static int stEvalLoadHash(stLoadExp *e, stRunInstance *i, brEval *target) {
 	
 	target->type = e->loadType;
 
-	if(e->local) pointer = &i->instance->type->steveData->stack[e->offset];
-	else pointer = &i->instance->variables[e->offset];
+	if (e->local)
+		pointer = &i->instance->type->steveData->stack[e->offset];
+	else
+		pointer = &i->instance->variables[e->offset];
 	
-	if(!*(brEvalHash**)pointer) {
+	if (!*(brEvalHash **)pointer) {
 		// if there is nothing here (uninitialized hash), then we create an empty hash.  
 		// we retain it, since it's stored as a variable.
 
-		*(brEvalHash**)pointer = brEvalHashNew();
-		stGCRetainPointer(*(void**)pointer, AT_LIST);
+		*(brEvalHash **)pointer = brEvalHashNew();
+		stGCRetainPointer(*(void **)pointer, AT_LIST);
 	}
 
-	BRHASH(target) = *(brEvalHash**)pointer;
+	BRHASH(target) = *(brEvalHash **)pointer;
 
 	return EC_OK;
 }
@@ -580,12 +586,15 @@ static int stEvalLoadString(stLoadExp *e, stRunInstance *i, brEval *target) {
 	
 	target->type = e->loadType;
 
-	if(e->local) pointer = &i->instance->type->steveData->stack[e->offset];
-	else pointer = &i->instance->variables[e->offset];
+	if (e->local)
+		pointer = &i->instance->type->steveData->stack[e->offset];
+	else
+		pointer = &i->instance->variables[e->offset];
 	
-	if(!(*(char**)pointer)) *(char**)pointer = slStrdup("");
+	if (!(*(char **)pointer))
+		*(char **)pointer = slStrdup("");
 
-	BRSTRING(target) = *(char**)pointer;
+	BRSTRING(target) = *(char **)pointer;
 
 	return EC_OK;
 }
@@ -595,10 +604,12 @@ static int stEvalLoadMatrix(stLoadExp *e, stRunInstance *i, brEval *target) {
 	
 	target->type = e->loadType;
 
-	if(e->local) pointer = &i->instance->type->steveData->stack[e->offset];
-	else pointer = &i->instance->variables[e->offset];
+	if (e->local)
+		pointer = &i->instance->type->steveData->stack[e->offset];
+	else
+		pointer = &i->instance->variables[e->offset];
 	
-	slMatrixCopy((double**)pointer, BRMATRIX(target));
+	slMatrixCopy((double **)pointer, BRMATRIX(target));
 
 	return EC_OK;
 }
@@ -610,48 +621,49 @@ int stLoadVariable(void *variable, unsigned char type, brEval *e, stRunInstance 
 
 	switch(e->type) {
 		case AT_INT:
-			BRINT(e) = *(int*)variable;
+			BRINT(e) = *(int *)variable;
 			break;
 		case AT_DOUBLE:
-			BRDOUBLE(e) = *(double*)variable;
+			BRDOUBLE(e) = *(double *)variable;
 			break;
 		case AT_POINTER:
 		case AT_INSTANCE:
 		case AT_DATA:
-			BRPOINTER(e) = *(void**)variable;
+			BRPOINTER(e) = *(void **)variable;
 			break;
 		case AT_VECTOR:
-			slVectorCopy((slVector*)variable, &BRVECTOR(e));
+			slVectorCopy((slVector *)variable, &BRVECTOR(e));
 			break;
 		case AT_LIST:
 			// if there is nothing here (uninitialized list), then we create an empty list.  
 			// we retain it, since it's now stored as a variable.
 
-			if(!*(brEvalListHead**)variable) {
-				*(brEvalListHead**)variable = brEvalListNew();
-				stGCRetainPointer(*(void**)variable, AT_LIST);
+			if (!*(brEvalListHead **)variable) {
+				*(brEvalListHead **)variable = brEvalListNew();
+				stGCRetainPointer(*(void **)variable, AT_LIST);
 			}
 
-			BRLIST(e) = *(brEvalListHead**)variable;
+			BRLIST(e) = *(brEvalListHead **)variable;
 			break;
 		case AT_HASH:
-			if(!*(brEvalHash**)variable) {
+			if (!*(brEvalHash **)variable) {
 				// if there is nothing here (uninitialized hash), then we create an empty hash.  
 				// we retain it, since it's stored as a variable.
 
-				*(brEvalHash**)variable = brEvalHashNew();
-				stGCRetainPointer(*(void**)variable, AT_HASH);
+				*(brEvalHash **)variable = brEvalHashNew();
+				stGCRetainPointer(*(void **)variable, AT_HASH);
 			}
 
-			BRHASH(e) = *(brEvalHash**)variable;			
+			BRHASH(e) = *(brEvalHash **)variable;			
 			break;
 		case AT_STRING:
-			if(!(*(char**)variable)) *(char**)variable = slStrdup("");
+			if (!(*(char**)variable))
+				*(char **)variable = slStrdup("");
 
-			BRSTRING(e) = slStrdup(*(char**)variable);
+			BRSTRING(e) = slStrdup(*(char **)variable);
 			break;
 		case AT_MATRIX:
-			slMatrixCopy((double**)variable, BRMATRIX(e));
+			slMatrixCopy((double **)variable, BRMATRIX(e));
 			break;
 		case AT_ARRAY:
 			stEvalError(i->instance->type->engine, EE_ARRAY, "Array variables cannot be loaded like normal expressions");
@@ -672,24 +684,25 @@ int stLoadVariable(void *variable, unsigned char type, brEval *e, stRunInstance 
 
 int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e, stRunInstance *i) {
 	stInstance *instance;
+	char *newstr;
 	int resultCode;
 	int noRetain = 0;
-	char *newstr;
 
-	if(type == AT_INSTANCE && otype && e->type == AT_INSTANCE && BRINSTANCE(e)) {
+	if (type == AT_INSTANCE && otype && e->type == AT_INSTANCE && BRINSTANCE(e)) {
 		// if they specified an object type in the code, make sure 
 		// that this is a valid cast.  this requires a lookup each
 		// time we're here, so it could really be improved.
 
-		instance = (stInstance*)BRINSTANCE(e)->userData;
+		instance = (stInstance *)BRINSTANCE(e)->userData;
 		
-		if(!stIsSubclassOf(instance->type, otype)) {
+		if (!stIsSubclassOf(instance->type, otype)) {
 			stEvalError(i->instance->type->engine, EE_TYPE, "Cannot assign instance of class \"%s\" to variable of class \"%s\"\n", instance->type->name, otype->name);
 			return EC_ERROR;
 		}
 	}
 
-	if((resultCode = stToType(e, type, e, i)) != EC_OK) return resultCode;
+	if ((resultCode = stToType(e, type, e, i)) != EC_OK)
+		return resultCode;
 
 #ifdef MULTITHREAD
 	if(i) pthread_mutex_lock(&i->lock);
@@ -697,60 +710,62 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 
 	switch(type) {
 		case AT_INT:
-			*(int*)variable = BRINT(e);
+			*(int *)variable = BRINT(e);
 			break;
 		case AT_DOUBLE:
-			*(double*)variable = BRDOUBLE(e);
+			*(double *)variable = BRDOUBLE(e);
 			break;
 		case AT_VECTOR:
-			slVectorCopy(&BRVECTOR(e), (slVector*)variable);
+			slVectorCopy(&BRVECTOR(e), (slVector *)variable);
 			break;
 		case AT_MATRIX:
-			slMatrixCopy(BRMATRIX(e), (double**)variable);
+			slMatrixCopy(BRMATRIX(e), (double **)variable);
 			break;
 		case AT_INSTANCE:
-			*(brInstance**)variable = BRINSTANCE(e);
+			*(brInstance **)variable = BRINSTANCE(e);
 			break;
 		case AT_DATA:
 			// overwriting an old data variable
 
-			if(*(brData**)variable != BRDATA(e)) stGCUnretainAndCollectPointer(*(void**)variable, AT_DATA);
+			if (*(brData **)variable != BRDATA(e))
+				stGCUnretainAndCollectPointer(*(void **)variable, AT_DATA);
 
 			// retain and set the new data 
 
-			if(BRDATA(e)) *(brData**)variable = BRDATA(e);
+			if (BRDATA(e))
+				*(brData **)variable = BRDATA(e);
 
 			break;
 		case AT_POINTER:
-			*(void**)variable = BRPOINTER(e);
+			*(void **)variable = BRPOINTER(e);
 			break;
 		case AT_STRING:
 			newstr = slStrdup(BRSTRING(e));
 
 			// are we overwriting an old string in memory?
-			if(*(void**)variable) slFree(*(void**)variable);	
+			if (*(char **)variable)
+				slFree(*(void **)variable);	
 
-			BRSTRING(e) = *(char**)variable = newstr;
+			*(char **)variable = BRSTRING(e) = newstr;
 
 			noRetain = 1;
 
 			break;
 		case AT_LIST:
-			if(!BRLIST(e)) {
+			if (!BRLIST(e)) {
 				// if this is an empty list, just allocate some space,
 				// and mark it.  it will be retained later.
 
 				e->type = AT_LIST;
 				BRLIST(e) = brEvalListNew();
-			} else if(*(brEvalListHead**)variable != BRLIST(e)) {
+			} else if (*(brEvalListHead **)variable != BRLIST(e)) {
 				// overwriting an old list at this location
 
-				stGCUnretainAndCollectPointer(*(void**)variable, AT_LIST);
-			} else {
+				stGCUnretainAndCollectPointer(*(void **)variable, AT_LIST);
+			} else
 				noRetain = 1;
-			}
 
-			if(e->type != AT_LIST) {
+			if (e->type != AT_LIST) {
 				slMessage(DEBUG_ALL, "Cannot convert \"%s\" to type \"list\" for assignment\n", slAtomicTypeStrings[e->type]);
 #ifdef MULTITHREAD
 				if(i) pthread_mutex_unlock(&i->lock);
@@ -758,23 +773,22 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 				return EC_ERROR;
 			}
 
-			*(brEvalListHead**)variable = BRLIST(e);
+			*(brEvalListHead **)variable = BRLIST(e);
 
 			break;
 		case AT_HASH:
 			// if this is an empty hash, just allocate some space...
 
-			if(!BRHASH(e)) {
+			if (!BRHASH(e)) {
 				e->type = AT_HASH;
 				BRHASH(e) = brEvalHashNew();
-			} else if(*(brEvalHash**)variable != BRHASH(e)) {
+			} else if(*(brEvalHash **)variable != BRHASH(e)) {
 				// overwriting an old hash at this location
-				stGCUnretainAndCollectPointer(*(void**)variable, AT_HASH);
-			} else {
+				stGCUnretainAndCollectPointer(*(void **)variable, AT_HASH);
+			} else
 				noRetain = 1;
-			}
 
-			if(e->type != AT_HASH) {
+			if (e->type != AT_HASH) {
 				slMessage(DEBUG_ALL, "Cannot convert \"%s\" to type \"hash\" for assignment\n", slAtomicTypeStrings[e->type]);
 #ifdef MULTITHREAD
 				if(i) pthread_mutex_unlock(&i->lock);
@@ -782,7 +796,7 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 				return EC_ERROR;
 			}
 
-			*(brEvalHash**)variable = BRHASH(e);
+			*(brEvalHash **)variable = BRHASH(e);
 
 			break;
 		case AT_ARRAY:
@@ -800,9 +814,10 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 			break;
 	}
 
-	if(!noRetain) {
+	if (!noRetain) {
 		stGCRetain(e);
-		if(i) stGCUnmark(i->instance, e);
+		if (i)
+			stGCUnmark(i->instance, e);
 	}
 
 #ifdef MULTITHREAD
@@ -816,7 +831,7 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 	\brief Computes the "truth" of an expression in steve.
 
 	Takes any kind of expression and decides whether it is "true" in
-	the context of boolean expressions.  It yields an int with a  value 
+	the context of boolean expressions.  It yields an int with a value 
 	of either 1 or 0.
 */
 
@@ -847,8 +862,10 @@ RTC_INLINE int stEvalTruth(brEval *e, brEval *t, stRunInstance *i) {
 			return EC_OK;
 			break;
 		case AT_INSTANCE:
-			if(BRINSTANCE(e) && (BRINSTANCE(e))->status != AS_ACTIVE) BRINT(t) = 0;
-			else BRINT(t) = (BRINSTANCE(e) != 0x0);
+			if (BRINSTANCE(e) && (BRINSTANCE(e))->status != AS_ACTIVE)
+				BRINT(t) = 0;
+			else
+				BRINT(t) = (BRINSTANCE(e) != 0x0);
 
 			return EC_OK;
 			break;
@@ -888,39 +905,42 @@ RTC_INLINE int stEvalTruth(brEval *e, brEval *t, stRunInstance *i) {
 */
 
 RTC_INLINE int stEvalFree(stFreeExp *s, stRunInstance *i, brEval *t) {
-	int resultCode;
 	brEval result;
 	brEvalList *list;
+	int resultCode;
 	int finished = 0;
 
 	t->type = AT_NULL;
 
 	resultCode = stExpEval3(s->expression, i, &result);
-	if(resultCode != EC_OK) return EC_ERROR;
+	if (resultCode != EC_OK)
+		return EC_ERROR;
 
-	if(result.type == AT_INSTANCE) {
-		if(!BRINSTANCE(&result)) {
+	if (result.type == AT_INSTANCE) {
+		if (!BRINSTANCE(&result)) {
 			slMessage(DEBUG_ALL, "warning: attempt to free uninitialized object\n");
 			return EC_OK;
 		}
 
 		// if we're freeing ourself (the calling instance) then we will return EC_STOP
 
-		if(BRINSTANCE(&result)->userData == i->instance) finished = 1;
+		if (BRINSTANCE(&result)->userData == i->instance)
+			finished = 1;
 
-		if(BRINSTANCE(&result)->status == AS_ACTIVE) brInstanceRelease(BRINSTANCE(&result));
-	} else if(result.type == AT_LIST) {
+		if (BRINSTANCE(&result)->status == AS_ACTIVE)
+			brInstanceRelease(BRINSTANCE(&result));
+	} else if (result.type == AT_LIST) {
 		list = (BRLIST(&result))->start;
 
-		while(list) {
-			if(list->eval.type == AT_INSTANCE) {
-				if(!BRINSTANCE(&list->eval)) {
+		while (list) {
+			if (list->eval.type == AT_INSTANCE) {
+				if (!BRINSTANCE(&list->eval))
 					slMessage(DEBUG_ALL, "warning: attempt to free uninitialized object\n");
-				} else {
+				else {
 					// if we're freeing ourself (the calling instance) then we will return EC_STOP
-					if(BRINSTANCE(&list->eval)->userData == i->instance) finished = 1;
+					if (BRINSTANCE(&list->eval)->userData == i->instance) finished = 1;
 
-					if(BRINSTANCE(&list->eval)->status == AS_ACTIVE) brInstanceRelease(BRINSTANCE(&list->eval));
+					if (BRINSTANCE(&list->eval)->status == AS_ACTIVE) brInstanceRelease(BRINSTANCE(&list->eval));
 				}
 			}
 
@@ -928,7 +948,8 @@ RTC_INLINE int stEvalFree(stFreeExp *s, stRunInstance *i, brEval *t) {
 		}
 	}
 
-	if(finished) return EC_STOP;
+	if (finished)
+		return EC_STOP;
 
 	return EC_OK;
 }
@@ -942,33 +963,38 @@ RTC_INLINE int stEvalCodeArray(stCodeArrayExp *a, stRunInstance *i, brEval *resu
 }
 
 int stEvalExpVector(std::vector< stExp* > *a, stRunInstance *i, brEval *result) {
-	int resultCode;
 	unsigned int count;
+	int resultCode;
 
-	if(i->instance->status != AS_ACTIVE) return EC_OK;
+	if (!i)
+		return EC_ERROR;
+	if (i->instance->status != AS_ACTIVE)
+		return EC_OK;
+	if (!result)
+		return EC_ERROR;
 
-	if(!i || !result) return EC_ERROR;
-
-	for(count=0;count<(*a).size();count++) {
+	for (count = 0; count < (*a).size(); ++count) {
 		stExp *expression = (*a)[count];
 
-		if(expression) {
+		if (expression) {
 			resultCode = stExpEval3(expression, i, result);
 
-			if(resultCode == EC_ERROR) {
+			if (resultCode == EC_ERROR) {
 				brErrorInfo *error = brEngineGetErrorInfo(i->type->engine);
 
 				error->line = expression->line;
 
-				if(error->file) slFree(error->file);
-
+				if (error->file)
+					slFree(error->file);
 				error->file = slStrdup(expression->file);
 
 				slMessage(DEBUG_ALL, "... error in file \"%s\" at line %d\n", expression->file, expression->line);
-				return EC_ERROR_HANDLED;
-			} else if(resultCode == EC_ERROR_HANDLED) return EC_ERROR_HANDLED;
 
-			else if(resultCode == EC_STOP) return EC_STOP;
+				return EC_ERROR_HANDLED;
+			} else if (resultCode == EC_ERROR_HANDLED)
+				return EC_ERROR_HANDLED;
+			else if (resultCode == EC_STOP)
+				return EC_STOP;
 		}
 	}
 
@@ -1018,56 +1044,52 @@ inline int brEvalListExp(stListExp *le, stRunInstance *i, brEval *result) {
 */
 
 RTC_INLINE int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) {
+	stRunInstance ri;
 	brEval obj;
 	int r;
-	stRunInstance ri;
 
 	r = stExpEval(mexp->objectExp, i, &obj, &ri.type);
 
-	if(r != EC_OK) return r;
+	if (r != EC_OK)
+		return r;
 
-	if(obj.type == AT_INSTANCE) {
+	if (obj.type == AT_INSTANCE) {
 		if(!BRINSTANCE(&obj) || BRINSTANCE(&obj)->status != AS_ACTIVE) {
 			stEvalError(i->type->engine, EE_NULL_INSTANCE, "method \"%s\" called with uninitialized object", mexp->methodName);
 			return EC_ERROR;
 		}
-
-		if(BRINSTANCE(&obj)->object->type != &gSteveData->steveObjectType) {
+		if(BRINSTANCE(&obj)->object->type != &gSteveData->steveObjectType)
 			return stEvalForeignMethodCall(mexp, BRINSTANCE(&obj), i, t);
-		}
 
-		ri.instance = (stInstance*)BRINSTANCE(&obj)->userData;
+		ri.instance = (stInstance *)BRINSTANCE(&obj)->userData;
 
-		if(!ri.type) ri.type = ri.instance->type;
+		if (!ri.type)
+			ri.type = ri.instance->type;
 
 		r = stRealEvalMethodCall(mexp, &ri, i, t);
 
 		return r;
 	}
 
-	if(obj.type == AT_LIST) {
+	if (obj.type == AT_LIST) {
 		brEvalList *listStart = BRLIST(&obj)->start;
 
-		while(listStart) {
-			if(!BRINSTANCE(&listStart->eval) || BRINSTANCE(&listStart->eval)->status != AS_ACTIVE) {
+		while (listStart) {
+			if (!BRINSTANCE(&listStart->eval) || BRINSTANCE(&listStart->eval)->status != AS_ACTIVE) {
 				stEvalError(i->type->engine, EE_NULL_INSTANCE, "method \"%s\" called with uninitialized object", mexp->methodName);
 				return EC_ERROR;
 			}
-
-			if(BRINSTANCE(&listStart->eval)->object->type != &gSteveData->steveObjectType) {
+			if (BRINSTANCE(&listStart->eval)->object->type != &gSteveData->steveObjectType)
 				return stEvalForeignMethodCall(mexp, BRINSTANCE(&listStart->eval), i, t);
-			}
 
-			ri.instance = (stInstance*)BRINSTANCE(&listStart->eval)->userData;
+			ri.instance = (stInstance *)BRINSTANCE(&listStart->eval)->userData;
 			ri.type = ri.instance->type;
 
 			r = stRealEvalMethodCall(mexp, &ri, i, t);
 			listStart = listStart->next;
-
-			if(r != EC_OK) return r;
 		}
 
-		return EC_OK;
+		return r;
 	}
 
 	stEvalError(i->instance->type->engine, EE_TYPE, "Method \"%s\" called for an expression that is neither an object nor a list", mexp->methodName);
@@ -1076,18 +1098,19 @@ RTC_INLINE int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) 
 }
 
 int stEvalForeignMethodCall(stMethodExp *mexp, brInstance *caller, stRunInstance *i, brEval *t) {
+	brEval args[mexp->arguments.size()];
+	brEval *argps[mexp->arguments.size()];
 	unsigned int n;
 	int resultCode;
 
-	brEval args[ mexp->arguments.size() ];
-	brEval *argps[ mexp->arguments.size() ];
-
-	for(n=0;n<mexp->arguments.size();n++) {
+	for(n = 0; n < mexp->arguments.size(); ++n) {
 		stKeyword *k = mexp->arguments[n];
 
 		argps[n] = &args[n];
 
-		if((resultCode = stExpEval(k->value, i, argps[n], NULL)) != EC_OK) return resultCode;
+		resultCode = stExpEval(k->value, i, argps[n], NULL);
+		if (resultCode != EC_OK)
+			return resultCode;
 	}
 
 	brMethodCallByNameWithArgs(caller, mexp->methodName, argps, mexp->arguments.size(), t);
@@ -1100,18 +1123,16 @@ int stEvalForeignMethodCall(stMethodExp *mexp, brInstance *caller, stRunInstance
 */
 
 inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *target, stRunInstance *caller, brEval *t) {
-	int resultCode;
-	unsigned int n, argCount;
-	unsigned int m;
-	stKeyword *key, *tmpkey;
 	stKeywordEntry *keyEntry;
+	stKeyword *key, *tmpkey;
+	unsigned int n, m, argCount;
+	int resultCode;
 
-	if(target->instance == NULL) {
+	if (!target->instance) {
 		stEvalError(caller->instance->type->engine, EE_NULL_INSTANCE, "method \"%s\" called with uninitialized object", mexp->methodName);
 		return EC_ERROR;
 	} 
-
-	if(target->instance->status != AS_ACTIVE) {
+	if (target->instance->status != AS_ACTIVE) {
 		stEvalError(caller->instance->type->engine, EE_FREED_INSTANCE, "method \"%s\" called with freed object (%p)", mexp->methodName, target->instance);
 		return EC_ERROR;
 	}
@@ -1121,26 +1142,27 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *target, stRunI
 	// it up again.  there is a fair amount of computation here looking up
 	// the method and argument order, so caching it is good.
 
-	if(mexp->objectCache != target->type) {
+	if (mexp->objectCache != target->type) {
 		stMethod *method;
 		stObject *newType;
 
 		method = stFindInstanceMethodWithMinArgs(target->type, mexp->methodName, mexp->arguments.size(), &newType);
 
-		target->type = newType;
-
-		if(!method) {
+		if (!method) {
 			// can't find the method!
 
 			char *kstring = "keywords";
 
-			if(mexp->arguments.size() == 1) kstring = "keyword";
+			if (mexp->arguments.size() == 1)
+				kstring = "keyword";
 
 			target->type = target->instance->type;
 			stEvalError(target->type->engine, EE_UNKNOWN_METHOD, "object type \"%s\" does not respond to method \"%s\" with %d %s", target->type->name, mexp->methodName, mexp->arguments.size(), kstring);
 			mexp->objectCache = NULL;
 			return EC_ERROR;
 		}
+
+		target->type = newType;
 
 		mexp->method = method;
 		mexp->objectCache = target->instance->type;
@@ -1150,30 +1172,32 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *target, stRunI
 
 		// we have to lookup the order of the keywords.  initialize them to -1 first.
 
-		for(n=0;n<argCount;n++) mexp->arguments[n]->position = -1;
+		for (n = 0; n < argCount; ++n)
+			mexp->arguments[n]->position = -1;
 
 		mexp->positionedArguments.clear();
 		mexp->positionedArguments.reserve(mexp->method->keywords.size());
 
-		for(n=0;n<mexp->method->keywords.size();n++) {
+		for (n = 0; n < mexp->method->keywords.size(); ++n) {
 			// look for the method's Nth keyword
 
 			key = NULL;
 			keyEntry = mexp->method->keywords[n];
 
-			for(m=0;m<argCount;m++) {
+			for (m = 0; m < argCount; ++m) {
 				// go through all the arguments, checking what was passed in.
 
 				tmpkey = mexp->arguments[m];
-				if(tmpkey->position == -1 && !strcmp(tmpkey->word, keyEntry->keyword)) {
+				if (tmpkey->position == -1 && !strcmp(tmpkey->word, keyEntry->keyword)) {
 					tmpkey->position = n;
 					key = tmpkey;
 				}
 			}
 
-			if(!key && keyEntry->defaultKey)  key = keyEntry->defaultKey;
+			if (!key && keyEntry->defaultKey)
+				key = keyEntry->defaultKey;
 
-			if(!key) {
+			if (!key) {
 				stEvalError(target->type->engine, EE_MISSING_KEYWORD, "Call to method %s of class %s missing keyword \"%s\"", mexp->method->name, target->type->name, keyEntry->keyword);
 				mexp->objectCache = NULL;
 				return EC_ERROR;
@@ -1182,8 +1206,8 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *target, stRunI
 			mexp->positionedArguments.push_back( key);
 		}
 
-		for(n=0;n<argCount;n++) {
-			if(mexp->arguments[n]->position == -1) {
+		for (n = 0; n < argCount; ++n) {
+			if (mexp->arguments[n]->position == -1) {
 				tmpkey = mexp->arguments[n];
 
 				stEvalError(target->type->engine, EE_UNKNOWN_KEYWORD, "unknown keyword \"%s\" in call to method \"%s\"", tmpkey->word, mexp->method->name);
@@ -1191,24 +1215,23 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *target, stRunI
 				return EC_ERROR;
 			}
 		}
-	} else {
+	} else
 		target->type = mexp->objectTypeCache;
-	}
 
-	if(mexp->method->inlined) {
+	if (mexp->method->inlined) {
 		// The method is inlined if it has no local variables, and no arguments
 
-		slStack newStack;
-
+		slStack newStack, *oldStack = target->instance->gcStack;
 		int resultCode;
-		slStack *oldStack = target->instance->gcStack;
+
 		target->instance->gcStack = &newStack;
 
 		resultCode = stEvalExpVector(&mexp->method->code, target, t);
 
 		// unmark the return value -- we'll make it the current instance's problem
 
-		if(t->type != AT_NULL) stGCUnmark(target->instance, t);
+		if (t->type != AT_NULL)
+			stGCUnmark(target->instance, t);
 
 		// collect and reset the gcStack
 
@@ -1217,13 +1240,14 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *target, stRunI
 
 		// mark the return value for the target's GC, if it exists
 
-		if(caller->instance->gcStack) {
+		if (caller->instance->gcStack)
 			stGCMark(caller->instance, t);
-		} else {
+		else {
 			// stGCUnretainAndCollect(t);
 		}
 
-		if(resultCode == EC_STOP) return EC_OK;
+		if (resultCode == EC_STOP)
+			return EC_OK;
 	
 		return resultCode;
 	}
@@ -1234,12 +1258,13 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *target, stRunI
 	brEval args[ mexp->method->keywords.size() ];
 	brEval *argps[ mexp->method->keywords.size() ];
 
-	for(n=0;n<mexp->method->keywords.size();n++) argps[n] = &args[n];
+	for (n = 0; n < mexp->method->keywords.size(); ++n)
+		argps[n] = &args[n];
 
-	for(n=0;n<mexp->method->keywords.size();n++) {
+	for (n = 0; n < mexp->method->keywords.size(); ++n) {
 		key = mexp->positionedArguments[n];
 
-		if(!key) {
+		if (!key) {
 			slMessage(DEBUG_ALL, "Missing keyword for method \"%s\"\n", mexp->method->name);
 			return EC_ERROR;
 		}
@@ -1248,13 +1273,14 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *target, stRunI
 
 		resultCode = stExpEval3(key->value, caller, argps[n]);
 
-		if(resultCode != EC_OK) {
+		if (resultCode != EC_OK) {
 			slMessage(DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", key->word, mexp->method->name);
 			return EC_ERROR;
 		}
 	}
 
-	if(!mexp->method) return EC_OK;
+	if (!mexp->method)
+		return EC_OK;
 
 	resultCode = stCallMethod(caller, target, mexp->method, argps, mexp->method->keywords.size(), t);
 
@@ -1266,32 +1292,24 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *target, stRunI
 */
 
 RTC_INLINE int stEvalWhile(stWhileExp *w, stRunInstance *i, brEval *result) {
-	brEval conditionExp, condition;
-	int evaluations = 0;
-	int resultCode;
+	brEval condition, conditionExp;
+	unsigned int evaluations = 0;
+	int r;
 
 	result->type = AT_NULL;
 
-	resultCode = stExpEval3(w->cond, i, &conditionExp);
-	if(resultCode != EC_OK) return resultCode;
+	if ((r = stExpEval3(w->cond, i, &conditionExp)) != EC_OK ||
+	    (r = stEvalTruth(&conditionExp, &condition, i)) != EC_OK)
+		return r;
 
-	resultCode = stEvalTruth(&conditionExp, &condition, i);
-	if(resultCode != EC_OK) return resultCode;
+	while (BRINT(&condition)) {
+		if ((r = stExpEval3(w->code, i, result)) != EC_OK ||
+		    (r = stExpEval3(w->cond, i, &conditionExp)) != EC_OK ||
+		    (r = stEvalTruth(&conditionExp, &condition, i)) != EC_OK)
+			return r;
 
-	while(BRINT(&condition)) {
-		evaluations++;
-
-		resultCode = stExpEval3(w->code, i, result); 
-		if(resultCode != EC_OK) return resultCode;
-
-		resultCode = stExpEval3(w->cond, i, &conditionExp);
-		if(resultCode != EC_OK) {
-			return resultCode;
-		}
-
-		resultCode = stEvalTruth(&conditionExp, &condition, i);
-		if(resultCode != EC_OK) return resultCode;
-	} 
+		++evaluations;
+	}
 
 	result->type = AT_NULL;
 
@@ -1299,43 +1317,26 @@ RTC_INLINE int stEvalWhile(stWhileExp *w, stRunInstance *i, brEval *result) {
 }
 
 RTC_INLINE int stEvalFor(stForExp *w, stRunInstance *i, brEval *result) {
-	brEval condition, conditionExp, assignment, iteration;
-	int evaluations = 0;
-	int resultCode;
+	brEval condition, conditionExp;
+	brEval assignment, iteration;
+	unsigned int evaluations = 0;
+	int r;
 
 	result->type = AT_NULL;
 
-	resultCode = stExpEval3(w->assignment, i, &assignment);
-	if(resultCode != EC_OK) {
-		return resultCode;
-	}
+	if ((r = stExpEval3(w->assignment, i, &assignment)) != EC_OK ||
+	    (r = stExpEval3(w->condition, i, &conditionExp)) != EC_OK ||
+	    (r = stEvalTruth(&conditionExp, &condition, i)) != EC_OK)
+		return r;
 
-	resultCode = stExpEval3(w->condition, i, &conditionExp);
-	if(resultCode != EC_OK) {
-		return resultCode;
-	}
+	while (BRINT(&condition)) {
+		if ((r = stExpEval3(w->code, i, result)) != EC_OK ||
+		    (r = stExpEval3(w->iteration, i, &iteration)) != EC_OK ||
+		    (r = stExpEval3(w->condition, i, &conditionExp)) != EC_OK ||
+		    (r = stEvalTruth(&conditionExp, &condition, i)) != EC_OK)
+			return r;
 
-	resultCode = stEvalTruth(&conditionExp, &condition, i);
-
-	if(resultCode != EC_OK) return resultCode;
-
-	while(BRINT(&condition)) {
-		evaluations++;
-
-		resultCode = stExpEval3(w->code, i, result); 
-		if(resultCode != EC_OK) return resultCode;
-
-		resultCode = stExpEval3(w->iteration, i, &iteration);
-		if(resultCode != EC_OK) return resultCode;
-
-		resultCode = stExpEval3(w->condition, i, &conditionExp);
-		if(resultCode != EC_OK) {
-			return resultCode;
-		}
-
-		resultCode = stEvalTruth(&conditionExp, &condition, i);
-
-		if(resultCode != EC_OK) return resultCode;
+		++evaluations;
 	} 
 
 	result->type = AT_NULL;
@@ -1345,50 +1346,52 @@ RTC_INLINE int stEvalFor(stForExp *w, stRunInstance *i, brEval *result) {
 
 RTC_INLINE int stEvalForeach(stForeachExp *w, stRunInstance *i, brEval *result) {
 	brEval list;
-	int evaluations = 0;
 	brEvalList *el;
 	void *iterationPointer;
+	unsigned int evaluations = 0;
 	int resultCode;
 
 	stAssignExp *assignExp = w->assignment;
 
 	result->type = AT_NULL;
 
-	if(assignExp->local) iterationPointer = &i->instance->type->steveData->stack[assignExp->offset];
-	else iterationPointer = &i->instance->variables[assignExp->offset];
+	if (assignExp->local)
+		iterationPointer = &i->instance->type->steveData->stack[assignExp->offset];
+	else
+		iterationPointer = &i->instance->variables[assignExp->offset];
 
 	stExpEval3(w->list, i, &list);
 
-	if(list.type != AT_LIST) {
+	if (list.type != AT_LIST) {
 		stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"list\" in foreach evaluation");
 		return EC_ERROR;
 	}
 
 	el = BRLIST(&list)->start;
 
-	while(el) {
+	while (el) {
 		brEval eval;
 
-		if((resultCode = brEvalCopy(&el->eval, &eval)) != EC_OK) return resultCode;
+		if ((resultCode = brEvalCopy(&el->eval, &eval)) != EC_OK)
+			return resultCode;
 
-        if(assignExp->objectName && !assignExp->objectType) {
+		if (assignExp->objectName && !assignExp->objectType) {
 			brObject *object = brObjectFind(i->instance->type->engine, assignExp->objectName);
 
-			if(object) assignExp->objectType = (stObject*)object->userData;
-			else assignExp->objectType = NULL;
+			if (object)
+				assignExp->objectType = (stObject*)object->userData;
+			else
+				assignExp->objectType = NULL;
 		}
 
-		if((resultCode = stSetVariable(iterationPointer, assignExp->assignType, assignExp->objectType, &eval, i)) != EC_OK) {
+		if ((resultCode = stSetVariable(iterationPointer, assignExp->assignType, assignExp->objectType, &eval, i)) != EC_OK)
 			return resultCode;
-		}
 
 		resultCode = stExpEval3(w->code, i, result); 
-
-		if(resultCode != EC_OK) {
+		if (resultCode != EC_OK)
 			return resultCode;
-		}
 
-		evaluations++;
+		++evaluations;
 		el = el->next;
 	} 
 
@@ -1399,22 +1402,22 @@ RTC_INLINE int stEvalForeach(stForeachExp *w, stRunInstance *i, brEval *result) 
 
 RTC_INLINE int stEvalIf(stIfExp *w, stRunInstance *i, brEval *result) {
 	brEval condition, conditionExp;
-	int resultCode, v;
+	int resultCode;
 
-	resultCode = stExpEval3(w->cond, i, &conditionExp);
-	if(resultCode != EC_OK) return resultCode;
+	if ((resultCode = stExpEval3(w->cond, i, &conditionExp)) != EC_OK ||
+	    (resultCode = stEvalTruth(&conditionExp, &condition, i)) != EC_OK)
+		return resultCode;
 
-	resultCode = stEvalTruth(&conditionExp, &condition, i);
-	if(resultCode != EC_OK) return resultCode;
-
-	v = BRINT(&condition);
-
-	if(v) {
-		if(!w->trueCode) return EC_OK;
-		return stExpEval3(w->trueCode, i, result); 
+	if (BRINT(&condition)) {
+		if (w->trueCode)
+			return stExpEval3(w->trueCode, i, result); 
+		else
+			return EC_OK;
 	} else {
-		if(!w->falseCode) return EC_OK;
-		return stExpEval3(w->falseCode, i, result);
+		if (w->falseCode)
+			return stExpEval3(w->falseCode, i, result);
+		else
+			return EC_OK;
 	}
 }
 
@@ -1422,25 +1425,23 @@ RTC_INLINE int stEvalListInsert(stListInsertExp *w, stRunInstance *i, brEval *re
 	brEval pushEval, index;
 	int resultCode;
 
-	resultCode = stExpEval3(w->listExp, i, result);
-	if(resultCode != EC_OK) return resultCode;
+	if ((resultCode = stExpEval3(w->listExp, i, result)) != EC_OK ||
+	    (resultCode = stExpEval3(w->exp, i, &pushEval)) != EC_OK)
+		return resultCode;
 
-	resultCode = stExpEval3(w->exp, i, &pushEval);
-	if(resultCode != EC_OK) return resultCode;
-
-	if(result->type != AT_LIST) {
+	if (result->type != AT_LIST) {
 		stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"list\" in \"push\" evaluation");
 		return EC_ERROR;
 	}
-
-	if(BRLIST(result) == NULL) {
+	if (!BRLIST(result)) {
 		stEvalError(i->instance->type->engine, EE_INTERNAL, "attempt to insert value into uninitialized list\n");
 		return EC_ERROR;
 	}
 
-	if(w->index) {
+	if (w->index) {
 		resultCode = stExpEval3(w->index, i, &index);
-		if(resultCode != EC_OK) return resultCode;
+		if (resultCode != EC_OK)
+			return resultCode;
 	} else {
 		index.type = AT_INT;
 		BRINT(&index) = BRLIST(result)->count;
@@ -1458,21 +1459,22 @@ RTC_INLINE int stEvalListRemove(stListRemoveExp *l, stRunInstance *i, brEval *re
 	int resultCode;
 
 	resultCode = stExpEval3(l->listExp, i, &listEval);
-	if(resultCode != EC_OK) return resultCode;
+	if (resultCode != EC_OK)
+		return resultCode;
 
-	if(listEval.type != AT_LIST) {
+	if (listEval.type != AT_LIST) {
 		stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"list\" during \"pop\" evaluation"); 
 		return EC_ERROR;
 	}
-
 	if(!BRLIST(&listEval)) {
 		result->type = AT_NULL;
 		return EC_OK;
 	}
 
-	if(l->index) {
+	if (l->index) {
 		resultCode = stExpEval3(l->index, i, &index);
-		if(resultCode != EC_OK) return resultCode;
+		if (resultCode != EC_OK)
+			return resultCode;
 	} else {
 		index.type = AT_INT;
 		BRINT(&index) = BRLIST(&listEval)->count - 1;
@@ -1493,10 +1495,10 @@ RTC_INLINE int stEvalCopyList(stCopyListExp *l, stRunInstance *i, brEval *result
 	brEval listEval;
 	int resultCode;
 
-	resultCode = stExpEval3(l->expression, i, &listEval);
-	if(resultCode != EC_OK) return resultCode;
+	if ((resultCode = stExpEval3(l->expression, i, &listEval)))
+		return resultCode;
 
-	if(listEval.type != AT_LIST) {
+	if (listEval.type != AT_LIST) {
 		stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"list\" during \"copylist\" evaluation"); 
 		return EC_ERROR;
 	}
@@ -1508,18 +1510,18 @@ RTC_INLINE int stEvalCopyList(stCopyListExp *l, stRunInstance *i, brEval *result
 }
 
 RTC_INLINE int stEvalAll(stAllExp *e, stRunInstance *i, brEval *result) {
-	std::set< stInstance*, stInstanceCompare>::iterator ii;
 	brEval instance;
+	std::set< stInstance*, stInstanceCompare>::iterator ii;
 
-	if(!e->object) {
+	if (!e->object) {
 		brObject *type = brObjectFind(i->instance->type->engine, e->name);
 
-		if(!type) {
+		if (!type) {
 			stEvalError(i->instance->type->engine, EE_UNKNOWN_OBJECT, "unknown object type \"%s\" in \"all\" expression\n", e->name);
 			return EC_ERROR;
 		}
 
-		e->object = (stObject*)type->userData;
+		e->object = (stObject *)type->userData;
 	}
 
 	BRLIST(result) = brEvalListNew();
@@ -1529,7 +1531,7 @@ RTC_INLINE int stEvalAll(stAllExp *e, stRunInstance *i, brEval *result) {
 
 	instance.type = AT_INSTANCE;
 
-	for(ii = e->object->allInstances.begin(); ii != e->object->allInstances.end(); ii++ ) {
+	for (ii = e->object->allInstances.begin(); ii != e->object->allInstances.end(); ii++ ) {
 		stInstance *i = *ii;
 		BRINSTANCE(&instance) = i->breveInstance;
 		brEvalListInsert(BRLIST(result), 0, &instance);
@@ -1544,11 +1546,12 @@ RTC_INLINE int stEvalSort(stSortExp *w, stRunInstance *i, brEval *result) {
 	int resultCode;
 
 	resultCode = stExpEval3(w->listExp, i, &listEval);
-	if(resultCode != EC_OK) return resultCode;
+	if (resultCode != EC_OK)
+		return resultCode;
 
 	method = stFindInstanceMethod(i->instance->type, w->methodName, 2, NULL);
 	
-	if(!method) {
+	if (!method) {
 		stEvalError(i->instance->type->engine, EE_UNKNOWN_METHOD, "object type \"%s\" does not respond to method \"%s\"", i->instance->type->name, w->methodName); 
 		return EC_ERROR;
 	}
@@ -1559,33 +1562,29 @@ RTC_INLINE int stEvalSort(stSortExp *w, stRunInstance *i, brEval *result) {
 }
 
 RTC_INLINE int stEvalListIndexPointer(stListIndexExp *l, stRunInstance *i, void **pointer, int *type) {
-	brEval list, index, *result;
+	brEval list, index;
+	brEval *result;
 	int resultCode;
 
-	resultCode = stExpEval3(l->listExp, i, &list);
-	if(resultCode != EC_OK) return resultCode;
+	if ((resultCode = stExpEval3(l->listExp, i, &list)) != EC_OK ||
+	    (resultCode = stExpEval3(l->indexExp, i, &index)) != EC_OK)
+		return resultCode;
 
-	resultCode = stExpEval3(l->indexExp, i, &index);
-	if(resultCode != EC_OK) return resultCode;
-
-	if(list.type == AT_LIST) {
-		if(index.type != AT_INT && stToInt(&index, &index, i) == EC_ERROR) {
-			stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"int\" in list element evaluation (index component)");
-			return EC_ERROR;
-		}
-
-		if(stDoEvalListIndexPointer(BRLIST(&list), BRINT(&index), &result)) {
-			stEvalError(i->instance->type->engine, EE_BOUNDS, "list index \"%d\" out of bounds", BRINT(&index));
-			return EC_ERROR;
-		}
-
-		*pointer = &result->values;
-		*type = result->type;
-	} else if(list.type == AT_HASH) {
+	if (list.type != AT_LIST)
 		return EC_ERROR;
-	} else {
+
+	if (index.type != AT_INT && stToInt(&index, &index, i) == EC_ERROR) {
+		stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"int\" in list element evaluation (index component)");
 		return EC_ERROR;
 	}
+
+	if (stDoEvalListIndexPointer(BRLIST(&list), BRINT(&index), &result)) {
+		stEvalError(i->instance->type->engine, EE_BOUNDS, "list index \"%d\" out of bounds", BRINT(&index));
+		return EC_ERROR;
+	}
+
+	*pointer = &result->values;
+	*type = result->type;
 
 	return EC_OK;
 }
@@ -1594,38 +1593,35 @@ RTC_INLINE int stEvalListIndex(stListIndexExp *l, stRunInstance *i, brEval *t) {
 	brEval list, index;
 	int resultCode;
 
-	resultCode = stExpEval3(l->listExp, i, &list);
-	if(resultCode != EC_OK) return resultCode;
+	if ((resultCode = stExpEval3(l->listExp, i, &list)) != EC_OK ||
+	    (resultCode = stExpEval3(l->indexExp, i, &index)) != EC_OK)
+		return resultCode;
 
-	resultCode =  stExpEval3(l->indexExp, i, &index);
-	if(resultCode != EC_OK) return resultCode;
-
-	if(list.type == AT_LIST) {
-		if(index.type != AT_INT && stToInt(&index, &index, i) == EC_ERROR) {
+	if (list.type == AT_LIST) {
+		if (index.type != AT_INT && stToInt(&index, &index, i) == EC_ERROR) {
 			stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"int\" in list index");
 			return EC_ERROR;
 		}
-
-		if(stDoEvalListIndex(BRLIST(&list), BRINT(&index), t)) {
+		if (stDoEvalListIndex(BRLIST(&list), BRINT(&index), t)) {
 			stEvalError(i->instance->type->engine, EE_BOUNDS, "list index \"%d\" out of bounds", BRINT(&index));
 			return EC_ERROR;
 		}
-	} else if(list.type == AT_HASH) {
+	} else if (list.type == AT_HASH)
 		brEvalHashLookup(BRHASH(&list), &index, t);
-	} else if(list.type == AT_STRING) {
+	else if (list.type == AT_STRING) {
 		char *newstring, *oldstring;
 
 		oldstring = BRSTRING(&list);
 
-		if((int)strlen(oldstring) <= BRINT(&index)) {
+		if ((int)strlen(oldstring) <= BRINT(&index)) {
 			stEvalError(i->instance->type->engine, EE_BOUNDS, "string index \"%d\" out of bounds", BRINT(&index));
 			return EC_ERROR;
 		}
 
-		newstring = (char*)slMalloc(2);
+		newstring = (char *)slMalloc(2);
 
 		newstring[0] = oldstring[BRINT(&index)];
-		newstring[1] = 0;
+		newstring[1] = '\0';
 
 		BRSTRING(t) = newstring;
 		t->type = AT_STRING;
@@ -1643,32 +1639,27 @@ RTC_INLINE int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, 
 	brEval list, index;
 	int resultCode;
 
-	resultCode = stExpEval3(l->listExp, i, &list);
-	if(resultCode != EC_OK) return resultCode;
+	if ((resultCode = stExpEval3(l->listExp, i, &list)) != EC_OK ||
+	    (resultCode = stExpEval3(l->indexExp, i, &list)) != EC_OK ||
+	    (resultCode = stExpEval3(l->assignment, i, t)) != EC_OK)
+		return resultCode;
 
-	resultCode = stExpEval3(l->indexExp, i, &index);
-	if(resultCode != EC_OK) return resultCode;
-
-	resultCode = stExpEval3(l->assignment, i, t);
-	if(resultCode != EC_OK) return resultCode;
-
-	if(list.type == AT_LIST) {
-		if(index.type != AT_INT && stToInt(&index, &index, i) == EC_ERROR) {
+	if (list.type == AT_LIST) {
+		if (index.type != AT_INT && stToInt(&index, &index, i) == EC_ERROR) {
 			stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"int\" for list element assignment index");
 			return EC_ERROR;
 		}
-
 		if(stDoEvalListIndexAssign(BRLIST(&list), BRINT(&index), t, i)) {
 			stEvalError(i->instance->type->engine, EE_BOUNDS, "list index \"%d\" out of bounds", BRINT(&index));
 			return EC_ERROR;
 		}
-	} else if(list.type == AT_HASH) {
+	} else if (list.type == AT_HASH) {
 		brEval old;
 
 		brEvalHashStore(BRHASH(&list), &index, t, &old);
 
 		stGCUnretainAndCollect(&old);
-	} else if(list.type == AT_STRING) {
+	} else if (list.type == AT_STRING) {
 		char **stringptr, *newstring, *oldstring, *substring;
 		unsigned int n;
 		int type;
@@ -1679,34 +1670,33 @@ RTC_INLINE int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, 
 
 		oldstring = *stringptr;
 
-		if(!oldstring || n < 0 || n > strlen(oldstring) + 1) {
+		if (!oldstring || n < 0 || n > strlen(oldstring) + 1) {
 			stEvalError(i->instance->type->engine, EE_BOUNDS, "string index \"%d\" out of bounds", BRINT(&index));
 			return EC_ERROR;
 		}
-
-		if(t->type != AT_STRING) {
+		if (t->type != AT_STRING) {
 			stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"string\" for string index assignment", BRINT(&index));
 			return EC_ERROR;
 		}
 
 		substring = BRSTRING(t);
 
-		newstring = (char*)slMalloc(strlen(oldstring) + strlen(substring) + 1);
+		newstring = (char *)slMalloc(strlen(oldstring) + strlen(substring) + 1);
 
 		strncpy(newstring, oldstring, n);
 		strcpy(&newstring[n], substring);
 
-		if(n != strlen(oldstring)) {
+		if (n != strlen(oldstring)) {
 			strcpy(&newstring[n + strlen(substring)], &oldstring[n + 1]);
 			newstring[strlen(oldstring) + strlen(substring) - 1] = 0;
-		} else {
+		} else
 			newstring[strlen(oldstring) + strlen(substring)] = 0;
-		}
 
 		BRSTRING(t) = *stringptr;
 		stGCUnmark(i->instance, t);
 
-		if(*stringptr) slFree(*stringptr);
+		if (*stringptr)
+			slFree(*stringptr);
 		*stringptr = newstring;
 
 		BRSTRING(t) = slStrdup(newstring);
@@ -1730,18 +1720,21 @@ RTC_INLINE int stEvalPrint(stPrintExp *exp, stRunInstance *i, brEval *t) {
 
 	t->type = AT_NULL;
 
-	for(n=0;n<exp->expressions.size();n++) {
+	for (n = 0; n < exp->expressions.size(); ++n) {
 		resultCode = stExpEval3(exp->expressions[n], i, &arg);
-		if(resultCode != EC_OK) return resultCode;
+		if (resultCode != EC_OK)
+			return resultCode;
 
 		resultCode = stPrintEvaluation(&arg, i);
+		if (resultCode != EC_OK)
+			return resultCode;
 
-		if(resultCode != EC_OK) return resultCode;
-
-		if(n != exp->expressions.size() - 1) slMessage(NORMAL_OUTPUT, " ");
+		if (n != exp->expressions.size() - 1)
+			slMessage(NORMAL_OUTPUT, " ");
 	}
 
-	if(exp->newline) slMessage(NORMAL_OUTPUT, "\n");
+	if (exp->newline)
+		slMessage(NORMAL_OUTPUT, "\n");
 
 	return EC_OK;
 }
@@ -1750,9 +1743,10 @@ RTC_INLINE int stEvalVectorElementExp(stVectorElementExp *s, stRunInstance *i, b
 	int resultCode;
 
 	resultCode = stExpEval3(s->exp, i, result);
-	if(resultCode != EC_OK) return EC_ERROR;
+	if (resultCode != EC_OK)
+		return EC_ERROR;
 
-	if(result->type != AT_VECTOR) {
+	if (result->type != AT_VECTOR) {
 		stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"vector\" in vector element evaluation");
 		return EC_ERROR;
 	}
@@ -1782,13 +1776,13 @@ RTC_INLINE int stEvalVectorElementExp(stVectorElementExp *s, stRunInstance *i, b
 }
 
 RTC_INLINE int stEvalVectorElementAssignExp(stVectorElementAssignExp *s, stRunInstance *i, brEval *result) {
-	int resultCode;
 	slVector *vector;
+	int resultCode;
 	int type;
 
 	resultCode = stPointerForExp(s->exp, i, (void **)&vector, &type);
-
-	if(resultCode != EC_OK) return EC_ERROR;
+	if (resultCode != EC_OK)
+		return EC_ERROR;
 
 	if(type != AT_VECTOR) {
 		stEvalError(i->instance->type->engine, EE_TYPE, "expected vector expression in vector element assign");
@@ -1826,18 +1820,17 @@ RTC_INLINE int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *result) {
 	brEval e[ST_CMAX_ARGS];
 	int n, resultCode;
 
-	for(n=0;n<c->function->nargs;n++) {
-		resultCode =  stExpEval3(c->arguments[n], i, &e[n]);
-
-		if(resultCode != EC_OK) return resultCode;
+	for(n = 0; n < c->function->nargs; ++n) {
+		resultCode = stExpEval3(c->arguments[n], i, &e[n]);
+		if (resultCode != EC_OK)
+			return resultCode;
 
 		/* if the types don't match, try to convert them */
 
-		if(e[n].type != c->function->argtypes[n]) {
+		if (e[n].type != c->function->argtypes[n])
 			resultCode = stToType(&e[n], c->function->argtypes[n], &e[n], i);
-		}
 
-		if(resultCode != EC_OK) {
+		if (resultCode != EC_OK) {
 			stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"%s\" for argument #%d to internal method \"%s\", got type \"%s\"", slAtomicTypeStrings[c->function->argtypes[n]], n + 1, c->function->name, slAtomicTypeStrings[e[n].type]);
 			return resultCode;
 		}
@@ -1876,11 +1869,10 @@ RTC_INLINE int stEvalArrayIndexPointer(stArrayIndexExp *a, stRunInstance *i, voi
 
 	*type = a->loadType;
 
-	if(r != EC_OK) {
+	if (r != EC_OK) {
 		slMessage(DEBUG_ALL, "Error evaluating index of array expression.\n");
 		return r;
 	}
-
 	if(indexExp.type != AT_INT && !(r = stToInt(&indexExp, &indexExp, i))) {
 		slMessage(DEBUG_ALL, "Array index must be of type \"int\"\n");
 		return r;
@@ -1888,15 +1880,17 @@ RTC_INLINE int stEvalArrayIndexPointer(stArrayIndexExp *a, stRunInstance *i, voi
 
 	offset = BRINT(&indexExp);
 
-	if(offset >= a->maxIndex || offset < 0) {
+	if (offset >= a->maxIndex || offset < 0) {
 		stEvalError(i->instance->type->engine, EE_BOUNDS, "array index \"%d\" out of bounds", BRINT(&indexExp));
 		return EC_ERROR;
 	}
 
-	if(a->local) *pointer = &i->instance->type->steveData->stack[a->offset];
-	else *pointer = &i->instance->variables[a->offset];
+	if (a->local)
+		*pointer = &i->instance->type->steveData->stack[a->offset];
+	else
+		*pointer = &i->instance->variables[a->offset];
 
-	*pointer += a->typeSize * offset;
+	*pointer = (char *)*pointer + a->typeSize * offset;
 
 	return EC_OK;
 }
@@ -1907,7 +1901,8 @@ RTC_INLINE int stEvalArrayIndex(stArrayIndexExp *a, stRunInstance *i, brEval *re
 
 	r = stEvalArrayIndexPointer(a, i, &pointer, &type);
 
-	if(r != EC_OK) return r;
+	if (r != EC_OK)
+		return r;
 
 	return stLoadVariable(pointer, a->loadType, result, i);
 }
@@ -1918,13 +1913,13 @@ RTC_INLINE int stEvalArrayIndexAssign(stArrayIndexAssignExp *a, stRunInstance *i
 	int r;
 
 	r = stExpEval3(a->index, i, &indexExp);
-	if(r != EC_OK) {
+	if (r != EC_OK) {
 		slMessage(DEBUG_ALL, "Error evaluating index of array expression.\n");
 		return r;
 	}
 
 	r =  stExpEval3(a->rvalue, i, rvalue);
-	if(r != EC_OK) {
+	if (r != EC_OK) {
 		slMessage(DEBUG_ALL, "Error evaluating right hand side of assignment expression.\n");
 		return r;
 	}
@@ -1934,13 +1929,15 @@ RTC_INLINE int stEvalArrayIndexAssign(stArrayIndexAssignExp *a, stRunInstance *i
 		return r;
 	}
 
-	if(BRINT(&indexExp) >= a->maxIndex || BRINT(&indexExp) < 0) {
+	if (BRINT(&indexExp) >= a->maxIndex || BRINT(&indexExp) < 0) {
 		stEvalError(i->instance->type->engine, EE_BOUNDS, "array index \"%d\" out of bounds", BRINT(&indexExp));
 		return EC_ERROR;
 	}
 
-	if(a->local) pointer = &i->instance->type->steveData->stack[a->offset];
-	else pointer = &i->instance->variables[a->offset];
+	if (a->local)
+		pointer = &i->instance->type->steveData->stack[a->offset];
+	else
+		pointer = &i->instance->variables[a->offset];
 
 	pointer += a->typeSize * BRINT(&indexExp);
 
@@ -1953,18 +1950,21 @@ RTC_INLINE int stEvalAssignment(stAssignExp *a, stRunInstance *i, brEval *t) {
 
 	resultCode = stExpEval3(a->rvalue, i, t);
 
-	if(resultCode != EC_OK) {
+	if (resultCode != EC_OK) {
 		slMessage(DEBUG_ALL, "Error evaluating right hand side of assignment expression.\n");
 		return resultCode;
 	}
 
-	if(a->local) pointer = &i->instance->type->steveData->stack[a->offset];
-	else pointer = &i->instance->variables[a->offset];
+	if (a->local)
+		pointer = &i->instance->type->steveData->stack[a->offset];
+	else
+		pointer = &i->instance->variables[a->offset];
 
-	if(a->objectName && !a->objectType) {
+	if (a->objectName && !a->objectType) {
 		brObject *object = brObjectFind(i->instance->type->engine, a->objectName);
 
-		if(object) a->objectType = (stObject*)object->userData;
+		if (object)
+			a->objectType = (stObject *)object->userData;
 	}
 
 	resultCode = stSetVariable(pointer, a->assignType, a->objectType, t, i);
@@ -1983,17 +1983,18 @@ RTC_INLINE int stEvalLoad(stLoadExp *e, stRunInstance *i, brEval *result) {
 }
 
 RTC_INLINE int stEvalUnaryExp(stUnaryExp *b, stRunInstance *i, brEval *result) {
-	int resultCode;
-	char *str;
 	brEval truth;
+	char *str;
+	int resultCode;
 
 	/* This particular code is not very robust. */
 
 	resultCode = stExpEval3(b->expression, i, result);
 
-	if(resultCode != EC_OK) return resultCode;
+	if (resultCode != EC_OK)
+		return resultCode;
 
-	if(b->op == UT_NOT) {
+	if (b->op == UT_NOT) {
 		stEvalTruth(result, &truth, i);
 		result->type = truth.type;
 		BRINT(result) = !BRINT(&truth);
@@ -2003,11 +2004,10 @@ RTC_INLINE int stEvalUnaryExp(stUnaryExp *b, stRunInstance *i, brEval *result) {
 
 	// if it's a string, switch to a number before continuing.
 
-	if(result->type == AT_STRING) {
+	if (result->type == AT_STRING) {
 		str = BRSTRING(result);
-		resultCode = stToDouble(result, result, i); 
-
-		if(resultCode != EC_OK) return resultCode;
+		if ((resultCode = stToDouble(result, result, i)) != EC_OK)
+			return resultCode;
 	}
 
 	if(result->type == AT_LIST) {
@@ -2873,262 +2873,267 @@ RTC_INLINE int stEvalNewInstance(stInstanceExp *ie, stRunInstance *i, brEval *t)
 }
 
 int stExpEval3(stExp *s, stRunInstance *i, brEval *result) {
-	if (s->block) return s->block->calls.stRtcEval3(s, i, result);
-
-	return stExpEval(s, i, result, NULL);
+	if (s->block)
+		return s->block->calls.stRtcEval3(s, i, result);
+	else
+		return stExpEval(s, i, result, NULL);
 }
 
 int stExpEval(stExp *s, stRunInstance *i, brEval *result, stObject **tClass) {
 	brEval t;
-	register int resultCode = EC_OK;
+	int resultCode = EC_OK;
 
-	if(tClass) *tClass = NULL;
+	if (tClass)
+		*tClass = NULL;
 
 	result->type = AT_NULL;
 
-	if(!i) {
+	if (!i) {
 		stEvalError(i->instance->type->engine, EE_INTERNAL, "Expression evaluated with uninitialized instance");
 		return EC_ERROR;
 	}
 
 	// check active instance status here rather than burden stExpEval3 with a test every time
-	if(i->instance->status == AS_ACTIVE) {
-		if(!s) return EC_OK;
+	if (i->instance->status == AS_ACTIVE) {
+		if (!s)
+			return EC_OK;
 
-		if(s->debug == 1) slDebug("debug called from within steve evaluation\n");
+		if (s->debug == 1)
+			slDebug("debug called from within steve evaluation\n");
 
-		if (s->block) {
+		if (s->block)
 			return s->block->calls.stRtcEval3(s, i, result);
-		}
 	} else {
-		// we don't allow execution with freed instances, unless it's a return
-		// value, in which case it's okay.
+		// we don't allow execution with freed instances, unless it's
+		// a return value, in which case it's okay.
 
-		if(s->type == ET_RETURN) {
+		if (s->type == ET_RETURN) {
 			result->type = AT_NULL;
-			resultCode = EC_STOP;
 
 			resultCode = stExpEval3(s, i, result);
 
-			if(resultCode == EC_OK) resultCode = EC_STOP;
+			resultCode = EC_STOP;
 		}
 
 		stEvalError(i->instance->type->engine, EE_FREED_INSTANCE, "Expression evaluated using freed instance");
 		return EC_ERROR;
 	}
 
-	if(s->debug == 1) slDebug("debug called from within steve evaluation\n");
+	if (s->debug == 1)
+		slDebug("debug called from within steve evaluation\n");
 
-	if (s->block) return s->block->calls.stRtcEval3(s, i, result);
+	if (s->block)
+		return s->block->calls.stRtcEval3(s, i, result);
 	
 	switch(s->type) {
-		case ET_LOAD:
-			{
-				stLoadExp	*e = s;
-				
-				switch(e->loadType) {
-					case AT_INT:
-						resultCode = EVAL_RTC_CALL_3(s, stEvalLoadInt, e, i, result);
-						break;
-					case AT_DOUBLE:
-						resultCode = EVAL_RTC_CALL_3(s, stEvalLoadDouble, e, i, result);
-						break;
-					case AT_POINTER:
-					case AT_INSTANCE:
-					case AT_DATA:
-						resultCode = EVAL_RTC_CALL_3(s, stEvalLoadIndirect, e, i, result);
-						break;
-					case AT_VECTOR:
-						resultCode = EVAL_RTC_CALL_3(s, stEvalLoadVector, e, i, result);
-						break;
-					case AT_LIST:
-						resultCode = EVAL_RTC_CALL_3(s, stEvalLoadList, e, i, result);
-						break;
-					case AT_HASH:
-						resultCode = EVAL_RTC_CALL_3(s, stEvalLoadHash, e, i, result);
-						break;
-					case AT_STRING:
-						resultCode = EVAL_RTC_CALL_3(s, stEvalLoadString, e, i, result);
-						break;
-					case AT_MATRIX:
-						resultCode = EVAL_RTC_CALL_3(s, stEvalLoadMatrix, e, i, result);
-						break;
-					case AT_ARRAY:
-						stEvalError(i->instance->type->engine, EE_ARRAY, "Array variables cannot be loaded like normal expressions");
-						return EC_ERROR;
-						break;
-					default:
-						slMessage(DEBUG_ALL, "Unknown atomic type in load: %d\n", e->type);
-						return EC_ERROR;
-						break;
-				}
+	case ET_LOAD:
+		{
+			stLoadExp *e = (stLoadExp *)s;
+
+			switch(e->loadType) {
+			case AT_INT:
+				resultCode = EVAL_RTC_CALL_3(s, stEvalLoadInt, e, i, result);
+				break;
+			case AT_DOUBLE:
+				resultCode = EVAL_RTC_CALL_3(s, stEvalLoadDouble, e, i, result);
+				break;
+			case AT_POINTER:
+			case AT_INSTANCE:
+			case AT_DATA:
+				resultCode = EVAL_RTC_CALL_3(s, stEvalLoadIndirect, e, i, result);
+				break;
+			case AT_VECTOR:
+				resultCode = EVAL_RTC_CALL_3(s, stEvalLoadVector, e, i, result);
+				break;
+			case AT_LIST:
+				resultCode = EVAL_RTC_CALL_3(s, stEvalLoadList, e, i, result);
+				break;
+			case AT_HASH:
+				resultCode = EVAL_RTC_CALL_3(s, stEvalLoadHash, e, i, result);
+				break;
+			case AT_STRING:
+				resultCode = EVAL_RTC_CALL_3(s, stEvalLoadString, e, i, result);
+				break;
+			case AT_MATRIX:
+				resultCode = EVAL_RTC_CALL_3(s, stEvalLoadMatrix, e, i, result);
+				break;
+			case AT_ARRAY:
+				stEvalError(i->instance->type->engine, EE_ARRAY, "Array variables cannot be loaded like normal expressions");
+				return EC_ERROR;
+				break;
+			default:
+				slMessage(DEBUG_ALL, "Unknown atomic type in load: %d\n", e->type);
+				return EC_ERROR;
+				break;
 			}
-			break;
-		case ET_ASSIGN:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalAssignment, s, i, result);
-			break;
-		case ET_BINARY:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalBinaryExp, s, i, result);
-			break;
-		case ET_METHOD:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalMethodCall, s, i, result);
-			break;
-		case ET_FUNC:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalCallFunc, s, i, result);
-			break;
-		case ET_RETURN:
-			if(!((stReturnExp*)s)->expression) {
-				result->type = AT_NULL;
+		}
+		break;
+	case ET_ASSIGN:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalAssignment, (stAssignExp *)s, i, result);
+		break;
+	case ET_BINARY:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalBinaryExp, (stBinaryExp *)s, i, result);
+		break;
+	case ET_METHOD:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalMethodCall, (stMethodExp *)s, i, result);
+		break;
+	case ET_FUNC:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalCallFunc, (stCCallExp *)s, i, result);
+		break;
+	case ET_RETURN:
+		if (!((stReturnExp *)s)->expression) {
+			result->type = AT_NULL;
+			resultCode = EC_STOP;
+		} else {
+			resultCode = stExpEval3(((stReturnExp *)s)->expression, i, result);
+			if (resultCode == EC_OK)
 				resultCode = EC_STOP;
-			} else {
-				resultCode = stExpEval3(((stReturnExp*)s)->expression, i, result);
+		}
 
-				if(resultCode == EC_OK) resultCode = EC_STOP;
-			}
-
-			break;
-		case ET_ARRAY_INDEX:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalArrayIndex, s, i, result);
-			break;
-		case ET_ARRAY_INDEX_ASSIGN:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalArrayIndexAssign, s, i, result);
-			break;
-		case ET_INT:
-			result->type = AT_INT;
-			BRINT(result) = ((stIntExp*)s)->intValue;
-			break;
-		case ET_DOUBLE:
+		break;
+	case ET_ARRAY_INDEX:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalArrayIndex, (stArrayIndexExp *)s, i, result);
+		break;
+	case ET_ARRAY_INDEX_ASSIGN:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalArrayIndexAssign, (stArrayIndexAssignExp *)s, i, result);
+		break;
+	case ET_INT:
+		result->type = AT_INT;
+		BRINT(result) = ((stIntExp *)s)->intValue;
+		break;
+	case ET_DOUBLE:
+		result->type = AT_DOUBLE;
+		BRDOUBLE(result) = ((stDoubleExp *)s)->doubleValue;
+		break;
+	case ET_SUPER:
+		result->type = AT_INSTANCE;
+		BRINSTANCE(result) = i->instance->breveInstance;
+		*tClass = i->type->super;
+		break;
+	case ET_SELF:
+		result->type = AT_INSTANCE;
+		BRINSTANCE(result) = i->instance->breveInstance;
+		break;
+	case ET_IF:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalIf, (stIfExp *)s, i, result);
+		break;
+	case ET_VECTOR:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalVectorExp, (stVectorExp *)s, i, result);
+		break;
+	case ET_MATRIX:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalMatrixExp, (stMatrixExp *)s, i, result);
+		break;
+	case ET_UNARY:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalUnaryExp, (stUnaryExp *)s, i, result);
+		break;
+	case ET_ST_EVAL:
+		memcpy(result, ((stEvalExp *)s)->eval, sizeof(brEval));
+		break;
+	case ET_LIST:
+		resultCode = brEvalListExp((stListExp *)s, i, result);
+		break;
+	case ET_CODE_ARRAY:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalCodeArray, (stCodeArrayExp *)s, i, result);
+		break;
+	case ET_LENGTH:
+		resultCode = stExpEval3(((stLengthExp *)s)->expression, i, result);
+		switch(result->type) {
+		case AT_VECTOR:
 			result->type = AT_DOUBLE;
-			BRDOUBLE(result) = ((stDoubleExp*)s)->doubleValue;
+			BRDOUBLE(result) = slVectorLength(&BRVECTOR(result));
+			resultCode = EC_OK;
 			break;
-		case ET_SUPER:
-			result->type = AT_INSTANCE;
-			BRINSTANCE(result) = i->instance->breveInstance;
-			*tClass = i->type->super;
+		case AT_LIST:
+			result->type = AT_INT;
+			BRINT(result) = BRLIST(result)->count;
+			resultCode = EC_OK;
 			break;
-		case ET_SELF:
-			result->type = AT_INSTANCE;
-			BRINSTANCE(result) = i->instance->breveInstance;
+		case AT_INT:
+			result->type = AT_INT;
+			BRINT(result) = abs(BRINT(result));
+			resultCode = EC_OK;
 			break;
-		case ET_IF:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalIf, s, i, result);
+		case AT_DOUBLE:
+			result->type = AT_DOUBLE;
+			BRDOUBLE(result) = fabs(BRDOUBLE(result));
+			resultCode = EC_OK;
 			break;
-		case ET_VECTOR:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalVectorExp, s, i, result);
-			break;
-		case ET_MATRIX:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalMatrixExp, s, i, result);
-			break;
-		case ET_UNARY:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalUnaryExp, s, i, result);
-			break;
-		case ET_ST_EVAL:
-			memmove(result, ((stEvalExp*)s)->eval, sizeof(brEval));
-			break;
-		case ET_LIST:
-			resultCode = brEvalListExp(s, i, result);
-			break;
-		case ET_CODE_ARRAY:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalCodeArray, s, i, result);
-			break;
-		case ET_LENGTH:
-			resultCode = stExpEval3(((stLengthExp*)s)->expression, i, result);
-			switch(result->type) {
-				case AT_VECTOR:
-					result->type = AT_DOUBLE;
-					BRDOUBLE(result) = slVectorLength(&BRVECTOR(result));
-					resultCode = EC_OK;
-					break;
-				case AT_LIST:
-					result->type = AT_INT;
-					BRINT(result) = BRLIST(result)->count;
-					resultCode = EC_OK;
-					break;
-				case AT_INT:
-					result->type = AT_INT;
-					BRINT(result) = abs(BRINT(result));
-					resultCode = EC_OK;
-					break;
-				case AT_DOUBLE:
-					result->type = AT_DOUBLE;
-					BRDOUBLE(result) = fabs(BRDOUBLE(result));
-					resultCode = EC_OK;
-					break;
-				case AT_STRING:
-					result->type = AT_INT;
-					if(!BRSTRING(result)) BRINT(result) = 0;
-					else BRINT(result) = strlen(BRSTRING(result));
-					break;
-
-				default:
-					stEvalError(i->instance->type->engine, EE_TYPE, "Cannot give magnitude of %s expression", slAtomicTypeStrings[result->type]);
-					return EC_ERROR;
-					break;				
-			}
-			break;
-		case ET_WHILE:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalWhile, s, i, result);
-			break;
-		case ET_FOREACH:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalForeach, s, i, result);
-			break;
-		case ET_FOR:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalFor, s, i, result);
-			break;
-		case ET_INSERT:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalListInsert, s, i, result);
-			break;
-		case ET_REMOVE:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalListRemove, s, i, result);
-			break;
-		case ET_COPYLIST:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalCopyList, s, i, result);
-			break;
-		case ET_ALL:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalAll, s, i, result);
-			break;
-		case ET_SORT:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalSort, s, i, result);
-			break;
-		case ET_LIST_INDEX:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalListIndex, s, i, result);
-			break;
-		case ET_LIST_INDEX_ASSIGN:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalListIndexAssign, s, i, result);
-			break;
-		case ET_PRINT:
-			resultCode = stEvalPrint(s, i, &t);
-			break;
-		case ET_STRING:
-			resultCode = stProcessString(s, i, result);
-			break; 
-		case ET_INSTANCE:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalNewInstance, s, i, result);
-			break;
-		case ET_VECTOR_ELEMENT:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalVectorElementExp, s, i, result);
-			break;
-		case ET_VECTOR_ELEMENT_ASSIGN:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalVectorElementAssignExp, s, i, result);
-			break;
-		case ET_RANDOM:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalRandExp, s, i, result);
-			break;
-		case ET_DUPLICATE:
-			resultCode = EVAL_RTC_CALL_3(s, stExpEval3, ((stDuplicateExp*)s)->expression, i, result);
-			break;
-		case ET_FREE:
-			resultCode = EVAL_RTC_CALL_3(s, stEvalFree, s, i, result);
-			break;
-		case ET_DIE:
-			resultCode = stExpEval3(((stDieExp*)s)->expression, i, &t);
-			stEvalError(i->instance->type->engine, EE_USER, "execution stopped from within simulation: %s", BRSTRING(&t));
-			return EC_ERROR;
+		case AT_STRING:
+			result->type = AT_INT;
+			if (!BRSTRING(result))
+				BRINT(result) = 0;
+			else
+				BRINT(result) = strlen(BRSTRING(result));
 			break;
 		default:
-			stEvalError(i->instance->type->engine, EE_INTERNAL, "unknown expression type (%d) in stExpEval", s->type);
-			resultCode = EC_ERROR;
-			break;
+			stEvalError(i->instance->type->engine, EE_TYPE, "Cannot give magnitude of %s expression", slAtomicTypeStrings[result->type]);
+			return EC_ERROR;
+			break;				
+		}
+		break;
+	case ET_WHILE:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalWhile, (stWhileExp *)s, i, result);
+		break;
+	case ET_FOREACH:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalForeach, (stForeachExp *)s, i, result);
+		break;
+	case ET_FOR:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalFor, (stForExp *)s, i, result);
+		break;
+	case ET_INSERT:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalListInsert, (stListInsertExp *)s, i, result);
+		break;
+	case ET_REMOVE:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalListRemove, (stListRemoveExp *)s, i, result);
+		break;
+	case ET_COPYLIST:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalCopyList, (stCopyListExp *)s, i, result);
+		break;
+	case ET_ALL:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalAll, (stAllExp *)s, i, result);
+		break;
+	case ET_SORT:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalSort, (stSortExp *)s, i, result);
+		break;
+	case ET_LIST_INDEX:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalListIndex, (stListIndexExp *)s, i, result);
+		break;
+	case ET_LIST_INDEX_ASSIGN:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalListIndexAssign, (stListIndexAssignExp *)s, i, result);
+		break;
+	case ET_PRINT:
+		resultCode = stEvalPrint((stPrintExp *)s, i, &t);
+		break;
+	case ET_STRING:
+		resultCode = stProcessString((stStringExp *)s, i, result);
+		break; 
+	case ET_INSTANCE:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalNewInstance, (stInstanceExp *)s, i, result);
+		break;
+	case ET_VECTOR_ELEMENT:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalVectorElementExp, (stVectorElementExp *)s, i, result);
+		break;
+	case ET_VECTOR_ELEMENT_ASSIGN:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalVectorElementAssignExp, (stVectorElementAssignExp *)s, i, result);
+		break;
+	case ET_RANDOM:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalRandExp, (stRandomExp *)s, i, result);
+		break;
+	case ET_DUPLICATE:
+		resultCode = EVAL_RTC_CALL_3(s, stExpEval3, ((stDuplicateExp *)s)->expression, i, result);
+		break;
+	case ET_FREE:
+		resultCode = EVAL_RTC_CALL_3(s, stEvalFree, (stFreeExp *)s, i, result);
+		break;
+	case ET_DIE:
+		resultCode = stExpEval3(((stDieExp *)s)->expression, i, &t);
+		stEvalError(i->instance->type->engine, EE_USER, "execution stopped from within simulation: %s", BRSTRING(&t));
+		return EC_ERROR;
+		break;
+	default:
+		stEvalError(i->instance->type->engine, EE_INTERNAL, "unknown expression type (%d) in stExpEval", s->type);
+		resultCode = EC_ERROR;
+		break;
 	}
 
 	return resultCode;
@@ -3142,16 +3147,17 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *result, stObject **tClass) {
 
 
 int stDoEvalListIndexPointer(brEvalListHead *l, int n, brEval **eval) {
-    brEvalList *list;
+	brEvalList *list;
 
-    if(n > (l->count - 1) || n < 0) {
-        *eval = NULL;
-        return -1;
-    }
+	if (n > (l->count - 1) || n < 0) {
+		*eval = NULL;
+		return -1;
+	}
 
-    list = brEvalListIndexLookup(l, n);
-    *eval = &list->eval;
-    return 0;
+	list = brEvalListIndexLookup(l, n);
+	*eval = &list->eval;
+
+	return 0;
 }
 
 /*!
@@ -3163,85 +3169,85 @@ int stDoEvalListIndexPointer(brEvalListHead *l, int n, brEval **eval) {
 */  
 
 int stDoEvalListIndex(brEvalListHead *l, int n, brEval *newLoc) {
-    brEval *eval;
+	brEval *eval;
 
-    stDoEvalListIndexPointer(l, n, &eval);
+	stDoEvalListIndexPointer(l, n, &eval);
+
+	if (!eval) {
+		newLoc->type = AT_NULL;
+		return -1;
+	}
     
-    if(!eval) {
-        newLoc->type = AT_NULL;
-        return -1;
-    }
+	brEvalCopy(eval, newLoc);
     
-    brEvalCopy(eval, newLoc);
-    
-    return 0;
+	return 0;
 }
    
 int stDoEvalListIndexAssign(brEvalListHead *l, int n, brEval *newVal, stRunInstance *ri) {
-    brEvalList *list;
-    
-    if(n > l->count) {
-        return -1;
-    }   
-    
-    // if this is a new entry at the end, append it instead
-    
-    if(n == l->count || n < 0) {
-        if(!brEvalListInsert(l, l->count, newVal)) return -1;
-        
-        return 0;
-    }   
+	brEvalList *list;
 
-    list = brEvalListIndexLookup(l, n);
+	if (n > l->count)
+		return -1;
+
+	// if this is a new entry at the end, append it instead
+
+	if (n == l->count || n < 0) {
+		if (brEvalListInsert(l, l->count, newVal))
+			return 0;
+		else
+			return -1;
+	}
+
+	list = brEvalListIndexLookup(l, n);
 
 	stGCUnretainAndCollect(&list->eval);
 
-    brEvalCopy(newVal, &list->eval);
+	brEvalCopy(newVal, &list->eval);
 
-    return 0;
+	return 0;
 }
 
 RTC_INLINE int stEvalBinaryEvalListExp(char op, brEval *l, brEval *r, brEval *result, stRunInstance *i) {
-    brEvalListHead *h1, *h2;
-    brEvalList *l1, *l2;
-    int same;
-    int ret;
+	brEvalListHead *h1, *h2;
+	brEvalList *l1, *l2;
+	int same;
+	int ret;
 
-    h1 = BRLIST(l);
-    h2 = BRLIST(r);
+	h1 = BRLIST(l);
+	h2 = BRLIST(r);
 
-    if(h1->count != h2->count) {
-        same = 0;
-    } else {
-        l1 = h1->start;
-        l2 = h2->start;
+	if (h1->count != h2->count)
+		same = 0;
+	else {
+		l1 = h1->start;
+		l2 = h2->start;
 
-        same = 1;
+		same = 1;
 
-        while(l1 && l2 && same) {
-            ret = stEvalBinaryExpWithEvals(i, BT_EQ, &l1->eval, &l2->eval, result);
+		while (l1 && l2 && same) {
+			ret = stEvalBinaryExpWithEvals(i, BT_EQ, &l1->eval, &l2->eval, result);
 
-            if(ret != EC_OK || !BRINT(result)) same = 0;
+			if (ret != EC_OK || !BRINT(result))
+				same = 0;
 
-            l1 = l1->next;
-            l2 = l2->next;
-        }
-    }
+			l1 = l1->next;
+			l2 = l2->next;
+		}
+	}
 
-    switch(op) {
-        case BT_EQ:
-            BRINT(result) = same;
-            break;
-        case BT_NE:
-            BRINT(result) = !same;
-            break;
-        default:
-            stEvalError(i->instance->type->engine, EE_INTERNAL, "unknown binary expression operator (%d) in stEvalBinaryDoubleExp", op);
-            return EC_ERROR;
-            break;
-    }
+	switch(op) {
+	case BT_EQ:
+		BRINT(result) = same;
+		break;
+	case BT_NE:
+		BRINT(result) = !same;
+		break;
+	default:
+		stEvalError(i->instance->type->engine, EE_INTERNAL, "unknown binary expression operator (%d) in stEvalBinaryDoubleExp", op);
+		return EC_ERROR;
+	}
 
-    return EC_OK;
+	return EC_OK;
 }
 
 /*!
@@ -3258,31 +3264,25 @@ RTC_INLINE int stEvalBinaryEvalListExp(char op, brEval *l, brEval *r, brEval *re
 
 void stEvalError(brEngine *e, int type, char *proto, ...) {
 	va_list vp;
-	char localMessage[BR_ERROR_TEXT_SIZE];
 	brErrorInfo *error = brEngineGetErrorInfo(e);
+	char *m, localMessage[BR_ERROR_TEXT_SIZE];
 
-	if(error->type == 0) {
-		// if this is the first stEvalError, this is the primary error --
+	if (!error->type) {
+		m = error->message;
+
+		// if this is the first stEvalError, this is the primary error
 		// print out all of the information
 
 		error->type = type;
-        
-		va_start(vp, proto);
-		vsnprintf(error->message, BR_ERROR_TEXT_SIZE, proto, vp);
-		va_end(vp); 
+	} else
+		m = localMessage;
 
-		slMessage(DEBUG_ALL, error->message);
-		slMessage(DEBUG_ALL, "\n");
+	va_start(vp, proto);
+	vsnprintf(m, BR_ERROR_TEXT_SIZE, proto, vp);
+	va_end(vp);
 
-		// stStackTrace(e);
-	} else {
-		va_start(vp, proto);
-		vsnprintf(localMessage, BR_ERROR_TEXT_SIZE, proto, vp);
-		va_end(vp); 
-
-		slMessage(DEBUG_ALL, localMessage);
-		slMessage(DEBUG_ALL, "\n");
-	}
+	slMessage(DEBUG_ALL, m);
+	slMessage(DEBUG_ALL, "\n");
 }
 
 /*!

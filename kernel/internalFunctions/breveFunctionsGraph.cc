@@ -33,29 +33,28 @@
 */
 
 int brIGraphNew(brEval args[], brEval *target, brInstance *i) {
-	void *p;
-	slGraph *graph;
 	slVector color;
+	slGraph *graph;
+	void *p;
 
 	slVectorSet(&color, .8, .8, 1);
 
 	graph = slGraphNew(&color, 0, 0, 200, 200);
 
-	if(!i->engine->newWindowCallback) {
+	if (!i->engine->newWindowCallback) {
 		slMessage(DEBUG_ALL, "cannot create new window\n");
-		BRGRAPHPOINTER(target) = NULL;
+		BRPOINTER(target) = NULL;
 		return EC_OK;
 	}
 
 	p = i->engine->newWindowCallback(BRSTRING(&args[0]), graph);
 
-	if(!p) {
+	if (!p) {
 		slMessage(DEBUG_ALL, "warning: new graph window callback failed--graphs not available for this interface\n");
-	} else {
+	} else
 		i->engine->windows.push_back(p);
-	}
 
-	BRGRAPHPOINTER(target) = graph;
+	BRPOINTER(target) = graph;
 	graph->userData = p;
 
 	return EC_OK;
@@ -71,7 +70,8 @@ int brIGraphSetTitle(brEval args[], brEval *target, brInstance *i) {
 	slGraph *g = BRGRAPHPOINTER(&args[0]);
 	char *string = BRSTRING(&args[1]);
 
-	if(g) slGraphSetTitle(g, string);
+	if (g)
+		slGraphSetTitle(g, string);
 
 	return EC_OK;
 }
@@ -86,7 +86,8 @@ int brIGraphSetXAxisName(brEval args[], brEval *target, brInstance *i) {
 	slGraph *g = BRGRAPHPOINTER(&args[0]);
 	char *string = BRSTRING(&args[1]);
 
-	if(g) slGraphSetXAxisName(g, string);
+	if (g)
+		slGraphSetXAxisName(g, string);
 
 	return EC_OK;
 }
@@ -101,7 +102,8 @@ int brIGraphSetYAxisName(brEval args[], brEval *target, brInstance *i) {
 	slGraph *g = BRGRAPHPOINTER(&args[0]);
 	char *string = BRSTRING(&args[1]);
 
-	if(g) slGraphSetYAxisName(g, string);
+	if (g)
+		slGraphSetYAxisName(g, string);
 
 	return EC_OK;
 }
@@ -119,7 +121,8 @@ int brIGraphAddLine(brEval args[], brEval *target, brInstance *i) {
 	slGraph *g = BRGRAPHPOINTER(&args[0]);
 	slVector *color = &BRVECTOR(&args[1]);
 
-	if(g) BRINT(target) = slGraphAddLine(g, color);
+	if (g)
+		BRINT(target) = slGraphAddLine(g, color);
 
 	return EC_OK;
 }
@@ -135,9 +138,10 @@ int brIGraphAddLineValue(brEval args[], brEval *target, brInstance *i) {
 	unsigned int line = BRINT(&args[1]);
 	double yValue = BRDOUBLE(&args[2]);
 
-	if(!g) return EC_OK;
+	if (!g)
+		return EC_OK;
 
-	if(line >= g->lines.size()) {
+	if (line >= g->lines.size()) {
 		/* error message */
 		return EC_OK;
 	}

@@ -166,7 +166,7 @@ struct slWorld {
 
 	slGISData *gisData;
 
-#ifdef HAVE_LIBENET
+#if HAVE_LIBENET
 	slNetsimData netsimData;
 	slNetsimClientData *netsimClient;
 #endif

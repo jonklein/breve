@@ -1,18 +1,20 @@
 #include "simulation.h"
 
 void slWorldObject::draw(slCamera *camera) {
-	if(shape) shape->draw(camera, &position, textureScale, drawMode, 0);
+	if (shape)
+		shape->draw(camera, &position, textureScale, drawMode, 0);
 }
 
 void slObjectLine::draw(slCamera *camera) {
 	slVector *x, *y;
 
-	if(!_src || !_dst) return;
+	if (!_src || !_dst)
+		return;
 
 	x = &_src->position.location;
 	y = &_dst->position.location;
 
-	if(_stipple) {
+	if (_stipple) {
 		glLineStipple(2, _stipple);
 		glEnable(GL_LINE_STIPPLE);
 	}
@@ -26,7 +28,8 @@ void slObjectLine::draw(slCamera *camera) {
 
 	glEnd();
 
-	if(_stipple) glDisable(GL_LINE_STIPPLE);
+	if (_stipple)
+		glDisable(GL_LINE_STIPPLE);
 }
 
 void slWorldObjectSetCallbackData(slWorldObject *wo, void *data) {
@@ -62,8 +65,7 @@ void slWorldObjectSetNeighborhoodSize(slWorldObject *wo, double size) {
 */
 
 void slWorldObjectSetTexture(slWorldObject *wo, int texture) {
-	if(texture < 0) texture = 0;
-	wo->texture = texture;
+	wo->texture = (texture > 0) ? texture : 0;
 }
 
 void slWorldObjectSetTextureMode(slWorldObject *wo, int mode) {
@@ -83,7 +85,8 @@ void slWorldObjectAddDrawMode(slWorldObject *wo, int mode) {
 }
 
 void slWorldObjectRemoveDrawMode(slWorldObject *wo, int mode) {
-	if(wo->drawMode & mode) wo->drawMode ^= mode;
+	if (wo->drawMode & mode)
+		wo->drawMode ^= mode;
 }
 
 std::vector<slWorldObject*> &slWorldObjectGetNeighbors(slWorldObject *wo) {
@@ -104,37 +107,37 @@ void slWorldObjectSetColor(slWorldObject *wo, slVector *color) {
 
 int slWorldObjectRaytrace(slWorldObject *wo, slVector *location, slVector* direction, slVector *erg_dir) {
 
-   if(!(wo->shape)) {
-      slMessage(DEBUG_ALL, "slWorldObjectRaytrace: This WorldObject has no shape\n");
-      return -2;
-   }
+	if (!(wo->shape)) {
+		slMessage(DEBUG_ALL, "slWorldObjectRaytrace: This WorldObject has no shape\n");
+		return -2;
+	}
    
-   //direction and location in wo's coordinates
-   slVector dir_wo, dir_wo_help;
-   slVector loc_wo_help;
-   slVector loc_wo;
-   slVector direction_norm;
+	//direction and location in wo's coordinates
+	slVector dir_wo, dir_wo_help;
+	slVector loc_wo_help;
+	slVector loc_wo;
+	slVector direction_norm;
    
-   slVectorCopy(direction, &direction_norm);
-   slVectorNormalize(&direction_norm);
+	slVectorCopy(direction, &direction_norm);
+	slVectorNormalize(&direction_norm);
  
-   slVectorInvXform(wo->position.rotation, &direction_norm, &dir_wo_help);
-   slVectorMul(&dir_wo_help, -1, &dir_wo);   
-   
-   slVectorSub(location, &wo->position.location, &loc_wo_help);
-   slVectorInvXform(wo->position.rotation, &loc_wo_help, &loc_wo);
+	slVectorInvXform(wo->position.rotation, &direction_norm, &dir_wo_help);
+	slVectorMul(&dir_wo_help, -1, &dir_wo);   
+
+	slVectorSub(location, &wo->position.location, &loc_wo_help);
+	slVectorInvXform(wo->position.rotation, &loc_wo_help, &loc_wo);
 
 //   slMessage(DEBUG_ALL, " [ %f, %f, %f ] %f %f ", dir_wo.x, dir_wo.y, dir_wo.z, atan2(dir_wo.z, dir_wo.x)*180/M_PI, atan2(direction->z, direction->x)*180/M_PI );
 //   slMessage(DEBUG_ALL, " [ %f, %f, %f ] ", loc_wo.x, loc_wo.y, loc_wo.z );
-   
-   slVector point;
-   if ( wo->shape->rayHitsShape(&dir_wo, &loc_wo, &point) < 0) {
-      slVectorSet(erg_dir, 0.0, 0.0, 0.0); //no hit
-      return -1;
-   }
 
-   double d = slVectorLength( &point);
-   slVectorMul( &direction_norm, d, erg_dir);
-   
-   return 0;
+	slVector point;
+	if (wo->shape->rayHitsShape(&dir_wo, &loc_wo, &point) < 0) {
+		slVectorSet(erg_dir, 0.0, 0.0, 0.0); //no hit
+		return -1;
+	}
+
+	double d = slVectorLength(&point);
+	slVectorMul(&direction_norm, d, erg_dir);
+
+	return 0;
 }

@@ -18,8 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include <errno.h>
-
 #include "kernel.h"
 
 #if !MINGW
@@ -30,7 +28,7 @@
 #define dlsym(D,F) (void*)GetProcAddress((HMODULE)D, F)
 #define dlclose(D) FreeLibrary((HMODULE)D)
 
-inline const char *dlerror(void) {
+const char *dlerror(void) {
 	static char message[256];
 
 	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -49,45 +47,38 @@ inline const char *dlerror(void) {
 	\brief Opens a plugin and loads it into the engine.
 */
 
-int brEngineAddDlPlugin(char *filename, char *func, brEngine *engine) {
-	void *handle;
+int brEngineAddDlPlugin(char *filename, char *func, brEngine *e) {
 	char *fullpath;
+	void *handle;
 	brDlPlugin *p;
 
-	p = new brDlPlugin;
-
-	// Linux exports symbols unmolested -- or so I am told.
-	// Apparently this is working for OS X too.
-
-	fullpath = brFindFile(engine, filename, NULL);
-
-	if (!fullpath) {
-		slMessage(DEBUG_ALL, "unable to locate file \"%s\"\n", filename);
+	if (!(fullpath = brFindFile(e, filename, NULL))) {
+		slMessage(DEBUG_ALL, "Cannot find plugin \"%s\"\n", filename);
 		return -1;
 	}
-
-	handle = brDlLoadPlugin(fullpath, func, engine->internalMethods);
-
+	handle = brDlLoadPlugin(fullpath, func, e->internalMethods);
 	slFree(fullpath);
 
-	if (handle) {
-		p->handle = handle;
-		p->name = slStrdup(filename);
-		engine->dlPlugins.push_back(p);
-		return 0;	
-	} else
+	if (!handle)
 		return -1;
+
+	p = new brDlPlugin;
+	p->handle = handle;
+	p->name = slStrdup(filename);
+	e->dlPlugins.push_back(p);
+
+	return 0;	
 }
 
 /*!
 	\brief Frees and unloads all loaded plugins.
 */
 
-void brEngineRemoveDlPlugins(brEngine *engine) {
+void brEngineRemoveDlPlugins(brEngine *e) {
 	brDlPlugin *p;
 	std::vector<brDlPlugin*>::iterator di;
 
-	for(di = engine->dlPlugins.begin(); di != engine->dlPlugins.end(); di++ ) {
+	for (di = e->dlPlugins.begin(); di != e->dlPlugins.end(); di++ ) {
 		p = *di;
 
 		dlclose(p->handle);
@@ -100,39 +91,34 @@ void brEngineRemoveDlPlugins(brEngine *engine) {
 	\brief Loads internal functions from a given plugin.
 */
 
-void *brDlLoadPlugin(char *filename, char *func, brNamespace *n) {
-	void (*f)(brNamespace *n);
+void *brDlLoadPlugin(char *filename, char *symname, brNamespace *n) {
+	void (*f)(brNamespace *);
 	void *handle;
 
-	handle = dlopen(filename, RTLD_LAZY|RTLD_GLOBAL);
-
-	if(!handle) {
-		slMessage(DEBUG_ALL, "error loading plugin %s: %s\n", filename, dlerror());
+	if (!(handle = dlopen(filename, RTLD_LAZY | RTLD_GLOBAL))) {
+		slMessage(DEBUG_ALL, "error loading plugin %s: %s\n",
+		    filename, dlerror());
+		return NULL;
+	}
+	if (!(f = (void (*)(brNamespace *))dlsym(handle, symname))) {
+		slMessage(DEBUG_ALL, "error resolving %s in %s: %s\n",
+		    symname, filename, dlerror());
 		return NULL;
 	}
 
-	f = (void (*)(brNamespace *n))dlsym(handle, func);
-
-	if(!f) {
-		slMessage(DEBUG_ALL, "error loading function %s from plugin %s: %s\n", func, filename, dlerror());
-	}
-
-	if(!f) return NULL;
-
-	// yay!
-
+	slMessage(DEBUG_INFO, "Calling %s() in %s\n", symname, filename);
 	f(n);
 
 	return handle;
 }
 
 /*!
-	\brief A plugin-accessable version of \ref brFindFile.
+	\brief A plugin-accessible version of \ref brFindFile.
 
 	Allows plugins to find files using the same file paths as the
 	breve engine does.
 */
 
-char * brPluginFindFile(char *name, void *i) {
+char *brPluginFindFile(char *name, void *i) {
 	return brFindFile(((brInstance *)i)->engine, name, NULL);
 }

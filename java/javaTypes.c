@@ -20,30 +20,30 @@
 
 #include "java.h"
 
-#ifdef HAVE_LIBJAVA
+#if HAVE_LIBJAVA
 int brEvalToJValue(brJavaBridgeData *bridge, brEval *e, jvalue *v, char javaType) {
 	switch(javaType) {
-		case 'V':	
-			e->type = AT_NULL;
-			break;
-		case 'I':
-			v->i = BRINT(e);
-			break;
-		case 'D':
+	case 'V':	
+		e->type = AT_NULL;
+		break;
+	case 'I':
+		v->i = BRINT(e);
+		break;
+	case 'D':
 			v->d = BRDOUBLE(e);
 			break;
-		case 'F':
-			v->f = BRDOUBLE(e);
-			break;
-		case 'T':
-			v->l = brMakeJavaString(bridge, BRSTRING(e));
-			break;
-		case 'O':
-			// extract the java instance
-			v->l = ((brJavaInstance*)(BRINSTANCE(e)->userData))->instance;
-			break;
-		default:
-			return EC_ERROR;
+	case 'F':
+		v->f = BRDOUBLE(e);
+		break;
+	case 'T':
+		v->l = brMakeJavaString(bridge, BRSTRING(e));
+		break;
+	case 'O':
+		// extract the java instance
+		v->l = ((brJavaInstance*)(BRINSTANCE(e)->userData))->instance;
+		break;
+	default:
+		return EC_ERROR;
 	}
 
 	return EC_OK;
@@ -51,26 +51,25 @@ int brEvalToJValue(brJavaBridgeData *bridge, brEval *e, jvalue *v, char javaType
 
 char brJTypeForType(unsigned char breveType) {
 	switch(breveType) {
-		case AT_NULL:
-			return 'V';
-			break;
-		case AT_INT:
-			return 'I';
-			break;
-		case AT_DOUBLE:
-			return 'D';
-			break;
-		case AT_INSTANCE:
-			return 'O';
-			break;
-		case AT_STRING:
-			return 'L';
-			break;
-		default:
-			return 'V';
-			break;
+	case AT_NULL:
+		return 'V';
+		break;
+	case AT_INT:
+		return 'I';
+		break;
+	case AT_DOUBLE:
+		return 'D';
+		break;
+	case AT_INSTANCE:
+		return 'O';
+		break;
+	case AT_STRING:
+		return 'L';
+		break;
+	default:
+		return 'V';
+		break;
 	}
-
 }
 
 jstring brMakeJavaString(brJavaBridgeData *bridge, char *string) {
@@ -80,7 +79,8 @@ jstring brMakeJavaString(brJavaBridgeData *bridge, char *string) {
 
 	characters = new jchar[sizeof(jchar) * (strlen(string) + 1)];
 
-	for(n=0;n<strlen(string);n++) characters[n] = string[n];
+	for (n = 0; n < strlen(string); ++n)
+		characters[n] = string[n];
 
 	s = (*bridge->env).NewString(characters, strlen(string));
 
@@ -92,15 +92,15 @@ jstring brMakeJavaString(brJavaBridgeData *bridge, char *string) {
 char *brReadJavaString(brJavaBridgeData *bridge, jstring string) {
 	char *result;
 	const jchar *characters;
-	int n, length;
+	int length, n;
 
 	length = (*bridge->env).GetStringLength(string);
 
-	result = (char*)slMalloc(length + 1);
+	result = (char *)slMalloc(length + 1);
 
 	characters = (*bridge->env).GetStringChars(string, NULL);
 
-	for(n=0;n<length;n++) 
+	for( n = 0; n < length; ++n) 
 		result[n] = characters[n];
 
 	result[n] = 0;

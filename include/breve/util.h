@@ -46,20 +46,17 @@ extern "C" {
 
 #include "utilTypedefs.h"
 
-#include "list.h"
-#include "stack.h"
-#include "hash.h"
-#include "memory.h"
-#include "text.h"
-
-#include "vector.h"
-#include "matrix.h"
-#include "quat.h"
-
-#include "nr.h"
 #include "error.h"
-
+#include "hash.h"
+#include "list.h"
+#include "matrix.h"
+#include "memory.h"
+#include "nr.h"
+#include "quat.h"
+#include "stack.h"
 #include "stringstream.h"
+#include "text.h"
+#include "vector.h"
 
 #ifdef __cplusplus
 }

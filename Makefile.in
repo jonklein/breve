@@ -139,12 +139,12 @@ CLI_release: clean
 	mkdir $(CLI_FOLDER)/lib
 	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin
 	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin
-	-cp lib/brevePlugin.a $(CLI_FOLDER)/lib/
 	cp -R lib $(CLI_FOLDER)
 	cp -R demos $(CLI_FOLDER)
 	rm -rf $(CLI_FOLDER)/demos/Music
 	mkdir $(CLI_FOLDER)/plugins
 	cp -R plugins/samples $(CLI_FOLDER)/plugins
+	rm -f plugins/samples/Makefile.in
 	cp plugins/slBrevePluginAPI.h plugins/README.txt $(CLI_FOLDER)/plugins
 	cp Changes.html GPL.txt README.txt $(CLI_FOLDER)
 	find $(CLI_FOLDER) -name CVS -prune -exec rm -rf {} \;

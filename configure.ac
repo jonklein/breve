@@ -1,4 +1,4 @@
-AC_PREREQ(2.57)
+AC_PREREQ(2.59)
 
 AC_INIT([the breve simulation environment], [2.1], [jk@spiderland.org])
 AC_CONFIG_HEADER([include/breve/config.h])
@@ -152,7 +152,7 @@ AC_SUBST(VERSION)
 AC_SUBST(EXTRAOPTFLAGS)
 
 AC_HEADER_TIME
-AC_CHECK_HEADERS([sys/param.h sys/time.h wctype.h])
+AC_CHECK_HEADERS([sys/time.h wctype.h])
 
 AC_C_CONST
 AC_C_INLINE
@@ -294,8 +294,9 @@ AC_CONFIG_FILES([Makefile
 		 plugins/slQTMusicPlugin/Makefile
 		 plugins/slRegexPlugin/Makefile
 		 plugins/slURLPlugin/Makefile
+		 plugins/samples/Makefile
 		 OSX/ConfigureLibraryList
-		Qt/breve.pro
+		 Qt/breve.pro
 ])
 
 if test "$ac_cv_lib_png_png_create_write_struct" != yes; then

@@ -42,10 +42,10 @@
 */
 
 struct brErrorInfo {
-	char message[BR_ERROR_TEXT_SIZE];
-	unsigned char type;
 	char *file;
 	int line;
+	unsigned char type;
+	char message[BR_ERROR_TEXT_SIZE];
 };
 
 /*!
@@ -153,7 +153,7 @@ class brEngine {
 
 		std::vector<brInstance*> freedInstances;
 
-#ifdef HAVE_LIBOSMESA
+#if HAVE_LIBOSMESA
 		GLubyte *osBuffer;
 		OSMesaContext osContext;
 #endif 
@@ -192,9 +192,9 @@ class brEngine {
 
 		std::vector<brDlPlugin*> dlPlugins;
 
-		// the drawEveryFrame flag is a hint to the display engine--if set,
-		// the application attempts to draw a frame with every iteration of 
-		// the breve engine. 
+		// the drawEveryFrame flag is a hint to the display engine
+		// if set, the application attempts to draw a frame with every
+		// iteration of the breve engine. 
 
 		unsigned char drawEveryFrame;
 
@@ -230,41 +230,41 @@ class brEngine {
 
 		briTunesData *iTunesData;
 
-		// *** Callback functions to be set by the application frontend ***
+		//
+		// Callback functions to be set by the application frontend
+		//
 
 		// callback to update a menu for an instance
 
-		void (*updateMenu)(brInstance *l);
+		void (*updateMenu)(brInstance *);
 
 		// callback to run save and load dialogs 
 
-		char *(*getSavename)();
-		char *(*getLoadname)();
+		char *(*getSavename)(void);
+		char *(*getLoadname)(void);
 
 		// callback to show a generic dialog
 
-		int (*dialogCallback)(char *title, char *message, char *button1, char *button2);
+		int (*dialogCallback)(char *, char *, char *, char *);
 	
 		// callback to play a beep sound
 	
-		int (*soundCallback)();
+		int (*soundCallback)(void);
 	
 		// returns the string identifying the implementation
 	
-		char *(*interfaceTypeCallback)();
+		char *(*interfaceTypeCallback)(void);
 	
 		// callback to setup and use the OS X interface features
 	
-		int (*interfaceSetStringCallback)(char *string, int number);
-		void (*interfaceSetCallback)(char *file);
+		int (*interfaceSetStringCallback)(char *, int);
+		void (*interfaceSetCallback)(char *);
 
-		// pause callback
+		int (*pauseCallback)(void);
 
-		int (*pauseCallback)();
-
-		void *(*newWindowCallback)(char *name, void *graph);
-		void (*freeWindowCallback)(void *g);
-		void (*renderWindowCallback)(void *g);
+		void *(*newWindowCallback)(char *, void *);
+		void (*freeWindowCallback)(void *);
+		void (*renderWindowCallback)(void *);
 };
 
 /*!

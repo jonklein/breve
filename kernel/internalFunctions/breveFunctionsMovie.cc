@@ -25,11 +25,11 @@
 
 #define BRMOVIEPOINTER(p)  ((slMovie*)BRPOINTER(p))
 
-#ifdef HAVE_LIBAVCODEC
+#if HAVE_LIBAVCODEC
 int breveMovieCreate(brEval args[], brEval *result, brInstance *i) {
-	slCamera *camera = i->engine->camera;
-	slMovie *movie;
 	char *path;
+	slMovie *movie;
+	slCamera *camera = i->engine->camera;
 
 	path = brOutputPath(i->engine, BRSTRING(&args[0]));
 
@@ -52,19 +52,17 @@ int breveMovieAddWorldFrame(brEval args[], brEval *result, brInstance *i) {
 int breveMovieClose(brEval args[], brEval *result, brInstance *i) {
 	slMovie *movie = BRMOVIEPOINTER(&args[0]);
 
-	if(!movie) {
+	if (!movie)
 		slMessage(DEBUG_ALL, "warning: attempt to close uninitialized movie pointer\n");
-		return EC_OK;
-	}
-
-	slMovieFinish(movie);
+	else
+		slMovieFinish(movie);
 
 	return EC_OK;
 
 }
-#endif /* HAVE_LIBAVCODEC */
+#endif
 
-#ifdef HAVE_LIBPNG
+#if HAVE_LIBPNG
 int breveSnapshot(brEval args[], brEval *result, brInstance *i) {
 	// this doesn't really belong here
 	char *path;
@@ -77,7 +75,7 @@ int breveSnapshot(brEval args[], brEval *result, brInstance *i) {
 
 	return EC_OK;
 }
-#endif /* HAVE_LIBPNG */
+#endif
 
 /*!
 	\brief Called if this version of breve is built without movie export support.
@@ -86,7 +84,8 @@ int breveSnapshot(brEval args[], brEval *result, brInstance *i) {
 */
 
 int breveMovieUnsupported(brEval args[], brEval *result, brInstance *i) {
-    slMessage(DEBUG_ALL, "This version of breve was built without support for movie export\n");
+	slMessage(DEBUG_ALL, "This version of breve was built without support for movie export\n");
+
 	return EC_ERROR;
 }
 
@@ -97,13 +96,14 @@ int breveMovieUnsupported(brEval args[], brEval *result, brInstance *i) {
 */
 
 int breveSnapshotUnsupported(brEval args[], brEval *result, brInstance *i) {
-    slMessage(DEBUG_ALL, "This version of breve was built without support for image export\n");
+	slMessage(DEBUG_ALL, "This version of breve was built without support for image export\n");
+
 	return EC_ERROR;
 }
 /*@}*/
 
 void breveInitMovieFunctions(brNamespace *n) {
-#ifdef HAVE_LIBAVCODEC
+#if HAVE_LIBAVCODEC
 	brNewBreveCall(n, "movieCreate", breveMovieCreate, AT_POINTER, AT_STRING, 0);
 	brNewBreveCall(n, "movieAddWorldFrame", breveMovieAddWorldFrame, AT_INT, AT_POINTER, 0);
 	brNewBreveCall(n, "movieClose", breveMovieClose, AT_INT, AT_POINTER, 0);
@@ -113,7 +113,7 @@ void breveInitMovieFunctions(brNamespace *n) {
 	brNewBreveCall(n, "movieClose", breveMovieUnsupported, AT_INT, AT_POINTER, 0);
 #endif
 
-#ifdef HAVE_LIBPNG
+#if HAVE_LIBPNG
 	brNewBreveCall(n, "snapshot", breveSnapshot, AT_INT, AT_STRING, 0);
 #else
 	brNewBreveCall(n, "snapshot", breveSnapshotUnsupported, AT_INT, AT_STRING, 0);

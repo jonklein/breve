@@ -27,7 +27,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-#if ! WINDOWS
+#if !WINDOWS
 #include <GL/glext.h>
 #include <GL/glx.h>
 #endif

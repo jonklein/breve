@@ -20,20 +20,20 @@
 
 #include "java.h"
 
-#ifdef HAVE_LIBJAVA
+#if HAVE_LIBJAVA
 
 /*!
 	\brief the callMethod field of the java brObjectType.
 */
 
 int brJavaMethodCallCallback(void *instanceData, void *methodData, brEval **args, brEval *result) {
+	brJavaMethod *method = (brJavaMethod *)methodData;
+	brJavaInstance *instance = (brJavaInstance *)instanceData;
 	jvalue jargs[JAVA_MAX_ARGS];
-	brJavaMethod *method = (brJavaMethod*)methodData;
-	brJavaInstance *instance = (brJavaInstance*)instanceData;
-	int n;
 
-	for(n=0;n<method->argumentCount;n++)
-		brEvalToJValue(instance->object->bridge, args[n], &jargs[n], method->argumentTypes[n]);
+	for (int n = 0; n < method->argumentCount; ++n)
+		brEvalToJValue(instance->object->bridge, args[n], &jargs[n],
+		    method->argumentTypes[n]);
 
 	return brJavaMethodCall(instance->object->bridge, instance, method, jargs, result);
 }
@@ -43,8 +43,9 @@ int brJavaMethodCallCallback(void *instanceData, void *methodData, brEval **args
 */
 
 void *brJavaObjectFindCallback(void *typeData, char *name) {
-	brJavaBridgeData *bridge = (brJavaBridgeData*)typeData;
-	return (void*)brJavaObjectFind(bridge, name);
+	brJavaBridgeData *bridge = (brJavaBridgeData *)typeData;
+
+	return (void *)brJavaObjectFind(bridge, name);
 }
 
 /*!
@@ -52,8 +53,9 @@ void *brJavaObjectFindCallback(void *typeData, char *name) {
 */
 
 void *brJavaMethodFindCallback(void *objectData, char *name, unsigned char *types, int tCount) {
-	brJavaObject *object = (brJavaObject*)objectData;
-	return (void*)brJavaMethodFind(object->bridge, object, name, types, tCount);
+	brJavaObject *object = (brJavaObject *)objectData;
+
+	return (void *)brJavaMethodFind(object->bridge, object, name, types, tCount);
 }
 
 /*!
@@ -69,7 +71,9 @@ int brJavaIsSubclassCallback(void *class1, void *class2) {
 */
 
 void *brJavaInstanceNewCallback(void *objectData, brEval **args, int argCount) {
-	return (void*)brJavaInstanceNew((brJavaObject*)objectData, args, argCount);
+	brJavaObject *object = (brJavaObject *)objectData;
+
+	return (void *)brJavaInstanceNew(object, args, argCount);
 }
 
 /*!
@@ -77,7 +81,6 @@ void *brJavaInstanceNewCallback(void *objectData, brEval **args, int argCount) {
 */
 
 void brJavaInstanceDestroyCallback(void *instance) {
-
 }
 
 /*!
@@ -88,9 +91,8 @@ void brJavaInit(brEngine *e) {
 	brObjectType *javaObjectType;
 	void *data;
 
-	data = brAttachJavaVM(e);
-
-	if(!data) return;
+	if (!(data = brAttachJavaVM(e)))
+		return;
 
 	javaObjectType = new brObjectType;
 
@@ -104,10 +106,9 @@ void brJavaInit(brEngine *e) {
 	javaObjectType->userData = data;
 
 	if(javaObjectType->userData)
-	    brEngineRegisterObjectType(e, javaObjectType);
+		brEngineRegisterObjectType(e, javaObjectType);
 }
 
 void brJavaFree(brEngine *e) {
-
 }
 #endif

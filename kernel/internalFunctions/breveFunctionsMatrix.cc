@@ -34,7 +34,6 @@
 #include <vecLib/vDSP.h>
 #endif
 
-
 #ifdef HAVE_LIBGSL
 typedef slBigMatrix2DGSL brMatrix2D;
 typedef slBigMatrix3DGSL brMatrix3D;
@@ -52,74 +51,84 @@ typedef slBigMatrix3DGSL brMatrix3D;
 
 #include "breveFunctionsImage.h"
 
-
 int brIMatrix2DNew(brEval args[], brEval *target, brInstance *i) {
-    if (target != 0) delete BRBIGMATRIX2D(target);
-    BRBIGMATRIX2D(target) = new brMatrix2D(BRINT(&args[0]), BRINT(&args[1]));
+	if (target)
+		delete BRBIGMATRIX2D(target);
+	BRPOINTER(target) = new brMatrix2D(BRINT(&args[0]), BRINT(&args[1]));
+
 	return EC_OK;
 }
 
 int brIMatrix2DFree(brEval args[], brEval *target, brInstance *i) {
-    delete BRBIGMATRIX2D(target);
+	delete BRBIGMATRIX2D(target);
+
 	return EC_OK;
 }
 
 int brIMatrix2DGet(brEval args[], brEval *target, brInstance *i) {
-    BRDOUBLE(target) = double(BRBIGMATRIX2D(&args[0])->get(BRINT(&args[1]), BRINT(&args[2])));
+	BRDOUBLE(target) = double(BRBIGMATRIX2D(&args[0])->get(BRINT(&args[1]), BRINT(&args[2])));
+
 	return EC_OK;
 }
 
 int brIMatrix2DSet(brEval args[], brEval *target, brInstance *i) {
-    BRBIGMATRIX2D(&args[0])->set(BRINT(&args[1]), BRINT(&args[2]), float(BRDOUBLE(&args[3])));
+	BRBIGMATRIX2D(&args[0])->set(BRINT(&args[1]), BRINT(&args[2]), float(BRDOUBLE(&args[3])));
+
 	return EC_OK;
 }
 
 int brIMatrix2DCopy(brEval args[], brEval *target, brInstance *i) {
-    delete BRBIGMATRIX2D(&args[1]);
-    BRBIGMATRIX2D(&args[1]) = new brMatrix2D(*static_cast<slBigMatrix2DGSL*>(BRBIGMATRIX2D(&args[0])));
+	delete BRBIGMATRIX2D(&args[1]);
+
+	BRPOINTER(&args[1]) = new brMatrix2D(*static_cast<slBigMatrix2DGSL*>(BRBIGMATRIX2D(&args[0])));
+
 	return EC_OK;
 }
 
 int brIMatrix2DGetAbsoluteSum(brEval args[], brEval *target, brInstance *i) {
 	BRDOUBLE(target) = double(static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->absoluteSum());
+
 	return EC_OK;
 }
 
 int brIMatrix2DAddScaled(brEval args[], brEval *target, brInstance *i) {
-    static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->scaleAndAdd(float(BRDOUBLE(&args[2])), *static_cast<slVectorView*>(BRBIGMATRIX2D(&args[1])));
+	static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->scaleAndAdd(float(BRDOUBLE(&args[2])), *static_cast<slVectorView*>(BRBIGMATRIX2D(&args[1])));
+
 	return EC_OK;
 }
 
 int brIMatrix2DAddScalar(brEval args[], brEval *target, brInstance *i) {
 	static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->inPlaceAdd(BRDOUBLE(&args[1]));
+
 	return EC_OK;
 }
 
 int brIMatrix2DMulElements(brEval args[], brEval *target, brInstance *i) {
-    static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->inPlaceMultiply(*static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[1])));
+	static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->inPlaceMultiply(*static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[1])));
+
 	return EC_OK;
 }
 
-/* Seperate BLAS routines are be deprecated
+/* Separate BLAS routines are deprecated
 int brIMatrixBlasMul(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 */
 
 int brIMatrix2DScale(brEval args[], brEval *target, brInstance *i) {
-    static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->inPlaceMultiply(BRDOUBLE(&args[1]));
+	static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->inPlaceMultiply(BRDOUBLE(&args[1]));
+
 	return EC_OK;
 }
 
 int brIMatrix2DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
-    brMatrix2D *diffTarget = BRBIGMATRIX2D(&args[1]);
-    brMatrix2D *chemSource = BRBIGMATRIX2D(&args[0]);
-    double scale = BRDOUBLE(&args[2]);
-    
-    double newVal = 0.0;
-    unsigned int xDim = chemSource->xDim();
-    unsigned int yDim = chemSource->yDim();    
-    unsigned int x = 0, y = 0;
+	brMatrix2D *diffTarget = BRBIGMATRIX2D(&args[1]);
+	brMatrix2D *chemSource = BRBIGMATRIX2D(&args[0]);
+	double scale = BRDOUBLE(&args[2]);
+	double newVal = 0.0;
+	unsigned int xDim = chemSource->xDim();
+	unsigned int yDim = chemSource->yDim();    
+	unsigned int x = 0, y = 0;
 	int xp, xm, yp, ym;
 
     // this will get moved to a seperate util class later
@@ -143,36 +152,41 @@ int brIMatrix2DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 #endif
 #endif
 
-	for(y=0; y < yDim; y++) {
-		for(x=0; x < xDim; x++) {
-			xp = (x+1) % xDim; yp = (y+1) % yDim;
-			xm = (x-1) % xDim; ym = (y-1) % yDim;
+	for (y = 0; y < yDim; y++)
+		for (x = 0; x < xDim; x++) {
+			xp = (x + 1) % xDim;
+			yp = (y + 1) % yDim;
+			xm = (x - 1) % xDim;
+			ym = (y - 1) % yDim;
 
-			if(xm < 0) xm += xDim;
-			else if(xp >= int(xDim)) xp -= xDim;
+			if (xm < 0)
+				xm += xDim;
+			else if (xp >= (int)xDim)
+				xp -= xDim;
 
-			if(ym < 0) ym += yDim;
-			else if(yp >= int(yDim)) yp -= yDim;
+			if (ym < 0)
+				ym += yDim;
+			else if (yp >= (int)yDim)
+				yp -= yDim;
 
-			newVal = scale * ((-4.0 * chemSource->get(x,y)) +
-			                  chemSource->get(xm, y) + chemSource->get(xp,y) + 
-				              chemSource->get(x, ym) + chemSource->get(x, yp));
-            diffTarget->set(x, y, newVal);
+			newVal = scale * ((-4.0 * chemSource->get(x, y)) +
+			    chemSource->get(xm, y) + chemSource->get(xp, y) + 
+			    chemSource->get(x, ym) + chemSource->get(x, yp));
+
+			diffTarget->set(x, y, newVal);
 		}
-	}
 
 	return EC_OK;
 }
 
 int brIMatrix2DDiffuse(brEval args[], brEval *target, brInstance *i) {
-    brMatrix2D *diffTarget = BRBIGMATRIX2D(&args[1]);
-    brMatrix2D *chemSource = BRBIGMATRIX2D(&args[0]);
-    double scale = BRDOUBLE(&args[2]);
-    
-    double newVal = 0.0;
-    unsigned int xDim = chemSource->xDim();
-    unsigned int yDim = chemSource->yDim();    
-    unsigned int x = 0, y = 0;
+	brMatrix2D *diffTarget = BRBIGMATRIX2D(&args[1]);
+	brMatrix2D *chemSource = BRBIGMATRIX2D(&args[0]);
+	double scale = BRDOUBLE(&args[2]);
+	double newVal = 0.0;
+	unsigned int xDim = chemSource->xDim();
+	unsigned int yDim = chemSource->yDim();    
+	unsigned int x = 0, y = 0;
 	int xp, xm, yp, ym;
 
     // this will get moved to a seperate util class later
@@ -196,48 +210,54 @@ int brIMatrix2DDiffuse(brEval args[], brEval *target, brInstance *i) {
 #endif
 #endif
 
-	for(y=0; y < yDim; y++) {
-		for(x=0; x < xDim; x++) {
-			xp = (x+1) % xDim; yp = (y+1) % yDim;
-			xm = (x-1) % xDim; ym = (y-1) % yDim;
+	for (y = 0; y < yDim; y++)
+		for (x = 0; x < xDim; x++) {
+			xp = (x + 1) % xDim;
+			yp = (y + 1) % yDim;
+			xm = (x - 1) % xDim;
+			ym = (y - 1) % yDim;
 
-			newVal = scale * ((-4.0 * chemSource->get(x,y)) +
-			                  chemSource->get(xm, y) + chemSource->get(xp,y) + 
-				              chemSource->get(x, ym) + chemSource->get(x, yp));
-            diffTarget->set(x, y, newVal);
+			newVal = scale * ((-4.0 * chemSource->get(x, y)) +
+			    chemSource->get(xm, y) + chemSource->get(xp, y) + 
+			    chemSource->get(x, ym) + chemSource->get(x, yp));
+
+			diffTarget->set(x, y, newVal);
 		}
-	}
+
 	return EC_OK;
 }
 
 int brIMatrix2DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 	brMatrix2D *sourceMatrix = BRBIGMATRIX2D(&args[0]);
 	brImageData *d = (brImageData*)BRPOINTER(&args[1]);
-	int offset = BRINT(&args[2]);
-	double scale = 255.0 * BRDOUBLE(&args[3]);
-	int r;
-
 	unsigned char *pdata;
+	double scale = 255.0 * BRDOUBLE(&args[3]);
+	int offset = BRINT(&args[2]);
+	int r;
 	int x, y, xmax, ymax;
 
 	xmax = sourceMatrix->xDim();
 	ymax = sourceMatrix->yDim();
 
-	if(xmax > d->x) xmax = d->x;
-	if(ymax > d->y) ymax = d->y;
+	if (xmax > d->x)
+		xmax = d->x;
+	if (ymax > d->y)
+		ymax = d->y;
 
 	pdata = d->data + offset;
 
-	for(y=0;y<ymax;y++) {
-	 	for(x=0;x<xmax;x++) {
+	for (y = 0; y < ymax; y++)
+	 	for (x = 0; x < xmax; x++) {
 			r = (int)(sourceMatrix->get(x, y) * scale);
-			if(r > 255) *pdata = 255;
-			else *pdata = r;
+			if (r > 255)
+				*pdata = 255;
+			else
+				*pdata = r;
 			pdata += 4;
 	 	}
-	}
 
-	if(d->textureNumber == -1) d->textureNumber = slTextureNew(i->engine->camera);
+	if (d->textureNumber == -1)
+		d->textureNumber = slTextureNew(i->engine->camera);
 
 	slUpdateTexture(i->engine->camera, d->textureNumber, d->data, d->x, d->y, GL_RGBA);
 
@@ -245,49 +265,59 @@ int brIMatrix2DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 }
 
 int brIMatrix3DNew(brEval args[], brEval *target, brInstance *i) {
-    if (target != 0) delete BRBIGMATRIX3D(target);
-    BRBIGMATRIX3D(target) = new brMatrix3D(BRINT(&args[0]), BRINT(&args[1]), BRINT(&args[2]));
+	if (target)
+		delete BRBIGMATRIX3D(target);
+	BRPOINTER(target) = new brMatrix3D(BRINT(&args[0]), BRINT(&args[1]), BRINT(&args[2]));
+
 	return EC_OK;
 }
 
 int brIMatrix3DFree(brEval args[], brEval *target, brInstance *i) {
-    delete BRBIGMATRIX3D(target);
+	delete BRBIGMATRIX3D(target);
+
 	return EC_OK;
 }
 
 int brIMatrix3DGet(brEval args[], brEval *target, brInstance *i) {
-    BRDOUBLE(target) = double(BRBIGMATRIX3D(&args[0])->get(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3])));
+	BRDOUBLE(target) = double(BRBIGMATRIX3D(&args[0])->get(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3])));
+
 	return EC_OK;
 }
 
 int brIMatrix3DSet(brEval args[], brEval *target, brInstance *i) {
-    BRBIGMATRIX3D(&args[0])->set(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]), float(BRDOUBLE(&args[4])));
+	BRBIGMATRIX3D(&args[0])->set(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]), float(BRDOUBLE(&args[4])));
+
 	return EC_OK;
 }
 
 int brIMatrix3DCopy(brEval args[], brEval *target, brInstance *i) {
-    delete BRBIGMATRIX3D(&args[1]);
-    BRBIGMATRIX3D(&args[1]) = new brMatrix3D(*static_cast<slBigMatrix3DGSL*>(BRBIGMATRIX3D(&args[0])));
+	delete BRBIGMATRIX3D(&args[1]);
+	BRPOINTER(&args[1]) = new brMatrix3D(*static_cast<slBigMatrix3DGSL*>(BRBIGMATRIX3D(&args[0])));
+
 	return EC_OK;
 }
 
 int brIMatrix3DGetAbsoluteSum(brEval args[], brEval *target, brInstance *i) {
 	BRDOUBLE(target) = double(static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[0]))->absoluteSum());
+
 	return EC_OK;
 }
 
 int brIMatrix3DAddScaled(brEval args[], brEval *target, brInstance *i) {
-    static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[0]))->scaleAndAdd(float(BRDOUBLE(&args[2])), *static_cast<slVectorView*>(BRBIGMATRIX3D(&args[1])));
+	static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[0]))->scaleAndAdd(float(BRDOUBLE(&args[2])), *static_cast<slVectorView*>(BRBIGMATRIX3D(&args[1])));
+
 	return EC_OK;
 }
 
 int brIMatrix3DAddScalar(brEval args[], brEval *target, brInstance *i) {
 	static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[0]))->inPlaceAdd(BRDOUBLE(&args[1]));
+
 	return EC_OK;
 }
 
 int brIMatrix3DMulElements(brEval args[], brEval *target, brInstance *i) {
-    static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[0]))->inPlaceMultiply(*static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[1])));
+	static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[0]))->inPlaceMultiply(*static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[1])));
+
 	return EC_OK;
 }
 
@@ -298,35 +328,38 @@ int brIMatrixBlasMul(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIMatrix3DScale(brEval args[], brEval *target, brInstance *i) {
-    static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[0]))->inPlaceMultiply(BRDOUBLE(&args[1]));
+	static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[0]))->inPlaceMultiply(BRDOUBLE(&args[1]));
+
 	return EC_OK;
 }
 /*
 int brIMatrix3DDiffuse(brEval args[], brEval *target, brInstance *i) {
-    brMatrix3D *diffTarget = BRBIGMATRIX3D(&args[1]);
-    brMatrix3D *chemSource = BRBIGMATRIX3D(&args[0]);
-    double scale = BRDOUBLE(&args[2]);
-    
-    double newVal = 0.0;
-    unsigned int xDim = chemSource->xDim();
-    unsigned int yDim = chemSource->yDim();    
-    unsigned int x = 0, y = 0;
+	brMatrix3D *diffTarget = BRBIGMATRIX3D(&args[1]);
+	brMatrix3D *chemSource = BRBIGMATRIX3D(&args[0]);
+	double scale = BRDOUBLE(&args[2]);
+	double newVal = 0.0;
+	unsigned int xDim = chemSource->xDim();
+	unsigned int yDim = chemSource->yDim();    
+	unsigned int x = 0, y = 0;
 	int xp, xm, yp, ym;
 
     // this will get moved to a seperate util class later
     // and will be converted to iterators when we migrate to gslmm based code
 
-	for(y=0; y < yDim; y++) {
-		for(x=0; x < xDim; x++) {
-			xp = (x+1) % xDim; yp = (y+1) % yDim;
-			xm = (x-1) % xDim; ym = (y-1) % yDim;
+	for (y = 0; y < yDim; y++)
+		for (x = 0; x < xDim; x++) {
+			xp = (x + 1) % xDim;
+			yp = (y + 1) % yDim;
+			xm = (x - 1) % xDim;
+			ym = (y - 1) % yDim;
 
-			newVal = scale * ((-4.0 * chemSource->get(x,y)) +
-			                  chemSource->get(xm, y) + chemSource->get(xp,y) + 
-				              chemSource->get(x, ym) + chemSource->get(x, yp));
-            diffTarget->set(x, y, newVal);
+			newVal = scale * ((-4.0 * chemSource->get(x, y)) +
+			    chemSource->get(xm, y) + chemSource->get(xp, y) + 
+			    chemSource->get(x, ym) + chemSource->get(x, yp));
+
+			diffTarget->set(x, y, newVal);
 		}
-	}
+
 	return EC_OK;
 }
 */
@@ -363,6 +396,3 @@ void breveInitMatrixFunctions(brNamespace *n) {
 	brNewBreveCall(n, "matrix3DMulElements", brIMatrix3DMulElements, AT_NULL, AT_POINTER, AT_POINTER, 0);
 	//brNewBreveCall(n, "matrixBlasMul", brIMatrixBlasMul, AT_NULL, AT_POINTER, AT_POINTER, AT_POINTER, 0);
 }
-
-
-

@@ -33,9 +33,9 @@
 */
 
 int brIFreeNetwork(brEval args[], brEval *target, brInstance *i) {
-    snFreeNetwork(BRFFLAYERPOINTER(&args[0]));
+	snFreeNetwork(BRFFLAYERPOINTER(&args[0]));
 
-    return EC_OK;
+	return EC_OK;
 }
 
 /*!
@@ -45,11 +45,12 @@ int brIFreeNetwork(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brINewFFLayer(brEval args[], brEval *target, brInstance *i) {
-    BRFFLAYERPOINTER(target) = snNewLayer(BRINT(&args[0]), BRFFLAYERPOINTER(&args[1]));
+	BRPOINTER(target) = snNewLayer(BRINT(&args[0]), BRFFLAYERPOINTER(&args[1]));
 
-    if(!BRPOINTER(target)) return EC_ERROR;
+	if (!BRFFLAYERPOINTER(target))
+		return EC_ERROR;
 
-    return EC_OK;
+	return EC_OK;
 }
 
 /*!
@@ -59,9 +60,9 @@ int brINewFFLayer(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIRandomizeWeights(brEval args[], brEval *target, brInstance *i) {
-    snRandomizeNetworkWeights(BRFFLAYERPOINTER(&args[0]), 8);
+	snRandomizeNetworkWeights(BRFFLAYERPOINTER(&args[0]), 8);
 
-    return EC_OK;
+	return EC_OK;
 }
 
 /*!
@@ -76,19 +77,17 @@ int brISetWeight(brEval args[], brEval *target, brInstance *i) {
 	int fromNode = BRINT(&args[2]);
 	double weight = BRDOUBLE(&args[3]);
 
-	if(!layer->previous) {
-        slMessage(DEBUG_ALL, "setWeight called on input layer (no weights to be set)");
-        return EC_ERROR;
+	if (!layer->previous) {
+		slMessage(DEBUG_ALL, "setWeight called on input layer (no weights to be set)");
+		return EC_ERROR;
 	}
-
-	if(toNode < 0 || toNode >= layer->count) {
-        slMessage(DEBUG_ALL, "setWeight called with out of bounds node number");
-        return EC_ERROR;
+	if (toNode < 0 || toNode >= layer->count) {
+		slMessage(DEBUG_ALL, "setWeight called with out of bounds node number");
+		return EC_ERROR;
 	}
-
-	if(fromNode < 0 || fromNode >= layer->previous->count) {
-        slMessage(DEBUG_ALL, "setWeight called with out of bounds node number from previous layer");
-        return EC_ERROR;
+	if (fromNode < 0 || fromNode >= layer->previous->count) {
+		slMessage(DEBUG_ALL, "setWeight called with out of bounds node number from previous layer");
+		return EC_ERROR;
 	}
 
 	layer->weights[toNode][fromNode] = weight;
@@ -107,19 +106,17 @@ int brIGetWeight(brEval args[], brEval *target, brInstance *i) {
 	int toNode = BRINT(&args[1]);
 	int fromNode= BRINT(&args[2]);
 
-	if(!layer->previous) {
-        slMessage(DEBUG_ALL, "getWeight called on input layer (no weights to be retrieved)");
-        return EC_ERROR;
+	if (!layer->previous) {
+		slMessage(DEBUG_ALL, "getWeight called on input layer (no weights to be retrieved)");
+		return EC_ERROR;
 	}
-
-	if(toNode < 0 || toNode >= layer->count) {
-        slMessage(DEBUG_ALL, "getWeight called with out of bounds node number");
-        return EC_ERROR;
+	if (toNode < 0 || toNode >= layer->count) {
+		slMessage(DEBUG_ALL, "getWeight called with out of bounds node number");
+		return EC_ERROR;
 	}
-
-	if(fromNode < 0 || fromNode >= layer->previous->count) {
-        slMessage(DEBUG_ALL, "getWeight called with out of bounds node number from previous layer");
-        return EC_ERROR;
+	if (fromNode < 0 || fromNode >= layer->previous->count) {
+		slMessage(DEBUG_ALL, "getWeight called with out of bounds node number from previous layer");
+		return EC_ERROR;
 	}
 
 	BRDOUBLE(target) = layer->weights[toNode][fromNode];
@@ -137,9 +134,9 @@ int brIGetValue(brEval args[], brEval *target, brInstance *i) {
 	snFFLayer *layer = BRFFLAYERPOINTER(&args[0]);
 	int node = BRINT(&args[1]);
 
-	if(node < 0 || node >= layer->count) {
-        slMessage(DEBUG_ALL, "getValue called with out of bounds node number");
-        return EC_ERROR;
+	if (node < 0 || node >= layer->count) {
+		slMessage(DEBUG_ALL, "getValue called with out of bounds node number");
+		return EC_ERROR;
 	}
 
 	BRDOUBLE(target) = layer->values[node];
@@ -156,35 +153,28 @@ int brIGetValue(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIFeedForward(brEval args[], brEval *target, brInstance *i) {
-    brEvalListHead *inputs, *outputs;
-    brEvalList *list;
-    snFFLayer *outputLayer, *inputLayer;
-    int count;
+	brEvalListHead *inputs, *outputs;
+	brEvalList *list;
+	snFFLayer *outputLayer, *inputLayer;
+	int n = 0;
 
-    outputLayer = BRFFLAYERPOINTER(&args[0]);
-    inputLayer = outputLayer->input;
+	outputLayer = BRFFLAYERPOINTER(&args[0]);
+	inputLayer = outputLayer->input;
 
-    inputs = BRLIST(&args[1]);
-    outputs = BRLIST(&args[2]);
+	inputs = BRLIST(&args[1]);
+	outputs = BRLIST(&args[2]);
 
-    if(inputs->count != inputLayer->count) {
-        slMessage(DEBUG_ALL, "feedForward expects list matching size of network input layer (%d inputs, list is size %d)", inputLayer->count, inputs->count);
-        return EC_ERROR;
-    }
+	if (inputs->count != inputLayer->count) {
+		slMessage(DEBUG_ALL, "feedForward expects list matching size of network input layer (%d inputs, list is size %d)", inputLayer->count, inputs->count);
+		return EC_ERROR;
+	}
 
-    list = inputs->start;
-    count = 0;
+	for (list = inputs->start; list; list = list->next)
+		inputLayer->values[n++] = BRDOUBLE(&list->eval);
 
-    while(list) {
-        inputLayer->values[count] = BRDOUBLE(&list->eval);
+	snFeedForward(outputLayer);
 
-        count++;
-        list = list->next; 
-    }
-
-    snFeedForward(outputLayer);
-
-    return EC_OK;
+	return EC_OK;
 }
 /*@}*/
 

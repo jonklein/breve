@@ -46,7 +46,7 @@ struct timezone {
 static inline int
 gettimeofday(struct timeval *tv, struct timezone *tz)
 {
-#ifdef WINDOWS
+#if WINDOWS
     FILETIME        ft;
     LARGE_INTEGER   li;
     __int64         t;

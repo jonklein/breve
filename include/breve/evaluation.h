@@ -50,11 +50,11 @@ struct stStackRecord {
 #define USE_RTC 1
 
 #if USE_RTC
-#define EVAL_RTC_CALL_3(_s, _call, _arg0, _arg1, _arg2) \
-						(_s->block = stNewRtcBlock(), \
-						_s->block->calls._call = _call, \
-						_s->block->flags |= RTC_EVAL_ARG_3, \
-						_s->block->calls._call(_arg0, _arg1, _arg2))
+#define EVAL_RTC_CALL_3(_s, _call, _arg0, _arg1, _arg2)		\
+	((_s)->block = stNewRtcBlock(),				\
+	 (_s)->block->flags |= RTC_EVAL_ARG_3,			\
+	 (_s)->block->calls._call = (_call),			\
+	 (_s)->block->calls._call((_arg0), (_arg1), (_arg2)))
 
 #define RTC_SET_LOAD_ROUTINE(_loadExp, _call, _type, _variable) \
 if (_loadExp) { \
@@ -67,7 +67,7 @@ if (_loadExp) { \
 #define RTC_SET_LOAD_ROUTINE(_loadExp, _call, _type, _variable)
 #endif
 
-int brEvalCopy(brEval *s, brEval *d);
+int brEvalCopy(brEval *, brEval *);
 
 inline int stEvalFree(stFreeExp *, stRunInstance *, brEval *);
 inline int stEvalCodeArray(stCodeArrayExp *a, stRunInstance *, brEval *);

@@ -54,9 +54,9 @@ int brIOpenFileForWriting(brEval args[], brEval *target, brInstance *i) {
 
 	fp = fopen(path, "w");
 
-	if(!fp) {
+	if (!fp) {
 		slMessage(DEBUG_ALL, "warning: could not open file %s for writing (%s)\n", path, strerror(errno));
-		BRFILEPOINTER(target) = NULL;
+		BRPOINTER(target) = NULL;
 		slFree(path);
 		return EC_OK;
 	}
@@ -66,12 +66,11 @@ int brIOpenFileForWriting(brEval args[], brEval *target, brInstance *i) {
 	p = new brFilePointer;
 	p->file = fp;
 
-	if(!p->file) {
+	if (!p->file) {
 		slMessage(DEBUG_ALL, "Could not open file \"%s\" for writing: %s\n", BRSTRING(&args[0]), strerror(errno));
-		BRFILEPOINTER(target) = NULL;
-	} else {
-		BRFILEPOINTER(target) = p;
-	}
+		BRPOINTER(target) = NULL;
+	} else
+		BRPOINTER(target) = p;
 
     return EC_OK;
 }
@@ -84,19 +83,19 @@ int brIOpenFileForWriting(brEval args[], brEval *target, brInstance *i) {
 
 int brIOpenFileForAppending(brEval args[], brEval *target, brInstance *i) {
 	brFilePointer *p;
-	char *file = brFindFile(i->engine, BRSTRING(&args[0]), NULL);
+	char *file;
 
-	if(!file) file = brOutputPath(i->engine, BRSTRING(&args[0]));
+	if (!(file = brFindFile(i->engine, BRSTRING(&args[0]), NULL)))
+		file = brOutputPath(i->engine, BRSTRING(&args[0]));
 
 	p = new brFilePointer;
 	p->file = fopen(file, "a");
 
-	if(!p->file) {
+	if (!p->file) {
 		slMessage(DEBUG_ALL, "Could not open file \"%s\" for appending: %s\n", BRSTRING(&args[0]), strerror(errno));
-		BRFILEPOINTER(target) = NULL;
-	} else {
-		BRFILEPOINTER(target) = p;
-	}
+		BRPOINTER(target) = NULL;
+	} else
+		BRPOINTER(target) = p;
 
 	slFree(file);
 
@@ -111,25 +110,22 @@ int brIOpenFileForAppending(brEval args[], brEval *target, brInstance *i) {
 
 int brIOpenFileForReading(brEval args[], brEval *target, brInstance *i) {
 	brFilePointer *p;
-	char *file = brFindFile(i->engine, BRSTRING(&args[0]), NULL);
+	char *file;
 
-	if(!file) {
+	if (!(file = brFindFile(i->engine, BRSTRING(&args[0]), NULL))) {
 		slMessage(DEBUG_ALL, "Could not locate file \"%s\"\n", BRSTRING(&args[0]));
-		BRFILEPOINTER(target) = NULL;
+		BRPOINTER(target) = NULL;
 		return EC_OK;
 	}
 
 	p = new brFilePointer;
-	p->file = fopen(file, "r");
-	
 	stat(file, &p->st);
 
-	if(!p->file) {
+	if (!(p->file = fopen(file, "r"))) {
 		slMessage(DEBUG_ALL, "Could not open file \"%s\" for reading: %s\n", BRSTRING(&args[0]), strerror(errno));
-		BRFILEPOINTER(target) = NULL;
-	} else {
-		BRFILEPOINTER(target) = p;
-	}
+		BRPOINTER(target) = NULL;
+	} else
+		BRPOINTER(target) = p;
 
 	slFree(file);
 
@@ -143,17 +139,17 @@ int brIOpenFileForReading(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIReadFileAsString(brEval args[], brEval *target, brInstance *i) {
-	char *text;
 	brFilePointer *p;
+	char *text;
 
 	p = BRFILEPOINTER(&args[0]);
 
-	if(!p || !p->file) {
+	if (!p || !p->file) {
 		slMessage(DEBUG_ALL, "readFileAsString called with uninitialized file\n");
 		return EC_ERROR;
 	}
 
-	text = (char*)slMalloc(p->st.st_size + 1);
+	text = (char *)slMalloc(p->st.st_size + 1);
 
 	fread(text, 1, p->st.st_size, p->file);
 	BRSTRING(target) = text;
@@ -190,9 +186,9 @@ int brIReadLine(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIReadDelimitedList(brEval args[], brEval *target, brInstance *i) {
+	brEval eval;
 	brEvalListHead *head;
 	brFilePointer *p;
-	brEval eval;
 	int n;
 	char line[10240];
 
@@ -223,9 +219,9 @@ int brIReadDelimitedList(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIReadWhitespaceDelimitedList(brEval args[], brEval *target, brInstance *i) {
+	brEval eval;
 	brFilePointer *p;
 	brEvalListHead *head;
-	brEval eval;
 	int n, start;
 	char line[10240];
 	char field[10240];

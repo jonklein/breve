@@ -28,7 +28,7 @@
 /*!
 	\brief Creates a new menu item for a given object.
 
-	brMenuItem pointer menuItemNew(object owner, string method, string name).
+	brMenuItem pointer menuItemNew(object owner, string method, string name)
 
 	The method parameter is the method to be called when the menu
 	item is activated.  The name parameter is the name attached to 
@@ -38,20 +38,21 @@
 int brIMenuItemNew(brEval args[], brEval *target, brInstance *i) {
 	brInstance *m;
 
-    target->type = AT_POINTER;
+	target->type = AT_POINTER;
 
-	if(!BRINSTANCE(&args[0])) {
+	if (!BRINSTANCE(&args[0])) {
 		slMessage(DEBUG_ALL, "addMenuItem called with uninitialized object\n");
 		return EC_ERROR;
 	}
 
 	m = BRINSTANCE(&args[0]);
 
-    BRMENUENTRYPOINTER(target) = brAddMenuItem(m, BRSTRING(&args[1]), BRSTRING(&args[2]));
+	BRPOINTER(target) = brAddMenuItem(m, BRSTRING(&args[1]), BRSTRING(&args[2]));
     
-    if(i->engine->updateMenu) i->engine->updateMenu(m);
+	if (i->engine->updateMenu)
+		i->engine->updateMenu(m);
 
-    return EC_OK;
+	return EC_OK;
 }   
 
 /*!
@@ -64,18 +65,19 @@ int brIMenuItemNew(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIMenuItemSetCheck(brEval args[], brEval *target, brInstance *i) {
-    brMenuEntry *item = BRMENUENTRYPOINTER(&args[0]);
+	brMenuEntry *item = BRMENUENTRYPOINTER(&args[0]);
 
-    if(!item) {
-        slMessage(DEBUG_ALL, "menuItemSetCheck called with uninitialized menu item\n");
-        return EC_OK;
-    }
+	if (!item) {
+		slMessage(DEBUG_ALL, "menuItemSetCheck called with uninitialized menu item\n");
+		return EC_OK;
+	}
 
-    item->checked = BRINT(&args[1]);
+	item->checked = BRINT(&args[1]);
 
-    if(item->instance && i->engine->updateMenu) i->engine->updateMenu(item->instance);
+	if (item->instance && i->engine->updateMenu)
+		i->engine->updateMenu(item->instance);
 
-    return EC_OK;
+	return EC_OK;
 }
 
 /*!
@@ -89,18 +91,19 @@ int brIMenuItemSetCheck(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIMenuItemSetEnabled(brEval args[], brEval *target, brInstance *i) {
-    brMenuEntry *item = BRMENUENTRYPOINTER(&args[0]);
+	brMenuEntry *item = BRMENUENTRYPOINTER(&args[0]);
 
-    if(!item) {
-        slMessage(DEBUG_ALL, "enableMenuItem called with uninitialized menu item\n");
-        return EC_OK;
-    }
+	if (!item) {
+		slMessage(DEBUG_ALL, "enableMenuItem called with uninitialized menu item\n");
+		return EC_OK;
+	}
 
-    item->enabled = BRINT(&args[1]);
+	item->enabled = BRINT(&args[1]);
 
-    if(item->instance && i->engine->updateMenu) i->engine->updateMenu(item->instance);
+	if (item->instance && i->engine->updateMenu)
+		i->engine->updateMenu(item->instance);
 
-    return EC_OK;
+	return EC_OK;
 }
 
 /*@}*/
@@ -110,4 +113,3 @@ void breveInitMenuFunctions(brNamespace *n) {
     brNewBreveCall(n, "menuItemSetEnabled", brIMenuItemSetEnabled, AT_NULL, AT_POINTER, AT_INT, 0);
     brNewBreveCall(n, "menuItemSetCheck", brIMenuItemSetCheck, AT_NULL, AT_POINTER, AT_INT, 0);
 }
-

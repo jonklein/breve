@@ -80,7 +80,7 @@ int brIImageGetValueAtCoordinates(brEval args[], brEval *result, brInstance *i) 
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
-	if(x < 0 || x >= (dm->x * 4) || y < 0 || y >= dm->y) {
+	if (x < 0 || x >= (dm->x * 4) || y < 0 || y >= dm->y) {
 		slMessage(DEBUG_ALL, "data matrix access (%d, %d) out of bounds (%d, %d)\n", x, y, dm->x, dm->y);
 		return EC_OK;
 	}
@@ -147,9 +147,9 @@ int brIImageLoadFromFile(brEval args[], brEval *result, brInstance *i) {
 
 	file = brFindFile(i->engine, BRSTRING(&args[0]), NULL);
 
-	if(!file) {
+	if (!file) {
 		slMessage(DEBUG_ALL, "Error loading image file \"%s\": no such file\n", BRSTRING(&args[0]));
-		BRIMAGEDATAPOINTER(result) = NULL;
+		BRPOINTER(result) = NULL;
 		return EC_OK;
 	}
 
@@ -158,16 +158,16 @@ int brIImageLoadFromFile(brEval args[], brEval *result, brInstance *i) {
 	dm->data = slReadImage(file, &dm->x, &dm->y, &c, 0);
 	dm->textureNumber = -1;
 
-	if(!file) {
+	if (!file) {
 		slMessage(DEBUG_ALL, "Error reading image from file \"%s\": unrecognized format or corrupt file\n", file);
 		slFree(file);
-		BRIMAGEDATAPOINTER(result) = NULL;
+		BRPOINTER(result) = NULL;
 		return EC_OK;
 	}
 
 	slFree(file);
 
-	BRIMAGEDATAPOINTER(result) = dm;
+	BRPOINTER(result) = dm;
 
 	return EC_OK;
 }
@@ -179,14 +179,15 @@ int brIImageLoadFromFile(brEval args[], brEval *result, brInstance *i) {
 int brIImageUpdateTexture(brEval args[], brEval *result, brInstance *i) { 
 	brImageData *image = BRIMAGEDATAPOINTER(&args[0]);
 
-	if(!image) {
+	if (!image) {
 		BRINT(result) = -1;
 		return EC_OK;
 	}
 
-	if(image->textureNumber == -1) image->textureNumber = slTextureNew(i->engine->camera);
+	if (image->textureNumber == -1)
+		image->textureNumber = slTextureNew(i->engine->camera);
 
-   	slUpdateTexture(i->engine->camera, image->textureNumber, image->data, image->x, image->y, GL_RGBA);
+	slUpdateTexture(i->engine->camera, image->textureNumber, image->data, image->x, image->y, GL_RGBA);
 
 	BRINT(result) = image->textureNumber;
 
@@ -204,7 +205,7 @@ int brIImageUpdateTexture(brEval args[], brEval *result, brInstance *i) {
 int brIImageGetPixelPointer(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
 
-	if(!dm) {
+	if (!dm) {
 		slMessage(DEBUG_ALL, "pixelPointer called with uninitialized image data\n");
 		return EC_ERROR;
 	}
@@ -221,18 +222,17 @@ int brIImageGetPixelPointer(brEval args[], brEval *result, brInstance *i) {
 */
 
 int brIImageWriteToFile(brEval args[], brEval *result, brInstance *i) {
-	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
+#if HAVE_LIBPNG
 	char *file;
+	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
 
 	file = brOutputPath(i->engine, BRSTRING(&args[1]));
-
-#ifdef HAVE_LIBPNG
 	BRINT(result) = slPNGWrite(file, dm->x, dm->y, dm->data, 4, 1);
-#else
-	slMessage(DEBUG_ALL, "This version of breve was built without support for image export\n");
-#endif
 
 	slFree(file);
+#else
+	slMessage(DEBUG_ALL, "This version of breve was built without support for PNG export\n");
+#endif
 
 	return EC_OK;
 
@@ -247,7 +247,6 @@ int brIImageWriteToFile(brEval args[], brEval *result, brInstance *i) {
 int brIImageDataInit(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm;
 	int x, y;
-
 	int width = BRINT(&args[0]);
 	int height = BRINT(&args[1]);
 
@@ -258,13 +257,11 @@ int brIImageDataInit(brEval args[], brEval *result, brInstance *i) {
 	dm->y = height;
 	dm->textureNumber = -1;
 
-	for(y=0;y<height;y++) {
-		for(x=0;x<width;x++) {
+	for (y = 0; y < height; ++y)
+		for (x = 0; x < width; ++x)
 			dm->data[(y * width * 4) + (x * 4) + 3] = 255;
-		}
-	}
 
-	BRIMAGEDATAPOINTER(result) = dm;
+	BRPOINTER(result) = dm;
 
 	return EC_OK;
 }
@@ -278,11 +275,8 @@ int brIImageDataInit(brEval args[], brEval *result, brInstance *i) {
 int brIImageDataFree(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
 
-	if(dm->textureNumber != -1) {
-		GLuint texture = dm->textureNumber;
-
-		slTextureFree(i->engine->camera, texture);
-	}
+	if (dm->textureNumber != -1)
+		slTextureFree(i->engine->camera, dm->textureNumber);
 
 	slFree(dm->data);
 	delete dm;
@@ -304,4 +298,3 @@ void breveInitImageFunctions(brNamespace *n) {
 	brNewBreveCall(n, "imageUpdateTexture", brIImageUpdateTexture, AT_INT, AT_POINTER, 0);
 	brNewBreveCall(n, "imageReadPixels", brIImageReadPixels, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
 }
-

@@ -24,11 +24,11 @@
 
 #include "simulation.h"
 
-#ifdef HAVE_LIBPNG
+#if HAVE_LIBPNG
 #include <png.h>
 #endif 
 
-#ifdef HAVE_LIBJPEG
+#if HAVE_LIBJPEG
 #ifdef __cplusplus      // make jpeglib C++ safe
 extern "C" {
 #endif
@@ -38,11 +38,11 @@ extern "C" {
 #endif
 
 struct slJPEGError {
-	struct jpeg_error_mgr pub;    /* "public" fields */
-	jmp_buf setjmp_buffer;    /* for return to caller */
+	struct jpeg_error_mgr pub;	/* "public" fields */
+	jmp_buf setjmp_buffer;		/* for return to caller */
 };
 
-void slJPEGErrorExit(j_common_ptr cinfo);
+void slJPEGErrorExit(j_common_ptr);
 
 #endif
 
@@ -63,17 +63,21 @@ unsigned char *slReadImage(char *name, int *width, int *height, int *components,
 
 	last = &name[strlen(name) - 1];
 
-	while(last >= name && *last != '.') last--;
+	while (last >= name && *last != '.')
+		--last;
 
-#ifdef HAVE_LIBJPEG
-	if(!strcasecmp(last, ".jpg") || !strcasecmp(last, ".jpeg")) return slReadJPEGImage(name, width, height, components, alpha); 
+#if HAVE_LIBJPEG
+	if (!strcasecmp(last, ".jpg") || !strcasecmp(last, ".jpeg"))
+		return slReadJPEGImage(name, width, height, components, alpha); 
 #endif 
 
-#ifdef HAVE_LIBPNG
-	if(!strcasecmp(last, ".png")) return slReadPNGImage(name, width, height, components, alpha); 
+#if HAVE_LIBPNG
+	if (!strcasecmp(last, ".png"))
+		return slReadPNGImage(name, width, height, components, alpha); 
 #endif
 
-	if(!strcasecmp(last, ".sgi")) return slReadSGIImage(name, width, height, components, alpha); 
+	if (!strcasecmp(last, ".sgi"))
+		return slReadSGIImage(name, width, height, components, alpha); 
 
 	slMessage(DEBUG_ALL, "Unknown or unsupported image type for file \"%s\"\n", name);
 
@@ -348,14 +352,13 @@ unsigned char *slReadSGIImage(char *name, int *width, int *height, int *componen
     return base;
 }
 
-#ifdef HAVE_LIBJPEG
+#if HAVE_LIBJPEG
 unsigned char *slReadJPEGImage(char *name, int *width, int *height, int *components, int usealpha) {
 	struct jpeg_decompress_struct cinfo;
 	slJPEGError jerr;
 	JSAMPARRAY buffer;
 	unsigned char *image;
 	int rowstride;
-
 	FILE *f = NULL;
 
 	cinfo.err = jpeg_std_error(&jerr.pub);
@@ -437,9 +440,9 @@ void slJPEGErrorExit(j_common_ptr cinfo)
   /* Return control to the setjmp point */
   longjmp(myerr->setjmp_buffer, 1);
 }
-#endif /* HAVE_LIBJPG */
+#endif
 
-#ifdef HAVE_LIBPNG
+#if HAVE_LIBPNG
 unsigned char *slReadPNGImage(char *name, int *width, int *height, int *components, int usealpha) {
 	FILE *f;
 	png_byte header[8];
@@ -645,7 +648,7 @@ int slPNGSnapshot(slWorld *w, slCamera *c, char *file) {
 
 	return r;
 }
-#endif /* HAVW_LIBPNG */
+#endif
 
 /*!
 	\brief Vertically reverses a pixel buffer.

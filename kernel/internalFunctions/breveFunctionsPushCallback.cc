@@ -1,6 +1,6 @@
 #include "kernel.h"
 
-#ifdef HAVE_LIBPUSH
+#if HAVE_LIBPUSH
 #include "pushC.h"
 
 struct brPushCallbackData {
@@ -10,8 +10,9 @@ struct brPushCallbackData {
 
 typedef struct brPushCallbackData brPushCallbackData;
 
-unsigned int brPushCallbackFunction(PushEnvironment *environment, void *data);
-void brPushFreeData(void *d);
+static int breveFunctionPushMacroNew(brEval *, brEval *, brInstance *);
+static unsigned int brPushCallbackFunction(PushEnvironment *, void *);
+static void brPushFreeData(void *);
 
 /*@{*/
 /*! \addtogroup InternalFunctions */
@@ -28,7 +29,7 @@ int breveFunctionPushCallbackNew(brEval arguments[], brEval *result, brInstance 
 	data->instance = callbackInstance;
 	data->method = brMethodFind(callbackInstance->object, methodName, NULL, 0);
 
-	if(!data->method) {
+	if (!data->method) {
 		slMessage(DEBUG_ALL, "Cannot locate method \"%s\" for class \"%s\" for push callback instruction\n", methodName, callbackInstance->object->name);
 		return EC_ERROR;
 	}
@@ -50,25 +51,25 @@ int breveFunctionPushMacroNew(brEval arguments[], brEval *result, brInstance *in
 
 unsigned int brPushCallbackFunction(PushEnvironment *environment, void *d) {
 	brEval eval;
-	brPushCallbackData *data = (brPushCallbackData*)d;
+	brPushCallbackData *data = (brPushCallbackData *)d;
 
-	if(brMethodCall(data->instance, data->method, NULL, &eval) != EC_OK) return 0;
+	(void)brMethodCall(data->instance, data->method, NULL, &eval);
 
 	return 0;
 }
 
 void brPushFreeData(void *d) {
-	brPushCallbackData *data = (brPushCallbackData*)d;
+	brPushCallbackData *data = (brPushCallbackData *)d;
 
 	brMethodFree(data->method);
 	delete data;
 }
-#endif /* HAVE_LIBPUSH */
+#endif
 
 /*@}*/
 
 void breveInitPushCallbackFunctions(brNamespace *names) {
-#ifdef HAVE_LIBPUSH
+#if HAVE_LIBPUSH
 	brNewBreveCall(names, "pushCallbackNew", breveFunctionPushCallbackNew, AT_POINTER, AT_POINTER, AT_STRING, AT_STRING, AT_INSTANCE, 0);
 	brNewBreveCall(names, "pushMacroNew", breveFunctionPushMacroNew, AT_POINTER, AT_POINTER, AT_STRING, AT_POINTER, 0);
 #endif

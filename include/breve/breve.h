@@ -18,9 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#if HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif
 
 #include <getopt.h>
 #include <stdio.h>
@@ -32,10 +30,6 @@
 #endif
 
 #include "graph.h"
-
-#ifndef MAXPATHLEN
-#define MAXPATHLEN 10240
-#endif
 
 #if defined(__GNUC__) && !defined(__STRICT_ANSI__)
 #define __dead __attribute__((__noreturn__))

@@ -4,43 +4,50 @@
 #define BRLINKPOINTER(p)	((slLink*)BRPOINTER(p))
 
 int brISpringNew(brEval args[], brEval *target, brInstance *i) {
-	BRSPRINGPOINTER(target) = slSpringNew(i->engine->world, BRLINKPOINTER(&args[0]), BRLINKPOINTER(&args[1]), &BRVECTOR(&args[2]), &BRVECTOR(&args[3]), BRDOUBLE(&args[4]), BRDOUBLE(&args[5]), BRDOUBLE(&args[6]));
+	BRPOINTER(target) = slSpringNew(i->engine->world, BRLINKPOINTER(&args[0]), BRLINKPOINTER(&args[1]), &BRVECTOR(&args[2]), &BRVECTOR(&args[3]), BRDOUBLE(&args[4]), BRDOUBLE(&args[5]), BRDOUBLE(&args[6]));
 
 	return EC_OK;
 }
 
 int brISpringSetStrength(brEval args[], brEval *target, brInstance *i) {
 	slSpringSetStrength(BRSPRINGPOINTER(&args[0]), BRDOUBLE(&args[1]));
+
 	return EC_OK;
 }
 
 int brISpringSetLength(brEval args[], brEval *target, brInstance *i) {
 	slSpringSetLength(BRSPRINGPOINTER(&args[0]), BRDOUBLE(&args[1]));
+
 	return EC_OK;
 }
 
 int brISpringGetCurrentLength(brEval args[], brEval *target, brInstance *i) {
 	BRDOUBLE(target) = slSpringGetCurrentLength(BRSPRINGPOINTER(&args[0]));
+
 	return EC_OK;
 }
 
 int brISpringGetForce(brEval args[], brEval *target, brInstance *i) {
 	BRDOUBLE(target) = slSpringGetForce(BRSPRINGPOINTER(&args[0]));
+
 	return EC_OK;
 }
 
 int brISpringSetDamping(brEval args[], brEval *target, brInstance *i) {
 	slSpringSetDamping(BRSPRINGPOINTER(&args[0]), BRDOUBLE(&args[1]));
+
 	return EC_OK;
 }
 
 int brISpringSetMode(brEval args[], brEval *target, brInstance *i) {
 	slSpringSetMode(BRSPRINGPOINTER(&args[0]), BRINT(&args[1]));
+
 	return EC_OK;
 }
 
 int brISpringRemove(brEval args[], brEval *target, brInstance *i) {
 	slWorldRemoveConnection(i->engine->world, BRSPRINGPOINTER(&args[0]));
+
 	return EC_OK;
 }
 

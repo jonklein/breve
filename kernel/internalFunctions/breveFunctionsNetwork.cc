@@ -113,7 +113,7 @@ int brIGetServerURL(brEval args[], brEval *target, brInstance *i) {
 
 	gethostname(hostname, l);
 
-	sprintf(url, "http://%s:%d", hostname, data->port);
+	snprintf(url, sizeof(url), "http://%s:%d", hostname, data->port);
 
 	BRSTRING(target) = slStrdup(url);
 
@@ -154,12 +154,10 @@ char *brHostnameFromAddr(struct in_addr *addr) {
 	struct hostent *h;
 	static char numeric[256];
 
-	h = gethostbyaddr((const char*)addr, 4, AF_INET);
+	if (!(h = gethostbyaddr((const char*)addr, 4, AF_INET))) {
+		unsigned char *address = (unsigned char *)addr;
 
-	if(!h) {
-		unsigned char *address = (unsigned char*)addr;
-
-		sprintf(numeric, "%d.%d.%d.%d", address[0], address[1], address[2], address[3]);
+		snprintf(numeric, sizeof(numeric), "%u.%u.%u.%u", address[0], address[1], address[2], address[3]);
 
 		return numeric;
 	}

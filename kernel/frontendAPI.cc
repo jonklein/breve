@@ -4,14 +4,14 @@
 /*!
 	\brief Creates a breveFrontend structure containing a valid \ref brEngine.
 
-	This function is called to setup the breveFrontend structure and to create 
-	a brEngine.  If this breve frontend is being run from the command line,
+	This function sets up the breveFrontend structure and creates a
+	brEngine.  If this breve frontend is being run from the command line,
 	the calling function should provide the input argument count (argc) and
 	the input argument pointers (argv).  If this information is not 
 	available, argc should be 0, and argv should be NULL.
 */
 
-breveFrontend *breveFrontendInit(int argc, char ** argv) {
+breveFrontend *breveFrontendInit(int argc, char **argv) {
 	breveFrontend *frontend = new breveFrontend;
 
 	frontend->engine = brEngineNew();
@@ -20,8 +20,8 @@ breveFrontend *breveFrontendInit(int argc, char ** argv) {
 
 	// initialize frontend languages below:
 
-#ifdef HAVE_LIBJAVA
-    // brJavaInit(frontend->engine);
+#if HAVE_LIBJAVA
+	brJavaInit(frontend->engine);
 #endif
 
 	return frontend;

@@ -52,9 +52,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* Plugin entry-point functions should be declared as DLLEXPORT */
+
+#if defined(_MSC_VER) || defined(__WIN32__) || defined(WINDOWS)
+#ifdef __cplusplus
+#define DLLEXPORT extern "C" __declspec(dllexport)
+#else
+#define DLLEXPORT __declspec(dllexport)
+#endif
+#elif defined(__cplusplus)
+#define DLLEXPORT extern "C"
+#else
+#define DLLEXPORT extern
+#endif
+
 #ifdef __cplusplus
 extern "C" {
-#endif /* __cplusplus */
+#endif
 
 typedef struct slVector slVector;
 typedef struct brEval brEval;
@@ -65,15 +79,10 @@ typedef struct brData brData;
 typedef struct stInstance stInstance;
 typedef struct brInstance brInstance;
 
-/* breve output error codes */
-
-#define EC_ERROR -1		/* causes the simulation to terminate */
-#define EC_OK 1			/* normal output--simulation continues */
-
 /* These entries appear in the brEval type field. */
 
 enum atomicTypes {
-	AT_UNDEFINED = 0,
+	AT_UNDEFINED = 0, 
 	AT_NULL,
 	AT_INT,
 	AT_DOUBLE,
@@ -114,7 +123,7 @@ struct brEval {
 };
 
 /*
-	Lists in steve are held internally by the brEvalListHead which
+	Lists in breve are held internally by the brEvalListHead which
 	holds a doubly-linked list of brEvalList structures.  
 
 	Do not modify this structure.
@@ -160,7 +169,7 @@ void brDataFree(brData *data);
 brEvalListHead *brEvalListNew(void);
 #define brEvalListAppend(a, eval) brEvalListInsert((a), (a)->count, (eval))
 
-/* Use these macros to treat brEval pointers like specific types. */
+/* Use these macros to treat brEval pointers as specific types. */
 
 #define BRINT(e)	((e)->values.intValue)
 #define BRFLOAT(e)	((e)->values.doubleValue)
@@ -174,30 +183,29 @@ brEvalListHead *brEvalListNew(void);
 #define BRHASH(e)	((e)->values.hashValue)
 #define BRLIST(e)	((e)->values.listValue)
 
-int brNewBreveCall(void *n, char *name, int (*call)(brEval *argumentArray,
+int brNewBreveCall(void *n, char *name, int (*call)(brEval argumentArray[],
 	brEval *returnValue, void *callingInstance), int rtype, ...);
 
-/*
-	to call breve methods from your plugin, use the following method.  
-	the arguments to the method should be placed in an array of brEval
-	structs in the order that they appear in the methods definition
-	(keywords are not used with this interface).  you must also supply
-	the number of arguments supplied.
+	/*
+	 * The stCallMethodByNameWithArgs() function calls the breve method
+	 * named by the string _name_ with _argcount_ number of arguments
+	 * in the array pointed to by _args_ and stores the return value of the
+	 * method (if any) in the brEval pointed to by _result_.
+	 *
+	 * The function returns EC_OK if successful.
+	 * If an error occurs while calling the specified method, EC_ERROR is
+	 * returned and the simulation is halted.
+	 */
 
-	the brEval pointed to in result will return the return value (if 
-	any) of the method.
+#define EC_ERROR -1
+#define EC_OK 1
 
-	the return value of the function itself is either EC_OK or EC_ERROR
-	depending on whether an error occurred while calling the specified
-	method.
-*/
-
-int stCallMethodByNameWithArgs(void *instance, char *name, brEval **args,
+int stCallMethodByNameWithArgs(void *instance, char *name, brEval *args[],
 	int argcount, brEval *result);
 
 	/*
-	 * The slMessage() function prints formatted a formatted error message
-	 * to the breve console. The _level_ argument must always be DEBUG_ALL.
+	 * The slMessage() function prints a formatted error message to the
+	 * breve console. The _level_ argument must always be DEBUG_ALL.
 	 * The _fmt_ specification (and associated arguments) may be any format
 	 * allowed by printf(3) or a simple string.
 	 */
@@ -211,7 +219,7 @@ void slMessage(int level, const char *fmt, ...);
 	 * and initializes the space to all bits zero.
 	 *
 	 * The slFree() function makes the space allocated to the object
-	 * pointed to by _ptr_ avaiable further allocation.
+	 * pointed to by _ptr_ available for further allocation.
 	 *
 	 * The slRealloc() function changes the size of the object pointed to
 	 * by _ptr_ to _size_ bytes and returns a pointer to the object.
@@ -230,7 +238,7 @@ void slFree(void *ptr);
 	 * The slStrdup() function allocates space for a copy of the string
 	 * pointed to by _s_, copies the string, and a returns a pointer
 	 * to the copied string. The returned pointer may subsequently be
-	 * used as an argument to the slFree() function.
+	 * used as an argument to the slFree() and slRealloc() functions.
 	 *
 	 * If the string cannot be copied, NULL is returned.
 	 */
@@ -256,4 +264,4 @@ char *brPluginFindFile(char *file, void *callingInstance);
 
 #ifdef __cplusplus
 }
-#endif /* __cplusplus */
+#endif

@@ -1,0 +1,22 @@
+BREVEDIR	= ../..
+CC		= @CC@
+CXX		= @CXX@
+
+all: cSample_plugin.o c++Sample_plugin.o
+
+cSample_plugin.o: cSample.o @PLUGINLIB@
+	$(CC) @PLUGINFLAGS@ -o $@ cSample.o @PLUGINLIB@
+
+c++Sample_plugin.o: c++Sample.o @PLUGINLIB@
+	$(CXX) @PLUGINFLAGS@ -o $@ cSample.o @PLUGINLIB@
+
+c++Sample.o: c++Sample.cpp
+
+.c.o:
+	$(CC) -I.. -c -o $@ $<
+
+.cpp.o:
+	$(CXX) -I.. -c -o $@ $<
+
+clean:
+	rm -f *.o

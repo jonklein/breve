@@ -38,11 +38,12 @@
 
 int brIPatchGridNew(brEval args[], brEval *target, brInstance *i) {
 	slVector center;
+
 	slVectorSet(&center, 0, 0, 0);
 
-	BRPATCHGRIDPOINTER(target) = slPatchGridAdd(i->engine->world, &BRVECTOR(&args[0]), &BRVECTOR(&args[1]), BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]));
+	BRPOINTER(target) = slPatchGridAdd(i->engine->world, &BRVECTOR(&args[0]), &BRVECTOR(&args[1]), BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]));
 
-    return EC_OK;
+	return EC_OK;
 }
 
 /*!
@@ -66,12 +67,12 @@ int brIPatchGridFree(brEval args[], brEval *target, brInstance *i) {
 int brIPatchAtIndex(brEval args[], brEval *target, brInstance *i) {
 	slPatchGrid *grid = BRPATCHGRIDPOINTER(&args[0]);
 
-	if(!grid) {
+	if (!grid) {
 		brEvalError(i->engine, EE_SIMULATION, "Patch method called with uninitialized patch grid.");
 		return EC_OK;
 	}
 
-	BRPATCHPOINTER(target) = slPatchAtIndex(grid, BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]));
+	BRPOINTER(target) = slPatchAtIndex(grid, BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]));
 
 	return EC_OK;
 }
@@ -86,16 +87,17 @@ int brIObjectAtLocation(brEval args[], brEval *target, brInstance *i) {
 	slPatchGrid *grid = BRPATCHGRIDPOINTER(&args[0]);
 	slPatch *patch;
 
-	if(!grid) {
+	if (!grid) {
 		brEvalError(i->engine, EE_SIMULATION, "Patch method called with uninitialized patch grid.");
-
 		return EC_OK;
 	}
 
 	patch = slPatchForLocation(grid, &BRVECTOR(&args[1]));
 
-	if(patch) slPatchGetData(patch);
-	else BRINSTANCE(target) = NULL;
+	if (patch)
+		slPatchGetData(patch);
+	else
+		BRINSTANCE(target) = NULL;
 
 	return EC_OK;
 }
@@ -109,12 +111,12 @@ int brIObjectAtLocation(brEval args[], brEval *target, brInstance *i) {
 int brIObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 	slPatchGrid *grid = BRPATCHGRIDPOINTER(&args[0]);
 
-	if(!grid) {
+	if (!grid) {
 		brEvalError(i->engine, EE_SIMULATION, "Patch method called with uninitialized patch grid.");
 		return EC_OK;
 	}
 	
-	BRINSTANCE(target) = (brInstance*)slPatchGetDataAtIndex(grid, BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]));
+	BRINSTANCE(target) = (brInstance *)slPatchGetDataAtIndex(grid, BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]));
 
 	return EC_OK;
 }
@@ -129,7 +131,7 @@ int brIObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 int brISetObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 	slPatchGrid *grid = BRPATCHGRIDPOINTER(&args[0]);
 
-	if(!grid) {
+	if (!grid) {
 		brEvalError(i->engine, EE_SIMULATION, "Patch method called with uninitialized patch grid.");
 		return EC_OK;
 	}
@@ -146,8 +148,7 @@ int brISetObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetPatchColor(brEval args[], brEval *target, brInstance *i) {
-	slPatch *patch = BRPATCHPOINTER(&args[0]);
-	slPatchSetColor(patch, &BRVECTOR(&args[1]));
+	slPatchSetColor(BRPATCHPOINTER(&args[0]), &BRVECTOR(&args[1]));
 
 	return EC_OK;
 }
@@ -159,8 +160,7 @@ int brISetPatchColor(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetPatchLocation(brEval args[], brEval *target, brInstance *i) {
-	slPatch *patch = BRPATCHPOINTER(&args[0]);
-	slPatchGetLocation(patch, &BRVECTOR(target));
+	slPatchGetLocation(BRPATCHPOINTER(&args[0]), &BRVECTOR(target));
 
 	return EC_OK;
 }
@@ -172,8 +172,7 @@ int brIGetPatchLocation(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetPatchTransparency(brEval args[], brEval *target, brInstance *i) {
-	slPatch *patch = BRPATCHPOINTER(&args[0]);
-	slPatchSetTransparency(patch, BRDOUBLE(&args[1]));
+	slPatchSetTransparency(BRPATCHPOINTER(&args[0]), BRDOUBLE(&args[1]));
 
 	return EC_OK;
 }

@@ -24,34 +24,33 @@ int brEvalCopy(brEval *s, brEval *d) {
 	d->type = s->type;
 
 	switch(s->type) {
-		case AT_NULL:
-			break;
-		case AT_INT:
-			BRINT(d) = BRINT(s);
-			break;
-		case AT_DOUBLE:
-			BRDOUBLE(d) = BRDOUBLE(s);
-			break;
-		case AT_LIST:
-		case AT_DATA:
-		case AT_HASH:
-		case AT_POINTER:
-		case AT_INSTANCE:
-			BRPOINTER(d) = BRPOINTER(s);
-			break;
-		case AT_VECTOR:
-			slVectorCopy(&BRVECTOR(s), &BRVECTOR(d));
-			break;
-		case AT_MATRIX:
-			slMatrixCopy(BRMATRIX(s), BRMATRIX(d));
-			break;
-		case AT_STRING:
-			BRSTRING(d) = slStrdup(BRSTRING(s));
-			break;
-		default:
-			slMessage(DEBUG_ALL, "warning: unknown evaluation type (%d) in brEvalCopy\n", s->type);
-			return EC_ERROR;
-			break;
+	case AT_NULL:
+		break;
+	case AT_INT:
+		BRINT(d) = BRINT(s);
+		break;
+	case AT_DOUBLE:
+		BRDOUBLE(d) = BRDOUBLE(s);
+		break;
+	case AT_LIST:
+	case AT_DATA:
+	case AT_HASH:
+	case AT_POINTER:
+	case AT_INSTANCE:
+		BRPOINTER(d) = BRPOINTER(s);
+		break;
+	case AT_VECTOR:
+		slVectorCopy(&BRVECTOR(s), &BRVECTOR(d));
+		break;
+	case AT_MATRIX:
+		slMatrixCopy(BRMATRIX(s), BRMATRIX(d));
+		break;
+	case AT_STRING:
+		BRSTRING(d) = slStrdup(BRSTRING(s));
+		break;
+	default:
+		slMessage(DEBUG_ALL, "warning: unknown evaluation type (%d) in brEvalCopy\n", s->type);
+		return EC_ERROR;
 	}
 
 	return EC_OK;
@@ -64,16 +63,16 @@ int brEvalCopy(brEval *s, brEval *d) {
 */
 
 char *brObjectDescription(brInstance *i) {
-	int r;
 	brEval result;
+	int r;
 
-	return slStrdup("");
-
-	if(!i || i->status != AS_ACTIVE) return slStrdup("");
+	if (!i || i->status != AS_ACTIVE)
+		return slStrdup("");
 
 	r = brMethodCallByName(i, "get-description", &result);
 
-	if(r != EC_OK || result.type != AT_STRING) return slStrdup("");
+	if (r != EC_OK || result.type != AT_STRING)
+		return slStrdup("");
 
 	return slStrdup(BRSTRING(&result));
 }
@@ -90,7 +89,8 @@ char *brFormatEvaluation(brEval *e, brInstance *i) {
 
 	result = brFormatEvaluationWithSeenList(e, i, &seen);
 
-	if(seen) slListFree(seen);
+	if (seen)
+		slListFree(seen);
 
 	return result;
 }
@@ -98,149 +98,126 @@ char *brFormatEvaluation(brEval *e, brInstance *i) {
 /*!
 	\brief Formats a brEval as text.
 
-	Does the work of \ref stFormatEvaluation, and keeps track of circular list
-	references via a "seen" list.  This method is called by \ref stFormatEvaluation
-	and shouldn't be called directly.
+	Does the work of \ref stFormatEvaluation, and keeps track of circular
+	list references via a "seen" list.  This method is called by
+	\ref stFormatEvaluation and shouldn't be called directly.
 */
 
 char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
-	brInstance *pi;
 	char *result;
-	int count;
-
-	std::vector<char*> textList;
-	std::vector<char*>::iterator ti;
-
-	brEvalListHead *listHead;
-	brEvalList *list;
 
 	switch(e->type) {
-		case AT_STRING:
-			if(BRSTRING(e)) return slStrdup(BRSTRING(e));
-			else return "";
-			break;
-		case AT_INT:
-			result = (char*)slMalloc(60);
-			sprintf(result, "%d", BRINT(e));
-			return result;
-			break;
-		case AT_DOUBLE:
-			result = (char*)slMalloc(60);
-			sprintf(result, "%f", BRDOUBLE(e));
-			return result;
-			break;
-		case AT_VECTOR:
-			result = (char*)slMalloc(180);
-			if(BRVECTOR(e).x > 1.0e10 || BRVECTOR(e).x > 1.0e10 || BRVECTOR(e).z > 1.0e10) sprintf(result, "(%.5e, %.5e, %.5e)", BRVECTOR(e).x, BRVECTOR(e).y, BRVECTOR(e).z);
-			else sprintf(result, "(%.5f, %.5f, %.5f)", BRVECTOR(e).x, BRVECTOR(e).y, BRVECTOR(e).z);
-			return result;
-			break;
-		case AT_MATRIX:
-			result = (char*)slMalloc(300);
-			sprintf(result, "[ (%.5f, %.5f, %.5f), (%.5f, %.5f, %.5f), (%.5f, %.5f, %.5f) ]", BRMATRIX(e)[0][0], BRMATRIX(e)[0][1], BRMATRIX(e)[0][2], BRMATRIX(e)[1][0], BRMATRIX(e)[1][1], BRMATRIX(e)[1][2], BRMATRIX(e)[2][0], BRMATRIX(e)[2][1], BRMATRIX(e)[2][2]);
-			return result;
-			break;
-		case AT_INSTANCE:
-			pi = BRINSTANCE(e);
-			if(pi) {
-				char *desc = brObjectDescription(pi);
-
-				if(desc && strlen(desc) == 0) {
-					slFree(desc);
-					desc = NULL;
-				}
-
-				if(desc) {
-					result = (char*)slMalloc(strlen(pi->object->name) + (sizeof(void*)*2) + 6 + strlen(desc));
-					sprintf(result, "%s (%p) %s", pi->object->name, pi, desc);
-					return result;
-				} else {
-					result = (char*)slMalloc(strlen(pi->object->name) + (sizeof(void*)*2) + 6);
-					sprintf(result, "%s (%p)", pi->object->name, pi);
-					return result;
-				}
-			} else {
-				return slStrdup("0x0 (NULL)");
-			}
-
-			break;
-		case AT_POINTER:
-			if(BRPOINTER(e)) {
-				result = (char*)slMalloc(20);
-				sprintf(result, "%p", BRPOINTER(e));
-				return result;
-			} else {
-				return slStrdup("(NULL pointer)");
-			}
-
-			break;
-		case AT_LIST:
-			listHead = BRLIST(e);
-			list = listHead->start;
-
-			if(!list) return slStrdup("{ }");
-
-			if(slInList(*seen, listHead)) {
-				char text[1025];
-
-				sprintf(text, "[circular list reference %p]", listHead);
-				return slStrdup(text);
-			}
-
-			// update the list of lists seen so that we don't get all circular
-
-			*seen = slListPrepend(*seen, listHead);
-
-			count = 0;
-
-			while(list) {
-				char *newString;
-
-				newString = brFormatEvaluationWithSeenList(&list->eval, i, seen);
-
-				textList.push_back(newString);
-
-				count += strlen(newString);
-				count++; // for the space 
-				count++; // for the comma 
-
-				list = list->next;
-			}
-
-			count += 4; /* for the braces */
-
-			result = (char*)slMalloc(count + 1);
-
-			sprintf(result, "{ ");
-
-			for(ti = textList.begin(); ti != textList.end(); ti++ ) {
-				char *newString = *ti;
-
-				strcat(result, newString);
-				if(ti + 1 != textList.end()) strcat(result, ", ");
-
-				slFree(newString);
-			}
-
-			strcat(result, " }");
-
-			return result;
-
-			break;
-		case AT_ARRAY:
-			return slStrdup("{ array }");
-			break;
-		case AT_HASH:
-			return slStrdup("{ hash table }");
-			break;
-		case AT_NULL:
-			return slStrdup("(NULL expression)");
-			break;
-		case AT_DATA:
-			return brDataHexEncode(BRDATA(e));
-			break;
-		default:
-			if(i) brEvalError(i->engine, EE_INTERNAL, "unknown atomic type %d in slFormatEvaluation\n", e->type);
+	case AT_STRING:
+		if (BRSTRING(e))
+			return slStrdup(BRSTRING(e));
+		else
 			return slStrdup("");
+	case AT_INT:
+		result = (char *)slMalloc(60);
+		snprintf(result, 60, "%d", BRINT(e));
+		return result;
+	case AT_DOUBLE:
+		result = (char *)slMalloc(60);
+		snprintf(result, 60, "%f", BRDOUBLE(e));
+		return result;
+	case AT_VECTOR:
+		result = (char *)slMalloc(180);
+		if (BRVECTOR(e).x > 1.0e10 || BRVECTOR(e).x > 1.0e10 || BRVECTOR(e).z > 1.0e10)
+			snprintf(result, 180, "(%.5e, %.5e, %.5e)", BRVECTOR(e).x, BRVECTOR(e).y, BRVECTOR(e).z);
+		else
+			snprintf(result, 180, "(%.5f, %.5f, %.5f)", BRVECTOR(e).x, BRVECTOR(e).y, BRVECTOR(e).z);
+		return result;
+	case AT_MATRIX:
+		result = (char *)slMalloc(300);
+		snprintf(result, 300, "[ (%.5f, %.5f, %.5f), (%.5f, %.5f, %.5f), (%.5f, %.5f, %.5f) ]", BRMATRIX(e)[0][0], BRMATRIX(e)[0][1], BRMATRIX(e)[0][2], BRMATRIX(e)[1][0], BRMATRIX(e)[1][1], BRMATRIX(e)[1][2], BRMATRIX(e)[2][0], BRMATRIX(e)[2][1], BRMATRIX(e)[2][2]);
+		return result;
+	case AT_INSTANCE:
+	{
+		brInstance *pi;
+		char *desc;
+		size_t len;
+
+		if (!(pi = BRINSTANCE(e)))
+			return slStrdup("0x0 (NULL)");
+
+		desc = brObjectDescription(pi);
+
+		len = strlen(pi->object->name) + strlen(desc) + sizeof(void *) * 2 + 5;
+
+		result = (char *)slMalloc(len);
+		snprintf(result, len, "%s (%p) %s", pi->object->name, pi, desc);
+		slFree(desc);
+
+		return result;
+	}
+	case AT_POINTER:
+		if (BRPOINTER(e)) {
+			result = (char *)slMalloc(20);
+			snprintf(result, 20, "%p", BRPOINTER(e));
+			return result;
+		} else
+			return slStrdup("(NULL pointer)");
+	case AT_LIST:
+	{
+		std::vector<char*> textList;
+		std::vector<char*>::iterator ti;
+		brEvalListHead *listHead;
+		brEvalList *list;
+		size_t len = 5;
+
+		listHead = BRLIST(e);
+		list = listHead->start;
+
+		if (!list)
+			return slStrdup("{ }");
+
+		if (slInList(*seen, listHead)) {
+			char text[64];
+			snprintf(text, 64, "[circular list reference %p]", listHead);
+			return slStrdup(text);
+		}
+
+		// update the list of lists seen so that we don't get all circular
+
+		*seen = slListPrepend(*seen, listHead);
+
+		while (list) {
+			char *newString;
+
+			newString = brFormatEvaluationWithSeenList(&list->eval, i, seen);
+			textList.push_back(newString);
+
+			len += strlen(newString) + 2;
+			list = list->next;
+		}
+		result = (char *)slMalloc(len);
+
+		sprintf(result, "{ ");
+
+		for (ti = textList.begin(); ti != textList.end(); ti++ ) {
+			char *newString = *ti;
+
+			strcat(result, newString);
+			if (ti + 1 != textList.end())
+				strcat(result, ", ");
+
+			slFree(newString);
+		}
+		strcat(result, " }");
+
+		return result;
+	}
+	case AT_ARRAY:
+		return slStrdup("{ array }");
+	case AT_HASH:
+		return slStrdup("{ hash table }");
+	case AT_NULL:
+		return slStrdup("(NULL expression)");
+	case AT_DATA:
+		return brDataHexEncode(BRDATA(e));
+	default:
+		if (i)
+			brEvalError(i->engine, EE_INTERNAL, "unknown atomic type %d in slFormatEvaluation\n", e->type);
+		return slStrdup("");
 	}
 }

@@ -103,14 +103,12 @@ int slRK4(slWorld *w, slLink *r, double *deltaT, int skipFirst) {
 
 	/* old state slVector and new */
 
-	osv = (double*)&r->stateVector[!r->currentState];
-	sv = (double*)&r->stateVector[r->currentState];
+	osv = (double *)&r->stateVector[!r->currentState];
+	sv = (double *)&r->stateVector[r->currentState];
 
-	if(r->mobile < 1) {
-		if(r->mobile == -1) {
-			memmove(&r->stateVector[!r->currentState],
-				&r->stateVector[r->currentState],
-				sizeof(slLinkIntegrationPosition));
+	if (r->mobile < 1) {
+		if (r->mobile == -1) {
+			memcpy(osv, sv, sizeof(slLinkIntegrationPosition));
 			r->mobile = 0;
 		}
 

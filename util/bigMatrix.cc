@@ -284,10 +284,8 @@ slBigMatrix3DGSL::slBigMatrix3DGSL(const slBigMatrix3DGSL& source)
 
 slBigMatrix3DGSL::~slBigMatrix3DGSL()
 {
-    int i = 0;
-    for (i = 0; i < _zdim; i++) {
+    for (unsigned int i = 0; i < _zdim; i++)
         gsl_matrix_float_free(_matrix[i]);
-    }
 }
 
 inline unsigned int slBigMatrix3DGSL::xDim() const

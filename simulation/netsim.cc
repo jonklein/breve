@@ -1,7 +1,7 @@
 #include <pthread.h>
 #include "simulation.h"
 
-#ifdef HAVE_LIBENET
+#if HAVE_LIBENET
 
 enum {
 	MT_SYNC = 0,

@@ -148,7 +148,7 @@ void slDrawGraph(slGraph *graph) {
 	glVertex2f(marginX, (graph->maxY - graph->minY) - marginY);
 	glEnd();
 
-	sprintf(label, "%.2f", graph->maxY);
+	snprintf(label, sizeof(label), "%.2f", graph->maxY);
 	glPushMatrix();
 	glLoadIdentity();
 	glTranslatef(marginX, (graph->maxY - graph->minY) - (.5 * marginY), 0.0);
@@ -156,7 +156,7 @@ void slDrawGraph(slGraph *graph) {
 	slStrokeCenteredString(0.0, 0.0, label);
 	glPopMatrix();
 
-	sprintf(label, "%.2f", graph->maxX);
+	snprintf(label, sizeof(label), "%.2f", graph->maxX);
 	glPushMatrix();
 	glLoadIdentity();
 	glTranslatef((graph->maxX - graph->minX) - (.5 * marginX), marginY - (TEXT_HEIGHT * textScaleY)/4.0, 0.0);

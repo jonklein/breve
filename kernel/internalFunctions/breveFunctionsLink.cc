@@ -37,7 +37,7 @@ int brILinkNew(brEval args[], brEval *target, brInstance *i) {
 
 	slWorldObjectSetCallbackData(l, i);
 
-	BRLINKPOINTER(target) = l;
+	BRPOINTER(target) = l;
 
 	return EC_OK;
 }
@@ -215,13 +215,15 @@ int brILinkSetVelocity(brEval args[], brEval *target, brInstance *i) {
 int brILinkSetPhysics(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 	
-	if(!link) {
+	if (!link) {
 		slMessage(DEBUG_ALL, "null pointer passed to setPhysics\n");
 		return EC_ERROR;
 	}
 
-	if(BRINT(&args[1])) slLinkEnableSimulation(link);
-	else slLinkDisableSimulation(link);
+	if (BRINT(&args[1]))
+		slLinkEnableSimulation(link);
+	else
+		slLinkDisableSimulation(link);
 	
 	return EC_OK;
 }
@@ -374,14 +376,15 @@ int brILinkGetMultibody(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 	slMultibody *mb;
 
-	if(!link) {
+	if (!link) {
 		slMessage(DEBUG_ALL, "null pointer passed to setLinkTorque\n");
 		return EC_ERROR;
 	}
 
-	mb = slLinkGetMultibody(link);
-	if(mb) BRINSTANCE(target) = (brInstance*)slMultibodyGetCallbackData(mb);
-	else BRINSTANCE(target) = NULL;
+	if ((mb = slLinkGetMultibody(link)))
+		BRINSTANCE(target) = (brInstance *)slMultibodyGetCallbackData(mb);
+	else
+		BRINSTANCE(target) = NULL;
 
 	return EC_OK;
 }
@@ -526,10 +529,9 @@ int brIVectorFromLinkPerspective(brEval args[], brEval *target, brInstance *i) {
 
 int brILinkSetLabel(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
-
 	char *label = BRSTRING(&args[1]);
 
-	if(!link || !label) {
+	if (!link || !label) {
 		slMessage(DEBUG_ALL, "NULL pointer passed to linkSetLabel\n");
 		return EC_OK;
 	}
@@ -593,4 +595,3 @@ void breveInitLinkFunctions(brNamespace *n) {
 	brNewBreveCall(n, "linkSetLabel", brILinkSetLabel, AT_NULL, AT_POINTER, AT_STRING, 0);
 	brNewBreveCall(n, "linkRemoveLabel", brILinkRemoveLabel, AT_NULL, AT_POINTER, 0);
 }
-

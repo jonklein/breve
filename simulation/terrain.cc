@@ -20,7 +20,7 @@
 
 #include "simulation.h"
 
-#ifdef HAVE_LIBTIFF
+#if HAVE_LIBTIFF
 namespace tiff {
 using namespace tiff;
 #include "tiffio.h"
@@ -39,9 +39,9 @@ using namespace tiff;
 */
 
 slTerrain *slTerrainNew(int res, double xscale, void *data) {
-	int n;
 	slVector location;
 	slTerrain *l;
+	int n;
 
 	l = new slTerrain;
 
@@ -1158,13 +1158,14 @@ void slTerrainSetBottomColor(slTerrain *t, slVector *color) {
 }
 
 int slTerrainLoadGeoTIFF(slTerrain *t, char *file) {
-#ifdef HAVE_LIBTIFF
+#if HAVE_LIBTIFF
+	TIFF* tif;
+	float *row;
 	int height, width, x, y;
 	unsigned short depth, samples;
-	float *row;
-	TIFF* tif = TIFFOpen(file, "r");
 
-	if(!tif) return -1;
+	if (!(tif = TIFFOpen(file, "r")))
+		return -1;
 
 	TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width);
 	TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height);
@@ -1177,13 +1178,16 @@ int slTerrainLoadGeoTIFF(slTerrain *t, char *file) {
 
 	row = new float[width];
 
-	if(width > t->side) width = t->side;
-	if(height > t->side) height = t->side;
+	if (width > t->side)
+		width = t->side;
 
-	for(x=0;x<height;x++) {
+	if (height > t->side)
+		height = t->side;
+
+	for (x = 0; x < height; ++x) {
 		TIFFReadScanline(tif, row, x, 0);
 
-		for(y=0;y<width;y++) {
+		for (y = 0; y < width; ++y) {
 			t->matrix[x][y] = (float)row[y];
 			// printf("t->matrix[%d][%d]  = %f\n", x, y, t->matrix[x][y] );
 		}

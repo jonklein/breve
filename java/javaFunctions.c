@@ -20,9 +20,9 @@
 
 #include "java.h"
 
-#ifdef HAVE_LIBJAVA
+#if HAVE_LIBJAVA
 
-int brJavaMethodCall(brJavaBridgeData *bridge, brJavaInstance *instance, brJavaMethod *method, jvalue *jargs, brEval *result);
+int brJavaMethodCall(brJavaBridgeData *, brJavaInstance *, brJavaMethod *, jvalue *, brEval *);
 
 brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	JavaVMInitArgs vm_args;
@@ -39,8 +39,8 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 
 	finder = brFindFile(e, "MethodFinder.jar", NULL);
 
-	if(!finder) {
-		// slMessage(DEBUG_ALL, "Java initialization failed: cannot locate Java utility archives\n");
+	if (!finder) {
+		slMessage(DEBUG_WARN, "Java initialization failed: cannot locate Java utility archives\n");
 		return NULL;
 	}
 
@@ -48,13 +48,14 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 
 	classPath = getenv("BREVE_CLASS_PATH");
 
-	if(!classPath) classPath = "";
+	if (!classPath)
+		classPath = "";
 
 	optstr = new char[(strlen(finder) + strlen(classPath) + strlen("-Djava.object.path=") + 1024)];
 
 	sprintf(optstr, "-Djava.class.path=%s:%s:.", finder, classPath);
 
-	// printf("opts: %s\n", optstr);
+	slMessage(DEBUG_GEN, "opts: %s\n", optstr);
 
 	JNI_GetDefaultJavaVMInitArgs(&vm_args);
 
@@ -76,16 +77,14 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 		return NULL;
 	}
 
-	finderObject = brJavaObjectFind(bridge, "MethodFinder");
-
-	if(!finderObject) {
+	if (!(finderObject = brJavaObjectFind(bridge, "MethodFinder"))) {
 		slMessage(DEBUG_ALL, "Cannot locate MethodFinder class\n");
 		return NULL;
 	}
 
 	bridge->methodFinder = brJavaBootstrapMethodFinder(finderObject);
 
-	if(!bridge->methodFinder) {
+	if (!bridge->methodFinder) {
 		slMessage(DEBUG_ALL, "Cannot instantiate MethodFinder class\n");
 		slFree(bridge);
 		return NULL;
@@ -95,7 +94,7 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 
 	args[0] = 'O'; args[1] = 'O'; args[2] = 'I'; args[3] = 'O';
 	method = (*(bridge->env)).GetMethodID(bridge->methodFinder->object->object, METHFIND_NAME, METHFIND_SIGNATURE);
-	if(!method) {
+	if (!method) {
 		slMessage(DEBUG_ALL, "Cannot locate Java method \"%s\" for Java bridge\n", METHFIND_NAME);
 		return NULL;
 	}

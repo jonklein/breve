@@ -328,7 +328,7 @@ class slVectorViewGSL : public slVectorView {
 };
 
 
-class slBigMatrix2DGSL : public slBigMatrix2D, slVectorViewGSL {
+class slBigMatrix2DGSL : public slBigMatrix2D, public slVectorViewGSL {
     public:
         
         slBigMatrix2DGSL(int x, int y);
@@ -354,7 +354,7 @@ class slBigMatrix2DGSL : public slBigMatrix2D, slVectorViewGSL {
 };
 
 
-class slBigMatrix3DGSL : public slBigMatrix3D, slVectorViewGSL {
+class slBigMatrix3DGSL : public slBigMatrix3D, public slVectorViewGSL {
     public:
 	
 		slBigMatrix3DGSL(int x, int y, int z);

@@ -25,9 +25,11 @@
 #define BUFFER_SIZE 512
  
 #include "simulation.h"
-#include "shadow.h"
-#include "asciiart.h"
+
 #include "glIncludes.h"
+
+#include "asciiart.h"
+#include "shadow.h"
 #include "tiger.h"
 
 #define REFLECTION_ALPHA	.75
@@ -53,7 +55,7 @@ void slMatrixGLMult(double m[3][3]) {
 	d[2][0] = m[0][2]; d[2][1] = m[1][2]; d[2][2] = m[2][2]; d[2][3] = 0;
 	d[3][0] = 0; d[3][1] = 0; d[3][2] = 0; d[3][3] = 1;
 
-	glMultMatrixd((double*)d);
+	glMultMatrixd((double *)d);
 }
 
 /*!
@@ -61,8 +63,8 @@ void slMatrixGLMult(double m[3][3]) {
 */
 
 void slMakeLightTexture(GLubyte *lTexture, GLubyte *dlTexture) {
-	int i, j;
 	double x, y, temp, dtemp;
+	int i, j;
 
 	for(i=0; i<LIGHTSIZE; i++){
 		for(j=0; j<LIGHTSIZE; j++){
@@ -143,10 +145,9 @@ void slInitGL(slWorld *w, slCamera *c) {
 */
 
 void slCompileSphereDrawList(int l) {
-	int n;
 	GLUquadricObj *quad;
 
-	for (n = 0; n < SPHERE_RESOLUTIONS; n++ ) {
+	for (int n = 0; n < SPHERE_RESOLUTIONS; ++n) {
 		glNewList(l + n, GL_COMPILE);
 
 		quad = gluNewQuadric();
@@ -207,9 +208,9 @@ void slCenterPixelsInSquareBuffer(unsigned char *pixels, int width, int height, 
 	ystart = (newheight - height) / 2;
 
 	for(y = 0; y < height; y++)
-		memmove(&buffer[(y + ystart) * (newwidth * 4) + (xstart * 4)],
-			&pixels[y * width * 4],
-			width * 4);
+		memcpy(&buffer[(y + ystart) * (newwidth * 4) + (xstart * 4)],
+		    &pixels[y * width * 4],
+		    width * 4);
 }
 
 /*!
@@ -219,20 +220,24 @@ void slCenterPixelsInSquareBuffer(unsigned char *pixels, int width, int height, 
 unsigned int slTextureNew(slCamera *c) {
 	GLuint texture;
 
-	if(!glActive) return 0;
+	if (!glActive)
+		return 0;
 
-	if(c->activateContextCallback) c->activateContextCallback();
+	if (c->activateContextCallback)
+		c->activateContextCallback();
 
 	glGenTextures(1, &texture);
 	return texture;
 }
 
 void slTextureFree(slCamera *c, const unsigned int n) {
-	if(!glActive) return;
+	if (!glActive)
+		return;
 
-	if(c->activateContextCallback) c->activateContextCallback();
+	if (c->activateContextCallback)
+		c->activateContextCallback();
 
-	glDeleteTextures(1, (GLuint*)&n);
+	glDeleteTextures(1, (GLuint *)&n);
 }
 
 /*!
@@ -245,23 +250,24 @@ int slUpdateTexture(slCamera *c, GLuint texture, unsigned char *pixels, int widt
 	unsigned char *newpixels;
 	int newheight, newwidth;
 
-	if(!glActive) return -1;
+	if (!glActive)
+		return -1;
 
-	if(c->activateContextCallback) c->activateContextCallback();
+	if (c->activateContextCallback)
+		c->activateContextCallback();
 
 	newwidth = slNextPowerOfTwo(width); 
 	newheight = slNextPowerOfTwo(height);
 
 	newwidth = newheight = MAX(newwidth, newheight);
 
-	if(newwidth != width || newheight != height) {
+	if (newwidth != width || newheight != height) {
 		newpixels = new unsigned char[newwidth * newheight * 4];
 		memset(newpixels, 0, newwidth * newheight * 4);
 
 		slCenterPixelsInSquareBuffer(pixels, width, height, newpixels, newwidth, newheight);
-	} else {
+	} else
 		newpixels = pixels;
-	}
 
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -273,22 +279,22 @@ int slUpdateTexture(slCamera *c, GLuint texture, unsigned char *pixels, int widt
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	if(newwidth != width || newheight != height) delete[] newpixels;
+	if (newwidth != width || newheight != height)
+		delete[] newpixels;
 
-	if(slClearGLErrors("error adding texture")) return -1;
+	if (slClearGLErrors("error adding texture"))
+		return -1;
 
 	return texture;
 }
 
 int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
-	GLuint selection_buffer[BUFFER_SIZE], *selections;
-	GLint viewport[4];
-	GLint hits;
-	GLuint namesInHit;
-	int n;
-	unsigned int nearest = 0xffffffff, min;
-	unsigned int hit = w->objects.size() + 1;
 	slVector cam;
+	GLuint *selections;
+	GLuint namesInHit, selection_buffer[BUFFER_SIZE];
+	GLint hits, viewport[4];
+	unsigned int min, nearest = 0xffffffff;
+	unsigned int hit = w->objects.size() + 1;
 
 	viewport[0] = c->ox;
 	viewport[1] = c->oy;
@@ -319,12 +325,12 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 
 	slClearGLErrors("about to select");
 
-    slVectorAdd(&c->location, &c->target, &cam);
-    gluLookAt(cam.x, cam.y, cam.z, c->target.x, c->target.y, c->target.z, 0.0, 1.0, 0.0);
+	slVectorAdd(&c->location, &c->target, &cam);
+	gluLookAt(cam.x, cam.y, cam.z, c->target.x, c->target.y, c->target.z, 0.0, 1.0, 0.0);
 
 	// Render the objects in the world, with name loading, and with billboards as spheres
 
-	slRenderObjects(w, c, DO_BILLBOARDS_AS_SPHERES|DO_LOAD_NAMES);
+	slRenderObjects(w, c, DO_BILLBOARDS_AS_SPHERES | DO_LOAD_NAMES);
 
 	hits = glRenderMode(GL_RENDER);
 
@@ -335,7 +341,7 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 
 	selections = &selection_buffer[0];
 
-	for(n=0;n<hits;n++) {
+	for (int n = 0; n < hits; ++n) {
 		namesInHit = *selections++;
 	   
 		// skip over the z-max value 
@@ -343,18 +349,20 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 		selections++;
 		min = *selections++;
 
-		if(min < nearest) {
+		if (min < nearest) {
 			nearest = min;
 		   
-			while(namesInHit--) hit = *selections++;
-		} else {
-			while(namesInHit--) selections++;
-		}
+			while (namesInHit--)
+				hit = *selections++;
+		} else
+			while (namesInHit--)
+				selections++;
 	}
 
 	glPopName();
 
-	if(hit == w->objects.size() + 1) return -1;
+	if (hit == w->objects.size() + 1)
+		return -1;
 
 	return hit;
 }
@@ -367,16 +375,15 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 */
 
 int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y, slVector *dragVector) {
-	slVector *t, cam;
 	slPlane plane;
+	slVector cam, end;
 	GLdouble model[16];
 	GLdouble proj[16];
-	GLint view[4];
 	GLdouble wx, wy;
 	GLdouble oxf, oyf, ozf;
-	int r;
-	slVector end;
 	double sD, eD;
+	slVector *t;
+	GLint view[4];
 
 	// set up the matrices for a regular draw--gluUnProject needs this 
 
@@ -412,7 +419,7 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 	// use gluUnProject to get the point in object space where we are clicking 
 	// (and at the far reach of our zClip variable). 
 
-	r = gluUnProject(wx, wy, 1.0, model, proj, view, &oxf, &oyf, &ozf);
+	(void)gluUnProject(wx, wy, 1.0, model, proj, view, &oxf, &oyf, &ozf);
 
 	end.x = oxf;
 	end.y = oyf;
@@ -451,33 +458,34 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 }
 
 void slRenderScene(slWorld *w, slCamera *c, int crosshair) {
-	if(w->detectLightExposure) slDetectLightExposure(w, c, 200, NULL);
+	if (w->detectLightExposure)
+		slDetectLightExposure(w, c, 200, NULL);
 
 	slRenderWorld(w, c, crosshair, 0);
 
-	if(w->cameras.size() != 0) slRenderWorldCameras(w);
+	if (w->cameras.size() != 0)
+		slRenderWorldCameras(w);
 }
 
 void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 	slVector cam;
 	int flags = 0;
 
-	if(!w || !c) return;
+	if (!w || !c)
+		return;
 
 	glViewport(c->ox, c->oy, c->x, c->y);
 
-	if(scissor) {
-		flags |= DO_NO_AXIS|DO_NO_BOUND;
+	if (scissor) {
+		flags |= DO_NO_AXIS | DO_NO_BOUND;
 		glEnable(GL_SCISSOR_TEST);
 		glScissor(c->ox, c->oy, c->x, c->y);
 	}
 
-	if(c->drawOutline) {
-		flags |= DO_OUTLINE;
-		flags |= DO_BILLBOARDS_AS_SPHERES;
-	} 
+	if (c->drawOutline)
+		flags |= DO_OUTLINE | DO_BILLBOARDS_AS_SPHERES;
 
-	if(c->recompile) {
+	if (c->recompile) {
 		c->recompile = 0;
 		slCompileCubeDrawList(c->cubeDrawList);
 		flags |= DO_RECOMPILE;
@@ -488,7 +496,8 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	if(w->backgroundTexture > 0 && !(flags & DO_OUTLINE)) slDrawBackground(c, w);
+	if (w->backgroundTexture > 0 && !(flags & DO_OUTLINE))
+		slDrawBackground(c, w);
 
 	gluPerspective(40.0, c->fov, 0.01, c->zClip);
 
@@ -503,88 +512,100 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 
 	c->updateFrustum();
 
-	if(c->drawFog) slDrawFog(w, c);
-	else glDisable(GL_FOG);
+	if (c->drawFog)
+		slDrawFog(w, c);
+	else
+		glDisable(GL_FOG);
 
 	// do a pass through to grab all the billboards--we want to sort them 
 	// so that they can be rendered back to front and blended correctly
 
-	if(c->drawLights) {
-		if(c->drawShadowVolumes) slDrawLights(c, 1);
-		else slDrawLights(c, 0);
+	if (c->drawLights) {
+		if (c->drawShadowVolumes)
+			slDrawLights(c, 1);
+		else
+			slDrawLights(c, 0);
 
-		if(c->drawReflection || c->drawShadow) slStencilFloor(w, c);
+		if (c->drawReflection || c->drawShadow)
+			slStencilFloor(w, c);
 
-		if(c->drawReflection && !(flags & DO_OUTLINE)) {
+		if (c->drawReflection && !(flags & DO_OUTLINE)) {
 			slVector toCam;
 
-			if(!c->drawShadowVolumes) gReflectionAlpha = REFLECTION_ALPHA;
-			else gReflectionAlpha = REFLECTION_ALPHA - 0.1;
+			if (!c->drawShadowVolumes)
+				gReflectionAlpha = REFLECTION_ALPHA;
+			else
+				gReflectionAlpha = REFLECTION_ALPHA - 0.1;
 
 			slVectorSub(&cam, &c->shadowPlane.vertex, &toCam);
 
-			if(slVectorDot(&toCam, &c->shadowPlane.normal) > 0.0) {
+			if (slVectorDot(&toCam, &c->shadowPlane.normal) > 0.0) {
 				slReflectionPass(w, c);
-				if(c->drawShadowVolumes) slDrawLights(c, 1);
+				if (c->drawShadowVolumes)
+					slDrawLights(c, 1);
 			}
 		}
-	} else {
+	} else
 		glDisable(GL_LIGHTING);
-	}
 
 	// render the mobile objects
 
-	slRenderObjects(w, c, flags|DO_NO_ALPHA);
+	slRenderObjects(w, c, flags | DO_NO_ALPHA);
 	slRenderLines(w, c);
 	slClearGLErrors("drew multibodies and lines");
 
 	// now we do transparent objects and billboards.  they have to come last 
 	// because they are blended.
 
-	if(!(flags & DO_BILLBOARDS_AS_SPHERES)) {
+	if (!(flags & DO_BILLBOARDS_AS_SPHERES)) {
 		slProcessBillboards(w, c);
 		slRenderBillboards(c, flags);
 	}
 
 	std::vector<slPatchGrid*>::iterator pi;
-	for(pi = w->patches.begin(); pi != w->patches.end(); pi++) (*pi)->draw(c);
+	for (pi = w->patches.begin(); pi != w->patches.end(); pi++)
+		(*pi)->draw(c);
 
-	if(c->drawLights) {
+	if (c->drawLights) {
 		// do the shadows
-		if(c->drawShadowVolumes) slRenderShadowVolume(w, c);
-		else if(c->drawShadow) slShadowPass(w, c);
+		if (c->drawShadowVolumes)
+			slRenderShadowVolume(w, c);
+		else if (c->drawShadow)
+			slShadowPass(w, c);
 	}
 
 	glDepthMask(GL_FALSE);
-	slRenderObjects(w, c, flags|DO_ONLY_ALPHA);
+	slRenderObjects(w, c, flags | DO_ONLY_ALPHA);
 	glDepthMask(GL_TRUE);
 
 	slRenderLabels(w);
 
-#ifdef HAVE_LIBENET
+#if HAVE_LIBENET
 	slDrawNetsimBounds(w);
 #endif
 
 	std::vector<slDrawCommandList*>::iterator di;
 	for(di = w->drawings.begin(); di != w->drawings.end(); di++) (*di)->draw(c);
 
-	if(w->gisData) w->gisData->draw(c);
+	if (w->gisData)
+		w->gisData->draw(c);
 
 	glPopMatrix();
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	if(c->drawText) slRenderText(w, c, &c->location, &c->target, crosshair);
+	if (c->drawText)
+		slRenderText(w, c, &c->location, &c->target, crosshair);
 
-	if(c->drawText && crosshair && !scissor) {
+	if (c->drawText && crosshair && !scissor) {
 		glPushMatrix();
 		glColor3f(0, 0, 0);
 		slText(0, 0, "+", GLUT_BITMAP_9_BY_15);
 		glPopMatrix();
 	}
 
-	if(scissor) {
+	if (scissor) {
 		double minY, maxY, minX, maxX;
 
 		minX = -1;
@@ -617,15 +638,14 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 }
 
 void slClear(slWorld *w, slCamera *c) {
-	if(c->drawOutline) {
+	if (c->drawOutline)
 		glClearColor(1, 1, 1, 0);
-	} else {
+	else
 		glClearColor(w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 1.0);
-	}
 
-	if(!c->blur) {
+	if (!c->blur)
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-	} else {
+	else {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -729,6 +749,7 @@ void slReflectionPass(slWorld *w, slCamera *c) {
 
 void slShadowPass(slWorld *w, slCamera *c) {
 	GLfloat shadowMatrix[4][4];
+
 	slShadowMatrix(shadowMatrix, &c->shadowPlane, &c->lights[0].location);
 
 	glPushAttrib(GL_ENABLE_BIT);
@@ -749,11 +770,11 @@ void slShadowPass(slWorld *w, slCamera *c) {
 	// glColor4f(1.0, 0.0, 0.0, 1.0);
 
 	glPushMatrix();
-	glMultMatrixf((GLfloat*)shadowMatrix);
+	glMultMatrixf((GLfloat *)shadowMatrix);
 	slRenderObjects(w, c, DO_NO_COLOR|DO_NO_TEXTURE|DO_NO_STATIONARY|DO_NO_BOUND|DO_NO_AXIS|DO_NO_TERRAIN);
 	glDisable(GL_LIGHTING);
 	// glDisable(GL_CULL_FACE);
-	slRenderBillboards(c, DO_NO_COLOR|DO_NO_BOUND);
+	slRenderBillboards(c, DO_NO_COLOR | DO_NO_BOUND);
 	glPopMatrix();
 
 	glPopAttrib();
@@ -764,32 +785,32 @@ void slShadowPass(slWorld *w, slCamera *c) {
 */
 
 void slRenderText(slWorld *w, slCamera *c, slVector *location, slVector *target, int crosshair) {
-	char textStr[128];
 	double fromLeft;
 	unsigned int n;
+	char textStr[128];
 
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_BLEND);
 	glColor4f(0.0, 0.0, 0.0, 1.0);
-	snprintf(textStr, 127, "%.2f", w->age);
+	snprintf(textStr, sizeof(textStr), "%.2f", w->age);
 
 	fromLeft = -1.0 + (5.0 / c->x);
 	slText(fromLeft, 1.0 - (20.0 / c->y), textStr, GLUT_BITMAP_HELVETICA_10);
 
-	if(crosshair) {
-		sprintf(textStr, "camera: (%.1f, %.1f, %.1f)", location->x, location->y, location->z);
+	if (crosshair) {
+		snprintf(textStr, sizeof(textStr), "camera: (%.1f, %.1f, %.1f)",
+		    location->x, location->y, location->z);
 		slText(fromLeft, -1.0 + (5.0 / c->y), textStr, GLUT_BITMAP_HELVETICA_10);
-		sprintf(textStr, "target: (%.1f, %.1f, %.1f)", target->x, target->y, target->z);
+		snprintf(textStr, sizeof(textStr), "target: (%.1f, %.1f, %.1f)",
+		    target->x, target->y, target->z);
 		slText(fromLeft, -1.0 + (30.0 / c->y), textStr, GLUT_BITMAP_HELVETICA_10);
-	} else {
-		for(n=0;n<c->text.size();n++) {
-			if(c->text[n].text) {
+	} else
+		for(n = 0; n < c->text.size(); ++n)
+			if (c->text[n].text) {
 				glColor4f(c->text[n].color.x, c->text[n].color.y, c->text[n].color.z, 0.9);
 				slStrokeText(c->text[n].x, c->text[n].y, c->text[n].text, c->textScale, GLUT_STROKE_ROMAN);
 			}
-		}
-	}
 }
 
 /*!
@@ -802,7 +823,7 @@ void slDrawBackground(slCamera *c, slWorld *w) {
 
 	glDisable(GL_DEPTH_TEST);
 
-	glPushAttrib(GL_LIGHTING_BIT|GL_TRANSFORM_BIT|GL_TEXTURE_BIT|GL_COLOR_BUFFER_BIT);
+	glPushAttrib(GL_LIGHTING_BIT | GL_TRANSFORM_BIT | GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT);
 
 	glEnable(GL_BLEND);
 
@@ -823,7 +844,7 @@ void slDrawBackground(slCamera *c, slWorld *w) {
 	// taking in the color from the GL_TEXTURE_ENV_COLOR--we'll just 
 	// set both.
 
-	if(w->isBackgroundImage) {
+	if (w->isBackgroundImage) {
 		textColor[0] = 1.0;
 		textColor[1] = 1.0;
 		textColor[2] = 1.0;
@@ -868,7 +889,7 @@ void slRenderLabels(slWorld *w) {
 	for(wi = w->objects.begin(); wi != w->objects.end(); wi++) {
 		wo = *wi;
 
-		if(wo->label) {
+		if (wo->label) {
 			l = &wo->position.location;
 			glPushMatrix();
 			glTranslatef(l->x, l->y, l->z);
@@ -885,15 +906,15 @@ void slRenderLabels(slWorld *w) {
 */
 
 void slRenderBillboards(slCamera *c, int flags) {
-	slBillboardEntry *b;
 	slVector normal;
+	slBillboardEntry *b;
 	unsigned int n;
 	int lastTexture = -1;
 
 	slVectorCopy(&c->location, &normal);
 	slVectorNormalize(&normal);
 
-	if(!(flags & DO_NO_TEXTURE)) {
+	if (!(flags & DO_NO_TEXTURE)) {
 		glPushAttrib(GL_LIGHTING_BIT|GL_TRANSFORM_BIT|GL_TEXTURE_BIT|GL_COLOR_BUFFER_BIT);
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
@@ -906,9 +927,9 @@ void slRenderBillboards(slCamera *c, int flags) {
 
 	glDepthMask(GL_FALSE);
 
-	for(n=0;n<c->billboardCount;n++) {
-		int bound;
+	for(n = 0; n < c->billboardCount; ++n) {
 		slWorldObject *object;
+		int bound;
 
 		glPushMatrix();
 
@@ -918,20 +939,18 @@ void slRenderBillboards(slCamera *c, int flags) {
 
 		bound = (object->drawMode & DM_BOUND);
 
-		if(object->textureMode == BBT_LIGHTMAP) {
+		if (object->textureMode == BBT_LIGHTMAP)
 			glBlendFunc(GL_ONE, GL_ONE);
-		} else {
-	    	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		else {
+	    		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 
-		if(!(flags & DO_NO_COLOR)) {
+		if (!(flags & DO_NO_COLOR))
 			glColor4f(object->color.x, object->color.y, object->color.z, object->alpha);
-		}
 
-		if(lastTexture != object->texture) {
+		if (lastTexture != object->texture)
 			glBindTexture(GL_TEXTURE_2D, object->texture);
-		}
 
 		lastTexture = object->texture;
 
@@ -941,8 +960,9 @@ void slRenderBillboards(slCamera *c, int flags) {
 
 		glCallList(c->billboardDrawList);
 
-		if(bound && !(flags & DO_NO_BOUND)) {
-			if(!(flags & DO_NO_TEXTURE)) glDisable(GL_TEXTURE_2D);
+		if (bound && !(flags & DO_NO_BOUND)) {
+			if (!(flags & DO_NO_TEXTURE))
+				glDisable(GL_TEXTURE_2D);
 			glPushMatrix();
 			glScalef(1.1, 1.1, 1.1);
 			glColor4f(0.0, 0.0, 0.0, 1.0);
@@ -953,7 +973,8 @@ void slRenderBillboards(slCamera *c, int flags) {
 				glVertex3f(c->billboardX.x - c->billboardY.x, c->billboardX.y - c->billboardY.y, c->billboardX.z - c->billboardY.z);
 			glEnd();
 			glPopMatrix();
-			if(!(flags & DO_NO_TEXTURE)) glEnable(GL_TEXTURE_2D);
+			if (!(flags & DO_NO_TEXTURE))
+				glEnable(GL_TEXTURE_2D);
 		}
 
 		glPopMatrix();
@@ -961,7 +982,8 @@ void slRenderBillboards(slCamera *c, int flags) {
 
 	glDepthMask(GL_TRUE);
 
-	if(!(flags & DO_NO_TEXTURE)) glPopAttrib();
+	if (!(flags & DO_NO_TEXTURE))
+		glPopAttrib();
 }
 
 void slStrokeText(double x, double y, char *string, double scale, void *font) {
@@ -977,7 +999,8 @@ void slStrokeText(double x, double y, char *string, double scale, void *font) {
 
 	glScalef(scale * 0.0005, scale * 0.0005, scale * 0.0005);
 	
-	while((c = *(string++)) != 0) glutStrokeCharacter(font, c);
+	while ((c = *(string++)) != 0)
+		glutStrokeCharacter(font, c);
 
 	glPopMatrix();
 }
@@ -987,7 +1010,8 @@ void slText(double x, double y, char *string, void *font) {
 
 	glRasterPos2f(x, y);
 
-	while((c = *(string++)) != 0) glutBitmapCharacter(font, c);
+	while ((c = *(string++)) != 0)
+		glutBitmapCharacter(font, c);
 }
 
 /*!
@@ -1007,7 +1031,7 @@ void slDrawLights(slCamera *c, int noDiffuse) {
 	dir[2] = c->lights[0].location.z;
 	dir[3] = 1.0;
 
-	if(noDiffuse) {
+	if (noDiffuse) {
 		dif[0] = 0.0;
 		dif[1] = 0.0;
 		dif[2] = 0.0;
@@ -1024,8 +1048,10 @@ void slDrawLights(slCamera *c, int noDiffuse) {
 	amb[2] = c->lights[0].ambient.z;
 	amb[3] = 0.0;
 
-	if(c->drawSmooth) glShadeModel(GL_SMOOTH);
-	else glShadeModel(GL_FLAT);
+	if (c->drawSmooth)
+		glShadeModel(GL_SMOOTH);
+	else
+		glShadeModel(GL_FLAT);
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -1044,9 +1070,7 @@ void slDrawLights(slCamera *c, int noDiffuse) {
 */
 
 void slShadowMatrix(GLfloat matrix[4][4], slPlane *p, slVector *light) {
-	GLfloat dot;
-
-	GLfloat groundplane[4], lightpos[4];
+	GLfloat dot, groundplane[4], lightpos[4];
 
 	lightpos[0] = light->x;
 	lightpos[1] = light->y;
@@ -1089,17 +1113,18 @@ void slShadowMatrix(GLfloat matrix[4][4], slPlane *p, slVector *light) {
 
 void slProcessBillboards(slWorld *w, slCamera *c) {
 	GLfloat matrix[16];
-	slSphere *ss;
 	std::vector<slWorldObject*>::iterator wi;
+	slSphere *ss;
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 
 	c->billboardCount = 0;
 
-	for(wi = w->objects.begin(); wi != w->objects.end(); wi++ ) {
+	for (wi = w->objects.begin(); wi != w->objects.end(); wi++ ) {
 		slWorldObject *wo = *wi;
 
-		if(wo->textureMode != BBT_NONE && wo->shape && wo->shape->_type == ST_SPHERE) {
+		if (wo->textureMode != BBT_NONE && wo->shape &&
+		    wo->shape->_type == ST_SPHERE) {
 			double z = 0;
 
 			ss = static_cast<slSphere*>(wo->shape);
@@ -1124,7 +1149,8 @@ void slProcessBillboards(slWorld *w, slCamera *c) {
 	c->billboardZ.y = matrix[6];
 	c->billboardZ.z = matrix[10];
 
-	if(c->billboardDrawList == 0) c->billboardDrawList = glGenLists(1);
+	if (c->billboardDrawList == 0)
+		c->billboardDrawList = glGenLists(1);
 
 	glNewList(c->billboardDrawList, GL_COMPILE);
 
@@ -1148,8 +1174,8 @@ void slProcessBillboards(slWorld *w, slCamera *c) {
 */
 
 void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
-	unsigned int n;
 	slWorldObject *wo;
+	unsigned int n;
 	int color = 1;
 
 	const int loadNames = (flags & DO_LOAD_NAMES);
@@ -1161,23 +1187,25 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 
 	camera->_points.clear();
 
-	if(flags & DO_ONLY_ALPHA) {
+	if (doOnlyAlpha) {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		// glBlendFunc(GL_ONE_MINUS_DST_ALPHA,GL_DST_ALPHA);
 	} 
 
-	if((flags & DO_OUTLINE) || (flags & DO_NO_COLOR)) color = 0;
-	if(flags & DO_OUTLINE) glColor4f(1, 1, 1, 0);
+	if (flags & (DO_OUTLINE | DO_NO_COLOR))
+		color = 0;
+	if (flags & DO_OUTLINE)
+		glColor4f(1, 1, 1, 0);
 
    	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
    	// glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
-	for(n=0;n<w->objects.size();n++) {
+	for (n = 0; n < w->objects.size(); ++n) {
 		int skip = 0;
 		wo = w->objects[n];
 
-		if(wo->_drawAsPoint) skip = 0;
+		if (wo->_drawAsPoint) skip = 0;
 		else if(wo->drawMode == DM_INVISIBLE) skip = 1;
 		else if(doNoAlpha && wo->alpha != 1.0) skip = 1;
 		else if(doOnlyAlpha && wo->alpha == 1.0) skip = 1;
@@ -1185,52 +1213,59 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 		else if(doNoTerrain && wo->type == WO_TERRAIN) skip = 1;
 		else if(wo->textureMode != BBT_NONE && !(flags & DO_BILLBOARDS_AS_SPHERES)) skip = 1;
 
-		if(!skip) {
-			if(loadNames) glLoadName(n);
+		if (!skip) {
+			if (loadNames)
+				glLoadName(n);
 
-			if( !wo->_drawAsPoint ) {
-				if(color) glColor4d(wo->color.x, wo->color.y, wo->color.z, wo->alpha);
+			if (!wo->_drawAsPoint ) {
+				if (color)
+					glColor4d(wo->color.x, wo->color.y, wo->color.z, wo->alpha);
 
-				if(wo->alpha != 1.0) {
-					if(!doNoTexture && wo->texture > 0) glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-					else glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				if (wo->alpha != 1.0) {
+					if (!doNoTexture && wo->texture > 0)
+						glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+					else
+						glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 					glDisable(GL_CULL_FACE);
 				}
 	
 				// 0 or -1 can be used to indicate no texture
 	
-				if(!doNoTexture && wo->texture > 0) {
+				if (!doNoTexture && wo->texture > 0) {
 					glBindTexture(GL_TEXTURE_2D, wo->texture);
 					glEnable(GL_TEXTURE_2D);
 				} 
 	
 				wo->draw(camera);
 	
-				if(wo->alpha != 1.0) glEnable(GL_CULL_FACE);
+				if (wo->alpha != 1.0)
+					glEnable(GL_CULL_FACE);
 	
-				if(wo->texture > 0) glDisable(GL_TEXTURE_2D);
-			} else {
+				if (wo->texture > 0)
+					glDisable(GL_TEXTURE_2D);
+			} else
 				camera->_points.push_back( std::pair< slVector, slVector>(wo->position.location, wo->color ) );
-			}
-		}
+		}	
 	}
 
 	glEnable(GL_BLEND);
 	glPointSize(2.0);
 	glBegin(GL_POINTS);
-	for(n=0;n<camera->_points.size();n++) {
-		slVector &v = camera->_points[ n].first;
-		slVector &c = camera->_points[ n].second;
+	for (n = 0; n < camera->_points.size(); ++n) {
+		slVector &v = camera->_points[n].first;
+		slVector &c = camera->_points[n].second;
 
 		glColor3d(c.x, c.y, c.z);
-		glVertex3d( v.x, v.y, v.z);
+		glVertex3d(v.x, v.y, v.z);
 	}
 	glEnd();
 
-	if(flags & DO_ONLY_ALPHA) glDisable(GL_BLEND);
+	if (doOnlyAlpha)
+		glDisable(GL_BLEND);
 
-	if(loadNames) glLoadName(w->objects.size() + 1);
+	if (loadNames)
+		glLoadName(w->objects.size() + 1);
 }
 
 /*!
@@ -1238,15 +1273,15 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 */
 
 void slRenderLines(slWorld *w, slCamera *c) {
-	unsigned int n;
-	slVector *x, *y;
 	slWorldObject *neighbor;
+	slVector *x, *y;
+	unsigned int n;
 
 	glLineWidth(1.2);
 
-	for(n=0;n<w->objects.size();n++) {
+	for (n = 0; n < w->objects.size(); ++n) {
 		if(w->objects[n] && !(w->objects[n]->drawMode & DM_INVISIBLE)) {
-			if(w->objects[n]->drawMode & DM_NEIGHBOR_LINES) {
+			if (w->objects[n]->drawMode & DM_NEIGHBOR_LINES) {
 				std::vector<slWorldObject*>::iterator wi;
 
 				glEnable(GL_BLEND);
@@ -1256,10 +1291,10 @@ void slRenderLines(slWorld *w, slCamera *c) {
 
 				glBegin(GL_LINES);
 
-				for(wi = w->objects[n]->neighbors.begin(); wi != w->objects[n]->neighbors.end(); wi++) { 
+				for (wi = w->objects[n]->neighbors.begin(); wi != w->objects[n]->neighbors.end(); wi++) { 
 					neighbor = *wi;
 
-					if(neighbor) {
+					if (neighbor) {
 						y = &neighbor->position.location;
 
 						glVertex3f(x->x, x->y, x->z);
@@ -1279,7 +1314,7 @@ void slRenderLines(slWorld *w, slCamera *c) {
 
 	std::vector<slObjectConnection*>::iterator li;
 
-	for(li = w->connections.begin(); li != w->connections.end(); li++ ) {
+	for (li = w->connections.begin(); li != w->connections.end(); li++ ) {
 		(*li)->draw(c);
 	}
 }
@@ -1319,7 +1354,8 @@ void slDrawAxis(double x, double y) {
 */
 
 int slCompileShape(slShape *s, int drawMode, double textureScale, int flags) {
-	if(s->drawList == 0) s->drawList = glGenLists(1);
+	if (!s->drawList)
+		s->drawList = glGenLists(1);
 	s->recompile = 0;
 
 	glNewList(s->drawList, GL_COMPILE);
@@ -1339,18 +1375,21 @@ int slCompileShape(slShape *s, int drawMode, double textureScale, int flags) {
 */
 
 void slRenderShape(slShape *s, int drawMode, double textureScale, int flags) {
-	int divisions;
 	GLUquadricObj *quad;
+	int divisions;
 
-	if(s->_type == ST_SPHERE) {
-		double radius = ((slSphere*)s)->_radius;
+	if (s->_type == ST_SPHERE) {
+		double radius = ((slSphere *)s)->_radius;
 
-		if(radius < 20) divisions = 20;
-		else divisions = (int)radius;
+		if (radius < 20)
+			divisions = 20;
+		else
+			divisions = (int)radius;
 
 		quad = gluNewQuadric();
 
-		if(drawMode != GL_POLYGON) gluQuadricDrawStyle(quad, GLU_LINE);
+		if (drawMode != GL_POLYGON)
+			gluQuadricDrawStyle(quad, GLU_LINE);
 		gluQuadricTexture(quad, GL_TRUE);
 
 		gluQuadricOrientation(quad, GLU_OUTSIDE);
@@ -1361,7 +1400,7 @@ void slRenderShape(slShape *s, int drawMode, double textureScale, int flags) {
 	} else {
 		std::vector<slFace*>::iterator fi;
 
-		for(fi = s->faces.begin(); fi != s->faces.end(); fi++ )
+		for (fi = s->faces.begin(); fi != s->faces.end(); fi++ )
 			slDrawFace(*fi, drawMode, textureScale, flags);
 	}
 }
@@ -1381,7 +1420,8 @@ void slPerpendicularVectors(slVector *v, slVector *p1, slVector *p2) {
 
 	slVectorMul(v, -1, &neg);
 
-	if(!slVectorCompare(p1, v) || !slVectorCompare(&neg, p1))  slVectorSet(p1, 1, 0, 0);
+	if (!slVectorCompare(p1, v) || !slVectorCompare(&neg, p1))
+		slVectorSet(p1, 1, 0, 0);
 	
 	slVectorCross(p1, v, p2);
 	slVectorCross(p2, v, p1);
@@ -1394,7 +1434,8 @@ void slPerpendicularVectors(slVector *v, slVector *p1, slVector *p2) {
 */
 
 void slDrawFace(slFace *f, int drawMode, double textureScale, int flags) {
-	slVector *v, *norm, xaxis, yaxis;
+	slVector xaxis, yaxis;
+	slVector *norm, *v;
 	slPoint *p;
 	int edgeCount;
 
@@ -1404,7 +1445,7 @@ void slDrawFace(slFace *f, int drawMode, double textureScale, int flags) {
 
 	glNormal3f(norm->x, norm->y, norm->z);
 
-	if(f->drawFlags & SD_REFLECT) {
+	if (f->drawFlags & SD_REFLECT) {
 		GLfloat v[4];
 
 		glPushAttrib(GL_ENABLE_BIT);
@@ -1418,13 +1459,13 @@ void slDrawFace(slFace *f, int drawMode, double textureScale, int flags) {
 	// if they're drawing lines, or if the face 
 	// isn't broken down, do a normal polygon
 
-	if(drawMode == GL_LINE_LOOP || !slBreakdownFace(f, textureScale)) {
+	if (drawMode == GL_LINE_LOOP || !slBreakdownFace(f, textureScale)) {
 		glBegin(drawMode);
 	
-		for(edgeCount=0;edgeCount<f->edgeCount;edgeCount++) {
-			p = (slPoint*)f->points[edgeCount];
+		for (edgeCount=0;edgeCount<f->edgeCount;edgeCount++) {
+			p = (slPoint *)f->points[edgeCount];
 
-			v = &((slPoint*)p)->vertex;
+			v = &((slPoint *)p)->vertex;
 	
 			glTexCoord2f(slVectorDot(v, &xaxis) / textureScale + 0.5, slVectorDot(v, &yaxis) / textureScale + 0.5);
 
@@ -1434,9 +1475,8 @@ void slDrawFace(slFace *f, int drawMode, double textureScale, int flags) {
 		glEnd();
 	}
 
-	if(f->drawFlags & SD_REFLECT) {
+	if (f->drawFlags & SD_REFLECT)
 		glPopAttrib();
-	}
 }
 
 /*!
@@ -1447,19 +1487,19 @@ void slDrawFace(slFace *f, int drawMode, double textureScale, int flags) {
 */
 
 int slBreakdownFace(slFace *f, double textureScale) {
-	slVector diff, total, subv[3], middle;
+	slVector diff, middle, subv[3], total, xaxis, yaxis;
+	double length = 0;
 	slVector *v1, *v2;
-	slVector xaxis, yaxis;
 	slPoint *p;
 	int n, n2;
-	double length = 0;
 
 	slPerpendicularVectors(&f->plane.normal, &xaxis, &yaxis);
 
 	slVectorZero(&total);
-	for(n=0;n<f->edgeCount;n++) {
+	for (n = 0; n < f->edgeCount; ++n) {
 		n2 = n+1;
-		if(n2 == f->edgeCount) n2 = 0;
+		if (n2 == f->edgeCount)
+			n2 = 0;
 	
 		p = f->points[n];
 		v1 = &p->vertex;
@@ -1474,13 +1514,15 @@ int slBreakdownFace(slFace *f, double textureScale) {
 
 	slVectorMul(&total, 1.0 / f->edgeCount, &total);
 
-	if(length < 30) return 0;
+	if (length < 30)
+		return 0;
 
 	glBegin(GL_TRIANGLES);
 	
-	for(n=0;n<f->edgeCount;n++) {
+	for (n = 0; n < f->edgeCount; ++n) {
 		n2 = n+1;
-		if(n2 == f->edgeCount) n2 = 0;
+		if (n2 == f->edgeCount)
+			n2 = 0;
 	
 		p = f->points[n];
 		v1 = &p->vertex;
@@ -1517,15 +1559,14 @@ int slBreakdownFace(slFace *f, double textureScale) {
 */
 
 void slBreakdownTriangle(slVector *v, double textureScale, int level, slVector *xaxis, slVector *yaxis) {
-	slVector subv[3];
-	slVector mids[3];
-	slVector diff;
+	slVector diff, mids[3], subv[3];
 	double length = 0;
 	int n, n2;
 
-	for(n=0;n<3;n++) {
+	for (n = 0; n < 3; ++n) {
 		n2 = n+1;
-		if(n2 == 3) n2 = 0;
+		if (n2 == 3)
+			n2 = 0;
 
 		slVectorSub(&v[n2], &v[n], &diff);
 
@@ -1535,8 +1576,8 @@ void slBreakdownTriangle(slVector *v, double textureScale, int level, slVector *
 		slVectorAdd(&v[n], &diff, &mids[n]);
 	}
 
-	if(length < 200 || level > 3) {
-		for(n=0;n<3;n++) {
+	if (length < 200 || level > 3) {
+		for (n = 0; n < 3; ++n) {
 			glTexCoord2f(slVectorDot(&v[n], xaxis) / textureScale + 0.5, slVectorDot(&v[n], yaxis) / textureScale + 0.5);
 			glVertex3f(v[n].x, v[n].y, v[n].z);
 		}
@@ -1577,7 +1618,7 @@ inline int slClearGLErrors(char *id) {
 	unsigned int n;
 	int c = 0;
 
-	while((n = glGetError())) {
+	while ((n = glGetError())) {
 		slMessage(DEBUG_ALL, "%s: OpenGL error %s\n", id, gluErrorString(n));
 		c++;
 	}
@@ -1592,8 +1633,8 @@ inline int slClearGLErrors(char *id) {
 void slFreeGL(slWorld *w, slCamera *c) {
 	unsigned int n;
 
-	for(n=0;n<w->objects.size();n++) {
-		if(w->objects[n] && w->objects[n]->shape) {
+	for (n = 0; n < w->objects.size(); ++n) {
+		if (w->objects[n] && w->objects[n]->shape) {
 			glDeleteLists(w->objects[n]->shape->drawList, 1);
 			w->objects[n]->shape->drawList = 0;
 		}

@@ -4,7 +4,7 @@
 #ifdef __cplusplus
 #include <vector>
 
-#ifdef HAVE_LIBENET
+#if HAVE_LIBENET
 #include <enet/enet.h>
 
 #define NETSIM_MASTER_PORT	5529
@@ -60,24 +60,24 @@ struct slNetworkHeader {
 	int messageCount;
 };
 
-void *slNetsimThread(void *data);
+void *slNetsimThread(void *);
 
-void slNetsimStartServer(slNetsimServerData *s);
-slNetsimServerData *slNetsimCreateServer(slWorld *world);
-slNetsimServerData *slNetsimCreateClient(slWorld *world);
+void slNetsimStartServer(slNetsimServerData *);
+slNetsimServerData *slNetsimCreateServer(slWorld *);
+slNetsimServerData *slNetsimCreateClient(slWorld *);
 
-slNetsimClientData *slNetsimOpenConnection(ENetHost *client, char *host, int port);
-slNetsimClientData *slNetsimOpenConnectionToAddress(ENetHost *client, ENetAddress *address);
+slNetsimClientData *slNetsimOpenConnection(ENetHost *, char *, int);
+slNetsimClientData *slNetsimOpenConnectionToAddress(ENetHost *, ENetAddress *);
 
-inline void slNetsimBoundsMessageToVectors(slNetsimBoundsMessage *m, slVector *min, slVector *max);
-inline void slNetsimVectorsToBoundsMessage(slNetsimBoundsMessage *m, slVector *min, slVector *max);
+inline void slNetsimBoundsMessageToVectors(slNetsimBoundsMessage *, slVector *, slVector *);
+inline void slNetsimVectorsToBoundsMessage(slNetsimBoundsMessage *, slVector *, slVector *);
 
-int slNetsimBroadcastSyncMessage(slNetsimServerData *server, double time);
-int slNetsimSendBoundsMessage(slNetsimClientData *client, slVector *min, slVector *max);
+int slNetsimBroadcastSyncMessage(slNetsimServerData *, double);
+int slNetsimSendBoundsMessage(slNetsimClientData *, slVector *, slVector *);
 
-void slDrawNetsimBounds(slWorld *w);
+void slDrawNetsimBounds(slWorld *);
 
 #endif
 #endif
 
-#endif /* _NETSIM_H */
+#endif

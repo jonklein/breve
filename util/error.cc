@@ -160,10 +160,10 @@ void slStackTrace() {
 
 	/* this is a hack */
 
-	if(getenv("MallocStackLogging") || getenv("MallocStackLoggingNoCompact")) {
+	if (getenv("MallocStackLogging") || getenv("MallocStackLoggingNoCompact")) {
 		void *test = malloc(1);
 
-		sprintf(command, "malloc_history %d %p | tail -1 2> /dev/null", getpid(), test);
+		snprintf(command, sizeof(command), "malloc_history %d %p | tail -1 2> /dev/null", getpid(), test);
 		system(command);
 
 		free(test);

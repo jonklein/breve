@@ -116,7 +116,7 @@ int slWorldLoadTigerFile(slWorld *w, char *f) {
 */
 
 int slWorldStartNetsimServer(slWorld *w) {
-#ifdef HAVE_LIBENET
+#if HAVE_LIBENET
 	enet_initialize();
 
 	w->netsimData.isMaster = 1;
@@ -124,7 +124,8 @@ int slWorldStartNetsimServer(slWorld *w) {
 	w->netsimData.server = slNetsimCreateServer(w);
 	slNetsimStartServer(w->netsimData.server);
 
-	if(!w->netsimData.server) return -1;
+	if (!w->netsimData.server)
+		return -1;
 
 	return 0;
 #else 
@@ -138,20 +139,23 @@ int slWorldStartNetsimServer(slWorld *w) {
 */
 
 int slWorldStartNetsimSlave(slWorld *w, char *host) {
-#ifdef HAVE_LIBENET
+#if HAVE_LIBENET
 	enet_initialize();
 
 	w->netsimData.isMaster = 0;
 
 	w->netsimData.server = new slNetsimServerData(w);
-	w->netsimClient = slNetsimOpenConnection(w->netsimData.server->host, host, NETSIM_MASTER_PORT);
+	w->netsimClient = slNetsimOpenConnection(w->netsimData.server->host,
+	    host, NETSIM_MASTER_PORT);
 	slNetsimStartServer(w->netsimData.server);
 
-	if(!w->netsimData.server) return -1;
+	if (!w->netsimData.server)
+		return -1;
 
 	return 0;
 #else
 	slMessage(DEBUG_ALL, "error: cannot start netsim slave -- not compiled with enet support\n");
+
 	return -1;
 #endif
 }
@@ -177,8 +181,9 @@ void slWorldFree(slWorld *w) {
 	dJointGroupDestroy(w->odeCollisionGroupID);
 	dJointGroupDestroy(w->odeJointGroupID);
 
-#ifdef HAS_LIBENET
-	if(w->netsimData.server) enet_deinitialize();
+#if HAS_LIBENET
+	if (w->netsimData.server)
+		enet_deinitialize();
 #endif
 
 	slFreeIntegrationVectors(w);
@@ -295,27 +300,29 @@ slStationary *slNewStationary(slShape *s, slVector *loc, double rot[3][3], void 
 
 double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 	double total = 0.0;
-#ifdef HAVE_LIBENET
+#if HAVE_LIBENET
 	static int lastSecond = 0;
 #endif
 
 	*error = 0;
 
-	if(!w->initialized) slVclipDataInit(w);
+	if (!w->initialized)
+		slVclipDataInit(w);
 
-	while(total < deltaT && !*error) 
+	while (total < deltaT && !*error) 
 		total += slWorldStep(w, step, error);
 
 	w->age += total;
 
-#ifdef HAVE_LIBENET
-	if(w->netsimData.server && w->netsimData.isMaster && (int)w->age >= lastSecond) {
+#if HAVE_LIBENET
+	if (w->netsimData.server && w->netsimData.isMaster &&
+	    (int)w->age >= lastSecond) {
 		lastSecond = (int)w->age + 1;
 
 		slNetsimBroadcastSyncMessage(w->netsimData.server, w->age);
 	}
-
-	if(w->netsimData.server && !w->netsimData.isMaster && w->detectCollisions) {
+	if (w->netsimData.server && !w->netsimData.isMaster &&
+	    w->detectCollisions) {
 		int maxIndex;
 		slVector max, min;
 
