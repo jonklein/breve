@@ -27,6 +27,29 @@
 #include "kernel.h"
 
 /*!
+	\brief Gets all the keys pressed down.
+*/
+
+int brIGetAllPressedKeys(brEval args[], brEval *target, brInstance *i) {
+	char down[257];
+	int index = 0;
+	int n;
+
+	for(n=0;n<256;n++) {
+		if(i->engine->keys[n] > 0) {
+			i->engine->keys[n]--;
+			down[index++] = n;
+		}
+	}	
+	
+	down[index] = 0;
+
+	BRSTRING(target) = slStrdup(down);
+
+	return EC_OK;
+}
+
+/*!
 	\brief Gets the mouse x-coordinate.
 */
 
@@ -541,4 +564,6 @@ void breveInitControlFunctions(brNamespace *n) {
 
     brNewBreveCall(n, "getMouseX", brIGetMouseX, AT_INT, 0);
     brNewBreveCall(n, "getMouseY", brIGetMouseY, AT_INT, 0);
+
+    brNewBreveCall(n, "getAllPressedKeys", brIGetAllPressedKeys, AT_STRING, 0);
 }

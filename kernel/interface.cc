@@ -222,6 +222,8 @@ int brKeyCallback(brEngine *e, char keyCode, int isDown) {
 	brEval eval;
 	int r;
 
+	if(isDown) e->keys[keyCode] = 5;
+
 	/* call catch-key-X-down or catch-key-X-up, depending on isDown.  we */
 	/* look for both the character and the ascii code, dvs, both		 */
 	/* catch-key-A-down and catch-key-0x41-down.  */

@@ -7,7 +7,7 @@ enum allocStatus {
 
 typedef struct brObjectType brObjectType;
 
-/*! \addtogroup API */
+/*! \addtogroup breveObjectAPI */
 /*@{*/
 
 /*!
@@ -124,20 +124,22 @@ int brMethodCall(brInstance *i, brMethod *m, brEval **args, brEval *result);
 int brMethodCallByName(brInstance *i, char *name, brEval *result);
 int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, int count, brEval *result);
 
-// functions related to adding classes and instances to the breve engine
+// functions related to adding and removing classes and instances to the breve engine
 
-brObject *brAddObjectToEngine(brEngine *e, brObjectType *t, char *name, void *pointer);
-void brAddObjectAlias(brEngine *e, char *name, brObject *o);
-brInstance *brAddInstanceToEngine(brEngine *e, brObject *o, void *pointer);
+brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *pointer);
+void brEngineAddObjectAlias(brEngine *e, char *name, brObject *o);
+brInstance *brEngineAddInstance(brEngine *e, brObject *o, void *pointer);
+void brEngineRemoveInstance(brEngine *e, brInstance *i);
 
-int brAddCollisionHandler(brObject *handler, brObject *collider, brMethod *m);
+
+int brObjectAddCollisionHandler(brObject *handler, brObject *collider, brMethod *m);
 
 // adding and removing dependencies and observers 
 
-int brAddDependency(brInstance *i, brInstance *dependency);
-int brAddObserver(brInstance *i, brInstance *observer, char *notification, char *mname);
-int brRemoveDependency(brInstance *i, brInstance *dependency);
-void brRemoveObserver(brInstance *i, brInstance *observerInstance, char *notification);
+int brInstanceAddDependency(brInstance *i, brInstance *dependency);
+int brInstanceAddObserver(brInstance *i, brInstance *observer, char *notification, char *mname);
+int brEngineRemoveInstanceDependency(brInstance *i, brInstance *dependency);
+void brEngineRemoveInstanceObserver(brInstance *i, brInstance *observerInstance, char *notification);
 
 // cleaning up 
 

@@ -67,13 +67,13 @@ struct slWorldObject {
 
 	int lightExposure;
 
-	char texture;
+	int texture;
 	char textureMode;
 	unsigned char drawMode;
 	float billboardRotation;
 	float alpha;
 
-	int textureScale;
+	float textureScale;
 
 	// bounding box information here is used for "proximity" data
 

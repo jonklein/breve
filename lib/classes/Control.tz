@@ -83,6 +83,14 @@ Abstract : Control (aka Controls) [version 1.9] {
 		movie (object).
 		movieMenu (object).
 
+	+ to accept-upload of uploadedObject (object) from host (string):
+		% This method is automatically called when an object is uploaded
+		% through a OBJECT(NetworkServer).  This implementation simply 
+		% prints out a message saying that the object has been received,
+		% but your controller may override the method to take other actions.
+
+		print "object $uploadedObject sent from host $host".
+
 	- to parse-xml-network-request from-string s (string):
 		return dearchiveXMLObjectFromString(s).
 

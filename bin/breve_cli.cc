@@ -49,7 +49,7 @@ int gShouldQuit = 0;
 
 extern char *interfaceID;
 
-brFrontend *frontend;
+breveFrontend *frontend;
 
 int main(int argc, char **argv) {
 	int index;
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 
 	signal(SIGINT, brCatchSignal);
 
-    frontend = brFrontendInit(argc, argv);
+    frontend = breveFrontendInit(argc, argv);
     frontend->data = breveFrontendInitData(frontend->engine);
 
 	brEngineSetIOPath(frontend->engine, getcwd(wd, 10239));

@@ -147,6 +147,9 @@ struct briTunesData {
 	int waveformEntries; 
 };
 
+#define brEngineLock(e)		(pthread_mutex_lock(&(e)->lock))
+#define brEngineUnlock(e)	(pthread_mutex_unlock(&(e)->lock))
+
 /*!
 	\brief The main breve engine structure.
 */
@@ -228,6 +231,10 @@ struct brEngine {
 	slList *windows;
 
 	slList *searchPath;
+
+	// which keys are pressed?
+
+	unsigned char keys[256];
 
 	// a list of events and the date of the next event
 
@@ -321,8 +328,6 @@ void stFreeDefine(void *d);
 
 void brPauseTimer(brEngine *e);
 void brUnpauseTimer(brEngine *e);
-
-void brInstanceRemove(brEngine *engine, brInstance *o);
 
 void brAddToInstanceLists(brInstance *i);
 void brRemoveFromInstanceLists(brInstance *i);

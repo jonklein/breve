@@ -48,7 +48,7 @@ Abstract : Image {
 
 		imageData = imageDataInit(imageWidth, imageHeight).
 
-	+ to destroy:
+	- to destroy:
 		if imageData: imageDataFree(imageData).
 
 	- to get-image-data:

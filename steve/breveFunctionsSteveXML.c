@@ -70,6 +70,12 @@ int stCDearchiveXMLObject(brEval args[], brEval *target, brInstance *i) {
 int stCDearchiveXMLObjectFromString(brEval args[], brEval *target, brInstance *i) {
 	stInstance *si = stXMLDearchiveObjectFromString(i->engine, BRSTRING(&args[0]));
 
+	if(!si) {
+		slMessage(DEBUG_ALL, "error decoding XML message from string\n");
+		STINSTANCE(target) = NULL;
+		return EC_OK;
+	}
+
     STINSTANCE(target) = si->breveInstance;
 
     return EC_OK;

@@ -91,7 +91,7 @@ char *interfaceID = "aqua/1.2";
 	bundlePath = [[NSBundle mainBundle] resourcePath];
 	classPath = (char*)[[NSString stringWithFormat: @"%@/classes", bundlePath] cString];
 
-	frontend = brFrontendInit(0, NULL);
+	frontend = breveFrontendInit(0, NULL);
 	frontend->data = breveFrontendInitData(frontend->engine);
 	engine = frontend->engine;
 

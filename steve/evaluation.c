@@ -599,7 +599,9 @@ inline int stEvalFree(stExp *s, stRunInstance *i, brEval *t) {
 		}
 
 		if(STINSTANCE(&target)->status == AS_ACTIVE) stInstanceFree(STINSTANCE(&target));
-		else slMessage(DEBUG_ALL, "warning: attempting to free released instance %p \n", STINSTANCE(&target));
+		else {
+			slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", STINSTANCE(&target));
+		}
 
 		// if we're freeing ourself (the calling instance) then we will return EC_STOP
 
@@ -612,7 +614,10 @@ inline int stEvalFree(stExp *s, stRunInstance *i, brEval *t) {
 				if(!STINSTANCE(&list->eval)) slMessage(DEBUG_ALL, "warning: attempt to free uninitialized object\n");
 				else {
 					if(STINSTANCE(&list->eval)->status == AS_ACTIVE) stInstanceFree(STINSTANCE(&list->eval));
-					else slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", STINSTANCE(&list->eval));
+					else {
+						slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", STINSTANCE(&list->eval));
+						slMessage(DEBUG_ALL, "... error in file \"%s\" at line %d\n", s->file, s->line);
+					}
 
 					// if we're freeing ourself (the calling instance) then we will return EC_STOP
 
@@ -2216,6 +2221,7 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 	int n;
 	stKeywordEntry *keyEntry;
 	stStackRecord record;
+	slStack *currentGCStack;
 
 	char *savedStackPointer, *newStStack;
 	int result;
@@ -2265,7 +2271,7 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 	new->instance->type->engine->stackRecord = &record;
 	record.gcStack = new->instance->gcStack;
 
-	new->instance->gcStack = slStackNew();
+	currentGCStack = new->instance->gcStack = slStackNew();
 
 	// prepare for the actual method call 
 
@@ -2310,8 +2316,10 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 
 	// collect the current gcStack.
 
-	stGCCollectStack(new->instance->gcStack);
-	slStackFree(new->instance->gcStack);
+	if(new->instance->gcStack) {
+		stGCCollectStack(new->instance->gcStack);
+		slStackFree(new->instance->gcStack);
+	}
 
 	// reset the previous gcStack.
 
@@ -2867,4 +2875,19 @@ void stEvalError(brEngine *e, int type, char *proto, ...) {
 	slMessage(DEBUG_ALL, "\n");
     
 	stStackTrace(e);
+}
+
+/*!
+	\brief Prints an evaluation warning.
+*/
+
+void stEvalWarn(stExp *exp, char *proto, ...) {
+	va_list vp;
+	char localMessage[BR_ERROR_TEXT_SIZE];
+
+	va_start(vp, proto);
+	vsnprintf(localMessage, BR_ERROR_TEXT_SIZE, proto, vp);
+	va_end(vp); 
+	slMessage(DEBUG_ALL, localMessage);
+	slMessage(DEBUG_ALL, "... at in file \"%s\" at line %d\n", exp->file, exp->line);
 }

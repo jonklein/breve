@@ -341,6 +341,7 @@ Object : Real (aka Reals) [version 2.0] {
 
 		return (super dearchive).
 
-	+ to destroy:
+	- to delete:
+		if realWorldPointer: removeObject(realWorldPointer).
 		free menus.
 }

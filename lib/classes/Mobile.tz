@@ -18,7 +18,6 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 		linkPointer (pointer).
 
 		location (vector).
-		color (vector).
 		rotation (matrix).
 		velocity (vector).
 		rvelocity (vector).
@@ -95,11 +94,6 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 		return (worldObjectShape get-mass).
 
   + section "Getting the Light Exposure of this Mobile Object"
-
-	+ to destroy:
-		if realWorldPointer: removeObject(realWorldPointer).
-
-		super destroy.
 
   + section "Controlling the Agent's Motion and Position"
 
@@ -299,6 +293,8 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 		return (super archive).
 
 	- to dearchive:
+		linkPointer = linkNew().
+		realWorldPointer = linkAddToWorld(linkPointer).
 		self set-shape to worldObjectShape.
 		self move to location.
 		self set-rotation to rotation.

@@ -1,8 +1,6 @@
 # 
 # The breve Simulation Environment Makefile
-# jon klein <jklein@spiderland.org>
-#
-# thi s  Ma k e#$#fil e  iS me aN T   to  bE  li#st ened t0 On  vyN @ @@al
+# jon klein <jk@spiderland.org>
 #
 
 prefix = @prefix@
@@ -122,3 +120,5 @@ install: optimize
 	-rm -rf @libdir@/breve/classes
 	-mkdir @libdir@/breve
 	cp -r lib/classes @libdir@/breve/
+
+# thi s  Ma k e#$#fil e  iS me aN T   to  bE  li#st ened t0 On  vyN @ @@al

@@ -1,7 +1,9 @@
-#ifdef HAVE_LIBENET
-#include <enet/enet.h>
 #include <pthread.h>
 #include "simulation.h"
+
+#ifdef HAVE_LIBENET
+
+#include <enet/enet.h>
 
 /*!
 	\brief Starts the net simulation server.

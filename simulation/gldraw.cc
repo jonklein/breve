@@ -1260,6 +1260,8 @@ void slDrawShape(slWorld *w, slCamera *c, slShape *s, slPosition *pos, slVector 
 	GLfloat specularColor[4] = { 0.2, 0.2, 0.2, 0.0 };
 	unsigned char bound, axis;
 
+	// printf("texture: %d\n", texture);
+
 	if(alpha != 1.0 && (flags & DO_NO_ALPHA)) return;
 	if(alpha == 1.0 && (flags & DO_ONLY_ALPHA)) return;
 

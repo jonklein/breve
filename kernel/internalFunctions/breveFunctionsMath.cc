@@ -68,7 +68,7 @@ int brIRandomGamma(brEval arguments[], brEval *result, brInstance *instance) {
 	int isinf(double).
 */
 
-int brIIsinf(brEval *args, brEval *target, brInstance *i) {
+int brIIsinf(brEval args[], brEval *target, brInstance *i) {
 	BRINT(target) = isinf(BRDOUBLE(&args[0]));
 	return EC_OK;
 }
@@ -91,7 +91,7 @@ int brILog(brEval arguments[], brEval *result, brInstance *instance) {
 	int isnan(double).
 */
 
-int brIIsnan(brEval *args, brEval *target, brInstance *i) {
+int brIIsnan(brEval args[], brEval *target, brInstance *i) {
 	BRINT(target) = isnan(BRDOUBLE(&args[0]));
 	return EC_OK;
 }
@@ -102,7 +102,7 @@ int brIIsnan(brEval *args, brEval *target, brInstance *i) {
 	double abs(double).
 */
 
-int brIAbs(brEval *args, brEval *target, brInstance *i) {
+int brIAbs(brEval args[], brEval *target, brInstance *i) {
 	BRDOUBLE(target) = fabs(BRDOUBLE(&args[0]));
 	return EC_OK;
 }
@@ -113,7 +113,7 @@ int brIAbs(brEval *args, brEval *target, brInstance *i) {
 	double sin(double).
 */
 
-int brISin(brEval *args, brEval *target, brInstance *i) {
+int brISin(brEval args[], brEval *target, brInstance *i) {
 	BRDOUBLE(target) = sin(BRDOUBLE(&args[0]));
 	return EC_OK;
 }
@@ -124,7 +124,7 @@ int brISin(brEval *args, brEval *target, brInstance *i) {
 	double cos(double).
 */
 
-int brICos(brEval *args, brEval *target, brInstance *i) {
+int brICos(brEval args[], brEval *target, brInstance *i) {
 	BRDOUBLE(target) = cos(BRDOUBLE(&args[0]));
 	return EC_OK;
 }
@@ -135,7 +135,7 @@ int brICos(brEval *args, brEval *target, brInstance *i) {
 	double tan(double).
 */
 
-int brITan(brEval *args, brEval *target, brInstance *i) {
+int brITan(brEval args[], brEval *target, brInstance *i) {
 	BRDOUBLE(target) = tan(BRDOUBLE(&args[0]));
 	return EC_OK;
 }
@@ -146,7 +146,7 @@ int brITan(brEval *args, brEval *target, brInstance *i) {
 	double asin(double).
 */
 
-int brIAsin(brEval *args, brEval *target, brInstance *i) {
+int brIAsin(brEval args[], brEval *target, brInstance *i) {
 	BRDOUBLE(target) = asin(BRDOUBLE(&args[0]));
 	return EC_OK;
 }
@@ -157,7 +157,7 @@ int brIAsin(brEval *args, brEval *target, brInstance *i) {
 	double acos(double).
 */
 
-int brIAcos(brEval *args, brEval *target, brInstance *i) {
+int brIAcos(brEval args[], brEval *target, brInstance *i) {
 	BRDOUBLE(target) = acos(BRDOUBLE(&args[0]));
 	return EC_OK;
 }
@@ -168,7 +168,7 @@ int brIAcos(brEval *args, brEval *target, brInstance *i) {
 	double atan(double).
 */
 
-int brIAtan(brEval *args, brEval *target, brInstance *i) {
+int brIAtan(brEval args[], brEval *target, brInstance *i) {
 	BRDOUBLE(target) = atan(BRDOUBLE(&args[0]));
 	return EC_OK;
 }
@@ -179,7 +179,7 @@ int brIAtan(brEval *args, brEval *target, brInstance *i) {
 	double atan2(double, double).
 */
 
-int brIAtan2(brEval *args, brEval *target, brInstance *i) {
+int brIAtan2(brEval args[], brEval *target, brInstance *i) {
 	BRDOUBLE(target) = atan2(BRDOUBLE(&args[0]), BRDOUBLE(&args[1]));
 	return EC_OK;
 }
@@ -190,7 +190,7 @@ int brIAtan2(brEval *args, brEval *target, brInstance *i) {
 	double sqrt(double).
 */
 
-int brISqrt(brEval *args, brEval *target, brInstance *i) {
+int brISqrt(brEval args[], brEval *target, brInstance *i) {
 	BRDOUBLE(target) = sqrt(BRDOUBLE(&args[0]));
 	return EC_OK;
 }
@@ -201,7 +201,7 @@ int brISqrt(brEval *args, brEval *target, brInstance *i) {
 	double sqrt(vector, vector).
 */
 
-int brIDot(brEval *args, brEval *target, brInstance *i) {
+int brIDot(brEval args[], brEval *target, brInstance *i) {
 	slVector *a = &BRVECTOR(&args[0]);
 	slVector *b = &BRVECTOR(&args[1]);
 
@@ -216,7 +216,7 @@ int brIDot(brEval *args, brEval *target, brInstance *i) {
 	double angle(vector, vector).
 */
 
-int brIAngle(brEval *args, brEval *target, brInstance *i) {
+int brIAngle(brEval args[], brEval *target, brInstance *i) {
 	slVector *a = &BRVECTOR(&args[0]);
 	slVector *b = &BRVECTOR(&args[1]);
 
@@ -231,7 +231,7 @@ int brIAngle(brEval *args, brEval *target, brInstance *i) {
 	vector cross(vector, vector).
 */
 
-int brICross(brEval *args, brEval *target, brInstance *i) {
+int brICross(brEval args[], brEval *target, brInstance *i) {
 	slVector *a = &BRVECTOR(&args[0]);
 	slVector *b = &BRVECTOR(&args[1]);
 
@@ -246,7 +246,7 @@ int brICross(brEval *args, brEval *target, brInstance *i) {
 	double max(double, double).
 */
 
-int brIMax(brEval *args, brEval *target, brInstance *i) {
+int brIMax(brEval args[], brEval *target, brInstance *i) {
 	if(BRDOUBLE(&args[0]) > BRDOUBLE(&args[1])) BRDOUBLE(target) = BRDOUBLE(&args[0]);
 	else BRDOUBLE(target) = BRDOUBLE(&args[1]);
 
@@ -259,7 +259,7 @@ int brIMax(brEval *args, brEval *target, brInstance *i) {
 	double min(double, double).
 */
 
-int brIMin(brEval *args, brEval *target, brInstance *i) {
+int brIMin(brEval args[], brEval *target, brInstance *i) {
 	if(BRDOUBLE(&args[0]) < BRDOUBLE(&args[1])) BRDOUBLE(target) = BRDOUBLE(&args[0]);
 	else BRDOUBLE(target) = BRDOUBLE(&args[1]);
 
@@ -272,7 +272,7 @@ int brIMin(brEval *args, brEval *target, brInstance *i) {
 	matrix transpose(matrix).
 */
 
-int brITranspose(brEval *args, brEval *target, brInstance *i) {
+int brITranspose(brEval args[], brEval *target, brInstance *i) {
 	slMatrixTranspose(BRMATRIX(&args[0]), BRMATRIX(target));
 	return EC_OK;
 }

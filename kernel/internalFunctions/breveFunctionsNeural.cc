@@ -30,7 +30,7 @@
 	void freeNetwork(snFFLayer pointer outputLayer).
 */
 
-int brIFreeNetwork(brEval *args, brEval *target, brInstance *i) {
+int brIFreeNetwork(brEval args[], brEval *target, brInstance *i) {
     snFreeNetwork(BRPOINTER(&args[0]));
 
     return EC_OK;
@@ -42,7 +42,7 @@ int brIFreeNetwork(brEval *args, brEval *target, brInstance *i) {
 	void newLayer(int size, snFFLayer pointer layer).
 */
 
-int brINewFFLayer(brEval *args, brEval *target, brInstance *i) {
+int brINewFFLayer(brEval args[], brEval *target, brInstance *i) {
     BRPOINTER(target) = snNewLayer(BRINT(&args[0]), BRPOINTER(&args[1]));
 
     if(!BRPOINTER(target)) return EC_ERROR;
@@ -56,7 +56,7 @@ int brINewFFLayer(brEval *args, brEval *target, brInstance *i) {
 	void randomizeWeights(snFFLayer pointer layer).
 */
 
-int brIRandomizeWeights(brEval *args, brEval *target, brInstance *i) {
+int brIRandomizeWeights(brEval args[], brEval *target, brInstance *i) {
     snRandomizeNetworkWeights(BRPOINTER(&args[0]), 8);
 
     return EC_OK;
@@ -68,7 +68,7 @@ int brIRandomizeWeights(brEval *args, brEval *target, brInstance *i) {
 	void randomizeWeights(snFFLayer pointer layer, int toNode, int fromNode, double weight).
 */
 
-int brISetWeight(brEval *args, brEval *target, brInstance *i) {
+int brISetWeight(brEval args[], brEval *target, brInstance *i) {
 	snFFLayer *layer = BRPOINTER(&args[0]);
 	int toNode = BRINT(&args[1]);
 	int fromNode = BRINT(&args[2]);
@@ -100,7 +100,7 @@ int brISetWeight(brEval *args, brEval *target, brInstance *i) {
 	double getWeight(snFFLayer pointer network, int toNode, int fromNode).
 */
 
-int brIGetWeight(brEval *args, brEval *target, brInstance *i) {
+int brIGetWeight(brEval args[], brEval *target, brInstance *i) {
 	snFFLayer *layer = BRPOINTER(&args[0]);
 	int toNode = BRINT(&args[1]);
 	int fromNode= BRINT(&args[2]);
@@ -131,7 +131,7 @@ int brIGetWeight(brEval *args, brEval *target, brInstance *i) {
 	double getValue(snFFLayer pointer layer, int node).
 */
 
-int brIGetValue(brEval *args, brEval *target, brInstance *i) {
+int brIGetValue(brEval args[], brEval *target, brInstance *i) {
 	snFFLayer *layer = BRPOINTER(&args[0]);
 	int node = BRINT(&args[1]);
 
@@ -153,7 +153,7 @@ int brIGetValue(brEval *args, brEval *target, brInstance *i) {
 	Stores the output values in the output list.
 */
 
-int brIFeedForward(brEval *args, brEval *target, brInstance *i) {
+int brIFeedForward(brEval args[], brEval *target, brInstance *i) {
     brEvalListHead *inputs, *outputs;
     brEvalList *list;
     snFFLayer *outputLayer, *inputLayer;

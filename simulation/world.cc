@@ -87,6 +87,8 @@ slWorld *slWorldNew() {
 
 	w->clipData = slVclipDataNew();
 
+	w->netsimData.isMaster = 0;
+
 	slVectorSet(&g, 0.0, -9.81, 0.0);
 	slWorldSetGravity(w, &g);
 
@@ -269,7 +271,8 @@ slWorldObject *slWorldAddObject(slWorld *w, void *p, int type) {
 slPatchGrid *slAddPatchGrid(slWorld *w, slVector *center, slVector *patchSize, int x, int y, int z) {
 	slPatchGrid *g = slNewPatchGrid(center, patchSize, x, y, z);
 
-	slStackPush(w->patchGridObjects, g);
+	// not used yet.
+	// slStackPush(w->patchGridObjects, g);
 
 	if(w->patchGridCount == w->maxPatchGrids) {
 		w->patchGridCount *= 2;
@@ -425,7 +428,7 @@ double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 		slNetsimBroadcastSyncMessage(w->netsimData.server, w->age);
 	}
 
-	if(!w->netsimData.isMaster && w->detectCollisions) {
+	if(w->netsimData.server && !w->netsimData.isMaster && w->detectCollisions) {
 		int maxIndex;
 		slVector max, min;
 

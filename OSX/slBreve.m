@@ -772,10 +772,6 @@ void updateMenu(brInstance *i) {
 	return [[openPanel filenames] objectAtIndex: 0];
 }
 
-// - (IBAction)runCommand:sender {
-//	[breveEngine runCommand: [[sender stringValue] cString]];
-//}
-
 - (IBAction)showAboutBox:sender {
 	[aboutBox center];
 	[aboutBox makeKeyAndOrderFront: self];

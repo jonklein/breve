@@ -122,7 +122,7 @@ brData *brDataHexDecode(char *string) {
 
     d->length = length / 2;
     d->data = slMalloc(d->length);
-	d->retainCount = 1;
+	d->retainCount = 0;
 
     for(n=0;n<d->length;n++) {
         sscanf(&string[n * 2], "%2x", &l);

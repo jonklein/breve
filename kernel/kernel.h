@@ -18,6 +18,34 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+/*!
+	\mainpage The breve Simulation Environment: source documentation
+
+	This is the documentation for the source code of the breve 
+	simulation environment.
+
+	<HR>
+
+	For those interested in implementing alternative language frontends
+	for breve, so that simulations can be written in languages beside 
+	steve, reading \ref breveObjectAPI is the first step.
+
+	Once a language frontend has been written, the user may either link
+	their new language frontend against an existing application frontend, 
+	which is described in \ref breveFrontendAPI, or may construct
+	a totally novel application frontend, which uses the API documented 
+	in \ref breveEngineAPI.
+
+	Users wishing to use breve simulations as part of other applications
+	should also refer to \ref breveEngineAPI.
+
+	When a new breve object frontend has been implemented, the standard
+	breve class files will need to be ported to the new language.  Working
+	from the standard steve-language class files, this is a rather 
+	straightforward process, but the simulation API is documented in
+	further detail in \ref InternalFunctions.
+*/
+
 #include "util.h"
 
 #ifdef MINGW
@@ -73,6 +101,3 @@
 
 #include "format.h"
 #include "interface.h"
-
-int yyparse(void);
-char *slFormatText(char *text);

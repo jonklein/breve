@@ -2,6 +2,10 @@
 
 #include "errorText.h"
 
+#include "breveFunctionsSteveDataObject.h"
+#include "breveFunctionsSteveObject.h"
+#include "breveFunctionsSteveXML.h"
+
 extern char *yyfile;
 extern int lineno;
 
@@ -15,11 +19,11 @@ void breveFrontendCleanupData(void *data) {
 	stSteveCleanup(data);
 }
 
-int breveFrontendLoadSimulation(brFrontend *frontend, char *code, char *file) {
+int breveFrontendLoadSimulation(breveFrontend *frontend, char *code, char *file) {
 	return stLoadSimulation(frontend->data, frontend->engine, code, file);
 }
 
-int breveFrontendLoadSavedSimulation(brFrontend *frontend, char *simcode, char *simfile, char *xmlfile) {
+int breveFrontendLoadSavedSimulation(breveFrontend *frontend, char *simcode, char *simfile, char *xmlfile) {
 	return stLoadSavedSimulation(frontend->data, frontend->engine, simcode, simfile, xmlfile);
 }
 
@@ -236,7 +240,7 @@ int stLoadSimulation(stSteveData *d, brEngine *engine, char *code, char *file) {
 
 	controller = stInstanceNew(controllerClass->pointer);
 
-	controller->breveInstance = brAddInstanceToEngine(engine, controllerClass, controller);
+	controller->breveInstance = brEngineAddInstance(engine, controllerClass, controller);
 
 	brEngineSetController(engine, controller->breveInstance);
 

@@ -71,9 +71,9 @@ stObject *stObjectNew(brEngine *engine, stSteveData *sdata, char *name, char *al
 
 	// save this object in the engine's object namespace
 
-	bo = brAddObjectToEngine(engine, &sdata->steveObjectType, name, o);
+	bo = brEngineAddObject(engine, &sdata->steveObjectType, name, o);
 	
-	if(alias) brAddObjectAlias(engine, alias, bo);
+	if(alias) brEngineAddObjectAlias(engine, alias, bo);
 
 	sdata->allObjects = slListPrepend(sdata->allObjects, o);
 
@@ -91,7 +91,7 @@ stInstance *stInstanceCreateAndRegister(brEngine *e, brObject *class) {
 
 	newi = stInstanceNew(class->pointer);
 
-	newi->breveInstance = brAddInstanceToEngine(e, class, newi);
+	newi->breveInstance = brEngineAddInstance(e, class, newi);
 
 	stInstanceInit(newi);
 
@@ -216,6 +216,7 @@ void stInstanceFreeNoInstanceLists(stInstance *i) {
 	ri.type = i->type;
 
 	stCallMethodByName(&ri, "destroy", &result);
+	stMethodTrace(&ri, "delete");
 
 	brInstanceRelease(i->breveInstance);
 

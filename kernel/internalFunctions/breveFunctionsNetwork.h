@@ -39,11 +39,11 @@ void *brHandleConnection(void *data);
 brNetworkServerData *brListenOnPort(int port, brEngine *engine);
 void *brListenOnSocket(brNetworkServerData *serverData);
 
-int brIListenOnPort(brEval *args, brEval *target, brInstance *i);
-int brICloseServer(brEval *args, brEval *target, brInstance *i);
-int brISendObject(brEval *args, brEval *target, brInstance *i);
-int brIGetServerURL(brEval *args, brEval *target, brInstance *i);
-int brISetIndexPage(brEval *args, brEval *target, brInstance *i);
+int brIListenOnPort(brEval args[], brEval *target, brInstance *i);
+int brICloseServer(brEval args[], brEval *target, brInstance *i);
+int brISendObject(brEval args[], brEval *target, brInstance *i);
+int brIGetServerURL(brEval args[], brEval *target, brInstance *i);
+int brISetIndexPage(brEval args[], brEval *target, brInstance *i);
 
 char *brFinishNetworkRead(brNetworkClientData *data, brNetworkRequest *request);
 

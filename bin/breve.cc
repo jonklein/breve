@@ -25,27 +25,8 @@
 	steve-frontend version of the breve simulation environment.
 */
 
-#include <stdio.h>
-#include <sys/param.h>
-
-#include <pthread.h>
-
-#include <readline/readline.h>
-#include <readline/history.h>
-
 #include "steve.h"
 #include "breve.h"
-
-/*!
-	\brief Callback data for additional rendering windows.
-*/
-
-struct slGLUTWindow {
-	int id;
-	slGraph *graph;
-};
-
-typedef struct slGLUTWindow slGLUTWindow;
 
 #ifdef MINGW
 extern char *optarg;
@@ -96,7 +77,7 @@ int gThreadRunning = 0;
 int gFull = 0;
 int gFormat = 0;
 
-brFrontend *frontend;
+breveFrontend *frontend;
 
 slGLUTWindow *gWindows[1024];
 
@@ -152,7 +133,7 @@ int main(int argc, char **argv) {
 		exit(0);
 	}
 
-	frontend = brFrontendInit(argc, argv);
+	frontend = breveFrontendInit(argc, argv);
 	frontend->data = breveFrontendInitData(frontend->engine);
 
 	brEngineSetIOPath(frontend->engine, getcwd(wd, 10239));
@@ -211,7 +192,7 @@ int main(int argc, char **argv) {
 
 	if(gFull) glutFullScreen();
 
-	glutSetCursor(GLUT_CURSOR_INFO);
+	// glutSetCursor(GLUT_CURSOR_INFO);
 
 	glutMainLoop();
 
@@ -227,11 +208,11 @@ void *workerThread(void *data) {
 
 	while(1) {
 		if(!gPaused && !frontend->engine->drawEveryFrame) {
-			pthread_mutex_lock(&gEngineMutex);
+			brEngineLock(frontend->engine);
 
    		 	r = brEngineIterate(frontend->engine);
 
-			pthread_mutex_unlock(&gEngineMutex);
+			brEngineUnlock(frontend->engine);
 
 			if(!r) brQuit(frontend->engine);
 		}
@@ -307,7 +288,7 @@ void brQuit(brEngine *e) {
 
 	gThreadShouldExit = 1;
 
-	/* wait for the thread to exit -- it will set gThreadShouldExit back to 0 */
+	// wait for the thread to exit -- it will set gThreadShouldExit back to 0 
 
 	pthread_mutex_unlock(&gThreadMutex);
 	while(gThreadRunning && gThreadShouldExit);
@@ -503,11 +484,10 @@ void slDemoReshape(int x, int y) {
 }
 
 void slDemoDisplay() {
-	pthread_mutex_lock(&gEngineMutex);
+	brEngineLock(frontend->engine);
+	brEngineRenderWorld(frontend->engine, gMotionCrosshair);
+	brEngineUnlock(frontend->engine);
 
-	slRenderWorld(frontend->engine->world, frontend->engine->camera, 0, GL_RENDER, gMotionCrosshair, 0);
-
-	pthread_mutex_unlock(&gEngineMutex);
 	glutSwapBuffers();
 }
 

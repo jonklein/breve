@@ -44,9 +44,6 @@ Real : Stationary (aka Stationaries) [version 1.8] {
 
         return objectLocation.
 
-    + to destroy:
-        if realWorldPointer: removeObject(realWorldPointer).
-
     - to get-world-object:
         % Used internally to get the pointer to the world.  Do not use this method
         % in user simulations.

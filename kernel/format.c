@@ -84,10 +84,15 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 			pi = BRINSTANCE(e);
 			if(pi) {
 				char *desc = brObjectDescription(pi);
+
+				if(desc && strlen(desc) == 0) {
+					slFree(desc);
+					desc = NULL;
+				}
+
 				if(desc) {
 					result = slMalloc(strlen(pi->class->name) + (sizeof(void*)*2) + 6 + strlen(desc));
 					sprintf(result, "%s (%p) %s", pi->class->name, pi, desc);
-					slFree(desc);
 					return result;
 				} else {
 					result = slMalloc(strlen(pi->class->name) + (sizeof(void*)*2) + 6);

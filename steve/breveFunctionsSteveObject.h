@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-void stInitObjectFuncs(brNamespace *n);
+void breveInitSteveObjectFuncs(brNamespace *n);
 
 int stOObjectName(brEval args[], brEval *target, brInstance *i);
 int stOisa(brEval args[], brEval *target, brInstance *i);

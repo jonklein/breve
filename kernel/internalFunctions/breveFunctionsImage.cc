@@ -30,7 +30,7 @@
 	int imageGetWidth(brImageData pointer).
 */
 
-int brIImageGetWidth(brEval *args, brEval *result, brInstance *i) {
+int brIImageGetWidth(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm = BRPOINTER(&args[0]);
 
 	BRINT(result) = dm->x;
@@ -43,7 +43,7 @@ int brIImageGetWidth(brEval *args, brEval *result, brInstance *i) {
 	int imageGetHeight(brImageData pointer).
 */
 
-int brIImageGetHeight(brEval *args, brEval *result, brInstance *i) {
+int brIImageGetHeight(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm = BRPOINTER(&args[0]);
 
 	BRINT(result) = dm->y;
@@ -61,7 +61,7 @@ int brIImageGetHeight(brEval *args, brEval *result, brInstance *i) {
 	to get the desired red, green or blue pixel.
 */
 
-int brIImageGetValueAtCoordinates(brEval *args, brEval *result, brInstance *i) {
+int brIImageGetValueAtCoordinates(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm = BRPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
@@ -87,7 +87,7 @@ int brIImageGetValueAtCoordinates(brEval *args, brEval *result, brInstance *i) {
 	to set the desired red, green or blue pixel.
 */
 
-int brIImageSetValueAtCoordinates(brEval *args, brEval *result, brInstance *i) {
+int brIImageSetValueAtCoordinates(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm = BRPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
@@ -107,7 +107,7 @@ int brIImageSetValueAtCoordinates(brEval *args, brEval *result, brInstance *i) {
 	\brief Reads Image data from the screen.
 */
 
-int brIImageReadPixels(brEval *args, brEval *result, brInstance *i) {
+int brIImageReadPixels(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm = BRPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
@@ -123,7 +123,7 @@ int brIImageReadPixels(brEval *args, brEval *result, brInstance *i) {
 	brImageData pointer imageLoadFromFile(string).
 */
 
-int brIImageLoadFromFile(brEval *args, brEval *result, brInstance *i) {
+int brIImageLoadFromFile(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm;
 	char *file;
 	int c;
@@ -159,7 +159,7 @@ int brIImageLoadFromFile(brEval *args, brEval *result, brInstance *i) {
 	\brief Updates the texture and returns the texture number number associated with an image.
 */
 
-int brIImageUpdateTexture(brEval *args, brEval *result, brInstance *i) { 
+int brIImageUpdateTexture(brEval args[], brEval *result, brInstance *i) { 
 	brImageData *image = BRPOINTER(&args[0]);
 
 	if(!image) {
@@ -182,7 +182,7 @@ int brIImageUpdateTexture(brEval *args, brEval *result, brInstance *i) {
 	Used by plugins that need raw pixel access.
 */
 
-int brIImageGetPixelPointer(brEval *args, brEval *result, brInstance *i) {
+int brIImageGetPixelPointer(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm = BRPOINTER(&args[0]);
 
 	if(!dm) {
@@ -201,7 +201,7 @@ int brIImageGetPixelPointer(brEval *args, brEval *result, brInstance *i) {
 	int imageWriteToFile(brImageData pointer, string).
 */
 
-int brIImageWriteToFile(brEval *args, brEval *result, brInstance *i) {
+int brIImageWriteToFile(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm = BRPOINTER(&args[0]);
 	char *file;
 
@@ -221,7 +221,7 @@ int brIImageWriteToFile(brEval *args, brEval *result, brInstance *i) {
 	brImageData pointer imageDataInit(int, int).
 */
 
-int brIImageDataInit(brEval *args, brEval *result, brInstance *i) {
+int brIImageDataInit(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm;
 	int x, y;
 
@@ -252,11 +252,14 @@ int brIImageDataInit(brEval *args, brEval *result, brInstance *i) {
 	imageDataFree(brImageData).
 */
 
-int brIImageDataFree(brEval *args, brEval *result, brInstance *i) {
+int brIImageDataFree(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm = BRPOINTER(&args[0]);
 	GLuint texture = dm->textureNumber;
 
-	if(dm->textureNumber != -1) glDeleteTextures(1, &texture);
+	if(dm->textureNumber != -1) {
+		printf("deleting texture %d\n", texture);
+		glDeleteTextures(1, &texture);
+	}
 
 	slFree(dm->data);
 	slFree(dm);

@@ -60,4 +60,4 @@ typedef struct brNetworkServerData brNetworkServerData;
 typedef struct brNetworkRequest brNetworkRequest;
 typedef struct brStringHeader brStringHeader;
 
-typedef struct brFrontend brFrontend;
+typedef struct breveFrontend breveFrontend;

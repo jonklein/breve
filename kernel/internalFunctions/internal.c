@@ -18,7 +18,27 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-/*! \defgroup InternalFunctions The C-Style Internal Function Simulation API */
+/*! \defgroup InternalFunctions The C-Style Internal Function Simulation API: the simulation API
+
+	The functions outlined in this section comprise the C-Style 
+	Internal Function Simulation API through which all of the 
+	breve simulation functionality is accessed.
+
+	The functions here are not simple C-functions as in the other
+	APIs---they are designed for simple interaction with "steve"
+	and other interpreted languages.  This is done by encapsulating
+	the input arguments and return values as \ref brEval structures.
+
+	As a result, all of the simulation API functions have the same 
+	function definition:
+
+	int simulationFunction(brEval args[], brEval *target, brInstance *i)
+
+	To call the functions in this API, you must encode the inputs in	
+	an array of \ref brEval structures, and decode the output from 
+	a \ref brEval as well.
+*/
+
 /*@{*/
 
 #include "kernel.h"

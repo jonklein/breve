@@ -22,99 +22,8 @@
 
 char *interfaceID;
 
-/** \defgroup API The breve external API */
+/** \defgroup breveEngineAPI The breve engine API: using a breve simulation from another program or application frontend */
 /*@{*/
-
-/*!
-	\brief Set the controller object for the simulation.
-*/
-
-int brEngineSetController(brEngine *e, brInstance *instance) {
-	if(e->controller) {
-		stParseError(e, PE_REDEFINITION, "Redefinition of \"Controller\" object");
-		return -1;
-	}
-
-	e->controller = instance;
-
-	return 0;
-}
-
-/*!
-	\brief Sets the output path, and adds the path to the search path.
-*/
-
-void brEngineSetIOPath(brEngine *e, char *path) {
-	if(e->outputPath) slFree(e->outputPath);
-	e->outputPath = slStrdup(path);
-	brAddSearchPath(e, path);
-}
-
-/*!
-	\brief Sets the output path.
-*/
-
-char *brOutputPath(brEngine *e, char *filename) {
-	char *f;
-
-	f = slMalloc(strlen(filename) + strlen(e->outputPath) + 3);
-
-	sprintf(f, "%s/%s", e->outputPath, filename);
-
-	return f;
-}
-
-/*!
-	\brief A wrapper for slMessage.
-
-	This function is a callback used by funopen() to associate a 
-	FILE* pointer with the slMessage logging system.  This allows
-	output written to a file pointer to be directed to the breve
-	log.  This function is not typically called manually.
-*/
-
-int brFileLogWrite(void *m, const char *buffer, int length) {
-	char *s = alloca(length + 1);
-	strncpy(s, buffer, length);
-
-	s[length] = 0;
-
-	slMessage(DEBUG_ALL, s);
-
-	return length;
-}
-
-/*!
-    \brief Pause the simulation timer.
-
-    Optional call to be made when the engine is paused,
-    so that we can track the realtime required for the simulation.
-*/
-
-void brPauseTimer(brEngine *e) {
-	struct timeval tv;
-
-	if(e->startTime.tv_sec == 0 && e->startTime.tv_usec == 0) return;
-
-	gettimeofday(&tv, NULL);
-
-	e->realTime.tv_sec += (tv.tv_sec - e->startTime.tv_sec);
-	e->realTime.tv_usec += (tv.tv_usec - e->startTime.tv_usec);
-
-	e->startTime.tv_sec = 0;
-	e->startTime.tv_usec = 0;
-}
-
-/*!
-    \brief Unpause the simulation timer.
-
-    Optional call to be made when the engine is running at fullspeed,
-    so that we can track the realtime required for the simulation.
-*/
-
-void brUnpauseTimer(brEngine *e) {
-	gettimeofday(&e->startTime, NULL);
-}
 
 /*!
     \brief Creates a brEngine structure.
@@ -221,28 +130,30 @@ brEngine *brEngineNew() {
 
 	e->controllerName = NULL;
 
-	/* objects is one of those "doubling" arrays that starts */
-	/* small and doubles in size when necessary */
+	// allocate self-growing stacks for the instances and the 
+	// iteration methods
 
 	e->instances = slStackNew();
 	e->postIterationInstances = slStackNew();
 	e->iterationInstances = slStackNew();
 
-	/* namespaces holding object names and method names */
+	// namespaces holding object names and method names 
 
 	e->objects = brNamespaceNew(128);
 	e->internalMethods = brNamespaceNew(128);
 
-	/* set up the initial search paths */
+	// set up the initial search paths 
 
 	e->searchPath = NULL;
 
 	brEngineSetIOPath(e, "");
 
+	// load all of the internal breve functions
+
 	brLoadInternalFunctions(e);
 
-	/* add the default class path, and check the BREVE_CLASS_PATH */
-	/* environment variable to see if it adds any more */
+	// add the default class path, and check the BREVE_CLASS_PATH 
+	// environment variable to see if it adds any more 
 
 	brAddSearchPath(e, "lib/classes");
 
@@ -255,10 +166,14 @@ brEngine *brEngineNew() {
 	}
 
 	if((envpath = getenv("HOME"))) {
+		// the user's home directory as a search path
+
 		brAddSearchPath(e, envpath);
 	}
 
 	e->windows = NULL;
+
+	bzero(e->keys, 256);
 
 	for(n=1;n<e->nThreads;n++) {
 		stThreadData *data;
@@ -271,7 +186,6 @@ brEngine *brEngineNew() {
 
 	return e;
 }
-
 
 /*!
 	\brief Frees a breve engine.
@@ -347,18 +261,96 @@ void brEngineFree(brEngine *e) {
 
 	slFree(e);
 }
+/*!
+	\brief Set the controller object for the simulation.
+
+	This function should be called as soon as the controller instance 
+	is created <b>before the controller's initialization methods are
+	even called</b>.  
+*/
+
+int brEngineSetController(brEngine *e, brInstance *instance) {
+	if(e->controller) {
+		stParseError(e, PE_REDEFINITION, "Redefinition of \"Controller\" object");
+		return -1;
+	}
+
+	e->controller = instance;
+
+	return 0;
+}
+
+/*!
+	\brief Sets the output path, and adds the path to the search path.
+*/
+
+void brEngineSetIOPath(brEngine *e, char *path) {
+	if(e->outputPath) slFree(e->outputPath);
+	e->outputPath = slStrdup(path);
+	brAddSearchPath(e, path);
+}
+
+/*!
+	\brief Sets the output path.
+*/
+
+char *brOutputPath(brEngine *e, char *filename) {
+	char *f;
+
+	f = slMalloc(strlen(filename) + strlen(e->outputPath) + 3);
+
+	sprintf(f, "%s/%s", e->outputPath, filename);
+
+	return f;
+}
+
+/*!
+	\brief Pause the simulation timer.
+
+    Optional call to be made when the engine is paused,
+    so that information about simulation speed can be measured.
+
+	Used in conjunction with \ref brUnpauseTimer.
+*/
+
+void brPauseTimer(brEngine *e) {
+	struct timeval tv;
+
+	if(e->startTime.tv_sec == 0 && e->startTime.tv_usec == 0) return;
+
+	gettimeofday(&tv, NULL);
+
+	e->realTime.tv_sec += (tv.tv_sec - e->startTime.tv_sec);
+	e->realTime.tv_usec += (tv.tv_usec - e->startTime.tv_usec);
+
+	e->startTime.tv_sec = 0;
+	e->startTime.tv_usec = 0;
+}
+
+/*!
+    \brief Unpause the simulation timer.
+
+    Optional call to be made when the engine is running at fullspeed,
+    so that information about simulation speed can be measured.
+
+	Used in conjunction with \ref brPauseTimer.
+*/
+
+void brUnpauseTimer(brEngine *e) {
+	gettimeofday(&e->startTime, NULL);
+}
 
 /*!  
 	\brief Adds a call to a method for an instance at a given time.
 */
 
-brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *name, double time) {
+brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *methodName, double time) {
 	brEvent *event;
 	slList *l, *eventEntry;
 
 	event = slMalloc(sizeof(brEvent));
 
-	event->name = slStrdup(name);
+	event->name = slStrdup(methodName);
 	event->instance = i;
 	event->time = time;
 
@@ -438,7 +430,7 @@ int brEngineIterate(brEngine *e) {
 		i = e->instances->data[n];
 
 		if(i->status == AS_RELEASED) {
-			brInstanceRemove(e, i);
+			brEngineRemoveInstance(e, i);
 			brInstanceFree(i);
 
 			// all the other objects are shifted down, so we 
@@ -529,7 +521,7 @@ char *brFindFile(brEngine *e, char *file, struct stat *st) {
 }
 
 /*!
-	\brief Render the current simulation world.
+	\brief Render the current simulation world to an active OpenGL context.
 
 	Requires that a valid OpenGL context is active.
 */
@@ -593,23 +585,6 @@ void brFreeObjectSpace(brNamespace *ns) {
 	slListFree(start);
     
     brNamespaceFree(ns);
-}
-
-/*!
-	\brief Removes an object from the engine.  
-
-	The object may still exist in the simulation (technically), but it 
-	will no longer be iterated by the engine.
-*/
-
-void brInstanceRemove(brEngine *e, brInstance *i) {
-	// inform the camera of the change
-
-	if(e->camera) e->camera->recompile = 1;
-
-	slStackRemove(e->instances, i);
-	slStackRemove(e->iterationInstances, i);
-	slStackRemove(e->postIterationInstances, i);
 }
 
 /*!
@@ -681,4 +656,30 @@ void brEvalError(brEngine *e, int type, char *proto, ...) {
     slMessage(DEBUG_ALL, "\n");
 }
 
+/*!
+	\brief A wrapper for slMessage.
+
+	This function is a callback used by funopen() to associate a 
+	FILE* pointer with the slMessage logging system.  This allows
+	output written to a file pointer to be directed to the breve
+	log.  This function is not typically called manually.
+*/
+
+int brFileLogWrite(void *m, const char *buffer, int length) {
+	char *s = alloca(length + 1);
+	strncpy(s, buffer, length);
+
+	s[length] = 0;
+
+	slMessage(DEBUG_ALL, s);
+
+	return length;
+}
+
+/*!
+    \brief Pause the simulation timer.
+
+    Optional call to be made when the engine is paused,
+    so that we can track the realtime required for the simulation.
+*/
 

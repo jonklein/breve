@@ -19,6 +19,25 @@
  *****************************************************************************/
 
 #include <getopt.h>
+#include <stdio.h>
+#include <sys/param.h>
+#include <pthread.h>
+
+#ifdef HAVE_LIBREADLINE
+#include <readline/readline.h>
+#include <readline/history.h>
+#endif
+
+/*!
+	\brief Callback data for additional rendering windows.
+*/
+
+struct slGLUTWindow {
+	int id;
+	slGraph *graph;
+};
+
+typedef struct slGLUTWindow slGLUTWindow;
 
 struct option gCLIOptions[] = {
         { "debug",      required_argument, 0, 'd' },
@@ -38,7 +57,6 @@ struct option gCLIOptions[] = {
         { "master",     no_argument,       0, 'M' }
 };
 
-void steveInit(void);
 int brParseArgs(int argc, char **argv);
 
 void brPrintUsage(char *name);

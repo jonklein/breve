@@ -1,0 +1,79 @@
+#!/Users/jk/dev/breve/bin/breve --version
+
+# include some frequently used classes and specify common classpaths
+
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use Stationary.
+@use NetworkServer.
+
+# tell the engine the name of the controller
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+	+ variables:
+		agent (object).
+
+	+ to init:
+		new NetworkServer listen on-port 30304.
+		agent = new Agent.
+
+		self schedule method-call "send" at-time 5.0.
+
+	+ to iterate:
+		super iterate.
+
+	+ to send:
+		agent send-over-network to "localhost" on 30304.
+
+	+ to accept-upload of theObject (object) from host (string):
+		print "received upload of $theObject from $host".
+
+		if ((theObject get-sub) get-list-string) == "cat": {
+			self end-simulation.
+		} else {
+			die "Error dearchiving networked object".
+		}
+}
+
+Mobile : Agent {
+	+ variables:
+		sub (object).
+
+	+ to init:
+		sub = new SubordinateAgent.
+
+		self add-dependency on sub.
+		self set-velocity to (0, -1, 0).
+
+	+ to iterate:
+		sub move to (self get-location) + (0, 1, 0).
+
+	+ to get-sub:
+		return sub.
+
+	+ to dearchive:
+		result (int).
+
+		result = (super dearchive).
+
+		self set-velocity to (0, 1, 0).
+}
+
+Mobile : SubordinateAgent {
+	+ variables:
+		l (list).
+
+	+ to init:
+		l = { 1, "cat" }.
+		self set-color to (1, 0, 0).
+
+	+ to get-list-string:
+		return l{1}.
+}

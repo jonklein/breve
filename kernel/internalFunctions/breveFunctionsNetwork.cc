@@ -51,7 +51,7 @@ struct brNetworkClientData {
 	void closeServer(brNetworkServerData pointer).
 */
 
-int brICloseServer(brEval *args, brEval *target, brInstance *i) {
+int brICloseServer(brEval args[], brEval *target, brInstance *i) {
 	brNetworkServerData *data = BRPOINTER(&args[0]);
 
 	if(!data) {
@@ -77,7 +77,7 @@ int brICloseServer(brEval *args, brEval *target, brInstance *i) {
 	void listenOnPort(brNetworkServerData pointer, string).
 */
 
-int brISetIndexPage(brEval *args, brEval *target, brInstance *i) {
+int brISetIndexPage(brEval args[], brEval *target, brInstance *i) {
 	brNetworkServerData *data = BRPOINTER(&args[0]);
 
 	if(data->index) slFree(data->index);
@@ -93,7 +93,7 @@ int brISetIndexPage(brEval *args, brEval *target, brInstance *i) {
 	string listenOnPort(brNetworkServerData pointer).
 */
 
-int brIGetServerURL(brEval *args, brEval *target, brInstance *i) {
+int brIGetServerURL(brEval args[], brEval *target, brInstance *i) {
 	brNetworkServerData *data = BRPOINTER(&args[0]);
 	char hostname[1024], url[1024];
 	int l = 1024;
@@ -113,7 +113,7 @@ int brIGetServerURL(brEval *args, brEval *target, brInstance *i) {
 	brNetworkServerData pointer listenOnPort(int).
 */
 
-int brIListenOnPort(brEval *args, brEval *target, brInstance *i) {
+int brIListenOnPort(brEval args[], brEval *target, brInstance *i) {
 	BRPOINTER(target) = brListenOnPort(BRINT(&args[0]), i->engine);
 
 	return EC_OK;
@@ -224,7 +224,7 @@ void *brListenOnSocket(brNetworkServerData *serverData) {
 		clientData->socket = accept(serverData->socket, (struct sockaddr*)&clientData->addr, &caddr_size);
 
 		if(clientData->socket != -1) {
-			fcntl(clientData->socket, F_SETFL, O_NONBLOCK);
+			// fcntl(clientData->socket, F_SETFL, O_NONBLOCK);
 			brHandleConnection(clientData);
 			close(clientData->socket);
 		}

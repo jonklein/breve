@@ -43,8 +43,8 @@ Image : DynamicTexture {
 
 		n++.
 
-		# updating at every iteration is too slow, and we can't even see
-		# the effect, so we'll do it every 20 iterations.
+		# updating at every iteration makes the cube turn too slow, and 
+		# the static go too fast!  so we'll do it every 20 iterations.
 
 		if n % 20: return.
 

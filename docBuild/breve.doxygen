@@ -437,7 +437,7 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a 
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 
-EXCLUDE                = ../include ../lib ../steve/steveparse.tab.c ../steve/steveparse.tab.h ../steve/stevelex.c ../steve/format.c ../plugins
+EXCLUDE                = ../include ../lib ../steve/steveparse.tab.c ../steve/steveparse.tab.h ../steve/stevelex.c ../steve/format.c ../plugins ../OSX
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or directories 
 # that are symbolic links (a Unix filesystem feature) are excluded from the input.
@@ -567,7 +567,7 @@ GENERATE_HTML          = YES
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be 
 # put in front of it. If left blank `html' will be used as the default path.
 
-HTML_OUTPUT            = html
+HTML_OUTPUT            = .
 
 # The HTML_FILE_EXTENSION tag can be used to specify the file extension for 
 # each generated HTML page (for example: .htm,.php,.asp). If it is left blank 

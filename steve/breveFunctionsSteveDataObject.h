@@ -30,7 +30,7 @@ struct brDataObjectHeader {
 
 typedef struct brDataObjectHeader brDataObjectHeader;
 
-void stInitDataFuncs(brNamespace *n);
+void breveInitSteveDataObjectFuncs(brNamespace *n);
 
 int stDDataCheckVariables(brEval *args, brEval *result, brInstance *i);
 int stDDataCopyObject(brEval *args, brEval *result, brInstance *i);

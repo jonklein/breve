@@ -31,7 +31,7 @@
 	Sets the root of the multibody to the given link.
 */
 
-int brISetMultibodyRoot(brEval *args, brEval *target, brInstance *i) {
+int brISetMultibodyRoot(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *mb = BRPOINTER(&args[0]);
 	slLink *root = BRPOINTER(&args[1]);
 
@@ -48,7 +48,7 @@ int brISetMultibodyRoot(brEval *args, brEval *target, brInstance *i) {
 	Creates a new, unattached multibody.
 */
 
-int brIMultibodyNew(brEval *args, brEval *target, brInstance *i) {
+int brIMultibodyNew(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *mb;
 
 	mb = slMultibodyNew(i->engine->world);
@@ -67,7 +67,7 @@ int brIMultibodyNew(brEval *args, brEval *target, brInstance *i) {
 	Returns a list of all links and joints associated with a multibody.
 */
 
-int brIMultibodyAllObjects(brEval *args, brEval *target, brInstance *i) {
+int brIMultibodyAllObjects(brEval args[], brEval *target, brInstance *i) {
 	slList *l, *start;
 	brEvalListHead *all;
 
@@ -100,7 +100,7 @@ int brIMultibodyAllObjects(brEval *args, brEval *target, brInstance *i) {
 	Destroys a multibody, but leaves all connected objects intact.
 */
 
-int brIMultibodyFree(brEval *args, brEval *target, brInstance *i) {
+int brIMultibodyFree(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *m = BRPOINTER(&args[0]);
 
 	i->engine->world->initialized = 0;
@@ -116,7 +116,7 @@ int brIMultibodyFree(brEval *args, brEval *target, brInstance *i) {
 	void multibodySetLocation(slMultibody pointer, vector).
 */
 
-int brIMultibodySetLocation(brEval *args, brEval *target, brInstance *i) {
+int brIMultibodySetLocation(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *mb = BRPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(&args[1]);
 
@@ -134,7 +134,7 @@ int brIMultibodySetLocation(brEval *args, brEval *target, brInstance *i) {
 	about the centerpoint of the root object.
 */
 
-int brIMultibodySetRotation(brEval *args, brEval *target, brInstance *i) {
+int brIMultibodySetRotation(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *mb = BRPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(&args[1]);
 	double len = BRDOUBLE(&args[2]);
@@ -147,7 +147,7 @@ int brIMultibodySetRotation(brEval *args, brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
-int brIMultibodySetRotationMatrix(brEval *args, brEval *target, brInstance *i) {
+int brIMultibodySetRotationMatrix(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *mb = BRPOINTER(&args[0]);
 
 	slMultibodyPosition(mb, NULL, BRMATRIX(&args[1]));
@@ -162,7 +162,7 @@ int brIMultibodySetRotationMatrix(brEval *args, brEval *target, brInstance *i) {
 	Rotates a multibody around a given vector by a given double amount.
 */
 
-int brIMultibodyRotateRelative(brEval *args, brEval *target, brInstance *i) {
+int brIMultibodyRotateRelative(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *mb = BRPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(&args[1]);
 	double len = BRDOUBLE(&args[2]);

@@ -23,7 +23,7 @@
 /*! \addtogroup InternalFunctions */
 /*@{*/
 
-int brIAddStationary(brEval *args, brEval *target, brInstance *i) {
+int brIAddStationary(brEval args[], brEval *target, brInstance *i) {
 	slShape *sh = BRPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(&args[1]);
 	slStationary *st;

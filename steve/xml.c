@@ -366,10 +366,7 @@ int stXMLPrintList(FILE *file, char *name, brEvalListHead *theHead, int spaces) 
 	spaces += XML_INDENT_SPACES;
 
 	while(list) {
-		brEval newEval;
-
-		brEvalCopy(&list->eval, &newEval);
-		stXMLPrintEval(file, "", &newEval, spaces);
+		stXMLPrintEval(file, "", &list->eval, spaces);
 		list = list->next;
 	}
 
@@ -628,6 +625,7 @@ stInstance *stXMLDearchiveObjectFromStream(brEngine *e, FILE *stream) {
 stInstance *stXMLDearchiveObjectFromString(brEngine *e, char *buffer) {
 	XML_Parser parser;
 	stXMLParserState parserState;
+	stInstance *dearchivedInstance;
 	int result = 0;
 
 	bzero(&parserState, sizeof(stXMLParserState));
@@ -672,16 +670,16 @@ stInstance *stXMLDearchiveObjectFromString(brEngine *e, char *buffer) {
 		result = -1;
 	}
 
+	dearchivedInstance = stXMLFindDearchivedInstance(parserState.instances, parserState.archiveIndex);
+
 	stXMLRunDearchiveMethods(parserState.instances);
 
-	if(parserState.error) {
-		result = -1;
-	}
+	if(parserState.error) result = -1;
 
 	XML_ParserFree(parser);
 
 	if(result == -1) return NULL;
-	else return stXMLFindDearchivedInstance(parserState.instances, parserState.archiveIndex);
+	else return dearchivedInstance;
 }
 
 int stXMLInitSimulationFromFile(brEngine *e, char *filename) {
@@ -1046,7 +1044,7 @@ void stXMLObjectEndElementHandler(stXMLParserState *userData, const XML_Char *na
 
 					o = brObjectFind(userData->engine, userData->currentInstance->type->name);
 
-					userData->currentInstance->breveInstance = brAddInstanceToEngine(userData->engine, o, userData->currentInstance);
+					userData->currentInstance->breveInstance = brEngineAddInstance(userData->engine, o, userData->currentInstance);
 
 					if(userData->controllerIndex == userData->currentInstance->index) 
 						userData->engine->controller = userData->currentInstance->breveInstance;
@@ -1068,13 +1066,7 @@ void stXMLObjectEndElementHandler(stXMLParserState *userData, const XML_Char *na
 
 						stSetVariable(&userData->currentInstance->variables[var->offset], var->type->type, NULL, &lastState->eval, &ri);	
 
-						// this is the end of the line for an eval we generated, so unretain it
-						// of course, it still exists in the variable we set, but no longer in 
-						// the current context.
-						// Does this work with the new GC?
-						// stGCUnretain(&lastState->eval);
-
-						// GC here?
+						stGCCollect(&lastState->eval);
 					}
 				}
 				break;
@@ -1087,13 +1079,14 @@ void stXMLObjectEndElementHandler(stXMLParserState *userData, const XML_Char *na
 					brEvalCopy(&lastState->eval, &state->key);
 				} else if(lastState->state == XP_VALUE) {
 					brEvalHashStore(BRHASH(&state->eval), &state->key, &lastState->eval, NULL);
-					// GC here?
 				}
+
+				stGCCollect(&lastState->eval);
+
 				break;
 			case XP_LIST:
 				brEvalListInsert(BRLIST(&state->eval), BRLIST(&state->eval)->count, &lastState->eval);
-
-				// GC here?
+				stGCCollect(&lastState->eval);
 
 				break;
 			case XP_ARRAY:
@@ -1107,7 +1100,7 @@ void stXMLObjectEndElementHandler(stXMLParserState *userData, const XML_Char *na
 				state->arrayIndex++;
 				break;
 			case XP_DEPENDENCIES:
-				brAddDependency(userData->currentInstance->breveInstance, STINSTANCE(&lastState->eval)->breveInstance);
+				brInstanceAddDependency(userData->currentInstance->breveInstance, STINSTANCE(&lastState->eval)->breveInstance);
 				break;
 		} 
 	}

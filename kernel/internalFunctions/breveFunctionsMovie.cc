@@ -24,7 +24,7 @@
 /*@{*/
 
 #ifdef HAVE_LIBAVCODEC
-int breveMovieCreate(brEval *args, brEval *result, brInstance *i) {
+int breveMovieCreate(brEval args[], brEval *result, brInstance *i) {
 	slCamera *camera = i->engine->camera;
 	slMovie *movie;
 	char *path;
@@ -39,7 +39,7 @@ int breveMovieCreate(brEval *args, brEval *result, brInstance *i) {
 	return EC_OK;
 }
 
-int breveMovieAddGLFrame(brEval *args, brEval *result, brInstance *i) {
+int breveMovieAddGLFrame(brEval args[], brEval *result, brInstance *i) {
 	slMovie *movie = BRPOINTER(&args[0]);
 
 #ifdef HAVE_LIBOSMESA
@@ -50,7 +50,7 @@ int breveMovieAddGLFrame(brEval *args, brEval *result, brInstance *i) {
 	return EC_OK;
 }
 
-int breveMovieClose(brEval *args, brEval *result, brInstance *i) {
+int breveMovieClose(brEval args[], brEval *result, brInstance *i) {
 	slMovie *movie = BRPOINTER(&args[0]);
 
 	if(!movie) {
@@ -66,7 +66,7 @@ int breveMovieClose(brEval *args, brEval *result, brInstance *i) {
 #endif /* HAVE_LIBAVCODEC */
 
 #ifdef HAVE_LIBPNG
-int breveSnapshot(brEval *args, brEval *result, brInstance *i) {
+int breveSnapshot(brEval args[], brEval *result, brInstance *i) {
 	// this doesn't really belong here
 	char *path;
 	slCamera *c = i->engine->camera;
@@ -90,7 +90,7 @@ int breveSnapshot(brEval *args, brEval *result, brInstance *i) {
 	Prints an error message.
 */
 
-int breveMovieUnsupported(brEval *args, brEval *result, brInstance *i) {
+int breveMovieUnsupported(brEval args[], brEval *result, brInstance *i) {
     slMessage(DEBUG_ALL, "This version of breve was built without support for movie export\n");
 	return EC_ERROR;
 }
@@ -101,7 +101,7 @@ int breveMovieUnsupported(brEval *args, brEval *result, brInstance *i) {
 	Prints an error message.
 */
 
-int breveSnapshotUnsupported(brEval *args, brEval *result, brInstance *i) {
+int breveSnapshotUnsupported(brEval args[], brEval *result, brInstance *i) {
     slMessage(DEBUG_ALL, "This version of breve was built without support for image export\n");
 	return EC_ERROR;
 }

@@ -1,60 +1,14 @@
 #include "kernel.h"
 
-/** \addtogroup API */
+/** \defgroup breveObjectAPI The breve object API: constructing a new language frontend for breve
+
+	The functions and structures in this group are used for creating 
+	custom language frontends for breve.  If you wish to construct
+	breve simulations from other languages, you'll need to use the 
+	functions shown here to interface with the breve object API.
+*/
+
 /*@{*/
-
-/*!
-	\brief Adds a collision handler to an object.
-
-    Defines a behavior for when object type "handler" collides with "collider".
-    The behavior is to call the specified method in the handler object
-    with the collider instance as an argument.
-*/
-
-int brAddCollisionHandler(brObject *handler, brObject *collider, brMethod *m) {
-	brCollisionHandler *ch;
-	int n;
-
-	for(n=0;n<handler->collisionHandlers->count;n++) {
-		ch = handler->collisionHandlers->data[n];
-
-		if(ch->object == collider && ch->method == m) return EC_STOP;
-	}
-
-	if(m->argumentCount > 0) {
-		if(m->argumentCount > 1) {
-			slMessage(DEBUG_ALL, "Collision handlers expect (at most) a single argument of type object.\n");
-			return EC_ERROR;
-		}
-	}
-
-	ch = slMalloc(sizeof(brCollisionHandler));
-
-	ch->object = collider;
-	ch->method = m;
-
-	slStackPush(handler->collisionHandlers, ch);
-
-	return EC_OK;
-}
-
-/*!
-    \brief Finds an object in the given namespace
-
-	returns an object with the given name from the given namespace.
-*/
-
-brObject *brObjectFind(brEngine *e, char *name) {
-	brNamespaceSymbol *nameSymbol;
-
-	nameSymbol = brNamespaceLookup(e->objects, name);
-
-	if(!nameSymbol) return NULL;
-
-	if(nameSymbol->type != ST_OBJECT && nameSymbol->type != ST_OBJECT_ALIAS) return NULL;
-
-	return nameSymbol->data;
-}
 
 /*!
 	\brief Finds a method in an object.
@@ -102,6 +56,24 @@ brMethod *brMethodFindWithArgRange(brObject *o, char *name, int min, int max) {
 	}
 
 	return NULL;
+}
+
+/*!
+    \brief Finds an object in the given namespace
+
+	returns an object with the given name from the given namespace.
+*/
+
+brObject *brObjectFind(brEngine *e, char *name) {
+	brNamespaceSymbol *nameSymbol;
+
+	nameSymbol = brNamespaceLookup(e->objects, name);
+
+	if(!nameSymbol) return NULL;
+
+	if(nameSymbol->type != ST_OBJECT && nameSymbol->type != ST_OBJECT_ALIAS) return NULL;
+
+	return nameSymbol->data;
 }
 
 /*!
@@ -175,7 +147,7 @@ int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, int cou
 	is executed for the observer.
 */
 
-int brAddObserver(brInstance *i, brInstance *observer, char *notification, char *mname) {
+int brInstanceAddObserver(brInstance *i, brInstance *observer, char *notification, char *mname) {
     brObserver *o;                                                           
     brMethod *method;
  
@@ -204,7 +176,7 @@ int brAddObserver(brInstance *i, brInstance *observer, char *notification, char 
 	instance i.
 */
     
-void brRemoveObserver(brInstance *i, brInstance *observerInstance, char *notification) {
+void brEngineRemoveInstanceObserver(brInstance *i, brInstance *observerInstance, char *notification) {
     slList *observerList, *match, *last;
     brObserver *observer;
 
@@ -243,7 +215,7 @@ void brRemoveObserver(brInstance *i, brInstance *observerInstance, char *notific
 	archiving the instance.
 */
 
-int brAddDependency(brInstance *i, brInstance *dependency) {
+int brInstanceAddDependency(brInstance *i, brInstance *dependency) {
     if(!i || !dependency) return 0;
 
     if(!slInList(i->dependencies, dependency)) i->dependencies = slListAppend(i->dependencies, dependency);
@@ -256,7 +228,7 @@ int brAddDependency(brInstance *i, brInstance *dependency) {
 	\brief Removes a dependency from i.
 */
 
-int brRemoveDependency(brInstance *i, brInstance *dependency) {
+int brEngineRemoveInstanceDependency(brInstance *i, brInstance *dependency) {
     if(!i || !dependency) return 0;
 
     if(slInList(i->dependencies, dependency)) i->dependencies = slListRemoveData(i->dependencies, dependency);
@@ -265,73 +237,12 @@ int brRemoveDependency(brInstance *i, brInstance *dependency) {
     return 1;  
 }
 
-/*!
-	\brief Destroys a brInstance structure.
-
-	Frees all of the data associated with a brInstance structure.
-*/
-
-void brInstanceFree(brInstance *i) {
-	slList *olist;
-	brObserver *observer;
-	int n;
-
-    slListFree(i->dependencies);
-    slListFree(i->dependents);
-
-    olist = slListCopy(i->observers);
-
-    while(olist) {
-        observer = olist->data;
-        slFree(observer->notification);
-        slFree(observer);
-        olist = olist->next;
-    }
-
-    slListFree(olist);
-    slListFree(i->observers);
-
-    i->observers = NULL;
-
-	// removing observers will modify the observee list,
-	// so copy the list first
-
-	olist = slListCopy(i->observees);
-
-    while(olist) {
-        brRemoveObserver(olist->data, i, NULL);
-		olist = olist->next;
-    }
-
-    slListFree(olist);
-
-    slListFree(i->observees);
-
-    for(n=0;n<i->menu.count;n++) {
-        slFree(i->menu.list[n]->title);
-        slFree(i->menu.list[n]->method);
-        slFree(i->menu.list[n]);
-    }
-
-	if(i->iterate) brMethodFree(i->iterate);
-	if(i->postIterate) brMethodFree(i->postIterate);
-
-    if(i->menu.list) slFree(i->menu.list);
-
-	slFree(i);
-}
-
-void brInstanceRelease(brInstance *i) {
-	if(!i) return;
-
-	i->status = AS_RELEASED;
-}
 
 /*!
 	\brief Adds an object to the engine.
 */
 
-brObject *brAddObjectToEngine(brEngine *e, brObjectType *t, char *name, void *pointer) {
+brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *pointer) {
 	brObject *o;
 
 	if(!name || !t || !e) return NULL;
@@ -354,27 +265,8 @@ brObject *brAddObjectToEngine(brEngine *e, brObjectType *t, char *name, void *po
 	An object alias is another name for an existing object.
 */
 
-void brAddObjectAlias(brEngine *e, char *name, brObject *o) {
+void brEngineAddObjectAlias(brEngine *e, char *name, brObject *o) {
     brNamespaceStore(e->objects, name, ST_OBJECT_ALIAS, o);
-}
-
-/*!
-	\brief Frees a breve object.
-*/
-
-void brObjectFree(brObject *o) {
-	int n;
-
-	for(n=0;n<o->collisionHandlers->count;n++) {
-		brCollisionHandler *h = o->collisionHandlers->data[n];
-
-		brMethodFree(h->method);
-		slFree(h);
-	}
-
-	slStackFree(o->collisionHandlers);
-	slFree(o->name);
-	slFree(o);
 }
 
 /*!
@@ -383,7 +275,7 @@ void brObjectFree(brObject *o) {
 	The instance's iterate method will be called at each iteration.
 */
 
-brInstance *brAddInstanceToEngine(brEngine *e, brObject *class, void *pointer) {
+brInstance *brEngineAddInstance(brEngine *e, brObject *class, void *pointer) {
 	brMethod *imethod, *pmethod;
 	brInstance *i;
 
@@ -421,6 +313,39 @@ brInstance *brAddInstanceToEngine(brEngine *e, brObject *class, void *pointer) {
 	return i;
 }
 
+
+/*!
+	\brief Marks a \ref brInstance as released, so that it can be removed
+	from the engine.
+
+	The instance will be removed from the engine and freed at the end of 
+	the next simulation iteration.  This function should be used instead of
+	\ref brInstanceFree except during simulation deallocation and cleanup.
+*/
+
+void brInstanceRelease(brInstance *i) {
+	if(!i) return;
+
+	i->status = AS_RELEASED;
+}
+
+/*!
+	\brief Removes an object from the engine.
+
+	The object may still exist in the simulation (technically), but it
+	will no longer be iterated by the engine.
+*/
+
+void brEngineRemoveInstance(brEngine *e, brInstance *i) {
+	// inform the camera of the change
+
+	if(e->camera) e->camera->recompile = 1;
+
+	slStackRemove(e->instances, i);
+	slStackRemove(e->iterationInstances, i);
+	slStackRemove(e->postIterationInstances, i);
+}
+
 /*!
 	\brief Frees a brMethod structure.
 
@@ -432,5 +357,118 @@ void brMethodFree(brMethod *m) {
 	if(m->name) slFree(m->name);
 	slFree(m);
 }
-	
+
+/*!
+	\brief Frees a breve object.
+*/
+
+void brObjectFree(brObject *o) {
+	int n;
+
+	for(n=0;n<o->collisionHandlers->count;n++) {
+		brCollisionHandler *h = o->collisionHandlers->data[n];
+
+		brMethodFree(h->method);
+		slFree(h);
+	}
+
+	slStackFree(o->collisionHandlers);
+	slFree(o->name);
+	slFree(o);
+}
+
+/*!
+	\brief Destroys a \ref brInstance structure.
+
+	Immediately frees all of the data associated with a \ref brInstance 
+	structure.  This function should not be used while a breve engine 
+	is being actively iterated.  It may be used for cleanup when the
+	engine isn't running, but otherwise use \ref brInstanceRelease instead.
+*/
+
+void brInstanceFree(brInstance *i) {
+	slList *olist;
+	brObserver *observer;
+	int n;
+
+    slListFree(i->dependencies);
+    slListFree(i->dependents);
+
+    olist = slListCopy(i->observers);
+
+    while(olist) {
+        observer = olist->data;
+        slFree(observer->notification);
+        slFree(observer);
+        olist = olist->next;
+    }
+
+    slListFree(olist);
+    slListFree(i->observers);
+
+    i->observers = NULL;
+
+	// removing observers will modify the observee list,
+	// so copy the list first
+
+	olist = slListCopy(i->observees);
+
+    while(olist) {
+        brEngineRemoveInstanceObserver(olist->data, i, NULL);
+		olist = olist->next;
+    }
+
+    slListFree(olist);
+
+    slListFree(i->observees);
+
+    for(n=0;n<i->menu.count;n++) {
+        slFree(i->menu.list[n]->title);
+        slFree(i->menu.list[n]->method);
+        slFree(i->menu.list[n]);
+    }
+
+	if(i->iterate) brMethodFree(i->iterate);
+	if(i->postIterate) brMethodFree(i->postIterate);
+
+    if(i->menu.list) slFree(i->menu.list);
+
+	slFree(i);
+}
+
+/*!
+	\brief Adds a collision handler to an object.
+
+    Defines a behavior for when object type "handler" collides with "collider".
+    The behavior is to call the specified method in the handler object
+    with the collider instance as an argument.
+*/
+
+int brObjectAddCollisionHandler(brObject *handler, brObject *collider, brMethod *m) {
+	brCollisionHandler *ch;
+	int n;
+
+	for(n=0;n<handler->collisionHandlers->count;n++) {
+		ch = handler->collisionHandlers->data[n];
+
+		if(ch->object == collider && ch->method == m) return EC_STOP;
+	}
+
+	if(m->argumentCount > 0) {
+		if(m->argumentCount > 1) {
+			slMessage(DEBUG_ALL, "Collision handlers expect (at most) a single argument of type object.\n");
+			return EC_ERROR;
+		}
+	}
+
+	ch = slMalloc(sizeof(brCollisionHandler));
+
+	ch->object = collider;
+	ch->method = m;
+
+	slStackPush(handler->collisionHandlers, ch);
+
+	return EC_OK;
+}
+
 /*@}*/

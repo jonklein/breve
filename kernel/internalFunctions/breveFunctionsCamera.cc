@@ -93,7 +93,7 @@ int brICameraSetDrawFog(brEval args[], brEval *target, brInstance *i) {
 	void cameraPositionDisplay(slCamera pointer camera, int x, int y).
 */
 
-int brICameraPositionDisplay(brEval *args, brEval *target, brInstance *i) {
+int brICameraPositionDisplay(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
@@ -110,7 +110,7 @@ int brICameraPositionDisplay(brEval *args, brEval *target, brInstance *i) {
 	void cameraResizeDisplay(slCamera pointer camera, int x, int y).
 */
 
-int brICameraResizeDisplay(brEval *args, brEval *target, brInstance *i) {
+int brICameraResizeDisplay(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
@@ -126,7 +126,7 @@ int brICameraResizeDisplay(brEval *args, brEval *target, brInstance *i) {
 	slCamera pointer cameraNew().
 */
 
-int brICameraNew(brEval *args, brEval *target, brInstance *i) {
+int brICameraNew(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera;
 
 	camera = slNewCamera(0, 0, GL_POLYGON);
@@ -147,7 +147,7 @@ int brICameraNew(brEval *args, brEval *target, brInstance *i) {
 	void cameraFree(slCamera pointer).
 */
 
-int brICameraFree(brEval *args, brEval *target, brInstance *i) {
+int brICameraFree(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRPOINTER(&args[0]);
 
 	slWorldRemoveCamera(i->engine->world, camera);
@@ -166,7 +166,7 @@ int brICameraFree(brEval *args, brEval *target, brInstance *i) {
 	target of the camera.
 */
 
-int brICameraPosition(brEval *args, brEval *target, brInstance *i) {
+int brICameraPosition(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRPOINTER(&args[0]);
 	slVector *l = &BRVECTOR(&args[1]);
 	slVector *t = &BRVECTOR(&args[2]);
@@ -183,10 +183,24 @@ int brICameraPosition(brEval *args, brEval *target, brInstance *i) {
 	void cameraSetEnabled(slCamera pointer, int).
 */
 
-int brICameraSetEnabled(brEval *args, brEval *target, brInstance *i) {
+int brICameraSetEnabled(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRPOINTER(&args[0]);
 
 	camera->enabled = BRINT(&args[1]);
+
+	return EC_OK;
+}
+
+/*!
+	\brief Enables or disables a camera's text display.
+
+	void cameraTextSetEnabled(slCamera pointer, int).
+*/
+
+int brICameraTextSetEnabled(brEval args[], brEval *target, brInstance *i) {
+	slCamera *camera = BRPOINTER(&args[0]);
+
+	camera->drawText = BRINT(&args[1]);
 
 	return EC_OK;
 }
@@ -201,4 +215,5 @@ void breveInitCameraFunctions(brNamespace *n) {
 	brNewBreveCall(n, "cameraFree", brICameraFree, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "cameraPosition", brICameraPosition, AT_NULL, AT_POINTER, AT_VECTOR, AT_VECTOR, 0);
 	brNewBreveCall(n, "cameraSetEnabled", brICameraSetEnabled, AT_NULL, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "cameraTextSetEnabled", brICameraTextSetEnabled, AT_NULL, AT_POINTER, AT_INT, 0);
 }

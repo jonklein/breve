@@ -24,6 +24,14 @@ Abstract : Camera {
 		% and drawn to the viewing window after each iteration.
 	
 		cameraSetEnabled(cameraPointer, 1).
+
+	+ to enable-text:
+		% Enables text for tihs camera.
+		cameraTextSetEnabled(cameraPointer, 1).
+
+	+ to disable-text:
+		% Disables text for tihs camera.
+		cameraTextSetEnabled(cameraPointer, 0).
 	
 	+ to set-size with-height newHeight (double) with-width newWidth (double):
 		% Sets the size of the camera viewing area.
@@ -55,6 +63,6 @@ Abstract : Camera {
 
 		cameraSetZClip(cameraPointer, distance).
 
-	+ to destroy:
+	- to delete:
 		cameraFree(cameraPointer).
 }

@@ -33,7 +33,7 @@
 	the menu item.
 */
 
-int brIMenuItemNew(brEval *args, brEval *target, brInstance *i) {
+int brIMenuItemNew(brEval args[], brEval *target, brInstance *i) {
 	brInstance *m;
 
     target->type = AT_POINTER;
@@ -61,7 +61,7 @@ int brIMenuItemNew(brEval *args, brEval *target, brInstance *i) {
 	the frontend implementation.
 */
 
-int brIMenuItemSetCheck(brEval *args, brEval *target, brInstance *i) {
+int brIMenuItemSetCheck(brEval args[], brEval *target, brInstance *i) {
     brMenuEntry *item = BRPOINTER(&args[0]);
 
     if(!item) {
@@ -86,7 +86,7 @@ int brIMenuItemSetCheck(brEval *args, brEval *target, brInstance *i) {
 	item, while others remove it from the menu completely.
 */
 
-int brIMenuItemSetEnabled(brEval *args, brEval *target, brInstance *i) {
+int brIMenuItemSetEnabled(brEval args[], brEval *target, brInstance *i) {
     brMenuEntry *item = BRPOINTER(&args[0]);
 
     if(!item) {

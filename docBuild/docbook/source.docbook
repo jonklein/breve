@@ -37,7 +37,7 @@ The following steps are required to set up a language front-end in breve.
 <listitem><para>Write special callbacks for the language front-end (<xref linkend="breve_object_callbacks">).</para></listitem>
 <listitem><para>Construct a new breve object type, and add classes to the breve engine (<xref linkend="breve_object_type">).</para></listitem>
 <listitem><para>Add instances to the breve engine (<xref linkend="breve_object_api">).</para></listitem>
-<listitem><para>Connect the language frontend to an application frontend.</para></listitem>
+<listitem><para>Connect the language frontend to an application frontend (<xref linkend="application_frontend">) or write your own customized frontend (<xref linkend="custom_application_frontend">).</para></listitem>
 </itemizedlist>
 </para>
 
@@ -49,7 +49,7 @@ In order to provide a language front-end to breve, a set of callbacks must be de
 <itemizedlist>
 <listitem>
 <para>
-findMethod: locate a method for a class by name and argument count.
+<function>findMethod</function>: locate a method for a class by name and argument count.
 	<screen>void *(*findMethod)(brObject *object, char *name, int nargs);</screen>
 </para>
 <para>
@@ -69,7 +69,7 @@ method.  This <function>void*</function> pointer will be stored in the "pointer"
 
 <listitem>
 <para>
-callMethod: trigger a method call in the front-end language.
+<function>callMethod</function>: trigger a method call in the front-end language.
 	<screen>int (*callMethod)(brInstance *instancePointer, brMethod *method, brEval **arguments, brEval *result);</screen>
 </para>
 <para>
@@ -94,7 +94,7 @@ argumentCount field.
 
 <listitem>
 <para>
-isSubclass: determine whether a class is a subclass of another.
+<function>isSubclass</function>: determine whether a class is a subclass of another.
 	<screen>int (*isSubclass)(brObject *class1, brObject *class2);</screen>
 </para>
 <para>
@@ -137,7 +137,7 @@ Only one <function>brObjectType</function> is required for each language front-e
 Once the language front-end is defined, objects can be registered with the breve engine.
 For each object that will be used in breve, the following function should be called once:
 <screen>
-brObject *brAddObjectToEngine(brEngine *e, brObjectType *t, char *name, void *pointer);
+brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *pointer);
 </screen>
 The final parameter, <replaceable>pointer</replaceable>, is a pointer to the native 
 language representation of the object.  This pointer will likely be used as part of the
@@ -146,12 +146,12 @@ language representation of the object.  This pointer will likely be used as part
 
 </sect2>
 
-<sect2 id="breve_object_api"><title>Adding instance to the breve engine</title>
+<sect2 id="breve_object_api"><title>Adding instances to the breve engine</title>
 <para>
 Once objects are registered with the breve engine, instances can be added to the engine as well.
-This is done with the function <function>brAddInstanceToEngine</function>.
+This is done with the function <function>brEngineAddInstance</function>.
 <screen>
-brInstance *brAddInstanceToEngine(brEngine *e, brObject *o, void *pointer);
+brInstance *brEngineAddInstance(brEngine *engine, brObject *object, void *pointer);
 </screen>
 The third argument, <replaceable>pointer</replaceable>, is a pointer to the native language 
 instance representation.  This pointer will be stored in the returned <function>brInstance</function>
@@ -313,6 +313,16 @@ To implement a custom application frontend, or to use breve
 simulations as part of another program, you'll need to familiarize 
 yourself with functions relating to the breve engine structure
 <function>brEngine</function>.
+</para>
+<para>
+<itemizedlist>
+<listitem><para>Create the breve engine</para></listitem>
+<listitem><para>Setup the language frontend as outlined in <xref linkend="language_frontend"></para></listitem>
+<listitem><para>Add objects to the breve engine (<function>brEngineAddObject</function>)</para></listitem>
+<listitem><para>Add instances to the breve engine (<function>brEngineAddInstance</function>)</para></listitem>
+<listitem><para>Iterate the breve engine (<function>brEngineAddInstance</function>)</para></listitem>
+</itemizedlist>
+
 </para>
 </sect1>
 

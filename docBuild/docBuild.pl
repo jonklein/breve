@@ -3,7 +3,7 @@
 use strict;
 
 my $bgcolor = "#ffffff";
-my $ignore_methods = "^init\$|^destroy\$|^iterate\$|^post-iterate\$|^archive\$|^dearchive\$|^get-description\$";
+my $ignore_methods = "^init\$|^delete\$|^destroy\$|^iterate\$|^post-iterate\$|^archive\$|^dearchive\$|^get-description\$";
 
 my $frameIndex=<<__EOT__;
 <HTML>

@@ -82,6 +82,6 @@ void slGraphSetTitle(slGraph *graph, char *title);
 
 void slGraphAddLineValue(slGraph *graph, int ln, float x, float y);
 
-void slGraphFreeLine(slGraphLine *graphLine);
+void slGraphLineFree(slGraphLine *graphLine);
 
 #include "draw.h"

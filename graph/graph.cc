@@ -104,7 +104,7 @@ void slGraphFree(slGraph *graph) {
 	int n;
 
 	for(n=0;n<graph->nLines;n++)
-		slFreeGraphLine(graph->lines[n]);
+		slGraphLineFree(graph->lines[n]);
 
 	slFree(graph->lines);
 
@@ -197,7 +197,7 @@ void slGraphAddLineValue(slGraph *graph, int ln, float x, float y) {
 	\brief Frees a graph line.
 */
 
-void slFreeGraphLine(slGraphLine *line) {
+void slGraphLineFree(slGraphLine *line) {
 	slFree(line->xValues);
 	slFree(line->yValues);
 	slFree(line);

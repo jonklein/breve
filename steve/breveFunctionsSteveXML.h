@@ -18,20 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#import "slLogView.h"
+void breveInitXMLFuncs(brNamespace *n);
 
-
-@implementation slLogView
-
-- (void)awakeFromNib {
-	[self setFont: [NSFont userFixedPitchFontOfSize: 9]];
-}
-
-- (void)keyDown:(NSEvent*)e {
-}
-
-- (BOOL)shouldDrawInsertionPoint {
-    return NO;
-}
-
-@end
+int stCWriteXMLEngine(brEval args[], brEval *target, brInstance *i);
+int stCArchiveXMLObject(brEval args[], brEval *target, brInstance *i);
+int stCDearchiveXMLObject(brEval args[], brEval *target, brInstance *i);
+int stCDearchiveXMLObjectFromString(brEval args[], brEval *target, brInstance *i);

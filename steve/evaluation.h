@@ -135,3 +135,5 @@ void stEvalError(brEngine *e, int type, char *proto, ...);
 
 void stConvertSteveInstanceToBreveInstance(brEval *e);
 
+void stEvalWarn(stExp *exp, char *proto, ...);
+

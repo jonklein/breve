@@ -50,7 +50,7 @@ int brIAddObserver(brEval args[], brEval *target, brInstance *bi) {
 	char *notification = BRSTRING(&args[1]);
 	char *method = BRSTRING(&args[2]);
 
-	BRINT(target) = brAddObserver(observedObject, bi, notification, method);
+	BRINT(target) = brInstanceAddObserver(observedObject, bi, notification, method);
 
 	return EC_OK;
 }
@@ -67,7 +67,7 @@ int brIRemoveObserver(brEval args[], brEval *target, brInstance *i) {
 	brInstance *observer = BRINSTANCE(&args[0]);
 	char *notification = BRSTRING(&args[1]);
 
-	brRemoveObserver(i, observer, notification);
+	brEngineRemoveInstanceObserver(i, observer, notification);
 	return EC_OK;
 }
 
@@ -78,7 +78,7 @@ int brIRemoveObserver(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIAddDependency(brEval args[], brEval *target, brInstance *i) {
-    brAddDependency(i, BRINSTANCE(&args[0]));
+    brInstanceAddDependency(i, BRINSTANCE(&args[0]));
     return EC_OK;
 }
 
@@ -89,7 +89,7 @@ int brIAddDependency(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIRemoveDependency(brEval args[], brEval *target, brInstance *i) {
-    brRemoveDependency(i, BRINSTANCE(&args[0]));
+    brEngineRemoveInstanceDependency(i, BRINSTANCE(&args[0]));
     return EC_OK;
 }
 
@@ -125,7 +125,7 @@ int brIAddCollisionHandler(brEval args[], brEval *target, brInstance *i) {
         return EC_ERROR;
     }
 
-    brAddCollisionHandler(handler, collider, method);
+    brObjectAddCollisionHandler(handler, collider, method);
 
     return EC_OK;
 }

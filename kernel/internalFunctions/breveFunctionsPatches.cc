@@ -33,7 +33,7 @@
 	and z sizes of the grid.
 */
 
-int brINewPatchGrid(brEval *args, brEval *target, brInstance *i) {
+int brINewPatchGrid(brEval args[], brEval *target, brInstance *i) {
 	slVector center;
 	slVectorSet(&center, 0, 0, 0);
 
@@ -48,7 +48,7 @@ int brINewPatchGrid(brEval *args, brEval *target, brInstance *i) {
 	void freePatchGrid(slPatchGrid pointer).
 */
 
-int brIFreePatchGrid(brEval *args, brEval *target, brInstance *i) {
+int brIFreePatchGrid(brEval args[], brEval *target, brInstance *i) {
 	slFreePatchGrid(BRPOINTER(&args[0]));
 
 	return EC_OK;
@@ -60,7 +60,7 @@ int brIFreePatchGrid(brEval *args, brEval *target, brInstance *i) {
 	slPatch pointer patchAtIndex(slPatchGrid pointer).
 */
 
-int brIPatchAtIndex(brEval *args, brEval *target, brInstance *i) {
+int brIPatchAtIndex(brEval args[], brEval *target, brInstance *i) {
 	slPatchGrid *grid = BRPOINTER(&args[0]);
 
 	if(!grid) {
@@ -79,7 +79,7 @@ int brIPatchAtIndex(brEval *args, brEval *target, brInstance *i) {
 	instance objectAtLocation(slPatchGrid pointer, vector).
 */
 
-int brIObjectAtLocation(brEval *args, brEval *target, brInstance *i) {
+int brIObjectAtLocation(brEval args[], brEval *target, brInstance *i) {
 	slPatchGrid *grid = BRPOINTER(&args[0]);
 	slPatch *patch;
 
@@ -103,7 +103,7 @@ int brIObjectAtLocation(brEval *args, brEval *target, brInstance *i) {
 	instance objectAtIndex(slPatchGrid pointer, int, int, int).
 */
 
-int brIObjectAtIndex(brEval *args, brEval *target, brInstance *i) {
+int brIObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 	slPatchGrid *grid = BRPOINTER(&args[0]);
 
 	if(!grid) {
@@ -138,7 +138,7 @@ int brIObjectAtIndex(brEval *args, brEval *target, brInstance *i) {
 	setObjectAtIndex(slPatchGrid pointer, instance, int, int, int).
 */
 
-int brISetObjectAtIndex(brEval *args, brEval *target, brInstance *i) {
+int brISetObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 	slPatchGrid *grid = BRPOINTER(&args[0]);
 
 	if(!grid) {
@@ -157,7 +157,7 @@ int brISetObjectAtIndex(brEval *args, brEval *target, brInstance *i) {
 	void setPatchColor(slPatch pointer, vector).
 */
 
-int brISetPatchColor(brEval *args, brEval *target, brInstance *i) {
+int brISetPatchColor(brEval args[], brEval *target, brInstance *i) {
 	slPatch *patch = BRPOINTER(&args[0]);
 	slVectorCopy(&BRVECTOR(&args[1]), &patch->color);
 
@@ -170,7 +170,7 @@ int brISetPatchColor(brEval *args, brEval *target, brInstance *i) {
 	vector getPatchLocation(slPatch pointer).
 */
 
-int brIGetPatchLocation(brEval *args, brEval *target, brInstance *i) {
+int brIGetPatchLocation(brEval args[], brEval *target, brInstance *i) {
 	slPatch *patch = BRPOINTER(&args[0]);
 	slVectorCopy(&patch->location, &BRVECTOR(target));
 
@@ -183,7 +183,7 @@ int brIGetPatchLocation(brEval *args, brEval *target, brInstance *i) {
 	void setPatchTransparency(slPatch pointer, double).
 */
 
-int brISetPatchTransparency(brEval *args, brEval *target, brInstance *i) {
+int brISetPatchTransparency(brEval args[], brEval *target, brInstance *i) {
 	slPatch *patch = BRPOINTER(&args[0]);
 	patch->transparency = BRDOUBLE(&args[1]);
 
