@@ -601,6 +601,7 @@ void brInterrupt(brEngine *engine) {
 	if(line && *line) add_history(line);
 #else
 	printf("breve> ");
+	fflush(stdout);
 	line = gets(staticLine);
 #endif
 
