@@ -9,20 +9,22 @@ int brISpringNew(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISpringSetStrength(brEval args[], brEval *target, brInstance *i) {
-	slSpring *spring = BRPOINTER(&args[0]);
-	spring->strength = BRDOUBLE(&args[1]);
+	slSpringSetStrength(BRPOINTER(&args[0]), BRDOUBLE(&args[1]));
 	return EC_OK;
 }
 
 int brISpringSetLength(brEval args[], brEval *target, brInstance *i) {
-	slSpring *spring = BRPOINTER(&args[0]);
-	spring->length = BRDOUBLE(&args[1]);
+	slSpringSetLength(BRPOINTER(&args[0]), BRDOUBLE(&args[1]));
 	return EC_OK;
 }
 
 int brISpringSetDamping(brEval args[], brEval *target, brInstance *i) {
-	slSpring *spring = BRPOINTER(&args[0]);
-	spring->damping = BRDOUBLE(&args[1]);
+	slSpringSetDamping(BRPOINTER(&args[0]), BRDOUBLE(&args[1]));
+	return EC_OK;
+}
+
+int brISpringSetMode(brEval args[], brEval *target, brInstance *i) {
+	slSpringSetMode(BRPOINTER(&args[0]), BRINT(&args[1]));
 	return EC_OK;
 }
 
@@ -36,5 +38,6 @@ void breveInitSpringFunctions(brNamespace *n) {
     brNewBreveCall(n, "springSetLength", brISpringSetLength, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
     brNewBreveCall(n, "springSetDamping", brISpringSetDamping, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
     brNewBreveCall(n, "springSetStrength", brISpringSetStrength, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
+    brNewBreveCall(n, "springSetMode", brISpringSetStrength, AT_NULL, AT_POINTER, AT_INT, 0);
     brNewBreveCall(n, "springRemove", brISpringRemove, AT_NULL, AT_POINTER, 0);
 }

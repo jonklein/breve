@@ -61,6 +61,9 @@ void slSpringApplyForce(slSpring *spring) {
 
 	distance -= spring->length;
 
+	if(spring->mode == SPRING_MODE_CONTRACT_ONLY && distance < 0.0) return;
+	else if(spring->mode == SPRING_MODE_EXPAND_ONLY && distance > 0.0) return;
+
 	damping = spring->damping * normVelocity;
 
 	distance = (distance * spring->strength) + damping;
@@ -75,6 +78,22 @@ void slSpringApplyForce(slSpring *spring) {
 
 	dBodyAddForceAtPos(spring->link1->odeBodyID, 
 			-force.x, -force.y, -force.z, pos2.x, pos2.y, pos2.z);
+}
+
+void slSpringSetStrength(slSpring *s, double strength) {
+	s->strength = strength;
+}
+
+void slSpringSetDamping(slSpring *s, double damping) {
+	s->strength = damping;
+}
+
+void slSpringSetLength(slSpring *s, double length) {
+	s->length = length;
+}
+
+void slSpringSetMode(slSpring *s, int mode) {
+	s->mode = mode;
 }
 
 /*!

@@ -229,7 +229,7 @@ Shape : PolygonDisk (aka PolygonDisks) {
 	% This class is used to create a polygon-disk.  This is a shape which can be 
 	% described as an extruded polygon. 
 
-	+ to init-with radius theRadius (float) sides sideCount (int) height theHeight (float):
+	+ to init-with radius theRadius = 1 (float) sides sideCount (int) height theHeight (float):
 		% Initializes the polygon-disk.
 		% <p>
 		% The distance from the center of the n-gon faces to the vertices 

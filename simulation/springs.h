@@ -1,7 +1,7 @@
 enum slSpringModes {
-	SM_NORMAL = 0,
-	SM_EXPAND_ONLY,
-	SM_CONTRACT_ONLY
+	SPRING_MODE_NORMAL = 0,
+	SPRING_MODE_EXPAND_ONLY,
+	SPRING_MODE_CONTRACT_ONLY
 };
 
 struct slSpring {
@@ -22,6 +22,11 @@ void slWorldApplySpringForces(slWorld *w);
 
 void slSpringApplyForce(slSpring *spring);
 slSpring *slSpringNew(slLink *l1, slLink *l2, slVector *v1, slVector *v2, double length, double strength, double damping);
+
+void slSpringSetLength(slSpring *s, double length);
+void slSpringSetStrength(slSpring *s, double strength);
+void slSpringSetDamping(slSpring *s, double damping);
+void slSpringSetMode(slSpring *s, int mode);
 
 void slWorldRemoveSpring(slWorld *w, slSpring *s);
 void slWorldAddSpring(slWorld *w, slSpring *s);
