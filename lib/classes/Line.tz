@@ -1,0 +1,31 @@
+Object : Line {
+	+ variables:
+		start, end (object).
+		linePointer (pointer).
+
+	+ to connect from start (Real object) to end (Real object) 
+		with-color theColor = (0, 0, 0) (vector) with-style theStyle = "----------------" (string):
+		% Adds a line to be drawn between Real objects start and end.  
+		% <P>
+        % The optional argument theColor specifies the color of the line.  The default
+        % color is the vector (0, 0, 0), black.
+        % <P>
+        % The optional argument theStyle specifies a pattern for the line.  theStyle is a
+        % string of 16 spaces and/or dashes which specify the line pattern to be drawn.
+        % A dotted line, for example, would use the pattern "- - - - - - - - ".  A thickly
+        % dashed line would use the pattern "--------        ".  If no style is given, a
+        % solid line is drawn.
+
+		if start == end: return.
+
+		addObjectLine((start get-world-object-pointer), (end get-world-object-pointer), theColor, theStyle).
+
+	+ to is-linked to worldObject (object):
+		% Returns 1 if this line is associated with worldObject.
+
+		if start == worldObject || end == worldObject: return 1.
+		return 0.
+
+	+ to destroy:
+		removeObjectLine(linePointer).
+}

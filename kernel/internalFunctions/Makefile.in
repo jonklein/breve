@@ -1,10 +1,13 @@
-INTERNALO = $(shell ls *.c *.cpp | sed s/\.c$$/\.o/ | sed s/\.cpp$$/\.o/)
+INTERNALO = $(shell ls *.c *.cc *.cpp | sed s/\.[a-z]\*$$/\.o/ )
 
 all: $(INTERNALO)
 
 INCLUDE	+= -I.. -I../../include/breve @CPPFLAGS@
 
 .c.o:
+	$(CXX) -fpermissive $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
+
+.cc.o:
 	$(CXX) -fpermissive $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
 
 .cpp.o:

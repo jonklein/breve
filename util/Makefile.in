@@ -11,8 +11,8 @@ INCLUDE +=-I../include/breve
 
 all: libbrutil.a 
 
-.c.o: *.h
-	$(CXX) $(CFLAGS) $(INCLUDE) $(DEFINES) -c $*.c
+.cc.o: *.h
+	$(CXX) $(CFLAGS) $(INCLUDE) $(DEFINES) -c $*.cc
 
 libbrutil.a: $(LIBO)
 	$(AR) -crv libbrutil.a $(LIBO)

@@ -15,8 +15,8 @@ INCLUDE	+=-I../include/breve @CPPFLAGS@
 
 all: libbrsimulation.a 
 
-.c.o: *.h
-	$(CXX) -fpermissive $(CFLAGS) $(DEFINES) $(INCLUDE) -c $*.c
+.cc.o: *.h
+	$(CXX) -fpermissive $(CFLAGS) $(DEFINES) $(INCLUDE) -c $*.cc
 
 libbrsimulation.a: $(LIBO)
 	$(AR) -crv libbrsimulation.a $(LIBO) 

@@ -4,12 +4,6 @@
 # s pi der la nd
 #
 
-BREVEO	= breve.o
-BREVEC	= breve.c
-
-BREVECLIO	= breve_cli.o
-BREVECLIC	= breve_cli.c
-
 BREVE_BINARY	= breve@EXE_SUFFIX@
 BREVE_CLI_BINARY	= breve_cli@EXE_SUFFIX@
 
@@ -21,16 +15,16 @@ INCLUDE	+= -I../include/breve @CPPFLAGS@
 
 all: $(BREVE_CLI_BINARY) $(BREVE_BINARY)
 
-%.o: %.c
+%.o: %.cc
 	$(CXX) -fpermissive $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
 
-breve@EXE_SUFFIX@: $(BREVEO) ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a ../lib/libbrsteve.a ../lib/libbrjava.a
-	$(CXX) -o $(BREVE_BINARY) $(CFLAGS) $(BREVEO) $(LIBS) @GLLIBS@ @AUDIOLIBS@
+breve@EXE_SUFFIX@: ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a ../lib/libbrsteve.a ../lib/libbrjava.a
+	$(CXX) -o $(BREVE_BINARY) $(CFLAGS) $(DEFINES) $(INCLUDE) breve.cc $(LIBS) @GLLIBS@ @AUDIOLIBS@
 	# strip -s ../lib/loadable-symbols breve
 	# strip breve
 
-breve_cli@EXE_SUFFIX@: $(BREVECLIO) ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a ../lib/libbrsteve.a ../lib/libbrjava.a
-	$(CXX) -o $(BREVE_CLI_BINARY) $(CFLAGS) $(BREVECLIO) $(LIBS) @GLLIBS@ @AUDIOLIBS@
+breve_cli@EXE_SUFFIX@: ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a ../lib/libbrsteve.a ../lib/libbrjava.a
+	$(CXX) -o $(BREVE_CLI_BINARY) $(CFLAGS) $(DEFINES) $(INCLUDE) breve_cli.cc $(LIBS) @GLLIBS@ @AUDIOLIBS@
 	# strip ../lib/loadable-symbols breve_cli
 	# strip breve_cli
 

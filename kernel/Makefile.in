@@ -12,14 +12,14 @@ LIBO	= engine.o breveEval.o breveObjectAPI.o frontendAPI.o \
 
 INCLUDE	+=-I../include/breve @CPPFLAGS@
 
-INTERNALO = $(shell ls internalFunctions/*.o | sed s/.c$$/.o/)
+INTERNALO = $(shell ls internalFunctions/*.o | sed s/.cc$$/.o/)
 
 all: internal libbrkernel.a
 
 internal:
 	cd internalFunctions; $(MAKE)
 
-%.o: %.c
+%.o: %.cc
 	$(CXX) -fpermissive $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
 
 libbrkernel.a: $(LIBO) $(INTERNALO)
