@@ -27,7 +27,7 @@
 #define COMPUTE_V(R, G, B) (unsigned char)((R - COMPUTE_Y(R, G, B)) * .713)
 
 void slInitYUVLookupTable();
-int RGB2YUV420(int x_dim, int y_dim, unsigned char *bmp, unsigned char *yuv, int flip);
+int slRGB2YUV420(int x_dim, int y_dim, unsigned char *uu, unsigned char *yy, unsigned char *bmp, unsigned char *yuv, int flip);
 
 /*!
 	\brief Opens a movie file for writing.
@@ -49,7 +49,7 @@ slMovie *slMovieCreate(char *filename, int width, int height, int framerate, flo
 	height -= height & 1;
 	width -= width & 1;
 
-	m = slMalloc(sizeof(slMovie));
+	m = new slMovie;
 
 	m->codec = avcodec_find_encoder(CODEC_ID_MPEG1VIDEO);
 
@@ -79,10 +79,14 @@ slMovie *slMovieCreate(char *filename, int width, int height, int framerate, flo
 	}
 
 	m->bufferSize = m->context->height * m->context->width * 3;
-	m->buffer = slMalloc(m->bufferSize);
 
-	m->pictureBuffer = slMalloc(m->bufferSize / 2);
-	m->picture->data[0] = m->pictureBuffer;
+	m->buffer = new unsigned char[m->bufferSize];
+	m->RGBpictureBuffer = new unsigned char[m->bufferSize];
+	m->YUVpictureBuffer = new unsigned char[m->bufferSize / 2];
+	m->vvBuffer = new unsigned char[m->context->height * m->context->width];
+	m->uuBuffer = new unsigned char[m->context->height * m->context->width];
+
+	m->picture->data[0] = m->YUVpictureBuffer;
 	m->picture->data[1] = m->picture->data[0] + (m->context->height * m->context->width);
 	m->picture->data[2] = m->picture->data[1] + (m->context->height * m->context->width) / 4;
 	m->picture->linesize[0] = m->context->width;
@@ -105,19 +109,13 @@ slMovie *slMovieCreate(char *filename, int width, int height, int framerate, flo
 */
 
 
-int slMovieAddFrame(slMovie *m, unsigned char *pixels) {
+int slMovieAddFrame(slMovie *m, int flip) {
 	int size;
-	char *reverse;
 	if(!m) return -1;
-
-	reverse = malloc(m->context->width * m->context->height * 3);
-	slReversePixelBuffer(pixels, reverse, m->context->width * 3, m->context->height);
 
 	// Z S M Q Q 7 I U P P R G B Y U V 4 2 0 Q T T P X R 9 0 ! B X Q Q F T
 
-	RGB2YUV420(m->context->width, m->context->height, reverse, m->pictureBuffer, 0);
-
-	free(reverse);
+	slRGB2YUV420(m->context->width, m->context->height, m->uuBuffer, m->vvBuffer, m->RGBpictureBuffer, m->YUVpictureBuffer, flip);
 
 	size = avcodec_encode_video(m->context, m->buffer, m->bufferSize, m->picture);
 
@@ -133,18 +131,10 @@ int slMovieAddFrame(slMovie *m, unsigned char *pixels) {
 */
 
 int slMovieAddGLFrame(slMovie *m, slCamera *c) {
-	char *buffer;
-	int r;
-
 	if(c->activateContextCallback) c->activateContextCallback();
 
-	buffer = malloc(m->context->width * m->context->height * 4);
-
-	glReadPixels(0, 0, m->context->width, m->context->height, GL_RGB, GL_UNSIGNED_BYTE, buffer);
-	r = slMovieAddFrame(m, buffer);
-	free(buffer);
-
-	return r;
+	glReadPixels(0, 0, m->context->width, m->context->height, GL_RGB, GL_UNSIGNED_BYTE, m->RGBpictureBuffer);
+	return slMovieAddFrame(m, 1);
 }
 
 /*!
@@ -174,10 +164,13 @@ int slMovieFinish(slMovie *m) {
 	free(m->context);
 	free(m->picture);
 
-	slFree(m->buffer);
-	slFree(m->pictureBuffer);
+	delete[] m->buffer;
+	delete[] m->YUVpictureBuffer;
+	delete[] m->RGBpictureBuffer;
+	delete[] m->vvBuffer;
+	delete[] m->uuBuffer;
 
-	slFree(m);
+	delete m;
 
 	return 0;
 }
@@ -194,38 +187,35 @@ static int RGB2YUV_YR[256], RGB2YUV_YG[256], RGB2YUV_YB[256];
 static int RGB2YUV_UR[256], RGB2YUV_UG[256], RGB2YUV_UBVR[256];
 static int RGB2YUV_VG[256], RGB2YUV_VB[256];
 
-int RGB2YUV420 (int x_dim, int y_dim, unsigned char *bmp, unsigned char *yuv, int flip) {
+int slRGB2YUV420 (int x_dim, int y_dim, unsigned char *uu, unsigned char *vv, unsigned char *bmp, unsigned char *yuv, int flip) {
 	int i, j;
 	unsigned char *r, *g, *b;
 	unsigned char *y, *u, *v;
-	unsigned char *uu, *vv;
 	unsigned char *pu1, *pu2,*pu3,*pu4;
 	unsigned char *pv1, *pv2,*pv3,*pv4;
 
-	if(flip==0) {
-		r=bmp;
-		g=bmp+1;
-		b=bmp+2;
-	} else {
-		b=bmp;
-		g=bmp+1;
-		r=bmp+2;
-	}
-
 	y=yuv;
-	uu=malloc(x_dim*y_dim);
-	vv=malloc(x_dim*y_dim);
 	u=uu;
 	v=vv;
 	for (i=0;i<y_dim;i++) {
+		int row;
+
+		if(flip) row = ((y_dim - 1) - i);
+		else row = i;
+
+		r = bmp + 3*x_dim*row;
+		g = r + 1;
+		b = r + 2;
+
 		for (j=0;j<x_dim;j++) {
+
 			*y++=( RGB2YUV_YR[*r]  +RGB2YUV_YG[*g]+RGB2YUV_YB[*b]+1048576)>>16;
 			*u++=(-RGB2YUV_UR[*r]  -RGB2YUV_UG[*g]+RGB2YUV_UBVR[*b]+8388608)>>16;
 			*v++=( RGB2YUV_UBVR[*r]-RGB2YUV_VG[*g]-RGB2YUV_VB[*b]+8388608)>>16;
 
-   			r+=3;
-			g+=3;
-			b+=3;
+			r += 3;
+			g += 3;
+			b += 3;
 		}
 	}
 
@@ -266,23 +256,20 @@ int RGB2YUV420 (int x_dim, int y_dim, unsigned char *bmp, unsigned char *yuv, in
 		pv4+=x_dim;
 	}
 
-	free(uu);
-	free(vv);
-
 	return 0;
 }
 
 void slInitYUVLookupTable() {
 	int i;
 
-	for (i = 0; i < 256; i++) RGB2YUV_YR[i] = (float)65.481 * (i<<8);
-	for (i = 0; i < 256; i++) RGB2YUV_YG[i] = (float)128.553 * (i<<8);
-	for (i = 0; i < 256; i++) RGB2YUV_YB[i] = (float)24.966 * (i<<8);
-	for (i = 0; i < 256; i++) RGB2YUV_UR[i] = (float)37.797 * (i<<8);
-	for (i = 0; i < 256; i++) RGB2YUV_UG[i] = (float)74.203 * (i<<8);
-	for (i = 0; i < 256; i++) RGB2YUV_VG[i] = (float)93.786 * (i<<8);
-	for (i = 0; i < 256; i++) RGB2YUV_VB[i] = (float)18.214 * (i<<8);
-	for (i = 0; i < 256; i++) RGB2YUV_UBVR[i] = (float)112 * (i<<8);
+	for (i = 0; i < 256; i++) RGB2YUV_YR[i] = (int)((float)65.481 * (i<<8));
+	for (i = 0; i < 256; i++) RGB2YUV_YG[i] = (int)((float)128.553 * (i<<8));
+	for (i = 0; i < 256; i++) RGB2YUV_YB[i] = (int)((float)24.966 * (i<<8));
+	for (i = 0; i < 256; i++) RGB2YUV_UR[i] = (int)((float)37.797 * (i<<8));
+	for (i = 0; i < 256; i++) RGB2YUV_UG[i] = (int)((float)74.203 * (i<<8));
+	for (i = 0; i < 256; i++) RGB2YUV_VG[i] = (int)((float)93.786 * (i<<8));
+	for (i = 0; i < 256; i++) RGB2YUV_VB[i] = (int)((float)18.214 * (i<<8));
+	for (i = 0; i < 256; i++) RGB2YUV_UBVR[i] = (int)((float)112 * (i<<8));
 }
 
 #endif

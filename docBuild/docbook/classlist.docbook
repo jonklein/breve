@@ -136,6 +136,10 @@
 <ulink url="../classes/PrismaticJoint.html">PrismaticJoint</ulink></para>
 </listitem>
 <listitem><para>
+<indexterm><primary>PushClusterGP class</primary></indexterm>
+<ulink url="../classes/PushClusterGP.html">PushClusterGP</ulink></para>
+</listitem>
+<listitem><para>
 <indexterm><primary>PushGP class</primary></indexterm>
 <ulink url="../classes/PushGP.html">PushGP</ulink></para>
 </listitem>

@@ -32,5 +32,7 @@ Abstract : Tone {
 		% Sets the frequency of the tone to newFrequency.
 
 		setFrequency(tonePointer, newFrequency).
-    
+
+	+ to destroy:
+		freeSinewave(tonePointer).
 }

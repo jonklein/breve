@@ -45,7 +45,6 @@ struct slJoint {
 
 	unsigned char type;
 	unsigned char isMbJoint;
-	int vectorOffset;
 
 	void *callbackData;
 };
@@ -60,8 +59,8 @@ int slJointSetNormal(slJoint *joint, slVector *normal);
 int slJointSetLinkPoints(slJoint *joint, slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3]);
 void slJointSetMaxTorque(slJoint *joint, double max);
 void slJointSetLimits(slJoint *joint, slVector *min, slVector *max);
-slLink *slJointBreak(slJoint *joint);
-void slJointDestroy(slJoint *joint);
+void slJointBreak(slJoint *joint);
+void slJointFree(slJoint *joint);
 void slJointApplyTorque(slJoint *j, slVector *torque);
 
 #ifdef __cplusplus

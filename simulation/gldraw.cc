@@ -99,10 +99,10 @@ void slInitGL(slWorld *w) {
 
 	slMakeLightTexture(&lt[0], &glt[0]);
 
-	slAddTexture(w, -1, gBrickImage, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA);
-	slAddTexture(w, -1, gPlaid, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA);
-	slAddTexture(w, -1, lt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA);
-	slAddTexture(w, -1, glt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA);
+	slUpdateTexture(w, slTextureNew(), gBrickImage, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA);
+	slUpdateTexture(w, slTextureNew(), gPlaid, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA);
+	slUpdateTexture(w, slTextureNew(), lt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA);
+	slUpdateTexture(w, slTextureNew(), glt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA);
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -202,7 +202,7 @@ int slNextPowerOfTwo(int n) {
 	Used for textures, which must be powers of two.
 */
 
-void slCenterPixelsInSquareBuffer(char *pixels, int width, int height, char *buffer, int newwidth, int newheight) {
+void slCenterPixelsInSquareBuffer(unsigned char *pixels, int width, int height, unsigned char *buffer, int newwidth, int newheight) {
 	int xstart, ystart;
 	int y;
 
@@ -215,18 +215,26 @@ void slCenterPixelsInSquareBuffer(char *pixels, int width, int height, char *buf
 }
 
 /*!
+	\brief Allocates space for a new texture.
+*/
+
+unsigned int slTextureNew() {
+	GLuint texture;
+	glGenTextures(1, &texture);
+	return texture;
+}
+
+/*!
 	\brief Adds (or updates) a texture to the camera.
 
 	Returns 0 if there was space, or -1 if all texture positions are used.
 */
 
-int slAddTexture(slWorld *w, GLuint texture, unsigned char *pixels, int width, int height, int format) {
+int slUpdateTexture(slWorld *w, GLuint texture, unsigned char *pixels, int width, int height, int format) {
 	char *newpixels;
 	int newheight, newwidth;
 
 	if(!glActive) return -1;
-
-	if(texture == -1) glGenTextures(1, &texture);
 
 	newwidth = slNextPowerOfTwo(width); 
 	newheight = slNextPowerOfTwo(height);
@@ -1026,7 +1034,7 @@ void slRenderLabels(slWorld *w) {
 
 	glColor3f(0, 0, 0);
 
-	for(n=0;n<w->objectCount;n++) {
+	for(n=0;n<w->objects.size();n++) {
 		if(w->objects[n]) {
 			m = w->objects[n]->data;
 			if(w->objects[n]->type == WO_LINK && m->label) {
@@ -1428,7 +1436,7 @@ int slRenderObjects(slWorld *w, slCamera *c, int loadNames, int flags) {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
-	for(n=0;n<w->objectCount;n++) {
+	for(n=0;n<w->objects.size();n++) {
 		int skip = 0;
 		wo = w->objects[n];
 
@@ -1483,7 +1491,7 @@ void slRenderLines(slWorld *w, slCamera *c, int flags) {
 
 	glLineWidth(1.2);
 
-	for(n=0;n<w->objectCount;n++) {
+	for(n=0;n<w->objects.size();n++) {
 		if(w->objects[n] && !(w->objects[n]->drawMode & DM_INVISIBLE)) {
 			if((w->objects[n]->drawMode & DM_NEIGHBOR_LINES) && !(flags & DO_NO_NEIGHBOR_LINES)) {
 				glEnable(GL_BLEND);
@@ -1919,7 +1927,7 @@ void slFreeGL(slWorld *w, slCamera *c) {
 
 	if(c->stationaryDrawList) glDeleteLists(c->stationaryDrawList, 1);
 
-	for(n=0;n<w->objectCount;n++) {
+	for(n=0;n<w->objects.size();n++) {
 		if(w->objects[n]) {
 			switch(w->objects[n]->type) {
 				case WO_LINK:
@@ -1950,7 +1958,7 @@ void slFreeGL(slWorld *w, slCamera *c) {
 	of channels), not just the number of pixels.
 */
 
-void slReversePixelBuffer(char *source, char *dest, int width, int height) {
+void slReversePixelBuffer(unsigned char *source, unsigned char *dest, int width, int height) {
 	int n;
 
 	for(n=0;n<height;n++)

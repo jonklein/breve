@@ -12,10 +12,13 @@ struct slMovie {
 	AVCodecContext *context;
 	AVFrame *picture;
 
-	char *buffer;
+	unsigned char *buffer;
 	int bufferSize;
 
-	char *pictureBuffer;
+	unsigned char *YUVpictureBuffer;
+	unsigned char *RGBpictureBuffer;
+	unsigned char *vvBuffer;
+	unsigned char *uuBuffer;
 
 	FILE *file;
 };
@@ -23,7 +26,7 @@ struct slMovie {
 typedef struct slMovie slMovie;
 
 slMovie *slMovieCreate(char *filename, int width, int height, int framerate, float quality);
-int slMovieAddFrame(slMovie *m, unsigned char *pixels);
+int slMovieAddFrame(slMovie *m, int flip);
 int slMovieAddGLFrame(slMovie *m, slCamera *c);
 int slMovieFinish(slMovie *m);
 #endif

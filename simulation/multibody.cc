@@ -44,7 +44,6 @@ void slMultibodySetLabel(slMultibody *m, char *label) {
 */
 
 void slMultibodyInitCollisionFlags(slMultibody *m, slPairEntry **pe) {
-	unsigned int x;
 	slLink *link1, *link2;
 	slPairEntry *e;
 	std::vector<slLink*>::iterator i1;
@@ -72,8 +71,10 @@ void slMultibodyInitCollisionFlags(slMultibody *m, slPairEntry **pe) {
 
 		// then prune out all adjacent pairs.
 
-		for(x=0;x<link1->outJoints->count;x++) {
-			link2 = ((slJoint*)link1->outJoints->data[x])->child;
+		std::vector<slJoint*>::iterator ji;
+
+		for(ji = link1->outJoints.begin(); ji != link1->outJoints.end(); ji++) {
+			link2 = (*ji)->child;
 
 			if(link1 != link2) {
 				e = slVclipPairEntry(pe, link1->clipNumber, link2->clipNumber);
@@ -197,82 +198,6 @@ void slMultibodyOffsetPosition(slMultibody *mb, slVector *offset) {
 }
 
 /*!
-	\brief Gives the position of a joint, relative to its native position.
-*/
-
-void slJointGetPosition(slJoint *j, slVector *r) {
-	switch(j->type) {
-		case JT_REVOLUTE:
-			r->x = dJointGetHingeAngle(j->odeJointID);
-			r->y = 0;
-			r->z = 0;
-			break;
-		case JT_PRISMATIC:
-			r->x = dJointGetSliderPosition(j->odeJointID);
-			r->y = 0;
-			r->z = 0;
-			break;
-		case JT_BALL:
-		case JT_UNIVERSAL:
-			r->x = dJointGetAMotorAngle(j->odeMotorID, dParamVel);
-			r->y = dJointGetAMotorAngle(j->odeMotorID, dParamVel2);
-			r->z = dJointGetAMotorAngle(j->odeMotorID, dParamVel3);
-			break;
-		default:
-			break;
-	}
-
-	return;
-}
-
-/*!
-	\brief Gets the joint velocity of a joint.
-
-	Returns the 1-DOF value for backwards compatability, but also
-	fills in the velocity vector.
-*/
-
-void slJointGetVelocity(slJoint *j, slVector *velocity) {
-	switch(j->type) {
-		case JT_REVOLUTE:
-			velocity->x = dJointGetHingeAngleRate(j->odeJointID);
-			break;
-		case JT_PRISMATIC:
-			velocity->x = dJointGetSliderPositionRate(j->odeJointID);
-			break;
-		case JT_BALL:
-			velocity->z = dJointGetAMotorParam(j->odeMotorID, dParamVel3);
-		case JT_UNIVERSAL:
-			velocity->x = dJointGetAMotorParam(j->odeMotorID, dParamVel);
-			velocity->y = dJointGetAMotorParam(j->odeMotorID, dParamVel2);
-			break;
-	}
-}
-
-/*!
-	\brief Sets the velocity of a joint.
-
-	The joint may be 1-, 2- or 3DOF, so only the relevant fields 
-	of the speed vector are used.
-*/
-
-void slJointSetVelocity(slJoint *j, slVector *speed) {
-	j->targetSpeed = speed->x;
-
-	// if(j->type == JT_REVOLUTE) dJointSetHingeParam (j->odeJointID, dParamVel, speed->x);
-	// else if(j->type == JT_PRISMATIC) dJointSetSliderParam (j->odeJointID, dParamVel, speed->x);
-
-	if(j->type == JT_UNIVERSAL) {
-		dJointSetAMotorParam(j->odeMotorID, dParamVel, speed->x);
-		dJointSetAMotorParam(j->odeMotorID, dParamVel3, speed->y);
-	} else if(j->type == JT_BALL) {
-		dJointSetAMotorParam(j->odeMotorID, dParamVel, speed->x);
-		dJointSetAMotorParam(j->odeMotorID, dParamVel2, speed->y);
-		dJointSetAMotorParam(j->odeMotorID, dParamVel3, speed->z);
-	}
-}
-
-/*!
 	\brief Sets the linear and/or rotational velocities of a link.
 */
 
@@ -323,152 +248,18 @@ void slMultibodyFree(slMultibody *m) {
 
 slList *slMultibodyAllCallbackData(slMultibody *mb) {
 	slList *list = NULL;
-	slLink *link;
-	unsigned int n;
-	std::vector<slLink*>::iterator i;
+	std::vector<slLink*>::iterator li;
+	std::vector<slJoint*>::iterator ji;
 
-	for( i = mb->links.begin(); i != mb->links.end(); i++ ) {
-		link = *i;
-		
-		list = slListPrepend(list, link->callbackData);
+	for( li = mb->links.begin(); li != mb->links.end(); li++ ) {
+		list = slListPrepend(list, (*li)->callbackData);
 
-		for(n=0;n<link->inJoints->count;n++) {
-			slJoint *j = link->inJoints->data[n];
-
-			list = slListPrepend(list, j->callbackData);
+		for(ji = (*li)->inJoints.begin(); ji != (*li)->inJoints.end(); ji++ ) {
+			list = slListPrepend(list, (*ji)->callbackData);
 		}
 	}
 
 	return list;
-}
-
-/*!
-	\brief Sets minima and maxima for a joint.
-
-	The minima and maxima are relative to the joint's natural state.
-	Since the joint may be 1-, 2- or 3-DOF, only the relevant field
-	of the vectors are used.
-*/
-
-void slJointSetLimits(slJoint *joint, slVector *min, slVector *max) {
-	switch(joint->type) {
-		case JT_PRISMATIC:	
-			dJointSetSliderParam(joint->odeJointID, dParamStopERP, .1);
-			dJointSetSliderParam(joint->odeJointID, dParamLoStop, min->x);
-			dJointSetSliderParam(joint->odeJointID, dParamHiStop, max->x);
-			break;
-		case JT_REVOLUTE:	
-			dJointSetHingeParam(joint->odeJointID, dParamStopERP, .1);
-			dJointSetHingeParam(joint->odeJointID, dParamLoStop, min->x);
-			dJointSetHingeParam(joint->odeJointID, dParamHiStop, max->x);
-			break;
-		case JT_BALL:	
-			if(max->y >= M_PI/2.0 - 0.001) max->y = M_PI/2.0 - 0.001;
-			if(min->y <= -M_PI/2.0 - 0.001) min->y = -M_PI/2.0 + 0.001;
-
-			dJointSetAMotorParam(joint->odeMotorID, dParamLoStop, min->x);
-			dJointSetAMotorParam(joint->odeMotorID, dParamLoStop2, min->y);
-			dJointSetAMotorParam(joint->odeMotorID, dParamLoStop3, min->z);
-			dJointSetAMotorParam(joint->odeMotorID, dParamStopERP, .1);
-			dJointSetAMotorParam(joint->odeMotorID, dParamStopERP2, .1);
-			dJointSetAMotorParam(joint->odeMotorID, dParamStopERP3, .1);
-			dJointSetAMotorParam(joint->odeMotorID, dParamHiStop, max->x);
-			dJointSetAMotorParam(joint->odeMotorID, dParamHiStop2, max->y);
-			dJointSetAMotorParam(joint->odeMotorID, dParamHiStop3, max->z);
-			break;
-		case JT_UNIVERSAL:
-			dJointSetAMotorParam(joint->odeMotorID, dParamLoStop, min->x);
-			dJointSetAMotorParam(joint->odeMotorID, dParamLoStop3, min->y);
-			dJointSetAMotorParam(joint->odeMotorID, dParamStopERP, .1);
-			dJointSetAMotorParam(joint->odeMotorID, dParamStopERP3, .1);
-			dJointSetAMotorParam(joint->odeMotorID, dParamHiStop, max->x);
-			dJointSetAMotorParam(joint->odeMotorID, dParamHiStop3, max->y);
-			break;
-	}
-}
-
-/*!
-	\brief Set the maximum torque that a joint can affect.
-*/
-
-void slJointSetMaxTorque(slJoint *joint, double max) {
-	switch(joint->type) {
-		case JT_REVOLUTE:
-			dJointSetHingeParam(joint->odeJointID, dParamFMax, max);
-			break;
-		case JT_PRISMATIC:
-			dJointSetSliderParam(joint->odeJointID, dParamFMax, max);
-			break;
-		case JT_UNIVERSAL:
-			dJointSetAMotorParam(joint->odeMotorID, dParamFMax, max);
-			dJointSetAMotorParam(joint->odeMotorID, dParamFMax3, max);
-			break;
-		case JT_BALL:
-			dJointSetAMotorParam(joint->odeMotorID, dParamFMax, max);
-			dJointSetAMotorParam(joint->odeMotorID, dParamFMax2, max);
-			dJointSetAMotorParam(joint->odeMotorID, dParamFMax3, max);
-			break;
-	}
-}
-
-/*!
-	\brief Frees an slJoint struct.
-*/
-
-void slJointDestroy(slJoint *joint) {
-	slFree(joint);
-}
-
-/*!
-	\brief Breaks an slJoint struct.
-
-	This triggers an automatic recomputation of multibodies.
-*/
-
-slLink *slJointBreak(slJoint *joint) {
-	slLink *parent = joint->parent, *child = joint->child;
-	slMultibody *parentBody = NULL, *childBody, *newMb;
-
-	if(!parent && !child) return NULL;
-
-	childBody = joint->child->multibody;
-
-	if(parent) parentBody = parent->multibody;
-
-	if(parent) slStackRemove(parent->outJoints, joint);
-	slStackRemove(child->inJoints, joint);
-
-	dJointAttach(joint->odeJointID, NULL, NULL);
-	dJointDestroy(joint->odeJointID);
-
-	if(joint->odeMotorID) {
-		dJointAttach(joint->odeMotorID, NULL, NULL);
-		dJointDestroy(joint->odeMotorID);
-	}
-
-	joint->child = NULL;
-	joint->parent = NULL;
-
-	if(parentBody) slMultibodyUpdate(parentBody);
-	if(childBody && childBody != parentBody) slMultibodyUpdate(childBody);
-
-	/* figure out if the broken links are still part of those bodies */
-	/* ... if not, then try to adopt the links */
-	/* ... if not, then NULL the multibody entries */
-
-	if(parent && parentBody && (std::find(parentBody->links.begin(), parentBody->links.end(), parent) != parentBody->links.end())) {
-		if((newMb = slLinkFindMultibody(parent))) slMultibodyUpdate(newMb);
-		else slNullOrphanMultibodies(parent);
-	}
-
-	if(child && childBody && (std::find(childBody->links.begin(), childBody->links.end(), child) != childBody->links.end())) {
-		if((newMb = slLinkFindMultibody(child))) slMultibodyUpdate(newMb);
-		else slNullOrphanMultibodies(child);
-	}
-
-	// the bodies may have changed...
-
-	return parent;
 }
 
 /*!
@@ -498,9 +289,8 @@ void slNullOrphanMultibodies(slLink *orphan) {
 
 slMultibody *slLinkFindMultibody(slLink *root) {
 	slList *start, *rootList = slLinkList(root, NULL, 0);
-	slStack *jointStack;
 	slJoint *joint;
-	unsigned int n;
+	std::vector<slJoint*>::iterator ji;
 
 	start = rootList;
 
@@ -511,10 +301,8 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 			/* okay!  link has another mb for us!  we need to find the joint */
 			/* connecting this new multibody to our old one! */
 
-			jointStack = link->inJoints;
-
-			for(n=0;n<jointStack->count;n++) {
-				joint = jointStack->data[n];
+			for(ji = root->inJoints.begin(); ji != root->inJoints.end(); ji++ ) {
+				joint = *ji;
 
 				if(joint->parent && joint->parent->multibody == root->multibody) {
 					joint->isMbJoint = 1;
@@ -523,10 +311,8 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 				}
 			}
 
-			jointStack = link->outJoints;
-
-			for(n=0;n<jointStack->count;n++) {
-				joint = jointStack->data[n];
+			for(ji = root->outJoints.begin(); ji != root->outJoints.end(); ji++ ) {
+				joint = *ji;
 
 				if(joint->child->multibody == root->multibody) {
 					joint->isMbJoint = 1;
@@ -549,20 +335,20 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 */
 
 slList *slLinkList(slLink *root, slList *list, int mbOnly) {
-	unsigned int n;
+	std::vector<slJoint*>::iterator ji;
 
 	if(!root || slInList(list, root)) return list; 
 
 	list = slListPrepend(list, root);
 
-	for(n=0;n<root->outJoints->count;n++) {
-		if(!mbOnly || ((slJoint*)root->outJoints->data[n])->isMbJoint) 
-			list = slLinkList(((slJoint*)root->outJoints->data[n])->child, list, mbOnly);
+	for(ji = root->outJoints.begin(); ji != root->outJoints.end(); ji++ ) {
+		if(!mbOnly || (*ji)->isMbJoint) 
+			list = slLinkList((*ji)->child, list, mbOnly);
 	}
 
-	for(n=0;n<root->inJoints->count;n++) {
-		if(!mbOnly || ((slJoint*)root->inJoints->data[n])->isMbJoint) 
-			list = slLinkList(((slJoint*)root->inJoints->data[n])->parent, list, mbOnly);
+	for(ji = root->inJoints.begin(); ji != root->inJoints.end(); ji++ ) {
+		if(!mbOnly || (*ji)->isMbJoint) 
+			list = slLinkList((*ji)->parent, list, mbOnly);
 	}
 
 	return list;

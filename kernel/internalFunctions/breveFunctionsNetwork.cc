@@ -81,7 +81,7 @@ int brICloseServer(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Sets the HTML index page of a server.
 
-	void listenOnPort(brNetworkServerData pointer, string).
+	void setIndexPage(brNetworkServerData pointer, string).
 */
 
 int brISetIndexPage(brEval args[], brEval *target, brInstance *i) {
@@ -97,7 +97,7 @@ int brISetIndexPage(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Gets the URL required to connect to the given server.
 
-	string listenOnPort(brNetworkServerData pointer).
+	string getServerURL(brNetworkServerData pointer).
 */
 
 int brIGetServerURL(brEval args[], brEval *target, brInstance *i) {

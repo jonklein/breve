@@ -41,7 +41,7 @@ slWorld *slWorldNew() {
 	gPhysicsError = 0;
 	gPhysicsErrorMessage = NULL;
 
-	w = slMalloc(sizeof(slWorld));
+	w = new slWorld;
 	bzero(w, sizeof(slWorld));
 
 	slAllocIntegrationVectors(w);
@@ -63,10 +63,6 @@ slWorld *slWorldNew() {
 	w->initialized = 0;
 
 	w->cameras = slStackNew();
-
-	w->maxObjects = 8;
-	w->objects = slMalloc(sizeof(slWorldObject*) * w->maxObjects);
-	w->objectCount = 0;
 
 	w->patchGridObjects = slStackNew();
 	w->springObjects = slStackNew();
@@ -148,13 +144,15 @@ int slWorldStartNetsimSlave(slWorld *w, char *host) {
 
 void slWorldFree(slWorld *w) {
 	int n;
+	std::vector<slWorldObject*>::iterator wi;
 
-	for(n=0;n<w->objectCount;n++) slWorldFreeObject(w->objects[n]);
+	for( wi = w->objects.begin(); wi != w->objects.end(); wi++ ) 
+		slWorldFreeObject( *wi );
+
 	for(n=0;n<w->patchGridObjects->count;n++) slFreePatchGrid(w->patchGridObjects->data[n]);
 
 	if(w->clipData) slFreeClipData(w->clipData);
 	if(w->proximityData) slFreeClipData(w->proximityData);
-	if(w->objects) slFree(w->objects);
 	if(w->patchGridObjects) slStackFree(w->patchGridObjects);
 	if(w->cameras) slStackFree(w->cameras);
 
@@ -167,7 +165,8 @@ void slWorldFree(slWorld *w) {
 #endif
 
 	slFreeIntegrationVectors(w);
-	slFree(w);
+
+	delete w;
 }
 
 /*!
@@ -241,7 +240,7 @@ void slWorldFreeObject(slWorldObject *o) {
 
 	slRemoveAllObjectLines(o);
 
-	slFree(o);
+	delete o;
 }
 
 /*!
@@ -251,16 +250,11 @@ void slWorldFreeObject(slWorldObject *o) {
 slWorldObject *slWorldAddObject(slWorld *w, void *p, int type) {
 	slWorldObject *no;
 
+	no = slWorldNewObject(p, type);
+
+	if(type == WO_LINK) w->objects.insert(w->objects.begin(), no);
+	else w->objects.push_back(no);
 	w->initialized = 0;
-
-	if(w->objectCount == w->maxObjects) {
-		w->maxObjects *= 2;
-		w->objects = slRealloc(w->objects, w->maxObjects*sizeof(slWorldObject*));
-	}
-
-	no = w->objects[w->objectCount] = slWorldNewObject(p, type);
-
-	w->objectCount++;
 
 	return no;
 }
@@ -282,20 +276,14 @@ slPatchGrid *slAddPatchGrid(slWorld *w, slVector *center, slVector *patchSize, i
 */
 
 void slRemoveObject(slWorld *w, slWorldObject *p) {
-	int n, found = 0;
+	std::vector<slWorldObject*>::iterator wi;
 
-	for(n=0;n<w->objectCount;n++) {
-		if(found) {
-			w->objects[n - 1] = w->objects[n];
-		} else if(w->objects[n] == p) {
-			w->objects[n] = NULL;
-			found = 1;
-		}
+	wi = std::find(w->objects.begin(), w->objects.end(), p);
+
+	if(wi != w->objects.end()) {
+		w->objects.erase(wi);
+		w->initialized = 0;
 	}
-
-	w->objectCount--;
-
-	if(found) w->initialized = 0;
 }
 
 /*!
@@ -309,7 +297,7 @@ void slRemoveObject(slWorld *w, slWorldObject *p) {
 slWorldObject *slWorldNewObject(void *d, int type) {
 	slWorldObject *w;
 
-	w = slMalloc(sizeof(slWorldObject));
+	w = new slWorldObject;
 	bzero(w, sizeof(slWorldObject));
 
 	if(!w) return NULL;
@@ -453,9 +441,12 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 
 	/* only step forward to the end of the multibodies */
 
-	while(n < w->objectCount && w->objects[n] && w->objects[n]->type == WO_LINK) {
+	while(n < w->objects.size() && w->objects[n] && w->objects[n]->type == WO_LINK) {
 		double dt = stepSize;
 		slLink *link;
+
+		// if(!w->objects[n] || w->objects[n]->type != WO_LINK) continue;
+
 		link = (slLink*)w->objects[n]->data;
 
 		if(link->simulate) {
@@ -614,7 +605,7 @@ void slNeighborCheck(slWorld *w) {
 
 	if(!w->proximityData) {
 		w->proximityData = slVclipDataNew();
-		slVclipDataRealloc(w->proximityData, w->objectCount);
+		slVclipDataRealloc(w->proximityData, w->objects.size());
 		slInitProximityData(w);
 		slInitBoundSort(w->proximityData);
 		slVclip(w->proximityData, 0.0, 1, 0);
@@ -622,7 +613,7 @@ void slNeighborCheck(slWorld *w) {
 
 	/* update all the bounding boxes first */
 
-	for(n=0;n<w->objectCount;n++) {
+	for(n=0;n<w->objects.size();n++) {
 		if(w->objects[n]->type == WO_LINK) {
 			slLink *link = w->objects[n]->data;
 		   
@@ -852,7 +843,7 @@ void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*), int (*
 }
 
 slWorldObject *slWorldGetObject(slWorld *w, int n) {
-	if(n > w->objectCount) return NULL;
+	if(n > w->objects.size()) return NULL;
 	return w->objects[n];
 }
 

@@ -167,7 +167,9 @@ int brIImageUpdateTexture(brEval args[], brEval *result, brInstance *i) {
 		return EC_OK;
 	}
 
-   	image->textureNumber = slAddTexture(i->engine->world, image->textureNumber, image->data, image->x, image->y, GL_RGBA);
+	if(image->textureNumber == -1) image->textureNumber = slTextureNew();
+
+   	slUpdateTexture(i->engine->world, image->textureNumber, image->data, image->x, image->y, GL_RGBA);
 
 	BRINT(result) = image->textureNumber;
 

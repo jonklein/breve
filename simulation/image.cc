@@ -292,7 +292,8 @@ void slSGIImageGetRow(slSGIImageRec *image, unsigned char *buf, int y, int z) {
 }
 
 unsigned char *slReadSGIImage(char *name, int *width, int *height, int *components, int usealpha) {
-    unsigned *base, *lptr;
+    unsigned char *base;
+	unsigned *lptr;
     unsigned char *rbuf, *gbuf, *bbuf, *abuf;
     slSGIImageRec *image;
     int y;
@@ -307,14 +308,14 @@ unsigned char *slReadSGIImage(char *name, int *width, int *height, int *componen
     (*width)=image->xsize;
     (*height)=image->ysize;
     (*components)=image->zsize;
-    base = (unsigned *)slMalloc(image->xsize*image->ysize*sizeof(unsigned));
+    base = (unsigned char*)slMalloc(image->xsize*image->ysize*sizeof(unsigned));
     rbuf = (unsigned char *)malloc(image->xsize*sizeof(unsigned char));
     gbuf = (unsigned char *)malloc(image->xsize*sizeof(unsigned char));
     bbuf = (unsigned char *)malloc(image->xsize*sizeof(unsigned char));
     abuf = (unsigned char *)malloc(image->xsize*sizeof(unsigned char));
     if(!base || !rbuf || !gbuf || !bbuf)
       return NULL;
-    lptr = base;
+    lptr = (unsigned*)base;
     for(y=0; y<image->ysize; y++) {
 	if(image->zsize>=4) {
 	    slSGIImageGetRow(image,rbuf,y,0);
@@ -346,7 +347,7 @@ unsigned char *slReadSGIImage(char *name, int *width, int *height, int *componen
     free(bbuf);
     free(abuf);
 
-    return (void*)base;
+    return base;
 }
 
 #ifdef HAVE_LIBJPEG
@@ -354,7 +355,7 @@ unsigned char *slReadJPEGImage(char *name, int *width, int *height, int *compone
 	struct jpeg_decompress_struct cinfo;
 	slJPEGError jerr;
 	JSAMPARRAY buffer;
-	char *image;
+	unsigned char *image;
 	int rowstride;
 
 	FILE *f = NULL;
@@ -390,7 +391,7 @@ unsigned char *slReadJPEGImage(char *name, int *width, int *height, int *compone
 		return NULL;
 	}
 
-	image = slMalloc(4 * cinfo.image_width * cinfo.image_height * sizeof(JSAMPLE)); 
+	image = (unsigned char*)slMalloc(4 * cinfo.image_width * cinfo.image_height * sizeof(JSAMPLE)); 
 
 	buffer = (*cinfo.mem->alloc_sarray)
 		((j_common_ptr) &cinfo, JPOOL_IMAGE, rowstride, 1);
@@ -400,7 +401,7 @@ unsigned char *slReadJPEGImage(char *name, int *width, int *height, int *compone
 	jpeg_start_decompress(&cinfo);
 
 	while(cinfo.output_scanline < cinfo.output_height) {
-		int n, m = 0;
+		unsigned int n, m = 0;
 		int row = cinfo.output_height - cinfo.output_scanline - 1;
 
 		jpeg_read_scanlines(&cinfo, buffer, 1); 
@@ -408,7 +409,7 @@ unsigned char *slReadJPEGImage(char *name, int *width, int *height, int *compone
 		for(n=0;n<4 * cinfo.output_width;n++) {
 			if((n+1) % 4) image[(4 * cinfo.output_width * row) + n] = buffer[0][m++];
 			else {
-				int total = (buffer[0][m - 1] + buffer[0][m - 2] + buffer[0][m - 3]) / 3.0;
+				int total = (int)((buffer[0][m - 1] + buffer[0][m - 2] + buffer[0][m - 3]) / 3.0);
 				image[(4 * cinfo.output_width * row) + n] = buffer[0][m - 1] = 0xff - total;
 			}
 		}
@@ -448,8 +449,8 @@ unsigned char *slReadPNGImage(char *name, int *width, int *height, int *componen
 	png_infop info;
 	int passes;
 	png_bytep *rows;
-	char *image;
-	int y, x;
+	unsigned char *image;
+	unsigned int y, x;
 
 	f = fopen(name, "rb");
 
@@ -512,7 +513,7 @@ unsigned char *slReadPNGImage(char *name, int *width, int *height, int *componen
 
 	png_read_image(png_ptr, rows);
 
-	image = slMalloc(4 * info->height * info->width);
+	image = (unsigned char*)slMalloc(4 * info->height * info->width);
 
 	for(x=0;x<info->height;x++) {
 		int rowOffset = 0;
@@ -624,7 +625,7 @@ int slWritePNGImage(char *name, int width, int height, unsigned char *buffer, in
 */
 
 int slPNGSnapshot(slCamera *c, char *file) {
-	char *buffer;
+	unsigned char *buffer;
 	int r;
 
 	if(c->enabled == CM_DISABLED) return -1;
@@ -633,13 +634,13 @@ int slPNGSnapshot(slCamera *c, char *file) {
 
 	if(c->activateContextCallback) c->activateContextCallback();
 
-	buffer = slMalloc(c->x * c->y * 3);
+	buffer = new unsigned char[c->x * c->y * 3];
 
 	glReadPixels(c->ox, c->oy, c->x, c->y, GL_RGB, GL_UNSIGNED_BYTE, buffer);
 
 	r = slWritePNGImage(file, c->x, c->y, buffer, 3, 1);
 
-	slFree(buffer);
+	delete[] buffer;
 
 	return r;
 }

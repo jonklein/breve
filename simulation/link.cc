@@ -27,23 +27,19 @@
 slLink *slLinkNew(slWorld *w) {
 	slLink *m;
 
-	m = slMalloc(sizeof(slLink));
+	m = new slLink;
+	m->shape = NULL;
+
+	bzero(m, sizeof(slLink));
 
 	m->odeBodyID = dBodyCreate(w->odeWorldID);
 
 	m->simulate = 0;
 
-	m->outJoints = slStackNew();
-	m->inJoints = slStackNew();
-
-	m->springs = slStackNew();
-
 	slQuatIdentity(&m->stateVector[0].rotQuat);
 	slQuatIdentity(&m->stateVector[1].rotQuat);
 
 	slMatrixIdentity(m->position.rotation);
-
-	m->multibody = NULL;
 
 	return m;
 }
@@ -241,29 +237,29 @@ void slLinkSetAcceleration(slLink *m, slVector *linear, slVector *rotational) {
 */
 
 void slLinkFree(slLink *l) {
-	int n;
+	std::vector<slJoint*>::iterator i;
+	std::vector<slJoint*> joints;
 
 	if(l->multibody && l->multibody->root == l) {
 		l->multibody->root = NULL;
 		slMultibodyUpdate(l->multibody);
 	}
 
-	// joint break will remove things from the inJoints and outJoints stacks
+	// WARNING: joint break will remove elements from the inJoints and 
+	// outJoints vectors.  We can therefore not iterate through the 
+	// vectors themselves -- we need to use a copy.
 
-	while(l->inJoints->count) slJointBreak(l->inJoints->data[0]);
-	while(l->outJoints->count) slJointBreak(l->outJoints->data[0]);
+	joints = l->inJoints;
+	for(i = joints.begin(); i != joints.end(); i++ ) slJointBreak(*i);
 
-	// break the joints (but don't delete them)
+	joints = l->outJoints;
+	for(i = joints.begin(); i != joints.end(); i++ ) slJointBreak(*i);
 
 	dBodyDestroy(l->odeBodyID);
 
 	slFreeShape(l->shape);
 
-	slStackFree(l->inJoints);
-	slStackFree(l->outJoints);
-	slStackFree(l->springs);
-
-	slFree(l);
+	delete l;
 }
 
 /*!
@@ -375,12 +371,12 @@ void slLinkApplyJointControls(slLink *m) {
 	slJoint *joint;
 	double angle, speed;
 	double newSpeed;
-	unsigned int n;
+	std::vector<slJoint*>::iterator ji;
 
 	slLinkApplyForce(m, &m->externalForce, NULL);
 
-	for(n=0;n<m->inJoints->count;n++) {
-		joint = m->inJoints->data[n];
+	for(ji = m->inJoints.begin(); ji != m->inJoints.end(); ji++ ) {
+		joint = *ji;
 
 		if(joint->type == JT_REVOLUTE) {
 			angle = dJointGetHingeAngle(joint->odeJointID);
@@ -537,7 +533,8 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 
 	slVectorNormalize(&tn);
 
-	joint = slMalloc(sizeof(slJoint));
+	joint = new slJoint;
+	bzero(joint, sizeof(slJoint));
 
 	/* for both parent and child:
 		if it does NOT exist, OR if it already has a mb, then 
@@ -627,8 +624,8 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 			break;
 	}
 
-	if(parent) slStackPush(parent->outJoints, joint);
-	slStackPush(child->inJoints, joint);
+	if(parent) parent->outJoints.push_back(joint);
+	child->inJoints.push_back(joint);
 
 	joint->parent = parent;
 	joint->child = child;

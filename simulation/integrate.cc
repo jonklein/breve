@@ -45,7 +45,7 @@ inline int slCalculateDerivs(slLink *r, double *sv, double *dv, slWorld *w) {
 */
 
 inline void slSumConfigVectors(double *inv, double *derv, double *outv, double w) {
-	int n;
+	unsigned int n;
 
 	for(n=0;n<sizeof(slLinkIntegrationPosition)/sizeof(double);n++) outv[n] = inv[n] + (derv[n] * w);
 }
@@ -157,7 +157,8 @@ int slRKCKRun(slWorld *w, slLink *m, double *deltaT, int skipFirst) {
 int slRKCK(slWorld *w, slLink *m, double *x, double acc, double stepSize, double *nextSize) {
 	double *osv, *sv;
 	double errmax, h, htemp, xnew;
-	int err = 0, i;
+	int err = 0;
+	unsigned int i;
 
 	osv = (double*)&m->stateVector[!m->currentState];
 	sv = (double*)&m->stateVector[m->currentState];
@@ -393,11 +394,8 @@ int slIntRKF(slWorld *w, slLink *m, double *deltaT, int skipFirst) {
 
 	//-- check singular differential equation case --//
 
-	if ( fabs( timeStep ) < RKF_MIN_TIMESTEP ) return RKF_MIN_TIMESTEP; 
-
+	if ( fabs( timeStep ) < RKF_MIN_TIMESTEP ) timeStep = RKF_MIN_TIMESTEP;
 	*deltaT = timeStep;
-
-	// printf("next timestep = %f\n", timeStep);
 
 	return simerr;
 }
@@ -406,7 +404,7 @@ void slFreeIntegrationVectors(slWorld *w) {
 	int n;
 
 	for(n=0;n<DV_VECTOR_COUNT;n++) {
-		if(w->dv[n]) slFree(w->dv[n]);
+		if(w->dv[n]) delete[] w->dv[n];
 		w->dv[n] = NULL;
 	}
 }
@@ -414,6 +412,6 @@ void slFreeIntegrationVectors(slWorld *w) {
 void slAllocIntegrationVectors(slWorld *w) {
 	int n;
 
-	for(n=0;n<DV_VECTOR_COUNT;n++) w->dv[n] = slMalloc(sizeof(slLinkIntegrationPosition));
+	for(n=0;n<DV_VECTOR_COUNT;n++) w->dv[n] = new double[sizeof(slLinkIntegrationPosition)];
 }
 

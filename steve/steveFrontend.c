@@ -31,8 +31,8 @@ int breveFrontendLoadSavedSimulation(breveFrontend *frontend, char *simcode, cha
 	\brief The breve callback to determine if one object is a subclass of another.
 */
 
-int stSubclassCallback(brObject *c1, brObject *c2) {
-	return stIsSubclassOf(c1->userData, c2->userData);
+int stSubclassCallback(void *c1, void *c2) {
+	return stIsSubclassOf(c1, c2);
 }
 
 /*!

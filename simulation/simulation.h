@@ -54,9 +54,6 @@ extern "C"{
 #include "shape.h"
 #include "volInt.h"
 
-#include "vclip.h"
-
-#include "link.h"
 #include "springs.h"
 
 #include "patch.h"
@@ -78,6 +75,10 @@ extern "C"{
 }
 #endif
 
+#include "vclip.h"
+
+#include "vclipData.h"
+#include "link.h"
 #include "multibody.h"
 #include "world.h"
 #include "joint.h"

@@ -48,13 +48,13 @@ brCollisionHandler *brCheckCollisionCallback(brInstance *o1, brInstance *o2) {
 	for(n=0;n<o1->object->collisionHandlers->count;n++) {
 		h = o1->object->collisionHandlers->data[n];
 
-		if(o2->object->type == h->object->type && o2->object->type->isSubclass(h->object, o2->object)) return h;
+		if(o2->object->type == h->object->type && o2->object->type->isSubclass(h->object->userData, o2->object->userData)) return h;
 	}
 
 	for(n=0;n<o2->object->collisionHandlers->count;n++) {
 		h = o2->object->collisionHandlers->data[n];
 
-		if(o1->object->type == h->object->type && o1->object->type->isSubclass(h->object, o1->object)) return h;
+		if(o1->object->type == h->object->type && o1->object->type->isSubclass(h->object->userData, o1->object->userData)) return h;
 	}
 
 	return NULL;
@@ -84,7 +84,7 @@ void brCollisionCallback(brInstance *o1, brInstance *o2, int type) {
 	for(n=0;n<o1->object->collisionHandlers->count;n++) {
 		h = o1->object->collisionHandlers->data[n];
 
-		if(o2->object->type == h->object->type && o2->object->type->isSubclass(o2->object, h->object)) {
+		if(o2->object->type == h->object->type && o2->object->type->isSubclass(o2->object->userData, h->object->userData)) {
 			meth = h->method;
 
 			collider.type = AT_INSTANCE;
@@ -108,7 +108,7 @@ void brCollisionCallback(brInstance *o1, brInstance *o2, int type) {
 	for(n=0;n<o2->object->collisionHandlers->count;n++) {
 		h = o2->object->collisionHandlers->data[n];
 
-		if(o1->object->type == h->object->type && o1->object->type->isSubclass(o1->object, h->object)) {
+		if(o1->object->type == h->object->type && o1->object->type->isSubclass(o1->object->userData, h->object->userData)) {
 			meth = h->method;
 
 			collider.type = AT_INSTANCE;

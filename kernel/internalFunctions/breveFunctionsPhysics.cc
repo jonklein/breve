@@ -65,9 +65,6 @@ int brIRotationMatrix(brEval args[], brEval *target, brInstance *i) {
 int brIJointApplyTorque(brEval args[], brEval *target, brInstance *i) {
 	slJoint *j = BRPOINTER(&args[0]);
 	slVector *tVector = &BRVECTOR(&args[1]);
-	double torque = tVector->x;
-	slVector t;
-	dVector3 axis;
 
 	// I think this is somewhat broken.
 
@@ -325,7 +322,7 @@ int brIJointBreak(brEval args[], brEval *target, brInstance *i) {
 	}
 
 	slJointBreak(joint);
-	slJointDestroy(joint);
+	slJointFree(joint);
 	slWorldSetUninitialized(i->engine->world);
 
 	return EC_OK;

@@ -103,7 +103,7 @@ struct slCamera {
 
 	int flags;
 
-	int zClip;
+	double zClip;
 
 	// used during drawing
 

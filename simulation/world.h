@@ -194,9 +194,7 @@ struct slWorld {
 
 	double age;
 
-	int objectCount;
-	int maxObjects;
-	slWorldObject **objects;
+	std::vector<slWorldObject*> objects;
 
 	// these structures will replace the standard objects above in the 
 	// near future -- OR WILL THEY?!

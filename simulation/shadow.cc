@@ -135,7 +135,7 @@ int slShadowVolumeForSphere(slCamera *c, slShape *s, slPosition *p) {
 
 	glBegin(GL_QUADS);
 
-	divisions = s->radius * 5;
+	divisions = (int)(s->radius * 5.0);
 
 	if(divisions < MIN_SPHERE_VOLUME_DIVISIONS) divisions = MIN_SPHERE_VOLUME_DIVISIONS;
 	else if(divisions > MAX_SPHERE_VOLUME_DIVISIONS) divisions = MAX_SPHERE_VOLUME_DIVISIONS;

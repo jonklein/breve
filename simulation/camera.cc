@@ -28,11 +28,12 @@ slCamera *slNewCamera(int x, int y, int drawMode) {
 	slCamera *c;
 	int n;
 
-	c = slMalloc(sizeof(slCamera));
+	c = new slCamera;
 
 	c->enabled = CM_NOT_UPDATED;
 
-	c->text = slMalloc(sizeof(slCameraText) * 8);
+	c->text = new slCameraText[8]; 
+
 	c->maxText = 8;
 	c->textCount = 0;
 	c->textScale = 1;
@@ -112,8 +113,8 @@ void slCameraFree(slCamera *c) {
 
 	for(n=0;n<c->textCount;n++) if(c->text[n].text) slFree(c->text[n].text);
 
-	slFree(c->text);
-	slFree(c);
+	delete[] c->text;
+	delete c;
 }
 
 /*!

@@ -104,6 +104,9 @@ struct slCollisionEntry {
 	\brief Data associated with the v-clip algorithm.
 */
 
+
+#ifdef __cplusplus
+#include <vector>
 struct slVclipData {
 	slBoundSort **xListPointers;
 	slBoundSort **yListPointers;
@@ -116,7 +119,7 @@ struct slVclipData {
 	slShape **shapeList;
 	slPosition **shapePositions;
 	
-	slWorldObject **objects;
+	std::vector<slWorldObject*> objects;
 
 	slCollisionEntry **collisions;
 
@@ -132,6 +135,7 @@ struct slVclipData {
 	int count;
 	int maxCount;
 };
+#endif
 
 void slAddCollisionCandidate(slVclipData *d, slPairEntry *e);
 void slRemoveCollisionCandidate(slVclipData *d, slPairEntry *e);

@@ -38,8 +38,6 @@ void slVclipDataInit(slWorld *w) {
 
 	w->initialized = 1;
 
-	if(w->objectCount > 1) qsort(w->objects, w->objectCount, sizeof(slWorldObject*), slObjectSortFunc);
-
 	if(w->proximityData) {
 		slInitProximityData(w);
 		slInitBoundSort(w->proximityData);
@@ -47,14 +45,14 @@ void slVclipDataInit(slWorld *w) {
 	
 	// allocate the right amount of space for the current set of collisions
 
-	slVclipDataRealloc(w->clipData, w->objectCount);
+	slVclipDataRealloc(w->clipData, w->objects.size());
 
 	w->clipData->objects = w->objects;
 
 	// for each object in the world, fill in it's shape, position and 
 	// min/max vectors
 
-	for(n=0;n<w->objectCount;n++) {
+	for(n=0;n<w->objects.size();n++) {
 		switch(w->objects[n]->type) {
 			case WO_LINK:
 				link = w->objects[n]->data;
@@ -90,13 +88,13 @@ void slVclipDataInit(slWorld *w) {
 		}
 	}
 
-	for(x=1;x<w->objectCount;x++) {
+	for(x=1;x<w->objects.size();x++) {
 		for(y=0;y<x;y++) {
 			slVclipDataAddPairEntry(w, x, y);
 		}
 	}
 
-	for(n=0;n<w->objectCount;n++) {
+	for(n=0;n<w->objects.size();n++) {
 	 	if(w->objects[n]->type == WO_LINK) {
 	 		link = ((slLink*)w->objects[n]->data);
 	 
@@ -373,9 +371,9 @@ void slInitProximityData(slWorld *w) {
 	int n, x, y;
 	slPairEntry *pe;
 
-	slVclipDataRealloc(w->proximityData, w->objectCount);
+	slVclipDataRealloc(w->proximityData, w->objects.size());
 
-	for(n=0;n<w->objectCount;n++) {
+	for(n=0;n<w->objects.size();n++) {
 		w->proximityData->xList[(n * 2)	].type = BT_MIN;
 		w->proximityData->xList[(n * 2) + 1].type = BT_MAX;
 		w->proximityData->xList[(n * 2)	].number = n;
@@ -445,7 +443,7 @@ void slInitProximityData(slWorld *w) {
 	// for the proximity data we don't need anything except the	
 	// x and y set in the pairList.  no features or object pointers.
 
-	for(x=1;x<w->objectCount;x++) {
+	for(x=1;x<w->objects.size();x++) {
 		for(y=0;y<x;y++) {
 			pe = &w->proximityData->pairList[x][y];
 

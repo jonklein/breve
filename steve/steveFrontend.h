@@ -23,7 +23,7 @@ struct stVersionRequirement {
 
 stSteveData *stSteveInit(brEngine *engine);
 
-int stSubclassCallback(brObject *c1, brObject *c2);
+int stSubclassCallback(void *c1, void *c2);
 
 int stLoadFiles(stSteveData *s, brEngine *engine, char *code, char *file);
 int stParseFile(stSteveData *s, brEngine *engine, char *filename);

@@ -67,8 +67,9 @@ enum linkDrawOptions {
 void slInitGL(slWorld *w);
 void slCompileCubeDrawList();
 
+unsigned int slTextureNew();
 int slLoadTexture(slWorld *w);
-int slAddTexture(slWorld *w, GLuint texNum, unsigned char *pixels, int width, int height, int p);
+int slUpdateTexture(slWorld *w, GLuint texNum, unsigned char *pixels, int width, int height, int p);
 int slAddMipmap(slWorld *w, unsigned char *pixels, int width, int height, int p);
 
 void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor);
@@ -129,7 +130,7 @@ void slFreeGL(slWorld *w, slCamera *c);
 
 void slDeleteMbGLLists(slMultibody *m);
 
-void slReversePixelBuffer(char *source, char *dest, int width, int height);
+void slReversePixelBuffer(unsigned char *source, unsigned char *dest, int width, int height);
 
 void slTransposeGLMatrix(GLfloat *m);
 

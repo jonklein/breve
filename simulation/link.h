@@ -47,6 +47,8 @@ struct slLinkIntegrationPosition {
 */
 
 #ifdef __cplusplus
+#include <vector>
+
 struct slLink {
 	slMultibody *multibody;
 
@@ -78,10 +80,8 @@ struct slLink {
 
 	slShape *shape;
 	
-	slStack *inJoints;
-	slStack *outJoints;
-
-	slStack *springs;
+	std::vector<slJoint*> inJoints;
+	std::vector<slJoint*> outJoints;
 
 	// bounding box parameters
 

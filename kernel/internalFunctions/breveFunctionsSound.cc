@@ -68,7 +68,7 @@ int brIPlaySoundFile(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
-/*
+/*!
 	\brief Creates a sinewave of a given frequency.
 
 	brSoundPlayer pointer newSinewave(int).
@@ -76,6 +76,16 @@ int brIPlaySoundFile(brEval args[], brEval *target, brInstance *i) {
 
 int brINewSinewave(brEval args[], brEval *target, brInstance *i) {
 	BRPOINTER(target) = brNewSinewave(i->engine->soundMixer, BRINT(&args[0]));
+	return EC_OK;
+}
+
+/*!
+	\brief Stops a sinewave.
+*/
+
+int brIFreeSinewave(brEval args[], brEval *target, brInstance *i) {
+	brSoundPlayer *p = BRPOINTER(&args[0]);
+	p->finished = 1;
 	return EC_OK;
 }
 
@@ -140,6 +150,7 @@ void breveInitSoundFunctions(brNamespace *n) {
 	brNewBreveCall(n, "playSoundFile", brIPlaySoundFile, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "freeSoundFile", brIFreeSoundFile, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "newSinewave", brINewSinewave, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "freeSinewave", brIFreeSinewave, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "setFrequency", brISetFrequency, AT_NULL, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "setVolume", brISetVolume, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "setBalance", brISetBalance, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
@@ -148,6 +159,7 @@ void breveInitSoundFunctions(brNamespace *n) {
 	brNewBreveCall(n, "playSoundFile", brISoundUnsupported, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "freeSoundFile", brISoundUnsupported, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "newSinewave", brISoundUnsupported, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "freeSinewave", brISoundUnsupported, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "setVolume", brISoundUnsupported, AT_NULL, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "setFrequency", brISoundUnsupported, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 #endif

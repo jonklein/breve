@@ -46,7 +46,7 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 		bufferSize = size * size * 3;
 	}
 
-	if(w->objectCount == 0) return;
+	if(w->objects.size()== 0) return;
 
 	glDisable(GL_LIGHTING);
 	glDisable(GL_BLEND);
@@ -72,7 +72,7 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	glClearColor(1, 1, 1, 1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	for(n=0;n<w->objectCount;n++) {
+	for(n=0;n<w->objects.size();n++) {
 		unsigned char br, bg, bb;
 		slVector color;
 
@@ -108,7 +108,7 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 
 		label = (expMap[x] << 16) + (expMap[x+1] << 8) + expMap[x+2];
 
-		if(label != WHITE_PIXEL && label < w->objectCount) {
+		if(label != WHITE_PIXEL && label < w->objects.size()) {
 			wo = (slWorldObject*)w->objects[label];
 			wo->lightExposure++;
 		}
