@@ -24,13 +24,15 @@ Object : Spring (aka Springs) {
 
 	+ variables:
 		springPointer (pointer).
+		length, strength, damping (float).
+		mode (int).
 
 	+ to connect from link1 (object) to link2 (object) 
 				from-point point1 = (0, 0, 0) (vector) 
 				to-point point2 = (0, 0, 0) (vector)
-				with-length length (float)
-				with-strength strength (float)
-				with-damping damping = 0.2 (float):
+				with-length springLength (float)
+				with-strength springStrength (float)
+				with-damping springDamping = 0.2 (float):
 
 		% Connects the spring from link1 to link2.  
 		% <p>
@@ -39,6 +41,10 @@ Object : Spring (aka Springs) {
 		% values are (0, 0, 0).
 
 		if link1 == link2: return.
+
+		length = springLength.
+		strength = springStrength.
+		damping = springDamping.
 
 		springPointer = springNew((link1 get-link-pointer), 
 				(link2 get-link-pointer), 
@@ -50,16 +56,22 @@ Object : Spring (aka Springs) {
 		if springPointer: return springGetCurrentLength(springPointer).
 		return 0.
 
+	+ to get-length:
+		return length.
+
 	+ to set-length to newLength (double):
 		% Sets the spring's length to newLength.
+		length = newLength.
 		if springPointer: springSetLength(springPointer, newLength).
 
 	+ to set-strength to newStrength (double):
 		% Sets the spring's strength to newStrength.
+		strength = newStrength.
 		if springPointer: springSetStrength(springPointer, newStrength).
 
 	+ to set-damping to newDamping (double):
 		% Sets the spring's damping to newDamping.
+		damping = newDamping.
 		if springPointer: springSetDamping(springPointer, newDamping).
 
 	+ to set-expand-and-contract:
@@ -68,6 +80,7 @@ Object : Spring (aka Springs) {
 		% to be larger than the natural length.  This is the default behavior of 
 		% a spring.
 
+		mode = 0.
 		if springPointer: springSetMode(springPointer, 0).
 
 	+ to set-expand-only:
@@ -75,6 +88,7 @@ Object : Spring (aka Springs) {
 		% if it is pushed smaller than its natural length, but will not contract
 		% if it is stretched to be larger.
 
+		mode = 1.
 		if springPointer: springSetMode(springPointer, 1).
 
 	+ to set-contract-only:
@@ -84,6 +98,7 @@ Object : Spring (aka Springs) {
 		% more like a rope.  See also METHOD(set-expand-only) and 
 		% METHOD(set-expand-and-contract).
 
+		mode = 2.
 		if springPointer: springSetMode(springPointer, 2).
 
 	+ to destroy: 
