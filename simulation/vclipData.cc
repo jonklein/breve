@@ -382,7 +382,7 @@ void slInitProximityData(slWorld *w) {
 		w->proximityData->xList[(n * 2) + 1].number = n;
 		w->proximityData->xList[(n * 2)	].value = &w->objects[n]->min.x;
 		w->proximityData->xList[(n * 2) + 1].value = &w->objects[n]->max.x;
-		w->proximityData->zList[(n * 2) + 1].previousLeft = NULL;
+		w->proximityData->xList[(n * 2) + 1].previousLeft = NULL;
 
 		w->proximityData->yList[(n * 2)	].type = BT_MIN;
 		w->proximityData->yList[(n * 2) + 1].type = BT_MAX;
@@ -390,7 +390,7 @@ void slInitProximityData(slWorld *w) {
 		w->proximityData->yList[(n * 2) + 1].number = n;
 		w->proximityData->yList[(n * 2)	].value = &w->objects[n]->min.y;
 		w->proximityData->yList[(n * 2) + 1].value = &w->objects[n]->max.y;
-		w->proximityData->zList[(n * 2) + 1].previousLeft = NULL;
+		w->proximityData->yList[(n * 2) + 1].previousLeft = NULL;
 
 		w->proximityData->zList[(n * 2)	].type = BT_MIN;
 		w->proximityData->zList[(n * 2) + 1].type = BT_MAX;

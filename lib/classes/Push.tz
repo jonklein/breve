@@ -292,8 +292,12 @@ Object : PushProgram (aka PushPrograms) {
 		self set-code-pointer to pushCodeSubtreeMutate((interpreter get-interpreter-pointer), codePointer, treeSize).
 
 	+ to delete-random-subtree:
-		% Removes a random subtree from the individual.
+		% Removes a random subtree from the code.
 		self set-code-pointer to pushCodeDeletionMutate((self get-code-pointer)).
+
+	+ to flatten-random-subtree:
+		% Flattens a random subtree in the code.
+		self set-code-pointer to pushCodeFlattenMutate((self get-code-pointer)).
 
 	+ to crossover from-parent1 p1 (object) from-parent2 p2 (object):
 		% Sets this object to a genetic crossover of p1 and p2.

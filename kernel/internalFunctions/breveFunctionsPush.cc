@@ -536,6 +536,20 @@ int breveFunctionPushCodeDeletionMutate(brEval arguments[], brEval *result, brIn
 }
 
 /*!
+	\brief A breve API function wrapper for the C-function \ref pushCodeFlattenMutate.
+
+	See the documentation for \ref pushCodeFlattenMutate for more details.
+*/
+
+int breveFunctionPushCodeFlattenMutate(brEval arguments[], brEval *result, brInstance *instance) {
+ 	PushCode *p1 = BRPOINTER(&arguments[0]);
+
+	BRPOINTER(result) = pushCodeFlattenMutate(p1);
+
+	return EC_OK;
+}
+
+/*!
 	\brief A breve API function wrapper for the C-function \ref pushCodeSubtreeMutate.
 
 	See the documentation for \ref pushCodeSubtreeMutate for more details.
@@ -623,6 +637,7 @@ void breveInitPushFunctions(brNamespace *namespace) {
  	brNewBreveCall(namespace, "pushVectorStackTop", breveFunctionPushVectorStackTop, AT_VECTOR, AT_POINTER, AT_VECTOR, 0);
  	brNewBreveCall(namespace, "pushVectorStackPush", breveFunctionPushVectorStackPush, AT_NULL, AT_POINTER, AT_VECTOR, 0);
  	brNewBreveCall(namespace, "pushCodeDeletionMutate", breveFunctionPushCodeDeletionMutate, AT_POINTER, AT_POINTER, 0);
+ 	brNewBreveCall(namespace, "pushCodeFlattenMutate", breveFunctionPushCodeFlattenMutate, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(namespace, "pushCodeSubtreeMutate", breveFunctionPushCodeSubtreeMutate, AT_POINTER, AT_POINTER, AT_POINTER, AT_INT, 0);
  	brNewBreveCall(namespace, "pushCodeCrossover", breveFunctionPushCodeCrossover, AT_POINTER, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(namespace, "pushCodeRandom", breveFunctionPushCodeRandom, AT_POINTER, AT_POINTER, AT_INT, 0);

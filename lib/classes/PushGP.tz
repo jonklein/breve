@@ -182,14 +182,16 @@ Object : PushGP {
 
 		newProgram = new PushProgram.
 
-		for n=0, n<100, n++: {
-			newProgram copy-from program p.
-			newProgram delete-random-subtree.
+		newProgram copy-from program p.
 
-			newFitness = (self compute-fitness for-program newProgram).	
+		if random[1]: newProgram delete-random-subtree.
+		else newProgram flatten-random-subtree.
 
-			if newFitness == fitness: p copy-from program newProgram.
-		}
+		newFitness = (self compute-fitness for-program newProgram).	
+
+		if newFitness == fitness: p copy-from program newProgram.
+
+		free newProgram.
 
 		return p.
 
@@ -212,6 +214,7 @@ Object : PushGP {
 
 	- to evaluate:
 		fitness (float).
+		n (int).
 
 		fitness = (self compute-fitness for-program current{ currentIndividual }).
 		
@@ -225,6 +228,13 @@ Object : PushGP {
 			print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;".
 			print ";; Solution found at generation $generation:", 
 					(current{ currentIndividual }  get-string).
+
+			for n=0,n<1000,n++: {
+				self auto-simplify program current{ currentIndividual }.
+			}
+
+			print ";; Simplifies to:", (current{ currentIndividual }  get-string).
+
 			controller end-simulation.
 		}
 
