@@ -548,6 +548,9 @@ static int stEvalLoadList(stLoadExp *e, stRunInstance *i, brEval *target) {
 		pointer = &i->instance->variables[e->offset];
 	
 	if (!*(brEvalListHead **)pointer) {
+		// if there is nothing here (uninitialized list), then we create an empty one.  
+		// we retain it, since it's already stored as a variable.
+
 		*(brEvalListHead **)pointer = brEvalListNew();
 		stGCRetainPointer(*(void **)pointer, AT_LIST);
 	}
@@ -568,8 +571,8 @@ static int stEvalLoadHash(stLoadExp *e, stRunInstance *i, brEval *target) {
 		pointer = &i->instance->variables[e->offset];
 	
 	if (!*(brEvalHash **)pointer) {
-		// if there is nothing here (uninitialized hash), then we create an empty hash.  
-		// we retain it, since it's stored as a variable.
+		// if there is nothing here (uninitialized hash), then we create an empty one.  
+		// we retain it, since it's already stored as a variable.
 
 		*(brEvalHash **)pointer = brEvalHashNew();
 		stGCRetainPointer(*(void **)pointer, AT_LIST);
@@ -685,7 +688,6 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 	stInstance *instance;
 	char *newstr;
 	int resultCode;
-	int noRetain = 0;
 
 	if (type == AT_INSTANCE && otype && e->type == AT_INSTANCE && BRINSTANCE(e)) {
 		// if they specified an object type in the code, make sure 
@@ -747,8 +749,6 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 
 			*(char **)variable = BRSTRING(e) = newstr;
 
-			noRetain = 1;
-
 			break;
 		case AT_LIST:
 			if (!BRLIST(e)) {
@@ -761,8 +761,7 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 				// overwriting an old list at this location
 
 				stGCUnretainAndCollectPointer(*(void **)variable, AT_LIST);
-			} else
-				noRetain = 1;
+			} 
 
 			if (e->type != AT_LIST) {
 				slMessage(DEBUG_ALL, "Cannot convert \"%s\" to type \"list\" for assignment\n", slAtomicTypeStrings[e->type]);
@@ -784,8 +783,7 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 			} else if(*(brEvalHash **)variable != BRHASH(e)) {
 				// overwriting an old hash at this location
 				stGCUnretainAndCollectPointer(*(void **)variable, AT_HASH);
-			} else
-				noRetain = 1;
+			} 
 
 			if (e->type != AT_HASH) {
 				slMessage(DEBUG_ALL, "Cannot convert \"%s\" to type \"hash\" for assignment\n", slAtomicTypeStrings[e->type]);
@@ -813,11 +811,8 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 			break;
 	}
 
-	if (!noRetain) {
-		stGCRetain(e);
-		if (i)
-			stGCUnmark(i->instance, e);
-	}
+	stGCRetain(e);
+	if (i) stGCUnmark(i->instance, e);
 
 #ifdef MULTITHREAD
 	if(i) pthread_mutex_unlock(&i->lock);
@@ -1027,6 +1022,7 @@ inline int brEvalListExp(stListExp *le, stRunInstance *i, brEval *result) {
 
 		brEvalListInsert(BRLIST(result), BRLIST(result)->count, &index);
 		stGCRetain(&index);
+		stGCUnmark(i->instance, &index);
 	}
 
 	stGCMark(i->instance, result);
@@ -1454,7 +1450,10 @@ RTC_INLINE int stEvalListInsert(stListInsertExp *w, stRunInstance *i, brEval *re
 
 	brEvalListInsert(BRLIST(result), BRINT(&index), &pushEval);
 
+	// the pushEval now has a home, so unmark it.
+
 	stGCRetain(&pushEval);
+	stGCUnmark(i->instance, &pushEval);
 
 	return EC_OK;
 }
@@ -1540,6 +1539,9 @@ RTC_INLINE int stEvalAll(stAllExp *e, stRunInstance *i, brEval *result) {
 		stInstance *i = *ii;
 		BRINSTANCE(&instance) = i->breveInstance;
 		brEvalListInsert(BRLIST(result), 0, &instance);
+
+		// adding it to the list -- retain it.  it will be unretained later.
+		stGCRetain(&instance);
 	}
 
 	return EC_OK;
@@ -1611,9 +1613,9 @@ RTC_INLINE int stEvalListIndex(stListIndexExp *l, stRunInstance *i, brEval *t) {
 			stEvalError(i->instance->type->engine, EE_BOUNDS, "list index \"%d\" out of bounds", BRINT(&index));
 			return EC_ERROR;
 		}
-	} else if (list.type == AT_HASH)
+	} else if (list.type == AT_HASH) {
 		brEvalHashLookup(BRHASH(&list), &index, t);
-	else if (list.type == AT_STRING) {
+	} else if (list.type == AT_STRING) {
 		char *newstring, *oldstring;
 
 		oldstring = BRSTRING(&list);
@@ -1635,8 +1637,6 @@ RTC_INLINE int stEvalListIndex(stListIndexExp *l, stRunInstance *i, brEval *t) {
 		return EC_ERROR;
 	}
 
-	stGCMark(i->instance, t);
-
 	return EC_OK;
 }
 
@@ -1654,6 +1654,7 @@ RTC_INLINE int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, 
 			stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"int\" for list element assignment index");
 			return EC_ERROR;
 		}
+
 		if(stDoEvalListIndexAssign(BRLIST(&list), BRINT(&index), t, i)) {
 			stEvalError(i->instance->type->engine, EE_BOUNDS, "list index \"%d\" out of bounds", BRINT(&index));
 			return EC_ERROR;
@@ -1975,16 +1976,6 @@ RTC_INLINE int stEvalAssignment(stAssignExp *a, stRunInstance *i, brEval *t) {
 	resultCode = stSetVariable(pointer, a->assignType, a->objectType, t, i);
 
 	return resultCode;
-}
-
-
-RTC_INLINE int stEvalLoad(stLoadExp *e, stRunInstance *i, brEval *result) {
-	void *pointer;
-	int type;
-
-	stEvalLoadPointer(e, i, &pointer, &type);
-
-	return stLoadVariable(pointer, e->loadType, result, i);
 }
 
 RTC_INLINE int stEvalUnaryExp(stUnaryExp *b, stRunInstance *i, brEval *result) {
@@ -2684,7 +2675,7 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 			else keyEntry->var->type->objectType = NULL;
 		}
 
-		resultCode = stSetVariable(&newStStack[keyEntry->var->offset], keyEntry->var->type->type, keyEntry->var->type->objectType, args[n], target);
+		resultCode = stSetVariable(&newStStack[keyEntry->var->offset], keyEntry->var->type->type, keyEntry->var->type->objectType, args[n], caller);
 
 		if(resultCode != EC_OK) {
 			slMessage(DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", keyEntry->keyword, method->name);
@@ -2722,7 +2713,14 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 	std::vector< stVar* >::iterator vi;
 	
 	for(vi = method->variables.begin(); vi != method->variables.end(); vi++ ) {
+		brEval e;
+
 		if((*vi)->type->type != AT_STRING || *(void**)&newStStack[(*vi)->offset] != result->values.stringValue) stGCUnretainAndCollectPointer(*(void**)&newStStack[(*vi)->offset], (*vi)->type->type);
+
+		e.values.pointerValue = *(void**)&newStStack[(*vi)->offset];
+		e.type = (*vi)->type->type;
+
+		stGCUnmark(target->instance, &e);
 	}
 
 	if(resultCode == EC_STOP) resultCode = EC_OK;
@@ -2742,12 +2740,7 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 	for(ki = method->keywords.begin(); ki != method->keywords.end(); ki++ ) {
 		keyEntry = *ki;
 
-		if(caller && caller->instance->gcStack) {
-			stGCUnretainPointer(*(void**)&newStStack[keyEntry->var->offset], keyEntry->var->type->type);
-			if(keyEntry->var->type->type == AT_STRING) slFree(*(void**)&newStStack[keyEntry->var->offset]);
-		} else {
-			stGCUnretainAndCollectPointer(*(void**)&newStStack[keyEntry->var->offset], keyEntry->var->type->type);
-		}
+		stGCUnretainAndCollectPointer(*(void**)&newStStack[keyEntry->var->offset], keyEntry->var->type->type);
 	}
 
 	// remember when we retained the return value before?
@@ -3184,7 +3177,7 @@ int stDoEvalListIndex(brEvalListHead *l, int n, brEval *newLoc) {
 	}
     
 	brEvalCopy(eval, newLoc);
-	stGCRetain(newLoc);
+	// stGCRetain(newLoc);
     
 	return 0;
 }
@@ -3192,17 +3185,19 @@ int stDoEvalListIndex(brEvalListHead *l, int n, brEval *newLoc) {
 int stDoEvalListIndexAssign(brEvalListHead *l, int n, brEval *newVal, stRunInstance *ri) {
 	brEvalList *list;
 
-	if (n > l->count)
+	if (n > l->count || n < 0)
 		return -1;
 
 	// if this is a new entry at the end, append it instead
 
-	if (n == l->count || n < 0) {
+	if (n == l->count || n == 0) {
 		if (brEvalListInsert(l, l->count, newVal) > -1)
 			return 0;
 		else
 			return -1;
 	}
+
+	// overwriting a previous evaluation -- lookup, unretain and replace
 
 	list = brEvalListIndexLookup(l, n);
 

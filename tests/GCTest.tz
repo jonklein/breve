@@ -9,7 +9,7 @@ Control : GCTest {
 		n (int).
 	
 	+ to init:
-		print (self test-argument-allocations with-list { new GCTesterI, { 2, 3, "dog" } }).
+		print (self test-argument-allocations with-list { new GCTesterI, { 2, 3, "dog" } } with-string "moo").
 		print "Argument allocations complete".
 
 		self test-local-allocations.
@@ -41,11 +41,10 @@ Control : GCTest {
 		print "SUCCESS".
 		self end-simulation.
 
-	+ to test-argument-allocations with-list l (list):
+	+ to test-argument-allocations with-list l (list) with-string s (string):
 		print "Testing argument allocations".
-		print l.
-
-		return "OK".
+		print l, s.
+		return s.
 
 	+ to test-local-allocations:
 		h (hash).
@@ -59,12 +58,14 @@ Control : GCTest {
 		h{ "123" } = { 1, 2, 3 }.
 
 	+ to test-global-allocations:
-		print "Testing global allocations".
+		print "Testing global hash allocations".
 
 		gh{ "stuff" } = { 1, 2, 3 }.
 		gh{ "123" } = new GCTesterI.
-		gl{0} = new GCTesterI.
 
+		print "Testing global list allocations".
+
+		gl{0} = new GCTesterI.
 		gl = { "hat", "sofa", "puppydog" }.
 		gl = { new GCTesterI }.
 
@@ -84,13 +85,13 @@ Object : GCTesterI {
 
 	+ to init:
 		self enable-auto-free.
-		# label = | all Objects |.
-		label = random[1000].
-		print "creating $self (#$label)".
+		# label = |all Objects|.
+		label = random[100].
+		print "=> creating $self (#$label)".
 		test2 = new GCTesterII.
 
 	+ to destroy:
-		print "destroying $self (#$label)".
+		print "=> destroying $self (#$label)".
 }
 
 Object : GCTesterII {
@@ -98,11 +99,12 @@ Object : GCTesterII {
 		label (int).
 
 	+ to init:
-		# label = | all Objects |.
-		label = random[1000].
-		print "creating $self (#$label)".
+		# print all GCTesterI .
+		# label = |all Objects|.
+		label = random[100].
+		print "=> creating $self (#$label)".
 		self enable-auto-free.
 
 	+ to destroy:
-		print "destroying $self (#$label)".
+		print "=> destroying $self (#$label)".
 }
