@@ -37,7 +37,6 @@
 int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
     int crossoverCount = 0, n;
     int varCount = 0;
-    int startPoint, endPoint;
     slList *list;
     stVar *var;
 
@@ -60,54 +59,31 @@ int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
 
     list = a->type->variableList;
 
-    // skip the "super" variable
-
-    list = list->next;
-
     // this has become a little complicated now that we have "array" variables */
     // they only appear internally as a single variable, but may contain more */
     // than one piece of information, and naturally we want to be able to     */
     // crossover in the middle. */
 
     while(list) {
+		int offset;
+		int index;
+		brEval value;
+
         var = list->data;
 
-        if(var->type->type == AT_ARRAY) varCount += var->type->arrayCount; 
-        else varCount++;
+        if(var->type->type == AT_ARRAY) {
+			for(index=0;index<var->type->arrayCount;index++) {
+				var->offset + (var->type->arrayCount * stSizeofAtomic(var->type->arrayType));
+			}
+
+		} else {
+
+		}
 
         list = list->next;
     }
 
-    list = a->type->variableList->next;
-
-    startPoint = a->type->varOffset;
-    endPoint = a->type->varSize;
-
     crossoverCount = random() % (varCount + 1);
-
-	for(n=0;n<varCount;n++) {
-		brEval value;
-
-		if(n == crossoverCount) b = a;
-
-		if(var->type->type == AT_ARRAY) {
-			int index;
-
-			for(index=0;index<var->type->arrayCount;index++) {
-				int offset = var->offset + (var->type->arrayCount * stSizeofAtomic(var->type->arrayType));
-
-				stLoadVariable(&a->variables[offset], var->type->arrayType, &value, NULL);
-				stSetVariable(&child->variables[offset], var->type->arrayType, NULL, &value, NULL);
-			}
-
-			n += (var->type->arrayCount - 1);
-		} else {
-			stLoadVariable(&a->variables[var->offset], var->type->type, &value, NULL);
-			stSetVariable(&child->variables[var->offset], var->type->type, NULL, &value, NULL);
-		}
-
-		list = list->next;
-	}
 
     return 0;
 }

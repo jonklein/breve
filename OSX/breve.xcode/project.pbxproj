@@ -912,9 +912,9 @@
 			isa = PBXFileReference;
 			lastKnownFileType = archive.ar;
 			name = libbreve.a;
-			path = /Users/jk/dev/breve_new/lib/libbreve.a;
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../lib/libbreve.a;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		48620C9207944552009195E5 = {
 			fileRef = 48620C9107944552009195E5;
@@ -1010,9 +1010,9 @@
 			isa = PBXFileReference;
 			lastKnownFileType = "compiled.mach-o.bundle";
 			name = DigitizerPlugin.o;
-			path = /Users/jk/dev/breve_new/plugins/slDigitizerPlugin/DigitizerPlugin.o;
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../plugins/slDigitizerPlugin/DigitizerPlugin.o;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		48ECC165071C13C100596F93 = {
 			fileRef = 48ECC163071C13C100596F93;

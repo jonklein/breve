@@ -25,6 +25,8 @@ Control : QGTest {
         program add-instruction with-string "(MEASURE 0)".
         program add-instruction with-string "(HADAMARD 1)".
         program add-instruction with-string "(U-THETA 1 5.96143477)".
+        program add-instruction with-string "(CNOT { 2 0 })".
+
 
         print (system test 
                 program program 
