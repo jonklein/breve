@@ -452,6 +452,9 @@ void slLinkDisableSimulation(slLink *r) {
 
 	slODEToSlMatrix((dReal*)rotation, r->position.rotation);
 
+	slLinkSetLocation(r, &r->position.location);
+	slLinkSetRotation(r, r->position.rotation);
+
 	r->velocity.a.x = angularV[0];
 	r->velocity.a.y = angularV[1];
 	r->velocity.a.z = angularV[2];
@@ -524,6 +527,8 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 	dBodySetRotation(child->odeBodyID, R);
 	dBodySetPosition(child->odeBodyID, newPosition.x, newPosition.y, newPosition.z);
 	slVectorCopy(&newPosition, &child->position.location);
+	slLinkSetLocation(child, &newPosition);
+	slLinkSetRotation(child, cR);
 
 	// normalize the normal vector, you know, just in case
 

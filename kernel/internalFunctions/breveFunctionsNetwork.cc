@@ -325,7 +325,7 @@ void *brHandleConnection(void *p) {
 */
 
 char *brFinishNetworkRead(brNetworkClientData *data, brNetworkRequest *request) {
-	char *d = slMalloc(sizeof(brNetworkRequest));
+	char *d = (char*)slMalloc(sizeof(brNetworkRequest));
 	char buffer[1024];
 	int count;
 	int size = sizeof(brNetworkRequest);
@@ -333,7 +333,7 @@ char *brFinishNetworkRead(brNetworkClientData *data, brNetworkRequest *request) 
 	bcopy(request, d, sizeof(brNetworkRequest));
 
 	while((count = brHTTPReadLine(data->socket, buffer, 1024)) == 1024) {
-		d = slRealloc(d, size + count + 1);
+		d = (char*)slRealloc(d, size + count + 1);
 
 		printf("read %d bytes\n", count);
 
@@ -352,78 +352,76 @@ char *brFinishNetworkRead(brNetworkClientData *data, brNetworkRequest *request) 
 */
 
 int brHandleHTTPConnection(brNetworkClientData *data, char *request) {
-		char *end, *method, *string;
-		brEval target;
-		int count, n;
-		int result;
-		brEval *evals, **evalPtrs;
+	char *end, *method, *string;
+	brEval target;
+	int count, n;
+	int result;
+	brEval *evals, **evalPtrs;
 
-		// remove the "GET ", skip forward to the request
+	// remove the "GET ", skip forward to the request
 
-		request += 4;
-		while(*request && isspace(*request)) request++;
-		end = request;
-		while(*end && !isspace(*end)) end++;
-		*end = 0;
+	request += 4;
+	while(*request && isspace(*request)) request++;
+	end = request;
+	while(*end && !isspace(*end)) end++;
+	*end = 0;
 
-		if(*request == '/') request++;
+	if(*request == '/') request++;
 
-		// if the request was ONLY "/", then they want the index 
+	// if the request was ONLY "/", then they want the index 
 
-		if(*request == 0 && data->server->index) {
-			request = data->server->index;
-		}
+	if(*request == 0 && data->server->index) request = data->server->index;
 
-		if(strstr(request, ".html") || request == data->server->index) {
-			brSendPage(data, request);
-			return 0;
-		}
+	if(strstr(request, ".html") || request == data->server->index) {
+		brSendPage(data, request);
+		return 0;
+	}
 
-		method = slSplit(request, "_", 0);
+	method = slSplit(request, "_", 0);
 
-		n = 0;
-		count = 0;
+	n = 0;
+	count = 0;
 
-		while(request[n]) {
-			if(request[n] == '_') count++;
-			n++;
-		}
+	while(request[n]) {
+		if(request[n] == '_') count++;
+		n++;
+	}
 
-		evalPtrs = alloca(sizeof(brEval*) * count);
-		evals = alloca(sizeof(brEval) * count);
+	evalPtrs = (brEval**)alloca(sizeof(brEval*) * count);
+	evals = (brEval*)alloca(sizeof(brEval) * count);
 
-		for(n=0;n<count;n++) {
-			evals[n].type = AT_STRING;
-			BRSTRING(&evals[n]) = slSplit(request, "_", n + 1);
-			evalPtrs[n] = &evals[n];
-		}
+	for(n=0;n<count;n++) {
+		evals[n].type = AT_STRING;
+		BRSTRING(&evals[n]) = slSplit(request, "_", n + 1);
+		evalPtrs[n] = &evals[n];
+	}
 
-		result = brMethodCallByNameWithArgs(data->engine->controller, method, evalPtrs, count, &target);
+	result = brMethodCallByNameWithArgs(data->engine->controller, method, evalPtrs, count, &target);
 
-		slFree(method);
+	slFree(method);
 
-		if(result != EC_OK) {
-			slUtilWrite(data->socket, SL_NET_FAILURE, strlen(SL_NET_FAILURE));
-			return 0;
-		}
+	if(result != EC_OK) {
+		slUtilWrite(data->socket, SL_NET_FAILURE, strlen(SL_NET_FAILURE));
+		return 0;
+	}
 
-		if(target.type == AT_NULL) {
-			if(data->server->index) brSendPage(data, data->server->index);
-			else slUtilWrite(data->socket, SL_NET_SUCCESS, strlen(SL_NET_SUCCESS));
-
-			return 0;
-		}	
-
-		string = brFormatEvaluation(&target, data->engine->controller);
-
-		if(strstr(string, ".html")) {
-			brSendPage(data, string);
-			return 0;
-		}
-
-		slUtilWrite(data->socket, string, strlen(string));
+	if(target.type == AT_NULL) {
+		if(data->server->index) brSendPage(data, data->server->index);
+		else slUtilWrite(data->socket, SL_NET_SUCCESS, strlen(SL_NET_SUCCESS));
 
 		return 0;
+	}	
+
+	string = brFormatEvaluation(&target, data->engine->controller);
+
+	if(strstr(string, ".html")) {
+		brSendPage(data, string);
+		return 0;
+	}
+
+	slUtilWrite(data->socket, string, strlen(string));
+
+	return 0;
 }
 
 /*!

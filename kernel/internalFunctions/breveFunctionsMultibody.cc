@@ -24,6 +24,7 @@
 #include "kernel.h"
 
 #define BRMULTIBODYPOINTER(p) ((slMultibody*)BRPOINTER(p))
+#define BRLINKPOINTER(p) ((slLink*)BRPOINTER(p))
 
 /*!
 	\brief Sets the root of the multibody.
@@ -35,7 +36,7 @@
 
 int brISetMultibodyRoot(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *mb = BRMULTIBODYPOINTER(&args[0]);
-	slLink *root = BRPOINTER(&args[1]);
+	slLink *root = BRLINKPOINTER(&args[1]);
 
 	slMultibodySetRoot(mb, root);
 
@@ -81,7 +82,7 @@ int brIMultibodyAllObjects(brEval args[], brEval *target, brInstance *i) {
 		brEval e;
 
 		e.type = AT_INSTANCE;
-		BRINSTANCE(&e) = l->data;
+		BRINSTANCE(&e) = (brInstance*)l->data;
 
 		if(l->data) brEvalListInsert(all, 0, &e);
 		l = l->next;
