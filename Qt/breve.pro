@@ -16,7 +16,7 @@ SOURCES	+= breveGLWidget.cpp \
 	main.cpp \
 	brqtEngine.cpp
 
-FORMS	= brqtMainwindow.ui \
+FORMS	= brqtMainWindow.ui \
 	brqtLogWindow.ui \
 	brqtObjectInspector.ui \
 	brqtEditorWindow.ui

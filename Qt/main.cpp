@@ -1,5 +1,5 @@
 #include <qapplication.h>
-#include "mainwindow.h"
+#include "brqtMainWindow.h"
 
 int main( int argc, char ** argv )
 {
