@@ -97,8 +97,8 @@ CLI_release:
 	mkdir $(CLI_FOLDER)/bin
 	mkdir $(CLI_FOLDER)/lib
 	make -f Makefile optimize
-	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin/breve
-	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin/breve_cli
+	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin/
+	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin/
 	cp -r lib/classes $(CLI_FOLDER)/lib/
 	cp -r docs $(CLI_FOLDER)/
 	cp -r demos $(CLI_FOLDER)/

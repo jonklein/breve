@@ -199,8 +199,6 @@ int main(int argc, char **argv) {
 
 	if(gFull) glutFullScreen();
 
-	// glutSetCursor(GLUT_CURSOR_INFO);
-
 	glutMainLoop();
 
 	return 0;
@@ -345,6 +343,11 @@ void brClick(int n) {
 
 		for(n=0;n<l->count;n++)
 			glutAddMenuEntry(l->list[n]->title, n);
+
+		glutAttachMenu(GLUT_RIGHT_BUTTON);
+	} else {
+		glutSetMenu(mainMenu);
+		glutAttachMenu(GLUT_RIGHT_BUTTON);
 	} 
 }
 
@@ -498,7 +501,6 @@ void slDemoMouse(int button, int state, int x, int y) {
 	}
 
 	gMods = glutGetModifiers();
-	printf("%x are the mods\n", gMods);
 
 	slDemoDisplay();
 }

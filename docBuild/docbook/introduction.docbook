@@ -272,14 +272,18 @@ initially paused.  To unpause the simulation, hit the space bar.  When the simul
 is running, the following controls can be useful:
 <itemizedlist>
 <listitem><para>Space bar: pause/unpause the simulation</para></listitem>
-<listitem><para>F1: run simulation forward one iteration</para></listitem>
-<listitem><para>Left mouse: rotate simulation, and select objects (described below)</para></listitem>
-<listitem><para>Right mouse: simulation menu, or contextual menu for currently selected object (described below)</para></listitem>
+<listitem><para>F1: run simulation forward one iteration step</para></listitem>
+<listitem><para>Left mouse: rotate simulation and select objects (described below)</para></listitem>
+<listitem><para>Right mouse click: display the simulation menu (described below)</para></listitem>
+<listitem><para>Middle mouse click: display a contextual menu for the currently selected object (described below)</para></listitem>
 <listitem><para>Control (or F2) + left mouse: zoom in and out of the simulation</para></listitem>
 <listitem><para>Alt (or F3) + left mouse: move the camera</para></listitem>
 <listitem><para>Shift (or F4) + left mouse: select and drag objects in the simulation</para></listitem>
 <listitem><para>Escape: to quit the simulation, or access the breve command prompt</para></listitem>
 </itemizedlist>
+The keys F2, F3 and F4 can be used instead of control, alt and shift, respectively, to allow 
+for easier use on platforms which emulate middle and right mouse buttons using the control,
+alt or shift keys.
 </para>
 <para>
 The breve command prompt (which can be accessed using the escape key) can be used to
@@ -329,14 +333,13 @@ program <function>breve_cli</function>.  Follow the same setup directions
 described above (<xref linkend="cli_setup">) in order to setup your environment,
 and then run the simulation:
 <screen>
-% ./bin/breve_cli ./demos/Swarm/ArrowSwarm.tz
+% ./bin/breve_cli ./demos/Push/PushRegression.tz
 </screen>
 </para>
 <para>
 Textual output will be printed as usual, but no graphical window is shown.  
 This feature is most useful for collecting data when user interaction and 
-observation
-is unimportant.
+observation is unimportant.
 </para>
 </sect2> 
 
