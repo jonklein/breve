@@ -253,7 +253,7 @@ int brIImageDataInit(brEval args[], brEval *result, brInstance *i) {
 
 	dm = new brImageData;
 
-	dm->data = new unsigned char[width * height * 4];
+	dm->data = (unsigned char*)slMalloc(width * height * 4);
 	dm->x = width;
 	dm->y = height;
 	dm->textureNumber = -1;
@@ -284,7 +284,7 @@ int brIImageDataFree(brEval args[], brEval *result, brInstance *i) {
 		slTextureFree(i->engine->camera, texture);
 	}
 
-	delete[] dm->data;
+	slFree(dm->data);
 	delete dm;
 
 	return EC_OK;
