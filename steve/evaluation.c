@@ -592,18 +592,16 @@ inline int stEvalFree(stExp *s, stRunInstance *i, brEval *t) {
 	if(result != EC_OK) return EC_ERROR;
 
 	if(target.type == AT_INSTANCE) {
-		// if we're freeing ourself (the calling instance) then we will return EC_STOP
-		if(BRINSTANCE(&target)->userData == i->instance) finished = 1;
-
 		if(!BRINSTANCE(&target)) {
 			slMessage(DEBUG_ALL, "warning: attempt to free uninitialized object\n");
 			return EC_OK;
 		}
 
+		// if we're freeing ourself (the calling instance) then we will return EC_STOP
+
+		if(BRINSTANCE(&target)->userData == i->instance) finished = 1;
+
 		if(BRINSTANCE(&target)->status == AS_ACTIVE) brInstanceRelease(BRINSTANCE(&target));
-		else {
-			// slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", BRINSTANCE(&target));
-		}
 	} else if(target.type == AT_LIST) {
 		list = (BRLIST(&target))->start;
 
@@ -616,10 +614,6 @@ inline int stEvalFree(stExp *s, stRunInstance *i, brEval *t) {
 					if(BRINSTANCE(&list->eval)->userData == i->instance) finished = 1;
 
 					if(BRINSTANCE(&list->eval)->status == AS_ACTIVE) brInstanceRelease(BRINSTANCE(&list->eval));
-					else {
-						// slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", BRINSTANCE(&list->eval));
-						// slMessage(DEBUG_ALL, "... error in file \"%s\" at line %d\n", s->file, s->line);
-					}
 				}
 			}
 

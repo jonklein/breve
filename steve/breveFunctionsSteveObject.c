@@ -207,8 +207,10 @@ int stSendXMLString(char *address, int port, char *object) {
 	if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) return -1;
 
 	saddr.sin_family = AF_INET;
-	saddr.sin_port = htonl(port);
-	saddr.sin_addr.s_addr = htonl(addr);
+	saddr.sin_port = htons(port);
+
+	// addr already in network order!
+	saddr.sin_addr.s_addr = addr;
 
 	request.type = NR_XML;
 	request.magic = NETWORK_MAGIC;

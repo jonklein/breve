@@ -433,7 +433,6 @@ PushGP : PushClusterGP {
 		transfer (object).
 		server (object).
 		lastTransfer (object).
-		index (int).
 
 	+ to init:
 		server = new NetworkServer.
@@ -472,6 +471,7 @@ PushGP : PushClusterGP {
 		recipientHost (string).
 		n (int).
 		p1, p2 (object).
+		index (int).
 
 		while n < (mutationPercent / 100.0) * populationSize: {
 			p1 = (self run-tournament).
@@ -541,6 +541,8 @@ Object : PushProgramTransporter {
 	+ to get-program number n (int): 
 		code (object).
 		code = new PushProgram.
+
+		if n > | programStrings |: return code.
 		code parse program programStrings{ n }.
 		return code.
 }
