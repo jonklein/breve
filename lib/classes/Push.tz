@@ -59,8 +59,10 @@ Object : PushInterpreter (aka PushInterpreters) {
 		evaluationLimit = newLimit.
 
   + section "Running a Push program"
+	- to run code codeObject (object):
+		self run program codeObject for-steps -1.
 
-	+ to run code codeObject (object) for-steps steps = -1 (int):
+	+ to run program codeObject (object) for-steps steps = -1 (int):
 		% Runs the specified push code.  If the steps variable is provided, 
 		% evaluation will only run for the specified number of instructions.
 		% Otherwise, evaluation will run for the evaluation limit, which is 

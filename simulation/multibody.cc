@@ -222,9 +222,9 @@ void slJointGetPosition(slJoint *j, slVector *r) {
 			break;
 		case JT_BALL:
 		case JT_UNIVERSAL:
-			r->x = dJointGetAMotorAngle(j->odeMotorID, 0);
-			r->y = dJointGetAMotorAngle(j->odeMotorID, 1);
-			r->z = dJointGetAMotorAngle(j->odeMotorID, 2);
+			r->x = dJointGetAMotorAngle(j->odeMotorID, dParamVel);
+			r->y = dJointGetAMotorAngle(j->odeMotorID, dParamVel2);
+			r->z = dJointGetAMotorAngle(j->odeMotorID, dParamVel3);
 			break;
 		default:
 			break;
@@ -249,10 +249,10 @@ void slJointGetVelocity(slJoint *j, slVector *velocity) {
 			velocity->x = dJointGetSliderPositionRate(j->odeJointID);
 			break;
 		case JT_BALL:
-			velocity->z = dJointGetAMotorParam(j->odeJointID, dParamVel3);
+			velocity->z = dJointGetAMotorParam(j->odeMotorID, dParamVel3);
 		case JT_UNIVERSAL:
-			velocity->x = dJointGetAMotorParam(j->odeJointID, dParamVel);
-			velocity->y = dJointGetAMotorParam(j->odeJointID, dParamVel2);
+			velocity->x = dJointGetAMotorParam(j->odeMotorID, dParamVel);
+			velocity->y = dJointGetAMotorParam(j->odeMotorID, dParamVel2);
 			break;
 	}
 }
