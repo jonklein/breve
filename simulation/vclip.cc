@@ -68,12 +68,15 @@ void slAddCollisionCandidate(slVclipData *vc, slPairFlags flags, int x, int y) {
 	c.x = x; 
 	c.y = y;
 
-	if(vc->objects.size() != 0) {
-		if(vc->objects[x]->shape && vc->objects[x]->shape->_type == ST_NORMAL) c.f1 = vc->objects[x]->shape->features[0];
-		else c.f1 = NULL;
+	c.f1 = NULL;
+	c.f2 = NULL;
 
-		if(vc->objects[y]->shape && vc->objects[y]->shape->_type == ST_NORMAL) c.f2 = vc->objects[y]->shape->features[0];
-		else c.f2 = NULL;
+	if(vc->objects.size() != 0) {
+		if(vc->objects[x]->shape && vc->objects[x]->shape->_type == ST_NORMAL) 
+			c.f1 = vc->objects[x]->shape->features[0];
+
+		if(vc->objects[y]->shape && vc->objects[y]->shape->_type == ST_NORMAL) 
+			c.f2 = vc->objects[y]->shape->features[0];
 	}
 
 	if(x < y) {

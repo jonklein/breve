@@ -79,7 +79,7 @@ struct slBoundSort {
 
 class slCollisionCandidate {
 	public:
-		slCollisionCandidate() {};
+		slCollisionCandidate() { f1 = NULL; f2 = NULL; };
 
 		slCollisionCandidate(int i1, int i2) {
 			if(i1 < i2) { x = i1; y = i2; }
