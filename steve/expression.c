@@ -471,8 +471,8 @@ stVectorElementExp::~stVectorElementExp() {
 
 stVectorElementAssignExp::stVectorElementAssignExp(stExp *v, stExp *r, char e, char *file, int line) : stExp(file, line) {
 	exp = v;
-	element = e;
 	assignExp = r;
+	element = e;
 
 	type = ET_VECTOR_ELEMENT_ASSIGN;
 }

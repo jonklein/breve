@@ -346,11 +346,13 @@ int brParseArgs(int argc, char **argv) {
 	int r, error = 0;
 	int level;
 
+	const char *optstring = "s:t:d:r:f:n:a:vhmuS:M";
+
 #ifdef MACOSX
 	// Mac OS X 10.2.8 doesn't seem to have getopt_long
-	while((r = getopt(argc, argv, "s:t:d:r:f:n:a:vhmuS:M")) != EOF) {
+	while((r = getopt(argc, argv, optstring)) != EOF) {
 #else 
-	while((r = getopt_long(argc, argv, "t:d:r:f:n:a:vhmuS:M", gCLIOptions, NULL)) != EOF) {
+	while((r = getopt_long(argc, argv, "optstring", gCLIOptions, NULL)) != EOF) {
 #endif
 		switch(r) {
 			case 'd':

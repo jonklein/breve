@@ -290,8 +290,7 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 
 	+ to transform world-vector theVector (vector):
 		% Transforms theVector in the world coordinate frame to a 
-		% vector in the frame of this object.  This assumes that the 
-		% origin of the link is the object itself.
+		% vector in the frame of this object.  
 
 		return vectorFromLinkPerspective(linkPointer, theVector).
 

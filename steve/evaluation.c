@@ -300,7 +300,7 @@ void stRtcAllocFPReg(stRtcCodeBlock *bloc, stRtcFunc *func, stRtcVar *var)
 */
 
 RTC_INLINE int stEvalLoadPointer(stLoadExp *e, stRunInstance *i, void **pointer, int *type) {
-	*type = e->type;
+	*type = e->loadType;
 
 	if(e->local) *pointer = &i->instance->type->steveData->stack[e->offset];
 	else *pointer = &i->instance->variables[e->offset];

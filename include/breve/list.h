@@ -27,15 +27,6 @@ struct slList {
     slList *next;
 };
 
-/*!
-	\brief A simple "array" data struct.
-*/
-
-struct slArray {
-    void **data;
-    int count;
-};
-
 slList *slListPrepend(slList *, void *);
 slList *slListAppend(slList *, void *);
 slList *slListReverse(slList *);
@@ -50,5 +41,3 @@ slList *slInList(slList *, void *);
 void slListFree(slList *);
 void slListFreeHead(slList *);
 int slListCount(slList *);
-
-void slFreeArray(slArray *);
