@@ -11,6 +11,8 @@
 	we could use funopen() under Mac OS X.  
 */
 
+#include <stdlib.h>
+
 slStringStream *slOpenStringStream() {
 	slStringStream *stream;
 	int fd;
