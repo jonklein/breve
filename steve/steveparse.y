@@ -320,6 +320,7 @@ vector_value
 
 		$$ = e;
 	}
+;
 
 matrix_value
 : '[' '(' number ',' number ',' number ')' ',' '(' number ',' number ',' number ')' ',' '(' number ',' number ',' number ')' ']' {
@@ -340,7 +341,7 @@ matrix_value
 		BRMATRIX(e)[2][1] = stDoubleFromIntOrDoubleExp($21); stExpFree($21);
 		BRMATRIX(e)[2][2] = stDoubleFromIntOrDoubleExp($23); stExpFree($23);
 	}
-
+;
 
 objectdefs
 : objectdef
@@ -610,7 +611,6 @@ keyword_and_variable
 		slFree($2);
 	}
 | WORD_VALUE WORD_VALUE '(' type ')' {
-		$$ = NULL;
 		stVar *v = stVarNew($2, $4);
 
 		$$ = stNewKeywordEntry($1, v, NULL);
