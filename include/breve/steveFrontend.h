@@ -50,7 +50,7 @@ void stFreeParseTrack(stSteveData *);
 char *stFindParseTrack(slList *, char *);
 stVersionRequirement *stMakeVersionRequirement(float, int);
 int stCheckVersionRequirement(float, stVersionRequirement *);
-void stObjectAllocationReport(void);
+void stObjectAllocationReport(stObject *);
 void stParseError(brEngine *, int, char *, ...);
 
 void stSteveCleanup(stSteveData *);
@@ -58,3 +58,6 @@ void stSteveCleanup(stSteveData *);
 int stPreprocess(stSteveData *, brEngine *, char *);
 
 int stSetControllerName(stSteveData *, brEngine *, char *);
+
+void stSetParseData(stSteveData *, char *, int);
+

@@ -28,9 +28,11 @@
 
 #include "steveparse.tab.h"
 
-static char *gParseString;
-static int gParseLength;
-static int gParseLoc = 0;
+static char *parseString;
+static int parseLength;
+static int parseLoc = 0;
+
+extern stSteveData *steveData;
 
 char *yyfile;
 int lineno = 1;
@@ -40,14 +42,13 @@ int gErrorLine = 0;
 /* yylval might not be big enough for a double */
 
 extern brEngine *parseEngine;
-extern stSteveData *gSteveData;
 
 void yyerror(char *);
 
 FILE *docHandle = NULL;
 
 #define YY_INPUT(buf,result,max_size) \
-    result = ((gParseLoc == gParseLength) ? YY_NULL : (buf[0] = gParseString[gParseLoc++], 1))
+    result = ((parseLoc == parseLength) ? YY_NULL : (buf[0] = parseString[parseLoc++], 1))
 %}
 
 DIGIT	[0-9]
@@ -150,7 +151,7 @@ path					{ return PATH; }
 ([a-zA-Z_]|[a-zA-Z_][a-zA-Z0-9\-_]*[a-zA-Z0-9_])	{ 
 		brEval *defineEval;
 
-		defineEval = gSteveData->defines[ yytext];
+		defineEval = steveData->defines[ yytext];
 
 		if(defineEval) {
 			brEval *copy = new brEval;
@@ -214,8 +215,9 @@ void yyerror(char *c) {
     gErrorLine = lineno;
 }
 
-void stSetParseString(char *string, int length) {
-    gParseString = string;
-    gParseLength = length;
-    gParseLoc = 0;
+void stSetParseData(stSteveData *d, char *string, int length) {
+    parseString = string;
+    parseLength = length;
+    parseLoc = 0;
+	// steveData = d;
 }

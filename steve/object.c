@@ -22,8 +22,6 @@
 #include "expression.h"
 #include "evaluation.h"
 
-extern stSteveData *gSteveData;
-
 /*!
 	Interface for setting up and interacting with steve language objects and their associate interfaces.
 */
@@ -84,13 +82,13 @@ stObject *stObjectNew(brEngine *engine, stSteveData *sdata, char *name, char *al
 	This method also fills in the "breveInstance" pointer in the steve object.
 */
 
-brInstance *stInstanceCreateAndRegister(brEngine *e, brObject *object) {
+brInstance *stInstanceCreateAndRegister(stSteveData *sdata, brEngine *e, brObject *object) {
 	stInstance *newi = NULL;
 	brInstance *bi;
 
 	bi = brObjectInstantiate(e, object, NULL, 0);
 
-	if(bi->object->type == &gSteveData->steveObjectType) {
+	if(bi->object->type == &sdata->steveObjectType) {
 		newi = (stInstance*)bi->userData;
 		newi->breveInstance = bi;
 		if(stInstanceInit(newi) != EC_OK) return NULL;
@@ -245,8 +243,8 @@ void stInstanceFreeNoInstanceLists(stInstance *i) {
 
 	i->status = AS_RELEASED;
 
-	if(gSteveData->retainFreedInstances) {
-		gSteveData->freedInstances.push_back( i);
+	if(i->type->steveData->retainFreedInstances) {
+		i->type->steveData->freedInstances.push_back( i);
 	} else {
 		delete i;
 	}

@@ -89,7 +89,7 @@ int slMakeCurrentContext();
 	char *classPath, *pluginPath;
 	slCamera *camera;
 
-	if(engine) return;
+	if(frontend) return;
 
 	bundlePath = [[NSBundle mainBundle] resourcePath];
 	classPath = (char*)[[NSString stringWithFormat: @"%@/classes", bundlePath] cString];
@@ -97,36 +97,35 @@ int slMakeCurrentContext();
 
 	frontend = breveFrontendInit(0, NULL);
 	frontend->data = breveFrontendInitData(frontend->engine);
-	engine = frontend->engine;
 
-	brEngineSetSoundCallback(engine, soundCallback);
-	brEngineSetDialogCallback(engine, dialogCallback);
+	brEngineSetSoundCallback(frontend->engine, soundCallback);
+	brEngineSetDialogCallback(frontend->engine, dialogCallback);
 
-	camera = brEngineGetCamera(engine);
+	camera = brEngineGetCamera(frontend->engine);
 	slCameraSetActivateContextCallback(camera, slMakeCurrentContext);
 
-	if(outputPath) brEngineSetIOPath(engine, outputPath);
+	if(outputPath) brEngineSetIOPath(frontend->engine, outputPath);
 
 	gDisplayView = displayView;
 
-	brEngineSetInterfaceInterfaceTypeCallback(engine, interfaceVersionCallback);
-	brEngineSetInterfaceSetStringCallback(engine, interfaceSetStringCallback);
-	brEngineSetInterfaceSetNibCallback(engine, setNibCallback);
+	brEngineSetInterfaceInterfaceTypeCallback(frontend->engine, interfaceVersionCallback);
+	brEngineSetInterfaceSetStringCallback(frontend->engine, interfaceSetStringCallback);
+	brEngineSetInterfaceSetNibCallback(frontend->engine, setNibCallback);
 
-	brEngineSetGetSavenameCallback(engine, getSaveNameCallback);
-	brEngineSetGetLoadnameCallback(engine, getLoadNameCallback);
-	brEngineSetPauseCallback(engine, pauseCallback);
-	brEngineSetUpdateMenuCallback(engine, updateMenu);
+	brEngineSetGetSavenameCallback(frontend->engine, getSaveNameCallback);
+	brEngineSetGetLoadnameCallback(frontend->engine, getLoadNameCallback);
+	brEngineSetPauseCallback(frontend->engine, pauseCallback);
+	brEngineSetUpdateMenuCallback(frontend->engine, updateMenu);
 
-	brAddSearchPath(engine, classPath);
-	brAddSearchPath(engine, pluginPath);
-	brAddSearchPath(engine, (char*)[bundlePath cString]);
-	brAddSearchPath(engine, (char*)[NSHomeDirectory() cString]);
+	brAddSearchPath(frontend->engine, classPath);
+	brAddSearchPath(frontend->engine, pluginPath);
+	brAddSearchPath(frontend->engine, (char*)[bundlePath cString]);
+	brAddSearchPath(frontend->engine, (char*)[NSHomeDirectory() cString]);
 
 	// Java should get inited automatically when the engine is created, 
 	// but unfortunately, the claspath isn't setup yet at that point...
 
-	brJavaInit(engine);
+	brJavaInit(frontend->engine);
 }
 
 - (void)freeEngine {
@@ -138,7 +137,7 @@ int slMakeCurrentContext();
 	breveFrontendCleanupData(frontend->data);
 	breveFrontendDestroy(frontend);
 
-	engine = NULL;
+	frontend = NULL;
 
 	[interfaceController updateObjectSelection];
 }
@@ -152,7 +151,7 @@ int slMakeCurrentContext();
 
 	if(!name) name = "<untitled>";
 
-	[displayView setEngine: engine fullscreen: full];
+	[displayView setEngine: frontend->engine fullscreen: full];
 
 	if(full) {
 		if(![displayView startFullScreen]) {
@@ -192,7 +191,7 @@ int slMakeCurrentContext();
 	if(saved) result = breveFrontendLoadSavedSimulation(frontend, buffer, name, saved);
 	else result = breveFrontendLoadSimulation(frontend, buffer, name);
 
-	controller = brEngineGetController(engine);
+	controller = brEngineGetController(frontend->engine);
 
 	if(filename) slFree(name);
 
@@ -248,11 +247,11 @@ int slMakeCurrentContext();
 }
 
 - (int)runCommand:(char*)command {
-	if(!engine || runState == BX_STOPPED) return -1;
+	if(!frontend || runState == BX_STOPPED) return -1;
 
 	if(runState == BX_RUN) [engineLock lock];
 	slMessage(DEBUG_ALL, "> %s\n", command);
-	stRunSingleStatement(frontend->data, engine, command);
+	stRunSingleStatement(frontend->data, frontend->engine, command);
 	if(runState == BX_RUN) [engineLock unlock];
 
 	return 0;
@@ -271,7 +270,8 @@ int slMakeCurrentContext();
 }
 
 - (brEngine*)getEngine {
-	return engine;
+	if(!frontend) return NULL;
+	return frontend->engine;
 }
 
 - (int)getRunState {
@@ -302,10 +302,10 @@ int slMakeCurrentContext();
 					mouse = [[[displayView window] contentView] convertPoint: mouse toView: displayView];
 				}
 
-				brEngineSetMouseLocation(engine, mouse.x, mouse.y);
+				brEngineSetMouseLocation(frontend->engine, mouse.x, mouse.y);
 			}
 
-			if((result = brEngineIterate(engine)) != EC_OK) {
+			if((result = brEngineIterate(frontend->engine)) != EC_OK) {
 				[engineLock unlock];
 
 				if([displayView isFullScreen]) [displayView stopFullScreen];
@@ -318,7 +318,7 @@ int slMakeCurrentContext();
 
 				if([displayView isFullScreen]) {
 					[displayView drawFullScreen];
-				} else if(displayMovie || brEngineGetDrawEveryFrame(engine)) {
+				} else if(displayMovie || brEngineGetDrawEveryFrame(frontend->engine)) {
 					[displayView lockFocus];
 					[displayView drawRect: nothing];
 					[displayView unlockFocus];
@@ -341,9 +341,7 @@ int slMakeCurrentContext();
 
 		[engineLock unlock];
 
-		while(engineWillPause) {
-			usleep(10000);
-		}
+		while(engineWillPause) usleep(10000);
 	}
 
 	[displayView setNeedsDisplay: YES];
@@ -364,22 +362,22 @@ int slMakeCurrentContext();
 	slCamera *c;
 	int x, y;
 
-	if(!engine) return;
+	if(!frontend) return;
 
-	c = brEngineGetCamera(engine);
+	c = brEngineGetCamera(frontend->engine);
 
 	if(runState == BX_RUN) [engineLock lock];
 	slCameraGetBounds(c, &x, &y);
-	brClickAtLocation(engine, p.x, y - p.y);
+	brClickAtLocation(frontend->engine, p.x, y - p.y);
 	[interfaceController updateObjectSelection];
 	if(runState == BX_RUN) [engineLock unlock];
 }
 
 - (void)doKeyEvent:(char)key isDown:(int)d {
-	if(!engine) return;
+	if(!frontend->engine) return;
 
 	if(runState == BX_RUN) [engineLock lock];
-	brKeyCallback(engine, key, d);
+	brKeyCallback(frontend->engine, key, d);
 	if(runState == BX_RUN) [engineLock unlock];
 }
 
@@ -431,9 +429,9 @@ int slMakeCurrentContext();
 	brEval result;
 	brInstance *i, *controller;
 
-	if(!engine) return NULL;
+	if(!frontend) return NULL;
 
-	controller = brEngineGetController(engine);
+	controller = brEngineGetController(frontend->engine);
 
 	method = brMethodFind(controller->object, "get-selection", NULL, 0);
  
@@ -453,9 +451,9 @@ int slMakeCurrentContext();
 }
 
 - (void)interfaceActionTag:(int)tag stringValue:(NSString*)s {
-	if(engine) {
+	if(frontend) {
 		[engineLock lock];
-		brInterfaceCallback(engine, tag, (char*)[s cString]);
+		brInterfaceCallback(frontend->engine, tag, (char*)[s cString]);
 		[engineLock unlock];
 	}
 }

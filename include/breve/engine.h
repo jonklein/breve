@@ -334,8 +334,6 @@ brMenuEntry *brAddContextualMenuItem(brObject *, char *, char *);
 
 void stSetParseEngine(brEngine *);
 
-void stSetParseString(char *, int);
-
 void brPrintVersion(void);
 
 void brFreeObjectSpace(brNamespace *);

@@ -369,12 +369,12 @@ Abstract : Control (aka Controls) [version 2.0] {
 		if selectedObject && (selectedObject is a "Link") && (selectedObject get-multibody):
 			selectedObject = (selectedObject get-multibody).
 
-		if !theObject || 
-			!(theObject can-respond to "show-bounding-box") || 
-			!(theObject can-respond to "show-axis") : return.
+		if !selectedObject || 
+			!(selectedObject can-respond to "show-bounding-box") || 
+			!(selectedObject can-respond to "show-axis") : return.
 
-		theObject show-bounding-box.
-		theObject show-axis.
+		selectedObject show-bounding-box.
+		selectedObject show-axis.
 
 	- to catch-key-0x7F-down:
 		% This method is automatically called when the delete key is pressed 

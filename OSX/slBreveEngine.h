@@ -54,7 +54,6 @@ enum {
     NSRecursiveLock *engineLock;
     NSRecursiveLock *threadLock;
     
-    brEngine *engine;
 	breveFrontend *frontend;
 
     int runState;

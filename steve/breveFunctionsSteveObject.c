@@ -144,8 +144,10 @@ int stORespondsTo(brEval args[], brEval *target, brInstance *i) {
 
 	target->type = AT_INT;
 
-	if( instance->type->methods[ method].size() != 0) BRINT(target) = 1;
-	else BRINT(target) = 0;
+	if( stFindInstanceMethodWithMinArgs( instance->type, method, 0, NULL)) 
+		BRINT(target) = 1;
+	else 
+		BRINT(target) = 0;
 
 	return EC_OK;
 }
@@ -172,21 +174,23 @@ int stOGetRetainCount(brEval args[], brEval *target, brInstance *bi) {
 	return EC_OK;
 }
 
-int stCObjectAllocationReport(brEval args[], brEval *target, brInstance *i) {
-    stObjectAllocationReport();
+int stCObjectAllocationReport(brEval args[], brEval *target, brInstance *bi) {
+	stInstance *i = (stInstance*)bi->userData;
+    stObjectAllocationReport(i->type);
     return EC_OK;
 }   
 
-int stNewInstanceForClassString(brEval args[], brEval *target, brInstance *i) {
-	brObject *o = brObjectFind(i->engine, BRSTRING(&args[0]));  
+int stNewInstanceForClassString(brEval args[], brEval *target, brInstance *bi) {
+	brObject *o = brObjectFind(bi->engine, BRSTRING(&args[0]));  
+	stInstance *i = (stInstance*)bi->userData;
  
 	if(!o) {
-		stEvalError(i->engine, EE_SIMULATION, "Unknown class '%s'.", BRSTRING(&args[0]));
+		stEvalError(bi->engine, EE_SIMULATION, "Unknown class '%s'.", BRSTRING(&args[0]));
     
 		return EC_ERROR;
 	} 
 
-	BRINSTANCE(target) = stInstanceCreateAndRegister(i->engine, o);
+	BRINSTANCE(target) = stInstanceCreateAndRegister(i->type->steveData, bi->engine, o);
     
 	return EC_OK;
 }   

@@ -10,8 +10,6 @@
 extern char *yyfile;
 extern int lineno;
 
-stSteveData *gSteveData;
-
 void *breveFrontendInitData(brEngine *engine) {
 	return stSteveInit(engine);
 }
@@ -102,28 +100,29 @@ void stInstanceFreeCallback(void *i) {
 
 stSteveData *stSteveInit(brEngine *engine) {
 	brNamespace *internal;
+	stSteveData *sd;
 
 	internal = brEngineGetInternalMethods(engine);
 
-	gSteveData = new stSteveData;
+	sd = new stSteveData;
 
 	breveInitSteveDataObjectFuncs(internal);
 	breveInitSteveObjectFuncs(internal);
 	breveInitXMLFuncs(internal);
 
-	gSteveData->steveObjectType.callMethod = stCallMethodBreveCallback;
-	gSteveData->steveObjectType.findMethod = stFindMethodBreveCallback;
-	gSteveData->steveObjectType.isSubclass = stSubclassCallback;
-	gSteveData->steveObjectType.instantiate = stInstanceNewCallback;
-	gSteveData->steveObjectType.destroyInstance = stInstanceFreeCallback;
+	sd->steveObjectType.callMethod = stCallMethodBreveCallback;
+	sd->steveObjectType.findMethod = stFindMethodBreveCallback;
+	sd->steveObjectType.isSubclass = stSubclassCallback;
+	sd->steveObjectType.instantiate = stInstanceNewCallback;
+	sd->steveObjectType.destroyInstance = stInstanceFreeCallback;
 
-	gSteveData->steveObjectType.findObject = NULL;
+	sd->steveObjectType.findObject = NULL;
 
-	gSteveData->retainFreedInstances = 1;
+	sd->retainFreedInstances = 1;
 
-	gSteveData->stackRecord = NULL;
+	sd->stackRecord = NULL;
 
-	return gSteveData; 
+	return sd; 
 }
 
 /*!
@@ -358,12 +357,12 @@ int stParseBuffer(stSteveData *s, brEngine *engine, char *buffer, char *filename
 
 	if(stPreprocess(s, engine, buffer)) return BPE_LIB_ERROR;
 
-	/* preprocess changes the yyfile and lineno globals -- reset them */
+	// preprocess changes the yyfile and lineno globals -- reset them 
 
 	yyfile = strdup(thisFile);
 	lineno = 1;
 
-	stSetParseString(buffer, strlen(buffer));
+	stSetParseData(s, buffer, strlen(buffer));
 
 	/* the REAL parse--set the parse engine so the parser knows */
 	/* what to do with the info it parses */
@@ -515,14 +514,16 @@ int stCheckVersionRequirement(float version, stVersionRequirement *r) {
 }
 
 /*!
-	\brief Reports on current object usage.
+	\brief Reports on current usage of all steve objects.
+
+	Requires any stObject.
 */
 	
-void stObjectAllocationReport() {
+void stObjectAllocationReport(stObject *o) {
 	std::vector< stObject* >::iterator oi;
 
-	for( oi = gSteveData->objects.begin(); oi != gSteveData->objects.end(); oi++ ) 
-		slMessage(DEBUG_ALL, "class %s: %d objects allocated\n", (*oi)->name, (*oi)->allInstances.size());
+	for( oi = o->steveData->objects.begin(); oi != o->steveData->objects.end(); oi++ ) 
+		slMessage(DEBUG_ALL, "class %s: %d instances allocated\n", (*oi)->name, (*oi)->allInstances.size());
 }   
 
 /*! 

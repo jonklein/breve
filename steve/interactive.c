@@ -44,7 +44,7 @@ int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
 
 	sd->singleStatement = NULL;
 
-	stSetParseString(fixedStatement, strlen(fixedStatement));
+	stSetParseData(sd, fixedStatement, strlen(fixedStatement));
 
 	controller = brEngineGetController(engine);
 

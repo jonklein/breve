@@ -22,8 +22,6 @@
 #include "expression.h"
 #include "evaluation.h"
 
-extern stSteveData *gSteveData;
-
 /*!
 	+ evaluation.c
 	= is the heart of steve.  it takes parse trees and executes them.
@@ -1059,7 +1057,10 @@ RTC_INLINE int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) 
 			stEvalError(i->type->engine, EE_NULL_INSTANCE, "method \"%s\" called with uninitialized object", mexp->methodName);
 			return EC_ERROR;
 		}
-		if(BRINSTANCE(&obj)->object->type != &gSteveData->steveObjectType)
+
+		// if the new instance is not a steve object, it's a foreign method call
+
+		if(BRINSTANCE(&obj)->object->type != &i->instance->type->steveData->steveObjectType)
 			return stEvalForeignMethodCall(mexp, BRINSTANCE(&obj), i, t);
 
 		ri.instance = (stInstance *)BRINSTANCE(&obj)->userData;
@@ -1080,7 +1081,10 @@ RTC_INLINE int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) 
 				stEvalError(i->type->engine, EE_NULL_INSTANCE, "method \"%s\" called with uninitialized object", mexp->methodName);
 				return EC_ERROR;
 			}
-			if (BRINSTANCE(&listStart->eval)->object->type != &gSteveData->steveObjectType)
+
+			// if the new instance is not a steve object, it's a foreign method call
+
+			if (BRINSTANCE(&listStart->eval)->object->type != &i->instance->type->steveData->steveObjectType)
 				return stEvalForeignMethodCall(mexp, BRINSTANCE(&listStart->eval), i, t);
 
 			ri.instance = (stInstance *)BRINSTANCE(&listStart->eval)->userData;
@@ -2684,7 +2688,6 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 
 		if(resultCode != EC_OK) {
 			slMessage(DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", keyEntry->keyword, method->name);
-			steveData->stackRecord = steveData->stackRecord->previousStackRecord;
 			return resultCode;
 		}
 	}
@@ -2849,7 +2852,7 @@ RTC_INLINE int stEvalNewInstance(stInstanceExp *ie, stRunInstance *i, brEval *t)
 	if(BRINT(&count) == 1) {
 		t->type = AT_INSTANCE;
 
-		BRINSTANCE(t) = stInstanceCreateAndRegister(i->instance->type->engine, object);
+		BRINSTANCE(t) = stInstanceCreateAndRegister(i->instance->type->steveData, i->instance->type->engine, object);
 
 		if(BRINSTANCE(t) == NULL) return EC_ERROR;
 	} else {
@@ -2857,7 +2860,7 @@ RTC_INLINE int stEvalNewInstance(stInstanceExp *ie, stRunInstance *i, brEval *t)
 		list = brEvalListNew();
 
 		for(n=0;n<BRINT(&count);n++) {
-			BRINSTANCE(&listItem) = stInstanceCreateAndRegister(i->instance->type->engine, object);
+			BRINSTANCE(&listItem) = stInstanceCreateAndRegister(i->instance->type->steveData, i->instance->type->engine, object);
 
 			if(BRINSTANCE(&listItem) == NULL) return EC_ERROR;
 
@@ -3121,7 +3124,8 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *result, stObject **tClass) {
 		resultCode = EVAL_RTC_CALL_3(s, stEvalRandExp, (stRandomExp *)s, i, result);
 		break;
 	case ET_DUPLICATE:
-		resultCode = EVAL_RTC_CALL_3(s, stExpEval3, ((stDuplicateExp *)s)->expression, i, result);
+		// resultCode = EVAL_RTC_CALL_3(s, stExpEval3, ((stDuplicateExp *)s)->expression, i, result);
+		resultCode = stExpEval(((stDuplicateExp *)s)->expression, i, result, NULL);
 		break;
 	case ET_FREE:
 		resultCode = EVAL_RTC_CALL_3(s, stEvalFree, (stFreeExp *)s, i, result);
