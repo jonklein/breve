@@ -1,0 +1,31 @@
+/*
+ *  libutil.a, spiderland utility library
+ *  Copyright (C) 2001    jon klein (jklein@spiderland.org)
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+This directory contains source code for the "utility" library of the 
+spiderland project.  The functionality offered here is meant to be 
+as modular as possible.
+
+hash.c -- hash table functionality
+list.c -- linked list functionality
+matrix.c -- 3x3 matrix and 6x6 spatial matrix funcionality
+memory.c -- malloc wrappers and memory related utilities
+nr.c -- "numerical recipes" math related functions
+parse.c -- string processing related functions
+quat.c -- quaternion functionality
+vector.c -- 3x1 vector and 6x1 spatial vector functionality

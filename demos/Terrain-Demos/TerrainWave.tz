@@ -1,0 +1,61 @@
+# 
+# This demo shows how a Terrain can be customized using user-specified 
+# values.  Here, the Terrain is set to the function sin(x)*cos(y) which
+# makes a wave shape.  Balls are then dropped on to the terrain from the 
+# sky.
+#
+
+@include "Stationary.tz"
+@include "PhysicalControl.tz"
+@include "Mobile.tz"
+@include "Terrain.tz"
+
+Controller TerrainWave.
+
+PhysicalControl : TerrainWave {
+	+ variables:
+		terrain (object).
+		clouds (int).
+
+    + to init:
+		x, y (int).
+
+		clouds = self load-image from "images/clouds.png".
+		self set-background-texture to clouds.
+
+		self enable-shadow-volumes.
+
+		terrain = new Terrain.
+
+		# here we set the terrain to look like the equations sin(x)*cos(y)
+
+		for x=0,x<100,x++: {
+			for y=0,y<100,y++: {
+				terrain set-height at-x x at-y y to 6 * sin(x/4.0)*cos(y/4.0).
+			}
+		}
+
+		self point-camera at (0, 0, 0) from (19, 30, 34).
+
+	+ to iterate:
+		if random[50] == 0: self drop-ball.
+
+		super iterate.
+
+	+ to drop-ball:
+		new Ball.
+}
+
+Mobile : Ball {
+	+ to init:
+		self set-shape to (new Shape init-with-sphere radius random[1.0]).
+
+		self set-color to random[(1, 1, 1)].
+
+		self move to random[(10, 0, 10)] + (-5, 15, -5).
+
+		self enable-physics.
+
+	+ to iterate:
+		if (self get-age) > 15: free self.
+}

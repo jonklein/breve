@@ -1,0 +1,251 @@
+NULL : Object (aka Objects) [version 1.8] {
+    % The Object class is the root class.  All classes used in breve have
+    % Object as an ancestor.  The object class implements some basic 
+    % services that all classes will have access to.
+    % <p>
+    % Subclassing Object is rare.  The classes OBJECT(Real) and OBJECT(Abstract)
+    % are logical separations of the Object class containing "real" objects
+    % (which correspond to a physical entity in the simulated world) and 
+    % "abstract" objects which are generally used for computation or 
+    % control of the real objects.  You should consider subclassing  
+    % one of these classes instead.
+
+    + variables:
+        objectReferences (int).
+        controller (object).
+		birthTime (float).
+
+    + to init:
+		objectReferences = 1.
+        controller = (self get-controller).
+
+		birthTime = (controller get-time).
+
+	+ to get-age:
+		% Returns the number of seconds this object has existed in the 
+		% simulation.
+
+		return (controller get-time) - birthTime.
+
+    + to destroy:
+        % Automatically called when this object is freed.  This method
+        % should never be called manually.  If subclasses need to free
+        % objects or data, they should implement their own "destroy" 
+        % methods.
+
+	+ section "Garbage Collection and Memory Management"
+
+	+ to enable-auto-free:
+		% Experimental--enables garbage collection on a per-object basis.
+
+		setGC(1).
+
+	+ to disable-auto-free:
+		% Experimental--disables garbage collection on a per-object basis.
+
+		setGC(0).
+
+    - to get-controller:
+        % Returns the controller object that associated with the current 
+        % simulation.  It's preferable to simply reference the variable
+        % "controller".
+
+        return getController().
+
+  + section "Getting Information About an Object"
+
+    + to get-type:
+        % Returns as a string the type of this object.
+
+        return objectName(self).
+
+    + to is a className (string):
+        % This method returns true or false (1 or 0) depending on whether
+        % the instance in question belongs to class className.  This 
+        % method checks if className is a superclass of the current 
+        % object as well.
+        % <p>
+        % The declaration of this method looks strange, but it should be 
+        % looked at as a statement about an instance which returns true
+        % or false: object is a "thing".
+
+        return isa(className).
+
+    + to is-a-subclass of className (string):
+		% Returns 1 if this object is a subclass of the class specified with
+		% className, returns 0 otherwise.
+
+        if className == (self get-type): return 1.
+        else if super: return (super is-a-subclass of className).
+        else return 0.
+
+    + to can-respond to methodName (string):
+        % Returns true or false (1 or 0) depending on whether this instance
+        % can respond to a method called methodName.
+        % <p>
+        % But wow, what an awkward declaration!  Same reason as the 
+        % method METHOD(is).  Again, works like a statement that
+        % replies with true or false: object can-respond to "run".
+        % <p>
+        % It's really not my fault that the infinitive of "can" is "be able".
+ 
+        return respondsTo(self, methodName).
+
+	+ to get-description:
+		% This method should provide a textual description of an object.
+		% When the "print" command prints an object, it calls this method
+		% to get a description of the object.  By default, print will show
+		% the class and pointer of an object, but by overriding this method
+		% in your own classes, you can append other sorts of data to the 
+		% output.
+
+  + section "Scheduling Events and Notificiations"
+
+    + to schedule method-call theMethod (string) at-time theTime (float):
+        % Schedules a call to theMethod when the simulation time equals
+        % theTime.  The margin of error of the callback time is equal
+        % to iteration step (see METHOD(set-iteration-step)).
+        % <br>
+        % If you want to schedule an event at a time relative to the
+        % current time, use the method METHOD(get-time) to get the
+        % current simulation time and then add the offset you want.
+
+        addEvent(theMethod, theTime).
+
+    + to observe instance theObject (object) for-notification theNotification (string) with-method theMethod (string):
+        % Causes the current object to observe theObject.  By registering as
+        % and observer, the current object will receive a call to theMethod whenever
+        % theObject calls the METHOD(announce) method with notificiation
+        % theNotification.
+
+        addObserver(theObject, theNotification, theMethod).
+
+    + to unobserve instance theObject (object) for-notificiation theNotification (string):
+        % Unregisters the current object as an observer of theObject with 
+        % notification theNotification.
+
+        removeObserver(theObject, theNotification).
+
+    + to announce message theMessage (string):
+        % Sends a notification with the message theMessage to all observer  
+        % objects.  See METHOD(observe) for information on making an object an observer.
+
+        notify(theMessage).
+
+  + section "Memory Management"
+
+    + to retain:
+        % Experimental memory management.  Meant to function like the Cocoa 
+        % retain/unretain messages.  To indicate that an object should be 
+        % saved, call this method.  To later indicate that you're done 
+        % with the object, call METHOD(unretain). 
+        % <p>
+		% <b>Creating an object with "new" automatically sets the retain count 
+		% to one</b>.  This means that the object creating an instance should
+		% <b>not</b> "retain" it, but <b>should</b> eventually "unretain" it 
+		% when it is no longer needed.</b>  When you are done using 
+		% an instance in your own context, but when the instance might be in use by 
+		% others, you should make an unretain call.  
+		% <p>
+        % The methods work by keeping a counter of all retains and unretains,
+        % freeing the object when the reference count is 0.  Every retain
+        % should be balanced by an unretain <b>in the same context</b>.  
+		% <p>
+		% This allows multiple instances to share references to the same instance.
+        % <p>
+        % The "free" command overrides the use of these methods, so be sure
+        % not to use it at all if you decide to use the retain/unretain 
+        % technique for an object.
+        % <p>
+        % An object should in general never need to call its own 
+        % retain/unretain messages.
+
+        objectReferences += 1.
+
+    + to unretain:
+        % Experimental memory management.  Meant to function like the Cocoa 
+        % retain/unretain messages.  This method reduces the retain count
+        % associated with an object.  See the notes for METHOD(retain)
+        % for more information.
+
+        objectReferences -= 1.
+
+
+        if objectReferences < 1: {
+			print "$objectReferences and freeing".
+			free self.
+		}
+
+  + section "Archiving & Dearchiving"
+
+    + to archive-as-xml file fileName (string):
+        % Writes the current object to the XML file fileName.
+
+        archiveXMLObject(self, fileName).
+
+	+ to send-over-network to hostName (string) on portNumber (int):
+		% Sends this object over the network to a breve server on host hostName
+		% listening on port portNumber.
+
+		sendXMLObject(hostName, portNumber, self).
+
+	+ to add-dependency on i (object):
+		% Makes this instance depend on instance i when archiving and 
+		% dearchiving.  This means that if this instance is archived,
+		% then i will also have to be archived, and that when this 
+		% instance is dearchived, that i will have to be dearchived 
+		% first.
+		% <p>
+		% Dependencies can cause large numbers of instances to be archived
+		% in response to a single archiving event (as dependencies of 
+		% dependencies, and dependencies of dependencies of dependencies, ad
+		% infinitum will also be archived).  This means that you should make
+		% dependencies sparingly, only when absolutely required.
+		% <p>
+		% Circular dependencies are forbidden.
+
+		addDependency(i).
+
+	+ to remove-dependency on theObject (object):
+		% Removes theObject from this object's dependency list.  See
+		% METHOD(add-dependency) for more information on dependencies.
+
+		removeDependency(theObject).
+
+	+ to dearchive:
+		return 1.
+
+	+ to archive:
+		return 1.
+
+	+ to call-method named methodName (string):
+		% Calls the method named methodName for this object.  Returns the result of
+		% the method call.
+
+		return callMethodNamed(self, methodName, { }).
+
+	+ to call-method named methodName (string) with-arguments argList (list):
+		% Calls the method named methodName for this object.  Returns the result of
+		% the method call.
+		% <p>
+		% The arguments to the object are passed in using the list argList.  Since
+		% keywords are not passed in, this method relies on the order the arguments
+		% appear in the argument list and passes them to methodName in the order 
+		% in which they appear in methodName's definition.
+		% <p>
+		% Why not call a method 
+		% directly?  This method is used in circumstances where you might
+		% want to have some sort of callback method.  As an example, let's 
+		% say you write a general purpose class which can sort objects based 
+		% on different criteria.  How would the user specify these arbitrary
+		% criteria?  Using this method would allow the user to pass in the
+		% name of the method they want to use, and the sorting object could
+		% use this method to execute the callback.
+		% <p>
+		% If the concept of a callback doesn't make sense, then you can
+		% probably ignore this method.
+
+		return callMethodNamed(self, methodName, argList).
+
+	- to iterate:
+}

@@ -1,0 +1,31 @@
+#
+# Copyright (C) 2000-2004    jon klein (jklein@spiderland.org)
+#
+# s pi der la nd
+#
+
+BREVEO	= breve.o
+BREVEC	= breve.c
+
+BREVECLIO	= breve_cli.o
+BREVECLIC	= breve_cli.c
+
+LIBS 	+=-L../lib -lbrsteve -lbrkernel -lbrsimulation -lbrutil -lbrneural -lbrgraph @LDFLAGS@ @LIBS@ -lstdc++ -ltermcap
+
+INCLUDE	+= -I../include/breve @CPPFLAGS@
+
+all: breve_cli breve
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
+
+breve: $(BREVEO) ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a
+	$(CC) -o breve $(CFLAGS) $(BREVEO) $(LIBS) @GLLIBS@ @AUDIOLIBS@
+
+breve_cli: $(BREVECLIO) ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a
+	$(CC) -o breve_cli $(CFLAGS) $(BREVECLIO) $(LIBS) @GLLIBS@ @AUDIOLIBS@
+
+clean:
+	-rm -f breve breve_cli *.o
+
+install: all

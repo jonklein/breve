@@ -1,0 +1,185 @@
+<!--
+    The breve Simulation Environment documentation
+    Copyright (C) 2003 Jonathan Klein
+-->
+
+<chapter id="agents">
+<title>Defining Basic Agents</title>
+<para>
+<indexterm><primary>agents</primary></indexterm>
+<indexterm><primary>Real (class)</primary></indexterm>
+<indexterm><primary>Stationary (class)</primary></indexterm>
+<indexterm><primary>Mobile (class)</primary></indexterm>
+<indexterm><primary>MultiBody (class)</primary></indexterm>
+
+To create a simple agent in breve, you'll need to subclass one of the basic
+agent classes, all subclasses of <ulink url="../classes/Real.html">Real</ulink>:
+<itemizedlist>
+<listitem><para>Stationary, an immobile object in the simulated world.</para></listitem>
+<listitem><para>Mobile, an object which moves around the simulated world.</para></listitem>
+<listitem><para>MultiBody, a physically simulated mobile object.</para></listitem>
+</itemizedlist>
+</para>
+<para>
+This chapter describes the basics of implementing agents in breve, with a focus
+on Mobile agents.  Stationary objects are even easier to use than Mobile objects,
+and Physically simulated MultiBody objects are described in the chapter on physical 
+simulation (<xref linkend="physics">).
+</para>
+<para>
+The section A Simple Mobile agent (<xref linkend="mobile_agent">) shows a very basic
+mobile agent template which can be used to any mobile agent.  The appearance of the 
+agent can be customized in a number of ways&mdash;some basic options are described
+in the section Changing the Appearance of Agents (<xref linkend="agent_appearence">).
+Controlling the motion of agents is described in the section Moving Agents Around
+the 3D World (<xref linkend="agent_motion">).  The final section describes how 
+events can be scheduled for specific times (<xref linkend="scheduling_events">).
+</para>
+
+<sect1 id="mobile_agent">
+<title>A Simple Mobile Agent</title>
+<para>
+The majority of agents created in breve are simple mobile agents.  
+</para>
+<para>
+Here's a simple mobile agent.  It inherits most of its behaviors from the class
+mobile, but we'll customize it with our own <function>init</function> and 
+<function>iterate</function> methods.
+<screen>
+Mobile : Bird {
+	+ variables:
+		myShape (object).
+
+	+ to init:
+		# make a new shape.
+
+		myShape = new Shape.
+		myShape init-with-cube size (1, 1, 1).
+
+		# register this Mobile with our shape and we're done!
+
+		self register with-shape myShape.
+
+	+ to iterate:
+		# here we would specify our default behavior--the action
+		# we take at each iteration.  typically this involves a
+		# change in velocity or acceleration based on some sort
+		# of computation
+}
+</screen>
+</para>
+<para>
+The shape used need not be a cube&mdash;you can choose from a number of shapes using
+the class <ulink url="../classes/Shape.html">Shape</ulink>.  You can also construct
+your own shapes with the class <ulink url="../classes/CustomShape.html">CustomShape</ulink>.
+</para>
+<para>
+This is only a simple example&mdash;a template for a real agent.  In the rest of the 
+chapter we'll see how to customize the appearance, motion and behavior of an agent.
+</para>
+</sect1>
+
+<sect1 id="agent_appearence">
+<title>Changing the Appearance of Agents</title>
+<para>
+There are a number of ways to customize the appearance of an agent.  As mentioned
+in the previous section, you can manipulate the size and shapes of objects using 
+the class <ulink url="../classes/Shape.html">Shape</ulink> and its subclasses.
+</para>
+<para>
+<indexterm><primary>color</primary></indexterm>
+<indexterm><primary>set-color (method)</primary></indexterm>
+To set the color of an agent, use the method 
+<ulink url="../classes/Real.html#set-color">set-color</ulink> in the class 
+<ulink url="../classes/Real.html">Real</ulink>.  The method expects a vector
+color where the three values represent red, green and blue intensities on
+a scale from 0.0 to 1.0.  For example:
+<screen>
+# set the color to red = 0, green = 1, blue = 0.
+
+self set-color to (0.0, 1.0, 0.0).
+</screen>
+</para>
+<para>
+Objects can also be textured, represented as images or even as translucent glowing 
+blobs called "lightmaps".  All of these techniques are covered in detail in the 
+chapter on Graphics and Sound (<xref linkend="graphics_and_sound">).
+</para>
+</sect1>
+
+<sect1 id="agent_motion">
+<title>Moving Agents Around the 3D World</title>
+<para>
+<indexterm><primary>move (method)</primary></indexterm>
+<indexterm><primary>set-velocity (method)</primary></indexterm>
+<indexterm><primary>set-acceleration (method)</primary></indexterm>
+<indexterm><primary>location</primary></indexterm>
+<indexterm><primary>velocity</primary></indexterm>
+<indexterm><primary>acceleration</primary></indexterm>
+Agents can be moved around the world in a number of ways: by specifying their 
+locations, their velocities and their accelerations.  Object locations are 
+typically set during initialization, while velocity and acceleration are 
+typically adjusted dynamically over the course of the simulation.
+</para>
+<para>
+Agents can be explicitly moved to a specific location using the method 
+<ulink url="../classes/Real.html#move">move</ulink> in the class 
+<ulink url="../classes/Real.html">Real</ulink>:
+<screen>
+# move the agent to the location (10, 0, 0) in 3D space...
+
+self move to (10, 0, 0).
+</screen>
+</para>
+<para>
+The speed of an agent can be set using the method
+<ulink url="../classes/Real.html#set-velocity">set-velocity</ulink> in the class 
+<ulink url="../classes/Real.html">Real</ulink>:
+<screen>
+# set the agent's velocity to (0, 0, 10) 
+
+self set-velocity to (0, 0, 10).
+</screen>
+</para>
+<para>
+The acceleration of an agent can be set using the method
+<ulink url="../classes/Real.html#set-acceleration">set-acceleration</ulink> in the class 
+<ulink url="../classes/Real.html">Real</ulink>:
+<screen>
+# set the agent's acceleration to (0, -9.8, 0) 
+
+self set-acceleration to (0, -9.8, 0).
+</screen>
+</para>
+</sect1>
+
+<sect1 id="scheduling_events">
+<title>Scheduling Events for a Specific Time</title>
+<para>
+<indexterm><primary>get-time (method)</primary></indexterm>
+<indexterm><primary>schedule (method)</primary></indexterm>
+<indexterm><primary>events</primary></indexterm>
+Events can be scheduled for a specific time for any object using the method
+<ulink url="../classes/Object.html#schedule">schedule</ulink> in the class 
+<ulink url="../classes/Object.html">Object</ulink>:
+<screen>
+# call a method after the simulation clock hits 100.0...
+
+self schedule method-call "sing-and-dance" at-time 100.0.
+</screen>
+</para>
+<para>
+It is often desirable to trigger a method call not for a specific simulation
+time, but for an offset relative to the current time (for example, "20 seconds
+from now").  This can be done with the help of the 
+<ulink url="../classes/Control.html#get-time">get-time</ulink> method in the class 
+<ulink url="../classes/Control.html">Control</ulink>:
+<screen>
+# call a method 100.0 seconds from now...
+
+self schedule method-call "sing-and-dance" at-time ((controller get-time) + 100.0).
+</screen>
+</para>
+</sect1>
+
+</chapter>

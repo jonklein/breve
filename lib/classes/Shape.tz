@@ -1,0 +1,262 @@
+@include "Abstract.tz"
+
+Abstract : Shape (aka Shapes) [version 1.8] {
+	% The Shape class is a work-in-progress which allows users to create 
+	% shapes which will be associated with OBJECT(Mobile), OBJECT(Stationary)
+	% or OBJECT(Link) objects and added to the simulated world.  An instance
+	% of the class Shape may be shared by several objects simultaneously.
+	% <p>
+	% Each Shape has it's own local coordinate frame, with the origin
+	% at the middle of the shape.
+
+	+ variables:
+		shapePointer (pointer).
+		density (float).
+		shapeData (data).
+
+	+ to init:
+		density = 1.0.
+
+	+ to get-mass:
+		% If the shape is properly initialized, this method returns the 
+		% shape's mass.
+
+		if shapePointer: return getMass(shapePointer).
+		return 0.0.
+
+	+ to set-mass to newMass (float):
+		% Sets the mass for this Shape object.  This implicitly changes the 
+		% density of the object.
+
+		if shapePointer: shapeSetMass(shapePointer, newMass).
+
+	+ to get-density:
+		% If the shape is properly initialized, this method returns the 
+		% shape's density.
+
+		if shapePointer: return getDensity(shapePointer).
+		return 0.0.
+
+	+ to set-density to newDensity (float):
+		% Sets the density for this Shape object.  This implicitly changes the 
+		% mass of the object.
+
+		density = newDensity.
+		shapeSetDensity(shapePointer, density).
+
+  + section "Dynamically Changing the Size of a Shape"
+
+	+ to scale by scale (vector):
+		% If the shape is <i>not</i> a sphere, scales the shape by the x, y 
+		% and z elements of scale.  If the shape <i>is</i> a sphere, scales 
+		% the shape by only the x element such that the shape always remains 
+		% spherical.
+		% <p>
+		% After the size has been changed, the instances announces a 
+		% "size-changed" notification.
+
+		scaleShape(shapePointer, scale).
+
+		self announce message "size-changed".
+
+  + section "Initializing the Shape"
+		
+	+ to init-with-sphere radius r (float):
+		% Sets this Shape object to a sphere with radius r.
+
+		shapePointer = newSphere(r, density).
+
+		return self.
+
+	+ to init-with-cube size v (vector):
+		% Sets this Shape object to a rectangular solid with size v.  
+		% <p>
+		% size refers to the vector from the center to one point, so the 
+		% for a vector (x, y, z), the actual size of the rectangular solid 
+		% will be 2*x by 2*y by 2*z.
+
+		shapePointer = newCube(v, density).
+
+		return self.
+
+	+ to init-with-polygon-disk radius theRadius (float) sides sideCount (int) height theHeight (float):
+		% Sets this Shape object to an extruded n-gon of sideCount sides, in other words,
+		% a disk with sideCount sides.
+		% <p>
+		% The distance from the center of the n-gon faces to the vertices 
+		% is theRadius.  sides has a maximum value of 99.  Higher values
+		% will cause the shape not to be initialized.
+		% <p>
+		% The height, or depth of the extrusion, is theHeight.
+		% <p>
+		% This method is experimental, but seems to work okay.  Go figure.
+ 
+		shapePointer = newNGonDisc(sideCount, theRadius, theHeight, density).
+ 
+		return self.
+
+	+ to init-with-polygon-cone radius theRadius (float) sides sideCount (int) height theHeight (float):
+		% Sets this Shape object to a cone-like shape with sideCount sides.
+		% <p>
+		% The distance from the center of the n-gon faces to the vertices 
+		% is theRadius.  sides has a maximum value of 99.  Higher values
+		% will cause the shape not to be initialized.
+		% <p>
+		% The height, or depth of the extrusion, is theHeight.
+		% <p>
+		% This method is experimental, but seems to work okay.  Go figure.
+
+		shapePointer = newNGonCone(sideCount, theRadius, theHeight, density).
+
+		return self.
+ 
+	- to get-pointer:
+		% Returns the shapePointer associated with this Shape object.  This 
+		% method is used internally and should not typically be used in 
+		% user simulations.
+
+		return shapePointer.
+
+  + section "Getting Information About a Shape's Geometry"
+
+	+ to get-point-on-shape on-vector theVector (vector):
+		% This method is experimental.
+		% <p>
+		% Starting from inside the shape at the center, this function goes in 
+		% the direction of theVector until it hits the edge of the shape.
+		% The resulting point is returned.  
+		% <p>
+		% This allows you to compute link points for arbitrary shapes. 
+		% For example, if you want to compute a link point for the 
+		% "left-most" point on the shape, you can call this method with
+		% (-1, 0, 0).  
+		% <p>
+		% Returns (0, 0, 0) if the shape is not initialized or if an
+		% error occurs.
+
+		if shapePointer: return pointOnShape(shapePointer, theVector).
+		else return (0, 0, 0).
+
+	+ to destroy:
+		if shapePointer: freeShape(shapePointer).
+
+  + section "Serializing the Shape"
+
+	+ to get-data-for-shape:
+		% Returns serialized data for the shape (if the shape object has 
+		% been properly initialized).  Used for archiving/dearchiving,
+		% should generally not be called manually, unless you <i>really</i>
+		% know what you're doing.
+
+		if shapePointer: return dataForShape(shapePointer).
+
+	+ to archive:
+		shapeData = (self get-data-for-shape).
+		return 1.
+
+	+ to dearchive:
+		shapePointer = shapeForData(shapeData).
+		print "dearchived $shapePointer".
+		return (super dearchive).
+}
+
+Shape : CustomShape (aka CustomShapes) {
+	% A CustomShape is a subclass of (Shape) which allows the user to 
+	% construct an arbitrary convex shape by specifying the faces of 
+	% the shape.
+	% <P>
+	% The shapes must conform to the following rules:
+	% <li>The point (0, 0, 0) must be on <b>inside</b> (not outside or 
+	% on the surface of) the shape.
+	% <li>The shape must be convex.
+	% <li>The shape must be solid and sealed by the faces.
+	% </ul>
+	% <p>
+	% If any of these conditions are not met, you will get errors 
+	% and/or unexpected results.
+
+	+ to init:
+		shapePointer = newShape().
+		
+	+ to add-face with-vertex-list vertexList (list): 
+		% Adds a face defined by the list of vectors in vertextList.
+
+		addShapeFace(shapePointer, vertexList).
+
+	+ to finish-shape with-density theDensity (float):
+		% This method must be called after all of the faces are added 
+		% to complete initialization of the shape.  The density given 
+		% here will effect the physical properties of the shape if 
+		% physical simulation is used.  A value of 1.0 is reasonable.
+		% <P>
+		% If the shape specified is invalid (according to the constraints
+		% listed above), this method will trigger an error.
+
+		return finishShape(shapePointer, theDensity).
+}
+
+Shape : Sphere (aka Spheres) {
+	% This class is used to create a sphere shape.
+
+	+ to init-with radius r (double):
+		% Initializes the sphere with the given radius.
+
+		shapePointer = newSphere(r, density).
+
+		return self.
+}
+
+Shape : Cube (aka Cubes) {
+	% This class is used to create an extruded rectangle.  Even though the class
+	% is named "Cube", the shapes do not need to be perfect cubes--they can be 
+	% rectangular solids of all sizes.
+
+	+ to init-with size s (vector):
+		% Initializes the cube to a rectangular solid with size v.  
+		% <p>
+		% size refers to the vector from the center to one point, so the 
+		% for a vector (x, y, z), the actual size of the rectangular solid 
+		% will be 2*x by 2*y by 2*z.
+
+		shapePointer = newCube(s, density).
+
+		return self.
+}
+
+Shape : PolygonDisk (aka PolygonDisks) {
+	% This class is used to create a polygon-disk.  This is a shape which can be 
+	% described as an extruded polygon. 
+
+	+ to init-with radius theRadius (float) sides sideCount (int) height theHeight (float):
+		% Initializes the polygon-disk.
+		% <p>
+		% The distance from the center of the n-gon faces to the vertices 
+		% is theRadius.  sides has a maximum value of 99.  Higher values
+		% will cause the shape not to be initialized.
+		% <p>
+		% The height, or depth of the extrusion, is theHeight.
+ 
+		shapePointer = newNGonDisc(sideCount, theRadius, theHeight, density).
+ 
+		return self.
+}
+
+Shape : PolygonCone (aka PolygonCones) {
+	% This class is used to create a polygon-cone shape.  This is a shape with a polygon
+	% base which tapers off to a point.  A pyramid is an example of a polygon-cone with
+	% 4 sides.  As the number of sides increases, the base becomes more circular and the
+	% resulting shape will more closely resemble a true cone.
+
+	+ to init-with radius theRadius (float) sides sideCount (int) height theHeight (float):
+		% Initializes the polygon-cone.
+		% <p>
+		% The distance from the center of the n-gon faces to the vertices 
+		% is theRadius.  sides has a maximum value of 99.  Higher values
+		% will cause the polygon-cone not to be initialized.
+		% <p>
+		% The height, or depth of the extrusion, is theHeight.
+
+		shapePointer = newNGonCone(sideCount, theRadius, theHeight, density).
+
+		return self.
+}

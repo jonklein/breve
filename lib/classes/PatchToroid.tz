@@ -1,0 +1,97 @@
+@include "Abstract.tz"
+@include "Patch.tz"
+
+# aka PatchTorroid due to a misspelling in the previous version!
+
+PatchGrid : PatchToroid (aka PatchTorroid) [version 1.8] {
+	% OBJECT(PatchToroid) is a subclass of OBJECT(PatchGrid) in which the 
+	% patch neighbors are initialized in a toroidal fashion, such that 
+	% patches on the edge of the grid are "connected" (via neighbor 
+	% relationships) to patches on the opposite edge.
+	% <p>
+	% Note that since OBJECT(PatchGrid) objects can already be 3 dimensional,
+	% that a 3D toroidal OBJECT(PatchGrid) is actually not the traditional 
+	% donut shaped toroidal topology--it's the corresponding topology in 
+	% 4 dimensions.  Now I don't know about you, but I get a headache
+	% thinking about this stuff, so let's just agree that "toroid" is not
+	% the totally accurate term, but that it's the easiest way to describe
+	% what's going on here.
+	% <p>
+	% Use METHOD(init-with) or METHOD(init-at) the create a PatchToroid.
+
+	+ to init-at location gridCenter (vector) with-patch-size pSize (vector) with-x-count x (int) with-y-count y (int) with-z-count z (int) with-patch-class class (string):
+		% Creates a PatchGrid in which each OBJECT(Patch) is a member of 
+		% class and is the size pSize and in which the total grid 
+		% dimensions are x by y by z.  
+		% <p> 
+		% Bear in mind that this will create a large number of objects: 
+		% x * y * z.  If you have an iterate method in your patch-class, 
+		% then this can amount to a great deal of computation which can
+		% slow down your simulation.
+
+		xCount, yCount, zCount (int).
+		patch (object).
+
+		patchSize = pSize.
+
+		grid = newPatchGrid(gridCenter, patchSize, x, y, z).
+
+		xSize = x.
+		ySize = y.
+		zSize = z.
+
+		xCount = 0.
+		yCount = 0.
+		zCount = 0.
+
+		while xCount < x: {
+			yCount = 0.
+
+			while yCount < y: {
+
+				zCount = 0.
+
+				while zCount < z: {
+    				patch = (controller make-new-instance of-class class).
+					patch init-with grid-patch self x-pos xCount y-pos yCount z-pos zCount.
+					push patch onto patches.
+
+					setPatchObjectAtIndex(grid, patch, xCount, yCount, zCount).
+
+					patch set-patch-pointer to patchAtIndex(grid, xCount, yCount, zCount).
+					self add-dependency on patch.
+				
+					zCount += 1.
+				}
+
+				yCount += 1.
+			}
+
+			xCount += 1.
+		}
+
+		xCount = 0.
+		yCount = 0.
+		zCount = 0.
+
+		while xCount < x: {
+			yCount = 0.
+
+			while yCount < y: {
+
+				zCount = 0.
+
+				while zCount < z: {
+					patchObjectAtIndex(grid, xCount, yCount, zCount) init-toroidal-neighbors.
+					patchObjectAtIndex(grid, xCount, yCount, zCount) init-patch.
+					zCount += 1.
+				}
+
+				yCount += 1.
+			}
+
+			xCount += 1.
+		}
+
+		return self.
+}

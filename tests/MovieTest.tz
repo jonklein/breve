@@ -1,0 +1,30 @@
+@use Control.
+@use Movie.
+@use Mobile.
+
+Controller MovieTest.
+
+Control : MovieTest {
+    + variables:
+        movie (object).
+
+    + to init:
+        movie = new Movie.
+        movie record to "TestMovie.mpeg".
+
+    + to iterate:
+        if (self get-time) > 1.0: self stop.
+
+        self set-background-color to random[(1, 1, 1)].
+
+        super iterate.
+
+		new Mobile move to random[(20, 20, 20)] - (10, 10, 10).
+
+    + to stop:
+        self save-snapshot to "TestSnapshot.png".
+
+        movie close.
+
+        self end-simulation.
+}

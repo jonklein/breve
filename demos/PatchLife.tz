@@ -1,0 +1,121 @@
+# 
+# This demos uses the "patches" to implement Conway's classic "Game of Life" 
+# simulation.  This file demonstrates how patches can be used to partition 
+# space into smaller areas.  These patches can be used to implement cellular
+# automata (as in this simulation), or to associate certain areas of space 
+# with different values (like temperature, or chemical concentrations).
+#
+
+@include "Control.tz"
+@include "PatchToroid.tz"
+@include "Patch.tz"
+@include "Wanderer.tz"
+
+Controller PatchLife.
+
+@define X_SIZE 40.
+@define Y_SIZE 40.
+
+Control : PatchLife {
+	+ variables:
+		patches (object).
+
+	+ to init:
+		patches = (new PatchToroid init-with patch-size (.5, .5, .5) with-x-count X_SIZE with-y-count Y_SIZE with-z-count 1 with-patch-class "LifePatch").
+
+		self set-background-color to (0, 0, 0).
+
+	+ to catch-key-r-down:
+		self randomize.
+
+	+ to catch-key-g-down:
+		self make-glider.
+
+	+ to catch-key-c-down:
+		self clear.
+
+	+ to clear:
+		patch (object).
+		patchList (list).
+
+		patchList = (patches get-patches).
+		foreach patch in patchList: patch set-state to 0.
+
+	+ to make-glider:
+		(patches get-patch-at x X_SIZE - 3 y 1 z 0) set-state to 1.
+		(patches get-patch-at x X_SIZE - 3 y 2 z 0) set-state to 1.
+		(patches get-patch-at x X_SIZE - 3 y 3 z 0) set-state to 1.
+		(patches get-patch-at x X_SIZE - 2 y 3 z 0) set-state to 1.
+		(patches get-patch-at x X_SIZE - 1 y 1 z 0) set-state to 1.
+
+	+ to randomize:
+		patch (object).
+		patchList (list).
+	
+		patchList = (patches get-patches).
+		foreach patch in patchList: patch set-state to random[1].
+}
+
+Patch : LifePatch {
+	+ variables:
+		state, nextstate (int).
+		neighbors (8 objects).
+		onCount (int).
+
+	+ to get-state:
+		return state.
+
+	+ to set-state to value (int):
+		self set-color to (xIndex / 10.0, yIndex / 10.0, 0).
+		self set-transparency to 1.0 - value.
+		state = value.
+
+	+ to init-patch:
+		state = random[1].
+
+		neighbors[0] = (self get-patch-to-left).
+		neighbors[1] = (self get-patch-to-right).
+		neighbors[2] = (self get-patch-above).
+		neighbors[3] = (self get-patch-below).
+		neighbors[4] = (self get-patch-to-lower-left).
+		neighbors[5] = (self get-patch-to-lower-right).
+		neighbors[6] = (self get-patch-to-upper-left).
+		neighbors[7] = (self get-patch-to-upper-right).
+
+		# we set the color now according to the location in the patchgrid, 
+		# but we'll change the transparency depending on whether we're on
+		# or off.
+
+		self set-color to (xIndex / 10.0, yIndex / 10.0, 0.0).
+
+	+ to iterate:
+		count, n (int).
+
+		for n=0, n<8, n=n+1: {
+			if neighbors[n]: {
+				count += (neighbors[n] get-state).
+
+				if count > 3: {
+					self set-transparency to 1.0.
+					nextstate = 0.
+					onCount = 0.
+					return.
+				}
+			}
+		}
+
+		if count == 3 || (count == 2 && state == 1): {
+			self set-transparency to 0.3.
+			nextstate = 1.
+
+			self set-color to (1.0 - (onCount / 20.0), onCount / 20.0, 0).
+		} else {
+			self set-transparency to 1.0.
+			nextstate = 0.
+			onCount = 0.
+		}
+
+	+ to post-iterate:
+		state = nextstate.
+		onCount++.
+}

@@ -1,0 +1,483 @@
+#LyX 1.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 221
+\textclass article
+\language english
+\inputencoding auto
+\fontscheme ae
+\graphics default
+\paperfontsize default
+\spacing single 
+\papersize Default
+\paperpackage a4
+\use_geometry 0
+\use_amsmath 0
+\use_natbib 0
+\use_numerical_citations 0
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\quotes_times 2
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+
+\layout Title
+
+Building Braitenberg Vehicles in breve
+\layout Standard
+
+
+\begin_inset Graphics
+	filename vehicle.png
+
+\end_inset 
+
+
+\layout Standard
+\align center 
+a tutorial
+\layout Standard
+\align center 
+The breve Simulation Environment
+\layout Standard
+\pagebreak_bottom \align center 
+http://www.spiderland.org
+\layout Section*
+
+Introduction
+\layout Standard
+
+Braitenberg vehicles are small robots that can exhibit complex behaviors
+ with very simple circuitry.
+ The vehicles typically have small box-shaped bodies with one wheel on each
+ side.
+ At the front of the vehicle are sensors, which detect different types of
+ stimuli (for example, light) from the environment.
+ These sensors are connected directly to the vehicle's wheels so that the
+ wheels turn when the sensors are activated.
+ Two simple Braitenberg vehicles are shown in figure 1.
+\layout Standard
+
+
+\begin_inset Float figure
+wide false
+collapsed false
+
+\layout Standard
+\align center 
+
+\begin_inset Graphics
+	filename vehicles.png
+
+\end_inset 
+
+
+\layout Caption
+
+two simple Braitenberg vehicles
+\end_inset 
+
+
+\layout Standard
+\pagebreak_bottom 
+The concept is simple, but Braitenberg showed that these vehicles could
+ appear to exhibit interesting and complex behaviors such as 
+\begin_inset Quotes eld
+\end_inset 
+
+love" or 
+\begin_inset Quotes eld
+\end_inset 
+
+hate", depending on how the sensors were connected to the wheels.
+ This tutorial describes how to create simulated Braitenberg vehicles in
+ breve.
+ Follow the directions outlined in the following steps in order to create
+ a basic Braitenberg vehicle.
+ You should read through each step in its entirety before making changes
+ to the code.
+ You should also be careful to type in each line exactly as it appears in
+ this tutorial---punctuation and capitalization are especially important.
+\layout Section*
+
+Step 1: Open a Braitenberg template file
+\layout Standard
+
+The first step in creating a Braitenberg Vehicle in breve is to launch the
+ breve application (version 1.5 or later) and open a template file for Braitenber
+g vehicles.
+ You can find this template by selecting the menu item 
+\begin_inset Quotes eld
+\end_inset 
+
+
+\noun on 
+Demos -> Braitenberg -> BraitenbergTemplate.tz
+\noun default 
+".
+ This should open a window containing the following text:
+\layout LyX-Code
+
+1   @use Braitenberg.
+\newline 
+2 
+\newline 
+3   Controller myBraitenbergControl.
+\newline 
+4 
+\newline 
+5   BraitenbergControl : myBraitenbergControl {
+\layout LyX-Code
+
+6      + variables:
+\layout LyX-Code
+
+7          vehicle (object).
+\layout LyX-Code
+
+8          leftSensor, rightSensor (object).
+\layout LyX-Code
+
+9          leftWheel, rightWheel (object).
+\layout LyX-Code
+
+10         light (object).
+\newline 
+11
+\newline 
+12     + to init:
+\layout LyX-Code
+
+13         light = new BraitenbergLight.
+\layout LyX-Code
+
+14         light move to (10, 1, 0).
+\newline 
+15
+\newline 
+16         vehicle = new BraitenbergVehicle.
+\layout LyX-Code
+
+17         self watch item vehicle.
+\layout LyX-Code
+
+18   }
+\layout LyX-Code
+
+\layout Standard
+
+This is a template for a Braitenberg vehicle simulation.
+ What does the code do so far? All breve simulations require a 
+\emph on 
+controller
+\emph default 
+ object, which will specify how the simulation is set up.
+ We tell breve the name of the controller at line 3.
+ At line 5, we start to define the object, called myBraitenbergControl.
+ Inside this controller object, we create a method called 
+\emph on 
+init
+\emph default 
+ (starting at line 12).
+ This method will be run automatically when the object is created---so anything
+ inside the method will be automatically run when the simulation starts.
+ Inside this 
+\emph on 
+init
+\emph default 
+ method, we do two things: we create a BraitenbergLight object (line 13),
+ and we create a BraitenbergVehicle object (line 16).
+ In addition, we associate names with these objects by assigning them to
+ some of the variables we've specified.
+ Later on, we can refer to these objects by their names---the BraitenbergVehicle
+ object will be known as 
+\emph on 
+vehicle
+\emph default 
+ and the BraitenbergLight object will be known as 
+\emph on 
+light
+\emph default 
+.
+ 
+\layout Standard
+\pagebreak_bottom 
+If you click on the 
+\begin_inset Quotes eld
+\end_inset 
+
+Play" button, you should see the simulation start, and that the light and
+ the vehicle are added to the simulated world (though the light is off-camera
+ to the right slightly).
+ Stop the simulation and return to your code to begin the next step.
+\layout Section*
+
+Step 2: Add wheels to the vehicle
+\layout Standard
+
+You probably noticed that the vehicle you created had no wheels.
+ You might be saying that vehicles without wheels are, in fact, not vehicles.
+ But instead of arguing about words, let's do something about it.
+ Let's add wheels to our vehicle.
+\layout Standard
+
+In order to do this, we'll need to 
+\begin_inset Quotes eld
+\end_inset 
+
+tell" the vehicle to add some new wheels.
+ Remember that we've attached the name 
+\emph on 
+vehicle
+\emph default 
+ to our vehicle, so here's how we tell it to create a new wheel:
+\layout LyX-Code
+
+vehicle add-wheel at (X, Y, Z).
+\layout Standard
+
+X, Y, and Z will specify the location of the new wheel on the vehicle---remember
+ that we're working in 3-dimensional space.
+ 
+\layout Standard
+
+A typical Braitenberg vehicle might have wheels halfway between the front
+ of the vehicle and the back, halfway between the top and the bottom, with
+ one on each side.
+ In breve, Braitenberg vehicles are 4.0 units long, .75 units high and 3.0
+ units wide.
+ The X, Y and Z values we pick have to be relative to the center of the
+ vehicle, which has the coordinates (0, 0, 0).
+ So relative to the center of the vehicle, what are the X, Y and Z coordinates
+ of our wheels? 
+\layout Standard
+
+The first two measurements are easy, since we want them to be halfway between
+ the front and back, and halfway between the top and bottom, they should
+ already be lined up with the middle of the vehicle.
+ This means that the X and Y values should be 0.
+ As for the Z values, we'll want one wheel on the left side, and one wheel
+ on the right.
+ Since the vehicle is 3.0 units wide, our Z values will be 1.5 and -1.5.
+ 
+\layout Standard
+
+So we'll want to add two lines to our program, after all the other commands
+ in the init method (but before the "}" line):
+\layout LyX-Code
+
+vehicle add-wheel at (0, 0, -1.5).
+\layout LyX-Code
+
+vehicle add-wheel at (0, 0, 1.5).
+\layout Standard
+
+As with the vehicle and the light, we'll need to attach names to them, so
+ we'll modify these lines slightly:
+\layout LyX-Code
+
+leftWheel = (vehicle add-wheel at (0, 0, -1.5)).
+\layout LyX-Code
+
+rightWheel = (vehicle add-wheel at (0, 0, 1.5)).
+\layout Standard
+\pagebreak_bottom 
+Run the simulation again.
+ The vehicle should now have wheels.
+ Stop the simulation and proceed to step 3.
+\layout Section*
+
+Step 3: Add sensors to your vehicle
+\layout Standard
+
+Adding sensors to your vehicle is a lot like adding wheels, so we won't
+ go into too much detail.
+ Sensors are added with the command: 
+\layout LyX-Code
+
+vehicle add-sensor at (X, Y, Z).
+\layout Standard
+
+This time, however, we want the new objects placed at the front of the vehicle,
+ with one on each side.
+ So what values should be used for X, Y and Z this time? You'll probably
+ end up with commands something like this:
+\layout LyX-Code
+
+vehicle add-sensor at (2.0, 0, -1.5).
+\layout LyX-Code
+
+vehicle add-sensor at (2.0, 0, 1.5).
+\layout Standard
+
+As with the code we used to create the wheels, we'll put these commands
+ after all of the others in the init method.
+ And once again, we'll want to attach names to the sensors so that we can
+ use them later.
+ So modify the sensor lines to look like this:
+\layout LyX-Code
+
+leftSensor = (vehicle add-sensor at (2.0, 0, -1.5)).
+\layout LyX-Code
+
+rightSensor = (vehicle add-sensor at (2.0, 0, 1.5)).
+\layout Standard
+\pagebreak_bottom 
+Run the simulation again, and you should see the new sensors attached to
+ the vehicle.
+ Stop the simulation and proceed to step 4.
+\layout Section*
+
+Step 4: Link the sensors to the wheels
+\layout Standard
+
+At this point, we have a fully assembled Braitenberg vehicle, but it doesn't
+ move! In order to make the vehicle react to stimuli in the environment,
+ we'll need to link the sensors to the wheels.
+ We have the names of the sensors and the names of the wheels, so we just
+ tell each sensor to link itself to a wheel.
+ We can link the sensors to either wheel, linking either to the wheels on
+ the same side, or on opposite sides.
+ If we wanted to simulate Braitenberg's 
+\emph on 
+Aggressor
+\emph default 
+, for example, we would link the sensors to the opposite wheels:
+\layout LyX-Code
+
+leftSensor link to rightWheel.
+ 
+\layout LyX-Code
+
+rightSensor link to leftWheel.
+\layout Standard
+\pagebreak_bottom 
+Run the simulation again and you'll see that the vehicle now moves.
+ The vehicle rolls toward (and then through) the light.
+ You can even use the arrow tool to select the light and move it away from
+ the vehicle.
+ You'll see that the vehicle will chase after it, as long as it's visible
+ to the vehicle's sensors.
+ Stop the simulation and proceed to step 5.
+\layout Section*
+
+Step 5: Customize the sensors & wheels
+\layout Standard
+
+Now we've got a functioning Braitenberg vehicle! By customizing the configuratio
+ns of the sensors and the wheels, we can get all sorts of interesting behaviors.
+ We'll customize the vehicle by changing the starting velocity of its wheels
+ and by changing the strength of the connections between the sensors and
+ wheels.
+\layout Standard
+
+On the vehicle we've created so far, the wheels start with a speed of 0,
+ and then accelerate in response to sensor input.
+ The speed of a wheel in the absence of light is called the 
+\emph on 
+natural velocity
+\emph default 
+ of the wheel in breve.
+ We can tell each wheel to set its natural velocity like this:
+\layout LyX-Code
+
+leftWheel set-natural-velocity to .5.
+\layout LyX-Code
+
+rightWheel set-natural-velocity to .5.
+\layout Standard
+
+This means that the wheels will start with a speed of .5 even when there
+ is no sensor input.
+ Of course, the natural velocities we give the wheels do not need to be
+ equal, nor do they need to be positive.
+ Choosing asymmetrical or negative natural velocities can lead to more interesti
+ng vehicle behaviors.
+ 
+\layout Standard
+
+As for the strength of the connection between a sensor and a wheel, this
+ value will determine how strongly the wheel will react in response to sensor
+ input---the higher the value, the stronger the reaction.
+ In breve, the strength of this connections is called the 
+\emph on 
+sensor bias
+\emph default 
+.
+ We can change the bias associated with a sensor like this:
+\layout LyX-Code
+
+leftSensor set-bias to 3.0.
+\layout LyX-Code
+
+rightSensor set-bias to 3.0.
+\layout Standard
+
+In this example, we set the bias to be three times as strong as the starting
+ value (which defaults to 1.0).
+ This means that the vehicle will react more strongly to the light, making
+ it faster and making its behavior more dramatic.
+\layout Standard
+\pagebreak_bottom 
+As with the natural velocity of the wheels, we can choose any bias values
+ we'd like.
+ By using negative bias values, we cause the wheels to slow down (and even
+ turn backwards) in response to light.
+ Picking different bias values for the left and right wheels will cause
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+asymmetrical
+\begin_inset Quotes erd
+\end_inset 
+
+ vehicle behaviors.
+ 
+\layout Section*
+
+Step 6: Things to try...
+\layout Itemize
+
+...
+ add additional lights to make the vehicle move in a specific pattern, like
+ a figure-eight or a circle.
+\layout Itemize
+
+...
+ modify the weights, wheel positions and velocities to create new behaviors,
+ like PARANOID, WHIMSICAL or CONFUSED.
+\layout Itemize
+
+...
+ program the lights to move around by themselves (see the documentation
+ for the class 
+\begin_inset Quotes eld
+\end_inset 
+
+Mobile
+\begin_inset Quotes erd
+\end_inset 
+
+).
+\layout Itemize
+
+...
+ continually modify weights and wheel velocities over the course of the
+ simulation (add an 
+\begin_inset Quotes eld
+\end_inset 
+
+iterate
+\begin_inset Quotes erd
+\end_inset 
+
+ method to the myBraitenbergControl class).
+\layout Itemize
+
+...
+ add a second vehicle with a different behavior.
+\the_end

@@ -1,0 +1,26 @@
+#
+# libbrutil.a
+# Copyright (C) 2000-2004    jon klein (jklein@spiderland.org)
+#
+# the  s pi der la nd  project
+# 
+
+LIBO	= error.o memory.o hash.o list.o stack.o text.o matrix.o vector.o quat.o nr.o stringstream.o time.o
+
+INCLUDE +=-I../include/breve
+
+all: libbrutil.a 
+
+.c.o:
+	$(CC) $(CFLAGS) $(INCLUDE) $(DEFINES) -c $*.c
+
+libbrutil.a: $(LIBO)
+	$(AR) -crv libbrutil.a $(LIBO)
+
+install: all
+	cp libbrutil.a ../lib
+	cp *.h ../include/breve
+	ranlib ../lib/libbrutil.a
+
+clean:
+	-/bin/rm -f $(LIBO) libbrutil.a

@@ -1,0 +1,41 @@
+#
+# libbrsteve.a
+# Copyright (C) 2000-2004    jon klein (jklein@spiderland.org)
+#
+# s pi der la nd
+#
+
+LIBO	= steveparse.tab.o stevelex.o stringexp.o dataObject.o genetic.o \
+		object.o expression.o evaluation.o format.o xml.o evalListSort.o \
+		interactive.o breveFunctionsSteveDataObject.o steveFrontend.o gc.o \
+		breveFunctionsSteveObject.o breveFunctionsSteveXML.o
+
+INCLUDE	+=-I../include/breve @CPPFLAGS@
+
+all: libbrsteve.a 
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
+
+format.c: format.l
+	flex format.l
+	mv lex.slFormat.c format.c
+
+stevelex.c: stevelex.l
+	flex stevelex.l
+	mv lex.yy.c stevelex.c
+
+steveparse.tab.c: steveparse.y
+	bison -d -v steveparse.y
+
+libbrsteve.a: $(LIBO)
+	$(AR) -crv libbrsteve.a $(LIBO) 
+	ranlib libbrsteve.a
+
+clean:
+	rm -f *.o stevelex.c steveparse.output steveparse.tab.[ch] libbrsteve.a
+
+install: all
+	/bin/cp libbrsteve.a ../lib
+	ranlib ../lib/libbrsteve.a
+	/bin/cp *.h ../include/breve

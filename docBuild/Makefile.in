@@ -1,0 +1,30 @@
+
+all: docExtract classes docbook Tutorials
+
+install: all
+
+tutorials:
+	cd Tutorials; make
+
+classes: docExtract
+	-mkdir ../docs
+	-mkdir ../docs/classes
+	./docExtract ../lib/classes/*.tz | ./docBuild.pl ../docs/classes
+	./indexBuild.pl ../lib/classes/*.tz > ../docs/classes/method_index.html
+	mv index.txt ../docs
+	cp classImages/*.jpg ../docs/classes/
+
+docbook: classes
+	cd docbook; make -f Makefile
+	rm -rf ../docs/docs
+	mv docbook/index.html docbook/docs ../docs
+
+clean:
+	rm -f docExtract
+	rm -f *.html
+	rm -rf ../docs
+
+source:
+	-mkdir ../docs
+	-mkdir ../docs/source
+	doxygen breve.doxygen

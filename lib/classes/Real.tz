@@ -1,0 +1,348 @@
+@include "Object.tz"
+
+Object : Real (aka Reals) [version 2.0] {
+	% A class which is never instantiated--just used as a logical
+	% distinction from the Abstract classes.  See the child classes
+	% OBJECT(Mobile), OBJECT(Link) and OBJECT(Stationary) for
+	% more information.  The methods documented here may be used 
+	% with any of the child classes.
+
+	+ variables:
+		realWorldPointer (pointer).
+		collisionHandlerList (list).
+		texture (int).
+		lightmap (int).
+		bitmap (int).
+		menus (list).
+		color (vector).
+
+		textureScale (float).
+		neighborhoodSize (float).
+
+		eT (float).
+		e (float).
+		mu (float).
+
+	+ to init:
+		texture = -1.
+		lightmap = -1.
+		bitmap = -1.
+
+		textureScale = 16.
+
+		self add-menu named "Delete Instance" for-method "delete-instance".
+		self add-menu named "Follow With Camera" for-method "watch".
+
+	- to get-world-object-pointer:
+		% Used internally.
+
+		return realWorldPointer.
+
+	+ to watch:
+		% Makes the camera follow this object.
+
+		controller watch item self.
+
+	- to delete-instance:
+		% Produces a dialog box (if supported by the current breve 
+		% engine) asking if the user wants to delete the object.  
+		% This is typically used in response to a user action like
+		% a click or menu callback.
+
+		result (int).
+
+		result = (controller show-dialog 
+					 with-title "Really Delete Instance?"
+					 with-message "Deleting this object may cause a fatal error in the simulation.  Really remove it?"
+					 with-yes-button "Okay"
+					 with-no-button "Cancel").
+
+		if result: free self.
+
+  + section "Configuring Physical Properties of the Object"
+
+	+ to set-e to newE (float):
+
+		% Sets the "coefficient of restitution" a value which
+		% determines the elasticity of the object in a collision.
+		% Valid values range from 0.0 to 1.0, with 0.0 representing
+		% a totally inelastic collision (such as a lump of clay)
+		% while 1.0 represents a totally (and unrealistically)
+		% elastic collision (such as a rubber ball).
+
+		e = newE.
+		setCollisionProperties(realWorldPointer, e, eT, mu).
+
+	+ to set-eT to newET (float):
+		% Sets the "tangential coefficient of restitution", a
+		% frictional version of the "coefficient of restitution"
+		% described in the documentation for METHOD(set-e).  The
+		% value ranges from -1.0 to 1.0.  Negative values mean that
+		% friction pushes against the sliding object.
+
+		eT = newET.
+		setCollisionProperties(realWorldPointer, e, eT, mu).
+
+	+ to set-mu to newMu (float):
+		% Sets the coefficient of friction to newMu.
+
+		mu = newMu.
+		setCollisionProperties(realWorldPointer, e, eT, mu).
+
+  + section "Using Menus"
+
+	+ to add-menu named menuName (string) for-method theMethod (string):
+		% Adds a menu named menuName to the application which will result
+		% in a call to theMethod for the calling instance.
+		% <p>
+		% If the calling instance is the Controller object, then the menu will
+		% become the "main" simulation menu.  Otherwise, the menu will become
+		% a contextual menu associated with the specific object in the simulation.
+		% <p>
+		% Note that unlike the METHOD(handle-collision) which sets the collision
+		% handler for the whole type (class, that is), this method affects only
+		% the instance for which it is called, meaning that each instance of a
+		% certain class may have a different menu.
+
+		newMenu (object).
+
+		newMenu = ((new MenuItem) create-menu named menuName for-object self for-method theMethod).
+		self add-dependency on newMenu.
+		push newMenu onto menus.
+
+		return newMenu.
+
+	+ to add-menu-separator:
+		% Adds a separator menu item--really just an empty menu item.
+
+		newMenu (object).
+
+		newMenu = ((new MenuItem) create-menu named "" for-object self for-method "").
+		self add-dependency on newMenu.
+		push newMenu onto menus.
+
+		return newMenu.
+
+  + section "Using Neighbor Detection"
+
+	+ to get-neighbors:
+		% Returns a list of all real objects in the simulation that are within
+		% the "neighborhood" range of this object in the world.
+
+		return getNeighbors(realWorldPointer).
+
+	+ to set-neighborhood-size to size (float):
+		% Used in conjunction with METHOD(get-neighbors), this function will set
+		% the neighborhood size for the current object.
+
+		neighborhoodSize = size.
+		setNeighborhoodSize(realWorldPointer, size).
+
+  + section "Managing the Appearence of Agents"
+
+	+ to show-bounding-box:
+		% Shows the bounding box for the object.
+
+		setBoundingBox(realWorldPointer, 1).
+
+	+ to hide-bounding-box:
+		% Hides the bounding box for the object.  The bounding box is 
+		% hidden by default, so you'll only need this method if you've 
+		% previously enabled them using METHOD(show-axis).
+
+		setBoundingBox(realWorldPointer, 0).
+
+	+ to add-line to otherObject (object) with-color theColor (vector):
+		% Adds a line to be drawn from this object to otherObject.  The line will
+		% have the color theColor.  The line can be removed later using METHOD(remove-line).
+		% <P>
+		% If a line to otherObject already exists, its color will be updated.
+
+		addObjectLine(realWorldPointer, (otherObject get-pointer), theColor, 0).
+
+	+ to remove-line to otherObject (object):
+		% Removes the line connecting this object to otherObject.
+
+		removeObjectLine(realWorldPointer, (otherObject get-pointer)).
+
+	+ to remove-all-lines:
+		% Removes all lines connecting this object to other objects.
+
+		removeAllObjectLines(realWorldPointer).
+
+
+	+ to show-axis:
+		% Shows the X and Y axes for the object.
+
+		setDrawAxis(realWorldPointer, 1).
+
+	+ to hide-axis:
+		% Hides the X and Y axes for the object.  The axes are hidden by
+		% default, so you'll only need this method if you've previously
+		% enabled them using METHOD(show-axis).
+
+		setDrawAxis(realWorldPointer, 0).
+
+	+ to show-neighbor-lines:
+		% Draws lines to this objects neighbors (when neighbor checking is
+		% enabled).
+
+		setNeighborLines(realWorldPointer, 1).
+
+	+ to hide-neighbor-lines:
+		% Hides lines to this objects neighbors.
+
+		setNeighborLines(realWorldPointer, 0).
+
+	+ to make-invisible:
+		% Makes the object invisible.  Can be made visible again later
+		% using the method METHOD(make-visible).
+
+		setVisible(realWorldPointer, 0).
+
+	+ to make-visible:
+		% Makes the object visible again (if it has previously been hidden
+		% using METHOD(make-invisible).
+
+		setVisible(realWorldPointer, 1).
+
+	+ to get-color:
+		% Returns the color of the object.
+
+		return color.
+
+	+ to set-color to newColor (vector):
+		% Sets the color of this object to newColor.
+
+		color = newColor.
+
+		setColor(realWorldPointer, newColor).
+
+	- to set-texture to textureNumber (int):
+		% Depreciated -- use METHOD(set-texture-image) instead.
+
+		print "Setting to texture ", textureNumber.
+
+		setTexture(realWorldPointer, textureNumber + 1).
+
+	+ to set-texture-image to textureImage (object):
+		% Changes the texture of this object to textureImage, an instance of 
+		% class Image.  If textureImage is NULL texturing is turned off for 
+		% the object.
+
+		if !textureImage: texture = -1.
+		else texture = (textureImage get-texture-number).
+
+		setTexture(realWorldPointer, texture).
+
+	+ to set-texture-scale to scaleSize (int):
+		% Changes the "scale" of the texture.  When a texture is applied
+		% over a shape, this value is used to decide how large the texture
+		% will be in terms of breve-world units.  The default value is 16,
+		% meaning that a 16x16 face will have one copy of the textured image.
+		% For smaller objects, this number will have to be decreased, or else
+		% the texture will be too big and will not be visible.
+
+		textureScale = scaleSize.
+		setTextureScale(realWorldPointer, scaleSize).
+
+	+ to set-bitmap-image to bitmapImage (object):
+		% Changes the bitmap of this object to bitmapImage, an instance of 
+		% class image.  If bitmapImage is NULL, bitmapping is turned off
+		% for the object.
+
+		if !bitmapImage: bitmap = -1.
+		else bitmap = (bitmapImage get-texture-number).
+
+		setBitmap(realWorldPointer, bitmap).
+		
+	- to set-bitmap to textureNumber (int):
+		% Depreciated.
+
+		bitmap = textureNumber.
+		setBitmap(realWorldPointer, textureNumber + 1).
+
+	+ to set-bitmap-heading to radianAngle (float):
+		% If this object is in 2d bitmap mode, the rotation of the 
+		% bitmap will be set to radianAngle.
+
+		setBitmapRotation(realWorldPointer, radianAngle).
+
+	+ to set-bitmap-heading-point towards-vector rotationVector (vector):
+		% If this object is in 2d bitmap mode, the rotation of the 
+		% bitmap will be set to degreeAngle degrees.
+
+		setBitmapRotationTowardsVector(realWorldPointer, rotationVector).
+
+	- to set-bitmap-transparency to alphaValue (float):
+		% Sets the transparency to alphaValue, a number between 0.0 
+		% (totally transparent) and 1.0 (fully opaque). 
+
+		setAlpha(realWorldPointer, alphaValue).
+
+	+ to set-transparency to alphaValue (float):
+		% Sets the transparency of this object to alphaValue, a number 
+		% between 0.0 (totally transparent) and 1.0 (fully opaque).
+
+		setAlpha(realWorldPointer, alphaValue).
+
+	+ to set-lightmap-image to lightmapImage (object):
+		% Sets the object to be displayed using a "lightmap".  A 
+		% lightmap uses the texture specified and treats it like a light
+		% source.  It's hard to explain.  Give it a try for yourself.
+		% <p>
+		% set-lightmap only has an effect on sphere shapes.  Other 
+		% shapes can be textured, but only spheres can be made into 
+		% lightmaps.
+
+		if !lightmapImage: lightmap = -1.
+		else lightmap = (lightmapImage get-texture-number).
+
+		setLightmap(realWorldPointer, lightmap).
+
+	- to set-lightmap to textureNumber (int):
+		% Depreciated.
+
+		lightmap = textureNumber.
+
+		setLightmap(realWorldPointer, lightmap + 1).
+
+  + section "Getting the Light Exposure of this Mobile Object"
+        
+	+ to get-light-exposure:
+		% When used in conjunction with light exposure detection
+		% (OBJECTMETHOD(Control:enable-light-exposure-detection)), this
+		% method returns the level of light exposure on this object.
+
+		if realWorldPointer: return worldObjectGetLightExposure(realWorldPointer).
+		else return 0.
+
+	+ section "Handling Collisions"
+
+	+ to handle-collisions with-type theType (string) with-method theMethod (string):
+		% Adds a collision handler for this object.  When a collision
+		% occurs between an instance of the this type and theType, the
+		% breve engine will automatically call theMethod of the colliding
+		% instance.
+
+		push { theType, theMethod } onto collisionHandlerList.
+		addCollisionHandler(self, theType, theMethod).
+
+	+ to dearchive:
+		handler (list).
+
+		foreach handler in collisionHandlerList: {
+		 	addCollisionHandler(self, handler{0}, handler{1}).
+		}
+
+		if texture > -1: self set-texture to texture.
+		if lightmap > -1: self set-lightmap to lightmap.
+		if bitmap > -1: self set-bitmap to bitmap.
+		self set-texture-scale to textureScale.
+		self set-neighborhood-size to neighborhoodSize.
+
+		return (super dearchive).
+
+	+ to destroy:
+		free menus.
+}

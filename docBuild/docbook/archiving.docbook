@@ -1,0 +1,150 @@
+<!--
+    The breve Simulation Environment documentation
+    Copyright (C) 2003 Jonathan Klein
+-->
+
+<chapter id="archiving">
+<title>Archiving and Dearchiving Objects and Simulations</title>
+<para>
+<indexterm><primary>archiving</primary></indexterm>
+<indexterm><primary>dearchiving</primary></indexterm>
+<indexterm><primary>XML files</primary></indexterm>
+breve allows simulations and individual objects within simulations to be
+archived into human-readable XML files, and then later extracted.  This chapter 
+first describes how individual objects can be archived and dearchived 
+(<xref linkend="object_archiving">) and then how entire simulations can 
+be archived and dearchived (<xref linkend="simulation_archiving">).
+</para>
+
+<sect1 id="object_archiving">
+<title>Saving and Loading Individual Objects</title>
+<para>
+<indexterm><primary>object archiving</primary></indexterm>
+<indexterm><primary>object dearchiving</primary></indexterm>
+<indexterm><primary>archive-as-xml (method)</primary></indexterm>
+<indexterm><primary>dearchive-xml (method)</primary></indexterm>
+<indexterm><primary>dependencies</primary></indexterm>
+<indexterm><primary>add-dependency (method)</primary></indexterm>
+<indexterm><primary>archive (method)</primary></indexterm>
+<indexterm><primary>dearchive (method)</primary></indexterm>
+
+This method of saving and loading instances can be done with any type of object.  When
+an object is dearchived with this method, a new instance is created for the saved object.
+This is in contrast to the method described in <xref linkend="simulation_archiving">, which 
+loads data into the contents of existing objects.
+</para>
+<para>
+Variables of type <function>object</function> and 
+<function>pointer</function> can not be automatically maintained without 
+special treatment.  This is because an <function>object</function> may 
+reference another, which in turn references several others, and so forth.  
+If all <function>object</function> variables were maintained, then a huge 
+chain reaction would result every time an instance was saved.
+</para>
+<para>
+To avoid this, saving objects does not include an object variable 
+<emphasis>unless</emphasis> the the object being saved has declared it as a 
+dependency, using the 
+<ulink url="../classes/Object.html">Object</ulink> method 
+<ulink url="../classes/Object.html#add-dependency">add-dependency</ulink>.  If you define
+an object, Y, as a dependency of X, then saving X will also save Y.  Loading 
+the saved instance X will also recreate the instance Y.
+</para>
+<para>
+Because adding dependencies also has the potential to lead to chain-reactions 
+of archiving, it should be used with care.  Generally, an object should only 
+add dependencies on objects it has created and for which it is exclusively 
+responsible.  So while a simulated creature might legitimately add a 
+dependency on an object containing its genome or an object which determines
+its movement (a "brain"), it would be inappropriate for the object to add a 
+dependency on the controller object, or other creatures in the world.
+</para>
+<para>
+When an object is to be archived using this technique, the user-supplied 
+method <function>archive</function> is executed for the object.  In your 
+<function>archive</function> method, you should include code that
+might be needed to prepare the object for archiving such as updating variables
+which will be required when the object is dearchived.  <emphasis>Your 
+<function>archive</function> method must, on success, return 1</emphasis>.  Any 
+other return value is considered failure
+and will abort the archive.
+</para>
+<para>
+When an object is to be dearchived using this method, the user-supplied method 
+<function>dearchive</function> is executed for the object.  In your 
+<function>dearchive</function> method, you should include code that
+might be needed to restore the state of the object, or to inform the rest of 
+the simulation of its presence if necessary.  <emphasis>Your dearchive method
+must, on success, return 1</emphasis>.  Any other return value is considered 
+failure and will abort the archive.
+</para>
+<para>
+Once dependencies, archive methods and dearchive methods (all of which may 
+prove to be unnecessary for most straightforward classes) are addressed, you 
+may initiate an archive using 
+the <ulink url="../classes/Object.html">Object</ulink> method 
+<ulink url="../classes/Object.html#archive-as-xml">archive-as-xml</ulink>.
+</para>
+<para>
+To dearchive an object previously archived with this technique, use the
+<ulink url="../classes/Control.html">Control</ulink> method 
+<ulink url="../classes/Control.html#dearchive-xml">dearchive-xml</ulink>.  
+Note that this creates new instances of the objects in the archived file,
+instead of "filling" an existing object.
+</para>
+</sect1>
+
+<sect1 id="simulation_archiving">
+<title>Saving and Loading the Entire State of a Simulation</title>
+<para>
+<indexterm><primary>simulation archiving</primary></indexterm>
+<indexterm><primary>simulation dearchiving</primary></indexterm>
+<indexterm><primary>save-as-xml (method)</primary></indexterm>
+This technique allows you to save a simulation, and resume it later.  In this
+case, all objects are archived and their states are archived entirely (except
+for objects containing variables of type pointer, which should apply only to
+those developing their own breve plug-ins).  <emphasis>You must have the 
+original simulation source file in order to restart a saved 
+simulation</emphasis>.
+</para>
+<para>
+As with the archiving discussed in the previous section 
+(<xref linkend="object_archiving">, dependencies can also be used when 
+archiving entire simulations.  In this case, the dependencies effect only 
+the order in which objects are dearchived, an issue that should not effect 
+most users.
+</para>
+<para>
+When an object is to be archived using this technique, the method "archive" is 
+executed for the object.  In your archive method, you should include code that
+might be needed to prepare the object for archiving such as updating variables
+which will be required when the object is dearchived.  <emphasis>Your archive 
+method must, on success, return 1</emphasis>.  Any other return value is 
+considered failure and will abort the archive.
+</para>
+<para>
+When an object is to be dearchived using this method, the method "dearchive" is 
+executed for the object.  In your dearchive method, you should include code that
+might be needed to restore the state of the object, or to inform the rest of 
+the simulation of its presence if necessary.  <emphasis>Your dearchive method
+must, on success, return 1</emphasis>.  Any other return value is considered 
+failure and will abort the archive.
+</para>
+<para>
+To initiate a "whole simulation archive", use the
+<ulink url="../classes/Control.html">Control</ulink> method 
+<ulink url="../classes/Control.html#save-as-xml">save-as-xml</ulink>.
+</para>
+<para>
+An archived world cannot be loaded into a running simulation&mdash;to dearchive a simulation 
+saved with this technique, you have to start the simulation with the archive.  In
+the OS X version of <emphasis>breve</emphasis>, this is done from the "File" menu.  In command-line
+versions of the software, this is done by using the "-l" flag, along with the name of 
+the saved simulation file, for example: 
+<screen>
+	breve -l "myWorld.xml" myWorld.tz
+</screen>
+</para>
+</sect1>
+
+</chapter>

@@ -1,0 +1,181 @@
+# 
+# This demo shows the different types of Joints available in breve, and 
+# should give you an idea of how to use them.
+#
+
+@include "PhysicalControl.tz"
+@include "Joint.tz"
+@include "MultiBody.tz"
+@include "Link.tz"
+@include "Shape.tz"
+@include "Stationary.tz"
+
+Controller JointTest.
+
+PhysicalControl : JointTest {
+    + variables:
+        body (object).
+
+    + to init:
+        self set-background-color to (.4, .4, .4).
+        new Stationary register with-shape (new Shape init-with-cube size (100, 0.1, 100)) at-location (0, 0, 0).
+        body = new JointTestBody.
+        
+        body show-bounding-box.
+        body show-axis.
+        
+        self add-menu-separator.
+        
+        self add-menu named "Fixed Joint" for-method "make-fixed-joint".
+        self add-menu named "Prismatic Joint" for-method "make-prismatic-joint".
+        self add-menu named "Revolute Joint" for-method "make-revolute-joint".
+        self add-menu named "Universal Joint" for-method "make-universal-joint".
+        self add-menu named "Ball Joint" for-method "make-ball-joint".
+        
+        self point-camera at (0, 10, 0) from (20, 4, 20).
+        
+        self set-display-text to "Use the simulation menu to select a joint type" at-x -.95 at-y -.95.
+        
+        self watch item body.
+
+    + to make-revolute-joint:
+        body make-revolute-joint.
+        self set-display-text to "RevoluteJoints rotate around one axis" at-x -.95 at-y -.95.
+
+    + to make-prismatic-joint:
+        body make-prismatic-joint.
+        self set-display-text to "PrismaticJoints slide along one axis" at-x -.95 at-y -.95.
+        
+    + to make-fixed-joint:
+        body make-fixed-joint.
+        self set-display-text to "FixedJoints do not move" at-x -.95 at-y -.95.
+    
+    + to make-ball-joint:
+        body make-ball-joint.
+        self set-display-text to "BallJoints rotate on all axes" at-x -.95 at-y -.95.
+    
+    + to make-universal-joint:
+        body make-universal-joint.
+        self set-display-text to "UniversalJoints rotate on two axes" at-x -.95 at-y -.95.
+}
+
+#
+# This is the multibody we'll be building.  It has one Link fixed in space,
+# and a second Link which we will attach with a variety of different types
+# of joints.
+#
+
+MultiBody : JointTestBody {
+    + variables:
+        shape, smallShape, joint, worldJoint (object).
+        links (list).
+
+    + to init:
+		# initialize with a fixed joint
+
+        shape = new Shape.
+        smallShape = new Shape.
+        shape init-with-cube size (1.1, 2.0, 1.1).
+        smallShape init-with-cube size (1.0, 2.0, 1.0).
+
+        links = 2 new Links.
+        links{0} set shape shape.
+        links{1} set shape smallShape.
+
+        self register with-link links{0}.
+        
+        links{0} set-color to (.8, 0, 0).
+        links{1} set-color to (.6, 0, 0).
+
+        self make-fixed-joint.
+
+        worldJoint = new FixedJoint.
+        worldJoint link parent 0 to-child links{0} 
+            with-parent-point (0, 10, 0) with-child-point (0, -1.0, 0).
+
+        return self.
+
+	#
+	# the methods below dynamically make changes to the joint that we're using.
+	# 
+
+    + to get-joint:
+	return joint.
+
+    + to make-fixed-joint:
+        if joint: free joint.
+        
+        joint = new FixedJoint.
+        joint link parent links{0} to-child links{1}
+            with-parent-point (0, -1.0, 0) with-child-point (0, 1.0, 0).
+
+    + to make-revolute-joint:
+        if joint: free joint.
+        
+        joint = new ExampleRevoluteJoint.
+        joint link parent links{0} to-child links{1}
+            with-parent-point (0, -1.0, 0) with-child-point (0, 1.0, 0) with-normal (1, 0, 0).
+
+        joint set-strength-limit to 100.
+
+    + to make-prismatic-joint:
+        if joint: free joint.
+        
+        joint = new ExamplePrismaticJoint.
+        joint link parent links{0} to-child links{1}
+            with-parent-point (0, -1.0, 0) with-child-point (0, 1.0, 0) with-normal (0, 1, 0).
+
+        joint set-strength-limit to 100.
+
+    + to make-ball-joint:
+        if joint: free joint.
+        
+        joint = new ExampleBallJoint.
+        joint link parent links{0} to-child links{1}
+            with-parent-point (0, -1.0, 0) with-child-point (0, 1.0, 0).
+
+        joint set-strength-limit to 100.
+
+    + to make-universal-joint:
+        if joint: free joint.
+        
+        joint = new ExampleUniversalJoint.
+        joint link parent links{0} to-child links{1}
+            with-parent-point (0, -1.0, 0) with-child-point (0, 1.0, 0) with-normal (1, 0, 0).
+
+        joint set-strength-limit to 100.
+}
+
+#
+# We use a subclass of the normal joint types so that they
+# can set the desired joint velocities in the iterate methods.
+# 
+# We'll use a simple sine-based function to set the velocities
+# of the joints over time, so that the behavior is cyclical.
+#
+
+RevoluteJoint : ExampleRevoluteJoint {
+    + to iterate:
+        self set-joint-velocity to sin((controller get-time) / 4) / 2.    
+}
+
+PrismaticJoint : ExamplePrismaticJoint {
+    + to iterate:
+        self set-joint-velocity to sin((controller get-time) / 4) / 2.    
+}
+
+BallJoint : ExampleBallJoint {
+    + to iterate:
+	x (double).
+	x = sin((controller get-time) / 15) / 2.
+
+        self set-joint-velocity to (x, x, .1).
+}
+
+UniversalJoint : ExampleUniversalJoint {
+    + to iterate:
+	x (double).
+	x = sin((controller get-time) / 15) / 2.
+
+        self set-joint-velocity axis-1 x axis-2 0.01.
+}

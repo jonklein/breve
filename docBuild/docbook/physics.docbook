@@ -1,0 +1,290 @@
+<!--
+    The breve Simulation Environment documentation
+    Copyright (C) 2003 Jonathan Klein
+-->
+
+<chapter id="physics">
+<title>Physical Simulation</title>
+<para>
+
+<indexterm><primary>physics</primary></indexterm>
+<indexterm><primary>physical simulation</primary></indexterm>
+<indexterm><primary>Open Dynamics Engine (ODE)</primary></indexterm>
+Physical simulation allows simulated agents to behave in a physically realistic 
+fashion.  This means that agents in the simulated world can be configured to 
+behave just as real objects do, according to the laws of physics.  If a ball 
+is placed in the air above a floor, for example, physical simulation can be 
+used to make the ball realistically fall towards the floor and bounce.  Among 
+other things, physical simulation can be used for realistic simulation of 
+robots, vehicles and animals.  The current version of breve uses portions of 
+the excellent ODE physical simulation engine.
+</para>
+<para>
+Even though it is incredibly useful, physical simulation can add complexity 
+and potential instabilities to a simulation.  This chapter begins by 
+with the section When to Use Physical Simulation 
+(<xref linkend="physics_vs_pseudo">), which discusses when it is appropriate 
+to use physical simulation and possible alternatives to full physical 
+simulation.  You should read this section first to help you decide whether
+physical simulation is necessary for your simulation.
+</para>
+<para>
+
+</para>
+
+<sect1 id="physics_vs_pseudo">
+<title>When to Use Physical Simulation</title>
+<para>
+<indexterm><primary>pseudo-physics</primary></indexterm>
+In many circumstances, users wish to write simulations which use certain 
+aspects of physics, but not others.  In these situations it is tempting to 
+enable physical simulation, but this often opens the door to other sorts of 
+complications.  Physical simulation is slower, more complicated and inherently 
+less stable than non-physical simulation.  It is often far more effective to 
+use "pseudo-physics" in which you implement some physical simulation features 
+without enabling full physical simulation.
+</para>
+<para>
+One example is a simulation which requires gravity for "ballistic" 
+(non-Multibody Real) objects.  Though the effects of gravity can be enabled 
+using physical simulation, a more robust and far more efficient approach is 
+to simply set a constant acceleration of (0, -9.8, 0).  By disabling the 
+physical simulation engine and setting a constant acceleration, a great 
+deal of complexity can be avoided.
+</para>
+<para>
+Another example is two objects which stick together and behave as a single 
+entity.  Though this can be simulated as a 
+<ulink url="../classes/MultiBody.html">MultiBody</ulink> object, 
+if other aspects of physical simulation are <emphasis>not</emphasis> required, 
+it may be better to enforce the relationship between the objects manually at 
+each time-step by making one of the objects move itself to maintain a certain 
+position relative to the other.
+</para>
+<para>
+It's often unclear which technique should be used, but many users tend to err 
+on the side of enabling physics which is the <emphasis>more</emphasis> 
+complicated solution.  True physical simulation is typically necessary only 
+when dealing with physically realistic jointed bodies, such as a simulated 
+robot or simulated animal.  You should be aware of the pros and cons of 
+true physical simulation and consider using your own "pseudo-physics" instead.  
+</para>
+
+</sect1>
+
+<sect1 id="stable_simulations">
+<title>Writing Stable Physical Simulations</title>
+<para>
+<indexterm><primary>stability</primary></indexterm>
+The physical simulation engine can be quite sensitive to the configuration
+of bodies in a simulation.  This can lead to performance problems, instabilities
+and unexpected results.  Because of the number of factors involved, it can be 
+difficult to track down the exact reason for instabilities or unexpected results.
+</para>
+<para>
+Below are some things to watch out for when dealing with physical simulation.
+</para>
+<para>
+<itemizedlist>
+<listitem><para>Instabilities may arise when dealing with very large (heavy) and very small (light) objects</para></listitem>
+<listitem><para>Exerting very large joint pressures or velocities may cause unrealistic behaviors.</para></listitem>
+<listitem><para>Beware of joints which force invalid or conflicting conformations on your objects.</para></listitem>
+<listitem><para>Avoid forcing deep collisions between objects with either joints or manual movement.</para></listitem>
+<listitem><para>Use of redundant or unnecessary joints will cause instabilities and performance problems.</para></listitem>
+</itemizedlist>
+</para>
+</sect1>
+
+<sect1 id="physical_simulation_parts"><title>The Components of Physically Simulated Bodies</title>
+<para>
+In order to construct physically simulated agents, you'll need to be familiar with the 
+components of physically simulated bodies.  There are three main components used in 
+physical simulations:
+<itemizedlist>
+<listitem><para>Links, the basic building blocks of physically simulated objects</para></listitem>
+<listitem><para>MultiBodies, physical bodies made up of one or more Link objects(<xref linkend="multibodies">)</para></listitem>
+<listitem><para>Joints, used to attach Link objects to one another (<xref linkend="joints">)</para></listitem>
+</itemizedlist>
+</para>
+
+<sect2 id="links"><title>The Link Class</title>
+<para>
+<indexterm><primary>Link class</primary></indexterm>
+<indexterm><primary>orphaned link</primary></indexterm>
+The Link class is the basic building block of physically simulated objects.  A link is 
+simply a rigid body with a particular shape.  Once a Link is created and associated 
+with a shape, it can be attached to other links via Joint objects, covered in the 
+section The Joint Class and its Subclasses (<xref linkend="joints">) or brought into
+the physical simulation by being associated with a MultiBody, as discussed in the 
+section on using MultiBody objects (<xref linkend="multibodies">).  
+<emphasis> Link objects by themselves will not appear in the simulated world unless 
+(directly or indirectly) associated with a MultiBody object</emphasis>.  A Link 
+object that is not associated with a MultiBody is known as an "orphaned" Link.
+</para>
+</sect2>
+
+<sect2 id="joints">
+<title>The Joint Class and its Subclasses</title>
+<para>
+<indexterm><primary>Joint class</primary></indexterm>
+<indexterm><primary>FixedJoint class</primary></indexterm>
+<indexterm><primary>PrismaticJoint class</primary></indexterm>
+<indexterm><primary>RevoluteJoint class</primary></indexterm>
+<indexterm><primary>UniversalJoint class</primary></indexterm>
+<indexterm><primary>BallJoint class</primary></indexterm>
+As mentioned in the previous section (<xref linkend="multibodies">), 
+<ulink url="../classes/Link.html">Links</ulink> are joined together using 
+<ulink url="../classes/Joint.html">Joint</ulink> objects.  
+</para>
+<para>
+There are several types of joints 
+available&mdash;see each class' documentation for more details:
+<itemizedlist>
+<listitem><para><ulink url="../classes/FixedJoint.html">FixedJoint</ulink></para></listitem>
+<listitem><para><ulink url="../classes/PrismaticJoint.html">PrismaticJoint</ulink></para></listitem>
+<listitem><para><ulink url="../classes/RevoluteJoint.html">RevoluteJoint</ulink></para></listitem>
+<listitem><para><ulink url="../classes/UniversalJoint.html">UniversalJoint</ulink></para></listitem>
+<listitem><para><ulink url="../classes/BallJoint.html">BallJoint</ulink></para></listitem>
+</itemizedlist>
+</para>
+</sect2>
+
+<sect2 id="multibodies">
+<title>The MultiBody class</title>
+<para>
+<indexterm><primary>MultiBody class</primary></indexterm>
+A MultiBody is a single logical physically simulated agent, whether it is made up
+of a single Link, or multiple Links joined together with Joint objects.  Links and
+Joints have no physical presence in the world, unless they are associated with 
+MultiBody objects.  Therefore, after creating a structure using Links and Joints,
+you must create a MultiBody object for the structure before it appears in the world.
+</para>
+<para>
+As mentioned above, a MultiBody may contain only a single Link object.  More commonly,
+however, it contains a series of Links connected by Joint objects.  Consider 
+a body, for example: it is made up of parts (arms, legs, torso, head), but they are all 
+part of a single logical unit, namely the body.  The Link objects are joined together 
+using subclasses of the class Joint. 
+<mediaobject><imageobject><imagedata align="center" fileref="images/Link.jpg"></imageobject></mediaobject>
+<mediaobject><imageobject><imagedata align="center" fileref="images/JointedLinks.jpg"></imageobject></mediaobject>
+</para>
+<para>
+Keeping these logical units together under a single MultiBody allows the user to move or 
+rotate the entire logical structure, as opposed to moving or rotating individual links.  
+Imagine that suddenly your arm was moved across the room without the rest of your body
+&mdash;in all likelihood, this would not make you very happy.  This is what it's like 
+for the underlying physics engine to move a single link&mdash;confusing and painful things 
+can happen.  By encompassing a set of connected Links within a MultiBody, the user has 
+more logical control over the object.
+<mediaobject><imageobject><imagedata align="center" fileref="images/MultiBody.jpg"></imageobject></mediaobject>
+</para>
+<para>
+To create a MultiBody, you'll first need to construct a network of Link and Joint 
+objects (or possibly just a single Link object).  Once you've created your Links,
+you'll need to pick one to be the <firstterm>root link</firstterm>.  The root link
+will be permanently associated with the MultiBody.  All other Links attached to it,
+both directly and indirectly, will also be part of the MultiBody (though they may become 
+dissociated from it later if the relevant Joints are broken).  Once a networks of Links 
+is associated with a MultiBody, the Links will appear in the simulated world.
+</para>
+<para>
+Any Link that is attached (via a Joint) to a Link in a MultiBody will become
+part of the MultiBody, <emphasis>unless</emphasis> the new link is 
+<emphasis>also</emphasis> associated with a MultiBody.  In the event that Links 
+from two distinct MultiBodies are joined, then the MultiBodies will remain distinct
+and all of the links will remain part of their respective bodies.
+<mediaobject><imageobject><imagedata align="center" fileref="images/JoinedMultiBodies.jpg"></imageobject></mediaobject>
+</para>
+</sect2>
+</sect1>
+
+<sect1 id="dynamic_joints">
+<title>Dynamically Creating and Destroying Joints</title>
+<para>
+<indexterm><primary>dynamic joints</primary></indexterm>
+<indexterm><primary>breaking joints</primary></indexterm>
+<indexterm><primary>orphaned link</primary></indexterm>
+<indexterm><primary>orphaned link adoption</primary></indexterm>
+breve allows <ulink url="../classes/Joint.html">Joints</ulink> to 
+be created and destroyed dynamically over the course of the simulation.  
+</para>
+<para>
+Joining <ulink url="../classes/MultiBody.html">MultiBodies</ulink> dynamically is simple&mdash;you simply
+link them as always using the various <ulink url="../classes/Joint.html">Joint</ulink> subclasses.
+The joints can be made not only to modify the structure of a single MultiBody, but also
+to join together distinct MultiBodies.
+</para>
+<para>
+Breaking MultiBodies is accomplished using the <ulink url="../classes/Joint.html">Joint</ulink> 
+method <ulink url="../classes/Joint.html#break">break</ulink>.  Breaking joints can be slightly 
+more complicated than creating them, because it can disrupt the structure of the MultiBody.
+There are basically three scenarios to consider here, and they are described below.
+</para>
+<para>
+<itemizedlist>
+<listitem>
+<para>
+In the most straightforward case, two distinct MultiBodies are 
+joined, and then the joint is broken, preserving the original MultiBody structures.  In 
+this case, there are no complications&mdash;the two MultiBodies remain distinct with no
+change in their structures.
+</para>
+</listitem>
+<listitem>
+<para>
+Consider the more complicated situation, however, in which a Joint is broken such that
+the MultiBody loses a link and the link then finds itself without a MultiBody.  We then
+say that the Link is "orphaned"&mdash;this is illustrated below.
+<mediaobject><imageobject><imagedata align="center" fileref="images/OrphanedLink.jpg"></imageobject></mediaobject>
+</para>
+<para>
+An orphaned link will not appear in the simulation.  It still exists as an object, 
+however and can reenter the simulation by becoming associated with a Multibody, meaning
+that it either becomes the root of a new MultiBody, or it becomes attached to a link
+on an existing MultiBody.
+</para>
+</listitem>
+<listitem>
+<para>
+In the final case, consider two linked MultiBodies, as shown below:
+<mediaobject><imageobject><imagedata align="center" fileref="images/JoinedMultiBodies.jpg"></imageobject></mediaobject>
+</para>
+<para>
+What happens if link 2 becomes dissociated from MultiBody 2?  In the last 
+scenario, we saw that this would cause an orphaned link.  <emphasis>However</emphasis>, because 
+"link 2" is still connected to part of MultiBody 1, MultiBody 1 will "adopt" the 
+link and it will remain active in the simulation.
+<mediaobject><imageobject><imagedata align="center" fileref="images/LinkAdoption.jpg"></imageobject></mediaobject>
+</para>
+</listitem>
+</itemizedlist>
+</para>
+<note>
+<title>Summary on Links &amp; Joints</title>
+<para>
+All Links must be part of a MultiBody to be part of the simulation.
+If a Link becomes dissociated from its MultiBody, it will try to become part of whichever 
+other MultiBody it is connected to.  If it is not connected to another MultiBody, it is 
+orphaned and will not exist in the simulated world.  If, at a later time, it is again 
+associated with a MultiBody, it will return to the world.
+</para>
+</note>
+</sect1>
+
+<sect1 id="terrains">
+<title>Using Terrains With Physical Simulation</title>
+<para>
+<indexterm><primary>terrain</primary></indexterm>
+<indexterm><primary>fractal terrain</primary></indexterm>
+The class <ulink url="../classes/Terrain.html">Terrain</ulink> allows fractal terrains to 
+be created in breve.  These terrains provide a more realistic ground than simply using 
+a flat plane.  The terrains can be automatically generated using the 
+method <ulink url="../classes/Terrain.html#generate">generate</ulink>, or set 
+manually by the user using the method 
+<ulink url="../classes/Terrain.html#set-height">set-height</ulink>.  See 
+the <ulink url="../classes/Terrain.html">Terrain</ulink> class documentation
+for information on using terrains.
+</para>
+</sect1>
+
+</chapter>

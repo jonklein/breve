@@ -1,0 +1,16 @@
+INCLUDES = -I../../include
+
+all: MethodFinder.jar javaPlugin.o
+
+javaPlugin.o: javaFunctions.o
+	$(CC) @PLUGINFLAGS@ -o javaPlugin.o javaFunctions.o @JAVALIBS@
+
+clean:
+	-rm -f *.o
+
+.c.o:
+	$(CC) -g -c $*.c $(INCLUDES) @JAVAINCS@
+
+MethodFinder.jar: MethodFinder.java
+	-javac MethodFinder.java 
+	-jar cf MethodFinder.jar MethodFinder.class

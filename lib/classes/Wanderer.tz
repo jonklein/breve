@@ -1,0 +1,58 @@
+@include "Mobile.tz"
+
+Mobile : Wanderer [version 1.8] {
+    % This class is a work-in-progress.  A Wanderer is simply a real object 
+    % that wanders randomly around a certain space.  The range of wandering
+    % is adjusted with the METHOD(set-wander-range) method.
+    % <p>
+    % Subclasses of Wanderer should implement their own <b>iterate</b> 
+    % method to perform class specific tasks, and then call the method
+    % <b>super iterate</b> in order for the Wanderer object to handle
+    % the object's motion.
+
+    + variables:
+        wanderVec (vector).
+        wanderMag (float).
+        topVelocity (float).
+
+    + to init:
+        self set-wander-range to (15, 15, 15).
+        topVelocity = 80.
+
+    + to set-wander-range to wanderVector (vector):
+        % Sets the range from the origin that the object can wander.  The 
+        % distance the object will wander from the center is the length of 
+        % wanderVector.  The direction of the wandering is proportional to 
+        % the normalized vector--that is to say that if wanderVector is 
+        % (100, 100, 0) that motion will be restricted to the X/Y plane.
+
+        wanderMag = | wanderVector |.
+        wanderVec = wanderVector / wanderMag.
+
+    + to iterate: 
+        if |(self get-location)| > wanderMag: {
+            self set-acceleration to 8 * -topVelocity * (self get-location)/|(self get-location)|.
+            return.
+        } else {
+            self set-acceleration to 8 * (2 * random[wanderVec] - wanderVec)*topVelocity.
+        }
+
+        if | (self get-velocity) | > topVelocity: {
+            self set-velocity to topVelocity * (self get-velocity) / |(self get-velocity)|.
+        }
+
+    + to set-top-velocity to newValue (float):
+        % Sets the top velocity of the wanderer to newValue.
+
+        topVelocity = newValue.
+
+    + to randomize-location:
+        randomVector (vector).
+        % Move the Wanderer to a random location within the wander space.
+
+        self move to wanderMag * (2 * random[wanderVec] - wanderVec).
+
+        randomVector = random[2 * wanderVec] - wanderVec.
+        randomVector /= |randomVector|.
+        self set-velocity to topVelocity * randomVector.
+}

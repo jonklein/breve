@@ -1,0 +1,21 @@
+*** ode_fixalloca ***
+
+The release version of ODE uses alloca() to allocate memory
+on the stack during function calls.  During large simulations,
+the memory required can cause a stack overflow, which will 
+crash breve.
+
+Though you can compile breve with the release ODE as is, the
+binary releases of breve will use the modified ODE libary to
+protect against crashes.
+
+The Perl script and C program here are used to replace the 
+alloca()'s with calls to malloc(), and add the appropriate 
+free() calls at the end of the functions.
+
+These scripts do MOST of the work, but do not work perfectly.
+In the case that an alloc() statement (or variable definition)
+is ifdef'd out, for example, the scripts will still add a free 
+at the end of the function call.  YOU WILL NEED TO MAKE A 
+FEW CHANGES TO THE SOURCES BEFORE COMPILING THE MODIFIED 
+LIBRARY.

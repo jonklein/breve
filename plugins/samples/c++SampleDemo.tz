@@ -1,0 +1,36 @@
+@use Control.
+
+@plugin "c++Sample_plugin.o" (cppSampleLoadFunctions).
+
+Controller cSampleController.
+
+Control : cSampleController {
+	+ to init:
+		pluginObject (object).
+		pluginObject = new cppSamplePluginObject.
+
+		print "* setting i to 5".
+		pluginObject set-i to 5.
+		print "* setting j to 10".
+		pluginObject set-j to 10.
+
+		print "* calling plugin function to sum and return result:".
+		print "the sum is:", (pluginObject get-sum).
+}
+
+Object : cppSamplePluginObject {
+	+ variables:
+		cppPointer (pointer).
+
+	+ to init:
+		cppPointer = cppSampleMakeTestClass().	
+		
+	+ to set-i to i (int):
+		cppSampleSetI(cppPointer, i).
+
+	+ to set-j to j (int):
+		cppSampleSetJ(cppPointer, j).
+
+	+ to get-sum:
+		return cppSampleGetSum(cppPointer).
+}

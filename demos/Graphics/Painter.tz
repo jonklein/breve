@@ -1,0 +1,147 @@
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use Image.
+
+# tell the engine the name of the controller
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+	+ variables:
+		image (object).
+		shape (object).
+		zoom (double).
+		blur (double).
+		file (string).
+
+		vel, acc, radius (double).
+
+	+ to init:
+		brush (object).
+
+		brush = (new Image load from "images/brush.png").
+
+		self disable-text.
+
+		vel = 1.0 + random[9].
+		acc = random[1000].
+		radius = .1 + random[2].
+
+		if (self get-argument-count) == 2: {
+			file = (self get-argument at-index 1).
+		} else file = "jon.jpg".
+
+		blur = .992.
+		if blur > .992: blur = .992.
+		blur = 1.0.
+
+		self enable-blur.
+		self set-blur-factor to blur.
+		self set-background-color to (0, 0, 0).
+
+		image = (new Image load from file).
+
+		image write to "thing.png".
+
+		radius *= (image get-width) / 300.
+		vel *= (image get-width) / 300.
+		acc *= (image get-width) / 300.
+
+		shape = new Sphere init-with radius radius.
+
+		200 new Painters set-bitmap-image to brush.
+
+		zoom = (image get-width) + 10.
+
+		self offset-camera by (0, 0, zoom).
+		self set-z-clip to zoom + 100.
+
+	+ to iterate:
+		if zoom < (image get-width) + 10: {
+			zoom += .35.
+			self offset-camera by (0, 0, zoom).
+			self set-z-clip to zoom + 100.
+		}
+
+		super iterate.
+
+	+ to get-image:
+		return image.        
+
+	+ to get-shape:
+		return shape. 
+
+	+ to get-vel:
+		return vel.
+
+	+ to get-acc:
+		return acc.
+}
+
+Mobile : Painter (aka Painters) {
+	+ variables:
+		image (object).
+		w, h (int).
+		factor (int).
+		vel, acc (double).
+
+	+ to init:
+		self set-shape to (controller get-shape).
+		image = (controller get-image).
+
+		w = (image get-width).
+		h = (image get-height).
+
+		self set-color to (0, 0, 0).
+
+		self reset.
+
+	+ to reset:
+		vel = (controller get-vel).
+		acc = (controller get-acc).
+
+		self move to random[(w - 1, h - 1, 0)] - (w/2, h/2, 0).
+		self set-velocity to random[(vel, vel, 0)] - (vel/2, vel/2, 0).
+
+		self set-color.
+
+	+ to set-color:
+		x, y, z (int).
+		location, velocity, color (vector).
+
+		location = (self get-location).
+		x = location::x.
+		y = location::y.
+		z = location::z.
+
+		if x > w/2 - 1 || x < -w/2 || y > h/2 - 1 || y < -h/2 || z > 200: {
+			self reset.
+			location = (self get-location).
+			x = location::x.
+			y = location::y.
+		}
+
+		x += w/2.
+		y += h/2.
+
+		# self set-color to (image get-rgb-pixel at-x x at-y y) / (RADIUS).
+		# self set-color to (image get-rgb-pixel at-x x at-y y) + random[(.1, .1, .1)].
+
+		color = (image get-rgb-pixel at-x x at-y y).
+		self set-color to color.
+
+	+ to iterate:
+		if random[20] == 0: self reset.
+		# if random[10] == 0: self set-color.
+
+		velocity = (self get-velocity).
+		if |velocity|: velocity /= | velocity |.
+
+		self set-velocity to vel * velocity.
+		self set-acceleration to random[(acc, acc, 0)] - (acc/2, acc/2, 0).
+}

@@ -1,0 +1,23 @@
+@use Abstract.
+
+@plugin "RegexPlugin.o" (slInitRegexFuncs).
+
+Abstract : RegexParser {
+	+ to split text inputString (string) with-pattern regexPattern (string):
+		% Similar to the Perl split operator, this method splits 
+		% inputString apart using the pattern matched by regexPattern
+		% as the delimiter.  The method returns a list containing the 
+		% components.
+		% <P>
+		% As an example, splitting the inputString "aaa:bbb:ccc" with 
+		% the regexPattern ":" will yield the 
+		% list { "aaa", "bbb", "ccc" }.
+
+		return split(regexPattern, inputString).
+
+	+ to match pattern regexPattern (string) in-text inputString (string):
+		% Returns 1 if the regular expression regexPattern matches 
+		% the input string inputString, 0 otherwise.
+
+		return regex(regexPattern, inputString).
+}

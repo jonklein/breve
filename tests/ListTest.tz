@@ -1,0 +1,26 @@
+@use Control.
+
+Controller GCTest.
+
+Control : GCTest {
+	+ variables:
+		l (list).
+
+	+ to init:
+		print (self make-list).
+
+	+ to make-list:
+		local (list).
+
+		push "1" onto local.
+		push "3" onto local.
+
+		insert "2" at local{1}.
+
+		print local.
+
+		remove local{2}.
+
+		return local.
+}
+

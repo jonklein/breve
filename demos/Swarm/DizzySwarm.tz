@@ -1,0 +1,431 @@
+#
+# This simulation is inspired by Craig Reynolds classic Boids flocking
+# algorithm.  The implementation is a bit more complicated than some of
+# the other breve demos.
+#
+# The idea behind the algorithm is that each bird is influenced by three
+# main urges:
+#   1) the urge to avoid collisions with neighbors
+#   2) the urge to stay close to neighbors
+#   3) the urge to match the velocity of neighbors
+#
+# These three urges are implemented in the Birds class, and by giving 
+# them different weights, we produce different flocking behaviors.
+# Additionally, this simulation adds a "random" urge, and an urge
+# to stay close to the center of the world.  
+#
+# If a bird touches the ground, it will land and stay on the ground
+# for a short time before rejoining the flock.
+#
+# Run the demo as it is and try the different behaviors from the 
+# Simulation menu.  Then try modifying the urge weights in the 
+# Birds class yourself to change the behavior of the flock.  
+#
+# This demo was O(n^2) previous to breve 1.2.  We used to make every 
+# bird look at the location of every other bird in order to assess 
+# whether it was close enough to have an influence on behavior.  Starting 
+# in breve version 1.2 we support "neighborhoods", a very fast and 
+# efficient way for objects in the simulation to find other objects 
+# within a certain range.
+#
+# It is unfortunate that sometimes it is difficult to see all the birds at 
+# once, and that if the flock breaks in two, the camera may point in between
+# them such that neither is visible. 
+#
+
+@include "Stationary.tz"
+@include "Control.tz"
+@include "Mobile.tz"
+
+Controller Swarm.
+
+Control : Swarm {
+    + variables:
+        birds (list).
+        item (object).
+        breveTexture (int).
+        cloudTexture (int).
+        selection (object).
+
+        # the menu items corresponding to different flocking behaviors
+
+        wackyMenu (object).
+        obedientMenu (object).
+        normalMenu (object).
+
+    + to click on item (object):
+        if selection: selection hide-neighbor-lines.
+        if item: item show-neighbor-lines.
+
+        selection = item.
+
+        super click on item.
+
+    + to init:
+        floor (object).
+
+        # Set up menus to modify the type of movement allowed.
+
+        self add-menu named "Smoosh The Birdies" for-method "squish".
+        self add-menu-separator.
+        obedientMenu = (self add-menu named "Flock Obediently" for-method "flock-obediently").
+        normalMenu = (self add-menu named "Flock Normally" for-method "flock-normally").
+        wackyMenu = (self add-menu named "Flock Wackily" for-method "flock-wackily").
+
+        self enable-lighting.
+        self move-light to (0, 20, 20).
+
+        breveTexture = (self load-image from "images/breve.png").
+        cloudTexture = (self load-image from "images/clouds.png").
+
+        # Add a huge floor.
+
+        floor = new Stationary.
+        floor register with-shape (new Shape init-with-cube size (100, 2, 100)) at-location (0, -5, 0).
+        floor catch-shadows.
+
+        birds = 60 new Birds.
+
+        # we'll call this method to set up the initial bird behavior.
+
+        self flock-normally.
+
+        self set-background-texture to cloudTexture.
+
+        self offset-camera by (5, 1.5, 6).
+
+        self enable-shadows.
+		self enable-reflections.
+
+    + to iterate:
+        location (vector).
+        velocity (vector).
+        birdLocation (vector).
+        topDiff (double).
+        highLoc (vector).
+ 
+        red (double).
+        green (double).
+        blue (double).
+
+        self update-neighbors.
+
+        # get the average location, and point the camera at it.
+
+        foreach item in birds: {
+            item fly with-flock birds.
+            location += (item get-location).
+
+			if | (item get-location) | > | highLoc |: highLoc = (item get-location).
+        }
+
+        # in the context of a number, the list represents the number of items 
+        # in the list.
+
+        location /= birds.
+		# print "the highest location is $location".
+
+        topDiff = 0.0.
+
+        foreach item in birds: {
+            if topDiff < |location - (item get-location) |:
+                topDiff = | location - (item get-location) |.
+        }
+
+        # we'll try to keep the camera aimed at the center of the 
+        # flock, and zoom in and out depending on how spread out the 
+        # flock is.  it's doesn't work very well :).
+
+        self aim-camera at location.
+        self zoom-camera to (.5 * topDiff) + 10.
+		self set-camera-rotation y |location| x 0.0.
+
+        # call the superclass iterate method to step the simulation forward.
+
+        super iterate.
+
+    # The following methods are the menu items we provide.
+
+    + to squish:
+        foreach item in birds: item move to (0, 0, 0).
+    
+    + to flock-normally:
+        foreach item in birds: item flock-normally.
+        normalMenu check.
+        obedientMenu uncheck.
+        wackyMenu uncheck.
+
+    + to flock-obediently:
+        foreach item in birds: item flock-obediently.
+        normalMenu uncheck.
+        obedientMenu check.
+        wackyMenu uncheck.
+
+    + to flock-wackily:
+        foreach item in birds: item flock-wackily.
+        normalMenu uncheck.
+        obedientMenu uncheck.
+        wackyMenu check.
+}
+
+Mobile : Bird (aka Birds) {
+    + variables: 
+        myVelocity (vector).
+
+        landed (int).
+
+        # These are all parameters that can change the way the flock
+        # behaves.  Look at the flock-normally method for an example.
+
+        cruiseDistance (float).
+ 
+        maxAcceleration (float).
+        maxVelocity (float).
+
+        wanderConstant (float).
+        worldCenterConstant (float).
+        centerConstant (float).
+        velocityConstant (float).
+        spacingConstant (float).
+
+    + to init:
+        # setup the initial location, velocity and color.
+
+		self set-shape to ((new Shape) init-with-polygon-cone radius .06 sides 3 height .5).
+        self move to random[(10, 10, 10)] - (5, -5, 5).
+        self set-velocity to random[(20, 20, 20)] - (10, 10, 10).
+        self set-color to random[(1, 1, 1)].
+
+        # when we hit the ground, we want to land on it using the method "land".
+        # it gets called automatically when the collision occurs.
+
+        self handle-collisions with-type "Stationary" with-method "land".
+
+        # set the neighborhood radius that we will look in to find neighbors.
+
+        self set-neighborhood-size to 3.0.
+
+    + to flock-normally:
+        wanderConstant = 4.0.
+        worldCenterConstant = 5.0.
+        centerConstant = 2.0.
+        velocityConstant = 2.0.
+        spacingConstant = 5.0.
+
+        maxVelocity = 15.
+        maxAcceleration = 15.
+        cruiseDistance = .4.
+
+    + to flock-normally-old:
+        wanderConstant = 6.0.
+        worldCenterConstant = 5.0.
+        centerConstant = 2.0.
+        velocityConstant = 4.0.
+        spacingConstant = 5.0.
+
+        maxVelocity = 20.
+        maxAcceleration = 12.
+        cruiseDistance = .4.
+
+    + to flock-obediently:
+        # The obedient flocking has a lower maxAcceleration, which means that 
+        # the objects don't react as quickly.  This has a calming effect on the 
+        # agents.
+       
+        wanderConstant = 6.0.
+        worldCenterConstant = 6.0.
+        centerConstant = 2.0.
+        velocityConstant = 3.0.
+        spacingConstant = 4.0.
+
+        maxVelocity = 16.
+        maxAcceleration = 20.
+        cruiseDistance = 1.
+
+    + to flock-wackily:
+        # The wacky flocking has a high maximum acceleration so that the 
+        # agents act heavily on all of their impulses every iteration.
+        # This makes them swarm like insects.
+
+        wanderConstant = 8.0.
+        worldCenterConstant = 14.0.
+        centerConstant = 1.0.
+        velocityConstant = 3.0.
+        spacingConstant = 4.0.
+
+        maxVelocity = 20.
+        maxAcceleration = 30.
+        cruiseDistance = .5.
+
+    + to land with ground (object):
+        # if we hit the ground, we stop moving and set the landed flag to 1.
+
+		# print "Landing".
+
+        self set-acceleration to (0, 0, 0).
+        self set-velocity to (0, 0, 0).
+
+        landed = 1.
+
+        # we don't want to keep colliding with the ground, or else we'll
+        # keep on getting stuck again at every iteration--move up just a 
+        # tiny bit.
+
+        self offset by (0, 0.01, 0).
+
+    + to check-landed:
+        # Ask the object if it has landed...
+
+        return landed.
+
+    + to fly with-flock flock (list):
+        # This is the method which does it all.
+
+        bird (object).
+        toNeighbor (vector).
+        
+        centerUrge (vector).
+        worldCenterUrge (vector).
+        velocityUrge (vector).
+        spacingUrge (vector).
+        wanderUrge (vector).
+
+        acceleration (vector).
+
+        newVelocity (vector).
+
+        neighbors (list).
+
+        take-off (int).
+
+        # get a list of neighbors within our neighborhood-size 
+        # (set during init), and check to see if they're visible.
+        # using get neighbors, we very quickly get a list of 
+        # eligible objects and then check them further.  this is
+        # *much* faster than checking every bird in the simulation.
+
+        foreach bird in (self get-neighbors): {
+            if (self check-visibility of bird): push bird onto neighbors.
+        }
+
+        # if we're on the ground now, we'll pick a random number to see if we 
+        # take off again.  The chances are 1 in 40, which is actually pretty
+        # reasonable since this code is called every iteration.
+
+        if landed: {
+            take-off = random[40].
+
+            if take-off == 1: {
+                # if we decide to take off, pick a random direction,
+                # but not towards the ground.
+
+                landed = 0.
+                self set-velocity to random[(.1, 1.1, .1)] - (.05, 0, .05).
+            } else {
+                return. 
+            }
+        }
+
+        # get the urge towards the center, and velocity matching urge. 
+
+        centerUrge = (self get-center-urge with neighbors).
+        velocityUrge = (self get-velocity-urge with neighbors).
+
+        # are we too close to our neighbors?  get a vector which reflects that
+        # urge.
+
+        foreach bird in neighbors: {
+            toNeighbor = (self get-location) - (bird get-location).
+            if |toNeighbor| < cruiseDistance: spacingUrge += toNeighbor.
+        }
+
+        # Are we wandering too far from the center of the world?
+
+        if |(self get-location)| > 10: worldCenterUrge = -(self get-location).
+
+        # Add a random component to the accumulation.
+
+        wanderUrge = random[(2, 2, 2)] - (1, 1, 1).
+
+        # normalize all of the vectors to length 1.
+
+        if |spacingUrge|: spacingUrge /= |spacingUrge|.
+        if |worldCenterUrge|: worldCenterUrge /= |worldCenterUrge|.
+        if |velocityUrge|: velocityUrge /= |velocityUrge|.
+        if |centerUrge|: centerUrge /= |centerUrge|.
+        if |wanderUrge|: wanderUrge /= |wanderUrge|.
+
+        wanderUrge *= wanderConstant.
+        worldCenterUrge *= worldCenterConstant.
+        centerUrge *= centerConstant.
+        velocityUrge *= velocityConstant.
+        spacingUrge *= spacingConstant.
+
+        acceleration = (worldCenterUrge + centerUrge + velocityUrge  + spacingUrge + wanderUrge).
+
+        if |acceleration| != 0: acceleration /= |acceleration|.
+        self set-acceleration to maxAcceleration * acceleration.
+
+        newVelocity = (self get-velocity).
+
+        if |newVelocity| > maxVelocity: 
+            newVelocity = maxVelocity * newVelocity/|newVelocity|.
+
+        self set-velocity to newVelocity.
+
+		self point vertex (0, 1, 0) at newVelocity/|newVelocity|.
+
+    + to get-velocity-urge with flock (list):
+        item (object).
+        count (float).
+        velocity (vector).
+
+        # get the average velocity of all the visible birds in the flock.        
+        foreach item in flock: {
+            count += 1.
+            velocity += (item get-velocity).
+        }
+
+        if count == 0: return (0, 0, 0).
+
+        velocity /= count.
+
+        return velocity - (self get-velocity).
+
+    + to get-center-urge with flock (list):
+        item (object).
+        count (float).
+        center (vector).
+
+        # get the average location of all the visible birds in the flock.
+        
+        foreach item in flock: {
+            count += 1.
+            center += (item get-location).
+        }
+
+        if count == 0: return (0, 0, 0).
+
+        center /= count.
+
+        return center - (self get-location).
+
+    + to check-visibility of item (object):
+        # An item is visible if it is within a certain angle (2.0 radians) 
+        # of the direction we're facing (assumed to be a vector in the 
+        # direction we're moving).
+
+        if (item == self): return 0.
+        if !(item is a "Bird"): return 0.
+        if (self get-angle to item) > 2.0: return 0.
+        if (item check-landed): return 0.
+
+        return 1. 
+
+    + to get-angle to otherMobile (object):
+        tempVector (vector).
+        
+        tempVector = (otherMobile get-location) - (self get-location).
+        return angle((self get-velocity), tempVector).
+}
+ 

@@ -1,0 +1,334 @@
+@include "Real.tz"
+@include "Shape.tz"
+@include "MenuItem.tz"
+
+Real : Mobile (aka Mobiles) [version 1.8] {
+	% Mobile objects are objects in the simulated world which move around 		
+	% and interact with other objects.  This is in contrast to 
+	% OBJECT(Stationary) objects which can collide and interact with 
+	% other objects but which never move.
+	% <P>
+	% When a Mobile object is created, it will be by default a simple 
+	% sphere.  You can change the appearence of this sphere by using
+	% methods in this class, or its parent class OBJECT(Real).  Or 
+	% you can change the shape altogether with the method METHOD(set-shape).
+
+	+ variables:
+		worldObjectShape (object).
+		linkPointer (pointer).
+
+		location (vector).
+		color (vector).
+		rotation (matrix).
+		velocity (vector).
+		rvelocity (vector).
+		acceleration (vector).
+
+	+ to init:
+		e = .2.
+		eT = .5.
+		mu = .2.
+
+		color = (1, 1, 1).
+
+		linkPointer = linkNew().
+		realWorldPointer = linkAddToWorld(linkPointer).
+
+		self set-shape to (controller get-generic-shape).
+
+	- to get-link-pointer:
+		% For internal use only.
+
+		return linkPointer.
+
+  + section "Setting Up the Mobile Object"
+
+	+ to set-shape to theShape (object):
+		% Associates a OBJECT(Shape) object with this Mobile object.  
+		% Returns this object.
+
+		if !(theShape get-pointer): 
+			die "attempt to register Mobile object with uninitialized shape ($theShape)".
+
+		if worldObjectShape: {
+			self remove-dependency on worldObjectShape.
+			worldObjectShape unretain.
+		}
+
+		worldObjectShape = theShape.
+		self add-dependency on worldObjectShape.
+		theShape retain.
+
+		linkSetShape(linkPointer, (theShape get-pointer)).
+
+		return self.
+
+  + section "Configuring Physics Parameters"
+
+	+ to enable-physics:
+		% Enables physical simulation for a OBJECT(Mobile) object.  
+		% This must be used in conjunction with a 
+		% OBJECT(PhysicalControl) object which sets up physical 
+		% simulation for the entire world.  
+		% <p>
+		% When physics is enabled for an object, the acceleration 
+		% can no longer be assigned manually--it will be computed 
+		% from the forces applied to the object.
+
+		linkSetPhysics(linkPointer, 1).
+
+	+ to disable-physics:
+		% Disables the physical simulation for a OBJECT(Mobile) object.
+		% <p>
+		% Note that disabling physics for instances of the subclass 
+		% OBJECT(MultiBody) may produce unexpected results and is
+		% not recommended.
+
+		linkSetPhysics(linkPointer, 0).
+
+	+ to get-mass: 
+		% Returns the mass of the object.
+
+		return (worldObjectShape get-mass).
+
+  + section "Getting the Light Exposure of this Mobile Object"
+
+	+ to destroy:
+		if realWorldPointer: removeObject(realWorldPointer).
+
+		if worldObjectShape: worldObjectShape unretain.
+
+		super destroy.
+
+  + section "Controlling the Agent's Motion and Position"
+
+	+ to move to newLocation (vector):
+		% Moves this object to location newLocation.
+
+		if !realWorldPointer:
+			die "attempt to move uninitialized Mobile object.".
+
+		linkSetLocation(linkPointer, newLocation).
+
+	+ to set-rotation to r (matrix):
+		% Sets the rotation of this object to the rotation matrix r.
+		% Working with matrices can be complicated, so a more simple
+		% approach is to use METHOD(rotate).
+
+		linkSetRotationMatrix(linkPointer, r).
+
+	+ to rotate around-axis thisAxis (vector) by amount (float):
+		% Sets the rotation of this object around vector axis thisAxis 
+		% by scalar amount (in radians).  This is an "absolute" rotation--the 
+		% current rotation of the object does not affect how the 
+		% object will be rotated.  For a rotation relative to the 
+		% current orientation, set METHOD(relative-rotate).
+		
+		length (float).
+
+		# normalize the axis
+
+		length = |thisAxis|.
+
+		if length == 0.0: return.
+		thisAxis /= length.
+
+		linkSetRotation(linkPointer, thisAxis, amount).
+
+	+ to relative-rotate around-axis thisAxis (vector) by amount (float):
+		% Sets the rotation of this object around vector axis thisAxis 
+		% by scalar amount (in radians).  This is a rotation relative to the 
+		% current position.
+
+		length (float).
+
+		# normalize the axis
+
+		length = |thisAxis|.
+
+		linkRotateRelative(realWorldPointer, thisAxis, amount).
+
+	+ to point vertex theVertex (vector) at theLocation (vector):
+		% An easier way to rotate an object--this function rotates 
+		% an object such that the local point theVertex, points towards
+		% the world direction theLocation.  In other words, theLocation
+		% is where you want the object to face, and theVertex indicates 
+		% which side of the object is to be considered the "front".
+
+		v (vector).
+		a (float).
+
+		v = cross(theVertex, theLocation).
+		a = angle(theVertex, theLocation).
+
+		if |v| == 0.0: {
+			self rotate around-axis theVertex by 0.01.
+			return.
+		}
+
+		self rotate around-axis v by a.
+
+	+ to get-location:
+		% Returns the vector location of this object. 
+
+		return linkGetLocation(linkPointer).
+
+	+ to get-rotation:
+		% Returns the matrix rotation of this object. 
+
+		return linkGetRotation(linkPointer).
+
+	+ to offset by amount (vector):
+		% Moves this object by amount.
+
+		linkSetLocation(linkPointer, (self get-location) + amount).
+
+	+ to set-acceleration to newAcceleration (vector):
+		% Sets the acceleration of this object to newAcceleration.
+		% This method has no effect if physical simulation is turned 
+		% on for the object, in which case the physical simulation 
+		% engine computes acceleration.
+
+		linkSetAcceleration(linkPointer, newAcceleration).
+
+	+ to set-rotational-acceleration to newAcceleration (vector):
+		% Sets the rotational acceleration of this object to 
+		% newAcceleration.  This method has no effect if physical 
+		% simulation is turned on for the object, in which case the 
+		% physical simulation engine computes acceleration.
+
+		linkSetRotationalAcceleration(linkPointer, newAcceleration).
+
+	+ to get-acceleration:
+		% Returns the vector acceleration of this object.
+
+		return linkGetAcceleration(linkPointer).
+
+	+ to set-velocity to newVelocity (vector):
+		% Sets the velocity of this object to newVelocity.
+
+		if !realWorldPointer: {
+			print "set-velocity called with uninitialized Mobile object".
+			return.
+		}
+
+		linkSetVelocity(linkPointer, newVelocity).
+
+	+ to set-force to newForce (vector):
+		% Sets the velocity acting on the object to newForce.  This 
+		% force will remain in effect until it is disabled with a 
+		% new call to METHOD(set-force).
+
+		if !realWorldPointer: {
+			print "set-force called with uninitialized Mobile object".
+			return.
+		}
+
+		linkSetForce(linkPointer, newForce).
+
+	# + to set-force at-point location (vector):
+
+	+ to set-torque to newTorque (vector):
+		% Sets the torque acting on the object to newTorque.  This 
+		% torque will remain in effect until it is disabled with a 
+		% new call to METHOD(set-torque).
+
+		linkSetTorque(linkPointer, newTorque).
+
+	+ to set-rotational-velocity to angularVelocity (vector):
+		% Sets the rotational velocity of this object to 
+		% angularVelocity.
+
+		linkSetRotationalVelocity(linkPointer, angularVelocity).
+
+	+ to get-velocity:
+		% Returns the vector velocity of this object.
+
+		return linkGetVelocity(linkPointer).
+
+	+ to get-rotational-velocity:
+		% Returns the vector angular velocity of this object.
+
+		return linkGetRotationalVelocity(linkPointer).
+
+	+ to get-distance from otherObject (object):
+		% Returns the scalar distance from this object's center to 
+		% otherObject.
+
+		return | (self get-location) - (otherObject get-location) |.
+
+	+ to transform world-vector theVector (vector):
+		% Transforms theVector in the world coordinate frame to a 
+		% vector in the frame of this object.  This assumes that the 
+		% origin of the link is the object itself.
+
+		return vectorFromLinkPerspective(linkPointer, theVector).
+
+	+ to get-bound-maximum:
+		% Returns the vector representing the maximum X, Y and Z locations of
+		% points on this link.
+
+		return linkGetMax(linkPointer).
+
+	+ to get-bound-minimum:
+		% Returns the vector representing the minimum X, Y and Z locations of
+		% points on this link.
+
+		return linkGetMin(linkPointer).
+
+
+  + section "Chaning the Object's Appearence"
+
+	+ to set-label to theLabel (string):
+		% Sets the label to be drawn along side the object.
+
+		linkSetLabel(linkPointer, theLabel).
+
+	+ to remove-label:
+		% Removes the label that would be drawn next to an object.
+		linkRemoveLabel(linkPointer).
+
+	- to archive:
+		location = (self get-location).
+		rotation = (self get-rotation).
+		velocity = (self get-velocity).
+		rvelocity = (self get-rotational-velocity).
+		acceleration = (self get-acceleration).
+		return (super archive).
+
+	- to dearchive:
+		self set-shape to worldObjectShape.
+		self move to location.
+		self set-rotation to rotation.
+		self set-velocity to velocity.
+		self set-rotational-velocity to rvelocity.
+		self set-acceleration to acceleration.
+		self set-color to color.
+		return (super dearchive).
+
+	+ to check-for-penetrations:
+		% Determines whether this link is currently penetrating with other objects
+		% in the simulation.  This is not meant as a general purpose collision
+		% detection tool -- it is meant to detect potentially troublesome
+		% configurations of links when they are created.
+		% <P>
+		% In order for this method to work properly, the Link must be part of a
+		% OBJECT(MultiBody).  Links that are not associated with MultiBody objects
+		% do not appear in the simulated world, and thus cannot be tested for
+		% collisions.
+
+		return linkCheckPenetration(linkPointer).
+
+	+ to check-for-self-penetrations:
+		% Determines whether this link is currently penetrating with other links
+		% in the same multibody.  This is not meant as a general purpose collision
+		% detection tool -- it is meant to detect potentially troublesome
+		% configurations of links when they are created.
+		% <P>
+		% In order for this method to work properly, the Link must be part of a
+		% OBJECT(MultiBody).  Links that are not associated with MultiBody objects
+		% do not appear in the simulated world, and thus cannot be tested for
+		% collisions.
+
+		return linkCheckSelfPenetration(linkPointer).
+}

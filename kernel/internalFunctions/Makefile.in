@@ -1,0 +1,8 @@
+INTERNALO = $(shell ls *.c | sed s/\.c$$/\.o/)
+
+all: $(INTERNALO)
+
+INCLUDE	+= -I.. -I../../include/breve
+
+%.o: %.c
+	$(CC) $(PLATFORM_OPT_FLAGS) $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<

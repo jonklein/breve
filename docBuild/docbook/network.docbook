@@ -1,0 +1,108 @@
+<chapter id="networking">
+<title>Networking</title>
+
+<indexterm><primary>networking</primary></indexterm>
+<indexterm><primary>web-server</primary></indexterm>
+<indexterm><primary>web-browser</primary></indexterm>
+<indexterm><primary>HTML</primary></indexterm>
+<indexterm><primary>sending objects</primary></indexterm>
+
+<para>
+breve supports two kinds of networking: sending objects over the 
+network from one simulation to another, and interacting with
+running breve simulations using a web browser.
+</para>
+<para>
+This chapter starts by describing how to create a NetworkServer object 
+which is used for both of these networking features (<xref linkend="network_server">).
+Next, sending and receiving breve objects over the network is 
+described (<xref linkend="network_send_receive">).  The final
+section describes how to allow the control of a breve simulation
+via a web interface (<xref linkend="network_web">).
+</para>
+<sect1 id="network_server"><title>Starting a Network Server</title>
+<para>
+To start a network server, make a new instance of the class 
+<ulink url="../classes/NetworkServer.html">NetworkServer</ulink>.
+The NetworkServer class is used for both receiving object from
+other breve simulations, and for allowing a web interface to
+your breve simulation.
+</para>
+<para>
+Once the NetworkServer instance has been created, it should 
+be told to start listening for connections using the method
+<ulink url="../classes/NetworkServer.html#listen">listen</ulink>.
+The listen method expects a port number which must be greater
+than 1024, but otherwise may be any unused port that both the
+client and the server breve users can agree to.
+</para>
+</sect1>
+
+<sect1 id="network_send_receive"><title>Sending and Receiving breve Objects</title>
+<para>
+When sending an instance over the network, breve recreates the 
+instance on the server machine.  It recreates the object and the 
+state of all of its variables, except that variables of type <function>object</function> and
+<function>pointer</function> can not be automatically maintained without
+special treatment.  The reason for this and the solution are described in
+<xref linkend="object_archiving">.
+</para>
+</sect1>
+
+<sect1 id="network_web"><title>Using a Web-interface to a breve Simulation</title>
+<para>
+The NetworkServer object can accept connections from regular web-browsers.  
+After the NetworkServer starts running, you can get the address that clients 
+should connect to by using the method 
+<ulink url="../classes/NetworkServer.html#get-url">get-url</ulink>.  The 
+URL will be the hostname (or IP address) of the server machine, followed 
+by a ":<replaceable>portNumber</replaceable>".
+</para>
+<para>
+When a web-client connects to the server, it may do one of two things: it
+may execute a command in the simulation's controller object, or it 
+may request an HTML page.
+</para>
+<sect2 id="web_method_execution"><title>Executing Controller Commands Via Web Requests</title>
+<para>
+To execute a method in the controller instance, simply append the
+method name to the end of the URL.  If you wish to pass in either
+int or double arguments, they can be added afterwards, delimited by
+underscores.  Other types may currently not be passed via the web
+interface.  Here are some examples:
+<programlisting>
+http://myserver:33333/turn-agent-blue
+http://myserver:33333/set-agent-color_.2_.4_.6
+</programlisting>
+</para>
+<para>
+The controller methods called may optionally return a string which
+will determine what information is sent back to the web-browser. 
+If the string ends with ".html", breve will try to load data from
+an HTML on the local disk and send it back to the 
+web-browser (sending HTML files is described in more detail in the next section).
+Otherwise, the string itself is returned to the web-broswer.
+</para>
+</sect2>
+
+<sect2 id="serving_html_pages"><title>Serving HTML Pages Via Web Requests</title>
+<para>
+If an HTTP request to a breve network server ends with ".html", 
+breve will try to provide the web-browser with an HTML file from
+the local disk.  This feature is not typically used to serve 
+informational web files as a normal web server might&mdash;instead,
+it should be used to serve files containing "links" that will 
+execute controller commands in the simulation, as described 
+above (<xref linkend="web_method_execution">).
+</para>
+<para>
+Additionally, you can set an "index" page that will be served to
+the web-browser when they send a request to your server without 
+an actual page or method request, for exampe, http://myserver:33333.
+This index page can be set using the method
+<ulink url="../classes/NetworkServer.html#set-index-page">set-index-page</ulink>.  
+</para>
+</sect2>
+</sect1>
+
+</chapter>

@@ -1,0 +1,58 @@
+#include "steve.h"
+
+int stCWriteXMLEngine(brEval args[], brEval *target, brInstance *i) {
+    char *filename = BRSTRING(&args[0]);
+
+    if(i->engine->outputPath) {
+        char *newfilename;
+        newfilename = slMalloc(strlen(i->engine->outputPath) + 2 + strlen(filename));
+        sprintf(newfilename, "%s/%s", i->engine->outputPath, filename);
+        BRINT(target) = stXMLWriteSimulationToFile(newfilename, i->engine);
+        slFree(newfilename);
+    } else {
+        BRINT(target) = stXMLWriteSimulationToFile(filename, i->engine);
+    }
+
+    return EC_OK;
+}
+
+int stCArchiveXMLObject(brEval args[], brEval *target, brInstance *i) {
+    char *filename = BRSTRING(&args[1]);
+    stInstance *archive;
+
+    archive = BRINSTANCE(&args[0])->pointer;
+
+    if(i->engine->outputPath) {
+        char *newfilename;
+        newfilename = slMalloc(strlen(i->engine->outputPath) + 2 + strlen(filename));
+        sprintf(newfilename, "%s/%s", i->engine->outputPath, filename);
+        BRINT(target) = stXMLWriteObjectToFile(archive, newfilename, 0);
+        slFree(newfilename);
+    } else {
+        BRINT(target) = stXMLWriteObjectToFile(archive, filename, 0);
+    }
+
+    return EC_OK;
+}
+
+int stCDearchiveXMLObject(brEval args[], brEval *target, brInstance *i) {
+    char *filename = brFindFile(i->engine, BRSTRING(&args[0]), NULL);
+
+    if(!filename) {
+        slMessage(DEBUG_ALL, "Cannot locate file \"%s\" for object dearchive\n", BRSTRING(&args[0]));
+        BRINSTANCE(target) = NULL;
+        return EC_OK;
+    }
+
+    STINSTANCE(target) = stXMLDearchiveObjectFromFile(i->engine, filename);
+
+    slFree(filename);
+
+    return EC_OK;
+}
+
+void breveInitXMLFuncs(brNamespace *n) {
+    brNewBreveCall(n, "writeXMLEngine", stCWriteXMLEngine, AT_INT, AT_STRING, 0);
+    brNewBreveCall(n, "archiveXMLObject", stCArchiveXMLObject, AT_NULL, AT_INSTANCE, AT_STRING, 0);
+    brNewBreveCall(n, "dearchiveXMLObject", stCDearchiveXMLObject, AT_INSTANCE, AT_STRING, 0);
+}

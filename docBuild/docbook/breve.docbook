@@ -1,0 +1,66 @@
+<!--
+    The breve Simulation Environment documentation
+    Copyright (C) 2003 Jonathan Klein
+-->
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V3.1//EN" [
+<!ENTITY preface SYSTEM "preface.docbook">
+<!ENTITY introduction SYSTEM "introduction.docbook">
+<!ENTITY steve SYSTEM "steve.docbook">
+<!ENTITY physics SYSTEM "physics.docbook">
+<!ENTITY agents SYSTEM "agents.docbook">
+<!ENTITY interactions SYSTEM "interactions.docbook">
+<!ENTITY graphics SYSTEM "graphics.docbook">
+<!ENTITY archiving SYSTEM "archiving.docbook">
+<!ENTITY interface SYSTEM "interface.docbook">
+<!ENTITY plugins SYSTEM "plugins.docbook">
+<!ENTITY java SYSTEM "java.docbook">
+<!ENTITY classlist SYSTEM "classlist.docbook">
+<!ENTITY index SYSTEM "index.docbook">
+<!ENTITY movie SYSTEM "movie.docbook">
+<!ENTITY network SYSTEM "network.docbook">
+<!ENTITY source SYSTEM "source.docbook">
+<!ENTITY version_2.0 SYSTEM "version_2.0.docbook">
+]>
+<book>
+<bookinfo>
+<mediaobject role="online">
+<imageobject><imagedata fileref="docs/images/breve_icon.jpg" align="center"></imageobject>
+</mediaobject>
+<date>2004-08-01</date>
+<title>breve Documentation</title>
+<subtitle>version 2.0</subtitle>
+</bookinfo>
+
+<toc>
+</toc>
+
+&preface;
+
+&introduction;
+&version_2.0;
+&steve; 
+&agents;
+&graphics;
+&interactions;
+&physics; 
+&interface;
+&movie;
+&archiving;
+&network;
+&plugins;
+&source;
+
+<part id="appendices">
+<title>Appendix</title>
+<appendix id="classes">
+<title>breve Class Documentation</title>
+<para>
+&classlist;
+</para>
+</appendix>
+</part>
+
+&index;
+
+</book>

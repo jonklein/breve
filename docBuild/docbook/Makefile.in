@@ -1,0 +1,26 @@
+DOCBOOKDIR	= /sw/share/sgml/dsssl/docbook-dsssl-nwalsh/bin
+
+all: html
+
+install: all
+
+html: classlist
+	-mkdir docs
+	touch index.docbook
+	openjade -t sgml -V html-index -d breve.dsl breve.docbook
+	$(DOCBOOKDIR)/collateindex.pl -g HTML.index > index.docbook
+	openjade -t sgml -d breve.dsl breve.docbook
+	cp -r images docs
+
+classlist: ../../docs/classes
+	./makeclasslist.sh ../../docs/classes > classlist.docbook
+
+clean:
+	-rm index.html
+	-rm docs/*.html
+
+spell:
+	ispell -H *.docbook
+
+tidy:
+	tidy -config tidy.cfg -m -i -xml *.docbook

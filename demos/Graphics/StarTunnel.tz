@@ -1,0 +1,59 @@
+@use Mobile.
+@use Control.
+
+Controller Tunnel.
+
+Control : Tunnel{
+	+ variables: 
+		particles (list).
+		lightmap (object).
+
+	+ to init:
+		# because we dont require high accuracy in this demo, we can step up
+		# the iteration and integration steps in order to make the demo run
+		# a little bit faster.
+
+		self set-integration-step to .1.
+		self set-iteration-step to .2.
+		self set-background-color to (0, 0, 0). 
+
+		self set-z-clip to 1000.
+
+		self disable-text.
+		# self enable-blur.
+
+		lightmap = (new Image load from "images/lightmap.png").
+
+		particles = 900 new Particles.
+
+		self point-camera at (0, 0, 0) from (0.0, 0.0, 100.0).
+
+	+ to get-lightmap:	
+		return lightmap.
+}
+
+Mobile : Particle (aka Particles) {
+	+ variables:
+		range (double).
+		shape (object).
+		
+	+ to iterate:
+		if (self get-location)::z > 100.0: self reset.
+
+	+ to init:
+		shape = ((new Shape) init-with-sphere radius .3 + random[1.0]).
+		self set-shape to shape.
+
+		self reset.
+
+		self set-lightmap-image to (controller get-lightmap).
+
+	+ to reset:
+		# instead of the viewer moving through space, we'll keep 
+		# the viewer at (0, 0, 0) and move the stars relative to 
+		# that.
+
+		self set-color to random[(1, 1, 1)].
+		self move to random[(600, 600, 0)] - (300, 300, 300 + random[1000]).
+		self set-velocity to (0, 0, 80).
+}

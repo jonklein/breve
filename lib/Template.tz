@@ -1,0 +1,37 @@
+# include some frequently used classes and specify common classpaths
+
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use Stationary.
+
+# tell the engine the name of the controller
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+	+ to init:
+		# put initialization code here which creates objects
+		# and sets up the simulation
+
+		print "simulation started".
+
+	+ to iterate:
+		# place code that should be called during every 
+		# iteration here.
+
+		super iterate.
+}
+
+# implement other objects in your simulation here
+
+Mobile : myAgent {
+	+ to init:
+
+	+ to iterate:
+
+}

@@ -1,0 +1,89 @@
+@use Control.
+
+Controller GCTest.
+
+Control : GCTest {
+	+ variables:
+		gh (hash).
+		gl (list).
+	
+	+ to init:
+		self test-argument-allocations with-list { new GCTesterI, { 2, 3, "dog" } }.
+		print "Argument allocations complete".
+
+		self test-local-allocations.
+		print "Local allocations complete".
+
+		self test-global-allocations.
+		gl = { }.
+		print "Global allocations complete".
+
+		self test-returned-allocations.
+		print "Returned allocations complete upon method return".
+
+	+ to iterate:
+		ti, tii (int).
+
+		ti = |(all GCTesterI)|.
+		tii = |(all GCTesterII)|.
+
+		print "$ti instances of GCTesterI allocated".
+		print "$tii instances of GCTesterII allocated".
+
+		if ti || tii: die "FAILURE".
+
+		print "SUCCESS".
+		self end-simulation.
+
+	+ to test-argument-allocations with-list l (list):
+		print "Testing argument allocations".
+		print l.
+
+	+ to test-local-allocations:
+		h (hash).
+		l (list).
+
+		print "Testing local allocations".
+
+		h{ "123" } = new GCTesterI.
+		l{0} = new GCTesterI.
+
+		h{ "123" } = { 1, 2, 3 }.
+
+	+ to test-global-allocations:
+		print "Testing global allocations".
+
+		gh{ "stuff" } = { 1, 2, 3 }.
+		gh{ "123" } = new GCTesterI.
+		gl{0} = new GCTesterI.
+
+		gl = { "hat", "sofa", "puppydog" }.
+		gl = { new GCTesterI }.
+
+		gh{ "stuff" } = 0.
+		gh{ "123" } = 0.
+
+	+ to test-returned-allocations:
+		print "Testing returned allocations".
+
+		return new GCTesterI.
+}
+
+Object : GCTesterI {
+	+ to init:
+		print "creating $self".
+		self enable-auto-free.
+		new GCTesterII.	
+
+	+ to destroy:
+		print "destroying $self".
+}
+
+Object : GCTesterII {
+	+ to init:
+		print "creating $self".
+		self enable-auto-free.
+
+	+ to destroy:
+		print "destroying $self".
+}

@@ -1,0 +1,78 @@
+#
+# This demo also shows an example of some of the physical simulation 
+# features of breve.  It features a ball rolling down a set of stairs 
+# over and over, changing the starting conditions each time.
+#
+
+@use Mobile.
+@use PhysicalControl.
+@use Stationary.
+
+Controller Gravity.
+
+PhysicalControl : Gravity {
+	+ variables: 
+		theBall (object).
+
+	+ to init:
+		# This demo is actually so fast that we're going to intentionally
+		# slow it down by setting the integration step to be small.  This 
+		# will also increase the accuracy of the simulation.
+
+		self set-integration-step to .0001.
+
+		# create a bunch of steps.
+
+		new Step create at (-.5, 0, 0) size (1.0, .02, 1).
+		new Step create at (.2, -.2, 0) size (.2, .02, 1).
+		new Step create at (.4, -.4, 0) size (.2, .02, 1).
+		new Step create at (.6, -.6, 0) size (.2, .02, 1).
+		new Step create at (.8, -.8, 0) size (.2, .02, 1).
+		new Step create at (1.0, -1.0, 0) size (.2, .02, 1).
+		new Step create at (2.0, -1.2, 0) size (2, .02, 1).
+
+		theBall = new Ball.
+
+		self point-camera at (1.0, -.8, -.6) from (3.5, 1.1, 5.0).
+
+		self enable-shadow-volumes.
+
+		self watch item theBall.
+
+		self add-menu named "Reset Ball" for-method "reset-ball".
+
+	+ to reset-ball:
+		theBall reset.
+}
+
+Stationary : Step {
+	+ to create at location (vector) size sizeVector (vector):
+		stepShape (object).
+
+		stepShape = (new Shape init-with-cube size sizeVector).
+
+		self register with-shape stepShape at-location location.
+}
+
+Mobile : Ball {
+	# the iterate method is called each timestep...
+
+	+ to iterate:
+		# if the Y component (height) of our position is less than -20, 
+		# then the ball has passed the steps and is continuing to fall,
+		# so we'll reset the ball with new starting conditions.
+
+		if (self get-location)::y < -2.0: self reset.
+
+	+ to init:
+		self set-shape to ((new Shape) init-with-sphere radius .1).
+		self enable-physics.
+		self reset.
+
+	+ to reset:
+		# vary initial conditions slightly each time
+
+		self set-color to random[(1, 1, 1)].
+		self move to (-.8 + random[.3], 1.0, 0).
+		self set-velocity to (1 + random[1.0], 1.0 + random[1.0], 0).
+}

@@ -1,0 +1,13 @@
+@use Abstract.
+
+@plugin "URLPlugin.o" (slInitURLFunctions).
+
+Abstract : URLReader {
+	% The URLReader class can grab files as text, or download them to disk.
+
+	+ to get url theURL (string):
+		% Downloads the specified URL and returns the contents as a string.
+		% Should only be used to retreive text, not to download files.
+
+		return getURL(theURL).
+}

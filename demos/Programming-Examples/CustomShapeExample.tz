@@ -1,0 +1,74 @@
+# 
+# This simple demo illustrates the use of the CustomShape class
+# to build customized shapes programatically.  See the class
+# myCustomShape below for details.
+#
+# NOTE: to use the class CustomShape, you should include the file
+# "Shape.tz".
+#
+
+@include "Mobile.tz"
+@include "Control.tz"
+@include "Shape.tz"
+
+Controller myController.
+
+Control : myController {
+	+ to init:
+		new CustomShapeAgent.
+		self enable-lighting.
+}
+		
+
+# We'll need a simple agent to show our custom shape.
+
+Mobile : CustomShapeAgent {
+	+ to init:
+		self register with-shape (new myCustomShape).
+		self set-color to random[(1, 1, 1)].
+		self set-rotational-velocity to (0.01, 0.05, 0.01).
+		self show-bounding-box.
+}
+
+#
+# As a simple illustration of a CustomShape, we'll make an irregular
+# shape with five vertices.  Imagine taking a triangle, then turning
+# it into a 3D shape by placing a vertex above its center, and another
+# below its center (like two pyramids, joined at their bases).  That's
+# the shape we'll generate here.
+#
+
+CustomShape : myCustomShape {
+	+ variables:
+		vertices (5 vectors).
+
+    + to init:
+		# the triangular "base" of the shape
+
+		vertices[0] = (-1, 0, 0).
+		vertices[1] = (1.4, 0, 1.4).
+		vertices[2] = (1.4, 0, -1.4).
+
+		# the points above and below the center
+
+		vertices[3] = (0, 1.4, 0).
+		vertices[4] = (0, -1.4, 0).
+
+		# for each of the line segments in the base, make a face by connecting
+		# it to the vertex above...
+
+        self add-face with-vertex-list { vertices[0], vertices[1], vertices[3] }.
+        self add-face with-vertex-list { vertices[1], vertices[2], vertices[3] }.
+        self add-face with-vertex-list { vertices[0], vertices[2], vertices[3] }.
+
+		# for each of the line segments in the base, make a face by connecting
+		# it to the vertex below...
+
+        self add-face with-vertex-list { vertices[0], vertices[1], vertices[4] }.
+        self add-face with-vertex-list { vertices[1], vertices[2], vertices[4] }.
+        self add-face with-vertex-list { vertices[0], vertices[2], vertices[4] }.
+
+		# all shapes must be completed with a call to finish-shape.
+
+        self finish-shape with-density 1.0.
+}

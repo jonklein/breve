@@ -1,0 +1,195 @@
+<!--
+	The breve Simulation Environment documentation
+	Copyright (C) 2003-2004 Jonathan Klein
+-->
+
+<chapter id="source">
+<title>The breve Source Code</title>
+<para>
+This chapter describes the breve source implementation, and how it can be extended.
+
+The following image shows the basic structure of the breve source code:
+<mediaobject><imageobject><imagedata align="center" fileref="images/breve_structure.jpg"></imageobject></mediaobject>
+
+The bottom layer, world simulation, is found in the <function>world</function> directory of the source.  
+
+</para>
+
+<sect1 id="frontends"><title>Adding a front-end language to the breve engine: the breve object API</title>
+<para>
+This section describes how to incorporate another front-end language with breve.  Using 
+this information, you'll be able to use the breve engine from any language which can 
+interface a C library.
+</para>
+<para>
+The following steps are required to set up a language front-end in breve.
+<itemizedlist>
+<listitem><para>Write special callbacks for the language front-end (<xref linkend="breve_object_callbacks">).</para></listitem>
+<listitem><para>Construct a new breve object type, and add classes to the breve engine (<xref linkend="breve_object_type">).</para></listitem>
+<listitem><para>Add instances to the breve engine (<xref linkend="breve_object_api">).</para></listitem>
+</itemizedlist>
+</para>
+
+<sect2 id="breve_object_callbacks"><title>Callbacks required to add a new front-end language</title>
+<para>
+
+In order to provide a language front-end to breve, a set of callbacks must be defined.  
+
+<itemizedlist>
+<listitem>
+<para>
+findMethod: locate a method for a class by name and argument count.
+	<screen>void *(*findMethod)(brObject *object, char *name, int nargs);</screen>
+</para>
+<para>
+The breve engine will need to be able to locate methods by name and argument count in order to preform
+certain callbacks.  Looking up methods by name may be time consuming, so breve will lookup the method 
+by name once, and then cache the result for future use.
+</para>
+<para>
+This callback method is given a breve object struct (<function>brObject</function>) a name character
+string, and a number of arguments.  The callback then looks up the method, making use of the 
+<function>brObject</function> "pointer" field, and returns a pointer corresponding to the desired 
+method.  This <function>void*</function> pointer will be stored in the "pointer" field of a 
+<function>brMethod</function> structure.  This data will be used later, when a method call is triggered.
+</para>
+</listitem>
+
+
+<listitem>
+<para>
+callMethod: trigger a method call in the front-end language.
+	<screen>int (*callMethod)(brInstance *instancePointer, brMethod *method, brEval **arguments, brEval *result);</screen>
+</para>
+<para>
+The breve engine will need to trigger method calls in the front-end language for a number
+of events such as iteration and collision handling.  This callback is used to trigger such
+events.
+</para>
+<para>
+The callback is given the instance to be used, a <function>brInstance</function> instance structure 
+(which contains a native language instance pointer in the "pointer" field); the method to 
+be called, a <function>brMethod</function> structure (which contains a native language 
+method pointer in the "pointer" field); an array of <function>brEval</function> argument pointers, 
+and a pointer to an output <function>brEval</function> structure.
+</para>
+<para>
+The callback should trigger the method call <replaceable>method</replaceable> for the instance
+<replaceable>instancePointer</replaceable>.  It expects that the <replaceable>arguments</replaceable>
+array contains the number of items specified by the <function>brMethod</function> structure's 
+argumentCount field.
+</para>
+</listitem>
+
+<listitem>
+<para>
+isSubclass: determine whether a class is a subclass of another.
+	<screen>int (*isSubclass)(brObject *class1, brObject *class2);</screen>
+</para>
+<para>
+In order to correctly handle certain interactions like collisions, the breve engine needs to
+know whether one class is a subclass of another.  
+</para>
+<para>
+This callback is given two breve object pointers, and must return 1 if 
+<replaceable>class1</replaceable> is a subclass of 
+<replaceable>class2</replaceable>, and 0 otherwise.
+</para>
+</listitem>
+
+</itemizedlist>
+
+</para>
+
+</sect2>
+
+<sect2 id="breve_object_type"><title>Specifying a new breve object type, and registering objects</title>
+<para>
+Every object in a front-end language that will have instances in the breve engine must be registered
+with the breve engine.  Moreoever, when an object is added to the breve engine, it must also tell the
+engine what "type" of object it is.  Each object "type" corresponds to a different language front-end
+and a different set of callbacks, so for each language front-end one creates, one must also create
+a <function>brObjectType</function> structure which contains the proper callbacks.  The structure 
+is shown below.
+<screen>
+struct brObjectType {
+	int (*callMethod)(brInstance *instancePointer, brMethod *method, brEval **arguments, brEval *result);
+	brMethod *(*findMethod)(brInstance *objectPointer, char *name, int nargs);
+	int (*isSubclass)(brObject *class1, brObject *class2);
+};
+</screen>
+Only one <function>brObjectType</function> is required for each language front-end.
+</para>
+<para>
+Once the language front-end is defined, objects can be registered with the breve engine.
+For each object that will be used in breve, the following function should be called once:
+<screen>
+brObject *brAddObjectToEngine(brEngine *e, brObjectType *t, char *name, void *pointer);
+</screen>
+The final parameter, <replaceable>pointer</replaceable>, is a pointer to the native 
+language representation of the object.  This pointer will likely be used as part of the
+<function>findMethod</function> and <function>findMethod</function> callbacks.
+</para>
+
+</sect2>
+
+<sect2 id="breve_object_api"><title>Adding instance to the breve engine</title>
+<para>
+Once objects are registered with the breve engine, instances can be added to the engine as well.
+This is done with the function <function>brAddInstanceToEngine</function>.
+<screen>
+brInstance *brAddInstanceToEngine(brEngine *e, brObject *o, void *pointer);
+</screen>
+The third argument, <replaceable>pointer</replaceable>, is a pointer to the native language 
+instance representation.  This pointer will be stored in the returned <function>brInstance</function>
+and will be needed when the <function>callMethod</function> callback is triggered.  Save the 
+returned <function>brInstance</function> pointer&mdash; it will be required later to interface with 
+the breve engine.
+</para>
+</sect2>
+
+<sect2 id="breve_object_api_structs"><title>Structures used by the breve object API</title>
+<para>
+The following structures are used by the breve object API:
+<screen>
+struct brObject {
+    void *pointer;
+
+    brObjectType *type;
+
+    char *name;
+
+    slStack *collisionHandlers;
+};
+
+struct brInstance {
+    void *pointer;
+
+    char status;
+
+    brObject *class;
+    brEngine *engine;
+    brMenuList menu;
+
+    slList *observers;
+    slList *observees;
+
+    slList *dependencies;
+    slList *dependents;
+
+};
+
+struct brMethod {
+    void *pointer;
+
+    char *name;
+    brObject *class;
+    int argumentCount;
+};
+</screen>
+</para>
+</sect2>
+
+</sect1>
+
+</chapter>

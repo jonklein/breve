@@ -1,0 +1,116 @@
+#
+# This demo is... 
+# well, there is no real explaination.
+#
+# It's an example of using QuickTime musical instruments to create some 
+# simple MIDI sounds.  Use the selection tool to click on the chimes you
+# want to activate.
+#
+
+@include "Mobile.tz"
+@include "Control.tz"
+@include "Instrument.tz"
+@include "Stationary.tz"
+
+Controller PsychoChimes.
+
+# implment the controller object
+
+Control : PsychoChimes {
+	+ variables:
+		vibe (object).
+
+	+ to init:
+		i, b (object).
+		n, m (int).
+
+		# make the demo pret-tay
+		
+		self enable-smooth-drawing.
+		self disable-text.
+
+		# set up the camera and lighting.
+
+		self aim-camera at (-1, -1, -.2).
+
+		self offset-camera by (4.2, 4.2, 6.3).
+
+		self move-light to (0, 15.0, 0).
+		self enable-lighting.
+
+		# we'll make 4 rows of instruments here
+
+		for m=0, m<4, m+=1: {
+			n = 0.
+
+			# Note that we make a new instrument for each row--each row
+			# of chimes will share the same instrument such that only one
+			# chime per row can be playing at a given time.
+			
+			vibe = (new Instrument init-as-vibraphone).
+			
+			foreach b in (12 new Bell): {
+				b set-position to-x n to-y m.
+				n += 1.
+				b set-instrument to vibe.
+			}
+		}
+		
+	+ to click on bell (object):
+		# we override the default "click" method from Control.tz, and we
+		# replace it with our own actions.
+
+		i (object).
+		 
+		if bell: bell toggle-bouncing.
+		else self announce message "reset".
+}
+
+Mobile : Bell {
+	+ variables:
+		bouncing (int).
+		positionX, positionY (int).
+		instrument (object).
+		 
+	 + to set-instrument to i (object):
+		instrument = i.
+
+	+ to set-position to-x n (int) to-y m (int):
+		positionX = n.
+		positionY = m.
+		self reset.
+		 
+	+ to reset:
+		self move to (positionX/1.5 - 4.5, 0, positionY * 1.5 - 2.5).
+		self set-color to ((positionX / 11.0), (positionY / 3.0), .3).
+		if instrument: instrument stop-last-note.
+
+	+ to init:
+		self register with-shape ((new Shape) init-with-sphere radius .2).
+		self observe instance controller for-notification "reset" with-method "stop-bouncing".
+
+	+ to ask-if-bouncing:
+		 return bouncing.
+
+	+ to toggle-bouncing:
+		if bouncing: self stop-bouncing.
+		else self start-bouncing.
+
+	+ to start-bouncing:
+		self set-acceleration to (0, -8.0, 0).
+		bouncing = 1.
+
+	+ to stop-bouncing:
+		self set-acceleration to (0, 0, 0).
+		self set-velocity to (0, 0, 0).
+		self reset.
+	 	bouncing = 0.
+
+	+ to iterate:
+		if bouncing: {
+			if (self get-location)::y < -3: {
+				self set-velocity to (0, 2 + random[8], 0).
+				   instrument start-note number (12 * positionY) + positionX + 48.
+			}
+		}
+}

@@ -1,0 +1,17 @@
+BREVEDIR	=	../..
+
+all: QTInstrumentPlugin.o
+
+QTInstrumentPlugin.o: QTInstrumentFunctions.o
+	$(CC) @PLUGINFLAGS@ -o QTInstrumentPlugin.o QTInstrumentFunctions.o @QUICKTIMEFLAGS@
+
+.c.o:
+	$(CC) $(CFLAGS) -c $*.c -I.. 
+
+clean:
+	-rm -f *.o
+
+install: all
+	-mkdir /usr/local/lib/breve/plugins
+	cp QTInstrumentPlugin.o /usr/local/lib/breve/plugins
+	cp QTInstrument.tz /usr/local/lib/breve/plugins

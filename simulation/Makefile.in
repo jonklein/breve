@@ -1,0 +1,30 @@
+#
+# libbrsimulation.a
+# Copyright (C) 2000-2004    jon klein (jklein@spiderland.org)
+#
+# s pi der la nd
+# 
+
+LIBO	= multibody.o link.o shape.o integrate.o \
+		camera.o world.o vclip.o vclipData.o patch.o gldraw.o \
+		shadow.o terrain.o volInt.o image.o movie.o lightdetector.o
+
+LIBS	+=-L../lib -lutil
+
+INCLUDE	+=-I../include/breve @CPPFLAGS@
+
+all: libbrsimulation.a 
+
+.c.o: 
+	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDE) -c $*.c
+
+libbrsimulation.a: $(LIBO)
+	$(AR) -crv libbrsimulation.a $(LIBO) 
+
+install: all
+	cp libbrsimulation.a ../lib
+	ranlib ../lib/libbrsimulation.a
+	cp *.h ../include/breve
+
+clean:
+	-/bin/rm -f *.o core libbrsimulation.a

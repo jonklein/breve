@@ -1,0 +1,176 @@
+<head>
+<title>slQTMusic Plugin documentation</title>
+</head>
+<body>
+slQTMusic is a breve plugin (for Mac OS X only) which gives access to 
+QuickTime musical instruments.  This allows music to be played using
+QuickTime's built-in MIDI instrument synthesizer.
+<p>
+slQTMusic is accessed through the class Instrument.  If the slQTMusic
+plugin is loaded, simply import the file "Instrument.tz".  Each instance
+of the Instrument class corresponds to a single voice with a specific 
+synthesized instrument--several different Instrument instances may be used 
+at the same time.
+<p>
+To use an Instrument, it must first be initialized as a specific specific
+synthesizer instrument such as piano, violin, etc.  
+<p>
+There are then two techniques to play notes: 1) to play notes from
+one instrument at a time 2) to play notes from several instruments
+at a time.
+<p>
+To play notes for a single instrument at a time, use the methods play-note 
+or play-chord.
+<p>
+To play notes for multiple instruments at the same time, you should use
+the method start-note for each instrument to begin playing, then later
+call stop-note for each instrument.  The notes should be given time to
+play using the controller method sleep.  
+<p>
+In either case, the notes are identified by number codes with 60 
+corresponding to middle C.
+<p>
+The methods of this class are described below.
+<p>
+<b>+ to init-as-piano:</b>
+<p>
+<blockquote>
+Initializes the Instrument object as a piano.
+</blockquote>
+<p>
+<b>+ to init-as-violin:</b>
+<p>
+<blockquote>
+Initializes the Instrument object as a violin.
+</blockquote>
+<p>
+<b>+ to init-as-cello:</b>
+<p>
+<blockquote>
+Initializes the Instrument object as a cello.
+</blockquote>
+<p>
+<b>+ to init-as-vibraphone:</b>
+<p>
+<blockquote>
+Initializes the Instrument object as a vibraphone.
+</blockquote>
+<p>
+<b>+ to init-as-instrument number n (int):</b>
+<p>
+<blockquote>
+Initializes the Instrument object as the QuickTime instrument identified
+by number.
+</blockquote>
+<p>
+<b>+ to play-note number n (int) for-duration duration (double):</b>
+<p>
+<blockquote>
+Plays a note, given as a MIDI note number, for a certain duration, in seconds.
+</blockquote>
+<p>
+<b>+ to play-chord with-notes notes (list) for-duration duration (double):</b>
+<p>
+<blockquote>
+Plays a chord, given as list MIDI note number, for a certain duration, in 
+seconds.
+</blockquote>
+<p>
+<b>+ to start-note number n (int):</b>
+<p>
+<blockquote>
+Starts playing a note, with the given MIDI note number.  The note will
+continue to be played until stop-last-note is called.
+</blockquote>
+<p>
+<b>+ to stop-last-note:</b>
+<p>
+<blockquote>
+If a note has been started using start-note, this method stops the note.
+</blockquote>
+<p>
+<hr>
+The following instruments are available from QuickTime and can be used 
+with the init-as-instrument method.
+<pre>
+PIANO                           CHROMATIC PERCUSSION
+1    Acoustic Grand             9   Celesta
+2    Bright Acoustic           10   Glockenspiel
+3    Electric Grand            11   Music Box
+4    Honky-Tonk                12   Vibraphone
+5    Electric Piano 1          13   Marimba
+6    Electric Piano 2          14   Xylophone
+7    Harpsichord               15   Tubular Bells
+8    Clavinet                  16   Dulcimer
+ 
+  ORGAN                          GUITAR
+17   Drawbar Organ             25   Nylon String Guitar
+18   Percussive Organ          26   Steel String Guitar
+19   Rock Organ                27   Electric Jazz Guitar
+20   Church Organ              28   Electric Clean Guitar
+21   Reed Organ                29   Electric Muted Guitar
+22   Accoridan                 30   Overdriven Guitar
+23   Harmonica                 31   Distortion Guitar
+24   Tango Accordian           32   Guitar Harmonics
+ 
+  BASS                           SOLO STRINGS
+33   Acoustic Bass             41   Violin
+34   Electric Bass(finger)     42   Viola
+35   Electric Bass(pick)       43   Cello
+36   Fretless Bass             44   Contrabass
+37   Slap Bass 1               45   Tremolo Strings
+38   Slap Bass 2               46   Pizzicato Strings
+39   Synth Bass 1              47   Orchestral Strings
+40   Synth Bass 2              48   Timpani
+
+  ENSEMBLE                       BRASS
+49   String Ensemble 1         57   Trumpet
+50   String Ensemble 2         58   Trombone
+51   SynthStrings 1            59   Tuba
+52   SynthStrings 2            60   Muted Trumpet
+53   Choir Aahs                61   French Horn
+54   Voice Oohs                62   Brass Section
+55   Synth Voice               63   SynthBrass 1
+56   Orchestra Hit             64   SynthBrass 2
+
+  REED                           PIPE
+65   Soprano Sax               73   Piccolo
+66   Alto Sax                  74   Flute
+67   Tenor Sax                 75   Recorder
+68   Baritone Sax              76   Pan Flute
+69   Oboe                      77   Blown Bottle
+70   English Horn              78   Skakuhachi
+71   Bassoon                   79   Whistle
+72   Clarinet                  80   Ocarina
+
+  SYNTH LEAD                     SYNTH PAD
+81   Lead 1 (square)           89   Pad 1 (new age)
+82   Lead 2 (sawtooth)         90   Pad 2 (warm)
+83   Lead 3 (calliope)         91   Pad 3 (polysynth)
+84   Lead 4 (chiff)            92   Pad 4 (choir)
+85   Lead 5 (charang)          93   Pad 5 (bowed)
+86   Lead 6 (voice)            94   Pad 6 (metallic)
+87   Lead 7 (fifths)           95   Pad 7 (halo)
+88   Lead 8 (bass+lead)        96   Pad 8 (sweep)
+ 
+   SYNTH EFFECTS                  ETHNIC
+ 97  FX 1 (rain)               105   Sitar
+ 98  FX 2 (soundtrack)         106   Banjo
+ 99  FX 3 (crystal)            107   Shamisen
+100  FX 4 (atmosphere)         108   Koto
+101  FX 5 (brightness)         109   Kalimba
+102  FX 6 (goblins)            110   Bagpipe
+103  FX 7 (echoes)             111   Fiddle
+104  FX 8 (sci-fi)             112   Shanai
+
+   PERCUSSIVE                     SOUND EFFECTS
+113  Tinkle Bell               121   Guitar Fret Noise
+114  Agogo                     122   Breath Noise
+115  Steel Drums               123   Seashore
+116  Woodblock                 124   Bird Tweet
+117  Taiko Drum                125   Telephone Ring
+118  Melodic Tom               126   Helicopter
+119  Synth Drum                127   Applause
+120  Reverse Cymbal            128   Gunshot
+</pre>
+</body>

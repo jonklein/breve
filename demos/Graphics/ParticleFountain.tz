@@ -1,0 +1,70 @@
+#
+# This demo is similar to the "Fountain" demo, but shows how to use "lightmaps".  
+# Lightmaps are like bitmaps, but have the effect of glowing light particles.
+#
+
+@use Mobile.
+@use Control.
+
+Controller Fountain.
+
+Control : Fountain {
+	+ variables: 
+		particles (list).
+		lightmap (object).
+
+	+ to init:
+		# because we dont require high accuracy in this demo, we can step up
+		# the iteration and integration steps in order to make the demo run
+		# a little bit faster.
+
+		self set-integration-step to .05.
+		self set-iteration-step to .1.
+		self set-background-color to (0, 0, 0). 
+
+		self set-blur-factor to 0.75.
+		self disable-text.
+		self enable-blur.
+
+		lightmap = (new Image load from "images/dirtylightmap.png").
+
+		particles = 600 new Particles.
+
+		self point-camera at (0, 9, 0) from (80.0, 2.1, 0.0).
+
+	+ to get-lightmap-image: 
+		return lightmap.
+
+	+ to iterate:
+		self pivot-camera x .001 y .001.
+		super iterate. 
+}
+
+Mobile : Particle (aka Particles) {
+	+ variables:
+		range (double).
+		shape (object).
+		
+	+ to iterate:
+		if (self get-location)::y < -16.0: self reset.
+
+	+ to init:
+		shape = ((new Shape) init-with-sphere radius random[2.0] + .1).
+		self set-shape to shape.
+
+		# texture #3 happens to be a built-in texture which nicely illustrates the 
+		# lightmap effect.
+
+		self set-lightmap-image to (controller get-lightmap-image).
+		range = 5.
+		self reset.
+
+	+ to set-range to n (double):
+		range = n.
+
+	+ to reset:
+		self set-color to random[(1, 1, 1)].
+		self move to (0, 0, 0).
+		self set-acceleration to random[(4, -15, 4)] - (2, 1, 2).
+		self set-velocity to random[(2*range, 20, 2*range)] + (-range, 4, -range).		
+}

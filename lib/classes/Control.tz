@@ -1,0 +1,1146 @@
+@use Abstract.
+@use MenuItem.
+@use Shape.
+@use Movie.
+@use Image.
+
+Abstract : Control (aka Controls) [version 1.9] {
+	% The Control object sets up and controls simulations.  Every simulation
+	% must have one Control subclass.  The user subclass of Control should 
+	% set up the simulation in the "init" method.
+	% <p>
+	% The Control class also acts as the main interaction between the user
+	% and the breve environment itself.  It provides access to elements of 
+	% the user interface, for example, so that the user can add menus and
+	% other interface features from inside simulations.
+	% <p>
+	% Because the breve engine is designed to run on a variety of systems,
+	% there are varying levels of support for some of these features.  In
+	% some cases, the features won't be supported at all on a system.  A
+	% background daemon written to use the breve engine, for example, will
+	% not place a dialog on the screen and wait for user input.
+
+	+ variables:
+		simTime (float).
+		simStep (float).
+		xRot (float).
+		yRot (float).
+
+		camTarget (vector).
+		camOffset (vector).
+		lightPosition (vector).
+
+		watchObject (object).
+
+		lightMenu (object).
+		lightFlag (int).
+
+		drawMenu (object).
+		smoothFlag (int).
+
+		backgroundColor (vector).
+		fogColor (vector).
+		lightAmbientColor, lightDiffuseColor (vector).
+
+		backgroundTexture (int).
+
+		fogIntensity (float).
+
+		loadedImages (list).
+
+		# we need to know when shadows and reflections are legal...
+
+		floorDefined (int).
+
+		shadowMenu (object).
+		shadowFlag (int).
+
+		shadowVolumeFlag (int).
+		
+		reflectMenu (object).
+		reflectFlag (int).
+
+		fogMenu (object).
+		fogFlag (int).
+
+		blurMenu (object).
+		blurFlag (int).
+		blurFactor (float).
+
+		selectedObject (object).
+
+		deltaOffset (vector).
+		deltaTarget (vector).
+
+		offsetting (int).
+		frozen (int).
+
+		drawEveryFrame (int).
+
+		genericShape (object).	
+		genericLinkShape (object).
+
+		movie (object).
+		movieMenu (object).
+
+	+ to end-simulation:
+		% Ends the simulation gracefully.
+
+		endSimulation().
+
+	+ to init:
+		% Initializes the Control object by setting up default values for 
+		% variables such as the size of the integration timestep.  Subclasses
+		% of Control may override these defaults in their own init functions.
+
+		floorDefined = 0.
+
+		self set-integration-step to .005.
+		self set-iteration-step to .05.
+		self enable-draw-every-frame.
+
+		backgroundTexture = -1.
+
+		self set-background-color to (.5, .7, 1.0).
+		self set-fog-color to (.8, .8, .8).
+
+		xRot = 0.0.
+		yRot = 0.0.
+
+		self move-light to (0, 0, 0).		
+		self point-camera at (0, 0, 0) from (0, 0, 30).
+
+		self set-background-scroll-rate x 0.001 y 0.0001.
+
+		lightMenu = (self add-menu named "Use Lighting" for-method "toggle-lighting").
+		drawMenu = (self add-menu named "Use Smooth Shading" for-method "toggle-smooth").
+		shadowMenu = (self add-menu named "Draw Shadows" for-method "toggle-shadows").
+		fogMenu = (self add-menu named "Draw Fog" for-method "toggle-fog").
+		reflectMenu = (self add-menu named "Draw Reflections" for-method "toggle-reflections").
+		blurMenu = (self add-menu named "Use Motion Blur" for-method "toggle-blur").
+
+		self add-menu-separator.
+		movieMenu = (self add-menu named "Record Movie to \"simulation.mpeg\"" for-method "toggle-recording-to-movie").
+		(self add-menu named "Save Snapshot to \"simulation.png\"" for-method "save-snapshot-to-file").
+
+		self enable-smooth-drawing.
+
+		# lighting is off by default, but we'll call the method anyway 
+		# to sync up the menus (shadow & reflect menus should be disabled).
+
+		self disable-lighting.
+
+		self add-menu-separator.
+
+		genericShape = (new Sphere init-with radius 1.0).
+		genericLinkShape = (new Cube init-with size (.1, 1, .1)).
+
+	- to toggle-recording-to-movie:
+		if movie: {
+			movieMenu uncheck.
+			movie close.
+			free movie.
+			return.
+		}
+
+		movie = new Movie.
+		movie record to "simulation.mpeg".
+		movieMenu check.
+
+	- to save-snapshot-to-file:
+		self save-snapshot to "simulation.png".
+
+	+ to save-snapshot to filename (string):
+		% Takes a PNG snapshot of the current simulation display and saves 
+		% it to a file named filename.  filename should end with ".png".
+
+		snapshot(filename).
+
+	- to get-generic-shape:
+		% Returns a "generic" shape for agents, a sphere of radius 1.0.
+
+		return genericShape.
+
+	- to get-generic-link-shape:
+		% Returns a "generic" shape for links, a cube with size (.1, 1, .1).
+
+		return genericLinkShape.
+
+  + section "Updating Neighbors"
+
+	+ to update-neighbors:
+		% The neighborhood for each object in the simulation is the set of 
+		% other objects within a specified radius--calling this method will
+		% update the neighborhood list for each object.  This method is 
+		% only useful in conjunction with methods in OBJECT(Real) which 
+		% set the neighborhood size and then later retrieve the neighbor
+		% list.
+
+		updateNeighbors().
+
+  + section "Controlling the Simulation Engine"
+
+	+ to pause:
+		% Pauses the simulation as though the user had done so.
+
+		pauseSimulation().
+
+	+ to sleep for-seconds s (float):
+		% Pauses execution for s seconds.  s does not have to be a whole 
+		% number.  Sleeping for a fraction of a second at each iteration
+		% (inside your controller's iterate method) can effectively slow 
+		% down a simulation which is too fast to observe.
+
+		sleep(s).
+
+	+ to set-integration-step to timeStep (float):
+		% Sets the integration stepsize to timeStep.  The integration stepsize
+		% determines how quickly the simulation runs: large values (perhaps
+		% as high as 1 second) mean that the simulation runs quickly at the 
+		% cost of accuracy, while low values mean more accuracy, but slower
+		% simulations.
+		% <p>
+		% The control object and its subclasses set the integration timeStep
+		% to reasonable values, so this method should only be invoked by
+		% expert users with a firm grasp of how they want their simulation
+		% to run.
+		% <p>
+		% Additionally, this value is only used as a suggestion--the 
+		% integrator itself may choose to adjust the integration stepsize
+		% according to the accuracy of previous timesteps.
+		
+		simStep = timeStep.
+
+	+ to set-iteration-step to timeStep (float):
+		% Sets the iteration stepsize to timeStep.  The iteration stepsize
+		% is simply the number of simulated seconds run between calling the 
+		% controller object's "iterate" method. <b>This value may not be
+		% smaller than the integration timestep</b>. 
+		% <p>
+		% The control object and its subclasses set the iteration stepsize 
+		% to reasonable values, so this method should only be invoked by
+		% expert users with a firm grasp of how they want their simulation
+		% to run.  Small values slow down the simulation considerably.
+		% <p>
+		% For physical simulations, the iteration stepsize should be 
+		% considerably larger than the integration stepsize.  The iteration
+		% stepsize, in this case, can be interpreted as the reaction time
+		% of the agents in the world to changes in their environment.
+
+		simTime = timeStep.
+
+		if simStep > simTime: simTime = simStep.
+
+  + section "Setting the Random Seed"
+
+	+ to set-random-seed to newSeed (int):
+		% Sets the random seed to newSeed.  Setting the random seed determines
+		% the way random numbers are chosen.  Two runs which use the same 
+		% random seed will yield the same exact random numbers.  Thus, by
+		% setting the random number seed manually, you can make simulations
+		% repeatable.
+
+		randomSeed(newSeed).
+
+	+ to set-random-seed-from-dev-random:
+		% Sets the random seed to a value read from /dev/random (if available).
+		% <P>
+		% By default, breve sets the random seed based on the current time. 
+		% This is generally sufficient for most simulations.  However, if 
+		% you are dealing with a setup in which multiple simulations might 
+		% be launched simultaneously (such as a cluster setup), then you may 
+		% have a situation in which the same random seed would be used for 
+		% multiple runs, and this will make you unhappy.  Using this method
+		% will restore happiness and harmony to your life.
+
+		randomSeedFromDevRandom().
+
+  + section "Creating a New Instance From a Classname String"
+
+	+ to make-new-instance of-class className (string):
+		% Returns a new instance of the class className.
+
+		return newInstanceForClassString(className).
+
+  + section "Getting Command-Line Arguments"
+
+	+ to get-argument-count:
+		% If this instance of breve was run from the command line, this method
+		% returns the number of arguments passed to the program.  <b>The first
+		% argument is always the name of the simulation file</b>.  Use this method
+		% in conjunction with METHOD(get-argument).
+
+		return getArgc().
+
+	+ to get-argument at-index theIndex (int):
+		% If this instance of breve was run from the command line, this method
+		% returns the argument at index theIndex.  The argument is always returned
+		% as a string, though this may naturally be converted to other types 
+		% depending on the context.  The arguments (like arrays and lists in <i>steve</i>)
+		% are zero based, meaning that the first element has index 0.  <b>The first 
+		% argument (the one at index 0) is always the name of the simulation 
+		% file</b>.  Use this method in conjunction with 
+		% METHOD(get-argument-count).  Make sure you check the number of arguments
+		% available before calling this method--requesting an out-of-bounds argument
+		% will cause a fatal error in the simulation.
+
+		return getArgv(theIndex).
+
+  + section "Selecting Objects"
+
+	- to get-drag-object:
+		if (selectedObject && ((selectedObject is a "Mobile") || (selectedObject is a "MultiBody"))): return selectedObject.
+		return 0.
+
+	+ to click on theObject (object):
+		% Called automatically when the user clicks on an theObject from 
+		% the graphical display window of the simulation.  The default
+		% behavior of this method is to select the object that was clicked
+		% and execute its "click" method, if it exists.  
+		% <p>
+		% If you do not wish to allow users to select objects in your 
+		% simulation, you should implement your own click method in your
+		% controller object.
+		% <p>
+		% If you wish to implement your own click method, but still want to
+		% maintain the default behavior of this method, make sure you 
+		% call "super click on theObject" from your method.
+		% <p>
+		% <b>theObject may be NULL</b>--an uninitialized object.  This means
+		% that a click occurred, but no object was selected, i.e., a deselection
+		% event.  You should test theObject before calling any of its methods.
+
+		if selectedObject == theObject: return.
+
+		if selectedObject : {
+			selectedObject hide-bounding-box.
+			selectedObject hide-axis.
+		}
+
+		selectedObject = theObject.
+
+		if selectedObject && (selectedObject is a "Link") && (selectedObject get-multibody):
+			selectedObject = (selectedObject get-multibody).
+
+		if !theObject || 
+			!(theObject can-respond to "show-bounding-box") || 
+			!(theObject can-respond to "show-axis") : return.
+
+		theObject show-bounding-box.
+		theObject show-axis.
+
+	- to catch-key-0x7F-down:
+		% This method is automatically called when the delete key is pressed 
+		% down to delete the selected object.  It deletes the selected instance.
+		% Do not call this method manually--it would work, but it would be 
+		% a bit roundabout. 
+
+		if selectedObject: selectedObject delete-instance.
+
+	+ to get-selection:
+		% Returns the "selected" object--the object which 
+		% has been clicked on in the simulation.
+
+		if (selectedObject is a "Link") && (selectedObject get-multibody):
+			return (selectedObject get-multibody).
+
+		return selectedObject.
+
+  + section "Background Appearance Options"
+
+	+ to set-background-scroll-rate x xValue (float) y yValue (float):
+		% Sets the rate of the background image scrolling.  Purely cosmetic.
+
+		setBackgroundScroll(xValue, yValue).
+
+	+ to set-background-color to newColor (vector):
+		% Sets the background color of the rendered world to newColor.
+
+		backgroundColor = newColor.
+		setBackgroundColor(newColor).
+
+	+ to set-background-texture-image to newTextureImage (object):
+		% Sets the background color of the rendered world to newTexture.
+		% newTexture must be a texture returned by the method 
+		% METHOD(load-image) or 0 for the default texture.  Setting
+		% the texture to -1 will turn off background texturing.
+
+		backgroundTexture = (newTextureImage get-texture-number).
+		setBackgroundTexture(backgroundTexture).
+
+	- to set-background-texture to newTexture (int):
+		backgroundTexture = newTexture + 1.
+		setBackgroundTexture(newTexture + 1).
+
+  + section "Camera & Lighting Options"
+
+	+ to disable-camera:
+		# cameraSetEnabled().
+	
+	+ to enable-camera:
+		# cameraSetEnabled().
+
+	+ to watch item theObject (object):
+		% Points the camera at the OBJECT(Mobile) object theObject.  If 
+		% theObject is passed in as 0, then the camera will stop watching
+		% a previously watched object.
+
+		watchObject = theObject.
+
+	+ to aim-camera at location (vector):
+		% To be replaced by METHOD(set-camera-target), which has a better
+		% name.
+
+		self set-camera-target to location.
+
+	+ to set-camera-target to location (vector):
+		% Aims the camera at location.  The offset of the camera (the offset
+		% from the existing target) stays the same.
+
+		cameraSetTarget(location).
+
+	+ to offset-camera by amount (vector):
+		% To be replaced by METHOD(set-camera-offset), which has a 
+		% better name.
+
+		self set-camera-offset to amount.
+
+	+ to set-camera-offset to offset (vector):
+		% Offsets the camera from the target by amount.  The target of
+		% the camera remains the same.
+
+		cameraSetOffset(offset).
+
+	+ to get-camera-offset:
+		% Returns the current offset from of the camera from its target.  
+		% Note that the camera offset can be changed manually by the user, 
+		% so it may be wise to use this function in conjunction with camera 
+		% movements to ensure consistency.
+
+		return cameraGetOffset().
+
+	+ to get-camera-target:
+		% Returns the current target of the camera.  Note that the camera
+		% target can be changed manually by the user, so it may be wise 
+		% to use this function in conjunction with camera movements to 
+		% ensure consistency.
+
+		return cameraGetTarget().
+
+	+ to bullet-pan-camera-offset by amount (vector) steps stepCount (int):
+		% Sets the camera in motion to smoothly change the camera offset
+		% over stepCount iteration steps, with the physical simulation
+		% frozen in the meantime.
+
+		frozen = 1.
+
+		self pan-camera-offset by amount steps stepCount.
+
+	+ to pan-camera-target to newTarget (vector) steps stepCount (int):
+		% Sets the camera in motion to smoothly change the camera target
+		% over stepCount iteration steps.
+
+		if stepCount < 2: {
+			self set-camera-target to newTarget.
+			return.
+		}
+
+		deltaTarget = (newTarget - (self get-camera-target)) / stepCount.
+		offsetting = stepCount + 1.
+
+	+ to pan-camera-offset by amount (vector) steps stepCount (int):
+		% Sets the camera in motion to smoothly change the camera offset
+		% over stepCount iteration steps.
+
+		if stepCount < 2: {
+			self offset-camera by amount.
+			return.
+		}
+
+		deltaOffset = (amount - (self get-camera-offset)) / stepCount.
+		offsetting = stepCount + 1.
+
+	+ to point-camera at location (vector) from offset (vector):
+		% Points the camera at vector location and positions it at
+		% vector offset (relative to location).  Same as calling 
+		% aim-camera and offset-camera.
+
+		camTarget = location.
+		camOffset = offset.
+ 
+		self set-camera-target to location.
+		self set-camera-offset to offset.
+
+	+ to pivot-camera x vx (float) y vy (float):
+		% Rotates the camera (from it's current position) on the x-axis by vx and on the y-axis by vy.
+
+		xRot += vx.
+		yRot += vy.
+		cameraSetRotation(xRot, yRot).
+
+	+ to set-camera-rotation x vx (float) y vy (float):
+		% Sets the camera rotation on the x-axis to vx and the y-axis to vy.  
+		% This method sets the rotation without regard for the current rotation.
+		% If you want to offset the camera rotation from the current position, 
+		% use the method METHOD(pivot-camera) instead.
+
+		xRot = vx.
+		yRot = vy.
+
+		cameraSetRotation(xRot, yRot).
+
+	+ to zoom-camera to theDistance (float):
+		% Zooms the camera to theDistance away from the current target--
+		% whether the target is a vector or object.
+
+		cameraSetZoom(theDistance).
+
+	+ to move-light to theLocation (vector):
+		% Moves the source light to theLocation.  The default position is 
+		% (0, 0, 0) which is the origin of the world.  
+
+		lightPosition = theLocation.
+		setLightPosition(theLocation).
+
+	+ to get-time:
+		% Returns the simulation time of the world.
+
+		return getTime().
+
+	+ to iterate:
+		result (float).
+
+		if watchObject: self set-camera-target to (watchObject get-location).
+
+		# we might be doing a "bullet-time" pan
+
+		if !frozen: result = worldStep(simTime, simStep).
+
+		if result == -1: die "An error occurred during world simulation.".
+
+		# if we're in the middle of a pan, continue
+
+		if offsetting: {
+			self set-camera-offset to ((self get-camera-offset) + deltaOffset).
+			self set-camera-target to ((self get-camera-target) + deltaTarget).
+			offsetting--.
+
+			# if we are done the pan, let the simulation roll again.
+ 
+			if offsetting == 0: frozen = 0.
+		}		
+
+  + section "Rendering Options"
+
+	- to set-floor-defined:
+		if lightFlag: {
+			shadowMenu enable.
+			reflectMenu enable.
+		}
+
+		floorDefined = 1.
+
+	+ to enable-draw-every-frame:
+		% If the method METHOD(disable-draw-every-frame) has been called previously,	
+		% this method will resort to the default behavior, namely that the rendering
+		% engine will try to render an image for each and every iteration of the breve
+		% engine.
+
+		drawEveryFrame = 1.
+		setDrawEveryFrame(1).
+
+	+ to disable-draw-every-frame:
+		% Allows the rendering engine to drop frames if the simulation is moving 
+		% faster than the display.  This can lead to faster simulations with choppier
+		% displays.  Not all breve development environments support this option.  The 
+		% Mac OS X application does, as do all threaded command-line breve programs.
+		% <p>
+		% There is rarely any benefit from using this method, except in instances where
+		% the drawing of a scene is complex, and the computation is simple.  The included
+		% DLA.tz demo is an example of one such simulation which benefits immensely from
+		% this feature.
+
+		drawEveryFrame = 0.
+		setDrawEveryFrame(0).
+
+	+ to set-z-clip to theDistance (int): 
+		% Sets the Z clipping plan to theDistance.  The Z clipping plan 
+		% determines how far the camera can see.  A short Z clipping distance
+		% means that objects far away will not be drawn.  
+		% <p>
+		% The default value is 200.0 and this works well for most simulations,
+		% so there is often no need to use this method.
+		% <p>
+		% Using a short Z clipping distance improves drawing quality, avoids 
+		% unnecessary rendering and can speed up drawing during the simulation.  
+		% However, it may also cause objects you would like to observe in the 
+		% simulation to not be drawn because they are too far away.
+
+		setZClip(theDistance).
+
+  + section "Special Effects & Drawing Options"
+
+	+ to enable-outline:
+		% Enables outline drawing.  Outline drawing is a wireframe black and white
+		% draw style.  Reflections and textures are ignored when outlining is 
+		% enabled.  Outlining is useful for producing diagram-like images.  It 
+		% looks cool.
+
+		setDrawOutline(1).
+
+	+ to disable-outline:
+		% Disables outline drawing.
+
+		setDrawOutline(0).
+
+	+ to toggle-lighting:
+		% toggle lighting for the main camera
+
+		if lightFlag == 1: self disable-lighting.
+		else self enable-lighting.
+
+	+ to enable-lighting:
+		% enable lighting for the main camera
+
+		lightFlag = 1.
+		setDrawLights(lightFlag).
+		lightMenu check.
+
+		if floorDefined: {
+			shadowMenu enable.
+			reflectMenu enable.
+		}
+		 
+	+ to disable-lighting:
+		% disable lighting for the main camera
+
+		lightFlag = 0.
+		setDrawLights(lightFlag).
+		lightMenu uncheck.
+
+		shadowMenu disable.
+		reflectMenu disable.
+
+	+ to toggle-smooth:
+		% Toggle smooth drawing for the main camera.  See METHOD(enable-smooth-drawing) and 
+		% METHOD(disable-smooth-drawing) for more information.
+
+		if smoothFlag == 1: self disable-smooth-drawing.
+		else self enable-smooth-drawing.
+
+	+ to enable-smooth-drawing:
+		% Enable smooth drawing for the main camera.  Smooth drawing enables 
+		% a smoother blending of colors, textures and lighting.  This feature
+		% is especially noticeable when dealing with spheres or large objects.
+		% <p>
+		% It is strongly recommended that smooth drawing be enabled whenever 
+		% lighting is enabled (see METHOD(enable-lighting)).  Otherwise,
+		% major artifacts may be visible, especially on larger polygons.
+		% <p>
+		% The disadvantage of smooth drawing is a potential performance hit.
+		% The degree of this performance hit depends on the number of polygons
+		% in the scene.  If speed is an issue, it is often best to disable 
+		% both lighting and smooth drawing.
+
+		smoothFlag = 1.
+		setDrawSmooth(smoothFlag).
+		drawMenu check.
+		 
+	+ to disable-smooth-drawing:
+		% Disable smooth drawing for the main camera.  See METHOD(enable-smooth-drawing)
+		% for more information.
+
+		smoothFlag = 0.
+		setDrawSmooth(smoothFlag).
+		drawMenu uncheck.
+
+	+ to toggle-shadows:
+		% Toggle shadows for the main camera.  See METHOD(enable-shadows) and 
+		% METHOD(disable-shadows) for more information on shadows.  
+
+		if shadowFlag == 1: self disable-shadows.
+		else self enable-shadows.
+
+	+ to enable-shadows:
+		% Enable shadows for the main camera.  Shadows use the current 
+		% position of the light in order to render shadows onto a flat 
+		% plane in the world.  Because of the complexity of drawing shadows, 
+		% they can only be drawn onto a single plane of a OBJECT(Stationary) 
+		% object--see the method catch-shadows of OBJECT(Stationary) for more 
+		% information.  The shadow-catching object must already be defined in
+		% order for this method to take effect.
+		% <P>
+		% For an improved shadowing algorithm, see METHOD(enable-shadow-volumes).
+
+		if !floorDefined: return.
+
+		shadowFlag = 1.
+		setDrawShadow(shadowFlag).
+		shadowMenu check.
+
+	+ to disable-shadows:
+		% Disable "flat" shadows for the main camera.  See 
+		% METHOD(enable-shadows) for more information on shadows.
+
+		shadowFlag = 0.
+		setDrawShadow(shadowFlag).
+		shadowMenu uncheck.
+
+	+ to enable-shadow-volumes:
+		% Enables shadows drawn using a "shadow volume" algorithm.  This
+		% is an alternative to the shadows rendered using METHOD(enable-shadows).
+		% <p>
+		% Shadow volumes allow all objects in the simulation to shadow one-another,
+		% as opposed to having objects only shadow a single plane (as is the case
+		% with the METHOD(enable-shadows) algorithm).  Shadow volumes are in fact
+		% superior in every way but one: shadow volumes will not generate accurate
+		% shadows of bitmapped objects the way the original algorithm will.
+		% If you want high-quality bitmap shadows in your simulation, use 
+		% METHOD(enable-shadows), otherwise, shadow volumes are likely the better
+		% choice.
+
+		shadowVolumeFlag = 1.
+		setDrawShadowVolumes(shadowVolumeFlag).
+
+	+ to disable-shadow-volumes:
+		% Disable shadow volumes for the main camera.  See 
+		% METHOD(enable-shadow-volumes) for more information on shadows.
+
+		shadowVolumeFlag = 0.
+		setDrawShadowVolumes(shadowFlag).
+
+	+ to toggle-reflections:
+		% Toggle reflections for the main camera.  See METHOD(enable-reflections) for 
+		% more information on reflections.
+
+		if !floorDefined: return.
+
+		shadowFlag = 1.
+
+		if reflectFlag == 1: self disable-reflections.
+		else self enable-reflections.
+	
+	+ to enable-reflections:
+		% Enable reflections for the main camera.  Reflections are used to draw a mirror
+		% image of objects in the world onto a single plane.  Because of 
+		% the complexity of drawing reflections, they can only be drawn onto a single plane
+		% of a OBJECT(Stationary) object--see the method catch-shadows of OBJECT(Stationary)
+		% for more information.  The reflection-catching object must already be defined in
+		% order for this method to take effect.
+
+		if !floorDefined: return.
+
+		reflectFlag = 1.
+		setDrawReflection(reflectFlag).
+		reflectMenu check.
+
+	+ to disable-reflections:
+		% Disable reflections for the main camera.  See METHOD(enable-reflections for 
+		% more information on reflections.
+
+		reflectFlag = 0.
+		setDrawReflection(reflectFlag).
+		reflectMenu uncheck.
+
+	+ to disable-text:
+		% Disable the timestamp and camera position texts (which appear when 
+		% changing the camera angle or position).  The text is on by default.  
+		% The text can be re-enabled using METHOD(enable-text).
+
+		setDrawText(0).
+
+	+ to enable-text:
+		% enables the timestamp and camera position texts (which appear when changing 
+		% the camera angle or position).  This is the default setting.  The text can 
+		% be disabled using METHOD(disable-text).
+
+		setDrawText(1).
+
+	+ to toggle-blur:
+		% Toggle motion blur for the main camera.  See METHOD(enable-blur) for 
+		% more information on reflections.
+
+		if blurFlag == 1: self disable-blur.
+		else self enable-blur.
+
+	+ to enable-blur:
+		% Enables blur.  Blurring simply draws a frame without 
+		% totally erasing the previous frame. 
+
+		blurFlag = 1.
+		setBlur(1).
+		blurMenu check.
+
+	+ to disable-blur:
+		% Disables blurring.  See METHOD(enable-blur) for more 
+		% information.
+
+		blurFlag = 0.
+		setBlur(0).
+		blurMenu uncheck.
+
+	+ to set-blur-factor to factor (float):
+		% Sets the blur level to factor.  Factor should be a value 
+		% between 1.0, which corresponds to the highest blur level, 
+		% and 0.0, which corresponds to the lowest blur level.  
+		% <p>Blur must first be enabled using the method 
+		% METHOD(enable-blur).  Note % that a blur level of 0.0 is 
+		% still a minor blur--to disable % blur completely, use the 
+		% method METHOD(disable-blur).
+
+		blurFactor = factor.
+		setBlurFactor(factor).
+
+	+ to set-display-text to theString (string) at-x xLoc (float) at-y yLoc (float):
+		% Sets a text string in the simulation display.  xLoc and yLoc 
+		% represent the location of the text.  The coordinate system 
+		% used goes from (-1, -1) to (1, 1) with (-1, -1) at the lower 
+		% left hand corner, (0, 0) in the center of the window and 
+		% (1, 1) in the top right hand corner.
+		% <p>
+		% Up to 8 messages can be placed on the display using 
+		% METHOD(set-display-message), but set-display-text will always
+		% use message #0.  If you wish to use more than one message,
+		% or if you wish to specify the color of the text, use the 
+		% method METHOD(set-display-message).
+
+		cameraSetText(theString, 0, xLoc, yLoc, (0, 0, 0)).
+
+	+ to set-display-text-scale to scale (double):
+		% Sets the scaling factor for text in the display window.  
+		% See METHOD(set-display-text) and METHOD(set-display-message) 
+		% for more information on adding text messages to the display 
+		% window.
+
+		cameraSetTextScale(scale).
+
+	+ to set-display-message to theString (string) with-number messageNumber (int) at-x xLoc (float) at-y yLoc (float) with-color textColor (vector):
+		% Sets a text string in the simulation display.  xLoc and yLoc 
+		% represent the location of the text.  The coordinate system used
+		% goes from (-1, -1) to (1, 1) with (-1, -1) at the lower left hand 
+		% corner, (0, 0) in the center of the window and (1, 1) in 
+		% the top right hand corner.  The color of the text is set
+		% to textColor.
+		% <p>
+		% Up to 8 messages can be displayed in the simulation window.  
+		% messageNumber specifies which message "slot" to modify.  
+		% Subsequent calls to this method with the same slot number
+		% erase previous entries.
+
+		cameraSetText(theString, messageNumber, xLoc, yLoc, textColor).
+
+	+ to add-menu named menuName (string) for-method theMethod (string):
+		% Adds a menu named menuName to the application which will result
+		% in a call to theMethod for the calling instance.
+		% <p>
+		% If the calling instance is the Controller object, then the menu will
+		% become the "main" simulation menu.  Otherwise, the menu will become
+		% a contextual menu associated with the specific object in the simulation.
+		% <p>
+		% Note that unlike the METHOD(handle-collision) which sets the collision
+		% handler for the whole type (class, that is), this method affects only
+		% the instance for which it is called, meaning that each instance of a
+		% certain class may have a different menu.
+
+		return ((new MenuItem) create-menu named menuName for-object self for-method theMethod).
+
+	+ to add-menu-separator:
+		% Adds a separator menu item--really just an empty menu item.
+
+		return ((new MenuItem) create-menu named "" for-object self for-method "").
+
+	+ to show-dialog with-title title (string) with-message message (string) with-yes-button yesString (string) with-no-button noString (string):
+		% Shows a dialog box (if supported by the current breve environment)
+		% and waits for the user to click on one of the buttons.  
+		% <p>
+		% If the "yes button" is clicked on, the method returns 1--if the 
+		% "no button" is clicked, or if the feature is not supported, 0
+		% is returned.
+
+		return dialogBox(title, message, yesString, noString).
+
+	+ to beep:
+		% Plays the system beep sound, if supported by the implementation.
+
+		playSound().
+
+	+ to load-image from file (string):
+		% Loads an image from a file, returning an OBJECT(Image) object.
+		% <P>
+		% This method is provided for backwards compatability only.
+		% The p
+		% <p>
+
+		image (object).
+
+		image = new Image.
+
+		if !(image load from file): {
+			print "error loading texture $file".
+		} else {
+			loadedImages{ loadedImages } = file.
+		}
+
+		return (image get-texture-number) - 1.
+
+	+ to load-image-without-alpha from file (string):
+		return (self load-image from file).
+
+	+ to execute command systemCommand (string):
+		% Executes the command systemCommand using /bin/sh.  Returns the
+		% output of command.
+
+		return system(systemCommand).
+
+	+ to set-light-color to newColor (vector):
+		% Sets the color of the light to newColor.  Only has an effect on the
+		% rendering when lighting has been turned on using 
+		% METHOD(enable-lighting).
+		% <p>
+		% This method sets both the ambient and diffuse colors, which can also
+		% be set individually with METHOD(set-light-ambient-color) and 
+		% METHOD(set-light-diffuse-color).
+
+		self set-light-ambient-color to newColor.
+		self set-light-diffuse-color to newColor.
+	
+	+ to set-light-ambient-color to newColor (vector):
+		% Sets the ambient, or background, color of the light to newColor.  
+		% Only has an effect on the rendering when lighting has been turned 
+		% on using METHOD(enable-lighting).
+		
+		lightAmbientColor = newColor.
+		setLightAmbientColor(newColor).
+
+	+ to set-light-diffuse-color to newColor (vector):
+		% Sets the diffuse, or foreground, color of the light to newColor.  
+		% Only has an effect on the rendering when lighting has been turned 
+		% on using METHOD(enable-lighting).
+		% <p>
+		% The diffuse color is the color coming directly from the light,
+		% as opposed to the "ambient" light that is also generated.
+
+		lightDiffuseColor = newColor.
+		setLightDiffuseColor(newColor).
+
+	+ to set-interface-item with-id tag (int) to-string newValue (string):
+		% This method will set the interface item tag to newValue.  This
+		% is for simulations which have an OS X nib file associated with
+		% them.
+
+		return setInterfaceString(newValue, tag).
+
+	+ to set-fog-limits with-start fogStart (float) with-end fogEnd (float):
+		% The calculation which calculates fog needs to know where the fog 
+		% starts (the point at which the fog appears) and where the fog ends
+		% (the point at which the fog has reached it's highest intensity).
+		% <p>
+		% This method sets the start value to fogStart and the end value to 
+		% fogEnd.  fogStart must be greater than or equal to zero.  fogEnd
+		% must be greater than fogStart.
+		% <p>
+		% Fog must first be turned on with METHOD(enable-lighting) before fog 
+		% is displayed.
+
+		setFogDistances(fogStart, fogEnd).
+
+	+ to set-fog-intensity to newIntensity (float):
+		% Sets the fog intensity to newIntensity.  Fog must first be turned on with
+		% METHOD(enable-lighting) before fog is displayed.
+
+		fogIntensity = newIntensity.
+		setFogIntensity(newIntensity).
+
+	+ to set-fog-color to newColor (vector):
+		% Sets the fog color to newColor.  Fog must first be turned on with
+		% METHOD(enable-lighting) before fog is displayed.
+
+		fogColor = newColor.
+		setFogColor(newColor).
+
+	+ to enable-fog:
+		% Enables fog for the main camera.  This adds the visual effect of fog to the
+		% world.  Fog parameters can be set using methods METHOD(set-fog-color), 
+		% METHOD(set-fog-intensity) and METHOD(set-fog-limits).
+		% <p>
+		% Fog and lightmap effects don't mix.
+
+		fogFlag = 1.
+		setDrawFog(1).
+		fogMenu check.
+
+	+ to disable-fog:
+		% Disables fog for the main camera.  See METHOD(enable-fog) for more information.
+		fogFlag = 0.
+		setDrawFog(0).
+		fogMenu uncheck.
+
+	+ to toggle-fog:
+		% Toggle fog for the main camera
+
+		if fogFlag == 1: self disable-fog.
+		else self enable-fog.
+
+  + section "Manipulating and Using Color"
+
+	+ to unique-color for-number n (int):
+		% Returns a unique color for each different value of n up 
+		% to 198.  These colors are allocated according to an 
+		% algorithm which attempts to give distinguishable colors,
+		% though this is subjective and not always possible.
+
+		return uniqueColor(n).
+
+	+ to get-hsv-color for-rgb-color rgbColor (vector):
+		% All colors in breve expect colors in the RGB format--a vector where 
+		% the 3 elements represent red, green and blue intensity on a scale 
+		% from 0.0 to 1.0.  
+		% <p>
+		% This method returns the HSV color vector for a given vector rgbColor
+		% in RGB color format.  
+
+		return RGBtoHSV(rgbColor).
+
+	+ to get-rgb-color for-hsv-color hsvColor (vector):
+		% All colors in breve expect colors in the RGB format--a vector where 
+		% the 3 elements represent red, green and blue intensity on a scale 
+		% from 0.0 to 1.0.  
+		% <p>
+		% This method returns the RGB color vector for a given vector hsvColor
+		% in HSV color format.  
+
+		return HSVtoRGB(hsvColor).
+
+  + section "Archiving & Dearchiving"
+
+	+ to archive:
+		camTarget = cameraGetTarget().
+		camOffset = cameraGetOffset().
+		return (super archive).
+
+	+ to dearchive:
+		image (string).
+		images (list).
+
+		foreach image in loadedImages: images{ images } = image.
+		foreach image in images: (self load-image from image).
+
+		self move-light to lightPosition.
+		self set-background-texture to backgroundTexture.
+		self set-background-color to backgroundColor.
+		self set-fog-color to fogColor.
+		self point-camera at camTarget from camOffset.
+		self set-blur-factor to blurFactor.
+
+		if lightFlag == 1: self enable-lighting.
+		if shadowFlag == 1: self enable-shadows.
+		if shadowVolumeFlag == 1: self enable-shadow-volumes.
+		if fogFlag == 1: self enable-fog.
+		if reflectFlag == 1: self enable-reflections.
+		if smoothFlag == 1: self enable-smooth-drawing.
+		if blurFlag == 1: self enable-blur.
+
+		if drawEveryFrame: (self enable-draw-every-frame).
+		else (self disable-draw-every-frame).
+
+		return 1.
+
+ 	+ to save-as-xml file filename (string):
+		% Writes the entire state of the world to an XML file, filename.  
+		% filename should have one of the following extensions: .xml, 
+		% .brevexml, .tzxml.
+		% <p>
+		% After saving the state of the world as an XML file, you can later
+		% start a new run of the same simulation from the saved state.  You
+		% will still need the original steve code which generated the file
+		% in order to restart the simulation.
+
+		writeXMLEngine(filename).
+
+	+ to dearchive-xml file filename (string):
+		% Asks the controller to dearchive an object from an XML file.  The
+		% XML file must have been created using 
+		% OBJECTMETHOD(Object:archive-as-xml).
+
+		return dearchiveXMLObject(filename).
+
+  + section "Detecting Light Exposure"
+
+	+ to enable-light-exposure-detection:
+		% <B>Experimental</B>
+		% <P>
+		% Light exposure detection will attempt to tell you how much "sunlight" 
+		% is reaching each object in your simulation.  You can set the location
+		% of the light source with METHOD(set-light-exposure-source).  Then, 
+		% use the method get-light-exposure (in OBJECT(Stationary), OBJECT(Mobile),
+		% and OBJECT(Link)) in order to find out how much light was detected for
+		% individual objects.
+		% <P>
+		% The direction of the sunlight is hardcoded towards the world point 
+		% (0, 0, 0), and only spreads out to fill an angle of 90 degrees.
+		% These limitations may be removed in the future if needed.
+
+		setDetectLightExposure(1).
+
+	+ to disable-light-exposure-detection:
+		% Disables light exposure detection.  See METHOD(enable-light-exposure-detection).
+
+		setDetectLightExposure(0).
+
+	+ to set-light-exposure-source to source (vector):
+		% Changes the light source for calculating exposure.  See 
+		% METHOD(enable-light-exposure-detection).
+
+		setLightExposureSource(source).
+
+  + section "Debugging & Performance"
+
+	+ to enable-freed-instance-protection:
+		% Freed instance protection means that the breve engine retains 
+		% instances which have been freed in order to make sure that they
+		% are not being incorrectly accessed.  This has a small memory
+		% cost associated with each freed object.
+		% <p>
+		% Freed instance protection is enabled by default, so you'll only
+		% need to call this method if it has been disabled using 
+		% METHOD(disable-freed-instance-protection).
+
+		setFreedInstanceProtection(1).
+
+	+ to disable-freed-instance-protection:
+		% Disabling freed instance protection means that the breve engine will
+		% not attempt to keep track of freed objects, and will yield better
+		% memory performance when large numbers of objects are being created
+		% and destroyed.
+		% <p>
+		% The downside is that improper access of freed instances may cause 
+		% crashes or unexpected behavior when freed instance protection is 
+		% disabled.  Simulations should thus always use freed instance 
+		% protection during development and testing, and the feature should
+		% only be disabled when the developer is confident that no freed
+		% instance bugs exist.
+		% <p>
+		% Freed instance protection may be reenabled with 
+		% METHOD(enable-freed-instance-protection), but only instances
+		% freed while instance protection is enabled will be protected.
+
+		setFreedInstanceProtection(0).
+
+	+ to stacktrace:
+		% Prints out a breve stacktrace--all of the methods which have been
+		% called to get to this point in the simulation.  This method is 
+		% useful for debugging.
+
+		stacktrace().
+
+	+ to get-interface-version:
+		% Returns a string identifying the program using the breve engine.  
+		% This string is in the format "name/version".
+
+		return getInterfaceVersion().
+
+	+ to report-object-allocation:
+		% Prints data about current object allocation to the log.
+
+		objectAllocationReport().
+}

@@ -1,0 +1,309 @@
+@use PhysicalControl.
+@use Shape.
+@use Stationary.
+@use Link.
+@use MultiBody.
+
+@define BRAITENBERG_MAX_VELOCITY 15.
+
+PhysicalControl : BraitenbergControl {
+	% This class is used for building simple Braitenberg vehicle 
+	% simulations.  Subclass BraitenbergControl and use the init
+	% method to create OBJECT(BraitenbergLight) and 
+	% OBJECT(BraitenbergVehicle) objects.
+	% <p>
+	% <b>NOTE: this class is included as part of the file "Braitenberg.tz".</b>
+
+	+ variables:
+		floor (object).
+		floorShape (object).
+		cloudTexture (int).
+
+	+ to init:
+		self enable-lighting.
+                self enable-smooth-drawing.
+
+		floorShape = new Shape.
+		floorShape init-with-cube size (200, .2, 200).
+
+		floor = new Stationary.
+		floor register with-shape floorShape at-location (0, 0, 0).
+		floor catch-shadows.
+
+		self point-camera at (0, 0, 0) from (3, 3, 24).
+
+		self enable-shadows.
+		self enable-reflections.
+
+		cloudTexture = (self load-image from "images/clouds.png"). 
+		self set-background-color to (.4, .6, .9).
+		self set-background-texture to cloudTexture.
+}
+
+MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
+	% This object is used in conjunction with OBJECT(BraitenbergControl) to
+	% create a simple Braitenberg vehicle.
+	% <p>
+	% <b>NOTE: this class is included as part of the file "Braitenberg.tz".</b>
+
+	+ variables:
+		bodyShape (object).
+		wheelShape (object).
+		sensorShape (object).
+		bodyLink (object).
+
+		wheels (list).
+		sensors (list).
+
+	+ to init:
+		bodyShape = new Shape.
+		bodyShape init-with-cube size (4.0, .75, 3.0).	
+
+		wheelShape = new Shape.
+		wheelShape init-with-polygon-disk radius .6 sides 40 height .1.
+
+		sensorShape = new Shape.
+		sensorShape init-with-polygon-cone radius .2 sides 10 height .5.
+
+		bodyLink = new Link.
+		bodyLink set-shape to bodyShape.	
+		bodyLink set-mu to -1.0.
+		bodyLink set-eT to .8.
+
+		self set-root to bodyLink.
+
+		self move to (0, 1.0, 0).
+		self set-texture-scale to 1.5.
+
+	+ to add-wheel at location (vector):
+		% Adds a wheel at location on the vehicle.  This method returns
+		% the wheel which is created, a OBJECT(BraitenbergWheel).  You'll
+		% use the returned object to connect it to the vehicle's sensors.
+
+		wheel, joint (object).
+
+		wheel = new BraitenbergWheel.
+		wheel set-shape to wheelShape.
+
+		joint = new RevoluteJoint.
+
+		joint set-relative-rotation around-axis (1, 0, 0) by 1.57.
+		joint link parent bodyLink to-child wheel with-normal (0, 0, 1)
+					with-parent-point location with-child-point (0, 0, 0).
+
+		wheel set-eT to .8.
+		wheel set-texture to 0.
+		wheel set-joint to joint.
+		joint set-strength-limit to (joint get-strength-hard-limit).
+		wheel set-color to (.3, .2, .2).
+		wheel set-mu to 100000.
+
+		self add-dependency on joint.
+		self add-dependency on wheel.
+
+		push wheel onto wheels.
+
+		return wheel.
+
+	+ to add-sensor at location (vector):
+		% Adds a sensor at location on the vehicle.  This method returns
+		% the sensor which is created, a OBJECT(BraitenbergSensor).  You'll
+		% use the returned object to connect it to the vehicle's wheels.
+
+		sensor, joint (object).
+
+		sensor = new BraitenbergSensor.
+		sensor set-shape to sensorShape.
+
+		joint = new RevoluteJoint.
+
+		joint set-relative-rotation around-axis (0, 0, 1) by -1.57.
+		joint link parent bodyLink to-child sensor with-normal (1, 0, 0)
+					with-parent-point location with-child-point (0, 0, 0).
+
+		joint set-double-spring with-strength 300 with-max 0.01 with-min -0.01.
+
+		self add-dependency on joint.
+		self add-dependency on sensor.
+
+		sensor set-color to (0, 0, 0).
+
+		push sensor onto sensors.
+
+		return sensor.
+
+	+ to destroy:
+		free bodyLink.
+		free wheels.
+		free sensors.
+
+		free sensorShape.
+		free wheelShape.
+		free bodyShape.
+
+		super destroy.
+}
+
+Mobile : BraitenbergLight (aka BraitenbergLights) {
+	% A BraitenbergLight is used in conjunction with OBJECT(BraitenbergControl)
+	% and OBJECT(BraitenbergVehicle).  It is what the OBJECT(BraitenbergSensor)
+	% objects on the BraitenbergVehicle detect.
+	% <p>
+	% There are no special behaviors associated with the lights--they're 
+	% basically just plain Mobile objects.
+	% <p>
+	% <b>NOTE: this class is included as part of the file "Braitenberg.tz".</b>
+
+	+ to init:
+		self set-shape to (new Shape init-with-sphere radius .3).
+		self set-color to (1, 0, 0).
+}
+
+Link : BraitenbergWheel (aka BraitenbergWheels) {
+	% A BraitenbergWheel is used in conjunction with OBJECT(BraitenbergVehicle)
+	% to build Braitenberg vehicles.  This class is typically not instantiated
+	% manually, since OBJECT(BraitenbergVehicle) creates one for you when you
+	% add a wheel to the vehicle.
+	% <p>
+	% <b>NOTE: this class is included as part of the file "Braitenberg.tz".</b>
+
+	+ variables:
+		joint (object).
+		naturalVelocity (float).
+		newVelocity, oldVelocity (float).
+
+	+ to init:
+		naturalVelocity = 0.
+		newVelocity = 0.
+
+	- to set-joint to j (object):
+		% Used internally.
+
+		joint = j.
+
+	+ to set-natural-velocity to n (float):
+		% Sets the "natural" velocity of this wheel.  The natural velocity
+		% is the speed at which the wheel turns in the absence of sensor
+		% input.  
+
+		naturalVelocity = n.
+
+	- to activate with-input n (float):
+		% Used internally.
+
+		newVelocity += n.
+
+	+ to post-iterate:
+		if newVelocity > BRAITENBERG_MAX_VELOCITY: newVelocity = BRAITENBERG_MAX_VELOCITY.
+
+		# this oldVelocity stuff is used to limit the deceleration so that 
+
+		if newVelocity == 0: {
+			joint set-joint-velocity to oldVelocity.
+			oldVelocity *= .95.
+		} else {
+			joint set-joint-velocity to newVelocity.
+			oldVelocity = newVelocity.
+		}
+
+		newVelocity = naturalVelocity.
+}
+
+Link : BraitenbergSensor (aka BraitenbergSensors) {
+	% A BraitenbergSensor is used in conjunction with OBJECT(BraitenbergVehicle)
+	% to build Braitenberg vehicles.  This class is typically not instantiated
+	% manually, since OBJECT(BraitenbergVehicle) creates one for you when you
+	% add a sensor to the vehicle.
+	% <p>
+	% <b>NOTE: this class is included as part of the file "Braitenberg.tz".</b>
+
+	+ variables:
+		wheels (list).
+		bias (float).
+		direction (vector).
+		sensorAngle (float).
+		activationObject (object).
+		activationMethod (string).
+
+	+ to init:
+		bias = 1.0.
+		direction = (0, 1, 0).
+		sensorAngle = 1.6.
+
+  + section "Linking the Sensor to a Wheel"
+
+	+ to link to w (object):
+		% Associates this sensor with wheel w.
+
+		push w onto wheels.
+
+  + section "Configuring the Sensor Values"
+
+	+ to set-bias to d (float):
+		% Sets the "bias" of this sensor.  The default bias is 1, meaning
+		% that the sensor has a positive influence on associated wheels
+		% with strength 1.  You can change this to any magnitude, positive
+		% or negative.
+
+		bias = d.
+	
+	+ to set-sensor-angle to n (float):
+		% Sets the angle in which this sensor can detect light.  The default
+		% value of 1.5 means that the sensor can see most of everything in
+		% front of it.  Setting the value to be any higher leads to general
+		% wackiness, so I don't suggest it.
+
+		sensorAngle = n.
+
+	+ to set-activation-method to m (string) in-object o (object):
+		% This method specifies an activation method for the sensor.  An
+		% activation method is a method which takes as input the strength
+		% read by the sensor, and as output returns the strength of the 
+		% signal which will travel on to the motor.
+		% <p>
+		% Your activation function should be defined as:
+		% <pre>
+		%     + to <i>activation-function-name</i> with-sensor-strength s (int):
+		% </pre>
+		% <p>
+		% The default activation method is linear, but more complex vehicles
+		% may require non-linear activation functions.
+		%
+
+		activationMethod = m.
+		activationObject = o.
+
+	+ to iterate:
+		i (object).
+		lights (int).
+		total, strength, angle (float).
+		toLight, transDir (vector).
+
+		transDir = (self get-rotation) * direction.
+
+		foreach i in (all BraitenbergLights): {
+			toLight = (i get-location) - (self get-location).
+			angle = angle(toLight, transDir).
+
+			if angle < sensorAngle: {
+                strength = | (self get-location) - (i get-location) |.
+				strength = 1.0 / (strength * strength) .
+
+				if activationMethod && activationObject: {
+					strength = (activationObject call-method named activationMethod with-arguments { strength }).
+				} 
+
+                if strength > 10: strength = 10.
+
+				total += strength.
+
+				lights++.
+			}
+		}
+
+		if lights != 0: total /= lights.
+
+		total = 50 * total * bias.
+
+		wheels activate with-input total.
+}

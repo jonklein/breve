@@ -1,0 +1,58 @@
+# This demo shows how images can be updated on the fly and used as textures.
+
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use Stationary.
+@use Image.
+
+Controller DynamicTextureExample.
+
+Control : DynamicTextureExample {
+	+ to init:
+		new DynamicCube.
+		self set-background-color to (0, 0, 0).
+		self enable-lighting.
+		self move-light to (0, 20, 0).
+}
+
+Mobile : DynamicCube {
+	+ to init:
+		self set-shape to (new Cube init-with size (8, 8, 8)).
+		self set-texture-image to (new DynamicTexture).
+
+		self set-rotational-velocity to (.05, .08, .05).
+
+		self set-transparency to .9.
+}
+
+Image : DynamicTexture {
+	# We'll create a small texture, then at every timestep, update with
+	# random static.
+
+	+ variables:
+		n (int).
+
+	+ to init:
+		self init-with width 32 height 32.
+
+	+ to iterate:
+		x, y (int).
+
+		n++.
+
+		# updating at every iteration is too slow, and we can't even see
+		# the effect, so we'll do it every 20 iterations.
+
+		if n % 20: return.
+
+		for x=0,x<32,x++: {
+			for y=0,y<32,y++: {
+				self set-pixel to random[1.0] * (1, 1, 1) at-x x at-y y.
+			}
+		}
+
+		super iterate.
+}

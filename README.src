@@ -1,0 +1,170 @@
+/*****************************************************************************
+ *                                                                           *
+ * The breve Simulation Environment                                          *
+ * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
+ *                                                                           *
+ * This program is free software; you can redistribute it and/or modify      *
+ * it under the terms of the GNU General Public License as published by      *
+ * the Free Software Foundation; either version 2 of the License, or         *
+ * (at your option) any later version.                                       *
+ *                                                                           *
+ * This program is distributed in the hope that it will be useful,           *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+ * GNU General Public License for more details.                              *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License         *
+ * along with this program; if not, write to the Free Software               *
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
+ *****************************************************************************/
+
+                    breve source code release - version 2.0
+                         http://www.spiderland.org/breve
+                              jklein@spiderland.org
+
+                                 -- INTRO --
+
+breve is a free simulation environment designed for multi-agent simulation.  
+breve allows users to define the behaviors of autonomous agents in a 
+continuous 3D world, then observe how they interact.  breve includes support 
+for a rich visualization engine, realistic physical simulation and an 
+easy-to-use scripting language.
+
+                               -- QUICK BUILD --
+
+If you're very lucky and have all of the required libraries installed,
+the following should build breve:
+
+1) ./configure
+2) make
+
+For the OS X application:
+
+1) ./configure
+2) make OSX_build
+
+If these commands fail it's likely that you will need to install some
+of the libraries required by breve.  See the section "REQUIRED LIBRARIES"
+below.
+
+                       --- NOTES ON THIS RELEASE ---
+
+breve is actively developed and maintained on three platforms:
+	Mac OS X
+	Linux (x86)
+	MinGW (Windows)
+
+breve has compiled successfully in the past on other platforms 
+as well, though some work may be required:
+	Irix
+	Solaris
+	CYGWIN (Windows)
+	Microsoft Visual C++
+
+Please report successful ports and the changes required back to the author 
+at jklein@spiderland.org.
+
+                          --- REQUIRED LIBRARIES ---
+
+It's always a drag to have to download another set of libraries to get 
+something working.  Sorry.
+
+* OpenGL and GLUT libraries
+
+* ODE, physical simulation library
+
+  http://www.ode.org
+
+  The current version of ODE makes liberal use of alloca() to allocate 
+  memory on the stack during a function call.  This can cause crashes
+  if the simulation becomes too complex and causes a stack overflow.
+  For this reason, official builds of breve use a modified version of 
+  the ODE source.
+
+* libdl, dynamic loading compatibility library (required for pre-10.3 
+  OS X only)
+
+  part of "fink", http://fink.sourceforge.net/
+
+* expat, XML parsing library
+
+  http://expat.sourceforge.net/
+
+* libjpeg, JPEG I/O library
+
+  http://www.ijg.org/
+
+* libpng, PNG I/O library
+
+  http://www.libpng.org/pub/png/libpng.html
+
+* libportaudio, portable sound APIs
+
+  http://www.portaudio.com/
+
+* libsndfile, portable sound file I/O library
+
+  http://www.zip.com.au/~erikd/libsndfile/
+
+* libffmpeg, mpeg movie export library
+
+  http://ffmpeg.sourceforge.net/
+
+                              -- ABOUT THE SOURCE --
+
+* NAMING CONVENTION: currently, all functions in the util and physics modules
+  use the prefix "sl", as in "slNewWorld".  All functions in the steve module
+  use the prefix "st" and all functions in the neural module use the prefix
+  "sn".  Please adhere to this convention.  New modules should use a similar
+  convention starting with the letter "s".
+
+* PROGRAMMING STYLE: this project uses C with the goal of being as portable
+  as possible.  Though the project does not use an OO language, it still
+  uses a somewhat OO approach of allocating data structures and then passing
+  them to functions.
+
+* TYPEDEFS: each module has its own "typedefs" file containing 
+  all the typedefs for a certain module.  this is so that pointers to 
+  a specific type can be defined in a function or data structure
+  definition even if the include file hasn't seen the corresponding
+  include file yet.  Do not put #typedefs in the header files.
+
+* MEMORY DEBUGGING: enabling the flag MALLOC_DEBUG in the Makefile enables
+  the util libraries built in memory tracking.  This can help you to discover
+  leaks or memory errors (freeing unalloc'd pointers, freeing freed pointers,
+  etc).  If used in conjunction with plugins, however, there will be some 
+  spurious errors due to the way plugins allocate and use memory--these can 
+  be ignored.  Under Mac OS X, MALLOC_DEBUG can also preform stack traces 
+  upon memory errors and leaks.
+
+* PHYSICS SUPPORT & GROWING PAINS
+
+  Since moving from a homegrown Featherstone based physics engine to ODE, 
+  there have been a number of paridigmatic changes to concepts like 
+  Links, MultiBodies, Joints, etc.  Ultimately, there are now a lot
+  more features, but some aspects are undeniably "weird" because 
+  of the code needed to accomidate the new engine, while offering 
+  conceptual backwards compatibility.
+
+  Specifically, a "MultiBody" was a very natural concept for the 
+  Featherstone algorithm and natural for thought as well--but it is 
+  not a feature of the ODE engine.  So there is a great deal of code
+  which accounts for this.  Likewise, the MultiBody paradigm has 
+  disadvantages as well, so additional code is then needed to make
+  sure that all of the features of ODE can be accessed if desired.
+
+  See the documentation for details on how these issues are resolved
+  from the user's perspective.
+
+
+== Building With Mesa3D Support ==
+
+Official builds of breve use standard OpenGL libraries, which do not support
+rendering into offscreen buffers.  The official non-graphical version of breve 
+(breve_cli) thus cannot support a number of breve features which rely on
+image data read from rendered images.  This includes the following features:
+taking snapshots, making movies, "visions" and light exposure detection
+
+The OpenGL-like library Mesa3D, however, does support offscreen rendering.
+If breve is built with Mesa3D support, these features can be used with
+breve_cli.

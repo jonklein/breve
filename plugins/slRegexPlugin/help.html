@@ -1,0 +1,21 @@
+<head>
+<title>slRegexPlugin help</title>
+</head>
+<body bgcolor="#ffffff">
+The slRegexPlugin is a simple plugin which adds some basic regular expression
+parsing to breve.  This plugin defines two functions:
+<ul>
+  <li>regex(<i>regexString</i>, <i>searchString</i>)
+  <p>
+  Returns 1 if the regular expression <i>regexString</i> is found in <i>searchString</i>. 
+  Otherwise, 0 is returned.
+  <li>split(<i>regexString</i>, <i>searchString</i>)
+  <p>
+  Like the perl function split, splits <i>searchString</i> in to a list of substrings delimited
+  by <i>regexString</i>.  So, for example, split(":", "a:b:c") returns a list containing the 
+  elements "a", "b" and "c".
+</ul>
+<p>
+For more information on the regular expressions that this plugin matches, see 
+man regex(3).
+</body>

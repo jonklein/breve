@@ -1,0 +1,16 @@
+BREVEDIR	=	../..
+
+all: RegexPlugin.o
+
+RegexPlugin.o: RegexFuncs.o
+	$(CC) @PLUGINFLAGS@ -o RegexPlugin.o RegexFuncs.o
+
+.c.o:
+	$(CC) $(CFLAGS) -c $*.c -I.. 
+
+clean:
+	-rm -f *.o
+
+install: all
+	-mkdir /usr/local/lib/breve/plugins
+	cp RegexPlugin.o /usr/local/lib/breve/plugins

@@ -1,0 +1,88 @@
+@use Real.
+
+Real : Terrain {
+	% Terrain is an experimental class to add terrains to simulations.
+
+	+ variables:
+		location (vector).
+		peakColor, valleyColor (vector).
+		heightData (data).
+
+	+ to init:
+		realWorldPointer = newTerrain(1).
+		self set-peak-color to (1, 1, 1).
+		self set-valley-color to (0, 1, .2).
+
+	+ to set-scale to value (double):
+		% Changes the size of a single tile in the terrain.
+
+		setTerrainScale(realWorldPointer, value).
+
+	+ to generate with-ruggedness ruggedness (float) with-height terrainHeight (float):
+		% Generates a fractal landscape with a ruggedness (between 0.0 and 1.0),
+		% and maximum height terrainHeight.
+	
+		generateFractalTerrain(realWorldPointer, 1.0 - ruggedness, terrainHeight).
+
+	+ to get-location:
+		% Returns the location of this Terrain object.
+
+		return location.
+
+	+ to move to newLocation (vector):
+		% Sets the location of the terrain to location.  This method can be used to 
+		% set the location of the terrain when setting up the world, but should not
+		% generally be used to dynamically over the course of the simulation.
+
+		location = newLocation.
+
+		setTerrainPosition(realWorldPointer, newLocation).
+
+	+ to set-height at-x xCoordinate (int) at-y yCoordinate (int) to height (double):
+		% Sets the height of the terrain at (xCoordinate, yCoordinate) to height.
+		% The coordinates refer to the polygons on the terrain, not to the real
+		% world location of points on the terrain.
+
+		setTerrainHeight(realWorldPointer, xCoordinate, yCoordinate, height).
+
+	+ to get-height at-x xCoordinate (int) at-y yCoordinate (int):
+		% Returns the height of the terrain at (xCoordinate, yCoordinate).
+		% The coordinates refer to the polygons on the terrain, not to the real
+		% world location of points on the terrain.
+
+		return getTerrainHeight(realWorldPointer, xCoordinate, yCoordinate).
+
+	+ to set-peak-color to color (vector):
+		% Sets the color of the highest regions of the terrain to color.
+		% As the height of the terrain decreases, There will be a gradient 
+		% towards the color specified with METHOD(set-valley-color).
+
+		peakColor = color.
+		setPeakColor(realWorldPointer, color).
+
+	+ to set-valley-color to color (vector):
+		% Sets the color of the lowest regions of the terrain to color.
+		% As the height of the terrain increases, There will be a gradient 
+		% towards the color specified with METHOD(set-peak-color).
+
+		valleyColor = color.
+		setValleyColor(realWorldPointer, color).
+
+	+ to set-color to color (vector):
+		% Sets the color of this terrain object.  The peak and valley colors
+		% can also be set independently using METHOD(set-peak-color) and
+		% METHOD(set-valley-color).
+
+		self set-peak-color to color.
+		self set-valley-color to color.
+
+	+ to archive:
+		return 1.
+
+	+ to dearchive:
+		realWorldPointer = newTerrain(1).
+		self set-peak-color to peakColor.
+		self set-valley-color to valleyColor.
+
+		return 1.
+}

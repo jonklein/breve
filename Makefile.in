@@ -1,0 +1,124 @@
+# 
+# The breve Simulation Environment Makefile
+# jon klein <jklein@spiderland.org>
+#
+# thi s  Ma k e#$#fil e  iS me aN T   to  bE  li#st ened t0 On  vyN @ @@al
+#
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+OPTFLAGS	=-O4 @DEFS@
+
+CFLAGS		=-g -Wall -Winline -DMEMORY_DEBUG @DEFS@
+
+PLATFORM	= $(shell uname)
+LPLATFORM	= $(shell echo ${PLATFORM} | tr '[A-Z]' '[a-z]')
+
+export
+
+all: 
+	-mkdir include
+	-mkdir bin
+	cd util; $(MAKE) -f Makefile install
+	cd simulation; $(MAKE) -f Makefile install
+	cd neural; $(MAKE) -f Makefile install
+	cd graph; $(MAKE) -f Makefile install
+	cd kernel; $(MAKE) -f Makefile install
+	cd steve; $(MAKE) -f Makefile install
+	cd bin; $(MAKE) -f Makefile install
+
+documentation:
+	cd docBuild; $(MAKE) -f Makefile install
+
+profile:
+	make CFLAGS='-pg $(OPTFLAGS)'
+
+optimize:
+	make CFLAGS='$(OPTFLAGS)'
+
+optimize_debug:
+	make CFLAGS+='-g $(OPTFLAGS)'
+
+memory_debug:
+	make CFLAGS+='-DMEMORY_DEBUG'
+
+clean:
+	rm -rf docs OSX/build
+	-cd util; $(MAKE) -f Makefile clean
+	-cd simulation; $(MAKE) -f Makefile clean
+	-cd kernel; $(MAKE) -f Makefile clean
+	-cd steve; $(MAKE) -f Makefile clean
+	-cd graph; $(MAKE) -f Makefile clean
+	-cd neural; $(MAKE) -f Makefile clean
+	-cd docBuild; $(MAKE) -f Makefile clean
+	-cd bin; $(MAKE) -f Makefile clean
+
+	-cp include/breve/config.h include/breve/config.h.bak
+	rm -f lib/*.a include/breve/*.h bin/breve bin/breve_cli
+	-mv include/breve/config.h.bak include/breve/config.h
+	find . -name '.gdb*' -exec rm -f {} \;
+	find . -name 'core' -exec rm -f {} \;
+	find . -name '.DS_Store' -exec rm -f {} \;
+
+OSX_build:
+	-mkdir docs
+	make -f Makefile optimize
+	cd plugins; make
+	cd OSX ; xcodebuild -activebuildstyle CC=
+
+OSX_clean:
+	rm -f breve.dmg
+	make -f Makefile clean
+	cd plugins; make clean
+	cd OSX; xcodebuild clean
+	rm -rf OSX/build plugins/*/build
+
+OSX_release: OSX_clean documentation OSX_build
+	rm -f breve.dmg
+	rm -rf breve_image_folder
+	mkdir breve_image_folder
+	cp -r OSX/build/breve.app breve_image_folder
+	cp OSX/README.html breve_image_folder
+	cp OSX/Documentation.txt breve_image_folder
+	cp Changes.html breve_image_folder
+	mkdir breve_image_folder/plugins
+	cp -r plugins/samples plugins/slBrevePluginAPI.h plugins/README.txt breve_image_folder/plugins
+	make_dmg.sh breve.dmg breve_image_folder/*
+	rm -rf breve_image_folder
+
+CLI_release:
+	make -f Makefile clean
+	rm -rf breve_$(LPLATFORM)
+	mkdir breve_$(LPLATFORM)
+	mkdir breve_$(LPLATFORM)/bin
+	mkdir breve_$(LPLATFORM)/lib
+	make -f Makefile optimize
+	cp bin/breve breve_$(LPLATFORM)/bin/breve
+	cp bin/breve_cli breve_$(LPLATFORM)/bin/breve_cli
+	cp -r lib/classes breve_$(LPLATFORM)/lib/
+	cp -r docs breve_$(LPLATFORM)/
+	cp -r demos breve_$(LPLATFORM)/
+	mkdir breve_$(LPLATFORM)/plugins
+	cp -r plugins/samples plugins/slBrevePluginAPI.h plugins/README.txt breve_$(LPLATFORM)/plugins
+	rm -rf breve_$(LPLATFORM)/demos/Music
+	cp README.txt breve_$(LPLATFORM)/
+	cp Changes.html breve_$(LPLATFORM)/
+	find breve_$(LPLATFORM) -name CVS -prune -exec rm -rf {} \;
+
+plugin_API:
+	-rm -rf breve_plugin_API
+	-mkdir breve_plugin_API
+	cp plugins/slBrevePluginAPI.h breve_plugin_API
+	cp plugins/README.html breve_plugin_API
+	tar zcvf breve_plugin_API.tar.gz breve_plugin_API
+	rm -rf breve_plugin_API
+
+install: optimize
+	-mkdir -p @bindir@
+	-mkdir -p @libdir@/breve
+	cp bin/breve @bindir@
+	cp bin/breve_cli @bindir@
+	-rm -rf @libdir@/breve/classes
+	-mkdir @libdir@/breve
+	cp -r lib/classes @libdir@/breve/

@@ -1,0 +1,47 @@
+@use Image.
+
+@plugin "DigitizerPlugin.o"  (slInitDigitizerFuncs).
+
+@define WIDTH 320.
+@define HEIGHT 240.
+
+Image : DigitizerImage {
+	+ variables:
+		cameraPointer (pointer).
+		pixelPointer (pointer).
+
+	+ to init:
+		super init-with width WIDTH height HEIGHT.
+		cameraPointer = digitizerOpenCamera(WIDTH, HEIGHT).
+		pixelPointer = (self get-pixel-pointer).
+
+	+ to flip:
+		return digitizerFlip(cameraPointer).
+
+	+ to update-frame:
+		modified = 1.
+		return digitizerUpdateFrame(cameraPointer, pixelPointer).
+
+	+ to update-intensity-reference-map:
+		digitizerReferenceMap(cameraPointer).
+		
+	+ to destroy:
+		if cameraPointer: digitizerCloseCamera(cameraPointer).		
+
+		super destroy.
+
+	+ to get-highest-delta:
+		return digitizerHighestDelta(cameraPointer).
+
+	+ to get-average-delta:
+		return digitizerAverageDelta(cameraPointer).
+
+	+ to get-highest-delta-location:
+		return digitizerHighestDeltaLocation(cameraPointer).
+
+	+ to get-intensity-map-value at-x x (int) at-y y (int):
+		return digitizerIntensityMapValue(cameraPointer, x, y).
+
+	+ to get-delta-map-value at-x x (int) at-y y (int):
+		return digitizerDeltaMapValue(cameraPointer, x, y).
+}

@@ -1,0 +1,23 @@
+@use Java.
+@use Control.
+
+Controller JavaTest.
+
+Control : JavaTest {
+	+ variables:
+		javaString (object).
+		breveString (string).
+
+	+ to init:
+		javaString = (new JavaObject make class "java.lang.String" 
+						with-arguments { "This is a Java string..." }).
+
+		# this is automatically converted to a breve string.
+
+		breveString = (javaString call method "concat" 
+						with-arguments { " automatically converted back to a breve string" }).
+
+		print breveString.
+
+		print "the java string length = ", (javaString call method "length" with-arguments { }).
+}

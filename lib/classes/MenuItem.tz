@@ -1,0 +1,76 @@
+@use Abstract.
+
+Abstract : MenuItem (aka MenuItems) [version 2.0] {
+    % The MenuItem class holds menu items associated with objects.  Menus
+    % can be associated with Mobile objects, in which case they are shown
+    % as contextual menu items, or associated with Control objects in which
+    % case they are shown under the global application menu.
+
+    + variables:
+        menuPointer (pointer).
+		name (string).
+		method (string).
+		owner (object).
+
+		enabled, checked (int).
+
+    + to create-menu named menuName (string) for-object theObject (object) for-method methodName (string):
+        % This method initializes a menu item with title menuName for
+		% theObject which will call methodName when selected.
+
+		name = menuName.
+		method = methodName.
+
+		owner = theObject.
+		self add-dependency on owner.
+
+        menuPointer = menuItemNew(owner, method, name).
+
+        if !menuPointer: {
+			print "error adding menu item for method $methodName.".
+			free self.
+			enabled = 1.
+			return 0.
+		}
+
+        return self.
+
+    + to check:
+        % Places a check mark next to the menu item.
+
+        if !menuPointer: return.
+        menuItemSetCheck(menuPointer, 1).
+		checked = 1.
+
+    + to uncheck:
+        % Removes the check mark next to the menu item, if it exists.
+
+        if !menuPointer: return.
+        menuItemSetCheck(menuPointer, 0).
+		checked = 0.
+
+    + to enable:
+        % Enables a menu item, if it is disabled.
+
+        if !menuPointer: return.
+        menuItemSetEnabled(menuPointer, 1).
+		enabled = 1.
+
+    + to disable:
+        % Disables the menu item such that it cannot be selected.
+
+        if !menuPointer: return.
+        menuItemSetEnabled(menuPointer, 0).
+		enabled = 0.
+
+	+ to get-description:
+		return name.
+
+	+ to dearchive:
+        menuPointer = menuItemNew(owner, method, name).
+		if checked: self check.
+		else self uncheck.
+		if enabled: self enable.
+		else self disable.
+		return 1.
+}

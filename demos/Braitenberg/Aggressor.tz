@@ -1,0 +1,55 @@
+#
+# A "Braitenberg Vehicle" is a simple simulated robot with wheels and 
+# sensors.  The most simple Braitenberg vehicles have sensors connected
+# directly to the motors so that sensory input (for example, light) 
+# causes the wheels to turn.  By changing the position of the sensors,
+# the positions of the wheels, and the connections between them, a 
+# number of "life-like" behaviors can be simulated.
+#
+# The "Aggressor" is a vehicle with two sensors and two wheels, connected
+# in a criss-cross pattern.  This means that light shining on the left
+# sensor activates the right wheel; light on the right sensor activates 
+# the left wheel.  The result is that the vehicle will turn towards the 
+# lights and rush aggressively towards them.
+#
+# Run the simulation, and use the arrow tool to grab the red lights and
+# move them around the world, to see how the vehicle reacts.  You can 
+# also build your own Braitenberg simulations by using the 
+# BraitenbergTemplate file (included with the demos).
+#
+
+@use Braitenberg.
+
+Controller AggressorController.
+
+BraitenbergControl : AggressorController {
+	+ variables:
+		leftSensor, rightSensor (object).
+		leftWheel, rightWheel (object).
+		light, vehicle (object).
+
+		n (int).
+
+	+ to init:
+		for n=0, n<10, n++:
+		 	new BraitenbergLight move to (20 * sin(n * 6.28 / 10), 1, 20 * cos(n * 6.28 / 10)).
+
+		vehicle = new BraitenbergVehicle.
+		self watch item vehicle.
+
+		vehicle move to (0, 2, 18).
+
+		leftWheel = (vehicle add-wheel at (-.5, 0, 1.5)).
+		rightWheel = (vehicle add-wheel at (-.5, 0, -1.5)).
+
+		leftWheel set-natural-velocity to 0.0.
+		rightWheel set-natural-velocity to 0.0.
+
+		rightSensor = (vehicle add-sensor at (2.0, .4, -1.5)).
+		leftSensor = (vehicle add-sensor at (2.0, .4, 1.5)).
+		leftSensor link to rightWheel.
+		rightSensor link to leftWheel.
+
+		leftSensor set-bias to 15.0.
+		rightSensor set-bias to 15.0.
+}

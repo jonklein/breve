@@ -1,0 +1,11 @@
+@use Control.
+
+Controller Logic.
+
+Control : Logic {
+	+ to init:
+		if 0 || 1 && 2: print "ok 1".
+		if 0 || (1 && 2): print "ok 2".
+
+		self end-simulation.
+}

@@ -1,0 +1,58 @@
+#
+# This demo shows some pretty graphics using "lightmaps", bitmaps and 
+# transparency.  Lightmaps are like bitmaps, but have an effect of glowing 
+# light particles.
+#
+
+@use Mobile.
+@use Control.
+
+Controller StarDust.
+
+Control : StarDust {
+	+ to init:
+		star, lightmap (object).
+
+		# because we dont require high accuracy in this demo, we can step up
+		# the iteration and integration steps in order to make the demo run
+		# a little bit faster.
+
+		self enable-blur.
+		self set-blur-factor to 0.2.
+
+		self set-background-color to (0, 0, 0). 
+
+		star = (new Image load from "images/star.png").
+		lightmap = (new Image load from "images/lightmap.png").
+
+		10 new Particles set-bitmap-image to star.
+		20 new Particles set-lightmap-image to lightmap.
+
+		self point-camera at (0, 0, 0) from (20.0, 2.1, 0.0).
+
+	+ to iterate:
+		self pivot-camera x 0.001 y 0.002.
+		super iterate.
+}
+
+Mobile : Particle (aka Particles) {
+	+ variables:
+		shape (object).
+		rotation (float).
+		rate (float).
+		offset (float).		
+
+	+ to iterate:
+		rotation += rate.
+		self set-bitmap-heading to rotation.
+		self set-bitmap-transparency to (sin((controller get-time)/30.0 + offset) + 1.0) / 2.0.
+
+	+ to init:
+		rate = random[0.08] - .04.
+		offset = random[6.28].
+		rotation = random[360].
+		shape = ((new Shape) init-with-sphere radius random[5.0] + .1).
+		self set-shape to shape.
+		self set-color to random[(1, 1, 1)].
+		self move to random[(10, 10, 10)] - (5, 5, 5).
+}

@@ -1,0 +1,41 @@
+<chapter id="movies">
+<title>Saving Movies and Snapshots</title>
+
+<indexterm><primary>movie export</primary></indexterm>
+<indexterm><primary>MPEG export</primary></indexterm>
+<indexterm><primary>snapshots</primary></indexterm>
+<indexterm><primary>PNG export</primary></indexterm>
+<indexterm><primary>Movie class</primary></indexterm>
+<indexterm><primary>save-snapshot</primary></indexterm>
+
+<para>
+breve allows you to save snapshots of your simulation as PNG
+files (<xref linkend="saving_snapshots">), and movies as MPEG files (<xref linkend="saving_movies">).
+</para>
+
+<note><title>Note Available When Using breve_cli</title>
+<para>
+These features are not supported for the "graphicless" build 
+of breve, breve_cli.
+</para>
+</note>
+
+<sect1 id="saving_movies"><title>Saving Movies</title>
+<para>
+You can save movies in breve using the class 
+<ulink url="../classes/Movie.html">Movie.tz</ulink>.  First create an
+instance of the class, then begin recording a movie by using the method
+<ulink url="../classes/Movie.html#record">record</ulink>.  
+</para>
+</sect1>
+
+<sect1 id="saving_snapshots"><title>Saving Snapshots</title>
+<para>
+To save a snapshot of a running breve simulation, use the method 
+<ulink url="../classes/Control.html#save-snapshot">save-snapshot</ulink>
+in the class <ulink url="../classes/Control.html">Control</ulink>.
+</para>
+
+</sect1>
+
+</chapter>

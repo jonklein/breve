@@ -1,0 +1,29 @@
+#
+# libneural.a
+# Copyright (C) 2000-2004    jon klein (jk@spiderland.org)
+#
+# s pi der la nd
+#
+
+LIBO	= ff.o ffTrain.o
+
+LIBS	+= -L../lib -lbrutil
+
+INCLUDE	+= -I../include/breve -I../ode/include
+
+.c.o: 
+	$(CC) $(CFLAGS) -c $*.c $(DEFINES) $(INCLUDE)
+
+all: libneural.a
+
+libneural.a: $(LIBO)
+	$(AR) -crv libbrneural.a $(LIBO) 
+	ranlib libbrneural.a
+
+install: all
+	cp libbrneural.a ../lib
+	cp *.h ../include/breve
+	ranlib ../lib/libbrneural.a
+
+clean:
+	-/bin/rm -f *.o core libbrneural.a test

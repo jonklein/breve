@@ -1,0 +1,92 @@
+@use Abstract.
+
+Abstract : File (aka Files) [version 1.8] {
+	% A File is an object used for creating textual output of your breve 
+	% simulation.
+	% <p>
+	% File is not meant as a tool for archiving and dearchiving data--for 
+	% a discussion of archiving and dearchiving objects, see the 
+	% <a href="http://www.spiderland.org/breve/docs/docs/archiving.html">Archiving and Dearchiving section</a>
+	% of the breve documentation.
+
+	+ variables:
+		filePointer (pointer).
+
+  + section "Opening Files"
+
+	+ to open-for-writing with-file fileName (string):
+		% Opens fileName for writing.  If the file already exists, it is truncated
+		% to length zero so that this method effectively overwrites files.
+		% If the file does not exist, it is created.
+		% <p>
+		% To be used with the methods METHOD(write), METHOD(write-line) and 
+		% METHOD(write-data) below.
+
+		filePointer = openFileForWriting(fileName).
+		if !filePointer: return 0.
+		return self.
+
+	+ to open-for-appending with-file fileName (string):
+		% Opens fileName for appending.  If the file already exists, future writes
+		% will append text to the end of the file instead of overwriting it.
+		% If the file does not exist, it is created.
+		% <p>
+		% To be used with the methods METHOD(write), METHOD(write-line) and 
+		% METHOD(write-data) below.
+		
+		filePointer = openFileForAppending(fileName).
+		if !filePointer: return 0.
+		return self.
+
+	+ to open-for-reading with-file fileName (string):
+		% Opens fileName for reading.  To be used with the methods 
+		% METHOD(read-as-string), METHOD(read-as-data) and METHOD(read-line)
+		% below.
+
+		filePointer = openFileForReading(fileName).
+		if !filePointer: return 0.
+		return self.
+
+  + section "Reading from an Open File"
+
+	+ to read-as-string:
+		% Reads the entire file and returns it as a string.
+
+		return readFileAsString(filePointer).
+
+	+ to read-as-data:
+		% Reads the entire file as binary data and returns a "data" type (not
+		% to be confused with a OBJECT(Data) object).
+
+		return readFileAsData(filePointer).
+
+	+ to read-line:
+		% Reads a single line of text from the file (ending with a newline).
+		% The size of the line read is limited to 10239
+
+		return readLine(filePointer).
+
+  + section "Writing to an Open File"
+
+	+ to write text t (string):
+		% Writes the string theText to the file.
+
+		writeString(filePointer, t).
+
+	+ to write-line text t (string):
+		% Like METHOD(write), but appends a new line at the end of the string.
+
+		writeString(filePointer, "$t\n").
+
+  + section "Closing a File".
+
+	+ to close:
+		% Closes the file.  This should be done when you're finished reading
+		% from or writing to a file.
+
+		if filePointer: closeFile(filePointer).
+		filePointer = 0.
+
+	+ to destroy:
+		if filePointer: (self close).
+}

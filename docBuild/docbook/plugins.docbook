@@ -1,0 +1,512 @@
+<!--
+    The breve Simulation Environment documentation
+    Copyright (C) 2003 Jonathan Klein
+-->
+
+<chapter id="plugins">
+<title>Plugins</title>
+<para>
+<indexterm><primary>plugins</primary></indexterm>
+breve's plugin architecture allows you to incorporate arbitrary code into a 
+breve simulation.  By loading external code into breve, you can add customized
+types of computation, bridges to other languages, connections to other input 
+and output methods and much more.  
+</para>
+<note>
+<title>Programming Experience Required</title>
+<para>
+Building plugins for breve does require some programming experience in C, 
+plus access to and familiarity with the GCC compiler.
+</para>
+</note>
+
+<sect1 id="plugin_api">
+<title>The Plugin API: Writing Plugins</title>
+<note><title>The breve Plugin API</title>
+<para>
+In order to build plugins for breve, you'll need to download the plugin API from 
+<ulink url="http://www.spiderland.org/breve">the breve website</ulink>.
+You'll also need a C compiler&mdash;the instructions here assume you're using GCC.
+</para>
+<para>
+In addition to the documentation listed here, you should also look at the sample
+plugin files included with the breve distribution.  These samples show how to 
+build simple plugins for Mac OS X, Linux and Windows.
+</para>
+</note>
+<para>
+In order to write plugins for breve, you'll need to follow a few 
+simple steps.
+<orderedlist>
+<listitem><para>compose C wrapper functions around your external code (C or C++), <xref linkend="c_wrappers"></para></listitem>
+<listitem><para>create an "entry point function" in C which will load your functions into the breve engine <xref linkend="entrypoint"></para></listitem>
+<listitem><para>write a class (or classes) to interface with your newly created functions</para></listitem>
+</orderedlist>
+</para>
+
+<sect2 id="c_wrappers">
+<title>Writing C Wrapper Functions Around Existing Code</title>
+<para>
+The first step in composing a breve plugin is to write wrapper functions
+around your existing code.  The wrapper functions simply act as a bridge 
+between the internal breve function calling code, and standard C function
+calls.  When a function is called from within steve, the wrapper function is 
+called.  The wrapper function, in turn, calls the necessary C code and 
+coordinates input and output between the C code and the breve call.
+</para>
+<para>
+The wrapper function passes input and output data between breve and C using a 
+structure called <function>stEval</function>.
+The <function>stEval</function> struct is a C data structure which is used internally
+to hold the values of expressions in steve.  The structure is used to hold any and all
+types of steve expressions.  So <function>ints</function>, <function>lists</function>,
+<function>objects</function> and the rest of the steve types are all held in 
+<function>stEval</function> structs.  The <function>type</function> field of the 
+struct specifies the type of the expression.  The <function>values</function> union
+of the struct contains the actual value of the expression.  Information on how
+to use these fields is listed below.
+</para>
+<para>
+Wrapper functions have the following prototype:
+<screen>
+int function(stEval arguments[], stEval *result, void *instance);
+</screen>
+Arguments are passed in as the <parameter>arguments</parameter> array of 
+<function>stEval</function> structs.  The function output is returned by 
+setting the contents of the <structname>stEval</structname> structure pointed to by 
+<parameter>result</parameter>.  <parameter>instance</parameter> is an
+internal pointer to the calling instance&mdash;this can be ignored.
+</para>
+<para>
+<indexterm><primary>BRINT plugin macro</primary></indexterm>
+<indexterm><primary>BR_INT plugin constant</primary></indexterm>
+<indexterm><primary>BRDOUBLE plugin macro</primary></indexterm>
+<indexterm><primary>BR_DOUBLE plugin constant</primary></indexterm>
+<indexterm><primary>BRVECTOR plugin macro</primary></indexterm>
+<indexterm><primary>BR_VECTOR plugin constant</primary></indexterm>
+<indexterm><primary>BRMATRIX plugin macro</primary></indexterm>
+<indexterm><primary>BR_MATRIX plugin constant</primary></indexterm>
+<indexterm><primary>BRBRRING plugin macro</primary></indexterm>
+<indexterm><primary>BR_BRRING plugin constant</primary></indexterm>
+<indexterm><primary>BROBJECT plugin macro</primary></indexterm>
+<indexterm><primary>BR_OBJECT plugin constant</primary></indexterm>
+<indexterm><primary>BRPOINTER plugin macro</primary></indexterm>
+<indexterm><primary>BR_POINTER plugin constant</primary></indexterm>
+<indexterm><primary>BRDATA plugin macro</primary></indexterm>
+<indexterm><primary>BR_DATA plugin constant</primary></indexterm>
+<indexterm><primary>BRHASH plugin macro</primary></indexterm>
+<indexterm><primary>BR_HASH constant</primary></indexterm>
+<indexterm><primary>BRLIST plugin macro</primary></indexterm>
+<indexterm><primary>BR_LIBR constant</primary></indexterm>
+To access native C types stored in the <structname>stEval</structname> struct, you'll
+need to use the following macros, which are defined in the header file distributed 
+with the API.
+<itemizedlist>
+<listitem>
+<para>
+<function>BRINT(&<replaceable>eval</replaceable>)</function>, returns the int (C type int) contained in <replaceable>eval</replaceable>
+</para>
+</listitem>
+
+<listitem>
+<para>
+<function>BRDOUBLE(&<replaceable>eval</replaceable>)</function>, returns the float (C type double) contained in <replaceable>eval</replaceable>
+</para>
+</listitem>
+
+<listitem>
+<para>
+<function>BRVECTOR(&<replaceable>eval</replaceable>)</function>, returns the vector (C type slVector struct) contained in <replaceable>eval</replaceable>
+</para>
+</listitem>
+
+<listitem>
+<para>
+<function>BRMATRIX(&<replaceable>eval</replaceable>)</function>, returns the matrix (C type double [3][3]) contained in <replaceable>eval</replaceable>
+</para>
+</listitem>
+
+<listitem>
+<para>
+<function>BRBRRING(&<replaceable>eval</replaceable>)</function>, returns the string (C type char*) contained in <replaceable>eval</replaceable>
+</para>
+</listitem>
+
+<listitem>
+<para>
+<function>BROBJECT(&<replaceable>eval</replaceable>)</function>, returns the object (C type brInstance*) contained in <replaceable>eval</replaceable>
+</para>
+</listitem>
+
+<listitem>
+<para>
+<function>BRPOINTER(&<replaceable>eval</replaceable>)</function>, returns the pointer (C type void*) contained in <replaceable>eval</replaceable>
+</para>
+</listitem>
+<listitem>
+<para>
+<function>BRDATA(&<replaceable>eval</replaceable>)</function>, returns the data (C type brData*) contained in <replaceable>eval</replaceable>
+</para>
+</listitem>
+<listitem>
+<para>
+<function>BRHASH(&<replaceable>eval</replaceable>)</function>, returns the hash (C type brEvalHash*) contained in <replaceable>eval</replaceable>
+</para>
+</listitem>
+<listitem>
+<para>
+<function>BRLIST(&<replaceable>eval</replaceable>)</function>, returns the list (C type brEvalList*) contained in <replaceable>eval</replaceable>
+</para>
+</listitem>
+</itemizedlist>
+</para>
+<para>
+These macros correspond to steve constants representing types.  You'll need these 
+constants in the next section when defining the inputs and outputs your functions
+will take.
+<itemizedlist>
+<listitem><para><function>BR_INT</function></para></listitem>
+<listitem><para><function>BR_DOUBLE</function></para></listitem>
+<listitem><para><function>BR_BRRING</function></para></listitem>
+<listitem><para><function>BR_VECTOR</function></para></listitem>
+<listitem><para><function>BR_MATRIX</function></para></listitem>
+<listitem><para><function>BR_DATA</function></para></listitem>
+<listitem><para><function>BR_HASH</function></para></listitem>
+<listitem><para><function>BR_LIBR</function></para></listitem>
+<listitem><para><function>BR_OBJECT</function></para></listitem>
+<listitem><para><function>BR_POINTER</function></para></listitem>
+</itemizedlist>
+</para>
+<para>
+Your wrapper function should use these macros to extract data from the arguments
+array, and to store the result.  The return value of your wrapper function
+should be <function>EC_OK</function> in the event of sucessful execution, or <function>EC_ERROR</function> in the event of 
+a fatal error.  Returning <function>EC_ERROR</function> will cause the simulation to stop, so you 
+should generally not return this value.  In many cases it is better to indicate 
+the error using a special return value of the internal function (that is to say, 
+buy putting a special value in the "result" struct, not actually returning from 
+your C code with a special value).  You can then handle the error from within
+steve.
+</para>
+<para>
+As an example of a breve function wrapper around an existing function, imagine a 
+function with the following prototype:
+<screen>
+char *downloadURL(char *url, int timeout);
+</screen>
+The wrapper function in breve will need to extract the url and timeout
+arguments from the arguments array, call the function, and store the 
+resulting string in the structure pointed to by result.  Here's how the
+wrapper function might look.
+<screen>
+int breveDownloadURL(stEval *arguments, stEval *result, void *instance) {
+	char *url;
+	int timeout;
+
+	url = BRBRRING(&amp;arguments[0]);
+	timeout = BRINT(&amp;arguments[1]);
+
+	BRBRRING(result) = downloadURL(url, timeout);
+		
+	return EC_OK;
+}
+</screen>
+</para>
+
+</sect2>
+
+<sect2 id="entrypoint">
+<title>Writing an Entry Point Function</title>
+<para>
+Your entry point function will be called when the plugin is loaded.  Its job is to 
+tell the breve engine what new steve functions to add, their names, and the arguments
+they will take.
+</para>
+<para>
+The prototype for an entry-point function is:
+<screen>
+void <replaceable>entryPointFunctionName</replaceable>(void *data);
+</screen>
+The name may be anything you'd like, but it must be a unique symbol.
+</para>
+<para>
+This entry-point function will be filled with one or more calls to the 
+function <function>stNewSteveCall</function>.  The calling convention 
+for this function is:
+<screen>
+stNewSteveCall(data, "<replaceable>functionName</replaceable>", <replaceable>cFunctionPointer</replaceable>, <replaceable>returnType</replaceable>, <replaceable>arg1</replaceable>, <replaceable>arg2</replaceable>, ..., 0);
+</screen>
+</para>
+<itemizedlist>
+<listitem>
+<para>
+The first argument, data, is the "data" pointer which gets passed in to the entry-point function.
+</para>
+</listitem>
+<listitem>
+<para>
+The second argument, functionName, is the quoted function name <emphasis>as it will appear in steve</emphasis>.
+</para>
+</listitem>
+<listitem>
+<para>
+The third argument, cFunctionPointer, is the unquoted name of the C function.
+</para>
+</listitem>
+<listitem>
+<para>
+The fourth argument, returnType, is the return type (as a steve constant, listed in the previous section).
+</para>
+</listitem>
+<listitem>
+<para>
+Subsequent arguments are the types of input arguments (as steve constants, listed in the previous section) that your steve function will expect, with the value 0 afterwards indicating the end of the parameter list.
+</para>
+</listitem>
+<listitem>
+<para>
+The final argument, to follow all of the input types, must be 0.
+</para>
+</listitem>
+</itemizedlist>
+<para>
+For example, if you have a function which takes two <function>vector</function> inputs and produces an <function>int</function>
+output, your <function>stNewSteveCall</function> might look like this:
+<screen>
+stNewSteveCall(data, "mySteveFunctionName", myCFunctionName, AT_INT, AT_VECTOR, AT_VECTOR, 0);
+</screen>
+</para>
+</sect2>
+
+<sect2>
+
+<title>Interfacing With The New Functions</title>
+<para>
+In order to write plugins for breve, you'll first need to familiarize 
+yourself with a feature of steve which is generally hidden from users&mdash;the 
+C-style function call.
+</para>
+<para>
+C-style function calls in breve work just as they do in C: they take a
+number of arguments and may return a value.  In breve, a C-style 
+function call is used to access code which is built in to the breve
+engine (as opposed to code written in steve).  In fact, the built-in
+class hierarchy provided with breve uses C-style function calls 
+extensively to interface with the breve engine.
+</para>
+<para>
+From the user's perspective, all computation in breve happens within objects.
+So when we write a plugin, we'll also give it an object interface.  Here's a
+simple example in which the plugin simply provides some data (like a 
+<function>float</function> or an <function>int</function>) back to the caller.
+<screen>
+Object : mySimplePluginObject {
+	+ to get-input-from-plugin:
+		return getPluginInput().
+}
+</screen>
+By packaging this functionality inside an object, breve users look at is as 
+they do any other object, without needing any information about how the plugin
+works underneath.
+</para>
+<para>
+The more important reason to use objects, however, is so that the plugin can
+be used by more than one agent simultaneously.  Imagine, for example, a 
+plugin which simulates neural networks.  It's easy to imagine that a breve 
+simulation might want to use several of these neural networks at the same
+time.  Because the neural networking code requires a "persistent state", 
+we would need a way to store many distinct states simultaneously.
+</para>
+<para>
+Inside our breve object, we'll hold a pointer to C-memory representing these
+distinct states.  Whenever a neural network function is needed, we'll pass
+that pointer back to the plugin so that it can operate on the correct state.
+Here's an example:
+<screen>
+Object : myNeuralNetwork {
+	+ variables:
+		networkPointer (pointer).
+
+	+ to init:
+		networkPointer = newNeuralNetwork().
+
+	+ to iterate:
+		neuralNetworkIterate(networkPointer).
+
+	+ to get-output:
+		return neuralNetworkOutput(networkPointer).
+
+	+ to set-input to value (double):
+		neuralNetworkSet(networkPointer, value).
+}
+</screen>
+
+</para>
+</sect2>
+
+</sect1>
+
+<sect1 id="building_plugins">
+<title>Building Plugins</title>
+<para>
+Once you've written your wrapper functions as described in the previous section, you'll need
+to compile the source into an object file.  On a system with GCC installed, this will probably
+look like:
+<screen>
+gcc -c <replaceable>myPluginFuncs</replaceable>.c
+</screen>
+This should produce a file named <replaceable>myPluginFuncs</replaceable>.o.  The final step
+in the process is different for each platform and is outlined below for Mac OS X, Linux and 
+Windows.
+</para>
+
+<sect2>
+<title>Building Plugins With Mac OS X</title>
+<para>
+<indexterm><primary>Mac OS X</primary></indexterm>
+Once you've created the object file containing your plugin functions, you'll need to 
+execute a command like the following to build the plugin file.
+<screen>
+cc -bundle -o <replaceable>myPlugin</replaceable>.o ./<replaceable>myPluginFuncs</replaceable>.o <replaceable>[required libraries]</replaceable> -bundle_loader <replaceable>/Applications/breve.app</replaceable>/Contents/MacOS/breve
+</screen>
+Note that the location of <function>breve.app</function> may be different on your system, 
+so you'll need to change part of the pathname accordingly.  Regardless of the path to 
+<function>breve.app</function>, you will need to append the text "/Contents/MacOS/breve".
+</para>
+<para>
+The <replaceable>[required libraries]</replaceable> means that you may have to include linker options
+to include any other libraries that your plugin relies on.  For example, if your plugin functions 
+require code from the standard math library, you may need to add <function>-lm</function>.
+</para>
+
+</sect2>
+
+<sect2>
+<title>Building Plugins With Linux</title>
+<para>
+<indexterm><primary>Linux</primary></indexterm>
+Once you've created the object file containing your plugin functions, you'll need to 
+execute a command like the following to build the plugin file.
+<screen>
+ld -shared -o <replaceable>myPlugin</replaceable>.so.1.0 ./<replaceable>myPluginFuncs</replaceable>.o <replaceable>[required libraries]</replaceable>
+</screen>
+The <replaceable>[required libraries]</replaceable> means that you may have to include linker options
+to include any other libraries that your plugin relies on.  For example, if your plugin functions 
+require code from the standard math library, you may need to add <function>-lm</function>.
+</para>
+</sect2>
+
+<sect2>
+<title>Building Plugins With Windows</title>
+<para>
+<indexterm><primary>Windows</primary></indexterm>
+Once you've created the object file containing your plugin functions, you'll need to 
+execute a command like the following to build the plugin file.  You'll need to have
+GNU development tools installed to follow the instructions listed below.
+<screen>
+dlltool -z <replaceable>myPluginFuncs</replaceable>.def <replaceable>myPluginFuncs</replaceable>.o
+ld -shared -o <replaceable>myPlugin</replaceable>.o <replaceable>myPluginFuncs</replaceable>.o <replaceable>myPluginFuncs</replaceable>.def <replaceable>path_to_breve_binary</replaceable>.exe <replaceable>[required libraries]</replaceable>
+</screen>
+The <replaceable>[required libraries]</replaceable> means that you may have to include linker options
+to include any other libraries that your plugin relies on.  For example, if your plugin functions 
+require code from the standard math library, you may need to add <function>-lm</function>.
+</para>
+</sect2>
+
+</sect1>
+
+<sect1 id="archiving_data">
+<title>Archiving Plugin Data With The <function>data</function> Type</title>
+<para>
+<indexterm><primary>data archiving</primary></indexterm>
+<indexterm><primary>brData structure</primary></indexterm>
+The <function>data</function> type is used for archiving and dearchiving custom
+binary data.  If a plugin creates a large internal block of data, for example,
+how could this data be archived?  The <function>pointer</function> type cannot
+be archived because breve doesn't know the structure or size of the data that
+the pointer is referring to.  The type <function>data</function> is therefore
+used to hold a linear block of data of a known type.
+</para>
+<para>
+In order for plugin data to be stored in a breve archive, the data must be
+made into a <function>data</function> type.  Internally, this is represented
+as the C structure <function>brData</function>.  The following functions are
+declared in the plugin header file and will allow you to create and free 
+<function>brData</function> structures:
+<screen>
+brData *brDataNew(void *data, int length);
+void brDataFree(brData *data);
+</screen>
+</para>
+<para>
+To archive and dearchive data from a plugin ojbect, you'll need one internal 
+function to serialize and encode the state of your plugin object and another to 
+deserialize and decode the object.  For instance, consider a plugin which deals
+with large matrices, say 100x100 doubles.  When the simulation is to be archived, the matrix needs 
+to be encoded into an <function>brData</function> struct and returned to the
+object.  When the simulation is to be dearchived, the <function>brData</function>
+needs to be decoded back into a matrix.
+</para>
+<para>
+Here's how these functions might look:
+<screen>
+int archiveMatrix(stEval arguments[], stEval *result, void *instance) {
+	// assume that the plugin object passes us the pointer to its matrix
+	// also assume that the size of the matrix is 100x100 doubles
+
+	double **matrix = BRPOINTER(&amp;arguments[0]);
+
+	BRDATA(result) = brDataNew(matrix, 100 * 100 * sizeof(double));
+
+	return EC_OK;
+}
+
+int dearchiveMatrix(stEval arguments[], stEval *result, void *instance) {
+	brData *matrixData = BRDATA(&amp;arguments[0]);
+	double **matrix = malloc(100 * 100 * sizeof(double));
+
+	bcopy(matrixData->data, matrix, 100 * 100 * sizeof(double));
+
+	// now we return the matrix pointer to the object, and the state 
+	// of the object is restored!
+
+	BRPOINTER(result) = matrix;
+
+	return EC_OK;
+}
+</screen>
+</para>
+<para>
+We also need to modify the <function>archive</function> and 
+<function>dearchive</function> methods of our breve plugin object to call the
+new functions:
+<screen>
++ to archive:
+	# convert the internal data to a "data" type
+	matrixData = archiveMatrix(matrixPointer).
+
++ to dearchive:
+	# convert the "data" type back to internal data
+	matrixPointer = dearchiveMatrix(matrixData).
+</screen>
+</para>
+</sect1>
+
+<sect1 id="using_plugins">
+<title>Using Plugins in Simulations</title>
+<para>
+<indexterm><primary>@plugin</primary></indexterm>
+Loading a plugin from within a simulation is relatively simple.  First, place
+the plugin in a directory where breve will find it (either a directory in your
+class path, or in a directory specified with a "@path" line).  Then simply load
+the plugin using a "@plugin" line at the top of your simulation file:
+<screen>
+@plugin "<replaceable>pluginName.o</replaceable>" (<replaceable>pluginEntryFunction</replaceable>).
+</screen>
+Assuming that breve is able to locate and load your plugin file and the 
+corresponding class files, you should now be able to use the plugin classes
+in your simulation.
+</para>
+</sect1>
+
+</chapter>

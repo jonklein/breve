@@ -1,0 +1,24 @@
+<head>
+<title>slRegexPlugin help</title>
+</head>
+<body bgcolor="#ffffff">
+The slURLPlugin is a simple breve plugin (Mac OS X only) which adds the 
+ability to open URLs and download URL content into breve.  This plugin 
+defines the following functioins:
+<ul>
+  <li>openURL(<i>urlString</i>)
+  <p>
+  Sends a message to the Finder to open the specified URL in the user's browser of choice.
+  <li>getURL(<i>urlString</i>)
+  <p>
+  Downloads the specified URL and returns the contents as a string.  
+  Should only be used to retreive text, not to download files.
+  <li>downloadURL(<i>urlString</i>, <i>fileString</i>)
+  <p>
+  Downloads the specified URL and saves the contents to the file specified
+  by <i>fileString</i>.  If the file location is not an absolute path, it
+  will appear in the default output directory as specified in the 
+  preferences.  This could be used, for example, to download breve object
+  files on the fly.
+</ul>
+</body>

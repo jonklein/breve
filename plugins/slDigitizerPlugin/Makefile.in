@@ -1,0 +1,18 @@
+# requires QuickTime -- currently OS X only
+
+INCLUDES = -I..
+BREVEDIR = ../../
+
+CFILES = DigitizerFunctions.c
+OFILES = DigitizerFunctions.o
+
+all: $(OFILES) DigitizerPlugin.o
+
+DigitizerPlugin.o: $(OFILES)
+	$(CC) @PLUGINFLAGS@ -o DigitizerPlugin.o DigitizerFunctions.o @QUICKTIMEFLAGS@
+
+clean:
+	-rm -f *.o
+
+.c.o:
+	$(CC) -g -c $*.c $(INCLUDES)

@@ -1,0 +1,200 @@
+@include "Mobile.tz"
+
+Object : MultiBody (aka MultiBodies) [version 2.0] {
+	% The MultiBody class is used to manipulate a group of connected
+	% OBJECT(Link) objects as a single logical body.  This means that 
+	% the entire group of links can be moved or otherwise manipulated
+	% using by referring to the MultiBody.
+	% <p>
+	% After the creating and connecting of the links is complete, 
+	% one of the OBJECT(Link) objects must be declared the root of 
+	% the MultiBody using the METHOD(set-root) method.  
+
+	+ variables:
+		rootLink (object).
+		selfCollisions (int).
+		multibodyPointer (pointer).
+		menus (list).
+
+	+ to init:
+		multibodyPointer = multibodyNew().
+
+	+ section "Adding Menus"
+
+	+ to add-menu named menuName (string) for-method theMethod (string):
+		% Adds a menu named menuName to the application which will result
+		% in a call to theMethod for the calling instance.
+		% <p>
+		% If the calling instance is the Controller object, then the menu will
+		% become the "main" simulation menu.  Otherwise, the menu will become
+		% a contextual menu associated with the specific object in the simulation.
+		% <p>
+		% Note that unlike the METHOD(handle-collision) which sets the collision
+		% handler for the whole type (class, that is), this method affects only
+		% the instance for which it is called, meaning that each instance of a
+		% certain class may have a different menu.
+
+		newMenu (object).
+
+		newMenu = ((new MenuItem) create-menu named menuName for-object self for-method theMethod).
+		self add-dependency on newMenu.
+		push newMenu onto menus.
+
+		return newMenu.
+
+	+ to add-menu-separator:
+		% Adds a separator menu item--really just an empty menu item.
+
+		newMenu (object).
+
+		newMenu = ((new MenuItem) create-menu named "" for-object self for-method "").
+		self add-dependency on newMenu.
+		push newMenu onto menus.
+
+		return newMenu.
+
+	+ section "Getting and Setting the Position of a MultiBody"
+
+	+ to get-location:
+		% Returns the location of the root link of the multibody.
+
+		return (rootLink get-location).
+
+	+ to move to newLocation (vector):
+		% Moves the entire MultiBody to newLocation.
+
+		multibodySetLocation(multibodyPointer, newLocation).
+
+	+ to rotate around-axis thisAxis (vector) by amount (float):
+		% Sets the rotation of this multibody around vector axis thisAxis
+		% by scalar amount (in radians).  This is an "absolute" rotation--the
+		% current rotation of the object does not affect how the
+		% object will be rotated.  For a rotation relative to the
+		% current orientation, set METHOD(relative-rotate).
+		% <p>
+		% This method implicitly changes the rotation and location of all
+		% attached link objects.
+
+		length (float).
+
+		# normalize the axis
+
+		length = |thisAxis|.
+
+		if length == 0.0: return.
+		thisAxis /= length.
+
+		multibodySetRotation(multibodyPointer, thisAxis, amount).
+
+	+ section "Managing the Appearence of MultiBodies".
+
+	+ to set-color to newColor (vector):
+		% Sets the color for all links.
+
+		(self get-all-connected-links) set-color to newColor.
+
+	+ to show-axis:
+		% Enables the axis for all connected links.
+
+		(self get-all-connected-links) show-axis.
+
+	+ to show-bounding-box:
+		% Enables the bounding box for all connected links.
+
+		(self get-all-connected-links) show-bounding-box.
+
+	+ to hide-axis:
+		% Disables the axis for all connected links.
+
+		(self get-all-connected-links) hide-axis.
+
+	+ to hide-bounding-box:
+		% Disables the bounding box for all connected links.
+
+		(self get-all-connected-links) hide-bounding-box.
+
+	+ section "Handling and Detecting Collisions"
+
+	+ to enable-self-collisions:
+		% Enables collisions between objects contained in the same MultiBody.  
+		% This option is disabled by default--it can lead to unexpected 
+		% behaviors if Links are inadvertantly forced together by the 
+		% configuration of the joints.
+
+		selfCollisions = 1.
+		multibodySetHandleSelfCollisions(multibodyPointer, selfCollisions).
+
+	+ to disable-self-collisions:
+		% Disables collisions between links within this MultiBody.  
+		% See METHOD(enable-self-collisions) for more information.
+
+		selfCollisions = 0.
+		multibodySetHandleSelfCollisions(multibodyPointer, selfCollisions).
+
+	+ to check-self-penetration:
+		% Checks to see if this MultiBody is colliding with itself.  
+		% This method is useful when a MultiBody is first built 
+		% to determine whether the "native" configuration of the body 
+		% is valid or not.  If the body is in a conflicting configuration 
+		% when it's first built, it may lead to unexpected behaviors as
+		% the body attempts to correct itself.
+
+		return multibodyCheckSelfPenetration(multibodyPointer).
+
+	+ section "Getting and Setting Information About Connected Objects"
+
+	+ to set-root to root (object):
+		% Associates a MultiBody with a link root.  All links attached
+		% to root, both directly and indirectly, will implicitly be 
+		% part of this MultiBody as well.  When joints are created
+		% and destroyed, the MultiBody automatically updates.
+
+		if !root || !(root get-link-pointer):
+			die "attempting to register MultiBody with uninitialized Link object".
+
+		rootLink = root.
+
+		self add-dependency on rootLink.
+
+		multibodySetRoot(multibodyPointer, (root get-link-pointer)).
+
+		if selfCollisions: self enable-self-collisions.
+
+	+ to get-all-connected-links:
+		% Returns all of the OBJECT(Link) objects which comprise the 
+		% MultiBody.
+
+		allObjects, links (list).
+		link (object).
+
+		allObjects = (self get-all-connected-objects).
+
+		foreach link in allObjects: {
+			if (link is a "Link"): push link onto links.
+		}
+
+		return links.
+
+	+ to get-all-connected-objects:
+		% Returns all of the OBJECT(Link) and OBJECT(Joint) objects
+		% which comprise this MultiBody.
+
+		return multibodyAllObjects(multibodyPointer).
+
+	+ to free-all-connected-objects:
+		% Frees all of the OBJECT(Link) and OBJECT(Joint) objects which
+		% comprise this MultiBody.
+
+		free (self get-all-connected-objects).
+
+	+ to dearchive:
+		self set-root to rootLink.
+
+		multibodySetHandleSelfCollisions(multibodyPointer, selfCollisions).
+
+		return 1.
+
+	+ to destroy:
+		multibodyFree(multibodyPointer).
+		free menus.
+}

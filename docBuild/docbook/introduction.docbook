@@ -1,0 +1,344 @@
+<!--
+    The breve Simulation Environment documentation
+    Copyright (C) 2003 Jonathan Klein
+-->
+
+<chapter id="introduction">
+<title>Introduction</title>
+<para>
+breve is a free environment designed for simulation of realistic, 3D,
+multi-agent systems.  
+</para>
+<para>
+This document describes breve and outlines how simulations are constructed.
+This chapter contains a brief overview on how to get started using breve to 
+run simulations and how to get started on constructing your own.
+</para>
+
+<sect1 id="what_is_breve">
+<title>What is breve?</title>
+<para>
+breve is a free simulation environment designed for multi-agent simulation.  breve 
+allows users to define the behaviors of autonomous agents in a continuous 3D world,
+then observe how they interact.  breve includes support for a rich visualization engine, 
+realistic physical simulation and an easy-to-use scripting language.
+</para>
+<para>
+breve can be used as a tool to explore any type of simulated world.  breve 
+has been used for a wide variety of simulation applications: simulated 
+virtual creatures, artificial ecosystems, simulations of molecular biology,
+visualization and much more.  breve facilitates the construction of complex
+agent-based simulations by automatically handling agent communication,
+representation in 3D space, graphical rendering, physical simulation and
+a number of other features which are useful to agent-based simulations.
+</para>
+<sect2><title>Multi-Agent Simulation</title>
+<para>
+<indexterm><primary>multi-agent simulation</primary></indexterm>
+<indexterm><primary>agents</primary></indexterm>
+The term <firstterm>agent</firstterm> refers to any object in a simulated 
+world, but in particular, an object with autonomous behaviors which interacts 
+with its environment and other agents.  A <firstterm>multi-agent 
+simulation</firstterm> is a simulation in which multiple agents exist and 
+interact in the simulated world.  An example of a multi-agent simulation is 
+an ecosystem simulation: a large number of autonomous agents (animals) 
+interacting with each other (eating and breeding) and the environment.
+</para>
+<para>
+<mediaobject><imageobject><imagedata align="center" fileref="images/particle_fountain.jpg"></imageobject>
+<caption><para>In the <emphasis>ParticleFountain</emphasis> demo, you can see 
+a particle system made up of hundreds of independent agents.</para></caption>
+</mediaobject>
+</para>
+</sect2>
+<sect2><title>3D Spatial Simulation</title>
+<para>
+<indexterm><primary>space</primary></indexterm>
+<indexterm><primary>spatial simulation</primary></indexterm>
+breve is a simulation environment which is used primarily for 3D 
+<firstterm>spatial simulations</firstterm>.  This means that breve simulates 
+3D physical space and that simulated agents occupy and interact in this physical
+space.  Because of this, breve can be used for realistic simulations involving 
+space, such as physical simulations.  This is in contrast to simulation 
+environments which model space in 2D or which treat "space" only as an 
+abstract concept.  
+</para>
+<para>
+<mediaobject><imageobject><imagedata align="center" fileref="images/DLA.jpg"></imageobject>
+<caption><para>
+In the <emphasis>DLA</emphasis> demo, a fractal structure forms in 3D space.
+</para></caption>
+</mediaobject>
+</para>
+</sect2>
+<sect2><title>Physical Simulation</title>
+<para>
+<indexterm><primary>physics</primary></indexterm>
+breve is capable of realistic <firstterm>physical simulation</firstterm>.  This 
+means that agents in the simulated world can be configured to behave just as 
+real objects do, according to the laws of physics.  If a ball is placed in 
+the air above a floor, for example, physical simulation can be used to 
+make the ball realistically fall towards the floor and bounce.  Among other 
+things, physical simulation can be used for realistic simulation of robots, 
+vehicles and animals.
+</para>
+<para>
+<mediaobject><imageobject><imagedata align="center" fileref="images/walker.jpg"></imageobject>
+<caption><para>
+In the <emphasis>Walker</emphasis> demo, a physically simulated creature 
+learns to walk.
+</para></caption>
+</mediaobject>
+</para>
+</sect2>
+</sect1>
+
+<sect1 id="install_os_x">
+<title>Installing and Running the breve Application on Mac OS X</title>
+<para>
+<indexterm><primary>Mac OS X</primary></indexterm>
+To install the breve application under Mac OS X, simply drag the application
+(<function>breve.app</function>) into your <function>/Applications</function> 
+folder (or to any other folder where you wish to put the program).
+</para>
+<para>
+To get started with breve, simply double-click the breve application.  
+</para>
+
+<sect2><title>Running the Demo Simulations</title>
+<para>
+If you're new to breve, the first thing to do is run one of the demo simulations 
+provided with the application.  To open a demo file, use the 
+<function>Demo</function> menu in the breve application.
+</para>
+<para>
+After selecting a demo, a window is opened showing the simulation code.
+By pushing the play button, you start the simulation.  The simulation
+can then be paused or stop by using the corresponding buttons below 
+the simulation display.
+</para>
+<para>
+If multiple code windows are open, you can select the simulation to start
+by using the popup menu located at the bottom of the simulation window.
+<mediaobject><imageobject><imagedata align="center" fileref="images/simulation_popup.jpg"></imageobject></mediaobject>
+</para>
+
+</sect2>
+
+<sect2 id="tools">
+<title>The Tool Palette</title>
+<para>
+<indexterm><primary>zoom-tool</primary></indexterm>
+<indexterm><primary>rotate-tool</primary></indexterm>
+<indexterm><primary>selection-tool</primary></indexterm>
+<indexterm><primary>dragging objects</primary></indexterm>
+On the right hand side of the simulation window is a small palette of tools.
+<mediaobject><imageobject><imagedata align="center" fileref="images/tools.jpg"></imageobject></mediaobject>
+</para>
+<para>
+The top tool is the rotation tool.  Use it to rotate the simulation view.
+The focal point of the simulation will remain the same, while the viewing 
+angle is changed.
+</para>
+<para>
+The second tool is the zoom tool.  Use this tool to zoom in and out.  As 
+with the rotation tool, the focal point of the simulation stays the same.
+</para>
+<para>
+The third tool is the motion tool, used to change the focal point of the 
+simulation.
+</para>
+<para>
+The final tool, the selection and motion tool, is used to select objects in 
+the simulation.  Once selected, an object can be inspected using the 
+selection inspector window (described in <xref linkend="selection_inspector">), 
+or dragged around the simulation.
+</para>
+</sect2>
+
+<sect2 id="selection_inspector">
+<title>The Selection Inspector</title>
+<para>
+The "selection inspector" allows simulation objects to be inspected in 
+real-time, as simulations run.  If no object is selected in the simulation
+display, the controller object is shown in the selection window&mdash;when
+an object is selected, its state is shown in the inspector.
+</para>
+<para>
+The inspector automatically updates every few seconds so that the current
+state of simulation variables is always shown.
+</para>
+<para>
+<mediaobject><imageobject><imagedata align="center" fileref="images/selection_inspector.jpg"></imageobject></mediaobject>
+</para>
+</sect2>
+
+<sect2 id="log_window">
+<title>The Log Window and Command-Input Field</title>
+<para>
+Text messages and output from the simulation are printed to the log window.
+</para>
+<para>
+The log window also contains a command-input field.  This field allows you
+to execute commands in running simulations.  "steve" commands can be written
+directly into this field, and will be executed in the simulation's 
+controller object.  The steve language (and the controller object) are 
+described in the next chapter (<xref linkend="steve">).
+<mediaobject><imageobject><imagedata align="center" fileref="images/log_window.jpg"></imageobject></mediaobject>
+</para>
+</sect2>
+
+<sect2 id="app_menus"> 
+<title>The Simulation Menu and Object Contextual Menus</title>
+<para>
+Users can also interact with a running simulation via the 
+<firstterm>simulation menu</firstterm>, located in the menu bar, or by 
+accessing contextual menus associated with objects in a simulation.  To access a 
+contextual menu for an object in the simulation, control-click on the object in 
+the simulation display.
+</para>
+<para>
+By default, the simulation menu and contextual menus are mostly empty.  As 
+you begin to customize simulations and construct your own, however, you will be
+able to add your own custom options to the simulation and contextual menus.
+</para>
+</sect2>
+
+</sect1>
+
+<sect1 id="install_command_line">
+<title>Installing and Running Command-Line breve on Mac OS X, Linux and Windows</title>
+<para>
+<indexterm><primary>Mac OS X</primary></indexterm>
+<indexterm><primary>Linux</primary></indexterm>
+<indexterm><primary>Windows</primary></indexterm>
+<indexterm><primary>command-line</primary></indexterm>
+<indexterm><primary>environment variables</primary></indexterm>
+<indexterm><primary>BREVE_CLASS_PATH</primary></indexterm>
+
+<indexterm><primary>zoom-tool</primary></indexterm>
+<indexterm><primary>rotate-tool</primary></indexterm>
+<indexterm><primary>selection-tool</primary></indexterm>
+<indexterm><primary>dragging objects</primary></indexterm>
+
+The command-line version of breve allows you to run breve simulations on the 
+command-line both with and without graphical display.  The command-line version
+of breve is available for Mac OS X, Linux and Windows.
+</para>
+<note><title>For Windows and Linux Users</title>
+<para>
+In order to run the command-line breve on any of these platforms, you'll need 
+to have OpenGL and GLUT libraries installed on your system.  If you encounter
+problems running breve, you may need to install these libraries.  They are 
+free available from the internet.
+</para>
+</note>
+<sect2 id="cli_setup"><title>Setting Up Your Environment</title>
+<para>
+Before running breve, you'll need to set up the environment variable 
+<function>BREVE_CLASS_PATH</function>.  This variable must contain
+the location of the "lib/classes" directory included in the 
+distribution.  Setting this environment is done differently for 
+different shells and platforms.  Some examples are shown below.
+<replaceable>path to breve</replaceable> is the location of the 
+breve distribution folder that you downloaded.
+<screen>
+# tcsh users (Linux &amp; OSX):
+	setenv BREVE_CLASS_PATH /<replaceable>&lt;path to breve&gt;</replaceable>/lib/classes
+
+# bash users (Linux &amp; OSX):
+	export BREVE_CLASS_PATH=/<replaceable>&lt;path to breve&gt;</replaceable>/lib/classes
+
+# Windows console users:
+	SET BREVE_CLASS_PATH=C:\<replaceable>&lt;path to breve&gt;</replaceable>\LIB\CLASSES
+</screen>
+You may freely move around the files in the breve distribution (to install them in 
+<function>/usr/local</function> on a UNIX system, for example), but be sure to set your 
+<function>BREVE_CLASS_PATH</function> accordingly.
+</para>
+</sect2>
+<sect2><title>Running the Demo Simulations</title>
+<para>
+Once your <function>BREVE_CLASS_PATH</function> environment variable is configured, you can get started by 
+running breve with one of the included simulation files.  Assuming that you are in the 
+breve distribution directory, you can type:
+<screen>
+% ./bin/breve ./demos/Swarm/ArrowSwarm.tz
+</screen>
+</para>
+<para>
+This command will open a graphical display window containing the simulation, which is
+initially paused.  To unpause the simulation, hit the space bar.  When the simulation
+is running, the following controls can be useful:
+<itemizedlist>
+<listitem><para>Space bar: pause/unpause the simulation</para></listitem>
+<listitem><para>F1: run simulation forward one iteration</para></listitem>
+<listitem><para>Left mouse: rotate simulation, and select objects (described below)</para></listitem>
+<listitem><para>Right mouse: simulation menu, or contextual menu for currently selected object (described below)</para></listitem>
+<listitem><para>Shift + left mouse: select and drag objects in the simulation</para></listitem>
+<listitem><para>F2 + left mouse: zoom in and out of the simulation</para></listitem>
+<listitem><para>Escape: to quit the simulation, or access the breve command prompt</para></listitem>
+</itemizedlist>
+</para>
+<para>
+The breve command prompt (which can be accessed using the escape key) can be used to
+execute commands in running simulations.  "steve" commands are typed in at this 
+prompt, and will be executed in the simulation's controller object.  The steve language 
+(and the controller object) are described in the next chapter (<xref linkend="steve">).
+</para>
+</sect2>
+
+<sect2 id="cli_menus"> 
+<title>The Simulation Menu and Object Contextual Menus</title>
+<para>
+Users can also interact with a running simulation via the 
+<firstterm>simulation menu</firstterm>, which is accessed from the left mouse button, and through the
+contextual menus associated with objects in a simulation.  To access a 
+contextual menu for an object in the simulation, right-click on the object in 
+the simulation display.
+</para>
+<para>
+By default, the simulation menu and contextual menus are mostly empty.  As 
+you begin to customize simulations and construct your own, however, you will be
+able to add your own custom options to the simulation and contextual menus.
+</para>
+</sect2>
+
+<sect2><title>Viewing the Simulation Code</title>
+<para>
+Simulations written in breve use the suffix ".tz" and are regular text files.  You can
+open up the file in your favorite editor to see how it works:
+<screen>
+% pico ./demos/Swarm/ArrowSwarm.tz 
+</screen>
+</para>
+<para>
+If this is your first time running breve, it is recommended that you take the 
+time to explore the demos and their code.  By exploring the demos, you'll see
+how a number of breve's features are used and gain a basic understanding of 
+how simulations are written.
+</para>
+</sect2>
+
+<sect2 id="cli_no_graphics">
+<title>Command-Line breve Without Graphical Display</title>
+<para>
+If you wish to run a simulation without graphical display, you can use the 
+program <function>breve_cli</function>.  Follow the same setup directions 
+described above (<xref linkend="cli_setup">) in order to setup your environment,
+and then run the simulation:
+<screen>
+% ./bin/breve_cli ./demos/Swarm/ArrowSwarm.tz
+</screen>
+</para>
+<para>
+Textual output will be printed as usual, but no graphical window is shown.  
+This feature is most useful for collecting data when user interaction and 
+observation
+is unimportant.
+</para>
+</sect2> 
+
+</sect1>
+
+</chapter>

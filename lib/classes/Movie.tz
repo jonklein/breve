@@ -1,0 +1,36 @@
+@use Abstract.
+
+Abstract : Movie {
+	% Records MPEG movies of breve runs.
+	% <P>
+	% The Movie class does not work when using the non-graphical 
+	% ("breve_cli") breve.
+
+	+ variables:
+		moviePointer (pointer).
+
+	+ to record to filename (string):
+		% Create a new MPEG movie file with the name filename.
+		% New frames will be automatically added to the movie as the simulation
+		% runs until the object is released or METHOD(close) is called.  filename
+		% should end with ".mpg".
+
+		moviePointer = movieCreate(filename).
+
+	+ to iterate:
+		if moviePointer: self add-frame-from-display.
+
+	+ to close:
+		% Closes the MPEG file and stops recording.
+
+		if moviePointer: movieClose(moviePointer).
+		moviePointer = 0.
+
+	- to add-frame-from-display:
+		% Add a frame from the current simulation display.
+
+		if moviePointer: movieAddGLFrame(moviePointer).
+
+	+ to destroy:
+		self close.
+}

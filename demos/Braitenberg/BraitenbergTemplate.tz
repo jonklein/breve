@@ -1,0 +1,24 @@
+@use Braitenberg.
+
+Controller myBraitenbergControl.
+
+BraitenbergControl : myBraitenbergControl {
+	+ variables:
+		vehicle (object).
+		leftSensor, rightSensor (object).
+		leftWheel, rightWheel (object).
+		light (object).
+
+	+ to init:
+		light = new BraitenbergLight.
+		light move to (10, 1, 0).
+
+		vehicle = new BraitenbergVehicle.
+		self watch item vehicle.
+}
+
+#
+# This demo is the template for building a Braitenberg vehicle
+# simulation.  Follow the Braitenberg vehicle tutorial, or look
+# at the other Braitenberg vehicle demos for more information.
+#

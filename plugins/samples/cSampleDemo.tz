@@ -1,0 +1,31 @@
+@use Control.
+@use Shape.
+
+@plugin "cSample_plugin.o" (cSampleLoadFunctions).
+
+Controller cSampleController.
+
+Control : cSampleController {
+	+ to init:
+		pluginObject (object).
+		pluginObject = new cSamplePluginObject.
+
+		print "* calling plugin test function -- plugin will print a message:".
+		pluginObject run-test1 with-int 5 with-string "text".
+
+		print "* calling plugin test function -- plugin will return a value:".
+		print "the plugin returns the number", (pluginObject run-test2).
+
+		pluginObject run-list-test.
+}
+
+Object : cSamplePluginObject {
+	+ to run-test1 with-int n (int) with-string s (string):
+		cSampleTest(n, s).
+		
+	+ to run-test2:
+		return cSampleTestII().
+
+	+ to run-list-test:
+		return cSampleListTest( { 1, 2, 3 } ).
+}

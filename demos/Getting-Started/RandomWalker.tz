@@ -1,0 +1,77 @@
+#
+# RandomWalker is a simulation in which small spheres do
+# a random walk.  
+#
+# This is just about the most simple simulation possible, and 
+# can be used as a skeleton for more complex simulations.
+#
+
+@include "Control.tz"           
+@include "Mobile.tz"           
+
+# First tell the breve engine the name of our controller class
+
+Controller myControl.             
+
+# We begin the class definition by specifying the parent object, then
+# the name of the new object.  The body of the class definition is then
+# enclosed by braces
+
+Control : myControl {
+    # Here we define the class variables.  We just have one 
+    # variable here, of type object.
+
+    + variables:
+        walkerShape (object).
+        
+    # Next we define a method called init.  The init method is called 
+    # automatically when our class is created.  Since this is the controller
+    # class, an instance gets created when we launch the simulation,
+    # so this is the entry point for our simulation.
+        
+    + to init:
+        print "Setting up the simulation.".
+
+        self point-camera at (0, 0, 0) from (0, 60, 0).
+
+        # first set up a shape that all of the RandomWalker objects 
+        # will use.
+        
+        walkerShape = new Shape.
+        walkerShape init-with-sphere radius 1.
+        
+        # Create a bunch of RandomWalkers.  You can create as few or 
+        # as many as you want... the simulation speed gets pretty 
+        # painful at around 1000.
+
+        200 new RandomWalker.
+
+    # The get-walker-shape is a method that allows other objects 
+    # to look at the walkerShape variable.  we do this so that 
+    # each RandomWalker object can reuse the same Shape object.
+    # This is not strictly required--each RandomWalker could create
+    # it's own copy of the same Shape, but fewer objects means 
+    # less memory used and more efficient simulations, so it's 
+    # a good programming practice.
+        
+    + to get-walker-shape:
+        return walkerShape.
+}
+
+# The RandomWalker object is the physical object in the simulation
+# that does the random walk.  
+
+Mobile : RandomWalker {
+    + to init:
+        # During init, the object asks the controller for the shape 
+        # it should use.  It then sets itself to a random color.
+
+        self set-shape to (controller get-walker-shape).
+        self set-color to random[(1.0, 1.0, 1.0)].
+        self move to random[(.1, .1, .1)].
+    
+    + to iterate:
+        # Set a new random velocity at every timestep.
+        
+        self set-velocity to random[(60, 60, 60)] - (30, 30, 30).
+}

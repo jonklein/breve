@@ -1,0 +1,32 @@
+#
+# libbrgraph.a
+# Copyright (C) 2000-2004    jon klein (jk@spiderland.org)
+#
+# s pi der la nd
+#
+
+INCLUDE += -I../include/breve
+LIBS	+= -L../lib -L. -lbrutil -lz
+
+CFILES	= graph.c draw.c
+OFILES	= graph.o draw.o
+
+all: libbrgraph.a graphTest
+
+graphTest: libbrgraph.a graphTest.c
+	$(CC) $(CFLAGS) -o graphTest graphTest.c $(INCLUDE) -L. -lbrgraph $(LIBS) @GLLIBS@ @DEFS@
+	
+libbrgraph.a: $(OFILES)
+	$(AR) crv libbrgraph.a $(OFILES)
+	ranlib libbrgraph.a
+
+install: all
+	cp *.h ../include/breve
+	cp libbrgraph.a ../lib
+	ranlib ../lib/libbrgraph.a
+
+.c.o: $(CFILES)
+	$(CC) $(CFLAGS) -c $*.c $(DEFINES) $(INCLUDE) 
+
+clean:
+	-rm *.o libbrgraph.a graphTest

@@ -1,0 +1,89 @@
+# 
+# This demo uses a particle system of lightmaps to make simple fireworks.
+#
+
+@use Mobile.
+@use Control.
+
+Controller Fireworks.
+
+Control : Fireworks {
+	+ variables:
+		lightmap (Image object).
+
+	+ to init:
+		# because we don't require high accuracy in this demo, we can step up
+		# the iteration and integration steps in order to make the demo run
+		# a little bit faster.
+
+		self set-integration-step to .2.
+		self set-iteration-step to .2.
+		self set-background-color to (0, 0, 0). 
+
+		lightmap = (new Image load from "images/lightmap.png").
+
+		self enable-blur.
+		self set-blur-factor to .85.
+
+		self point-camera at (0, 0, 0) from (120, 2.1, 0.0).
+
+	+ to get-lightmap-image:
+		return lightmap.
+
+	+ to iterate:
+		if random[30] == 0: new Shooter.
+		super iterate.
+
+	+ to catch-key-n-down:
+		new Shooter.
+}
+
+Mobile : Shooter (aka Shooters) {
+	+ variables:
+		age, limit (int).
+
+	+ to init:
+		self set-shape to (new Shape init-with-sphere radius 0.1 + random[1.4]).
+		self set-lightmap-image to (controller get-lightmap-image).
+		self set-color to random[(.2, .2, .2)] + (.8, .8, .8).
+		self move to random[(6, 0, 6)] - (3, 30, 3).
+		self set-velocity to random[(4, 3, 4)] + (-2, 9, -2).
+		self set-acceleration to (0, -1, 0).
+
+		limit = 30 + random[15].
+
+	+ to iterate:
+		age += 1.
+
+		if age > limit: {
+			80 new Particle move to (self get-location).
+			free self.
+		}
+}
+
+Mobile : Particle {
+	+ variables:
+		rate, intensity (float).
+		color (vector).
+
+	+ to init:
+		self set-shape to (new Shape init-with-sphere radius 0.1 + random[4.0]).
+		intensity = 1.0.
+		rate = .9 + random[.08].
+
+		# texture #2 happens to be a built-in texture which nicely illustrates the
+		# lightmap effect.
+
+		self set-lightmap-image to (controller get-lightmap-image).
+		color = random[(1, 1, 1)].
+		self set-color to color.
+		self set-velocity to random[(5, 5, 5)] - (2.5, 2.5, 2.5).	
+		self set-acceleration to (0, -random[.5], 0).
+
+	+ to iterate:
+		intensity *= rate.
+
+		self set-color to color * intensity.
+
+		if intensity < .1: free self.
+}

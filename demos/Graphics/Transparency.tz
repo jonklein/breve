@@ -1,0 +1,37 @@
+# This demo shows the use of transparency and textures.
+
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use Stationary.
+@use Image.
+
+Controller TransparencyExample.
+
+Control : TransparencyExample {
+	+ to init:
+		new TransparentCube.
+		self set-background-color to (0, 0, 0).
+		self enable-lighting.
+		self move-light to (0, 20, 0).
+}
+
+Mobile : TransparentCube {
+	+ to init:
+		self set-shape to (new Cube init-with size (8, 8, 8)).
+		self set-texture-image to (new Image load from "images/water.png").
+
+		self set-texture-scale to 8.
+		self set-transparency to .8.
+
+		self set-rotational-velocity to (.01, .02, .05).
+
+	+ to iterate:
+		t (double).
+
+		t = (controller get-time) / 100.0.
+
+		self set-color to (sin(t), cos(t), 1.0).
+}

@@ -1,0 +1,166 @@
+@use Abstract.
+@use Patch.
+
+Abstract : PatchGrid [version 1.9] {
+	% OBJECT(PatchGrid) is a class which allows you to create "patches".  
+	% A OBJECT(Patch) is a non-physical object which is associated with 
+	% a specific area in the 3D world.  This allows you to associate 
+	% information or actions with specific areas in space, such as the 
+	% presence of a chemical or nutrient at that area.
+	% <p>
+	% Use METHOD(init-with) or METHOD(init-at) the create a PatchGrid.
+
+	+ variables:
+		grid (pointer).
+		patches (list).
+		location, patchSize (vector).
+		xSize, ySize, zSize (int).
+
+	+ to init-with patch-size pSize (vector) with-x-count x (int) with-y-count y (int) with-z-count z (int) with-patch-class class (string):
+		% Like METHOD(init-at), but centers the patch grid at the origin of the world.
+
+		return (self init-at location (0, 0, 0) with-patch-size pSize with-x-count x with-y-count y with-z-count z with-patch-class class).
+
+	+ to init-at location gridCenter (vector) with-patch-size pSize (vector) with-x-count x (int) with-y-count y (int) with-z-count z (int) with-patch-class class (string):
+		% Creates a PatchGrid in which each OBJECT(Patch) is a member of 
+		% class and is the size pSize and in which the total grid 
+		% dimensions are x by y by z.  
+		% <p> 
+		% Bear in mind that this will create a large number of objects: 
+		% x * y * z.  If you have an iterate method in your patch-class, 
+		% then this can amount to a great deal of computation which can
+		% slow down your simulation.
+
+		xCount, yCount, zCount (int).
+		patch (object).
+
+		xSize = x.
+		ySize = y.
+		zSize = z.
+
+		patchSize = pSize.
+
+		location = gridCenter.
+
+		grid = newPatchGrid(gridCenter, patchSize, x, y, z).
+
+		xCount = 0.
+		yCount = 0.
+		zCount = 0.
+
+		while xCount < x: {
+			yCount = 0.
+
+			while yCount < y: {
+
+				zCount = 0.
+
+				while zCount < z: {
+    				patch = (controller make-new-instance of-class class).
+					patch init-with grid-patch self x-pos xCount y-pos yCount z-pos zCount.
+					push patch onto patches.
+
+					setPatchObjectAtIndex(grid, patch, xCount, yCount, zCount).
+
+					patch set-patch-pointer to patchAtIndex(grid, xCount, yCount, zCount).
+					self add-dependency on patch.
+
+					zCount += 1.
+				}
+
+				yCount += 1.
+			}
+
+			xCount += 1.
+		}
+
+		xCount = 0.
+		yCount = 0.
+		zCount = 0.
+
+		while xCount < x: {
+			yCount = 0.
+
+			while yCount < y: {
+
+				zCount = 0.
+
+				while zCount < z: {
+					patchObjectAtIndex(grid, xCount, yCount, zCount) init-neighbors.
+					patchObjectAtIndex(grid, xCount, yCount, zCount) init-patch.
+					zCount += 1.
+				}
+
+				yCount += 1.
+			}
+
+			xCount += 1.
+		}
+
+		return self.
+
+	+ to get-x-count:
+		% If the grid is initialized, returns the size of the grid on the X-axis.
+		return xSize.
+
+	+ to get-y-count:
+		% If the grid is initialized, returns the size of the grid on the Y-axis.
+		return ySize.
+
+	+ to get-z-count:
+		% If the grid is initialized, returns the size of the grid on the Z-axis.
+		return zSize.
+
+	+ to get-patch-size:
+		% Returns the vector size of a single patch.
+
+		return patchSize.
+
+	+ to get-patch-at x xind (int) y yind (int) z zind (int):
+		% Returns the patch object associated with the specified indices.  Note
+		% that this method may return a NULL object in the case that the 
+		% indices given are out of bounds.
+
+		return patchObjectAtIndex(grid, xind, yind, zind).
+
+	+ to get-patch at-location theLocation (vector):
+		% Returns the OBJECT(Patch) in which theLocation resides.  Make sure you
+		% test for the validity of the returned object, since it is possible that
+		% there is no patch at the specified location.
+
+		return objectAtLocation(grid, theLocation).
+
+	+ to get-patches:
+		% Returns a list of all patch objects.
+
+		return patches.
+
+	+ to get-description:
+		return "$xSize x $ySize x $zSize".
+
+	+ to dearchive:
+		x, y, z (int).
+		index (int).
+
+		grid = newPatchGrid(location, patchSize, xSize, ySize, zSize).
+
+		print "starting dearchive.".
+		for x=0,x<xSize,x++: {
+			for y=0,y<ySize,y++: {
+				for z=0,z<zSize,z++: {
+					setPatchObjectAtIndex(grid, patches{index}, x, y, z).
+					patches{index} set-patch-pointer to patchAtIndex(grid, x, y, z).
+					patches{index} update-colors.
+
+					index++.
+				}
+			}
+		}
+
+		print "done dearchive.".
+
+		return 1.
+
+	+ to archive:
+		return 1.
+}

@@ -1,0 +1,27 @@
+@use Mobile.
+@use Joint.
+
+Mobile : Link (aka Links) [version 2.0] {
+	% Used in conjunction with the OBJECT(MultiBody) object, Link objects
+	% are individual pieces of an articulated body.  
+	% <P>
+	% Prior to breve version 2.0, Link objects were required to build MultiBodies.
+	% Because of this, they were not subclasses of other "Mobile" objects, they 
+	% were a completely different concept.
+	% <P>
+	% In release 2.0, Link is a subclass of OBJECT(Mobile), and OBJECT(MultiBody) 
+	% objects can be constructed out of any Mobile objects.  This means that a 
+	% great deal of the methods and functionality that used to be a part of 
+	% OBJECT(Link) are now accessed via the superclasses OBJECT(Mobile) and 
+	% OBJECT(Real).
+
+	+ to init:
+		setCollisionProperties(realWorldPointer, .2, .5, .2).
+
+		self enable-physics.
+
+	+ to get-multibody:
+		% Returns the OBJECT(MultiBody) that this link is a part of, if any.
+
+		return linkGetMultibody(linkPointer).
+}

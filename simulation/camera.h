@@ -1,0 +1,199 @@
+/*****************************************************************************
+ *                                                                           *
+ * The breve Simulation Environment                                          *
+ * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
+ *                                                                           *
+ * This program is free software; you can redistribute it and/or modify      *
+ * it under the terms of the GNU General Public License as published by      *
+ * the Free Software Foundation; either version 2 of the License, or         *
+ * (at your option) any later version.                                       *
+ *                                                                           *
+ * This program is distributed in the hope that it will be useful,           *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+ * GNU General Public License for more details.                              *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License         *
+ * along with this program; if not, write to the Free Software               *
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
+ *****************************************************************************/
+
+enum billboardType {
+	BBT_NONE = 0,
+	BBT_BITMAP,
+	BBT_LIGHTMAP
+};
+
+/*!
+	\brief Holds location and color information for a light.
+*/
+
+struct slLight {
+	slVector location;
+	slVector diffuse;
+	slVector ambient;
+
+	unsigned char changed;
+};
+
+/*!
+	\brief A string of text printed to the GL view.
+*/
+
+struct slCameraText {
+	char *text;
+	float x;
+	float y;
+	slVector color;
+	unsigned char size;
+};
+
+/*!
+	\brief Data for billboarded bitmaps.
+
+	Billboards, no matter how damn simple they should be, turn out to be 
+	a huge pain in the ass.  It is very hard to handle the billboards 
+	properly when they contain alpha info, and also on multiple pass 
+	algorithms.  Therefore, we make a first pass through to find the 
+	billboards and compute their current coordinates, sort them back 
+	to front and then finally draw them.
+*/
+
+struct slBillboardEntry {
+	slVector location;
+
+	slVector color;
+
+	int bitmap;
+
+	unsigned char mode;
+	unsigned char selected;
+
+	float rotation;
+	float size;
+	float z;
+	float alpha;
+};
+
+/*!
+	\brief The camera for the graphical display.
+
+	Holds camera position/location, as well as a variety of other
+	rendering data.
+*/
+
+struct slCamera {
+	slLight lights[8];
+	int nLights;
+
+	unsigned char enabled;
+
+	// this flag specifies whether the data in this camera is 
+	// automatically being rendered.  In the normal graphical
+	// breve, we can go a glReadPixels whenever we want, and 
+	// we know that we're getting an up-to-date image.  In 
+	// non GUI versions, we may have to update the camera 
+	// ourselves.
+
+	unsigned char updated;
+
+	int flags;
+
+	int zClip;
+
+	// used during drawing
+
+	slBillboardEntry **billboards;
+	int billboardCount;
+	int maxBillboards;
+	int billboardDrawList;
+
+	slVector billboardX;
+	slVector billboardY;
+	slVector billboardZ;
+
+	// used render all stationary objects at once 
+
+	int stationaryDrawList;
+
+	// recompile can be set to 1 at any time to force recompilation 
+	// of draw lists next time the world is drawn. 
+
+	unsigned char recompile;
+
+	slCameraText *text;
+	int textCount;
+	int maxText;
+	double textScale;
+
+	unsigned char drawMode;
+	unsigned char drawLights;
+	unsigned char drawFog;
+	unsigned char drawSmooth;
+	unsigned char drawShadow;
+	unsigned char drawShadowVolumes;
+	unsigned char drawOutline;
+	unsigned char drawReflection;
+	unsigned char drawText;
+	unsigned char blur;
+	unsigned char onlyMultibodies;
+	double blurFactor;
+
+	double fogIntensity;
+	double fogStart;
+	double fogEnd;
+
+	slPlane shadowPlane;
+
+	// offset & target of camera
+
+	slVector location;
+	slVector target; 
+	double rotation[3][3];
+
+	// rotation & zoom 
+
+	double rx, ry;
+	double zoom;
+
+	double backgroundScrollX, backgroundScrollY;
+
+	// the window's perspective of x and y axis at the current rotation 
+
+	slVector xAxis;
+	slVector yAxis;
+
+	// camera size 
+	
+	int x;
+	int y;
+
+	/* camera origin on screen view coords */
+
+	int ox;
+	int oy;
+
+	double fov;
+
+	void (*activateContextCallback)();
+};
+
+slCamera *slNewCamera(int x, int y, int drawMode);
+void slUpdateCamera(slCamera *c);
+
+void slCameraResize(slCamera *c, int x, int y);
+
+void slCameraFree(slCamera *c);
+
+void slSetCameraText(slCamera *c, int n, char *string, float x, float y, slVector *v);
+void slSetShadowCatcher(slCamera *c, slShape *s, slVector *normal, slPosition *pos);
+
+void slAddBillboard(slCamera *c, slVector *color, slVector *loc, float size, float rotation, float alpha, int bitmap, int textureMode, float z, unsigned char selected);
+
+void slSortBillboards(slCamera *c);
+
+int slBillboardSortFunc(const void *a, const void *b);
+
+void slRotateCameraWithMouseMovement(slCamera *c, double dx, double dy, double scamx);
+void slMoveCameraWithMouseMovement(slCamera *c, double dx, double dy);
+void slZoomCameraWithMouseMovement(slCamera *c, double dx, double dy);

@@ -1,0 +1,87 @@
+#
+# This demo simply shows how to use the "neighbor detection" feature
+# of breve.  The simulation does nothing--it just waits for objects to 
+# be clicked on, then changes the color of the neighbors.
+#
+# The three steps to using neighbor checking:
+#   1) set the neighbor size for the Mobile objects 
+#  	   (in the init method of object Things).
+#   2) call update-neighbors for the controller object at each iteration
+#      (in the iterate method of object Gatherers).
+#   3) get the neighbor list from the Mobile objects using get-neighbors 
+#      (the click method of object Gatherers).
+#
+
+@include "Mobile.tz"
+@include "Control.tz"
+
+Controller Gatherers.
+
+Control : Gatherers {
+	+ to init:
+		t (list).
+
+		# create a bunch of objects, and set up the camera.
+
+		t = 150 new Things.
+
+		self point-camera at (0, 0, 0) from (0, 0, 50).
+
+		self set-display-text to "Select an object to highlight its neighbors" at-x -.95 at-y -.9.
+		# self set-display-text-scale to 2.0.
+
+		# self enable-lighting.
+		self enable-smooth-drawing.
+
+		self update-neighbors.
+
+	+ to click on item (object):
+		# here we override the "click" method so that we catch clicks
+		# and customize the behavior.  if this method isn't overriden,
+		# then the objects are selected when clicked on as usual.
+
+		neighbors (list).
+		color (vector).
+
+		# make sure we check that the user didn't click on empty space
+
+		if !item: return.
+
+		# get the neighbor list
+
+		neighbors = (item get-neighbors).
+
+		# tell the neighbors in the list list to change color 
+
+		color = random[(1, 1, 1)].
+
+		neighbors set-color to color.
+
+		super click on item.
+	
+	+ to iterate:
+		# the objects in this simulation don't move--the only action 
+		# we do is to update the neighbors.  since the objects don't
+		# move, it's actually not required to call update-neighbors 
+		# at every timestep, but since this is a demonstration of 
+		# how neighbor checking works, we do it anyway.  in a real
+		# simulation with moving objects, it should be called every
+		# iteration.
+
+		self update-neighbors.
+
+		super iterate.
+}
+
+Mobile : Things {
+	# the Things object is pretty simple--it doesn't do anything.  we 
+	# create the object as a Sphere, set the color, and then set the 
+	# neighborhood size telling the engine how much space should be 
+	# examined in the neighbor check.
+
+	+ to init:
+		self register with-shape ((new Shape) init-with-sphere radius .3 + random[.9]).
+		self set-color to random [(1.0, 1.0, 1.0)].
+		self move to random[(30, 30, 30)] - (15, 15, 15).
+		self set-neighborhood-size to 10.0.
+}

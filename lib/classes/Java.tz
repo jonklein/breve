@@ -1,0 +1,37 @@
+@use Abstract.
+
+@plugin "javaPlugin.o" (stInitJavaFuncs).
+
+Abstract : JavaObject {
+	% The JavaObject class is a bridge to Java objects.  It allows breve simulations
+	% to instantiate and use Java objects.  Classes are instantiated using the 
+	% method METHOD(make).  Methods can be called using METHOD(call).
+	% <P>
+	% This class is currently experimental.  It is actively in development.
+	% <P>
+	% The biggest limitation is currently that breve cannot discern between overloaded
+	% methods.  If multiple methods with the same name and same argument count exist,
+	% breve will pick the first one it finds.
+	% <P>
+	% Under Mac OS X 10.3, the Java bridge should work automatically.
+	% <P>
+	% Under Linux and Windows, breve may have trouble finding the Java virtual machine.
+	% You may need to install Java libraries and/or configure your environment to
+	% locate the Java shared libraries.
+
+	+ to make class className (string) with-arguments constructorArguments (list):
+		% Associates this breve object with a new Java object of class className.
+		% The constructor is passed the arguments in the list constructorArguments.
+
+		newJavaObject(className, constructorArguments).
+		return self.
+
+	+ to call method methodName (string) with-arguments methodArguments (list):
+		% Calls the method named methodName with the arguments specified in the 
+		% list methodArguments.
+
+		return callJavaMethod(methodName, methodArguments).
+
+	+ to destroy:
+		freeJavaObject().
+}

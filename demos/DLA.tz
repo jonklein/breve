@@ -1,0 +1,165 @@
+#
+# DLA stands for diffusion limited aggregation--a decentralized model of 
+# fractal growth.  The rules are simple: starting with a single frozen 
+# particle, allow other particles to float in randomly from any direction.
+# If a floating particle hits a frozen particle, it freezes and becomes 
+# part of the mass.  Rather quickly, fractal-like patterns develop.
+#
+# In this simulation, the Diffuser is the object which will float around
+# looking for the mass.  When it hits the mass, it sends a message to the
+# controller to place a particle at the collision point.  The Diffuser
+# is then sent to a random location and begins the random walk again.
+#
+# Note that the simulation code proceeds so quickly that the rendering 
+# code cannot possibly keep up.  We thus disable the requirement that
+# every frame be drawn (using the method disable-draw-every-frame). 
+# This makes it difficult to see exactly what is happening in the 
+# simulation, but it ultimately allows the structure to grow more 
+# quickly.
+#
+
+@include "Stationary.tz"
+@include "Control.tz"
+@include "Mobile.tz"
+
+Controller DLA.
+
+Control : DLA {
+	+ variables:
+		maxLocation (float).
+		sphereShape (object).
+
+	+ to init:
+		firstAgent (object).
+
+		# We'll need to simulate a hit using one of the agents, so 
+		# we need to know one of the diffusers by name.
+
+		firstAgent = new Diffuser.
+		
+		# ... and then we'll create two more 
+
+		2 new Diffuser.
+
+		# The max location keeps track of the size of the particle 
+		# mass and helps us decide how far away to start with the 
+		# diffuser particles.  We'll start with 0.
+
+		maxLocation = 0.
+
+		# This simulation runs much faster than the image can be 
+		# displayed.  In order to let the simulation run as quickly
+		# as possible, we tell the engine that it can drop frames
+		# of drawing.
+
+		self disable-draw-every-frame.
+
+		# We don't require high accuracy in this simulation, so we'll
+		# make the integration and iteration steps a bit larger and
+		# make the simulation run a bit more quickly.
+
+		self set-integration-step to 1.0.
+		self set-iteration-step to 5.0.
+
+		self set-background-color to (0, 0, 0).
+
+		# Initialize the sphereShape--we use it every time a collision
+		# occurs.
+
+		sphereShape = new Shape.
+		sphereShape init-with-sphere radius 1.
+
+		self enable-lighting. 
+
+		# Place the "seed" object at the origin by simulating a collision there
+
+		self hit at (0, 0, 0) color (.8, .8, .8) with-agent firstAgent.
+
+		self point-camera at (0, 0, 0) from (0, 0, 60).
+		self set-light-color to (.2, .2, .5).
+
+		self move-light to (10, 0, 0).
+
+	+ to hit at location (vector) color c (vector) with-agent agent (object):
+		newParticle (object).
+
+		# When a collision occurs, we create a new Stationary object 
+		# at the collision point.  Why a Stationary object?  Because 
+		# once an object is frozen, we know it will never move again--by
+		# using a Stationary object, we save a good deal of computation time.
+
+		newParticle = new Stationary.
+		newParticle register with-shape sphereShape at-location location.
+
+		# Setting texture to -1 turns off texturing.  We'll give it a 
+		# color similar to the object it hit.
+
+		newParticle set-texture to -1.
+		newParticle set-color to c + (random[(.2, .2, .2)] - (.1, .1, .1)).
+
+		# move the Diffuser agent to a random location in space, but not 
+		# too close to an existing object.
+
+		if | location | > maxLocation: maxLocation = | location |.
+		agent set-maximum-distance to maxLocation.
+		agent offset-from-center by maxLocation + 2.
+}
+
+Mobile : Diffuser {
+	# the diffuser is the mobile object that runs the world waiting for 
+	# a collision to occur with the mass of objects.
+
+	+ variables:
+		direction (vector).
+		roaming (int).
+		sphereShape (object).
+		maxDist (double).
+
+	+ to set-maximum-distance to max (double):
+		maxDist = max.
+
+	+ to init:
+		sphereShape = new Shape.
+		sphereShape init-with-sphere radius 1.
+
+		self set-shape to sphereShape.
+
+		# register to catch collisions with any Stationary objects.  If we 
+		# collide with one, the method "collide" will be called.
+
+		self handle-collisions with-type "Stationary" with-method "collide".
+
+		self move to random[(10, 10, 10)] - (5, 5, 5).
+
+	+ to iterate:
+		if |(self get-location)| > maxDist + 10: self offset-from-center by maxDist + 2.
+
+		self set-velocity to random[(1.2, 1.2, 1.2)] - (.6, .6, .6).
+
+		# The roaming variable is just a precaution against the event that
+		# two collisions occur in a single timestep... see the collide 
+		# method for more information.
+
+		roaming = 1.
+
+	+ to collide with group (object):
+		# This is our collision callback.
+		# Make sure the roaming flag is set: if two collisions happen in
+		# a single timestep, we want to only handle the first one.  When
+		# a collision occurs, we turn off the roaming flag to say that 
+		# we've handled the collision.  During the next timestep, when
+		# iterate is called, the roaming flag is turned back on.
+
+		if roaming: (self get-controller) hit at (self get-location) color (group get-color) with-agent self.
+		roaming = 0.
+
+	+ to offset-from-center by offset (float):
+		# This method moves the Diffuser object a certain distance from the
+		# origin in a random direction.  We first pick a random vector with
+		# each element between -1 and 1.
+
+		direction = random[(2, 2, 2)] - (1, 1, 1).
+		direction /= |direction|.
+
+		self move to direction * offset.
+}

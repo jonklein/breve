@@ -1,0 +1,101 @@
+#
+# The Fountain demo shows a particle system of objects shooting up like
+# a fountain.  This demo can be used as an example of how to create 
+# simple objects and move them around the simulated world.
+#
+
+@include "Mobile.tz"
+@include "Control.tz"
+
+@define PARTICLE_COUNT	250.
+
+Controller Fountain.
+
+Control : Fountain {
+	+ variables: 
+		particles (list).
+		m1, m2, m3 (object).
+
+	+ to init:
+		# because we dont require high accuracy in this demo, we can step up
+		# the iteration and integration steps in order to make the demo run
+		# a little bit faster.
+
+		self set-integration-step to .05.
+		self set-iteration-step to .1.
+		self enable-lighting.
+		self enable-smooth-drawing.
+		self set-background-color to (0, 0, 0). 
+
+		particles = PARTICLE_COUNT new Particle.
+
+		self point-camera at (0, 9, 0) from (40.0, 2.1, 0.0).
+
+		m1 = (self add-menu named "Thin Fountain" for-method "set-small-range").
+		m2 = (self add-menu named "Normal Fountain" for-method "set-normal-range").
+		m3 = (self add-menu named "Large Fountain" for-method "set-large-range").
+
+		self set-normal-range.
+
+	+ to set-particle-range to n (double):
+		# set the mobility range for all of the particles so that we can
+		# control the width of the fountain
+		
+		particles set-range to n.
+
+	+ to set-small-range:
+		m1 check.
+		m2 uncheck.
+		m3 uncheck.
+		self set-particle-range to 1.
+		
+	+ to set-normal-range:
+		m1 uncheck.
+		m2 check.
+		m3 uncheck.
+		self set-particle-range to 3.
+	
+	+ to set-large-range:
+		m1 uncheck.
+		m2 uncheck.
+		m3 check.
+		self set-particle-range to 8.
+}
+
+Mobile : Particle {
+	+ variables:
+		range (double).
+		
+	+ to iterate:
+		# at every iteration, we check to see if the particle is below 
+		# a certain height--if so, then we reset the particle
+
+		if (self get-location)::y < -6.0: self reset.
+
+	+ to init:
+		# register the particles as randomly sized cube shapes
+
+		self set-shape to ((new Shape) init-with-cube size random[(1.0, 1.0, 1.0)] + (.1, .1, .1)).
+
+		# the "physics" of the particle is to always move downwards 
+		# with an acceleration of 9.8 m/s^2.
+
+		self set-acceleration to (0, -9.8, 0.0).
+		range = 5.
+		self reset.
+
+	+ to set-range to n (double):
+		# the range effects how far the particles can fly outward.
+
+		range = n.
+
+	+ to reset:
+		# this method puts the particle back into the base of the fountain
+		# and changes how it behaves so that it looks like a new particle
+
+		self set-color to random[(0, 1, 1)].
+		self move to (0, 0, 0).
+		
+		self set-velocity to random[(2*range, 20, 2*range)] + (-range, 4, -range).		
+		self set-rotational-velocity to random[(.6, .6, .6)].
+}

@@ -1,0 +1,46 @@
+# include some frequently used classes and specify common classpaths
+
+@path "classes"
+@path "lib/classes"
+
+@include "Mobile.tz"
+@include "Control.tz"
+@include "Stationary.tz"
+@use Graph.
+
+# tell the engine the name of the controller
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+	+ variables:
+		g (Graph object).
+
+	+ to init:
+		# put initialization code here which creates objects
+		# and sets up the simulation
+
+		print "simulation started".
+
+		g = new Graph.
+		g add-line with-color (0, 0, 0).
+
+	+ to iterate:
+		# place code that should be called during every 
+		# iteration here.
+
+		g add-point on-line 0 with-value sin(100 * (self get-time)).
+
+		super iterate.
+}
+
+# implement other objects in your simulation here
+
+Mobile : myAgent {
+	+ to init:
+
+	+ to iterate:
+
+}

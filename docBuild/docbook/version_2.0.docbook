@@ -1,0 +1,140 @@
+<chapter id="version-2.0"> <title>What's New In Version 2.0</title>
+
+<sect1 id="new-features"> <title>New Features in Version 2.0</title>
+<para>
+
+<itemizedlist>
+  <listitem><para>Textures may now be any size</para></listitem>
+  <listitem><para>The Image class is now used for assigning textures</para></listitem>
+  <listitem><para>New list operators: <replaceable>insert</replaceable> and <replaceable>remove</replaceable></para></listitem>
+</itemizedlist> 
+
+</para> </sect1>
+
+<sect1 id="upgrading-simulations"> <title>Upgrading Simulations From
+Version 1.x</title>
+
+<para>In addition to the new features listed above, version 2.0 also
+introduces some changes to existing features, which may require changes
+to simulations written in previous versions of breve.
+
+<itemizedlist> 
+<listitem><para>MultiBody functionality has been changed <xref linkend="multibody_changes"/></para></listitem>
+<listitem><para>Arrays are now depreciated <xref linkend="array_depreciated"/></para></listitem> 
+<listitem><para>The Data class has been removed <xref linkend="data_removed"/></para></listitem> 
+<listitem><para>The Vision class has been removed <xref linkend="visions_removed"/></para></listitem>
+<listitem><para>Texture loading has been changed <xref linkend="texture_changes"/></para></listitem> 
+</itemizedlist> 
+
+</para>
+
+<sect2 id="multibody_changes">
+<title>Changes to MultiBody Functionality</title>
+
+<para>MultiBodies are now optional.  Some MultiBody functionality has
+changed, and some MultiBody methods have been removed. </para> 
+
+<para>
+The MultiBody class is used to manage a logical collection of connected
+links.  Prior to version 2.0, all physically connected objects were
+required to be part of a MultiBody.  This lead to complications when
+multiple MultiBodies would merge to form a single body, or when a single
+MultiBody would split to become two bodies. </para> 
+
+<para>In version 2.0, MultiBody objects are now optional.  The Link class 
+is now a subclass of Mobile, so Links can be created as real objects in the
+simulated world, and can be connected or disconnected from other links
+as desired.  The MultiBody object is now a distinct class.  It can be
+used, if desired, to move or rotate a group of connected link objects,
+but it is otherwise not required for physically simulated bodies.
+</para> 
+
+<para>Some of the methods which MultiBody previously inherited
+from the Real class are now no longer available (since MultiBody is no
+longer a subclass of Real or Mobile).  You must now call these methods
+directly on the link objects associated with the MultiBody.  The method
+get-all-connected-links will help you </para>
+
+<para>Freeing a MultiBody will also no longer free all of the connected
+Link and Joint objects, and the associated bodies will remain in the
+simulation.  If you want to destroy the simulated objects, you should
+call the method free-all-connected-objects before freeing the
+MultiBody.</para>
+
+<para>If your simulation made use of MultiBodies prior to version 2.0, you may
+need to modify your simulation to account for the changes described
+above.</para> </sect2>
+
+<sect2 id="array_depreciated"> <title>Arrays Are Now
+Decpreciated</title> <para>The use of arrays has now been depreciated
+and will be removed from a future release of breve: use lists
+instead</para>
+
+<para>Lists have all of the functionality of arrays and more.  Arrays
+existed for a short time before lists had been implemented, and have
+been around ever since, though they are only rarely used. </para>
+
+<para>As of version 1.9, lists are indexed for fast access so that
+repeated list accesses are as fast as array accesses. </para>
+
+<para>If your simulation uses arrays, you should convert them to lists
+to ensure compatibility in the future.</para> </sect2>
+
+<sect2 id="data_removed">
+<title>The Data Class is Now Obsolete</title>
+
+<para>The Data class has been depreciated and will be removed from a
+future release of breve.</para>
+
+<para>Because archiving and networking has been improved and allows for
+archiving of complex types such as objects and lists, the Data class is
+now obsolete.  It will be removed from a future version of breve.</para>
+
+</sect2>
+
+<sect2 id="visions_removed">
+<title>The "Visions" class has been removed</title>
+
+<para>The same functionality can be reproduced using the new "Camera"
+class and the updated "Image" class.</para>
+
+<para>The "Visions" class was used to provide the user with pixel
+buffers of rendered perspectives in the simulated world.  This allowed
+multiple rendered perspectives in the main viewing window, but it also
+required reading pixels from the graphics card at each time step, an
+operation which is somewhat slow.</para>
+
+<para>The new Camera class allows multiple perspectives to be rendered
+to the main output window without the slow pixel reading step.  The
+updated Image class now allows pixels to be read from the main output
+window as desired.  The Image class provides all of the functionality of
+the Vision class, and more: its pixels can be read or modified, it can
+be written to disk or used to texture another object in the simulation,
+and it can provide a pointer to raw pixel data.</para>
+
+<para>One important note regarding differences between the Vision class
+and the Image class: Visions stored three separate pixel buffers for
+red, green, blue data.  The Image class stores a single buffer
+containing interleaved red, green, blue and alpha pixels.</para>
+
+<para>If your simulation used the Vision class in a prior version of
+breve, it will need to use the Camera and Image objects to preform the
+same functionality in the current version of breve.</para></sect2>
+
+<sect2 id="texture_changes"><title>Loading Textures From the Controller Class is Now
+Depreciated</title>
+
+<para>Obtaining a "texture number" by loading an image from the Control
+class is now depreciated, as is using a texture number to set a texture,
+bitmap or lightmap.  You should now load an image using the Image class,
+and use the Real object methods set-texture-image, set-bitmap-image and
+set-lightmap-image to apply textures, bitmaps and images.</para>
+
+<para>The Image class provides much better control over textures than
+the previous method.</para>
+
+</sect2>
+
+</sect1>
+
+</chapter>

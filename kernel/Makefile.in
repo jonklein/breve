@@ -1,0 +1,67 @@
+#
+# libbrkernel.a
+# Copyright (C) 2000-2004    jon klein (jklein@spiderland.org)
+#
+# s pi der la nd
+#
+
+LIBO	= engine.o breveEval.o breveObjectAPI.o \
+		evalList.o evalListCopy.o evalData.o \
+		callback.o namespace.o color.o interface.o \
+		plugins.o evalHash.o sound.o multithread.o format.o
+
+INCLUDE	+=-I../include/breve @CPPFLAGS@
+
+INTERNALO = $(shell ls internalFunctions/*.o | sed s/.c$$/.o/)
+
+all: internal libbrkernel.a
+
+internal:
+	cd internalFunctions; make
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
+
+libbrkernel.a: $(LIBO) $(INTERNALO)
+	$(AR) -crv libbrkernel.a $(LIBO) $(INTERNALO)
+	ranlib libbrkernel.a
+
+clean:
+	rm -f *.o libbrkernel.a 
+	rm internalFunctions/*.o
+
+install: all
+	/bin/cp libbrkernel.a ../lib
+	ranlib ../lib/libbrkernel.a
+	/bin/cp *.h ../include/breve
+
+#
+# i knew these two people. 
+# and, um...a boy and a girl, 
+# and they liked to hang together. 
+#  
+# they were nice people. 
+# um...they were the people, 
+# that made you feel good 
+# to be around. 
+#  
+# anyway, the thing was, 
+# one day, they started acting 
+# kinda funny...kinda weird. 
+#  
+# they started being seen, 
+# exchanging tokens of affection. 
+# and there were rumors that they were, 
+# engaging in...
+#  
+# i think that they'd run out of time. 
+#  
+# you know what happened to them? 
+# you know what they do? 
+# what they became? 
+# you know what happened to them? 
+# you know what they do? 
+# what they became? 
+# you know what happened to them? 
+#  
+

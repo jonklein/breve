@@ -1,0 +1,60 @@
+@use Abstract.
+
+Abstract : Camera {
+	% The Camera class is used to set up a viewing perspective in a simulation.
+	% Creating a new camera object places a viewing area with the new camera 
+	% perspective in the main viewing window.
+
+	+ variables:
+		cameraPointer (pointer).
+
+	+ to init:
+		cameraPointer = cameraNew().
+		self set-size with-height 100 with-width 100.
+		self set-position with-x 0 with-y 0.
+
+	+ to disable:
+		% Disables this camera.  The view from this camera will not be 
+		% updated or drawn to the viewing window. 
+
+		cameraSetEnabled(cameraPointer, 0).
+
+	+ to enable:
+		% Enables the camera.  The view from this camera will be updated
+		% and drawn to the viewing window after each iteration.
+	
+		cameraSetEnabled(cameraPointer, 1).
+	
+	+ to set-size with-height newHeight (double) with-width newWidth (double):
+		% Sets the size of the camera viewing area.
+
+		cameraResizeDisplay(cameraPointer, newWidth, newHeight).
+
+	+ to set-position with-x newX (double) with-y newY (double):
+		% Sets the position of the camera viewing area inside the main window.
+
+		cameraPositionDisplay(cameraPointer, newX, newY).
+	
+	+ to look at target (vector) from position (vector):
+		% Move to position and aim at target.
+
+		cameraPosition(cameraPointer, position, target).
+
+	+ to set-z-clip to distance (double):
+		% Sets the Z clipping plan to theDistance.  The Z clipping plan
+		% determines how far the camera can see.  A short Z clipping distance
+		% means that objects far away will not be drawn.
+		% <p>
+		% The default value is 500.0 and this works well for most simulations,
+		% so there is often no need to use this method.
+		% <p>
+		% Using a short Z clipping distance improves drawing quality, avoids
+		% unnecessary rendering and can speed up drawing during the simulation.
+		% However, it may also cause objects you would like to observe in the
+		% simulation to not be drawn because they are too far away.
+
+		cameraSetZClip(cameraPointer, distance).
+
+	+ to destroy:
+		cameraFree(cameraPointer).
+}

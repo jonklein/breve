@@ -1,0 +1,30 @@
+@include "Object.tz"
+
+Abstract : Sound (aka Sounds) {
+	% The Sound class allows sound files to be loaded and played in 
+	% a simulation.
+	% The sound file, in WAV or AIFF format, is loaded using the 
+	% method METHOLD(load).  The sound can then be played using 
+	% METHOD(play).  The same sound effect can be played several times
+	% simultaneously by making repeated calls to METHOD(play).  
+
+	+ variables:
+		soundPointer (pointer).
+
+	+ to load from-file file (string):
+		% Loads the sound-file filename using the current breve
+		% search path.  Returns self.
+
+		if soundPointer: freeSoundFile(soundPointer).
+
+		soundPointer = loadSoundFile(file).
+		return self.
+
+	+ to play:
+		% Begins playing this sound.
+
+		if soundPointer: playSoundFile(soundPointer).
+
+	+ to destroy:
+		freeSoundFile(soundPointer).
+}
