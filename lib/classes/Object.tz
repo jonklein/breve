@@ -115,7 +115,10 @@ NULL : Object (aka Objects) [version 2.1] {
         % current time, use the method METHOD(get-time) to get the
         % current simulation time and then add the offset you want.
 
-        addEvent(theMethod, theTime).
+        addEvent(theMethod, theTime, 0).
+
+	- to schedule-repeated method-call theMethod (string) with-interval theInterval (double): 
+        addEvent(theMethod, theInterval, theInterval).
 
     + to observe instance theObject (object) for-notification theNotification (string) with-method theMethod (string):
         % Causes the current object to observe theObject.  By registering as

@@ -215,8 +215,6 @@ slObjectLine *slWorldAddObjectLine(slWorld *, slWorldObject *, slWorldObject *, 
 void slWorldRemoveConnection(slWorld *, slObjectConnection *);
 void slWorldAddConnection(slWorld *, slObjectConnection *);
 
-void slVclipDataAddPairEntry(slWorld *, int, int);
-
 double slWorldGetAge(slWorld *);
 void slWorldSetAge(slWorld *, double);
 

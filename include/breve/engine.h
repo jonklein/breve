@@ -273,12 +273,13 @@ class brEngine {
 
 class brEvent {
 	public:
-		brEvent(char *name, double time, brInstance *i);
+		brEvent(char *name, double time, double interval, brInstance *i);
 		~brEvent();
 
-		char *name;
-		double time;
-		brInstance *instance;
+		char *_name;
+		double _time;
+		double _interval;
+		brInstance *_instance;
 };
 #endif
 
@@ -298,7 +299,7 @@ extern "C" {
 void brEngineLock(brEngine *);
 void brEngineUnlock(brEngine *);
 
-brEvent *brEngineAddEvent(brEngine *, brInstance *, char *, double);
+brEvent *brEngineAddEvent(brEngine *, brInstance *, char *, double, double);
 void brEventFree(brEvent *);
 
 int brEngineSetController(brEngine *, brInstance *);

@@ -308,17 +308,16 @@ int slLinkCheckSelfPenetration(slWorld *world, slLink *l) {
 	// slLinkList(l, &links, 0);
 
 	for(li = links.begin(); li != links.end(); li++ ) {
-		slPairEntry *pe;
-
 		slLink *link2 = *li;
 
 		if(l != link2) {
-			x = l->clipNumber;
-			y = link2->clipNumber;
+			slCollisionCandidate c;
+			slPairFlags *flags = slVclipPairFlags(vc->pairList, x, y);
 
-			pe = slVclipPairEntry(vc->pairList, x, y);
+			c.x = x;
+			c.y = y;
 
-			if((slVclipFlagsShouldTest(pe->flags)) && slVclipTestPair(vc, pe, NULL)) {
+			if((slVclipFlagsShouldTest(*flags)) && slVclipTestPair(vc, &c, NULL)) {
 				return 1;
 			}
 		}
@@ -335,7 +334,6 @@ int slLinkCheckSelfPenetration(slWorld *world, slLink *l) {
 
 int slLinkCheckPenetration(slWorld *w, slLink *l) {
 	slVclipData *vc;
-	slPairEntry *pe;
 	unsigned int ln;
 	unsigned int n;
 
@@ -347,10 +345,13 @@ int slLinkCheckPenetration(slWorld *w, slLink *l) {
 
 	for(n=0;n<vc->count;n++) {
 		if(ln != n) {
-			pe = slVclipPairEntry(vc->pairList, ln, n);
+			slCollisionCandidate c;
+			slPairFlags *flags = slVclipPairFlags(vc->pairList, ln, n);
 
-			if((slVclipFlagsShouldTest(pe->flags) && pe->flags & BT_SIMULATE) && slVclipTestPair(vc, pe, NULL)) 
-				return 1;
+			c.x = ln;
+			c.y = n;
+
+			if((slVclipFlagsShouldTest(*flags) && *flags & BT_SIMULATE) && slVclipTestPair(vc, &c, NULL)) return 1;
 		}
 	}
 

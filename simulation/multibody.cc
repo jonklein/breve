@@ -34,9 +34,9 @@
 	\brief Ignores collisions between adjacent multibody links.
 */
 
-void slMultibodyInitCollisionFlags(slMultibody *m, std::vector<slPairEntry*> &pe) {
+void slMultibodyInitCollisionFlags(slMultibody *m, std::vector<slPairFlags*> &pe) {
 	slLink *link1, *link2;
-	slPairEntry *e;
+	slPairFlags *flags;
 	std::vector<slLink*>::iterator i1;
 	std::vector<slLink*>::iterator i2;
 
@@ -50,10 +50,10 @@ void slMultibodyInitCollisionFlags(slMultibody *m, std::vector<slPairEntry*> &pe
 			link2 = *i2;
 
 			if(link1 != link2) {
-				e = slVclipPairEntry(pe, link1->clipNumber, link2->clipNumber);
+				flags = slVclipPairFlags(pe, link1->clipNumber, link2->clipNumber);
 
-				if(m->handleSelfCollisions) e->flags |= BT_CHECK;
-				else if(e->flags & BT_CHECK) e->flags ^= BT_CHECK;
+				if(m->handleSelfCollisions) *flags |= BT_CHECK;
+				else if(*flags & BT_CHECK) *flags ^= BT_CHECK;
 			}
 		}
 	}
@@ -69,9 +69,9 @@ void slMultibodyInitCollisionFlags(slMultibody *m, std::vector<slPairEntry*> &pe
 			link2 = (*ji)->child;
 
 			if(link1 != link2) {
-				e = slVclipPairEntry(pe, link1->clipNumber, link2->clipNumber);
+				flags = slVclipPairFlags(pe, link1->clipNumber, link2->clipNumber);
 
-				if(e->flags & BT_CHECK) e->flags ^= BT_CHECK;
+				if(*flags & BT_CHECK) *flags ^= BT_CHECK;
 			}
 		}
 	}
@@ -564,8 +564,7 @@ void slODEToSlMatrix(dReal *r, double m[3][3]) {
 
 int slMultibodyCheckSelfPenetration(slWorld *world, slMultibody *m) {
 	slVclipData *vc;
-	int x, y;
-	slPairEntry *pe;
+	slPairFlags *flags;
 	std::vector<slLink*>::iterator i1;
 	std::vector<slLink*>::iterator i2;
 
@@ -582,13 +581,14 @@ int slMultibodyCheckSelfPenetration(slWorld *world, slMultibody *m) {
 			slLink *link2 = *i2;
 
 			if(link1 != link2) {
-				x = link1->clipNumber;
-				y = link2->clipNumber;
+				slCollisionCandidate c;
 
-				if(x > y) pe = &vc->pairList[x][y];
-				else pe = &vc->pairList[y][x];
+				c.x = link1->clipNumber;
+				c.y = link2->clipNumber;
 
-				if(slVclipFlagsShouldTest(pe->flags) && slVclipTestPair(vc, pe, NULL)) return 1;
+				flags = slVclipPairFlags(vc->pairList, link1->clipNumber, link2->clipNumber);
+
+				if(slVclipFlagsShouldTest(*flags) && slVclipTestPair(vc, &c, NULL)) return 1;
 			}
 		}
 	}

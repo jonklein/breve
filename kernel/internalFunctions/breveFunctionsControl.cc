@@ -164,7 +164,7 @@ int brIAddEvent(brEval args[], brEval *target, brInstance *i) {
         return EC_OK;
     }
 
-    if(!brEngineAddEvent(i->engine, i, BRSTRING(&args[0]), BRDOUBLE(&args[1]))) {
+    if(!brEngineAddEvent(i->engine, i, BRSTRING(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]))) {
         slMessage(DEBUG_ALL, "unable to add new event to engine: brEngineAddEvent() failed\n");
         return EC_ERROR;
     }
@@ -559,7 +559,7 @@ void breveInitControlFunctions(brNamespace *n) {
     brNewBreveCall(n, "sleep", brISleep, AT_NULL, AT_DOUBLE, 0);
     brNewBreveCall(n, "pauseSimulation", brIPause, AT_NULL, 0);
 
-    brNewBreveCall(n, "addEvent", brIAddEvent, AT_NULL, AT_STRING, AT_DOUBLE, 0);
+    brNewBreveCall(n, "addEvent", brIAddEvent, AT_NULL, AT_STRING, AT_DOUBLE, AT_DOUBLE, 0);
     brNewBreveCall(n, "setFogColor", brISetFogColor, AT_NULL, AT_VECTOR, 0);
     brNewBreveCall(n, "setFogIntensity", brISetFogIntensity, AT_NULL, AT_DOUBLE, 0);
     brNewBreveCall(n, "setFogDistances", brISetFogDistances, AT_NULL, AT_DOUBLE, AT_DOUBLE, 0);

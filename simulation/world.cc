@@ -373,18 +373,17 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 			slCollision *c = &(*ci);
 			slWorldObject *w1;
 			slWorldObject *w2;
-			slPairEntry *pe;
+			slPairFlags *flags;
 			unsigned int x;
 
-			w1 = w2 = NULL; pe = NULL;
+			w1 = w2 = NULL;
 
 			w1 = w->objects[c->n1];
 			w2 = w->objects[c->n2];
 
-			if(c->n1 > c->n2) pe = &w->clipData->pairList[c->n1][c->n2];
-			else pe = &w->clipData->pairList[c->n2][c->n1];
+			flags = slVclipPairFlags(w->clipData->pairList, c->n1, c->n2);
 
-			if(w1 && w2 && (pe->flags & BT_SIMULATE)) {
+			if(w1 && w2 && (*flags & BT_SIMULATE)) {
 				dBodyID bodyX = NULL, bodyY = NULL;
 				dJointID id;
 				double maxDepth = 0.0;
@@ -443,10 +442,6 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 					contact->geom.g1 = NULL;
 					contact->geom.g2 = NULL;
 
-					// printf("%d, %d\n", pe->odeBodyIDX, pe->odeBodyIDY);
-					// slVectorPrint(&c->normal);
-					// printf("%d\n", x);
-	
 					contact->geom.normal[0] = -c->normal.x;
 					contact->geom.normal[1] = -c->normal.y;
 					contact->geom.normal[2] = -c->normal.z;
@@ -464,7 +459,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 				}
 			}
 
-			if((pe->flags & BT_CALLBACK) && w->collisionCallback && w1 && w2) {
+			if((*flags & BT_CALLBACK) && w->collisionCallback && w1 && w2) {
 				 w->collisionCallback(w1->userData, w2->userData, CC_NORMAL);
 			}
 		}
@@ -488,9 +483,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 void slNeighborCheck(slWorld *w) {
 	double dist;
 	slVector *location, diff, *l1 = NULL, *l2 = NULL;
-	slPairEntry *pe;
 	slWorldObject *o1, *o2;
-	std::vector<slPairEntry*>::iterator ci;
 	std::vector<slWorldObject*>::iterator wi;
 
 	if(!w->initialized) slVclipDataInit(w);
@@ -522,23 +515,23 @@ void slNeighborCheck(slWorld *w) {
 
 	slVclip(w->proximityData, 0.0, 1, 0);
 
+	std::map< std::pair< int, int>, slCollisionCandidate >::iterator ci;
+
 	for(ci = w->proximityData->candidates.begin(); 
 		ci != w->proximityData->candidates.end(); ci++) {
-		pe = *ci;
+		slCollisionCandidate c = ci->second;
 
-		if(pe) {
-			o1 = w->objects[pe->x];
-			o2 = w->objects[pe->y];
+		o1 = w->objects[c.x];
+		o2 = w->objects[c.y];
 
-			l1 = &o1->position.location;
-			l2 = &o2->position.location;
+		l1 = &o1->position.location;
+		l2 = &o2->position.location;
 
-			slVectorSub(l1, l2, &diff);
-			dist = slVectorLength(&diff);
+		slVectorSub(l1, l2, &diff);
+		dist = slVectorLength(&diff);
 
-			if(dist < o1->proximityRadius) o1->neighbors.push_back(o2);
-			if(dist < o2->proximityRadius) o2->neighbors.push_back(o1);
-		}
+		if(dist < o1->proximityRadius) o1->neighbors.push_back(o2);
+		if(dist < o2->proximityRadius) o2->neighbors.push_back(o1);
 	}
 }
 

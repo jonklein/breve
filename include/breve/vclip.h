@@ -21,7 +21,7 @@
 #define MC_TOLERANCE	0.00
 #define VC_WARNING_TOLERANCE -0.1
 
-#define slVclipPairEntry(pe, x, y)		((x)>(y)?(&(pe)[(x)][(y)]):(&(pe)[(y)][(x)]))
+#define slVclipPairFlags(pe, x, y)		((x)>(y)?(&(pe)[(x)][(y)]):(&(pe)[(y)][(x)]))
 
 enum collisionTypes {
 	CC_SIMULATE,
@@ -51,6 +51,12 @@ enum boundListTypeFlags {
 	BT_SIMULATE = 0x20	/* 100000 */
 };
 
+/*!
+	\brief Data on whether a certain pair of objects should be simulated.
+*/
+
+typedef unsigned char slPairFlags;
+
 #define slVclipFlagsShouldTest(x)		(((x) & BT_ALL) == BT_ALL)
 
 /*!
@@ -67,26 +73,27 @@ struct slBoundSort {
 	double *value;
 };
 
-/*!
-	\brief A record of a potential collision between two objects.
-
-	We make n^2 of these, so we'd like to be able to keep them small.
-*/
-
 #ifdef __cplusplus
 #include <vector>
-class slPairEntry {
+#include <map>
+
+class slCollisionCandidate {
 	public:
+		slCollisionCandidate() {};
+
+		slCollisionCandidate(int i1, int i2) {
+			if(i1 < i2) { x = i1; y = i2; }
+			else { x = i2; y = i1; }
+		}
+
 		slFeature *f1;
 		slFeature *f2;
 
-		long candidateNumber;
-
 		long x;
 		long y;
-
-		unsigned char flags;
 };
+
+typedef struct slCollisionCandidate slCollisionCandidate;
 
 /*!
 	\brief A record of a collision.
@@ -121,9 +128,9 @@ class slVclipData {
 
 		std::vector<slCollision> collisions;
 
-		std::vector<slPairEntry*> pairList;
+		std::vector<slPairFlags*> pairList;
 
-		std::vector<slPairEntry*> candidates;
+		std::map< std::pair< int, int>, slCollisionCandidate > candidates;
 
 		unsigned int count;
 		unsigned int maxCount;
@@ -138,8 +145,8 @@ void slInitBoundSortList(std::vector<slBoundSort*> &list, unsigned int size, slV
 
 #endif
 
-void slAddCollisionCandidate(slVclipData *d, slPairEntry *e);
-void slRemoveCollisionCandidate(slVclipData *d, slPairEntry *e);
+void slAddCollisionCandidate(slVclipData *d, slPairFlags f, int x, int y);
+void slRemoveCollisionCandidate(slVclipData *d, int x, int y);
 
 slVector *slPositionVertex(slPosition *p, slVector *i, slVector *o);
 slPlane *slPositionPlane(slPosition *p, slPlane *p1, slPlane *pt);
@@ -152,8 +159,8 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 
 double slPlaneDistance(slPlane *pl, slVector *p);
 
-int slVclipTestPair(slVclipData *v, slPairEntry *e, slCollision *ce);
-int slVclipTestPairAllFeatures(slVclipData *v, slPairEntry *e, slCollision *ce);
+int slVclipTestPair(slVclipData *, slCollisionCandidate*, slCollision *);
+int slVclipTestPairAllFeatures(slVclipData*, slCollisionCandidate*, slCollision *);
 
 int slClipPoint(slVector *p, slPlane *v, slPosition *vp, int count, int *update, double *dist);
 int slClipPointMax(slVector *p, slPlane *v, slPosition *vpos, int vcount, int *update);
@@ -172,7 +179,6 @@ double signEdgePlaneDistanceDeriv(slPlane *p, slVector *edgeVector, slVector *la
 
 int slCountFaceCollisionPoints(slCollision *c, slFeature *f1, slFeature *f2, slPosition *p1, slPosition *p2, slShape *s1, slShape *s2);
 
-double slFeatureDistance(slPairEntry *fp, slPosition *p1, slPosition *p2);
 double slMinPointDist(slFace *f, slPosition *fp, slVector *p, slPosition *pp);
 
 void slEdgeFaceCountCollisionPoints(slCollision *p, int pairFlip, slEdge *e, slPosition *ep, slFace *f, slPosition *fp, slShape *s1, slShape *s2);

@@ -50,7 +50,7 @@ struct stInstance {
 	stObject *type;
 	brInstance *breveInstance;
 
-	pthread_mutex_t lock;
+	// pthread_mutex_t lock;
 
 	unsigned int index;
 

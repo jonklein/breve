@@ -40,6 +40,8 @@ slStack *slStackNew() {
 	s->maxCount = 0;
 	s->data = NULL;
 	s->count = 0;
+
+	return s;
 }
 
 /*!

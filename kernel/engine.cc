@@ -33,14 +33,15 @@ void brEngineUnlock(brEngine *e) {
 	(pthread_mutex_unlock(&(e)->lock));
 }
 
-brEvent::brEvent(char *n, double t, brInstance *i) {
-	instance = i;
-	name = slStrdup(n);
-	time = t;
+brEvent::brEvent(char *n, double t, double interval, brInstance *i) {
+	_instance = i;
+	_name = slStrdup(n);
+	_time = t;
+	_interval = interval;
 }
 
 brEvent::~brEvent() {
-	slFree(name);
+	slFree(_name);
 }
 
 /*!
@@ -342,11 +343,11 @@ void brUnpauseTimer(brEngine *e) {
 	\brief Adds a call to a method for an instance at a given time.
 */
 
-brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *methodName, double time) {
+brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *methodName, double time, double interval) {
 	brEvent *event;
 	std::vector<brEvent*>::iterator ei;
 
-	event = new brEvent(methodName, time, i);
+	event = new brEvent(methodName, time, interval, i);
 
 	// insert the event where it belongs according to the time it will be called 
 
@@ -357,11 +358,11 @@ brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *methodName, double t
 		return event;
 	}
 
-	while(ei != e->events.begin() && (*ei)->time < time) ei--;
+	while(ei != e->events.begin() && (*ei)->_time < time) ei--;
 
 	// we want to insert AFTER the current event...
 
-	if(((*ei)->time) > time) ei++;
+	if(((*ei)->_time) > time) ei++;
 
 	e->events.insert(ei, event);
 
@@ -439,13 +440,13 @@ int brEngineIterate(brEngine *e) {
 
 	double oldAge = slWorldGetAge(e->world);
 
-	while(!e->events.empty() && (oldAge + e->iterationStepSize) >= e->events.back()->time) {
+	while(!e->events.empty() && (oldAge + e->iterationStepSize) >= e->events.back()->_time) {
 		event = e->events.back();
 
-		if(event->instance->status == AS_ACTIVE) {
-			slWorldSetAge(e->world, event->time);
+		if(event->_instance->status == AS_ACTIVE) {
+			slWorldSetAge(e->world, event->_time);
 
-			rcode = brMethodCallByName(event->instance, event->name, &result);
+			rcode = brMethodCallByName(event->_instance, event->_name, &result);
 
 			delete event;
 

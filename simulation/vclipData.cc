@@ -70,7 +70,7 @@ void slVclipDataInit(slWorld *w) {
 	}
 
 	for(x=0;x<w->objects.size();x++) {
-		for(y=0;y<x;y++) slVclipDataAddPairEntry(w, x, y);
+		for(y=0;y<x;y++) slVclipDataInitPairFlags(w, x, y);
 	}
 
 	for(x=0;x<w->objects.size();x++) {
@@ -80,12 +80,12 @@ void slVclipDataInit(slWorld *w) {
 	 		link = (slLink*)w->objects[x];
 	 
 			for(ji = link->outJoints.begin(); ji != link->outJoints.end(); ji++ ) {
-				slPairEntry *e;
+				slPairFlags *flags;
 				slLink *link2 = (*ji)->child;
 
-				e = slVclipPairEntry(w->clipData->pairList, link->clipNumber, link2->clipNumber);
+				flags = slVclipPairFlags(w->clipData->pairList, link->clipNumber, link2->clipNumber);
 
-				if(e->flags & BT_CHECK) e->flags ^= BT_CHECK;
+				if(*flags & BT_CHECK) *flags ^= BT_CHECK;
 			}
 
 	 		if(link->multibody) slMultibodyInitCollisionFlags(link->multibody, w->clipData->pairList);
@@ -99,7 +99,7 @@ void slVclipDataInit(slWorld *w) {
 }
 
 /*!
-	\brief Initializes a single slPairEntry struct.
+	\brief Initializes the slPairFlags for an object pair.
 
 	Initializes the data which stores the collision status for 
 	a single pair of objects.
@@ -109,27 +109,21 @@ void slVclipDataInit(slWorld *w) {
 	not.
 */
 
-void slVclipDataAddPairEntry(slWorld *w, int x, int y) {
+void slVclipDataInitPairFlags(slWorld *w, int x, int y) {
 	slWorldObject *o1, *o2;
 	void *c1, *c2;
-	slPairEntry *pe;
+	slPairFlags *flags;
 	int t1, t2;
 	int sim1, sim2;
 	int callback = 0;
 	int simulate = 0;
 
-	pe = slVclipPairEntry(w->clipData->pairList, x, y);
+	flags = slVclipPairFlags(w->clipData->pairList, x, y);
 
-	pe->flags = 0;
+	*flags = 0;
 
 	o1 = w->objects[x];
 	o2 = w->objects[y];
-
-	if(o1->shape && o1->shape->_type == ST_NORMAL) pe->f1 = o1->shape->features[0];
-	else pe->f1 = NULL;
-
-	if(o2->shape && o2->shape->_type == ST_NORMAL) pe->f2 = o2->shape->features[0];
-	else pe->f2 = NULL;
 
 	t1 = w->objects[x]->type;
 	t2 = w->objects[y]->type;
@@ -140,7 +134,7 @@ void slVclipDataAddPairEntry(slWorld *w, int x, int y) {
 	// collision detection is never turned on for 2 non-link objects.
 	   
 	if(t1 != WO_LINK && t2 != WO_LINK) {
-		if(pe->flags & BT_CHECK) pe->flags ^= BT_CHECK;
+		if(*flags & BT_CHECK) *flags ^= BT_CHECK;
 		return;
 	}
 	
@@ -161,15 +155,13 @@ void slVclipDataAddPairEntry(slWorld *w, int x, int y) {
 
 	if(simulate || callback) {
 		w->detectCollisions = 1;
-		pe->flags |= BT_CHECK;
+		*flags |= BT_CHECK;
 
-		if(simulate) pe->flags |= BT_SIMULATE;
-		if(callback) pe->flags |= BT_CALLBACK;
-	} else if(pe->flags & BT_CHECK) {
-		pe->flags ^= BT_CHECK;
+		if(simulate) *flags |= BT_SIMULATE;
+		if(callback) *flags |= BT_CALLBACK;
+	} else if(*flags & BT_CHECK) {
+		*flags ^= BT_CHECK;
 	}
-
-	pe->candidateNumber = -1;
 }
 
 /* 
@@ -179,7 +171,7 @@ void slVclipDataAddPairEntry(slWorld *w, int x, int y) {
 */
 
 slVclipData *slVclipDataNew() {
-	unsigned int listSize, n, m;
+	unsigned int listSize, n;
 
 	slVclipData *v;
 
@@ -192,14 +184,10 @@ slVclipData *slVclipDataNew() {
 
 	v->pairList.insert(v->pairList.end(), v->maxCount + 1, NULL);
 
-	/* init the pair list--we need an entry for every possible object pair */
-	/* we only need a diagonal matrix here.  initialize the CHECK flag	 */
-	/* for all entries, we'll remove some later.			   */ 
-
 	for(n=1;n<v->maxCount;n++) {
-		v->pairList[n] = new slPairEntry[n];		
+		v->pairList[n] = new slPairFlags[n];		
 
-		for(m=0;m<n;m++) v->pairList[n][m].flags = BT_CHECK;
+		memset(v->pairList[n], BT_CHECK, n);
 	}
 
 	return v;
@@ -212,7 +200,7 @@ slVclipData *slVclipDataNew() {
 */
 
 void slVclipDataRealloc(slVclipData *v, unsigned int count) {
-	unsigned int listSize, n, m;
+	unsigned int listSize, n;
 	int oldMax;
 
 	v->count = count;
@@ -232,9 +220,9 @@ void slVclipDataRealloc(slVclipData *v, unsigned int count) {
 	// for all entries, we'll remove some later.
 
 	for(n=oldMax;n<v->maxCount;n++) {
-		v->pairList[n] = new slPairEntry[n];
+		v->pairList[n] = new slPairFlags[n];
 
-		for(m=0;m<n;m++) v->pairList[n][m].flags = BT_CHECK;
+		memset(v->pairList[n], BT_CHECK, n);
 	}
 }
 
@@ -273,8 +261,7 @@ void slAddBoundingBoxForVectors(slVclipData *data, int offset, slVector *min, sl
 }
 
 void slInitProximityData(slWorld *w) {
-	unsigned int n, x, y;
-	slPairEntry *pe;
+	unsigned int n;
 
 	slVclipDataRealloc(w->proximityData, w->objects.size());
 
@@ -293,19 +280,6 @@ void slInitProximityData(slWorld *w) {
 		wo->neighborMax.x = wo->position.location.x + wo->proximityRadius;
 		wo->neighborMax.y = wo->position.location.y + wo->proximityRadius;
 		wo->neighborMax.z = wo->position.location.z + wo->proximityRadius;
-	}
-
-	// for the proximity data we don't need anything except the	
-	// x and y set in the pairList.  no features or object pointers.
-
-	for(x=1;x<w->objects.size();x++) {
-		for(y=0;y<x;y++) {
-			pe = &w->proximityData->pairList[x][y];
-
-			pe->x = x;
-			pe->y = y;
-			pe->candidateNumber = -1;
-		}
 	}
 }
 

@@ -35,9 +35,9 @@ void slInitBoundSort(slVclipData *d) {
 
 	for(x=1;x<d->count;x++) {
 		for(y=0;y<x;y++) {
-			d->pairList[x][y].candidateNumber = -1;
-			d->pairList[x][y].x = x;
-			d->pairList[x][y].y = y;
+			// d->pairList[x][y].candidateNumber = -1;
+			// d->pairList[x][y].x = x;
+			// d->pairList[x][y].y = y;
 		}
 	}
 
@@ -61,39 +61,41 @@ void slInitBoundSort(slVclipData *d) {
 	is run.
 */
 
-void slAddCollisionCandidate(slVclipData *vc, slPairEntry *pair) {
-	if(!(pair->flags & BT_CHECK)) return;
+void slAddCollisionCandidate(slVclipData *vc, slPairFlags flags, int x, int y) {
+	if(!(flags & BT_CHECK)) return;
 
-	if(pair->candidateNumber != -1) {
-		if(vc->candidates[pair->candidateNumber] == pair) return;
+	slCollisionCandidate c;
 
-		slDebug("vclip candidate inconsistancy -- mismatch for candidate pair %d\n", pair->candidateNumber);	
+	c.x = x; 
+	c.y = y;
+
+	if(vc->objects[x]->shape->_type == ST_NORMAL) c.f1 = vc->objects[x]->shape->features[0];
+	else c.f1 = NULL;
+
+	if(vc->objects[y]->shape->_type == ST_NORMAL) c.f2 = vc->objects[y]->shape->features[0];
+	else c.f2 = NULL;
+
+	if(x < y) {
+		int temp = x;
+		x = y;
+		y = temp;
 	}
 
-	pair->candidateNumber = vc->candidates.size();
-	vc->candidates.push_back(pair);
+	vc->candidates[ std::pair<int, int>(x, y) ] = c;
 }
 
 /*! 
 	\brief Removes the collision candidate from the candidate list.
 */
 
-void slRemoveCollisionCandidate(slVclipData *vc, slPairEntry *pair) {
-	if(pair->candidateNumber < 0) {
-		// slDebug("vclip candidate inconsistancy -- removing missing candidate\n");
-		return;
+void slRemoveCollisionCandidate(slVclipData *vc, int x, int y) {
+	if(x < y) {
+		int temp = x;
+		x = y;
+		y = temp;
 	}
 
-	if(vc->candidates.size() < 1) {
-		slDebug("vclip candidate inconsistancy -- removing from empty candidate list\n");
-		return;
-	}
-
-	vc->candidates[pair->candidateNumber] = vc->candidates[vc->candidates.size() - 1];
-	vc->candidates[pair->candidateNumber]->candidateNumber = pair->candidateNumber;
-
-	vc->candidates.pop_back();
-	pair->candidateNumber = -1;
+	vc->candidates.erase( std::pair<int, int>(x, y));
 }
 
 /*!
@@ -110,8 +112,7 @@ void slRemoveCollisionCandidate(slVclipData *vc, slPairEntry *pair) {
 int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly) {
 	int result;
 	slCollision *ce;
-	slPairEntry *pe;
-	std::vector<slPairEntry*>::iterator ci;
+	std::map< std::pair<int, int>, slCollisionCandidate >::iterator ci;
 
 	d->collisions.clear();
 
@@ -121,37 +122,24 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 
 	if(pruneOnly) return 0;
 
-	/* the old way to go through this was O(n^2), now we just look */
-	/* at the actual collisions */
-
 	ce = slNextCollision(d);
 
-	if(boundingBoxOnly) {
-		for(ci = d->candidates.begin(); ci != d->candidates.end(); ci++ ) {
-			pe = *ci;
+	for(ci = d->candidates.begin(); ci != d->candidates.end(); ci++ ) {
+		slCollisionCandidate c = ci->second;
 
-			if(!pe) slDebug("missing collision candidate!\n");
-
-			if(d->objects[pe->x] && d->objects[pe->y] && pe->x != pe->y) {
-				ce->n1 = pe->x;
-				ce->n2 = pe->y;
+		if(boundingBoxOnly) {
+			if(d->objects[c.x] && d->objects[c.y] && c.x != c.y) {
+				ce->n1 = c.x;
+				ce->n2 = c.y;
 
 				ce = slNextCollision(d);
 			}
+		} else {
+			result = slVclipTestPair(d, &c, ce);
+
+			if(result == CT_ERROR) return -1;
+			if(result == CT_PENETRATE) ce = slNextCollision(d);
 		}
-
-		d->collisions.pop_back();
-
-		return d->collisions.size();
-	}
-
-	for(ci = d->candidates.begin(); ci != d->candidates.end(); ci++ ) {
-		pe = *ci;
-
-		result = slVclipTestPair(d, pe, ce);
-
-		if(result == CT_ERROR) return -1;
-		if(result == CT_PENETRATE) ce = slNextCollision(d);
 	}
 
 	// d->collisionCount is pointing to the next empty collision 
@@ -198,12 +186,12 @@ slCollision *slNextCollision(slVclipData *v) {
 	2-dimensional simulations--when the objects don't leave a certain
 	plane, we do *n^2 iterations*.
 
-	To break ties, we rely on the number field of the bound entry.
+	So, to break ties, we rely on the number field of the bound entry.
 */
 
 void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, unsigned int size, char boundTypeFlag) {
 	unsigned int n, current;
-	slPairEntry *pe;
+	slPairFlags *flags;
 	slBoundSort *tempList;
 	int x, y;
 
@@ -232,25 +220,25 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, unsigned int size,
 
 			y = list[current - 1]->number;
 
-			pe = slVclipPairEntry(d->pairList, x, y);
+			flags = slVclipPairFlags(d->pairList, x, y);
 			
-			if(x != y && (pe->flags & BT_CHECK)) {
+			if(x != y && (*flags & BT_CHECK)) {
 				if(list[current]->type == BT_MIN && list[current - 1]->type == BT_MAX) {
 
-					if((pe->flags & boundTypeFlag) && *(list[current]->value) != *(list[current-1]->value)) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already on]!\n");
+					if((*flags & boundTypeFlag) && *(list[current]->value) != *(list[current-1]->value)) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already on]!\n");
 
-					pe->flags |= boundTypeFlag;
+					*flags |= boundTypeFlag;
 
-					if(slVclipFlagsShouldTest(pe->flags)) slAddCollisionCandidate(d, pe);
+					if(slVclipFlagsShouldTest(*flags)) slAddCollisionCandidate(d, *flags, x, y);
 
 				} else if(list[current]->type == BT_MAX && list[current - 1]->type == BT_MIN && 
 						*(list[current]->value) != *(list[current - 1]->value)) {
 
-					if(!(pe->flags & boundTypeFlag) && *(list[current]->value) != *(list[current-1]->value)) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already off]!\n");
+					if(!(*flags & boundTypeFlag) && *(list[current]->value) != *(list[current-1]->value)) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already off]!\n");
 
-					if(slVclipFlagsShouldTest(pe->flags)) slRemoveCollisionCandidate(d, pe);
+					if(slVclipFlagsShouldTest(*flags)) slRemoveCollisionCandidate(d, x, y);
 
-					pe->flags ^= boundTypeFlag;
+					*flags ^= boundTypeFlag;
 				}
 			}
 
@@ -263,6 +251,12 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, unsigned int size,
 			current--;
 		}
 	}
+}
+
+bool slBoundSortCompare(const slBoundSort *a, const slBoundSort *b) {
+	if(*a->value == *b->value) return (a->number < b->number);
+
+	return (*a->value < *b->value);
 }
 
 /* 
@@ -283,26 +277,25 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, unsigned int size,
 
 void slInitBoundSortList(std::vector<slBoundSort*> &list, unsigned int size, slVclipData *v, char boundTypeFlag) {
 	unsigned int n, extend;
-	unsigned char *pair;
-	slPairEntry *pe;
 	int x, y;
 	int otherSide;
+	slPairFlags *flags;
 
 	int finished;
 	
-	slIsort(v, list, size, boundTypeFlag);
+	std::sort(list.begin(), list.end(), slBoundSortCompare);
+	// slIsort(v, list, size, boundTypeFlag);
 
 	/* zero out this entry for all pairs */
 
 	for(n=0;n<v->count;n++) {
 		for(extend=n+1;extend < v->count;extend++) {
-			if(v->pairList[extend][n].flags & boundTypeFlag) {
+			flags = slVclipPairFlags(v->pairList, extend, n);
+			
+			if(*flags & boundTypeFlag) {
+				if(slVclipFlagsShouldTest(*flags))  slRemoveCollisionCandidate(v, extend, n);
 
-				if(slVclipFlagsShouldTest(v->pairList[extend][n].flags)) {
-					slRemoveCollisionCandidate(v, &v->pairList[extend][n]);
-				}
-
-				v->pairList[extend][n].flags ^= boundTypeFlag;
+				*flags ^= boundTypeFlag;
 			}
 		}
 	}
@@ -327,19 +320,16 @@ void slInitBoundSortList(std::vector<slBoundSort*> &list, unsigned int size, slV
 					x = list[n]->number;
 					y = list[extend]->number;   
 			
-					if(x > y) pe = &v->pairList[x][y];
-					else pe = &v->pairList[y][x];
-
-					pair = &pe->flags;
+					flags = slVclipPairFlags(v->pairList, x, y);
 
 					if(list[extend]->type == BT_MIN) {
-						if(*pair & boundTypeFlag) {
+						if(*flags & boundTypeFlag) {
 							slMessage(DEBUG_ALL, "vclip init inconsistancy [flag is already on]\n");
 						}
 
-						*pair |= boundTypeFlag;
+						*flags |= boundTypeFlag;
 
-						if(slVclipFlagsShouldTest(*pair)) slAddCollisionCandidate(v, pe);
+						if(slVclipFlagsShouldTest(*flags)) slAddCollisionCandidate(v, *flags, x, y);
 					} 
 				}
 
@@ -371,7 +361,7 @@ slPlane *slPositionPlane(slPosition *p, slPlane *p1, slPlane *pt) {
 	return pt;
 }
 
-int slVclipTestPair(slVclipData *vc, slPairEntry *e, slCollision *ce) {
+int slVclipTestPair(slVclipData *vc, slCollisionCandidate *e, slCollision *ce) {
 	int result = 0, iterations = 0, limit;
 	int x, y;
 
@@ -413,7 +403,7 @@ int slVclipTestPair(slVclipData *vc, slPairEntry *e, slCollision *ce) {
 		do {
 			if(iterations == limit) {
 				// this is the worst-case scenario.  it indicates serious 
-				// problems in the logic (by which i mean implementation) 
+				// problems in the logic (by which i mean my implementation) 
 				// of the vclip algorithm.
 				// slMessage(DEBUG_ALL, "warning: vclip feature loop detected, using brute force detection\n");
 				return slVclipTestPairAllFeatures(vc, e, ce);
@@ -464,7 +454,7 @@ int slVclipTestPair(slVclipData *vc, slPairEntry *e, slCollision *ce) {
 	= this is only done if a feature loop is detected.
 */
 
-int slVclipTestPairAllFeatures(slVclipData *vc, slPairEntry *e, slCollision *ce) {
+int slVclipTestPairAllFeatures(slVclipData *vc, slCollisionCandidate *e, slCollision *ce) {
 	int result;
 	slPosition *p1, *p2;
 	slShape *s1, *s2;

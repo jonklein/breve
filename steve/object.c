@@ -130,8 +130,8 @@ stInstance *stInstanceNew(stObject *o) {
 	i->gc = 0;
 	i->retainCount = 0;
 
-	if(pthread_mutex_init(&i->lock, NULL)) 
-		slMessage(0, "warning: error creating mutex for instance %p\n", i);
+	// if(pthread_mutex_init(&i->lock, NULL)) 
+	// 	slMessage(0, "warning: error creating mutex for instance %p\n", i);
 
 	stAddToInstanceLists(i);
 
