@@ -2,10 +2,9 @@
 #define _BREVEOBJECTAPI_H
 
 enum allocStatus { 
-	AS_DEARCHIVING = -2,        // allocated, but not ready for use
-	AS_RELEASED,                // still allocated, but ready to be freed
-	AS_FREED,                   // all memory freed--don't try to use 
-	AS_ACTIVE                   // active object
+	AS_RELEASED = -1,	// still allocated, but ready to be freed
+	AS_FREED,			// all memory freed--don't try to use 
+	AS_ACTIVE			// active object
 };
 
 typedef struct brObjectType brObjectType;

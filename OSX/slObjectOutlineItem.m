@@ -54,10 +54,12 @@
         childObjects = NULL;
     }
 
-    if(childCount != 0) {
-        childObjects = malloc(sizeof(id) * childCount);
-        for(c=0;c<childCount;c++) childObjects[c] = NULL;
-    }
+	// childObjects will be expected to be allocated later on...
+
+	if(childCount < 1) childCount = 1;
+
+	childObjects = malloc(sizeof(id) * childCount);
+	for(c=0;c<childCount;c++) childObjects[c] = NULL;
 
     return self;
 }
@@ -87,9 +89,7 @@
 
 	childObjects = realloc(childObjects, sizeof(id) * newChildCount);
 
-	for(n=childCount;n<newChildCount;n++) {
-		childObjects[n] = NULL;
-	}
+	for(n=childCount;n<newChildCount;n++) childObjects[n] = NULL;
 
 	childCount = newChildCount;
 }

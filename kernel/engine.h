@@ -25,6 +25,8 @@
 
 #ifdef __cplusplus
 #include <vector>
+#include <map>
+#include <string>
 #include <algorithm>
 #endif
 
@@ -35,10 +37,6 @@
 // the maximum error size 
 
 #define BR_ERROR_TEXT_SIZE 4096
-
-// the size of the steve runtime evaluation stack 
-
-#define ST_STACK_SIZE   0x4000
 
 /*!
 	\brief A structure to hold information about errors during parsing/execution.
@@ -161,22 +159,20 @@ struct briTunesData {
 */
 
 #ifdef __cplusplus
+typedef struct brObjectType brObjectType;
+
 class brEngine {
 	public:
 		slWorld *world;
 		slCamera *camera;
 
-		slStack *objectTypes;
+		std::vector<brObjectType*> objectTypes;
 
 		char simulationWillStop;
 
 		brSoundMixer *soundMixer;
 
 		std::vector<brInstance*> freedInstances;
-
-#ifdef HAVE_LIBAVCODEC
-		slMovie *movie;
-#endif
 
 #ifdef HAVE_LIBOSMESA
 		GLubyte *osBuffer;
@@ -197,7 +193,8 @@ class brEngine {
 
 		brInstance *controller;
 
-		brNamespace *objects;
+		std::map<std::string,brObject*> objectAliases;
+		std::map<std::string,brObject*> objects;
 		brNamespace *internalMethods;
 
 		std::vector<brInstance*> postIterationInstances;
@@ -209,8 +206,6 @@ class brEngine {
 
 		std::vector<brEvent*> events;
 
-		// brMenuList menu;
-
 		// runtime error info 
 
 		brErrorInfo error;
@@ -220,7 +215,7 @@ class brEngine {
 
 		// plugin, plugins, plugins!
 
-		slList *dlPlugins;
+		std::vector<brDlPlugin*> dlPlugins;
 
 		// the drawEveryFrame flag is a hint to the display engine--if set,
 		// the application attempts to draw a frame with every iteration of 
@@ -242,9 +237,8 @@ class brEngine {
 
 		int lastScheduled;
 
-		slList *windows;
-
-		slList *searchPath;
+		std::vector<void*> windows;
+		std::vector<char*> searchPath;
 
 		// which keys are pressed?
 
@@ -261,46 +255,40 @@ class brEngine {
 
 		briTunesData *iTunesData;
 
-	//
-	// CALLBACK FUNCTIONS AND RELATED DATA FOR THE APPLICATION FRONTEND
-	//
+		// *** Callback functions to be set by the application frontend ***
 
-	void *callbackData;
+		void *callbackData;
 
-	// callback to run save and load dialogs 
+		// callback to run save and load dialogs 
 
-	char *(*getSavename)(void *data);
-	char *(*getLoadname)(void *data);
+		char *(*getSavename)(void *data);
+		char *(*getLoadname)(void *data);
 
-	// callback to show a generic dialog
+		// callback to show a generic dialog
 
-	int (*dialogCallback)(void *data, char *title, char *message, 
-									char *button1, char *button2);
+		int (*dialogCallback)(void *data, char *title, char *message, 
+										char *button1, char *button2);
+	
+		// callback to play a beep sound
+	
+		int (*soundCallback)(void *data);
+	
+		// returns the string identifying the implementation
+	
+		char *(*interfaceTypeCallback)(void *data);
+	
+		// callback to setup and use the OS X interface features
+	
+		int (*interfaceSetStringCallback)(char *string, int number);
+		void (*interfaceSetCallback)(char *file);
 
-	// callback to play a beep sound
+		// pause callback
 
-	int (*soundCallback)(void *data);
+		int (*pauseCallback)(void *data);
 
-	// returns the string identifying the implementation
-
-	char *(*interfaceTypeCallback)(void *data);
-
-	// callback to setup and use the OS X interface features
-
-	int (*interfaceSetStringCallback)(char *string, int number);
-	void (*interfaceSetCallback)(char *file);
-
-	// keypress callback 
-
-	int (*keyCallback)(void *data, char key);
-
-	// pause callback
-
-	int (*pauseCallback)(void *data);
-
-	void *(*newWindowCallback)(char *name, void *graph);
-	void (*freeWindowCallback)(void *g);
-	void (*renderWindowCallback)(void *g);
+		void *(*newWindowCallback)(char *name, void *graph);
+		void (*freeWindowCallback)(void *g);
+		void (*renderWindowCallback)(void *g);
 };
 #endif
 
@@ -359,6 +347,7 @@ void stSetParseString(char *string, int length);
 void brPrintVersion();
 
 void brFreeObjectSpace(brNamespace *ns);
+void brEngineFreeObjects(brEngine *e);
 
 void brEngineRenderWorld(brEngine *e, int crosshair);
 

@@ -20,13 +20,15 @@
 
 #include "kernel.h"
 
+#define BRSHAPEPOINTER(p)	((slShape*)BRPOINTER(p))
+
 /*! \addtogroup InternalFunctions */
 /*@{*/
 
 int brINewShape(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slShapeNew();
+	BRSHAPEPOINTER(target) = slShapeNew();
 
-	if(!BRPOINTER(target)) {
+	if(!BRSHAPEPOINTER(target)) {
 		slMessage(DEBUG_ALL, "newShape() failed\n");
 		return EC_ERROR;
 	}
@@ -36,7 +38,7 @@ int brINewShape(brEval args[], brEval *target, brInstance *i) {
 
 int brIAddShapeFace(brEval args[], brEval *target, brInstance *i) {
 	int n = 0;
-	slShape *s = BRPOINTER(&args[0]);
+	slShape *s = BRSHAPEPOINTER(&args[0]);
 	brEvalListHead *list = BRLIST(&args[1]);
 	brEvalList *h;
 	slVector **face;
@@ -74,7 +76,7 @@ int brIAddShapeFace(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIFinishShape(brEval args[], brEval *target, brInstance *i) {
-	slShape *s = BRPOINTER(&args[0]);
+	slShape *s = BRSHAPEPOINTER(&args[0]);
 	double density = BRDOUBLE(&args[1]);
 
 	s = slShapeInitNeighbors(s, density);
@@ -88,7 +90,7 @@ int brIFinishShape(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIShapeSetDensity(brEval args[], brEval *target, brInstance *i) {
-	slShape *s = BRPOINTER(&args[0]);
+	slShape *s = BRSHAPEPOINTER(&args[0]);
 	double density = BRDOUBLE(&args[1]);
 
 	slShapeSetDensity(s, density);
@@ -97,7 +99,7 @@ int brIShapeSetDensity(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIShapeSetMass(brEval args[], brEval *target, brInstance *i) {
-	slShape *s = BRPOINTER(&args[0]);
+	slShape *s = BRSHAPEPOINTER(&args[0]);
 	double mass = BRDOUBLE(&args[1]);
 
 	slShapeSetMass(s, mass);
@@ -106,7 +108,7 @@ int brIShapeSetMass(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brINewSphere(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slSphereNew(BRDOUBLE(&args[0]), BRDOUBLE(&args[1]));
+	BRSHAPEPOINTER(target) = slSphereNew(BRDOUBLE(&args[0]), BRDOUBLE(&args[1]));
 
 	if(!BRINSTANCE(target)) {
 		slMessage(DEBUG_ALL, "newSphere() failed\n");
@@ -117,9 +119,9 @@ int brINewSphere(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brINewCube(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slNewCube(&BRVECTOR(&args[0]), BRDOUBLE(&args[1]));
+	BRSHAPEPOINTER(target) = slNewCube(&BRVECTOR(&args[0]), BRDOUBLE(&args[1]));
 
-	if(!BRPOINTER(target)) {
+	if(!BRSHAPEPOINTER(target)) {
 		slMessage(DEBUG_ALL, "newCube() failed\n");
 		return EC_ERROR;
 	}
@@ -128,9 +130,9 @@ int brINewCube(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brINewNGonDisc(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slNewNGonDisc(BRINT(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]), BRDOUBLE(&args[3]));
+	BRSHAPEPOINTER(target) = slNewNGonDisc(BRINT(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]), BRDOUBLE(&args[3]));
 
-	if(!BRPOINTER(target)) {
+	if(!BRSHAPEPOINTER(target)) {
 		slMessage(DEBUG_ALL, "newNGonDisc() failed\n");
 		return EC_ERROR;
 	}
@@ -139,9 +141,9 @@ int brINewNGonDisc(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brINewNGonCone(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slNewNGonCone(BRINT(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]), BRDOUBLE(&args[3]));
+	BRSHAPEPOINTER(target) = slNewNGonCone(BRINT(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]), BRDOUBLE(&args[3]));
 
-	if(!BRPOINTER(target)) {
+	if(!BRSHAPEPOINTER(target)) {
 		slMessage(DEBUG_ALL, "newNGonCone() failed\n");
 		return EC_ERROR;
 	}
@@ -150,7 +152,7 @@ int brINewNGonCone(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIFreeShape(brEval args[], brEval *target, brInstance *i) {
-	slShapeFree(BRPOINTER(&args[0]));
+	slShapeFree(BRSHAPEPOINTER(&args[0]));
 
 	return EC_OK;
 }
@@ -159,7 +161,7 @@ int brIDataForShape(brEval args[], brEval *target, brInstance *i) {
 	void *serialShape;
 	int length;
 
-	serialShape = slSerializeShape(BRPOINTER(&args[0]), &length);
+	serialShape = slSerializeShape(BRSHAPEPOINTER(&args[0]), &length);
 
 	BRDATA(target) = brDataNew(serialShape, length);
 
@@ -176,13 +178,13 @@ int brIShapeForData(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	BRPOINTER(target) = slDeserializeShape((slSerializedShapeHeader*)d->data, d->length);
+	BRSHAPEPOINTER(target) = slDeserializeShape((slSerializedShapeHeader*)d->data, d->length);
 
 	return EC_OK;
 }
 
 int brIScaleShape(brEval args[], brEval *target, brInstance *i) {
-	slShape *s = BRPOINTER(&args[0]);
+	slShape *s = BRSHAPEPOINTER(&args[0]);
 	slVector *scale = &BRVECTOR(&args[1]);
 
 	if(!s) {
@@ -196,7 +198,7 @@ int brIScaleShape(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIGetMass(brEval args[], brEval *target, brInstance *i) {
-	slShape *s = BRPOINTER(&args[0]);
+	slShape *s = BRSHAPEPOINTER(&args[0]);
 
 	if(!s) {
 		slMessage(DEBUG_ALL, "NULL pointer passed to getMass\n");
@@ -209,7 +211,7 @@ int brIGetMass(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIGetDensity(brEval args[], brEval *target, brInstance *i) {
-	slShape *s = BRPOINTER(&args[0]);
+	slShape *s = BRSHAPEPOINTER(&args[0]);
 
 	if(!s) {
 		slMessage(DEBUG_ALL, "NULL pointer passed to getDensity\n");
@@ -223,7 +225,7 @@ int brIGetDensity(brEval args[], brEval *target, brInstance *i) {
 
 
 int brIPointOnShape(brEval args[], brEval *target, brInstance *i) {
-	slShape *shape = BRPOINTER(&args[0]);
+	slShape *shape = BRSHAPEPOINTER(&args[0]);
 	slVector *location = &BRVECTOR(&args[1]);
 	int result;
 

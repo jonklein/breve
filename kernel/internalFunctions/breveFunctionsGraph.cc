@@ -24,6 +24,8 @@
 #include "kernel.h"
 #include "graph.h"
 
+#define BRGRAPHPOINTER(p)	((slGraph*)BRPOINTER(p))
+
 /*!
 	\brief Creates a new graph.
 
@@ -44,10 +46,10 @@ int brIGraphNew(brEval args[], brEval *target, brInstance *i) {
 	if(!p) {
 		slMessage(DEBUG_ALL, "warning: new graph window callback failed--graphs not available for this interface\n");
 	} else {
-		i->engine->windows = slListPrepend(i->engine->windows, p);
+		i->engine->windows.push_back(p);
 	}
 
-	BRPOINTER(target) = graph;
+	BRGRAPHPOINTER(target) = graph;
 	graph->userData = p;
 
 	return EC_OK;
@@ -60,7 +62,7 @@ int brIGraphNew(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGraphSetTitle(brEval args[], brEval *target, brInstance *i) {
-	slGraph *g = BRPOINTER(&args[0]);
+	slGraph *g = BRGRAPHPOINTER(&args[0]);
 	char *string = BRSTRING(&args[1]);
 
 	if(g) slGraphSetTitle(g, string);
@@ -75,7 +77,7 @@ int brIGraphSetTitle(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGraphSetXAxisName(brEval args[], brEval *target, brInstance *i) {
-	slGraph *g = BRPOINTER(&args[0]);
+	slGraph *g = BRGRAPHPOINTER(&args[0]);
 	char *string = BRSTRING(&args[1]);
 
 	if(g) slGraphSetXAxisName(g, string);
@@ -90,7 +92,7 @@ int brIGraphSetXAxisName(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGraphSetYAxisName(brEval args[], brEval *target, brInstance *i) {
-	slGraph *g = BRPOINTER(&args[0]);
+	slGraph *g = BRGRAPHPOINTER(&args[0]);
 	char *string = BRSTRING(&args[1]);
 
 	if(g) slGraphSetYAxisName(g, string);
@@ -108,7 +110,7 @@ int brIGraphSetYAxisName(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGraphAddLine(brEval args[], brEval *target, brInstance *i) {
-	slGraph *g = BRPOINTER(&args[0]);
+	slGraph *g = BRGRAPHPOINTER(&args[0]);
 	slVector *color = &BRVECTOR(&args[1]);
 
 	if(g) BRINT(target) = slGraphAddLine(g, color);
@@ -123,8 +125,8 @@ int brIGraphAddLine(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGraphAddLineValue(brEval args[], brEval *target, brInstance *i) {
-	slGraph *g = BRPOINTER(&args[0]);
-	int line = BRINT(&args[1]);
+	slGraph *g = BRGRAPHPOINTER(&args[0]);
+	unsigned int line = BRINT(&args[1]);
 	double yValue = BRDOUBLE(&args[2]);
 
 	if(line >= g->lines.size()) {

@@ -88,7 +88,7 @@ char *brDataHexEncode(brData *d) {
 
     if(!d || d->length < 1) return slStrdup("");
 
-    string = slMalloc((d->length * 2) + 1);
+    string = (char*)slMalloc((d->length * 2) + 1);
 
     for(n=0;n<d->length;n++)
         sprintf(&string[n*2], "%02x", ((unsigned char*)d->data)[n]);
@@ -118,10 +118,10 @@ brData *brDataHexDecode(char *string) {
         return NULL;
     }
 
-    d = slMalloc(sizeof(brData));
+    d = new brData;
 
     d->length = length / 2;
-    d->data = slMalloc(d->length);
+    d->data = new unsigned char[d->length];
 	d->retainCount = 0;
 
     for(n=0;n<d->length;n++) {

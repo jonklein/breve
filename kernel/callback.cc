@@ -36,9 +36,12 @@
 	or if all collision resolution is on, otherwise 0.
 */
 
-int brCheckCollisionCallback(brInstance *o1, brInstance *o2, int type) {
+int brCheckCollisionCallback(void *p1, void *p2, int type) {
 	unsigned int n;
 	brCollisionHandler *h;
+
+	brInstance *o1 = (brInstance*)p1;
+	brInstance *o2 = (brInstance*)p2;
 
 	if(!o1 || !o2) return 0;
 
@@ -95,13 +98,16 @@ int brCheckCollisionCallback(brInstance *o1, brInstance *o2, int type) {
 	that is colliding with it as the argument.
 */
 
-void brCollisionCallback(brInstance *o1, brInstance *o2, int type) {
+void brCollisionCallback(void *p1, void *p2, int type) {
 	unsigned int n;
 	brMethod *meth;
 	brEval collider, result;
 	brCollisionHandler *h;
 
 	brEval *argPtr[1];
+
+	brInstance *o1 = (brInstance*)p1;
+	brInstance *o2 = (brInstance*)p2;
 
 	if(!o1 || !o2 || (o1->status != AS_ACTIVE) || (o2->status != AS_ACTIVE)) return;
 

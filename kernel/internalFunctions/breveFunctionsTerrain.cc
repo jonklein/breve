@@ -23,21 +23,23 @@
 
 #include "kernel.h"
 
+#define BRTERRAINPOINTER(p)  ((slTerrain*)BRPOINTER(p))
+
 int brITerrainNew(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t;
 
-	// t = slTerrainNew(5, BRDOUBLE(&args[0]), i);
-	t = slTerrainNew(6, BRDOUBLE(&args[0]), i);
+	t = slTerrainNew(5, BRDOUBLE(&args[0]), i);
+	// t = slTerrainNew(6, BRDOUBLE(&args[0]), i);
 
 	slWorldAddObject(i->engine->world, t, WO_TERRAIN);
 
-	BRPOINTER(target) = t;
+	BRTERRAINPOINTER(target) = t;
 
 	return EC_OK;
 }
 
 int brIGenerateFractalTerrain(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t = BRPOINTER(&args[0]);
+	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 	double h = BRDOUBLE(&args[1]);
 	double height = BRDOUBLE(&args[2]);
 
@@ -47,7 +49,7 @@ int brIGenerateFractalTerrain(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISetTerrainScale(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t = BRPOINTER(&args[0]);
+	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 	double x = BRDOUBLE(&args[1]);
 
 	if(x < 0.01) return EC_OK;
@@ -58,7 +60,7 @@ int brISetTerrainScale(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISetTerrainHeight(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t = BRPOINTER(&args[0]);
+	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 	double h = BRDOUBLE(&args[3]);
@@ -73,7 +75,7 @@ int brISetTerrainHeight(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIGetTerrainHeight(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t = BRPOINTER(&args[0]);
+	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
@@ -85,7 +87,7 @@ int brIGetTerrainHeight(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIGetTerrainHeightAtLocation(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t = BRPOINTER(&args[0]);
+	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 	double x = BRDOUBLE(&args[1]);
 	double y = BRDOUBLE(&args[2]);
 
@@ -97,7 +99,7 @@ int brIGetTerrainHeightAtLocation(brEval args[], brEval *target, brInstance *i) 
 }
 
 int brIGetTerrainSlope(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t = BRPOINTER(&args[0]);
+	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 	double x1 = BRDOUBLE(&args[1]);
 	double y1 = BRDOUBLE(&args[2]);
 	double x2 = BRDOUBLE(&args[3]);
@@ -111,7 +113,7 @@ int brIGetTerrainSlope(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISetTerrainPosition(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t = BRPOINTER(&args[0]);
+	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 
 	if(!t) return EC_OK;
 
@@ -121,7 +123,7 @@ int brISetTerrainPosition(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISetPeakColor(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t = BRPOINTER(&args[0]);
+	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 
 	if(!t) return EC_OK;
 
@@ -131,7 +133,7 @@ int brISetPeakColor(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISetValleyColor(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t = BRPOINTER(&args[0]);
+	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 
 	if(!t) return EC_OK;
 
@@ -141,7 +143,7 @@ int brISetValleyColor(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brILoadGeoTIFF(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t = BRPOINTER(&args[0]);
+	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 	char *file = brFindFile(i->engine, BRSTRING(&args[1]), NULL);
 	
 	if(!file) {

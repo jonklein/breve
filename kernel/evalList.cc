@@ -42,7 +42,7 @@
 brEvalListHead *brEvalListNew() {
 	brEvalListHead *head;
 
-	head = slMalloc(sizeof(brEvalListHead));
+	head = new brEvalListHead;
 
 	head->start = head->end = NULL;
 	head->count = 0;
@@ -82,14 +82,14 @@ void brEvalListFree(brEvalListHead *lh) {
 	while(list) {
 		next = list->next;
 
-		slFree(list);
+		delete list;
 
 		list = next;
 	}
 
 	if(lh->index) slFree(lh->index);
 
-	slFree(lh);
+	delete lh;
 }
 
 /*!
@@ -118,7 +118,7 @@ int brEvalListInsert(brEvalListHead *head, int index, brEval *value) {
 		head->index = slRealloc(head->index, sizeof(brEvalList*) * head->indexSize);
 	}
 
-	newList = slMalloc(sizeof(brEvalList));
+	newList = new brEvalList;
 
 	brEvalCopy(value, &newList->eval);
 
@@ -174,7 +174,7 @@ int brEvalListRemove(brEvalListHead *head, int index, brEval *value) {
 
 	brEvalCopy(&start->eval, value);
 
-	slFree(start);
+	delete start;
 
 	return index;
 }
@@ -284,7 +284,7 @@ brEvalListHead *brDoEvalListDeepCopy(brEvalListHead *l, slList **s) {
 brEvalListCopyRecord *brMakeListCopyRecord(brEvalListHead *original, brEvalListHead *copy) {
 	brEvalListCopyRecord *r;
 
-	r = slMalloc(sizeof(brEvalListCopyRecord));
+	r = new brEvalListCopyRecord;
 
 	r->original = original;
 	r->copy = copy;
@@ -296,7 +296,7 @@ brEvalListHead *brCopyRecordInList(slList *recordList, brEvalListHead *search) {
 	brEvalListCopyRecord *r;
 
 	while(recordList) {
-		r = recordList->data;
+		r = (brEvalListCopyRecord*)recordList->data;
 
 		if(r->original == search) return r->copy;
 
@@ -308,7 +308,7 @@ brEvalListHead *brCopyRecordInList(slList *recordList, brEvalListHead *search) {
 
 void brFreeListRecords(slList *records) {
 	while(records) {
-		slFree(records->data);
+		delete (brEvalListCopyRecord*)records->data;
 		records = records->next;
 	}
 }

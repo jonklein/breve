@@ -24,7 +24,7 @@ Control : Tunnel{
 
 		lightmap = (new Image load from "images/lightmap.png").
 
-		particles = 900 new Particles.
+		particles = 700 new Particles.
 
 		self point-camera at (0, 0, 0) from (0.0, 0.0, 100.0).
 
@@ -54,5 +54,5 @@ Mobile : Particle (aka Particles) {
 
 		self set-color to random[(1, 1, 1)].
 		self move to random[(600, 600, 0)] - (300, 300, 300 + random[1000]).
-		self set-velocity to (0, 0, 80).
+		self set-velocity to (0, 0, 200).
 }

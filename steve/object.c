@@ -53,7 +53,7 @@ stObject *stObjectNew(brEngine *engine, stSteveData *sdata, char *name, char *al
 
 	// new namespace for the object 
 
-	o->keywords = brNamespaceNew(64);
+	o->keywords = brNamespaceNew();
 
 	// before any variables are added here, our variable vector 
 	// the size of our parent's variable vector.  our vector 
@@ -403,22 +403,6 @@ int stMethodTrace(stRunInstance *i, char *name) {
 	}
 
 	return EC_OK;
-}
-
-/*!
-	\brief Returns the steve object with the given name.
-*/
-
-stObject *stObjectFind(brNamespace *n, char *name) {
-	brNamespaceSymbol *nameSymbol;
-
-	nameSymbol = brNamespaceLookup(n, name);
-
-	if(!nameSymbol) return NULL;
-
-	if(nameSymbol->type != ST_OBJECT && nameSymbol->type != ST_OBJECT_ALIAS) return NULL;
-
-	return ((brObject*)nameSymbol->data)->userData;
 }
 
 /*!
@@ -982,5 +966,3 @@ void stRemoveFromInstanceLists(stInstance *i) {
 		type = type->super;
 	}
 }
-
-

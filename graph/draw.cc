@@ -126,8 +126,9 @@ void slDrawGraph(slGraph *graph) {
 			}
 
 		} else {
-			for(v=0;v<graph->lines[l]->xValues.size();v++)
-				slPlotPoint(graph->lines[l]->xValues[v], graph->lines[l]->yValues[v], marginX, marginY, graph);
+			unsigned int point;
+			for(point=0;point<graph->lines[l]->xValues.size();point++)
+				slPlotPoint(graph->lines[l]->xValues[point], graph->lines[l]->yValues[point], marginX, marginY, graph);
 		}
 
 
@@ -165,7 +166,7 @@ void slDrawGraph(slGraph *graph) {
 }
 
 void slStrokeCenteredString(float x, float y, char *text) {
-	float offset = glutStrokeLength(GLUT_STROKE_ROMAN, (const char*)text) / 2.0;
+	float offset = glutStrokeLength(GLUT_STROKE_ROMAN, (const unsigned char*)text) / 2.0;
 	slStrokeString(x - offset, y, text);
 }
 

@@ -7,10 +7,12 @@
 
 #ifdef HAVE_LIBGSL
 
+#define GSL_MATRIX_POINTER(p)	((gsl_matrix_float*)(BRPOINTER(p)))
+
 int brIMatrixNew(brEval args[], brEval *target, brInstance *i) {
 	gsl_matrix_float *m;
 
-	BRPOINTER(target) = m = gsl_matrix_float_alloc(BRINT(&args[0]), BRINT(&args[1]));
+	GSL_MATRIX_POINTER(target) = m = gsl_matrix_float_alloc(BRINT(&args[0]), BRINT(&args[1]));
 
 	if(!m) {
 		slMessage(DEBUG_ALL, "Could not create matrix: gsl_matrix_float_alloc failed\n");
@@ -23,23 +25,23 @@ int brIMatrixNew(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrixFree(brEval args[], brEval *target, brInstance *i) {
-	if(BRPOINTER(&args[0])) gsl_matrix_float_free(BRPOINTER(&args[0]));
+	if(GSL_MATRIX_POINTER(&args[0])) gsl_matrix_float_free(GSL_MATRIX_POINTER(&args[0]));
 	return EC_OK;
 }
 
 int brIMatrixGet(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = (double)gsl_matrix_float_get(BRPOINTER(&args[0]), BRINT(&args[1]), BRINT(&args[2]));
+	BRDOUBLE(target) = (double)gsl_matrix_float_get(GSL_MATRIX_POINTER(&args[0]), BRINT(&args[1]), BRINT(&args[2]));
 	return EC_OK;
 }
 
 int brIMatrixSet(brEval args[], brEval *target, brInstance *i) {
-	gsl_matrix_float_set(BRPOINTER(&args[0]), BRINT(&args[1]), BRINT(&args[2]), BRDOUBLE(&args[3]));
+	gsl_matrix_float_set(GSL_MATRIX_POINTER(&args[0]), BRINT(&args[1]), BRINT(&args[2]), BRDOUBLE(&args[3]));
 	return EC_OK;
 }
 
 int brIMatrixCopy(brEval args[], brEval *target, brInstance *i) {
-	gsl_matrix_float *m = BRPOINTER(&args[0]);
-	gsl_matrix_float *n = BRPOINTER(&args[1]);
+	gsl_matrix_float *m = GSL_MATRIX_POINTER(&args[0]);
+	gsl_matrix_float *n = GSL_MATRIX_POINTER(&args[1]);
 
 	gsl_vector_float_view mv = gsl_vector_float_view_array(m->data, m->tda * m->size1);
 	gsl_vector_float_view nv = gsl_vector_float_view_array(n->data, n->tda * n->size2);
@@ -51,8 +53,8 @@ int brIMatrixCopy(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrixAddScaled(brEval args[], brEval *target, brInstance *i) {
-	gsl_matrix_float *m = BRPOINTER(&args[0]);
-	gsl_matrix_float *n = BRPOINTER(&args[1]);
+	gsl_matrix_float *m = GSL_MATRIX_POINTER(&args[0]);
+	gsl_matrix_float *n = GSL_MATRIX_POINTER(&args[1]);
 	float scale = BRDOUBLE(&args[2]);
 
 	gsl_vector_float_view mv = gsl_vector_float_view_array(m->data, m->tda * m->size1);
@@ -64,7 +66,7 @@ int brIMatrixAddScaled(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrixAddScalar(brEval args[], brEval *target, brInstance *i) {
-	gsl_matrix_float *m = BRPOINTER(&args[0]);
+	gsl_matrix_float *m = GSL_MATRIX_POINTER(&args[0]);
 	float c = (float)BRDOUBLE(&args[1]);
 
 	gsl_matrix_float_add_constant(m, c);
@@ -73,8 +75,8 @@ int brIMatrixAddScalar(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrixMulElements(brEval args[], brEval *target, brInstance *i) {
-	gsl_matrix_float *m = BRPOINTER(&args[0]);
-	gsl_matrix_float *n = BRPOINTER(&args[1]);
+	gsl_matrix_float *m = GSL_MATRIX_POINTER(&args[0]);
+	gsl_matrix_float *n = GSL_MATRIX_POINTER(&args[1]);
 
 	gsl_matrix_float_mul_elements(m, n);
 
@@ -82,9 +84,9 @@ int brIMatrixMulElements(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrixBlasMul(brEval args[], brEval *target, brInstance *i) {
-	gsl_matrix_float *m = BRPOINTER(&args[0]);
-	gsl_matrix_float *n = BRPOINTER(&args[1]);
-	gsl_matrix_float *o = BRPOINTER(&args[2]);
+	gsl_matrix_float *m = GSL_MATRIX_POINTER(&args[0]);
+	gsl_matrix_float *n = GSL_MATRIX_POINTER(&args[1]);
+	gsl_matrix_float *o = GSL_MATRIX_POINTER(&args[2]);
 
 	gsl_blas_sgemm(CblasNoTrans, CblasNoTrans, 1, m, n, 0, o);
 
@@ -92,7 +94,7 @@ int brIMatrixBlasMul(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrixScale(brEval args[], brEval *target, brInstance *i) {
-	gsl_matrix_float *m = BRPOINTER(&args[0]);
+	gsl_matrix_float *m = GSL_MATRIX_POINTER(&args[0]);
 	double scale = BRDOUBLE(&args[1]);
 
 	gsl_matrix_float_scale(m, scale);
@@ -101,8 +103,8 @@ int brIMatrixScale(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrixDiffuse(brEval args[], brEval *target, brInstance *i) {
-	gsl_matrix_float *m = BRPOINTER(&args[0]);
-	gsl_matrix_float *n = BRPOINTER(&args[1]);
+	gsl_matrix_float *m = GSL_MATRIX_POINTER(&args[0]);
+	gsl_matrix_float *n = GSL_MATRIX_POINTER(&args[1]);
 	double scale = BRDOUBLE(&args[2]);
 
 	unsigned int x, y;
@@ -123,8 +125,8 @@ int brIMatrixDiffuse(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrixDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
-	gsl_matrix_float *m = BRPOINTER(&args[0]);
-	gsl_matrix_float *n = BRPOINTER(&args[1]);
+	gsl_matrix_float *m = GSL_MATRIX_POINTER(&args[0]);
+	gsl_matrix_float *n = GSL_MATRIX_POINTER(&args[1]);
 	double scale = BRDOUBLE(&args[2]);
 	unsigned int x, y;
 	int xp, xm, yp, ym;
@@ -135,10 +137,10 @@ int brIMatrixDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 			xm = x-1; ym = y-1;
 
 			if(xm < 0) xm += m->size2;
-			else if(xp >= m->size2) xp -= m->size2;
+			else if(xp >= (int)m->size2) xp -= m->size2;
 
 			if(ym < 0) ym += m->size2;
-			else if(yp >= m->size1) yp -= m->size1;
+			else if(yp >= (int)m->size1) yp -= m->size1;
 
 			n->data[m->tda * y + x] = 
 				scale * (-4.0*m->data[m->tda * y + x] +
@@ -151,8 +153,8 @@ int brIMatrixDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrixCopyToImage(brEval args[], brEval *result, brInstance *i) {
-	gsl_matrix_float *m = BRPOINTER(&args[0]);
-	brImageData *d = BRPOINTER(&args[1]);
+	gsl_matrix_float *m = GSL_MATRIX_POINTER(&args[0]);
+	brImageData *d = (brImageData*)BRPOINTER(&args[1]);
 	int offset = BRINT(&args[2]);
 	double scale = BRDOUBLE(&args[3]);
 	int r;

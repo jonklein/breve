@@ -15,7 +15,7 @@
 */
 
 void brEngineRegisterObjectType(brEngine *e, brObjectType *t) {
-	if(t) slStackPush(e->objectTypes, t);
+	e->objectTypes.push_back(t);
 }
 
 /*!
@@ -81,15 +81,13 @@ brMethod *brMethodFindWithArgRange(brObject *o, char *name, unsigned char *types
 */
 
 brObject *brObjectFind(brEngine *e, char *name) {
-	brNamespaceSymbol *nameSymbol;
+	brObject *object;
+	std::string names = name;
 
-	nameSymbol = brNamespaceLookup(e->objects, name);
+	if((object = e->objects[ names])) return object;
+	if((object = e->objectAliases[ names])) return object;
 
-	if(!nameSymbol) return brUnknownObjectFind(e, name);
-
-	if(nameSymbol->type != ST_OBJECT && nameSymbol->type != ST_OBJECT_ALIAS) return NULL;
-
-	return nameSymbol->data;
+	return brUnknownObjectFind(e, name);
 }
 
 /*!
@@ -100,10 +98,10 @@ brObject *brObjectFind(brEngine *e, char *name) {
 */
 
 brObject *brUnknownObjectFind(brEngine *e, char *name) {
-	int n;
+	std::vector<brObjectType*>::iterator oi;
 
-	for(n=0;n<e->objectTypes->count;n++) {
-		brObjectType *type = e->objectTypes->data[n];
+	for(oi = e->objectTypes.begin(); oi != e->objectTypes.end(); oi++ ) {
+		brObjectType *type = *oi;
 		void *pointer = NULL;
 
 		if(type->findObject) {
@@ -307,6 +305,7 @@ int brEngineRemoveInstanceDependency(brInstance *i, brInstance *dependency) {
 
 brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *pointer) {
 	brObject *o;
+	std::string names = name;
 
 	if(!name || !t || !e) return NULL;
 
@@ -317,7 +316,7 @@ brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *poin
 	o->userData = pointer;
 	o->collisionHandlers = slStackNew();
 
-	brNamespaceStore(e->objects, name, ST_OBJECT, o);
+	e->objects[names] = o;
 
 	return o;
 }
@@ -329,7 +328,9 @@ brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *poin
 */
 
 void brEngineAddObjectAlias(brEngine *e, char *name, brObject *o) {
-    brNamespaceStore(e->objects, name, ST_OBJECT_ALIAS, o);
+	std::string names = name;
+
+	e->objectAliases[ name] = o;
 }
 
 /*!

@@ -10,6 +10,7 @@
 extern "C" {
 #endif
 void breveInitCameraFunctions(brNamespace *n);
+void breveInitJointFunctions(brNamespace *n);
 void breveInitControlFunctions(brNamespace *n);
 void breveInitFileFunctions(brNamespace *n);
 void breveInitGraphFunctions(brNamespace *n);

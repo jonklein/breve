@@ -339,7 +339,7 @@ char *interfaceVersionCallback(void *data) {
 }
 
 char *getSavename(void *data) {
-	char *name = slMalloc(1024);
+	char *name = (char*)slMalloc(1024);
 	printf("filename to save: ");
 	fgets(name, 1023, stdin);
 	if(strlen(name) > 0) name[strlen(name) - 1] = 0;
@@ -347,7 +347,7 @@ char *getSavename(void *data) {
 }
 
 char *getLoadname(void *data) {
-	char *name = slMalloc(1024);
+	char *name = (char*)slMalloc(1024);
 	printf("filename to load: ");
 	fgets(name, 1023, stdin);
 	if(strlen(name) > 0) name[strlen(name) - 1] = 0;

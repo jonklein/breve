@@ -71,7 +71,7 @@ int brNewBreveCall(brNamespace *n, char *name, int (*f)(brEval *a, brEval *r, br
 	va_list ap;
 	int value;
 
-	c = slMalloc(sizeof(brInternalFunction));
+	c = new brInternalFunction;
 
 	c->call = f;
 	c->rtype = rtype;
@@ -85,7 +85,7 @@ int brNewBreveCall(brNamespace *n, char *name, int (*f)(brEval *a, brEval *r, br
 
 	va_end(ap);
 
-	if(!brNamespaceStore(n, name, ST_FUNC, c)) {
+	if(!brNamespaceStore(n, name, 0, c)) {
 		slMessage(DEBUG_ALL, "failed to initialize internal function \"%s\"\n", name);
 		return -1;
 	}
@@ -94,10 +94,10 @@ int brNewBreveCall(brNamespace *n, char *name, int (*f)(brEval *a, brEval *r, br
 }
 
 void brFreeBreveCall(void *d) {
-	brInternalFunction *i = d;
+	brInternalFunction *i = (brInternalFunction*)d;
 
 	slFree(i->name);
-	slFree(i);
+	delete i;
 }
 
 /*!
@@ -126,6 +126,7 @@ void brLoadInternalFunctions(brEngine *e) {
 	breveInitMathFunctions(e->internalMethods);
 	breveInitMenuFunctions(e->internalMethods);
 	breveInitPhysicsFunctions(e->internalMethods);
+	breveInitJointFunctions(e->internalMethods);
 	breveInitMultibodyFunctions(e->internalMethods);
 	breveInitShapeFunctions(e->internalMethods);
 	breveInitLinkFunctions(e->internalMethods);

@@ -1,40 +1,42 @@
 #include "kernel.h"
 
-int brISpringNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slSpringNew(BRPOINTER(&args[0]), BRPOINTER(&args[1]), &BRVECTOR(&args[2]), &BRVECTOR(&args[3]), BRDOUBLE(&args[4]), BRDOUBLE(&args[5]), BRDOUBLE(&args[6]));
+#define BRSPRINGPOINTER(p)	((slSpring*)BRPOINTER(p))
 
-	slWorldAddSpring(i->engine->world, BRPOINTER(target));
+int brISpringNew(brEval args[], brEval *target, brInstance *i) {
+	BRSPRINGPOINTER(target) = slSpringNew(BRPOINTER(&args[0]), BRPOINTER(&args[1]), &BRVECTOR(&args[2]), &BRVECTOR(&args[3]), BRDOUBLE(&args[4]), BRDOUBLE(&args[5]), BRDOUBLE(&args[6]));
+
+	slWorldAddSpring(i->engine->world, BRSPRINGPOINTER(target));
 
 	return EC_OK;
 }
 
 int brISpringSetStrength(brEval args[], brEval *target, brInstance *i) {
-	slSpringSetStrength(BRPOINTER(&args[0]), BRDOUBLE(&args[1]));
+	slSpringSetStrength(BRSPRINGPOINTER(&args[0]), BRDOUBLE(&args[1]));
 	return EC_OK;
 }
 
 int brISpringSetLength(brEval args[], brEval *target, brInstance *i) {
-	slSpringSetLength(BRPOINTER(&args[0]), BRDOUBLE(&args[1]));
+	slSpringSetLength(BRSPRINGPOINTER(&args[0]), BRDOUBLE(&args[1]));
 	return EC_OK;
 }
 
 int brISpringGetCurrentLength(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = slSpringGetCurrentLength(BRPOINTER(&args[0]));
+	BRDOUBLE(target) = slSpringGetCurrentLength(BRSPRINGPOINTER(&args[0]));
 	return EC_OK;
 }
 
 int brISpringSetDamping(brEval args[], brEval *target, brInstance *i) {
-	slSpringSetDamping(BRPOINTER(&args[0]), BRDOUBLE(&args[1]));
+	slSpringSetDamping(BRSPRINGPOINTER(&args[0]), BRDOUBLE(&args[1]));
 	return EC_OK;
 }
 
 int brISpringSetMode(brEval args[], brEval *target, brInstance *i) {
-	slSpringSetMode(BRPOINTER(&args[0]), BRINT(&args[1]));
+	slSpringSetMode(BRSPRINGPOINTER(&args[0]), BRINT(&args[1]));
 	return EC_OK;
 }
 
 int brISpringRemove(brEval args[], brEval *target, brInstance *i) {
-	slWorldRemoveSpring(i->engine->world, BRPOINTER(&args[0]));
+	slWorldRemoveSpring(i->engine->world, BRSPRINGPOINTER(&args[0]));
 	return EC_OK;
 }
 

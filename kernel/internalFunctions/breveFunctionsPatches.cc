@@ -23,6 +23,8 @@
 
 #include "kernel.h"
 
+#define BRPATCHGRIDPOINTER(p)	((slPatchGrid*)BRPOINTER(p))
+
 /*!
 	\brief Creates a new patch grid.
 
@@ -37,7 +39,7 @@ int brIPatchGridNew(brEval args[], brEval *target, brInstance *i) {
 	slVector center;
 	slVectorSet(&center, 0, 0, 0);
 
-	BRPOINTER(target) = slPatchGridAdd(i->engine->world, &BRVECTOR(&args[0]), &BRVECTOR(&args[1]), BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]));
+	BRPATCHGRIDPOINTER(target) = slPatchGridAdd(i->engine->world, &BRVECTOR(&args[0]), &BRVECTOR(&args[1]), BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]));
 
     return EC_OK;
 }
@@ -49,7 +51,7 @@ int brIPatchGridNew(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIPatchGridFree(brEval args[], brEval *target, brInstance *i) {
-	slPatchGridFree(BRPOINTER(&args[0]));
+	slPatchGridFree(BRPATCHGRIDPOINTER(&args[0]));
 
 	return EC_OK;
 }
@@ -61,7 +63,7 @@ int brIPatchGridFree(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIPatchAtIndex(brEval args[], brEval *target, brInstance *i) {
-	slPatchGrid *grid = BRPOINTER(&args[0]);
+	slPatchGrid *grid = BRPATCHGRIDPOINTER(&args[0]);
 
 	if(!grid) {
 		brEvalError(i->engine, EE_SIMULATION, "Patch method called with uninitialized patch grid.");
@@ -80,7 +82,7 @@ int brIPatchAtIndex(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIObjectAtLocation(brEval args[], brEval *target, brInstance *i) {
-	slPatchGrid *grid = BRPOINTER(&args[0]);
+	slPatchGrid *grid = BRPATCHGRIDPOINTER(&args[0]);
 	slPatch *patch;
 
 	if(!grid) {
@@ -124,7 +126,7 @@ int brIObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
-	slPatchGrid *grid = BRPOINTER(&args[0]);
+	slPatchGrid *grid = BRPATCHGRIDPOINTER(&args[0]);
 
 	if(!grid) {
 		brEvalError(i->engine, EE_SIMULATION, "Patch method called with uninitialized patch grid.");

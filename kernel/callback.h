@@ -18,5 +18,5 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-int brCheckCollisionCallback(brInstance *o1, brInstance *o2, int type);
-void brCollisionCallback(brInstance *o1, brInstance *o2, int type);
+int brCheckCollisionCallback(void *o1, void *o2, int type);
+void brCollisionCallback(void *o1, void *o2, int type);

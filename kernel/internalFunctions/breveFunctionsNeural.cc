@@ -24,6 +24,8 @@
 #include "kernel.h"
 #include "neural.h"
 
+#define BRFFLAYERPOINTER(p)	((snFFLayer*)BRPOINTER(p))
+
 /*!
 	\brief Fress a neural network structure.
 
@@ -31,7 +33,7 @@
 */
 
 int brIFreeNetwork(brEval args[], brEval *target, brInstance *i) {
-    snFreeNetwork(BRPOINTER(&args[0]));
+    snFreeNetwork(BRFFLAYERPOINTER(&args[0]));
 
     return EC_OK;
 }
@@ -39,11 +41,11 @@ int brIFreeNetwork(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Given a layer of a neural network, adds another layer of a given size.
 
-	void newLayer(int size, snFFLayer pointer layer).
+	snFFLayer pointer newLayer(int size, snFFLayer pointer layer).
 */
 
 int brINewFFLayer(brEval args[], brEval *target, brInstance *i) {
-    BRPOINTER(target) = snNewLayer(BRINT(&args[0]), BRPOINTER(&args[1]));
+    BRFFLAYERPOINTER(target) = snNewLayer(BRINT(&args[0]), BRFFLAYERPOINTER(&args[1]));
 
     if(!BRPOINTER(target)) return EC_ERROR;
 
@@ -57,7 +59,7 @@ int brINewFFLayer(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIRandomizeWeights(brEval args[], brEval *target, brInstance *i) {
-    snRandomizeNetworkWeights(BRPOINTER(&args[0]), 8);
+    snRandomizeNetworkWeights(BRFFLAYERPOINTER(&args[0]), 8);
 
     return EC_OK;
 }
@@ -69,7 +71,7 @@ int brIRandomizeWeights(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetWeight(brEval args[], brEval *target, brInstance *i) {
-	snFFLayer *layer = BRPOINTER(&args[0]);
+	snFFLayer *layer = BRFFLAYERPOINTER(&args[0]);
 	int toNode = BRINT(&args[1]);
 	int fromNode = BRINT(&args[2]);
 	double weight = BRDOUBLE(&args[3]);
@@ -101,7 +103,7 @@ int brISetWeight(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetWeight(brEval args[], brEval *target, brInstance *i) {
-	snFFLayer *layer = BRPOINTER(&args[0]);
+	snFFLayer *layer = BRFFLAYERPOINTER(&args[0]);
 	int toNode = BRINT(&args[1]);
 	int fromNode= BRINT(&args[2]);
 
@@ -132,7 +134,7 @@ int brIGetWeight(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetValue(brEval args[], brEval *target, brInstance *i) {
-	snFFLayer *layer = BRPOINTER(&args[0]);
+	snFFLayer *layer = BRFFLAYERPOINTER(&args[0]);
 	int node = BRINT(&args[1]);
 
 	if(node < 0 || node >= layer->count) {
@@ -159,11 +161,11 @@ int brIFeedForward(brEval args[], brEval *target, brInstance *i) {
     snFFLayer *outputLayer, *inputLayer;
     int count;
 
-    outputLayer = BRPOINTER(&args[0]);
+    outputLayer = BRFFLAYERPOINTER(&args[0]);
     inputLayer = outputLayer->input;
 
-    inputs = BRPOINTER(&args[1]);
-    outputs = BRPOINTER(&args[2]);
+    inputs = BRLIST(&args[1]);
+    outputs = BRLIST(&args[2]);
 
     if(inputs->count != inputLayer->count) {
         slMessage(DEBUG_ALL, "feedForward expects list matching size of network input layer (%d inputs, list is size %d)", inputLayer->count, inputs->count);

@@ -63,7 +63,7 @@ brSoundPlayer *brNewPlayer(brSoundMixer *mixer, brSoundData *data);
 brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency);
 
 brSoundData *brLoadSound(char *file);
-void brFreeSound(brSoundData *data);
+void brFreeSoundData(brSoundData *data);
 
 int brPASoundCallback(void *ibuf, void *obuf, unsigned long fbp, PaTimestamp outTime, void *data);
 

@@ -20,12 +20,12 @@
 
 #include "kernel.h"
 
-brNamespace *brNamespaceNew(int size) {
+brNamespace *brNamespaceNew() {
 	return new brNamespace;
 }
 
 void brNamespaceFree(brNamespace *ns) {
-	delete ns;
+	brNamespaceFreeWithFunction(ns, NULL);
 }
 
 void brNamespaceFreeWithFunction(brNamespace *ns, void (*symFree)(void *s)) {
@@ -34,6 +34,8 @@ void brNamespaceFreeWithFunction(brNamespace *ns, void (*symFree)(void *s)) {
 	for(mi = ns->map.begin(); mi != ns->map.end(); mi++) {
 		if(mi->second) brNamespaceSymbolFreeWithFunction(mi->second, symFree);
 	}
+
+	ns->map.clear();
 
 	delete ns;
 }
@@ -57,7 +59,7 @@ brNamespaceSymbol *brNamespaceStore(brNamespace *space, char *name, int type, vo
 
 	if(space->map[ nameS]) return NULL;
 
-	space->map[ nameS] = brNamespaceSymbolNew(name, type, data);
+	space->map[ nameS] = brNamespaceSymbolNew(type, data);
 
 	return space->map[ nameS];
 }
@@ -67,12 +69,11 @@ brNamespaceSymbol *brNamespaceLookup(brNamespace *space, char *name) {
 	return space->map[ nameS];
 }
 
-brNamespaceSymbol *brNamespaceSymbolNew(char *name, int type, void *data) {
+brNamespaceSymbol *brNamespaceSymbolNew(int type, void *data) {
 	brNamespaceSymbol *s;
 	
 	s = new brNamespaceSymbol;
 	
-	s->name = slStrdup(name);
 	s->type = type;
 	s->data = data;
 	
@@ -81,6 +82,5 @@ brNamespaceSymbol *brNamespaceSymbolNew(char *name, int type, void *data) {
 
 void brNamespaceSymbolFreeWithFunction(brNamespaceSymbol *s, void (*symFree)(void *s)) {
 	if(symFree && s->data) symFree(s->data);
-	slFree(s->name);
 	delete s;
 }

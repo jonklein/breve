@@ -167,7 +167,7 @@ int *brSampleUp(int *in, long frames) {
 	return out;
 }
 
-void brFreeSound(brSoundData *data) {
+void brFreeSoundData(brSoundData *data) {
 	delete[] data->data;
 	delete data;
 }

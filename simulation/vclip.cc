@@ -1690,8 +1690,6 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 			if(p2depths < 0.0 && p2depths > best2depth) {
 				best2depth = p2depths;
 				*f2p = faces2[y];
-
-				// slVectorPrint(&plane2.normal);
 			}
 
 			for(pi = s1->points.begin(); pi != s1->points.end(); pi++ ) {
@@ -1705,8 +1703,6 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 			if(p1depths < 0.0 && p1depths > best1depth) {
 				best1depth = p1depths;
 				*f1p = faces1[x];
-
-				// slVectorPrint(&plane1.normal);
 			}
 		}
 	}

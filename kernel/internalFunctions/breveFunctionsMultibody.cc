@@ -23,6 +23,8 @@
 
 #include "kernel.h"
 
+#define BRMULTIBODYPOINTER(p) ((slMultibody*)BRPOINTER(p))
+
 /*!
 	\brief Sets the root of the multibody.
 
@@ -32,7 +34,7 @@
 */
 
 int brISetMultibodyRoot(brEval args[], brEval *target, brInstance *i) {
-	slMultibody *mb = BRPOINTER(&args[0]);
+	slMultibody *mb = BRMULTIBODYPOINTER(&args[0]);
 	slLink *root = BRPOINTER(&args[1]);
 
 	slMultibodySetRoot(mb, root);
@@ -54,7 +56,7 @@ int brIMultibodyNew(brEval args[], brEval *target, brInstance *i) {
 	mb = slMultibodyNew(i->engine->world);
 	slMultibodySetCallbackData(mb, i);
 
-	BRPOINTER(target) = mb;
+	BRMULTIBODYPOINTER(target) = mb;
 
 	return EC_OK;
 }
@@ -73,7 +75,7 @@ int brIMultibodyAllObjects(brEval args[], brEval *target, brInstance *i) {
 
 	all = brEvalListNew();
 
-	start = l = slMultibodyAllCallbackData(BRPOINTER(&args[0]));
+	start = l = slMultibodyAllCallbackData(BRMULTIBODYPOINTER(&args[0]));
 
 	while(l) {
 		brEval e;
@@ -101,7 +103,7 @@ int brIMultibodyAllObjects(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIMultibodyFree(brEval args[], brEval *target, brInstance *i) {
-	slMultibody *m = BRPOINTER(&args[0]);
+	slMultibody *m = BRMULTIBODYPOINTER(&args[0]);
 
 	slWorldSetUninitialized(i->engine->world);
 
@@ -117,7 +119,7 @@ int brIMultibodyFree(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIMultibodySetLocation(brEval args[], brEval *target, brInstance *i) {
-	slMultibody *mb = BRPOINTER(&args[0]);
+	slMultibody *mb = BRMULTIBODYPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(&args[1]);
 
 	slMultibodyPosition(mb, v, NULL);
@@ -135,7 +137,7 @@ int brIMultibodySetLocation(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIMultibodySetRotation(brEval args[], brEval *target, brInstance *i) {
-	slMultibody *mb = BRPOINTER(&args[0]);
+	slMultibody *mb = BRMULTIBODYPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(&args[1]);
 	double len = BRDOUBLE(&args[2]);
 	double rot[3][3];
@@ -148,7 +150,7 @@ int brIMultibodySetRotation(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMultibodySetRotationMatrix(brEval args[], brEval *target, brInstance *i) {
-	slMultibody *mb = BRPOINTER(&args[0]);
+	slMultibody *mb = BRMULTIBODYPOINTER(&args[0]);
 
 	slMultibodyPosition(mb, NULL, BRMATRIX(&args[1]));
 
@@ -163,7 +165,7 @@ int brIMultibodySetRotationMatrix(brEval args[], brEval *target, brInstance *i) 
 */
 
 int brIMultibodyRotateRelative(brEval args[], brEval *target, brInstance *i) {
-	slMultibody *mb = BRPOINTER(&args[0]);
+	slMultibody *mb = BRMULTIBODYPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(&args[1]);
 	double len = BRDOUBLE(&args[2]);
 	double rotation[3][3];
@@ -186,7 +188,7 @@ int brIMultibodyRotateRelative(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIMultibodySetHandleSelfCollisions(brEval args[], brEval *target, brInstance *i) { 
-	slMultibody *m = BRPOINTER(&args[0]);
+	slMultibody *m = BRMULTIBODYPOINTER(&args[0]);
 
 	if(!m) return EC_OK;
 
@@ -202,7 +204,7 @@ int brIMultibodySetHandleSelfCollisions(brEval args[], brEval *target, brInstanc
 */
 
 int brIMultibodyCheckSelfPenetration(brEval args[], brEval *target, brInstance *i) { 
-	slMultibody *m = BRPOINTER(&args[0]);
+	slMultibody *m = BRMULTIBODYPOINTER(&args[0]);
 
 	if(!m) return EC_OK;
 

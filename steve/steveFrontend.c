@@ -110,7 +110,7 @@ stSteveData *stSteveInit(brEngine *engine) {
 	gSteveData->freedInstances = NULL;
 	gSteveData->allObjects = NULL;
 
-	gSteveData->defines = brNamespaceNew(64);
+	gSteveData->defines = brNamespaceNew();
 
 	gSteveData->stackRecord = NULL;
 
@@ -160,7 +160,7 @@ void stSteveCleanup(stSteveData *d) {
 
 	stFreeParseTrack(d);
 
-	if(d->defines) brNamespaceFreeWithFunction(d->defines, (void(*)(void*))stFreeDefine);
+	brNamespaceFreeWithFunction(d->defines, (void(*)(void*))stFreeDefine);
 
 	brEvalListFreeSortVars();
 

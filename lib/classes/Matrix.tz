@@ -37,7 +37,7 @@ Object : Matrix2D (aka Matrices2D) {
 
 	+ to multiply-with-elements from otherMatrix (Matrix2D object):
 		% Multiplies each element in this matrix with the corresponding 
-		% element in otherMatrix.  This is not regular matrix multiplication,
+		% element in otherMatrix.  This is not regular matrix multiplication;
 		% rather, it is a way to scale each element in otherMatrix.
 
 		matrixMulElements(matrixPointer, (otherMatrix get-matrix-pointer)).
@@ -104,19 +104,21 @@ Object : Matrix2D (aka Matrices2D) {
 		% <pre>
 		% 0 1 0
 		% 1 4 1
-		% 0 1 1
+		% 0 1 0
 		% </pre>
 		% <P>
 		% chemicalMatrix is assumed to have periodic boundary conditions so that 	
 		% the chemical will flow freely from the edges of the matrix to the 
 		% other side.
 		% <P>
-		% The optional scale argument may be used to scale the resulting scale matrix.
+		% The optional scale argument may be used to scale the resulting scale 
+		% matrix.
 
 		matrixDiffusePeriodic((chemicalMatrix get-matrix-pointer), matrixPointer, scale).
 
 	+ to copy-to-red-channel of-image theImage (Image object) with-scale scale = 1.0 (float):
-		% Copies the contents of this matrix to the red channel of theImage.  The optional
+		% Copies the contents of this matrix to the red channel of theImage.  
+		% The optional
 		% argument scale specifies how the matrix elements should be scaled.
 		% <P>
 		% This method, and it's counterparts METHOD(copy-to-green-channel) and 
@@ -126,7 +128,8 @@ Object : Matrix2D (aka Matrices2D) {
 		matrixCopyToImage(matrixPointer, (theImage get-image-data), 0, scale).
 
 	+ to copy-to-green-channel of-image theImage (Image object) with-scale scale = 1.0 (float):
-		% Copies the contents of this matrix to the green channel of theImage.  The optional
+		% Copies the contents of this matrix to the green channel of theImage.  
+		% The optional
 		% argument scale specifies how the matrix elements should be scaled.
 		% <P>
 		% This method, and it's counterparts METHOD(copy-to-blue-channel) and 
@@ -136,7 +139,8 @@ Object : Matrix2D (aka Matrices2D) {
 		matrixCopyToImage(matrixPointer, (theImage get-image-data), 1, scale).
 
 	+ to copy-to-blue-channel of-image theImage (Image object) with-scale scale = 1.0 (float):
-		% Copies the contents of this matrix to the blue channel of theImage.  The optional
+		% Copies the contents of this matrix to the blue channel of theImage.  
+		% The optional
 		% argument scale specifies how the matrix elements should be scaled.
 		% <P>
 		% This method, and it's counterparts METHOD(copy-to-red-channel) and 

@@ -126,7 +126,7 @@ struct slWorld {
 	// the collision callback is called when the collision is detected --
 	// at the estimated time of collision.  
 
-	int (*collisionCallback)(void *body1, void *body2, int type);
+	void (*collisionCallback)(void *body1, void *body2, int type);
 
 	// the collisionCheckCallback is a callback defined by the program
 	// using the physics engine.  it takes two userData (see slWorldObject)
@@ -237,7 +237,7 @@ void slWorldSetLightExposureDetection(slWorld *w, int n);
 void slWorldSetLightExposureSource(slWorld *w, slVector *v);
 int slWorldGetLightExposureDetection(slWorld *w);
 
-void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*, int t), int (*collide)(void*, void*, int t));
+void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*, int t), void (*collide)(void*, void*, int t));
 
 slWorldObject *slWorldGetObject(slWorld *w, unsigned int n);
 

@@ -23,6 +23,8 @@
 
 #include "kernel.h"
 
+#define BRCAMERAPOINTER(p)	((slCamera*)BRPOINTER(p))
+
 /*!
 	\brief Sets the z-clipping plane distance for a camera.
 
@@ -30,7 +32,7 @@
 */
 
 int brICameraSetZClip(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRPOINTER(&args[0]);
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	camera->zClip = abs(BRINT(&args[1]));
 	return EC_OK;
 }
@@ -42,7 +44,7 @@ int brICameraSetZClip(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraSetDrawSmooth(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRPOINTER(&args[0]);
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	camera->drawSmooth = BRINT(&args[0]);
 	camera->recompile = 1;
 	return EC_OK;
@@ -55,7 +57,7 @@ int brICameraSetDrawSmooth(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraSetBlur(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRPOINTER(&args[0]);
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	camera->blur = BRINT(&args[0]);
 	camera->recompile = 1;
 	return EC_OK;
@@ -68,7 +70,7 @@ int brICameraSetBlur(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraSetBlurFactor(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRPOINTER(&args[0]);
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	camera->blurFactor = BRDOUBLE(&args[0]);
 	camera->recompile = 1;
 	return EC_OK;
@@ -81,7 +83,7 @@ int brICameraSetBlurFactor(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraSetDrawFog(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRPOINTER(&args[0]);
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	camera->drawFog = BRINT(&args[0]);
 	camera->recompile = 1;
 	return EC_OK;
@@ -94,7 +96,7 @@ int brICameraSetDrawFog(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraPositionDisplay(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRPOINTER(&args[0]);
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
@@ -111,7 +113,7 @@ int brICameraPositionDisplay(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraResizeDisplay(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRPOINTER(&args[0]);
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
@@ -134,7 +136,7 @@ int brICameraNew(brEval args[], brEval *target, brInstance *i) {
 	slVectorSet(&camera->target, 1, 0, 0);
 	slVectorSet(&camera->location, 0, 0, 0);
 
-	BRPOINTER(target) = camera;
+	BRCAMERAPOINTER(target) = camera;
 
 	slWorldAddCamera(i->engine->world, camera);
 
@@ -148,7 +150,7 @@ int brICameraNew(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraFree(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRPOINTER(&args[0]);
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 
 	slWorldRemoveCamera(i->engine->world, camera);
 
@@ -167,7 +169,7 @@ int brICameraFree(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraPosition(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRPOINTER(&args[0]);
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	slVector *l = &BRVECTOR(&args[1]);
 	slVector *t = &BRVECTOR(&args[2]);
 
@@ -184,8 +186,6 @@ int brICameraPosition(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraSetEnabled(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRPOINTER(&args[0]);
-
 	// camera->enabled = BRINT(&args[1]);
 
 	return EC_OK;
@@ -198,7 +198,7 @@ int brICameraSetEnabled(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraTextSetEnabled(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRPOINTER(&args[0]);
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 
 	camera->drawText = BRINT(&args[1]);
 

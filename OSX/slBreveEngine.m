@@ -447,6 +447,8 @@ int slMakeCurrentContext();
 		} 
 	}
 
+	brMethodFree(method);
+
 	return NULL;
 }
 

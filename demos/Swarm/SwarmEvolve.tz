@@ -11,6 +11,14 @@
 # Proceedings of the Genetic and Evolutionary Computation Conference
 # (GECCO-2003), to be published by Springer-Verlag.
 #
+# This is not the exact simulation as described by the paper.  In particular,
+# this simulation now uses the new Push 3.0 implementation, a different Push
+# instruction set.  In addition, a number of changes have beeen made to this
+# simulation code itself, including the sharing code, which was the focus of 
+# the GECCO paper.  The Push 3.0 implementation does not currently include 
+# support for finding the discrepancy between two code objects, and as such,
+# the "kin" recognition mechanism is not currently supported.
+#
 # This code requires Breve 2.0 or better, which can be obtained from:
 #    http://www.spiderland.org/breve
 #
@@ -739,7 +747,6 @@ Mobile : Bird (aka Birds) {
 
         self move to random[(10, 0, 10)] - (5, 3, 5).
         self set-velocity to (0, 0, 0).
-        #self point vertex (0, 1, 0) at random[(1, 1, 1)] - (0.5, 0.5, 0.5).
         hue = random[1.0].
         self set-color to (controller get-rgb-color for-hsv-color (hue * 360, 1, 1)).
         energy = 0.8 + random[0.2].
@@ -844,14 +851,14 @@ Mobile : Bird (aka Birds) {
         # we've now executed the feedFriend instruction, so we are a friendFeeder
         friendFeeder = 1.
 
+		controller increment-friendFeedings.
+
         bird = (self closest-friend).
+
+		if ((bird get-pushCode) get-discrepancy from pushCode) > 9: return.
 
         if (bird get-energy) < energy: {
             self adjust-energy delta -0.01.
-
-            # mode #0 is a throw-away -- we're penalized, but return before the actual feeding
-            if mode == 0: return.
-
             bird adjust-energy delta 0.01.
         }
 
@@ -888,14 +895,12 @@ Mobile : Bird (aka Birds) {
         # we've now executed the feedOther instruction, so we are an otherFeeder
         otherFeeder = 1.
 
+		controller increment-otherFeedings.
+
         bird = (self closest-other).
 
         if (bird get-energy) < energy: {
             self adjust-energy delta -0.01.
-
-            # mode #0 is a throw-away -- we're penalized, but return before the actual feeding
-            if mode == 0: return.
-
             bird adjust-energy delta 0.01.
         }
 

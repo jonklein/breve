@@ -439,6 +439,8 @@ PushProgram : PushGPIndividual (aka PushGPIndividuals) {
 		errors = errorList.
 
 	+ to get-errors:
+		% Returns the current list of errors for an individual as determined
+		% by the fitness test.
 		return errors.
 
 	+ to set-fitness to newFitness (double):

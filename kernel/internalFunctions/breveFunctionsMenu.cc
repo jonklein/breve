@@ -20,6 +20,8 @@
 
 #include "kernel.h"
 
+#define BRMENUENTRYPOINTER(p) ((brMenuEntry*)BRPOINTER(p))
+
 /*! \addtogroup InternalFunctions */
 /*@{*/
 
@@ -45,7 +47,7 @@ int brIMenuItemNew(brEval args[], brEval *target, brInstance *i) {
 
 	m = BRINSTANCE(&args[0]);
 
-    BRPOINTER(target) = brAddMenuItem(m, BRSTRING(&args[1]), BRSTRING(&args[2]));
+    BRMENUENTRYPOINTER(target) = brAddMenuItem(m, BRSTRING(&args[1]), BRSTRING(&args[2]));
     
     if(m->menu.updateMenu) m->menu.updateMenu(m);
 
@@ -62,7 +64,7 @@ int brIMenuItemNew(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIMenuItemSetCheck(brEval args[], brEval *target, brInstance *i) {
-    brMenuEntry *item = BRPOINTER(&args[0]);
+    brMenuEntry *item = BRMENUENTRYPOINTER(&args[0]);
 
     if(!item) {
         slMessage(DEBUG_ALL, "menuItemSetCheck called with uninitialized menu item\n");
@@ -87,7 +89,7 @@ int brIMenuItemSetCheck(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIMenuItemSetEnabled(brEval args[], brEval *target, brInstance *i) {
-    brMenuEntry *item = BRPOINTER(&args[0]);
+    brMenuEntry *item = BRMENUENTRYPOINTER(&args[0]);
 
     if(!item) {
         slMessage(DEBUG_ALL, "enableMenuItem called with uninitialized menu item\n");

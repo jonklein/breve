@@ -11,9 +11,11 @@ void breveInitPushFunctions(brNamespace *n);
 
 /*@{*/
 /*! \addtogroup InternalFunctions */
-#include "pushC.h"
-
 #ifdef HAVE_LIBPUSH
+
+#include "pushC.h"
+#include "Code.h"
+#include "CodeUtils.h"
 
 /*!
 	\brief A breve API function wrapper for the C-function \ref pushEnvironmentNew.
@@ -627,6 +629,17 @@ int breveFunctionPushCodeRandom(brEval arguments[], brEval *result, brInstance *
 	return EC_OK;
 }
 
+int breveFunctionPushCodeDiscrepancy(brEval arguments[], brEval *result, brInstance *instance) {
+	push::Code *p1, *p2;
+
+	p1 = BRPOINTER(&arguments[0]);
+	p2 = BRPOINTER(&arguments[1]);
+
+	BRINT(result) = push::discrepancy(*p1, *p2);
+
+	return EC_OK;
+}
+
 #endif /* HAVE_LIBPUSH */
 /*@}*/
 
@@ -666,6 +679,7 @@ void breveInitPushFunctions(brNamespace *n) {
  	brNewBreveCall(n, "pushCodeStackPop", breveFunctionPushCodeStackPop, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeStackTop", breveFunctionPushCodeStackTop, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeStackPush", breveFunctionPushCodeStackPush, AT_NULL, AT_POINTER, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushCodeDiscrepancy", breveFunctionPushCodeDiscrepancy, AT_INT, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(n, "pushVectorStackSize", breveFunctionPushVectorStackSize, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushVectorStackPop", breveFunctionPushVectorStackPop, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(n, "pushVectorStackTop", breveFunctionPushVectorStackTop, AT_VECTOR, AT_POINTER, AT_VECTOR, 0);

@@ -23,6 +23,8 @@
 /*! \addtogroup InternalFunctions */
 /*@{*/
 
+#define BRMOVIEPOINTER(p)  ((slMovie*)BRPOINTER(p))
+
 #ifdef HAVE_LIBAVCODEC
 int breveMovieCreate(brEval args[], brEval *result, brInstance *i) {
 	slCamera *camera = i->engine->camera;
@@ -34,13 +36,13 @@ int breveMovieCreate(brEval args[], brEval *result, brInstance *i) {
 	movie = slMovieCreate(path, camera->x, camera->y, 30, 1.0);
 	slFree(path);
 
-	BRPOINTER(result) = movie;
+	BRMOVIEPOINTER(result) = movie;
 
 	return EC_OK;
 }
 
 int breveMovieAddWorldFrame(brEval args[], brEval *result, brInstance *i) {
-	slMovie *movie = BRPOINTER(&args[0]);
+	slMovie *movie = BRMOVIEPOINTER(&args[0]);
 
 	BRINT(result) = slMovieAddWorldFrame(movie, i->engine->world, i->engine->camera);
 
@@ -48,7 +50,7 @@ int breveMovieAddWorldFrame(brEval args[], brEval *result, brInstance *i) {
 }
 
 int breveMovieClose(brEval args[], brEval *result, brInstance *i) {
-	slMovie *movie = BRPOINTER(&args[0]);
+	slMovie *movie = BRMOVIEPOINTER(&args[0]);
 
 	if(!movie) {
 		slMessage(DEBUG_ALL, "warning: attempt to close uninitialized movie pointer\n");

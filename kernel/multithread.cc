@@ -18,10 +18,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+// this code does not work.
+
 #include "kernel.h"
 
 void *stIterationThread(void *data) {
-	stThreadData *threadData = data;
+	stThreadData *threadData = (stThreadData*)data;
 	brEngine *e = threadData->engine;
 
 	while(1) {

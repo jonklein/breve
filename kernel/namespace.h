@@ -24,29 +24,25 @@
 
 enum symbolTypes {
     ST_METHODS = 1,
-    ST_OBJECT,
-    ST_OBJECT_ALIAS,
-    ST_CLASS,
-    ST_FUNC,
     ST_VAR
 };
 
 /*!
 	\brief A hashtable for holding symbols of different types.
 
-	Used by the steve language, and to hold internal method, object 
-	and function names.
+	Used by the steve language as a generic hash table.
+
+	This used to be a homegrown hash-table in C, now it's a wrapper
+	around an STL map.
 */
 
 #ifdef __cplusplus
 #include <map>
 #include <string>
 
-struct brNamespace {
-    int tableSize;
-    slList **buckets;
-
-	std::map<std::string,brNamespaceSymbol*> map;
+class brNamespace {
+	public:
+		std::map<std::string,brNamespaceSymbol*> map;
 };
 #endif
 
@@ -55,7 +51,6 @@ struct brNamespace {
 */
 
 struct brNamespaceSymbol {
-    char *name;
     int type;
     void *data;
 };
@@ -64,20 +59,17 @@ struct brNamespaceSymbol {
 extern "C" {
 #endif
 
-
-brNamespace *brNamespaceNew(int size);
+brNamespace *brNamespaceNew();
 void brNamespaceFree(brNamespace *ns);
 void brNamespaceFreeWithFunction(brNamespace *ns, void (*symFree)(void *s));
 
 brNamespaceSymbol *brNamespaceStore(brNamespace *space, char *name, int type, void *data);
 brNamespaceSymbol *brNamespaceLookup(brNamespace *space, char *name);
 
-brNamespaceSymbol *brNamespaceSymbolNew(char *name, int type, void *data);
+brNamespaceSymbol *brNamespaceSymbolNew(int type, void *data);
 
 void brNamespaceSymbolFree(brNamespaceSymbol *s);
 void brNamespaceSymbolFreeWithFunction(brNamespaceSymbol *s, void (*symFree)(void *s));
-
-int brNamespaceHashSymbol(char *string);
 
 slList *brNamespaceSymbolList(brNamespace *space);
 

@@ -50,16 +50,13 @@ __inline const char *dlerror() {
 
 int brEngineAddDlPlugin(char *filename, char *func, brEngine *engine) {
 	void *handle;
-	char *fullpath, *realFunc;
+	char *fullpath;
 	brDlPlugin *p;
 
-	p = slMalloc(sizeof(brDlPlugin));
+	p = new brDlPlugin;
 
 	// Linux exports symbols unmolested -- or so I am told.
 	// Apparently this is working for OS X too.
-
-	realFunc = slMalloc(strlen(func) + 1);
-	sprintf(realFunc, "%s", func);
 
 	fullpath = brFindFile(engine, filename, NULL);
 
@@ -68,15 +65,14 @@ int brEngineAddDlPlugin(char *filename, char *func, brEngine *engine) {
 		return -1;
 	}
 
-	handle = brDlLoadPlugin(fullpath, realFunc, engine->internalMethods);
+	handle = brDlLoadPlugin(fullpath, func, engine->internalMethods);
 
 	slFree(fullpath);
-	slFree(realFunc);
 
 	if(handle) {
 		p->handle = handle;
 		p->name = slStrdup(filename);
-		engine->dlPlugins = slListPrepend(engine->dlPlugins, p);
+		engine->dlPlugins.push_back(p);
 		return 0;	
 	} else {
 		return -1;
@@ -88,17 +84,15 @@ int brEngineAddDlPlugin(char *filename, char *func, brEngine *engine) {
 */
 
 void brEngineRemoveDlPlugins(brEngine *engine) {
-	slList *l;
 	brDlPlugin *p;
+	std::vector<brDlPlugin*>::iterator di;
 
-	l = engine->dlPlugins;
+	for(di = engine->dlPlugins.begin(); di != engine->dlPlugins.end(); di++ ) {
+		p = *di;
 
-	while(l) {
-		p = l->data;
 		dlclose(p->handle);
 		slFree(p->name);
-		slFree(p);
-		l = l->next;
+		delete p;
 	}
 }
 
@@ -122,13 +116,15 @@ void *brDlLoadPlugin(char *filename, char *func, brNamespace *n) {
 		return NULL;
 	}
 
-	f = dlsym(handle, func);
+	f = (void (*)(brNamespace *n))dlsym(handle, func);
 
 	if(!f) {
 		slMessage(DEBUG_ALL, "error loading function %s from plugin %s: %s\n", func, filename, dlerror());
 	}
 
 	if(!f) return NULL;
+
+	// yay!
 
 	f(n);
 

@@ -29,7 +29,7 @@
 brEvalHash *brEvalHashNew() {
 	brEvalHash *h;
 
-	h = slMalloc(sizeof(brEvalHash));
+	h = new brEvalHash;
 
 	h->table = slNewHash(1024, brEvalHashFunction, brEvalHashCompareFunction);
 	h->retainCount = 0;
@@ -51,7 +51,7 @@ void brEvalHashFree(brEvalHash *h) {
 	start = all = slHashValues(h->table);
 
 	while(all) {
-		slFree(all->data);
+		delete (brEval*)all->data;
 		all = all->next;
 	}
 
@@ -60,7 +60,7 @@ void brEvalHashFree(brEvalHash *h) {
 	start = all = slHashKeys(h->table);
 
 	while(all) {
-		slFree(all->data);
+		delete (brEval*)all->data;
 		all = all->next;
 	}
 
@@ -68,7 +68,7 @@ void brEvalHashFree(brEvalHash *h) {
 
 	slFreeHash(h->table);
 
-	slFree(h);
+	delete h;
 }
 
 /*!
@@ -84,8 +84,8 @@ void brEvalHashStore(brEvalHash *h, brEval *key, brEval *value, brEval *oldValue
 	v = slDehashDataAndKey(h->table, key, (void**)&k);
 
 	if(!v) {
-		v = slMalloc(sizeof(brEval));
-		k = slMalloc(sizeof(brEval));
+		v = new brEval;
+		k = new brEval;
 		brEvalCopy(key, k);
 
 		if(oldValue) oldValue->type = AT_NULL;
@@ -154,7 +154,7 @@ void brEvalHashLookup(brEvalHash *h, brEval *key, brEval *value) {
 }
 
 unsigned int brEvalHashFunction(void *e, unsigned int hsize) {
-	brEval *ee = e;
+	brEval *ee = (brEval*)e;
 	int i;
 	int dataSize = 0;
 	int total = 0;
@@ -166,28 +166,28 @@ unsigned int brEvalHashFunction(void *e, unsigned int hsize) {
 		case AT_DATA:
 		case AT_HASH:
 		case AT_LIST:
-			p = (void*)&BRPOINTER(ee);
+			p = (unsigned char*)&BRPOINTER(ee);
 			dataSize = sizeof(void*);
 			break;
 		case AT_INT:
-			p = (void*)&BRINT(ee);
+			p = (unsigned char*)&BRINT(ee);
 			dataSize = sizeof(int);
 			break;
 		case AT_DOUBLE:
-			p = (void*)&BRDOUBLE(ee);
+			p = (unsigned char*)&BRDOUBLE(ee);
 			dataSize = sizeof(double);
 			break;
 		case AT_STRING:
-			p = BRSTRING(ee);
+			p = (unsigned char*)BRSTRING(ee);
 			dataSize = strlen(BRSTRING(ee));
 			break;
 		case AT_VECTOR:
 			dataSize = sizeof(slVector);
-			p = (void*)&BRVECTOR(ee);
+			p = (unsigned char*)&BRVECTOR(ee);
 			break;
 		case AT_MATRIX:
 			dataSize = sizeof(double) * 9;
-			p = (void*)&BRMATRIX(ee);
+			p = (unsigned char*)&BRMATRIX(ee);
 			break;
 		default:
 			dataSize = 0;
@@ -202,7 +202,7 @@ unsigned int brEvalHashFunction(void *e, unsigned int hsize) {
 }
 
 unsigned int brEvalHashCompareFunction(void *a, void *b) {
-	brEval *ae = a, *be = b;
+	brEval *ae = (brEval*)a, *be = (brEval*)b;
 
 	if(ae->type != be->type) return 1;
 

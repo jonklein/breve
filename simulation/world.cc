@@ -452,6 +452,8 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 					contact->geom.normal[1] = -c->normal.y;
 					contact->geom.normal[2] = -c->normal.z;
 
+					slVectorPrint(&c->normal);
+
 					slVector *v = &c->points[x];
 
 					contact->geom.pos[0] = v->x;
@@ -714,7 +716,7 @@ void slWorldSetLightExposureSource(slWorld *w, slVector *v) {
 	slVectorCopy(v, &w->lightExposureSource);
 }
 
-void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*, int t), int (*collide)(void*, void*, int t)) {
+void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*, int t), void (*collide)(void*, void*, int t)) {
 	w->collisionCallback = collide;
 	w->collisionCheckCallback = check;
 }

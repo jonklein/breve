@@ -99,7 +99,7 @@ int brISystem(brEval args[], brEval *target, brInstance *i) {
         return EC_ERROR;
     }
 
-    result = slMalloc(PIPE_READ_SIZE);
+    result = (char*)slMalloc(PIPE_READ_SIZE);
     position = 0;
     totalSize = PIPE_READ_SIZE;
 
@@ -109,7 +109,7 @@ int brISystem(brEval args[], brEval *target, brInstance *i) {
         if(totalRead == PIPE_READ_SIZE) {
             position = totalSize;
             totalSize += PIPE_READ_SIZE;
-            command = slRealloc(result, totalSize);
+            command = (char*)slRealloc(result, totalSize);
         }
     } while(totalRead == PIPE_READ_SIZE);
 

@@ -20,6 +20,8 @@
 
 #include "kernel.h"
 
+#define BRWORLDOBJECTPOINTER(p)	((slWorldObject*)BRPOINTER(p))
+
 /*! \addtogroup InternalFunctions */
 /*@{*/
 
@@ -114,7 +116,8 @@ int brIGetTime(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brILoadTexture(brEval args[], brEval *target, brInstance *i) {
-	unsigned char *path, *pixels = NULL;
+	unsigned char *pixels = NULL;
+	char *path;
 	int w, h, c;
 	int useAlpha = BRINT(&args[1]);
 
@@ -191,7 +194,7 @@ int brIUpdateNeighbors(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetNeighborhoodSize(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *wo = BRPOINTER(&args[0]);
+	slWorldObject *wo = BRWORLDOBJECTPOINTER(&args[0]);
 	double size = BRDOUBLE(&args[1]);
 
 	if(!wo) {
@@ -205,13 +208,38 @@ int brISetNeighborhoodSize(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
+	\brief Set the collision properties (mu, e, eT) of a stationary object.
+
+	void setCollisionProperties(slWorldObject pointer stationary, double e, double eT, double mu).
+*/
+
+int brISetCollisionProperties(brEval args[], brEval *target, brInstance *i) {
+	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
+	
+	double e = BRDOUBLE(&args[1]);
+	double eT = BRDOUBLE(&args[2]);
+	double mu = BRDOUBLE(&args[3]);
+
+	if(!o) {
+		slMessage(DEBUG_ALL, "null pointer passed to setCollisionProperties\n");
+		return EC_ERROR;
+	}
+
+	slWorldObjectSetCollisionE(o, e);
+	slWorldObjectSetCollisionET(o, eT);
+	slWorldObjectSetCollisionMU(o, mu);
+
+	return EC_OK;
+}
+
+/*!
 	\brief Gets an object's neighbors.
 
 	list getNeighbors(slWorldObject pointer).
 */
 
 int brIGetNeighbors(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *wo = BRPOINTER(&args[0]);
+	slWorldObject *wo = BRWORLDOBJECTPOINTER(&args[0]);
 	const slStack *neighbors;
 	unsigned int n;
 	brEval eval;
@@ -221,7 +249,7 @@ int brIGetNeighbors(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 	
-	BRPOINTER(target) = brEvalListNew();
+	BRLIST(target) = brEvalListNew();
 
 	eval.type = AT_INSTANCE;
 
@@ -230,9 +258,9 @@ int brIGetNeighbors(brEval args[], brEval *target, brInstance *i) {
 	for(n=0;n<neighbors->count;n++) {
 		// grab the neighbor instances from the userData of the neighbors
 
-		BRINSTANCE(&eval) = slWorldObjectGetCallbackData((slWorldObject*)neighbors->data[n]);
+		BRINSTANCE(&eval) = (brInstance*)slWorldObjectGetCallbackData((slWorldObject*)neighbors->data[n]);
 
-		if(BRINSTANCE(&eval) && BRINSTANCE(&eval)->status == AS_ACTIVE) brEvalListInsert(BRPOINTER(target), 0, &eval);
+		if(BRINSTANCE(&eval) && BRINSTANCE(&eval)->status == AS_ACTIVE) brEvalListInsert(BRLIST(target), 0, &eval);
 	}
 
 	return EC_OK;
@@ -246,7 +274,7 @@ int brIGetNeighbors(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIWorldObjectGetLightExposure(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *wo = BRPOINTER(&args[0]);
+	slWorldObject *wo = BRWORLDOBJECTPOINTER(&args[0]);
 
 	BRINT(target) = slWorldObjectGetLightExposure(wo);
 
@@ -260,8 +288,8 @@ int brIWorldObjectGetLightExposure(brEval args[], brEval *target, brInstance *i)
 */
 
 int brIRemoveObject(brEval args[], brEval *target, brInstance *i) {
-	slRemoveObject(i->engine->world, BRPOINTER(&args[0]));
-	slWorldFreeObject(BRPOINTER(&args[0]));
+	slRemoveObject(i->engine->world, BRWORLDOBJECTPOINTER(&args[0]));
+	slWorldFreeObject(BRWORLDOBJECTPOINTER(&args[0]));
  
 	return EC_OK;
 }
@@ -273,7 +301,7 @@ int brIRemoveObject(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetBoundingBox(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *o = BRPOINTER(&args[0]);
+	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	int value = BRINT(&args[1]);
 
 	if(!o) {
@@ -294,7 +322,7 @@ int brISetBoundingBox(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetDrawAxis(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *o = BRPOINTER(&args[0]);
+	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	int value = BRINT(&args[1]);
 
 	if(!o) {
@@ -311,7 +339,7 @@ int brISetDrawAxis(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISetNeighborLines(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *o = BRPOINTER(&args[0]);
+	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	int value = BRINT(&args[1]);
 
 	if(!o) {
@@ -326,7 +354,7 @@ int brISetNeighborLines(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISetVisible(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *o = BRPOINTER(&args[0]);
+	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	int visible = BRINT(&args[1]);
 
 	if(!o) {
@@ -343,7 +371,7 @@ int brISetVisible(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISetTexture(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *o = BRPOINTER(&args[0]);
+	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	int value = BRINT(&args[1]);
 
 	if(!o) {
@@ -359,7 +387,7 @@ int brISetTexture(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISetTextureScale(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *o = BRPOINTER(&args[0]);
+	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	int value = BRINT(&args[1]);
 
 	if(!o) {
@@ -378,7 +406,7 @@ int brISetTextureScale(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISetBitmap(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *o = BRPOINTER(&args[0]);
+	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	int texture = BRINT(&args[1]);
 
 	if(!o) {
@@ -393,7 +421,7 @@ int brISetBitmap(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISetBitmapRotation(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *o = BRPOINTER(&args[0]);
+	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 
 	if(!o) {
 		slMessage(DEBUG_ALL, "null pointer passed to setBitmapRotation\n");
@@ -417,7 +445,7 @@ int brISetBitmapRotation(brEval args[], brEval *target, brInstance *i) {
 */
 		
 int brISetBitmapRotationTowardsVector(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *o = BRPOINTER(&args[0]);
+	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(&args[1]);
 	slVector offset, vdiff, vproj, up, axis;
 	double dot, rotation;
@@ -455,7 +483,7 @@ int brISetBitmapRotationTowardsVector(brEval args[], brEval *target, brInstance 
 }
 
 int brISetAlpha(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *o = BRPOINTER(&args[0]);
+	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 
 	if(!o) {
 		slMessage(DEBUG_ALL, "null pointer passed to setAlpha\n");
@@ -468,7 +496,7 @@ int brISetAlpha(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISetLightmap(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *o = BRPOINTER(&args[0]);
+	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	int value = BRINT(&args[1]);
 
 	if(!o) {
@@ -487,7 +515,7 @@ int brISetLightmap(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetColor(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *o = BRPOINTER(&args[0]);
+	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	slVector *color = &BRVECTOR(&args[1]);
 
 	if(!o) {
@@ -499,6 +527,8 @@ int brISetColor(brEval args[], brEval *target, brInstance *i) {
 
 	return EC_OK;
 }
+
+
 
 int brICameraSetTarget(brEval args[], brEval *target, brInstance *i) {
 	slVector *tar = &BRVECTOR(&args[0]);
@@ -803,8 +833,8 @@ int brISetShadowCatcher(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIAddObjectLine(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *src = BRPOINTER(&args[0]);
-	slWorldObject *dst = BRPOINTER(&args[1]);
+	slWorldObject *src = BRWORLDOBJECTPOINTER(&args[0]);
+	slWorldObject *dst = BRWORLDOBJECTPOINTER(&args[1]);
 	slVector *color = &BRVECTOR(&args[2]);
 	char *patternString = BRSTRING(&args[3]);
 	int pattern = 0, n = 0;
@@ -830,8 +860,8 @@ int brIAddObjectLine(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIRemoveObjectLine(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *src = BRPOINTER(&args[0]);
-	slWorldObject *dst = BRPOINTER(&args[1]);
+	slWorldObject *src = BRWORLDOBJECTPOINTER(&args[0]);
+	slWorldObject *dst = BRWORLDOBJECTPOINTER(&args[1]);
 
 	slRemoveObjectLine(i->engine->world, src, dst);
 
@@ -845,7 +875,7 @@ int brIRemoveObjectLine(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIRemoveAllObjectLines(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *src = BRPOINTER(&args[0]);
+	slWorldObject *src = BRWORLDOBJECTPOINTER(&args[0]);
 
 	slRemoveAllObjectLines(src);
 
@@ -947,4 +977,6 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "setBoundsOnlyCollisionDetection", brISetBoundsOnlyCollisionDetection, AT_NULL, AT_INT, 0);
 
 	brNewBreveCall(n, "loadTigerData", brILoadTigerData, AT_NULL, AT_STRING, 0);
+
+	brNewBreveCall(n, "setCollisionProperties", brISetCollisionProperties, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0);
 }

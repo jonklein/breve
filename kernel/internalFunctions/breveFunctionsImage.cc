@@ -24,6 +24,8 @@
 #include "kernel.h"
 #include "breveFunctionsImage.h"
 
+#define BRIMAGEDATAPOINTER(p)	((brImageData*)BRPOINTER(p))
+
 /*!
 	\brief Retuns the width of an image.
 
@@ -31,7 +33,7 @@
 */
 
 int brIImageGetWidth(brEval args[], brEval *result, brInstance *i) {
-	brImageData *dm = BRPOINTER(&args[0]);
+	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
 
 	BRINT(result) = dm->x;
 	return EC_OK;
@@ -44,7 +46,7 @@ int brIImageGetWidth(brEval args[], brEval *result, brInstance *i) {
 */
 
 int brIImageGetHeight(brEval args[], brEval *result, brInstance *i) {
-	brImageData *dm = BRPOINTER(&args[0]);
+	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
 
 	BRINT(result) = dm->y;
 	return EC_OK;
@@ -62,7 +64,7 @@ int brIImageGetHeight(brEval args[], brEval *result, brInstance *i) {
 */
 
 int brIImageGetValueAtCoordinates(brEval args[], brEval *result, brInstance *i) {
-	brImageData *dm = BRPOINTER(&args[0]);
+	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
@@ -88,10 +90,10 @@ int brIImageGetValueAtCoordinates(brEval args[], brEval *result, brInstance *i) 
 */
 
 int brIImageSetValueAtCoordinates(brEval args[], brEval *result, brInstance *i) {
-	brImageData *dm = BRPOINTER(&args[0]);
+	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
-	int value = 255 * BRDOUBLE(&args[3]);
+	int value = (int)(255.0 * BRDOUBLE(&args[3]));
 
 	if(value > 255) value = 255;
 	else if(value < 0) value = 0;
@@ -111,7 +113,7 @@ int brIImageSetValueAtCoordinates(brEval args[], brEval *result, brInstance *i) 
 */
 
 int brIImageReadPixels(brEval args[], brEval *result, brInstance *i) {
-	brImageData *dm = BRPOINTER(&args[0]);
+	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
@@ -135,11 +137,11 @@ int brIImageLoadFromFile(brEval args[], brEval *result, brInstance *i) {
 
 	if(!file) {
 		slMessage(DEBUG_ALL, "Error loading image file \"%s\": no such file\n", BRSTRING(&args[0]));
-		BRPOINTER(result) = NULL;
+		BRIMAGEDATAPOINTER(result) = NULL;
 		return EC_OK;
 	}
 
-	dm = slMalloc(sizeof(brImageData));
+	dm = new brImageData;
 
 	dm->data = slReadImage(file, &dm->x, &dm->y, &c, 0);
 	dm->textureNumber = -1;
@@ -147,13 +149,13 @@ int brIImageLoadFromFile(brEval args[], brEval *result, brInstance *i) {
 	if(!file) {
 		slMessage(DEBUG_ALL, "Error reading image from file \"%s\": unrecognized format or corrupt file\n", file);
 		slFree(file);
-		BRPOINTER(result) = NULL;
+		BRIMAGEDATAPOINTER(result) = NULL;
 		return EC_OK;
 	}
 
 	slFree(file);
 
-	BRPOINTER(result) = dm;
+	BRIMAGEDATAPOINTER(result) = dm;
 
 	return EC_OK;
 }
@@ -163,7 +165,7 @@ int brIImageLoadFromFile(brEval args[], brEval *result, brInstance *i) {
 */
 
 int brIImageUpdateTexture(brEval args[], brEval *result, brInstance *i) { 
-	brImageData *image = BRPOINTER(&args[0]);
+	brImageData *image = BRIMAGEDATAPOINTER(&args[0]);
 
 	if(!image) {
 		BRINT(result) = -1;
@@ -188,7 +190,7 @@ int brIImageUpdateTexture(brEval args[], brEval *result, brInstance *i) {
 */
 
 int brIImageGetPixelPointer(brEval args[], brEval *result, brInstance *i) {
-	brImageData *dm = BRPOINTER(&args[0]);
+	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
 
 	if(!dm) {
 		slMessage(DEBUG_ALL, "pixelPointer called with uninitialized image data\n");
@@ -207,7 +209,7 @@ int brIImageGetPixelPointer(brEval args[], brEval *result, brInstance *i) {
 */
 
 int brIImageWriteToFile(brEval args[], brEval *result, brInstance *i) {
-	brImageData *dm = BRPOINTER(&args[0]);
+	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
 	char *file;
 
 	file = brOutputPath(i->engine, BRSTRING(&args[1]));
@@ -237,9 +239,9 @@ int brIImageDataInit(brEval args[], brEval *result, brInstance *i) {
 	int width = BRINT(&args[0]);
 	int height = BRINT(&args[1]);
 
-	dm = slMalloc(sizeof(brImageData));
+	dm = new brImageData;
 
-	dm->data = slMalloc(sizeof(unsigned char) * width * height * 4);
+	dm->data = new unsigned char[width * height * 4];
 	dm->x = width;
 	dm->y = height;
 	dm->textureNumber = -1;
@@ -250,7 +252,7 @@ int brIImageDataInit(brEval args[], brEval *result, brInstance *i) {
 		}
 	}
 
-	BRPOINTER(result) = dm;
+	BRIMAGEDATAPOINTER(result) = dm;
 
 	return EC_OK;
 }
@@ -262,7 +264,7 @@ int brIImageDataInit(brEval args[], brEval *result, brInstance *i) {
 */
 
 int brIImageDataFree(brEval args[], brEval *result, brInstance *i) {
-	brImageData *dm = BRPOINTER(&args[0]);
+	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
 
 	if(dm->textureNumber != -1) {
 		GLuint texture = dm->textureNumber;
@@ -270,8 +272,8 @@ int brIImageDataFree(brEval args[], brEval *result, brInstance *i) {
 		slTextureFree(i->engine->camera, texture);
 	}
 
-	slFree(dm->data);
-	slFree(dm);
+	delete dm->data;
+	delete dm;
 
 	return EC_OK;
 }

@@ -355,7 +355,14 @@ Object : PushProgram (aka PushPrograms) {
 
 		return pushCodeGetString(codePointer).
 
+	+ to get-discrepancy from otherProgram (object):
+		% Determines the discrepancy between this program and otherProgram.
+		% This is defined as the number of points (atoms and subtrees) found
+		% in this program which do not exist in otherProgram, plus the number
+		% of points found in otherProgram that do not exist in this program.
+
+		return pushCodeDiscrepancy(codePointer, (otherProgram get-code-pointer)).
+
 	+ to destroy:
 		if codePointer: pushCodeFree(codePointer).
-
 }

@@ -54,8 +54,6 @@ brEngine *brEngineNew() {
 
 	e->simulationWillStop = 0;
 
-	e->objectTypes = slStackNew();
-
 	e->camera = slNewCamera(400, 400);
 
 #if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
@@ -83,8 +81,6 @@ brEngine *brEngineNew() {
 
 	e->path = new char[MAXPATHLEN + 1];
 	e->drawEveryFrame = 1;
-
-	e->dlPlugins = NULL;
 
 	getcwd(e->path, MAXPATHLEN);
 
@@ -127,12 +123,9 @@ brEngine *brEngineNew() {
 
 	// namespaces holding object names and method names 
 
-	e->objects = brNamespaceNew(128);
-	e->internalMethods = brNamespaceNew(128);
+	e->internalMethods = brNamespaceNew();
 
 	// set up the initial search paths 
-
-	e->searchPath = NULL;
 
 	brEngineSetIOPath(e, ".");
 
@@ -157,8 +150,6 @@ brEngine *brEngineNew() {
 		brAddSearchPath(e, envpath);
 	}
 
-	e->windows = NULL;
-
 	bzero(e->keys, 256);
 
 	for(n=1;n<e->nThreads;n++) {
@@ -176,7 +167,7 @@ brEngine *brEngineNew() {
 brInternalFunction *brEngineInternalFunctionLookup(brEngine *e, char *name) {
 	brNamespaceSymbol *s = brNamespaceLookup(e->internalMethods, name);
 
-	if(!s || s->type != ST_FUNC) return NULL;
+	if(!s) return NULL;
 
 	return s->data;
 }
@@ -189,8 +180,8 @@ brInternalFunction *brEngineInternalFunctionLookup(brEngine *e, char *name) {
 */
 
 void brEngineFree(brEngine *e) {
-	slList *l;
 	std::vector<brInstance*>::iterator bi;
+	std::vector<void*>::iterator wi;
 
 #if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
 	if(e->soundMixer) brFreeSoundMixer(e->soundMixer);
@@ -208,14 +199,9 @@ void brEngineFree(brEngine *e) {
 	for(bi = e->instances.begin(); bi != e->instances.end(); bi++ )
 		brInstanceRelease(*bi);
 
-	slStackFree(e->objectTypes);
-
 	if(e->path) delete[] e->path;
 
-	if(e->dlPlugins) {
-		brEngineRemoveDlPlugins(e);
-		slListFree(e->dlPlugins);	
-	}
+	brEngineRemoveDlPlugins(e);
 
 	if(e->error.file) {
 		slFree(e->error.file);
@@ -228,25 +214,34 @@ void brEngineFree(brEngine *e) {
 	if(e->outputPath) slFree(e->outputPath);
 	if(e->iTunesData) delete e->iTunesData;
 
-	l = e->windows;
-
-	while(l) {
-		e->freeWindowCallback(l->data);
-		l = l->next;
+	for(wi = e->windows.begin(); wi != e->windows.end(); wi++ ) {
+		e->freeWindowCallback(*wi);
 	}
-
-	slListFree(e->windows);
 
 	for(bi = e->freedInstances.begin(); bi != e->freedInstances.end(); bi++ ) {
 		slFree( *bi);
 	}
 
 	brNamespaceFreeWithFunction(e->internalMethods, (void(*)(void*))brFreeBreveCall);
-	brFreeObjectSpace(e->objects);
+	brEngineFreeObjects(e);
+    // brNamespaceFreeWithFunction(e->objects, (void(*)(void*))brObjectFree);
+	// brFreeObjectSpace(e->objects);
 
 	brFreeSearchPath(e);
 
-	slFree(e);
+	delete e;
+}
+
+/*!
+	\brief Frees all of the objects in the engine.
+*/
+
+void brEngineFreeObjects(brEngine *e) {
+	std::map<std::string,brObject*>::iterator oi;
+
+	for(oi = e->objects.begin(); oi != e->objects.end(); oi++ ) {
+		if(oi->second) brObjectFree(oi->second);
+	}
 }
 
 /*!
@@ -299,6 +294,8 @@ void brEngineSetIOPath(brEngine *e, char *path) {
 
 char *brOutputPath(brEngine *e, char *filename) {
 	char *f;
+
+	if(*filename == '/') return slStrdup(filename);
 
 	f = (char*)slMalloc(strlen(filename) + strlen(e->outputPath) + 3);
 
@@ -501,7 +498,7 @@ int brEngineIterate(brEngine *e) {
 */
 
 void brAddSearchPath(brEngine *e, char *path) {
-	e->searchPath = slListAppend(e->searchPath, slStrdup(path));
+	e->searchPath.push_back(slStrdup(path));
 }
 
 /*!
@@ -513,27 +510,23 @@ void brAddSearchPath(brEngine *e, char *path) {
 */
 
 char *brFindFile(brEngine *e, char *file, struct stat *st) {
-	slList *start;
 	char path[4096];
 	struct stat localStat, *sp;
+	std::vector<char*>::iterator pi;
 
 	if(!file || !*file) return NULL;
 
 	if(st) sp = st;
 	else sp = &localStat;
 
-	start = e->searchPath;
-
-	/* first try the file as an absolute path */
+	// first try the file as an absolute path 
 
 	if(!stat(file, sp)) return slStrdup(file);
 
-	while(start) {
-		snprintf(path, 4095, "%s/%s", (char*)start->data, file);   
+	for(pi = e->searchPath.begin(); pi != e->searchPath.end(); pi++ ) {
+		snprintf(path, 4095, "%s/%s", *pi, file);   
 
 		if(!stat(path, sp)) return slStrdup(path);
-
-		start = start->next;
 	}
 
 	return NULL;
@@ -558,16 +551,9 @@ void brEngineRenderWorld(brEngine *e, int crosshair) {
 */
 
 void brFreeSearchPath(brEngine *e) {
-	slList *path;
+	std::vector<char*>::iterator pi;
 
-	path = e->searchPath;
-
-	while(path) { 
-		slFree(path->data); 
-		path = path->next; 
-	}
-
-	slListFree(e->searchPath);
+	for(pi = e->searchPath.begin(); pi != e->searchPath.end(); pi++ ) slFree(*pi); 
 }
 
 /*!
@@ -577,33 +563,6 @@ void brFreeSearchPath(brEngine *e) {
 void brPrintVersion() {
 	fprintf(stderr, "breve version %s (%s)\n", interfaceID, __DATE__);
 	exit(1);
-}
-
-/*!
-	\brief Frees all of the breve objects in a namespace.
-
-	Frees all of the breve objects in a namespace.
-*/
-
-void brFreeObjectSpace(brNamespace *ns) {
-    slList *objects, *start;
-    brNamespaceSymbol *symbol;
-
-    start = objects = brNamespaceSymbolList(ns);
-    
-    while(objects) {
-        symbol = objects->data;
-
-        if(symbol->type != ST_OBJECT) {
-            if(symbol->type != ST_OBJECT_ALIAS) slMessage(DEBUG_ALL, "warning: found unknown type %d while freeing object list!\n", symbol->type);
-        } else brObjectFree(symbol->data);
-
-        objects = objects->next;
-    }
-
-	slListFree(start);
-    
-    brNamespaceFree(ns);
 }
 
 /*!

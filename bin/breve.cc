@@ -267,14 +267,14 @@ void brGLMainMenuUpdate(brInstance *i) {
 		char *message;
 
 		if(l->list[n]->enabled) {
-			message = slMalloc(strlen(l->list[n]->title) + 4);
+			message = new char[strlen(l->list[n]->title) + 4];
 
 			if(l->list[n]->checked) sprintf(message, "* %s", l->list[n]->title);
 			else sprintf(message, "  %s", l->list[n]->title);
 
 			glutAddMenuEntry(message, n);
 
-			slFree(message);
+			delete message;
 		}
 
 		else glutAddMenuEntry(" ", n);
@@ -662,7 +662,7 @@ char *interfaceVersionCallback(void *data) {
 }
 
 char *getSavename(void *data) {
-	char *name = slMalloc(1024);
+	char *name = (char*)slMalloc(1024);
 	printf("filename to save: ");
 	fgets(name, 1023, stdin);
 	if(strlen(name) > 0) name[strlen(name) - 1] = 0;
@@ -670,7 +670,7 @@ char *getSavename(void *data) {
 }
 
 char *getLoadname(void *data) {
-	char *name = slMalloc(1024);
+	char *name = (char*)slMalloc(1024);
 	printf("filename to load: ");
 	fgets(name, 1023, stdin);
 	if(strlen(name) > 0) name[strlen(name) - 1] = 0;
