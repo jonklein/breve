@@ -119,9 +119,9 @@ int brIGetTime(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
-	\brief Loads a texture from an image file [depreciated].  
+	\brief Loads a texture from an image file [deprecated].  
 
-	USE OF THIS FUNCTION IS DEPRECIATED.  The image loading methods from
+	USE OF THIS FUNCTION IS DEPRECATED.  The image loading methods from
 	breveFunctionsImage.c are now used instead.
 */
 

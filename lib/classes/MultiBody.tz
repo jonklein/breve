@@ -154,7 +154,7 @@ Object : MultiBody (aka MultiBodies) [version 2.0] {
 	+ section "Getting and Setting Information About Connected Objects"
 
 	- to register with-link root (object):
-		% Depreciated.  Don't use.
+		% Deprecated.  Don't use.
 		self set-root to root.
 
 	+ to set-root to root (object):

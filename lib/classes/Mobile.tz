@@ -45,13 +45,13 @@ Real : Mobile (aka Mobiles) [version 1.8] {
   + section "Setting Up the Mobile Object"
 
 	- to register with-shape theShape (object):
-		% Depreciated.  Don't use.
-		print "warning: the method \"register\" of Mobile is depreciated, use the method \"set\" instead".
+		% Deprecated.  Don't use.
+		print "warning: the method \"register\" of Mobile is deprecated, use the method \"set\" instead".
 
 		self set-shape to theShape.
 
 	- to set shape theShape (object):
-		% Depreciated.  Don't use.
+		% Deprecated.  Don't use.
 		self set-shape to theShape.
 
 	+ to set-shape to theShape (object):

@@ -251,7 +251,7 @@ Object : Real (aka Reals) [version 2.1] {
 		setColor(realWorldPointer, newColor).
 
 	- to set-texture to textureNumber (int):
-		% Depreciated -- use METHOD(set-texture-image) instead.
+		% Deprecated -- use METHOD(set-texture-image) instead.
 
 		setTexture(realWorldPointer, textureNumber + 1).
 
@@ -287,7 +287,7 @@ Object : Real (aka Reals) [version 2.1] {
 		setBitmap(realWorldPointer, bitmap).
 		
 	- to set-bitmap to textureNumber (int):
-		% Depreciated.
+		% Deprecated.
 
 		bitmap = textureNumber.
 		setBitmap(realWorldPointer, textureNumber + 1).
@@ -331,7 +331,7 @@ Object : Real (aka Reals) [version 2.1] {
 		setLightmap(realWorldPointer, lightmap).
 
 	- to set-lightmap to textureNumber (int):
-		% Depreciated.
+		% Deprecated.
 
 		lightmap = textureNumber.
 
