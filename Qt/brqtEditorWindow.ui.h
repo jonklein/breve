@@ -12,10 +12,21 @@
 
 #include <iostream>
 #include <qfile.h>
+#include <brqtSteveSyntaxHighlighter.h>
+
+void brqtEditorWindow::init() {
+    popupMenu->setTextArea(sourceTextArea);
+    
+    new brqtSteveSyntaxHighlighter(sourceTextArea);
+}
+
+void brqtEditorWindow::destroy() {
+    closed(this);
+}
 
 const char * brqtEditorWindow::getString()
 {
-    return strdup(textEdit1->text().ascii());
+    return strdup(sourceTextArea->text().ascii());
 }
 
 void brqtEditorWindow::loadFile( QString &file )
@@ -29,11 +40,42 @@ void brqtEditorWindow::loadFile( QString &file )
     contents = stream.read();
     
     setCaption( file);
-    textEdit1->setText( contents);
+    sourceTextArea->setText( contents);
 }
 
 
 void brqtEditorWindow::setupMethodPopup()
 {
 
+}
+
+
+void brqtEditorWindow::lineChanged( int para, int pos )
+{
+    QString s;
+    
+    s.sprintf("%d", para + 1);
+    lineBox->setText( s);
+}
+
+
+void brqtEditorWindow::selectLine( )
+{
+    int line = lineBox->text().toInt();
+    
+    if(line > sourceTextArea->paragraphs()) {
+	QString newLine;
+	
+	line = sourceTextArea->paragraphs();	
+	newLine.sprintf("%d", line);
+	lineBox->setText(newLine);
+    }
+	
+    sourceTextArea->setSelection(line - 1, 0, line, 0);
+}
+
+void brqtEditorWindow::setController( QWidget *w)
+{
+    connect(this, SIGNAL( closed( QWidget*) ), w, SLOT( closeDocument( QWidget*) ) );
+    connect(this, SIGNAL( nameChanged() ), w, SLOT( changeDocumentName( ) ) );
 }

@@ -12,10 +12,6 @@
 #include <qgl.h>
 #include "kernel.h"
 
-/**
- * breveGLWidget inherits from QGLWidget (http://doc.trolltech.com/2.3/qglwidget.html) <BR>
- * QGLWidget basically allows you to control OpenGL through method calls
- */
 class breveGLWidget : public QGLWidget
 {
   Q_OBJECT
@@ -25,16 +21,39 @@ public:
   
   void setEngine(brEngine *e) { 
 		_engine = e; 
-		slInitGL(_engine->world, _engine->camera);
+
+		if(_engine) {
+			slInitGL(_engine->world, _engine->camera);
+
+			_drawTimer = startTimer(20);
+			_engine->camera->x = width();
+			_engine->camera->y = height();
+		} else {
+			killTimer( _drawTimer);
+		}
   }
 
+public slots: 
+    virtual void setButtonMode(int mode) {
+    _buttonMode = mode;
+    }
+  
 protected:
     void initializeGL();
     void paintGL();
     void resizeGL( int w, int h );
 
+	void mousePressEvent ( QMouseEvent *e);
+	void mouseMoveEvent ( QMouseEvent *e );
+
 private:
     brEngine *_engine;    
+	int _buttonMode;
+	QPoint lastPosition;
+
+	int _drawTimer;
+
+	void timerEvent( QTimerEvent *);
 };
 
 #endif // GLFRACTAL_H

@@ -5,7 +5,6 @@ void *brqtEngineLoop(void *e) {
 
     while(! engine->_stop) {
 	brEngineIterate( engine->_engine);
-	engine->_glwidget->repaint();
     }
     return NULL;
 }

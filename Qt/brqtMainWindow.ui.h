@@ -12,15 +12,18 @@
 
 #include <sys/types.h>
 #include <dirent.h>
-#include <QString.h>
+#include <qstring.h>
+#include <vector>
 
-#include "kernel.h"
 #include "steve.h"
 #include "brqtEditorWindow.h"
+#include "brqtErrorWindow.h"
 #include "brqtEngine.h"
 
 breveFrontend *frontend;
 brqtEditorWindow *gW;
+
+std::vector< brqtEditorWindow* > documents;
 
 std::map<int, QString> demoMap;
 
@@ -71,9 +74,8 @@ void brqtMainWindow::init() {
 
 void brqtMainWindow::fileNew()
 {
-    brqtEditorWindow *w = new brqtEditorWindow( 0);
-	
-    w->setCaption("Untitled");
+    brqtEditorWindow *w = newDocument();
+
     w->show();
     
     gW = w;
@@ -128,9 +130,21 @@ void brqtMainWindow::editCut()
 }
 
 
-void brqtMainWindow::editCopy()
+brqtEditorWindow *brqtMainWindow::newDocument()
 {
+    int xloc;
+    brqtEditorWindow *w = new brqtEditorWindow;
+    w->setCaption("Untitled");
+    w->setController(this);
+    
+    xloc = width() + 4;
+    
+    w->move( QPoint( xloc, 24 ) );
+    documents.push_back(w);
 
+	buildDocumentMenu();
+    
+    return w;
 }
 
 
@@ -172,16 +186,19 @@ void brqtMainWindow::toggleSimulation()
     frontend->data = breveFrontendInitData(frontend->engine);
     frontend->engine->camera = slCameraNew(400, 400);
 
-    breveFrontendLoadSimulation(frontend, w->getString(), "<untitled>");
+    if(breveFrontendLoadSimulation(frontend, w->getString(), "<untitled>") != EC_OK) {
+	brqtErrorWindow *w = new brqtErrorWindow(0);
+	w->displayError(&frontend->engine->error);
+	w->show();
+	return;
+    }
 
     currentEngine = new brqtEngine(frontend->engine, breveGLWidget1);
-    
 }
-
 
 void brqtMainWindow::loadDemo(int n)
 {
-    brqtEditorWindow *w = new brqtEditorWindow( 0);
+    brqtEditorWindow *w = newDocument();
 	
     w->loadFile(demoMap[n]);
     w->show();		
@@ -193,7 +210,38 @@ void brqtMainWindow::loadDemo(int n)
 void brqtMainWindow::stopSimulation()
 {
     if (currentEngine) {
-	delete currentEngine;
-	currentEngine = NULL;
+      delete currentEngine;
+      currentEngine = NULL;
+
+      breveFrontendDestroy(frontend);
+      frontend = NULL;
     }
+}
+
+
+void brqtMainWindow::closeDocument( QWidget *document )
+{
+    std::vector< brqtEditorWindow* >::iterator wi;
+    wi = std::find(documents.begin(), documents.end(), document);
+    
+    printf("closing document...\n");
+    
+    documents.erase(wi);
+    buildDocumentMenu();
+}
+
+void brqtMainWindow::changeDocumentName()
+{
+    printf("reconstructing menu...\n");
+    buildDocumentMenu();
+}
+
+
+void brqtMainWindow::buildDocumentMenu()
+{
+    documentMenu->clear();
+
+	for(int n=0; n<documents.size(); n++) {
+    	documentMenu->insertItem( documents[n]->caption() );
+	}
 }

@@ -8,9 +8,15 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>788</width>
-            <height>661</height>
+            <width>460</width>
+            <height>508</height>
         </rect>
+    </property>
+    <property name="minimumSize">
+        <size>
+            <width>459</width>
+            <height>158</height>
+        </size>
     </property>
     <property name="caption">
         <string>breve</string>
@@ -19,6 +25,139 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
+        <widget class="breveGLWidget" row="0" column="0" rowspan="1" colspan="6">
+            <property name="name">
+                <cstring>breveGLWidget1</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>7</hsizetype>
+                    <vsizetype>7</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="font">
+                <font>
+                    <pointsize>9</pointsize>
+                </font>
+            </property>
+        </widget>
+        <widget class="QComboBox" row="1" column="5">
+            <item>
+                <property name="text">
+                    <string>Choose Simulation...</string>
+                </property>
+            </item>
+            <property name="name">
+                <cstring>documentMenu</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>7</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>1</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>143</width>
+                    <height>20</height>
+                </size>
+            </property>
+            <property name="font">
+                <font>
+                    <pointsize>10</pointsize>
+                </font>
+            </property>
+        </widget>
+        <spacer row="1" column="1">
+            <property name="name">
+                <cstring>spacer10</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>1000</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+        <spacer row="1" column="4">
+            <property name="name">
+                <cstring>spacer9</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>1000</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="QToolButton" row="1" column="2">
+            <property name="name">
+                <cstring>runButton</cstring>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>26</width>
+                    <height>26</height>
+                </size>
+            </property>
+            <property name="maximumSize">
+                <size>
+                    <width>26</width>
+                    <height>26</height>
+                </size>
+            </property>
+            <property name="text">
+                <string></string>
+            </property>
+            <property name="iconSet">
+                <iconset>play.png</iconset>
+            </property>
+            <property name="autoRaise">
+                <bool>false</bool>
+            </property>
+        </widget>
+        <widget class="QToolButton" row="1" column="3">
+            <property name="name">
+                <cstring>stopButton</cstring>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>26</width>
+                    <height>26</height>
+                </size>
+            </property>
+            <property name="maximumSize">
+                <size>
+                    <width>26</width>
+                    <height>26</height>
+                </size>
+            </property>
+            <property name="text">
+                <string></string>
+            </property>
+            <property name="iconSet">
+                <iconset>stop.png</iconset>
+            </property>
+            <property name="autoRaise">
+                <bool>false</bool>
+            </property>
+        </widget>
         <widget class="QButtonGroup" row="1" column="0">
             <property name="name">
                 <cstring>buttonGroup1</cstring>
@@ -30,6 +169,12 @@
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                 </sizepolicy>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>210</width>
+                    <height>36</height>
+                </size>
             </property>
             <property name="maximumSize">
                 <size>
@@ -59,34 +204,7 @@
             </property>
             <widget class="QToolButton">
                 <property name="name">
-                    <cstring>toolButton3_2_3</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>156</x>
-                        <y>15</y>
-                        <width>50</width>
-                        <height>14</height>
-                    </rect>
-                </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>1</hsizetype>
-                        <vsizetype>0</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="text">
-                    <string>Select</string>
-                </property>
-                <property name="toggleButton">
-                    <bool>true</bool>
-                </property>
-            </widget>
-            <widget class="QToolButton">
-                <property name="name">
-                    <cstring>toolButton3</cstring>
+                    <cstring>rotateButton</cstring>
                 </property>
                 <property name="geometry">
                     <rect>
@@ -116,7 +234,7 @@
             </widget>
             <widget class="QToolButton">
                 <property name="name">
-                    <cstring>toolButton3_2</cstring>
+                    <cstring>zoomButton</cstring>
                 </property>
                 <property name="geometry">
                     <rect>
@@ -143,7 +261,7 @@
             </widget>
             <widget class="QToolButton">
                 <property name="name">
-                    <cstring>toolButton3_2_2</cstring>
+                    <cstring>moveButton</cstring>
                 </property>
                 <property name="geometry">
                     <rect>
@@ -168,89 +286,33 @@
                     <bool>true</bool>
                 </property>
             </widget>
-        </widget>
-        <spacer row="1" column="1">
-            <property name="name">
-                <cstring>spacer10</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>100</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
-        <widget class="QPushButton" row="1" column="2">
-            <property name="name">
-                <cstring>pushButton1</cstring>
-            </property>
-            <property name="text">
-                <string>&amp;Run</string>
-            </property>
-        </widget>
-        <widget class="QPushButton" row="1" column="3">
-            <property name="name">
-                <cstring>pushButton2</cstring>
-            </property>
-            <property name="text">
-                <string>Stop</string>
-            </property>
-        </widget>
-        <spacer row="1" column="4">
-            <property name="name">
-                <cstring>spacer9</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>100</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
-        <widget class="QComboBox" row="1" column="5">
-            <item>
-                <property name="text">
-                    <string>Choose Simulation...</string>
+            <widget class="QToolButton">
+                <property name="name">
+                    <cstring>selectButton</cstring>
                 </property>
-            </item>
-            <property name="name">
-                <cstring>comboBox2</cstring>
-            </property>
-            <property name="font">
-                <font>
-                    <pointsize>10</pointsize>
-                </font>
-            </property>
-        </widget>
-        <widget class="breveGLWidget" row="0" column="0" rowspan="1" colspan="6">
-            <property name="name">
-                <cstring>breveGLWidget1</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>7</hsizetype>
-                    <vsizetype>7</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="font">
-                <font>
-                    <pointsize>9</pointsize>
-                </font>
-            </property>
+                <property name="geometry">
+                    <rect>
+                        <x>156</x>
+                        <y>15</y>
+                        <width>50</width>
+                        <height>14</height>
+                    </rect>
+                </property>
+                <property name="sizePolicy">
+                    <sizepolicy>
+                        <hsizetype>1</hsizetype>
+                        <vsizetype>0</vsizetype>
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                    </sizepolicy>
+                </property>
+                <property name="text">
+                    <string>Select</string>
+                </property>
+                <property name="toggleButton">
+                    <bool>true</bool>
+                </property>
+            </widget>
         </widget>
     </grid>
 </widget>
@@ -281,7 +343,9 @@
     </item>
     <item text="Demos" name="Demos">
     </item>
-    <item text="new menu" name="qt_dead_widget_new_menu_4">
+    <item text="Speed" name="Speed">
+    </item>
+    <item text="Simulation" name="Simulation">
     </item>
     <item text="&amp;Help" name="helpMenu">
         <action name="helpContentsAction"/>
@@ -289,13 +353,15 @@
         <separator/>
         <action name="helpAboutAction"/>
     </item>
+    <item text="new menu" name="new_menu">
+    </item>
 </menubar>
 <toolbars>
 </toolbars>
 <customwidgets>
     <customwidget>
         <class>breveGLWidget</class>
-        <header location="global">/Users/jk/dev/breve/Qt/breveGLWidget.h</header>
+        <header location="local">/Users/jk/dev/breve/Qt/breveGLWidget.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>
@@ -624,12 +690,6 @@
         <slot>editCut()</slot>
     </connection>
     <connection>
-        <sender>editCopyAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>editCopy()</slot>
-    </connection>
-    <connection>
         <sender>editPasteAction</sender>
         <signal>activated()</signal>
         <receiver>MainWindow</receiver>
@@ -660,24 +720,23 @@
         <slot>helpAbout()</slot>
     </connection>
     <connection>
-        <sender>pushButton1</sender>
+        <sender>runButton</sender>
         <signal>clicked()</signal>
         <receiver>MainWindow</receiver>
         <slot>toggleSimulation()</slot>
     </connection>
     <connection>
-        <sender>pushButton2</sender>
+        <sender>stopButton</sender>
         <signal>clicked()</signal>
         <receiver>MainWindow</receiver>
         <slot>stopSimulation()</slot>
     </connection>
 </connections>
-<tabstops>
-    <tabstop>pushButton1</tabstop>
-    <tabstop>pushButton2</tabstop>
-</tabstops>
 <includes>
     <include location="local" impldecl="in declaration">brqtEngine.h</include>
+    <include location="local" impldecl="in declaration">kernel.h</include>
+    <include location="local" impldecl="in declaration">qworkspace.h</include>
+    <include location="local" impldecl="in declaration">brqtEditorWindow.h</include>
     <include location="local" impldecl="in implementation">brqtMainWindow.ui.h</include>
 </includes>
 <variables>
@@ -693,7 +752,6 @@
     <slot>editUndo()</slot>
     <slot>editRedo()</slot>
     <slot>editCut()</slot>
-    <slot>editCopy()</slot>
     <slot>editPaste()</slot>
     <slot>editFind()</slot>
     <slot>helpIndex()</slot>
@@ -702,9 +760,13 @@
     <slot>toggleSimulation()</slot>
     <slot>loadDemo( int n )</slot>
     <slot>stopSimulation()</slot>
+    <slot>closeDocument( QWidget * document )</slot>
+    <slot>changeDocumentName()</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
+    <function returnType="brqtEditorWindow *">newDocument()</function>
+    <function>buildDocumentMenu()</function>
 </functions>
 <pixmapinproject/>
 <layoutdefaults spacing="6" margin="11"/>

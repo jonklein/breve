@@ -22,8 +22,11 @@ breveGLWidget::~breveGLWidget()
  */
 void breveGLWidget::paintGL()
 {
-    if (_engine) brEngineRenderWorld(_engine, 0);
-	else {
+    if (_engine) {
+		brEngineLock(_engine);
+		brEngineRenderWorld(_engine, 0);
+		brEngineUnlock(_engine);
+	} else {
 		glClearColor(0, 0, 0, 0);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	}
@@ -36,8 +39,12 @@ void breveGLWidget::paintGL()
 
 void breveGLWidget::initializeGL()
 {
-  glClearColor( 0.0, 0.0, 0.0, 0.0 ); // Let OpenGL clear to black
-  glShadeModel( GL_SMOOTH ); // we want smooth shading . . . try GL_FLAT if you like
+	startTimer(1);
+}
+
+void breveGLWidget::timerEvent( QTimerEvent *e) {
+	// update();
+	glDraw();
 }
 
 /*--------------------------------------------------------------------------*/
@@ -46,9 +53,29 @@ void breveGLWidget::initializeGL()
  */
 void breveGLWidget::resizeGL( int w, int h )
 {
-  glViewport( 0, 0, (GLint)w, (GLint)h );
-  glMatrixMode( GL_PROJECTION );
-  glLoadIdentity();
-  glFrustum(-1.0,1.0,-1.0,1.0,5.0,15.0);
-  glMatrixMode( GL_MODELVIEW );
+  if( _engine) {
+    _engine->camera->x = w;
+    _engine->camera->y = h;
+  }
 }
+
+void breveGLWidget::mousePressEvent ( QMouseEvent *e) {
+	lastPosition = e->pos();
+	
+	if(!_engine) return;
+	
+    	brClickAtLocation(_engine, e->x(), e->y());	
+}
+
+void breveGLWidget::mouseMoveEvent ( QMouseEvent *e ) {
+	const QPoint &pos = e->pos();
+	
+	double dx = pos.x() - lastPosition.x(), dy = pos.y() - lastPosition.y();
+	
+	lastPosition = pos;
+		
+	if(!_engine) return;
+		
+	slRotateCameraWithMouseMovement(_engine->camera, dx, dy, 0);
+}
+

@@ -32,6 +32,8 @@
 */
 
 #define YY_NO_UNPUT
+#include <stdlib.h>
+#include <string.h>
 
 int slQPLevel = 0;
 
@@ -62,7 +64,7 @@ AKA		\({WHITE}*aka{WHITE}+{WORD}{WHITE}*\)
 %x OBJECT
 
 %option noyywrap
-%option prefix="slYy"
+/* %option prefix="slYy"*/
 
 %%
 
@@ -93,9 +95,9 @@ void slObjectParseCountNewlines(char *text) {
 	}
 }
 
-void slObjectParseSetBuffer(char *b, int n) {
+void slObjectParseSetBuffer(char *b) {
     slObjectParseBuffer = b;
-    slObjectParseLength = n;
+    slObjectParseLength = strlen(b);
     slObjectParseLocation = 0;
     slObjectParseLine = 1;
 }
