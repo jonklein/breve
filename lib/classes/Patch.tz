@@ -1,7 +1,7 @@
 @include "Abstract.tz"
 @include "PatchGrid.tz"
 
-Abstract : Patch [version 2.0] {
+Abstract : Patch (aka Patches) [version 2.0] {
 	% A patch is a non-physical object which is associated with a specific 
 	% location in space.  A patch can hold information about the state of
 	% the world in that location, such as the presence of a nutrient, for

@@ -528,10 +528,9 @@ int breveFunctionPushVectorStackPush(brEval arguments[], brEval *result, brInsta
 */
 
 int breveFunctionPushCodeDeletionMutate(brEval arguments[], brEval *result, brInstance *instance) {
-	PushEnvironment *environment = BRPOINTER(&arguments[0]);
- 	PushCode *p1 = BRPOINTER(&arguments[1]);
+ 	PushCode *p1 = BRPOINTER(&arguments[0]);
 
-	BRPOINTER(result) = pushCodeDeletionMutate(environment, p1);
+	BRPOINTER(result) = pushCodeDeletionMutate(p1);
 
 	return EC_OK;
 }
@@ -623,7 +622,7 @@ void breveInitPushFunctions(brNamespace *namespace) {
  	brNewBreveCall(namespace, "pushVectorStackPop", breveFunctionPushVectorStackPop, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(namespace, "pushVectorStackTop", breveFunctionPushVectorStackTop, AT_VECTOR, AT_POINTER, AT_VECTOR, 0);
  	brNewBreveCall(namespace, "pushVectorStackPush", breveFunctionPushVectorStackPush, AT_NULL, AT_POINTER, AT_VECTOR, 0);
- 	brNewBreveCall(namespace, "pushCodeDeletionMutate", breveFunctionPushCodeDeletionMutate, AT_POINTER, AT_POINTER, AT_POINTER, 0);
+ 	brNewBreveCall(namespace, "pushCodeDeletionMutate", breveFunctionPushCodeDeletionMutate, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(namespace, "pushCodeSubtreeMutate", breveFunctionPushCodeSubtreeMutate, AT_POINTER, AT_POINTER, AT_POINTER, AT_INT, 0);
  	brNewBreveCall(namespace, "pushCodeCrossover", breveFunctionPushCodeCrossover, AT_POINTER, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(namespace, "pushCodeRandom", breveFunctionPushCodeRandom, AT_POINTER, AT_POINTER, AT_INT, 0);

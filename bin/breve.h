@@ -52,6 +52,7 @@ struct option gCLIOptions[] = {
         { "size",       required_argument, 0, 's' },
         { "position",   required_argument, 0, 'p' },
         { "help",       no_argument,       0, 'h' },
+        { "stdin",      no_argument,       0, 'i' },
 
         { "slave",      required_argument, 0, 'S' },
         { "master",     no_argument,       0, 'M' }

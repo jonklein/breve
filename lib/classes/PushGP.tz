@@ -173,6 +173,26 @@ Object : PushGP {
 
 		return best.
 
+	+ to auto-simplify program p (object):
+		fitness, newFitness (float).
+		newProgram (object).
+		n (int).
+
+		fitness = (self compute-fitness for-program p).
+
+		newProgram = new PushProgram.
+
+		for n=0, n<100, n++: {
+			newProgram copy-from program p.
+			newProgram delete-random-subtree.
+
+			newFitness = (self compute-fitness for-program newProgram).	
+
+			if newFitness == fitness: p copy-from program newProgram.
+		}
+
+		return p.
+
 	+ to iterate:
 		n (int).
 		percent (int).
@@ -191,7 +211,29 @@ Object : PushGP {
 			controller set-display-message with-number 0 at-x -0.9 at-y -0.8 to "Generation $generation: breeding".
 
 	- to evaluate:
-		self compute-fitness for-program current{ currentIndividual }.
+		fitness (float).
+
+		fitness = (self compute-fitness for-program current{ currentIndividual }).
+		
+		if fitness < 0.0: {
+			# this indicates an error -- give it an arbitrarily bad fitness
+			print "warning: error value lower than 0 for GP individual".
+			fitness = 100000000.
+		}
+
+		if fitness < 0.001: {
+			print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;".
+			print ";; Solution found at generation $generation:", 
+					(current{ currentIndividual }  get-string).
+			controller end-simulation.
+		}
+
+		if !bestOfGen || (fitness < (bestOfGen get-fitness)): bestOfGen = current{ currentIndividual }.
+
+		totalSize += (current{ currentIndividual } get-size).
+
+		current{ currentIndividual } set-fitness to fitness.
+
 		currentIndividual++.
 
 		if currentIndividual == populationSize: {
@@ -220,30 +262,13 @@ Object : PushGP {
 			self setup-fitness-test for-fitness-case n 
 				with-interpreter interpreter.
 
-			interpreter run code current{ currentIndividual }.			
+			interpreter run code p.
 
 			fitness += (self compute-error for-fitness-case n 
 				with-interpreter interpreter).
 		}
 
-		if fitness < 0.0: {
-			# this indicates an error -- give it an arbitrarily bad fitness
-			print "warning: error value lower than 0 for GP individual".
-			fitness = 100000000.
-		}
-
-		if fitness < 0.001: {
-			print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;".
-			print ";; Solution found at generation $generation:", 
-					(current{ currentIndividual } get-string).
-			controller end-simulation.
-		}
-
-		if !bestOfGen || (fitness < (bestOfGen get-fitness)): bestOfGen = current{ currentIndividual }.
-
-		totalSize += (current{ currentIndividual } get-size).
-
-		current{ currentIndividual } set-fitness to fitness.
+		return fitness.
 
 	+ section "Methods Overridden by the User To Set Up PushGP Experiments"
 

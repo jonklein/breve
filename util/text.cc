@@ -342,3 +342,25 @@ char *slFgets(char *str, int size, FILE *stream) {
 
 	return str;
 }
+
+/*!
+	\brief Reads all the text from stdin.
+*/
+
+char *slUtilReadStdin() {
+	char *data = slMalloc(4096);
+	int n, total = 0;
+
+	while(!feof(stdin)) {
+		n = fread(&data[total], 1, 4095, stdin);
+		total += n;
+
+		data[total] = 0;
+
+		data = slRealloc(data, total + 4096);
+	}
+
+	printf("%s\n", data);
+
+	return data;
+}

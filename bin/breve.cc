@@ -53,9 +53,7 @@ extern char *gErrorNames[];
 
 char keyDown[256];
 
-char *gSimFile;
-
-int gMainWindow;
+char *gArchiveFile;
 
 void *workerThread(void *data);
 int soundCallback(void *data);
@@ -85,6 +83,7 @@ int gLastX, gLastY, gMods, gSpecial;
 double gStartCamX;
 
 int gPaused = 1;
+int gStdin = 0;
 
 int gMotionCrosshair = 0;
 
@@ -95,7 +94,7 @@ int main(int argc, char **argv) {
 	pthread_t thread;
 	int index;
 	int n;
-	char *text;
+	char *text, *simulationFile;
 
 	interfaceID = "glut/2.0";
 
@@ -105,7 +104,7 @@ int main(int argc, char **argv) {
 	pthread_mutex_init(&gEngineMutex, NULL);
 	pthread_mutex_init(&gThreadMutex, NULL);
 
-	gSimFile = NULL;
+	gArchiveFile = NULL;
 
 #ifdef MEMORY_DEBUG
 	slMessage(DEBUG_ALL, "### Running with breve slMalloc debugging enabled.\n\n");
@@ -124,20 +123,26 @@ int main(int argc, char **argv) {
 	argc -= index;
 	argv += index;
 
-	if(argc < 2) {
+	if(argc < 2 && !gStdin) {
 		brPrintUsage(argv[0]);
 	}
 
-	text = slUtilReadFile(argv[1]);
+	if(!gStdin) {
+		text = slUtilReadFile(argv[1]);
+		simulationFile = argv[1];
+	} else {
+		text = slUtilReadStdin();
+		simulationFile = "<stdin>";
+	}
 
 	if(!text) {
-		printf("Error reading file \"%s\": %s\n", argv[1], strerror(errno));
+		printf("Error reading file \"%s\": %s\n", simulationFile, strerror(errno));
 		exit(1);
 	}
 
 	if(gFormat) {
 		char *newtext = slFormatText(text);
-		slUtilWriteFile(argv[1], newtext);
+		slUtilWriteFile(simulationFile, newtext);
 		free(newtext);
 		exit(0);
 	}
@@ -163,18 +168,18 @@ int main(int argc, char **argv) {
 	frontend->engine->freeWindowCallback = freeWindowCallback;
 	frontend->engine->renderWindowCallback = renderWindowCallback;
 
-	slInitGlut(argc, argv, argv[1]);
+	slInitGlut(argc, argv, simulationFile);
 
-	if(gSimFile) {
-		if(breveFrontendLoadSavedSimulation(frontend, text, argv[1], gSimFile) != EC_OK) {
+	if(gArchiveFile) {
+		if(breveFrontendLoadSavedSimulation(frontend, text, simulationFile, gArchiveFile) != EC_OK) {
 			slFree(text);
-			slFree(gSimFile);
+			slFree(gArchiveFile);
 			brQuit(frontend->engine);
 		}
 
-		slFree(gSimFile);
+		slFree(gArchiveFile);
 	} else {
-		if(breveFrontendLoadSimulation(frontend, text, argv[1]) != EC_OK) {
+		if(breveFrontendLoadSimulation(frontend, text, simulationFile) != EC_OK) {
 			slFree(text);
 			brQuit(frontend->engine);
 		}
@@ -245,10 +250,6 @@ void brGlutLoop() {
 
 		oldD = frontend->engine->drawEveryFrame;
 	}
-}
-
-void brGLMenuStatus(int stat, int x, int y) {
-
 }
 
 void brGLMainMenuUpdate(brInstance *i) {
@@ -355,7 +356,7 @@ int brParseArgs(int argc, char **argv) {
 	int r, error = 0;
 	int level;
 
-	while((r = getopt_long(argc, argv, "w:s:d:r:l:vhfmFuSM", gCLIOptions, NULL)) != EOF) {
+	while((r = getopt_long(argc, argv, "w:s:d:r:l:vhfmFuSMi", gCLIOptions, NULL)) != EOF) {
 		switch(r) {
 			case 'd':
 				level = atoi(optarg);
@@ -375,8 +376,11 @@ int brParseArgs(int argc, char **argv) {
 					error++;
 				}
 				break;
+			case 'i':
+				gStdin = 1;
+				break;
 			case 'a':
-				gSimFile = slStrdup(optarg);
+				gArchiveFile = slStrdup(optarg);
 				break;
 			case 'v':
 				brPrintVersion();
@@ -442,7 +446,7 @@ void slInitGlut(int argc, char **argv, char *title) {
 
 	if(xpos || ypos) glutInitWindowPosition(xpos, ypos);
 
-	gMainWindow = glutGetWindow();
+	glutGetWindow();
 
 	glutMouseFunc(slDemoMouse);
 	glutMotionFunc(slDemoMotion);
@@ -458,8 +462,6 @@ void slInitGlut(int argc, char **argv, char *title) {
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 	contextMenu = glutCreateMenu(brContextMenu);
 	glutAttachMenu(GLUT_MIDDLE_BUTTON);
-
-	glutMenuStatusFunc(brGLMenuStatus);
 
 	glutIdleFunc(brGlutLoop);
 

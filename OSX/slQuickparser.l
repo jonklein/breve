@@ -66,9 +66,7 @@ AKA		\({WHITE}*aka{WHITE}+{WORD}{WHITE}*\)
 
 %%
 
-#.*							;
-
-
+<OBJECT>#.*							;
 
 {WORD}{WHITE}:{WHITE}{WORD}{WHITE}{AKA}?{WHITE}/\{	{ slObjectParseText = yytext; BEGIN(OBJECT); slQPLevel = 0; return TZ_OBJECT; }
 

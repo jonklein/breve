@@ -44,3 +44,4 @@ char *slStrcatM(char *start, char *end);
 
 char *slFgets(char *str, int size, FILE *stream);
 
+char *slUtilReadStdin();
