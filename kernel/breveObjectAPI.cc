@@ -80,6 +80,9 @@ brObject *brObjectFind(brEngine *e, char *name) {
 	\brief Calls a method for an instance.
 
 	Executes the callMethod callback for to trigger a method call.
+
+	WARNING: the brEval values stored in args may be changed by the 
+	method call, depending on the implementation of the language frontend.
 */
 
 int brMethodCall(brInstance *i, brMethod *m, brEval **args, brEval *result) {
@@ -121,6 +124,9 @@ int brMethodCallByName(brInstance *i, char *name, brEval *result) {
 	As with \ref brMethodCallByName, this method is inefficient because
 	it has to look up the method being called.  This function should 
 	only be used for sporatic method calls.
+
+	WARNING: the brEval values stored in args may be changed by the 
+	method call, depending on the implementation of the language frontend.
 */
 
 int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, int count, brEval *result) {

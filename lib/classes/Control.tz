@@ -972,6 +972,8 @@ Abstract : Control (aka Controls) [version 2.0] {
 
 		image (object).
 
+		print "warning: the Control method \"load-image\" is now depreciated!".
+
 		image = new Image.
 
 		if (image load from file): {
