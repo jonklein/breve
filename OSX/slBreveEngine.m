@@ -122,6 +122,11 @@ int slMakeCurrentContext();
 	brAddSearchPath(engine, pluginPath);
 	brAddSearchPath(engine, (char*)[bundlePath cString]);
 	brAddSearchPath(engine, (char*)[NSHomeDirectory() cString]);
+
+	// Java should get inited automatically when the engine is created, 
+	// but unfortunately, the claspath isn't setup yet at that point...
+
+	brJavaInit(engine);
 }
 
 - (void)freeEngine {

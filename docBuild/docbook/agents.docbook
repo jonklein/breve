@@ -10,21 +10,21 @@
 <indexterm><primary>Real (class)</primary></indexterm>
 <indexterm><primary>Stationary (class)</primary></indexterm>
 <indexterm><primary>Mobile (class)</primary></indexterm>
-<indexterm><primary>MultiBody (class)</primary></indexterm>
+<indexterm><primary>Link (class)</primary></indexterm>
 
 To create a simple agent in breve, you'll need to subclass one of the basic
 agent classes, all subclasses of <ulink url="../classes/Real.html">Real</ulink>:
 <itemizedlist>
 <listitem><para>Stationary, an immobile object in the simulated world.</para></listitem>
 <listitem><para>Mobile, an object which moves around the simulated world.</para></listitem>
-<listitem><para>MultiBody, a physically simulated mobile object.</para></listitem>
+<listitem><para>Link, a physically simulated mobile object.</para></listitem>
 </itemizedlist>
 </para>
 <para>
 This chapter describes the basics of implementing agents in breve, with a focus
 on Mobile agents.  Stationary objects are even easier to use than Mobile objects,
-and Physically simulated MultiBody objects are described in the chapter on physical 
-simulation (<xref linkend="physics">).
+and Physically simulated Link objects (and their companion class, MultiBody) 
+are described in the chapter on physical simulation (<xref linkend="physics">).
 </para>
 <para>
 The section A Simple Mobile agent (<xref linkend="mobile_agent">) shows a very basic

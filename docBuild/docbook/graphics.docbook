@@ -205,9 +205,9 @@ PNG.</para>
 Prior to version 2.0, breve required all images loaded into breve to
 be square, and for the length of the sides of the images must be a power 
 of two (for example, 256x256 or 128x128).  This is no longer strictly
-required, though it may still be preferable: breve will automatically 
+required, though it may still be preferable.  breve will automatically 
 surround the image with a transparent border in order to fulfill the 
-size requirements. 
+size requirements.
 </para>
 <para>
 Images are loaded using the class Image.  To load an image file, 

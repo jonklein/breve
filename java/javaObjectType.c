@@ -86,6 +86,11 @@ void brJavaInstanceDestroyCallback(void *instance) {
 
 void brJavaInit(brEngine *e) {
 	brObjectType *javaObjectType;
+	void *data;
+
+	data = brAttachJavaVM(e);
+
+	if(!data) return;
 
 	javaObjectType = slMalloc(sizeof(brObjectType));
 
@@ -96,7 +101,7 @@ void brJavaInit(brEngine *e) {
 	javaObjectType->instantiate = brJavaInstanceNewCallback;
 	javaObjectType->destroyInstance = brJavaInstanceDestroyCallback;
 
-	javaObjectType->userData = brAttachJavaVM(e);
+	javaObjectType->userData = data;
 
 	if(javaObjectType->userData)
 	    brEngineRegisterObjectType(e, javaObjectType);

@@ -323,7 +323,7 @@ int stLoadVariable(void *variable, unsigned char type, brEval *e, stRunInstance 
 				// we retain it, since it's stored as a variable.
 
 				*(brEvalHash**)variable = brEvalHashNew();
-				stGCRetainPointer(*(void**)variable, AT_LIST);
+				stGCRetainPointer(*(void**)variable, AT_HASH);
 			}
 
 			BRHASH(e) = *(brEvalHash**)variable;

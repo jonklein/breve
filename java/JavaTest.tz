@@ -8,22 +8,23 @@
 Controller JavaTestController.
 
 Control : JavaTestController {
-	+ variables:
-		test (object).
+    + variables:
+        test (object).
 
-	+ to init:
-		# put initialization code here which creates objects
-		# and sets up the simulation
+    + to init:
+        # put initialization code here which creates objects
+        # and sets up the simulation
 
-		test = new "JavaTest".
+        new "java.lang.String".
+        test = new "JavaTest".
 
-		print "Int test: ", (test intTest with-number random[10]).
-		print "".
-		print "Double test: ", (test doubleTest with-number random[10.0]).
-		print "".
-		print "String test: ", (test stringTest with-string "string").
-		print "".
+        print "Int test: ", (test intTest with-number random[10]).
+        print "".
+        print "Double test: ", (test doubleTest with-number random[10.0]).
+        print "".
+        print "String test: ", (test stringTest with-string "string").
+        print "".
 
-	+ to iterate:
-		self end-simulation.
+    + to iterate:
+        self end-simulation.
 }

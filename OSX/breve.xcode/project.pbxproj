@@ -35,6 +35,7 @@
 //104
 		1058C7A6FEA54F5311CA2CBB = {
 			children = (
+				48E1722307AAAF370072492B,
 				4862155C07944AB9009195E5,
 				48620C9107944552009195E5,
 				F5BD20F30397BFE301980AE4,
@@ -788,6 +789,7 @@
 				48619FB9071475A500E0A1B6,
 				48620C9207944552009195E5,
 				4862155D07944AB9009195E5,
+				48E1722407AAAF370072492B,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -983,6 +985,20 @@
 			path = slGraphWindowView.m;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
+		};
+		48E1722307AAAF370072492B = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = JavaVM.framework;
+			path = /System/Library/Frameworks/JavaVM.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		48E1722407AAAF370072492B = {
+			fileRef = 48E1722307AAAF370072492B;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 		48ECC160071C137300596F93 = {
 			buildActionMask = 2147483647;

@@ -864,14 +864,10 @@ expression
 		$$ = stNewVectorElementAssignExp($1, $4, $2, yyfile, lineno);
 	}
 | atomic_expression vector_element math_assign_operator expression {
-		stExp *loadExp = $1;
+		stExp *element = stNewVectorElementExp(stNewDuplicateExp($1, yyfile, lineno), $2, yyfile, lineno);
+		stExp *binaryExp = stNewBinaryExp($3, element, $4, yyfile, lineno);
 
-		if(loadExp->type != ET_LOAD) {
-			stParseError(parseEngine, PE_SYNTAX, "Invalid vector element assignment");
-			YYERROR;
-		}
-
-		// $$ = stNewVectorElementAssign($1, $2, $4, yyfile, lineno);
+		$$ = stNewVectorElementAssignExp($1, binaryExp, $2, yyfile, lineno);
 	}
 | atomic_expression '{' expression'}' '=' expression {
 		$$ = stNewListIndexAssignExp($1, $3, $6, yyfile, lineno);

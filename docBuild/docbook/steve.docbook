@@ -897,10 +897,31 @@ print "this is a string".
 
 <sect3><title><function>string</function> Operators</title>
 <para>
-There are no string operators, per se, but simple variables can be embedded 
-strings so that the strings are interpreted dynamically, as in Perl.  
-The following, for example, will use the variable "self" in order to build 
-the string which will then be printed:
+<itemizedlist>
+<listitem>
+<para>
+<function><replaceable>string</replaceable> { <replaceable>index</replaceable> }</function>: returns, as a string, the letter at the specified index.
+</para>
+</listitem>
+
+<listitem>
+<para>
+<function><replaceable>string</replaceable> { <replaceable>index</replaceable> } = <replaceable>otherString</replaceable></function>: replaces the letter at the specified location with the string <replaceable>otherString</replaceable>.
+</para>
+</listitem>
+
+<listitem>
+<para>
+<function>| <replaceable>string</replaceable> |</function>: returns the length of the string.
+</para>
+</listitem>
+</itemizedlist>
+
+In addition to the operators listed above, simple variables can be embedded 
+strings so that the strings are interpreted dynamically, as in language 
+like Perl.  To indicate a variable embedded in a string, use the "$" 
+character.  The following, for example, will use the variable "self" in order 
+to build a string to be printed:
 <screen>
 print "my value is $self.".
 </screen>

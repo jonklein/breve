@@ -1,7 +1,7 @@
                       The breve Simulation Environment
 
                       http://www.spiderland.org/breve
-                        release 2.1b - 01.XX.2005
+                        release 2.1 - 01.28.2005
              command line version for Mac OS X, Linux and Windows
                          jklein@spiderland.org 
 
@@ -106,7 +106,7 @@ Portions of this software use the Open Dynamics Engine library, under the
 following license: 
 
 Open Dynamics Engine
-Copyright (c) 2001,2002, Russell L. Smith.
+Copyright (c) 2001, 2002, Russell L. Smith.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

@@ -7,8 +7,9 @@ breve version 2.1 introduces several new features and changes.
 <sect1 id="new_features"> <title>New Features in Version 2.1</title>
 <para>
 
-Below are some of the major new features found in breve 2.1.  For a full list of new features, 
-see the "Changes" file that is included with the breve distribution.
+Below are some of the major new features found in breve 2.1.  For a full 
+list of new features, see the "Changes" file that is included with the 
+breve distribution.
 
 <itemizedlist>
   <listitem><para>
@@ -16,12 +17,29 @@ see the "Changes" file that is included with the breve distribution.
   </para></listitem>
 
   <listitem><para>
+    New custom drawing class (see documentation for class <ulink url="docs/classes/Drawing.html">Drawing</ulink>).
+  </para></listitem>
+
+  <listitem><para>
+    New elastic Spring simulation class (see documentation for class <ulink url="docs/classes/Spring.html">Spring</ulink>).
+  </para></listitem>
+
+  <listitem><para>
+    New fast 2D matrix class (see documentation for class <ulink url="docs/classes/Matrix2D.html">Matrix2D</ulink>).
+  </para></listitem>
+
+  <listitem><para>
     Updated breve Object API allows programmers to interface with breve from other programming languages (<xref linkend="language_frontend">).
   </para></listitem>
 
   <listitem><para>
-    New custom drawing class allows custom lines and polygons to be drawn (<xref linkend="drawing">).
+    Faster physical simulation.
   </para></listitem>
+
+  <listitem><para>
+    Improved string manipulation support.
+  </para></listitem>
+
 </itemizedlist> 
 
 </para> </sect1>

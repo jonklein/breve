@@ -40,7 +40,7 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	finder = brFindFile(e, "MethodFinder.jar", NULL);
 
 	if(!finder) {
-		slMessage(DEBUG_ALL, "Java loading failed: cannot locate the breve Java archive files\n");
+		// slMessage(DEBUG_ALL, "Java initialization failed: cannot locate Java utility archives\n");
 		return NULL;
 	}
 
