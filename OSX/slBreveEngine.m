@@ -129,8 +129,8 @@ char *interfaceID = "aqua/1.2";
 
 	while([displayView drawing]);
 
-	breveFrontendCleanupData(frontend->data);
 	brEngineFree(frontend->engine);
+	breveFrontendCleanupData(frontend->data);
 	slFree(frontend);
 
 	if(slMemoryAllocated()) {
