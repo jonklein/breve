@@ -49,8 +49,6 @@ brEngine *brEngineNew() {
 	e = slMalloc(sizeof(brEngine));
 	e->speedFactor = 1.0;
 
-	e->gcStack = slStackNew();
-
 	e->simulationWillStop = 0;
 
 #if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)

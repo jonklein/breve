@@ -246,7 +246,7 @@ Abstract : Control (aka Controls) [version 1.9] {
 		simTime = timeStep.
 
 		if simStep > simTime: simTime = simStep.
-#
+
 	+ to get-iteration-step:
 		% Returns the current iteration step size.
 		

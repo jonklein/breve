@@ -871,14 +871,12 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 
 		int result;
 		slStack *oldStack = caller->instance->gcStack;
-
 		caller->instance->gcStack = slStackNew();
 
 		result = stEvalArray(mexp->method->code, caller, t);
 
-		// unmark the return value -- we'll make it the caller's problem
+		// unmark the return value -- we'll make it the current instance's problem
 
-		// stGCRetain(t);
 		stGCUnmark(caller->instance, t);
 
 		// collect and reset the gcStack
@@ -889,7 +887,7 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 
 		// mark the return value for the caller's GC
 
-		if(caller->instance->gcStack) stGCMark(caller->instance, t);
+		if(i->instance->gcStack) stGCMark(i->instance, t);
 
 		if(result == EC_STOP) return EC_OK;
 	
@@ -1146,7 +1144,7 @@ inline int stEvalListRemove(stListRemoveExp *l, stRunInstance *i, brEval *target
 		if(result != EC_OK) return result;
 	} else {
 		index.type = AT_INT;
-		BRINT(&index) = BRLIST(&listEval)->count;
+		BRINT(&index) = BRLIST(&listEval)->count - 1;
 	}
 
 	brEvalListRemove(BRLIST(&listEval), BRINT(&index), target);
@@ -2357,7 +2355,7 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 
 	if(new->instance->gcStack) {
 		stGCUnretain(target);
-		stGCMark(new->instance, target);
+		stGCMark(old->instance, target);
 	}
 
 	// restore the previous stack and stack records

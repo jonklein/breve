@@ -267,8 +267,8 @@ Object : PushProgram {
 		self set-code-pointer to pushCodeCrossover((p1 get-code-pointer), (p2 get-code-pointer)).
 
 	+ to copy-from program otherProgram (object):
-		self parse program "( 3 )".
-		# self parse program (otherProgram get-string).
+		# self parse program "( 3 )".
+		self parse program (otherProgram get-string).
 
 	+ to parse program codeString (string):
 		% Sets the content of this code to the newly parsed string.
