@@ -1,7 +1,7 @@
 @include "Real.tz"
 @include "MenuItem.tz"
 
-Real : Stationary (aka Stationaries) [version 1.8] {
+Real : Stationary (aka Stationaries) [version 2.0] {
     % Stationary objects are objects such as floors and walls that may 
     % collide with other objects but will never move.  Stationary objects
     % require much less computation than OBJECT(Mobile) objects, so it is 

@@ -6,7 +6,6 @@ Data : Genome (aka Genomes) [version 2.0] {
     % This class is primarily used in conjunction with genetic algorithms and 
     % artificial life simulations.
     % <p>
-    %
     % As with its parent class, Data, the Genome class is incomplete and experimental.  
     % The API is subject to change in future releases. 
 

@@ -19,7 +19,7 @@
 	H2 {
 		font-size: 250%
 	}
-	H3 {
+	h4 {
 		font-size: 150%
 	}
 </STYLE>
@@ -28,83 +28,70 @@
 The <a href="http://www.spiderland.org/breve">breve</a> simulation environment change log.
 <p>
 <H2>version 2.0 [XX/XX/2004]</H2>
+
+<h4>New Features</h4>
 <ul>
-
 <li>Full integration of the "Push" programming language for evolutionary computation.
-
-<li>Control method "get-real-time" returns the current real-time in seconds, with microsecond resolution.
-
 <li>Method arguments can now be given default values to indicate that they are optional.
-
 <li>Mouse coordinates in window can be read with new Control methods get-mouse-x-coordinate and get-mouse-y-coordinate.
-
-<li>New "insert" operator for lists: insert <i>expression</i> at <i>list</i>{ <i>index</i> }.
-
-<li>New "remove" operator for lists: remove <i>list</i>{ <i>index</i> }.
-
-<li>"Vision" class has been removed.  Its functionality can now be replicated using the classes "Camera" (to render images) and "Image" (to read the images from the screen).
-
-<li>The "Image" class is now used for applying setting textures.
-
-<li>Textures can be updated on-the-fly.
-
-<li>There is now no hard limit on the number of textures in a simulation
-
-<li>General improvements to transparency and texturing effects.
-
-<li>Incorrect texturing on non "up/down" faces has been fixed.
-
-<li>Added rendering of back-faces of transparent objects to improve transparency effect.
-
-<li>Multiple perspectives can be viewed in a simulation using the "Camera" class.
-
 <li>Totally revamped garbage collection system.
-
 <li>Garbage collection works for objects.  It is enabled on a per-object basis.
-
-<li>The depreciated "register with-shape" method has been removed for Mobile objects.  The method to use is now "set-shape to".
-
-<li>Use of arrays is now depreciated&mdash;use lists instead
-
-<li>Fixed potential physics engine crash when dealing with large numbers of objects.
-
-<li>Fixed printing of "%" characters to the output log.
-
-<li>Fixed potential crash reading DOS formatted text files on OS X (File class).
-
-<li>Fixed truncated read bug in the File class.
-
-<li>Links and mobile objects can be transparent.
-
-<li>The depreciated Joint methods have been removed from the Link class&mdash;use the Joint classes instead.  
-
-<li>"destroy" method no longer called for superclasses&mdash;must be done manually if desired.
-
+<li>Added rendering of back-faces of transparent objects to improve transparency effect.
+<li>Multiple perspectives can be viewed in a simulation using the "Camera" class.
+<li>Textures can be updated on-the-fly.
+<li>There is now no hard limit on the number of textures in a simulation
+<li>General improvements to transparency and texturing effects.
+<li>Control method "get-real-time" returns the current real-time in seconds, with microsecond resolution.
 <li>Major memory and performance optimizations.
+</ul>
 
-<li>MultiBodies are now optional.  Links can exist independently in a simulation.
-
-<li>MultiBodies are now no longer subclasses of Mobile&mdash;they are now Abstract objects which refer to groups of other Links and Joints.
-
-<li>"super" is no longer an actual instance.  Calling a method with "super" still has the same effect, but "super" no longer refers to a separate instance than "self".
-
+<h4>Bug Fixes</h4>
+<ul>
+<li>Fixed potential physics engine crash when dealing with large numbers of objects.
+<li>Fixed printing of "%" characters to the output log.
+<li>Fixed potential crash reading DOS formatted text files on OS X (File class).
+<li>Fixed truncated read bug in the File class.
+<li>Links and mobile objects can be transparent.
 <li>Fixed distorted shadow volumes for spheres.
+<li>Incorrect texturing on non "up/down" faces has been fixed.
+</ul>
 
+<h4>Changes to the steve Language</h4>
+<ul>
+<li>New "insert" operator for lists: insert <i>expression</i> at <i>list</i>{ <i>index</i> }.
+<li>New "remove" operator for lists: remove <i>list</i>{ <i>index</i> }.
+<li>Use of arrays is now depreciated&mdash;use lists instead
+<li>"super" is no longer an actual instance.  Calling a method with "super" still has the same effect, but "super" no longer refers to a separate instance than "self".
+<li>"Vision" class has been removed.  Its functionality can now be replicated using the classes "Camera" (to render images) and "Image" (to read the images from the screen).
+<li>The "Image" class is now used for applying setting textures.
+<li>The depreciated "register with-shape" method has been removed for Mobile objects.  The method to use is now "set-shape to".
+<li>The depreciated Joint methods have been removed from the Link class&mdash;use the Joint classes instead.  
+<li>MultiBodies are now no longer subclasses of Mobile&mdash;they are now Abstract objects which refer to groups of other Links and Joints.
+</ul>
+
+<h4>Changes to Physical Simulation</h4>
+<ul>
+<li>MultiBodies are now optional.  Links can exist independently in a simulation.
+</ul>
+
+<h4>Changes to the Mac OS X Interface</h4>
+<ul>
 <li>Redesigned OS X interface.
-
 <li>Mac OS X style plugins are no longer supported&mdash;switching to the common plugin structure is trivial.
+</ul>
 
-<li>New API for using the breve engine with other frontend languages.
-
-<li>Source code completely restructured.
-
-<li>Source code now fully documented with doxygen.
-
+<h4>Changes to Command-Line breve</h4>
+<ul>
 <li>Window-position can be specified from the command line with the flag -w X,Y.
-
 <li>Window-size can be specified from the command line with the flag -l NxM.
+</ul>
 
+<h4>Changes to the breve Source Code</h4>
+<ul>
+<li>New API for using the breve engine with other frontend languages.
+<li>Source code completely restructured.
 <li>Plugin API: all "ST" macros and symbols have been changed to "BR" (i.e., STINT() is now BRINT()).
+<li>Source code now documented with doxygen.
 </ul>
 
 <p>
@@ -119,7 +106,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <HR>
 <H2>version 1.9 [05/11/2004]</H2>
 <P>
-<H3><B>New Features:</B></H3>
+<h4><B>New Features:</B></h4>
 <UL>
 <LI>Support for saving PNG snapshots on all platforms
 <LI>Support for saving MPEG movies on all platforms
@@ -140,7 +127,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <LI>New (experimental) Java bridge plugin [OS X only, for the moment]
 </UL>
 <P>
-<H3><B>Bug Fixes:</B></H3>
+<h4><B>Bug Fixes:</B></h4>
 <UL>
 <LI>Display labels fixed (set-label)
 <LI>Fixed rendering bugs (shadows, flashing)
@@ -165,7 +152,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <HR>
 <H2>version 1.8 [01/29/2004]</H2>
 <P>
-<H3><B>New Features:</B></H3>
+<h4><B>New Features:</B></h4>
 <UL>
 <LI>Vector elements can now be assigned using the "::" notation (myVector::x = 10)
 <LI>"{ }" is now parsed as an empty list
@@ -192,7 +179,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <LI>All XML archive/object loading now searches the full file path
 <LI>The File class now searches the entire breve search path to locate files to open
 </UL>
-<H3>Bug Fixes</H3>
+<h4>Bug Fixes</h4>
 <UL>
 <LI>set-force (Link.tz) now adds persistent force
 <LI>Added correct simulation time to dearchived simulations
@@ -216,7 +203,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 
 <H2>version 1.7 [09/18/2003]</H2>
 <P>
-<H3><B>New Features:</B></H3>
+<h4><B>New Features:</B></h4>
 <UL>
 <LI>Source now available under GPL
 <LI>New preview release available for Windows
@@ -237,7 +224,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <LI>Major improvements in garbage collection
 <LI>Upgraded to version 0.039 of the ODE physics engine
 </UL>
-<H3><B>Bug Fixes:</B></H3>
+<h4><B>Bug Fixes:</B></h4>
 <UL>
 <LI>Fixed bug in dearchiving strings (which may have caused general failures in dearchiving)
 <LI>Fixed many potential memory leaks
@@ -249,7 +236,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <HR>
 <H2>version 1.6 [06/19/2003]</H2>
 <p>
-<H3><B>New Features:</B></H3>
+<h4><B>New Features:</B></h4>
 <UL>
 <LI>Lines can be arbitrarily drawn between objects
 <LI>Objects can be made invisible
@@ -272,7 +259,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 
 </UL>
 <p>
-<H3><b>Changes to physics support:</b></H3>
+<h4><b>Changes to physics support:</b></h4>
 <p>
 <UL>
 <LI>Support for new ODE joint types: Universal &amp; Ball.
@@ -283,7 +270,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <LI>Joint link-points can be scaaled dynamically as shapes change size
 <LI>Links can be fixed to points in space (by creating a Joint with no parent)
 </UL>
-<H3><B>Bug fixes:</B></H3>
+<h4><B>Bug fixes:</B></h4>
 <UL>
 <LI>Fixed list garbage collection bug which could cause unexpected errors or crashes
 <LI><b>breve</b> now properly parses files with Windows and MacOS9 style newlines (\r and \r\n)
@@ -298,9 +285,9 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 </UL>
 <HR>
 <p>
-<H2>version 1.5 [03/10/2003]</H3>
+<H2>version 1.5 [03/10/2003]</h4>
 <p>
-<H3><b>New Features:</b></H3>
+<h4><b>New Features:</b></h4>
 <p>
 <ul>
 <LI>Multiple code windows can be opened in the OS X <b>breve</b> application
@@ -319,14 +306,14 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <LI>Improved physics support
 </ul>
 <p>
-<H3><b>Changes to the graphical rendering:</b></H3>
+<h4><b>Changes to the graphical rendering:</b></h4>
 <p>
 <ul> 
 <LI>Improvements to shadows and reflections
 <LI>Speed improvements
 </ul>
 <p>
-<H3><b>Changes to the steve language:</b></H3>
+<h4><b>Changes to the steve language:</b></h4>
 <p>
 <ul>
 <LI>New "data" type allows for encoding binary data (not to be confused with Data objects, which can contain many types of data).
@@ -337,7 +324,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <LI>Warnings added for unused variables
 </ul>
 <p>
-<H3><b>Changes to physics support:</b></H3>
+<h4><b>Changes to physics support:</b></h4>
 <p>
 <ul>
 <LI>Shapes sizes can be scaled dynamically, useful for simulating growth (scale-shape in Shape.tz)
@@ -345,7 +332,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <LI>Joint link points can be adjusted dynamically during a simulation (set-link-point in Joint.tz)
 </ul>
 <p>
-<H3><b>Bug Fixes:</b></H3>
+<h4><b>Bug Fixes:</b></h4>
 <ul>
 <LI>Fixed freeze bug when pausing simulations with high logging activity.
 <LI>Fixed bug in calculating mass and inertia properties
@@ -354,7 +341,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <p>
 <hr><H2>version 1.4 [11/04/2002]</H2>
 <p>
-<H3><b>Important change for users of previous versions:</b></H3>
+<h4><b>Important change for users of previous versions:</b></h4>
 <p>
 <UL>
 <LI>Brand new physics engine! [in progress]
@@ -366,7 +353,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 </blockquote>
 </UL>
 <p>
-<H3><b>New features:</b></H3>
+<h4><b>New features:</b></h4>
 <ul>
 <LI>There is a Linux version now, not that this is an OS X feature.
 <LI>Added initial support for creating custom interfaces for simulations (see the InterfaceSwarm demo for an example).
@@ -376,7 +363,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <LI>New built-in feed-forward neural network functionality [experimental]
 </ul>
 <p>
-<H3><b>Changes to the steve language:</b></H3>
+<h4><b>Changes to the steve language:</b></h4>
 <p>
 <ul>
 <LI>Added "matrix" (3x3 matrices) as a basic type [experimental]
@@ -385,7 +372,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <LI>Strings can now use special sequences like \n (newline), \t (tab) and " (quotation mark)
 <LI>Logical AND/OR expressions are now "short-circuit" operators
 </ul>
-<H3><b>General changes:</b></H3>
+<h4><b>General changes:</b></h4>
 <ul>
 <LI>Super-duper optimization
 <LI>Changed texture limit from 8 textures to 128
@@ -397,7 +384,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <LI>New demos
 </ul>
 <p>
-<H3><b>Bug fixes:</b></H3>
+<h4><b>Bug fixes:</b></h4>
 <p>
 <ul>
 <LI>Fixed "Save As..." bug, where <b>breve</b> would forget the existing filename is "Cancel" was selected
@@ -409,7 +396,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <p>
 <hr><H2>version 1.3 [12/05/2001]</H2>
 <p>
-<H3><b>Important change for users of previous versions:</b></H3>
+<h4><b>Important change for users of previous versions:</b></h4>
 <p>
 The default iteration and integration timesteps have been changed.
 <blockquote>
@@ -428,7 +415,7 @@ Control.tz has changed the default timesteps and integration steps to match
   A number of demos have been modified to accommodate this change.
 </blockquote>
 <p>
-<H3><b>General changes:</b></H3>
+<h4><b>General changes:</b></h4>
 <p>
 <ul>
 <LI>Major bug fixes and improvements to physics engine.
@@ -441,7 +428,7 @@ Control.tz has changed the default timesteps and integration steps to match
 <LI>Class documentation now uses frames for easier navigation.
 </ul>
 <p>
-<H3><b>Changes to the steve language:</b></H3>
+<h4><b>Changes to the steve language:</b></h4>
 <p>
 <ul>
 <LI>Added "notifications".  Instances can now register for notifications from other
@@ -449,7 +436,7 @@ Control.tz has changed the default timesteps and integration steps to match
   observing instances.  See documentation for Object.tz for more information.
 </ul>
 <p>
-<H3><b>Changes to the application interface:</b></H3>
+<h4><b>Changes to the application interface:</b></h4>
 <p>
 <ul>
 <LI>Improved preferences dialog box with many new options.
@@ -459,8 +446,8 @@ Control.tz has changed the default timesteps and integration steps to match
 <LI>Recent menu now preserved every time <b>breve</b> is run.
 </ul>
 <p>
-<H3><b>
-Changes to the included <b>breve</b> class files:</b></H3>
+<h4><b>
+Changes to the included <b>breve</b> class files:</b></h4>
 <p>
 <ul>
 <LI>New "system" method of Control.tz allows shell commands to be executed from within simulations.
@@ -469,9 +456,9 @@ Changes to the included <b>breve</b> class files:</b></H3>
 <LI>Introductory networking support.
 </ul>
 <p>
-<hr><H3>version 1.2 [10/08/2001]</H3>
+<hr><h4>version 1.2 [10/08/2001]</h4>
 <p>
-<H3><b>General changes:</b></H3>
+<h4><b>General changes:</b></h4>
 <p>
 <ul>
 <LI>New "tips &amp; techniques" documentation describes how to use many of 
@@ -501,14 +488,14 @@ Changes to the included <b>breve</b> class files:</b></H3>
 <LI>Potential memory leaks fixed with improved garbage collection in steve.
 </ul>
 <p>
-<H3><b>Changes to the application interface:</b></H3>
+<h4><b>Changes to the application interface:</b></h4>
 <p>
 <ul>
 <LI>Added "New From Template" menu item to create a new document with a simulation template.
 <LI>Added "Open Recent" submenu from the file menu.
 </ul>
 <p>
-<H3><b>Changes to the steve language:</b></H3>
+<h4><b>Changes to the steve language:</b></h4>
 <p>
 <ul>
 <LI>Added support for perl-like embedding of simple variables in strings, such as
@@ -520,7 +507,7 @@ Changes to the included <b>breve</b> class files:</b></H3>
  controller is universally defined. 
 </ul>
 <p>
-<H3><b>Changes to the included <b>breve</b> class files:</b></H3>
+<h4><b>Changes to the included <b>breve</b> class files:</b></h4>
 <p>
 <ul>
 <LI>Many new features.
@@ -532,9 +519,9 @@ Changes to the included <b>breve</b> class files:</b></H3>
  objects in the simulation world.
 </ul>
 <p>
-<hr><H3>version 1.1 [07/16/2001]</H3>
+<hr><h4>version 1.1 [07/16/2001]</h4>
 <p>
-<H3><b>VERY IMPORTANT CHANGE AFFECTING SIMULATIONS WRITTEN WITH VERSION 1.0:</b></H3>
+<h4><b>VERY IMPORTANT CHANGE AFFECTING SIMULATIONS WRITTEN WITH VERSION 1.0:</b></h4>
 <blockquote>
 The "scale" of the world has now been fixed at "1 world unit" = 1 meter.  The world is now effectively 1/10th the size of the world in version 1.0.
 <p>
@@ -545,7 +532,7 @@ Bear in mind when adjusting forces applied to objects and joints that the mass o
 <b>If you are not using the class PhysicalControl</b> then the only effect of the changes will be that the textures on objects are very small and that the default starting camera position may be closer than desired.  You can fix these problems by following the same directions given above for those using the class PhysicalControl.
 </blockquote>
 <p>
-<H3><b>General changes:</b></H3>
+<h4><b>General changes:</b></h4>
 <p>
 <ul>
 <LI>Fixed display bug on systems without Mac OS X OpenGL hardware 
@@ -562,8 +549,8 @@ Bear in mind when adjusting forces applied to objects and joints that the mass o
 <LI>fixed possible freeze bug associated with log window.
 <LI>many small bugs fixed.
 </ul>
-<H3><b>Changes to the included <b>breve</b> class files:
-</b></H3>
+<h4><b>Changes to the included <b>breve</b> class files:
+</b></h4>
 <p>
 <ul>
 <LI>new Data class allows instances to be saved to disk and 
@@ -572,7 +559,7 @@ Bear in mind when adjusting forces applied to objects and joints that the mass o
  for the class Data.tz for more information.
 </ul>
 <p>
-<H3><b>Changes to the steve language:</b></H3>
+<h4><b>Changes to the steve language:</b></h4>
 <ul>
 <LI>added support for basic arrays
 <LI>list support greatly improved.
@@ -583,14 +570,14 @@ Bear in mind when adjusting forces applied to objects and joints that the mass o
 <LI>testing the truth value of a freed instance returns 0.  previously a freed object had a truth value of 1.
 </ul>
 <p>
-<H3><b>Changes to physical simulation:</b></H3>
+<h4><b>Changes to physical simulation:</b></h4>
 <p>
 <ul>
 <LI>some bugs fixed.
 <LI>some bugs remain.
 </ul>
 <p>
-<hr><H3>version 1.0 [05/07/2001]</H3>
+<hr><h4>version 1.0 [05/07/2001]</h4>
 <p>
 Initial release.
 </BODY>

@@ -34,13 +34,15 @@ my $frameIndex=<<__EOT__;
 __EOT__
 
 my $WARNING=<<__EOT__;
-<font size=-1>
+<center>
+<font size=-2>
 These pages are auto-generated from self-documenting comments embedded 
 in class files.
-<p>
+<br>
 For more information on <b>breve</b> and <i>steve</i>, refer to the 
 <a href="http://www.spiderland.org/breve" target="_top">breve homepage</a>.
 </font>
+</center>
 __EOT__
 
 if(scalar(@ARGV) != 1) {
@@ -69,9 +71,16 @@ my @sections;
 my %classhash;
 
 foreach $class (@classes) {
-    my ($parent, $classname);
+    my ($parent, $classname, $filename);
 
-    ($parent, $classname) = ($class =~ /^(\w+)\s*:\s*(\w+)/);
+	my ($firstline, $aka);
+	($firstline) = ($class =~ /^(.*)/);
+
+    ($parent, $classname) = ($firstline =~ /^(\w+)\s*:\s*(\w+)/);
+	($filename) = ($firstline =~ /\[(\S+)\]$/);
+	($aka) = ($firstline =~ /\(aka (\w+)\)/);
+
+	$filename =~ s/.*\///;
 
     next if($parent eq "" || $classname eq "");
 
@@ -100,7 +109,7 @@ foreach $class (@classes) {
 
     select(DOC);
 
-   	header($parent, $classname, $classdesc, $bgcolor);
+   	header($parent, $classname, $filename, $classdesc, $bgcolor);
 
 	print "<BLOCKQUOTE>\n";
 	foreach $section (@sections) {
@@ -164,8 +173,8 @@ print<<__EOT__;
 </STYLE>
 </HEAD>
 <BODY BACKGROUND="../aqua.gif">
-<br>
-<i>$WARNING</i>
+<p>
+$WARNING
 <p>
 <a href="method_index.html" target=\"class\">Method index</a>
 <p>
@@ -184,11 +193,15 @@ close DOC;
 sub header() {
     my $parent = $_[0];
     my $class = $_[1];
-    my $classdesc = $_[2];
-    my $color = $_[3];
-    my $file = $_[4];
+    my $filename = $_[2];
+    my $classdesc = $_[3];
+    my $color = $_[4];
 
     my $parent_link;
+
+	my $no_tz = $filename;
+
+	$no_tz =~ s/\.tz//;
 
     if($parent eq "NULL") {
 		$parent = "(no parent)";
@@ -202,10 +215,11 @@ sub header() {
 <title>$parent : $class</title>
 <STYLE TYPE="text/css">
     BODY, P, LI {
-        color: black;
-        font-family: Geneva,Arial,Helvetica,Swiss,SunSans-Regular;
-        font-size: 95%;
+		color: black;
+		font-family: Verdana, Arial, sans-serif;
+		font-size: small;
     }
+
     BODY {
         margin-left: 10%;
         margin-right: 10%;
@@ -221,16 +235,20 @@ sub header() {
 <p>
 <img src="breve_icon.jpg"></center>
 <p>
+<p>
 
 <i>$WARNING</i>
 
 <h2>$parent_link : $class</h2>
+This class is included as part of the file $filename.
+<br>
+To use this class, include the line \"<b>\@use $no_tz.</b>\"
 __EOT__
     if($classdesc =~ /\%/) {
         my @nothing = ();
         $classdesc = process_docs($classdesc, \@nothing);
 
-        print "<p>\n<h3>Class Description:</h3><p>\n";
+        print "<p>\n<h3>Class description:</h3><p>\n";
 		print "<blockquote>\n";
         print "$classdesc";
 		print "</blockquote>\n";

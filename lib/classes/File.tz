@@ -2,7 +2,7 @@
 
 Abstract : File (aka Files) [version 2.0] {
 	% A File is an object used for creating textual output of your breve 
-	% simulation, or for reading in data from text files.
+	% simulation, or for reading in data from text files.  
 	% <p>
 	% Though some File methods can be used to encode or decode simulation
 	% objects, it is not the preferred method for archiving and dearchiving 
@@ -12,6 +12,8 @@ Abstract : File (aka Files) [version 2.0] {
 
 	+ variables:
 		filePointer (pointer).
+
+  + section "Checking For the End of a File"
 
 	+ to is-end-of-file:
 		% Returns whether the file pointer is at the end of the file.

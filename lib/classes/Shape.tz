@@ -1,6 +1,6 @@
 @include "Abstract.tz"
 
-Abstract : Shape (aka Shapes) [version 1.8] {
+Abstract : Shape (aka Shapes) [version 2.0] {
 	% The Shape class is a work-in-progress which allows users to create 
 	% shapes which will be associated with OBJECT(Mobile), OBJECT(Stationary)
 	% or OBJECT(Link) objects and added to the simulated world.  An instance
@@ -16,6 +16,8 @@ Abstract : Shape (aka Shapes) [version 1.8] {
 
 	+ to init:
 		density = 1.0.
+
+  + section "Getting and Setting a Shape's Mass Properties"
 
 	+ to get-mass:
 		% If the shape is properly initialized, this method returns the 

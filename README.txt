@@ -1,7 +1,7 @@
                       The breve Simulation Environment
 
                       http://www.spiderland.org/breve
-                          release 1.9.1 - 05.12.2004
+                          release 2.0b - 09.28.2004
              command line version for Mac OS X, Linux and Windows
                            jklein@spiderland.org 
 
@@ -37,7 +37,7 @@ information on programming and running simulations with breve is available
 in the documentation, which is found in the "docs" directory.
 
 These are the directions to get started quickly with the command-line 
-version of breve 1.9.
+version of breve 2.0.
 
 1) set the environment variable BREVE_CLASS_PATH to the full path of the
    included "lib/classes" directory.  For example, using the bash shell

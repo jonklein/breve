@@ -1,6 +1,6 @@
 @use Abstract.
 
-Abstract : Camera {
+Abstract : Camera (aka Cameras) [version 2.0] {
 	% The Camera class is used to set up a viewing perspective in a simulation.
 	% Creating a new camera object places a viewing area with the new camera 
 	% perspective in the main viewing window.
@@ -12,6 +12,8 @@ Abstract : Camera {
 		cameraPointer = cameraNew().
 		self set-size with-height 100 with-width 100.
 		self set-position with-x 0 with-y 0.
+
+  + section "Enabling and Disabling the Camera"
 
 	+ to disable:
 		% Disables this camera.  The view from this camera will not be 
@@ -25,6 +27,8 @@ Abstract : Camera {
 	
 		cameraSetEnabled(cameraPointer, 1).
 
+  + section "Enabling and Disabling Text in the Camera's Display"
+
 	+ to enable-text:
 		% Enables text for tihs camera.
 		cameraTextSetEnabled(cameraPointer, 1).
@@ -32,6 +36,8 @@ Abstract : Camera {
 	+ to disable-text:
 		% Disables text for tihs camera.
 		cameraTextSetEnabled(cameraPointer, 0).
+
+  + section "Changing the Size, Position and Perspective of the Viewing Window"
 	
 	+ to set-size with-height newHeight (double) with-width newWidth (double):
 		% Sets the size of the camera viewing area.
@@ -42,7 +48,7 @@ Abstract : Camera {
 		% Sets the position of the camera viewing area inside the main window.
 
 		cameraPositionDisplay(cameraPointer, newX, newY).
-	
+
 	+ to look at target (vector) from position (vector):
 		% Move to position and aim at target.
 

@@ -1,9 +1,9 @@
 @use Object.
 
-Abstract : Joint (aka Joints) [version 1.9] {
+Abstract : Joint (aka Joints) [version 2.0] {
 	% Joint is class used to connect two OBJECT(Link) objects together.  The
-	% Joint class itself is actually never instantiated--instead, one of its
-	% subclasses should be used.
+	% Joint class itself is actually never instantiated--instead, one of the
+	% following joint subclasses should be used.
 	% <ul>
 	% <li>OBJECT(PrismaticJoint) for linear sliding joints between links
 	% <li>OBJECT(RevoluteJoint) for rotational joints between links
@@ -14,6 +14,10 @@ Abstract : Joint (aka Joints) [version 1.9] {
 	% <P>
 	% Although the class itself is never instantiated, the class methods 
 	% described below are often used with the object's subclasses.
+	% <P>
+	% The joints supported in breve can be 1, 2 or 3 degrees of freedom 
+	% (DOF), meaning that they allow motion in 1, 2 or 3 independent 
+	% directions.  
 
 	+ variables:
 		parent, child (object).
@@ -29,6 +33,8 @@ Abstract : Joint (aka Joints) [version 1.9] {
 	+ to init:
 		normalVector. # ditch the unused variable warning.
 		relativeRotation = [ (1, 0, 0), (0, 1, 0), (0, 0, 1) ].
+
+  + setting "Setting parameters for joint springs and damping (friction)"
 
 	+ to set-double-spring with-strength theStrength (float) with-max theMax (float) with-min theMin (float):
 		% Enable this joint's spring to take effect when the rotation is above
@@ -51,10 +57,11 @@ Abstract : Joint (aka Joints) [version 1.9] {
 		jointSetSpring(jointPointer, theStrength, theMin, theMax).
 
 	+ to set-joint-damping to dampingValue (float):
-		% Sets the joint "damping", which is another way to say the friction
-		% of the joint.  
+		% Sets the joint damping--the friction of the joint.  
 
 		jointSetDamping(jointPointer, dampingValue).
+
+  + section "Getting and setting the velocity of a joint"
 
 	+ to set-joint-velocity to newVelocity (float):
 		% Sets the joint velocity to newVelocity.
@@ -193,6 +200,7 @@ Abstract : Joint (aka Joints) [version 1.9] {
 		return 1.
 
   + section "Breaking Joints"
+
 	+ to break:
 		% Breaks this joint--removes the child (and all of the links connected to it)
 		% from the body.  The child link (and its descendents) are therefore removed 
@@ -255,11 +263,11 @@ Abstract : Joint (aka Joints) [version 1.9] {
 
 		return jointPointer.
 
-	+ to destroy:
+	- to destroy:
 		self break.
 }
 
-Joint : PrismaticJoint (aka PrismaticJoints) [version 1.9] {
+Joint : PrismaticJoint (aka PrismaticJoints) [version 2.0] {
 	% This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects
 	% together using a sliding linear joint.  
 	% <P>
@@ -324,7 +332,7 @@ Joint : PrismaticJoint (aka PrismaticJoints) [version 1.9] {
 		return (super dearchive).
 }
 
-Joint : RevoluteJoint (aka RevoluteJoints) [version 1.9] {
+Joint : RevoluteJoint (aka RevoluteJoints) [version 2.0] {
 	% This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects
 	% together using a rotating joint.  
 	% <P>
@@ -401,14 +409,14 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 1.9] {
 		return (super dearchive).
 }
 
-Joint : FixedJoint (aka FixedJoints) [version 1.9] {
+Joint : FixedJoint (aka FixedJoints) [version 2.0] {
 	% This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects
 	% together using a static, or fixed, joint.
 	% <P>
 	% <CENTER><IMG SRC="FixedJoint.jpg" BORDER=1></CENTER>
 	% <P>
 	% <b>Fixed joints do not currently support a relative rotation the way
-	% other joint types do.</b>  I'm sorry.  
+	% other joint types do.</b>  I'm so sorry.  
 	% <P>
 	% <b>NOTE: this class is included as part of the file "Joint.tz".</b>
 
@@ -457,7 +465,7 @@ Joint : FixedJoint (aka FixedJoints) [version 1.9] {
 		return (super dearchive).
 }
 
-Joint : UniversalJoint (aka UniversalJoints) [version 1.9] {
+Joint : UniversalJoint (aka UniversalJoints) [version 2.0] {
 	% This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects
 	% together using a universal joint.  
 	% <P>
@@ -542,7 +550,7 @@ Joint : UniversalJoint (aka UniversalJoints) [version 1.9] {
 		return (super dearchive).
 }
 
-Joint : BallJoint (aka BallJoints) [version 1.9] {
+Joint : BallJoint (aka BallJoints) [version 2.0] {
 	% This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects
 	% together using a ball joint.
 	% <p>

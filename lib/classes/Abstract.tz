@@ -1,11 +1,12 @@
 @include "Object.tz"
 
-Object : Abstract (aka Abstracts) [version 1.8] {
-    % The Abstract class currently has no methods implemented.  It is 
-    % used as a logical distinction from the classes which correspond
-    % physical objects in the simulated world.  By convention, all 
-    % user objects which do not correspond directly to features in 
-    % the simulated world should be subclasses of OBJECT(Abstract).
+Object : Abstract (aka Abstracts) [version 2.0] {
+	% Abstract is a logical separation of the OBJECT(Object) class,
+	% used for objects which have no representation in the simulated 
+	% world.  This is in contrast to OBJECT(Real) objects, which 
+	% do have representations in the simulated world.
+    % Since "abstract" is only a logical distinction, the Abstract class 
+	% currently has no methods implemented.  
 
 	+ to dearchive:
 		return 1.

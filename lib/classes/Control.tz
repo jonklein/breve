@@ -4,7 +4,7 @@
 @use Movie.
 @use Image.
 
-Abstract : Control (aka Controls) [version 1.9] {
+Abstract : Control (aka Controls) [version 2.0] {
 	% The Control object sets up and controls simulations.  Every simulation
 	% must have one Control subclass.  The user subclass of Control should 
 	% set up the simulation in the "init" method.
@@ -83,22 +83,6 @@ Abstract : Control (aka Controls) [version 1.9] {
 		movie (object).
 		movieMenu (object).
 
-	+ to accept-upload of uploadedObject (object) from host (string):
-		% This method is automatically called when an object is uploaded
-		% through a OBJECT(NetworkServer).  This implementation simply 
-		% prints out a message saying that the object has been received,
-		% but your controller may override the method to take other actions.
-
-		print "object $uploadedObject sent from host $host".
-
-	- to parse-xml-network-request from-string s (string):
-		return dearchiveXMLObjectFromString(s).
-
-	+ to end-simulation:
-		% Ends the simulation gracefully.
-
-		endSimulation().
-
 	+ to init:
 		% Initializes the Control object by setting up default values for 
 		% variables such as the size of the integration timestep.  Subclasses
@@ -161,11 +145,8 @@ Abstract : Control (aka Controls) [version 1.9] {
 	- to save-snapshot-to-file:
 		self save-snapshot to "simulation.png".
 
-	+ to save-snapshot to filename (string):
-		% Takes a PNG snapshot of the current simulation display and saves 
-		% it to a file named filename.  filename should end with ".png".
-
-		snapshot(filename).
+	- to parse-xml-network-request from-string s (string):
+		return dearchiveXMLObjectFromString(s).
 
 	- to get-generic-shape:
 		% Returns a "generic" shape for agents, a sphere of radius 1.0.
@@ -177,7 +158,25 @@ Abstract : Control (aka Controls) [version 1.9] {
 
 		return genericLinkShape.
 
-  + section "Updating Neighbors"
+  + section "Accepting network uploads"
+
+	+ to accept-upload of uploadedObject (object) from host (string):
+		% This method is automatically called when an object is uploaded
+		% through a OBJECT(NetworkServer).  This implementation simply 
+		% prints out a message saying that the object has been received,
+		% but your controller may override the method to take other actions.
+
+		print "object $uploadedObject sent from host $host".
+
+  + section "Saving snapshots of simulations"
+
+	+ to save-snapshot to filename (string):
+		% Takes a PNG snapshot of the current simulation display and saves 
+		% it to a file named filename.  filename should end with ".png".
+
+		snapshot(filename).
+
+  + section "Updating neighbors"
 
 	+ to update-neighbors:
 		% The neighborhood for each object in the simulation is the set of 
@@ -189,10 +188,29 @@ Abstract : Control (aka Controls) [version 1.9] {
 
 		updateNeighbors().
 
-  + section "Controlling the Simulation Engine"
+  + section "Getting simulation time"
+
+	+ to get-real-time:
+		% Returns the number of seconds since January 1st, 1970 with microsecond
+		% accuracy.
+
+		return getRealTime().
+
+	+ to get-time:
+		% Returns the simulation time of the world.
+
+		return getTime().
+
+  + section "Pausing and stopping simulations"
+
+	+ to end-simulation:
+		% Ends the simulation gracefully.
+
+		endSimulation().
 
 	+ to pause:
-		% Pauses the simulation as though the user had done so.
+		% Pauses the simulation as though the user had done so through
+		% the user interface.
 
 		pauseSimulation().
 
@@ -203,6 +221,8 @@ Abstract : Control (aka Controls) [version 1.9] {
 		% down a simulation which is too fast to observe.
 
 		sleep(s).
+
+  + section "Setting and getting the iteration and integration time steps"
 
 	+ to set-integration-step to timeStep (float):
 		% Sets the integration stepsize to timeStep.  The integration stepsize
@@ -517,17 +537,6 @@ Abstract : Control (aka Controls) [version 1.9] {
 		lightPosition = theLocation.
 		setLightPosition(theLocation).
 
-	+ to get-real-time:
-		% Returns the number of seconds since January 1st, 1970 with microsecond
-		% accuracy.
-
-		return getRealTime().
-
-	+ to get-time:
-		% Returns the simulation time of the world.
-
-		return getTime().
-
 	+ to iterate:
 		result (float).
 
@@ -812,6 +821,57 @@ Abstract : Control (aka Controls) [version 1.9] {
 		blurFactor = factor.
 		setBlurFactor(factor).
 
+	+ to set-fog-limits with-start fogStart (float) with-end fogEnd (float):
+		% The calculation which calculates fog needs to know where the fog 
+		% starts (the point at which the fog appears) and where the fog ends
+		% (the point at which the fog has reached it's highest intensity).
+		% <p>
+		% This method sets the start value to fogStart and the end value to 
+		% fogEnd.  fogStart must be greater than or equal to zero.  fogEnd
+		% must be greater than fogStart.
+		% <p>
+		% Fog must first be turned on with METHOD(enable-lighting) before fog 
+		% is displayed.
+
+		setFogDistances(fogStart, fogEnd).
+
+	+ to set-fog-intensity to newIntensity (float):
+		% Sets the fog intensity to newIntensity.  Fog must first be turned on with
+		% METHOD(enable-lighting) before fog is displayed.
+
+		fogIntensity = newIntensity.
+		setFogIntensity(newIntensity).
+
+	+ to set-fog-color to newColor (vector):
+		% Sets the fog color to newColor.  Fog must first be turned on with
+		% METHOD(enable-lighting) before fog is displayed.
+
+		fogColor = newColor.
+		setFogColor(newColor).
+
+	+ to enable-fog:
+		% Enables fog for the main camera.  This adds the visual effect of fog to the
+		% world.  Fog parameters can be set using methods METHOD(set-fog-color), 
+		% METHOD(set-fog-intensity) and METHOD(set-fog-limits).
+		% <p>
+		% Fog and lightmap effects don't mix.
+
+		fogFlag = 1.
+		setDrawFog(1).
+		fogMenu check.
+
+	+ to disable-fog:
+		% Disables fog for the main camera.  See METHOD(enable-fog) for more information.
+		fogFlag = 0.
+		setDrawFog(0).
+		fogMenu uncheck.
+
+	+ to toggle-fog:
+		% Toggle fog for the main camera
+
+		if fogFlag == 1: self disable-fog.
+		else self enable-fog.
+
 	+ to set-display-text to theString (string) at-x xLoc (float) at-y yLoc (float):
 		% Sets a text string in the simulation display.  xLoc and yLoc 
 		% represent the location of the text.  The coordinate system 
@@ -903,7 +963,7 @@ Abstract : Control (aka Controls) [version 1.9] {
 
 		playSound().
 
-	+ to load-image from file (string):
+	- to load-image from file (string):
 		% Loads an image from a file, returning an OBJECT(Image) object.
 		% <P>
 		% This method is provided for backwards compatability only.
@@ -929,8 +989,9 @@ Abstract : Control (aka Controls) [version 1.9] {
 		return (self load-image from file).
 
 	+ to execute command systemCommand (string):
-		% Executes the command systemCommand using /bin/sh.  Returns the
-		% output of command.
+		% Executes the shell command systemCommand using /bin/sh.  
+		% Returns the output of command.  Not supported on all 
+		% implementations.
 
 		return system(systemCommand).
 
@@ -972,58 +1033,7 @@ Abstract : Control (aka Controls) [version 1.9] {
 
 		return setInterfaceString(newValue, tag).
 
-	+ to set-fog-limits with-start fogStart (float) with-end fogEnd (float):
-		% The calculation which calculates fog needs to know where the fog 
-		% starts (the point at which the fog appears) and where the fog ends
-		% (the point at which the fog has reached it's highest intensity).
-		% <p>
-		% This method sets the start value to fogStart and the end value to 
-		% fogEnd.  fogStart must be greater than or equal to zero.  fogEnd
-		% must be greater than fogStart.
-		% <p>
-		% Fog must first be turned on with METHOD(enable-lighting) before fog 
-		% is displayed.
-
-		setFogDistances(fogStart, fogEnd).
-
-	+ to set-fog-intensity to newIntensity (float):
-		% Sets the fog intensity to newIntensity.  Fog must first be turned on with
-		% METHOD(enable-lighting) before fog is displayed.
-
-		fogIntensity = newIntensity.
-		setFogIntensity(newIntensity).
-
-	+ to set-fog-color to newColor (vector):
-		% Sets the fog color to newColor.  Fog must first be turned on with
-		% METHOD(enable-lighting) before fog is displayed.
-
-		fogColor = newColor.
-		setFogColor(newColor).
-
-	+ to enable-fog:
-		% Enables fog for the main camera.  This adds the visual effect of fog to the
-		% world.  Fog parameters can be set using methods METHOD(set-fog-color), 
-		% METHOD(set-fog-intensity) and METHOD(set-fog-limits).
-		% <p>
-		% Fog and lightmap effects don't mix.
-
-		fogFlag = 1.
-		setDrawFog(1).
-		fogMenu check.
-
-	+ to disable-fog:
-		% Disables fog for the main camera.  See METHOD(enable-fog) for more information.
-		fogFlag = 0.
-		setDrawFog(0).
-		fogMenu uncheck.
-
-	+ to toggle-fog:
-		% Toggle fog for the main camera
-
-		if fogFlag == 1: self disable-fog.
-		else self enable-fog.
-
-  + section "Manipulating and Using Color"
+  + section "Manipulating and Using Colors"
 
 	+ to unique-color for-number n (int):
 		% Returns a unique color for each different value of n up 

@@ -1,13 +1,13 @@
-NULL : Object (aka Objects) [version 1.8] {
+NULL : Object (aka Objects) [version 2.0] {
     % The Object class is the root class.  All classes used in breve have
     % Object as an ancestor.  The object class implements some basic 
     % services that all classes will have access to.
     % <p>
-    % Subclassing Object is rare.  The classes OBJECT(Real) and OBJECT(Abstract)
-    % are logical separations of the Object class containing "real" objects
-    % (which correspond to a physical entity in the simulated world) and 
-    % "abstract" objects which are generally used for computation or 
-    % control of the real objects.  You should consider subclassing  
+    % Subclassing Object directly is rare.  The classes OBJECT(Real) and 
+	% OBJECT(Abstract) are logical separations of the Object class containing 
+	% "real" objects (which correspond to a physical entity in the simulated 
+	% world) and "abstract" objects which are generally used for computation 
+	% or control of the real objects.  You should consider subclassing  
     % one of these classes instead.
 
     + variables:
@@ -135,6 +135,35 @@ NULL : Object (aka Objects) [version 1.8] {
 
         notify(theMessage).
 
+	+ to call-method named methodName (string):
+		% Calls the method named methodName for this object.  Returns the result of
+		% the method call.
+
+		return callMethodNamed(self, methodName, { }).
+
+	+ to call-method named methodName (string) with-arguments argList (list):
+		% Calls the method named methodName for this object.  Returns the result of
+		% the method call.
+		% <p>
+		% The arguments to the object are passed in using the list argList.  Since
+		% keywords are not passed in, this method relies on the order the arguments
+		% appear in the argument list and passes them to methodName in the order 
+		% in which they appear in methodName's definition.
+		% <p>
+		% Why not call a method 
+		% directly?  This method is used in circumstances where you might
+		% want to have some sort of callback method.  As an example, let's 
+		% say you write a general purpose class which can sort objects based 
+		% on different criteria.  How would the user specify these arbitrary
+		% criteria?  Using this method would allow the user to pass in the
+		% name of the method they want to use, and the sorting object could
+		% use this method to execute the callback.
+		% <p>
+		% If the concept of a callback doesn't make sense, then you can
+		% probably ignore this method.
+
+		return callMethodNamed(self, methodName, argList).
+
   + section "Archiving & Dearchiving"
 
     + to archive-as-xml file fileName (string):
@@ -176,35 +205,6 @@ NULL : Object (aka Objects) [version 1.8] {
 
 	+ to archive:
 		return 1.
-
-	+ to call-method named methodName (string):
-		% Calls the method named methodName for this object.  Returns the result of
-		% the method call.
-
-		return callMethodNamed(self, methodName, { }).
-
-	+ to call-method named methodName (string) with-arguments argList (list):
-		% Calls the method named methodName for this object.  Returns the result of
-		% the method call.
-		% <p>
-		% The arguments to the object are passed in using the list argList.  Since
-		% keywords are not passed in, this method relies on the order the arguments
-		% appear in the argument list and passes them to methodName in the order 
-		% in which they appear in methodName's definition.
-		% <p>
-		% Why not call a method 
-		% directly?  This method is used in circumstances where you might
-		% want to have some sort of callback method.  As an example, let's 
-		% say you write a general purpose class which can sort objects based 
-		% on different criteria.  How would the user specify these arbitrary
-		% criteria?  Using this method would allow the user to pass in the
-		% name of the method they want to use, and the sorting object could
-		% use this method to execute the callback.
-		% <p>
-		% If the concept of a callback doesn't make sense, then you can
-		% probably ignore this method.
-
-		return callMethodNamed(self, methodName, argList).
 
 	- to iterate:
 }

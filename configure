@@ -1387,7 +1387,7 @@ cat >>confdefs.h <<\_ACEOF
 #define LINUX
 _ACEOF
 
-		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E"
+		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E -Xlinker -Bstatic"
 
 		;;
 

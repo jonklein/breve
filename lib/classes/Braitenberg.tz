@@ -8,11 +8,10 @@
 
 PhysicalControl : BraitenbergControl {
 	% This class is used for building simple Braitenberg vehicle 
-	% simulations.  Subclass BraitenbergControl and use the init
-	% method to create OBJECT(BraitenbergLight) and 
+	% simulations.  To create a Braitenberg vehicle simulation, 
+	% subclass BraitenbergControl and use the init method to 
+	% create OBJECT(BraitenbergLight) and 
 	% OBJECT(BraitenbergVehicle) objects.
-	% <p>
-	% <b>NOTE: this class is included as part of the file "Braitenberg.tz".</b>
 
 	+ variables:
 		floor (object).
@@ -42,9 +41,7 @@ PhysicalControl : BraitenbergControl {
 
 MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
 	% This object is used in conjunction with OBJECT(BraitenbergControl) to
-	% create a simple Braitenberg vehicle.
-	% <p>
-	% <b>NOTE: this class is included as part of the file "Braitenberg.tz".</b>
+	% create simple Braitenberg vehicles.
 
 	+ variables:
 		bodyShape (object).
@@ -74,6 +71,8 @@ MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
 
 		self move to (0, 1.0, 0).
 		self set-texture-scale to 1.5.
+
+	+ section "Adding Wheels and Sensors to a Vehicle"
 
 	+ to add-wheel at location (vector):
 		% Adds a wheel at location on the vehicle.  This method returns
@@ -150,9 +149,7 @@ Mobile : BraitenbergLight (aka BraitenbergLights) {
 	% objects on the BraitenbergVehicle detect.
 	% <p>
 	% There are no special behaviors associated with the lights--they're 
-	% basically just plain Mobile objects.
-	% <p>
-	% <b>NOTE: this class is included as part of the file "Braitenberg.tz".</b>
+	% basically just plain OBJECT(Mobile) objects.
 
 	+ to init:
 		self set-shape to (new Shape init-with-sphere radius .3).
@@ -181,6 +178,8 @@ Link : BraitenbergWheel (aka BraitenbergWheels) {
 
 		joint = j.
 
+	+ section "Configuring the Wheel's Natural Velocity"
+
 	+ to set-natural-velocity to n (float):
 		% Sets the "natural" velocity of this wheel.  The natural velocity
 		% is the speed at which the wheel turns in the absence of sensor
@@ -193,7 +192,7 @@ Link : BraitenbergWheel (aka BraitenbergWheels) {
 
 		newVelocity += n.
 
-	+ to post-iterate:
+	- to post-iterate:
 		if newVelocity > BRAITENBERG_MAX_VELOCITY: newVelocity = BRAITENBERG_MAX_VELOCITY.
 
 		# this oldVelocity stuff is used to limit the deceleration so that 

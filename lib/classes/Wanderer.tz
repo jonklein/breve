@@ -1,6 +1,6 @@
 @include "Mobile.tz"
 
-Mobile : Wanderer [version 1.8] {
+Mobile : Wanderer [version 2.0] {
     % This class is a work-in-progress.  A Wanderer is simply a real object 
     % that wanders randomly around a certain space.  The range of wandering
     % is adjusted with the METHOD(set-wander-range) method.
@@ -19,16 +19,6 @@ Mobile : Wanderer [version 1.8] {
         self set-wander-range to (15, 15, 15).
         topVelocity = 80.
 
-    + to set-wander-range to wanderVector (vector):
-        % Sets the range from the origin that the object can wander.  The 
-        % distance the object will wander from the center is the length of 
-        % wanderVector.  The direction of the wandering is proportional to 
-        % the normalized vector--that is to say that if wanderVector is 
-        % (100, 100, 0) that motion will be restricted to the X/Y plane.
-
-        wanderMag = | wanderVector |.
-        wanderVec = wanderVector / wanderMag.
-
     + to iterate: 
         if |(self get-location)| > wanderMag: {
             self set-acceleration to 8 * -topVelocity * (self get-location)/|(self get-location)|.
@@ -40,6 +30,16 @@ Mobile : Wanderer [version 1.8] {
         if | (self get-velocity) | > topVelocity: {
             self set-velocity to topVelocity * (self get-velocity) / |(self get-velocity)|.
         }
+
+    + to set-wander-range to wanderVector (vector):
+        % Sets the range from the origin that the object can wander.  The 
+        % distance the object will wander from the center is the length of 
+        % wanderVector.  The direction of the wandering is proportional to 
+        % the normalized vector--that is to say that if wanderVector is 
+        % (100, 100, 0) that motion will be restricted to the X/Y plane.
+
+        wanderMag = | wanderVector |.
+        wanderVec = wanderVector / wanderMag.
 
     + to set-top-velocity to newValue (float):
         % Sets the top velocity of the wanderer to newValue.

@@ -1,6 +1,6 @@
 @use Abstract.
 
-Abstract : Image {
+Abstract : Image (aka Images) [version 2.0] {
 	% The Image class provides an interface to work with images and 
 	% textures.  The individual pixels of the image can be read 
 	% or changed by the simulation as desired.
@@ -17,7 +17,16 @@ Abstract : Image {
 		textureNumber (int).
 		modified (int).
 
-	+ section "Loading and Creating Images"
+	+ to init:
+		textureNumber = -1.
+
+	+ to iterate:
+		if modified: {
+			imageUpdateTexture(imageData).
+			modified = 0.
+		}
+
+  + section "Loading and creating Images"
 		
 	+ to load from imageFile (string):
 		% Loads an image from the file imageFile.
@@ -30,15 +39,6 @@ Abstract : Image {
 		if textureNumber != -1: modified = 1.
 
 		return self.
-
-	+ to write to imageFile (string):
-		% Write the image to imageFile.  The image is written as a 
-		% PNG file, so imageFile should end with .PNG.
-
-		imageWriteToFile(imageData, imageFile).
-
-	+ to init:
-		textureNumber = -1.
 
 	+ to init-with width imageWidth (int) height imageHeight (int):
 		% Creates an empty image buffer with width imageWidth
@@ -54,7 +54,7 @@ Abstract : Image {
 	- to get-image-data:
 		return imageData.
 
-	+ section "Getting information about the size and format of an image"
+  + section "Getting information about the size and format of an image"
 
 	+ to get-width:
 		% Returns the width of the image.  
@@ -67,7 +67,7 @@ Abstract : Image {
 
 		return imageGetHeight(imageData).
 
-	+ section "Getting the value of pixels"
+  + section "Getting the value of pixels"
 
 	+ to get-red-pixel at-x x (int) at-y y (int):
 		% Returns the red pixel at the image coordinates (x, y).
@@ -105,7 +105,7 @@ Abstract : Image {
 
 		return (r, g, b).
 
-	+ section "Setting the value of pixels"
+  + section "Setting the value of pixels"
 
 	+ to set-red-pixel to redPixel (float) at-x x (int) at-y y (int):
 		% Sets the red pixel value at coordinates (x, y) to redPixel.
@@ -143,28 +143,23 @@ Abstract : Image {
 		self set-green-pixel to pixelVector::y at-x x at-y y.
 		self set-blue-pixel to pixelVector::z at-x x at-y y.
 
-	+ to iterate:
-		if modified: {
-			imageUpdateTexture(imageData).
-			modified = 0.
-		}
-
-	+ section "Reading Pixels from the Screen"
+  + section "Reading Pixels from the Screen"
 
 	+ to read-pixels at-x x (int) at-y y (int):
 		% Reads pixels into this Image from the rendered image on the 
 		% screen.  The resulting image can be written to a file or 
-		% analyzed if desired.
+		% analyzed if desired.  This is only supported in graphical
+		% versions of breve.
 
 		imageReadPixels(imageData, x, y).
 
-	+ section "Getting a Pointer to Pixel Data"
+  + section "Getting a Pointer to Pixel Data"
 
 	+ to get-pixel-pointer:
 		% Returns a pointer to the pixels this image is holding in RGBA
 		% format.  The size of the buffer is 4 * height * width.  This 
 		% data is provided for plugin developers who wish to read or 
-		% write pixel data directly.  The buffer should be used with caution.
+		% write pixel data directly.  
 
 		return imageGetPixelPointer(imageData).
 
@@ -174,4 +169,13 @@ Abstract : Image {
 		if textureNumber == -1: textureNumber = imageUpdateTexture(imageData).
 
 		return textureNumber.
+
+  + section "Writing an image to a file"
+
+	+ to write to imageFile (string):
+		% Write the image to imageFile.  The image is written as a 
+		% PNG file, so imageFile should end with .PNG.
+
+		imageWriteToFile(imageData, imageFile).
+
 }

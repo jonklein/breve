@@ -21,6 +21,7 @@
 
 int level = 0;
 int noprint = 0;
+char *filename;
 %}
 
 WORD	[_a-zA-Z][_a-zA-Z0-9]*
@@ -40,7 +41,7 @@ WHITE	[\t\ \n]*
 
 %%
 
-{WORD}{WHITE}:{WHITE}{WORD}{WHITE}[^%#]*/\{	{ printf("# %s\n", yytext); BEGIN(OBJECT); level = 0; }
+{WORD}{WHITE}:{WHITE}{WORD}{WHITE}[^%#]*/\{	{ printf("# %s [%s]\n", yytext, filename); BEGIN(OBJECT); level = 0; noprint = 0; }
 
 <OBJECT>\{				{ level++; }
 
@@ -67,6 +68,7 @@ int main(int argc, char **argv) {
 
     for(n=1;n<argc;n++) {
         if((yyin = fopen(argv[n], "r"))) {
+			filename = argv[n];
             while(yylex());
         } else {
             fprintf(stderr, "cannot open %s, skipping...\n", argv[n]);

@@ -1,9 +1,10 @@
 @include "Abstract.tz"
 
-Abstract : Data (aka Datum) [version 1.8] {
-	% <b>This class is now considered obsolete and should no longer be used</b>.
+Abstract : Data (aka Datum) [version 2.0] {
+	% <b>The use of this class is depreciated and will be removed in a future release.</b>.
 	% See the section 
-	% <a href="http://www.spiderland.org/breve/docs/docs/archiving.html">Archiving and Dearchiving</a> of the breve documentation for more details.
+	% <a href="http://www.spiderland.org/breve/docs/docs/archiving.html">Archiving and Dearchiving</a> of 
+	% the breve documentation for more details.
 	% <p>
 	% The now obsolete class description follows.
 	% <p>
@@ -20,6 +21,14 @@ Abstract : Data (aka Datum) [version 1.8] {
     + to init:
         if dataCheckVariables() != 0:
             die "subclasses of class Data may not variables of type object or pointer.".
+
+    - to save-to file theFile (string):
+        % Depreciated.
+        return dataWriteObject(theFile).
+
+    - to load-from file theFile (string):
+        % Depreciated.
+        return dataReadObject(theFile).
 
     + to save-with-dialog:
         % Presents the user with a save dialog box in order to get a 
@@ -47,27 +56,6 @@ Abstract : Data (aka Datum) [version 1.8] {
         % instances must be of the same type.
 
         dataCopyObject(otherInstance).
-
-    + to save-to file theFile (string):
-        % This method is obsolete.  See METHOD(save-as-xml) instead.
-
-        return dataWriteObject(theFile).
-
-    + to load-from file theFile (string):
-		% This method is obsolete.  You should use METHOD(save-as-xml) and METHOD(load-from-xml)
-		% for saving and loading objects from now on.  This method is still supported for loading
-		% in instances saved in older versions of breve.
-		% <p>
-        % Loads the current instance from theFile.  The file is saved in the current "default" 
-        % directory which <b>may or may not be explicitly defined</b>, depending on which 
-        % <b>breve</b> implementation is being used.  For implementations in which the 
-        % user is not able to define a default directory, the default should be a "reasonable"
-        % location such as UNIX home directory or Mac OS X "Documents" directory.
-        % <p>
-        % Unless you are absolutely sure of which implementation and configuration will 
-        % be used when your simulation is run, you should use save-with-dialog instead.
-
-        return dataReadObject(theFile).
 
     + to send to theHost (string) on-port thePort (int):
 		% Used in conjunction with OBJECT(NetworkServer) to send the contents of this object
