@@ -867,12 +867,38 @@ int slRayHitsShape(slShape *s, slVector *dir, slVector *target, slVector *point)
 }
 
 int slSphere::rayHitsShape(slVector *dir, slVector *target, slVector *point) {
-        double d = slVectorLength(target);
-        double test = d*d - _radius*_radius;
-        if (test <= 0)
-           return -1;
-	slVectorMul(dir, sqrt(test), point);
-	return 0;
+   slVector current;
+   slVectorMul(dir, -1, &current);
+   slVectorSet(point, 0.0,0.0,0.0);   
+   
+   double v1 = current.x;
+   double v2 = current.y;
+   double v3 = current.z;
+   double u1 = target->x;
+   double u2 = target->y;
+   double u3 = target->z;
+
+   double a = v1*v1   + v2*v2   + v3*v3;
+   double b = 2*v1*u1 + 2*v2*u2 + 2*v3*u3;
+   double c = u1*u1   + u2*u2   + u3*u3   - _radius*_radius;
+
+   double test = b*b - 4*a*c;
+   if ((test < 0) || (a == 0))
+      return -1;
+
+   double x1 = (-b + sqrt(test))/(2*a);
+   double x2 = (-b - sqrt(test))/(2*a);
+
+   if ((x1 < 0) && (x2 < 0))
+      return -1;
+
+   //slMessage(DEBUG_ALL, " [ %f, %f ]", x1, x2);
+   double erg = x1 < x2 ? x1:x2;
+
+   slVectorNormalize(&current);
+   slVectorMul(&current, erg, point);
+
+   return 0;
 }
 
 int slShape::rayHitsShape(slVector *dir, slVector *target, slVector *point) {
