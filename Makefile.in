@@ -23,7 +23,6 @@ CLI_FOLDER	= breve_@VERSION@
 all: bin/breve@EXE_SUFFIX@ bin/breve_cli@EXE_SUFFIX@ bin/graphTest@EXE_SUFFIX@ \
 	lib/classes/MethodFinder.jar
 
-include util/Makefile
 include simulation/Makefile
 include kernel/Makefile
 include graph/Makefile
@@ -31,6 +30,7 @@ include neural/Makefile
 include steve/Makefile
 include java/Makefile
 include docBuild/Makefile
+include util/Makefile
 include .depend
 
 DEPS	:= $(SRC) bin/breve.cc bin/breve_cli.cc graph/graphTest.cc

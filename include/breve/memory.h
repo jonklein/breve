@@ -20,27 +20,15 @@
 
 #ifndef _MEMORY_H
 #define _MEMORY_H
-#include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void *slMalloc(int);
 void *slRealloc(void *, int);
 void slFree(void *);
+#ifdef __cplusplus
+}
+#endif
 
-char *slDequeueMessage(void);
-int slCheckMessageQueue(void);
-
-void slFatal(char *, ...);
-void utilPause(void);
-
-void slMemoryReport(void);
-int slMemoryAllocated(void);
-
-void slDebugMatrix(int, double [3][3]);
-
-slHash *slInitUtilMallocHash(void);
-
-void slPrintIfString(char *, int, int);
-
-unsigned int slUtilPointerCompare(void *, void *);
-unsigned int slUtilPointerHash(void *, unsigned int);
 #endif
