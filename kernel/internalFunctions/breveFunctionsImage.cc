@@ -22,7 +22,19 @@
 /*@{*/
 
 #include "kernel.h"
-#include "breveFunctionsImage.h"
+
+typedef struct brImageData brImageData;
+
+/*!
+    \brief Holds image data used by the breve image class.
+*/
+
+struct brImageData {
+	unsigned char *data;
+	int x;
+	int y;
+	int textureNumber;
+};
 
 #define BRIMAGEDATAPOINTER(p)	((brImageData*)BRPOINTER(p))
 

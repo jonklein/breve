@@ -35,20 +35,15 @@
 //104
 		1058C7A6FEA54F5311CA2CBB = {
 			children = (
+				4862155C07944AB9009195E5,
+				48620C9107944552009195E5,
 				F5BD20F30397BFE301980AE4,
-				48619FBE071475F100E0A1B6,
 				F5BD21540397C2DA01980AE4,
 				F5BD20F20397BFE301980AE4,
 				F5BD20F40397BFE301980AE4,
 				1058C7A7FEA54F5311CA2CBB,
 				48807AA104DF1DB800A8D232,
 				48807AB004DF1E2C00A8D232,
-				F5BD213F0397C03F01980AE4,
-				F5BD21400397C03F01980AE4,
-				481A471A067E190B0096AF6E,
-				F5BD21410397C03F01980AE4,
-				F5BD21420397C03F01980AE4,
-				48D1C0F904634A600093F8AA,
 			);
 			isa = PBXGroup;
 			name = "Linked Frameworks";
@@ -111,7 +106,6 @@
 		};
 		2A37F4AAFDCFA73011CA2CEA = {
 			children = (
-				48924DB2073719C300C7050E,
 				48ECC16B071C13D200596F93,
 				2A37F4ABFDCFA73011CA2CEA,
 				2A37F4B8FDCFA73011CA2CEA,
@@ -316,7 +310,7 @@
 				HEADER_SEARCH_PATHS = "../include/breve /usr/local/include /sw/include";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = /Applications;
-				LIBRARY_SEARCH_PATHS = "../lib /usr/local/lib /Users/jk/dev/breve/lib";
+				LIBRARY_SEARCH_PATHS = "../lib /usr/local/lib /Users/jk/dev/breve/lib /Users/jk/dev/breve_new/lib /usr/lib/gcc/darwin/3.3";
 				MACOSX_DEPLOYMENT_TARGET = 10.1;
 				OTHER_CFLAGS = "$(CPPFLAGS)";
 				OTHER_LDFLAGS = "$(LIBS) /usr/local/lib/libdl.a";
@@ -790,16 +784,10 @@
 				480F317A07146D7A00E71420,
 				480F317B07146D8000E71420,
 				480F317D07146D8200E71420,
-				480F317E07146D8300E71420,
-				480F317F07146D8300E71420,
-				480F318007146D8400E71420,
-				480F318107146D8400E71420,
-				480F318207146D8500E71420,
-				480F318307146D8600E71420,
 				48619FB8071475A500E0A1B6,
 				48619FB9071475A500E0A1B6,
-				48619FBF071475F100E0A1B6,
-				48924DB3073719C300C7050E,
+				48620C9207944552009195E5,
+				4862155D07944AB9009195E5,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -834,44 +822,8 @@
 			settings = {
 			};
 		};
-		480F317E07146D8300E71420 = {
-			fileRef = 48D1C0F904634A600093F8AA;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		480F317F07146D8300E71420 = {
-			fileRef = 481A471A067E190B0096AF6E;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		480F318007146D8400E71420 = {
-			fileRef = F5BD213F0397C03F01980AE4;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		480F318107146D8400E71420 = {
-			fileRef = F5BD21400397C03F01980AE4;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		480F318207146D8500E71420 = {
-			fileRef = F5BD21410397C03F01980AE4;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		480F318307146D8600E71420 = {
-			fileRef = F5BD21420397C03F01980AE4;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		480F31A9071472AD00E71420 = {
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			files = (
 			);
 			inputPaths = (
@@ -881,7 +833,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# This is a shell script that attempts to complete the entire\n# breve build process for Mac OS X, including the configure\n# step, the building of the breve libraries, and the building \n# of the final breve.app with the proper external libraries.\n\n### first do the configure, if neccessary\n\nif [ ! -f \"ConfigureLibraryList\" ]; then\n\techo \"ConfigureLibraryList not found!  Running configure...\"\n\t(cd ..; ./configure)\nfi\n\n### now build the breve engine libraries\n\n(cd ..; make optimize)\n\n### use the libraries provided by \"configure\" to build the \n### OS X application using xcodebuild\n\nexport LIBS=`cat ConfigureLibraryList`\n\nxcodebuild -activebuildstyle -target real_breve.app";
+			shellScript = "# This is a shell script that attempts to complete the entire\n# breve build process for Mac OS X, including the configure\n# step, the building of the breve libraries, and the building \n# of the final breve.app with the proper external libraries.\n\n### first do the configure, if neccessary\n\nif [ ! -f \"ConfigureLibraryList\" ]; then\n\techo \"ConfigureLibraryList not found!  Running configure...\"\n\t(cd ..; ./configure)\nfi\n\n### now build the breve engine libraries\n\n(cd ..; make lib/libbreve.a)\n\n### use the libraries provided by \"configure\" to build the \n### OS X application using xcodebuild\n\nexport LIBS=`cat ConfigureLibraryList`\n\nxcodebuild -activebuildstyle -target real_breve.app";
 		};
 		480F31AA071472AD00E71420 = {
 			buildPhases = (
@@ -900,14 +852,6 @@
 			isa = PBXAggregateTarget;
 			name = breve.app;
 			productName = fake;
-		};
-		481A471A067E190B0096AF6E = {
-			isa = PBXFileReference;
-			lastKnownFileType = archive.ar;
-			name = libbrkernel.a;
-			path = ../lib/libbrkernel.a;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
 		};
 		481D2181042A2D2100FFA442 = {
 			children = (
@@ -964,16 +908,30 @@
 			settings = {
 			};
 		};
-		48619FBE071475F100E0A1B6 = {
+		48620C9107944552009195E5 = {
 			isa = PBXFileReference;
 			lastKnownFileType = archive.ar;
-			name = "libstdc++.a";
-			path = "/usr/lib/gcc/darwin/3.3/libstdc++.a";
+			name = libbreve.a;
+			path = /Users/jk/dev/breve_new/lib/libbreve.a;
 			refType = 0;
 			sourceTree = "<absolute>";
 		};
-		48619FBF071475F100E0A1B6 = {
-			fileRef = 48619FBE071475F100E0A1B6;
+		48620C9207944552009195E5 = {
+			fileRef = 48620C9107944552009195E5;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4862155C07944AB9009195E5 = {
+			isa = PBXFileReference;
+			lastKnownFileType = archive.ar;
+			name = "libstdc++.a";
+			path = "/usr/lib/libstdc++.a";
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		4862155D07944AB9009195E5 = {
+			fileRef = 4862155C07944AB9009195E5;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -993,20 +951,6 @@
 			path = /System/Library/Frameworks/AudioToolbox.framework;
 			refType = 0;
 			sourceTree = "<absolute>";
-		};
-		48924DB2073719C300C7050E = {
-			isa = PBXFileReference;
-			lastKnownFileType = archive.ar;
-			name = libbrjava.a;
-			path = /Users/jk/dev/breve/lib/libbrjava.a;
-			refType = 0;
-			sourceTree = "<absolute>";
-		};
-		48924DB3073719C300C7050E = {
-			fileRef = 48924DB2073719C300C7050E;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		48D1C0BC04632D760093F8AA = {
 			fileEncoding = 4;
@@ -1040,14 +984,6 @@
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
-		48D1C0F904634A600093F8AA = {
-			isa = PBXFileReference;
-			lastKnownFileType = archive.ar;
-			name = libbrgraph.a;
-			path = ../lib/libbrgraph.a;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
 		48ECC160071C137300596F93 = {
 			buildActionMask = 2147483647;
 			dstPath = plugins;
@@ -1074,7 +1010,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = "compiled.mach-o.bundle";
 			name = DigitizerPlugin.o;
-			path = /Users/jk/dev/breve/plugins/slDigitizerPlugin/DigitizerPlugin.o;
+			path = /Users/jk/dev/breve_new/plugins/slDigitizerPlugin/DigitizerPlugin.o;
 			refType = 0;
 			sourceTree = "<absolute>";
 		};
@@ -1115,9 +1051,9 @@
 			isa = PBXFileReference;
 			lastKnownFileType = "compiled.mach-o.bundle";
 			name = QTInstrumentPlugin.o;
-			path = /Users/jk/dev/breve/plugins/slQTMusicPlugin/QTInstrumentPlugin.o;
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../plugins/slQTMusicPlugin/QTInstrumentPlugin.o;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		48ECC170071C13F400596F93 = {
 			fileRef = 48ECC16E071C13F400596F93;
@@ -1472,38 +1408,6 @@
 			path = /System/Library/Frameworks/QuickTime.framework;
 			refType = 0;
 			sourceTree = "<absolute>";
-		};
-		F5BD213F0397C03F01980AE4 = {
-			isa = PBXFileReference;
-			lastKnownFileType = archive.ar;
-			name = libbrneural.a;
-			path = ../lib/libbrneural.a;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		F5BD21400397C03F01980AE4 = {
-			isa = PBXFileReference;
-			lastKnownFileType = archive.ar;
-			name = libbrsimulation.a;
-			path = ../lib/libbrsimulation.a;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		F5BD21410397C03F01980AE4 = {
-			isa = PBXFileReference;
-			lastKnownFileType = archive.ar;
-			name = libbrsteve.a;
-			path = ../lib/libbrsteve.a;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		F5BD21420397C03F01980AE4 = {
-			isa = PBXFileReference;
-			lastKnownFileType = archive.ar;
-			name = libbrutil.a;
-			path = ../lib/libbrutil.a;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
 		};
 		F5BD21540397C2DA01980AE4 = {
 			isa = PBXFileReference;

@@ -19,21 +19,14 @@
  *****************************************************************************/
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
-#include <sys/types.h>
-#include <unistd.h>
 
-#include "util.h"
+#include "memory.h"
 
-#include <map>
-
-/* 
-    memory.c defines a set of malloc wrappers -- mostly obsolete
+/*!
+    memory.c defines a set of malloc wrappers -- mostly obsolete except for the 
+	bzero after mallocing...
 */
 
-#ifndef MEMORY_DEBUG
 void *slMalloc(int n) {
 	void *m = malloc(n);
 	bzero(m, n);
@@ -48,4 +41,3 @@ void slFree(void *p) {
 	free(p);
 	return;
 }
-#endif

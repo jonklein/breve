@@ -107,14 +107,6 @@ int main(int argc, char **argv) {
 
 	gOptionArchiveFile = NULL;
 
-#ifdef MEMORY_DEBUG
-	slMessage(DEBUG_ALL, "### Running with breve slMalloc debugging enabled.\n\n");
-#ifdef MACOSX
-	slMessage(DEBUG_ALL, "### Set the environment variable MallocStackLogging\n");
-	slMessage(DEBUG_ALL, "### to see stack traces of unfreed pointers on exit.\n\n");
-#endif /* MACOSX */
-#endif /* MEMORY_DEBUG */
-
 	/* parse the command line args. */
 
 	index = brParseArgs(argc, argv);
@@ -307,11 +299,6 @@ void brQuit(brEngine *e) {
 	brEngineFree(frontend->engine);
 	breveFrontendCleanupData(frontend->data);
 	breveFrontendDestroy(frontend);
-
-#ifdef MEMORY_DEBUG
-	slMemoryReport();
-	if(slUtilMemoryUnfreed()) slUtilPause();
-#endif
 
 	exit(0);
 }

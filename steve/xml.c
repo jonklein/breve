@@ -20,6 +20,8 @@
 
 #include "steve.h"
 
+#include "xml.h"
+
 enum states {
 	XP_ENGINE = 1,
 	XP_INSTANCE_ARCHIVE,

@@ -26,10 +26,10 @@ char *gPhysicsErrorMessage;
 
 void *operator new (size_t size) {
 	void *p = slMalloc(size); 
-
-	if (p == NULL) throw std::bad_alloc(); 
-
-	return p;
+ 
+ 	if (p == NULL) throw std::bad_alloc(); 
+ 
+ 	return p;
 }
 
 void operator delete (void *p) {
