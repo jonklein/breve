@@ -1376,8 +1376,8 @@ cat >>confdefs.h <<\_ACEOF
 #define MACOSX
 _ACEOF
 
-		ARCHIVER="tar zcvf"
-		ARCHIVER_SUFFIX="tar.gz"
+		ARCHIVER="tar -zcvf"
+		ARCHIVE_SUFFIX="tar.gz"
 
 		;;
 
@@ -1391,8 +1391,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E"
-		ARCHIVER="tar zcvf"
-		ARCHIVER_SUFFIX="tar.gz"
+		ARCHIVER="tar -zcvf"
+		ARCHIVE_SUFFIX="tar.gz"
 
 		;;
 
@@ -1414,7 +1414,7 @@ _ACEOF
 		AUDIOLIBS="-lwinmm"
 		PTHREADLIBS="-lwsock32"
 		ARCHIVER="zip -r"
-		ARCHIVER_SUFFIX="zip"
+		ARCHIVE_SUFFIX="zip"
 
 		;;
 
@@ -1433,7 +1433,7 @@ _ACEOF
 
 		AUDIOLIBS="-lwinmm"
 		ARCHIVER="zip -r"
-		ARCHIVER_SUFFIX="zip"
+		ARCHIVE_SUFFIX="zip"
 
 		;;
 

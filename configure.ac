@@ -18,8 +18,8 @@ case "${host_os}" in
 		PLUGINFLAGS="-bundle -undefined suppress -flat_namespace"
 		QUICKTIMEFLAGS="-framework QuickTime -framework Carbon"
 		AC_DEFINE([MACOSX], [], [Mac OS X])
-		ARCHIVER="tar zcvf"
-		ARCHIVER_SUFFIX="tar.gz"
+		ARCHIVER="tar -zcvf"
+		ARCHIVE_SUFFIX="tar.gz"
 
 		;;
 
@@ -30,8 +30,8 @@ case "${host_os}" in
 		PLUGINFLAGS="-shared"
 		AC_DEFINE([LINUX], [], [Linux])
 		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E"
-		ARCHIVER="tar zcvf"
-		ARCHIVER_SUFFIX="tar.gz"
+		ARCHIVER="tar -zcvf"
+		ARCHIVE_SUFFIX="tar.gz"
 
 		;;
 
@@ -46,7 +46,7 @@ case "${host_os}" in
 		AUDIOLIBS="-lwinmm"
 		PTHREADLIBS="-lwsock32"
 		ARCHIVER="zip -r"
-		ARCHIVER_SUFFIX="zip"
+		ARCHIVE_SUFFIX="zip"
 
 		;;
 
@@ -58,7 +58,7 @@ case "${host_os}" in
 		AC_DEFINE([WINDOWS], [], [Windows])
 		AUDIOLIBS="-lwinmm"
 		ARCHIVER="zip -r"
-		ARCHIVER_SUFFIX="zip"
+		ARCHIVE_SUFFIX="zip"
 
 		;;
 
