@@ -201,7 +201,7 @@ void slSortBillboards(slCamera *);
 
 int slBillboardSortFunc(const void *, const void *);
 
-void slRotateCameraWithMouseMovement(slCamera *, double, double, double);
+void slRotateCameraWithMouseMovement(slCamera *, double, double);
 void slMoveCameraWithMouseMovement(slCamera *, double, double);
 void slZoomCameraWithMouseMovement(slCamera *, double, double);
 

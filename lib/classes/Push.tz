@@ -33,9 +33,13 @@ Object : PushInterpreter (aka PushInterpreters) {
 
   + section "Configuring and setting up a Push interpreter"
 
-	+ to add-instruction named instructionName (string) for-instance targetInstance (object) for-method methodName (string):
+	+ to add-instruction named instructionName = "" (string) for-instance targetInstance (object) for-method methodName (string):
 		% Adds a custom callback instruction named instructionName to the push interpreter.  
 		% When instructionName is called, it will trigger the method methodName in targetInstance.
+
+		if instructionName == "": instructionName = methodName.
+
+		print "adding $instructionName".
 
 		pushCallbackNew(pushInterpreterPointer, instructionName, methodName, targetInstance).
 
@@ -83,13 +87,20 @@ Object : PushInterpreter (aka PushInterpreters) {
 
   + section "Running a Push program"
 	+ to run program codeObject (object) for-steps steps = -1 (int):
-		% Runs the specified push code.  If the steps variable is provided, 
-		% evaluation will only run for the specified number of instructions.
-		% Otherwise, evaluation will run for the evaluation limit, which is 
+		% Runs the specified push code from the beginning of the program.  If 
+		% the steps variable is provided, evaluation will only run for the 
+		% specified number of instructions.  Otherwise, evaluation will run for 
+		% the evaluation limit, which is 
 		% set with METHOD(set-evaluation-limit).
 		% <P>
 		% The method returns 0 if the interpreter completely executes the 
 		% program, or 1 if execution stopped due to the evaluation limit.
+		% <P>
+		% If the program is not executed completely, execution may be stepped 
+		% forward using the method METHOD(step).  In some cases, it may be 
+		% desirable to step push programs forward in small increments by calling
+		% this method with steps = 0 in order to load the program, then using 
+		% METHOD(step) to step the simulatation forward.
 
 		if steps == -1: steps = evaluationLimit.
 

@@ -25,7 +25,7 @@
 extern char *slObjectParseText;
 extern int slObjectParseLine;
 
-void slObjectParseSetBuffer(char *b, int n);
+void slObjectParseSetBuffer(char *b);
 
 char *slStripSpaces(char *text);
 
@@ -636,7 +636,7 @@ int slYylex();
 
     text = (void*)[[self string] cString];
 
-    slObjectParseSetBuffer(text, strlen(text));
+    slObjectParseSetBuffer(text);
 
     while(type = slYylex()) {
         if(type != 1) {

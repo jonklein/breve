@@ -76,6 +76,8 @@ void brqtMainWindow::init() {
 	MenuBar->reparent(0, 0, p, true);
 #endif
 
+	currentEngine = NULL;
+
 	demoMenuForDirectory(this, Demos, directory, 0);
 }
 
@@ -188,6 +190,11 @@ void brqtMainWindow::helpAbout()
 void brqtMainWindow::toggleSimulation()
 {
     brqtEditorWindow *w = gW;
+
+	if(currentEngine) {
+		currentEngine->pause();
+		return;
+	}
     
     frontend = breveFrontendInit(0, NULL);
     frontend->data = breveFrontendInitData(frontend->engine);
@@ -239,7 +246,6 @@ void brqtMainWindow::closeDocument( QWidget *document )
 
 void brqtMainWindow::changeDocumentName()
 {
-    printf("reconstructing menu...\n");
     buildDocumentMenu();
 }
 

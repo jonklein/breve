@@ -304,7 +304,6 @@
 	static NSPoint d;
 	int mode;
 	BOOL firstTime = YES;
-	double startCamX, startCamY;
 
 	if(!viewEngine) return;
 
@@ -312,8 +311,6 @@
 	else {
 		lastp = [theEvent locationInWindow];
 	}
-
-	slCameraGetRotation(camera, &startCamX, &startCamY);
 
 	mode = [motionSelector selectedColumn];
 
@@ -333,7 +330,7 @@
 		switch(mode) {
 			case 0: /* rotation */
 				drawCrosshair = 1;
-				slRotateCameraWithMouseMovement(camera, d.x, d.y, startCamX);
+				slRotateCameraWithMouseMovement(camera, d.x, d.y);
 				break;
 
 			case 1: /* zoom */

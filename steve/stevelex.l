@@ -53,6 +53,8 @@ FILE *docHandle = NULL;
 DIGIT	[0-9]
 WORDBREAK	[^0-9a-zA-Z\-_]
 
+WHITESPACE	[\ \t]+
+
 %%
 
 #.*						{ /* comment */ };
@@ -66,6 +68,8 @@ Controller/{WORDBREAK}	{ return CONTROLLER; }
 aka/{WORDBREAK}			{ return AKA; }
 version/{WORDBREAK}		{ return VERSION; }
 define/{WORDBREAK}		{ return DEFINE; }
+
+with{WHITESPACE}interface { return WITH_INTERFACE; }
 
 @@DEBUG@@				{ return DEBUG; }
 

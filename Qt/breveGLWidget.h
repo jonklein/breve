@@ -26,17 +26,16 @@ public:
 		if(_engine) {
 			slInitGL(_engine->world, _engine->camera);
 
-			_drawTimer = startTimer(20);
 			_engine->camera->x = width();
 			_engine->camera->y = height();
-		} else {
-			killTimer( _drawTimer);
-		}
+		} 
+
+		updateGL();
   }
 
 public slots: 
     virtual void setButtonMode(int mode) {
-    _buttonMode = mode;
+		_buttonMode = mode;
     }
   
 protected:
@@ -51,10 +50,6 @@ private:
     brEngine *_engine;    
 	int _buttonMode;
 	QPoint lastPosition;
-
-	int _drawTimer;
-
-	void timerEvent( QTimerEvent *);
 };
 
 #endif // GLFRACTAL_H

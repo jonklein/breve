@@ -39,12 +39,7 @@ void breveGLWidget::paintGL()
 
 void breveGLWidget::initializeGL()
 {
-	startTimer(10);
-}
 
-void breveGLWidget::timerEvent( QTimerEvent *e) {
-	// update();
-	if (_engine) glDraw();
 }
 
 /*--------------------------------------------------------------------------*/
@@ -60,11 +55,13 @@ void breveGLWidget::resizeGL( int w, int h )
 }
 
 void breveGLWidget::mousePressEvent ( QMouseEvent *e) {
-	lastPosition = e->pos();
-	
 	if(!_engine) return;
 	
-    	brClickAtLocation(_engine, e->x(), e->y());	
+	lastPosition = e->pos();
+	
+	brClickAtLocation(_engine, e->x(), e->y());	
+
+	updateGL();
 }
 
 void breveGLWidget::mouseMoveEvent ( QMouseEvent *e ) {
@@ -75,7 +72,22 @@ void breveGLWidget::mouseMoveEvent ( QMouseEvent *e ) {
 	lastPosition = pos;
 		
 	if(!_engine) return;
-		
-	slRotateCameraWithMouseMovement(_engine->camera, dx, dy, 0);
+
+	switch( _buttonMode) {
+		case 0:
+			slRotateCameraWithMouseMovement(_engine->camera, dx, dy);
+			break;
+		case 1:
+			slZoomCameraWithMouseMovement(_engine->camera, dx, dy);
+			break;
+		case 2:
+			slMoveCameraWithMouseMovement(_engine->camera, dx, dy);
+			break;
+		case 3:
+			brDragCallback(_engine, pos.x(), pos.y());
+			break;
+	}
+
+	updateGL();
 }
 

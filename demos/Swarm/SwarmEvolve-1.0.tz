@@ -35,7 +35,7 @@ Control : Swarm {
 		birds (list).
 		item (object).
 		breveTexture (int).
-		cloudTexture (int).
+		cloudTexture (object).
 		selection (object).
 		feeders (list).
 		iteration (int).
@@ -81,8 +81,8 @@ Control : Swarm {
 		skipFramesIfNecessaryMenu uncheck.
 
 		# Set up the background.
-		cloudTexture = (self load-image from "clouds.sgi").
-		self set-background-texture to cloudTexture.
+		cloudTexture = (new Image load from "clouds.sgi").
+		self set-background-texture-image to cloudTexture.
 
 		# Add a huge floor.
 		floor = new Stationary.

@@ -302,6 +302,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/slRegexPlugin/Makefile
 		 plugins/slURLPlugin/Makefile
 		 OSX/ConfigureLibraryList
+		Qt/breve.pro
 ])
 
 if test "$ac_cv_lib_png_png_create_write_struct" != yes; then

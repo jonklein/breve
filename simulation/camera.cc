@@ -406,11 +406,12 @@ void slMoveCameraWithMouseMovement(slCamera *camera, double dx, double dy) {
 
 	This is called by the interface when a mouse movement is made
 	with the rotate modifier key pressed, or with the rotate tool is 
-	selected.
+	sineelected.
 */
 
-void slRotateCameraWithMouseMovement(slCamera *camera, double dx, double dy, double startCamX) {
-	if(startCamX > M_PI/2.0 && startCamX < 3.0/2.0 * M_PI) dy *= -1;
+void slRotateCameraWithMouseMovement(slCamera *camera, double dx, double dy) {
+	
+	if(camera->rx > M_PI/2.0 && camera->rx < 3.0/2.0 * M_PI) dy *= -1;
 
 	camera->ry -= dx * .01;
 	camera->rx -= dy * .01;

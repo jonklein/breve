@@ -520,7 +520,7 @@ void slDemoMotion(int x, int y) {
 		} else if((gMods & GLUT_ACTIVE_CTRL) || (gSpecial == GLUT_KEY_F3)) {
 			slMoveCameraWithMouseMovement(frontend->engine->camera, x - gLastX, y - gLastY);
 		} else {
-			slRotateCameraWithMouseMovement(frontend->engine->camera, x - gLastX, y - gLastY, gStartCamX);
+			slRotateCameraWithMouseMovement(frontend->engine->camera, x - gLastX, y - gLastY);
 		}
 
 		gLastX = x; 

@@ -93,9 +93,9 @@ void slObjectParseCountNewlines(char *text) {
 	}
 }
 
-void slObjectParseSetBuffer(char *b, int n) {
+void slObjectParseSetBuffer(char *b) {
     slObjectParseBuffer = b;
-    slObjectParseLength = n;
+    slObjectParseLength = strlen(b);
     slObjectParseLocation = 0;
     slObjectParseLine = 1;
 }
