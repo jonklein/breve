@@ -515,6 +515,53 @@ int brIVectorFromLinkPerspective(brEval args[], brEval *target, brInstance *i) {
 
 	return EC_OK;
 } 
+
+/*!
+	\brief Sets the text label from a body.
+
+	void setLabel(slWorldObject pointer body, string label).
+*/
+
+int brILinkSetLabel(brEval args[], brEval *target, brInstance *i) {
+	slWorldObject *w = BRPOINTER(&args[0]);
+	slLink *m;
+
+	char *label = BRSTRING(&args[1]);
+
+	if(!w || !label) {
+		slMessage(DEBUG_ALL, "NULL pointer passed to linkSetLabel\n");
+		return EC_OK;
+	}
+
+	m = w->data;
+
+	slLinkSetLabel(m, label);
+
+	return EC_OK;
+}
+
+/*!
+	\brief Removes the text label from a body.
+
+	void removeLabel(slWorldObject pointer body).
+*/
+
+int brILinkRemoveLabel(brEval args[], brEval *target, brInstance *i) {
+	slWorldObject *w = BRPOINTER(&args[0]);
+	slLink *m;
+
+	if(!w) {
+		slMessage(DEBUG_ALL, "NULL pointer passed to linkSetLabel\n");
+		return EC_OK;
+	}
+
+	m = w->data;
+
+	slLinkSetLabel(m, NULL);
+
+	return EC_OK;
+}
+
 /*@}*/
 
 void breveInitLinkFunctions(brNamespace *n) {
@@ -546,5 +593,8 @@ void breveInitLinkFunctions(brNamespace *n) {
 	brNewBreveCall(n, "linkSetTexture", brILinkSetTexture, AT_NULL, AT_POINTER, AT_INT, 0);
 
 	brNewBreveCall(n, "vectorFromLinkPerspective", brIVectorFromLinkPerspective, AT_VECTOR, AT_POINTER, AT_VECTOR, 0);
+
+	brNewBreveCall(n, "linkSetLabel", brILinkSetLabel, AT_NULL, AT_POINTER, AT_STRING, 0);
+	brNewBreveCall(n, "linkRemoveLabel", brILinkRemoveLabel, AT_NULL, AT_POINTER, 0);
 }
 

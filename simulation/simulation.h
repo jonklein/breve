@@ -53,6 +53,7 @@
 #include "vclip.h"
 
 #include "link.h"
+#include "springs.h"
 #include "multibody.h"
 
 #include "patch.h"

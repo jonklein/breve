@@ -55,6 +55,8 @@ typedef struct slWorldObject slWorldObject;
 typedef struct slStationary slStationary;
 typedef struct slObjectLine slObjectLine;
 
+typedef struct slSpring slSpring;
+
 typedef struct slNetsimData slNetsimData;
 typedef struct slNetsimServerData slNetsimServerData;
 typedef struct slNetsimClientData slNetsimClientData;

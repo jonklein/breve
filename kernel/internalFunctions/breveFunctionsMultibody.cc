@@ -179,6 +179,38 @@ int brIMultibodyRotateRelative(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+/*!
+	\brief Turn self-collision handling on or off for a body.
+
+	void multibodyHandleSelfCollisions(slWorldObject pointer body, int state).
+*/
+
+int brIMultibodySetHandleSelfCollisions(brEval args[], brEval *target, brInstance *i) { 
+	slMultibody *m = BRPOINTER(&args[0]);
+
+	if(!m) return EC_OK;
+
+	m->handleSelfCollisions = BRINT(&args[1]);
+   
+	return EC_OK;
+}
+
+/*!
+	\brief Check for self-penetrations in a body.
+
+	int multibodyCheckSelfPenetration(slWorldObject pointer body).
+*/
+
+int brIMultibodyCheckSelfPenetration(brEval args[], brEval *target, brInstance *i) { 
+	slMultibody *m = BRPOINTER(&args[0]);
+
+	if(!m) return EC_OK;
+
+	BRINT(target) = slMultibodyCheckSelfPenetration(i->engine->world, m);
+   
+	return EC_OK;
+}
+
 /*@}*/
 
 void breveInitMultibodyFunctions(brNamespace *n) {
@@ -190,4 +222,7 @@ void breveInitMultibodyFunctions(brNamespace *n) {
 	brNewBreveCall(n, "multibodySetRoot", brISetMultibodyRoot, AT_NULL, AT_POINTER, AT_POINTER, 0);
 	brNewBreveCall(n, "multibodyAllObjects", brIMultibodyAllObjects, AT_LIST, AT_POINTER, 0);
 	brNewBreveCall(n, "multibodyFree", brIMultibodyFree, AT_NULL, AT_POINTER, 0);
+	brNewBreveCall(n, "multibodySetHandleSelfCollisions", brIMultibodySetHandleSelfCollisions, AT_NULL, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "multibodyCheckSelfPenetration", brIMultibodyCheckSelfPenetration, AT_INT, AT_POINTER, 0);
+
 }

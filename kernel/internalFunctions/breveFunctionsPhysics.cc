@@ -24,43 +24,6 @@
 /*@{*/
 
 /*!
-	\brief Turn self-collision handling on or off for a body.
-
-	void multibodyHandleSelfCollisions(slWorldObject pointer body, int state).
-*/
-
-int brIMultibodySetHandleSelfCollisions(brEval args[], brEval *target, brInstance *i) { 
-	slMultibody *m = BRPOINTER(&args[0]);
-
-	if(!m) return EC_OK;
-
-	m->handleSelfCollisions = BRINT(&args[1]);
-   
-	return EC_OK;
-}
-
-/*!
-	\brief Check for self-penetrations in a body.
-
-	int multibodyCheckSelfPenetration(slWorldObject pointer body).
-*/
-
-int brIMultibodyCheckSelfPenetration(brEval args[], brEval *target, brInstance *i) { 
-	slWorldObject *w = BRPOINTER(&args[0]);
-	slMultibody *m;
-
-	if(!w) return EC_OK;
-
-	m = w->data;
-
-	if(!m) return EC_OK;
-
-	BRINT(target) = slMultibodyCheckSelfPenetration(i->engine->world, m);
-   
-	return EC_OK;
-}
-
-/*!
 	\brief Set the acceleration of the world's gravity.
 
 	void setGravity(vector acceleration).
@@ -93,13 +56,13 @@ int brIRotationMatrix(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Applies torque to a joint.
 
-	void applyRevoluteTorque(slJoint pointer joint, vector torque).
+	void jointApplyTorque(slJoint pointer joint, vector torque).
 
 	Since the joint may be 1, 2 or 3 DOF, only some elements of 
 	the torque vector may be used.
 */
 
-int brIApplyRevoluteTorque(brEval args[], brEval *target, brInstance *i) {
+int brIJointApplyTorque(brEval args[], brEval *target, brInstance *i) {
 	slJoint *j = BRPOINTER(&args[0]);
 	slVector *tVector = &BRVECTOR(&args[1]);
 	double torque = tVector->x;
@@ -107,7 +70,7 @@ int brIApplyRevoluteTorque(brEval args[], brEval *target, brInstance *i) {
 	dVector3 axis;
 
 	if(!j) {
-		slMessage(DEBUG_ALL, "applyRevoluteTorque failed\n");
+		slMessage(DEBUG_ALL, "jointApplyTorque failed\n");
 		return EC_ERROR;
 	}
 
@@ -127,12 +90,12 @@ int brIApplyRevoluteTorque(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Create a revolute joint between two bodies.
 
-	slJoint pointer linkRevolute(slLink pointer parent, slLink pointer child
+	slJoint pointer jointLinkRevolute(slLink pointer parent, slLink pointer child
 									vector normal, vector parentLinkPoint,
 									vector childLinkPoint).
 */
 
-int brILinkRevolute(brEval args[], brEval *target, brInstance *i) {
+int brJointILinkRevolute(brEval args[], brEval *target, brInstance *i) {
 	slLink *parent = BRPOINTER(&args[0]);
 	slLink *child = BRPOINTER(&args[1]);
 	slVector *normal = &BRVECTOR(&args[2]);
@@ -141,7 +104,7 @@ int brILinkRevolute(brEval args[], brEval *target, brInstance *i) {
 	slJoint *joint;
 
 	if(!child) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to linkRevolute\n");
+		slMessage(DEBUG_ALL, "NULL pointer passed to jointLinkRevolute\n");
 		return EC_ERROR;
 	}
 
@@ -149,7 +112,7 @@ int brILinkRevolute(brEval args[], brEval *target, brInstance *i) {
 	joint->callbackData = i;
 
 	if(!joint) {
-		slMessage(DEBUG_ALL, "error creating joint: linkRevolute failed\n");
+		slMessage(DEBUG_ALL, "error creating joint: jointLinkRevolute failed\n");
 		return EC_ERROR;
 	}
 
@@ -208,14 +171,14 @@ int brIJointSetLinkPoints(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Create a revolute joint between two bodies.
 
-	slJoint pointer linkRevolute(slLink pointer parent, 
+	slJoint pointer jointLinkRevolute(slLink pointer parent, 
 									slLink pointer child
 									vector normal,
 									vector parentLinkPoint,
 									vector childLinkPoint).
 */
 
-int brILinkPrismatic(brEval args[], brEval *target, brInstance *i) {
+int brJointILinkPrismatic(brEval args[], brEval *target, brInstance *i) {
 	slLink *parent = BRPOINTER(&args[0]);
 	slLink *child = BRPOINTER(&args[1]);
 	slVector *normal = &BRVECTOR(&args[2]);
@@ -224,14 +187,14 @@ int brILinkPrismatic(brEval args[], brEval *target, brInstance *i) {
 	slJoint *joint;
 
 	if(!child) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to linkPrismatic\n");
+		slMessage(DEBUG_ALL, "NULL pointer passed to jointLinkPrismatic\n");
 		return EC_ERROR;
 	}
  
 	joint = slLinkLinks(i->engine->world, parent, child, JT_PRISMATIC, normal, ppoint, cpoint, BRMATRIX(&args[5]));
 
 	if(!joint) {
-		slMessage(DEBUG_ALL, "error creating joint: linkPrismatic failed\n");
+		slMessage(DEBUG_ALL, "error creating joint: jointLinkPrismatic failed\n");
 		return EC_ERROR;
 	}
 
@@ -246,12 +209,12 @@ int brILinkPrismatic(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Create a ball joint between two bodies.
 
-	slJoint pointer linkBall(slLink pointer parent, slLink pointer child
+	slJoint pointer jointLinkBall(slLink pointer parent, slLink pointer child
 									vector normal, vector parentLinkPoint,
 									vector childLinkPoint).
 */
 
-int brILinkBall(brEval args[], brEval *target, brInstance *i) {
+int brJointILinkBall(brEval args[], brEval *target, brInstance *i) {
 	slLink *parent = BRPOINTER(&args[0]);
 	slLink *child = BRPOINTER(&args[1]);
 	slVector *normal = &BRVECTOR(&args[2]);
@@ -260,14 +223,14 @@ int brILinkBall(brEval args[], brEval *target, brInstance *i) {
 	slJoint *joint;
 
 	if(!child) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to linkBall\n");
+		slMessage(DEBUG_ALL, "NULL pointer passed to jointLinkBall\n");
 		return EC_ERROR;
 	}
  
 	joint = slLinkLinks(i->engine->world, parent, child, JT_BALL, normal, ppoint, cpoint, BRMATRIX(&args[5]));
 
 	if(!joint) {
-		slMessage(DEBUG_ALL, "error creating joint: linkBall failed\n");
+		slMessage(DEBUG_ALL, "error creating joint: jointLinkBall failed\n");
 		return EC_ERROR;
 	}
 
@@ -282,12 +245,12 @@ int brILinkBall(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Create a universal joint between two bodies.
 
-	slJoint pointer linkUniversal(slLink pointer parent, slLink pointer child
+	slJoint pointer jointLinkUniversal(slLink pointer parent, slLink pointer child
 									vector normal, vector parentLinkPoint,
 									vector childLinkPoint).
 */
 
-int brILinkUniversal(brEval args[], brEval *target, brInstance *i) {
+int brJointILinkUniversal(brEval args[], brEval *target, brInstance *i) {
 	slLink *parent = BRPOINTER(&args[0]);
 	slLink *child = BRPOINTER(&args[1]);
 	slVector *normal = &BRVECTOR(&args[2]);
@@ -296,14 +259,14 @@ int brILinkUniversal(brEval args[], brEval *target, brInstance *i) {
 	slJoint *joint;
 
 	if(!child) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to linkUniversal\n");
+		slMessage(DEBUG_ALL, "NULL pointer passed to jointLinkUniversal\n");
 		return EC_ERROR;
 	}
  
 	joint = slLinkLinks(i->engine->world, parent, child, JT_UNIVERSAL, normal, ppoint, cpoint, BRMATRIX(&args[5]));
 
 	if(!joint) {
-		slMessage(DEBUG_ALL, "error creating joint: linkUniversal\n");
+		slMessage(DEBUG_ALL, "error creating joint: jointLinkUniversal\n");
 		return EC_ERROR;
 	}
 
@@ -318,14 +281,14 @@ int brILinkUniversal(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Create a static joint between two bodies.
 
-	slJoint pointer linkStatic(slLink pointer parent, slLink pointer child
+	slJoint pointer jointLinkStatic(slLink pointer parent, slLink pointer child
 									vector normal, vector parentLinkPoint,
 									vector childLinkPoint).
 
 	The normal vector is currently unused.
 */
 
-int brILinkStatic(brEval args[], brEval *target, brInstance *i) {
+int brJointILinkStatic(brEval args[], brEval *target, brInstance *i) {
 	slLink *parent = BRPOINTER(&args[0]);
 	slLink *child = BRPOINTER(&args[1]);
 	slVector *normal = &BRVECTOR(&args[2]);
@@ -334,14 +297,14 @@ int brILinkStatic(brEval args[], brEval *target, brInstance *i) {
 	slJoint *joint;
 
 	if(!child) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to linkStatic\n");
+		slMessage(DEBUG_ALL, "NULL pointer passed to jointLinkStatic\n");
 		return EC_ERROR;
 	}
  
 	joint = slLinkLinks(i->engine->world, parent, child, JT_FIX, normal, ppoint, cpoint, BRMATRIX(&args[5]));
 
 	if(!joint) {
-		slMessage(DEBUG_ALL, "error creating joint: linkStatic failed\n");
+		slMessage(DEBUG_ALL, "error creating joint: jointLinkStatic failed\n");
 		return EC_ERROR;
 	}
 
@@ -559,73 +522,23 @@ int brIJointSetMaxStrength(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
-/*!
-	\brief Sets the text label from a body.
-
-	void setLabel(slWorldObject pointer body, string label).
-*/
-
-int brILinkSetLabel(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *w = BRPOINTER(&args[0]);
-	slLink *m;
-
-	char *label = BRSTRING(&args[1]);
-
-	if(!w || !label) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to linkSetLabel\n");
-		return EC_OK;
-	}
-
-	m = w->data;
-
-	slLinkSetLabel(m, label);
-
-	return EC_OK;
-}
-
-/*!
-	\brief Removes the text label from a body.
-
-	void removeLabel(slWorldObject pointer body).
-*/
-
-int brILinkRemoveLabel(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *w = BRPOINTER(&args[0]);
-	slLink *m;
-
-	if(!w) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to linkSetLabel\n");
-		return EC_OK;
-	}
-
-	m = w->data;
-
-	slLinkSetLabel(m, NULL);
-
-	return EC_OK;
-}
 /*@}*/
 
 void breveInitPhysicsFunctions(brNamespace *n) {
-	brNewBreveCall(n, "multibodySetHandleSelfCollisions", brIMultibodySetHandleSelfCollisions, AT_NULL, AT_POINTER, AT_INT, 0);
-
-	brNewBreveCall(n, "multibodyCheckSelfPenetration", brIMultibodyCheckSelfPenetration, AT_INT, AT_POINTER, 0);
-
 	brNewBreveCall(n, "worldSetCollisionResolution", brIWorldSetCollisionResolution, AT_NULL, AT_INT, 0);
 	brNewBreveCall(n, "worldSetGravity", brIWorldSetGravity, AT_NULL, AT_VECTOR, 0);
 
-
 	brNewBreveCall(n, "rotationMatrix", brIRotationMatrix, AT_MATRIX, AT_VECTOR, AT_DOUBLE, 0);
 
-	brNewBreveCall(n, "applyRevoluteTorque", brIApplyRevoluteTorque, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
-
-	brNewBreveCall(n, "linkRevolute", brILinkRevolute, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
-	brNewBreveCall(n, "linkPrismatic", brILinkPrismatic, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
-	brNewBreveCall(n, "linkBall", brILinkBall, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
-	brNewBreveCall(n, "linkStatic", brILinkStatic, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
-	brNewBreveCall(n, "linkUniversal", brILinkUniversal, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
-
 	brNewBreveCall(n, "setCollisionProperties", brISetCollisionProperties, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0);
+
+	brNewBreveCall(n, "jointApplyTorque", brIJointApplyTorque, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
+
+	brNewBreveCall(n, "jointLinkRevolute", brJointILinkRevolute, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
+	brNewBreveCall(n, "jointLinkPrismatic", brJointILinkPrismatic, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
+	brNewBreveCall(n, "jointLinkBall", brJointILinkBall, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
+	brNewBreveCall(n, "jointLinkStatic", brJointILinkStatic, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
+	brNewBreveCall(n, "jointLinkUniversal", brJointILinkUniversal, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
 
 	brNewBreveCall(n, "jointBreak", brIJointBreak, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "jointSetVelocity", brIJointSetVelocity, AT_NULL, AT_POINTER, AT_VECTOR, 0);
@@ -639,6 +552,4 @@ void breveInitPhysicsFunctions(brNamespace *n) {
 	brNewBreveCall(n, "jointGetPosition", brIJointGetPosition, AT_VECTOR, AT_POINTER, 0);
 	brNewBreveCall(n, "jointGetVelocity", brIJointGetVelocity, AT_VECTOR, AT_POINTER, 0);
 
-	brNewBreveCall(n, "linkSetLabel", brILinkSetLabel, AT_NULL, AT_POINTER, AT_STRING, 0);
-	brNewBreveCall(n, "linkRemoveLabel", brILinkRemoveLabel, AT_NULL, AT_POINTER, 0);
 }

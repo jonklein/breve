@@ -324,7 +324,7 @@
 				LIBRARY_SEARCH_PATHS = "../lib /usr/local/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.1;
 				OTHER_CFLAGS = "$(CPPFLAGS)";
-				OTHER_LDFLAGS = "$(LDFLAGS) /usr/local/lib/libdl.a";
+				OTHER_LDFLAGS = "-t $(LIBS) /usr/local/lib/libdl.a";
 				PRODUCT_NAME = breve;
 				SECTORDER_FLAGS = "";
 				UNSTRIPPED_PRODUCT = NO;

@@ -323,7 +323,7 @@ Abstract : Control (aka Controls) [version 1.9] {
 
 		if selectedObject == theObject: return.
 
-		if selectedObject : {
+		if selectedObject: {
 			selectedObject hide-bounding-box.
 			selectedObject hide-axis.
 		}

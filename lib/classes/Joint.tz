@@ -292,7 +292,7 @@ Joint : PrismaticJoint (aka PrismaticJoints) [version 1.9] {
 		if childLink && !cpointer:
 			die "attempting to link uninitialized Link object $childLink.".
 
-		jointPointer = linkPrismatic(ppointer, cpointer, theNormal, parentPoint, childPoint, relativeRotation).
+		jointPointer = jointLinkPrismatic(ppointer, cpointer, theNormal, parentPoint, childPoint, relativeRotation).
 
 		normalVector = theNormal.
 		plinkPoint = parentPoint.
@@ -361,7 +361,7 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 1.9] {
 		if jointPointer:
 			die "attempt to link previously linked Joint object.".
 
-		jointPointer = linkRevolute(ppointer, cpointer, theNormal, parentPoint, childPoint, relativeRotation).
+		jointPointer = jointLinkRevolute(ppointer, cpointer, theNormal, parentPoint, childPoint, relativeRotation).
 
 		normalVector = theNormal.
 		plinkPoint = parentPoint.
@@ -375,7 +375,8 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 1.9] {
 
 	+ to set-joint-torque to torqueValue (double): 
 		% Applies a torque of torqueValue to the revolute joint. 
-		applyRevoluteTorque(jointPointer, (torqueValue, 0, 0)).
+
+		jointApplyTorque(jointPointer, (torqueValue, 0, 0)).
 
 	- to get-joint-position:
 		return (self get-joint-angle).
@@ -435,7 +436,7 @@ Joint : FixedJoint (aka FixedJoints) [version 1.9] {
 		if childLink && !cpointer:
 			die "attempting to link uninitialized Link object $childLink.".
 
-		jointPointer = linkStatic(ppointer, cpointer, (0, 0, 0), parentPoint, childPoint, relativeRotation).
+		jointPointer = jointLinkStatic(ppointer, cpointer, (0, 0, 0), parentPoint, childPoint, relativeRotation).
 
 		normalVector = (1, 0, 0).
 		plinkPoint = parentPoint.
@@ -501,7 +502,7 @@ Joint : UniversalJoint (aka UniversalJoints) [version 1.9] {
 		if jointPointer:
 			die "attempt to link previously linked Joint object.".
 
-		jointPointer = linkUniversal(ppointer, cpointer, normalVector, parentPoint, childPoint, relativeRotation).
+		jointPointer = jointLinkUniversal(ppointer, cpointer, normalVector, parentPoint, childPoint, relativeRotation).
 
 		plinkPoint = parentPoint.
 		clinkPoint = childPoint.
@@ -582,7 +583,7 @@ Joint : BallJoint (aka BallJoints) [version 1.9] {
 		if jointPointer:
 			die "attempt to link previously linked Joint object.".
 
-		jointPointer = linkBall(ppointer, cpointer, (0, 0, 0), parentPoint, childPoint, relativeRotation).
+		jointPointer = jointLinkBall(ppointer, cpointer, (0, 0, 0), parentPoint, childPoint, relativeRotation).
 
 		plinkPoint = parentPoint.
 		clinkPoint = childPoint.

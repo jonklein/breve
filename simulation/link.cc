@@ -483,7 +483,6 @@ void slLinkUpdatePosition(slLink *r) {
 
 /*!
 	\brief Creates a joint between two links.
-
 */
 
 slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointType, slVector *normal, slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3]) {

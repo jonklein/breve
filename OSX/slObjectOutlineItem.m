@@ -67,7 +67,7 @@
 
     if([self getExpandable] && eval.type == AT_INSTANCE) {
 		evalInstance = STINSTANCE(&eval);
-        childCount = slCountList(evalInstance->type->variableList);
+        childCount = slListCount(evalInstance->type->variableList);
     } else if([self getExpandable] && eval.type == AT_LIST) {
         childCount = BRLIST(&eval)->count;
     } else if([self getExpandable] && isArray) {

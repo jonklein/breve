@@ -782,7 +782,7 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 	} 
 
 	if(caller->instance->status != AS_ACTIVE) {
-		stEvalError(caller->type->engine, EE_FREED_INSTANCE, "method \"%s\" called with freed object (%p)", mexp->methodName, caller->instance);
+		stEvalError(i->instance->type->engine, EE_FREED_INSTANCE, "method \"%s\" called with freed object (%p)", mexp->methodName, caller->instance);
 		return EC_ERROR;
 	}
 
@@ -2291,7 +2291,7 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 	
 	if(new->instance->gcStack) {
 		stGCUnmark(new->instance, target);
-		// stGCRetain(target);
+		stGCRetain(target);
 	}
 
 	// unretain the input arguments

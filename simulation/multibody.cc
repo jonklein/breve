@@ -832,11 +832,15 @@ int slMultibodyCheckSelfPenetration(slWorld *world, slMultibody *m) {
 	vc = world->clipData;
 
 	l1 = m->linkList;
-	l2 = m->linkList;
 
 	while(l1) {
 		slLink *link1 = l1->data;
 
+		// start with the next thing in the list.  this way we avoid 
+		// doing repeats like 1st-2nd and 2nd-1st
+
+		l2 = l1->next;
+		
 		while(l2) {
 			slLink *link2 = l2->data;
 
@@ -847,7 +851,9 @@ int slMultibodyCheckSelfPenetration(slWorld *world, slMultibody *m) {
 				if(x > y) pe = &vc->pairList[x][y];
 				else pe = &vc->pairList[y][x];
 
-				if(slVclipTestPair(vc, pe, NULL)) return 1;
+				printf("flags [%d][%d] %p %x\n", x, y, pe, pe->flags);
+
+				if(pe->flags == BT_ALL && slVclipTestPair(vc, pe, NULL)) return 1;
 			}
 
 			l2 = l2->next;

@@ -1058,10 +1058,10 @@ int slEdgePointClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf
 	start = e->neighbors[0]->data;
 	end = e->neighbors[1]->data;
 
-	slVectorSub(&start->vertex, &end->vertex, &edgeVector);
-	slVectorXform(ep->rotation, &edgeVector, &transEdgeVector);
-
 	if(!included) {
+		slVectorSub(&start->vertex, &end->vertex, &edgeVector);
+		slVectorXform(ep->rotation, &edgeVector, &transEdgeVector);
+
 		if(update1 != -1 && update1 == update2) {
 			*nf2 = p->neighbors[update2];
 			return CT_CONTINUE;

@@ -206,7 +206,7 @@ void slListFreeHead(slList *l) {
     \brief Returns the number of elements in a list.
 */
 
-int slCountList(slList *l) {
+int slListCount(slList *l) {
     int n = 0;
 
     while(l) {
@@ -237,7 +237,7 @@ slArray *slListToArray(slList *l) {
 		return a;
 	}
 
-    a->count = slCountList(l);
+    a->count = slListCount(l);
 
     a->data = malloc(sizeof(void*) * a->count);
 

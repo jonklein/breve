@@ -49,7 +49,7 @@ slList *slInList(slList *s, void *p);
 
 void slListFree(slList *l);
 void slListFreeHead(slList *l);
-int slCountList(slList *l);
+int slListCount(slList *l);
 
 slArray *slNewArray(int count, int size);
 void slFreeArray(slArray *a);

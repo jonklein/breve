@@ -35,6 +35,8 @@ profile:
 
 optimize:
 	make CFLAGS='$(OPTFLAGS)'
+	strip bin/breve
+	strip bin/breve_cli
 
 optimize_debug:
 	make CFLAGS+='-g $(OPTFLAGS)'
@@ -64,7 +66,7 @@ OSX_build:
 	-mkdir docs
 	make -f Makefile optimize
 	cd plugins; make
-	cd OSX ; xcodebuild -activebuildstyle CC=
+	cd OSX ; xcodebuild -activebuildstyle CC= LIBS='@LDFLAGS@ @LIBS@'
 
 OSX_clean:
 	rm -f breve.dmg

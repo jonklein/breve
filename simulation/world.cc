@@ -523,6 +523,8 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 
 				mu += 1.0;
 
+				printf("collision with %d points\n", c->pointCount);
+
 				for(x=0;x<c->pointCount;x++) {
 					dContact *contact, con;
 

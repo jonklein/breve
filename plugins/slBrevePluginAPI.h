@@ -26,7 +26,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /*
-	the breve simulation environment plugin API version 1.7
+	the breve simulation environment plugin API version 2.0
 
 	Documentation on using the breve plugin API is included in
 	the documentation distributed with breve.
@@ -46,7 +46,6 @@ typedef struct stInstance stInstance;
 #define EC_OK 1			/* normal output--simulation continues */
 
 /* these entries appear in the brEval field */ 
-
 
 enum atomicTypes {
 	AT_UNDEFINED = 0,

@@ -154,9 +154,13 @@ __EOT__
 	$return_result = "";
 	$return_result = "$return_accessor(result) = " if($return_type ne "void");
 
+	$return_function = "$name($function_arguments)";
+
+	if($return_type eq "char *") { $return_function = "slStrdup($return_function)"; }
+
 print CFILE <<__EOT__;
 
-	${return_result}$name($function_arguments);
+	${return_result}$return_function;
 
 	return EC_OK;
 }

@@ -566,7 +566,7 @@ void stObjectAllocationReport(brEngine *engine) {
 	
 		o = bo->pointer;
 
-		slMessage(DEBUG_ALL, "class %s: %d objects allocated\n", o->name, slCountList(o->allInstances));
+		slMessage(DEBUG_ALL, "class %s: %d objects allocated\n", o->name, slListCount(o->allInstances));
 	}
 	
 	slListFree(objects);
