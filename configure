@@ -5497,7 +5497,7 @@ echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Lib'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_Lib'}'`" >&6
 if test `eval echo '${'$as_ac_Lib'}'` = yes; then
   cat >>confdefs.h <<\_ACEOF
-#define HAVA_LIBJAVA 1
+#define HAVE_LIBJAVA 1
 _ACEOF
 
 fi
