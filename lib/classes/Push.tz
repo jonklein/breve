@@ -92,8 +92,8 @@ Object : PushInterpreter (aka PushInterpreters) {
 		self run program codeObject for-steps 0.
 
 		for n=0, n<steps, n++: {
-			self step.
-			print "boolean depth = ", (self get-boolean-stack-size).
+			if !(self step): return.
+			# print "boolean depth = ", (self get-boolean-stack-size).
 			printf "===> $n. ".
 			self print-exec-stack.
 		}

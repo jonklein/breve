@@ -38,6 +38,16 @@ int breveFunctionPushCallbackNew(brEval arguments[], brEval *result, brInstance 
 	return EC_OK;
 }
 
+int breveFunctionPushMacroNew(brEval arguments[], brEval *result, brInstance *instance) {
+	void *environment = BRPOINTER(&arguments[0]);
+	char *name = BRSTRING(&arguments[1]);
+	PushCode *code = BRPOINTER(&arguments[2]);
+
+	pushAddMacroInstruction(environment, name, code);
+
+	return EC_OK;
+}
+
 unsigned int brPushCallbackFunction(PushEnvironment *environment, void *d) {
 	brEval eval;
 	brPushCallbackData *data = (brPushCallbackData*)d;
@@ -60,5 +70,6 @@ void brPushFreeData(void *d) {
 void breveInitPushCallbackFunctions(brNamespace *names) {
 #ifdef HAVE_LIBPUSH
 	brNewBreveCall(names, "pushCallbackNew", breveFunctionPushCallbackNew, AT_POINTER, AT_POINTER, AT_STRING, AT_STRING, AT_INSTANCE, 0);
+	brNewBreveCall(names, "pushMacroNew", breveFunctionPushMacroNew, AT_POINTER, AT_POINTER, AT_STRING, AT_POINTER, 0);
 #endif
 }

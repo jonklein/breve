@@ -246,6 +246,8 @@ Object : PushGP {
 
 			print ";; Simplifies to:", (current{ currentIndividual }  get-string).
 
+			self examine program current{ currentIndividual }.
+
 			controller end-simulation.
 		}
 
@@ -273,6 +275,11 @@ Object : PushGP {
 			}
 		}
 
+	+ to examine program p (object):
+		% This method is called when a solution is found.  You should override 
+		% this method to preform any additional analysis you'd like.  Typically
+		% this involves examining the program for generalization.
+
 	- to compute-fitness for-program p (object):
 		n, invalid (int).
 		errors (list).
@@ -285,7 +292,8 @@ Object : PushGP {
 
 			if (interpreter run code p): {
 				# score for invalid programs.
-				return 100000000.
+				# return 100000000.
+				push .1 + (self compute-error for-fitness-case n with-interpreter interpreter) onto errors.
 			} else {
 				push (self compute-error for-fitness-case n with-interpreter interpreter) onto errors.
 			}
