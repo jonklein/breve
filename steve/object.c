@@ -93,7 +93,7 @@ brInstance *stInstanceCreateAndRegister(brEngine *e, brObject *object) {
 	bi = brObjectInstantiate(e, object, NULL, 0);
 
 	if(bi->object->type == &gSteveData->steveObjectType) {
-		newi = bi->pointer;
+		newi = bi->userData;
 		newi->breveInstance = bi;
 		stInstanceInit(newi);
 	}
@@ -422,7 +422,7 @@ stObject *stObjectFind(brNamespace *n, char *name) {
 
 	if(nameSymbol->type != ST_OBJECT && nameSymbol->type != ST_OBJECT_ALIAS) return NULL;
 
-	return ((brObject*)nameSymbol->data)->pointer;
+	return ((brObject*)nameSymbol->data)->userData;
 }
 
 /*!

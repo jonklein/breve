@@ -47,7 +47,7 @@ int stDDataCheckVariables(brEval *args, brEval *result, brInstance *bi) {
 	int type = 0;
 	stObject *o;
 
-	stInstance *i = bi->pointer;
+	stInstance *i = bi->userData;
 
 	o = i->type;
 
@@ -82,8 +82,8 @@ int stDDataCheckVariables(brEval *args, brEval *result, brInstance *bi) {
 }
 
 int stDDataCopyObject(brEval *args, brEval *result, brInstance *bi) {
-	stInstance *i = bi->pointer;
-    stInstance *otherObject = BRINSTANCE(&args[0])->pointer;
+	stInstance *i = bi->userData;
+    stInstance *otherObject = BRINSTANCE(&args[0])->userData;
 
 	if(!otherObject) {
         BRINT(result) = -1;
@@ -106,7 +106,7 @@ int stDDataCopyObject(brEval *args, brEval *result, brInstance *bi) {
 
 int stDDataWriteObject(brEval *args, brEval *result, brInstance *bi) {
     char *filename = BRSTRING(&args[0]);
-	stInstance *i = bi->pointer;
+	stInstance *i = bi->userData;
 
     result->type = AT_INT;
 
@@ -211,7 +211,7 @@ int stUnpackObject(stInstance *i, char *buffer, int length) {
 
 int stDDataWriteObjectWithDialog(brEval *args, brEval *result, brInstance *bi) {
     char *filename = NULL;
-	stInstance *i = bi->pointer;
+	stInstance *i = bi->userData;
     
     result->type = AT_INT;
     BRINT(result) = 1;
@@ -235,7 +235,7 @@ int stDDataWriteObjectWithDialog(brEval *args, brEval *result, brInstance *bi) {
 }
 
 int stDDataReadXMLObject(brEval args[], brEval *target, brInstance *bi) {
-	stInstance *i = bi->pointer;
+	stInstance *i = bi->userData;
 
     char *filename = brFindFile(bi->engine, BRSTRING(&args[0]), NULL);
     BRINT(target) = stXMLReadObjectFromFile(i, filename);
@@ -245,7 +245,7 @@ int stDDataReadXMLObject(brEval args[], brEval *target, brInstance *bi) {
 
 int stDWriteXMLObject(brEval args[], brEval *target, brInstance *bi) {
     char *filename = BRSTRING(&args[0]);
-	stInstance *i = bi->pointer;
+	stInstance *i = bi->userData;
 
     if(i->type->engine->outputPath) {
         char *newfilename;
@@ -262,7 +262,7 @@ int stDWriteXMLObject(brEval args[], brEval *target, brInstance *bi) {
 
 int stDDataReadObject(brEval *args, brEval *result, brInstance *bi) {
     char *filename = BRSTRING(&args[0]);
-	stInstance *i = bi->pointer;
+	stInstance *i = bi->userData;
 
     if(!filename) {
         slMessage(DEBUG_ALL, "NULL string passed to dataReadObject.  Read cancelled.\n");
@@ -278,7 +278,7 @@ int stDDataReadObject(brEval *args, brEval *result, brInstance *bi) {
 
 int stDDataReadObjectWithDialog(brEval *args, brEval *result, brInstance *bi) {
     char *filename = NULL;
-	stInstance *i = bi->pointer;
+	stInstance *i = bi->userData;
 
     result->type = AT_INT;
     BRINT(result) = 1;
@@ -356,7 +356,7 @@ int stCSimpleCrossover(brEval *args, brEval *target, brInstance *i) {
         return EC_ERROR;
     }
     
-    if(stObjectSimpleCrossover(a->pointer, b->pointer, child->pointer)) return EC_ERROR;
+    if(stObjectSimpleCrossover(a->userData, b->userData, child->userData)) return EC_ERROR;
 
     return EC_OK;
 }   

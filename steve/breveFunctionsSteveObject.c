@@ -65,14 +65,14 @@ extern stSteveData *gSteveData;
 */
 
 int stSSetFreedInstanceProtection(brEval args[], brEval *target, brInstance *i) {
-	stSteveData *data = i->object->type->data;
+	stSteveData *data = i->object->type->userData;
 
     data->retainFreedInstances = BRINT(&args[0]);
     return EC_OK;
 }
 
 int stOCallMethodNamed(brEval args[], brEval *target, brInstance *i) {
-	stInstance *newI = BRINSTANCE(&args[0])->pointer;
+	stInstance *newI = BRINSTANCE(&args[0])->userData;
 	char *method = BRSTRING(&args[1]);
 	brEvalListHead *l = BRLIST(&args[2]);
 	int argCount = 0, n;
@@ -110,7 +110,7 @@ int stOCallMethodNamed(brEval args[], brEval *target, brInstance *i) {
 int stOIsa(brEval args[], brEval *target, brInstance *bi) {
 	stObject *o;
 	stObject *io;
-	stInstance *i = bi->pointer;
+	stInstance *i = bi->userData;
 
 	/* go down to the base instance */
 
@@ -135,7 +135,7 @@ int stOIsa(brEval args[], brEval *target, brInstance *bi) {
 */
 
 int stORespondsTo(brEval args[], brEval *target, brInstance *i) {
-	stInstance *instance = BRINSTANCE(&args[0])->pointer;
+	stInstance *instance = BRINSTANCE(&args[0])->userData;
 	char *method = BRSTRING(&args[1]);
 
 	brNamespaceSymbol *mSymbol;
@@ -155,7 +155,7 @@ int stORespondsTo(brEval args[], brEval *target, brInstance *i) {
 */
 
 int stOSetGC(brEval args[], brEval *target, brInstance *bi) {
-	stInstance *i = bi->pointer;
+	stInstance *i = bi->userData;
 
 	i->gc = BRINT(&args[0]);
 
@@ -167,7 +167,7 @@ int stOSetGC(brEval args[], brEval *target, brInstance *bi) {
 */
 
 int stOGetRetainCount(brEval args[], brEval *target, brInstance *bi) {
-	stInstance *i = bi->pointer;
+	stInstance *i = bi->userData;
 	BRINT(target) = i->retainCount;
 	return EC_OK;
 }
@@ -236,7 +236,7 @@ int stNSendXMLObject(brEval *args, brEval *target, brInstance *i) {
 	FILE *file = xmlBuffer->fp;
 	char *buffer;
 
-	stXMLWriteObjectToStream(archive->pointer, file, 0);
+	stXMLWriteObjectToStream(archive->userData, file, 0);
 	buffer = slCloseStringStream(xmlBuffer);
 
 	BRINT(target) = stSendXMLString(addr, port, buffer);

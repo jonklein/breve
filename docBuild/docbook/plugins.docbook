@@ -91,8 +91,8 @@ internal pointer to the calling instance&mdash;this can be ignored.
 <indexterm><primary>AT_VECTOR plugin constant</primary></indexterm>
 <indexterm><primary>BRMATRIX plugin macro</primary></indexterm>
 <indexterm><primary>AT_MATRIX plugin constant</primary></indexterm>
-<indexterm><primary>BRBRRING plugin macro</primary></indexterm>
-<indexterm><primary>AT_BRRING plugin constant</primary></indexterm>
+<indexterm><primary>BRSTRING plugin macro</primary></indexterm>
+<indexterm><primary>AT_STRING plugin constant</primary></indexterm>
 <indexterm><primary>BROBJECT plugin macro</primary></indexterm>
 <indexterm><primary>AT_OBJECT plugin constant</primary></indexterm>
 <indexterm><primary>BRPOINTER plugin macro</primary></indexterm>
@@ -171,12 +171,12 @@ arguments and output types.  The "AT" prefix stands for "atomic type".
 <itemizedlist>
 <listitem><para><function>AT_INT</function></para></listitem>
 <listitem><para><function>AT_DOUBLE</function></para></listitem>
-<listitem><para><function>AT_BRRING</function></para></listitem>
+<listitem><para><function>AT_STRING</function></para></listitem>
 <listitem><para><function>AT_VECTOR</function></para></listitem>
 <listitem><para><function>AT_MATRIX</function></para></listitem>
 <listitem><para><function>AT_DATA</function></para></listitem>
 <listitem><para><function>AT_HASH</function></para></listitem>
-<listitem><para><function>AT_LIBR</function></para></listitem>
+<listitem><para><function>AT_LIST</function></para></listitem>
 <listitem><para><function>AT_OBJECT</function></para></listitem>
 <listitem><para><function>AT_POINTER</function></para></listitem>
 </itemizedlist>

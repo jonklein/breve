@@ -24,6 +24,8 @@
 	breveFrontend functions which comprise the breveFrontendAPI.
 */
 
+typedef struct breveFrontend breveFrontend;
+
 struct breveFrontend {
     brEngine *engine;
     void *data;

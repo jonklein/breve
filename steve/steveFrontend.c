@@ -32,21 +32,24 @@ int breveFrontendLoadSavedSimulation(breveFrontend *frontend, char *simcode, cha
 */
 
 int stSubclassCallback(brObject *c1, brObject *c2) {
-	return stIsSubclassOf(c1->pointer, c2->pointer);
+	return stIsSubclassOf(c1->userData, c2->userData);
 }
 
 /*!
 	\brief The breve callback to call a method in the steve language.
 */
 
-int stCallMethodBreveCallback(brInstance *i, brMethod *method, brEval **arguments, brEval *result) {
-	int r;
+int stCallMethodBreveCallback(void *instanceData, void *methodData, brEval **arguments, brEval *result) {
+	int r, count = 0;
+	stMethod *method = methodData;
 	stRunInstance ri;
 
-	ri.instance = i->pointer;
+	ri.instance = instanceData;
 	ri.type = ri.instance->type;
 
-	r = stCallMethod(&ri, &ri, method->pointer, arguments, method->argumentCount, result);
+	if(method->keywords) count = method->keywords->count;
+
+	r = stCallMethod(&ri, &ri, method, arguments, count, result);
 
 	return r;
 }
@@ -55,18 +58,18 @@ int stCallMethodBreveCallback(brInstance *i, brMethod *method, brEval **argument
 	\brief The steve callback to create a new instance.
 */
 
-void *stInstanceNewCallback(brObject *object, brEval **constructorArgs, int argCount) {
-	return stInstanceNew(object->pointer);
+void *stInstanceNewCallback(void *object, brEval **constructorArgs, int argCount) {
+	return stInstanceNew(object);
 }
 
 /*!
 	\brief The breve callback to find a method.
 */
 
-void *stFindMethodBreveCallback(brObject *object, char *name, unsigned char *argTypes, int args) {
+void *stFindMethodBreveCallback(void *object, char *name, unsigned char *argTypes, int args) {
 	stMethod *method;
 
-	method = stFindInstanceMethod(object->pointer, name, args, NULL);
+	method = stFindInstanceMethod(object, name, args, NULL);
 
 	return method;
 }
@@ -75,8 +78,8 @@ void *stFindMethodBreveCallback(brObject *object, char *name, unsigned char *arg
 	\brief The steve language callback to free an instance.
 */
 
-void stInstanceFreeCallback(brInstance *i) {
-	stInstanceFree(i->pointer);
+void stInstanceFreeCallback(void *i) {
+	stInstanceFree(i);
 }
 
 /*!
@@ -226,7 +229,7 @@ int stLoadFiles(stSteveData *sdata, brEngine *engine, char *code, char *file) {
 	}
 
 	sdata->singleStatementMethod = stNewMethod("internal-user-input-method", NULL, "<user-input>", 0);
-	stStoreInstanceMethod(controller->pointer, "internal-user-input-method", sdata->singleStatementMethod);
+	stStoreInstanceMethod(controller->userData, "internal-user-input-method", sdata->singleStatementMethod);
 
 	return EC_OK;
 }
@@ -251,7 +254,7 @@ int stLoadSimulation(stSteveData *d, brEngine *engine, char *code, char *file) {
 		return EC_ERROR;
 	}
 
-	controller = stInstanceNew(controllerClass->pointer);
+	controller = stInstanceNew(controllerClass->userData);
 
 	controller->breveInstance = brEngineAddInstance(engine, controllerClass, controller);
 
@@ -577,7 +580,7 @@ void stObjectAllocationReport(brEngine *engine) {
 	while(objects) {
 		bo = objects->data;
 	
-		o = bo->pointer;
+		o = bo->userData;
 
 		slMessage(DEBUG_ALL, "class %s: %d objects allocated\n", o->name, slListCount(o->allInstances));
 	}

@@ -39,7 +39,8 @@ int brEvalToJValue(brJavaBridgeData *bridge, brEval *e, jvalue *v, char javaType
 			v->l = brMakeJavaString(bridge, BRSTRING(e));
 			break;
 		case 'O':
-			v->l = ((brJavaInstance*)(BRINSTANCE(e)->pointer))->instance;
+			// extract the java instance
+			v->l = ((brJavaInstance*)(BRINSTANCE(e)->userData))->instance;
 			break;
 		default:
 			return EC_ERROR;

@@ -22,17 +22,14 @@
 
 #ifdef HAVE_LIBJAVA
 
-brObjectType gJavaObjectType;
-brJavaBridgeData *gJavaBridge;
-
 /*!
 	\brief the callMethod field of the java brObjectType.
 */
 
-int brJavaMethodCallCallback(brInstance *i, brMethod *m, brEval **args, brEval *result) {
+int brJavaMethodCallCallback(void *instanceData, void *methodData, brEval **args, brEval *result) {
 	jvalue jargs[JAVA_MAX_ARGS];
-	brJavaMethod *method = m->pointer;
-	brJavaInstance *instance = i->pointer;
+	brJavaMethod *method = methodData;
+	brJavaInstance *instance = instanceData;
 	int n;
 
 	for(n=0;n<method->argumentCount;n++)
@@ -45,8 +42,8 @@ int brJavaMethodCallCallback(brInstance *i, brMethod *m, brEval **args, brEval *
 	\brief the findMethod field of the java brObjectType.
 */
 
-brJavaObject *brJavaObjectFindCallback(brObjectType *type, char *name) {
-	brJavaBridgeData *bridge = type->data;
+brJavaObject *brJavaObjectFindCallback(void *typeData, char *name) {
+	brJavaBridgeData *bridge = typeData;
 	return brJavaObjectFind(bridge, name);
 }
 
@@ -54,8 +51,8 @@ brJavaObject *brJavaObjectFindCallback(brObjectType *type, char *name) {
 	\brief the findMethod field of the java brObjectType.
 */
 
-brJavaMethod *brJavaMethodFindCallback(brObject *o, char *name, unsigned char *types, int tCount) {
-	brJavaObject *object = o->pointer;
+brJavaMethod *brJavaMethodFindCallback(void *objectData, char *name, unsigned char *types, int tCount) {
+	brJavaObject *object = objectData;
 	return brJavaMethodFind(object->bridge, object, name, types, tCount);
 }
 
@@ -71,15 +68,15 @@ brJavaMethod *brJavaIsSubclassCallback(brObject *class1, brObject *class2) {
 	\brief the instantiate field of the java brObjectType.
 */
 
-brJavaInstance *brJavaInstanceNewCallback(brObject *object, brEval **args, int argCount) {
-	return brJavaInstanceNew(object->pointer, args, argCount);
+brJavaInstance *brJavaInstanceNewCallback(void *objectData, brEval **args, int argCount) {
+	return brJavaInstanceNew(objectData, args, argCount);
 }
 
 /*!
 	\brief the destroyInstance field of the java brObjectType.
 */
 
-void brJavaInstanceDestroyCallback(brObject *object, brEval **args, int argCount) {
+void brJavaInstanceDestroyCallback(void *instance) {
 
 }
 
@@ -88,17 +85,19 @@ void brJavaInstanceDestroyCallback(brObject *object, brEval **args, int argCount
 */
 
 void brJavaInit(brEngine *e) {
-	gJavaObjectType.callMethod = brJavaMethodCallCallback;
-	gJavaObjectType.findMethod = brJavaMethodFindCallback;
-	gJavaObjectType.findObject = brJavaObjectFindCallback;
-	gJavaObjectType.isSubclass = brJavaIsSubclassCallback;
-	gJavaObjectType.instantiate = brJavaInstanceNewCallback;
-	gJavaObjectType.destroyInstance = brJavaInstanceDestroyCallback;
+	brObjectType *javaObjectType;
 
-	gJavaBridge = brAttachJavaVM(e);
+	javaObjectType = slMalloc(sizeof(brObjectType));
 
-	gJavaObjectType.data = gJavaBridge;
+	javaObjectType->callMethod = brJavaMethodCallCallback;
+	javaObjectType->findMethod = brJavaMethodFindCallback;
+	javaObjectType->findObject = brJavaObjectFindCallback;
+	javaObjectType->isSubclass = brJavaIsSubclassCallback;
+	javaObjectType->instantiate = brJavaInstanceNewCallback;
+	javaObjectType->destroyInstance = brJavaInstanceDestroyCallback;
 
-	if(gJavaBridge) brEngineRegisterObjectType(e, &gJavaObjectType);
+	javaObjectType->userData = brAttachJavaVM(e);
+
+	if(javaObjectType->userData) brEngineRegisterObjectType(e, javaObjectType);
 }
 #endif

@@ -379,7 +379,7 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 			return EC_ERROR;
 		}
 
-		instance = BRINSTANCE(e)->pointer;
+		instance = BRINSTANCE(e)->userData;
 		
 		if(!stIsSubclassOf(instance->type, otype)) {
 			stEvalError(i->instance->type->engine, EE_TYPE, "Cannot assign instance of class \"%s\" to variable of class \"%s\"\n", instance->type->name, otype->name);
@@ -598,7 +598,7 @@ inline int stEvalFree(stExp *s, stRunInstance *i, brEval *t) {
 
 	if(target.type == AT_INSTANCE) {
 		// if we're freeing ourself (the calling instance) then we will return EC_STOP
-		if(BRINSTANCE(&target)->pointer == i->instance) finished = 1;
+		if(BRINSTANCE(&target)->userData == i->instance) finished = 1;
 
 		if(!BRINSTANCE(&target)) {
 			slMessage(DEBUG_ALL, "warning: attempt to free uninitialized object\n");
@@ -607,7 +607,7 @@ inline int stEvalFree(stExp *s, stRunInstance *i, brEval *t) {
 
 		if(BRINSTANCE(&target)->status == AS_ACTIVE) brInstanceRelease(BRINSTANCE(&target));
 		else {
-			slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", BRINSTANCE(&target));
+			// slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", BRINSTANCE(&target));
 		}
 	} else if(target.type == AT_LIST) {
 		list = (BRLIST(&target))->start;
@@ -618,12 +618,12 @@ inline int stEvalFree(stExp *s, stRunInstance *i, brEval *t) {
 					slMessage(DEBUG_ALL, "warning: attempt to free uninitialized object\n");
 				} else {
 					// if we're freeing ourself (the calling instance) then we will return EC_STOP
-					if(BRINSTANCE(&list->eval)->pointer == i->instance) finished = 1;
+					if(BRINSTANCE(&list->eval)->userData == i->instance) finished = 1;
 
 					if(BRINSTANCE(&list->eval)->status == AS_ACTIVE) brInstanceRelease(BRINSTANCE(&list->eval));
 					else {
-						slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", BRINSTANCE(&list->eval));
-						slMessage(DEBUG_ALL, "... error in file \"%s\" at line %d\n", s->file, s->line);
+						// slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", BRINSTANCE(&list->eval));
+						// slMessage(DEBUG_ALL, "... error in file \"%s\" at line %d\n", s->file, s->line);
 					}
 				}
 			}
@@ -733,7 +733,7 @@ inline int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) {
 			return stEvalForeignMethodCall(mexp, BRINSTANCE(&obj), i, t);
 		}
 
-		ri.instance = BRINSTANCE(&obj)->pointer;
+		ri.instance = BRINSTANCE(&obj)->userData;
 
 		if(!ri.instance) {
 			stEvalError(i->type->engine, EE_NULL_INSTANCE, "method \"%s\" called with uninitialized object", mexp->methodName);
@@ -755,7 +755,7 @@ inline int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) {
 				return stEvalForeignMethodCall(mexp, BRINSTANCE(&listStart->eval), i, t);
 			}
 
-			ri.instance = BRINSTANCE(&listStart->eval)->pointer;
+			ri.instance = BRINSTANCE(&listStart->eval)->userData;
 			ri.type = ri.instance->type;
 
 			r = stRealEvalMethodCall(mexp, &ri, i, t);

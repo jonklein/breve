@@ -9,16 +9,19 @@ public class JavaTest {
 
 	public int intTest(int n) {
         System.out.println("The int input was " + n);
+        System.out.println("returning n + n = ");
 		return n + n;
 	}
 
 	public double doubleTest(double n) {
         System.out.println("The double input was " + n);
+        System.out.println("returning n + n = ");
 		return n + n;
 	}
 
 	public String stringTest(String n) {
         System.out.println("The string input was " + n);
+        System.out.println("returning n + n = ");
 		return n + n;
 	}
 }

@@ -36,12 +36,12 @@ brMethod *brMethodFind(brObject *o, char *name, unsigned char *types, int argCou
 		for(n=0;n<argCount;n++) types[n] = AT_UNDEFINED;
 	}
 
-	mp = o->type->findMethod(o, name, types, argCount);
+	mp = o->type->findMethod(o->userData, name, types, argCount);
 
 	if(!mp) return NULL;
 
 	m = slMalloc(sizeof(brMethod));
-	m->pointer = mp;
+	m->userData = mp;
 	m->argumentCount = argCount;
 	m->name = slStrdup(name);
 
@@ -107,7 +107,7 @@ brObject *brUnknownObjectFind(brEngine *e, char *name) {
 		void *pointer = NULL;
 
 		if(type->findObject) {
-			pointer = type->findObject(type, name);
+			pointer = type->findObject(type->userData, name);
 
 			if(pointer) return brEngineAddObject(e, type, name, pointer);
 		}
@@ -131,7 +131,7 @@ int brMethodCall(brInstance *i, brMethod *m, brEval **args, brEval *result) {
 		return EC_OK;
 	}
 
-	return i->object->type->callMethod(i, m, args, result);
+	return i->object->type->callMethod(i->userData, m->userData, args, result);
 }
 
 /*!
@@ -147,7 +147,7 @@ int brMethodCallByName(brInstance *i, char *name, brEval *result) {
 	int r;
 
 	if(!m) {
-		slMessage(DEBUG_ALL, "warning: unknown method \"%s\" called for instance %p of class \"%s\"\n", name, i->pointer, i->object->name);
+		slMessage(DEBUG_ALL, "warning: unknown method \"%s\" called for instance %p of class \"%s\"\n", name, i->userData, i->object->name);
 		return EC_ERROR;
 	}
 
@@ -174,7 +174,7 @@ int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, int cou
 	int r;
 
 	if(!m) {
-		slMessage(DEBUG_ALL, "warning: unknown method \"%s\" called for instance %p of class \"%s\"\n", name, i->pointer, i->object->name);
+		slMessage(DEBUG_ALL, "warning: unknown method \"%s\" called for instance %p of class \"%s\"\n", name, i->userData, i->object->name);
 		return EC_ERROR;
 	}
 
@@ -298,7 +298,7 @@ brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *poin
 
 	o->name = slStrdup(name);
 	o->type = t;
-	o->pointer = pointer;
+	o->userData = pointer;
 	o->collisionHandlers = slStackNew();
 
     brNamespaceStore(e->objects, name, ST_OBJECT, o);
@@ -329,7 +329,7 @@ brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
 
 	for(n=0;n<e->instances->count;n++) {
 		i = e->instances->data[n];
-		if(i->pointer == pointer) return NULL;
+		if(i->userData == pointer) return NULL;
 	}
 
     i = slMalloc(sizeof(brInstance));
@@ -342,7 +342,7 @@ brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
     i->menu.list = NULL;
     i->menu.updateMenu = NULL;
 
-    i->pointer = pointer;
+    i->userData = pointer;
 
 	// it's a bit of a hack, but we need the camera to be informed of
 	// new objects in the world.  the code which adds objects to the
@@ -367,7 +367,7 @@ brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
 }
 
 brInstance *brObjectInstantiate(brEngine *e, brObject *o, brEval **args, int argCount) {
-	return brEngineAddInstance(e, o, o->type->instantiate(o, args, argCount));
+	return brEngineAddInstance(e, o, o->type->instantiate(o->userData, args, argCount));
 }
 
 /*!
@@ -447,7 +447,7 @@ void brInstanceFree(brInstance *i) {
 	brObserver *observer;
 	int n;
 
-	if(i && i->pointer) i->object->type->destroyInstance(i);
+	if(i && i->userData) i->object->type->destroyInstance(i->userData);
 
     slListFree(i->dependencies);
     slListFree(i->dependents);

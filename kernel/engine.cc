@@ -184,10 +184,6 @@ brEngine *brEngineNew() {
 		pthread_create(&data->thread, NULL, stIterationThread, data);
 	}
 
-#ifdef HAVE_LIBJAVA
-	// brJavaInit(e);
-#endif
-
 	return e;
 }
 
@@ -219,8 +215,8 @@ void brEngineFree(brEngine *e) {
 
 	for(n=0;n<e->instances->count;n++) {
 		brInstance *i = e->instances->data[n];
-		if(i->object->type->destroyInstance) i->object->type->destroyInstance(i);
-		i->pointer = NULL;
+		if(i->object->type->destroyInstance) i->object->type->destroyInstance(i->userData);
+		i->userData = NULL;
 	}
 
 	for(n=0;n<e->instances->count;n++) 

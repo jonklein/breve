@@ -95,7 +95,7 @@ void stGCRetainPointer(void *pointer, int type) {
 
 	switch(type) {
 		case AT_INSTANCE:
-			stInstanceRetain(((brInstance*)pointer)->pointer);
+			stInstanceRetain(((brInstance*)pointer)->userData);
 			break;
 		case AT_LIST:
 			brEvalListRetain(pointer);
@@ -132,7 +132,7 @@ void stGCUnretainPointer(void *pointer, int type) {
 
 	switch(type) {
 		case AT_INSTANCE:
-			stInstanceUnretain(((brInstance*)pointer)->pointer);
+			stInstanceUnretain(((brInstance*)pointer)->userData);
 			break;
 		case AT_LIST:
 			brEvalListUnretain(pointer);
@@ -168,7 +168,7 @@ inline void stGCCollectPointer(void *pointer, int type) {
 
 	switch(type) {
 		case AT_INSTANCE:
-			if(((brInstance*)pointer)->pointer) stInstanceCollect(((brInstance*)pointer)->pointer);
+			if(((brInstance*)pointer)->userData) stInstanceCollect(((brInstance*)pointer)->userData);
 			break;
 		case AT_LIST:
 			brEvalListCollect(pointer);

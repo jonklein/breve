@@ -170,6 +170,9 @@ Object : Real (aka Reals) [version 2.0] {
 		addObjectLine(realWorldPointer, (otherObject get-world-object-pointer), theColor, theStyle).
 
 	+ to add-dotted-line to otherObject (object) with-color theColor = (0, 0, 0) (vector):
+		% Adds a dotted line to otherObject.  See METHOD(add-line) for more information
+		% on object lines.
+
 		self add-line to otherObject with-color theColor with-style "- - - - - - - - ".
 
 	+ to remove-line to otherObject (object):

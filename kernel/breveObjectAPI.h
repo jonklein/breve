@@ -6,6 +6,8 @@ enum allocStatus {
 };
 
 typedef struct brObjectType brObjectType;
+typedef struct brMethod brMethod;
+typedef struct brCollisionHandler brCollisionHandler;
 
 /*! \addtogroup breveObjectAPI */
 /*@{*/
@@ -22,20 +24,20 @@ typedef struct brObjectType brObjectType;
 */
 
 struct brObjectType {
-	void *(*findMethod)(brObject *object, char *name, unsigned char *types, int nargs);
-	void *(*findObject)(brObjectType *type, char *name);
-	void *(*instantiate)(brObject *class, brEval **constructorArgs, int argCount);
+	void *(*findMethod)(void *objectData, char *name, unsigned char *types, int nargs);
+	void *(*findObject)(void *typeData, char *name);
+	void *(*instantiate)(void *objectData, brEval **constructorArgs, int argCount);
 
-	int (*callMethod)(brInstance *instance, brMethod *method, brEval **arguments, brEval *result);
+	int (*callMethod)(void *instanceData, void *methodData, brEval **arguments, brEval *result);
 
-	int (*isSubclass)(brObject *class1, brObject *class2);
+	int (*isSubclass)(void *classData1, void *classData2);
 
-	void (*destroyObject)(brObject *object);
-	void (*destoryMethod)(brMethod *method);
-	void (*destroyInstance)(brInstance *instance);
-	void (*destroyObjectType)(brObjectType *objectType);
+	void (*destroyObject)(void *objectData);
+	void (*destoryMethod)(void *methodData);
+	void (*destroyInstance)(void *instanceData);
+	void (*destroyObjectType)(void *objectTypeData);
 
-	void *data;
+	void *userData;
 };
 
 /*!
@@ -45,7 +47,7 @@ struct brObjectType {
 */
 
 struct brObject {
-	void *pointer;
+	void *userData;
 
 	brObjectType *type;
 
@@ -65,7 +67,7 @@ struct brObject {
 */
 
 struct brInstance {
-	void *pointer;
+	void *userData;
 
 	char status;
 
@@ -106,7 +108,7 @@ struct brCollisionHandler {
 */
 
 struct brMethod {
-	void *pointer;
+	void *userData;
 
 	char *name;
 	brObject *object;
@@ -151,9 +153,9 @@ int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args,
 
 // functions related to adding and removing classes and instances to the breve engine
 
-brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *pointer);
+brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *userData);
 void brEngineAddObjectAlias(brEngine *e, char *name, brObject *o);
-brInstance *brEngineAddInstance(brEngine *e, brObject *o, void *pointer);
+brInstance *brEngineAddInstance(brEngine *e, brObject *o, void *userData);
 brInstance *brObjectInstantiate(brEngine *e, brObject *o, brEval **args, int argCount);
 void brEngineRemoveInstance(brEngine *e, brInstance *i);
 
@@ -173,5 +175,3 @@ void brInstanceRelease(brInstance *i);
 void brObjectFree(brObject *o);
 void brInstanceFree(brInstance *i);
 void brMethodFree(brMethod *i);
-
-

@@ -64,7 +64,7 @@ int stXMLAssignIndices(brEngine *e) {
 	int top = 0;
 
 	for(n=0;n<e->instances->count;n++) {
-		stInstance *i = ((brInstance*)e->instances->data[n])->pointer;
+		stInstance *i = ((brInstance*)e->instances->data[n])->userData;
 		i->index = n;
 	}
 
@@ -148,7 +148,7 @@ int stXMLWriteSimulationToStream(FILE *file, brEngine *e) {
 	stXMLArchiveRecord record;
 	stInstance *controller;
 
-	controller = e->controller->pointer;
+	controller = e->controller->userData;
 
 	bzero(&record, sizeof(stXMLArchiveRecord));
 
@@ -158,7 +158,7 @@ int stXMLWriteSimulationToStream(FILE *file, brEngine *e) {
 	fprintf(file, "<engine controllerIndex=\"%d\">\n", controller->index);
 	spaces += XML_INDENT_SPACES;
 
-	for(n=0;n<e->instances->count;n++) stXMLWriteObject(&record, file, ((brObject*)e->instances->data[n])->pointer, spaces, 0);
+	for(n=0;n<e->instances->count;n++) stXMLWriteObject(&record, file, ((brObject*)e->instances->data[n])->userData, spaces, 0);
 
 	spaces -= XML_INDENT_SPACES;
 	fprintf(file, "</engine>\n");
@@ -188,7 +188,7 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 	d = i->breveInstance->dependencies;
 
 	while(d) {
-		stXMLWriteObject(record, file, ((brObject*)d->data)->pointer, spaces, isDataObject);
+		stXMLWriteObject(record, file, ((brObject*)d->data)->userData, spaces, isDataObject);
 		d = d->next;
 	}
 
@@ -232,7 +232,7 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 			int index;
 	
 			if(obs->instance && obs->instance->status == AS_ACTIVE) {
-				index = ((stInstance*)obs->instance->pointer)->index;
+				index = ((stInstance*)obs->instance->userData)->index;
 			} else {
 				index = -1;
 			}
@@ -262,7 +262,7 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 		list = i->breveInstance->dependencies;
 
 		while(list) {
-			stInstance *dep = ((brInstance*)list->data)->pointer;
+			stInstance *dep = ((brInstance*)list->data)->userData;
 			int index;
 	
 			if(dep && dep->status == AS_ACTIVE) index = dep->index;
@@ -470,7 +470,7 @@ int stXMLPrintEval(FILE *file, char *name, brEval *target, int spaces) {
 			fprintf(file, "<pointer name=\"%s\"/>\n", name);
 			break;
 		case AT_INSTANCE:
-			i = BRINSTANCE(target)->pointer;
+			i = BRINSTANCE(target)->userData;
 
 			if(i && i->status == AS_ACTIVE) index = i->index;
 			else index = -1;
@@ -842,7 +842,7 @@ void stXMLPreparseStartElementHandler(stXMLParserState *userData, const XML_Char
 				return;
 			}
 
-			i = stInstanceNew(object->pointer);
+			i = stInstanceNew(object->userData);
 		} else i = userData->currentInstance;
 
 		i->index = index;

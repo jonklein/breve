@@ -37,10 +37,8 @@ typedef struct brEval brEval;
 typedef struct brNamespaceSymbol brNamespaceSymbol;
 typedef struct brNamespace brNamespace;
 
-typedef struct brObject brObject;
 typedef struct brInstance brInstance;
-typedef struct brMethod brMethod;
-typedef struct brCollisionHandler brCollisionHandler;
+typedef struct brObject brObject;
 
 typedef struct brInternalFunction brInternalFunction;
 
@@ -59,5 +57,3 @@ typedef struct brNetworkClientData brNetworkClientData;
 typedef struct brNetworkServerData brNetworkServerData;
 typedef struct brNetworkRequest brNetworkRequest;
 typedef struct brStringHeader brStringHeader;
-
-typedef struct breveFrontend breveFrontend;

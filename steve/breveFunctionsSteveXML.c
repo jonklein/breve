@@ -28,7 +28,7 @@ int stCArchiveXMLObject(brEval args[], brEval *target, brInstance *i) {
     char *filename = BRSTRING(&args[1]);
     stInstance *archive;
 
-    archive = BRINSTANCE(&args[0])->pointer;
+    archive = BRINSTANCE(&args[0])->userData;
 
     if(i->engine->outputPath) {
         char *newfilename;

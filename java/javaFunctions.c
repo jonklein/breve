@@ -22,8 +22,6 @@
 
 #ifdef HAVE_LIBJAVA
 
-extern brJavaBridgeData *gJavaBridge;
-
 brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	JavaVMInitArgs vm_args;
 	JavaVMOption options[2];
@@ -344,9 +342,7 @@ brJavaObject *brJavaObjectFind(brJavaBridgeData *bridge, char *name) {
 	return object;
 }
 
-int brJavaInstanceFree(brInstance *i) {
-	brJavaInstance *instance = i->pointer;
-
+int brJavaInstanceFree(brJavaInstance *i) {
 	slFree(i);
 
 	return EC_OK;

@@ -53,7 +53,7 @@ Object : PushGP {
 		currentIndividual (int).
 		generationLimit (int).
 
-	+ to accept-upload of-instance i (object):
+	- to accept-upload of-instance i (object):
 		if !(i is a "PushProgramTransporter"): {
 			return.
 		}
@@ -196,6 +196,16 @@ Object : PushGP {
 		return best.
 
 	+ to auto-simplify program p (object):
+		% Programs generated through genetic programming are often complicated and 
+		% difficult to understand.  This method attempts to simplify an evolved  
+		% push program while maintaining the same fitness.
+		% <P>
+		% Each time this method is invoked, a random simplification is preformed 
+		% on the program p.  If the simplification does not harm the fitness, p
+		% is modified to contain the simplification, otherwise, nothing happens.
+		% This method should be called repeatedly -- perhaps 100 times or more 
+		% to aggressively simplify an unweildy program.
+
 		fitness, newFitness (float).
 		newProgram (object).
 		n (int).

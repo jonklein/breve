@@ -37,7 +37,7 @@ int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
     sd->singleStatement = NULL;
 
     stSetParseString(fixedStatement, strlen(fixedStatement));
-    stParseSetObjectAndMethod((stObject*)engine->controller->object->pointer, sd->singleStatementMethod);
+    stParseSetObjectAndMethod((stObject*)engine->controller->object->userData, sd->singleStatementMethod);
     stParseSetEngine(engine);
 
     engine->error.type = 0;
@@ -48,7 +48,7 @@ int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
         return BPE_SIM_ERROR;
     }
 
-	i = engine->controller->pointer;
+	i = engine->controller->userData;
 	ri.instance = i;
 	ri.type = i->type;
 
