@@ -99,7 +99,7 @@ int brJointILinkRevolute(brEval args[], brEval *target, brInstance *i) {
 	}
 
 	joint = slLinkLinks(i->engine->world, parent, child, JT_REVOLUTE, normal, ppoint, cpoint, BRMATRIX(&args[5]));
-	joint->callbackData = i;
+	joint->userData = i;
 
 	if(!joint) {
 		slMessage(DEBUG_ALL, "error creating joint: jointLinkRevolute failed\n");
@@ -344,7 +344,7 @@ int brIWorldSetCollisionResolution(brEval args[], brEval *target, brInstance *i)
 /*!
 	\brief Set the collision properties (mu, e, eT) of a stationary object.
 
-	void setStationaryCollisionProperties(slWorldObject pointer stationary, double e, double eT, double mu).
+	void setCollisionProperties(slWorldObject pointer stationary, double e, double eT, double mu).
 */
 
 int brISetCollisionProperties(brEval args[], brEval *target, brInstance *i) {
@@ -359,9 +359,9 @@ int brISetCollisionProperties(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	o->e = e;
-	o->eT = eT;
-	o->mu = mu;
+	slWorldObjectSetCollisionE(o, e);
+	slWorldObjectSetCollisionET(o, eT);
+	slWorldObjectSetCollisionMU(o, mu);
 
 	return EC_OK;
 }

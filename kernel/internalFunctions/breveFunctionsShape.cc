@@ -77,7 +77,7 @@ int brIFinishShape(brEval args[], brEval *target, brInstance *i) {
 	slShape *s = BRPOINTER(&args[0]);
 	double density = BRDOUBLE(&args[1]);
 
-	s = slInitNeighbors(s, density);
+	s = slShapeInitNeighbors(s, density);
 
 	if(!s) {
 		slMessage(DEBUG_ALL, "finishShape() failed: error completing shape initialization\n");

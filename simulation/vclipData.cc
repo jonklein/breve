@@ -59,15 +59,12 @@ void slVclipDataInit(slWorld *w) {
 				link = w->objects[x];
 				link->clipNumber = x;
 
-				w->clipData->shapes[x] = link->shape;
-
 				slLinkUpdateBoundingBox(link);
 				slAddBoundingBoxForVectors(w->clipData, x, &link->min, &link->max);
 
 				break;
 			case WO_STATIONARY:
 				st = w->objects[x];
-				w->clipData->shapes[x] = st->shape;
 
 				slShapeBounds(st->shape, &st->position, &st->min, &st->max);
 				slAddBoundingBoxForVectors(w->clipData, x, &st->min, &st->max);
@@ -75,7 +72,6 @@ void slVclipDataInit(slWorld *w) {
 				break;
 			case WO_TERRAIN:
 				terrain = w->objects[x];
-				w->clipData->shapes[x] = NULL;
 
 				slAddBoundingBoxForVectors(w->clipData, x, &terrain->min, &terrain->max);
 
@@ -129,8 +125,11 @@ void slVclipDataAddPairEntry(slWorld *w, int x, int y) {
 	o1 = w->objects[x];
 	o2 = w->objects[y];
 
-	if(w->clipData->shapes[x] && w->clipData->shapes[x]->type == ST_NORMAL) pe->f1 = w->clipData->shapes[x]->features[0];
-	if(w->clipData->shapes[y] && w->clipData->shapes[y]->type == ST_NORMAL) pe->f2 = w->clipData->shapes[y]->features[0];
+	if(o1->shape && o1->shape->type == ST_NORMAL) pe->f1 = o1->shape->features[0];
+	else pe->f1 = NULL;
+
+	if(o2->shape && o2->shape->type == ST_NORMAL) pe->f2 = o2->shape->features[0];
+	else pe->f2 = NULL;
 
 	t1 = w->objects[x]->type;
 	t2 = w->objects[y]->type;
@@ -180,7 +179,7 @@ void slVclipDataAddPairEntry(slWorld *w, int x, int y) {
 */
 
 slVclipData *slVclipDataNew() {
-	int listSize, n, m;
+	unsigned int listSize, n, m;
 
 	slVclipData *v;
 
@@ -191,11 +190,7 @@ slVclipData *slVclipDataNew() {
 
 	listSize = v->maxCount * 2;
 
-	// init the collisions 
-
-	/* init the bound lists and bound list pointers */
-
-	v->pairList = slMalloc(sizeof(slPairEntry*) * (v->maxCount + 1));
+	v->pairList.insert(v->pairList.end(), v->maxCount + 1, NULL);
 
 	/* init the pair list--we need an entry for every possible object pair */
 	/* we only need a diagonal matrix here.  initialize the CHECK flag	 */
@@ -207,8 +202,6 @@ slVclipData *slVclipDataNew() {
 		for(m=0;m<n;m++) v->pairList[n][m].flags = BT_CHECK;
 	}
 
-	v->shapes = slMalloc(sizeof(slShape*) * v->maxCount);
-
 	return v;
 }
 
@@ -218,8 +211,8 @@ slVclipData *slVclipDataNew() {
 	vclipData never shrinks, it only grows when neccessary.
 */
 
-void slVclipDataRealloc(slVclipData *v, int count) {
-	int listSize, n, m;
+void slVclipDataRealloc(slVclipData *v, unsigned int count) {
+	unsigned int listSize, n, m;
 	int oldMax;
 
 	v->count = count;
@@ -232,7 +225,7 @@ void slVclipDataRealloc(slVclipData *v, int count) {
 
 	listSize = v->maxCount * 2;
 
-	v->pairList = slRealloc(v->pairList, sizeof(slPairEntry*) * (v->maxCount + 1));
+	v->pairList.insert(v->pairList.end(), (v->maxCount + 1) - v->pairList.size(), NULL);
 
 	// init the pair list--we need an entry for every possible object pair
 	// we only need a diagonal matrix here.  initialize the CHECK flag
@@ -243,8 +236,6 @@ void slVclipDataRealloc(slVclipData *v, int count) {
 
 		for(m=0;m<n;m++) v->pairList[n][m].flags = BT_CHECK;
 	}
-
-	v->shapes = slRealloc(v->shapes, sizeof(slShape*) * v->maxCount);
 }
 
 /*!
@@ -284,35 +275,10 @@ void slAddBoundingBoxForVectors(slVclipData *data, int offset, slVector *min, sl
 	data->boundLists[2].push_back(maxB);
 }
 
-/*
-	\brief Disables collisions with the specified object.
-
-	Removes the BT_CHECK flag for all object pairs containing this
-	object.
-*/
-
-void slIgnoreAllCollisions(slVclipData *d, int object) {
-	unsigned int n;
-	slPairEntry *pe;
-
-	for(n=1;n<d->count;n++) {
-		pe = slVclipPairEntry(d->pairList, n, object);
-
-		if(pe->flags & BT_CHECK) pe->flags ^= BT_CHECK;
-	}   
-}
-
-/*!
-	\brief Turn on/off bounds-only collision detection.
-*/
-
-void slSetBoundsOnlyCollisionDetection(slWorld *w, int b) {
-	w->boundingBoxOnly = b;
-}
-
 void slInitProximityData(slWorld *w) {
 	unsigned int n, x, y;
 	slPairEntry *pe;
+	std::vector<slWorldObject*>::iterator wi;
 
 	slVclipDataRealloc(w->proximityData, w->objects.size());
 
@@ -320,47 +286,17 @@ void slInitProximityData(slWorld *w) {
 	w->proximityData->boundLists[1].clear();
 	w->proximityData->boundLists[2].clear();
 
-	for(n=0;n<w->objects.size();n++) {
-		slAddBoundingBoxForVectors(w->proximityData, n, &w->objects[n]->min, &w->objects[n]->max);
+	for(n=0;n < w->objects.size(); n++) {
+		slWorldObject *wo = w->objects[n];
 
-		switch(w->objects[n]->type) {
-			slWorldObject *wo;
-			slStationary *s;
-			slLink *l;
+		slAddBoundingBoxForVectors(w->proximityData, n, &wo->neighborMin, &wo->neighborMax);
 
-			case WO_STATIONARY:
-				wo = w->objects[n];
-				s = w->objects[n];
-				wo->min.x = s->position.location.x - wo->proximityRadius;
-				wo->min.y = s->position.location.y - wo->proximityRadius;
-				wo->min.z = s->position.location.z - wo->proximityRadius;
-				wo->max.x = s->position.location.x + wo->proximityRadius;
-				wo->max.y = s->position.location.y + wo->proximityRadius;
-				wo->max.z = s->position.location.z + wo->proximityRadius;
-				break;
-			case WO_LINK:
-				wo = w->objects[n];
-				l = w->objects[n];
-				wo->min.x = l->position.location.x - wo->proximityRadius;
-				wo->min.y = l->position.location.y - wo->proximityRadius;
-				wo->min.z = l->position.location.z - wo->proximityRadius;
-				wo->max.x = l->position.location.x + wo->proximityRadius;
-				wo->max.y = l->position.location.y + wo->proximityRadius;
-				wo->max.z = l->position.location.z + wo->proximityRadius;
-				break;
-			case WO_TERRAIN:
-				wo = w->objects[n];
-				wo->min.x -= wo->proximityRadius;
-				wo->min.y -= wo->proximityRadius;
-				wo->min.z -= wo->proximityRadius;
-				wo->max.x += wo->proximityRadius;
-				wo->max.y += wo->proximityRadius;
-				wo->max.z += wo->proximityRadius;
-				break;
-			default: 
-				slMessage(DEBUG_ALL, "Unknown world object type in slVclipDataInit()\n");
-				return;
-		}
+		wo->neighborMin.x = wo->position.location.x - wo->proximityRadius;
+		wo->neighborMin.y = wo->position.location.y - wo->proximityRadius;
+		wo->neighborMin.z = wo->position.location.z - wo->proximityRadius;
+		wo->neighborMax.x = wo->position.location.x + wo->proximityRadius;
+		wo->neighborMax.y = wo->position.location.y + wo->proximityRadius;
+		wo->neighborMax.z = wo->position.location.z + wo->proximityRadius;
 	}
 
 	// for the proximity data we don't need anything except the	
@@ -382,7 +318,7 @@ void slInitProximityData(slWorld *w) {
 */
 
 void slFreeClipData(slVclipData *v) {
-	int n;
+	unsigned int n;
 
 	if(!v->maxCount) {
 		// everything is uninitialized and empty
@@ -390,10 +326,7 @@ void slFreeClipData(slVclipData *v) {
 		return;
 	}
 
-	if(v->shapes) slFree(v->shapes);
-
 	for(n=1;n<v->maxCount;n++) delete[] v->pairList[n];
-	if(v->pairList) slFree(v->pairList);
 
 	delete v;
 }

@@ -287,7 +287,7 @@ int slLinkCheckSelfPenetration(slWorld *world, slLink *l) {
 int slLinkCheckPenetration(slWorld *w, slLink *l) {
 	slVclipData *vc;
 	slPairEntry *pe;
-	int ln;
+	unsigned int ln;
 	unsigned int n;
 
 	if(!w->initialized) slVclipDataInit(w);

@@ -723,7 +723,7 @@ inline int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) {
 			return EC_ERROR;
 		}
 
-		if(BRINSTANCE(&obj)->object->type != gSteveData) {
+		if(BRINSTANCE(&obj)->object->type != &gSteveData->steveObjectType) {
 			return stEvalForeignMethodCall(mexp, BRINSTANCE(&obj), i, t);
 		}
 
@@ -740,7 +740,7 @@ inline int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) {
 		brEvalList *listStart = BRLIST(&obj)->start;
 
 		while(listStart) {
-			if(BRINSTANCE(&listStart->eval)->object->type != gSteveData) {
+			if(BRINSTANCE(&listStart->eval)->object->type != &gSteveData->steveObjectType) {
 				return stEvalForeignMethodCall(mexp, BRINSTANCE(&listStart->eval), i, t);
 			}
 

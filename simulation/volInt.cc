@@ -79,7 +79,7 @@ int slConvertShapeToPolyhedron(slShape *s, slMPPolyhedron *p) {
 		p->faces[p->numFaces].norm[Z] = theFace->plane.normal.z;
 
 		theEdge = theFace->neighbors[0];
-		thePoint = theEdge->neighbors[0];
+		thePoint = theEdge->points[0];
 
 		p->faces[p->numFaces].w = -slVectorDot(&theFace->plane.normal, &thePoint->vertex);
 

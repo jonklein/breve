@@ -132,7 +132,7 @@ brInstance *brClickCallback(brEngine *e, int n) {
 	if(!method) return NULL;
 
 	theArg.type = AT_INSTANCE;
-	if(o) BRINSTANCE(&theArg) = o->userData;
+	if(o) BRINSTANCE(&theArg) = slWorldObjectGetCallbackData(o);
 	else BRINSTANCE(&theArg) = NULL;
 
 	argPtr[0] = &theArg;
@@ -142,7 +142,7 @@ brInstance *brClickCallback(brEngine *e, int n) {
 
 	if(!o) return NULL;
 
-	return o->userData;
+	return slWorldObjectGetCallbackData(o);
 }
 
 void brBeginDrag(brEngine *e, brInstance *i) {

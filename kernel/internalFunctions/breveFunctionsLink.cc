@@ -33,7 +33,7 @@ int brILinkNew(brEval args[], brEval *target, brInstance *i) {
 
 	l = slLinkNew(i->engine->world);
 
-	slLinkSetCallbackData(l, i);
+	slWorldObjectSetCallbackData(l, i);
 
 	BRPOINTER(target) = l;
 
@@ -56,7 +56,6 @@ int brILinkAddToWorld(brEval args[], brEval *target, brInstance *i) {
 	}
 
 	wo = slWorldAddObject(i->engine->world, link, WO_LINK);
-	wo->userData = i;
 
 	BRPOINTER(target) = wo;
 
@@ -545,15 +544,12 @@ int brILinkSetLabel(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brILinkRemoveLabel(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *w = BRPOINTER(&args[0]);
-	slLink *m;
+	slLink *m = BRPOINTER(&args[0]);
 
-	if(!w) {
+	if(!m) {
 		slMessage(DEBUG_ALL, "NULL pointer passed to linkSetLabel\n");
 		return EC_OK;
 	}
-
-	m = w->data;
 
 	slLinkSetLabel(m, NULL);
 

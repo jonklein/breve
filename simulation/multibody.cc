@@ -34,7 +34,7 @@
 	\brief Ignores collisions between adjacent multibody links.
 */
 
-void slMultibodyInitCollisionFlags(slMultibody *m, slPairEntry **pe) {
+void slMultibodyInitCollisionFlags(slMultibody *m, std::vector<slPairEntry*> pe) {
 	slLink *link1, *link2;
 	slPairEntry *e;
 	std::vector<slLink*>::iterator i1;

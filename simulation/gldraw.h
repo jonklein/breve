@@ -104,8 +104,6 @@ void slStrokeText(double x, double y, char *string, double scale, void *font);
 void slDrawLights(slCamera *c, int noDiff);
 void slShadowMatrix(GLfloat shadowMat[4][4], slPlane *plane, slVector *light);
 
-void slDrawStationary(slWorld *w, slStationary *m, slCamera *c, slVector *color, int texture, double textureScale, int textureMode, float alpha, int mode, int flags);
-inline void slDrawMultibody(slWorld *w, slMultibody *m, slCamera *c, slVector *color, int texture, double textureScale, int billboard, float bbRot, float bbAlpha, int mode, int flags);
 void slDrawShape(slWorld *w, slCamera *c, slShape *s, slPosition *pos, slVector *color, int texture, double textureScale, int tmode, int mode, int flags, float bbRot, float alpha);
 
 int slCompileShape(slWorld *w, slShape *s, int drawMode, int texture, double textureScale, int flags);

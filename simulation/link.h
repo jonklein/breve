@@ -79,8 +79,6 @@ class slLink: public slWorldObject {
 		slsVector acceleration;
 		slsVector velocity;
 
-		char *label;
-
 		char mobile;
 
 		slLinkIntegrationPosition stateVector[2];
@@ -88,7 +86,7 @@ class slLink: public slWorldObject {
 		unsigned char currentState;
 		unsigned char simulate;
 
-		int clipNumber;
+		unsigned int clipNumber;
 
 		dBodyID odeBodyID;
 		dMass massData;

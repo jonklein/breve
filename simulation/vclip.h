@@ -112,7 +112,6 @@ struct slCollisionEntry {
 
 struct slVclipData {
 	std::vector<slBoundSort*> boundListPointers[3];
-
 	std::vector<slBoundSort> boundLists[3];
 
 	slShape **shapes;
@@ -121,20 +120,20 @@ struct slVclipData {
 
 	std::vector<slCollisionEntry> collisions;
 
-	slPairEntry **pairList;
+	std::vector<slPairEntry*> pairList;
 
 	std::vector<slPairEntry*> candidates;
 
 	unsigned int count;
-	int maxCount;
+	unsigned int maxCount;
 };
 
 slCollisionEntry *slNextCollisionEntry(slVclipData *v);
 slCollisionEntry *slNextCollisionEntry(slVclipData *v, int x, int y);
 
 void slInitBoundSort(slVclipData *v);
-void slIsort(slVclipData *vc, std::vector<slBoundSort*> &list, int size, char boundTypeFlag);
-void slInitBoundSortList(std::vector<slBoundSort*> &list, int size, slVclipData *v, char boundTypeFlag);
+void slIsort(slVclipData *vc, std::vector<slBoundSort*> &list, unsigned int size, char boundTypeFlag);
+void slInitBoundSortList(std::vector<slBoundSort*> &list, unsigned int size, slVclipData *v, char boundTypeFlag);
 
 #endif
 

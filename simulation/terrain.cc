@@ -610,14 +610,14 @@ int slTerrainTestPair(slVclipData *vc, int x, int y, slCollisionEntry *ce) {
 	slWorldObject *w2 = vc->objects[y];
 
 	if(w1->type != WO_TERRAIN) {
-		slShape *s = vc->shapes[x];
-		terrain = w2;
+		slShape *s = w1->shape;
+		terrain = (slTerrain*)w2;
 		if(!terrain->initialized) slTerrainInitialize(terrain);
 		if(s->type == ST_SPHERE) return slTerrainSphereClip(vc, terrain, x, y, ce, 0);
 		else return slTerrainShapeClip(vc, terrain, x, y, ce, 0);
 	} else {
-		slShape *s = vc->shapes[y];
-		terrain = w1;
+		slShape *s = w2->shape;
+		terrain = (slTerrain*)w1;
 		if(!terrain->initialized) slTerrainInitialize(terrain);
 		if(s->type == ST_SPHERE) return slTerrainSphereClip(vc, terrain, y, x, ce, 1);
 		else return slTerrainShapeClip(vc, terrain, y, x, ce, 1);
@@ -637,7 +637,7 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 	int startX, endX, startZ, endZ, earlyStart, lateEnd, x, z, quad;
 	int collisions = 0;
 
-	slShape *ss = vc->shapes[obX];
+	slShape *ss = vc->objects[obX]->shape;
 	slPosition *sp = &vc->objects[obX]->position;
 
 	if(!flip) {
@@ -841,7 +841,7 @@ int slTerrainShapeClip(slVclipData *vc, slTerrain *l, int obX, int obY, slCollis
 	std::vector<slFace*>::iterator fi;
 	int collisions = 0;
 
-	slShape *ss = vc->shapes[obX];
+	slShape *ss = vc->objects[obX]->shape;
 	slPosition *sp = &vc->objects[obX]->position;
 
 	slVectorSet(&ce->normal, 0, 0, 0);

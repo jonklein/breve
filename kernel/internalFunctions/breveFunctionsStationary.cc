@@ -32,16 +32,15 @@ int brIAddStationary(brEval args[], brEval *target, brInstance *i) {
 	double id[3][3];
 
 	if(!sh) {
-		slMessage(DEBUG_ALL, "null pointer passed to addStationary\n");
+		slMessage(DEBUG_ALL, "null shape passed to addStationary\n");
 		return EC_ERROR;
 	}
 
 	slMatrixIdentity(id);
 
-	st = slNewStationary(sh, v, id);
+	st = slNewStationary(sh, v, id, i);
 
 	wo = slWorldAddObject(i->engine->world, st, WO_STATIONARY);
-	wo->userData = i;
 
 	BRPOINTER(target) = wo;
    

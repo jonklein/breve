@@ -196,7 +196,7 @@ Mobile : Bird (aka Birds) {
 
 		# set the neighborhood radius that we will look in to find neighbors.
 
-		self set-neighborhood-size to 3.0.
+		self set-neighborhood-size to 2.0.
 
 	+ to flock-normally:
 		wanderConstant = 4.0.

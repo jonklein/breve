@@ -70,6 +70,8 @@ Control : PDBViewer {
 
         average /= | all Mobiles |.
 
+		print | all Mobiles |, " atoms".
+
         self point-camera at average from average + (30, 0, 30).
         self move-light to average + (30, 0, 30).
         self enable-lighting.

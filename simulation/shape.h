@@ -58,6 +58,11 @@ struct slPlane {
 class slFeature {
 	public:
 		int type;
+		slPlane *voronoi;	
+
+		~slFeature() {
+		    delete[] voronoi;
+		}
 };
 
 /*!
@@ -68,9 +73,6 @@ class slPoint : public slFeature {
 	public:
 		slVector vertex;
 
-		// the voronoi planes defining this point and the number of planes 
-
-		slPlane *voronoi;
 		int edgeCount;
 
 		/* temp data for terrain collisions :( */
@@ -91,7 +93,10 @@ class slPoint : public slFeature {
 			neighbors = NULL;
 		}
 
-		~slPoint();
+		~slPoint() {
+			delete[] neighbors;
+			delete[] faces;
+		}
 };
 
 /*!
@@ -102,12 +107,16 @@ class slPoint : public slFeature {
 
 class slEdge : public slFeature {
 	public:
-		slPlane voronoi[4];
 		slFeature *neighbors[4];
 		slFace *faces[2];
 		slPoint *points[2];
 
-		~slEdge();
+		slEdge() {
+			voronoi = new slPlane[4];
+		}
+
+		~slEdge() {
+		}
 };
 
 /*!
@@ -120,15 +129,17 @@ class slFace : public slFeature {
 
 		slPlane plane;
 
-		slPlane *voronoi;	
-
 		slEdge **neighbors;		// neighbor edges
 		slPoint **points;		// connected points 
 		slFace **faces;			// connected faces
 
 		char drawFlags;
 
-		~slFace();
+		~slFace() {
+			delete[] neighbors;
+			delete[] faces;
+			delete[] points;
+		}
 };
 
 /*!
@@ -136,33 +147,34 @@ class slFace : public slFeature {
 */
 
 struct slShape {
-	int referenceCount;
+	public:
+		int referenceCount;
 
-	int drawList;
+		int drawList;
 
-	unsigned char recompile;
+		unsigned char recompile;
 
-	double inertia[3][3];
-	double mass;
-	double density;
+		double inertia[3][3];
+		double mass;
+		double density;
 
-	/* the max reach on each axis */
+		// the max reach on each axis 
 
-	slVector max;
+		slVector max;
 
-	/* add support for this shape to be a sphere, in which case the */
-	/* normal features below are ignored */
+		// add support for this shape to be a sphere, in which case the 
+		// normal features below are ignored 
 
-	int type;
-	double radius;
+		int type;
+		double radius;
 
-	std::vector<slFeature*> features;
+		std::vector<slFeature*> features;
 
-	int firstPoint;
+		int firstPoint;
 
-	std::vector<slFace*> faces;
-	std::vector<slEdge*> edges;
-	std::vector<slPoint*> points;
+		std::vector<slFace*> faces;
+		std::vector<slEdge*> edges;
+		std::vector<slPoint*> points;
 };
 #endif
 
@@ -223,7 +235,7 @@ slPlane *slSetPlane(slPlane *p, slVector *normal, slVector *vertex);
 
 int slFeatureSort(const void *a, const void *b);
 
-slShape *slInitNeighbors(slShape *s, double density);
+slShape *slShapeInitNeighbors(slShape *s, double density);
 
 void slShapeSetMass(slShape *shape, double mass);
 void slShapeSetDensity(slShape *shape, double density);

@@ -1037,7 +1037,7 @@ void slDrawBackground(slCamera *c, slWorld *w) {
 }
 
 void slRenderLabels(slWorld *w) {
-	slLink *m;
+	slWorldObject *wo;
 	slVector *l;
 	std::vector<slWorldObject*>::iterator wi;
 
@@ -1046,13 +1046,13 @@ void slRenderLabels(slWorld *w) {
 	glColor3f(0, 0, 0);
 
 	for(wi = w->objects.begin(); wi != w->objects.end(); wi++) {
-		m = *wi;
+		wo = *wi;
 
-		if(m && m->type == WO_LINK && m->label) {
-			l = &m->position.location;
+		if(wo->label) {
+			l = &wo->position.location;
 			glPushMatrix();
 			glTranslatef(l->x, l->y, l->z);
-			slText(0, 0, m->label, GLUT_BITMAP_HELVETICA_10);
+			slText(0, 0, wo->label, GLUT_BITMAP_HELVETICA_10);
 			glPopMatrix();
 		}
 	}
@@ -1426,10 +1426,6 @@ void slDrawShape(slWorld *w, slCamera *c, slShape *s, slPosition *pos, slVector 
 	\brief Renders a stationary object.
 */
 
-void slDrawStationary(slWorld *w, slStationary *s, slCamera *c, slVector *color, int texture, double textureScale, int textureMode, float alpha, int mode, int flags) {
-	slDrawShape(w, c, s->shape, &s->position, color, texture, textureScale, textureMode, mode, flags, 0, alpha);
-}
-
 /*! 
 	\brief Renders the objects, assuming that all necessary transformations 
 	have been set up.
@@ -1438,7 +1434,6 @@ void slDrawStationary(slWorld *w, slStationary *s, slCamera *c, slVector *color,
 int slRenderObjects(slWorld *w, slCamera *c, int loadNames, int flags) {
 	unsigned int n;
 	int texture, textureMode;
-	slLink *m;
 	slWorldObject *wo;
 
 	int labels = 0;
@@ -1467,12 +1462,10 @@ int slRenderObjects(slWorld *w, slCamera *c, int loadNames, int flags) {
 
 			switch(wo->type) {
 				case WO_LINK:
-					m = wo;
-					if(!(flags & DO_NO_LINK)) slDrawShape(w, c, m->shape, &m->position, &wo->color, texture, wo->textureScale, textureMode, wo->drawMode, flags, wo->billboardRotation, wo->alpha);
+					if(!(flags & DO_NO_LINK)) slDrawShape(w, c, wo->shape, &wo->position, &wo->color, texture, wo->textureScale, textureMode, wo->drawMode, flags, wo->billboardRotation, wo->alpha);
 					break;
-
 				case WO_STATIONARY:
-					if(!(flags & DO_NO_STATIONARY)) slDrawStationary(w, (slStationary*)wo, c, &wo->color, texture, wo->textureScale, textureMode, wo->alpha, wo->drawMode, flags);
+					if(!(flags & DO_NO_STATIONARY)) slDrawShape(w, c, wo->shape, &wo->position, &wo->color, texture, wo->textureScale, textureMode, wo->drawMode, flags, 0, wo->alpha);
 					break;
 				case WO_TERRAIN:
 					if(!(flags & DO_NO_TERRAIN)) slDrawTerrain(w, c, (slTerrain*)wo, texture, wo->textureScale, wo->drawMode, flags);
@@ -1500,8 +1493,6 @@ void slRenderLines(slWorld *w, slCamera *c, int flags) {
 	unsigned int m;
 	slVector *x, *y;
 	slWorldObject *neighbor;
-	slList *lineList;
-	slObjectLine *line;
 
 	glLineWidth(1.2);
 
@@ -1529,41 +1520,36 @@ void slRenderLines(slWorld *w, slCamera *c, int flags) {
 				glEnd();
 				glDisable(GL_BLEND);
 			}
-
-			lineList = w->objects[n]->outLines;
-
-			if(lineList && !(flags & DO_NO_NEIGHBOR_LINES)) {
-				x = &w->objects[n]->position.location;
-
-				glDisable(GL_LIGHTING);
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-				while(lineList) {
-					line = lineList->data;
-
-					if(line->stipple) {
-						glLineStipple(2, line->stipple);
-						glEnable(GL_LINE_STIPPLE);
-					}
-
-					glColor4f(line->color.x, line->color.y, line->color.z, 0.8);
-
-					glBegin(GL_LINES);
-
-					y = &((slWorldObject*)line->destination)->position.location;
-
-					glVertex3f(x->x, x->y, x->z);
-					glVertex3f(y->x, y->y, y->z);
-
-					lineList = lineList->next;
-
-					glEnd();
-
-					if(line->stipple) glDisable(GL_LINE_STIPPLE);
-				}
-			}
 		}
+	}
+
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	std::vector<slObjectLine>::iterator li;
+
+	for(li = w->connections.begin(); li != w->connections.end(); li++ ) {
+		slObjectLine &line = *li;
+
+		x = &line.src->position.location;
+		y = &line.dst->position.location;
+
+		if(line.stipple) {
+			glLineStipple(2, line.stipple);
+			glEnable(GL_LINE_STIPPLE);
+		}
+
+		glColor4f(line.color.x, line.color.y, line.color.z, 0.8);
+
+		glBegin(GL_LINES);
+
+		glVertex3f(x->x, x->y, x->z);
+		glVertex3f(y->x, y->y, y->z);
+
+		glEnd();
+
+		glDisable(GL_LINE_STIPPLE);
 	}
 }
 
@@ -1915,29 +1901,13 @@ int slClearGLErrors(char *id) {
 
 void slFreeGL(slWorld *w, slCamera *c) {
 	unsigned int n;
-	slStationary *so;
-	slLink *link;
 
 	if(c->stationaryDrawList) glDeleteLists(c->stationaryDrawList, 1);
 
 	for(n=0;n<w->objects.size();n++) {
-		if(w->objects[n]) {
-			switch(w->objects[n]->type) {
-				case WO_LINK:
-					link = w->objects[n];
-					glDeleteLists(link->shape->drawList, 1);
-					break;
-				case WO_STATIONARY:
-					so = w->objects[n];
-					if(so->shape->drawList) {
-						glDeleteLists(so->shape->drawList, 1);
-						so->shape->drawList = 0;
-					}
-					break;
-				 default:
-					/* buh */
-					break;
-			}
+		if(w->objects[n] && w->objects[n]->shape) {
+			glDeleteLists(w->objects[n]->shape->drawList, 1);
+			w->objects[n]->shape->drawList = 0;
 		}
 	}
 }

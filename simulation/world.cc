@@ -24,6 +24,19 @@ char *gPhysicsErrorMessage;
 #include "simulation.h"
 #include "tiger.h"
 
+void *operator new (size_t size) {
+	void *p = slMalloc(size); 
+
+	if (p == NULL) // did malloc succeed?
+		throw std::bad_alloc(); // ANSI/ISO compliant behavior
+
+	return p;
+}
+
+void operator delete (void *p) {
+	slFree(p); 
+}
+
 void slODEErrorHandler(int errnum, const char *msg, va_list ap) {
 	static char error[2048];
 
@@ -209,23 +222,12 @@ void slRenderWorldCameras(slWorld *w) {
 */
 
 void slWorldFreeObject(slWorldObject *o) {
-	slWorldObject *otherObject;
+	std::vector<slObjectLine*>::iterator li;
 
-	if(!o) return;
-
-	slStackFree(o->neighbors);
-
-	// so why not iterate the list as normal ( while(l) l = l->next )?
-	// because slRemoveObjectLine is destructive and will change the 
-	// list with each iteration.  so we'll have to go back to the start
-	// each time.  not pretty.  and yet, not ugly either.
-
-	while(o->inLines) {
-		otherObject = o->inLines->data;
-		slRemoveObjectLine(otherObject, o);
+	for(li = o->lines.begin(); li != o->lines.end(); li++ ) {
+		(*li)->src = NULL;
+		(*li)->dst = NULL;
 	}
-
-	slRemoveAllObjectLines(o);
 
 	delete o;
 }
@@ -408,7 +410,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 				double e = 0;
 
 				if(w1->type == WO_LINK) {
-					slLink *l = w1;
+					slLink *l = (slLink*)w1;
 					bodyX = l->odeBodyID;
 				}
 				
@@ -416,7 +418,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 				e = w1->e + w2->e;
 
 				if(w2->type == WO_LINK) {
-					slLink *l = w2;
+					slLink *l = (slLink*)w2;
 					bodyY = l->odeBodyID;
 				}
 
@@ -506,12 +508,12 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 }
 
 void slNeighborCheck(slWorld *w) {
-	unsigned int n;
 	double dist;
 	slVector *location, diff, *l1 = NULL, *l2 = NULL;
 	slPairEntry *pe;
 	slWorldObject *o1, *o2;
 	std::vector<slPairEntry*>::iterator ci;
+	std::vector<slWorldObject*>::iterator wi;
 
 	if(!w->initialized) slVclipDataInit(w);
 
@@ -525,19 +527,17 @@ void slNeighborCheck(slWorld *w) {
 
 	/* update all the bounding boxes first */
 
-	for(n=0;n<w->objects.size();n++) {
-		location = &w->objects[n]->position.location;
+	for(wi = w->objects.begin(); wi != w->objects.end(); wi++ ) {
+		slWorldObject *wo = *wi;
+		location = &wo->position.location;
 
-		if(location) {
-			w->objects[n]->min.x = location->x - w->objects[n]->proximityRadius;
-			w->objects[n]->min.y = location->y - w->objects[n]->proximityRadius;
-			w->objects[n]->min.z = location->z - w->objects[n]->proximityRadius;
-			w->objects[n]->max.x = location->x + w->objects[n]->proximityRadius;
-			w->objects[n]->max.y = location->y + w->objects[n]->proximityRadius;
-			w->objects[n]->max.z = location->z + w->objects[n]->proximityRadius;
-
-			slStackClear(w->objects[n]->neighbors);
-		}
+		wo->neighborMin.x = location->x - wo->proximityRadius;
+		wo->neighborMin.y = location->y - wo->proximityRadius;
+		wo->neighborMin.z = location->z - wo->proximityRadius;
+		wo->neighborMax.x = location->x + wo->proximityRadius;
+		wo->neighborMax.y = location->y + wo->proximityRadius;
+		wo->neighborMax.z = location->z + wo->proximityRadius;
+		slStackClear(wo->neighbors);
 	}
 
 	// vclip, but stop after the pruning stage 
@@ -568,50 +568,53 @@ void slWorldSetGravity(slWorld *w, slVector *gravity) {
 	dWorldSetGravity(w->odeWorldID, gravity->x, gravity->y, gravity->z);
 }
 
-slObjectLine *slWorldAddObjectLine(slWorldObject *src, slWorldObject *dst, int stipple, slVector *color) {
-	slObjectLine *line;
+slObjectLine *slWorldAddObjectLine(slWorld *w, slWorldObject *src, slWorldObject *dst, int stipple, slVector *color) {
+	slObjectLine line, *linep;
 
 	if(src == dst) return NULL;
 
-	line = slFindObjectLine(src, dst);
+	linep = slFindObjectLine(src, dst);
 
-	if(line) {
-		slVectorCopy(color, &line->color);
-		line->stipple = stipple;
-		return line;
+	if(linep) {
+		slVectorCopy(color, &linep->color);
+		linep->stipple = stipple;
+		return linep;
 	}
 
-	line = new slObjectLine;
+	line.stipple = stipple;
+	line.dst = dst;
+	line.src = src;
+	slVectorCopy(color, &line.color);
 
-	line->stipple = stipple;
-	line->destination = dst;
-	slVectorCopy(color, &line->color);
+	w->connections.push_back( line);
 
-	src->outLines = slListPrepend(src->outLines, line);
-	dst->inLines = slListPrepend(dst->inLines, src);
+	linep = &w->connections[ w->connections.size() - 1];
 
-	return line;
+	src->lines.push_back( linep);
+
+	return linep;
 }
 
-int slRemoveObjectLine(slWorldObject *src, slWorldObject *dst) {
-	slList *lines = src->outLines;
+int slRemoveObjectLine(slWorld *w, slWorldObject *src, slWorldObject *dst) {
+	std::vector<slObjectLine>::iterator li;
+	std::vector<slObjectLine*>::iterator linep;
+
 	slObjectLine *line;
-	int d = 0;
 
-	while(lines) {
-		line = lines->data;
+	for(li = w->connections.begin(); li != w->connections.end(); li++) {
+		line = &(*li);
 
-		if(line->destination == dst) {
-			src->outLines = slListRemoveData(src->outLines, line);
-			dst->inLines = slListRemoveData(dst->inLines, src);
+		if(line->dst == dst) {
+			linep = find(src->lines.begin(), src->lines.end(), line);
+			src->lines.erase(linep);
 
-			delete line;
+			linep = find(dst->lines.begin(), dst->lines.end(), line);
+			dst->lines.erase(linep);
+
+			w->connections.erase(li);
 
 			return 0;
 		}
-
-		lines = lines->next;
-		d++;
 	}
 
 	return -1;
@@ -622,22 +625,23 @@ int slRemoveObjectLine(slWorldObject *src, slWorldObject *dst) {
 */
 
 int slRemoveAllObjectLines(slWorldObject *src) {
+	std::vector<slObjectLine*>::iterator li;
 	slObjectLine *line;
 	slWorldObject *dst;
-	slList *duplicate, *start;
 	
-	start = duplicate = slListCopy(src->outLines);
+	while(src->lines.size()) {
+		line = src->lines[0];
+		dst = line->dst;
 
-	while(duplicate) {
-		line = duplicate->data;
-		dst = line->destination;
+		std::vector<slWorldObject*>::iterator wi;
 
-		src->outLines = slListRemoveData(src->outLines, line);
-		dst->inLines = slListRemoveData(dst->inLines, src);
+		li = find(src->lines.begin(), src->lines.end(), line);
+		src->lines.erase(li);
+
+		li = find(src->lines.begin(), src->lines.end(), line);
+		src->lines.erase(li);
 
 		delete line;
-
-		duplicate = duplicate->next;
 	}
 
 	return 0;
@@ -648,15 +652,13 @@ int slRemoveAllObjectLines(slWorldObject *src) {
 */
 
 slObjectLine *slFindObjectLine(slWorldObject *src, slWorldObject *dst) {
-	slList *lines = src->outLines;
+	std::vector<slObjectLine*>::iterator li;
 	slObjectLine *line;
 
-	while(lines) {
-		line = lines->data;
+	for(li = src->lines.begin(); li != src->lines.end(); li++) {
+		line = *li;
 
-		if(line->destination == dst) return line;
-
-		lines = lines->next;
+		if(line->dst == dst) return line;
 	}
 
 	return NULL;
@@ -693,6 +695,15 @@ void slWorldSetUninitialized(slWorld *w) {
 void slWorldSetCollisionResolution(slWorld *w, int n) {
 	w->resolveCollisions = n;
 }
+
+/*!
+    \brief Turn on/off bounds-only collision detection.
+*/
+
+void slWorldSetBoundsOnlyCollisionDetection(slWorld *w, int b) {
+    w->boundingBoxOnly = b;
+}
+
 
 void slWorldSetPhysicsMode(slWorld *w, int n) {
 	w->odeStepMode = n;

@@ -86,9 +86,6 @@ class slWorldObject {
 			billboardRotation = 0;
 			alpha = 1.0;
 
-			inLines = NULL;
-			outLines = NULL;
-
 			e = 0.4;
 			eT = 0.2;
 			mu = 0.15;
@@ -99,7 +96,14 @@ class slWorldObject {
 			slVectorSet(&position.location, 0, 0, 0);
 		}
 
+		~slWorldObject() {
+			if(shape) slShapeFree(shape);
+			slStackFree(neighbors);
+		}
+
 		slShape *shape;
+
+		char *label;
 
 		slPosition position;
 
@@ -122,6 +126,8 @@ class slWorldObject {
 
 		// bounding box information here is used for "proximity" data
 	
+		slVector neighborMax;
+		slVector neighborMin;
 		slVector max;
 		slVector min;
 	
@@ -134,20 +140,8 @@ class slWorldObject {
 
 		// the list of lines that this object makes to other objects
 
-		slList *outLines;
+		std::vector<slObjectLine*> lines;
 
-		// and--so that we can eliminate the connections when this
-		// object is freed--we'll keep the lines other objects make
-		// to this one.
-
-		slList *inLines;
-
-		// the userData is defined by users of the physics engine so that, 
-		// for example, the engine can report which objects are colliding  
-		// using the collision callback.  in the specific case of breve, 
-		// the user data represents the steve instance associated with the
-		// world object... 
-	
 		void *userData;
 };
 
@@ -159,16 +153,25 @@ class slStationary: public slWorldObject {
 	public:
 };
 
-// typedef safe_ptr<slWorldObject> slWorldObject;
+typedef safe_ptr<slWorldObject> slWorldObjectPointer;
+
+
+class slObjectConnection {
+	public:
+		slWorldObject *src;
+		slWorldObject *dst;
+
+		// virtual void draw() = 0;
+};
 
 /*!
 	\brief A line drawn from one object to another.
 */
 
-struct slObjectLine {
-	slVector color;
-	int stipple;
-	slWorldObject *destination;
+class slObjectLine: public slObjectConnection {
+	public:
+		slVector color;
+		int stipple;
 };
 #endif
 
@@ -226,16 +229,12 @@ struct slWorld {
 
 	double age;
 
-	// these structures will replace the standard objects above in the 
-	// near future -- OR WILL THEY?!
-
-	slStack *stationaryObjects;
-	slStack *mobileObjects;
-
 	std::vector<slWorldObject*> objects;
 	std::vector<slPatchGrid*> patches;
 	std::vector<slSpring*> springs;
 	std::vector<slCamera*> cameras;
+
+	std::vector<slObjectLine> connections;
 
 	// we have one slVclipData for the regular collision detection
 	// and one which will be used to answer "proximity" questions:
@@ -294,20 +293,17 @@ double slWorldStep(slWorld *w, double stepSize, int *error);
 void slNeighborCheck(slWorld *w);
 
 slVclipData *slVclipDataNew();
-void slVclipDataRealloc(slVclipData *v, int count);
 
 slStationary *slNewStationary(slShape *s, slVector *loc, double rot[3][3], void *data);
 
-void slIgnoreAllCollisions(slVclipData *d, int object);
-
 void slWorldSetGravity(slWorld *w, slVector *gravity);
 
-void slSetBoundsOnlyCollisionDetection(slWorld *w, int value);
+void slWorldSetBoundsOnlyCollisionDetection(slWorld *w, int value);
 
 void slInitProximityData(slWorld *w);
 
-slObjectLine *slWorldAddObjectLine(slWorldObject *src, slWorldObject *dst, int stipple, slVector *color);
-int slRemoveObjectLine(slWorldObject *src, slWorldObject *dst);
+slObjectLine *slWorldAddObjectLine(slWorld *w, slWorldObject *src, slWorldObject *dst, int stipple, slVector *color);
+int slRemoveObjectLine(slWorld *w, slWorldObject *src, slWorldObject *dst);
 int slRemoveAllObjectLines(slWorldObject *src);
 
 slObjectLine *slFindObjectLine(slWorldObject *src, slWorldObject *dst);

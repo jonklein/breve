@@ -199,7 +199,7 @@ int brISetNeighborhoodSize(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	wo->proximityRadius = size;
+	slWorldObjectSetNeighborhoodSize(wo, size);
 
 	return EC_OK;
 }
@@ -212,6 +212,7 @@ int brISetNeighborhoodSize(brEval args[], brEval *target, brInstance *i) {
 
 int brIGetNeighbors(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *wo = BRPOINTER(&args[0]);
+	const slStack *neighbors;
 	unsigned int n;
 	brEval eval;
 
@@ -224,10 +225,12 @@ int brIGetNeighbors(brEval args[], brEval *target, brInstance *i) {
 
 	eval.type = AT_INSTANCE;
 
-	for(n=0;n<wo->neighbors->count;n++) {
+	neighbors = slWorldObjectGetNeighbors(wo);
+
+	for(n=0;n<neighbors->count;n++) {
 		// grab the neighbor instances from the userData of the neighbors
 
-		BRINSTANCE(&eval) = ((slWorldObject*)wo->neighbors->data[n])->userData;
+		BRINSTANCE(&eval) = slWorldObjectGetCallbackData((slWorldObject*)neighbors->data[n]);
 
 		if(BRINSTANCE(&eval) && BRINSTANCE(&eval)->status == AS_ACTIVE) brEvalListInsert(BRPOINTER(target), 0, &eval);
 	}
@@ -245,7 +248,7 @@ int brIGetNeighbors(brEval args[], brEval *target, brInstance *i) {
 int brIWorldObjectGetLightExposure(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *wo = BRPOINTER(&args[0]);
 
-	BRINT(target) = wo->lightExposure;
+	BRINT(target) = slWorldObjectGetLightExposure(wo);
 
 	return EC_OK;
 }
@@ -278,8 +281,8 @@ int brISetBoundingBox(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	if(value) o->drawMode |= DM_BOUND;
-	else if(o->drawMode & DM_BOUND) o->drawMode ^= DM_BOUND;
+	if(value) slWorldObjectAddDrawMode(o, DM_BOUND);
+	else slWorldObjectRemoveDrawMode(o, DM_BOUND);
 
 	return EC_OK;
 }
@@ -299,10 +302,10 @@ int brISetDrawAxis(brEval args[], brEval *target, brInstance *i) {
 		return EC_OK;
 	}
 
-	if(value) o->drawMode |= DM_AXIS;
-	else if(o->drawMode & DM_AXIS) o->drawMode ^= DM_AXIS;
+	if(value) slWorldObjectAddDrawMode(o, DM_AXIS);
+	else slWorldObjectRemoveDrawMode(o, DM_AXIS);
 
-	if(o->type == WO_STATIONARY) i->engine->camera->recompile = 1;
+	i->engine->camera->recompile = 1;
 
 	return EC_OK;
 }
@@ -316,10 +319,8 @@ int brISetNeighborLines(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	if(value) o->drawMode |= DM_NEIGHBOR_LINES;
-	else if(o->drawMode & DM_NEIGHBOR_LINES) o->drawMode ^= DM_NEIGHBOR_LINES;
-
-	if(o->type == WO_STATIONARY) i->engine->camera->recompile = 1;
+	if(value) slWorldObjectAddDrawMode(o, DM_NEIGHBOR_LINES);
+	else slWorldObjectRemoveDrawMode(o, DM_NEIGHBOR_LINES);
 
 	return EC_OK;
 }
@@ -333,10 +334,10 @@ int brISetVisible(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	if(!visible) o->drawMode |= DM_INVISIBLE;
-	else if(o->drawMode & DM_INVISIBLE) o->drawMode ^= DM_INVISIBLE;
+	if(!visible) slWorldObjectAddDrawMode(o, DM_INVISIBLE);
+	else slWorldObjectRemoveDrawMode(o, DM_INVISIBLE);
 
-	if(o->type == WO_STATIONARY) i->engine->camera->recompile = 1;
+	i->engine->camera->recompile = 1;
 
 	return EC_OK;
 }
@@ -350,8 +351,8 @@ int brISetTexture(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	o->texture = value;
-	o->textureMode = BBT_NONE;
+	slWorldObjectSetTexture(o, value);
+	slWorldObjectSetTextureMode(o, BBT_NONE);
 	i->engine->camera->recompile = 1;
 
 	return EC_OK;
@@ -371,23 +372,22 @@ int brISetTextureScale(brEval args[], brEval *target, brInstance *i) {
 		value = 1;
 	} 
 
-	o->textureScale = value;
-	i->engine->camera->recompile = 1;
+	slWorldObjectSetTextureScale(o, value);
 
 	return EC_OK;
 }
 
 int brISetBitmap(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *o = BRPOINTER(&args[0]);
-	int value = BRINT(&args[1]);
+	int texture = BRINT(&args[1]);
 
 	if(!o) {
 		slMessage(DEBUG_ALL, "null pointer passed to setBitmap\n");
 		return EC_ERROR;
 	}
 
-	o->texture = value;
-	o->textureMode = BBT_BITMAP;
+	slWorldObjectSetTexture(o, texture);
+	slWorldObjectSetTextureMode(o, BBT_BITMAP);
 
 	return EC_OK;
 }
@@ -400,7 +400,7 @@ int brISetBitmapRotation(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	o->billboardRotation = RADTODEG(BRDOUBLE(&args[1]));
+	slWorldObjectSetBitmapRotation(o, RADTODEG(BRDOUBLE(&args[1])));
 
 	return EC_OK;
 }
@@ -410,9 +410,9 @@ int brISetBitmapRotation(brEval args[], brEval *target, brInstance *i) {
 			this is c . (nc + v) where c is the camera vector, v is the 
 			vector in question, and n is some constant.
 
-			do the math, it becomes n * c.c + c.v = 0
+			it becomes n * c.c + c.v = 0
 		
-			c.c is obviously 1, so n = -c.v
+			c.c = 1, so n = -c.v
 		
 */
 		
@@ -449,7 +449,7 @@ int brISetBitmapRotationTowardsVector(brEval args[], brEval *target, brInstance 
 
 	if(slVectorDot(&axis, &vproj) > 0.0) rotation = 2*M_PI - rotation;
 
-	o->billboardRotation = RADTODEG(rotation);
+	slWorldObjectSetBitmapRotation(o, RADTODEG(rotation));
 
 	return EC_OK;
 }
@@ -462,7 +462,7 @@ int brISetAlpha(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	o->alpha = BRDOUBLE(&args[1]);
+	slWorldObjectSetAlpha(o, BRDOUBLE(&args[1]));
 
 	return EC_OK;
 }
@@ -476,8 +476,8 @@ int brISetLightmap(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	o->texture = value;
-	o->textureMode = BBT_LIGHTMAP;
+	slWorldObjectSetTexture(o, value);
+	slWorldObjectSetTextureMode(o, BBT_LIGHTMAP);
 
 	return EC_OK;
 }
@@ -495,9 +495,7 @@ int brISetColor(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	if(o->type == WO_STATIONARY) i->engine->camera->recompile = 1;
-
-	slVectorCopy(color, &o->color);
+	slWorldObjectSetColor(o, color);
 
 	return EC_OK;
 }
@@ -520,29 +518,29 @@ int brICameraSetOffset(brEval args[], brEval *target, brInstance *i) {
 
 	slVectorNormalize(loc);
 
-	/* don't ask me to explain the following.  please.	  */
-	/* it took me a while to work out on paper and i didn't */ 
-	/* save my notes.  i never learn.  never never.		 */
+	// don't ask me to explain the following.  please.
+	// it took me a while to work out on paper and i didn't 
+	// save my notes.  i never learn.  never never.
 
-	/* and now, a year later, there's a bug in this code!  */
-	/* looks like i'll have to figure it out. */
+	// and now, a year later, there's a bug in this code! 
+	// looks like i'll have to figure it out. 
 
-	/* if we had a unit vector (0, 0, 1), what are the X and Y */
-	/* rotations to get to the target vector? */
+	// if we have a unit vector (0, 0, 1), what are the X and Y
+	// rotations to get to the target vector?
 
-	/* how much of a rotation about the x-axis would we make to */
-	/* get a Y value of loc->y? */
+	// how much of a rotation about the x-axis would we make to
+	// get a Y value of loc->y? 
 
 	i->engine->camera->rx = -asin(loc->y);
 
-	/* now--how much would we rotate the resulting vector in order */
-	/* to get the X value where we want it? */
+	// now--how much would we rotate the resulting vector in order
+	// to get the X value where we want it?
 
-	/* now consider that we're at (0, .707, 0) and that the target */
-	/* is (.707, .707, 0).  That's 90 degree turn away, but if we  */
-	/* just took asin(.707) we'd get 45.  We have to 'normalize'   */
-	/* the X value by dividing it from our own distance from the   */
-	/* (0, 1, 0) vector. */
+	// now consider that we're at (0, .707, 0) and that the target 
+	// is (.707, .707, 0).  That's 90 degree turn away, but if we  
+	// just took asin(.707) we'd get 45.  We have to 'normalize'   
+	// the X value by dividing it from our own distance from the   
+	// (0, 1, 0) vector. 
 
 	x = loc->x / cos(i->engine->camera->rx);
 
@@ -551,8 +549,8 @@ int brICameraSetOffset(brEval args[], brEval *target, brInstance *i) {
 
 	i->engine->camera->ry = asin(x);
 
-	/* there are two x-rot values which fulfill this situation: */
-	/* (x, y, z) and (x, y, -z) */
+	// there are two x-rot values which fulfill this situation: 
+	// (x, y, z) and (x, y, -z) 
 
 	if(loc->z < 0.0) i->engine->camera->ry = M_PI - i->engine->camera->ry;
 
@@ -788,26 +786,12 @@ int brISetLightDiffuseColor(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetShadowCatcher(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *o = BRPOINTER(&args[0]);
+	slStationary *st = BRPOINTER(&args[0]);
 	slVector *norm = &BRVECTOR(&args[1]);
 
-	slStationary *st;
+	slWorldObjectAddDrawMode(st, DM_STENCIL);
 
-	if(!o) {
-		brEvalError(i->engine, EE_SIMULATION, "NULL pointer passed to setShadowCatcher");
-		return EC_ERROR;
-	}
-
-	if(o->type != WO_STATIONARY) {
-		brEvalError(i->engine, EE_SIMULATION, "setShadowCatcher requires a Stationary world object");
-		return EC_ERROR;
-	}
-
-	st = o->data;
-
-	o->drawMode |= DM_STENCIL;
-
-	slSetShadowCatcher(i->engine->camera, st->shape, norm, &st->position);
+	slSetShadowCatcher(i->engine->camera, st, norm);
 
 	return EC_OK;
 }
@@ -834,7 +818,7 @@ int brIAddObjectLine(brEval args[], brEval *target, brInstance *i) {
 		pattern |= (*(patternString++) == '-');
 	}
 
-	slWorldAddObjectLine(src, dst, pattern, color);
+	slWorldAddObjectLine(i->engine->world, src, dst, pattern, color);
 
 	return EC_OK;
 }
@@ -849,7 +833,7 @@ int brIRemoveObjectLine(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *src = BRPOINTER(&args[0]);
 	slWorldObject *dst = BRPOINTER(&args[1]);
 
-	slRemoveObjectLine(src, dst);
+	slRemoveObjectLine(i->engine->world, src, dst);
 
 	return EC_OK;
 }
@@ -877,7 +861,7 @@ int brIRemoveAllObjectLines(brEval args[], brEval *target, brInstance *i) {
 int brISetBoundsOnlyCollisionDetection(brEval args[], brEval *target, brInstance *i) {
 	int value = BRINT(&args[0]);
 
-	slSetBoundsOnlyCollisionDetection(i->engine->world, value);
+	slWorldSetBoundsOnlyCollisionDetection(i->engine->world, value);
 
 	return EC_OK;
 }

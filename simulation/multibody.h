@@ -44,6 +44,8 @@ struct slMultibody {
 
 void slLinkList(slLink *root, std::vector<slLink*> *list, int mbOnly);
 
+void slMultibodyInitCollisionFlags(slMultibody *m, std::vector<slPairEntry*> pe);
+
 #endif
 
 #ifdef __cplusplus
@@ -51,8 +53,6 @@ extern "C"{
 #endif
 slMultibody *slMultibodyNew(slWorld *w);
 void slMultibodySetRoot(slMultibody *m, slLink *root);
-
-void slMultibodyInitCollisionFlags(slMultibody *m, slPairEntry **pe);
 
 int slInitShapeList(slShape **slist, slPosition **plist, slMultibody *root);
 

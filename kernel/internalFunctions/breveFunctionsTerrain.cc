@@ -25,50 +25,29 @@
 
 int brITerrainNew(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t;
-	slWorldObject *wo;
 
-	t = slTerrainNew(5, BRDOUBLE(&args[0]));
+	t = slTerrainNew(5, BRDOUBLE(&args[0]), i);
 
-	wo = slWorldAddObject(i->engine->world, t, WO_TERRAIN);
+	slWorldAddObject(i->engine->world, t, WO_TERRAIN);
 
-	BRPOINTER(target) = wo;
-	wo->userData = i;
+	BRPOINTER(target) = t;
 
 	return EC_OK;
 }
 
 int brIGenerateFractalTerrain(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t;
-	slWorldObject *wo = BRPOINTER(&args[0]);
+	slTerrain *t = BRPOINTER(&args[0]);
 	double h = BRDOUBLE(&args[1]);
 	double height = BRDOUBLE(&args[2]);
-
-	t = wo->data;
 
 	slGenerateFractalTerrain(t, h, height);
 
 	return EC_OK;
 }
 
-int brISetTerrainDrawMode(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t;
-	slWorldObject *wo = BRPOINTER(&args[0]);
-
-	t = wo->data;
-
-	if(!t) return EC_OK;
-
-	t->drawMode = BRINT(&args[1]);
-
-	return EC_OK;
-}
-
 int brISetTerrainScale(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t;
-	slWorldObject *wo = BRPOINTER(&args[0]);
+	slTerrain *t = BRPOINTER(&args[0]);
 	double x = BRDOUBLE(&args[1]);
-
-	t = wo->data;
 
 	if(x < 0.01) return EC_OK;
 
@@ -78,18 +57,14 @@ int brISetTerrainScale(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISetTerrainHeight(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t;
-	slWorldObject *wo = BRPOINTER(&args[0]);
+	slTerrain *t = BRPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 	double h = BRDOUBLE(&args[3]);
 
-	t = wo->data;
+	if(!t) return EC_OK;
 
-	if(x > 0 && y > 0 && x < t->side && y < t->side) {
-		t->matrix[x][y] = h;
-		t->initialized = 0;
-	}
+	slTerrainSetHeight(t, x, y, h);
 
 	i->engine->camera->recompile = 1;
 
@@ -97,24 +72,19 @@ int brISetTerrainHeight(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIGetTerrainHeight(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t;
-	slWorldObject *wo = BRPOINTER(&args[0]);
+	slTerrain *t = BRPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
-	t = wo->data;
+	if(!t) return EC_OK;
 
-	if(x > 0 && y > 0 && x < t->side && y < t->side) BRDOUBLE(target) = t->matrix[x][y];
-	else BRDOUBLE(target) = 0.0;
+	BRDOUBLE(target) = slTerrainGetHeight(t, x, y);
 
 	return EC_OK;
 }
 
 int brISetTerrainPosition(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t;
-	slWorldObject *wo = BRPOINTER(&args[0]);
-
-	t = wo->data;
+	slTerrain *t = BRPOINTER(&args[0]);
 
 	if(!t) return EC_OK;
 
@@ -124,23 +94,21 @@ int brISetTerrainPosition(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISetPeakColor(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t;
-	slWorldObject *wo = BRPOINTER(&args[0]);
+	slTerrain *t = BRPOINTER(&args[0]);
 
-	t = wo->data;
+	if(!t) return EC_OK;
 
-	slVectorCopy(&BRVECTOR(&args[1]), &t->topColor);
+	slTerrainSetTopColor(t, &BRVECTOR(&args[1]));
 
 	return EC_OK;
 }
 
 int brISetValleyColor(brEval args[], brEval *target, brInstance *i) {
-	slTerrain *t;
-	slWorldObject *wo = BRPOINTER(&args[0]);
+	slTerrain *t = BRPOINTER(&args[0]);
 
-	t = wo->data;
+	if(!t) return EC_OK;
 
-	slVectorCopy(&BRVECTOR(&args[1]), &t->bottomColor);
+	slTerrainSetBottomColor(t, &BRVECTOR(&args[1]));
 
 	return EC_OK;
 }
@@ -152,7 +120,6 @@ void breveInitTerrainFunctions(brNamespace *n) {
     brNewBreveCall(n, "setPeakColor", brISetPeakColor, AT_NULL, AT_POINTER, AT_VECTOR, 0);
     brNewBreveCall(n, "setValleyColor", brISetValleyColor, AT_NULL, AT_POINTER, AT_VECTOR, 0);
     brNewBreveCall(n, "generateFractalTerrain", brIGenerateFractalTerrain, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0);
-    brNewBreveCall(n, "setTerrainDrawMode", brISetTerrainDrawMode, AT_NULL, AT_POINTER, AT_INT, 0);
     brNewBreveCall(n, "setTerrainPosition", brISetTerrainPosition, AT_NULL, AT_POINTER, AT_VECTOR, 0);
     brNewBreveCall(n, "setTerrainScale", brISetTerrainScale, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
     brNewBreveCall(n, "setTerrainHeight", brISetTerrainHeight, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_DOUBLE, 0);

@@ -98,18 +98,22 @@ slShape *slNewNGonCone(int count, double radius, double height, double density) 
 */
 
 void slShapeFree(slShape *s) {
-	unsigned int n;
+	std::vector<slPoint*>::iterator pi;
+	std::vector<slEdge*>::iterator ei;
+	std::vector<slFace*>::iterator fi;
 
 	if(--s->referenceCount) return;
 
-	for(n=0;n<s->features.size();n++) delete s->features[n];
+	for(pi = s->points.begin() ; pi != s->points.end(); pi++ ) delete *pi;
+	for(ei = s->edges.begin() ; ei != s->edges.end(); ei++ ) delete *ei;
+	for(fi = s->faces.begin() ; fi != s->faces.end(); fi++ ) delete *fi;
 
 	if(s->drawList) glDeleteLists(s->drawList, 1);
 
 	delete s;
 }
 
-slShape *slInitNeighbors(slShape *s, double density) {
+slShape *slShapeInitNeighbors(slShape *s, double density) {
 	int m, o, faceCount;
 	slPoint *p, *start, *end;
 	slEdge *e;
@@ -280,7 +284,7 @@ slFace *slAddFace(slShape *s, slVector **points, int nPoints) {
 
 	f = new slFace;
 	f->type = FT_FACE;
-   
+
 	f->edgeCount = 0;
 	f->neighbors = new slEdge*[nPoints];
 	f->voronoi = new slPlane[nPoints];
@@ -309,7 +313,7 @@ slFace *slAddFace(slShape *s, slVector **points, int nPoints) {
 		for(n=0;n<nPoints;n++) rpoints[n] = points[(nPoints - 1) - n];
 		for(n=0;n<nPoints;n++) points[n] = rpoints[n];
 	
-		delete rpoints;
+		delete[] rpoints;
 
 		slVectorCopy(points[1], &f->plane.vertex);
 	}
@@ -499,19 +503,6 @@ slPlane *slSetPlane(slPlane *p, slVector *normal, slVector *vertex) {
 	return p; 
 }
 
-slFace::~slFace() {
-	delete[] neighbors;
-	delete[] voronoi;
-	delete[] faces;
-	delete[] points;
-}
-
-slPoint::~slPoint() {
-	delete[] neighbors;
-	delete[] voronoi;
-	delete[] faces;
-}
-
 /*!
 	\brief Sets a shape to be a rectangular solid.
 */
@@ -584,7 +575,7 @@ slShape *slSetCube(slShape *s, slVector *size, double density) {
  
 	slAddFace(s, face, 4);
 
-	return slInitNeighbors(s, density);
+	return slShapeInitNeighbors(s, density);
 }
 
 /*!
@@ -642,7 +633,7 @@ slShape *slSetNGonDisc(slShape *s, int sideCount, double radius, double height, 
 	delete[] topP;
 	delete[] bottomP;
 
-	return slInitNeighbors(s, density);
+	return slShapeInitNeighbors(s, density);
 }
 
 /*!
@@ -690,7 +681,7 @@ slShape *slSetNGonCone(slShape *s, int sideCount, double radius, double height, 
 	delete[] bottoms;
 	delete[] bottomP;
 
-	return slInitNeighbors(s, density);
+	return slShapeInitNeighbors(s, density);
 }
 
 void slCubeInertiaMatrix(slVector *c, double mass, double i[3][3]) {
@@ -818,7 +809,7 @@ void slScaleShape(slShape *s, slVector *scale) {
 
 	if(s->type == ST_SPHERE) {
 		s->radius *= scale->x;
-		slInitNeighbors(s, s->density);
+		slShapeInitNeighbors(s, s->density);
 		return;
 	}
 
@@ -840,7 +831,7 @@ void slScaleShape(slShape *s, slVector *scale) {
 		slVectorXform(m, &v, &f->plane.vertex);
 	}
 
-	slInitNeighbors(s, s->density);
+	slShapeInitNeighbors(s, s->density);
 }
 
 /*!
@@ -962,7 +953,7 @@ slShape *slDeserializeShape(slSerializedShapeHeader *header, int length) {
 		delete[] vectorp;
 	}
 
-	slInitNeighbors(s, header->density);
+	slShapeInitNeighbors(s, header->density);
 
 	return s;
 }
