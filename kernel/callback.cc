@@ -49,7 +49,7 @@ int brCheckCollisionCallback(void *p1, void *p2, int type) {
 	/* to see if there exists code to collide with eachother  */
 
 	for(n=0;n<o1->object->collisionHandlers->count;n++) {
-		h = o1->object->collisionHandlers->data[n];
+		h = (brCollisionHandler*)o1->object->collisionHandlers->data[n];
 
 		if(o2->object->type == h->object->type && o2->object->type->isSubclass(h->object->userData, o2->object->userData)) {
 			if(type == CC_CALLBACK) {
@@ -66,7 +66,7 @@ int brCheckCollisionCallback(void *p1, void *p2, int type) {
 	}
 
 	for(n=0;n<o2->object->collisionHandlers->count;n++) {
-		h = o2->object->collisionHandlers->data[n];
+		h = (brCollisionHandler*)o2->object->collisionHandlers->data[n];
 
 		if(o1->object->type == h->object->type && o1->object->type->isSubclass(h->object->userData, o1->object->userData)) {
 			if(type == CC_CALLBACK) {
@@ -112,7 +112,7 @@ void brCollisionCallback(void *p1, void *p2, int type) {
 	if(!o1 || !o2 || (o1->status != AS_ACTIVE) || (o2->status != AS_ACTIVE)) return;
 
 	for(n=0;n<o1->object->collisionHandlers->count;n++) {
-		h = o1->object->collisionHandlers->data[n];
+		h = (brCollisionHandler*)o1->object->collisionHandlers->data[n];
 
 		if(o2->object->type == h->object->type && o2->object->type->isSubclass(o2->object->userData, h->object->userData)) {
 			meth = h->method;
@@ -136,7 +136,7 @@ void brCollisionCallback(void *p1, void *p2, int type) {
 	if(o1->status != AS_ACTIVE || o2->status != AS_ACTIVE) return;
 	
 	for(n=0;n<o2->object->collisionHandlers->count;n++) {
-		h = o2->object->collisionHandlers->data[n];
+		h = (brCollisionHandler*)o2->object->collisionHandlers->data[n];
 
 		if(o1->object->type == h->object->type && o1->object->type->isSubclass(o1->object->userData, h->object->userData)) {
 			meth = h->method;

@@ -1,6 +1,7 @@
-@include "Object.tz"
+@use Object.
+@use Line.
 
-Object : Real (aka Reals) [version 2.0] {
+Object : Real (aka Reals) [version 2.1] {
 	% A class which is never instantiated--just used as a logical
 	% distinction from the Abstract classes.  See the child classes
 	% OBJECT(Mobile), OBJECT(Link) and OBJECT(Stationary) for

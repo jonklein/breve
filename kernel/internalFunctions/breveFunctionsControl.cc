@@ -146,7 +146,7 @@ int brISleep(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIPause(brEval args[], brEval *target, brInstance *i) {
-    if(i->engine->pauseCallback) i->engine->pauseCallback(i->engine->callbackData);
+    if(i->engine->pauseCallback) i->engine->pauseCallback();
     return EC_OK;
 }
 
@@ -363,7 +363,7 @@ int brISetZClip(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetInterfaceVersion(brEval args[], brEval *target, brInstance *i) {
-    BRSTRING(target) = slStrdup(i->engine->interfaceTypeCallback(i->engine->callbackData));
+    BRSTRING(target) = slStrdup(i->engine->interfaceTypeCallback());
     return EC_OK;
 }
 
@@ -382,7 +382,7 @@ int brIDialogBox(brEval args[], brEval *target, brInstance *i) {
 
     if(!i->engine->dialogCallback) return EC_OK;
 
-    BRINT(target) = i->engine->dialogCallback(i->engine->callbackData, BRSTRING(&args[0]), BRSTRING(&args[1]), BRSTRING(&args[2]), BRSTRING(&args[3]));
+    BRINT(target) = i->engine->dialogCallback(BRSTRING(&args[0]), BRSTRING(&args[1]), BRSTRING(&args[2]), BRSTRING(&args[3]));
 
     return EC_OK;
 }
@@ -396,7 +396,7 @@ int brIDialogBox(brEval args[], brEval *target, brInstance *i) {
 int brIPlaySound(brEval args[], brEval *target, brInstance *i) {
     if(!i->engine->soundCallback) return EC_OK;
 
-    i->engine->soundCallback(i->engine->callbackData);
+    i->engine->soundCallback();
 
     return EC_OK;
 }

@@ -1,0 +1,48 @@
+# include some frequently used classes and specify common classpaths
+
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use Stationary.
+
+# tell the engine the name of the controller
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+	+ to init:
+		# put initialization code here which creates objects
+		# and sets up the simulation
+
+		print "simulation started".
+
+		30 new myAgents.
+
+	+ to iterate:
+		# place code that should be called during every 
+		# iteration here.
+
+		if | all myAgents | == 0: self end-simulation.
+
+		super iterate.
+}
+
+# implement other objects in your simulation here
+
+Mobile : myAgent (aka myAgents) {
+	+ to init:
+		other (object).
+
+		self move to random[(20, 20, 20)] - (10, 10, 10).
+
+		other = (all myAgents) { random [ | all myAgents | - 1 ] }.
+		
+		self add-line to other with-color random[(1, 1, 1)] with-style "- -- - -- - - - ".
+
+	+ to iterate:
+		if random[100] == 0: free self.
+}

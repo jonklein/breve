@@ -348,10 +348,7 @@ brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
 	i->object = object;
 	i->status = AS_ACTIVE;
     
-    i->menu.count = 0;
-    i->menu.maxCount = 0;
-    i->menu.list = NULL;
-    i->menu.updateMenu = NULL;
+	i->menus = slStackNew();
 
     i->userData = pointer;
 
@@ -465,7 +462,6 @@ void brObjectFree(brObject *o) {
 void brInstanceFree(brInstance *i) {
 	slList *olist;
 	brObserver *observer;
-	int n;
 
 	if(i && i->userData) i->object->type->destroyInstance(i->userData);
 
@@ -500,16 +496,18 @@ void brInstanceFree(brInstance *i) {
 
     slListFree(i->observees);
 
-    for(n=0;n<i->menu.count;n++) {
-        slFree(i->menu.list[n]->title);
-        slFree(i->menu.list[n]->method);
-        slFree(i->menu.list[n]);
+	unsigned int n;
+
+    for(n=0;n<i->menus->count;n++) {
+		brMenuEntry *menu = (brMenuEntry*)i->menus->data[ n];
+
+        slFree(menu->title);
+        slFree(menu->method);
+		delete menu;
     }
 
 	if(i->iterate) brMethodFree(i->iterate);
 	if(i->postIterate) brMethodFree(i->postIterate);
-
-    if(i->menu.list) slFree(i->menu.list);
 
 	i->userData = NULL;
 

@@ -28,7 +28,6 @@ typedef struct brVersionRequirement brVersionRequirement;
 typedef struct brVisualData brVisualData;
 typedef struct briTunesData briTunesData;
 typedef struct brMenuEntry brMenuEntry;
-typedef struct brMenuList brMenuList;
 typedef struct brEvent brEvent;
 typedef struct stStackRecord stStackRecord;
 typedef struct brErrorInfo brErrorInfo;

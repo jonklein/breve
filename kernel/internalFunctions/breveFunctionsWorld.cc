@@ -966,7 +966,7 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "setLightDiffuseColor", brISetLightDiffuseColor, AT_NULL, AT_VECTOR, 0);
 
 	brNewBreveCall(n, "addObjectLine", brIAddObjectLine, AT_NULL, AT_POINTER, AT_POINTER, AT_VECTOR, AT_STRING, 0);
-	brNewBreveCall(n, "removeObjectLine", brIRemoveObjectLine, AT_NULL, AT_POINTER, AT_POINTER, 0);
+	brNewBreveCall(n, "removeObjectLine", brIRemoveObjectLine, AT_NULL, AT_POINTER, 0);
 
 	brNewBreveCall(n, "setBoundsOnlyCollisionDetection", brISetBoundsOnlyCollisionDetection, AT_NULL, AT_INT, 0);
 

@@ -476,27 +476,26 @@
 
 - (void)updateContextualMenu:(id)menu withInstance:(stInstance*)i {
 	id menuItem;
-	brMenuList *menuList;
-	int n;
+	unsigned int n;
 
-	menuList = &i->breveInstance->menu;
-
-	if(!menuList->count) return;
+	if(i->breveInstance->menus->count == 0) return;
 
 	[selectionMenu addItem: [NSMenuItem separatorItem]];
 
-	for(n=0;n<menuList->count;n++) {
-		if(!strcmp(menuList->list[n]->title, "")) {
+	for(n=0;n<i->breveInstance->menus->count;n++) {
+		brMenuEntry *menuEntry = (brMenuEntry*)i->breveInstance->menus->data[n];
+
+		if(!strcmp(menuEntry->title, "")) {
 			[menu addItem: [NSMenuItem separatorItem]];
 		} else {
-			menuItem = [menu addItemWithTitle: [NSString stringWithCString: menuList->list[n]->title] action: @selector(contextualMenu:) keyEquivalent: @""];
+			menuItem = [menu addItemWithTitle: [NSString stringWithCString: menuEntry->title] action: @selector(contextualMenu:) keyEquivalent: @""];
 	
 			[menuItem setTag: n];
 	
-			if(contextEnabled == YES) [menuItem setEnabled: menuList->list[n]->enabled];
+			if(contextEnabled == YES) [menuItem setEnabled: menuEntry->enabled];
 			else [menuItem setEnabled: NO];
 
-			[menuItem setState: menuList->list[n]->checked]; 
+			[menuItem setState: menuEntry->checked]; 
 		}
 	}   
 }

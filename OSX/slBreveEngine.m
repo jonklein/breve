@@ -28,6 +28,8 @@ id mySelf;
 
 id gDisplayView;
 
+id gInterfaceController;
+
 BOOL engineWillPause;
 
 @implementation slBreveEngine
@@ -47,6 +49,8 @@ int slMakeCurrentContext();
 - init {
 	engineLock = [[NSRecursiveLock alloc] init];
 	threadLock = [[NSRecursiveLock alloc] init];
+
+	gInterfaceController = interfaceController;
 
 	speedFactor = 1;
 
@@ -98,10 +102,6 @@ int slMakeCurrentContext();
 	brEngineSetSoundCallback(engine, soundCallback);
 	brEngineSetDialogCallback(engine, dialogCallback);
 
-	// engine->newWindowCallback = newWindowCallback;
-	// engine->freeWindowCallback = freeWindowCallback;
-	// engine->renderWindowCallback = renderWindowCallback;
-
 	camera = brEngineGetCamera(engine);
 	slCameraSetActivateContextCallback(camera, slMakeCurrentContext);
 
@@ -116,6 +116,7 @@ int slMakeCurrentContext();
 	brEngineSetGetSavenameCallback(engine, getSaveNameCallback);
 	brEngineSetGetLoadnameCallback(engine, getLoadNameCallback);
 	brEngineSetPauseCallback(engine, pauseCallback);
+	brEngineSetUpdateMenuCallback(engine, updateMenu);
 
 	brAddSearchPath(engine, classPath);
 	brAddSearchPath(engine, pluginPath);
@@ -130,7 +131,7 @@ int slMakeCurrentContext();
 
 	brEngineFree(frontend->engine);
 	breveFrontendCleanupData(frontend->data);
-	slFree(frontend);
+	breveFrontendDestroy(frontend);
 
 	engine = NULL;
 
@@ -187,8 +188,6 @@ int slMakeCurrentContext();
 	else result = breveFrontendLoadSimulation(frontend, buffer, name);
 
 	controller = brEngineGetController(engine);
-
-	if(result == EC_OK) brSetUpdateMenuCallback(controller, updateMenu);
 
 	if(filename) slFree(name);
 
@@ -460,27 +459,27 @@ int slMakeCurrentContext();
 
 /* +++ CALLBACKS +++ */
 
-char *getLoadNameCallback(void *data) {
+char *getLoadNameCallback() {
 	NSString *s;
 
-	s = [(id)data loadNameForTypes: [NSArray arrayWithObjects: @"tzxml", @"tzb", NULL] withAccView: NULL];
+	s = [(id)gInterfaceController loadNameForTypes: [NSArray arrayWithObjects: @"xml", @"tzxml", @"tzb", NULL] withAccView: NULL];
 
 	if(s) return slStrdup((char*)[s cString]);
 
 	return NULL;
 }
 
-char *getSaveNameCallback(void *data) {
+char *getSaveNameCallback() {
 	NSString *s;
 
-	s = [(id)data saveNameForType: @"tzxml" withAccView: NULL];
+	s = [(id)gInterfaceController saveNameForType: @"tzxml" withAccView: NULL];
 
 	if(s) return slStrdup((char*)[s cString]);
 
 	return NULL;
 }
 
-int dialogCallback(void *data, char *title, char *message, char *b1, char *b2) {
+int dialogCallback(char *title, char *message, char *b1, char *b2) {
 	  NSString *ts, *ms, *b1s, *b2s;
 	  int result;
 
@@ -495,13 +494,13 @@ int dialogCallback(void *data, char *title, char *message, char *b1, char *b2) {
 	  return 0; 
 }
 
-int soundCallback(void *data) {
+int soundCallback() {
 	NSBeep();
 
 	return 0;
 }
 
-char *interfaceVersionCallback(void *data) {
+char *interfaceVersionCallback() {
 	return "cocoa/2.0";
 }
 
@@ -512,7 +511,7 @@ int interfaceSetStringCallback(char *string, int tag) {
 	return 0;
 }
 
-int pauseCallback(void *data) {
+int pauseCallback() {
 	engineWillPause = YES;
 	return 1;
 }

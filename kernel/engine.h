@@ -102,23 +102,12 @@ enum parseErrorCodes {
 };
 
 /*!
-	\brief Holds the menus for a certain instance, as well as a pointer to an update function.
-*/
-
-struct brMenuList {
-	brMenuEntry **list;
-	void (*updateMenu)(brInstance *l);
-	int count;
-	int maxCount;
-};
-
-/*!
 	\brief A single menu item.
 */
 
 struct brMenuEntry {
-	brMenuList *submenu;
-	brInstance *instance;  
+	brInstance *instance;
+	slStack *submenus;
 	char *method;
 	char *title;
 	unsigned char enabled;
@@ -255,25 +244,26 @@ class brEngine {
 
 		// *** Callback functions to be set by the application frontend ***
 
-		void *callbackData;
+		// callback to update a menu for an instance
+
+		void (*updateMenu)(brInstance *l);
 
 		// callback to run save and load dialogs 
 
-		char *(*getSavename)(void *data);
-		char *(*getLoadname)(void *data);
+		char *(*getSavename)();
+		char *(*getLoadname)();
 
 		// callback to show a generic dialog
 
-		int (*dialogCallback)(void *data, char *title, char *message, 
-										char *button1, char *button2);
+		int (*dialogCallback)(char *title, char *message, char *button1, char *button2);
 	
 		// callback to play a beep sound
 	
-		int (*soundCallback)(void *data);
+		int (*soundCallback)();
 	
 		// returns the string identifying the implementation
 	
-		char *(*interfaceTypeCallback)(void *data);
+		char *(*interfaceTypeCallback)();
 	
 		// callback to setup and use the OS X interface features
 	
@@ -282,7 +272,7 @@ class brEngine {
 
 		// pause callback
 
-		int (*pauseCallback)(void *data);
+		int (*pauseCallback)();
 
 		void *(*newWindowCallback)(char *name, void *graph);
 		void (*freeWindowCallback)(void *g);
@@ -366,16 +356,17 @@ brNamespace *brEngineGetInternalMethods(brEngine *e);
 
 int brEngineGetDrawEveryFrame(brEngine *e);
 
-void brEngineSetSoundCallback(brEngine *e, int (*callback)(void *));
-void brEngineSetDialogCallback(brEngine *e, int (*callback)(void *, char *, char *, char *, char *));
+void brEngineSetSoundCallback(brEngine *e, int (*callback)());
+void brEngineSetDialogCallback(brEngine *e, int (*callback)(char *, char *, char *, char *));
 
-void brEngineSetPauseCallback(brEngine *e, int (*callback)(void*));
-void brEngineSetGetLoadnameCallback(brEngine *e, char *(*callback)(void*));
-void brEngineSetGetSavenameCallback(brEngine *e, char *(*callback)(void*));
+void brEngineSetPauseCallback(brEngine *e, int (*callback)());
+void brEngineSetGetLoadnameCallback(brEngine *e, char *(*callback)());
+void brEngineSetGetSavenameCallback(brEngine *e, char *(*callback)());
 
-void brEngineSetInterfaceInterfaceTypeCallback(brEngine *e, char *(*interfaceTypeCallback)(void *data));
+void brEngineSetInterfaceInterfaceTypeCallback(brEngine *e, char *(*interfaceTypeCallback)());
 void brEngineSetInterfaceSetStringCallback(brEngine *e, int (*interfaceSetStringCallback)(char *string, int number));
 void brEngineSetInterfaceSetNibCallback(brEngine *e, void (*interfaceSetCallback)(char *file));
+void brEngineSetUpdateMenuCallback(brEngine *e, void (*updateMenu)(brInstance *l));
 
 slCamera *brEngineGetCamera(brEngine *e);
 slWorld *brEngineGetWorld(brEngine *e);

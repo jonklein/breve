@@ -108,14 +108,14 @@ enum {
 
 - (void)interfaceActionTag:(int)tag stringValue:(NSString*)s;
 
-char *getLoadNameCallback(void *data);
-char *getSaveNameCallback(void *data);
-int dialogCallback(void *data, char *title, char *message, char *b1, char *b2);
-char *interfaceVersionCallback(void *data);
-int interfaceSetStringCallback(char *string, int tag);
-int soundCallback(void *data);
-int pauseCallback(void *data);
+char *getLoadNameCallback();
+char *getSaveNameCallback();
+int dialogCallback(char *title, char *message, char *b1, char *b2);
+char *interfaceVersionCallback();
+int soundCallback();
+int pauseCallback();
 void setNibCallback(char *n);
+int interfaceSetStringCallback(char *string, int tag);
 
 void *newWindowCallback(char *name, void *graph);
 void freeWindowCallback(void *data);

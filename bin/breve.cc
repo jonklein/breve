@@ -53,17 +53,12 @@ extern char *gErrorNames[];
 
 char keyDown[256];
 
-char *gArchiveFile;
-
 void *workerThread(void *data);
-int soundCallback(void *data);
-int pauseCallback(void *data);
+
 void brInterrupt(brEngine *engine);
 void *newWindowCallback(char *name, void *graph);
 void freeWindowCallback(void *w);
 void renderWindowCallback(void *w);
-
-void *passiveMotionCallback = NULL;
 
 void graphDisplay();
 
@@ -73,18 +68,24 @@ pthread_cond_t gThreadPaused;
 
 int gThreadShouldExit = 0;
 int gThreadRunning = 0; 
-int gFull = 0;
-int gFormat = 0;
+
+// Options set when the command line is parsed.
+
+int gOptionFull = 0;
+int gOptionFormat = 0;
+int gOptionStdin = 0;
+char *gOptionArchiveFile;
+
 
 breveFrontend *frontend;
 
 slGLUTWindow *gWindows[1024];
+std::map<int, void*> gWindowMap;
 
 int gLastX, gLastY, gMods, gSpecial;
 double gStartCamX;
 
 int gPaused = 1;
-int gStdin = 0;
 
 int gMotionCrosshair = 0;
 
@@ -105,7 +106,7 @@ int main(int argc, char **argv) {
 	pthread_mutex_init(&gThreadMutex, NULL);
 	pthread_cond_init(&gThreadPaused, NULL);
 
-	gArchiveFile = NULL;
+	gOptionArchiveFile = NULL;
 
 #ifdef MEMORY_DEBUG
 	slMessage(DEBUG_ALL, "### Running with breve slMalloc debugging enabled.\n\n");
@@ -124,11 +125,11 @@ int main(int argc, char **argv) {
 	argc -= index;
 	argv += index;
 
-	if(argc < 2 && !gStdin) {
+	if(argc < 2 && !gOptionStdin) {
 		brPrintUsage(argv[0]);
 	}
 
-	if(!gStdin) {
+	if(!gOptionStdin) {
 		text = slUtilReadFile(argv[1]);
 		simulationFile = argv[1];
 	} else {
@@ -141,7 +142,7 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
-	if(gFormat) {
+	if(gOptionFormat) {
 		char *newtext = slFormatText(text);
 		slUtilWriteFile(simulationFile, newtext);
 		free(newtext);
@@ -168,14 +169,14 @@ int main(int argc, char **argv) {
 
 	slInitGlut(argc, argv, simulationFile);
 
-	if(gArchiveFile) {
-		if(breveFrontendLoadSavedSimulation(frontend, text, simulationFile, gArchiveFile) != EC_OK) {
+	if(gOptionArchiveFile) {
+		if(breveFrontendLoadSavedSimulation(frontend, text, simulationFile, gOptionArchiveFile) != EC_OK) {
 			slFree(text);
-			slFree(gArchiveFile);
+			slFree(gOptionArchiveFile);
 			brQuit(frontend->engine);
 		}
 
-		slFree(gArchiveFile);
+		slFree(gOptionArchiveFile);
 	} else {
 		if(breveFrontendLoadSimulation(frontend, text, simulationFile) != EC_OK) {
 			slFree(text);
@@ -186,7 +187,7 @@ int main(int argc, char **argv) {
 
 	slFree(text);
 
-	brSetUpdateMenuCallback(frontend->engine->controller, brGLMainMenuUpdate);
+	brEngineSetUpdateMenuCallback(frontend->engine, brGlutMenuUpdate);
 
 	for(n=0;n<256;n++) keyDown[n] = 0;
 
@@ -200,7 +201,7 @@ int main(int argc, char **argv) {
 		slFree(gSlaveHost);
 	}
 
-	if(gFull) glutFullScreen();
+	if(gOptionFull) glutFullScreen();
 
 	glutMainLoop();
 
@@ -250,13 +251,12 @@ void brGlutLoop() {
 	}
 }
 
-void brGLMainMenuUpdate(brInstance *i) {
-	int n, total;
-	brMenuList *l;
+void brGlutMenuUpdate(brInstance *i) {
+	unsigned int n, total;
+
+	if(i != frontend->engine->controller) return;
 
 	glutSetMenu(mainMenu);
-
-	l = &i->menu;
 
 	total = glutGet(GLUT_MENU_NUM_ITEMS);
 
@@ -264,14 +264,17 @@ void brGLMainMenuUpdate(brInstance *i) {
 		glutRemoveMenuItem(1);
 	}
 
-	for(n=0;n<l->count;n++) {
+	for(n=0;n<i->menus->count;n++) {
+		brMenuEntry *menu;
 		char *message;
 
-		if(l->list[n]->enabled) {
-			message = new char[strlen(l->list[n]->title) + 4];
+		menu = (brMenuEntry*)i->menus->data[n];
 
-			if(l->list[n]->checked) sprintf(message, "* %s", l->list[n]->title);
-			else sprintf(message, "  %s", l->list[n]->title);
+		if(menu->enabled) {
+			message = new char[strlen(menu->title) + 4];
+
+			if(menu->checked) sprintf(message, "* %s", menu->title);
+			else sprintf(message, "  %s", menu->title);
 
 			glutAddMenuEntry(message, n);
 
@@ -325,8 +328,7 @@ void brContextMenu(int n) {
 }
 
 void brClick(int n) {
-	int total;
-	brMenuList *l;
+	unsigned int m, total;
 
 	gSelected = brClickCallback(frontend->engine, n);
 
@@ -334,14 +336,14 @@ void brClick(int n) {
 
 	total = glutGet(GLUT_MENU_NUM_ITEMS);
 
-	for(n=0;n<total;n++) 
+	for(m=0;m<total;m++) 
 		glutRemoveMenuItem(1);
 
 	if(gSelected) {
-		l = &gSelected->menu;
-
-		for(n=0;n<l->count;n++)
-			glutAddMenuEntry(l->list[n]->title, n);
+		for(m=0;m<gSelected->menus->count;m++) {
+			brMenuEntry *menu = (brMenuEntry*)gSelected->menus->data[m];
+			glutAddMenuEntry(menu->title, m);
+		}
 
 		glutAttachMenu(GLUT_RIGHT_BUTTON);
 	} else {
@@ -374,10 +376,10 @@ int brParseArgs(int argc, char **argv) {
 				}
 				break;
 			case 'i':
-				gStdin = 1;
+				gOptionStdin = 1;
 				break;
 			case 'a':
-				gArchiveFile = slStrdup(optarg);
+				gOptionArchiveFile = slStrdup(optarg);
 				break;
 			case 'v':
 				brPrintVersion();
@@ -386,14 +388,14 @@ int brParseArgs(int argc, char **argv) {
 				brPrintUsage(argv[0]);
 				break;
 			case 'f':
-				gFull = 1;
+				gOptionFull = 1;
 				break;
 			case 'u':
 				gPaused = 0;
 				glutIdleFunc(brGlutLoop);
 				break;
 			case 'F':
-				gFormat = 1;
+				gOptionFormat = 1;
 				break;
 			case 'p':
 				sscanf(optarg, "%d,%d", &xpos, &ypos);
@@ -491,7 +493,7 @@ void slDemoMouse(int button, int state, int x, int y) {
 		gStartCamX = frontend->engine->camera->rx;
 
 		brClick(slGlSelect(frontend->engine->world, frontend->engine->camera, x, y));
-		brGLMainMenuUpdate(frontend->engine->controller);
+		brGlutMenuUpdate(frontend->engine->controller);
 
 		gMotionCrosshair = 1;
 
@@ -595,9 +597,9 @@ void brInterrupt(brEngine *engine) {
 
 	gWaiting = 1;
 
-	if(gFull) {
+	if(gOptionFull) {
 		glutReshapeWindow(400, 400);
-		gFull = 0;
+		gOptionFull = 0;
 		return;
 	}
 
@@ -622,7 +624,7 @@ void brInterrupt(brEngine *engine) {
 
 	if(line && line != staticLine) free(line);
 
-	if(gFull) glutFullScreen();
+	if(gOptionFull) glutFullScreen();
 
 	brUnpauseTimer(engine);
 }
@@ -643,7 +645,7 @@ void slDemoKeyboardUp(unsigned char key, int x, int y) {
 	this is GLUT and we don't have one...
 */
 
-int brCLIDialogCallback(void *data, char *title, char *message, char *b1, char *b2) {
+int brCLIDialogCallback(char *title, char *message, char *b1, char *b2) {
 	int result;
 
 	while (1) {
@@ -660,11 +662,11 @@ int brCLIDialogCallback(void *data, char *title, char *message, char *b1, char *
 	} 
 }
 
-char *interfaceVersionCallback(void *data) {
+char *interfaceVersionCallback() {
 	return interfaceID;
 }
 
-char *getSavename(void *data) {
+char *getSavename() {
 	char *name = (char*)slMalloc(1024);
 	printf("filename to save: ");
 	fgets(name, 1023, stdin);
@@ -672,7 +674,7 @@ char *getSavename(void *data) {
 	return name;
 }
 
-char *getLoadname(void *data) {
+char *getLoadname() {
 	char *name = (char*)slMalloc(1024);
 	printf("filename to load: ");
 	fgets(name, 1023, stdin);
@@ -680,13 +682,13 @@ char *getLoadname(void *data) {
 	return name;
 }
 
-int soundCallback(void *data) {
+int soundCallback() {
 	putchar(0x07);
 	fflush(stdout);
 	return 0;
 }
 
-int pauseCallback(void *data) {
+int pauseCallback() {
 	gPaused = 1;
 	brPauseTimer(frontend->engine);
 	glutIdleFunc(NULL);
@@ -696,10 +698,11 @@ int pauseCallback(void *data) {
 void *newWindowCallback(char *name, void *graph) {
 	slGLUTWindow *w;
 
-	w = malloc(sizeof(slGLUTWindow));
+	w = new slGLUTWindow;
 	w->id = glutCreateWindow(name);
 	w->graph = graph;
 
+	gWindowMap[w->id] = w;
 	gWindows[w->id] = w;
 
 	glutDisplayFunc(graphDisplay);
@@ -708,10 +711,10 @@ void *newWindowCallback(char *name, void *graph) {
 }
 
 void freeWindowCallback(void *w) {
-	slGLUTWindow *window = w;
+	slGLUTWindow *window = (slGLUTWindow*)w;
 
 	glutDestroyWindow(window->id);
-	slFree(w);
+	delete window;
 }
 
 void renderWindowCallback(void *w) {

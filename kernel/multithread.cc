@@ -29,6 +29,8 @@ int brEngineNextMethodCall(brEngine *e, brInstance **i, brMethod **m) {
 	*m = NULL;
 
 	pthread_mutex_unlock(&e->scheduleLock);
+
+	return NULL;
 }
 
 void *brIterationThread(void *data) {

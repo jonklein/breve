@@ -5,7 +5,7 @@ void brBeginDrag(brEngine*, brInstance*);
 void brEndDrag(brEngine*, brInstance*);
 void brSetUpdateMenuCallback(brInstance *i, void (*updateMenu)(brInstance *l));
 
-int brMenuCallback(brEngine *e, brInstance *i, int n);
+int brMenuCallback(brEngine *e, brInstance *i, unsigned int n);
 int brMenuCallbackByName(brEngine *e, char *name);
 brInstance *brClickCallback(brEngine *e, int n);
 brInstance *brClickAtLocation(brEngine *e, int x, int y);

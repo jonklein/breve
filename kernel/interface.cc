@@ -21,24 +21,6 @@
 #include "kernel.h"
 
 /*!
-	\brief Sets the callback to be triggered when a menu changes.
-*/
-
-void brSetUpdateMenuCallback(brInstance *i, void (*updateMenu)(brInstance *l)) {
-	i->menu.updateMenu = updateMenu;
-
-	updateMenu(i);
-}
-
-/*!
-	\brief Sets a callback that will trigger a dialog box.
-*/
-
-void brSetDialogCallback(brEngine *e, int (*dc)(void *data, char *t, char *m, char *b1, char *b2)) {
-	e->dialogCallback = dc;
-}
-
-/*!
 	\brief Adds an item to an object's menu.
 
 	Adds an item to the object's menu with the specified title, that will 
@@ -56,26 +38,17 @@ brMenuEntry *brAddMenuItem(brInstance *i, char *method, char *title) {
 
 	if(m) brMethodFree(m);
 
-	if(i->menu.count == 0) {
-		i->menu.maxCount = 8;
-		i->menu.list = slMalloc(i->menu.maxCount * sizeof(brMenuEntry*));
-	} else if(i->menu.count == i->menu.maxCount) {
-		i->menu.maxCount *= 2;
-		i->menu.list = slRealloc(i->menu.list, i->menu.maxCount * sizeof(brMenuEntry*));
-	}
+	brMenuEntry *entry = new brMenuEntry;
+	entry->method = slStrdup(method);
+	entry->title = slStrdup(title);
+	entry->instance = i;
+	entry->checked = 0;
+	entry->enabled = 1;
+	slStackPush(i->menus, entry);
 
-	i->menu.list[i->menu.count] = slMalloc(sizeof(brMenuEntry));
+	if(i->engine->updateMenu) i->engine->updateMenu(i);
 
-	i->menu.list[i->menu.count]->instance = i;
-	i->menu.list[i->menu.count]->method = slStrdup(method);
-	i->menu.list[i->menu.count]->title = slStrdup(title);
-
-	i->menu.list[i->menu.count]->checked = 0;
-	i->menu.list[i->menu.count]->enabled = 1;
-
-	if(i->menu.updateMenu) i->menu.updateMenu(i);
-
-	return i->menu.list[i->menu.count++];
+	return entry;
 }
 
 /*
@@ -87,22 +60,24 @@ brMenuEntry *brAddMenuItem(brInstance *i, char *method, char *title) {
 	interface to use that number to refer to the menu selection now.
 */
 
-int brMenuCallback(brEngine *e, brInstance *i, int n) {
+int brMenuCallback(brEngine *e, brInstance *i, unsigned int n) {
 	brEval eval;
 
 	if(!i) i = e->controller;
 
 	if(i->status != AS_ACTIVE) return EC_OK;
 
-	if(n >= i->menu.count) {
-		brEvalError(e, EE_INTERNAL, "Menu callback #%d not defined for instance %x", n, i);
+	if(n >= i->menus->count || n < 0) {
+		brEvalError(e, EE_INTERNAL, "Menu callback #%d out of bounds for instance %x", n, i);
 		return EC_ERROR;
 	}
 
-	if(!i->menu.list[n]->enabled) return EC_OK;
-	if(!strcmp(i->menu.list[n]->method, "")) return EC_OK;
+	brMenuEntry *menu = (brMenuEntry*)i->menus->data[ n];
 
-	return brMethodCallByName(i, i->menu.list[n]->method, &eval);
+	if(!menu->enabled) return EC_OK;
+	if(!strcmp(menu->method, "")) return EC_OK;
+
+	return brMethodCallByName(i, menu->method, &eval);
 }
 
 brInstance *brClickAtLocation(brEngine *e, int x, int y) {
@@ -315,7 +290,7 @@ int brInterfaceCallback(brEngine *e, int interfaceID, char *string) {
 
 char *brEngineRunSaveDialog(brEngine *e) {
 	if(e->getSavename) return NULL;
-	return e->getSavename(e);
+	return e->getSavename();
 }
 
 /*!
@@ -324,7 +299,7 @@ char *brEngineRunSaveDialog(brEngine *e) {
 
 char *brEngineRunLoadDialog(brEngine *e) {
 	if(e->getLoadname) return NULL;
-	return e->getLoadname(e);
+	return e->getLoadname();
 }
 
 void brEngineSetMouseLocation(brEngine *e, int x, int y) {

@@ -677,27 +677,27 @@ brNamespace *brEngineGetInternalMethods(brEngine *e) {
 	return e->internalMethods;
 }
 
-void brEngineSetSoundCallback(brEngine *e, int (*callback)(void *)) {
+void brEngineSetSoundCallback(brEngine *e, int (*callback)()) {
 	e->soundCallback = callback;
 }
 
-void brEngineSetDialogCallback(brEngine *e, int (*callback)(void *, char *, char *, char *, char *)) {
+void brEngineSetDialogCallback(brEngine *e, int (*callback)(char *, char *, char *, char *)) {
 	e->dialogCallback = callback;
 }
 
-void brEngineSetGetSavenameCallback(brEngine *e, char *(*callback)(void*)) {
+void brEngineSetGetSavenameCallback(brEngine *e, char *(*callback)()) {
 	e->getSavename = callback;
 }
 
-void brEngineSetGetLoadnameCallback(brEngine *e, char *(*callback)(void*)) {
+void brEngineSetGetLoadnameCallback(brEngine *e, char *(*callback)()) {
 	e->getLoadname = callback;
 }
 
-void brEngineSetPauseCallback(brEngine *e, int (callback)(void*)) {
+void brEngineSetPauseCallback(brEngine *e, int (callback)()) {
 	e->pauseCallback = callback;
 }
 
-void brEngineSetInterfaceInterfaceTypeCallback(brEngine *e, char *(*callback)(void*)) {
+void brEngineSetInterfaceInterfaceTypeCallback(brEngine *e, char *(*callback)()) {
 	e->interfaceTypeCallback = callback;
 }
 
@@ -707,6 +707,10 @@ void brEngineSetInterfaceSetStringCallback(brEngine *e, int (*callback)(char*, i
 
 void brEngineSetInterfaceSetNibCallback(brEngine *e, void (*callback)(char*)) {
 	e->interfaceSetCallback = callback;
+}
+
+void brEngineSetUpdateMenuCallback(brEngine *e, void (*updateMenu)(brInstance *l)) {
+	e->updateMenu = updateMenu;
 }
 
 int brEngineGetDrawEveryFrame(brEngine *e) {

@@ -78,7 +78,8 @@ struct brInstance {
 
 	brObject *object;
 	brEngine *engine;
-	brMenuList menu;
+
+	slStack *menus;
 
 	slList *observers;
 	slList *observees;

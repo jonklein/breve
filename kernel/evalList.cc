@@ -48,7 +48,7 @@ brEvalListHead *brEvalListNew() {
 	head->count = 0;
 	head->retainCount = 0;
 
-	head->index = slMalloc(sizeof(brEvalList*) * LIST_INDEX_SIZE);
+	head->index = (brEvalList**)slMalloc(sizeof(brEvalList*) * LIST_INDEX_SIZE);
 	head->indexSize = LIST_INDEX_SIZE;
 	head->indexTop = -1;
 
@@ -115,7 +115,7 @@ int brEvalListInsert(brEvalListHead *head, int index, brEval *value) {
 
 	if(head->count >= head->indexSize) {
 		head->indexSize += 128;
-		head->index = slRealloc(head->index, sizeof(brEvalList*) * head->indexSize);
+		head->index = (brEvalList**)slRealloc(head->index, sizeof(brEvalList*) * head->indexSize);
 	}
 
 	newList = new brEvalList;

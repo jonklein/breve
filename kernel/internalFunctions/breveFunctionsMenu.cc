@@ -49,7 +49,7 @@ int brIMenuItemNew(brEval args[], brEval *target, brInstance *i) {
 
     BRMENUENTRYPOINTER(target) = brAddMenuItem(m, BRSTRING(&args[1]), BRSTRING(&args[2]));
     
-    if(m->menu.updateMenu) m->menu.updateMenu(m);
+    if(i->engine->updateMenu) i->engine->updateMenu(m);
 
     return EC_OK;
 }   
@@ -73,7 +73,7 @@ int brIMenuItemSetCheck(brEval args[], brEval *target, brInstance *i) {
 
     item->checked = BRINT(&args[1]);
 
-    if(item->instance && item->instance->menu.updateMenu) item->instance->menu.updateMenu(item->instance);
+    if(item->instance && i->engine->updateMenu) i->engine->updateMenu(item->instance);
 
     return EC_OK;
 }
@@ -98,7 +98,7 @@ int brIMenuItemSetEnabled(brEval args[], brEval *target, brInstance *i) {
 
     item->enabled = BRINT(&args[1]);
 
-    if(item->instance && item->instance->menu.updateMenu) item->instance->menu.updateMenu(item->instance);
+    if(item->instance && i->engine->updateMenu) i->engine->updateMenu(item->instance);
 
     return EC_OK;
 }

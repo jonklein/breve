@@ -320,7 +320,7 @@ void brQuit(brEngine *e) {
 	exit(0);
 }
 
-int brCLIDialogCallback(void *data, char *title, char *message, char *b1, char *b2) {
+int brCLIDialogCallback(char *title, char *message, char *b1, char *b2) {
 	int result;
 
 	while (1) {
@@ -340,11 +340,11 @@ int brCLIDialogCallback(void *data, char *title, char *message, char *b1, char *
 	} 
 }
 
-char *interfaceVersionCallback(void *data) {
+char *interfaceVersionCallback() {
 	return interfaceID;
 }
 
-char *getSavename(void *data) {
+char *getSavename() {
 	char *name = (char*)slMalloc(1024);
 	printf("filename to save: ");
 	fgets(name, 1023, stdin);
@@ -352,7 +352,7 @@ char *getSavename(void *data) {
 	return name;
 }
 
-char *getLoadname(void *data) {
+char *getLoadname() {
 	char *name = (char*)slMalloc(1024);
 	printf("filename to load: ");
 	fgets(name, 1023, stdin);

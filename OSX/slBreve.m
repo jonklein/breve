@@ -433,7 +433,7 @@ static NSRecursiveLock *gLogLock;
 	
 	if(!engine) return;
 
-	controller = brEngineGetController(engine);;
+	controller = brEngineGetController(engine);
 
 	i = [breveEngine getSelectedInstance];
 
@@ -735,24 +735,25 @@ int isHTMLfile(struct dirent *d) {
 }
 
 void updateMenu(brInstance *i) {
-	brMenuList *menuList;
 	id menuItem;
 	int n;
 
+	if(!i->engine || i != brEngineGetController(i->engine)) return;
+
 	[gSelf clearSimulationMenu];
 
-	menuList = &i->menu;
+	for(n=0;n<i->menus->count;n++) {
+		brMenuEntry *entry = i->menus->data[n];
 
-	for(n=0;n<menuList->count;n++) {
-		if(!strcmp(menuList->list[n]->title, "")) {
+		if(!strcmp(entry->title, "")) {
 			[gSimMenu addItem: [NSMenuItem separatorItem]];
 		} else {
-			menuItem = [gSimMenu addItemWithTitle: [NSString stringWithCString: menuList->list[n]->title] action: @selector(simMenu:) keyEquivalent: @""];
+			menuItem = [gSimMenu addItemWithTitle: [NSString stringWithCString: entry->title] action: @selector(simMenu:) keyEquivalent: @""];
 
 			[menuItem setTag: n];
 
-			[menuItem setEnabled: menuList->list[n]->enabled];
-			[menuItem setState: menuList->list[n]->checked];
+			[menuItem setEnabled: entry->enabled];
+			[menuItem setState: entry->checked];
 		}
 	}
 }

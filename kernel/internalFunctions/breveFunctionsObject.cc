@@ -169,7 +169,7 @@ int brINotify(brEval args[], brEval *target, brInstance *i) {
     // for each observer, check to see if what it's observing
 
     while(observers) {
-        observer = observers->data;
+        observer = (brObserver*)observers->data;
 
         if(!strcmp(notification, observer->notification)) {
             count = observer->method->argumentCount;

@@ -72,7 +72,7 @@ void brGLMenuStatus(int stat, int x, int y);
 void brContextualMenu(int n); 
 void brClick(int n);
 
-void brGLMainMenuUpdate(brInstance *l);
+void brGlutMenuUpdate(brInstance *l);
 
 void slInitGlut(int argc, char **argv, char *name);
 
@@ -86,8 +86,9 @@ void slDemoSpecialUp(int key, int x, int y);
 void slDemoKeyboard(unsigned char key, int x, int y);
 void slDemoKeyboardUp(unsigned char key, int x, int y);
 
-int brCLIDialogCallback(void *data, char *title, char *message, char *b1, char *b2);
-
-char *interfaceVersionCallback(void *data);
-char *getSavename(void *data);
-char *getLoadname(void *data);
+int brCLIDialogCallback(char *title, char *message, char *b1, char *b2);
+char *interfaceVersionCallback();
+char *getSavename();
+char *getLoadname();
+int soundCallback();
+int pauseCallback();
