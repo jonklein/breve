@@ -27,12 +27,12 @@
 #include <wctype.h>
 #endif
 
+#include "kernel.h"
+#include "breveFunctionsFile.h"
+
 #ifndef HAVE_ISWSPACE
 #define iswspace(c) ((c)==' '||(c)=='\f'||(c)=='\n'||(c)=='\r'||(c)=='\t'||(c)=='\v')
 #endif
-
-#include "kernel.h"
-#include "breveFunctionsFile.h"
 
 #define BRFILEPOINTER(p)  ((brFilePointer*)BRPOINTER(p))
 
