@@ -45,9 +45,12 @@ slMovie *slMovieCreate(char *filename, int width, int height, int rate, int b) {
 
 	m = new slMovie;
 
+#if FFMPEG_VERSION_INT <= 0x408
+	if (!(m->context = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext))) ||
+#else
 	if (!(m->context = av_alloc_format_context()) ||
-	    !(m->context->oformat = guess_format("mpeg", NULL, NULL)) ||
-	    !(st = m->context->streams[0] = av_new_stream(m->context, 0))) {
+#endif
+	    !(st = av_new_stream(m->context, 0))) {
 		slMessage(DEBUG_ALL, "Could allocate lavf context\n");
 		delete m;
 		return NULL;
@@ -60,41 +63,56 @@ slMovie *slMovieCreate(char *filename, int width, int height, int rate, int b) {
 	if (url_fopen(&m->context->pb, filename, URL_WRONLY) < 0) {
 		slMessage(DEBUG_ALL, "Could not open file \"%s\" for writing: %s\n", filename, strerror(errno));
 		av_free(st);
+		av_free(m->context);
+		delete m;
+		return NULL;
+	}
+	if (!(m->context->oformat = guess_format("mpeg", filename, NULL))) {
+		slMessage(DEBUG_ALL, "Could not find MPEG muxer\n");
+		av_free(st);
+		av_free(m->context);
 		delete m;
 		return NULL;
 	}
 
 	c = &st->codec;
-
 	c->codec_id = CODEC_ID_MPEG1VIDEO;
 	c->codec_type = CODEC_TYPE_VIDEO;
 
 	if (!(codec = avcodec_find_encoder(c->codec_id))) {
 		slMessage(DEBUG_ALL, "Could not find MPEG-1 encoder\n");
 		av_free(st);
+		av_free(m->context);
 		delete m;
 		return NULL;
 	}
+
+#if FFMPEG_VERSION_INT <= 0x408
+	c->pix_fmt = PIX_FMT_YUV420P;
+#else
 	c->pix_fmt = codec->pix_fmts[0];
+#endif
 
 	c->width = width;
 	c->height = height;
 	c->frame_rate = rate;
 	c->frame_rate_base = b;
 
-	/* use lavc ratecontrol to get 1-pass constant bit-rate */
+	/* Use lavc ratecontrol to get 1-pass constant bit-rate. */
 
 	c->rc_max_rate = c->rc_min_rate = c->bit_rate = 800 * 1000;
 
 	c->bit_rate_tolerance = c->bit_rate * 10;
+	c->gop_size = 15;
 	c->rc_buffer_aggressivity = 1.0f;
-	c->rc_buffer_size = 224 * 1024;
+	c->rc_buffer_size = 320 * 1024;
 	c->rc_strategy = 2;
 	c->rc_qsquish = 1.0f;
 
+#if FFMPEG_VERSION_INT > 0x408
 	c->flags = CODEC_FLAG_TRELLIS_QUANT;
-	c->gop_size = 15;
 	c->max_b_frames = 1;
+	c->rc_initial_buffer_occupancy = 320 * 768;
 
 	/* Give the muxer the magic numbers. */
 
@@ -102,11 +120,13 @@ slMovie *slMovieCreate(char *filename, int width, int height, int rate, int b) {
 	m->context->mux_rate = 1411200;
 	m->context->packet_size = 2324;
 	m->context->preload = (int)(0.44 * AV_TIME_BASE);
+#endif
 
 	if (av_set_parameters(m->context, NULL) < 0 ||
 	    avcodec_open(c, codec) < 0) {
 		slMessage(DEBUG_ALL, "error opening video output codec\n");
 		av_free(st);
+		av_free(m->context);
 		delete m;
 		return NULL;
 	}
@@ -115,6 +135,7 @@ slMovie *slMovieCreate(char *filename, int width, int height, int rate, int b) {
 		slMessage(DEBUG_ALL, "Could not allocate lavc frame\n");
 		avcodec_close(c);
 		av_free(st);
+		av_free(m->context);
 		delete m;
 		return NULL;
 	}
@@ -182,6 +203,9 @@ int slMovieEncodeFrame(slMovie *m) {
 	 */
 
 	if (size) {
+#if FFMPEG_VERSION_INT <= 0x408
+		av_write_frame(m->context, st->index, m->enc_buf, size);
+#else
 		AVPacket pkt;
 
 		av_init_packet(&pkt);
@@ -195,6 +219,7 @@ int slMovieEncodeFrame(slMovie *m) {
 		pkt.pts = c->coded_frame->pts;
 
 		av_write_frame(m->context, &pkt);
+#endif
 	}
 
 	return 0;
@@ -240,7 +265,6 @@ int slMovieAddWorldFrame(slMovie *m, slWorld *w, slCamera *cam) {
 */
 
 int slMovieFinish(slMovie *m) {
-	AVPacket pkt;
 	AVCodecContext *c;
 	AVStream *st;
 	int n;
@@ -256,20 +280,25 @@ int slMovieFinish(slMovie *m) {
 	for (int i = 0; i <= c->max_b_frames; ++i) {
 		n = avcodec_encode_video(c, m->enc_buf, m->enc_len, NULL);
 
-		if (!n)
-			continue;
+		if (n) {
+#if FFMPEG_VERSION_INT <= 0x408
+			av_write_frame(m->context, st->index, m->enc_buf, n);
+#else
+			AVPacket pkt;
 
-		av_init_packet(&pkt);
+			av_init_packet(&pkt);
 
-		pkt.data = m->enc_buf;
-		pkt.size = n;
-		pkt.stream_index = st->index;
+			pkt.data = m->enc_buf;
+			pkt.size = n;
+			pkt.stream_index = st->index;
 
-		if (c->coded_frame->key_frame)
-			pkt.flags |= PKT_FLAG_KEY;
-		pkt.pts = c->coded_frame->pts;
+			if (c->coded_frame->key_frame)
+				pkt.flags |= PKT_FLAG_KEY;
+			pkt.pts = c->coded_frame->pts;
 
-		av_write_frame(m->context, &pkt);
+			av_write_frame(m->context, &pkt);
+#endif
+		}
 	}
 
 	av_write_trailer(m->context);
