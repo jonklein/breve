@@ -933,7 +933,7 @@ Mobile : Bird (aka Birds) {
             pushInterpreter copy-code-stack-top to c2.
             if (c2 get-size) > 0: {
                 pushInterpreter pop-code-stack.
-                c3 crossover from-parent1 c1 from-parent2 c2.
+                c3 crossover from-parent1 c1 from-parent2 c2 with-interpreter pushInterpreter.
                 pushInterpreter push-code value c3.
             } else {
                 pushInterpreter push-code value c1.

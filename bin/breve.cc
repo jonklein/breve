@@ -101,6 +101,10 @@ int main(int argc, char **argv) {
 
 	srandom(time(NULL));
 
+#ifdef WINDOWS
+	pthread_win32_process_attach_np();
+#endif
+
 	pthread_mutex_init(&gEngineMutex, NULL);
 	pthread_mutex_init(&gThreadMutex, NULL);
 	pthread_cond_init(&gThreadPaused, NULL);

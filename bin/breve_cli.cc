@@ -70,6 +70,10 @@ int main(int argc, char **argv) {
 	double nextNotify;
 	char wd[MAXPATHLEN];
 
+#ifdef WINDOWS
+	pthread_win32_process_attach_np();
+#endif
+
 	srandom(time(NULL));
 
 	interfaceID = "cli/1.9.1";
