@@ -17,7 +17,7 @@ If you're very lucky and have all of the required libraries installed,
 the following should build breve:
 
 1) ./configure
-2) make
+2) make optimize
 
 For the OS X application:
 
