@@ -213,7 +213,7 @@ int brParseArgs(int argc, char **argv) {
 	int r, error = 0;
 	int level;
 
-	while((r = getopt_long(argc, argv, "t:d:r:f:n:l:vhS:M", gCLIOptions, NULL)) != EOF) {
+	while((r = getopt_long(argc, argv, "t:d:r:f:n:l:vhmS:M", gCLIOptions, NULL)) != EOF) {
 		switch(r) {
 			case 'd':
 				level = atoi(optarg);

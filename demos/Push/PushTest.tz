@@ -1,0 +1,54 @@
+#
+# PushTest.tz 9/24/2004 
+# jon klein <jk@spiderland.org>
+# 
+# This simulation is a basic test of breve's built-in Push language 
+# capabilities.  
+# 
+
+@path "classes"
+@path "lib/classes"
+
+@use Push.
+@use Control.
+
+Controller myController.
+
+Control : myController {
+	+ to init:
+		agents (list).
+
+		new myPushAgents go.
+}
+
+Object : myPushAgent (aka myPushAgents) {
+	+ variables:
+		code, interpreter (object).
+
+	+ to init:
+		interpreter = new PushInterpreter.
+
+		interpreter clear-stacks.
+
+		interpreter read-config from-file "PushTest.config".
+
+		interpreter add-instruction named "CALLBACK-TEST" for-method "callback" for-instance self.
+
+	+ to go:
+		interpreter clear-stacks.
+		code = (new PushProgram parse program "( CALLBACK-TEST )").
+
+		interpreter run code code.
+
+		interpreter print-stacks.
+		interpreter print-config.
+
+		print "Should free the interpreter now.".
+		free interpreter.
+
+		controller end-simulation.
+
+	+ to callback:
+		print "$self is calling the breve callback function, pushing 7, ".
+		interpreter push-integer value 7.
+}

@@ -1,0 +1,41 @@
+@use Control.
+@use GSLRNG.
+
+Controller GSLRNGTester.
+
+Control : GSLRNGTester {
+	+ to init:
+	
+		rng (object).
+		rng = new GSLRNG.
+
+		print "Random uniform".
+		print (rng uniform).
+		
+		print "Random exponential, mu = 1".
+		print (rng exponential with-mu 1).
+		
+		print "Random gaussian, mu=1, sigma=1".
+		print (rng gaussian with-mu 1 and-sigma 1).
+		
+		print "Random poisson, mu=1".
+		print (rng poisson with-mu 1).
+		
+		print "Random binomial, p=0.5, n=10".
+		print (rng binomial with-p 0.5 and-n 10).
+		
+		print "Random negative binomial, p=0.5, n=10".
+		print (rng negative-binomial with-p 0.5 and-n 10).
+		
+		print "Random gamma, a=0.5, b=1".
+		print (rng gamma with-a 0.5 and-b 1).
+		
+		print "Random weibull, a=0.5, b=1".
+		print (rng weibull with-a 0.5 and-b 1).
+		
+		print "Random bernoulli, p=0.5".
+		print (rng bernoulli with-p 0.5).
+		
+		print "Random geometric, p=0.5".
+		print (rng geometric with-p 0.5).
+}

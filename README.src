@@ -3,7 +3,7 @@
                          http://www.spiderland.org/breve
                                 jk@spiderland.org
 
-                               -- INTRODUCTION --
+                             -- INTRODUCTION --
 
 breve is a free simulation environment designed for multi-agent simulation.  
 breve allows users to define the behaviors of autonomous agents in a 
@@ -11,22 +11,33 @@ continuous 3D world, then observe how they interact.  breve includes support
 for a rich visualization engine, realistic physical simulation and an 
 easy-to-use scripting language.
 
-                               -- QUICK BUILD --
+                           -- BUILDING BREVE --
 
-If you're very lucky and have all of the required libraries installed,
-the following should build breve:
+1) Confirm that you have all of the required libraries installed.
 
-1) ./configure
-2) make optimize
+  See the sections on "REQUIRED LIBRARIES" below for more information
+  on the libraries required to build breve.
 
-For the OS X application:
+2) Specify paths of external library and header files, if required
 
-1) ./configure
-2) make OSX_build
+  If you have external libraries or headers installed in locations 
+  other than /usr/{lib or include} or /usr/local/{lib or include}, 
+  you may have to specify their location by setting the environment
+  variables LDFLAGS and CPPFLAGS.
 
-If these commands fail it's likely that you will need to install some
-of the libraries required by breve.  See the section "REQUIRED LIBRARIES"
-below.  
+  Example: 
+
+	export LDFLAGS='-L/opt/local/lib' CPPFLAGS='-I/opt/local/include'
+
+3) ./configure
+
+4) make optimize
+
+To build the Mac OS X application:
+
+5) make OSX_build
+
+                             -- BUILD NOTES -- 
 
 OS X Note #1: the OS X xcode project is setup to link against all of the 
 breve libraries, even though some of the libraries are optional.  If you
@@ -37,7 +48,7 @@ OS X Note #2: if a library is installed, but cannot be found with the
 configure script, you may have to run "ranlib" on the library before
 it can be found.  See the ranlib manpage for more information.
 
-                       --- NOTES ON THIS RELEASE ---
+                           --- PLATFORMS ---
 
 breve is actively developed and maintained on three platforms:
 	Mac OS X
@@ -54,94 +65,114 @@ as well, though some work may be required:
 Please report successful ports and the changes required back to the author 
 at jk@spiderland.org.
 
-                          --- REQUIRED LIBRARIES ---
+                    --- REQUIRED LIBRARIES: SUMMARY ---
 
 It's always a drag to have to download another set of libraries to get 
-something working.  Sorry.  Make sure to include the libraries and the include
-header files in your environment before running configure.  
+something working.  Sorry.  Below is a summary of libraries which breve
+uses.  Some of these libraries are required, meaning that breve will not
+build without them.  Others are optional, meaning that breve will build
+without them, but that some features will not be available.
 
-Use LDFLAGS to include the library dirs and CPPFLAGS to include the include dirs. 
-Example: 
+Many of these libraries are included with standard OS distributions and
+developer tools and do not need to be downloaded separately.
 
-	export LDFLAGS='-L/opt/local/lib' CPPFLAGS='-I/opt/local/include'
+Required:
+  OpenGL
+  GLUT
+  ODE
+  expat
+  zlib
+  libpthread
+  libdl
+
+Optional:
+  libpng
+  libjpeg
+  libportaudio
+  libsndfile
+  libffmpeg
+  libpush
+  libenet
 
 
-- OpenGL and GLUT libraries [required]
+                    --- REQUIRED LIBRARIES: DETAILS ---
 
-- ODE, physical simulation library [required]
++ [required] OpenGL, graphics libraries 
+  Platform specific -- consult your OS vendor for more information.
 
++ [required] GLUT, OpenGL Utility Library
+  http://www.opengl.org/resources/libraries/glut.html
+ 
+  Windows users can obtain the DLL from:
+    http://www.xmission.com/~nate/glut.html.
+
++ [required] ODE, physical simulation library 
   http://www.ode.org
 
   The current version of ODE makes liberal use of alloca() to allocate 
-  memory on the stack during a function call.  This can cause crashes
+  memory on the stack during a function call.  This can cause crashes 
   if the simulation becomes too complex and causes a stack overflow.
   For this reason, official builds of breve use a modified version of 
   the ODE source.
 
-- libdl, dynamic loading compatibility library [required when building 
-  on or for pre-10.3 OS X only]
++ [required] libdl, dynamic loading library 
 
-  part of "fink", http://fink.sourceforge.net/
+  This library is already installed on most platforms.  A notable 
+  exception is when building on or for a version of Mac OS X prior to 
+  10.3.  For pre-10.3 versions of Mac OS X, users will need to install
+  a library called "dlcompat".
 
-- expat, XML parsing library [required]
-
++ [required] expat, XML parsing library 
   http://expat.sourceforge.net/
 
-- libjpeg, JPEG I/O library [optional]
++ [required] zlib, gzip compression library
+  http://www.gzip.org/zlib/
 
-  Provides support for loading JPG images.  This library is optional.  If it 
-  is not available, JPG import will not be supported.
-
++ [optional] libjpeg, JPEG I/O library 
   http://www.ijg.org/
 
-- libpng, PNG I/O library [optional]
+  Provides support for loading JPG images.  This library is optional.  
+  If it is not available, JPG import will not be supported.
 
-  Provides support for loading and saving PNG images.  This library is optional.  
-  If it is not available, PNG import and export will not be supported.
-
++ [optional] libpng, PNG I/O library 
   http://www.libpng.org/pub/png/libpng.html
 
-- libportaudio, portable sound APIs [optional]
+  Provides support for loading and saving PNG images.  This library is 
+  optional.  If it is not available, PNG import and export will not be 
+  supported.
 
-  Provides support for playing soundfiles.  This library is optional.  If 
-  it is not available, sound support will not be available.
-
++ [optional] libportaudio, portable sound APIs
   http://www.portaudio.com/
 
-- libsndfile, portable sound file I/O library [optional]
+  Provides support for playing soundfiles.  This library is optional.  
+  If it is not available, sound support will not be available.
 
-  Provides support for loading soundfiles.  This library is optional.  If 
-  it is not available, sound support will not be available.
-
++ [optional] libsndfile, portable sound file I/O library 
   http://www.zip.com.au/~erikd/libsndfile/
 
-- libffmpeg, mpeg movie export library [optional]
+  Provides support for loading soundfiles.  This library is optional.  
+  If it is not available, sound support will not be available.
+
++ [optional] libffmpeg, mpeg movie export library
+  http://ffmpeg.sourceforge.net/
 
   Provides support for exporting MPEG movies of simulations.  This library
   is optional.  If it is not available, movie export will not be supported.
 
-  http://ffmpeg.sourceforge.net/
++ [optional] libpush, push language libary 
+  http://push-evolve.sourceforge.net
 
-- libpush, push language libary [optional]
+  Provides support for the Push programming language for evolutionary
+  computation.  This library is optional.  If it is not available, the 
+  Push language will not be supported.  Requires GCC 3.3
 
-
-- libenet, networking library [optional]
-
-  Optional.  Not yet used for any release-quality features.
-
++ [optional] libenet, networking library 
   http://enet.cubik.org/
 
-                       -- Building With Mesa3D Support --
+  Very optional.  Not yet used for any release-quality features.
 
-Official builds of breve use standard OpenGL libraries, which do not support
-rendering into offscreen buffers.  The official non-graphical version of breve 
-(breve_cli) thus cannot support a number of breve features which rely on
-image data read from rendered images.  This includes the following features:
-taking snapshots, making movies, "visions" and light exposure detection
 
-The OpenGL-like library Mesa3D, however, does support offscreen rendering.
-If breve is built with Mesa3D support, these features can be used with
-breve_cli.
+                                -- License --
 
 /*****************************************************************************
  *                                                                           *

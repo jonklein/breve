@@ -21,6 +21,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 	+ to init:
 		pushInterpreterPointer = pushEnvironmentNew(random[2000000000]).
 		evaluationLimit = 100.
+		self set-list-limit to 200.
 
 	+ to add-instruction named instructionName (string) for-instance targetInstance (object) for-method methodName (string):
 		% Adds a custom callback instruction named instructionName to the push interpreter.  
@@ -35,6 +36,11 @@ Object : PushInterpreter (aka PushInterpreters) {
 	+ to read-config from-file configFile (string):
 		% Reads the push configuration file configFile.
 
+		if !findFile(configFile): {
+				print "Could not locate Push configuration file $configFile".
+				return.
+		}
+
 		pushEnvironmentReadConfigFile(pushInterpreterPointer, findFile(configFile)).
 
 	+ to run code codeObject (object) for-steps steps = -1 (int):
@@ -48,8 +54,9 @@ Object : PushInterpreter (aka PushInterpreters) {
 		pushRun(pushInterpreterPointer, (codeObject get-code-pointer), steps).
 
 	+ to set-list-limit to newLimit (int):
-		% CURRENTLY UNIMPLEMENTED.
 		% Sets the size limit of lists constructed in push.  
+		% <b>This is only partially implemented currently</b>.
+
 		pushEnvironmentSetListLimit(pushInterpreterPointer, newLimit).	
 
 	+ to set-evaluation-limit to newLimit (int):
@@ -201,7 +208,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 		pushEnvironmentFree(pushInterpreterPointer).
 }
 
-Object : PushProgram {
+Object : PushProgram (aka PushPrograms) {
 	% A PushProgram object is a program in the Push programming language.  To 
 	% be used in conjunction with the class OBJECT(PushInterpreter).
 
@@ -267,7 +274,8 @@ Object : PushProgram {
 		self set-code-pointer to pushCodeCrossover((p1 get-code-pointer), (p2 get-code-pointer)).
 
 	+ to copy-from program otherProgram (object):
-		# self parse program "( 3 )".
+		% Copies the contents of otherProgram to this object.
+
 		self parse program (otherProgram get-string).
 
 	+ to parse program codeString (string):

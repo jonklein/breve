@@ -395,12 +395,6 @@ Abstract : Control (aka Controls) [version 1.9] {
 
   + section "Camera & Lighting Options"
 
-	+ to disable-camera:
-		# cameraSetEnabled().
-	
-	+ to enable-camera:
-		# cameraSetEnabled().
-
 	+ to watch item theObject (object):
 		% Points the camera at the OBJECT(Mobile) object theObject.  If 
 		% theObject is passed in as 0, then the camera will stop watching
@@ -841,7 +835,7 @@ Abstract : Control (aka Controls) [version 1.9] {
 
 		cameraSetTextScale(scale).
 
-	+ to set-display-message to theString (string) with-number messageNumber (int) at-x xLoc (float) at-y yLoc (float) with-color textColor (vector):
+	+ to set-display-message to theString (string) with-number messageNumber (int) at-x xLoc (float) at-y yLoc (float) with-color textColor = (0, 0, 0) (vector):
 		% Sets a text string in the simulation display.  xLoc and yLoc 
 		% represent the location of the text.  The coordinate system used
 		% goes from (-1, -1) to (1, 1) with (-1, -1) at the lower left hand 
@@ -929,7 +923,9 @@ Abstract : Control (aka Controls) [version 1.9] {
 
 		return (image get-texture-number) - 1.
 
-	+ to load-image-without-alpha from file (string):
+	- to load-image-without-alpha from file (string):
+		% Depreciated.
+
 		return (self load-image from file).
 
 	+ to execute command systemCommand (string):

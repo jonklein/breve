@@ -250,7 +250,11 @@ header
 		char *fullnib, *nib = slMalloc(strlen(unquoted) + 5);
 		sprintf(nib, "%s.nib", unquoted);
 
-		fullnib = brFindFile(parseEngine, nib, NULL);
+		fullnib = brFindFile(parseEngine, unquoted, NULL);
+
+		// check for it with the .nib extension
+
+		if(!fullnib) fullnib = brFindFile(parseEngine, nib, NULL);
 
 		if(!fullnib) {
 			slMessage(DEBUG_ALL, "warning: unable to locate nib file \"%s\"\n", nib);

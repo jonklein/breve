@@ -41,7 +41,7 @@ is being used can be found on
 <ulink url="http://hampshire.edu/lspector/push.html">this page</ulink>.
 </para>
 
-<sect1><title>A Brief Introduction to Push</title>
+<sect1 id="push-intro"><title>A Brief Introduction to Push</title>
 <para>
 The Push language is well suited for evolution because of its extremely
 simple syntax, and its stack-based typing system.  The simple syntax
@@ -109,14 +109,86 @@ and features, see
 </para>
 </sect1>
 
-<sect1><title>Creating and Configuring Push Environments</title>
+<sect1 id="push-environment"><title>Creating and Configuring Push Environments</title>
 <para>
 To create a new push interpreter, simply create a new instance of the 
 class PushInterpreter.
 </para>
+<para>
+An important decission in creating a PushGP experiment is deciding what
+Push instructions will be available to evolution.  It is important to 
+choose instructions that will give evolving programs the right tools to 
+solve the problems they are given.  
+</para>
+<para>
+These instructions and other parameters must be specified using a Push 
+configuration file which is loaded into the interpreter with the 
+PushInterpreter method 
+<ulink url="classes/PushInterpreter.html#read-config">read-config</ulink>.
+A full list of Push instructions and parameters, as well as instructions on
+setting up a Push configuration file are available 
+<ulink url="http://hampshire.edu/lspector/push.html">here</ulink>.
+</para>
 </sect1>
 
-<sect1><title>Interacting with the Simulated World Using Callback Instructions</title>
+<sect1 id="push-programs"><title>Running and Evolving Push Programs</title>
+<para>
+A program in the Push language is stored in a 
+<ulink url="../classes/Push.tz">PushProgram</ulink> object.  This object
+provides methods for parsing Push programs, creating random programs, 
+breeding and mutating programs and more.  All of these features are 
+described in detail in the class documentation.
+</para>
+<para>
+Running a Push program is accomplished with help from the PushInterpeter 
+object.  Typically, the steps involved in running a Push program are:
+<itemizedlist>
+
+<listitem><para>Create and configure the Push interpreter</para></listitem>
+
+<listitem><para>
+Clear the interpreter's stacks with the method
+<ulink url="classes/PushInterpreter.html#clear-stacks">clear-stacks</ulink>.
+</para></listitem>
+
+<listitem><para>
+Push input values onto the interpreter's stacks (using various methods 
+in the PushInterpreter 
+<ulink url="classes/PushInterpreter.html">PushInterpreter</ulink> class).
+</para></listitem>
+
+<listitem><para>
+Run the push program with the method 
+<ulink url="classes/PushInterpreter.html#run">run</ulink>.
+</para></listitem>
+
+<listitem><para>
+Read output values from the interpreter's stacks (using various methods 
+in the PushInterpreter 
+<ulink url="classes/PushInterpreter.html">PushInterpreter</ulink> class).
+</para></listitem>
+
+</itemizedlist>
+</para>
+</sect1>
+
+<sect1 id="pushgp"><title>Genetic Programming With the PushGP Class</title>
+<para>
+The simplest way to run a basic genetic programming experiment with Push 
+is to override the included 
+<ulink url="classes/PushGP.html">PushGP</ulink> class.  Using this class,
+you need only to implement two simple methods to create a basic PushGP 
+experiment.  One method sets up the PushInterpreter before running a fitness 
+test, and the other inspects the interpreter after running the fitness test to 
+determine the fitness of the output.
+</para>
+<para>
+See the <ulink url="classes/PushGP.html">PushGP</ulink> class for more 
+information.
+</para>
+</sect1>
+
+<sect1 id="push-callbacks"><title>Interacting with the Simulated World Using Callback Instructions</title>
 <para>
 Push includes a variety of instructions for preforming computation on
 the native Push types, but does not provide instructions for interacting 
@@ -125,10 +197,10 @@ behaviors for simulated agents, you will need to provide instructions by
 which Push programs can read input data from the world ("sensors") and 
 other output instructions by which the programs can modify the agent's 
 behavior ("actuators").
-<para>
 </para>
+<para>
 Instructions are added to a PushInterpreter with the method 
-<ulink url="../classes/Push.html#add-instruction">add-instruction</a>. 
+<ulink url="../classes/Push.html#add-instruction">add-instruction</ulink>. 
 The method is passed a name for the new instruction, the name of the
 "callback" method, and the breve instance which is to receive the 
 method call.  When the newly created instruction is called, the specified 
@@ -147,13 +219,6 @@ from the Push interpreter's stack and use those values to preform an
 action in the world.  A "move-towards" instruction, for example, might 
 read a vector value from the vector stack, and then use the breve method
 "set-velocity" to direct the agent towards the Push-computed location.
-</para>
-</sect1>
-
-<sect1><title>Running and Evolving Push Programs</title>
-<para>
-A program in the Push language is stored in a 
-<ulink url="../classes/Push.tz">PushProgram</ulink> object.
 </para>
 </sect1>
 

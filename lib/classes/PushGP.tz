@@ -1,0 +1,292 @@
+@use Push.
+@use Control.
+
+@define POPULATION_SIZE 2000.
+@define TOURNAMENT_SIZE 9.
+@define MUTATE_PERCENT 30.
+@define CROSSOVER_PERCENT 50.
+
+Object : PushGP {
+	% This class is a special control class used to implement 
+	% experiments using the Push Genetic Programming (PushGP)
+	% system.  PushGP is a system which uses genetic programming
+	% and the Push programming language to attempt to evolve 
+	% solutions to a wide variety of problems.  For more 
+	% information on Push and PushGP, see the class OBJECT(Push).
+	% <p>
+	% To implement a PushGP experiment you will need to setup
+	% a PushGPControl object which overrides two methods:
+	% METHOD(setup-fitness-test), which sets up a fitness test
+	% and METHOD(compute-error), which is used to compute the 
+	% fitness of an individual.
+	% <p>
+	% Additionally, other methods in this class are useful for
+	% configuring the genetic programming environment and a 
+	% variety of parameters including population size, 
+	% mutation rate, crossover rate, and the Push language 	
+	% interpreter set.
+	% <p>
+	% Finally, you may also wish to add custom instructions 
+	% to the Push interpreter objects which manipulate data
+	% or trigger actions in the simulated world.  The Push
+	% interpreter can be retrieved using the method 
+	% METHOD(get-interpreter), and adding instructions is 
+	% documented in OBJECT(PushInterpreter).
+
+	+ variables:
+		interpreter (object).
+		pop1, pop2 (list).
+		current, next (list).
+
+		bestOfGen (object).
+		totalSize (int).
+
+		generation (int).
+		input (float).
+
+		inited (int).
+
+		crossoverPercent, mutatePercent (float).
+		tournamentSize (int).
+		populationSize (int).
+		currentIndividual (int).
+
+	+ to set-population-size to n (int):
+		% Sets the population size to n and reinitializes the population.
+
+		populationSize = n.
+		inited = 0.
+
+	+ to get-population-size: 
+		% Returns the population size.
+
+		return populationSize.
+
+	+ to read-interpreter-config from-file file (string):
+		% Reads a configuration file for the interpreter used in the  
+		% fitness tests.  Changing the configuration also reinitializes
+		% the evolving population (since instructions sets may be changed).
+
+		interpreter read-config from-file file.
+		inited = 0.
+
+	+ to init:
+		populationSize = POPULATION_SIZE.
+
+		interpreter = new PushInterpreter.
+
+	- to create-population:
+		if pop1: free pop1.
+		if pop2: free pop2.
+
+		pop1 = populationSize new Individuals.
+		pop2 = populationSize new Individuals.
+
+		pop1 set-interpreter to interpreter.
+		pop2 set-interpreter to interpreter.
+
+		current = pop1.
+		next = pop2.
+
+		inited = 1.
+
+	+ to get-interpreter: 
+		% Returns the OBJECT(PushInterpreter) object that this object is 
+		% using for fitness tests.
+
+		return interpreter.
+
+	- to swap-current:
+		% Used internally.
+		if current == pop1: {
+			current = pop2.
+			next = pop1.
+		} else {
+			current = pop1.
+			next = pop2.
+		}
+
+	- to run-tournament:
+		% Used internally.
+
+		n, test (int).
+		best (object).
+
+		best = current{ random[populationSize - 1] }.
+
+		for n = 0, n < TOURNAMENT_SIZE - 1, n++: {
+			test = random[populationSize - 1].
+
+			if (current{test} get-fitness) < (best get-fitness): best = current{test}.
+		}
+
+		return best.
+
+	+ to iterate:
+		n (int).
+		percent (int).
+
+		if !inited: self create-population.
+
+		for n=0,n<100,n++: self evaluate.
+
+		percent = (100.0 * currentIndividual / populationSize).
+
+		controller set-display-message with-number 0 at-x -0.9 at-y -0.8 to "Generation $generation: $percent% Complete".
+
+		# if we're breeding in the next timestep, we'll set the message now...
+
+		if currentIndividual >= (populationSize - 100): 
+			controller set-display-message with-number 0 at-x -0.9 at-y -0.8 to "Generation $generation: breeding".
+
+	- to evaluate:
+		self compute-fitness for-program current{ currentIndividual }.
+		currentIndividual++.
+
+		if currentIndividual == populationSize: {
+			self reproduce.
+			self report.
+			self swap-current.
+			currentIndividual = 0.
+			generation++.
+			bestOfGen = 0.
+			totalSize = 0.
+		}
+
+	- to compute-fitness for-program p (object):
+		n (int).
+		fitness (float).
+
+		for n=0, n < (self count-fitness-cases), n++: {
+			interpreter clear-stacks.
+
+			self setup-fitness-test for-fitness-case n 
+				with-interpreter interpreter.
+
+			interpreter run code current{ currentIndividual }.			
+
+			fitness += (self compute-error for-fitness-case n 
+				with-interpreter interpreter).
+		}
+
+		if fitness < 0.001: {
+			print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;".
+			print ";; Solution found at generation $generation:".
+			print (current{ currentIndividual } get-string).
+			controller end-simulation.
+		}
+
+		if !bestOfGen || (fitness < (bestOfGen get-fitness)): bestOfGen = current{ currentIndividual }.
+
+		totalSize += (current{ currentIndividual } get-size).
+
+		current{ currentIndividual } set-fitness to fitness.
+
+	+ to setup-fitness-test for-fitness-case n (int) 
+		with-interpreter interpreter (object):
+
+		% This method must be overridden by the user in order to run a 
+		% PushGP experiment.  The job of this method is to prepare to run 
+		% the specified fitness test.  This typically means pushing input 
+		% values onto the OBJECT(PushInterpreter) object's stacks.
+		% <p>
+		% In a symbolic regression problem, for example, this method might 
+		% push a predetermined input value onto the float stack.
+		% <pre>
+		% 	interpreter push-float value inputValues{ n }.
+		% </pre>
+
+		die "The method setup-fitness-test must be overridden by the user -- see the class documentation for PushGPControl for more information".
+	
+	+ to compute-error for-fitness-case n (int) 
+		with-interpreter interpreter (object):
+
+		% This method must be overridden by the user in order to run a 
+		% PushGP experiment.  The job of this method is to inspect the 
+		% state of the OBJECT(PushInterpreter) object and determine
+		% the fitness (in terms of error) of the specified fitness case.  
+		% This typically involves comparing values from the interpreter's 
+		% stacks against desired values.
+		% <p>
+		% For example, with a symbolic regression problem, this method 
+		% might return the difference between the top of the float stack, 
+		% and the predetermined "correct" answer for the specified fitness 
+		% case.  For example:
+		% <pre>
+		% 	return (interpreter get-float-stack-top) - desiredOutputs{ n }.
+		% </pre>
+
+		die "The method compute-fitness must be overridden by the user -- see the class documentation for PushGPControl for more information".
+
+	+ to report:
+		% Logs information to the output at every generation.  This method 
+		% may be overridden to provide more (or less) output data.
+
+		n, size (int).
+		bestFitness (float).
+
+		totalSize /= populationSize.
+
+		bestFitness = (bestOfGen get-fitness).
+
+		print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;".
+		print ";; Generation: $generation".
+		print ";; Average program size: $totalSize".
+		print ";; Best error: $bestFitness".
+		print ";; Best Individual: ", (bestOfGen get-string).
+		print "".
+
+		controller set-display-message with-number 2 at-x -0.9 at-y -0.9 to "Best Fitness: $bestFitness".
+
+	- to reproduce:
+		% Used internally.
+
+		n (int).
+		p1, p2 (object).
+
+		while n < (MUTATE_PERCENT / 100.0) * populationSize: {
+			p1 = (self run-tournament).
+			next{n} copy-from program p1.
+			next{n} mutate with-max-new-code-size 10 with-interpreter interpreter.
+
+			n++.
+		}
+
+		while n < ((CROSSOVER_PERCENT + MUTATE_PERCENT) / 100.0) * populationSize: {
+			p1 = (self run-tournament).
+			p2 = (self run-tournament).
+			next{n} crossover from-parent1 p1 from-parent2 p2.
+			n++.
+		}
+
+		while n < populationSize: {
+			p1 = (self run-tournament).
+			next{n} copy-from program p1.
+			n++.
+		}
+}
+
+PushProgram : Individual (aka Individuals) {
+	% A class used by OBJECT(PushGP), this is a single individual
+	% in a PushGP run.  It is not typically used directly by the user.
+
+	+ variables:
+		interpreter (object).
+		fitness (double).
+
+	- to set-interpreter to newInterpreter (object):
+		interpreter = newInterpreter.
+		self make-random-code with-interpreter interpreter.
+
+	+ to set-fitness to newFitness (double):
+		% Sets the fitness of this object to newFitness.  You 
+		% shouldn't call this method unless you're implementing
+		% your own GP system.
+
+		fitness = newFitness.
+
+	+ to get-fitness: 
+		% Returns the fitness of this GP individual.
+
+		return fitness.
+}

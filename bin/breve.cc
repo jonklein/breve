@@ -350,7 +350,7 @@ int brParseArgs(int argc, char **argv) {
 	int r, error = 0;
 	int level;
 
-	while((r = getopt_long(argc, argv, "w:s:d:r:l:vhfFuSM", gCLIOptions, NULL)) != EOF) {
+	while((r = getopt_long(argc, argv, "w:s:d:r:l:vhfmFuSM", gCLIOptions, NULL)) != EOF) {
 		switch(r) {
 			case 'd':
 				level = atoi(optarg);
@@ -419,7 +419,7 @@ void brPrintUsage(char *name) {
 	fprintf(stderr, "  -v              Display the current version number.\n");
 	fprintf(stderr, "  -h              Display this information.\n");
 	fprintf(stderr, "  -u              Unpause: begin running simulation immediately.\n");
-	fprintf(stderr, "  -m              Format the simulation file and quit.\n");
+	fprintf(stderr, "  -F              Format the simulation file and quit.\n");
 	fprintf(stderr, "  -w X,Y          Move the window to coordinates (X, Y).\n");
 	fprintf(stderr, "  -s NxM          Create a window of size (N, M).\n");
 	fprintf(stderr, "\n");

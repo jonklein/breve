@@ -1,0 +1,57 @@
+@use PushGP.
+@use Control.
+
+Controller RegressionController.
+
+Control : RegressionController {
+	+ to init:
+		new RegressionGP.
+}
+
+PushGP : RegressionGP {
+	+ variables:
+		currentInput (float).
+
+	+ to init:
+		self read-interpreter-config from-file "PushRegression.config".
+
+		# PushGP regression problems are helped by being able to retrieve 
+		# the input values with an instruction.  Adding this callback is 
+		# optional, but does tend to produce better results.
+
+		(self get-interpreter) add-instruction named "INPUT" 
+			for-instance self 
+			for-method "input-callback".
+
+	+ to count-fitness-cases:
+		# We'll do 10 fitness tests 
+
+		return 10.
+
+	+ to setup-fitness-test for-fitness-case n (int) 
+				with-interpreter interpreter (object):
+
+		# Push a test case input value (n) onto the float stack.  
+
+		currentInput = n.
+
+		interpreter push-float value n.
+
+	+ to compute-error for-fitness-case n (int) 
+			with-interpreter interpreter (object):
+
+		# Compute the error between the program's output and our target 
+		# equation.  Return the absolute value of the difference.
+
+		desiredResult (float).
+
+		desiredResult = (n * n * n) + (4 * n * n) - (2 * n).
+
+		return | (interpreter get-float-stack-top) - desiredResult |.
+
+	+ to input-callback:
+		# This input instruction just puts the current input value on
+		# top of the float stack.
+
+		(self get-interpreter) push-float value currentInput.
+}

@@ -35,8 +35,6 @@ profile:
 
 optimize:
 	make CFLAGS='$(OPTFLAGS)'
-	strip bin/breve
-	strip bin/breve_cli
 
 optimize_debug:
 	make CFLAGS+='-g $(OPTFLAGS)'

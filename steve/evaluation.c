@@ -124,7 +124,8 @@ inline int stToInt(brEval *e, brEval *t, stRunInstance *i) {
 			break;
 		case AT_STRING:
 			str = BRSTRING(e);
-			result = atoi(BRSTRING(e));
+			if(str) result = atoi(BRSTRING(e));
+			else result = 0;
 			break;
 		case AT_LIST:
 			/* copy the list to a local variable, so that we can free it */
@@ -184,7 +185,8 @@ inline int stToDouble(brEval *e, brEval *t, stRunInstance *i) {
 			break;
 		case AT_STRING:
 			str = BRSTRING(e);
-			result = atof(BRSTRING(e));
+			if(str) result = atof(BRSTRING(e));
+			else result = 0.0;
 			break;
 		case AT_LIST:
 			theList = BRLIST(e);
@@ -1604,19 +1606,21 @@ inline int stEvalUnaryExp(stUnaryExp *b, stRunInstance *i, brEval *target) {
 
 	if(result != EC_OK) return result;
 
-	if(target->type == AT_STRING) {
-		str = BRSTRING(target);
-		result = stToDouble(target, target, i); 
-
-		if(result != EC_OK) return result;
-	}
-
 	if(b->type == UT_NOT) {
 		stEvalTruth(target, &truth, i);
 		target->type = truth.type;
 		BRINT(target) = !BRINT(&truth);
 
 		return EC_OK;
+	}
+
+	// if it's a string, switch to a number before continuing.
+
+	if(target->type == AT_STRING) {
+		str = BRSTRING(target);
+		result = stToDouble(target, target, i); 
+
+		if(result != EC_OK) return result;
 	}
 
 	if(target->type == AT_LIST) {
@@ -2355,7 +2359,7 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 
 	if(new->instance->gcStack) {
 		stGCUnretain(target);
-		stGCMark(old->instance, target);
+		if(old) stGCMark(old->instance, target);
 	}
 
 	// restore the previous stack and stack records

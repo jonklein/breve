@@ -10,7 +10,7 @@ struct brPushCallbackData {
 
 typedef struct brPushCallbackData brPushCallbackData;
 
-unsigned int brPushCallbackFunction(void *environment, brPushCallbackData *data);
+unsigned int brPushCallbackFunction(PushEnvironment *environment, void *data);
 void brPushFreeData(void *d);
 
 /*@{*/
@@ -38,8 +38,9 @@ int breveFunctionPushCallbackNew(brEval arguments[], brEval *result, brInstance 
 	return EC_OK;
 }
 
-unsigned int brPushCallbackFunction(void *environment, brPushCallbackData *data) {
+unsigned int brPushCallbackFunction(PushEnvironment *environment, void *d) {
 	brEval eval;
+	brPushCallbackData *data = (brPushCallbackData*)d;
 
 	if(brMethodCall(data->instance, data->method, NULL, &eval) != EC_OK) return -1;
 

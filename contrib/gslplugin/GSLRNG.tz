@@ -1,0 +1,36 @@
+@use Object.
+
+@plugin "GSLRNG_plugin.o" (GSLRNGLoadFunctions).
+
+Object : GSLRNG {
+	+ variables:
+			rngPointer (pointer).
+	+ to init:
+			rngPointer = GSLRNG_new().
+	+ to set-seed with-seed s (int):
+			GSLRNG_set(rngPointer,s).
+	+ to uniform:
+			return GSLRNG_uniform(rngPointer).
+	+ to uniform-int with-upper u (int):
+			return GSLRNG_uniform_int(rngPointer,u).
+	+ to gaussian with-mu mu (double) and-sigma sigma (double):
+			return GSLRNG_gaussian(rngPointer,mu,sigma).
+	+ to exponential with-mu mu (double):
+			return GSLRNG_exponential(rngPointer,mu).
+	+ to poisson with-mu mu (double):
+			return GSLRNG_poisson(rngPointer,mu).
+	+ to binomial with-p p (double) and-n n (int):
+			return GSLRNG_binomial(rngPointer,p,n).
+	+ to negative-binomial with-p p (double) and-n n (int):
+			return GSLRNG_negative_binomial(rngPointer,p,n).
+	+ to gamma with-a a (double) and-b b (double):
+			return GSLRNG_gamma(rngPointer,a,b).
+	+ to weibull with-a a (double) and-b b (double):
+			return GSLRNG_weibull(rngPointer,a,b).
+	+ to bernoulli with-p p (double):
+			return GSLRNG_bernoulli(rngPointer,p).
+	+ to geometric with-p p (double):
+			return GSLRNG_geometric(rngPointer,p).		
+	+ to destroy:
+			GSLRNG_free(rngPointer).
+}

@@ -68,6 +68,10 @@
 <ulink url="../classes/Image.html">Image</ulink></para>
 </listitem>
 <listitem><para>
+<indexterm><primary>Individual class</primary></indexterm>
+<ulink url="../classes/Individual.html">Individual</ulink></para>
+</listitem>
+<listitem><para>
 <indexterm><primary>JavaObject class</primary></indexterm>
 <ulink url="../classes/JavaObject.html">JavaObject</ulink></para>
 </listitem>
@@ -134,6 +138,10 @@
 <listitem><para>
 <indexterm><primary>PrismaticJoint class</primary></indexterm>
 <ulink url="../classes/PrismaticJoint.html">PrismaticJoint</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>PushGP class</primary></indexterm>
+<ulink url="../classes/PushGP.html">PushGP</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>PushInterpreter class</primary></indexterm>

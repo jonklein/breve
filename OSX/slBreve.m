@@ -134,8 +134,8 @@ static NSRecursiveLock *gLogLock;
 
 	[runWindow makeKeyAndOrderFront: nil];
 
-	if(![[defaults stringForKey: @"ShowedWelcomeMessage"] isEqualTo: @"1.9b"]) {
-		[defaults setObject: @"1.9b" forKey: @"ShowedWelcomeMessage"];
+	if(![[defaults stringForKey: @"ShowedWelcomeMessage"] isEqualTo: @"2.0d"]) {
+		[defaults setObject: @"2.0d" forKey: @"ShowedWelcomeMessage"];
 		[self showWelcomeMessage];
 	}
 
