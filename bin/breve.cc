@@ -186,7 +186,7 @@ int main(int argc, char **argv) {
 
 	slFree(text);
 
-	brSetUpdateMenuCallback(frontend->engine->controller, (void*)brGLMainMenuUpdate);
+	brSetUpdateMenuCallback(frontend->engine->controller, brGLMainMenuUpdate);
 
 	for(n=0;n<256;n++) keyDown[n] = 0;
 

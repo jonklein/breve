@@ -47,7 +47,7 @@ slStack *slStackNewWithSize(unsigned int size) {
 
     if(size < 1) size = 1;
 
-    s = slMalloc(sizeof(slStack));
+    s = new slStack;
     s->count = 0;
     s->maxCount = size;
     s->data = slMalloc(sizeof(void*) * s->maxCount);
@@ -66,7 +66,7 @@ void slStackFree(slStack *s) {
 	if(!s) return;
 
     slFree(s->data);
-    slFree(s);
+    delete s;
 }
 
 /*!

@@ -73,6 +73,7 @@ void slDrawFog(slWorld *w, slCamera *c);
 void slMatrixGLMult(double m[3][3]);
 
 void slCompileCubeDrawList(int l);
+void slCompileSphereDrawList(int l);
 
 void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor);
 void slRenderWorldToBuffer(slWorld *w, slCamera *c, char *r, char *g, char *b, char *temp);

@@ -132,12 +132,6 @@ int slMakeCurrentContext();
 	breveFrontendCleanupData(frontend->data);
 	slFree(frontend);
 
-	if(slMemoryAllocated()) {
-		slMemoryReport();
-		slMessage(DEBUG_ALL, "Freeing manually...\n");
-		slUtilMemoryFreeAll();
-	}
-
 	engine = NULL;
 
 	[interfaceController updateObjectSelection];

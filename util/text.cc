@@ -20,11 +20,8 @@
 
 /*!
 	= text.c -- lower level utility functions related to text processing.
-	= most of the hardcore text processing for steve is done with lex and 
-	= yacc and is found in the steve source tree.
 */
 
-// extern int errno;
 #include <errno.h>
 
 #include "util.h"
@@ -184,6 +181,9 @@ char *slUtilReadFile(char *path) {
 		slMessage(DEBUG_ALL, "error opening file \"%s\": %s\n", path, strerror(errno));
 		return NULL;
 	}
+
+	// the "stat" size is the compressed size -- we'll need to dynamically 
+	// resize to accomidate the uncompressed data.
 
 	buffer = slMalloc(1);
 
@@ -359,8 +359,6 @@ char *slUtilReadStdin() {
 
 		data = slRealloc(data, total + 4096);
 	}
-
-	printf("%s\n", data);
 
 	return data;
 }

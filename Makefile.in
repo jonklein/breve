@@ -45,9 +45,6 @@ optimize:
 optimize_debug:
 	$(MAKE) CFLAGS='-g $(OPTFLAGS)'
 
-memory_debug:
-	$(MAKE) CFLAGS+='-DMEMORY_DEBUG'
-
 clean:
 	rm -rf OSX/build
 	-cd util; $(MAKE) -f Makefile clean

@@ -22,58 +22,15 @@
 #define _MEMORY_H
 #include <stdio.h>
 
-#ifdef MEMORY_DEBUG
-#define slFree(p)		slDebugFree((p), __LINE__, __FILE__)
-#define slMalloc(p) 	slDebugMalloc((p), __LINE__, __FILE__)
-#define slRealloc(p, s) slDebugRealloc((p), (s), __LINE__, __FILE__)
-#else
 void *slMalloc(int n);
 void *slRealloc(void *p, int n);
 void slFree(void *p);
-#endif
 
-enum mallocStatus {
-    MS_NULL = 0,
-    MS_MALLOC,
-    MS_REALLOC,
-    MS_FREE
-};
-
-/*!
-	\brief Data used to track a memory allocation, only used when memory 
-	debugging is enabled.
-*/
-
-struct slMallocData {
-    void *pointer;
-    int size;
-
-    char status;
-
-	int line;
-	char *file;
-};
-
-void *slNormalMalloc(int n);
-
-void *slDebugMalloc(int n, int line, char *file);
-void *slDebugRealloc(void *p, int n, int line, char *file);
-void slDebugFree(void *p, int line, char *file);
-
-int slMallocHash(void *hash, void *p, slMallocData *d);
-slMallocData *slMallocLookup(void *hash, void *p);
-slMallocData *slNewUtilMallocData(void *p, int size, int line, char *file);
-
-int slUtilMemoryUnfreed();
-void slUtilMemoryFreeAll();
-
-void slMessage(int level, char *format, ...);
 char *slDequeueMessage();
 int slCheckMessageQueue();
 
 void slFatal(char *format, ...);
 void utilPause();
-double randomDouble();
 
 void slMemoryReport();
 int slMemoryAllocated();

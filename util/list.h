@@ -51,8 +51,5 @@ void slListFree(slList *l);
 void slListFreeHead(slList *l);
 int slListCount(slList *l);
 
-slArray *slNewArray(int count, int size);
 void slFreeArray(slArray *a);
-
-void slPrintList(slList *l);
 

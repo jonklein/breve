@@ -48,7 +48,7 @@
 slList *slListPrepend(slList *l, void *d) {
     slList *newList;
 
-    newList = malloc(sizeof(slList));
+    newList = new slList;
    
     if(!newList) return NULL;
 
@@ -115,7 +115,7 @@ slList *slListRemoveData(slList *s, void *p) {
 		else list = NULL;
 	}
 
-	if(s) free(s);
+	if(s) delete s;
 	
 	return list;
 }
@@ -181,25 +181,19 @@ void slListFree(slList *l) {
 
     while(l) {
         next = l->next;
-        free(l);    
+        delete l;
         l = next;
     }
 }
 
 /*!
 	\brief Free a list head.
-
-    Since the lists use free() and malloc() instead of slFree() and 
-    slMalloc(), we give the users an interface to just free a single
-    element of the list themselves so that they are not expected to 
-    know to do a raw free() on something they did not explicitly
-    allocate themselves.
 */
 
 void slListFreeHead(slList *l) {
     if(!l) return;
 
-    free(l);
+    delete l;
 }
 
 /*!
@@ -229,7 +223,7 @@ slArray *slListToArray(slList *l) {
     slArray *a;
     int n;
 
-    a = malloc(sizeof(slArray));
+    a = new slArray;
 
 	if(!l) {
 		a->count = 0;
@@ -239,34 +233,13 @@ slArray *slListToArray(slList *l) {
 
     a->count = slListCount(l);
 
-    a->data = malloc(sizeof(void*) * a->count);
+    a->data = new void*[a->count];
 
     n = 0;
 
     while(l) {
         a->data[n++] = l->data;
         l = l->next;
-    }
-
-    return a;
-}
-
-/*!
-    \brief Creates an empty array of a specific size.
-*/
-
-slArray *slNewArray(int count, int size) {
-    slArray *a;
-    int n;
-
-    a = malloc(sizeof(slArray));
-
-    a->count = count;
-
-    a->data = malloc(sizeof(void*) * a->count);
-
-    if(size) {
-        for(n=0;n<count;n++) a->data[n] = malloc(size);
     }
 
     return a;
@@ -280,23 +253,6 @@ slArray *slNewArray(int count, int size) {
 */
 
 void slFreeArray(slArray *a) {
-    if(a->data) free(a->data);
-    free(a);
-}
-
-void slPrintList(slList *l) {
-	int first = 1;
-
-	printf(" { ");
-
-	while(l) { 
-		if(first) printf("%p", l->data);
-		else printf(", %p", l->data);
-
-		first = 0;
-
-		l = l->next;
-	}
-
-	printf(" } ");
+    if(a->data) delete[] a->data;
+    delete (a);
 }

@@ -346,6 +346,13 @@ Object : PushGP {
 		% </pre>
 
 		die "The method setup-fitness-test must be overridden by the user -- see the class documentation for PushGPControl for more information".
+
+	+ to count-fitness-cases:
+		% This method must be overriden by the user in order to run a
+		% PushGP experiment.  This method should return the number of 
+		% fitness cases to be run.
+
+		die "The method count-fitness-cases must be overridden by the user -- see the class documentation for PushGPControl for more information".
 	
 	+ to compute-error for-fitness-case n (int) 
 		with-interpreter interpreter (object):

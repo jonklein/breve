@@ -54,9 +54,9 @@ slHash *slNewHash(unsigned int size, unsigned int (*hf)(void *p, unsigned int n)
     slHash *h;
     unsigned int n;
 
-    h = malloc(sizeof(slHash));
+    h = new slHash;
 
-    h->buckets = malloc(sizeof(slList*) * size);
+    h->buckets = new slList*[size];
     h->size = size;
 
     for(n=0;n<h->size;n++) h->buckets[n] = 0;
@@ -82,16 +82,16 @@ void slFreeHash(slHash *h) {
 		buckets = h->buckets[n];
 
 		while(buckets) {
-			free(buckets->data);
+			delete (slHashEntry*)buckets->data;
 			buckets = buckets->next;
 		}
 
 		slListFree(h->buckets[n]);
 	}
 
-	free(h->buckets);
+	delete[] h->buckets;
 
-	free(h);
+	delete h;
 }
 
 /*!
@@ -125,7 +125,7 @@ void *slHashData(slHash *h, void *key, void *data) {
         activeList = activeList->next;
     }
 
-    newEntry = malloc(sizeof(slHashEntry));
+    newEntry = new slHashEntry;
 
     newEntry->data = data;
     newEntry->key = key;
@@ -214,7 +214,7 @@ slList *slHashKeys(slHash *h) {
 */
 
 unsigned int slHashString(void *d, unsigned int s) {
-	char *string = d;
+	char *string = (char*)d;
 	char c;
 	int r = 0;
 
@@ -238,7 +238,7 @@ unsigned int slCompString(void *a, void *b) {
 unsigned int slHashPointer(void *p, unsigned int n) {
 	unsigned int total = 0;
 	void *localP = p;
-	unsigned char *start = (void*)&localP;
+	unsigned char *start = (char*)&localP;
 	unsigned int c;
 
 	for(c=0;c<sizeof(void*);c++) total += start[c];

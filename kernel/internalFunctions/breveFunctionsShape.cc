@@ -41,7 +41,6 @@ int brIAddShapeFace(brEval args[], brEval *target, brInstance *i) {
 	slShape *s = BRSHAPEPOINTER(&args[0]);
 	brEvalListHead *list = BRLIST(&args[1]);
 	brEvalList *h;
-	slVector **face;
 
 	if(!s) return EC_OK;
 
@@ -50,7 +49,7 @@ int brIAddShapeFace(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	face = slMalloc(sizeof(slVector*) * list->count);
+	slVector *face[list->count];
 
 	h = list->start;
 
@@ -69,8 +68,6 @@ int brIAddShapeFace(brEval args[], brEval *target, brInstance *i) {
 	}
 
 	slAddFace(s, face, list->count);
-
-	slFree(face);
 
 	return EC_OK;
 }

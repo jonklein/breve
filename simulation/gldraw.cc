@@ -132,7 +132,7 @@ void slInitGL(slWorld *w, slCamera *c) {
 	c->cubeDrawList = glGenLists(1);
 	slCompileCubeDrawList(c->cubeDrawList);
 	c->sphereDrawLists = glGenLists(SPHERE_RESOLUTIONS);
-	slCompileCubeDrawList(c->sphereDrawLists);
+	slCompileSphereDrawList(c->sphereDrawLists);
 
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specularColor);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 90);
@@ -153,7 +153,7 @@ void slCompileSphereDrawList(int l) {
 
 		gluQuadricTexture(quad, GL_TRUE);
 		gluQuadricOrientation(quad, GLU_OUTSIDE);
-		gluSphere(quad, 1.0, 5 + n * 5, 5 + n * 5);
+		gluSphere(quad, 1.0, 6 + n * 3, 6 + n * 3);
 
 		gluDeleteQuadric(quad);
 

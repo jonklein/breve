@@ -80,22 +80,6 @@ double slVectorAngle(slVector *a, slVector *b) {
 	return ac;
 }
 
-/*! 
-	\brief Sets all elements of a 3x1 vector to 0.0.
-*/
-
-void slVectorZero(slVector *v) {
-	bzero(v, sizeof(slVector));
-}
-
-/*!
-	\brief sets all elements of a 6x1 vector to 0.0.
-*/
-
-inline void slsVectorZero(slsVector *s) {
-	bzero(s, sizeof(slsVector));
-}
-
 /*!
 	\brief Adds 6x1 vectors s1 and s2, storing the output in 6x1 vector d.
 */

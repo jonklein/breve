@@ -22,6 +22,8 @@
 
 #ifdef HAVE_LIBJAVA
 
+int brJavaMethodCall(brJavaBridgeData *bridge, brJavaInstance *instance, brJavaMethod *method, jvalue *jargs, brEval *result);
+
 brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	JavaVMInitArgs vm_args;
 	JavaVMOption options[2];

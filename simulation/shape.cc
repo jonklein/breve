@@ -36,7 +36,7 @@ void slSphere::draw(slCamera *c, slPosition *pos, double textureScale, int mode,
 
 	glScalef(_radius, _radius, _radius);
 
-	glCallList(c->sphereDrawLists + 1);
+	glCallList(c->sphereDrawLists + 2);
 
 	if(bound || axis) {
 		glPushAttrib(GL_COLOR_BUFFER_BIT);
@@ -46,6 +46,7 @@ void slSphere::draw(slCamera *c, slPosition *pos, double textureScale, int mode,
 		glScalef(1.1, 1.1, 1.1);
 		if(axis) slDrawAxis(max.x, max.y);
 		if(bound) slRenderShape(this, GL_LINE_LOOP, 0, 0);
+		glPopAttrib();
 	}
 
 	glPopMatrix();

@@ -128,7 +128,7 @@ void slMessage(int level, char *format, ...) {
 
     va_start(vp, format);
 
-	queueMessage = alloca(length);
+	queueMessage = (char*)alloca(length);
 	vsnprintf(queueMessage, length - 1, format, vp);
 
     va_end(vp);
