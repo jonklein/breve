@@ -1469,7 +1469,6 @@ inline int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *target) {
 
 		if(e[n].type != c->function->argtypes[n]) {
 			result = stToType(&e[n], c->function->argtypes[n], &e[n], i);
-
 		}
 
 		if(result != EC_OK) {
@@ -1488,7 +1487,8 @@ inline int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *target) {
 
 	// special case--if the define type is undefined, any type may be returned. */
 
-	if(c->function->rtype != AT_UNDEFINED) target->type = c->function->rtype;
+	if(result != EC_OK) target->type = AT_NULL;
+	else if(c->function->rtype != AT_UNDEFINED) target->type = c->function->rtype;
 
 	stGCMark(i->instance, target);
 
@@ -2557,9 +2557,9 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *target, stObject **tClass) {
 
 			result = stExpEval(s->values.pValue, i, &t, NULL);
 
-			brEvalCopy(&t, target);
-
 			if(result != EC_OK) result = result;
+			else brEvalCopy(&t, target);
+
 			result = EC_STOP;
 			break;
 		case ET_ARRAY_INDEX:
