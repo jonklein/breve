@@ -194,7 +194,7 @@ class slShape {
 
 		virtual void drawShadowVolume(slCamera *camera, slPosition *position);
 
-		void draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags);
+		virtual void draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags);
 
 		int drawList;
 
@@ -228,6 +228,8 @@ class slSphere : public slShape {
 		}
 
 		double _radius;
+
+		void draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags);
 
 		void bounds(slPosition *position, slVector *min, slVector *max);
 		int pointOnShape(slVector *dir, slVector *point);

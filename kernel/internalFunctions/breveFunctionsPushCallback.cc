@@ -58,7 +58,7 @@ unsigned int brPushCallbackFunction(PushEnvironment *environment, void *d) {
 }
 
 void brPushFreeData(void *d) {
-	brPushCallbackData *data = d;
+	brPushCallbackData *data = (brPushCallbackData*)d;
 
 	brMethodFree(data->method);
 	delete data;

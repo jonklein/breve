@@ -24,4 +24,4 @@ struct stThreadData {
 	int number;
 };
 
-void *stIterationThread(void *data);
+void *brIterationThread(void *data);

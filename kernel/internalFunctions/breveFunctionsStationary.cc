@@ -24,7 +24,7 @@
 /*@{*/
 
 int brIAddStationary(brEval args[], brEval *target, brInstance *i) {
-	slShape *sh = BRPOINTER(&args[0]);
+	slShape *sh = (slShape*)BRPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(&args[1]);
 	slStationary *st;
 	slWorldObject *wo;

@@ -146,9 +146,7 @@ brEngine *brEngineNew() {
 		}
 	}
 
-	if((envpath = getenv("HOME"))) {
-		brAddSearchPath(e, envpath);
-	}
+	if((envpath = getenv("HOME"))) brAddSearchPath(e, envpath);
 
 	bzero(e->keys, 256);
 
@@ -158,7 +156,7 @@ brEngine *brEngineNew() {
 		data = new stThreadData;
 		data->engine = e;
 		data->number = n;
-		pthread_create(&data->thread, NULL, stIterationThread, data);
+		pthread_create(&data->thread, NULL, brIterationThread, data);
 	}
 
 	return e;
@@ -404,7 +402,6 @@ int brEngineIterate(brEngine *e) {
 	pthread_mutex_lock(&e->lock);
 
 	e->lastScheduled = -1;
-
 
 	for(bi = e->instancesToAdd.begin(); bi != e->instancesToAdd.end(); bi++ ) {
 		i = *bi;

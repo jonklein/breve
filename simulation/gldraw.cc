@@ -131,9 +131,34 @@ void slInitGL(slWorld *w, slCamera *c) {
 
 	c->cubeDrawList = glGenLists(1);
 	slCompileCubeDrawList(c->cubeDrawList);
+	c->sphereDrawLists = glGenLists(SPHERE_RESOLUTIONS);
+	slCompileCubeDrawList(c->sphereDrawLists);
 
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specularColor);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 90);
+}
+
+/*!
+	\brief Initializes 3 sphere draw lists.
+*/
+
+void slCompileSphereDrawList(int l) {
+	int n;
+	GLUquadricObj *quad;
+
+	for (n = 0; n < SPHERE_RESOLUTIONS; n++ ) {
+		glNewList(l + n, GL_COMPILE);
+
+		quad = gluNewQuadric();
+
+		gluQuadricTexture(quad, GL_TRUE);
+		gluQuadricOrientation(quad, GLU_OUTSIDE);
+		gluSphere(quad, 1.0, 5 + n * 5, 5 + n * 5);
+
+		gluDeleteQuadric(quad);
+
+		glEndList();
+	}
 }
 
 /*!

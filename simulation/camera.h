@@ -18,6 +18,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#define SPHERE_RESOLUTIONS	5
+
 enum billboardType {
 	BBT_NONE = 0,
 	BBT_BITMAP,
@@ -103,6 +105,7 @@ struct slCamera {
 	slVector billboardZ;
 
 	int cubeDrawList;
+	int sphereDrawLists;
 
 	// recompile can be set to 1 at any time to force recompilation 
 	// of draw lists next time the world is drawn. 

@@ -22,40 +22,28 @@
 
 #include "kernel.h"
 
-void *stIterationThread(void *data) {
+int brEngineNextMethodCall(brEngine *e, brInstance **i, brMethod **m) {
+    pthread_mutex_lock(&e->scheduleLock);
+
+	*i = NULL;
+	*m = NULL;
+
+	pthread_mutex_unlock(&e->scheduleLock);
+}
+
+void *brIterationThread(void *data) {
 	stThreadData *threadData = (stThreadData*)data;
 	brEngine *e = threadData->engine;
 
 	while(1) {
-		int r;
+		brInstance *i;
+		brMethod *m;
+		int rcode;
+		brEval result;
 
-		r = pthread_cond_wait(&e->condition, &e->conditionLock);
+		if(i && m) brEngineNextMethodCall(e, &i, &m);
 
-		printf("condition waited (%d) for thread %d at time %f\n", r, threadData->number, slWorldGetAge(e->world));
-
-		printf("result from unlocking condition %d for thread %d\n", pthread_mutex_unlock(&e->conditionLock), threadData->number);
-
-		while(e->lastScheduled < e->instances.size()) {
-			printf("locked mutex %p %d, thread %d\n", &e->scheduleLock, pthread_mutex_lock(&e->scheduleLock), threadData->number);
-			printf("locked mutex %p %d, thread %d\n", &e->lock, pthread_mutex_lock(&e->lock), threadData->number);
-		
-			if(e->lastScheduled < e->instances.size()) {
-				int n;
-
-				e->lastScheduled++;
-				n = e->lastScheduled;
-
-				printf("got schedule lock for %d, thread %d at time %f\n", n, threadData->number, slWorldGetAge(e->world));
-
-				if(e->instances[n]) {
-					// rcode = brMethodCall(e->instances[n], e->instances[n]->iterate, NULL, &result);
-				}
-
-			}
-
-        	pthread_mutex_unlock(&e->scheduleLock);
-
-		}
+		if(i && m) rcode = brMethodCall(i, m, NULL, &result);
     }
 
 	return NULL;

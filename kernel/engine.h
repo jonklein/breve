@@ -187,11 +187,7 @@ class brEngine {
 
 		double iterationStepSize;
 
-		int evalStats[100];
-
 		FILE *logFile;
-
-		slStack *drawContexts;
 
 		brInstance *controller;
 

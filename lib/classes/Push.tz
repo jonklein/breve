@@ -207,8 +207,17 @@ Object : PushInterpreter (aka PushInterpreters) {
 		% Copies the top of the code stack to an existing program.
 		% Use METHOD(get-code-stack-size) to determine whether the 
 		% code stack is empty or not.
-	
-		program set-code-pointer to pushCodeStackTop(pushInterpreterPointer).
+
+		other (pointer).
+
+		other = pushCodeStackTop(pushInterpreterPointer).
+
+		if !other: {
+			program parse program "( )".
+			return.
+		}
+
+		program parse program pushCodeGetString(other).
 
   + section "Popping the Push Stacks"
 

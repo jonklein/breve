@@ -49,6 +49,9 @@ struct brNetworkClientData {
 
 int brINetworkSetRecipient(brEval args[], brEval *target, brInstance *i) {
 	brNetworkServer *data = BRNETWORKSERVERPOINTER(&args[0]);
+
+	if(!data) return EC_OK;
+
 	data->recipient = BRINSTANCE(&args[1]);
 
 	return EC_OK;

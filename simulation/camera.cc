@@ -118,25 +118,6 @@ void slCameraUpdateFrustum(slCamera *c) {
 	frust[14] = modl[12] * proj[ 2] + modl[13] * proj[ 6] + modl[14] * proj[10] + modl[15] * proj[14];
 	frust[15] = modl[12] * proj[ 3] + modl[13] * proj[ 7] + modl[14] * proj[11] + modl[15] * proj[15];
 
-	/* 
-		But why doesn't this code work? 
-
-		printf("%f %f %f %f\n", frust[0], frust[1], frust[2], frust[3]);
-
-		glPushMatrix();
-
-		glMatrixMode(GL_MODELVIEW);
-
-		glGetFloatv(GL_PROJECTION_MATRIX, proj);
-	
-		glMultMatrixf(proj);
-	
-		glGetFloatv(GL_MODELVIEW_MATRIX, frust);
-
-		glPopMatrix();
-		printf("%f %f %f %f\n", frust[0], frust[1], frust[2], frust[3]);
-	*/
-
 	slVectorAdd(&c->target, &c->location, &loc);
 	slVectorCopy(&loc, &c->frustumPlanes[0].vertex);
 	slVectorCopy(&loc, &c->frustumPlanes[1].vertex);
