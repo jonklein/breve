@@ -2340,8 +2340,10 @@ int stCallMethod(stRunInstance *old, stRunInstance *newI, stMethod *method, brEv
 	// this will keep it alive through the releasing stage.
 	
 	if(newI->instance->gcStack) {
-		if(target->type != AT_NULL) stGCUnmark(newI->instance, target);
-		stGCRetain(target);
+		if(target->type != AT_NULL) {
+			stGCUnmark(newI->instance, target);
+			stGCRetain(target);
+		}
 	}
 
 	// unretain the input arguments

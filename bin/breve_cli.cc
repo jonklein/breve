@@ -284,24 +284,24 @@ void brPrintUsage(char *name) {
 }
 
 void brQuit(brEngine *e) {
-    double diff;
+	double diff;
 
-    brPauseTimer(e);
+	brPauseTimer(e);
 
-    diff = e->realTime.tv_sec + (e->realTime.tv_usec / 1000000.0);
+	diff = e->realTime.tv_sec + (e->realTime.tv_usec / 1000000.0);
 
-    if(e->world->age != 0.0) {
-        printf("%f simulated seconds elapsed\n", e->world->age);
-        printf("%f real seconds elapsed\n", diff);
-        printf("%f simulated/real\n", e->world->age/diff);
-    }
+	if(e->world->age != 0.0) {
+		printf("%f simulated seconds elapsed\n", e->world->age);
+		printf("%f real seconds elapsed\n", diff);
+		printf("%f simulated/real\n", e->world->age/diff);
+	}
 
-    breveFrontendCleanupData(frontend->data);
 	brEngineFree(frontend->engine);
+    	breveFrontendCleanupData(frontend->data);
 	slFree(frontend);
 
 #ifdef MEMORY_DEBUG
-    slMemoryReport();
+	slMemoryReport();
 	slUtilMemoryUnfreed();
 #endif
 

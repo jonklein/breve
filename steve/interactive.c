@@ -12,41 +12,47 @@ extern int lineno;
 */
 
 int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
-    char *file = "<user input>";
-    int length = strlen(statement) - 1;
-    char *fixedStatement;
+	char *file = "<user input>";
+	int length;
+
+	char *fixedStatement;
 	brEval target;
 	stInstance *i;
 	stRunInstance ri;
 	int r;
 
+	if(!statement) return 0;
+
+	length = strlen(statement) - 1;
+
 	if(length < 1) return 0;
 
 	// put in the dot to make steve happy!
 
-    while(statement[length] == '\n' || statement[length] == ' ' || statement[length] == '\t') length--;
 
-    if(length > 0 && statement[length] != '.') statement[length + 1] = '.';
+	while(statement[length] == '\n' || statement[length] == ' ' || statement[length] == '\t') length--;
 
-    fixedStatement = slMalloc(strlen(statement) + 5);
+	if(length > 0 && statement[length] != '.') statement[length + 1] = '.';
 
-    sprintf(fixedStatement, "> %s", statement);
+	fixedStatement = slMalloc(strlen(statement) + 5);
 
-    yyfile = file;
+	sprintf(fixedStatement, "> %s", statement);
 
-    sd->singleStatement = NULL;
+	yyfile = file;
 
-    stSetParseString(fixedStatement, strlen(fixedStatement));
-    stParseSetObjectAndMethod((stObject*)engine->controller->object->userData, sd->singleStatementMethod);
-    stParseSetEngine(engine);
+	sd->singleStatement = NULL;
 
-    engine->error.type = 0;
+	stSetParseString(fixedStatement, strlen(fixedStatement));
+	stParseSetObjectAndMethod((stObject*)engine->controller->object->userData, sd->singleStatementMethod);
+	stParseSetEngine(engine);
 
-    if(yyparse() || engine->error.type) {
-        slFree(fixedStatement);
-        sd->singleStatement = NULL;
-        return BPE_SIM_ERROR;
-    }
+	engine->error.type = 0;
+
+	if(yyparse() || engine->error.type) {
+		slFree(fixedStatement);
+		sd->singleStatement = NULL;
+		return BPE_SIM_ERROR;
+	}
 
 	i = engine->controller->userData;
 	ri.instance = i;
@@ -54,14 +60,14 @@ int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
 
 	i->gcStack = slStackNew(); 
 
-    r = stExpEval(sd->singleStatement, &ri, &target, NULL);
+	r = stExpEval(sd->singleStatement, &ri, &target, NULL);
 
 	stGCCollectStack(i->gcStack);
 	slStackFree(i->gcStack);
 	i->gcStack = NULL;
 
-    stExpFree(sd->singleStatement);
-    slFree(fixedStatement);
+	stExpFree(sd->singleStatement);
+	slFree(fixedStatement);
 
-    return r;
+	return r;
 }

@@ -301,7 +301,7 @@ brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *poin
 	o->userData = pointer;
 	o->collisionHandlers = slStackNew();
 
-    brNamespaceStore(e->objects, name, ST_OBJECT, o);
+	brNamespaceStore(e->objects, name, ST_OBJECT, o);
 
 	return o;
 }
@@ -502,7 +502,7 @@ void brInstanceFree(brInstance *i) {
 
     if(i->menu.list) slFree(i->menu.list);
 
-	slFree(i);
+	i->userData = NULL;
 }
 
 /*!

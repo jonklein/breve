@@ -221,8 +221,6 @@ void stInstanceFreeNoInstanceLists(stInstance *i) {
 	stCallMethodByName(&ri, "destroy", &result);
 	stMethodTrace(&ri, "delete");
 
-	brInstanceRelease(i->breveInstance);
-
 	e = i->type->engine;
 
 	stInstanceFreeInternals(i);
