@@ -96,7 +96,6 @@ int slMakeCurrentContext();
 	pluginPath = (char*)[[NSString stringWithFormat: @"%@/plugins", bundlePath] cString];
 
 	frontend = breveFrontendInit(0, NULL);
-	frontend->data = breveFrontendInitData(frontend->engine);
 
 	brEngineSetSoundCallback(frontend->engine, soundCallback);
 	brEngineSetDialogCallback(frontend->engine, dialogCallback);
@@ -125,7 +124,7 @@ int slMakeCurrentContext();
 	// Java should get inited automatically when the engine is created, 
 	// but unfortunately, the claspath isn't setup yet at that point...
 
-	brJavaInit(frontend->engine);
+	frontend->data = breveFrontendInitData(frontend->engine);
 }
 
 - (void)freeEngine {

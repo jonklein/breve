@@ -132,9 +132,10 @@ int main(int argc, char **argv) {
 #endif
 
 	frontend = breveFrontendInit(argc, argv);
-	frontend->data = breveFrontendInitData(frontend->engine);
 
 	brEngineSetIOPath(frontend->engine, getcwd(wd, sizeof(wd)));
+
+	frontend->data = breveFrontendInitData(frontend->engine);
 
 	frontend->engine->argc = argc - 1;
 	frontend->engine->argv = argv + 1;

@@ -8657,7 +8657,7 @@ case "${host_os}" in linux*)
 if test "x$_have_jvm" = x ; then
 CPPFLAGS="-I/usr/local/linux-sun-jdk1.4.2/include -I/usr/local/linux-sun-jdk1.4.2/include/linux ${_old_cppflags}"
 LDFLAGS="${_old_ldflags} -L/usr/local/linux-sun-jdk1.4.2/jre/lib/i386 -L/usr/local/linux-sun-jdk1.4.2/jre/lib/i386/server -Wl,-rpath-link -Wl,/usr/local/linux-sun-jdk1.4.2/jre/lib/i386:/compat/linux/lib:/compat/linux/usr/lib"
-LIBS="-ljvm -ljava ${_old_libs}"
+LIBS="-ljvm -lverify -ljava ${_old_libs}"
 cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
