@@ -11,7 +11,7 @@ LDFLAGS		= @LDFLAGS@
 EXTRACFLAGS	= -g
 
 CFLAGS		= $(EXTRACFLAGS) -pipe -Wall
-CXXFLAGS	= $(EXTRACFLAGS) -pipe -fpermissive -Wall
+CXXFLAGS	= $(EXTRACFLAGS) -pipe -Wall -fpermissive
 YFLAGS		= -d
 
 PLATFORM	= @PLATFORM@
@@ -47,11 +47,13 @@ bin/breve_cli@EXE_SUFFIX@: bin/breve_cli.o $(OBJ)
 bin/graphTest@EXE_SUFFIX@: graph/graphTest.o $(OBJ)
 	$(CXX) -o $@ $(LDFLAGS) $^ @LIBS@ @GLLIBS@
 
-%.o: %.c includes
+%.o: %.c
 	$(CC) -c -o $@ $(CPPFLAGS) $(INCLUDE) $(CFLAGS) $<
 
-%.o: %.cc includes
+%.o: %.cc
 	$(CXX) -c -o $@ $(CPPFLAGS) $(INCLUDE) $(CXXFLAGS) $<
+
+%.h: .includes
 
 %.tab.c: %.y
 	$(YACC) $(YFLAGS) -o $@ $<
@@ -68,15 +70,15 @@ optimize_debug:
 profile:
 	$(MAKE) EXTRACFLAGS='-pg -O3'
 
-.PHONY: includes depend clean OSX_build OSX_clean OSX_release CLI_release \
-		plugin_API install
+.includes: $(HEADERS)
+	cp -p $(HEADERS) include/breve/
+	touch .includes
 
-includes: $(HEADERS)
-	@ln -f $(HEADERS) include/breve/
-
-depend: includes $(SRC)
+.depend: $(SRC) .includes
 	@MKDEP@ $(CPPFLAGS) $(INCLUDE) $(SRC) bin/breve.cc bin/breve_cli.cc \
 		graph/graphTest.cc > .depend
+
+.PHONY: clean OSX_build OSX_clean OSX_release CLI_release plugin_API install
 
 clean:
 	rm -f bin/breve bin/breve_cli bin/graphTest
@@ -87,6 +89,8 @@ clean:
 	-mv include/breve/config.h include/breve/config.h.bak
 	rm -f include/breve/*.h
 	-mv include/breve/config.h.bak include/breve/config.h
+	rm .depend .includes
+	touch .depend
 	find . -name '.DS_Store' -exec rm -f {} \;
 	find . -name 'core' -exec rm -f {} \;
 	find . -name '.gdb*' -exec rm -f {} \;
