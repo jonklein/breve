@@ -7,20 +7,8 @@ import java.lang.NoSuchMethodException;
 import java.lang.reflect.Array;
 
 public class MethodFinder {
-	Class methodClass, voidClass;
-
-	public MethodFinder() throws Exception {
-		// System.out.println("Creating the MethodFinder class...");
-		// System.out.println("Done.");
-
-		try {
-			methodClass = Class.forName("java.lang.reflect.Method");
-			voidClass = Class.forName("java.lang.Void");
-		} catch (Exception e) {
-			System.out.println("Cannot initialize the MethodFinder object\n");
-			throw new Exception();
-		}
-	}
+	Class methodClass = java.lang.reflect.Method.class;
+	Class voidClass = java.lang.Void.TYPE;
 
 	public Object findMethod(Class type, String name, int arguments, char types[]) throws NoSuchMethodException {
 		Method methods[], method;
