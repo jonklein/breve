@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os AUDIOLIBS GLLIBS JAVALIBS JAVAINCS PLUGINFLAGS QUICKTIMEFLAGS CPPFLAGS YACC CXX CXXFLAGS LDFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE RANLIB ac_ct_RANLIB ALLOCA CPP EGREP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os AUDIOLIBS GLLIBS JAVALIBS JAVAINCS PLUGINFLAGS QUICKTIMEFLAGS EXTRALDFLAGS CPPFLAGS YACC CXX CXXFLAGS LDFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE RANLIB ac_ct_RANLIB ALLOCA CPP EGREP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1381,13 +1381,14 @@ _ACEOF
 
 	linux* )
 				GLLIBS="-L/usr/X11R6/lib -lglut -lGL -lGLU -lXmu -lXt -lSM -lICE -lX11 -lXi -lXext"
+		EXTRALDFLAGS="-Xlinker -Bdynamic"
 		PLUGINFLAGS="-shared"
 
 cat >>confdefs.h <<\_ACEOF
 #define LINUX
 _ACEOF
 
-		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E -Xlinker -Bstatic"
+		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E"
 
 		;;
 
@@ -1432,6 +1433,7 @@ _ACEOF
 
 		;;
 esac
+
 
 
 
@@ -6580,6 +6582,7 @@ s,@JAVALIBS@,$JAVALIBS,;t t
 s,@JAVAINCS@,$JAVAINCS,;t t
 s,@PLUGINFLAGS@,$PLUGINFLAGS,;t t
 s,@QUICKTIMEFLAGS@,$QUICKTIMEFLAGS,;t t
+s,@EXTRALDFLAGS@,$EXTRALDFLAGS,;t t
 s,@CPPFLAGS@,$CPPFLAGS,;t t
 s,@YACC@,$YACC,;t t
 s,@CXX@,$CXX,;t t

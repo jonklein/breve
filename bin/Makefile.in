@@ -12,7 +12,7 @@ BREVECLIC	= breve_cli.c
 
 LANGUAGE_FRONTEND_LIBRARY	= -lbrsteve
 
-LIBS 	+=-L../lib $(LANGUAGE_FRONTEND_LIBRARY) -lbrkernel -lbrsimulation -lbrutil -lbrneural -lbrgraph @LDFLAGS@ @LIBS@ -lstdc++
+LIBS 	+=-L../lib $(LANGUAGE_FRONTEND_LIBRARY) -lbrkernel -lbrsimulation -lbrutil -lbrneural -lbrgraph @LDFLAGS@ @EXTRALDFLAGS@ @LIBS@ -lstdc++
 
 INCLUDE	+= -I../include/breve @CPPFLAGS@
 

@@ -24,9 +24,10 @@ case "${host_os}" in
 	linux* )
 		dnl Linux configuration
 		GLLIBS="-L/usr/X11R6/lib -lglut -lGL -lGLU -lXmu -lXt -lSM -lICE -lX11 -lXi -lXext"
+		EXTRALDFLAGS="-Xlinker -Bdynamic"
 		PLUGINFLAGS="-shared"
 		AC_DEFINE([LINUX], [], [Linux])
-		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E -Xlinker -Bstatic"
+		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E"
 
 		;;
 
@@ -65,6 +66,7 @@ AC_SUBST(JAVALIBS)
 AC_SUBST(JAVAINCS)
 AC_SUBST(PLUGINFLAGS)
 AC_SUBST(QUICKTIMEFLAGS)
+AC_SUBST(EXTRALDFLAGS)
 AC_SUBST(CPPFLAGS)
 
 # Checks for programs.
