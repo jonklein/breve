@@ -27,10 +27,10 @@
 #define slMalloc(p) 	slDebugMalloc((p), __LINE__, __FILE__)
 #define slRealloc(p, s) slDebugRealloc((p), (s), __LINE__, __FILE__)
 #else
-#define slFree(p) free(p)
-#define slMalloc(p) slNormalMalloc(p)
-#define slRealloc(p, s) realloc(p, s)
-#endif /* MEMORY_DEBUG */
+void *slMalloc(int n);
+void *slRealloc(void *p, int n);
+void slFree(void *p);
+#endif
 
 enum mallocStatus {
     MS_NULL = 0,

@@ -65,11 +65,6 @@ slHash *slInitUtilMallocHash() {
 	functions that track memory usage).
 */
 
-void *slNormalMalloc(int n) {
-	void *m = malloc(n);
-	bzero(m, n);
-	return m;
-}
 
 void *slDebugMalloc(int n, int line, char *file) {
     void *m;
@@ -102,9 +97,22 @@ void *slDebugMalloc(int n, int line, char *file) {
     return m;
 }
 
-// void *slRealloc(void *p, int n) {
-//   return realloc(p, n);
-// }
+#ifndef MEMORY_DEBUG
+void *slMalloc(int n) {
+	void *m = malloc(n);
+	bzero(m, n);
+	return m;
+}
+
+void *slRealloc(void *p, int n) {
+	return realloc(p, n);
+}
+
+void slFree(void *p) {
+	free(p);
+	return;
+}
+#endif
 
 void *slDebugRealloc(void *p, int n, int line, char *file) {
     void *m;
@@ -163,11 +171,6 @@ void *slDebugRealloc(void *p, int n, int line, char *file) {
 
     return m;
 }
-
-// void slFree(void *p) {
-//   free(p);
-//    return;
-// }
 
 void slDebugFree(void *p, int line, char *file) {
     slMallocData *d;
