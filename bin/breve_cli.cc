@@ -306,8 +306,7 @@ void brQuit(brEngine *e) {
 	slMemoryReport();
 	slUtilMemoryUnfreed();
 #endif
-
-    exit(0);
+	exit(0);
 }
 
 int brCLIDialogCallback(void *data, char *title, char *message, char *b1, char *b2) {

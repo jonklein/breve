@@ -20,11 +20,13 @@
 
 #include "simulation.h"
 
+#ifdef HAVE_LIBTIFF
 namespace tiff {
 using namespace tiff;
 #include "xtiffio.h"
 }
 using namespace tiff;
+#endif
 
 /* based on tutorial and code from Paul E. Martz */
 
@@ -1143,6 +1145,7 @@ void slTerrainSetBottomColor(slTerrain *t, slVector *color) {
 }
 
 int slTerrainLoadGeoTIFF(slTerrain *t, char *file) {
+#ifdef HAVE_LIBTIFF
 	int height, width, x, y;
 	unsigned short depth, samples;
 	float *row;
@@ -1179,6 +1182,7 @@ int slTerrainLoadGeoTIFF(slTerrain *t, char *file) {
 
 	TIFFClose(tif);
 
+#endif
 	return 0;
 }
 

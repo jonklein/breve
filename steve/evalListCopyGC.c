@@ -81,7 +81,7 @@ brEvalListHead *stDoEvalListDeepCopyGC(brEvalListHead *l, slList **s) {
 			}
 		} else {
 			brEvalListInsert(newList, newList->count, &item->eval);
-			stGCRetain(&newSubList);
+			stGCRetain(&item->eval);
 		}
 
 		item = item->next;
