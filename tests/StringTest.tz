@@ -33,7 +33,7 @@ Control : myController {
 		m{ 5 } = "dog".
 		print m.
 
-		if m != "puppydog": die "replacing string index 0 failed".
+		if m != "puppydog": die "replacing string index 5 failed".
 
 		m{ 8 } = "s are awesome".
 		print m.

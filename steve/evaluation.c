@@ -1669,7 +1669,7 @@ RTC_INLINE int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, 
 
 		stGCUnretainAndCollect(&old);
 	} else if(list.type == AT_STRING) {
-		char *stringptr, *newstring, *oldstring, *substring;
+		char **stringptr, *newstring, *oldstring, *substring;
 		unsigned int n;
 		int type;
 
@@ -1677,7 +1677,7 @@ RTC_INLINE int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, 
 
 		resultCode = stPointerForExp(l->listExp, i, (void **)&stringptr, &type);
 
-		oldstring = stringptr;
+		oldstring = *stringptr;
 
 		if(!oldstring || n < 0 || n > strlen(oldstring) + 1) {
 			stEvalError(i->instance->type->engine, EE_BOUNDS, "string index \"%d\" out of bounds", BRINT(&index));
@@ -1696,11 +1696,15 @@ RTC_INLINE int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, 
 		strncpy(newstring, oldstring, n);
 		strcpy(&newstring[n], substring);
 
-		if(n != strlen(oldstring) + 1) 
+		if(n != strlen(oldstring)) {
 			strcpy(&newstring[n + strlen(substring)], &oldstring[n + 1]);
+			newstring[strlen(oldstring) + strlen(substring) - 1] = 0;
+		} else {
+			newstring[strlen(oldstring) + strlen(substring)] = 0;
+		}
 
-		if(stringptr) slFree(stringptr);
-		stringptr = newstring;
+		if(*stringptr) slFree(*stringptr);
+		*stringptr = newstring;
 
 		BRSTRING(t) = slStrdup(newstring);
 	} else {

@@ -32,8 +32,6 @@ slList *slListAppend(slList *, void *);
 slList *slListReverse(slList *);
 slList *slListCopy(slList *);
 
-slArray *slListToArray(slList *);
-
 slList *slListRemoveData(slList *, void *);
 
 slList *slInList(slList *, void *);
