@@ -730,7 +730,7 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 			// are we overwriting an old string in memory?
 			if(*(void**)variable) slFree(*(void**)variable);	
 
-			*(char**)variable = newstr;
+			BRSTRING(e) = *(char**)variable = newstr;
 
 			noRetain = 1;
 
@@ -1702,6 +1702,9 @@ RTC_INLINE int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, 
 		} else {
 			newstring[strlen(oldstring) + strlen(substring)] = 0;
 		}
+
+		BRSTRING(t) = *stringptr;
+		stGCUnmark(i->instance, t);
 
 		if(*stringptr) slFree(*stringptr);
 		*stringptr = newstring;
@@ -2715,7 +2718,7 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 	std::vector< stVar* >::iterator vi;
 	
 	for(vi = method->variables.begin(); vi != method->variables.end(); vi++ ) {
-		stGCUnretainAndCollectPointer(*(void**)&newStStack[(*vi)->offset], (*vi)->type->type);
+		if((*vi)->type->type != AT_STRING || *(void**)&newStStack[(*vi)->offset] != result->values.stringValue) stGCUnretainAndCollectPointer(*(void**)&newStStack[(*vi)->offset], (*vi)->type->type);
 	}
 
 	if(resultCode == EC_STOP) resultCode = EC_OK;
