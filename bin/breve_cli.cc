@@ -80,14 +80,6 @@ int main(int argc, char **argv) {
 
 	gSimFile = NULL;
 
-#ifdef MEMORY_DEBUG
-	slMessage(DEBUG_ALL, "Running with breve slMalloc debugging enabled.\n\n");
-#ifdef MACOSX
-	slMessage(DEBUG_ALL, "Set the environment variable MallocStackLogging\n");
-	slMessage(DEBUG_ALL, "to see stack traces of unfreed pointers on exit.\n\n");
-#endif /* MACOSX */
-#endif /* MEMORY_DEBUG */
-
 	/* parse the command line args. */
 
 	index = brParseArgs(argc, argv);
@@ -236,7 +228,12 @@ int brParseArgs(int argc, char **argv) {
 	int r, error = 0;
 	int level;
 
+#ifdef MACOSX
+	// Mac OS X 10.2.8 doesn't seem to have getopt_long
+	while((r = getopt(argc, argv, "t:d:r:f:n:l:vhmS:M")) != EOF) {
+#else 
 	while((r = getopt_long(argc, argv, "t:d:r:f:n:l:vhmS:M", gCLIOptions, NULL)) != EOF) {
+#endif
 		switch(r) {
 			case 'd':
 				level = atoi(optarg);

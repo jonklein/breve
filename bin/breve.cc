@@ -346,7 +346,12 @@ int brParseArgs(int argc, char **argv) {
 	int r, error = 0;
 	int level;
 
-	while((r = getopt_long(argc, argv, "w:s:d:r:l:vhfmFuSMi", gCLIOptions, NULL)) != EOF) {
+#ifdef MACOSX
+	// Mac OS X 10.2.8 doesn't seem to have getopt_long
+	while((r = getopt(argc, argv, "t:d:r:f:n:l:vhmS:M")) != EOF) {
+#else 
+	while((r = getopt_long(argc, argv, "t:d:r:f:n:l:vhmS:M", gCLIOptions, NULL)) != EOF) {
+#endif
 		switch(r) {
 			case 'd':
 				level = atoi(optarg);

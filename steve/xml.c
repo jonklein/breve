@@ -565,6 +565,7 @@ int stXMLReadObjectFromString(stInstance *i, char *buffer) {
 
 	parser = XML_ParserCreate(NULL);
 
+	parserState.engine = i->type->engine;
 	parserState.currentInstance = i;
 	parserState.mode = PARSE_INSTANCE;
 	parserState.error = 0;

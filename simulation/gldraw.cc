@@ -1185,7 +1185,9 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 			if(color) glColor4f(wo->color.x, wo->color.y, wo->color.z, wo->alpha);
 
 			if(wo->alpha != 1.0) {
-			// 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+				if(texture && wo->texture > 1) glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+				else glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 				glDisable(GL_CULL_FACE);
 			}
 
