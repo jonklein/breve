@@ -1180,7 +1180,7 @@ Mobile : Bird (aka Birds) {
             self toFood.
             savedToFood = (pushInterpreter get-vector-stack-top).
 
-            pushInterpreter run code pushCode.
+            pushInterpreter run program pushCode.
 
             #print savedToFood.
 

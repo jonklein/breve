@@ -18,6 +18,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 	+ variables:
 		pushInterpreterPointer (pointer).
 		evaluationLimit (int).
+		listLimit (int).
 
 	+ to init:
 		pushInterpreterPointer = pushEnvironmentNew(random[2000000000]).
@@ -53,10 +54,17 @@ Object : PushInterpreter (aka PushInterpreters) {
 		pushEnvironmentReadConfigFile(pushInterpreterPointer, findFile(configFile)).
 
 	+ to set-list-limit to newLimit (int):
-		% Sets the size limit of lists constructed in push.  
-		% <b>This is only partially implemented currently</b>.
+		% Sets the size limit of lists constructed in push.  This limit
+		% also applies to programs created using genetic operators.
 
+		listLimit = newLimit.
 		pushEnvironmentSetListLimit(pushInterpreterPointer, newLimit).	
+
+	+ to get-list-limit:
+		% Returns the size limit of lists constructed in push.  See 
+		% METHOD(set-list-limit) for more information.
+
+		return listLimit.
 
 	+ to set-evaluation-limit to newLimit (int):
 		% Sets the evaluation limit to newLimit.  This specifies the number of 
@@ -65,10 +73,13 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 		evaluationLimit = newLimit.
 
-  + section "Running a Push program"
-	- to run code codeObject (object):
-		return (self run program codeObject for-steps -1).
+	+ to get-evaluation-limit:
+		% Returns the current push evaluation limit.  See METHOD(set-evaluation-limit) 
+		% for more information on the evaluation limit.
 
+		return evaluationLimit.
+
+  + section "Running a Push program"
 	+ to run program codeObject (object) for-steps steps = -1 (int):
 		% Runs the specified push code.  If the steps variable is provided, 
 		% evaluation will only run for the specified number of instructions.
@@ -99,7 +110,6 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 		for n=0, n<steps, n++: {
 			if !(self step): return.
-			# print "boolean depth = ", (self get-boolean-stack-size).
 			printf "===> Step $n. ".
 			self print-exec-stack.
 		}
@@ -151,7 +161,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 	+ to get-float-stack-size:
 		% Returns the size of the float stack.
-		return pushBoolStackSize(pushInterpreterPointer).
+		return pushFloatStackSize(pushInterpreterPointer).
 
 	+ to get-integer-stack-size:
 		% Returns the size of the integer stack.
@@ -169,7 +179,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 		% Returns the size of the vector stack.
 		return pushVectorStackSize(pushInterpreterPointer).
 
-	+ section "Getting Values From the Top of Push Stacks"
+  + section "Getting Values From the Top of Push Stacks"
 
 	+ to get-float-stack-top:
 		% Returns the top of the float stack.

@@ -294,7 +294,7 @@ Object : PushGP {
 			self setup-fitness-test for-fitness-case n 
 				with-interpreter interpreter.
 
-			if (interpreter run code p): {
+			if (interpreter run program p): {
 				# score for invalid programs.
 				# return 100000000.
 				push .1 + (self compute-error for-fitness-case n with-interpreter interpreter) onto errors.
