@@ -201,7 +201,7 @@ int slNetsimSendBoundsMessage(slNetsimClientData *client, slVector *min, slVecto
 	return 0;
 }
 
-__inline__ void slNetsimBoundsMessageToVectors(slNetsimBoundsMessage *m, slVector *min, slVector *max) {
+inline void slNetsimBoundsMessageToVectors(slNetsimBoundsMessage *m, slVector *min, slVector *max) {
 	min->x = m->minX;
 	min->y = m->minY;
 	min->z = m->minZ;
@@ -211,7 +211,7 @@ __inline__ void slNetsimBoundsMessageToVectors(slNetsimBoundsMessage *m, slVecto
 	max->z = m->maxZ;
 }
 
-__inline__ void slNetsimVectorsToBoundsMessage(slNetsimBoundsMessage *m, slVector *min, slVector *max) {
+inline void slNetsimVectorsToBoundsMessage(slNetsimBoundsMessage *m, slVector *min, slVector *max) {
 	m->minX = min->x;
 	m->minY = min->y;
 	m->minZ = min->z;

@@ -69,8 +69,8 @@ slNetsimServerData *slNetsimCreateClient(slWorld *world);
 slNetsimClientData *slNetsimOpenConnection(ENetHost *client, char *host, int port);
 slNetsimClientData *slNetsimOpenConnectionToAddress(ENetHost *client, ENetAddress *address);
 
-__inline__ void slNetsimBoundsMessageToVectors(slNetsimBoundsMessage *m, slVector *min, slVector *max);
-__inline__ void slNetsimVectorsToBoundsMessage(slNetsimBoundsMessage *m, slVector *min, slVector *max);
+inline void slNetsimBoundsMessageToVectors(slNetsimBoundsMessage *m, slVector *min, slVector *max);
+inline void slNetsimVectorsToBoundsMessage(slNetsimBoundsMessage *m, slVector *min, slVector *max);
 
 int slNetsimBroadcastSyncMessage(slNetsimServerData *server, double time);
 int slNetsimSendBoundsMessage(slNetsimClientData *client, slVector *min, slVector *max);

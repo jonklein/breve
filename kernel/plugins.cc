@@ -27,7 +27,7 @@
 #define dlsym(D,F) (void*)GetProcAddress((HMODULE)D, F)
 #define dlclose(D) FreeLibrary((HMODULE)D)
 
-__inline const char *dlerror() {
+inline const char *dlerror(void) {
 	static char message[256];
 
 	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -104,12 +104,7 @@ void *brDlLoadPlugin(char *filename, char *func, brNamespace *n) {
 	void (*f)(brNamespace *n);
 	void *handle;
 
-#ifdef WINDOWS
-	// can't find RTLD_NOW on Windows
-	handle = dlopen(filename, 0);
-#else
 	handle = dlopen(filename, RTLD_LAZY|RTLD_GLOBAL);
-#endif
 
 	if(!handle) {
 		slMessage(DEBUG_ALL, "error loading plugin %s: %s\n", filename, dlerror());

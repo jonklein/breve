@@ -1552,7 +1552,7 @@ void slBreakdownTriangle(slVector *v, double textureScale, int level, slVector *
 	\brief Prints out and clears OpenGL errors.
 */
 
-__inline__ int slClearGLErrors(char *id) {
+inline int slClearGLErrors(char *id) {
 	unsigned int n;
 	int c = 0;
 
