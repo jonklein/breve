@@ -175,6 +175,8 @@ public:
     void OnInspectorctrlItemActivated( wxListEvent& event );
     void OnUpdateClick( wxCommandEvent& event );
     void OnClose(wxCloseEvent &event);
+    void OnSize(wxSizeEvent &event);
+    void OnMove(wxMoveEvent &event);
 
     wxBitmap GetBitmapResource( const wxString& name );
     wxIcon GetIconResource( const wxString& name );

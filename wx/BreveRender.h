@@ -134,6 +134,8 @@ public:
     void OnSelectClick(wxCommandEvent&event);
     void OnKeyUp(wxKeyEvent&event);
     void OnKeyDown(wxKeyEvent&event);
+    void OnSize(wxSizeEvent &event);
+    void OnMove(wxMoveEvent &event);
 
     wxBitmap GetBitmapResource( const wxString& name );
     wxIcon GetIconResource( const wxString& name );

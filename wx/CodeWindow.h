@@ -70,6 +70,7 @@ public:
     void OnEdit(wxCommandEvent& event);
     void OnSelection(wxCommandEvent& event);
     void OnMenu(wxCommandEvent &event);
+    void OnSize(wxSizeEvent &event);
 
     wxString GetCode();
     void UpdateChoice();

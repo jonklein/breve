@@ -29,6 +29,8 @@
 #include "SimInstance.h"
 #include "Inspector.h"
 
+#include <wx/confbase.h>
+
 #include "images/expanded.xpm"
 #include "images/play.xpm"
 
@@ -39,6 +41,8 @@ BEGIN_EVENT_TABLE( Inspector, wxFrame )
     EVT_LIST_ITEM_SELECTED( ID_INSPECTORCTRL, Inspector::OnInspectorctrlSelected )
     EVT_LIST_ITEM_ACTIVATED( ID_INSPECTORCTRL, Inspector::OnInspectorctrlItemActivated )
     EVT_BUTTON( ID_UPDATE, Inspector::OnUpdateClick )
+    EVT_MOVE(Inspector::OnMove)
+    EVT_SIZE(Inspector::OnSize)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE( ResizingListCtrl, wxListCtrl )
@@ -73,10 +77,34 @@ Inspector::Inspector( wxWindow* parent, wxWindowID id, const wxString& caption, 
 
 bool Inspector::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
+    bool loaded = FALSE;
+    wxSize tsize;
+    wxPoint tpoint;
+
     InspectorCtrl = NULL;
     UpdateButton = NULL;
 
-    wxFrame::Create( parent, id, caption, pos, size, style );
+    tsize = size;
+    tpoint = pos;
+
+    wxConfigBase * config = wxConfigBase::Get();
+
+    if (config != NULL)
+    {
+	int x, y, w, h;
+
+	if (config->Read("InspectorX", &x) && config->Read("InspectorY", &y) &&
+	    config->Read("InspectorWidth", &w) && config->Read("InspectorHeight", &h))
+	{
+	    tpoint.x = x;
+	    tpoint.y = y;
+	    tsize.SetHeight(h);
+	    tsize.SetWidth(w);
+	    loaded = TRUE;
+	}
+    }
+
+    wxFrame::Create( parent, id, caption, tpoint, tsize, style );
 
 #ifdef __WXMSW__
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
@@ -87,6 +115,12 @@ bool Inspector::Create( wxWindow* parent, wxWindowID id, const wxString& caption
     GetSizer()->SetSizeHints(this);
 
     SetRoot(NULL);
+
+    if (loaded)
+    {
+	SetSize(tsize);
+	Move(tpoint);
+    }
 
     Show(TRUE);
 
@@ -518,4 +552,34 @@ bool ExpData::ShouldExpand(VarData * loc)
     return s->IsExpanded();
 }
 
+void Inspector::OnSize(wxSizeEvent &event)
+{
+    if (!IsMaximized())
+    {
+	wxConfigBase * config = wxConfigBase::Get();
+
+	if (config != NULL)
+	{
+	    config->Write("InspectorWidth", event.GetSize().GetWidth());
+	    config->Write("InspectorHeight", event.GetSize().GetHeight());
+	}
+    }
+
+    event.Skip();
+}
+
+void Inspector::OnMove(wxMoveEvent &event)
+{
+    {
+	wxConfigBase * config = wxConfigBase::Get();
+
+	if (config != NULL)
+	{
+	    config->Write("InspectorX", event.GetPosition().x);
+	    config->Write("InspectorY", event.GetPosition().y);
+	}
+    }
+
+    event.Skip();
+}
 

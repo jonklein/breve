@@ -24,6 +24,8 @@
 #include "steve.h"
 #include "SimInstance.h"
 
+#include <wx/confbase.h>
+
 IMPLEMENT_CLASS( CodeWindow, wxFrame )
 
 BEGIN_EVENT_TABLE( CodeWindow, wxFrame )
@@ -32,6 +34,7 @@ BEGIN_EVENT_TABLE( CodeWindow, wxFrame )
     EVT_IDLE(CodeWindow::OnIdle)
     EVT_CHOICE(ID_CODE_METHCHOICE, CodeWindow::OnSelection)
     EVT_MENU_RANGE(12000, 12017, CodeWindow::OnMenu)
+    EVT_SIZE(CodeWindow::OnSize)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE( MethodChoice, wxChoice )
@@ -88,7 +91,25 @@ CodeWindow::~CodeWindow()
 
 bool CodeWindow::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
-    wxFrame::Create( parent, id, caption, pos, size, style );
+    wxSize tsize;
+    wxConfigBase * config = wxConfigBase::Get();
+
+    if (config != NULL)
+    {
+	int w, h;
+
+	if (config->Read("CodeWindowWidth", &w) && config->Read("CodeWindowHeight", &h))
+	{
+	    tsize.SetWidth(w);
+	    tsize.SetHeight(h);
+	}
+	else
+	    tsize = size;
+    }
+    else
+	tsize = size;
+
+    wxFrame::Create( parent, id, caption, pos, tsize, style );
 
     CreateControls();
     //Centre();
@@ -435,3 +456,20 @@ void CodeWindow::UpdateChoice()
 
     free(buf);
 }
+
+void CodeWindow::OnSize(wxSizeEvent &event)
+{
+    if (!IsMaximized())
+    {
+	wxConfigBase * config = wxConfigBase::Get();
+
+	if (config != NULL)
+	{
+	    config->Write("CodeWindowWidth", event.GetSize().GetWidth());
+	    config->Write("CodeWindowHeight", event.GetSize().GetHeight());
+	}
+    }
+
+    event.Skip();
+}
+

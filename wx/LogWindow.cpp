@@ -23,12 +23,16 @@
 #include "steve.h"
 #include "SimInstance.h"
 
+#include <wx/confbase.h>
+
 IMPLEMENT_CLASS( LogWindow, wxFrame )
 
 BEGIN_EVENT_TABLE( LogWindow, wxFrame )
     EVT_CLOSE (LogWindow::OnClose)
     EVT_TEXT_ENTER(ID_LOG_CMDINPUT, LogWindow::RunEvent)
     EVT_BUTTON(ID_LOG_CMDBUTTON, LogWindow::RunEvent)
+    EVT_SIZE(LogWindow::OnSize)
+    EVT_MOVE(LogWindow::OnMove)
 END_EVENT_TABLE()
 
 LogWindow::LogWindow( )
@@ -46,7 +50,31 @@ LogWindow::~LogWindow()
 
 bool LogWindow::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
-    wxFrame::Create( parent, id, caption, pos, size, style );
+    wxPoint tpoint;
+    wxSize tsize;
+    bool loaded = FALSE;
+
+    tpoint = pos;
+    tsize = size;
+
+    wxConfigBase * config = wxConfigBase::Get();
+
+    if (config != NULL)
+    {
+	int x, y, w, h;
+
+	if (config->Read("LogWindowX", &x) && config->Read("LogWindowY", &y) &&
+	    config->Read("LogWindowWidth", &w) && config->Read("LogWindowHeight", &h))
+	{
+	    tpoint.x = x;
+	    tpoint.y = y;
+	    tsize.SetHeight(h);
+	    tsize.SetWidth(w);
+	    loaded = TRUE;
+	}
+    }
+
+    wxFrame::Create( parent, id, caption, tpoint, tsize, style );
 
 #ifdef __WXMSW__
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
@@ -54,6 +82,12 @@ bool LogWindow::Create( wxWindow* parent, wxWindowID id, const wxString& caption
 
     CreateControls();
     //Centre();
+
+    if (loaded)
+    {
+	Move(tpoint);
+	SetSize(tsize);
+    }
 
     Show(TRUE);
     return TRUE;
@@ -135,4 +169,35 @@ void LogWindow::RunEvent(wxCommandEvent &event)
     breverender->GetSimulation()->GetInterface()->ExecuteCommand(str);
 }
 
+
+void LogWindow::OnSize(wxSizeEvent &event)
+{
+    if (!IsMaximized())
+    {
+	wxConfigBase * config = wxConfigBase::Get();
+
+	if (config != NULL)
+	{
+	    config->Write("LogWindowWidth", event.GetSize().GetWidth());
+	    config->Write("LogWindowHeight", event.GetSize().GetHeight());
+	}
+    }
+    
+    event.Skip();
+}
+
+void LogWindow::OnMove(wxMoveEvent &event)
+{
+    {
+	wxConfigBase * config = wxConfigBase::Get();
+
+	if (config != NULL)
+	{
+	    config->Write("LogWindowX", event.GetPosition().x);
+	    config->Write("LogWindowY", event.GetPosition().y);
+	}
+    }
+    
+    event.Skip();
+}
 

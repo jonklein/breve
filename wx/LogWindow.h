@@ -45,6 +45,8 @@ public:
 
     void OnClose(wxCloseEvent& event);
     void RunEvent(wxCommandEvent& event);
+    void OnSize(wxSizeEvent &event);
+    void OnMove(wxMoveEvent &event);
 
     void CreateControls();
     wxBitmap GetBitmapResource( const wxString& name );

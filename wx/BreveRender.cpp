@@ -28,6 +28,7 @@
 #include <wx/filename.h>
 #include <wx/tglbtn.h>
 #include <wx/dir.h>
+#include <wx/confbase.h>
 
 #include "BreveRender.h"
 #include "BreveCanvas.h"
@@ -62,6 +63,8 @@ BEGIN_EVENT_TABLE( BreveRender, wxFrame )
     EVT_CHOICE(ID_SIM_SELECT, BreveRender::OnSimSelect)
     EVT_KEY_UP(BreveRender::OnKeyUp)
     EVT_KEY_DOWN(BreveRender::OnKeyDown)
+    EVT_MOVE(BreveRender::OnMove)
+    EVT_SIZE(BreveRender::OnSize)
 END_EVENT_TABLE()
 
 BreveRender::BreveRender( )
@@ -89,7 +92,31 @@ BreveRender::~BreveRender()
 
 bool BreveRender::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
-    wxFrame::Create( parent, id, caption, pos, size, style );
+    bool loadedvalues = FALSE;
+    wxSize tsize;
+    wxPoint tpoint;
+
+    tsize = size;
+    tpoint = pos;
+
+    wxConfigBase * config = wxConfigBase::Get();
+
+    if (config != NULL)
+    {
+	int x, y, w, h;
+
+	if (config->Read("BreveRenderX", &x) && config->Read("BreveRenderY", &y) &&
+	    config->Read("BreveRenderWidth", &w) && config->Read("BreveRenderHeight", &h))
+	{
+	    tpoint.x = x;
+	    tpoint.y = y;
+	    tsize.SetHeight(h);
+	    tsize.SetWidth(w);
+	    loadedvalues = TRUE;
+	}
+    }
+
+    wxFrame::Create( parent, id, caption, tpoint, tsize, style );
 
 #ifdef __WXMSW__
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
@@ -105,7 +132,13 @@ bool BreveRender::Create( wxWindow* parent, wxWindowID id, const wxString& capti
     GetSizer()->SetSizeHints(this);
     //Centre();
 
-    Move(0, 0);
+    if (!loadedvalues)
+	Move(0, 0);
+    else
+    {
+	SetSize(tsize);
+	Move(tpoint);
+    }
 
     {
 	wxRect m;
@@ -113,9 +146,14 @@ bool BreveRender::Create( wxWindow* parent, wxWindowID id, const wxString& capti
 	m = GetRect();
 
 	logwindow = new LogWindow(this);
-	logwindow->Move(m.x, m.y + m.height + 30);
+
+	if (!loadedvalues)
+	    logwindow->Move(m.x, m.y + m.height + 30);
+
 	inspector = new Inspector(this);
-	inspector->Move(m.x + m.width + 10, m.y);
+
+	if (!loadedvalues)
+	    inspector->Move(m.x + m.width + 10, m.y);
     }
 
     Show(TRUE);
@@ -880,3 +918,35 @@ void BreveRender::OnSelectClick(wxCommandEvent&event)
     movebutton->SetValue(FALSE);
     event.Skip();
 }
+
+void BreveRender::OnSize(wxSizeEvent &event)
+{
+    if (!IsMaximized())
+    {
+	wxConfigBase * config = wxConfigBase::Get();
+
+	if (config != NULL)
+	{
+	    config->Write("BreveRenderWidth", event.GetSize().GetWidth());
+	    config->Write("BreveRenderHeight", event.GetSize().GetHeight());
+	}
+    }
+
+    event.Skip();
+}
+
+void BreveRender::OnMove(wxMoveEvent &event)
+{
+    {
+	wxConfigBase * config = wxConfigBase::Get();
+
+	if (config != NULL)
+	{
+	    config->Write("BreveRenderX", event.GetPosition().x);
+	    config->Write("BreveRenderY", event.GetPosition().y);
+	}
+    }
+
+    event.Skip();
+}
+
