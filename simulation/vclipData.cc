@@ -324,6 +324,7 @@ void slAddBoundingBoxForVectors(slWorld *w, int offset, slVector *min, slVector 
 	w->clipData->xList[(offset * 2) + 1].type = BT_MIN;	
 	w->clipData->xList[(offset * 2) + 1].value = &min->x;
 	w->clipData->xList[(offset * 2) + 1].number = offset;
+	w->clipData->xList[(offset * 2) + 1].previousLeft = 0;
 
 	w->clipData->yList[offset * 2].type = BT_MAX;	
 	w->clipData->yList[offset * 2].value = &max->y;
@@ -331,6 +332,7 @@ void slAddBoundingBoxForVectors(slWorld *w, int offset, slVector *min, slVector 
 	w->clipData->yList[(offset * 2) + 1].type = BT_MIN;	
 	w->clipData->yList[(offset * 2) + 1].value = &min->y;
 	w->clipData->yList[(offset * 2) + 1].number = offset;
+	w->clipData->yList[(offset * 2) + 1].previousLeft = 0;
 
 	w->clipData->zList[offset * 2].type = BT_MAX;	
 	w->clipData->zList[offset * 2].value = &max->z;
@@ -338,6 +340,7 @@ void slAddBoundingBoxForVectors(slWorld *w, int offset, slVector *min, slVector 
 	w->clipData->zList[(offset * 2) + 1].type = BT_MIN;	
 	w->clipData->zList[(offset * 2) + 1].value = &min->z;
 	w->clipData->zList[(offset * 2) + 1].number = offset;	
+	w->clipData->zList[(offset * 2) + 1].previousLeft = 0;
 }
 
 /*

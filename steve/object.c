@@ -315,8 +315,6 @@ void stObjectFreeAllInstances(stObject *o) {
 	}
 
 	slListFree(all);
-
-	slListFree(o->allInstances);
 }
 
 /*!
@@ -360,6 +358,8 @@ void stObjectFree(stObject *o) {
 
 		symbolList = symbolList->next;
 	}
+
+	slListFree(o->allInstances);
 
 	brNamespaceFree(o->keywords);
 
