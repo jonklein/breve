@@ -84,10 +84,7 @@ brEngine *brEngineNew() {
 
 	e->world = slWorldNew();
 
-	e->world->resolveCollisions = 0;
-	e->world->detectCollisions = 0;
-	e->world->collisionCallback = (void*)brCollisionCallback;
-	e->world->collisionCheckCallback = (void*)brCheckCollisionCallback;
+	slWorldSetCollisionCallbacks(e->world, brCheckCollisionCallback, brCollisionCallback);
 
 	gettimeofday(&e->startTime, NULL);
 
@@ -253,6 +250,15 @@ void brEngineFree(brEngine *e) {
 	}
 
 	slListFree(e->windows);
+
+	l = e->freedInstances;
+
+	while(l) {
+		slFree(l->data);
+		l = l->next;
+	}
+
+	slListFree(e->freedInstances);
 
 	brNamespaceFreeWithFunction(e->internalMethods, (void(*)(void*))brFreeInternalFunction);
 	brFreeObjectSpace(e->objects);
@@ -442,11 +448,11 @@ int brEngineIterate(brEngine *e) {
 			eventList = i->events;
 			event = eventList->data;
 
-			if((e->world->age + e->iterationStepSize) >= event->time) {
+			if((slWorldGetAge(e->world) + e->iterationStepSize) >= event->time) {
 				i->events = eventList->next;
 
-				oldAge = e->world->age;
-				e->world->age = event->time;
+				oldAge = slWorldGetAge(e->world);
+				slWorldSetAge(e->world, event->time);
 
 				if(i->status == AS_ACTIVE) rcode = brMethodCallByName(i, event->name, &result);
 
@@ -458,7 +464,7 @@ int brEngineIterate(brEngine *e) {
 					return rcode;
 				}
 
-				e->world->age = oldAge;
+				slWorldSetAge(e->world, oldAge);
 			}
 		}
 	}

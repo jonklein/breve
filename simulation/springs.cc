@@ -20,6 +20,13 @@
 
 #include "simulation.h"
 
+void slWorldApplySpringForces(slWorld *w) {
+	std::vector<slSpring*>::iterator i;
+    for(i = w->springs.begin(); i != w->springs.end(); i++) {
+		slSpringApplyForce(*i);
+	}
+}
+
 /*!
 	\brief Applies the spring forces between two bodies.
 */
@@ -77,7 +84,7 @@ void slSpringApplyForce(slSpring *spring) {
 slSpring *slSpringNew(slLink *l1, slLink *l2, slVector *p1, slVector *p2, double length, double strength, double damping) {
 	slSpring *spring;
 
-	spring = slMalloc(sizeof(slSpring));
+	spring = new slSpring;
 
 	slVectorCopy(p1, &spring->point1);
 	slVectorCopy(p2, &spring->point2);
@@ -97,7 +104,21 @@ slSpring *slSpringNew(slLink *l1, slLink *l2, slVector *p1, slVector *p2, double
 */
 
 void slWorldAddSpring(slWorld *w, slSpring *s) {
-	slStackPush(w->springObjects, s);
+	w->springs.push_back(s);
+}
+
+/*!
+	\brief Removes a spring from the world.
+*/
+
+void slWorldRemoveSpring(slWorld *w, slSpring *s) {
+	std::vector<slSpring*>::iterator i;
+
+	if(!s) return;
+
+	i = std::find(w->springs.begin(), w->springs.end(), s);
+	slSpringFree(*i);
+	w->springs.erase(i);
 }
 
 /*!
@@ -106,7 +127,7 @@ void slWorldAddSpring(slWorld *w, slSpring *s) {
 
 void slWorldDrawSprings(slWorld *w) {
 	slVector pos1, pos2;
-	int n;
+	std::vector<slSpring*>::iterator i = w->springs.begin();
 
 	glLineStipple(1, 0xaaaa);
 	glEnable(GL_LINE_STIPPLE);
@@ -117,8 +138,8 @@ void slWorldDrawSprings(slWorld *w) {
 
 	glBegin(GL_LINES);
 
-	for(n=0;n<w->springObjects->count;n++) {
-		slSpring *spring = w->springObjects->data[n];
+	for(i = w->springs.begin(); i != w->springs.end(); i++) {
+		slSpring *spring = *i;
 
 		slPositionVertex(&spring->link1->position, &spring->point1, &pos1);
 		slPositionVertex(&spring->link2->position, &spring->point2, &pos2);
@@ -133,5 +154,5 @@ void slWorldDrawSprings(slWorld *w) {
 }
 
 void slSpringFree(slSpring *s) {
-	slFree(s);
+	delete s;
 }

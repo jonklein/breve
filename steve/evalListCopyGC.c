@@ -20,41 +20,72 @@
 
 #include "kernel.h"
 
-void *stIterationThread(void *data) {
-	stThreadData *threadData = data;
-	brEngine *e = threadData->engine;
+brEvalListHead *brEvalListCopyGC(brEvalListHead *l) {
+	brEvalListHead *newList;
+	brEvalList *item = l->start;
 
-	while(1) {
-		int r;
+	newList = brEvalListNew();
 
-		r = pthread_cond_wait(&e->condition, &e->conditionLock);
+	while(item) {
+		brEvalListInsert(newList, newList->count, &item->eval);
+		stGCRetain(&item->eval);
+		item = item->next;
+	}
 
-		printf("condition waited (%d) for thread %d at time %f\n", r, threadData->number, slWorldGetAge(e->world));
+	return newList;
+}
 
-		printf("result from unlocking condition %d for thread %d\n", pthread_mutex_unlock(&e->conditionLock), threadData->number);
+brEvalListHead *brEvalListDeepCopyGC(brEvalListHead *l) {
+	slList *seen = NULL;
+	brEvalListHead *head;
 
-		while(e->lastScheduled < e->instances->count) {
-			printf("locked mutex %p %d, thread %d\n", &e->scheduleLock, pthread_mutex_lock(&e->scheduleLock), threadData->number);
-			printf("locked mutex %p %d, thread %d\n", &e->lock, pthread_mutex_lock(&e->lock), threadData->number);
-		
-			if(e->lastScheduled < e->instances->count) {
-				int n;
+	head = stDoEvalListDeepCopyGC(l, &seen);
 
-				e->lastScheduled++;
-				n = e->lastScheduled;
+	if(seen) {
+		stFreeListRecords(seen);
+		slListFree(seen);
+	}
 
-				printf("got schedule lock for %d, thread %d at time %f\n", n, threadData->number, slWorldGetAge(e->world));
+	return head;
+}
 
-				if(e->instances->data[n]) {
-					// rcode = brMethodCall(e->instances[n], e->instances[n]->iterate, NULL, &result);
-				}
+brEvalListHead *stDoEvalListDeepCopyGC(brEvalListHead *l, slList **s) {
+	brEvalListHead *newList;
+	brEval newSubList;
+	brEvalList *item = l->start;
 
+	/* we're now officially copying this list -- all future occurences should */
+	/* refer to the copy, so we make a record entry for it */
+
+	newList = brEvalListNew();
+
+	*s = slListPrepend(*s, stMakeListCopyRecord(l, newList));
+
+	while(item) {
+		brEvalListHead *copy;
+
+		/* is this a list? have we seen it before? */
+
+		if(item->eval.type == AT_LIST) {
+			copy = stCopyRecordInList(*s, BRLIST(&item->eval));
+			newSubList.type = AT_LIST;
+
+			if(!copy) {
+				BRLIST(&newSubList) = stDoEvalListDeepCopy(BRLIST(&item->eval), s);
+				brEvalListInsert(newList, newList->count, &newSubList);
+				stGCRetain(&newSubList);
+			} else {
+				BRLIST(&newSubList) = copy;
+				brEvalListInsert(newList, newList->count, &newSubList);
+				stGCRetain(&newSubList);
 			}
-
-        	pthread_mutex_unlock(&e->scheduleLock);
-
+		} else {
+			brEvalListInsert(newList, newList->count, &item->eval);
+			stGCRetain(&newSubList);
 		}
-    }
 
-	return NULL;
+		item = item->next;
+	}
+
+	return newList;
 }

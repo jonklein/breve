@@ -285,7 +285,7 @@ void brGLMainMenuUpdate(brInstance *i) {
 }
 
 void brQuit(brEngine *e) {
-	double diff;
+	double diff, age;
 
 	gThreadShouldExit = 1;
 
@@ -298,10 +298,12 @@ void brQuit(brEngine *e) {
 
 	diff = e->realTime.tv_sec + (e->realTime.tv_usec / 1000000.0);
 
-	if(e->world->age != 0.0) {
-		printf("%f simulated seconds elapsed\n", e->world->age);
+	age = slWorldGetAge(e->world);
+
+	if(age != 0.0) {
+		printf("%f simulated seconds elapsed\n", age);
 		printf("%f real seconds elapsed\n", diff);
-		printf("%f simulated/real\n", e->world->age/diff);
+		printf("%f simulated/real\n", age/diff);
 	}
 
 	brEngineFree(frontend->engine);
@@ -330,7 +332,7 @@ void brClick(int n) {
 	int total;
 	brMenuList *l;
 
-	if(n < frontend->engine->world->objectCount) gSelected = brClickCallback(frontend->engine, n);
+	gSelected = brClickCallback(frontend->engine, n);
 
 	glutSetMenu(contextMenu);
 

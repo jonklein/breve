@@ -143,6 +143,8 @@ struct slCamera {
 	unsigned char onlyMultibodies;
 	double blurFactor;
 
+	slVector fogColor;
+
 	double fogIntensity;
 	double fogStart;
 	double fogEnd;

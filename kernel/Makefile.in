@@ -6,7 +6,7 @@
 #
 
 LIBO	= engine.o breveEval.o breveObjectAPI.o frontendAPI.o \
-		evalList.o evalData.o \
+		evalList.o evalData.o evalListCopy.o \
 		callback.o namespace.o color.o interface.o \
 		plugins.o evalHash.o sound.o multithread.o format.o
 

@@ -30,8 +30,7 @@
 */
 
 int brISetStepFast(brEval args[], brEval *target, brInstance *i) {
-	i->engine->world->stepFast = BRINT(&args[0]);
-
+	slWorldSetPhysicsMode(i->engine->world, BRINT(&args[0]));
 	return EC_OK;
 }
 
@@ -102,7 +101,7 @@ int brIRandomSeedFromDevRandom(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetTime(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = i->engine->world->age;
+	BRDOUBLE(target) = slWorldGetAge(i->engine->world);
 
 	return EC_OK;
 }
@@ -678,12 +677,12 @@ int brICameraGetTarget(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetBackgroundColor(brEval args[], brEval *target, brInstance *i) {
-	slVectorCopy(&BRVECTOR(&args[0]), &i->engine->world->backgroundColor);
+	slWorldSetBackgroundColor(i->engine->world, &BRVECTOR(&args[0]));
 	return EC_OK;
 }
 
 int brISetBackgroundTextureColor(brEval args[], brEval *target, brInstance *i) {
-	slVectorCopy(&BRVECTOR(&args[0]), &i->engine->world->backgroundTextureColor);
+	slWorldSetBackgroundTextureColor(i->engine->world, &BRVECTOR(&args[0]));
 	return EC_OK;
 }
 
@@ -694,9 +693,7 @@ int brISetBackgroundTextureColor(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetBackgroundTexture(brEval args[], brEval *target, brInstance *i) {
-	i->engine->world->backgroundTexture = BRINT(&args[0]);
-	i->engine->world->isBackgroundImage = 0;
-
+	slWorldSetBackgroundTexture(i->engine->world, BRINT(&args[0]), 0);
 	return EC_OK;
 }
 
@@ -707,9 +704,7 @@ int brISetBackgroundTexture(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetBackgroundImage(brEval args[], brEval *target, brInstance *i) {
-	i->engine->world->backgroundTexture = BRINT(&args[0]);
-	i->engine->world->isBackgroundImage = 1;
-
+	slWorldSetBackgroundTexture(i->engine->world, BRINT(&args[0]), 1);
 	return EC_OK;
 }
 
@@ -743,7 +738,7 @@ int brISetLightPosition(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetDetectLightExposure(brEval args[], brEval *target, brInstance *i) {
-	i->engine->world->detectLightExposure = BRINT(&args[0]);
+	slWorldSetLightExposureDetection(i->engine->world, BRINT(&args[0]));
 	return EC_OK;
 }
 
@@ -754,7 +749,7 @@ int brISetDetectLightExposure(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetLightExposureSource(brEval args[], brEval *target, brInstance *i) {
-	slVectorCopy(&BRVECTOR(&args[0]), &i->engine->world->lightExposureSource);
+	slWorldSetLightExposureSource(i->engine->world, &BRVECTOR(&args[0]));
 	return EC_OK;
 }
 

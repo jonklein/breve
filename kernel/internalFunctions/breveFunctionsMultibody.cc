@@ -103,7 +103,7 @@ int brIMultibodyAllObjects(brEval args[], brEval *target, brInstance *i) {
 int brIMultibodyFree(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *m = BRPOINTER(&args[0]);
 
-	i->engine->world->initialized = 0;
+	slWorldSetUninitialized(i->engine->world);
 
 	if(m) slMultibodyFree(m);
 
@@ -224,5 +224,4 @@ void breveInitMultibodyFunctions(brNamespace *n) {
 	brNewBreveCall(n, "multibodyFree", brIMultibodyFree, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "multibodySetHandleSelfCollisions", brIMultibodySetHandleSelfCollisions, AT_NULL, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "multibodyCheckSelfPenetration", brIMultibodyCheckSelfPenetration, AT_INT, AT_POINTER, 0);
-
 }

@@ -120,12 +120,12 @@ int brMenuCallback(brEngine *e, brInstance *i, int n) {
 brInstance *brClickCallback(brEngine *e, int n) {
 	brEval eval, theArg, *argPtr[1];
 	brMethod *method;
-	unsigned char *types = { AT_INSTANCE };
+	unsigned char types[] = { AT_INSTANCE };
 
 	slWorldObject *o;
 
 	if(n == -1) o = NULL;
-	else o = e->world->objects[n];
+	else o = slWorldGetObject(e->world, n);
 
 	method = brMethodFind(e->controller->object, "click", types, 1);
 	

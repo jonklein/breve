@@ -41,6 +41,10 @@
 
 // do not change the order of the includes--they depend on eachother
 
+#ifdef __cplusplus      // make jpeglib C++ safe
+extern "C"{
+#endif
+
 #include "simulationTypedefs.h"
 
 #include "util.h"
@@ -60,7 +64,6 @@
 
 #include "terrain.h"
 #include "camera.h"
-#include "world.h"
 #include "integrate.h"
 
 #include "gldraw.h"
@@ -71,3 +74,9 @@
 #include "shadow.h"
 
 #include "movie.h"
+
+#ifdef __cplusplus
+}
+#endif
+
+#include "world.h"

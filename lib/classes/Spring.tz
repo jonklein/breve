@@ -55,4 +55,7 @@ Object : Spring (aka Springs) {
 	+ to set-damping to newDamping (double):
 		% Sets the spring's damping to newDamping.
 		if springPointer: springSetDamping(springPointer, newDamping).
+
+	+ to destroy: 
+		springRemove(springPointer).
 }

@@ -159,7 +159,7 @@ int brIPause(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIAddEvent(brEval args[], brEval *target, brInstance *i) {
-    if(BRDOUBLE(&args[1]) <= i->engine->world->age) {
+    if(BRDOUBLE(&args[1]) <= slWorldGetAge(i->engine->world)) {
         slMessage(DEBUG_ALL, "warning: attempt to add event to the past\n");
         return EC_OK;
     }
@@ -227,7 +227,7 @@ int brISetDrawFog(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetFogIntensity(brEval args[], brEval *target, brInstance *i) {
-    i->engine->world->fogIntensity = BRDOUBLE(&args[0]);
+    i->engine->camera->fogIntensity = BRDOUBLE(&args[0]);
     return EC_OK;
 }
 
@@ -238,7 +238,7 @@ int brISetFogIntensity(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetFogColor(brEval args[], brEval *target, brInstance *i) {
-	slVectorCopy(&BRVECTOR(&args[0]), &i->engine->world->fogColor);
+	slVectorCopy(&BRVECTOR(&args[0]), &i->engine->camera->fogColor);
     return EC_OK;
 }
 
@@ -249,8 +249,8 @@ int brISetFogColor(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetFogDistances(brEval args[], brEval *target, brInstance *i) {
-    i->engine->world->fogStart = BRDOUBLE(&args[0]);
-    i->engine->world->fogEnd = BRDOUBLE(&args[1]);
+    i->engine->camera->fogStart = BRDOUBLE(&args[0]);
+    i->engine->camera->fogEnd = BRDOUBLE(&args[1]);
     return EC_OK;
 }
 

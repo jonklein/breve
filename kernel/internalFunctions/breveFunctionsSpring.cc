@@ -26,9 +26,15 @@ int brISpringSetDamping(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+int brISpringRemove(brEval args[], brEval *target, brInstance *i) {
+	slWorldRemoveSpring(i->engine->world, BRPOINTER(&args[0]));
+	return EC_OK;
+}
+
 void breveInitSpringFunctions(brNamespace *n) {
     brNewBreveCall(n, "springNew", brISpringNew, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0);
     brNewBreveCall(n, "springSetLength", brISpringSetLength, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
     brNewBreveCall(n, "springSetDamping", brISpringSetDamping, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
     brNewBreveCall(n, "springSetStrength", brISpringSetStrength, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
+    brNewBreveCall(n, "springRemove", brISpringRemove, AT_NULL, AT_POINTER, 0);
 }

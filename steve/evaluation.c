@@ -1204,7 +1204,7 @@ inline int stEvalCopyList(stExp *l, stRunInstance *i, brEval *target) {
 	}
 
 	target->type = AT_LIST;
-	BRLIST(target) = brEvalListDeepCopy(BRLIST(&listEval));
+	BRLIST(target) = brEvalListDeepCopyGC(BRLIST(&listEval));
 
 	return EC_OK;
 }

@@ -817,9 +817,9 @@ void slClear(slWorld *w, slCamera *c) {
 void slDrawFog(slWorld *w, slCamera *c) {
 	GLfloat fog_color[4];
 
-	fog_color[0] = w->fogColor.x;
-	fog_color[1] = w->fogColor.y;
-	fog_color[2] = w->fogColor.z;
+	fog_color[0] = c->fogColor.x;
+	fog_color[1] = c->fogColor.y;
+	fog_color[2] = c->fogColor.z;
 	fog_color[3] = 1.0;
 
 	glEnable(GL_FOG);

@@ -57,6 +57,9 @@ slWorld *slWorldNew() {
 	w->odeCollisionGroupID = dJointGroupCreate(0);
 	w->odeJointGroupID = dJointGroupCreate(0);
 
+	w->resolveCollisions = 0;
+	w->detectCollisions = 0;
+
 	w->initialized = 0;
 
 	w->cameras = slStackNew();
@@ -469,9 +472,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 		n++;
 	}
 
-	for(n=0;n<w->springObjects->count;n++) {
-		slSpringApplyForce(w->springObjects->data[n]);
-	}
+	slWorldApplySpringForces(w);
 
 	if(w->detectCollisions) {
 		result = slVclip(w->clipData, 0.0, 0, w->boundingBoxOnly);
@@ -787,3 +788,71 @@ slObjectLine *slFindObjectLine(slWorldObject *src, slWorldObject *dst) {
 
 	return NULL;
 }
+
+/*!
+	\brief Returns the age of the world.
+*/
+
+double slWorldGetAge(slWorld *w) {
+	return w->age;
+}
+
+/*!
+	\brief Sets the age of the world.
+*/
+
+void slWorldSetAge(slWorld *w, double a) {
+	w->age = a;
+}
+
+/*!
+	\brief Sets the collision detection structures as uninitialized.
+*/
+
+void slWorldSetUninitialized(slWorld *w) {
+	w->initialized = 0;
+}
+
+/*!
+	\brief Sets collision resolution on or off.
+*/
+
+void slWorldSetCollisionResolution(slWorld *w, int n) {
+	w->resolveCollisions = n;
+}
+
+void slWorldSetPhysicsMode(slWorld *w, int n) {
+	w->odeStepMode = n;
+}
+
+void slWorldSetBackgroundColor(slWorld *w, slVector *v) {
+	slVectorCopy(v, &w->backgroundColor);
+}
+
+void slWorldSetBackgroundTextureColor(slWorld *w, slVector *v) {
+	slVectorCopy(v, &w->backgroundTextureColor);
+}
+
+void slWorldSetBackgroundTexture(slWorld *w, int n, int mode) {
+	w->backgroundTexture = n;
+	w->isBackgroundImage = mode;
+}
+
+void slWorldSetLightExposureDetection(slWorld *w, int n) {
+	w->detectLightExposure = n;
+}
+
+void slWorldSetLightExposureSource(slWorld *w, slVector *v) {
+	slVectorCopy(v, &w->lightExposureSource);
+}
+
+void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*), int (*collide)(void*, void*, int t)) {
+	w->collisionCallback = collide;
+	w->collisionCheckCallback = check;
+}
+
+slWorldObject *slWorldGetObject(slWorld *w, int n) {
+	if(n > w->objectCount) return NULL;
+	return w->objects[n];
+}
+

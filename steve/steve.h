@@ -22,6 +22,7 @@
 #include "interactive.h"
 
 #include "evalListSort.h"
+#include "evalListCopyGC.h"
 
 #include "steveparse.h"
 

@@ -150,12 +150,12 @@ int main(int argc, char **argv) {
 	}
 
 	while(!gShouldQuit && brEngineIterate(frontend->engine) == EC_OK) {
-		if(gNotify && frontend->engine->world->age > nextNotify) {
-			printf("%f seconds elapsed\n", frontend->engine->world->age);
+		if(gNotify && slWorldGetAge(frontend->engine->world) > nextNotify) {
+			printf("%f seconds elapsed\n", slWorldGetAge(frontend->engine->world));
 			nextNotify += gNotify;
 		}
 
-		if(gSimMax > 0.0 && frontend->engine->world->age >= gSimMax) {
+		if(gSimMax > 0.0 && slWorldGetAge(frontend->engine->world) >= gSimMax) {
 			printf("%f simulation seconds completed\n", gSimMax);
 			brQuit(frontend->engine);
 		}
@@ -284,16 +284,18 @@ void brPrintUsage(char *name) {
 }
 
 void brQuit(brEngine *e) {
-	double diff;
+	double diff, age;
 
 	brPauseTimer(e);
 
 	diff = e->realTime.tv_sec + (e->realTime.tv_usec / 1000000.0);
 
-	if(e->world->age != 0.0) {
-		printf("%f simulated seconds elapsed\n", e->world->age);
+	age = slWorldGetAge(e->world);
+
+	if(age != 0.0) {
+		printf("%f simulated seconds elapsed\n", age);
 		printf("%f real seconds elapsed\n", diff);
-		printf("%f simulated/real\n", e->world->age/diff);
+		printf("%f simulated/real\n", age/diff);
 	}
 
 	brEngineFree(frontend->engine);

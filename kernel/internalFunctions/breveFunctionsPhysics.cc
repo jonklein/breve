@@ -116,7 +116,7 @@ int brJointILinkRevolute(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	i->engine->world->initialized = 0;
+	slWorldSetUninitialized(i->engine->world);
 
 	BRPOINTER(target) = joint;
 	target->type = AT_POINTER;
@@ -198,7 +198,7 @@ int brJointILinkPrismatic(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	i->engine->world->initialized = 0;
+	slWorldSetUninitialized(i->engine->world);
 
 	BRPOINTER(target) = joint;
 	target->type = AT_POINTER;
@@ -234,7 +234,7 @@ int brJointILinkBall(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	i->engine->world->initialized = 0;
+	slWorldSetUninitialized(i->engine->world);
 
 	BRPOINTER(target) = joint;
 	target->type = AT_POINTER;
@@ -270,7 +270,7 @@ int brJointILinkUniversal(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	i->engine->world->initialized = 0;
+	slWorldSetUninitialized(i->engine->world);
 
 	BRPOINTER(target) = joint;
 	target->type = AT_POINTER;
@@ -308,7 +308,7 @@ int brJointILinkStatic(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	i->engine->world->initialized = 0;
+	slWorldSetUninitialized(i->engine->world);
 
 	BRPOINTER(target) = joint;
 	target->type = AT_POINTER;
@@ -332,7 +332,7 @@ int brIJointBreak(brEval args[], brEval *target, brInstance *i) {
 
 	slJointBreak(joint);
 	slJointDestroy(joint);
-	i->engine->world->initialized = 0;
+	slWorldSetUninitialized(i->engine->world);
 
 	return EC_OK;
 }
@@ -344,7 +344,7 @@ int brIJointBreak(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIWorldSetCollisionResolution(brEval args[], brEval *target, brInstance *i) {
-	i->engine->world->resolveCollisions = BRINT(&args[0]);
+	slWorldSetCollisionResolution(i->engine->world, BRINT(&args[0]));
 	
 	target->type = AT_NULL;
 	

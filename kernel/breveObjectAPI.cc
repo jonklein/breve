@@ -503,6 +503,8 @@ void brInstanceFree(brInstance *i) {
     if(i->menu.list) slFree(i->menu.list);
 
 	i->userData = NULL;
+
+	i->engine->freedInstances = slListPrepend(i->engine->freedInstances, i);
 }
 
 /*!

@@ -7,7 +7,7 @@
 
 LIBO	= steveparse.tab.o stevelex.o stringexp.o dataObject.o genetic.o \
 		object.o expression.o evaluation.o format.o xml.o evalListSort.o \
-		evalListCopy.o \
+		evalListCopyGC.o \
 		interactive.o breveFunctionsSteveDataObject.o steveFrontend.o gc.o \
 		breveFunctionsSteveObject.o breveFunctionsSteveXML.o
 

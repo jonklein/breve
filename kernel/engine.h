@@ -162,6 +162,8 @@ struct brEngine {
 
 	brSoundMixer *soundMixer;
 
+	slList *freedInstances;
+
 #ifdef HAVE_LIBAVCODEC
 	slMovie *movie;
 #endif

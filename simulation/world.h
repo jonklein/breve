@@ -18,6 +18,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifdef __cplusplus
+#include <vector>
+#include <algorithm> 
+#endif
+
 #define DV_VECTOR_COUNT	10
 
 enum slWorldObjectTypes {
@@ -137,12 +142,13 @@ struct slObjectLine {
 	\brief A structure holding the simulated world.
 */
 
+#ifdef __cplusplus
 struct slWorld {
 	/* when objects are added or removed from the world, this flag must be */
 	/* set to 0 so that vclip structures are reinitialized.				*/
 
 	unsigned char initialized;
-	unsigned char stepFast;
+	unsigned char odeStepMode;
 
 	dWorldID odeWorldID;
 	dJointGroupID odeCollisionGroupID;
@@ -200,6 +206,8 @@ struct slWorld {
 	slStack *patchGridObjects;
 	slStack *springObjects;
 
+	std::vector<slSpring*> springs;
+
 	// we have one slVclipData for the regular collision detection
 	// and one which will be used to answer "proximity" questions:
 	// to allow objects to ask for all objects within a certain radius
@@ -216,12 +224,7 @@ struct slWorld {
 
 	slVector backgroundColor;
 	slVector backgroundTextureColor;
-	slVector fogColor;
 	slVector shadowColor;
-
-	double fogIntensity;
-	double fogStart;
-	double fogEnd;
 
 	int backgroundTexture;
 	int isBackgroundImage;
@@ -231,7 +234,11 @@ struct slWorld {
 	slNetsimClientData *netsimClient;
 #endif
 };
+#endif
 
+#ifdef __cplusplus
+extern "C"{
+#endif
 slWorld *slWorldNew();
 slWorldObject *slWorldNewObject(void *d, int type);
 
@@ -279,3 +286,25 @@ int slRemoveAllObjectLines(slWorldObject *src);
 slObjectLine *slFindObjectLine(slWorldObject *src, slWorldObject *dst);
 
 void slVclipDataAddPairEntry(slWorld *w, int x, int y);
+
+double slWorldGetAge(slWorld *w);
+void slWorldSetAge(slWorld *w, double time);
+
+void slWorldSetUninitialized(slWorld *w);
+void slWorldSetCollisionResolution(slWorld *w, int n);
+void slWorldSetPhysicsMode(slWorld *w, int n);
+
+void slWorldSetBackgroundColor(slWorld *w, slVector *v);
+void slWorldSetBackgroundTextureColor(slWorld *w, slVector *v);
+void slWorldSetBackgroundTexture(slWorld *w, int n, int mode);
+
+void slWorldSetLightExposureDetection(slWorld *w, int n);
+void slWorldSetLightExposureSource(slWorld *w, slVector *v);
+
+void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*), int (*collide)(void*, void*, int type));
+
+slWorldObject *slWorldGetObject(slWorld *w, int n);
+
+#ifdef __cplusplus
+}
+#endif
