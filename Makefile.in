@@ -90,15 +90,14 @@ OSX_release: OSX_clean documentation OSX_build
 	rm -rf breve_image_folder
 
 CLI_release:
-	echo @PLATFORM@
 	make -f Makefile clean
 	rm -rf breve_$(LPLATFORM)
 	mkdir breve_$(LPLATFORM)
 	mkdir breve_$(LPLATFORM)/bin
 	mkdir breve_$(LPLATFORM)/lib
 	make -f Makefile optimize
-	cp bin/breve breve_$(LPLATFORM)/bin/breve
-	cp bin/breve_cli breve_$(LPLATFORM)/bin/breve_cli
+	cp bin/breve@PROGRAM_SUFFIX@ breve_$(LPLATFORM)/bin/breve
+	cp bin/breve_cli@PROGRAM_SUFFIX@ breve_$(LPLATFORM)/bin/breve_cli
 	cp -r lib/classes breve_$(LPLATFORM)/lib/
 	cp -r docs breve_$(LPLATFORM)/
 	cp -r demos breve_$(LPLATFORM)/

@@ -22,12 +22,12 @@ all: breve_cli breve
 	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
 
 breve: $(BREVEO) ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a ../lib/libbrsteve.a
-	$(CC) -o breve $(CFLAGS) $(BREVEO) $(LIBS) @GLLIBS@ @AUDIOLIBS@
+	$(CC) -o breve@PROGRAM_SUFFIX@ $(CFLAGS) $(BREVEO) $(LIBS) @GLLIBS@ @AUDIOLIBS@
 	# strip -s ../lib/loadable-symbols breve
 	# strip breve
 
 breve_cli: $(BREVECLIO) ../lib/libbrsimulation.a ../lib/libbrutil.a ../lib/libbrkernel.a ../lib/libbrsteve.a
-	$(CC) -o breve_cli $(CFLAGS) $(BREVECLIO) $(LIBS) @GLLIBS@ @AUDIOLIBS@
+	$(CC) -o breve_cli@PROGRAM_SUFFIX@ $(CFLAGS) $(BREVECLIO) $(LIBS) @GLLIBS@ @AUDIOLIBS@
 	# strip ../lib/loadable-symbols breve_cli
 	# strip breve_cli
 
