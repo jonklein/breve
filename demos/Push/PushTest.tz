@@ -39,9 +39,10 @@ Object : myPushAgent (aka myPushAgents) {
 		interpreter clear-stacks.
 
 		code = (new PushProgram parse program "( 1 2 3 4 5 6 CALLBACK-TEST )").
-		code2 = (new PushProgram parse program "( 1 ( 2 3 ) 4 5 6 CALLBACK-TEST )").
+		code2 = (new PushProgram parse program "( 1 2 3 4 8 4 CALLBACK-TEST )").
 
 		print "Discrepancy", (code get-discrepancy from code2).
+		print "Top level diff", (code get-top-level-difference from code2).
 
 		interpreter run code code.
 

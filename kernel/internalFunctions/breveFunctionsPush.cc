@@ -632,10 +632,47 @@ int breveFunctionPushCodeRandom(brEval arguments[], brEval *result, brInstance *
 int breveFunctionPushCodeDiscrepancy(brEval arguments[], brEval *result, brInstance *instance) {
 	push::Code *p1, *p2;
 
-	p1 = BRPOINTER(&arguments[0]);
-	p2 = BRPOINTER(&arguments[1]);
+	p1 = (push::Code*)BRPOINTER(&arguments[0]);
+	p2 = (push::Code*)BRPOINTER(&arguments[1]);
 
 	BRINT(result) = push::discrepancy(*p1, *p2);
+
+	return EC_OK;
+}
+
+int breveFunctionPushCodeTopLevelDiff(brEval arguments[], brEval *result, brInstance *instance) {
+	push::Code *p1, *p2;
+	unsigned int length, diff, n;
+	unsigned int s1, s2;
+
+	p1 = (push::Code*)BRPOINTER(&arguments[0]);
+	p2 = (push::Code*)BRPOINTER(&arguments[1]);
+
+	const push::CodeArray& st1 = (*p1)->get_stack();
+	const push::CodeArray& st2 = (*p2)->get_stack();
+
+	// get the shortest length
+
+	s1 = st1.size();
+	s2 = st2.size();
+
+	if(s1 < s2) length = s1;
+	else length = s2;
+
+	// any extra elements are automatically different
+
+	diff = abs(s1 - s2);
+
+	// the lists are stored backwards.
+
+	for(n=0; n < length; n++) {
+		if( !equal_to(st1[s1 - (n+1)], st2[s2 - (n+1)])) {
+			// printf("%s == %s\n", pushCodeGetString((PushCode*)&st1[n]), pushCodeGetString((PushCode*)&st2[n]));
+			diff++;
+		}
+	}
+
+	BRINT(result) = diff;
 
 	return EC_OK;
 }
@@ -680,6 +717,7 @@ void breveInitPushFunctions(brNamespace *n) {
  	brNewBreveCall(n, "pushCodeStackTop", breveFunctionPushCodeStackTop, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeStackPush", breveFunctionPushCodeStackPush, AT_NULL, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeDiscrepancy", breveFunctionPushCodeDiscrepancy, AT_INT, AT_POINTER, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushCodeTopLevelDiff", breveFunctionPushCodeTopLevelDiff, AT_INT, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(n, "pushVectorStackSize", breveFunctionPushVectorStackSize, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushVectorStackPop", breveFunctionPushVectorStackPop, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(n, "pushVectorStackTop", breveFunctionPushVectorStackTop, AT_VECTOR, AT_POINTER, AT_VECTOR, 0);

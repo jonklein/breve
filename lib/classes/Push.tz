@@ -360,8 +360,29 @@ Object : PushProgram (aka PushPrograms) {
 		% This is defined as the number of points (atoms and subtrees) found
 		% in this program which do not exist in otherProgram, plus the number
 		% of points found in otherProgram that do not exist in this program.
+		% <P>
+		% This method considers the order of points in a program, and 
+		% considers all sublists found in a program.  For this reason, it is a 
+		% good measure of similarity between two evolved programs.  For a 
+		% simpler comparison operator, suitable for comparing lists in which
+		% order should be preserved, see METHOD(get-top-level-difference).
 
 		return pushCodeDiscrepancy(codePointer, (otherProgram get-code-pointer)).
+
+	+ to get-top-level-difference from otherProgram (object):
+		% Determines the top level difference between this program and otherProgram.
+		% This is calculated by comparing each element of the program against 
+		% the corresponding element of otherProgram, with every mismatch counting 
+		% as one point of difference.  Sublists are not considered; each element 
+		% in the top level list is treated as an atomic element.
+		% <P>
+		% This method is well suited for comparing lists produced as output of 
+		% push programs.  Because it does not consider sublists or order, it is 
+		% not well suited for determining the true level of similarity between
+		% two programs as one might with to do with evolved code.  For that
+		% type of functionality, see the method METHOD(get-discrepancy).
+
+		return pushCodeTopLevelDiff(codePointer, (otherProgram get-code-pointer)).
 
 	+ to destroy:
 		if codePointer: pushCodeFree(codePointer).
