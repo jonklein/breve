@@ -206,9 +206,10 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, char boundTypeFlag
 
 		// NaNs mess up the logic of the sort since they are not =, < or > than
 		// any other value, meaning they have no proper place in the list.  
-		// -INFINITY does have a proper (yet "meaningless") place in the list
+		// -Infinity does have a proper (yet "meaningless") place in the list
 
-		if(isnan(*currentSort->value)) *currentSort->value = -INFINITY;
+		if (isnan(*currentSort->value))
+			*currentSort->value = -HUGE_VAL;
 
 		// Keep moving to the left; until:
 		// 1) there are no more entries to the left
