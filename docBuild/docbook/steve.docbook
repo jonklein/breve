@@ -148,8 +148,7 @@ Control : myControl {
 
         # set up a shape that all of the RandomWalker objects will use.
         
-        walkerShape = new Shape.
-        walkerShape init-with-sphere radius 1.
+        walkerShape = (new Sphere init-with radius 1).
         
         # Create a bunch of RandomWalkers.  You can create as few or 
         # as many as you want... 
@@ -176,7 +175,7 @@ Mobile : RandomWalker {
         # During init, the object asks the controller for the shape 
         # it should use.  It then sets itself to a random color.
 
-        self register with-shape (controller get-walker-shape).
+        self set-shape to (controller get-walker-shape).
         self set-color to random[(1.0, 1.0, 1.0)].
         self move to random[(.1, .1, .1)].
     

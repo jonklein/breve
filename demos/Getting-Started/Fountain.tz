@@ -75,7 +75,7 @@ Mobile : Particle {
 	+ to init:
 		# register the particles as randomly sized cube shapes
 
-		self set-shape to ((new Shape) init-with-cube size random[(1.0, 1.0, 1.0)] + (.1, .1, .1)).
+		self set-shape to (new Cube init-with size random[(1.0, 1.0, 1.0)] + (.1, .1, .1)).
 
 		# the "physics" of the particle is to always move downwards 
 		# with an acceleration of 9.8 m/s^2.

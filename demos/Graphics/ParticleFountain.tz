@@ -49,7 +49,7 @@ Mobile : Particle (aka Particles) {
 		if (self get-location)::y < -16.0: self reset.
 
 	+ to init:
-		shape = ((new Shape) init-with-sphere radius random[2.0] + .1).
+		shape = (new Sphere init-with radius random[2.0] + .1).
 		self set-shape to shape.
 
 		# texture #3 happens to be a built-in texture which nicely illustrates the 

@@ -79,7 +79,7 @@ PhysicalControl : Walker {
 
 		# Create the floor for the critter to walk on.
 
-		floorShape = (new Shape init-with-cube size (1000, 2, 1000)).
+		floorShape = (new Cube init-with size (1000, 2, 1000)).
 		floor = new Stationary.
 
 		floor register with-shape floorShape at-location (0, 0, 0).
@@ -333,14 +333,9 @@ MultiBody : Creature {
 
 		self add-menu named "Send to Center" for-method "center".
 
-		lowerLinkShape = new Shape.
-		lowerLinkShape init-with-cube size (.36, 1, .36).
-
-		linkShape = new Shape.
-		linkShape init-with-cube size (.38, 1, .38).
-
-		bodyShape = new Shape.
-		bodyShape init-with-cube size (4, 3, .4).
+		lowerLinkShape = (new Cube init-with size (.36, 1, .36)).
+		linkShape = (new Cube init-with size (.38, 1, .38)).
+		bodyShape = (new Cube init-with size (4, 3, .4)).
 
 		links = 8 new Links.
 		joints = 8 new RevoluteJoints.

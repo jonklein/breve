@@ -112,7 +112,7 @@ Mobile : Musician (aka Musicians) {
 		self add-menu named "Select" for-method "select".
 
 	+ to build:
-		self register with-shape ((new Shape) init-with-polygon-disk 
+		self register with-shape (new PolygonDisk init-with
 			 radius (genome get-radius) 
 			 sides (genome get-sides) 
 			 height (genome get-height)).

@@ -43,7 +43,7 @@ Mobile : Shooter (aka Shooters) {
 		age, limit (int).
 
 	+ to init:
-		self set-shape to (new Shape init-with-sphere radius 0.1 + random[1.4]).
+		self set-shape to (new Sphere init-with radius 0.1 + random[1.4]).
 		self set-lightmap-image to (controller get-lightmap-image).
 		self set-color to random[(.2, .2, .2)] + (.8, .8, .8).
 		self move to random[(6, 0, 6)] - (3, 30, 3).
@@ -67,7 +67,7 @@ Mobile : Particle {
 		color (vector).
 
 	+ to init:
-		self set-shape to (new Shape init-with-sphere radius 0.1 + random[4.0]).
+		self set-shape to (new Sphere init-with radius 0.1 + random[4.0]).
 		intensity = 1.0.
 		rate = .9 + random[.08].
 

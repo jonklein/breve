@@ -5,23 +5,20 @@
 # sky.
 #
 
-@include "Stationary.tz"
-@include "PhysicalControl.tz"
-@include "Mobile.tz"
-@include "Terrain.tz"
+@use PhysicalControl.
+@use Mobile.
+@use Terrain.
 
 Controller TerrainWave.
 
 PhysicalControl : TerrainWave {
 	+ variables:
 		terrain (object).
-		clouds (int).
 
     + to init:
 		x, y (int).
 
-		clouds = self load-image from "images/clouds.png".
-		self set-background-texture to clouds.
+		self set-background-texture-image to (new Image load from "images/clouds.png").
 
 		self enable-shadow-volumes.
 
@@ -48,7 +45,7 @@ PhysicalControl : TerrainWave {
 
 Mobile : Ball {
 	+ to init:
-		self set-shape to (new Shape init-with-sphere radius random[1.0]).
+		self set-shape to (new Sphere init-with radius random[1.0]).
 
 		self set-color to random[(1, 1, 1)].
 

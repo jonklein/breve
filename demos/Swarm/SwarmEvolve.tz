@@ -261,7 +261,7 @@ Control : Swarm {
 
         # Create the floor.
         floor = new Stationary.
-        floor register with-shape (new Shape init-with-cube size (100, 2, 100)) at-location (0, -5, 0).
+        floor register with-shape (new Cube init-with size (100, 2, 100)) at-location (0, -5, 0).
         floor catch-shadows.
 
         # Initialize other variables.
@@ -275,7 +275,7 @@ Control : Swarm {
         reproMutationRates = 0.0.
         discrepancies = 0.0.
         naturalBirths = 0.
-        corpseShape = ((new Shape) init-with-polygon-cone radius .06 sides 5 height .2).
+        corpseShape = (new PolygonCone init-with radius .06 sides 5 height .2).
         servos = 0.
 
         #self disable-freed-instance-protection.
@@ -528,7 +528,7 @@ Mobile : Feeders {
         shape (object).
 
     + to init:
-        shape = ((new Shape) init-with-sphere radius 0.3).
+        shape = (new Sphere init-with radius 0.3).
         self set-shape to shape.
         self move to random[(30, 0, 30)] - (15, 0, 15).
         self set-velocity to (0, 0, 0).
@@ -665,7 +665,7 @@ Mobile : Bird (aka Birds) {
 
     + to init:
         # register the object, set the initial location, velocity and color.
-        shape = ((new Shape) init-with-polygon-cone radius .1 sides 5 height .2).
+        shape = (new PolygonCone init-with radius .1 sides 5 height .2).
         self set-shape to shape.
 
         self handle-collisions with-type "Stationary" with-method "land".

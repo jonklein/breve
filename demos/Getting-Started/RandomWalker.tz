@@ -37,8 +37,7 @@ Control : myControl {
         # first set up a shape that all of the RandomWalker objects 
         # will use.
         
-        walkerShape = new Shape.
-        walkerShape init-with-sphere radius 1.
+        walkerShape = (new Sphere init-with radius 1).
         
         # Create a bunch of RandomWalkers.  You can create as few or 
         # as many as you want... the simulation speed gets pretty 

@@ -18,7 +18,7 @@ PhysicalControl : JointTest {
 
     + to init:
         self set-background-color to (.4, .4, .4).
-        new Stationary register with-shape (new Shape init-with-cube size (100, 0.1, 100)) at-location (0, 0, 0).
+        new Stationary register with-shape (new Cube init-with size (100, 0.1, 100)) at-location (0, 0, 0).
         body = new JointTestBody.
         
         body show-bounding-box.
@@ -73,10 +73,8 @@ MultiBody : JointTestBody {
     + to init:
 		# initialize with a fixed joint
 
-        shape = new Shape.
-        smallShape = new Shape.
-        shape init-with-cube size (1.1, 2.0, 1.1).
-        smallShape init-with-cube size (1.0, 2.0, 1.0).
+        shape = (new Cube init-with size (1.1, 2.0, 1.1)).
+        smallShape = (new Cube init-with size (1.0, 2.0, 1.0)).
 
         links = 2 new Links.
         links{0} set shape shape.

@@ -51,14 +51,15 @@ Mobile : Bird {
 		myShape (object).
 
 	+ to init:
-		# make a new shape.
+		# make a new shape -- this step is optional.  The 
+		# default shape for a new mobile is a sphere of 
+		# radius 1.
 
-		myShape = new Shape.
-		myShape init-with-cube size (1, 1, 1).
+		myShape = (new Cube init-with size (1, 1, 1)).
 
-		# register this Mobile with our shape and we're done!
+		# set the Mobile to the new shape and we're done!
 
-		self register with-shape myShape.
+		self set-shape to myShape.
 
 	+ to iterate:
 		# here we would specify our default behavior--the action

@@ -102,7 +102,7 @@ Control : Swarm {
         # Add a huge floor.
 
         floor = new Stationary.
-        floor register with-shape (new Shape init-with-cube size (100, 2, 100)) at-location (0, -5, 0).
+        floor register with-shape (new Cube init-with size (100, 2, 100)) at-location (0, -5, 0).
         floor catch-shadows.
 
         birds = SWARM_SIZE new Birds.
@@ -214,7 +214,7 @@ Mobile : Bird (aka Birds) {
     + to init:
         # register the object, set the initial location, velocity and color.
 
-        self register with-shape ((new Shape) init-with-sphere radius .1). 
+        self register with-shape (new Sphere init-with radius .1). 
         self move to random[(10, 10, 10)] - (5, -5, 5).
         self set-velocity to random[(20, 20, 20)] - (10, 10, 10).
         self set-color to random[(1, 1, 1)].

@@ -41,7 +41,7 @@ Mobile : Particle (aka Particles) {
 		if (self get-location)::z > 100.0: self reset.
 
 	+ to init:
-		shape = ((new Shape) init-with-sphere radius .3 + random[1.0]).
+		shape = (new Sphere init-with radius .3 + random[1.0]).
 		self set-shape to shape.
 
 		self reset.

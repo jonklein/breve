@@ -49,7 +49,7 @@ Stationary : Step {
 	+ to create at location (vector) size sizeVector (vector):
 		stepShape (object).
 
-		stepShape = (new Shape init-with-cube size sizeVector).
+		stepShape = (new Cube init-with size sizeVector).
 
 		self register with-shape stepShape at-location location.
 }
@@ -65,7 +65,7 @@ Mobile : Ball {
 		if (self get-location)::y < -2.0: self reset.
 
 	+ to init:
-		self set-shape to ((new Shape) init-with-sphere radius .1).
+		self set-shape to (new Sphere init-with radius .1).
 		self enable-physics.
 		self reset.
 
