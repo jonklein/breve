@@ -68,13 +68,16 @@ Object : PushInterpreter (aka PushInterpreters) {
 		% evaluation will only run for the specified number of instructions.
 		% Otherwise, evaluation will run for the evaluation limit, which is 
 		% set with METHOD(set-evaluation-limit).
+		% <P>
+		% The method returns 0 if the interpreter completely executes the 
+		% program, or 1 if execution stopped due to the evaluation limit.
 
 		if steps == -1: steps = evaluationLimit.
 
-		pushRun(pushInterpreterPointer, (codeObject get-code-pointer), steps).
+		return pushRun(pushInterpreterPointer, (codeObject get-code-pointer), steps).
 
 	+ to step for-steps steps = 1 (int):
-		pushStep(pushInterpreterPointer, steps).
+		return pushStep(pushInterpreterPointer, steps).
 
 	+ to run-with-exec-stack-dump program codeObject (object) for-steps steps = -1 (int):
 		n (int).
