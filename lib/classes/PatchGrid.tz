@@ -97,7 +97,6 @@ Abstract : PatchGrid [version 2.2] {
 				zCount = 0.
 
 				while zCount < z: {
-					patchObjectAtIndex(grid, xCount, yCount, zCount) init-neighbors.
 					patchObjectAtIndex(grid, xCount, yCount, zCount) init-patch.
 					zCount += 1.
 				}

@@ -48,15 +48,6 @@ Abstract : Patch (aka Patches) [version 2.2] {
 		patchPointer (pointer).
 		grid (object).
 		xIndex, yIndex, zIndex (int).
-		plusXpatch, plusYpatch, plusZpatch (object).
-		minusXpatch, minusYpatch, minusZpatch (object).
-
-		plusXplusYpatch, minusXminusYpatch, minusXplusYpatch, plusXminusYpatch (object).
-		plusXplusZpatch, minusXminusZpatch, minusXplusZpatch, plusXminusZpatch (object).
-		plusYplusZpatch, minusYminusZpatch, minusYplusZpatch, plusYminusZpatch (object).
-
-		plusXplusYplusZpatch, plusXplusYminusZpatch, plusXminusYplusZpatch, plusXminusYminusZpatch (object).
-		minusXplusYplusZpatch, minusXplusYminusZpatch, minusXminusYplusZpatch, minusXminusYminusZpatch (object).
 
 	- to init-with grid-patch gp (object) x-pos x (int) y-pos y (int) z-pos z (int):
 		% Used internally by the grid patch system when setting up the 
@@ -102,52 +93,6 @@ Abstract : Patch (aka Patches) [version 2.2] {
 		% be initialized.
 
 	- to init-neighbors:
-		% Used internally by CLASS(PatchGrid) to initialize the neighbors of the patches.  
-
-		xsize, ysize, zsize (int).
-		plusX, minusX, plusY, minusY, plusZ, minusZ (int).
-
-		xsize = (grid get-x-count).
-		ysize = (grid get-y-count).
-		zsize = (grid get-z-count).
-
-		plusX = xIndex + 1.
-		plusY = yIndex + 1.
-		plusZ = zIndex + 1.
-		minusX = xIndex - 1.
-		minusY = yIndex - 1.
-		minusZ = zIndex - 1.
-
-		plusXpatch = (grid get-patch-at x plusX y yIndex z zIndex).
-		plusYpatch = (grid get-patch-at x xIndex y plusY z zIndex).
-		plusZpatch = (grid get-patch-at x xIndex y yIndex z plusZ).
-		minusXpatch = (grid get-patch-at x minusX y yIndex z zIndex).
-		minusYpatch = (grid get-patch-at x xIndex y minusY z zIndex).
-		minusZpatch = (grid get-patch-at x xIndex y yIndex z minusZ).
-
-		plusXplusYpatch = (grid get-patch-at x plusX y plusY z zIndex).
-		plusXminusYpatch = (grid get-patch-at x plusX y minusY z zIndex).
-		minusXminusYpatch = (grid get-patch-at x minusX y minusY z zIndex).
-		minusXplusYpatch = (grid get-patch-at x minusX y plusY z zIndex).
-
-		plusXplusZpatch = (grid get-patch-at x plusX y yIndex z plusZ).
-		plusXminusZpatch = (grid get-patch-at x plusX y yIndex z minusZ).
-		minusXminusZpatch = (grid get-patch-at x minusX y yIndex z minusZ).
-		minusXplusZpatch = (grid get-patch-at x minusX y yIndex z plusZ).
-
-		plusYplusZpatch = (grid get-patch-at x xIndex y plusY z plusZ).
-		plusYminusZpatch = (grid get-patch-at x xIndex y plusY z minusZ).
-		minusYminusZpatch = (grid get-patch-at x xIndex y minusY z minusZ).
-		minusYplusZpatch = (grid get-patch-at x xIndex y minusY z plusZ).
-
-		plusXplusYplusZpatch = (grid get-patch-at x plusX y plusY z plusZ).
-		plusXplusYminusZpatch = (grid get-patch-at x plusX y plusY z minusZ).
-		plusXminusYplusZpatch = (grid get-patch-at x plusX y minusY z plusZ).
-		plusXminusYminusZpatch = (grid get-patch-at x plusX y minusY z minusZ).
-		minusXplusYplusZpatch = (grid get-patch-at x minusX y plusY z plusZ).
-		minusXplusYminusZpatch = (grid get-patch-at x minusX y plusY z minusZ).
-		minusXminusYplusZpatch = (grid get-patch-at x minusX y minusY z plusZ).
-		minusXminusYminusZpatch = (grid get-patch-at x minusX y minusY z minusZ).
 
 	- to set-patch-pointer to p (pointer):
 		% Used internally when setting up the patches.  Do not call
@@ -270,119 +215,113 @@ Abstract : Patch (aka Patches) [version 2.2] {
 		% Assumes that the patches are being observed from an XZ-plane.
 		% Returns the patch towards (0, 0, -1). 
 		# (0, 0, -1)
-		return minusZpatch.
+		return (grid get-patch-at x xIndex y yIndex z (zIndex - 1) ).
 
 	+ to get-patch-to-south:
 		% Assumes that the patches are being observed from an XZ-plane.
 		% Returns the patch towards (0, 0, 1). 
 		# (0, 0, 1)
-		return plusZpatch.
+		return (grid get-patch-at x xIndex y yIndex z (zIndex + 1) ).
 
 	+ to get-patch-to-east:
 		% Assumes that the patches are being observed from an XZ-plane.
 		% Returns the patch towards (1, 0, 0). 
 		# (1, 0, 0)
-		return plusXpatch.
+		return (grid get-patch-at x (xIndex + 1) y yIndex z zIndex ).
 
 	+ to get-patch-to-west:
 		% Assumes that the patches are being observed from an XZ-plane.
 		% Returns the patch towards (-1, 0, 0). 
 		# (-1, 0, 0)
-		return minusXpatch.
+		return (grid get-patch-at x (xIndex - 1) y yIndex z zIndex ).
 
 	+ to get-patch-above:
 		% Returns the patch towards (0, 1, 0).
 		# (0, 1, 0)
-		return plusYpatch.
+		return (grid get-patch-at x xIndex y (yIndex + 1) z zIndex ).
 
 	+ to get-patch-below:
 		% Returns the patch towards (0, -1, 0).
 		# (0, -1, 0)
-		return minusYpatch.
+		return (grid get-patch-at x xIndex y (yIndex - 1) z zIndex ).
 
 	+ to get-patch-to-left:
 		% Returns the patch towards (-1, 0, 0).
 		# (-1, 0, 0)
-		return minusXpatch.
+		return (grid get-patch-at x (xIndex - 1) y yIndex z zIndex ).
 
 	+ to get-patch-to-right:
 		% Returns the patch towards (1, 0, 0).
 		# (1, 0, 0)
-		return plusXpatch.
+		return (grid get-patch-at x (xIndex + 1) y yIndex z zIndex ).
 
 	+ to get-patch-to-upper-left:
 		% Returns the patch towards (-1, 1, 0).
 		# (-1, 1, 0)
-		return minusXplusYpatch.
+		return (grid get-patch-at x (xIndex - 1) y (yIndex + 1) z zIndex).
 
 	+ to get-patch-to-lower-left:
 		% Returns the patch towards (-1, -1, 0).
 		# (-1, -1, 0)
-		return minusXminusYpatch.
+		return (grid get-patch-at x (xIndex - 1) y (yIndex - 1) z zIndex).
 
 	+ to get-patch-to-upper-right:
 		% Returns the patch towards (1, 1, 0).
 		# (1, 1, 0)
-		return plusXplusYpatch.
+		return (grid get-patch-at x (xIndex + 1) y (yIndex + 1) z zIndex).
 
 	+ to get-patch-to-lower-right:
 		% Returns the patch towards (1, -1, 0).
 		# (1, -1, 0)
-		return plusXminusYpatch.
+		return (grid get-patch-at x (xIndex + 1) y (yIndex - 1) z zIndex).
 
 	+ to get-patch-towards-plus-x:
 		% Returns the patch towards (1, 0, 0).
 		# (1, 0, 0)
-		return plusXpatch.
+		return (grid get-patch-at x (xIndex + 1) y yIndex z zIndex ).
 
 	+ to get-patch-towards-minus-x:
 		% Returns the patch towards (-1, 0, 0).
 		# (-1, 0, 0)
-		return minusXpatch.
+		return (grid get-patch-at x (xIndex - 1) y yIndex z zIndex ).
 
 	+ to get-patch-towards-plus-y:
 		% Returns the patch towards (0, 1, 0).
 		# (0, 1, 0)
-		return plusYpatch.
+		return (grid get-patch-at x xIndex y (yIndex + 1) z zIndex ).
 
 	+ to get-patch-towards-minus-y:
 		% Returns the patch towards (0, -1, 0).
 		# (0, -1, 0)
-		return minusYpatch.
+		return (grid get-patch-at x xIndex y (yIndex - 1) z zIndex ).
 
 	+ to get-patch-towards-plus-z:
 		% Returns the patch towards (0, 0, 1).
 		# (0, 0, 1)
-		return plusZpatch.
+		return (grid get-patch-at x xIndex y yIndex z (zIndex + 1) ).
 
 	+ to get-patch-towards-minus-z:
 		% Returns the patch towards (0, 0, -1).
 		# (0, 0, -1)
-		return minusZpatch.
+		return (grid get-patch-at x xIndex y yIndex z (zIndex - 1) ).
 
 	# THE X/Y NEIGHBORS
 
 	+ to get-patch-towards-minus-x-minus-y:
 		% returns the patch towards (-1, -1, 0)
-		return minusXminusYpatch.
+		return (grid get-patch-at x (xIndex - 1) y (yIndex - 1) z zIndex).
 
 	+ to get-patch-towards-minus-x-plus-y:
 		% returns the patch towards (-1, 1, 0)
-		return minusXplusYpatch.
+		return (grid get-patch-at x (xIndex - 1) y (yIndex + 1) z zIndex).
 
 	+ to get-patch-towards-plus-x-minus-y:
 		% returns the patch towards (1, -1, 0)
-		return plusXminusYpatch.
+		return (grid get-patch-at x (xIndex + 1) y (yIndex - 1) z zIndex).
 
 	+ to get-patch-towards-plus-x-plus-y:
 		% returns the patch towards (1, 1, 0)
-		return plusXplusYpatch.
-
-	# THE X/Z NEIGHBORS
-
-	# THE Y/Z NEIGHBORS
-
-	# THE DIAGONAL NEIGHBORS
+		return (grid get-patch-at x (xIndex + 1) y (yIndex + 1) z zIndex).
 
 	+ to get-description:
 		return "patch at indices ($xIndex, $yIndex, $zIndex)".
