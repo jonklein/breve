@@ -172,6 +172,8 @@ struct brEngine {
 	unsigned char useOSMesa;
 #endif 
 
+	slStack *gcStack;
+
 	int useMouse;
 	int mouseX;
 	int mouseY;
