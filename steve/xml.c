@@ -492,7 +492,8 @@ int stXMLPrintEval(FILE *file, char *name, brEval *target, int spaces) {
 			fprintf(file, "<pointer name=\"%s\"/>\n", name);
 			break;
 		case AT_INSTANCE:
-			i = BRINSTANCE(target)->userData;
+			if(BRINSTANCE(target)) i = BRINSTANCE(target)->userData;
+			else i = NULL;
 
 			if(i && i->status == AS_ACTIVE) index = i->index;
 			else index = -1;

@@ -229,7 +229,7 @@ class slSphere : public slShape {
 
 		double _radius;
 
-		void draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags);
+		void xdraw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags);
 
 		void bounds(slPosition *position, slVector *min, slVector *max);
 		int pointOnShape(slVector *dir, slVector *point);

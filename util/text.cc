@@ -285,7 +285,8 @@ char *slDequote(char *d) {
 */
 
 int slUtilRead(int socket, void *buffer, size_t size ) {
-	int n, readcount = 0; 
+	int n;
+	unsigned int readcount = 0; 
   
 	while(readcount < size) {
 		n = read(socket, (char*)buffer + readcount, size - readcount);
@@ -307,7 +308,7 @@ int slUtilWrite(int socket, const void *buffer, size_t size ) {
 	unsigned int writecount = 0; 
   
 	while(writecount < size) {
-		n = write(socket, buffer + writecount, size - writecount);
+		n = write(socket, (char*)buffer + writecount, size - writecount);
 		if(n < 1) return writecount;
   
 		writecount += n;

@@ -34,6 +34,7 @@ void breveInitPushFunctions(brNamespace *n);
 void breveInitPushCallbackFunctions(brNamespace *n);
 void breveInitSpringFunctions(brNamespace *n);
 void breveInitMatrixFunctions(brNamespace *n);
+void breveInitQGAMEFunctions(brNamespace *n);
 
 int brNewBreveCall(brNamespace *n, char *name, int (*call)(brEval *a, brEval *r, brInstance *i), int rtype, ...);
 

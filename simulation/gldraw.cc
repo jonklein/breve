@@ -153,7 +153,7 @@ void slCompileSphereDrawList(int l) {
 
 		gluQuadricTexture(quad, GL_TRUE);
 		gluQuadricOrientation(quad, GLU_OUTSIDE);
-		gluSphere(quad, 1.0, 6 + n * 3, 6 + n * 3);
+		gluSphere(quad, 100.0, 6 + n * 3, 6 + n * 3);
 
 		gluDeleteQuadric(quad);
 
@@ -1400,7 +1400,7 @@ void slRenderShape(slShape *s, int drawMode, double textureScale, int flags) {
 	if(s->_type == ST_SPHERE) {
 		double radius = ((slSphere*)s)->_radius;
 
-		if(radius < 10) divisions = 10;
+		if(radius < 20) divisions = 20;
 		else divisions = (int)radius;
 
 		quad = gluNewQuadric();

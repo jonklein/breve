@@ -24,7 +24,7 @@ slShape *slShapeNew() {
 	return new slShape;
 }
 
-void slSphere::draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags) {
+void slSphere::xdraw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags) {
 	unsigned char bound, axis;
 
 	bound = (mode & DM_BOUND) && !(flags & DO_NO_BOUND);
@@ -34,9 +34,9 @@ void slSphere::draw(slCamera *c, slPosition *pos, double textureScale, int mode,
 	glTranslated(pos->location.x, pos->location.y, pos->location.z);
 	slMatrixGLMult(pos->rotation);
 
-	glScalef(_radius, _radius, _radius);
+	glScalef(_radius / 100.0, _radius / 100.0, _radius / 100.0);
 
-	glCallList(c->sphereDrawLists + 2);
+	glCallList(c->sphereDrawLists + (SPHERE_RESOLUTIONS - 2));
 
 	if(bound || axis) {
 		glPushAttrib(GL_COLOR_BUFFER_BIT);

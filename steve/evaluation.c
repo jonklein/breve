@@ -735,6 +735,11 @@ inline int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) {
 		brEvalList *listStart = BRLIST(&obj)->start;
 
 		while(listStart) {
+			if(!BRINSTANCE(&listStart->eval)) {
+				stEvalError(i->type->engine, EE_NULL_INSTANCE, "method \"%s\" called with uninitialized object", mexp->methodName);
+				return EC_ERROR;
+			}
+
 			if(BRINSTANCE(&listStart->eval)->object->type != &gSteveData->steveObjectType) {
 				return stEvalForeignMethodCall(mexp, BRINSTANCE(&listStart->eval), i, t);
 			}

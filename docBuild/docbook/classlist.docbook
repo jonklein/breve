@@ -160,6 +160,14 @@
 <ulink url="../classes/PushProgramTransporter.html">PushProgramTransporter</ulink></para>
 </listitem>
 <listitem><para>
+<indexterm><primary>QProgram class</primary></indexterm>
+<ulink url="../classes/QProgram.html">QProgram</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>QSystem class</primary></indexterm>
+<ulink url="../classes/QSystem.html">QSystem</ulink></para>
+</listitem>
+<listitem><para>
 <indexterm><primary>Real class</primary></indexterm>
 <ulink url="../classes/Real.html">Real</ulink></para>
 </listitem>

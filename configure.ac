@@ -193,6 +193,8 @@ esac
 AC_LANG([C++])
 AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]),[-lstdc++])
 AC_CHECK_LIB([push], [pushEnvironmentNew],,,[-lstdc++])
+AC_CHECK_HEADER([qgame++.h])
+AC_CHECK_LIB([qgame++], [main])
 AC_LANG([C])
 
 AC_CHECK_LIB([OSMesa], [OSMesaCreateContext],,,$GLLIBS)

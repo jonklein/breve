@@ -1,0 +1,30 @@
+@use Object.
+
+Object : QSystem {
+	+ variables:
+		systemPointer (pointer).
+
+	+ to init:
+		systemPointer = qsysNew().
+
+	+ to test program theProgram (object) with-cases testCases (list):
+		% Runs a series of test cases, specified by testCases, on theProgram.
+
+		qsysTestProgram(systemPointer, (theProgram get-program-pointer), testCases, 0).
+}
+
+Object : QProgram {
+	+ variables:
+		programPointer (pointer).
+
+	+ to init:
+		programPointer = qprogramNew().
+
+	- to get-program-pointer:
+		return programPointer.
+
+	+ to add-instruction with-string instructionString (string): 
+		% Adds an instruction to the program parsed from instructionString.
+
+		qprogramAddInstruction(programPointer, instructionString).
+}

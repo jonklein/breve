@@ -60,6 +60,9 @@
 /* Define to 1 if you have the `gsl' library (-lgsl). */
 #undef HAVE_LIBGSL
 
+/* Define to 1 if you have the `gslblasnative' library (-lgslblasnative). */
+#undef HAVE_LIBGSLBLASNATIVE
+
 /* Define to 1 if you have the `gslcblas' library (-lgslcblas). */
 #undef HAVE_LIBGSLCBLAS
 
@@ -81,6 +84,9 @@
 /* Define to 1 if you have the `ode' library (-lode). */
 #undef HAVE_LIBODE
 
+/* Define to 1 if you have the `ogg' library (-logg). */
+#undef HAVE_LIBOGG
+
 /* Define to 1 if you have the `OSMesa' library (-lOSMesa). */
 #undef HAVE_LIBOSMESA
 
@@ -95,6 +101,9 @@
 
 /* Define to 1 if you have the `push' library (-lpush). */
 #undef HAVE_LIBPUSH
+
+/* Define to 1 if you have the `qgame++' library (-lqgame++). */
+#undef HAVE_LIBQGAME__
 
 /* Define to 1 if you have the `readline' library (-lreadline). */
 #undef HAVE_LIBREADLINE
@@ -113,9 +122,6 @@
 
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
-
-/* Define to 1 if you have the <malloc.h> header file. */
-#undef HAVE_MALLOC_H
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
@@ -195,6 +201,9 @@
 
 /* Define to 1 if you have the `vprintf' function. */
 #undef HAVE_VPRINTF
+
+/* Define to 1 if you have the <wctype.h> header file. */
+#undef HAVE_WCTYPE_H
 
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL

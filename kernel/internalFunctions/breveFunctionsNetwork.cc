@@ -218,7 +218,7 @@ brNetworkServer *brListenOnPort(int port, brEngine *engine) {
 void *brListenOnSocket(void *data) {
 	brNetworkServer *serverData = (brNetworkServer*)data;
 
-	int caddr_size = sizeof(struct sockaddr_in);
+	socklen_t caddr_size = sizeof(struct sockaddr_in);
 
 	while(!serverData->terminate) {
 		brNetworkClientData clientData;

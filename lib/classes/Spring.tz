@@ -26,21 +26,25 @@ Object : Spring (aka Springs) {
 		springPointer (pointer).
 		length, strength, damping (float).
 		mode (int).
+		link1, link2 (object).
 
-	+ to connect from link1 (object) to link2 (object) 
+	+ to connect from springLink1 (object) to springLink2 (object) 
 				from-point point1 = (0, 0, 0) (vector) 
 				to-point point2 = (0, 0, 0) (vector)
 				with-length springLength (float)
 				with-strength springStrength (float)
 				with-damping springDamping = 0.2 (float):
 
-		% Connects the spring from link1 to link2.  
+		% Connects the spring from springLink1 to springLink2.  
 		% <p>
 		% The optional arguments point1 and point2 specify the locations
 		% on the objects to which the springs are attached.  The default
 		% values are (0, 0, 0).
 
-		if link1 == link2: return.
+		if springLink1 == springLink2: return.
+
+		link1 = springLink1.
+		link2 = springLink2.
 
 		length = springLength.
 		strength = springStrength.
@@ -106,4 +110,9 @@ Object : Spring (aka Springs) {
 
 	+ to destroy: 
 		springRemove(springPointer).
+
+	+ to get-links:
+		% Returns a list with two items, the links which are joined by this spring.
+
+		return { link1, link2 }.
 }

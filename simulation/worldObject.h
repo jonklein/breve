@@ -9,8 +9,10 @@
 class slWorld;
 class slWorldObject;
 
-template <class T> class safe_ptr {
+template <class T> class handle_ptr {
 		T* ptr;
+
+		T** handle;
 	public:
 		explicit safe_ptr(T* p = 0) : ptr(p) {}
 		~safe_ptr()                 {delete ptr;}
