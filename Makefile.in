@@ -17,6 +17,7 @@ PLATFORM	= @PLATFORM@
 LPLATFORM	= $(shell echo ${PLATFORM} | tr '[A-Z]' '[a-z]')
 
 DMG_FILE	= breve_@VERSION@.dmg
+CLI_FOLDER	= breve_@VERSION@
 
 export
 
@@ -91,24 +92,24 @@ OSX_release: OSX_clean documentation OSX_build
 
 CLI_release:
 	make -f Makefile clean
-	rm -rf breve_$(LPLATFORM)
-	mkdir breve_$(LPLATFORM)
-	mkdir breve_$(LPLATFORM)/bin
-	mkdir breve_$(LPLATFORM)/lib
+	rm -rf $(CLI_FOLDER)
+	mkdir $(CLI_FOLDER)
+	mkdir $(CLI_FOLDER)/bin
+	mkdir $(CLI_FOLDER)/lib
 	make -f Makefile optimize
-	cp bin/breve@EXE_SUFFIX@ breve_$(LPLATFORM)/bin/breve
-	cp bin/breve_cli@EXE_SUFFIX@ breve_$(LPLATFORM)/bin/breve_cli
-	cp -r lib/classes breve_$(LPLATFORM)/lib/
-	cp -r docs breve_$(LPLATFORM)/
-	cp -r demos breve_$(LPLATFORM)/
-	mkdir breve_$(LPLATFORM)/plugins
-	cp -r plugins/samples plugins/slBrevePluginAPI.h plugins/README.txt breve_$(LPLATFORM)/plugins
-	rm -rf breve_$(LPLATFORM)/demos/Music
-	cp README.txt breve_$(LPLATFORM)/
-	cp Changes.html breve_$(LPLATFORM)/
-	find breve_$(LPLATFORM) -name CVS -prune -exec rm -rf {} \;
-	rm -f breve_@VERSION@.@ARCHIVE_SUFFIX@
-	@ARCHIVER@ breve_@VERSION@.@ARCHIVE_SUFFIX@ breve_$(LPLATFORM)
+	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin/breve
+	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin/breve_cli
+	cp -r lib/classes $(CLI_FOLDER)/lib/
+	cp -r docs $(CLI_FOLDER)/
+	cp -r demos $(CLI_FOLDER)/
+	mkdir $(CLI_FOLDER)/plugins
+	cp -r plugins/samples plugins/slBrevePluginAPI.h plugins/README.txt $(CLI_FOLDER)/plugins
+	rm -rf $(CLI_FOLDER)/demos/Music
+	cp README.txt $(CLI_FOLDER)/
+	cp Changes.html $(CLI_FOLDER)/
+	find $(CLI_FOLDER) -name CVS -prune -exec rm -rf {} \;
+	rm -f breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@
+	@ARCHIVER@ breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@ $(CLI_FOLDER)
 
 plugin_API:
 	-rm -rf breve_plugin_API

@@ -206,12 +206,7 @@ void *workerThread(void *data) {
 
 	while(1) {
 		if(!gPaused && !frontend->engine->drawEveryFrame) {
-			brEngineLock(frontend->engine);
-
    		 	r = brEngineIterate(frontend->engine);
-
-			brEngineUnlock(frontend->engine);
-
 			if(!r) brQuit(frontend->engine);
 		}
 
