@@ -55,6 +55,8 @@ fi
 AC_PROVIDE([$0])
 ])
 
+JAVALIBRARY="gcj"
+
 case "${host_os}" in
 	darwin*)
 		AUDIOLIBS="-framework vecLib -framework CoreAudio -framework AudioToolbox"
@@ -175,7 +177,7 @@ AC_CHECK_LIB([termcap], [tputs])
 AC_CHECK_LIB([ncurses], [tputs])
 AC_CHECK_LIB([history], [add_history])
 AC_CHECK_LIB([readline], [readline])
-AC_CHECK_LIB([java], [JNI_CreateJavaVM],,,$JAVALIBS)
+AC_CHECK_LIB($JAVALIBRARY, [JNI_CreateJavaVM],,,$JAVALIBS)
 AC_CHECK_LIB([gslcblas], [cblas_ccopy])
 AC_CHECK_LIB([gslblasnative], [gsl_blas_raw_dgemm])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc])
