@@ -116,8 +116,6 @@ int main(int argc, char **argv) {
 	frontend->engine->camera->enabled = CM_NOT_UPDATED;
 #endif
 
-	brJavaInit(frontend->engine);
-
 	text = slUtilReadFile(argv[1]);
 
 	if(!text) {

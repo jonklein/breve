@@ -5172,7 +5172,7 @@ if test "${ac_cv_lib_java_JNI_CreateJavaVM+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-ljava $JAVALIBS $LIBS"
+LIBS="-Xlinker -rpath /usr/java/j2sdk1.4.0_01/jre/lib/i386/client -Xlinker -rpath /usr/java/j2sdk1.4.0_01/jre/lib/i386 -ljava $JAVALIBS $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */

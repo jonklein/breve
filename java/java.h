@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <jni.h>
-
 #include "kernel.h"
 #include "util.h"
 
 #ifdef HAVE_LIBJAVA
+#include <jni.h>
+
 #define JAVA_MAX_ARGS	32
 
 #define JAVA_BRIDGE_CLASS_NAME	"JavaObject"
