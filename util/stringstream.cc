@@ -14,19 +14,19 @@
 slStringStream *slOpenStringStream() {
 	slStringStream *stream;
 	int fd;
-	char template[128];
+	char nameTemplate[128];
 
 #ifdef WINDOWS
 	// no mkstemp -- here's an inaqaduate solution!
-	sprintf(template, "breve_temp.%d", random() % 10000);
+	sprintf(nameTemplate, "breve_temp.%d", random() % 10000);
 #else 
-	sprintf(template, "/tmp/breve_temp.XXXXXX");
-	fd = mkstemp(template);
+	sprintf(nameTemplate, "/tmp/breve_temp.XXXXXX");
+	fd = mkstemp(nameTemplate);
 #endif
 
 	stream = slMalloc(sizeof(slStringStream));	
 	stream->fp = fdopen(fd, "w");
-	stream->filename = slStrdup(template);
+	stream->filename = slStrdup(nameTemplate);
 
 	return stream;
 }

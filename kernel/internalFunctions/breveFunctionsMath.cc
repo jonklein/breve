@@ -277,6 +277,39 @@ int brITranspose(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+/*!
+	\brief Gives the standard deviation of a list of numbers.
+	
+	double stddev(list).
+*/
+
+int brIStddev(brEval args[], brEval *target, brInstance *i) {
+	double sum = 0, sumsq = 0, top;
+	brEvalListHead *list = BRLIST(&args[0]);
+	brEvalList *start = list->start;
+	int n = 0;
+
+	while(start) {
+		if(start->eval.type != AT_DOUBLE) {
+			slMessage(DEBUG_ALL, "Internal function stddev expects a list of float values\n");
+			return EC_ERROR;
+		}
+
+		sum += BRDOUBLE(&start->eval);
+		sumsq += BRDOUBLE(&start->eval) * BRDOUBLE(&start->eval);
+		start = start->next;
+
+		n++;
+	}
+
+	sum /= n;
+	top = sumsq - (n * sum * sum);
+
+	BRDOUBLE(target) = sqrt(top / (double)(n - 1));
+
+	return EC_OK;
+}
+
 /*@}*/
 
 void breveInitMathFunctions(brNamespace *n) {
@@ -301,6 +334,8 @@ void breveInitMathFunctions(brNamespace *n) {
 	brNewBreveCall(n, "randomExponential", brIRandomExponential, AT_DOUBLE, 0);
 	brNewBreveCall(n, "randomGamma", brIRandomGamma, AT_DOUBLE, AT_INT, 0);
 	brNewBreveCall(n, "log", brILog, AT_DOUBLE, AT_DOUBLE, 0);
+
+	brNewBreveCall(n, "stddev", brIStddev, AT_LIST, AT_LIST, 0);
 }
 
 /*

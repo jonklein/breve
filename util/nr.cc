@@ -147,7 +147,6 @@ void slPseudoInverse(double m[3][3], double mi[3][3]) {
 }
 
 int slSvdcmp(double *a, int m, int n, double *w, double *v) {
-	extern double slPythag();
 	int flag, i, its, j, jj, k, l = 0, nm = 0;
 	double anorm, c, f, g, h, s, scale, x, y, zz, rv1[MAX_N];
 
