@@ -1,188 +1,190 @@
 @use Abstract.
 
 Abstract : Image (aka Images) [version 2.0] {
-	% The Image class provides an interface to work with images and 
-	% textures.  The individual pixels of the image can be read 
-	% or changed by the simulation as desired.
-	% <P>
-	% The image class can read rendered images from the screen using the 
-	% method METHOD(read-pixels), so that agents in the 3D world 
-	% can have access to real rendered data.  In addition, the method 
-	% METHOD(get-pixel-pointer) can be used to provide a pointer to the 
-	% RGBA pixel data so that plugins can access and analyze image data.
-	% This could be used, among other things, to implement agent vision.
+    % The Image class provides an interface to work with images and 
+    % textures.  The individual pixels of the image can be read 
+    % or changed by the simulation as desired.
+    % <P>
+    % The image class can read rendered images from the screen using the 
+    % method METHOD(read-pixels), so that agents in the 3D world 
+    % can have access to real rendered data.  In addition, the method 
+    % METHOD(get-pixel-pointer) can be used to provide a pointer to the 
+    % RGBA pixel data so that plugins can access and analyze image data.
+    % This could be used, among other things, to implement agent vision.
 
-	+ variables:
-		imageData (pointer).
-		textureNumber (int).
-		modified (int).
+    + variables:
+        imageData (pointer).
+        textureNumber (int).
+        modified (int).
 
-	+ to init:
-		textureNumber = -1.
+    + to init:
+        textureNumber = -1.
 
-	+ to iterate:
-		if modified: {
-			imageUpdateTexture(imageData).
-			modified = 0.
-		}
+    + to iterate:
+        if modified: {
+            imageUpdateTexture(imageData).
+            modified = 0.
+        }
 
   + section "Loading and creating Images"
-		
-	+ to load from imageFile (string):
-		% Loads an image from the file imageFile.
+        
+    + to load from imageFile (string):
+        % Loads an image from the file imageFile.
 
-		if imageData: imageDataFree(imageData).
+        if imageData: imageDataFree(imageData).
 
-		imageData = imageLoadFromFile(imageFile).
-		if !imageData: return 0.
+        imageData = imageLoadFromFile(imageFile).
+        if !imageData: return 0.
 
-		if textureNumber != -1: modified = 1.
+        if textureNumber != -1: modified = 1.
 
-		return self.
+        return self.
 
-	+ to init-with width imageWidth (int) height imageHeight (int):
-		% Creates an empty image buffer with width imageWidth
-		% and length imageLength.
+    + to init-with width imageWidth (int) height imageHeight (int):
+        % Creates an empty image buffer with width imageWidth
+        % and length imageLength.
 
-		if imageData: imageDataFree(imageData).
+        if imageData: imageDataFree(imageData).
 
-		imageData = imageDataInit(imageWidth, imageHeight).
+        imageData = imageDataInit(imageWidth, imageHeight).
 
-	- to destroy:
-		if imageData: imageDataFree(imageData).
+        return (self).
+        
+    - to destroy:
+        if imageData: imageDataFree(imageData).
 
-	- to get-image-data:
-		return imageData.
+    - to get-image-data:
+        return imageData.
 
   + section "Getting information about the size and format of an image"
 
-	+ to get-width:
-		% Returns the width of the image.  
+    + to get-width:
+        % Returns the width of the image.  
 
-		if !imageData: return 0.
-		return imageGetWidth(imageData).
+        if !imageData: return 0.
+        return imageGetWidth(imageData).
 
-	+ to get-height:
-		% Returns the width of the image.  
+    + to get-height:
+        % Returns the width of the image.  
 
-		return imageGetHeight(imageData).
+        return imageGetHeight(imageData).
 
   + section "Getting the value of pixels"
 
-	+ to get-red-pixel at-x x (int) at-y y (int):
-		% Returns the red pixel at the image coordinates (x, y).
-		% The pixel value is given on a scale from 0.0 to 1.0.
+    + to get-red-pixel at-x x (int) at-y y (int):
+        % Returns the red pixel at the image coordinates (x, y).
+        % The pixel value is given on a scale from 0.0 to 1.0.
 
-		return imageGetValueAtCoordinates(imageData, x * 4, y).
+        return imageGetValueAtCoordinates(imageData, x * 4, y).
 
-	+ to get-green-pixel at-x x (int) at-y y (int):
-		% Returns the green pixel at the image coordinates (x, y).
-		% The pixel value is given on a scale from 0.0 to 1.0.
+    + to get-green-pixel at-x x (int) at-y y (int):
+        % Returns the green pixel at the image coordinates (x, y).
+        % The pixel value is given on a scale from 0.0 to 1.0.
 
-		return imageGetValueAtCoordinates(imageData, (x * 4) + 1, y).
+        return imageGetValueAtCoordinates(imageData, (x * 4) + 1, y).
 
-	+ to get-blue-pixel at-x x (int) at-y y (int):
-		% Returns the blue pixel at the image coordinates (x, y).
-		% The pixel value is given on a scale from 0.0 to 1.0.
+    + to get-blue-pixel at-x x (int) at-y y (int):
+        % Returns the blue pixel at the image coordinates (x, y).
+        % The pixel value is given on a scale from 0.0 to 1.0.
 
-		return imageGetValueAtCoordinates(imageData, (x * 4) + 2, y).
+        return imageGetValueAtCoordinates(imageData, (x * 4) + 2, y).
 
-	+ to get-alpha-pixel at-x x (int) at-y y (int):
-		% Returns the alpha channel pixel at the image coordinates (x, y).
-		% The pixel value is given on a scale from 0.0 to 1.0.
+    + to get-alpha-pixel at-x x (int) at-y y (int):
+        % Returns the alpha channel pixel at the image coordinates (x, y).
+        % The pixel value is given on a scale from 0.0 to 1.0.
 
-		return imageGetValueAtCoordinates(imageData, (x * 4) + 3, y).
+        return imageGetValueAtCoordinates(imageData, (x * 4) + 3, y).
 
-	+ to get-rgb-pixel at-x x (int) at-y y (int):
-		% Returns the red, green and blue components of the pixel
-		% at image coordinates (x, y) as a vector.
+    + to get-rgb-pixel at-x x (int) at-y y (int):
+        % Returns the red, green and blue components of the pixel
+        % at image coordinates (x, y) as a vector.
 
-		r, g, b (double).
+        r, g, b (double).
 
-		r = imageGetValueAtCoordinates(imageData, x * 4, y).
-		g = imageGetValueAtCoordinates(imageData, (x * 4) + 1, y).
-		b = imageGetValueAtCoordinates(imageData, (x * 4) + 2, y).
+        r = imageGetValueAtCoordinates(imageData, x * 4, y).
+        g = imageGetValueAtCoordinates(imageData, (x * 4) + 1, y).
+        b = imageGetValueAtCoordinates(imageData, (x * 4) + 2, y).
 
-		return (r, g, b).
+        return (r, g, b).
 
   + section "Setting the value of pixels"
 
-	+ to set-red-pixel to redPixel (float) at-x x (int) at-y y (int):
-		% Sets the red pixel value at coordinates (x, y) to redPixel.
-		% redPixel should be a value between 0.0 and 1.0.
+    + to set-red-pixel to redPixel (float) at-x x (int) at-y y (int):
+        % Sets the red pixel value at coordinates (x, y) to redPixel.
+        % redPixel should be a value between 0.0 and 1.0.
 
-		modified = 1.
-		imageSetValueAtCoordinates(imageData, (x * 4), y, redPixel).
+        modified = 1.
+        imageSetValueAtCoordinates(imageData, (x * 4), y, redPixel).
 
-	+ to set-green-pixel to greenPixel (float) at-x x (int) at-y y (int):
-		% Sets the green pixel value at coordinates (x, y) to greenPixel.
-		% greenPixel should be a value between 0.0 and 1.0.
+    + to set-green-pixel to greenPixel (float) at-x x (int) at-y y (int):
+        % Sets the green pixel value at coordinates (x, y) to greenPixel.
+        % greenPixel should be a value between 0.0 and 1.0.
 
-		modified = 1.
-		imageSetValueAtCoordinates(imageData, (x * 4) + 1, y, greenPixel).
+        modified = 1.
+        imageSetValueAtCoordinates(imageData, (x * 4) + 1, y, greenPixel).
 
-	+ to set-blue-pixel to bluePixel (float) at-x x (int) at-y y (int):
-		% Sets the blue pixel value at coordinates (x, y) to bluePixel.
-		% bluePixel should be a value between 0.0 and 1.0.
+    + to set-blue-pixel to bluePixel (float) at-x x (int) at-y y (int):
+        % Sets the blue pixel value at coordinates (x, y) to bluePixel.
+        % bluePixel should be a value between 0.0 and 1.0.
 
-		modified = 1.
-		imageSetValueAtCoordinates(imageData, (x * 4) + 2, y, bluePixel).
+        modified = 1.
+        imageSetValueAtCoordinates(imageData, (x * 4) + 2, y, bluePixel).
 
-	+ to set-alpha-pixel to alphaPixel (float) at-x x (int) at-y y (int):
-		% Sets the alpha pixel value at coordinates (x, y) to alphaPixel.
-		% alphaPixel should be a value between 0.0 and 1.0.
+    + to set-alpha-pixel to alphaPixel (float) at-x x (int) at-y y (int):
+        % Sets the alpha pixel value at coordinates (x, y) to alphaPixel.
+        % alphaPixel should be a value between 0.0 and 1.0.
 
-		modified = 1.
-		imageSetValueAtCoordinates(imageData, (x * 4) + 3, y, alphaPixel).
+        modified = 1.
+        imageSetValueAtCoordinates(imageData, (x * 4) + 3, y, alphaPixel).
 
-	- to set-pixel to pixelVector (vector) at-x x (int) at-y y (int):
-		% Deprecated -- for compatibility only.
+    - to set-pixel to pixelVector (vector) at-x x (int) at-y y (int):
+        % Deprecated -- for compatibility only.
 
-		self set-red-pixel to pixelVector::x at-x x at-y y.
-		self set-green-pixel to pixelVector::y at-x x at-y y.
-		self set-blue-pixel to pixelVector::z at-x x at-y y.
-		
-	+ to set-rgb-pixel to pixelVector (vector) at-x x (int) at-y y (int):
-		% Sets the red, green and blue pixel values at image coordinates 
-		% (x, y) from the values in pixelVector.
+        self set-red-pixel to pixelVector::x at-x x at-y y.
+        self set-green-pixel to pixelVector::y at-x x at-y y.
+        self set-blue-pixel to pixelVector::z at-x x at-y y.
+        
+    + to set-rgb-pixel to pixelVector (vector) at-x x (int) at-y y (int):
+        % Sets the red, green and blue pixel values at image coordinates 
+        % (x, y) from the values in pixelVector.
 
-		self set-red-pixel to pixelVector::x at-x x at-y y.
-		self set-green-pixel to pixelVector::y at-x x at-y y.
-		self set-blue-pixel to pixelVector::z at-x x at-y y.
+        self set-red-pixel to pixelVector::x at-x x at-y y.
+        self set-green-pixel to pixelVector::y at-x x at-y y.
+        self set-blue-pixel to pixelVector::z at-x x at-y y.
 
   + section "Reading Pixels from the Screen"
 
-	+ to read-pixels at-x x (int) at-y y (int):
-		% Reads pixels into this Image from the rendered image on the 
-		% screen.  The resulting image can be written to a file or 
-		% analyzed if desired.  This is only supported in graphical
-		% versions of breve.
+    + to read-pixels at-x x (int) at-y y (int):
+        % Reads pixels into this Image from the rendered image on the 
+        % screen.  The resulting image can be written to a file or 
+        % analyzed if desired.  This is only supported in graphical
+        % versions of breve.
 
-		imageReadPixels(imageData, x, y).
+        imageReadPixels(imageData, x, y).
 
   + section "Getting a Pointer to Pixel Data"
 
-	+ to get-pixel-pointer:
-		% Returns a pointer to the pixels this image is holding in RGBA
-		% format.  The size of the buffer is 4 * height * width.  This 
-		% data is provided for plugin developers who wish to read or 
-		% write pixel data directly.  
+    + to get-pixel-pointer:
+        % Returns a pointer to the pixels this image is holding in RGBA
+        % format.  The size of the buffer is 4 * height * width.  This 
+        % data is provided for plugin developers who wish to read or 
+        % write pixel data directly.  
 
-		return imageGetPixelPointer(imageData).
+        return imageGetPixelPointer(imageData).
 
-	- to get-texture-number:
-		% Internal use only.
+    - to get-texture-number:
+        % Internal use only.
 
-		if textureNumber == -1: textureNumber = imageUpdateTexture(imageData).
+        if textureNumber == -1: textureNumber = imageUpdateTexture(imageData).
 
-		return textureNumber.
+        return textureNumber.
 
   + section "Writing an image to a file"
 
-	+ to write to imageFile (string):
-		% Write the image to imageFile.  The image is written as a 
-		% PNG file, so imageFile should end with .PNG.
+    + to write to imageFile (string):
+        % Write the image to imageFile.  The image is written as a 
+        % PNG file, so imageFile should end with .PNG.
 
-		imageWriteToFile(imageData, imageFile).
+        imageWriteToFile(imageData, imageFile).
 
 }
