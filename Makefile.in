@@ -52,6 +52,9 @@ bin/breve_cli@EXE_SUFFIX@: bin/breve_cli.o $(OBJ)
 bin/graphTest@EXE_SUFFIX@: graph/graphTest.o $(OBJ)
 	$(CXX) -o $@ $(LDFLAGS) $^ @LIBS@ @GLLIBS@ @AUDIOLIBS@
 
+breve.dll: $(OBJ)
+	$(CXX) -shared -o $@ @PLUGINIMP@ $^ @LIBS@ @GLLIBS@ @AUDIOLIBS@
+
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $< $(CPPFLAGS) 
 
@@ -72,10 +75,6 @@ optimize_debug:
 
 profile:
 	$(MAKE) EXTRACFLAGS='-pg -O3'
-
-breve.dll: $(OBJ)
-	$(DLLTOOL) --export-all-symbols -z breve.def -l breve.dll \
-		kernel/*.o util/*.o simulation/*.o
 
 lib/libbreve.a: $(OBJ)
 	$(AR) -cr $@ $(OBJ)
