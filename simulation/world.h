@@ -229,8 +229,10 @@ struct slWorld {
 	int backgroundTexture;
 	int isBackgroundImage;
 
+#ifdef HAVE_LIBENET
 	slNetsimData netsimData;
 	slNetsimClientData *netsimClient;
+#endif
 };
 
 slWorld *slWorldNew();

@@ -508,6 +508,7 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 }
 
 void slDrawNetsimBounds(slWorld *w) {
+#ifdef HAVE_LIBENET
 	int n;
 
 	if(!w->netsimData.remoteHosts) return;
@@ -546,6 +547,7 @@ void slDrawNetsimBounds(slWorld *w) {
 			glVertex3f(data->min.x, data->max.y, data->max.z);
 		glEnd();
 	}
+#endif
 }
 
 void slDrawWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor) {
@@ -1251,7 +1253,7 @@ void slShadowMatrix(GLfloat matrix[4][4], slPlane *p, slVector *light) {
 }
 
 /*!
-	\brief Draws a shape.
+	\brief Draws a shape by setting up its transformations and calling its drawlist.
 */
 
 void slDrawShape(slWorld *w, slCamera *c, slShape *s, slPosition *pos, slVector *color, int texture, int textureScale, int textureMode, int mode, int flags, float bbRot, float alpha) {
@@ -1383,6 +1385,10 @@ void slDrawShape(slWorld *w, slCamera *c, slShape *s, slPosition *pos, slVector 
 
 	glPopMatrix();
 }
+
+/*!
+	\brief Renders a stationary object.
+*/
 
 void slDrawStationary(slWorld *w, slStationary *s, slCamera *c, slVector *color, int texture, int textureScale, int textureMode, float alpha, int mode, int flags) {
 	slDrawShape(w, c, s->shape, &s->position, color, texture, textureScale, textureMode, mode, flags, 0, alpha);
@@ -1605,6 +1611,10 @@ void slComputeBillboardVectors(slWorld *w, slCamera *c) {
 	c->billboardZ.y = matrix[6];
 	c->billboardZ.z = matrix[10];
 }
+
+/*!
+	\brief Adds a billboard to the billboard list in preparation for sorting and rendering.
+*/
 
 void slProcessBillboard(slWorld *w, slCamera *c, slVector *color, slVector *loc, int bitmap, int textureMode, float size, float rotation, float alpha, unsigned char selected) {
 	GLfloat matrix[16];

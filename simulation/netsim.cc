@@ -1,3 +1,4 @@
+#ifdef HAVE_LIBENET
 #include <enet/enet.h>
 #include <pthread.h>
 #include "simulation.h"
@@ -221,3 +222,4 @@ __inline__ void slNetsimVectorsToBoundsMessage(slNetsimBoundsMessage *m, slVecto
 	m->maxY = max->y;
 	m->maxZ = max->z;
 }
+#endif

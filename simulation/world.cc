@@ -98,6 +98,7 @@ slWorld *slWorldNew() {
 */
 
 int slWorldStartNetsimServer(slWorld *w) {
+#ifdef HAVE_LIBENET
 	enet_initialize();
 
 	w->netsimData.isMaster = 1;
@@ -109,6 +110,10 @@ int slWorldStartNetsimServer(slWorld *w) {
 	if(!w->netsimData.server) return -1;
 
 	return 0;
+#else 
+	slMessage(DEBUG_ALL, "error: cannot start netsim server -- not compiled with enet support\n");
+	return -1;
+#endif
 }
 
 /*!
@@ -116,6 +121,7 @@ int slWorldStartNetsimServer(slWorld *w) {
 */
 
 int slWorldStartNetsimSlave(slWorld *w, char *host) {
+#ifdef HAS_LIBENET
 	enet_initialize();
 
 	w->netsimData.isMaster = 0;
@@ -128,6 +134,10 @@ int slWorldStartNetsimSlave(slWorld *w, char *host) {
 	if(!w->netsimData.server) return -1;
 
 	return 0;
+#else
+	slMessage(DEBUG_ALL, "error: cannot start netsim slave -- not compiled with enet support\n");
+	return -1;
+#endif
 }
 
 /*!  
@@ -408,6 +418,7 @@ double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 
 	w->age += total;
 
+#ifdef HAVE_LIBENET
 	if(w->netsimData.isMaster && (int)w->age >= lastSecond) {
 		lastSecond = w->age + 1;
 
@@ -430,6 +441,7 @@ double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 
 		slNetsimSendBoundsMessage(w->netsimClient, &min, &max);
 	}
+#endif
 
 	return total;
 }

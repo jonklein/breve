@@ -1,3 +1,5 @@
+
+#ifdef HAVE_LIBENET
 #include <enet/enet.h>
 
 #define NETSIM_MASTER_PORT	5529
@@ -9,20 +11,20 @@ enum {
 	MT_START
 } messageTypes;
 
-struct slNetsimData {
-	int isMaster;
-	slNetsimServerData *server;
-	slNetsimServerData *slave;
-
-	slStack *remoteHosts;
-};
-
 struct slNetsimRemoteHostData {
 	slVector min, max;
 	double simTime;
 	double syncTime;
 	double speedRatio;
 	ENetPeer *peer;
+};
+
+struct slNetsimData {
+	int isMaster;
+	slNetsimServerData *server;
+	slNetsimServerData *slave;
+
+	slStack *remoteHosts;
 };
 
 struct slNetsimServerData {
@@ -67,4 +69,4 @@ __inline__ void slNetsimVectorsToBoundsMessage(slNetsimBoundsMessage *m, slVecto
 
 int slNetsimBroadcastSyncMessage(slNetsimServerData *server, double time);
 int slNetsimSendBoundsMessage(slNetsimClientData *client, slVector *min, slVector *max);
-
+#endif
