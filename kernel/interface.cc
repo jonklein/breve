@@ -144,6 +144,20 @@ brInstance *brClickCallback(brEngine *e, int n) {
 	return o->userData;
 }
 
+void brBeginDrag(brEngine *e, brInstance *i) {
+	brEval result;
+	brMethodCallByName(e->controller, "get-drag-object", &result);
+	if(!BRINSTANCE(&result)) return;
+	brMethodCallByName(BRINSTANCE(&result), "suspend-physics", &result);
+}
+
+void brEndDrag(brEngine *e, brInstance *i) {
+	brEval result;
+	brMethodCallByName(e->controller, "get-drag-object", &result);
+	if(!BRINSTANCE(&result)) return;
+	brMethodCallByName(BRINSTANCE(&result), "resume-physics", &result);
+}
+
 /*!
 	\brief Handles a drag event.
 

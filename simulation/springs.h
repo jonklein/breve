@@ -1,7 +1,15 @@
+enum slSpringModes {
+	SM_NORMAL = 0,
+	SM_EXPAND_ONLY,
+	SM_CONTRACT_ONLY
+};
+
 struct slSpring {
-	double naturalLength;
-	double springConstant;
-	double dampingConstant;
+	double length;
+	double strength;
+	double damping;
+
+	unsigned char mode;
 
 	slLink *link1;
 	slLink *link2;

@@ -23,6 +23,7 @@ Control : PhysicalControl [version 1.8] {
         self full-gravity.
 
         self enable-lighting.
+		self enable-shadow-volumes.
 
         self point-camera at (0, 0, 0) from (0, 10, 30).
         self move-light to (0, 30, 15).

@@ -263,7 +263,7 @@ Object : PushGP {
 		}
 
 	- to compute-fitness for-program p (object):
-		n (int).
+		n, invalid (int).
 		errors (list).
 
 		for n=0, n < (self count-fitness-cases), n++: {
@@ -272,9 +272,12 @@ Object : PushGP {
 			self setup-fitness-test for-fitness-case n 
 				with-interpreter interpreter.
 
-			interpreter run code p.
-
-			push (self compute-error for-fitness-case n with-interpreter interpreter) onto errors.
+			if (interpreter run code p): {
+				# score for invalid programs.
+				return 100000000.
+			} else {
+				push (self compute-error for-fitness-case n with-interpreter interpreter) onto errors.
+			}
 		}
 
 		return (self compute-error-vector-fitness for-errors errors).
@@ -369,10 +372,6 @@ Object : PushGP {
 
 		while n < populationSize: {
 			p1 = (self run-tournament).
-			p1 = (self auto-simplify program p1).
-			p1 = (self auto-simplify program p1).
-			p1 = (self auto-simplify program p1).
-			p1 = (self auto-simplify program p1).
 			next{n} copy-from program p1.
 			n++.
 		}

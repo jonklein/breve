@@ -182,7 +182,8 @@ void slCompileCubeDrawList() {
 }
 
 /*!
-	\brief Returns the closest power of two which is greater than or equal to the input.
+	\brief Returns the closest power of two which is greater than or equal to 
+	the input.
 
 	Used to round up for non-power-of-two textures.
 */
@@ -735,6 +736,8 @@ void slDrawWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair
 		if(c->drawShadowVolumes) slRenderShadowVolume(w, c);
 		else if(c->drawShadow) slShadowPass(w, c);
 	}
+
+	slWorldDrawSprings(w);
 
 	if(labels) slRenderLabels(w);
 
@@ -1527,7 +1530,7 @@ void slRenderLines(slWorld *w, slCamera *c, int flags) {
 					line = lineList->data;
 
 					if(line->stipple) {
-						glLineStipple(1, line->stipple);
+						glLineStipple(2, line->stipple);
 						glEnable(GL_LINE_STIPPLE);
 					}
 

@@ -487,6 +487,8 @@ void slDemoDisplay() {
 }
 
 void slDemoMouse(int button, int state, int x, int y) {
+	gMods = glutGetModifiers();
+
 	if(state == GLUT_DOWN) { 
 		gLastX = x;
 		gLastY = y;
@@ -496,13 +498,17 @@ void slDemoMouse(int button, int state, int x, int y) {
 		brGLMainMenuUpdate(frontend->engine->controller);
 
 		gMotionCrosshair = 1;
+
+		if(gMods & GLUT_ACTIVE_SHIFT) brBeginDrag(frontend->engine, gSelected);
+
 	} else { 
 		gLastX = 0;
 		gLastY = 0;
 		gMotionCrosshair = 0;
+
+		brEndDrag(frontend->engine, gSelected);
 	}
 
-	gMods = glutGetModifiers();
 
 	slDemoDisplay();
 }

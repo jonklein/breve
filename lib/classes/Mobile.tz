@@ -23,6 +23,8 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 		archiveRvelocity (vector).
 		archiveAcceleration (vector).
 
+		physicsEnabled (int).
+
 	+ to init:
 		e = .2.
 		eT = .5.
@@ -82,16 +84,20 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 		% can no longer be assigned manually--it will be computed 
 		% from the forces applied to the object.
 
+		physicsEnabled = 1.
 		linkSetPhysics(linkPointer, 1).
 
 	+ to disable-physics:
 		% Disables the physical simulation for a OBJECT(Mobile) object.
-		% <p>
-		% Note that disabling physics for instances of the subclass 
-		% OBJECT(MultiBody) may produce unexpected results and is
-		% not recommended.
 
+		physicsEnabled = 0.
 		linkSetPhysics(linkPointer, 0).
+
+	- to suspend-physics:
+		linkSetPhysics(linkPointer, 0).
+
+	- to resume-physics:
+		linkSetPhysics(linkPointer, physicsEnabled).
 
 	+ to get-mass: 
 		% Returns the mass of the object.

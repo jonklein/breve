@@ -207,6 +207,10 @@ Object : MultiBody (aka MultiBodies) [version 2.0] {
 
 		free (self get-all-connected-objects).
 
+	- to suspend-physics:
+
+	- to resume-physics:
+
 	+ to dearchive:
 		self set-root to rootLink.
 

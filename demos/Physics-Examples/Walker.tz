@@ -58,7 +58,7 @@ PhysicalControl : Walker {
 
 		lockMenu, symMenu (object).
 
-		cloudTexture (int).
+		cloudTexture (object).
 
 	+ to init:
 		floorShape (object).
@@ -86,13 +86,13 @@ PhysicalControl : Walker {
 		floor catch-shadows.
 		floor set-color to (1.0, 1.0, 1.0).
 
-		cloudTexture = (self load-image from "images/clouds.png").
+		cloudTexture = (new Image load from "images/clouds.png").
 
 		self enable-shadow-volumes.
 		self enable-reflections.
 
 		self set-background-color to (.4, .6, .9).
-		self set-background-texture to cloudTexture.
+		self set-background-texture-image to cloudTexture.
 
 		# Create the Creature.
 

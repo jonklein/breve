@@ -20,7 +20,7 @@ Real : Stationary (aka Stationaries) [version 2.0] {
 
   + section "Setting Up the Stationary Object"
 
-    + to register with-shape theShape (object) at-location theLocation (vector):
+    + to register with-shape theShape (object) at-location theLocation = (0, 0, 0) (vector):
         % Registers a stationary object using shape theShape at the location
         % specified by theLocation.
 
