@@ -84,6 +84,32 @@ int brIGetTerrainHeight(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+int brIGetTerrainHeightAtLocation(brEval args[], brEval *target, brInstance *i) {
+	slTerrain *t = BRPOINTER(&args[0]);
+	double x = BRDOUBLE(&args[1]);
+	double y = BRDOUBLE(&args[2]);
+
+	if(!t) return EC_OK;
+
+	BRDOUBLE(target) = slTerrainGetHeightAtLocation(t, x, y);
+
+	return EC_OK;
+}
+
+int brIGetTerrainSlope(brEval args[], brEval *target, brInstance *i) {
+	slTerrain *t = BRPOINTER(&args[0]);
+	double x1 = BRDOUBLE(&args[1]);
+	double y1 = BRDOUBLE(&args[2]);
+	double x2 = BRDOUBLE(&args[3]);
+	double y2 = BRDOUBLE(&args[4]);
+
+	if(!t) return EC_OK;
+
+	slTerrainGetSlope(t, x1, y1, x2, y2, &BRVECTOR(target));
+
+	return EC_OK;
+}
+
 int brISetTerrainPosition(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t = BRPOINTER(&args[0]);
 
@@ -140,5 +166,7 @@ void breveInitTerrainFunctions(brNamespace *n) {
     brNewBreveCall(n, "setTerrainScale", brISetTerrainScale, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
     brNewBreveCall(n, "setTerrainHeight", brISetTerrainHeight, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_DOUBLE, 0);
     brNewBreveCall(n, "getTerrainHeight", brIGetTerrainHeight, AT_DOUBLE, AT_POINTER, AT_INT, AT_INT, 0);
+    brNewBreveCall(n, "getTerrainHeightAtLocation", brIGetTerrainHeightAtLocation, AT_DOUBLE, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0);
+    brNewBreveCall(n, "getTerrainSlope", brIGetTerrainSlope, AT_VECTOR, AT_POINTER, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0);
     brNewBreveCall(n, "loadGeoTIFF", brILoadGeoTIFF, AT_INT, AT_POINTER, AT_STRING, 0);
 }

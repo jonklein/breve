@@ -38,10 +38,6 @@ double gReflectionAlpha;
 
 int glActive = 0;
 
-void slDrawFog(slWorld *w, slCamera *c);
-
-void slMatrixGLMult(double m[3][3]);
-
 /*!
 	\brief Calls glMultMatrix with 3x3 orientation slMatrix.
 
@@ -149,38 +145,24 @@ void slInitGL(slWorld *w, slCamera *c) {
 void slCompileCubeDrawList(int l) {
 	glNewList(l, GL_COMPILE);
 
-	glBegin(GL_QUAD_STRIP);
-		// -x face 
+	// juh?
+
+	glBegin(GL_TRIANGLE_STRIP);
 		glVertex3f(0.0, 0.0, 0.0);
-		glVertex3f(0.0, 0.0, 1.0);
-		glVertex3f(0.0, 1.0, 0.0);
-		glVertex3f(0.0, 1.0, 1.0);
-
-		// +y face
-		glVertex3f(1.0, 1.0, 0.0);
-		glVertex3f(1.0, 1.0, 1.0);
-
-		// +x face 
 		glVertex3f(1.0, 0.0, 0.0);
-		glVertex3f(1.0, 0.0, 1.0);
-
-		// -y face 
-		glVertex3f(0.0, 0.0, 0.0);
-		glVertex3f(0.0, 0.0, 1.0);
-	glEnd();
-
-	glBegin(GL_QUADS);
-		// -z face
-		glVertex3f(0.0, 1.0, 0.0);
-		glVertex3f(1.0, 1.0, 0.0);
-		glVertex3f(1.0, 0.0, 0.0);
-		glVertex3f(0.0, 0.0, 0.0);
-
-		// +z face 
 		glVertex3f(0.0, 0.0, 1.0);
 		glVertex3f(1.0, 0.0, 1.0);
 		glVertex3f(1.0, 1.0, 1.0);
+		glVertex3f(1.0, 0.0, 0.0);
+		glVertex3f(1.0, 1.0, 0.0);
+		glVertex3f(0.0, 0.0, 0.0);
+		glVertex3f(0.0, 1.0, 0.0);
+		glVertex3f(0.0, 0.0, 1.0);
 		glVertex3f(0.0, 1.0, 1.0);
+		glVertex3f(1.0, 1.0, 1.0);
+		glVertex3f(0.0, 1.0, 0.0);
+		glVertex3f(1.0, 1.0, 0.0);
+
 	glEnd();
 
 	glEndList();
@@ -386,7 +368,6 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 	glLoadIdentity();
 
 	slVectorAdd(&c->location, t, &cam);
-
 	gluLookAt(cam.x, cam.y, cam.z, t->x, t->y, t->z, 0.0, 1.0, 0.0);
 
 	// get the data for gluUnProject
@@ -414,11 +395,9 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 	slVectorNormalize(&plane.normal);
 	slVectorCopy(dragVertex, &plane.vertex);
 
-	/* 
-		compute the distance 
-				1) from the camera to the object plane
-				2) from the zClip plane to the object plane
-	*/
+	//	compute the distance 
+	//		1) from the camera to the object plane
+	//		2) from the zClip plane to the object plane
 
 	sD = slPlaneDistance(&plane, &cam);
 	eD = slPlaneDistance(&plane, &end);
@@ -426,11 +405,9 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 	eD = fabs(eD);
 	sD = fabs(sD);
 
-	/* 
-		compute the vector from the camera to the end of the zClip plane.
-		this is the vector containing all of the candidate points that the
-		user is dragging--we need to figure out which one we're interested in
-	*/
+	// compute the vector from the camera to the end of the zClip plane.
+	// this is the vector containing all of the candidate points that the
+	// user is dragging--we need to figure out which one we're interested in
 
 	slVectorSub(&end, &cam, dragVector);
 
@@ -442,64 +419,12 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 	return 0;
 }
 
-/*!
-	\brief Draws the world into a buffer specified by r, g, b pixel buffers 
-
-	The r, g, b and temp buffers must be allocated to accomodate an image
-	of the correct size.  Used for rendering "visions".
-*/
-
-void slRenderWorldToBuffer(slWorld *w, slCamera *c, char *r, char *g, char *b, char *temp) {
-	slRenderWorld(w, c, 0, GL_RENDER, 0, 1);
-}
-
 void slRenderScene(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor) {
 	if(w->detectLightExposure) slDetectLightExposure(w, c, 200, NULL);
 
 	slRenderWorld(w, c, recompile, mode, crosshair, scissor);
 
 	if(w->cameras.size() != 0) slRenderWorldCameras(w);
-}
-
-void slDrawNetsimBounds(slWorld *w) {
-#ifdef HAVE_LIBENET
-	std::vector<slNetsimRemoteHostData*>::iterator hi;
-
-	for(hi = w->netsimData.remoteHosts.begin(); hi != w->netsimData.remoteHosts.end(); hi++ ) {
-		slNetsimRemoteHostData *data = *hi;
-
-		glEnable(GL_BLEND);
-		glColor4f(0.4, 0.0, 0.0, .3);
-
-		glBegin(GL_LINE_LOOP);
-			glVertex3f(data->min.x, data->min.y, data->min.z);
-			glVertex3f(data->max.x, data->min.y, data->min.z);
-			glVertex3f(data->max.x, data->max.y, data->min.z);
-			glVertex3f(data->min.x, data->max.y, data->min.z);
-		glEnd();
-
-		glBegin(GL_LINE_LOOP);
-			glVertex3f(data->min.x, data->min.y, data->max.z);
-			glVertex3f(data->min.x, data->max.y, data->max.z);
-			glVertex3f(data->max.x, data->max.y, data->max.z);
-			glVertex3f(data->max.x, data->min.y, data->max.z);
-		glEnd();
-
-		glBegin(GL_LINES);
-			glVertex3f(data->min.x, data->min.y, data->min.z);
-			glVertex3f(data->min.x, data->min.y, data->max.z);
-
-			glVertex3f(data->max.x, data->min.y, data->min.z);
-			glVertex3f(data->max.x, data->min.y, data->max.z);
-
-			glVertex3f(data->max.x, data->max.y, data->min.z);
-			glVertex3f(data->max.x, data->max.y, data->max.z);
-
-			glVertex3f(data->min.x, data->max.y, data->min.z);
-			glVertex3f(data->min.x, data->max.y, data->max.z);
-		glEnd();
-	}
-#endif
 }
 
 void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor) {
@@ -519,11 +444,8 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 
 	if(c->drawOutline) {
 		flags |= DO_OUTLINE;
-		glClearColor(1, 1, 1, 0);
 		flags |= DO_BILLBOARDS_AS_SPHERES;
-	} else {
-		glClearColor(w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 1.0);
-	}
+	} 
 
 	if(c->recompile) {
 		c->recompile = 0;
@@ -540,7 +462,7 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 
 	gluPerspective(40.0, c->fov, 0.01, c->zClip);
 
-	glEnable(GL_DEPTH_TEST);
+	// glEnable(GL_DEPTH_TEST);
 
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
@@ -550,16 +472,15 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 
 	gluLookAt(cam.x, cam.y, cam.z, c->target.x, c->target.y, c->target.z, 0.0, 1.0, 0.0);
 
-	slCameraUpdateFrustum(c);
+	// slCameraUpdateFrustum(c);
 
-	if(c->drawFog && !(flags & DO_NO_FOG)) slDrawFog(w, c);
+	if(c->drawFog) slDrawFog(w, c);
 	else glDisable(GL_FOG);
 
 	// do a pass through to grab all the billboards--we want to sort them 
 	// so that they can be rendered back to front and blended correctly
 
 	if(!(flags & DO_BILLBOARDS_AS_SPHERES)) {
-		slComputeBillboardVectors(w, c);
 		slProcessBillboards(w, c);
 	}
 
@@ -584,7 +505,6 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 		}
 	} else {
 		glDisable(GL_LIGHTING);
-		flags |= DO_NO_REFLECT;
 	}
 
 	slRenderObjects(w, c, 0, flags|DO_NO_LINK|DO_NO_TERRAIN);
@@ -626,7 +546,9 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 
 	slRenderLabels(w);
 
+#ifdef HAVE_LIBENET
 	slDrawNetsimBounds(w);
+#endif
 
 	if(w->gisData) w->gisData->draw(c);
 
@@ -677,6 +599,12 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 }
 
 void slClear(slWorld *w, slCamera *c) {
+	if(c->drawOutline) {
+		glClearColor(1, 1, 1, 0);
+	} else {
+		glClearColor(w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 1.0);
+	}
+
 	if(!c->blur) {
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 	} else {
@@ -939,10 +867,24 @@ void slRenderLabels(slWorld *w) {
 
 void slRenderBillboards(slCamera *c, int flags) {
 	slBillboardEntry *b;
-
+	GLfloat matrix[16];
 	int n;
 	int lastTexture = -1;
-	slVector normal;
+	slVector normal, billboardX, billboardY, billboardZ;
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+
+	billboardX.x = matrix[0];
+	billboardX.y = matrix[4];
+	billboardX.z = matrix[8];
+
+	billboardY.x = matrix[1];
+	billboardY.y = matrix[5];
+	billboardY.z = matrix[9];
+
+	billboardZ.x = matrix[2];
+	billboardZ.y = matrix[6];
+	billboardZ.z = matrix[10];
 
 	slVectorCopy(&c->location, &normal);
 	slVectorNormalize(&normal);
@@ -959,13 +901,13 @@ void slRenderBillboards(slCamera *c, int flags) {
 
 	glBegin(GL_TRIANGLE_STRIP);
 		glTexCoord2f(1.0, 1.0); 
-		glVertex3f(c->billboardX.x + c->billboardY.x, c->billboardX.y + c->billboardY.y, c->billboardX.z + c->billboardY.z);
+		glVertex3f(billboardX.x + billboardY.x, billboardX.y + billboardY.y, billboardX.z + billboardY.z);
 		glTexCoord2f(0.0, 1.0);
-		glVertex3f(-c->billboardX.x + c->billboardY.x, -c->billboardX.y + c->billboardY.y, -c->billboardX.z + c->billboardY.z);
+		glVertex3f(-billboardX.x + billboardY.x, -billboardX.y + billboardY.y, -billboardX.z + billboardY.z);
 		glTexCoord2f(1.0, 0.0); 
-		glVertex3f(c->billboardX.x - c->billboardY.x, c->billboardX.y - c->billboardY.y, c->billboardX.z - c->billboardY.z);
+		glVertex3f(billboardX.x - billboardY.x, billboardX.y - billboardY.y, billboardX.z - billboardY.z);
 		glTexCoord2f(0.0, 0.0);
-		glVertex3f(-c->billboardX.x - c->billboardY.x, -c->billboardX.y - c->billboardY.y, -c->billboardX.z - c->billboardY.z);
+		glVertex3f(-billboardX.x - billboardY.x, -billboardX.y - billboardY.y, -billboardX.z - billboardY.z);
 	glEnd();
 
 	glEndList();
@@ -1018,10 +960,10 @@ void slRenderBillboards(slCamera *c, int flags) {
 			glScalef(1.1, 1.1, 1.1);
 			glColor4f(0.0, 0.0, 0.0, 1.0);
 			glBegin(GL_LINE_LOOP);
-				glVertex3f(c->billboardX.x + c->billboardY.x, c->billboardX.y + c->billboardY.y, c->billboardX.z + c->billboardY.z);
-				glVertex3f(-c->billboardX.x + c->billboardY.x, -c->billboardX.y + c->billboardY.y, -c->billboardX.z + c->billboardY.z);
-				glVertex3f(-c->billboardX.x - c->billboardY.x, -c->billboardX.y - c->billboardY.y, -c->billboardX.z - c->billboardY.z);
-				glVertex3f(c->billboardX.x - c->billboardY.x, c->billboardX.y - c->billboardY.y, c->billboardX.z - c->billboardY.z);
+				glVertex3f(billboardX.x + billboardY.x, billboardX.y + billboardY.y, billboardX.z + billboardY.z);
+				glVertex3f(-billboardX.x + billboardY.x, -billboardX.y + billboardY.y, -billboardX.z + billboardY.z);
+				glVertex3f(-billboardX.x - billboardY.x, -billboardX.y - billboardY.y, -billboardX.z - billboardY.z);
+				glVertex3f(billboardX.x - billboardY.x, billboardX.y - billboardY.y, billboardX.z - billboardY.z);
 			glEnd();
 			glPopMatrix();
 			if(!(flags & DO_NO_TEXTURE)) glEnable(GL_TEXTURE_2D);
@@ -1424,34 +1366,6 @@ int slCompileShape(slShape *s, int drawMode, double textureScale, int flags) {
 
 	return s->drawList;
 }
-
-/*!
-	\brief Initializes the x-, y- and z- axes from the camera's perspective,
-	which are used to render the billboards.
-*/
-
-void slComputeBillboardVectors(slWorld *w, slCamera *c) {
-	GLfloat matrix[16];
-
-	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-
-	c->billboardX.x = matrix[0];
-	c->billboardX.y = matrix[4];
-	c->billboardX.z = matrix[8];
-
-	c->billboardY.x = matrix[1];
-	c->billboardY.y = matrix[5];
-	c->billboardY.z = matrix[9];
-
-	c->billboardZ.x = matrix[2];
-	c->billboardZ.y = matrix[6];
-	c->billboardZ.z = matrix[10];
-}
-
-/*!
-	\brief Adds a billboard to the billboard list in preparation for sorting and rendering.
-*/
-
 
 /*!
 	\brief Render a shape.

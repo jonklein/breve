@@ -29,30 +29,23 @@ enum drawOptions {
     DO_NO_LINK					= 0x000002,
     DO_NO_TERRAIN				= 0x000004,
 
-    /* effects */
+    // effects 
 
-    DO_NO_LIGHTING 				= 0x000008,
-    DO_NO_TEXTURE 				= 0x000010,
-    DO_NO_BOUND					= 0x000020,
-    DO_NO_AXIS					= 0x000040,
-    DO_NO_COLOR					= 0x000080,
-    DO_NO_STENCIL				= 0x000100,
-    DO_NO_REFLECT				= 0x000200,
-    DO_NO_BILLBOARD				= 0x000400,
-    DO_ONLY_BILLBOARD			= 0x000800,
-    DO_PROCESS_BILLBOARD		= 0x001000,
-    DO_ONLY_MULTIBODIES			= 0x002000,
-    DO_BILLBOARDS_AS_SPHERES	= 0x004000,
-    DO_NO_NEIGHBOR_LINES		= 0x008000,    
-    DO_OUTLINE					= 0x010000,
-    DO_SHADOW_VOLUME			= 0x020000,
-    DO_NO_FOG					= 0x040000,
-    DO_NO_ALPHA					= 0x080000,
-    DO_ONLY_ALPHA				= 0x100000,
+    DO_NO_TEXTURE 				= 0x000008,
+    DO_NO_BOUND					= 0x000010,
+    DO_NO_AXIS					= 0x000020,
+    DO_NO_COLOR					= 0x000040,
+    DO_NO_BILLBOARD				= 0x000080,
+    DO_ONLY_MULTIBODIES			= 0x000100,
+    DO_BILLBOARDS_AS_SPHERES	= 0x000200,
+    DO_NO_NEIGHBOR_LINES		= 0x000400,    
+    DO_OUTLINE					= 0x000800,
+    DO_NO_ALPHA					= 0x001000,
+    DO_ONLY_ALPHA				= 0x002000,
 
-    /* recompile flag */
+    // recompile flag 
 
-    DO_RECOMPILE				= 0x200000
+    DO_RECOMPILE				= 0x004000
 };
 
 #ifdef __cplusplus 
@@ -70,6 +63,10 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y);
 #ifdef __cplusplus 
 }
 #endif
+
+void slDrawFog(slWorld *w, slCamera *c);
+
+void slMatrixGLMult(double m[3][3]);
 
 void slCompileCubeDrawList(int l);
 
@@ -100,7 +97,6 @@ void slDrawShape(slCamera *c, slShape *s, slPosition *pos, double textureScale, 
 int slCompileShape(slShape *s, int drawMode, double textureScale, int flags);
 void slRenderShape(slShape *s, int drawMode, double textureScale, int flags);
 void slDrawAxis(double x, double y);
-void slComputeBillboardVectors(slWorld *w, slCamera *c);
 
 void slProcessBillboards(slWorld *w, slCamera *c);
 void slRenderBillboards(slCamera *c, int flags);
@@ -122,5 +118,3 @@ void slDeleteMbGLLists(slMultibody *m);
 void slTransposeGLMatrix(GLfloat *m);
 
 void slClear(slWorld *w, slCamera *c);
-
-void slDrawNetsimBounds(slWorld *w);

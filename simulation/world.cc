@@ -141,7 +141,7 @@ int slWorldStartNetsimSlave(slWorld *w, char *host) {
 
 	w->netsimData.isMaster = 0;
 
-	w->netsimData.server = slNetsimCreateClient(w);
+	w->netsimData.server = new slNetsimServerData(w);
 	w->netsimClient = slNetsimOpenConnection(w->netsimData.server->host, host, NETSIM_MASTER_PORT);
 	slNetsimStartServer(w->netsimData.server);
 

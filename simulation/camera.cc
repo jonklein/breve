@@ -272,6 +272,8 @@ void slUpdateCamera(slCamera *c) {
 	// apply the zoom
 	
 	slVectorMul(&c->location, c->zoom, &c->location);
+
+	slCameraUpdateFrustum(c);
 }
 
 /*!

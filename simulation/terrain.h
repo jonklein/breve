@@ -249,6 +249,8 @@ void slTerrainSetBottomColor(slTerrain *t, slVector *color);
 
 double slTerrainGetHeightAtLocation(slTerrain *t, double x, double z);
 
+void slTerrainGetSlope(slTerrain *t, double x1, double z1, double x2, double z2, slVector *result);
+
 int slTerrainLoadGeoTIFF(slTerrain *t, char *file);
 
 

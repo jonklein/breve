@@ -8,32 +8,38 @@
 #define NETSIM_MASTER_PORT	5529
 #define NETSIM_SLAVE_PORT	5732
 
-struct slNetsimRemoteHostData {
-	slVector min, max;
-	double simTime;
-	double syncTime;
-	double speedRatio;
-	ENetPeer *peer;
+class slNetsimRemoteHostData {
+	public:
+		slVector min, max;
+		double simTime;
+		double syncTime;
+		double speedRatio;
+		ENetPeer *peer;
 };
 
-struct slNetsimData {
-	int isMaster;
-	slNetsimServerData *server;
-	slNetsimServerData *slave;
+class slNetsimData {
+	public:
+		int isMaster;
+		slNetsimServerData *server;
+		slNetsimServerData *slave;
 
-	std::vector<slNetsimRemoteHostData*> remoteHosts;
+		std::vector<slNetsimRemoteHostData*> remoteHosts;
 };
 
-struct slNetsimServerData {
-	ENetHost *host;
-	slWorld *world;
-	int terminate;
+class slNetsimServerData {
+	public:
+		slNetsimServerData(slWorld *w);
+
+		ENetHost *host;
+		slWorld *world;
+		int terminate;
 };
 
-struct slNetsimClientData {
-	ENetHost *host;
-	ENetPeer *peer;
-	int terminate;
+class slNetsimClientData {
+	public:
+		ENetHost *host;
+		ENetPeer *peer;
+		int terminate;
 };
 
 struct slNetsimBoundsMessage {
@@ -66,5 +72,8 @@ __inline__ void slNetsimVectorsToBoundsMessage(slNetsimBoundsMessage *m, slVecto
 
 int slNetsimBroadcastSyncMessage(slNetsimServerData *server, double time);
 int slNetsimSendBoundsMessage(slNetsimClientData *client, slVector *min, slVector *max);
+
+void slDrawNetsimBounds(slWorld *w);
+
 #endif
 #endif

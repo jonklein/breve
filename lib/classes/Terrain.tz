@@ -52,8 +52,12 @@ Real : Terrain {
 
 		return getTerrainHeight(realWorldPointer, xCoordinate, yCoordinate).
 
-	+ to get-real-height:
-		% ...
+	+ to get-height-in-world at-x xCoordinate (double) at-z zCoordinate (double):
+		% This method returns the height of the terrain at the <b>real world</b> 
+		% (xCoordinate, zCoodinate) location.  This is in contrast to the height
+		% in terrain grid coordinates given give with METHOD(get-height)
+
+		return getTerrainHeightAtLocation(realWorldPointer, xCoordinate, zCoordinate).
 
 	+ to set-peak-color to color (vector):
 		% Sets the color of the highest regions of the terrain to color.

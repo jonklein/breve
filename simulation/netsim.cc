@@ -15,26 +15,16 @@ enum {
 	\brief Starts the net simulation server.
 */
 
-slNetsimServerData *slNetsimCreateClient(slWorld *world) {
-	slNetsimServerData *data;
-
-	data = new slNetsimServerData;
-
-	data->world = world;
-
-	data->host = enet_host_create(NULL, 32, 0, 0);
-
-
-	return data;
+slNetsimServerData::slNetsimServerData(slWorld *w) {
+	world = w;
+	host = enet_host_create(NULL, 32, 0, 0);
 }
 
 slNetsimServerData *slNetsimCreateServer(slWorld *world) {
 	slNetsimServerData *data;
 	ENetAddress address;
 
-	data = new slNetsimServerData;
-
-	data->world = world;
+	data = new slNetsimServerData( world);
 
 	address.host = ENET_HOST_ANY;
 	address.port = NETSIM_MASTER_PORT;
@@ -229,5 +219,44 @@ __inline__ void slNetsimVectorsToBoundsMessage(slNetsimBoundsMessage *m, slVecto
 	m->maxX = max->x;
 	m->maxY = max->y;
 	m->maxZ = max->z;
+}
+
+void slDrawNetsimBounds(slWorld *w) {
+	std::vector<slNetsimRemoteHostData*>::iterator hi;
+
+	for(hi = w->netsimData.remoteHosts.begin(); hi != w->netsimData.remoteHosts.end(); hi++ ) {
+		slNetsimRemoteHostData *data = *hi;
+
+		glEnable(GL_BLEND);
+		glColor4f(0.4, 0.0, 0.0, .3);
+
+		glBegin(GL_LINE_LOOP);
+			glVertex3f(data->min.x, data->min.y, data->min.z);
+			glVertex3f(data->max.x, data->min.y, data->min.z);
+			glVertex3f(data->max.x, data->max.y, data->min.z);
+			glVertex3f(data->min.x, data->max.y, data->min.z);
+		glEnd();
+
+		glBegin(GL_LINE_LOOP);
+			glVertex3f(data->min.x, data->min.y, data->max.z);
+			glVertex3f(data->min.x, data->max.y, data->max.z);
+			glVertex3f(data->max.x, data->max.y, data->max.z);
+			glVertex3f(data->max.x, data->min.y, data->max.z);
+		glEnd();
+
+		glBegin(GL_LINES);
+			glVertex3f(data->min.x, data->min.y, data->min.z);
+			glVertex3f(data->min.x, data->min.y, data->max.z);
+
+			glVertex3f(data->max.x, data->min.y, data->min.z);
+			glVertex3f(data->max.x, data->min.y, data->max.z);
+
+			glVertex3f(data->max.x, data->max.y, data->min.z);
+			glVertex3f(data->max.x, data->max.y, data->max.z);
+
+			glVertex3f(data->min.x, data->max.y, data->min.z);
+			glVertex3f(data->min.x, data->max.y, data->max.z);
+		glEnd();
+	}
 }
 #endif

@@ -46,12 +46,14 @@ struct slLight {
 	\brief A string of text printed to the GL view.
 */
 
-struct slCameraText {
-	char *text;
-	float x;
-	float y;
-	slVector color;
-	unsigned char size;
+#ifdef __cplusplus
+class slCameraText {
+	public:
+		char *text;
+		float x;
+		float y;
+		slVector color;
+		unsigned char size;
 };
 
 /*!
@@ -65,7 +67,6 @@ struct slCameraText {
 	to front and then finally draw them.
 */
 
-#ifdef __cplusplus
 struct slBillboardEntry {
 	float size;
 	float z;
@@ -106,10 +107,6 @@ struct slCamera {
 	int billboardCount;
 	int maxBillboards;
 	int billboardDrawList;
-
-	slVector billboardX;
-	slVector billboardY;
-	slVector billboardZ;
 
 	int cubeDrawList;
 

@@ -116,12 +116,12 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 
 		linkSetLocation(linkPointer, newLocation).
 
-	+ to set-rotation to r (matrix):
-		% Sets the rotation of this object to the rotation matrix r.
+	+ to set-rotation to theRotation (matrix):
+		% Sets the rotation of this object to the rotation matrix theRotation.
 		% Working with matrices can be complicated, so a more simple
 		% approach is to use METHOD(rotate).
 
-		linkSetRotationMatrix(linkPointer, r).
+		linkSetRotationMatrix(linkPointer, theRotation).
 
 	+ to rotate around-axis thisAxis (vector) by amount (float):
 		% Sets the rotation of this object around vector axis thisAxis 

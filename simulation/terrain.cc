@@ -1212,3 +1212,6 @@ double slTerrainGetHeightAtLocation(slTerrain *t, double x, double z) {
 
 	return t->matrix[xoff][zoff];
 }
+
+void slTerrainGetSlope(slTerrain *t, double x1, double z1, double x2, double z2, slVector *result) {
+}
