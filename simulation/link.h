@@ -46,8 +46,9 @@ struct slLinkIntegrationPosition {
 	linked bodies called multibodies.
 */
 
+#ifdef __cplusplus
 struct slLink {
-	slMultibody *mb;
+	slMultibody *multibody;
 
 	slsVector acceleration;
 	slsVector velocity;
@@ -89,7 +90,11 @@ struct slLink {
 
 	void *callbackData;
 };
+#endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 slLink *slLinkNew(slWorld *w);
 void slLinkSetShape(slLink *l, slShape *s);
 
@@ -123,3 +128,25 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child,
 
 void slVelocityAtPoint(slVector *vel, slVector *avel, slVector *atPoint, slVector *d);
 
+void slLinkGetAcceleration(slLink *l, slVector *linear, slVector *rotational);
+void slLinkSetAcceleration(slLink *m, slVector *linear, slVector *rotational);
+
+void slLinkGetVelocity(slLink *m, slVector *velocity, slVector *rotational);
+void slLinkSetVelocity(slLink *m, slVector *velocity, slVector *rotational);
+
+void slLinkSetCallbackData(slLink *l, void *callbackData);
+void *slLinkGetCallbackData(slLink *l);
+
+slPosition *slLinkGetPosition(slLink *l);
+
+slMultibody *slLinkGetMultibody(slLink *l);
+
+void slLinkSetTexture(slLink *l, int texture);
+
+void slLinkGetBounds(slLink *l, slVector *min, slVector *max);
+
+void slLinkSetForce(slLink *l, slVector *force);
+
+#ifdef __cplusplus
+}
+#endif

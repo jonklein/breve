@@ -45,6 +45,13 @@ struct brNetworkClientData {
 /*! \addtogroup InternalFunctions */
 /*@{*/
 
+int brINetworkSetRecipient(brEval args[], brEval *target, brInstance *i) {
+	brNetworkServerData *data = BRPOINTER(&args[0]);
+	data->recipient = BRINSTANCE(&args[1]);
+
+	return EC_OK;
+}
+
 /*!
 	\brief Shuts down a network server.
 
@@ -127,6 +134,7 @@ int brIListenOnPort(brEval args[], brEval *target, brInstance *i) {
 
 void breveInitNetworkFunctions(brNamespace *n) {
 	brNewBreveCall(n, "listenOnPort", brIListenOnPort, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "networkSetRecipient", brINetworkSetRecipient, AT_NULL, AT_POINTER, AT_INSTANCE, 0);
 	brNewBreveCall(n, "getServerURL", brIGetServerURL, AT_STRING, AT_POINTER, 0);
 	brNewBreveCall(n, "closeServer", brICloseServer, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "setIndexPage", brISetIndexPage, AT_NULL, AT_POINTER, AT_STRING, 0);
@@ -198,6 +206,7 @@ brNetworkServerData *brListenOnPort(int port, brEngine *engine) {
 
 	serverData->index = NULL;
 	serverData->engine = engine;
+	serverData->recipient = engine->controller;
 	serverData->port = port;
 	serverData->socket = ssock;
 	serverData->terminate = 0;
@@ -243,6 +252,7 @@ void *brHandleConnection(void *p) {
 	char *hostname, *buffer;
 	brStringHeader header;
 	int length, count;
+	brMethod *method;
 	brEval eval[2], result, *args[2];
   
 	hostname = brHostnameFromAddr(&data->addr.sin_addr);
@@ -299,7 +309,12 @@ void *brHandleConnection(void *p) {
 			BRSTRING(&eval[1]) = hostname;
 			eval[1].type = AT_STRING;
 
-			brMethodCallByNameWithArgs(data->engine->controller, "accept-upload", args, 2, &result);
+			method = brMethodFindWithArgRange(data->server->recipient->object, "accept-upload", NULL, 0, 2);
+
+			if(method) {
+				brMethodCall(data->server->recipient, method, args, &result);
+				brMethodFree(method);	
+			}
 
 			slFree(buffer);
 

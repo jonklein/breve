@@ -45,22 +45,22 @@ void slMultibodySetLabel(slMultibody *m, char *label) {
 
 void slMultibodyInitCollisionFlags(slMultibody *m, slPairEntry **pe) {
 	unsigned int x;
-	slList *links1, *links2;
 	slLink *link1, *link2;
 	slPairEntry *e;
+	std::vector<slLink*>::iterator i1;
+	std::vector<slLink*>::iterator i2;
 
-	links1 = m->linkList;
+	i1 = m->links.begin();
+	i2 = m->links.begin();
 
-	while(links1) {
-		link1 = links1->data;
-
-		links2 = m->linkList;
+	for(i1 = m->links.begin(); i1 != m->links.end(); i1++) {
+		link1 = *i1;
 
 		// set all check flags on or off, depending on whether self collision
 		// are handled or not.
 
-		while(links2) {
-			link2 = links2->data;
+		for(i2 = m->links.begin(); i2 != m->links.end(); i2++) {
+			link2 = *i2;
 
 			if(link1 != link2) {
 				e = slVclipPairEntry(pe, link1->clipNumber, link2->clipNumber);
@@ -68,8 +68,6 @@ void slMultibodyInitCollisionFlags(slMultibody *m, slPairEntry **pe) {
 				if(m->handleSelfCollisions) e->flags |= BT_CHECK;
 				else if(e->flags & BT_CHECK) e->flags ^= BT_CHECK;
 			}
-
-			links2 = links2->next;
 		}
 
 		// then prune out all adjacent pairs.
@@ -83,8 +81,6 @@ void slMultibodyInitCollisionFlags(slMultibody *m, slPairEntry **pe) {
 				if(e->flags & BT_CHECK) e->flags ^= BT_CHECK;
 			}
 		}
-
-		links1 = links1->next;
 	}
 }
 
@@ -136,29 +132,29 @@ void slMultibodyRotAngleToMatrix(slVector *axis, double r, double rot[3][3]) {
 */
 
 void slMultibodyRotate(slMultibody *mb, double rotation[3][3]) {
-	slList *links = mb->linkList;
-	slLink *m;
+	slLink *link;
 	slVector toLink, newToLink;
 	double newRot[3][3];
 	dQuaternion Q;
 	slQuat q;
+	std::vector<slLink*>::iterator i1;
 
-	while(links) {
+	for(i1 = mb->links.begin(); i1 != mb->links.end(); i1++) {	
+		link = *i1;
+
 		// first, since the whole body is making this rotation, 
 		// our location will be changed.  we have to compute 
 		// the new position based on the rotation angle and our
 		// location relative to the root link.
 
-		m = links->data;
-
-		slVectorSub(&m->position.location, &mb->root->position.location, &toLink);
+		slVectorSub(&link->position.location, &mb->root->position.location, &toLink);
 		slVectorXform(rotation, &toLink, &newToLink);
 		slVectorAdd(&newToLink, &mb->root->position.location, &newToLink);
-		dBodySetPosition(m->odeBodyID, newToLink.x, newToLink.y, newToLink.z);
+		dBodySetPosition(link->odeBodyID, newToLink.x, newToLink.y, newToLink.z);
 	
-		slMatrixMulMatrix(rotation, m->position.rotation, newRot);
+		slMatrixMulMatrix(rotation, link->position.rotation, newRot);
 
-		slMatrixCopy(newRot, m->position.rotation);
+		slMatrixCopy(newRot, link->position.rotation);
 
 		// update the ODE state
 
@@ -169,9 +165,7 @@ void slMultibodyRotate(slMultibody *mb, double rotation[3][3]) {
 		Q[2] = q.y;
 		Q[3] = q.z;
 
-		if(m->simulate) dBodySetQuaternion(m->odeBodyID, Q);
-
-		links = links->next;
+		if(link->simulate) dBodySetQuaternion(link->odeBodyID, Q);
 	}
 }
 
@@ -180,27 +174,25 @@ void slMultibodyRotate(slMultibody *mb, double rotation[3][3]) {
 */
 
 void slMultibodyOffsetPosition(slMultibody *mb, slVector *offset) {
-	slLink *m;
-	slList *links = mb->linkList;
+	slLink *link;
 	const dReal *oldP;
 	dReal newP[3];
+	std::vector<slLink*>::iterator i1;
 
-	while(links) {
-		m = links->data;
+	for(i1 = mb->links.begin(); i1 != mb->links.end(); i1++) {	
+		link = *i1;
 
-		slVectorAdd(&m->position.location, offset, &m->position.location);
+		slVectorAdd(&link->position.location, offset, &link->position.location);
 
-		if(m->simulate) {
-			oldP = dBodyGetPosition(m->odeBodyID);
+		if(link->simulate) {
+			oldP = dBodyGetPosition(link->odeBodyID);
 
 			newP[0] = oldP[0] + offset->x;
 			newP[1] = oldP[1] + offset->y;
 			newP[2] = oldP[2] + offset->z;
 			
-			dBodySetPosition(m->odeBodyID, newP[0], newP[1], newP[2]);
+			dBodySetPosition(link->odeBodyID, newP[0], newP[1], newP[2]);
 		}
-
-		links = links->next;
 	}
 }
 
@@ -285,15 +277,13 @@ void slJointSetVelocity(slJoint *j, slVector *speed) {
 */
 
 void slMultibodySetVelocity(slMultibody *mb, slVector *linear, slVector *rotational) {
-	slList *links = mb->linkList;
-	slLink *m;
+	slLink *link;
+	std::vector<slLink*>::iterator i;
 
-	while(links) {
-		m = links->data;
+	for(i=mb->links.begin(); i != mb->links.end(); i++) {
+		link = *i;
 
-		slLinkSetVelocity(m, linear, rotational);
-
-		links = links->next;
+		slLinkSetVelocity(link, linear, rotational);
 	}
 }
 
@@ -302,15 +292,13 @@ void slMultibodySetVelocity(slMultibody *mb, slVector *linear, slVector *rotatio
 */
 
 void slMultibodySetAcceleration(slMultibody *mb, slVector *linear, slVector *rotational) {
-	slList *links = mb->linkList;
-	slLink *m;
+	slLink *link;
+	std::vector<slLink*>::iterator i;
 
-	while(links) {
-		m = links->data;
+	for(i=mb->links.begin(); i != mb->links.end(); i++) {
+		link = *i;
 
-		slLinkSetAcceleration(m, linear, rotational);
-
-		links = links->next;
+		slLinkSetAcceleration(link, linear, rotational);
 	}
 }
 
@@ -324,8 +312,9 @@ void slMultibodySetAcceleration(slMultibody *mb, slVector *linear, slVector *rot
 
 void slMultibodyFree(slMultibody *m) {
 	slNullOrphanMultibodies(m->root);
-	slListFree(m->linkList);
-	slFree(m);
+	m->links.empty();
+
+	delete m;
 }
 
 /*!
@@ -333,23 +322,21 @@ void slMultibodyFree(slMultibody *m) {
 */
 
 slList *slMultibodyAllCallbackData(slMultibody *mb) {
-	slList *links = mb->linkList;
-	slLink *l;
 	slList *list = NULL;
+	slLink *link;
 	unsigned int n;
+	std::vector<slLink*>::iterator i;
 
-	while(links) {
-		l = links->data;
+	for( i = mb->links.begin(); i != mb->links.end(); i++ ) {
+		link = *i;
 		
-		list = slListPrepend(list, l->callbackData);
+		list = slListPrepend(list, link->callbackData);
 
-		for(n=0;n<l->inJoints->count;n++) {
-			slJoint *j = l->inJoints->data[n];
+		for(n=0;n<link->inJoints->count;n++) {
+			slJoint *j = link->inJoints->data[n];
 
 			list = slListPrepend(list, j->callbackData);
 		}
-
-		links = links->next;
 	}
 
 	return list;
@@ -444,9 +431,9 @@ slLink *slJointBreak(slJoint *joint) {
 
 	if(!parent && !child) return NULL;
 
-	childBody = joint->child->mb;
+	childBody = joint->child->multibody;
 
-	if(parent) parentBody = parent->mb;
+	if(parent) parentBody = parent->multibody;
 
 	if(parent) slStackRemove(parent->outJoints, joint);
 	slStackRemove(child->inJoints, joint);
@@ -469,12 +456,12 @@ slLink *slJointBreak(slJoint *joint) {
 	/* ... if not, then try to adopt the links */
 	/* ... if not, then NULL the multibody entries */
 
-	if(parent && parentBody && !slInList(parentBody->linkList, parent)) {
+	if(parent && parentBody && (std::find(parentBody->links.begin(), parentBody->links.end(), parent) != parentBody->links.end())) {
 		if((newMb = slLinkFindMultibody(parent))) slMultibodyUpdate(newMb);
 		else slNullOrphanMultibodies(parent);
 	}
 
-	if(child && childBody && !slInList(childBody->linkList, child)) {
+	if(child && childBody && (std::find(childBody->links.begin(), childBody->links.end(), child) != childBody->links.end())) {
 		if((newMb = slLinkFindMultibody(child))) slMultibodyUpdate(newMb);
 		else slNullOrphanMultibodies(child);
 	}
@@ -494,7 +481,7 @@ void slNullOrphanMultibodies(slLink *orphan) {
 	o = orphans = slLinkList(orphan, NULL, 0);
 	
 	while(orphans) {
-		((slLink*)orphans->data)->mb = NULL;
+		((slLink*)orphans->data)->multibody = NULL;
 
 		orphans = orphans->next;
 	}
@@ -520,7 +507,7 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 	while(rootList) {
 		slLink *link = rootList->data;
 
-		if(link != root && root->mb != link->mb) {
+		if(link != root && root->multibody != link->multibody) {
 			/* okay!  link has another mb for us!  we need to find the joint */
 			/* connecting this new multibody to our old one! */
 
@@ -529,10 +516,10 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 			for(n=0;n<jointStack->count;n++) {
 				joint = jointStack->data[n];
 
-				if(joint->parent && joint->parent->mb == root->mb) {
+				if(joint->parent && joint->parent->multibody == root->multibody) {
 					joint->isMbJoint = 1;
 					slListFree(start);
-					return link->mb;
+					return link->multibody;
 				}
 			}
 
@@ -541,10 +528,10 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 			for(n=0;n<jointStack->count;n++) {
 				joint = jointStack->data[n];
 
-				if(joint->child->mb == root->mb) {
+				if(joint->child->multibody == root->multibody) {
 					joint->isMbJoint = 1;
 					slListFree(start);
-					return link->mb;
+					return link->multibody;
 				}
 			}
 		}
@@ -581,25 +568,23 @@ slList *slLinkList(slLink *root, slList *list, int mbOnly) {
 	return list;
 }
 
+void slMultibodyComputeLinks(slMultibody *mb, int mbOnly) {
+
+}
+
 /*!
 	\brief Counts multibody links and sets the links' mb fields.
 */
 
 int slMultibodyCountLinks(slMultibody *mb) {
-	slLink *link;
-	slList *list;
 	int number = 0;
+	std::vector<slLink*>::iterator i;
 
-	list = mb->linkList;
+	for( i = mb->links.begin(); i != mb->links.end(); i++ ) {	
+		slLink *link = *i;
 
-	while(list) {
-		link = list->data;
-
-		link->mb = mb;
-
+		link->multibody = mb;
 		number++;
-
-		list = list->next;
 	}
 
 	return number;
@@ -611,17 +596,13 @@ int slMultibodyCountLinks(slMultibody *mb) {
 
 double slMultibodyComputeMass(slMultibody *mb) {
 	slLink *link;
-	slList *list;
 	double mass = 0.0;
+	std::vector<slLink*>::iterator i;
 
-	list = mb->linkList;
-
-	while(list) {
-		link = list->data;
+	for(i = mb->links.begin(); i != mb->links.end(); i++ ) {
+		link = *i;
 
 		mass += link->shape->mass;
-
-		list = list->next;
 	}
 
 	return mass;
@@ -721,7 +702,7 @@ int slJointSetLinkPoints(slJoint *joint, slVector *plinkPoint, slVector *clinkPo
 slMultibody *slMultibodyNew(slWorld *w) {
 	slMultibody *m;
 
-	m = slMalloc(sizeof(slMultibody));
+	m = new slMultibody;
 
 	m->world = w;
 	m->handleSelfCollisions = 0;
@@ -740,7 +721,7 @@ slMultibody *slMultibodyNew(slWorld *w) {
 
 void slMultibodySetRoot(slMultibody *m, slLink *root) {
 	m->root = root;
-	root->mb = m;
+	root->multibody = m;
 
 	slMultibodyUpdate(m);
 }
@@ -752,10 +733,18 @@ void slMultibodySetRoot(slMultibody *m, slLink *root) {
 */
 
 void slMultibodyUpdate(slMultibody *m) {
+	slList *links;
+
 	if(!m) return;
 
-	if(m->linkList) slListFree(m->linkList);
-	m->linkList = slLinkList(m->root, NULL, 1);
+	m->links.clear();
+
+	links = slLinkList(m->root, NULL, 1);
+
+	while(links) {
+		m->links.push_back((slLink*)links->data);
+		links = links->next;
+	}
 
 	m->linkCount = slMultibodyCountLinks(m);
 	m->mass = slMultibodyComputeMass(m);
@@ -768,16 +757,13 @@ void slMultibodyUpdate(slMultibody *m) {
 */
 
 void slMultibodyUpdatePositions(slMultibody *mb) {
-	slList *links = mb->linkList;
-	slLink *m;
+	std::vector<slLink*>::iterator i;
 
-	while(links) {
-		m = links->data;
+	for(i = mb->links.begin(); i != mb->links.end(); i++ ) {
+		slLink *link = *i;
 
-		slLinkUpdatePositions(m);
-		slLinkUpdateBoundingBox(m);
-
-		links = links->next;
+		slLinkUpdatePositions(link);
+		slLinkUpdateBoundingBox(link);
 	}
 }
 
@@ -824,25 +810,22 @@ void slODEToSlMatrix(dReal *r, double m[3][3]) {
 
 int slMultibodyCheckSelfPenetration(slWorld *world, slMultibody *m) {
 	slVclipData *vc;
-	slList *l1, *l2;
 	int x, y;
 	slPairEntry *pe;
+	std::vector<slLink*>::iterator i1;
+	std::vector<slLink*>::iterator i2;
 
 	if(!world->initialized) slVclipDataInit(world);
 	vc = world->clipData;
 
-	l1 = m->linkList;
-
-	while(l1) {
-		slLink *link1 = l1->data;
+	for(i1 = m->links.begin(); i1 != m->links.end(); i1++ ) {
+		slLink *link1 = *i1;
 
 		// start with the next thing in the list.  this way we avoid 
 		// doing repeats like 1st-2nd and 2nd-1st
 
-		l2 = l1->next;
-		
-		while(l2) {
-			slLink *link2 = l2->data;
+		for( i2 = i1 ; i2 != m->links.end(); i2++ ) {
+			slLink *link2 = *i2;
 
 			if(link1 != link2) {
 				x = link1->clipNumber;
@@ -855,12 +838,20 @@ int slMultibodyCheckSelfPenetration(slWorld *world, slMultibody *m) {
 
 				if(pe->flags == BT_ALL && slVclipTestPair(vc, pe, NULL)) return 1;
 			}
-
-			l2 = l2->next;
 		}
-
-		l1 = l1->next;
 	}
 
 	return 0;
+}
+
+void *slMultibodyGetCallbackData(slMultibody *m) {
+	return m->callbackData;
+}
+
+void slMultibodySetCallbackData(slMultibody *m, void *c) {
+	m->callbackData = c;
+}
+
+void slMultibodySetHandleSelfCollisions(slMultibody *m, int n) {
+	m->handleSelfCollisions = 1;
 }

@@ -18,66 +18,52 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <math.h>
-#include <stdlib.h>
-#include <float.h>
-#include <limits.h>
-#include <unistd.h>
-#include <string.h>
-#include <time.h>
-#include <unistd.h>
-#include <errno.h>
+enum jointTypes {
+	JT_REVOLUTE = 1,
+	JT_PRISMATIC,
+	JT_BALL,
+	JT_UNIVERSAL,
+	JT_FIX
+};
 
-#include "ode/ode.h"
+/*!
+	\brief A joint connecting two links.
+*/
 
-// M_PI not defined on some platforms?  bastards.
+struct slJoint {
+	slLink *parent;
+	slLink *child;
+	dJointID odeJointID;
+	dJointID odeMotorID;
 
-#ifndef M_PI
-#define M_PI 3.14159265
+	double kDamp;
+	double kSpring;
+	double sMax;
+	double sMin;
+	double torque;
+	double targetSpeed;
+
+	unsigned char type;
+	unsigned char isMbJoint;
+	int vectorOffset;
+
+	void *callbackData;
+};
+
+#ifdef __cplusplus
+extern "C" {
 #endif
-
-// do not change the order of the includes--they depend on eachother
-
-#ifdef __cplusplus      // make jpeglib C++ safe
-extern "C"{
-#endif
-
-#include "simulationTypedefs.h"
-
-#include "util.h"
-
-#include "netsim.h"
-
-#include "shape.h"
-#include "volInt.h"
-
-#include "vclip.h"
-
-#include "link.h"
-#include "springs.h"
-
-#include "patch.h"
-
-#include "terrain.h"
-#include "camera.h"
-#include "integrate.h"
-
-#include "gldraw.h"
-
-#include "image.h"
-#include "lightdetector.h"
-
-#include "shadow.h"
-
-#include "movie.h"
+void slJointGetVelocity(slJoint *m, slVector *v);
+void slJointSetVelocity(slJoint *j, slVector *speed);
+void slJointGetPosition(slJoint *m, slVector *v);
+int slJointSetNormal(slJoint *joint, slVector *normal);
+int slJointSetLinkPoints(slJoint *joint, slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3]);
+void slJointSetMaxTorque(slJoint *joint, double max);
+void slJointSetLimits(slJoint *joint, slVector *min, slVector *max);
+slLink *slJointBreak(slJoint *joint);
+void slJointDestroy(slJoint *joint);
+void slJointApplyTorque(slJoint *j, slVector *torque);
 
 #ifdef __cplusplus
 }
 #endif
-
-#include "multibody.h"
-#include "world.h"
-#include "joint.h"

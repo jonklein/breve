@@ -52,7 +52,7 @@ int brIMultibodyNew(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *mb;
 
 	mb = slMultibodyNew(i->engine->world);
-	mb->callbackData = i;
+	slMultibodySetCallbackData(mb, i);
 
 	BRPOINTER(target) = mb;
 
@@ -190,7 +190,7 @@ int brIMultibodySetHandleSelfCollisions(brEval args[], brEval *target, brInstanc
 
 	if(!m) return EC_OK;
 
-	m->handleSelfCollisions = BRINT(&args[1]);
+	slMultibodySetHandleSelfCollisions(m, BRINT(&args[1]));
    
 	return EC_OK;
 }

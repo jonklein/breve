@@ -1,6 +1,6 @@
 @include "Object.tz"
 
-Abstract : NetworkServer (aka NetworkServers) [version 1.9] {
+Abstract : NetworkServer (aka NetworkServers) [version 2.1] {
     % NetworkServer sets up a breve simulation to listen on a port
     % to accept connections from other breve engines or from web 
 	% browsers.  To start a NetworkServer, use the method 
@@ -18,7 +18,8 @@ Abstract : NetworkServer (aka NetworkServers) [version 1.9] {
 	% another using the OBJECT(Object) method 
 	% OBJECTMETHOD(Object:send-over-network).  The instance is 
 	% automatically added to the server's simulation.  In addition,
-    % the server's controller object will receive a call to the method 
+    % the server's controller object (or any other desired object--see the 
+	% method METHOD(set-upload-recipient)) will receive a call to the method 
 	% "accept-upload".  This method must be 
     % implemented by the user with the following prototype:
     % <pre>+ to accept-upload of-instance i (object) from-host h (string):</pre>
@@ -86,6 +87,12 @@ Abstract : NetworkServer (aka NetworkServers) [version 1.9] {
 		% without specifying a specific page or command.
 
 		setIndexPage(serverData, indexPage).
+
+	+ to set-upload-recipient to newRecipient (object):
+		% Sets the object which will receive the "accept-upload" message.
+		% The default upload recipient is the controller.
+
+		networkSetRecipient(serverData, newRecipient).
 
     + to destroy:
         if serverData: closeServer(serverData).

@@ -76,7 +76,7 @@ int stCDearchiveXMLObjectFromString(brEval args[], brEval *target, brInstance *i
 		return EC_OK;
 	}
 
-    STINSTANCE(target) = si->breveInstance;
+    BRINSTANCE(target) = si->breveInstance;
 
     return EC_OK;
 }

@@ -43,7 +43,7 @@ slLink *slLinkNew(slWorld *w) {
 
 	slMatrixIdentity(m->position.rotation);
 
-	m->mb = NULL;
+	m->multibody = NULL;
 
 	return m;
 }
@@ -243,17 +243,15 @@ void slLinkSetAcceleration(slLink *m, slVector *linear, slVector *rotational) {
 void slLinkFree(slLink *l) {
 	int n;
 
-	if(l->mb && l->mb->root == l) {
-		l->mb->root = NULL;
-		slMultibodyUpdate(l->mb);
+	if(l->multibody && l->multibody->root == l) {
+		l->multibody->root = NULL;
+		slMultibodyUpdate(l->multibody);
 	}
 
 	// joint break will remove things from the inJoints and outJoints stacks
 
 	while(l->inJoints->count) slJointBreak(l->inJoints->data[0]);
 	while(l->outJoints->count) slJointBreak(l->outJoints->data[0]);
-
-	for(n=0;n<l->springs->count;n++) slSpringFree(l->springs->data[n]);
 
 	// break the joints (but don't delete them)
 
@@ -378,10 +376,6 @@ void slLinkApplyJointControls(slLink *m) {
 	double angle, speed;
 	double newSpeed;
 	unsigned int n;
-
-	// in progress...
-
-	for(n=0;n<m->springs->count;n++) slSpringApplyForce(m->springs->data[n]);
 
 	slLinkApplyForce(m, &m->externalForce, NULL);
 
@@ -549,11 +543,11 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 		if it does NOT exist, OR if it already has a mb, then 
 		this is not an MB joint */ 
 
-	if(!parent || (child->mb && parent->mb)) {
+	if(!parent || (child->multibody && parent->multibody)) {
 		joint->isMbJoint = 0;
 	} else {
-		if(child->mb) parent->mb = child->mb;
-		else child->mb = parent->mb;
+		if(child->multibody) parent->multibody = child->multibody;
+		else child->multibody = parent->multibody;
 
 		joint->isMbJoint = 1;
 	}
@@ -640,8 +634,8 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 	joint->child = child;
 	joint->type = jointType;
 
-	if(parent && parent->mb) slMultibodyUpdate(parent->mb);
-	if(child->mb && (!parent || (child->mb != parent->mb))) slMultibodyUpdate(child->mb);
+	if(parent && parent->multibody) slMultibodyUpdate(parent->multibody);
+	if(child->multibody && (!parent || (child->multibody != parent->multibody))) slMultibodyUpdate(child->multibody);
 
 	return joint;
 }
@@ -649,4 +643,38 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 void slVelocityAtPoint(slVector *vel, slVector *avel, slVector *atPoint, slVector *d) {
 	slVectorCross(avel, atPoint, d);
 	slVectorAdd(d, vel, d);
+}
+
+void slLinkSetCallbackData(slLink *l, void *callbackData) {
+	l->callbackData = callbackData;
+}
+
+void *slLinkGetCallbackData(slLink *l) {
+	return l->callbackData;
+}
+
+slPosition *slLinkGetPosition(slLink *l) {
+	return &l->position;
+}
+
+slMultibody *slLinkGetMultibody(slLink *l) {
+	return l->multibody;
+}
+
+void slLinkSetTexture(slLink *l, int texture) {
+	l->texture = texture;
+}
+
+void slLinkGetAcceleration(slLink *l, slVector *linear, slVector *rotational) {
+	if(linear) slVectorCopy(&l->acceleration.b, linear);
+	if(rotational) slVectorCopy(&l->acceleration.a, rotational);
+}
+
+void slLinkGetBounds(slLink *l, slVector *min, slVector *max) {
+	if(min) slVectorCopy(&l->min, min);
+	if(max) slVectorCopy(&l->max, max);
+}
+
+void slLinkSetForce(slLink *l, slVector *force) {
+	slVectorCopy(force, &l->externalForce);
 }

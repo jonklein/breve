@@ -100,7 +100,7 @@ void slVclipDataInit(slWorld *w) {
 	 	if(w->objects[n]->type == WO_LINK) {
 	 		link = ((slLink*)w->objects[n]->data);
 	 
-	 		if(link->mb) slMultibodyInitCollisionFlags(link->mb, w->clipData->pairList);
+	 		if(link->multibody) slMultibodyInitCollisionFlags(link->multibody, w->clipData->pairList);
 		}
 	}
 

@@ -56,6 +56,30 @@ Object : Spring (aka Springs) {
 		% Sets the spring's damping to newDamping.
 		if springPointer: springSetDamping(springPointer, newDamping).
 
+	+ to set-expand-and-contract:
+		% This sets a spring to apply forces to expand when the spring is pushed
+		% smaller than the natural length, and contract when the spring is pulled
+		% to be larger than the natural length.  This is the default behavior of 
+		% a spring.
+
+		if springPointer: springSetMode(springPointer, 0).
+
+	+ to set-expand-only:
+		% Setting a spring as "expand only" means that the spring will expand
+		% if it is pushed smaller than its natural length, but will not contract
+		% if it is stretched to be larger.
+
+		if springPointer: springSetMode(springPointer, 1).
+
+	+ to set-contract-only:
+		% Setting a spring as "contract only" means that the spring will contract
+		% if it is expanded larger than its natural length, but will not expand 
+		% if it is pushed to smaller lengths.  This makes the spring behavior 
+		% more like a rope.  See also METHOD(set-expand-only) and 
+		% METHOD(set-expand-and-contract).
+
+		if springPointer: springSetMode(springPointer, 2).
+
 	+ to destroy: 
 		springRemove(springPointer).
 }

@@ -33,8 +33,7 @@ int brILinkNew(brEval args[], brEval *target, brInstance *i) {
 
 	l = slLinkNew(i->engine->world);
 
-	l->simulate = 0;
-	l->callbackData = i;
+	slLinkSetCallbackData(l, i);
 
 	BRPOINTER(target) = l;
 
@@ -142,7 +141,7 @@ int brILinkRotateRelative(brEval args[], brEval *target, brInstance *i) {
 	double m[3][3], nm[3][3];
 
 	slRotationMatrix(v, len, m);
-	slMatrixMulMatrix(m, l->position.rotation, nm);
+	slMatrixMulMatrix(m, slLinkGetPosition(l)->rotation, nm);
 
 	slLinkSetRotation(l, nm);
 
@@ -163,7 +162,7 @@ int brILinkGetLocation(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slVectorCopy(&link->position.location, &BRVECTOR(target));
+	slVectorCopy(&slLinkGetPosition(link)->location, &BRVECTOR(target));
 
 	return EC_OK;
 }
@@ -182,7 +181,7 @@ int brILinkGetRotation(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slMatrixCopy(&link->position.rotation, BRMATRIX(target));
+	slMatrixCopy(&slLinkGetPosition(link)->rotation, BRMATRIX(target));
 
 	return EC_OK;
 }
@@ -280,7 +279,7 @@ int brILinkGetAcceleration(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slVectorCopy(&link->acceleration.b, &BRVECTOR(target));
+	slLinkGetAcceleration(link, &BRVECTOR(target), NULL);
 
 	return EC_OK;
 }   
@@ -357,7 +356,7 @@ int brILinkSetForce(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slVectorCopy(&BRVECTOR(&args[1]), &link->externalForce);
+	slLinkSetForce(link, &BRVECTOR(&args[1]));
 
 	return EC_OK;
 }
@@ -372,13 +371,15 @@ int brILinkSetForce(brEval args[], brEval *target, brInstance *i) {
 
 int brILinkGetMultibody(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRPOINTER(&args[0]);
+	slMultibody *mb;
 
 	if(!link) {
 		slMessage(DEBUG_ALL, "null pointer passed to setLinkTorque\n");
 		return EC_ERROR;
 	}
 
-	if(link->mb) BRINSTANCE(target) = link->mb->callbackData;
+	mb = slLinkGetMultibody(link);
+	if(mb) BRINSTANCE(target) = slMultibodyGetCallbackData(mb);
 	else BRINSTANCE(target) = NULL;
 
 	return EC_OK;
@@ -451,7 +452,7 @@ int brILinkGetMax(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slVectorCopy(&l->max, &BRVECTOR(target));
+	slLinkGetBounds(l, NULL, &BRVECTOR(target));
 
 	return EC_OK;
 }
@@ -472,7 +473,7 @@ int brILinkGetMin(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slVectorCopy(&l->min, &BRVECTOR(target));
+	slLinkGetBounds(l, &BRVECTOR(target), NULL);
 
 	return EC_OK;
 }
@@ -490,7 +491,7 @@ int brILinkSetTexture(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	m->texture = texture;
+	slLinkSetTexture(m, texture);
 
 	return EC_OK;
 }
@@ -511,7 +512,7 @@ int brIVectorFromLinkPerspective(brEval args[], brEval *target, brInstance *i) {
 	}
 
 	target->type = AT_VECTOR;
-	slVectorInvXform(link->position.rotation, vector, &BRVECTOR(target));
+	slVectorInvXform(slLinkGetPosition(link)->rotation, vector, &BRVECTOR(target));
 
 	return EC_OK;
 } 

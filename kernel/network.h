@@ -6,6 +6,7 @@ enum networkRequests {
 
 struct brNetworkServerData {
     brEngine *engine;
+	brInstance *recipient;
     char *index;
     int port;
     int socket;

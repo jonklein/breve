@@ -843,6 +843,7 @@ void stXMLPreparseStartElementHandler(stXMLParserState *userData, const XML_Char
 			}
 
 			i = stInstanceNew(object->userData);
+			i->breveInstance = brEngineAddInstance(userData->engine, object, i);
 		} else i = userData->currentInstance;
 
 		i->index = index;
@@ -1043,8 +1044,6 @@ void stXMLObjectEndElementHandler(stXMLParserState *userData, const XML_Char *na
 					brObject *o;
 
 					o = brObjectFind(userData->engine, userData->currentInstance->type->name);
-
-					userData->currentInstance->breveInstance = brEngineAddInstance(userData->engine, o, userData->currentInstance);
 
 					if(userData->controllerIndex == userData->currentInstance->index) 
 						userData->engine->controller = userData->currentInstance->breveInstance;

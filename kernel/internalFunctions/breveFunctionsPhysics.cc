@@ -69,20 +69,14 @@ int brIJointApplyTorque(brEval args[], brEval *target, brInstance *i) {
 	slVector t;
 	dVector3 axis;
 
+	// I think this is somewhat broken.
+
 	if(!j) {
 		slMessage(DEBUG_ALL, "jointApplyTorque failed\n");
 		return EC_ERROR;
 	}
 
-	dJointGetHingeAxis(j->odeJointID, axis);
-
-	t.x = axis[0] * torque;
-	t.y = axis[1] * torque;
-	t.z = axis[2] * torque;
-
-
-	if(j->parent) dBodySetTorque(j->parent->odeBodyID, t.x, t.y, t.z);
-	if(j->child) dBodySetTorque(j->child->odeBodyID, -t.x, -t.y, -t.z);
+	slJointApplyTorque(BRPOINTER(&args[0]), &BRVECTOR(&args[1]));
 
 	return EC_OK;
 }

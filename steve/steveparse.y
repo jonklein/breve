@@ -154,26 +154,10 @@ sucessful_parse
 ;
 
 file
-: objectdefs 		/* there don't have to be any headers */
-| headers			/* there don't have to be any objects (just defines/includes?) */
-| headers objectdefs
+: steve_code
+| file steve_code
 ;
 
-/* the headers are handled by a manual parse step before yyparse(). */
-
-headers
-: header
-| headers error {
-			if(parseEngine->error.type) YYABORT;
-		}
-| headers header
-| headers CONTROLLER WORD_VALUE END {
-		if(!gReparse && stSetControllerName(steveData, parseEngine, $3))
-			stParseError(parseEngine, PE_INTERNAL, "Error defining \"Controller\" object");
-
-		slFree($3);
-	}
-;
 
 /* 
 	the headers lines are lines outside of the objects which control
@@ -310,6 +294,12 @@ header
 		brNamespaceStore(steveData->defines, $3, 0, $4);
 		slFree($3);
 	}
+| CONTROLLER WORD_VALUE END {
+		if(!gReparse && stSetControllerName(steveData, parseEngine, $2))
+			stParseError(parseEngine, PE_INTERNAL, "Error defining \"Controller\" object");
+
+		slFree($2);
+	}
 ;
 
 vector_value
@@ -348,9 +338,9 @@ matrix_value
 	}
 ;
 
-objectdefs
+steve_code
 : objectdef
-| objectdefs objectdef
+| header
 ;
 
 objectdef

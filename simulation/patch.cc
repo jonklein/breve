@@ -59,9 +59,9 @@ slPatchGrid *slNewPatchGrid(slVector *center, slVector *patchSize, int x, int y,
 
 slPatch *slPatchForLocation(slPatchGrid *g, slVector *location) {
 	int x, y, z;
-	x = (location->x - g->startPosition.x) / g->patchSize.x;
-	y = (location->y - g->startPosition.y) / g->patchSize.y;
-	z = (location->z - g->startPosition.z) / g->patchSize.z;
+	x = (int)((location->x - g->startPosition.x) / g->patchSize.x);
+	y = (int)((location->y - g->startPosition.y) / g->patchSize.y);
+	z = (int)((location->z - g->startPosition.z) / g->patchSize.z);
 
 	if(x < 0 || x >= g->xSize) return NULL;
 	if(y < 0 || y >= g->ySize) return NULL;

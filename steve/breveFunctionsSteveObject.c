@@ -200,7 +200,7 @@ int stSendXMLString(char *address, int port, char *object) {
 	header.length = strlen(object);
 
 	if(!addr) {
-		slMessage(DEBUG_ALL, "upload failed: cannot find address for host %s\n", address);
+		slMessage(DEBUG_ALL, "upload failed: cannot find address for host \"%s\"\n", address);
 		return -1;
 	}
 
@@ -215,7 +215,7 @@ int stSendXMLString(char *address, int port, char *object) {
 	request.version = NETWORK_VERSION;
 
 	if(connect(sockfd, (struct sockaddr*)&saddr, sizeof(saddr))) {
-		slMessage(DEBUG_ALL, "upload failed: cannot connect to server %s\n", address);
+		slMessage(DEBUG_ALL, "upload failed: cannot connect to server \"%s\"\n", address);
 		return -1;
 	}
 

@@ -1342,7 +1342,7 @@ void slDrawShape(slWorld *w, slCamera *c, slShape *s, slPosition *pos, slVector 
 		return;
 	} 
 
-	if(s->drawList == 0 || ((flags & DO_RECOMPILE) && 0)) slCompileShape(w, s, c->drawMode, texture, textureScale, flags);
+	if(s->drawList == 0 || s->recompile || ((flags & DO_RECOMPILE) && 0)) slCompileShape(w, s, c->drawMode, texture, textureScale, flags);
 
 	glPushMatrix();
 	glTranslated(pos->location.x, pos->location.y, pos->location.z);

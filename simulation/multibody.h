@@ -18,13 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-enum jointTypes {
-	JT_REVOLUTE = 1,
-	JT_PRISMATIC,
-	JT_BALL,
-	JT_UNIVERSAL,
-	JT_FIX
-};
+#ifdef __cplusplus
+#include <vector>
+#include <algorithm>
 
 /*!
 	\brief A logical collection of attached links.
@@ -34,6 +30,8 @@ struct slMultibody {
 	slWorld *world;
 	struct slLink *root;
 	slList *linkList;
+
+	std::vector<slLink*> links;
 
 	char *label;
 
@@ -45,35 +43,13 @@ struct slMultibody {
 
 	void *callbackData;
 };
+#endif
 
-/*!
-	\brief A joint connecting two links.
-*/
-
-struct slJoint {
-	slLink *parent;
-	slLink *child;
-	dJointID odeJointID;
-	dJointID odeMotorID;
-
-	double kDamp;
-	double kSpring;
-	double sMax;
-	double sMin;
-	double torque;
-	double targetSpeed;
-
-	unsigned char type;
-	unsigned char isMbJoint;
-	int vectorOffset;
-
-	void *callbackData;
-};
-
+#ifdef __cplusplus
+extern "C"{
+#endif
 slMultibody *slMultibodyNew(slWorld *w);
 void slMultibodySetRoot(slMultibody *m, slLink *root);
-
-void slJointSetLimits(slJoint *joint, slVector *min, slVector *max);
 
 void slMultibodyInitCollisionFlags(slMultibody *m, slPairEntry **pe);
 
@@ -99,19 +75,6 @@ void slLinkSetAcceleration(slLink *m, slVector *velocity, slVector *rotational);
 int slMultibodyCountLinks(slMultibody *m);
 double slMultibodyComputeMass(slMultibody *m);
 
-void slJointGetVelocity(slJoint *m, slVector *v);
-void slJointSetVelocity(slJoint *j, slVector *speed);
-
-void slJointGetPosition(slJoint *m, slVector *v);
-
-int slJointSetNormal(slJoint *joint, slVector *normal);
-int slJointSetLinkPoints(slJoint *joint, slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3]);
-
-void slJointSetMaxTorque(slJoint *joint, double max);
-
-slLink *slJointBreak(slJoint *joint);
-void slJointDestroy(slJoint *joint);
-
 void slMultibodyUpdate(slMultibody *root);
 
 slMultibody *slLinkFindMultibody(slLink *root);
@@ -129,4 +92,12 @@ void slODEToSlMatrix(dReal *r, double m[3][3]);
 void slNullOrphanMultibodies(slLink *orphan);
 
 int slMultibodyCheckSelfPenetration(slWorld *w, slMultibody *m);
+void *slMultibodyGetCallbackData(slMultibody *m);
+void slMultibodySetCallbackData(slMultibody *m, void *c);
+
+void slMultibodySetHandleSelfCollisions(slMultibody *m, int n);
+
+#ifdef __cplusplus
+}
+#endif
 

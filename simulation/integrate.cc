@@ -92,7 +92,7 @@ int slEuler(slWorld *w, slLink *r, double *deltaT, int skipFirst) {
 
 int slRK4(slWorld *w, slLink *r, double *deltaT, int skipFirst) {
 	double *osv, *sv;
-	int n;
+	unsigned int n;
 	int err = 0;
 
 	double hDelta;
@@ -197,7 +197,8 @@ int slRKCK(slWorld *w, slLink *m, double *x, double acc, double stepSize, double
 /* spiderland-multibody-runge-kutta-cash-karp-step */
 
 int slRKCKS(slWorld *w, slLink *m, double *sv, double *osv, double *error, double h) {
-	int err = 0, n;
+	unsigned int n;
+	int err = 0;
 
 	/* multipliers */
 
@@ -285,7 +286,7 @@ int slRKCKS(slWorld *w, slLink *m, double *sv, double *osv, double *error, doubl
 #define RKF_MAX(x,y)		((x)>(y)?(x):(y))
 
 int slIntRKF(slWorld *w, slLink *m, double *deltaT, int skipFirst) {
-	int i = 0;
+	unsigned int i = 0;
 	int simerr = 0;
 
 	double error;

@@ -35,8 +35,6 @@ PhysicalControl : Walker {
 
 		lockMenu, symMenu (object).
 
-		cloudTexture (int).
-
 	+ to init:
 		floorShape (object).
 		floor (object).
@@ -56,8 +54,7 @@ PhysicalControl : Walker {
 		floor register with-shape floorShape at-location (0, 0, 0).
 		floor catch-shadows.
 
-		cloudTexture = (self load-image from "images/clouds.png").
-		self set-background-texture to cloudTexture.
+		self set-background-texture-image to (new Image load from "images/clouds.png").
 
 		self enable-shadows.
 		self enable-reflections.
