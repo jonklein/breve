@@ -138,10 +138,17 @@ void breveInitNetworkFunctions(brNamespace *n) {
 
 char *brHostnameFromAddr(struct in_addr *addr) {
 	struct hostent *h;
+	static char numeric[256];
 
 	h = gethostbyaddr((const void*)addr, 4, AF_INET);
 
-	if(!h) return NULL;
+	if(!h) {
+		unsigned char *address = (void*)addr;
+
+		sprintf(numeric, "%d.%d.%d.%d", address[0], address[1], address[2], address[3]);
+
+		return numeric;
+	}
 
 	return h->h_name;
 }
@@ -235,13 +242,14 @@ void *brListenOnSocket(brNetworkServerData *serverData) {
 void *brHandleConnection(void *p) {
 	brNetworkClientData *data = p;	
 	brNetworkRequest request;
-	char *name, *buffer;
+	char *hostname, *buffer;
 	brStringHeader header;
 	int length, count;
-	brEval eval, result, *args[1];
+	brEval eval[2], result, *args[2];
   
-	name = brHostnameFromAddr(&data->addr.sin_addr);
-	slMessage(DEBUG_ALL, "network connection from %s\n", name);
+	hostname = brHostnameFromAddr(&data->addr.sin_addr);
+
+	slMessage(DEBUG_ALL, "network connection from %s\n", hostname);
 
 	count = slUtilRead(data->socket, &request, sizeof(brNetworkRequest));
 
@@ -274,17 +282,28 @@ void *brHandleConnection(void *p) {
 		case NR_XML:
 			slUtilRead(data->socket, &header, sizeof(brStringHeader));
 			length = header.length;
-			slMessage(DEBUG_ALL, "received XML message of length: %d\n", length); 
+			slMessage(DEBUG_ALL, "received XML message of length %d from host %s\n", length, hostname); 
 			buffer = slMalloc(length+1);
 			slUtilRead(data->socket, buffer, length);
 			buffer[length] = 0;
 			pthread_mutex_lock(&data->engine->lock);
 
-			BRSTRING(&eval) = buffer;
-			eval.type = AT_STRING;
-			args[0] = &eval;
+			args[0] = &eval[0];
+			args[1] = &eval[1];
+
+			BRSTRING(&eval[0]) = buffer;
+			eval[0].type = AT_STRING;
 
 			brMethodCallByNameWithArgs(data->engine->controller, "parse-xml-network-request", args, 1, &result);
+
+			args[0] = &result;
+
+			BRSTRING(&eval[1]) = hostname;
+			eval[1].type = AT_STRING;
+
+			brMethodCallByNameWithArgs(data->engine->controller, "accept-upload", args, 2, &result);
+
+			slFree(buffer);
 
 			pthread_mutex_unlock(&data->engine->lock);
 			break;

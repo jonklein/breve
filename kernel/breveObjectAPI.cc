@@ -131,6 +131,11 @@ int brMethodCallByName(brInstance *i, char *name, brEval *result) {
 	brMethod *m = brMethodFind(i->class, name, 0);
 	int r;
 
+	if(!m) {
+		slMessage(DEBUG_ALL, "warning: unknown method \"%s\" called for instance %p of class \"%s\"\n", name, i->pointer, i->class->name);
+		return EC_ERROR;
+	}
+
 	r = brMethodCall(i, m, NULL, result);
 
 	brMethodFree(m);
@@ -149,6 +154,11 @@ int brMethodCallByName(brInstance *i, char *name, brEval *result) {
 int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, int count, brEval *result) {
 	brMethod *m = brMethodFind(i->class, name, count);
 	int r;
+
+	if(!m) {
+		slMessage(DEBUG_ALL, "warning: unknown method \"%s\" called for instance %p of class \"%s\"\n", name, i->pointer, i->class->name);
+		return EC_ERROR;
+	}
 
 	r = brMethodCall(i, m, args, result);
 

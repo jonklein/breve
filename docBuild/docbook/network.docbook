@@ -47,6 +47,29 @@ state of all of its variables, except that variables of type <function>object</f
 special treatment.  The reason for this and the solution are described in
 <xref linkend="object_archiving">.
 </para>
+
+<para>
+To send an object over the network, use the Object method 
+<function><ulink url="../classes/Object.html#send-over-network">send-over-network</ulink></function>
+with the server computer's hostname and port:
+<screen>
+	self send-over-network to "myOtherComputer" on 31337.
+</screen>
+</para>
+
+<para>
+If a NetworkServer receives an instance upload from another host, it dearchives
+the object, adds it to the simulation, then informs the controller of the newly
+added object with the callback method <function>accept-upload</function>.  You 
+should implement your own <function>accept-upload</function> with the following
+method declaration:
+<screen>
+	+ to accept-upload of-instance newInstance (object) from-host clientHostname (string):
+</screen>
+The newly created instance, and the hostname which sent the instance are passed
+in as arguments.
+</para>
+
 </sect1>
 
 <sect1 id="network_web"><title>Using a Web-interface to a breve Simulation</title>

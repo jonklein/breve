@@ -7,7 +7,6 @@ enum allocStatus {
 
 typedef struct brObjectType brObjectType;
 
-
 /*! \addtogroup API */
 /*@{*/
 

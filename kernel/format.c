@@ -171,6 +171,9 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 		case AT_ARRAY:
 			return slStrdup("{ array }");
 			break;
+		case AT_HASH:
+			return slStrdup("{ hash table }");
+			break;
 		case AT_NULL:
 			return slStrdup("(NULL expression)");
 			break;

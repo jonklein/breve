@@ -34,7 +34,9 @@ Control : myController {
 
 		if (self get-argument-count) == 2: {
 			file = (self get-argument at-index 1).
-		} else file = "jon.jpg".
+		} else file = "images/jon.png".
+
+		image = (new Image load from file).
 
 		blur = .992.
 		if blur > .992: blur = .992.
@@ -44,13 +46,9 @@ Control : myController {
 		self set-blur-factor to blur.
 		self set-background-color to (0, 0, 0).
 
-		image = (new Image load from file).
-
-		image write to "thing.png".
-
-		radius *= (image get-width) / 300.
-		vel *= (image get-width) / 300.
-		acc *= (image get-width) / 300.
+		radius *= (image get-width) / 300.0.
+		vel *= (image get-width) / 300.0.
+		acc *= (image get-width) / 300.0.
 
 		shape = new Sphere init-with radius radius.
 
@@ -60,6 +58,9 @@ Control : myController {
 
 		self offset-camera by (0, 0, zoom).
 		self set-z-clip to zoom + 100.
+
+	+ to catch-key-s-down:
+		self save-snapshot-to-file.
 
 	+ to iterate:
 		if zoom < (image get-width) + 10: {

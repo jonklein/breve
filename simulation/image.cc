@@ -60,7 +60,7 @@ unsigned char *slReadImage(char *name, int *width, int *height, int *components,
 	while(last >= name && *last != '.') last--;
 
 #ifdef HAVE_LIBJPEG
-	if(!strcasecmp(last, ".jpg")) return slReadJPEGImage(name, width, height, components, alpha); 
+	if(!strcasecmp(last, ".jpg") || !strcasecmp(last, ".jpeg")) return slReadJPEGImage(name, width, height, components, alpha); 
 #endif 
 
 #ifdef HAVE_LIBPNG

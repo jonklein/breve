@@ -50,7 +50,7 @@
 #define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the `avcodec' library (-lavcodec). */
-#define HAVE_LIBAVCODEC 1
+// #define HAVE_LIBAVCODEC 1
 
 /* Define to 1 if you have the `expat' library (-lexpat). */
 #define HAVE_LIBEXPAT 1
@@ -71,16 +71,16 @@
 #define HAVE_LIBPNG 1
 
 /* Define to 1 if you have the `portaudio' library (-lportaudio). */
-#define HAVE_LIBPORTAUDIO 1
+// #define HAVE_LIBPORTAUDIO 1
 
 /* Define to 1 if you have the `pthread' library (-lpthread). */
 #define HAVE_LIBPTHREAD 1
 
 /* Define to 1 if you have the `readline' library (-lreadline). */
-#define HAVE_LIBREADLINE 1
+// #define HAVE_LIBREADLINE 1
 
 /* Define to 1 if you have the `sndfile' library (-lsndfile). */
-#define HAVE_LIBSNDFILE 1
+// #define HAVE_LIBSNDFILE 1
 
 /* Define to 1 if you have the `z' library (-lz). */
 #define HAVE_LIBZ 1

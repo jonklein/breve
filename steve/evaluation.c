@@ -2277,7 +2277,10 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 	// we don't want the return value released, so we'll retain it.
 	// this will keep it alive through the releasing stage.
 	
-	if(new->instance->gcStack) stGCRetain(target);
+	if(new->instance->gcStack) {
+		stGCRetain(target);
+		stGCUnmark(new->instance, target);
+	}
 
 	// unretain the input arguments
 

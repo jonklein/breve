@@ -79,6 +79,7 @@ AC_PROG_RANLIB
 AC_CHECK_LIB([z], [gzopen],,AC_MSG_FAILURE([Missing zlib library]))
 AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]),[-lstdc++])
 AC_CHECK_LIB([avcodec], [avcodec_init])
+AC_CHECK_LIB([enet], [enet_initialize])
 AC_CHECK_LIB([expat], [XML_ParserCreate],,AC_MSG_FAILURE([Missing expat library]))
 AC_CHECK_LIB([jpeg], [jpeg_read_header])
 AC_CHECK_LIB([l], [yywrap])

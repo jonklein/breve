@@ -27,7 +27,7 @@ Abstract : Image {
 		imageData = imageLoadFromFile(imageFile).
 		if !imageData: return 0.
 
-		modified = 1.
+		if textureNumber != -1: modified = 1.
 
 		return self.
 

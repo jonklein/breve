@@ -12,6 +12,8 @@ brFrontend *breveFrontendInit(int argc, char** argv) {
 	
 	frontend->engine = brEngineNew();
 	frontend->data = stSteveInit(frontend->engine);
+	frontend->engine->argc = argc;
+	frontend->engine->argv = argv;
 
 	return frontend;
 }

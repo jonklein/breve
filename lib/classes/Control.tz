@@ -83,6 +83,9 @@ Abstract : Control (aka Controls) [version 1.9] {
 		movie (object).
 		movieMenu (object).
 
+	- to parse-xml-network-request from-string s (string):
+		return dearchiveXMLObjectFromString(s).
+
 	+ to end-simulation:
 		% Ends the simulation gracefully.
 

@@ -54,8 +54,20 @@ extern stSteveData *gSteveData;
 */ 
 
 
+/*!
+	\brief Sets freed instance protection on/off for steve.
+
+	void setFreedInstanceProtection(int).
+
+	Freed instance protection retains pointers to freed objects so that calling
+	a message with a released object does not crash breve.  This should almost
+	always be left on.
+*/
+
 int stSSetFreedInstanceProtection(brEval args[], brEval *target, brInstance *i) {
-    gSteveData->retainFreedInstances = BRINT(&args[0]);
+	stSteveData *data = i->class->type;
+
+    data->retainFreedInstances = BRINT(&args[0]);
     return EC_OK;
 }
 
@@ -118,10 +130,8 @@ int stOIsa(brEval args[], brEval *target, brInstance *bi) {
 	return EC_OK;
 }
 
-/*
-	+ stORespondsTo
-	= determines whether a certain instance understand a certain
-	= method.
+/*!
+	\brief Determines whether a certain instance understand a certain method.
 */
 
 int stORespondsTo(brEval args[], brEval *target, brInstance *i) {
@@ -139,6 +149,10 @@ int stORespondsTo(brEval args[], brEval *target, brInstance *i) {
 
 	return EC_OK;
 }
+
+/*!
+	\brief Turns garbage collection on or off for an object.
+*/
 
 int stOSetGC(brEval args[], brEval *target, brInstance *bi) {
 	stInstance *i = bi->pointer;
@@ -202,6 +216,7 @@ int stSendXMLString(char *address, int port, char *object) {
 	write(sockfd, &request, sizeof(brNetworkRequest));
 	write(sockfd, &header, sizeof(brStringHeader));
 	write(sockfd, object, header.length);
+	close(sockfd);
 	return 0;
 }
 

@@ -37,7 +37,7 @@ brEngine *parseEngine = NULL;
 stObject *thisObject = NULL;
 stMethod *thisMethod = NULL;
 
-extern stSteveData *gSteveData;
+stSteveData *steveData;
 
 extern int lineno;
 
@@ -49,9 +49,10 @@ int gReparse;
 
 void stStartParse();
 void stEndParse();
-void stSetParseEngine(brEngine *e);
-void stSetParseObject(stObject *o);
-void stSetParseObjectAndMethod(stObject *o, stMethod *m);
+void stParseSetSteveData(stSteveData *d);
+void stParseSetEngine(brEngine *e);
+void stParseSetObject(stObject *o);
+void stParseSetObjectAndMethod(stObject *o, stMethod *m);
 
 void yyerror(char *c);
 
@@ -146,7 +147,7 @@ sucessful_parse
 		if(!thisMethod || !thisObject) YYERROR;
 	} statement {
 		if(parseEngine->error.type) YYABORT;
-		gSteveData->singleStatement = $3;
+		steveData->singleStatement = $3;
 	}
 ;
 
@@ -165,7 +166,7 @@ headers
 		}
 | headers header
 | headers CONTROLLER WORD_VALUE END {
-		if(!gReparse && stSetControllerName(gSteveData, parseEngine, $3))
+		if(!gReparse && stSetControllerName(steveData, parseEngine, $3))
 			stParseError(parseEngine, PE_INTERNAL, "Error defining \"Controller\" object");
 
 		slFree($3);
@@ -270,7 +271,7 @@ header
 		e->type = AT_STRING;
 		BRSTRING(e) = slStrdup($4);
 
-		brNamespaceStore(gSteveData->defines, $3, 0, e);
+		brNamespaceStore(steveData->defines, $3, 0, e);
 
 		slFree($3);
 		slFree($4);
@@ -282,7 +283,7 @@ header
 		e->type = AT_DOUBLE;
 		BRDOUBLE(e) = $4;
 
-		brNamespaceStore(gSteveData->defines, $3, 0, e);
+		brNamespaceStore(steveData->defines, $3, 0, e);
 		slFree($3);
 	}
 | '@' DEFINE WORD_VALUE INT_VALUE END {
@@ -292,16 +293,16 @@ header
 		e->type = AT_INT;
 		BRINT(e) = $4;
 
-		brNamespaceStore(gSteveData->defines, $3, 0, e);
+		brNamespaceStore(steveData->defines, $3, 0, e);
 		slFree($3);
 	}
 | '@' DEFINE WORD_VALUE vector_value END {
-		brNamespaceStore(gSteveData->defines, $3, 0, $4);
+		brNamespaceStore(steveData->defines, $3, 0, $4);
 		slFree($3);
 	}
 | '@' DEFINE WORD_VALUE matrix_value END {
 
-		brNamespaceStore(gSteveData->defines, $3, 0, $4);
+		brNamespaceStore(steveData->defines, $3, 0, $4);
 		slFree($3);
 	}
 ;
@@ -413,7 +414,7 @@ objecttype
 				slFree($3);
 				if($4) slFree($4);
 			} else {
-				thisObject = stObjectNew(parseEngine, $3, $4, parentObject, version);
+				thisObject = stObjectNew(parseEngine, steveData, $3, $4, parentObject, version);
 				thisMethod = NULL;
 
 				slFree($1);
@@ -1215,14 +1216,18 @@ void stStartParse() {
 
 }
 
-void stSetParseEngine(brEngine *e) {
+void stParseSetEngine(brEngine *e) {
 	parseEngine = e;
 	e->error.type = 0;
 }
 
-void stSetParseObjectAndMethod(stObject *o, stMethod *m) {
+void stParseSetObjectAndMethod(stObject *o, stMethod *m) {
 	thisMethod = m;
 	thisObject = o;
+}
+
+void stParseSetSteveData(stSteveData *data) {
+	steveData = data;
 }
 
 double stDoubleFromIntOrDoubleExp(stExp *e) {

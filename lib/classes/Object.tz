@@ -132,50 +132,6 @@ NULL : Object (aka Objects) [version 1.8] {
 
         notify(theMessage).
 
-  + section "Memory Management"
-
-    + to retain:
-        % Experimental memory management.  Meant to function like the Cocoa 
-        % retain/unretain messages.  To indicate that an object should be 
-        % saved, call this method.  To later indicate that you're done 
-        % with the object, call METHOD(unretain). 
-        % <p>
-		% <b>Creating an object with "new" automatically sets the retain count 
-		% to one</b>.  This means that the object creating an instance should
-		% <b>not</b> "retain" it, but <b>should</b> eventually "unretain" it 
-		% when it is no longer needed.</b>  When you are done using 
-		% an instance in your own context, but when the instance might be in use by 
-		% others, you should make an unretain call.  
-		% <p>
-        % The methods work by keeping a counter of all retains and unretains,
-        % freeing the object when the reference count is 0.  Every retain
-        % should be balanced by an unretain <b>in the same context</b>.  
-		% <p>
-		% This allows multiple instances to share references to the same instance.
-        % <p>
-        % The "free" command overrides the use of these methods, so be sure
-        % not to use it at all if you decide to use the retain/unretain 
-        % technique for an object.
-        % <p>
-        % An object should in general never need to call its own 
-        % retain/unretain messages.
-
-        objectReferences += 1.
-
-    + to unretain:
-        % Experimental memory management.  Meant to function like the Cocoa 
-        % retain/unretain messages.  This method reduces the retain count
-        % associated with an object.  See the notes for METHOD(retain)
-        % for more information.
-
-        objectReferences -= 1.
-
-
-        if objectReferences < 1: {
-			print "$objectReferences and freeing".
-			free self.
-		}
-
   + section "Archiving & Dearchiving"
 
     + to archive-as-xml file fileName (string):

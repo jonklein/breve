@@ -124,12 +124,12 @@ int main(int argc, char **argv) {
 
 	index = brParseArgs(argc, argv);
 
-	/* offset argc and argv to account for the options parsed out */
+	// offset argc and argv to account for the options parsed out 
 
 	argc -= index;
 	argv += index;
 
-	if((argc) < 2) {
+	if(argc < 2) {
 		brPrintUsage(argv[0]);
 	}
 

@@ -162,6 +162,11 @@ int brIImageLoadFromFile(brEval *args, brEval *result, brInstance *i) {
 int brIImageUpdateTexture(brEval *args, brEval *result, brInstance *i) { 
 	brImageData *image = BRPOINTER(&args[0]);
 
+	if(!image) {
+		BRINT(result) = -1;
+		return EC_OK;
+	}
+
    	image->textureNumber = slAddTexture(i->engine->world, image->textureNumber, image->data, image->x, image->y, GL_RGBA);
 
 	BRINT(result) = image->textureNumber;
