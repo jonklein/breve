@@ -49,10 +49,9 @@ enum slDrawModes {
 	DM_BOUND 			= 0x02,
 	DM_AXIS				= 0x04,
 	DM_STENCIL			= 0x08,
-	DM_NEIGHBOR_LINES		= 0x10,
-	DM_INVISIBLE			= 0x20,
-	DM_HIGHLIGHT			= 0x40,
-	DM_ALL				= 0xFFFF
+	DM_NEIGHBOR_LINES	= 0x10,
+	DM_INVISIBLE		= 0x20,
+	DM_HIGHLIGHT		= 0x40,
 };
 
 enum textureSettings {
