@@ -50,7 +50,7 @@ slStack *slStackNewWithSize(unsigned int size) {
 	s = new slStack;
 	s->count = 0;
 	s->maxCount = size;
-	s->data = slMalloc(sizeof(void*) * s->maxCount);
+	s->data = (void**)slMalloc(sizeof(void*) * s->maxCount);
 
 	return s;
 }
@@ -76,7 +76,7 @@ void slStackFree(slStack *s) {
 int slStackPush(slStack *s, void *data) {
 	if(s->count == s->maxCount) {
 		s->maxCount *= 2;
-		s->data = slRealloc(s->data, sizeof(void*) * s->maxCount);
+		s->data = (void**)slRealloc(s->data, sizeof(void*) * s->maxCount);
 	}
 
 	s->data[s->count] = data;

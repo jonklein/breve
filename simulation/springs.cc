@@ -20,42 +20,62 @@
 
 #include "simulation.h"
 
-void slWorldApplySpringForces(slWorld *w) {
-	std::vector<slSpring*>::iterator i;
-    for(i = w->springs.begin(); i != w->springs.end(); i++) {
-		slSpringApplyForce(*i);
-	}
-}
-
 double slSpringGetCurrentLength(slSpring *spring) {
 	slVector pos1, pos2, toV1;
-	slPositionVertex(&spring->_src->position, &spring->point1, &pos1);
-	slPositionVertex(&spring->_dst->position, &spring->point2, &pos2);
+
+	if(!spring->_src || !spring->_dst) return 0.0;
+
+	slPositionVertex(&spring->_src->position, &spring->_point1, &pos1);
+	slPositionVertex(&spring->_dst->position, &spring->_point2, &pos2);
 
 	slVectorSub(&pos1, &pos2, &toV1);
 
 	return slVectorLength(&toV1);
 }
 
-double slSpringGetLength(slSpring *spring) {
-	return spring->length;
+void slSpring::draw(slCamera *camera) {
+	slVector x, y;
+
+	if(!_src || !_dst) return;
+
+	slPositionVertex(&_src->position, &_point1, &x);
+	slPositionVertex(&_dst->position, &_point2, &y);
+
+	if(_stipple) {
+		glLineStipple(2, _stipple);
+		glEnable(GL_LINE_STIPPLE);
+	}
+
+	glColor4f(_color.x, _color.y, _color.z, 0.8);
+
+	glBegin(GL_LINES);
+
+	glVertex3f(x.x, x.y, x.z);
+	glVertex3f(y.x, y.y, y.z);
+
+	glEnd();
+
+	if(_stipple) glDisable(GL_LINE_STIPPLE);
 }
+
 
 /*!
 	\brief Applies the spring forces between two bodies.
 */
 
-void slSpringApplyForce(slSpring *spring) {
+void slSpring::step(double step) {
 	slVector pos1, pos2, toV1, vel1, vel2, velocity, point, force;
 	double distance, normVelocity, damping;
 	slVector linearVel, angularVel;
 	slLink *l1, *l2;
 
-	l1 = spring->_src;
-	l2 = spring->_dst;
+	if(!_src || !_dst) return;
 
-	slPositionVertex(&spring->_src->position, &spring->point1, &pos1);
-	slPositionVertex(&spring->_dst->position, &spring->point2, &pos2);
+	l1 = (slLink*)_src;
+	l2 = (slLink*)_dst;
+
+	slPositionVertex(&_src->position, &_point1, &pos1);
+	slPositionVertex(&_dst->position, &_point2, &pos2);
 
 	slVectorSub(&pos1, &pos2, &toV1);
 
@@ -63,12 +83,12 @@ void slSpringApplyForce(slSpring *spring) {
 
 	////////////////////////////////////////////////
 
-	slVectorXform(spring->_src->position.rotation, &spring->point1, &point);
-	slLinkGetVelocity(spring->_src, &linearVel, &angularVel);
+	slVectorXform(l1->position.rotation, &_point1, &point);
+	slLinkGetVelocity(l1, &linearVel, &angularVel);
 	slVelocityAtPoint(&linearVel, &angularVel, &point, &vel1);
 
-	slVectorXform(spring->_dst->position.rotation, &spring->point2, &point);
-	slLinkGetVelocity(spring->_dst, &linearVel, &angularVel);
+	slVectorXform(l2->position.rotation, &_point2, &point);
+	slLinkGetVelocity(l2, &linearVel, &angularVel);
 	slVelocityAtPoint(&linearVel, &angularVel, &point, &vel2);
 
 	slVectorSub(&vel1, &vel2, &velocity);
@@ -77,17 +97,17 @@ void slSpringApplyForce(slSpring *spring) {
 
 	////////////////////////////////////////////////
 
-	distance -= spring->length;
+	distance -= _length;
 
-	if(spring->mode == SPRING_MODE_CONTRACT_ONLY && distance < 0.0) return;
-	else if(spring->mode == SPRING_MODE_EXPAND_ONLY && distance > 0.0) return;
+	if(_mode == SPRING_MODE_CONTRACT_ONLY && distance < 0.0) return;
+	else if(_mode == SPRING_MODE_EXPAND_ONLY && distance > 0.0) return;
 
-	damping = spring->damping * normVelocity;
+	damping = _damping * normVelocity;
 
-	distance = (distance * spring->strength) + damping;
+	_force = (distance * _strength) + damping;
 
 	slVectorNormalize(&toV1);
-	slVectorMul(&toV1, distance, &force);
+	slVectorMul(&toV1, _force, &force);
 
 	////////////////////////////////////////////////
 
@@ -99,92 +119,52 @@ void slSpringApplyForce(slSpring *spring) {
 }
 
 void slSpringSetStrength(slSpring *s, double strength) {
-	s->strength = strength;
+	s->_strength = strength;
 }
 
 void slSpringSetDamping(slSpring *s, double damping) {
-	s->strength = damping;
+	s->_damping = damping;
 }
 
 void slSpringSetLength(slSpring *s, double length) {
-	s->length = length;
+	s->_length = length;
 }
 
 void slSpringSetMode(slSpring *s, int mode) {
-	s->mode = mode;
+	s->_mode = mode;
 }
 
 /*!
 	\brief Creates a new spring.
 */
 
-slSpring *slSpringNew(slLink *l1, slLink *l2, slVector *p1, slVector *p2, double length, double strength, double damping) {
+slSpring *slSpringNew(slWorld *w, slLink *l1, slLink *l2, slVector *p1, slVector *p2, double length, double strength, double damping) {
 	slSpring *spring;
 
 	spring = new slSpring;
 
-	slVectorCopy(p1, &spring->point1);
-	slVectorCopy(p2, &spring->point2);
+	slVectorCopy(p1, &spring->_point1);
+	slVectorCopy(p2, &spring->_point2);
 
 	spring->_src = l1;
 	spring->_dst = l2;
 
-	spring->length = length;
-	spring->strength = strength;
-	spring->damping = damping;
+	spring->_length = length;
+	spring->_strength = strength;
+	spring->_damping = damping;
+	spring->_force = 0;
+
+	slWorldAddConnection(w, spring);
 
 	return spring;
 }
 
-/*!
-	\brief Adds a spring to the world.
-*/
-
-void slWorldAddSpring(slWorld *w, slSpring *s) {
-	w->springs.push_back(s);
+double slSpringGetLength(slSpring *spring) {
+	return spring->_length;
 }
 
-/*!
-	\brief Removes a spring from the world.
-*/
-
-void slWorldRemoveSpring(slWorld *w, slSpring *s) {
-	std::vector<slSpring*>::iterator i;
-
-	if(!s) return;
-
-	i = std::find(w->springs.begin(), w->springs.end(), s);
-	slSpringFree(*i);
-	w->springs.erase(i);
-}
-
-void slWorldDrawSprings(slWorld *w) {
-	std::vector<slSpring*>::iterator i;
-
-	for(i = w->springs.begin(); i != w->springs.end(); i++ ) (*i)->draw();
-}
-
-void slSpring::draw() {
-	slVector pos1, pos2;
-
-	glLineStipple(1, 0xaaaa);
-	glEnable(GL_LINE_STIPPLE);
-	
-	glEnable(GL_BLEND);
-	glLineWidth(1.8);
-	glColor4f(0.0, 0.0, 0.0, 0.8);
-
-	glBegin(GL_LINES);
-
-	slPositionVertex(&_src->position, &point1, &pos1);
-	slPositionVertex(&_dst->position, &point2, &pos2);
-
-	glVertex3f(pos1.x, pos1.y, pos1.z);
-	glVertex3f(pos2.x, pos2.y, pos2.z);
-
-	glEnd();
-
-	glDisable(GL_LINE_STIPPLE);
+double slSpringGetForce(slSpring *spring) {
+	return spring->_force;
 }
 
 void slSpringFree(slSpring *s) {

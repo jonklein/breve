@@ -122,7 +122,7 @@ for						{ return FOR; }
 if						{ return IF; }
 else					{ return ELSE; }
 
-in						{ return ST_IN; }
+xxxxin						{ return ST_IN; }
 
 new						{ return NEW; }
 free					{ return FREE; }

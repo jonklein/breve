@@ -250,8 +250,7 @@ int brISetCollisionProperties(brEval args[], brEval *target, brInstance *i) {
 
 int brIGetNeighbors(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *wo = BRWORLDOBJECTPOINTER(&args[0]);
-	const slStack *neighbors;
-	unsigned int n;
+	std::vector<slWorldObject*>::iterator wi;
 	brEval eval;
 
 	if(!wo) {
@@ -263,12 +262,12 @@ int brIGetNeighbors(brEval args[], brEval *target, brInstance *i) {
 
 	eval.type = AT_INSTANCE;
 
-	neighbors = slWorldObjectGetNeighbors(wo);
+	std::vector<slWorldObject*> &neighbors = slWorldObjectGetNeighbors(wo);
 
-	for(n=0;n<neighbors->count;n++) {
+	for(wi = neighbors.begin(); wi != neighbors.end(); wi++ ) {
 		// grab the neighbor instances from the userData of the neighbors
 
-		BRINSTANCE(&eval) = (brInstance*)slWorldObjectGetCallbackData((slWorldObject*)neighbors->data[n]);
+		BRINSTANCE(&eval) = (brInstance*)slWorldObjectGetCallbackData(*wi);
 
 		if(BRINSTANCE(&eval) && BRINSTANCE(&eval)->status == AS_ACTIVE) brEvalListInsert(BRLIST(target), 0, &eval);
 	}
@@ -870,24 +869,9 @@ int brIAddObjectLine(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIRemoveObjectLine(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *src = BRWORLDOBJECTPOINTER(&args[0]);
-	slWorldObject *dst = BRWORLDOBJECTPOINTER(&args[1]);
+	slObjectConnection *line = (slObjectConnection*)BRPOINTER(&args[0]);
 
-	slRemoveObjectLine(i->engine->world, src, dst);
-
-	return EC_OK;
-}
-
-/*!
-	\brief Removes all lines originating from an object.
-
-	void removeAllObjectLines(slWorldObject pointer object).
-*/
-
-int brIRemoveAllObjectLines(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *src = BRWORLDOBJECTPOINTER(&args[0]);
-
-	slRemoveAllObjectLines(src);
+	slWorldRemoveConnection(i->engine->world, line);
 
 	return EC_OK;
 }
@@ -983,7 +967,6 @@ void breveInitWorldFunctions(brNamespace *n) {
 
 	brNewBreveCall(n, "addObjectLine", brIAddObjectLine, AT_NULL, AT_POINTER, AT_POINTER, AT_VECTOR, AT_STRING, 0);
 	brNewBreveCall(n, "removeObjectLine", brIRemoveObjectLine, AT_NULL, AT_POINTER, AT_POINTER, 0);
-	brNewBreveCall(n, "removeAllObjectLines", brIRemoveAllObjectLines, AT_NULL, AT_POINTER, 0);
 
 	brNewBreveCall(n, "setBoundsOnlyCollisionDetection", brISetBoundsOnlyCollisionDetection, AT_NULL, AT_INT, 0);
 

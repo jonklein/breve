@@ -713,7 +713,7 @@ inline int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) {
 	if(r != EC_OK) return r;
 
 	if(obj.type == AT_INSTANCE) {
-		if(!BRINSTANCE(&obj)) {
+		if(!BRINSTANCE(&obj) || BRINSTANCE(&obj)->status != AS_ACTIVE) {
 			stEvalError(i->type->engine, EE_NULL_INSTANCE, "method \"%s\" called with uninitialized object", mexp->methodName);
 			return EC_ERROR;
 		}
@@ -735,7 +735,7 @@ inline int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) {
 		brEvalList *listStart = BRLIST(&obj)->start;
 
 		while(listStart) {
-			if(!BRINSTANCE(&listStart->eval)) {
+			if(!BRINSTANCE(&listStart->eval) || BRINSTANCE(&listStart->eval)->status != AS_ACTIVE) {
 				stEvalError(i->type->engine, EE_NULL_INSTANCE, "method \"%s\" called with uninitialized object", mexp->methodName);
 				return EC_ERROR;
 			}

@@ -5,21 +5,27 @@ enum slSpringModes {
 };
 
 #ifdef __cplusplus
-class slSpring: public slObjectConnection {
+class slSpring: public slObjectLine {
 	public:
-		slLink *_src;
-		slLink *_dst;
+		slSpring() {
+			slVectorSet(&_color, 0, 0, 0);
+			_stipple = 0xaaaa;
+		}
 
-		void slSpring::draw();
+		void draw(slCamera *c);
 
-		double length;
-		double strength;
-		double damping;
+		void step(double step);
 
-		unsigned char mode;
+		double _length;
+		double _strength;
+		double _damping;
 
-		slVector point1;
-		slVector point2;
+		double _force;
+
+		unsigned char _mode;
+
+		slVector _point1;
+		slVector _point2;
 };
 #endif
 
@@ -29,7 +35,7 @@ void slSpringApplyForce(slSpring *spring);
 #ifdef __cplusplus
 extern "C" {
 #endif
-slSpring *slSpringNew(slLink *l1, slLink *l2, slVector *v1, slVector *v2, double length, double strength, double damping);
+slSpring *slSpringNew(slWorld *w, slLink *l1, slLink *l2, slVector *v1, slVector *v2, double length, double strength, double damping);
 
 double slSpringGetCurrentLength(slSpring *s);
 double slSpringGetLength(slSpring *s);
@@ -44,6 +50,8 @@ void slWorldAddSpring(slWorld *w, slSpring *s);
 void slWorldDrawSprings(slWorld *w);
 
 void slSpringFree(slSpring *spring);
+
+double slSpringGetForce(slSpring *spring);
 #ifdef __cplusplus
 }
 #endif

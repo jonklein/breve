@@ -90,7 +90,7 @@ slCamera *slCameraNew(int x, int y) {
 	return c;
 }
 
-void slCameraUpdateFrustum(slCamera *c) {
+void slCamera::updateFrustum() {
 	slVector loc;
 	float proj[16], frust[16], modl[16];
 
@@ -118,45 +118,61 @@ void slCameraUpdateFrustum(slCamera *c) {
 	frust[14] = modl[12] * proj[ 2] + modl[13] * proj[ 6] + modl[14] * proj[10] + modl[15] * proj[14];
 	frust[15] = modl[12] * proj[ 3] + modl[13] * proj[ 7] + modl[14] * proj[11] + modl[15] * proj[15];
 
-	slVectorAdd(&c->target, &c->location, &loc);
-	slVectorCopy(&loc, &c->frustumPlanes[0].vertex);
-	slVectorCopy(&loc, &c->frustumPlanes[1].vertex);
-	slVectorCopy(&loc, &c->frustumPlanes[2].vertex);
-	slVectorCopy(&loc, &c->frustumPlanes[3].vertex);
+	slVectorAdd(&target, &location, &loc);
+	slVectorCopy(&loc, &frustumPlanes[0].vertex);
+	slVectorCopy(&loc, &frustumPlanes[1].vertex);
+	slVectorCopy(&loc, &frustumPlanes[2].vertex);
+	slVectorCopy(&loc, &frustumPlanes[3].vertex);
 
-	c->frustumPlanes[0].normal.x = frust[3 ] - frust[0];
-	c->frustumPlanes[0].normal.y = frust[7 ] - frust[4];
-	c->frustumPlanes[0].normal.z = frust[11] - frust[8];
+	frustumPlanes[0].normal.x = frust[3 ] - frust[0];
+	frustumPlanes[0].normal.y = frust[7 ] - frust[4];
+	frustumPlanes[0].normal.z = frust[11] - frust[8];
 
-	c->frustumPlanes[1].normal.x = frust[3 ] + frust[0];
-	c->frustumPlanes[1].normal.y = frust[7 ] + frust[4];
-	c->frustumPlanes[1].normal.z = frust[11] + frust[8];
+	frustumPlanes[1].normal.x = frust[3 ] + frust[0];
+	frustumPlanes[1].normal.y = frust[7 ] + frust[4];
+	frustumPlanes[1].normal.z = frust[11] + frust[8];
 
-	c->frustumPlanes[2].normal.x = frust[3 ] - frust[1];
-	c->frustumPlanes[2].normal.y = frust[7 ] - frust[5];
-	c->frustumPlanes[2].normal.z = frust[11] - frust[9];
+	frustumPlanes[2].normal.x = frust[3 ] - frust[1];
+	frustumPlanes[2].normal.y = frust[7 ] - frust[5];
+	frustumPlanes[2].normal.z = frust[11] - frust[9];
 
-	c->frustumPlanes[3].normal.x = frust[3 ] + frust[1];
-	c->frustumPlanes[3].normal.y = frust[7 ] + frust[5];
-	c->frustumPlanes[3].normal.z = frust[11] + frust[9];
+	frustumPlanes[3].normal.x = frust[3 ] + frust[1];
+	frustumPlanes[3].normal.y = frust[7 ] + frust[5];
+	frustumPlanes[3].normal.z = frust[11] + frust[9];
 
-	slVectorNormalize(&c->frustumPlanes[0].normal);
-	slVectorNormalize(&c->frustumPlanes[1].normal);
-	slVectorNormalize(&c->frustumPlanes[2].normal);
-	slVectorNormalize(&c->frustumPlanes[3].normal);
+	slVectorNormalize(&frustumPlanes[0].normal);
+	slVectorNormalize(&frustumPlanes[1].normal);
+	slVectorNormalize(&frustumPlanes[2].normal);
+	slVectorNormalize(&frustumPlanes[3].normal);
 }
 
-int slCameraPointInFrustum(slCamera *c, slVector *test) {
+/*
+	\brief Tests whether a single point is inside the camera frustum.
+*/
+
+int slCamera::pointInFrustum(slVector *test) {
 	int n;
 
 	for(n=0;n<4;n++) {
-		if(slPlaneDistance(&c->frustumPlanes[n], test) < 0.0) return 0;
+		if(slPlaneDistance(&frustumPlanes[n], test) < 0.0) return 0;
 	}
 
 	return 1;
 }
 
-int slCameraPolygonInFrustum(slCamera *c, slVector *test, int n) {
+/*
+	\brief Tests whether the min and max vectors of an object are inside the camera frustum.
+*/
+
+int slCamera::minMaxInFrustum(slVector *min, slVector *max) {
+	return 1;
+}
+
+/*!
+	\brief Tests whether a polygon is inside the camera frustum.
+*/
+
+int slCamera::polygonInFrustum(slVector *test, int n) {
 	int x;
 	char violations[4] = { 0, 0, 0, 0 };
 	int v = 0;
@@ -165,7 +181,7 @@ int slCameraPolygonInFrustum(slCamera *c, slVector *test, int n) {
 		int plane;
 
 		for(plane=0;plane<4;plane++) {
-			if(slPlaneDistance(&c->frustumPlanes[plane], &test[x]) < 0.0) {
+			if(slPlaneDistance(&frustumPlanes[plane], &test[x]) < 0.0) {
 				violations[plane] = 1;
 				v++;
 				plane = 4;

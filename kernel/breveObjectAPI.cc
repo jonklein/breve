@@ -219,7 +219,7 @@ int brInstanceAddObserver(brInstance *i, brInstance *observer, char *notificatio
         return -1; 
     }
  
-    o = slMalloc(sizeof(brObserver));                                        
+    o = new brObserver;
     o->instance = observer; 
     o->method = method;
     o->notification = slStrdup(notification);
@@ -248,7 +248,7 @@ void brEngineRemoveInstanceObserver(brInstance *i, brInstance *observerInstance,
     if(i->status == AS_FREED || observerInstance->status == AS_FREED) return;
 
     while(observerList) {
-        observer = observerList->data;
+        observer = (brObserver*)observerList->data;
 
         if(observer->instance == observerInstance && (!notification || !strcmp(notification, observer->notification))) {
             match = observerList;
@@ -309,7 +309,7 @@ brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *poin
 
 	if(!name || !t || !e) return NULL;
 
-	o = slMalloc(sizeof(brObject));
+	o = new brObject;
 
 	o->name = slStrdup(name);
 	o->type = t;
@@ -343,7 +343,7 @@ brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
 	brMethod *imethod, *pmethod;
 	brInstance *i;
 
-    i = slMalloc(sizeof(brInstance));
+    i = new brInstance;
     i->engine = e;
 	i->object = object;
 	i->status = AS_ACTIVE;
@@ -439,18 +439,18 @@ void brMethodFree(brMethod *m) {
 */
 
 void brObjectFree(brObject *o) {
-	int n;
+	unsigned int n;
 
 	for(n=0;n<o->collisionHandlers->count;n++) {
-		brCollisionHandler *h = o->collisionHandlers->data[n];
+		brCollisionHandler *h = (brCollisionHandler*)o->collisionHandlers->data[n];
 
 		if(h->method) brMethodFree(h->method);
-		slFree(h);
+		delete h;
 	}
 
 	slStackFree(o->collisionHandlers);
 	slFree(o->name);
-	slFree(o);
+	delete o;
 }
 
 /*!
@@ -463,7 +463,7 @@ void brObjectFree(brObject *o) {
 */
 
 void brInstanceFree(brInstance *i) {
-	slList *olist, *events;
+	slList *olist;
 	brObserver *observer;
 	int n;
 
@@ -475,9 +475,9 @@ void brInstanceFree(brInstance *i) {
     olist = slListCopy(i->observers);
 
     while(olist) {
-        observer = olist->data;
+        observer = (brObserver*)olist->data;
         slFree(observer->notification);
-        slFree(observer);
+        delete observer;
         olist = olist->next;
     }
 
@@ -492,24 +492,13 @@ void brInstanceFree(brInstance *i) {
 	olist = slListCopy(i->observees);
 
     while(olist) {
-        brEngineRemoveInstanceObserver(olist->data, i, NULL);
+        brEngineRemoveInstanceObserver((brInstance*)olist->data, i, NULL);
 		olist = olist->next;
     }
 
     slListFree(olist);
 
     slListFree(i->observees);
-
-	// free the instance's events
-
-	events = i->events;
-
-	while(events) {
-		brEventFree(events->data);
-		events = events->next;
-	}
-
-	slListFree(i->events);
 
     for(n=0;n<i->menu.count;n++) {
         slFree(i->menu.list[n]->title);
@@ -542,7 +531,7 @@ int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *nam
 	unsigned char types[] = { AT_INSTANCE, AT_DOUBLE };
 
 	for(n=0;n<handler->collisionHandlers->count;n++) {
-		ch = handler->collisionHandlers->data[n];
+		ch = (brCollisionHandler*)handler->collisionHandlers->data[n];
 
 		if(ch->object == collider) return EC_STOP;
 	}
@@ -554,7 +543,7 @@ int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *nam
 		return EC_ERROR;
     }
 
-	ch = slMalloc(sizeof(brCollisionHandler));
+	ch = new brCollisionHandler;
 
 	ch->object = collider;
 	ch->method = method;
@@ -571,7 +560,7 @@ int brObjectSetIgnoreCollisionsWith(brObject *handler, brObject *collider, int i
 	unsigned int n;
 
 	for(n=0;n<handler->collisionHandlers->count;n++) {
-		ch = handler->collisionHandlers->data[n];
+		ch = (brCollisionHandler*)handler->collisionHandlers->data[n];
 
 		if(ch->object == collider) {
 			ch->ignore = ignore;
@@ -579,7 +568,7 @@ int brObjectSetIgnoreCollisionsWith(brObject *handler, brObject *collider, int i
 		}
 	}
 
-	ch = slMalloc(sizeof(brCollisionHandler));
+	ch = new brCollisionHandler;
 
 	ch->object = collider;
 	ch->method = NULL;

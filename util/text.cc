@@ -44,7 +44,7 @@ char *slStrdup(char *str) {
  
 	if(!str) return NULL;
  
-	copy = slMalloc(strlen(str) + 1);
+	copy = (char*)slMalloc(strlen(str) + 1);
  
 	if(!copy) return NULL;
  
@@ -95,7 +95,7 @@ char *slSplit(char *start, char *substr, int n) {
 	if(start) {
 		start -= strlen(substr);
 
-		result = slMalloc((start - oldstart) + 1);
+		result = (char*)slMalloc((start - oldstart) + 1);
 		strncpy(result, oldstart, start - oldstart);
 		result[start - oldstart] = 0;
 	} else result = slStrdup(oldstart);
@@ -185,7 +185,7 @@ char *slUtilReadFile(char *path) {
 	// the "stat" size is the compressed size -- we'll need to dynamically 
 	// resize to accomidate the uncompressed data.
 
-	buffer = slMalloc(1);
+	buffer = (char*)slMalloc(1);
 
 	while((n = slUtilGzread(temp, 2048, fp))) {
 		if(n == -1) {
@@ -193,7 +193,7 @@ char *slUtilReadFile(char *path) {
 			return NULL;
 		}
 
-		buffer = slRealloc(buffer, total + n + 1);
+		buffer = (char*)slRealloc(buffer, total + n + 1);
 
 		bcopy(temp, &buffer[total], n);
 		
@@ -234,7 +234,7 @@ char *slUtilReadStream(FILE *stream) {
 	char temp[2048];
 	int total = 0, n;
 
-	buffer = slMalloc(1);
+	buffer = (char*)slMalloc(1);
 
 	while((n = slUtilFread(temp, 2048, 1, stream))) { // TODO:  is 1 the right value
 		if(n == -1) {
@@ -242,7 +242,7 @@ char *slUtilReadStream(FILE *stream) {
 			return NULL;
 		}
 
-		buffer = slRealloc(buffer, total + n + 1);
+		buffer = (char*)slRealloc(buffer, total + n + 1);
 
 		bcopy(temp, &buffer[total], n);
 		
@@ -271,7 +271,7 @@ char *slDequote(char *d) {
 			
 	if(len <= 1) return NULL;
 	
-	n = slMalloc(len - 1);
+	n = (char*)slMalloc(len - 1);
 		
 	strncpy(n, &d[1], len - 2);
 	n[len - 2] = 0;  
@@ -350,7 +350,7 @@ char *slFgets(char *str, int size, FILE *stream) {
 */
 
 char *slUtilReadStdin() {
-	char *data = slMalloc(4096);
+	char *data = (char*)slMalloc(4096);
 	int n, total = 0;
 
 	while(!feof(stdin)) {
@@ -359,7 +359,7 @@ char *slUtilReadStdin() {
 
 		data[total] = 0;
 
-		data = slRealloc(data, total + 4096);
+		data = (char*)slRealloc(data, total + 4096);
 	}
 
 	return data;

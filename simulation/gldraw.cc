@@ -231,7 +231,7 @@ void slTextureFree(slCamera *c, const unsigned int n) {
 
 	if(c->activateContextCallback) c->activateContextCallback();
 
-	glDeleteTextures(1, &n);
+	glDeleteTextures(1, (GLuint*)&n);
 }
 
 /*!
@@ -319,7 +319,6 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 	slClearGLErrors("about to select");
 
     slVectorAdd(&c->location, &c->target, &cam);
-    
     gluLookAt(cam.x, cam.y, cam.z, c->target.x, c->target.y, c->target.z, 0.0, 1.0, 0.0);
 
 	// Render the objects in the world, with name loading, and with billboards as spheres
@@ -445,6 +444,8 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 	slVectorMul(dragVector, (sD / (eD + sD)), dragVector);
 	slVectorAdd(dragVector, &cam, dragVector);
 
+	glLoadIdentity();
+
 	return 0;
 }
 
@@ -498,10 +499,9 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 	glLoadIdentity();
 
 	slVectorAdd(&c->location, &c->target, &cam);
-
 	gluLookAt(cam.x, cam.y, cam.z, c->target.x, c->target.y, c->target.z, 0.0, 1.0, 0.0);
 
-	slCameraUpdateFrustum(c);
+	c->updateFrustum();
 
 	if(c->drawFog) slDrawFog(w, c);
 	else glDisable(GL_FOG);
@@ -557,10 +557,6 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 	glDepthMask(GL_FALSE);
 	slRenderObjects(w, c, flags|DO_ONLY_ALPHA);
 	glDepthMask(GL_TRUE);
-
-	// The following elements are one time renders with no special effects.
-
-	slWorldDrawSprings(w);
 
 	slRenderLabels(w);
 
@@ -1276,7 +1272,6 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 
 void slRenderLines(slWorld *w, slCamera *c) {
 	unsigned int n;
-	unsigned int m;
 	slVector *x, *y;
 	slWorldObject *neighbor;
 
@@ -1285,6 +1280,8 @@ void slRenderLines(slWorld *w, slCamera *c) {
 	for(n=0;n<w->objects.size();n++) {
 		if(w->objects[n] && !(w->objects[n]->drawMode & DM_INVISIBLE)) {
 			if(w->objects[n]->drawMode & DM_NEIGHBOR_LINES) {
+				std::vector<slWorldObject*>::iterator wi;
+
 				glEnable(GL_BLEND);
 				glColor4f(0.0, 0.0, 0.0, 0.5);
 
@@ -1292,8 +1289,8 @@ void slRenderLines(slWorld *w, slCamera *c) {
 
 				glBegin(GL_LINES);
 
-				for(m=0;m<w->objects[n]->neighbors->count;m++) {
-					neighbor = w->objects[n]->neighbors->data[m];
+				for(wi = w->objects[n]->neighbors.begin(); wi != w->objects[n]->neighbors.end(); wi++) { 
+					neighbor = *wi;
 
 					if(neighbor) {
 						y = &neighbor->position.location;
@@ -1313,29 +1310,10 @@ void slRenderLines(slWorld *w, slCamera *c) {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	std::vector<slObjectLine>::iterator li;
+	std::vector<slObjectConnection*>::iterator li;
 
 	for(li = w->connections.begin(); li != w->connections.end(); li++ ) {
-		slObjectLine &line = *li;
-
-		x = &line._src->position.location;
-		y = &line._dst->position.location;
-
-		if(line._stipple) {
-			glLineStipple(2, line._stipple);
-			glEnable(GL_LINE_STIPPLE);
-		}
-
-		glColor4f(line._color.x, line._color.y, line._color.z, 0.8);
-
-		glBegin(GL_LINES);
-
-		glVertex3f(x->x, x->y, x->z);
-		glVertex3f(y->x, y->y, y->z);
-
-		glEnd();
-
-		glDisable(GL_LINE_STIPPLE);
+		(*li)->draw(c);
 	}
 }
 

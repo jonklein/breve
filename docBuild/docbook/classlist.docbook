@@ -72,6 +72,10 @@
 <ulink url="../classes/Joint.html">Joint</ulink></para>
 </listitem>
 <listitem><para>
+<indexterm><primary>Line class</primary></indexterm>
+<ulink url="../classes/Line.html">Line</ulink></para>
+</listitem>
+<listitem><para>
 <indexterm><primary>Link class</primary></indexterm>
 <ulink url="../classes/Link.html">Link</ulink></para>
 </listitem>

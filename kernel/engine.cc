@@ -167,7 +167,7 @@ brInternalFunction *brEngineInternalFunctionLookup(brEngine *e, char *name) {
 
 	if(!s) return NULL;
 
-	return s->data;
+	return (brInternalFunction*)s->data;
 }
 
 
@@ -215,7 +215,7 @@ void brEngineFree(brEngine *e) {
 	}
 
 	for(bi = e->freedInstances.begin(); bi != e->freedInstances.end(); bi++ ) {
-		slFree( *bi);
+		delete *bi;
 	}
 
 #ifdef HAVE_LIBOSMESA
@@ -347,7 +347,7 @@ void brUnpauseTimer(brEngine *e) {
 
 brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *methodName, double time) {
 	brEvent *event;
-	slList *l, *eventEntry;
+	std::vector<brEvent*>::iterator ei;
 
 	event = new brEvent;
 
@@ -355,27 +355,18 @@ brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *methodName, double t
 	event->time = time;
 	event->instance = i;
 
-	eventEntry = slListPrepend(NULL, event);
-
 	// insert the event where it belongs according to the time it will be called 
 
-	if(i->events) {
-		l = i->events;
-
-		/* are we less than the first entry? */
-
-		if(((brEvent*)l->data)->time > time) {
-			eventEntry->next = l;
-			i->events = eventEntry;
-		} else {
-			while(l->next && ((brEvent*)l->next->data)->time < time) l = l->next;
-
-			eventEntry->next = l->next;
-			l->next = eventEntry;
-		}
-	} else {
-		i->events = eventEntry;
+	if(e->events.size() == 0) {
+		e->events.push_back(event);
+		return event;
 	}
+
+	ei = e->events.end() - 1;
+
+	while(ei != e->events.begin() && (*ei)->time < time) ei--;
+
+	e->events.insert(ei, event);
 
 	return event;
 }
@@ -450,34 +441,28 @@ int brEngineIterate(brEngine *e) {
 		}
 	}
 
-	for(bi = e->instances.begin(); bi != e->instances.end(); bi++ ) {
-		i = *bi;
+	double oldAge = slWorldGetAge(e->world);
 
-		if(i->status == AS_ACTIVE && i->events) {
-			double oldAge;
+	while(!e->events.empty() && (oldAge + e->iterationStepSize) >= e->events.back()->time) {
+		event = e->events.back();
 
-			eventList = i->events;
-			event = eventList->data;
+		if(event->instance->status == AS_ACTIVE) {
+			slWorldSetAge(e->world, event->time);
 
-			if((slWorldGetAge(e->world) + e->iterationStepSize) >= event->time) {
-				i->events = eventList->next;
+			rcode = brMethodCallByName(event->instance, event->name, &result);
 
-				oldAge = slWorldGetAge(e->world);
-				slWorldSetAge(e->world, event->time);
+			brEventFree(event);
+			slListFreeHead(eventList);
 
-				rcode = brMethodCallByName(i, event->name, &result);
+			slWorldSetAge(e->world, oldAge);
 
-				brEventFree(event);
-				slListFreeHead(eventList);
-
-				slWorldSetAge(e->world, oldAge);
-
-				if(rcode != EC_OK) {
-					pthread_mutex_unlock(&e->lock);
-					return rcode;
-				}
+			if(rcode != EC_OK) {
+				pthread_mutex_unlock(&e->lock);
+				return rcode;
 			}
 		}
+
+		e->events.pop_back();
 	}
 
 	pthread_mutex_unlock(&e->lock);

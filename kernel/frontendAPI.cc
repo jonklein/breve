@@ -11,7 +11,7 @@
 */
 
 breveFrontend *breveFrontendInit(int argc, char ** argv) {
-	breveFrontend *frontend = slMalloc(sizeof(breveFrontend));
+	breveFrontend *frontend = new breveFrontend;
 
 	frontend->engine = brEngineNew();
 	frontend->engine->argc = argc;
@@ -24,4 +24,12 @@ breveFrontend *breveFrontendInit(int argc, char ** argv) {
 #endif
 
 	return frontend;
+}
+
+/*!
+	\brief Deletes the breveFrontend.
+*/
+
+void breveFrontendDestroy(breveFrontend *frontend) {
+	delete frontend;
 }

@@ -4,6 +4,31 @@ void slWorldObject::draw(slCamera *camera) {
 	if(shape) shape->draw(camera, &position, textureScale, drawMode, 0);
 }
 
+void slObjectLine::draw(slCamera *camera) {
+	slVector *x, *y;
+
+	if(!_src || !_dst) return;
+
+	x = &_src->position.location;
+	y = &_dst->position.location;
+
+	if(_stipple) {
+		glLineStipple(2, _stipple);
+		glEnable(GL_LINE_STIPPLE);
+	}
+
+	glColor4f(_color.x, _color.y, _color.z, 0.8);
+
+	glBegin(GL_LINES);
+
+	glVertex3f(x->x, x->y, x->z);
+	glVertex3f(y->x, y->y, y->z);
+
+	glEnd();
+
+	if(_stipple) glDisable(GL_LINE_STIPPLE);
+}
+
 void slWorldObjectSetCallbackData(slWorldObject *wo, void *data) {
 	wo->userData = data;
 }
@@ -61,7 +86,7 @@ void slWorldObjectRemoveDrawMode(slWorldObject *wo, int mode) {
 	if(wo->drawMode & mode) wo->drawMode ^= mode;
 }
 
-const slStack *slWorldObjectGetNeighbors(slWorldObject *wo) {
+std::vector<slWorldObject*> &slWorldObjectGetNeighbors(slWorldObject *wo) {
 	return wo->neighbors;
 }
 

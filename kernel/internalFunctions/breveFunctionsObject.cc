@@ -166,7 +166,7 @@ int brINotify(brEval args[], brEval *target, brInstance *i) {
     newargs[0] = &iEval;
     newargs[1] = &sEval;
 
-    /* for each observer, check to see if what it's observing */
+    // for each observer, check to see if what it's observing
 
     while(observers) {
         observer = observers->data;

@@ -163,7 +163,7 @@ void slGISData::draw(slCamera *c) {
 			start.y = 0;
 			start.z = pi->_y - _center._y;
 
-			if(slCameraPointInFrustum(c, &start)) {
+			if(c->pointInFrustum(&start)) {
 				glBegin(GL_LINE_STRIP);
 
 				glVertex3f(start.x, start.y, start.z);

@@ -24,16 +24,6 @@
 
 #include "util.h"
 
-/* 
-	= nr.c, mathematical functions
-
-	= a few functions in this file based loosly Numerical Recipes in C but 
-	= i fixed all the nutty stuff they do.  like arrays starting at 1.  
-	= what's that all about?  what's up wit dat, sister?
-
-	= other functions are pure klein, baby.
-*/
-
 /*!
 	\brief Returns the closest power of two which is greater than or equal to 
 	the input.                                                               
@@ -47,8 +37,4 @@ int slNextPowerOfTwo(int n) {
 	while(power < n) power <<= 1;
 
 	return power;
-}
-
-int slIsinf(double d) {
-	return (d == 1.0/0.0);
 }

@@ -1666,7 +1666,9 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 	best1depth = -DBL_MAX;
 	best2depth = -DBL_MAX;
 
-	if((*f1p)->type == FT_FACE && (*f2p)->type == FT_FACE) return;
+	if((*f1p)->type == FT_FACE && (*f2p)->type == FT_FACE) {
+		return;
+	}
 
 	for(x=0;x<count1;x++) {
 		face1 = faces1[x];
@@ -1695,7 +1697,7 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 				*f2p = faces2[y];
 			}
 
-			for(pi = s1->points.begin(); pi != s1->points.end(); pi++ ) {
+			for(pi = s2->points.begin(); pi != s2->points.end(); pi++ ) {
 				point = *pi;
 				slPositionVertex(p2, &point->vertex, &tv);
 				dist = slPlaneDistance(&plane1, &tv);

@@ -53,6 +53,7 @@ typedef struct slMPPolyhedron slMPPolyhedron;
 typedef struct slWorld slWorld;
 typedef struct slWorldObject slWorldObject;
 typedef struct slStationary slStationary;
+typedef struct slObjectConnection slObjectConnection;
 typedef struct slObjectLine slObjectLine;
 
 typedef struct slSpring slSpring;

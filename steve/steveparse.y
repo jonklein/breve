@@ -682,9 +682,13 @@ statement
 ;
 
 control_statement
-: FOREACH WORD_VALUE ST_IN expression ':' statement {
+: FOREACH WORD_VALUE WORD_VALUE expression ':' statement {
 		stExp *ae = stNewAssignExp(thisMethod, thisObject, $2, NULL, yyfile, lineno);
 		slFree($2);
+
+		if(strcmp($3, "in")) {
+			stParseError(parseEngine, PE_PARSE, "Expected \"in\" after list expression of \"foreach\" statement");
+		}
 
 		if(ae) {
 			$$ = stNewForeachExp(ae->values.pValue, $4, $6, yyfile, lineno);

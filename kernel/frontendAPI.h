@@ -36,6 +36,7 @@ extern "C" {
 #endif
 
 breveFrontend *breveFrontendInit(int argc, char ** argv);
+void breveFrontendDestroy(breveFrontend *frontend);
 
 /*!
 	\brief [TO BE IMPLEMENTED BY THE LANGUAGE FRONTEND] Create the language-frontend data.

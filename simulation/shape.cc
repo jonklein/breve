@@ -78,7 +78,7 @@ void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, 
 		glColor4f(0, 0, 0, .5);
 		glDepthMask(GL_FALSE);
 		slRenderShape(this, GL_LINE_LOOP, 0, 0);
-		glDepthMask(GL_TRUE);
+		glDepthMask(GL_FALSE);
 		glDisable(GL_POLYGON_OFFSET_FILL);
 
 		if(_type == ST_SPHERE) {
@@ -832,9 +832,7 @@ int slShape::pointOnShape(slVector *dir, slVector *point) {
 
 		k = D/(X+Y+Z);
 
-		// printf("%p: k = %f [%d]\n", features[n], k, (!slIsinf(k) && k > 0.0));
-
-		if(!slIsinf(k) && k > 0.0) {
+		if((X+Y+Z) != 0.0 && k > 0.0) {
 			/* we have the length of the matching vector on the plane of this */
 			/* face. */
 

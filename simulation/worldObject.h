@@ -6,19 +6,10 @@
 #include "util.h"
 #include "shape.h"
 
+#include <vector>
+
 class slWorld;
 class slWorldObject;
-
-template <class T> class handle_ptr {
-		T* ptr;
-
-		T** handle;
-	public:
-		explicit handle_ptr(T* p = 0) : ptr(p) {}
-		~handle_ptr()                 {delete ptr;}
-		T& operator*()              {return *ptr;}
-		T* operator->()             {return ptr;}
-};
 
 /*!
 	\brief A line drawn from one object to another.
@@ -26,7 +17,8 @@ template <class T> class handle_ptr {
 
 class slObjectConnection {
 	public:
-		virtual void draw() = 0;
+		virtual void draw(slCamera *c) = 0;
+		virtual void step(double timestep) = 0;
 
 		slWorldObject *_src;
 		slWorldObject *_dst;
@@ -34,7 +26,8 @@ class slObjectConnection {
 
 class slObjectLine: public slObjectConnection {
 	public:
-		void draw() {};
+		void draw(slCamera *c);
+		void step(double timestep) {};
 
 		slVector _color;
 		int _stipple;
@@ -52,7 +45,6 @@ class slWorldObject {
 			shape = NULL;
 
 			proximityRadius = 0.00001;
-			neighbors = slStackNew();
 
 			billboardRotation = 0;
 			alpha = 1.0;
@@ -68,8 +60,14 @@ class slWorldObject {
 		}
 
 		virtual ~slWorldObject() {
+			std::vector<slObjectConnection*>::iterator ci;
+
+			for(ci = connections.begin(); ci != connections.end(); ci++ ) {
+				(*ci)->_src = NULL;
+				(*ci)->_dst = NULL;
+			}
+
 			if(shape) slShapeFree(shape);
-			slStackFree(neighbors);
 		}
 
 		virtual void draw(slCamera *camera);
@@ -114,17 +112,17 @@ class slWorldObject {
 		double mu;
 
 		double proximityRadius;
-		slStack *neighbors;
+		std::vector<slWorldObject*> neighbors;
 
 		// the list of lines that this object makes to other objects
 
-		std::vector<slObjectLine*> lines;
+		std::vector<slObjectConnection*> connections;
 
 		void *userData;
 };
 
+std::vector<slWorldObject*> &slWorldObjectGetNeighbors(slWorldObject *wo);
 #endif
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -149,8 +147,6 @@ void slWorldObjectSetBitmapRotation(slWorldObject *wo, double rot);
 
 void slWorldObjectAddDrawMode(slWorldObject *wo, int mode);
 void slWorldObjectRemoveDrawMode(slWorldObject *wo, int mode);
-
-const slStack *slWorldObjectGetNeighbors(slWorldObject *wo);
 
 int slWorldObjectGetLightExposure(slWorldObject *wo);
 #ifdef __cplusplus

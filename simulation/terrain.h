@@ -117,7 +117,7 @@ class slTerrainQuadtree {
 			_minDist = 100000;
 			_culled = true;
 
-			_clip = slCameraPolygonInFrustum(c, _points, 4);
+			_clip = c->polygonInFrustum(_points, 4);
 
 			if(_clip == 0) return _culled;
 

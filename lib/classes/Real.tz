@@ -15,6 +15,7 @@ Object : Real (aka Reals) [version 2.0] {
 		bitmap (int).
 		menus (list).
 		color (vector).
+		lines (list).
 
 		textureScale (float).
 		neighborhoodSize (float).
@@ -167,7 +168,15 @@ Object : Real (aka Reals) [version 2.0] {
 		% <P>
 		% If a line to otherObject already exists, its color and/or style will be updated.
 
-		addObjectLine(realWorldPointer, (otherObject get-world-object-pointer), theColor, theStyle).
+		line (object).
+
+		self remove-line to otherObject.
+
+		line = new Line.
+
+		line connect from self to otherObject with-color theColor with-style theStyle.
+
+		push line onto lines.
 
 	+ to add-dotted-line to otherObject (object) with-color theColor = (0, 0, 0) (vector):
 		% Adds a dotted line to otherObject.  See METHOD(add-line) for more information
@@ -177,13 +186,21 @@ Object : Real (aka Reals) [version 2.0] {
 
 	+ to remove-line to otherObject (object):
 		% Removes the line connecting this object to otherObject.
+	
+		line (object).
 
-		removeObjectLine(realWorldPointer, (otherObject get-world-object-pointer)).
+		foreach line in lines: {
+			if (line is-linked to otherObject): {
+				free line.
+				return.
+			}
+		}
 
 	+ to remove-all-lines:
 		% Removes all lines connecting this object to other objects.
 
-		removeAllObjectLines(realWorldPointer).
+		free lines.
+		lines = { }.
 
 	+ to show-axis:
 		% Shows the X and Y axes for the object.

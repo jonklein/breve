@@ -108,10 +108,11 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 	char *result;
 	int count;
 
+	std::vector<char*> textList;
+	std::vector<char*>::iterator ti;
+
 	brEvalListHead *listHead;
 	brEvalList *list;
-
-	slList *txtlist;
 
 	switch(e->type) {
 		case AT_STRING:
@@ -175,7 +176,7 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 			break;
 		case AT_LIST:
 			listHead = BRLIST(e);
-			list = listHead->end;
+			list = listHead->start;
 
 			if(!list) return slStrdup("{ }");
 
@@ -190,8 +191,6 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 
 			*seen = slListPrepend(*seen, listHead);
 
-			txtlist = NULL;
-
 			count = 0;
 
 			while(list) {
@@ -199,13 +198,13 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 
 				newString = brFormatEvaluationWithSeenList(&list->eval, i, seen);
 
-				txtlist = slListPrepend(txtlist, newString);
+				textList.push_back(newString);
 
 				count += strlen(newString);
 				count++; // for the space 
 				count++; // for the comma 
 
-				list = list->previous;
+				list = list->next;
 			}
 
 			count += 4; /* for the braces */
@@ -214,20 +213,16 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 
 			sprintf(result, "{ ");
 
-			while(txtlist) {
-				char *newString = txtlist->data;
+			for(ti = textList.begin(); ti != textList.end(); ti++ ) {
+				char *newString = *ti;
 
 				strcat(result, newString);
-				if(txtlist->next) strcat(result, ", ");
+				if(ti + 1 != textList.end()) strcat(result, ", ");
 
 				slFree(newString);
-
-				txtlist = txtlist->next;
 			}
 
 			strcat(result, " }");
-
-			if(txtlist) slListFree(txtlist);
 
 			return result;
 

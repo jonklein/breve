@@ -223,13 +223,6 @@ void slRenderWorldCameras(slWorld *w) {
 */
 
 void slWorldFreeObject(slWorldObject *o) {
-	std::vector<slObjectLine*>::iterator li;
-
-	for(li = o->lines.begin(); li != o->lines.end(); li++ ) {
-		(*li)->_src = NULL;
-		(*li)->_dst = NULL;
-	}
-
 	delete o;
 }
 
@@ -350,6 +343,7 @@ double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 double slWorldStep(slWorld *w, double stepSize, int *error) {
 	unsigned int n, simulate = 0;
 	std::vector<slWorldObject*>::iterator wi;
+	std::vector<slObjectConnection*>::iterator li;
 	int result;
 
 	n = 0;
@@ -359,7 +353,8 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 		(*wi)->step(w, stepSize);
 	}
 
-	slWorldApplySpringForces(w);
+	for(li = w->connections.begin(); li != w->connections.end(); li++ ) 
+		(*li)->step(stepSize);
 
 	if(w->detectCollisions) {
 		result = slVclip(w->clipData, 0.0, 0, w->boundingBoxOnly);
@@ -518,7 +513,7 @@ void slNeighborCheck(slWorld *w) {
 		wo->neighborMax.x = location->x + wo->proximityRadius;
 		wo->neighborMax.y = location->y + wo->proximityRadius;
 		wo->neighborMax.z = location->z + wo->proximityRadius;
-		slStackClear(wo->neighbors);
+		wo->neighbors.clear();
 	}
 
 	// vclip, but stop after the pruning stage 
@@ -539,8 +534,8 @@ void slNeighborCheck(slWorld *w) {
 			slVectorSub(l1, l2, &diff);
 			dist = slVectorLength(&diff);
 
-			if(dist < o1->proximityRadius) slStackPush(o1->neighbors, o2);
-			if(dist < o2->proximityRadius) slStackPush(o2->neighbors, o1);
+			if(dist < o1->proximityRadius) o2->neighbors.push_back(o1);
+			if(dist < o2->proximityRadius) o1->neighbors.push_back(o2);
 		}
 	}
 }
@@ -550,99 +545,45 @@ void slWorldSetGravity(slWorld *w, slVector *gravity) {
 }
 
 slObjectLine *slWorldAddObjectLine(slWorld *w, slWorldObject *src, slWorldObject *dst, int stipple, slVector *color) {
-	slObjectLine line, *linep;
+	slObjectLine *line;
 
 	if(src == dst) return NULL;
 
-	linep = slFindObjectLine(src, dst);
+	line = new slObjectLine;
 
-	if(linep) {
-		slVectorCopy(color, &linep->_color);
-		linep->_stipple = stipple;
-		return linep;
-	}
+	line->_stipple = stipple;
+	line->_dst = dst;
+	line->_src = src;
+	slVectorCopy(color, &line->_color);
 
-	line._stipple = stipple;
-	line._dst = dst;
-	line._src = src;
-	slVectorCopy(color, &line._color);
+	slWorldAddConnection(w, line);
 
-	w->connections.push_back( line);
-
-	linep = &w->connections[ w->connections.size() - 1];
-
-	src->lines.push_back( linep);
-
-	return linep;
+	return line;
 }
 
-int slRemoveObjectLine(slWorld *w, slWorldObject *src, slWorldObject *dst) {
-	std::vector<slObjectLine>::iterator li;
-	std::vector<slObjectLine*>::iterator linep;
-
-	slObjectLine *line;
-
-	for(li = w->connections.begin(); li != w->connections.end(); li++) {
-		line = &(*li);
-
-		if(line->_dst == dst) {
-			linep = find(src->lines.begin(), src->lines.end(), line);
-			if(linep != src->lines.end()) src->lines.erase(linep);
-
-			linep = find(dst->lines.begin(), dst->lines.end(), line);
-			if(linep != dst->lines.end()) dst->lines.erase(linep);
-
-			w->connections.erase(li);
-
-			return 0;
-		}
-	}
-
-	return -1;
+void slWorldAddConnection(slWorld *w, slObjectConnection *c) {
+	w->connections.push_back( c);
+	c->_src->connections.push_back( c);
+	c->_dst->connections.push_back( c);
 }
 
-/*!
-	\brief Frees all of the object lines for an object.
-*/
+void slWorldRemoveConnection(slWorld *w, slObjectConnection *c) {
+	std::vector<slObjectConnection*>::iterator li;
 
-int slRemoveAllObjectLines(slWorldObject *src) {
-	std::vector<slObjectLine*>::iterator li;
-	slObjectLine *line;
-	slWorldObject *dst;
-	
-	while(src->lines.size()) {
-		line = src->lines[0];
-		dst = line->_dst;
+	if(!c) return;
 
-		std::vector<slWorldObject*>::iterator wi;
-
-		li = find(src->lines.begin(), src->lines.end(), line);
-		src->lines.erase(li);
-
-		li = find(src->lines.begin(), src->lines.end(), line);
-		src->lines.erase(li);
-
-		delete line;
+	if(c->_src) {
+		li = find(c->_src->connections.begin(), c->_src->connections.end(), c);
+		if(li != c->_src->connections.end()) c->_src->connections.erase(li);
 	}
 
-	return 0;
-}
-
-/*!
-	\brief Finds the object line between src and dst.
-*/
-
-slObjectLine *slFindObjectLine(slWorldObject *src, slWorldObject *dst) {
-	std::vector<slObjectLine*>::iterator li;
-	slObjectLine *line;
-
-	for(li = src->lines.begin(); li != src->lines.end(); li++) {
-		line = *li;
-
-		if(line->_dst == dst) return line;
+	if(c->_dst) {
+		li = find(c->_dst->connections.begin(), c->_dst->connections.end(), c);
+		if(li != c->_dst->connections.end()) c->_dst->connections.erase(li);
 	}
 
-	return NULL;
+	li = find(w->connections.begin(), w->connections.end(), c);
+	if(li != w->connections.end()) w->connections.erase(li);
 }
 
 /*!

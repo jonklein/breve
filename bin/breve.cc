@@ -304,7 +304,7 @@ void brQuit(brEngine *e) {
 
 	brEngineFree(frontend->engine);
 	breveFrontendCleanupData(frontend->data);
-	slFree(frontend);
+	breveFrontendDestroy(frontend);
 
 #ifdef MEMORY_DEBUG
 	slMemoryReport();

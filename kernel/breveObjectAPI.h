@@ -85,8 +85,6 @@ struct brInstance {
 
 	slList *dependencies;
 	slList *dependents;
-
-	slList *events;
 };
 
 /*!

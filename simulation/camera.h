@@ -81,101 +81,106 @@ struct slBillboardEntry {
 */
 
 #ifdef __cplusplus
-struct slCamera {
-	slLight lights[8];
-	int nLights;
+class slCamera {
+	public:
+		slLight lights[8];
+		int nLights;
 
-	// unsigned char enabled;
+		void updateFrustum();
 
-	slWorldObject *shadowCatcher;
+		int pointInFrustum(slVector *test);
+		int minMaxInFrustum(slVector *min, slVector *max);
+		int polygonInFrustum(slVector *test, int n);
 
-	int flags;
+		// unsigned char enabled;
 
-	double zClip;
+		slWorldObject *shadowCatcher;
 
-	// used during drawing
+		int flags;
 
-	slBillboardEntry **billboards;
-	unsigned int billboardCount;
-	unsigned int maxBillboards;
-	int billboardDrawList;
+		double zClip;
 
-	slVector billboardX;
-	slVector billboardY;
-	slVector billboardZ;
+		// used during drawing
 
-	int cubeDrawList;
-	int sphereDrawLists;
-
-	// recompile can be set to 1 at any time to force recompilation 
-	// of draw lists next time the world is drawn. 
-
-	unsigned char recompile;
-
-	std::vector<slCameraText> text;
-
-	double textScale;
-
-	unsigned char drawMode;
-	unsigned char drawLights;
-	unsigned char drawFog;
-	unsigned char drawSmooth;
-	unsigned char drawShadow;
-	unsigned char drawShadowVolumes;
-	unsigned char drawOutline;
-	unsigned char drawReflection;
-	unsigned char drawText;
-	unsigned char blur;
-	double blurFactor;
-
-	slVector fogColor;
-
-	double fogIntensity;
-	double fogStart;
-	double fogEnd;
-
-	slPlane shadowPlane;
-
-	// offset & target of camera
-
-	slVector location;
-	slVector target; 
-	double rotation[3][3];
-
-	// rotation & zoom 
-
-	double rx, ry;
-	double zoom;
-
-	double backgroundScrollX, backgroundScrollY;
-
-	// the window's perspective of x and y axis at the current rotation 
-
-	slVector xAxis;
-	slVector yAxis;
-
-	slPlane frustumPlanes[6];
-
-	// camera size 
+		slBillboardEntry **billboards;
+		unsigned int billboardCount;
+		unsigned int maxBillboards;
+		int billboardDrawList;
 	
-	int x;
-	int y;
+		slVector billboardX;
+		slVector billboardY;
+		slVector billboardZ;
+	
+		int cubeDrawList;
+		int sphereDrawLists;
+	
+		// recompile can be set to 1 at any time to force recompilation 
+		// of draw lists next time the world is drawn. 
+	
+		unsigned char recompile;
+	
+		std::vector<slCameraText> text;
+	
+		double textScale;
+	
+		unsigned char drawMode;
+		unsigned char drawLights;
+		unsigned char drawFog;
+		unsigned char drawSmooth;
+		unsigned char drawShadow;
+		unsigned char drawShadowVolumes;
+		unsigned char drawOutline;
+		unsigned char drawReflection;
+		unsigned char drawText;
+		unsigned char blur;
+		double blurFactor;
+	
+		slVector fogColor;
+	
+		double fogIntensity;
+		double fogStart;
+		double fogEnd;
+	
+		slPlane shadowPlane;
+	
+		// offset & target of camera
+	
+		slVector location;
+		slVector target; 
+		double rotation[3][3];
+	
+		// rotation & zoom 
 
-	// camera origin on screen view coords 
-
-	int ox;
-	int oy;
-
-	double fov;
-
-	int (*activateContextCallback)();
-	void (*renderContextCallback)(slWorld *w, slCamera *c);
+		double rx, ry;
+		double zoom;
+	
+		double backgroundScrollX, backgroundScrollY;
+	
+		// the window's perspective of x and y axis at the current rotation 
+	
+		slVector xAxis;
+		slVector yAxis;
+	
+		slPlane frustumPlanes[6];
+	
+		// camera size 
+		
+		int x;
+		int y;
+	
+		// camera origin on screen view coords 
+	
+		int ox;
+		int oy;
+	
+		double fov;
+	
+		int (*activateContextCallback)();
+		void (*renderContextCallback)(slWorld *w, slCamera *c);
 };
 #endif
 
 void slCameraUpdateFrustum(slCamera *c);
-int slCameraPointInFrustum(slCamera *c, slVector *test);
-int slCameraPolygonInFrustum(slCamera *c, slVector *test, int n);
 
 #ifdef __cplusplus
 extern "C" {

@@ -26,7 +26,9 @@ Object : Spring (aka Springs) {
 		springPointer (pointer).
 		length, strength, damping (float).
 		mode (int).
-		link1, link2 (object).
+		start, end (object).
+
+	+ section "Connecting Links Using a Spring"
 
 	+ to connect from springLink1 (object) to springLink2 (object) 
 				from-point point1 = (0, 0, 0) (vector) 
@@ -43,15 +45,15 @@ Object : Spring (aka Springs) {
 
 		if springLink1 == springLink2: return.
 
-		link1 = springLink1.
-		link2 = springLink2.
+		start = springLink1.
+		end = springLink2.
 
 		length = springLength.
 		strength = springStrength.
 		damping = springDamping.
 
-		springPointer = springNew((link1 get-link-pointer), 
-				(link2 get-link-pointer), 
+		springPointer = springNew((start get-link-pointer), 
+				(end get-link-pointer), 
 				point1, point2, length, strength, damping).
 
 	+ to get-current-length:
@@ -60,11 +62,22 @@ Object : Spring (aka Springs) {
 		if springPointer: return springGetCurrentLength(springPointer).
 		return 0.
 
+	+ section "Getting and Setting Spring Parameters"
+
 	+ to get-length:
 		% This method returns the natural length of the spring.  See also
 		% METHOD(get-current-length) which returns the current (stretched
 		% or compressed) length of the spring.
 		return length.
+
+	+ to get-force:
+		% Returns the amount of force applied by this spring at the last 
+		% timestep.  The returned value is a double representing the 
+		% magnitude of the force.  The direction of the force is determined
+		% by the locations of the links to which the spring is attached.
+
+        if springPointer: return springGetForce(springPointer).
+		return 0.
 
 	+ to set-length to newLength (double):
 		% Sets the spring's length to newLength.
@@ -109,10 +122,10 @@ Object : Spring (aka Springs) {
 		if springPointer: springSetMode(springPointer, 2).
 
 	+ to destroy: 
-		springRemove(springPointer).
+		if springPointer: springRemove(springPointer).
 
 	+ to get-links:
 		% Returns a list with two items, the links which are joined by this spring.
 
-		return { link1, link2 }.
+		return { start, end }.
 }

@@ -140,10 +140,8 @@ struct slWorld {
 
 	std::vector<slWorldObject*> objects;
 	std::vector<slPatchGrid*> patches;
-	std::vector<slSpring*> springs;
 	std::vector<slCamera*> cameras;
-
-	std::vector<slObjectLine> connections;
+	std::vector<slObjectConnection*> connections;
 
 	// we have one slVclipData for the regular collision detection
 	// and one which will be used to answer "proximity" questions:
@@ -212,10 +210,8 @@ void slWorldSetBoundsOnlyCollisionDetection(slWorld *w, int value);
 void slInitProximityData(slWorld *w);
 
 slObjectLine *slWorldAddObjectLine(slWorld *w, slWorldObject *src, slWorldObject *dst, int stipple, slVector *color);
-int slRemoveObjectLine(slWorld *w, slWorldObject *src, slWorldObject *dst);
-int slRemoveAllObjectLines(slWorldObject *src);
-
-slObjectLine *slFindObjectLine(slWorldObject *src, slWorldObject *dst);
+void slWorldRemoveConnection(slWorld *w, slObjectConnection *c);
+void slWorldAddConnection(slWorld *w, slObjectConnection *c);
 
 void slVclipDataAddPairEntry(slWorld *w, int x, int y);
 
