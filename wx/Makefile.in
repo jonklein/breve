@@ -1,0 +1,87 @@
+WXVERSION:=$(shell echo `wx-config --version`)
+CXX=g++
+RESCOMP=windres.exe
+RCFILE=wxbreve
+RESOURCEOBJECT=
+MACRESOURCECMD=
+MACPACKAGEINFO=
+OUTPUTPATH=wxbreve
+OBJECTPATH=wxbreve
+PROGRAM=wxbreve
+LIBS=`wx-config --inplace --libs gl,core,stc` @LIBS@
+LINKERFLAGS=
+WARNINGFLAGS=
+OPTFLAGS=
+DEBUGFLAGS=
+LIBPATH=
+CPPINC=`wx-config --inplace --cxxflags` -g -I../include/breve -I/System/Library/Frameworks/JavaVM.framework/Headers
+LDFLAGS=$(LIBS) $(LIBPATH) $(LINKERFLAGS) 
+CPPFLAGS=$(CPPINC) $(GCCFLAGS) $(DEBUGFLAGS) $(OPTFLAGS) $(WARNINGFLAGS) 
+LIBDIRNAME=/usr/local/lib/wx
+
+OBJECTS=$(OBJECTPATH)/Main.o $(OBJECTPATH)/BreveCanvas.o $(OBJECTPATH)/gluthack.o $(OBJECTPATH)/BreveInterface.o $(OBJECTPATH)/SimInstance.o $(OBJECTPATH)/LogWindow.o $(OBJECTPATH)/FindDialog.o $(OBJECTPATH)/CodeWindow.o $(OBJECTPATH)/CodeCtrl.o $(OBJECTPATH)/BreveRender.o $(OBJECTPATH)/Inspector.o $(OBJECTPATH)/BDialog.o $(RESOURCEOBJECT)
+
+all:	$(OBJECTPATH) $(MACPACKAGEINFO)
+
+$(OBJECTPATH):
+	mkdir -p $(OBJECTPATH)
+
+clean:
+	rm -f $(OBJECTPATH)/*.o
+	rm -f $(OBJECTPATH)/*.res
+	rm -fr .deps .pch
+	rm -fr $(PROGRAM).app
+	rm -f $(OUTPUTPATH)/$(PROGRAM)
+
+help:
+	@echo "Usage: make -f Makefile [all|clean|help]"
+
+### Targets ####
+
+all:	$(OUTPUTPATH)/$(PROGRAM)
+
+$(OUTPUTPATH)/$(PROGRAM):	$(OBJECTS)
+	$(CXX) -o $@ $(OBJECTS) $(LDFLAGS)
+	$(MACRESOURCECMD)
+
+# Windows only
+$(OBJECTPATH)/$(RCFILE)_rc.o:	$(RCFILE).rc
+	$(RESCOMP) --use-temp-file -i$< -o$@ $(RESPATH) --include-dir . --define NOPCH
+
+$(OBJECTPATH)/Main.o:	Main.cpp Main.h
+	$(CXX) -c -o $@ $(CPPFLAGS) Main.cpp
+
+$(OBJECTPATH)/BreveRender.o:	BreveRender.cpp BreveRender.h
+	$(CXX) -c -o $@ $(CPPFLAGS) BreveRender.cpp
+
+$(OBJECTPATH)/Inspector.o:	Inspector.cpp Inspector.h
+	$(CXX) -c -o $@ $(CPPFLAGS) Inspector.cpp
+
+$(OBJECTPATH)/LogWindow.o:	LogWindow.cpp LogWindow.h
+	$(CXX) -c -o $@ $(CPPFLAGS) LogWindow.cpp
+
+$(OBJECTPATH)/BDialog.o:	BDialog.cpp BDialog.h
+	$(CXX) -c -o $@ $(CPPFLAGS) BDialog.cpp
+
+$(OBJECTPATH)/CodeWindow.o: CodeWindow.cpp CodeWindow.h
+	$(CXX) -c -o $@ $(CPPFLAGS) CodeWindow.cpp
+
+$(OBJECTPATH)/FindDialog.o: FindDialog.cpp FindDialog.h
+	$(CXX) -c -o $@ $(CPPFLAGS) FindDialog.cpp
+
+$(OBJECTPATH)/CodeCtrl.o: CodeCtrl.cpp CodeCtrl.h
+	$(CXX) -c -o $@ $(CPPFLAGS) CodeCtrl.cpp
+
+$(OBJECTPATH)/SimInstance.o:	SimInstance.cpp SimInstance.h
+	$(CXX) -c -o $@ $(CPPFLAGS) SimInstance.cpp
+
+$(OBJECTPATH)/BreveCanvas.o:	BreveCanvas.cpp BreveCanvas.h
+	$(CXX) -c -o $@ $(CPPFLAGS) BreveCanvas.cpp
+
+$(OBJECTPATH)/BreveInterface.o:	BreveInterface.cpp BreveInterface.h
+	$(CXX) -c -o $@ $(CPPFLAGS) BreveInterface.cpp
+
+$(OBJECTPATH)/gluthack.o:	gluthack.cpp gluthack.h
+	$(CXX) -c -o $@ $(CPPFLAGS) gluthack.cpp
+
+.PHONY:	all clean

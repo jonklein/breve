@@ -1,0 +1,48 @@
+Gabriel Tarasuk-Levin
+gt04@hampshire.edu
+3/19/05
+
+wxbreve 1.0
+
+Windows notes:
+I've only been able to get Breve 2.1 to compile using Cygwin... to that end, I
+strongly suggest that you stick with Cygwin, rather than attempt to use MSVC or
+the like.
+
+Compiling for Linux or Windows (using Cygwin):
+First, you need to install wxWidgets 2.5.4.  Be sure to enable opengl support
+when compiling it.  On Cygwin, you need to additionally edit setup.h to make
+sure that wxUSE_MOUSEWHEEL support is defined, along with wxUSE_GLCANVAS.
+wxWidgets socket support doesn't compile on Cygwin, so disable that.  Also disable
+shared library support.  wxGTK should work out of the box.
+
+After that, compile and install wxWidgets/contrib/stc.
+
+Next, get breve 2.1 to compile from source.  This will require getting a few
+libraries - a straightforward process.  FFMpeg should be configured with
+--disable-vhook on Cygwin.
+
+Note that I haven't been able to get Breve 2.1 to work properly with Java.  While
+it will compile properly, it won't function correctly... you'll see error messages
+in the standard breve client, and it will cause wxbreve to crash whenever it tries to
+regenerate a BreveInterface.  I strongly suggest you compile breve 2.1 without java
+support - which, if I recall correctly, requires editing config.h.
+
+Once Breve works, you need to make it into a static library.  The command to do this
+is 'ar rcs libbreve.a <object files>' where object files are all of Breve's object
+files, minus the executable object files (graph files, breve.o, breve_cli.o).
+
+Put the static library into the directory containing the wxbreve source
+(this directory), then copy the breve 2.1 source directory into this directory, calling
+it breve_source.  Object files and source files need not be copied - the client
+just needs to have access to the breve 2.1 include files and static library.
+
+From here, you can compile wxbreve.  Linux users can just type make.  Cygwin
+users should use Makefile.cyg (make -f Makefile.cyg).
+
+For Linux users, this should have all been rather painless.  It's pretty easy.
+Cygwin, on the other hand, can be a real pain sometimes... if you need help,
+feel free to email me.
+
+Important:  Make sure your compiled wxbreve binary lives in the same directory
+as the tiff images and breve_source directory.
