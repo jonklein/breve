@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include "javaFunctions.h"
+#include "java.h"
+
+#ifdef HAVE_LIBJAVA
 
 extern brJavaBridgeData *gJavaBridge;
-
-#define USER_CLASSPATH "."
 
 brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	JavaVMInitArgs vm_args;
@@ -55,8 +55,7 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 
 	optstr = malloc(strlen(finder) + strlen(classPath) + strlen("-Djava.object.path=") + 1024);
 
-	sprintf(optstr, "-Djava.object.path=%s:%s", classPath, finder);
-	printf("%s\n", optstr);
+	sprintf(optstr, "-Djava.class.path=%s:%s:.", finder, classPath);
 
 	JNI_GetDefaultJavaVMInitArgs(&vm_args);
 
@@ -169,6 +168,11 @@ brJavaMethod *brJavaMethodFind(brJavaBridgeData *bridge, brJavaObject *object, c
 	static jcharArray array = NULL;
 	jchar cargTypes[JAVA_MAX_ARGS];
 
+	// translate to a valid java name
+	name = slStrdup(name);
+	for(count=0;count<strlen(name);count++) 
+		if(name[count] == '-') name[count] = '_';
+
 	if(!array) array = (*bridge->env)->NewCharArray(bridge->env, JAVA_MAX_ARGS);
 
 	for(count=0;count<nargs;count++) cargTypes[count] = brJTypeForType(types[count]);
@@ -212,6 +216,8 @@ brJavaMethod *brJavaMethodFind(brJavaBridgeData *bridge, brJavaObject *object, c
 
 		if(error != EC_OK) return NULL;
 	}
+
+	slFree(name);
 
 	return brJavaMakeMethodData(name, methodID, returnType, argumentTypes, nargs);
 }
@@ -276,7 +282,7 @@ int brJavaMethodCall(brJavaBridgeData *bridge, brJavaInstance *instance, brJavaM
 			BRDOUBLE(result) = returnValue.f;
 			break;
 		case 'D':
-			returnValue.d = (*bridge->env)->CallFloatMethodA(bridge->env, instance->instance, method->method, jargs);
+			returnValue.d = (*bridge->env)->CallDoubleMethodA(bridge->env, instance->instance, method->method, jargs);
 			result->type = AT_DOUBLE;
 			BRDOUBLE(result) = returnValue.d;
 			break;
@@ -300,6 +306,8 @@ int brJavaMethodCall(brJavaBridgeData *bridge, brJavaInstance *instance, brJavaM
 	// check for exception here
 	
 	if((*bridge->env)->ExceptionOccurred(bridge->env)) {
+		(*bridge->env)->ExceptionDescribe(bridge->env);
+		(*bridge->env)->ExceptionClear(bridge->env);
 		slMessage(DEBUG_ALL, "Exception occured in Java execution of method \"%s\"\n", method->name);
 		result->type = AT_NULL;
 		return EC_ERROR;			
@@ -310,6 +318,13 @@ int brJavaMethodCall(brJavaBridgeData *bridge, brJavaInstance *instance, brJavaM
 
 brJavaObject *brJavaObjectFind(brJavaBridgeData *bridge, char *name) {
 	brJavaObject *object;
+	int n;
+
+	name = slStrdup(name);
+
+	// translate to a valid java object name.
+
+	for(n=0;n<strlen(name);n++) if(name[n] == '.') name[n] = '/';
 
 	if(!(object = slDehashData(bridge->objectHash, name))) {
 		object = slMalloc(sizeof(brJavaObject));
@@ -323,6 +338,8 @@ brJavaObject *brJavaObjectFind(brJavaBridgeData *bridge, char *name) {
 
 		object->bridge = bridge;
 	}
+
+	slFree(name);
 
 	return object;
 }
@@ -363,7 +380,7 @@ brJavaInstance *brJavaInstanceNew(brJavaObject *object, brEval **args, int argCo
 
 	for(n=0;n<argCount;n++) {
 		if(brEvalToJValue(object->bridge, args[n], &jargs[n], method->argumentTypes[n]) != EC_OK) {
-			slMessage(DEBUG_ALL, "Error converting breve type to native Java type\n");
+			slMessage(DEBUG_ALL, "Error converting breve type to Java native type\n");
 			return NULL;
 		}
 	}
@@ -376,94 +393,6 @@ brJavaInstance *brJavaInstanceNew(brJavaObject *object, brEval **args, int argCo
 	}
 
 	return instance;
-}
-
-int brEvalToJValue(brJavaBridgeData *bridge, brEval *e, jvalue *v, char javaType) {
-	switch(javaType) {
-		case 'V':	
-			e->type = AT_NULL;
-			break;
-		case 'I':
-			v->i = BRINT(e);
-			break;
-		case 'D':
-			v->d = BRDOUBLE(e);
-			break;
-		case 'F':
-			v->f = BRDOUBLE(e);
-			break;
-		case 'T':
-			v->l = brMakeJavaString(bridge, BRSTRING(e));
-			break;
-		case 'O':
-			v->l = ((brJavaInstance*)(BRINSTANCE(e)->pointer))->instance;
-			break;
-		default:
-			return EC_ERROR;
-	}
-
-	return EC_OK;
-}
-
-char brJTypeForType(unsigned char breveType) {
-	switch(breveType) {
-		case AT_NULL:
-			return 'V';
-			break;
-		case AT_INT:
-			return 'I';
-			break;
-		case AT_DOUBLE:
-			return 'D';
-			break;
-		case AT_INSTANCE:
-			return 'O';
-			break;
-		case AT_STRING:
-			return 'L';
-			break;
-		default:
-			return 'V';
-			break;
-	}
-
-}
-
-jstring brMakeJavaString(brJavaBridgeData *bridge, char *string) {
-	jchar *characters;
-	jstring s;
-	int n;
-
-	characters = slMalloc(sizeof(jchar) * (strlen(string) + 1));
-
-	for(n=0;n<strlen(string);n++) characters[n] = string[n];
-
-	s = (*bridge->env)->NewString(bridge->env, characters, strlen(string));
-
-	slFree(characters);
-
-	return s;
-}
-
-char *brReadJavaString(brJavaBridgeData *bridge, jstring string) {
-	char *result;
-	const jchar *characters;
-	int n, length;
-
-	length = (*bridge->env)->GetStringLength(bridge->env, string);
-
-	result = slMalloc(length + 1);
-
-	characters = (*bridge->env)->GetStringChars(bridge->env, string, NULL);
-
-	for(n=0;n<length;n++) 
-		result[n] = characters[n];
-
-	result[n] = 0;
-
-	(*bridge->env)->ReleaseStringChars(bridge->env, string, characters);
-
-	return result;
 }
 
 void brFreeJavaMethodData(brJavaMethod *method) {
@@ -481,3 +410,4 @@ void brFreeJavaBridgeData(brJavaBridgeData *bridge) {
 	slFree(bridge->methodFinder);
 	slFree(bridge);
 }
+#endif

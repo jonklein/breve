@@ -1,6 +1,6 @@
 INCLUDES = -I../include/breve
 
-LIBO	= javaObjectType.o javaFunctions.o 
+LIBO	= javaObjectType.o javaFunctions.o javaTypes.o
 
 install: all
 

@@ -1,0 +1,23 @@
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use Stationary.
+
+Controller JavaTestController.
+
+Control : JavaTestController {
+	+ variables:
+		test (object).
+
+	+ to init:
+		# put initialization code here which creates objects
+		# and sets up the simulation
+
+		test = new "JavaTest".
+
+		print "Int test: ", (test intTest with-number random[10]).
+		print "Double test: ", (test doubleTest with-number random[10.0]).
+		print "String test: ", (test stringTest with-string "string").
+}

@@ -10,7 +10,8 @@ public class MethodFinder {
 	Class methodClass, voidClass;
 
 	public MethodFinder() throws Exception {
-		System.out.println("Creating the MethodFinder class...\n");
+		System.out.println("Creating the MethodFinder class...");
+		System.out.println("Done.");
 
 		try {
 			methodClass = Class.forName("java.lang.reflect.Method");
