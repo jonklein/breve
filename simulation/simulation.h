@@ -49,8 +49,6 @@ extern "C"{
 
 #include "util.h"
 
-#include "netsim.h"
-
 #include "springs.h"
 
 #include "patch.h"
@@ -69,6 +67,7 @@ extern "C"{
 }
 #endif
 
+#include "netsim.h"
 #include "vclip.h"
 #include "shape.h"
 #include "shadow.h"
@@ -79,4 +78,3 @@ extern "C"{
 #include "world.h"
 #include "joint.h"
 #include "volInt.h"
-

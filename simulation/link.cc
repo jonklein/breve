@@ -301,17 +301,18 @@ void slLinkUpdatePositions(slLink *l) {
 int slLinkCheckSelfPenetration(slWorld *world, slLink *l) {
 	slVclipData *vc;
 	int x, y;
-	slList *links;
+	std::vector<slLink*> links;
+	std::vector<slLink*>::iterator li;
 
 	if(!world->initialized) slVclipDataInit(world);
 	vc = world->clipData;
 
-	links = slLinkList(l, NULL, 0);
+	// slLinkList(l, &links, 0);
 
-	while(links) {
+	for(li = links.begin(); li != links.end(); li++ ) {
 		slPairEntry *pe;
 
-		slLink *link2 = links->data;
+		slLink *link2 = *li;
 
 		if(l != link2) {
 			x = l->clipNumber;
@@ -320,15 +321,10 @@ int slLinkCheckSelfPenetration(slWorld *world, slLink *l) {
 			pe = slVclipPairEntry(vc->pairList, x, y);
 
 			if((slVclipFlagsShouldTest(pe->flags)) && slVclipTestPair(vc, pe, NULL)) {
-				slListFree(links);
 				return 1;
 			}
 		}
-
-		links = links->next;
 	}
-
-	slListFree(links);
 
 	return 0;
 }

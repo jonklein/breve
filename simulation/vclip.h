@@ -74,6 +74,8 @@ struct slBoundSort {
 	We make n^2 of these, so we'd like to be able to keep them small.
 */
 
+#ifdef __cplusplus
+#include <vector>
 struct slPairEntry {
 	slFeature *f1;
 	slFeature *f2;
@@ -98,11 +100,8 @@ struct slCollisionEntry {
 
 	double distance;
 
-	slVector *worldPoints;
-	double *pointDepths;
-
-	short pointCount;
-	short maxPoints;
+	std::vector<slVector> points;
+	std::vector<double> depths;
 
 	long n1; 
 	long n2;
@@ -113,27 +112,20 @@ struct slCollisionEntry {
 */
 
 
-#ifdef __cplusplus
-#include <vector>
 struct slVclipData {
 	slBoundSort **xListPointers;
 	slBoundSort **yListPointers;
 	slBoundSort **zListPointers;
 
-	slBoundSort *xList;
-	slBoundSort *yList;
-	slBoundSort *zList;
+	std::vector<slBoundSort> boundLists[3];
 
 	slShape **shapes;
 	slPosition **positions;
 	
 	std::vector<slWorldObject*> objects;
 
-	slCollisionEntry **collisions;
+	std::vector<slCollisionEntry> collisions;
 
-	int collisionCount;
-	int maxCollisions;
- 
 	slPairEntry **pairList;
 
 	std::vector<slPairEntry*> candidates;
@@ -151,7 +143,6 @@ void slInitBoundSort(slVclipData *v);
 void slInitBoundSortList(slBoundSort **list, int size, slVclipData *v, char boundTypeFlag);
 
 slCollisionEntry *slNextCollisionEntry(slVclipData *v);
-void slNextCollisionPoint(slCollisionEntry *e);
 
 slVector *slPositionVertex(slPosition *p, slVector *i, slVector *o);
 slPlane *slPositionPlane(slPosition *p, slPlane *p1, slPlane *pt);

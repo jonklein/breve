@@ -530,13 +530,11 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 
 void slDrawNetsimBounds(slWorld *w) {
 #ifdef HAVE_LIBENET
-	std::vector<slNetsimRemoteHostData*>::iterator hosti;
+	std::vector<slNetsimRemoteHostData*>::iterator hi;
 	unsigned int n;
 
-	if(!w->netsimData.remoteHosts) return;
-
-	for(n=0;n<w->netsimData.remoteHosts->count;n++) {
-		slNetsimRemoteHostData *data = w->netsimData.remoteHosts->data[n];
+	for(hi = w->netsimData.remoteHosts.begin(); hi != w->netsimData.remoteHosts.end(); hi++ ) {
+		slNetsimRemoteHostData *data = *hi;
 
 		glEnable(GL_BLEND);
 		glColor4f(0.4, 0.0, 0.0, .3);

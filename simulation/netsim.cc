@@ -82,12 +82,12 @@ void *slNetsimThread(void *d) {
 				remoteHost = new slNetsimRemoteHostData;
 				remoteHost->peer = event.peer;
 
-				slStackPush(serverData->world->netsimData.remoteHosts, remoteHost);
+				serverData->world->netsimData.remoteHosts.push_back(remoteHost);
 				
 				break;
 
 			case ENET_EVENT_TYPE_RECEIVE:
-				remoteHost = serverData->world->netsimData.remoteHosts->data[ (int)event.peer->data ];
+				remoteHost = serverData->world->netsimData.remoteHosts[ (int)event.peer->data ];
 
 				switch(event.channelID) {
 					case MT_SYNC:

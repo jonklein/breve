@@ -32,7 +32,6 @@
 void slVclipDataInit(slWorld *w) {
 	slStationary *st;
 	slLink *link;
-	unsigned int n;
 	unsigned int x, y;
 	slTerrain *terrain;
 
@@ -43,8 +42,6 @@ void slVclipDataInit(slWorld *w) {
 		slInitBoundSort(w->proximityData);
 	}
 	
-	// allocate the right amount of space for the current set of collisions
-
 	slVclipDataRealloc(w->clipData, w->objects.size());
 
 	w->clipData->objects = w->objects;
@@ -52,34 +49,38 @@ void slVclipDataInit(slWorld *w) {
 	// for each object in the world, fill in it's shape, position and 
 	// min/max vectors
 
-	for(n=0;n<w->objects.size();n++) {
-		switch(w->objects[n]->type) {
-			case WO_LINK:
-				link = w->objects[n]->data;
-				link->clipNumber = n;
+	w->clipData->boundLists[0].clear();
+	w->clipData->boundLists[1].clear();
+	w->clipData->boundLists[2].clear();
 
-				w->clipData->positions[n] = &link->position;
-				w->clipData->shapes[n] = link->shape;
+	for(x=0;x<w->objects.size();x++) {
+		switch(w->objects[x]->type) {
+			case WO_LINK:
+				link = w->objects[x]->data;
+				link->clipNumber = x;
+
+				w->clipData->positions[x] = &link->position;
+				w->clipData->shapes[x] = link->shape;
 
 				slLinkUpdateBoundingBox(link);
-				slAddBoundingBoxForVectors(w, n, &link->min, &link->max);
+				slAddBoundingBoxForVectors(w->clipData, x, &link->min, &link->max);
 
 				break;
 			case WO_STATIONARY:
-				st = w->objects[n]->data;
-				w->clipData->positions[n] = &st->position;
-				w->clipData->shapes[n] = st->shape;
+				st = w->objects[x]->data;
+				w->clipData->positions[x] = &st->position;
+				w->clipData->shapes[x] = st->shape;
 
 				slShapeBounds(st->shape, &st->position, &st->min, &st->max);
-				slAddBoundingBoxForVectors(w, n, &st->min, &st->max);
+				slAddBoundingBoxForVectors(w->clipData, x, &st->min, &st->max);
 
 				break;
 			case WO_TERRAIN:
-				terrain = w->objects[n]->data;
-				w->clipData->positions[n] = NULL;
-				w->clipData->shapes[n] = NULL;
+				terrain = w->objects[x]->data;
+				w->clipData->positions[x] = NULL;
+				w->clipData->shapes[x] = NULL;
 
-				slAddBoundingBoxForVectors(w, n, &terrain->min, &terrain->max);
+				slAddBoundingBoxForVectors(w->clipData, x, &terrain->min, &terrain->max);
 
 				break;
 			default:
@@ -88,13 +89,19 @@ void slVclipDataInit(slWorld *w) {
 		}
 	}
 
-	for(x=1;x<w->objects.size();x++) {
+	for(x=0;x<w->objects.size()*2;x++) {
+		w->clipData->xListPointers[x] = &w->clipData->boundLists[0][x];
+		w->clipData->yListPointers[x] = &w->clipData->boundLists[1][x];
+		w->clipData->zListPointers[x] = &w->clipData->boundLists[2][x];
+	}
+
+	for(x=0;x<w->objects.size();x++) {
 		for(y=0;y<x;y++) slVclipDataAddPairEntry(w, x, y);
 	}
 
-	for(n=0;n<w->objects.size();n++) {
-	 	if(w->objects[n]->type == WO_LINK) {
-	 		link = ((slLink*)w->objects[n]->data);
+	for(x=0;x<w->objects.size();x++) {
+	 	if(w->objects[x]->type == WO_LINK) {
+	 		link = ((slLink*)w->objects[x]->data);
 	 
 	 		if(link->multibody) slMultibodyInitCollisionFlags(link->multibody, w->clipData->pairList);
 		}
@@ -131,8 +138,8 @@ void slVclipDataAddPairEntry(slWorld *w, int x, int y) {
 	o1 = w->objects[x];
 	o2 = w->objects[y];
 
-	if(w->clipData->shapes[x]->type == ST_NORMAL) pe->f1 = w->clipData->shapes[x]->features[0];
-	if(w->clipData->shapes[y]->type == ST_NORMAL) pe->f2 = w->clipData->shapes[y]->features[0];
+	if(w->clipData->shapes[x] && w->clipData->shapes[x]->type == ST_NORMAL) pe->f1 = w->clipData->shapes[x]->features[0];
+	if(w->clipData->shapes[y] && w->clipData->shapes[y]->type == ST_NORMAL) pe->f2 = w->clipData->shapes[y]->features[0];
 
 	t1 = w->objects[x]->type;
 	t2 = w->objects[y]->type;
@@ -195,31 +202,12 @@ slVclipData *slVclipDataNew() {
 
 	// init the collisions 
 
-	v->maxCollisions = 8;
-	v->collisionCount = 0;
-	v->collisions = slMalloc(sizeof(slCollisionEntry*) * v->maxCollisions);
-
-	for(n=0;n<v->maxCollisions;n++) {
-		v->collisions[n] = slMalloc(sizeof(slCollisionEntry));
-		v->collisions[n]->maxPoints = 0;
-	}
-
 	/* init the bound lists and bound list pointers */
 
 	v->xListPointers = slMalloc(sizeof(slBoundSort*) * listSize);
 	v->yListPointers = slMalloc(sizeof(slBoundSort*) * listSize);
 	v->zListPointers = slMalloc(sizeof(slBoundSort*) * listSize);
 
-	v->xList = slMalloc(sizeof(slBoundSort) * listSize);
-	v->yList = slMalloc(sizeof(slBoundSort) * listSize);
-	v->zList = slMalloc(sizeof(slBoundSort) * listSize);
-
-	for(n=0;n<listSize;n++) {
-		v->xListPointers[n] = &v->xList[n];
-		v->yListPointers[n] = &v->yList[n];
-		v->zListPointers[n] = &v->zList[n];
-	}
-	
 	v->pairList = slMalloc(sizeof(slPairEntry*) * (v->maxCount + 1));
 
 	/* init the pair list--we need an entry for every possible object pair */
@@ -264,16 +252,6 @@ void slVclipDataRealloc(slVclipData *v, int count) {
 	v->yListPointers = slRealloc(v->yListPointers, sizeof(slBoundSort*) * listSize);
 	v->zListPointers = slRealloc(v->zListPointers, sizeof(slBoundSort*) * listSize);
 
-	v->xList = slRealloc(v->xList, sizeof(slBoundSort) * listSize);
-	v->yList = slRealloc(v->yList, sizeof(slBoundSort) * listSize);
-	v->zList = slRealloc(v->zList, sizeof(slBoundSort) * listSize);
-
-	for(n=0;n<listSize;n++) {
-		v->xListPointers[n] = &v->xList[n];
-		v->yListPointers[n] = &v->yList[n];
-		v->zListPointers[n] = &v->zList[n];
-	}
-
 	v->pairList = slRealloc(v->pairList, sizeof(slPairEntry*) * (v->maxCount + 1));
 
 	// init the pair list--we need an entry for every possible object pair
@@ -299,30 +277,32 @@ void slVclipDataRealloc(slVclipData *v, int count) {
 	vclip algorithm is run.
 */
 
-void slAddBoundingBoxForVectors(slWorld *w, int offset, slVector *min, slVector *max) {
-	w->clipData->xList[offset * 2].type = BT_MAX;	
-	w->clipData->xList[offset * 2].value = &max->x;
-	w->clipData->xList[offset * 2].number = offset;
-	w->clipData->xList[(offset * 2) + 1].type = BT_MIN;	
-	w->clipData->xList[(offset * 2) + 1].value = &min->x;
-	w->clipData->xList[(offset * 2) + 1].number = offset;
-	w->clipData->xList[(offset * 2) + 1].previousLeft = NULL;
+void slAddBoundingBoxForVectors(slVclipData *data, int offset, slVector *min, slVector *max) {
+	slBoundSort minB, maxB;
 
-	w->clipData->yList[offset * 2].type = BT_MAX;	
-	w->clipData->yList[offset * 2].value = &max->y;
-	w->clipData->yList[offset * 2].number = offset;
-	w->clipData->yList[(offset * 2) + 1].type = BT_MIN;	
-	w->clipData->yList[(offset * 2) + 1].value = &min->y;
-	w->clipData->yList[(offset * 2) + 1].number = offset;
-	w->clipData->yList[(offset * 2) + 1].previousLeft = NULL; 
+	minB.type = BT_MIN;
+	maxB.type = BT_MAX;
 
-	w->clipData->zList[offset * 2].type = BT_MAX;	
-	w->clipData->zList[offset * 2].value = &max->z;
-	w->clipData->zList[offset * 2].number = offset;
-	w->clipData->zList[(offset * 2) + 1].type = BT_MIN;	
-	w->clipData->zList[(offset * 2) + 1].value = &min->z;
-	w->clipData->zList[(offset * 2) + 1].number = offset;	
-	w->clipData->zList[(offset * 2) + 1].previousLeft = NULL;
+	minB.previousLeft = NULL;
+	maxB.previousLeft = NULL;
+	
+	minB.number = offset;
+	maxB.number = offset;
+
+	minB.value = &min->x;
+	maxB.value = &max->x;
+	data->boundLists[0].push_back(minB);
+	data->boundLists[0].push_back(maxB);
+
+	minB.value = &min->y;
+	maxB.value = &max->y;
+	data->boundLists[1].push_back(minB);
+	data->boundLists[1].push_back(maxB);
+
+	minB.value = &min->z;
+	maxB.value = &max->z;
+	data->boundLists[2].push_back(minB);
+	data->boundLists[2].push_back(maxB);
 }
 
 /*
@@ -357,30 +337,12 @@ void slInitProximityData(slWorld *w) {
 
 	slVclipDataRealloc(w->proximityData, w->objects.size());
 
+	w->proximityData->boundLists[0].clear();
+	w->proximityData->boundLists[1].clear();
+	w->proximityData->boundLists[2].clear();
+
 	for(n=0;n<w->objects.size();n++) {
-		w->proximityData->xList[(n * 2)	].type = BT_MIN;
-		w->proximityData->xList[(n * 2) + 1].type = BT_MAX;
-		w->proximityData->xList[(n * 2)	].number = n;
-		w->proximityData->xList[(n * 2) + 1].number = n;
-		w->proximityData->xList[(n * 2)	].value = &w->objects[n]->min.x;
-		w->proximityData->xList[(n * 2) + 1].value = &w->objects[n]->max.x;
-		w->proximityData->xList[(n * 2) + 1].previousLeft = NULL;
-
-		w->proximityData->yList[(n * 2)	].type = BT_MIN;
-		w->proximityData->yList[(n * 2) + 1].type = BT_MAX;
-		w->proximityData->yList[(n * 2)	].number = n;
-		w->proximityData->yList[(n * 2) + 1].number = n;
-		w->proximityData->yList[(n * 2)	].value = &w->objects[n]->min.y;
-		w->proximityData->yList[(n * 2) + 1].value = &w->objects[n]->max.y;
-		w->proximityData->yList[(n * 2) + 1].previousLeft = NULL;
-
-		w->proximityData->zList[(n * 2)	].type = BT_MIN;
-		w->proximityData->zList[(n * 2) + 1].type = BT_MAX;
-		w->proximityData->zList[(n * 2)	].number = n;
-		w->proximityData->zList[(n * 2) + 1].number = n;
-		w->proximityData->zList[(n * 2)	].value = &w->objects[n]->min.z;
-		w->proximityData->zList[(n * 2) + 1].value = &w->objects[n]->max.z;
-		w->proximityData->zList[(n * 2) + 1].previousLeft = NULL;
+		slAddBoundingBoxForVectors(w->proximityData, n, &w->objects[n]->min, &w->objects[n]->max);
 
 		switch(w->objects[n]->type) {
 			slWorldObject *wo;
@@ -424,6 +386,12 @@ void slInitProximityData(slWorld *w) {
 		}
 	}
 
+	for(n=0;n<w->objects.size()*2;n++) {
+		w->proximityData->xListPointers[n] = &w->proximityData->boundLists[0][n];
+		w->proximityData->yListPointers[n] = &w->proximityData->boundLists[1][n];
+		w->proximityData->zListPointers[n] = &w->proximityData->boundLists[2][n];
+	}
+
 	// for the proximity data we don't need anything except the	
 	// x and y set in the pairList.  no features or object pointers.
 
@@ -456,20 +424,6 @@ void slFreeClipData(slVclipData *v) {
 	for(n=1;n<v->maxCount;n++) slFree(v->pairList[n]);
 	if(v->pairList) slFree(v->pairList);
 
-	for(n=0;n<v->maxCollisions;n++) {
-		if(v->collisions[n]->maxPoints) {
-			slFree(v->collisions[n]->pointDepths);
-			slFree(v->collisions[n]->worldPoints);
-		}
-
-		slFree(v->collisions[n]);
-	}
-
-	if(v->collisions) slFree(v->collisions);
-
-	if(v->xList) slFree(v->xList);
-	if(v->yList) slFree(v->yList);
-	if(v->zList) slFree(v->zList);
 	if(v->xListPointers) slFree(v->xListPointers);
 	if(v->yListPointers) slFree(v->yListPointers);
 	if(v->zListPointers) slFree(v->zListPointers);

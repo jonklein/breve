@@ -96,7 +96,6 @@ int slWorldStartNetsimServer(slWorld *w) {
 
 	w->netsimData.isMaster = 1;
 
-	w->netsimData.remoteHosts = slStackNew();
 	w->netsimData.server = slNetsimCreateServer(w);
 	slNetsimStartServer(w->netsimData.server);
 
@@ -119,7 +118,6 @@ int slWorldStartNetsimSlave(slWorld *w, char *host) {
 
 	w->netsimData.isMaster = 0;
 
-	w->netsimData.remoteHosts = slStackNew();
 	w->netsimData.server = slNetsimCreateClient(w);
 	w->netsimClient = slNetsimOpenConnection(w->netsimData.server->host, host, NETSIM_MASTER_PORT);
 	slNetsimStartServer(w->netsimData.server);
@@ -468,15 +466,15 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 			(*error)++;
 			return 0;
 		}
+	
+		std::vector<slCollisionEntry>::iterator ci;
 
-		for(n=0;n<w->clipData->collisionCount;n++) {
-			slCollisionEntry *c;
+		for(ci = w->clipData->collisions.begin(); ci != w->clipData->collisions.end(); ci++ ) {
+			slCollisionEntry *c = &(*ci);
 			slWorldObject *w1;
 			slWorldObject *w2;
 			slPairEntry *pe;
 			int x;
-
-			c = w->clipData->collisions[n];
 
 			w1 = w->objects[c->n1];
 			w2 = w->objects[c->n2];
@@ -511,7 +509,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 
 				// printf("collision with %d points\n", c->pointCount);
 
-				for(x=0;x<c->pointCount;x++) {
+				for(x=0;x<c->points.size();x++) {
 					dContact *contact, con;
 
 					contact = &con;
@@ -528,17 +526,17 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 					contact->surface.bounce = e;
 					contact->surface.bounce_vel = .05;
 
-					if(c->pointDepths[x] < -0.10) {
+					if(c->depths[x] < -0.10) {
 						/* this is a scenerio we might want to analyze */
 
-						c->pointDepths[x] = -0.05;
+						c->depths[x] = -0.05;
 
-						slMessage(DEBUG_WARN, "warning: point depth = %f for pair (%d, %d) -- cheating\n", c->pointDepths[x], c->n1, c->n2);
+						slMessage(DEBUG_WARN, "warning: point depth = %f for pair (%d, %d) -- cheating\n", c->depths[x], c->n1, c->n2);
 					}
 
-					if(c->pointDepths[x] < maxDepth) maxDepth = c->pointDepths[x];
+					if(c->depths[x] < maxDepth) maxDepth = c->depths[x];
 	
-					contact->geom.depth = -c->pointDepths[x];
+					contact->geom.depth = -c->depths[x];
 					// contact->geom.depth = -.001;
 					contact->geom.g1 = NULL;
 					contact->geom.g2 = NULL;
@@ -546,15 +544,16 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 					// printf("%d, %d\n", pe->odeBodyIDX, pe->odeBodyIDY);
 					// slVectorPrint(&c->normal);
 					// printf("%d\n", x);
-					// slVectorPrint(&c->worldPoints[x]);
 	
 					contact->geom.normal[0] = -c->normal.x;
 					contact->geom.normal[1] = -c->normal.y;
 					contact->geom.normal[2] = -c->normal.z;
 
-					contact->geom.pos[0] = c->worldPoints[x].x;
-					contact->geom.pos[1] = c->worldPoints[x].y;
-					contact->geom.pos[2] = c->worldPoints[x].z;
+					slVector *v = &c->points[x];
+
+					contact->geom.pos[0] = v->x;
+					contact->geom.pos[1] = v->y;
+					contact->geom.pos[2] = v->z;
 
 					// printf("contacting %p, %p\n", bodyX, bodyY);
 	

@@ -49,14 +49,11 @@ void slMultibodyInitCollisionFlags(slMultibody *m, slPairEntry **pe) {
 	std::vector<slLink*>::iterator i1;
 	std::vector<slLink*>::iterator i2;
 
-	i1 = m->links.begin();
-	i2 = m->links.begin();
-
 	for(i1 = m->links.begin(); i1 != m->links.end(); i1++) {
 		link1 = *i1;
 
-		// set all check flags on or off, depending on whether self collision
-		// are handled or not.
+		// set all check flags on or off, depending on whether 
+		// self collisions are handled or not.
 
 		for(i2 = m->links.begin(); i2 != m->links.end(); i2++) {
 			link2 = *i2;
@@ -68,6 +65,10 @@ void slMultibodyInitCollisionFlags(slMultibody *m, slPairEntry **pe) {
 				else if(e->flags & BT_CHECK) e->flags ^= BT_CHECK;
 			}
 		}
+	}
+
+	for(i1 = m->links.begin(); i1 != m->links.end(); i1++) {
+		link1 = *i1;
 
 		// then prune out all adjacent pairs.
 
@@ -267,17 +268,12 @@ slList *slMultibodyAllCallbackData(slMultibody *mb) {
 */
 
 void slNullOrphanMultibodies(slLink *orphan) {
-	slList *o, *orphans;
+	std::vector<slLink*> links;
+	std::vector<slLink*>::iterator li;
 
-	o = orphans = slLinkList(orphan, NULL, 0);
+	slLinkList(orphan, &links, 0);
 	
-	while(orphans) {
-		((slLink*)orphans->data)->multibody = NULL;
-
-		orphans = orphans->next;
-	}
-
-	slListFree(o);
+	for(li = links.begin(); li != links.end(); li++) (*li)->multibody = NULL;
 }
 
 /*!
@@ -288,14 +284,15 @@ void slNullOrphanMultibodies(slLink *orphan) {
 */
 
 slMultibody *slLinkFindMultibody(slLink *root) {
-	slList *start, *rootList = slLinkList(root, NULL, 0);
 	slJoint *joint;
 	std::vector<slJoint*>::iterator ji;
+	std::vector<slLink*> links;
+	std::vector<slLink*>::iterator li;
 
-	start = rootList;
+	slLinkList(root, &links, 0);
 
-	while(rootList) {
-		slLink *link = rootList->data;
+	for(li = links.begin(); li != links.end(); li++ ) {
+		slLink *link = *li;
 
 		if(link != root && root->multibody != link->multibody) {
 			/* okay!  link has another mb for us!  we need to find the joint */
@@ -306,7 +303,6 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 
 				if(joint->parent && joint->parent->multibody == root->multibody) {
 					joint->isMbJoint = 1;
-					slListFree(start);
 					return link->multibody;
 				}
 			}
@@ -316,16 +312,11 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 
 				if(joint->child->multibody == root->multibody) {
 					joint->isMbJoint = 1;
-					slListFree(start);
 					return link->multibody;
 				}
 			}
 		}
-
-		rootList = rootList->next;
 	}
-
-	slListFree(start);
 
 	return NULL;
 }
@@ -334,28 +325,22 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 	\brief Returns a list of links connected to a root link.
 */
 
-slList *slLinkList(slLink *root, slList *list, int mbOnly) {
+void slLinkList(slLink *root, std::vector<slLink*> *list, int mbOnly) {
 	std::vector<slJoint*>::iterator ji;
 
-	if(!root || slInList(list, root)) return list; 
+	if(!root || std::find(list->begin(), list->end(), root) != list->end()) return;
 
-	list = slListPrepend(list, root);
+	list->push_back(root);
 
 	for(ji = root->outJoints.begin(); ji != root->outJoints.end(); ji++ ) {
 		if(!mbOnly || (*ji)->isMbJoint) 
-			list = slLinkList((*ji)->child, list, mbOnly);
+			slLinkList((*ji)->child, list, mbOnly);
 	}
 
 	for(ji = root->inJoints.begin(); ji != root->inJoints.end(); ji++ ) {
 		if(!mbOnly || (*ji)->isMbJoint) 
-			list = slLinkList((*ji)->parent, list, mbOnly);
+			slLinkList((*ji)->parent, list, mbOnly);
 	}
-
-	return list;
-}
-
-void slMultibodyComputeLinks(slMultibody *mb, int mbOnly) {
-
 }
 
 /*!
@@ -519,18 +504,11 @@ void slMultibodySetRoot(slMultibody *m, slLink *root) {
 */
 
 void slMultibodyUpdate(slMultibody *m) {
-	slList *links;
-
 	if(!m) return;
 
 	m->links.clear();
 
-	links = slLinkList(m->root, NULL, 1);
-
-	while(links) {
-		m->links.push_back((slLink*)links->data);
-		links = links->next;
-	}
+	slLinkList(m->root, &m->links, 1);
 
 	m->linkCount = slMultibodyCountLinks(m);
 	m->mass = slMultibodyComputeMass(m);
@@ -619,8 +597,6 @@ int slMultibodyCheckSelfPenetration(slWorld *world, slMultibody *m) {
 
 				if(x > y) pe = &vc->pairList[x][y];
 				else pe = &vc->pairList[y][x];
-
-				// printf("flags [%d][%d] %p %x\n", x, y, pe, pe->flags);
 
 				if(slVclipFlagsShouldTest(pe->flags) && slVclipTestPair(vc, pe, NULL)) return 1;
 			}

@@ -444,7 +444,7 @@ void slJPEGErrorExit(j_common_ptr cinfo)
 #ifdef HAVE_LIBPNG
 unsigned char *slReadPNGImage(char *name, int *width, int *height, int *components, int usealpha) {
 	FILE *f;
-	char header[8];
+	png_byte header[8];
 	png_structp png_ptr;
 	png_infop info;
 	int passes;
@@ -583,7 +583,7 @@ int slWritePNGImage(char *name, int width, int height, unsigned char *buffer, in
 		return -1;
     }
 
-	rowPtrs = alloca(sizeof(char*) * height);
+	rowPtrs = new png_bytep[height];
 
 	if(!reversed) for(n=0;n<height;n++) rowPtrs[n] = &buffer[n * (width * channels)];
 	else for(n=0;n<height;n++) rowPtrs[height - (n + 1)] = &buffer[n * (width * channels)];
@@ -614,6 +614,8 @@ int slWritePNGImage(char *name, int width, int height, unsigned char *buffer, in
 	png_write_png(png_ptr, info_ptr, 0, NULL);
 
 	png_destroy_write_struct(&png_ptr, &info_ptr);
+
+	delete[] rowPtrs;
 
 	fclose(fp);
 	

@@ -43,6 +43,9 @@ struct slMultibody {
 
 	void *callbackData;
 };
+
+void slLinkList(slLink *root, std::vector<slLink*> *list, int mbOnly);
+
 #endif
 
 #ifdef __cplusplus
@@ -78,8 +81,6 @@ double slMultibodyComputeMass(slMultibody *m);
 void slMultibodyUpdate(slMultibody *root);
 
 slMultibody *slLinkFindMultibody(slLink *root);
-
-slList *slLinkList(slLink *root, slList *list, int mbOnly);
 
 void slMultibodyRotate(slMultibody *m, double rotation[3][3]);
 

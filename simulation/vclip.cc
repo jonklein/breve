@@ -41,12 +41,6 @@ void slInitBoundSort(slVclipData *d) {
 		}
 	}
 
-	for(x=0;x<listSize;x++) {
-		d->xListPointers[x] = &d->xList[x];
-		d->yListPointers[x] = &d->yList[x];
-		d->zListPointers[x] = &d->zList[x];
-	}
-
 	slInitBoundSortList(d->xListPointers, listSize, d, BT_XAXIS);
 	slInitBoundSortList(d->yListPointers, listSize, d, BT_YAXIS);
 	slInitBoundSortList(d->zListPointers, listSize, d, BT_ZAXIS);
@@ -116,7 +110,7 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 	slIsort(d, d->yListPointers, d->count * 2, BT_YAXIS);
 	slIsort(d, d->zListPointers, d->count * 2, BT_ZAXIS);
 
-	d->collisionCount = 0;
+	d->collisions.clear();
 
 	if(pruneOnly) return 0;
 
@@ -139,9 +133,9 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 			}
 		}
 
-		d->collisionCount--;
+		d->collisions.pop_back();
 
-		return d->collisionCount;
+		return d->collisions.size();
 	}
 
 	for(ci = d->candidates.begin(); ci != d->candidates.end(); ci++ ) {
@@ -156,42 +150,16 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 	// d->collisionCount is pointing to the next empty collision 
 	// in other words, 1 + the actual number of collisions
 
-	d->collisionCount--;
+	d->collisions.pop_back();
 
-	return d->collisionCount;
+	return d->collisions.size();
 }
 
 slCollisionEntry *slNextCollisionEntry(slVclipData *v) {
-	int n, oldMax;
+	slCollisionEntry e;
 
-	if(v->collisionCount == v->maxCollisions) {
-		oldMax = v->maxCollisions;
-		v->maxCollisions *= 2;
-		v->collisions = slRealloc(v->collisions, v->maxCollisions * sizeof(slCollisionEntry*));
-
-		for(n=oldMax;n<v->maxCollisions;n++) {
-			v->collisions[n] = slMalloc(sizeof(slCollisionEntry));
-			v->collisions[n]->maxPoints = 0;
-		}
-	}
-
-	v->collisions[v->collisionCount]->pointCount = 0;
-
-	return v->collisions[v->collisionCount++];
-}
-
-void slNextCollisionPoint(slCollisionEntry *e) {
-	e->pointCount++;
-
-	if(e->maxPoints == 0) {
-		e->maxPoints = 4;
-		e->worldPoints = slMalloc(e->maxPoints * sizeof(slVector));
-		e->pointDepths = slMalloc(e->maxPoints * sizeof(double));
-	} else if(e->pointCount == e->maxPoints) {
-		e->maxPoints *= 2;
-		e->worldPoints = slRealloc(e->worldPoints, e->maxPoints * sizeof(slVector));
-		e->pointDepths = slRealloc(e->pointDepths, e->maxPoints * sizeof(double));
-	}
+	v->collisions.push_back(e);
+	return &v->collisions.back();
 }
 
 /*!
@@ -251,10 +219,10 @@ void slIsort(slVclipData *d, slBoundSort **list, int size, char boundTypeFlag) {
 		} 
 
 		while(current > 0 && (*(list[current]->value) <= *(list[current-1]->value) || list[current]->infnan)) {
-			/* NaN used to flip out an entire simulation because the bounding box */
-			/* lists wouldn't get sorted properly and then collisions wouldn't get */
-			/* detected, and so forth.  So now, we give NaNs a place in the list  */
-			/* so that the rest of the list can get sorted in peace */
+			// NaN used to flip out an entire simulation because the bounding box 
+			// lists wouldn't get sorted properly and then collisions wouldn't get 
+			// detected, and so forth.  So now, we give NaNs a place in the list 
+			// so that the rest of the list can get sorted in peace
 
 			y = list[current - 1]->number;
 
@@ -441,10 +409,6 @@ int slVclipTestPair(slVclipData *vc, slPairEntry *e, slCollisionEntry *ce) {
 
 	limit = 2 * ((s1->features.size() * s2->features.size()) + 1);
 
-	if(ce) {
-		ce->pointCount = 0;
-	}
-
 	if(s1->type == ST_SPHERE && s2->type == ST_SPHERE) {
 		result = slSphereSphereCheck(vc, x, y, ce);
 	} else if(s1->type == ST_SPHERE && s2->type == ST_NORMAL) {
@@ -590,11 +554,6 @@ int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollisionEntry *ce) {
 
 	if(!ce) return CT_PENETRATE;
  
-	slNextCollisionPoint(ce);
-
-	ce->distance = depth;
-	ce->pointDepths[0] = depth;
-
 	ce->n1 = x;
 	ce->n2 = y;
 
@@ -603,7 +562,11 @@ int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollisionEntry *ce) {
 	slVectorNormalize(&ce->normal);
 
 	slVectorMul(&ce->normal, s1->radius, &tempV1);
-	slVectorAdd(&tempV1, &p1->location, &ce->worldPoints[0]);
+
+	slVectorAdd(&tempV1, &p1->location, &tempV1);
+
+	ce->points.push_back(tempV1);
+	ce->depths.push_back(depth);
 
 	slVectorMul(&ce->normal, -1, &ce->normal);
 	return CT_PENETRATE;
@@ -650,16 +613,15 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 					} else {
 						if(!ce) return CT_PENETRATE;
 
-						ce->distance = dist;
 						slVectorCopy(&transformedPlane.normal, &ce->normal);
-						slNextCollisionPoint(ce);
-
-						ce->pointDepths[0] = dist;
 
 						slVectorMul(&ce->normal, -s1->radius, &tempV1);
 						slVectorInvXform(p1->rotation, &tempV1, &spPoint);
 
-						slVectorAdd(&tempV1, &p1->location, &ce->worldPoints[0]);
+						slVectorAdd(&tempV1, &p1->location, &tempV1);
+
+						ce->points.push_back(tempV1);
+						ce->depths.push_back(dist);
 
 						/* now take the sphere location + the offset to find the collision */
 						/* point in world coordinates, and then translate into shape coord */
@@ -708,14 +670,10 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 					if(dist <= MC_TOLERANCE) {
 						if(!ce) return CT_PENETRATE;
 
-						ce->distance = dist;
-
-						slNextCollisionPoint(ce);
-
-						ce->pointDepths[0] = dist;
-
 						slVectorSub(&p1->location, &shPoint, &ce->normal);
-						slVectorCopy(&shPoint, &ce->worldPoints[0]);
+
+						ce->points.push_back(shPoint);
+						ce->depths.push_back(dist);
 
 						slVectorNormalize(&ce->normal);
 
@@ -758,16 +716,11 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 					if(dist <= MC_TOLERANCE) {
 						if(!ce) return CT_PENETRATE;
 
-						ce->distance = dist;
-
-						slNextCollisionPoint(ce);
-
-						ce->pointDepths[0] = dist;
-
 						slVectorCopy(&vertex, &ce->normal);
 						slVectorNormalize(&ce->normal);
 
-						slVectorCopy(&vertex, &ce->worldPoints[0]);						
+						ce->points.push_back(vertex);
+						ce->depths.push_back(dist);
 
 						if(flip) {
 							ce->n1 = x;
@@ -805,7 +758,6 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 
 	if(!ce) return CT_PENETRATE;
 
-	slNextCollisionPoint(ce);
 	slVectorCopy(&transformedPlane.normal, &ce->normal);
 	slVectorNormalize(&ce->normal);
 
@@ -818,10 +770,8 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 		ce->n1 = y;
 		ce->n2 = x;
 	}
-		
 
-	ce->distance = -10; 
-	ce->pointDepths[0] = -10;
+	ce->depths.push_back(-10);
 
 	return CT_PENETRATE;
 }
@@ -1317,7 +1267,7 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 
 int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf2, slPosition *fp, slShape *fs, slVclipData *v, int pairFlip, int x, int y, slCollisionEntry *ce) {
 	int update;
-	int n, maxFeature = 0;
+	int n;
 	slVector tPoint, tEnd;
 	slPoint *endPoint;
 	double sD, asD, eD, max;
@@ -1391,17 +1341,15 @@ int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf
 		sD = slPlaneDistance(&transformedPlane, &tPoint);
 
 		if(sD > max) {
-			maxFeature = n;
+			*nf2 = *fi;
 			max = sD;
 		} 
 	}
 
 	/* we'll end up here if there's nothing above zero */
 
-	if(max <= MC_TOLERANCE) { 
+	if(max <= MC_TOLERANCE) {
 		if(!ce) return CT_PENETRATE;
-
-		*nf2 = fs->features[maxFeature];
 
 		slVectorXform(fp->rotation, &f->plane.normal, &ce->normal);
 
@@ -1419,8 +1367,6 @@ int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf
 		
 		return CT_PENETRATE;
 	}
-
-	*nf2 = fs->features[maxFeature];
 
 	return CT_CONTINUE;
 }
@@ -1842,11 +1788,8 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 			}
 
 			if(distance <= MC_TOLERANCE && distance > maxDepth) {
-				slNextCollisionPoint(ce);
-
-				ce->pointDepths[ce->pointCount - 1] = distance;
-
-				slVectorCopy(&point, &ce->worldPoints[ce->pointCount - 1]);
+				ce->points.push_back(point);
+				ce->depths.push_back(distance);
 			}
 		}
 
@@ -1870,10 +1813,8 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 			}
 
 			if(distance <= MC_TOLERANCE && distance > maxDepth) {
-				slNextCollisionPoint(ce);
-
-				ce->pointDepths[ce->pointCount - 1] = distance;
-				slVectorCopy(&point, &ce->worldPoints[ce->pointCount - 1]);
+				ce->points.push_back(point);
+				ce->depths.push_back(distance);
 			}
 		}
 
@@ -1897,10 +1838,8 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 			}
 
 			if(distance <= MC_TOLERANCE && distance > maxDepth) {
-				slNextCollisionPoint(ce);
-
-				ce->pointDepths[ce->pointCount - 1] = distance;
-				slVectorCopy(&point, &ce->worldPoints[ce->pointCount - 1]);
+				ce->points.push_back(point);
+				ce->depths.push_back(distance);
 			}
 		}
 	}
@@ -1917,22 +1856,15 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 			included = slClipPoint(&point, face1->voronoi, p1, face1->edgeCount, &update1, &distance);
 
 			if(included) {
-				slNextCollisionPoint(ce);
+				ce->points.push_back(point);
+				ce->depths.push_back(distance);
 
-				ce->pointDepths[ce->pointCount - 1] = distance;
-				slVectorCopy(&point, &ce->worldPoints[ce->pointCount - 1]);
-
-				/* we're piercing plane1, so we'll use its normal */
+				// we're piercing plane1, so we'll use its normal 
 
 				useNorm1 = 1;
 			}
 		}
 	}
-
-	ce->distance = 0.0;
-
-	for(n=0;n<ce->pointCount;n++)
-		if(ce->pointDepths[n] < ce->distance) ce->distance = ce->pointDepths[n];
 
 	if(useNorm1) {
 		slVectorMul(&plane1.normal, -1, &ce->normal);
@@ -1943,7 +1875,7 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 	/* a deep collision is usually an indication that we're using the wrong plane */
 
 	if(ce->distance < -0.1) {
-		slMessage(100, "Unusually deep collision: %f meters\n", ce->distance);
+		slMessage(100, "Unusually deep collision: %f units\n", ce->distance);
 
 		// getchar();
 
@@ -1963,7 +1895,8 @@ int slCountFaceCollisionPoints(slCollisionEntry *ce, slFeature *f1, slFeature *f
 
 	slFindCollisionFaces(s1, p1, &newF1, s2, p2, &newF2);
 	slFaceFaceCollisionPoints(ce, s1, p1, newF1, s2, p2, newF2);
-	return ce->pointCount;
+
+	return ce->points.size();
 }
 
 /*!

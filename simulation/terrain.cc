@@ -112,7 +112,7 @@ void slTerrainInitialize(slTerrain *l) {
 	slTerrainBoundingBox(l);
 
 	l->initialized = 1;
-	// l->repeating = 1;
+	l->repeating = 0;
 }
 
 void slTerrainBoundingBox(slTerrain *l) {
@@ -337,7 +337,9 @@ void slDrawTerrain(slWorld *w, slCamera *c, slTerrain *l, int texture, double te
 				glPopMatrix();
 			}
 		}
-	} else slDrawTerrainSide(w, l, texture, textureScale, drawMode, flags, 0);
+	} else {
+		slDrawTerrainSide(w, l, texture, textureScale, drawMode, flags, 0);
+	}
 }
 
 void slDrawTerrainSide(slWorld *w, slTerrain *l, int texture, double textureScale, int drawMode, int flags, int bottom) {
@@ -402,10 +404,12 @@ void slDrawTerrainSide(slWorld *w, slTerrain *l, int texture, double textureScal
 		glBindTexture(GL_TEXTURE_2D, texture);
 	}
 
-	for(i=0;i<l->side-1;i++) {
+#define DRAW_SKIP 2
+
+	for(i=0;i<l->side-1;i+=DRAW_SKIP) {
 		glBegin(GL_TRIANGLE_STRIP);
 
-		for(j=0;j<l->side;j++) {
+		for(j=0;j<l->side;j+=DRAW_SKIP) {
 			if(l->drawMode) ambientColor[0] = ambientColor[1] = ambientColor[2] = 0.0;
 			else {
 				ambientColor[0] = l->bottomColor.x;
@@ -424,14 +428,14 @@ void slDrawTerrainSide(slWorld *w, slTerrain *l, int texture, double textureScal
 				glColor3f(ambientColor[0], ambientColor[1], ambientColor[2]);
 			}
 
-			norm = &l->vnormals[i+1][j];
+			norm = &l->vnormals[i+DRAW_SKIP][j];
 
 			if(bottom) glNormal3f(-norm->x, -norm->y, -norm->z);
 			else glNormal3f(norm->x, norm->y, norm->z);
 
-			if(texture) glTexCoord2f((i+1)/textureScale, j/textureScale); 
+			if(texture) glTexCoord2f((i+DRAW_SKIP)/textureScale, j/textureScale); 
 
-			glVertex3f((i+1) * l->xscale, l->matrix[i+1][j], j * l->xscale);
+			glVertex3f((i+DRAW_SKIP) * l->xscale, l->matrix[i+DRAW_SKIP][j], j * l->xscale);
 
 			if(l->drawMode) ambientColor[0] = ambientColor[1] = ambientColor[2] = 1.0;
 			else {
@@ -629,6 +633,7 @@ int slTerrainSphereClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int 
 	double dist;
 	slVector terrainPoint, aveNormal, toSphere;
 	int startX, endX, startZ, endZ, earlyStart, lateEnd, x, z, quad;
+	int collisions = 0;
 
 	ce->distance = 0.0;
 
@@ -689,20 +694,16 @@ int slTerrainSphereClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int 
 						dist = slPlaneDistance(&landPlane, &sp->location) - ss->radius;
 
 						if(dist < MC_TOLERANCE && dist > (-2 * ss->radius)) {
+							collisions++;
+
 							slVectorMul(&landPlane.normal, ss->radius, &toSphere);
 							slVectorSub(&sp->location, &toSphere, &terrainPoint);
 
-							slNextCollisionPoint(ce);
+							if(dist < VC_WARNING_TOLERANCE)
+								slMessage(DEBUG_ALL, "deep collision (%f) in terrain/sphere clip\n", dist);
 
-				if(dist < VC_WARNING_TOLERANCE)
-					slMessage(DEBUG_ALL, "deep collision (%f) in terrain/sphere clip\n", dist);
-
-							if(dist < ce->distance) ce->distance = dist;
-
-							ce->pointDepths[ce->pointCount - 1] = dist;
-
-							slVectorCopy(&terrainPoint, &ce->worldPoints[ce->pointCount - 1]);
-
+							ce->depths.push_back(dist);
+							ce->points.push_back(terrainPoint);
 							slVectorAdd(&aveNormal, &landPlane.normal, &aveNormal);
 						} 
 					} else if(trivi == 0x01 || trivi == 0x02 || trivi == 0x04) {
@@ -722,18 +723,13 @@ int slTerrainSphereClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int 
 						dist = slPointLineDist(start, end, &sp->location, &collisionPoint) - ss->radius;
 
 						if(dist < MC_TOLERANCE && dist > (-2 * ss->radius)) {
+							collisions++;
+
+							ce->depths.push_back(dist);
+							ce->points.push_back(collisionPoint);
+
 							slVectorSub(&sp->location, &collisionPoint, &toSphere);
-
-							slNextCollisionPoint(ce);
-
-							if(dist < ce->distance) ce->distance = dist;
-
-							ce->pointDepths[ce->pointCount - 1] = dist;
-
-							slVectorCopy(&collisionPoint, &ce->worldPoints[ce->pointCount - 1]);
-
 							slVectorNormalize(&toSphere);
-
 							slVectorAdd(&aveNormal, &toSphere, &aveNormal);
 						} 
 					} else {
@@ -751,14 +747,10 @@ int slTerrainSphereClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int 
 						dist = slVectorLength(&toSphere) - ss->radius;
 
 						if(dist < MC_TOLERANCE && dist > (-2 * ss->radius)) {
+							collisions++;
 
-							slNextCollisionPoint(ce);
-
-							if(dist < ce->distance) ce->distance = dist;
-
-							ce->pointDepths[ce->pointCount - 1] = dist;
-
-							slVectorCopy(point, &ce->worldPoints[ce->pointCount - 1]);
+							ce->depths.push_back(dist);
+							ce->points.push_back(*point);
 
 							slVectorNormalize(&toSphere);
 							slVectorAdd(&aveNormal, &toSphere, &aveNormal);
@@ -769,14 +761,14 @@ int slTerrainSphereClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int 
 		}
 	}
 
-	if(ce->pointCount == 0) return CT_DISJOINT;
+	if(collisions == 0) return CT_DISJOINT;
 
 	if(!flip) {
-		slVectorMul(&aveNormal, -1.0/ce->pointCount, &ce->normal);
+		slVectorMul(&aveNormal, -1.0/collisions, &ce->normal);
 		ce->n2 = obX;
 		ce->n1 = obY;
 	} else {
-		slVectorMul(&aveNormal, 1.0/ce->pointCount, &ce->normal);
+		slVectorMul(&aveNormal, 1.0/collisions, &ce->normal);
 		ce->n2 = obY;
 		ce->n1 = obX;
 	}
@@ -827,6 +819,7 @@ int slPointIn2DTriangle(slVector *vertex, slVector *a, slVector *b, slVector *c)
 int slTerrainShapeClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int obY, slCollisionEntry *ce, int flip) {
 	std::vector<slPoint*>::iterator pi;
 	std::vector<slFace*>::iterator fi;
+	int collisions = 0;
 
 	slVectorSet(&ce->normal, 0, 0, 0);
 
@@ -962,14 +955,16 @@ int slTerrainShapeClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int o
 		}
 	}
 
-	if(!ce->pointCount) return CT_DISJOINT;
+	collisions = ce->points.size();
+
+	if(collisions == 0) return CT_DISJOINT;
 
 	if(!flip) {
-		slVectorMul(&ce->normal, -1.0/ce->pointCount, &ce->normal);
+		slVectorMul(&ce->normal, -1.0/collisions, &ce->normal);
 		ce->n2 = obX;
 		ce->n1 = obY;
 	} else {
-		slVectorMul(&ce->normal, 1.0/ce->pointCount, &ce->normal);
+		slVectorMul(&ce->normal, 1.0/collisions, &ce->normal);
 		ce->n2 = obY;
 		ce->n1 = obX;
 	}
@@ -998,16 +993,12 @@ int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosit
 	hdist = slPlaneDistance(facePlane, &headPoint);
 
 	if(hdist < MC_TOLERANCE && hdist > -0.1) {
-		slNextCollisionPoint(ce);
-
 		if(hdist < VC_WARNING_TOLERANCE)
 			slMessage(DEBUG_ALL, "deep collision (%f) in terrain/edge clip\n", hdist);
 
-		if(hdist < ce->distance) ce->distance = hdist;
+		ce->depths.push_back(hdist);
+		ce->points.push_back(headPoint);
 
-   		ce->pointDepths[ce->pointCount - 1] = hdist;
-
-		slVectorCopy(&headPoint, &ce->worldPoints[ce->pointCount - 1]);
 		slVectorSub(&ce->normal, &facePlane->normal, &ce->normal);
 	}
 
@@ -1024,16 +1015,12 @@ int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosit
 	tdist = slPlaneDistance(facePlane, &tailPoint);
 
 	if(tdist < MC_TOLERANCE && tdist > -0.1) {
-		slNextCollisionPoint(ce);
-
 		if(tdist < VC_WARNING_TOLERANCE)
 			slMessage(DEBUG_ALL, "deep collision (%f) in terrain/edge clip\n", tdist);
 
-		if(tdist < ce->distance) ce->distance = tdist;
+		ce->depths.push_back(tdist);
+		ce->points.push_back(tailPoint);
 
-   		ce->pointDepths[ce->pointCount - 1] = tdist;
-
-		slVectorCopy(&tailPoint, &ce->worldPoints[ce->pointCount - 1]);
 		slVectorSub(&ce->normal, &facePlane->normal, &ce->normal);
 	}
 
@@ -1064,16 +1051,11 @@ double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollisionE
 	dist = slPlaneDistance(&landPlane, &tp);
 
 	if(dist < MC_TOLERANCE && dist > -1.0) {
-		slNextCollisionPoint(ce);
-	
 		if(dist < VC_WARNING_TOLERANCE) 
 			slMessage(DEBUG_ALL, "deep collision (%f) in point/terrain clip\n", dist);
 
-		if(dist < ce->distance) ce->distance = dist;
-
-   		ce->pointDepths[ce->pointCount - 1] = dist;
-
-		slVectorCopy(&tp, &ce->worldPoints[ce->pointCount - 1]);
+		ce->depths.push_back(dist);
+		ce->points.push_back(tp);
 
 		slVectorAdd(&ce->normal, &landPlane.normal, &ce->normal);
 	} 
@@ -1085,9 +1067,9 @@ slSerializedTerrain *slSerializeTerrain(slTerrain *t, int *size) {
 	slSerializedTerrain *st;
 	int x, y;
 
-	*size = sizeof(slSerializedTerrain) + t->side * t->side * sizeof(float);
+	*size = sizeof(slSerializedTerrain) + t->side * t->side * sizeof(double);
 
-	st = slMalloc(*size);
+	st = (slSerializedTerrain*)slMalloc(*size);
 
 	for(x=0;x<t->side;x++) {
 		for(y=0;y<t->side;y++) {

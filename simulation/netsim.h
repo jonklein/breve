@@ -1,4 +1,6 @@
 
+#include <vector>
+
 #ifdef HAVE_LIBENET
 #include <enet/enet.h>
 
@@ -18,7 +20,7 @@ struct slNetsimData {
 	slNetsimServerData *server;
 	slNetsimServerData *slave;
 
-	slStack *remoteHosts;
+	std::vector<slNetsimRemoteHostData*> remoteHosts;
 };
 
 struct slNetsimServerData {

@@ -259,7 +259,7 @@ slVclipData *slVclipDataNew();
 void slVclipDataRealloc(slVclipData *v, int count);
 int slObjectSortFunc(const void *a, const void *b);
 
-void slAddBoundingBoxForVectors(slWorld *w, int offset, slVector *max, slVector *min);
+void slAddBoundingBoxForVectors(slVclipData *w, int offset, slVector *max, slVector *min);
 
 slStationary *slNewStationary(slShape *s, slVector *loc, double rot[3][3]);
 
