@@ -21,7 +21,6 @@ docbook: classes
 clean:
 	rm -f docExtract
 	rm -f *.html
-	rm -rf ../docs
 
 source:
 	-mkdir ../docs
