@@ -1,5 +1,7 @@
 DOCBOOKDIR	= /sw/share/sgml/dsssl/docbook-dsssl-nwalsh/bin
 
+.PHONY: classes docbook documentation source spell tidy
+
 documentation: docbook
 
 classes: docBuild/docExtract
@@ -23,12 +25,12 @@ docbook: classes
 	mkdir docs/docs/images
 	ln -f docBuild/docbook/images/*.jpg docs/docs/images/
 
+source:
+	mkdir -p ../docs/source
+	doxygen breve.doxygen
+
 spell:
 	ispell -H docbook/*.docbook
 
 tidy:
 	cd docbook; tidy -config tidy.cfg -m -i -xml *.docbook
-
-source:
-	mkdir -p ../docs/source
-	doxygen breve.doxygen

@@ -98,7 +98,9 @@ OSX_clean: clean
 	cd OSX; xcodebuild clean
 	rm -rf OSX/build plugins/*/build
 
-OSX_release: OSX_clean documentation OSX_build
+OSX_release: OSX_clean
+	$(MAKE) documentation
+	$(MAKE) OSX_build
 	rm -f $(DMG_FILE)
 	rm -rf breve_image_folder
 	mkdir breve_image_folder
@@ -111,7 +113,9 @@ OSX_release: OSX_clean documentation OSX_build
 	make_dmg.sh $(DMG_FILE) breve_image_folder/*
 	rm -rf breve_image_folder
 
-CLI_release: clean optimize
+CLI_release: clean
+	$(MAKE) documentation
+	$(MAKE) optimize
 	rm -rf $(CLI_FOLDER)
 	mkdir $(CLI_FOLDER)
 	mkdir $(CLI_FOLDER)/bin
