@@ -211,6 +211,8 @@ int main(int argc, char **argv) {
 
 	if(gFull) glutFullScreen();
 
+	glutSetCursor(GLUT_CURSOR_INFO);
+
 	glutMainLoop();
 
 	return 0;
