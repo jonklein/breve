@@ -24,3 +24,5 @@ slSpring *slSpringNew(slLink *l1, slLink *l2, slVector *v1, slVector *v2, double
 void slWorldAddSpring(slWorld *w, slSpring *s);
 
 void slWorldDrawSprings(slWorld *w);
+
+void slSpringFree(slSpring *spring);

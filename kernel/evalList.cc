@@ -89,6 +89,8 @@ void brEvalListFree(brEvalListHead *lh) {
 
 	if(lh->index) slFree(lh->index);
 
+	printf("freeing %p\n", lh);
+
 	slFree(lh);
 }
 
@@ -121,6 +123,8 @@ int brEvalListInsert(brEvalListHead *head, int index, brEval *value) {
 	newList = slMalloc(sizeof(brEvalList));
 
 	brEvalCopy(value, &newList->eval);
+
+	stGCRetain(value);
 
 	if(start) {
 		newList->previous = start->previous;

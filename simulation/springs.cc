@@ -131,3 +131,7 @@ void slWorldDrawSprings(slWorld *w) {
 
 	glDisable(GL_LINE_STIPPLE);
 }
+
+void slSpringFree(slSpring *s) {
+	slFree(s);
+}

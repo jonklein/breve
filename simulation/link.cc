@@ -241,6 +241,8 @@ void slLinkSetAcceleration(slLink *m, slVector *linear, slVector *rotational) {
 */
 
 void slLinkFree(slLink *l) {
+	int n;
+
 	if(l->mb && l->mb->root == l) {
 		l->mb->root = NULL;
 		slMultibodyUpdate(l->mb);
@@ -251,6 +253,8 @@ void slLinkFree(slLink *l) {
 	while(l->inJoints->count) slJointBreak(l->inJoints->data[0]);
 	while(l->outJoints->count) slJointBreak(l->outJoints->data[0]);
 
+	for(n=0;n<l->springs->count;n++) slSpringFree(l->springs->data[n]);
+
 	// break the joints (but don't delete them)
 
 	dBodyDestroy(l->odeBodyID);
@@ -259,6 +263,7 @@ void slLinkFree(slLink *l) {
 
 	slStackFree(l->inJoints);
 	slStackFree(l->outJoints);
+	slStackFree(l->springs);
 
 	slFree(l);
 }
