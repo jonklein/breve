@@ -48,8 +48,12 @@ Object : PushGP {
 		crossoverPercent, mutationPercent (float).
 		tournamentSize (int).
 		populationSize (int).
-		currentIndividual (int).
+		currentIndividual, currentFitnessTest (int).
 		generationLimit (int).
+
+		fitnessTestDuration (float).
+
+		spatialRadius (int).
 
 		seed (string).
 
@@ -122,6 +126,23 @@ Object : PushGP {
 		interpreter read-config from-file file.
 		inited = 0.
 
+	+ to set-fitness-test-duration to d (double):
+		% Sets the duration of the fitness test to d.  The duration of the 
+		% fitness test determines how much simulation time is allowed for 
+		% each fitness test.  
+		% <P>
+		% The default value is 0, a value which is appropriate for programs
+		% which do not require simulation to determine fitness values.
+		
+		fitnessTestDuration = d.
+
+	- to set-spatial-radius to n (int):
+		% Undocumented until that paper is complete ?!
+		spatialRadius = n.
+
+	+ to get-fitness-test-duration:
+		return fitnessTestDuration.
+
 	+ to init:
 		populationSize = 2000.
 		mutationPercent = 40.
@@ -166,7 +187,7 @@ Object : PushGP {
 			next = pop2.
 		}
 
-	+ to run-tournament:
+	+ to run-tournament for-index index = -1 (int):
 		% Runs a tournament selection from the population.  Used internally during
 		% reproduction uses the tournament size set with 
 		% METHOD(set-tournament-size).
@@ -178,10 +199,22 @@ Object : PushGP {
 		n, test (int).
 		best (object).
 
-		best = current{ random[populationSize - 1] }.
+		if spatialRadius == 0: best = current{ random[populationSize - 1] }.
+		else {
+			test = (index + (random[2 * spatialRadius - 1] - spatialRadius)).
+			if test >= populationSize: test -= populationSize.
+			if test < 0: test += populationSize.
+
+			best = current{ test }.
+		}
 
 		for n = 0, n < tournamentSize - 1, n++: {
-			test = random[populationSize - 1].
+			if spatialRadius == 0: test = random[populationSize - 1].
+			else {
+				test = (index + (random[2 * spatialRadius - 1] - spatialRadius)).
+				if test >= populationSize: test -= populationSize.
+				if test < 0: test += populationSize.
+			}
 
 			if (current{test} get-fitness) < (best get-fitness): best = current{test}.
 		}
@@ -202,7 +235,7 @@ Object : PushGP {
 		fitness, newFitness (float).
 		newProgram (object).
 
-		fitness = (self compute-fitness for-program p).
+		fitness = (self compute-zero-duration-fitness for-program p).
 
 		newProgram = new PushGPIndividual.
 
@@ -211,7 +244,7 @@ Object : PushGP {
 		if random[1]: newProgram delete-random-subtree.
 		else newProgram flatten-random-subtree.
 
-		newFitness = (self compute-fitness for-program newProgram).	
+		newFitness = (self compute-zero-duration-fitness for-program newProgram).	
 
 		if newFitness == fitness: p copy-from program newProgram.
 
@@ -259,7 +292,7 @@ Object : PushGP {
 		fitness (float).
 		n (int).
 
-		fitness = (self compute-fitness for-program current{ currentIndividual }).
+		fitness = (self compute-zero-duration-fitness for-program current{ currentIndividual }).
 		
 		if fitness < 0.0: {
 			# this indicates an error -- give it an arbitrarily bad fitness
@@ -303,7 +336,7 @@ Object : PushGP {
 			}
 		}
 
-	- to compute-fitness for-program p (object):
+	- to compute-zero-duration-fitness for-program p (object):
 		n (int).
 		errors (list).
 
@@ -397,7 +430,7 @@ Object : PushGP {
 		% 	return (interpreter get-float-stack-top) - desiredOutputs{ n }.
 		% </pre>
 
-		die "The method compute-fitness must be overridden by the user -- see the class documentation for PushGPControl for more information".
+		die "The method compute-error must be overridden by the user -- see the class documentation for PushGPControl for more information".
 
 	+ to report with-best bestIndividual (object):
 		% Logs information to the output at every generation.  This method 
@@ -431,29 +464,26 @@ Object : PushGP {
 		controller set-display-message with-number 2 at-x -0.9 at-y -0.9 to "Best Fitness: $bestFitness".
 
 	+ to reproduce:
-		% Used internally to produce a new generation of individuals.
+		% Used internally.                
 
-		n (int).
-		p1, p2 (object).
+		n, method (int).                
+		p1, p2 (object).                
 
-		while n < (mutationPercent / 100.0) * populationSize: {
-			p1 = (self run-tournament).
-			next{n} copy-from program p1.
-			next{n} mutate with-max-new-code-size 10 with-interpreter interpreter.
+		while n < populationSize: { 
+			method = random[100]. 
+			if method < mutationPercent: {
+				p1 = (self run-tournament for-index n).
+				next{n} copy-from program p1.
+				next{n} mutate with-max-new-code-size 10 with-interpreter interpreter.
+			} else if method < (crossoverPercent + mutationPercent): {
+				p1 = (self run-tournament for-index n).
+				p2 = (self run-tournament for-index n).
+				next{n} crossover from-parent1 p1 from-parent2 p2 with-interpreter interpreter.     
+			} else {
+				p1 = (self run-tournament for-index n).
+				next{n} copy-from program p1.
+			}
 
-			n++.
-		}
-
-		while n < ((crossoverPercent + mutationPercent) / 100.0) * populationSize: {
-			p1 = (self run-tournament).
-			p2 = (self run-tournament).
-			next{n} crossover from-parent1 p1 from-parent2 p2 with-interpreter interpreter.
-			n++.
-		}
-
-		while n < populationSize: {
-			p1 = (self run-tournament).
-			next{n} copy-from program p1.
 			n++.
 		}
 }
@@ -549,39 +579,37 @@ PushGP : PushClusterGP {
 
 		emigrationHosts = copylist hosts.
 
-	- to reproduce: 
+	- to reproduce:
+		% Used internally.                
+
+		n, method (int).                
+		p1, p2 (object).                
+
 		recipientHost (string).
-		n (int).
-		p1, p2 (object).
+
 		index (int).
 
-		while n < (mutationPercent / 100.0) * populationSize: {
-			p1 = (self run-tournament).
-			next{n} copy-from program p1.
-			next{n} mutate with-max-new-code-size 10 with-interpreter interpreter.
+		while n < populationSize: { 
+			method = random[100]. 
+			if method < mutationPercent: {
+				p1 = (self run-tournament for-index n).
+				next{n} copy-from program p1.
+				next{n} mutate with-max-new-code-size 10 with-interpreter interpreter.
+			} else if method < (crossoverPercent + mutationPercent): {
+				p1 = (self run-tournament for-index n).
+				p2 = (self run-tournament for-index n).
+				next{n} crossover from-parent1 p1 from-parent2 p2 with-interpreter interpreter.     
+			} else if method < (crossoverPercent + mutationPercent + emigrationPercent): {
+				if lastTransfer: p1 = (lastTransfer get-program number index).
+				else p1 = (self run-tournament for-index n).
 
-			n++.
-		}
+				next{n} copy-from program p1.
+				index++.
+			} else {
+				p1 = (self run-tournament for-index n).
+				next{n} copy-from program p1.
+			}
 
-		while n < ((crossoverPercent + mutationPercent) / 100.0) * populationSize: {
-			p1 = (self run-tournament).
-			p2 = (self run-tournament).
-			next{n} crossover from-parent1 p1 from-parent2 p2 with-interpreter interpreter.
-			n++.
-		}
-
-		while n < ((crossoverPercent + mutationPercent + emigrationPercent) / 100.0) * populationSize: {
-			if lastTransfer: p1 = (lastTransfer get-program number index).
-			else p1 = (self run-tournament).
-
-			next{n} copy-from program p1.
-			index++.
-			n++.
-		}
-
-		while n < populationSize: {
-			p1 = (self run-tournament).
-			next{n} copy-from program p1.
 			n++.
 		}
 

@@ -1627,7 +1627,7 @@ RTC_INLINE int stEvalListIndex(stListIndexExp *l, stRunInstance *i, brEval *t) {
 		BRSTRING(t) = newstring;
 		t->type = AT_STRING;
 	} else {
-		stEvalError(i->instance->type->engine, EE_TYPE, "expected list or hash in lookup expression");
+		stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"list\" or \"hash\" in lookup expression");
 		return EC_ERROR;
 	}
 
@@ -1641,7 +1641,7 @@ RTC_INLINE int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, 
 	int resultCode;
 
 	if ((resultCode = stExpEval3(l->listExp, i, &list)) != EC_OK ||
-	    (resultCode = stExpEval3(l->indexExp, i, &list)) != EC_OK ||
+	    (resultCode = stExpEval3(l->indexExp, i, &index)) != EC_OK ||
 	    (resultCode = stExpEval3(l->assignment, i, t)) != EC_OK)
 		return resultCode;
 
