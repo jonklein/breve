@@ -264,7 +264,7 @@ Object : PushGP {
 
 	- to compute-fitness for-program p (object):
 		n (int).
-		fitness (float).
+		errors (list).
 
 		for n=0, n < (self count-fitness-cases), n++: {
 			interpreter clear-stacks.
@@ -274,9 +274,17 @@ Object : PushGP {
 
 			interpreter run code p.
 
-			fitness += (self compute-error for-fitness-case n 
-				with-interpreter interpreter).
+			push (self compute-error for-fitness-case n with-interpreter interpreter) onto errors.
 		}
+
+		return (self compute-error-vector-fitness for-errors errors).
+
+	+ to compute-error-vector-fitness for-errors errorList (list):
+		fitness, value (double).
+
+		return stddev( errorList ).
+		
+		foreach value in errorList: fitness += value.
 
 		return fitness.
 
@@ -361,6 +369,10 @@ Object : PushGP {
 
 		while n < populationSize: {
 			p1 = (self run-tournament).
+			p1 = (self auto-simplify program p1).
+			p1 = (self auto-simplify program p1).
+			p1 = (self auto-simplify program p1).
+			p1 = (self auto-simplify program p1).
 			next{n} copy-from program p1.
 			n++.
 		}

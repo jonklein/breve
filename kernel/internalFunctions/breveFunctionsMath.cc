@@ -290,13 +290,19 @@ int brIStddev(brEval args[], brEval *target, brInstance *i) {
 	int n = 0;
 
 	while(start) {
-		if(start->eval.type != AT_DOUBLE) {
-			slMessage(DEBUG_ALL, "Internal function stddev expects a list of float values\n");
+		double value;
+
+		if(start->eval.type == AT_INT) {
+			value = BRINT(&start->eval);
+		} else if(start->eval.type == AT_DOUBLE) {
+			value = BRDOUBLE(&start->eval);
+		} else {
+			slMessage(DEBUG_ALL, "Internal function stddev expects a list of number values\n");
 			return EC_ERROR;
 		}
 
-		sum += BRDOUBLE(&start->eval);
-		sumsq += BRDOUBLE(&start->eval) * BRDOUBLE(&start->eval);
+		sum += value;
+		sumsq += value * value;
 		start = start->next;
 
 		n++;
@@ -335,7 +341,7 @@ void breveInitMathFunctions(brNamespace *n) {
 	brNewBreveCall(n, "randomGamma", brIRandomGamma, AT_DOUBLE, AT_INT, 0);
 	brNewBreveCall(n, "log", brILog, AT_DOUBLE, AT_DOUBLE, 0);
 
-	brNewBreveCall(n, "stddev", brIStddev, AT_LIST, AT_LIST, 0);
+	brNewBreveCall(n, "stddev", brIStddev, AT_DOUBLE, AT_LIST, 0);
 }
 
 /*
