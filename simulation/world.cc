@@ -60,7 +60,7 @@ slWorld *slWorldNew() {
 	slAllocIntegrationVectors(w);
 
 	w->odeWorldID = dWorldCreate();
-	// dWorldSetQuickStepNumIterations(w->odeWorldID, 100);
+	dWorldSetQuickStepNumIterations(w->odeWorldID, 60);
 
 	dWorldSetCFM (w->odeWorldID,1e-6);
 	dWorldSetERP(w->odeWorldID,0.1);
@@ -85,6 +85,8 @@ slWorld *slWorldNew() {
 	w->integrator = slEuler;
 
 	w->boundingBoxOnly = 0;
+
+	w->odeStepMode = 0;
 
 	w->backgroundTexture = 0;
 	slVectorSet(&w->backgroundTextureColor, 1, 1, 1);
@@ -452,8 +454,6 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 					contact->geom.normal[1] = -c->normal.y;
 					contact->geom.normal[2] = -c->normal.z;
 
-					slVectorPrint(&c->normal);
-
 					slVector *v = &c->points[x];
 
 					contact->geom.pos[0] = v->x;
@@ -474,12 +474,11 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 	}
 
 	if(simulate != 0) {
-		dWorldStep(w->odeWorldID, stepSize);
-
-		// dWorldQuickStep(w->odeWorldID, stepSize);
-		// FILE *f = fopen ("myfile.DIF","wb");
-		// dWorldExportDIF (w->odeWorldID, f, "");
-		// fclose (f);
+		if(w->odeStepMode == 0) {
+			dWorldStep(w->odeWorldID, stepSize);
+		} else {
+			dWorldQuickStep(w->odeWorldID, stepSize);
+		}
 
 		dJointGroupEmpty(w->odeCollisionGroupID);
 
@@ -724,4 +723,8 @@ void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*, int t),
 slWorldObject *slWorldGetObject(slWorld *w, unsigned int n) {
 	if(n > w->objects.size()) return NULL;
 	return w->objects[n];
+}
+
+void slWorldSetQuickstepIterations(slWorld *w, int n) {
+	dWorldSetQuickStepNumIterations(w->odeWorldID, n);
 }

@@ -47,7 +47,15 @@ int brIMatrixCopy(brEval args[], brEval *target, brInstance *i) {
 	gsl_vector_float_view nv = gsl_vector_float_view_array(n->data, n->tda * n->size2);
 	
 	gsl_blas_scopy((gsl_vector_float*)&mv, (gsl_vector_float*)&nv);
-	// gsl_matrix_float_memcpy(n, m);
+
+	return EC_OK;
+}
+
+int brIMatrixGetAbsoluteSum(brEval args[], brEval *target, brInstance *i) {
+	gsl_matrix_float *m = GSL_MATRIX_POINTER(&args[0]);
+	gsl_vector_float_view mv = gsl_vector_float_view_array(m->data, m->tda * m->size1);
+
+	BRDOUBLE(target) = gsl_blas_sasum((gsl_vector_float*)&mv);
 
 	return EC_OK;
 }
@@ -200,6 +208,7 @@ void breveInitMatrixFunctions(brNamespace *n) {
 	brNewBreveCall(n, "matrixGet", brIMatrixGet, AT_DOUBLE, AT_POINTER, AT_INT, AT_INT, 0);
 	brNewBreveCall(n, "matrixSet", brIMatrixSet, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrixScale", brIMatrixScale, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
+	brNewBreveCall(n, "matrixGetAbsoluteSum", brIMatrixGetAbsoluteSum, AT_DOUBLE, AT_POINTER, 0);
 	brNewBreveCall(n, "matrixAddScaled", brIMatrixAddScaled, AT_NULL, AT_POINTER, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrixAddScalar", brIMatrixAddScalar, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrixCopy", brIMatrixCopy, AT_NULL, AT_POINTER, AT_POINTER, 0);

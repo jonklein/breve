@@ -46,6 +46,9 @@ PhysicalControl : Walker {
 		self enable-lighting.
 		self enable-smooth-drawing.
 
+		self enable-fast-physics.
+		self set-fast-physics-iterations to 5.
+
 		# Create the floor for the critter to walk on.
 
 		floorShape = (new Cube init-with size (1000, 2, 1000)).
@@ -53,6 +56,8 @@ PhysicalControl : Walker {
 
 		floor register with-shape floorShape at-location (0, 0, 0).
 		floor catch-shadows.
+		floor set-eT to .9.
+		floor set-mu to 1.0.
 
 		self set-background-texture-image to (new Image load from "images/clouds.png").
 

@@ -12,6 +12,7 @@ Control : PhysicalControl [version 1.8] {
     + to init:
         self set-integration-step to .004.
         self set-iteration-step to .05.
+		self set-fast-physics-iterations to 40.
 
 		gravityMenu[0] = (self add-menu named "Zero Gravity" for-method "zero-gravity").
 		gravityMenu[1] = (self add-menu named "Half Gravity" for-method "half-gravity").
@@ -37,6 +38,13 @@ Control : PhysicalControl [version 1.8] {
 		% METHOD(disable-fast-physics).
 
         setStepFast(1).
+
+	+ to set-fast-physics-iterations to iterations (int):
+		% Sets the iterations parameter for the fast physics algorithm.  This
+		% parameter can be tuned to give better speed or better accuracy.
+		% The default value is 40.
+
+		setStepFastIterations(iterations).
     
     + to disable-fast-physics:
 		% Returns to the default physics simulation.  This is slower, but 

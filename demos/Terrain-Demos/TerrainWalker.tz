@@ -67,6 +67,8 @@ PhysicalControl : Walker {
         locked = 0.
 
         self set-random-seed-from-dev-random.
+		self enable-fast-physics.
+		self set-fast-physics-iterations to 5.
     
         # these are the default values anyway...
 
@@ -84,6 +86,7 @@ PhysicalControl : Walker {
         terrain = new Terrain.
         terrain generate with-ruggedness .4 with-height 15.
 		terrain set-scale to 3.
+		terrain set-eT to .9.
 
         # Create the Creature.
 

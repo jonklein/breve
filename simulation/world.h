@@ -238,6 +238,8 @@ int slWorldGetLightExposureDetection(slWorld *w);
 
 void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*, int t), void (*collide)(void*, void*, int t));
 
+void slWorldSetQuickstepIterations(slWorld *w, int n);
+
 slWorldObject *slWorldGetObject(slWorld *w, unsigned int n);
 
 int slWorldLoadTigerFile(slWorld *w, char *f);

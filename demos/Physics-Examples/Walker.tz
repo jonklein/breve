@@ -69,6 +69,9 @@ PhysicalControl : Walker {
 		locked = 0.
 
 		self set-random-seed-from-dev-random.
+
+		self enable-fast-physics.
+		self set-fast-physics-iterations to 5.
 	
 		# these are the default values anyway...
 
@@ -85,6 +88,8 @@ PhysicalControl : Walker {
 		floor register with-shape floorShape at-location (0, 0, 0).
 		floor catch-shadows.
 		floor set-color to (1.0, 1.0, 1.0).
+
+		floor set-eT to .9.
 
 		cloudTexture = (new Image load from "images/clouds.png").
 

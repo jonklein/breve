@@ -4,6 +4,8 @@ Object : Matrix2D (aka Matrices2D) {
 	% Matrix2D objects store an arbitrary sized 2D grid of arbitrary floating 
 	% point data.
 	% <P>
+	% By convention, 
+	% <P>
 	% Several of these matrix operations are built on top of the BLAS library
 	% and may be hardware accelerated on certain processors if the platform
 	% provides a hardware accelerated BLAS library.  In particular, AltiVec 
@@ -18,8 +20,8 @@ Object : Matrix2D (aka Matrices2D) {
 	% than to first scale using METHOD(scale) and then add using METHOD(add).
 	% <P>
 	% Technical note: matrix objects are implemented using single precision 
-	% floats, while the rest of the breve simulation environment uses double
-	% precision floating point math.
+	% floats, while much of the rest of the breve simulation environment uses 
+	% double precision floating point math.
 
 	+ variables:
 		matrixPointer (pointer).
@@ -35,7 +37,15 @@ Object : Matrix2D (aka Matrices2D) {
 	- to get-matrix-pointer:
 		return matrixPointer.
 
-	+ to multiply-with-elements from otherMatrix (Matrix2D object):
+	+ to get-absolute-sum:
+		% Returns the sum of the absolute values of all elements in this 
+		% matrix.
+		% <P>
+		% This method is hardware accelerated where supported.
+
+		return matrixGetAbsoluteSum(matrixPointer).
+
+	+ to multiply-with-values of otherMatrix (Matrix2D object):
 		% Multiplies each element in this matrix with the corresponding 
 		% element in otherMatrix.  This is not regular matrix multiplication;
 		% rather, it is a way to scale each element in otherMatrix.
@@ -57,7 +67,7 @@ Object : Matrix2D (aka Matrices2D) {
 		
 		matrixAddScalar(matrixPointer, scalarValue).
 
-	+ to add to otherMatrix (object) scaled-by scale = 1.0 (double):
+	+ to add-values of otherMatrix (object) scaled-by scale = 1.0 (double):
 		% Adds this matrix to otherMatrix leaving the result in otherMatrix.
 		% The matrices must be of the same size.  The 
 		% optional argument scale allows otherMatrix to be scaled before 
@@ -65,9 +75,9 @@ Object : Matrix2D (aka Matrices2D) {
 		% <P>
 		% This method is hardware accelerated where supported.
 
-		matrixAddScaled((otherMatrix get-matrix-pointer), matrixPointer, scale).
+		matrixAddScaled(matrixPointer, (otherMatrix get-matrix-pointer), scale).
 
-	+ to subtract from otherMatrix (object) scaled-by scale = 1.0 (double):
+	+ to subtract-values of otherMatrix (object) scaled-by scale = 1.0 (double):
 		% Subtracts this matrix from this otherMatrix, leaving the result
 		% in otherMatrix.  This method uses the
 		% same mechanism as METHOD(add), but using a negative scale 
@@ -77,7 +87,7 @@ Object : Matrix2D (aka Matrices2D) {
 		% <P>
 		% This method is hardware accelerated where supported.
 
-		matrixAddScaled((otherMatrix get-matrix-pointer), matrixPointer, -1.0 * scale).
+		matrixAddScaled(matrixPointer, (otherMatrix get-matrix-pointer), -1.0 * scale).
 
 	+ to scale by scaleValue (float):
 		% Scales all elements in the matrix by scaleValue.

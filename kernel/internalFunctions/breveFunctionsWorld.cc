@@ -37,6 +37,17 @@ int brISetStepFast(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
+	\brief Sets the iterations parameter for quickstep.
+
+	setStepFastIterations(int).
+*/
+
+int brISetStepFastIterations(brEval args[], brEval *target, brInstance *i) {
+	slWorldSetQuickstepIterations(i->engine->world, BRINT(&args[0]));
+	return EC_OK;
+}
+
+/*!
 	\brief Enables or disables drawing of every frame.  
 
 	setDrawEveryFrame(int).
@@ -916,6 +927,7 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "worldObjectGetLightExposure", brIWorldObjectGetLightExposure, AT_INT, AT_POINTER, 0);
 
 	brNewBreveCall(n, "setStepFast", brISetStepFast, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "setStepFastIterations", brISetStepFastIterations, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "setDrawEveryFrame", brISetDrawEveryFrame, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "randomSeed", brIRandomSeed, AT_NULL, AT_INT, 0);
 	brNewBreveCall(n, "randomSeedFromDevRandom", brIRandomSeedFromDevRandom, AT_INT, 0);

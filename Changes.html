@@ -36,6 +36,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <li>New feature: efficient Matrix2D manipulation class.  AltiVec accelerated, where supported by hardware.
 <li>New feature: chemical diffusion via Matrix2D class.
 <li>Physical collisions may now be disabled between specific object types.
+<li>"QuickStep" physics allows for huge improvements in physical simulation speed, as well as linear scaling with the number of bodies.
 <li>Introduced fully transparent steve to Java bridge on Mac OS X.
 <li>Fixed network server starting on wrong port on x86 machines
 <li>Fixed copylist garbage collection bug
@@ -44,7 +45,8 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <li>Fixed bug in Mobile method "set-label".
 <li>Various improvements to the Push programming language.
 <li>Changes to Push programming language to match the Lisp implementation
-<li>Different patterns can be drawn for lines.
+<li>Implemented "discrepancy" method for comparing Push programs.
+<li>Different patterns (dashed, dotted, etc) can be drawn for lines between objects.
 <li>Improved "Go to method..." popup menu (OS X only).
 <li>Fixed incorrect rendering when bitmaps rendered after transparencies.
 </ul>
@@ -57,7 +59,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 </ul>
 <ul>
 <P>Source Code Changes</P>
-<li>The simulation backend library has been partially converted to C++ and cleaned up significantly, though work remains.  The changes so far have allowed for some major optimizations.
+<li>The simulation backend library and the breve kernel have been partially converted to C++ and cleaned up significantly.  The changes so far have allowed for some major optimizations.
 </ul>
 
 <p>

@@ -29,7 +29,7 @@ Control : myController {
 
 # implement other objects in your simulation here
 
-Mobile : myAgent {
+Mobile : myAgent (aka myAgents) {
 	+ to init:
 
 	+ to iterate:

@@ -861,7 +861,6 @@ void slRenderLabels(slWorld *w) {
 
 void slRenderBillboards(slCamera *c, int flags) {
 	slBillboardEntry *b;
-	GLfloat matrix[16];
 	slVector normal;
 	int n;
 	int lastTexture = -1;
@@ -1127,7 +1126,6 @@ void slProcessBillboards(slWorld *w, slCamera *c) {
 	GLfloat matrix[16];
 	slSphere *ss;
 	std::vector<slWorldObject*>::iterator wi;
-	slVector normal;
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 
@@ -1196,6 +1194,7 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 	if(flags & DO_ONLY_ALPHA) {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// glBlendFunc(GL_ONE_MINUS_DST_ALPHA,GL_DST_ALPHA);
 	} 
 
 	if((flags & DO_OUTLINE) || (flags & DO_NO_COLOR)) color = 0;
@@ -1209,12 +1208,12 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 		wo = w->objects[n];
 
 		if(!wo || (wo->drawMode & DM_INVISIBLE)) skip = 1;
-		if(wo->alpha != 1.0 && (flags & DO_NO_ALPHA)) skip = 1;
-		if(wo->alpha == 1.0 && (flags & DO_ONLY_ALPHA)) skip = 1;
-		if(wo->type == WO_STATIONARY && (flags & DO_NO_STATIONARY)) skip = 1;
-		if(wo->type == WO_LINK && (flags & DO_NO_LINK)) skip = 1;
-		if(wo->type == WO_TERRAIN && (flags & DO_NO_TERRAIN)) skip = 1;
-		if(wo->textureMode != BBT_NONE && !(flags & DO_BILLBOARDS_AS_SPHERES)) skip = 1;
+		else if(wo->alpha != 1.0 && (flags & DO_NO_ALPHA)) skip = 1;
+		else if(wo->alpha == 1.0 && (flags & DO_ONLY_ALPHA)) skip = 1;
+		else if(wo->type == WO_STATIONARY && (flags & DO_NO_STATIONARY)) skip = 1;
+		else if(wo->type == WO_LINK && (flags & DO_NO_LINK)) skip = 1;
+		else if(wo->type == WO_TERRAIN && (flags & DO_NO_TERRAIN)) skip = 1;
+		else if(wo->textureMode != BBT_NONE && !(flags & DO_BILLBOARDS_AS_SPHERES)) skip = 1;
 
 		if(!skip) {
 			if(loadNames) glLoadName(n);
@@ -1222,7 +1221,7 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 			if(color) glColor4f(wo->color.x, wo->color.y, wo->color.z, wo->alpha);
 
 			if(wo->alpha != 1.0) {
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			// 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 				glDisable(GL_CULL_FACE);
 			}
 
