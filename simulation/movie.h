@@ -7,26 +7,35 @@
 	\brief A struct used to export breve movie.
 */
 
-struct slMovie {
-	AVCodec *codec;	
-	AVCodecContext *context;
-	AVFrame *picture;
+#ifdef __cplusplus
+class slMovie {
+	public:
+		AVCodec *codec;	
+		AVCodecContext *context;
+		AVFrame *picture;
 
-	unsigned char *buffer;
-	int bufferSize;
+		unsigned char *buffer;
+		int bufferSize;
 
-	unsigned char *YUVpictureBuffer;
-	unsigned char *RGBpictureBuffer;
-	unsigned char *vvBuffer;
-	unsigned char *uuBuffer;
+		unsigned char *YUVpictureBuffer;
+		unsigned char *RGBpictureBuffer;
+		unsigned char *vvBuffer;
+		unsigned char *uuBuffer;
 
-	FILE *file;
+		FILE *file;
 };
+#endif
 
 typedef struct slMovie slMovie;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 slMovie *slMovieCreate(char *filename, int width, int height, int framerate, float quality);
 int slMovieAddFrame(slMovie *m, int flip);
 int slMovieAddGLFrame(slMovie *m, slCamera *c);
 int slMovieFinish(slMovie *m);
-#endif
+#ifdef __cplusplus
+}
+#endif // __cplusplus 
+#endif // HAVE_LIBAVCODEC

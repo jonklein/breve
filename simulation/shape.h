@@ -52,6 +52,25 @@ struct slPlane {
 	slVector vertex;
 };
 
+/*!
+	\brief A header used when serializing shape data.
+*/
+
+struct slSerializedShapeHeader {
+	double inertia[3][3];
+	double density;
+	double mass;
+
+	slVector max;
+
+	int type; 
+	double radius;
+    
+	int faceCount;
+};  
+
+typedef struct slSerializedShapeHeader slSerializedShapeHeader;
+
 #ifdef __cplusplus
 #include <vector>
 
@@ -142,6 +161,7 @@ class slFace : public slFeature {
 		}
 };
 
+
 /*!
 	\brief A shape in the simulated world.
 */
@@ -149,6 +169,23 @@ class slFace : public slFeature {
 class slShape {
 	public:
 		int referenceCount;
+
+		slShape() {
+			drawList = 0;
+			_type = ST_NORMAL;
+			density = 1.0;
+			referenceCount = 1;
+		}
+
+		virtual ~slShape() {
+		}
+
+		virtual void bounds(slPosition *position, slVector *min, slVector *max);
+		virtual int pointOnShape(slVector *dir, slVector *point);
+		virtual void scale(slVector *point);
+		virtual slSerializedShapeHeader *serialize(int *length);
+
+		virtual void drawShadowVolume(slCamera *camera, slPosition *position);
 
 		int drawList;
 
@@ -165,8 +202,7 @@ class slShape {
 		// add support for this shape to be a sphere, in which case the 
 		// normal features below are ignored 
 
-		int type;
-		double radius;
+		int _type;
 
 		std::vector<slFeature*> features;
 
@@ -176,28 +212,22 @@ class slShape {
 };
 
 class slSphere : public slShape {
+	public:
+		slSphere(double radius) : slShape() {
+			_type = ST_SPHERE;
+			_radius = radius;
+		}
 
+		double _radius;
+
+		void bounds(slPosition *position, slVector *min, slVector *max);
+		int pointOnShape(slVector *dir, slVector *point);
+		void scale(slVector *point);
+		slSerializedShapeHeader *serialize(int *length);
+
+		void drawShadowVolume(slCamera *camera, slPosition *position);
 };
 #endif
-
-/*!
-	\brief A header used when serializing shape data.
-*/
-
-struct slSerializedShapeHeader {
-	double inertia[3][3];
-	double density;
-	double mass;
-
-	slVector max;
-
-	int type; 
-	double radius;
-    
-	int faceCount;
-};  
-
-typedef struct slSerializedShapeHeader slSerializedShapeHeader;
 
 /*!
 	\brief A header used when serializing face data.  
@@ -214,12 +244,12 @@ typedef struct slSerializedFaceHeader slSerializedFaceHeader;
 #ifdef __cplusplus
 extern "C" {
 #endif
-slShape *slNewShape(void);
+slShape *slShapeNew(void);
 
 slShape *slNewCube(slVector *size, double density);
 slShape *slNewNGonDisc(int count, double radius, double height, double density);
 slShape *slNewNGonCone(int count, double radius, double height, double density);
-slShape *slNewSphere(double radius, double density);
+slShape *slSphereNew(double radius, double density);
 
 slFace *slAddFace(slShape *v, slVector **points, int vCount);
 slEdge *slAddEdge(slShape *s, slFace *theFace, slVector *start, slVector *end);

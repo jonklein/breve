@@ -4,19 +4,24 @@ enum slSpringModes {
 	SPRING_MODE_CONTRACT_ONLY
 };
 
-struct slSpring {
-	double length;
-	double strength;
-	double damping;
+#ifdef __cplusplus
+class slSpring: public slObjectConnection {
+	public:
+		slLink *_src;
+		slLink *_dst;
 
-	unsigned char mode;
+		void slSpring::draw();
 
-	slLink *link1;
-	slLink *link2;
+		double length;
+		double strength;
+		double damping;
 
-	slVector point1;
-	slVector point2;
+		unsigned char mode;
+
+		slVector point1;
+		slVector point2;
 };
+#endif
 
 void slWorldApplySpringForces(slWorld *w);
 void slSpringApplyForce(slSpring *spring);

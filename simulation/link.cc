@@ -25,8 +25,37 @@
 */
 
 slLink *slLinkNew(slWorld *w) {
-	// return new slLink(new slLinkObject(w));
 	return new slLink(w);
+}
+
+slLink::~slLink() {
+	if(multibody && multibody->root == this) {
+		multibody->root = NULL;
+		slMultibodyUpdate(multibody);
+	}
+
+	std::vector<slJoint*>::iterator ji;
+
+	// This is a bad situation here: slJointBreak modifies the 
+	// joint list.  I intend to fix this.
+
+	while(inJoints.size() != 0) slJointBreak(*inJoints.begin());
+	while(outJoints.size() != 0) slJointBreak(*outJoints.begin());
+
+	dBodyDestroy(odeBodyID);
+}
+
+void slLink::step(slWorld *world, double step) {
+	if(simulate) {
+		slLinkUpdatePositions(this);
+		slLinkApplyJointControls(this);
+	} else {
+		world->integrator(world, this, &step, 0);
+		slLinkSwapConfig(this);
+		slLinkUpdatePosition(this);
+	}
+
+	if(world->detectCollisions) slLinkUpdateBoundingBox(this);
 }
 
 /*!
@@ -360,7 +389,7 @@ void slLinkApplyJointControls(slLink *m) {
 */
 
 void slLinkUpdateBoundingBox(slLink *link) {
-	slShapeBounds(link->shape, &link->position, &link->min, &link->max);
+	link->shape->bounds(&link->position, &link->min, &link->max);
 }
 
 /*!

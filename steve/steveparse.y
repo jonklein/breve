@@ -605,6 +605,7 @@ keyword_and_variable
 
 		slFree($1);
 		slFree($2);
+		slFree($3);
 	}
 | WORD_VALUE WORD_VALUE '(' type ')' {
 		stVar *v = stVarNew($2, $4);

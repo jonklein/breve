@@ -24,7 +24,7 @@
 /*@{*/
 
 int brINewShape(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slNewShape();
+	BRPOINTER(target) = slShapeNew();
 
 	if(!BRPOINTER(target)) {
 		slMessage(DEBUG_ALL, "newShape() failed\n");
@@ -106,7 +106,7 @@ int brIShapeSetMass(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brINewSphere(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slNewSphere(BRDOUBLE(&args[0]), BRDOUBLE(&args[1]));
+	BRPOINTER(target) = slSphereNew(BRDOUBLE(&args[0]), BRDOUBLE(&args[1]));
 
 	if(!BRINSTANCE(target)) {
 		slMessage(DEBUG_ALL, "newSphere() failed\n");

@@ -25,6 +25,7 @@
 #define BUFFER_SIZE 512
  
 #include "simulation.h"
+#include "shadow.h"
 #include "asciiart.h"
 #include "glIncludes.h"
 #include "tiger.h"
@@ -147,33 +148,33 @@ void slCompileCubeDrawList() {
 	glNewList(gCubeDrawList, GL_COMPILE);
 
 	glBegin(GL_QUAD_STRIP);
-		/* - x face */
+		// -x face 
 		glVertex3f(0.0, 0.0, 0.0);
 		glVertex3f(0.0, 0.0, 1.0);
 		glVertex3f(0.0, 1.0, 0.0);
 		glVertex3f(0.0, 1.0, 1.0);
 
-		/* + y face */
+		// +y face
 		glVertex3f(1.0, 1.0, 0.0);
 		glVertex3f(1.0, 1.0, 1.0);
 
-		/* + x face */
+		// +x face 
 		glVertex3f(1.0, 0.0, 0.0);
 		glVertex3f(1.0, 0.0, 1.0);
 
-		/* - y face */
+		// -y face 
 		glVertex3f(0.0, 0.0, 0.0);
 		glVertex3f(0.0, 0.0, 1.0);
 	glEnd();
 
 	glBegin(GL_QUADS);
-		/* - z face */
+		// -z face
 		glVertex3f(0.0, 1.0, 0.0);
 		glVertex3f(1.0, 1.0, 0.0);
 		glVertex3f(1.0, 0.0, 0.0);
 		glVertex3f(0.0, 0.0, 0.0);
 
-		/* + z face */
+		// +z face 
 		glVertex3f(0.0, 0.0, 1.0);
 		glVertex3f(1.0, 0.0, 1.0);
 		glVertex3f(1.0, 1.0, 1.0);
@@ -222,9 +223,15 @@ void slCenterPixelsInSquareBuffer(unsigned char *pixels, int width, int height, 
 
 unsigned int slTextureNew() {
 	GLuint texture;
+
 	if(!glActive) return 0;
 	glGenTextures(1, &texture);
 	return texture;
+}
+
+void slTextureFree(unsigned int n) {
+	if(!glActive) return;
+	glDeleteTextures(1, &n);
 }
 
 /*!
@@ -512,8 +519,6 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 
 	// camera locataion and target 
 
-	slVector *s, *t;
-
 	if(!w || !c) return;
 
 	glViewport(c->ox, c->oy, c->x, c->y);
@@ -542,6 +547,8 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 			recompile = 1;
 		}
 	}
+
+	if(!c->drawLights) flags |= DO_NO_LIGHTING|DO_NO_STENCIL|DO_NO_REFLECT;
 
 	if(!c->stationaryDrawList || recompile) {
 		// draw once to make sure the draw lists are good...
@@ -684,7 +691,7 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	if(c->drawText) slRenderText(w, c, s, t, crosshair);
+	if(c->drawText) slRenderText(w, c, &c->location, &c->target, crosshair);
 
 	if(c->drawText && crosshair && !scissor) {
 		glPushMatrix();
@@ -984,6 +991,8 @@ void slRenderLabels(slWorld *w) {
 
 void slRenderBillboards(slCamera *c, int flags) {
 	slBillboardEntry *b;
+	float modelview[16];
+
 	int n;
 	int lastTexture = -1;
 	slVector normal;
@@ -1219,19 +1228,19 @@ void slDrawShape(slCamera *c, slShape *s, slPosition *pos, slVector *color, int 
 	// if this is a sphere to be rendered as a billboard, but this is 
 	// not the billboard pass, then we don't do anything--return. 
 
-	if(s->type == ST_SPHERE && textureMode != BBT_NONE && !(flags & DO_BILLBOARDS_AS_SPHERES) && !(flags & DO_PROCESS_BILLBOARD)) return;
+	if(s->_type == ST_SPHERE && textureMode != BBT_NONE && !(flags & DO_BILLBOARDS_AS_SPHERES) && !(flags & DO_PROCESS_BILLBOARD)) return;
 
-	if(textureMode != BBT_NONE && s->type != ST_SPHERE) texture = 0;
+	if(textureMode != BBT_NONE && s->_type != ST_SPHERE) texture = 0;
 
 	/* if this is the billboard pass, and we're not a billboard, then we're done */
 
-	if((flags & DO_PROCESS_BILLBOARD) && (s->type != ST_SPHERE || textureMode == BBT_NONE)) return;
+	if((flags & DO_PROCESS_BILLBOARD) && (s->_type != ST_SPHERE || textureMode == BBT_NONE)) return;
 
 	bound = (mode & DM_BOUND) && !(flags & DO_NO_BOUND);
 	axis = (mode & DM_AXIS) && !(flags & DO_NO_AXIS);
 
 	if(flags & DO_SHADOW_VOLUME) {
-		slShadowVolumeForShape(c, s, pos);
+		s->drawShadowVolume(c, pos);
 		return;
 	}
 
@@ -1267,13 +1276,13 @@ void slDrawShape(slCamera *c, slShape *s, slPosition *pos, slVector *color, int 
 
     	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	} else if(s->type == ST_SPHERE && textureMode != BBT_NONE && (flags & DO_BILLBOARDS_AS_SPHERES)) {
+	} else if(s->_type == ST_SPHERE && textureMode != BBT_NONE && (flags & DO_BILLBOARDS_AS_SPHERES)) {
 		texture = 0;
 		textureMode = 0;
 	}
 
-	if(s->type == ST_SPHERE && textureMode != BBT_NONE && !(flags & DO_BILLBOARDS_AS_SPHERES)) {
-		slProcessBillboard(c, color, &pos->location, texture, textureMode, s->radius, bbRot, alpha, bound);
+	if(s->_type == ST_SPHERE && textureMode != BBT_NONE && !(flags & DO_BILLBOARDS_AS_SPHERES)) {
+		slProcessBillboard(c, color, &pos->location, texture, textureMode, ((slSphere*)s)->_radius, bbRot, alpha, bound);
 		glDisable(GL_TEXTURE_2D);
 
 		return;
@@ -1302,7 +1311,7 @@ void slDrawShape(slCamera *c, slShape *s, slPosition *pos, slVector *color, int 
 		glDepthMask(GL_TRUE);
 		glDisable(GL_POLYGON_OFFSET_FILL);
 
-		if(s->type == ST_SPHERE) {
+		if(s->_type == ST_SPHERE) {
 			glColor4f(1, 1, 1, 0);
 			glDisable(GL_DEPTH_TEST);
 			glScalef(.96, .96, .96);
@@ -1444,15 +1453,15 @@ void slRenderLines(slWorld *w, slCamera *c, int flags) {
 	for(li = w->connections.begin(); li != w->connections.end(); li++ ) {
 		slObjectLine &line = *li;
 
-		x = &line.src->position.location;
-		y = &line.dst->position.location;
+		x = &line._src->position.location;
+		y = &line._dst->position.location;
 
-		if(line.stipple) {
-			glLineStipple(2, line.stipple);
+		if(line._stipple) {
+			glLineStipple(2, line._stipple);
 			glEnable(GL_LINE_STIPPLE);
 		}
 
-		glColor4f(line.color.x, line.color.y, line.color.z, 0.8);
+		glColor4f(line._color.x, line._color.y, line._color.z, 0.8);
 
 		glBegin(GL_LINES);
 
@@ -1561,18 +1570,21 @@ void slRenderShape(slShape *s, int drawMode, int texture, double textureScale, i
 	int divisions;
 	GLUquadricObj *quad;
 
-	if(s->type == ST_SPHERE) {
-		if(s->radius < 10) divisions = 10;
-		else divisions = (int)s->radius;
+	if(s->_type == ST_SPHERE) {
+		double radius = ((slSphere*)s)->_radius;
+
+		if(radius < 10) divisions = 10;
+		else divisions = (int)radius;
 
 		quad = gluNewQuadric();
 
 		if(drawMode != GL_POLYGON) gluQuadricDrawStyle(quad, GLU_LINE);
-		if(texture) gluQuadricTexture(quad, GL_TRUE);
+		// if(texture) gluQuadricTexture(quad, GL_TRUE);
+		gluQuadricTexture(quad, GL_TRUE);
 
 		gluQuadricOrientation(quad, GLU_OUTSIDE);
 
-		gluSphere(quad, s->radius, divisions, divisions);
+		gluSphere(quad, radius, divisions, divisions);
 
 		gluDeleteQuadric(quad);
 	} else {

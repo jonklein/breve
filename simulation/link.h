@@ -72,13 +72,12 @@ class slLink: public slWorldObject {
 			slVectorZero(&externalForce);
 		}
 
-		~slLink() {
-			dBodyDestroy(odeBodyID);
-		}
+		~slLink();
 
 		void draw() {
-
 		}
+
+		void step(slWorld *world, double step);
 
 		slMultibody *multibody;
 
@@ -90,7 +89,6 @@ class slLink: public slWorldObject {
 		slLinkIntegrationPosition stateVector[2];
 
 		unsigned char currentState;
-		unsigned char simulate;
 
 		unsigned int clipNumber;
 

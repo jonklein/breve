@@ -41,32 +41,27 @@
 
 // do not change the order of the includes--they depend on eachother
 
-#ifdef __cplusplus      // make jpeglib C++ safe
-extern "C"{
-#endif
-
-#include "simulationTypedefs.h"
-
-#include "util.h"
-
-#include "movie.h"
-
 #ifdef __cplusplus
+extern "C" {
+#endif
+#include "util.h"
+#ifdef __cplusplus 
 }
 #endif
 
+#include "simulationTypedefs.h"
+#include "movie.h"
 #include "image.h"
 #include "integrate.h"
-#include "shape.h"
 #include "netsim.h"
 #include "gldraw.h"
+#include "shape.h"
 #include "patch.h"
 #include "world.h"
 #include "link.h"
 #include "lightdetector.h"
 #include "vclip.h"
 #include "vclipData.h"
-#include "shadow.h"
 #include "camera.h"
 #include "multibody.h"
 #include "springs.h"

@@ -19,13 +19,12 @@
  *****************************************************************************/
 
 #include "simulation.h"
+#include "shadow.h"
 
-int slShadowVolumeForShape(slCamera *c, slShape *s, slPosition *p) {
+void slShape::drawShadowVolume(slCamera *c, slPosition *p) {
 	std::vector<slEdge*>::iterator ei;
 	slVector light;
 	slVector lNormal;
-
-	if(s->type == ST_SPHERE) return slShadowVolumeForSphere(c, s, p);
 
 	slVectorCopy(&c->lights[0].location, &light);
 	slVectorCopy(&light, &lNormal);
@@ -34,7 +33,7 @@ int slShadowVolumeForShape(slCamera *c, slShape *s, slPosition *p) {
 
 	glBegin(GL_QUADS);
 
-	for(ei = s->edges.begin(); ei != s->edges.end(); ei++ ) {
+	for(ei = edges.begin(); ei != edges.end(); ei++ ) {
 		slEdge *e = *ei;
 		double d1, d2;
 		slFace *f1, *f2;
@@ -101,11 +100,9 @@ int slShadowVolumeForShape(slCamera *c, slShape *s, slPosition *p) {
 	}
 
 	glEnd();
-
-	return 0;
 }
 
-int slShadowVolumeForSphere(slCamera *c, slShape *s, slPosition *p) {
+void slSphere::drawShadowVolume(slCamera *c, slPosition *p) {
 	slVector light, lNormal, x1, x2, lastV;
 	int n, first = 1;
 	double diff;
@@ -131,7 +128,7 @@ int slShadowVolumeForSphere(slCamera *c, slShape *s, slPosition *p) {
 
 	glBegin(GL_QUADS);
 
-	divisions = (int)(s->radius * 5.0);
+	divisions = (int)(_radius * 5.0);
 
 	if(divisions < MIN_SPHERE_VOLUME_DIVISIONS) divisions = MIN_SPHERE_VOLUME_DIVISIONS;
 	else if(divisions > MAX_SPHERE_VOLUME_DIVISIONS) divisions = MAX_SPHERE_VOLUME_DIVISIONS;
@@ -141,8 +138,8 @@ int slShadowVolumeForSphere(slCamera *c, slShape *s, slPosition *p) {
 	for(n=0;n<divisions + 1;n++) {
 		slVector dx, dy, v, vBottom, lBottom;
 
-		slVectorMul(&x1, s->radius * cos(n*diff) * 1.05, &dx);
-		slVectorMul(&x2, s->radius * sin(n*diff) * 1.05, &dy);
+		slVectorMul(&x1, _radius * cos(n*diff) * 1.05, &dx);
+		slVectorMul(&x2, _radius * sin(n*diff) * 1.05, &dy);
 
 		slVectorAdd(&p->location, &dx, &v);
 		slVectorAdd(&v, &dy, &v);
@@ -169,8 +166,8 @@ int slShadowVolumeForSphere(slCamera *c, slShape *s, slPosition *p) {
 	for(n=0;n<divisions + 1;n++) {
 		slVector dx, dy, v;
 
-		slVectorMul(&x1, s->radius * cos(n*diff) * 1.05, &dx);
-		slVectorMul(&x2, s->radius * sin(n*diff) * 1.05, &dy);
+		slVectorMul(&x1, _radius * cos(n*diff) * 1.05, &dx);
+		slVectorMul(&x2, _radius * sin(n*diff) * 1.05, &dy);
 
 		slVectorAdd(&p->location, &dx, &v);
 		slVectorAdd(&v, &dy, &v);
@@ -179,8 +176,6 @@ int slShadowVolumeForSphere(slCamera *c, slShape *s, slPosition *p) {
 	}
 
 	glEnd();
-
-	return 0;
 }
 
 void slRenderShadowVolume(slWorld *w, slCamera *c) {
@@ -216,7 +211,7 @@ void slRenderShadowVolume(slWorld *w, slCamera *c) {
 	
 	glStencilFunc(GL_EQUAL, 0, 0xffffffff);
 
-	/* draw the scene again, with lighting, only where the value is 0 */
+	// draw the scene again, with lighting, only where the value is 0 
 	
 	slRenderObjects(w, c, 0, DO_NO_ALPHA);
 

@@ -91,7 +91,7 @@ int brIObjectAtLocation(brEval args[], brEval *target, brInstance *i) {
 
 	patch = slPatchForLocation(grid, &BRVECTOR(&args[1]));
 
-	if(patch) BRINSTANCE(target) = patch->data;
+	if(patch) slPatchGetData(patch);
 	else BRINSTANCE(target) = NULL;
 
 	return EC_OK;
@@ -144,7 +144,7 @@ int brISetObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 
 int brISetPatchColor(brEval args[], brEval *target, brInstance *i) {
 	slPatch *patch = BRPOINTER(&args[0]);
-	slVectorCopy(&BRVECTOR(&args[1]), &patch->color);
+	slPatchSetColor(patch, &BRVECTOR(&args[1]));
 
 	return EC_OK;
 }
@@ -157,7 +157,7 @@ int brISetPatchColor(brEval args[], brEval *target, brInstance *i) {
 
 int brIGetPatchLocation(brEval args[], brEval *target, brInstance *i) {
 	slPatch *patch = BRPOINTER(&args[0]);
-	slVectorCopy(&patch->location, &BRVECTOR(target));
+	slPatchGetLocation(patch, &BRVECTOR(target));
 
 	return EC_OK;
 }
@@ -170,7 +170,7 @@ int brIGetPatchLocation(brEval args[], brEval *target, brInstance *i) {
 
 int brISetPatchTransparency(brEval args[], brEval *target, brInstance *i) {
 	slPatch *patch = BRPOINTER(&args[0]);
-	patch->transparency = BRDOUBLE(&args[1]);
+	slPatchSetTransparency(patch, BRDOUBLE(&args[1]));
 
 	return EC_OK;
 }

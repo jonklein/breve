@@ -77,6 +77,7 @@ class slWorldObject {
 			texture = -1;
 			textureMode = 0;
 			textureScale = 16;
+			simulate = 0;
 
 			shape = NULL;
 
@@ -103,9 +104,14 @@ class slWorldObject {
 
 		virtual void draw(slCamera *camera) {};
 
+		virtual void step(slWorld *world, double step) {};
+
 		slShape *shape;
 
 		char *label;
+
+		unsigned char simulate;
+		unsigned char update;
 
 		slPosition position;
 
@@ -157,13 +163,12 @@ class slStationary: public slWorldObject {
 
 typedef safe_ptr<slWorldObject> slWorldObjectPointer;
 
-
 class slObjectConnection {
 	public:
-		slWorldObject *src;
-		slWorldObject *dst;
+		virtual void draw() = 0;
 
-		// virtual void draw() = 0;
+		slWorldObject *_src;
+		slWorldObject *_dst;
 };
 
 /*!
@@ -172,8 +177,10 @@ class slObjectConnection {
 
 class slObjectLine: public slObjectConnection {
 	public:
-		slVector color;
-		int stipple;
+		void draw() {};
+
+		slVector _color;
+		int _stipple;
 };
 #endif
 

@@ -245,7 +245,7 @@
 
 	if(viewEngine) {
 	   	if(!fullScreen) {
-			slRenderWorld(viewEngine->world, viewEngine->camera, 0, GL_RENDER, drawCrosshair, 0);
+			slRenderScene(viewEngine->world, viewEngine->camera, 0, GL_RENDER, drawCrosshair, 0);
 			if(theMovie) [theMovie addFrameFromRGBAPixels: [self RGBAPixels]];
 		}
 	} else {
@@ -270,7 +270,7 @@
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 		}
 
-		slRenderWorld(viewEngine->world, viewEngine->camera, firstFullScreen, GL_RENDER, drawCrosshair, 0);
+		slRenderScene(viewEngine->world, viewEngine->camera, firstFullScreen, GL_RENDER, drawCrosshair, 0);
 		firstFullScreen = 0;
 		CGLFlushDrawable([fullScreenView context]);
 		pthread_mutex_unlock(&viewEngine->lock);

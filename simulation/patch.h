@@ -18,26 +18,45 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifdef __cplusplus
 /*!
 	\brief Data associated with a certain region of 3D space.
 */
 
-struct slPatch {
-	void *data;
-	float transparency;
-	slVector color;
-	slVector location;
-};
+class slPatch {
+	public:
+		slPatch() {
+			transparency = 1.0;
+			data = NULL;
+			slVectorSet(&color, 0, 0, 0);
+		}
 
-typedef struct slPatch slPatch;
+		void *data;
+		float transparency;
+		slVector color;
+		slVector location;
+};
 
 /*!
 	\brief A grid of \ref slPatch objects.
 */
 
-#ifdef __cplusplus
 class slPatchGrid {
 	public:
+		~slPatchGrid() {
+			int b, c;
+
+			for(c=0;c<zSize;c++) {
+				for(b=0;b<ySize;b++) {
+					delete[] patches[c][b];
+				}
+
+				delete[] patches[c];
+			}
+
+			delete[] patches;
+		}
+
 		void draw(slCamera *camera);
 
 		int xSize, ySize, zSize;
@@ -50,14 +69,26 @@ class slPatchGrid {
 #endif
 
 typedef struct slPatchGrid slPatchGrid;
+typedef struct slPatch slPatch;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 slPatchGrid *slPatchGridNew(slVector *center, slVector *size, int x, int y, int z);
+
 void slPatchGridFree(slPatchGrid *g);
 void slInitPatch(slPatch *p);
+
 void slPatchSetData(slPatch *p, void *data);
+void *slPatchGetData(slPatch *p);
+
+void slPatchGetLocation(slPatch *p, slVector *location);
+void slPatchGetColor(slPatch *p, slVector *color);
+void slPatchSetColor(slPatch *p, slVector *color);
+
+void slPatchSetTransparency(slPatch *p, double transparency);
+
 slPatch *slPatchForLocation(slPatchGrid *g, slVector *location);
 
 void slDrawPatches(slPatchGrid *patches, slVector *cam, slVector *target);

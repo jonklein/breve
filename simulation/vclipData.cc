@@ -62,7 +62,7 @@ void slVclipDataInit(slWorld *w) {
 				break;
 			case WO_STATIONARY:
 				st = (slStationary*)w->objects[x];
-				slShapeBounds(st->shape, &st->position, &st->min, &st->max);
+				st->shape->bounds(&st->position, &st->min, &st->max);
 				break;
 		}
 
@@ -109,13 +109,15 @@ void slVclipDataAddPairEntry(slWorld *w, int x, int y) {
 
 	pe = slVclipPairEntry(w->clipData->pairList, x, y);
 
+	pe->flags = 0;
+
 	o1 = w->objects[x];
 	o2 = w->objects[y];
 
-	if(o1->shape && o1->shape->type == ST_NORMAL) pe->f1 = o1->shape->features[0];
+	if(o1->shape && o1->shape->_type == ST_NORMAL) pe->f1 = o1->shape->features[0];
 	else pe->f1 = NULL;
 
-	if(o2->shape && o2->shape->type == ST_NORMAL) pe->f2 = o2->shape->features[0];
+	if(o2->shape && o2->shape->_type == ST_NORMAL) pe->f2 = o2->shape->features[0];
 	else pe->f2 = NULL;
 
 	t1 = w->objects[x]->type;
@@ -142,11 +144,11 @@ void slVclipDataAddPairEntry(slWorld *w, int x, int y) {
 	// see if the user wants to simulate them and/or callback for them
 
 	if(c1 && c2 && w->collisionCheckCallback) {
-		simulate = w->collisionCheckCallback(c1, c2, CC_SIMULATE);
+		if(sim1 && sim2) simulate = w->collisionCheckCallback(c1, c2, CC_SIMULATE);
 		callback = w->collisionCheckCallback(c1, c2, CC_CALLBACK);
 	}
 
-	if(((sim1 && sim2) && simulate) || callback) {
+	if(simulate || callback) {
 		w->detectCollisions = 1;
 		pe->flags |= BT_CHECK;
 

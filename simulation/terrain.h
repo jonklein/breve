@@ -88,7 +88,7 @@ void slTerrainInitialize(slTerrain *l);
 void slTerrainFree(slTerrain *l);
 void slTerrainMakeNormals(slTerrain *l);
 
-int slTerrainTestPair(slVclipData *vc, int x, int y, slCollisionEntry *ce);
+int slTerrainTestPair(slVclipData *vc, int x, int y, slCollision *ce);
 
 void slTerrainFacesUnderRange(slTerrain *l, 
 	double minX, double maxX, double minZ, double maxZ,
@@ -96,11 +96,11 @@ void slTerrainFacesUnderRange(slTerrain *l,
 	int *earlyStart, int *lateEnd);
 
 int slTerrainPlaneUnderPoint(slTerrain *l, slVector *point, slPlane *plane);
-int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int x, int y, slCollisionEntry *ce, int flip);
-int slTerrainShapeClip(slVclipData *vc, slTerrain *l, int obX, int obY, slCollisionEntry *ce, int flip);
-double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollisionEntry *ce);
+int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int x, int y, slCollision *ce, int flip);
+int slTerrainShapeClip(slVclipData *vc, slTerrain *l, int obX, int obY, slCollision *ce, int flip);
+double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollision *ce);
 
-int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosition *position, slPlane *facePlane, slCollisionEntry *ce);
+int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosition *position, slPlane *facePlane, slCollision *ce);
 
 void slDrawTerrain(slTerrain *l, int texture, double textureScale, int drawMode, int flags);
 void slDrawTerrainSide(slTerrain *l, int texture, double textureScale, int drawMode, int flags, int bottom);

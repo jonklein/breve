@@ -266,7 +266,7 @@ int brIImageDataFree(brEval args[], brEval *result, brInstance *i) {
 
 		if(i->engine->camera->activateContextCallback) i->engine->camera->activateContextCallback();
 
-		glDeleteTextures(1, &texture);
+		slTextureFree(texture);
 	}
 
 	slFree(dm->data);

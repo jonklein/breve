@@ -48,7 +48,6 @@ slPatchGrid *slPatchGridNew(slVector *center, slVector *patchSize, int x, int y,
 			grid->patches[c][b] = new slPatch[x];
 		
 			for(a=0;a<x;a++) {
-				slInitPatch(&grid->patches[c][b][a]);
 				grid->patches[c][b][a].location.x = grid->startPosition.x + a * patchSize->x;
 				grid->patches[c][b][a].location.y = grid->startPosition.y + b * patchSize->y;
 				grid->patches[c][b][a].location.z = grid->startPosition.z + c * patchSize->z;
@@ -103,6 +102,8 @@ void slPatchGrid::draw(slCamera *camera) {
 
 	glEnable(GL_BLEND);
 
+	glEnable(GL_CULL_FACE);
+
 	glPushMatrix();
 
 	for(z=0;z<zSize;z++) {
@@ -147,32 +148,32 @@ void slPatchGrid::draw(slCamera *camera) {
 */
 
 void slPatchGridFree(slPatchGrid *g) {
-	int a, b, c;
-
-	for(c=0;c<g->zSize;c++) {
-		for(b=0;b<g->ySize;b++) {
-			for(a=0;a<g->xSize;a++) {
-
-			}
-
-			delete[] g->patches[c][b];
-		}
-
-		delete[] g->patches[c];
-	}
-
-	delete[] g->patches;
-
 	delete g;
-}
-
-void slInitPatch(slPatch *p) {
-	p->transparency = 1.0;
-	p->data = NULL;
 }
 
 void slPatchSetData(slPatch *p, void *data) {
 	p->data = data;
+}
+
+void *slPatchGetData(slPatch *p) {
+	if(!p) return NULL;
+	return p->data;
+}
+
+void slPatchGetLocation(slPatch *p, slVector *location) {
+	slVectorCopy(&p->location, location);
+}
+
+void slPatchSetColor(slPatch *p, slVector *color) {
+	slVectorCopy(color, &p->color);
+}
+
+void slPatchSetTransparency(slPatch *p, double transparency) {
+	p->transparency = transparency;
+}
+
+void slPatchGetColor(slPatch *p, slVector *color) {
+	slVectorCopy(&p->color, color);
 }
 
 slPatch *slPatchAtIndex(slPatchGrid *grid, int x, int y, int z) {

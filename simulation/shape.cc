@@ -20,34 +20,17 @@
 
 #include "simulation.h"
 
-slShape *slNewShape() {
-	slShape *s;
-
-	s = new slShape;
-	s->drawList = 0;
-	s->type = ST_NORMAL;
-	s->density = 1.0;
-
-	s->referenceCount = 1;
-
-	slVectorSet(&s->max, 0, 0, 0);
-
-	return s;
+slShape *slShapeNew() {
+	return new slShape;
 }
 
-slShape *slNewSphere(double radius, double mass) {
-	slShape *s;
+slShape *slSphereNew(double radius, double mass) {
+	slSphere *s;
 
-	s = slNewShape();
-
-	s->referenceCount = 1;
-
-	s->type = ST_SPHERE;
-	s->radius = radius;
-
+	s = new slSphere(radius);
 	s->mass = mass;
 
-	slVectorSet(&s->max, radius, radius, radius);
+	// slVectorSet(&s->max, radius, radius, radius);
 
 	slSphereInertiaMatrix(radius, mass, s->inertia);
 
@@ -57,7 +40,7 @@ slShape *slNewSphere(double radius, double mass) {
 slShape *slNewCube(slVector *size, double density) {
 	slShape *s;
 
-	s = slNewShape();
+	s = slShapeNew();
 
 	if(!slSetCube(s, size, density)) {
 		slShapeFree(s);
@@ -70,7 +53,7 @@ slShape *slNewCube(slVector *size, double density) {
 slShape *slNewNGonDisc(int count, double radius, double height, double density) {
 	slShape *s;
 
-	s = slNewShape();
+	s = slShapeNew();
 
 	if(!slSetNGonDisc(s, count, radius, height, density)) {
 		slShapeFree(s);
@@ -83,7 +66,7 @@ slShape *slNewNGonDisc(int count, double radius, double height, double density) 
 slShape *slNewNGonCone(int count, double radius, double height, double density) {
 	slShape *s;
 
-	s = slNewShape();
+	s = slShapeNew();
 
 	if(!slSetNGonCone(s, count, radius, height, density)) {
 		slShapeFree(s);
@@ -131,9 +114,9 @@ slShape *slShapeInitNeighbors(slShape *s, double density) {
 
 		// now check to see if it's a maximum for the shape 
 
-		if(p->vertex.x > s->max.x) s->max.x = p->vertex.x;
-		if(p->vertex.y > s->max.y) s->max.y = p->vertex.y;
-		if(p->vertex.z > s->max.z) s->max.z = p->vertex.z;
+		// if(p->vertex.x > s->max.x) s->max.x = p->vertex.x;
+		// if(p->vertex.y > s->max.y) s->max.y = p->vertex.y;
+		// if(p->vertex.z > s->max.z) s->max.z = p->vertex.z;
 
 		// reset edgeCount to 0 so it can act as a counter 
 		// as the actual edges are added below
@@ -725,6 +708,15 @@ void slSphereInertiaMatrix(double r, double mass, double i[3][3]) {
 */
 
 int slPointOnShape(slShape *s, slVector *dir, slVector *point) {
+	return s->pointOnShape(dir, point);
+}
+
+int slSphere::pointOnShape(slVector *dir, slVector *point) {
+	slVectorMul(dir, _radius, point);
+	return 0;
+}
+
+int slShape::pointOnShape(slVector *dir, slVector *point) {
 	int n;
 	double D, X, Y, Z, k;
 	slVector pointOnPlane;
@@ -740,12 +732,7 @@ int slPointOnShape(slShape *s, slVector *dir, slVector *point) {
 
 	slVectorNormalize(dir);
 
-	if(s->type == ST_SPHERE) {
-		slVectorMul(dir, s->radius, point);
-		return 0;
-	} 
-
-	for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
+	for(fi = faces.begin(); fi != faces.end(); fi++ ) {
 		slFace *f = *fi;
 
 		planes++;
@@ -760,7 +747,7 @@ int slPointOnShape(slShape *s, slVector *dir, slVector *point) {
 
 		k = D/(X+Y+Z);
 
-		// printf("%p: k = %f [%d]\n", s->features[n], k, (!slIsinf(k) && k > 0.0));
+		// printf("%p: k = %f [%d]\n", features[n], k, (!slIsinf(k) && k > 0.0));
 
 		if(!slIsinf(k) && k > 0.0) {
 			/* we have the length of the matching vector on the plane of this */
@@ -787,7 +774,19 @@ int slPointOnShape(slShape *s, slVector *dir, slVector *point) {
 	return -1;
 }
 
+
+
 void slScaleShape(slShape *s, slVector *scale) {
+	s->scale(scale);
+}
+
+void slSphere::scale(slVector *scale) {
+	recompile = 1;
+	_radius *= scale->x;
+	slShapeInitNeighbors(this, this->density);
+}
+
+void slShape::scale(slVector *scale) {
 	std::vector<slFace*>::iterator fi;
 	std::vector<slPoint*>::iterator pi;
 	slPoint *p;
@@ -801,15 +800,9 @@ void slScaleShape(slShape *s, slVector *scale) {
 	m[1][1] = scale->y;
 	m[2][2] = scale->z;
 
-	s->recompile = 1;
+	recompile = 1;
 
-	if(s->type == ST_SPHERE) {
-		s->radius *= scale->x;
-		slShapeInitNeighbors(s, s->density);
-		return;
-	}
-
-	for(pi = s->points.begin(); pi != s->points.end(); pi++ ) {
+	for(pi = points.begin(); pi != points.end(); pi++ ) {
 		p = *pi;
 
 		delete[] p->neighbors;
@@ -820,14 +813,14 @@ void slScaleShape(slShape *s, slVector *scale) {
 		slVectorXform(m, &v, &p->vertex);
 	}
 
-	for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
+	for(fi = faces.begin(); fi != faces.end(); fi++ ) {
 		f = *fi;
 
 		slVectorCopy(&f->plane.vertex, &v);
 		slVectorXform(m, &v, &f->plane.vertex);
 	}
 
-	slShapeInitNeighbors(s, s->density);
+	slShapeInitNeighbors(this, density);
 }
 
 /*!
@@ -837,6 +830,24 @@ void slScaleShape(slShape *s, slVector *scale) {
 */
 
 slSerializedShapeHeader *slSerializeShape(slShape *s, int *length) {
+	return s->serialize(length);
+}
+
+slSerializedShapeHeader *slSphere::serialize(int *length) {
+	slSerializedShapeHeader *header;
+
+	*length = sizeof(slSerializedShapeHeader);
+	header = (slSerializedShapeHeader*)slMalloc(sizeof(slSerializedShapeHeader));
+
+	header->type = ST_SPHERE;
+	header->radius = _radius;
+	header->mass = mass;
+	header->density = density;
+
+	return header;
+}
+
+slSerializedShapeHeader *slShape::serialize(int *length) {
 	int p, faceCount = 0, facePointCount = 0;
 	slSerializedShapeHeader *header;
 	slSerializedFaceHeader *fhead;
@@ -845,21 +856,9 @@ slSerializedShapeHeader *slSerializeShape(slShape *s, int *length) {
 	slVector *v;
 	std::vector<slFace*>::iterator fi;
 
-	if(s->type == ST_SPHERE) { 
-		*length = sizeof(slSerializedShapeHeader);
-		header = (slSerializedShapeHeader*)slMalloc(sizeof(slSerializedShapeHeader));
+	// count the different points and faces we have to add 
 
-		header->type = ST_SPHERE;
-		header->radius = s->radius;
-		header->mass = s->mass;
-		header->density = s->density;
-
-		return header;
-	}
-
-	/* count the different points and faces we have to add */
-
-	for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
+	for(fi = faces.begin(); fi != faces.end(); fi++ ) {
 		face = *fi;
 
 		faceCount++;
@@ -869,11 +868,11 @@ slSerializedShapeHeader *slSerializeShape(slShape *s, int *length) {
 		facePointCount += face->edgeCount;
 	}
 
-	/* figure out the total length of the data */
+	// figure out the total length of the data 
 
-	*length = sizeof(slSerializedShapeHeader) + 					/* the header        */
-              (faceCount * sizeof(slSerializedFaceHeader)) + 		/* the face headers  */
-              (facePointCount * sizeof(slVector));					/* the face vertices */
+	*length = sizeof(slSerializedShapeHeader) +              // header
+              (faceCount * sizeof(slSerializedFaceHeader)) + // face headers
+              (facePointCount * sizeof(slVector));           // face points
 
 	data = (char*)slMalloc(*length);
 	header = (slSerializedShapeHeader*)data;
@@ -881,17 +880,17 @@ slSerializedShapeHeader *slSerializeShape(slShape *s, int *length) {
 	/* fill in the header */
 
 	header->faceCount = faceCount;
-	header->type = s->type;
-	slMatrixCopy(s->inertia, header->inertia);
-	header->density = s->density;
-	header->mass = s->mass;
-	slVectorCopy(&s->max, &header->max);
+	header->type = _type;
+	slMatrixCopy(inertia, header->inertia);
+	header->density = density;
+	header->mass = mass;
+	// slVectorCopy(&s->max, &header->max);
 
 	/* skip over the header */
 
 	position = data + sizeof(slSerializedShapeHeader);
 
-	for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
+	for(fi = faces.begin(); fi != faces.end(); fi++ ) {
 		face = *fi;
 		fhead = (slSerializedFaceHeader*)position;
 
@@ -917,9 +916,9 @@ slShape *slDeserializeShape(slSerializedShapeHeader *header, int length) {
 	int n, vind;
 	slVector *v, *vectors, **vectorp;
 
-	if(header->type == ST_SPHERE) return slNewSphere(header->radius, header->mass);
+	if(header->type == ST_SPHERE) return slSphereNew(header->radius, header->mass);
 
-	s = slNewShape();
+	s = slShapeNew();
 
 	// offset the pointer to the endge of the header
 
@@ -954,21 +953,24 @@ slShape *slDeserializeShape(slSerializedShapeHeader *header, int length) {
 	return s;
 }
 
-void slShapeBounds(slShape *shape, slPosition *position, slVector *min, slVector *max) {
+void slSphere::bounds(slPosition *position, slVector *min, slVector *max) {
+	max->x = position->location.x + (_radius);
+	max->y = position->location.y + (_radius);
+	max->z = position->location.z + (_radius);
+
+	min->x = position->location.x - (_radius);
+	min->y = position->location.y - (_radius);
+	min->z = position->location.z - (_radius);
+
+}
+
+void slShape::bounds(slPosition *position, slVector *min, slVector *max) {
 	std::vector<slPoint*>::iterator pi;
 
 	slVectorSet(max, INT_MIN, INT_MIN, INT_MIN);
 	slVectorSet(min, INT_MAX, INT_MAX, INT_MAX);
 
-    if(shape->type == ST_SPHERE) {
-        max->x = position->location.x + (shape->radius);
-        max->y = position->location.y + (shape->radius);
-        max->z = position->location.z + (shape->radius);
-
-        min->x = position->location.x - (shape->radius);
-        min->y = position->location.y - (shape->radius);
-        min->z = position->location.z - (shape->radius);
-    } else for(pi = shape->points.begin(); pi != shape->points.end(); pi++ ) {
+    for(pi = points.begin(); pi != points.end(); pi++ ) {
         slPoint *p = *pi;
 		slVector loc;
 

@@ -64,9 +64,9 @@ void slJointBreak(slJoint *joint) {
 	if(parentBody) slMultibodyUpdate(parentBody);
 	if(childBody && childBody != parentBody) slMultibodyUpdate(childBody);
 
-	/* figure out if the broken links are still part of those bodies */
-	/* ... if not, then try to adopt the links */
-	/* ... if not, then NULL the multibody entries */
+	// figure out if the broken links are still part of those bodies
+	// ... if not, then try to adopt the links 
+	// ... if not, then NULL the multibody entries 
 
 	if(parent && parentBody && (std::find(parentBody->links.begin(), parentBody->links.end(), parent) != parentBody->links.end())) {
 		if((newMb = slLinkFindMultibody(parent))) slMultibodyUpdate(newMb);

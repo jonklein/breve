@@ -46,7 +46,7 @@ typedef struct slShape slShape;
 typedef struct slCollisionHeap slCollisionHeap;
 typedef struct slBoundSort slBoundSort;
 typedef struct slPairEntry slPairEntry;
-typedef struct slCollisionEntry slCollisionEntry;
+typedef struct slCollision slCollision;
 typedef struct slVclipData slVclipData;
 typedef struct slMPFace slMPFace;
 typedef struct slMPPolyhedron slMPPolyhedron;

@@ -27,8 +27,7 @@ char *gPhysicsErrorMessage;
 void *operator new (size_t size) {
 	void *p = slMalloc(size); 
 
-	if (p == NULL) // did malloc succeed?
-		throw std::bad_alloc(); // ANSI/ISO compliant behavior
+	if (p == NULL) throw std::bad_alloc(); 
 
 	return p;
 }
@@ -225,8 +224,8 @@ void slWorldFreeObject(slWorldObject *o) {
 	std::vector<slObjectLine*>::iterator li;
 
 	for(li = o->lines.begin(); li != o->lines.end(); li++ ) {
-		(*li)->src = NULL;
-		(*li)->dst = NULL;
+		(*li)->_src = NULL;
+		(*li)->_dst = NULL;
 	}
 
 	delete o;
@@ -347,33 +346,15 @@ double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 */
 
 double slWorldStep(slWorld *w, double stepSize, int *error) {
-	unsigned int n, simulated = 0;
+	unsigned int n, simulate = 0;
+	std::vector<slWorldObject*>::iterator wi;
 	int result;
 
 	n = 0;
 
-	/* only step forward to the end of the multibodies */
-
-	while(n < w->objects.size() && w->objects[n] && w->objects[n]->type == WO_LINK) {
-		double dt = stepSize;
-		slLink *link;
-
-		// if(!w->objects[n] || w->objects[n]->type != WO_LINK) continue;
-
-		link = (slLink*)w->objects[n];
-
-		if(link->simulate) {
-			slLinkUpdatePositions(link);
-			slLinkApplyJointControls(link);
-			simulated++;
-		} else {
-			w->integrator(w, link, &dt, 0);
-			slLinkSwapConfig(link);
-			slLinkUpdatePosition(link);
-		}
-
-		if(w->detectCollisions) slLinkUpdateBoundingBox(link);
-		n++;
+	for(wi = w->objects.begin(); wi != w->objects.end(); wi++) {
+		simulate += (*wi)->simulate;
+		(*wi)->step(w, stepSize);
 	}
 
 	slWorldApplySpringForces(w);
@@ -387,14 +368,16 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 			return 0;
 		}
 	
-		std::vector<slCollisionEntry>::iterator ci;
+		std::vector<slCollision>::iterator ci;
 
 		for(ci = w->clipData->collisions.begin(); ci != w->clipData->collisions.end(); ci++ ) {
-			slCollisionEntry *c = &(*ci);
+			slCollision *c = &(*ci);
 			slWorldObject *w1;
 			slWorldObject *w2;
 			slPairEntry *pe;
 			unsigned int x;
+
+			w1 = w2 = NULL; pe = NULL;
 
 			w1 = w->objects[c->n1];
 			w2 = w->objects[c->n2];
@@ -402,7 +385,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 			if(c->n1 > c->n2) pe = &w->clipData->pairList[c->n1][c->n2];
 			else pe = &w->clipData->pairList[c->n2][c->n1];
 
-			if(w1 && w2 && pe->flags & BT_SIMULATE) {
+			if(w1 && w2 && (pe->flags & BT_SIMULATE)) {
 				dBodyID bodyX = NULL, bodyY = NULL;
 				dJointID id;
 				double maxDepth = 0.0;
@@ -480,18 +463,15 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 					id = dJointCreateContact(w->odeWorldID, w->odeCollisionGroupID, contact);
 					dJointAttach(id, bodyY, bodyX);
 				}
-
-				// printf("t = %f, max: %f ", w->age, maxDepth);
-				// slVectorPrint(&c->normal);
 			}
 
 			if((pe->flags & BT_CALLBACK) && w->collisionCallback && w1 && w2) {
-				w->collisionCallback(w1->userData, w2->userData, CC_NORMAL);
+				 w->collisionCallback(w1->userData, w2->userData, CC_NORMAL);
 			}
 		}
 	}
 
-	if(simulated != 0) {
+	if(simulate != 0) {
 		dWorldStep(w->odeWorldID, stepSize);
 
 		// dWorldQuickStep(w->odeWorldID, stepSize);
@@ -525,7 +505,7 @@ void slNeighborCheck(slWorld *w) {
 		slVclip(w->proximityData, 0.0, 1, 0);
 	}
 
-	/* update all the bounding boxes first */
+	// update all the bounding boxes first 
 
 	for(wi = w->objects.begin(); wi != w->objects.end(); wi++ ) {
 		slWorldObject *wo = *wi;
@@ -576,15 +556,15 @@ slObjectLine *slWorldAddObjectLine(slWorld *w, slWorldObject *src, slWorldObject
 	linep = slFindObjectLine(src, dst);
 
 	if(linep) {
-		slVectorCopy(color, &linep->color);
-		linep->stipple = stipple;
+		slVectorCopy(color, &linep->_color);
+		linep->_stipple = stipple;
 		return linep;
 	}
 
-	line.stipple = stipple;
-	line.dst = dst;
-	line.src = src;
-	slVectorCopy(color, &line.color);
+	line._stipple = stipple;
+	line._dst = dst;
+	line._src = src;
+	slVectorCopy(color, &line._color);
 
 	w->connections.push_back( line);
 
@@ -604,7 +584,7 @@ int slRemoveObjectLine(slWorld *w, slWorldObject *src, slWorldObject *dst) {
 	for(li = w->connections.begin(); li != w->connections.end(); li++) {
 		line = &(*li);
 
-		if(line->dst == dst) {
+		if(line->_dst == dst) {
 			linep = find(src->lines.begin(), src->lines.end(), line);
 			src->lines.erase(linep);
 
@@ -631,7 +611,7 @@ int slRemoveAllObjectLines(slWorldObject *src) {
 	
 	while(src->lines.size()) {
 		line = src->lines[0];
-		dst = line->dst;
+		dst = line->_dst;
 
 		std::vector<slWorldObject*>::iterator wi;
 
@@ -658,7 +638,7 @@ slObjectLine *slFindObjectLine(slWorldObject *src, slWorldObject *dst) {
 	for(li = src->lines.begin(); li != src->lines.end(); li++) {
 		line = *li;
 
-		if(line->dst == dst) return line;
+		if(line->_dst == dst) return line;
 	}
 
 	return NULL;

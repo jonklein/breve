@@ -401,7 +401,7 @@ void slDrawTerrainSide(slTerrain *l, int texture, double textureScale, int drawM
 		glBindTexture(GL_TEXTURE_2D, texture);
 	}
 
-#define DRAW_SKIP 1
+#define DRAW_SKIP 2
 
 	for(i=0;i<l->side-1;i+=DRAW_SKIP) {
 		glBegin(GL_TRIANGLE_STRIP);
@@ -597,7 +597,7 @@ int slTerrainAreaUnderPoint(slTerrain *l, slVector *origpoint, int *x, int *z, i
 	return result;
 }
 
-int slTerrainTestPair(slVclipData *vc, int x, int y, slCollisionEntry *ce) {
+int slTerrainTestPair(slVclipData *vc, int x, int y, slCollision *ce) {
 	slTerrain *terrain;
 	slWorldObject *w1 = vc->objects[x];
 	slWorldObject *w2 = vc->objects[y];
@@ -606,13 +606,13 @@ int slTerrainTestPair(slVclipData *vc, int x, int y, slCollisionEntry *ce) {
 		slShape *s = w1->shape;
 		terrain = (slTerrain*)w2;
 		if(!terrain->initialized) slTerrainInitialize(terrain);
-		if(s->type == ST_SPHERE) return slTerrainSphereClip(vc, terrain, x, y, ce, 0);
+		if(s->_type == ST_SPHERE) return slTerrainSphereClip(vc, terrain, x, y, ce, 0);
 		else return slTerrainShapeClip(vc, terrain, x, y, ce, 0);
 	} else {
 		slShape *s = w2->shape;
 		terrain = (slTerrain*)w1;
 		if(!terrain->initialized) slTerrainInitialize(terrain);
-		if(s->type == ST_SPHERE) return slTerrainSphereClip(vc, terrain, y, x, ce, 1);
+		if(s->_type == ST_SPHERE) return slTerrainSphereClip(vc, terrain, y, x, ce, 1);
 		else return slTerrainShapeClip(vc, terrain, y, x, ce, 1);
 	}
 
@@ -623,14 +623,14 @@ int slTerrainTestPair(slVclipData *vc, int x, int y, slCollisionEntry *ce) {
 	\brief Check for a collision of a sphere against a landscape.
 */
 
-int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slCollisionEntry *ce, int flip) {
+int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slCollision *ce, int flip) {
 	slPlane landPlane;
 	double dist;
 	slVector terrainPoint, aveNormal, toSphere;
 	int startX, endX, startZ, endZ, earlyStart, lateEnd, x, z, quad;
 	int collisions = 0;
 
-	slShape *ss = vc->objects[obX]->shape;
+	slSphere *ss = (slSphere*)vc->objects[obX]->shape;
 	slPosition *sp = &vc->objects[obX]->position;
 
 	if(!flip) {
@@ -643,8 +643,8 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 
 	slVectorSet(&aveNormal, 0, 0, 0);
 
-	slTerrainFacesUnderRange(l, sp->location.x - ss->radius, sp->location.x + ss->radius, 
-								sp->location.z - ss->radius, sp->location.z + ss->radius,
+	slTerrainFacesUnderRange(l, sp->location.x - ss->_radius, sp->location.x + ss->_radius, 
+								sp->location.z - ss->_radius, sp->location.z + ss->_radius,
 								&startX, &endX, &startZ, &endZ, &earlyStart, &lateEnd);
 
 	for(x=startX;x<=endX;x++) {
@@ -695,12 +695,12 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 
 						slVectorCopy(&l->fnormals[quad][x][z], &landPlane.normal);
 
-						dist = slPlaneDistance(&landPlane, &sp->location) - ss->radius;
+						dist = slPlaneDistance(&landPlane, &sp->location) - ss->_radius;
 
-						if(dist < MC_TOLERANCE && dist > (-2 * ss->radius)) {
+						if(dist < MC_TOLERANCE && dist > (-2 * ss->_radius)) {
 							collisions++;
 
-							slVectorMul(&landPlane.normal, ss->radius, &toSphere);
+							slVectorMul(&landPlane.normal, ss->_radius, &toSphere);
 							slVectorSub(&sp->location, &toSphere, &terrainPoint);
 
 							if(dist < VC_WARNING_TOLERANCE)
@@ -711,8 +711,8 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 							slVectorCopy(&landPlane.normal, &ce->normal);
 							if(!flip) slVectorMul(&ce->normal, -1, &ce->normal);
 
-							if(flip) ce = slNextCollisionEntry(vc, obX, obY);
-							else ce = slNextCollisionEntry(vc, obY, obX);
+							if(flip) ce = slNextCollision(vc, obX, obY);
+							else ce = slNextCollision(vc, obY, obX);
 						} 
 					} else if(trivi == 0x01 || trivi == 0x02 || trivi == 0x04) {
 						// a violation against one of the edges -- test that edge
@@ -730,9 +730,9 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 							end = &a;		
 						}
 
-						dist = slPointLineDist(start, end, &sp->location, &collisionPoint) - ss->radius;
+						dist = slPointLineDist(start, end, &sp->location, &collisionPoint) - ss->_radius;
 
-						if(dist < MC_TOLERANCE && dist > (-2 * ss->radius)) {
+						if(dist < MC_TOLERANCE && dist > (-2 * ss->_radius)) {
 							collisions++;
 
 							if(dist < VC_WARNING_TOLERANCE)
@@ -746,8 +746,8 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 							slVectorCopy(&toSphere, &ce->normal);
 							if(!flip) slVectorMul(&ce->normal, -1, &ce->normal);
 
-							if(flip) ce = slNextCollisionEntry(vc, obX, obY);
-							else ce = slNextCollisionEntry(vc, obY, obX);
+							if(flip) ce = slNextCollision(vc, obX, obY);
+							else ce = slNextCollision(vc, obY, obX);
 						} 
 					} else {
 						slVector *point;
@@ -761,9 +761,9 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 						}
 
 						slVectorSub(&sp->location, point, &toSphere);
-						dist = slVectorLength(&toSphere) - ss->radius;
+						dist = slVectorLength(&toSphere) - ss->_radius;
 
-						if(dist < MC_TOLERANCE && dist > (-2 * ss->radius)) {
+						if(dist < MC_TOLERANCE && dist > (-2 * ss->_radius)) {
 							collisions++;
 
 							if(dist < VC_WARNING_TOLERANCE)
@@ -776,8 +776,8 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 							slVectorCopy(&toSphere, &ce->normal);
 							if(!flip) slVectorMul(&ce->normal, -1, &ce->normal);
 
-							if(flip) ce = slNextCollisionEntry(vc, obX, obY);
-							else ce = slNextCollisionEntry(vc, obY, obX);
+							if(flip) ce = slNextCollision(vc, obX, obY);
+							else ce = slNextCollision(vc, obY, obX);
 						}
 					}
 				}
@@ -829,7 +829,7 @@ int slPointIn2DTriangle(slVector *vertex, slVector *a, slVector *b, slVector *c)
 		- test edge against the plane
 */
 
-int slTerrainShapeClip(slVclipData *vc, slTerrain *l, int obX, int obY, slCollisionEntry *ce, int flip) {
+int slTerrainShapeClip(slVclipData *vc, slTerrain *l, int obX, int obY, slCollision *ce, int flip) {
 	std::vector<slPoint*>::iterator pi;
 	std::vector<slFace*>::iterator fi;
 	int collisions = 0;
@@ -988,7 +988,7 @@ int slTerrainShapeClip(slVclipData *vc, slTerrain *l, int obX, int obY, slCollis
 	return CT_PENETRATE;
 }
 
-int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosition *position, slPlane *facePlane, slCollisionEntry *ce) {
+int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosition *position, slPlane *facePlane, slCollision *ce) {
 	double headDelta, tailDelta, hdist, tdist;
 	int update1, update2;
 	slVector edgeVector, headPoint, tailPoint;
@@ -1049,7 +1049,7 @@ int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosit
 	= terrain.  also gives the terrain x, z & quad of the point.
 */
 
-double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollisionEntry *ce) {
+double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollision *ce) {
 	slVector tp;
 	double dist;
 	slPlane landPlane;

@@ -109,7 +109,7 @@ void slRemoveCollisionCandidate(slVclipData *vc, slPairEntry *pair) {
 
 int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly) {
 	int result;
-	slCollisionEntry *ce;
+	slCollision *ce;
 	slPairEntry *pe;
 	std::vector<slPairEntry*>::iterator ci;
 
@@ -124,7 +124,7 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 	/* the old way to go through this was O(n^2), now we just look */
 	/* at the actual collisions */
 
-	ce = slNextCollisionEntry(d);
+	ce = slNextCollision(d);
 
 	if(boundingBoxOnly) {
 		for(ci = d->candidates.begin(); ci != d->candidates.end(); ci++ ) {
@@ -136,7 +136,7 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 				ce->n1 = pe->x;
 				ce->n2 = pe->y;
 
-				ce = slNextCollisionEntry(d);
+				ce = slNextCollision(d);
 			}
 		}
 
@@ -151,7 +151,7 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 		result = slVclipTestPair(d, pe, ce);
 
 		if(result == CT_ERROR) return -1;
-		if(result == CT_PENETRATE) ce = slNextCollisionEntry(d);
+		if(result == CT_PENETRATE) ce = slNextCollision(d);
 	}
 
 	// d->collisionCount is pointing to the next empty collision 
@@ -162,8 +162,8 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 	return d->collisions.size();
 }
 
-slCollisionEntry *slNextCollisionEntry(slVclipData *v, int x, int y) {
-	slCollisionEntry *e = slNextCollisionEntry(v);
+slCollision *slNextCollision(slVclipData *v, int x, int y) {
+	slCollision *e = slNextCollision(v);
 
 	e->n1 = x;
 	e->n2 = y;
@@ -171,10 +171,10 @@ slCollisionEntry *slNextCollisionEntry(slVclipData *v, int x, int y) {
 	return e;
 }
 
-slCollisionEntry *slNextCollisionEntry(slVclipData *v) {
-	slCollisionEntry e;
+slCollision *slNextCollision(slVclipData *v) {
+	slCollision e;
 
-	bzero(&e, sizeof(slCollisionEntry));
+	bzero(&e, sizeof(slCollision));
 
 	v->collisions.push_back(e);
 	return &v->collisions.back();
@@ -371,7 +371,7 @@ slPlane *slPositionPlane(slPosition *p, slPlane *p1, slPlane *pt) {
 	return pt;
 }
 
-int slVclipTestPair(slVclipData *vc, slPairEntry *e, slCollisionEntry *ce) {
+int slVclipTestPair(slVclipData *vc, slPairEntry *e, slCollision *ce) {
 	int result = 0, iterations = 0, limit;
 	int x, y;
 
@@ -403,19 +403,19 @@ int slVclipTestPair(slVclipData *vc, slPairEntry *e, slCollisionEntry *ce) {
 
 	limit = 2 * ((s1->features.size() * s2->features.size()) + 1);
 
-	if(s1->type == ST_SPHERE && s2->type == ST_SPHERE) {
+	if(s1->_type == ST_SPHERE && s2->_type == ST_SPHERE) {
 		result = slSphereSphereCheck(vc, x, y, ce);
-	} else if(s1->type == ST_SPHERE && s2->type == ST_NORMAL) {
+	} else if(s1->_type == ST_SPHERE && s2->_type == ST_NORMAL) {
 		result = slSphereShapeCheck(vc, f2, 0, x, y, ce);
-	} else if(s1->type == ST_NORMAL && s2->type == ST_SPHERE) {
+	} else if(s1->_type == ST_NORMAL && s2->_type == ST_SPHERE) {
 		result = slSphereShapeCheck(vc, f1, 1, y, x, ce);
 	} else {
 		do {
 			if(iterations == limit) {
-				// this is the worst-case scenario.  it indicates serious problems
-				// in the logic of the vclip algorithm.
-
-				slMessage(DEBUG_WARN, "warning: vclip feature loop detected, attempting brute force detection\n");
+				// this is the worst-case scenario.  it indicates serious 
+				// problems in the logic (by which i mean implementation) 
+				// of the vclip algorithm.
+				// slMessage(DEBUG_ALL, "warning: vclip feature loop detected, using brute force detection\n");
 				return slVclipTestPairAllFeatures(vc, e, ce);
 			}
 
@@ -464,7 +464,7 @@ int slVclipTestPair(slVclipData *vc, slPairEntry *e, slCollisionEntry *ce) {
 	= this is only done if a feature loop is detected.
 */
 
-int slVclipTestPairAllFeatures(slVclipData *vc, slPairEntry *e, slCollisionEntry *ce) {
+int slVclipTestPairAllFeatures(slVclipData *vc, slPairEntry *e, slCollision *ce) {
 	int result;
 	slPosition *p1, *p2;
 	slShape *s1, *s2;
@@ -525,12 +525,12 @@ int slVclipTestPairAllFeatures(slVclipData *vc, slPairEntry *e, slCollisionEntry
 	return CT_DISJOINT;
 }
 
-int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollisionEntry *ce) {
+int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollision *ce) {
 	slVector diff, tempV1;
 	double totalLen, depth;
 
-	slShape *s1 = vc->objects[x]->shape;
-	slShape *s2 = vc->objects[y]->shape;
+	slSphere *s1 = (slSphere*)vc->objects[x]->shape;
+	slSphere *s2 = (slSphere*)vc->objects[y]->shape;
 	slPosition *p1 = &vc->objects[x]->position;
 	slPosition *p2 = &vc->objects[y]->position;
 
@@ -538,7 +538,7 @@ int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollisionEntry *ce) {
 
 	totalLen = slVectorLength(&diff);
 
-	depth = totalLen - (s1->radius + s2->radius);
+	depth = totalLen - (s1->_radius + s2->_radius);
 
 	if(depth > MC_TOLERANCE) {
 		// if(ce) ce->distance = depth;
@@ -554,7 +554,7 @@ int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollisionEntry *ce) {
 
 	slVectorNormalize(&ce->normal);
 
-	slVectorMul(&ce->normal, s1->radius, &tempV1);
+	slVectorMul(&ce->normal, s1->_radius, &tempV1);
 
 	slVectorAdd(&tempV1, &p1->location, &tempV1);
 
@@ -565,7 +565,7 @@ int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollisionEntry *ce) {
 	return CT_PENETRATE;
 }
 
-int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y, slCollisionEntry *ce) {
+int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y, slCollision *ce) {
 	unsigned int n = 0;
 	int included, update;
 	slFeature *minFeature = 0;
@@ -580,7 +580,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 
 	slPlane transformedPlane;
 
-	slShape *s1 = vc->objects[x]->shape;
+	slSphere *s1 = (slSphere*)vc->objects[x]->shape;
 	slShape *s2 = vc->objects[y]->shape;
 	slPosition *p1 = &vc->objects[x]->position;
 	slPosition *p2 = &vc->objects[y]->position;
@@ -599,7 +599,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 				centerDist = slPlaneDistance(&transformedPlane, &p1->location);
 
 				if(included) {
-					dist = centerDist - s1->radius;
+					dist = centerDist - s1->_radius;
 
 					if(dist > MC_TOLERANCE) {
 						// if(ce) ce->distance = dist;
@@ -609,7 +609,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 
 						slVectorCopy(&transformedPlane.normal, &ce->normal);
 
-						slVectorMul(&ce->normal, -s1->radius, &tempV1);
+						slVectorMul(&ce->normal, -s1->_radius, &tempV1);
 						slVectorInvXform(p1->rotation, &tempV1, &spPoint);
 
 						slVectorAdd(&tempV1, &p1->location, &tempV1);
@@ -659,7 +659,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 					slPositionVertex(p2, &start->vertex, &tStart);
 					slPositionVertex(p2, &end->vertex, &tEnd);
 		   
-					dist = slPointLineDist(&tStart, &tEnd, &p1->location, &shPoint) - s1->radius;
+					dist = slPointLineDist(&tStart, &tEnd, &p1->location, &shPoint) - s1->_radius;
 
 					if(dist <= MC_TOLERANCE) {
 						if(!ce) return CT_PENETRATE;
@@ -671,7 +671,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 
 						slVectorNormalize(&ce->normal);
 
-						slVectorMul(&ce->normal, -s1->radius, &tempV1);
+						slVectorMul(&ce->normal, -s1->_radius, &tempV1);
 						slVectorInvXform(p1->rotation, &tempV1, &spPoint);
 						slVectorInvXform(p2->rotation, &tempV1, &shPoint);
 
@@ -705,7 +705,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 					slPositionVertex(p2, &p->vertex, &vertex);
 					slVectorSub(&p1->location, &vertex, &vertex);
 
-					dist = slVectorLength(&vertex) - s1->radius;
+					dist = slVectorLength(&vertex) - s1->_radius;
 
 					if(dist <= MC_TOLERANCE) {
 						if(!ce) return CT_PENETRATE;
@@ -770,7 +770,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 	return CT_PENETRATE;
 }
 
-int slPointPointClip(slFeature **nf1, slPosition *p1p, slShape *s1, slFeature **nf2, slPosition *p2p, slShape *s2, slCollisionEntry *ce) {
+int slPointPointClip(slFeature **nf1, slPosition *p1p, slShape *s1, slFeature **nf2, slPosition *p2p, slShape *s2, slCollision *ce) {
 	int update;
 	slVector v1, v2, dist;
    
@@ -799,7 +799,7 @@ int slPointPointClip(slFeature **nf1, slPosition *p1p, slShape *s1, slFeature **
 	return CT_DISJOINT;
 }
 
-int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int pairFlip, int x, int y, slCollisionEntry *ce) {
+int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int pairFlip, int x, int y, slCollision *ce) {
 	int update1, update2, startEdge, total, included, n;
 	double l1, l2, eD, sD;
 	slVector edgeVector, tempV1, eLambda, sLambda, transEdgeVector, eStart;
@@ -974,7 +974,7 @@ double slSignEdgePlaneDistanceDeriv(slPlane *p, slVector *edgeVector, slVector *
 	return d * slVectorDot(edgeVector, &p->normal);
 }
 
-int slEdgePointClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf2, slPosition *pp, slShape *s2, slCollisionEntry *ce) {
+int slEdgePointClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf2, slPosition *pp, slShape *s2, slCollision *ce) {
 	int update1, update2;
 	double l1, l2; /* edge clip lambdas */
 	slVector edgeVector, eLambda, transEdgeVector, tempV1;
@@ -1045,7 +1045,7 @@ int slEdgePointClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf
 	return CT_DISJOINT;
 }
 
-int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2, slPosition *p2, slShape *s2, slCollisionEntry *ce) {
+int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2, slPosition *p2, slShape *s2, slCollision *ce) {
 	int update1, update2;
 	double l1, l2; /* edge lambdas */
 	slPoint *start, *end;
@@ -1259,7 +1259,7 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 /* belongs to because handleLocalMinima needs to traverse through all the */
 /* slFaces in the entire slShape											  */
 
-int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf2, slPosition *fp, slShape *fs, slVclipData *v, int pairFlip, int x, int y, slCollisionEntry *ce) {
+int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf2, slPosition *fp, slShape *fs, slVclipData *v, int pairFlip, int x, int y, slCollision *ce) {
 	int update;
 	int n;
 	slVector tPoint, tEnd;
@@ -1727,7 +1727,7 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 	the vertices and we compute points on edges that go through the suspect plane.
 */
 
-int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1, slFace *face1, slShape *s2, slPosition *p2, slFace *face2) {
+int slFaceFaceCollisionPoints(slCollision *ce, slShape *s1, slPosition *p1, slFace *face1, slShape *s2, slPosition *p2, slFace *face2) {
 	int n, update1, update2, included;
 	double l1, l2;
 
@@ -1865,7 +1865,7 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 	\brief Find colliding faces and count collision points for colliding objects.
 */
 
-int slCountFaceCollisionPoints(slCollisionEntry *ce, slFeature *f1, slFeature *f2, slPosition *p1, slPosition *p2, slShape *s1, slShape *s2) {
+int slCountFaceCollisionPoints(slCollision *ce, slFeature *f1, slFeature *f2, slPosition *p1, slPosition *p2, slShape *s1, slShape *s2) {
 	slFeature *newF1 = f1, *newF2 = f2;
 
 	slFindCollisionFaces(s1, p1, &newF1, s2, p2, &newF2);

@@ -60,6 +60,7 @@ extern "C" {
 #endif
 void slInitGL(slWorld *w);
 unsigned int slTextureNew();
+void slTextureFree(unsigned int texture);
 int slUpdateTexture(slWorld *w, GLuint texNum, unsigned char *pixels, int width, int height, int p);
 void slRenderScene(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor);
 int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y, slVector *dragVector);

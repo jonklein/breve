@@ -22,6 +22,6 @@
 #define MAX_SPHERE_VOLUME_DIVISIONS 40
 
 void slRenderShadowVolume(slWorld *w, slCamera *c);
-int slShadowVolumeForShape(slCamera *c, slShape *s, slPosition *p);
-int slShadowVolumeForSphere(slCamera *c, slShape *s, slPosition *p);
+void slShadowVolumeForShape(slCamera *c, slShape *s, slPosition *p);
+void slShadowVolumeForSphere(slCamera *c, slSphere *s, slPosition *p);
 
