@@ -1,807 +1,732 @@
-<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
-<class>brqtMainWindow</class>
-<widget class="QMainWindow">
-    <property name="name">
-        <cstring>MainWindow</cstring>
+<ui version="4.0" stdsetdef="1" >
+  <author></author>
+  <comment></comment>
+  <exportmacro></exportmacro>
+  <class>MainWindow</class>
+  <widget class="Q3MainWindow" name="MainWindow" >
+    <property name="objectName" >
+      <string notr="true" >MainWindow</string>
     </property>
-    <property name="geometry">
-        <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>460</width>
-            <height>508</height>
-        </rect>
+    <property name="geometry" >
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>460</width>
+        <height>508</height>
+      </rect>
     </property>
-    <property name="minimumSize">
-        <size>
-            <width>459</width>
-            <height>109</height>
-        </size>
+    <property name="minimumSize" >
+      <size>
+        <width>459</width>
+        <height>109</height>
+      </size>
     </property>
-    <property name="caption">
-        <string>breve</string>
+    <property name="windowTitle" >
+      <string>breve</string>
     </property>
-    <grid>
-        <property name="name">
-            <cstring>unnamed</cstring>
+    <layout class="QGridLayout" >
+      <property name="objectName" >
+        <string notr="true" >unnamed</string>
+      </property>
+      <item rowspan="1" row="0" column="0" colspan="6" >
+        <widget class="breveGLWidget" name="breveGLWidget1" >
+          <property name="objectName" >
+            <string notr="true" >breveGLWidget1</string>
+          </property>
+          <property name="sizePolicy" >
+            <sizepolicy>
+              <hsizetype>7</hsizetype>
+              <vsizetype>7</vsizetype>
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+            </sizepolicy>
+          </property>
+          <property name="font" >
+            <font>
+              <family></family>
+              <pointsize>9</pointsize>
+              <weight>0</weight>
+              <italic>false</italic>
+              <bold>false</bold>
+              <underline>false</underline>
+              <strikeout>false</strikeout>
+            </font>
+          </property>
+        </widget>
+      </item>
+      <item row="1" column="5" >
+        <widget class="QComboBox" name="documentMenu" >
+          <property name="objectName" >
+            <string notr="true" >documentMenu</string>
+          </property>
+          <property name="sizePolicy" >
+            <sizepolicy>
+              <hsizetype>7</hsizetype>
+              <vsizetype>0</vsizetype>
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+            </sizepolicy>
+          </property>
+          <property name="minimumSize" >
+            <size>
+              <width>143</width>
+              <height>20</height>
+            </size>
+          </property>
+          <property name="font" >
+            <font>
+              <family></family>
+              <pointsize>10</pointsize>
+              <weight>0</weight>
+              <italic>false</italic>
+              <bold>false</bold>
+              <underline>false</underline>
+              <strikeout>false</strikeout>
+            </font>
+          </property>
+          <item>
+            <property name="text" >
+              <string>Choose Simulation...</string>
+            </property>
+          </item>
+        </widget>
+      </item>
+      <item row="1" column="1" >
+        <spacer name="spacer10" >
+          <property name="sizeHint" >
+            <size>
+              <width>1000</width>
+              <height>20</height>
+            </size>
+          </property>
+          <property name="sizeType" >
+            <enum>Expanding</enum>
+          </property>
+          <property name="orientation" >
+            <enum>Horizontal</enum>
+          </property>
+        </spacer>
+      </item>
+      <item row="1" column="4" >
+        <spacer name="spacer9" >
+          <property name="sizeHint" >
+            <size>
+              <width>1000</width>
+              <height>20</height>
+            </size>
+          </property>
+          <property name="sizeType" >
+            <enum>Expanding</enum>
+          </property>
+          <property name="orientation" >
+            <enum>Horizontal</enum>
+          </property>
+        </spacer>
+      </item>
+      <item row="1" column="2" >
+        <widget class="QToolButton" name="runButton" >
+          <property name="objectName" >
+            <string notr="true" >runButton</string>
+          </property>
+          <property name="minimumSize" >
+            <size>
+              <width>26</width>
+              <height>26</height>
+            </size>
+          </property>
+          <property name="maximumSize" >
+            <size>
+              <width>26</width>
+              <height>26</height>
+            </size>
+          </property>
+          <property name="text" >
+            <string/>
+          </property>
+          <property name="shortcut" >
+            <string/>
+          </property>
+          <property name="icon" >
+            <iconset>play.png</iconset>
+          </property>
+          <property name="autoRaise" >
+            <bool>false</bool>
+          </property>
+        </widget>
+      </item>
+      <item row="1" column="3" >
+        <widget class="QToolButton" name="stopButton" >
+          <property name="objectName" >
+            <string notr="true" >stopButton</string>
+          </property>
+          <property name="minimumSize" >
+            <size>
+              <width>26</width>
+              <height>26</height>
+            </size>
+          </property>
+          <property name="maximumSize" >
+            <size>
+              <width>26</width>
+              <height>26</height>
+            </size>
+          </property>
+          <property name="text" >
+            <string/>
+          </property>
+          <property name="icon" >
+            <iconset>stop.png</iconset>
+          </property>
+          <property name="autoRaise" >
+            <bool>false</bool>
+          </property>
+        </widget>
+      </item>
+      <item row="1" column="0" >
+        <widget class="Q3ButtonGroup" name="buttonGroup1" >
+          <property name="objectName" >
+            <string notr="true" >buttonGroup1</string>
+          </property>
+          <property name="sizePolicy" >
+            <sizepolicy>
+              <hsizetype>0</hsizetype>
+              <vsizetype>0</vsizetype>
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+            </sizepolicy>
+          </property>
+          <property name="minimumSize" >
+            <size>
+              <width>210</width>
+              <height>36</height>
+            </size>
+          </property>
+          <property name="maximumSize" >
+            <size>
+              <width>210</width>
+              <height>34</height>
+            </size>
+          </property>
+          <property name="font" >
+            <font>
+              <family></family>
+              <pointsize>11</pointsize>
+              <weight>0</weight>
+              <italic>false</italic>
+              <bold>false</bold>
+              <underline>false</underline>
+              <strikeout>false</strikeout>
+            </font>
+          </property>
+          <property name="frameShape" >
+            <enum>GroupBoxPanel</enum>
+          </property>
+          <property name="frameShadow" >
+            <enum>Sunken</enum>
+          </property>
+          <property name="title" >
+            <string>Cursor Mode</string>
+          </property>
+          <property name="exclusive" >
+            <bool>true</bool>
+          </property>
+          <property name="radioButtonExclusive" >
+            <bool>true</bool>
+          </property>
+          <widget class="QToolButton" name="rotateButton" >
+            <property name="objectName" >
+              <string notr="true" >rotateButton</string>
+            </property>
+            <property name="geometry" >
+              <rect>
+                <x>4</x>
+                <y>15</y>
+                <width>50</width>
+                <height>14</height>
+              </rect>
+            </property>
+            <property name="sizePolicy" >
+              <sizepolicy>
+                <hsizetype>1</hsizetype>
+                <vsizetype>0</vsizetype>
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+              </sizepolicy>
+            </property>
+            <property name="text" >
+              <string>Rotate</string>
+            </property>
+            <property name="checkable" >
+              <bool>true</bool>
+            </property>
+            <property name="buttonGroupId" >
+              <number>0</number>
+            </property>
+            <property name="toolTip" stdset="0" >
+              <string>Rotate Camera</string>
+            </property>
+          </widget>
+          <widget class="QToolButton" name="zoomButton" >
+            <property name="objectName" >
+              <string notr="true" >zoomButton</string>
+            </property>
+            <property name="geometry" >
+              <rect>
+                <x>55</x>
+                <y>15</y>
+                <width>50</width>
+                <height>14</height>
+              </rect>
+            </property>
+            <property name="sizePolicy" >
+              <sizepolicy>
+                <hsizetype>1</hsizetype>
+                <vsizetype>0</vsizetype>
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+              </sizepolicy>
+            </property>
+            <property name="text" >
+              <string>Zoom</string>
+            </property>
+            <property name="checkable" >
+              <bool>true</bool>
+            </property>
+            <property name="buttonGroupId" >
+              <number>1</number>
+            </property>
+            <property name="toolTip" stdset="0" >
+              <string>Zoom Camera</string>
+            </property>
+          </widget>
+          <widget class="QToolButton" name="moveButton" >
+            <property name="objectName" >
+              <string notr="true" >moveButton</string>
+            </property>
+            <property name="geometry" >
+              <rect>
+                <x>106</x>
+                <y>15</y>
+                <width>49</width>
+                <height>14</height>
+              </rect>
+            </property>
+            <property name="sizePolicy" >
+              <sizepolicy>
+                <hsizetype>1</hsizetype>
+                <vsizetype>0</vsizetype>
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+              </sizepolicy>
+            </property>
+            <property name="text" >
+              <string>Move</string>
+            </property>
+            <property name="checkable" >
+              <bool>true</bool>
+            </property>
+            <property name="buttonGroupId" >
+              <number>2</number>
+            </property>
+            <property name="toolTip" stdset="0" >
+              <string>Move Camera</string>
+            </property>
+          </widget>
+          <widget class="QToolButton" name="selectButton" >
+            <property name="objectName" >
+              <string notr="true" >selectButton</string>
+            </property>
+            <property name="geometry" >
+              <rect>
+                <x>156</x>
+                <y>15</y>
+                <width>50</width>
+                <height>14</height>
+              </rect>
+            </property>
+            <property name="sizePolicy" >
+              <sizepolicy>
+                <hsizetype>1</hsizetype>
+                <vsizetype>0</vsizetype>
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+              </sizepolicy>
+            </property>
+            <property name="text" >
+              <string>Select</string>
+            </property>
+            <property name="checkable" >
+              <bool>true</bool>
+            </property>
+            <property name="buttonGroupId" >
+              <number>3</number>
+            </property>
+            <property name="toolTip" stdset="0" >
+              <string>Select and Drag Objects</string>
+            </property>
+          </widget>
+        </widget>
+      </item>
+    </layout>
+    <widget class="QMenuBar" name="MenuBar" >
+      <property name="objectName" >
+        <string notr="true" >MenuBar</string>
+      </property>
+      <widget class="QMenu" name="fileMenu" >
+        <property name="objectName" >
+          <string notr="true" >fileMenu</string>
         </property>
-        <widget class="breveGLWidget" row="0" column="0" rowspan="1" colspan="6">
-            <property name="name">
-                <cstring>breveGLWidget1</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>7</hsizetype>
-                    <vsizetype>7</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="font">
-                <font>
-                    <pointsize>9</pointsize>
-                </font>
-            </property>
-        </widget>
-        <widget class="QComboBox" row="1" column="5">
-            <item>
-                <property name="text">
-                    <string>Choose Simulation...</string>
-                </property>
-            </item>
-            <property name="name">
-                <cstring>documentMenu</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>7</hsizetype>
-                    <vsizetype>0</vsizetype>
-                    <horstretch>1</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="minimumSize">
-                <size>
-                    <width>143</width>
-                    <height>20</height>
-                </size>
-            </property>
-            <property name="font">
-                <font>
-                    <pointsize>10</pointsize>
-                </font>
-            </property>
-        </widget>
-        <spacer row="1" column="1">
-            <property name="name">
-                <cstring>spacer10</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>1000</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
-        <spacer row="1" column="4">
-            <property name="name">
-                <cstring>spacer9</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>1000</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
-        <widget class="QToolButton" row="1" column="2">
-            <property name="name">
-                <cstring>runButton</cstring>
-            </property>
-            <property name="minimumSize">
-                <size>
-                    <width>26</width>
-                    <height>26</height>
-                </size>
-            </property>
-            <property name="maximumSize">
-                <size>
-                    <width>26</width>
-                    <height>26</height>
-                </size>
-            </property>
-            <property name="text">
-                <string></string>
-            </property>
-            <property name="accel">
-                <string></string>
-            </property>
-            <property name="iconSet">
-                <iconset>play.png</iconset>
-            </property>
-            <property name="autoRaise">
-                <bool>false</bool>
-            </property>
-        </widget>
-        <widget class="QToolButton" row="1" column="3">
-            <property name="name">
-                <cstring>stopButton</cstring>
-            </property>
-            <property name="minimumSize">
-                <size>
-                    <width>26</width>
-                    <height>26</height>
-                </size>
-            </property>
-            <property name="maximumSize">
-                <size>
-                    <width>26</width>
-                    <height>26</height>
-                </size>
-            </property>
-            <property name="text">
-                <string></string>
-            </property>
-            <property name="iconSet">
-                <iconset>stop.png</iconset>
-            </property>
-            <property name="autoRaise">
-                <bool>false</bool>
-            </property>
-        </widget>
-        <widget class="QButtonGroup" row="1" column="0">
-            <property name="name">
-                <cstring>buttonGroup1</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>0</hsizetype>
-                    <vsizetype>0</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="minimumSize">
-                <size>
-                    <width>210</width>
-                    <height>36</height>
-                </size>
-            </property>
-            <property name="maximumSize">
-                <size>
-                    <width>210</width>
-                    <height>34</height>
-                </size>
-            </property>
-            <property name="font">
-                <font>
-                    <pointsize>11</pointsize>
-                </font>
-            </property>
-            <property name="frameShape">
-                <enum>GroupBoxPanel</enum>
-            </property>
-            <property name="frameShadow">
-                <enum>Sunken</enum>
-            </property>
-            <property name="title">
-                <string>Cursor Mode</string>
-            </property>
-            <property name="exclusive">
-                <bool>true</bool>
-            </property>
-            <property name="radioButtonExclusive">
-                <bool>true</bool>
-            </property>
-            <widget class="QToolButton">
-                <property name="name">
-                    <cstring>rotateButton</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>4</x>
-                        <y>15</y>
-                        <width>50</width>
-                        <height>14</height>
-                    </rect>
-                </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>1</hsizetype>
-                        <vsizetype>0</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="text">
-                    <string>Rotate</string>
-                </property>
-                <property name="toggleButton">
-                    <bool>true</bool>
-                </property>
-                <property name="on">
-                    <bool>true</bool>
-                </property>
-                <property name="buttonGroupId">
-                    <number>0</number>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>Rotate Camera</string>
-                </property>
-            </widget>
-            <widget class="QToolButton">
-                <property name="name">
-                    <cstring>zoomButton</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>55</x>
-                        <y>15</y>
-                        <width>50</width>
-                        <height>14</height>
-                    </rect>
-                </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>1</hsizetype>
-                        <vsizetype>0</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="text">
-                    <string>Zoom</string>
-                </property>
-                <property name="toggleButton">
-                    <bool>true</bool>
-                </property>
-                <property name="buttonGroupId">
-                    <number>1</number>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>Zoom Camera</string>
-                </property>
-            </widget>
-            <widget class="QToolButton">
-                <property name="name">
-                    <cstring>moveButton</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>106</x>
-                        <y>15</y>
-                        <width>49</width>
-                        <height>14</height>
-                    </rect>
-                </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>1</hsizetype>
-                        <vsizetype>0</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="text">
-                    <string>Move</string>
-                </property>
-                <property name="toggleButton">
-                    <bool>true</bool>
-                </property>
-                <property name="buttonGroupId">
-                    <number>2</number>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>Move Camera</string>
-                </property>
-            </widget>
-            <widget class="QToolButton">
-                <property name="name">
-                    <cstring>selectButton</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>156</x>
-                        <y>15</y>
-                        <width>50</width>
-                        <height>14</height>
-                    </rect>
-                </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>1</hsizetype>
-                        <vsizetype>0</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="text">
-                    <string>Select</string>
-                </property>
-                <property name="toggleButton">
-                    <bool>true</bool>
-                </property>
-                <property name="buttonGroupId">
-                    <number>3</number>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>Select and Drag Objects</string>
-                </property>
-            </widget>
-        </widget>
-    </grid>
-</widget>
-<menubar>
-    <property name="name">
-        <cstring>MenuBar</cstring>
-    </property>
-    <item text="&amp;File" name="fileMenu">
-        <action name="fileNewAction"/>
-        <action name="fileOpenAction"/>
-        <action name="fileSaveAction"/>
-        <action name="fileSaveAsAction"/>
-        <separator/>
-        <action name="filePrint_ScreenAction"/>
-        <action name="filePrintAction"/>
-        <separator/>
-        <action name="fileExitAction"/>
-    </item>
-    <item text="&amp;Edit" name="editMenu">
-        <action name="editUndoAction"/>
-        <action name="editRedoAction"/>
-        <separator/>
-        <action name="editCutAction"/>
-        <action name="editCopyAction"/>
-        <action name="editPasteAction"/>
-        <separator/>
-        <action name="editFindAction"/>
-    </item>
-    <item text="Demos" name="Demos">
-    </item>
-    <item text="Speed" name="Speed">
-    </item>
-    <item text="Simulation" name="Simulation">
-    </item>
-    <item text="&amp;Help" name="helpMenu">
-        <action name="helpContentsAction"/>
-        <action name="helpIndexAction"/>
-        <separator/>
-        <action name="helpAboutAction"/>
-    </item>
-</menubar>
-<toolbars>
-</toolbars>
-<customwidgets>
+        <property name="title" >
+          <string>&amp;File</string>
+        </property>
+        <addaction name="fileNewAction" />
+        <addaction name="fileOpenAction" />
+        <addaction name="fileSaveAction" />
+        <addaction name="fileSaveAsAction" />
+        <addaction name="separator" />
+        <addaction name="filePrint_ScreenAction" />
+        <addaction name="filePrintAction" />
+        <addaction name="separator" />
+        <addaction name="fileExitAction" />
+      </widget>
+      <widget class="QMenu" name="editMenu" >
+        <property name="objectName" >
+          <string notr="true" >editMenu</string>
+        </property>
+        <property name="title" >
+          <string>&amp;Edit</string>
+        </property>
+        <addaction name="editUndoAction" />
+        <addaction name="editRedoAction" />
+        <addaction name="separator" />
+        <addaction name="editCutAction" />
+        <addaction name="editCopyAction" />
+        <addaction name="editPasteAction" />
+        <addaction name="separator" />
+        <addaction name="editFindAction" />
+      </widget>
+      <widget class="QMenu" name="Demos" >
+        <property name="objectName" >
+          <string notr="true" >Demos</string>
+        </property>
+        <property name="title" >
+          <string>Demos</string>
+        </property>
+      </widget>
+      <widget class="QMenu" name="Speed" >
+        <property name="objectName" >
+          <string notr="true" >Speed</string>
+        </property>
+        <property name="title" >
+          <string>Speed</string>
+        </property>
+      </widget>
+      <widget class="QMenu" name="Simulation" >
+        <property name="objectName" >
+          <string notr="true" >Simulation</string>
+        </property>
+        <property name="title" >
+          <string>Simulation</string>
+        </property>
+      </widget>
+      <widget class="QMenu" name="helpMenu" >
+        <property name="objectName" >
+          <string notr="true" >helpMenu</string>
+        </property>
+        <property name="title" >
+          <string>&amp;Help</string>
+        </property>
+        <addaction name="helpContentsAction" />
+        <addaction name="helpIndexAction" />
+        <addaction name="separator" />
+        <addaction name="helpAboutAction" />
+      </widget>
+      <addaction name="fileMenu" />
+      <addaction name="editMenu" />
+      <addaction name="Demos" />
+      <addaction name="Speed" />
+      <addaction name="Simulation" />
+      <addaction name="helpMenu" />
+    </widget>
+    <action name="fileNewAction" >
+      <property name="objectName" >
+        <string>fileNewAction</string>
+      </property>
+      <property name="icon" >
+        <iconset/>
+      </property>
+      <property name="iconText" >
+        <string>New</string>
+      </property>
+      <property name="text" >
+        <string>&amp;New</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+N</string>
+      </property>
+    </action>
+    <action name="fileOpenAction" >
+      <property name="objectName" >
+        <string>fileOpenAction</string>
+      </property>
+      <property name="icon" >
+        <iconset/>
+      </property>
+      <property name="iconText" >
+        <string>Open</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Open...</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+O</string>
+      </property>
+    </action>
+    <action name="fileSaveAction" >
+      <property name="objectName" >
+        <string>fileSaveAction</string>
+      </property>
+      <property name="icon" >
+        <iconset/>
+      </property>
+      <property name="iconText" >
+        <string>Save</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Save</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+S</string>
+      </property>
+    </action>
+    <action name="fileSaveAsAction" >
+      <property name="objectName" >
+        <string>fileSaveAsAction</string>
+      </property>
+      <property name="iconText" >
+        <string>Save As</string>
+      </property>
+      <property name="text" >
+        <string>Save &amp;As...</string>
+      </property>
+      <property name="shortcut" >
+        <string/>
+      </property>
+    </action>
+    <action name="filePrintAction" >
+      <property name="objectName" >
+        <string>filePrintAction</string>
+      </property>
+      <property name="icon" >
+        <iconset/>
+      </property>
+      <property name="iconText" >
+        <string>Print</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Print...</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+P</string>
+      </property>
+    </action>
+    <action name="fileExitAction" >
+      <property name="objectName" >
+        <string>fileExitAction</string>
+      </property>
+      <property name="iconText" >
+        <string>Exit</string>
+      </property>
+      <property name="text" >
+        <string>E&amp;xit</string>
+      </property>
+      <property name="shortcut" >
+        <string/>
+      </property>
+    </action>
+    <action name="editUndoAction" >
+      <property name="objectName" >
+        <string>editUndoAction</string>
+      </property>
+      <property name="icon" >
+        <iconset/>
+      </property>
+      <property name="iconText" >
+        <string>Undo</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Undo</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+Z</string>
+      </property>
+    </action>
+    <action name="editRedoAction" >
+      <property name="objectName" >
+        <string>editRedoAction</string>
+      </property>
+      <property name="icon" >
+        <iconset/>
+      </property>
+      <property name="iconText" >
+        <string>Redo</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Redo</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+Y</string>
+      </property>
+    </action>
+    <action name="editCutAction" >
+      <property name="objectName" >
+        <string>editCutAction</string>
+      </property>
+      <property name="icon" >
+        <iconset/>
+      </property>
+      <property name="iconText" >
+        <string>Cut</string>
+      </property>
+      <property name="text" >
+        <string>Cu&amp;t</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+X</string>
+      </property>
+    </action>
+    <action name="editCopyAction" >
+      <property name="objectName" >
+        <string>editCopyAction</string>
+      </property>
+      <property name="icon" >
+        <iconset/>
+      </property>
+      <property name="iconText" >
+        <string>Copy</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Copy</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+C</string>
+      </property>
+    </action>
+    <action name="editPasteAction" >
+      <property name="objectName" >
+        <string>editPasteAction</string>
+      </property>
+      <property name="icon" >
+        <iconset/>
+      </property>
+      <property name="iconText" >
+        <string>Paste</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Paste</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+V</string>
+      </property>
+    </action>
+    <action name="editFindAction" >
+      <property name="objectName" >
+        <string>editFindAction</string>
+      </property>
+      <property name="icon" >
+        <iconset/>
+      </property>
+      <property name="iconText" >
+        <string>Find</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Find...</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+F</string>
+      </property>
+    </action>
+    <action name="helpContentsAction" >
+      <property name="objectName" >
+        <string>helpContentsAction</string>
+      </property>
+      <property name="iconText" >
+        <string>Contents</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Contents...</string>
+      </property>
+      <property name="shortcut" >
+        <string/>
+      </property>
+    </action>
+    <action name="helpIndexAction" >
+      <property name="objectName" >
+        <string>helpIndexAction</string>
+      </property>
+      <property name="iconText" >
+        <string>Index</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Index...</string>
+      </property>
+      <property name="shortcut" >
+        <string/>
+      </property>
+    </action>
+    <action name="helpAboutAction" >
+      <property name="objectName" >
+        <string>helpAboutAction</string>
+      </property>
+      <property name="iconText" >
+        <string>About</string>
+      </property>
+      <property name="text" >
+        <string>&amp;About</string>
+      </property>
+      <property name="shortcut" >
+        <string/>
+      </property>
+    </action>
+    <action name="filePrint_ScreenAction" >
+      <property name="objectName" >
+        <string>filePrint_ScreenAction</string>
+      </property>
+      <property name="iconText" >
+        <string>Print Screen</string>
+      </property>
+      <property name="text" >
+        <string>Print Screen</string>
+      </property>
+    </action>
+  </widget>
+  <layoutdefault spacing="6" margin="11" />
+  <pixmapfunction></pixmapfunction>
+  <customwidgets>
     <customwidget>
-        <class>breveGLWidget</class>
-        <header location="local">breveGLWidget.h</header>
-        <sizehint>
-            <width>-1</width>
-            <height>-1</height>
-        </sizehint>
-        <container>0</container>
-        <sizepolicy>
-            <hordata>5</hordata>
-            <verdata>5</verdata>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-        </sizepolicy>
-        <pixmap>image0</pixmap>
-        <slot access="public" specifier="">setButtonMode(int)</slot>
+      <class>breveGLWidget</class>
+      <extends></extends>
+      <header location="local" >breveGLWidget.h</header>
+      <sizehint>
+        <width>-1</width>
+        <height>-1</height>
+      </sizehint>
+      <container>0</container>
+      <sizepolicy>
+        <hordata>5</hordata>
+        <verdata>5</verdata>
+      </sizepolicy>
+      <pixmap>image0</pixmap>
     </customwidget>
-</customwidgets>
-<actions>
-    <action>
-        <property name="name">
-            <cstring>fileNewAction</cstring>
-        </property>
-        <property name="iconSet">
-            <iconset></iconset>
-        </property>
-        <property name="text">
-            <string>New</string>
-        </property>
-        <property name="menuText">
-            <string>&amp;New</string>
-        </property>
-        <property name="accel">
-            <string>Ctrl+N</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>fileOpenAction</cstring>
-        </property>
-        <property name="iconSet">
-            <iconset></iconset>
-        </property>
-        <property name="text">
-            <string>Open</string>
-        </property>
-        <property name="menuText">
-            <string>&amp;Open...</string>
-        </property>
-        <property name="accel">
-            <string>Ctrl+O</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>fileSaveAction</cstring>
-        </property>
-        <property name="iconSet">
-            <iconset></iconset>
-        </property>
-        <property name="text">
-            <string>Save</string>
-        </property>
-        <property name="menuText">
-            <string>&amp;Save</string>
-        </property>
-        <property name="accel">
-            <string>Ctrl+S</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>fileSaveAsAction</cstring>
-        </property>
-        <property name="text">
-            <string>Save As</string>
-        </property>
-        <property name="menuText">
-            <string>Save &amp;As...</string>
-        </property>
-        <property name="accel">
-            <string></string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>filePrintAction</cstring>
-        </property>
-        <property name="iconSet">
-            <iconset></iconset>
-        </property>
-        <property name="text">
-            <string>Print</string>
-        </property>
-        <property name="menuText">
-            <string>&amp;Print...</string>
-        </property>
-        <property name="accel">
-            <string>Ctrl+P</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>fileExitAction</cstring>
-        </property>
-        <property name="text">
-            <string>Exit</string>
-        </property>
-        <property name="menuText">
-            <string>E&amp;xit</string>
-        </property>
-        <property name="accel">
-            <string></string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>editUndoAction</cstring>
-        </property>
-        <property name="iconSet">
-            <iconset></iconset>
-        </property>
-        <property name="text">
-            <string>Undo</string>
-        </property>
-        <property name="menuText">
-            <string>&amp;Undo</string>
-        </property>
-        <property name="accel">
-            <string>Ctrl+Z</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>editRedoAction</cstring>
-        </property>
-        <property name="iconSet">
-            <iconset></iconset>
-        </property>
-        <property name="text">
-            <string>Redo</string>
-        </property>
-        <property name="menuText">
-            <string>&amp;Redo</string>
-        </property>
-        <property name="accel">
-            <string>Ctrl+Y</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>editCutAction</cstring>
-        </property>
-        <property name="iconSet">
-            <iconset></iconset>
-        </property>
-        <property name="text">
-            <string>Cut</string>
-        </property>
-        <property name="menuText">
-            <string>Cu&amp;t</string>
-        </property>
-        <property name="accel">
-            <string>Ctrl+X</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>editCopyAction</cstring>
-        </property>
-        <property name="iconSet">
-            <iconset></iconset>
-        </property>
-        <property name="text">
-            <string>Copy</string>
-        </property>
-        <property name="menuText">
-            <string>&amp;Copy</string>
-        </property>
-        <property name="accel">
-            <string>Ctrl+C</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>editPasteAction</cstring>
-        </property>
-        <property name="iconSet">
-            <iconset></iconset>
-        </property>
-        <property name="text">
-            <string>Paste</string>
-        </property>
-        <property name="menuText">
-            <string>&amp;Paste</string>
-        </property>
-        <property name="accel">
-            <string>Ctrl+V</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>editFindAction</cstring>
-        </property>
-        <property name="iconSet">
-            <iconset></iconset>
-        </property>
-        <property name="text">
-            <string>Find</string>
-        </property>
-        <property name="menuText">
-            <string>&amp;Find...</string>
-        </property>
-        <property name="accel">
-            <string>Ctrl+F</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>helpContentsAction</cstring>
-        </property>
-        <property name="text">
-            <string>Contents</string>
-        </property>
-        <property name="menuText">
-            <string>&amp;Contents...</string>
-        </property>
-        <property name="accel">
-            <string></string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>helpIndexAction</cstring>
-        </property>
-        <property name="text">
-            <string>Index</string>
-        </property>
-        <property name="menuText">
-            <string>&amp;Index...</string>
-        </property>
-        <property name="accel">
-            <string></string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>helpAboutAction</cstring>
-        </property>
-        <property name="text">
-            <string>About</string>
-        </property>
-        <property name="menuText">
-            <string>&amp;About</string>
-        </property>
-        <property name="accel">
-            <string></string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>filePrint_ScreenAction</cstring>
-        </property>
-        <property name="text">
-            <string>Print Screen</string>
-        </property>
-        <property name="menuText">
-            <string>Print Screen</string>
-        </property>
-    </action>
-</actions>
-<images>
-    <image name="image0">
-        <data format="XBM.GZ" length="79">789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
+  </customwidgets>
+  <images>
+    <image name="image0" >
+      <data format="XBM.GZ" length="79" >789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
     </image>
-</images>
-<connections>
-    <connection>
-        <sender>fileNewAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>fileNew()</slot>
-    </connection>
-    <connection>
-        <sender>fileOpenAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>fileOpen()</slot>
-    </connection>
-    <connection>
-        <sender>fileSaveAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>fileSave()</slot>
-    </connection>
-    <connection>
-        <sender>fileSaveAsAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>fileSaveAs()</slot>
-    </connection>
-    <connection>
-        <sender>filePrintAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>filePrint()</slot>
-    </connection>
-    <connection>
-        <sender>fileExitAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>fileExit()</slot>
-    </connection>
-    <connection>
-        <sender>editUndoAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>editUndo()</slot>
-    </connection>
-    <connection>
-        <sender>editRedoAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>editRedo()</slot>
-    </connection>
-    <connection>
-        <sender>editCutAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>editCut()</slot>
-    </connection>
-    <connection>
-        <sender>editPasteAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>editPaste()</slot>
-    </connection>
-    <connection>
-        <sender>editFindAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>editFind()</slot>
-    </connection>
-    <connection>
-        <sender>helpIndexAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>helpIndex()</slot>
-    </connection>
-    <connection>
-        <sender>helpContentsAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>helpContents()</slot>
-    </connection>
-    <connection>
-        <sender>helpAboutAction</sender>
-        <signal>activated()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>helpAbout()</slot>
-    </connection>
-    <connection>
-        <sender>runButton</sender>
-        <signal>clicked()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>toggleSimulation()</slot>
-    </connection>
-    <connection>
-        <sender>stopButton</sender>
-        <signal>clicked()</signal>
-        <receiver>MainWindow</receiver>
-        <slot>stopSimulation()</slot>
-    </connection>
-    <connection>
-        <sender>buttonGroup1</sender>
-        <signal>clicked(int)</signal>
-        <receiver>breveGLWidget1</receiver>
-        <slot>setButtonMode(int)</slot>
-    </connection>
-</connections>
-<includes>
-    <include location="local" impldecl="in declaration">brqtEditorWindow.h</include>
-    <include location="local" impldecl="in implementation">brqtMainWindow.ui.h</include>
-    <include location="local" impldecl="in declaration">brqtEngine.h</include>
-    <include location="local" impldecl="in declaration">kernel.h</include>
-</includes>
-<variables>
-    <variable access="private">brqtEngine *currentEngine;</variable>
-</variables>
-<slots>
-    <slot>fileNew()</slot>
-    <slot>fileOpen()</slot>
-    <slot>fileSave()</slot>
-    <slot>fileSaveAs()</slot>
-    <slot>filePrint()</slot>
-    <slot>fileExit()</slot>
-    <slot>editUndo()</slot>
-    <slot>editRedo()</slot>
-    <slot>editCut()</slot>
-    <slot>editPaste()</slot>
-    <slot>editFind()</slot>
-    <slot>helpIndex()</slot>
-    <slot>helpContents()</slot>
-    <slot>helpAbout()</slot>
-    <slot>toggleSimulation()</slot>
-    <slot>loadDemo( int n )</slot>
-    <slot>stopSimulation()</slot>
-    <slot>closeDocument( QWidget * document )</slot>
-    <slot>changeDocumentName()</slot>
-</slots>
-<functions>
-    <function access="private" specifier="non virtual">init()</function>
-    <function returnType="brqtEditorWindow *">newDocument()</function>
-    <function>buildDocumentMenu()</function>
-</functions>
-<pixmapinproject/>
-<layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>breveglwidget.h</includehint>
-</includehints>
-</UI>
+  </images>
+  <includes>
+    <include location="local" >brqtEditorWindow.h</include>
+    <include location="local" >brqtEngine.h</include>
+    <include location="local" >kernel.h</include>
+  </includes>
+</ui>

@@ -111,15 +111,6 @@ struct brMenuEntry {
 	unsigned char checked;
 };
 
-/*!
-	\brief A scheduled event in the breve engine
-*/
-
-struct brEvent {
-	char *name;
-	double time;
-	brInstance *instance;
-};
 
 /*!
 	\brief Visualization data used if this is part of an iTunes plugin.
@@ -274,6 +265,20 @@ class brEngine {
 		void *(*newWindowCallback)(char *name, void *graph);
 		void (*freeWindowCallback)(void *g);
 		void (*renderWindowCallback)(void *g);
+};
+
+/*!
+	\brief A scheduled event in the breve engine
+*/
+
+class brEvent {
+	public:
+		brEvent(char *name, double time, brInstance *i);
+		~brEvent();
+
+		char *name;
+		double time;
+		brInstance *instance;
 };
 #endif
 

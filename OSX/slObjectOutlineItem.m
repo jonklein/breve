@@ -127,12 +127,12 @@
 		bcopy(&eval, e, sizeof(brEval));
 	}
 
-	if(!isArray && eval.type == AT_LIST) {
-		[self updateChildCount: BRLIST(&eval)->count];
+	if(!isArray && e->type == AT_LIST) {
+		[self updateChildCount: BRLIST(e)->count];
 	}
 
-    if(!isArray && eval.type == AT_INSTANCE) {
-		if(BRINSTANCE(&eval) && BRINSTANCE(&eval)->status != AS_ACTIVE) {
+    if(!isArray && e->type == AT_INSTANCE) {
+		if(BRINSTANCE(e) && BRINSTANCE(e)->status != AS_ACTIVE) {
 			[self updateChildCount: 0];
 		}
 
@@ -171,8 +171,6 @@
     char *cstr;
 
 	[self getEval: &evaluation];
-
-	// if(evaluation.type == AT_LIST) return @"list";
 
     cstr = brFormatEvaluation(&evaluation, NULL);
 

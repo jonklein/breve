@@ -333,19 +333,19 @@ MultiBody : Creature {
         links = 8 new Links.
         joints = 8 new RevoluteJoints.
 
-        links{0} set shape linkShape.
-        links{2} set shape linkShape.
-        links{4} set shape linkShape.
-        links{6} set shape linkShape.
-        links{1} set shape lowerLinkShape.
-        links{3} set shape lowerLinkShape.
-        links{5} set shape lowerLinkShape.
-        links{7} set shape lowerLinkShape.
+        links{0} set-shape to linkShape.
+        links{2} set-shape to linkShape.
+        links{4} set-shape to linkShape.
+        links{6} set-shape to linkShape.
+        links{1} set-shape to lowerLinkShape.
+        links{3} set-shape to lowerLinkShape.
+        links{5} set-shape to lowerLinkShape.
+        links{7} set-shape to lowerLinkShape.
 
         links set-color to random[(1.0, 1.0, 1.0)].
 
         bodyLink = new Link.
-        bodyLink set shape bodyShape.
+        bodyLink set-shape to bodyShape.
 
         joints{0} link parent bodyLink to-child links{0}
                                  with-normal (0, 0, 1) 

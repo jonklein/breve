@@ -37,6 +37,10 @@ extern "C" {
 
 DLLEXPORT void *
 slMalloc(int n) {
+	if(n > 1000000) {
+		slDebug("warning: very large allocation %d\n", n);
+	}
+
 	return calloc(1, n);
 }
 

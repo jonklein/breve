@@ -66,6 +66,9 @@ brNamespaceSymbol *brNamespaceStore(brNamespace *space, char *name, int type, vo
 
 brNamespaceSymbol *brNamespaceLookup(brNamespace *space, char *name) {
 	std::string nameS = name;
+
+	if(!name) return NULL;
+
 	return space->map[ nameS];
 }
 

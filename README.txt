@@ -1,7 +1,7 @@
                       The breve Simulation Environment
 
                       http://www.spiderland.org/breve
-                        release 2.1 - 01.28.2005
+                        release 2.2d - 03.XX.2005
              command line version for Mac OS X, Linux and Windows
                          jklein@spiderland.org 
 

@@ -1,70 +1,61 @@
-<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
-<class>brqtErrorWindow</class>
-<widget class="QDialog">
-    <property name="name">
-        <cstring>Form1</cstring>
+<ui version="4.0" stdsetdef="1" >
+  <author></author>
+  <comment></comment>
+  <exportmacro></exportmacro>
+  <class>Form1</class>
+  <widget class="QDialog" name="Form1" >
+    <property name="objectName" >
+      <string notr="true" >Form1</string>
     </property>
-    <property name="geometry">
+    <property name="geometry" >
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>600</width>
+        <height>480</height>
+      </rect>
+    </property>
+    <property name="windowTitle" >
+      <string>Form1</string>
+    </property>
+    <widget class="QLabel" name="errorText" >
+      <property name="objectName" >
+        <string notr="true" >errorText</string>
+      </property>
+      <property name="geometry" >
         <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>600</width>
-            <height>480</height>
+          <x>80</x>
+          <y>120</y>
+          <width>410</width>
+          <height>190</height>
         </rect>
-    </property>
-    <property name="caption">
-        <string>Form1</string>
-    </property>
-    <widget class="QLabel">
-        <property name="name">
-            <cstring>errorText</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>80</x>
-                <y>120</y>
-                <width>410</width>
-                <height>190</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>multi
+      </property>
+      <property name="text" >
+        <string>multi
 line 
 fun</string>
-        </property>
+      </property>
     </widget>
-    <widget class="QPushButton">
-        <property name="name">
-            <cstring>pushButton7</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>280</x>
-                <y>430</y>
-                <width>70</width>
-                <height>32</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>OK</string>
-        </property>
+    <widget class="QPushButton" name="pushButton7" >
+      <property name="objectName" >
+        <string notr="true" >pushButton7</string>
+      </property>
+      <property name="geometry" >
+        <rect>
+          <x>280</x>
+          <y>430</y>
+          <width>70</width>
+          <height>32</height>
+        </rect>
+      </property>
+      <property name="text" >
+        <string>OK</string>
+      </property>
     </widget>
-</widget>
-<connections>
-    <connection>
-        <sender>pushButton7</sender>
-        <signal>clicked()</signal>
-        <receiver>Form1</receiver>
-        <slot>close()</slot>
-    </connection>
-</connections>
-<includes>
-    <include location="local" impldecl="in declaration">kernel.h</include>
-    <include location="local" impldecl="in implementation">brqtErrorWindow.ui.h</include>
-</includes>
-<slots>
-    <slot>displayError( brErrorInfo * e )</slot>
-</slots>
-<pixmapinproject/>
-<layoutdefaults spacing="6" margin="11"/>
-</UI>
+  </widget>
+  <layoutdefault spacing="6" margin="11" />
+  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+  <includes>
+    <include location="local" >kernel.h</include>
+  </includes>
+</ui>

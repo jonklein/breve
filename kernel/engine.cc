@@ -33,6 +33,16 @@ void brEngineUnlock(brEngine *e) {
 	(pthread_mutex_unlock(&(e)->lock));
 }
 
+brEvent::brEvent(char *n, double t, brInstance *i) {
+	instance = i;
+	name = slStrdup(n);
+	time = t;
+}
+
+brEvent::~brEvent() {
+	slFree(name);
+}
+
 /*!
     \brief Creates a brEngine structure.
 
@@ -336,11 +346,7 @@ brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *methodName, double t
 	brEvent *event;
 	std::vector<brEvent*>::iterator ei;
 
-	event = new brEvent;
-
-	event->name = slStrdup(methodName);
-	event->time = time;
-	event->instance = i;
+	event = new brEvent(methodName, time, i);
 
 	// insert the event where it belongs according to the time it will be called 
 
@@ -441,7 +447,7 @@ int brEngineIterate(brEngine *e) {
 
 			rcode = brMethodCallByName(event->instance, event->name, &result);
 
-			brEventFree(event);
+			delete event;
 
 			slWorldSetAge(e->world, oldAge);
 
@@ -536,17 +542,6 @@ void brFreeSearchPath(brEngine *e) {
 void brPrintVersion() {
 	fprintf(stderr, "breve version %s (%s)\n", interfaceID, __DATE__);
 	exit(1);
-}
-
-/*!
-	\brief Frees a single brEvent.  
-
-	Used internally when the \ref brEngine is finished with an event.
-*/
-
-void brEventFree(brEvent *e) {
-	slFree(e->name);
-	delete e;
 }
 
 /*!

@@ -71,11 +71,7 @@ Abstract : Shape (aka Shapes) [version 2.0] {
 		return self.
 
 	+ to init-with-cube size v (vector):
-		% Sets this Shape object to a rectangular solid with size v.  
-		% <p>
-		% size refers to the vector from the center to one point, so the 
-		% for a vector (x, y, z), the actual size of the rectangular solid 
-		% will be 2*x by 2*y by 2*z.
+		% Sets this Shape object to a rectangular solid of size v.  
 
 		shapePointer = newCube(v, density).
 
@@ -215,10 +211,6 @@ Shape : Cube (aka Cubes) {
 
 	+ to init-with size s (vector):
 		% Initializes the cube to a rectangular solid with size v.  
-		% <p>
-		% size refers to the vector from the center to one point, so the 
-		% for a vector (x, y, z), the actual size of the rectangular solid 
-		% will be 2*x by 2*y by 2*z.
 
 		shapePointer = newCube(s, density).
 

@@ -1,59 +1,62 @@
-<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
-<class>brqtInspectorWindow</class>
-<widget class="QDialog">
-    <property name="name">
-        <cstring>brqtObjectInspector</cstring>
+<ui version="4.0" stdsetdef="1" >
+  <author></author>
+  <comment></comment>
+  <exportmacro></exportmacro>
+  <class>brqtObjectInspector</class>
+  <widget class="QDialog" name="brqtObjectInspector" >
+    <property name="objectName" >
+      <string notr="true" >brqtObjectInspector</string>
     </property>
-    <property name="geometry">
+    <property name="geometry" >
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>279</width>
+        <height>481</height>
+      </rect>
+    </property>
+    <property name="windowTitle" >
+      <string>Form3</string>
+    </property>
+    <widget class="Q3ListView" name="listView1" >
+      <property name="objectName" >
+        <string notr="true" >listView1</string>
+      </property>
+      <property name="geometry" >
         <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>279</width>
-            <height>481</height>
+          <x>10</x>
+          <y>10</y>
+          <width>260</width>
+          <height>450</height>
         </rect>
-    </property>
-    <property name="caption">
-        <string>Form3</string>
-    </property>
-    <widget class="QListView">
-        <column>
-            <property name="text">
-                <string>Column 1</string>
-            </property>
-            <property name="clickable">
-                <bool>true</bool>
-            </property>
-            <property name="resizable">
-                <bool>true</bool>
-            </property>
-        </column>
-    <item>
-        <property name="text">
-            <string>New Item</string>
+      </property>
+      <property name="frameShape" >
+        <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow" >
+        <enum>QFrame::Sunken</enum>
+      </property>
+      <column>
+        <property name="text" >
+          <string>Column 1</string>
         </property>
-        <property name="pixmap">
-            <pixmap></pixmap>
+        <property name="clickable" >
+          <bool>true</bool>
         </property>
-    </item>
-        <property name="name">
-            <cstring>listView1</cstring>
+        <property name="resizable" >
+          <bool>true</bool>
         </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>10</y>
-                <width>260</width>
-                <height>450</height>
-            </rect>
+      </column>
+      <item>
+        <property name="text" >
+          <string>New Item</string>
         </property>
-        <property name="frameShape">
-            <enum>StyledPanel</enum>
+        <property name="pixmap" >
+          <pixmap/>
         </property>
-        <property name="frameShadow">
-            <enum>Sunken</enum>
-        </property>
+      </item>
     </widget>
-</widget>
-<pixmapinproject/>
-<layoutdefaults spacing="6" margin="11"/>
-</UI>
+  </widget>
+  <layoutdefault spacing="6" margin="11" />
+  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+</ui>

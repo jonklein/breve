@@ -1,63 +1,66 @@
-<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
-<class>brqtLogWindow</class>
-<widget class="QDialog">
-    <property name="name">
-        <cstring>LogWindow</cstring>
+<ui version="4.0" stdsetdef="1" >
+  <author></author>
+  <comment></comment>
+  <exportmacro></exportmacro>
+  <class>LogWindow</class>
+  <widget class="QDialog" name="LogWindow" >
+    <property name="objectName" >
+      <string notr="true" >LogWindow</string>
     </property>
-    <property name="geometry">
+    <property name="geometry" >
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>493</width>
+        <height>131</height>
+      </rect>
+    </property>
+    <property name="windowTitle" >
+      <string>Form2</string>
+    </property>
+    <widget class="Q3TextEdit" name="textEdit1" >
+      <property name="objectName" >
+        <string notr="true" >textEdit1</string>
+      </property>
+      <property name="geometry" >
         <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>493</width>
-            <height>131</height>
+          <x>10</x>
+          <y>10</y>
+          <width>471</width>
+          <height>81</height>
         </rect>
-    </property>
-    <property name="caption">
-        <string>Form2</string>
-    </property>
-    <widget class="QTextEdit">
-        <property name="name">
-            <cstring>textEdit1</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>10</y>
-                <width>471</width>
-                <height>81</height>
-            </rect>
-        </property>
+      </property>
     </widget>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>lineEdit1</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>100</y>
-                <width>350</width>
-                <height>21</height>
-            </rect>
-        </property>
+    <widget class="QLineEdit" name="lineEdit1" >
+      <property name="objectName" >
+        <string notr="true" >lineEdit1</string>
+      </property>
+      <property name="geometry" >
+        <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>350</width>
+          <height>21</height>
+        </rect>
+      </property>
     </widget>
-    <widget class="QPushButton">
-        <property name="name">
-            <cstring>pushButton3</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>370</x>
-                <y>100</y>
-                <width>120</width>
-                <height>32</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>Run Command</string>
-        </property>
+    <widget class="QPushButton" name="pushButton3" >
+      <property name="objectName" >
+        <string notr="true" >pushButton3</string>
+      </property>
+      <property name="geometry" >
+        <rect>
+          <x>370</x>
+          <y>100</y>
+          <width>120</width>
+          <height>32</height>
+        </rect>
+      </property>
+      <property name="text" >
+        <string>Run Command</string>
+      </property>
     </widget>
-</widget>
-<pixmapinproject/>
-<layoutdefaults spacing="6" margin="11"/>
-</UI>
+  </widget>
+  <layoutdefault spacing="6" margin="11" />
+  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+</ui>

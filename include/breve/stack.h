@@ -23,6 +23,8 @@
 
 	slStack is a simple stack-like structure, but it's used mostly as a 
 	dynamically resizing array.
+
+	This is a somewhat obsolete data
 */
 
 struct slStack {
@@ -35,6 +37,5 @@ slStack *slStackNew(void);
 slStack *slStackNewWithSize(unsigned int);
 void slStackFree(slStack *);
 int slStackPush(slStack *, void *);
-int slStackRemove(slStack *, void *);
 
-void slStackClear(slStack *);
+#define slStackClear(s)	((s)->count = 0)

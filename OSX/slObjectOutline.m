@@ -42,18 +42,20 @@
 - (void)setEngine:(brEngine*)e instance:(stInstance*)i {
     brEval newEval;
 
+	// return;
+
     engine = e;
 
     if(root) {
-        /* if the data source was previously associated with another instance, */
-        /* free the data */
+        // if the data source was previously associated with another instance, 
+        // free the data 
 
         [theView deselectAll: self];
         [root release];
         root = NULL;
     }
 
-    /* if this is a valid and active instance, create a data item for it */
+    // if this is a valid and active instance, create a data item for it
 
     if(i && i->status == AS_ACTIVE) {
 		BRINSTANCE(&newEval) = i->breveInstance;
@@ -130,6 +132,5 @@
 - (BOOL)outlineView:(NSOutlineView *)o shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item {
     return NO;
 }
-
 
 @end

@@ -28,14 +28,18 @@
 #include "util.h"
 
 /*!
-	\brief Creates a new stack with a default size (8).
+	\brief Creates a new stack with a default size (0).
 
-	Calls slStackNewWithSize to create a new stack with the default 
-	starting size, 8.
+	Creates an empty stack with the default capacity 0.  Capacity 
+	is automatically increased to 8 on the first "push".
 */
 
 slStack *slStackNew() {
-    return slStackNewWithSize(8);
+	slStack *s = new slStack;
+
+	s->maxCount = 0;
+	s->data = NULL;
+	s->count = 0;
 }
 
 /*!
@@ -56,7 +60,7 @@ slStack *slStackNewWithSize(unsigned int size) {
 }
 
 /*!
-	\brief Frees the stack structure
+	\brief Frees the stack structure.
 
 	Does not free any data you may have pushed onto the stack.  You have to 
 	do that yourself, you lazy git!
@@ -65,7 +69,7 @@ slStack *slStackNewWithSize(unsigned int size) {
 void slStackFree(slStack *s) {
 	if(!s) return;
 
-	slFree(s->data);
+	if(s->data) slFree(s->data);
 	delete s;
 }
 
@@ -75,8 +79,13 @@ void slStackFree(slStack *s) {
 
 int slStackPush(slStack *s, void *data) {
 	if(s->count == s->maxCount) {
-		s->maxCount *= 2;
-		s->data = (void**)slRealloc(s->data, sizeof(void*) * s->maxCount);
+		if(s->maxCount == 0) {
+			s->maxCount = 8;
+			s->data = (void**)slMalloc(sizeof(void*) * s->maxCount);
+		} else {
+			s->maxCount *= 2;
+			s->data = (void**)slRealloc(s->data, sizeof(void*) * s->maxCount);
+		}
 	}
 
 	s->data[s->count] = data;
@@ -84,41 +93,4 @@ int slStackPush(slStack *s, void *data) {
 	s->count++;
 
 	return s->count;
-}
-
-/*!
-	\brief Remove an element from the middle of a stack.
-
-	What the...?  You can't remove elements from the middle of a stack!
-	ARE YOU MAD!?  You'll destroy the stack paradigm upon which all
-	of computer science is based!  Won't somebody please think of the
-	children!?!
-*/
-
-int slStackRemove(slStack *s, void *remove) {
-	unsigned int n;
-
-	if(s->count == 0) return 0;
-
-	for(n=0;n<s->count;n++) {
-		if(s->data[n] == remove) {
-			while(n < (s->count - 1)) {
-				s->data[n] = s->data[n+1];
-				n++;
-			}
-
-			s->count--;
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
-/*!
-	\brief Clears the stack and resets the stack counter.
-*/
-
-void slStackClear(slStack *s) {
-	s->count = 0;
 }
