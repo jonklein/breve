@@ -1,7 +1,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+void brBeginDrag(brEngine*, brInstance*);
+void brEndDrag(brEngine*, brInstance*);
 void brSetUpdateMenuCallback(brInstance *i, void (*updateMenu)(brInstance *l));
 
 int brMenuCallback(brEngine *e, brInstance *i, int n);

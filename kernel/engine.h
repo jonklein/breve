@@ -21,6 +21,8 @@
 #ifndef _ENGINE_H
 #define _ENGINE_H
 
+#include <pthread.h>
+
 #include "simulation.h"
 
 #ifdef __cplusplus

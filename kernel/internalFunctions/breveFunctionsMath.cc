@@ -348,9 +348,7 @@ void breveInitMathFunctions(brNamespace *n) {
 	\brief Return a random double between 0.0 and 1.0.
 */
 
-double drand() {
-	return ( (double) random() / (double) RAND_MAX );
-} 
+#define drand() (((double) random()) / 0x7fffffff)
 
 /*!
 	\brief Draw from Gaussian/Normal distribution.  

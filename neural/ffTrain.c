@@ -137,7 +137,5 @@ void randomOrder(int *vector, int count) {
 }
 
 int randomSort(const void *a, const void *b) {
-    if(rand() > rand()) return 1;
-
-    return -1;
+	return random()&1 ? 1 : -1;
 }

@@ -532,7 +532,7 @@ int brIFindFile(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
-	\brief Returns the current real-time time with micro-second accuracy.
+	\brief Returns the current real-time time with micro-second precision.
 */
 
 int brIGetRealTime(brEval args[], brEval *target, brInstance *i) {

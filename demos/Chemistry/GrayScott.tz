@@ -2,7 +2,8 @@
 # GrayScott -- the Gray Scott reaction diffusion model
 # jon klein <jk@spiderland.org>
 #
-# This is a simulation of a chemical reaction/diffusion model.
+# This is a simulation of the Gray Scott self-reproducing spots
+# reaction/diffusion model.
 #
 
 @use Control.
@@ -11,7 +12,7 @@
 
 @define F 0.01.
 @define K 0.04.
-@define RU .088.
+@define RU .078.
 @define RV .022.
 
 @define TIMESTEP 1.0.

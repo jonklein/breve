@@ -70,7 +70,6 @@ int brISetDrawEveryFrame(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIRandomSeed(brEval args[], brEval *target, brInstance *i) {
-	srand(BRINT(&args[0]));
 	srandom(BRINT(&args[0]));
 
 	return EC_OK;
@@ -86,23 +85,23 @@ int brIRandomSeed(brEval args[], brEval *target, brInstance *i) {
 
 int brIRandomSeedFromDevRandom(brEval args[], brEval *target, brInstance *i) {
 	FILE *f;
-	unsigned long seed;
+	unsigned int seed = 0;
 
 	f = fopen("/dev/random", "r");
 
-	if(!f) {
-		BRINT(target) = -1;
-		return EC_OK;
+	if (!fread(&seed, sizeof seed, 1, f) || !seed) {
+		fclose(f);
+		f = fopen("/dev/urandom", "r");
+		fread(&seed, sizeof seed, 1, f);
 	}
 
-	BRINT(target) = 0;
+	fclose(f);
 
-	fread(&seed, sizeof(long), 1, f);
-
-	slMessage(DEBUG_ALL, "read random seed %u from /dev/random\n", seed);
-
-	srandom(seed);
-	srand(seed);
+	if (seed) {
+		BRINT(target) = 0;
+		slMessage(DEBUG_ALL, "read seed %u from random device\n", seed);
+		srandom(seed);
+	} else BRINT(target) = -1;
 
 	return EC_OK;
 }

@@ -43,7 +43,7 @@ optimize:
 	$(MAKE) CFLAGS='$(OPTFLAGS)'
 
 optimize_debug:
-	$(MAKE) CFLAGS+='-g $(OPTFLAGS)'
+	$(MAKE) CFLAGS='-g $(OPTFLAGS)'
 
 memory_debug:
 	$(MAKE) CFLAGS+='-DMEMORY_DEBUG'

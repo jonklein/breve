@@ -46,14 +46,13 @@ slMovie *slMovieCreate(char *filename, int width, int height, int framerate, flo
 	avcodec_init();
 	avcodec_register_all();
 
-	height -= height & 1;
-	width -= width & 1;
+	height &= ~1;
+	width &= ~1;
 
 	m = new slMovie;
 
-	m->codec = avcodec_find_encoder(CODEC_ID_MPEG1VIDEO);
-
-	if(!m->codec) {
+	if(!(m->codec = avcodec_find_encoder(CODEC_ID_MPEG2VIDEO)) &&
+	   !(m->codec = avcodec_find_encoder(CODEC_ID_MPEG1VIDEO))) {
 		slMessage(DEBUG_ALL, "cannot locate video encoding codec\n");
 		return NULL;
 	}

@@ -30,11 +30,11 @@ Abstract : Camera (aka Cameras) [version 2.0] {
   + section "Enabling and Disabling Text in the Camera's Display"
 
 	+ to enable-text:
-		% Enables text for tihs camera.
+		% Enables text for this camera.
 		cameraTextSetEnabled(cameraPointer, 1).
 
 	+ to disable-text:
-		% Disables text for tihs camera.
+		% Disables text for this camera.
 		cameraTextSetEnabled(cameraPointer, 0).
 
   + section "Changing the Size, Position and Perspective of the Viewing Window"

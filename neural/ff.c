@@ -198,7 +198,7 @@ void snRandomizeNetworkWeights(snFFLayer *output, int c) {
     if(output->previous) {
         for(n=0;n<output->count;n++) {
             for(m=0;m<output->previous->count;m++) {
-                output->weights[n][m] = range*((double)rand()/(RAND_MAX)) - halfrange;
+                output->weights[n][m] = range*(((double)random())/0x7fffffff) - halfrange;
             }
         }
 

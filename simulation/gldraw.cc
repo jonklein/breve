@@ -516,10 +516,6 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 	// now we do transparent objects and billboards.  they have to come last 
 	// because they are blended.
 
-	glDepthMask(GL_FALSE);
-	slRenderObjects(w, c, flags|DO_ONLY_ALPHA);
-	glDepthMask(GL_TRUE);
-
 	if(!(flags & DO_BILLBOARDS_AS_SPHERES)) {
 		slProcessBillboards(w, c);
 		slRenderBillboards(c, flags);
@@ -532,6 +528,10 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 		if(c->drawShadowVolumes) slRenderShadowVolume(w, c);
 		else if(c->drawShadow) slShadowPass(w, c);
 	}
+
+	glDepthMask(GL_FALSE);
+	slRenderObjects(w, c, flags|DO_ONLY_ALPHA);
+	glDepthMask(GL_TRUE);
 
 	// The following elements are one time renders with no special effects.
 
@@ -1137,7 +1137,7 @@ void slProcessBillboards(slWorld *w, slCamera *c) {
 		if(wo->textureMode != BBT_NONE && wo->shape && wo->shape->_type == ST_SPHERE) {
 			double z = 0;
 
-			ss = wo->shape;
+			ss = static_cast<slSphere*>(wo->shape);
 
 			z = matrix[2] * wo->position.location.x + matrix[6] * wo->position.location.y + matrix[10] * wo->position.location.z;
 

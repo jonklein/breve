@@ -75,8 +75,19 @@ void slVclipDataInit(slWorld *w) {
 
 	for(x=0;x<w->objects.size();x++) {
 	 	if(w->objects[x]->type == WO_LINK) {
+			std::vector<slJoint*>::iterator ji;
+
 	 		link = (slLink*)w->objects[x];
 	 
+			for(ji = link->outJoints.begin(); ji != link->outJoints.end(); ji++ ) {
+				slPairEntry *e;
+				slLink *link2 = (*ji)->child;
+
+				e = slVclipPairEntry(w->clipData->pairList, link->clipNumber, link2->clipNumber);
+
+				if(e->flags & BT_CHECK) e->flags ^= BT_CHECK;
+			}
+
 	 		if(link->multibody) slMultibodyInitCollisionFlags(link->multibody, w->clipData->pairList);
 		}
 	}

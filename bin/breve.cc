@@ -69,6 +69,7 @@ void graphDisplay();
 
 pthread_mutex_t gEngineMutex;
 pthread_mutex_t gThreadMutex;
+pthread_cond_t gThreadPaused;
 
 int gThreadShouldExit = 0;
 int gThreadRunning = 0; 
@@ -98,11 +99,11 @@ int main(int argc, char **argv) {
 
 	interfaceID = "glut/2.0";
 
-	srand(time(NULL));
 	srandom(time(NULL));
 
 	pthread_mutex_init(&gEngineMutex, NULL);
 	pthread_mutex_init(&gThreadMutex, NULL);
+	pthread_cond_init(&gThreadPaused, NULL);
 
 	gArchiveFile = NULL;
 
@@ -207,45 +208,45 @@ int main(int argc, char **argv) {
 }
 
 void *workerThread(void *data) {
-	int r;
-
 	gThreadRunning = 1;
 
-	pthread_mutex_lock(&gThreadMutex);
-
 	while(1) {
-		if(!gPaused && !frontend->engine->drawEveryFrame) {
-   		 	r = brEngineIterate(frontend->engine);
-			if(!r) brQuit(frontend->engine);
+		pthread_mutex_lock(&gThreadMutex);
+
+		if((!gPaused && !frontend->engine->drawEveryFrame) ||
+		   !pthread_cond_wait(&gThreadPaused, &gThreadMutex)) {
+   		 	if (gThreadShouldExit ||
+			    brEngineIterate(frontend->engine) != EC_OK) {
+				brQuit(frontend->engine);
+				pthread_mutex_unlock(&gThreadMutex);
+				return NULL;
+			}
 		}
 
-		if(gThreadShouldExit) {
-			/* once we catch the exit symbol, change it back so the */
-			/* caller knows that it's been received. */
-
-			gThreadShouldExit = 0;
-			return NULL;
-		}
+		pthread_mutex_unlock(&gThreadMutex);
 	}
-
-	pthread_mutex_unlock(&gThreadMutex);
 }
 
 void brGlutLoop() {
 	static int oldD = 1;
+	int newD = frontend->engine->drawEveryFrame;
 
 	gWaiting = 0;
 
 	if(!gPaused) {
-		if(frontend->engine->drawEveryFrame)
-   	 		if(brEngineIterate(frontend->engine) != EC_OK) brQuit(frontend->engine);
+		if(newD && brEngineIterate(frontend->engine) != EC_OK)
+			brQuit(frontend->engine);
 
 		glutPostRedisplay();
 
-		if(!frontend->engine->drawEveryFrame && oldD) pthread_mutex_unlock(&gThreadMutex);
-		else if(frontend->engine->drawEveryFrame && !oldD) pthread_mutex_lock(&gThreadMutex);
+		if(!newD && oldD) {
+			pthread_mutex_unlock(&gThreadMutex);
+			pthread_cond_signal(&gThreadPaused);
+		}
+		else if(newD && !oldD) 
+			pthread_mutex_lock(&gThreadMutex);
 
-		oldD = frontend->engine->drawEveryFrame;
+		oldD = newD;
 	}
 }
 
@@ -284,12 +285,10 @@ void brGLMainMenuUpdate(brInstance *i) {
 void brQuit(brEngine *e) {
 	double diff, age;
 
-	gThreadShouldExit = 1;
-
-	// wait for the thread to exit -- it will set gThreadShouldExit back to 0 
-
-	pthread_mutex_unlock(&gThreadMutex);
-	while(gThreadRunning && gThreadShouldExit);
+	if(gThreadRunning && !gPaused && !frontend->engine->drawEveryFrame) {
+		gThreadShouldExit = 1;
+		pthread_mutex_lock(&gThreadMutex);
+	}
 
 	brPauseTimer(e);
 
@@ -364,7 +363,6 @@ int brParseArgs(int argc, char **argv) {
 				break;
 			case 'r':
 				srandom(atoi(optarg));
-				srand(atoi(optarg));
 				printf("random seed: %d\n", atoi(optarg));
 				break;
 			case 's':
@@ -392,6 +390,7 @@ int brParseArgs(int argc, char **argv) {
 				break;
 			case 'u':
 				gPaused = 0;
+				glutIdleFunc(brGlutLoop);
 				break;
 			case 'F':
 				gFormat = 1;
@@ -461,8 +460,6 @@ void slInitGlut(int argc, char **argv, char *title) {
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 	contextMenu = glutCreateMenu(brContextMenu);
 	glutAttachMenu(GLUT_MIDDLE_BUTTON);
-
-	glutIdleFunc(brGlutLoop);
 
 	slInitGL(frontend->engine->world, frontend->engine->camera);
 
@@ -573,8 +570,14 @@ void slDemoKeyboard(unsigned char key, int x, int y) {
 		case ' ':
 			gPaused = !gPaused;
 
-			if(gPaused) brPauseTimer(frontend->engine);
-			else brUnpauseTimer(frontend->engine);
+			if(gPaused) {
+				brPauseTimer(frontend->engine);
+				glutIdleFunc(NULL);
+			} else {
+				brUnpauseTimer(frontend->engine);
+				pthread_cond_signal(&gThreadPaused);
+				glutIdleFunc(brGlutLoop);
+			}
 
 			break;
 		case 0x1b:
@@ -686,6 +689,7 @@ int soundCallback(void *data) {
 int pauseCallback(void *data) {
 	gPaused = 1;
 	brPauseTimer(frontend->engine);
+	glutIdleFunc(NULL);
 	return 0;
 }
 

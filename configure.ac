@@ -12,6 +12,50 @@ AC_CANONICAL_HOST
 
 AC_PATH_X
 
+AC_DEFUN([AC_PROG_JAVAC_WORKS],[
+AC_CACHE_CHECK([if $JAVAC works], ac_cv_prog_javac_works, [
+JAVA_TEST=Test.java
+CLASS_TEST=Test.class
+cat << \EOF > $JAVA_TEST
+/* [#]line __oline__ "configure" */
+public class Test {
+}
+EOF
+if AC_TRY_COMMAND($JAVAC $JAVACFLAGS $JAVA_TEST) >/dev/null 2>&1; then
+  ac_cv_prog_javac_works=yes
+else
+  AC_MSG_ERROR([The Java compiler $JAVAC failed (see config.log, check the CLASSPATH?)])
+  echo "configure: failed program was:" >&AC_FD_CC
+  cat $JAVA_TEST >&AC_FD_CC
+fi
+rm -f $JAVA_TEST $CLASS_TEST
+])
+AC_PROVIDE([$0])dnl
+])
+
+AC_DEFUN([AC_PROG_JAVAC],[
+AC_REQUIRE([AC_EXEEXT])dnl
+if test "x$JAVAPREFIX" = x; then
+        test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, javac$EXEEXT "gcj$EXEEXT -C" "egcj -C" guavac$EXEEXT jikes$EXEEXT)
+else
+        test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, javac$EXEEXT "gcj$EXEEXT -C" "egcj -C" guavac$EXEEXT jikes$EXEEXT, $JAVAPREFIX)
+fi
+test "x$JAVAC" = x && AC_MSG_ERROR([no acceptable Java compiler found in \$PATH])
+AC_PROG_JAVAC_WORKS
+AC_PROVIDE([$0])dnl
+])
+
+AC_DEFUN([AC_PROG_JAR],[
+AC_REQUIRE([AC_EXEEXT])dnl
+if test "x$JAVAPREFIX" = x; then
+        test "x$JAR" = x && AC_CHECK_PROGS(JAR, jar$EXEEXT ejar)
+else
+        test "x$JAR" = x && AC_CHECK_PROGS(JAR, jar ejar, $JAVAPREFIX)
+fi
+test "x$JAR" = x && AC_MSG_ERROR([no acceptable jar program found in \$PATH])
+AC_PROVIDE([$0])dnl
+])
+
 case "${host_os}" in
 	darwin* )
 		dnl Mac OS X configuration
@@ -74,9 +118,10 @@ case "${host_os}" in
 
 	
 	openbsd* )
-		GLLIBS="-lglut -lGL -lGLU -lXmu -lm -lutf8"
-		CPPFLAGS="$(CPPFLAGS) -I/usr/local/include -I/usr/X11R6/include"
-		LDFLAGS="$(LDFLAGS) -L/usr/local/lib -L/usr/X11R6/lib"
+		GLLIBS="-lglut -lGL -lGLU -lXmu -lXi -lm"
+		CPPFLAGS="${CPPFLAGS} -I/usr/local/include -I/usr/X11R6/include"
+		LDFLAGS="${LDFLAGS} -L/usr/local/lib -L/usr/X11R6/lib"
+		AC_CHECK_LIB([ogg],[oggpack_read])
 
 		;;
 
@@ -113,6 +158,9 @@ AC_PROG_LEX
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
+AC_PROG_JAVAC
+AC_PROG_JAR
+
 # Checks for libraries.
 AC_CHECK_LIB([z], [gzopen],,AC_MSG_FAILURE([Missing zlib library -- see http://www.zlib.org]))
 AC_CHECK_LIB([expat], [XML_ParserCreate],,AC_MSG_FAILURE([Missing expat library -- see http://www.jclark.com/xml/expat.html]))
@@ -130,6 +178,7 @@ AC_CHECK_LIB([history], [add_history])
 AC_CHECK_LIB([readline], [readline])
 AC_CHECK_LIB([java], [JNI_CreateJavaVM],,,$JAVALIBS)
 AC_CHECK_LIB([gslcblas], [cblas_ccopy])
+AC_CHECK_LIB([gslblasnative], [gsl_blas_raw_dgemm])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc])
 AC_CHECK_LIB([tiff], [TIFFOpen])
 
@@ -151,7 +200,7 @@ AC_CHECK_LIB([OSMesa], [OSMesaCreateContext],,,$GLLIBS)
 # Checks for header files.
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
-AC_CHECK_HEADERS([fcntl.h float.h limits.h malloc.h netdb.h netinet/in.h stdlib.h string.h strings.h sys/file.h sys/param.h sys/socket.h sys/time.h unistd.h])
+AC_CHECK_HEADERS([fcntl.h float.h limits.h netdb.h netinet/in.h stdlib.h string.h strings.h sys/file.h sys/param.h sys/socket.h sys/time.h unistd.h wctype.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

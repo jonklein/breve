@@ -35,6 +35,14 @@
 
 #include "glIncludes.h"
 
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#else
+#define MAXPATHLEN 10240
+#endif
+
+#define MAXLINE 10240
+
 double gNotify = 40.0;
 double gSimMax = 0.0;
 
@@ -58,9 +66,8 @@ int main(int argc, char **argv) {
 	int index;
 	char *text;
 	double nextNotify;
-	char wd[10240];
+	char wd[MAXPATHLEN];
 
-	srand(time(NULL));
 	srandom(time(NULL));
 
 	interfaceID = "cli/1.9.1";
@@ -94,7 +101,7 @@ int main(int argc, char **argv) {
 	frontend = breveFrontendInit(argc, argv);
 	frontend->data = breveFrontendInitData(frontend->engine);
 
-	brEngineSetIOPath(frontend->engine, getcwd(wd, 10239));
+	brEngineSetIOPath(frontend->engine, getcwd(wd, MAXPATHLEN));
 
 	frontend->engine->camera->activateContextCallback = activateContext;
 	frontend->engine->camera->renderContextCallback = renderContext;
@@ -177,7 +184,7 @@ int main(int argc, char **argv) {
 
 void brCatchSignal(int signal) {
 	char *line;
-	char staticLine[10240];
+	char staticLine[MAXLINE];
 	static int waiting = 0;
 
 	if(waiting) return;
@@ -195,7 +202,7 @@ void brCatchSignal(int signal) {
 #else 
 	printf("breve> ");
 	fflush(stdout);
-	line = gets(staticLine);
+	line = fgets(staticLine, MAXLINE, stdin);
 #endif
 
 	if(*line && line[0] == 'x') {
@@ -232,7 +239,6 @@ int brParseArgs(int argc, char **argv) {
 				break;
 			case 'r':
 				srandom(atoi(optarg));
-				srand(atoi(optarg));
 				printf("random seed: %d\n", atoi(optarg));
 				break;
 			case 'n':

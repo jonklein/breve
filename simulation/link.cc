@@ -351,7 +351,7 @@ int slLinkCheckPenetration(slWorld *w, slLink *l) {
 		if(ln != n) {
 			pe = slVclipPairEntry(vc->pairList, ln, n);
 
-			if((slVclipFlagsShouldTest(pe->flags)) && slVclipTestPair(vc, pe, NULL)) 
+			if((slVclipFlagsShouldTest(pe->flags) && pe->flags & BT_SIMULATE) && slVclipTestPair(vc, pe, NULL)) 
 				return 1;
 		}
 	}
@@ -525,7 +525,7 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 	dBodySetPosition(child->odeBodyID, newPosition.x, newPosition.y, newPosition.z);
 	slVectorCopy(&newPosition, &child->position.location);
 
-	/* normalize the normal vector, just in case */
+	// normalize the normal vector, you know, just in case
 
 	slVectorNormalize(&tn);
 
