@@ -817,7 +817,7 @@ int brISetShadowCatcher(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
-	\brief Adds an object line between two objects.
+	\brief Adds a rendered line between two objects.
 
 	void addObjectLine(slWorldObject pointer source, slWorldObject pointer dest, vector color, int style).
 */

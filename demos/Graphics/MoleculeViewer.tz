@@ -1,3 +1,7 @@
+#
+# This demo shows how to display molecular models loaded in from 
+# PDB files.
+#
 
 @path "classes"
 @path "lib/classes"
@@ -26,7 +30,7 @@ Control : PDBViewer {
         average (vector).
 		atomString (string).
 
-        self set-background-color to (0, 0, 0).
+        self set-background-color to (.3, .3, .3).
 
         hShape = new Sphere init-with radius .3.
 

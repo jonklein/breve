@@ -138,7 +138,7 @@ Object : Real (aka Reals) [version 2.0] {
 		neighborhoodSize = size.
 		setNeighborhoodSize(realWorldPointer, size).
 
-  + section "Managing the Appearence of Agents"
+  + section "Changing the Appearence of Agents"
 
 	+ to show-bounding-box:
 		% Shows the bounding box for the object.
@@ -158,18 +158,17 @@ Object : Real (aka Reals) [version 2.0] {
 		% <P>
 		% If a line to otherObject already exists, its color will be updated.
 
-		addObjectLine(realWorldPointer, (otherObject get-pointer), theColor, 0).
+		addObjectLine(realWorldPointer, (otherObject get-world-object-pointer), theColor, 0).
 
 	+ to remove-line to otherObject (object):
 		% Removes the line connecting this object to otherObject.
 
-		removeObjectLine(realWorldPointer, (otherObject get-pointer)).
+		removeObjectLine(realWorldPointer, (otherObject get-world-object-pointer)).
 
 	+ to remove-all-lines:
 		% Removes all lines connecting this object to other objects.
 
 		removeAllObjectLines(realWorldPointer).
-
 
 	+ to show-axis:
 		% Shows the X and Y axes for the object.

@@ -8,16 +8,25 @@
 #	frontend.
 # 
 
-if($#ARGV != 0) {
+if($#ARGV != 0 && $#ARGV != 1) {
 	print STDERR "usage: $0 filename\n";
 	exit 0;
 }
 
 open(FILE, $ARGV[0]) || die "Cannot open $ARGV[0]: $!\n";
 
-$filename = $ARGV[0]; 
-$filename = ucfirst($filename);
+if($#ARGV == 1) {
+	$filename = $ARGV[1];
+} else {
+	$filename = $ARGV[0]; 
+}
+
 $filename =~ s/\.[ch]$//;
+$filename =~ s/^.*\///;
+$filename = ucfirst($filename);
+
+open(CFILE, ">breveFunctions${filename}.c") || die "Cannot open breveFunctions${filename}.c for writing: $!\n";
+open(TZFILE, ">${filename}.tz") || die "Cannot open ${filename}.tz for writing: $!\n";
 
 # Some recursive regular expressions for parsing out a function definition
 
@@ -41,7 +50,22 @@ $declaration_list = "(?:(?:)|(?:$declaration)|(?:(?:$declaration,)*$declaration)
 
 $function_definition = "^$declaration\\s*\\($declaration_list\\);";
 
-print<<__EOT__;
+print TZFILE<<__EOT__;
+\@use Object.
+
+Object : $file {
+	+ to init:
+
+	+ to destroy:
+}
+__EOT__
+
+print CFILE<<__EOT__;
+/*
+	the breve simulation environment
+
+	This file was generated automatically by the script $0.
+*/
 
 #include "kernel.h"
 #include "$ARGV[0]"
@@ -81,7 +105,7 @@ foreach $line (<FILE>) {
 
 	# start printing out the declaration
 
-print<<__EOT__;
+print CFILE<<__EOT__;
 /*!
 	\\brief A breve API function wrapper for the C-function \\ref $name.
 
@@ -103,7 +127,11 @@ __EOT__
 
 		$accessor = accessorForType($argtype);
 
-		print "\t$argtype $argname = $accessor(&arguments[$index]);\n";
+		if($argtype =~ /\*$/) {
+			print CFILE "\t${argtype}$argname = $accessor(&arguments[$index]);\n";
+		} else {
+			print CFILE "\t$argtype $argname = $accessor(&arguments[$index]);\n";
+		}
 
 		$enum = enumForType($argtype);
 
@@ -126,7 +154,7 @@ __EOT__
 	$return_result = "";
 	$return_result = "$return_accessor(result) = " if($return_type ne "void");
 
-print<<__EOT__;
+print CFILE <<__EOT__;
 
 	${return_result}$name($function_arguments);
 
@@ -144,12 +172,15 @@ __EOT__
 # Print out the 
 #
 
-print<<__EOT__;
+print CFILE<<__EOT__;
 /*@}*/
 
-void breveInit${filename}Funcs(brNamespace *namespace) {
+void breveInit${filename}Functions(brNamespace *namespace) {
 @newcalls}
 __EOT__
+
+close(CFILE);
+close(TZFILE);
 
 exit(0);
 

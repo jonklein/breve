@@ -237,10 +237,7 @@ void slWorldFreeObject(slWorldObject *o) {
 		slRemoveObjectLine(otherObject, o);
 	}
 
-	while(o->outLines) {
-		otherObject = ((slObjectLine*)o->outLines->data)->destination;
-		slRemoveObjectLine(o, otherObject);
-	}
+	slRemoveAllObjectLines(o);
 
 	slFree(o);
 }
@@ -734,6 +731,8 @@ int slRemoveObjectLine(slWorldObject *src, slWorldObject *dst) {
 			src->outLines = slListRemoveData(src->outLines, line);
 			dst->inLines = slListRemoveData(dst->inLines, src);
 
+			slFree(line);
+
 			return 0;
 		}
 
@@ -744,16 +743,27 @@ int slRemoveObjectLine(slWorldObject *src, slWorldObject *dst) {
 	return -1;
 }
 
+/*!
+	\brief Frees all of the object lines for an object.
+*/
+
 int slRemoveAllObjectLines(slWorldObject *src) {
 	slObjectLine *line;
 	slWorldObject *dst;
+	slList *duplicate, *start;
+	
+	start = duplicate = slListCopy(src->outLines);
 
-	while(src->outLines) {
-		line = src->outLines->data;
+	while(duplicate) {
+		line = duplicate->data;
 		dst = line->destination;
 
 		src->outLines = slListRemoveData(src->outLines, line);
 		dst->inLines = slListRemoveData(dst->inLines, src);
+
+		slFree(line);
+
+		duplicate = duplicate->next;
 	}
 
 	return 0;

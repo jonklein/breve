@@ -162,6 +162,16 @@ int stOSetGC(brEval args[], brEval *target, brInstance *bi) {
 	return EC_OK;
 }
 
+/*!
+	\brief Gets the retain count for an object.
+*/
+
+int stOGetRetainCount(brEval args[], brEval *target, brInstance *bi) {
+	stInstance *i = bi->pointer;
+	BRINT(target) = i->retainCount;
+	return EC_OK;
+}
+
 int stCObjectAllocationReport(brEval args[], brEval *target, brInstance *i) {
     stObjectAllocationReport(i->engine);
     return EC_OK;
@@ -251,6 +261,7 @@ void breveInitSteveObjectFuncs(brNamespace *n) {
 	brNewBreveCall(n, "isa", stOIsa, AT_INT, AT_STRING, 0);
 	brNewBreveCall(n, "respondsTo", stORespondsTo, AT_INT, AT_INSTANCE, AT_STRING, 0);
 	brNewBreveCall(n, "setGC", stOSetGC, AT_NULL, AT_INT, 0);
+	brNewBreveCall(n, "getRetainCount", stOGetRetainCount, AT_INT, 0);
 
     brNewBreveCall(n, "objectAllocationReport", stCObjectAllocationReport, AT_NULL, 0);
 	brNewBreveCall(n, "newInstanceForClassString", stNewInstanceForClassString, AT_INSTANCE, AT_STRING, 0);

@@ -89,6 +89,7 @@ AC_CHECK_LIB([portaudio], [Pa_OpenStream],,,$AUDIOLIBS)
 AC_CHECK_LIB([sndfile], [sf_open])
 AC_CHECK_LIB([OSMesa], [OSMesaCreateContext],,,$GLLIBS)
 AC_CHECK_LIB([readline], [readline],,,[-ltermcap])
+AC_CHECK_LIB([push], [pushEnvironmentNew])
 
 # Checks for header files.
 AC_FUNC_ALLOCA

@@ -1508,7 +1508,7 @@ void slRenderLines(slWorld *w, slCamera *c, int flags) {
 				if(w->objects[n]->type == WO_STATIONARY) 
 					x = &((slStationary*)w->objects[n]->data)->position.location;
 				else 
-					x = &((slMultibody*)w->objects[n]->data)->root->position.location;
+					x = &((slLink*)w->objects[n]->data)->position.location;
 
 				glDisable(GL_LIGHTING);
 				glEnable(GL_BLEND);
@@ -1529,7 +1529,7 @@ void slRenderLines(slWorld *w, slCamera *c, int flags) {
 					if(line->destination->type == WO_STATIONARY) 
 						y = &((slStationary*)line->destination->data)->position.location;
 					else 
-						y = &((slMultibody*)line->destination->data)->root->position.location;
+						y = &((slLink*)line->destination->data)->position.location;
 
 					glVertex3f(x->x, x->y, x->z);
 					glVertex3f(y->x, y->y, y->z);

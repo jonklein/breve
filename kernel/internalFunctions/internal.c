@@ -165,5 +165,6 @@ void brLoadInternalFunctions(brEngine *e) {
 	breveInitTerrainFunctions(e->internalMethods);
 	breveInitImageFunctions(e->internalMethods);
 	breveInitMovieFunctions(e->internalMethods);
+	breveInitPushFunctions(e->internalMethods);
 }
 /*@}*/

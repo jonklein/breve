@@ -187,7 +187,7 @@ void brCatchSignal(int signal) {
 	printf("\n\nSimulation interupted.  Type a steve command, 'x' to quit, or hit enter to continue\n");
 	fflush(stdout);
 
-	line = readline("> ");
+	line = readline("breve> ");
 	if(*line) add_history(line);
 
 	if(*line && line[0] == 'x') {

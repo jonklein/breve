@@ -518,6 +518,19 @@ int brIRGBtoHSV(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+/*!
+	\brief Finds a file and retruns the entire file path using the engine's 
+	file path.
+
+	string findFile(string file).
+*/
+
+int brIFindFile(brEval args[], brEval *target, brInstance *i) {
+	BRSTRING(target) = brFindFile(i->engine, BRSTRING(&args[0]), NULL);
+
+	return EC_OK;
+}
+
 /*@}*/
 
 // initialize the control related functions
@@ -566,4 +579,6 @@ void breveInitControlFunctions(brNamespace *n) {
     brNewBreveCall(n, "getMouseY", brIGetMouseY, AT_INT, 0);
 
     brNewBreveCall(n, "getAllPressedKeys", brIGetAllPressedKeys, AT_STRING, 0);
+
+    brNewBreveCall(n, "findFile", brIFindFile, AT_STRING, AT_STRING, 0);
 }

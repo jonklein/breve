@@ -45,6 +45,9 @@ NULL : Object (aka Objects) [version 1.8] {
 
 		setGC(0).
 
+	- to get-retain-count:
+		return getRetainCount().
+
     - to get-controller:
         % Returns the controller object that associated with the current 
         % simulation.  It's preferable to simply reference the variable

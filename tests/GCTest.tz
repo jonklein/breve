@@ -73,7 +73,8 @@ Object : GCTesterI {
 	+ to init:
 		print "creating $self".
 		self enable-auto-free.
-		new GCTesterII.	
+		@@DEBUG@@(new GCTesterII).
+		print "xxx".
 
 	+ to destroy:
 		print "destroying $self".
@@ -83,6 +84,7 @@ Object : GCTesterII {
 	+ to init:
 		print "creating $self".
 		self enable-auto-free.
+		print (self get-retain-count).
 
 	+ to destroy:
 		print "destroying $self".

@@ -151,6 +151,10 @@ slList *slListReverse(slList *s) {
     return previous;
 }
 
+/*!
+	\brief Makes a shalow copy of a list.
+*/
+
 slList *slListCopy(slList *s) {
 	slList *result = NULL;
 

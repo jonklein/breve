@@ -160,14 +160,13 @@ brEngine *brEngineNew() {
 	if((envpath = getenv("BREVE_CLASS_PATH"))) {
 		while((dir = slSplit(envpath, ":", n++))) {
 			brAddSearchPath(e, dir);
-			slMessage(DEBUG_INFO, "adding '%s' to class path\n", dir);
+			slMessage(DEBUG_INFO, "adding \"%s\" to class path\n", dir);
 			slFree(dir);
 		}
 	}
 
 	if((envpath = getenv("HOME"))) {
 		// the user's home directory as a search path
-
 		brAddSearchPath(e, envpath);
 	}
 
@@ -482,7 +481,7 @@ int brEngineIterate(brEngine *e) {
 */
 
 void brAddSearchPath(brEngine *e, char *path) {
-	e->searchPath = slListPrepend(e->searchPath, slStrdup(path));
+	e->searchPath = slListAppend(e->searchPath, slStrdup(path));
 }
 
 /*!

@@ -429,6 +429,8 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 
 			*(char**)variable = newstr;
 
+			noRetain = 1;
+
 			break;
 		case AT_LIST:
 			if(!BRLIST(e)) {
@@ -495,9 +497,10 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 			break;
 	}
 
-	stGCUnmark(i->instance, e);
-
-	if(!noRetain) stGCRetain(e);
+	if(!noRetain) {
+		stGCRetain(e);
+		stGCUnmark(i->instance, e);
+	}
 
 #ifdef MULTITHREAD
 	if(i) pthread_mutex_unlock(&i->lock);
@@ -869,7 +872,8 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 
 		// unmark the return value -- we'll make it the caller's problem
 
-		if(oldStack) stGCUnmark(caller->instance, t);
+		// stGCRetain(t);
+		stGCUnmark(caller->instance, t);
 
 		// collect and reset the gcStack
 
@@ -1272,6 +1276,8 @@ inline int stEvalListIndex(stListIndexExp *l, stRunInstance *i, brEval *t) {
 		stEvalError(i->instance->type->engine, EE_TYPE, "expected list or hash in lookup expression");
 		return EC_ERROR;
 	}
+
+	stGCMark(i->instance, t);
 
 	return EC_OK;
 }
@@ -2284,8 +2290,8 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 	// this will keep it alive through the releasing stage.
 	
 	if(new->instance->gcStack) {
-		stGCRetain(target);
 		stGCUnmark(new->instance, target);
+		// stGCRetain(target);
 	}
 
 	// unretain the input arguments

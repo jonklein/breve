@@ -278,7 +278,17 @@ void stGCUnmark(stInstance *i, brEval *collect) {
 		r = i->gcStack->data[n];
 	
 		if(r->pointer == collect->values.pointerValue) {
-			r->pointer = NULL;
+			switch(r->type) {
+				case AT_HASH:
+				case AT_STRING:
+				case AT_DATA:
+				case AT_LIST:
+				case AT_INSTANCE:
+					r->pointer = NULL;
+					break;
+				default:
+					break;
+			}
 		}
 	}
 }
