@@ -149,6 +149,9 @@ void slWorldObjectAddDrawMode(slWorldObject *wo, int mode);
 void slWorldObjectRemoveDrawMode(slWorldObject *wo, int mode);
 
 int slWorldObjectGetLightExposure(slWorldObject *wo);
+
+int slWorldObjectRaytrace(slWorldObject *wo, slVector *location, slVector* direction, slVector *erg_dir);
+
 #ifdef __cplusplus
 }
 #endif

@@ -900,6 +900,24 @@ int brILoadTigerData(brEval args[], brEval *target, brInstance *i) {
 
 }
 
+int brIRaytrace(brEval args[], brEval *target, brInstance *i) {
+	slWorldObject *o    = BRWORLDOBJECTPOINTER(&args[0]);
+ 	slVector *location  = &BRVECTOR(&args[1]);
+        slVector *direction = &BRVECTOR(&args[2]); 
+
+	if(!o) {
+		slMessage(DEBUG_ALL, "null pointer passed to raytrace\n");
+		return EC_ERROR;
+	}
+
+	int error = slWorldObjectRaytrace(o, location, direction, &BRVECTOR(target));
+
+        if (error == -2)
+           return EC_ERROR;
+        
+	return EC_OK;
+}
+
 /*@}*/
 
 /*!
@@ -973,4 +991,6 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "loadTigerData", brILoadTigerData, AT_NULL, AT_STRING, 0);
 
 	brNewBreveCall(n, "setCollisionProperties", brISetCollisionProperties, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0);
+
+	brNewBreveCall(n, "raytrace", brIRaytrace, AT_VECTOR, AT_POINTER, AT_VECTOR, AT_VECTOR, 0);
 }

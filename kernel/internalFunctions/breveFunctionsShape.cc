@@ -230,6 +230,23 @@ int brIPointOnShape(brEval args[], brEval *target, brInstance *i) {
 
 	return EC_OK;
 }
+
+int brIRayHitsShape(brEval args[], brEval *target, brInstance *i) {
+	slShape *shape = BRSHAPEPOINTER(&args[0]);
+	slVector *direction = &BRVECTOR(&args[1]);
+	slVector *location  = &BRVECTOR(&args[2]);
+	int result;
+
+	result = slRayHitsShape(shape, direction, location, &BRVECTOR(target));
+
+        // The shape was not hit by the ray
+        if (result < 0) {
+           slVectorSet(&BRVECTOR(target), -1.0, -1.0, -1.0);
+        }
+        
+	return EC_OK;
+}
+
 /*@}*/
 
 /*!
@@ -249,6 +266,7 @@ void breveInitShapeFunctions(brNamespace *n) {
 	brNewBreveCall(n, "newNGonCone", brINewNGonCone, AT_POINTER, AT_INT, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "freeShape", brIFreeShape, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "pointOnShape", brIPointOnShape, AT_VECTOR, AT_POINTER, AT_VECTOR, 0);
+//	brNewBreveCall(n, "rayHitsShape", brIRayHitsShape, AT_VECTOR, AT_POINTER, AT_VECTOR, AT_VECTOR, 0);
 	brNewBreveCall(n, "dataForShape", brIDataForShape, AT_DATA, AT_POINTER, 0);
 	brNewBreveCall(n, "shapeForData", brIShapeForData, AT_POINTER, AT_DATA, 0);
 	brNewBreveCall(n, "getMass", brIGetMass, AT_DOUBLE, AT_POINTER, 0);

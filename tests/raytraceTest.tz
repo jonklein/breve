@@ -1,0 +1,106 @@
+# author: Marc Szymanski 24 Jan 2005
+# email: szymanski@ira.uka.de
+# include some frequently used classes and specify common classpaths
+
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use Stationary.
+@use File.
+
+# tell the engine the name of the controller
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+	+ variables:
+		fat-one (object).
+		fat-two (object).
+		stat    (object).
+
+	+ to init:
+		# put initialization code here which creates objects
+		# and sets up the simulation
+
+		print "simulation started".
+		self point-camera at (0, 0, 0) from (-70, 40, 0).
+		
+		new myAgent.
+		fat-one = new myFatAgent.
+		fat-two = new myFatAgent.
+		fat-two set-color to (1,0,0).
+		stat = new Stationary.
+		stat register with-shape (new Cube init-with size (60, 10, 10)) at-location (0, 0, 20).
+
+	+ to iterate:
+		# place code that should be called during every 
+		# iteration here.
+
+		#if | all myAgents | == 0: self end-simulation.
+
+		super iterate.
+        + to get-fat-one:
+		return fat-one.
+
+        + to get-fat-two:
+		return fat-two.
+
+        + to get-stat:
+		return stat.
+}
+
+# implement other objects in your simulation here
+
+Mobile : myAgent (aka myAgents) {
+        + variables:
+	        out (object).
+		count (int).
+
+	+ to init:
+		other (object).
+
+		self set-shape to (new Cube init-with size (5, 5, 5)).		
+		self move to (-10, 0, 0).
+		self rotate around-axis (0,1,0) by 1.57.
+		self set-rotational-velocity to (0, -0.01, 0).
+		self set-color to (0,0,1).
+		out = new File.
+		out open-for-writing with-file "ir-test.dat".
+
+	+ to iterate:
+		direction, location, hit1, hit2, hit3 (vector).
+		v1, v2, v3 (double).
+		direction = ((self get-rotation)*(1,0,0)).
+		location  = (self get-location).
+
+		hit1 =  ((controller get-fat-one) raytrace from-location location with-direction direction).
+		v1 = |hit1|.		
+		if (hit1  == (-1, -1, -1)) : v1 = 60.
+
+		hit2 =  ((controller get-fat-two) raytrace from-location location with-direction direction).
+		v2 = |hit2|.		
+		if (hit2 == (-1, -1, -1)) : v2 = 60.
+
+		hit3 =  ((controller get-stat) raytrace from-location location with-direction direction).
+		v3 = |hit3|.		
+		if (hit3 == (-1, -1, -1)) : v3 = 60.
+
+		printf count. printf " ". 		
+		printf v1. printf " ". 		
+		printf v2. printf " ". 		
+		printf v3. print " ". 		
+
+		count++.
+}
+
+Mobile : myFatAgent {
+       + to init:
+		self move to (random[(0, 0, 40.0)] - (-40, 0, 20)).
+		self rotate around-axis (0,1,0) by (random[6.3] - 3.14).
+		self set-shape to (new Cube init-with size (20, 20, 20)).
+		self set-color to (0,1,0).
+}

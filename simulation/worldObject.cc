@@ -101,3 +101,36 @@ void slWorldObjectSetAlpha(slWorldObject *wo, double alpha) {
 void slWorldObjectSetColor(slWorldObject *wo, slVector *color) {
 	slVectorCopy(color, &wo->color);
 }
+
+int slWorldObjectRaytrace(slWorldObject *wo, slVector *location, slVector* direction, slVector *erg_dir) {
+
+   if(!(wo->shape)) {
+      slMessage(DEBUG_ALL, "slWorldObjectRaytrace: This WorldObject has no shape\n");
+      return -2;
+   }
+   
+   //direction and location in wo's coordinates
+   slVector dir_wo, dir_wo_help;
+   slVector loc_wo_help;
+   slVector loc_wo;
+
+   slVectorInvXform(wo->position.rotation, direction, &dir_wo_help);
+   slVectorMul(&dir_wo_help, -1, &dir_wo);   
+   
+   slVectorSub(location, &wo->position.location, &loc_wo_help);
+   slVectorInvXform(wo->position.rotation, &loc_wo_help, &loc_wo);   
+   
+//   slMessage(DEBUG_ALL, " [ %f, %f, %f ] %f %f ", dir_wo.x, dir_wo.y, dir_wo.z, atan2(dir_wo.z, dir_wo.x)*180/M_PI, atan2(direction->z, direction->x)*180/M_PI );
+//   slMessage(DEBUG_ALL, " [ %f, %f, %f ] ", loc_wo.x, loc_wo.y, loc_wo.z );
+   
+   slVector point;
+   if ( wo->shape->rayHitsShape(&dir_wo, &loc_wo, &point) < 0) {
+      slVectorSet(erg_dir, 0.0, 0.0, 0.0); //no hit
+      return -1;
+   }
+
+   double d = slVectorLength( &point);
+   slVectorMul( direction, d, erg_dir);
+   
+   return 0;
+}

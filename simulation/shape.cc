@@ -854,6 +854,108 @@ int slShape::pointOnShape(slVector *dir, slVector *point) {
 	return -1;
 }
 
+/*!
+	\brief Returns the point where a ray send from location with direction hit the shape.
+        The location and the direction must be given int the frame of the shape. But the returned
+        point is relative to the location. This function should only be use by the slWorldObjectRaytrace
+        function.
+*/
+int slRayHitsShape(slShape *s, slVector *dir, slVector *target, slVector *point) {
+        slVector invert;
+        slVectorMul(dir, -1, &invert);
+	return s->rayHitsShape(&invert, target, point);
+}
+
+int slSphere::rayHitsShape(slVector *dir, slVector *target, slVector *point) {
+        double d = slVectorLength(target);
+        double test = d*d - _radius*_radius;
+        if (test <= 0)
+           return -1;
+	slVectorMul(dir, sqrt(test), point);
+	return 0;
+}
+
+int slShape::rayHitsShape(slVector *dir, slVector *target, slVector *point) {
+        double D, X, Y, Z, k;
+	slVector pointOnPlane;
+	slPosition pos;
+	int update, result, planes = 0;
+	double distance;
+        double minDistance = 1.0e10;
+        bool isFirst = true;        
+	std::vector<slFace*>::iterator fi;
+//       slMessage(DEBUG_ALL, " [ %f, %f, %f ] %f", dir->x, dir->y, dir->z, atan2(dir->z, dir->x)*180/M_PI);
+//        slMessage(DEBUG_ALL, " [ %f, %f, %f ] ", target->x, target->y, target->z );
+   
+        // point = (0,0,0)'
+	slVectorSet(point, 0.0, 0.0, 0.0);
+
+	slVectorSet(&pos.location, 0.0, 0.0, 0.0);
+	slMatrixIdentity(pos.rotation);
+
+	slVectorNormalize(dir);
+
+	for(fi = faces.begin(); fi != faces.end(); fi++ ) {
+		slFace *f = *fi;
+ 
+		planes++;
+
+                slPlane newPlane;
+                slVectorMul(&f->plane.normal, -1, &newPlane.normal);
+                slVectorAdd(&f->plane.vertex, target, &newPlane.vertex);
+                
+		D = slVectorDot(&newPlane.normal, &newPlane.vertex);
+
+	        //printf("d = %f\n", D);
+
+		X = newPlane.normal.x * dir->x;
+		Y = newPlane.normal.y * dir->y;
+		Z = newPlane.normal.z * dir->z;
+
+		k = D/(X+Y+Z);
+                
+                // k>0 means that dir is pointing to the right direction                              
+		if((X+Y+Z) != 0.0 && k > 0.0) {
+			/* we have the length k of the matching vector on the plane of this */
+			/* face. */
+                   
+			slVectorMul(dir, k, &pointOnPlane);
+
+                        /* discribe the vector in respect to the target frame */
+                        slVector checkPointOnPlane;
+                        slVectorSub(&pointOnPlane, target, &checkPointOnPlane);               
+                
+			// distance = slPlaneDistance(&f->plane, &pointOnPlane);
+
+			/* now figure out if the point in question is within the face */
+
+			result = slClipPoint(&checkPointOnPlane, f->voronoi, &pos, f->edgeCount, &update, &distance);
+
+			/* if this point is within the voronoi region of the plane, it must be */
+			/* on the face */
+
+			if (result == 1) {
+                           // sets the first one found as minDistance
+                           if (isFirst) {                            
+                              minDistance = k;
+                              isFirst = false;
+                              slVectorCopy(&pointOnPlane, point);
+                           } else if (k < minDistance) {
+                             //slMessage(DEBUG_ALL, "\n [ %f, %f, %f ] %f %d\n", f->plane.vertex.x, f->plane.vertex.y, f->plane.vertex.z, k, result );
+                              slVectorCopy(&pointOnPlane, point);
+                              minDistance = k;
+                           }
+			} 
+		}
+	}
+
+        // we hit a face
+        if (!isFirst)
+           return 0;
+
+	return -1;
+}
+
 
 
 void slScaleShape(slShape *s, slVector *scale) {

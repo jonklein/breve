@@ -28,6 +28,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <string.h> //szymansk Jan 24th 2005
 
 /*!
 	\brief Takes a rotation velocity vector and turns it into a quaternion derivative.

@@ -189,7 +189,8 @@ class slShape {
 
 		virtual void bounds(slPosition *position, slVector *min, slVector *max);
 		virtual int pointOnShape(slVector *dir, slVector *point);
-		virtual void scale(slVector *point);
+                virtual int rayHitsShape(slVector *dir, slVector *target, slVector *point);
+                virtual void scale(slVector *point);
 		virtual slSerializedShapeHeader *serialize(int *length);
 
 		virtual void drawShadowVolume(slCamera *camera, slPosition *position);
@@ -233,6 +234,7 @@ class slSphere : public slShape {
 
 		void bounds(slPosition *position, slVector *min, slVector *max);
 		int pointOnShape(slVector *dir, slVector *point);
+                int rayHitsShape(slVector *dir, slVector *target, slVector *point);
 		void scale(slVector *point);
 		slSerializedShapeHeader *serialize(int *length);
 
@@ -291,6 +293,7 @@ void slCubeInertiaMatrix(slVector *c, double mass, double i[3][3]);
 void slSphereInertiaMatrix(double radius, double mass, double i[3][3]);
 
 int slPointOnShape(slShape *s, slVector *dir, slVector *point);
+int slRayHitsShape(slShape *s, slVector *dir, slVector *target, slVector *point);
 
 void slScaleShape(slShape *s, slVector *scale);
 
