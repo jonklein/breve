@@ -60,9 +60,7 @@ slWorld *slWorldNew() {
 	slAllocIntegrationVectors(w);
 
 	w->odeWorldID = dWorldCreate();
-#ifndef WINDOWS
 	dWorldSetQuickStepNumIterations(w->odeWorldID, 60);
-#endif
 
 	dWorldSetCFM (w->odeWorldID,1e-6);
 	dWorldSetERP(w->odeWorldID,0.1);
@@ -474,9 +472,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 		if(w->odeStepMode == 0) {
 			dWorldStep(w->odeWorldID, stepSize);
 		} else {
-#ifndef WINDOWS
 			dWorldQuickStep(w->odeWorldID, stepSize);
-#endif
 		}
 
 		dJointGroupEmpty(w->odeCollisionGroupID);
@@ -671,7 +667,5 @@ slWorldObject *slWorldGetObject(slWorld *w, unsigned int n) {
 }
 
 void slWorldSetQuickstepIterations(slWorld *w, int n) {
-#ifndef WINDOWS
 	dWorldSetQuickStepNumIterations(w->odeWorldID, n);
-#endif
 }
