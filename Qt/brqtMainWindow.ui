@@ -8,107 +8,302 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>722</width>
-            <height>617</height>
+            <width>744</width>
+            <height>589</height>
         </rect>
     </property>
     <property name="caption">
         <string>breve</string>
     </property>
-    <grid>
+    <widget class="breveGLWidget">
         <property name="name">
-            <cstring>unnamed</cstring>
+            <cstring>breveGLWidget1</cstring>
         </property>
-        <spacer row="1" column="0" rowspan="1" colspan="2">
+        <property name="geometry">
+            <rect>
+                <x>11</x>
+                <y>11</y>
+                <width>713</width>
+                <height>476</height>
+            </rect>
+        </property>
+        <property name="sizePolicy">
+            <sizepolicy>
+                <hsizetype>7</hsizetype>
+                <vsizetype>7</vsizetype>
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+            </sizepolicy>
+        </property>
+        <property name="font">
+            <font>
+                <pointsize>9</pointsize>
+            </font>
+        </property>
+    </widget>
+    <widget class="QButtonGroup">
+        <property name="name">
+            <cstring>buttonGroup1</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>11</x>
+                <y>493</y>
+                <width>210</width>
+                <height>34</height>
+            </rect>
+        </property>
+        <property name="sizePolicy">
+            <sizepolicy>
+                <hsizetype>0</hsizetype>
+                <vsizetype>0</vsizetype>
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+            </sizepolicy>
+        </property>
+        <property name="maximumSize">
+            <size>
+                <width>210</width>
+                <height>34</height>
+            </size>
+        </property>
+        <property name="font">
+            <font>
+                <pointsize>11</pointsize>
+            </font>
+        </property>
+        <property name="frameShape">
+            <enum>GroupBoxPanel</enum>
+        </property>
+        <property name="frameShadow">
+            <enum>Sunken</enum>
+        </property>
+        <property name="title">
+            <string>Cursor Mode</string>
+        </property>
+        <property name="exclusive">
+            <bool>true</bool>
+        </property>
+        <property name="radioButtonExclusive">
+            <bool>true</bool>
+        </property>
+        <widget class="QToolButton">
             <property name="name">
-                <cstring>spacer8</cstring>
+                <cstring>toolButton3_2_3</cstring>
             </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
+            <property name="geometry">
+                <rect>
+                    <x>156</x>
+                    <y>15</y>
+                    <width>50</width>
+                    <height>14</height>
+                </rect>
             </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>280</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
-        <widget class="QPushButton" row="1" column="2">
-            <property name="name">
-                <cstring>pushButton1</cstring>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>1</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
             </property>
             <property name="text">
-                <string>&amp;Run</string>
+                <string>Select</string>
+            </property>
+            <property name="toggleButton">
+                <bool>true</bool>
             </property>
         </widget>
-        <widget class="QPushButton" row="1" column="3">
+        <widget class="QToolButton">
             <property name="name">
-                <cstring>pushButton2</cstring>
+                <cstring>toolButton3</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>4</x>
+                    <y>15</y>
+                    <width>50</width>
+                    <height>14</height>
+                </rect>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>1</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
             </property>
             <property name="text">
-                <string>Stop</string>
+                <string>Rotate</string>
+            </property>
+            <property name="toggleButton">
+                <bool>true</bool>
+            </property>
+            <property name="on">
+                <bool>true</bool>
             </property>
         </widget>
-        <spacer row="1" column="4" rowspan="1" colspan="2">
+        <widget class="QToolButton">
             <property name="name">
-                <cstring>spacer9</cstring>
+                <cstring>toolButton3_2</cstring>
             </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
+            <property name="geometry">
+                <rect>
+                    <x>55</x>
+                    <y>15</y>
+                    <width>50</width>
+                    <height>14</height>
+                </rect>
             </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>1</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
             </property>
-            <property name="sizeHint">
-                <size>
-                    <width>280</width>
-                    <height>20</height>
-                </size>
+            <property name="text">
+                <string>Zoom</string>
             </property>
-        </spacer>
-        <spacer row="0" column="0">
-            <property name="name">
-                <cstring>spacer6</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Fixed</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>20</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
-        <widget class="breveGLWidget" row="0" column="1" rowspan="1" colspan="4">
-            <property name="name">
-                <cstring>breveGLWidget1</cstring>
+            <property name="toggleButton">
+                <bool>true</bool>
             </property>
         </widget>
-        <spacer row="0" column="5">
+        <widget class="QToolButton">
             <property name="name">
-                <cstring>spacer7</cstring>
+                <cstring>toolButton3_2_2</cstring>
             </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
+            <property name="geometry">
+                <rect>
+                    <x>106</x>
+                    <y>15</y>
+                    <width>49</width>
+                    <height>14</height>
+                </rect>
             </property>
-            <property name="sizeType">
-                <enum>Fixed</enum>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>1</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
             </property>
-            <property name="sizeHint">
-                <size>
-                    <width>20</width>
-                    <height>20</height>
-                </size>
+            <property name="text">
+                <string>Move</string>
             </property>
-        </spacer>
-    </grid>
+            <property name="toggleButton">
+                <bool>true</bool>
+            </property>
+        </widget>
+    </widget>
+    <spacer>
+        <property name="name">
+            <cstring>spacer10</cstring>
+        </property>
+        <property name="orientation">
+            <enum>Horizontal</enum>
+        </property>
+        <property name="sizeType">
+            <enum>Expanding</enum>
+        </property>
+        <property name="sizeHint">
+            <size>
+                <width>100</width>
+                <height>20</height>
+            </size>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>227</x>
+                <y>500</y>
+                <width>100</width>
+                <height>20</height>
+            </rect>
+        </property>
+    </spacer>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>pushButton1</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>330</x>
+                <y>500</y>
+                <width>64</width>
+                <height>32</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>&amp;Run</string>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>pushButton2</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>390</x>
+                <y>500</y>
+                <width>68</width>
+                <height>32</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Stop</string>
+        </property>
+    </widget>
+    <spacer>
+        <property name="name">
+            <cstring>spacer9</cstring>
+        </property>
+        <property name="orientation">
+            <enum>Horizontal</enum>
+        </property>
+        <property name="sizeType">
+            <enum>Expanding</enum>
+        </property>
+        <property name="sizeHint">
+            <size>
+                <width>100</width>
+                <height>20</height>
+            </size>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>460</x>
+                <y>500</y>
+                <width>100</width>
+                <height>20</height>
+            </rect>
+        </property>
+    </spacer>
+    <widget class="QComboBox">
+        <item>
+            <property name="text">
+                <string>Choose Simulation...</string>
+            </property>
+        </item>
+        <property name="name">
+            <cstring>comboBox2</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>574</x>
+                <y>500</y>
+                <width>150</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="font">
+            <font>
+                <pointsize>10</pointsize>
+            </font>
+        </property>
+    </widget>
 </widget>
 <menubar>
     <property name="name">
@@ -522,6 +717,10 @@
         <slot>toggleSimulation()</slot>
     </connection>
 </connections>
+<tabstops>
+    <tabstop>pushButton1</tabstop>
+    <tabstop>pushButton2</tabstop>
+</tabstops>
 <includes>
     <include location="local" impldecl="in implementation">brqtMainwindow.ui.h</include>
 </includes>

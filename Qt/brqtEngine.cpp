@@ -3,7 +3,7 @@
 void *brqtEngineLoop(void *e) {
     brqtEngine *engine = e;
 
-    while(1) {
+    while(! engine->_stop) {
 	brEngineIterate( engine->_engine);
 	engine->_glwidget->repaint();
     }

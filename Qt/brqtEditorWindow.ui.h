@@ -18,9 +18,6 @@ const char * brqtEditorWindow::getString()
     return strdup(textEdit1->text().ascii());
 }
 
-
-
-
 void brqtEditorWindow::loadFile( QString &file )
 {
     QString contents;

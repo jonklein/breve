@@ -62,6 +62,9 @@ int demoMenuForDirectory(QWidget *receiver, QPopupMenu *menu, QString &directory
 
 void brqtMainWindow::init() {
 	QString directory = "/Users/jk/dev/breve/demos";
+	QPoint p;
+	
+	MenuBar->reparent(0, 0, p, true);
 
 	demoMenuForDirectory(this, Demos, directory, 0);
 }
@@ -181,7 +184,7 @@ void brqtMainWindow::loadDemo(int n)
     brqtEditorWindow *w = new brqtEditorWindow( 0);
 	
     w->loadFile(demoMap[n]);
-    w->show();
+    w->show();		
     
     gW = w;
 }

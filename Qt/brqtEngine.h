@@ -15,6 +15,7 @@ public:
     
     ~brqtEngine() {
 	_stop = 1;
+	pthread_join( _thread, NULL);
     }
     
     brEngine *_engine;
