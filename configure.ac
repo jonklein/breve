@@ -61,6 +61,8 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_YACC
 
+AC_ARG_WITH([wx], AC_HELP_STRING([--with-wx=path], [use <path> for wxWindows headers and libraries]), WXCONFIG=[$withval/bin/wx-config], WXCONFIG=[wx-config])
+
 AC_PATH_PROG(MKDEP, mkdep)
 AC_PATH_PROG(MAKEDEPEND, makedepend)
 
@@ -150,6 +152,7 @@ AC_SUBST(RANLIB)
 AC_SUBST(REGEXLIB)
 AC_SUBST(VERSION)
 AC_SUBST(EXTRAOPTFLAGS)
+AC_SUBST(WXCONFIG)
 
 AC_HEADER_TIME
 AC_CHECK_HEADERS([sys/time.h wctype.h])

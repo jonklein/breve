@@ -16,6 +16,8 @@
 // For compilers that support precompilation, includes "wx/wx.h".
 #include "wx/wxprec.h"
 
+#include "util.h"
+
 #ifdef __BORLANDC__
 #pragma hdrstop
 #endif
@@ -239,8 +241,7 @@ bool BCTestApp::OnInit()
 		if (str.Last() != FILE_SEP_PATH)
 		    str << FILE_SEP_PATH;
 
-		if (wxDirExists(str + "demos") && wxDirExists(str + "plugins"))
-		{
+		if ( wxDirExists(str + "demos") ) {
 		    BreveDir = str;
 		    config->Write("BreveAppPath", BreveDir);
 		    break;

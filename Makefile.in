@@ -22,6 +22,7 @@ LPLATFORM	= $(shell echo $(PLATFORM)|tr '[A-Z]' '[a-z]'|tr -d '[0-9].-')
 
 DMG_FILE	= breve_@VERSION@.dmg
 CLI_FOLDER	= breve_@VERSION@
+IDE_FOLDER	= breveIDE_@VERSION@
 
 exec_prefix	= @exec_prefix@
 prefix		= @prefix@
@@ -136,6 +137,7 @@ CLI_release: clean
 	mkdir $(CLI_FOLDER)/lib
 	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin
 	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin
+	cp bin/glut32.dll $(IDE_FOLDER)
 	cp -R lib $(CLI_FOLDER)
 	cp -R demos $(CLI_FOLDER)
 	rm -rf $(CLI_FOLDER)/demos/Music
@@ -150,9 +152,24 @@ CLI_release: clean
 	@ARCHIVER@ breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@ $(CLI_FOLDER)
 
 WX_release: clean
-	$(MAKE) documentation
-	$(MAKE) optimize
+	# $(MAKE) optimize
 	cd wx; make
+	mkdir $(IDE_FOLDER)
+	mkdir $(IDE_FOLDER)/lib
+	cp wx/breveIDE@EXE_SUFFIX@ $(IDE_FOLDER)
+	cp bin/glut32.dll $(IDE_FOLDER)
+	cp -R lib/classes $(IDE_FOLDER)/lib
+	cp -R demos $(IDE_FOLDER)
+	rm -rf $(IDE_FOLDER)/demos/Music
+	mkdir $(IDE_FOLDER)/plugins
+	cp -R plugins/samples $(IDE_FOLDER)/plugins
+	rm -f plugins/samples/Makefile.in
+	cp plugins/slBrevePluginAPI.h plugins/README.txt $(IDE_FOLDER)/plugins
+	cp Changes.html GPL.txt README.txt $(IDE_FOLDER)
+	find $(IDE_FOLDER) -name CVS -prune -exec rm -rf {} \;
+	find $(IDE_FOLDER) -name '.cvsignore' -prune -exec rm -rf {} \;
+	rm -f breveIDE_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@
+	@ARCHIVER@ breveIDE_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@ $(IDE_FOLDER)
 
 install: optimize
 	mkdir -p @bindir@
