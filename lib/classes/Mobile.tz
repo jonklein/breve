@@ -146,7 +146,7 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 
 		length = |thisAxis|.
 
-		linkRotateRelative(realWorldPointer, thisAxis, amount).
+		linkRotateRelative(linkPointer, thisAxis, amount).
 
 	+ to point vertex theVertex (vector) at theLocation (vector):
 		% An easier way to rotate an object--this function rotates 

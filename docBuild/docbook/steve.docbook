@@ -1383,7 +1383,7 @@ In the event that multiple breve simulations are launched simultaneously (typica
 cluster environments), it may be necessary to pick unique random seeds for each simulation to prevent
 each of the simulations from giving the same results.  Refer to the 
 <ulink url="../classes/Control.html">Controller</ulink> method 
-<ulink url="../classes/Controller.html#set-random-seed-from-dev-random">set-random-seed-from-dev-random</ulink>
+<ulink url="../classes/Control.html#set-random-seed-from-dev-random">set-random-seed-from-dev-random</ulink>
 for more information on automatically picking unique random seeds on systems which support it.
 </para>
 </sect2>

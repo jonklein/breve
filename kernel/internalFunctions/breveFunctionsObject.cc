@@ -30,7 +30,7 @@
 */
 
 int brIObjectName(brEval args[], brEval *target, brInstance *i) {
-    BRSTRING(target) = BRINSTANCE(&args[0])->class->name;
+    BRSTRING(target) = slStrdup(BRINSTANCE(&args[0])->class->name);
 
     return EC_OK;
 }
