@@ -96,8 +96,8 @@ CLI_release:
 	mkdir breve_$(LPLATFORM)/bin
 	mkdir breve_$(LPLATFORM)/lib
 	make -f Makefile optimize
-	cp bin/breve@PROGRAM_SUFFIX@ breve_$(LPLATFORM)/bin/breve
-	cp bin/breve_cli@PROGRAM_SUFFIX@ breve_$(LPLATFORM)/bin/breve_cli
+	cp bin/breve@EXE_SUFFIX@ breve_$(LPLATFORM)/bin/breve
+	cp bin/breve_cli@EXE_SUFFIX@ breve_$(LPLATFORM)/bin/breve_cli
 	cp -r lib/classes breve_$(LPLATFORM)/lib/
 	cp -r docs breve_$(LPLATFORM)/
 	cp -r demos breve_$(LPLATFORM)/

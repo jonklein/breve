@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os AUDIOLIBS CC CXX RANLIB GLLIBS JAVALIBS JAVAINCS PLUGINFLAGS QUICKTIMEFLAGS EXTRALDFLAGS LDFLAGS CPPFLAGS ARCHIVER ARCHIVE_SUFFIX PLATFORM YACC CXXFLAGS ac_ct_CXX EXEEXT OBJEXT CFLAGS ac_ct_CC LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE ac_ct_RANLIB ALLOCA CPP EGREP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os AUDIOLIBS CC CXX RANLIB GLLIBS JAVALIBS JAVAINCS PLUGINFLAGS QUICKTIMEFLAGS EXTRALDFLAGS LDFLAGS CPPFLAGS ARCHIVER ARCHIVE_SUFFIX EXE_SUFFIX PLATFORM YACC CXXFLAGS ac_ct_CXX EXEEXT OBJEXT CFLAGS ac_ct_CC LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE ac_ct_RANLIB ALLOCA CPP EGREP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1378,6 +1378,7 @@ _ACEOF
 
 		ARCHIVER="tar -zcvf"
 		ARCHIVE_SUFFIX="tar.gz"
+		PLATFORM="macosx"
 
 		;;
 
@@ -1393,6 +1394,7 @@ _ACEOF
 		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E"
 		ARCHIVER="tar -zcvf"
 		ARCHIVE_SUFFIX="tar.gz"
+		PLATFORM="linux"
 
 		;;
 
@@ -1415,6 +1417,8 @@ _ACEOF
 		PTHREADLIBS="-lwsock32"
 		ARCHIVER="zip -r"
 		ARCHIVE_SUFFIX="zip"
+		EXE_SUFFIX=".exe"
+		PLATFORM="windows"
 
 		;;
 
@@ -1434,6 +1438,8 @@ _ACEOF
 		AUDIOLIBS="-lwinmm"
 		ARCHIVER="zip -r"
 		ARCHIVE_SUFFIX="zip"
+		EXE_SUFFIX=".exe"
+		PLATFORM="cygwin"
 
 		;;
 
@@ -1442,7 +1448,6 @@ _ACEOF
 		;;
 esac
 
-PLATFORM=$host_os
 
 
 
@@ -6673,6 +6678,7 @@ s,@LDFLAGS@,$LDFLAGS,;t t
 s,@CPPFLAGS@,$CPPFLAGS,;t t
 s,@ARCHIVER@,$ARCHIVER,;t t
 s,@ARCHIVE_SUFFIX@,$ARCHIVE_SUFFIX,;t t
+s,@EXE_SUFFIX@,$EXE_SUFFIX,;t t
 s,@PLATFORM@,$PLATFORM,;t t
 s,@YACC@,$YACC,;t t
 s,@CXXFLAGS@,$CXXFLAGS,;t t

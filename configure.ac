@@ -20,6 +20,7 @@ case "${host_os}" in
 		AC_DEFINE([MACOSX], [], [Mac OS X])
 		ARCHIVER="tar -zcvf"
 		ARCHIVE_SUFFIX="tar.gz"
+		PLATFORM="macosx"
 
 		;;
 
@@ -32,6 +33,7 @@ case "${host_os}" in
 		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E"
 		ARCHIVER="tar -zcvf"
 		ARCHIVE_SUFFIX="tar.gz"
+		PLATFORM="linux"
 
 		;;
 
@@ -47,6 +49,8 @@ case "${host_os}" in
 		PTHREADLIBS="-lwsock32"
 		ARCHIVER="zip -r"
 		ARCHIVE_SUFFIX="zip"
+		EXE_SUFFIX=".exe"
+		PLATFORM="windows"
 
 		;;
 
@@ -59,6 +63,8 @@ case "${host_os}" in
 		AUDIOLIBS="-lwinmm"
 		ARCHIVER="zip -r"
 		ARCHIVE_SUFFIX="zip"
+		EXE_SUFFIX=".exe"
+		PLATFORM="cygwin"
 
 		;;
 
@@ -67,8 +73,6 @@ case "${host_os}" in
 
 		;;
 esac
-
-PLATFORM=$host_os
 
 AC_SUBST(AUDIOLIBS)
 AC_SUBST(CC)
@@ -85,6 +89,7 @@ AC_SUBST(CPPFLAGS)
 
 AC_SUBST(ARCHIVER)
 AC_SUBST(ARCHIVE_SUFFIX)
+AC_SUBST(EXE_SUFFIX)
 AC_SUBST(PLATFORM)
 
 # Checks for programs.
