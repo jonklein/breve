@@ -105,6 +105,10 @@ bool BCTestApp::OnInit()
 	wxString str, sep;
 	bool hasenv = FALSE;
 
+#ifdef __WXCOCOA__
+	wxSetEnv("BREVE_CLASS_PATH", AppDir << FILE_SEP_PATH << ".." << FILE_SEP_PATH << "Resources");
+#endif
+
 	if (wxGetEnv("BREVE_CLASS_PATH", &str))
 	{
 	    wxString tmp, xstr;
@@ -228,7 +232,7 @@ bool BCTestApp::OnInit()
     if (!BreveDir.IsEmpty() && BreveDir.Last() != FILE_SEP_PATH)
 	BreveDir << FILE_SEP_PATH;
 
-    renderwindow = new BreveRender(NULL, -1, "Breve Render Window");
+    renderwindow = new BreveRender(NULL, -1, "breve");
 
     breverender = renderwindow;
 

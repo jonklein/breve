@@ -1,13 +1,13 @@
 WXVERSION:=$(shell echo `wx-config --version`)
 CXX=@CXX@
 RESCOMP=windres.exe
-RCFILE=wxbreve
+RCFILE=breveIDE
 RESOURCEOBJECT=
 MACRESOURCECMD=
 MACPACKAGEINFO=
-OUTPUTPATH=wxbreve
-OBJECTPATH=wxbreve
-PROGRAM=wxbreve
+OUTPUTPATH=.
+OBJECTPATH=objects
+PROGRAM=breveIDE
 LIBS=`wx-config --inplace --libs stc,gl,core` -L../lib -lbreve @LIBS@
 LINKERFLAGS=
 WARNINGFLAGS=
@@ -24,6 +24,23 @@ all:	$(OBJECTPATH) $(MACPACKAGEINFO)
 
 $(OBJECTPATH):
 	mkdir -p $(OBJECTPATH)
+
+#
+# MacOS X application bundle. 
+#
+
+breveIDE.app: $(OUTPUTPATH)/$(PROGRAM) Info.plist InfoPlist.strings 
+	-mkdir breveIDE.app    
+	-mkdir breveIDE.app/Contents
+	-mkdir breveIDE.app/Contents/MacOS
+	-mkdir breveIDE.app/Contents/Resources
+	-mkdir breveIDE.app/Contents/Resources/English.lproj
+	cp Info.plist breveIDE.app/Contents/
+	cp InfoPlist.strings breveIDE.app/Contents/Resources/English.lproj/
+	cp -r ../demos breveIDE.app/Contents/Resources
+	cp -r ../lib/classes breveIDE.app/Contents/Resources
+	echo -n 'APPL????' > breveIDE.app/Contents/PkgInfo
+	cp $(OUTPUTPATH)/$(PROGRAM) breveIDE.app/Contents/MacOS/breveIDE
 
 clean:
 	rm -f $(OBJECTPATH)/*.o

@@ -149,6 +149,11 @@ CLI_release: clean
 	rm -f breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@
 	@ARCHIVER@ breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@ $(CLI_FOLDER)
 
+WX_release: clean
+    $(MAKE) documentation
+    $(MAKE) optimize
+    cd wx; make
+
 install: optimize
 	mkdir -p @bindir@
 	cp bin/breve @bindir@
