@@ -179,7 +179,7 @@ int main(int argc, char **argv) {
 	for(n=0;n<256;n++) keyDown[n] = 0;
 
 	pthread_mutex_lock(&gThreadMutex);
-	pthread_create(&thread, NULL, workerThread, NULL);
+	// pthread_create(&thread, NULL, workerThread, NULL);
 
 	if(gMaster) slWorldStartNetsimServer(frontend->engine->world);
 
@@ -436,28 +436,24 @@ int gMotionCrosshair = 0;
 int gFrameNo, gClipNo, gRecording;
 
 void slInitGlut(int argc, char **argv, char *title) {
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH|GLUT_STENCIL|GLUT_ALPHA);
 	glutInitWindowSize(width, height);
-	if(xpos || ypos) glutInitWindowPosition(xpos, ypos);
-
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH|GLUT_STENCIL);
 	glutCreateWindow(title);
 
+	if(xpos || ypos) glutInitWindowPosition(xpos, ypos);
+
 	gMainWindow = glutGetWindow();
-
-	glEnable(GL_NORMALIZE);
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	glutMouseFunc(slDemoMouse);
 	glutMotionFunc(slDemoMotion);
 	glutPassiveMotionFunc(slDemoPassiveMotion);
 	glutDisplayFunc(slDemoDisplay);
-	glutKeyboardFunc(slDemoKeyboard);
 	glutSpecialFunc(slDemoSpecial);
 	glutSpecialUpFunc(slDemoSpecialUp);
-	glutKeyboardUpFunc(slDemoKeyboardUp);
 	glutReshapeFunc(slDemoReshape);
+	glutKeyboardUpFunc(slDemoKeyboardUp);
+	glutKeyboardFunc(slDemoKeyboard);
 
 	mainMenu = glutCreateMenu(brMainMenu);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -585,11 +581,8 @@ void slDemoKeyboard(unsigned char key, int x, int y) {
 		case ' ':
 			gPaused = !gPaused;
 
-			if(gPaused) {
-				brPauseTimer(frontend->engine);
-			} else {
-				brUnpauseTimer(frontend->engine);
-			}
+			if(gPaused) brPauseTimer(frontend->engine);
+			else brUnpauseTimer(frontend->engine);
 
 			break;
 		case 0x1b:
@@ -663,10 +656,7 @@ int brCLIDialogCallback(void *data, char *title, char *message, char *b1, char *
 		result = getc(stdin);
 		getc(stdin);
 
-		if(result == EOF) {
-			printf("EOF found, assuming answer is N\n");
-			return 0; 
-		}
+		if(result == EOF) return 0; 
 
 		if(result == 'n' || result == 'N') return 0;
 

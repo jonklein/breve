@@ -34,7 +34,7 @@ Abstract : Joint (aka Joints) [version 2.0] {
 		normalVector. # ditch the unused variable warning.
 		relativeRotation = [ (1, 0, 0), (0, 1, 0), (0, 0, 1) ].
 
-  + setting "Setting parameters for joint springs and damping (friction)"
+  + section "Setting parameters for joint springs and damping (friction)"
 
 	+ to set-double-spring with-strength theStrength (float) with-max theMax (float) with-min theMin (float):
 		% Enable this joint's spring to take effect when the rotation is above
