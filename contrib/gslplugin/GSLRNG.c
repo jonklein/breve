@@ -1,4 +1,4 @@
-#include "slBrevePluginAPI.h"
+#include "../../plugins/slBrevePluginAPI.h"
 #include <math.h>
 #include <stdio.h>
 #include <gsl/gsl_rng.h>
