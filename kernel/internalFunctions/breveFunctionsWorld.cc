@@ -89,13 +89,13 @@ int brIRandomSeedFromDevRandom(brEval args[], brEval *target, brInstance *i) {
 
 	f = fopen("/dev/random", "r");
 
-	if (!fread(&seed, sizeof seed, 1, f) || !seed) {
-		fclose(f);
-		f = fopen("/dev/urandom", "r");
-		fread(&seed, sizeof seed, 1, f);
+	if (!f || !fread(&seed, sizeof seed, 1, f) || !seed) {
+		if (f) fclose(f);
+		if ((f = fopen("/dev/urandom", "r")))
+		    fread(&seed, sizeof seed, 1, f);
 	}
 
-	fclose(f);
+	if (f) fclose(f);
 
 	if (seed) {
 		BRINT(target) = 0;
