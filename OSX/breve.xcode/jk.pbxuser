@@ -718,10 +718,6 @@
 			};
 			PBXWorkspaceStateSaveDate = 118781552;
 		};
-		perUserProjectItems = {
-			480F320F0714759100E71420 = 480F320F0714759100E71420;
-			48619FC10714761600E0A1B6 = 48619FC10714761600E0A1B6;
-		};
 		sourceControlManager = 48E065B3055C318700C40B45;
 		userBuildSettings = {
 		};
@@ -789,26 +785,6 @@
 		isa = PBXFileBreakpoint;
 		lineNumber = 457;
 		state = 1;
-	};
-	480F320F0714759100E71420 = {
-		fRef = F5BD20C70397BFC001980AE4;
-		isa = PBXTextBookmark;
-		name = "\t\tbitsPerPixel: 0];\n";
-		rLen = 20;
-		rLoc = 11542;
-		rType = 0;
-		vrLen = 51;
-		vrLoc = 11215;
-	};
-	48619FC10714761600E0A1B6 = {
-		fRef = F5BD20C70397BFC001980AE4;
-		isa = PBXTextBookmark;
-		name = "\t\tbitsPerPixel: 0];\n";
-		rLen = 20;
-		rLoc = 11542;
-		rType = 0;
-		vrLen = 76;
-		vrLoc = 11190;
 	};
 	48BB5D1405C9659B007C7301 = {
 		fileReference = 2A37F4ACFDCFA73011CA2CEA;
