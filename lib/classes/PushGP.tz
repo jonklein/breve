@@ -219,6 +219,25 @@ Object : PushGP {
 
 		return p.
 
+	+ to compute-diversity for-tolerance t (int):
+		% Computes the diversity of the current population, as defined by 
+		% the OBJECT(PushDiversityPool) object.  Returns the number of 
+		% unique "species" which differ by less than t points.
+
+		pool (object).
+		n (int).
+
+		pool = new PushDiversityPool.
+		pool set-tolerance to t.
+
+		for n=0, n<|current|, n++: pool add program current{n}.
+
+		n = (pool get-size).
+
+		free pool.
+
+		return n.
+
 	+ to iterate:
 		n (int).
 		percent (int).
@@ -411,8 +430,8 @@ Object : PushGP {
 
 		controller set-display-message with-number 2 at-x -0.9 at-y -0.9 to "Best Fitness: $bestFitness".
 
-	- to reproduce:
-		% Used internally.
+	+ to reproduce:
+		% Used internally to produce a new generation of individuals.
 
 		n (int).
 		p1, p2 (object).

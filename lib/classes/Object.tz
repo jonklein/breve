@@ -1,4 +1,6 @@
 NULL : Object (aka Objects) [version 2.0] {
+	% Summary: the top level object class.
+	% <P>
     % The Object class is the root class.  All classes used in breve have
     % Object as an ancestor.  The object class implements some basic 
     % services that all classes will have access to.

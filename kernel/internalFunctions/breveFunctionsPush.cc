@@ -696,6 +696,44 @@ int breveFunctionPushCodeTopLevelDiff(brEval arguments[], brEval *result, brInst
 	return EC_OK;
 }
 
+int breveFunctionPushDiversityPoolNew(brEval args[], brEval *result, brInstance *instance) {
+	BRPOINTER(result) = new push::DiversityPool(BRINT(&args[0]));
+	return EC_OK;
+}
+
+int breveFunctionPushDiversityPoolFree(brEval args[], brEval *result, brInstance *instance) {
+	push::DiversityPool *pool = (push::DiversityPool*)BRPOINTER(&args[0]);
+	delete pool;
+	return EC_OK;
+}
+
+int breveFunctionPushDiversityPoolAdd(brEval args[], brEval *result, brInstance *instance) {
+	push::DiversityPool *pool = (push::DiversityPool*)BRPOINTER(&args[0]);
+	push::Code *code = (push::Code*)BRPOINTER(&args[1]);
+	pool->addIndividual(*code);
+	return EC_OK;
+}
+
+int breveFunctionPushDiversityPoolClear(brEval args[], brEval *result, brInstance *instance) {
+	push::DiversityPool *pool = (push::DiversityPool*)BRPOINTER(&args[0]);
+	pool->clear();
+	return EC_OK;
+}
+
+int breveFunctionPushDiversityPoolGetCount(brEval args[], brEval *result, brInstance *instance) {
+	push::DiversityPool *pool = (push::DiversityPool*)BRPOINTER(&args[0]);
+	BRINT(result) = pool->getSize();
+
+	return EC_OK;
+}
+
+int breveFunctionPushDiversityPoolSetTolerance(brEval args[], brEval *result, brInstance *instance) {
+	push::DiversityPool *pool = (push::DiversityPool*)BRPOINTER(&args[0]);
+	pool->setTolerance(BRINT(&args[1]));
+
+	return EC_OK;
+}
+
 #endif /* HAVE_LIBPUSH */
 /*@}*/
 
@@ -748,5 +786,12 @@ void breveInitPushFunctions(brNamespace *n) {
  	brNewBreveCall(n, "pushCodeSubtreeMutate", breveFunctionPushCodeSubtreeMutate, AT_POINTER, AT_POINTER, AT_POINTER, AT_INT, 0);
  	brNewBreveCall(n, "pushCodeCrossover", breveFunctionPushCodeCrossover, AT_POINTER, AT_POINTER, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeRandom", breveFunctionPushCodeRandom, AT_POINTER, AT_POINTER, AT_INT, 0);
+
+ 	brNewBreveCall(n, "pushDiversityPoolNew", breveFunctionPushDiversityPoolNew, AT_POINTER, AT_INT, 0);
+ 	brNewBreveCall(n, "pushDiversityPoolFree", breveFunctionPushDiversityPoolFree, AT_NULL, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushDiversityPoolClear", breveFunctionPushDiversityPoolClear, AT_NULL, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushDiversityPoolGetCount", breveFunctionPushDiversityPoolGetCount, AT_INT, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushDiversityPoolSetTolerance", breveFunctionPushDiversityPoolSetTolerance, AT_NULL, AT_POINTER, AT_INT, 0);
+ 	brNewBreveCall(n, "pushDiversityPoolAdd", breveFunctionPushDiversityPoolAdd, AT_NULL, AT_POINTER, AT_POINTER, 0);
 #endif /* HAVE_LIBPUSH */
 }

@@ -1,6 +1,8 @@
 @use Abstract.
 
 Abstract : Camera (aka Cameras) [version 2.0] {
+	% Summary: creates a new rendering perspective in the simulated world.
+	% <P>
 	% The Camera class is used to set up a viewing perspective in a simulation.
 	% Creating a new camera object places a viewing area with the new camera 
 	% perspective in the main viewing window.

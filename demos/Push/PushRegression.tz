@@ -1,3 +1,15 @@
+# 
+# PushRegression.tz
+# A simple example of using the Push programming language and associated
+# genetic programming environment PushGP to solve a simple symbolic 
+# regression problem.  
+# 
+# In symbolic regression problems, a system is provided with a dataset and 
+# is challanged to find the function that created it.  The approach shown 
+# here uses genetic programming in which Push programs are evolved to find
+# a solution.  
+#
+
 @use PushGP.
 @use Control.
 
@@ -8,13 +20,22 @@ Control : RegressionController {
 		new RegressionGP.
 }
 
+# 
+# In order to run a PushGP experiment, we subclass the PushGP class.  
+# The parent class PushGP does most of the computation, but asks us to 
+# override certain methods so that we can provide information about 
+# fitness cases and fitness tests.
+# 
+
 PushGP : RegressionGP {
 	+ variables:
 		currentInput (float).
 
 	+ to init:
+		# Set some parameters for the Push interpreter.
+
 		self read-interpreter-config from-file "PushRegression.config".
-		self set-population-size to 5000.
+		self set-population-size to 2000.
 
 		# PushGP regression problems are helped by being able to retrieve 
 		# the input values with an instruction.  Adding this callback is 
@@ -25,13 +46,15 @@ PushGP : RegressionGP {
 			for-method "input-callback".
 
 	+ to count-fitness-cases:
-		# We'll do 10 fitness tests 
+		# This method is implemented as instructed by the PushGP class.
+		# Return the number of fitness cases to be tested.
 
 		return 10.
 
 	+ to setup-fitness-test for-fitness-case n (int) 
 				with-interpreter interpreter (object):
 
+		# This method is implemented as instructed by the PushGP class.
 		# Push a test case input value (n) onto the float stack.  
 
 		currentInput = n.
@@ -41,8 +64,10 @@ PushGP : RegressionGP {
 	+ to compute-error for-fitness-case n (int) 
 			with-interpreter interpreter (object):
 
+		# This method is implemented as instructed by the PushGP class.
 		# Compute the error between the program's output and our target 
-		# equation.  Return the absolute value of the difference.
+		# equation.  In this case, return the absolute value of the 
+		# difference.
 
 		desiredResult (float).
 

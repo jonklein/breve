@@ -5,6 +5,8 @@
 @use Image.
 
 Abstract : Control (aka Controls) [version 2.0] {
+	% Summary: a parent class for the "controller" object required for all simulations.
+	% <P>
 	% The Control object sets up and controls simulations.  Every simulation
 	% must have one Control subclass.  The user subclass of Control should 
 	% set up the simulation in the "init" method.
