@@ -37,7 +37,7 @@ information on programming and running simulations with breve is available
 in the documentation, which is found in the "docs" directory.
 
 These are the directions to get started quickly with the command-line 
-version of breve 2.0.
+version of breve 2.1.
 
 1) set the environment variable BREVE_CLASS_PATH to the full path of the
    included "lib/classes" directory.  For example, using the bash shell

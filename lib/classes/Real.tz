@@ -385,16 +385,16 @@ Object : Real (aka Reals) [version 2.1] {
 		if realWorldPointer: removeObject(realWorldPointer).
 		free menus.
 
-   + section "Useful funtions for sensors"
+  + section "Useful Funtions for Sensors"
 
-        + to raytrace from-location theLocation (vector) with-direction theDirection (vector):
-		% Computes the vector from the-location in the give direction
-		% that hits the shape of the Real.
+	+ to raytrace from-location theLocation (vector) with-direction theDirection (vector):
+		% Computes the vector from theLocation towards theDirection
+		% that hits the shape of this object.
 		% <p>
-		% If the real was not hit vector (0, 0, 0) will be returned.
+		% If the object was not hit vector (0, 0, 0) will be returned.
 		% <p>
-		% The location and direction vector must be given in respect
-		% to the world frame. 
-	        return raytrace(realWorldPointer, theLocation, theDirection).
+		% The location and direction vector must be given relative to the world's
+		% coordinate frame. 
 
+		return raytrace(realWorldPointer, theLocation, theDirection).
 }

@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*
-			the breve simulation environment plugin API version 2.0
+	the breve simulation environment plugin API version 2.1
 
 	Documentation on using the breve plugin API is included in
 	the documentation distributed with breve.

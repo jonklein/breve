@@ -127,7 +127,7 @@ argumentCount field.
 <listitem>
 <para>
 <function>instantiate</function>: create an instance of an object.
-	<screen>void *(*instantiate)(brObject *class, brEval **constructorArgs, int argCount);</screen>
+	<screen>void *(*instantiate)(brObject *object, brEval **constructorArgs, int argCount);</screen>
 </para>
 </listitem>
 
@@ -200,7 +200,7 @@ The structure is shown below.
 struct brObjectType {
     void *(*findMethod)(brObject *object, char *name, unsigned char *types, int nargs);
     void *(*findObject)(brObjectType *type, char *name);
-    void *(*instantiate)(brObject *class, brEval **constructorArgs, int argCount);
+    void *(*instantiate)(brObject *object, brEval **constructorArgs, int argCount);
 
     int (*callMethod)(brInstance *instance, brMethod *method, brEval **arguments, brEval *result);
 
