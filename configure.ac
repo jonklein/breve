@@ -7,6 +7,8 @@ AC_CONFIG_HEADER([include/breve/config.h])
 
 AC_CANONICAL_HOST
 
+AC_PATH_X
+
 case "${host_os}" in
 	darwin* )
 		dnl Mac OS X configuration
@@ -26,7 +28,7 @@ case "${host_os}" in
 
 	linux* )
 		dnl Linux configuration
-		GLLIBS="-Xlinker -Bdynamic -L/usr/X11R6/lib -lglut -lGL -lGLU -lXmu -lXt -lSM -lICE -lX11 -lXi -lXext"
+		GLLIBS="-Xlinker -Bdynamic -L$x_libraries -lglut -lGL -lGLU -lXmu -lXt -lSM -lICE -lX11 -lXi -lXext"
 		EXTRALDFLAGS="-Xlinker -Bstatic"
 		PLUGINFLAGS="-shared"
 		AC_DEFINE([LINUX], [], [Linux])

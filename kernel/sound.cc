@@ -180,8 +180,6 @@ int brPASoundCallback(void *ibuf, void *obuf, unsigned long fbp, PaTimestamp out
 		return 1;
 	}
 
-	// printf("%d\n", fbp);
-
 	for(n=0;n<fbp;n++) {
 		total = 0;
 
