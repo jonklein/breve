@@ -194,7 +194,7 @@ brNetworkServerData *brListenOnPort(int port, brEngine *engine) {
 	serverData = malloc(sizeof(brNetworkServerData));
 
 	saddr.sin_family = AF_INET;
-	saddr.sin_port = htonl(port);
+	saddr.sin_port = htons(port);
 	saddr.sin_addr.s_addr = INADDR_ANY;
 
 	if(bind(ssock, (struct sockaddr*)&saddr, sizeof(saddr)) < 0) {
@@ -202,7 +202,10 @@ brNetworkServerData *brListenOnPort(int port, brEngine *engine) {
 		return NULL;
 	}
 
-	listen(ssock, 5);
+	if(listen(ssock, 5) < 0) {
+		slMessage(DEBUG_ALL, "Network server unable to listen for connections on port %d\n", port);
+		return NULL;
+	}
 
 	serverData->index = NULL;
 	serverData->engine = engine;
