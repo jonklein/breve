@@ -33,24 +33,15 @@ void slInitBoundSort(slVclipData *d) {
 
 	d->candidates.clear();
 
-	for(x=1;x<d->count;x++) {
-		for(y=0;y<x;y++) {
-			// d->pairList[x][y].candidateNumber = -1;
-			// d->pairList[x][y].x = x;
-			// d->pairList[x][y].y = y;
-		}
-	}
-
 	for(x=0;x<3;x++) {
 		d->boundListPointers[x].clear();
-		for(y=0;y<listSize;y++) {
-			d->boundListPointers[x].push_back(&d->boundLists[x][y]);
-		}
+
+		for(y=0;y<listSize;y++) d->boundListPointers[x].push_back(&d->boundLists[x][y]);
 	}
 
-	slInitBoundSortList(d->boundListPointers[0], listSize, d, BT_XAXIS);
-	slInitBoundSortList(d->boundListPointers[1], listSize, d, BT_YAXIS);
-	slInitBoundSortList(d->boundListPointers[2], listSize, d, BT_ZAXIS);
+	slInitBoundSortList(d->boundListPointers[0], d, BT_XAXIS);
+	slInitBoundSortList(d->boundListPointers[1], d, BT_YAXIS);
+	slInitBoundSortList(d->boundListPointers[2], d, BT_ZAXIS);
 }
 
 /*!
@@ -64,18 +55,23 @@ void slInitBoundSort(slVclipData *d) {
 void slAddCollisionCandidate(slVclipData *vc, slPairFlags flags, int x, int y) {
 	slCollisionCandidate c;
 
-	if(flags & BT_UNKNOWN) slVclipDataInitPairFlags(vc->world, x, y);
+	if(flags & BT_UNKNOWN) {
+		slVclipDataInitPairFlags(vc->world, x, y);
+		flags = *slVclipPairFlags(vc, x, y);
+	}
 
 	if(!(flags & BT_CHECK)) return;
 
 	c.x = x; 
 	c.y = y;
 
-	if(vc->objects[x]->shape->_type == ST_NORMAL) c.f1 = vc->objects[x]->shape->features[0];
-	else c.f1 = NULL;
+	if(vc->objects.size() != 0) {
+		if(vc->objects[x]->shape->_type == ST_NORMAL) c.f1 = vc->objects[x]->shape->features[0];
+		else c.f1 = NULL;
 
-	if(vc->objects[y]->shape->_type == ST_NORMAL) c.f2 = vc->objects[y]->shape->features[0];
-	else c.f2 = NULL;
+		if(vc->objects[y]->shape->_type == ST_NORMAL) c.f2 = vc->objects[y]->shape->features[0];
+		else c.f2 = NULL;
+	}
 
 	if(x < y) {
 		int temp = x;
@@ -118,9 +114,11 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 
 	d->collisions.clear();
 
-	slIsort(d, d->boundListPointers[0], d->count * 2, BT_XAXIS);
-	slIsort(d, d->boundListPointers[1], d->count * 2, BT_YAXIS);
-	slIsort(d, d->boundListPointers[2], d->count * 2, BT_ZAXIS);
+	// return 0;
+
+	slIsort(d, d->boundListPointers[0], BT_XAXIS);
+	slIsort(d, d->boundListPointers[1], BT_YAXIS);
+	slIsort(d, d->boundListPointers[2], BT_ZAXIS);
 
 	if(pruneOnly) return 0;
 
@@ -186,57 +184,59 @@ slCollision *slNextCollision(slVclipData *v) {
 
 	This doesn't seem like such a big deal, but is a MAJOR slowdown in 
 	2-dimensional simulations--when the objects don't leave a certain
-	plane, we do *n^2 iterations*.
+	plane, we do *n^2 iterations*.  So, to break ties, we rely on the 
+	number field of the bound entry.
 
-	So, to break ties, we rely on the number field of the bound entry.
+	This function is a major bottleneck for large simulations, and has
+	been optimized accordingly.
 */
 
-void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, unsigned int size, char boundTypeFlag) {
-	unsigned int n, current;
-	slPairFlags *flags;
-	slBoundSort *tempList;
+void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, char boundTypeFlag) {
 	int x, y;
 
-	for(n=0;n<size;n++) {
-		current = n;
+	std::vector<slBoundSort*>::iterator currentI, leftI;
 
-		x = list[n]->number; 
+	if(list.size() == 0) return;
 
-		if(isnan(*list[n]->value)) list[n]->infnan = 1;
-		else list[n]->infnan = 0;
+	for(currentI = list.begin() + 1; currentI != list.end(); currentI++) {
+		const slBoundSort *currentSort = *currentI;
+		slBoundSort *leftSort; 
+
+		x = currentSort->number; 
+
+		// NaNs mess up the logic of the sort since they are not =, < or > than
+		// any other value, meaning they have no proper place in the list.  
+		// -INFINITY does have a proper (yet "meaningless") place in the list
+
+		if(isnan(*currentSort->value)) *currentSort->value = -INFINITY;
 
 		// Keep moving to the left; until:
 		// 1) there are no more entries to the left
 		// 2) this entry is greater than the entry to the left 
 		// 3) this entry is equal to the entry on the left AND has a larger number
+		
+		leftI = currentI;
+		leftSort = *(leftI - 1);
 
-		while(current > 0 &&
-			(((*(list[current]->value) < *(list[current-1]->value)) ||
-			(*(list[current]->value) == *(list[current-1]->value) && list[current]->number < list[current-1]->number) ||
-			list[current]->infnan))) {
+		while(leftI > list.begin() && ((*currentSort->value < *leftSort->value) ||
+			(*currentSort->value == *leftSort->value && currentSort->number < leftSort->number))) {
 
-			// NaN used to flip out an entire simulation because the bounding box 
-			// lists wouldn't get sorted properly and then collisions wouldn't get 
-			// detected, and so forth.  So now, we give NaNs a place in the list 
-			// so that the rest of the list can get sorted in peace
+			slPairFlags *flags;
 
-			y = list[current - 1]->number;
+			y = leftSort->number;
 
-			flags = slVclipPairFlags(d->pairList, x, y);
-			
+			flags = slVclipPairFlags(d, x, y);
+
 			if(x != y && (*flags & BT_CHECK)) {
-				if(list[current]->type == BT_MIN && list[current - 1]->type == BT_MAX) {
-
-					if((*flags & boundTypeFlag) && *(list[current]->value) != *(list[current-1]->value)) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already on]!\n");
+				if(currentSort->type == BT_MIN && leftSort->type == BT_MAX) {
+					if((*flags & boundTypeFlag) && *currentSort->value != *leftSort->value) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already on]!\n");
 
 					*flags |= boundTypeFlag;
 
 					if(slVclipFlagsShouldTest(*flags)) slAddCollisionCandidate(d, *flags, x, y);
 
-				} else if(list[current]->type == BT_MAX && list[current - 1]->type == BT_MIN && 
-						*(list[current]->value) != *(list[current - 1]->value)) {
-
-					if(!(*flags & boundTypeFlag) && *(list[current]->value) != *(list[current-1]->value)) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already off]!\n");
+				} else if(currentSort->type == BT_MAX && leftSort->type == BT_MIN && *currentSort->value != *leftSort->value) {
+					if(!(*flags & boundTypeFlag)) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already off]!\n");
 
 					if(slVclipFlagsShouldTest(*flags)) slRemoveCollisionCandidate(d, x, y);
 
@@ -244,13 +244,14 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, unsigned int size,
 				}
 			}
 
-			/* swap the two */
-			
-			tempList = list[current - 1];
-			list[current - 1] = list[current];
-			list[current] = tempList;
-			
-			current--;
+			*(leftI - 1) = (slBoundSort*)currentSort;
+			*leftI = leftSort;
+
+			leftI--;
+
+			if(leftI != list.begin()) {
+				leftSort = *(leftI - 1);
+			}
 		}
 	}
 }
@@ -277,37 +278,35 @@ bool slBoundSortCompare(const slBoundSort *a, const slBoundSort *b) {
 	= are thus not consistant.
 */
 
-void slInitBoundSortList(std::vector<slBoundSort*> &list, unsigned int size, slVclipData *v, char boundTypeFlag) {
+void slInitBoundSortList(std::vector<slBoundSort*> &list, slVclipData *v, char boundTypeFlag) {
 	unsigned int n, extend;
 	int x, y;
 	int otherSide;
 	slPairFlags *flags;
 
-	int finished;
-
 	std::sort(list.begin(), list.end(), slBoundSortCompare);
 
-	/* zero out this entry for all pairs */
+	// zero out this entry for all pairs 
 
-	for(n=0;n<size;n++) {
+	for(n=0;n<list.size();n++) {
+
 		if(list[n]->type == BT_MIN) {
 			extend = n+1;
 
-			finished = 0;
+			x = list[n]->number;
 
-			/* we move to the right until the end of the list or until */
-			/* the corresponding BT_MAX has been found AND the extend  */
-			/* value is equal to the BT_MAX value  */
+			// we move to the right until the end of the list, or until
+			// the corresponding BT_MAX has been found AND the extend 
+			// value is greater than the BT_MAX value 
 
 			otherSide = -1;
 		 
-			while(extend < size && (otherSide == -1 || *list[otherSide]->value == *list[extend]->value)) {
+			while(extend < list.size() && (otherSide == -1 || *list[otherSide]->value == *list[extend]->value)) {
 				if(list[extend]->number == list[n]->number) otherSide = extend;
 				else {
-					x = list[n]->number;
 					y = list[extend]->number;   
 			
-					flags = slVclipPairFlags(v->pairList, x, y);
+					flags = slVclipPairFlags(v, x, y);
 
 					if(list[extend]->type == BT_MIN) {
 						if(*flags & boundTypeFlag) {
@@ -347,6 +346,10 @@ slPlane *slPositionPlane(slPosition *p, slPlane *p1, slPlane *pt) {
 
 	return pt;
 }
+
+/*!
+	\brief Preforms a second-stage collision check on the specified object pair.
+*/
 
 int slVclipTestPair(slVclipData *vc, slCollisionCandidate *e, slCollision *ce) {
 	int result = 0, iterations = 0, limit;
@@ -431,14 +434,16 @@ int slVclipTestPair(slVclipData *vc, slCollisionCandidate *e, slCollision *ce) {
 	return CT_DISJOINT;
 }
 
-/*
-	= there appear to be some cases in which the regular feature testing
-	= fails and causes a loop.  this is obviously a bug, and should be 
-	= fixed.  however, since the simulation must go on, as they say in
-	= show business, we'll have a "brute force" method that checks
-	= every feature pair.
-	=
-	= this is only done if a feature loop is detected.
+/*! 
+	\brief A brute-force collision check.
+
+	There appear to be some cases in which the regular feature testing
+	Fails and causes a loop.  this is obviously a bug, and should be 
+	fixed.  however, since the simulation must go on, as they say in
+	show business, we'll have a brute force method that checks
+	every feature pair.
+	
+	This is only done if a feature loop is detected.
 */
 
 int slVclipTestPairAllFeatures(slVclipData *vc, slCollisionCandidate *e, slCollision *ce) {
@@ -773,7 +778,6 @@ int slPointPointClip(slFeature **nf1, slPosition *p1p, slShape *s1, slFeature **
 
 	if(ce) {
 		slVectorSub(&v1, &v2, &dist);
-		// ce->distance = slVectorLength(&dist);
 	}
 	
 	return CT_DISJOINT;
@@ -1556,8 +1560,10 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 		count1 = 2;
 		faces1 = ((slEdge*)f1)->faces;
 	} else {
-		count1 = ((slFace*)f1)->edgeCount + 1;
-		faces1 = ((slFace*)f1)->faces;
+		// count1 = ((slFace*)f1)->edgeCount + 1;
+		// faces1 = ((slFace*)f1)->faces;
+		count1 = 1;
+		faces1 = (slFace**)&f1;
 	}
 
 	if(f2->type == FT_POINT) {
@@ -1567,8 +1573,10 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 		count2 = 2;
 		faces2 = ((slEdge*)f2)->faces;
 	} else {
-		count2 = ((slFace*)f2)->edgeCount + 1;
-		faces2 = ((slFace*)f2)->faces;
+		// count2 = ((slFace*)f2)->edgeCount + 1;
+		// faces2 = ((slFace*)f2)->faces;
+		count2 = 1;
+		faces2 = (slFace**)&f2;
 	}
 
 	for(x=0;x<count1;x++) {
@@ -1640,12 +1648,10 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 		}
 	}
 
+	if((*f1p)->type == FT_FACE && (*f2p)->type == FT_FACE) return;
+
 	best1depth = -DBL_MAX;
 	best2depth = -DBL_MAX;
-
-	if((*f1p)->type == FT_FACE && (*f2p)->type == FT_FACE) {
-		return;
-	}
 
 	for(x=0;x<count1;x++) {
 		face1 = faces1[x];
@@ -1889,19 +1895,6 @@ double slPointLineDist(slVector *p1, slVector *p2, slVector *src, slVector *i) {
 	slVectorSub(i, src, &tempV1);
 
 	return slVectorLength(&tempV1);
-}
-
-/*!
-	\brief Calculate the distance between a plane and a point.
-
-	A positive value indicates that the point is on the "positive"
-	side of the plane, in the same direction as the plane's normal.
-*/
-
-double slPlaneDistance(slPlane *pl, slVector *p) {
-	return pl->normal.x * (p->x - pl->vertex.x) + 
-		   pl->normal.y * (p->y - pl->vertex.y) + 
-		   pl->normal.z * (p->z - pl->vertex.z); 
 }
 
 /*!

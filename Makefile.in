@@ -53,7 +53,7 @@ breve.dll: $(OBJ)
 	$(CXX) @PLUGINFLAGS@ -o $@ @PLUGINIMP@ $^ @LIBS@
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $< $(CPPFLAGS) 
+	$(CXX) $(CFLAGS) -c -o $@ $< $(CPPFLAGS) 
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(CPPFLAGS) 
@@ -67,7 +67,7 @@ breve.dll: $(OBJ)
 debug: all
 
 optimize:
-	$(MAKE) EXTRACFLAGS='-O3'
+	$(MAKE) EXTRACFLAGS='-O4 -mdynamic-no-pic -falign-loops=16'
 
 optimize_debug:
 	$(MAKE) EXTRACFLAGS='-g -O3'

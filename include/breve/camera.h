@@ -92,6 +92,8 @@ class slCamera {
 		int minMaxInFrustum(slVector *min, slVector *max);
 		int polygonInFrustum(slVector *test, int n);
 
+		std::vector< std::pair< slVector, slVector> > _points;
+
 		// unsigned char enabled;
 
 		slWorldObject *shadowCatcher;

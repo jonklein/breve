@@ -72,28 +72,6 @@ int brIRemoveObserver(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
-	\brief Adds a dependency to the calling object's dependency list.
-
-	void addDependency(object dependency).
-*/
-
-int brIAddDependency(brEval args[], brEval *target, brInstance *i) {
-    brInstanceAddDependency(i, BRINSTANCE(&args[0]));
-    return EC_OK;
-}
-
-/*!
-	\brief Removes a dependency from the calling object's dependency list.
-
-	void removeDependency(object dependency).
-*/
-
-int brIRemoveDependency(brEval args[], brEval *target, brInstance *i) {
-    brEngineRemoveInstanceDependency(i, BRINSTANCE(&args[0]));
-    return EC_OK;
-}
-
-/*!
 	\brief Add a collision handler for an object type.
 
 	Note that though this method takes a single instance as input, it will
@@ -206,9 +184,6 @@ void breveInitObjectFunctions(brNamespace *n) {
 
 	brNewBreveCall(n, "addCollisionHandler", brIAddCollisionHandler, AT_INT, AT_INSTANCE, AT_STRING, AT_STRING, 0);
 	brNewBreveCall(n, "setIgnoreCollisionsWith", brISetIgnoreCollisionsWith, AT_INT, AT_INSTANCE, AT_STRING, AT_INT, 0);
-
-	brNewBreveCall(n, "addDependency", brIAddDependency, AT_NULL, AT_INSTANCE, 0);
-	brNewBreveCall(n, "removeDependency", brIRemoveDependency, AT_NULL, AT_INSTANCE, 0);
 
 	brNewBreveCall(n, "getController", brIGetController, AT_INSTANCE, 0);
 }

@@ -44,16 +44,13 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 		return NULL;
 	}
 
-	bridge = slMalloc(sizeof(brJavaBridgeData));
-
-	bridge->objectHash = slNewHash(1027, slHashPointer, slCompPointer);
-	bridge->objectHash = slNewHash(1027, slHashString, slCompString);
+	bridge = new brJavaBridgeData;
 
 	classPath = getenv("BREVE_CLASS_PATH");
 
 	if(!classPath) classPath = "";
 
-	optstr = malloc(strlen(finder) + strlen(classPath) + strlen("-Djava.object.path=") + 1024);
+	optstr = new char[(strlen(finder) + strlen(classPath) + strlen("-Djava.object.path=") + 1024)];
 
 	sprintf(optstr, "-Djava.class.path=%s:%s:.", finder, classPath);
 
@@ -71,7 +68,7 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	// Create the Java VM 
 	res = JNI_CreateJavaVM(&bridge->jvm, (void**)&bridge->env, &vm_args);
 
-	free(optstr);
+	delete[] optstr;
 
 	if (res < 0) {
 		slMessage(DEBUG_ALL, "Can't create JavaVM\n");
@@ -97,7 +94,7 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	// method finder
 
 	args[0] = 'O'; args[1] = 'O'; args[2] = 'I'; args[3] = 'O';
-	method = (*bridge->env)->GetMethodID(bridge->env, bridge->methodFinder->object->object, METHFIND_NAME, METHFIND_SIGNATURE);
+	method = (*(bridge->env)).GetMethodID(bridge->methodFinder->object->object, METHFIND_NAME, METHFIND_SIGNATURE);
 	if(!method) {
 		slMessage(DEBUG_ALL, "Cannot locate Java method \"%s\" for Java bridge\n", METHFIND_NAME);
 		return NULL;
@@ -107,7 +104,7 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	// method signature finder
 
 	args[0] = 'O';
-	method = (*bridge->env)->GetMethodID(bridge->env, bridge->methodFinder->object->object, METHSIG_NAME, METHSIG_SIGNATURE);
+	method = (*bridge->env).GetMethodID(bridge->methodFinder->object->object, METHSIG_NAME, METHSIG_SIGNATURE);
 	if(!method) {
 		slMessage(DEBUG_ALL, "Cannot locate Java method \"%s\" for Java bridge\n", METHSIG_NAME);
 		return NULL;
@@ -115,7 +112,7 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	bridge->methsigMethod = brJavaMakeMethodData(METHSIG_NAME, method, 'T', args, 1);
 
 	args[0] = 'O';
-	method = (*bridge->env)->GetMethodID(bridge->env, bridge->methodFinder->object->object, RETTYPE_NAME, RETTYPE_SIGNATURE);
+	method = (*bridge->env).GetMethodID(bridge->methodFinder->object->object, RETTYPE_NAME, RETTYPE_SIGNATURE);
 	if(!method) {
 		slMessage(DEBUG_ALL, "Cannot locate Java method \"%s\" for Java bridge\n", RETTYPE_NAME);
 		return NULL;
@@ -123,7 +120,7 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	bridge->rettypeMethod = brJavaMakeMethodData(RETTYPE_NAME, method, 'C', args, 2);
 
 	args[0] = 'O'; args[1] = 'I';
-	method = (*bridge->env)->GetMethodID(bridge->env, bridge->methodFinder->object->object, ARGTYPES_NAME, ARGTYPES_SIGNATURE);
+	method = (*bridge->env).GetMethodID(bridge->methodFinder->object->object, ARGTYPES_NAME, ARGTYPES_SIGNATURE);
 	if(!method) {
 		slMessage(DEBUG_ALL, "Cannot locate Java method \"%s\" for Java bridge\n", ARGTYPES_NAME);
 		return NULL;
@@ -131,7 +128,7 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	bridge->argtypesMethod = brJavaMakeMethodData(ARGTYPES_NAME, method, 'C', args, 2);
 
 	args[0] = 'O';
-	method = (*bridge->env)->GetMethodID(bridge->env, bridge->methodFinder->object->object, ARGCOUNT_NAME, ARGCOUNT_SIGNATURE);
+	method = (*bridge->env).GetMethodID(bridge->methodFinder->object->object, ARGCOUNT_NAME, ARGCOUNT_SIGNATURE);
 	if(!method) {
 		slMessage(DEBUG_ALL, "Cannot locate Java method \"%s\" for Java bridge\n", ARGCOUNT_NAME);
 		return NULL;
@@ -139,7 +136,7 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	bridge->argcountMethod = brJavaMakeMethodData(ARGCOUNT_NAME, method, 'I', args, 1);
 
 	args[0] = 'O';
-	method = (*bridge->env)->GetMethodID(bridge->env, bridge->methodFinder->object->object, CLASSNAME_NAME, CLASSNAME_SIGNATURE);
+	method = (*bridge->env).GetMethodID(bridge->methodFinder->object->object, CLASSNAME_NAME, CLASSNAME_SIGNATURE);
 	if(!method) {
 		slMessage(DEBUG_ALL, "Cannot locate Java method \"%s\" for Java bridge\n", CLASSNAME_NAME);
 		return NULL;
@@ -156,13 +153,14 @@ void brDetachJavaVM(brJavaBridgeData *bridge) {
 }
 
 void brFreeJavaClassData(brJavaObject *data) {
-	slFree(data);
+	delete data;
 }
 
-brJavaMethod *brJavaMethodFind(brJavaBridgeData *bridge, brJavaObject *object, char *name, unsigned char *types, int nargs) {
+brJavaMethod *brJavaMethodFind(brJavaBridgeData *bridge, brJavaObject *object, char *name, unsigned char *types, unsigned int nargs) {
 	char returnType, argumentTypes[JAVA_MAX_ARGS];
 	jmethodID methodID;
-	int count, error;
+	unsigned int count;
+	int error;
 	brEval result;
 	jvalue args[JAVA_MAX_ARGS];
 	char *signature;
@@ -175,11 +173,11 @@ brJavaMethod *brJavaMethodFind(brJavaBridgeData *bridge, brJavaObject *object, c
 	for(count=0;count<strlen(name);count++) 
 		if(name[count] == '-') name[count] = '_';
 
-	if(!array) array = (*bridge->env)->NewCharArray(bridge->env, JAVA_MAX_ARGS);
+	if(!array) array = (*bridge->env).NewCharArray(JAVA_MAX_ARGS);
 
 	for(count=0;count<nargs;count++) cargTypes[count] = brJTypeForType(types[count]);
 
-	(*bridge->env)->SetCharArrayRegion(bridge->env, array, 0, nargs, cargTypes);
+	(*bridge->env).SetCharArrayRegion(array, 0, nargs, cargTypes);
 
 	// find the method with this name and arg counts for this object
 	args[0].l = object->object;
@@ -187,7 +185,7 @@ brJavaMethod *brJavaMethodFind(brJavaBridgeData *bridge, brJavaObject *object, c
 	args[2].i = nargs;
 	args[3].l = array;
 	error = brJavaMethodCall(bridge, bridge->methodFinder, bridge->methfindMethod, args, &result);
-	methodPtr = BRPOINTER(&result);
+	methodPtr = (jobject)BRPOINTER(&result);
 
 	if(error != EC_OK) return NULL;
 
@@ -198,7 +196,7 @@ brJavaMethod *brJavaMethodFind(brJavaBridgeData *bridge, brJavaObject *object, c
 
 	if(error != EC_OK) return NULL;
 
-	methodID = (*bridge->env)->GetMethodID(bridge->env, object->object, name, signature);
+	methodID = (*bridge->env).GetMethodID(object->object, name, signature);
 	slFree(signature);
 
 	// find the return type for the method
@@ -228,7 +226,7 @@ brJavaMethod *brJavaMakeMethodData(char *name, jmethodID method, char returnType
 	brJavaMethod *data;
 	int n;
 
-	data = slMalloc(sizeof(brJavaMethod));
+	data = new brJavaMethod;
 
 	data->method = method;
 	data->argumentCount = nargs;
@@ -245,58 +243,58 @@ int brJavaMethodCall(brJavaBridgeData *bridge, brJavaInstance *instance, brJavaM
 
 	switch(method->returnType) {
 		case 'V':
-			(*bridge->env)->CallVoidMethodA(bridge->env, instance->instance, method->method, jargs);
+			(*bridge->env).CallVoidMethodA(instance->instance, method->method, jargs);
 			result->type = AT_NULL;
 			break;
 		case 'I':
-			returnValue.i = (*bridge->env)->CallIntMethodA(bridge->env, instance->instance, method->method, jargs);
+			returnValue.i = (*bridge->env).CallIntMethodA(instance->instance, method->method, jargs);
 			result->type = AT_INT;
 			BRINT(result) = returnValue.i;
 			break;
 		case 'J':
-			returnValue.j = (*bridge->env)->CallLongMethodA(bridge->env, instance->instance, method->method, jargs);
+			returnValue.j = (*bridge->env).CallLongMethodA(instance->instance, method->method, jargs);
 			result->type = AT_INT;
 			BRINT(result) = returnValue.j;
 			break;
 		case 'C':
-			returnValue.c = (*bridge->env)->CallCharMethodA(bridge->env, instance->instance, method->method, jargs);
+			returnValue.c = (*bridge->env).CallCharMethodA(instance->instance, method->method, jargs);
 			result->type = AT_INT;
 			BRINT(result) = returnValue.c;
 			break;
 		case 'B':
-			returnValue.b = (*bridge->env)->CallByteMethodA(bridge->env, instance->instance, method->method, jargs);
+			returnValue.b = (*bridge->env).CallByteMethodA(instance->instance, method->method, jargs);
 			result->type = AT_INT;
 			BRINT(result) = returnValue.b;
 			break;
 		case 'Z':
-			returnValue.z = (*bridge->env)->CallBooleanMethodA(bridge->env, instance->instance, method->method, jargs);
+			returnValue.z = (*bridge->env).CallBooleanMethodA(instance->instance, method->method, jargs);
 			result->type = AT_INT;
 			BRINT(result) = returnValue.z;
 			break;
 		case 'S':
-			returnValue.s = (*bridge->env)->CallShortMethodA(bridge->env, instance->instance, method->method, jargs);
+			returnValue.s = (*bridge->env).CallShortMethodA(instance->instance, method->method, jargs);
 			result->type = AT_INT;
 			BRINT(result) = returnValue.s;
 			break;
 		case 'F':
-			returnValue.f = (*bridge->env)->CallFloatMethodA(bridge->env, instance->instance, method->method, jargs);
+			returnValue.f = (*bridge->env).CallFloatMethodA(instance->instance, method->method, jargs);
 			result->type = AT_DOUBLE;
 			BRDOUBLE(result) = returnValue.f;
 			break;
 		case 'D':
-			returnValue.d = (*bridge->env)->CallDoubleMethodA(bridge->env, instance->instance, method->method, jargs);
+			returnValue.d = (*bridge->env).CallDoubleMethodA(instance->instance, method->method, jargs);
 			result->type = AT_DOUBLE;
 			BRDOUBLE(result) = returnValue.d;
 			break;
 		case 'T':
 			// 'T' is breve's code for a string object
-			returnValue.l = (*bridge->env)->CallObjectMethodA(bridge->env, instance->instance, method->method, jargs);
+			returnValue.l = (*bridge->env).CallObjectMethodA(instance->instance, method->method, jargs);
 			result->type = AT_STRING;
-			BRSTRING(result) = brReadJavaString(bridge, returnValue.l);
+			BRSTRING(result) = brReadJavaString(bridge, (jstring)returnValue.l);
 			break;
 		case 'O':
 			// 'O' is breve's code for an object
-			returnValue.l = (*bridge->env)->CallObjectMethodA(bridge->env, instance->instance, method->method, jargs);
+			returnValue.l = (*bridge->env).CallObjectMethodA(instance->instance, method->method, jargs);
 			result->type = AT_POINTER;
 			BRPOINTER(result) = returnValue.l;
 			break;
@@ -307,9 +305,9 @@ int brJavaMethodCall(brJavaBridgeData *bridge, brJavaInstance *instance, brJavaM
 
 	// check for exception here
 	
-	if((*bridge->env)->ExceptionOccurred(bridge->env)) {
-		(*bridge->env)->ExceptionDescribe(bridge->env);
-		(*bridge->env)->ExceptionClear(bridge->env);
+	if((*bridge->env).ExceptionOccurred()) {
+		(*bridge->env).ExceptionDescribe();
+		(*bridge->env).ExceptionClear();
 		slMessage(DEBUG_ALL, "Exception occured in Java execution of method \"%s\"\n", method->name);
 		result->type = AT_NULL;
 		return EC_ERROR;			
@@ -320,7 +318,7 @@ int brJavaMethodCall(brJavaBridgeData *bridge, brJavaInstance *instance, brJavaM
 
 brJavaObject *brJavaObjectFind(brJavaBridgeData *bridge, char *name) {
 	brJavaObject *object;
-	int n;
+	unsigned int n;
 
 	name = slStrdup(name);
 
@@ -328,17 +326,14 @@ brJavaObject *brJavaObjectFind(brJavaBridgeData *bridge, char *name) {
 
 	for(n=0;n<strlen(name);n++) if(name[n] == '.') name[n] = '/';
 
-	if(!(object = slDehashData(bridge->objectHash, name))) {
-		object = slMalloc(sizeof(brJavaObject));
+	if(!(object = bridge->objects[ name])) {
+		object = new brJavaObject;
 
-		object->object = (*bridge->env)->FindClass(bridge->env, name);
+		object->object = (*bridge->env).FindClass(name);
 
 		if(!object->object) {
-			// slMessage(DEBUG_ALL, "Cannot locate Java object \"%s\"\n", name);
-
-			if ((*bridge->env)->ExceptionOccurred(bridge->env)) {
-				// (*bridge->env)->ExceptionDescribe(bridge->env);
-				(*bridge->env)->ExceptionClear(bridge->env);
+			if ((*bridge->env).ExceptionOccurred()) {
+				(*bridge->env).ExceptionClear();
 			}
 
 			return NULL;
@@ -353,18 +348,18 @@ brJavaObject *brJavaObjectFind(brJavaBridgeData *bridge, char *name) {
 }
 
 int brJavaInstanceFree(brJavaInstance *i) {
-	slFree(i);
+	delete i;
 
 	return EC_OK;
 }
 
 brJavaInstance *brJavaBootstrapMethodFinder(brJavaObject *object) {
-	brJavaInstance *instance = slMalloc(sizeof(brJavaInstance));
+	brJavaInstance *instance = new brJavaInstance;
 
-	jmethodID method = (*object->bridge->env)->GetMethodID(object->bridge->env, object->object, "<init>", "()V"); 
+	jmethodID method = (*object->bridge->env).GetMethodID(object->object, "<init>", "()V"); 
 
 	instance->object = object;
-	instance->instance = (*object->bridge->env)->NewObjectA(object->bridge->env, object->object, method, NULL);
+	instance->instance = (*object->bridge->env).NewObjectA(object->object, method, NULL);
 
 	return instance;
 }
@@ -376,7 +371,7 @@ brJavaInstance *brJavaInstanceNew(brJavaObject *object, brEval **args, int argCo
 	unsigned char types[JAVA_MAX_ARGS];
 	int n;
 
-	instance = slMalloc(sizeof(brJavaInstance));
+	instance = new brJavaInstance;
 
 	instance->object = object;
 
@@ -391,7 +386,7 @@ brJavaInstance *brJavaInstanceNew(brJavaObject *object, brEval **args, int argCo
 		}
 	}
 
-	instance->instance = (*object->bridge->env)->NewObjectA(object->bridge->env, object->object, method->method, jargs);
+	instance->instance = (*object->bridge->env).NewObjectA(object->object, method->method, jargs);
 
 	if(!instance->instance) {
 		slFree(instance);
@@ -403,7 +398,7 @@ brJavaInstance *brJavaInstanceNew(brJavaObject *object, brEval **args, int argCo
 
 void brFreeJavaMethodData(brJavaMethod *method) {
 	slFree(method->name);
-	slFree(method);
+	delete method;
 }
 
 void brFreeJavaBridgeData(brJavaBridgeData *bridge) {
@@ -413,7 +408,7 @@ void brFreeJavaBridgeData(brJavaBridgeData *bridge) {
 	brFreeJavaMethodData(bridge->argcountMethod);
 	brFreeJavaMethodData(bridge->rettypeMethod);
 	brFreeJavaMethodData(bridge->objectnameMethod);
-	slFree(bridge->methodFinder);
-	slFree(bridge);
+	delete bridge->methodFinder;
+	delete bridge;
 }
 #endif

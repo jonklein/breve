@@ -20,13 +20,7 @@
 
 /*
     = list.c -- a set of general purpose linked list functions.  used 
-    = quite frequently by many different areas of the project
-
-    = it also includes functions dealing with the slArray datatype.  
-    = an slArray is like a list in that it stores a set of (void*)
-    = data, but unlike a list in that it is a set number of entries
-    = which cannot be changed.  it has the advantage that it offers
-    = faster random access of variables.
+    = quite frequently by many different areas of the project.
 
     = often data sets will be creates as lists (during text parsing,
     = for example) and then converted to arrays when they contain
@@ -209,50 +203,4 @@ int slListCount(slList *l) {
     }
 
     return n;
-}
-
-/*!
-    \brief Converts an slList to an slArray containing pointers to the same data.  
-	
-	This function does not free the original slList--you should do this yourself.  
-	However, you should NOT free the list's data in this case, since the new slArray
-    will be pointing to the same memory.
-*/
-
-slArray *slListToArray(slList *l) {
-    slArray *a;
-    int n;
-
-    a = new slArray;
-
-	if(!l) {
-		a->count = 0;
-		a->data = NULL;
-		return a;
-	}
-
-    a->count = slListCount(l);
-
-    a->data = new void*[a->count];
-
-    n = 0;
-
-    while(l) {
-        a->data[n++] = l->data;
-        l = l->next;
-    }
-
-    return a;
-}
-
-/*!
-	\brief Frees an slArray structure, 
-
-	This function does not free the slArray data contents.  If you use this 
-	function, make sure you iterate through the array and free the data first!
-*/
-
-void slFreeArray(slArray *a) {
-    if(a->data) delete[] a->data;
-    delete (a);
 }

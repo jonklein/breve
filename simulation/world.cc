@@ -233,8 +233,10 @@ void slWorldFreeObject(slWorldObject *o) {
 slWorldObject *slWorldAddObject(slWorld *w, slWorldObject *no, int type) {
 	no->type = type;
 
-	if(type == WO_LINK) w->objects.insert(w->objects.begin(), no);
-	else w->objects.push_back(no);
+	// if(type == WO_LINK) w->objects.insert(w->objects.begin(), no);
+	// else w->objects.push_back(no);
+
+	w->objects.push_back(no);
 
 	w->initialized = 0;
 
@@ -251,8 +253,6 @@ slPatchGrid *slPatchGridAdd(slWorld *w, slVector *center, slVector *patchSize, i
 
 /*!
 	\brief Removes an object from the world.
-
-	Removes the object p, shift all the other objects down.
 */
 
 void slRemoveObject(slWorld *w, slWorldObject *p) {
@@ -341,12 +341,10 @@ double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 */
 
 double slWorldStep(slWorld *w, double stepSize, int *error) {
-	unsigned int n, simulate = 0;
+	unsigned simulate = 0;
 	std::vector<slWorldObject*>::iterator wi;
 	std::vector<slObjectConnection*>::iterator li;
 	int result;
-
-	n = 0;
 
 	for(wi = w->objects.begin(); wi != w->objects.end(); wi++) {
 		simulate += (*wi)->simulate;
@@ -381,7 +379,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 			w1 = w->objects[c->n1];
 			w2 = w->objects[c->n2];
 
-			flags = slVclipPairFlags(w->clipData->pairList, c->n1, c->n2);
+			flags = slVclipPairFlags(w->clipData, c->n1, c->n2);
 
 			if(w1 && w2 && (*flags & BT_SIMULATE)) {
 				dBodyID bodyX = NULL, bodyY = NULL;
@@ -482,7 +480,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 
 void slNeighborCheck(slWorld *w) {
 	double dist;
-	slVector *location, diff, *l1 = NULL, *l2 = NULL;
+	slVector *location, diff;
 	slWorldObject *o1, *o2;
 	std::vector<slWorldObject*>::iterator wi;
 
@@ -524,10 +522,7 @@ void slNeighborCheck(slWorld *w) {
 		o1 = w->objects[c.x];
 		o2 = w->objects[c.y];
 
-		l1 = &o1->position.location;
-		l2 = &o2->position.location;
-
-		slVectorSub(l1, l2, &diff);
+		slVectorSub(&o1->position.location, &o2->position.location, &diff);
 		dist = slVectorLength(&diff);
 
 		if(dist < o1->proximityRadius) o1->neighbors.push_back(o2);

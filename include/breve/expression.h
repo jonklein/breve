@@ -165,7 +165,7 @@ typedef struct stRtcCodeBlock_t {
 		int (*stEvalLoadPointer)(stLoadExp *e, stRunInstance *i, void **pointer, int *type);
 		int (*stEvalTruth)(brEval *e, brEval *t, stRunInstance *i);
 		int (*stEvalFree)(stExp *s, stRunInstance *i, brEval *t);
-		int (*stEvalArray)(slArray *a, stRunInstance *i, brEval *target);
+		int (*stEvalArray)(std::vector< stExp* > *a, stRunInstance *i, brEval *target);
 		int (*stEvalMethodCall)(stMethodExp *mexp, stRunInstance *i, brEval *t);
 		int (*stEvalWhile)(stWhileExp *w, stRunInstance *i, brEval *target);
 		int (*stEvalFor)(stForExp *w, stRunInstance *i, brEval *target);
@@ -210,268 +210,250 @@ typedef struct stRtcCodeBlock_t {
 		int (*stEvalNewInstance)(stInstanceExp *ie, stRunInstance *i, brEval *t);
 		int (*stEvalBinaryEvalListExp)(char op, brEval *l, brEval *r, brEval *target, stRunInstance *i);
 	};
+
 	unsigned int	code[0];
 } stRtcCodeBlock;
 
-struct stExp {
-	union {
-		int iValue;
-		double dValue;
-		void *pValue;
-	} values;
+class stExp {
+	public:
+		union {
+			int iValue;
+			double dValue;
+			void *pValue;
+		} values;
 
-	unsigned char type;
-	unsigned char debug;
+		unsigned char type;
+		unsigned char debug;
 
-	int line;
-	char *file;
+		int line;
+		char *file;
 	
-	stRtcCodeBlock	*block;
+		stRtcCodeBlock	*block;
 };
 
-struct stIsaExp {
-	stExp *expression;
-	stVarType *type;
-	
-	stRtcCodeBlock	*block;
+class stIsaExp : public stExp {
+	public:
+		stExp *expression;
+		stVarType *type;
 };
 
-struct stStringExp {
-	int baseSize;
-	char *string;
+class stStringExp : public stExp {
+	public:
+		int baseSize;
+		char *string;
 
-	slArray *substrings;
-	
-	stRtcCodeBlock	*block;
+		std::vector< stSubstringExp* > substrings;
 };
 
-/* an stSubstringExp is a variable embedded in an stStringExp */
-
-struct stSubstringExp {
-	stExp *loadExp;
-	char *string;
-	int offset;
-	unsigned char retain;
-	
-	stRtcCodeBlock	*block;
+class stSubstringExp : public stExp {
+	public:
+		stExp *loadExp;
+		char *string;
+		int offset;
+		unsigned char retain;
 };
 
-struct stBinaryExp {
-	unsigned char type;
-	stExp *left;
-	stExp *right;
-	
-	stRtcCodeBlock	*block;
+class stBinaryExp : public stExp {
+	public:
+		unsigned char type;
+		stExp *left;
+		stExp *right;
 };
 
-struct stUnaryExp {
-	unsigned char type;
-	stExp *exp;
-	
-	stRtcCodeBlock	*block;
+class stUnaryExp : public stExp {
+	public:
+		unsigned char type;
+		stExp *exp;
 };
 
-struct stVectorExp {
-	stExp *x;
-	stExp *y;
-	stExp *z;
-	
-	stRtcCodeBlock	*block;
+class stVectorExp : public stExp {
+	public:
+		stExp *x;
+		stExp *y;
+		stExp *z;
 };
 
-struct stMatrixExp {
-	stExp *expressions[9];
-	
-	stRtcCodeBlock	*block;
+class stMatrixExp : public stExp {
+	public:
+		stExp *expressions[9];
 };
 
-struct stPrintExp {
-	slArray *expressions;
-	unsigned char newline;
-	
-	stRtcCodeBlock	*block;
+class stPrintExp : public stExp {
+	public:
+		std::vector< stExp* > expressions;
+		unsigned char newline;
 };
 
-struct stVectorElementExp {
-	stExp *exp;
-	char element;
-	
-	stRtcCodeBlock	*block;
+class stVectorElementExp : public stExp {
+	public:
+		stExp *exp;
+		char element;
 };
 
-struct stVectorElementAssignExp {
-	stExp *exp;
-	stExp *assignExp;
-	char element;
-	
-	stRtcCodeBlock	*block;
+class stVectorElementAssignExp : public stExp {
+	public:
+		stExp *exp;
+		stExp *assignExp;
+		char element;
 };
 
-struct stListInsertExp {
-	stExp *exp;
-	stExp *listExp;
-	stExp *index;
-	
-	stRtcCodeBlock	*block;
+class stListInsertExp : public stExp {
+	public:
+		stExp *exp;
+		stExp *listExp;
+		stExp *index;
 };
 
-struct stListRemoveExp {
-	stExp *listExp;
-	stExp *index;
-	
-	stRtcCodeBlock	*block;
+class stListRemoveExp : public stExp {
+	public:
+		stExp *listExp;
+		stExp *index;
 };
 
-struct stSortExp {
-	stExp *listExp;
-	char *methodName;
-	
-	stRtcCodeBlock	*block;
+class stSortExp : public stExp {
+	public:
+		stExp *listExp;
+		char *methodName;
 };
 
-struct stListIndexExp {
-	stExp *listExp;
-	stExp *indexExp;
-	
-	stRtcCodeBlock	*block;
+class stListIndexExp : public stExp {
+	public:
+		stExp *listExp;
+		stExp *indexExp;
 };
 
-struct stListIndexAssignExp {
-	stExp *listExp;
-	stExp *indexExp;
-	stExp *assignment;
-	
-	stRtcCodeBlock	*block;
+class stListIndexAssignExp : public stExp {
+	public:
+		stExp *listExp;
+		stExp *indexExp;
+		stExp *assignment;
 };
 
-struct stMethodExp {
-	stExp *objectExp;
+class stMethodExp : public stExp {
+	public:
+		stExp *objectExp;
 
-	char *methodName;
-	stMethod *method;
-
-	slArray *arguments;
-	slStack *positionedArguments;
-
-	stObject *objectCache;
-	stObject *objectTypeCache;
+		char *methodName;
+		stMethod *method;
 	
-	stRtcCodeBlock	*block;
+		std::vector< stKeyword* > arguments;
+		std::vector< stKeyword* > positionedArguments;
+
+		stObject *objectCache;
+		stObject *objectTypeCache;
 };
 
-struct stAssignExp {
-	int offset;
-	char local;
-	unsigned char type;
-	stExp *rvalue;
-	char *objectName;
-	stObject *objectType;
-	
-	stRtcCodeBlock	*block;
+class stAssignExp : public stExp {
+	public:
+		int offset;
+		char local;
+		unsigned char type;
+		stExp *rvalue;
+		char *objectName;
+		stObject *objectType;
 };
 
-struct stLoadExp {
-	int offset;
-	char local;
-	unsigned char type;
-	
-	stRtcCodeBlock	*block;
+class stLoadExp : public stExp {
+	public:
+		int offset;
+		char local;
+		unsigned char type;
 };
 
-struct stArrayIndexAssignExp {
-	int offset;
-	int maxIndex;
-	unsigned char local;
-	unsigned char type;
-	int typeSize;
-	stExp *index;
+class stArrayExp : public stExp {
+	public:
+		stArrayExp(std::vector< stExp* > *e) { expressions = *e; }
 
-	stExp *rvalue;
-	
-	stRtcCodeBlock	*block;
+		~stArrayExp() { 
+			unsigned int n;
+
+			for(n = 0; n < expressions.size(); n++)  
+				delete expressions[n];
+		}
+
+		std::vector< stExp* > expressions;
 };
 
-struct stArrayIndexExp {
-	int offset;
-	int maxIndex;
-	unsigned char local;
-	unsigned char type;
-	int typeSize;
-	stExp *index;
+class stArrayIndexAssignExp : public stExp {
+	public:
+		int offset;
+		int maxIndex;
+		unsigned char local;
+		unsigned char type;
+		int typeSize;
+		stExp *index;
 	
-	stRtcCodeBlock	*block;
+		stExp *rvalue;
 };
 
-struct stWhileExp {
-	stExp *cond;
-	stExp *code;
-	
-	stRtcCodeBlock	*block;
+class stArrayIndexExp : public stExp {
+	public:
+		int offset;
+		int maxIndex;
+		unsigned char local;
+		unsigned char type;
+		int typeSize;
+		stExp *index;
 };
 
-struct stForeachExp {
-	stAssignExp *assignment;
-	stExp *list;
-	stExp *code;
-	
-	stRtcCodeBlock	*block;
+class stWhileExp : public stExp {
+	public:
+		stExp *cond;
+		stExp *code;
 };
 
-struct stForExp {
-	stExp *assignment;
-	stExp *condition;
-	stExp *iteration;
-	stExp *code;
-	
-	stRtcCodeBlock	*block;
+class stForeachExp : public stExp {
+	public:
+		stAssignExp *assignment;
+		stExp *list;
+		stExp *code;
 };
 
-struct stIfExp {
-	stExp *cond;
-	stExp *trueCode;
-	stExp *falseCode;
-	
-	stRtcCodeBlock	*block;
+class stForExp : public stExp {
+	public:
+		stExp *assignment;
+		stExp *condition;
+		stExp *iteration;
+		stExp *code;
 };
 
-struct stAllExp {
-	char *name;
-	stObject *object;
-	
-	stRtcCodeBlock	*block;
+class stIfExp : public stExp {
+	public:
+		stExp *cond;
+		stExp *trueCode;
+		stExp *falseCode;
 };
 
-struct stInstanceExp {
-	char *name;
-	stExp *count;
-	
-	stRtcCodeBlock	*block;
+class stAllExp : public stExp {
+	public:
+		char *name;
+		stObject *object;
 };
 
-struct stCCallExp {
-	brInternalFunction *function;
-	slArray *args;
-	slArray *evals;
-	
-	stRtcCodeBlock	*block;
+class stInstanceExp : public stExp {
+	public:
+		char *name;
+		stExp *count;
 };
 
-struct stKeyword {
-	char *word;
-	stExp *value;
-	int position;
-	
-	stRtcCodeBlock	*block;
+class stCCallExp : public stExp {
+	public:
+		brInternalFunction *function;
+		std::vector< stExp* > arguments;
 };
 
-int stExpFree(stExp *e);
+class stKeyword : public stExp {
+	public:
+		char *word;
+		stExp *value;
+		int position;
+};
+
+void stExpFree(stExp *e);
 
 void stExpFreeList(slList *n);
 
-void stExpFreeArray(slArray *a);
-
 stKeyword *stNewKeyword(char *word, stExp *data);
-void stFreeKeywordArray(slArray *a);
 void stFreeKeyword(stKeyword *k);
 
 stExp *stNewAssignExp(stMethod *m, stObject *o, char *word, stExp *rvalue, char *file, int line);
@@ -495,7 +477,7 @@ stExp *stNewStEvalExp(brEval *e, char *file, int line);
 stExp *stNewAllExp(char *object, char *file, int line);
 void stFreeAllExp(stAllExp *e);
 
-stExp *stNewCCallExp(brEngine *e, brInternalFunction *s, slList *exps, char *file, int line);
+stExp *stNewCCallExp(brEngine *e, brInternalFunction *s, std::vector< stExp* > *, char *file, int line);
 
 stExp *stNewWhileExp(stExp *cond, stExp *code, char *file, int line);
 void stFreeWhileExp(stWhileExp *e);
@@ -527,7 +509,7 @@ void stFreeListRemoveExp(stListRemoveExp *e);
 stExp *stNewIfExp(stExp *cond, stExp *trueCode, stExp *falseCode, char *file, int lineno);
 void stFreeIfExp(stIfExp *e);
 
-stMethodExp *stNewMethodCall(stObject *o, stExp *expression, char *method, slArray *args);
+stMethodExp *stNewMethodCall(stObject *o, stExp *expression, char *method, std::vector< stKeyword* > *arguments);
 void stFreeMethodExp(stMethodExp *m);
 
 void stFreeCCallExp(stCCallExp *m);
@@ -544,7 +526,7 @@ void stFreeVectorExp(stVectorExp *v);
 stExp *stNewMatrixExp(stExp *e00, stExp *e01, stExp *e02, stExp *e10, stExp *e11, stExp *e12, stExp *e20, stExp *e21, stExp *e22, char *file, int line);
 void stFreeMatrixExp(stMatrixExp *m);
 
-stExp *stNewPrintExp(slArray *expressions, int newline, char *file, int line);
+stExp *stNewPrintExp(std::vector< stExp* > *expressions, int newline, char *file, int line);
 void stFreePrintExp(stPrintExp *m);
 
 stExp *stNewVectorElementExp(stExp *v, char element, char *file, int line);

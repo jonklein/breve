@@ -36,6 +36,8 @@ slLink::slLink(slWorld *w) : slWorldObject() {
 	currentState = 0;
 	mobile = 0;
 
+	mobile = 1;
+
 	memset(&stateVector[0], 0, sizeof(slLinkIntegrationPosition));
 	memset(&stateVector[1], 0, sizeof(slLinkIntegrationPosition));
 
@@ -214,25 +216,27 @@ void slLinkGetRotation(slLink *link, double m[3][3]) {
 	\brief Sets the linear and/or rotational velocity of a link.
 */
 
+// these mobile/rmobile optimizations appear to do more slowdown than good...
+
 void slLinkSetVelocity(slLink *m, slVector *velocity, slVector *rotational) {
 	slLinkIntegrationPosition *config;
-	int vmobile = 0, rmobile = 0;
+	// int vmobile = 0, rmobile = 0;
 
 	if(!m->simulate) {
 		config = (slLinkIntegrationPosition*)&m->stateVector[m->currentState];
 
 		if(velocity) {
 			slVectorCopy(velocity, &config->velocity.b);
-			if(!slVectorZeroTest(velocity)) vmobile = 1;
+			// if(!slVectorZeroTest(velocity)) vmobile = 1;
 		}
 
 		if(rotational) {
 			slVectorCopy(rotational, &config->velocity.a);
-			if(!slVectorZeroTest(rotational)) rmobile = 1;
+			// if(!slVectorZeroTest(rotational)) rmobile = 1;
 		}
 
-		if(m->mobile && !rmobile && !vmobile) m->mobile = -1;
-		else if(vmobile || rmobile) m->mobile = 1;
+		// if(m->mobile && !rmobile && !vmobile) m->mobile = -1;
+		// else if(vmobile || rmobile) m->mobile = 1;
 	} else {
 		if(velocity) dBodySetLinearVel(m->odeBodyID, velocity->x, velocity->y, velocity->z);
 		if(rotational) dBodySetAngularVel(m->odeBodyID, rotational->x, rotational->y, rotational->z);
@@ -311,7 +315,7 @@ int slLinkCheckSelfPenetration(slWorld *world, slLink *l) {
 
 		if(l != link2) {
 			slCollisionCandidate c;
-			slPairFlags *flags = slVclipPairFlags(vc->pairList, l->clipNumber, link2->clipNumber);
+			slPairFlags *flags = slVclipPairFlags(vc, l->clipNumber, link2->clipNumber);
 
 			c.x = l->clipNumber;
 			c.y = link2->clipNumber;
@@ -345,7 +349,7 @@ int slLinkCheckPenetration(slWorld *w, slLink *l) {
 	for(n=0;n<vc->count;n++) {
 		if(ln != n) {
 			slCollisionCandidate c;
-			slPairFlags *flags = slVclipPairFlags(vc->pairList, ln, n);
+			slPairFlags *flags = slVclipPairFlags(vc, ln, n);
 
 			c.x = ln;
 			c.y = n;

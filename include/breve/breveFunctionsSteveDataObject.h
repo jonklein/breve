@@ -22,10 +22,10 @@
 #define SDO_VERSION             1
 
 struct brDataObjectHeader {
-    int varSize;
-    int nameLength;
-    int version;
-    int magic;
+    unsigned int varSize;
+    unsigned int nameLength;
+    unsigned int version;
+    unsigned int magic;
 };
 
 typedef struct brDataObjectHeader brDataObjectHeader;

@@ -98,7 +98,7 @@ int breveFunctionPushStep(brEval arguments[], brEval *result, brInstance *instan
 int breveFunctionPushGetConfigString(brEval arguments[], brEval *result, brInstance *instance) {
 	PushEnvironment *environment = BRPOINTER(&arguments[0]);
 
-	BRSTRING(result) = slStrdupAndFree(pushGetConfigString(environment));
+	BRSTRING(result) = pushGetConfigString(environment);
 
 	return EC_OK;
 }
@@ -112,7 +112,7 @@ int breveFunctionPushGetConfigString(brEval arguments[], brEval *result, brInsta
 int breveFunctionPushGetStacksString(brEval arguments[], brEval *result, brInstance *instance) {
 	PushEnvironment *environment = BRPOINTER(&arguments[0]);
 
-	BRSTRING(result) = slStrdupAndFree(pushGetStacksString(environment));
+	BRSTRING(result) = pushGetStacksString(environment);
 
 	return EC_OK;
 }
@@ -126,7 +126,7 @@ int breveFunctionPushGetStacksString(brEval arguments[], brEval *result, brInsta
 int breveFunctionPushGetExecStackString(brEval arguments[], brEval *result, brInstance *instance) {
 	PushEnvironment *environment = BRPOINTER(&arguments[0]);
 
-	BRSTRING(result) = slStrdupAndFree(pushGetExecStackString(environment));
+	BRSTRING(result) = pushGetExecStackString(environment);
 
 	return EC_OK;
 }
@@ -183,7 +183,7 @@ int breveFunctionPushParse(brEval arguments[], brEval *result, brInstance *insta
 int breveFunctionPushCodeGetString(brEval arguments[], brEval *result, brInstance *instance) {
 	PushCode *code = BRPOINTER(&arguments[0]);
 
-	BRSTRING(result) = slStrdupAndFree(pushCodeGetString(code));
+	BRSTRING(result) = pushCodeGetString(code);
 
 	return EC_OK;
 }

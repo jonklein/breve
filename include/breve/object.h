@@ -22,6 +22,14 @@
 	\brief A steve object type.
 */
 
+#include <set>
+
+struct stInstanceCompare {
+	bool operator()(const stInstance* s1, const stInstance* s2) const {
+		return s1 < s2;
+	}
+};
+
 struct stObject {
 	char *name;
 	brEngine *engine;
@@ -29,15 +37,15 @@ struct stObject {
 
 	float version;
 
-	int varSize;
-	int varOffset;
+	unsigned int varSize;
+	unsigned int varOffset;
 
 	stObject *super;
 
-	brNamespace *keywords;
+	std::map< std::string, stVar* > variables;
+	std::map< std::string, std::vector< stMethod* > > methods;
 
-	slList *variableList;
-	slList *allInstances;
+	std::set< stInstance*, stInstanceCompare> allInstances;
 };
 
 /*!
@@ -50,19 +58,18 @@ struct stInstance {
 	stObject *type;
 	brInstance *breveInstance;
 
-	// pthread_mutex_t lock;
-
-	unsigned int index;
-
 	char *variables;
 
 	// status is the memory status of the object 
 	char status;
 
-	unsigned char gc;
+	bool gc;
 	int retainCount;
 
 	slStack *gcStack;
+
+	std::set< stInstance*, stInstanceCompare > dependencies;
+	std::set< stInstance*, stInstanceCompare > dependents;
 };
 
 /*!
@@ -74,19 +81,12 @@ struct stMethod {
 
 	unsigned char inlined;
 
-	// = 1 if keywords need garbage collection 
-	unsigned char gcKeywords;
-
-	// = 1 if variables need garbage collection 
-	unsigned char gcVariables;
-
 	int lineno;
 	char *filename;
 
-	slArray *keywords;
-	slArray *code;
-
-	slList *variables;
+	std::vector< stKeywordEntry* > keywords;
+	std::vector< stExp* > code;
+	std::vector< stVar* > variables;
 
 	// how much space does this method need on the stack for inputs and locals? 
 
@@ -149,6 +149,10 @@ stObject *stObjectFind(brNamespace *n, char *name);
 stInstance *stFindInstanceIndex(stInstance *i, int index);
 int stEnumerateInstance(stInstance *i, int start);
 
+void stInstanceAddDependency(stInstance *i, stInstance *dependency);
+void stInstanceRemoveDependency(stInstance *i, stInstance *dependency);
+
+
 void stObjectFreeSpace(brNamespace *ns);
 void stObjectFree(stObject *o);
 
@@ -172,13 +176,12 @@ stVar *stVarNew(char *name, stVarType *type);
 void stFreeStVar(stVar *v);
 
 void stFreeKeywordEntry(stKeywordEntry *e);
-void stFreeKeywordEntryArray(slArray *a);
 
-brNamespaceSymbol *stInstanceNewVar(stVar *var, stObject *object);
+stVar *stInstanceNewVar(stVar *var, stObject *object);
 
-stMethod *stNewMethod(char *n, slArray *keywords, char *file, int line);
+stMethod *stNewMethod(char *n, std::vector< stKeywordEntry* > *keywords, char *file, int line);
 void stFreeMethod(stMethod *meth);
-slList *stMethodAddVar(stVar *var, stMethod *method);
+stVar *stMethodAddVar(stVar *var, stMethod *method);
 
 void stMethodAlignStack(stMethod *method);
 
@@ -186,29 +189,29 @@ stKeywordEntry *stNewKeywordEntry(char *stKeyword, stVar *v, brEval *defVal);
 
 int findVariableOffset(stObject *o, char *name);
 
-brNamespaceSymbol *stObjectLookup(stObject *o, char *word, unsigned char type);
+stVar *stObjectLookupVariable(stObject *ob, char *word);
 
 stKeywordEntry *stFindKeyword(char *keyword, stMethod *m);
-stVar *stFindLocal(char *name, stMethod *m);
+stVar *stFindLocal(char *name, stMethod *);
 
-int stUnusedInstanceVarWarning(stObject *o);
+int stUnusedInstanceVarWarning(stObject *);
 
-stMethod *stFindInstanceMethod(stObject *o, char *word, int nArgs, stObject **oo);
-stMethod *stFindInstanceMethodNoSuper(stObject *o, char *word, int nArgs);
-stMethod *stFindInstanceMethodWithArgRange(stObject *o, char *word, int minArgs, int maxArgs, stObject **oo);
-stMethod *stFindInstanceMethodWithMinArgs(stObject *o, char *word, int minArgs, stObject **oo);
+stMethod *stFindInstanceMethodNoSuper(stObject *, char *, unsigned int);
+stMethod *stFindInstanceMethod(stObject *, char *, int, stObject **);
+stMethod *stFindInstanceMethodWithArgRange(stObject *, char *, unsigned int, unsigned int, stObject **);
+stMethod *stFindInstanceMethodWithMinArgs(stObject *, char *, unsigned int, stObject **);
 
-int stStoreInstanceMethod(stObject *o, char *word, stMethod *method);
+int stStoreInstanceMethod(stObject *, char *, stMethod *);
 
-void stInstanceRetain(stInstance *i);
-void stInstanceUnretain(stInstance *i);
-void stInstanceCollect(stInstance *i);
+void stInstanceRetain(stInstance *);
+void stInstanceUnretain(stInstance *);
+void stInstanceCollect(stInstance *);
 
-int stIsSubclassOf(stObject *a, stObject *o);
+int stIsSubclassOf(stObject *a, stObject *);
 
-void stAddToInstanceLists(stInstance *i);
-void stRemoveFromInstanceLists(stInstance *i);
+void stAddToInstanceLists(stInstance *);
+void stRemoveFromInstanceLists(stInstance *);
 
-brInstance *stInstanceCreateAndRegister(brEngine *engine, brObject *object);
+brInstance *stInstanceCreateAndRegister(brEngine *, brObject *);
 
-void stObjectFreeAllInstances(stObject *o);
+void stObjectFreeAllInstances(stObject *);

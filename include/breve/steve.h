@@ -4,13 +4,13 @@
 #include "util.h"
 #include "kernel.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "steveTypedefs.h"
 
 #include "object.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "gc.h"
 

@@ -55,6 +55,11 @@ struct slPlane {
 	slVector vertex;
 };
 
+#define slPlaneDistance(plane, point) ( \
+	(plane)->normal.x * ((point)->x - (plane)->vertex.x) + \
+	(plane)->normal.y * ((point)->y - (plane)->vertex.y) + \
+	(plane)->normal.z * ((point)->z - (plane)->vertex.z) )
+
 /*!
 	\brief A header used when serializing shape data.
 */

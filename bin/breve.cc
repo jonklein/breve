@@ -140,7 +140,7 @@ int main(int argc, char **argv) {
 	if(gOptionFormat) {
 		char *newtext = slFormatText(text);
 		slUtilWriteFile(simulationFile, newtext);
-		free(newtext);
+		slFree(newtext);
 		exit(0);
 	}
 
@@ -348,9 +348,9 @@ int brParseArgs(int argc, char **argv) {
 
 #ifdef MACOSX
 	// Mac OS X 10.2.8 doesn't seem to have getopt_long
-	while((r = getopt(argc, argv, "s:t:d:r:f:n:l:vhmuS:M")) != EOF) {
+	while((r = getopt(argc, argv, "s:t:d:r:f:n:a:vhmuS:M")) != EOF) {
 #else 
-	while((r = getopt_long(argc, argv, "t:d:r:f:n:l:vhmuS:M", gCLIOptions, NULL)) != EOF) {
+	while((r = getopt_long(argc, argv, "t:d:r:f:n:a:vhmuS:M", gCLIOptions, NULL)) != EOF) {
 #endif
 		switch(r) {
 			case 'd':
@@ -417,7 +417,7 @@ void brPrintUsage(char *name) {
 	fprintf(stderr, "usage: %s [options] simulation_file\n", name);
 	fprintf(stderr, "options:\n");
 	fprintf(stderr, "  -r <seed>       Sets the random seed to <seed>.\n");
-	fprintf(stderr, "  -l <xml_file>   Dearchive simulation from <xml_file>.  <xml_file> should be\n");
+	fprintf(stderr, "  -a <xml_file>   Dearchive simulation from <xml_file>.  <xml_file> should be\n");
 	fprintf(stderr, "                  an archive of the simulation contained in the input file.\n");
 	fprintf(stderr, "  -f              Start breve in fullscreen mode.\n");
 	fprintf(stderr, "  -v              Display the current version number.\n");

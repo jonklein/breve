@@ -96,16 +96,16 @@ void stGCRetainPointer(void *pointer, int type) {
 	switch(type) {
 		case AT_INSTANCE:
 			if(((brInstance*)pointer)->status != AS_ACTIVE) return;
-			stInstanceRetain(((brInstance*)pointer)->userData);
+			stInstanceRetain((stInstance*)((brInstance*)pointer)->userData);
 			break;
 		case AT_LIST:
-			brEvalListRetain(pointer);
+			brEvalListRetain((brEvalListHead*)pointer);
 			break; 
 		case AT_HASH: 
-			brEvalHashRetain(pointer);
+			brEvalHashRetain((brEvalHash*)pointer);
 			break;
 		case AT_DATA:
-			brDataRetain(pointer);
+			brDataRetain((brData*)pointer);
 			break;
 		default:
 			break;
@@ -134,16 +134,16 @@ void stGCUnretainPointer(void *pointer, int type) {
 	switch(type) {
 		case AT_INSTANCE:
 			if(((brInstance*)pointer)->status != AS_ACTIVE) return;
-			stInstanceUnretain(((brInstance*)pointer)->userData);
+			stInstanceUnretain((stInstance*)((brInstance*)pointer)->userData);
 			break;
 		case AT_LIST:
-			brEvalListUnretain(pointer);
+			brEvalListUnretain((brEvalListHead*)pointer);
 			break;
 		case AT_HASH:
-			brEvalHashUnretain(pointer);
+			brEvalHashUnretain((brEvalHash*)pointer);
 			break;
 		case AT_DATA:
-			brDataUnretain(pointer);
+			brDataUnretain((brData*)pointer);
 			break;
 		case AT_STRING:
 			// slFree(pointer);
@@ -171,20 +171,19 @@ inline void stGCCollectPointer(void *pointer, int type) {
 	switch(type) {
 		case AT_INSTANCE:
 			if(((brInstance*)pointer)->status != AS_ACTIVE) return;
-			stInstanceCollect(((brInstance*)pointer)->userData);
+			stInstanceCollect((stInstance*)((brInstance*)pointer)->userData);
 			break;
 		case AT_LIST:
-			brEvalListCollect(pointer);
+			brEvalListCollect((brEvalListHead*)pointer);
 			break;
 		case AT_STRING:
-			// printf("collecting %s\n", pointer);
-			slFree(pointer);
+			slFree((char*)pointer);
 			break;
 		case AT_HASH:
-			brEvalHashCollect(pointer);
+			brEvalHashCollect((brEvalHash*)pointer);
 			break;
 		case AT_DATA:
-			brDataCollect(pointer);
+			brDataCollect((brData*)pointer);
 			break;
 		default:
 			break;
@@ -219,13 +218,13 @@ void stGCUnretainAndCollectPointer(void *pointer, int type) {
 */
 
 void stGCCollectStack(slStack *gc) {
-	int n;
+	unsigned int n;
 
 	for(n=0;n<gc->count;n++) {
-		stGCRecord *r = gc->data[n];
+		stGCRecord *r = (stGCRecord*)gc->data[n];
 
 		stGCCollectPointer(r->pointer, r->type);
-		slFree(gc->data[n]);
+		delete r;
 	}
 
 	gc->count = 0;
@@ -254,7 +253,7 @@ inline void stGCMarkPointer(stInstance *i, void *pointer, int type) {
 	switch(type) {
 		case AT_INSTANCE:
 			if(((brInstance*)pointer)->status != AS_ACTIVE) return;
-			collect = ((brInstance*)pointer)->userData;
+			collect = (stInstance*)((brInstance*)pointer)->userData;
 			if(!collect->gc) return;
 			break;
 		default:
@@ -262,15 +261,11 @@ inline void stGCMarkPointer(stInstance *i, void *pointer, int type) {
 	}
 
 
-	r = slMalloc(sizeof(stGCRecord));
+	r = new stGCRecord;
 	r->pointer = pointer;
 	r->type = type;
 	
 	slStackPush(i->gcStack, r);
-
-	// if(i->gcStack->count > 1000) {
-	// 	// printf("huge gc stack for %p: %d\n", i, i->gcStack->count);
-	// }
 }
 
 /*!
@@ -279,7 +274,7 @@ inline void stGCMarkPointer(stInstance *i, void *pointer, int type) {
 */
 
 void stGCUnmark(stInstance *i, brEval *collect) {
-	int n;
+	unsigned int n;
 	stGCRecord *r;
 
 	if(!i->gcStack || collect->type == AT_NULL || collect->type == AT_INT || 
@@ -289,15 +284,15 @@ void stGCUnmark(stInstance *i, brEval *collect) {
 	if(collect->type == AT_INSTANCE) {
 		stInstance *i;
 
-		if(((brInstance*)BRINSTANCE(collect))->status != AS_ACTIVE) return;
+		if(BRINSTANCE(collect)->status != AS_ACTIVE) return;
 
-		i = BRINSTANCE(collect)->userData;
+		i = (stInstance*)BRINSTANCE(collect)->userData;
 
 		if(!i->gc) return;
 	} 
 
 	for(n=0;n<i->gcStack->count;n++) {
-		r = i->gcStack->data[n];
+		r = (stGCRecord*)i->gcStack->data[n];
 	
 		if(r->pointer == collect->values.pointerValue) {
 			switch(r->type) {
@@ -407,7 +402,7 @@ void brEvalHashFreeGC(brEvalHash *h) {
 	start = all = slHashValues(h->table);
 
 	while(all) {
-		stGCUnretainAndCollect(all->data);
+		stGCUnretainAndCollect((brEval*)all->data);
 		all = all->next;
 	}
 
@@ -416,7 +411,7 @@ void brEvalHashFreeGC(brEvalHash *h) {
 	start = all = slHashKeys(h->table);
 
 	while(all) {
-		stGCUnretainAndCollect(all->data);
+		stGCUnretainAndCollect((brEval*)all->data);
 		all = all->next;
 	}
 

@@ -34,7 +34,7 @@
 	\brief Ignores collisions between adjacent multibody links.
 */
 
-void slMultibodyInitCollisionFlags(slMultibody *m, std::vector<slPairFlags*> &pe) {
+void slMultibodyInitCollisionFlags(slMultibody *m, slVclipData *cd) {
 	slLink *link1, *link2;
 	slPairFlags *flags;
 	std::vector<slLink*>::iterator i1;
@@ -50,7 +50,7 @@ void slMultibodyInitCollisionFlags(slMultibody *m, std::vector<slPairFlags*> &pe
 			link2 = *i2;
 
 			if(link1 != link2) {
-				flags = slVclipPairFlags(pe, link1->clipNumber, link2->clipNumber);
+				flags = slVclipPairFlags(cd, link1->clipNumber, link2->clipNumber);
 
 				if(m->handleSelfCollisions) *flags |= BT_CHECK;
 				else if(*flags & BT_CHECK) *flags ^= BT_CHECK;
@@ -69,7 +69,7 @@ void slMultibodyInitCollisionFlags(slMultibody *m, std::vector<slPairFlags*> &pe
 			link2 = (*ji)->child;
 
 			if(link1 != link2) {
-				flags = slVclipPairFlags(pe, link1->clipNumber, link2->clipNumber);
+				flags = slVclipPairFlags(cd, link1->clipNumber, link2->clipNumber);
 
 				if(*flags & BT_CHECK) *flags ^= BT_CHECK;
 			}
@@ -503,7 +503,7 @@ void slMultibodyUpdate(slMultibody *m) {
 	m->linkCount = slMultibodyCountLinks(m);
 	m->mass = slMultibodyComputeMass(m);
 
-	if(m->world->initialized) slMultibodyInitCollisionFlags(m, m->world->clipData->pairList);
+	if(m->world->initialized) slMultibodyInitCollisionFlags(m, m->world->clipData);
 }
 
 /*!
@@ -586,7 +586,7 @@ int slMultibodyCheckSelfPenetration(slWorld *world, slMultibody *m) {
 				c.x = link1->clipNumber;
 				c.y = link2->clipNumber;
 
-				flags = slVclipPairFlags(vc->pairList, link1->clipNumber, link2->clipNumber);
+				flags = slVclipPairFlags(vc, link1->clipNumber, link2->clipNumber);
 
 				if(slVclipFlagsShouldTest(*flags) && slVclipTestPair(vc, &c, NULL)) return 1;
 			}

@@ -32,10 +32,12 @@
 
 #include "steve.h"
 
+#include <vector>
+
 brEngine *parseEngine = NULL;
 
-stObject *thisObject = NULL;
-stMethod *thisMethod = NULL;
+stObject *currentObject = NULL;
+stMethod *currentMethod = NULL;
 
 stSteveData *steveData;
 
@@ -88,10 +90,13 @@ int stGetTypeForString(char *name);
 	struct stExp *exp;
 	struct brEval *eval;
 	struct stVarType *type;
-	struct slList *list;
 	struct stVar *variable;
 	struct stVersionRequirement *requirement;
 	struct stKeywordEntry *keyword;
+
+	std::vector< stExp* > *exp_vector;
+	std::vector< stKeywordEntry* > *keyword_entry_vector;
+	std::vector< stKeyword* > *keyword_vector;
 }
 
 %type <integer> vector_element math_assign_operator
@@ -101,7 +106,9 @@ int stGetTypeForString(char *name);
 %type <exp> atomic_expression unary_expression mul_expression add_expression comp_expression
 %type <exp> log_expression land_expression method_call expression
 %type <exp> control_statement simple_statement statement compound_statement
-%type <list> keyword_list exp_list code method_code keyword_and_variables keyword_and_variable_list
+%type <exp_vector> exp_list code method_code 
+%type <keyword_vector> keyword_list
+%type <keyword_entry_vector> keyword_and_variable_list keyword_and_variables 
 %type <type> type
 %type <requirement> header_version
 %type <variable> variable
@@ -145,7 +152,7 @@ sucessful_parse
 		if(brGetError(parseEngine)) YYABORT;
 	}
 | GT { 
-		if(!thisMethod || !thisObject) YYERROR;
+		if(!currentMethod || !currentObject) YYERROR;
 	} statement {
 		if(brGetError(parseEngine)) YYABORT;
 		steveData->singleStatement = $3;
@@ -210,7 +217,7 @@ header
 			stObject *so;
 
 			o = brObjectFind(parseEngine, $3);
-			so = o->userData;
+			so = (stObject*)o->userData;
 
 			if(so) {
 				if(!stCheckVersionRequirement(so->version, $4)) {
@@ -219,7 +226,7 @@ header
 				}
 			}
 
-			slFree($4);
+			delete $4;
 		}
 
 		slFree($3); 
@@ -234,7 +241,7 @@ header
 	}
 | '@' NIB_FILE STRING_VALUE END {
 		char *unquoted = slDequote($3);
-		char *fullnib, *nib = slMalloc(strlen(unquoted) + 5);
+		char *fullnib, *nib = new char[strlen(unquoted) + 5];
 		sprintf(nib, "%s.nib", unquoted);
 
 		fullnib = brFindFile(parseEngine, unquoted, NULL);
@@ -251,17 +258,17 @@ header
 	
 		slFree($3);
 		slFree(unquoted);
-		slFree(nib);
+		delete[] nib;
 		if(fullnib) slFree(fullnib);
 	}
 | '@' DEFINE WORD_VALUE STRING_VALUE END {
 		brEval *e;
 
-		e = slMalloc(sizeof(brEval));
+		e = new brEval;
 		e->type = AT_STRING;
 		BRSTRING(e) = slDequote($4);
 
-		brNamespaceStore(steveData->defines, $3, 0, e);
+		steveData->defines[ $3] = e;
 
 		slFree($3);
 		slFree($4);
@@ -269,30 +276,31 @@ header
 | '@' DEFINE WORD_VALUE FLOAT_VALUE END {
 		brEval *e;
 
-		e = slMalloc(sizeof(brEval));
+		e = new brEval;
 		e->type = AT_DOUBLE;
 		BRDOUBLE(e) = $4;
 
-		brNamespaceStore(steveData->defines, $3, 0, e);
+		steveData->defines[ $3] = e;
+
 		slFree($3);
 	}
 | '@' DEFINE WORD_VALUE INT_VALUE END {
 		brEval *e;
 
-		e = slMalloc(sizeof(brEval));
+		e = new brEval;
 		e->type = AT_INT;
 		BRINT(e) = $4;
 
-		brNamespaceStore(steveData->defines, $3, 0, e);
+		steveData->defines[ $3] = e;
+
 		slFree($3);
 	}
 | '@' DEFINE WORD_VALUE vector_value END {
-		brNamespaceStore(steveData->defines, $3, 0, $4);
+		steveData->defines[ $3] = $4;
 		slFree($3);
 	}
 | '@' DEFINE WORD_VALUE matrix_value END {
-
-		brNamespaceStore(steveData->defines, $3, 0, $4);
+		steveData->defines[ $3] = $4;
 		slFree($3);
 	}
 | CONTROLLER WORD_VALUE END {
@@ -307,7 +315,7 @@ vector_value
 : '(' number ',' number ',' number ')'  {
 		brEval *e;
 
-		e = slMalloc(sizeof(brEval));
+		e = new brEval;
 		e->type = AT_VECTOR;
 
 		BRVECTOR(e).x = stDoubleFromIntOrDoubleExp($2); stExpFree($2);
@@ -322,7 +330,7 @@ matrix_value
 : '[' '(' number ',' number ',' number ')' ',' '(' number ',' number ',' number ')' ',' '(' number ',' number ',' number ')' ']' {
 		brEval *e;
 
-		e = slMalloc(sizeof(brEval));
+		e = new brEval;
 		e->type = AT_MATRIX;
 
 		BRMATRIX(e)[0][0] = stDoubleFromIntOrDoubleExp($3); stExpFree($3);
@@ -348,10 +356,10 @@ objectdef
 : objecttype '{' definitionlist '}' {
 	}
 | objecttype '{' variabledef '}' {
-		stUnusedInstanceVarWarning(thisObject);
+		stUnusedInstanceVarWarning(currentObject);
 	}
 | objecttype '{' variabledef definitionlist '}' {
-		stUnusedInstanceVarWarning(thisObject);
+		stUnusedInstanceVarWarning(currentObject);
 	}
 | objecttype EMPTY_LIST	{
 	}
@@ -384,24 +392,24 @@ objecttype
 
 		o = brObjectFind(parseEngine, $3);
 
-		if(o) thisObject = o->userData;
-		else thisObject = NULL;
+		if(o) currentObject = (stObject*)o->userData;
+		else currentObject = NULL;
 
 		if($4) {
 			o = brObjectFind(parseEngine, $4);
 
-			if(o) akaObject = o->userData;
+			if(o) akaObject = (stObject*)o->userData;
 			else akaObject = NULL;
 		}
 		else akaObject = NULL;
 
-		if(thisObject && gReparse) {
-			stObjectFree(thisObject);
-			thisObject = NULL;
+		if(currentObject && gReparse) {
+			stObjectFree(currentObject);
+			currentObject = NULL;
 			akaObject = NULL;
 		}
 
-		if(thisObject) {
+		if(currentObject) {
 			stParseError(parseEngine, PE_REDEFINITION, "Class \"%s\" already defined", $3);
 			slFree($1);
 			slFree($3);
@@ -414,7 +422,7 @@ objecttype
 		} else {
 			brObject *o = brObjectFind(parseEngine, $1);
 
-			if(o) parentObject = o->userData;
+			if(o) parentObject = (stObject*)o->userData;
 			else parentObject = NULL;
 
 			if(!parentObject && strcmp($1, "NULL")) {
@@ -423,8 +431,8 @@ objecttype
 				slFree($3);
 				if($4) slFree($4);
 			} else {
-				thisObject = stObjectNew(parseEngine, steveData, $3, $4, parentObject, version);
-				thisMethod = NULL;
+				currentObject = stObjectNew(parseEngine, steveData, $3, $4, parentObject, version);
+				currentMethod = NULL;
 
 				slFree($1);
 				slFree($3);
@@ -442,17 +450,13 @@ objecttype
 
 methoddef
 : method_head method_code {
-		slList *code;
+		if($2) currentMethod->code = *$2;
 
-		code = slListReverse($2);
-		thisMethod->code = slListToArray(code);
-		slListFree(code);
-
-		stMethodAlignStack(thisMethod);
+		stMethodAlignStack(currentMethod);
 		
-		if(stStoreInstanceMethod(thisObject, $1, thisMethod)) {
-			stParseError(parseEngine, PE_REDEFINITION, "Symbol \"%s\" already defined for class \"%s\"", $1, thisObject->name);
-			stFreeMethod(thisMethod);
+		if(stStoreInstanceMethod(currentObject, $1, currentMethod)) {
+			stParseError(parseEngine, PE_REDEFINITION, "Symbol \"%s\" already defined for class \"%s\"", $1, currentObject->name);
+			stFreeMethod(currentMethod);
 		}
 
 		slFree($1);
@@ -464,17 +468,13 @@ methoddef
 		if(brGetError(parseEngine)) YYABORT;
 	}
 | method_head variable_list method_code {
-		slList *code;
+		if($3) currentMethod->code = *$3;
 
-		code = slListReverse($3);
-		thisMethod->code = slListToArray(code);
-		slListFree(code);
+		stMethodAlignStack(currentMethod);
 
-		stMethodAlignStack(thisMethod);
-
-		if(stStoreInstanceMethod(thisObject, $1, thisMethod)) {
-			stParseError(parseEngine, PE_REDEFINITION, "Symbol \"%s\" already defined for class \"%s\"", $1, thisObject->name);
-			stFreeMethod(thisMethod);
+		if(stStoreInstanceMethod(currentObject, $1, currentMethod)) {
+			stParseError(parseEngine, PE_REDEFINITION, "Symbol \"%s\" already defined for class \"%s\"", $1, currentObject->name);
+			stFreeMethod(currentMethod);
 		}
 
 		slFree($1);
@@ -491,16 +491,7 @@ to
 
 method_head
 : to WORD_VALUE keyword_and_variables ':' { 
-		slArray *keywordArray;
-		slList *rev = NULL;
-
-		rev = slListReverse($3);
-
-		keywordArray = slListToArray(rev);
-
-		if($3) slListFree(rev);
-
-		thisMethod = stNewMethod($2, keywordArray, yyfile, lineno);
+		currentMethod = stNewMethod($2, $3, yyfile, lineno);
 
 		$$ = $2; 
 	}
@@ -510,7 +501,7 @@ default_value
 : '=' vector_value { $$ = $2; }
 | '=' matrix_value { $$ = $2; }
 | '=' number { 
-		brEval *e = slMalloc(sizeof(brEval));
+		brEval *e = new brEval;
 		e->type = AT_DOUBLE;
 
 		BRDOUBLE(e) = stDoubleFromIntOrDoubleExp($2); stExpFree($2);
@@ -518,7 +509,7 @@ default_value
 		$$ = e;
 	}
 | '=' STRING_VALUE {
-		brEval *e = slMalloc(sizeof(brEval));
+		brEval *e = new brEval;
 		e->type = AT_STRING;
 
 		BRSTRING(e) = slDequote($2);
@@ -549,14 +540,14 @@ variable
 
 		slFree($1);
 
-		if(!thisMethod) {
-			if(!stInstanceNewVar(var, thisObject)) {
-				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in class \"%s\"", var->name, thisObject->name);
+		if(!currentMethod) {
+			if(!stInstanceNewVar(var, currentObject)) {
+				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in class \"%s\"", var->name, currentObject->name);
 				stFreeStVar(var);
 			}
 		} else {
-			if(!stMethodAddVar(var, thisMethod)) {
-				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in method \"%s\"", var->name, thisMethod->name);
+			if(!stMethodAddVar(var, currentMethod)) {
+				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in method \"%s\"", var->name, currentMethod->name);
 				stFreeStVar(var);
 			}
 		}
@@ -577,14 +568,14 @@ variable
 
 		slFree($1);
 
-		if(!thisMethod) {
-			if(!stInstanceNewVar(thisVar, thisObject)) {
-				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in class \"%s\"", thisVar->name, thisObject->name);
+		if(!currentMethod) {
+			if(!stInstanceNewVar(thisVar, currentObject)) {
+				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in class \"%s\"", thisVar->name, currentObject->name);
 				stFreeStVar(thisVar);
 			}
 		} else {
-			if(!stMethodAddVar(thisVar, thisMethod)) {
-				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in method \"%s\"", thisVar->name, thisMethod->name);
+			if(!stMethodAddVar(thisVar, currentMethod)) {
+				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in method \"%s\"", thisVar->name, currentMethod->name);
 				stFreeStVar(thisVar);
 			}
 		}
@@ -595,18 +586,17 @@ variable
 
 keyword_and_variables
 : keyword_and_variable_list { $$ = $1; }
-| /* empty */ { $$ = NULL; }
+| /* empty */ { $$ = new std::vector< stKeywordEntry* >(); }
 ;
 
 keyword_and_variable_list 
 : keyword_and_variable { 
-		$$ = slListPrepend(NULL, $1); 
-	}
-| '[' keyword_and_variable ']' { 
-		$$ = slListPrepend(NULL, $2); 
+		$$ = new std::vector< stKeywordEntry* >();
+		$$->push_back($1);
 	}
 | keyword_and_variable_list keyword_and_variable { 
-		$$ = slListPrepend($1, $2); 
+		$$ = $1;
+		$1->push_back($2);
 	}
 ;
 
@@ -618,7 +608,7 @@ keyword_and_variable
 
 		slFree($1);
 		slFree($2);
-		slFree($3);
+		delete $3;
 	}
 | WORD_VALUE WORD_VALUE type {
 		stVar *v = stVarNew($2, $3);
@@ -637,23 +627,18 @@ method_code
 
 compound_statement
 : '{' code '}' { 
-		slArray *a;
-		slList *rev;
-
-		rev = slListReverse($2);
-		a = slListToArray(rev);
-		slListFree(rev);
-
-		$$ = stExpNew(a, ET_CODE_ARRAY, yyfile, lineno);
+		$$ = stExpNew($2, ET_CODE_ARRAY, yyfile, lineno);
 	}
 ;
 
 code
 : statement { 
-		$$ = slListPrepend(NULL, $1); 
+		$$ = new std::vector< stExp* >();
+		$$->push_back($1);
 	}
 | code statement { 
-		$$ = slListPrepend($1, $2); 
+		$1->push_back($2);
+		$$ = $1;
 	}
 ;
 
@@ -683,7 +668,7 @@ statement
 
 control_statement
 : FOREACH WORD_VALUE WORD_VALUE expression ':' statement {
-		stExp *ae = stNewAssignExp(thisMethod, thisObject, $2, NULL, yyfile, lineno);
+		stExp *ae = stNewAssignExp(currentMethod, currentObject, $2, NULL, yyfile, lineno);
 		slFree($2);
 
 		if(strcmp($3, "in")) {
@@ -727,28 +712,10 @@ else
 simple_statement
 : method_call 		{ $$ = $1; }
 | PRINT exp_list { 
-		slArray *a;
-		slList *rev;
-
-		rev = slListReverse($2);
-
-		a = slListToArray(rev);
-
-		slListFree(rev);
-
-		$$ = stNewPrintExp(a, 1, yyfile, lineno); 
+		$$ = stNewPrintExp($2, 1, yyfile, lineno); 
 	}
 | PRINTF exp_list { 
-		slArray *a;
-		slList *rev;
-
-		rev = slListReverse($2);
-
-		a = slListToArray(rev);
-
-		slListFree(rev);
-
-		$$ = stNewPrintExp(a, 0, yyfile, lineno); 
+		$$ = stNewPrintExp($2, 0, yyfile, lineno); 
 	}
 | DIE { 
 		stParseError(parseEngine, PE_SYNTAX, "'die' requires an error message string");
@@ -765,7 +732,7 @@ simple_statement
 		$$ = stExpNew($2, ET_FREE, yyfile, lineno); 
 	}
 | WORD_VALUE '=' method_call {
-		$$ = stNewAssignExp(thisMethod, thisObject, $1, $3, yyfile, lineno);
+		$$ = stNewAssignExp(currentMethod, currentObject, $1, $3, yyfile, lineno);
 
 		if(!$$) stExpFree($3);
 		
@@ -774,30 +741,33 @@ simple_statement
 ; 
 
 exp_list
-: expression			{ $$ = slListPrepend(NULL, $1); }
-| exp_list ',' expression	{ $$ = slListPrepend($1, $3); }
+: expression			{ 
+		$$ = new std::vector< stExp* >();
+		$$->push_back($1);
+	}
+| exp_list ',' expression	{ 
+		$$ = $1; 
+		$$->push_back($3);
+	}
 ;
 
 method_call
 : atomic_expression WORD_VALUE keyword_list { 
-		slList *l = $3;
-		slArray *a;
 		stMethodExp *m;
 
-		a = slListToArray(l);
-		slListFree(l);
-
-		m = stNewMethodCall(thisObject, $1, $2, a);
+		m = stNewMethodCall(currentObject, $1, $2, $3);
 		if(m) $$ = stExpNew(m, ET_METHOD, yyfile, lineno);
-	else $$ = NULL;
+		else $$ = NULL;
 
 		slFree($2);
 	}
 | atomic_expression WORD_VALUE {
 		stMethodExp *m;
-		m = stNewMethodCall(thisObject, $1, $2, slListToArray(NULL));
+		std::vector< stKeyword* > keywords;
+
+		m = stNewMethodCall(currentObject, $1, $2, &keywords);
 		if(m) $$ = stExpNew(m, ET_METHOD, yyfile, lineno);
-	else $$ = NULL;
+		else $$ = NULL;
 
 		slFree($2);
 	}
@@ -805,16 +775,13 @@ method_call
 
 keyword_list 
 : WORD_VALUE expression {
-		stKeyword *k = stNewKeyword((char *)$1, (stExp*)$2);
-
-		$$ = slListPrepend(NULL, k);
+		$$ = new std::vector< stKeyword* >();
+		$$->push_back(stNewKeyword((char *)$1, (stExp*)$2));
 
 		slFree($1);
 	}
 | keyword_list WORD_VALUE expression {
-		stKeyword *k = stNewKeyword($2, (stExp*)$3);
-
-		$$ = slListPrepend($1, k); 
+		$$->push_back( stNewKeyword($2, (stExp*)$3));
 
 		slFree($2);
 	}
@@ -825,16 +792,16 @@ expression
 | WORD_VALUE math_assign_operator expression {
 		stExp *loadExp, *binExp;
 
-		loadExp = stNewLoadExp(thisMethod, thisObject, $1, yyfile, lineno);
+		loadExp = stNewLoadExp(currentMethod, currentObject, $1, yyfile, lineno);
 
 		binExp = stNewBinaryExp($2, loadExp, $3, yyfile, lineno);
 
-		$$ = stNewAssignExp(thisMethod, thisObject, $1, binExp, yyfile, lineno);
+		$$ = stNewAssignExp(currentMethod, currentObject, $1, binExp, yyfile, lineno);
 
 		slFree($1);
 	}
 | WORD_VALUE '=' expression {
-		$$ = stNewAssignExp(thisMethod, thisObject, $1, $3, yyfile, lineno);
+		$$ = stNewAssignExp(currentMethod, currentObject, $1, $3, yyfile, lineno);
 
 		if(!$$) {
 			stExpFree($3);
@@ -843,20 +810,20 @@ expression
 		slFree($1);
 	}
 | WORD_VALUE PLUSPLUS {
-		stExp *var = stNewLoadExp(thisMethod, thisObject, $1, yyfile, lineno);
+		stExp *var = stNewLoadExp(currentMethod, currentObject, $1, yyfile, lineno);
 		stExp *one = stNewIntExp(1, yyfile, lineno);
 		stExp *newExp = stNewBinaryExp(BT_ADD, var, one, yyfile, lineno); 
 
-		$$ = stNewAssignExp(thisMethod, thisObject, $1, newExp, yyfile, lineno);
+		$$ = stNewAssignExp(currentMethod, currentObject, $1, newExp, yyfile, lineno);
 
 		slFree($1);
 	}
 | WORD_VALUE MINUSMINUS {
-		stExp *var = stNewLoadExp(thisMethod, thisObject, $1, yyfile, lineno);
+		stExp *var = stNewLoadExp(currentMethod, currentObject, $1, yyfile, lineno);
 		stExp *one = stNewIntExp(1, yyfile, lineno);
 		stExp *newExp = stNewBinaryExp(BT_SUB, var, one, yyfile, lineno); 
 
-		$$ = stNewAssignExp(thisMethod, thisObject, $1, newExp, yyfile, lineno);
+		$$ = stNewAssignExp(currentMethod, currentObject, $1, newExp, yyfile, lineno);
 
 		slFree($1);
 	}
@@ -883,16 +850,16 @@ expression
 		$$ = stNewListIndexAssignExp(stNewDuplicateExp($1, yyfile, lineno), stNewDuplicateExp($3, yyfile, lineno), binExp, yyfile, lineno);
 	}
 | WORD_VALUE '[' expression']' '=' expression {
-		$$ = stNewArrayIndexAssignExp(thisMethod, thisObject, $1, $3, $6, yyfile, lineno);
+		$$ = stNewArrayIndexAssignExp(currentMethod, currentObject, $1, $3, $6, yyfile, lineno);
 		slFree($1);
 	}
 | WORD_VALUE '[' expression']' math_assign_operator expression {
 		stExp *loadExp, *binExp;
 
-		loadExp = stNewArrayIndexExp(thisMethod, thisObject, $1, $3, yyfile, lineno);
+		loadExp = stNewArrayIndexExp(currentMethod, currentObject, $1, $3, yyfile, lineno);
 		binExp = stNewBinaryExp($5, loadExp, $6, yyfile, lineno);
 
-		$$ = stNewArrayIndexAssignExp(thisMethod, thisObject, $1, stNewDuplicateExp($3, yyfile, lineno), binExp, yyfile, lineno);
+		$$ = stNewArrayIndexAssignExp(currentMethod, currentObject, $1, stNewDuplicateExp($3, yyfile, lineno), binExp, yyfile, lineno);
 
 		slFree($1);
 	}
@@ -1047,7 +1014,7 @@ atomic_expression
 		$$ = stNewListIndexExp($1, $3, yyfile, lineno); 
 	}
 | WORD_VALUE '[' expression ']' {
-		$$ = stNewArrayIndexExp(thisMethod, thisObject, $1, $3, yyfile, lineno);
+		$$ = stNewArrayIndexExp(currentMethod, currentObject, $1, $3, yyfile, lineno);
 
 		slFree($1);
 
@@ -1057,7 +1024,7 @@ atomic_expression
 		}
 	}
 | WORD_VALUE { 
-		$$ = stNewLoadExp(thisMethod, thisObject, $1, yyfile, lineno);
+		$$ = stNewLoadExp(currentMethod, currentObject, $1, yyfile, lineno);
 
 		slFree($1);
 
@@ -1095,8 +1062,7 @@ atomic_expression
 		$$ = stExpNew($3, ET_RANDOM, yyfile, lineno); 
 	}
 | '{' exp_list '}' {
-		slList *rev = slListReverse($2);
-		$$ = stExpNew(rev, ET_LIST, yyfile, lineno);
+		$$ = stExpNew($2, ET_LIST, yyfile, lineno);
 	}
 | EMPTY_LIST {
 		$$ = stExpNew(NULL, ET_LIST, yyfile, lineno);
@@ -1105,24 +1071,16 @@ atomic_expression
 		brInternalFunction *func = brEngineInternalFunctionLookup(parseEngine, $1);
 
 		if(!func) {	  
-			slList *l = $3;
-
+			unsigned int n;
 			stParseError(parseEngine, PE_UNKNOWN_FUNCTION, "Internal function \"%s\" not found", $1);
 
-			while(l) {
-				stExpFree(l->data);
-				l = l->next;
-			}
+			for(n=0; n < $3->size(); n++) stExpFree((*$3)[n]);
 
-			slListFree($3);
+			delete $3;
 			slFree($1);
 			$$ = NULL;
 		} else {
-			slList *l = slListReverse($3);
-
-			$$ = stNewCCallExp(parseEngine, func, l, yyfile, lineno); 
-			slListFree(l);
-
+			$$ = stNewCCallExp(parseEngine, func, $3, yyfile, lineno); 
 			slFree($1);
 		}
 	}
@@ -1181,7 +1139,7 @@ vector_element
 string
 : STRING_VALUE { 
 		char *unquoted = slDequote($1);
-		$$ = stNewStringExp(unquoted, thisMethod, thisObject, yyfile, lineno);
+		$$ = stNewStringExp(unquoted, currentMethod, currentObject, yyfile, lineno);
 
 		slFree($1);
 		slFree(unquoted);
@@ -1240,8 +1198,8 @@ void stParseSetEngine(brEngine *e) {
 }
 
 void stParseSetObjectAndMethod(stObject *o, stMethod *m) {
-	thisMethod = m;
-	thisObject = o;
+	currentMethod = m;
+	currentObject = o;
 }
 
 void stParseSetSteveData(stSteveData *data) {

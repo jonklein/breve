@@ -31,12 +31,15 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <h5>version 2.2 [in progress]</h5>
 
 <ul>
-<li>steve code evaluation optimized.
+<li>steve code evaluation greatly optimized (thanks to Michael Larson).
 <li>Enhanced support for the vector (point) type in Push.
-<li>Added method to set Mobile object rotation from Euler angles
-<li>Memory requirements and initialization time greatly reduced for large simulations
+<li>Added method to set Mobile object rotation from Euler angles.
+<li>Memory requirements and initialization time greatly reduced for large simulations.
+<li>breve is now capable of simulating far more objects than previously possible.
+<li>Objects can now be rendered as points.
 </ul>
 
+<h5>Bug fixes</h5>
 <ul>
 <li>Fixed "-u" flag for command-line OS X breve.
 <li>Fixed "set-density" method for Spheres.
@@ -44,6 +47,8 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <li>Fix to make "init" method errors stop the simulation
 <li>Exported slMalloc and slFree symbols for plugins.
 <li>Fixed freed-list memory leak in object inspector (OS X application)
+<li>Fixed truncated method names from NetworkServer object.
+<li>Fixed "unprepend" bug removing wrong element from lists.
 </ul>
 <hr>
 

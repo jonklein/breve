@@ -107,6 +107,8 @@ void slSphere::drawShadowVolume(slCamera *c, slPosition *p) {
 	int n, first = 1;
 	double diff;
 	int divisions;
+	static int inited;
+	static float sineTable[361], cosineTable[361];
 
 	slVectorSub(&c->lights[0].location, &p->location, &light);
 	// slVectorCopy(&c->lights[0].location, &light);
@@ -134,13 +136,26 @@ void slSphere::drawShadowVolume(slCamera *c, slPosition *p) {
 	if(divisions < MIN_SPHERE_VOLUME_DIVISIONS) divisions = MIN_SPHERE_VOLUME_DIVISIONS;
 	else if(divisions > MAX_SPHERE_VOLUME_DIVISIONS) divisions = MAX_SPHERE_VOLUME_DIVISIONS;
 
+	if(!inited) {
+		double step = (2.0*M_PI/360.0);
+		inited = 1;
+
+		for(n=0; n< 361;n++) {
+
+			sineTable[ n] = sin(step * n) * 1.05;
+			cosineTable[ n] = cos(step * n) * 1.05;
+		}
+	}
+
 	diff = 2.0*M_PI/(double)divisions;
+
+	int step = (360/divisions);
 
 	for(n=0;n<divisions + 1;n++) {
 		slVector dx, dy, v, vBottom, lBottom;
 
-		slVectorMul(&x1, _radius * cos(n*diff) * 1.05, &dx);
-		slVectorMul(&x2, _radius * sin(n*diff) * 1.05, &dy);
+		slVectorMul(&x1, _radius * cosineTable[ n * step], &dx);
+		slVectorMul(&x2, _radius * sineTable[n * step], &dy);
 
 		slVectorAdd(&p->location, &dx, &v);
 		slVectorAdd(&v, &dy, &v);
@@ -167,8 +182,8 @@ void slSphere::drawShadowVolume(slCamera *c, slPosition *p) {
 	for(n=0;n<divisions + 1;n++) {
 		slVector dx, dy, v;
 
-		slVectorMul(&x1, _radius * cos(n*diff) * 1.05, &dx);
-		slVectorMul(&x2, _radius * sin(n*diff) * 1.05, &dy);
+		slVectorMul(&x1, _radius * cosineTable[ n * step], &dx);
+		slVectorMul(&x2, _radius * sineTable[n * step], &dy);
 
 		slVectorAdd(&p->location, &dx, &v);
 		slVectorAdd(&v, &dy, &v);

@@ -96,7 +96,7 @@ struct slWorld {
 	// when objects are added or removed from the world, this flag must be 
 	// set to 0 so that vclip structures are reinitialized.
 
-	unsigned char initialized;
+	bool initialized;
 	unsigned char odeStepMode;
 
 	dWorldID odeWorldID;
@@ -110,8 +110,6 @@ struct slWorld {
 
 	slVector lightExposureSource;
 	slVector lightExposureTarget;
-
-	// visions are rendered from certain perspectives in the world
 
 	// integration vectors -- DV_VECTOR_COUNT depends on the requirements
 	// of the integration algorithm we're using... mbEuler requires only 
@@ -154,8 +152,8 @@ struct slWorld {
 
 	slVector gravity;
 
-	unsigned char detectCollisions;
-	unsigned char resolveCollisions;
+	bool detectCollisions;
+	bool resolveCollisions;
 
 	// drawing the world...
 

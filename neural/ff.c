@@ -30,16 +30,16 @@ snFFLayer *snNewLayer(int count, snFFLayer *previous) {
 
     if(count < 1) return NULL;
 
-    l = slMalloc(sizeof(snFFLayer));
+    l = new snFFLayer;
 
     l->count = count;
 
     /* we'll need space for both the sums and the activation */
     /* values in order to run the back propogation algorithm */
 
-    l->values = slMalloc(sizeof(double)*count);
-    l->sums = slMalloc(sizeof(double)*count);
-    l->deltas = slMalloc(sizeof(double)*count);
+    l->values = new double[count];
+    l->sums = new double[count];
+    l->deltas = new double[count];
 
     for(n=0;n<count;n++) {
         l->values[n] = 0.0;
@@ -59,16 +59,16 @@ snFFLayer *snNewLayer(int count, snFFLayer *previous) {
 
         /* we'll need 'count' sets of weights... */
 
-        l->weights = slMalloc(sizeof(double*)*count);
-        l->previousDeltas = slMalloc(sizeof(double*)*count);
+        l->weights = new double*[count];
+        l->previousDeltas = new double*[count];
 
         /* and each one goes back to everything on the last layer */
 
         for(n=0;n<count;n++) {
             /* + 1 for good luck, or for threshold, if you wish */
 
-            l->weights[n] = slMalloc(sizeof(double)*previous->count + 1);
-            l->previousDeltas[n] = slMalloc(sizeof(double)*previous->count + 1);
+            l->weights[n] = new double[previous->count + 1];
+            l->previousDeltas[n] = new double[previous->count + 1];
 
             for(m=0;m<previous->count + 1;m++) {
                 l->weights[n][m] = 1.5;
@@ -87,23 +87,23 @@ void snFreeNetwork(snFFLayer *output) {
 
     if(!output) return;
 
-    slFree(output->sums);
-    slFree(output->values);
-    slFree(output->deltas);
+    delete output->sums;
+    delete output->values;
+    delete output->deltas;
 
 	if(output->previous) {
 		for(n=0;n<output->count;n++) {
-	    	slFree(output->weights[n]);
-    		slFree(output->previousDeltas[n]);
+	    	delete output->weights[n];
+    		delete output->previousDeltas[n];
 		}
 
-    	slFree(output->weights);
-    	slFree(output->previousDeltas);
+    	delete output->weights;
+    	delete output->previousDeltas;
 	}
 
     snFreeNetwork(output->previous);
 
-    slFree(output);
+    delete output;
 }
 
 void snFeedForward(snFFLayer *output) {

@@ -21,18 +21,12 @@
 #include "steve.h"
 
 int brDataCopyObject(stInstance *src, stInstance *dst) {
-	slList *vars;
-
-	src = src;
-	dst = dst;
+	std::map< std::string, stVar* >::iterator vi;
 
 	if(src->type != dst->type) return -1;
-	
-	vars = src->type->variableList;
 
-	while(vars) {
-		brDataCopyVar(vars->data, src, dst);
-		vars = vars->next;
+	for(vi = src->type->variables.begin(); vi != src->type->variables.end(); vi++) {
+		brDataCopyVar(vi->second, src, dst);
 	}
 
 	return 0;

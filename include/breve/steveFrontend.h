@@ -1,5 +1,7 @@
 #define ST_STACK_SIZE   0x4000
 
+#include <vector>
+
 struct stSteveData {
 	brObjectType steveObjectType;
 
@@ -8,18 +10,19 @@ struct stSteveData {
     stExp *singleStatement;
     stMethod *singleStatementMethod;
 
-	slList *allObjects;
-	slList *filesSeen;
+	std::vector< stObject* > objects;
+	std::vector< std::string > filesSeen;
 
-	brNamespace *defines;
+	std::map< std::string, brEval* > defines;
 
-	slList *freedInstances;
-	char retainFreedInstances;
+	std::vector< stInstance* > freedInstances;
+	bool retainFreedInstances;
 
 	// the stack pointer and memory for running steve code
 
 	char stackBase[ST_STACK_SIZE];
 	char *stack;
+
 	stStackRecord *stackRecord;
 };
 
@@ -50,7 +53,5 @@ void stParseError(brEngine *, int, char *, ...);
 void stSteveCleanup(stSteveData *);
 
 int stPreprocess(stSteveData *, brEngine *, char *);
-
-void stFreeDefine(void *);
 
 int stSetControllerName(stSteveData *, brEngine *, char *);

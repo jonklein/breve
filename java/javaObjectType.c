@@ -28,8 +28,8 @@
 
 int brJavaMethodCallCallback(void *instanceData, void *methodData, brEval **args, brEval *result) {
 	jvalue jargs[JAVA_MAX_ARGS];
-	brJavaMethod *method = methodData;
-	brJavaInstance *instance = instanceData;
+	brJavaMethod *method = (brJavaMethod*)methodData;
+	brJavaInstance *instance = (brJavaInstance*)instanceData;
 	int n;
 
 	for(n=0;n<method->argumentCount;n++)
@@ -42,25 +42,25 @@ int brJavaMethodCallCallback(void *instanceData, void *methodData, brEval **args
 	\brief the findMethod field of the java brObjectType.
 */
 
-brJavaObject *brJavaObjectFindCallback(void *typeData, char *name) {
-	brJavaBridgeData *bridge = typeData;
-	return brJavaObjectFind(bridge, name);
+void *brJavaObjectFindCallback(void *typeData, char *name) {
+	brJavaBridgeData *bridge = (brJavaBridgeData*)typeData;
+	return (void*)brJavaObjectFind(bridge, name);
 }
 
 /*!
 	\brief the findMethod field of the java brObjectType.
 */
 
-brJavaMethod *brJavaMethodFindCallback(void *objectData, char *name, unsigned char *types, int tCount) {
-	brJavaObject *object = objectData;
-	return brJavaMethodFind(object->bridge, object, name, types, tCount);
+void *brJavaMethodFindCallback(void *objectData, char *name, unsigned char *types, int tCount) {
+	brJavaObject *object = (brJavaObject*)objectData;
+	return (void*)brJavaMethodFind(object->bridge, object, name, types, tCount);
 }
 
 /*!
 	\brief the isSubclass field of the java brObjectType.
 */
 
-brJavaMethod *brJavaIsSubclassCallback(brObject *class1, brObject *class2) {
+int brJavaIsSubclassCallback(void *class1, void *class2) {
 	return 0;
 }
 
@@ -68,8 +68,8 @@ brJavaMethod *brJavaIsSubclassCallback(brObject *class1, brObject *class2) {
 	\brief the instantiate field of the java brObjectType.
 */
 
-brJavaInstance *brJavaInstanceNewCallback(void *objectData, brEval **args, int argCount) {
-	return brJavaInstanceNew(objectData, args, argCount);
+void *brJavaInstanceNewCallback(void *objectData, brEval **args, int argCount) {
+	return (void*)brJavaInstanceNew((brJavaObject*)objectData, args, argCount);
 }
 
 /*!
@@ -92,7 +92,7 @@ void brJavaInit(brEngine *e) {
 
 	if(!data) return;
 
-	javaObjectType = slMalloc(sizeof(brObjectType));
+	javaObjectType = new brObjectType;
 
 	javaObjectType->callMethod = brJavaMethodCallCallback;
 	javaObjectType->findMethod = brJavaMethodFindCallback;

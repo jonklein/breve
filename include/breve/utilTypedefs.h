@@ -21,11 +21,8 @@
 typedef struct slHash slHash;
 typedef struct slHashEntry slHashEntry;
 typedef struct slList slList;
-typedef struct slArray slArray;
 typedef struct slQuat slQuat;
-typedef struct slMallocData slMallocData;
 typedef struct slVector slVector;
 typedef struct slsVector slsVector;
 typedef struct slStack slStack;
-
 typedef struct slStringStream slStringStream;

@@ -52,7 +52,7 @@
 stExp *stExpNew(void *data, char type, char *file, int line) {
 	stExp *e;
 
-	e = slMalloc(sizeof(stExp));
+	e = new stExp;
 
 	e->values.pValue = data;
 	e->type = type;
@@ -65,25 +65,14 @@ stExp *stExpNew(void *data, char type, char *file, int line) {
 	return e;
 }
 
-int stExpFree(stExp *e) {
-	int result = 0;
-
-	if(!e) return result;
+void stExpFree(stExp *e) {
+	if(!e) return;
 
 	if (e->block)
 		free(e->block);
 		
 	switch(e->type) {
-		/* these elements have nothing additional allocated */
-
-		case ET_SUPER:
-		case ET_SELF:
-		case ET_INT:
-		case ET_DOUBLE:
-		case ET_DUPLICATE:
-			break;
-
-		/* these elements have only static buffers allocated */
+		// these elements have only static buffers allocated 
 
 		case ET_ST_EVAL:
 			stGCCollect(e->values.pValue);
@@ -94,7 +83,7 @@ int stExpFree(stExp *e) {
 			slFree(e->values.pValue);
 			break;
 
-		/* these elements just have another stExp */
+		// these elements just have another stExp 
 
 		case ET_RETURN:
 		case ET_FREE:
@@ -105,13 +94,10 @@ int stExpFree(stExp *e) {
 			stExpFree(e->values.pValue);
 			break;
 
-		/* these need special freeing */
+		// these need special freeing 
 
 		case ET_ALL:
 			stFreeAllExp(e->values.pValue);
-			break;
-		case ET_LIST:
-			stExpFreeList(e->values.pValue);
 			break;
 		case ET_VECTOR_ELEMENT:
 			stFreeVectorElementExp(e->values.pValue);
@@ -124,9 +110,6 @@ int stExpFree(stExp *e) {
 			break;
 		case ET_MATRIX:
 			stFreeMatrixExp(e->values.pValue);
-			break;
-		case ET_EXP_ARRAY:
-			stExpFreeArray(e->values.pValue);
 			break;
 		case ET_BINARY:
 			stFreeBinaryExp(e->values.pValue);
@@ -151,11 +134,6 @@ int stExpFree(stExp *e) {
 			break;
 		case ET_PRINT:
 			stFreePrintExp(e->values.pValue);
-			break;
-
-		case ET_CODE_ARRAY:
-		case ET_ERROR:
-			stExpFreeArray(e->values.pValue);
 			break;
 
 		case ET_INSTANCE:
@@ -205,15 +183,9 @@ int stExpFree(stExp *e) {
 		case ET_ISA:
 			stFreeIsaExp(e->values.pValue);
 			break;
-
-		default: 
-			slMessage(DEBUG_ALL, "expression type %d not freed\n", e->type);
-			break;
 	}
 
-	slFree(e);
-
-	return result;
+	delete e;
 }
 
 void stExpFreeList(slList *n) {
@@ -227,20 +199,10 @@ void stExpFreeList(slList *n) {
 	slListFree(head);
 }
 
-void stExpFreeArray(slArray *a) {
-	int n;
-
-	if(!a) return;
-
-	for(n=0;n<a->count;n++) stExpFree(a->data[n]);
-
-	slFreeArray(a); 
-}
-
 stExp *stNewStEvalExp(brEval *eval, char *file, int line) {
 	stExp *e;
 
-	e = slMalloc(sizeof(stExp));
+	e = new stExp;
 
 	e->values.pValue = eval;
 	e->type = ET_ST_EVAL;
@@ -253,7 +215,7 @@ stExp *stNewStEvalExp(brEval *eval, char *file, int line) {
 stExp *stNewIntExp(int n, char *file, int line) {
 	stExp *e;
 
-	e = slMalloc(sizeof(stExp));
+	e = new stExp;
 
 	e->values.iValue = n;
 	e->type = ET_INT;
@@ -266,7 +228,7 @@ stExp *stNewIntExp(int n, char *file, int line) {
 stExp *stNewDoubleExp(double n, char *file, int line) {
 	stExp *e;
 
-	e = slMalloc(sizeof(stExp));
+	e = new stExp;
 
 	e->values.dValue = n;
 	e->type = ET_DOUBLE;
@@ -279,31 +241,29 @@ stExp *stNewDoubleExp(double n, char *file, int line) {
 stExp *stNewArrayIndexExp(stMethod *m, stObject *o, char *word, stExp *index, char *file, int line) {
 	stVar *var;
 	stArrayIndexExp *sa;
-	brNamespaceSymbol *varSymbol;
 
-	sa = slMalloc(sizeof(stArrayIndexExp));
+	sa = new stArrayIndexExp;
 	sa->index = index;
  
-	/* first find out if this is a local variable */
+	// first find out if this is a local variable 
  
 	if((var = stFindLocal(word, m))) {
 		sa->local = 1;
 	} else {
-		varSymbol = stObjectLookup(o, word, ST_VAR);
+		var = stObjectLookupVariable(o, word);
 
-		if(!varSymbol) {
+		if(!var) {
 			stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name);
-			slFree(sa);
+			delete sa;
 			return NULL;
 		}
 
-		var = varSymbol->data;
 		sa->local = 0;
 	}
 
 	if(var->type->type != AT_ARRAY) {
 		stParseError(o->engine, PE_TYPE, "Variable \"%s\" is not an array", word);
-		slFree(sa);
+		delete sa;
 		return NULL;
 	}
 
@@ -320,15 +280,14 @@ stExp *stNewArrayIndexExp(stMethod *m, stObject *o, char *word, stExp *index, ch
 void stFreeArrayIndexExp(stArrayIndexExp *e) {
 	stExpFree(e->index);
 	if (e->block) free(e->block);
-	slFree(e);
+	delete e;
 }
 
 stExp *stNewArrayIndexAssignExp(stMethod *m, stObject *o, char *word, stExp *index, stExp *rvalue, char *file, int line) {
 	stVar *var;
 	stArrayIndexAssignExp *sa;
-	brNamespaceSymbol *varSymbol;
 
-	sa = slMalloc(sizeof(stArrayIndexAssignExp));
+	sa = new stArrayIndexAssignExp;
 	sa->index = index;
 	sa->rvalue = rvalue;
  
@@ -337,21 +296,20 @@ stExp *stNewArrayIndexAssignExp(stMethod *m, stObject *o, char *word, stExp *ind
 	if((var = stFindLocal(word, m))) {
 		sa->local = 1;
 	} else {
-		varSymbol = stObjectLookup(o, word, ST_VAR);
+		var = stObjectLookupVariable(o, word);
 
-		if(!varSymbol) {
+		if(!var) {
 			stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name);
-			slFree(sa);
+			delete sa;
 			return NULL;
 		}
 
-		var = varSymbol->data;
 		sa->local = 0;
 	}
 
 	if(var->type->type != AT_ARRAY) {
 		stParseError(o->engine, PE_TYPE, "Variable \"%s\" is not an array");
-		slFree(sa);
+		delete sa;
 		return NULL;
 	}
 
@@ -368,30 +326,28 @@ void stFreeArrayIndexAssignExp(stArrayIndexAssignExp *e) {
 	stExpFree(e->rvalue);
 	stExpFree(e->index);
 	if (e->block) free(e->block);
-	slFree(e);
+	delete e;
 }
 
 stExp *stNewLoadExp(stMethod *m, stObject *o, char *word, char *file, int line) {
 	stVar *var;
-	brNamespaceSymbol *varSymbol;
 	stLoadExp *le;
  
-	le = slMalloc(sizeof(stLoadExp));
+	le = new stLoadExp;
 
 	/* we don't know if this variable is local or not */
 
 	if((var = stFindLocal(word, m))) {
 		le->local = 1;
 	} else {
-		varSymbol = stObjectLookup(o, word, ST_VAR);
+		var = stObjectLookupVariable(o, word);
 
-		if(!varSymbol) {
+		if(!var) {
 			stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name);
-			slFree(le);
+			delete le;
 			return NULL;
 		}
 
-		var = varSymbol->data;
 		le->local = 0;
 	}
 
@@ -406,15 +362,14 @@ void stFreeAssignExp(stAssignExp *a) {
 	if(a->objectName) slFree(a->objectName);
 	if(a->rvalue) stExpFree(a->rvalue);
 	if (a->block) free(a->block);
-	slFree(a);
+	delete a;
 }
 
 stExp *stNewAssignExp(stMethod *m, stObject *o, char *word, stExp *rvalue, char *file, int line) {
 	stVar *var;
-	brNamespaceSymbol *varSymbol;
 	stAssignExp *ae;
  
-	ae = slMalloc(sizeof(stAssignExp));
+	ae = new stAssignExp;
 	ae->rvalue = rvalue;
 
 	/* we don't know if this variable is local or not */
@@ -422,15 +377,14 @@ stExp *stNewAssignExp(stMethod *m, stObject *o, char *word, stExp *rvalue, char 
 	if((var = stFindLocal(word, m))) {
 		ae->local = 1;
 	} else {
-		varSymbol = stObjectLookup(o, word, ST_VAR);
+		var = stObjectLookupVariable(o, word);
 
-		if(!varSymbol) {
+		if(!var) {
 			stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name);
-			slFree(ae);
+			delete ae;
 			return NULL;
 		}
 
-		var = varSymbol->data;
 		ae->local = 0;
 	}
 
@@ -445,7 +399,7 @@ stExp *stNewAssignExp(stMethod *m, stObject *o, char *word, stExp *rvalue, char 
 	return stExpNew(ae, ET_ASSIGN, file, line);
 }
 
-stMethodExp *stNewMethodCall(stObject *o, stExp *callingObject, char *method, slArray *args) {
+stMethodExp *stNewMethodCall(stObject *o, stExp *callingObject, char *method, std::vector< stKeyword* > *arguments) {
 	stMethodExp *m;
 
 	if(!strcmp(method, "init")) {
@@ -453,24 +407,26 @@ stMethodExp *stNewMethodCall(stObject *o, stExp *callingObject, char *method, sl
 		return NULL;
 	}
 
-	m = slMalloc(sizeof(stMethodExp));
+	m = new stMethodExp;
 
 	m->methodName = slStrdup(method);
 	m->method = NULL;
 	m->objectExp = callingObject;
-	m->arguments = args;
-	m->positionedArguments = slStackNew();
+	m->arguments = *arguments;
 
 	return m;
 }
 
 void stFreeMethodExp(stMethodExp *m) {
+	std::vector< stKeyword* >::iterator ki;
+
 	slFree(m->methodName);
 	stExpFree(m->objectExp);
-	stFreeKeywordArray(m->arguments);
-	slStackFree(m->positionedArguments);
+
+	for(ki = m->arguments.begin(); ki != m->arguments.end(); ki++ ) stFreeKeyword( *ki);
+
 	if (m->block) free(m->block);
-	slFree(m);
+	delete m;
 }
 
 // these methods involve creating LIST operator expressions
@@ -478,7 +434,7 @@ void stFreeMethodExp(stMethodExp *m) {
 stExp *stNewListInsertExp(stExp *list, stExp *exp, stExp *index, char *file, int lineno) {
 	stListInsertExp *p;
 
-	p = slMalloc(sizeof(stListInsertExp));
+	p = new stListInsertExp;
 
 	p->listExp = list;
 	p->exp = exp;
@@ -490,7 +446,7 @@ stExp *stNewListInsertExp(stExp *list, stExp *exp, stExp *index, char *file, int
 stExp *stNewListRemoveExp(stExp *list, stExp *index, char *file, int lineno) {
 	stListRemoveExp *p;
 
-	p = slMalloc(sizeof(stListRemoveExp));
+	p = new stListRemoveExp;
 	p->listExp = list;
 	p->index = index;
 
@@ -503,7 +459,7 @@ void stFreeListRemoveExp(stListRemoveExp *p) {
 		free(p->block);
 	if(p->index) stExpFree(p->index);
 	if (p->block) free(p->block);
-	slFree(p);
+	delete p;
 }
 
 void stFreeListInsertExp(stListInsertExp *p) {
@@ -511,13 +467,13 @@ void stFreeListInsertExp(stListInsertExp *p) {
 	stExpFree(p->exp);
 	if(p->index) stExpFree(p->index);
 	if (p->block) free(p->block);
-	slFree(p);
+	delete p;
 }
 
 stExp *stNewSortExp(stExp *list, char *method, char *file, int lineno) {
 	stSortExp *s;
  
-	s = slMalloc(sizeof(stSortExp));
+	s = new stSortExp;
 	s->methodName = slStrdup(method);
 	s->listExp = list;
 
@@ -529,13 +485,13 @@ void stFreeSortExp(stSortExp *s) {
 
 	slFree(s->methodName);
 	if (s->block) free(s->block);
-	slFree(s);
+	delete s;
 }
 
 stExp *stNewListIndexExp(stExp *list, stExp *index, char *file, int lineno) {
 	stListIndexExp *e;
 
-	e = slMalloc(sizeof(stListIndexExp));
+	e = new stListIndexExp;
 
 	e->listExp = list;
 	e->indexExp = index;
@@ -548,13 +504,13 @@ void stFreeListIndexExp(stListIndexExp *e) {
 	stExpFree(e->indexExp);
 
 	if (e->block) free(e->block);
-	slFree(e);
+	delete e;
 }
 
 stExp *stNewListIndexAssignExp(stExp *list, stExp *index, stExp *assignment, char *file, int lineno) {
 	stListIndexAssignExp *s;
 
-	s = slMalloc(sizeof(stListIndexAssignExp));
+	s = new stListIndexAssignExp;
 
 	s->listExp = list;
 	s->indexExp = index;
@@ -569,31 +525,23 @@ void stFreeListIndexAssignExp(stListIndexAssignExp *s) {
 	stExpFree(s->assignment);
 
 	if (s->block) free(s->block);
-	slFree(s);
+	delete s;
 }
 
-stExp *stNewCCallExp(brEngine *e, brInternalFunction *s, slList *exps, char *file, int line) {
+stExp *stNewCCallExp(brEngine *e, brInternalFunction *s, std::vector< stExp* > *expressions, char *file, int line) {
 	stCCallExp *c;
-	int passedArgs;
   
-	c = slMalloc(sizeof(stCCallExp));
+	c = new stCCallExp;
 
 	c->function = s;
 
-	if(exps) {
-		c->args = slListToArray(exps);
+	if(expressions) c->arguments = *expressions;
 
-		passedArgs = c->args->count;
-	} else {
-		c->args = NULL;
-		passedArgs = 0;
-	}
+	// parse time check of the number of args passed in. 
+	// type checking has to be done at run time. 
 
-	/* parse time check of the number of args passed in. */
-	/* type checking has to be done at run time. */
-
-	if(c->function->nargs != passedArgs) {
-		stParseError(e, PE_PROTOTYPE, "invalid number of arguments to internal method \"%s\": expected %d, got %d", s->name, c->function->nargs, passedArgs); 
+	if(c->function->nargs != c->arguments.size()) {
+		stParseError(e, PE_PROTOTYPE, "invalid number of arguments to internal method \"%s\": expected %d, got %d", s->name, c->function->nargs, c->arguments.size()); 
 		slFree(c);
 
 		return NULL;
@@ -603,9 +551,9 @@ stExp *stNewCCallExp(brEngine *e, brInternalFunction *s, slList *exps, char *fil
 }
 
 void stFreeCCallExp(stCCallExp *c) {
-	/* UNFREED ... */
+	unsigned int n;
 
-	stExpFreeArray(c->args);
+	for(n=0; n < c->arguments.size(); n++) stExpFree(c->arguments[n]);
 
 	if (c->block) free(c->block);
 	slFree(c);
@@ -614,7 +562,7 @@ void stFreeCCallExp(stCCallExp *c) {
 stExp *stNewAllExp(char *object, char *file, int line) {
 	stAllExp *e;
 
-	e = slMalloc(sizeof(stAllExp));
+	e = new stAllExp;
 	e->name = slStrdup(object);
 
 	return stExpNew(e, ET_ALL, file, line);
@@ -629,7 +577,7 @@ void stFreeAllExp(stAllExp *e) {
 stExp *stNewWhileExp(stExp *cond, stExp *code, char *file, int lineno) {
 	stWhileExp *w;
 
-	w = slMalloc(sizeof(stWhileExp));
+	w = new stWhileExp;
 
 	w->cond = cond;
 	w->code = code;
@@ -648,7 +596,7 @@ void stFreeWhileExp(stWhileExp *w) {
 stExp *stNewForeachExp(stAssignExp *assignment, stExp *list, stExp *code, char *file, int lineno) {
 	stForeachExp *w;
 
-	w = slMalloc(sizeof(stForeachExp));
+	w = new stForeachExp;
 
 	w->assignment = assignment;
 	w->list = list;
@@ -669,7 +617,7 @@ void stFreeForeachExp(stForeachExp *f) {
 stExp *stNewForExp(stExp *assignment, stExp *condition, stExp *iteration, stExp *code, char *file, int lineno) {
 	stForExp *f;
 
-	f = slMalloc(sizeof(stForExp));
+	f = new stForExp;
 
 	f->condition = condition;
 	f->assignment = assignment;
@@ -692,7 +640,7 @@ void stFreeForExp(stForExp *f) {
 stExp *stNewIfExp(stExp *cond, stExp *trueCode, stExp *falseCode, char *file, int lineno) {
 	stIfExp *i;
 
-	i = slMalloc(sizeof(stIfExp));
+	i = new stIfExp;
 
 	i->cond = cond;
 	i->trueCode = trueCode;
@@ -710,18 +658,21 @@ void stFreeIfExp(stIfExp *f) {
 	slFree(f);
 }
 
-stExp *stNewPrintExp(slArray *array, int newline, char *file, int lineno) {
+stExp *stNewPrintExp(std::vector< stExp* > *expressions, int newline, char *file, int lineno) {
 	stPrintExp *pe;
 
-	pe = slMalloc(sizeof(stPrintExp));
-	pe->expressions = array;
+	pe = new stPrintExp;
+	pe->expressions = *expressions;
 	pe->newline = newline;
 
 	return stExpNew(pe, ET_PRINT, file, lineno);
 }
 
 void stFreePrintExp(stPrintExp *pe) {
-	stExpFreeArray(pe->expressions);
+	unsigned int n;
+
+	for(n=0; n < pe->expressions.size(); n++) stExpFree( pe->expressions[n] );
+
 	if (pe->block) free(pe->block);
 	slFree(pe);
 }
@@ -729,22 +680,12 @@ void stFreePrintExp(stPrintExp *pe) {
 stKeyword *stNewKeyword(char *word, stExp *data) {
 	stKeyword *k;
 
-	k = slMalloc(sizeof(struct stKeyword));
+	k = new stKeyword;
 
 	k->word = slStrdup(word);
 	k->value = data;
 
 	return k;
-}
-
-void stFreeKeywordArray(slArray *a) {
-	int n;
-
-	if(!a) return;
-
-	for(n=0;n<a->count;n++) stFreeKeyword(a->data[n]);
-
-	slFreeArray(a);
 }
 
 void stFreeKeyword(stKeyword *k) {
@@ -758,7 +699,7 @@ void stFreeKeyword(stKeyword *k) {
 stExp *stNewBinaryExp(int type, stExp *left, stExp *right, char *file, int line) {
 	stBinaryExp *be;
 
-	be = slMalloc(sizeof(stBinaryExp));
+	be = new stBinaryExp;
 
 	be->left = left;
 	be->right = right;
@@ -773,13 +714,14 @@ void stFreeBinaryExp(stBinaryExp *b) {
 	stExpFree(b->right);
 
 	if (b->block) free(b->block);
-	slFree(b);
+
+	delete b;
 }
 
 stExp *stNewUnaryExp(int type, stExp *exp, char *file, int line) {
 	stUnaryExp *be;
 
-	be = slMalloc(sizeof(stUnaryExp));
+	be = new stUnaryExp;
 
 	be->exp = exp;
 
@@ -792,13 +734,14 @@ void stFreeUnaryExp(stUnaryExp *u) {
 	stExpFree(u->exp);
 
 	if (u->block) free(u->block);
-	slFree(u);
+
+	delete u;
 }
 
 stExp *stNewVectorExp(stExp *x, stExp *y, stExp *z, char *file, int line) {
 	stVectorExp *ve;
 
-	ve = slMalloc(sizeof(stVectorExp));
+	ve = new stVectorExp;
 
 	ve->x = x;
 	ve->y = y;
@@ -810,7 +753,7 @@ stExp *stNewVectorExp(stExp *x, stExp *y, stExp *z, char *file, int line) {
 stExp *stNewMatrixExp(stExp *e00, stExp *e01, stExp *e02, stExp *e10, stExp *e11, stExp *e12, stExp *e20, stExp *e21, stExp *e22, char *file, int line) {
 	stMatrixExp *me;
 
-	me = slMalloc(sizeof(stMatrixExp));
+	me = new stMatrixExp;
 
 	me->expressions[0] = e00;
 	me->expressions[1] = e01;
@@ -833,7 +776,7 @@ void stFreeVectorExp(stVectorExp *v) {
 	stExpFree(v->z);
 
 	if (v->block) free(v->block);
-	slFree(v);
+	delete v;
 }
 
 void stFreeMatrixExp(stMatrixExp *m) {
@@ -842,14 +785,15 @@ void stFreeMatrixExp(stMatrixExp *m) {
 	for(n=0;n<9;n++) stExpFree(m->expressions[n]);
 
 	if (m->block) free(m->block);
-	slFree(m);
+
+	delete m;
 }
 
 
 stExp *stNewVectorElementExp(stExp *v, char element, char *file, int line) {
 	stVectorElementExp *ve;
 
-	ve = slMalloc(sizeof(stVectorElementExp));
+	ve = new stVectorElementExp;
 
 	ve->exp = v;
 	ve->element = element;
@@ -860,13 +804,14 @@ stExp *stNewVectorElementExp(stExp *v, char element, char *file, int line) {
 void stFreeVectorElementExp(stVectorElementExp *v) {
 	stExpFree(v->exp);
 	if (v->block) free(v->block);
-	slFree(v);
+
+	delete v;
 }
 
 stExp *stNewVectorElementAssignExp(stExp *v, stExp *rvalue, char element, char *file, int line) {
 	stVectorElementAssignExp *ve;
 
-	ve = slMalloc(sizeof(stVectorElementAssignExp));
+	ve = new stVectorElementAssignExp;
 
 	ve->exp = v;
 	ve->element = element;
@@ -885,7 +830,7 @@ void stFreeVectorElementAssignExp(stVectorElementAssignExp *v) {
 stExp *stInstanceNewExp(char *name, stExp *count, char *file, int line) {
 	stInstanceExp *ie;
 
-	ie = slMalloc(sizeof(stInstanceExp));
+	ie = new stInstanceExp;
 
 	ie->count = count;
 	ie->name = slStrdup(name);
@@ -906,7 +851,7 @@ stExp *stNewDuplicateExp(stExp *e, char *file, int line) {
 stExp *stNewIsaExp(stExp *e, stVarType *type, char *file, int line) {
 	stIsaExp *isa;
 
-	isa = slMalloc(sizeof(stIsaExp));
+	isa = new stIsaExp;
 	isa->expression = e;
 	isa->type = type;
 

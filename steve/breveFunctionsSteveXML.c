@@ -20,12 +20,10 @@ int stCWriteXMLEngine(brEval args[], brEval *target, brInstance *i) {
 */
 
 int stCArchiveXMLObject(brEval args[], brEval *target, brInstance *i) {
-	stInstance *archive;
 	char *filename = BRSTRING(&args[1]);
 	char *path = brOutputPath(i->engine, filename);
 
-	archive = BRINSTANCE(&args[0])->userData;
-	BRINT(target) = stXMLWriteObjectToFile(archive, path, 0);
+	BRINT(target) = stXMLWriteObjectToFile((stInstance*)BRINSTANCE(&args[0]), path, 0);
 	slFree(path);
 
 	return EC_OK;
@@ -44,7 +42,6 @@ int stCDearchiveXMLObject(brEval args[], brEval *target, brInstance *i) {
 		BRINSTANCE(target) = NULL;
 		return EC_OK;
 	}
-
 
 	si = stXMLDearchiveObjectFromFile(i->engine, filename);
 

@@ -60,33 +60,12 @@ enum states {
 	in the engine.
 */
 
-int stXMLAssignIndices(brEngine *e) {
-	int n;
-	int top = 0;
-	slStack *instances = brEngineGetAllInstances(e);
+int stXMLAssignIndices(brEngine *e, std::map< stInstance*, int > &instanceToIndexMap) {
+	unsigned int n;
 
-	for(n=0;n<instances->count;n++) {
-		stInstance *i = ((brInstance*)instances->data[n])->userData;
-		i->index = n;
-	}
+	for(n=0; n<e->instances.size(); n++) instanceToIndexMap[ (stInstance*)e->instances[n]->userData ] = n;
 
-	slStackFree(instances);
-
-	return top;
-}
-
-stInstance *stXMLFindDearchivedInstance(slList *l, int n) {
-	stInstance *i;
-
-	while(l) {
-		i = l->data;
-
-		if(i->index == n) return i;
-
-		l = l->next;
-	}
-
-	return NULL;
+	return n;
 }
 
 int stXMLWriteObjectToFile(stInstance *i, char *filename, int isDataObject) {
@@ -113,14 +92,12 @@ int stXMLWriteObjectToStream(stInstance *i, FILE *file, int isDataObject) {
 	stXMLArchiveRecord record;
 	int spaces = 0;
 
-	stXMLAssignIndices(i->type->engine);
-
-	memset(&record, 0, sizeof(stXMLArchiveRecord));
+	stXMLAssignIndices(i->type->engine, record.instanceToIndexMap);
 
 	fprintf(file, "<?xml version=\"1.0\"?>\n");
 	fprintf(file, "<!DOCTYPE steveObject SYSTEM \"steveObject.dtd\">\n");
 
-	if(!isDataObject) fprintf(file, "<instance_archive archiveIndex=\"%d\">\n", i->index);
+	if(!isDataObject) fprintf(file, "<instance_archive archiveIndex=\"%d\">\n", record.instanceToIndexMap[ i]);
 	else fprintf(file, "<data_instance_archive>\n");
 
 	spaces += XML_INDENT_SPACES;
@@ -129,8 +106,6 @@ int stXMLWriteObjectToStream(stInstance *i, FILE *file, int isDataObject) {
 
 	if(!isDataObject) fprintf(file, "</instance_archive>\n");
 	else fprintf(file, "</data_instance_archive>\n");
-
-	slListFree(record.instances);
 
 	return 0;
 }
@@ -141,8 +116,6 @@ int stXMLWriteObjectToStream(stInstance *i, FILE *file, int isDataObject) {
 
 int stXMLWriteSimulationToFile(char *filename, brEngine *e) {
 	FILE *file;
-
-	stXMLAssignIndices(e);
 
 	if(!(file = fopen(filename, "w"))) {
 		slMessage(DEBUG_ALL, "error opening file \"%s\" for archive of simulation\n", filename);
@@ -161,27 +134,24 @@ int stXMLWriteSimulationToFile(char *filename, brEngine *e) {
 */
 
 int stXMLWriteSimulationToStream(FILE *file, brEngine *e) {
-	int n;
 	int spaces = 0;
 	stXMLArchiveRecord record;
 	stInstance *controller;
-	slStack *instances;
 
-	controller = brEngineGetController(e)->userData;
+	controller = (stInstance*)brEngineGetController(e)->userData;
 
-	memset(&record, 0, sizeof(stXMLArchiveRecord));
+	stXMLAssignIndices(e, record.instanceToIndexMap);
 
 	fprintf(file, "<?xml version=\"1.0\"?>\n");
 	fprintf(file, "<!DOCTYPE steveEngine SYSTEM \"steveEngine.dtd\">\n");
 
-	fprintf(file, "<engine controllerIndex=\"%d\">\n", controller->index);
+	fprintf(file, "<engine controllerIndex=\"%d\">\n", record.instanceToIndexMap[ controller]);
 	spaces += XML_INDENT_SPACES;
 
-	instances = brEngineGetAllInstances(e);
+	std::vector<brInstance*>::iterator bi;
 
-	for(n=0;n<instances->count;n++) stXMLWriteObject(&record, file, ((brObject*)instances->data[n])->userData, spaces, 0);
-
-	slStackFree(instances);
+	for(bi=e->instances.begin(); bi != e->instances.end(); bi++ )
+		stXMLWriteObject(&record, file, (stInstance*)(*bi)->userData, spaces, 0);
 
 	spaces -= XML_INDENT_SPACES;
 	fprintf(file, "</engine>\n");
@@ -190,12 +160,12 @@ int stXMLWriteSimulationToStream(FILE *file, brEngine *e) {
 }
 
 int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int spaces, int isDataObject) {
-	slList *list, *d;
+	slList *list;
 	stObject *o;
 	brEval result;
 	int r;
 
-	if(slInList(record->instances, i)) return 0;
+	if( record->written.find( i) != record->written.end()) return 0;
 
 	if(i->status != AS_ACTIVE) {
 		slMessage(DEBUG_ALL, "warning: requested archive of freed instance %p of class %s, skipping...\n", i, i->type->name);
@@ -204,15 +174,14 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 
 	o = i->type;
 
-	record->instances = slListPrepend(record->instances, i);
+	record->written.insert( i);
 
 	// make sure the dependencies are archived first
 
-	d = i->breveInstance->dependencies;
+	std::set< stInstance*, stInstanceCompare>::iterator ii;
 
-	while(d) {
-		stXMLWriteObject(record, file, ((brObject*)d->data)->userData, spaces, isDataObject);
-		d = d->next;
+	for(ii = i->dependencies.begin(); ii != i->dependencies.end(); ii++ ) {
+		stXMLWriteObject(record, file, *ii, spaces, isDataObject);
 	}
 
 	// if we're not writing data only, call the archive method
@@ -234,9 +203,9 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 	XMLPutSpaces(spaces, file);
 
 	if(isDataObject) {
-		fprintf(file, "<data_instance class=\"%s\" index=\"%d\">\n", o->name, i->index);
+		fprintf(file, "<data_instance class=\"%s\" index=\"%d\">\n", o->name, record->instanceToIndexMap[ i] );
 	} else {
-		fprintf(file, "<instance class=\"%s\" index=\"%d\">\n", o->name, i->index);
+		fprintf(file, "<instance class=\"%s\" index=\"%d\">\n", o->name, record->instanceToIndexMap[ i] );
 	}
 
 	spaces += XML_INDENT_SPACES;
@@ -251,11 +220,11 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 		list = i->breveInstance->observers;
 
 		while(list) {
-			brObserver *obs = list->data;
+			brObserver *obs = (brObserver*)list->data;
 			int index;
 	
 			if(obs->instance && obs->instance->status == AS_ACTIVE) {
-				index = ((stInstance*)obs->instance->userData)->index;
+				index = record->instanceToIndexMap[ (stInstance*)obs->instance->userData];
 			} else {
 				index = -1;
 			}
@@ -282,19 +251,17 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 		fprintf(file, "<dependencies>\n");
 		spaces += XML_INDENT_SPACES;
 
-		list = i->breveInstance->dependencies;
+		std::set< stInstance*, stInstanceCompare>::iterator ii;
 
-		while(list) {
-			stInstance *dep = ((brInstance*)list->data)->userData;
+		for(ii = i->dependencies.begin(); ii != i->dependencies.end(); ii++ ) {
+			stInstance *dep = *ii;
 			int index;
 	
-			if(dep && dep->status == AS_ACTIVE) index = dep->index;
+			if(dep && dep->status == AS_ACTIVE) index = record->instanceToIndexMap[ dep];
 			else index = -1;
 
 			XMLPutSpaces(spaces, file);
 			fprintf(file, "<object index=\"%d\"/>\n", index);
-			
-			list = list->next;
 		}
 	
 		spaces -= XML_INDENT_SPACES;
@@ -302,7 +269,7 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 		fprintf(file, "</dependencies>\n");
 	}
 
-	/* stores the variables of this instance (& the parents) */
+	// stores the variables of this instance (& the parents) 
 
 	XMLPutSpaces(spaces, file);
 
@@ -311,15 +278,14 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 	spaces += XML_INDENT_SPACES;
 
 	while(o) {
-		list = o->variableList;
+		std::map< std::string, stVar* >::iterator vi;
 
 		XMLPutSpaces(spaces, file);
 		fprintf(file, "<class name=\"%s\" version=\"%f\">\n", o->name, o->version);
 		spaces += XML_INDENT_SPACES;
 
-		while(list) {
-			stXMLVariablePrint(file, list->data, i, spaces);
-			list = list->next;
+		for(vi = o->variables.begin(); vi != o->variables.end(); vi++ ) {
+			stXMLVariablePrint(record, file, vi->second, i, spaces);
 		}
 
 		spaces -= XML_INDENT_SPACES;
@@ -344,7 +310,7 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 	return 0;
 }
 
-int stXMLVariablePrint(FILE *file, stVar *variable, stInstance *i, int spaces) {
+int stXMLVariablePrint(stXMLArchiveRecord *record, FILE *file, stVar *variable, stInstance *i, int spaces) {
 	brEval target;
 	stRunInstance ri;
 
@@ -362,7 +328,7 @@ int stXMLVariablePrint(FILE *file, stVar *variable, stInstance *i, int spaces) {
 
 		for(n=0;n<variable->type->arrayCount;n++) {
 			stLoadVariable(&i->variables[variable->offset + n * typeSize], variable->type->arrayType, &target, &ri);
-			stXMLPrintEval(file, "", &target, spaces);
+			stXMLPrintEval(record, file, "", &target, spaces);
 		}
 
 		spaces -= XML_INDENT_SPACES;
@@ -374,12 +340,12 @@ int stXMLVariablePrint(FILE *file, stVar *variable, stInstance *i, int spaces) {
 	} 
 
 	stLoadVariable(&i->variables[variable->offset], variable->type->type, &target, &ri);
-	stXMLPrintEval(file, variable->name, &target, spaces);
+	stXMLPrintEval(record, file, variable->name, &target, spaces);
 
 	return 0;
 }
 
-int stXMLPrintList(FILE *file, char *name, brEvalListHead *theHead, int spaces) {
+int stXMLPrintList(stXMLArchiveRecord *record, FILE *file, char *name, brEvalListHead *theHead, int spaces) {
 	brEvalList *list;
 
 	list = theHead->start;
@@ -389,7 +355,7 @@ int stXMLPrintList(FILE *file, char *name, brEvalListHead *theHead, int spaces) 
 	spaces += XML_INDENT_SPACES;
 
 	while(list) {
-		stXMLPrintEval(file, "", &list->eval, spaces);
+		stXMLPrintEval(record, file, "", &list->eval, spaces);
 		list = list->next;
 	}
 
@@ -400,7 +366,7 @@ int stXMLPrintList(FILE *file, char *name, brEvalListHead *theHead, int spaces) 
 	return 0;
 }
 
-int stXMLPrintHash(FILE *file, char *name, brEvalHash *hash, int spaces) {
+int stXMLPrintHash(stXMLArchiveRecord *record, FILE *file, char *name, brEvalHash *hash, int spaces) {
 	brEvalListHead *keys;
 	brEvalList *list;
 
@@ -421,7 +387,7 @@ int stXMLPrintHash(FILE *file, char *name, brEvalHash *hash, int spaces) {
 		spaces += XML_INDENT_SPACES;
 
 		brEvalCopy(&list->eval, &newEval);
-		stXMLPrintEval(file, "", &newEval, spaces);
+		stXMLPrintEval(record, file, "", &newEval, spaces);
 
 		spaces -= XML_INDENT_SPACES;
 		XMLPutSpaces(spaces, file);
@@ -432,7 +398,7 @@ int stXMLPrintHash(FILE *file, char *name, brEvalHash *hash, int spaces) {
 		spaces += XML_INDENT_SPACES;
 
 		brEvalCopy(&value, &newEval);
-		stXMLPrintEval(file, "", &newEval, spaces);
+		stXMLPrintEval(record, file, "", &newEval, spaces);
 
 		spaces -= XML_INDENT_SPACES;
 		XMLPutSpaces(spaces, file);
@@ -448,17 +414,17 @@ int stXMLPrintHash(FILE *file, char *name, brEvalHash *hash, int spaces) {
 	return 0;
 }
 
-int stXMLPrintEval(FILE *file, char *name, brEval *target, int spaces) {
+int stXMLPrintEval(stXMLArchiveRecord *record, FILE *file, char *name, brEval *target, int spaces) {
 	stInstance *i;
 	int index;
 	char *data, *encoded;
 
 	switch(target->type) {
 		case AT_LIST:
-			return stXMLPrintList(file, name, BRLIST(target), spaces);
+			return stXMLPrintList(record, file, name, BRLIST(target), spaces);
 			break;
 		case AT_HASH:
-			return stXMLPrintHash(file, name, BRHASH(target), spaces);
+			return stXMLPrintHash(record, file, name, BRHASH(target), spaces);
 			break;
 		case AT_DATA:
 			data = brDataHexEncode((brData*)BRDATA(target));
@@ -478,7 +444,7 @@ int stXMLPrintEval(FILE *file, char *name, brEval *target, int spaces) {
 			XMLPutSpaces(spaces, file);
 			encoded = stXMLEncodeString(BRSTRING(target));
 			fprintf(file, "<string name=\"%s\">%s</string>\n", name, encoded);
-			slFree(encoded);
+			delete[] encoded;
 			break;
 		case AT_VECTOR:
 			XMLPutSpaces(spaces, file);
@@ -493,10 +459,10 @@ int stXMLPrintEval(FILE *file, char *name, brEval *target, int spaces) {
 			fprintf(file, "<pointer name=\"%s\"/>\n", name);
 			break;
 		case AT_INSTANCE:
-			if(BRINSTANCE(target)) i = BRINSTANCE(target)->userData;
+			if(BRINSTANCE(target)) i = (stInstance*)BRINSTANCE(target)->userData;
 			else i = NULL;
 
-			if(i && i->status == AS_ACTIVE) index = i->index;
+			if(i && i->status == AS_ACTIVE) index = record->instanceToIndexMap[ i] ;
 			else index = -1;
 
 			XMLPutSpaces(spaces, file);
@@ -560,8 +526,6 @@ int stXMLReadObjectFromString(stInstance *i, char *buffer) {
 	stXMLParserState parserState;
 	int result = 0;
 
-	memset(&parserState, 0, sizeof(stXMLParserState));
-
 	parser = XML_ParserCreate(NULL);
 
 	parserState.engine = i->type->engine;
@@ -571,7 +535,7 @@ int stXMLReadObjectFromString(stInstance *i, char *buffer) {
 
 	/* preparse */
 
-	XML_SetStartElementHandler(parser, (void*)stXMLPreparseStartElementHandler);
+	XML_SetStartElementHandler(parser, stXMLPreparseStartElementHandler);
 	XML_SetEndElementHandler(parser, NULL);
 	XML_SetCharacterDataHandler(parser, NULL);
 	XML_SetUserData(parser, &parserState);
@@ -593,9 +557,9 @@ int stXMLReadObjectFromString(stInstance *i, char *buffer) {
 
 	parserState.currentInstance = i;
 	parser = XML_ParserCreate(NULL);
-	XML_SetStartElementHandler(parser, (void*)stXMLObjectStartElementHandler);
-	XML_SetEndElementHandler(parser, (void*)stXMLObjectEndElementHandler);
-	XML_SetCharacterDataHandler(parser, (void*)stXMLObjectCharacterDataHandler);
+	XML_SetStartElementHandler(parser, stXMLObjectStartElementHandler);
+	XML_SetEndElementHandler(parser, stXMLObjectEndElementHandler);
+	XML_SetCharacterDataHandler(parser, stXMLObjectCharacterDataHandler);
 	XML_SetUserData(parser, &parserState);
 
 	if(!XML_Parse(parser, buffer, strlen(buffer), 1)) {
@@ -653,7 +617,6 @@ stInstance *stXMLDearchiveObjectFromString(brEngine *e, char *buffer) {
 	stInstance *dearchivedInstance;
 	int result = 0;
 
-	memset(&parserState, 0, sizeof(stXMLParserState));
 	parser = XML_ParserCreate(NULL);
 
 	parserState.engine = e;
@@ -661,11 +624,11 @@ stInstance *stXMLDearchiveObjectFromString(brEngine *e, char *buffer) {
 	parserState.error = 0;
 
 	XML_SetParamEntityParsing(parser, XML_PARAM_ENTITY_PARSING_ALWAYS);
-	XML_SetExternalEntityRefHandler(parser, (void*)stExternalEntityParserCreate);
+	// XML_SetExternalEntityRefHandler(parser, stExternalEntityParserCreate);
 
-	/* do the preparse stage */
+	// do the preparse stage 
 
-	XML_SetStartElementHandler(parser, (void*)stXMLPreparseStartElementHandler);
+	XML_SetStartElementHandler(parser, stXMLPreparseStartElementHandler);
 	XML_SetEndElementHandler(parser, NULL);
 	XML_SetCharacterDataHandler(parser, NULL);
 	XML_SetUserData(parser, &parserState);
@@ -685,9 +648,9 @@ stInstance *stXMLDearchiveObjectFromString(brEngine *e, char *buffer) {
 	/* do the real parse stage */
 
 	parser = XML_ParserCreate(NULL);
-	XML_SetStartElementHandler(parser, (void*)stXMLObjectStartElementHandler);
-	XML_SetEndElementHandler(parser, (void*)stXMLObjectEndElementHandler);
-	XML_SetCharacterDataHandler(parser, (void*)stXMLObjectCharacterDataHandler);
+	XML_SetStartElementHandler(parser, stXMLObjectStartElementHandler);
+	XML_SetEndElementHandler(parser, stXMLObjectEndElementHandler);
+	XML_SetCharacterDataHandler(parser, stXMLObjectCharacterDataHandler);
 	XML_SetUserData(parser, &parserState);
 
 	if(!XML_Parse(parser, buffer, strlen(buffer), 1)) {
@@ -695,9 +658,9 @@ stInstance *stXMLDearchiveObjectFromString(brEngine *e, char *buffer) {
 		result = -1;
 	}
 
-	dearchivedInstance = stXMLFindDearchivedInstance(parserState.instances, parserState.archiveIndex);
+	dearchivedInstance = parserState.indexToInstanceMap[ parserState.archiveIndex];
 
-	result = stXMLRunDearchiveMethods(parserState.instances);
+	result = stXMLRunDearchiveMethods(&parserState);
 
 	if(parserState.error) result = -1;
 
@@ -746,8 +709,6 @@ int stXMLInitSimulationFromString(brEngine *e, char *buffer) {
 	stXMLParserState parserState;
 	int result = 0;
 
-	memset(&parserState, 0, sizeof(stXMLParserState));
-
 	if(!buffer) {
 		slMessage(DEBUG_ALL, "Error loading archived simulation file: could not open buffer\n");
 		return -1;
@@ -761,7 +722,7 @@ int stXMLInitSimulationFromString(brEngine *e, char *buffer) {
 
 	/* do the preparse stage */
 
-	XML_SetStartElementHandler(parser, (void*)stXMLPreparseStartElementHandler);
+	XML_SetStartElementHandler(parser, stXMLPreparseStartElementHandler);
 	XML_SetEndElementHandler(parser, NULL);
 	XML_SetCharacterDataHandler(parser, NULL);
 	XML_SetUserData(parser, &parserState);
@@ -782,9 +743,9 @@ int stXMLInitSimulationFromString(brEngine *e, char *buffer) {
 	/* do the real parse stage */
 
 	parser = XML_ParserCreate(NULL);
-	XML_SetStartElementHandler(parser, (void*)stXMLObjectStartElementHandler);
-	XML_SetEndElementHandler(parser, (void*)stXMLObjectEndElementHandler);
-	XML_SetCharacterDataHandler(parser, (void*)stXMLObjectCharacterDataHandler);
+	XML_SetStartElementHandler(parser, stXMLObjectStartElementHandler);
+	XML_SetEndElementHandler(parser, stXMLObjectEndElementHandler);
+	XML_SetCharacterDataHandler(parser, stXMLObjectCharacterDataHandler);
 	XML_SetUserData(parser, &parserState);
 
 	if(!XML_Parse(parser, buffer, strlen(buffer), 1)) {
@@ -793,7 +754,7 @@ int stXMLInitSimulationFromString(brEngine *e, char *buffer) {
 		result = -1;
 	}
 
-	stXMLRunDearchiveMethods(parserState.instances);
+	stXMLRunDearchiveMethods(&parserState);
 
 	if(parserState.error) {
 		slMessage(DEBUG_ALL, "Error loading archived simulation\n");
@@ -809,24 +770,26 @@ int stXMLInitSimulationFromString(brEngine *e, char *buffer) {
 	\brief Runs dearchive for the list of instances.
 */
 
-int stXMLRunDearchiveMethods(slList *l) {
+int stXMLRunDearchiveMethods(stXMLParserState *s) {
 	int r;
 	brEval result;
+	std::map< int, stInstance* >::iterator ii;
 
-	while(l) {
+	for(ii = s->indexToInstanceMap.begin(); ii != s->indexToInstanceMap.end(); ii++ ) {
 		stRunInstance ri;
 
-		ri.instance = l->data;
-		ri.type = ri.instance->type;
+		if(ii->second) {
 
-		r = stCallMethodByName(&ri, "dearchive", &result);
+			ri.instance = ii->second;
+			ri.type = ri.instance->type;
 
-		if(r != EC_OK || BRINT(&result) != 1) {
-			slMessage(DEBUG_ALL, "dearchive of instance %p (%s) failed\n", ri.instance, ri.instance->type->name);
-			return -1;
+			r = stCallMethodByName(&ri, "dearchive", &result);
+
+			if(r != EC_OK || BRINT(&result) != 1) {
+				slMessage(DEBUG_ALL, "dearchive of instance %p (%s) failed\n", ri.instance, ri.instance->type->name);
+				return -1;
+			}
 		}
-
-		l = l->next;
 	}
 
 	return 0;
@@ -840,11 +803,13 @@ int stXMLRunDearchiveMethods(slList *l) {
 	pointers the second time around.
 */
 
-void stXMLPreparseStartElementHandler(stXMLParserState *userData, const XML_Char *attname, const XML_Char **atts) {
+void stXMLPreparseStartElementHandler(void *data, const XML_Char *attname, const XML_Char **atts) {
 	int state;
 	int n = 0;
 	int index = -1;
 	const char *objectName = NULL;
+
+	stXMLParserState *parserState = (stXMLParserState*)data;
 
 	state = stXMLStateForElement((char*)attname);
 
@@ -857,43 +822,42 @@ void stXMLPreparseStartElementHandler(stXMLParserState *userData, const XML_Char
 	if(state == XP_INSTANCE || state == XP_DATA_INSTANCE) {
 		stInstance *i;
 
-		if(userData->mode != PARSE_DATA_INSTANCE) {
-			brObject *object = brObjectFind(userData->engine, (char*)objectName);
+		if(parserState->mode != PARSE_DATA_INSTANCE) {
+			brObject *object = brObjectFind(parserState->engine, (char*)objectName);
 
 			if(!object) {
 				slMessage(DEBUG_ALL, "archive contains an instance of unknown class \"%s\"\n", objectName);
 				slMessage(DEBUG_ALL, "mismatch between simulation file and XML archive\n", objectName);
-				userData->error++;
+				parserState->error++;
 				return;
 			}
 
-			i = stInstanceNew(object->userData);
-			i->breveInstance = brEngineAddInstance(userData->engine, object, i);
-		} else i = userData->currentInstance;
+			i = stInstanceNew((stObject*)object->userData);
+			i->breveInstance = brEngineAddInstance(parserState->engine, object, i);
+		} else i = parserState->currentInstance;
 
-		i->index = index;
-
-		userData->instances = slListAppend(userData->instances, i);
+		parserState->indexToInstanceMap[ index] = i;
 	} 
 }
 
-void stXMLObjectStartElementHandler(stXMLParserState *userData, const XML_Char *name, const XML_Char **atts) {
+void stXMLObjectStartElementHandler(void *userData, const XML_Char *name, const XML_Char **atts) {
 	int n = 0;
 	stXMLStackEntry *state;
 	const char *objectName = NULL;
 	int controllerIndex = 0, index = 0, archiveIndex = 0;
-	brNamespaceSymbol *symbol;
 	stInstance *steveInstance;
 	brObject *object;
 
-	if(userData->error != 0) return;
+	stXMLParserState *parserState = (stXMLParserState*)userData;
 
-	state = slMalloc(sizeof(stXMLStackEntry));
+	if(parserState->error != 0) return;
+
+	state = new stXMLStackEntry;
 	state->state = stXMLStateForElement((char*)name);
 
 	state->string = NULL;
 
-	userData->stateStack = slListPrepend(userData->stateStack, state);
+	parserState->stateStack.push_back( state);
 
 	while(atts[n]) {
 		if(!strcasecmp(atts[n], "name")) state->name = slStrdup((char*)atts[n + 1]);
@@ -906,24 +870,23 @@ void stXMLObjectStartElementHandler(stXMLParserState *userData, const XML_Char *
 
 	switch(state->state) {
 		case XP_ENGINE:
-			userData->controllerIndex = controllerIndex;
+			parserState->controllerIndex = controllerIndex;
 			break;
 		case XP_INSTANCE_ARCHIVE:
-			userData->archiveIndex = archiveIndex;
+			parserState->archiveIndex = archiveIndex;
 			break;
 		case XP_INSTANCE:
-			userData->currentInstance = stXMLFindDearchivedInstance(userData->instances, index);
+			parserState->currentInstance = parserState->indexToInstanceMap[ index];
 			break;
 		case XP_ARRAY:
-			symbol = stObjectLookup(userData->currentObject, state->name, ST_VAR);
+			state->variable = stObjectLookupVariable(parserState->currentObject, state->name);
 
-			if(symbol) {
-				state->variable = symbol->data;
+			if(state->variable) {
 				state->arrayIndex = 0;
 			} else {
-				slMessage(DEBUG_ALL, "archive contains unknown variable \"%s\" for class \"%s\"\n", state->name, userData->currentInstance->type->name);
+				slMessage(DEBUG_ALL, "archive contains unknown variable \"%s\" for class \"%s\"\n", state->name, parserState->currentInstance->type->name);
 				slMessage(DEBUG_ALL, "mismatch between simulation file and XML archive\n", objectName);
-				userData->error++;
+				parserState->error++;
 			}
 
 			break;
@@ -939,7 +902,7 @@ void stXMLObjectStartElementHandler(stXMLParserState *userData, const XML_Char *
 			// we don't see the character data for this one 
 			state->eval.type = AT_INSTANCE;
 
-			steveInstance = stXMLFindDearchivedInstance(userData->instances, index);
+			steveInstance = parserState->indexToInstanceMap[ index];
 			if(steveInstance) {
 				BRINSTANCE(&state->eval) = steveInstance->breveInstance;
 			} else {
@@ -952,10 +915,10 @@ void stXMLObjectStartElementHandler(stXMLParserState *userData, const XML_Char *
 			state->eval.type = AT_POINTER;
 			break;
 		case XP_CLASS:
-			object = brObjectFind(userData->engine, state->name);
+			object = brObjectFind(parserState->engine, state->name);
 
-			if(object) userData->currentObject = object->userData;
-			else userData->currentObject = NULL;
+			if(object) parserState->currentObject = (stObject*)object->userData;
+			else parserState->currentObject = NULL;
 
 			break;
 	}
@@ -969,13 +932,15 @@ void stXMLObjectStartElementHandler(stXMLParserState *userData, const XML_Char *
 	and append data.
 */
 
-void stXMLObjectCharacterDataHandler(stXMLParserState *userData, const XML_Char *data, int len) {
+void stXMLObjectCharacterDataHandler(void *userData, const XML_Char *data, int len) {
+	stXMLParserState *parserState = (stXMLParserState*)userData;
+
 	stXMLStackEntry *e;
 	int oldLen;
 
-	if(userData->error != 0) return;
+	if(parserState->error != 0) return;
 
-	e = userData->stateStack->data;
+	e = parserState->stateStack.back();
 
 	// these data do not expect character data
 
@@ -999,10 +964,10 @@ void stXMLObjectCharacterDataHandler(stXMLParserState *userData, const XML_Char 
 	oldLen = 0;
 
 	if(!e->string) {
-		e->string = slMalloc(len + 1);
+		e->string = (char*)slMalloc(len + 1);
 	} else {
 		oldLen = strlen(e->string);
-		e->string = slRealloc(e->string, oldLen + len + 1);
+		e->string = (char*)slRealloc(e->string, oldLen + len + 1);
 	}
 
 	// copy in the new data
@@ -1011,24 +976,28 @@ void stXMLObjectCharacterDataHandler(stXMLParserState *userData, const XML_Char 
 	e->string[oldLen + len] = 0;
 }
 
-void stXMLObjectEndElementHandler(stXMLParserState *userData, const XML_Char *name) {
-	slList *top = userData->stateStack;
+void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
+	stXMLParserState *parserState = (stXMLParserState*)userData;
 	stXMLStackEntry *state = NULL, *lastState = NULL;
 	stRunInstance ri;
 	double x, y, z;
 	double *m;
 	stVar *v;
 
-	if(userData->error != 0) return;
+	if(parserState->error != 0) return;
 
-	state = top->data;
+	lastState = state = parserState->stateStack.back();
 
 	// finish up the current state by parsing the character string
 
 	if(state->string) {
-		/* variable states, read into the eval */
+		// variable states, read into the eval 
 
 		switch(state->state) {
+			case XP_INSTANCE:
+				if(parserState->currentInstance == parserState->indexToInstanceMap[ parserState->controllerIndex ]) 
+					brEngineSetController(parserState->engine, parserState->currentInstance->breveInstance);
+				break;
 			case XP_DATA:
 				state->eval.type = AT_DATA;
 				BRDATA(&state->eval) = brDataHexDecode(state->string);
@@ -1070,38 +1039,31 @@ void stXMLObjectEndElementHandler(stXMLParserState *userData, const XML_Char *na
 		slFree(state->string);
 	}
 
-	lastState = top->data;
-	userData->stateStack = top->next;
+	parserState->stateStack.pop_back();
 
-	if(userData->stateStack) state = userData->stateStack->data;
+	if(parserState->stateStack.size() != 0) state = parserState->stateStack.back();
+	else state = NULL;
 
 	if(state) {
 		switch(state->state) {
 			case XP_INSTANCE:
-				if(userData->mode != PARSE_DATA_INSTANCE) {
-					brObject *o;
-
-					o = brObjectFind(userData->engine, userData->currentInstance->type->name);
-
-					if(userData->controllerIndex == userData->currentInstance->index) 
-						brEngineSetController(userData->engine, userData->currentInstance->breveInstance);
+				if(parserState->mode != PARSE_DATA_INSTANCE) {
 				}
 				break;
 			case XP_CLASS:
 				if(lastState->state != XP_ARRAY) {
-					brNamespaceSymbol *symbol;
-					stInstance *i = userData->currentInstance;
+					stInstance *i = parserState->currentInstance;
+					stVar *var;
 
-					symbol = stObjectLookup(i->type, lastState->name, ST_VAR);
+					var = stObjectLookupVariable(i->type, lastState->name);
 
-					if(symbol && lastState->eval.type) {
+					if(var && lastState->eval.type) {
 						stRunInstance ri;
-						stVar *var = symbol->data;
 
-						ri.instance = userData->currentInstance;
+						ri.instance = parserState->currentInstance;
 						ri.type = ri.instance->type;
 
-						stSetVariable(&userData->currentInstance->variables[var->offset], var->type->type, NULL, &lastState->eval, &ri);	
+						stSetVariable(&parserState->currentInstance->variables[var->offset], var->type->type, NULL, &lastState->eval, &ri);	
 
 						stGCCollect(&lastState->eval);
 					}
@@ -1131,24 +1093,21 @@ void stXMLObjectEndElementHandler(stXMLParserState *userData, const XML_Char *na
 			case XP_ARRAY:
 				v = state->variable;
 
-				ri.instance = userData->currentInstance;
+				ri.instance = parserState->currentInstance;
 				ri.type = ri.instance->type; 
 
-				stSetVariable(&userData->currentInstance->variables[v->offset + state->arrayIndex * stSizeofAtomic(v->type->arrayType)], v->type->arrayType, NULL, &lastState->eval, &ri);	
+				stSetVariable(&parserState->currentInstance->variables[v->offset + state->arrayIndex * stSizeofAtomic(v->type->arrayType)], v->type->arrayType, NULL, &lastState->eval, &ri);	
 
 				state->arrayIndex++;
 				break;
 			case XP_DEPENDENCIES:
-				brInstanceAddDependency(userData->currentInstance->breveInstance, BRINSTANCE(&lastState->eval));
+				stInstanceAddDependency(parserState->currentInstance, (stInstance*)BRINSTANCE(&lastState->eval)->userData);
 				break;
 		} 
 	}
 
-	if(lastState) {
-		if(lastState->name) slFree(lastState->name);
-		slFree(lastState);
-		slListFreeHead(top);
-	}
+	if(lastState->name) slFree(lastState->name);
+	delete lastState;
 }
 
 int stXMLStateForElement(char *name) {
@@ -1233,7 +1192,7 @@ char *stXMLEncodeString(char *string) {
 		n++;
 	}
 
-	result = slMalloc(size + 1);
+	result = new char[size + 1];
 
 	n = 0;
 	m = 0;
@@ -1287,7 +1246,7 @@ char *stXMLDecodeString(char *string) {
 	char *result;
 	int n, m;
 
-	result = slMalloc(strlen(string) + 1);
+	result = (char*)slMalloc(strlen(string) + 1);
 
 	n = 0;
 	m = 0;

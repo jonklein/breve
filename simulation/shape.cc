@@ -91,6 +91,9 @@ void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, 
 
 		glPopAttrib();
 	} else {
+		// glBegin(GL_POINTS);
+		// glVertex3f(0, 0, 0);
+		// glEnd();
 		glCallList(drawList);
 	}
 

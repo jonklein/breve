@@ -35,9 +35,6 @@ extern "C" {
 
 DLLEXPORT void *
 slMalloc(size_t n) {
-	if(n > 1000000)
-		slDebug("warning: very large allocation %d\n", n);
-
 	return calloc(1, n);
 }
 
@@ -63,13 +60,6 @@ slStrdup(const char *s) {
 	strcpy(t, s);
 	return t;
 #endif
-}
-
-inline char *
-slStrdupAndFree(char *s) {
-	char *t = slStrdup(s);
-	free(s);
-	return t;
 }
 
 #ifdef __cplusplus

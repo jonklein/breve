@@ -55,7 +55,8 @@ int brIQProgramGetString(brEval args[], brEval *target, brInstance *i) {
 	std::ostringstream os;
 
 	os << *program;
-	BRSTRING(target) = slStrdup(os.str().c_str());
+
+	BRSTRING(target) = slStrdup((char*)os.str().c_str());
 
 	return EC_OK;
 }

@@ -42,9 +42,7 @@ stExp *stNewStringExp(char *theString, stMethod *m, stObject *o, char *file, int
 	char *varstart, *varend, *varname;
 	stSubstringExp *sub;
 
-	slList *expList = NULL;
-
-	se = slMalloc(sizeof(stStringExp));
+	se = new stStringExp;
 
 	se->baseSize = 0;
 
@@ -65,11 +63,11 @@ stExp *stNewStringExp(char *theString, stMethod *m, stObject *o, char *file, int
 				while(*s && (isalnum(*s) || *s == '_' || *s == '-')) s++;
 				varend = s;
 
-				varname = slMalloc((varend - varstart) + 1);
+				varname = new char[(varend - varstart) + 1];
 				strncpy(varname, varstart, (varend - varstart));
 				varname[varend - varstart] = 0;
 
-				sub = slMalloc(sizeof(stSubstringExp));
+				sub = new stSubstringExp;
 			   	sub->offset = se->baseSize;
 
 				// is this an array or list? 
@@ -84,13 +82,13 @@ stExp *stNewStringExp(char *theString, stMethod *m, stObject *o, char *file, int
 					if((*varend == '{' && *numend == '}') || (*varend == '[' && *numend == ']')) {
 						/* we have a valid array or list exp */
 
-						number = slMalloc(numend - varend);
+						number = new char[numend - varend];
 						strncpy(number, varend + 1, numend - (varend + 1));
 						number[numend - (varend + 1)] = 0;
 						offset = atoi(number);
 
 						index = stNewIntExp(offset, file, line);
-						slFree(number);
+						delete[] number;
 
 						if(*varend == '{') {
 							stExp *listExp = stNewLoadExp(m, o, varname, file, line);
@@ -112,14 +110,14 @@ stExp *stNewStringExp(char *theString, stMethod *m, stObject *o, char *file, int
 					}
 				}
 
-				expList = slListPrepend(expList, sub);
-
+				se->substrings.push_back( sub);
+				
 				if(!sub->loadExp) {
 					stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Error locating variable \"%s\" while parsing string", varname);
 					return NULL;
 				}
 
-				slFree(varname);
+				delete[] varname;
 			}
 		} else if(sym == 'n' && prev == '\\') {
 			/* if we find a \n, then replace the previous char (\) */
@@ -165,9 +163,6 @@ stExp *stNewStringExp(char *theString, stMethod *m, stObject *o, char *file, int
 	theString[se->baseSize] = 0;
 
 	se->string = slStrdup(theString);
-	se->substrings = slListToArray(expList);
-
-	slListFree(expList);
 
 	return stExpNew(se, ET_STRING, file, line);
 }
@@ -183,11 +178,12 @@ int stProcessString(stStringExp *s, stRunInstance *i, brEval *target) {
 	brEval subtar;
 	stSubstringExp *ss;
 	char *newstr;
-	int n, length, currentPosition;
+	unsigned int n; 
+	int length, currentPosition;
 
 	target->type = AT_STRING;
 
-	if(!s->substrings || s->substrings->count == 0) {
+	if(s->substrings.size() == 0) {
 		BRSTRING(target) = slStrdup(s->string);
 		stGCMark(i->instance, target);
 		return EC_OK;
@@ -195,8 +191,8 @@ int stProcessString(stStringExp *s, stRunInstance *i, brEval *target) {
 
 	length = s->baseSize + 1;
 
-	for(n=0;n<s->substrings->count;n++) {
-		ss = s->substrings->data[n];
+	for(n=0;n<s->substrings.size();n++) {
+		ss = s->substrings[n];
 		stExpEval(ss->loadExp, i, &subtar, NULL);
 
 		ss->string = stFormatEvaluation(&subtar, i->instance);
@@ -204,25 +200,22 @@ int stProcessString(stStringExp *s, stRunInstance *i, brEval *target) {
 		length += strlen(ss->string);
 	}
 
-	/* the substrings are in descending order--start from the last one */
-	/* to find the first position we need to edit					*/
+	// the substrings are in descending order--start from the last one 
+	// to find the first position we need to edit
 
-	n = s->substrings->count - 1;
-
-	newstr = slMalloc(length);
+	newstr = (char*)slMalloc(length);
 	newstr[0] = 0;
 
-	/* currentPosition is the position in the "template" string */
-	/* so it doesn't count the length of the variable strings   */
+	// currentPosition is the position in the "template" string 
+	// so it doesn't count the length of the variable strings 
 
 	currentPosition = 0;
 
-	while(n > -1) {
-		ss = s->substrings->data[n];
+	for(n=0; n < s->substrings.size(); n++) {
+		ss = s->substrings[n];
 		strncat(newstr, &s->string[currentPosition], ss->offset - currentPosition);
 		strncat(newstr, ss->string, strlen(ss->string));
 		currentPosition = ss->offset;
-		n--;
 
 		slFree(ss->string);
 		ss->string = NULL;
@@ -242,21 +235,17 @@ int stProcessString(stStringExp *s, stRunInstance *i, brEval *target) {
 */
 
 void stFreeStringExp(stStringExp *s) {
-	int n;
+	unsigned int n;
 	stSubstringExp *ss;
 
-	if(s->substrings) {
-		for(n=0;n<s->substrings->count;n++) {
-			ss = s->substrings->data[n];
-			stExpFree(ss->loadExp);
-			slFree(ss);
-		}
-
-		slFreeArray(s->substrings);
+	for(n=0;n<s->substrings.size();n++) {
+		ss = s->substrings[n];
+		stExpFree(ss->loadExp);
+		delete ss;
 	}
 
 	slFree(s->string);
-	slFree(s);
+	delete s;
 }
 
 /*!

@@ -40,20 +40,15 @@ stObject *stObjectNew(brEngine *engine, stSteveData *sdata, char *name, char *al
 
 	if(brObjectFind(engine, name)) return NULL;
 
-	o = slMalloc(sizeof(stObject));
+	o = new stObject;
 
 	o->version = version;
 
 	o->engine = engine;
 	o->steveData = sdata;
 	o->super = super;
-	o->variableList = NULL;
 
 	o->name = slStrdup(name);
-
-	// new namespace for the object 
-
-	o->keywords = brNamespaceNew();
 
 	// before any variables are added here, our variable vector 
 	// the size of our parent's variable vector.  our vector 
@@ -76,7 +71,7 @@ stObject *stObjectNew(brEngine *engine, stSteveData *sdata, char *name, char *al
 	
 	if(alias) brEngineAddObjectAlias(engine, alias, bo);
 
-	sdata->allObjects = slListPrepend(sdata->allObjects, o);
+	sdata->objects.push_back(o);
 
 	return o;
 }
@@ -94,7 +89,7 @@ brInstance *stInstanceCreateAndRegister(brEngine *e, brObject *object) {
 	bi = brObjectInstantiate(e, object, NULL, 0);
 
 	if(bi->object->type == &gSteveData->steveObjectType) {
-		newi = bi->userData;
+		newi = (stInstance*)bi->userData;
 		newi->breveInstance = bi;
 		if(stInstanceInit(newi) != EC_OK) return NULL;
 	}
@@ -119,11 +114,11 @@ stInstance *stInstanceNew(stObject *o) {
 		return NULL;
 	}
 
-	i = slMalloc(sizeof(stInstance));
+	i = new stInstance;
 
 	i->type = o;
 
-	i->variables = slMalloc(o->varSize);
+	i->variables = new char[o->varSize];
 	memset(i->variables, 0, o->varSize);
 
 	i->status = AS_ACTIVE;
@@ -153,6 +148,29 @@ int stInstanceInit(stInstance *i) {
 	if(stMethodTrace(&ri, "init") != EC_OK) return EC_ERROR;
 
 	return EC_OK;
+}
+
+/*!
+	\brief Adds an instance to another's dependencies list.
+*/
+
+void stInstanceAddDependency(stInstance *i, stInstance *dependency) {
+	i->dependencies.insert( dependency);
+	dependency->dependents.insert( i);
+}
+
+/*!
+	\brief Removes an instance from another's dependencies list.
+*/
+
+void stInstanceRemoveDependency(stInstance *i, stInstance *dependency) {
+	std::set< stInstance*, stInstanceCompare>::iterator ii;
+
+	ii = i->dependencies.find( dependency);
+	if(ii != i->dependencies.end()) i->dependencies.erase( ii);
+
+	ii = dependency->dependents.find( i);
+	if(ii != dependency->dependents.end()) dependency->dependents.erase( ii);
 }
 
 /*!
@@ -226,9 +244,9 @@ void stInstanceFreeNoInstanceLists(stInstance *i) {
 	i->status = AS_RELEASED;
 
 	if(gSteveData->retainFreedInstances) {
-		gSteveData->freedInstances = slListPrepend(gSteveData->freedInstances, i);
+		gSteveData->freedInstances.push_back( i);
 	} else {
-		slFree(i);
+		delete i;
 	}
 }
 
@@ -239,7 +257,6 @@ void stInstanceFreeNoInstanceLists(stInstance *i) {
 */
 
 void stInstanceFreeInternals(stInstance *i) {
-	slList *listHead, *list;
 	stObject *type;
 	stVar *var;
 	int n;
@@ -250,15 +267,15 @@ void stInstanceFreeInternals(stInstance *i) {
 
 	type = i->type;
 
+	std::map< std::string, stVar* >::iterator vi;
+
 	while(type) {
-		list = listHead = brNamespaceSymbolList(type->keywords);
+		for(vi = type->variables.begin(); vi != type->variables.end(); vi++) {
+			char *varpointer;
 
-		while(listHead) {
-			if(((brNamespaceSymbol*)listHead->data)->type == ST_VAR) {
-				char *varpointer;
+			var = vi->second;
 
-				var = ((brNamespaceSymbol*)listHead->data)->data;
-
+			if(var) {
 				varpointer = &i->variables[var->offset];
 
 				stGCUnretainAndCollectPointer(*(void**)varpointer, var->type->type);
@@ -270,21 +287,17 @@ void stInstanceFreeInternals(stInstance *i) {
 
 					for(n=0;n<var->type->arrayCount;n++) {
 						varpointer = arraypointer + (n * stSizeofAtomic(var->type->arrayType));
-				
+			
 						stGCUnretainAndCollectPointer(*(void**)varpointer, var->type->arrayType);
 					}
 				}
 			}
-
-			listHead = listHead->next;
 		}
 
 		type = type->super;
-
-		slListFree(list);
 	}
 
-	slFree(i->variables);
+	delete[] i->variables;
 }
 
 /*!
@@ -294,25 +307,22 @@ void stInstanceFreeInternals(stInstance *i) {
 */
 
 void stObjectFreeAllInstances(stObject *o) {
-	slList *all;
+	std::set< stInstance*, stInstanceCompare> all;
+	std::set< stInstance*, stInstanceCompare>::iterator ii;
 
 	// it's possible that the allInstances list will change while
 	// we're going through it!  We'll use a copy instead.
 
-	all = slListCopy(o->allInstances);
+	all = o->allInstances;
 
-	while(all) {
-		stInstance *i = all->data;
+	for(ii = all.begin(); ii != all.end(); ii++) {
+		stInstance *i = *ii;
 
 		// only object matching the base class should be freed now
 
 		if(i->type == o) 
-			stInstanceFreeNoInstanceLists(all->data);
-
-		all = all->next;
+			stInstanceFreeNoInstanceLists(i);
 	}
-
-	slListFree(all);
 }
 
 /*!
@@ -322,51 +332,31 @@ void stObjectFreeAllInstances(stObject *o) {
 */
 
 void stObjectFree(stObject *o) {
-	slList *symbolList, *start, *mList;
-	brNamespaceSymbol *symbol;
+	// slList *symbolList, *start;
+	// brNamespaceSymbol *symbol;
 
-	start = symbolList = brNamespaceSymbolList(o->keywords);
+	std::map< std::string, std::vector<stMethod*> >::iterator li;
 
 	// free all of the variable/method symbols associated with the object 
 
-	while(symbolList) {
-		symbol = symbolList->data;
+	for(li = o->methods.begin(); li != o->methods.end(); li++) {
+		// the methods are going to be a list of methods with the same name.
 
-		switch(symbol->type) {
-			case ST_METHODS:
-				// the methods are going to be a list of methods with the same name.
+		std::vector< stMethod* > &mlist = li->second;
+		std::vector< stMethod* >::iterator mi;
 
-				mList = symbol->data;
-
-				while(mList) {
-					stFreeMethod(mList->data);
-					mList = mList->next;
-				}
-
-				slListFree(symbol->data);
-
-				break;
-			case ST_VAR:
-				stFreeStVar(symbol->data);
-				break;
-			default:
-				slMessage(DEBUG_WARN, "warning: found unknown symbol type %d in object\n", symbol->type);
-				break;
-		}
-
-		symbolList = symbolList->next;
+		for(mi = mlist.begin(); mi != mlist.end(); mi++ ) stFreeMethod(*mi);
 	}
 
-	slListFree(o->allInstances);
+	std::map< std::string, stVar* >::iterator vi;
 
-	brNamespaceFree(o->keywords);
-
-	slListFree(start);
-	slListFree(o->variableList);
+	for(vi = o->variables.begin(); vi != o->variables.end(); vi++) {
+		stFreeStVar(vi->second);
+	}
 
 	slFree(o->name);
 
-	slFree(o);
+	delete o;
 }
 
 /*!
@@ -411,12 +401,10 @@ int stMethodTrace(stRunInstance *i, char *name) {
 
 stKeywordEntry *stFindKeyword(char *keyword, stMethod *m) {
 	stKeywordEntry *e;
-	int n;
+	unsigned int n;
 
-	if(!m->keywords) return NULL;
-
-	for(n=0;n<m->keywords->count;n++) {
-		e = m->keywords->data[n];
+	for(n=0;n<m->keywords.size();n++) {
+		e = m->keywords[n];
 		if(!strcmp(keyword, e->keyword)) return e;
 	}
 
@@ -424,33 +412,30 @@ stKeywordEntry *stFindKeyword(char *keyword, stMethod *m) {
 }
 
 /*!
-	\brief locate the desired keyword entry or local variable in a method.
+	\brief Locate a keyword or local variable in a method.
+
+	Return the variable, or NULL if the method is not found.
 */
 
 stVar *stFindLocal(char *name, stMethod *m) {
 	stKeywordEntry *e;
-	slList *varList;
-	int n;
+	unsigned int n;
 
-	varList = m->variables;
+	std::vector< stVar* >::iterator vi;
 
-	/* is a local variable? */
+	// is a local variable? 
 
-	while(varList) {
-		if(!strcmp(((stVar*)varList->data)->name, name)) return varList->data;
-		varList = varList->next;
+	for(vi = m->variables.begin(); vi != m->variables.end(); vi++ ) 
+		if(!strcmp((*vi)->name, name)) return *vi;
+
+	// perhaps it's a keyword argument to the method... 
+
+	for(n=0;n<m->keywords.size();n++) {
+		e = m->keywords[n];
+		if(!strcmp(name, e->var->name)) return e->var;
 	}
 
-	/* perhaps it's a keyword argument to the method... */
-
-	if(m->keywords) {
-		for(n=0;n<m->keywords->count;n++) {
-			e = m->keywords->data[n];
-			if(!strcmp(name, e->var->name)) return e->var;
-		}
-	}
-
-	/* it's not here */
+	// it's not here 
 
 	return NULL;
 }
@@ -465,7 +450,7 @@ stKeywordEntry *stNewKeywordEntry(char *keyword, stVar *v, brEval *defValue) {
 	stKeywordEntry *e;
 	brEval *copy;
 
-	e = slMalloc(sizeof(stKeywordEntry));
+	e = new stKeywordEntry;
 
 	if(!e || !v || !keyword) return NULL;
 
@@ -475,7 +460,7 @@ stKeywordEntry *stNewKeywordEntry(char *keyword, stVar *v, brEval *defValue) {
 	e->defaultKey = NULL;
 
 	if(defValue) {
-		copy = slMalloc(sizeof(brEval));
+		copy = new brEval;
 		memcpy(copy, defValue, sizeof(brEval));
 		e->defaultKey = stNewKeyword(keyword, stExpNew(copy, ET_ST_EVAL, NULL, 0));
 	}
@@ -490,75 +475,55 @@ stKeywordEntry *stNewKeywordEntry(char *keyword, stVar *v, brEval *defValue) {
 void stFreeKeywordEntry(stKeywordEntry *k) {
 	slFree(k->keyword);
 	stFreeStVar(k->var);
+
 	if(k->defaultKey) stFreeKeyword(k->defaultKey);
-	slFree(k);
+
+	delete k;
 }
-
-/*!
-	\brief Frees an slArray of stKeywordEntry structs.
-*/
-
-void stFreeKeywordEntryArray(slArray *a) {
-	int n;
-	
-	if(!a) return;
-
-	for(n=0;n<a->count;n++) stFreeKeywordEntry(a->data[n]);
-	
-	slFreeArray(a);
-}  
 
 /*!
 	\brief Make a new stMethod.
 
-	Given a name and a keyword slArray stNewMethod creates and fills in an stMethod struct.
+	Given a name and a keyword vector, stNewMethod creates and fills in an stMethod struct.
 
 	Due to the fact that life is complicated and that we will have only seen the function 
 	definition at the time this code is called, the code array and the local variables will 
 	be filled in later.
 */
 
-stMethod *stNewMethod(char *name, slArray *keywords, char *file, int line) {
-	stMethod *s;
-	int count;
+stMethod *stNewMethod(char *name, std::vector< stKeywordEntry* > *keywords, char *file, int line) {
+	stMethod *method;
+	unsigned int count;
 	stKeywordEntry *e;
 
-	s = slMalloc(sizeof(stMethod));
+	method = new stMethod;
 
-	s->name = slStrdup(name);
+	method->name = slStrdup(name);
+	method->stackOffset = 0;
+	method->lineno = line;
+	method->filename = slStrdup(file);
 
-	s->stackOffset = 0;
+	if(keywords) method->keywords = *keywords;
 
-	s->lineno = line;
-	s->filename = slStrdup(file);
+	// step through the keywords, calculation their offsets and required storage space 
 
-	/* step through the keywords, calculation their offsets and */
-	/* required storage space */
+	for(count=0;count<method->keywords.size();count++) {
+		e = method->keywords[count];
 
-	if(keywords) {
-		for(count=0;count<keywords->count;count++) {
-			e = keywords->data[count];
+		// we may not be aligned for this data type, so possibly
+		// add another 4 bytes or so (it could be a double)...
 
-			/* we may not be aligned for this data type, so possibly */
-			/* add another 4 bytes or so (it could be a double) ...  */
+		method->stackOffset += (method->stackOffset % stAlign(e->var->type));
 
-			s->stackOffset += (s->stackOffset % stAlign(e->var->type));
-
-			e->var->offset = s->stackOffset;
-			s->stackOffset += stSizeof(e->var->type);
-		}
+		e->var->offset = method->stackOffset;
+		method->stackOffset += stSizeof(e->var->type);
 	} 
 
-	/* make sure the stack offset is aligned to any possible data */
+	// make sure the stack offset is aligned to any possible data 
 
-	s->stackOffset += (s->stackOffset % stAlignAtomic(AT_DOUBLE));
+	method->stackOffset += (method->stackOffset % stAlignAtomic(AT_DOUBLE));
 
-	s->keywords = keywords;
-
-	s->code = NULL;
-	s->variables = NULL;
-
-	return s;
+	return method;
 }
 
 /*!
@@ -566,44 +531,40 @@ stMethod *stNewMethod(char *name, slArray *keywords, char *file, int line) {
 */
 
 void stFreeMethod(stMethod *meth) {
-	slList *variables;
+	std::vector< stVar* >::iterator vi;
+	unsigned int n;
 
-	stExpFreeArray(meth->code);
-	stFreeKeywordEntryArray(meth->keywords);
+	for(n=0;n<meth->code.size();n++) stExpFree(meth->code[n]);
+	for(n=0;n<meth->keywords.size();n++) stFreeKeywordEntry(meth->keywords[n]);
 
 	slFree(meth->filename);
 
-	variables = meth->variables;
-
-	while(variables) {
-		stFreeStVar(variables->data);
-		variables = variables->next;
-	}
+	for(vi = meth->variables.begin(); vi != meth->variables.end(); vi++) stFreeStVar( *vi );
 
 	slFree(meth->name);
-	slListFree(meth->variables);
 
-	slFree(meth);
+	delete meth;
 }
 
 /*!
 	\brief Adds a local variable to a method.  
+
+	Returns the variable added to the list of methods, or NULL if the variable
+	already exists.
 */
 
-slList *stMethodAddVar(stVar *var, stMethod *method) {
+stVar *stMethodAddVar(stVar *var, stMethod *method) {
 	if(stFindLocal(var->name, method)) return NULL;
 
 	method->stackOffset += (method->stackOffset % stAlign(var->type));
 		
 	var->offset = method->stackOffset;
 
-	if(var->type->type == AT_LIST || var->type->type == AT_STRING) method->gcVariables = 1;
-
-	method->variables = slListPrepend(method->variables, var);
+	method->variables.push_back( var);
 
 	method->stackOffset += stSizeof(var->type);
 
-	return method->variables;
+	return var;
 }
 
 /*!
@@ -626,7 +587,7 @@ void stMethodAlignStack(stMethod *method) {
 stVarType *stVarTypeNew(unsigned char type, unsigned char arrayType, int arrayCount, char *objectType) {
 	stVarType *t;
 
-	t = slMalloc(sizeof(stVarType));
+	t = new stVarType;
 
 	t->type = type;
 	t->arrayType = arrayType;
@@ -652,7 +613,7 @@ stVarType *stVarTypeCopy(stVarType *t) {
 stVar *stVarNew(char *name, stVarType *type) {
 	stVar *v;
 
-	v = slMalloc(sizeof(stVar));
+	v = new stVar;
 
 	v->name = slStrdup(name);
 	v->type = type;
@@ -666,38 +627,35 @@ stVar *stVarNew(char *name, stVarType *type) {
 */
 
 void stFreeStVar(stVar *v) {
+	if(!v) return;
+
 	slFree(v->name);
 
 	if(v->type->objectName) slFree(v->type->objectName);
 
-	slFree(v->type);
-	slFree(v);
+	delete v->type;
+
+	delete v;
 }
 
 /*!
 	\brief Associates an stVar variable with an object to make an instance variable.
 */
 
-brNamespaceSymbol *stInstanceNewVar(stVar *v, stObject *object) {
-	brNamespaceSymbol *var;
+stVar *stInstanceNewVar(stVar *v, stObject *object) {
+	if(object->variables[ v->name]) return NULL;
 
-	var = brNamespaceLookup(object->keywords, v->name);
-
-	/* symbol redefined--return NULL */
-
-	if(var) return NULL;
-
-	/* make sure that this object's variables are aligned to store */
-	/* this data type. */
+	// make sure that this object's variables are aligned to store the data
 
 	object->varSize += (object->varSize % stAlign(v->type));
 
 	v->offset = object->varSize;
 
 	object->varSize += stSizeof(v->type);
-	object->variableList = slListPrepend(object->variableList, v);
 
-	return brNamespaceStore(object->keywords, v->name, ST_VAR, v);
+	object->variables[ v->name] = v;
+
+	return v;
 }
 
 /*!
@@ -705,97 +663,83 @@ brNamespaceSymbol *stInstanceNewVar(stVar *v, stObject *object) {
 */
 
 int stUnusedInstanceVarWarning(stObject *o) {
-	slList *theList, *vList, *mList, *listStart;
-	brNamespaceSymbol *symbol;
 	stVar *var;
 	stMethod *method;
 	stKeywordEntry *e;
-	int n;
+	unsigned int n;
 
-	listStart = theList = brNamespaceSymbolList(o->keywords);
+	std::map< std::string, stVar* >::iterator vi;
 
-	while(theList) {
-		symbol = theList->data;
+	for(vi = o->variables.begin(); vi != o->variables.end(); vi++ ) {
+		stVar *var = vi->second;
 
-		if(symbol->type == ST_VAR) {
-			var = symbol->data;
-
-			if(!var->used)
-				slMessage(DEBUG_ALL, "warning: unused class variable \"%s\" in class %s\n", var->name, o->name);
-		}
-
-		if(symbol->type == ST_METHODS) {
-			int used;
-
-			mList = symbol->data;
-
-			while(mList) {
-				method = mList->data;
-				vList = method->variables;
-
-				used = 0;
-
-				while(vList) {
-					var = vList->data;
-
-					if(stObjectLookup(o, var->name, ST_VAR)) {
-						slMessage(DEBUG_ALL, "warning: local variable \"%s\" in method %s of class %s shadows instance variable of same name\n", var->name, method->name, o->name);
-					}
-
-					/* caller is a special variable */
-
-					if(!var->used && strcmp(var->name, "caller")) {
-						slMessage(DEBUG_ALL, "warning: unused local variable \"%s\" in method %s of class %s\n", var->name, method->name, o->name);
-					} else if(var->used) {
-						used++;
-					}
-
-					vList = vList->next;
-				}
-
-				if(method->keywords) {
-					for(n=0;n<method->keywords->count;n++) {
-						e = method->keywords->data[n];
-
-						if(!e->var->used) {
-							slMessage(DEBUG_ALL, "warning: unused keyword \"%s\" in method %s of class %s\n", e->var->name, method->name, o->name);
-						} else {
-							used++;
-						}
-					}
-				}
-
-				if(used == 0) {
-					method->inlined = 1;
-				} 
-
-				mList = mList->next;
-			}
-		}
-
-		theList = theList->next;
+		if(var && !var->used)
+			slMessage(DEBUG_ALL, "warning: unused class variable \"%s\" in class %s\n", var->name, o->name);
 	}
 
-	slListFree(listStart);
+	std::map< std::string, std::vector< stMethod* > >::iterator mli;
+
+	for(mli = o->methods.begin(); mli != o->methods.end(); mli++ ) {
+		std::vector< stMethod*> methodList = mli->second;
+		std::vector< stMethod*>::iterator mi;
+
+		for(mi = methodList.begin(); mi != methodList.end(); mi++) {	
+			int used = 0;
+
+			method = *mi;
+
+			std::vector< stVar* >::iterator vi;
+
+			for(vi = method->variables.begin(); vi != method->variables.end(); vi++ ) {
+				var = *vi;
+
+				if(stObjectLookupVariable(o, var->name)) {
+					slMessage(DEBUG_ALL, "warning: local variable \"%s\" in method %s of class %s shadows instance variable of same name\n", var->name, method->name, o->name);
+				}
+
+				/* caller is a special variable */
+
+				if(!var->used && strcmp(var->name, "caller")) {
+					slMessage(DEBUG_ALL, "warning: unused local variable \"%s\" in method %s of class %s\n", var->name, method->name, o->name);
+				} else if(var->used) {
+					used++;
+				}
+			}
+
+			for(n=0;n<method->keywords.size();n++) {
+				e = method->keywords[n];
+
+				if(!e->var->used) {
+					slMessage(DEBUG_ALL, "warning: unused keyword \"%s\" in method %s of class %s\n", e->var->name, method->name, o->name);
+				} else {
+					used++;
+				}
+			}
+
+			if(used == 0) {
+				method->inlined = 1;
+			} 
+		}
+	}
 
 	return 0;
 }
 
 /*!
-	\brief Finds a symbol of a specified type inside an object.
+	\brief Finds a variable in an object.
 
-	Searches the parent objects for the symbol as well.
+	Searches the parent objects for the variable as well.
 */
 
-brNamespaceSymbol *stObjectLookup(stObject *ob, char *word, unsigned char type) {
-	brNamespaceSymbol *var;
-
+stVar *stObjectLookupVariable(stObject *ob, char *word) {
 	do {
-		var = brNamespaceLookup(ob->keywords, word);
-	} while(!var && (ob = ob->super));
+		std::map< std::string, stVar* >::iterator vi;
 
-	if(var && var->type == type) return var;
-  
+		vi = ob->variables.find( word);
+
+		if( vi != ob->variables.end()) return vi->second;
+	} while((ob = ob->super));
+
 	return NULL;
 }
 
@@ -803,24 +747,16 @@ brNamespaceSymbol *stObjectLookup(stObject *ob, char *word, unsigned char type) 
 	\brief Finds an instance method without searching super-objects.
 */
 
-stMethod *stFindInstanceMethodNoSuper(stObject *o, char *word, int nArgs) {
-	brNamespaceSymbol *var;
-	slList *list;
+stMethod *stFindInstanceMethodNoSuper(stObject *object, char *word, unsigned int nArgs) {
+	std::vector< stMethod* > methodList;
+	std::vector< stMethod* >::iterator mi;
 	stMethod *method;
 
-	var = brNamespaceLookup(o->keywords, word);
+	methodList = object->methods[ word];
 
-	if(var) {
-		if(var->type != ST_METHODS) return NULL;
-
-		list = var->data;
-
-		while(list) {
-			method = list->data;
-			if(method->keywords->count == nArgs) return method;
-
-			list = list->next;
-		}
+	for(mi = methodList.begin(); mi != methodList.end(); mi++ ) {
+		method = *mi;
+		if(method->keywords.size() == nArgs) return method;
 	}
 
 	return NULL;
@@ -829,45 +765,38 @@ stMethod *stFindInstanceMethodNoSuper(stObject *o, char *word, int nArgs) {
 /*!
 	\brief Finds an instance method.
 
-	Searches parent objects as well.
+	Searches parent objects as well.  Sets foundObject to the object where 
+	the method was found, which may be a superclass of object.
 */
 
-stMethod *stFindInstanceMethod(stObject *o, char *word, int nArgs, stObject **oo) {
-	return stFindInstanceMethodWithArgRange(o, word, nArgs, nArgs, oo);
+stMethod *stFindInstanceMethod(stObject *object, char *word, int nArgs, stObject **foundObject) {
+	return stFindInstanceMethodWithArgRange(object, word, nArgs, nArgs, foundObject);
 }
 
 /*!
 	\brief Finds an instance method with a variable number of arguments.
 
-	Searches parent objects as well.
+	Searches parent objects as well.  Sets foundObject to the object where 
+	the method was found, which may be a superclass of object.
 */
 
-stMethod *stFindInstanceMethodWithArgRange(stObject *o, char *word, int minArgs, int maxArgs, stObject **oo) {
-	brNamespaceSymbol *var;
-	slList *list;
+stMethod *stFindInstanceMethodWithArgRange(stObject *object, char *word, unsigned int minArgs, unsigned int maxArgs, stObject **foundObject) {
 	stMethod *method;
+	std::vector< stMethod* > methodList;
+	std::vector< stMethod* >::iterator mi;
 
 	do {
-		var = brNamespaceLookup(o->keywords, word);
+		methodList = object->methods[ word];
 
-		if(var) {
-			if(var->type != ST_METHODS) return NULL;
+		for(mi = methodList.begin(); mi != methodList.end(); mi++ ) {
+			method = *mi;
 
-			list = var->data;
-
-			while(list) {
-				method = list->data;
-				if(method->keywords->count >= minArgs && method->keywords->count <= maxArgs) {
-					if(oo) *oo = o;
-					return method;
-				}
-
-				list = list->next;
+			if(method->keywords.size() >= minArgs && method->keywords.size() <= maxArgs) {
+				if(foundObject) *foundObject = object;
+				return method;
 			}
 		}
-
-
-	} while((o = o->super));
+	} while((object = object->super));
 
 	return NULL;
 }
@@ -875,40 +804,33 @@ stMethod *stFindInstanceMethodWithArgRange(stObject *o, char *word, int minArgs,
 /*!
 	\brief Finds an instance method which accepts at least a given mimimum number of arguments.
 
-    Searches parent objects as well.
+	Searches parent objects as well.  Sets foundObject to the object where 
+	the method was found, which may be a superclass of object.
 */
 
-stMethod *stFindInstanceMethodWithMinArgs(stObject *o, char *word, int minArgs, stObject **oo) {
-	brNamespaceSymbol *var;
-	slList *list;
+stMethod *stFindInstanceMethodWithMinArgs(stObject *object, char *word, unsigned int minArgs, stObject **foundObject) {
 	stMethod *method, *best = NULL;
 
+	std::vector< stMethod* > mlist;
+	std::vector< stMethod* >::iterator mi;
+
 	do {
-		var = brNamespaceLookup(o->keywords, word);
+		mlist = object->methods[ word];
 
-		if(var) {
-			if(var->type != ST_METHODS) return NULL;
+		for(mi = mlist.begin(); mi != mlist.end(); mi++ ) {
+			method = *mi;
 
-			list = var->data;
+			if(method->keywords.size() >= minArgs) {
+				// we want to find the method with the lowest number of arguments
+				// greater than minArgs.
 
-			while(list) {
-				method = list->data;
-
-				if(method->keywords->count >= minArgs) {
-					// we want to find the method with the lowest number of arguments
-					// greater than minArgs.
-
-					if(!best || method->keywords->count < best->keywords->count) {
-						best = method;
-						if(oo) *oo = o;
-					}
+				if(!best || method->keywords.size() < best->keywords.size() ) {
+					best = method;
+					if(foundObject) *foundObject = object;
 				}
-
-				list = list->next;
 			}
 		}
-
-	} while((o = o->super));
+	} while((object = object->super));
 
 	return best;
 }
@@ -918,12 +840,13 @@ stMethod *stFindInstanceMethodWithMinArgs(stObject *o, char *word, int minArgs, 
 */
 
 int stStoreInstanceMethod(stObject *o, char *word, stMethod *method) {
-	brNamespaceSymbol *symbol = brNamespaceLookup(o->keywords, word);
+	unsigned int n;
+	std::vector< stMethod* > &mlist = o->methods[ word];
 
-	if(symbol && symbol->type != ST_METHODS) return -1;
+	for(n = 0; n < mlist.size(); n++ )
+		if( mlist[ n]->keywords.size() == method->keywords.size() ) return -1;
 
-	if(symbol) symbol->data = slListPrepend((slList*)symbol->data, method);
-	else brNamespaceStore(o->keywords, word, ST_METHODS, slListPrepend(NULL, method));
+	o->methods[ word].push_back( method);
 
 	return 0;
 }
@@ -949,7 +872,7 @@ void stAddToInstanceLists(stInstance *i) {
 	stObject *type = i->type;
     
 	while(type) { 
-		type->allInstances = slListPrepend(type->allInstances, i);
+		type->allInstances.insert(i);
 		type = type->super;
 	}
 }
@@ -962,7 +885,12 @@ void stRemoveFromInstanceLists(stInstance *i) {
 	stObject *type = i->type;
 
 	while(type) {
-		type->allInstances = slListRemoveData(type->allInstances, i);
+		std::set< stInstance*, stInstanceCompare>::iterator ii;
+
+		ii = type->allInstances.find( i);
+
+		if(ii != type->allInstances.end()) type->allInstances.erase( ii);
+
 		type = type->super;
 	}
 }

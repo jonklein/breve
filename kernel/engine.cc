@@ -380,7 +380,6 @@ brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *methodName, double t
 
 int brEngineIterate(brEngine *e) {
 	brEval result;
-	int rcode;
 	brEvent *event;
 	std::vector<brInstance*>::iterator bi;
 	int n = 0;
@@ -416,11 +415,9 @@ int brEngineIterate(brEngine *e) {
 		n++;
 
 		if(i->status == AS_ACTIVE) {
-			rcode = brMethodCall(i, i->iterate, NULL, &result);
-
-			if(rcode < 0) {
+			if(brMethodCall(i, i->iterate, NULL, &result) != EC_OK) {
 				pthread_mutex_unlock(&e->lock);
-				return rcode;
+				return EC_ERROR;
 			}
 		}
 	}
@@ -429,11 +426,9 @@ int brEngineIterate(brEngine *e) {
 		i = *bi;
 
 		if(i->status == AS_ACTIVE) {
-			rcode = brMethodCall(i, i->postIterate, NULL, &result);
-
-			if(rcode < 0) {
+			if(brMethodCall(i, i->postIterate, NULL, &result) != EC_OK) {
 				pthread_mutex_unlock(&e->lock);
-				return rcode;
+				return EC_ERROR;
 			}
 		}
 	}
@@ -446,7 +441,7 @@ int brEngineIterate(brEngine *e) {
 		if(event->_instance->status == AS_ACTIVE) {
 			slWorldSetAge(e->world, event->_time);
 
-			rcode = brMethodCallByName(event->_instance, event->_name, &result);
+			int rcode = brMethodCallByName(event->_instance, event->_name, &result);
 
 			delete event;
 
@@ -478,6 +473,7 @@ int brEngineIterate(brEngine *e) {
 */
 
 void brAddSearchPath(brEngine *e, char *path) {
+	slMessage(DEBUG_INFO, "adding search path %s\n", path);
 	e->searchPath.push_back(slStrdup(path));
 }
 

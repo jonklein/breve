@@ -269,45 +269,6 @@ void brEngineRemoveInstanceObserver(brInstance *i, brInstance *observerInstance,
 }
 
 /*!
-	\brief Adds an object dependency for i.
-
-	Adds an object dependency for i.  This doesn't do anything to the object in 
-	and of itself, but the information may be used later on for copying or 
-	archiving the instance.
-*/
-
-int brInstanceAddDependency(brInstance *i, brInstance *dependency) {
-    if (!i || !dependency)
-	return 0;
-
-    if (!slInList(i->dependencies, dependency))
-	i->dependencies = slListPrepend(i->dependencies, dependency);
-
-    if(!slInList(dependency->dependents, i))
-	dependency->dependents = slListPrepend(dependency->dependents, i);
-
-    return 1;
-}
-
-/*!
-	\brief Removes a dependency from i.
-*/
-
-int brEngineRemoveInstanceDependency(brInstance *i, brInstance *dependency) {
-    if (!i || !dependency)
-	return 0;
-
-    if (slInList(i->dependencies, dependency))
-	i->dependencies = slListRemoveData(i->dependencies, dependency);
-
-    if(slInList(dependency->dependents, i))
-	dependency->dependents = slListRemoveData(dependency->dependents, i);
-
-    return 1;  
-}
-
-
-/*!
 	\brief Adds an object to the engine.
 */
 
@@ -473,9 +434,6 @@ void brInstanceFree(brInstance *i) {
 	brObserver *observer;
 
 	if(i && i->userData) i->object->type->destroyInstance(i->userData);
-
-    slListFree(i->dependencies);
-    slListFree(i->dependents);
 
     olist = slListCopy(i->observers);
 

@@ -70,7 +70,7 @@ struct brJavaBridgeData {
 	brJavaMethod *rettypeMethod;
 	brJavaMethod *objectnameMethod;
 
-	slHash *objectHash;
+	std::map< std::string, brJavaObject* > objects;
 
 	JavaVM *jvm;
 	JNIEnv *env;
@@ -83,7 +83,7 @@ void brJavaInit(brEngine *e);
 
 brJavaInstance *brJavaBootstrapMethodFinder(brJavaObject *);
 
-brJavaMethod *brJavaMethodFind(brJavaBridgeData *, brJavaObject *, char *, unsigned char *, int);
+brJavaMethod *brJavaMethodFind(brJavaBridgeData *, brJavaObject *, char *, unsigned char *, unsigned int);
 
 void brFreeJavaClassData(brJavaObject *data);
 void brFreeJavaBridgeData(brJavaBridgeData *data);
@@ -103,11 +103,11 @@ brJavaMethod *brJavaMakeMethodData(char *, jmethodID, char, char *, int);
 
 int brJavaMethodCall(brJavaBridgeData *, brJavaInstance *, brJavaMethod *, jvalue *, brEval *);
 
-brJavaMethod *brJavaMethodFindCallback(void *, char *, unsigned char *, int);
-brJavaObject *brJavaObjectFindCallback(void *, char *);
-brJavaInstance *brJavaInstanceNewCallback(void *, brEval **, int);
+void *brJavaMethodFindCallback(void *, char *, unsigned char *, int);
+void *brJavaObjectFindCallback(void *, char *);
+void *brJavaInstanceNewCallback(void *, brEval **, int);
 int brJavaMethodCallCallback(void *, void *, brEval **, brEval *);
-brJavaMethod *brJavaIsSubclassCallback(brObject *, brObject *);
+int brJavaIsSubclassCallback(void *, void *);
 void brJavaInstanceDestroyCallback(void *);
 
 int brEvalToJValue(brJavaBridgeData *, brEval *, jvalue *, char);

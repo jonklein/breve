@@ -21,7 +21,7 @@
 #define MC_TOLERANCE	0.00
 #define VC_WARNING_TOLERANCE -0.1
 
-#define slVclipPairFlags(pe, x, y)		((x)>(y)?(&(pe)[(x)][(y)]):(&(pe)[(y)][(x)]))
+#define slVclipPairFlags(pe, x, y)		((x)>(y)?(&(pe)->pairList[(x)*(pe)->count + (y)]):(&(pe)->pairList[(y)*(pe)->count + (x)]))
 
 enum collisionTypes {
 	CC_SIMULATE,
@@ -30,7 +30,6 @@ enum collisionTypes {
 
 enum clipCodes {
 	CT_DISJOINT = 0,
-	CT_TOUCH,
 	CT_CONTINUE,
 	CT_PENETRATE,
 	CT_ERROR
@@ -70,7 +69,6 @@ enum slCollisionFlags {
 struct slBoundSort {
 	unsigned int number;
 	char type;
-	char infnan;	// is this a fucked up entry?
 	double *value;
 };
 
@@ -90,8 +88,8 @@ class slCollisionCandidate {
 		slFeature *f1;
 		slFeature *f2;
 
-		long x;
-		long y;
+		unsigned int x;
+		unsigned int y;
 };
 
 typedef struct slCollisionCandidate slCollisionCandidate;
@@ -110,8 +108,8 @@ class slCollision {
 		std::vector<slVector> points;
 		std::vector<double> depths;
 
-		long n1; 
-		long n2;
+		unsigned int n1; 
+		unsigned int n2;
 };
 
 /*! 
@@ -125,13 +123,11 @@ class slVclipData {
 		std::vector<slBoundSort*> boundListPointers[3];
 		std::vector<slBoundSort> boundLists[3];
 
-		// slShape **shapes;
-	
 		std::vector<slWorldObject*> objects;
 
 		std::vector<slCollision> collisions;
 
-		std::vector<slPairFlags*> pairList;
+		slPairFlags *pairList;
 
 		std::map< std::pair< int, int>, slCollisionCandidate > candidates;
 
@@ -143,8 +139,8 @@ slCollision *slNextCollision(slVclipData *v);
 slCollision *slNextCollision(slVclipData *v, int x, int y);
 
 void slInitBoundSort(slVclipData *v);
-void slIsort(slVclipData *vc, std::vector<slBoundSort*> &list, unsigned int size, char boundTypeFlag);
-void slInitBoundSortList(std::vector<slBoundSort*> &list, unsigned int size, slVclipData *v, char boundTypeFlag);
+void slIsort(slVclipData *vc, std::vector<slBoundSort*> &list, char boundTypeFlag);
+void slInitBoundSortList(std::vector<slBoundSort*> &list, slVclipData *v, char boundTypeFlag);
 
 #endif
 
@@ -159,8 +155,6 @@ int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollision *ce);
 int slSphereShapeCheck(slVclipData *vc, slFeature **f, int flip, int x, int y, slCollision *ce);
 
 int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly);
-
-double slPlaneDistance(slPlane *pl, slVector *p);
 
 int slVclipTestPair(slVclipData *, slCollisionCandidate*, slCollision *);
 int slVclipTestPairAllFeatures(slVclipData*, slCollisionCandidate*, slCollision *);

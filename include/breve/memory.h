@@ -36,6 +36,4 @@
 DLLEXPORT char *slStrdup(const char *);
 #endif
 
-inline char *slStrdupAndFree(char *);
-
 #endif

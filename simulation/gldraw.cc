@@ -1129,11 +1129,11 @@ void slProcessBillboards(slWorld *w, slCamera *c) {
 	glNewList(c->billboardDrawList, GL_COMPILE);
 
 	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(1.0, 1.0); 
+		glTexCoord2f(1.0, 1.0);
 		glVertex3f(c->billboardX.x + c->billboardY.x, c->billboardX.y + c->billboardY.y, c->billboardX.z + c->billboardY.z);
 		glTexCoord2f(0.0, 1.0);
 		glVertex3f(-c->billboardX.x + c->billboardY.x, -c->billboardX.y + c->billboardY.y, -c->billboardX.z + c->billboardY.z);
-		glTexCoord2f(1.0, 0.0); 
+		glTexCoord2f(1.0, 0.0);
 		glVertex3f(c->billboardX.x - c->billboardY.x, c->billboardX.y - c->billboardY.y, c->billboardX.z - c->billboardY.z);
 		glTexCoord2f(0.0, 0.0);
 		glVertex3f(-c->billboardX.x - c->billboardY.x, -c->billboardX.y - c->billboardY.y, -c->billboardX.z - c->billboardY.z);
@@ -1151,10 +1151,15 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 	unsigned int n;
 	slWorldObject *wo;
 	int color = 1;
-	int texture = 1;
-	int loadNames = (flags & DO_LOAD_NAMES);
 
-	if(flags & DO_NO_TEXTURE) texture = 0;
+	const int loadNames = (flags & DO_LOAD_NAMES);
+	const int doNoAlpha = (flags & DO_NO_ALPHA);
+	const int doOnlyAlpha = (flags & DO_ONLY_ALPHA);
+	const int doNoStationary = (flags & DO_NO_STATIONARY);
+	const int doNoTerrain = (flags & DO_NO_TERRAIN);
+	const int doNoTexture = (flags & DO_NO_TEXTURE);
+
+	camera->_points.clear();
 
 	if(flags & DO_ONLY_ALPHA) {
 		glEnable(GL_BLEND);
@@ -1172,40 +1177,56 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 		int skip = 0;
 		wo = w->objects[n];
 
-		if(!wo || (wo->drawMode & DM_INVISIBLE)) skip = 1;
-		else if(wo->alpha != 1.0 && (flags & DO_NO_ALPHA)) skip = 1;
-		else if(wo->alpha == 1.0 && (flags & DO_ONLY_ALPHA)) skip = 1;
-		else if(wo->type == WO_STATIONARY && (flags & DO_NO_STATIONARY)) skip = 1;
-		else if(wo->type == WO_LINK && (flags & DO_NO_LINK)) skip = 1;
-		else if(wo->type == WO_TERRAIN && (flags & DO_NO_TERRAIN)) skip = 1;
+		if(wo->_drawAsPoint) skip = 0;
+		else if(wo->drawMode == DM_INVISIBLE) skip = 1;
+		else if(doNoAlpha && wo->alpha != 1.0) skip = 1;
+		else if(doOnlyAlpha && wo->alpha == 1.0) skip = 1;
+		else if(doNoStationary && wo->type == WO_STATIONARY) skip = 1;
+		else if(doNoTerrain && wo->type == WO_TERRAIN) skip = 1;
 		else if(wo->textureMode != BBT_NONE && !(flags & DO_BILLBOARDS_AS_SPHERES)) skip = 1;
 
 		if(!skip) {
 			if(loadNames) glLoadName(n);
 
-			if(color) glColor4f(wo->color.x, wo->color.y, wo->color.z, wo->alpha);
+			if( !wo->_drawAsPoint ) {
+				if(color) glColor4d(wo->color.x, wo->color.y, wo->color.z, wo->alpha);
 
-			if(wo->alpha != 1.0) {
-				if(texture && wo->texture > 1) glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-				else glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-				glDisable(GL_CULL_FACE);
+				if(wo->alpha != 1.0) {
+					if(!doNoTexture && wo->texture > 0) glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+					else glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+					glDisable(GL_CULL_FACE);
+				}
+	
+				// 0 or -1 can be used to indicate no texture
+	
+				if(!doNoTexture && wo->texture > 0) {
+					glBindTexture(GL_TEXTURE_2D, wo->texture);
+					glEnable(GL_TEXTURE_2D);
+				} 
+	
+				wo->draw(camera);
+	
+				if(wo->alpha != 1.0) glEnable(GL_CULL_FACE);
+	
+				if(wo->texture > 0) glDisable(GL_TEXTURE_2D);
+			} else {
+				camera->_points.push_back( std::pair< slVector, slVector>(wo->position.location, wo->color ) );
 			}
-
-			// 0 or -1 can be used to indicate no texture
-
-			if(texture && wo->texture > 0) {
-				glBindTexture(GL_TEXTURE_2D, wo->texture);
-				glEnable(GL_TEXTURE_2D);
-			} 
-
-			wo->draw(camera);
-
-			if(wo->alpha != 1.0) glEnable(GL_CULL_FACE);
-
-			if(wo->texture > 0) glDisable(GL_TEXTURE_2D);
 		}
 	}
+
+	glEnable(GL_BLEND);
+	glPointSize(2.0);
+	glBegin(GL_POINTS);
+	for(n=0;n<camera->_points.size();n++) {
+		slVector &v = camera->_points[ n].first;
+		slVector &c = camera->_points[ n].second;
+
+		glColor3d(c.x, c.y, c.z);
+		glVertex3d( v.x, v.y, v.z);
+	}
+	glEnd();
 
 	if(flags & DO_ONLY_ALPHA) glDisable(GL_BLEND);
 

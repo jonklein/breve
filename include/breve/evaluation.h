@@ -70,7 +70,7 @@ if (_loadExp) { \
 int brEvalCopy(brEval *s, brEval *d);
 
 inline int stEvalFree(stExp *, stRunInstance *, brEval *);
-inline int stEvalArray(slArray *, stRunInstance *, brEval *);
+inline int stEvalArray(std::vector< stExp* > *, stRunInstance *, brEval *);
 inline int stEvalMethodCall(stMethodExp *, stRunInstance *, brEval *);
 inline int stRealEvalMethodCall(stMethodExp *, stRunInstance *, stRunInstance *, brEval *);
 int stEvalForeignMethodCall(stMethodExp *, brInstance *, stRunInstance *, brEval *);
@@ -128,8 +128,8 @@ inline int stEvalListIndexPointer(stListIndexExp *, stRunInstance *, void **, in
 inline int stEvalListIndexAssign(stListIndexAssignExp *, stRunInstance *, brEval *);
 
 DLLEXPORT int stCallMethodByNameWithArgs(stRunInstance *, char *, brEval **, int, brEval *);
-inline int stCallMethodByName(stRunInstance *, char *, brEval *);
-inline int stCallMethod(stRunInstance *, stRunInstance *, stMethod *, brEval **, int, brEval *);
+int stCallMethodByName(stRunInstance *, char *, brEval *);
+int stCallMethod(stRunInstance *, stRunInstance *, stMethod *, brEval **, int, brEval *);
 
 int stLoadVariable(void *, unsigned char, brEval *, stRunInstance *);
 int stSetVariable(void *, unsigned char, stObject *, brEval *, stRunInstance *);

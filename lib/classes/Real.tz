@@ -265,6 +265,14 @@ Object : Real (aka Reals) [version 2.1] {
 
 		setTexture(realWorldPointer, texture).
 
+	+ to draw-as-point:
+		% Draws the object as a single point.  This is by far the fastest way
+		% to display an agent.  Points can be used to draw upwards of 20,000
+		% agents with a reasonable frame rate, while drawing as many spheres or 
+		% bitmaps would slow down the simulation significantly.
+
+		setDrawAsPoint(realWorldPointer, 1).
+
 	+ to set-texture-scale to scaleSize (int):
 		% Changes the "scale" of the texture.  When a texture is applied
 		% over a shape, this value is used to decide how large the texture

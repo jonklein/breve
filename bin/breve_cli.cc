@@ -230,9 +230,9 @@ int brParseArgs(int argc, char **argv) {
 
 #ifdef MACOSX
 	// Mac OS X 10.2.8 doesn't seem to have getopt_long
-	while((r = getopt(argc, argv, "t:d:r:f:n:l:vhmS:M")) != EOF) {
+	while((r = getopt(argc, argv, "t:d:r:f:n:a:vhmS:M")) != EOF) {
 #else 
-	while((r = getopt_long(argc, argv, "t:d:r:f:n:l:vhmS:M", gCLIOptions, NULL)) != EOF) {
+	while((r = getopt_long(argc, argv, "t:d:r:f:n:a:vhmS:M", gCLIOptions, NULL)) != EOF) {
 #endif
 		switch(r) {
 			case 'd':
@@ -252,7 +252,7 @@ int brParseArgs(int argc, char **argv) {
 				gSimMax = atof(optarg);
 				printf("running for %f seconds\n", gSimMax);
 				break;
-			case 'l':
+			case 'a':
 				gSimFile = slStrdup(optarg);
 				break;
 			case 'h':

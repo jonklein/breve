@@ -37,32 +37,8 @@ enum parserModes {
 */
 
 struct stXMLArchiveRecord {
-	slList *instances;
-};
-
-/*!
-	\brief Data used when preforming a dearchive.
-*/
-
-struct stXMLDearchiveRecord {
-	slList *instances;
-};
-
-/*!
-	\brief Data used when parsing an XML archive.
-*/
-
-struct stXMLParserState {
-	int mode;
-	int error;
-	brEngine *engine;
-	stInstance *currentInstance;
-	stObject *currentObject;
-	char *currentKey;
-	slList *stateStack;
-	int controllerIndex;
-	int archiveIndex;
-	slList *instances;
+	std::map< stInstance*, int > instanceToIndexMap;
+	std::set< stInstance*, stInstanceCompare > written;
 };
 
 /*!
@@ -87,55 +63,69 @@ struct stXMLStackEntry {
 	char *string;
 };
 
+/*!
+	\brief Data used when parsing an XML archive.
+*/
+
+struct stXMLParserState {
+	int mode;
+	int error;
+	brEngine *engine;
+	stInstance *currentInstance;
+	stObject *currentObject;
+	std::vector< stXMLStackEntry* > stateStack;
+	int controllerIndex;
+	int archiveIndex;
+	slList *instances;
+	std::map< int, stInstance* > indexToInstanceMap;
+};
+
 typedef struct stXMLArchiveRecord stXMLArchiveRecord;
 typedef struct stXMLDearchiveRecord stXMLDearchiveRecord;
 
 typedef struct stXMLParserState stXMLParserState;
 typedef struct stXMLStackEntry stXMLStackEntry;
 
-int stXMLAssignIndices(brEngine *e);
+int stXMLAssignIndices(brEngine *, std::map< stInstance*, int>&);
 
-int stXMLWriteObjectToFile(stInstance *i, char *filename, int isData);
-int stXMLWriteSimulationToFile(char *filename, brEngine *i);
-int stXMLWriteSimulationToStream(FILE *f, brEngine *e);
-int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int spaces, int isDataObject);
-int stXMLSimulationWrite(FILE *file, brEngine *i, int spaces);
-int stXMLVariablePrint(FILE *file, stVar *variable, stInstance *i, int spaces);
-int stXMLPrintEval(FILE *file, char *name, brEval *target, int spaces);
+int stXMLWriteObjectToFile(stInstance *, char *, int);
+int stXMLWriteSimulationToFile(char *, brEngine *);
+int stXMLWriteSimulationToStream(FILE *, brEngine *);
+int stXMLWriteObject(stXMLArchiveRecord *, FILE *, stInstance *, int, int);
+int stXMLSimulationWrite(FILE *, brEngine *, int);
 
-int stXMLPrintList(FILE *file, char *name, brEvalListHead *head, int spaces);
-int stXMLPrintHash(FILE *file, char *name, brEvalHash *hash, int spaces);
+int stXMLVariablePrint(stXMLArchiveRecord *, FILE *, stVar *, stInstance *, int);
+int stXMLPrintEval(stXMLArchiveRecord *, FILE *, char *, brEval *, int);
+int stXMLPrintList(stXMLArchiveRecord *, FILE *, char *, brEvalListHead *, int);
+int stXMLPrintHash(stXMLArchiveRecord *, FILE *, char *, brEvalHash *, int);
 
-int stXMLReadObjectFromFile(stInstance *i, char *filename);
-int stXMLReadObjectFromStream(stInstance *i, FILE *stream);
-int stXMLReadObjectFromString(stInstance *i, char *buffer);
-stInstance *stXMLDearchiveObjectFromFile(brEngine *i, char *filename);
-stInstance *stXMLDearchiveObjectFromStream(brEngine *i, FILE *stream);
-stInstance *stXMLDearchiveObjectFromString(brEngine *i, char *buffer);
-int stXMLInitSimulationFromFile(brEngine *i, char *filename);
-int stXMLInitSimulationFromStream(brEngine *i, FILE *stream);
-int stXMLInitSimulationFromString(brEngine *i, char *buffer);
+int stXMLReadObjectFromFile(stInstance *i, char *);
+int stXMLReadObjectFromStream(stInstance *i, FILE *);
+int stXMLReadObjectFromString(stInstance *i, char *);
+stInstance *stXMLDearchiveObjectFromFile(brEngine *, char *);
+stInstance *stXMLDearchiveObjectFromStream(brEngine *, FILE *);
+stInstance *stXMLDearchiveObjectFromString(brEngine *, char *);
+int stXMLInitSimulationFromFile(brEngine *, char *);
+int stXMLInitSimulationFromStream(brEngine *, FILE *);
+int stXMLInitSimulationFromString(brEngine *, char *);
 
-int stXMLStateForElement(char *name);
+int stXMLStateForElement(char *);
 
-void stXMLObjectStartElementHandler(stXMLParserState *userData, const XML_Char *name, const XML_Char **atts);
-void stXMLObjectCharacterDataHandler(stXMLParserState *userData, const XML_Char *name, int len);
-void stXMLObjectEndElementHandler(stXMLParserState *userData, const XML_Char *name);
+void stXMLObjectStartElementHandler(void *, const XML_Char *, const XML_Char **);
+void stXMLObjectCharacterDataHandler(void *, const XML_Char *, int);
+void stXMLObjectEndElementHandler(void *, const XML_Char *);
 
-void stXMLPreparseStartElementHandler(stXMLParserState *userData, const XML_Char *name, const XML_Char **atts);
-void stXMLPreparseCharacterDataHandler(stXMLParserState *userData, const XML_Char *name, int len);
-void stXMLPreparseEndElementHandler(stXMLParserState *userData, const XML_Char *name);
+void stXMLPreparseStartElementHandler(void *, const XML_Char *, const XML_Char **);
+void stXMLPreparseCharacterDataHandler(void *, const XML_Char *, int);
+void stXMLPreparseEndElementHandler(void *, const XML_Char *);
 
-XML_Parser stExternalEntityParserCreate(XML_Parser p, const XML_Char *context, const XML_Char *encoding);
+XML_Parser stExternalEntityParserCreate(XML_Parser, const XML_Char *, const XML_Char *);
 
-void stPrintXMLError(XML_Parser p);
+void stPrintXMLError(XML_Parser);
 
-stInstance *stXMLFindDearchivedInstance(slList *l, int n);
+char *stXMLEncodeString(char *);
+char *stXMLDecodeString(char *);
 
-char *stXMLEncodeString(char *string);
-char *stXMLDecodeString(char *string);
+int stXMLWriteObjectToStream(stInstance *, FILE *, int);
 
-int stXMLWriteObjectToStream(stInstance *i, FILE * file, int isDataObject);
-
-int stXMLRunDearchiveMethods(slList *l);
-
+int stXMLRunDearchiveMethods(stXMLParserState *);

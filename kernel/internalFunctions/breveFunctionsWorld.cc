@@ -836,6 +836,15 @@ int brISetShadowCatcher(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
+	\brief Enables or disables point drawing for an object.
+*/
+
+int brISetDrawAsPoint(brEval args[], brEval *target, brInstance *i) {
+	BRWORLDOBJECTPOINTER(&args[0])->_drawAsPoint = BRINT(&args[1]);
+	return EC_OK;
+}
+
+/*!
 	\brief Adds a rendered line between two objects.
 
 	void addObjectLine(slWorldObject pointer source, slWorldObject pointer dest, vector color, int style).
@@ -979,6 +988,7 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "setBackgroundTextureColor", brISetBackgroundTextureColor, AT_NULL, AT_VECTOR, 0);
 
 	brNewBreveCall(n, "setShadowCatcher", brISetShadowCatcher, AT_NULL, AT_POINTER, AT_VECTOR, 0);
+	brNewBreveCall(n, "setDrawAsPoint", brISetDrawAsPoint, AT_NULL, AT_POINTER, AT_INT, 0);
 
 	brNewBreveCall(n, "setLightAmbientColor", brISetLightAmbientColor, AT_NULL, AT_VECTOR, 0);
 	brNewBreveCall(n, "setLightDiffuseColor", brISetLightDiffuseColor, AT_NULL, AT_VECTOR, 0);

@@ -70,10 +70,7 @@ void slVclipDataInit(slWorld *w) {
 		slAddBoundingBoxForVectors(w->clipData, x, &w->objects[x]->min, &w->objects[x]->max);
 	}
 
-	for(x=0;x<w->objects.size();x++) {
-		//for(y=0;y<x;y++) slVclipDataInitPairFlags(w, x, y);
-		memset(w->clipData->pairList[x], (BT_CHECK | BT_UNKNOWN), x);
-	}
+	memset(w->clipData->pairList, (BT_CHECK | BT_UNKNOWN), (w->clipData->maxCount * w->clipData->maxCount));
 
 	for(x=0;x<w->objects.size();x++) {
 	 	if(w->objects[x]->type == WO_LINK) {
@@ -85,12 +82,12 @@ void slVclipDataInit(slWorld *w) {
 				slPairFlags *flags;
 				slLink *link2 = (*ji)->child;
 
-				flags = slVclipPairFlags(w->clipData->pairList, link->clipNumber, link2->clipNumber);
+				flags = slVclipPairFlags(w->clipData, link->clipNumber, link2->clipNumber);
 
 				if(*flags & BT_CHECK) *flags ^= BT_CHECK;
 			}
 
-	 		if(link->multibody) slMultibodyInitCollisionFlags(link->multibody, w->clipData->pairList);
+	 		if(link->multibody) slMultibodyInitCollisionFlags(link->multibody, w->clipData);
 		}
 	}
 
@@ -119,7 +116,7 @@ void slVclipDataInitPairFlags(slWorld *w, int x, int y) {
 	int callback = 0;
 	int simulate = 0;
 
-	flags = slVclipPairFlags(w->clipData->pairList, x, y);
+	flags = slVclipPairFlags(w->clipData, x, y);
 
 	if(*flags & BT_UNKNOWN) *flags ^= BT_UNKNOWN;
 
@@ -169,8 +166,6 @@ void slVclipDataInitPairFlags(slWorld *w, int x, int y) {
 */
 
 slVclipData *slVclipDataNew() {
-	unsigned int listSize, n;
-
 	slVclipData *v;
 
 	v = new slVclipData;
@@ -178,15 +173,9 @@ slVclipData *slVclipDataNew() {
 	v->count = 0;
 	v->maxCount = 32;
 
-	listSize = v->maxCount * 2;
+	v->pairList = new unsigned char[(v->maxCount * v->maxCount)];
 
-	v->pairList.insert(v->pairList.end(), v->maxCount + 1, NULL);
-
-	for(n=1;n<v->maxCount;n++) {
-		v->pairList[n] = new slPairFlags[n];		
-
-		memset(v->pairList[n], BT_CHECK, n);
-	}
+	memset(v->pairList, (BT_CHECK | BT_UNKNOWN), (v->maxCount * v->maxCount));
 
 	return v;
 }
@@ -198,30 +187,16 @@ slVclipData *slVclipDataNew() {
 */
 
 void slVclipDataRealloc(slVclipData *v, unsigned int count) {
-	unsigned int listSize, n;
-	int oldMax;
-
 	v->count = count;
 
 	if(v->count < v->maxCount) return;
 
-	oldMax = v->maxCount;
-
 	while(v->count > v->maxCount) v->maxCount *= 2;
 
-	listSize = v->maxCount * 2;
+	delete[] v->pairList;
+	v->pairList = new unsigned char[(v->maxCount * v->maxCount)];
 
-	v->pairList.insert(v->pairList.end(), (v->maxCount + 1) - v->pairList.size(), NULL);
-
-	// init the pair list--we need an entry for every possible object pair
-	// we only need a diagonal matrix here.  initialize the CHECK flag
-	// for all entries, we'll remove some later.
-
-	for(n=oldMax;n<v->maxCount;n++) {
-		v->pairList[n] = new slPairFlags[n];
-
-		memset(v->pairList[n], BT_CHECK, n);
-	}
+	memset(v->pairList, (BT_CHECK | BT_UNKNOWN), (v->maxCount * v->maxCount));
 }
 
 /*!
@@ -263,6 +238,8 @@ void slInitProximityData(slWorld *w) {
 
 	slVclipDataRealloc(w->proximityData, w->objects.size());
 
+	w->proximityData->world = w;
+
 	w->proximityData->boundLists[0].clear();
 	w->proximityData->boundLists[1].clear();
 	w->proximityData->boundLists[2].clear();
@@ -286,15 +263,13 @@ void slInitProximityData(slWorld *w) {
 */
 
 void slFreeClipData(slVclipData *v) {
-	unsigned int n;
-
 	if(!v->maxCount) {
 		// everything is uninitialized and empty
 		delete v;
 		return;
 	}
 
-	for(n=1;n<v->maxCount;n++) delete[] v->pairList[n];
+	delete[] v->pairList;
 
 	delete v;
 }

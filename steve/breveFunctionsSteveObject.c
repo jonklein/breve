@@ -66,14 +66,14 @@ extern stSteveData *gSteveData;
 */
 
 int stSSetFreedInstanceProtection(brEval args[], brEval *target, brInstance *i) {
-	stSteveData *data = i->object->type->userData;
+	stSteveData *data = (stSteveData*)i->object->type->userData;
 
     data->retainFreedInstances = BRINT(&args[0]);
     return EC_OK;
 }
 
 int stOCallMethodNamed(brEval args[], brEval *target, brInstance *i) {
-	stInstance *newI = BRINSTANCE(&args[0])->userData;
+	stInstance *newI = (stInstance*)BRINSTANCE(&args[0])->userData;
 	char *method = BRSTRING(&args[1]);
 	brEvalListHead *l = BRLIST(&args[2]);
 	int argCount = 0, n;
@@ -90,10 +90,10 @@ int stOCallMethodNamed(brEval args[], brEval *target, brInstance *i) {
 	start = l->start;
 
 	if(argCount != 0) {
-		newargs = alloca(sizeof(brEval*) * argCount);
+		newargs = (brEval**)alloca(sizeof(brEval*) * argCount);
 
 		for(n=0;n<argCount;n++) {
-			newargs[n] = alloca(sizeof(brEval));
+			newargs[n] = (brEval*)alloca(sizeof(brEval));
 			brEvalCopy(&start->eval, newargs[n]);
 
 			start = start->next;
@@ -112,14 +112,13 @@ int stOIsa(brEval args[], brEval *target, brInstance *bi) {
 	stObject *o;
 	stObject *io;
 	brObject *bo;
-	stInstance *i = bi->userData;
+	stInstance *i = (stInstance*)bi->userData;
 
-	/* go down to the base instance */
-
+	// go down to the base instance 
 	
 	bo = brObjectFind(i->type->engine, BRSTRING(&args[0]));
 
-	if(bo) o = bo->userData;
+	if(bo) o = (stObject*)bo->userData;
 	else o = NULL;
 
 	io = i->type;
@@ -142,16 +141,12 @@ int stOIsa(brEval args[], brEval *target, brInstance *bi) {
 */
 
 int stORespondsTo(brEval args[], brEval *target, brInstance *i) {
-	stInstance *instance = BRINSTANCE(&args[0])->userData;
+	stInstance *instance = (stInstance*)BRINSTANCE(&args[0])->userData;
 	char *method = BRSTRING(&args[1]);
-
-	brNamespaceSymbol *mSymbol;
-	
-	mSymbol = stObjectLookup(instance->type, method, ST_METHODS);
 
 	target->type = AT_INT;
 
-	if(mSymbol) BRINT(target) = 1;
+	if( instance->type->methods[ method].size() != 0) BRINT(target) = 1;
 	else BRINT(target) = 0;
 
 	return EC_OK;
@@ -162,7 +157,7 @@ int stORespondsTo(brEval args[], brEval *target, brInstance *i) {
 */
 
 int stOSetGC(brEval args[], brEval *target, brInstance *bi) {
-	stInstance *i = bi->userData;
+	stInstance *i = (stInstance*)bi->userData;
 
 	i->gc = BRINT(&args[0]);
 
@@ -174,7 +169,7 @@ int stOSetGC(brEval args[], brEval *target, brInstance *bi) {
 */
 
 int stOGetRetainCount(brEval args[], brEval *target, brInstance *bi) {
-	stInstance *i = bi->userData;
+	stInstance *i = (stInstance*)bi->userData;
 	BRINT(target) = i->retainCount;
 	return EC_OK;
 }
@@ -245,7 +240,7 @@ int stNSendXMLObject(brEval *args, brEval *target, brInstance *i) {
 	FILE *file = xmlBuffer->fp;
 	char *buffer;
 
-	stXMLWriteObjectToStream(archive->userData, file, 0);
+	stXMLWriteObjectToStream((stInstance*)archive->userData, file, 0);
 	buffer = slCloseStringStream(xmlBuffer);
 
 	BRINT(target) = stSendXMLString(addr, port, buffer);
@@ -256,10 +251,32 @@ int stNSendXMLObject(brEval *args, brEval *target, brInstance *i) {
 }
 
 int stCStacktrace(brEval args[], brEval *target, brInstance *i) {
-	stInstance *si = i->userData;
+	stInstance *si = (stInstance*)i->userData;
 
     stStackTrace(si->type->steveData);
     return EC_OK;
+}
+
+/*!
+	\brief Adds a dependency to the calling object's dependency list.
+
+	void addDependency(object dependency).
+*/
+
+int stIAddDependency(brEval args[], brEval *target, brInstance *i) {
+	stInstanceAddDependency((stInstance*)i->userData, (stInstance*)BRINSTANCE(&args[0])->userData);
+	return EC_OK;
+}
+
+/*!
+	\brief Removes a dependency from the calling object's dependency list.
+
+	void removeDependency(object dependency).
+*/
+
+int stIRemoveDependency(brEval args[], brEval *target, brInstance *i) {
+	stInstanceRemoveDependency((stInstance*)i->userData, (stInstance*)BRINSTANCE(&args[0])->userData);
+	return EC_OK;
 }
 
 void breveInitSteveObjectFuncs(brNamespace *n) {
@@ -276,4 +293,9 @@ void breveInitSteveObjectFuncs(brNamespace *n) {
 
 	brNewBreveCall(n, "sendXMLObject", stNSendXMLObject, AT_INT, AT_STRING, AT_INT, AT_INSTANCE, 0);
 	brNewBreveCall(n, "stacktrace", stCStacktrace, AT_NULL, 0);
+
+	brNewBreveCall(n, "addDependency", stIAddDependency, AT_NULL, AT_INSTANCE, 0);
+	brNewBreveCall(n, "removeDependency", stIRemoveDependency, AT_NULL, AT_INSTANCE, 0);
+
+
 }

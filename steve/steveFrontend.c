@@ -17,15 +17,15 @@ void *breveFrontendInitData(brEngine *engine) {
 }
 
 void breveFrontendCleanupData(void *data) {
-	stSteveCleanup(data);
+	stSteveCleanup((stSteveData*)data);
 }
 
 int breveFrontendLoadSimulation(breveFrontend *frontend, char *code, char *file) {
-	return stLoadSimulation(frontend->data, frontend->engine, code, file);
+	return stLoadSimulation((stSteveData*)frontend->data, frontend->engine, code, file);
 }
 
 int breveFrontendLoadSavedSimulation(breveFrontend *frontend, char *simcode, char *simfile, char *xmlfile) {
-	return stLoadSavedSimulation(frontend->data, frontend->engine, simcode, simfile, xmlfile);
+	return stLoadSavedSimulation((stSteveData*)frontend->data, frontend->engine, simcode, simfile, xmlfile);
 }
 
 /*!
@@ -33,7 +33,7 @@ int breveFrontendLoadSavedSimulation(breveFrontend *frontend, char *simcode, cha
 */
 
 int stSubclassCallback(void *c1, void *c2) {
-	return stIsSubclassOf(c1, c2);
+	return stIsSubclassOf((stObject*)c1, (stObject*)c2);
 }
 
 /*!
@@ -42,23 +42,25 @@ int stSubclassCallback(void *c1, void *c2) {
 
 int stCallMethodBreveCallback(void *instanceData, void *methodData, brEval **arguments, brEval *result) {
 	int r, count = 0;
-	stMethod *method = methodData;
+	stMethod *method = (stMethod*)methodData;
 	stRunInstance ri;
 	slStack *previous;
 
-	ri.instance = instanceData;
-	ri.type = ri.instance->type;
+	slStack newStack;
 
-	if(method->keywords) count = method->keywords->count;
+	ri.instance = (stInstance*)instanceData;
+
+	count = method->keywords.size();
 
 	previous = ri.instance->gcStack;
 
-	ri.instance->gcStack = slStackNew();
+	ri.instance->gcStack = &newStack;
+
+	ri.type = ri.instance->type;
 
 	r = stCallMethod(&ri, &ri, method, arguments, count, result);
 
 	stGCCollectStack(ri.instance->gcStack);
-	slStackFree(ri.instance->gcStack);
 	ri.instance->gcStack = previous;
 
 	return r;
@@ -69,7 +71,7 @@ int stCallMethodBreveCallback(void *instanceData, void *methodData, brEval **arg
 */
 
 void *stInstanceNewCallback(void *object, brEval **constructorArgs, int argCount) {
-	return stInstanceNew(object);
+	return (void*)stInstanceNew((stObject*)object);
 }
 
 /*!
@@ -79,7 +81,7 @@ void *stInstanceNewCallback(void *object, brEval **constructorArgs, int argCount
 void *stFindMethodBreveCallback(void *object, char *name, unsigned char *argTypes, int args) {
 	stMethod *method;
 
-	method = stFindInstanceMethod(object, name, args, NULL);
+	method = stFindInstanceMethod((stObject*)object, name, args, NULL);
 
 	return method;
 }
@@ -89,7 +91,7 @@ void *stFindMethodBreveCallback(void *object, char *name, unsigned char *argType
 */
 
 void stInstanceFreeCallback(void *i) {
-	stInstanceFree(i);
+	stInstanceFree((stInstance*)i);
 }
 
 /*!
@@ -101,8 +103,7 @@ stSteveData *stSteveInit(brEngine *engine) {
 
 	internal = brEngineGetInternalMethods(engine);
 
-	gSteveData = slMalloc(sizeof(stSteveData));
-	gSteveData->allObjects = NULL;
+	gSteveData = new stSteveData;
 
 	breveInitSteveDataObjectFuncs(internal);
 	breveInitSteveObjectFuncs(internal);
@@ -117,10 +118,6 @@ stSteveData *stSteveInit(brEngine *engine) {
 	gSteveData->steveObjectType.findObject = NULL;
 
 	gSteveData->retainFreedInstances = 1;
-	gSteveData->freedInstances = NULL;
-	gSteveData->allObjects = NULL;
-
-	gSteveData->defines = brNamespaceNew();
 
 	gSteveData->stackRecord = NULL;
 
@@ -135,58 +132,30 @@ stSteveData *stSteveInit(brEngine *engine) {
 */
 
 void stSteveCleanup(stSteveData *d) {
-	slList *o;
+	std::vector< stObject* >::iterator oi;
+	std::vector< stInstance* >::iterator ii;
 
 	// free all the instances.
 
-	o = d->allObjects;
-
-	while(o) {
-		stObjectFreeAllInstances(o->data);
-		o = o->next;
-	}
+	for( oi = d->objects.begin(); oi != d->objects.end(); oi++ ) 
+		stObjectFreeAllInstances( *oi);
 
 	// free all the objects.
 
-	o = d->allObjects;
+	for( oi = d->objects.begin(); oi != d->objects.end(); oi++ ) 
+		stObjectFree( *oi);
 
-	while(o) {
-		stObjectFree(o->data);
-		o = o->next;
-	}
-
-	slListFree(d->allObjects);
-
-	o = d->freedInstances;
-
-	while(o) {
-		slFree(o->data);
-		o = o->next;
-	}
+	for( ii = d->freedInstances.begin(); ii != d->freedInstances.end(); ii++ ) 
+		delete *ii;
 
 	if(d->controllerName) slFree(d->controllerName);
 
-	slListFree(d->freedInstances);
-
-	stFreeParseTrack(d);
-
-	brNamespaceFreeWithFunction(d->defines, (void(*)(void*))stFreeDefine);
+	// brNamespaceFreeWithFunction(d->defines, (void(*)(void*))stFreeDefine);
 
 	brEvalListFreeSortVars();
 
-	slFree(d);
+	delete d;
 }
-
-/*!
-	\brief Free a define brEval.
-*/
-
-void stFreeDefine(void *d) {
-	brEval *e = d;
-    
-	if(e->type == AT_STRING) slFree(BRSTRING(e));
-	slFree(e);
-}       
 
 /*!
 	\brief Loads steve simulation code to prepare to run a simulation.
@@ -214,12 +183,12 @@ int stLoadFiles(stSteveData *sdata, brEngine *engine, char *code, char *file) {
 	} else if(n != 0) {
 		/* relative path */
 		
-		char *fullpath = slMalloc(strlen(enginePath) + strlen(path) + 2);
+		char *fullpath = new char[strlen(enginePath) + strlen(path) + 2];
 		sprintf(fullpath, "%s/%s", enginePath, path);
 		
 		brAddSearchPath(engine, fullpath);
 		
-		slFree(fullpath);
+		delete[] fullpath;
 	} else {
 		// no path--just a file in the current directory
 		
@@ -248,7 +217,7 @@ int stLoadFiles(stSteveData *sdata, brEngine *engine, char *code, char *file) {
 	}
 
 	sdata->singleStatementMethod = stNewMethod("internal-user-input-method", NULL, "<user-input>", 0);
-	stStoreInstanceMethod(controller->userData, "internal-user-input-method", sdata->singleStatementMethod);
+	stStoreInstanceMethod((stObject*)controller->userData, "internal-user-input-method", sdata->singleStatementMethod);
 
 	return EC_OK;
 }
@@ -273,7 +242,7 @@ int stLoadSimulation(stSteveData *d, brEngine *engine, char *code, char *file) {
 		return EC_ERROR;
 	}
 
-	controller = stInstanceNew(controllerClass->userData);
+	controller = stInstanceNew((stObject*)controllerClass->userData);
 
 	controller->breveInstance = brEngineAddInstance(engine, controllerClass, controller);
 
@@ -367,7 +336,7 @@ int stParseFile(stSteveData *sdata, brEngine *engine, char *filename) {
 int stParseBuffer(stSteveData *s, brEngine *engine, char *buffer, char *filename) {
 	char *thisFile;
 
-	if(stFindParseTrack(s->filesSeen, filename)) {
+	if(std::find(s->filesSeen.begin(), s->filesSeen.end(), std::string(filename)) != s->filesSeen.end()) {
 		slMessage(DEBUG_INFO, "skipping \"%s\", already included\n", filename);
 		return 0;
 	}
@@ -375,7 +344,8 @@ int stParseBuffer(stSteveData *s, brEngine *engine, char *buffer, char *filename
 	/* if this file hasn't been seen, add it to the parse track and go */
 
 	if(filename) {
-		thisFile = stNewStParseTrack(s, filename);
+		thisFile = filename;
+		s->filesSeen.push_back( filename);
 	} else thisFile = "<untitled>";
 
 	/* set the global variables for the parser */
@@ -456,7 +426,7 @@ int stPreprocess(stSteveData *s, brEngine *engine, char *line) {
 				if(useWord[strlen(useWord) - 1] == '.')
 					useWord[strlen(useWord) - 1] = 0;
 
-				filename = slMalloc(strlen(useWord) + 4);
+				filename = new char[strlen(useWord) + 4];
 				sprintf(filename, "%s.tz", useWord);
 			} else {
 				while(line[n] != 0 && line[n] != '\n') {
@@ -465,7 +435,7 @@ int stPreprocess(stSteveData *s, brEngine *engine, char *line) {
 					else if(line[n] == '\"') end = &line[n];
 				}
 
-				filename = slMalloc((end - start) + 1);
+				filename = new char[(end - start) + 1];
 				strncpy(filename, start, (end - start));
 				filename[end - start] = 0;
 			}
@@ -485,56 +455,11 @@ int stPreprocess(stSteveData *s, brEngine *engine, char *line) {
 				brAddSearchPath(engine, filename);
 			}
 
-			slFree(filename);
+			delete[] filename;
 		}
 	} while((line = strchr(line, '\n')));
 
 	return 0;
-}
-
-
-/*
-	\brief Keep track of files that have been seen.
-
-	Adds the specified file to the list of files that have been seen.
-	This avoids parsing the same file multiple times.
-*/
-
-char *stNewStParseTrack(stSteveData *s, char *name) {
-	char *dup = slStrdup(name);
-
-	s->filesSeen = slListPrepend(s->filesSeen, dup);
-
-	return dup;
-}
-
-/*
-	\brief Frees the parse track data.
-*/
-
-void stFreeParseTrack(stSteveData *s) {
-	slList *start = s->filesSeen;
-
-	while(start) {
-		slFree(start->data);
-		start = start->next;
-	}
-
-	slListFree(s->filesSeen);
-}
-
-/*!
-	\brief Determine if a file has already been seen.
-*/
-
-char *stFindParseTrack(slList *l, char *name) {
-	while(l) {
-		if(!strcmp(l->data, name)) return l->data;
-
-		l = l->next;
-	}
-
-	return NULL;
 }
 
 /*!
@@ -544,7 +469,7 @@ char *stFindParseTrack(slList *l, char *name) {
 stVersionRequirement *stMakeVersionRequirement(float version, int operation) {
 	stVersionRequirement *b;
 
-	b = slMalloc(sizeof(stVersionRequirement));
+	b = new stVersionRequirement;
 
 	b->version = version;
 	b->operation = operation;
@@ -592,19 +517,10 @@ int stCheckVersionRequirement(float version, stVersionRequirement *r) {
 */
 	
 void stObjectAllocationReport() {
-	brObject *bo;
-	stObject *o;
-	slList *objects = gSteveData->allObjects;
-	
-	while(objects) {
-		bo = objects->data;
-	
-		o = bo->userData;
+	std::vector< stObject* >::iterator oi;
 
-		slMessage(DEBUG_ALL, "class %s: %d objects allocated\n", o->name, slListCount(o->allInstances));
-	}
-	
-	slListFree(objects);
+	for( oi = gSteveData->objects.begin(); oi != gSteveData->objects.end(); oi++ ) 
+		slMessage(DEBUG_ALL, "class %s: %d objects allocated\n", (*oi)->name, (*oi)->allInstances.size());
 }   
 
 /*! 
@@ -619,7 +535,7 @@ void stParseError(brEngine *e, int type, char *proto, ...) {
 	char localMessage[BR_ERROR_TEXT_SIZE];
 	brErrorInfo *error = brEngineGetErrorInfo(e);
 
-	/* if there is no "primary" error defined, then we do the whole process */
+	// if there is no "primary" error defined, then we do the whole process 
 
 	if(error->type == 0) {
 		error->type = type;

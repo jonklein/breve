@@ -46,7 +46,7 @@ struct slMultibody {
 
 void slLinkList(slLink *root, std::vector<slLink*> *list, int mbOnly);
 
-void slMultibodyInitCollisionFlags(slMultibody *m, std::vector<slPairFlags*> &pe);
+void slMultibodyInitCollisionFlags(slMultibody *m, slVclipData *cd);
 
 #endif
 

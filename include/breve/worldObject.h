@@ -41,6 +41,7 @@ class slWorldObject {
 			textureMode = 0;
 			textureScale = 16;
 			simulate = 0;
+			_drawAsPoint = 0;
 
 			shape = NULL;
 
@@ -92,6 +93,7 @@ class slWorldObject {
 
 		int lightExposure;
 
+		bool _drawAsPoint;
 		int texture;
 		char textureMode;
 		unsigned char drawMode;

@@ -18,20 +18,28 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#include <stdio.h>
+
 /*!
 	\brief A simple stack-like data structure.
 
 	slStack is a simple stack-like structure, but it's used mostly as a 
 	dynamically resizing array.
-
-	This is a somewhat obsolete data
 */
 
+#ifdef __cplusplus
 struct slStack {
+	slStack() {
+		data = NULL;
+		count = 0;
+		maxCount = 0;
+	}
+
     void **data;
     unsigned int count;
     unsigned int maxCount;
 };
+#endif
 
 slStack *slStackNew(void);
 slStack *slStackNewWithSize(unsigned int);

@@ -76,15 +76,15 @@ char brJTypeForType(unsigned char breveType) {
 jstring brMakeJavaString(brJavaBridgeData *bridge, char *string) {
 	jchar *characters;
 	jstring s;
-	int n;
+	unsigned int n;
 
-	characters = slMalloc(sizeof(jchar) * (strlen(string) + 1));
+	characters = new jchar[sizeof(jchar) * (strlen(string) + 1)];
 
 	for(n=0;n<strlen(string);n++) characters[n] = string[n];
 
-	s = (*bridge->env)->NewString(bridge->env, characters, strlen(string));
+	s = (*bridge->env).NewString(characters, strlen(string));
 
-	slFree(characters);
+	delete[] characters;
 
 	return s;
 }
@@ -94,18 +94,18 @@ char *brReadJavaString(brJavaBridgeData *bridge, jstring string) {
 	const jchar *characters;
 	int n, length;
 
-	length = (*bridge->env)->GetStringLength(bridge->env, string);
+	length = (*bridge->env).GetStringLength(string);
 
-	result = slMalloc(length + 1);
+	result = (char*)slMalloc(length + 1);
 
-	characters = (*bridge->env)->GetStringChars(bridge->env, string, NULL);
+	characters = (*bridge->env).GetStringChars(string, NULL);
 
 	for(n=0;n<length;n++) 
 		result[n] = characters[n];
 
 	result[n] = 0;
 
-	(*bridge->env)->ReleaseStringChars(bridge->env, string, characters);
+	(*bridge->env).ReleaseStringChars(string, characters);
 
 	return result;
 }

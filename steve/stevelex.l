@@ -24,9 +24,11 @@
 
 #include <string.h>
 
-#include "steveparse.tab.h"
+#include <vector>
 
 #include "steve.h"
+
+#include "steveparse.tab.h"
 
 static char *gParseString;
 static int gParseLength;
@@ -148,12 +150,14 @@ path					{ return PATH; }
 \+[\ ]*variables/{WORDBREAK}	{ return VARIABLES; }
 
 ([a-zA-Z_]|[a-zA-Z_][a-zA-Z0-9\-_]*[a-zA-Z0-9_])	{ 
-		brNamespaceSymbol *symbol = brNamespaceLookup(gSteveData->defines, yytext);
+		brEval *defineEval;
 
-		if(symbol) {
-			brEval *copy = slMalloc(sizeof(brEval));
+		defineEval = gSteveData->defines[ yytext];
 
-			brEvalCopy(symbol->data, copy);
+		if(defineEval) {
+			brEval *copy = (brEval*)slMalloc(sizeof(brEval));
+
+			brEvalCopy((brEval*)defineEval, copy);
 			yylval.eval = copy;
 
 			return ST_EVAL;

@@ -34,7 +34,7 @@ int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
 
 	if(length > 0 && statement[length] != '.') statement[length + 1] = '.';
 
-	fixedStatement = slMalloc(strlen(statement) + 5);
+	fixedStatement = new char[strlen(statement) + 5];
 
 	sprintf(fixedStatement, "> %s", statement);
 
@@ -57,7 +57,7 @@ int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
 		return BPE_SIM_ERROR;
 	}
 
-	i = controller->userData;
+	i = (stInstance*)controller->userData;
 	ri.instance = i;
 	ri.type = i->type;
 
@@ -70,7 +70,7 @@ int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
 	i->gcStack = NULL;
 
 	stExpFree(sd->singleStatement);
-	slFree(fixedStatement);
+	delete[] fixedStatement;
 
 	return r;
 }

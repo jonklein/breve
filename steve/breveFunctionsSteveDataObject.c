@@ -43,12 +43,12 @@
 /* only types valid for the Data object */
 
 int stDDataCheckVariables(brEval *args, brEval *result, brInstance *bi) {
-    slList *varlist;
     stVar *v;
 	int type = 0;
 	stObject *o;
+	std::map< std::string, stVar* >::iterator vi;
 
-	stInstance *i = bi->userData;
+	stInstance *i = (stInstance*)bi->userData;
 
 	o = i->type;
 
@@ -57,10 +57,8 @@ int stDDataCheckVariables(brEval *args, brEval *result, brInstance *bi) {
     result->type = AT_INT;
 
 	while(o && strcmp(o->name, "Data")) {
-	    varlist = o->variableList;
-
-	    while(varlist) {
-			v = varlist->data;
+		for(vi = o->variables.begin(); vi != o->variables.end(); vi++ ) {
+			v = vi->second;
 
 			if(v->type->type == AT_ARRAY) type = v->type->arrayType;
 			else type = v->type->type;
@@ -70,8 +68,6 @@ int stDDataCheckVariables(brEval *args, brEval *result, brInstance *bi) {
 				BRINT(result) = -1;
 				return EC_OK;
 			}
-        
-			varlist = varlist->next;
 		}
 
 		o = o->super;
@@ -83,8 +79,8 @@ int stDDataCheckVariables(brEval *args, brEval *result, brInstance *bi) {
 }
 
 int stDDataCopyObject(brEval *args, brEval *result, brInstance *bi) {
-	stInstance *i = bi->userData;
-    stInstance *otherObject = BRINSTANCE(&args[0])->userData;
+	stInstance *i = (stInstance*)bi->userData;
+    stInstance *otherObject = (stInstance*)BRINSTANCE(&args[0])->userData;
 
 	if(!otherObject) {
         BRINT(result) = -1;
@@ -108,7 +104,7 @@ int stDDataCopyObject(brEval *args, brEval *result, brInstance *bi) {
 int stDDataWriteObject(brEval *args, brEval *result, brInstance *bi) {
     char *filename = BRSTRING(&args[0]);
 	char *path;
-	stInstance *i = bi->userData;
+	stInstance *i = (stInstance*)bi->userData;
 
     result->type = AT_INT;
 
@@ -155,7 +151,7 @@ char *stPackObject(stInstance *i, int *length) {
 
     *length = sizeof(brDataObjectHeader) + (i->type->varSize - i->type->varOffset) + strlen(i->type->name);
 
-    package = slMalloc(*length);
+    package = (char*)slMalloc(*length);
     header = (brDataObjectHeader*)&package[0];
   
     header->varSize = i->type->varSize - i->type->varOffset;
@@ -208,7 +204,7 @@ int stUnpackObject(stInstance *i, char *buffer, int length) {
 
 int stDDataWriteObjectWithDialog(brEval *args, brEval *result, brInstance *bi) {
     char *filename = NULL;
-	stInstance *i = bi->userData;
+	stInstance *i = (stInstance*)bi->userData;
     
     result->type = AT_INT;
     BRINT(result) = 1;
@@ -228,7 +224,7 @@ int stDDataWriteObjectWithDialog(brEval *args, brEval *result, brInstance *bi) {
 }
 
 int stDDataReadXMLObject(brEval args[], brEval *target, brInstance *bi) {
-	stInstance *i = bi->userData;
+	stInstance *i = (stInstance*)bi->userData;
 
     char *filename = brFindFile(bi->engine, BRSTRING(&args[0]), NULL);
     BRINT(target) = stXMLReadObjectFromFile(i, filename);
@@ -239,7 +235,7 @@ int stDDataReadXMLObject(brEval args[], brEval *target, brInstance *bi) {
 int stDWriteXMLObject(brEval args[], brEval *target, brInstance *bi) {
     char *filename = BRSTRING(&args[0]);
     char *path;
-	stInstance *i = bi->userData;
+	stInstance *i = (stInstance*)bi->userData;
 
 	path = brOutputPath(i->type->engine, filename);
    	BRINT(target) = stXMLWriteObjectToFile(i, path, 1);
@@ -250,7 +246,7 @@ int stDWriteXMLObject(brEval args[], brEval *target, brInstance *bi) {
 
 int stDDataReadObject(brEval *args, brEval *result, brInstance *bi) {
     char *filename = BRSTRING(&args[0]);
-	stInstance *i = bi->userData;
+	stInstance *i = (stInstance*)bi->userData;
 
     if(!filename) {
         slMessage(DEBUG_ALL, "NULL string passed to dataReadObject.  Read cancelled.\n");
@@ -266,7 +262,7 @@ int stDDataReadObject(brEval *args, brEval *result, brInstance *bi) {
 
 int stDDataReadObjectWithDialog(brEval *args, brEval *result, brInstance *bi) {
     char *filename = NULL;
-	stInstance *i = bi->userData;
+	stInstance *i = (stInstance*)bi->userData;
 
     result->type = AT_INT;
     BRINT(result) = 1;
@@ -316,7 +312,7 @@ int stReadObject(stInstance *i, char *filename) {
 
     length = sizeof(brDataObjectHeader) + header.nameLength + header.varSize;
 
-    package = slMalloc(length);
+    package = new char[length];
     memcpy(package, &header, sizeof(brDataObjectHeader));
     
     result = slUtilFread(&package[sizeof(brDataObjectHeader)], 1, header.nameLength + header.varSize, fp);
@@ -325,22 +321,22 @@ int stReadObject(stInstance *i, char *filename) {
 
     result = stUnpackObject(i, package, length);
 
-    slFree(package);
+    delete[] package;
 
     return result;
 }
 
 int stCSimpleCrossover(brEval *args, brEval *target, brInstance *i) {
-    brInstance *a = BRINSTANCE(&args[0]);
-    brInstance *b = BRINSTANCE(&args[1]);
-    brInstance *child = BRINSTANCE(&args[2]);
+    stInstance *a = (stInstance*)BRINSTANCE(&args[0])->userData;
+    stInstance *b = (stInstance*)BRINSTANCE(&args[1])->userData;
+    stInstance *child = (stInstance*)BRINSTANCE(&args[2])->userData;
     
     if(!a || !b) {
         slMessage(DEBUG_ALL, "uninitialized object passed to simpleCrossover\n");
         return EC_ERROR;
     }
     
-    if(stObjectSimpleCrossover(a->userData, b->userData, child->userData)) return EC_ERROR;
+    if(stObjectSimpleCrossover(a, b, child)) return EC_ERROR;
 
     return EC_OK;
 }   

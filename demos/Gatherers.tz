@@ -21,10 +21,10 @@
 @include "Wanderer.tz"
 @include "Control.tz"
 
-@define COLLECTOR_COUNT		20.
-@define FOOD_COUNT			150.
+@define COLLECTOR_COUNT		50.
+@define FOOD_COUNT			400.
 
-@define WANDER_RANGE		(20, 20, 0).
+@define WANDER_RANGE		(20, 20, 20).
 
 Controller Gatherers.
 
@@ -43,6 +43,8 @@ Control : Gatherers {
 
         COLLECTOR_COUNT new Collectors.
         foodList = FOOD_COUNT new Foods.
+	
+		foodList set-bitmap to 2.
 
         # this sim can run a bit slowly, but doesn't need a lot of 
         # accuracy, so we can set up the integration step a bit.
@@ -118,7 +120,7 @@ Wanderer : Collector (aka Collectors) {
             # true.
 
             newLoc = (food get-location).
-            newLoc += random[(3, 3, 0)] - (1.5, 1.5, 0).
+            newLoc += random[(2, 2, 2)] - (1, 1, 1).
  
             carrying move to newLoc.
             carrying set-owner to 0.

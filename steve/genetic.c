@@ -37,7 +37,6 @@
 int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
 	int crossoverCount = 0, n;
 	int varCount = 0;
-	slList *list;
 	stVar *var;
 	stInstance *source;
 
@@ -59,33 +58,32 @@ int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
 
 	source = a;
 
-	list = a->type->variableList;
-
 	// this has become a little complicated now that we have "array" variables 
 	// they only appear internally as a single variable, but may contain more
 	// than one piece of information, and naturally we want to be able to
 	// crossover in the middle.
 
-	while(list) {
-		var = list->data;
+	std::map< std::string, stVar* >::iterator vi;
+
+	for(vi = a->type->variables.begin(); vi != a->type->variables.end(); vi++ ) {
+		var = vi->second;
 
 		if(var->type->type == AT_ARRAY) varCount += var->type->arrayCount;
 		else varCount++;
-
-		list = list->next;
 	}
-
-	list = a->type->variableList;
 
 	crossoverCount = random() % (varCount + 1);
 
 	source = a;
 
-	// while(list) {
-	for(n=0;n<varCount;n++) {
+	n = 0;
+
+	for(vi = a->type->variables.begin(); vi != a->type->variables.end(); vi++ ) {
 		brEval value;
 
-		var = list->data;
+		n++;
+
+		var = vi->second;
 
 		if(n >= crossoverCount) source = b;
 
@@ -93,7 +91,7 @@ int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
 			int index;
 
 			for(index=0;index<var->type->arrayCount;index++) {
-				int offset = var->offset + (n * stSizeofAtomic(var->type->arrayType));
+				int offset = var->offset + (index * stSizeofAtomic(var->type->arrayType));
 
 				stLoadVariable(&source->variables[offset], var->type->arrayType, &value, NULL);
 
@@ -110,8 +108,6 @@ int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
 
 			stSetVariable(&child->variables[var->offset], var->type->type, NULL, &value, NULL);
 		}
-
-		list = list->next;
 	}
 
 	return 0;

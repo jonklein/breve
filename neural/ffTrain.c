@@ -89,7 +89,7 @@ void backPropSets(snFFLayer *input, snFFLayer *output, double **inputs, double *
 
     ten = iterations/10;
 
-    order = slMalloc(sizeof(int) * sets);
+    order = new int[sets];
 
     for(i=0;i<iterations;i++) {
         if(!(i % ten)) {
@@ -123,7 +123,7 @@ void backPropSets(snFFLayer *input, snFFLayer *output, double **inputs, double *
         oldAse = ase;
     }
 
-    slFree(order);
+    delete[] order;
 }
 
 void randomOrder(int *vector, int count) {
