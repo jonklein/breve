@@ -33,7 +33,7 @@
 }
 
 - (void)initGL {
-	if(viewEngine) slInitGL(viewEngine->world, viewEngine->camera);
+	if(viewEngine) slInitGL(world, camera);
 
 	/* no padding when we get gl pixels */
 
@@ -116,7 +116,6 @@
 	
 	fullScreenView = [[slFullScreen alloc] init];
 
-	[self setAllowsClicks: YES];
 	drawing = 0;
 	drawCrosshair = 0;
 
@@ -155,17 +154,17 @@
 	if(!viewEngine) return;
 
 	if(fullScreen) {
-		viewEngine->camera->x = [fullScreenView width];
-		viewEngine->camera->y = [fullScreenView height];
+		camera->x = [fullScreenView width];
+		camera->y = [fullScreenView height];
 	} else {
 		[[self openGLContext] makeCurrentContext];
-		viewEngine->camera->x = bounds.size.width;
-		viewEngine->camera->y = bounds.size.height;
+		camera->x = bounds.size.width;
+		camera->y = bounds.size.height;
 	}
 
-	viewEngine->camera->fov = (double)viewEngine->camera->x/(double)viewEngine->camera->y;
+	camera->fov = (double)camera->x/(double)camera->y;
 
-	glViewport(0, 0, viewEngine->camera->x, viewEngine->camera->y);
+	glViewport(0, 0, camera->x, camera->y);
 }
 
 /*!
@@ -175,7 +174,17 @@
 - (void)setEngine:(brEngine*)e fullscreen:(BOOL)f {
 	viewEngine = e;
 
-	if(!e || !e->world || !e->camera) return;
+	if(!e) return;
+
+	camera = brEngineGetCamera(e);
+	world = brEngineGetWorld(e);
+
+	if(!world || !camera) {
+		e = NULL;
+		world = NULL;
+		camera = NULL;
+		return;
+	}
 
 	if(!f) [self initGL];
 	[self updateSize: self];
@@ -235,7 +244,8 @@
 */
 
 - (void)drawRect:(NSRect)r {
-	[drawLock lock];
+	brEngineLock(viewEngine);
+	// [drawLock lock];
 
 	[[self openGLContext] makeCurrentContext];
 
@@ -243,7 +253,7 @@
 
 	if(viewEngine) {
 	   	if(!fullScreen) {
-			slRenderScene(viewEngine->world, viewEngine->camera, drawCrosshair);
+			slRenderScene(world, camera, drawCrosshair);
 			if(theMovie) [theMovie addFrameFromRGBAPixels: [self RGBAPixels]];
 		}
 	} else {
@@ -255,24 +265,25 @@
 
 	drawing = 0;
 
-	[drawLock unlock];
+	// [drawLock unlock];
+	brEngineUnlock(viewEngine);
 }
 
 - (void)drawFullScreen {
 	if(fullScreen && viewEngine) {
-		pthread_mutex_lock(&viewEngine->lock);
+		brEngineLock(viewEngine);
 		CGLSetCurrentContext([fullScreenView context]);
 
 		if(firstFullScreen) {
 			glClearColor(0, 0, 0, 1.0);
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-			viewEngine->camera->recompile = 1;
+			camera->recompile = 1;
 		}
 
-		slRenderScene(viewEngine->world, viewEngine->camera, drawCrosshair);
+		slRenderScene(world, camera, drawCrosshair);
 		firstFullScreen = 0;
 		CGLFlushDrawable([fullScreenView context]);
-		pthread_mutex_unlock(&viewEngine->lock);
+		brEngineUnlock(viewEngine);
 	}
 }
 
@@ -282,16 +293,6 @@
 
 - (int)drawing {
 	return drawing;
-}
-
-/* 
-	+ setAllowsClicks:
-	= specify whether this view should respond to mouse input.  the default
-	= is yes.
-*/
-
-- (void)setAllowsClicks:(BOOL)allows {
-	allowClicks = allows;
 }
 
 /*
@@ -306,16 +307,14 @@
 	BOOL firstTime = YES;
 	double startCamX;
 
-	if(allowClicks == NO) return;
-	
-	if(!viewEngine || !viewEngine->world || !viewEngine->camera) return;
+	if(!viewEngine) return;
 
 	if(!fullScreen) lastp = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 	else {
 		lastp = [theEvent locationInWindow];
 	}
 
-	startCamX = viewEngine->camera->rx;
+	startCamX = camera->rx;
 	
 	mode = [motionSelector selectedColumn];
 
@@ -335,17 +334,17 @@
 		switch(mode) {
 			case 0: /* rotation */
 				drawCrosshair = 1;
-				slRotateCameraWithMouseMovement(viewEngine->camera, d.x, d.y, startCamX);
+				slRotateCameraWithMouseMovement(camera, d.x, d.y, startCamX);
 				break;
 
 			case 1: /* zoom */
 				drawCrosshair = 1;
-				slZoomCameraWithMouseMovement(viewEngine->camera, d.x, d.y);
+				slZoomCameraWithMouseMovement(camera, d.x, d.y);
 				break;
 
 			case 2: /* motion */
 				drawCrosshair = 1;
-				slMoveCameraWithMouseMovement(viewEngine->camera, d.x, d.y);
+				slMoveCameraWithMouseMovement(camera, d.x, d.y);
 				break;
 			case 3: /* select */
 				if(firstTime) {
@@ -354,7 +353,7 @@
 					drawCrosshair = 0;
 				} else {
 					[drawLock lock];
-					brDragCallback(viewEngine, (int)p.x, (int)(viewEngine->camera->y - p.y));
+					brDragCallback(viewEngine, (int)p.x, (int)(camera->y - p.y));
 					[drawLock unlock];
 				}
 
@@ -364,7 +363,7 @@
 				break;
 		}
 		
-		slUpdateCamera(viewEngine->camera);
+		slUpdateCamera(camera);
 		[self setNeedsDisplay: YES];
 
 	} while([theEvent type] != NSLeftMouseUp);

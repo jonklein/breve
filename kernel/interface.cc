@@ -105,6 +105,10 @@ int brMenuCallback(brEngine *e, brInstance *i, int n) {
 	return brMethodCallByName(i, i->menu.list[n]->method, &eval);
 }
 
+brInstance *brClickAtLocation(brEngine *e, int x, int y) {
+	return brClickCallback(e, slGlSelect(e->world, e->camera, x, y));
+}
+
 /*!
 	\brief Called when the user clicks in the breve graphical window.
 
@@ -132,7 +136,7 @@ brInstance *brClickCallback(brEngine *e, int n) {
 	if(!method) return NULL;
 
 	theArg.type = AT_INSTANCE;
-	if(o) BRINSTANCE(&theArg) = slWorldObjectGetCallbackData(o);
+	if(o) BRINSTANCE(&theArg) = (brInstance*)slWorldObjectGetCallbackData(o);
 	else BRINSTANCE(&theArg) = NULL;
 
 	argPtr[0] = &theArg;
@@ -142,7 +146,7 @@ brInstance *brClickCallback(brEngine *e, int n) {
 
 	if(!o) return NULL;
 
-	return slWorldObjectGetCallbackData(o);
+	return (brInstance*)slWorldObjectGetCallbackData(o);
 }
 
 void brBeginDrag(brEngine *e, brInstance *i) {
@@ -172,7 +176,7 @@ int brDragCallback(brEngine *e, int x, int y) {
 	brMethod *method;
 	brInstance *i;
 	int n;
-	char types[] = { AT_VECTOR };
+	unsigned char types[] = { AT_VECTOR };
 
 	pthread_mutex_lock(&e->lock);
 
@@ -321,4 +325,9 @@ char *brEngineRunSaveDialog(brEngine *e) {
 char *brEngineRunLoadDialog(brEngine *e) {
 	if(e->getLoadname) return NULL;
 	return e->getLoadname(e);
+}
+
+void brEngineSetMouseLocation(brEngine *e, int x, int y) {
+	e->mouseX = x;
+	e->mouseY = y;
 }

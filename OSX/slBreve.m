@@ -426,16 +426,19 @@ static NSRecursiveLock *gLogLock;
 - (void)updateObjectSelection {
 	stInstance *i = NULL;
 	brEngine *engine = [breveEngine getEngine];
+	brInstance *controller;
 	
 	if(!engine) return;
+
+	controller = brEngineGetController(engine);;
 
 	i = [breveEngine getSelectedInstance];
 
 	if(!i || i->status != AS_ACTIVE) {
 		[selectionText setStringValue: 
-			[NSString stringWithFormat: @"No Selection (%s [%p])", engine->controller->object->name, engine->controller]];
+			[NSString stringWithFormat: @"No Selection (%s [%p])", controller->object->name, controller]];
 
-		[editorData setEngine: engine instance: engine->controller->userData];
+		[editorData setEngine: engine instance: controller->userData];
 	} else {
 		[editorData setEngine: engine instance: i];
 
@@ -479,7 +482,8 @@ static NSRecursiveLock *gLogLock;
 
 - (IBAction)simMenu:sender {
 	brEngine *e = [breveEngine getEngine];
-	[self doMenuCallbackForInstance: e->controller->userData item: [sender tag]];
+	brInstance *controller = brEngineGetController(e);
+	[self doMenuCallbackForInstance: controller->userData item: [sender tag]];
 }
 
 - (IBAction)contextualMenu:sender {
@@ -600,16 +604,19 @@ void slPrintLog(char *text) {
 	brEngine *engine;
 	unsigned int n;
 	NSString *stringKey, *text;
+	brErrorInfo *error;
 	
 	engine = [breveEngine getEngine];
 
-	if(!engine || engine->error.type == 0) return;
+	if(!engine) return;
 
-	if(engine->error.file) {
-		simpleFilename = (char*)[[[NSString stringWithCString: engine->error.file] lastPathComponent] cString];
+	error = brEngineGetErrorInfo(engine);
+
+	if(error->file) {
+		simpleFilename = (char*)[[[NSString stringWithCString: error->file] lastPathComponent] cString];
 	} else {
 		// this shouldn't happen, but it happened once and caused a crash, so I'm
-		// fixing the symptom instead of the disease
+		// fixing the symptom instead of the disease.  for shame.
 
 		simpleFilename = "(untitled)";
 	}
@@ -621,13 +628,13 @@ void slPrintLog(char *text) {
 			currentCName = (char*)[[[doc fileName] lastPathComponent] cString];
 
 			if(!strcmp(currentCName, simpleFilename)) {
-				[[doc text] goToLine: engine->error.line];
+				[[doc text] goToLine: error->line];
 				[[doc window] makeKeyAndOrderFront: self];
 			}
 		}
 	}
 
-	stringKey = [NSString stringWithFormat: @"%s Title", gErrorNames[engine->error.type]];
+	stringKey = [NSString stringWithFormat: @"%s Title", gErrorNames[error->type]];
 	text = NSLocalizedStringFromTable(stringKey, @"Errors", @"");
 
 	[errorWindow setTitle: text];
@@ -639,14 +646,14 @@ void slPrintLog(char *text) {
 	[errorWindowErrorMessage setEditable: NO];
 	[errorWindowErrorMessage setSelectable: NO];
 
-	stringKey = [NSString stringWithFormat: @"%s Text", gErrorNames[engine->error.type]];
+	stringKey = [NSString stringWithFormat: @"%s Text", gErrorNames[error->type]];
 	text = NSLocalizedStringFromTable(stringKey, @"Errors", @"");
 
 	[errorWindowErrorMessage setString: 
 		[NSString stringWithFormat: @"Error in file \"%s\" at line %d:\n\n%s\n\n%@", 
 			simpleFilename, 
-			engine->error.line, 
-			engine->error.message, 
+			error->line, 
+			error->message, 
 			text
 		]
 	];
@@ -668,7 +675,7 @@ void slPrintLog(char *text) {
 
 	[NSApp runModalForWindow: errorWindow];
 
-	engine->error.type = 0;
+	brClearError(engine);
 }
 
 - (IBAction)stopErrorWindowModal:sender {

@@ -155,7 +155,7 @@ int brILoadTexture(brEval args[], brEval *target, brInstance *i) {
 
 int brIWorldStep(brEval args[], brEval *target, brInstance *i) {
 	double totalTime = BRDOUBLE(&args[0]);
-	double stepSize = BRDOUBLE(&args[1]) / i->engine->speedFactor;
+	double stepSize = BRDOUBLE(&args[1]);
 	int error;
 
 	i->engine->iterationStepSize = totalTime;

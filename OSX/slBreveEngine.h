@@ -116,7 +116,7 @@ int soundCallback(void *data);
 int pauseCallback(void *data);
 void setNibCallback(char *n);
 
-void *newWindowCallback(char *name, slGraph *graph);
+void *newWindowCallback(char *name, void *graph);
 void freeWindowCallback(void *data);
 void renderWindowCallback(void *data);
 

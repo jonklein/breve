@@ -129,7 +129,7 @@ int brICameraResizeDisplay(brEval args[], brEval *target, brInstance *i) {
 int brICameraNew(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera;
 
-	camera = slNewCamera(0, 0, GL_POLYGON);
+	camera = slNewCamera(0, 0);
 
 	slVectorSet(&camera->target, 1, 0, 0);
 	slVectorSet(&camera->location, 0, 0, 0);
@@ -186,7 +186,7 @@ int brICameraPosition(brEval args[], brEval *target, brInstance *i) {
 int brICameraSetEnabled(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRPOINTER(&args[0]);
 
-	camera->enabled = BRINT(&args[1]);
+	// camera->enabled = BRINT(&args[1]);
 
 	return EC_OK;
 }

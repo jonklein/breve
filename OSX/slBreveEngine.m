@@ -44,8 +44,6 @@ NSString *movieQualityStrings[] = {
 
 int slMakeCurrentContext();
 
-char *interfaceID = "aqua/1.2";
-
 - init {
 	engineLock = [[NSRecursiveLock alloc] init];
 	threadLock = [[NSRecursiveLock alloc] init];
@@ -85,6 +83,7 @@ char *interfaceID = "aqua/1.2";
 - (void)initEngine {
 	NSString *bundlePath; 
 	char *classPath, *pluginPath;
+	slCamera *camera;
 
 	if(engine) return;
 
@@ -96,27 +95,27 @@ char *interfaceID = "aqua/1.2";
 	frontend->data = breveFrontendInitData(frontend->engine);
 	engine = frontend->engine;
 
-	engine->speedFactor = speedFactor;
-	engine->callbackData = interfaceController;
-	engine->camera = slNewCamera(400, 400, GL_POLYGON);
-	engine->dialogCallback = dialogCallback;
-	engine->soundCallback = soundCallback;
-	engine->interfaceTypeCallback = interfaceVersionCallback;
-	engine->interfaceSetStringCallback = interfaceSetStringCallback;
-	engine->interfaceSetNibCallback = setNibCallback;
-	engine->newWindowCallback = newWindowCallback;
-	engine->freeWindowCallback = freeWindowCallback;
-	engine->renderWindowCallback = renderWindowCallback;
-	engine->camera->activateContextCallback = slMakeCurrentContext;
+	brEngineSetSoundCallback(engine, soundCallback);
+	brEngineSetDialogCallback(engine, dialogCallback);
+
+	// engine->newWindowCallback = newWindowCallback;
+	// engine->freeWindowCallback = freeWindowCallback;
+	// engine->renderWindowCallback = renderWindowCallback;
+
+	camera = brEngineGetCamera(engine);
+	camera->activateContextCallback = slMakeCurrentContext;
 
 	if(outputPath) brEngineSetIOPath(engine, outputPath);
 
 	gDisplayView = displayView;
 
-	engine->getSavename = getSaveNameCallback;
-	engine->getLoadname = getLoadNameCallback;
+	brEngineSetInterfaceInterfaceTypeCallback(engine, interfaceVersionCallback);
+	brEngineSetInterfaceSetStringCallback(engine, interfaceSetStringCallback);
+	brEngineSetInterfaceSetNibCallback(engine, setNibCallback);
 
-	engine->pauseCallback = pauseCallback;
+	brEngineSetGetSavenameCallback(engine, getSaveNameCallback);
+	brEngineSetGetLoadnameCallback(engine, getLoadNameCallback);
+	brEngineSetPauseCallback(engine, pauseCallback);
 
 	brAddSearchPath(engine, classPath);
 	brAddSearchPath(engine, pluginPath);
@@ -185,6 +184,7 @@ char *interfaceID = "aqua/1.2";
 - (int)parseText:(char*)buffer withFilename:(char*)filename withSavedSimulationFile:(char*)saved {
 	char *name = NULL;
 	int result;
+	brInstance *controller;
 
 	if(filename) name = slStrdup(filename);
 	else name = slStrdup("<untitled>");
@@ -192,7 +192,9 @@ char *interfaceID = "aqua/1.2";
 	if(saved) result = breveFrontendLoadSavedSimulation(frontend, buffer, name, saved);
 	else result = breveFrontendLoadSimulation(frontend, buffer, name);
 
-	if(result == EC_OK) brSetUpdateMenuCallback(engine->controller, updateMenu);
+	controller = brEngineGetController(engine);
+
+	if(result == EC_OK) brSetUpdateMenuCallback(controller, updateMenu);
 
 	if(filename) slFree(name);
 
@@ -294,7 +296,7 @@ char *interfaceID = "aqua/1.2";
 		[engineLock lock];
 
 		if(runState != BX_STOP) {
-			if(1 || engine->useMouse) {
+			if(1) {
 				NSPoint mouse = [NSEvent mouseLocation];
 
 				if(![displayView isFullScreen]) {
@@ -302,8 +304,7 @@ char *interfaceID = "aqua/1.2";
 					mouse = [[[displayView window] contentView] convertPoint: mouse toView: displayView];
 				}
 
-				engine->mouseX = mouse.x;
-				engine->mouseY = mouse.y;
+				brEngineSetMouseLocation(engine, mouse.x, mouse.y);
 			}
 
 			if((result = brEngineIterate(engine)) != EC_OK) {
@@ -315,11 +316,11 @@ char *interfaceID = "aqua/1.2";
 
 				[interfaceController stopSimulation: self];
 			} else {
-				/* if we are recording, we must catch every frame */
+				// if we are recording a movie, we must catch every frame 
 
 				if([displayView isFullScreen]) {
 					[displayView drawFullScreen];
-				} else if(displayMovie || engine->drawEveryFrame) {
+				} else if(displayMovie || brEngineGetDrawEveryFrame(engine)) {
 					[displayView lockFocus];
 					[displayView drawRect: nothing];
 					[displayView unlockFocus];
@@ -362,13 +363,14 @@ char *interfaceID = "aqua/1.2";
 }
 
 - (void)doSelectionAt:(NSPoint)p {
-	int selection;
+	slCamera *c;
 
 	if(!engine) return;
 
+	c = brEngineGetCamera(engine);
+
 	if(runState == BX_RUN) [engineLock lock];
-	selection = slGlSelect(engine->world, engine->camera, p.x, engine->camera->y - p.y);
-	brClickCallback(engine, selection);
+	brClickAtLocation(engine, p.x, c->y - p.y);
 	[interfaceController updateObjectSelection];
 	if(runState == BX_RUN) [engineLock unlock];
 }
@@ -427,14 +429,16 @@ char *interfaceID = "aqua/1.2";
 - (stInstance*)getSelectedInstance {
 	brMethod *method;
 	brEval result;
-	brInstance *i;
+	brInstance *i, *controller;
 
-	if(!engine || !engine->controller) return NULL;
+	if(!engine) return NULL;
 
-	method = brMethodFind(engine->controller->object, "get-selection", NULL, 0);
+	controller = brEngineGetController(engine);
+
+	method = brMethodFind(controller->object, "get-selection", NULL, 0);
  
 	if(method) {
-		if(brMethodCall(engine->controller, method, NULL, &result) == EC_OK) {
+		if(brMethodCall(controller, method, NULL, &result) == EC_OK) {
 			if(result.type = AT_INSTANCE) {
 				i = BRINSTANCE(&result);
 
@@ -498,13 +502,12 @@ int soundCallback(void *data) {
 }
 
 char *interfaceVersionCallback(void *data) {
-	return interfaceID;
+	return "cocoa/2.0";
 }
 
 int interfaceSetStringCallback(char *string, int tag) {
-	if(simNib) {
+	if(simNib)
 		return [simNib setString: [NSString stringWithCString: string] forObjectWithTag: tag];
-	}
 
 	return 0;
 }
@@ -518,7 +521,7 @@ void setNibCallback(char *n) {
 	simNib = [[slBreveNibLoader alloc] initWithNib: [NSString stringWithCString: n] andEngine: mySelf];
 }
 
-void *newWindowCallback(char *string, slGraph *graph) {
+void *newWindowCallback(char *string, void *graph) {
     id windowController;
     
     windowController = [[slGraphWindowController alloc] init];

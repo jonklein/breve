@@ -51,4 +51,6 @@ void stSteveCleanup(stSteveData *steveData);
 
 int stPreprocess(stSteveData *steveData, brEngine *engine, char *line);
 
+void stFreeDefine(void *d);
+
 int stSetControllerName(stSteveData *steveData, brEngine *engine, char *controller);

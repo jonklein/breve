@@ -156,9 +156,6 @@ struct briTunesData {
 	int waveformEntries; 
 };
 
-#define brEngineLock(e)		(pthread_mutex_lock(&(e)->lock))
-#define brEngineUnlock(e)	(pthread_mutex_unlock(&(e)->lock))
-
 /*!
 	\brief The main breve engine structure.
 */
@@ -193,7 +190,6 @@ class brEngine {
 		double iterationStepSize;
 
 		int evalStats[100];
-		double speedFactor;
 
 		FILE *logFile;
 
@@ -208,62 +204,62 @@ class brEngine {
 		std::vector<brInstance*> iterationInstances;
 		std::vector<brInstance*> instances;
 	
-	std::vector<brInstance*> instancesToAdd;
-	std::vector<brInstance*> instancesToRemove;
+		std::vector<brInstance*> instancesToAdd;
+		std::vector<brInstance*> instancesToRemove;
 
-	std::vector<brEvent*> events;
+		std::vector<brEvent*> events;
 
-	brMenuList menu;
+		// brMenuList menu;
 
-	// runtime error info 
+		// runtime error info 
 
-	brErrorInfo error;
+		brErrorInfo error;
 
-	char *outputPath;
-	char *path;
+		char *outputPath;
+		char *path;
 
-	// plugin, plugins, plugins!
+		// plugin, plugins, plugins!
 
-	slList *dlPlugins;
+		slList *dlPlugins;
 
-	// the drawEveryFrame flag is a hint to the display engine--if set,
-	// the application attempts to draw a frame with every iteration of 
-	// the breve engine. 
+		// the drawEveryFrame flag is a hint to the display engine--if set,
+		// the application attempts to draw a frame with every iteration of 
+		// the breve engine. 
 
-	unsigned char drawEveryFrame;
+		unsigned char drawEveryFrame;
 
-	struct timeval startTime;
-	struct timeval realTime;
+		struct timeval startTime;
+		struct timeval realTime;
 
-	int argc;
-	char **argv;
+		int argc;
+		char **argv;
 
-	int nThreads;
-	pthread_mutex_t lock;
-	pthread_mutex_t scheduleLock;
-	pthread_mutex_t conditionLock;
-	pthread_cond_t condition;
+		int nThreads;
+		pthread_mutex_t lock;
+		pthread_mutex_t scheduleLock;
+		pthread_mutex_t conditionLock;
+		pthread_cond_t condition;
 
-	int lastScheduled;
+		int lastScheduled;
 
-	slList *windows;
+		slList *windows;
 
-	slList *searchPath;
+		slList *searchPath;
 
-	// which keys are pressed?
+		// which keys are pressed?
 
-	unsigned char keys[256];
+		unsigned char keys[256];
 
-	// evalList sort data... 
+		// evalList sort data... 
 
-	void **sortVector;
-	int sortVectorLength;
-	int evalListSortError;
-	brInstance *sortObject;
+		void **sortVector;
+		int sortVectorLength;
+		int evalListSortError;
+		brInstance *sortObject;
 
-	// iTunes plugin data
+		// iTunes plugin data
 
-	briTunesData *iTunesData;
+		briTunesData *iTunesData;
 
 	//
 	// CALLBACK FUNCTIONS AND RELATED DATA FOR THE APPLICATION FRONTEND
@@ -321,6 +317,9 @@ enum versionRequiermentOperators {
 extern "C" {
 #endif
 
+void brEngineLock(brEngine *e);
+void brEngineUnlock(brEngine *e);
+
 brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *name, double time);
 void brEventFree(brEvent *e);
 
@@ -337,8 +336,6 @@ char *brOutputPath(brEngine *e, char *filename);
 brEngine *brEngineNew();
 void brMakeiTunesData(brEngine *e);
 void brEngineFree(brEngine *e);
-
-void stFreeDefine(void *d);
 
 void brPauseTimer(brEngine *e);
 void brUnpauseTimer(brEngine *e);
@@ -367,8 +364,6 @@ void brEngineRenderWorld(brEngine *e, int crosshair);
 
 brInternalFunction *brEngineInternalFunctionLookup(brEngine *e, char *name);
 
-void brFreeInternalFunction(void *d);
-
 void brEvalError(brEngine *e, int type, char *proto, ...);
 
 void brClearError(brEngine *e);
@@ -381,6 +376,22 @@ brErrorInfo *brEngineGetErrorInfo(brEngine *e);
 char *brEngineGetPath(brEngine *e);
 
 brNamespace *brEngineGetInternalMethods(brEngine *e);
+
+int brEngineGetDrawEveryFrame(brEngine *e);
+
+void brEngineSetSoundCallback(brEngine *e, int (*callback)(void *));
+void brEngineSetDialogCallback(brEngine *e, int (*callback)(void *, char *, char *, char *, char *));
+
+void brEngineSetPauseCallback(brEngine *e, int (*callback)(void*));
+void brEngineSetGetLoadnameCallback(brEngine *e, char *(*callback)(void*));
+void brEngineSetGetSavenameCallback(brEngine *e, char *(*callback)(void*));
+
+void brEngineSetInterfaceInterfaceTypeCallback(brEngine *e, char *(*interfaceTypeCallback)(void *data));
+void brEngineSetInterfaceSetStringCallback(brEngine *e, int (*interfaceSetStringCallback)(char *string, int number));
+void brEngineSetInterfaceSetNibCallback(brEngine *e, void (*interfaceSetCallback)(char *file));
+
+slCamera *brEngineGetCamera(brEngine *e);
+slWorld *brEngineGetWorld(brEngine *e);
 
 #ifdef __cplusplus
 }

@@ -27,12 +27,13 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "graph.h"
+// #import "graph.h"
 
 @interface slGraphWindowView : NSOpenGLView {
-    slGraph *graph;
+    // slGraph *graph;
+	void *graph;
 }
 
-- (void)setGraph:(slGraph*)g;
+- (void)setGraph:(void*)g;
 
 @end

@@ -23,7 +23,7 @@
 */
 
 struct brData {
-	void *data;
+	unsigned char *data;
 	int length;
 	int retainCount;
 };

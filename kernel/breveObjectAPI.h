@@ -152,6 +152,11 @@ brMethod *brMethodFindWithArgRange(brObject *o, char *name,
 brObject *brObjectFind(brEngine *n, char *name);
 brObject *brUnknownObjectFind(brEngine *e, char *name);
 
+// functions for getting user data
+
+void *brInstanceGetUserData(brInstance *i);
+void *brObjectGetUserData(brInstance *i);
+
 // functions for calling methods with breve instances
 
 int brMethodCall(brInstance *i, brMethod *m, brEval **args, brEval *result);
@@ -169,7 +174,6 @@ void brEngineRemoveInstance(brEngine *e, brInstance *i);
 
 int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *name);
 int brObjectSetIgnoreCollisionsWith(brObject *handler, brObject *collider, int ignore);
-
 
 // adding and removing dependencies and observers 
 

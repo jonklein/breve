@@ -59,7 +59,7 @@ void *workerThread(void *data);
 int soundCallback(void *data);
 int pauseCallback(void *data);
 void brInterrupt(brEngine *engine);
-void *newWindowCallback(char *name, slGraph *graph);
+void *newWindowCallback(char *name, void *graph);
 void freeWindowCallback(void *w);
 void renderWindowCallback(void *w);
 
@@ -151,9 +151,6 @@ int main(int argc, char **argv) {
 	frontend->data = breveFrontendInitData(frontend->engine);
 
 	brEngineSetIOPath(frontend->engine, getcwd(wd, 10239));
-
-	frontend->engine->camera = slNewCamera(width, height, GL_POLYGON);
-	frontend->engine->camera->enabled = CM_UPDATED;
 
 	frontend->engine->argc = argc - 1;
 	frontend->engine->argv = argv + 1;
@@ -692,7 +689,7 @@ int pauseCallback(void *data) {
 	return 0;
 }
 
-void *newWindowCallback(char *name, slGraph *graph) {
+void *newWindowCallback(char *name, void *graph) {
 	slGLUTWindow *w;
 
 	w = malloc(sizeof(slGLUTWindow));

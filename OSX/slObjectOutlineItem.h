@@ -48,6 +48,8 @@
 
 - (id)initWithEval:(brEval*)e name: (NSString*)name withVar:(stVar*)v withOffset: (int)offset instance:(stInstance*)i;
 
+- (void)setEvalObject:(stObject*)c;
+
 - (NSString*)getName;
 - (NSString*)getValue;
 - (void)getEval:(brEval*)eval;

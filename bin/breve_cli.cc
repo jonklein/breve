@@ -96,8 +96,6 @@ int main(int argc, char **argv) {
 
 	brEngineSetIOPath(frontend->engine, getcwd(wd, 10239));
 
-	frontend->engine->camera = slNewCamera(400, 400, GL_POLYGON);
-	frontend->engine->camera->enabled = CM_DISABLED;
 	frontend->engine->camera->activateContextCallback = activateContext;
 	frontend->engine->camera->renderContextCallback = renderContext;
 
@@ -120,8 +118,6 @@ int main(int argc, char **argv) {
 
 	frontend->engine->camera->x = OSMESA_WINDOW_SIZE;
 	frontend->engine->camera->y = OSMESA_WINDOW_SIZE;
-
-	frontend->engine->camera->enabled = CM_NOT_UPDATED;
 #endif
 
 	text = slUtilReadFile(argv[1]);

@@ -27,7 +27,8 @@
 //
 
 #import "slGraphWindowView.h"
-#import "graph.h"
+#import "glIncludes.h"
+// #import "graph.h"
 
 @implementation slGraphWindowView
 
@@ -50,7 +51,7 @@
     return [super initWithFrame: frameRect pixelFormat: format];
 }
 
-- (void)setGraph:(slGraph*)g {
+- (void)setGraph:(void*)g {
     graph = g;
 }
 
@@ -65,9 +66,9 @@
     	glClearColor(0.0, 0.0, 0.0, 0.0);
     	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	} else {
-		graph->width = bounds.size.width;
-		graph->height = bounds.size.height;
-		slDrawGraph(graph);
+		// graph->width = bounds.size.width;
+		// graph->height = bounds.size.height;
+		// slDrawGraph(graph);
 	}
 
 	glFlush();

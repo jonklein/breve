@@ -34,6 +34,8 @@
 	id printView;
 
     brEngine *viewEngine;
+	slCamera *camera;
+	slWorld *world;
 
     id motionSelector;
     id theMovie;
@@ -46,7 +48,6 @@
 
     int drawCrosshair;
     int drawing;
-    BOOL allowClicks;
     BOOL contextEnabled;
 
     id selectionMenu;
@@ -74,8 +75,6 @@
 - (void)drawRect:(NSRect)aRect;
 
 - (void)mouseDown:(NSEvent*)theEvent;
-
-- (void)setAllowsClicks:(BOOL)allows;
 
 - (char*)RGBAPixels;
 - (int)snapshotToFile:(NSString*)filename;

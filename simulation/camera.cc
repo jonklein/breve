@@ -24,14 +24,12 @@
 	\brief Creates a new camera of a given size.
 */
 
-slCamera *slNewCamera(int x, int y, int drawMode) {
+slCamera *slNewCamera(int x, int y) {
 	slCamera *c;
 	int n;
 
 	c = new slCamera;
 	bzero(c, sizeof(slCamera));
-
-	c->enabled = CM_NOT_UPDATED;
 
 	c->text = new slCameraText[8]; 
 
@@ -56,7 +54,7 @@ slCamera *slNewCamera(int x, int y, int drawMode) {
 	c->rx = 0.001;
 	c->ry = 0.001;
 
-	c->drawMode = drawMode;
+	c->drawMode = GL_POLYGON;
 
 	slVectorSet(&c->target, 0, 0, 0);
 

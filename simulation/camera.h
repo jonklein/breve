@@ -18,12 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-enum cameraEnablingModes {
-	CM_DISABLED = 0,
-	CM_UPDATED,
-	CM_NOT_UPDATED
-};
-
 enum billboardType {
 	BBT_NONE = 0,
 	BBT_BITMAP,
@@ -86,7 +80,7 @@ struct slCamera {
 	slLight lights[8];
 	int nLights;
 
-	unsigned char enabled;
+	// unsigned char enabled;
 
 	slWorldObject *shadowCatcher;
 
@@ -183,7 +177,7 @@ int slCameraPolygonInFrustum(slCamera *c, slVector *test, int n);
 #ifdef __cplusplus
 extern "C" {
 #endif
-slCamera *slNewCamera(int x, int y, int drawMode);
+slCamera *slNewCamera(int x, int y);
 void slUpdateCamera(slCamera *c);
 
 void slCameraResize(slCamera *c, int x, int y);

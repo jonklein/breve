@@ -98,7 +98,7 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 		wo = *wi;
 		wo->lightExposure = 0;
 
-		if(wo->shape) slDrawShape(c, wo->shape, &wo->position, 0, 0, 0);
+		if(wo->shape) wo->shape->draw(c, &wo->position, 0, 0, 0);
 
 		n++;
 	}

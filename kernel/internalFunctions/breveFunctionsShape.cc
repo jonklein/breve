@@ -176,7 +176,7 @@ int brIShapeForData(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	BRPOINTER(target) = slDeserializeShape(d->data, d->length);
+	BRPOINTER(target) = slDeserializeShape((slSerializedShapeHeader*)d->data, d->length);
 
 	return EC_OK;
 }

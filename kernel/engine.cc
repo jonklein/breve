@@ -25,6 +25,14 @@ char *interfaceID;
 /** \defgroup breveEngineAPI The breve engine API: using a breve simulation from another program or application frontend */
 /*@{*/
 
+void brEngineLock(brEngine *e) {
+	(pthread_mutex_lock(&(e)->lock));
+}
+
+void brEngineUnlock(brEngine *e) {
+	(pthread_mutex_unlock(&(e)->lock));
+}
+
 /*!
     \brief Creates a brEngine structure.
 
@@ -42,18 +50,16 @@ brEngine *brEngineNew() {
 	pthread_win32_process_attach_np();
 #endif
 
-#if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
-	Pa_Initialize();
-#endif
-
 	e = new brEngine;
-	e->speedFactor = 1.0;
 
 	e->simulationWillStop = 0;
 
 	e->objectTypes = slStackNew();
 
+	e->camera = slNewCamera(400, 400);
+
 #if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
+	Pa_Initialize();
 	e->soundMixer = brNewSoundMixer();
 #endif
 
@@ -73,7 +79,7 @@ brEngine *brEngineNew() {
 	e->logFile = funopen(e, NULL, brFileLogWrite, NULL, NULL);
 #else
 	e->logFile = stderr;
-#endif /* MACOSX */
+#endif 
 
 	e->path = new char[MAXPATHLEN + 1];
 	e->drawEveryFrame = 1;
@@ -201,16 +207,6 @@ void brEngineFree(brEngine *e) {
 
 	for(bi = e->instances.begin(); bi != e->instances.end(); bi++ )
 		brInstanceRelease(*bi);
-
-	for(bi = e->instances.begin(); bi != e->instances.end(); bi++ ) {
-		brInstance *i = *bi;
-
-		if(*i->object->type->destroyInstance) i->object->type->destroyInstance(i->userData);
-		i->userData = NULL;
-	}
-
-	for(bi = e->instances.begin(); bi != e->instances.end(); bi++ )
-		brInstanceFree(*bi);
 
 	slStackFree(e->objectTypes);
 
@@ -722,6 +718,14 @@ char *brEngineGetPath(brEngine *e) {
 	return e->path;
 }
 
+slCamera *brEngineGetCamera(brEngine *e) {
+	return e->camera;
+}
+
+slWorld *brEngineGetWorld(brEngine *e) {
+	return e->world;
+}
+
 /*!
 	\brief Returns the internal methods namespace.
 */
@@ -729,3 +733,40 @@ char *brEngineGetPath(brEngine *e) {
 brNamespace *brEngineGetInternalMethods(brEngine *e) {
 	return e->internalMethods;
 }
+
+void brEngineSetSoundCallback(brEngine *e, int (*callback)(void *)) {
+	e->soundCallback = callback;
+}
+
+void brEngineSetDialogCallback(brEngine *e, int (*callback)(void *, char *, char *, char *, char *)) {
+	e->dialogCallback = callback;
+}
+
+void brEngineSetGetSavenameCallback(brEngine *e, char *(*callback)(void*)) {
+	e->getSavename = callback;
+}
+
+void brEngineSetGetLoadnameCallback(brEngine *e, char *(*callback)(void*)) {
+	e->getLoadname = callback;
+}
+
+void brEngineSetPauseCallback(brEngine *e, int (callback)(void*)) {
+	e->pauseCallback = callback;
+}
+
+void brEngineSetInterfaceInterfaceTypeCallback(brEngine *e, char *(*callback)(void*)) {
+	e->interfaceTypeCallback = callback;
+}
+
+void brEngineSetInterfaceSetStringCallback(brEngine *e, int (*callback)(char*, int)) {
+	e->interfaceSetStringCallback = callback;
+}
+
+void brEngineSetInterfaceSetNibCallback(brEngine *e, void (*callback)(char*)) {
+	e->interfaceSetCallback = callback;
+}
+
+int brEngineGetDrawEveryFrame(brEngine *e) {
+	return e->drawEveryFrame;
+}
+

@@ -117,6 +117,22 @@ brObject *brUnknownObjectFind(brEngine *e, char *name) {
 }
 
 /*!
+	\brief Returns the userData field of a brInstance.
+*/
+
+void *brInstanceGetUserData(brInstance *i) {
+	return i->userData;
+}
+
+/*!
+	\brief Returns the userData field of a brObject.
+*/
+
+void *brObjectGetUserData(brObject *o) {
+	return o->userData;
+}
+
+/*!
 	\brief Calls a method for an instance.
 
 	Executes the callMethod callback for to trigger a method call.
@@ -373,7 +389,7 @@ brInstance *brObjectInstantiate(brEngine *e, brObject *o, brEval **args, int arg
 void brInstanceRelease(brInstance *i) {
 	if(!i || i->status != AS_ACTIVE) return;
 
-	printf("adding %p for removal\n", i);
+	// printf("adding %p for removal\n", i);
 
 	i->engine->instancesToRemove.push_back(i);
 	brInstanceFree(i);

@@ -51,9 +51,6 @@ void brFreeSoundMixer(brSoundMixer *mixer) {
 
 	if(!mixer) return;
 
-	// printf("waiting for %p (%p) to finish\n", mixer, mixer->stream);
-	// while(mixer->stream && Pa_StreamActive(mixer->stream));
-
 	Pa_StopStream(mixer->stream);
 	while(mixer->stream && Pa_StreamActive(mixer->stream));
 
@@ -105,6 +102,8 @@ brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency) {
 	player->balance = .5;
 	player->phase = 0;
 	player->finished = 0;
+
+	// mixer->playerV.push_back(player);
 
 	return player;
 }

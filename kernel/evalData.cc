@@ -31,7 +31,7 @@ brData *brDataNew(void *info, int length) {
 
 	d->length = length;
 	d->retainCount = 0;
-	d->data = new char[length];
+	d->data = new unsigned char[length];
 	bcopy(info, d->data, d->length);
 
 	return d;
