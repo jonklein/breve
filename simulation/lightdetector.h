@@ -18,4 +18,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer);
+#ifdef __cplusplus
+}
+#endif
