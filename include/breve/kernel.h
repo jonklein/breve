@@ -66,9 +66,7 @@
 #include <sys/param.h>
 #include <sys/types.h>
 
-#ifndef WINDOWS
-#include <sys/time.h>
-#endif 
+#include "timeval.h"
 
 #include <fcntl.h>
 
