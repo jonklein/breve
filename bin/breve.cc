@@ -79,7 +79,6 @@ char *gOptionArchiveFile;
 
 breveFrontend *frontend;
 
-slGLUTWindow *gWindows[1024];
 std::map<int, void*> gWindowMap;
 
 int gLastX, gLastY, gMods, gSpecial;
@@ -620,7 +619,7 @@ void brInterrupt(brEngine *engine) {
 
 	if(!line || line[0] == 'x') brQuit(engine);
 
-	if(*line && line[0] != '\n') stRunSingleStatement(frontend->data, engine, line);
+	if(*line && line[0] != '\n') stRunSingleStatement((stSteveData*)frontend->data, engine, line);
 
 	if(line && line != staticLine) free(line);
 
@@ -700,10 +699,9 @@ void *newWindowCallback(char *name, void *graph) {
 
 	w = new slGLUTWindow;
 	w->id = glutCreateWindow(name);
-	w->graph = graph;
+	w->graph = (slGraph*)graph;
 
 	gWindowMap[w->id] = w;
-	gWindows[w->id] = w;
 
 	glutDisplayFunc(graphDisplay);
 
@@ -718,7 +716,7 @@ void freeWindowCallback(void *w) {
 }
 
 void renderWindowCallback(void *w) {
-	slGLUTWindow *window = w;
+	slGLUTWindow *window = (slGLUTWindow*)w;
 	slDrawGraph(window->graph);
 }
 
@@ -730,6 +728,6 @@ void graphDisplay() {
 	//printf("displaying window #%d...\n", windowid);
 	
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	renderWindowCallback(gWindows[windowid]);
+	renderWindowCallback(gWindowMap[windowid]);
 	glutSwapBuffers();
 }

@@ -14,8 +14,8 @@ void breveInitPushFunctions(brNamespace *n);
 #ifdef HAVE_LIBPUSH
 
 #include "pushC.h"
-#include "Code.h"
-#include "CodeUtils.h"
+#include "push/Code.h"
+#include "push/CodeUtils.h"
 
 /*!
 	\brief A breve API function wrapper for the C-function \ref pushEnvironmentNew.
