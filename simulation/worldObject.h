@@ -14,8 +14,8 @@ template <class T> class handle_ptr {
 
 		T** handle;
 	public:
-		explicit safe_ptr(T* p = 0) : ptr(p) {}
-		~safe_ptr()                 {delete ptr;}
+		explicit handle_ptr(T* p = 0) : ptr(p) {}
+		~handle_ptr()                 {delete ptr;}
 		T& operator*()              {return *ptr;}
 		T* operator->()             {return ptr;}
 };

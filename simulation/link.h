@@ -94,8 +94,6 @@ class slLink: public slWorldObject {
 		std::vector<slJoint*> outJoints;
 };
 
-typedef safe_ptr<slLink> slLinkPointer;
-
 #endif
 
 #ifdef __cplusplus

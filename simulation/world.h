@@ -82,8 +82,6 @@ class slStationary: public slWorldObject {
 	public:
 };
 
-typedef safe_ptr<slWorldObject> slWorldObjectPointer;
-
 #endif
 
 /*!

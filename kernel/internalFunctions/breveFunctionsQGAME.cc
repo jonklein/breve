@@ -1,7 +1,9 @@
-#include <qgame++.h>
 #include "kernel.h"
 
 #ifdef HAVE_LIBQGAME__
+
+#include <qgame++.h>
+
 int brIQSysNew(brEval args[], brEval *target, brInstance *i) {
 	BRPOINTER(target) = (void*)new qgame::QSys;
 	return EC_OK;
