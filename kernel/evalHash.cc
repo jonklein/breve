@@ -110,7 +110,7 @@ brEvalListHead *brEvalHashKeys(brEvalHash *h) {
 	el = brEvalListNew();
 
 	while(l) {
-		brEvalListInsert(el, 0, l->data);
+		brEvalListInsert(el, 0, (brEval*)l->data);
 		l = l->next;
 	}
 
@@ -129,7 +129,7 @@ brEvalListHead *brEvalHashValues(brEvalHash *h) {
 	el = brEvalListNew();
 
 	while(l) {
-		brEvalListInsert(el, 0, l->data);
+		brEvalListInsert(el, 0, (brEval*)l->data);
 		l = l->next;
 	}
 
@@ -143,7 +143,7 @@ brEvalListHead *brEvalHashValues(brEvalHash *h) {
 void brEvalHashLookup(brEvalHash *h, brEval *key, brEval *value) {
 	brEval *v;
 
-	v = slDehashData(h->table, key);
+	v = (brEval*)slDehashData(h->table, key);
 
 	if(!v) {
 		value->type = AT_NULL;
