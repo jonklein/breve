@@ -1932,7 +1932,7 @@ double slPlaneDistance(slPlane *pl, slVector *p) {
 */
 
 int slCollidingFaceForPoint(slVector *p, slShape *shape, slPosition *pos) {
-	int n;
+	int n = 0;
 	slFace *face;
 	slPlane plane;
 	double dist, bestDist = -DBL_MAX;

@@ -335,7 +335,6 @@ void stSetParseString(char *, int);
 void brPrintVersion(void);
 
 void brFreeObjectSpace(brNamespace *);
-void brEngineFreeObjects(brEngine *);
 
 void brEngineRenderWorld(brEngine *, int);
 

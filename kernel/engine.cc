@@ -23,6 +23,12 @@
 
 char *interfaceID;
 
+#if defined(WINDOWS) && defined(WINDOWS_DLL)
+asm (".section .drectve");
+asm (".ascii \"-export:brEngineNew\"");
+asm (".ascii \"-export:brEngineFree\"");
+#endif
+
 /** \defgroup breveEngineAPI The breve engine API: using a breve simulation from another program or application frontend */
 /*@{*/
 
@@ -211,13 +217,11 @@ void brEngineFree(brEngine *e) {
 	if(e->outputPath) slFree(e->outputPath);
 	if(e->iTunesData) delete e->iTunesData;
 
-	for(wi = e->windows.begin(); wi != e->windows.end(); wi++ ) {
+	for(wi = e->windows.begin(); wi != e->windows.end(); wi++ ) 
 		e->freeWindowCallback(*wi);
-	}
 
-	for(bi = e->freedInstances.begin(); bi != e->freedInstances.end(); bi++ ) {
+	for(bi = e->freedInstances.begin(); bi != e->freedInstances.end(); bi++ )
 		delete *bi;
-	}
 
 #ifdef HAVE_LIBOSMESA
 	slFree(e->osBuffer);
@@ -225,25 +229,15 @@ void brEngineFree(brEngine *e) {
 #endif
 
 	brNamespaceFreeWithFunction(e->internalMethods, (void(*)(void*))brFreeBreveCall);
-	brEngineFreeObjects(e);
-    // brNamespaceFreeWithFunction(e->objects, (void(*)(void*))brObjectFree);
-	// brFreeObjectSpace(e->objects);
+
+	std::map<std::string,brObject*>::iterator oi;
+
+	for(oi = e->objects.begin(); oi != e->objects.end(); oi++ )
+		if(oi->second) brObjectFree(oi->second);
 
 	brFreeSearchPath(e);
 
 	delete e;
-}
-
-/*!
-	\brief Frees all of the objects in the engine.
-*/
-
-void brEngineFreeObjects(brEngine *e) {
-	std::map<std::string,brObject*>::iterator oi;
-
-	for(oi = e->objects.begin(); oi != e->objects.end(); oi++ ) {
-		if(oi->second) brObjectFree(oi->second);
-	}
 }
 
 /*!

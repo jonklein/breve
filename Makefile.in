@@ -67,6 +67,11 @@ optimize_debug:
 profile:
 	$(MAKE) EXTRACFLAGS='-pg -O3'
 
+windows_dlls:
+	$(MAKE) clean
+	$(MAKE) EXTRACFLAGS='-DWINDOWS_DLL'
+	$(DLLTOOL) --export-all-symbols -z breve.def -l breve.dll kernel/*.o util/*.o simulation/*.o
+
 .depend: $(DEPS)
 	@for i in $(DEPS); do echo -n `dirname $$i`/ >> .depend; \
 		@MKDEP@ $(CPPFLAGS) $$i >> .depend; done
