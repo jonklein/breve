@@ -20,8 +20,8 @@ LPLATFORM	= $(shell echo $(PLATFORM) | tr '[A-Z]' '[a-z]')
 DMG_FILE	= breve_@VERSION@.dmg
 CLI_FOLDER	= breve_@VERSION@
 
-all: bin/breve@EXE_SUFFIX@ bin/breve_cli@EXE_SUFFIX@ bin/graphTest@EXE_SUFFIX@ \
-	lib/classes/MethodFinder.jar
+all: .depend bin/breve@EXE_SUFFIX@ bin/breve_cli@EXE_SUFFIX@ \
+	bin/graphTest@EXE_SUFFIX@ lib/classes/MethodFinder.jar
 
 include simulation/Makefile
 include kernel/Makefile
@@ -31,7 +31,7 @@ include steve/Makefile
 include java/Makefile
 include docBuild/Makefile
 include util/Makefile
-include .depend
+-include .depend
 
 DEPS	:= $(SRC) bin/breve.cc bin/breve_cli.cc graph/graphTest.cc
 OBJ	:= $(SRC:.cc=.o)
@@ -67,14 +67,18 @@ optimize_debug:
 profile:
 	$(MAKE) EXTRACFLAGS='-pg -O3'
 
-windows_dlls:
-	$(MAKE) clean
+windows_dlls: clean
 	$(MAKE) EXTRACFLAGS='-DWINDOWS_DLL'
 	$(DLLTOOL) --export-all-symbols -z breve.def -l breve.dll kernel/*.o util/*.o simulation/*.o
 
-.depend: $(DEPS)
+.depend:: $(DEPS)
 	@for i in $(DEPS); do echo -n `dirname $$i`/ >> .depend; \
 		@MKDEP@ $(CPPFLAGS) $$i >> .depend; done
+
+# this rule is a no-op to avoid updating .depend needlessly
+# it have commands and no prerequisites and must not touch .depend
+.depend::
+	@echo -n
 
 .PHONY: clean OSX_build OSX_clean OSX_release CLI_release plugin_API install
 
@@ -83,9 +87,8 @@ clean:
 	rm -f steve/format.c steve/stevelex.c
 	rm -f steve/steveparse.tab.c steve/steveparse.tab.h
 	rm -f java/*.class lib/classes/*.jar
-	rm -rf docBuild/docs docs
-	rm -rf OSX/build
-	rm -f .depend
+	rm -rf docBuild/docs docs OSX/build
+	rm -rf breve.dll breve.def .depend
 	find . -name '.DS_Store' -exec rm -f {} \;
 	find . -name 'core' -exec rm -f {} \;
 	find . -name '.gdb*' -exec rm -f {} \;
