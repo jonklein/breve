@@ -342,8 +342,6 @@ slFace *slAddFace(slShape *s, slVector **points, int nPoints) {
 	if(slPlaneDistance(&f->plane, &origin) > 0.0) {
 		rpoints = new slVector*[nPoints];
 
-		printf ("switching face normals!\n");
-
 		for(n=0;n<nPoints;n++) rpoints[n] = points[(nPoints - 1) - n];
 		for(n=0;n<nPoints;n++) points[n] = rpoints[n];
 	
@@ -354,8 +352,6 @@ slFace *slAddFace(slShape *s, slVector **points, int nPoints) {
 		slVectorSub(points[2], points[1], &y); 
 		slVectorCross(&x, &y, &f->plane.normal);
 		slVectorNormalize(&f->plane.normal);
-
-		printf("reversed: %f\n", slPlaneDistance(&f->plane, &origin));
 	}
 
 	for(n=0;n<nPoints;n++) f->points[n] = slAddPoint(s, points[n]);

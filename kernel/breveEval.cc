@@ -119,23 +119,23 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 			else return("");
 			break;
 		case AT_INT:
-			result = slMalloc(60);
+			result = (char*)slMalloc(60);
 			sprintf(result, "%d", BRINT(e));
 			return result;
 			break;
 		case AT_DOUBLE:
-			result = slMalloc(60);
+			result = (char*)slMalloc(60);
 			sprintf(result, "%f", BRDOUBLE(e));
 			return result;
 			break;
 		case AT_VECTOR:
-			result = slMalloc(180);
+			result = (char*)slMalloc(180);
 			if(BRVECTOR(e).x > 1.0e10 || BRVECTOR(e).x > 1.0e10 || BRVECTOR(e).z > 1.0e10) sprintf(result, "(%.5e, %.5e, %.5e)", BRVECTOR(e).x, BRVECTOR(e).y, BRVECTOR(e).z);
 			else sprintf(result, "(%.5f, %.5f, %.5f)", BRVECTOR(e).x, BRVECTOR(e).y, BRVECTOR(e).z);
 			return result;
 			break;
 		case AT_MATRIX:
-			result = slMalloc(300);
+			result = (char*)slMalloc(300);
 			sprintf(result, "[ (%.5f, %.5f, %.5f), (%.5f, %.5f, %.5f), (%.5f, %.5f, %.5f) ]", BRMATRIX(e)[0][0], BRMATRIX(e)[0][1], BRMATRIX(e)[0][2], BRMATRIX(e)[1][0], BRMATRIX(e)[1][1], BRMATRIX(e)[1][2], BRMATRIX(e)[2][0], BRMATRIX(e)[2][1], BRMATRIX(e)[2][2]);
 			return result;
 			break;
@@ -165,7 +165,7 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 			break;
 		case AT_POINTER:
 			if(BRPOINTER(e)) {
-				result = slMalloc(20);
+				result = (char*)slMalloc(20);
 				sprintf(result, "%p", BRPOINTER(e));
 				return result;
 			} else {
@@ -210,7 +210,7 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 
 			count += 4; /* for the braces */
 
-			result = slMalloc(count + 1);
+			result = (char*)slMalloc(count + 1);
 
 			sprintf(result, "{ ");
 

@@ -862,7 +862,7 @@ void slRenderLabels(slWorld *w) {
 void slRenderBillboards(slCamera *c, int flags) {
 	slBillboardEntry *b;
 	slVector normal;
-	int n;
+	unsigned int n;
 	int lastTexture = -1;
 
 	slVectorCopy(&c->location, &normal);
