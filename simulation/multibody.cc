@@ -30,15 +30,6 @@
 
 #include "simulation.h"
 
-/*
-	\brief Sets the label associated with this multibody.
-*/
-
-void slMultibodySetLabel(slMultibody *m, char *label) {
-	if(m->label) slFree(m->label);
-	m->label = slStrdup(label);
-}
-
 /*!
 	\brief Ignores collisions between adjacent multibody links.
 */
@@ -253,10 +244,10 @@ slList *slMultibodyAllCallbackData(slMultibody *mb) {
 	std::vector<slJoint*>::iterator ji;
 
 	for( li = mb->links.begin(); li != mb->links.end(); li++ ) {
-		list = slListPrepend(list, (*li)->callbackData);
+		list = slListPrepend(list, (*li)->userData);
 
 		for(ji = (*li)->inJoints.begin(); ji != (*li)->inJoints.end(); ji++ ) {
-			list = slListPrepend(list, (*ji)->callbackData);
+			list = slListPrepend(list, (*ji)->userData);
 		}
 	}
 
@@ -607,11 +598,11 @@ int slMultibodyCheckSelfPenetration(slWorld *world, slMultibody *m) {
 }
 
 void *slMultibodyGetCallbackData(slMultibody *m) {
-	return m->callbackData;
+	return m->userData;
 }
 
 void slMultibodySetCallbackData(slMultibody *m, void *c) {
-	m->callbackData = c;
+	m->userData = c;
 }
 
 void slMultibodySetHandleSelfCollisions(slMultibody *m, int n) {

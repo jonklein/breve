@@ -36,12 +36,14 @@
 #define INFINITY 0xffffffff
 #endif
 
-slTerrain *slTerrainNew(int res, double xscale) {
+slTerrain *slTerrainNew(int res, double xscale, void *data) {
 	int n;
 	slVector location;
 	slTerrain *l;
 
 	l = new slTerrain;
+
+	l->userData = data;
 
 	l->side = (int)pow(2, res) + 1;
 
@@ -86,7 +88,7 @@ void slTerrainSetScale(slTerrain *l, double scale) {
 	x = l->side * l->xscale / 2;
 
 	slVectorSet(&half, x, 0, x);
-	slVectorAdd(&l->position, &half, &p);
+	slVectorAdd(&l->position.location, &half, &p);
 
 	l->xscale = scale;
 
@@ -102,7 +104,7 @@ void slTerrainSetLocation(slTerrain *l, slVector *location) {
 	x = l->side * l->xscale / 2;
 
 	slVectorSet(&half, x, 0, x);
-	slVectorSub(location, &half, &l->position);
+	slVectorSub(location, &half, &l->position.location);
 
 	slTerrainInitialize(l);
 }
@@ -137,8 +139,8 @@ void slTerrainBoundingBox(slTerrain *l) {
 		l->max.x = l->max.z = INFINITY;
 	}
 
-	slVectorAdd(&l->min, &l->position, &l->min);
-	slVectorAdd(&l->max, &l->position, &l->max);
+	slVectorAdd(&l->min, &l->position.location, &l->min);
+	slVectorAdd(&l->max, &l->position.location, &l->max);
 }
 
 void slFractalTerrainMatrix(slTerrain *l, double h, double height) {
@@ -295,25 +297,23 @@ float slAverageDiamondValues(slTerrain *l, int x, int y, int jump) {
 	}
 }
 
-void slTerrainFree(slTerrain *l) {
+slTerrain::~slTerrain() {
 	int n;
 
-	for(n=0;n<l->side - 1;n++) {
-		delete[] l->fnormals[0][n];
-		delete[] l->fnormals[1][n];
+	for(n=0; n < side - 1;n++) {
+		delete[] fnormals[0][n];
+		delete[] fnormals[1][n];
 	}
 
-	for(n=0;n<l->side;n++) {
-		delete[] l->vnormals[n];
-		delete[] l->matrix[n];
+	for(n=0; n < side;n++) {
+		delete[] vnormals[n];
+		delete[] matrix[n];
 	}
 
-	delete[] l->fnormals[0];
-	delete[] l->fnormals[1];
-	delete[] l->vnormals;
-	delete[] l->matrix;
-
-	delete[] l;
+	delete[] fnormals[0];
+	delete[] fnormals[1];
+	delete[] vnormals;
+	delete[] matrix;
 }
 
 void slDrawTerrain(slWorld *w, slCamera *c, slTerrain *l, int texture, double textureScale, int drawMode, int flags) {
@@ -382,14 +382,12 @@ void slDrawTerrainSide(slWorld *w, slTerrain *l, int texture, double textureScal
 
 	glPushMatrix();
 
-	if(bottom) glTranslatef(l->position.x, l->position.y - 1, l->position.z);
-	else glTranslatef(l->position.x, l->position.y, l->position.z);
+	if(bottom) glTranslatef(l->position.location.x, l->position.location.y - 1, l->position.location.z);
+	else glTranslatef(l->position.location.x, l->position.location.y, l->position.location.z);
 
 	glDisable(GL_CULL_FACE);
 
 	if(!(flags & DO_NO_LIGHTING)) glEnable(GL_LIGHTING);
-
-	// if(l->drawMode) glShadeModel(GL_FLAT);
 
 	glColor4f(1, 1, 1, 1.0);
 
@@ -404,7 +402,7 @@ void slDrawTerrainSide(slWorld *w, slTerrain *l, int texture, double textureScal
 		glBindTexture(GL_TEXTURE_2D, texture);
 	}
 
-#define DRAW_SKIP 2
+#define DRAW_SKIP 1
 
 	for(i=0;i<l->side-1;i+=DRAW_SKIP) {
 		glBegin(GL_TRIANGLE_STRIP);
@@ -511,10 +509,10 @@ void slTerrainFacesUnderRange(slTerrain *l,
 
 	int localX, localZ;
 
-	minX -= l->position.x;
-	maxX -= l->position.x;
-	minZ -= l->position.z;
-	maxZ -= l->position.z;
+	minX -= l->position.location.x;
+	maxX -= l->position.location.x;
+	minZ -= l->position.location.z;
+	maxZ -= l->position.location.z;
 
 	minX /= l->xscale;
 	maxX /= l->xscale;
@@ -567,7 +565,7 @@ int slTerrainAreaUnderPoint(slTerrain *l, slVector *origpoint, int *x, int *z, i
 
 	/* transform this point into the terrain's coordinates */
 
-	slVectorSub(origpoint, &l->position, &point);
+	slVectorSub(origpoint, &l->position.location, &point);
 
 	/* scale down by l->xscale on both x and z axes */
 
@@ -606,19 +604,23 @@ int slTerrainAreaUnderPoint(slTerrain *l, slVector *origpoint, int *x, int *z, i
 	return result;
 }
 
-int slTerrainTestPair(slWorldObject *w1, slWorldObject *w2, slShape *s1, slShape *s2, slPosition *p1, slPosition *p2, int x, int y, slCollisionEntry *ce) {
+int slTerrainTestPair(slVclipData *vc, int x, int y, slCollisionEntry *ce) {
 	slTerrain *terrain;
+	slWorldObject *w1 = vc->objects[x];
+	slWorldObject *w2 = vc->objects[y];
 
-	if(s1) {
-		terrain = w2->data;
+	if(w1->type != WO_TERRAIN) {
+		slShape *s = vc->shapes[x];
+		terrain = w2;
 		if(!terrain->initialized) slTerrainInitialize(terrain);
-		if(s1->type == ST_SPHERE) return slTerrainSphereClip(terrain, s1, p1, x, y, ce, 0);
-		else return slTerrainShapeClip(terrain, s1, p1, x, y, ce, 0);
+		if(s->type == ST_SPHERE) return slTerrainSphereClip(vc, terrain, x, y, ce, 0);
+		else return slTerrainShapeClip(vc, terrain, x, y, ce, 0);
 	} else {
-		terrain = w1->data;
+		slShape *s = vc->shapes[y];
+		terrain = w1;
 		if(!terrain->initialized) slTerrainInitialize(terrain);
-		if(s2->type == ST_SPHERE) return slTerrainSphereClip(terrain, s2, p2, y, x, ce, 1);
-		else return slTerrainShapeClip(terrain, s2, p2, y, x, ce, 1);
+		if(s->type == ST_SPHERE) return slTerrainSphereClip(vc, terrain, y, x, ce, 1);
+		else return slTerrainShapeClip(vc, terrain, y, x, ce, 1);
 	}
 
 	return CT_DISJOINT;
@@ -628,14 +630,23 @@ int slTerrainTestPair(slWorldObject *w1, slWorldObject *w2, slShape *s1, slShape
 	\brief Check for a collision of a sphere against a landscape.
 */
 
-int slTerrainSphereClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int obY, slCollisionEntry *ce, int flip) {
+int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slCollisionEntry *ce, int flip) {
 	slPlane landPlane;
 	double dist;
 	slVector terrainPoint, aveNormal, toSphere;
 	int startX, endX, startZ, endZ, earlyStart, lateEnd, x, z, quad;
 	int collisions = 0;
 
-	ce->distance = 0.0;
+	slShape *ss = vc->shapes[obX];
+	slPosition *sp = &vc->objects[obX]->position;
+
+	if(!flip) {
+		ce->n1 = obY;
+		ce->n2 = obX;
+	} else {
+		ce->n1 = obX;
+		ce->n2 = obY;
+	}
 
 	slVectorSet(&aveNormal, 0, 0, 0);
 
@@ -646,13 +657,13 @@ int slTerrainSphereClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int 
 	for(x=startX;x<=endX;x++) {
 		for(z=startZ;z<=endZ;z++) {
 			slVectorSet(&landPlane.vertex, x * l->xscale, l->matrix[x][z], z * l->xscale);
-			slVectorAdd(&landPlane.vertex, &l->position, &landPlane.vertex);
+			slVectorAdd(&landPlane.vertex, &l->position.location, &landPlane.vertex);
 
 			for(quad=0;quad<2;quad++) {
 				int skip = 0;
 
-				/* check to see if we are covering enough of the upper-right and lower-left */
-				/* squares to check the second face */
+				// check to see if we are covering enough of the upper-right and lower-left 
+				// squares to check the second face 
 
 				if(x == startX && z == startZ && quad == 0 && !earlyStart) skip = 1;
 				else if(x == endX && z == endZ && quad == 1 && !lateEnd) skip = 1;
@@ -680,14 +691,14 @@ int slTerrainSphereClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int 
 					c.x *= l->xscale;
 					c.z *= l->xscale;
 
-					slVectorAdd(&a, &l->position, &a);
-					slVectorAdd(&b, &l->position, &b);
-					slVectorAdd(&c, &l->position, &c);
+					slVectorAdd(&a, &l->position.location, &a);
+					slVectorAdd(&b, &l->position.location, &b);
+					slVectorAdd(&c, &l->position.location, &c);
 
 					trivi = slPointIn2DTriangle(&sloc, &a, &b, &c);
 
 					if(trivi == 0) {
-						/* no violations, test against the plane */
+						// no violations, test against the plane 
 
 						slVectorCopy(&l->fnormals[quad][x][z], &landPlane.normal);
 
@@ -700,13 +711,19 @@ int slTerrainSphereClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int 
 							slVectorSub(&sp->location, &toSphere, &terrainPoint);
 
 							if(dist < VC_WARNING_TOLERANCE)
-								slMessage(DEBUG_ALL, "deep collision (%f) in terrain/sphere clip\n", dist);
+								slMessage(DEBUG_ALL, "deep plane collision (%f) in terrain/sphere clip\n", dist);
 
 							ce->depths.push_back(dist);
 							ce->points.push_back(terrainPoint);
-							slVectorAdd(&aveNormal, &landPlane.normal, &aveNormal);
+							slVectorCopy(&landPlane.normal, &ce->normal);
+							if(!flip) slVectorMul(&ce->normal, -1, &ce->normal);
+
+							if(flip) ce = slNextCollisionEntry(vc, obX, obY);
+							else ce = slNextCollisionEntry(vc, obY, obX);
 						} 
 					} else if(trivi == 0x01 || trivi == 0x02 || trivi == 0x04) {
+						// a violation against one of the edges -- test that edge
+
 						slVector *start, *end, collisionPoint;
 
 						if(trivi == 0x01) {
@@ -725,12 +742,19 @@ int slTerrainSphereClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int 
 						if(dist < MC_TOLERANCE && dist > (-2 * ss->radius)) {
 							collisions++;
 
+							if(dist < VC_WARNING_TOLERANCE)
+								slMessage(DEBUG_ALL, "deep edge collision (%f) in terrain/sphere clip, triangle violation %d\n", dist, trivi);
+
 							ce->depths.push_back(dist);
 							ce->points.push_back(collisionPoint);
 
 							slVectorSub(&sp->location, &collisionPoint, &toSphere);
 							slVectorNormalize(&toSphere);
-							slVectorAdd(&aveNormal, &toSphere, &aveNormal);
+							slVectorCopy(&toSphere, &ce->normal);
+							if(!flip) slVectorMul(&ce->normal, -1, &ce->normal);
+
+							if(flip) ce = slNextCollisionEntry(vc, obX, obY);
+							else ce = slNextCollisionEntry(vc, obY, obX);
 						} 
 					} else {
 						slVector *point;
@@ -749,11 +773,18 @@ int slTerrainSphereClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int 
 						if(dist < MC_TOLERANCE && dist > (-2 * ss->radius)) {
 							collisions++;
 
+							if(dist < VC_WARNING_TOLERANCE)
+								slMessage(DEBUG_ALL, "deep point collision (%f) in terrain/sphere clip, triangle violation %d\n", dist, trivi);
+
 							ce->depths.push_back(dist);
 							ce->points.push_back(*point);
 
 							slVectorNormalize(&toSphere);
-							slVectorAdd(&aveNormal, &toSphere, &aveNormal);
+							slVectorCopy(&toSphere, &ce->normal);
+							if(!flip) slVectorMul(&ce->normal, -1, &ce->normal);
+
+							if(flip) ce = slNextCollisionEntry(vc, obX, obY);
+							else ce = slNextCollisionEntry(vc, obY, obX);
 						}
 					}
 				}
@@ -762,16 +793,6 @@ int slTerrainSphereClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int 
 	}
 
 	if(collisions == 0) return CT_DISJOINT;
-
-	if(!flip) {
-		slVectorMul(&aveNormal, -1.0/collisions, &ce->normal);
-		ce->n2 = obX;
-		ce->n1 = obY;
-	} else {
-		slVectorMul(&aveNormal, 1.0/collisions, &ce->normal);
-		ce->n2 = obY;
-		ce->n1 = obX;
-	}
 
 	return CT_PENETRATE;
 }
@@ -802,24 +823,26 @@ int slPointIn2DTriangle(slVector *vertex, slVector *a, slVector *b, slVector *c)
 	return violation;
 }
 
-/*
-	+ slTerrainShapeClip
-	= tests a shape against a terrain for collisions.
-	=
-	= I'm not sure this is the world's greatest algorithm:
-	=
-	= - for every point in the shape 
-	=   - test for collision against the terrain (noting which mesh triangle it's over)
-	=
-	= - for every face in the shape
-	=   - for all terrain edges covered by the face (based on the point test above)
-	=	 - test edge against the plane
+/*!
+	\brief Tests a shape against a terrain for collisions.
+
+	I'm not sure this is the world's greatest algorithm:
+
+	- for every point in the shape 
+		- test for collision against the terrain (noting which mesh triangle it's over)
+
+	- for every face in the shape
+		- for all terrain edges covered by the face (based on the point test above)
+		- test edge against the plane
 */
 
-int slTerrainShapeClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int obY, slCollisionEntry *ce, int flip) {
+int slTerrainShapeClip(slVclipData *vc, slTerrain *l, int obX, int obY, slCollisionEntry *ce, int flip) {
 	std::vector<slPoint*>::iterator pi;
 	std::vector<slFace*>::iterator fi;
 	int collisions = 0;
+
+	slShape *ss = vc->shapes[obX];
+	slPosition *sp = &vc->objects[obX]->position;
 
 	slVectorSet(&ce->normal, 0, 0, 0);
 
@@ -924,9 +947,9 @@ int slTerrainShapeClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int o
 						v3.y = l->matrix[x + 1][1];
 					}
 
-					slVectorAdd(&v1, &l->position, &v1);
-					slVectorAdd(&v2, &l->position, &v2);
-					slVectorAdd(&v3, &l->position, &v3);
+					slVectorAdd(&v1, &l->position.location, &v1);
+					slVectorAdd(&v2, &l->position.location, &v2);
+					slVectorAdd(&v3, &l->position.location, &v3);
 
 					/* in the last square, we don't test the upper and right edge */
 
@@ -1045,7 +1068,7 @@ double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollisionE
 	}
 
 	slVectorSet(&landPlane.vertex, (p->terrainX + 1) * t->xscale, t->matrix[p->terrainX + 1][p->terrainZ], p->terrainZ * t->xscale);
-	slVectorAdd(&landPlane.vertex, &t->position, &landPlane.vertex);
+	slVectorAdd(&landPlane.vertex, &t->position.location, &landPlane.vertex);
 	slVectorCopy(&t->fnormals[p->terrainQuad][p->terrainX][p->terrainZ], &landPlane.normal);
 
 	dist = slPlaneDistance(&landPlane, &tp);
@@ -1078,4 +1101,23 @@ slSerializedTerrain *slSerializeTerrain(slTerrain *t, int *size) {
 	}
 
 	return st;
+}
+
+double slTerrainGetHeight(slTerrain *t, int x, int y) {
+	if(x < 0 || y < 0 || x >= t->side || y >= t->side) return 0.0;
+	return t->matrix[x][y];
+}
+
+void slTerrainSetHeight(slTerrain *t, int x, int y, double height) {
+	if(x < 0 || y < 0 || x >= t->side || y >= t->side) return;
+	t->matrix[x][y] = height;
+	t->initialized = 0;
+}
+
+void slTerrainSetTopColor(slTerrain *t, slVector *color) {
+	slVectorCopy(color, &t->topColor);
+}
+
+void slTerrainSetBottomColor(slTerrain *t, slVector *color) {
+	slVectorCopy(color, &t->bottomColor);
 }

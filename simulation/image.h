@@ -18,26 +18,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-/*
- * read_texture() - read in an image file in SGI 'libimage' format
- * 	currently its very simple minded and converts all images
- *      to RGBA8 regardless of the input format and returns the
- *	original number of components in the appropriate parameter.
- *    
- *     
- *	the components are converted as follows
- *		L    -> LLL 1.0
- *		LA   -> LLL A
- *		RGB  -> RGB 1.0
- *		RGBA -> RGB A
- *
- */
-
-unsigned char *slReadImage(char *name, int *height, int *width, int *components, int alpha);
 unsigned char *slReadSGIImage(char *name, int *width, int *height, int *components, int usealpha);
 unsigned char *slReadJPEGImage(char *name, int *width, int *height, int *components, int usealpha);
 unsigned char *slReadPNGImage(char *name, int *width, int *height, int *components, int usealpha);
 
-int slWritePNGImage(char *name, int width, int height, unsigned char *buffer, int channels, int reversed);
-
+#ifdef __cplusplus
+extern "C" {
+#endif
+unsigned char *slReadImage(char *name, int *height, int *width, int *components, int alpha);
+int slWritePNGImage(char *name, int w, int h, unsigned char *buffer, int channels, int reversed);
 int slPNGSnapshot(slCamera *c, char *file);
+#ifdef __cplusplus
+}
+#endif

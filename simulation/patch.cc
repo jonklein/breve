@@ -79,10 +79,10 @@ void slPatchGridFree(slPatchGrid *g) {
 
 			}
 
-			delete g->patches[c][b];
+			delete[] g->patches[c][b];
 		}
 
-		delete g->patches[c];
+		delete[] g->patches[c];
 	}
 
 	delete[] g->patches;

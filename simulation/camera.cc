@@ -81,7 +81,7 @@ slCamera *slNewCamera(int x, int y, int drawMode) {
 	c->fogStart = 10;	
 	c->fogEnd = 40;	
 
-	for(n=0;n<c->maxBillboards;n++) c->billboards[n] = slMalloc(sizeof(slBillboardEntry));
+	for(n=0;n<c->maxBillboards;n++) c->billboards[n] = new slBillboardEntry;
 
 	c->nLights = 1;
 
@@ -109,7 +109,7 @@ void slCameraResize(slCamera *c, int x, int y) {
 void slCameraFree(slCamera *c) {
 	int n;
 
-	for(n=0;n<c->maxBillboards;n++) slFree(c->billboards[n]);
+	for(n=0;n<c->maxBillboards;n++) delete c->billboards[n];
 	slFree(c->billboards);
 
 	for(n=0;n<c->textCount;n++) if(c->text[n].text) slFree(c->text[n].text);
@@ -190,12 +190,12 @@ void slSetCameraText(slCamera *c, int n, char *string, float x, float y, slVecto
 	catcher.
 */
 
-void slSetShadowCatcher(slCamera *c, slShape *s, slVector *normal, slPosition *pos) {
+void slSetShadowCatcher(slCamera *c, slStationary *s, slVector *normal) {
 	slFace *face, *bestFace = NULL;
 	double best = 0.0, dot;
 	std::vector<slFace*>::iterator fi;
 
-	for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
+	for(fi = s->shape->faces.begin(); fi != s->shape->faces.end(); fi++ ) {
         face = *fi;
 
         dot = slVectorDot(&face->plane.normal, normal);
@@ -215,7 +215,7 @@ void slSetShadowCatcher(slCamera *c, slShape *s, slVector *normal, slPosition *p
 
 	bcopy(&bestFace->plane, &c->shadowPlane, sizeof(slPlane));
 
-	slVectorAdd(&c->shadowPlane.vertex, &pos->location, &c->shadowPlane.vertex);
+	slVectorAdd(&c->shadowPlane.vertex, &s->position.location, &c->shadowPlane.vertex);
 
 	c->recompile = 1;
 
@@ -236,9 +236,9 @@ void slAddBillboard(slCamera *c, slVector *color, slVector *loc, float size, flo
 	    last = c->maxBillboards;
 	    c->maxBillboards *= 2;
 
-	    c->billboards = slRealloc(c->billboards, sizeof(slBillboardEntry*) * c->maxBillboards);
+	    c->billboards = (slBillboardEntry**)slRealloc(c->billboards, sizeof(slBillboardEntry*) * c->maxBillboards);
 
-	    for(n=last;n<c->maxBillboards;n++) c->billboards[n] = slMalloc(sizeof(slBillboardEntry));
+	    for(n=last;n<c->maxBillboards;n++) c->billboards[n] = new slBillboardEntry;
 	}
 
 	slVectorCopy(loc, &c->billboards[c->billboardCount]->location);
@@ -255,33 +255,20 @@ void slAddBillboard(slCamera *c, slVector *color, slVector *loc, float size, flo
 	c->billboardCount++;
 }
 
-bool slBillboardCompare(const slBillboardEntry* &a, const slBillboardEntry* &b) {
-	printf("sorting\n");
-	return 1;
-}
-
-/*!
-	\brief Sorts the billboards from back to front.
-
-	Calls qsort to correctly sort the billboards for rendering.
-*/
-
-void slSortBillboards(slCamera *c) {
-	// std::sort(&c->billboards[0], &c->billboards[c->billboardCount + 1], slBillboardCompare);
-	qsort(&c->billboards[0], c->billboardCount, sizeof(slBillboardEntry*), slBillboardSortFunc);
-}
-
 /*!
 	\brief The sort function used to sort billboards from back to front.
 */
 
-int slBillboardSortFunc(const void *a, const void *b) {
-	slBillboardEntry **ah = (slBillboardEntry**)a, **bh = (slBillboardEntry**)b;
+bool slBillboardCompare(const slBillboardEntry *a, const slBillboardEntry *b) {
+	return a->z < b->z;
+}
 
-	if((*ah)->z > (*bh)->z) return 1;
-	if((*ah)->z < (*bh)->z) return -1;
+/*!
+	\brief Sorts the billboards from back to front.
+*/
 
-	return 0;
+void slSortBillboards(slCamera *c) {
+	std::sort(c->billboards, c->billboards + c->billboardCount + 1, slBillboardCompare);
 }
 
 /*!

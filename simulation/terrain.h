@@ -35,39 +35,43 @@ struct slSerializedTerrain {
 	\brief Terrain data.
 */
 
-struct slTerrain {
-	float **matrix;
-	slVector **fnormals[2];
-	slVector **vnormals;
+#ifdef __cplusplus
+class slTerrain: public slWorldObject {
+	public:
+		slTerrain() : slWorldObject() {}
+		~slTerrain();
 
-	int initialized;
+		float **matrix;
+		slVector **fnormals[2];
+		slVector **vnormals;
 
-	int side;
-	int repeating;
+		int initialized;
 
-	int drawList;
-	int drawMode;
+		int side;
+		int repeating;
 
-	double xscale;
-	double yscale;
+		int drawList;
+		int drawMode;
 
-	float h;
+		double xscale;
+		double yscale;
 
-	slVector position;
+		float h;
+	
+		double heightDelta;
+		double heightMin;
 
-	slVector max;
-	slVector min;
+		// color at the valleys and peaks
 
-	/* color at the valleys and peaks */
-
-	double heightDelta;
-	double heightMin;
-
-	slVector bottomColor;
-	slVector topColor;
+		slVector bottomColor;
+		slVector topColor;
 };
+#endif
 
-slTerrain *slTerrainNew(int res, double xscale);
+#ifdef __cplusplus
+extern "C" {
+#endif
+slTerrain *slTerrainNew(int res, double xscale, void *userData);
 void slGenerateFractalTerrain(slTerrain *l, double h, double height);
 
 void slTerrainSetLocation(slTerrain *l, slVector *location);
@@ -82,10 +86,7 @@ void slTerrainInitialize(slTerrain *l);
 void slTerrainFree(slTerrain *l);
 void slTerrainMakeNormals(slTerrain *l);
 
-int slTerrainTestPair(slWorldObject *w1, slWorldObject *w2, 
-		slShape *s1, slShape *s2, 
-		slPosition *p1, slPosition *p2, 
-		int x, int y, slCollisionEntry *ce);
+int slTerrainTestPair(slVclipData *vc, int x, int y, slCollisionEntry *ce);
 
 void slTerrainFacesUnderRange(slTerrain *l, 
 	double minX, double maxX, double minZ, double maxZ,
@@ -93,8 +94,8 @@ void slTerrainFacesUnderRange(slTerrain *l,
 	int *earlyStart, int *lateEnd);
 
 int slTerrainPlaneUnderPoint(slTerrain *l, slVector *point, slPlane *plane);
-int slTerrainSphereClip(slTerrain *l, slShape *ss, slPosition *sp, int x, int y, slCollisionEntry *ce, int flip);
-int slTerrainShapeClip(slTerrain *l, slShape *ss, slPosition *sp, int obX, int obY, slCollisionEntry *ce, int flip);
+int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int x, int y, slCollisionEntry *ce, int flip);
+int slTerrainShapeClip(slVclipData *vc, slTerrain *l, int obX, int obY, slCollisionEntry *ce, int flip);
 double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollisionEntry *ce);
 
 int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosition *position, slPlane *facePlane, slCollisionEntry *ce);
@@ -105,3 +106,12 @@ void slDrawTerrainSide(slWorld *w, slTerrain *l, int texture, double textureScal
 int slPointIn2DTriangle(slVector *vertex, slVector *a, slVector *b, slVector *c);
 
 slSerializedTerrain *slSerializeTerrain(slTerrain *t, int *size);
+
+void slTerrainSetHeight(slTerrain *t, int x, int y, double height);
+double slTerrainGetHeight(slTerrain *t, int x, int y);
+
+void slTerrainSetTopColor(slTerrain *t, slVector *color);
+void slTerrainSetBottomColor(slTerrain *t, slVector *color);
+#ifdef __cplusplus
+}
+#endif

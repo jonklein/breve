@@ -46,9 +46,14 @@ struct slPatchGrid {
 
 typedef struct slPatchGrid slPatchGrid;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 slPatchGrid *slPatchGridNew(slVector *center, slVector *size, int x, int y, int z);
 void slPatchGridFree(slPatchGrid *g);
 void slInitPatch(slPatch *p);
 void slPatchSetData(slPatch *p, void *data);
-
 slPatch *slPatchForLocation(slPatchGrid *g, slVector *location);
+#ifdef __cplusplus
+}
+#endif

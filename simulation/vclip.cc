@@ -29,7 +29,7 @@
 
 void slInitBoundSort(slVclipData *d) {
 	int listSize = d->count * 2;
-	int x, y;
+	unsigned int x, y;
 
 	d->candidates.clear();
 
@@ -41,9 +41,16 @@ void slInitBoundSort(slVclipData *d) {
 		}
 	}
 
-	slInitBoundSortList(d->xListPointers, listSize, d, BT_XAXIS);
-	slInitBoundSortList(d->yListPointers, listSize, d, BT_YAXIS);
-	slInitBoundSortList(d->zListPointers, listSize, d, BT_ZAXIS);
+	for(x=0;x<3;x++) {
+		d->boundListPointers[x].clear();
+		for(y=0;y<listSize;y++) {
+			d->boundListPointers[x].push_back(&d->boundLists[x][y]);
+		}
+	}
+
+	slInitBoundSortList(d->boundListPointers[0], listSize, d, BT_XAXIS);
+	slInitBoundSortList(d->boundListPointers[1], listSize, d, BT_YAXIS);
+	slInitBoundSortList(d->boundListPointers[2], listSize, d, BT_ZAXIS);
 }
 
 /*
@@ -106,9 +113,9 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 	slPairEntry *pe;
 	std::vector<slPairEntry*>::iterator ci;
 
-	slIsort(d, d->xListPointers, d->count * 2, BT_XAXIS);
-	slIsort(d, d->yListPointers, d->count * 2, BT_YAXIS);
-	slIsort(d, d->zListPointers, d->count * 2, BT_ZAXIS);
+	slIsort(d, d->boundListPointers[0], d->count * 2, BT_XAXIS);
+	slIsort(d, d->boundListPointers[1], d->count * 2, BT_YAXIS);
+	slIsort(d, d->boundListPointers[2], d->count * 2, BT_ZAXIS);
 
 	d->collisions.clear();
 
@@ -155,6 +162,15 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 	return d->collisions.size();
 }
 
+slCollisionEntry *slNextCollisionEntry(slVclipData *v, int x, int y) {
+	slCollisionEntry *e = slNextCollisionEntry(v);
+
+	e->n1 = x;
+	e->n2 = y;
+
+	return e;
+}
+
 slCollisionEntry *slNextCollisionEntry(slVclipData *v) {
 	slCollisionEntry e;
 
@@ -188,7 +204,7 @@ slCollisionEntry *slNextCollisionEntry(slVclipData *v) {
 	the flags will already be set.
 */
 
-void slIsort(slVclipData *d, slBoundSort **list, int size, char boundTypeFlag) {
+void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, int size, char boundTypeFlag) {
 	int n, current;
 	slPairEntry *pe;
 	slBoundSort *tempList;
@@ -287,7 +303,7 @@ void slIsort(slVclipData *d, slBoundSort **list, int size, char boundTypeFlag) {
 	= are thus not consistant.
 */
 
-void slInitBoundSortList(slBoundSort **list, int size, slVclipData *v, char boundTypeFlag) {
+void slInitBoundSortList(std::vector<slBoundSort*> &list, int size, slVclipData *v, char boundTypeFlag) {
 	int n, extend;
 	unsigned char *pair;
 	slPairEntry *pe;
@@ -399,12 +415,10 @@ int slVclipTestPair(slVclipData *vc, slPairEntry *e, slCollisionEntry *ce) {
 	s1 = vc->shapes[x];
 	s2 = vc->shapes[y];
 
-	p1 = vc->positions[x];
-	p2 = vc->positions[y];
+	p1 = &vc->objects[x]->position;
+	p2 = &vc->objects[y]->position;
 
-	if(!s1 || !s2) {
-		return slTerrainTestPair(vc->objects[x], vc->objects[y], s1, s2, p1, p2, x, y, ce);
-	}
+	if(!s1 || !s2) return slTerrainTestPair(vc, x, y, ce);
 
 	f1 = &e->f1;
 	f2 = &e->f2;
@@ -489,8 +503,8 @@ int slVclipTestPairAllFeatures(slVclipData *vc, slPairEntry *e, slCollisionEntry
 	s1 = vc->shapes[x];
 	s2 = vc->shapes[y];
 
-	p1 = vc->positions[x];
-	p2 = vc->positions[y];
+	p1 = &vc->objects[x]->position;
+	p2 = &vc->objects[y]->position;
 
 	f1 = &fp1;
 	f2 = &fp2;
@@ -539,8 +553,8 @@ int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollisionEntry *ce) {
 
 	slShape *s1 = vc->shapes[x];
 	slShape *s2 = vc->shapes[y];
-	slPosition *p1 = vc->positions[x];
-	slPosition *p2 = vc->positions[y];
+	slPosition *p1 = &vc->objects[x]->position;
+	slPosition *p2 = &vc->objects[y]->position;
 
 	slVectorSub(&p2->location, &p1->location, &diff);
 
@@ -549,8 +563,7 @@ int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollisionEntry *ce) {
 	depth = totalLen - (s1->radius + s2->radius);
 
 	if(depth > MC_TOLERANCE) {
-		if(ce) ce->distance = depth;
-
+		// if(ce) ce->distance = depth;
 		return CT_DISJOINT;
 	}
 
@@ -591,8 +604,8 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 
 	slShape *s1 = vc->shapes[x];
 	slShape *s2 = vc->shapes[y];
-	slPosition *p1 = vc->positions[x];
-	slPosition *p2 = vc->positions[y];
+	slPosition *p1 = &vc->objects[x]->position;
+	slPosition *p2 = &vc->objects[y]->position;
 
 	if(!*feat) *feat = s2->features[0];
 	minFeature = s2->faces[0];
@@ -611,7 +624,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 					dist = centerDist - s1->radius;
 
 					if(dist > MC_TOLERANCE) {
-						if(ce) ce->distance = dist;
+						// if(ce) ce->distance = dist;
 						return CT_DISJOINT;
 					} else {
 						if(!ce) return CT_PENETRATE;
@@ -697,7 +710,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 						return CT_PENETRATE;
 					}
 
-					if(ce) ce->distance = dist;
+					// if(ce) ce->distance = dist;
 					return CT_DISJOINT;
 				}
 
@@ -738,7 +751,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 						return CT_PENETRATE;
 					}
 
-					if(ce) ce->distance = dist;
+					// if(ce) ce->distance = dist;
 
 					return CT_DISJOINT;
 				}
@@ -802,7 +815,7 @@ int slPointPointClip(slFeature **nf1, slPosition *p1p, slShape *s1, slFeature **
 
 	if(ce) {
 		slVectorSub(&v1, &v2, &dist);
-		ce->distance = slVectorLength(&dist);
+		// ce->distance = slVectorLength(&dist);
 	}
 	
 	return CT_DISJOINT;
@@ -819,8 +832,8 @@ int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int pairFli
 	slFace *f;
 	slEdge *e, *newEdge;
 
-	slPosition *ep = v->positions[x];
-	slPosition *fp = v->positions[y];
+	slPosition *ep = &v->objects[x]->position;
+	slPosition *fp = &v->objects[y]->position;
 	slShape *s1 = v->shapes[x];
 	slShape *s2 = v->shapes[y];
 
@@ -1048,7 +1061,7 @@ int slEdgePointClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf
 	if(ce) {
 		slPositionVertex(ep, &start->vertex, &tStart);
 		slPositionVertex(ep, &end->vertex, &tEnd);
-		ce->distance = slPointLineDist(&tStart, &tEnd, &tPoint, &linePoint);
+		// ce->distance = slPointLineDist(&tStart, &tEnd, &tPoint, &linePoint);
 	}
 	
 	return CT_DISJOINT;
@@ -1320,7 +1333,7 @@ int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf
 	}
 
 	if(sD > MC_TOLERANCE) {
-		if(ce) ce->distance = sD;
+		// if(ce) ce->distance = sD;
 		return CT_DISJOINT;
 	}
 
@@ -1873,17 +1886,6 @@ int slFaceFaceCollisionPoints(slCollisionEntry *ce, slShape *s1, slPosition *p1,
 		slVectorMul(&plane1.normal, -1, &ce->normal);
 	} else {
 		slVectorCopy(&plane2.normal, &ce->normal);
-	}
-
-	/* a deep collision is usually an indication that we're using the wrong plane */
-
-	if(ce->distance < -0.1) {
-		slMessage(100, "Unusually deep collision: %f units\n", ce->distance);
-
-		// getchar();
-
-		// slVectorPrint(&plane1.normal);
-		// slVectorPrint(&plane2.normal);
 	}
 
 	return 0;

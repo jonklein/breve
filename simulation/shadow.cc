@@ -41,8 +41,8 @@ int slShadowVolumeForShape(slCamera *c, slShape *s, slPosition *p) {
 		slVector n1, n2;
 		slVector tv;
 
-		f1 = e->neighbors[2];
-		f2 = e->neighbors[3];
+		f1 = e->faces[0];
+		f2 = e->faces[1];
 
 		// look at this edge's faces, and calculate the dot product
 		// with the light's vector.

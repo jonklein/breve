@@ -28,7 +28,6 @@
 enum slWorldObjectTypes {
 	WO_LINK = 1,
 	WO_STATIONARY,
-	WO_PATCH_GRID,
 	WO_TERRAIN
 };
 
@@ -61,72 +60,106 @@ enum collisionCallbackTypes {
 	as a pointer to the actual object type (stationary, mobile, terrain, etc).
 */
 
-struct slWorldObject {
-	/* type is one of the slWorldObjectTypes -- a stationary or a multibody */
-	/* the data pointer is thus a pointer to the corresponding structure.   */
+#ifdef __cplusplus
+template <class T> class safe_ptr {
+		T* ptr;
+	public:
+		explicit safe_ptr(T* p = 0) : ptr(p) {}
+		~safe_ptr()                 {delete ptr;}
+		T& operator*()              {return *ptr;}
+		T* operator->()             {return ptr;}
+};
 
-	unsigned char type;
-	void *data;
+class slWorldObject {
+	public:
+		slWorldObject() {
+			drawMode = 0;
+			texture = -1;
+			textureMode = 0;
+			textureScale = 16;
 
-	slVector color;
+			shape = NULL;
 
-	int lightExposure;
+			proximityRadius = 0.00001;
+			neighbors = slStackNew();
 
-	int texture;
-	char textureMode;
-	unsigned char drawMode;
-	float billboardRotation;
-	float alpha;
+			billboardRotation = 0;
+			alpha = 1.0;
 
-	float textureScale;
+			inLines = NULL;
+			outLines = NULL;
 
-	// bounding box information here is used for "proximity" data
+			e = 0.4;
+			eT = 0.2;
+			mu = 0.15;
 
-	slVector max;
-	slVector min;
+			slVectorSet(&color, 1, 1, 1);
 
-	double e;
-	double eT;
-	double mu;
+			slMatrixIdentity(position.rotation);
+			slVectorSet(&position.location, 0, 0, 0);
+		}
 
-	double proximityRadius;
-	slStack *neighbors;
+		slShape *shape;
 
-	// the list of lines that this object makes to other objects
+		slPosition position;
 
-	slList *outLines;
+		// type is one of the slWorldObjectTypes -- a stationary or a multibody
+		// the data pointer is thus a pointer to the corresponding structure.
 
-	// and--so that we can eliminate the connections when this
-	// object is freed--we'll keep the lines other objects make
-	// to this one.
+		unsigned char type;
 
-	slList *inLines;
+		slVector color;
 
-	// the userData is defined by users of the physics engine so that, 
-	// for example, the engine can report which objects are colliding  
-	// using the collision callback.  in the specific case of breve, 
-	// the user data represents the steve instance associated with the
-	// world object... 
+		int lightExposure;
 
-	void *userData;
+		int texture;
+		char textureMode;
+		unsigned char drawMode;
+		float billboardRotation;
+		float alpha;
+	
+		float textureScale;
+
+		// bounding box information here is used for "proximity" data
+	
+		slVector max;
+		slVector min;
+	
+		double e;
+		double eT;
+		double mu;
+
+		double proximityRadius;
+		slStack *neighbors;
+
+		// the list of lines that this object makes to other objects
+
+		slList *outLines;
+
+		// and--so that we can eliminate the connections when this
+		// object is freed--we'll keep the lines other objects make
+		// to this one.
+
+		slList *inLines;
+
+		// the userData is defined by users of the physics engine so that, 
+		// for example, the engine can report which objects are colliding  
+		// using the collision callback.  in the specific case of breve, 
+		// the user data represents the steve instance associated with the
+		// world object... 
+	
+		void *userData;
 };
 
 /*!
 	\brief A stationary object in the simulated world.
 */
 
-struct slStationary {
-	slShape *shape;
-
-	slPosition position;
-
-	int lightExposure;
-
-	/* min and max get pointed to by the vclip bounding box data */
-
-	slVector min;
-	slVector max;
+class slStationary: public slWorldObject {
+	public:
 };
+
+// typedef safe_ptr<slWorldObject> slWorldObject;
 
 /*!
 	\brief A line drawn from one object to another.
@@ -137,6 +170,7 @@ struct slObjectLine {
 	int stipple;
 	slWorldObject *destination;
 };
+#endif
 
 /*!
 	\brief A structure holding the simulated world.
@@ -160,8 +194,9 @@ struct slWorld {
 
 	unsigned char detectLightExposure;
 	unsigned char drawLightExposure;
-	slVector lightExposureSource;
 
+	slVector lightExposureSource;
+	slVector lightExposureTarget;
 
 	// visions are rendered from certain perspectives in the world
 
@@ -251,21 +286,17 @@ void slWorldFreeObject(slWorldObject *o);
 void slFreeClipData(slVclipData *v);
 void slRenderWorldCameras(slWorld *w);
 
-slWorldObject *slWorldAddObject(slWorld *w, void *p, int type);
+slWorldObject *slWorldAddObject(slWorld *w, slWorldObject *p, int type);
 void slRemoveObject(slWorld *w, slWorldObject *p);
 
 double slRunWorld(slWorld *w, double deltaT, double stepSize, int *error);
 double slWorldStep(slWorld *w, double stepSize, int *error);
 void slNeighborCheck(slWorld *w);
 
-void slVclipDataInit(slWorld *w);
 slVclipData *slVclipDataNew();
 void slVclipDataRealloc(slVclipData *v, int count);
-int slObjectSortFunc(const void *a, const void *b);
 
-void slAddBoundingBoxForVectors(slVclipData *w, int offset, slVector *max, slVector *min);
-
-slStationary *slNewStationary(slShape *s, slVector *loc, double rot[3][3]);
+slStationary *slNewStationary(slShape *s, slVector *loc, double rot[3][3], void *data);
 
 void slIgnoreAllCollisions(slVclipData *d, int object);
 
@@ -297,12 +328,11 @@ void slWorldSetBackgroundTexture(slWorld *w, int n, int mode);
 void slWorldSetLightExposureDetection(slWorld *w, int n);
 void slWorldSetLightExposureSource(slWorld *w, slVector *v);
 
-void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*), int (*collide)(void*, void*, int type));
+void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*, int t), int (*collide)(void*, void*, int t));
 
 slWorldObject *slWorldGetObject(slWorld *w, unsigned int n);
 
 int slWorldLoadTigerFile(slWorld *w, char *f);
-
 #ifdef __cplusplus
 }
 #endif

@@ -25,23 +25,8 @@
 */
 
 slLink *slLinkNew(slWorld *w) {
-	slLink *m;
-
-	m = new slLink;
-	m->shape = NULL;
-
-	bzero(m, sizeof(slLink));
-
-	m->odeBodyID = dBodyCreate(w->odeWorldID);
-
-	m->simulate = 0;
-
-	slQuatIdentity(&m->stateVector[0].rotQuat);
-	slQuatIdentity(&m->stateVector[1].rotQuat);
-
-	slMatrixIdentity(m->position.rotation);
-
-	return m;
+	// return new slLink(new slLinkObject(w));
+	return new slLink(w);
 }
 
 /*!
@@ -227,42 +212,6 @@ void slLinkSetAcceleration(slLink *m, slVector *linear, slVector *rotational) {
 }
 
 /*!
-	\brief Free an slLink struct.
-
-	Frees the memory associated with a link.  Breaks all the joints 
-	that the link is attached to, but does not free them.  They must
-	be freed independently.
-
-	Also triggers an update to the multibody which holds it.
-*/
-
-void slLinkFree(slLink *l) {
-	std::vector<slJoint*>::iterator i;
-	std::vector<slJoint*> joints;
-
-	if(l->multibody && l->multibody->root == l) {
-		l->multibody->root = NULL;
-		slMultibodyUpdate(l->multibody);
-	}
-
-	// WARNING: joint break will remove elements from the inJoints and 
-	// outJoints vectors.  We can therefore not iterate through the 
-	// vectors themselves -- we need to use a copy.
-
-	joints = l->inJoints;
-	for(i = joints.begin(); i != joints.end(); i++ ) slJointBreak(*i);
-
-	joints = l->outJoints;
-	for(i = joints.begin(); i != joints.end(); i++ ) slJointBreak(*i);
-
-	dBodyDestroy(l->odeBodyID);
-
-	slShapeFree(l->shape);
-
-	delete l;
-}
-
-/*!
 	\brief Apply a linear/rotational force to a link.
 */
 
@@ -339,7 +288,7 @@ int slLinkCheckPenetration(slWorld *w, slLink *l) {
 	slVclipData *vc;
 	slPairEntry *pe;
 	int ln;
-	int n;
+	unsigned int n;
 
 	if(!w->initialized) slVclipDataInit(w);
 
@@ -636,14 +585,6 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 void slVelocityAtPoint(slVector *vel, slVector *avel, slVector *atPoint, slVector *d) {
 	slVectorCross(avel, atPoint, d);
 	slVectorAdd(d, vel, d);
-}
-
-void slLinkSetCallbackData(slLink *l, void *callbackData) {
-	l->callbackData = callbackData;
-}
-
-void *slLinkGetCallbackData(slLink *l) {
-	return l->callbackData;
 }
 
 slPosition *slLinkGetPosition(slLink *l) {

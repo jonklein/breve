@@ -49,47 +49,60 @@ struct slLinkIntegrationPosition {
 #ifdef __cplusplus
 #include <vector>
 
-struct slLink {
-	slMultibody *multibody;
+class slLink: public slWorldObject {
+	public:
+		slLink(slWorld *w) : slWorldObject() {
+    		odeBodyID = dBodyCreate(w->odeWorldID);
 
-	slsVector acceleration;
-	slsVector velocity;
+		    simulate = 0;
+			currentState = 0;
+			mobile = 0;
 
-	char *label;
+			bzero(&stateVector[0], sizeof(slLinkIntegrationPosition));
+			bzero(&stateVector[1], sizeof(slLinkIntegrationPosition));
 
-	char mobile;
+		    slQuatIdentity(&stateVector[0].rotQuat);
+		    slQuatIdentity(&stateVector[1].rotQuat);
 
-	slLinkIntegrationPosition stateVector[2];
+			multibody = NULL;
 
-	unsigned char currentState;
-	unsigned char simulate;
+			slsVectorZero(&acceleration);
+			slsVectorZero(&velocity);
 
-	int clipNumber;
+			slVectorZero(&externalForce);
+		}
 
-	dBodyID odeBodyID;
-	dMass massData;
+		~slLink();
 
-	slPosition position;
+		slMultibody *multibody;
 
-	slVector externalForce;
+		slsVector acceleration;
+		slsVector velocity;
 
-	unsigned char drawOptions;
+		char *label;
 
-	char texture;
-	int textureScale;
+		char mobile;
 
-	slShape *shape;
-	
-	std::vector<slJoint*> inJoints;
-	std::vector<slJoint*> outJoints;
+		slLinkIntegrationPosition stateVector[2];
 
-	// bounding box parameters
+		unsigned char currentState;
+		unsigned char simulate;
 
-	slVector max;
-	slVector min;
+		int clipNumber;
 
-	void *callbackData;
+		dBodyID odeBodyID;
+		dMass massData;
+
+		slVector externalForce;
+
+		unsigned char drawOptions;
+
+		std::vector<slJoint*> inJoints;
+		std::vector<slJoint*> outJoints;
 };
+
+typedef safe_ptr<slLink> slLinkPointer;
+
 #endif
 
 #ifdef __cplusplus
@@ -133,9 +146,6 @@ void slLinkSetAcceleration(slLink *m, slVector *linear, slVector *rotational);
 
 void slLinkGetVelocity(slLink *m, slVector *velocity, slVector *rotational);
 void slLinkSetVelocity(slLink *m, slVector *velocity, slVector *rotational);
-
-void slLinkSetCallbackData(slLink *l, void *callbackData);
-void *slLinkGetCallbackData(slLink *l);
 
 slPosition *slLinkGetPosition(slLink *l);
 

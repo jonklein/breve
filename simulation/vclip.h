@@ -98,8 +98,6 @@ struct slPairEntry {
 struct slCollisionEntry {
 	slVector normal;
 
-	double distance;
-
 	std::vector<slVector> points;
 	std::vector<double> depths;
 
@@ -113,14 +111,11 @@ struct slCollisionEntry {
 
 
 struct slVclipData {
-	slBoundSort **xListPointers;
-	slBoundSort **yListPointers;
-	slBoundSort **zListPointers;
+	std::vector<slBoundSort*> boundListPointers[3];
 
 	std::vector<slBoundSort> boundLists[3];
 
 	slShape **shapes;
-	slPosition **positions;
 	
 	std::vector<slWorldObject*> objects;
 
@@ -130,19 +125,21 @@ struct slVclipData {
 
 	std::vector<slPairEntry*> candidates;
 
-	int count;
+	unsigned int count;
 	int maxCount;
 };
+
+slCollisionEntry *slNextCollisionEntry(slVclipData *v);
+slCollisionEntry *slNextCollisionEntry(slVclipData *v, int x, int y);
+
+void slInitBoundSort(slVclipData *v);
+void slIsort(slVclipData *vc, std::vector<slBoundSort*> &list, int size, char boundTypeFlag);
+void slInitBoundSortList(std::vector<slBoundSort*> &list, int size, slVclipData *v, char boundTypeFlag);
+
 #endif
 
 void slAddCollisionCandidate(slVclipData *d, slPairEntry *e);
 void slRemoveCollisionCandidate(slVclipData *d, slPairEntry *e);
-
-void slIsort(slVclipData *vc, slBoundSort **list, int size, char boundTypeFlag);
-void slInitBoundSort(slVclipData *v);
-void slInitBoundSortList(slBoundSort **list, int size, slVclipData *v, char boundTypeFlag);
-
-slCollisionEntry *slNextCollisionEntry(slVclipData *v);
 
 slVector *slPositionVertex(slPosition *p, slVector *i, slVector *o);
 slPlane *slPositionPlane(slPosition *p, slPlane *p1, slPlane *pt);

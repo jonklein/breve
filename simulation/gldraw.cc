@@ -1037,24 +1037,23 @@ void slDrawBackground(slCamera *c, slWorld *w) {
 }
 
 void slRenderLabels(slWorld *w) {
-	slMultibody *m;
+	slLink *m;
 	slVector *l;
-	unsigned int n;
+	std::vector<slWorldObject*>::iterator wi;
 
 	glDisable(GL_DEPTH_TEST);
 
 	glColor3f(0, 0, 0);
 
-	for(n=0;n<w->objects.size();n++) {
-		if(w->objects[n]) {
-			m = w->objects[n]->data;
-			if(w->objects[n]->type == WO_LINK && m->label) {
-				l = &m->root->position.location;
-				glPushMatrix();
-				glTranslatef(l->x, l->y, l->z);
-				slText(0, 0, m->label, GLUT_BITMAP_HELVETICA_10);
-				glPopMatrix();
-			}
+	for(wi = w->objects.begin(); wi != w->objects.end(); wi++) {
+		m = *wi;
+
+		if(m && m->type == WO_LINK && m->label) {
+			l = &m->position.location;
+			glPushMatrix();
+			glTranslatef(l->x, l->y, l->z);
+			slText(0, 0, m->label, GLUT_BITMAP_HELVETICA_10);
+			glPopMatrix();
 		}
 	}
 	
@@ -1468,15 +1467,15 @@ int slRenderObjects(slWorld *w, slCamera *c, int loadNames, int flags) {
 
 			switch(wo->type) {
 				case WO_LINK:
-					m = wo->data;
+					m = wo;
 					if(!(flags & DO_NO_LINK)) slDrawShape(w, c, m->shape, &m->position, &wo->color, texture, wo->textureScale, textureMode, wo->drawMode, flags, wo->billboardRotation, wo->alpha);
 					break;
 
 				case WO_STATIONARY:
-					if(!(flags & DO_NO_STATIONARY)) slDrawStationary(w, (slStationary*)wo->data, c, &wo->color, texture, wo->textureScale, textureMode, wo->alpha, wo->drawMode, flags);
+					if(!(flags & DO_NO_STATIONARY)) slDrawStationary(w, (slStationary*)wo, c, &wo->color, texture, wo->textureScale, textureMode, wo->alpha, wo->drawMode, flags);
 					break;
 				case WO_TERRAIN:
-					if(!(flags & DO_NO_TERRAIN)) slDrawTerrain(w, c, (slTerrain*)wo->data, texture, wo->textureScale, wo->drawMode, flags);
+					if(!(flags & DO_NO_TERRAIN)) slDrawTerrain(w, c, (slTerrain*)wo, texture, wo->textureScale, wo->drawMode, flags);
 					break;
 			}
 		}
@@ -1512,21 +1511,15 @@ void slRenderLines(slWorld *w, slCamera *c, int flags) {
 				glEnable(GL_BLEND);
 				glColor4f(0.0, 0.0, 0.0, 0.5);
 
-				if(w->objects[n]->type == WO_STATIONARY) 
-					x = &((slStationary*)w->objects[n]->data)->position.location;
-				else 
-					x = &((slLink*)w->objects[n]->data)->position.location;
+				x = &w->objects[n]->position.location;
 
 				glBegin(GL_LINES);
 
 				for(m=0;m<w->objects[n]->neighbors->count;m++) {
 					neighbor = w->objects[n]->neighbors->data[m];
 
-					if(neighbor->data) {
-						if(neighbor->type == WO_STATIONARY) 
-							y = &((slStationary*)neighbor->data)->position.location;
-						else 
-							y = &((slLink*)neighbor->data)->position.location;
+					if(neighbor) {
+						y = &neighbor->position.location;
 
 						glVertex3f(x->x, x->y, x->z);
 						glVertex3f(y->x, y->y, y->z);
@@ -1540,10 +1533,7 @@ void slRenderLines(slWorld *w, slCamera *c, int flags) {
 			lineList = w->objects[n]->outLines;
 
 			if(lineList && !(flags & DO_NO_NEIGHBOR_LINES)) {
-				if(w->objects[n]->type == WO_STATIONARY) 
-					x = &((slStationary*)w->objects[n]->data)->position.location;
-				else 
-					x = &((slLink*)w->objects[n]->data)->position.location;
+				x = &w->objects[n]->position.location;
 
 				glDisable(GL_LIGHTING);
 				glEnable(GL_BLEND);
@@ -1561,10 +1551,7 @@ void slRenderLines(slWorld *w, slCamera *c, int flags) {
 
 					glBegin(GL_LINES);
 
-					if(line->destination->type == WO_STATIONARY) 
-						y = &((slStationary*)line->destination->data)->position.location;
-					else 
-						y = &((slLink*)line->destination->data)->position.location;
+					y = &((slWorldObject*)line->destination)->position.location;
 
 					glVertex3f(x->x, x->y, x->z);
 					glVertex3f(y->x, y->y, y->z);
@@ -1573,9 +1560,7 @@ void slRenderLines(slWorld *w, slCamera *c, int flags) {
 
 					glEnd();
 
-					if(line->stipple) {
-						glDisable(GL_LINE_STIPPLE);
-					}
+					if(line->stipple) glDisable(GL_LINE_STIPPLE);
 				}
 			}
 		}
@@ -1939,11 +1924,11 @@ void slFreeGL(slWorld *w, slCamera *c) {
 		if(w->objects[n]) {
 			switch(w->objects[n]->type) {
 				case WO_LINK:
-					link = w->objects[n]->data;
+					link = w->objects[n];
 					glDeleteLists(link->shape->drawList, 1);
 					break;
 				case WO_STATIONARY:
-					so = w->objects[n]->data;
+					so = w->objects[n];
 					if(so->shape->drawList) {
 						glDeleteLists(so->shape->drawList, 1);
 						so->shape->drawList = 0;

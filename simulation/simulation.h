@@ -49,32 +49,28 @@ extern "C"{
 
 #include "util.h"
 
-#include "springs.h"
-
-#include "patch.h"
-
-#include "terrain.h"
-#include "integrate.h"
-
-#include "gldraw.h"
-
-#include "image.h"
-#include "lightdetector.h"
-
 #include "movie.h"
 
 #ifdef __cplusplus
 }
 #endif
 
-#include "netsim.h"
-#include "vclip.h"
+#include "image.h"
+#include "patch.h"
+#include "integrate.h"
 #include "shape.h"
+#include "netsim.h"
+#include "world.h"
+#include "link.h"
+#include "gldraw.h"
+#include "lightdetector.h"
+#include "vclip.h"
+#include "vclipData.h"
 #include "shadow.h"
 #include "camera.h"
-#include "vclipData.h"
-#include "link.h"
 #include "multibody.h"
-#include "world.h"
+#include "springs.h"
+#include "worldObject.h"
 #include "joint.h"
 #include "volInt.h"
+#include "terrain.h"

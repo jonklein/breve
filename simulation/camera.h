@@ -197,7 +197,7 @@ void slCameraResize(slCamera *c, int x, int y);
 void slCameraFree(slCamera *c);
 
 void slSetCameraText(slCamera *c, int n, char *string, float x, float y, slVector *v);
-void slSetShadowCatcher(slCamera *c, slShape *s, slVector *normal, slPosition *pos);
+void slSetShadowCatcher(slCamera *c, slStationary *s, slVector *normal);
 
 void slAddBillboard(slCamera *c, slVector *color, slVector *loc, float size, float rotation, float alpha, int bitmap, int textureMode, float z, unsigned char selected);
 

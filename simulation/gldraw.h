@@ -64,15 +64,22 @@ enum linkDrawOptions {
 	LD_INVISIBLE				= 0x04
 };
 
+#ifdef __cplusplus 
+extern "C" {
+#endif
 void slInitGL(slWorld *w);
+unsigned int slTextureNew();
+int slUpdateTexture(slWorld *w, GLuint texNum, unsigned char *pixels, int width, int height, int p);
+void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor);
+int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y, slVector *dragVector);
+int slGlSelect(slWorld *w, slCamera *c, int x, int y);
+
+#ifdef __cplusplus 
+}
+#endif
+
 void slCompileCubeDrawList();
 
-unsigned int slTextureNew();
-int slLoadTexture(slWorld *w);
-int slUpdateTexture(slWorld *w, GLuint texNum, unsigned char *pixels, int width, int height, int p);
-int slAddMipmap(slWorld *w, unsigned char *pixels, int width, int height, int p);
-
-void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor);
 void slDrawWorld(slWorld *w, slCamera *c, int recompile, int render_mode, int crosshair, int scissor);
 
 void slDrawWorldToBuffer(slWorld *w, slCamera *c, char *r, char *g, char *b, char *temp);
@@ -91,12 +98,9 @@ void slRenderLines(slWorld *w, slCamera *c, int flags);
 
 void slRenderText(slWorld *w, slCamera *c, slVector *loc, slVector *target, int crosshair);
 
-void slPointAtNextObject(slWorld *w, slCamera *c);
-
 void slText(double x, double y, char *string, void *font);
 void slStrokeText(double x, double y, char *string, double scale, void *font);
 
-void slDefaultLighting();
 void slDrawLights(slCamera *c, int noDiff);
 void slShadowMatrix(GLfloat shadowMat[4][4], slPlane *plane, slVector *light);
 
@@ -115,14 +119,9 @@ void slDrawFace(slFace *f, int drawMode, int texture, double textureScale, int f
 int slBreakdownFace(slFace *f, int texture, double textureScale);
 void slBreakdownTriangle(slVector *v, int texture, double textureScale, int level, slVector *xaxis, slVector *yaxis);
 
-int slGlSelect(slWorld *w, slCamera *c, int x, int y);
-int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y, slVector *dragVector);
-
 int slCompileBox();
 
 void slGlError();
-void slInitializeFog ( float r, float g, float b, float a,
-                     float near, float far, float density);
 
 int slClearGLErrors(char *e);
 
@@ -137,4 +136,3 @@ void slTransposeGLMatrix(GLfloat *m);
 void slClear(slWorld *w, slCamera *c);
 
 void slDrawNetsimBounds(slWorld *w);
-

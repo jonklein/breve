@@ -77,6 +77,8 @@ slWorld *slWorldNew() {
 	w->backgroundTexture = -1;
 	slVectorSet(&w->backgroundTextureColor, 1, 1, 1);
 
+	slVectorSet(&w->lightExposureTarget, 0, 0, 0);
+
 	w->clipData = slVclipDataNew();
 
 	w->gisData = NULL;
@@ -89,6 +91,10 @@ slWorld *slWorldNew() {
 
 int slWorldLoadTigerFile(slWorld *w, char *f) {
 	w->gisData = new slGISData(f);
+
+	if(!w->gisData) return -1;
+
+	return 0;
 }
 
 /*!
@@ -207,24 +213,6 @@ void slWorldFreeObject(slWorldObject *o) {
 
 	if(!o) return;
 
-	switch(o->type) {
-		case WO_STATIONARY:
-			if(o->data) {
-				slShapeFree(((slStationary*)o->data)->shape);
-				delete o->data;
-			}
-			break;
-		case WO_LINK:
-			if(o->data) slLinkFree(o->data);
-			break;
-		case WO_TERRAIN:
-			if(o->data) slTerrainFree(o->data);
-			break;
-		default:
-			slMessage(DEBUG_ALL, "slWorldFreeObject called with unknown object type [%d]: %p\n", o->type, o);
-			break;
-	}
-
 	slStackFree(o->neighbors);
 
 	// so why not iterate the list as normal ( while(l) l = l->next )?
@@ -246,13 +234,12 @@ void slWorldFreeObject(slWorldObject *o) {
 	\brief Adds an object to the world.
 */
 
-slWorldObject *slWorldAddObject(slWorld *w, void *p, int type) {
-	slWorldObject *no;
-
-	no = slWorldNewObject(p, type);
+slWorldObject *slWorldAddObject(slWorld *w, slWorldObject *no, int type) {
+	no->type = type;
 
 	if(type == WO_LINK) w->objects.insert(w->objects.begin(), no);
 	else w->objects.push_back(no);
+
 	w->initialized = 0;
 
 	return no;
@@ -284,68 +271,10 @@ void slRemoveObject(slWorld *w, slWorldObject *p) {
 }
 
 /*!
-	\brief Creates a new slWorldObject struct.
-
-	Takes a void pointer, which must correspond to a slWorldObjectType
-	(currently a stationary or link) and a type and creates a new slWorldObject 
-	to be placed in the slWorld.
-*/
-
-slWorldObject *slWorldNewObject(void *d, int type) {
-	slWorldObject *w;
-
-	w = new slWorldObject;
-	bzero(w, sizeof(slWorldObject));
-
-	if(!w) return NULL;
-
-	w->type = type;
-	w->data = d;
-
-	w->drawMode = 0;
-
-	w->userData = NULL;
-
-	w->texture = -1;
-	w->textureMode = 0;
-	w->textureScale = 16;
-
-	w->proximityRadius = 0.00001;
-	w->neighbors = slStackNew();
-
-	w->billboardRotation = 0;
-	w->alpha = 1.0;
-
-	w->inLines = NULL;
-	w->outLines = NULL;
-
-	w->e = 0.4; 
-	w->eT = 0.2;
-	w->mu = 0.15;
-
-	w->color.x = w->color.y = w->color.z = 1.0;
-
-	// make sure we understand this object type
-
-	switch(type) {
-		case WO_LINK:
-		case WO_STATIONARY:
-		case WO_TERRAIN:
-			break;
-		default:
-			slMessage(DEBUG_ALL, "slWorldNewObject called with unknown object type: %d\n", type);
-			return NULL;
-			break;
-	}
-
-	return w;
-}
-
-/*!
 	\brief Creates a new stationary object.
 */
 
-slStationary *slNewStationary(slShape *s, slVector *loc, double rot[3][3]) {
+slStationary *slNewStationary(slShape *s, slVector *loc, double rot[3][3], void *data) {
 	slStationary *so;
 
 	s->referenceCount++;
@@ -353,28 +282,12 @@ slStationary *slNewStationary(slShape *s, slVector *loc, double rot[3][3]) {
 	so = new slStationary;
 
 	so->shape = s;
+	so->userData = data;
+
 	slVectorCopy(loc, &so->position.location);
 	slMatrixCopy(rot, so->position.rotation);
 
 	return so;
-}
-
-/*!
-	\brief A callback to qsort to sort world objects with multibodies first.
-*/
-
-int slObjectSortFunc(const void *a, const void *b) {
-	slWorldObject *sa, *sb;
-
-	sa = *(slWorldObject**)a;
-	sb = *(slWorldObject**)b;
-
-	if(!sa) return 1;
-	if(!sb) return -1;
-
-	if(sa->type == WO_LINK && sb->type != WO_LINK) return -1;
-	if(sa->type != WO_LINK && sb->type == WO_LINK) return 1;
-	else return 0;
 }
 
 /*!
@@ -412,13 +325,13 @@ double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 
 		maxIndex = (w->clipData->count * 2) - 1;
 
-		min.x = *w->clipData->xListPointers[0]->value;
-		min.y = *w->clipData->yListPointers[0]->value;
-		min.z = *w->clipData->zListPointers[0]->value;
+		min.x = *w->clipData->boundListPointers[0][0]->value;
+		min.y = *w->clipData->boundListPointers[2][0]->value;
+		min.z = *w->clipData->boundListPointers[2][0]->value;
 
-		max.x = *w->clipData->xListPointers[maxIndex]->value;
-		max.y = *w->clipData->yListPointers[maxIndex]->value;
-		max.z = *w->clipData->zListPointers[maxIndex]->value;
+		max.x = *w->clipData->boundListPointers[0][maxIndex]->value;
+		max.y = *w->clipData->boundListPointers[1][maxIndex]->value;
+		max.z = *w->clipData->boundListPointers[2][maxIndex]->value;
 
 		slNetsimSendBoundsMessage(w->netsimClient, &min, &max);
 	}
@@ -445,7 +358,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 
 		// if(!w->objects[n] || w->objects[n]->type != WO_LINK) continue;
 
-		link = (slLink*)w->objects[n]->data;
+		link = (slLink*)w->objects[n];
 
 		if(link->simulate) {
 			slLinkUpdatePositions(link);
@@ -479,7 +392,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 			slWorldObject *w1;
 			slWorldObject *w2;
 			slPairEntry *pe;
-			int x;
+			unsigned int x;
 
 			w1 = w->objects[c->n1];
 			w2 = w->objects[c->n2];
@@ -495,7 +408,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 				double e = 0;
 
 				if(w1->type == WO_LINK) {
-					slLink *l = w1->data;
+					slLink *l = w1;
 					bodyX = l->odeBodyID;
 				}
 				
@@ -503,7 +416,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 				e = w1->e + w2->e;
 
 				if(w2->type == WO_LINK) {
-					slLink *l = w2->data;
+					slLink *l = w2;
 					bodyY = l->odeBodyID;
 				}
 
@@ -596,7 +509,6 @@ void slNeighborCheck(slWorld *w) {
 	unsigned int n;
 	double dist;
 	slVector *location, diff, *l1 = NULL, *l2 = NULL;
-	slStationary *st;
 	slPairEntry *pe;
 	slWorldObject *o1, *o2;
 	std::vector<slPairEntry*>::iterator ci;
@@ -614,17 +526,7 @@ void slNeighborCheck(slWorld *w) {
 	/* update all the bounding boxes first */
 
 	for(n=0;n<w->objects.size();n++) {
-		if(w->objects[n]->type == WO_LINK) {
-			slLink *link = w->objects[n]->data;
-		   
-			location = &link->position.location;
-		} else if(w->objects[n]->type == WO_STATIONARY) {
-			st = w->objects[n]->data;
-
-			location = &st->position.location;
-		} else {
-			location = NULL;
-		}
+		location = &w->objects[n]->position.location;
 
 		if(location) {
 			w->objects[n]->min.x = location->x - w->objects[n]->proximityRadius;
@@ -650,29 +552,8 @@ void slNeighborCheck(slWorld *w) {
 			o1 = w->objects[pe->x];
 			o2 = w->objects[pe->y];
 
-			switch(o1->type) {
-				case WO_STATIONARY:
-					l1 = &((slStationary*)o1->data)->position.location;
-					break;
-				case WO_LINK: 
-					l1 = &((slLink*)o1->data)->position.location;
-					break;
-				case WO_TERRAIN:
-					l1 = &((slTerrain*)o1->data)->position;
-					break;
-			}
-		
-			switch(o2->type) {
-				case WO_STATIONARY:
-					l2 = &((slStationary*)o2->data)->position.location;
-					break;
-				case WO_LINK: 
-					l2 = &((slLink*)o2->data)->position.location;
-					break;
-				case WO_TERRAIN:
-					l2 = &((slTerrain*)o2->data)->position;
-					break;
-			}
+			l1 = &o1->position.location;
+			l2 = &o2->position.location;
 
 			slVectorSub(l1, l2, &diff);
 			dist = slVectorLength(&diff);
@@ -838,7 +719,7 @@ void slWorldSetLightExposureSource(slWorld *w, slVector *v) {
 	slVectorCopy(v, &w->lightExposureSource);
 }
 
-void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*), int (*collide)(void*, void*, int t)) {
+void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*, int t), int (*collide)(void*, void*, int t)) {
 	w->collisionCallback = collide;
 	w->collisionCheckCallback = check;
 }

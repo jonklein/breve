@@ -25,9 +25,8 @@
 // ( pssst.  i can't believe this crap works! )
 
 void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
-	slLink *m;
 	slWorldObject *wo;
-	slStationary *s;
+	std::vector<slWorldObject*>::iterator wi;
 	unsigned int n;
 	int x;
 
@@ -36,9 +35,18 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 
 	GLubyte *expMap;
 
-	slVector *sun;
+	slVector *sun, *target;
 
 	sun = &w->lightExposureSource;
+	target = &w->lightExposureTarget;
+
+	if(sun->y < target->y) {
+		for(wi = w->objects.begin(); wi != w->objects.end(); wi++ ) {
+			(*wi)->lightExposure = 0;
+		}
+
+		return;
+	}
 
 	if(size * size * 3 > bufferSize) {
 		if(staticBuffer) delete[] staticBuffer;
@@ -69,12 +77,13 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	glPushMatrix();
 	glLoadIdentity();
 
-	gluLookAt(sun->x, sun->y, sun->z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	gluLookAt(sun->x, sun->y, sun->z, 
+		target->x, target->y, target->z, 0.0, 1.0, 0.0);
 
 	glClearColor(1, 1, 1, 1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	for(n=0;n<w->objects.size();n++) {
+	for(wi = w->objects.begin(); wi != w->objects.end(); wi++) {
 		unsigned char br, bg, bb;
 		slVector color;
 
@@ -84,16 +93,10 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 
 		glColor4ub(br, bg, bb, 0xff);
 
-		wo = w->objects[n];
+		wo = *wi;
 		wo->lightExposure = 0;
 
-		if(wo->type == WO_LINK) {
-			m = wo->data;
-			if(sun->y > 0.0) slDrawShape(w, c, m->shape, &m->position, &color, 0, 0, 0, 0, DO_NO_LIGHTING|DO_NO_COLOR|DO_NO_TEXTURE, 0, 1.0);
-		} else if(wo->type == WO_STATIONARY) {
-			s = wo->data;
-			if(sun->y > 0.0) slDrawShape(w, c, s->shape, &s->position, &color, 0, 0, 0, 0, DO_NO_LIGHTING|DO_NO_COLOR|DO_NO_TEXTURE, 0, 1.0);
-		}
+		if(wo->shape && sun->y > 0) slDrawShape(w, c, wo->shape, &wo->position, &color, 0, 0, 0, 0, DO_NO_LIGHTING|DO_NO_COLOR|DO_NO_TEXTURE, 0, 1.0);
 	}
 
 	glPopMatrix();
@@ -111,7 +114,7 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 		label = (expMap[x] << 16) + (expMap[x+1] << 8) + expMap[x+2];
 
 		if(label != WHITE_PIXEL && label < w->objects.size()) {
-			wo = (slWorldObject*)w->objects[label];
+			wo = w->objects[label];
 			wo->lightExposure++;
 		}
 	}

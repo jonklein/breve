@@ -33,15 +33,13 @@ struct slMultibody {
 
 	std::vector<slLink*> links;
 
-	char *label;
-
 	double mass;
 
 	unsigned char handleSelfCollisions;
 
 	unsigned int linkCount;
 
-	void *callbackData;
+	void *userData;
 };
 
 void slLinkList(slLink *root, std::vector<slLink*> *list, int mbOnly);

@@ -46,7 +46,7 @@ struct slJoint {
 	unsigned char type;
 	unsigned char isMbJoint;
 
-	void *callbackData;
+	void *userData;
 };
 
 #ifdef __cplusplus
