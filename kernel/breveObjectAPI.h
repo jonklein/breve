@@ -22,9 +22,10 @@ typedef struct brObjectType brObjectType;
 */
 
 struct brObjectType {
-	int (*callMethod)(brInstance *instancePointer, brMethod *method, brEval **arguments, brEval *result);
-	void *(*findMethod)(brObject *objectPointer, char *name, int nargs);
+	int (*callMethod)(brInstance *instance, brMethod *method, brEval **arguments, brEval *result);
+	void *(*findMethod)(brObject *object, char *name, unsigned char *types, int nargs);
 	int (*isSubclass)(brObject *class1, brObject *class2);
+	void (*instantiate)(brObject *class, brEval **constructorArgs, int argCount);
 
 	void *data;
 };
@@ -123,6 +124,7 @@ struct brObserver {
 
 brMethod *brMethodFind(brObject *type, char *name, int argCount);
 brMethod *brMethodFindWithArgRange(brObject *o, char *name, int min, int max);
+
 brObject *brObjectFind(brEngine *n, char *name);
 
 // functions for calling methods with breve instances

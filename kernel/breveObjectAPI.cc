@@ -22,7 +22,7 @@ brMethod *brMethodFind(brObject *o, char *name, int argCount) {
 	brMethod *m;
 	void *mp;
 
-	mp = o->type->findMethod(o, name, argCount);
+	mp = o->type->findMethod(o, name, NULL, argCount);
 
 	if(!mp) return NULL;
 

@@ -38,8 +38,13 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <li>New feature: Springs.
 <li>Different patterns can be drawn for lines.
 <li>Improved "Go to method..." popup menu.
-<li>Important change to breve APIs: the brMethod and brInstance structs previously contained an element called "class".  This has been changed to "object" to avoid conflicts with C++ compilers.
 <li>Fixed incorrect rendering when bitmaps rendered after transparencies.
+</ul>
+<P>breve Object API Changes</P>
+<ul>
+<li>The brObjectType findMethod function pointer now takes an additional argument: the method argument types. 
+<li>The "class" fields of structs have been changed to be called "object", to avoid conflicts with C++ compilers.
+<li>brObjectTypes should now include an "instantiate" function pointer.
 </ul>
 
 <p>

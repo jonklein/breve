@@ -4,6 +4,7 @@
 #include <jni.h>
 
 #include "kernel.h"
+#include "util.h"
 
 #define JAVA_MAX_ARGS	32
 
@@ -29,25 +30,26 @@
 #define ARGCOUNT_NAME			"getArgumentCount"
 #define ARGCOUNT_SIGNATURE		"(Ljava/lang/Object;)I"
 
-// public String getClassName(Class class)
+// public String getClassName(Class object)
 #define CLASSNAME_NAME			"getClassName"
 #define CLASSNAME_SIGNATURE		"(Ljava/lang/Object;)Ljava/lang/String;"
 
-struct stJavaClassData {
-	jclass class;
-	slHash *methodHash;
+typedef struct brJavaBridgeData brJavaBridgeData;
+typedef struct brJavaObject brJavaObject;
+typedef struct brJavaMethodData brJavaMethodData;
+typedef struct brJavaInstance brJavaInstance;
+
+struct brJavaObject {
+	brJavaBridgeData *bridge;
+	jclass object;
 };
 
-typedef struct stJavaClassData stJavaClassData;
-
-struct stJavaObjectData {
-	stJavaClassData *class;
-	jobject object;
+struct brJavaInstance {
+	brJavaObject *object;
+	jobject instance;
 };
 
-typedef struct stJavaObjectData stJavaObjectData;
-
-struct stJavaMethodData {
+struct brJavaMethodData {
 	char *name;
 	jmethodID method;
 	char returnType;
@@ -55,50 +57,48 @@ struct stJavaMethodData {
 	int argumentCount;
 };
 
-typedef struct stJavaMethodData stJavaMethodData;
+struct brJavaBridgeData {
+	brObjectType javaObjectType;
 
-struct stJavaBridgeData {
-	stJavaObjectData *methodFinder;
+	brJavaInstance *methodFinder;
 
-	stJavaMethodData *methfindMethod;
-	stJavaMethodData *methsigMethod;
-	stJavaMethodData *argtypesMethod;
-	stJavaMethodData *argcountMethod;
-	stJavaMethodData *rettypeMethod;
-	stJavaMethodData *classnameMethod;
+	brJavaMethodData *methfindMethod;
+	brJavaMethodData *methsigMethod;
+	brJavaMethodData *argtypesMethod;
+	brJavaMethodData *argcountMethod;
+	brJavaMethodData *rettypeMethod;
+	brJavaMethodData *objectnameMethod;
 
 	slHash *objectHash;
-	slHash *classHash;
 
 	JavaVM *jvm;
 	JNIEnv *env;
 };
 
-typedef struct stJavaBridgeData stJavaBridgeData;
+void brFreeJavaClassData(brJavaObject *data);
+void brFreeJavaBridgeData(brJavaBridgeData *data);
+void brFreeJavaMethodData(brJavaMethodData *data);
 
-void stFreeJavaClassData(stJavaClassData *data);
-void stFreeJavaBridgeData(stJavaBridgeData *data);
-void stFreeJavaMethodData(stJavaMethodData *data);
+brJavaInstance *brJavaInstanceNew(brJavaBridgeData *bridge, char *name, brEvalListHead *args);
 
-stJavaObjectData *stNewJavaObject(stJavaBridgeData *bridge, char *name, brEvalListHead *args);
-int stJavaCallMethod(stJavaBridgeData *bridge, stJavaObjectData *object, stJavaMethodData *method, jvalue *jargs, brEval *result);
+int brJavaCallMethod(brInstance *i, brMethod *m, brEval **args, brEval *result);
 
-stJavaBridgeData *stAttachJavaVM(brEngine *e);
-void stDetachJavaVM(stJavaBridgeData *bridge);
+brJavaBridgeData *brAttachJavaVM(brEngine *e);
+void brDetachJavaVM(brJavaBridgeData *bridge);
 
 void brInitJavaFuncs(brNamespace *n);
 
-stJavaMethodData *stJavaFindMethod(stJavaBridgeData *bridge, stJavaClassData *class, char *name, unsigned char *types, int nargs);
-stJavaMethodData *stJavaMakeMethod(stJavaBridgeData *bridge, stJavaClassData *class, char *name, unsigned char *types, int nargs);
-stJavaMethodData *stJavaMakeMethodData(char *name, jmethodID method, char returnType, char *argumentTypes, int nargs);
+brJavaMethodData *brJavaFindMethod(brJavaBridgeData *bridge, brJavaObject *object, char *name, unsigned char *types, int nargs);
+brJavaMethodData *brJavaMakeMethod(brJavaBridgeData *bridge, brJavaObject *object, char *name, unsigned char *types, int nargs);
+brJavaMethodData *brJavaMakeMethodData(char *name, jmethodID method, char returnType, char *argumentTypes, int nargs);
 
-int brEvalToJValue(stJavaBridgeData *bridge, brEval *e, jvalue *v, char javaType);
+int brEvalToJValue(brJavaBridgeData *bridge, brEval *e, jvalue *v, char javaType);
 
-stJavaClassData *stJavaFindClass(stJavaBridgeData *bridge, char *name);
+brJavaObject *brJavaFindObject(brJavaBridgeData *bridge, char *name);
 
-char *stReadJavaString(stJavaBridgeData *bridge, jstring string);
-jstring stMakeJavaString(stJavaBridgeData *bridge, char *string);
+char *brReadJavaString(brJavaBridgeData *bridge, jstring string);
+jstring brMakeJavaString(brJavaBridgeData *bridge, char *string);
 
-brInstance *stJavaObjectWrapper(brEngine *e, jobject object);
+brInstance *brJavaObjectWrapper(brEngine *e, jobject object);
 
-char stJTypeForType(unsigned char breve_type);
+char brJTypeForType(unsigned char breve_type);

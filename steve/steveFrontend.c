@@ -64,7 +64,7 @@ int stCallMethodBreveCallback(brInstance *i, brMethod *method, brEval **argument
 	\brief The breve callback to find a method.
 */
 
-void *stFindMethodBreveCallback(brObject *object, char *name, int args) {
+void *stFindMethodBreveCallback(brObject *object, char *name, unsigned char *argTypes, int args) {
 	stMethod *method;
 
 	method = stFindInstanceMethod(object->pointer, name, args, NULL);
