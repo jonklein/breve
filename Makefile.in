@@ -16,6 +16,7 @@ LPLATFORM	= $(shell echo ${PLATFORM} | tr '[A-Z]' '[a-z]')
 export
 
 all: 
+	-mkdir docs
 	-mkdir include
 	-mkdir bin
 	cd util; $(MAKE) -f Makefile install
