@@ -937,7 +937,7 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "getNeighbors", brIGetNeighbors, AT_LIST, AT_POINTER, 0);
 	brNewBreveCall(n, "setNeighborhoodSize", brISetNeighborhoodSize, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 
-	brNewBreveCall(n, "removeObject", brIRemoveObject, AT_POINTER, AT_POINTER, 0);
+	brNewBreveCall(n, "removeObject", brIRemoveObject, AT_NULL, AT_POINTER, 0);
 
 	brNewBreveCall(n, "setBoundingBox", brISetBoundingBox, AT_NULL, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "setDrawAxis", brISetDrawAxis, AT_NULL, AT_POINTER, AT_INT, 0);

@@ -199,6 +199,9 @@ void brEngineFree(brEngine *e) {
 	for(bi = e->instances.begin(); bi != e->instances.end(); bi++ )
 		brInstanceRelease(*bi);
 
+	for(bi = e->instancesToAdd.begin(); bi != e->instancesToAdd.end(); bi++ )
+		brInstanceRelease(*bi);
+
 	if(e->path) delete[] e->path;
 
 	brEngineRemoveDlPlugins(e);
@@ -418,7 +421,6 @@ int brEngineIterate(brEngine *e) {
 		 i = *bi;
 
 		brEngineRemoveInstance(e, i);
-		// brInstanceFree(i);
 	}
 
 	e->instancesToRemove.clear();
