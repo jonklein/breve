@@ -41,21 +41,22 @@ enum slBoundSortTypes {
 	BT_MAX
 };
 
-enum boundListTypeFlags {
-	BT_XAXIS 	= 0x01, /* 000001 */
-	BT_YAXIS 	= 0x02, /* 000010 */
-	BT_ZAXIS 	= 0x04, /* 000100 */
-	BT_CHECK 	= 0x08, /* 001000 */
-	BT_ALL   	= 0x0f, /* 001111 */
-	BT_CALLBACK	= 0x10,	/* 010000 */
-	BT_SIMULATE = 0x20	/* 100000 */
-};
-
 /*!
 	\brief Data on whether a certain pair of objects should be simulated.
 */
 
 typedef unsigned char slPairFlags;
+
+enum slCollisionFlags {
+	BT_XAXIS 	= 0x01, // 0000001 
+	BT_YAXIS 	= 0x02, // 0000010 
+	BT_ZAXIS 	= 0x04, // 0000100 
+	BT_CHECK 	= 0x08, // 0001000 
+	BT_ALL   	= 0x0f, // 0001111 -- x, y, z overlap and checking desired
+	BT_CALLBACK	= 0x10,	// 0010000 -- these objects require a callback
+	BT_SIMULATE = 0x20,	// 0100000 -- these objects require simulation
+	BT_UNKNOWN	= 0x40	// 1000000 -- need to check callback & simulation
+};
 
 #define slVclipFlagsShouldTest(x)		(((x) & BT_ALL) == BT_ALL)
 
@@ -119,10 +120,12 @@ class slCollision {
 
 class slVclipData {
 	public:
+		slWorld *world;
+
 		std::vector<slBoundSort*> boundListPointers[3];
 		std::vector<slBoundSort> boundLists[3];
 
-		slShape **shapes;
+		// slShape **shapes;
 	
 		std::vector<slWorldObject*> objects;
 

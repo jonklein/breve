@@ -32,7 +32,7 @@
 void slVclipDataInit(slWorld *w) {
 	slStationary *st;
 	slLink *link;
-	unsigned int x, y;
+	unsigned int x;
 
 	w->initialized = 1;
 
@@ -44,6 +44,7 @@ void slVclipDataInit(slWorld *w) {
 	slVclipDataRealloc(w->clipData, w->objects.size());
 
 	w->clipData->objects = w->objects;
+	w->clipData->world = w;
 
 	// for each object in the world, fill in it's shape, position and 
 	// min/max vectors
@@ -70,7 +71,8 @@ void slVclipDataInit(slWorld *w) {
 	}
 
 	for(x=0;x<w->objects.size();x++) {
-		for(y=0;y<x;y++) slVclipDataInitPairFlags(w, x, y);
+		//for(y=0;y<x;y++) slVclipDataInitPairFlags(w, x, y);
+		memset(w->clipData->pairList[x], (BT_CHECK | BT_UNKNOWN), x);
 	}
 
 	for(x=0;x<w->objects.size();x++) {
@@ -110,7 +112,6 @@ void slVclipDataInit(slWorld *w) {
 */
 
 void slVclipDataInitPairFlags(slWorld *w, int x, int y) {
-	slWorldObject *o1, *o2;
 	void *c1, *c2;
 	slPairFlags *flags;
 	int t1, t2;
@@ -120,16 +121,10 @@ void slVclipDataInitPairFlags(slWorld *w, int x, int y) {
 
 	flags = slVclipPairFlags(w->clipData->pairList, x, y);
 
-	*flags = 0;
-
-	o1 = w->objects[x];
-	o2 = w->objects[y];
+	if(*flags & BT_UNKNOWN) *flags ^= BT_UNKNOWN;
 
 	t1 = w->objects[x]->type;
 	t2 = w->objects[y]->type;
-
-	c1 = w->objects[x]->userData;
-	c2 = w->objects[y]->userData;
 
 	// collision detection is never turned on for 2 non-link objects.
 	   
@@ -141,10 +136,13 @@ void slVclipDataInitPairFlags(slWorld *w, int x, int y) {
 	sim1 = 1;
 	sim2 = 1;
 
+	c1 = w->objects[x]->userData;
+	c2 = w->objects[y]->userData;
+
 	// see if simulation is enabled for both of these objects 
 
-	if(t1 == WO_LINK) sim1 = ((slLink*)o1)->simulate;
-	if(t2 == WO_LINK) sim2 = ((slLink*)o2)->simulate;
+	if(t1 == WO_LINK) sim1 = ((slLink*)w->objects[x])->simulate;
+	if(t2 == WO_LINK) sim2 = ((slLink*)w->objects[y])->simulate;
 
 	// see if the user wants to simulate them and/or callback for them
 

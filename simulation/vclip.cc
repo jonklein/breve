@@ -62,9 +62,11 @@ void slInitBoundSort(slVclipData *d) {
 */
 
 void slAddCollisionCandidate(slVclipData *vc, slPairFlags flags, int x, int y) {
-	if(!(flags & BT_CHECK)) return;
-
 	slCollisionCandidate c;
+
+	if(flags & BT_UNKNOWN) slVclipDataInitPairFlags(vc->world, x, y);
+
+	if(!(flags & BT_CHECK)) return;
 
 	c.x = x; 
 	c.y = y;
@@ -282,26 +284,11 @@ void slInitBoundSortList(std::vector<slBoundSort*> &list, unsigned int size, slV
 	slPairFlags *flags;
 
 	int finished;
-	
+
 	std::sort(list.begin(), list.end(), slBoundSortCompare);
-	// slIsort(v, list, size, boundTypeFlag);
 
 	/* zero out this entry for all pairs */
 
-	for(n=0;n<v->count;n++) {
-		for(extend=n+1;extend < v->count;extend++) {
-			flags = slVclipPairFlags(v->pairList, extend, n);
-			
-			if(*flags & boundTypeFlag) {
-				if(slVclipFlagsShouldTest(*flags))  slRemoveCollisionCandidate(v, extend, n);
-
-				*flags ^= boundTypeFlag;
-			}
-		}
-	}
-
-	if(v->candidates.size() != 0) slDebug("%d candidates remaining\n", v->candidates.size());
-	
 	for(n=0;n<size;n++) {
 		if(list[n]->type == BT_MIN) {
 			extend = n+1;

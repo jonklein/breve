@@ -298,7 +298,6 @@ void slLinkUpdatePositions(slLink *l) {
 
 int slLinkCheckSelfPenetration(slWorld *world, slLink *l) {
 	slVclipData *vc;
-	int x, y;
 	std::vector<slLink*> links;
 	std::vector<slLink*>::iterator li;
 
@@ -312,10 +311,10 @@ int slLinkCheckSelfPenetration(slWorld *world, slLink *l) {
 
 		if(l != link2) {
 			slCollisionCandidate c;
-			slPairFlags *flags = slVclipPairFlags(vc->pairList, x, y);
+			slPairFlags *flags = slVclipPairFlags(vc->pairList, l->clipNumber, link2->clipNumber);
 
-			c.x = x;
-			c.y = y;
+			c.x = l->clipNumber;
+			c.y = link2->clipNumber;
 
 			if((slVclipFlagsShouldTest(*flags)) && slVclipTestPair(vc, &c, NULL)) {
 				return 1;
