@@ -354,7 +354,7 @@ brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
 	return i;
 }
 
-brInstance *brEngineInstantiate(brEngine *e, brObject *o, brEval **args, int argCount) {
+brInstance *brObjectInstantiate(brEngine *e, brObject *o, brEval **args, int argCount) {
 	return brEngineAddInstance(e, o, o->type->instantiate(o, args, argCount));
 }
 

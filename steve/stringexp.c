@@ -267,9 +267,7 @@ void stFreeStringExp(stStringExp *s) {
 char *stFormatEvaluation(brEval *e, stInstance *i) {
 	char *r;
 
-	stConvertSteveInstanceToBreveInstance(e);
 	r = brFormatEvaluation(e, i->breveInstance);
-	stConvertBreveInstanceToSteveInstance(e);
 
 	return r;
 }

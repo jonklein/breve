@@ -208,6 +208,6 @@ int stIsSubclassOf(stObject *a, stObject *o);
 void stAddToInstanceLists(stInstance *i);
 void stRemoveFromInstanceLists(stInstance *i);
 
-stInstance *stInstanceCreateAndRegister(brEngine *engine, brObject *object);
+brInstance *stInstanceCreateAndRegister(brEngine *engine, brObject *object);
 
 void stObjectFreeAllInstances(stObject *o);

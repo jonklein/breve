@@ -86,11 +86,11 @@ stObject *stObjectNew(brEngine *engine, stSteveData *sdata, char *name, char *al
 	This method also fills in the "breveInstance" pointer in the steve object.
 */
 
-stInstance *stInstanceCreateAndRegister(brEngine *e, brObject *object) {
+brInstance *stInstanceCreateAndRegister(brEngine *e, brObject *object) {
 	stInstance *newi = NULL;
 	brInstance *bi;
 
-	bi = brEngineInstantiate(e, object, NULL, 0);
+	bi = brObjectInstantiate(e, object, NULL, 0);
 
 	if(bi->object->type == &gSteveData->steveObjectType) {
 		newi = bi->pointer;
@@ -98,7 +98,7 @@ stInstance *stInstanceCreateAndRegister(brEngine *e, brObject *object) {
 		stInstanceInit(newi);
 	}
 
-	return newi;
+	return bi;
 }
 
 /*!

@@ -362,6 +362,7 @@ int stLoadVariable(void *variable, unsigned char type, brEval *e, stRunInstance 
 */
 
 int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e, stRunInstance *i) {
+	stInstance *instance;
 	int result;
 	int noRetain = 0;
 	char *newstr;
@@ -375,9 +376,11 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 			stEvalError(i->instance->type->engine, EE_TYPE, "Cannot locate class named \"%s\" in assignment expression\n", otype->name);
 			return EC_ERROR;
 		}
-	 
-		if(!stIsSubclassOf(STINSTANCE(e)->type, otype)) {
-			stEvalError(i->instance->type->engine, EE_TYPE, "Cannot assign instance of class \"%s\" to variable of class \"%s\"\n", STINSTANCE(e)->type->name, otype->name);
+
+		instance = BRINSTANCE(e)->pointer;
+		
+		if(!stIsSubclassOf(instance->type, otype)) {
+			stEvalError(i->instance->type->engine, EE_TYPE, "Cannot assign instance of class \"%s\" to variable of class \"%s\"\n", instance->type->name, otype->name);
 			return EC_ERROR;
 		}
 	}
@@ -402,7 +405,7 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 			slMatrixCopy(BRMATRIX(e), (double**)variable);
 			break;
 		case AT_INSTANCE:
-			*(stInstance**)variable = STINSTANCE(e);
+			*(brInstance**)variable = BRINSTANCE(e);
 			break;
 		case AT_DATA:
 			// overwriting an old data variable
@@ -540,8 +543,8 @@ inline int stEvalTruth(brEval *e, brEval *t, stRunInstance *i) {
 			return EC_OK;
 			break;
 		case AT_INSTANCE:
-			if(STINSTANCE(e) && (STINSTANCE(e))->status != AS_ACTIVE) BRINT(t) = 0;
-			else BRINT(t) = (STINSTANCE(e) != 0x0);
+			if(BRINSTANCE(e) && (BRINSTANCE(e))->status != AS_ACTIVE) BRINT(t) = 0;
+			else BRINT(t) = (BRINSTANCE(e) != 0x0);
 
 			return EC_OK;
 			break;
@@ -592,35 +595,35 @@ inline int stEvalFree(stExp *s, stRunInstance *i, brEval *t) {
 	if(result != EC_OK) return EC_ERROR;
 
 	if(target.type == AT_INSTANCE) {
-		if(!STINSTANCE(&target)) {
+		if(!BRINSTANCE(&target)) {
 			slMessage(DEBUG_ALL, "warning: attempt to free uninitialized object\n");
 			return EC_OK;
 		}
 
-		if(STINSTANCE(&target)->status == AS_ACTIVE) stInstanceFree(STINSTANCE(&target));
+		if(BRINSTANCE(&target)->status == AS_ACTIVE) brInstanceFree(BRINSTANCE(&target));
 		else {
-			slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", STINSTANCE(&target));
+			slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", BRINSTANCE(&target));
 		}
 
 		// if we're freeing ourself (the calling instance) then we will return EC_STOP
 
-		if(STINSTANCE(&target) == i->instance) finished = 1;
+		if(BRINSTANCE(&target)->pointer == i->instance) finished = 1;
 	} else if(target.type == AT_LIST) {
 		list = (BRLIST(&target))->start;
 
 		while(list) {
 			if(list->eval.type == AT_INSTANCE) {
-				if(!STINSTANCE(&list->eval)) slMessage(DEBUG_ALL, "warning: attempt to free uninitialized object\n");
+				if(!BRINSTANCE(&list->eval)) slMessage(DEBUG_ALL, "warning: attempt to free uninitialized object\n");
 				else {
-					if(STINSTANCE(&list->eval)->status == AS_ACTIVE) stInstanceFree(STINSTANCE(&list->eval));
+					if(BRINSTANCE(&list->eval)->status == AS_ACTIVE) brInstanceFree(BRINSTANCE(&list->eval));
 					else {
-						slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", STINSTANCE(&list->eval));
+						slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", BRINSTANCE(&list->eval));
 						slMessage(DEBUG_ALL, "... error in file \"%s\" at line %d\n", s->file, s->line);
 					}
 
 					// if we're freeing ourself (the calling instance) then we will return EC_STOP
 
-					if(STINSTANCE(&list->eval) == i->instance) finished = 1;
+					if(BRINSTANCE(&list->eval)->pointer == i->instance) finished = 1;
 				}
 			}
 
@@ -725,7 +728,7 @@ inline int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) {
 	if(r != EC_OK) return r;
 
 	if(obj.type == AT_INSTANCE) {
-		ri.instance = STINSTANCE(&obj);
+		ri.instance = BRINSTANCE(&obj)->pointer;
 
 		if(!ri.instance) {
 			stEvalError(i->type->engine, EE_NULL_INSTANCE, "method \"%s\" called with uninitialized object", mexp->methodName);
@@ -743,7 +746,7 @@ inline int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) {
 		brEvalList *listStart = BRLIST(&obj)->start;
 
 		while(listStart) {
-			ri.instance = STINSTANCE(&listStart->eval);
+			ri.instance = BRINSTANCE(&listStart->eval)->pointer;
 			ri.type = ri.instance->type;
 
 			r = stRealEvalMethodCall(mexp, &ri, i, t);
@@ -1201,7 +1204,8 @@ inline int stEvalAll(stAllExp *e, stRunInstance *i, brEval *target) {
 	instance.type = AT_INSTANCE;
 
 	while(l) {
-		STINSTANCE(&instance) = l->data;
+		stInstance *i = l->data;
+		BRINSTANCE(&instance) = i->breveInstance;
 		brEvalListInsert(BRLIST(target), 0, &instance);
 		l = l->next;
 	}
@@ -1451,9 +1455,6 @@ inline int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *target) {
 
 		}
 
-		if(c->function->argtypes[n] == AT_INSTANCE && STINSTANCE(&e[n]))
-			BRINSTANCE(&e[n]) = STINSTANCE(&e[n])->breveInstance;
-
 		if(result != EC_OK) {
 			stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"%s\" for argument #%d to internal method \"%s\", got type \"%s\"", slAtomicTypeStrings[c->function->argtypes[n]], n + 1, c->function->name, slAtomicTypeStrings[e[n].type]);
 			return result;
@@ -1471,8 +1472,6 @@ inline int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *target) {
 	// special case--if the define type is undefined, any type may be returned. */
 
 	if(c->function->rtype != AT_UNDEFINED) target->type = c->function->rtype;
-
-	stConvertBreveInstanceToSteveInstance(target);
 
 	stGCMark(i->instance, target);
 
@@ -2454,17 +2453,17 @@ inline int stEvalNewInstance(stInstanceExp *ie, stRunInstance *i, brEval *t) {
 	if(BRINT(&count) == 1) {
 		t->type = AT_INSTANCE;
 
-		STINSTANCE(t) = stInstanceCreateAndRegister(i->instance->type->engine, object);
+		BRINSTANCE(t) = stInstanceCreateAndRegister(i->instance->type->engine, object);
 
-		if(STINSTANCE(t) == NULL) return EC_ERROR_HANDLED;
+		if(BRINSTANCE(t) == NULL) return EC_ERROR_HANDLED;
 	} else {
 		listItem.type = AT_INSTANCE;
 		list = brEvalListNew();
 
 		for(n=0;n<BRINT(&count);n++) {
-			STINSTANCE(&listItem) = stInstanceCreateAndRegister(i->instance->type->engine, object);
+			BRINSTANCE(&listItem) = stInstanceCreateAndRegister(i->instance->type->engine, object);
 
-			if(STINSTANCE(&listItem) == NULL) return EC_ERROR_HANDLED;
+			if(BRINSTANCE(&listItem) == NULL) return EC_ERROR_HANDLED;
 
 			brEvalListInsert(list, 0, &listItem);
 		}
@@ -2560,12 +2559,12 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *target, stObject **tClass) {
 			break;
 		case ET_SUPER:
 			target->type = AT_INSTANCE;
-			STINSTANCE(target) = i->instance;
+			BRINSTANCE(target) = i->instance->breveInstance;
 			*tClass = i->type->super;
 			break;
 		case ET_SELF:
 			target->type = AT_INSTANCE;
-			STINSTANCE(target) = i->instance;
+			BRINSTANCE(target) = i->instance->breveInstance;
 			break;
 		case ET_IF:
 			result = stEvalIf(s->values.pValue, i, target);
@@ -2819,56 +2818,6 @@ int stEvalBinaryEvalListExp(char op, brEval *l, brEval *r, brEval *target, stRun
     }
 
     return EC_OK;
-}
-
-/*!
-	\brief Convert breveInstances to stInstsances using the pointer field.
-
-	Sigh.  The breveObjectAPI gives a great deal of freedom when it comes to porting the
-	breve engine to other languages, but it requires this ugliness of converting between
-	steve objects and breve objects.
-*/
-
-void stConvertBreveInstanceToSteveInstance(brEval *e) {
-	if(e->type == AT_INSTANCE) {
-		if(BRINSTANCE(e)) STINSTANCE(e) = BRINSTANCE(e)->pointer;
-	}
-
-	if(e->type == AT_LIST) {
-		brEvalListHead *head = BRLIST(e);
-		brEvalList *l;
-
-		l = head->start;
-
-		while(l) {
-			stConvertBreveInstanceToSteveInstance(&l->eval);
-			l = l->next;
-		}
-	}
-}
-
-/*!
-	\brief Convert stInstances to brInstsances using the breveInstance field.
-
-	Once again, not something to be proud of.
-*/
-
-void stConvertSteveInstanceToBreveInstance(brEval *e) {
-	if(e->type == AT_INSTANCE) {
-		if(STINSTANCE(e)) BRINSTANCE(e) = STINSTANCE(e)->breveInstance;
-	}
-
-	if(e->type == AT_LIST) {
-		brEvalListHead *head = BRLIST(e);
-		brEvalList *l;
-
-		l = head->start;
-
-		while(l) {
-			stConvertSteveInstanceToBreveInstance(&l->eval);
-			l = l->next;
-		}
-	}
 }
 
 /*!

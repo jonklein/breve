@@ -46,16 +46,7 @@ int stCallMethodBreveCallback(brInstance *i, brMethod *method, brEval **argument
 	ri.instance = i->pointer;
 	ri.type = ri.instance->type;
 
-	for(n=0;n<method->argumentCount;n++) {
-		if(arguments[n]->type == AT_INSTANCE) {
-			if(BRINSTANCE(arguments[n])) STINSTANCE(arguments[n]) = BRINSTANCE(arguments[n])->pointer;
-		}
-	}
-
 	r = stCallMethod(&ri, &ri, method->pointer, arguments, method->argumentCount, result);
-
-	if(result->type == AT_INSTANCE) 
-		if(STINSTANCE(result)) BRINSTANCE(result) = STINSTANCE(result)->breveInstance;
 
 	return r;
 }

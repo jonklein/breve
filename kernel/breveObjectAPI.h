@@ -145,7 +145,7 @@ int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, int cou
 brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *pointer);
 void brEngineAddObjectAlias(brEngine *e, char *name, brObject *o);
 brInstance *brEngineAddInstance(brEngine *e, brObject *o, void *pointer);
-brInstance *brEngineInstantiate(brEngine *e, brObject *o, brEval **args, int argCount);
+brInstance *brObjectInstantiate(brEngine *e, brObject *o, brEval **args, int argCount);
 void brEngineRemoveInstance(brEngine *e, brInstance *i);
 
 int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *name);
