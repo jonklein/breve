@@ -19,36 +19,22 @@
  *****************************************************************************/
 
 /*
-	+ breve.c
+	+ breve_cli.cc
 	= this is a hack-ish wrapper around the breve engine for a command line
 	= based GLUT version of breve.  
 */
 
 #define OSMESA_WINDOW_SIZE 300
 
-#include <stdio.h>
-#include <signal.h>
-
 #include "steve.h"
 
+#include <signal.h>
+
 #include "breve.h"
-
 #include "glIncludes.h"
-
-#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
-
-#ifndef MAXPATHLEN
-#define MAXPATHLEN 10240
-#endif
-
-#define MAXLINE 10240
 
 double gNotify = 40.0;
 double gSimMax = 0.0;
-
-void brCatchSignal(int signal);
 
 char *gSimFile;
 
@@ -62,6 +48,7 @@ extern char *interfaceID;
 breveFrontend *frontend;
 
 int activateContext(void);
+void brCatchSignal(int);
 void renderContext(slWorld *, slCamera *);
 
 int main(int argc, char **argv) {
@@ -70,7 +57,7 @@ int main(int argc, char **argv) {
 	double nextNotify;
 	char wd[MAXPATHLEN];
 
-#ifdef MINGW
+#if MINGW
 	pthread_win32_process_attach_np();
 #endif
 
@@ -89,10 +76,8 @@ int main(int argc, char **argv) {
 	argc -= index;
 	argv += index;
 
-	if((argc) < 2) {
+	if (argc < 2)
 		brPrintUsage(argv[0]);
-		exit(1);
-	}
 
 	signal(SIGINT, brCatchSignal);
 
@@ -112,11 +97,11 @@ int main(int argc, char **argv) {
 	frontend->engine->dialogCallback = brCLIDialogCallback;
 	frontend->engine->interfaceTypeCallback = interfaceVersionCallback;
 
-#ifdef HAVE_LIBOSMESA
+#if HAVE_LIBOSMESA
 	frontend->engine->osBuffer = (GLubyte *)slMalloc(OSMESA_WINDOW_SIZE * OSMESA_WINDOW_SIZE * 4 * sizeof(GLubyte));
 	frontend->engine->osContext = OSMesaCreateContext(OSMESA_RGBA, NULL);
 
-	if(!OSMesaMakeCurrent(frontend->engine->osContext, frontend->engine->osBuffer, GL_UNSIGNED_BYTE, OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE)) 
+	if (!OSMesaMakeCurrent(frontend->engine->osContext, frontend->engine->osBuffer, GL_UNSIGNED_BYTE, OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE)) 
 		slMessage(DEBUG_ALL, "Could not activate offscreen rendering context\n");
 
 	slInitGL(frontend->engine->world, frontend->engine->camera);
@@ -127,65 +112,60 @@ int main(int argc, char **argv) {
 
 	text = slUtilReadFile(argv[1]);
 
-	if(!text) {
+	if (!text) {
 		fprintf(stderr, "Error reading file \"%s\"\n", argv[1]);
 		exit(1);
 	}
 
-	if(gSimFile) {
-		if(breveFrontendLoadSavedSimulation(frontend, text, argv[1], gSimFile) != EC_OK) {
-			slFree(text);
-			slFree(gSimFile);
+	if (gSimFile) {
+		if (breveFrontendLoadSavedSimulation(frontend, text, argv[1], gSimFile) != EC_OK)
 			brQuit(frontend->engine);
-		}
-
-		slFree(gSimFile);
-	} else {
-		if(breveFrontendLoadSimulation(frontend, text, argv[1]) != EC_OK) {
-			slFree(text);
+	} else if(breveFrontendLoadSimulation(frontend, text, argv[1]) != EC_OK)
 			brQuit(frontend->engine);
-		}
-	}
 
 	slFree(text);
 
 	nextNotify = gNotify;
 
-	if(gMaster) slWorldStartNetsimServer(frontend->engine->world);
+	if (gMaster)
+		slWorldStartNetsimServer(frontend->engine->world);
 
-	if(gSlave) {
+	if (gSlave) {
 		slWorldStartNetsimSlave(frontend->engine->world, gSlaveHost);
 		slFree(gSlaveHost);
 	}
 
-	while(!gShouldQuit && brEngineIterate(frontend->engine) == EC_OK) {
-		if(gNotify && slWorldGetAge(frontend->engine->world) > nextNotify) {
-			printf("%f seconds elapsed\n", slWorldGetAge(frontend->engine->world));
+	while (!gShouldQuit && brEngineIterate(frontend->engine) == EC_OK) {
+		if (gNotify &&
+		    slWorldGetAge(frontend->engine->world) > nextNotify) {
+			printf("%f seconds elapsed\n",
+			    slWorldGetAge(frontend->engine->world));
 			nextNotify += gNotify;
 		}
 
-		if(gSimMax > 0.0 && slWorldGetAge(frontend->engine->world) >= gSimMax) {
+		if (gSimMax > 0.0 &&
+		    slWorldGetAge(frontend->engine->world) >= gSimMax) {
 			printf("%f simulation seconds completed\n", gSimMax);
 			brQuit(frontend->engine);
 		}
 
-#ifdef HAVE_LIBOSMESA
-		if(slWorldGetLightExposureDetection(frontend->engine->world)) 
-			slDetectLightExposure(frontend->engine->world, frontend->engine->camera, OSMESA_WINDOW_SIZE, frontend->engine->osBuffer);
+#if HAVE_LIBOSMESA
+		if (slWorldGetLightExposureDetection(frontend->engine->world)) 
+			slDetectLightExposure(frontend->engine->world,
+			    frontend->engine->camera, OSMESA_WINDOW_SIZE,
+			    frontend->engine->osBuffer);
 #endif
 	}
 
 	brQuit(frontend->engine);
-
-	return 0;
 }
 
 void brCatchSignal(int signal) {
-	char *line;
-	char staticLine[MAXLINE];
 	static int waiting = 0;
+	char *line, staticLine[10240];
 
-	if(waiting) return;
+	if (waiting)
+		return;
 
 	waiting = 1;
 
@@ -194,30 +174,32 @@ void brCatchSignal(int signal) {
 	printf("\n\nSimulation interupted.  Type a steve command, 'x' to quit, or hit enter to continue\n");
 	fflush(stdout);
 
-#if defined(HAVE_LIBREADLINE) && defined(HAVE_LIBHISTORY)
+#if HAVE_LIBREADLINE && HAVE_LIBHISTORY
 	line = readline("breve> ");
-	if(*line) add_history(line);
+	if (line && *line)
+		add_history(line);
 #else 
 	printf("breve> ");
 	fflush(stdout);
-	line = fgets(staticLine, MAXLINE, stdin);
+	line = fgets(staticLine, sizeof(staticLine), stdin);
 #endif
 
-	if(*line && line[0] == 'x') {
+	if (!line || *line == 'x') {
 		brUnpauseTimer(frontend->engine);
 		gShouldQuit = 1;
 		waiting = 0;
 		return;
 	}
 
-	if(*line && line[0] == '\n') {
+	if (*line == '\n') {
 		waiting = 0;
 		return;
 	}
 
-	if(line) stRunSingleStatement((stSteveData*)frontend->data, frontend->engine, line);
+	stRunSingleStatement((stSteveData *)frontend->data, frontend->engine, line);
 
-	if(line && line != staticLine) free(line);
+	if (line != staticLine)
+		free(line);
 
 	brUnpauseTimer(frontend->engine);
 
@@ -225,57 +207,60 @@ void brCatchSignal(int signal) {
 }
 
 int brParseArgs(int argc, char **argv) {
-	int r, error = 0;
-	int level;
+	int level, r;
+	int error = 0;
 
-#ifdef MACOSX
-	// Mac OS X 10.2.8 doesn't seem to have getopt_long
-	while((r = getopt(argc, argv, "t:d:r:f:n:a:vhmS:M")) != EOF) {
+	const char *optstring = "a:d:hn:r:t:vMS:";
+
+#if HAVE_GETOPT_LONG
+	while((r = getopt_long(argc, argv, optstring, gCLIOptions, NULL)) != -1)
 #else 
-	while((r = getopt_long(argc, argv, "t:d:r:f:n:a:vhmS:M", gCLIOptions, NULL)) != EOF) {
+	while((r = getopt(argc, argv, optstring)) != -1) {
 #endif
+	{
 		switch(r) {
-			case 'd':
-				level = atoi(optarg);
-				printf("debug level: %d\n", level);
-				slSetDebugLevel(level);
-				break;
-			case 'r':
-				srandom(atoi(optarg));
-				printf("random seed: %d\n", atoi(optarg));
-				break;
-			case 'n':
-				gNotify = atof(optarg);
-				if(gNotify) printf("Notification every %f seconds\n", gNotify);
-				else printf("Notifications disabled\n");
-				break;
-			case 't':
-				gSimMax = atof(optarg);
-				printf("running for %f seconds\n", gSimMax);
-				break;
-			case 'a':
-				gSimFile = slStrdup(optarg);
-				break;
-			case 'h':
-				brPrintUsage(argv[0]);
-				break;
-			case 'v':
-				brPrintVersion();
-				break;
-			case 'S':
-				gSlaveHost = slStrdup(optarg);
-				gSlave = 1;
-				break;
-			case 'M':
-				gMaster = 1;
-				break;
-			default:
-				printf("unknown option: '%c'\n", r);
-				error++;
+		case 'a':
+			gSimFile = slStrdup(optarg);
+			break;
+		case 'd':
+			level = atoi(optarg);
+			printf("debug level: %d\n", level);
+			slSetDebugLevel(level);
+			break;
+		case 'n':
+			gNotify = atof(optarg);
+			if (gNotify)
+				printf("Notification every %f seconds\n", gNotify);
+			else
+				printf("Notifications disabled\n");
+			break;
+		case 'r':
+			srandom(atoi(optarg));
+			printf("random seed: %d\n", atoi(optarg));
+			break;
+		case 't':
+			gSimMax = atof(optarg);
+			printf("running for %f seconds\n", gSimMax);
+			break;
+		case 'v':
+			brPrintVersion();
+			break;
+		case 'M':
+			gMaster = 1;
+			break;
+		case 'S':
+			gSlaveHost = slStrdup(optarg);
+			gSlave = 1;
+			break;
+		default:
+			printf("unknown option: '%c'\n", r);
+		case 'h':
+			error++;
 		}
 	}
 
-	if(error) brPrintUsage(argv[0]);
+	if (error)
+		brPrintUsage(argv[0]);
 
 	return optind - 1;
 }
@@ -307,7 +292,7 @@ void brQuit(brEngine *e) {
 
 	age = slWorldGetAge(e->world);
 
-	if(age != 0.0) {
+	if (age != 0.0) {
 		printf("%f simulated seconds elapsed\n", age);
 		printf("%f real seconds elapsed\n", diff);
 		printf("%f simulated/real\n", age/diff);
@@ -317,30 +302,27 @@ void brQuit(brEngine *e) {
 	breveFrontendCleanupData(frontend->data);
 	breveFrontendDestroy(frontend);
 
-#ifdef MEMORY_DEBUG
-	slMemoryReport();
-	slUtilMemoryUnfreed();
-#endif
 	exit(0);
 }
 
 int brCLIDialogCallback(char *title, char *message, char *b1, char *b2) {
 	int result;
 
-	while (1) {
+	for (;;) {
 		printf("%s\n\n%s\n[Y/N]? ", title, message);
 
-		result = getc(stdin);
-		getc(stdin);
+		result = getchar();
+		(void)getchar();
 
-		if(result == EOF) {
-			printf("EOF found, assuming answer is N\n");
-			return 0; 
+		switch(result) {
+		case EOF:
+		case 'n':
+		case 'N':
+			return 0;
+		case 'y':
+		case 'Y':
+			return 1;
 		}
-
-		if(result == 'n' || result == 'N') return 0;
-
-		if(result == 'y' || result == 'Y') return 1;
 	} 
 }
 
@@ -349,24 +331,32 @@ char *interfaceVersionCallback() {
 }
 
 char *getSavename() {
-	char *name = (char*)slMalloc(1024);
+	char name[MAXPATHLEN];
+
 	printf("filename to save: ");
-	fgets(name, 1023, stdin);
-	if(strlen(name) > 0) name[strlen(name) - 1] = 0;
-	return name;
+	fgets(name, sizeof(name), stdin);
+
+	if (*name)
+		name[strlen(name) - 1] = '\0';
+
+	return slStrdup(name);
 }
 
 char *getLoadname() {
-	char *name = (char*)slMalloc(1024);
+	char name[MAXPATHLEN];
+
 	printf("filename to load: ");
-	fgets(name, 1023, stdin);
-	if(strlen(name) > 0) name[strlen(name) - 1] = 0;
-	return name;
+	fgets(name, sizeof(name), stdin);
+
+	if (*name)
+		name[strlen(name) - 1] = 0;
+
+	return slStrdup(name);
 }
 
 int activateContext() {
-#ifdef HAVE_LIBOSMESA
-	if(!OSMesaMakeCurrent(frontend->engine->osContext, frontend->engine->osBuffer, GL_UNSIGNED_BYTE, OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE)) {
+#if HAVE_LIBOSMESA
+	if (!OSMesaMakeCurrent(frontend->engine->osContext, frontend->engine->osBuffer, GL_UNSIGNED_BYTE, OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE)) {
 		slMessage(DEBUG_ALL, "Could not activate offscreen rendering context\n");
 		return -1;
 	}
@@ -378,7 +368,7 @@ int activateContext() {
 }
 
 void renderContext(slWorld *w, slCamera *c) {
-#ifdef HAVE_LIBOSMESA
+#if HAVE_LIBOSMESA
 	slRenderScene(w, c, 0);
 #endif
 }

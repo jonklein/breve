@@ -155,7 +155,7 @@ AC_SUBST(VERSION)
 AC_SUBST(EXTRAOPTFLAGS)
 
 AC_HEADER_TIME
-AC_CHECK_HEADERS([sys/time.h wctype.h])
+AC_CHECK_HEADERS([sys/param.h sys/time.h wctype.h])
 
 AC_C_CONST
 AC_C_INLINE
@@ -231,7 +231,7 @@ AC_CHECK_LIB([gsl], [gsl_rng_alloc])
 AC_CHECK_LIB([avcodec], [avcodec_init])
 AC_CHECK_LIB([OSMesa], [OSMesaCreateContext])
 
-AC_CHECK_FUNCS([gettimeofday iswspace mkstemp strdup vasprintf])
+AC_CHECK_FUNCS([getopt_long gettimeofday iswspace mkstemp strdup vasprintf])
 
 AC_MSG_CHECKING([for JVM library])
 

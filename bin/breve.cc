@@ -28,12 +28,12 @@
 #include "steve.h"
 #include "breve.h"
 
-#ifdef MINGW
+#if MINGW
 extern char *optarg;
 extern int optind;
 #endif
 
-extern char *interfaceID;
+extern char *interfaceID, **gErrorNames;
 
 extern int gPaused;
 
@@ -49,16 +49,14 @@ int xpos = 0, ypos = 0;
 
 brInstance *gSelected = NULL;
 
-extern char *gErrorNames[];
-
 char keyDown[256];
 
-void *workerThread(void *data);
+void *workerThread(void *);
 
-void brInterrupt(brEngine *engine);
-void *newWindowCallback(char *name, void *graph);
-void freeWindowCallback(void *w);
-void renderWindowCallback(void *w);
+void brInterrupt(brEngine *);
+void *newWindowCallback(char *, void *);
+void freeWindowCallback(void *);
+void renderWindowCallback(void *);
 
 void graphDisplay();
 
@@ -74,8 +72,7 @@ int gThreadRunning = 0;
 int gOptionFull = 0;
 int gOptionFormat = 0;
 int gOptionStdin = 0;
-char *gOptionArchiveFile;
-
+char *gOptionArchiveFile = NULL;
 
 breveFrontend *frontend;
 
@@ -88,28 +85,23 @@ int gPaused = 1;
 
 int gMotionCrosshair = 0;
 
-// int gFrameNo, gRecording;
-
 int main(int argc, char **argv) {
-	char wd[10240];
 	pthread_t thread;
 	int index;
-	int n;
 	char *text, *simulationFile;
+	char wd[MAXPATHLEN];
 
 	interfaceID = "glut/2.0";
 
 	srandom(time(NULL));
 
-#ifdef MINGW
+#if MINGW
 	pthread_win32_process_attach_np();
 #endif
 
 	pthread_mutex_init(&gEngineMutex, NULL);
 	pthread_mutex_init(&gThreadMutex, NULL);
 	pthread_cond_init(&gThreadPaused, NULL);
-
-	gOptionArchiveFile = NULL;
 
 	/* parse the command line args. */
 
@@ -120,11 +112,10 @@ int main(int argc, char **argv) {
 	argc -= index;
 	argv += index;
 
-	if(argc < 2 && !gOptionStdin) {
-		brPrintUsage(argv[0]);
-	}
+	if (!gOptionStdin) {
+		if (argc < 2)
+			brPrintUsage(argv[0]);
 
-	if(!gOptionStdin) {
 		text = slUtilReadFile(argv[1]);
 		simulationFile = argv[1];
 	} else {
@@ -132,12 +123,12 @@ int main(int argc, char **argv) {
 		simulationFile = "<stdin>";
 	}
 
-	if(!text) {
+	if (!text) {
 		printf("Error reading file \"%s\": %s\n", simulationFile, strerror(errno));
 		exit(1);
 	}
 
-	if(gOptionFormat) {
+	if (gOptionFormat) {
 		char *newtext = slFormatText(text);
 		slUtilWriteFile(simulationFile, newtext);
 		slFree(newtext);
@@ -147,7 +138,7 @@ int main(int argc, char **argv) {
 	frontend = breveFrontendInit(argc, argv);
 	frontend->data = breveFrontendInitData(frontend->engine);
 
-	brEngineSetIOPath(frontend->engine, getcwd(wd, 10239));
+	brEngineSetIOPath(frontend->engine, getcwd(wd, sizeof(wd)));
 
 	frontend->engine->argc = argc - 1;
 	frontend->engine->argv = argv + 1;
@@ -164,39 +155,33 @@ int main(int argc, char **argv) {
 
 	slInitGlut(argc, argv, simulationFile);
 
-	if(gOptionArchiveFile) {
-		if(breveFrontendLoadSavedSimulation(frontend, text, simulationFile, gOptionArchiveFile) != EC_OK) {
-			slFree(text);
-			slFree(gOptionArchiveFile);
+	if (gOptionArchiveFile) {
+		if (breveFrontendLoadSavedSimulation(frontend, text,
+		    simulationFile, gOptionArchiveFile) != EC_OK)
 			brQuit(frontend->engine);
-		}
-
-		slFree(gOptionArchiveFile);
-	} else {
-		if(breveFrontendLoadSimulation(frontend, text, simulationFile) != EC_OK) {
-			slFree(text);
-			brQuit(frontend->engine);
-		}
-
-	}
+	} else if (breveFrontendLoadSimulation(frontend, text, simulationFile)
+		    != EC_OK)
+		brQuit(frontend->engine);
 
 	slFree(text);
 
 	brEngineSetUpdateMenuCallback(frontend->engine, brGlutMenuUpdate);
 
-	for(n=0;n<256;n++) keyDown[n] = 0;
+	memset(keyDown, 0, sizeof(keyDown));
 
 	pthread_mutex_lock(&gThreadMutex);
 	pthread_create(&thread, NULL, workerThread, NULL);
 
-	if(gMaster) slWorldStartNetsimServer(frontend->engine->world);
+	if (gMaster)
+		slWorldStartNetsimServer(frontend->engine->world);
 
-	if(gSlave) {
+	if (gSlave) {
 		slWorldStartNetsimSlave(frontend->engine->world, gSlaveHost);
 		slFree(gSlaveHost);
 	}
 
-	if(gOptionFull) glutFullScreen();
+	if (gOptionFull)
+		glutFullScreen();
 
 	glutMainLoop();
 
@@ -209,8 +194,8 @@ void *workerThread(void *data) {
 	while(1) {
 		pthread_mutex_lock(&gThreadMutex);
 
-		if((!gPaused && !frontend->engine->drawEveryFrame) ||
-		   !pthread_cond_wait(&gThreadPaused, &gThreadMutex)) {
+		if ((!gPaused && !frontend->engine->drawEveryFrame) ||
+		    !pthread_cond_wait(&gThreadPaused, &gThreadMutex)) {
    		 	if (gThreadShouldExit ||
 			    brEngineIterate(frontend->engine) != EC_OK) {
 				brQuit(frontend->engine);
@@ -223,23 +208,22 @@ void *workerThread(void *data) {
 	}
 }
 
-void brGlutLoop() {
+void brGlutLoop(void) {
 	static int oldD = 1;
 	int newD = frontend->engine->drawEveryFrame;
 
 	gWaiting = 0;
 
-	if(!gPaused) {
-		if(newD && brEngineIterate(frontend->engine) != EC_OK)
+	if (!gPaused) {
+		if (newD && brEngineIterate(frontend->engine) != EC_OK)
 			brQuit(frontend->engine);
 
 		glutPostRedisplay();
 
-		if(!newD && oldD) {
+		if (!newD && oldD) {
 			pthread_mutex_unlock(&gThreadMutex);
 			pthread_cond_signal(&gThreadPaused);
-		}
-		else if(newD && !oldD) 
+		} else if (newD && !oldD) 
 			pthread_mutex_lock(&gThreadMutex);
 
 		oldD = newD;
@@ -249,27 +233,29 @@ void brGlutLoop() {
 void brGlutMenuUpdate(brInstance *i) {
 	unsigned int n, total;
 
-	if(i != frontend->engine->controller) return;
+	if (i != frontend->engine->controller)
+		return;
 
 	glutSetMenu(mainMenu);
 
 	total = glutGet(GLUT_MENU_NUM_ITEMS);
 
-	for(n=0;n<total;n++) {
+	for(n = 0; n < total; ++n)
 		glutRemoveMenuItem(1);
-	}
 
-	for(n=0;n<i->menus->count;n++) {
+	for(n = 0; n < i->menus->count; ++n) {
 		brMenuEntry *menu;
 		char *message;
 
-		menu = (brMenuEntry*)i->menus->data[n];
+		menu = (brMenuEntry *)i->menus->data[n];
 
-		if(menu->enabled) {
+		if (menu->enabled) {
 			message = new char[strlen(menu->title) + 4];
 
-			if(menu->checked) sprintf(message, "* %s", menu->title);
-			else sprintf(message, "  %s", menu->title);
+			if (menu->checked)
+				sprintf(message, "* %s", menu->title);
+			else
+				sprintf(message, "  %s", menu->title);
 
 			glutAddMenuEntry(message, n);
 
@@ -283,7 +269,7 @@ void brGlutMenuUpdate(brInstance *i) {
 void brQuit(brEngine *e) {
 	double diff, age;
 
-	if(gThreadRunning && !gPaused && !frontend->engine->drawEveryFrame) {
+	if (gThreadRunning && !gPaused && !frontend->engine->drawEveryFrame) {
 		gThreadShouldExit = 1;
 		pthread_mutex_lock(&gThreadMutex);
 	}
@@ -294,7 +280,7 @@ void brQuit(brEngine *e) {
 
 	age = slWorldGetAge(e->world);
 
-	if(age != 0.0) {
+	if (age != 0.0) {
 		printf("%f simulated seconds elapsed\n", age);
 		printf("%f real seconds elapsed\n", diff);
 		printf("%f simulated/real\n", age/diff);
@@ -313,7 +299,9 @@ void brMainMenu(int n) {
 }
 
 void brContextMenu(int n) {
-	if(gSelected) brMenuCallback(frontend->engine, gSelected, n);
+	if (gSelected)
+		brMenuCallback(frontend->engine, gSelected, n);
+
 	glutPostRedisplay();
 }
 
@@ -326,91 +314,91 @@ void brClick(int n) {
 
 	total = glutGet(GLUT_MENU_NUM_ITEMS);
 
-	for(m=0;m<total;m++) 
+	for(m = 0; m < total; ++m) 
 		glutRemoveMenuItem(1);
 
-	if(gSelected) {
-		for(m=0;m<gSelected->menus->count;m++) {
-			brMenuEntry *menu = (brMenuEntry*)gSelected->menus->data[m];
+	if (gSelected) {
+		brMenuEntry *menu;
+
+		for(m = 0; m < gSelected->menus->count; ++m) {
+			menu = (brMenuEntry *)gSelected->menus->data[m];
 			glutAddMenuEntry(menu->title, m);
 		}
-
-		glutAttachMenu(GLUT_RIGHT_BUTTON);
-	} else {
+	} else
 		glutSetMenu(mainMenu);
-		glutAttachMenu(GLUT_RIGHT_BUTTON);
-	} 
+
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
 int brParseArgs(int argc, char **argv) {
-	int r, error = 0;
-	int level;
+	int level, r;
+	int error = 0;
 
-	const char *optstring = "s:t:d:r:f:n:a:vhmuS:M";
+	const char *optstring = "a:d:fhip:r:s:uvFMS:";
 
-#ifdef MACOSX
-	// Mac OS X 10.2.8 doesn't seem to have getopt_long
-	while((r = getopt(argc, argv, optstring)) != EOF) {
+#if HAVE_GETOPT_LONG
+	while((r = getopt_long(argc, argv, optstring, gCLIOptions, NULL)) != -1)
 #else 
-	while((r = getopt_long(argc, argv, optstring, gCLIOptions, NULL)) != EOF) {
+	while((r = getopt(argc, argv, optstring)) != -1)
 #endif
+	{
 		switch(r) {
-			case 'd':
-				level = atoi(optarg);
-				printf("debug level: %d\n", level);
-				slSetDebugLevel(level);
-				break;
-			case 'r':
-				srandom(atoi(optarg));
-				printf("random seed: %d\n", atoi(optarg));
-				break;
-			case 's':
-				sscanf(optarg, "%dx%d\n", &width, &height);
-				if(width <= 0 || width > 1000 || height <= 0 || height > 1000) {
-					printf("-s size flag must be in the form NxM, where N and M\n");
-					printf("are between 0 and 1000\n");
-					error++;
-				}
-				break;
-			case 'i':
-				gOptionStdin = 1;
-				break;
-			case 'a':
-				gOptionArchiveFile = slStrdup(optarg);
-				break;
-			case 'v':
-				brPrintVersion();
-				break;
-			case 'h':
-				brPrintUsage(argv[0]);
-				break;
-			case 'f':
-				gOptionFull = 1;
-				break;
-			case 'u':
-				gPaused = 0;
-				glutIdleFunc(brGlutLoop);
-				break;
-			case 'F':
-				gOptionFormat = 1;
-				break;
-			case 'p':
-				sscanf(optarg, "%d,%d", &xpos, &ypos);
-				break;
-			case 'S':
-				gSlaveHost = slStrdup(optarg);
-				gSlave = 1;
-				break;
-			case 'M':
-				gMaster = 1;
-				break;
-			default:
-				printf("unknown option: '%c'\n", r);
+		case 'a':
+			gOptionArchiveFile = slStrdup(optarg);
+			break;
+		case 'd':
+			level = atoi(optarg);
+			printf("debug level: %d\n", level);
+			slSetDebugLevel(level);
+			break;
+		case 'f':
+			gOptionFull = 1;
+			break;
+		case 'i':
+			gOptionStdin = 1;
+			break;
+		case 'p':
+			sscanf(optarg, "%d,%d", &xpos, &ypos);
+			break;
+		case 'r':
+			srandom(atoi(optarg));
+			printf("random seed: %d\n", atoi(optarg));
+			break;
+		case 's':
+			sscanf(optarg, "%dx%d\n", &width, &height);
+			if (width <= 0 || width > 1000 ||
+			    height <= 0 || height > 1000) {
+				printf("-s size flag must be in the form NxM, \
+				    where N and M are from 1 to 1000\n");
 				error++;
+			}
+			break;
+		case 'u':
+			gPaused = 0;
+			glutIdleFunc(brGlutLoop);
+			break;
+		case 'v':
+			brPrintVersion();
+			break;
+		case 'F':
+			gOptionFormat = 1;
+			break;
+		case 'M':
+			gMaster = 1;
+			break;
+		case 'S':
+			gSlaveHost = slStrdup(optarg);
+			gSlave = 1;
+			break;
+		default:
+			printf("unknown option: '%c'\n", r);
+		case 'h':
+			error++;
 		}
 	}
 
-	if(error) brPrintUsage(argv[0]);
+	if (error)
+		brPrintUsage(argv[0]);
 
 	return optind - 1;
 }
@@ -422,12 +410,12 @@ void brPrintUsage(char *name) {
 	fprintf(stderr, "  -a <xml_file>   Dearchive simulation from <xml_file>.  <xml_file> should be\n");
 	fprintf(stderr, "                  an archive of the simulation contained in the input file.\n");
 	fprintf(stderr, "  -f              Start breve in fullscreen mode.\n");
-	fprintf(stderr, "  -v              Display the current version number.\n");
-	fprintf(stderr, "  -h              Display this information.\n");
 	fprintf(stderr, "  -u              Unpause: begin running simulation immediately.\n");
 	fprintf(stderr, "  -F              Format the simulation file and quit.\n");
 	fprintf(stderr, "  -w X,Y          Move the window to coordinates (X, Y).\n");
 	fprintf(stderr, "  -s NxM          Create a window of size (N, M).\n");
+	fprintf(stderr, "  -v              Display the current version number.\n");
+	fprintf(stderr, "  -h              Display this information.\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "For full documentation, or to submit a bug report, visit the breve homepage:\n");
 	fprintf(stderr, "http://www.spiderland.org/breve\n\n");
@@ -441,7 +429,8 @@ void slInitGlut(int argc, char **argv, char *title) {
 	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH|GLUT_STENCIL);
 	glutCreateWindow(title);
 
-	if(xpos || ypos) glutInitWindowPosition(xpos, ypos);
+	if (xpos || ypos)
+		glutInitWindowPosition(xpos, ypos);
 
 	glutGetWindow();
 
@@ -466,9 +455,10 @@ void slInitGlut(int argc, char **argv, char *title) {
 }
 
 void slDemoReshape(int x, int y) {
-	frontend->engine->camera->x = x; frontend->engine->camera->y = y;
+	frontend->engine->camera->x = x;
+	frontend->engine->camera->y = y;
 
-	frontend->engine->camera->fov = (double)x/(double)y;
+	frontend->engine->camera->fov = x / (double)y;
 	glViewport(0, 0, x, y);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
@@ -484,7 +474,7 @@ void slDemoDisplay() {
 void slDemoMouse(int button, int state, int x, int y) {
 	gMods = glutGetModifiers();
 
-	if(state == GLUT_DOWN) { 
+	if (state == GLUT_DOWN) { 
 		gLastX = x;
 		gLastY = y;
 		gStartCamX = frontend->engine->camera->rx;
@@ -537,7 +527,8 @@ void slDemoSpecial(int key, int x, int y) {
 
 	switch(key) {
 		case GLUT_KEY_F1:
-			if(brEngineIterate(frontend->engine) != EC_OK) slFatal("engine iteration failed\n");
+			if (brEngineIterate(frontend->engine) != EC_OK)
+				slFatal("engine iteration failed\n");
 			break;
 		case GLUT_KEY_UP:
 			slDemoMotion(0, -10);
@@ -561,7 +552,8 @@ void slDemoSpecialUp(int key, int x, int y) {
 }
 
 void slDemoKeyboard(unsigned char key, int x, int y) {
-	if(keyDown[key]) return;
+	if (keyDown[key])
+		return;
 
 	keyDown[key] = 1;
 
@@ -569,7 +561,7 @@ void slDemoKeyboard(unsigned char key, int x, int y) {
 		case ' ':
 			gPaused = !gPaused;
 
-			if(gPaused) {
+			if (gPaused) {
 				brPauseTimer(frontend->engine);
 				glutIdleFunc(NULL);
 			} else {
@@ -580,7 +572,8 @@ void slDemoKeyboard(unsigned char key, int x, int y) {
 
 			break;
 		case 0x1b:
-			if(!gWaiting) brInterrupt(frontend->engine);
+			if (!gWaiting)
+				brInterrupt(frontend->engine);
 			break;
 		default:
 			brKeyCallback(frontend->engine, key, 1);
@@ -590,11 +583,11 @@ void slDemoKeyboard(unsigned char key, int x, int y) {
 
 void brInterrupt(brEngine *engine) {
 	char *line;
-	char staticLine[10240];	
+	char staticLine[MAXPATHLEN];	
 
 	gWaiting = 1;
 
-	if(gOptionFull) {
+	if (gOptionFull) {
 		glutReshapeWindow(400, 400);
 		gOptionFull = 0;
 		return;
@@ -606,22 +599,27 @@ void brInterrupt(brEngine *engine) {
 	printf("\n\nSimulation interupted.  Type a steve command, 'x' to quit, or hit enter to continue\n");
 	fflush(stdout);
 
-#if defined(HAVE_LIBREADLINE) && defined(HAVE_LIBHISTORY)
+#if HAVE_LIBREADLINE && HAVE_LIBHISTORY
 	line = readline("breve> ");
-	if(line && *line) add_history(line);
+	if (line && *line)
+		add_history(line);
 #else
 	printf("breve> ");
 	fflush(stdout);
-	line = fgets(staticLine, 10239, stdin);
+	line = fgets(staticLine, sizeof(staticLine), stdin);
 #endif
 
-	if(!line || line[0] == 'x') brQuit(engine);
+	if (!line || *line == 'x')
+		brQuit(engine);
 
-	if(*line && line[0] != '\n') stRunSingleStatement((stSteveData*)frontend->data, engine, line);
+	if (*line != '\0' && *line != '\n')
+		stRunSingleStatement((stSteveData *)frontend->data, engine, line);
 
-	if(line && line != staticLine) free(line);
+	if (line != staticLine)
+		free(line);
 
-	if(gOptionFull) glutFullScreen();
+	if (gOptionFull)
+		glutFullScreen();
 
 	brUnpauseTimer(engine);
 }
@@ -645,17 +643,21 @@ void slDemoKeyboardUp(unsigned char key, int x, int y) {
 int brCLIDialogCallback(char *title, char *message, char *b1, char *b2) {
 	int result;
 
-	while (1) {
+	for (;;) {
 		printf("%s\n\n%s\n[Y/N]? ", title, message);
 
-		result = getc(stdin);
-		getc(stdin);
+		result = getchar();
+		(void)getchar();
 
-		if(result == EOF) return 0; 
-
-		if(result == 'n' || result == 'N') return 0;
-
-		if(result == 'y' || result == 'Y') return 1;
+		switch(result) {
+		case EOF:
+		case 'n':
+		case 'N':
+			return 0;
+		case 'y':
+		case 'Y':
+			return 1;
+		}
 	} 
 }
 
@@ -664,19 +666,27 @@ char *interfaceVersionCallback() {
 }
 
 char *getSavename() {
-	char *name = (char*)slMalloc(1024);
+	char name[MAXPATHLEN];
+
 	printf("filename to save: ");
-	fgets(name, 1023, stdin);
-	if(strlen(name) > 0) name[strlen(name) - 1] = 0;
-	return name;
+	fgets(name, sizeof(name), stdin);
+
+	if (*name)
+		name[strlen(name) - 1] = 0;
+
+	return slStrdup(name);
 }
 
 char *getLoadname() {
-	char *name = (char*)slMalloc(1024);
+	char name[MAXPATHLEN];
+
 	printf("filename to load: ");
-	fgets(name, 1023, stdin);
-	if(strlen(name) > 0) name[strlen(name) - 1] = 0;
-	return name;
+	fgets(name, sizeof(name), stdin);
+
+	if (*name)
+		name[strlen(name) - 1] = '\0';
+
+	return slStrdup(name);
 }
 
 int soundCallback() {
@@ -697,7 +707,7 @@ void *newWindowCallback(char *name, void *graph) {
 
 	w = new slGLUTWindow;
 	w->id = glutCreateWindow(name);
-	w->graph = (slGraph*)graph;
+	w->graph = (slGraph *)graph;
 
 	gWindowMap[w->id] = w;
 
@@ -707,25 +717,26 @@ void *newWindowCallback(char *name, void *graph) {
 }
 
 void freeWindowCallback(void *w) {
-	slGLUTWindow *window = (slGLUTWindow*)w;
+	slGLUTWindow *window = (slGLUTWindow *)w;
 
 	glutDestroyWindow(window->id);
 	delete window;
 }
 
 void renderWindowCallback(void *w) {
-	slGLUTWindow *window = (slGLUTWindow*)w;
+	slGLUTWindow *window = (slGLUTWindow *)w;
 	slDrawGraph(window->graph);
 }
 
 void graphDisplay() {
 	int windowid = glutGetWindow();
 
-	if(windowid > 1024) return;
+	if (windowid > 1024)
+		return;
 
 	//printf("displaying window #%d...\n", windowid);
 	
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	renderWindowCallback(gWindowMap[windowid]);
 	glutSwapBuffers();
 }

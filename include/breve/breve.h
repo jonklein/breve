@@ -18,16 +18,29 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+
 #include <getopt.h>
 #include <stdio.h>
-#include <sys/param.h>
 #include <pthread.h>
+
+#if HAVE_LIBREADLINE && HAVE_LIBHISTORY
+#include <readline/readline.h>
+#include <readline/history.h>
+#endif
 
 #include "graph.h"
 
-#if defined(HAVE_LIBREADLINE) && defined(HAVE_LIBHISTORY)
-#include <readline/readline.h>
-#include <readline/history.h>
+#ifndef MAXPATHLEN
+#define MAXPATHLEN 10240
+#endif
+
+#if defined(__GNUC__) && !defined(__STRICT_ANSI__)
+#define __dead __attribute__((__noreturn__))
+#else
+#define __dead
 #endif
 
 /*!
@@ -41,38 +54,38 @@ struct slGLUTWindow {
 
 typedef struct slGLUTWindow slGLUTWindow;
 
-struct option gCLIOptions[] = {
-        { "debug",      required_argument, 0, 'd' },
-        { "random",     required_argument, 0, 'r' },
-        { "notify",     required_argument, 0, 'n' },
+const struct option gCLIOptions[] = {
         { "archive",    required_argument, 0, 'a' }, 
-        { "version",    no_argument,       0, 'v' }, 
-        { "terminate",  required_argument, 0, 't' },
+        { "debug",      required_argument, 0, 'd' },
         { "fullscreen", no_argument,       0, 'f' },
-        { "format",     no_argument,       0, 'F' },
-        { "unpause",    no_argument,       0, 'u' },
-        { "size",       required_argument, 0, 's' },
-        { "position",   required_argument, 0, 'p' },
         { "help",       no_argument,       0, 'h' },
         { "stdin",      no_argument,       0, 'i' },
-
-        { "slave",      required_argument, 0, 'S' },
-        { "master",     no_argument,       0, 'M' }
+        { "notify",     required_argument, 0, 'n' },
+        { "position",   required_argument, 0, 'p' },
+        { "random",     required_argument, 0, 'r' },
+        { "size",       required_argument, 0, 's' },
+        { "terminate",  required_argument, 0, 't' },
+        { "unpause",    no_argument,       0, 'u' },
+        { "version",    no_argument,       0, 'v' }, 
+        { "format",     no_argument,       0, 'F' },
+        { "master",     no_argument,       0, 'M' },
+        { "slave",      required_argument, 0, 'S' }
 };
 
 int brParseArgs(int, char **);
 
-void brPrintUsage(char *);
+__dead void brPrintUsage(char *);
 
-void glutLoop(void);
+__dead void brQuit(brEngine *);
 
-void brQuit(brEngine *);
-void brMainMenu(int); 
-void brGLMenuStatus(int, int, int);
-void brContextualMenu(int); 
 void brClick(int);
 
+void brContextualMenu(int); 
+void brMainMenu(int); 
+
 void brGlutMenuUpdate(brInstance *);
+
+void brGlutLoop(void);
 
 void slInitGlut(int, char **, char *);
 

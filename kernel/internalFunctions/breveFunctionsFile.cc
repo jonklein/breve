@@ -173,12 +173,12 @@ int brIReadLine(brEval args[], brEval *target, brInstance *i) {
 
 	p = BRFILEPOINTER(&args[0]);
 
-	if(!p || !p->file) {
+	if (!p || !p->file) {
 		slMessage(DEBUG_ALL, "readLine called with uninitialized file\n");
 		return EC_ERROR;
 	}
 
-	slFgets(&line[0], 10239 , p->file);
+	slFgets(line, sizeof(line) - 1, p->file);
 
 	BRSTRING(target) = slStrdup(line);
 
@@ -192,22 +192,24 @@ int brIReadLine(brEval args[], brEval *target, brInstance *i) {
 int brIReadDelimitedList(brEval args[], brEval *target, brInstance *i) {
 	brEvalListHead *head;
 	brFilePointer *p;
-	char line[10240];
 	brEval eval;
-	int n = 0;
+	int n;
+	char line[10240];
 
 	p = BRFILEPOINTER(&args[0]);
 
 	BRLIST(target) = head = brEvalListNew();
 
-	if(!p || !p->file) {
+	if (!p || !p->file) {
 		slMessage(DEBUG_ALL, "readDelimitedList called with uninitialized file\n");
 		return EC_ERROR;
 	}
 
-	slFgets(line, 10239, p->file);
+	slFgets(line, sizeof(line) - 1, p->file);
 
 	eval.type = AT_STRING;
+
+	n = 0;
 
 	while((BRSTRING(&eval) = slSplit(line, BRSTRING(&args[1]), n++)))
 		brEvalListInsert(head, head->count, &eval);
@@ -223,45 +225,47 @@ int brIReadDelimitedList(brEval args[], brEval *target, brInstance *i) {
 int brIReadWhitespaceDelimitedList(brEval args[], brEval *target, brInstance *i) {
 	brFilePointer *p;
 	brEvalListHead *head;
+	brEval eval;
+	int n, start;
 	char line[10240];
 	char field[10240];
-	brEval eval;
-	int n = 0, start;
 
 	p = BRFILEPOINTER(&args[0]);
 
 	BRLIST(target) = head = brEvalListNew();
 
-	if(!p || !p->file) {
+	if (!p || !p->file) {
 		slMessage(DEBUG_ALL, "readWhitespaceDelimitedList called with uninitialized file\n");
 		return EC_ERROR;
 	}
 
-	slFgets(line, 10239, p->file);
+	slFgets(line, sizeof(line) - 1, p->file);
 
 	start = 0;
 
 	eval.type = AT_STRING;
 
+	n = 0;
+
 	while(line[n]) {
 		if(iswspace(line[n])) {
-			// if we're at a space, we've found the end of the field.
+			// if we're at a space, we've found the end of the field
 
 			strncpy(field, &line[start], n - start);
 			field[n - start] = 0;
 
 			// continue to the next field data.
 
-			while(line[n] && iswspace(line[n])) n++;
+			while(line[n] && iswspace(line[n]))
+				n++;
 
 			BRSTRING(&eval) = field;
 
 			brEvalListInsert(head, head->count, &eval);
 
 			start = n;
-		} else {
+		} else
 			n++;
-		}
 	}
 
 	return EC_OK;

@@ -66,12 +66,12 @@ brEngine *brEngineNew(void) {
 
 	e->camera = slCameraNew(400, 400);
 
-#if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
+#if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
 	Pa_Initialize();
 	e->soundMixer = brNewSoundMixer();
 #endif
 
-#ifdef HAVE_LIBOSMESA
+#if HAVE_LIBOSMESA
 	e->osBuffer = NULL;
 	e->osContext = NULL;
 #endif
@@ -83,15 +83,15 @@ brEngine *brEngineNew(void) {
 	// the linux version, we can't and don't really need to do this--they
 	// can just use stderr.
 
-#ifdef MACOSX
+#if MACOSX
 	e->logFile = funopen(e, NULL, brFileLogWrite, NULL, NULL);
 #else
 	e->logFile = stderr;
 #endif 
 
-	e->path = new char[MAXPATHLEN + 1];
 	e->drawEveryFrame = 1;
 
+	e->path = new char[MAXPATHLEN + 1];
 	getcwd(e->path, MAXPATHLEN);
 
 	e->world = slWorldNew();
@@ -103,31 +103,31 @@ brEngine *brEngineNew(void) {
 	e->realTime.tv_sec = 0;
 	e->realTime.tv_usec = 0;
 
-	if(pthread_mutex_init(&e->lock, NULL)) {
-        slMessage(0, "warning: error creating lock for breve engine\n");
-		if(e->nThreads > 1) {
-        	slMessage(0, "cannot start multi-threaded simulation without lock\n");
+	if (pthread_mutex_init(&e->lock, NULL)) {
+		slMessage(0, "warning: error creating lock for breve engine\n");
+		if (e->nThreads > 1) {
+			slMessage(0, "cannot start multi-threaded simulation without lock\n");
 			return NULL;
 		}
 	}
 
-	if(pthread_mutex_init(&e->scheduleLock, NULL)) {
-        slMessage(0, "warning: error creating lock for breve engine\n");
-		if(e->nThreads > 1) {
-        	slMessage(0, "cannot start multi-threaded simulation without lock\n");
+	if (pthread_mutex_init(&e->scheduleLock, NULL)) {
+		slMessage(0, "warning: error creating lock for breve engine\n");
+		if (e->nThreads > 1) {
+ 			slMessage(0, "cannot start multi-threaded simulation without lock\n");
 			return NULL;
 		}
 	}
 
-	if(pthread_mutex_init(&e->conditionLock, NULL)) {
-        slMessage(0, "warning: error creating lock for breve engine\n");
-		if(e->nThreads > 1) {
-        	slMessage(0, "cannot start multi-threaded simulation without lock\n");
+	if (pthread_mutex_init(&e->conditionLock, NULL)) {
+		slMessage(0, "warning: error creating lock for breve engine\n");
+		if (e->nThreads > 1) {
+			slMessage(0, "cannot start multi-threaded simulation without lock\n");
 			return NULL;
 		}
 	}
 
-	if(pthread_cond_init(&e->condition, NULL)) {
+	if (pthread_cond_init(&e->condition, NULL)) {
 		slMessage(0, "warning: error creating pthread condition variable\n");
 	}
 
@@ -175,9 +175,7 @@ brEngine *brEngineNew(void) {
 brInternalFunction *brEngineInternalFunctionLookup(brEngine *e, char *name) {
 	brNamespaceSymbol *s = brNamespaceLookup(e->internalMethods, name);
 
-	if(!s) return NULL;
-
-	return (brInternalFunction*)s->data;
+	return s ? (brInternalFunction *)s->data : NULL;
 }
 
 
@@ -191,11 +189,12 @@ void brEngineFree(brEngine *e) {
 	std::vector<brInstance*>::iterator bi;
 	std::vector<void*>::iterator wi;
 
-#if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
-	if(e->soundMixer) brFreeSoundMixer(e->soundMixer);
+#if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
+	if (e->soundMixer)
+		brFreeSoundMixer(e->soundMixer);
 #endif
 
-#if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
+#if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
 	Pa_Terminate();
 #endif
 
@@ -226,7 +225,7 @@ void brEngineFree(brEngine *e) {
 	for(bi = e->freedInstances.begin(); bi != e->freedInstances.end(); bi++ )
 		delete *bi;
 
-#ifdef HAVE_LIBOSMESA
+#if HAVE_LIBOSMESA
 	slFree(e->osBuffer);
 	OSMesaDestroyContext(e->osContext);
 #endif
@@ -282,7 +281,8 @@ slStack *brEngineGetAllInstances(brEngine *e) {
 */
 
 void brEngineSetIOPath(brEngine *e, char *path) {
-	if(e->outputPath) slFree(e->outputPath);
+	if (e->outputPath)
+		slFree(e->outputPath);
 	e->outputPath = slStrdup(path);
 	brAddSearchPath(e, path);
 }
@@ -294,9 +294,10 @@ void brEngineSetIOPath(brEngine *e, char *path) {
 char *brOutputPath(brEngine *e, char *filename) {
 	char *f;
 
-	if(*filename == '/') return slStrdup(filename);
+	if (*filename == '/')
+		return slStrdup(filename);
 
-	f = (char*)slMalloc(strlen(filename) + strlen(e->outputPath) + 3);
+	f = (char *)slMalloc(strlen(filename) + strlen(e->outputPath) + 2);
 
 	sprintf(f, "%s/%s", e->outputPath, filename);
 
@@ -315,7 +316,8 @@ char *brOutputPath(brEngine *e, char *filename) {
 void brPauseTimer(brEngine *e) {
 	struct timeval tv;
 
-	if(e->startTime.tv_sec == 0 && e->startTime.tv_usec == 0) return;
+	if (e->startTime.tv_sec == 0 && e->startTime.tv_usec == 0)
+		return;
 
 	gettimeofday(&tv, NULL);
 

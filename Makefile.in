@@ -2,6 +2,7 @@ CC	= @CC@
 CXX	= @CXX@
 DLLTOOL = @DLLTOOL@
 JAR	= @JAR@
+JAVAC	= @JAVAC@
 LEX	= @LEX@
 RANLIB	= @RANLIB@
 YACC	= @YACC@
@@ -12,6 +13,7 @@ CPPFLAGS	= @CPPFLAGS@ -Iinclude/breve @DEFS@
 LDFLAGS		= @LDFLAGS@
 
 EXTRACFLAGS	= -g
+OPTFLAGS	= -O3 @EXTRAOPTFLAGS@
 
 CXXFLAGS	= $(EXTRACFLAGS) -pipe -Wall -fpermissive
 YFLAGS		= -d
@@ -61,18 +63,18 @@ breve.dll: $(OBJ)
 	$(YACC) $(YFLAGS) -o $@ $<
 
 %.class: %.java
-	@JAVAC@ $<
+	$(JAVAC) $<
 
 debug: all
 
 optimize:
-	$(MAKE) EXTRACFLAGS='-O4 @EXTRAOPTFLAGS@'
+	$(MAKE) EXTRACFLAGS=$(OPTFLAGS)
 
 optimize_debug:
-	$(MAKE) EXTRACFLAGS='-g -O3'
+	$(MAKE) EXTRACFLAGS='-g $(OPTFLAGS)'
 
 profile:
-	$(MAKE) EXTRACFLAGS='-pg -O3'
+	$(MAKE) EXTRACFLAGS='-pg $(OPTFLAGS)'
 
 lib/libbreve.a: $(OBJ)
 	$(AR) -cr $@ $(OBJ)
@@ -93,11 +95,10 @@ lib/libbreve.a: $(OBJ)
 
 clean:
 	rm -f bin/breve@EXE_SUFFIX@ bin/breve_cli@EXE_SUFFIX@
-	rm -f .depend 
+	rm -f .depend breve.dll lib/*.a
 	rm -f steve/format.c steve/stevelex.c
 	rm -f steve/steveparse.tab.c steve/steveparse.tab.h
 	rm -f java/*.class lib/classes/*.jar
-	rm -f breve.dll breve.def lib/*.a lib/plugin.def
 	rm -rf docs docBuild/docs OSX/build
 	find . -name '.DS_Store' -exec rm -f {} \;
 	find . -name 'core' -exec rm -f {} \;
@@ -141,7 +142,7 @@ CLI_release: clean
 	mkdir $(CLI_FOLDER)/lib
 	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin/
 	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin/
-	cp -R lib/classes $(CLI_FOLDER)/lib/
+	cp -R lib $(CLI_FOLDER)/
 	cp -R docs $(CLI_FOLDER)/
 	cp -R demos $(CLI_FOLDER)/
 	mkdir $(CLI_FOLDER)/plugins

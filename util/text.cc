@@ -294,23 +294,25 @@ int slUtilWrite(int socket, const void *buffer, size_t size) {
 */
 	
 char *slFgets(char *str, int size, FILE *stream) {
+	int next, s;
 	int n = 0;
-	int s;
 
 	do {
 		str[n++] = s = fgetc(stream);
 
-		if(s == '\r') {
+		if (s == '\r') {
 			// check for \r\n -- if there is a \n, eat it
 			// otherwise, put it back in the stream
 
-			int next = fgetc(stream);
+			next = fgetc(stream);
 
-			if(next != '\n') ungetc(next, stream);
+			if (next != '\n')
+				ungetc(next, stream);
 		}
 	} while(s != EOF && s != '\n' && s != '\r');
 
-	if(s == EOF) n--;
+	if (s == EOF)
+		n--;
 	str[n] = 0;
 
 	return str;
@@ -321,7 +323,7 @@ char *slFgets(char *str, int size, FILE *stream) {
 */
 
 char *slUtilReadStdin() {
-	char *data = (char*)slMalloc(4096);
+	char *data = (char *)slMalloc(4096);
 	int n, total = 0;
 
 	while(!feof(stdin)) {
@@ -330,7 +332,7 @@ char *slUtilReadStdin() {
 
 		data[total] = 0;
 
-		data = (char*)slRealloc(data, total + 4096);
+		data = (char *)slRealloc(data, total + 4096);
 	}
 
 	return data;

@@ -242,7 +242,7 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, char boundTypeFlag
 
 #ifdef DEBUG
 					if((*flags & boundTypeFlag) && *currentSort->value != *leftSort->value) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already on]!\n");
-#endif DEBUG
+#endif
 
 					*flags |= boundTypeFlag;
 
