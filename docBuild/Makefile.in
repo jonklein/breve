@@ -11,7 +11,6 @@ classes: docExtract
 	-mkdir ../docs/classes
 	./docExtract ../lib/classes/*.tz | ./docBuild.pl ../docs/classes
 	./indexBuild.pl ../lib/classes/*.tz > ../docs/classes/method_index.html
-	mv index.txt ../docs
 	cp classImages/*.jpg ../docs/classes/
 
 docbook: classes

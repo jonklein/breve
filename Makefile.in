@@ -32,6 +32,7 @@ all:
 	cd bin; $(MAKE) -f Makefile install
 
 documentation:
+	rm -rf docs
 	cd docBuild; $(MAKE) -f Makefile install
 
 profile:
