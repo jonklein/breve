@@ -36,6 +36,12 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 		pushCallbackNew(pushInterpreterPointer, instructionName, methodName, targetInstance).
 
+	+ to add-macro named instructionName (string) for-code code (object):
+		% Adds a new instruction named instructionName, which has the effect of calling 
+		% the instructions in code.
+
+		pushMacroNew(pushInterpreterPointer, instructionName, (code get-code-pointer)).
+
 	+ to read-config from-file configFile (string):
 		% Reads the push configuration file configFile.
 
