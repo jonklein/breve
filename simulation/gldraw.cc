@@ -26,8 +26,8 @@
  
 #include "simulation.h"
 #include "asciiart.h"
-
 #include "glIncludes.h"
+#include "tiger.h"
 
 #define REFLECTION_ALPHA	.75
 
@@ -349,7 +349,7 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 	GLuint namesInHit;
 	int n;
 	unsigned int nearest = 0xffffffff, min;
-	int hit = -1;
+	unsigned int hit = w->objects.size() + 1;
 
 	viewport[0] = c->ox;
 	viewport[1] = c->oy;
@@ -372,6 +372,12 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 
 	gluPerspective(40.0, c->fov, 0.01, c->zClip);
 
+	// since the selection buffer uses unsigned ints for names, we can't 
+	// use -1 to mean no selection -- we'll use the number of objects 
+	// plus 1 to indicate that no selectable object was selected.
+
+	glLoadName(w->objects.size() + 1);
+
 	slClearGLErrors("about to select");
 	slDrawWorld(w, c, 0, GL_SELECT, 0, 0);
 
@@ -387,7 +393,7 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 	for(n=0;n<hits;n++) {
 		namesInHit = *selections++;
 	   
-		/* skip over the z-max value */
+		// skip over the z-max value 
 
 		selections++;
 		min = *selections++;
@@ -404,6 +410,8 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 	glMatrixMode(GL_MODELVIEW);
 
 	glPopName();
+
+	if(hit == w->objects.size() + 1) return -1;
 
 	return hit;
 }
@@ -531,7 +539,6 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 void slDrawNetsimBounds(slWorld *w) {
 #ifdef HAVE_LIBENET
 	std::vector<slNetsimRemoteHostData*>::iterator hi;
-	unsigned int n;
 
 	for(hi = w->netsimData.remoteHosts.begin(); hi != w->netsimData.remoteHosts.end(); hi++ ) {
 		slNetsimRemoteHostData *data = *hi;
@@ -723,6 +730,8 @@ void slDrawWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair
 		glStencilFunc(GL_ALWAYS, 0, 0xffffffff);
 		glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
 	}
+
+	if(w->gisData) w->gisData->draw();
 
 	labels = slRenderObjects(w, c, 0, flags|DO_NO_STATIONARY|DO_NO_TERRAIN|DO_NO_ALPHA);
 	slRenderLines(w, c, 0);
@@ -1477,6 +1486,8 @@ int slRenderObjects(slWorld *w, slCamera *c, int loadNames, int flags) {
 		glDisable(GL_BLEND);
 	}
 
+	if(loadNames) glLoadName(w->objects.size() + 1);
+
 	return labels;
 }
 
@@ -1486,7 +1497,7 @@ int slRenderObjects(slWorld *w, slCamera *c, int loadNames, int flags) {
 */
 
 void slRenderLines(slWorld *w, slCamera *c, int flags) {
-	int n;
+	unsigned int n;
 	unsigned int m;
 	slVector *x, *y;
 	slWorldObject *neighbor;

@@ -299,7 +299,7 @@ void brQuit(brEngine *e) {
 	}
 
 	brEngineFree(frontend->engine);
-    	breveFrontendCleanupData(frontend->data);
+	breveFrontendCleanupData(frontend->data);
 	slFree(frontend);
 
 #ifdef MEMORY_DEBUG

@@ -1,6 +1,6 @@
 @use Image.
 
-@plugin "DigitizerPlugin.plugin"  (slInitDigitizerFuncs).
+@plugin "DigitizerPlugin.o"  (slInitDigitizerFuncs).
 
 @define WIDTH 320.
 @define HEIGHT 240.

@@ -22,6 +22,7 @@ int gPhysicsError;
 char *gPhysicsErrorMessage;
  
 #include "simulation.h"
+#include "tiger.h"
 
 void slODEErrorHandler(int errnum, const char *msg, va_list ap) {
 	static char error[2048];
@@ -76,14 +77,18 @@ slWorld *slWorldNew() {
 	w->backgroundTexture = -1;
 	slVectorSet(&w->backgroundTextureColor, 1, 1, 1);
 
-	w->clipData = NULL;
-
 	w->clipData = slVclipDataNew();
+
+	w->gisData = NULL;
 
 	slVectorSet(&g, 0.0, -9.81, 0.0);
 	slWorldSetGravity(w, &g);
 
 	return w;
+}
+
+int slWorldLoadTigerFile(slWorld *w, char *f) {
+	w->gisData = new slGISData(f);
 }
 
 /*!

@@ -45,6 +45,8 @@ int brDigitizerOpenCamera(brEval args[], brEval *target, void *i) {
 int brDigitizerFlip(brEval args[], brEval *target, void *i) {
 	brDigitizer *b = BRPOINTER(&args[0]);
 
+	if(!b) return EC_ERROR;
+
 	b->flip = !b->flip;
 
 	BRINT(target) = b->flip;
@@ -56,6 +58,8 @@ int brDigitizerUpdateFrame(brEval args[], brEval *target, void *i) {
 	brDigitizer *b = BRPOINTER(&args[0]);
 	char *output = BRPOINTER(&args[1]);
 	int value;
+
+	if(!b) return EC_ERROR;
 
 	value = SGIdle(b->instance);
 
@@ -69,6 +73,8 @@ int brDigitizerUpdateFrame(brEval args[], brEval *target, void *i) {
 
 int brDigitizerReferenceMap(brEval args[], brEval *target, void *i) { 
 	brDigitizer *b = BRPOINTER(&args[0]);
+
+	if(!b) return EC_ERROR;
 	ccIntensityMapARGB(b, !b->map->active);
 
 	return EC_OK;
@@ -76,12 +82,14 @@ int brDigitizerReferenceMap(brEval args[], brEval *target, void *i) {
 
 int brDigitizerHighestDelta(brEval args[], brEval *target, void *i) { 
 	brDigitizer *b = BRPOINTER(&args[0]);
+	if(!b) return EC_ERROR;
 	BRINT(target) = b->map->delta[b->map->highest];
 	return EC_OK;
 }
 
 int brDigitizerAverageDelta(brEval args[], brEval *target, void *i) { 
 	brDigitizer *b = BRPOINTER(&args[0]);
+	if(!b) return EC_ERROR;
 	BRINT(target) = b->map->average;
 	return EC_OK;
 }
@@ -90,6 +98,8 @@ int brDigitizerAverageDelta(brEval args[], brEval *target, void *i) {
 int brDigitizerHighestDeltaLocation(brEval args[], brEval *target, void *i) { 
 	brDigitizer *b = BRPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(target);	
+
+	if(!b) return EC_ERROR;
 
 	// note that the camera shows a non-mirrored view, so we'll flip the coord
 
@@ -109,6 +119,8 @@ int brDigitizerIntensityMapValue(brEval args[], brEval *target, void *i) {
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
+	if(!b) return EC_ERROR;
+
 	BRINT(target) = b->map->map[b->map->active][(b->map->size * y) + x];
 
 	return EC_OK;
@@ -119,6 +131,7 @@ int brDigitizerDeltaMapValue(brEval args[], brEval *target, void *i) {
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
+	if(!b) return EC_ERROR;
 	BRINT(target) = b->map->delta[(b->map->size * y) + x];
 
 	return EC_OK;

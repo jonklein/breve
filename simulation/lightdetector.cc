@@ -28,7 +28,8 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	slLink *m;
 	slWorldObject *wo;
 	slStationary *s;
-	int n, x;
+	unsigned int n;
+	int x;
 
 	static int bufferSize = 0;
 	static GLubyte *staticBuffer = NULL;
@@ -40,8 +41,9 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	sun = &w->lightExposureSource;
 
 	if(size * size * 3 > bufferSize) {
-		if(staticBuffer) staticBuffer = realloc(staticBuffer, size * size * 3);
-		else staticBuffer = malloc(size * size * 3);
+		if(staticBuffer) delete[] staticBuffer;
+
+		staticBuffer = new GLubyte[size * size * 3];
 
 		bufferSize = size * size * 3;
 	}

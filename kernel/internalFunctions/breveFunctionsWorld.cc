@@ -881,6 +881,17 @@ int brISetBoundsOnlyCollisionDetection(brEval args[], brEval *target, brInstance
 
 	return EC_OK;
 }
+
+/*!
+	\brief Loads data from a Tiger/Line file.
+*/
+
+int brILoadTigerData(brEval args[], brEval *target, brInstance *i) {
+	slWorldLoadTigerFile(i->engine->world, BRSTRING(&args[0]));
+	return EC_OK;
+
+}
+
 /*@}*/
 
 /*!
@@ -950,4 +961,6 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "removeAllObjectLines", brIRemoveAllObjectLines, AT_NULL, AT_POINTER, 0);
 
 	brNewBreveCall(n, "setBoundsOnlyCollisionDetection", brISetBoundsOnlyCollisionDetection, AT_NULL, AT_INT, 0);
+
+	brNewBreveCall(n, "loadTigerData", brILoadTigerData, AT_NULL, AT_STRING, 0);
 }

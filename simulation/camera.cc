@@ -73,7 +73,7 @@ slCamera *slNewCamera(int x, int y, int drawMode) {
 
 	c->billboardCount = 0;
 	c->maxBillboards = 8;
-	c->billboards = slMalloc(sizeof(slBillboardEntry*) * c->maxBillboards);
+	c->billboards = (slBillboardEntry**)slMalloc(sizeof(slBillboardEntry*) * c->maxBillboards);
 	c->billboardDrawList = 0;
 	c->onlyMultibodies = 0;
 
@@ -255,6 +255,11 @@ void slAddBillboard(slCamera *c, slVector *color, slVector *loc, float size, flo
 	c->billboardCount++;
 }
 
+bool slBillboardCompare(const slBillboardEntry* &a, const slBillboardEntry* &b) {
+	printf("sorting\n");
+	return 1;
+}
+
 /*!
 	\brief Sorts the billboards from back to front.
 
@@ -262,7 +267,7 @@ void slAddBillboard(slCamera *c, slVector *color, slVector *loc, float size, flo
 */
 
 void slSortBillboards(slCamera *c) {
-	//std::sort(&c->billboards[0], &c->billboards[c->billboardCount + 1]);
+	// std::sort(&c->billboards[0], &c->billboards[c->billboardCount + 1], slBillboardCompare);
 	qsort(&c->billboards[0], c->billboardCount, sizeof(slBillboardEntry*), slBillboardSortFunc);
 }
 

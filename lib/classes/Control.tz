@@ -992,8 +992,9 @@ Abstract : Control (aka Controls) [version 2.0] {
 
 	+ to execute command systemCommand (string):
 		% Executes the shell command systemCommand using /bin/sh.  
-		% Returns the output of command.  Not supported on all 
-		% implementations.
+		% Returns the output of command.  Supported on UNIX-based
+		% implementations only (Mac OS X and Linux included), not
+		% supported on Windows.
 
 		return system(systemCommand).
 

@@ -143,6 +143,8 @@ struct slObjectLine {
 */
 
 #ifdef __cplusplus
+class slGISData;
+
 struct slWorld {
 	/* when objects are added or removed from the world, this flag must be */
 	/* set to 0 so that vclip structures are reinitialized.				*/
@@ -221,6 +223,8 @@ struct slWorld {
 	int backgroundTexture;
 	int isBackgroundImage;
 
+	slGISData *gisData;
+
 #ifdef HAVE_LIBENET
 	slNetsimData netsimData;
 	slNetsimClientData *netsimClient;
@@ -296,6 +300,8 @@ void slWorldSetLightExposureSource(slWorld *w, slVector *v);
 void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*), int (*collide)(void*, void*, int type));
 
 slWorldObject *slWorldGetObject(slWorld *w, unsigned int n);
+
+int slWorldLoadTigerFile(slWorld *w, char *f);
 
 #ifdef __cplusplus
 }
