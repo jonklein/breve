@@ -127,6 +127,8 @@ brSoundData *brLoadSound(char *file) {
 	brSoundData *data;
 	int upsample;
 
+	info.format = 0;
+
 	fp = sf_open(file, SFM_READ, &info);
 	if(!fp) return NULL;
 
