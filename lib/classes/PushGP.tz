@@ -51,9 +51,13 @@ Object : PushGP {
 		currentIndividual (int).
 		generationLimit (int).
 
-		
+		seed (string).
 
   + section "Setting and Retrieving GP Parameters"
+
+	+ to seed-population with-program pushProgram (object):
+		% Uses pushProgram to seed the initial population.
+		seed = (pushProgram get-string).
 
 	+ to set-generation-limit to n (int):
 		% Sets the generation limit to n.  If no solution is found by
@@ -139,6 +143,8 @@ Object : PushGP {
 
 		current = pop1.
 		next = pop2.
+
+		if seed: (pop1{0} parse program seed).
 
 		inited = 1.
 

@@ -37,9 +37,10 @@ int brIQProgramFree(brEval args[], brEval *target, brInstance *i) {
 
 int brIQProgramAddInstruction(brEval args[], brEval *target, brInstance *i) {
 	qgame::QProgram *program = (qgame::QProgram*)BRPOINTER(&args[0]);
+	std::string s = BRSTRING(&args[1]);
 
 	try {
-		program->addInstruction(BRSTRING(&args[1]));
+		program->addInstruction(s);
 		BRINT(target) = 0;
 	} catch(qgame::Error e) {
 		slMessage("error adding QGAME instruction: %s\n", e.s.c_str());

@@ -267,6 +267,10 @@ inline void stGCMarkPointer(stInstance *i, void *pointer, int type) {
 	r->type = type;
 	
 	slStackPush(i->gcStack, r);
+
+	if(i->gcStack->count > 1000) {
+		printf("huge gc stack for %p: %d\n", i, i->gcStack->count);
+	}
 }
 
 /*!

@@ -22,8 +22,8 @@ Object : QSystem {
 		% <li> Maximum number of oracle calls
 		% <li> Average number of oracle calls
 		% <P>
-		% If an error occurs during the execution of the program, all of the elements of the 
-		% returned list are set to -1.
+		% If an error occurs during the execution of the program, all of the 
+		% elements of the returned list are set to -1.
 
 		return qsysTestProgram(systemPointer, (theProgram get-program-pointer), testCases, qb, finalQB, t).
 
