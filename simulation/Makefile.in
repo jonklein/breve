@@ -15,16 +15,16 @@ INCLUDE	+=-I../include/breve @CPPFLAGS@
 
 all: libbrsimulation.a 
 
-.c.o: 
+.c.o: *.h
 	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDE) -c $*.c
 
 libbrsimulation.a: $(LIBO)
 	$(AR) -crv libbrsimulation.a $(LIBO) 
-
-install: all
 	cp libbrsimulation.a ../lib
 	ranlib ../lib/libbrsimulation.a
 	cp *.h ../include/breve
+
+install: all
 
 clean:
 	-/bin/rm -f *.o core libbrsimulation.a

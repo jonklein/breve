@@ -104,7 +104,6 @@ int brIRemoveDependency(brEval args[], brEval *target, brInstance *i) {
 
 int brIAddCollisionHandler(brEval args[], brEval *target, brInstance *i) {
     brObject *handler, *collider;
-    brMethod *method;
 	brInstance *caller;
 
     caller = BRINSTANCE(&args[0]);

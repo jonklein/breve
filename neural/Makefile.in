@@ -14,16 +14,15 @@ INCLUDE	+= -I../include/breve -I../ode/include
 .c.o: 
 	$(CC) $(CFLAGS) -c $*.c $(DEFINES) $(INCLUDE)
 
-all: libneural.a
+all: libbrneural.a
 
-libneural.a: $(LIBO)
+libbrneural.a: $(LIBO)
 	$(AR) -crv libbrneural.a $(LIBO) 
-	ranlib libbrneural.a
+	cp libbrneural.a ../lib
+	ranlib ../lib/libbrneural.a
+	/bin/cp *.h ../include/breve
 
 install: all
-	cp libbrneural.a ../lib
-	cp *.h ../include/breve
-	ranlib ../lib/libbrneural.a
 
 clean:
 	-/bin/rm -f *.o core libbrneural.a test

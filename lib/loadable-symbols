@@ -12,3 +12,4 @@ _slRealloc
 _slFree
 _slGetLogFilePointer
 _brPluginFindFile
+_environ

@@ -11,16 +11,16 @@ INCLUDE +=-I../include/breve
 
 all: libbrutil.a 
 
-.c.o:
+.c.o: *.h
 	$(CC) $(CFLAGS) $(INCLUDE) $(DEFINES) -c $*.c
 
 libbrutil.a: $(LIBO)
 	$(AR) -crv libbrutil.a $(LIBO)
-
-install: all
 	cp libbrutil.a ../lib
 	cp *.h ../include/breve
 	ranlib ../lib/libbrutil.a
+
+install: all
 
 clean:
 	-/bin/rm -f $(LIBO) libbrutil.a

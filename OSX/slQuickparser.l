@@ -82,9 +82,9 @@ AKA		\({WHITE}*aka{WHITE}+{WORD}{WHITE}*\)
 <OBJECT>.				;
 <OBJECT>\n				{ slObjectParseLine++; }
 
-.					;
 \n					{ slObjectParseLine++; }
 \r					{ slObjectParseLine++; }
+.					;
 
 %%
 

@@ -18,12 +18,12 @@ graphTest: libbrgraph.a graphTest.c
 	
 libbrgraph.a: $(OFILES)
 	$(AR) crv libbrgraph.a $(OFILES)
-	ranlib libbrgraph.a
-
-install: all
 	cp *.h ../include/breve
 	cp libbrgraph.a ../lib
+	ranlib libbrgraph.a
 	ranlib ../lib/libbrgraph.a
+
+install: all
 
 .c.o: $(CFILES)
 	$(CC) $(CFLAGS) -c $*.c $(DEFINES) $(INCLUDE) 

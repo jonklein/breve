@@ -30,12 +30,12 @@ steveparse.tab.c: steveparse.y
 
 libbrsteve.a: $(LIBO)
 	$(AR) -crv libbrsteve.a $(LIBO) 
-	ranlib libbrsteve.a
+	/bin/cp libbrsteve.a ../lib
+	ranlib ../lib/libbrsteve.a
+	/bin/cp *.h ../include/breve
 
 clean:
 	rm -f *.o stevelex.c steveparse.output steveparse.tab.[ch] libbrsteve.a
 
 install: all
-	/bin/cp libbrsteve.a ../lib
-	ranlib ../lib/libbrsteve.a
-	/bin/cp *.h ../include/breve
+

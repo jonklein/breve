@@ -24,16 +24,15 @@ internal:
 
 libbrkernel.a: $(LIBO) $(INTERNALO)
 	$(AR) -crv libbrkernel.a $(LIBO) $(INTERNALO)
-	ranlib libbrkernel.a
+	/bin/cp libbrkernel.a ../lib
+	ranlib ../lib/libbrkernel.a
+	/bin/cp *.h ../include/breve
 
 clean:
 	rm -f *.o libbrkernel.a 
 	rm internalFunctions/*.o
 
 install: all
-	/bin/cp libbrkernel.a ../lib
-	ranlib ../lib/libbrkernel.a
-	/bin/cp *.h ../include/breve
 
 #
 # i knew these two people. 
