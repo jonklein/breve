@@ -21,9 +21,6 @@
 #include <stdio.h>
 #include <zlib.h>
 
-DLLEXPORT char *slStrdup(char *);
-char *slStrdupAndFree(char *);
-
 char *slSplit(char *, char *, int);
 
 int slUtilGzread(char *, int, gzFile);

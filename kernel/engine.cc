@@ -504,7 +504,7 @@ char *brFindFile(brEngine *e, char *file, struct stat *st) {
 	if(!stat(file, sp)) return slStrdup(file);
 
 	for(pi = e->searchPath.begin(); pi != e->searchPath.end(); pi++ ) {
-		snprintf(path, 4095, "%s/%s", *pi, file);   
+		snprintf(path, sizeof(path), "%s/%s", *pi, file);   
 
 		if(!stat(path, sp)) return slStrdup(path);
 	}

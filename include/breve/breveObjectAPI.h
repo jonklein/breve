@@ -3,8 +3,8 @@
 
 enum allocStatus { 
 	AS_RELEASED = -1,	// still allocated, but ready to be freed
-	AS_FREED,			// all memory freed--don't try to use 
-	AS_ACTIVE			// active object
+	AS_FREED,		// all memory freed--don't try to use 
+	AS_ACTIVE		// active object
 };
 
 typedef struct brObjectType brObjectType;
@@ -55,7 +55,7 @@ struct brObject {
 
 	char *name;
 
-    slStack *collisionHandlers;
+	slStack *collisionHandlers;
 };
 
 /*!
@@ -157,7 +157,7 @@ void *brObjectGetUserData(brInstance *);
 
 int brMethodCall(brInstance *, brMethod *, brEval **, brEval *);
 int brMethodCallByName(brInstance *, char *, brEval *);
-DLLEXPORT int brMethodCallByNameWithArgs(brInstance *, char *, brEval **, int, brEval *);
+int brMethodCallByNameWithArgs(brInstance *, char *, brEval **, int, brEval *);
 
 // functions related to adding and removing classes and instances to the breve engine
 

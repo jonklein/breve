@@ -117,7 +117,7 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 	switch(e->type) {
 		case AT_STRING:
 			if(BRSTRING(e)) return slStrdup(BRSTRING(e));
-			else return("");
+			else return "";
 			break;
 		case AT_INT:
 			result = (char*)slMalloc(60);

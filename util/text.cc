@@ -22,50 +22,19 @@
 	= text.c -- lower level utility functions related to text processing.
 */
 
-#include <errno.h>
-
-#include "util.h"
-#include <string.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 #ifndef WINDOWS
 #include <sys/socket.h>
 #endif
 
-/*!
-	\brief An implementation of strdup returning an slMalloc'd string.
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-	Returns a copy of str, allocated by slMalloc.  The string must be
-	freed later using slFree.
-*/
-	
-char *slStrdup(char *str) {
-	char *copy;
- 
-	if(!str) return NULL;
- 
-	copy = (char*)slMalloc(strlen(str) + 1);
- 
-	if(!copy) return NULL;
- 
-	strcpy(copy, str);
- 
-	return copy;
-}
-
-/*!
-	\brief Takes a malloc'd string and turns it into an slMalloc'd string
-	by duplicating and freeing the original.
-*/
-
-char *slStrdupAndFree(char *str) {
-	char *copy = slStrdup(str);
-	free(str);
-	return copy;
-}
+#include "util.h"
 
 /*!
 	\brief Splits a string into several smaller strings based on a 
@@ -108,21 +77,23 @@ char *slSplit(char *start, char *substr, int n) {
 
 /*!
 	\brief A wrapper around fwrite() that guarantees that all bytes are 
-	read before returning.
+	written before returning.
 */
 
 int slUtilFwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream) {
-	unsigned int n, written = 0;
+	ssize_t n;
+	size_t written = 0;
 
 	while(written < nmemb) {
-		n = fwrite((char*)ptr + (written * size), size, nmemb - written, stream);
+		n = fwrite((char *)ptr + (written * size), size,
+			nmemb - written, stream);
 
-		if(n < 1) return -1;
+		if (n < 1)
+			return -1;
 
 		written += n;
 	}
-
-	return nmemb;
+	return written;
 }
 
 /*!
@@ -131,31 +102,35 @@ int slUtilFwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream) {
 */
 
 int slUtilFread(void *ptr, size_t size, size_t nmemb, FILE *stream) {
-	unsigned int n, readcount = 0; 
+	ssize_t n;
+	size_t readcount = 0;
   
 	while(readcount < nmemb) {
-		n = fread((char*)ptr + (readcount * size), size, nmemb - readcount, stream);
+		n = fread((char *)ptr + (readcount * size), size,
+			nmemb - readcount, stream);
  
-		if(n<1) return -1;
+		if(n < 1)
+			return -1;
   
 		readcount += n;
 	}
- 
-	return nmemb;
+	return readcount;
 } 
 
 /*!
-	\brief A wrapper around gzread() that guarantees that all bytes are read 
+	\brief A wrapper around gzread() that guarantees that all bytes are read
 	before returning.
 */
 
-int slUtilGzread(char *ptr, int size, gzFile stream) {
-	int n, readcount = 0; 
+int slUtilGzread(char *ptr, size_t size, gzFile stream) {
+	ssize_t n;
+	size_t readcount = 0; 
   
 	do {
 		n = gzread(stream, ptr + readcount, (size - readcount));
  
-		if(n < 0) return -1;
+		if (n < 0)
+			return -1;
   
 		readcount += n;
 	} while(n && size != readcount);
@@ -169,40 +144,40 @@ int slUtilGzread(char *ptr, int size, gzFile stream) {
 */
 
 char *slUtilReadFile(char *path) {
+	char temp[2048];
 	struct stat st;
 	char *buffer;
-	char temp[2048];
 	gzFile fp;
 	int total = 0, n;
 
-	if(stat(path, &st)) {
-		// unable to stat 
+	if (stat(path, &st))
 		return NULL;
-	}
 
 	if(!(fp = gzopen(path, "r"))) {
-		slMessage(DEBUG_ALL, "error opening file \"%s\": %s\n", path, strerror(errno));
+		slMessage(DEBUG_ALL, "gzopen %s: %s\n", path, strerror(errno));
 		return NULL;
 	}
 
-	// the "stat" size is the compressed size -- we'll need to dynamically 
-	// resize to accomidate the uncompressed data.
+	/*
+	 * Because uncompressed size is not predictable from stat(),
+	 * which gives size of compressed file, buffer must be
+	 * dynamically resized.
+	 */
 
-	buffer = (char*)slMalloc(1);
+	buffer = (char *)slMalloc(1);
 
-	while((n = slUtilGzread(temp, 2048, fp))) {
+	while((n = slUtilGzread(temp, sizeof(temp), fp))) {
 		if(n == -1) {
-			slMessage(DEBUG_ALL, "error reading from file \"%s\"\n", path);
+			slMessage(DEBUG_ALL, "slUtilGzread %s: error)\n", path);
 			return NULL;
 		}
 
-		buffer = (char*)slRealloc(buffer, total + n + 1);
+		buffer = (char *)slRealloc(buffer, total + n + 1);
 
 		memcpy(&buffer[total], temp, n);
 		
 		total += n;
 	}
-
 	buffer[total] = 0;
 
 	gzclose(fp);
@@ -217,9 +192,8 @@ char *slUtilReadFile(char *path) {
 int slUtilWriteFile(char *path, char *text) {
 	FILE *f;
 
-	f = fopen(path, "w");
-
-	if(!f) return -1;
+	if (!(f = fopen(path, "w")))
+		return -1;
 
 	slUtilFwrite(text, strlen(text), 1, f);
 
@@ -229,7 +203,8 @@ int slUtilWriteFile(char *path, char *text) {
 }
 
 /*!
-	\brief Reads a stream, returning the pointer to the data as a slMalloc'd string.
+	\brief Reads a stream, returning the pointer to the data as a slMalloc'd
+	string.
 */
 
 char *slUtilReadStream(FILE *stream) {
@@ -237,21 +212,20 @@ char *slUtilReadStream(FILE *stream) {
 	char temp[2048];
 	int total = 0, n;
 
-	buffer = (char*)slMalloc(1);
+	buffer = (char *)slMalloc(1);
 
-	while((n = slUtilFread(temp, 2048, 1, stream))) { // TODO:  is 1 the right value
+	while((n = slUtilFread(temp, sizeof(temp), 1, stream))) {
 		if(n == -1) {
 			slMessage(DEBUG_ALL, "error reading from Stream\n");
 			return NULL;
 		}
 
-		buffer = (char*)slRealloc(buffer, total + n + 1);
+		buffer = (char *)slRealloc(buffer, total + n + 1);
 
 		memcpy(&buffer[total], temp, n);
 		
 		total += n;
 	}
-
 	buffer[total] = 0;
 	
 	return buffer;
@@ -287,36 +261,34 @@ char *slDequote(char *d) {
 	before returning.
 */
 
-int slUtilRead(int socket, void *buffer, size_t size ) {
-	int n;
-	unsigned int readcount = 0; 
+int slUtilRead(int socket, void *buffer, size_t size) {
+	ssize_t n;
+	size_t readcount = 0; 
   
 	while(readcount < size) {
-		n = read(socket, (char*)buffer + readcount, size - readcount);
-		if(n < 1) return readcount;
-  
+		n = read(socket, (char *)buffer + readcount, size - readcount);
+		if(n < 1)
+			break;
 		readcount += n;
 	}
- 
 	return readcount;
 } 
 
 /*!
-	\brief A wrapper around write() that guarantees that all bytes are written 
-	before returning.
+	\brief A wrapper around write() that guarantees that all bytes are
+	written before returning.
 */
 
-int slUtilWrite(int socket, const void *buffer, size_t size ) {
-	int n; 
-	unsigned int writecount = 0; 
+int slUtilWrite(int socket, const void *buffer, size_t size) {
+	ssize_t n; 
+	size_t writecount = 0; 
   
 	while(writecount < size) {
-		n = write(socket, (char*)buffer + writecount, size - writecount);
-		if(n < 1) return writecount;
-  
+		n = write(socket, (char *)buffer + writecount, size - writecount);
+		if (n < 1)
+			break;
 		writecount += n;
 	}
- 
 	return size;
 } 
 

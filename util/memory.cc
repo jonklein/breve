@@ -23,12 +23,10 @@
 #undef slMalloc
 #undef slRealloc
 #undef slFree
+#undef slStrdup
 
 /*!
     memory.cc defines a set of malloc wrappers
-
-	These could be replaced with macros, except that they are used 
-	by plugins which expect to find the actual symbols.
 */
 
 #ifdef __cplusplus
@@ -36,22 +34,42 @@ extern "C" {
 #endif
 
 DLLEXPORT void *
-slMalloc(int n) {
-	if(n > 1000000) {
+slMalloc(size_t n) {
+	if(n > 1000000)
 		slDebug("warning: very large allocation %d\n", n);
-	}
 
 	return calloc(1, n);
 }
 
 DLLEXPORT void *
-slRealloc(void *p, int n) {
+slRealloc(void *p, size_t n) {
 	return realloc(p, n);
 }
 
 DLLEXPORT void
 slFree(void *p) {
 	free(p);
+}
+
+DLLEXPORT char *
+slStrdup(const char *s) {
+#if HAVE_STRDUP
+	return strdup(s);
+#else
+	if (!s)
+		return s;
+
+	char *t = malloc(strlen(s));
+	strcpy(t, s);
+	return t;
+#endif
+}
+
+inline char *
+slStrdupAndFree(char *s) {
+	char *t = slStrdup(s);
+	free(s);
+	return t;
 }
 
 #ifdef __cplusplus

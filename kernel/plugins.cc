@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include "kernel.h"
+#include <errno.h>
 
 #ifndef MINGW
 #include <dlfcn.h>
@@ -42,7 +42,7 @@ inline const char *dlerror(void) {
 }
 #endif /* MINGW */
 
-#include <errno.h>
+#include "kernel.h"
 
 /*!
 	\brief Opens a plugin and loads it into the engine.
@@ -60,7 +60,7 @@ int brEngineAddDlPlugin(char *filename, char *func, brEngine *engine) {
 
 	fullpath = brFindFile(engine, filename, NULL);
 
-	if(!fullpath) {
+	if (!fullpath) {
 		slMessage(DEBUG_ALL, "unable to locate file \"%s\"\n", filename);
 		return -1;
 	}
@@ -69,14 +69,13 @@ int brEngineAddDlPlugin(char *filename, char *func, brEngine *engine) {
 
 	slFree(fullpath);
 
-	if(handle) {
+	if (handle) {
 		p->handle = handle;
 		p->name = slStrdup(filename);
 		engine->dlPlugins.push_back(p);
 		return 0;	
-	} else {
+	} else
 		return -1;
-	}
 }
 
 /*!
@@ -129,9 +128,10 @@ void *brDlLoadPlugin(char *filename, char *func, brNamespace *n) {
 /*!
 	\brief A plugin-accessable version of \ref brFindFile.
 
-	Allows plugins to find files using the same file paths as the breve engine does.
+	Allows plugins to find files using the same file paths as the
+	breve engine does.
 */
 
-char *brPluginFindFile(char *name, void *i) {
-	return brFindFile(((brInstance*)i)->engine, name, NULL);
+char * brPluginFindFile(char *name, void *i) {
+	return brFindFile(((brInstance *)i)->engine, name, NULL);
 }

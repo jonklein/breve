@@ -127,7 +127,7 @@ inline int stEvalListIndex(stListIndexExp *, stRunInstance *, brEval *);
 inline int stEvalListIndexPointer(stListIndexExp *, stRunInstance *, void **, int *);
 inline int stEvalListIndexAssign(stListIndexAssignExp *, stRunInstance *, brEval *);
 
-int stCallMethodByNameWithArgs(stRunInstance *, char *, brEval **, int, brEval *);
+DLLEXPORT int stCallMethodByNameWithArgs(stRunInstance *, char *, brEval **, int, brEval *);
 inline int stCallMethodByName(stRunInstance *, char *, brEval *);
 inline int stCallMethod(stRunInstance *, stRunInstance *, stMethod *, brEval **, int, brEval *);
 

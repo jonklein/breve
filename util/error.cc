@@ -18,24 +18,23 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include "util.h"
+#include <sys/types.h>
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #ifdef MINGW
 #include <malloc.h>
 #endif
 
+#include "util.h"
+
 static int gDebugLevel;
 
-void slStderrMessageCallback(char *string);
-
-static void (*gMessageOutputFunction)(char *output) = slStderrMessageCallback;
+static void (*gMessageOutputFunction)(char *) = slStderrMessageCallback;
 
 /*!
 	\brief Set the level of detail of error output.
@@ -43,7 +42,7 @@ static void (*gMessageOutputFunction)(char *output) = slStderrMessageCallback;
     This should be 0, except for developers who may choose to use 
     another value to get more detail about certain processes.
 
-    the error reporting functions report every message under the 
+    The error reporting functions report every message under the 
     current gDebugLevel, so an important error should be reported
     (using slMessage) with value DEBUG_ALL (0) while a developer 
     debugging message might use DEBUG_INFO (50).
@@ -62,7 +61,7 @@ void slSetDebugLevel(int level) {
 	to a file, etc.
 */
 
-void slSetMessageCallbackFunction(void (f)(char *text)) {
+void slSetMessageCallbackFunction(void (f)(char *)) {
 	gMessageOutputFunction = f;
 }
 
@@ -79,7 +78,7 @@ void slStderrMessageCallback(char *string) {
 	\brief Prints a fatal error to stderr and quits.
     
 	slFatal is an exception to the normal error handling rules.
-    Regardless of the message-output callback function, we'll 
+	Regardless of the message-output callback function, we'll 
 	print the error to stderr before quitting.
 */
 
@@ -129,33 +128,18 @@ void slDebugFunction(char *file, int line, char *text, ...) {
 	string.
 */
 
-void slMessage(int level, char *format, ...) {
-    va_list vp;   
-    char *queueMessage;
-	int length = 1024 + strlen(format) * 10; 
+void slMessage(int level, const char *format, ...) {
+	if (level > gDebugLevel || !gMessageOutputFunction)
+		return;
 
-    if(level > gDebugLevel) return;
+	char queueMessage[1024 + strlen(format) * 10];
+	va_list vp;   
 
-    va_start(vp, format);
+	va_start(vp, format);
+	vsnprintf(queueMessage, sizeof(queueMessage), format, vp);
+	va_end(vp);
 
-	queueMessage = (char*)alloca(length);
-	vsnprintf(queueMessage, length - 1, format, vp);
-
-    va_end(vp);
-
-	if(gMessageOutputFunction) gMessageOutputFunction(queueMessage);
-}
-
-/*!
-	\brief Prints a string to the output log.
-
-	Uses the global message output function to output the specified 
-	string.  Unlike slMessage, this method does not use sprintf,
-	meaning that '%' characters can safely be printed.
-*/
-
-void slFormattedMessage(int level, char *string) {
-	if(gMessageOutputFunction) gMessageOutputFunction(string);
+	gMessageOutputFunction(queueMessage);
 }
 
 /*!

@@ -2814,7 +2814,7 @@ int stPrintEvaluation(brEval *e, stRunInstance *i) {
 
 	evalString = stFormatEvaluation(e, i->instance);
 
-	slFormattedMessage(NORMAL_OUTPUT, evalString);
+	slMessage(NORMAL_OUTPUT, "%s", evalString);
 
 	slFree(evalString);
 

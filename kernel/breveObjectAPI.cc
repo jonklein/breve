@@ -14,7 +14,6 @@
 	\brief Registers a new object type with the engine.
 */
 
-DLLEXPORT 
 void brEngineRegisterObjectType(brEngine *e, brObjectType *t) {
 	e->objectTypes.push_back(t);
 }
@@ -27,7 +26,6 @@ void brEngineRegisterObjectType(brEngine *e, brObjectType *t) {
 	a pointer to the method to be cached, to avoid frequent lookups.
 */
 
-DLLEXPORT 
 brMethod *brMethodFind(brObject *o, char *name, unsigned char *types, int argCount) {
 	brMethod *m;
 	void *mp;
@@ -62,7 +60,6 @@ brMethod *brMethodFind(brObject *o, char *name, unsigned char *types, int argCou
 	are provided.  
 */
 
-DLLEXPORT 
 brMethod *brMethodFindWithArgRange(brObject *o, char *name, unsigned char *types, int min, int max) {
 	int n;
 
@@ -83,7 +80,6 @@ brMethod *brMethodFindWithArgRange(brObject *o, char *name, unsigned char *types
 	to ask each language frontend to locate the object.
 */
 
-DLLEXPORT 
 brObject *brObjectFind(brEngine *e, char *name) {
 	brObject *object;
 	std::string names = name;
@@ -101,7 +97,6 @@ brObject *brObjectFind(brEngine *e, char *name) {
 	an object that does not currently exist in the engine.
 */
 
-DLLEXPORT 
 brObject *brUnknownObjectFind(brEngine *e, char *name) {
 	std::vector<brObjectType*>::iterator oi;
 
@@ -123,7 +118,6 @@ brObject *brUnknownObjectFind(brEngine *e, char *name) {
 	\brief Returns the userData field of a brInstance.
 */
 
-DLLEXPORT 
 void *brInstanceGetUserData(brInstance *i) {
 	return i->userData;
 }
@@ -132,7 +126,6 @@ void *brInstanceGetUserData(brInstance *i) {
 	\brief Returns the userData field of a brObject.
 */
 
-DLLEXPORT 
 void *brObjectGetUserData(brObject *o) {
 	return o->userData;
 }
@@ -146,7 +139,6 @@ void *brObjectGetUserData(brObject *o) {
 	method call, depending on the implementation of the language frontend.
 */
 
-DLLEXPORT 
 int brMethodCall(brInstance *i, brMethod *m, brEval **args, brEval *result) {
 	if(i->status != AS_ACTIVE) {
 		slMessage(DEBUG_ALL, "warning: method \"%s\" called for released instance %p\n", m->name, i);
@@ -164,7 +156,6 @@ int brMethodCall(brInstance *i, brMethod *m, brEval **args, brEval *result) {
 	not be used if the method is going to be called frequently.
 */
 
-DLLEXPORT 
 int brMethodCallByName(brInstance *i, char *name, brEval *result) {
 	brMethod *m = brMethodFind(i->object, name, NULL, 0);
 	int r;
@@ -192,7 +183,6 @@ int brMethodCallByName(brInstance *i, char *name, brEval *result) {
 	method call, depending on the implementation of the language frontend.
 */
 
-DLLEXPORT 
 int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, int count, brEval *result) {
 	brMethod *m = brMethodFind(i->object, name, NULL, count);
 	int r;
@@ -217,7 +207,6 @@ int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, int cou
 	is executed for the observer.
 */
 
-DLLEXPORT 
 int brInstanceAddObserver(brInstance *i, brInstance *observer, char *notification, char *mname) {
     brObserver *o;                                                           
     brMethod *method;
@@ -248,7 +237,6 @@ int brInstanceAddObserver(brInstance *i, brInstance *observer, char *notificatio
 	instance i.
 */
     
-DLLEXPORT 
 void brEngineRemoveInstanceObserver(brInstance *i, brInstance *observerInstance, char *notification) {
     slList *observerList, *match, *last;
     brObserver *observer;
@@ -288,12 +276,15 @@ void brEngineRemoveInstanceObserver(brInstance *i, brInstance *observerInstance,
 	archiving the instance.
 */
 
-DLLEXPORT 
 int brInstanceAddDependency(brInstance *i, brInstance *dependency) {
-    if(!i || !dependency) return 0;
+    if (!i || !dependency)
+	return 0;
 
-    if(!slInList(i->dependencies, dependency)) i->dependencies = slListPrepend(i->dependencies, dependency);
-    if(!slInList(dependency->dependents, i)) dependency->dependents = slListPrepend(dependency->dependents, i);
+    if (!slInList(i->dependencies, dependency))
+	i->dependencies = slListPrepend(i->dependencies, dependency);
+
+    if(!slInList(dependency->dependents, i))
+	dependency->dependents = slListPrepend(dependency->dependents, i);
 
     return 1;
 }
@@ -302,12 +293,15 @@ int brInstanceAddDependency(brInstance *i, brInstance *dependency) {
 	\brief Removes a dependency from i.
 */
 
-DLLEXPORT 
 int brEngineRemoveInstanceDependency(brInstance *i, brInstance *dependency) {
-    if(!i || !dependency) return 0;
+    if (!i || !dependency)
+	return 0;
 
-    if(slInList(i->dependencies, dependency)) i->dependencies = slListRemoveData(i->dependencies, dependency);
-    if(slInList(dependency->dependents, i)) dependency->dependents = slListRemoveData(dependency->dependents, i);
+    if (slInList(i->dependencies, dependency))
+	i->dependencies = slListRemoveData(i->dependencies, dependency);
+
+    if(slInList(dependency->dependents, i))
+	dependency->dependents = slListRemoveData(dependency->dependents, i);
 
     return 1;  
 }
@@ -317,7 +311,6 @@ int brEngineRemoveInstanceDependency(brInstance *i, brInstance *dependency) {
 	\brief Adds an object to the engine.
 */
 
-DLLEXPORT 
 brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *pointer) {
 	brObject *o;
 	std::string names = name;
@@ -342,11 +335,10 @@ brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *poin
 	An object alias is another name for an existing object.
 */
 
-DLLEXPORT 
 void brEngineAddObjectAlias(brEngine *e, char *name, brObject *o) {
 	std::string names = name;
 
-	e->objectAliases[ name] = o;
+	e->objectAliases[name] = o;
 }
 
 /*!
@@ -355,7 +347,6 @@ void brEngineAddObjectAlias(brEngine *e, char *name, brObject *o) {
 	The instance's iterate method will be called at each iteration.
 */
 
-DLLEXPORT 
 brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
 	brMethod *imethod, *pmethod;
 	brInstance *i;
@@ -401,7 +392,6 @@ brInstance *brObjectInstantiate(brEngine *e, brObject *o, brEval **args, int arg
 	\ref brInstanceFree except during simulation deallocation and cleanup.
 */
 
-DLLEXPORT 
 void brInstanceRelease(brInstance *i) {
 	if(!i || i->status != AS_ACTIVE) return;
 
@@ -420,7 +410,6 @@ void brInstanceRelease(brInstance *i) {
 	will no longer be iterated by the engine.
 */
 
-DLLEXPORT 
 void brEngineRemoveInstance(brEngine *e, brInstance *i) {
 	// inform the camera of the change
 
@@ -445,9 +434,9 @@ void brEngineRemoveInstance(brEngine *e, brInstance *i) {
 	you must free it using this method when you are done with it.
 */
 
-DLLEXPORT 
 void brMethodFree(brMethod *m) {
-	if(m->name) slFree(m->name);
+	if(m->name)
+		slFree(m->name);
 	delete m;
 }
 
@@ -455,7 +444,6 @@ void brMethodFree(brMethod *m) {
 	\brief Frees a breve object.
 */
 
-DLLEXPORT 
 void brObjectFree(brObject *o) {
 	unsigned int n;
 
@@ -480,7 +468,6 @@ void brObjectFree(brObject *o) {
 	engine isn't running, but otherwise use \ref brInstanceRelease instead.
 */
 
-DLLEXPORT 
 void brInstanceFree(brInstance *i) {
 	slList *olist;
 	brObserver *observer;
@@ -546,7 +533,6 @@ void brInstanceFree(brInstance *i) {
     with the collider instance as an argument.
 */
 
-DLLEXPORT 
 int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *name) {
 	brCollisionHandler *ch;
 	brMethod *method;
@@ -577,7 +563,6 @@ int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *nam
 	return EC_OK;
 }
 
-DLLEXPORT 
 int brObjectSetIgnoreCollisionsWith(brObject *handler, brObject *collider, int ignore) {
 	brCollisionHandler *ch;
 	unsigned int n;

@@ -229,7 +229,7 @@ void *brListenOnSocket(void *data) {
 		clientData.socket = accept(serverData->socket, (struct sockaddr*)&clientData.addr, &caddr_size);
 
 		if(clientData.socket != -1) {
-			// fcntl(clientData->socket, F_SETFL, O_NONBLOCK);
+			// fcntl(clientData.socket, F_SETFL, O_NONBLOCK);
 			brHandleConnection(&clientData);
 			close(clientData.socket);
 		}
@@ -329,23 +329,23 @@ void *brHandleConnection(void *p) {
 */
 
 char *brFinishNetworkRead(brNetworkClientData *data, brNetworkRequest *request) {
-	char *d = (char*)slMalloc(sizeof(brNetworkRequest));
-	char buffer[1024];
-	int count;
-	int size = sizeof(brNetworkRequest);
+	char	buffer[1024];
+	ssize_t count;
+	size_t	size = sizeof(brNetworkRequest);
+	char	*d = (char *)slMalloc(size + 1);
 
-	memcpy(d, request, sizeof(brNetworkRequest));
+	memcpy(d, request, size);
 
-	while((count = brHTTPReadLine(data->socket, buffer, 1024)) == 1024) {
-		d = (char*)slRealloc(d, size + count + 1);
+	while (d[size - 1] != '\n' ||
+	      (d[size - 2] != '\n' && d[size - 3] != '\n')) {
+		count = read(data->socket, buffer, sizeof(buffer));
+		if (count < 1)
+			break;
 
-		printf("read %d bytes\n", count);
-
+		d = (char *)slRealloc(d, size + count + 1);
 		memcpy(&d[size], buffer, count);
-
 		size += count;
 	}
-
 	d[size] = 0;
 
 	return d;
@@ -452,23 +452,4 @@ void brSendPage(brNetworkClientData *data, char *page) {
 	slFree(text);
 
 	return;
-}
-
-/*!
-	\brief Reads an HTTP request until no more data is found.
-*/
-
-int brHTTPReadLine(int socket, char *buffer, size_t size ) {
-    unsigned int n, readcount = 0;
-
-    while(readcount < size) {
-        n = read(socket, buffer + readcount, size - readcount);
-
-		if(strchr(buffer, '\n')) return readcount;
-        if(n < 1) return readcount;
-
-        readcount += n;
-    }
-
-    return readcount;
 }

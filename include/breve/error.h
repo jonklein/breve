@@ -42,8 +42,7 @@ void slDebugFunction(char *, int, char *, ...);
 
 void slDebugMatrix(int, double [3][3]);
 
-DLLEXPORT void slMessage(int, char *, ...);
-void slFormattedMessage(int, char *);
+DLLEXPORT void slMessage(int, const char *, ...);
 
 void slStderrMessageCallback(char *);
 

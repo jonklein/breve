@@ -35,6 +35,19 @@
 #define stEvalList brEvalList
 #define stEvalListHead brEvalListHead
 #define stNewEvalList brEvalListNew
+#define stPluginFindFile brPluginFindFile
+
+#define STINT		BRINT
+#define STFLOAT		BRFLOAT
+#define STDOUBLE	BRDOUBLE
+#define STSTRING	BRSTRING
+#define STVECTOR	BRVECTOR
+#define STMATRIX	BRMATRIX
+#define STINSTANCE	BRINSTANCE
+#define STPOINTER	BRPOINTER
+#define STDATA		BRDATA
+#define STHASH		BRHASH
+#define STLIST		BRLIST
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,12 +65,12 @@ typedef struct brData brData;
 typedef struct stInstance stInstance;
 typedef struct brInstance brInstance;
 
-// breve output error codes 
+/* breve output error codes */
 
 #define EC_ERROR -1		/* causes the simulation to terminate */
 #define EC_OK 1			/* normal output--simulation continues */
 
-// these entries appear in the brEval type field
+/* These entries appear in the brEval type field. */
 
 enum atomicTypes {
 	AT_UNDEFINED = 0,
@@ -78,9 +91,7 @@ enum atomicTypes {
 };
 
 struct slVector {
-	double x;
-	double y;
-	double z;
+	double x, y, z;
 };
 
 typedef double slMatrix[3][3];
@@ -103,10 +114,10 @@ struct brEval {
 };
 
 /*
-	lists in steve are held internally by the brEvalListHead which
+	Lists in steve are held internally by the brEvalListHead which
 	holds a doubly-linked list of brEvalList structures.  
 
-	do not modify this structure.
+	Do not modify this structure.
 */
 
 struct brEvalListHead {
@@ -128,7 +139,7 @@ struct brEvalList {
 };
 
 /*
- * the brData struct and associated functions.
+ * The brData struct and associated functions.
  */
 
 struct brData {
@@ -140,18 +151,16 @@ struct brData {
 brData *brDataNew(void *data, int length);
 void brDataFree(brData *data);
 
-char *slStrdup(char *string);
-
 /* 
-	the following functions are used to create & edit evaluation lists.
-	you can create brEvalLists to be returned by your functions.  don't
-	worry about freeing brEvalLists, this is done by the engine.
+	The following functions are used to create & edit evaluation lists.
+	You can create brEvalLists to be returned by your functions.
+	Don't worry about freeing brEvalLists, this is done by the engine.
 */
 
 brEvalListHead *brEvalListNew(void);
 #define brEvalListAppend(a, eval) brEvalListInsert((a), (a)->count, (eval))
 
-/* use these macros to treat brEval pointers like specific types */
+/* Use these macros to treat brEval pointers like specific types. */
 
 #define BRINT(e)	((e)->values.intValue)
 #define BRFLOAT(e)	((e)->values.doubleValue)
@@ -165,19 +174,8 @@ brEvalListHead *brEvalListNew(void);
 #define BRHASH(e)	((e)->values.hashValue)
 #define BRLIST(e)	((e)->values.listValue)
 
-#define STINT		BRINT
-#define STFLOAT		BRFLOAT
-#define STDOUBLE	BRDOUBLE
-#define STSTRING	BRSTRING
-#define STVECTOR	BRVECTOR
-#define STMATRIX	BRMATRIX
-#define STINSTANCE	BRINSTANCE
-#define STPOINTER	BRPOINTER
-#define STDATA		BRDATA
-#define STHASH		BRHASH
-#define STLIST		BRLIST
-
-int brNewBreveCall(void *n, char *name, int (*call)(brEval *argumentArray, brEval *returnValue, void *callingInstance), int rtype, ...);
+int brNewBreveCall(void *n, char *name, int (*call)(brEval *argumentArray,
+	brEval *returnValue, void *callingInstance), int rtype, ...);
 
 /*
 	to call breve methods from your plugin, use the following method.  
@@ -194,39 +192,67 @@ int brNewBreveCall(void *n, char *name, int (*call)(brEval *argumentArray, brEva
 	method.
 */
 
-int stCallMethodByNameWithArgs(void *instance, char *name, brEval **args, int argcount, brEval *result);
+int stCallMethodByNameWithArgs(void *instance, char *name, brEval **args,
+	int argcount, brEval *result);
 
-/*
-	to print error messages to the breve console, use the function slMessage
-	the first argument should always be DEBUG_ALL.  the second argument is a
-	"printf" style format string, and subsequent arguments correspond to the
-	arguments referenced in the format string.
-*/
+	/*
+	 * The slMessage() function prints formatted a formatted error message
+	 * to the breve console. The _level_ argument must always be DEBUG_ALL.
+	 * The _fmt_ specification (and associated arguments) may be any format
+	 * allowed by printf(3) or a simple string.
+	 */
 
 #define DEBUG_ALL	0
 
-int slMessage(int level, char *format, ...);
+void slMessage(int level, const char *fmt, ...);
 
-/*
-	slMalloc and slFree are plugin replacements for malloc and free which 
-	do some simple memory management.  Their use is optional, but if you 
-	choose to use one, then you must use the other as well.  An slMalloc
-	call must be balanced by an slFree.
-*/
+	/*
+	 * The slMalloc() function allocates space for an object of _size_ bytes
+	 * and initializes the space to all bits zero.
+	 *
+	 * The slFree() function makes the space allocated to the object
+	 * pointed to by _ptr_ avaiable further allocation.
+	 *
+	 * The slRealloc() function changes the size of the object pointed to
+	 * by _ptr_ to _size_ bytes and returns a pointer to the object.
+	 *
+	 * It is an error to call slFree() or slRealloc() for an object which
+	 * was not returned by a previous call to slMalloc() or slRealloc().
+	 *
+	 * The slMalloc() and slRealloc() functions return NULL on error.
+	 */
 
-void *slMalloc(int size);
-void *slRealloc(void *pointer, int size);
-void slFree(void *pointer);
+void *slMalloc(size_t size);
+void *slRealloc(void *ptr, size_t size);
+void slFree(void *ptr);
 
-/*
-	pass in the callingInstance pointer, and this function returns 
-	a FILE* to which fprintf output can be directed in order to send 
-	it to the breve log.
-*/
+	/*
+	 * The slStrdup() function allocates space for a copy of the string
+	 * pointed to by _s_, copies the string, and a returns a pointer
+	 * to the copied string. The returned pointer may subsequently be
+	 * used as an argument to the slFree() function.
+	 *
+	 * If the string cannot be copied, NULL is returned.
+	 */
+
+char *slStrdup(const char *s);
+
+	/*
+	 * The slGetLogFilePointer() function returns a FILE pointer
+	 * referring to the breve output log, typically stderr.
+	 */
 
 FILE *slGetLogFilePointer(void *callingInstance);
 
-char *stPluginFindFile(char *file, void *i);
+	/*
+	 * The brPluginFindFile() function finds a file in the engine's
+	 * search path and returns the pathname to that file.
+	 *
+	 * The returned pointer, if it is not NULL, should be deallocated
+	 * with slFree() when it is no longer needed by the plugin.
+	 */
+
+char *brPluginFindFile(char *file, void *callingInstance);
 
 #ifdef __cplusplus
 }

@@ -49,8 +49,6 @@ void brSendPage(brNetworkClientData *, char *);
 
 int brHandleHTTPConnection(brNetworkClientData *, char *);
 
-int brHTTPReadLine(int, char *, size_t);
-
 #define SL_NET_404  "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\
 <HTML><HEAD> \
 <TITLE>404 Not Found</TITLE> \
