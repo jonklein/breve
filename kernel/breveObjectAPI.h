@@ -22,12 +22,19 @@ typedef struct brObjectType brObjectType;
 */
 
 struct brObjectType {
-	int (*callMethod)(brInstance *instance, brMethod *method, brEval **arguments, brEval *result);
-	void *(*findMethod)(brObject *object, char *name, unsigned char *types, int nargs);
+	void *(*findMethod)(brObject *object, char *name, 
+		unsigned char *types, int nargs);
 	void *(*findObject)(brObjectType *type, char *name);
-	int (*isSubclass)(brObject *class1, brObject *class2);
 	void *(*instantiate)(brObject *class, brEval **constructorArgs, int argCount);
+
+	int (*callMethod)(brInstance *instance, brMethod *method, brEval **arguments, brEval *result);
+
+	int (*isSubclass)(brObject *class1, brObject *class2);
+
+	void (*destroyObject)(brObject *object);
+	void (*destoryMethod)(brMethod *method);
 	void (*destroyInstance)(brInstance *instance);
+	void (*destroyObjectType)(brObjectType *objectType);
 
 	void *data;
 };
@@ -128,8 +135,10 @@ void brEngineRegisterObjectType(brEngine *e, brObjectType *t);
 
 // locating objects and methods within objects
 
-brMethod *brMethodFind(brObject *type, char *name, int argCount);
-brMethod *brMethodFindWithArgRange(brObject *o, char *name, int min, int max);
+brMethod *brMethodFind(brObject *type, char *name, 
+	unsigned char *types, int argCount);
+brMethod *brMethodFindWithArgRange(brObject *o, char *name, 
+	unsigned char *types, int min, int max);
 
 brObject *brObjectFind(brEngine *n, char *name);
 brObject *brUnknownObjectFind(brEngine *e, char *name);
@@ -138,7 +147,8 @@ brObject *brUnknownObjectFind(brEngine *e, char *name);
 
 int brMethodCall(brInstance *i, brMethod *m, brEval **args, brEval *result);
 int brMethodCallByName(brInstance *i, char *name, brEval *result);
-int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, int count, brEval *result);
+int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, 
+	int count, brEval *result);
 
 // functions related to adding and removing classes and instances to the breve engine
 

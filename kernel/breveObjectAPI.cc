@@ -15,7 +15,7 @@
 */
 
 void brEngineRegisterObjectType(brEngine *e, brObjectType *t) {
-	slStackPush(e->objectTypes, t);
+	if(t) slStackPush(e->objectTypes, t);
 }
 
 /*!
@@ -26,11 +26,17 @@ void brEngineRegisterObjectType(brEngine *e, brObjectType *t) {
 	a pointer to the method to be cached, to avoid frequent lookups.
 */
 
-brMethod *brMethodFind(brObject *o, char *name, int argCount) {
+brMethod *brMethodFind(brObject *o, char *name, unsigned char *types, int argCount) {
 	brMethod *m;
 	void *mp;
+	int n;
 
-	mp = o->type->findMethod(o, name, NULL, argCount);
+	if(!types && argCount) {
+		types = alloca(argCount);
+		for(n=0;n<argCount;n++) types[n] = AT_UNDEFINED;
+	}
+
+	mp = o->type->findMethod(o, name, types, argCount);
 
 	if(!mp) return NULL;
 
@@ -54,11 +60,11 @@ brMethod *brMethodFind(brObject *o, char *name, int argCount) {
 	are provided.  
 */
 
-brMethod *brMethodFindWithArgRange(brObject *o, char *name, int min, int max) {
+brMethod *brMethodFindWithArgRange(brObject *o, char *name, unsigned char *types, int min, int max) {
 	int n;
 
 	for(n=max;n>=min;n--) {
-		brMethod *m = brMethodFind(o, name, n);
+		brMethod *m = brMethodFind(o, name, types, n);
 
 		if(m) return m;
 	}
@@ -69,7 +75,9 @@ brMethod *brMethodFindWithArgRange(brObject *o, char *name, int min, int max) {
 /*!
     \brief Finds an object in the given namespace
 
-	returns an object with the given name from the given namespace.
+	Looks up an object in the engine's table of known objects.  If 
+	the object cannot be found, \ref brUnknownObjectFind is called 
+	to ask each language frontend to locate the object.
 */
 
 brObject *brObjectFind(brEngine *e, char *name) {
@@ -86,6 +94,9 @@ brObject *brObjectFind(brEngine *e, char *name) {
 
 /*!
 	\brief Looks up an unknown object and adds it to the engine.
+
+	Uses the language frontend callbacks to locate and register
+	an object that does not currently exist in the engine.
 */
 
 brObject *brUnknownObjectFind(brEngine *e, char *name) {
@@ -132,7 +143,7 @@ int brMethodCall(brInstance *i, brMethod *m, brEval **args, brEval *result) {
 */
 
 int brMethodCallByName(brInstance *i, char *name, brEval *result) {
-	brMethod *m = brMethodFind(i->object, name, 0);
+	brMethod *m = brMethodFind(i->object, name, NULL, 0);
 	int r;
 
 	if(!m) {
@@ -159,7 +170,7 @@ int brMethodCallByName(brInstance *i, char *name, brEval *result) {
 */
 
 int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, int count, brEval *result) {
-	brMethod *m = brMethodFind(i->object, name, count);
+	brMethod *m = brMethodFind(i->object, name, NULL, count);
 	int r;
 
 	if(!m) {
@@ -185,8 +196,9 @@ int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, int cou
 int brInstanceAddObserver(brInstance *i, brInstance *observer, char *notification, char *mname) {
     brObserver *o;                                                           
     brMethod *method;
+	unsigned char types[] = { AT_INSTANCE, AT_STRING };
  
-	method = brMethodFindWithArgRange(observer->object, mname, 0, 2);
+	method = brMethodFindWithArgRange(observer->object, mname, types, 0, 2);
  
     if(!method) {                                                            
         slMessage(DEBUG_ALL, "error adding observer: could not locate method \"%s\" for class %s\n", mname, observer->object->name);
@@ -340,8 +352,8 @@ brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
 
 	// find the iterate method which we will call at each iteration
 
-	imethod = brMethodFind(i->object, "iterate", 0);
-	pmethod = brMethodFind(i->object, "post-iterate", 0);
+	imethod = brMethodFind(i->object, "iterate", NULL, 0);
+	pmethod = brMethodFind(i->object, "post-iterate", NULL, 0);
 
 	i->iterate = imethod;
 	i->postIterate = pmethod;
@@ -435,6 +447,8 @@ void brInstanceFree(brInstance *i) {
 	brObserver *observer;
 	int n;
 
+	if(i && i->pointer) i->object->type->destroyInstance(i);
+
     slListFree(i->dependencies);
     slListFree(i->dependents);
 
@@ -503,6 +517,7 @@ int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *nam
 	brCollisionHandler *ch;
 	brMethod *method;
 	int n;
+	unsigned char types[] = { AT_INSTANCE, AT_DOUBLE };
 
 	for(n=0;n<handler->collisionHandlers->count;n++) {
 		ch = handler->collisionHandlers->data[n];
@@ -510,7 +525,7 @@ int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *nam
 		if(ch->object == collider) return EC_STOP;
 	}
 
-	method = brMethodFindWithArgRange(handler, name, 0, 1);
+	method = brMethodFindWithArgRange(handler, name, types, 0, 1);
 
 	if(!method) {
 		slMessage(DEBUG_ALL, "Error adding collision handler: cannot locate method \"%s\" for class \"%s\"\n", handler->name, name);

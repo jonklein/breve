@@ -26,7 +26,7 @@ int breveFunctionPushCallbackNew(brEval arguments[], brEval *result, brInstance 
 
 	data = slMalloc(sizeof(brPushCallbackData));
 	data->instance = callbackInstance;
-	data->method = brMethodFind(callbackInstance->object, methodName, 0);
+	data->method = brMethodFind(callbackInstance->object, methodName, NULL, 0);
 
 	if(!data->method) {
 		slMessage(DEBUG_ALL, "Cannot locate method \"%s\" for class \"%s\" for push callback instruction\n", methodName, callbackInstance->object->name);

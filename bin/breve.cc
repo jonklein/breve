@@ -168,7 +168,7 @@ int main(int argc, char **argv) {
 	frontend->engine->freeWindowCallback = freeWindowCallback;
 	frontend->engine->renderWindowCallback = renderWindowCallback;
 
-	// brJavaInit(frontend->engine);
+	brJavaInit(frontend->engine);
 
 	slInitGlut(argc, argv, simulationFile);
 
@@ -306,8 +306,8 @@ void brQuit(brEngine *e) {
 		printf("%f simulated/real\n", e->world->age/diff);
 	}
 
-	breveFrontendCleanupData(frontend->data);
 	brEngineFree(frontend->engine);
+	breveFrontendCleanupData(frontend->data);
 	slFree(frontend);
 
 #ifdef MEMORY_DEBUG

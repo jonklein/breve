@@ -21,4 +21,6 @@ struct slSpring {
 void slSpringApplyForce(slSpring *spring);
 slSpring *slSpringNew(slLink *l1, slLink *l2, slVector *v1, slVector *v2, double length, double strength, double damping);
 
+void slWorldAddSpring(slWorld *w, slSpring *s);
+
 void slWorldDrawSprings(slWorld *w);

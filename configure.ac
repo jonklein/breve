@@ -121,6 +121,15 @@ AC_CHECK_LIB([termcap], [tputs])
 AC_CHECK_LIB([ncurses], [tputs])
 AC_CHECK_LIB([history], [add_history])
 AC_CHECK_LIB([readline], [readline])
+AC_CHECK_LIB([java], [JNI_CreateJavaVM],,,$JAVALIBS)
+
+case "${host_os}" in
+	darwin* )
+		LIBS="$LIBS $JAVALIBS"
+		AC_DEFINE([HAVE_LIBJAVA])
+
+	;;
+esac
 
 AC_LANG([C++])
 AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]),[-lstdc++])

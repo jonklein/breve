@@ -53,6 +53,8 @@ __inline__ int stEvalFree(stExp *e, stRunInstance *i, brEval *t);
 __inline__ int stEvalArray(slArray *l, stRunInstance *i, brEval *target);
 __inline__ int stEvalMethodCall(stMethodExp *m, stRunInstance *i, brEval *t);
 __inline__ int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunInstance *i, brEval *t);
+int stEvalForeignMethodCall(stMethodExp *mexp, brInstance *caller, stRunInstance *i, brEval *t);
+
 
 __inline__ int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *target);
 

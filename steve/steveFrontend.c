@@ -40,7 +40,7 @@ int stSubclassCallback(brObject *c1, brObject *c2) {
 */
 
 int stCallMethodBreveCallback(brInstance *i, brMethod *method, brEval **arguments, brEval *result) {
-	int n, r;
+	int r;
 	stRunInstance ri;
 
 	ri.instance = i->pointer;
@@ -72,6 +72,14 @@ void *stFindMethodBreveCallback(brObject *object, char *name, unsigned char *arg
 }
 
 /*!
+	\brief The steve language callback to free an instance.
+*/
+
+void stInstanceFreeCallback(brInstance *i) {
+	stInstanceFree(i->pointer);
+}
+
+/*!
 	\brief Initializes the steve language and sets up the brObjectType structure.
 */
 
@@ -87,6 +95,7 @@ stSteveData *stSteveInit(brEngine *engine) {
 	gSteveData->steveObjectType.findMethod = stFindMethodBreveCallback;
 	gSteveData->steveObjectType.isSubclass = stSubclassCallback;
 	gSteveData->steveObjectType.instantiate = stInstanceNewCallback;
+	gSteveData->steveObjectType.destroyInstance = stInstanceFreeCallback;
 
 	gSteveData->steveObjectType.findObject = NULL;
 

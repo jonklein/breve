@@ -20,6 +20,8 @@
 
 #include "steve.h"
 
+extern stSteveData *gSteveData;
+
 /*!
 	+ evaluation.c
 	= is the heart of steve.  it takes parse trees and executes them.
@@ -595,35 +597,34 @@ inline int stEvalFree(stExp *s, stRunInstance *i, brEval *t) {
 	if(result != EC_OK) return EC_ERROR;
 
 	if(target.type == AT_INSTANCE) {
+		// if we're freeing ourself (the calling instance) then we will return EC_STOP
+		if(BRINSTANCE(&target)->pointer == i->instance) finished = 1;
+
 		if(!BRINSTANCE(&target)) {
 			slMessage(DEBUG_ALL, "warning: attempt to free uninitialized object\n");
 			return EC_OK;
 		}
 
-		if(BRINSTANCE(&target)->status == AS_ACTIVE) brInstanceFree(BRINSTANCE(&target));
+		if(BRINSTANCE(&target)->status == AS_ACTIVE) brInstanceRelease(BRINSTANCE(&target));
 		else {
 			slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", BRINSTANCE(&target));
 		}
-
-		// if we're freeing ourself (the calling instance) then we will return EC_STOP
-
-		if(BRINSTANCE(&target)->pointer == i->instance) finished = 1;
 	} else if(target.type == AT_LIST) {
 		list = (BRLIST(&target))->start;
 
 		while(list) {
 			if(list->eval.type == AT_INSTANCE) {
-				if(!BRINSTANCE(&list->eval)) slMessage(DEBUG_ALL, "warning: attempt to free uninitialized object\n");
-				else {
-					if(BRINSTANCE(&list->eval)->status == AS_ACTIVE) brInstanceFree(BRINSTANCE(&list->eval));
+				if(!BRINSTANCE(&list->eval)) {
+					slMessage(DEBUG_ALL, "warning: attempt to free uninitialized object\n");
+				} else {
+					// if we're freeing ourself (the calling instance) then we will return EC_STOP
+					if(BRINSTANCE(&list->eval)->pointer == i->instance) finished = 1;
+
+					if(BRINSTANCE(&list->eval)->status == AS_ACTIVE) brInstanceRelease(BRINSTANCE(&list->eval));
 					else {
 						slMessage(DEBUG_ALL, "warning: attempting to free released instance %p\n", BRINSTANCE(&list->eval));
 						slMessage(DEBUG_ALL, "... error in file \"%s\" at line %d\n", s->file, s->line);
 					}
-
-					// if we're freeing ourself (the calling instance) then we will return EC_STOP
-
-					if(BRINSTANCE(&list->eval)->pointer == i->instance) finished = 1;
 				}
 			}
 
@@ -728,6 +729,10 @@ inline int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) {
 	if(r != EC_OK) return r;
 
 	if(obj.type == AT_INSTANCE) {
+		if(BRINSTANCE(&obj)->object->type != gSteveData) {
+			return stEvalForeignMethodCall(mexp, BRINSTANCE(&obj), i, t);
+		}
+
 		ri.instance = BRINSTANCE(&obj)->pointer;
 
 		if(!ri.instance) {
@@ -746,6 +751,10 @@ inline int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) {
 		brEvalList *listStart = BRLIST(&obj)->start;
 
 		while(listStart) {
+			if(BRINSTANCE(&listStart->eval)->object->type != gSteveData) {
+				return stEvalForeignMethodCall(mexp, BRINSTANCE(&listStart->eval), i, t);
+			}
+
 			ri.instance = BRINSTANCE(&listStart->eval)->pointer;
 			ri.type = ri.instance->type;
 
@@ -761,6 +770,25 @@ inline int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) {
 	stEvalError(i->instance->type->engine, EE_TYPE, "Method \"%s\" called for an expression that is neither an object nor a list", mexp->methodName);
 
 	return EC_ERROR;
+}
+
+int stEvalForeignMethodCall(stMethodExp *mexp, brInstance *caller, stRunInstance *i, brEval *t) {
+	int n, result;
+	brEval *args, **argps;
+
+	args = alloca(sizeof(brEval) * mexp->arguments->count);
+	argps = alloca(sizeof(brEval*) * mexp->arguments->count);
+
+	for(n=0;n<mexp->arguments->count;n++) {
+		stKeyword *k = mexp->arguments->data[n];
+
+		argps[n] = &args[n];
+		if((result = stExpEval(k->value, i, argps[n], NULL)) != EC_OK) return result;
+	}
+
+	brMethodCallByNameWithArgs(caller, mexp->methodName, argps, mexp->arguments->count, t);
+
+	return EC_OK;
 }
 
 /*!

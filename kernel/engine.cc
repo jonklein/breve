@@ -211,6 +211,15 @@ void brEngineFree(brEngine *e) {
 #endif
 
 	for(n=0;n<e->instances->count;n++) 
+		brInstanceRelease(e->instances->data[n]);
+
+	for(n=0;n<e->instances->count;n++) {
+		brInstance *i = e->instances->data[n];
+		if(i->object->type->destroyInstance) i->object->type->destroyInstance(i);
+		i->pointer = NULL;
+	}
+
+	for(n=0;n<e->instances->count;n++) 
 		brInstanceFree(e->instances->data[n]);
 
 	slStackFree(e->instances);

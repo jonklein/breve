@@ -60,6 +60,9 @@
 /* Define to 1 if you have the `history' library (-lhistory). */
 #undef HAVE_LIBHISTORY
 
+/* Define to 1 if you have the `java' library (-ljava). */
+#undef HAVE_LIBJAVA
+
 /* Define to 1 if you have the `jpeg' library (-ljpeg). */
 #undef HAVE_LIBJPEG
 

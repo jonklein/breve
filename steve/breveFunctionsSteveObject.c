@@ -179,7 +179,6 @@ int stCObjectAllocationReport(brEval args[], brEval *target, brInstance *i) {
 
 int stNewInstanceForClassString(brEval args[], brEval *target, brInstance *i) {
 	brObject *o = brObjectFind(i->engine, BRSTRING(&args[0]));  
-	stInstance *newi;
  
 	if(!o) {
 		stEvalError(i->engine, EE_SIMULATION, "Unknown class '%s'.", BRSTRING(&args[0]));
@@ -187,9 +186,7 @@ int stNewInstanceForClassString(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	} 
 
-	newi = stInstanceCreateAndRegister(i->engine, o);
-
-	BRINSTANCE(target) = newi->breveInstance;
+	BRINSTANCE(target) = stInstanceCreateAndRegister(i->engine, o);
     
 	return EC_OK;
 }   

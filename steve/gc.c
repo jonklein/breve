@@ -91,9 +91,11 @@ void stGCRetain(brEval *e) {
 */
 
 void stGCRetainPointer(void *pointer, int type) {
+	if(!pointer) return;
+
 	switch(type) {
 		case AT_INSTANCE:
-			stInstanceRetain(pointer);
+			stInstanceRetain(((brInstance*)pointer)->pointer);
 			break;
 		case AT_LIST:
 			brEvalListRetain(pointer);
@@ -130,7 +132,7 @@ void stGCUnretainPointer(void *pointer, int type) {
 
 	switch(type) {
 		case AT_INSTANCE:
-			stInstanceUnretain(pointer);
+			stInstanceUnretain(((brInstance*)pointer)->pointer);
 			break;
 		case AT_LIST:
 			brEvalListUnretain(pointer);
@@ -166,7 +168,7 @@ inline void stGCCollectPointer(void *pointer, int type) {
 
 	switch(type) {
 		case AT_INSTANCE:
-			stInstanceCollect(pointer);
+			if(((brInstance*)pointer)->pointer) stInstanceCollect(((brInstance*)pointer)->pointer);
 			break;
 		case AT_LIST:
 			brEvalListCollect(pointer);

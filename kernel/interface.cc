@@ -50,7 +50,7 @@ brMenuEntry *brAddMenuItem(brInstance *i, char *method, char *title) {
 	/* rather than using the global engine variable, we extract */
 	/* the value from the brInstance */
 
-	m = brMethodFind(i->object, method, 0);
+	m = brMethodFind(i->object, method, NULL, 0);
 
 	if(strcmp(title, "") && !m) return NULL;
 
@@ -120,13 +120,14 @@ int brMenuCallback(brEngine *e, brInstance *i, int n) {
 brInstance *brClickCallback(brEngine *e, int n) {
 	brEval eval, theArg, *argPtr[1];
 	brMethod *method;
+	unsigned char *types = { AT_INSTANCE };
 
 	slWorldObject *o;
 
 	if(n == -1) o = NULL;
 	else o = e->world->objects[n];
 
-	method = brMethodFind(e->controller->object, "click", 1);
+	method = brMethodFind(e->controller->object, "click", types, 1);
 	
 	if(!method) return NULL;
 
@@ -171,10 +172,11 @@ int brDragCallback(brEngine *e, int x, int y) {
 	brMethod *method;
 	brInstance *i;
 	int n;
+	char types[] = { AT_VECTOR };
 
 	pthread_mutex_lock(&e->lock);
 
-	method = brMethodFind(e->controller->object, "get-drag-object", 0);
+	method = brMethodFind(e->controller->object, "get-drag-object", NULL, 0);
 	if(!method) return EC_ERROR;
 
 	n = brMethodCall(e->controller, method, NULL, &eval);
@@ -192,7 +194,7 @@ int brDragCallback(brEngine *e, int x, int y) {
 		return EC_OK;
 	}
 
-	method = brMethodFind(i->object, "get-location", 0);
+	method = brMethodFind(i->object, "get-location", NULL, 0);
 	if(!method) return EC_ERROR;
 
 	n = brMethodCall(i, method, NULL, &eval);
@@ -205,7 +207,7 @@ int brDragCallback(brEngine *e, int x, int y) {
 	}
 
 	slVectorForDrag(e->world, e->camera, &BRVECTOR(&eval), x, y, &BRVECTOR(&theArg));
-	method = brMethodFind(i->object, "move", 1);
+	method = brMethodFind(i->object, "move", types, 1);
 
 	if(!method) {
 		pthread_mutex_unlock(&e->lock);
@@ -246,20 +248,20 @@ int brKeyCallback(brEngine *e, unsigned char keyCode, int isDown) {
 
 	if(isDown) {
 		sprintf(mname, "catch-key-%c-down", keyCode);
-		method = brMethodFind(e->controller->object, mname, 0);
+		method = brMethodFind(e->controller->object, mname, NULL, 0);
 
 		if(!method) {
 			sprintf(mname, "catch-key-0x%X-down", keyCode);
-			method = brMethodFind(e->controller->object, mname, 0);
+			method = brMethodFind(e->controller->object, mname, NULL, 0);
 		}
 	} else {
 		sprintf(mname , "catch-key-%c-up", keyCode);
 
-		method = brMethodFind(e->controller->object, mname, 0);
+		method = brMethodFind(e->controller->object, mname, NULL, 0);
 
 		if(!method) {
 			sprintf(mname, "catch-key-0x%X-up", keyCode);
-			method = brMethodFind(e->controller->object, mname, 0);
+			method = brMethodFind(e->controller->object, mname, NULL, 0);
 		}
 	}
 
@@ -283,6 +285,7 @@ int brInterfaceCallback(brEngine *e, int interfaceID, char *string) {
 	brEval eval, *args, a;
 	char mname[128];
 	brMethod *method;
+	unsigned char types[] = { AT_UNDEFINED };
 	int r;
 
 	args = &a;
@@ -291,7 +294,7 @@ int brInterfaceCallback(brEngine *e, int interfaceID, char *string) {
 
 	sprintf(mname, "catch-interface-id-%d", interfaceID);
 
-	method = brMethodFind(e->controller->object, mname, 1);
+	method = brMethodFind(e->controller->object, mname, types, 1);
 
 	if(!method) return EC_OK;
 
