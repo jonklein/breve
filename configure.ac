@@ -79,7 +79,6 @@ AC_PROG_RANLIB
 
 # Checks for libraries.
 AC_CHECK_LIB([z], [gzopen],,AC_MSG_FAILURE([Missing zlib library]))
-AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]),[-lstdc++])
 AC_CHECK_LIB([expat], [XML_ParserCreate],,AC_MSG_FAILURE([Missing expat library -- see http://www.jclark.com/xml/expat.html]))
 AC_CHECK_LIB([pthread], [pthread_create],,AC_MSG_FAILURE([Missing pthread library]),$PTHREADLIBS)
 AC_CHECK_LIB([avcodec], [avcodec_init])
@@ -93,6 +92,7 @@ AC_CHECK_LIB([OSMesa], [OSMesaCreateContext],,,$GLLIBS)
 AC_CHECK_LIB([readline], [readline],,,[-ltermcap])
 
 AC_LANG([C++])
+AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]),[-lstdc++])
 AC_CHECK_LIB([push], [pushEnvironmentNew],,,[-lstdc++])
 AC_LANG([C])
 
