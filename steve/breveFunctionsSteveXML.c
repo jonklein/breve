@@ -5,19 +5,19 @@
 */
 
 int stCWriteXMLEngine(brEval args[], brEval *target, brInstance *i) {
-    char *filename = BRSTRING(&args[0]);
+	 char *filename = BRSTRING(&args[0]);
 
-    if(i->engine->outputPath) {
-        char *newfilename;
-        newfilename = slMalloc(strlen(i->engine->outputPath) + 2 + strlen(filename));
-        sprintf(newfilename, "%s/%s", i->engine->outputPath, filename);
-        BRINT(target) = stXMLWriteSimulationToFile(newfilename, i->engine);
-        slFree(newfilename);
-    } else {
-        BRINT(target) = stXMLWriteSimulationToFile(filename, i->engine);
-    }
+	 if(i->engine->outputPath) {
+		  char *newfilename;
+		  newfilename = slMalloc(strlen(i->engine->outputPath) + 2 + strlen(filename));
+		  sprintf(newfilename, "%s/%s", i->engine->outputPath, filename);
+		  BRINT(target) = stXMLWriteSimulationToFile(newfilename, i->engine);
+		  slFree(newfilename);
+	 } else {
+		  BRINT(target) = stXMLWriteSimulationToFile(filename, i->engine);
+	 }
 
-    return EC_OK;
+	 return EC_OK;
 }
 
 /*!
@@ -25,22 +25,22 @@ int stCWriteXMLEngine(brEval args[], brEval *target, brInstance *i) {
 */
 
 int stCArchiveXMLObject(brEval args[], brEval *target, brInstance *i) {
-    char *filename = BRSTRING(&args[1]);
-    stInstance *archive;
+	 char *filename = BRSTRING(&args[1]);
+	 stInstance *archive;
 
-    archive = BRINSTANCE(&args[0])->userData;
+	 archive = BRINSTANCE(&args[0])->userData;
 
-    if(i->engine->outputPath) {
-        char *newfilename;
-        newfilename = slMalloc(strlen(i->engine->outputPath) + 2 + strlen(filename));
-        sprintf(newfilename, "%s/%s", i->engine->outputPath, filename);
-        BRINT(target) = stXMLWriteObjectToFile(archive, newfilename, 0);
-        slFree(newfilename);
-    } else {
-        BRINT(target) = stXMLWriteObjectToFile(archive, filename, 0);
-    }
+	 if(i->engine->outputPath) {
+		  char *newfilename;
+		  newfilename = slMalloc(strlen(i->engine->outputPath) + 2 + strlen(filename));
+		  sprintf(newfilename, "%s/%s", i->engine->outputPath, filename);
+		  BRINT(target) = stXMLWriteObjectToFile(archive, newfilename, 0);
+		  slFree(newfilename);
+	 } else {
+		  BRINT(target) = stXMLWriteObjectToFile(archive, filename, 0);
+	 }
 
-    return EC_OK;
+	 return EC_OK;
 }
 
 /*!
@@ -48,19 +48,22 @@ int stCArchiveXMLObject(brEval args[], brEval *target, brInstance *i) {
 */
 
 int stCDearchiveXMLObject(brEval args[], brEval *target, brInstance *i) {
-    char *filename = brFindFile(i->engine, BRSTRING(&args[0]), NULL);
+	char *filename = brFindFile(i->engine, BRSTRING(&args[0]), NULL);
+	stInstance *si;
 
-    if(!filename) {
-        slMessage(DEBUG_ALL, "Cannot locate file \"%s\" for object dearchive\n", BRSTRING(&args[0]));
-        BRINSTANCE(target) = NULL;
-        return EC_OK;
-    }
+	if(!filename) {
+		slMessage(DEBUG_ALL, "Cannot locate file \"%s\" for object dearchive\n", BRSTRING(&args[0]));
+		BRINSTANCE(target) = NULL;
+		return EC_OK;
+	}
 
-    STINSTANCE(target) = stXMLDearchiveObjectFromFile(i->engine, filename);
 
-    slFree(filename);
+	si = stXMLDearchiveObjectFromFile(i->engine, filename);
+	BRINSTANCE(target) = si->breveInstance;
 
-    return EC_OK;
+	slFree(filename);
+
+	return EC_OK;
 }
 
 /*!
@@ -76,14 +79,14 @@ int stCDearchiveXMLObjectFromString(brEval args[], brEval *target, brInstance *i
 		return EC_OK;
 	}
 
-    BRINSTANCE(target) = si->breveInstance;
+	 BRINSTANCE(target) = si->breveInstance;
 
-    return EC_OK;
+	 return EC_OK;
 }
 
 void breveInitXMLFuncs(brNamespace *n) {
-    brNewBreveCall(n, "writeXMLEngine", stCWriteXMLEngine, AT_INT, AT_STRING, 0);
-    brNewBreveCall(n, "archiveXMLObject", stCArchiveXMLObject, AT_NULL, AT_INSTANCE, AT_STRING, 0);
-    brNewBreveCall(n, "dearchiveXMLObject", stCDearchiveXMLObject, AT_INSTANCE, AT_STRING, 0);
-    brNewBreveCall(n, "dearchiveXMLObjectFromString", stCDearchiveXMLObjectFromString, AT_INSTANCE, AT_STRING, 0);
+	 brNewBreveCall(n, "writeXMLEngine", stCWriteXMLEngine, AT_INT, AT_STRING, 0);
+	 brNewBreveCall(n, "archiveXMLObject", stCArchiveXMLObject, AT_NULL, AT_INSTANCE, AT_STRING, 0);
+	 brNewBreveCall(n, "dearchiveXMLObject", stCDearchiveXMLObject, AT_INSTANCE, AT_STRING, 0);
+	 brNewBreveCall(n, "dearchiveXMLObjectFromString", stCDearchiveXMLObjectFromString, AT_INSTANCE, AT_STRING, 0);
 }
