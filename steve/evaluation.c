@@ -243,17 +243,13 @@ inline int stToType(brEval *e, int type, brEval *t, stRunInstance *i) {
 		case AT_INSTANCE:
 			/* the only legal conversion to object is when the int interpretation is 0--a NULL object */
 
-			if(e->type != AT_INT && e->type != AT_INSTANCE) {
-				stEvalError(i->instance->type->engine, EE_CONVERT, "cannot convert type \"%s\" to type \"object\"", slAtomicTypeStrings[e->type]);
-				return EC_ERROR;
-			}
-
-			if(BRINT(t) == 0) {
+			if((e->type == AT_DOUBLE && BRDOUBLE(t) == 0.0) || (e->type == AT_INT && BRINT(t) == 0)) {
+				BRINSTANCE(t) = NULL;
 				t->type = AT_INSTANCE;
 				return EC_OK;
 			}
 
-			/* little hack to get rid of any potential error from stToInt--we want to handle the error here */
+			// little hack to get rid of any potential error from stToInt--we want to handle the error here
 
 			i->instance->type->engine->error.type = 0;
 			stEvalError(i->instance->type->engine, EE_CONVERT, "cannot convert type \"%s\" to type \"object\"", slAtomicTypeStrings[e->type]);
@@ -272,9 +268,7 @@ inline int stToType(brEval *e, int type, brEval *t, stRunInstance *i) {
 			return EC_ERROR;
 			break;
 		case AT_POINTER:
-			stToInt(e, t, i);
-
-			if(BRINT(t) == 0) {
+			if(t->type == AT_INT && BRINT(t) == 0) {
 				t->type = AT_INSTANCE;
 				return EC_OK;
 			}
@@ -795,17 +789,20 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 		stMethod *method;
 		stObject *newType;
 
-		method = stFindInstanceMethod(caller->type, mexp->methodName, mexp->args->count, &newType);
+		method = stFindInstanceMethodWithMinArgs(caller->type, mexp->methodName, mexp->args->count, &newType);
 
 		caller->type = newType;
 
 		if(!method) {
+			// can't find the method!
+
 			char *kstring = "keywords";
 
 			if(mexp->args && mexp->args->count == 1) kstring = "keyword";
 
 			caller->type = caller->instance->type;
 			stEvalError(caller->type->engine, EE_UNKNOWN_METHOD, "object type \"%s\" does not respond to method \"%s\" with %d %s", caller->type->name, mexp->methodName, mexp->args->count, kstring);
+			mexp->objectCache = NULL;
 			return EC_ERROR;
 		}
 
@@ -823,12 +820,13 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 
 		for(n=0;n<argCount;n++) ((stKeyword*)mexp->args->data[n])->position = -1;
 
+		slStackClear(mexp->arguments);
+
 		for(n=0;n<keyCount;n++) {
 			// look for the method's Nth keyword
 
-			keyEntry = mexp->method->keywords->data[n];
-
 			key = NULL;
+			keyEntry = mexp->method->keywords->data[n];
 
 			for(m=0;m<argCount;m++) {
 				// go through all the args, checking what was passed in.
@@ -841,10 +839,15 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 				}
 			}
 
+			if(!key && keyEntry->defaultKey)  key = keyEntry->defaultKey;
+
 			if(!key) {
-				stEvalError(caller->type->engine, EE_MISSING_KEYWORD, "call to method \"%s\" missing keyword \"%s\"", mexp->method->name, keyEntry->keyword);
+				stEvalError(caller->type->engine, EE_MISSING_KEYWORD, "Call to method %s of class %s missing keyword \"%s\"", mexp->method->name, caller->type->name, keyEntry->keyword);
+				mexp->objectCache = NULL;
 				return EC_ERROR;
 			}
+
+			slStackPush(mexp->arguments, key);
 		}
 
 		for(n=0;n<argCount;n++) {
@@ -852,6 +855,7 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 				tmpkey = mexp->args->data[n];
 
 				stEvalError(caller->type->engine, EE_UNKNOWN_KEYWORD, "unknown keyword \"%s\" in call to method \"%s\"", tmpkey->word, mexp->method->name);
+				mexp->objectCache = NULL;
 				return EC_ERROR;
 			}
 		}
@@ -863,6 +867,8 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 	}
 
 	if(mexp->method->inlined) {
+		// The method is inlined if it has no local variables, and no arguments
+
 		int result;
 		slStack *oldStack = caller->instance->gcStack;
 
@@ -890,29 +896,34 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunI
 		return result;
 	}
 
+	// we don't want to reuse the same argps in the case of a recursive function 
+	// so we create some local storage for them.
+
 	if(keyCount) {
 		args = alloca(sizeof(brEval) * keyCount);
 		argps = alloca(sizeof(brEval*) * keyCount);
+
+		for(n=0;n<keyCount;n++) argps[n] = &args[n];
 	} else {
 		args = NULL;
 		argps = NULL;
 	}
 
 	for(n=0;n<keyCount;n++) {
-		key = mexp->args->data[n];
+		key = mexp->arguments->data[n];
 
-		// the expressions are evaluated with the *old* instance
-		// we don't want to reuse the same args in the case of a recursive function 
+		if(!key) {
+			slMessage(DEBUG_ALL, "Missing keyword for method \"%s\"\n", mexp->method->name);
+			return EC_ERROR;
+		}
 
-		argps[key->position] = &args[n];
+		// evaluate the key into the eval...
 
-		// place the argument into the proper position.
-		
-		result = stExpEval(key->value, i, argps[key->position], NULL);
+		result = stExpEval(key->value, i, argps[n], NULL);
 
 		if(result != EC_OK) {
 			slMessage(DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", key->word, mexp->method->name);
-			return result;
+			return EC_ERROR;
 		}
 	}
 
@@ -1887,6 +1898,16 @@ inline int stEvalBinaryVectorExp(char op, brEval *l, brEval *r, brEval *t, stRun
 				BRVECTOR(l).y == BRVECTOR(r).y && 
 					BRVECTOR(l).z == BRVECTOR(r).z) BRINT(t) = 1;
 			else BRINT(t) = 0;
+
+			t->type = AT_INT;
+
+			return EC_OK;
+			break;
+		case BT_NE:
+			if(BRVECTOR(l).x == BRVECTOR(r).x && 
+				BRVECTOR(l).y == BRVECTOR(r).y && 
+					BRVECTOR(l).z == BRVECTOR(r).z) BRINT(t) = 0;
+			else BRINT(t) = 1;
 
 			t->type = AT_INT;
 

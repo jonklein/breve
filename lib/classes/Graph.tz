@@ -7,20 +7,20 @@ Abstract : Graph {
 		graphPointer (pointer).
 
 	+ to init:
-		graphPointer = newGraph("Graph").
+		graphPointer = graphNew("Graph").
 
 	+ to set-title to title (string):
 		% Sets the title of the graph to title.
-		setGraphTitle(graphPointer, title).
+		graphSetTitle(graphPointer, title).
 
 	+ to set-x-axis-name to xName (string):
 		% Sets the X-axis label to xName.
 
-		setGraphXAxisName(graphPointer, xName).
+		graphSetXAxisName(graphPointer, xName).
 
 	+ to set-y-axis-name to yName (string):
 		% Sets the Y-axis label to yName.
-		setGraphYAxisName(graphPointer, yName).
+		graphSetYAxisName(graphPointer, yName).
 
 	+ to add-line with-color lineColor (vector):
 		% Adds a line to the graph with the color lineColor.  This 
@@ -28,10 +28,10 @@ Abstract : Graph {
 		% You will need to use this number to add values to the line
 		% later on using METHOD(add-point).
 
-		return addLine(graphPointer, lineColor).
+		return graphAddLine(graphPointer, lineColor).
 
 	+ to add-point on-line lineNumber (int) with-value yValue (float):
 		% Adds a point on the line lineNumber, with the Y-value yValue.
 
-		addLineValue(graphPointer, lineNumber, yValue).
+		graphAddLineValue(graphPointer, lineNumber, yValue).
 }

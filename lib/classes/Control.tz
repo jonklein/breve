@@ -513,6 +513,12 @@ Abstract : Control (aka Controls) [version 1.9] {
 		lightPosition = theLocation.
 		setLightPosition(theLocation).
 
+	+ to get-real-time:
+		% Returns the number of seconds since January 1st, 1970 with microsecond
+		% accuracy.
+
+		return getRealTime().
+
 	+ to get-time:
 		% Returns the simulation time of the world.
 

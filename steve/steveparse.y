@@ -261,7 +261,7 @@ header
 		slFree($3);
 		slFree(unquoted);
 		slFree(nib);
-		slFree(fullnib);
+		if(fullnib) slFree(fullnib);
 	}
 | '@' DEFINE WORD_VALUE STRING_VALUE END {
 		brEval *e;
@@ -504,7 +504,7 @@ default_value
 		brEval *e = slMalloc(sizeof(brEval));
 		e->type = AT_DOUBLE;
 
-		BRDOUBLE(e) = 0.0;
+		BRDOUBLE(e) = stDoubleFromIntOrDoubleExp($2); stExpFree($2);
 
 		$$ = e;
 	}

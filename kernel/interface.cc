@@ -216,7 +216,7 @@ int brDragCallback(brEngine *e, int x, int y) {
 	(1) or up (0).
 */
 
-int brKeyCallback(brEngine *e, char keyCode, int isDown) {
+int brKeyCallback(brEngine *e, unsigned char keyCode, int isDown) {
 	char mname[128];
 	brMethod *method;
 	brEval eval;

@@ -35,6 +35,7 @@
 //104
 		1058C7A6FEA54F5311CA2CBB = {
 			children = (
+				487A433106F3A84400C6CD59,
 				48C71FFD04DEA90A00613353,
 				F5BD21540397C2DA01980AE4,
 				F5BD20F20397BFE301980AE4,
@@ -295,6 +296,7 @@
 		};
 		4802DC1A05616137008198B9 = {
 			buildPhases = (
+				487A432C06F3A76B00C6CD59,
 				4802DC1B05616137008198B9,
 				4802DC3005616137008198B9,
 				4802DC4B05616137008198B9,
@@ -324,7 +326,7 @@
 				LIBRARY_SEARCH_PATHS = "../lib /usr/local/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.1;
 				OTHER_CFLAGS = "$(CPPFLAGS)";
-				OTHER_LDFLAGS = "-t $(LIBS) /usr/local/lib/libdl.a";
+				OTHER_LDFLAGS = "$(LIBS) /usr/local/lib/libdl.a";
 				PRODUCT_NAME = breve;
 				SECTORDER_FLAGS = "";
 				UNSTRIPPED_PRODUCT = NO;
@@ -797,6 +799,7 @@
 				48F3824E06133752000C8D20,
 				481A471B067E190B0096AF6E,
 				485594AF06D289CF0036EAAD,
+				487A433206F3A84400C6CD59,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1004,8 +1007,8 @@
 			};
 		};
 		485594AE06D289CF0036EAAD = {
+			explicitFileType = archive.ar;
 			isa = PBXFileReference;
-			lastKnownFileType = archive.ar;
 			name = libenet.a;
 			path = /usr/local/lib/libenet.a;
 			refType = 0;
@@ -1023,6 +1026,33 @@
 			path = breve.scriptSuite;
 			refType = 4;
 			sourceTree = "<group>";
+		};
+		487A432C06F3A76B00C6CD59 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd .. && make -f Makefile optimize";
+		};
+		487A433106F3A84400C6CD59 = {
+			isa = PBXFileReference;
+			lastKnownFileType = archive.ar;
+			name = libpush.a;
+			path = /usr/local/lib/libpush.a;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		487A433206F3A84400C6CD59 = {
+			fileRef = 487A433106F3A84400C6CD59;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 		48807AA104DF1DB800A8D232 = {
 			isa = PBXFileReference;

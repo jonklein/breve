@@ -269,7 +269,7 @@ void slVclipDataRealloc(slVclipData *v, int count) {
 
 	listSize = v->maxCount * 2;
 
-	/* init the bound lists and bound list pointers */
+	// init the bound lists and bound list pointers 
 
 	v->xListPointers = slRealloc(v->xListPointers, sizeof(slBoundSort*) * listSize);
 	v->yListPointers = slRealloc(v->yListPointers, sizeof(slBoundSort*) * listSize);
@@ -278,6 +278,12 @@ void slVclipDataRealloc(slVclipData *v, int count) {
 	v->xList = slRealloc(v->xList, sizeof(slBoundSort) * listSize);
 	v->yList = slRealloc(v->yList, sizeof(slBoundSort) * listSize);
 	v->zList = slRealloc(v->zList, sizeof(slBoundSort) * listSize);
+
+	for(n=0;n<listSize;n++) {
+		v->xListPointers[n] = &v->xList[n];
+		v->yListPointers[n] = &v->yList[n];
+		v->zListPointers[n] = &v->zList[n];
+	}
 
 	v->pairList = slRealloc(v->pairList, sizeof(slPairEntry*) * (v->maxCount + 1));
 
@@ -357,7 +363,7 @@ void slInitProximityData(slWorld *w) {
 	int n, x, y;
 	slPairEntry *pe;
 
-	slVclipDataRealloc(w->clipData, w->objectCount);
+	slVclipDataRealloc(w->proximityData, w->objectCount);
 
 	for(n=0;n<w->objectCount;n++) {
 		w->proximityData->xList[(n * 2)	].type = BT_MIN;
@@ -423,15 +429,16 @@ void slInitProximityData(slWorld *w) {
 		}
 	}
 
-	/* for the proximity data we don't need anything except the	 */
-	/* x and y set in the pairList.  no features or object pointers */
+	// for the proximity data we don't need anything except the	
+	// x and y set in the pairList.  no features or object pointers.
 
 	for(x=1;x<w->objectCount;x++) {
 		for(y=0;y<x;y++) {
-		   pe = &w->proximityData->pairList[x][y];
+			pe = &w->proximityData->pairList[x][y];
 
-		   pe->x = x;
-		   pe->y = y;
+			pe->x = x;
+			pe->y = y;
+			pe->candidateNumber = -1;
 		}
 	}
 }

@@ -462,13 +462,61 @@ For example, here is a simple method which uses local variables:
 </para>
 <note><title>For developer use only</title>
 <para>
-When examining the internal classes included with the breve distribution,  you might notice some methods defined using a minus sign instead of a plus sign: 
+When examining the internal classes included with the breve distribution, you might 
+notice some methods defined using a minus sign instead of a plus sign: 
 <screen>
 - to methodName:
 </screen>
-This syntax simple means that the method should be treated as a non-public method and that the method should not be documented.  Though these methods function as all other methods, their use in user simulations is discouraged. 
+This syntax simple means that the method should be treated as a non-public method 
+and that the method should not be documented.  Though these methods function as all 
+other methods, their use in user simulations is discouraged. 
 </para>
 </note>
+</sect2>
+
+<sect2 id="optional_arguments"><title>Optional Arguments in Methods</title>
+<indexterm><primary>instance variable</primary></indexterm>
+<para>
+Methods definitions may also specify <firstterm>optional arguments</firstterm>.  Optional
+arguments are arguments which are given default values, and therefore do not need to be 
+provided when calling the method.  Optional arguments can greatly simplify writing code
+in steve.
+</para>
+<para>
+To make an argument optional, you need to provide it with a default value.  To do so,
+you'll need to modify the argument defintion to include the text <function>= <replaceable>value</replaceable></function>
+after the argument name.  For example, a variable called <function>theHeight</function> with keyword
+<function>with-height</function> could be given a default value like this: <function>with-height theHeight = 100 (int)</function>.
+Default values for optional arguments must be literal values (and not expressions or variables).
+</para>
+<para>
+Below is an example of a method defined with a set of optional arguments.
+<screen>
+	# Create a new agent, with some default values.
+
+	+ to create-new-agent with-color color = (1, 0, 0) (vector) 
+							with-energy energy = 100 (int)
+							with-radius radius = 10 (int) 
+							with-name name = "agent" (string):
+</screen>
+</para>
+<para>
+The method above could be called in a number of ways, optionally including or 
+excluding each of the arguments:
+<screen>
+	# no arguments 
+	self create-new-agent.
+
+	# some of the arguments 
+	self create-new-agent with-energy 10 with-name "Becky".
+
+	# all of the arguments
+	self create-new-agent with-color (1, 1, 1) 
+							with-energy 100
+							with-radius 20
+							with-name "Robert".
+</screen>
+</para>
 </sect2>
 
 <sect2 id="special_method_names"><title>Special Method Names</title>

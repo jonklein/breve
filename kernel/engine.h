@@ -345,7 +345,7 @@ int brMenuCallback(brEngine *e, brInstance *i, int n);
 int brMenuCallbackByName(brEngine *e, char *name);
 brInstance *brClickCallback(brEngine *e, int n);
 int brDragCallback(brEngine *e, int x, int y);
-int brKeyCallback(brEngine *e, char keyCode, int isDown);
+int brKeyCallback(brEngine *e, unsigned char keyCode, int isDown);
 int brInterfaceCallback(brEngine *e, int interfaceID, char *string);
 
 void stSetParseEngine(brEngine *e);

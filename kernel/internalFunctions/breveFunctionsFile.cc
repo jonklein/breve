@@ -22,6 +22,7 @@
 /*@{*/
 
 #include <unistd.h>
+#include <wctype.h>
 #include "kernel.h"
 #include "breveFunctionsFile.h"
 

@@ -8,22 +8,28 @@
 #	frontend.
 # 
 
-if($#ARGV != 0 && $#ARGV != 1) {
-	print STDERR "usage: $0 filename\n";
+if($#ARGV < 2 || $#ARGV > 3) {
+	print STDERR "usage: $0 headerfile includename outputname [configfile]\n";
 	exit 0;
 }
 
 open(FILE, $ARGV[0]) || die "Cannot open $ARGV[0]: $!\n";
 
-if($#ARGV == 1) {
-	$filename = $ARGV[1];
-} else {
-	$filename = $ARGV[0]; 
-}
+$filename = $ARGV[2];
 
 $filename =~ s/\.[ch]$//;
 $filename =~ s/^.*\///;
 $filename = ucfirst($filename);
+
+if($#ARGV == 3) {
+	open(CONFIGFILE, $ARGV[3]) || die "Cannot open $ARGV[3]: $!\n";
+
+	$line = join('', <CONFIGFILE>);
+
+	eval($line);
+
+	close(CONFIGFILE);
+}
 
 open(CFILE, ">breveFunctions${filename}.c") || die "Cannot open breveFunctions${filename}.c for writing: $!\n";
 open(TZFILE, ">${filename}.tz") || die "Cannot open ${filename}.tz for writing: $!\n";
@@ -35,6 +41,7 @@ $symbol = "[a-zA-Z0-9_]+";
 # Types: standard C types, known breve structures, or pointer types.
 
 $type = "(?:void\\s+)|(?:int\\s+)|(?:float\\s+)|(?:double\\s+)|(?:slMatrix\s+)|(?:(?:struct\\s\*)?$symbol\\s\*\\*)";
+
 
 # a declaration is a type and a symbol.
 
@@ -50,15 +57,7 @@ $declaration_list = "(?:(?:)|(?:$declaration)|(?:(?:$declaration,)*$declaration)
 
 $function_definition = "^$declaration\\s*\\($declaration_list\\);";
 
-print TZFILE<<__EOT__;
-\@use Object.
-
-Object : $file {
-	+ to init:
-
-	+ to destroy:
-}
-__EOT__
+select CFILE;
 
 print CFILE<<__EOT__;
 /*
@@ -68,7 +67,7 @@ print CFILE<<__EOT__;
 */
 
 #include "kernel.h"
-#include "$ARGV[0]"
+#include "$ARGV[1]"
 
 /*\@{*/
 /*! \\addtogroup InternalFunctions */
@@ -118,6 +117,8 @@ __EOT__
 	$index = 0;
 	$argnames = ( );
 
+	@accessors = ( );
+
 	foreach $argument (@arguments) {
 		$argument =~ /^$declaration/;
 		$argtype = $1;
@@ -128,10 +129,12 @@ __EOT__
 		$accessor = accessorForType($argtype);
 
 		if($argtype =~ /\*$/) {
-			print CFILE "\t${argtype}$argname = $accessor(&arguments[$index]);\n";
+			$accessor = "\t${argtype}$argname = $accessor(&arguments[$index]);\n";
 		} else {
-			print CFILE "\t$argtype $argname = $accessor(&arguments[$index]);\n";
+			$accessor = "\t$argtype $argname = $accessor(&arguments[$index]);\n";
 		}
+
+		push @accessors, $accessor;
 
 		$enum = enumForType($argtype);
 
@@ -158,14 +161,13 @@ __EOT__
 
 	if($return_type eq "char *") { $return_function = "slStrdup($return_function)"; }
 
-print CFILE <<__EOT__;
+	if(eval("defined \&$name;")) {
+		eval("${name}(\\\@accessors, \$return_result, \$return_function);");
+	} else {
+		outputFunction(\@accessors, $return_result, $return_function);
+	}
 
-	${return_result}$return_function;
-
-	return EC_OK;
-}
-
-__EOT__
+	print CFILE "}\n\n";
 
 	$newcall = "\tbrNewBreveCall(namespace, \"$name\", $functionname, $enum_arguments 0);\n";
 
@@ -190,6 +192,9 @@ exit(0);
 
 sub accessorForType() {
 	$symbol = symbolForType($_[0]);
+
+	return "&BRVECTOR" if($symbol eq "VECTOR");
+
 	return "BR$symbol";
 }
 
@@ -208,7 +213,24 @@ sub symbolForType() {
 	return "HASH" if($type eq "slHash *");
 	return "MATRIX" if($type eq "slMatrix");
 	return "VECTOR" if($type eq "slVector *");
+	return "VECTOR" if($type eq "PushVector *");
 	return "DATA" if($type eq "slData *");
 	return "NULL" if($type eq "void");
 	return "POINTER";
+}
+
+sub outputFunction() {
+	$a_ref = $_[0];
+	$result = $_[1];
+	$function = $_[2];
+
+	@accessors = @$a_ref;
+
+	if($#accessors != -1) { print CFILE "@accessors\n"; }
+
+print CFILE <<__EOT__;
+	${result}${function};
+
+	return EC_OK;
+__EOT__
 }

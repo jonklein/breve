@@ -531,6 +531,23 @@ int brIFindFile(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+/*!
+	\brief Returns the current real-time time with micro-second accuracy.
+*/
+
+int brIGetRealTime(brEval args[], brEval *target, brInstance *i) {
+	struct timeval now;
+	double seconds;
+
+	gettimeofday(&now, NULL);
+
+	seconds = now.tv_sec + now.tv_usec / 1000000;
+
+	BRDOUBLE(target) = seconds;
+
+	return EC_OK;
+}
+
 /*@}*/
 
 // initialize the control related functions
@@ -581,4 +598,5 @@ void breveInitControlFunctions(brNamespace *n) {
     brNewBreveCall(n, "getAllPressedKeys", brIGetAllPressedKeys, AT_STRING, 0);
 
     brNewBreveCall(n, "findFile", brIFindFile, AT_STRING, AT_STRING, 0);
+    brNewBreveCall(n, "getRealTime", brIGetRealTime, AT_DOUBLE, 0);
 }

@@ -142,6 +142,8 @@ void stSteveCleanup(stSteveData *d) {
 
 	if(d->defines) brNamespaceFreeWithFunction(d->defines, (void(*)(void*))stFreeDefine);
 
+	brEvalListFreeSortVars();
+
 	slFree(d);
 }
 

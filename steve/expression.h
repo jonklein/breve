@@ -239,6 +239,7 @@ struct stMethodExp {
 	stMethod *method;
 
 	slArray *args;
+	slStack *arguments;
 
 	stObject *objectCache;
 	stObject *objectTypeCache;

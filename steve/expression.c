@@ -75,12 +75,12 @@ int stExpFree(stExp *e) {
 		case ET_SELF:
 		case ET_INT:
 		case ET_DOUBLE:
-		case ET_ST_EVAL:
 		case ET_DUPLICATE:
 			break;
 
 		/* these elements have only static buffers allocated */
 
+		case ET_ST_EVAL:
 		case ET_LOAD:
 			slFree(e->values.pValue);
 			break;
@@ -447,6 +447,7 @@ stMethodExp *stNewMethodCall(stObject *o, stExp *callingObject, char *method, sl
 	m->method = NULL;
 	m->objectExp = callingObject;
 	m->args = args;
+	m->arguments = slStackNew();
 
 	return m;
 }
@@ -455,10 +456,11 @@ void stFreeMethodExp(stMethodExp *m) {
 	slFree(m->methodName);
 	stExpFree(m->objectExp);
 	stFreeKeywordArray(m->args);
+	slStackFree(m->arguments);
 	slFree(m);
 }
 
-/* these methods involve creating LIST operator expressions */
+// these methods involve creating LIST operator expressions
 
 stExp *stNewListInsertExp(stExp *list, stExp *exp, stExp *index, char *file, int lineno) {
 	stListInsertExp *p;

@@ -44,7 +44,10 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 
 	- to register with-shape theShape (object):
 		% Depreciated.  Don't use.
+		self set-shape to theShape.
 
+	- to set shape theShape (object):
+		% Depreciated.  Don't use.
 		self set-shape to theShape.
 
 	+ to set-shape to theShape (object):

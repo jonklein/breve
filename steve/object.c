@@ -478,16 +478,24 @@ stVar *stFindLocal(char *name, stMethod *m) {
 	The keyword entry will eventually be added to a methods list of keywords.
 */
 
-stKeywordEntry *stNewKeywordEntry(char *stKeyword, stVar *v, brEval *defValue) {
+stKeywordEntry *stNewKeywordEntry(char *keyword, stVar *v, brEval *defValue) {
 	stKeywordEntry *e;
+	brEval *copy;
 
 	e = slMalloc(sizeof(stKeywordEntry));
 
-	if(!e || !v || !stKeyword) return NULL;
+	if(!e || !v || !keyword) return NULL;
 
-	e->keyword = slStrdup(stKeyword);
+
+	e->keyword = slStrdup(keyword);
 	e->var = v;
-	e->defaultValue = defValue;
+	e->defaultKey = NULL;
+
+	if(defValue) {
+		copy = slMalloc(sizeof(brEval));
+		bcopy(defValue, copy, sizeof(brEval));
+		e->defaultKey = stNewKeyword(keyword, stExpNew(copy, ET_ST_EVAL, NULL, 0));
+	}
 
 	return e;
 }
@@ -499,7 +507,7 @@ stKeywordEntry *stNewKeywordEntry(char *stKeyword, stVar *v, brEval *defValue) {
 void stFreeKeywordEntry(stKeywordEntry *k) {
 	slFree(k->keyword);
 	stFreeStVar(k->var);
-	if(k->defaultValue) slFree(k->defaultValue);
+	if(k->defaultKey) stFreeKeyword(k->defaultKey);
 	slFree(k);
 }
 
@@ -879,6 +887,47 @@ stMethod *stFindInstanceMethodWithArgRange(stObject *o, char *word, int minArgs,
 	} while((o = o->super));
 
 	return NULL;
+}
+
+/*!
+	\brief Finds an instance method which accepts at least a given mimimum number of arguments.
+
+    Searches parent objects as well.
+*/
+
+stMethod *stFindInstanceMethodWithMinArgs(stObject *o, char *word, int minArgs, stObject **oo) {
+	brNamespaceSymbol *var;
+	slList *list;
+	stMethod *method, *best = NULL;
+
+	do {
+		var = brNamespaceLookup(o->keywords, word);
+
+		if(var) {
+			if(var->type != ST_METHODS) return NULL;
+
+			list = var->data;
+
+			while(list) {
+				method = list->data;
+
+				if(method->keywords->count >= minArgs) {
+					// we want to find the method with the lowest number of arguments
+					// greater than minArgs.
+
+					if(!best || method->keywords->count < best->keywords->count) {
+						best = method;
+						if(oo) *oo = o;
+					}
+				}
+
+				list = list->next;
+			}
+		}
+
+	} while((o = o->super));
+
+	return best;
 }
 
 /*!

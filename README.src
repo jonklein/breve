@@ -28,12 +28,14 @@ If these commands fail it's likely that you will need to install some
 of the libraries required by breve.  See the section "REQUIRED LIBRARIES"
 below.  
 
-NOTE: On Mac OS X the configure command may fail indicating a missing
-library even when the library is correctly installed.  If you know the 
-library is installed and can be found (you've included any relevant path 
-includes and exported the environment vars) you may need to run 
-"ranlib libxxx.a" on the library in question.  See the man page for 
-"ranlib" for more information.
+OS X Note #1: the OS X xcode project is setup to link against all of the 
+breve libraries, even though some of the libraries are optional.  If you
+configure and build breve with some of the optional libraries missing, 
+you need to open the xcode project and disable the missing libraries.
+
+OS X Note #2: if a library is installed, but cannot be found with the 
+configure script, you may have to run "ranlib" on the library before
+it can be found.  See the ranlib manpage for more information.
 
                        --- NOTES ON THIS RELEASE ---
 
@@ -140,10 +142,6 @@ taking snapshots, making movies, "visions" and light exposure detection
 The OpenGL-like library Mesa3D, however, does support offscreen rendering.
 If breve is built with Mesa3D support, these features can be used with
 breve_cli.
-
-
-
-
 
 /*****************************************************************************
  *                                                                           *

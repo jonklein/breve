@@ -9,6 +9,7 @@ struct brPushCallbackData {
 typedef struct brPushCallbackData brPushCallbackData;
 
 unsigned int brPushCallbackFunction(void *environment, brPushCallbackData *data);
+void brPushFreeData(void *d);
 
 /*@{*/
 /*! \addtogroup InternalFunctions */
@@ -30,18 +31,9 @@ int breveFunctionPushCallbackNew(brEval arguments[], brEval *result, brInstance 
 		return EC_ERROR;
 	}
 
-	pushAddCallbackInstruction(environment, brPushCallbackFunction, name, data);
+	pushAddCallbackInstruction(environment, brPushCallbackFunction, brPushFreeData, name, data);
 
 	BRPOINTER(result) = data;
-
-	return EC_OK;
-}
-
-int breveFunctionPushCallbackFree(brEval arguments[], brEval *result, brInstance *instance) {
-	brPushCallbackData *data = BRPOINTER(&arguments[0]);
-
-	slFree(data);
-	brMethodFree(data->method);
 
 	return EC_OK;
 }
@@ -50,7 +42,6 @@ int breveFunctionPushCallbackFree(brEval arguments[], brEval *result, brInstance
 
 void breveInitPushCallbackFunctions(brNamespace *namespace) {
 	brNewBreveCall(namespace, "pushCallbackNew", breveFunctionPushCallbackNew, AT_POINTER, AT_POINTER, AT_STRING, AT_STRING, AT_INSTANCE, 0);
-	brNewBreveCall(namespace, "pushCallbackFree", breveFunctionPushCallbackFree, AT_NULL, AT_POINTER, 0);
 }
 
 unsigned int brPushCallbackFunction(void *environment, brPushCallbackData *data) {
@@ -59,4 +50,11 @@ unsigned int brPushCallbackFunction(void *environment, brPushCallbackData *data)
 	if(brMethodCall(data->instance, data->method, NULL, &eval) != EC_OK) return -1;
 
 	return 0;
+}
+
+void brPushFreeData(void *d) {
+	brPushCallbackData *data = d;
+
+	brMethodFree(data->method);
+	slFree(data);
 }

@@ -143,16 +143,26 @@ Object : MultiBody (aka MultiBodies) [version 2.0] {
 
 	+ section "Getting and Setting Information About Connected Objects"
 
+	- to register with-link root (object):
+		% Depreciated.  Don't use.
+		self set-root to root.
+
 	+ to set-root to root (object):
 		% Associates a MultiBody with a link root.  All links attached
 		% to root, both directly and indirectly, will implicitly be 
 		% part of this MultiBody as well.  When joints are created
 		% and destroyed, the MultiBody automatically updates.
 
-		if !root || !(root get-link-pointer):
+		if !(root get-link-pointer):
 			die "attempting to register MultiBody with uninitialized Link object".
 
 		rootLink = root.
+
+		if !root: {
+			self remove-dependency on rootLink.
+			multibodySetRoot(multibodyPointer, 0).
+			return.
+		}
 
 		self add-dependency on rootLink.
 
@@ -195,6 +205,7 @@ Object : MultiBody (aka MultiBodies) [version 2.0] {
 		return 1.
 
 	+ to destroy:
+		free (self get-all-connected-objects).
 		multibodyFree(multibodyPointer).
 		free menus.
 }

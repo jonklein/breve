@@ -139,7 +139,7 @@ struct stVar {
 struct stKeywordEntry {
 	char *keyword;
 	stVar *var;
-	brEval *defaultValue;
+	stKeyword *defaultKey;
 };
 
 stObject *stObjectNew(brEngine *e, stSteveData *data, char *name, char *alias, stObject *super, float version);
@@ -195,6 +195,7 @@ int stUnusedInstanceVarWarning(stObject *o);
 stMethod *stFindInstanceMethod(stObject *o, char *word, int nArgs, stObject **oo);
 stMethod *stFindInstanceMethodNoSuper(stObject *o, char *word, int nArgs);
 stMethod *stFindInstanceMethodWithArgRange(stObject *o, char *word, int minArgs, int maxArgs, stObject **oo);
+stMethod *stFindInstanceMethodWithMinArgs(stObject *o, char *word, int minArgs, stObject **oo);
 
 int stStoreInstanceMethod(stObject *o, char *word, stMethod *method);
 
