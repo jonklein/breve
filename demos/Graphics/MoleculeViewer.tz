@@ -30,7 +30,7 @@ Control : PDBViewer {
         average (vector).
 		atomString (string).
 
-        self set-background-color to (.3, .3, .3).
+        self set-background-color to (.6, .6, .6).
 
         hShape = new Sphere init-with radius .3.
 
@@ -72,9 +72,11 @@ Control : PDBViewer {
 
 		print | all Mobiles |, " atoms".
 
+		# bitmaps are faster to display than actual spheres.
+
+		all Mobiles set-bitmap to 2.
+
         self point-camera at average from average + (30, 0, 30).
-        self move-light to average + (30, 0, 30).
-        self enable-lighting.
 
     + to iterate:
         self pivot-camera y 0.03 x 0.0.

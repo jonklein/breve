@@ -445,7 +445,7 @@ int stPreprocess(stSteveData *s, brEngine *engine, char *line) {
 					yyfile = oldYyfile;
 					lineno = oldLineno;
 					stParseError(engine, EE_FILE_NOT_FOUND, "Error including file \"%s\"", filename);
-					slFree(filename);
+					delete[] filename;
 					return -1;
 				}
 

@@ -70,6 +70,9 @@ void slVclipDataInit(slWorld *w) {
 		slAddBoundingBoxForVectors(w->clipData, x, &w->objects[x]->min, &w->objects[x]->max);
 	}
 
+	for(x=0;x<w->clipData->maxCount;x++) 
+		memset(w->clipData->pairArray[x], (BT_CHECK | BT_UNKNOWN), w->clipData->maxCount);
+
 	for(x=0;x<w->objects.size();x++) {
 	 	if(w->objects[x]->type == WO_LINK) {
 			std::vector<slJoint*>::iterator ji;
@@ -175,7 +178,6 @@ slVclipData *slVclipDataNew() {
 
 	for(unsigned int n=0; n < v->maxCount; n++) {
 		v->pairArray[n] = new unsigned char[v->maxCount];
-		memset(v->pairArray[n], (BT_CHECK | BT_UNKNOWN), v->maxCount);
 	}
 
 
@@ -195,13 +197,12 @@ void slVclipDataRealloc(slVclipData *v, unsigned int count) {
 
 	if(v->count < v->maxCount) return;
 
-	while(v->count > v->maxCount) v->maxCount *= 2;
+	while(v->count >= v->maxCount) v->maxCount *= 2;
 
 	v->pairArray = new unsigned char*[v->maxCount];
 
 	for(unsigned int n=0; n < v->maxCount; n++) {
 		v->pairArray[n] = new unsigned char[v->maxCount];
-		memset(v->pairArray[n], (BT_CHECK | BT_UNKNOWN), v->maxCount);
 	}
 }
 
@@ -249,6 +250,9 @@ void slInitProximityData(slWorld *w) {
 	w->proximityData->boundLists[0].clear();
 	w->proximityData->boundLists[1].clear();
 	w->proximityData->boundLists[2].clear();
+
+	for(n=0;n<w->proximityData->maxCount;n++) 
+		memset(w->proximityData->pairArray[n], (BT_CHECK | BT_UNKNOWN), w->proximityData->maxCount);
 
 	for(n=0;n < w->objects.size(); n++) {
 		slWorldObject *wo = w->objects[n];

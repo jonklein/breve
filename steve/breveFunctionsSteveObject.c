@@ -261,6 +261,8 @@ int stCStacktrace(brEval args[], brEval *target, brInstance *i) {
 */
 
 int stIAddDependency(brEval args[], brEval *target, brInstance *i) {
+	if(!BRINSTANCE(&args[0])) return EC_OK;
+
 	stInstanceAddDependency((stInstance*)i->userData, (stInstance*)BRINSTANCE(&args[0])->userData);
 	return EC_OK;
 }

@@ -197,7 +197,7 @@ NULL : Object (aka Objects) [version 2.1] {
 		% <p>
 		% Circular dependencies are forbidden.
 
-		addDependency(i).
+		if i: addDependency(i).
 
 	+ to remove-dependency on theObject (object):
 		% Removes theObject from this object's dependency list.  See
