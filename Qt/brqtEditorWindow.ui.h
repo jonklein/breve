@@ -16,11 +16,18 @@
 
 void brqtEditorWindow::init() {
     popupMenu->setTextArea(sourceTextArea);
+
+	setWFlags( Qt::WDestructiveClose);
     
     new brqtSteveSyntaxHighlighter(sourceTextArea);
 }
 
+destroy() {
+	printf("destroying function...\n");
+}
+
 void brqtEditorWindow::destroy() {
+	printf("destroying...\n");
     closed(this);
 }
 
@@ -41,6 +48,7 @@ void brqtEditorWindow::loadFile( QString &file )
     
     setCaption( file);
     sourceTextArea->setText( contents);
+	nameChanged();
 }
 
 

@@ -33,7 +33,7 @@ Object : Spring (aka Springs) {
 	+ to connect from springLink1 (object) to springLink2 (object) 
 				from-point point1 = (0, 0, 0) (vector) 
 				to-point point2 = (0, 0, 0) (vector)
-				with-length springLength (float)
+				with-length springLength = 0 (float)
 				with-strength springStrength (float)
 				with-damping springDamping = 0.2 (float):
 
@@ -42,6 +42,8 @@ Object : Spring (aka Springs) {
 		% The optional arguments point1 and point2 specify the locations
 		% on the objects to which the springs are attached.  The default
 		% values are (0, 0, 0).
+		% <p>
+		% If the length arugment is omitted, length defaults to 0.
 
 		if springLink1 == springLink2: return.
 

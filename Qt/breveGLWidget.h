@@ -1,15 +1,12 @@
 /**
  * glfractal.h
- *
- * Brief Definition of breveGLWidget
- *
- * This is a simple QGLWidget displaying an openGL Sierpinski Gasket
  */
 
 #ifndef GLFRACTAL_H
 #define GLFRACTAL_H
 
-#include <qgl.h>
+#include <QtOpenGL/QGLWidget>
+#include <QMouseEvent>
 
 #include "kernel.h"
 
@@ -17,7 +14,7 @@ class breveGLWidget : public QGLWidget
 {
   Q_OBJECT
 public:
-  breveGLWidget( QWidget* parent, const char* name );
+  breveGLWidget( QWidget* parent, const QGLWidget *share, Qt::WFlags f);
   ~breveGLWidget();
   
   void setEngine(brEngine *e) { 
@@ -35,8 +32,6 @@ public:
 
 public slots: 
     virtual void setButtonMode(int mode) {
-		printf("setting button mode, bitches!\n");
-		printf("to %d, bitches!\n", mode);
 		_buttonMode = mode;
     }
   

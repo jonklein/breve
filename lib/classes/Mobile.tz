@@ -1,8 +1,8 @@
-@include "Real.tz"
-@include "Shape.tz"
-@include "MenuItem.tz"
+@use Real.
+@use Shape.
+@use MenuItem.
 
-Real : Mobile (aka Mobiles) [version 1.8] {
+Real : Mobile (aka Mobiles) [version 2.2] {
 	% Mobile objects are objects in the simulated world which move around 		
 	% and interact with other objects.  This is in contrast to 
 	% OBJECT(Stationary) objects which can collide and interact with 
@@ -42,16 +42,18 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 
 		return linkPointer.
 
-  + section "Setting Up the Mobile Object"
+  + section "Setting the Shape of a Mobile Object"
 
 	- to register with-shape theShape (object):
 		% Deprecated.  Don't use.
-		print "warning: the method \"register\" of Mobile is deprecated, use the method \"set\" instead".
+		print "warning: the method \"register\" of Mobile is deprecated, use the method \"set-shape\" instead".
 
 		self set-shape to theShape.
 
 	- to set shape theShape (object):
 		% Deprecated.  Don't use.
+		print "warning: the method \"set\" of Mobile is deprecated, use the method \"set-shape\" instead".
+
 		self set-shape to theShape.
 
 	+ to set-shape to theShape (object):
@@ -103,8 +105,6 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 
 		return (worldObjectShape get-mass).
 
-  + section "Getting the Light Exposure of this Mobile Object"
-
   + section "Controlling the Agent's Motion and Position"
 
 	+ to move to newLocation (vector):
@@ -122,7 +122,35 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 
 		linkSetRotationMatrix(linkPointer, theRotation).
 
-	+ to rotate around-axis thisAxis (vector) by amount (float):
+	+ to set-rotation-euler-angles to angles (vector):
+		% Sets the rotation of this object to the Euler angles specified 
+		% by angles (in radians).
+		
+		m (matrix).
+		r00, r01, r02, r10, r11, r12, r20, r21, r22 (double).
+
+		r00 = cos(angles::z)*cos(angles::x) - cos(angles::y)*sin(angles::x)*sin(angles::z).
+		r01 = cos(angles::z)*sin(angles::x) + cos(angles::y)*cos(angles::x)*sin(angles::z).
+		r02 = sin(angles::z)*cos(angles::y).
+	
+		r10 = -sin(angles::z)*cos(angles::x) - cos(angles::y)*sin(angles::x)*cos(angles::z).
+		r11 = -sin(angles::z)*sin(angles::x) + cos(angles::y)*cos(angles::x)*cos(angles::z).
+		r12 = cos(angles::z)*sin(angles::y).
+
+		r20 = sin(angles::y)*sin(angles::x).
+		r21 = -sin(angles::y)*cos(angles::x).
+		r22 = cos(angles::y).
+
+		m = [ ( r00, r01, r02 ), ( r10, r11, r12 ), ( r20, r21, r22 ) ].
+
+		self set-rotation to m.
+
+	- to rotate around-axis thisAxis (vector) by amount (float):
+		% Deprecated.  Renamed to METHOD(set-rotation).
+
+		self set-rotation around-axis thisAxis by amount.
+
+	+ to set-rotation around-axis thisAxis (vector) by amount (float):
 		% Sets the rotation of this object around vector axis thisAxis 
 		% by scalar amount (in radians).  This is an "absolute" rotation--the 
 		% current rotation of the object does not affect how the 
@@ -280,7 +308,7 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 		return linkGetMin(linkPointer).
 
 
-  + section "Chaning the Object's Appearence"
+  + section "Changing an Object's Appearence"
 
 	+ to set-label to theLabel (string):
 		% Sets the label to be drawn along side the object.
@@ -310,6 +338,8 @@ Real : Mobile (aka Mobiles) [version 1.8] {
 		self set-acceleration to archiveAcceleration.
 		self set-color to color.
 		return (super dearchive).
+
+  + section "Determining Whether an Object is Colliding"
 
 	+ to check-for-penetrations:
 		% Determines whether this link is currently penetrating with other objects

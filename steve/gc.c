@@ -287,7 +287,12 @@ void stGCUnmark(stInstance *i, brEval *collect) {
 		collect->type == AT_VECTOR || !collect->values.pointerValue) return;
 
 	if(collect->type == AT_INSTANCE) {
-		stInstance *i = BRINSTANCE(collect)->userData;
+		stInstance *i;
+
+		if(((brInstance*)BRINSTANCE(collect))->status != AS_ACTIVE) return;
+
+		i = BRINSTANCE(collect)->userData;
+
 		if(!i->gc) return;
 	} 
 

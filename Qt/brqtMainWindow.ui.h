@@ -104,11 +104,10 @@ void brqtMainWindow::fileOpen() {
 		"Open File...",
 		"Choose a file" );
 
-	// cout << s;
-
 	if( s != "") {
 		brqtEditorWindow *w = newDocument();
 		w->loadFile(s);
+		w->show();
 	}
 }
 
@@ -208,12 +207,16 @@ void brqtMainWindow::helpAbout()
 
 void brqtMainWindow::toggleSimulation()
 {
-    brqtEditorWindow *w = gW;
-
 	if(currentEngine) {
 		currentEngine->pause();
 		return;
 	}
+
+	int active = documentMenu->currentItem();
+
+	if( active < 0 || active > documents.size()) return;
+
+	brqtEditorWindow *w = documents[ active];
     
     frontend = breveFrontendInit(0, NULL);
     frontend->data = breveFrontendInitData(frontend->engine);
@@ -227,6 +230,10 @@ void brqtMainWindow::toggleSimulation()
     }
 
     currentEngine = new brqtEngine(frontend->engine, breveGLWidget1);
+
+	// QPoint p;
+	// breveGLWidget1->reparent(0, 0, p, true);
+	// breveGLWidget1->showFullScreen();
 }
 
 void brqtMainWindow::loadDemo(int n)
@@ -257,8 +264,6 @@ void brqtMainWindow::closeDocument( QWidget *document )
     std::vector< brqtEditorWindow* >::iterator wi;
     wi = std::find(documents.begin(), documents.end(), document);
     
-    printf("closing document...\n");
-    
     documents.erase(wi);
     buildDocumentMenu();
 }
@@ -276,4 +281,6 @@ void brqtMainWindow::buildDocumentMenu()
 	for(unsigned int n=0; n<documents.size(); n++) {
     	documentMenu->insertItem( documents[n]->caption() );
 	}
+
+	if(documents.size() == 0) documentMenu->insertItem( "Select Simulation...");
 }

@@ -380,8 +380,6 @@
         <separator/>
         <action name="helpAboutAction"/>
     </item>
-    <item text="xxxx" name="xxxx">
-    </item>
 </menubar>
 <toolbars>
 </toolbars>

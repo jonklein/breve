@@ -29,6 +29,8 @@ void brqtMethodPopup::popup() {
 			_lineMap.push_back(slObjectParseLine);
 		}
 	}
+
+	if( count() == 0) insertItem("Go to method...");
     
 	free(text);
 
@@ -36,8 +38,9 @@ void brqtMethodPopup::popup() {
 }
 
 void brqtMethodPopup::go(int index) {
-	printf("moving to line %d\n", _lineMap[index]);
 	clear();
 	insertItem("Go to method...");
+
+	if(index >= _lineMap.size()) return;
 	_textArea->setSelection( _lineMap[index] - 1, 0, _lineMap[index], 0);
 }

@@ -1,4 +1,4 @@
-NULL : Object (aka Objects) [version 2.0] {
+NULL : Object (aka Objects) [version 2.1] {
 	% Summary: the top level object class.
 	% <P>
     % The Object class is the root class.  All classes used in breve have
@@ -22,12 +22,6 @@ NULL : Object (aka Objects) [version 2.0] {
         controller = (self get-controller).
 
 		birthTime = (controller get-time).
-
-	+ to get-age:
-		% Returns the number of seconds this object has existed in the 
-		% simulation.
-
-		return (controller get-time) - birthTime.
 
     + to destroy:
         % Automatically called when this object is freed.  This method
@@ -58,6 +52,12 @@ NULL : Object (aka Objects) [version 2.0] {
         return getController().
 
   + section "Getting Information About an Object"
+
+	+ to get-age:
+		% Returns the number of seconds this object has existed in the 
+		% simulation.
+
+		return (controller get-time) - birthTime.
 
     + to get-type:
         % Returns as a string the type of this object.

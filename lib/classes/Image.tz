@@ -135,7 +135,14 @@ Abstract : Image (aka Images) [version 2.0] {
 		modified = 1.
 		imageSetValueAtCoordinates(imageData, (x * 4) + 3, y, alphaPixel).
 
-	+ to set-pixel to pixelVector (vector) at-x x (int) at-y y (int):
+	- to set-pixel to pixelVector (vector) at-x x (int) at-y y (int):
+		% Deprecated -- for compatibility only.
+
+		self set-red-pixel to pixelVector::x at-x x at-y y.
+		self set-green-pixel to pixelVector::y at-x x at-y y.
+		self set-blue-pixel to pixelVector::z at-x x at-y y.
+		
+	+ to set-rgb-pixel to pixelVector (vector) at-x x (int) at-y y (int):
 		% Sets the red, green and blue pixel values at image coordinates 
 		% (x, y) from the values in pixelVector.
 

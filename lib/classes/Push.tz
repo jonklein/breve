@@ -39,8 +39,6 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 		if instructionName == "": instructionName = methodName.
 
-		print "adding $instructionName".
-
 		pushCallbackNew(pushInterpreterPointer, instructionName, methodName, targetInstance).
 
 	+ to add-macro named instructionName (string) for-code code (object):

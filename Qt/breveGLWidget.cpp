@@ -5,8 +5,8 @@
 /**
  * Constructor that creates a breveGLWidget widget
  */
-breveGLWidget::breveGLWidget( QWidget* parent, const char* name )
-  : QGLWidget( parent, name )
+breveGLWidget::breveGLWidget( QWidget* parent, const QGLWidget *share, Qt::WFlags f) 
+ : QGLWidget( parent, share, f )
 {
    _engine = NULL;
 }
