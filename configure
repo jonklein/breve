@@ -1442,7 +1442,7 @@ _ACEOF
 		;;
 esac
 
-PLATFORM=$host_cpu
+PLATFORM=$host_os
 
 
 

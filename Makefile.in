@@ -108,7 +108,7 @@ CLI_release:
 	cp README.txt breve_$(LPLATFORM)/
 	cp Changes.html breve_$(LPLATFORM)/
 	find breve_$(LPLATFORM) -name CVS -prune -exec rm -rf {} \;
-	@ARCHIVER@ breve_$(LPLATFORM).@ARCHIVE_SUFFIX breve_$(LPLATFORM)
+	@ARCHIVER@ breve_$(LPLATFORM).@ARCHIVE_SUFFIX@ breve_$(LPLATFORM)
 
 plugin_API:
 	-rm -rf breve_plugin_API

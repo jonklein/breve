@@ -68,7 +68,7 @@ case "${host_os}" in
 		;;
 esac
 
-PLATFORM=$host_cpu
+PLATFORM=$host_os
 
 AC_SUBST(AUDIOLIBS)
 AC_SUBST(CC)
