@@ -12,6 +12,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <time.h>
+#include <winsock.h>
 
 #ifndef __GNUC__
 #define EPOCHFILETIME (116444736000000000i64)
