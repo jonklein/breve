@@ -44,8 +44,7 @@ Control : Swarm {
     + variables:
         birds (list).
         item (object).
-        breveTexture (int).
-        cloudTexture (int).
+        cloudTexture (object).
         selection (object).
 
         # the menu items corresponding to different flocking behaviors
@@ -63,8 +62,6 @@ Control : Swarm {
         super click on item.
 
     + to init:
-        floor (object).
-
         # Set up menus to modify the type of movement allowed.
 
         self add-menu named "Smoosh The Birdies" for-method "squish".
@@ -76,10 +73,9 @@ Control : Swarm {
         self enable-lighting.
         self move-light to (0, 20, 20).
 
-        breveTexture = (self load-image from "images/breve.png").
-        cloudTexture = (self load-image from "images/clouds.png").
+        cloudTexture = (new Image load from "images/clouds.png").
 
-        # Add a huge floor.
+        # Add a terrain.
 
 		new Terrain generate with-ruggedness .15 with-height 15.3.
 
@@ -89,7 +85,7 @@ Control : Swarm {
 
         self flock-normally.
 
-        self set-background-texture to cloudTexture.
+        self set-background-texture-image to cloudTexture.
 
         self offset-camera by (5, 1.5, 6).
 
@@ -105,7 +101,7 @@ Control : Swarm {
         # get the average location, and point the camera at it.
 
         foreach item in birds: {
-            item fly with-flock birds.
+            item fly.
             location += (item get-location).
 
 			if | (item get-location) | > | highLoc |: highLoc = (item get-location).
@@ -251,8 +247,6 @@ Mobile : Birds {
     + to land with ground (object):
         # if we hit the ground, we stop moving and set the landed flag to 1.
 
-		# print "Landing".
-
         self set-acceleration to (0, 0, 0).
         self set-velocity to (0, 0, 0).
 
@@ -269,7 +263,7 @@ Mobile : Birds {
 
         return landed.
 
-    + to fly with-flock flock (list):
+    + to fly:
         # This is the method which does it all.
 
         bird (object).

@@ -44,7 +44,7 @@ Control : Swarm {
     + variables:
         birds (list).
         item (object).
-        cloudTexture (int).
+        cloudTexture (object).
         selection (object).
 
         # the menu items corresponding to different flocking behaviors
@@ -82,7 +82,7 @@ Control : Swarm {
         self enable-lighting.
         self move-light to (0, 20, 20).
 
-        cloudTexture = (self load-image from "images/clouds.png").
+        cloudTexture = (new Image load from "images/clouds.png").
 
         # Add a huge floor.
 

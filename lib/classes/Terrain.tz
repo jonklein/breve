@@ -6,7 +6,7 @@ Real : Terrain {
 	+ variables:
 		location (vector).
 		peakColor, valleyColor (vector).
-		heightData (data).
+		# heightData (data).
 
 	+ to init:
 		realWorldPointer = newTerrain(1).

@@ -23,7 +23,7 @@
 #   3) let each individual control the body and record how far it moves
 #   4) sort the four best individuals based on which could go the furthest
 #   5) breed the best two individuals, create two offspring which will 
-#	  replace the two worst individuals.
+#      replace the two worst individuals.
 #   6) return to step 2 and repeat.
 #
 # The creatures quickly learn to move by dragging the body along the 
@@ -45,389 +45,379 @@
 Controller Walker.
 
 PhysicalControl : Walker {
-	+ variables:
-		seats, monkeys (list).
-		terrain (object).
+    + variables:
+        seats, monkeys (list).
+        terrain (object).
 
-		currentSeat (int).
+        currentSeat (int).
 
-		wigglyThing (object).
+        wigglyThing (object).
 
-		# the following are flags that can be controlled by the user
-		# via the simulation menu
+        # the following are flags that can be controlled by the user
+        # via the simulation menu
 
-		locked (int).
+        locked (int).
 
-		lockMenu, symMenu (object).
+        lockMenu (object).
 
-		cloudTexture (int).
+    + to init:
+        number (int).
+        item (object).
 
-	+ to init:
-		floorShape (object).
-		floor (object).
-		number (int).
-		item (object).
+        locked = 0.
 
-		locked = 0.
+        self set-random-seed-from-dev-random.
+    
+        # these are the default values anyway...
 
-		self set-random-seed-from-dev-random.
-	
-		# these are the default values anyway...
+        self enable-lighting.
+        self enable-smooth-drawing.
+        # self set-gravity to (0, 0, 0).
 
-		self enable-lighting.
-		self enable-smooth-drawing.
-		# self set-gravity to (0, 0, 0).
+        self move-light to (0, 40, 0).
 
-		self move-light to (0, 40, 0).
+        self enable-reflections.
+        self enable-shadow-volumes.
 
-		cloudTexture = (self load-image from "images/clouds.png").
+        self set-background-color to (.4, .6, .9).
+        self set-background-texture-image to (new Image load from "images/clouds.png").
 
-		self enable-reflections.
-		self enable-shadow-volumes.
+        terrain = new Terrain.
+        terrain generate with-ruggedness .2 with-height 15.
 
-		self set-background-color to (.4, .6, .9).
-		self set-background-texture to cloudTexture.
+        # Create the Creature.
 
-		terrain = new Terrain.
-		terrain generate with-ruggedness .2 with-height 15.
+        wigglyThing = new Creature.
+        wigglyThing move to (0, 6, 0).
+        self offset-camera by (3, 13, -13).
+        self watch item wigglyThing.
 
-		# Create the Creature.
+        # The "Monkeys" are the individuals that will control the Creature.
+        # Create the Monkeys and assign them numbers.
 
-		wigglyThing = new Creature.
-		wigglyThing move to (0, 6, 0).
-		self offset-camera by (3, 13, -13).
-		self watch item wigglyThing.
+        monkeys = 15 new Monkeys.
 
-		# The "Monkeys" are the individuals that will control the Creature.
-		# Create the Monkeys and assign them numbers.
+        foreach item in monkeys: {
+            (item set-number to number).
+            number += 1.
+        }
 
-		monkeys = 15 new Monkeys.
+        self pick-drivers.
 
-		foreach item in monkeys: {
-			(item set-number to number).
-			number += 1.
-		}
+        # set up the menus...
 
-		self pick-drivers.
+        lockMenu = (self add-menu named "Lock Driver" for-method "toggle-driver-lock").
 
-		# set up the menus...
+        self add-menu-separator.
 
-		lockMenu = (self add-menu named "Lock Driver" for-method "toggle-driver-lock").
+        self add-menu named "Save Current Genome" for-method "save-current-genome".
+        self add-menu named "Load Into Current Genome" for-method "load-into-current-genome".
 
-		self add-menu-separator.
+        # schedule the first driver change and we're ready to go.
 
-		self add-menu named "Save Current Genome" for-method "save-current-genome".
-		self add-menu named "Load Into Current Genome" for-method "load-into-current-genome".
+        self schedule method-call "change-drivers" at-time (self get-time) + 20.0.
 
-		# schedule the first driver change and we're ready to go.
+        self display-current-driver.
 
-		self schedule method-call "change-drivers" at-time (self get-time) + 20.0.
+    + to display-current-driver:
+        currentNumber (int).
 
-		self display-current-driver.
+        currentNumber = (seats{currentSeat} get-number).
 
-	+ to display-current-driver:
-		currentNumber (int).
+        self set-display-text to "Driver #$currentNumber" at-x -.95 at-y -.9.
 
-		currentNumber = (seats{currentSeat} get-number).
+    + to iterate:
+        seats{currentSeat} control robot wigglyThing at-time (self get-time).
 
-		self set-display-text to "Driver #$currentNumber" at-x -.95 at-y -.9.
+        super iterate.
 
-	+ to iterate:
-		seats{currentSeat} control robot wigglyThing at-time (self get-time).
+    + to pick-drivers:
+        # pick 4 new drivers at random.  we do this by sorting the 
+        # list randomly and picking the first 4 items.
 
-		super iterate.
+        sort monkeys with random-sort.
 
-	+ to pick-drivers:
-		# pick 4 new drivers at random.  we do this by sorting the 
-		# list randomly and picking the first 4 items.
+        seats{0} = monkeys{0}.
+        seats{1} = monkeys{1}.
+        seats{2} = monkeys{2}.
+        seats{3} = monkeys{3}.
 
-		sort monkeys with random-sort.
+        currentSeat = 0.
 
-		seats{0} = monkeys{0}.
-		seats{1} = monkeys{1}.
-		seats{2} = monkeys{2}.
-		seats{3} = monkeys{3}.
+    + to random-sort objectA a (object) objectB b (object):
+        return random[3] - 1.
 
-		currentSeat = 0.
+    + to change-drivers:
+        newDriver (int).
+        newOffset (vector).
 
-	+ to random-sort objectA a (object) objectB b (object):
-		return random[3] - 1.
+        # if they have locked the current driver, do nothing.
 
-	+ to change-drivers:
-		newDriver (int).
-		newOffset (vector).
+        if locked: return.
 
-		# if they have locked the current driver, do nothing.
+        # pick a new camera angle and pan...
 
-		if locked: return.
+        newOffset = random[(30, 6, 30)] + (-15, 1, -15).
+        if |newOffset| < 14: newOffset = 14 * newOffset/|newOffset|.
+        self pan-camera-offset by newOffset steps 30.
 
-		# pick a new camera angle and pan...
+        # we change the drivers every time a monkey is finished it's 
+        # turn.  if we have seen the last monkey, breed them together.
 
-		newOffset = random[(30, 6, 30)] + (-15, 1, -15).
-		if |newOffset| < 14: newOffset = 14 * newOffset/|newOffset|.
-		self pan-camera-offset by newOffset steps 30.
+        seats{currentSeat} set-distance to |(wigglyThing get-location)|.
+        wigglyThing center.
 
-		# we change the drivers every time a monkey is finished it's 
-		# turn.  if we have seen the last monkey, breed them together.
+        currentSeat += 1.
 
-		seats{currentSeat} set-distance to |(wigglyThing get-location)|.
-		wigglyThing center.
+        if currentSeat > 3: {
+            self breed-new-monkeys.
+            self pick-drivers.
+        }
 
-		currentSeat += 1.
+        newDriver = (seats{currentSeat} get-number).
 
-		if currentSeat > 3: {
-			self breed-new-monkeys.
-			self pick-drivers.
-		}
+        # schedule a new driver change in 20 seconds.
 
-		newDriver = (seats{currentSeat} get-number).
+        self schedule method-call "change-drivers" at-time (self get-time) + 20.0.
+        self display-current-driver.
 
-		# schedule a new driver change in 20 seconds.
+    + to breed-new-monkeys:
+        print "breeding monkeys...".
 
-		self schedule method-call "change-drivers" at-time (self get-time) + 20.0.
-		self display-current-driver.
+        sort seats with compare-distance.
 
-	+ to breed-new-monkeys:
-		print "breeding monkeys...".
+        # print out the distance for each individual tested
 
-		sort seats with compare-distance.
+        print "driver ", (seats{0} get-number), (seats{0} get-distance).
+        print "driver ", (seats{1} get-number), (seats{1} get-distance).
+        print "driver ", (seats{2} get-number), (seats{2} get-distance).
+        print "driver ", (seats{3} get-number), (seats{3} get-distance).
 
-		# print out the distance for each individual tested
+        # breed the two best twice, replacing the two worst.
 
-		print "driver ", (seats{0} get-number), (seats{0} get-distance).
-		print "driver ", (seats{1} get-number), (seats{1} get-distance).
-		print "driver ", (seats{2} get-number), (seats{2} get-distance).
-		print "driver ", (seats{3} get-number), (seats{3} get-distance).
+        seats{0} breed with seats{1} to-child seats{2}.
+        seats{1} breed with seats{0} to-child seats{3}.
 
-		# breed the two best twice, replacing the two worst.
+        # give each individual a mutation
 
-		seats{0} breed with seats{1} to-child seats{2}.
-		seats{1} breed with seats{0} to-child seats{3}.
+        (seats{2} get-genome) mutate.
+        (seats{3} get-genome) mutate.
 
-		# give each individual a mutation
+    + to compare-distance of a (object) with b (object):
+        result (float).
 
-		(seats{2} get-genome) mutate.
-		(seats{3} get-genome) mutate.
+        result = (b get-distance) - (a get-distance).
+        return result.
 
-	+ to compare-distance of a (object) with b (object):
-		result (float).
+    # the following methods are accessed from the simulation menu.
 
-		result = (b get-distance) - (a get-distance).
-		return result.
+    + to toggle-driver-lock:
+        if locked == 1: {
+            locked = 0.
+            wigglyThing center.
+            self schedule method-call "change-drivers" at-time (self get-time) + 20.0.
+            lockMenu uncheck.
+        } else {
+            locked = 1.
+            lockMenu check.
+        }
 
-	# the following methods are accessed from the simulation menu.
+    + to save-current-genome:
+        (seats{currentSeat} get-genome) save-with-dialog.
 
-	+ to toggle-driver-lock:
-		if locked == 1: {
-			locked = 0.
-			wigglyThing center.
-			self schedule method-call "change-drivers" at-time (self get-time) + 20.0.
-			lockMenu uncheck.
-		} else {
-			locked = 1.
-			lockMenu check.
-		}
-
-	+ to save-current-genome:
-		(seats{currentSeat} get-genome) save-with-dialog.
-
-	+ to load-into-current-genome:
-		(seats{currentSeat} get-genome) load-with-dialog.
+    + to load-into-current-genome:
+        (seats{currentSeat} get-genome) load-with-dialog.
 }
 
 Object : Monkeys {
-	+ variables:
-		distanceTraveled (float).
-		genome (object).
+    + variables:
+        distanceTraveled (float).
+        genome (object).
 
-		number (int).
+        number (int).
 
-	+ to set-number to n (int):
-		number = n.
+    + to set-number to n (int):
+        number = n.
 
-	+ to get-number:
-		return number.
-	
-	+ to init:
-		genome = new MonkeyGenome.
-		self randomize.
+    + to get-number:
+        return number.
+    
+    + to init:
+        genome = new MonkeyGenome.
+        self randomize.
 
-	+ to randomize:
-		genome randomize.
+    + to randomize:
+        genome randomize.
 
-	+ to get-genome:
-		return genome.
+    + to get-genome:
+        return genome.
 
-	+ to breed with otherMonkey (object) to-child child (object):
-		(child get-genome) crossover from-parent-1 (otherMonkey get-genome) from-parent-2 (self get-genome).
+    + to breed with otherMonkey (object) to-child child (object):
+        (child get-genome) crossover from-parent-1 (otherMonkey get-genome) from-parent-2 (self get-genome).
 
-	+ to control robot theRobot (object) at-time t (float):
-		theRobot set-joint-velocity-0 to SPEED_K * (genome calculate-torque-0 at t).
-		theRobot set-joint-velocity-1 to SPEED_K * (genome calculate-torque-1 at t).
-		theRobot set-joint-velocity-2 to SPEED_K * -(genome calculate-torque-2 at t).
-		theRobot set-joint-velocity-3 to SPEED_K * -(genome calculate-torque-3 at t).
+    + to control robot theRobot (object) at-time t (float):
+        theRobot set-joint-velocity-0 to SPEED_K * (genome calculate-torque-0 at t).
+        theRobot set-joint-velocity-1 to SPEED_K * (genome calculate-torque-1 at t).
+        theRobot set-joint-velocity-2 to SPEED_K * -(genome calculate-torque-2 at t).
+        theRobot set-joint-velocity-3 to SPEED_K * -(genome calculate-torque-3 at t).
 
-	+ to set-distance to value (float):
-		distanceTraveled = value.
+    + to set-distance to value (float):
+        distanceTraveled = value.
 
-	+ to get-distance:
-		return distanceTraveled.
+    + to get-distance:
+        return distanceTraveled.
 }
 
 Genome : MonkeyGenome {
-	+ variables:
-		genomeData (9 floats).
+    + variables:
+        genomeData (9 floats).
 
-	+ to randomize:
-		genomeData[8] = random[5.0] - 2.5.
+    + to randomize:
+        genomeData[8] = random[5.0] - 2.5.
 
-		genomeData[0] = random[2.0] - 1.0.
-		genomeData[1] = random[2.0] - 1.0.
-		genomeData[2] = random[2.0] - 1.0.
-		genomeData[3] = random[2.0] - 1.0.
+        genomeData[0] = random[2.0] - 1.0.
+        genomeData[1] = random[2.0] - 1.0.
+        genomeData[2] = random[2.0] - 1.0.
+        genomeData[3] = random[2.0] - 1.0.
 
-		genomeData[4] = random[6.3] - 3.15.
-		genomeData[5] = random[6.3] - 3.15.
-		genomeData[6] = random[6.3] - 3.15.
-		genomeData[7] = random[6.3] - 3.15.
+        genomeData[4] = random[6.3] - 3.15.
+        genomeData[5] = random[6.3] - 3.15.
+        genomeData[6] = random[6.3] - 3.15.
+        genomeData[7] = random[6.3] - 3.15.
 
-	+ to calculate-torque-0 at time (float):
-		return .5 * (sin(genomeData[8] * (time + genomeData[4])) - (genomeData[0])).
+    + to calculate-torque-0 at time (float):
+        return .5 * (sin(genomeData[8] * (time + genomeData[4])) - (genomeData[0])).
 
-	+ to calculate-torque-1 at time (float):
-		return .5 * (sin(genomeData[8] * (time + genomeData[5])) - (genomeData[1])).
+    + to calculate-torque-1 at time (float):
+        return .5 * (sin(genomeData[8] * (time + genomeData[5])) - (genomeData[1])).
 
-	+ to calculate-torque-2 at time (float):
-		return .5 * (sin(genomeData[8] * (time + genomeData[6])) - (genomeData[2])).
+    + to calculate-torque-2 at time (float):
+        return .5 * (sin(genomeData[8] * (time + genomeData[6])) - (genomeData[2])).
 
-	+ to calculate-torque-3 at time (float):
-		return .5 * (sin(genomeData[8] * (time + genomeData[7])) - (genomeData[3])). 
+    + to calculate-torque-3 at time (float):
+        return .5 * (sin(genomeData[8] * (time + genomeData[7])) - (genomeData[3])). 
 
-	+ to mutate:
-		n (int).
+    + to mutate:
+        n (int).
 
-		n = random[8].
+        n = random[8].
 
-		if n < 4: genomeData[n] = random[2.0] - 1.0.
-		else if n < 8: genomeData[n] = random[6.3] - 3.15.
-		else genomeData[n] = random[5.0] - 2.5.
+        if n < 4: genomeData[n] = random[2.0] - 1.0.
+        else if n < 8: genomeData[n] = random[6.3] - 3.15.
+        else genomeData[n] = random[5.0] - 2.5.
 
-		print "mutated item $n of $self".
+        print "mutated item $n of $self".
 }
 
 MultiBody : Creature {
-	+ variables:
-		bodyLink (object).
+    + variables:
+        bodyLink (object).
+        links (list).
+        joints (list).
 
-		links (list).
+    + to get-root:
+        return bodyLink.
 
-	+ to get-root:
-		return bodyLink.
+    + to init:
+        linkShape, lowerLinkShape, bodyShape (object).
 
-	+ to init:
-		counter (int).
-		linkShape, lowerLinkShape, bodyShape (object).
+        self add-menu named "Send to Center" for-method "center".
 
-		self add-menu named "Send to Center" for-method "center".
+        lowerLinkShape = new Shape.
+        lowerLinkShape init-with-cube size (.36, 1, .36).
 
-		lowerLinkShape = new Shape.
-		lowerLinkShape init-with-cube size (.36, 1, .36).
+        linkShape = new Shape.
+        linkShape init-with-cube size (.38, 1, .38).
 
-		linkShape = new Shape.
-		linkShape init-with-cube size (.38, 1, .38).
+        bodyShape = new Shape.
+        bodyShape init-with-cube size (4, 3, .4).
 
-		bodyShape = new Shape.
-		bodyShape init-with-cube size (4, 3, .4).
+        links = 8 new Links.
+        joints = 8 new RevoluteJoints.
 
-		links = 8 new Links.
+        links{0} set shape linkShape.
+        links{2} set shape linkShape.
+        links{4} set shape linkShape.
+        links{6} set shape linkShape.
+        links{1} set shape lowerLinkShape.
+        links{3} set shape lowerLinkShape.
+        links{5} set shape lowerLinkShape.
+        links{7} set shape lowerLinkShape.
 
-		links{0} set shape linkShape.
-		links{2} set shape linkShape.
-		links{4} set shape linkShape.
-		links{6} set shape linkShape.
-		links{1} set shape lowerLinkShape.
-		links{3} set shape lowerLinkShape.
-		links{5} set shape lowerLinkShape.
-		links{7} set shape lowerLinkShape.
+        links set-color to random[(1.0, 1.0, 1.0)].
 
-		links set-color to random[(1.0, 1.0, 1.0)].
+        bodyLink = new Link.
+        bodyLink set shape bodyShape.
 
-		bodyLink = new Link.
-		bodyLink set shape bodyShape.
+        joints{0} link parent bodyLink to-child links{0}
+                                 with-normal (0, 0, 1) 
+                                 with-parent-point (2.0, -1.5, 0)
+                                 with-child-point (0, .5, 0).
+        joints{1} link parent links{0} to-child links{1}
+                                 with-normal (1, 0, 0) 
+                                 with-parent-point (0, -.5, 0)
+                                 with-child-point (0, .5, 0).
 
-		links{0} link-revolute to-link bodyLink 
-								 with-normal (0, 0, 1) 
-								 with-parent-point (2.0, -1.5, 0)
-								 with-child-point (0, .5, 0).
-		links{1} link-revolute to-link links{0} 
-								 with-normal (1, 0, 0) 
-								 with-parent-point (0, -.5, 0)
-								 with-child-point (0, .5, 0).
+        joints{4} link parent bodyLink to-child links{4}
+                                 with-normal (0, 0, 1) 
+                                 with-parent-point (-2.0, -1.5, 0)
+                                 with-child-point (0, .5, 0).
+        joints{5} link parent links{4} to-child links{5}
+                                 with-normal (1, 0, 0) 
+                                 with-parent-point (0, -.5, 0)
+                                 with-child-point (0, .5, 0).
 
-		links{4} link-revolute to-link bodyLink 
-								 with-normal (0, 0, 1) 
-								 with-parent-point (-2.0, -1.5, 0)
-								 with-child-point (0, .5, 0).
-		links{5} link-revolute to-link links{4} 
-								 with-normal (1, 0, 0) 
-								 with-parent-point (0, -.5, 0)
-								 with-child-point (0, .5, 0).
+        joints{2} link parent bodyLink to-child links{2} 
+                                 with-normal (0, 0, 1) 
+                                 with-parent-point (2.0, 1.5, 0)
+                                 with-child-point (0, -.5, 0).
+        joints{3} link parent links{2} to-child links{3} 
+                                 with-normal (1, 0, 0) 
+                                 with-parent-point (0, .5, 0)
+                                 with-child-point (0, -.5, 0).
 
-		links{2} link-revolute to-link bodyLink 
-								 with-normal (0, 0, 1) 
-								 with-parent-point (2.0, 1.5, 0)
-								 with-child-point (0, -.5, 0).
-		links{3} link-revolute to-link links{2} 
-								 with-normal (1, 0, 0) 
-								 with-parent-point (0, .5, 0)
-								 with-child-point (0, -.5, 0).
+        joints{6} link parent bodyLink to-child links{6} 
+                                 with-normal (0, 0, 1) 
+                                 with-parent-point (-2.0, 1.5, 0)
+                                 with-child-point (0, -.5, 0).
+        joints{7} link parent links{6} to-child links{7} 
+                                 with-normal (1, 0, 0) 
+                                 with-parent-point (0, .5, 0)
+                                 with-child-point (0, -.5, 0).
 
-		links{6} link-revolute to-link bodyLink 
-								 with-normal (0, 0, 1) 
-								 with-parent-point (-2.0, 1.5, 0)
-								 with-child-point (0, -.5, 0).
-		links{7} link-revolute to-link links{6} 
-								 with-normal (1, 0, 0) 
-								 with-parent-point (0, .5, 0)
-								 with-child-point (0, -.5, 0).
+        self register with-link bodyLink.
+        # rotate the creature and move it to above the origin.
+        
+        self rotate around-axis (1, 0, 0) by 1.57.
 
-		self register with-link bodyLink.
-		# rotate the creature and move it to above the origin.
-		
-		self rotate around-axis (1, 0, 0) by 1.57.
 
-		links set-double-spring with-strength 400 with-max .8 with-min -.8.
-		links set-strength-limit to 300.
+        joints set-double-spring with-strength 400 with-max .8 with-min -.8.
+        joints set-strength-limit to 300.
 
-	+ to center:
-		# to center the object, we set the X and Z components to 0, but not
-		# the Y, otherwise we would push the walker into the ground
+    + to center:
+        # to center the object, we set the X and Z components to 0, but not
+        # the Y, otherwise we would push the walker into the ground
 
-		self move to (0, 10, 0).
-		self set-velocity to (0, 0, 0).
+        self move to (0, 10, 0).
 
-	# The following four method allow external objects to manipulate 
-	# the torque values of the links.
+    # The following four method allow external objects to manipulate 
+    # the torque values of the links.
 
-	+ to set-joint-velocity-0 to value (float):
-		links{0} set-joint-velocity to value.
-		links{6} set-joint-velocity to -value.
+    + to set-joint-velocity-0 to value (float):
+        joints{0} set-joint-velocity to value.
+        joints{6} set-joint-velocity to -value.
 
-	+ to set-joint-velocity-1 to value (float):
-		links{1} set-joint-velocity to value.
-		links{7} set-joint-velocity to -value.
+    + to set-joint-velocity-1 to value (float):
+        joints{1} set-joint-velocity to value.
+        joints{7} set-joint-velocity to -value.
 
-	+ to set-joint-velocity-2 to value (float):
-		links{2} set-joint-velocity to value.
-		links{4} set-joint-velocity to -value.
+    + to set-joint-velocity-2 to value (float):
+        joints{2} set-joint-velocity to value.
+        joints{4} set-joint-velocity to -value.
 
-	+ to set-joint-velocity-3 to value (float):
-		links{3} set-joint-velocity to value.
-		links{5} set-joint-velocity to -value.
-
-	+ to destroy:
-		free links.
-		free bodyLink.
+    + to set-joint-velocity-3 to value (float):
+        joints{3} set-joint-velocity to value.
+        joints{5} set-joint-velocity to -value.
 }
 
 # stars of track & field are beautiful people.

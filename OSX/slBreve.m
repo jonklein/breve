@@ -666,7 +666,7 @@ void slPrintLog(char *text) {
 	[errorWindow setContentSize: bounds.size];
 	[errorWindow center];
 
-	// [NSApp runModalForWindow: errorWindow];
+	[NSApp runModalForWindow: errorWindow];
 
 	engine->error.type = 0;
 }

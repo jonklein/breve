@@ -257,6 +257,9 @@ int brIImageDataFree(brEval args[], brEval *result, brInstance *i) {
 
 	if(dm->textureNumber != -1) {
 		GLuint texture = dm->textureNumber;
+
+		if(i->engine->camera->activateContextCallback) i->engine->camera->activateContextCallback();
+
 		glDeleteTextures(1, &texture);
 	}
 

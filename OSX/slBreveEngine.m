@@ -546,7 +546,6 @@ void renderWindowCallback(void *data) {
 }
 
 void slMakeCurrentContext() {
-	NSLog(@"activating %@\n", gDisplayView);
 	[gDisplayView activateContext];
 }
 
