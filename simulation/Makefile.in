@@ -21,7 +21,7 @@ all: libbrsimulation.a
 libbrsimulation.a: $(LIBO)
 	$(AR) -crv libbrsimulation.a $(LIBO) 
 	cp libbrsimulation.a ../lib
-	ranlib ../lib/libbrsimulation.a
+	$(RANLIB) ../lib/libbrsimulation.a
 	cp *.h ../include/breve
 
 install: all

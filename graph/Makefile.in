@@ -20,8 +20,8 @@ libbrgraph.a: $(OFILES)
 	$(AR) crv libbrgraph.a $(OFILES)
 	cp *.h ../include/breve
 	cp libbrgraph.a ../lib
-	ranlib libbrgraph.a
-	ranlib ../lib/libbrgraph.a
+	$(RANLIB) libbrgraph.a
+	$(RANLIB) ../lib/libbrgraph.a
 
 install: all
 

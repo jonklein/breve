@@ -10,6 +10,9 @@ OPTFLAGS	=-O4 @DEFS@
 
 CFLAGS		=-g -Wall -Winline @DEFS@
 
+CC			= @CC@
+RANLIB		= @RANLIB@
+
 PLATFORM	= $(shell uname)
 LPLATFORM	= $(shell echo ${PLATFORM} | tr '[A-Z]' '[a-z]')
 

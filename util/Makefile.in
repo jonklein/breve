@@ -18,7 +18,7 @@ libbrutil.a: $(LIBO)
 	$(AR) -crv libbrutil.a $(LIBO)
 	cp libbrutil.a ../lib
 	cp *.h ../include/breve
-	ranlib ../lib/libbrutil.a
+	$(RANLIB) ../lib/libbrutil.a
 
 install: all
 

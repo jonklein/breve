@@ -25,7 +25,7 @@ internal:
 libbrkernel.a: $(LIBO) $(INTERNALO)
 	$(AR) -crv libbrkernel.a $(LIBO) $(INTERNALO)
 	/bin/cp libbrkernel.a ../lib
-	ranlib ../lib/libbrkernel.a
+	$(RANLIB) ../lib/libbrkernel.a
 	/bin/cp *.h ../include/breve
 
 clean:

@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os AUDIOLIBS CC CXX GLLIBS JAVALIBS JAVAINCS PLUGINFLAGS QUICKTIMEFLAGS EXTRALDFLAGS LDFLAGS CPPFLAGS YACC CXXFLAGS ac_ct_CXX EXEEXT OBJEXT CFLAGS ac_ct_CC LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE RANLIB ac_ct_RANLIB ALLOCA CPP EGREP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os AUDIOLIBS CC CXX RANLIB GLLIBS JAVALIBS JAVAINCS PLUGINFLAGS QUICKTIMEFLAGS EXTRALDFLAGS LDFLAGS CPPFLAGS YACC CXXFLAGS ac_ct_CXX EXEEXT OBJEXT CFLAGS ac_ct_CC LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE ac_ct_RANLIB ALLOCA CPP EGREP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1433,6 +1433,7 @@ _ACEOF
 
 		;;
 esac
+
 
 
 
@@ -6583,6 +6584,7 @@ s,@host_os@,$host_os,;t t
 s,@AUDIOLIBS@,$AUDIOLIBS,;t t
 s,@CC@,$CC,;t t
 s,@CXX@,$CXX,;t t
+s,@RANLIB@,$RANLIB,;t t
 s,@GLLIBS@,$GLLIBS,;t t
 s,@JAVALIBS@,$JAVALIBS,;t t
 s,@JAVAINCS@,$JAVAINCS,;t t
@@ -6602,7 +6604,6 @@ s,@LEX@,$LEX,;t t
 s,@LEXLIB@,$LEXLIB,;t t
 s,@LEX_OUTPUT_ROOT@,$LEX_OUTPUT_ROOT,;t t
 s,@SET_MAKE@,$SET_MAKE,;t t
-s,@RANLIB@,$RANLIB,;t t
 s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
 s,@ALLOCA@,$ALLOCA,;t t
 s,@CPP@,$CPP,;t t

@@ -19,7 +19,7 @@ all: libbrneural.a
 libbrneural.a: $(LIBO)
 	$(AR) -crv libbrneural.a $(LIBO) 
 	cp libbrneural.a ../lib
-	ranlib ../lib/libbrneural.a
+	$(RANLIB) ../lib/libbrneural.a
 	/bin/cp *.h ../include/breve
 
 install: all

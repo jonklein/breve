@@ -31,7 +31,7 @@ steveparse.tab.c: steveparse.y
 libbrsteve.a: $(LIBO)
 	$(AR) -crv libbrsteve.a $(LIBO) 
 	/bin/cp libbrsteve.a ../lib
-	ranlib ../lib/libbrsteve.a
+	$(RANLIB) ../lib/libbrsteve.a
 	/bin/cp *.h ../include/breve
 
 clean:
