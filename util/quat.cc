@@ -31,7 +31,7 @@
     = an existing quaternion.
 */
 
-inline slQuat *slAngularVelocityToDeriv(slVector *av, slQuat *rot, slQuat *deriv) {
+slQuat *slAngularVelocityToDeriv(slVector *av, slQuat *rot, slQuat *deriv) {
     deriv->s = ((av->x * -rot->x) + (av->y * -rot->y) + (av->z * -rot->z))/2.0;
     deriv->x = ((av->x *  rot->s) + (av->y * -rot->z) + (av->z *  rot->y))/2.0;
     deriv->y = ((av->x *  rot->z) + (av->y *  rot->s) + (av->z * -rot->x))/2.0;
@@ -82,7 +82,7 @@ slQuat *slQuatIdentity(slQuat *q) {
     = slQuatIdentity normalizes the passed quaternion.
 */
 
-inline slQuat *slQuatNormalize(slQuat *q) {
+slQuat *slQuatNormalize(slQuat *q) {
     double d;
 
     d = sqrt((q->s * q->s) + (q->x * q->x) + (q->y * q->y) + (q->z * q->z));

@@ -34,7 +34,7 @@ struct slStack {
 slStack *slStackNew();
 slStack *slStackNewWithSize(unsigned int size);
 void slStackFree(slStack *s);
-__inline__ int slStackPush(slStack *s, void *data);
+int slStackPush(slStack *s, void *data);
 int slStackRemove(slStack *s, void *remove);
 
 void *slStackPop(slStack *s);

@@ -5,12 +5,6 @@
 #define NETSIM_MASTER_PORT	5529
 #define NETSIM_SLAVE_PORT	5732
 
-enum { 
-	MT_SYNC = 0,
-	MT_BOUNDS = 1,
-	MT_START
-} messageTypes;
-
 struct slNetsimRemoteHostData {
 	slVector min, max;
 	double simTime;

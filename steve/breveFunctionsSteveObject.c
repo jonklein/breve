@@ -65,14 +65,14 @@ extern stSteveData *gSteveData;
 */
 
 int stSSetFreedInstanceProtection(brEval args[], brEval *target, brInstance *i) {
-	stSteveData *data = i->class->type->data;
+	stSteveData *data = i->object->type->data;
 
     data->retainFreedInstances = BRINT(&args[0]);
     return EC_OK;
 }
 
 int stOCallMethodNamed(brEval args[], brEval *target, brInstance *i) {
-	stInstance *new = BRINSTANCE(&args[0])->pointer;
+	stInstance *newI = BRINSTANCE(&args[0])->pointer;
 	char *method = BRSTRING(&args[1]);
 	brEvalListHead *l = BRLIST(&args[2]);
 	int argCount = 0, n;
@@ -99,8 +99,8 @@ int stOCallMethodNamed(brEval args[], brEval *target, brInstance *i) {
 		}
 	}
 
-	ri.instance = new;
-	ri.type = new->type;
+	ri.instance = newI;
+	ri.type = newI->type;
 
 	stCallMethodByNameWithArgs(&ri, method, newargs, argCount, target);
 

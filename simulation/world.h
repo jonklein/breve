@@ -156,7 +156,7 @@ struct slWorld {
 
 	// patches 
 
-	slPatchGrid *patches;
+	// slPatchGrid *patches;
 
 	// visions are rendered from certain perspectives in the world
 
@@ -198,10 +198,7 @@ struct slWorld {
 	slStack *stationaryObjects;
 	slStack *mobileObjects;
 	slStack *patchGridObjects;
-
-	int patchGridCount;
-	int maxPatchGrids;
-	slPatchGrid **patchGrids;
+	slStack *springObjects;
 
 	// we have one slVclipData for the regular collision detection
 	// and one which will be used to answer "proximity" questions:

@@ -2,14 +2,15 @@
 # Process this file with autoconf to produce a configure script.
 
 # AC_PREREQ(2.57)
-AC_INIT([the breve simulation environment], [2.0], [jk@spiderland.org])
+
+AC_INIT([the breve simulation environment], [2.1], [jk@spiderland.org])
 AC_CONFIG_HEADER([include/breve/config.h])
+
+VERSION=2.1
 
 AC_CANONICAL_HOST
 
 AC_PATH_X
-
-VERSION="2.0"
 
 case "${host_os}" in
 	darwin* )

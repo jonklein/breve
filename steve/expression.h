@@ -366,7 +366,8 @@ stExp *stNewForExp(stExp *assignment, stExp *condition, stExp *iteration, stExp 
 void stFreeForExp(stForExp *e);
 
 stExp *stInstanceNewExp(char *name, stExp *count, char *file, int line);
-void stInstanceFreeExp();
+void stInstanceFreeExp(stInstanceExp *i);
+
 
 stExp *stNewForeachExp(stAssignExp *assignment, stExp *list, stExp *code, char *file, int lineno);
 void stFreeForeachExp(stForeachExp *e);

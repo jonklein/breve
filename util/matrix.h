@@ -67,7 +67,7 @@ typedef double slMatrix[3][3];
 
 void slMatrixMulScalar(double m1[3][3], double n, double d[3][3]);
 
-void slMatrixTranspose(double s[3][3], double d[3][3]);
+void slMatrixTranspose(slMatrix m, slMatrix t);
 
 void slSkewSymmetric(slVector *v, double m[3][3]);
 

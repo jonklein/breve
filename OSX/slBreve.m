@@ -433,7 +433,7 @@ static NSRecursiveLock *gLogLock;
 
 	if(!i || i->status != AS_ACTIVE) {
 		[selectionText setStringValue: 
-			[NSString stringWithFormat: @"No Selection (%s [%p])", engine->controller->class->name, engine->controller]];
+			[NSString stringWithFormat: @"No Selection (%s [%p])", engine->controller->object->name, engine->controller]];
 
 		[editorData setEngine: engine instance: engine->controller->pointer];
 	} else {

@@ -28,16 +28,16 @@ struct stGCRecord {
 };
 
 void stGCRetain(brEval *eval);
-inline void stGCRetainPointer(void *pointer, int type);
+void stGCRetainPointer(void *pointer, int type);
 
 void stGCUnretain(brEval *eval);
-inline void stGCUnretainPointer(void *pointer, int type);
+void stGCUnretainPointer(void *pointer, int type);
 
 void stGCCollect(brEval *eval);
 inline void stGCCollectPointer(void *pointer, int type);
 
 void stGCUnretainAndCollect(brEval *eval);
-inline void stGCUnretainAndCollectPointer(void *pointer, int type);
+void stGCUnretainAndCollectPointer(void *pointer, int type);
 
 void stGCMark(stInstance *instance, brEval *collect);
 inline void stGCMarkPointer(stInstance *instance, void *pointer, int type);

@@ -21,3 +21,4 @@ void breveInitTerrainFunctions(brNamespace *n);
 void breveInitWorldFunctions(brNamespace *n);
 void breveInitPushFunctions(brNamespace *n);
 void breveInitPushCallbackFunctions(brNamespace *n);
+void breveInitSpringFunctions(brNamespace *n);

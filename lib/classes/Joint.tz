@@ -420,11 +420,13 @@ Joint : FixedJoint (aka FixedJoints) [version 2.0] {
 	% <P>
 	% <b>NOTE: this class is included as part of the file "Joint.tz".</b>
 
-	+ to link parent parentLink (object) to-child childLink (object)
-			with-parent-point parentPoint (vector) with-child-point childPoint (vector):
+	+ to link parent parentLink = 0 (object) 
+			to-child childLink (object)
+			with-parent-point parentPoint = (0, 0, 0) (vector) 
+			with-child-point childPoint = (0, 0, 0) (vector):
 
 		% Creates a fixed joint between parentLink and childLink.  
-		% The joint will be lcoated at parentPoint on the parent's body, and at
+		% The joint will be located at parentPoint on the parent's body, and at
 		% childPoint on the child's body.  
 		% <P>
 		% Unfortunately, FixedJoints do not use the relative joint orientation

@@ -73,6 +73,23 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 		pushRun(pushInterpreterPointer, (codeObject get-code-pointer), steps).
 
+	+ to step for-steps steps = 1 (int):
+		pushStep(pushInterpreterPointer, steps).
+
+	+ to run-with-exec-stack-dump program codeObject (object) for-steps steps = -1 (int):
+		n (int).
+
+		if steps == -1: steps = evaluationLimit.
+
+		self run program codeObject for-steps 0.
+
+		for n=0, n<steps, n++: {
+			self step.
+			print "boolean depth = ", (self get-boolean-stack-size).
+			printf "===> $n. ".
+			self print-exec-stack.
+		}
+
   + section "Getting Push interpreter configuration and state information"
 
 	+ to print-config:
@@ -83,6 +100,10 @@ Object : PushInterpreter (aka PushInterpreters) {
 	+ to print-stacks:
 		% Prints out the current contents of the stacks.  Useful for debugging.
 		print pushGetStacksString(pushInterpreterPointer).
+
+	+ to print-exec-stack:
+		% Prints out the current contents of the exec stack.  Useful for debugging.
+		print "(", pushGetExecStackString(pushInterpreterPointer), ")".
 
   + section "Pushing Values onto Push Stacks"
 

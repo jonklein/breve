@@ -37,7 +37,7 @@ int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
     sd->singleStatement = NULL;
 
     stSetParseString(fixedStatement, strlen(fixedStatement));
-    stParseSetObjectAndMethod((stObject*)engine->controller->class->pointer, sd->singleStatementMethod);
+    stParseSetObjectAndMethod((stObject*)engine->controller->object->pointer, sd->singleStatementMethod);
     stParseSetEngine(engine);
 
     engine->error.type = 0;

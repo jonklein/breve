@@ -31,7 +31,15 @@
 #include <setjmp.h>
 
 #ifdef HAVE_LIBJPEG
-#include <jpeglib.h>
+
+#ifdef __cplusplus      // make jpeglib C++ safe
+extern "C"{
+#endif
+#include<jpeglib.h>
+#ifdef __cplusplus
+}
+#endif
+
 void slJPEGErrorExit(j_common_ptr cinfo);
 
 /*!

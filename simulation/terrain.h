@@ -82,7 +82,10 @@ void slTerrainInitialize(slTerrain *l);
 void slFreeTerrain(slTerrain *l);
 void slTerrainMakeNormals(slTerrain *l);
 
-int slTerrainTestPair();
+int slTerrainTestPair(slWorldObject *w1, slWorldObject *w2, 
+		slShape *s1, slShape *s2, 
+		slPosition *p1, slPosition *p2, 
+		int x, int y, slCollisionEntry *ce);
 
 void slTerrainFacesUnderRange(slTerrain *l, 
 	double minX, double maxX, double minZ, double maxZ,

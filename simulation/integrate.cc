@@ -66,6 +66,7 @@ int slEuler(slWorld *w, slLink *r, double *deltaT, int skipFirst) {
 			bcopy(&r->stateVector[r->currentState], &r->stateVector[!r->currentState], sizeof(slLinkIntegrationPosition));
 			r->mobile = 0;
 		}
+
 		return 0;
 	}
 
@@ -102,6 +103,15 @@ int slRK4(slWorld *w, slLink *r, double *deltaT, int skipFirst) {
 
 	osv = (double*)&r->stateVector[!r->currentState];
 	sv = (double*)&r->stateVector[r->currentState];
+
+	if(r->mobile < 1) {
+		if(r->mobile == -1) {
+			bcopy(&r->stateVector[r->currentState], &r->stateVector[!r->currentState], sizeof(slLinkIntegrationPosition));
+			r->mobile = 0;
+		}
+
+		return 0;
+	}
 
 	err += slCalculateDerivs(r, sv, w->dv[0], w);
 	slSumConfigVectors(sv, w->dv[0], w->dv[4], hDelta);

@@ -45,16 +45,16 @@ brCollisionHandler *brCheckCollisionCallback(brInstance *o1, brInstance *o2) {
 	/* check all of the collision handlers for both instances */
 	/* to see if there exists code to collide with eachother  */
 
-	for(n=0;n<o1->class->collisionHandlers->count;n++) {
-		h = o1->class->collisionHandlers->data[n];
+	for(n=0;n<o1->object->collisionHandlers->count;n++) {
+		h = o1->object->collisionHandlers->data[n];
 
-		if(o2->class->type == h->object->type && o2->class->type->isSubclass(h->object, o2->class)) return h;
+		if(o2->object->type == h->object->type && o2->object->type->isSubclass(h->object, o2->object)) return h;
 	}
 
-	for(n=0;n<o2->class->collisionHandlers->count;n++) {
-		h = o2->class->collisionHandlers->data[n];
+	for(n=0;n<o2->object->collisionHandlers->count;n++) {
+		h = o2->object->collisionHandlers->data[n];
 
-		if(o1->class->type == h->object->type && o1->class->type->isSubclass(h->object, o1->class)) return h;
+		if(o1->object->type == h->object->type && o1->object->type->isSubclass(h->object, o1->object)) return h;
 	}
 
 	return NULL;
@@ -81,10 +81,10 @@ void brCollisionCallback(brInstance *o1, brInstance *o2, int type) {
 
 	if(!o1 || !o2 || (o1->status != AS_ACTIVE) || (o2->status != AS_ACTIVE)) return;
 
-	for(n=0;n<o1->class->collisionHandlers->count;n++) {
-		h = o1->class->collisionHandlers->data[n];
+	for(n=0;n<o1->object->collisionHandlers->count;n++) {
+		h = o1->object->collisionHandlers->data[n];
 
-		if(o2->class->type == h->object->type && o2->class->type->isSubclass(o2->class, h->object)) {
+		if(o2->object->type == h->object->type && o2->object->type->isSubclass(o2->object, h->object)) {
 			meth = h->method;
 
 			collider.type = AT_INSTANCE;
@@ -105,10 +105,10 @@ void brCollisionCallback(brInstance *o1, brInstance *o2, int type) {
 
 	if(o1->status != AS_ACTIVE || o2->status != AS_ACTIVE) return;
 	
-	for(n=0;n<o2->class->collisionHandlers->count;n++) {
-		h = o2->class->collisionHandlers->data[n];
+	for(n=0;n<o2->object->collisionHandlers->count;n++) {
+		h = o2->object->collisionHandlers->data[n];
 
-		if(o1->class->type == h->object->type && o1->class->type->isSubclass(o1->class, h->object)) {
+		if(o1->object->type == h->object->type && o1->object->type->isSubclass(o1->object, h->object)) {
 			meth = h->method;
 
 			collider.type = AT_INSTANCE;

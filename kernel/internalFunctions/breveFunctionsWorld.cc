@@ -826,9 +826,19 @@ int brIAddObjectLine(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *src = BRPOINTER(&args[0]);
 	slWorldObject *dst = BRPOINTER(&args[1]);
 	slVector *color = &BRVECTOR(&args[2]);
-	int style = BRINT(&args[3]);
+	char *patternString = BRSTRING(&args[3]);
+	int pattern = 0, n = 0;
 
-	slWorldAddObjectLine(src, dst, style, color);
+	n = strlen(patternString);
+
+	if(n > 16) n = 16;
+
+	while(n--) {
+		pattern <<= 1;
+		pattern |= (*(patternString++) == '-');
+	}
+
+	slWorldAddObjectLine(src, dst, pattern, color);
 
 	return EC_OK;
 }
@@ -939,7 +949,7 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "setLightAmbientColor", brISetLightAmbientColor, AT_NULL, AT_VECTOR, 0);
 	brNewBreveCall(n, "setLightDiffuseColor", brISetLightDiffuseColor, AT_NULL, AT_VECTOR, 0);
 
-	brNewBreveCall(n, "addObjectLine", brIAddObjectLine, AT_NULL, AT_POINTER, AT_POINTER, AT_VECTOR, AT_INT, 0);
+	brNewBreveCall(n, "addObjectLine", brIAddObjectLine, AT_NULL, AT_POINTER, AT_POINTER, AT_VECTOR, AT_STRING, 0);
 	brNewBreveCall(n, "removeObjectLine", brIRemoveObjectLine, AT_NULL, AT_POINTER, AT_POINTER, 0);
 	brNewBreveCall(n, "removeAllObjectLines", brIRemoveAllObjectLines, AT_NULL, AT_POINTER, 0);
 

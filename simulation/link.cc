@@ -36,6 +36,8 @@ slLink *slLinkNew(slWorld *w) {
 	m->outJoints = slStackNew();
 	m->inJoints = slStackNew();
 
+	m->springs = slStackNew();
+
 	slQuatIdentity(&m->stateVector[0].rotQuat);
 	slQuatIdentity(&m->stateVector[1].rotQuat);
 
@@ -372,6 +374,10 @@ void slLinkApplyJointControls(slLink *m) {
 	double newSpeed;
 	unsigned int n;
 
+	// in progress...
+
+	for(n=0;n<m->springs->count;n++) slSpringApplyForce(m->springs->data[n]);
+
 	slLinkApplyForce(m, &m->externalForce, NULL);
 
 	for(n=0;n<m->inJoints->count;n++) {
@@ -538,7 +544,7 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 		if it does NOT exist, OR if it already has a mb, then 
 		this is not an MB joint */ 
 
-	if(child->mb && (!parent || parent->mb)) {
+	if(!parent || (child->mb && parent->mb)) {
 		joint->isMbJoint = 0;
 	} else {
 		if(child->mb) parent->mb = child->mb;
@@ -635,3 +641,7 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 	return joint;
 }
 
+void slVelocityAtPoint(slVector *vel, slVector *avel, slVector *atPoint, slVector *d) {
+	slVectorCross(avel, atPoint, d);
+	slVectorAdd(d, vel, d);
+}

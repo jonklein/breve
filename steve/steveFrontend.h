@@ -18,8 +18,10 @@ struct stSteveData {
 
 struct stVersionRequirement {
     float version;
-    int operator;
+    int operation;
 };
+
+stSteveData *stSteveInit(brEngine *engine);
 
 int stSubclassCallback(brObject *c1, brObject *c2);
 
@@ -33,12 +35,10 @@ int stParseBuffer(stSteveData *s, brEngine *engine, char *buffer, char *filename
 char *stNewStParseTrack(stSteveData *e, char *name);
 void stFreeParseTrack(stSteveData *e);
 char *stFindParseTrack(slList *l, char *name);
-stVersionRequirement *stMakeVersionRequirement(float version, int operator);
+stVersionRequirement *stMakeVersionRequirement(float version, int operation);
 int stCheckVersionRequirement(float version, stVersionRequirement *r);
 void stObjectAllocationReport(brEngine *engine);
 void stParseError(brEngine *e, int type, char *proto, ...);
-
-stSteveData *stSteveInit();
 
 void stSteveCleanup(stSteveData *steveData);
 

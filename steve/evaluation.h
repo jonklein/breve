@@ -79,7 +79,7 @@ __inline__ int stToType(brEval *e, int type, brEval *t, stRunInstance *i);
 __inline__ int stEvalVectorExp(stVectorExp *s, stRunInstance *i, brEval *target);
 __inline__ int stEvalMatrixExp(stMatrixExp *s, stRunInstance *i, brEval *target);
 __inline__ int stEvalBinaryExp(stBinaryExp *b, stRunInstance *i, brEval *target);
-__inline__ int stEvalBinaryExpWithEvals(stRunInstance *i, unsigned char operator, brEval *tr, brEval *tl, brEval *target);
+__inline__ int stEvalBinaryExpWithEvals(stRunInstance *i, unsigned char op, brEval *tr, brEval *tl, brEval *target);
 
 __inline__ int stEvalUnaryExp(stUnaryExp *b, stRunInstance *i, brEval *target);
 
@@ -106,9 +106,9 @@ __inline__ int stEvalListIndex(stListIndexExp *l, stRunInstance *i, brEval *t);
 __inline__ int stEvalListIndexPointer(stListIndexExp *l, stRunInstance *i, void **pointer, int *type);
 __inline__ int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, brEval *t);
 
-int stCallMethodByNameWithArgs(stRunInstance *new, char *name, brEval **args, int argCount, brEval *result);
-__inline__ int stCallMethodByName(stRunInstance *new, char *name, brEval *result);
-__inline__ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEval **args, int count, brEval *result);
+int stCallMethodByNameWithArgs(stRunInstance *newI, char *name, brEval **args, int argCount, brEval *result);
+int stCallMethodByName(stRunInstance *newI, char *name, brEval *result);
+__inline__ int stCallMethod(stRunInstance *old, stRunInstance *newI, stMethod *method, brEval **args, int count, brEval *result);
 
 int stLoadVariable(void *variable, unsigned char type, brEval *e, stRunInstance *i);
 int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e, stRunInstance *i);

@@ -2118,37 +2118,37 @@ inline int stEvalBinaryExp(stBinaryExp *b, stRunInstance *i, brEval *target) {
 	return stEvalBinaryExpWithEvals(i, b->type, &tl, &tr, target);
 }
 
-inline int stEvalBinaryExpWithEvals(stRunInstance *i, unsigned char operator, brEval *tl, brEval *tr, brEval *target) {
+inline int stEvalBinaryExpWithEvals(stRunInstance *i, unsigned char op, brEval *tl, brEval *tr, brEval *target) {
 	int c;
 
 	if(tl->type == AT_INT && tr->type == AT_INT) {
 		target->type = AT_INT;
- 		return stEvalBinaryIntExp(operator, tl, tr, target, i);
+ 		return stEvalBinaryIntExp(op, tl, tr, target, i);
  	}
 
 	/* if either expression is a matrix... */
 
 	if(tl->type == AT_MATRIX || tr->type == AT_MATRIX) {
-		return stEvalBinaryMatrixExp(operator, tl, tr, target, i);
+		return stEvalBinaryMatrixExp(op, tl, tr, target, i);
 	}
 
 	/* if either expression is a vector... */
 
 	if(tl->type == AT_VECTOR || tr->type == AT_VECTOR) {
 		target->type = AT_VECTOR;
-		return stEvalBinaryVectorExp(operator, tl, tr, target, i);
+		return stEvalBinaryVectorExp(op, tl, tr, target, i);
 	}
 
 	/* if we have two strings and they're testing for equality or inequality */
 	/* we do a string compare--otherwise we'll convert to doubles and handle */
 	/* the expression that way */
 
-	if(tr->type == AT_STRING && tl->type == AT_STRING && (operator == BT_EQ || operator == BT_NE)) {
-		return stEvalBinaryStringExp(operator, tl, tr, target, i);
+	if(tr->type == AT_STRING && tl->type == AT_STRING && (op == BT_EQ || op == BT_NE)) {
+		return stEvalBinaryStringExp(op, tl, tr, target, i);
 	}
 
-	if(tr->type == AT_LIST && tl->type == AT_LIST && (operator == BT_EQ || operator == BT_NE)) {
-		return stEvalBinaryEvalListExp(operator, tl, tr, target, i);
+	if(tr->type == AT_LIST && tl->type == AT_LIST && (op == BT_EQ || op == BT_NE)) {
+		return stEvalBinaryEvalListExp(op, tl, tr, target, i);
 	}
 
 	if(tr->type == AT_STRING) if((c = stToDouble(tr, tr, i)) != EC_OK) return c;
@@ -2159,11 +2159,11 @@ inline int stEvalBinaryExpWithEvals(stRunInstance *i, unsigned char operator, br
 
 	if(tl->type == AT_DOUBLE || tr->type == AT_DOUBLE) {
 		target->type = AT_DOUBLE;
-		return stEvalBinaryDoubleExp(operator, tl, tr, target, i);
+		return stEvalBinaryDoubleExp(op, tl, tr, target, i);
 	}
 
 	target->type = AT_INT;
-	return stEvalBinaryIntExp(operator, tl, tr, target, i);
+	return stEvalBinaryIntExp(op, tl, tr, target, i);
 }
 
 inline int stEvalRandExp(stExp *r, stRunInstance *i, brEval *target) {
@@ -2246,7 +2246,7 @@ inline int stEvalMatrixExp(stMatrixExp *v, stRunInstance *i, brEval *target) {
 	\brief Calls a method once the method has been found and the arguments have been processed.
 */
 
-int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEval **args, int argcount, brEval *target) {
+int stCallMethod(stRunInstance *old, stRunInstance *newI, stMethod *method, brEval **args, int argcount, brEval *target) {
 	int n;
 	stKeywordEntry *keyEntry;
 	stStackRecord record;
@@ -2255,23 +2255,23 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 	char *savedStackPointer, *newStStack;
 	int result;
 
-	if(new->instance->status != AS_ACTIVE) {
-		stEvalError(new->instance->type->engine, EE_FREED_INSTANCE, "method \"%s\" being called with freed instance of class \"%s\" (%p)", method->name, new->instance->type->name, new->instance);
+	if(newI->instance->status != AS_ACTIVE) {
+		stEvalError(newI->instance->type->engine, EE_FREED_INSTANCE, "method \"%s\" being called with freed instance of class \"%s\" (%p)", method->name, newI->instance->type->name, newI->instance);
 		return EC_ERROR;
 	}
 
-	savedStackPointer = new->instance->type->engine->stack;
+	savedStackPointer = newI->instance->type->engine->stack;
 
 	// if there is no current stackpointer (outermost frame), start at the end of the stack 
 
-	if(savedStackPointer == NULL) new->instance->type->engine->stack = &new->instance->type->engine->stackBase[ST_STACK_SIZE];
+	if(savedStackPointer == NULL) newI->instance->type->engine->stack = &newI->instance->type->engine->stackBase[ST_STACK_SIZE];
 
 	// step down the stack enough to make room for the current calling method
 
-	newStStack = new->instance->type->engine->stack - method->stackOffset;
+	newStStack = newI->instance->type->engine->stack - method->stackOffset;
 
-	if(newStStack < new->instance->type->engine->stackBase) {
-		slMessage(DEBUG_ALL, "Stack overflow in class \"%s\" method \"%s\"\n", new->instance->type->name, method->name);
+	if(newStStack < newI->instance->type->engine->stackBase) {
+		slMessage(DEBUG_ALL, "Stack overflow in class \"%s\" method \"%s\"\n", newI->instance->type->name, method->name);
 		return EC_ERROR;
 	}
 
@@ -2283,37 +2283,37 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 		keyEntry = method->keywords->data[n];
 
         if(keyEntry->var->type->objectName && !keyEntry->var->type->objectType)
-			keyEntry->var->type->objectType = stObjectFind(new->instance->type->engine->objects, keyEntry->var->type->objectName);
+			keyEntry->var->type->objectType = stObjectFind(newI->instance->type->engine->objects, keyEntry->var->type->objectName);
 
-		result = stSetVariable(&newStStack[keyEntry->var->offset], keyEntry->var->type->type, keyEntry->var->type->objectType, args[n], new);
+		result = stSetVariable(&newStStack[keyEntry->var->offset], keyEntry->var->type->type, keyEntry->var->type->objectType, args[n], newI);
 
 		if(result != EC_OK) {
 			slMessage(DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", keyEntry->keyword, method->name);
-			new->instance->type->engine->stackRecord = new->instance->type->engine->stackRecord->previousStackRecord;
+			newI->instance->type->engine->stackRecord = newI->instance->type->engine->stackRecord->previousStackRecord;
 			return result;
 		}
 	}
 
-	record.instance = new->instance;
+	record.instance = newI->instance;
 	record.method = method;
-	record.previousStackRecord = new->instance->type->engine->stackRecord;
-	new->instance->type->engine->stackRecord = &record;
-	record.gcStack = new->instance->gcStack;
+	record.previousStackRecord = newI->instance->type->engine->stackRecord;
+	newI->instance->type->engine->stackRecord = &record;
+	record.gcStack = newI->instance->gcStack;
 
-	currentGCStack = new->instance->gcStack = slStackNew();
+	currentGCStack = newI->instance->gcStack = slStackNew();
 
 	// prepare for the actual method call 
 
 	target->type = AT_NULL;
-	new->instance->type->engine->stack = newStStack;
+	newI->instance->type->engine->stack = newStStack;
 
-	result = stEvalArray(method->code, new, target);
+	result = stEvalArray(method->code, newI, target);
 
 	// we don't want the return value released, so we'll retain it.
 	// this will keep it alive through the releasing stage.
 	
-	if(new->instance->gcStack) {
-		if(target->type != AT_NULL) stGCUnmark(new->instance, target);
+	if(newI->instance->gcStack) {
+		if(target->type != AT_NULL) stGCUnmark(newI->instance, target);
 		stGCRetain(target);
 	}
 
@@ -2345,46 +2345,46 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
 
 	// collect the current gcStack.
 
-	if(new->instance->gcStack) {
-		stGCCollectStack(new->instance->gcStack);
-		slStackFree(new->instance->gcStack);
+	if(newI->instance->gcStack) {
+		stGCCollectStack(newI->instance->gcStack);
+		slStackFree(newI->instance->gcStack);
 	}
 
 	// reset the previous gcStack.
 
-	new->instance->gcStack = record.gcStack;
+	newI->instance->gcStack = record.gcStack;
 
 	// remember when we retained the return value before?
 	// unretain it, and make it the caller's problem.
 
-	if(new->instance->gcStack) {
+	if(newI->instance->gcStack) {
 		if(target->type != AT_NULL) stGCUnretain(target);
 		if(old) stGCMark(old->instance, target);
 	}
 
 	// restore the previous stack and stack records
 
-	new->instance->type->engine->stack = savedStackPointer;
-	new->instance->type->engine->stackRecord = record.previousStackRecord;
+	newI->instance->type->engine->stack = savedStackPointer;
+	newI->instance->type->engine->stackRecord = record.previousStackRecord;
 
 	return result;
 }
 
-int stCallMethodByName(stRunInstance *new, char *name, brEval *result) {
-	return stCallMethodByNameWithArgs(new, name, NULL, 0, result);
+int stCallMethodByName(stRunInstance *newI, char *name, brEval *result) {
+	return stCallMethodByNameWithArgs(newI, name, NULL, 0, result);
 }
 
-int stCallMethodByNameWithArgs(stRunInstance *new, char *name, brEval **args, int argcount, brEval *result) {
+int stCallMethodByNameWithArgs(stRunInstance *newI, char *name, brEval **args, int argcount, brEval *result) {
 	stMethod *method;
 	stRunInstance ri;
 
-	ri.instance = new->instance;
+	ri.instance = newI->instance;
 
-	method = stFindInstanceMethod(new->instance->type, name, argcount, &ri.type);
+	method = stFindInstanceMethod(newI->instance->type, name, argcount, &ri.type);
 	result->type = AT_NULL;
 
 	if(!method) {
-		stEvalError(new->instance->type->engine, EE_UNKNOWN_METHOD, "object type \"%s\" does not respond to method \"%s\"", new->instance->type->name, name); 
+		stEvalError(newI->instance->type->engine, EE_UNKNOWN_METHOD, "object type \"%s\" does not respond to method \"%s\"", newI->instance->type->name, name); 
 		return EC_ERROR;
 	}
 
@@ -2430,14 +2430,14 @@ int stPrintEvaluation(brEval *e, stRunInstance *i) {
 */
 
 inline int stEvalNewInstance(stInstanceExp *ie, stRunInstance *i, brEval *t) {
-	brObject *class;
+	brObject *object;
 	brEvalListHead *list = NULL;
 	brEval listItem, count;
 	int n;
 
-	class = brObjectFind(i->instance->type->engine, ie->name);
+	object = brObjectFind(i->instance->type->engine, ie->name);
 
-	if(!class) {
+	if(!object) {
 		stEvalError(i->instance->type->engine, EE_UNKNOWN_OBJECT, "unknown object type \"%s\" during new instance evaluation\n", ie->name);
 		return EC_ERROR;
 	}
@@ -2454,7 +2454,7 @@ inline int stEvalNewInstance(stInstanceExp *ie, stRunInstance *i, brEval *t) {
 	if(BRINT(&count) == 1) {
 		t->type = AT_INSTANCE;
 
-		STINSTANCE(t) = stInstanceCreateAndRegister(i->instance->type->engine, class);
+		STINSTANCE(t) = stInstanceCreateAndRegister(i->instance->type->engine, object);
 
 		if(STINSTANCE(t) == NULL) return EC_ERROR_HANDLED;
 	} else {
@@ -2462,7 +2462,7 @@ inline int stEvalNewInstance(stInstanceExp *ie, stRunInstance *i, brEval *t) {
 		list = brEvalListNew();
 
 		for(n=0;n<BRINT(&count);n++) {
-			STINSTANCE(&listItem) = stInstanceCreateAndRegister(i->instance->type->engine, class);
+			STINSTANCE(&listItem) = stInstanceCreateAndRegister(i->instance->type->engine, object);
 
 			if(STINSTANCE(&listItem) == NULL) return EC_ERROR_HANDLED;
 
@@ -2888,6 +2888,9 @@ void stEvalError(brEngine *e, int type, char *proto, ...) {
 	char localMessage[BR_ERROR_TEXT_SIZE];
 
 	if(e->error.type == 0) {
+		// if this is the first stEvalError, this is the primary error -- 
+		// print out all of the information
+
 		e->error.type = type;
         
 		va_start(vp, proto);
@@ -2895,17 +2898,17 @@ void stEvalError(brEngine *e, int type, char *proto, ...) {
 		va_end(vp); 
 
 		slMessage(DEBUG_ALL, e->error.message);
+		slMessage(DEBUG_ALL, "\n");
+
+		stStackTrace(e);
 	} else {
 		va_start(vp, proto);
 		vsnprintf(localMessage, BR_ERROR_TEXT_SIZE, proto, vp);
 		va_end(vp); 
 
 		slMessage(DEBUG_ALL, localMessage);
+		slMessage(DEBUG_ALL, "\n");
 	}
-    
-	slMessage(DEBUG_ALL, "\n");
-    
-	stStackTrace(e);
 }
 
 /*!

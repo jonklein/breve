@@ -50,6 +50,9 @@ struct brObject {
 	
 	brInstance is an object instance in the breve engine, though the 
 	object could be part of any language, steve, java, SmallTalk, etc.
+
+	Note: the "object" field was previously named "class".  This has been
+	changed to avoid conflicts with C++ compilers.
 */
 
 struct brInstance {
@@ -60,7 +63,7 @@ struct brInstance {
 	brMethod *iterate;
 	brMethod *postIterate;
 
-	brObject *class;
+	brObject *object;
 	brEngine *engine;
 	brMenuList menu;
 
@@ -88,13 +91,16 @@ struct brCollisionHandler {
 	\brief A reference to a native method.
 
 	A reference to a method of any language.
+
+	Note: the "object" field was previously named "class".  This has been
+	changed to avoid conflicts with C++ compilers.
 */
 
 struct brMethod {
 	void *pointer;
 
 	char *name;
-	brObject *class;
+	brObject *object;
 	int argumentCount;
 };
 

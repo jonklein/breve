@@ -91,7 +91,7 @@ int brMethodCall(brInstance *i, brMethod *m, brEval **args, brEval *result) {
 		return EC_OK;
 	}
 
-	return i->class->type->callMethod(i, m, args, result);
+	return i->object->type->callMethod(i, m, args, result);
 }
 
 /*!
@@ -103,11 +103,11 @@ int brMethodCall(brInstance *i, brMethod *m, brEval **args, brEval *result) {
 */
 
 int brMethodCallByName(brInstance *i, char *name, brEval *result) {
-	brMethod *m = brMethodFind(i->class, name, 0);
+	brMethod *m = brMethodFind(i->object, name, 0);
 	int r;
 
 	if(!m) {
-		slMessage(DEBUG_ALL, "warning: unknown method \"%s\" called for instance %p of class \"%s\"\n", name, i->pointer, i->class->name);
+		slMessage(DEBUG_ALL, "warning: unknown method \"%s\" called for instance %p of class \"%s\"\n", name, i->pointer, i->object->name);
 		return EC_ERROR;
 	}
 
@@ -130,11 +130,11 @@ int brMethodCallByName(brInstance *i, char *name, brEval *result) {
 */
 
 int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, int count, brEval *result) {
-	brMethod *m = brMethodFind(i->class, name, count);
+	brMethod *m = brMethodFind(i->object, name, count);
 	int r;
 
 	if(!m) {
-		slMessage(DEBUG_ALL, "warning: unknown method \"%s\" called for instance %p of class \"%s\"\n", name, i->pointer, i->class->name);
+		slMessage(DEBUG_ALL, "warning: unknown method \"%s\" called for instance %p of class \"%s\"\n", name, i->pointer, i->object->name);
 		return EC_ERROR;
 	}
 
@@ -157,10 +157,10 @@ int brInstanceAddObserver(brInstance *i, brInstance *observer, char *notificatio
     brObserver *o;                                                           
     brMethod *method;
  
-	method = brMethodFindWithArgRange(observer->class, mname, 0, 2);
+	method = brMethodFindWithArgRange(observer->object, mname, 0, 2);
  
     if(!method) {                                                            
-        slMessage(DEBUG_ALL, "error adding observer: could not locate method \"%s\" for class %s\n", mname, observer->class->name);
+        slMessage(DEBUG_ALL, "error adding observer: could not locate method \"%s\" for class %s\n", mname, observer->object->name);
         return -1; 
     }
  
@@ -281,13 +281,13 @@ void brEngineAddObjectAlias(brEngine *e, char *name, brObject *o) {
 	The instance's iterate method will be called at each iteration.
 */
 
-brInstance *brEngineAddInstance(brEngine *e, brObject *class, void *pointer) {
+brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
 	brMethod *imethod, *pmethod;
 	brInstance *i;
 
     i = slMalloc(sizeof(brInstance));
     i->engine = e;
-	i->class = class;
+	i->object = object;
 	i->status = AS_ACTIVE;
     
     i->menu.count = 0;
@@ -305,8 +305,8 @@ brInstance *brEngineAddInstance(brEngine *e, brObject *class, void *pointer) {
 
 	// find the iterate method which we will call at each iteration
 
-	imethod = brMethodFind(i->class, "iterate", 0);
-	pmethod = brMethodFind(i->class, "post-iterate", 0);
+	imethod = brMethodFind(i->object, "iterate", 0);
+	pmethod = brMethodFind(i->object, "post-iterate", 0);
 
 	i->iterate = imethod;
 	i->postIterate = pmethod;

@@ -3,6 +3,12 @@
 
 #ifdef HAVE_LIBENET
 
+enum {
+	MT_SYNC = 0,
+	MT_BOUNDS = 1,
+	MT_START
+} messageTypes;
+
 #include <enet/enet.h>
 
 /*!

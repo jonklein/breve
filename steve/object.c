@@ -86,12 +86,12 @@ stObject *stObjectNew(brEngine *engine, stSteveData *sdata, char *name, char *al
 	This method also fills in the "breveInstance" pointer in the steve object.
 */
 
-stInstance *stInstanceCreateAndRegister(brEngine *e, brObject *class) {
+stInstance *stInstanceCreateAndRegister(brEngine *e, brObject *object) {
 	stInstance *newi;
 
-	newi = stInstanceNew(class->pointer);
+	newi = stInstanceNew(object->pointer);
 
-	newi->breveInstance = brEngineAddInstance(e, class, newi);
+	newi->breveInstance = brEngineAddInstance(e, object, newi);
 
 	stInstanceInit(newi);
 

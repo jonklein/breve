@@ -508,13 +508,13 @@ char *stFindParseTrack(slList *l, char *name) {
 	\brief Makes a version requirement.
 */
 
-stVersionRequirement *stMakeVersionRequirement(float version, int operator) {
+stVersionRequirement *stMakeVersionRequirement(float version, int operation) {
 	stVersionRequirement *b;
 
 	b = slMalloc(sizeof(stVersionRequirement));
 
 	b->version = version;
-	b->operator = operator;
+	b->operation = operation;
 
 	return b;
 }
@@ -526,7 +526,7 @@ stVersionRequirement *stMakeVersionRequirement(float version, int operator) {
 int stCheckVersionRequirement(float version, stVersionRequirement *r) {
 	if(!r) return 1;
 
-	switch(r->operator) {
+	switch(r->operation) {
 		case VR_GT:
 			return version > r->version;
 			break;
@@ -546,7 +546,7 @@ int stCheckVersionRequirement(float version, stVersionRequirement *r) {
 			return version != r->version;
 			break;
 		default:
-			slMessage(DEBUG_ALL, "unknown operator %d in stCheckVersionRequirement\n", r->operator);
+			slMessage(DEBUG_ALL, "unknown operator %d in stCheckVersionRequirement\n", r->operation);
 			return 0;
 			break;
 	}

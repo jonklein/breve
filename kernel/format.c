@@ -91,12 +91,12 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 				}
 
 				if(desc) {
-					result = slMalloc(strlen(pi->class->name) + (sizeof(void*)*2) + 6 + strlen(desc));
-					sprintf(result, "%s (%p) %s", pi->class->name, pi, desc);
+					result = slMalloc(strlen(pi->object->name) + (sizeof(void*)*2) + 6 + strlen(desc));
+					sprintf(result, "%s (%p) %s", pi->object->name, pi, desc);
 					return result;
 				} else {
-					result = slMalloc(strlen(pi->class->name) + (sizeof(void*)*2) + 6);
-					sprintf(result, "%s (%p)", pi->class->name, pi);
+					result = slMalloc(strlen(pi->object->name) + (sizeof(void*)*2) + 6);
+					sprintf(result, "%s (%p)", pi->object->name, pi);
 					return result;
 				}
 			} else {

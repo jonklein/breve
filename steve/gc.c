@@ -90,7 +90,7 @@ void stGCRetain(brEval *e) {
 	Calls type-specific retain functions.
 */
 
-inline void stGCRetainPointer(void *pointer, int type) {
+void stGCRetainPointer(void *pointer, int type) {
 	switch(type) {
 		case AT_INSTANCE:
 			stInstanceRetain(pointer);
@@ -115,7 +115,7 @@ inline void stGCRetainPointer(void *pointer, int type) {
 	Calls \ref stGCUnretainPointer.
 */
 
-inline void stGCUnretain(brEval *e) {
+void stGCUnretain(brEval *e) {
 	stGCUnretainPointer(BRPOINTER(e), e->type);
 }
 
@@ -125,7 +125,7 @@ inline void stGCUnretain(brEval *e) {
 	Calls type-specific unretain functions.
 */
 
-inline void stGCUnretainPointer(void *pointer, int type) {
+void stGCUnretainPointer(void *pointer, int type) {
 	if(type == AT_NULL || !pointer) return;
 
 	switch(type) {
@@ -201,7 +201,7 @@ void stGCUnretainAndCollect(brEval *e) {
 	count is 0.
 */
 
-inline void stGCUnretainAndCollectPointer(void *pointer, int type) {
+void stGCUnretainAndCollectPointer(void *pointer, int type) {
 	stGCUnretainPointer(pointer, type);
 	stGCCollectPointer(pointer, type);
 }

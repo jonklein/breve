@@ -57,7 +57,7 @@ struct brEval {
 		double doubleValue;  
 		int intValue;
 		slVector vectorValue;
-		double matrixValue[3][3];
+		slMatrix matrixValue;
 		void *pointerValue;
 		char *stringValue;
 		brEvalHash *hashValue;

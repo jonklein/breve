@@ -819,12 +819,12 @@ void stXMLPreparseStartElementHandler(stXMLParserState *userData, const XML_Char
 	int state;
 	int n = 0;
 	int index = -1;
-	const char *class = NULL;
+	const char *objectName = NULL;
 
 	state = stXMLStateForElement((char*)attname);
 
 	while(atts[n]) {
-		if(!strcasecmp(atts[n], "class")) class = atts[n + 1];
+		if(!strcasecmp(atts[n], "class")) objectName = atts[n + 1];
 		if(!strcasecmp(atts[n], "index")) index = atoi(atts[n + 1]);
 		n += 2;
 	}
@@ -833,11 +833,11 @@ void stXMLPreparseStartElementHandler(stXMLParserState *userData, const XML_Char
 		stInstance *i;
 
 		if(userData->mode != PARSE_DATA_INSTANCE) {
-			brObject *object = brObjectFind(userData->engine, (char*)class);
+			brObject *object = brObjectFind(userData->engine, (char*)objectName);
 
 			if(!object) {
-				slMessage(DEBUG_ALL, "archive contains an instance of unknown class \"%s\"\n", class);
-				slMessage(DEBUG_ALL, "mismatch between simulation file and XML archive\n", class);
+				slMessage(DEBUG_ALL, "archive contains an instance of unknown class \"%s\"\n", objectName);
+				slMessage(DEBUG_ALL, "mismatch between simulation file and XML archive\n", objectName);
 				userData->error++;
 				return;
 			}
@@ -854,7 +854,7 @@ void stXMLPreparseStartElementHandler(stXMLParserState *userData, const XML_Char
 void stXMLObjectStartElementHandler(stXMLParserState *userData, const XML_Char *name, const XML_Char **atts) {
 	int n = 0;
 	stXMLStackEntry *state;
-	const char *class = NULL;
+	const char *objectName = NULL;
 	int controllerIndex = 0, index = 0, archiveIndex = 0;
 	brNamespaceSymbol *symbol;
 
@@ -869,7 +869,7 @@ void stXMLObjectStartElementHandler(stXMLParserState *userData, const XML_Char *
 
 	while(atts[n]) {
 		if(!strcasecmp(atts[n], "name")) state->name = slStrdup((char*)atts[n + 1]);
-		if(!strcasecmp(atts[n], "class")) class = atts[n + 1];
+		if(!strcasecmp(atts[n], "class")) objectName = atts[n + 1];
 		if(!strcasecmp(atts[n], "controllerIndex")) controllerIndex = atoi(atts[n + 1]);
 		if(!strcasecmp(atts[n], "archiveIndex")) archiveIndex = atoi(atts[n + 1]);
 		if(!strcasecmp(atts[n], "index")) index = atoi(atts[n + 1]);
@@ -894,7 +894,7 @@ void stXMLObjectStartElementHandler(stXMLParserState *userData, const XML_Char *
 				state->arrayIndex = 0;
 			} else {
 				slMessage(DEBUG_ALL, "archive contains unknown variable \"%s\" for class \"%s\"\n", state->name, userData->currentInstance->type->name);
-				slMessage(DEBUG_ALL, "mismatch between simulation file and XML archive\n", class);
+				slMessage(DEBUG_ALL, "mismatch between simulation file and XML archive\n", objectName);
 				userData->error++;
 			}
 

@@ -73,7 +73,7 @@ void slStackFree(slStack *s) {
     \brief Pushes data onto a stack.
 */
 
-inline int slStackPush(slStack *s, void *data) {
+int slStackPush(slStack *s, void *data) {
     if(s->count == s->maxCount) {
         s->maxCount *= 2;
         s->data = slRealloc(s->data, sizeof(void*) * s->maxCount);

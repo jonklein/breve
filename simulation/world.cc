@@ -65,9 +65,8 @@ slWorld *slWorldNew() {
 	w->objects = slMalloc(sizeof(slWorldObject*) * w->maxObjects);
 	w->objectCount = 0;
 
-	w->maxPatchGrids = 4;
-	w->patchGrids = slMalloc(sizeof(slPatchGrid*) * w->maxPatchGrids);
-	w->patchGridCount = 0;
+	w->patchGridObjects = slStackNew();
+	w->springObjects = slStackNew();
 
 	w->age = 0.0;
 
@@ -148,12 +147,12 @@ void slWorldFree(slWorld *w) {
 	int n;
 
 	for(n=0;n<w->objectCount;n++) slWorldFreeObject(w->objects[n]);
-	for(n=0;n<w->patchGridCount;n++) slFreePatchGrid(w->patchGrids[n]);
+	for(n=0;n<w->patchGridObjects->count;n++) slFreePatchGrid(w->patchGridObjects->data[n]);
 
 	if(w->clipData) slFreeClipData(w->clipData);
 	if(w->proximityData) slFreeClipData(w->proximityData);
 	if(w->objects) slFree(w->objects);
-	if(w->patchGrids) slFree(w->patchGrids);
+	if(w->patchGridObjects) slStackFree(w->patchGridObjects);
 	if(w->cameras) slStackFree(w->cameras);
 
 	dWorldDestroy(w->odeWorldID);
@@ -267,14 +266,8 @@ slPatchGrid *slAddPatchGrid(slWorld *w, slVector *center, slVector *patchSize, i
 	slPatchGrid *g = slNewPatchGrid(center, patchSize, x, y, z);
 
 	// not used yet.
-	// slStackPush(w->patchGridObjects, g);
 
-	if(w->patchGridCount == w->maxPatchGrids) {
-		w->maxPatchGrids *= 2;
-		w->patchGrids = slRealloc(w->patchGrids, w->maxPatchGrids * sizeof(slPatchGrid*));
-	}
-
-	w->patchGrids[w->patchGridCount++] = g;
+	slStackPush(w->patchGridObjects, g);
 
 	return g;
 }
@@ -476,6 +469,10 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 		n++;
 	}
 
+	for(n=0;n<w->springObjects->count;n++) {
+		slSpringApplyForce(w->springObjects->data[n]);
+	}
+
 	if(w->detectCollisions) {
 		result = slVclip(w->clipData, 0.0, 0, w->boundingBoxOnly);
 
@@ -649,7 +646,7 @@ void slNeighborCheck(slWorld *w) {
 		}
 	}
 
-	/* vclip, but stop after the pruning stage */
+	// vclip, but stop after the pruning stage 
 
 	slVclip(w->proximityData, 0.0, 1, 0);
 
@@ -659,7 +656,6 @@ void slNeighborCheck(slWorld *w) {
 		if(pe) {
 			o1 = w->objects[pe->x];
 			o2 = w->objects[pe->y];
-
 
 			switch(o1->type) {
 				case WO_STATIONARY:
@@ -772,6 +768,10 @@ int slRemoveAllObjectLines(slWorldObject *src) {
 
 	return 0;
 }
+
+/*!
+	\brief Finds the object line between src and dst.
+*/
 
 slObjectLine *slFindObjectLine(slWorldObject *src, slWorldObject *dst) {
 	slList *lines = src->outLines;

@@ -84,12 +84,14 @@ struct slVector {
 	double z;
 };
 
+typedef double slMatrix[3][3];
+
 struct brEval {
     union {
         double doubleValue;
         int intValue;
         slVector vectorValue;
-        double matrixValue[3][3];
+        slMatrix matrixValue;
         void *pointerValue;
         char *stringValue;
         brEvalHash *hashValue;

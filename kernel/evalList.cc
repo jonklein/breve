@@ -99,7 +99,7 @@ void brEvalListFree(brEvalListHead *lh) {
 
 int brEvalListInsert(brEvalListHead *head, int index, brEval *value) {
 	brEvalList *start = head->start;
-	brEvalList *new;
+	brEvalList *newList;
 
 	// were moving elements -- update the index top
 
@@ -118,29 +118,29 @@ int brEvalListInsert(brEvalListHead *head, int index, brEval *value) {
 		head->index = slRealloc(head->index, sizeof(brEvalList*) * head->indexSize);
 	}
 
-	new = slMalloc(sizeof(brEvalList));
+	newList = slMalloc(sizeof(brEvalList));
 
-	brEvalCopy(value, &new->eval);
+	brEvalCopy(value, &newList->eval);
 
 	if(start) {
-		new->previous = start->previous;
-		new->next = start;
+		newList->previous = start->previous;
+		newList->next = start;
 
-		if(start->previous) start->previous->next = new;
+		if(start->previous) start->previous->next = newList;
 
-		start->previous = new;
+		start->previous = newList;
 
-		if(start == head->start) head->start = new;
+		if(start == head->start) head->start = newList;
 	} else {
 		// after the last element of the list.
-		new->previous = head->end;
-		new->next = NULL;
+		newList->previous = head->end;
+		newList->next = NULL;
 
-		if(head->end) head->end->next = new;
+		if(head->end) head->end->next = newList;
 
-		head->end = new;
+		head->end = newList;
 
-		if(head->start == NULL) head->start = new;
+		if(head->start == NULL) head->start = newList;
 	}
 
 	return index;

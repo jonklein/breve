@@ -168,6 +168,10 @@
 <ulink url="../classes/Sphere.html">Sphere</ulink></para>
 </listitem>
 <listitem><para>
+<indexterm><primary>Spring class</primary></indexterm>
+<ulink url="../classes/Spring.html">Spring</ulink></para>
+</listitem>
+<listitem><para>
 <indexterm><primary>Stationary class</primary></indexterm>
 <ulink url="../classes/Stationary.html">Stationary</ulink></para>
 </listitem>

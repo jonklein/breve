@@ -26,10 +26,10 @@ int breveFunctionPushCallbackNew(brEval arguments[], brEval *result, brInstance 
 
 	data = slMalloc(sizeof(brPushCallbackData));
 	data->instance = callbackInstance;
-	data->method = brMethodFind(callbackInstance->class, methodName, 0);
+	data->method = brMethodFind(callbackInstance->object, methodName, 0);
 
 	if(!data->method) {
-		slMessage(DEBUG_ALL, "Cannot locate method \"%s\" for class \"%s\" for push callback instruction\n", methodName, callbackInstance->class->name);
+		slMessage(DEBUG_ALL, "Cannot locate method \"%s\" for class \"%s\" for push callback instruction\n", methodName, callbackInstance->object->name);
 		return EC_ERROR;
 	}
 
@@ -42,7 +42,7 @@ unsigned int brPushCallbackFunction(PushEnvironment *environment, void *d) {
 	brEval eval;
 	brPushCallbackData *data = (brPushCallbackData*)d;
 
-	if(brMethodCall(data->instance, data->method, NULL, &eval) != EC_OK) return -1;
+	if(brMethodCall(data->instance, data->method, NULL, &eval) != EC_OK) return 0;
 
 	return 0;
 }
@@ -57,8 +57,8 @@ void brPushFreeData(void *d) {
 
 /*@}*/
 
-void breveInitPushCallbackFunctions(brNamespace *namespace) {
+void breveInitPushCallbackFunctions(brNamespace *names) {
 #ifdef HAVE_LIBPUSH
-	brNewBreveCall(namespace, "pushCallbackNew", breveFunctionPushCallbackNew, AT_POINTER, AT_POINTER, AT_STRING, AT_STRING, AT_INSTANCE, 0);
+	brNewBreveCall(names, "pushCallbackNew", breveFunctionPushCallbackNew, AT_POINTER, AT_POINTER, AT_STRING, AT_STRING, AT_INSTANCE, 0);
 #endif
 }

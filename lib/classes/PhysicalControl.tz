@@ -24,8 +24,8 @@ Control : PhysicalControl [version 1.8] {
 
         self enable-lighting.
 
-        self point-camera at (0, 0, 0) from (0, 30, 0).
-        self move-light to (0, 15, 15).
+        self point-camera at (0, 0, 0) from (0, 10, 30).
+        self move-light to (0, 30, 15).
 
     + to enable-collision-resolution:
         % Enables the collision resolution for a world.  This method should 

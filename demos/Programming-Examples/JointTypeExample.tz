@@ -77,10 +77,10 @@ MultiBody : JointTestBody {
         smallShape = (new Cube init-with size (1.0, 2.0, 1.0)).
 
         links = 2 new Links.
-        links{0} set shape shape.
-        links{1} set shape smallShape.
+        links{0} set-shape to shape.
+        links{1} set-shape to smallShape.
 
-        self register with-link links{0}.
+        self set-root to links{0}.
         
         links{0} set-color to (.8, 0, 0).
         links{1} set-color to (.6, 0, 0).

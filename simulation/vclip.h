@@ -143,8 +143,8 @@ void slInitBoundSortList(slBoundSort **list, int size, slVclipData *v, char boun
 slCollisionEntry *slNextCollisionEntry(slVclipData *v);
 void slNextCollisionPoint(slCollisionEntry *e);
 
-__inline__ slVector *slPositionVertex(slPosition *p, slVector *i, slVector *o);
-__inline__ slPlane *slPositionPlane(slPosition *p, slPlane *p1, slPlane *pt);
+slVector *slPositionVertex(slPosition *p, slVector *i, slVector *o);
+slPlane *slPositionPlane(slPosition *p, slPlane *p1, slPlane *pt);
 
 int slSphereSphereCheck(slVclipData *vc, slShape *s1, slPosition *p1, slShape *s2, slPosition *p2, int x, int y, slCollisionEntry *ce);
 
@@ -152,7 +152,7 @@ int slSphereShapeCheck(slVclipData *vc, slShape *s1, slPosition *p1, slShape *s2
 
 int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly);
 
-__inline__ double slPlaneDistance(slPlane *pl, slVector *p);
+double slPlaneDistance(slPlane *pl, slVector *p);
 
 int slVclipTestPair(slVclipData *v, slPairEntry *e, slCollisionEntry *ce);
 int slVclipTestPairAllFeatures(slVclipData *v, slPairEntry *e, slCollisionEntry *ce);

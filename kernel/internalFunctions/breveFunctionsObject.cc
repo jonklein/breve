@@ -30,7 +30,7 @@
 */
 
 int brIObjectName(brEval args[], brEval *target, brInstance *i) {
-    BRSTRING(target) = slStrdup(BRINSTANCE(&args[0])->class->name);
+    BRSTRING(target) = slStrdup(BRINSTANCE(&args[0])->object->name);
 
     return EC_OK;
 }
@@ -108,7 +108,7 @@ int brIAddCollisionHandler(brEval args[], brEval *target, brInstance *i) {
 
     caller = BRINSTANCE(&args[0]);
 
-    handler = caller->class;
+    handler = caller->object;
 
     collider = brObjectFind(i->engine, BRSTRING(&args[1]));
 

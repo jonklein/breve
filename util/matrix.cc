@@ -82,7 +82,7 @@ void slMatrixVectorSet(double m[3][3], slVector *diag, slVector *sym) {
     the output in 3x3 matrix d.
 */
 
-inline void slMatrixMulScalar(double m[3][3], double n, double d[3][3]) {
+void slMatrixMulScalar(double m[3][3], double n, double d[3][3]) {
     d[0][0] = m[0][0] * n; d[0][1] = m[0][1] * n; d[0][2] = m[0][2] * n;
     d[1][0] = m[1][0] * n; d[1][1] = m[1][1] * n; d[1][2] = m[1][2] * n;
     d[2][0] = m[2][0] * n; d[2][1] = m[2][1] * n; d[2][2] = m[2][2] * n;
@@ -95,7 +95,7 @@ inline void slMatrixMulScalar(double m[3][3], double n, double d[3][3]) {
 	OUTPUT MATRIX d!
 */
 
-inline void slMatrixTranspose(double s[3][3], double d[3][3]) {
+void slMatrixTranspose(double s[3][3], double d[3][3]) {
     d[0][0] = s[0][0]; d[0][1] = s[1][0]; d[0][2] = s[2][0];    
     d[1][0] = s[0][1]; d[1][1] = s[1][1]; d[1][2] = s[2][1];    
     d[2][0] = s[0][2]; d[2][1] = s[1][2]; d[2][2] = s[2][2];    
@@ -131,7 +131,7 @@ inline double slDetermanent(double m[3][3]) {
     INPUT MATRIX m MAY NOT EQUAL OUTPUT MATRIX d!
 */
 
-inline int slMatrixInvert(double m[3][3], double d[3][3]) {
+int slMatrixInvert(double m[3][3], double d[3][3]) {
     double det = slDetermanent(m);
  
     if(fabs(det) < 10e-22) return -1;

@@ -56,6 +56,8 @@ void stParseSetObjectAndMethod(stObject *o, stMethod *m);
 
 void yyerror(char *c);
 
+int yylex();
+
 double stDoubleFromIntOrDoubleExp(stExp *e);
 
 %}
@@ -830,18 +832,18 @@ expression
 | WORD_VALUE PLUSPLUS {
 		stExp *var = stNewLoadExp(thisMethod, thisObject, $1, yyfile, lineno);
 		stExp *one = stNewIntExp(1, yyfile, lineno);
-		stExp *new = stNewBinaryExp(BT_ADD, var, one, yyfile, lineno); 
+		stExp *newExp = stNewBinaryExp(BT_ADD, var, one, yyfile, lineno); 
 
-		$$ = stNewAssignExp(thisMethod, thisObject, $1, new, yyfile, lineno);
+		$$ = stNewAssignExp(thisMethod, thisObject, $1, newExp, yyfile, lineno);
 
 		slFree($1);
 	}
 | WORD_VALUE MINUSMINUS {
 		stExp *var = stNewLoadExp(thisMethod, thisObject, $1, yyfile, lineno);
 		stExp *one = stNewIntExp(1, yyfile, lineno);
-		stExp *new = stNewBinaryExp(BT_SUB, var, one, yyfile, lineno); 
+		stExp *newExp = stNewBinaryExp(BT_SUB, var, one, yyfile, lineno); 
 
-		$$ = stNewAssignExp(thisMethod, thisObject, $1, new, yyfile, lineno);
+		$$ = stNewAssignExp(thisMethod, thisObject, $1, newExp, yyfile, lineno);
 
 		slFree($1);
 	}

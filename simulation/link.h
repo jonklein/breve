@@ -80,6 +80,8 @@ struct slLink {
 	slStack *inJoints;
 	slStack *outJoints;
 
+	slStack *springs;
+
 	// bounding box parameters
 
 	slVector max;
@@ -115,6 +117,9 @@ void slLinkEnableSimulation(slLink *r);
 
 void slLinkUpdatePosition(slLink *r);
 
-slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointType, 
-		slVector *normal, slVector *plinkPoint, slVector *clinkPoint, double m[3][3]);
+slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child,
+		int jointType, slVector *normal, 
+		slVector *plinkPoint, slVector *clinkPoint, double m[3][3]);
+
+void slVelocityAtPoint(slVector *vel, slVector *avel, slVector *atPoint, slVector *d);
 

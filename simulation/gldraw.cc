@@ -717,8 +717,8 @@ void slDrawWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair
 	slRenderLines(w, c, 0);
 	slClearGLErrors("drew multibodies and lines");
 
-	// now we do transparent objects and billboards.  they have to come last because 
-	// they are blended.
+	// now we do transparent objects and billboards.  they have to come last 
+	// because they are blended.
 
 	glDepthMask(GL_FALSE);
 	slRenderObjects(w, c, 0, flags|DO_NO_STATIONARY|DO_NO_TERRAIN|DO_ONLY_ALPHA);
@@ -727,7 +727,7 @@ void slDrawWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair
 
 	// patches too are blended.
 
-	for(n=0;n<w->patchGridCount;n++) slDrawPatches(w->patchGrids[n], &cam, t);
+	for(n=0;n<w->patchGridObjects->count;n++) slDrawPatches(w->patchGridObjects->data[n], &cam, t);
 
 
 	if(c->drawLights) {
@@ -1091,9 +1091,12 @@ void slRenderBillboards(slWorld *w, slCamera *c, int flags) {
 			glBlendFunc(GL_ONE, GL_ONE);
 		} else {
 	    	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 
-		if(!(flags & DO_NO_COLOR)) glColor4f(b->color.x, b->color.y, b->color.z, b->alpha);
+		if(!(flags & DO_NO_COLOR)) {
+			glColor4f(b->color.x, b->color.y, b->color.z, b->alpha);
+		}
 
 		if(lastTexture != b->bitmap) {
 			/* avoid rebinding the texture if possible */

@@ -152,13 +152,25 @@ Object : Real (aka Reals) [version 2.0] {
 
 		setBoundingBox(realWorldPointer, 0).
 
-	+ to add-line to otherObject (object) with-color theColor (vector):
-		% Adds a line to be drawn from this object to otherObject.  The line will
-		% have the color theColor.  The line can be removed later using METHOD(remove-line).
+	+ to add-line to otherObject (object) with-color theColor = (0, 0, 0) (vector) with-style theStyle = "----------------" (string):
+		% Adds a line to be drawn from this object to otherObject.  The line can be removed 
+		% later using METHOD(remove-line).
 		% <P>
-		% If a line to otherObject already exists, its color will be updated.
+		% The optional argument theColor specifies the color of the line.  The default
+		% color is the vector (0, 0, 0), black.
+		% <P>
+		% The optional argument theStyle specifies a pattern for the line.  theStyle is a 
+		% string of 16 spaces and/or dashes which specify the line pattern to be drawn.
+		% A dotted line, for example, would use the pattern "- - - - - - - - ".  A thickly
+		% dashed line would use the pattern "--------        ".  If no style is given, a 
+		% solid line is drawn. 
+		% <P>
+		% If a line to otherObject already exists, its color and/or style will be updated.
 
-		addObjectLine(realWorldPointer, (otherObject get-world-object-pointer), theColor, 0).
+		addObjectLine(realWorldPointer, (otherObject get-world-object-pointer), theColor, theStyle).
+
+	+ to add-dotted-line to otherObject (object) with-color theColor = (0, 0, 0) (vector):
+		self add-line to otherObject with-color theColor with-style "- - - - - - - - ".
 
 	+ to remove-line to otherObject (object):
 		% Removes the line connecting this object to otherObject.

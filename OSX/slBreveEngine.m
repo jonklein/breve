@@ -431,7 +431,7 @@ char *interfaceID = "aqua/1.2";
 
 	if(!engine || !engine->controller) return NULL;
 
-	method = brMethodFind(engine->controller->class, "get-selection", 0);
+	method = brMethodFind(engine->controller->object, "get-selection", 0);
  
 	if(method) {
 		if(brMethodCall(engine->controller, method, NULL, &result) == EC_OK) {

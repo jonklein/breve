@@ -182,8 +182,8 @@ void slMultibodyRotate(slMultibody *mb, double rotation[3][3]) {
 void slMultibodyOffsetPosition(slMultibody *mb, slVector *offset) {
 	slLink *m;
 	slList *links = mb->linkList;
-	const dReal *old;
-	dReal new[3];
+	const dReal *oldP;
+	dReal newP[3];
 
 	while(links) {
 		m = links->data;
@@ -191,13 +191,13 @@ void slMultibodyOffsetPosition(slMultibody *mb, slVector *offset) {
 		slVectorAdd(&m->position.location, offset, &m->position.location);
 
 		if(m->simulate) {
-			old = dBodyGetPosition(m->odeBodyID);
+			oldP = dBodyGetPosition(m->odeBodyID);
 
-			new[0] = old[0] + offset->x;
-			new[1] = old[1] + offset->y;
-			new[2] = old[2] + offset->z;
+			newP[0] = oldP[0] + offset->x;
+			newP[1] = oldP[1] + offset->y;
+			newP[2] = oldP[2] + offset->z;
 			
-			dBodySetPosition(m->odeBodyID, new[0], new[1], new[2]);
+			dBodySetPosition(m->odeBodyID, newP[0], newP[1], newP[2]);
 		}
 
 		links = links->next;

@@ -52,7 +52,7 @@ struct brSoundPlayer {
 int *brSampleUp(int *in, long frames);
 
 brSoundMixer *brNewSoundMixer();
-void brFreeSoundMixer();
+void brFreeSoundMixer(brSoundMixer *mixer);
 
 brSoundPlayer *brNewPlayer(brSoundMixer *mixer, brSoundData *data);
 brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency);
