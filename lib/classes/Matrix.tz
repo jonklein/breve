@@ -1,6 +1,7 @@
 @use Object.
 
-Object : Matrix2D (aka Matrices2D) {
+
+Object : Matrix (aka Matricies) {
 	% Matrix2D objects store an arbitrary sized 2D grid of arbitrary floating 
 	% point data.
 	% <P>
@@ -24,13 +25,17 @@ Object : Matrix2D (aka Matrices2D) {
 	+ variables:
 		matrixPointer (pointer).
 
+}
+
+Matrix : Matrix2D (aka Matrices2D) {
+
 	+ to init:
-		matrixPointer = matrixNew(10, 10).
+		matrixPointer = matrix2DNew(10, 10).
 
 	+ to set-size x xSize (int) y ySize (int):
 		% Sets the size of this matrix to (xSize, ySize).
-
-		matrixPointer = matrixNew(xSize, ySize).
+        
+		matrixPointer = matrix2DNew(xSize, ySize).
 
 	- to get-matrix-pointer:
 		return matrixPointer.
@@ -41,29 +46,29 @@ Object : Matrix2D (aka Matrices2D) {
 		% <P>
 		% This method is hardware accelerated where supported.
 
-		return matrixGetAbsoluteSum(matrixPointer).
+		return matrix2DGetAbsoluteSum(matrixPointer).
 
 	+ to multiply-with-values of otherMatrix (Matrix2D object):
 		% Multiplies each element in this matrix with the corresponding 
 		% element in otherMatrix.  This is not regular matrix multiplication;
 		% rather, it is a way to scale each element in otherMatrix.
 
-		matrixMulElements(matrixPointer, (otherMatrix get-matrix-pointer)).
+		matrix2DMulElements(matrixPointer, (otherMatrix get-matrix-pointer)).
 
 	+ to get-value at-x x (int) at-y y (int):
 		% Returns the matrix value at position (x, y).
 
-		return matrixGet(matrixPointer, x, y).
+		return matrix2DGet(matrixPointer, x, y).
 
 	+ to set-value to value (double) at-x x (int) at-y y (int):
 		% Sets the matrix value at position (x, y).
 
-		return matrixSet(matrixPointer, x, y, value).
+		return matrix2DSet(matrixPointer, x, y, value).
 
 	+ to add-scalar value scalarValue (double):
 		% Adds the number scalarValue to each element in the matrix.
 		
-		matrixAddScalar(matrixPointer, scalarValue).
+		matrix2DAddScalar(matrixPointer, scalarValue).
 
 	+ to add-values of otherMatrix (object) scaled-by scale = 1.0 (double):
 		% Adds this matrix to otherMatrix leaving the result in otherMatrix.
@@ -73,7 +78,7 @@ Object : Matrix2D (aka Matrices2D) {
 		% <P>
 		% This method is hardware accelerated where supported.
 
-		matrixAddScaled(matrixPointer, (otherMatrix get-matrix-pointer), scale).
+		matrix2DAddScaled(matrixPointer, (otherMatrix get-matrix-pointer), scale).
 
 	+ to subtract-values of otherMatrix (object) scaled-by scale = 1.0 (double):
 		% Subtracts this matrix from this otherMatrix, leaving the result
@@ -85,21 +90,21 @@ Object : Matrix2D (aka Matrices2D) {
 		% <P>
 		% This method is hardware accelerated where supported.
 
-		matrixAddScaled(matrixPointer, (otherMatrix get-matrix-pointer), -1.0 * scale).
+		matrix2DAddScaled(matrixPointer, (otherMatrix get-matrix-pointer), -1.0 * scale).
 
 	+ to scale by scaleValue (float):
 		% Scales all elements in the matrix by scaleValue.
 		% <P>
 		% This method is hardware accelerated where supported.
 
-		matrixScale(matrixPointer, scaleValue).
+		matrix2DScale(matrixPointer, scaleValue).
 
 	+ to copy from otherMatrix (object):
 		% Copies the contents of otherMatrix to thisMatrix.
 		% <P>
 		% This method is hardware accelerated where supported.
 
-		matrixCopy((otherMatrix get-matrix-pointer), matrixPointer).
+		matrix2DCopy((otherMatrix get-matrix-pointer), matrixPointer).
 
 	+ to compute-diffusion-matrix from chemicalMatrix (object) with-scale scale = 1.0 (float):
 		% Sets the contents of this matrix to a diffusion rate from the matrix
@@ -122,7 +127,7 @@ Object : Matrix2D (aka Matrices2D) {
 		% The optional scale argument may be used to scale the resulting scale 
 		% matrix.
 
-		matrixDiffusePeriodic((chemicalMatrix get-matrix-pointer), matrixPointer, scale).
+		matrix2DDiffusePeriodic((chemicalMatrix get-matrix-pointer), matrixPointer, scale).
 
 	+ to copy-to-red-channel of-image theImage (Image object) with-scale scale = 1.0 (float):
 		% Copies the contents of this matrix to the red channel of theImage.  
@@ -133,7 +138,7 @@ Object : Matrix2D (aka Matrices2D) {
 		% METHOD(copy-to-blue-channel) are far faster than looping manually through
 		% the matrix values.
 
-		matrixCopyToImage(matrixPointer, (theImage get-image-data), 0, scale).
+		matrix2DCopyToImage(matrixPointer, (theImage get-image-data), 0, scale).
 
 	+ to copy-to-green-channel of-image theImage (Image object) with-scale scale = 1.0 (float):
 		% Copies the contents of this matrix to the green channel of theImage.  
@@ -144,7 +149,7 @@ Object : Matrix2D (aka Matrices2D) {
 		% METHOD(copy-to-red-channel) are far faster than looping manually through
 		% the matrix values.
 
-		matrixCopyToImage(matrixPointer, (theImage get-image-data), 1, scale).
+		matrix2DCopyToImage(matrixPointer, (theImage get-image-data), 1, scale).
 
 	+ to copy-to-blue-channel of-image theImage (Image object) with-scale scale = 1.0 (float):
 		% Copies the contents of this matrix to the blue channel of theImage.  
@@ -155,5 +160,131 @@ Object : Matrix2D (aka Matrices2D) {
 		% METHOD(copy-to-green-channel) are far faster than looping manually through
 		% the matrix values.
 
-		matrixCopyToImage(matrixPointer, (theImage get-image-data), 2, scale).
+		matrix2DCopyToImage(matrixPointer, (theImage get-image-data), 2, scale).
+}
+
+Matrix : Matrix3D (aka Matrices3D) {
+	% Matrix3D objects store an arbitrary sized 3D grid of arbitrary floating 
+	% point data.
+	% <P>
+	% Several of these matrix operations are built on top of the BLAS library
+	% and may be hardware accelerated on certain processors if the platform
+	% provides a hardware accelerated BLAS library.  In particular, AltiVec 
+	% acceleration is provided on G4 an G5 processors with Mac OS X.  
+	% <P>
+	% Hardware accelerated methods sometimes preform multiple operations 
+	% simultaneously for the same computational cost.  The METHOD(add)
+	% operation, for example, also scales one of the matrices being added.
+	% When using these methods, it is often beneficial to structure code
+	% to take advantage of all of the operations preformed.  It is far 
+	% more efficient to scale and add a matrix simultaneously using METHOD(add)
+	% than to first scale using METHOD(scale) and then add using METHOD(add).
+	% <P>
+	% Technical note: matrix objects are implemented using single precision 
+	% floats, while much of the rest of the breve simulation environment uses 
+	% double precision floating point math.
+
+	+ variables:
+		matrixPointer (pointer).
+
+	+ to init:
+		matrixPointer = matrix3DNew(10, 10, 10).
+
+	+ to set-size x xSize (int) y ySize (int) z zSize (int):
+		% Sets the size of this matrix to (xSize, ySize, zSize).
+
+		matrixPointer = matrix3DNew(xSize, ySize, zSize).
+
+	- to get-matrix-pointer:
+		return matrixPointer.
+
+	+ to get-absolute-sum:
+		% Returns the sum of the absolute values of all elements in this 
+		% matrix.
+		% <P>
+		% This method is hardware accelerated where supported.
+
+		return matrix3DGetAbsoluteSum(matrixPointer).
+
+	+ to multiply-with-values of otherMatrix (Matrix3D object):
+		% Multiplies each element in this matrix with the corresponding 
+		% element in otherMatrix.  This is not regular matrix multiplication;
+		% rather, it is a way to scale each element in otherMatrix.
+
+		matrix3DMulElements(matrixPointer, (otherMatrix get-matrix-pointer)).
+
+	+ to get-value at-x x (int) at-y y (int) at-z z (int):
+		% Returns the matrix value at position (x, y, z).
+
+		return matrix3DGet(matrixPointer, x, y, z).
+
+	+ to set-value to value (double) at-x x (int) at-y y (int) at-z z (int):
+		% Sets the matrix value at position (x, y, z).
+
+		return matrix3DSet(matrixPointer, x, y, z, value).
+
+	+ to add-scalar value scalarValue (double):
+		% Adds the number scalarValue to each element in the matrix.
+		
+		matrix3DAddScalar(matrixPointer, scalarValue).
+
+	+ to add-values of otherMatrix (object) scaled-by scale = 1.0 (double):
+		% Adds this matrix to otherMatrix leaving the result in otherMatrix.
+		% The matrices must be of the same size.  The 
+		% optional argument scale allows otherMatrix to be scaled before 
+		% adding it to this matrix.
+		% <P>
+		% This method is hardware accelerated where supported.
+
+		matrix3DAddScaled(matrixPointer, (otherMatrix get-matrix-pointer), scale).
+
+	+ to subtract-values of otherMatrix (object) scaled-by scale = 1.0 (double):
+		% Subtracts this matrix from this otherMatrix, leaving the result
+		% in otherMatrix.  This method uses the
+		% same mechanism as METHOD(add), but using a negative scale 
+		% argument.
+		% The optional argument scale allows otherMatrix to be scaled before 
+		% subtracting it from this matrix.
+		% <P>
+		% This method is hardware accelerated where supported.
+
+		matrix3DAddScaled(matrixPointer, (otherMatrix get-matrix-pointer), -1.0 * scale).
+
+	+ to scale by scaleValue (float):
+		% Scales all elements in the matrix by scaleValue.
+		% <P>
+		% This method is hardware accelerated where supported.
+
+		matrix3DScale(matrixPointer, scaleValue).
+
+	+ to copy from otherMatrix (object):
+		% Copies the contents of otherMatrix to thisMatrix.
+		% <P>
+		% This method is hardware accelerated where supported.
+
+		matrix3DCopy((otherMatrix get-matrix-pointer), matrixPointer).
+
+	+ to compute-diffusion-matrix from chemicalMatrix (object) with-scale scale = 1.0 (float):
+		% Sets the contents of this matrix to a diffusion rate from the matrix
+		% chemicalMatrix.  chemicalMatrix is treated as a matrix of spatial 
+		% chemical concentrations, and the resulting diffusion matrix gives the 
+		% approximate rates of diffiusion of the chemical.
+		% <P>
+		% This is done by sampling each concentration's local neighborhood 
+		% according to the following matrix:
+		% <pre>
+		% 0 0 0  0 1 0  0 0 0
+		% 0 1 0  1-6 1  0 1 0
+		% 0 0 0  0 1 0  0 0 0
+		% </pre>
+		% <P>
+		% chemicalMatrix is assumed to have periodic boundary conditions so that 	
+		% the chemical will flow freely from the edges of the matrix to the 
+		% other side.
+		% <P>
+		% The optional scale argument may be used to scale the resulting scale 
+		% matrix.
+
+		# matrix3DDiffusePeriodic((chemicalMatrix get-matrix-pointer), matrixPointer, scale).
+
 }
