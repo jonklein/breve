@@ -11,14 +11,14 @@ Abstract : Movie {
 
 	+ to record to filename (string):
 		% Create a new MPEG movie file with the name filename.
-		% New frames will be automatically added to the movie as the simulation
-		% runs until the object is released or METHOD(close) is called.  filename
-		% should end with ".mpg".
+		% New frames will be automatically added to the movie as the
+		% simulation runs until the object is released or METHOD(close)
+		% is called.  filename should end with ".mpg" or ".mpeg".
 
 		moviePointer = movieCreate(filename).
 
 	+ to iterate:
-		if moviePointer: self add-frame-from-display.
+		self add-frame-from-display.
 
 	+ to close:
 		% Closes the MPEG file and stops recording.
