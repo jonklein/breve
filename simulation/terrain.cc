@@ -39,12 +39,6 @@ using namespace tiff;
 	1 5 3 5 1
 */
 
-// this is not truly infinity -- it's just really big.
-
-#ifndef INFINITY
-#define INFINITY 0xffffffff
-#endif
-
 slTerrain *slTerrainNew(int res, double xscale, void *data) {
 	int n;
 	slVector location;
@@ -160,8 +154,8 @@ void slTerrainBoundingBox(slTerrain *l) {
 	l->min.y = hmin;
 
 	if(l->repeating) {
-		l->min.x = l->min.z = -INFINITY;
-		l->max.x = l->max.z = INFINITY;
+		l->min.x = l->min.z = -DBL_MAX;
+		l->max.x = l->max.z = DBL_MAX;
 	}
 
 	slVectorAdd(&l->min, &l->position.location, &l->min);
