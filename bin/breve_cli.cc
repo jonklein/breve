@@ -219,7 +219,7 @@ void brCatchSignal(int signal) {
 
 	if(line && line != staticLine) free(line);
 
-	stRunSingleStatement((stSteveData*)frontend->data, frontend->engine, line);
+	if(line) stRunSingleStatement((stSteveData*)frontend->data, frontend->engine, line);
 
 	brUnpauseTimer(frontend->engine);
 

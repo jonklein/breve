@@ -43,13 +43,22 @@ int stCallMethodBreveCallback(void *instanceData, void *methodData, brEval **arg
 	int r, count = 0;
 	stMethod *method = methodData;
 	stRunInstance ri;
+	slStack *previous;
 
 	ri.instance = instanceData;
 	ri.type = ri.instance->type;
 
 	if(method->keywords) count = method->keywords->count;
 
+	previous = ri.instance->gcStack;
+
+	ri.instance->gcStack = slStackNew();
+
 	r = stCallMethod(&ri, &ri, method, arguments, count, result);
+
+	stGCCollectStack(ri.instance->gcStack);
+	slStackFree(ri.instance->gcStack);
+	ri.instance->gcStack = previous;
 
 	return r;
 }

@@ -177,6 +177,7 @@ inline void stGCCollectPointer(void *pointer, int type) {
 			brEvalListCollect(pointer);
 			break;
 		case AT_STRING:
+			// printf("collecting %s\n", pointer);
 			slFree(pointer);
 			break;
 		case AT_HASH:
@@ -251,15 +252,12 @@ inline void stGCMarkPointer(stInstance *i, void *pointer, int type) {
 	if(type == AT_NULL || !pointer) return;
 
 	switch(type) {
-		case AT_LIST:
-			break;
 		case AT_INSTANCE:
 			if(((brInstance*)pointer)->status != AS_ACTIVE) return;
 			collect = ((brInstance*)pointer)->userData;
 			if(!collect->gc) return;
 			break;
 		default:
-			return;
 			break;
 	}
 
