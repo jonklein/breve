@@ -1,6 +1,6 @@
 #
 # SwarmEvolve.tz
-# SwarmEvolve, Version 2.0
+# SwarmEvolve, Version 2.0 [breve]
 # Code for evolving swarms of goal-directed agents
 # c) 2003, Lee Spector (lspector@hampshire.edu, http://hampshire.edu/lspector)
 # Contributions by Jon Klein (jklein@artificial.com)
@@ -15,11 +15,10 @@
 # this simulation now uses the new Push 3.0 implementation, a different Push
 # instruction set.  In addition, a number of changes have beeen made to this
 # simulation code itself, including the sharing code, which was the focus of 
-# the GECCO paper.  The Push 3.0 implementation does not currently include 
-# support for finding the discrepancy between two code objects, and as such,
-# the "kin" recognition mechanism is not currently supported.
+# the GECCO paper.  This code does not include support for different sharing 
+# modes.
 #
-# This code requires Breve 2.0 or better, which can be obtained from:
+# This code requires Breve 2.1 or better, which can be obtained from:
 #    http://www.spiderland.org/breve
 #
 # A user interface, provided via SwarmInterface.nib, is available only when

@@ -216,9 +216,7 @@ int slMakeCurrentContext();
 }
 
 - (void)stopSimulation {
-	if([displayView isFullScreen] && runState == BX_PAUSE) {
-		[displayView stopFullScreen];
-	}
+	if([displayView isFullScreen]) [displayView stopFullScreen];
 
 	if(runState == BX_PAUSE) [self unpauseSimulation];
 

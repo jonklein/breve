@@ -1083,66 +1083,6 @@ void slShadowMatrix(GLfloat matrix[4][4], slPlane *p, slVector *light) {
 }
 
 /*!
-	\brief Draws a shape by setting up its transformations and calling its drawlist.
-*/
-
-void slDrawShape(slCamera *c, slShape *s, slPosition *pos, double textureScale, int mode, int flags) {
-	unsigned char bound, axis;
-
-	bound = (mode & DM_BOUND) && !(flags & DO_NO_BOUND);
-	axis = (mode & DM_AXIS) && !(flags & DO_NO_AXIS);
-
-	if(s->drawList == 0 || s->recompile || (flags & DO_RECOMPILE)) slCompileShape(s, c->drawMode, textureScale, flags);
-
-	glPushMatrix();
-	glTranslated(pos->location.x, pos->location.y, pos->location.z);
-	slMatrixGLMult(pos->rotation);
-
-	if(flags & DO_OUTLINE) {
-		glPushAttrib(GL_ENABLE_BIT);
-		glDisable(GL_LIGHTING);
-		glPushMatrix();
-		glScalef(.99, .99, .99);
-		glPolygonOffset(1, 2);
-		glEnable(GL_POLYGON_OFFSET_FILL);
-		glCallList(s->drawList);
-		glPopMatrix();
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glColor4f(0, 0, 0, .5);
-		glDepthMask(GL_FALSE);
-		slRenderShape(s, GL_LINE_LOOP, 0, 0);
-		glDepthMask(GL_TRUE);
-		glDisable(GL_POLYGON_OFFSET_FILL);
-
-		if(s->_type == ST_SPHERE) {
-			glColor4f(1, 1, 1, 0);
-			glDisable(GL_DEPTH_TEST);
-			glScalef(.96, .96, .96);
-			glCallList(s->drawList);
-			glEnable(GL_DEPTH_TEST);
-		}
-
-		glPopAttrib();
-	} else {
-		glCallList(s->drawList);
-	}
-
-	if(bound || axis) {
-		glPushAttrib(GL_COLOR_BUFFER_BIT);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glColor4f(0.0, 0.0, 0.0, 0.5);
-		glScalef(1.1, 1.1, 1.1);
-		if(axis) slDrawAxis(s->max.x, s->max.y);
-		if(bound) slRenderShape(s, GL_LINE_LOOP, 0, 0);
-		glPopAttrib();
-	}
-
-	glPopMatrix();
-}
-
-/*!
 	\brief Renders a stationary object.
 */
 

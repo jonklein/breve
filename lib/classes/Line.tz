@@ -18,7 +18,7 @@ Object : Line {
 
 		if start == end: return.
 
-		addObjectLine((start get-world-object-pointer), (end get-world-object-pointer), theColor, theStyle).
+		linePointer = addObjectLine((start get-world-object-pointer), (end get-world-object-pointer), theColor, theStyle).
 
 	+ to is-linked to worldObject (object):
 		% Returns 1 if this line is associated with worldObject.
@@ -27,5 +27,5 @@ Object : Line {
 		return 0.
 
 	+ to destroy:
-		removeObjectLine(linePointer).
+		if linePointer: removeObjectLine(linePointer).
 }

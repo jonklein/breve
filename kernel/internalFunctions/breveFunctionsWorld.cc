@@ -857,7 +857,7 @@ int brIAddObjectLine(brEval args[], brEval *target, brInstance *i) {
 		pattern |= (*(patternString++) == '-');
 	}
 
-	slWorldAddObjectLine(i->engine->world, src, dst, pattern, color);
+	BRPOINTER(target) = slWorldAddObjectLine(i->engine->world, src, dst, pattern, color);
 
 	return EC_OK;
 }
@@ -965,7 +965,7 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "setLightAmbientColor", brISetLightAmbientColor, AT_NULL, AT_VECTOR, 0);
 	brNewBreveCall(n, "setLightDiffuseColor", brISetLightDiffuseColor, AT_NULL, AT_VECTOR, 0);
 
-	brNewBreveCall(n, "addObjectLine", brIAddObjectLine, AT_NULL, AT_POINTER, AT_POINTER, AT_VECTOR, AT_STRING, 0);
+	brNewBreveCall(n, "addObjectLine", brIAddObjectLine, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_STRING, 0);
 	brNewBreveCall(n, "removeObjectLine", brIRemoveObjectLine, AT_NULL, AT_POINTER, 0);
 
 	brNewBreveCall(n, "setBoundsOnlyCollisionDetection", brISetBoundsOnlyCollisionDetection, AT_NULL, AT_INT, 0);

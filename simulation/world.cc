@@ -584,6 +584,8 @@ void slWorldRemoveConnection(slWorld *w, slObjectConnection *c) {
 
 	li = find(w->connections.begin(), w->connections.end(), c);
 	if(li != w->connections.end()) w->connections.erase(li);
+
+	delete c;
 }
 
 /*!

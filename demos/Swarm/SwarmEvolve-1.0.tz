@@ -1,0 +1,662 @@
+#
+# SwarmEvolve-1.0.tz
+# Code for evolving swarms of goal-directed agents.
+# Based on swarm Breve code by Jon Klein.
+# Extensions c) 2002, Lee Spector (lspector@hampshire.edu).
+#
+# This is the version ("SwarmEvolve 1.0") described in: 
+#   "Evolutionary Dynamics Discovered via Visualization in th
+#   BREVE Simulation Environment," by Lee Spector and Jon Klein,
+#   a paper for the workshop "Beyond Fitness: Visualising Evolution"
+#   at The 8th International Conference on the Simulation and
+#   Synthesis of Living Systems, Artificial Life VIII, December, 2002.
+# The paper and associate links can be found at:
+#   http://hampshire.edu/lspector/alife8-visualization.html
+#
+# Requires Breve version 1.3 or better, which can be obtained from:
+#   http://www.spiderland.org/breve.
+# 
+# Last major edit (cosmetic changes): October 23, 2002
+# Edited for inclusion as a breve demo: January 19, 2005
+# 
+
+@path "classes"
+
+@include "Object.tz"
+@include "Stationary.tz"
+@include "Control.tz"
+@include "Mobile.tz"
+
+
+Controller Swarm.
+
+Control : Swarm {
+	+ variables:
+		birds (list).
+		item (object).
+		breveTexture (int).
+		cloudTexture (int).
+		selection (object).
+		feeders (list).
+		iteration (int).
+		deaths (int).
+		autoCameraMode (int).
+		autoCameraMenu (object).
+		manualCameraMenu (object).
+		doMutations (int).
+		drawEveryFrameMenu (object).
+		skipFramesIfNecessaryMenu (object).
+
+	+ to click on item (object):
+		if selection: selection hide-neighbor-lines.
+		if item: item show-neighbor-lines.
+		selection = item.
+		super click on item.
+
+	+ to init:
+		floor (object).
+
+		# set up the lighting
+		self enable-lighting.
+		self move-light to (0, 20, 20).
+
+		# camera control menus
+		autoCameraMenu = (self add-menu named "Automatic Camera Control" for-method "set-autoCameraMode").
+		manualCameraMenu = (self add-menu named "Manual Camera Control" for-method "set-manualCameraMode").
+		autoCameraMode = 1.
+		autoCameraMenu check.
+		manualCameraMenu uncheck.
+
+		# nicely/evolve menus
+		self add-menu-separator.
+		self add-menu named "Flock Nicely" for-method "flock-nicely".
+		self add-menu named "Randomize and Evolve" for-method "randomize-and-evolve".
+		self add-menu named "Evolve without Randomizing" for-method "evolve-without-randomizing".
+
+		# draw every frames menus
+		self add-menu-separator.
+		drawEveryFrameMenu = (self add-menu named "Draw Every Frame" for-method "set-drawEveryFrame").
+		skipFramesIfNecessaryMenu = (self add-menu named "Skip Frames if Necessary" for-method "set-skipFramesIfNecessaryMenu").
+		drawEveryFrameMenu check.
+		skipFramesIfNecessaryMenu uncheck.
+
+		# Set up the background.
+		cloudTexture = (self load-image from "clouds.sgi").
+		self set-background-texture to cloudTexture.
+
+		# Add a huge floor.
+		floor = new Stationary.
+		floor register with-shape (new Shape init-with-cube size (100, 2, 100)) at-location (0, -5, 0).
+		floor catch-shadows.
+
+		# Create the birds and feeders.
+		birds = 60 new Birds.
+		feeders = 2 new Feeders.
+
+		# Initialize birds with random parameters and enable mutation.
+		self randomize-and-evolve.
+
+		# Set some camera/display options.
+		self offset-camera by (5, 1.5, 6).
+		self enable-shadows.
+		#self enable-reflections.
+		self disable-text.
+		#self enable-outline.
+
+	+ to set-autoCameraMode:
+		autoCameraMode = 1.
+		autoCameraMenu check.
+		manualCameraMenu uncheck.
+
+	+ to set-manualCameraMode:
+		autoCameraMode = 0.
+		autoCameraMenu uncheck.
+		manualCameraMenu check.
+
+	+ to set-drawEveryFrame:
+		drawEveryFrameMenu check.
+		skipFramesIfNecessaryMenu uncheck.
+		self enable-draw-every-frame.
+
+	+ to set-skipFramesIfNecessaryMenu:
+		drawEveryFrameMenu uncheck.
+		skipFramesIfNecessaryMenu check.
+		self disable-draw-every-frame.
+
+	+ to iterate:
+		location (vector).
+		velocity (vector).
+		topDiff (double).
+
+		# Compute neighbors for later use.
+		self update-neighbors.
+
+		# Tell each bird to fly. While doing so, get the average location and then
+		# point the camera at it with a reasonable zoom.
+		foreach item in birds: {
+			item fly with-flock birds with-feeders feeders.
+			location += (item get-location).
+		}
+		# In a number context, the list represents the number of items in the list.
+		location /= birds.
+		topDiff = 0.0.
+		foreach item in birds: {
+			if topDiff < |location - (item get-location) |:
+			topDiff = | location - (item get-location) |.
+		}
+		if autoCameraMode: {
+			self aim-camera at location.
+			self zoom-camera to (.5 * topDiff) + 10.
+		}
+
+		# Handle deaths.
+		foreach item in birds: {
+			if (item get-energy) == 0: {
+				item die-and-spawn with-parent (self best-fellow of item).
+				deaths = deaths + 1.
+			}
+		}        
+		# Print death tallies occasionally.
+		iteration = iteration + 1.
+		if (iteration > 100): {
+			print "deaths: $deaths".
+			iteration = 0.
+			deaths = 0.
+		}
+
+		# Move the feeders occasionally.
+		foreach item in feeders: {
+			item maybe-teleport.
+		}
+
+		# Call the superclass iterate method to step the simulation forward.
+		super iterate.
+
+	+ to best-fellow of bird (object):
+		# "best" here means minimum (age * energy)
+		other-bird (object).
+		other-score (int).
+		best-bird (object).
+		best-score (int).
+		species (int).
+
+		best-score = 0.
+		best-bird = bird.
+		species = (bird check-species).
+		foreach other-bird in birds: {
+			if (other-bird check-species) == species: {
+				other-score= (other-bird get-age) * (other-bird get-energy).
+				if other-score > best-score: {
+					best-bird = other-bird.
+					best-score = other-score.
+				}
+			}
+		}
+		return best-bird.
+
+
+	+ to flock-nicely:
+		foreach item in birds: item flock-nicely.
+		doMutations = 0.
+
+	+ to randomize-and-evolve:
+		foreach item in birds: item flock-randomly.
+		doMutations = 1.
+
+	+ to evolve-without-randomizing:
+		doMutations = 1.
+
+	+ to check-doMutations:
+		return doMutations.
+
+	+ to get-birds:
+		return birds.
+
+	+ to set-birds to newBirds (list):
+		birds = newBirds.
+}
+
+Mobile : Feeders {
+	+ variables:
+		drifting (int).
+		driftLocation (vector).
+	+ to init:
+		self set-shape to ((new Shape) init-with-polygon-disk radius 1 sides 5 height 0.1).
+
+		self move to random[(20, 0, 20)] - (10, 0, 10).
+		self set-velocity to (0, 0, 0).
+		self set-color to (1, 1, 0.3).
+	+ to maybe-teleport:
+		if random[250] == 0: { 
+			self drift to random[(20, 0, 20)] - (10, 0, 10).
+		}           
+	+ to iterate:
+		if drifting: {
+			self offset by .06 * (driftLocation - (self get-location)).
+			if (|driftLocation - (self get-location)| < .001): {
+				self move to driftLocation.
+				drifting = 0.   
+			}
+		} 
+	+ to drift to location (vector):
+		drifting = 1.
+		driftLocation = location.            
+}
+
+Mobile : Birds {
+	+ variables: 
+		myVelocity (vector).
+		landed (int).
+		cruiseDistance (float).
+		xenoDistance (float).
+		maxAcceleration (float).
+		maxVelocity (float).
+		wanderConstant (float).
+		worldCenterConstant (float).
+		centerConstant (float).
+		velocityConstant (float).
+		spacingConstant (float).
+		xenoSpacingConstant (float).
+		feederConstant (float).
+		species (int).
+		energy (float).
+		age (int).
+
+	+ to init:
+		# register the object, set the initial location, velocity and color.
+		self set-shape to ((new Shape) init-with-polygon-cone radius .1 sides 5 height .2). 
+		self move to random[(10, 10, 10)] - (5, -5, 5).
+		self set-velocity to random[(20, 20, 20)] - (10, 10, 10).
+
+		species = random[2].
+		if species == 0: {
+			self set-color to (0.1, 0.1, 1).
+		} else if species == 1: {
+			self set-color to (1, 0.1, 0.1).
+		} else if species == 2: {
+			self set-color to (1, 0.1, 1).
+		}
+
+		energy = 0.5 + random[0.2].
+		self handle-collisions with-type "Stationary" with-method "land".
+		self handle-collisions with-type "Feeders" with-method "eat".
+		# self handle-collisions with-type "Birds" with-method "bump".
+		self set-neighborhood-size to 3.0.
+		age = 0.
+
+	+ to eat with feeder (object):
+		energy = energy + 0.02.
+		if energy > 1: energy = 1.
+
+	+ to get-energy:
+		return energy.
+
+	+ to set-energy to e (float):
+		energy = e.
+
+	+ to get-age:
+		return age.
+
+	+ to mutate number n (float) delta d (float) max max (float) min min (float):
+		new-value (float).
+
+		if (controller check-doMutations): {
+			new-value = n + (random[(2 * d)] - d).
+		} else {
+			new-value = n.
+		}       
+		if new-value < min: new-value = min.
+		if new-value > max: new-value = max.
+		return new-value.
+
+	+ to die-and-spawn with-parent p (object):
+		parent-new-energy (float).
+
+		energy = 0.5 + random[0.2].
+		age = 0.
+
+		wanderConstant = (self mutate number (p get-wanderConstant) delta 0.5 max 15.0 min 0.1).
+		worldCenterConstant = (self mutate number (p get-worldCenterConstant) delta 0.5 max 15.0 min 0.1).
+		centerConstant = (self mutate number (p get-centerConstant) delta 0.5 max 15.0 min 0.1).
+		velocityConstant = (self mutate number (p get-velocityConstant) delta 0.5 max 15.0 min 0.1).
+		spacingConstant = (self mutate number (p get-spacingConstant) delta 0.5 max 15.0 min 0.1).
+		feederConstant = (self mutate number (p get-feederConstant) delta 0.5 max 15.0 min 0.1).
+		xenoSpacingConstant = (self mutate number (p get-xenoSpacingConstant) delta 0.5 max 15.0 min 0.1).
+		cruiseDistance = (self mutate number (p get-cruiseDistance) delta 0.5 max 15.0 min 0.1).
+		xenoDistance = (self mutate number (p get-xenoDistance) delta 0.5 max 15.0 min 0.1).
+		maxVelocity = (self mutate number (p get-maxVelocity) delta 0.5 max 15.0 min 0.1).
+		maxAcceleration = (self mutate number (p get-maxAcceleration) delta 0.5 max 15.0 min 0.1). 
+
+		# cost of giving birth
+		parent-new-energy = (p get-energy).
+		parent-new-energy = parent-new-energy - 0.001.
+		if parent-new-energy < 0: parent-new-energy = 0.
+		p set-energy to parent-new-energy.
+		p adjust-color.
+
+		# + to bump with bird (object): # not called -- causes slow, jerky motion
+		# if species == (bird check-species):
+		# energy = energy - 0.01.
+		# else
+		# energy = energy - 0.05.
+		# if energy < 0: energy = 0.
+
+	+ to flock-nicely:
+		wanderConstant = 3.0.
+		worldCenterConstant = 4.0.
+		centerConstant = 1.0.
+		velocityConstant = 3.0.
+		spacingConstant = 4.0.
+		feederConstant = 3.0.
+		xenoSpacingConstant = 20.0.
+		cruiseDistance = .4.
+		xenoDistance = 5.0.
+		maxVelocity = 15.
+		maxAcceleration = 15.
+
+	+ to flock-randomly:
+		wanderConstant = random[14.9] + 0.1.
+		worldCenterConstant = random[14.9] + 0.1.
+		centerConstant = random[14.9] + 0.1.
+		velocityConstant = random[14.9] + 0.1.
+		spacingConstant = random[14.9] + 0.1.
+		feederConstant = random[14.9] + 0.1.
+		xenoSpacingConstant = random[14.9] + 0.1.
+		cruiseDistance = random[14.9] + 0.1.
+		xenoDistance = random[14.9] + 0.1.
+		maxVelocity = random[14.9] + 0.1.
+		maxAcceleration = random[14.9] + 0.1.
+
+	+ to get-wanderConstant: return wanderConstant.
+	+ to get-worldCenterConstant: return worldCenterConstant.
+	+ to get-centerConstant: return centerConstant.
+	+ to get-velocityConstant: return velocityConstant.
+	+ to get-spacingConstant: return spacingConstant.
+	+ to get-feederConstant: return feederConstant.
+	+ to get-xenoSpacingConstant: return xenoSpacingConstant.
+	+ to get-cruiseDistance: return cruiseDistance.
+	+ to get-xenoDistance: return xenoDistance.
+	+ to get-maxVelocity: return maxVelocity.
+	+ to get-maxAcceleration: return maxAcceleration.
+
+	+ to land with ground (object):
+		# if we hit the ground, we stop moving and set the landed flag to 1.
+		self set-acceleration to (0, 0, 0).
+		self set-velocity to (0, 0, 0).
+		self my-point vertex (0, 1, 0) at (0, 1, 0). 
+		landed = 1.
+
+		# we don't want to keep colliding with the ground, or else we'll
+		# keep on getting stuck again at every iteration--move up just a 
+		# tiny bit.
+		self offset by (0, 0.1, 0).
+
+	+ to check-landed: return landed.
+	+ to check-species: return species.
+
+	+ to fly with-flock flock (list) with-feeders feeders (list):
+		bird (object).
+		toNeighbor (vector).
+		centerUrge (vector).
+		worldCenterUrge (vector).
+		velocityUrge (vector).
+		spacingUrge (vector).
+		xenoSpacingUrge (vector).
+		wanderUrge (vector).
+		feederUrge (vector).
+		acceleration (vector).
+		newVelocity (vector).
+		take-off (int).
+		# these are only the visible ones, for computing urges
+		conspecifics (list). 
+		others (list).
+		# these are all in neighborhood, for computing outnumbered penalty
+		neighbor-conspecifics (list).
+		neighbor-others (list).
+
+		age = age + 1.
+		# cost of living for one cycle
+		energy = energy - 0.01.
+		if energy < 0: energy = 0.
+
+		# cost of being outnumbered
+		foreach bird in (self get-neighbors): {
+			if (bird is a "Birds"): {
+				if (bird check-species) == species: {
+					push bird onto neighbor-conspecifics.
+				} else {
+					push bird onto neighbor-others.
+				}
+				# cost of being too close to conspecifics, in place of collision detection
+				if |(self get-location) - (bird get-location)| < 0.25: { 					#was 0.15
+					energy = energy - 0.25. #0.05.
+					if energy < 0: energy = 0.
+				}
+			}
+		}
+		if neighbor-others > neighbor-conspecifics: {
+			energy = energy - 0.1.
+			if energy < 0: energy = 0.
+		}
+
+		self adjust-color.
+
+		# get a list of neighbors within our neighborhood-size 
+		# (set during init), and check to see if they're visible.
+		# using get neighbors, we very quickly get a list of 
+		# eligible objects and then check them further.  this is
+		# *much* faster than checking every bird in the simulation.
+
+		foreach bird in (self get-neighbors): {
+			#if (self check-visibility of bird): push bird onto neighbors.
+			if (self check-visibility of bird):
+			if ((self check-species) == (bird check-species)):
+			push bird onto conspecifics.
+			else   
+			push bird onto others.
+		}
+
+		# if we're on the ground now, we'll pick a random number to see if we 
+		# take off again.  The chances are 1 in 40, which is actually pretty
+		# reasonable since this code is called every iteration.
+
+		if landed: {
+			take-off = random[40].
+			if take-off == 1: {
+				# if we decide to take off, pick a random direction,
+				# but not towards the ground.
+				landed = 0.
+				self set-velocity to random[(.1, 1.1, .1)] - (.05, 0, .05).
+			} else {
+				return. 
+			}
+		}
+
+		# get the urge towards the center, and velocity matching urge. 
+		centerUrge = (self get-center-urge with conspecifics).
+		velocityUrge = (self get-velocity-urge with conspecifics).
+
+		# are we too close to our neighbors?  get a vector which reflects that
+		# urge.
+		foreach bird in conspecifics: {
+			toNeighbor = (self get-location) - (bird get-location).
+			if |toNeighbor| < cruiseDistance: spacingUrge += toNeighbor.
+		}
+
+		# similarly, but for other species
+		foreach bird in others: {
+			toNeighbor = (self get-location) - (bird get-location).
+			if |toNeighbor| < xenoDistance: xenoSpacingUrge += toNeighbor.
+		}
+
+		# Are we wandering too far from the center of the world?
+		if |(self get-location)| > 10: worldCenterUrge = -(self get-location).
+
+		# A random component.
+		wanderUrge = random[(2, 2, 2)] - (1, 1, 1).
+
+		# Compute feeder urge.
+		feederUrge = (self get-feeder-urge with feeders).
+
+		# Mormalize all of the vectors to length 1.
+		if |spacingUrge|: spacingUrge /= |spacingUrge|.
+		if |xenoSpacingUrge|: xenoSpacingUrge /= | xenoSpacingUrge |.
+		if |worldCenterUrge|: worldCenterUrge /= |worldCenterUrge|.
+		if |velocityUrge|: velocityUrge /= |velocityUrge|.
+		if |centerUrge|: centerUrge /= |centerUrge|.
+		if |wanderUrge|: wanderUrge /= |wanderUrge|.
+		if |feederUrge|: feederUrge /= |feederUrge|.
+
+		# Multiply vectors by the parameters of this bird (the chromosome).
+		wanderUrge *= wanderConstant.
+		worldCenterUrge *= worldCenterConstant.
+		centerUrge *= centerConstant.
+		velocityUrge *= velocityConstant.
+		spacingUrge *= spacingConstant.
+		xenoSpacingUrge *= xenoSpacingConstant.
+		feederUrge *= feederConstant.
+
+		# Add up the results to get the acceleration and set velocity appropriately
+		acceleration = (worldCenterUrge + centerUrge + velocityUrge  + spacingUrge + wanderUrge + feederUrge + xenoSpacingUrge).
+		if |acceleration| != 0: acceleration /= |acceleration|.
+		self set-acceleration to maxAcceleration * acceleration.
+		newVelocity = (self get-velocity).
+		if |newVelocity| > maxVelocity: 
+		newVelocity = maxVelocity * newVelocity/|newVelocity|.
+		self set-velocity to newVelocity.
+
+		# Point the cone vertex in the direction of the new velocity.
+		self my-point vertex (0, 1, 0) at newVelocity.
+
+	+ to adjust-color:
+		myColor (vector).
+		newRed (float).
+		newGreen (float).
+		newBlue (float).
+
+		myColor = (self get-color).
+
+		# species 0: adjust z
+		# species 1: adjust x
+		# species 2: adjust x and z
+
+		if species == 0: {
+			newRed =  myColor::x.
+			newGreen =  myColor::y.
+			newBlue = (self scale-color color energy with-minimum 0.3).
+		} else if species == 1: {
+			newRed = (self scale-color color energy with-minimum 0.3).
+			newGreen = myColor::y.
+			newBlue = myColor::z.
+		} else if species == 2: {
+			newRed = (self scale-color color energy with-minimum 0.3).
+			newGreen = myColor::y.
+			newBlue = (self scale-color color energy with-minimum 0.3).
+		}
+		self set-color to (newRed, newGreen, newBlue).
+
+	+ to scale-color color c (float) with-minimum m (float):
+		return (m + (c * (1.0 - m))).
+
+	+ to min of num1 (float) and num2 (float):
+		if num1 < num2: {
+			return num1.
+		} else {
+			return num2.
+		}
+
+	+ to max of num1 (float) and num2 (float):
+		if num1 < num2: {
+			return num2.
+		} else {
+			return num1.
+		}
+
+	+ to get-velocity-urge with flock (list):
+		item (object).
+		count (float).
+		velocity (vector).
+
+		# get the average velocity of all the visible birds in the flock.        
+		foreach item in flock: {
+			count += 1.
+			velocity += (item get-velocity).
+		}
+
+		if count == 0: return (0, 0, 0).
+		velocity /= count.
+		return velocity - (self get-velocity).
+
+	+ to get-center-urge with flock (list):
+		item (object).
+		count (float).
+		center (vector).
+
+		# get the average location of all the visible birds in the flock.
+		foreach item in flock: {
+			count += 1.
+			center += (item get-location).
+		}
+
+		if count == 0: return (0, 0, 0).
+		center /= count.
+		return center - (self get-location).
+
+	+ to get-feeder-urge with feeders (list):
+		closest-food (vector).
+		this-food (vector).
+		item (object).
+		closest-distance (float).
+		this-distance (float).
+
+		closest-distance = 10000.0.
+		foreach item in feeders: {
+			this-food = ((item get-location) - (self get-location)).
+			this-distance = |this-food|.
+			if this-distance < closest-distance: {
+				closest-food = this-food.
+				closest-distance = this-distance.
+			}
+		}
+		return closest-food.
+
+	+ to check-visibility of item (object):
+		# An item is visible if it is within a certain angle (2.0 radians) 
+		# of the direction we're facing (assumed to be a vector in the 
+		# direction we're moving).
+
+		if (item == self): return 0.
+		if !(item is a "Birds"): return 0.
+		if (self get-angle to item) > 2.0: return 0.
+		if (item check-landed): return 0.
+
+		return 1. 
+
+	+ to get-angle to otherMobile (object):
+		tempVector (vector).
+
+		tempVector = (otherMobile get-location) - (self get-location).
+		return angle((self get-velocity), tempVector).
+
+	+ to my-point vertex theVertex (vector) at theLocation (vector):
+         v (vector).
+         a (double).
+
+         v = (self cross vector1 theVertex with-vector2 theLocation).
+         a = angle(theVertex, theLocation).
+         if |v| == 0.0: {
+             self rotate around-axis theVertex by 0.1.
+             return.
+         }
+         self rotate around-axis v by a.
+
+     + to cross vector1 v1 (vector) with-vector2 v2 (vector):
+         x, y, z (double).
+
+         x = v1::y * v2::z - v1::z * v2::y.
+         y = v1::z * v2::x - v1::x * v2::z.
+         z = v1::x * v2::y - v1::y * v2::x.
+
+         return (x, y, z).
+}
+

@@ -31,7 +31,7 @@ Abstract : PatchGrid [version 1.9] {
 		with-x-count x (int) 
 		with-y-count y (int) 
 		with-z-count z (int) 
-		with-patch-class class (string):
+		with-patch-class class = "Patch" (string):
 
 		% Creates a PatchGrid in which each OBJECT(Patch) is a member of 
 		% class and is the size pSize and in which the total grid 

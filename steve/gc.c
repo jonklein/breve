@@ -282,7 +282,14 @@ void stGCUnmark(stInstance *i, brEval *collect) {
 	int n;
 	stGCRecord *r;
 
-	if(!i->gcStack || collect->type == AT_NULL || !collect->values.pointerValue) return;
+	if(!i->gcStack || collect->type == AT_NULL || collect->type == AT_INT || 
+		collect->type == AT_DOUBLE || collect->type == AT_MATRIX || 
+		collect->type == AT_VECTOR || !collect->values.pointerValue) return;
+
+	if(collect->type == AT_INSTANCE) {
+		stInstance *i = BRINSTANCE(collect)->userData;
+		if(!i->gc) return;
+	} 
 
 	for(n=0;n<i->gcStack->count;n++) {
 		r = i->gcStack->data[n];

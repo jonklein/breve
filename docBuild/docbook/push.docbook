@@ -2,7 +2,7 @@
 <title>The "Push" Language</title>
 
 <para>
-This chapter describes genetic programming, and describes how use genetic 
+This chapter describes genetic programming, and describes how to use genetic 
 programming in breve simulations using an evolvable language called "Push".
 </para>
 
@@ -55,9 +55,9 @@ all push programs are semantically valid.
 Arguments are passed to instructions using a set of stacks, one for
 each variable type.  When an instruction is executed, it reads and
 removes argument values from the tops of the relevant stacks, it 
-preforms a computation, and then it pushes any output values onto
+performs a computation, and then it pushes any output values onto
 the relevant stacks.  If a stack is empty and cannot provide input
-values for an instruction, the instruction preforms a "NOOP" and 
+values for an instruction, the instruction performs a "NOOP" and 
 does nothing.  This scheme ensures that instructions are always 
 provided with input data of the correct type.
 </para>
@@ -66,7 +66,7 @@ The version of push built into breve 2.0 provides support for the
 following native types: integer, float, name, vector and code.
 </para>
 <para>
-A Push program is made up lists of the following elements: instructions, 
+A Push program is made up of lists of the following elements: instructions, 
 literal values, and sublists of these elements.  Execution of a Push 
 program begins by placing the entire expression onto the code stack
 and proceeds recursively as follows:
@@ -100,7 +100,7 @@ After execution of the program, the stacks are left in the following states:
 </para>
 <para>
 Real push programs are far more complex: instructions are provided to allow
-push programs to modify their own code, preform logical and program flow 
+push programs to modify their own code, perform logical and program flow 
 control operations.  and even create and run new programs on-the-fly 
 (automatically providing support for elements which resemble macros and 
 "automatically defined functions").  For a full list of Push instructions
@@ -190,7 +190,7 @@ information.
 
 <sect1 id="push-callbacks"><title>Interacting with the Simulated World Using Callback Instructions</title>
 <para>
-Push includes a variety of instructions for preforming computation on
+Push includes a variety of instructions for performing computation on
 the native Push types, but does not provide instructions for interacting 
 with the the simulated world or simulated agents.  If you plan to evolve 
 behaviors for simulated agents, you will need to provide instructions by
@@ -215,7 +215,7 @@ stack a vector toward the food object.
 </para>
 <para>
 An output callback instruction ("actuator") will typically take values 
-from the Push interpreter's stack and use those values to preform an
+from the Push interpreter's stack and use those values to perform an
 action in the world.  A "move-towards" instruction, for example, might 
 read a vector value from the vector stack, and then use the breve method
 "set-velocity" to direct the agent towards the Push-computed location.

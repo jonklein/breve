@@ -174,6 +174,11 @@ case "${host_os}" in
 		AC_DEFINE([HAVE_LIBJAVA])
 
 	;;
+
+	* )
+		AC_CHECK_LIB([gslcblas], [cblas_ccopy])
+	;;
+
 esac
 
 AC_LANG([C++])
