@@ -21,7 +21,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 	+ to init:
 		pushInterpreterPointer = pushEnvironmentNew(random[2000000000]).
-		evaluationLimit = 200.
+		self set-evaluation-limit to 200.
 		self set-list-limit to 200.
 
 	- to get-interpreter-pointer:
@@ -100,7 +100,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 		for n=0, n<steps, n++: {
 			if !(self step): return.
 			# print "boolean depth = ", (self get-boolean-stack-size).
-			printf "===> $n. ".
+			printf "===> Step $n. ".
 			self print-exec-stack.
 		}
 
@@ -343,9 +343,9 @@ Object : PushProgram (aka PushPrograms) {
 		% Flattens a random subtree in the code.
 		self set-code-pointer to pushCodeFlattenMutate((self get-code-pointer)).
 
-	+ to crossover from-parent1 p1 (object) from-parent2 p2 (object):
+	+ to crossover from-parent1 p1 (object) from-parent2 p2 (object) with-interpreter interpreter (object):
 		% Sets this object to a genetic crossover of p1 and p2.
-		self set-code-pointer to pushCodeCrossover((p1 get-code-pointer), (p2 get-code-pointer)).
+		self set-code-pointer to pushCodeCrossover((interpreter get-interpreter-pointer), (p1 get-code-pointer), (p2 get-code-pointer)).
 
 	+ to copy-from program otherProgram (object):
 		% Copies the contents of otherProgram to this object.

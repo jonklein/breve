@@ -606,10 +606,11 @@ int breveFunctionPushCodeSubtreeMutate(brEval arguments[], brEval *result, brIns
 */
 
 int breveFunctionPushCodeCrossover(brEval arguments[], brEval *result, brInstance *instance) {
-	PushCode *p1 = BRPOINTER(&arguments[0]);
- 	PushCode *p2 = BRPOINTER(&arguments[1]);
+	PushEnvironment *environment = BRPOINTER(&arguments[0]);
+	PushCode *p1 = BRPOINTER(&arguments[1]);
+ 	PushCode *p2 = BRPOINTER(&arguments[2]);
 
-	BRPOINTER(result) = pushCodeCrossover(p1, p2);
+	BRPOINTER(result) = pushCodeCrossover(environment, p1, p2);
 
 	return EC_OK;
 }
@@ -725,7 +726,7 @@ void breveInitPushFunctions(brNamespace *n) {
  	brNewBreveCall(n, "pushCodeDeletionMutate", breveFunctionPushCodeDeletionMutate, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeFlattenMutate", breveFunctionPushCodeFlattenMutate, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeSubtreeMutate", breveFunctionPushCodeSubtreeMutate, AT_POINTER, AT_POINTER, AT_POINTER, AT_INT, 0);
- 	brNewBreveCall(n, "pushCodeCrossover", breveFunctionPushCodeCrossover, AT_POINTER, AT_POINTER, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushCodeCrossover", breveFunctionPushCodeCrossover, AT_POINTER, AT_POINTER, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeRandom", breveFunctionPushCodeRandom, AT_POINTER, AT_POINTER, AT_INT, 0);
 #endif /* HAVE_LIBPUSH */
 }
