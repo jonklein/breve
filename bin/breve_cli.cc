@@ -45,6 +45,9 @@ void brCatchSignal(int signal);
 
 char *gSimFile;
 
+int gSlave = 0, gMaster = 0;
+char *gSlaveHost;
+
 int gShouldQuit = 0;
 
 extern char *interfaceID;
@@ -143,6 +146,13 @@ int main(int argc, char **argv) {
 
 	nextNotify = gNotify;
 
+	if(gMaster) slWorldStartNetsimServer(frontend->engine->world);
+
+	if(gSlave) {
+		slWorldStartNetsimSlave(frontend->engine->world, gSlaveHost);
+		slFree(gSlaveHost);
+	}
+
 	while(!gShouldQuit && brEngineIterate(frontend->engine) == EC_OK) {
 		if(gNotify && frontend->engine->world->age > nextNotify) {
 			printf("%f seconds elapsed\n", frontend->engine->world->age);
@@ -203,7 +213,7 @@ int brParseArgs(int argc, char **argv) {
 	int r, error = 0;
 	int level;
 
-	while((r = getopt_long(argc, argv, "t:d:r:f:n:l:vh", gCLIOptions, NULL)) != EOF) {
+	while((r = getopt_long(argc, argv, "t:d:r:f:n:l:vhS:M", gCLIOptions, NULL)) != EOF) {
 		switch(r) {
 			case 'd':
 				level = atoi(optarg);
@@ -231,6 +241,13 @@ int brParseArgs(int argc, char **argv) {
 				break;
 			case 'v':
 				brPrintVersion();
+				break;
+			case 'S':
+				gSlaveHost = slStrdup(optarg);
+				gSlave = 1;
+				break;
+			case 'M':
+				gMaster = 1;
 				break;
 			default:
 				printf("unknown option: '%c'\n", r);
