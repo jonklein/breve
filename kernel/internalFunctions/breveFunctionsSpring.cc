@@ -1,9 +1,10 @@
 #include "kernel.h"
 
 #define BRSPRINGPOINTER(p)	((slSpring*)BRPOINTER(p))
+#define BRLINKPOINTER(p)	((slLink*)BRPOINTER(p))
 
 int brISpringNew(brEval args[], brEval *target, brInstance *i) {
-	BRSPRINGPOINTER(target) = slSpringNew(BRPOINTER(&args[0]), BRPOINTER(&args[1]), &BRVECTOR(&args[2]), &BRVECTOR(&args[3]), BRDOUBLE(&args[4]), BRDOUBLE(&args[5]), BRDOUBLE(&args[6]));
+	BRSPRINGPOINTER(target) = slSpringNew(BRLINKPOINTER(&args[0]), BRLINKPOINTER(&args[1]), &BRVECTOR(&args[2]), &BRVECTOR(&args[3]), BRDOUBLE(&args[4]), BRDOUBLE(&args[5]), BRDOUBLE(&args[6]));
 
 	slWorldAddSpring(i->engine->world, BRSPRINGPOINTER(target));
 

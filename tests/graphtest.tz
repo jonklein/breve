@@ -34,6 +34,8 @@ Control : myController {
 		g add-point on-line 0 with-value sin(100 * (self get-time)).
 
 		super iterate.
+
+		if (self get-time) > 10: self end-simulation.
 }
 
 # implement other objects in your simulation here

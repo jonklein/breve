@@ -54,7 +54,7 @@ brEngine *brEngineNew() {
 
 	e->simulationWillStop = 0;
 
-	e->camera = slNewCamera(400, 400);
+	e->camera = slCameraNew(400, 400);
 
 #if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
 	Pa_Initialize();

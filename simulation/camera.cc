@@ -24,17 +24,18 @@
 	\brief Creates a new camera of a given size.
 */
 
-slCamera *slNewCamera(int x, int y) {
+slCamera *slCameraNew(int x, int y) {
+	slCameraText text;
+	slCameraText &t = text;
+
 	slCamera *c;
-	int n;
+	unsigned int n;
 
 	c = new slCamera;
 	bzero(c, sizeof(slCamera));
 
-	c->text = new slCameraText[8]; 
+	c->text.insert(c->text.begin(), 8, t);
 
-	c->maxText = 8;
-	c->textCount = 0;
 	c->textScale = 1;
 
 	c->x = x;
@@ -219,14 +220,13 @@ void slCameraResize(slCamera *c, int x, int y) {
 */
 
 void slCameraFree(slCamera *c) {
-	int n;
+	unsigned int n;
 
 	for(n=0;n<c->maxBillboards;n++) delete c->billboards[n];
 	slFree(c->billboards);
 
-	for(n=0;n<c->textCount;n++) if(c->text[n].text) slFree(c->text[n].text);
+	for(n=0;n<c->text.size();n++) if(c->text[n].text) slFree(c->text[n].text);
 
-	delete[] c->text;
 	delete c;
 }
 
@@ -279,12 +279,10 @@ void slUpdateCamera(slCamera *c) {
 */
 
 void slSetCameraText(slCamera *c, int n, char *string, float x, float y, slVector *v) {
-	if(n >= c->maxText || n < 0) {
+	if((int)n >= c->text.size() || n < 0) {
 	    slMessage(DEBUG_ALL, "out of bounds text position %d in slSetCameraText\n", n);
 	    return;
 	}
-
-	if(c->textCount < (n+1)) c->textCount = (n+1);
 
 	if(c->text[n].text) slFree(c->text[n].text);
 
@@ -345,7 +343,7 @@ void slSetShadowCatcher(slCamera *c, slStationary *s, slVector *normal) {
 */
 
 void slAddBillboard(slCamera *c, slWorldObject *object, float size, float z) {
-	int n, last;
+	unsigned int n, last;
 
 	if(c->billboardCount == c->maxBillboards) {
 	    last = c->maxBillboards;

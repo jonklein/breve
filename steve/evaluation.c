@@ -1495,6 +1495,8 @@ inline int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *target) {
 	if(result != EC_OK) target->type = AT_NULL;
 	else if(c->function->rtype != AT_UNDEFINED) target->type = c->function->rtype;
 
+	if(c->function->rtype == AT_UNDEFINED)  printf("undefined function return\n");
+
 	stGCMark(i->instance, target);
 
 	return result;

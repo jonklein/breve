@@ -43,6 +43,8 @@ struct slLight {
 #ifdef __cplusplus
 class slCameraText {
 	public:
+		slCameraText() { text = NULL; }
+
 		char *text;
 		float x;
 		float y;
@@ -76,6 +78,7 @@ struct slBillboardEntry {
 	rendering data.
 */
 
+#ifdef __cplusplus
 struct slCamera {
 	slLight lights[8];
 	int nLights;
@@ -91,8 +94,8 @@ struct slCamera {
 	// used during drawing
 
 	slBillboardEntry **billboards;
-	int billboardCount;
-	int maxBillboards;
+	unsigned int billboardCount;
+	unsigned int maxBillboards;
 	int billboardDrawList;
 
 	slVector billboardX;
@@ -106,9 +109,8 @@ struct slCamera {
 
 	unsigned char recompile;
 
-	slCameraText *text;
-	int textCount;
-	int maxText;
+	std::vector<slCameraText> text;
+
 	double textScale;
 
 	unsigned char drawMode;
@@ -166,6 +168,7 @@ struct slCamera {
 	int (*activateContextCallback)();
 	void (*renderContextCallback)(slWorld *w, slCamera *c);
 };
+#endif
 
 void slCameraUpdateFrustum(slCamera *c);
 int slCameraPointInFrustum(slCamera *c, slVector *test);
@@ -174,7 +177,7 @@ int slCameraPolygonInFrustum(slCamera *c, slVector *test, int n);
 #ifdef __cplusplus
 extern "C" {
 #endif
-slCamera *slNewCamera(int x, int y);
+slCamera *slCameraNew(int x, int y);
 void slUpdateCamera(slCamera *c);
 
 void slCameraResize(slCamera *c, int x, int y);

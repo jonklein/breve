@@ -22,6 +22,8 @@ PhysicalControl : TerrainWave {
 
 		self enable-shadow-volumes.
 
+		self set-gravity to (0, 0, 0).
+
 		terrain = new Terrain.
 
 		# here we set the terrain to look like the equations sin(x)*cos(y)

@@ -741,7 +741,7 @@ void slShadowPass(slWorld *w, slCamera *c) {
 void slRenderText(slWorld *w, slCamera *c, slVector *location, slVector *target, int crosshair) {
 	char textStr[128];
 	double fromLeft;
-	int n;
+	unsigned int n;
 
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_STENCIL_TEST);
@@ -758,7 +758,7 @@ void slRenderText(slWorld *w, slCamera *c, slVector *location, slVector *target,
 		sprintf(textStr, "target: (%.1f, %.1f, %.1f)", target->x, target->y, target->z);
 		slText(fromLeft, -1.0 + (30.0 / c->y), textStr, GLUT_BITMAP_HELVETICA_10);
 	} else {
-		for(n=0;n<c->textCount;n++) {
+		for(n=0;n<c->text.size();n++) {
 			if(c->text[n].text) {
 				glColor4f(c->text[n].color.x, c->text[n].color.y, c->text[n].color.z, 0.9);
 				slStrokeText(c->text[n].x, c->text[n].y, c->text[n].text, c->textScale, GLUT_STROKE_ROMAN);

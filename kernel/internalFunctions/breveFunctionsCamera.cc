@@ -131,7 +131,7 @@ int brICameraResizeDisplay(brEval args[], brEval *target, brInstance *i) {
 int brICameraNew(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera;
 
-	camera = slNewCamera(0, 0);
+	camera = slCameraNew(0, 0);
 
 	slVectorSet(&camera->target, 1, 0, 0);
 	slVectorSet(&camera->location, 0, 0, 0);

@@ -827,7 +827,7 @@ int brISetLightDiffuseColor(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetShadowCatcher(brEval args[], brEval *target, brInstance *i) {
-	slStationary *st = BRPOINTER(&args[0]);
+	slStationary *st = (slStationary*)BRPOINTER(&args[0]);
 	slVector *norm = &BRVECTOR(&args[1]);
 
 	slWorldObjectAddDrawMode(st, DM_STENCIL);

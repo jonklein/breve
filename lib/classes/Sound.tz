@@ -15,16 +15,16 @@ Abstract : Sound (aka Sounds) {
 		% Loads the sound-file filename using the current breve
 		% search path.  Returns self.
 
-		if soundPointer: freeSoundFile(soundPointer).
+		if soundPointer: freeSoundData(soundPointer).
 
-		soundPointer = loadSoundFile(file).
+		soundPointer = loadSoundData(file).
 		return self.
 
 	+ to play:
 		% Begins playing this sound.
 
-		if soundPointer: playSoundFile(soundPointer).
+		if soundPointer: playSoundData(soundPointer).
 
 	+ to destroy:
-		freeSoundFile(soundPointer).
+		freeSoundData(soundPointer).
 }
