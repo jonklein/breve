@@ -37,7 +37,7 @@
 
     NSMutableArray *methodMenuArray;
 
-    int tabSpaceCount;
+    unsigned int tabSpaceCount;
 
     BOOL wholeFileNextColor;
 

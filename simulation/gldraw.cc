@@ -500,7 +500,10 @@ void slDrawWorldToBuffer(slWorld *w, slCamera *c, char *r, char *g, char *b, cha
 }
 
 void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor) {
-	if(w->detectLightExposure) slDetectLightExposure(w, c, 200, NULL);
+	if(w->detectLightExposure) {
+		if(!c->stationaryDrawList || recompile) slDrawWorld(w, c, recompile, mode, crosshair, scissor);
+		slDetectLightExposure(w, c, 200, NULL);
+	}
 
 	slDrawWorld(w, c, recompile, mode, crosshair, scissor);
 

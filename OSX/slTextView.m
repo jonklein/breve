@@ -707,7 +707,7 @@ char *slStripSpaces(char *text) {
 	NSMutableString *newString;
 	NSMutableString *tabs;
 	NSRange range;
-	int n;
+	unsigned int n;
 
 	newString = [NSMutableString stringWithString: s]; 
 

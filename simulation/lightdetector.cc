@@ -52,6 +52,7 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
 	glShadeModel(GL_FLAT);
 
 	glViewport(c->ox, c->oy, size, size);
@@ -68,8 +69,8 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	gluLookAt(sun->x, sun->y, sun->z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
 	glClearColor(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-	
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	for(n=0;n<w->objectCount;n++) {
 		unsigned char br, bg, bb;
 		slVector color;
@@ -88,11 +89,13 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 			if(sun->y > 0.0) slDrawShape(w, c, m->shape, &m->position, &color, 0, 0, 0, 0, DO_NO_LIGHTING|DO_NO_COLOR|DO_NO_TEXTURE, 0, 0);
 		} else if(wo->type == WO_STATIONARY) {
 			s = wo->data;
-			if(sun->y > 0.0) slDrawStationary(w, s, c, &color, 0, 0, 0, 0, 0, DO_NO_LIGHTING|DO_NO_COLOR|DO_NO_TEXTURE);
+			if(sun->y > 0.0) slDrawShape(w, c, s->shape, &s->position, &color, 0, 0, 0, 0, DO_NO_LIGHTING|DO_NO_COLOR|DO_NO_TEXTURE, 0, 0);
 		}
 	}
 
 	glPopMatrix();
+
+	return;
 
 	if(!buffer) {
 		glReadPixels(c->ox, c->oy, size, size, GL_RGB, GL_UNSIGNED_BYTE, staticBuffer);
@@ -111,4 +114,7 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 			wo->lightExposure++;
 		}
 	}
+
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	glDepthMask(GL_TRUE);
 }
