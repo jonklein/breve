@@ -369,15 +369,10 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 	int noRetain = 0;
 	char *newstr;
 
-	if(type == AT_INSTANCE && otype) {
+	if(type == AT_INSTANCE && otype && e->type == AT_INSTANCE && BRINSTANCE(e)) {
 		// if they specified an object type in the code, make sure 
 		// that this is a valid cast.  this requires a lookup each
 		// time we're here, so it could really be improved.
-
-		if(!otype) {
-			stEvalError(i->instance->type->engine, EE_TYPE, "Cannot locate class named \"%s\" in assignment expression\n", otype->name);
-			return EC_ERROR;
-		}
 
 		instance = BRINSTANCE(e)->userData;
 		
