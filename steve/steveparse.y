@@ -977,7 +977,7 @@ unary_expression
 		$$ = stNewListRemoveExp($2, NULL, yyfile, lineno);
 	}
 | UNPREPEND atomic_expression {
-		$$ = stNewListRemoveExp($2, stNewIntExp(1, yyfile, lineno), yyfile, lineno);
+		$$ = stNewListRemoveExp($2, stNewIntExp(0, yyfile, lineno), yyfile, lineno);
 	}
 | PUSH expression WORD_VALUE atomic_expression {
 		if(strcmp($3, "onto")) {
