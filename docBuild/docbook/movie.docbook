@@ -22,18 +22,22 @@ of breve, breve_cli.
 
 <sect1 id="saving_movies"><title>Saving Movies</title>
 <para>
-You can save movies in breve using the class 
-<ulink url="../classes/Movie.html">Movie.tz</ulink>.  First create an
+You can save MPEG movies of <emphasis>breve</emphasis> simulations using the 
+class <ulink url="../classes/Movie.html">Movie.tz</ulink>.  First create an
 instance of the class, then begin recording a movie by using the method
-<ulink url="../classes/Movie.html#record">record</ulink>.  
+<ulink url="../classes/Movie.html#record">record</ulink>.  For your 
+convenience, the standard Control class simulation menu includes an
+option for exporting an MPEG movie.
 </para>
 </sect1>
 
 <sect1 id="saving_snapshots"><title>Saving Snapshots</title>
 <para>
-To save a snapshot of a running breve simulation, use the method 
+To save a PNG snapshot of a running <emphasis>breve</emphasis> simulation, use the method 
 <ulink url="../classes/Control.html#save-snapshot">save-snapshot</ulink>
-in the class <ulink url="../classes/Control.html">Control</ulink>.
+in the class <ulink url="../classes/Control.html">Control</ulink>.  For your
+convenience, the standard Control class simulation menu includes an
+option for exporting PNG snapshots.
 </para>
 
 </sect1>

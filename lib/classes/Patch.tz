@@ -209,6 +209,7 @@ Abstract : Patch [version 2.0] {
 		% this method.
 
 		patchPointer = p.
+		self set-transparency to 0.
 
 	+ to get-moore-neighborhood: 
 		% Returns a list of the 2D Moore neighborhood, using the X/Y plane.
@@ -394,7 +395,7 @@ Abstract : Patch [version 2.0] {
 	+ to dearchive:
 		return 1.
 
-	+ to update-colors:
+	- to update-colors:
 		% Used internally.  Synchronizes the patch's color with recently 
 		% dearchived values. 
 

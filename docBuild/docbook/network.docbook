@@ -90,13 +90,16 @@ may request an HTML page.
 <para>
 To execute a method in the controller instance, simply append the
 method name to the end of the URL.  If you wish to pass in either
-int or double arguments, they can be added afterwards, delimited by
+int or float arguments, they can be added afterwards, delimited by
 underscores.  Other types may currently not be passed via the web
 interface.  Here are some examples:
-<programlisting>
+<screen>
+# call the Controller method "turn-agent-blue"
 http://myserver:33333/turn-agent-blue
+
+# call the Controller method "set-agent-color" with three float type arguments.
 http://myserver:33333/set-agent-color_.2_.4_.6
-</programlisting>
+</screen>
 </para>
 <para>
 The controller methods called may optionally return a string which

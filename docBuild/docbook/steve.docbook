@@ -102,6 +102,10 @@ step of the simulation.  Thus, "Hello, World!".  Ad nauseum.
 language.  It does not, however, give any insight into how 3D multiagent simulations 
 are written in steve.  This section shows the code for a simple 3D multiagent 
 simulation.  
+<mediaobject><imageobject><imagedata align="center" fileref="images/random_walker.jpg"></imageobject>
+<caption><para>In the <emphasis>RandomWalker</emphasis> demo, you can see 
+a simple simulation containing hundreds of independent agents.</para></caption>
+</mediaobject>
 </para>
 <para>
 The simulation below is very heavily commented&mdash;all of the lines 
@@ -115,14 +119,15 @@ The simple simulation below features a number of agents which perform a
 the agents will move in a random direction.
 </para>
 <screen>
-@include "Control.tz"           
-@include "Mobile.tz"           
-
 #
 # RandomWalker is a simulation in which small spheres do
 # a random walk.  This is a very simple simulation which
 # can be used as a skeleton for more complex simulations.
 #
+
+# include some requiresd breve class files
+@use Control.
+@use Mobile.
 
 # First tell the breve engine the name of our controller class
 
@@ -167,8 +172,8 @@ Control : myControl {
         return walkerShape.
 }
 
-# The RandomWalker object is the physical object in the simulation
-# that does the random walk.
+# The "RandomWalker" object is the physical object in the simulation
+# that does the random walk.  It is a subclass of "Mobile".
 
 Mobile : RandomWalker {
     + to init:
@@ -177,7 +182,6 @@ Mobile : RandomWalker {
 
         self set-shape to (controller get-walker-shape).
         self set-color to random[(1.0, 1.0, 1.0)].
-        self move to random[(.1, .1, .1)].
     
     + to iterate:
         # Set a new random velocity at every timestep.
@@ -192,16 +196,19 @@ Mobile : RandomWalker {
 <para>
 <indexterm><primary>controller object</primary></indexterm>
 The <firstterm>controller object</firstterm> is the foundation of a <emphasis>breve</emphasis>
-breve simulation.  The controller object is a single instance which acts as the "boss" for the 
+simulation.  The controller object is a single instance which acts as the "boss" for the 
 simulation.  When the simulation starts, it is the controller object which is responsible for 
 creating and setting up the rest of the simulation.  <emphasis>The controller object is the 
 only object which is automatically instantiated when the simulation begins</emphasis>.  
+If you're used to programming in C or C++, the controller is like the <function>main</function>
+function.
 </para>
 <para>
 The first step in writing a <emphasis>breve</emphasis> simulation is to create a controller 
 class which will setup and manage the simulation.  The controller class you create 
 <emphasis>must be a subclass of the class <ulink url="../classes/Control.html">Control</ulink>
-or one of its subclasses</emphasis>.  How to do this is described in the rest of this chapter.
+or one of its subclasses</emphasis>.  Details on how to do this is described in the rest of 
+this chapter.
 </para>
 <para>
 As shown in the previous section (<xref linkend="simple_example">), the controller object is
@@ -236,7 +243,7 @@ of these concepts will become clearer in the rest of the documentation.
 All objects in the simulated world correspond to programming objects in steve.  
 In order to define an agent in the simulated world, you'll start by 
 constructing a programming object, or class.  This class will serve as a 
-template  which defines the agent's behaviors.  This section describes how to 
+template which defines the agent's behaviors.  This section describes how to 
 construct and use these classes.
 </para>
 <para>
@@ -1073,11 +1080,11 @@ This variable always contains the value of the instantiation in which the  curre
 </para>
 <para>
 <indexterm><primary>super</primary></indexterm>
-This special value refers to the parent, or super-instance.  This is used to invoke a parent class'
-implementation of a method, instead of the current class' implementation.
+This special value refers to the parent, or super-instance.  This is used to invoke a parent class
+implementation of a method, instead of the current class implementation.
 </para>
 <para>
-For example, in the Controller's iterate method, the superclass iterate method is often called: super iterate.  This is because custom subclasses of Control typically preform simulation specific tasks, but must then call on the superclass implementation (Control) to actually step the physical simulation forward and update the state of the world.
+For example, in the Controller's iterate method, the superclass iterate method is often called: super iterate.  This is because custom subclasses of Control typically preform simulation specific tasks, but must then call on the superclass implementation (Control) to actually step the physical simulation forward and update the state of the world.  Anytime you wish to implement a custom object behavior <emphasis>in addition</emphasis> a parent class behavior, you should invoke the parent class method as well.
 </para>
 </listitem>
 
@@ -1291,7 +1298,7 @@ y = x++.            # as does this.
 <indexterm><primary>infinity</primary></indexterm>
 <indexterm><primary>NaN (not-a-number)</primary></indexterm>
 
-A number of internal functions (which are otherwise typically not used in breve simulations) are available for math-related expressions.  Internal functions are called just like C functions: functionName(arguments). 
+A number of internal functions (which are otherwise typically not used in breve simulations) are available for math-related expressions.  Internal functions are called just like C functions: <function><replaceable>functionName</replaceable>(<replaceable>arguments</replaceable>)</function>. 
 <itemizedlist>
 <listitem><para><function>sin(<replaceable>input</replaceable>)</function> 
 gives the sine of the radian angle <replaceable>input</replaceable>.</para></listitem>
@@ -1375,7 +1382,7 @@ The values are produced using the standard C library <function>random()</functio
 In the event that multiple breve simulations are launched simultaneously (typically only relevant in 
 cluster environments), it may be necessary to pick unique random seeds for each simulation to prevent
 each of the simulations from giving the same results.  Refer to the 
-<ulink url="../classes/Controller.html">Controller</ulink> method 
+<ulink url="../classes/Control.html">Controller</ulink> method 
 <ulink url="../classes/Controller.html#set-random-seed-from-dev-random">set-random-seed-from-dev-random</ulink>
 for more information on automatically picking unique random seeds on systems which support it.
 </para>
@@ -1517,14 +1524,14 @@ If you wish to assign the result of a method call, use it in a mathematical expr
 </para>
 <para>
 <screen>
-myInt = (self get-speed).                 # correct
 myInt = self get-speed.                   # incorrect
+myInt = (self get-speed).                 # correct
 
-myInt = (self get-speed) + 5.             # correct
 myInt = self get-speed + 5.               # incorrect
+myInt = (self get-speed) + 5.             # correct
 
-self set-speed to (neighbor get-speed).   # correct
 self set-speed to neighbor get-speed.     # incorrect 
+self set-speed to (neighbor get-speed).   # correct
 </screen>
 </para>
 <para>

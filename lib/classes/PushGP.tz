@@ -7,7 +7,7 @@ Object : PushGP {
 	% system.  PushGP is a system which uses genetic programming
 	% and the Push programming language to attempt to evolve 
 	% solutions to a wide variety of problems.  For more 
-	% information on Push and PushGP, see the class OBJECT(Push).
+	% information on Push and PushGP, see the class OBJECT(PushInterpreter).
 	% <p>
 	% This class is appropriate for evolving Push programs which
 	% are only run once per fitness case.

@@ -9,7 +9,7 @@
 This chapter describes the breve source implementation, and how it can be 
 extended.  This documentation describes only key API features for extending
 certain aspects of breve functionality.  For more detailed documentation of 
-the source code, see the <ulink url="../source">full breve source code 
+the source code, see the <ulink url="http://www.spiderland.org/breve/docs/source">full breve source code 
 documentation</ulink>.
 </para>
 

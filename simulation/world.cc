@@ -270,8 +270,8 @@ slPatchGrid *slAddPatchGrid(slWorld *w, slVector *center, slVector *patchSize, i
 	// slStackPush(w->patchGridObjects, g);
 
 	if(w->patchGridCount == w->maxPatchGrids) {
-		w->patchGridCount *= 2;
-		w->patchGrids = slRealloc(w->patchGrids, w->patchGridCount * sizeof(slPatchGrid*));
+		w->maxPatchGrids *= 2;
+		w->patchGrids = slRealloc(w->patchGrids, w->maxPatchGrids * sizeof(slPatchGrid*));
 	}
 
 	w->patchGrids[w->patchGridCount++] = g;

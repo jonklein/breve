@@ -74,7 +74,7 @@ In the event that the key you want to catch is
 <emphasis>not</emphasis> a letter or number, then the method names 
 described above may not work, due to conflicts with the steve 
 language.  If you tried to catch the space bar, for example, using 
-a method named <function>catch-key- -up</function>, breve would get 
+a method named "<function>catch-key- -up</function>", breve would get 
 confused&mdash;the same is true of most punctuation as well.  In
 this case, you can still catch the event using the <firstterm>hexadecimal
 ASCII equivalent</firstterm> for the character.  In this case of the space

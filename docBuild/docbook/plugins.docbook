@@ -24,19 +24,24 @@ plus access to and familiarity with the GCC compiler.
 <title>The Plugin API: Writing Plugins</title>
 <note><title>The breve Plugin API</title>
 <para>
-In order to build plugins for breve, you'll need to download the plugin API from 
-<ulink url="http://www.spiderland.org/breve">the breve website</ulink>.
-You'll also need a C compiler&mdash;the instructions here assume you're using GCC.
+In order to build plugins for breve, you'll need the breve plugin API which
+is included with all command-line distributions of breve.  You'll also need a 
+C compiler&mdash;the instructions here assume you're using GCC.
 </para>
 <para>
 In addition to the documentation listed here, you should also look at the sample
 plugin files included with the breve distribution.  These samples show how to 
 build simple plugins for Mac OS X, Linux and Windows.
 </para>
+<para>
+A number of the names and symbols have been changed from versions of the breve plugin API
+prior to version 2.0, though the older symbols should be preserved for backwards
+compatability.  Still, you will most likely have to rebuild your plugin using 
+the 2.0 header file to ensure continued compatability.
+</para>
 </note>
 <para>
-In order to write plugins for breve, you'll need to follow a few 
-simple steps.
+In order to write plugins for breve, you'll need to follow a few simple steps.
 <orderedlist>
 <listitem><para>compose C wrapper functions around your external code (C or C++), <xref linkend="c_wrappers"></para></listitem>
 <listitem><para>create an "entry point function" in C which will load your functions into the breve engine <xref linkend="entrypoint"></para></listitem>
@@ -56,12 +61,12 @@ coordinates input and output between the C code and the breve call.
 </para>
 <para>
 The wrapper function passes input and output data between breve and C using a 
-structure called <function>stEval</function>.
-The <function>stEval</function> struct is a C data structure which is used internally
+structure called <function>brEval</function>.
+The <function>brEval</function> struct is a C data structure which is used internally
 to hold the values of expressions in steve.  The structure is used to hold any and all
 types of steve expressions.  So <function>ints</function>, <function>lists</function>,
 <function>objects</function> and the rest of the steve types are all held in 
-<function>stEval</function> structs.  The <function>type</function> field of the 
+<function>brEval</function> structs.  The <function>type</function> field of the 
 struct specifies the type of the expression.  The <function>values</function> union
 of the struct contains the actual value of the expression.  Information on how
 to use these fields is listed below.
@@ -69,36 +74,36 @@ to use these fields is listed below.
 <para>
 Wrapper functions have the following prototype:
 <screen>
-int function(stEval arguments[], stEval *result, void *instance);
+int function(brEval arguments[], brEval *result, void *instance);
 </screen>
 Arguments are passed in as the <parameter>arguments</parameter> array of 
-<function>stEval</function> structs.  The function output is returned by 
-setting the contents of the <structname>stEval</structname> structure pointed to by 
+<function>brEval</function> structs.  The function output is returned by 
+setting the contents of the <structname>brEval</structname> structure pointed to by 
 <parameter>result</parameter>.  <parameter>instance</parameter> is an
 internal pointer to the calling instance&mdash;this can be ignored.
 </para>
 <para>
 <indexterm><primary>BRINT plugin macro</primary></indexterm>
-<indexterm><primary>BR_INT plugin constant</primary></indexterm>
+<indexterm><primary>AT_INT plugin constant</primary></indexterm>
 <indexterm><primary>BRDOUBLE plugin macro</primary></indexterm>
-<indexterm><primary>BR_DOUBLE plugin constant</primary></indexterm>
+<indexterm><primary>AT_DOUBLE plugin constant</primary></indexterm>
 <indexterm><primary>BRVECTOR plugin macro</primary></indexterm>
-<indexterm><primary>BR_VECTOR plugin constant</primary></indexterm>
+<indexterm><primary>AT_VECTOR plugin constant</primary></indexterm>
 <indexterm><primary>BRMATRIX plugin macro</primary></indexterm>
-<indexterm><primary>BR_MATRIX plugin constant</primary></indexterm>
+<indexterm><primary>AT_MATRIX plugin constant</primary></indexterm>
 <indexterm><primary>BRBRRING plugin macro</primary></indexterm>
-<indexterm><primary>BR_BRRING plugin constant</primary></indexterm>
+<indexterm><primary>AT_BRRING plugin constant</primary></indexterm>
 <indexterm><primary>BROBJECT plugin macro</primary></indexterm>
-<indexterm><primary>BR_OBJECT plugin constant</primary></indexterm>
+<indexterm><primary>AT_OBJECT plugin constant</primary></indexterm>
 <indexterm><primary>BRPOINTER plugin macro</primary></indexterm>
-<indexterm><primary>BR_POINTER plugin constant</primary></indexterm>
+<indexterm><primary>AT_POINTER plugin constant</primary></indexterm>
 <indexterm><primary>BRDATA plugin macro</primary></indexterm>
-<indexterm><primary>BR_DATA plugin constant</primary></indexterm>
+<indexterm><primary>AT_DATA plugin constant</primary></indexterm>
 <indexterm><primary>BRHASH plugin macro</primary></indexterm>
-<indexterm><primary>BR_HASH constant</primary></indexterm>
+<indexterm><primary>AT_HASH constant</primary></indexterm>
 <indexterm><primary>BRLIST plugin macro</primary></indexterm>
-<indexterm><primary>BR_LIBR constant</primary></indexterm>
-To access native C types stored in the <structname>stEval</structname> struct, you'll
+<indexterm><primary>AT_LIST constant</primary></indexterm>
+To access native C types stored in the <structname>brEval</structname> struct, you'll
 need to use the following macros, which are defined in the header file distributed 
 with the API.
 <itemizedlist>
@@ -161,20 +166,19 @@ with the API.
 </itemizedlist>
 </para>
 <para>
-These macros correspond to steve constants representing types.  You'll need these 
-constants in the next section when defining the inputs and outputs your functions
-will take.
+The following list of constants specifies the types for plugin function input 
+arguments and output types.  The "AT" prefix stands for "atomic type".
 <itemizedlist>
-<listitem><para><function>BR_INT</function></para></listitem>
-<listitem><para><function>BR_DOUBLE</function></para></listitem>
-<listitem><para><function>BR_BRRING</function></para></listitem>
-<listitem><para><function>BR_VECTOR</function></para></listitem>
-<listitem><para><function>BR_MATRIX</function></para></listitem>
-<listitem><para><function>BR_DATA</function></para></listitem>
-<listitem><para><function>BR_HASH</function></para></listitem>
-<listitem><para><function>BR_LIBR</function></para></listitem>
-<listitem><para><function>BR_OBJECT</function></para></listitem>
-<listitem><para><function>BR_POINTER</function></para></listitem>
+<listitem><para><function>AT_INT</function></para></listitem>
+<listitem><para><function>AT_DOUBLE</function></para></listitem>
+<listitem><para><function>AT_BRRING</function></para></listitem>
+<listitem><para><function>AT_VECTOR</function></para></listitem>
+<listitem><para><function>AT_MATRIX</function></para></listitem>
+<listitem><para><function>AT_DATA</function></para></listitem>
+<listitem><para><function>AT_HASH</function></para></listitem>
+<listitem><para><function>AT_LIBR</function></para></listitem>
+<listitem><para><function>AT_OBJECT</function></para></listitem>
+<listitem><para><function>AT_POINTER</function></para></listitem>
 </itemizedlist>
 </para>
 <para>
@@ -199,7 +203,7 @@ arguments from the arguments array, call the function, and store the
 resulting string in the structure pointed to by result.  Here's how the
 wrapper function might look.
 <screen>
-int breveDownloadURL(stEval *arguments, stEval *result, void *instance) {
+int breveDownloadURL(brEval *arguments, brEval *result, void *instance) {
 	char *url;
 	int timeout;
 
@@ -231,10 +235,10 @@ The name may be anything you'd like, but it must be a unique symbol.
 </para>
 <para>
 This entry-point function will be filled with one or more calls to the 
-function <function>stNewSteveCall</function>.  The calling convention 
+function <function>brNewBreveCall</function>.  The calling convention 
 for this function is:
 <screen>
-stNewSteveCall(data, "<replaceable>functionName</replaceable>", <replaceable>cFunctionPointer</replaceable>, <replaceable>returnType</replaceable>, <replaceable>arg1</replaceable>, <replaceable>arg2</replaceable>, ..., 0);
+brNewBreveCall(data, "<replaceable>functionName</replaceable>", <replaceable>cFunctionPointer</replaceable>, <replaceable>returnType</replaceable>, <replaceable>arg1</replaceable>, <replaceable>arg2</replaceable>, ..., 0);
 </screen>
 </para>
 <itemizedlist>
@@ -271,9 +275,9 @@ The final argument, to follow all of the input types, must be 0.
 </itemizedlist>
 <para>
 For example, if you have a function which takes two <function>vector</function> inputs and produces an <function>int</function>
-output, your <function>stNewSteveCall</function> might look like this:
+output, your <function>brNewBreveCall</function> might look like this:
 <screen>
-stNewSteveCall(data, "mySteveFunctionName", myCFunctionName, AT_INT, AT_VECTOR, AT_VECTOR, 0);
+brNewBreveCall(data, "mySteveFunctionName", myCFunctionName, AT_INT, AT_VECTOR, AT_VECTOR, 0);
 </screen>
 </para>
 </sect2>
@@ -450,7 +454,7 @@ needs to be decoded back into a matrix.
 <para>
 Here's how these functions might look:
 <screen>
-int archiveMatrix(stEval arguments[], stEval *result, void *instance) {
+int archiveMatrix(brEval arguments[], brEval *result, void *instance) {
 	// assume that the plugin object passes us the pointer to its matrix
 	// also assume that the size of the matrix is 100x100 doubles
 
@@ -461,7 +465,7 @@ int archiveMatrix(stEval arguments[], stEval *result, void *instance) {
 	return EC_OK;
 }
 
-int dearchiveMatrix(stEval arguments[], stEval *result, void *instance) {
+int dearchiveMatrix(brEval arguments[], brEval *result, void *instance) {
 	brData *matrixData = BRDATA(&amp;arguments[0]);
 	double **matrix = malloc(100 * 100 * sizeof(double));
 

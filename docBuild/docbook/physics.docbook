@@ -97,6 +97,15 @@ Below are some things to watch out for when dealing with physical simulation.
 
 <sect1 id="physical_simulation_parts"><title>The Components of Physically Simulated Bodies</title>
 <para>
+<note><title>Changed in breve 2.0</title>
+<para>
+The methods used for loading images have been changed from breve 1.x,
+so pay close attention to this section if you're updating your
+simulation from a previous version of breve.
+</para>
+</note>
+</para>
+<para>
 In order to construct physically simulated agents, you'll need to be familiar with the 
 components of physically simulated bodies.  There are three main components used in 
 physical simulations:
@@ -117,9 +126,10 @@ with a shape, it can be attached to other links via Joint objects, covered in th
 section The Joint Class and its Subclasses (<xref linkend="joints">) or brought into
 the physical simulation by being associated with a MultiBody, as discussed in the 
 section on using MultiBody objects (<xref linkend="multibodies">).  
-<emphasis> Link objects by themselves will not appear in the simulated world unless 
-(directly or indirectly) associated with a MultiBody object</emphasis>.  A Link 
-object that is not associated with a MultiBody is known as an "orphaned" Link.
+</para>
+<para>
+Prior to breve 2.0, Link objects would not appear in the simulated world unless they
+were associated with MultiBody objects (described below).  This is no longer the case.
 </para>
 </sect2>
 
@@ -154,22 +164,16 @@ available&mdash;see each class' documentation for more details:
 <para>
 <indexterm><primary>MultiBody class</primary></indexterm>
 A MultiBody is a single logical physically simulated agent, whether it is made up
-of a single Link, or multiple Links joined together with Joint objects.  Links and
-Joints have no physical presence in the world, unless they are associated with 
-MultiBody objects.  Therefore, after creating a structure using Links and Joints,
-you must create a MultiBody object for the structure before it appears in the world.
+of a single Link, or multiple Links joined together with Joint objects. 
 </para>
 <para>
-As mentioned above, a MultiBody may contain only a single Link object.  More commonly,
-however, it contains a series of Links connected by Joint objects.  Consider 
-a body, for example: it is made up of parts (arms, legs, torso, head), but they are all 
-part of a single logical unit, namely the body.  The Link objects are joined together 
-using subclasses of the class Joint. 
-<mediaobject><imageobject><imagedata align="center" fileref="images/Link.jpg"></imageobject></mediaobject>
-<mediaobject><imageobject><imagedata align="center" fileref="images/JointedLinks.jpg"></imageobject></mediaobject>
+<emphasis>The role of the MultiBody has changed drastically in breve 2.0 from 
+previous versions of breve</emphasis>.  Previously, Link objects would not 
+appear at all in the simulated world unless they were part of a MultiBody.  Now,
+the use of MultiBodies is completely optional.
 </para>
 <para>
-Keeping these logical units together under a single MultiBody allows the user to move or 
+Keeping a set of Links bound together as a logical MultiBody unit allows the user to move or 
 rotate the entire logical structure, as opposed to moving or rotating individual links.  
 Imagine that suddenly your arm was moved across the room without the rest of your body
 &mdash;in all likelihood, this would not make you very happy.  This is what it's like 
@@ -179,21 +183,13 @@ more logical control over the object.
 <mediaobject><imageobject><imagedata align="center" fileref="images/MultiBody.jpg"></imageobject></mediaobject>
 </para>
 <para>
-To create a MultiBody, you'll first need to construct a network of Link and Joint 
-objects (or possibly just a single Link object).  Once you've created your Links,
-you'll need to pick one to be the <firstterm>root link</firstterm>.  The root link
-will be permanently associated with the MultiBody.  All other Links attached to it,
-both directly and indirectly, will also be part of the MultiBody (though they may become 
-dissociated from it later if the relevant Joints are broken).  Once a networks of Links 
-is associated with a MultiBody, the Links will appear in the simulated world.
+To create a MultiBody, you can simply associate it with any existing Link object.
+The Link object you choose will be known as the <firstterm>root link</firstterm>,
+and all other Links connected to the root link&mdash;directly or indirectly&mdash;will
+become part of the MultiBody.  The MultiBody is automatically updated as joints are 
+created and destroyed.
 </para>
 <para>
-Any Link that is attached (via a Joint) to a Link in a MultiBody will become
-part of the MultiBody, <emphasis>unless</emphasis> the new link is 
-<emphasis>also</emphasis> associated with a MultiBody.  In the event that Links 
-from two distinct MultiBodies are joined, then the MultiBodies will remain distinct
-and all of the links will remain part of their respective bodies.
-<mediaobject><imageobject><imagedata align="center" fileref="images/JoinedMultiBodies.jpg"></imageobject></mediaobject>
 </para>
 </sect2>
 </sect1>
@@ -216,59 +212,15 @@ to join together distinct MultiBodies.
 </para>
 <para>
 Breaking MultiBodies is accomplished using the <ulink url="../classes/Joint.html">Joint</ulink> 
-method <ulink url="../classes/Joint.html#break">break</ulink>.  Breaking joints can be slightly 
-more complicated than creating them, because it can disrupt the structure of the MultiBody.
-There are basically three scenarios to consider here, and they are described below.
+method <ulink url="../classes/Joint.html#break">break</ulink>.  
 </para>
 <para>
-<itemizedlist>
-<listitem>
-<para>
-In the most straightforward case, two distinct MultiBodies are 
-joined, and then the joint is broken, preserving the original MultiBody structures.  In 
-this case, there are no complications&mdash;the two MultiBodies remain distinct with no
-change in their structures.
+Prior to <emphasis>breve</emphasis> version 2.0, when all Links had to be part of a MultiBody to appear 
+in the simulated world, breaking joints were often accompanied by broken hearts: breaking a joint 
+could cause entire subtrees of links to disappear into the ether because the links were orphaned.  
+In <emphasis>breve</emphasis> 2.0, links will go on living happily even if they are not associated 
+with a MultiBody.
 </para>
-</listitem>
-<listitem>
-<para>
-Consider the more complicated situation, however, in which a Joint is broken such that
-the MultiBody loses a link and the link then finds itself without a MultiBody.  We then
-say that the Link is "orphaned"&mdash;this is illustrated below.
-<mediaobject><imageobject><imagedata align="center" fileref="images/OrphanedLink.jpg"></imageobject></mediaobject>
-</para>
-<para>
-An orphaned link will not appear in the simulation.  It still exists as an object, 
-however and can reenter the simulation by becoming associated with a Multibody, meaning
-that it either becomes the root of a new MultiBody, or it becomes attached to a link
-on an existing MultiBody.
-</para>
-</listitem>
-<listitem>
-<para>
-In the final case, consider two linked MultiBodies, as shown below:
-<mediaobject><imageobject><imagedata align="center" fileref="images/JoinedMultiBodies.jpg"></imageobject></mediaobject>
-</para>
-<para>
-What happens if link 2 becomes dissociated from MultiBody 2?  In the last 
-scenario, we saw that this would cause an orphaned link.  <emphasis>However</emphasis>, because 
-"link 2" is still connected to part of MultiBody 1, MultiBody 1 will "adopt" the 
-link and it will remain active in the simulation.
-<mediaobject><imageobject><imagedata align="center" fileref="images/LinkAdoption.jpg"></imageobject></mediaobject>
-</para>
-</listitem>
-</itemizedlist>
-</para>
-<note>
-<title>Summary on Links &amp; Joints</title>
-<para>
-All Links must be part of a MultiBody to be part of the simulation.
-If a Link becomes dissociated from its MultiBody, it will try to become part of whichever 
-other MultiBody it is connected to.  If it is not connected to another MultiBody, it is 
-orphaned and will not exist in the simulated world.  If, at a later time, it is again 
-associated with a MultiBody, it will return to the world.
-</para>
-</note>
 </sect1>
 
 <sect1 id="terrains">
