@@ -93,8 +93,8 @@ int main(int argc, char **argv) {
 
 	signal(SIGINT, brCatchSignal);
 
-    frontend = breveFrontendInit(argc, argv);
-    frontend->data = breveFrontendInitData(frontend->engine);
+	frontend = breveFrontendInit(argc, argv);
+	frontend->data = breveFrontendInitData(frontend->engine);
 
 	brEngineSetIOPath(frontend->engine, getcwd(wd, 10239));
 
@@ -194,6 +194,7 @@ void brCatchSignal(int signal) {
 	line = readline("breve> ");
 	if(*line) add_history(line);
 #else 
+	printf("breve> ");
 	line = gets(staticLine);
 #endif
 
@@ -270,12 +271,13 @@ int brParseArgs(int argc, char **argv) {
 void brPrintUsage(char *name) {
 	fprintf(stderr, "usage: %s [options] simulation_file\n", name);
 	fprintf(stderr, "options:\n");
-	fprintf(stderr, "  -t, --terminate <seconds>  Stops the simulation after <sim_seconds>\n");
-	fprintf(stderr, "  -n, --notify <seconds>     Prints a message every time <notify_seconds>\n");
+	fprintf(stderr, "  -t, --terminate <seconds>  Stops the simulation after <seconds>\n");
+	fprintf(stderr, "  -n, --notify <seconds>     Prints a message every time <seconds>\n");
 	fprintf(stderr, "                             have passed\n");
 	fprintf(stderr, "  -r, --random <seed>        Sets the random seed to <seed>.\n");
-	fprintf(stderr, "  -a, --archive <xml_file>   Dearchive simulation from <xml_file>.  <xml_file> should be\n");
-	fprintf(stderr, "                             an archive of the simulation contained in the input file.\n");
+	fprintf(stderr, "  -a, --archive <xml_file>   Dearchive simulation from <xml_file>.  <xml_file>\n");
+	fprintf(stderr, "                             should be an archive of the simulation contained \n");
+	fprintf(stderr, "                             in the input file.\n");
 	fprintf(stderr, "  -v, --version              Display the current version number.\n");
 	fprintf(stderr, "  -h, --help                 Display this information.\n");
 	fprintf(stderr, "\n");

@@ -623,6 +623,7 @@ void brInterrupt(brEngine *engine) {
 	line = readline("breve> ");
 	if(line && *line) add_history(line);
 #else
+	printf("breve> ");
 	line = gets(staticLine);
 #endif
 
