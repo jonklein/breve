@@ -622,7 +622,7 @@ int slMultibodyCheckSelfPenetration(slWorld *world, slMultibody *m) {
 
 				// printf("flags [%d][%d] %p %x\n", x, y, pe, pe->flags);
 
-				if(pe->flags == BT_ALL && slVclipTestPair(vc, pe, NULL)) return 1;
+				if(slVclipFlagsShouldTest(pe->flags) && slVclipTestPair(vc, pe, NULL)) return 1;
 			}
 		}
 	}

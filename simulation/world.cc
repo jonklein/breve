@@ -489,7 +489,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 			if(c->n1 > c->n2) pe = &w->clipData->pairList[c->n1][c->n2];
 			else pe = &w->clipData->pairList[c->n2][c->n1];
 
-			if(w1 && w2 && ((w1->type != WO_LINK || ((slLink*)w1->data)->simulate) && (w2->type != WO_LINK || ((slLink*)w2->data)->simulate))) {
+			if(w1 && w2 && pe->flags & BT_SIMULATE) {
 				dBodyID bodyX = NULL, bodyY = NULL;
 				dJointID id;
 				double maxDepth = 0.0;

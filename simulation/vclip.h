@@ -23,6 +23,11 @@
 
 #define slVclipPairEntry(pe, x, y)		((x)>(y)?(&(pe)[(x)][(y)]):(&(pe)[(y)][(x)]))
 
+enum collisionTypes {
+	CC_SIMULATE,
+	CC_CALLBACK
+};
+
 enum clipCodes {
 	CT_DISJOINT = 0,
 	CT_TOUCH,
@@ -42,8 +47,11 @@ enum boundListTypeFlags {
 	BT_ZAXIS 	= 0x04, /* 000100 */
 	BT_CHECK 	= 0x08, /* 001000 */
 	BT_ALL   	= 0x0f, /* 001111 */
-	BT_CALLBACK	= 0x10	/* 010000 */
+	BT_CALLBACK	= 0x10,	/* 010000 */
+	BT_SIMULATE = 0x20	/* 100000 */
 };
+
+#define slVclipFlagsShouldTest(x)		(((x) & BT_ALL) == BT_ALL)
 
 /*!
 	\brief The minima and maxima of the collision detection pruning stage.

@@ -36,7 +36,7 @@
 	or if all collision resolution is on, otherwise 0.
 */
 
-brCollisionHandler *brCheckCollisionCallback(brInstance *o1, brInstance *o2) {
+int brCheckCollisionCallback(brInstance *o1, brInstance *o2, int type) {
 	int n;
 	brCollisionHandler *h;
 
@@ -48,16 +48,40 @@ brCollisionHandler *brCheckCollisionCallback(brInstance *o1, brInstance *o2) {
 	for(n=0;n<o1->object->collisionHandlers->count;n++) {
 		h = o1->object->collisionHandlers->data[n];
 
-		if(o2->object->type == h->object->type && o2->object->type->isSubclass(h->object->userData, o2->object->userData)) return h;
+		if(o2->object->type == h->object->type && o2->object->type->isSubclass(h->object->userData, o2->object->userData)) {
+			if(type == CC_CALLBACK) {
+				if(h->method) return 1;
+				return 0;
+			}
+
+			if(type == CC_SIMULATE) {
+				// simulate is the default -- only return 0 if they want to explicity ignore
+				if(h->ignore) return 0;
+				return 1;
+			}
+		}
 	}
 
 	for(n=0;n<o2->object->collisionHandlers->count;n++) {
 		h = o2->object->collisionHandlers->data[n];
 
-		if(o1->object->type == h->object->type && o1->object->type->isSubclass(h->object->userData, o1->object->userData)) return h;
+		if(o1->object->type == h->object->type && o1->object->type->isSubclass(h->object->userData, o1->object->userData)) {
+			if(type == CC_CALLBACK) {
+				if(h->method) return 1;
+				return 0;
+			}
+
+			if(type == CC_SIMULATE) {
+				// simulate is the default -- only return 0 if they want to explicity ignore
+				if(h->ignore) return 0;
+				return 1;
+			}
+		}
 	}
 
-	return NULL;
+	if(type == CC_CALLBACK) return 0;
+	
+	return 1;
 }
 
 /*!

@@ -319,7 +319,7 @@ int slLinkCheckSelfPenetration(slWorld *world, slLink *l) {
 
 			pe = slVclipPairEntry(vc->pairList, x, y);
 
-			if((pe->flags == BT_ALL) && slVclipTestPair(vc, pe, NULL)) {
+			if((slVclipFlagsShouldTest(pe->flags)) && slVclipTestPair(vc, pe, NULL)) {
 				slListFree(links);
 				return 1;
 			}
@@ -355,7 +355,7 @@ int slLinkCheckPenetration(slWorld *w, slLink *l) {
 		if(ln != n) {
 			pe = slVclipPairEntry(vc->pairList, ln, n);
 
-			if((pe->flags == BT_ALL) && slVclipTestPair(vc, pe, NULL)) 
+			if((slVclipFlagsShouldTest(pe->flags)) && slVclipTestPair(vc, pe, NULL)) 
 				return 1;
 		}
 	}

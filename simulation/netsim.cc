@@ -18,7 +18,7 @@ enum {
 slNetsimServerData *slNetsimCreateClient(slWorld *world) {
 	slNetsimServerData *data;
 
-	data = slMalloc(sizeof(slNetsimServerData));
+	data = new slNetsimServerData;
 
 	data->world = world;
 
@@ -32,7 +32,7 @@ slNetsimServerData *slNetsimCreateServer(slWorld *world) {
 	slNetsimServerData *data;
 	ENetAddress address;
 
-	data = slMalloc(sizeof(slNetsimServerData));
+	data = new slNetsimServerData;
 
 	data->world = world;
 
@@ -43,7 +43,7 @@ slNetsimServerData *slNetsimCreateServer(slWorld *world) {
 
 	if(!data->host) {
 		slMessage(DEBUG_ALL, "netsim: error starting server on port %d\n", NETSIM_MASTER_PORT);
-		slFree(data);
+		delete data;
 		return NULL;
 	}
 
@@ -65,7 +65,7 @@ void *slNetsimThread(void *d) {
 	slNetsimBoundsMessage *bMessage;
 	slNetsimSyncMessage *sMessage;
 
-	slNetsimServerData *serverData = d;
+	slNetsimServerData *serverData = (slNetsimServerData*)d;
 	slNetsimRemoteHostData *remoteHost;
 
 	ENetHost *server = serverData->host;
@@ -79,7 +79,7 @@ void *slNetsimThread(void *d) {
 					event.peer -> address.host,
 					event.peer -> address.port);
 
-				remoteHost = slMalloc(sizeof(slNetsimRemoteHostData));
+				remoteHost = new slNetsimRemoteHostData;
 				remoteHost->peer = event.peer;
 
 				slStackPush(serverData->world->netsimData.remoteHosts, remoteHost);
@@ -120,7 +120,7 @@ slNetsimClientData *slNetsimClientOpenConnectionToAddress(ENetHost *client, ENet
 	slNetsimClientData *data;
 	ENetEvent event;
 
-	data = slMalloc(sizeof(slNetsimClientData));
+	data = new slNetsimClientData;
 
 	data->host = client;
 
@@ -128,7 +128,7 @@ slNetsimClientData *slNetsimClientOpenConnectionToAddress(ENetHost *client, ENet
 
 	if (!(enet_host_service (client, & event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT)) {
 		slMessage(DEBUG_ALL, "netsim: error connecting to host %x:%d\n", address->host, address->port);
-		slFree(data);
+		delete data;
 		return NULL;
 	}
 
@@ -156,13 +156,13 @@ slNetsimClientData *slNetsimOpenConnectionToAddress(ENetHost *client, ENetAddres
 	slNetsimClientData *data;
 	ENetEvent event;
 
-	data = slMalloc(sizeof(slNetsimClientData));
+	data = new slNetsimClientData;
 
 	data->host = client;
 
 	if(!client) {
 		slMessage(DEBUG_ALL, "netsim: error creating client!\n");
-		slFree(data);
+		delete data;
 		return NULL;
 	}
 
@@ -170,7 +170,7 @@ slNetsimClientData *slNetsimOpenConnectionToAddress(ENetHost *client, ENetAddres
 
 	if (!(enet_host_service (client, & event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT)) {
 		slMessage(DEBUG_ALL, "netsim: error connecting to host %x:%d\n", address->host, address->port);
-		slFree(data);
+		delete data;
 		return NULL;
 	}
 

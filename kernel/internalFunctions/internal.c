@@ -168,5 +168,6 @@ void brLoadInternalFunctions(brEngine *e) {
 	breveInitPushFunctions(e->internalMethods);
 	breveInitSpringFunctions(e->internalMethods);
 	breveInitPushCallbackFunctions(e->internalMethods);
+	breveInitMatrixFunctions(e->internalMethods);
 }
 /*@}*/

@@ -38,6 +38,6 @@ void breveInitSpringFunctions(brNamespace *n) {
     brNewBreveCall(n, "springSetLength", brISpringSetLength, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
     brNewBreveCall(n, "springSetDamping", brISpringSetDamping, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
     brNewBreveCall(n, "springSetStrength", brISpringSetStrength, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
-    brNewBreveCall(n, "springSetMode", brISpringSetStrength, AT_NULL, AT_POINTER, AT_INT, 0);
+    brNewBreveCall(n, "springSetMode", brISpringSetMode, AT_NULL, AT_POINTER, AT_INT, 0);
     brNewBreveCall(n, "springRemove", brISpringRemove, AT_NULL, AT_POINTER, 0);
 }

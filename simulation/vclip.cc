@@ -278,7 +278,7 @@ void slIsort(slVclipData *d, slBoundSort **list, int size, char boundTypeFlag) {
 
 					pe->flags |= boundTypeFlag;
 
-					if((pe->flags & BT_ALL) == BT_ALL) {
+					if(slVclipFlagsShouldTest(pe->flags)) {
 						slAddCollisionCandidate(d, pe);
 					}
 				} else if(list[current]->type == BT_MAX && list[current - 1]->type == BT_MIN && 
@@ -286,7 +286,7 @@ void slIsort(slVclipData *d, slBoundSort **list, int size, char boundTypeFlag) {
 
 					if(!(pe->flags & boundTypeFlag) && *(list[current]->value) != *(list[current-1]->value)) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already off]!\n");
 
-					if((pe->flags & BT_ALL) == BT_ALL) slRemoveCollisionCandidate(d, pe);
+					if(slVclipFlagsShouldTest(pe->flags)) slRemoveCollisionCandidate(d, pe);
 
 					pe->flags ^= boundTypeFlag;
 				}
@@ -346,7 +346,7 @@ void slInitBoundSortList(slBoundSort **list, int size, slVclipData *v, char boun
 		for(extend=n+1;extend < v->count;extend++) {
 			if(v->pairList[extend][n].flags & boundTypeFlag) {
 
-				if((v->pairList[extend][n].flags & BT_ALL) == BT_ALL) {
+				if(slVclipFlagsShouldTest(v->pairList[extend][n].flags)) {
 					slRemoveCollisionCandidate(v, &v->pairList[extend][n]);
 				}
 
@@ -389,7 +389,7 @@ void slInitBoundSortList(slBoundSort **list, int size, slVclipData *v, char boun
 
 						*pair |= boundTypeFlag;
 
-						if((*pair & BT_ALL) == BT_ALL) {
+						if(slVclipFlagsShouldTest(*pair)) {
 							slAddCollisionCandidate(v, pe);
 						}
 					} 

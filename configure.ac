@@ -16,7 +16,7 @@ case "${host_os}" in
 	darwin* )
 		dnl Mac OS X configuration
 
-		AUDIOLIBS="-framework CoreAudio -framework AudioToolbox"
+		AUDIOLIBS="-framework vecLib -framework CoreAudio -framework AudioToolbox"
 		JAVALIBS="-framework JavaVM"
 		JAVAINCS="-I/System/Library/Frameworks/JavaVM.framework/Headers"
 		GLLIBS="-framework OpenGL -framework GLUT -framework AppKit"
@@ -122,6 +122,8 @@ AC_CHECK_LIB([ncurses], [tputs])
 AC_CHECK_LIB([history], [add_history])
 AC_CHECK_LIB([readline], [readline])
 AC_CHECK_LIB([java], [JNI_CreateJavaVM],,,$JAVALIBS)
+AC_CHECK_LIB([gslcblas], [cblas_ccopy])
+AC_CHECK_LIB([gsl], [gsl_rng_alloc])
 
 case "${host_os}" in
 	darwin* )

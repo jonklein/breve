@@ -29,6 +29,7 @@ slCamera *slNewCamera(int x, int y, int drawMode) {
 	int n;
 
 	c = new slCamera;
+	bzero(c, sizeof(slCamera));
 
 	c->enabled = CM_NOT_UPDATED;
 

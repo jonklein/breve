@@ -179,14 +179,14 @@ struct slWorld {
 	// the collision callback is called when the collision is detected --
 	// at the estimated time of collision.  
 
-	void (*collisionCallback)(void *body1, void *body2, int type);
+	int (*collisionCallback)(void *body1, void *body2, int type);
 
 	// the collisionCheckCallback is a callback defined by the program
 	// using the physics engine.  it takes two userData (see slWorldObject)
 	// pointers and returns whether collision detection should be preformed
 	// on the objects or not.
 
-	int (*collisionCheckCallback)(void *body1, void *body2);
+	int (*collisionCheckCallback)(void *body1, void *body2, int type);
 
 	unsigned char boundingBoxOnly;
 

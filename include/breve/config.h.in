@@ -57,6 +57,9 @@
 /* Define to 1 if you have the `expat' library (-lexpat). */
 #undef HAVE_LIBEXPAT
 
+/* Define to 1 if you have the `gsl' library (-lgsl). */
+#undef HAVE_LIBGSL
+
 /* Define to 1 if you have the `history' library (-lhistory). */
 #undef HAVE_LIBHISTORY
 

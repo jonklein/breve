@@ -124,6 +124,9 @@ void slVclipDataAddPairEntry(slWorld *w, int x, int y) {
 	void *c1, *c2;
 	slPairEntry *pe;
 	int t1, t2;
+	int sim1, sim2;
+	int callback = 0;
+	int simulate = 0;
 
 	pe = slVclipPairEntry(w->clipData->pairList, x, y);
 
@@ -139,43 +142,36 @@ void slVclipDataAddPairEntry(slWorld *w, int x, int y) {
 	c1 = w->objects[x]->userData;
 	c2 = w->objects[y]->userData;
 
-	/* find out if collision detection is neccessary between	   */
-	/* each object pair.  it's never turned on for 2 non-link      */
-	/* objects.  for all other object pairs, we ask the callback.  */
+	// collision detection is never turned on for 2 non-link objects.
 	   
 	if(t1 != WO_LINK && t2 != WO_LINK) {
 		if(pe->flags & BT_CHECK) pe->flags ^= BT_CHECK;
-	} else if(w->resolveCollisions) {
-		int sim1 = 0, sim2 = 0;
+		return;
+	}
+	
+	sim1 = 1;
+	sim2 = 1;
 
-		/* see if simulation is enabled for both of these objects */
+	// see if simulation is enabled for both of these objects 
 
-		if(t1 == WO_LINK) sim1 = ((slLink*)o1->data)->simulate;
-		if(t2 == WO_LINK) sim2 = ((slLink*)o2->data)->simulate;
+	if(t1 == WO_LINK) sim1 = ((slLink*)o1->data)->simulate;
+	if(t2 == WO_LINK) sim2 = ((slLink*)o2->data)->simulate;
 
-		if(sim1 || sim2) {
-			w->detectCollisions = 1;
-			pe->flags |= BT_CHECK;
-		} else if(pe->flags & BT_CHECK) pe->flags ^= BT_CHECK;
+	// see if the user wants to simulate them and/or callback for them
 
-		if(w->collisionCheckCallback && c1 && c2 && w->collisionCheckCallback(c1, c2)) {
-			w->detectCollisions = 1;
-			pe->flags |= BT_CHECK;
-			pe->flags |= BT_CALLBACK;
-		} 
+	if(c1 && c2 && w->collisionCheckCallback) {
+		simulate = w->collisionCheckCallback(c1, c2, CC_SIMULATE);
+		callback = w->collisionCheckCallback(c1, c2, CC_CALLBACK);
+	}
 
-	} else if(w->collisionCheckCallback && c1 && c2) {
-		// no collision resolution -- but do the users want callbacks?
+	if(((sim1 && sim2) && simulate) || callback) {
+		w->detectCollisions = 1;
+		pe->flags |= BT_CHECK;
 
-		if(!w->collisionCheckCallback(c1, c2)) {
-			if(pe->flags & BT_CHECK) pe->flags ^= BT_CHECK;
-		} else {
-			w->detectCollisions = 1;
-			pe->flags |= BT_CALLBACK;
-			pe->flags |= BT_CHECK;
-		}
-	} else {
-		// printf("will not check %p and %p\n", c1, c2);
+		if(simulate) pe->flags |= BT_SIMULATE;
+		if(callback) pe->flags |= BT_CALLBACK;
+	} else if(pe->flags & BT_CHECK) {
+		pe->flags ^= BT_CHECK;
 	}
 
 	pe->candidateNumber = -1;

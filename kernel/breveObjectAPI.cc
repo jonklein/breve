@@ -538,6 +538,32 @@ int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *nam
 
 	ch->object = collider;
 	ch->method = method;
+	ch->ignore = 0;
+
+	slStackPush(handler->collisionHandlers, ch);
+
+	return EC_OK;
+}
+
+
+int brObjectSetIgnoreCollisionsWith(brObject *handler, brObject *collider, int ignore) {
+	brCollisionHandler *ch;
+	int n;
+
+	for(n=0;n<handler->collisionHandlers->count;n++) {
+		ch = handler->collisionHandlers->data[n];
+
+		if(ch->object == collider) {
+			ch->ignore = ignore;
+			return EC_OK;
+		}
+	}
+
+	ch = slMalloc(sizeof(brCollisionHandler));
+
+	ch->object = collider;
+	ch->method = NULL;
+	ch->ignore = ignore;
 
 	slStackPush(handler->collisionHandlers, ch);
 

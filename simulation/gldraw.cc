@@ -1111,7 +1111,7 @@ void slRenderBillboards(slWorld *w, slCamera *c, int flags) {
 		}
 
 		if(lastTexture != b->bitmap) {
-			/* avoid rebinding the texture if possible */
+			// avoid rebinding the texture if possible 
 			glBindTexture(GL_TEXTURE_2D, b->bitmap);
 		}
 
@@ -1334,6 +1334,7 @@ void slDrawShape(slWorld *w, slCamera *c, slShape *s, slPosition *pos, slVector 
 		if(!(flags & DO_NO_LIGHTING)) glEnable(GL_LIGHTING);
 
 		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texture);
 
 		glColor4f(color->x, color->y, color->z, alpha);
 
@@ -1664,14 +1665,14 @@ void slRenderShape(slWorld *w, slShape *s, int drawMode, int texture, int textur
 	int n, divisions;
 	GLUquadricObj *quad;
 
-	if(texture && !(flags & DO_OUTLINE)) {
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, texture);
-	}
+	//if(texture && !(flags & DO_OUTLINE)) {
+	//	glEnable(GL_TEXTURE_2D);
+	//	glBindTexture(GL_TEXTURE_2D, texture);
+	//}
 
 	if(s->type == ST_SPHERE) {
 		if(s->radius < 16) divisions = 16;
-		else divisions = s->radius;
+		else divisions = (int)s->radius;
 
 		quad = gluNewQuadric();
 
@@ -1691,7 +1692,7 @@ void slRenderShape(slWorld *w, slShape *s, int drawMode, int texture, int textur
 		}
 	}
 
-	if(texture && !(flags & DO_OUTLINE)) glDisable(GL_TEXTURE_2D);
+	//if(texture && !(flags & DO_OUTLINE)) glDisable(GL_TEXTURE_2D);
 }
 
 /*!

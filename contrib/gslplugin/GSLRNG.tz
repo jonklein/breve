@@ -7,30 +7,43 @@ Object : GSLRNG {
 			rngPointer (pointer).
 	+ to init:
 			rngPointer = GSLRNG_new().
+
 	+ to set-seed with-seed s (int):
 			GSLRNG_set(rngPointer,s).
-	+ to uniform:
+
+	+ to get-uniform:
 			return GSLRNG_uniform(rngPointer).
-	+ to uniform-int with-upper u (int):
+
+	+ to get-uniform-int with-upper u (int):
 			return GSLRNG_uniform_int(rngPointer,u).
-	+ to gaussian with-mu mu (double) and-sigma sigma (double):
+
+	+ to get-gaussian with-mu mu (double) and-sigma sigma (double):
 			return GSLRNG_gaussian(rngPointer,mu,sigma).
-	+ to exponential with-mu mu (double):
+
+	+ to get-exponential with-mu mu (double):
 			return GSLRNG_exponential(rngPointer,mu).
-	+ to poisson with-mu mu (double):
+
+	+ to get-poisson with-mu mu (double):
 			return GSLRNG_poisson(rngPointer,mu).
-	+ to binomial with-p p (double) and-n n (int):
+
+	+ to get-binomial with-p p (double) and-n n (int):
 			return GSLRNG_binomial(rngPointer,p,n).
-	+ to negative-binomial with-p p (double) and-n n (int):
+
+	+ to get-negative-binomial with-p p (double) and-n n (int):
 			return GSLRNG_negative_binomial(rngPointer,p,n).
-	+ to gamma with-a a (double) and-b b (double):
+
+	+ to get-gamma with-a a (double) and-b b (double):
 			return GSLRNG_gamma(rngPointer,a,b).
-	+ to weibull with-a a (double) and-b b (double):
+
+	+ to get-weibull with-a a (double) and-b b (double):
 			return GSLRNG_weibull(rngPointer,a,b).
-	+ to bernoulli with-p p (double):
+
+	+ to get-bernoulli with-p p (double):
 			return GSLRNG_bernoulli(rngPointer,p).
+
 	+ to geometric with-p p (double):
 			return GSLRNG_geometric(rngPointer,p).		
+
 	+ to destroy:
 			GSLRNG_free(rngPointer).
 }

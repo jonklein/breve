@@ -19,7 +19,6 @@ Control : PhysicalControl [version 1.8] {
 		gravityMenu[2] = (self add-menu named "Full Gravity" for-method "full-gravity").
 		gravityMenu[3] = (self add-menu named "Double Gravity" for-method "double-gravity").
 
-        self enable-collision-resolution.
         self full-gravity.
 
         self enable-lighting.
@@ -28,15 +27,8 @@ Control : PhysicalControl [version 1.8] {
         self point-camera at (0, 0, 0) from (0, 10, 30).
         self move-light to (0, 30, 15).
 
-    + to enable-collision-resolution:
-        % Enables the collision resolution for a world.  This method should 
-        % be called during initialization--enabling collision resolution of 
-        % an existing world will have unexpected results.  This method is 
-        % in fact called by the init method of PhysicalControl, so it should 
-        % never be called by the user.
-
-		collisionResolution = 1.
-        worldSetCollisionResolution(1).
+    - to enable-collision-resolution:
+        % Obsolete.
 
     + to enable-fast-physics:
 		% This alternative physical simulation is faster, but less accurate
@@ -101,7 +93,5 @@ Control : PhysicalControl [version 1.8] {
         gravityMenu[3] check.
 
 	+ to dearchive:
-		if collisionResolution: self enable-collision-resolution.
-
 		return (super dearchive).
 }

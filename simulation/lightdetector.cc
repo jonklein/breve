@@ -46,7 +46,7 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 		bufferSize = size * size * 3;
 	}
 
-	if(w->objects.size()== 0) return;
+	if(w->objects.size() == 0) return;
 
 	glDisable(GL_LIGHTING);
 	glDisable(GL_BLEND);
@@ -87,10 +87,10 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 
 		if(wo->type == WO_LINK) {
 			m = wo->data;
-			if(sun->y > 0.0) slDrawShape(w, c, m->shape, &m->position, &color, 0, 0, 0, 0, DO_NO_LIGHTING|DO_NO_COLOR|DO_NO_TEXTURE, 0, 0);
+			if(sun->y > 0.0) slDrawShape(w, c, m->shape, &m->position, &color, 0, 0, 0, 0, DO_NO_LIGHTING|DO_NO_COLOR|DO_NO_TEXTURE, 0, 1.0);
 		} else if(wo->type == WO_STATIONARY) {
 			s = wo->data;
-			if(sun->y > 0.0) slDrawShape(w, c, s->shape, &s->position, &color, 0, 0, 0, 0, DO_NO_LIGHTING|DO_NO_COLOR|DO_NO_TEXTURE, 0, 0);
+			if(sun->y > 0.0) slDrawShape(w, c, s->shape, &s->position, &color, 0, 0, 0, 0, DO_NO_LIGHTING|DO_NO_COLOR|DO_NO_TEXTURE, 0, 1.0);
 		}
 	}
 

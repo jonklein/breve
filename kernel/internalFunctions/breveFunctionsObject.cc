@@ -122,6 +122,26 @@ int brIAddCollisionHandler(brEval args[], brEval *target, brInstance *i) {
     return EC_OK;
 }
 
+int brISetIgnoreCollisionsWith(brEval args[], brEval *target, brInstance *i) {
+    brObject *handler, *collider;
+	brInstance *caller;
+
+    caller = BRINSTANCE(&args[0]);
+
+    handler = caller->object;
+
+    collider = brObjectFind(i->engine, BRSTRING(&args[1]));
+
+    if(!collider) {
+        slMessage(DEBUG_ALL, "addCollisionCallback: Cannot locate class \"%s\"\n", BRSTRING(&args[1]));
+        return EC_ERROR;
+    }
+
+    brObjectSetIgnoreCollisionsWith(handler, collider, BRINT(&args[2]));
+
+    return EC_OK;
+}
+
 /*!
 	\brief Sends a notification, which triggers an event for all observers.
 
@@ -185,6 +205,7 @@ void breveInitObjectFunctions(brNamespace *n) {
 	brNewBreveCall(n, "notify", brINotify, AT_NULL, AT_STRING, 0);
 
 	brNewBreveCall(n, "addCollisionHandler", brIAddCollisionHandler, AT_INT, AT_INSTANCE, AT_STRING, AT_STRING, 0);
+	brNewBreveCall(n, "setIgnoreCollisionsWith", brISetIgnoreCollisionsWith, AT_INT, AT_INSTANCE, AT_STRING, AT_INT, 0);
 
 	brNewBreveCall(n, "addDependency", brIAddDependency, AT_NULL, AT_INSTANCE, 0);
 	brNewBreveCall(n, "removeDependency", brIRemoveDependency, AT_NULL, AT_INSTANCE, 0);

@@ -337,14 +337,22 @@ Object : Real (aka Reals) [version 2.0] {
 		% breve engine will automatically call theMethod of the colliding
 		% instance.
 
-		push { theType, theMethod } onto collisionHandlerList.
+		push { theType, theMethod, 0 } onto collisionHandlerList.
 		addCollisionHandler(self, theType, theMethod).
+
+	+ to ignore-collisions with-type theType (string): 
+		% Instructs the engine to ignore physical collisions with theType objects.
+		% This does not affect collision callbacks specified with METHOD(handle-collisions).
+
+		push { theType, 0, 1 } onto collisionHandlerList.
+		setIgnoreCollisionsWith(self, theType, 1).
 
 	+ to dearchive:
 		handler (list).
 
 		foreach handler in collisionHandlerList: {
-		 	addCollisionHandler(self, handler{0}, handler{1}).
+		 	if handler{1}: addCollisionHandler(self, handler{0}, handler{1}).
+			if handler{2}: setIgnoreCollisionsWith(self, handler{0}, 1).
 		}
 
 		if texture > -1: self set-texture to texture.

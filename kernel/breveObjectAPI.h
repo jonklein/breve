@@ -96,6 +96,7 @@ struct brInstance {
 struct brCollisionHandler {
     brObject *object;
     brMethod *method;
+	unsigned char ignore;
 };
 
 /*!
