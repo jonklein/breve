@@ -23,7 +23,7 @@
 #ifdef HAVE_LIBTIFF
 namespace tiff {
 using namespace tiff;
-#include "xtiffio.h"
+#include "tiffio.h"
 }
 using namespace tiff;
 #endif

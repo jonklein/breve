@@ -115,6 +115,8 @@ int main(int argc, char **argv) {
 	if(!OSMesaMakeCurrent(frontend->engine->osContext, frontend->engine->osBuffer, GL_UNSIGNED_BYTE, OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE)) 
 		slMessage(DEBUG_ALL, "Could not activate offscreen rendering context\n");
 
+	slInitGL(frontend->engine->world, frontend->engine->camera);
+
 	frontend->engine->camera->x = OSMESA_WINDOW_SIZE;
 	frontend->engine->camera->y = OSMESA_WINDOW_SIZE;
 
@@ -167,7 +169,7 @@ int main(int argc, char **argv) {
 
 #ifdef HAVE_LIBOSMESA
 		if(slWorldGetLightExposureDetection(frontend->engine->world)) 
-			slDetectLightExposure(steveData->engine->world, steveData->engine->camera, OSMESA_WINDOW_SIZE, steveData->engine->osBuffer);
+			slDetectLightExposure(frontend->engine->world, frontend->engine->camera, OSMESA_WINDOW_SIZE, frontend->engine->osBuffer);
 #endif
 	}
 
@@ -370,6 +372,6 @@ int activateContext() {
 
 void renderContext(slWorld *w, slCamera *c) {
 #ifdef HAVE_LIBOSMESA
-	slRenderWorld(w, c, 0);	
+	slRenderScene(w, c, 0);
 #endif
 }

@@ -70,10 +70,6 @@ int breveSnapshot(brEval args[], brEval *result, brInstance *i) {
 
 	path = brOutputPath(i->engine, BRSTRING(&args[0]));
 
-#ifdef HAVE_LIBOSMESA
-	slRenderWorld(i->engine->world, i->engine->camera, 0, GL_RENDER, 0, 0);
-#endif /* HAVE_LIBOSMESA */
-
 	BRINT(result) = slPNGSnapshot(i->engine->world, c, path);
 	slFree(path);
 
