@@ -2285,7 +2285,7 @@ int stCallMethod(stRunInstance *old, stRunInstance *new, stMethod *method, brEva
         if(keyEntry->var->type->objectName && !keyEntry->var->type->objectType)
 			keyEntry->var->type->objectType = stObjectFind(new->instance->type->engine->objects, keyEntry->var->type->objectName);
 
-		result = stSetVariable(&newStStack[keyEntry->var->offset], keyEntry->var->type->type, keyEntry->var->type->objectType, args[n], old);
+		result = stSetVariable(&newStStack[keyEntry->var->offset], keyEntry->var->type->type, keyEntry->var->type->objectType, args[n], new);
 
 		if(result != EC_OK) {
 			slMessage(DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", keyEntry->keyword, method->name);
