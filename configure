@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP ARCHIVER ARCHIVE_SUFFIX AUDIOLIBS CXX EXE_SUFFIX GLLIBS JAVAINCS JAVALIBS PLATFORM PLUGINFLAGS QUICKTIMEFLAGS RANLIB VERSION CXXFLAGS ac_ct_CXX JAR JAVAC LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE ac_ct_RANLIB YACC MKDEP MAKEDEPEND CXXCPP EGREP ALLOCA LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP JAVAC JAVAPREFIX JAR ARCHIVER ARCHIVE_SUFFIX AUDIOLIBS CXX DLLTOOL EXE_SUFFIX GLLIBS JAVAINCS JAVALIBS PLATFORM PLUGINFLAGS PLUGINIMP PLUGINLIB QUICKTIMEFLAGS RANLIB REGEXLIB VERSION CXXFLAGS ac_ct_CXX LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE ac_ct_RANLIB YACC ac_ct_DLLTOOL MKDEP MAKEDEPEND CXXCPP EGREP ALLOCA LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -770,6 +770,18 @@ ac_env_CPP_set=${CPP+set}
 ac_env_CPP_value=$CPP
 ac_cv_env_CPP_set=${CPP+set}
 ac_cv_env_CPP_value=$CPP
+ac_env_JAVAC_set=${JAVAC+set}
+ac_env_JAVAC_value=$JAVAC
+ac_cv_env_JAVAC_set=${JAVAC+set}
+ac_cv_env_JAVAC_value=$JAVAC
+ac_env_JAVAPREFIX_set=${JAVAPREFIX+set}
+ac_env_JAVAPREFIX_value=$JAVAPREFIX
+ac_cv_env_JAVAPREFIX_set=${JAVAPREFIX+set}
+ac_cv_env_JAVAPREFIX_value=$JAVAPREFIX
+ac_env_JAR_set=${JAR+set}
+ac_env_JAR_value=$JAR
+ac_cv_env_JAR_set=${JAR+set}
+ac_cv_env_JAR_value=$JAR
 ac_env_CXX_set=${CXX+set}
 ac_env_CXX_value=$CXX
 ac_cv_env_CXX_set=${CXX+set}
@@ -872,6 +884,9 @@ Some influential environment variables:
   CPPFLAGS    C/C++ preprocessor flags, e.g. -I<include dir> if you have
               headers in a nonstandard directory <include dir>
   CPP         C preprocessor
+  JAVAC       Java bytecode compiler
+  JAVAPREFIX  Path to Java tool-chain
+  JAR         Java archiver
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
   CXXCPP      C++ preprocessor
@@ -2713,6 +2728,11 @@ fi
 
 
 
+
+
+
+
+
 case "${host_os}" in
 	darwin*)
 		AUDIOLIBS="-framework vecLib -framework CoreAudio -framework AudioToolbox"
@@ -2752,6 +2772,8 @@ _ACEOF
 		JAVALIBS="breve.exe /mingw/lib/libjvm.dll.a jvm.def"
 		JAVAINCS="-I/include -I/e/j2sdk1.4.1_03/include -I/e/j2sdk1.4.1_03/include/win32"
 		PLUGINFLAGS="-shared"
+		PLUGINIMP="-Wl,--out-implib -Wl,lib/plugin.a"
+		PLUGINLIB="\$(BREVEDIR)/lib/plugin.a"
 
 cat >>confdefs.h <<\_ACEOF
 #define MINGW
@@ -2774,6 +2796,8 @@ _ACEOF
 	cygwin*)
 		GLLIBS="-lopengl32 -lglut32 -lglu32 -lwsock32 -lstdc++"
 		PLUGINFLAGS="-shared"
+		PLUGINIMP="-Wl,--out-implib -Wl,lib/plugin.a"
+		PLUGINLIB="\$(BREVEDIR)/lib/plugin.a"
 
 cat >>confdefs.h <<\_ACEOF
 #define CYGWIN
@@ -2795,11 +2819,18 @@ _ACEOF
 	*bsd*)
 		GLLIBS="-lglut -lGL -lGLU -lXmu -lXi -lm"
 		CPPFLAGS="${CPPFLAGS} -I/usr/local/include -I/usr/X11R6/include"
-		LDFLAGS="${LDFLAGS} -L/usr/local/lib -L/usr/X11R6/lib"
+		LDFLAGS="${LDFLAGS} -Wl,-E -L/usr/local/lib -L/usr/X11R6/lib"
 		PLUGINFLAGS="-shared"
+		ARCHIVER="tar czf"
+		ARCHIVE_SUFFIX="tar.gz"
+		PLATFORM=${host_os}
 
 		;;
 esac
+
+
+
+
 
 
 
@@ -3804,9 +3835,7 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-
-if test "x$JAVAPREFIX" = x; then
-        test "x$JAR" = x && for ac_prog in jar$EXEEXT ejar
+test "x$JAR" = x && for ac_prog in jar fastjar ejar
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3819,7 +3848,8 @@ else
   ac_cv_prog_JAR="$JAR" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
+as_dummy="$PATH:$JAVAPREFIX"
+for as_dir in $as_dummy
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
@@ -3845,56 +3875,17 @@ fi
 
   test -n "$JAR" && break
 done
+test -n "$JAR" || JAR=":"
 
-else
-        test "x$JAR" = x && for ac_prog in jar ejar
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_JAR+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$JAR"; then
-  ac_cv_prog_JAR="$JAR" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_JAR="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-JAR=$ac_cv_prog_JAR
-if test -n "$JAR"; then
-  echo "$as_me:$LINENO: result: $JAR" >&5
-echo "${ECHO_T}$JAR" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$JAR" && break
-done
-test -n "$JAR" || JAR="$JAVAPREFIX"
-
-fi
-test "x$JAR" = x && { echo "$as_me:$LINENO: WARNING: no acceptable jar program found in \$PATH" >&5
+if test "x$JAR" = x; then
+	{ echo "$as_me:$LINENO: WARNING: no acceptable jar program found in \$PATH" >&5
 echo "$as_me: WARNING: no acceptable jar program found in \$PATH" >&2;}
+	JAR=":"
+fi
 
 
-if test "x$JAVAPREFIX" = x; then
-        test "x$JAVAC" = x && for ac_prog in javac$EXEEXT "gcj$EXEEXT -C" "egcj -C" guavac$EXEEXT jikes$EXEEXT
+
+test "x$JAVAC" = x && for ac_prog in javac "gcj -C" "egcj -C" guavac jikes
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3907,7 +3898,8 @@ else
   ac_cv_prog_JAVAC="$JAVAC" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
+as_dummy="$PATH:$JAVAPREFIX"
+for as_dir in $as_dummy
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
@@ -3933,53 +3925,12 @@ fi
 
   test -n "$JAVAC" && break
 done
+test -n "$JAVAC" || JAVAC=":"
 
-else
-        test "x$JAVAC" = x && for ac_prog in javac$EXEEXT "gcj$EXEEXT -C" "egcj -C" guavac$EXEEXT jikes$EXEEXT
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_JAVAC+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$JAVAC"; then
-  ac_cv_prog_JAVAC="$JAVAC" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_JAVAC="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-JAVAC=$ac_cv_prog_JAVAC
-if test -n "$JAVAC"; then
-  echo "$as_me:$LINENO: result: $JAVAC" >&5
-echo "${ECHO_T}$JAVAC" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$JAVAC" && break
-done
-test -n "$JAVAC" || JAVAC="$JAVAPREFIX"
-
-fi
 if test "x$JAVAC" = x; then
 	{ echo "$as_me:$LINENO: WARNING: no acceptable Java compiler found in \$PATH" >&5
 echo "$as_me: WARNING: no acceptable Java compiler found in \$PATH" >&2;}
+	JAVAC=":"
 else
 
 echo "$as_me:$LINENO: checking if $JAVAC works" >&5
@@ -3991,7 +3942,7 @@ else
 JAVA_TEST=Test.java
 CLASS_TEST=Test.class
 cat << \EOF > $JAVA_TEST
-/* #line 3994 "configure" */
+/* #line 3945 "configure" */
 public class Test {
 }
 EOF
@@ -4015,7 +3966,9 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_prog_javac_works" >&5
 echo "${ECHO_T}$ac_cv_prog_javac_works" >&6
 
+
 fi
+
 
 for ac_prog in flex lex
 do
@@ -4409,6 +4362,87 @@ fi
   test -n "$YACC" && break
 done
 test -n "$YACC" || YACC="yacc"
+
+
+if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}dlltool", so it can be a program name with args.
+set dummy ${ac_tool_prefix}dlltool; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_DLLTOOL+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$DLLTOOL"; then
+  ac_cv_prog_DLLTOOL="$DLLTOOL" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_DLLTOOL="${ac_tool_prefix}dlltool"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+DLLTOOL=$ac_cv_prog_DLLTOOL
+if test -n "$DLLTOOL"; then
+  echo "$as_me:$LINENO: result: $DLLTOOL" >&5
+echo "${ECHO_T}$DLLTOOL" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+fi
+if test -z "$ac_cv_prog_DLLTOOL"; then
+  ac_ct_DLLTOOL=$DLLTOOL
+  # Extract the first word of "dlltool", so it can be a program name with args.
+set dummy dlltool; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_DLLTOOL+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_DLLTOOL"; then
+  ac_cv_prog_ac_ct_DLLTOOL="$ac_ct_DLLTOOL" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_DLLTOOL="dlltool"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_prog_ac_ct_DLLTOOL" && ac_cv_prog_ac_ct_DLLTOOL=":"
+fi
+fi
+ac_ct_DLLTOOL=$ac_cv_prog_ac_ct_DLLTOOL
+if test -n "$ac_ct_DLLTOOL"; then
+  echo "$as_me:$LINENO: result: $ac_ct_DLLTOOL" >&5
+echo "${ECHO_T}$ac_ct_DLLTOOL" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  DLLTOOL=$ac_ct_DLLTOOL
+else
+  DLLTOOL="$ac_cv_prog_DLLTOOL"
+fi
 
 
 # Extract the first word of "mkdep", so it can be a program name with args.
@@ -5722,6 +5756,64 @@ _ACEOF
 
   LIBS="-ltiff $LIBS"
 
+fi
+
+echo "$as_me:$LINENO: checking for regcomp in -lregex" >&5
+echo $ECHO_N "checking for regcomp in -lregex... $ECHO_C" >&6
+if test "${ac_cv_lib_regex_regcomp+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lregex  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char regcomp ();
+int
+main ()
+{
+regcomp ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_regex_regcomp=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_regex_regcomp=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_regex_regcomp" >&5
+echo "${ECHO_T}$ac_cv_lib_regex_regcomp" >&6
+if test $ac_cv_lib_regex_regcomp = yes; then
+  REGEXLIB=-lregex
 fi
 
 
@@ -8098,8 +8190,7 @@ done
 
 
 
-
-for ac_func in bzero floor getcwd gethostbyaddr gethostbyname gettimeofday pow regcomp socket sqrt strcasecmp strchr strdup strerror strstr iswspace
+for ac_func in floor getcwd gethostbyaddr gethostbyname gettimeofday pow regcomp socket sqrt strcasecmp strchr strdup strerror strstr iswspace
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ac_func" >&5
@@ -8862,29 +8953,35 @@ s,@ac_ct_CC@,$ac_ct_CC,;t t
 s,@EXEEXT@,$EXEEXT,;t t
 s,@OBJEXT@,$OBJEXT,;t t
 s,@CPP@,$CPP,;t t
+s,@JAVAC@,$JAVAC,;t t
+s,@JAVAPREFIX@,$JAVAPREFIX,;t t
+s,@JAR@,$JAR,;t t
 s,@ARCHIVER@,$ARCHIVER,;t t
 s,@ARCHIVE_SUFFIX@,$ARCHIVE_SUFFIX,;t t
 s,@AUDIOLIBS@,$AUDIOLIBS,;t t
 s,@CXX@,$CXX,;t t
+s,@DLLTOOL@,$DLLTOOL,;t t
 s,@EXE_SUFFIX@,$EXE_SUFFIX,;t t
 s,@GLLIBS@,$GLLIBS,;t t
 s,@JAVAINCS@,$JAVAINCS,;t t
 s,@JAVALIBS@,$JAVALIBS,;t t
 s,@PLATFORM@,$PLATFORM,;t t
 s,@PLUGINFLAGS@,$PLUGINFLAGS,;t t
+s,@PLUGINIMP@,$PLUGINIMP,;t t
+s,@PLUGINLIB@,$PLUGINLIB,;t t
 s,@QUICKTIMEFLAGS@,$QUICKTIMEFLAGS,;t t
 s,@RANLIB@,$RANLIB,;t t
+s,@REGEXLIB@,$REGEXLIB,;t t
 s,@VERSION@,$VERSION,;t t
 s,@CXXFLAGS@,$CXXFLAGS,;t t
 s,@ac_ct_CXX@,$ac_ct_CXX,;t t
-s,@JAR@,$JAR,;t t
-s,@JAVAC@,$JAVAC,;t t
 s,@LEX@,$LEX,;t t
 s,@LEXLIB@,$LEXLIB,;t t
 s,@LEX_OUTPUT_ROOT@,$LEX_OUTPUT_ROOT,;t t
 s,@SET_MAKE@,$SET_MAKE,;t t
 s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
 s,@YACC@,$YACC,;t t
+s,@ac_ct_DLLTOOL@,$ac_ct_DLLTOOL,;t t
 s,@MKDEP@,$MKDEP,;t t
 s,@MAKEDEPEND@,$MAKEDEPEND,;t t
 s,@CXXCPP@,$CXXCPP,;t t

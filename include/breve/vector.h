@@ -51,12 +51,12 @@ struct slsVector {
 #define slVectorAdd(a,b,c) ((c)->x=(a)->x+(b)->x,(c)->y=(a)->y+(b)->y,(c)->z=(a)->z+(b)->z)
 #define slVectorSub(a,b,c) ((c)->x=(a)->x-(b)->x,(c)->y=(a)->y-(b)->y,(c)->z=(a)->z-(b)->z)
 #define slVectorMul(a,b,c) ((c)->x=(a)->x*(b),(c)->y=(a)->y*(b),(c)->z=(a)->z*(b))
-#define slVectorCopy(a, b) (bcopy((a), (b), sizeof(slVector)))
-#define slsVectorCopy(a, b) (bcopy((a), (b), sizeof(slsVector)))
+#define slVectorCopy(a, b) (memmove((b), (a), sizeof(slVector)))
+#define slsVectorCopy(a, b) (memmove((b), (a), sizeof(slsVector)))
 #define slVectorDot(a, b) (((a)->x * (b)->x) + ((a)->y * (b)->y) + ((a)->z * (b)->z))
 
-#define slsVectorZero(a) (bzero((a), sizeof(slsVector)))
-#define slVectorZero(a) (bzero((a), sizeof(slVector)))
+#define slsVectorZero(a) (memset((a), 0, sizeof(slsVector)))
+#define slVectorZero(a) (memset((a), 0, sizeof(slVector)))
 
 void slVectorCross(slVector *, slVector *, slVector *);
 double slVectorAngle(slVector *, slVector *);

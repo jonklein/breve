@@ -174,7 +174,7 @@ slCollision *slNextCollision(slVclipData *v, int x, int y) {
 slCollision *slNextCollision(slVclipData *v) {
 	slCollision e;
 
-	bzero(&e, sizeof(slCollision));
+	memset(&e, 0, sizeof(slCollision));
 
 	v->collisions.push_back(e);
 	return &v->collisions.back();

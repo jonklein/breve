@@ -25,8 +25,8 @@
 	the documentation distributed with breve.
 */
 
-// These are depreciated symbol names, 
-// included here for backwards compatability
+/* These are deprecated symbol names, 
+   included here for backwards compatability */
 
 #define stNewBreveCall brNewBreveCall
 #define stEval brEval
@@ -34,8 +34,6 @@
 #define stEvalList brEvalList
 #define stEvalListHead brEvalListHead
 #define stNewEvalList brEvalListNew
-
-#define stEvalListAppend(list, element) brEvalListInsert((list), (list)->count, (element))
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -64,7 +62,7 @@ enum atomicTypes {
 	AT_UNDEFINED = 0,
 	AT_NULL,
 	AT_INT,
-    AT_DOUBLE,
+	AT_DOUBLE,
 	AT_STRING,
 	AT_INSTANCE,
 	AT_BRIDGE_INSTANCE,
@@ -149,23 +147,22 @@ char *slStrdup(char *string);
 	worry about freeing brEvalLists, this is done by the engine.
 */
 
-brEvalListHead *brEvalListNew();
-brEval *brEvalListPrepend(brEvalListHead *a, brEval *eval);
-brEval *brEvalListAppend(brEvalListHead *a, brEval *eval);
+brEvalListHead *brEvalListNew(void);
+#define brEvalListAppend(a, eval) brEvalListInsert((a), (a)->count, (eval))
 
 /* use these macros to treat brEval pointers like specific types */
 
-#define BRINT(e)        ((e)->values.intValue)
-#define BRFLOAT(e)      ((e)->values.doubleValue)
-#define BRDOUBLE(e)     ((e)->values.doubleValue)
-#define BRSTRING(e)     ((e)->values.stringValue)
-#define BRVECTOR(e)     ((e)->values.vectorValue)
-#define BRMATRIX(e)     ((e)->values.matrixValue)
-#define BRINSTANCE(e)     ((e)->values.instanceValue)
-#define BRPOINTER(e)    ((e)->values.pointerValue)
-#define BRDATA(e)       ((e)->values.dataValue)
-#define BRHASH(e)       ((e)->values.hashValue)
-#define BRLIST(e)       ((e)->values.listValue)
+#define BRINT(e)	((e)->values.intValue)
+#define BRFLOAT(e)	((e)->values.doubleValue)
+#define BRDOUBLE(e)	((e)->values.doubleValue)
+#define BRSTRING(e)	((e)->values.stringValue)
+#define BRVECTOR(e)	((e)->values.vectorValue)
+#define BRMATRIX(e)	((e)->values.matrixValue)
+#define BRINSTANCE(e)	((e)->values.instanceValue)
+#define BRPOINTER(e)	((e)->values.pointerValue)
+#define BRDATA(e)	((e)->values.dataValue)
+#define BRHASH(e)	((e)->values.hashValue)
+#define BRLIST(e)	((e)->values.listValue)
 
 #define STINT		BRINT
 #define STFLOAT		BRFLOAT
@@ -199,9 +196,9 @@ int brNewBreveCall(void *n, char *name, int (*call)(brEval *argumentArray, brEva
 int stCallMethodByNameWithArgs(void *instance, char *name, brEval **args, int argcount, brEval *result);
 
 /*
-	to print error messages to the breve console, use the function slMessage.
-	the first argument should always be DEBUG_ALL.  the second argument is a 
-	"printf" style format string, and subsequent arguments correspond to the 
+	to print error messages to the breve console, use the function slMessage
+	the first argument should always be DEBUG_ALL.  the second argument is a
+	"printf" style format string, and subsequent arguments correspond to the
 	arguments referenced in the format string.
 */
 

@@ -21,18 +21,10 @@
 #ifndef _MEMORY_H
 #define _MEMORY_H
 
-#ifdef WINDOWS
-#define bzero(p, l) memset((p), 0, (l))
-#endif
+#include <stdlib.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-void *slMalloc(int);
-void *slRealloc(void *, int);
-void slFree(void *);
-#ifdef __cplusplus
-}
-#endif
+#define slMalloc(n) calloc(1,n)
+#define slRealloc(p,n) realloc(p,n)
+#define slFree(p) free(p)
 
 #endif

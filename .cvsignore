@@ -1,5 +1,7 @@
 .depend
 autom4te.cache
+breve.dll
+breve.def
 config.log
 config.status
 docs

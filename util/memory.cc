@@ -18,28 +18,35 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "util.h"
 
+#undef slMalloc
+#undef slRealloc
+#undef slFree
+
 /*!
-    memory.c defines a set of malloc wrappers -- mostly obsolete except for the 
-	bzero after mallocing...
+    memory.cc defines a set of malloc wrappers
 */
 
-void *slMalloc(int n) {
-	void *m = malloc(n);
-	bzero(m, n);
-	return m;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+DLLEXPORT void *
+slMalloc(int n) {
+	return calloc(1, n);
 }
 
-void *slRealloc(void *p, int n) {
+DLLEXPORT void *
+slRealloc(void *p, int n) {
 	return realloc(p, n);
 }
 
-void slFree(void *p) {
+DLLEXPORT void
+slFree(void *p) {
 	free(p);
-	return;
 }
+
+#ifdef __cplusplus
+}
+#endif

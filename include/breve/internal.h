@@ -1,51 +1,52 @@
+#include <stdio.h>
+#include <stdarg.h>
+
 #include "kernelTypedefs.h"
 #include "breveEval.h"
 #include "engine.h"
 #include "breveObjectAPI.h"
 #include "namespace.h"
-#include <stdio.h>
-#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-void breveInitCameraFunctions(brNamespace *n);
-void breveInitJointFunctions(brNamespace *n);
-void breveInitControlFunctions(brNamespace *n);
-void breveInitFileFunctions(brNamespace *n);
-void breveInitGraphFunctions(brNamespace *n);
-void breveInitImageFunctions(brNamespace *n);
-void breveInitLinkFunctions(brNamespace *n);
-void breveInitMathFunctions(brNamespace *n);
-void breveInitMenuFunctions(brNamespace *n);
-void breveInitMovieFunctions(brNamespace *n);
-void breveInitMultibodyFunctions(brNamespace *n);
-void breveInitNetworkFunctions(brNamespace *n);
-void breveInitNeuralFunctions(brNamespace *n);
-void breveInitObjectFunctions(brNamespace *n);
-void breveInitPatchFunctions(brNamespace *n);
-void breveInitPhysicsFunctions(brNamespace *n);
-void breveInitShapeFunctions(brNamespace *n);
-void breveInitStationaryFunctions(brNamespace *n);
-void breveInitSoundFunctions(brNamespace *n);
-void breveInitTerrainFunctions(brNamespace *n);
-void breveInitWorldFunctions(brNamespace *n);
-void breveInitPushFunctions(brNamespace *n);
-void breveInitPushCallbackFunctions(brNamespace *n);
-void breveInitSpringFunctions(brNamespace *n);
-void breveInitMatrixFunctions(brNamespace *n);
-void breveInitQGAMEFunctions(brNamespace *n);
-void breveInitDrawFunctions(brNamespace *n);
+void breveInitCameraFunctions(brNamespace *);
+void breveInitJointFunctions(brNamespace *);
+void breveInitControlFunctions(brNamespace *);
+void breveInitFileFunctions(brNamespace *);
+void breveInitGraphFunctions(brNamespace *);
+void breveInitImageFunctions(brNamespace *);
+void breveInitLinkFunctions(brNamespace *);
+void breveInitMathFunctions(brNamespace *);
+void breveInitMenuFunctions(brNamespace *);
+void breveInitMovieFunctions(brNamespace *);
+void breveInitMultibodyFunctions(brNamespace *);
+void breveInitNetworkFunctions(brNamespace *);
+void breveInitNeuralFunctions(brNamespace *);
+void breveInitObjectFunctions(brNamespace *);
+void breveInitPatchFunctions(brNamespace *);
+void breveInitPhysicsFunctions(brNamespace *);
+void breveInitShapeFunctions(brNamespace *);
+void breveInitStationaryFunctions(brNamespace *);
+void breveInitSoundFunctions(brNamespace *);
+void breveInitTerrainFunctions(brNamespace *);
+void breveInitWorldFunctions(brNamespace *);
+void breveInitPushFunctions(brNamespace *);
+void breveInitPushCallbackFunctions(brNamespace *);
+void breveInitSpringFunctions(brNamespace *);
+void breveInitMatrixFunctions(brNamespace *);
+void breveInitQGAMEFunctions(brNamespace *);
+void breveInitDrawFunctions(brNamespace *);
 
-int brNewBreveCall(brNamespace *n, char *name, int (*call)(brEval *a, brEval *r, brInstance *i), int rtype, ...);
+DLLEXPORT int brNewBreveCall(brNamespace *, char *, int (*)(brEval *, brEval *, brInstance *), int, ...);
 
-FILE *slGetLogFilePointer(brInstance *i);
+DLLEXPORT FILE *slGetLogFilePointer(brInstance *);
 #ifdef __cplusplus
 }
 #endif
 
-void brLoadInternalFunctions(brEngine *e);
-void brFreeBreveCall(void *d);
+void brLoadInternalFunctions(brEngine *);
+void brFreeBreveCall(void *);
 
 
 /*!

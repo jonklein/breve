@@ -124,7 +124,7 @@ stInstance *stInstanceNew(stObject *o) {
 	i->type = o;
 
 	i->variables = slMalloc(o->varSize);
-	bzero(i->variables, o->varSize);
+	memset(i->variables, 0, o->varSize);
 
 	i->status = AS_ACTIVE;
 	i->gc = 0;
@@ -476,7 +476,7 @@ stKeywordEntry *stNewKeywordEntry(char *keyword, stVar *v, brEval *defValue) {
 
 	if(defValue) {
 		copy = slMalloc(sizeof(brEval));
-		bcopy(defValue, copy, sizeof(brEval));
+		memcpy(copy, defValue, sizeof(brEval));
 		e->defaultKey = stNewKeyword(keyword, stExpNew(copy, ET_ST_EVAL, NULL, 0));
 	}
 

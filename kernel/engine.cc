@@ -23,12 +23,6 @@
 
 char *interfaceID;
 
-#if defined(WINDOWS) && defined(WINDOWS_DLL)
-asm (".section .drectve");
-asm (".ascii \"-export:brEngineNew\"");
-asm (".ascii \"-export:brEngineFree\"");
-#endif
-
 /** \defgroup breveEngineAPI The breve engine API: using a breve simulation from another program or application frontend */
 /*@{*/
 
@@ -155,7 +149,7 @@ brEngine *brEngineNew() {
 
 	if((envpath = getenv("HOME"))) brAddSearchPath(e, envpath);
 
-	bzero(e->keys, 256);
+	memset(e->keys, 0, sizeof(e->keys));
 
 	for(n=1;n<e->nThreads;n++) {
 		stThreadData *data;

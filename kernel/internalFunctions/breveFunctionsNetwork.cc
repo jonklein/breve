@@ -28,6 +28,7 @@
 #else
 #include <wininet.h>
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #endif /* MINGW */
 
 #define BRNETWORKSERVERPOINTER(p)	((brNetworkServer*)BRPOINTER(p))
@@ -218,8 +219,7 @@ brNetworkServer *brListenOnPort(int port, brEngine *engine) {
 void *brListenOnSocket(void *data) {
 	brNetworkServer *serverData = (brNetworkServer*)data;
 
-	// socklen_t caddr_size = sizeof(struct sockaddr_in);
-	int caddr_size = sizeof(struct sockaddr_in);
+	socklen_t caddr_size = sizeof(struct sockaddr_in);
 
 	while(!serverData->terminate) {
 		brNetworkClientData clientData;
@@ -334,14 +334,14 @@ char *brFinishNetworkRead(brNetworkClientData *data, brNetworkRequest *request) 
 	int count;
 	int size = sizeof(brNetworkRequest);
 
-	bcopy(request, d, sizeof(brNetworkRequest));
+	memcpy(d, request, sizeof(brNetworkRequest));
 
 	while((count = brHTTPReadLine(data->socket, buffer, 1024)) == 1024) {
 		d = (char*)slRealloc(d, size + count + 1);
 
 		printf("read %d bytes\n", count);
 
-		bcopy(buffer, &d[size], count);
+		memcpy(&d[size], buffer, count);
 
 		size += count;
 	}

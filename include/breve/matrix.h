@@ -30,9 +30,9 @@
 
 typedef double slMatrix[3][3];
 
-#define slMatrixZero(x)         bzero(x, 9 * sizeof(double))
-#define slMatrixIdentity(x)     (bzero(x, 9 * sizeof(double)),(x)[0][0] = (x)[1][1] = (x)[2][2] = 1.0)
-#define slMatrixCopy(a, b)      bcopy((a), (b), 9 * sizeof(double))
+#define slMatrixZero(x)         memset(x, 0, 9 * sizeof(double))
+#define slMatrixIdentity(x)     (memset(x, 0, 9 * sizeof(double)),(x)[0][0] = (x)[1][1] = (x)[2][2] = 1.0)
+#define slMatrixCopy(a, b)      memcpy((b), (a), 9 * sizeof(double))
 
 #define slMatrixMulMatrix(m, n, d) \
     (   (d)[0][0] = (m)[0][0] * (n)[0][0] + (m)[0][1] * (n)[1][0] + (m)[0][2] * (n)[2][0], \

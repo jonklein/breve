@@ -31,15 +31,15 @@ struct brData {
 #ifdef __cplusplus
 extern "C" {
 #endif
-brData *brDataNew(void *data, int length);
-void brDataFree(brData *data);
+DLLEXPORT brData *brDataNew(void *, int);
+DLLEXPORT void brDataFree(brData *);
 
-void brDataRetain(brData *data);
-void brDataUnretain(brData *data);
-void brDataCollect(brData *data);
+void brDataRetain(brData *);
+void brDataUnretain(brData *);
+void brDataCollect(brData *);
 
-char *brDataHexEncode(brData *d);
-brData *brDataHexDecode(char *string);
+char *brDataHexEncode(brData *);
+brData *brDataHexDecode(char *);
 #ifdef __cplusplus
 }
 #endif

@@ -36,8 +36,8 @@ slLink::slLink(slWorld *w) : slWorldObject() {
 	currentState = 0;
 	mobile = 0;
 
-	bzero(&stateVector[0], sizeof(slLinkIntegrationPosition));
-	bzero(&stateVector[1], sizeof(slLinkIntegrationPosition));
+	memset(&stateVector[0], 0, sizeof(slLinkIntegrationPosition));
+	memset(&stateVector[1], 0, sizeof(slLinkIntegrationPosition));
 
 	slQuatIdentity(&stateVector[0].rotQuat);
 	slQuatIdentity(&stateVector[1].rotQuat);
@@ -533,7 +533,7 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 	slVectorNormalize(&tn);
 
 	joint = new slJoint;
-	bzero(joint, sizeof(slJoint));
+	memset(joint, 0, sizeof(slJoint));
 
 	/* for both parent and child:
 		if it does NOT exist, OR if it already has a mb, then 

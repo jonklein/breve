@@ -47,7 +47,7 @@ size_t slURLWriteFunction(void *ptr, size_t size, size_t nmemb, void *stream) {
 		data->string = slRealloc(data->string, data->maxSize);
 	}
 
-	bcopy(ptr, &data->string[data->size], size * nmemb);
+	memmove(&data->string[data->size], ptr, size * nmemb);
 
 	data->size += size * nmemb;
 }

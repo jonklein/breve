@@ -396,13 +396,12 @@ int slJointSetLinkPoints(slJoint *joint, slVector *plinkPoint, slVector *clinkPo
 	double ideal[3][3];
 
 	childR = dBodyGetRotation(joint->child->odeBodyID);
-	bcopy(childR, savedChildR, sizeof(dReal) * 16);
+	memcpy(savedChildR, childR, sizeof(savedChildR));
 
-	if(joint->parent) {
-		slMatrixMulMatrix(joint->parent->position.rotation, rotation, ideal);
-	} else {
-		slMatrixCopy(rotation, ideal);		
-	}
+	if (joint->parent)
+	   slMatrixMulMatrix(joint->parent->position.rotation, rotation, ideal);
+	else
+	   slMatrixCopy(rotation, ideal);		
 
 	slSlToODEMatrix(ideal, idealR);
 

@@ -206,9 +206,10 @@ void slCenterPixelsInSquareBuffer(unsigned char *pixels, int width, int height, 
 	xstart = (newwidth - width) / 2;
 	ystart = (newheight - height) / 2;
 
-	for(y=0;y<height;y++) {
-		bcopy(&pixels[y * width * 4], &buffer[(y + ystart) * (newwidth * 4) + (xstart * 4)], width * 4);
-	}
+	for(y = 0; y < height; y++)
+		memmove(&buffer[(y + ystart) * (newwidth * 4) + (xstart * 4)],
+			&pixels[y * width * 4],
+			width * 4);
 }
 
 /*!
@@ -255,7 +256,7 @@ int slUpdateTexture(slCamera *c, GLuint texture, unsigned char *pixels, int widt
 
 	if(newwidth != width || newheight != height) {
 		newpixels = new unsigned char[newwidth * newheight * 4];
-		bzero(newpixels, newwidth * newheight * 4);
+		memset(newpixels, 0, newwidth * newheight * 4);
 
 		slCenterPixelsInSquareBuffer(pixels, width, height, newpixels, newwidth, newheight);
 	} else {

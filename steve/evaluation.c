@@ -1536,7 +1536,7 @@ inline int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *result) {
 		}
 	}
 
-	bzero(result, sizeof(brEval));
+	memset(result, 0, sizeof(brEval));
 
 #ifdef MULTITHREAD
 	pthread_mutex_lock(&(i->instance->lock));
@@ -2354,7 +2354,7 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 		return EC_ERROR;
 	}
 
-	bzero(newStStack, method->stackOffset);
+	memset(newStStack, 0, method->stackOffset);
 
 	// go through the arguments and place them on the stack.
 
@@ -2666,7 +2666,7 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *result, stObject **tClass) {
 			resultCode = stEvalUnaryExp(s->values.pValue, i, result);
 			break;
 		case ET_ST_EVAL:
-			bcopy(s->values.pValue, result, sizeof(brEval));
+			memmove(result, s->values.pValue, sizeof(brEval));
 			break;
 		case ET_LIST:
 			resultCode = brEvalListExp(s->values.pValue, i, result);

@@ -659,6 +659,8 @@ int slPNGSnapshot(slWorld *w, slCamera *c, char *file) {
 void slReversePixelBuffer(unsigned char *source, unsigned char *dest, int width, int height) {
 	int n;
 
-	for(n=0;n<height;n++)
-		bcopy(&source[n * width], &dest[(height - (n + 1)) * width], width);
+	for(n = 0; n < height; n++)
+		memmove(&dest[(height - (n + 1)) * width],
+			&source[n * width],
+			width);
 }

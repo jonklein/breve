@@ -20,8 +20,6 @@
 
 #include "steve.h"
 
-#include "xml.h"
-
 enum states {
 	XP_ENGINE = 1,
 	XP_INSTANCE_ARCHIVE,
@@ -116,7 +114,7 @@ int stXMLWriteObjectToStream(stInstance *i, FILE *file, int isDataObject) {
 
 	stXMLAssignIndices(i->type->engine);
 
-	bzero(&record, sizeof(stXMLArchiveRecord));
+	memset(&record, 0, sizeof(stXMLArchiveRecord));
 
 	fprintf(file, "<?xml version=\"1.0\"?>\n");
 	fprintf(file, "<!DOCTYPE steveObject SYSTEM \"steveObject.dtd\">\n");
@@ -170,7 +168,7 @@ int stXMLWriteSimulationToStream(FILE *file, brEngine *e) {
 
 	controller = brEngineGetController(e)->userData;
 
-	bzero(&record, sizeof(stXMLArchiveRecord));
+	memset(&record, 0, sizeof(stXMLArchiveRecord));
 
 	fprintf(file, "<?xml version=\"1.0\"?>\n");
 	fprintf(file, "<!DOCTYPE steveEngine SYSTEM \"steveEngine.dtd\">\n");
@@ -561,7 +559,7 @@ int stXMLReadObjectFromString(stInstance *i, char *buffer) {
 	stXMLParserState parserState;
 	int result = 0;
 
-	bzero(&parserState, sizeof(stXMLParserState));
+	memset(&parserState, 0, sizeof(stXMLParserState));
 
 	parser = XML_ParserCreate(NULL);
 
@@ -654,7 +652,7 @@ stInstance *stXMLDearchiveObjectFromString(brEngine *e, char *buffer) {
 	stInstance *dearchivedInstance;
 	int result = 0;
 
-	bzero(&parserState, sizeof(stXMLParserState));
+	memset(&parserState, 0, sizeof(stXMLParserState));
 	parser = XML_ParserCreate(NULL);
 
 	parserState.engine = e;
@@ -747,7 +745,7 @@ int stXMLInitSimulationFromString(brEngine *e, char *buffer) {
 	stXMLParserState parserState;
 	int result = 0;
 
-	bzero(&parserState, sizeof(stXMLParserState));
+	memset(&parserState, 0, sizeof(stXMLParserState));
 
 	if(!buffer) {
 		slMessage(DEBUG_ALL, "Error loading archived simulation file: could not open buffer\n");

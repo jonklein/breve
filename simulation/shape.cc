@@ -480,10 +480,10 @@ slEdge *slAddEdge(slShape *s, slFace *f, slVector *start, slVector *end) {
 		e->faces[0] = originalEdge->faces[1];
 		e->faces[1] = originalEdge->faces[0];
 
-		bcopy(&originalEdge->voronoi[0], &e->voronoi[1], sizeof(slPlane));
-		bcopy(&originalEdge->voronoi[1], &e->voronoi[0], sizeof(slPlane));
-		bcopy(&originalEdge->voronoi[2], &e->voronoi[2], sizeof(slPlane));
-		bcopy(&originalEdge->voronoi[3], &e->voronoi[3], sizeof(slPlane));
+		memcpy(&e->voronoi[1], &originalEdge->voronoi[0], sizeof(slPlane));
+		memcpy(&e->voronoi[0], &originalEdge->voronoi[1], sizeof(slPlane));
+		memcpy(&e->voronoi[2], &originalEdge->voronoi[2], sizeof(slPlane));
+		memcpy(&e->voronoi[3], &originalEdge->voronoi[3], sizeof(slPlane));
 	} else {
 		e->faces[0] = f;
 

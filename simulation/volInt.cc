@@ -262,7 +262,7 @@ int slSetMassProperties(slShape *s, double density) {
   slMPPolyhedron p;
   double r[3];            /* center of mass */
 
-  bzero(&p, sizeof(slMPPolyhedron));
+  memset(&p, 0, sizeof(slMPPolyhedron));
 
   if(slConvertShapeToPolyhedron(s, &p)) return -1;
  

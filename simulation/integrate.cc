@@ -63,7 +63,9 @@ int slEuler(slWorld *w, slLink *r, double *deltaT, int skipFirst) {
 
 	if(r->mobile < 1) {
 		if(r->mobile == -1) {
-			bcopy(&r->stateVector[r->currentState], &r->stateVector[!r->currentState], sizeof(slLinkIntegrationPosition));
+			memmove(&r->stateVector[!r->currentState],
+				&r->stateVector[r->currentState],
+				sizeof(slLinkIntegrationPosition));
 			r->mobile = 0;
 		}
 
@@ -106,7 +108,9 @@ int slRK4(slWorld *w, slLink *r, double *deltaT, int skipFirst) {
 
 	if(r->mobile < 1) {
 		if(r->mobile == -1) {
-			bcopy(&r->stateVector[r->currentState], &r->stateVector[!r->currentState], sizeof(slLinkIntegrationPosition));
+			memmove(&r->stateVector[!r->currentState],
+				&r->stateVector[r->currentState],
+				sizeof(slLinkIntegrationPosition));
 			r->mobile = 0;
 		}
 

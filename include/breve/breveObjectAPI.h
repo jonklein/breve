@@ -138,40 +138,37 @@ extern "C" {
 
 // registering a new object type
 
-void brEngineRegisterObjectType(brEngine *e, brObjectType *t);
+void brEngineRegisterObjectType(brEngine *, brObjectType *);
 
 // locating objects and methods within objects
 
-brMethod *brMethodFind(brObject *type, char *name, 
-	unsigned char *types, int argCount);
-brMethod *brMethodFindWithArgRange(brObject *o, char *name, 
-	unsigned char *types, int min, int max);
+brMethod *brMethodFind(brObject *, char *, unsigned char *, int);
+brMethod *brMethodFindWithArgRange(brObject *, char *, unsigned char *, int, int);
 
-brObject *brObjectFind(brEngine *n, char *name);
-brObject *brUnknownObjectFind(brEngine *e, char *name);
+brObject *brObjectFind(brEngine *, char *);
+brObject *brUnknownObjectFind(brEngine *, char *);
 
 // functions for getting user data
 
-void *brInstanceGetUserData(brInstance *i);
-void *brObjectGetUserData(brInstance *i);
+void *brInstanceGetUserData(brInstance *);
+void *brObjectGetUserData(brInstance *);
 
 // functions for calling methods with breve instances
 
-int brMethodCall(brInstance *i, brMethod *m, brEval **args, brEval *result);
-int brMethodCallByName(brInstance *i, char *name, brEval *result);
-int brMethodCallByNameWithArgs(brInstance *i, char *name, brEval **args, 
-	int count, brEval *result);
+int brMethodCall(brInstance *, brMethod *, brEval **, brEval *);
+int brMethodCallByName(brInstance *, char *, brEval *);
+DLLEXPORT int brMethodCallByNameWithArgs(brInstance *, char *, brEval **, int, brEval *);
 
 // functions related to adding and removing classes and instances to the breve engine
 
-brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *userData);
-void brEngineAddObjectAlias(brEngine *e, char *name, brObject *o);
-brInstance *brEngineAddInstance(brEngine *e, brObject *o, void *userData);
-brInstance *brObjectInstantiate(brEngine *e, brObject *o, brEval **args, int argCount);
-void brEngineRemoveInstance(brEngine *e, brInstance *i);
+brObject *brEngineAddObject(brEngine *, brObjectType *, char *, void *);
+void brEngineAddObjectAlias(brEngine *, char *, brObject *);
+brInstance *brEngineAddInstance(brEngine *, brObject *, void *);
+brInstance *brObjectInstantiate(brEngine *, brObject *, brEval **, int);
+void brEngineRemoveInstance(brEngine *, brInstance *);
 
-int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *name);
-int brObjectSetIgnoreCollisionsWith(brObject *handler, brObject *collider, int ignore);
+int brObjectAddCollisionHandler(brObject *, brObject *, char *);
+int brObjectSetIgnoreCollisionsWith(brObject *, brObject *, int);
 
 // adding and removing dependencies and observers 
 

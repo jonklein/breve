@@ -8,25 +8,6 @@
 	functions shown here to interface with the breve object API.
 */
 
-#if defined(WINDOWS) && defined(WINDOWS_DLL)
-asm (".section .drectve");  
-asm (".ascii \"-export:brEngineRegisterObjectType\"");
-asm (".ascii \"-export:brObjectFind\"");
-asm (".ascii \"-export:brMethodFind\"");
-asm (".ascii \"-export:brMethodFindWithArgRange\"");
-asm (".ascii \"-export:brUnknownObjectFind\"");
-asm (".ascii \"-export:brMethodCall\"");
-asm (".ascii \"-export:brMethodCallByName\"");
-asm (".ascii \"-export:brMethodCallByNameWithArgs\"");
-asm (".ascii \"-export:brEngineAddObject\"");
-asm (".ascii \"-export:brEngineAddObjectAlias\"");
-asm (".ascii \"-export:brEngineAddInstance\"");
-asm (".ascii \"-export:brEngineRemoveInstance\"");
-asm (".ascii \"-export:brObjectInstantiate\"");
-asm (".ascii \"-export:brObjectAddCollisionHandler\"");
-asm (".ascii \"-export:brObjectSetIgnoreCollisionsWith\"");
-#endif /* WINDOWS */
-
 /*@{*/
 
 /*!
@@ -572,7 +553,6 @@ int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *nam
 
 	return EC_OK;
 }
-
 
 int brObjectSetIgnoreCollisionsWith(brObject *handler, brObject *collider, int ignore) {
 	brCollisionHandler *ch;

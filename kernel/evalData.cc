@@ -32,7 +32,7 @@ brData *brDataNew(void *info, int length) {
 	d->length = length;
 	d->retainCount = 0;
 	d->data = new unsigned char[length];
-	bcopy(info, d->data, d->length);
+	memcpy(d->data, info, d->length);
 
 	return d;
 }

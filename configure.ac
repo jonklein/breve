@@ -27,33 +27,32 @@ else
 fi
 rm -f $JAVA_TEST $CLASS_TEST
 ])
-AC_PROVIDE([$0])dnl
+AC_PROVIDE([$0])
 ])
 
+AC_ARG_VAR(JAVAC, [Java bytecode compiler])
+AC_ARG_VAR(JAVAPREFIX, [Path to Java tool-chain])
+
 AC_DEFUN([AC_PROG_JAVAC],[
-AC_REQUIRE([AC_EXEEXT])dnl
-if test "x$JAVAPREFIX" = x; then
-        test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, javac$EXEEXT "gcj$EXEEXT -C" "egcj -C" guavac$EXEEXT jikes$EXEEXT)
-else
-        test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, javac$EXEEXT "gcj$EXEEXT -C" "egcj -C" guavac$EXEEXT jikes$EXEEXT, $JAVAPREFIX)
-fi
+test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, javac "gcj -C" "egcj -C" guavac jikes, :, $PATH:$JAVAPREFIX)
 if test "x$JAVAC" = x; then
 	AC_MSG_WARN([no acceptable Java compiler found in \$PATH])
+	JAVAC=":"
 else
 	AC_PROG_JAVAC_WORKS
 fi
-AC_PROVIDE([$0])dnl
+AC_PROVIDE([$0])
 ])
 
+AC_ARG_VAR(JAR, [Java archiver])
+
 AC_DEFUN([AC_PROG_JAR],[
-AC_REQUIRE([AC_EXEEXT])dnl
-if test "x$JAVAPREFIX" = x; then
-        test "x$JAR" = x && AC_CHECK_PROGS(JAR, jar$EXEEXT ejar)
-else
-        test "x$JAR" = x && AC_CHECK_PROGS(JAR, jar ejar, $JAVAPREFIX)
+test "x$JAR" = x && AC_CHECK_PROGS(JAR, jar fastjar ejar, :, $PATH:$JAVAPREFIX)
+if test "x$JAR" = x; then
+	AC_MSG_WARN([no acceptable jar program found in \$PATH])
+	JAR=":"
 fi
-test "x$JAR" = x && AC_MSG_WARN([no acceptable jar program found in \$PATH])
-AC_PROVIDE([$0])dnl
+AC_PROVIDE([$0])
 ])
 
 case "${host_os}" in
@@ -87,6 +86,8 @@ case "${host_os}" in
 		JAVALIBS="breve.exe /mingw/lib/libjvm.dll.a jvm.def"
 		JAVAINCS="-I/include -I/e/j2sdk1.4.1_03/include -I/e/j2sdk1.4.1_03/include/win32"
 		PLUGINFLAGS="-shared"
+		PLUGINIMP="-Wl,--out-implib -Wl,lib/plugin.a"
+		PLUGINLIB="\$(BREVEDIR)/lib/plugin.a"
 		AC_DEFINE([MINGW], [], [MinGW])
 		AC_DEFINE([WINDOWS], [], [Windows])
 		AUDIOLIBS="-lwinmm"
@@ -101,6 +102,8 @@ case "${host_os}" in
 	cygwin*)
 		GLLIBS="-lopengl32 -lglut32 -lglu32 -lwsock32 -lstdc++"
 		PLUGINFLAGS="-shared"
+		PLUGINIMP="-Wl,--out-implib -Wl,lib/plugin.a"
+		PLUGINLIB="\$(BREVEDIR)/lib/plugin.a"
 		AC_DEFINE([CYGWIN], [], [Cygwin])
 		AC_DEFINE([WINDOWS], [], [Windows])
 		AUDIOLIBS="-lwinmm"
@@ -114,8 +117,11 @@ case "${host_os}" in
 	*bsd*)
 		GLLIBS="-lglut -lGL -lGLU -lXmu -lXi -lm"
 		CPPFLAGS="${CPPFLAGS} -I/usr/local/include -I/usr/X11R6/include"
-		LDFLAGS="${LDFLAGS} -L/usr/local/lib -L/usr/X11R6/lib"
+		LDFLAGS="${LDFLAGS} -Wl,-E -L/usr/local/lib -L/usr/X11R6/lib"
 		PLUGINFLAGS="-shared"
+		ARCHIVER="tar czf"
+		ARCHIVE_SUFFIX="tar.gz"
+		PLATFORM=${host_os}
 
 		;;
 esac
@@ -126,6 +132,7 @@ AC_SUBST(AUDIOLIBS)
 AC_SUBST(CC)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(CXX)
+AC_SUBST(DLLTOOL)
 AC_SUBST(EXE_SUFFIX)
 AC_SUBST(GLLIBS)
 AC_SUBST(JAVAINCS)
@@ -133,8 +140,11 @@ AC_SUBST(JAVALIBS)
 AC_SUBST(LDFLAGS)
 AC_SUBST(PLATFORM)
 AC_SUBST(PLUGINFLAGS)
+AC_SUBST(PLUGINIMP)
+AC_SUBST(PLUGINLIB)
 AC_SUBST(QUICKTIMEFLAGS)
 AC_SUBST(RANLIB)
+AC_SUBST(REGEXLIB)
 AC_SUBST(VERSION)
 
 AC_PROG_CC
@@ -145,6 +155,8 @@ AC_PROG_LEX
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_YACC
+
+AC_CHECK_TOOL(DLLTOOL, dlltool, :)
 
 AC_PATH_PROG(MKDEP, mkdep)
 AC_PATH_PROG(MAKEDEPEND, makedepend)
@@ -168,6 +180,7 @@ AC_CHECK_LIB([gslcblas], [cblas_ccopy])
 AC_CHECK_LIB([gslblasnative], [gsl_blas_raw_dgemm])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc])
 AC_CHECK_LIB([tiff], [TIFFOpen])
+AC_CHECK_LIB([regex], [regcomp], [REGEXLIB=-lregex])
 
 case "${host_os}" in
 	darwin* )
@@ -204,7 +217,7 @@ AC_TYPE_SIZE_T
 
 AC_FUNC_STAT
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([bzero floor getcwd gethostbyaddr gethostbyname gettimeofday pow regcomp socket sqrt strcasecmp strchr strdup strerror strstr iswspace])
+AC_CHECK_FUNCS([floor getcwd gethostbyaddr gethostbyname gettimeofday pow regcomp socket sqrt strcasecmp strchr strdup strerror strstr iswspace])
 
 AC_MSG_CHECKING(how to generate dependency info)
 if test "$ac_cv_c_compiler_gnu" = yes; then

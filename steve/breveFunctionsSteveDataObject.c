@@ -36,7 +36,6 @@
 */ 
 
 #include "steve.h"
-#include "xml.h"
 #include "breveFunctionsSteveDataObject.h"
     
 /* check the variables of this object to make sure that it contains */
@@ -164,7 +163,7 @@ char *stPackObject(stInstance *i, int *length) {
     header->version = SDO_VERSION;
 
     strcpy(&package[sizeof(brDataObjectHeader)], i->type->name);
-    bcopy(&i->variables[i->type->varOffset], &package[sizeof(brDataObjectHeader) + header->nameLength], header->varSize);
+    memcpy(&package[sizeof(brDataObjectHeader) + header->nameLength], &i->variables[i->type->varOffset], header->varSize);
 
     return package;
 }
@@ -190,7 +189,7 @@ int stUnpackObject(stInstance *i, char *buffer, int length) {
         return -1;
     }
 
-    bcopy(&buffer[sizeof(brDataObjectHeader)], &name[0], header->nameLength);
+    memcpy(&name[0], &buffer[sizeof(brDataObjectHeader)], header->nameLength);
 
     name[header->nameLength] = 0;
 
@@ -199,8 +198,9 @@ int stUnpackObject(stInstance *i, char *buffer, int length) {
         return -1;
     }
 
-    bcopy(&buffer[header->nameLength + sizeof(brDataObjectHeader)], 
-          &i->variables[i->type->varOffset], header->varSize);
+    memcpy(&i->variables[i->type->varOffset],
+	&buffer[header->nameLength + sizeof(brDataObjectHeader)],
+	header->varSize);
 
     return 0;
 }
@@ -316,7 +316,7 @@ int stReadObject(stInstance *i, char *filename) {
     length = sizeof(brDataObjectHeader) + header.nameLength + header.varSize;
 
     package = slMalloc(length);
-    bcopy(&header, package, sizeof(brDataObjectHeader));
+    memcpy(package, &header, sizeof(brDataObjectHeader));
     
     result = slUtilFread(&package[sizeof(brDataObjectHeader)], 1, header.nameLength + header.varSize, fp);
 

@@ -32,7 +32,7 @@ slCamera *slCameraNew(int x, int y) {
 	unsigned int n;
 
 	c = new slCamera;
-	bzero(c, sizeof(slCamera));
+	memset(c, 0, sizeof(slCamera));
 
 	c->text.insert(c->text.begin(), 8, t);
 
@@ -321,7 +321,7 @@ void slSetShadowCatcher(slCamera *c, slStationary *s, slVector *normal) {
 	    return;
 	}
 
-	bcopy(&bestFace->plane, &c->shadowPlane, sizeof(slPlane));
+	memcpy(&c->shadowPlane, &bestFace->plane, sizeof(slPlane));
 
 	slVectorAdd(&c->shadowPlane.vertex, &s->position.location, &c->shadowPlane.vertex);
 

@@ -54,7 +54,7 @@ int brDataCopyVar(stVar *v, stInstance *src, stInstance *dst) {
 		case AT_DOUBLE:
 		case AT_VECTOR:
 		case AT_MATRIX:
-			bcopy(&src->variables[v->offset], &dst->variables[v->offset], stSizeofAtomic(v->type->type));
+			memcpy(&dst->variables[v->offset], &src->variables[v->offset], stSizeofAtomic(v->type->type));
 			break;
 
 		case AT_STRING:
@@ -96,7 +96,7 @@ int brDataCopyArray(stVar *v, stInstance *src, stInstance *dst) {
 		case AT_DOUBLE:
 		case AT_VECTOR:
 		case AT_MATRIX:
-			bcopy(&src->variables[v->offset], &dst->variables[v->offset], stSizeofAtomic(v->type->arrayType) * v->type->arrayCount);
+			memcpy(&dst->variables[v->offset], &src->variables[v->offset], stSizeofAtomic(v->type->arrayType) * v->type->arrayCount);
 			break;
 		case AT_STRING:
 			for(n=0;n<v->type->arrayCount;n++) {

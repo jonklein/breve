@@ -26,6 +26,14 @@
 
 #include "config.h"
 
+#ifdef WINDOWS
+#define DLLEXPORT __declspec(dllexport)
+#elif defined(__GNUC__) && (__GNUC__ >= 4)
+#define DLLEXPORT __attribute__ ((visibility("default")))
+#else
+#define DLLEXPORT
+#endif
+
 #ifdef MINGW
 
 #define usleep(x) _sleep((unsigned int)((x) / 1000.0))

@@ -469,7 +469,7 @@ int dearchiveMatrix(brEval arguments[], brEval *result, void *instance) {
 	brData *matrixData = BRDATA(&amp;arguments[0]);
 	double **matrix = malloc(100 * 100 * sizeof(double));
 
-	bcopy(matrixData->data, matrix, 100 * 100 * sizeof(double));
+	memcpy(matrix, matrixData->data, 100 * 100 * sizeof(double));
 
 	// now we return the matrix pointer to the object, and the state 
 	// of the object is restored!

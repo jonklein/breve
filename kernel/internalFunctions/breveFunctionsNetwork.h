@@ -22,36 +22,34 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#ifndef MINGW
 #include <sys/types.h>
 #include <unistd.h>
-#endif
 
 #include <pthread.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/file.h>
 
-void breveInitNetworkFuncs(brNamespace *n);
+void breveInitNetworkFuncs(brNamespace *);
 
-void *brHandleConnection(void *data);
+void *brHandleConnection(void *);
 
-brNetworkServer *brListenOnPort(int port, brEngine *engine);
-void *brListenOnSocket(void *serverData);
+brNetworkServer *brListenOnPort(int, brEngine *);
+void *brListenOnSocket(void *);
 
-int brIListenOnPort(brEval args[], brEval *target, brInstance *i);
-int brICloseServer(brEval args[], brEval *target, brInstance *i);
-int brISendObject(brEval args[], brEval *target, brInstance *i);
-int brIGetServerURL(brEval args[], brEval *target, brInstance *i);
-int brISetIndexPage(brEval args[], brEval *target, brInstance *i);
+int brIListenOnPort(brEval [], brEval *, brInstance *);
+int brICloseServer(brEval [], brEval *, brInstance *);
+int brISendObject(brEval [], brEval *, brInstance *);
+int brIGetServerURL(brEval [], brEval *, brInstance *);
+int brISetIndexPage(brEval [], brEval *, brInstance *);
 
-char *brFinishNetworkRead(brNetworkClientData *data, brNetworkRequest *request);
+char *brFinishNetworkRead(brNetworkClientData *, brNetworkRequest *);
 
-void brSendPage(brNetworkClientData *data, char *page);
+void brSendPage(brNetworkClientData *, char *);
 
-int brHandleHTTPConnection(brNetworkClientData *data, char *request);
+int brHandleHTTPConnection(brNetworkClientData *, char *);
 
-int brHTTPReadLine(int socket, char *buffer, size_t size );
+int brHTTPReadLine(int, char *, size_t);
 
 #define SL_NET_404  "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\
 <HTML><HEAD> \
@@ -71,5 +69,3 @@ The requested URL was not found on this server.<P> \
 <HTML><HEAD> \
 <TITLE>Command failed</TITLE> \
 </HEAD><BODY><H1>The requested breve command triggered an error or could not be found.</H1></BODY></HTML>"
-
-

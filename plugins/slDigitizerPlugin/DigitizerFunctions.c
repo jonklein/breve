@@ -279,7 +279,7 @@ void ccGaussianBlurRGB(unsigned char *source, unsigned char *dest, int x, int y)
 	int dindex = 0;
 	int rowBytes = x * 3;
 
-	bzero(dest, y*rowBytes);
+	memset(dest, 0, y*rowBytes);
 
 	for(n=0;n<y;n++) {
 		for(m=0;m<rowBytes;m++) {
@@ -332,9 +332,9 @@ ccIntensityMap *ccNewIntensityMap(int size) {
 	map->map[1] = malloc(size * size * sizeof(int));
 	map->delta = malloc(size * size * sizeof(int));
 
-	bzero(map->delta, size * size * sizeof(int));
-	bzero(map->map[0], size * size * sizeof(int));
-	bzero(map->map[1], size * size * sizeof(int));
+	memset(map->delta, 0, size * size * sizeof(int));
+	memset(map->map[0], 0, size * size * sizeof(int));
+	memset(map->map[1], 0, size * size * sizeof(int));
 
 	map->active = 0;
 	map->size = size;

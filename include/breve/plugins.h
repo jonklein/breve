@@ -30,11 +30,11 @@ struct brDlPlugin {
 #ifdef __cplusplus
 extern "C" {
 #endif
-int brEngineAddDlPlugin(char *filename, char *func, brEngine *engine);
-void brEngineRemoveDlPlugins(brEngine *engine);
-void *brDlLoadPlugin(char *filename, char *loadFunc, brNamespace *n);
+int brEngineAddDlPlugin(char *, char *, brEngine *);
+void brEngineRemoveDlPlugins(brEngine *);
+void *brDlLoadPlugin(char *, char *, brNamespace *);
 
-char *brPluginFindFile(char *file, void *i);
+DLLEXPORT char *brPluginFindFile(char *, void *);
 
 #ifdef __cplusplus
 }

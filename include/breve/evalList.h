@@ -70,7 +70,7 @@ typedef struct brEvalListCopyRecord brEvalListCopyRecord;
 extern "C" {
 #endif
 
-brEvalListHead *brEvalListNew(void);
+DLLEXPORT brEvalListHead *brEvalListNew(void);
 void brEvalListFree(brEvalListHead *);
 
 int brEvalListCompare(const void *, const void *);
@@ -84,7 +84,7 @@ brEvalListHead *brEvalListCopy(brEvalListHead *);
 
 brEvalList *brEvalListIndexLookup(brEvalListHead *, int);
 
-int brEvalListInsert(brEvalListHead *, int, brEval *);
+DLLEXPORT int brEvalListInsert(brEvalListHead *, int, brEval *);
 int brEvalListRemove(brEvalListHead *, int, brEval *);
 
 brEvalList *brEvalListIndexLookup(brEvalListHead *, int);

@@ -1,17 +1,16 @@
-BREVEDIR	=	../..
+BREVEDIR	= ../..
+CC		= @CC@
+CFLAGS		= @CPPFLAGS@ -I..
 
 all: URLPlugin.o
 
-URLPlugin.o: URLFunctions.o
-	$(CC) @PLUGINFLAGS@ @LDFLAGS@ -o URLPlugin.o URLFunctions.o -lcurl
-
-.c.o:
-	$(CC) -g @CPPFLAGS@ -c $*.c -I.. 
+URLPlugin.o: URLFunctions.o @PLUGINLIB@
+	$(CC) @PLUGINFLAGS@ @LDFLAGS@ -o $@ $^ -lcurl
 
 clean:
-	-rm -f *.o
+	rm -f *.o
 
 install: all
-	-mkdir /usr/local/lib/breve/plugins
-	cp pushPlugin.o /usr/local/lib/breve/plugins
-	cp Push.tz /usr/local/lib/breve/plugins
+	mkdir -p @libdir@/breve/plugins
+	cp URLPlugin.o @libdir@/breve/plugins
+	cp URLPlugin.tz @libdir@/breve/plugins

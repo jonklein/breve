@@ -198,7 +198,7 @@ char *slUtilReadFile(char *path) {
 
 		buffer = (char*)slRealloc(buffer, total + n + 1);
 
-		bcopy(temp, &buffer[total], n);
+		memcpy(&buffer[total], temp, n);
 		
 		total += n;
 	}
@@ -247,7 +247,7 @@ char *slUtilReadStream(FILE *stream) {
 
 		buffer = (char*)slRealloc(buffer, total + n + 1);
 
-		bcopy(temp, &buffer[total], n);
+		memcpy(&buffer[total], temp, n);
 		
 		total += n;
 	}

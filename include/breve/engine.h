@@ -310,8 +310,9 @@ void brEngineSetIOPath(brEngine *, char *);
 char *brOutputPath(brEngine *, char *);
 
 brEngine *brEngineNew(void);
-void brMakeiTunesData(brEngine *);
 void brEngineFree(brEngine *);
+
+void brMakeiTunesData(brEngine *);
 
 void brPauseTimer(brEngine *);
 void brUnpauseTimer(brEngine *);

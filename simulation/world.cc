@@ -55,7 +55,7 @@ slWorld *slWorldNew() {
 	gPhysicsErrorMessage = NULL;
 
 	w = new slWorld;
-	bzero(w, sizeof(slWorld));
+	memset(w, 0, sizeof(slWorld));
 
 	slAllocIntegrationVectors(w);
 
@@ -414,7 +414,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 
 					contact = &con;
 
-					bzero(contact, sizeof(dContact));
+					memset(contact, 0, sizeof(dContact));
 					contact->surface.mode = dContactSoftERP|dContactApprox1|dContactBounce;
 					// contact->surface.mode = dContactSoftERP|dContactBounce;
 

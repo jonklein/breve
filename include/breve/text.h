@@ -21,11 +21,7 @@
 #include <stdio.h>
 #include <zlib.h>
 
-#ifdef WINDOWS
-#define bcopy(x, y, z) memcpy((y), (x), z)
-#endif
-
-char *slStrdup(char *);
+DLLEXPORT char *slStrdup(char *);
 char *slStrdupAndFree(char *);
 
 char *slSplit(char *, char *, int);
