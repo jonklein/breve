@@ -26,7 +26,7 @@ case "${host_os}" in
 		GLLIBS="-L/usr/X11R6/lib -lglut -lGL -lGLU -lXmu -lXt -lSM -lICE -lX11 -lXi -lXext"
 		PLUGINFLAGS="-shared"
 		AC_DEFINE([LINUX], [], [Linux])
-		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E"
+		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E -Xlinker -Bstatic"
 
 		;;
 
