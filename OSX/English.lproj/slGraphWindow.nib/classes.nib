@@ -1,0 +1,20 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = slGLWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {window = id; windowView = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = slGLWindowView; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = slGraphWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {graphView = id; window = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = slGraphWindowView; LANGUAGE = ObjC; SUPERCLASS = NSOpenGLView; }
+    ); 
+    IBVersion = 1; 
+}

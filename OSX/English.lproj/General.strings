@@ -1,0 +1,19 @@
+/*
+    To localize: keep the left hand size string the same--this is used to 
+    identify the message internally.  The right hand size message is what 
+    should be localized.
+*/
+
+/* GENERAL PURPOSE STRINGS */
+
+"Fullscreen Error Title" = "Error Starting Fullscreen Simulation";
+
+"Fullscreen Error Message" = "An error occured while attempting to run this simulation in fullscreen mode.\n\nThis typically occurs when there is not enough graphics card memory for fullscreen OpenGL rendering.  Try reducing the screen resolution or the number of colors and try again.";
+
+"Welcome Title" = "Welcome to breve 1.9";
+
+"Welcome Message" = "Welcome to breve 1.9.  Please read the included README file before continuing.\n\nIf this is your first time running breve, start by selecting a demo from the Demo menu, and hitting the run button.  If you have written simulations in previous versions, please read about the changes and new features in the included Changes file.";
+
+"Syntax Check Passed Title" = "Syntax Check Passed";
+
+"Syntax Check Passed Message" = "No errors found during syntax check.";

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Classes</key>
+	<dict>
+		<key>slBreveApplication</key>
+		<dict>
+			<key>Attributes</key>
+			<dict>
+				<key>fullscreen</key>
+				<dict>
+					<key>Description</key>
+					<string>Is the current simulation set to run fullscreen?</string>
+					<key>Name</key>
+					<string>fullscreen</string>
+				</dict>
+			</dict>
+			<key>Description</key>
+			<string>breve's top level scripting object.</string>
+			<key>Name</key>
+			<string>application</string>
+			<key>PluralName</key>
+			<string>applications</string>
+		</dict>
+	</dict>
+	<key>Commands</key>
+	<dict>
+		<key>sleep</key>
+		<dict>
+			<key>Arguments</key>
+			<dict/>
+			<key>Description</key>
+			<string>this command sleeps for some number of seconds</string>
+			<key>Name</key>
+			<string>sleep</string>
+		</dict>
+		<key>startsim</key>
+		<dict>
+			<key>Description</key>
+			<string>starts the currently selected simulation</string>
+			<key>Name</key>
+			<string>startsim</string>
+		</dict>
+		<key>stopsim</key>
+		<dict>
+			<key>Description</key>
+			<string>stops the currently running simulation</string>
+			<key>Name</key>
+			<string>stopsim</string>
+		</dict>
+	</dict>
+	<key>Description</key>
+	<string>breve specific classes</string>
+	<key>Name</key>
+	<string>breve suite</string>
+</dict>
+</plist>

@@ -1,0 +1,125 @@
+/*
+    To localize: keep the left hand size string the same--this is used to 
+    identify the message internally.  The right hand size message is what 
+    should be localized.
+*/
+
+/* EVALUATION ERROR TITLES */
+
+"No Error Title" = "No Error";
+
+"Unknown Controller Error Title" = "Unknown Controller Error";
+
+"Simulation Triggered Error Title" = "Simulation Triggered Error";
+
+"Internal Error Title" = "Internal Error";
+
+"Type Error Title" = "Type Error";
+
+"Array Error Title" = "Array Error";
+
+"Conversion Error Title" = "Conversion Error";
+
+"Freed Instance Error Title" = "Freed Instance Error";
+
+"NULL Instance Error Title" = "NULL Instance Error";
+
+"Math Error Title" = "Math Error";
+
+"Simulation Error Title" = "Simulation Error";
+
+"Bounds Error Title" = "Bounds Error";
+
+"Unknown Object Error Title" = "Unknown Object Error";
+
+"Unknown Method Error Title"  = "Unknown Method Error";
+
+"Unknown Keyword Error Title"  = "Unknown Keyword Error";
+
+"Missing Keyword Error Title"  = "Missing Keyword Error";
+
+/* ======= EVALUATION ERROR TEXT ======= */
+
+"No Error Text" = "No error occurred.";
+
+"Unknown Controller Error Title" = "An \"unknown controller error\" indicates that the Controller object specified in this simulation cannot be found.  Check the spelling of the classname and confirm that the class is properly defined.";
+
+"Simulation Triggered Error Text" = "A \"simulation triggered error\" indicates that this error was triggered manually from within the simulation using the \"die\" command.";
+
+"Internal Error Text" = "An \"internal error\" indicates that a bug was encountered in the simulation environment software during the simulation.\n\nPlease file a bug report which includes a copy of the simulation which triggered this bug.";
+
+"Type Error Text" = "A \"type error\" indicates that a certain expression expected one type of value, but was given another.\n\nThe error text should indicate that a certain type was expected, or, in some cases that a certain type is explicitly not allowed in the specified expression.  Not all operators can be used on all types--make sure that the type operator you are using is compatible with the type it is given.";
+
+"Array Error Text" = "An \"array error\" indicates that a variable defined as an array is being used as a simple variable.\n\nThe only legal way to use an array variable is in conjunction with an array index, in order to access or assign a specific member of the array.";
+
+"Conversion Error Text" = "A \"conversion error\" indicates that an error occurred while attempting to convert one type to another.\n\nThis error indicates that a certain type was expected for an evaluation and that the value given could not be converted to the desired type.";
+
+"Freed Instance Error Text" = "A \"freed instance error\" indicates that a freed instance is being referenced in the simulation, most likely with a method call.\n\nIf instances are freed during the course of your simulation, they should be tested before they are passed method calls.";
+
+"NULL Instance Error Text" = "A \"NULL instance error\" indicates that a method is being called with an uninitialized instance.\n\nAll instances must be instantiated using the \"new\" operator before they are passed messages.";
+
+"Math Error Text" = "A \"math error\" indicates that an error occurred while evaluating a mathematical expression.\n\nThe error indicates that invalid values were used in the mathematical expression, such as a division or modulus by zero.";
+
+"Simulation Error Text" = "A \"simulation error\" indicates that an error occurred while simulating the world.  Simulation errors are most commonly caused by numerical overflows during simulation and are not easy to track down.\n\nSome common problems include:\n- deeply penetrating objects when the simulation begins\n- extremely high forces or torques acting on objects\n- very large or very small object masses";
+
+"Bounds Error Text" = "A \"bounds error\" indicates that the simulation attempted to access or assign an element of a list which is too large.  Make sure that you do not try to access or assign elements with indexes larger than the length of the list.";
+
+"Unknown Object Error Text" = "An \"unknown object\" error indicates that the \"new\" operator was called with an object name that could not be found.\n\nMake sure that the proper object file is included and that the object name is spelled correctly.";
+
+"Unknown Method Error Text" = "An \"unknown method error\" indicates that the method called in an object could not be found.\n\nCheck the definition of the target object type and confirm that the method is defined.";
+
+"Unknown Keyword Error Text" = "An \"unknown keyword error\" indicates that one of the keywords passed to the method in question is unknown.\n\nCheck that the keywords passed to the method match the keywords defined in the method definition.";
+
+"Missing Keyword Error Text" = "A \"missing keyword error\" indicates that at least one keyword is missing from the method call in question.\n\nCheck the definition of the method and make sure that all the keywords are passed in.";
+
+/* PARSE ERROR TITLES */
+
+"Parse Error Title" = "Parse Error";
+
+"Syntax Error Title" = "Syntax Error";
+
+"Internal Error Title" = "Internal Error";
+
+"Unknown Symbol Error Title" = "Unknown Symbol Error";
+
+"Unknown Function Error Title" = "Unknown Function Error";
+
+"Unknown Object Error Title" = "Unknown Object Error";
+
+"Redefinition Error Title" = "Redefinition Error";
+
+"Type Error Title" = "Type Error";
+
+"Function Prototype Error Title" = "Function Prototype Error";
+
+"No Controller Error Title" = "No Controller Error";
+
+"File Not Found Title"  = "File Not Found";
+
+"Incompatible File Error Title" = "Incompatible File Error";
+
+/* ======= PARSE ERROR TEXT ======== */
+
+"Parse Error Text" = "A \"parse error\" is a very general error indicating that the parser encountered unexpected input.\n\nThe error can sometimes be hard to track down, as it does not always appear on the line specified by this error message--it is possible that the error occurs on a preceding line but is not discovered until the line specified.  Check for missing punctuation, misspellings and missing keywords in method calls.";
+
+"Syntax Error Text" = "A \"syntax error\" indicates that a specific syntax error was encountered while parsing the simulation.\n\nThe error description above should describe the problem and how it can be fixed.";
+
+"Internal Error Text" = "An \"internal error\" indicates that a bug was encountered in this program while parsing the simulation.\n\nPlease file a bug report which includes a copy of the simulation which triggered this bug.";
+
+"Unknown Symbol Error Text" = "An \"unknown symbol error\" indicates that an unknown variable was referenced.\n\nCheck that the variable is properly declared and that the variable name is spelled correctly.";
+
+"Unknown Function Error Text" = "An \"unknown function error\" indicates that a call was made to an unknown function.\n\nConfirm that the function exists and that the function name is spelled correctly.";
+
+"Unknown Object Error Text" = "An \"unknown object error\" indicates that a reference was made to an unknown object type.\n\nConfirm that the right class files are imported and that the class name is spelled correctly.";
+
+"Redefinition Error Text" = "A \"redefinition error\" indicates that a symbol (such as a class name, variable or method name) has been defined more than once.";
+
+"Type Error Text" = "A \"type error\" indicates that the parser expected a different datatype while parsing an expression.";
+
+"Function Prototype Error Text" = "A \"function prototype error\" indicates the wrong number of arguments were passed to the specified function.";
+
+"No Controller Error Text" = "A \"no controller error\" indicates that no Controller object was found in the simulation code.  Every simulation must have a single Controller object defined.";
+
+"File Not Found Text"  = "A \"file not found\" error indicates that the simulation could not continue because a necessary file was not found.\n\nCheck to see that the specified file is available and that a @path line specifies its location if necessary.";
+
+"Incompatible File Text" = "An \"incompatible file version\" error indicates that the simulation could not continue because one of the files required by the simulation is an incompatible version for this simulation.\n\nExamine the simulation file to find out what specific versions of breve class files are required for this simulation.";

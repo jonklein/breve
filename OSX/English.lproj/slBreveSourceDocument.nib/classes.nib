@@ -1,0 +1,41 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = MyDocument; LANGUAGE = ObjC; SUPERCLASS = NSDocument; }, 
+        {
+            ACTIONS = {
+                find = id; 
+                findNext = id; 
+                findPrevious = id; 
+                findSelection = id; 
+                scrollToSelection = id; 
+            }; 
+            CLASS = slBreveSourceDocument; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {sourceWindow = id; steveText = id; }; 
+            SUPERCLASS = NSDocument; 
+        }, 
+        {
+            ACTIONS = {
+                commentSelection = id; 
+                findNext = id; 
+                findPrevious = id; 
+                goToMethod = id; 
+                uncommentSelection = id; 
+            }; 
+            CLASS = slTextView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                findCaseSwitch = id; 
+                findMessage = id; 
+                findText = id; 
+                findWindow = id; 
+                lineNumberBox = id; 
+                thePopupMenu = id; 
+                thisWindow = id; 
+            }; 
+            SUPERCLASS = NSTextView; 
+        }
+    ); 
+    IBVersion = 1; 
+}

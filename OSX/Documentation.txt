@@ -1,0 +1,3 @@
+Full documentation for breve is available from the breve application's
+help menu, or online at:
+	http://www.spiderland.org/breve/docs
