@@ -238,7 +238,7 @@ unsigned int slCompString(void *a, void *b) {
 unsigned int slHashPointer(void *p, unsigned int n) {
 	unsigned int total = 0;
 	void *localP = p;
-	unsigned char *start = (char*)&localP;
+	unsigned char *start = (unsigned char*)&localP;
 	unsigned int c;
 
 	for(c=0;c<sizeof(void*);c++) total += start[c];

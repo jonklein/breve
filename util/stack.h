@@ -37,5 +37,4 @@ void slStackFree(slStack *s);
 int slStackPush(slStack *s, void *data);
 int slStackRemove(slStack *s, void *remove);
 
-void *slStackPop(slStack *s);
 void slStackClear(slStack *s);

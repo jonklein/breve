@@ -17,14 +17,14 @@ slStringStream *slOpenStringStream() {
 	char nameTemplate[128];
 
 #ifdef WINDOWS
-	// no mkstemp -- here's an inaqaduate solution!
+	// no mkstemp -- here a totally inaqaduate solution!
 	sprintf(nameTemplate, "breve_temp.%d", random() % 10000);
 #else 
 	sprintf(nameTemplate, "/tmp/breve_temp.XXXXXX");
 	fd = mkstemp(nameTemplate);
 #endif
 
-	stream = slMalloc(sizeof(slStringStream));	
+	stream = new slStringStream;
 	stream->fp = fdopen(fd, "w");
 	stream->filename = slStrdup(nameTemplate);
 
@@ -39,7 +39,7 @@ char *slCloseStringStream(slStringStream *stream) {
 	result = slUtilReadFile(stream->filename);
 	unlink(stream->filename);
 	slFree(stream->filename);
-	slFree(stream);
+	delete stream;
 
 	return result;
 }

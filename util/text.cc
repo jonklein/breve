@@ -112,7 +112,7 @@ int slUtilFwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream) {
 	unsigned int n, written = 0;
 
 	while(written < nmemb) {
-		n = fwrite(ptr + (written * size), size, nmemb - written, stream);
+		n = fwrite((char*)ptr + (written * size), size, nmemb - written, stream);
 
 		if(n < 1) return -1;
 
@@ -131,7 +131,7 @@ int slUtilFread(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 	unsigned int n, readcount = 0; 
   
 	while(readcount < nmemb) {
-		n = fread(ptr + (readcount * size), size, nmemb - readcount, stream);
+		n = fread((char*)ptr + (readcount * size), size, nmemb - readcount, stream);
  
 		if(n<1) return -1;
   
@@ -288,7 +288,7 @@ int slUtilRead(int socket, void *buffer, size_t size ) {
 	int n, readcount = 0; 
   
 	while(readcount < size) {
-		n = read(socket, buffer + readcount, size - readcount);
+		n = read(socket, (char*)buffer + readcount, size - readcount);
 		if(n < 1) return readcount;
   
 		readcount += n;
@@ -303,7 +303,8 @@ int slUtilRead(int socket, void *buffer, size_t size ) {
 */
 
 int slUtilWrite(int socket, const void *buffer, size_t size ) {
-	int n, writecount = 0; 
+	int n; 
+	unsigned int writecount = 0; 
   
 	while(writecount < size) {
 		n = write(socket, buffer + writecount, size - writecount);
