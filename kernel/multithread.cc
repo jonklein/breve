@@ -33,11 +33,11 @@ void *stIterationThread(void *data) {
 
 		printf("result from unlocking condition %d for thread %d\n", pthread_mutex_unlock(&e->conditionLock), threadData->number);
 
-		while(e->lastScheduled < e->instances->count) {
+		while(e->lastScheduled < e->instances.size()) {
 			printf("locked mutex %p %d, thread %d\n", &e->scheduleLock, pthread_mutex_lock(&e->scheduleLock), threadData->number);
 			printf("locked mutex %p %d, thread %d\n", &e->lock, pthread_mutex_lock(&e->lock), threadData->number);
 		
-			if(e->lastScheduled < e->instances->count) {
+			if(e->lastScheduled < e->instances.size()) {
 				int n;
 
 				e->lastScheduled++;
@@ -45,7 +45,7 @@ void *stIterationThread(void *data) {
 
 				printf("got schedule lock for %d, thread %d at time %f\n", n, threadData->number, slWorldGetAge(e->world));
 
-				if(e->instances->data[n]) {
+				if(e->instances[n]) {
 					// rcode = brMethodCall(e->instances[n], e->instances[n]->iterate, NULL, &result);
 				}
 

@@ -18,6 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-void stHSVtoRGB(slVector *rgb, slVector *hsv);
-void stRGBtoHSV(slVector *hsv, slVector *rgb);
-void stUniqueColor(slVector *color, int n);
+void brHSVtoRGB(slVector *rgb, slVector *hsv);
+void brRGBtoHSV(slVector *hsv, slVector *rgb);
+void brUniqueColor(slVector *color, int n);

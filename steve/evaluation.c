@@ -103,7 +103,7 @@ inline int stPointerForExp(stExp *expression, stRunInstance *i, void **pointer, 
 inline int stEvalLoadPointer(stLoadExp *e, stRunInstance *i, void **pointer, int *type) {
 	*type = e->type;
 
-	if(e->local) *pointer = &i->instance->type->engine->stack[e->offset];
+	if(e->local) *pointer = &i->instance->type->steveData->stack[e->offset];
 	else *pointer = &i->instance->variables[e->offset];
 
 	return EC_OK;
@@ -636,15 +636,18 @@ inline int stEvalArray(slArray *a, stRunInstance *i, brEval *target) {
 		if(a->data[count]) {
 			n = stExpEval(a->data[count], i, target, NULL);
 
-			/* free the string or evalList, unless it's being returned */
+			// free the string or evalList, unless it's being returned 
 
 			if(n == EC_ERROR) {
+				brErrorInfo *error = brEngineGetErrorInfo(i->type->engine);
+
 				e = a->data[count];
-				i->instance->type->engine->error.line = e->line;
+				error->line = e->line;
 
-				if(i->instance->type->engine->error.file) slFree(i->instance->type->engine->error.file);
+				if(error->file) slFree(error->file);
 
-				i->instance->type->engine->error.file = slStrdup(e->file);
+				error->file = slStrdup(e->file);
+
 				slMessage(DEBUG_ALL, "... error in file \"%s\" at line %d\n", e->file, e->line);
 				return EC_ERROR_HANDLED;
 			} else if(n == EC_ERROR_HANDLED) return EC_ERROR_HANDLED;
@@ -1043,7 +1046,7 @@ inline int stEvalForeach(stForeachExp *w, stRunInstance *i, brEval *target) {
 
 	target->type = AT_NULL;
 
-	if(assignExp->local) iterationPointer = &i->instance->type->engine->stack[assignExp->offset];
+	if(assignExp->local) iterationPointer = &i->instance->type->steveData->stack[assignExp->offset];
 	else iterationPointer = &i->instance->variables[assignExp->offset];
 
 	stExpEval(w->list, i, &list, NULL);
@@ -1060,8 +1063,12 @@ inline int stEvalForeach(stForeachExp *w, stRunInstance *i, brEval *target) {
 
 		if((result = brEvalCopy(&el->eval, &eval)) != EC_OK) return result;
 
-        if(assignExp->objectName && !assignExp->objectType)
-			assignExp->objectType = stObjectFind(i->instance->type->engine->objects, assignExp->objectName);
+        if(assignExp->objectName && !assignExp->objectType) {
+			brObject *object = brObjectFind(i->instance->type->engine, assignExp->objectName);
+
+			if(object) assignExp->objectType = object->userData;
+			else assignExp->objectType = NULL;
+		}
 
 		if((result = stSetVariable(iterationPointer, assignExp->type, assignExp->objectType, &eval, i)) != EC_OK) {
 			return result;
@@ -1197,12 +1204,14 @@ inline int stEvalAll(stAllExp *e, stRunInstance *i, brEval *target) {
 	brEval instance;
 
 	if(!e->object) {
-		e->object = stObjectFind(i->instance->type->engine->objects, e->name);
+		brObject *type = brObjectFind(i->instance->type->engine, e->name);
 
-		if(!e->object) {
+		if(!type) {
 			stEvalError(i->instance->type->engine, EE_UNKNOWN_OBJECT, "unknown object type \"%s\" in \"all\" expression\n", e->name);
 			return EC_ERROR;
 		}
+
+		e->object = type->userData;
 	}
 
 	l = e->object->allInstances;
@@ -1519,7 +1528,7 @@ inline int stEvalArrayIndexPointer(stArrayIndexExp *a, stRunInstance *i, void **
 		return EC_ERROR;
 	}
 
-	if(a->local) *pointer = &i->instance->type->engine->stack[a->offset];
+	if(a->local) *pointer = &i->instance->type->steveData->stack[a->offset];
 	else *pointer = &i->instance->variables[a->offset];
 
 	*pointer += a->typeSize * offset;
@@ -1565,7 +1574,7 @@ inline int stEvalArrayIndexAssign(stArrayIndexAssignExp *a, stRunInstance *i, br
 		return EC_ERROR;
 	}
 
-	if(a->local) pointer = &i->instance->type->engine->stack[a->offset];
+	if(a->local) pointer = &i->instance->type->steveData->stack[a->offset];
 	else pointer = &i->instance->variables[a->offset];
 
 	pointer += a->typeSize * BRINT(&indexExp);
@@ -1584,11 +1593,14 @@ inline int stEvalAssignment(stAssignExp *a, stRunInstance *i, brEval *t) {
 		return result;
 	}
 
-	if(a->local) pointer = &i->instance->type->engine->stack[a->offset];
+	if(a->local) pointer = &i->instance->type->steveData->stack[a->offset];
 	else pointer = &i->instance->variables[a->offset];
 
-	if(a->objectName && !a->objectType)
-		a->objectType = stObjectFind(i->instance->type->engine->objects, a->objectName);
+	if(a->objectName && !a->objectType) {
+		brObject *object = brObjectFind(i->instance->type->engine, a->objectName);
+
+		if(object) a->objectType = object->userData;
+	}
 
 	result = stSetVariable(pointer, a->type, a->objectType, t, i);
 
@@ -2270,17 +2282,17 @@ int stCallMethod(stRunInstance *old, stRunInstance *newI, stMethod *method, brEv
 		return EC_ERROR;
 	}
 
-	savedStackPointer = newI->instance->type->engine->stack;
+	savedStackPointer = newI->instance->type->steveData->stack;
 
 	// if there is no current stackpointer (outermost frame), start at the end of the stack 
 
-	if(savedStackPointer == NULL) newI->instance->type->engine->stack = &newI->instance->type->engine->stackBase[ST_STACK_SIZE];
+	if(savedStackPointer == NULL) newI->instance->type->steveData->stack = &newI->instance->type->steveData->stackBase[ST_STACK_SIZE];
 
 	// step down the stack enough to make room for the current calling method
 
-	newStStack = newI->instance->type->engine->stack - method->stackOffset;
+	newStStack = newI->instance->type->steveData->stack - method->stackOffset;
 
-	if(newStStack < newI->instance->type->engine->stackBase) {
+	if(newStStack < newI->instance->type->steveData->stackBase) {
 		slMessage(DEBUG_ALL, "Stack overflow in class \"%s\" method \"%s\"\n", newI->instance->type->name, method->name);
 		return EC_ERROR;
 	}
@@ -2292,22 +2304,26 @@ int stCallMethod(stRunInstance *old, stRunInstance *newI, stMethod *method, brEv
 	for(n=0;n<argcount;n++) {
 		keyEntry = method->keywords->data[n];
 
-        if(keyEntry->var->type->objectName && !keyEntry->var->type->objectType)
-			keyEntry->var->type->objectType = stObjectFind(newI->instance->type->engine->objects, keyEntry->var->type->objectName);
+        if(keyEntry->var->type->objectName && !keyEntry->var->type->objectType) {
+			brObject *o = brObjectFind(newI->instance->type->engine, keyEntry->var->type->objectName);
+
+			if(o) keyEntry->var->type->objectType = o->userData;
+			else keyEntry->var->type->objectType = NULL;
+		}
 
 		result = stSetVariable(&newStStack[keyEntry->var->offset], keyEntry->var->type->type, keyEntry->var->type->objectType, args[n], newI);
 
 		if(result != EC_OK) {
 			slMessage(DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", keyEntry->keyword, method->name);
-			newI->instance->type->engine->stackRecord = newI->instance->type->engine->stackRecord->previousStackRecord;
+			newI->instance->type->steveData->stackRecord = newI->instance->type->steveData->stackRecord->previousStackRecord;
 			return result;
 		}
 	}
 
 	record.instance = newI->instance;
 	record.method = method;
-	record.previousStackRecord = newI->instance->type->engine->stackRecord;
-	newI->instance->type->engine->stackRecord = &record;
+	record.previousStackRecord = newI->instance->type->steveData->stackRecord;
+	newI->instance->type->steveData->stackRecord = &record;
 	record.gcStack = newI->instance->gcStack;
 
 	currentGCStack = newI->instance->gcStack = slStackNew();
@@ -2315,7 +2331,7 @@ int stCallMethod(stRunInstance *old, stRunInstance *newI, stMethod *method, brEv
 	// prepare for the actual method call 
 
 	target->type = AT_NULL;
-	newI->instance->type->engine->stack = newStStack;
+	newI->instance->type->steveData->stack = newStStack;
 
 	result = stEvalArray(method->code, newI, target);
 
@@ -2378,8 +2394,8 @@ int stCallMethod(stRunInstance *old, stRunInstance *newI, stMethod *method, brEv
 
 	// restore the previous stack and stack records
 
-	newI->instance->type->engine->stack = savedStackPointer;
-	newI->instance->type->engine->stackRecord = record.previousStackRecord;
+	newI->instance->type->steveData->stack = savedStackPointer;
+	newI->instance->type->steveData->stackRecord = record.previousStackRecord;
 
 	return result;
 }
@@ -2405,8 +2421,8 @@ int stCallMethodByNameWithArgs(stRunInstance *newI, char *name, brEval **args, i
 	return stCallMethod(NULL, &ri, method, args, argcount, result);
 }
 
-void stStackTrace(brEngine *e) {
-	stStackRecord *r = e->stackRecord;
+void stStackTrace(stSteveData *d) {
+	stStackRecord *r = d->stackRecord;
 
 	slMessage(NORMAL_OUTPUT, "breve engine tack trace:\n");
 
@@ -2850,21 +2866,22 @@ int stEvalBinaryEvalListExp(char op, brEval *l, brEval *r, brEval *target, stRun
 void stEvalError(brEngine *e, int type, char *proto, ...) {
 	va_list vp;
 	char localMessage[BR_ERROR_TEXT_SIZE];
+	brErrorInfo *error = brEngineGetErrorInfo(e);
 
-	if(e->error.type == 0) {
+	if(error->type == 0) {
 		// if this is the first stEvalError, this is the primary error -- 
 		// print out all of the information
 
-		e->error.type = type;
+		error->type = type;
         
 		va_start(vp, proto);
-		vsnprintf(e->error.message, BR_ERROR_TEXT_SIZE, proto, vp);
+		vsnprintf(error->message, BR_ERROR_TEXT_SIZE, proto, vp);
 		va_end(vp); 
 
-		slMessage(DEBUG_ALL, e->error.message);
+		slMessage(DEBUG_ALL, error->message);
 		slMessage(DEBUG_ALL, "\n");
 
-		stStackTrace(e);
+		// stStackTrace(e);
 	} else {
 		va_start(vp, proto);
 		vsnprintf(localMessage, BR_ERROR_TEXT_SIZE, proto, vp);

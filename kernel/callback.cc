@@ -37,7 +37,7 @@
 */
 
 int brCheckCollisionCallback(brInstance *o1, brInstance *o2, int type) {
-	int n;
+	unsigned int n;
 	brCollisionHandler *h;
 
 	if(!o1 || !o2) return NULL;
@@ -96,7 +96,7 @@ int brCheckCollisionCallback(brInstance *o1, brInstance *o2, int type) {
 */
 
 void brCollisionCallback(brInstance *o1, brInstance *o2, int type) {
-	int n;
+	unsigned int n;
 	brMethod *meth;
 	brEval collider, result;
 	brCollisionHandler *h;

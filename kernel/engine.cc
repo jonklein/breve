@@ -46,7 +46,7 @@ brEngine *brEngineNew() {
 	Pa_Initialize();
 #endif
 
-	e = slMalloc(sizeof(brEngine));
+	e = new brEngine;
 	e->speedFactor = 1.0;
 
 	e->simulationWillStop = 0;
@@ -75,7 +75,7 @@ brEngine *brEngineNew() {
 	e->logFile = stderr;
 #endif /* MACOSX */
 
-	e->path = slMalloc(MAXPATHLEN + 1);
+	e->path = new char[MAXPATHLEN + 1];
 	e->drawEveryFrame = 1;
 
 	e->dlPlugins = NULL;
@@ -90,13 +90,6 @@ brEngine *brEngineNew() {
 
 	e->realTime.tv_sec = 0;
 	e->realTime.tv_usec = 0;
-
-	e->stackRecord = NULL;
-
-	if(!e->world) {
-		slFree(e);
-		return NULL;
-	}
 
 	if(pthread_mutex_init(&e->lock, NULL)) {
         slMessage(0, "warning: error creating lock for breve engine\n");
@@ -126,15 +119,6 @@ brEngine *brEngineNew() {
 		slMessage(0, "warning: error creating pthread condition variable\n");
 	}
 
-	e->controllerName = NULL;
-
-	// allocate self-growing stacks for the instances and the 
-	// iteration methods
-
-	e->instances = slStackNew();
-	e->postIterationInstances = slStackNew();
-	e->iterationInstances = slStackNew();
-
 	// namespaces holding object names and method names 
 
 	e->objects = brNamespaceNew(128);
@@ -144,7 +128,7 @@ brEngine *brEngineNew() {
 
 	e->searchPath = NULL;
 
-	brEngineSetIOPath(e, "");
+	brEngineSetIOPath(e, ".");
 
 	// load all of the internal breve functions
 
@@ -164,7 +148,6 @@ brEngine *brEngineNew() {
 	}
 
 	if((envpath = getenv("HOME"))) {
-		// the user's home directory as a search path
 		brAddSearchPath(e, envpath);
 	}
 
@@ -175,7 +158,7 @@ brEngine *brEngineNew() {
 	for(n=1;n<e->nThreads;n++) {
 		stThreadData *data;
 
-		data = slMalloc(sizeof(stThreadData));
+		data = new stThreadData;
 		data->engine = e;
 		data->number = n;
 		pthread_create(&data->thread, NULL, stIterationThread, data);
@@ -183,6 +166,15 @@ brEngine *brEngineNew() {
 
 	return e;
 }
+
+brInternalFunction *brEngineInternalFunctionLookup(brEngine *e, char *name) {
+	brNamespaceSymbol *s = brNamespaceLookup(e->internalMethods, name);
+
+	if(!s || s->type != ST_FUNC) return NULL;
+
+	return s->data;
+}
+
 
 /*!
 	\brief Frees a breve engine.
@@ -192,7 +184,7 @@ brEngine *brEngineNew() {
 
 void brEngineFree(brEngine *e) {
 	slList *l;
-	int n;
+	std::vector<brInstance*>::iterator bi;
 
 #if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
 	if(e->soundMixer) brFreeSoundMixer(e->soundMixer);
@@ -207,25 +199,22 @@ void brEngineFree(brEngine *e) {
 	OSMesaDestroyContext(e->osContext);
 #endif
 
-	for(n=0;n<e->instances->count;n++) 
-		brInstanceRelease(e->instances->data[n]);
+	for(bi = e->instances.begin(); bi != e->instances.end(); bi++ )
+		brInstanceRelease(*bi);
 
-	for(n=0;n<e->instances->count;n++) {
-		brInstance *i = e->instances->data[n];
-		if(i->object->type->destroyInstance) i->object->type->destroyInstance(i->userData);
+	for(bi = e->instances.begin(); bi != e->instances.end(); bi++ ) {
+		brInstance *i = *bi;
+
+		if(*i->object->type->destroyInstance) i->object->type->destroyInstance(i->userData);
 		i->userData = NULL;
 	}
 
-	for(n=0;n<e->instances->count;n++) 
-		brInstanceFree(e->instances->data[n]);
+	for(bi = e->instances.begin(); bi != e->instances.end(); bi++ )
+		brInstanceFree(*bi);
 
-	slStackFree(e->instances);
-	slStackFree(e->iterationInstances);
-	slStackFree(e->postIterationInstances);
 	slStackFree(e->objectTypes);
 
-	if(e->path) slFree(e->path);
-	if(e->controllerName) slFree(e->controllerName);
+	if(e->path) delete[] e->path;
 
 	if(e->dlPlugins) {
 		brEngineRemoveDlPlugins(e);
@@ -241,7 +230,7 @@ void brEngineFree(brEngine *e) {
 	if(e->camera) slCameraFree(e->camera);
 	if(e->world) slWorldFree(e->world);
 	if(e->outputPath) slFree(e->outputPath);
-	if(e->iTunesData) slFree(e->iTunesData);
+	if(e->iTunesData) delete e->iTunesData;
 
 	l = e->windows;
 
@@ -252,14 +241,9 @@ void brEngineFree(brEngine *e) {
 
 	slListFree(e->windows);
 
-	l = e->freedInstances;
-
-	while(l) {
-		slFree(l->data);
-		l = l->next;
+	for(bi = e->freedInstances.begin(); bi != e->freedInstances.end(); bi++ ) {
+		slFree( *bi);
 	}
-
-	slListFree(e->freedInstances);
 
 	brNamespaceFreeWithFunction(e->internalMethods, (void(*)(void*))brFreeBreveCall);
 	brFreeObjectSpace(e->objects);
@@ -268,6 +252,7 @@ void brEngineFree(brEngine *e) {
 
 	slFree(e);
 }
+
 /*!
 	\brief Set the controller object for the simulation.
 
@@ -278,13 +263,28 @@ void brEngineFree(brEngine *e) {
 
 int brEngineSetController(brEngine *e, brInstance *instance) {
 	if(e->controller) {
-		stParseError(e, PE_REDEFINITION, "Redefinition of \"Controller\" object");
+		slMessage(DEBUG_ALL, "Error: redefinition of \"Controller\" object");
 		return -1;
 	}
 
 	e->controller = instance;
 
 	return 0;
+}
+
+brInstance *brEngineGetController(brEngine *e) {
+	return e->controller;
+}
+
+slStack *brEngineGetAllInstances(brEngine *e) {
+	std::vector<brInstance*>::iterator ii;
+	slStack *s = slStackNew();
+	
+	for(ii = e->instances.begin(); ii != e->instances.end(); ii++ ) {
+			slStackPush(s, *ii);
+	}
+
+	return s;
 }
 
 /*!
@@ -298,13 +298,13 @@ void brEngineSetIOPath(brEngine *e, char *path) {
 }
 
 /*!
-	\brief Sets the output path.
+	\brief Takes a filename, and returns a slMalloc'd string with the full output path for that file.
 */
 
 char *brOutputPath(brEngine *e, char *filename) {
 	char *f;
 
-	f = slMalloc(strlen(filename) + strlen(e->outputPath) + 3);
+	f = (char*)slMalloc(strlen(filename) + strlen(e->outputPath) + 3);
 
 	sprintf(f, "%s/%s", e->outputPath, filename);
 
@@ -355,14 +355,15 @@ brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *methodName, double t
 	brEvent *event;
 	slList *l, *eventEntry;
 
-	event = slMalloc(sizeof(brEvent));
+	event = new brEvent;
 
 	event->name = slStrdup(methodName);
 	event->time = time;
+	event->instance = i;
 
 	eventEntry = slListPrepend(NULL, event);
 
-	/* insert the event where it belongs according to the time it will be called */
+	// insert the event where it belongs according to the time it will be called 
 
 	if(i->events) {
 		l = i->events;
@@ -396,9 +397,11 @@ brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *methodName, double t
 
 int brEngineIterate(brEngine *e) {
 	brEval result;
-	int n, rcode;
+	int rcode;
 	brEvent *event;
 	slList *eventList;
+	std::vector<brInstance*>::iterator bi;
+	int n = 0;
 
 	brInstance *i;
 
@@ -406,8 +409,31 @@ int brEngineIterate(brEngine *e) {
 
 	e->lastScheduled = -1;
 
-	for(n=0;n<e->iterationInstances->count;n++) {
-		i = e->iterationInstances->data[n];
+
+	for(bi = e->instancesToAdd.begin(); bi != e->instancesToAdd.end(); bi++ ) {
+		i = *bi;
+
+		e->instances.push_back(i);
+    
+		if(i->iterate) e->iterationInstances.push_back(i);
+		if(i->postIterate) e->postIterationInstances.push_back(i);
+	}
+
+	e->instancesToAdd.clear();
+
+	for(bi = e->instancesToRemove.begin(); bi != e->instancesToRemove.end(); bi++ ) {
+		i = *bi;
+
+		brEngineRemoveInstance(e, i);
+		brInstanceFree(i);
+	}
+
+	e->instancesToRemove.clear();
+
+	for(bi = e->iterationInstances.begin(); bi != e->iterationInstances.end(); bi++ ) {
+		i = *bi;
+
+		n++;
 
 		if(i->status == AS_ACTIVE) {
 			rcode = brMethodCall(i, i->iterate, NULL, &result);
@@ -419,8 +445,8 @@ int brEngineIterate(brEngine *e) {
 		}
 	}
 
-	for(n=0;n<e->postIterationInstances->count;n++) {
-		i = e->postIterationInstances->data[n];
+	for(bi = e->postIterationInstances.begin(); bi != e->postIterationInstances.end(); bi++ ) {
+		i = *bi;
 
 		if(i->status == AS_ACTIVE) {
 			rcode = brMethodCall(i, i->postIterate, NULL, &result);
@@ -432,18 +458,10 @@ int brEngineIterate(brEngine *e) {
 		}
 	}
 
-	for(n=0;n<e->instances->count;n++) {
-		i = e->instances->data[n];
+	for(bi = e->instances.begin(); bi != e->instances.end(); bi++ ) {
+		i = *bi;
 
-		if(i->status == AS_RELEASED) {
-			brEngineRemoveInstance(e, i);
-			brInstanceFree(i);
-
-			// all the other objects are shifted down, so we 
-			// need to check number n again 
-
-			n--;
-		} else if(i->status == AS_ACTIVE && i->events) {
+		if(i->status == AS_ACTIVE && i->events) {
 			double oldAge;
 
 			eventList = i->events;
@@ -455,17 +473,17 @@ int brEngineIterate(brEngine *e) {
 				oldAge = slWorldGetAge(e->world);
 				slWorldSetAge(e->world, event->time);
 
-				if(i->status == AS_ACTIVE) rcode = brMethodCallByName(i, event->name, &result);
+				rcode = brMethodCallByName(i, event->name, &result);
 
 				brEventFree(event);
 				slListFreeHead(eventList);
+
+				slWorldSetAge(e->world, oldAge);
 
 				if(rcode != EC_OK) {
 					pthread_mutex_unlock(&e->lock);
 					return rcode;
 				}
-
-				slWorldSetAge(e->world, oldAge);
 			}
 		}
 	}
@@ -599,8 +617,8 @@ void brFreeObjectSpace(brNamespace *ns) {
 */
 
 void brEventFree(brEvent *e) {
-	if(e->name) slFree(e->name);
-	slFree(e);
+	delete[] e->name;
+	delete e;
 }
 
 /*!
@@ -611,7 +629,7 @@ void brEventFree(brEvent *e) {
 */
 
 void brMakeiTunesData(brEngine *e) {
-	e->iTunesData = slMalloc(sizeof(briTunesData));
+	e->iTunesData = new briTunesData;
 	e->iTunesData->data = NULL;
 }
 
@@ -648,6 +666,15 @@ void brEvalError(brEngine *e, int type, char *proto, ...) {
     slMessage(DEBUG_ALL, "\n");
 }
 
+void brClearError(brEngine *e) {
+	e->error.type = 0;
+}
+
+int brGetError(brEngine *e) {
+	return e->error.type;
+}
+
+
 /*!
 	\brief A wrapper for slMessage.
 
@@ -658,7 +685,7 @@ void brEvalError(brEngine *e, int type, char *proto, ...) {
 */
 
 int brFileLogWrite(void *m, const char *buffer, int length) {
-	char *s = alloca(length + 1);
+	char *s = (char*)alloca(length + 1);
 	strncpy(s, buffer, length);
 
 	s[length] = 0;
@@ -669,9 +696,36 @@ int brFileLogWrite(void *m, const char *buffer, int length) {
 }
 
 /*!
-    \brief Pause the simulation timer.
-
-    Optional call to be made when the engine is paused,
-    so that we can track the realtime required for the simulation.
+	\brief Calls the interfaceSetCallback.
 */
 
+int brEngineSetInterface(brEngine *e, char *name) {
+	if(!e->interfaceSetCallback) return -1;
+
+	e->interfaceSetCallback(name);
+	return 0;
+}
+
+/*!
+	\brief Returns a pointer to the error info structure.
+*/
+
+brErrorInfo *brEngineGetErrorInfo(brEngine *e) {
+	return &e->error;
+}
+
+/*!
+	\brief Returns the working directory where breve was started.
+*/
+
+char *brEngineGetPath(brEngine *e) {
+	return e->path;
+}
+
+/*!
+	\brief Returns the internal methods namespace.
+*/
+
+brNamespace *brEngineGetInternalMethods(brEngine *e) {
+	return e->internalMethods;
+}

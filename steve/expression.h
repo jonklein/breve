@@ -357,7 +357,7 @@ stExp *stNewStEvalExp(brEval *e, char *file, int line);
 stExp *stNewAllExp(char *object, char *file, int line);
 void stFreeAllExp(stAllExp *e);
 
-stExp *stNewCCallExp(brEngine *e, brNamespaceSymbol *s, slList *exps, char *file, int line);
+stExp *stNewCCallExp(brEngine *e, brInternalFunction *s, slList *exps, char *file, int line);
 
 stExp *stNewWhileExp(stExp *cond, stExp *code, char *file, int line);
 void stFreeWhileExp(stWhileExp *e);

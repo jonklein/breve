@@ -29,14 +29,9 @@
 slGraph *slGraphNew(slVector *color, float minX, float minY, float maxX, float maxY) {
 	slGraph *g;
 
-	g = slMalloc(sizeof(slGraph));
+	g = new slGraph;
 
 	slVectorCopy(color, &g->color);
-
-	g->nLines = 0;
-	g->maxLines = 8;
-
-	g->lines = slMalloc(sizeof(slGraphLine*) * g->maxLines);
 
 	g->minX = minX;
 	g->maxX = maxX;
@@ -86,14 +81,9 @@ void slGraphSetYAxisName(slGraph *graph, char *title) {
 }
 
 int slGraphAddLine(slGraph *graph, slVector *color) {
-	if(graph->nLines >= graph->maxLines) {
-		graph->maxLines *= 2;
-		graph->lines = slRealloc(graph->lines, sizeof(slGraphLine*) * graph->maxLines);
-	}
+	graph->lines.push_back(slGraphNewLine(graph, color));
 
-	graph->lines[graph->nLines] = slGraphNewLine(graph, color);
-
-	return graph->nLines++;
+	return graph->lines.size();
 }
 
 /*!
@@ -101,18 +91,16 @@ int slGraphAddLine(slGraph *graph, slVector *color) {
 */
 
 void slGraphFree(slGraph *graph) {
-	int n;
+	unsigned int n;
 
-	for(n=0;n<graph->nLines;n++)
+	for(n=0;n<graph->lines.size();n++)
 		slGraphLineFree(graph->lines[n]);
-
-	slFree(graph->lines);
 
 	if(graph->title) slFree(graph->title);
 	if(graph->xAxis) slFree(graph->xAxis);
 	if(graph->yAxis) slFree(graph->yAxis);
 
-	slFree(graph);
+	delete graph;
 }
 
 /*!
@@ -125,7 +113,7 @@ void slGraphFree(slGraph *graph) {
 slGraphLine *slGraphNewLine(slGraph *graph, slVector *color) {
 	slGraphLine *line;
 
-	line = slMalloc(sizeof(slGraphLine));
+	line = new slGraphLine;
 
 	line->graph = graph;
 
@@ -134,12 +122,6 @@ slGraphLine *slGraphNewLine(slGraph *graph, slVector *color) {
 
 	line->lastX = 0;
 	line->lastY = 0;
-
-	line->nValues = 0;
-	line->maxValues = graph->maxX;
-
-	line->xValues = slMalloc(sizeof(float) * line->maxValues);
-	line->yValues = slMalloc(sizeof(float) * line->maxValues);
 
 	slVectorCopy(color, &line->color);
 
@@ -179,18 +161,10 @@ void slGraphAddLineValue(slGraph *graph, int ln, float x, float y) {
 		return;
 	}
 
-	if(line->nValues >= line->maxValues) {
-		line->maxValues *= 2;
-		line->xValues = slRealloc(line->xValues, sizeof(float) * line->maxValues);
-		line->yValues = slRealloc(line->yValues, sizeof(float) * line->maxValues);
-	}
+	line->xValues.push_back(x);
+	line->yValues.push_back(y);
 
-	line->xValues[line->nValues] = x;
-	line->yValues[line->nValues] = y;
-
-	line->nValues++;
-
-	if(line->nValues > line->graph->maxX) line->graph->maxX *= 2;
+	if(line->xValues.size() > line->graph->maxX) line->graph->maxX *= 2;
 }
 
 /*
@@ -198,7 +172,7 @@ void slGraphAddLineValue(slGraph *graph, int ln, float x, float y) {
 */
 
 void slGraphLineFree(slGraphLine *line) {
-	slFree(line->xValues);
-	slFree(line->yValues);
-	slFree(line);
+	line->xValues.clear();
+	line->yValues.clear();
+	delete[] line;
 }

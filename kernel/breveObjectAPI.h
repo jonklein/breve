@@ -96,11 +96,13 @@ struct brInstance {
 	Keeps track of what methods are used to handle collisions between objects.
 */
 
+#ifdef __cplusplus
 struct brCollisionHandler {
     brObject *object;
     brMethod *method;
 	unsigned char ignore;
 };
+#endif
 
 /*!
 	\brief A reference to a native method.
@@ -137,6 +139,7 @@ struct brObserver {
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 // registering a new object type
 
 void brEngineRegisterObjectType(brEngine *e, brObjectType *t);
@@ -167,6 +170,8 @@ brInstance *brObjectInstantiate(brEngine *e, brObject *o, brEval **args, int arg
 void brEngineRemoveInstance(brEngine *e, brInstance *i);
 
 int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *name);
+int brObjectSetIgnoreCollisionsWith(brObject *handler, brObject *collider, int ignore);
+
 
 // adding and removing dependencies and observers 
 
@@ -182,6 +187,7 @@ void brInstanceRelease(brInstance *i);
 void brObjectFree(brObject *o);
 void brInstanceFree(brInstance *i);
 void brMethodFree(brMethod *i);
+
 #ifdef __cplusplus
 }
 #endif

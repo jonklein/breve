@@ -57,7 +57,7 @@ char *gArchiveFile;
 
 void *workerThread(void *data);
 int soundCallback(void *data);
-int pauseCallback();
+int pauseCallback(void *data);
 void brInterrupt(brEngine *engine);
 void *newWindowCallback(char *name, slGraph *graph);
 void freeWindowCallback(void *w);
@@ -501,14 +501,14 @@ void slDemoMouse(int button, int state, int x, int y) {
 
 		gMotionCrosshair = 1;
 
-		if(gMods & GLUT_ACTIVE_SHIFT) brBeginDrag(frontend->engine, gSelected);
+		// if(gMods & GLUT_ACTIVE_SHIFT) brBeginDrag(frontend->engine, gSelected);
 
 	} else { 
 		gLastX = 0;
 		gLastY = 0;
 		gMotionCrosshair = 0;
 
-		brEndDrag(frontend->engine, gSelected);
+		// brEndDrag(frontend->engine, gSelected);
 	}
 
 
@@ -686,7 +686,7 @@ int soundCallback(void *data) {
 	return 0;
 }
 
-int pauseCallback() {
+int pauseCallback(void *data) {
 	gPaused = 1;
 	brPauseTimer(frontend->engine);
 	return 0;

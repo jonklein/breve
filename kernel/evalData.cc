@@ -27,11 +27,11 @@
 brData *brDataNew(void *info, int length) {
 	brData *d;
 
-	d = slMalloc(sizeof(brData));
+	d = new brData;
 
 	d->length = length;
 	d->retainCount = 0;
-	d->data = slMalloc(length);
+	d->data = new char[length];
 	bcopy(info, d->data, d->length);
 
 	return d;
@@ -42,8 +42,8 @@ brData *brDataNew(void *info, int length) {
 */
 
 void brDataFree(brData *d) {
-	slFree(d->data);
-	slFree(d);
+	delete[] d->data;
+	delete d;
 }
 
 /*!

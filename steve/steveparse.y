@@ -142,12 +142,12 @@ int stGetTypeForString(char *name);
 
 sucessful_parse
 : file {
-		if(parseEngine->error.type) YYABORT;
+		if(brGetError(parseEngine)) YYABORT;
 	}
 | GT { 
 		if(!thisMethod || !thisObject) YYERROR;
 	} statement {
-		if(parseEngine->error.type) YYABORT;
+		if(brGetError(parseEngine)) YYABORT;
 		steveData->singleStatement = $3;
 	}
 ;
@@ -206,12 +206,14 @@ header
 | '@' PATH STRING_VALUE END { slFree($3); }
 | '@' USE WORD_VALUE header_version END { 
 		if($4) {
-			stObject *o;
+			brObject *o;
+			stObject *so;
 
-			o = stObjectFind(parseEngine->objects, $3);
+			o = brObjectFind(parseEngine, $3);
+			so = o->userData;
 
-			if(o) {
-				if(!stCheckVersionRequirement(o->version, $4)) {
+			if(so) {
+				if(!stCheckVersionRequirement(so->version, $4)) {
 					stParseError(parseEngine, PE_FILE_VERSION, "Incompatible file version for class \"%s\"", $3);
 					YYABORT;
 				}
@@ -244,7 +246,7 @@ header
 		if(!fullnib) {
 			slMessage(DEBUG_ALL, "warning: unable to locate nib file \"%s\"\n", nib);
 		} else {
-			if(parseEngine->interfaceSetNibCallback) parseEngine->interfaceSetNibCallback(fullnib);
+			brEngineSetInterface(parseEngine, fullnib);
 		}
 	
 		slFree($3);
@@ -374,14 +376,23 @@ object_aka
 objecttype
 : WORD_VALUE ':' WORD_VALUE	object_aka object_version { 
 		stObject *parentObject, *akaObject;
+		brObject *o;
 		float version;
 
 		if($5) version = $5;
 		else version = 1.0;
 
-		thisObject = stObjectFind(parseEngine->objects, $3);
+		o = brObjectFind(parseEngine, $3);
 
-		if($4) akaObject = stObjectFind(parseEngine->objects, $4);
+		if(o) thisObject = o->userData;
+		else thisObject = NULL;
+
+		if($4) {
+			o = brObjectFind(parseEngine, $4);
+
+			if(o) akaObject = o->userData;
+			else akaObject = NULL;
+		}
 		else akaObject = NULL;
 
 		if(thisObject && gReparse) {
@@ -401,7 +412,10 @@ objecttype
 			slFree($3);
 			slFree($4);
 		} else {
-			parentObject = stObjectFind(parseEngine->objects, $1); 
+			brObject *o = brObjectFind(parseEngine, $1);
+
+			if(o) parentObject = o->userData;
+			else parentObject = NULL;
 
 			if(!parentObject && strcmp($1, "NULL")) {
 				stParseError(parseEngine, PE_UNKNOWN_OBJECT, "Cannot locate parent class \"%s\" for definition of class \"%s\"", $1, $3);
@@ -420,7 +434,7 @@ objecttype
 
 		/* an error check */
 
-		if(parseEngine->error.type) YYABORT;
+		if(brGetError(parseEngine)) YYABORT;
 	}
 ;
 
@@ -447,7 +461,7 @@ methoddef
 		/* that the method would be stored before we stop the parsing... */
 		/* this way we're sure to free the allocated memory.			 */
 
-		if(parseEngine->error.type) YYABORT;
+		if(brGetError(parseEngine)) YYABORT;
 	}
 | method_head variable_list method_code {
 		slList *code;
@@ -465,7 +479,7 @@ methoddef
 
 		slFree($1);
 
-		if(parseEngine->error.type) YYABORT;
+		if(brGetError(parseEngine)) YYABORT;
 	}
 ;
 
@@ -649,14 +663,15 @@ statement
 | simple_statement END { $$ = $1; }
 | simple_statement error { 
 		if($1) stExpFree($1);
-		if(parseEngine->error.type) YYABORT;
+
+		if(brGetError(parseEngine)) YYABORT;
 
 		stParseError(parseEngine, PE_PARSE, "Possible missing period on previous line");
 		YYABORT;
 		$$ = NULL;
 	}
 | error {
-		if(parseEngine->error.type) YYABORT;
+		if(brGetError(parseEngine)) YYABORT;
 
 		stParseError(parseEngine, PE_PARSE, "Parse error");
 		$$ = NULL;
@@ -1084,9 +1099,9 @@ atomic_expression
 		$$ = stExpNew(NULL, ET_LIST, yyfile, lineno);
 	}
 | WORD_VALUE '(' exp_list ')' { 
-		brNamespaceSymbol *s = brNamespaceLookup(parseEngine->internalMethods, $1);
+		brInternalFunction *func = brEngineInternalFunctionLookup(parseEngine, $1);
 
-		if(!s || s->type != ST_FUNC) {	  
+		if(!func) {	  
 			slList *l = $3;
 
 			stParseError(parseEngine, PE_UNKNOWN_FUNCTION, "Internal function \"%s\" not found", $1);
@@ -1102,21 +1117,21 @@ atomic_expression
 		} else {
 			slList *l = slListReverse($3);
 
-			$$ = stNewCCallExp(parseEngine, s, l, yyfile, lineno); 
+			$$ = stNewCCallExp(parseEngine, func, l, yyfile, lineno); 
 			slListFree(l);
 
 			slFree($1);
 		}
 	}
 | WORD_VALUE '(' ')' {
-		brNamespaceSymbol *s = brNamespaceLookup(parseEngine->internalMethods, $1);
+		brInternalFunction *func = brEngineInternalFunctionLookup(parseEngine, $1);
 
-		if(!s || s->type != ST_FUNC) {	  
+		if(!func) {
 			stParseError(parseEngine, PE_UNKNOWN_FUNCTION, "Internal function \"%s\" not found", $1);
 			slFree($1);
 			$$ = NULL;
 		} else {
-			$$ = stNewCCallExp(parseEngine, s, NULL, yyfile, lineno); 
+			$$ = stNewCCallExp(parseEngine, func, NULL, yyfile, lineno); 
 
 			slFree($1);
 
@@ -1218,7 +1233,7 @@ void stStartParse() {
 
 void stParseSetEngine(brEngine *e) {
 	parseEngine = e;
-	e->error.type = 0;
+	brClearError(e);
 }
 
 void stParseSetObjectAndMethod(stObject *o, stMethod *m) {

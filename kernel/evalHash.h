@@ -32,6 +32,10 @@ struct brEvalHash {
 	int retainCount;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 brEvalHash *brEvalHashNew();
 void brEvalHashFree(brEvalHash *h);
 
@@ -46,3 +50,7 @@ unsigned int brEvalHashCompareFunction(void *a, void *b);
 
 void brEvalHashLookup(brEvalHash *h, brEval *key, brEval *value);
 void brEvalHashStore(brEvalHash *h, brEval *key, brEval *value, brEval *oldValue);
+
+#ifdef __cplusplus
+}
+#endif

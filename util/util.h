@@ -47,6 +47,9 @@
 
 #include <zlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "utilTypedefs.h"
 
 #include "list.h"
@@ -63,5 +66,8 @@
 #include "error.h"
 
 #include "stringstream.h"
+#ifdef __cplusplus
+}
+#endif
 
 #endif

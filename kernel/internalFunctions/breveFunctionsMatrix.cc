@@ -105,7 +105,7 @@ int brIMatrixDiffuse(brEval args[], brEval *target, brInstance *i) {
 	gsl_matrix_float *n = BRPOINTER(&args[1]);
 	double scale = BRDOUBLE(&args[2]);
 
-	int x, y;
+	unsigned int x, y;
 	int xp, xm, yp, ym;
 
 	for(y=0;x<m->size1;y++) {
@@ -126,7 +126,7 @@ int brIMatrixDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 	gsl_matrix_float *m = BRPOINTER(&args[0]);
 	gsl_matrix_float *n = BRPOINTER(&args[1]);
 	double scale = BRDOUBLE(&args[2]);
-	int x, y;
+	unsigned int x, y;
 	int xp, xm, yp, ym;
 
 	for(y=0;y<m->size1;y++) {
@@ -173,7 +173,7 @@ int brIMatrixCopyToImage(brEval args[], brEval *result, brInstance *i) {
 
 	for(y=0;y<ymax;y++) {
 	 	for(x=0;x<xmax;x++) {
-			r = *mdata * scale * 255;
+			r = (int)(*mdata * scale * 255.0);
 			if(r > 255) *pdata = 255;
 			else *pdata = r;
 			pdata += 4;

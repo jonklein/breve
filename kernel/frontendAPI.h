@@ -31,6 +31,10 @@ struct breveFrontend {
     void *data;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 breveFrontend *breveFrontendInit(int argc, char ** argv);
 
 /*!
@@ -75,5 +79,9 @@ int breveFrontendLoadSavedSimulation(breveFrontend *d, char *code, char *file, c
 */
 
 void breveFrontendCleanupData(void *data);
+
+#ifdef __cplusplus
+}
+#endif
 
 /*@}*/

@@ -23,6 +23,8 @@
 #include <sys/param.h>
 #include <pthread.h>
 
+#include "graph.h"
+
 #if defined(HAVE_LIBREADLINE) && defined(HAVE_LIBHISTORY)
 #include <readline/readline.h>
 #include <readline/history.h>

@@ -110,11 +110,17 @@ int stOCallMethodNamed(brEval args[], brEval *target, brInstance *i) {
 int stOIsa(brEval args[], brEval *target, brInstance *bi) {
 	stObject *o;
 	stObject *io;
+	brObject *bo;
 	stInstance *i = bi->userData;
 
 	/* go down to the base instance */
 
-	o = stObjectFind(i->type->engine->objects, BRSTRING(&args[0]));
+	
+	bo = brObjectFind(i->type->engine, BRSTRING(&args[0]));
+
+	if(bo) o = bo->userData;
+	else o = NULL;
+
 	io = i->type;
 
 	while(io) {
@@ -173,7 +179,7 @@ int stOGetRetainCount(brEval args[], brEval *target, brInstance *bi) {
 }
 
 int stCObjectAllocationReport(brEval args[], brEval *target, brInstance *i) {
-    stObjectAllocationReport(i->engine);
+    stObjectAllocationReport();
     return EC_OK;
 }   
 
@@ -249,7 +255,9 @@ int stNSendXMLObject(brEval *args, brEval *target, brInstance *i) {
 }
 
 int stCStacktrace(brEval args[], brEval *target, brInstance *i) {
-    stStackTrace(i->engine);
+	stInstance *si = i->userData;
+
+    stStackTrace(si->type->steveData);
     return EC_OK;
 }
 

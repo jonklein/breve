@@ -22,7 +22,13 @@
 #include <stdlib.h>
 #include <strings.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "util.h"
 
 #include "ff.h"
 #include "ffTrain.h"
+#ifdef __cplusplus
+}
+#endif

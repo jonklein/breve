@@ -304,3 +304,21 @@ int brInterfaceCallback(brEngine *e, int interfaceID, char *string) {
 
 	return r;
 }
+
+/*!
+	\brief Calls the getSavename callback.
+*/
+
+char *brEngineRunSaveDialog(brEngine *e) {
+	if(e->getSavename) return NULL;
+	return e->getSavename(e);
+}
+
+/*!
+	\brief Calls the getLoad callback.
+*/
+
+char *brEngineRunLoadDialog(brEngine *e) {
+	if(e->getLoadname) return NULL;
+	return e->getLoadname(e);
+}

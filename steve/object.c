@@ -38,13 +38,14 @@ stObject *stObjectNew(brEngine *engine, stSteveData *sdata, char *name, char *al
 
 	/* check to see if the object exists */
 
-	if(stObjectFind(engine->objects, name)) return NULL;
+	if(brObjectFind(engine, name)) return NULL;
 
 	o = slMalloc(sizeof(stObject));
 
 	o->version = version;
 
 	o->engine = engine;
+	o->steveData = sdata;
 	o->super = super;
 	o->variableList = NULL;
 

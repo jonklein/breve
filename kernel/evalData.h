@@ -28,6 +28,9 @@ struct brData {
 	int retainCount;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 brData *brDataNew(void *data, int length);
 void brDataFree(brData *data);
 
@@ -36,4 +39,7 @@ void brDataUnretain(brData *data);
 void brDataCollect(brData *data);
 
 char *brDataHexEncode(brData *d);
-
+brData *brDataHexDecode(char *string);
+#ifdef __cplusplus
+}
+#endif

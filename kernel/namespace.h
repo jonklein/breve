@@ -38,11 +38,17 @@ enum symbolTypes {
 	and function names.
 */
 
+#ifdef __cplusplus
+#include <map>
+#include <string>
+
 struct brNamespace {
     int tableSize;
-    
     slList **buckets;
+
+	std::map<std::string,brNamespaceSymbol*> map;
 };
+#endif
 
 /*!
 	\brief A symbol in a brNamespace.
@@ -53,6 +59,11 @@ struct brNamespaceSymbol {
     int type;
     void *data;
 };
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 brNamespace *brNamespaceNew(int size);
 void brNamespaceFree(brNamespace *ns);
@@ -69,4 +80,9 @@ void brNamespaceSymbolFreeWithFunction(brNamespaceSymbol *s, void (*symFree)(voi
 int brNamespaceHashSymbol(char *string);
 
 slList *brNamespaceSymbolList(brNamespace *space);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

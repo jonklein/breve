@@ -23,7 +23,8 @@
 #define TEXT_HEIGHT 119.05
 
 void slDrawGraph(slGraph *graph) {
-	int l, v;
+	unsigned int l;
+	int v;
 	char label[1024];
 	double marginX, marginY;
 
@@ -80,7 +81,7 @@ void slDrawGraph(slGraph *graph) {
 
 	glLoadIdentity();
 
-	for(l=0;l<graph->nLines;l++) {
+	for(l=0;l<graph->lines.size();l++) {
 		int drawing = 0;
 
 		glColor4f(graph->lines[l]->color.x, graph->lines[l]->color.y, graph->lines[l]->color.z, 0.5);
@@ -125,7 +126,7 @@ void slDrawGraph(slGraph *graph) {
 			}
 
 		} else {
-			for(v=0;v<graph->lines[l]->nValues;v++)
+			for(v=0;v<graph->lines[l]->xValues.size();v++)
 				slPlotPoint(graph->lines[l]->xValues[v], graph->lines[l]->yValues[v], marginX, marginY, graph);
 		}
 
@@ -164,7 +165,7 @@ void slDrawGraph(slGraph *graph) {
 }
 
 void slStrokeCenteredString(float x, float y, char *text) {
-	float offset = glutStrokeLength(GLUT_STROKE_ROMAN, text) / 2.0;
+	float offset = glutStrokeLength(GLUT_STROKE_ROMAN, (const char*)text) / 2.0;
 	slStrokeString(x - offset, y, text);
 }
 

@@ -14,7 +14,7 @@ extern int lineno;
 int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
 	char *file = "<user input>";
 	int length;
-
+	brInstance *controller;
 	char *fixedStatement;
 	brEval target;
 	stInstance *i;
@@ -43,18 +43,21 @@ int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
 	sd->singleStatement = NULL;
 
 	stSetParseString(fixedStatement, strlen(fixedStatement));
-	stParseSetObjectAndMethod((stObject*)engine->controller->object->userData, sd->singleStatementMethod);
+
+	controller = brEngineGetController(engine);
+
+	stParseSetObjectAndMethod((stObject*)controller->object->userData, sd->singleStatementMethod);
 	stParseSetEngine(engine);
 
-	engine->error.type = 0;
+	brClearError(engine);
 
-	if(yyparse() || engine->error.type) {
+	if(yyparse() || brGetError(engine)) {
 		slFree(fixedStatement);
 		sd->singleStatement = NULL;
 		return BPE_SIM_ERROR;
 	}
 
-	i = engine->controller->userData;
+	i = controller->userData;
 	ri.instance = i;
 	ri.type = i->type;
 

@@ -23,7 +23,7 @@
 #define MIN3(x, y, z)	(((x)<(y) && (x)<(z))?(x):((y)<(z)?(y):(z)))
 #define MAX3(x, y, z)	(((x)>(y) && (x)>(z))?(x):((y)>(z)?(y):(z)))
 
-void stHSVtoRGB(slVector *hsv, slVector *rgb) {
+void brHSVtoRGB(slVector *hsv, slVector *rgb) {
 	int i;
 	double f, p, q, t;
 	double h, s, v;
@@ -38,7 +38,7 @@ void stHSVtoRGB(slVector *hsv, slVector *rgb) {
 	}
 
 	h /= 60;			// sector 0 to 5
-	i = floor( h );
+	i = (int)floor( h );
 	f = h - i;		      // factorial part of h
 	p = v * ( 1 - s );
 	q = v * ( 1 - s * f );
@@ -78,7 +78,7 @@ void stHSVtoRGB(slVector *hsv, slVector *rgb) {
 	}
 }
 
-void stRGBtoHSV(slVector *rgb, slVector *hsv) {
+void brRGBtoHSV(slVector *rgb, slVector *hsv) {
 	double min, max, delta;
 
 	min = MIN3( rgb->x, rgb->y, rgb->z );
@@ -115,7 +115,7 @@ void stRGBtoHSV(slVector *rgb, slVector *hsv) {
 #undef MAX3
 #undef MIN3
 
-void stUniqueColor(slVector *color, int n) {
+void brUniqueColor(slVector *color, int n) {
 	slVector hsv;
 
 	if(n == 0) {
@@ -140,5 +140,5 @@ void stUniqueColor(slVector *color, int n) {
 
 	hsv.z = 1.0 - ((n % 32) / 8) * .20;
 
-	stHSVtoRGB(&hsv, color);
+	brHSVtoRGB(&hsv, color);
 }

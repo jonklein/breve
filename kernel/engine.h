@@ -22,7 +22,11 @@
 #define _ENGINE_H
 
 #include "simulation.h"
-#include "graph.h"
+
+#ifdef __cplusplus
+#include <vector>
+#include <algorithm>
+#endif
 
 #ifdef WINDOWS
 // #include <winsock2.h>
@@ -128,6 +132,7 @@ struct brMenuEntry {
 struct brEvent {
 	char *name;
 	double time;
+	brInstance *instance;
 };
 
 /*!
@@ -158,6 +163,7 @@ struct briTunesData {
 	\brief The main breve engine structure.
 */
 
+#ifdef __cplusplus
 struct brEngine {
 	slWorld *world;
 	slCamera *camera;
@@ -168,7 +174,7 @@ struct brEngine {
 
 	brSoundMixer *soundMixer;
 
-	slList *freedInstances;
+	std::vector<brInstance*> freedInstances;
 
 #ifdef HAVE_LIBAVCODEC
 	slMovie *movie;
@@ -192,15 +198,19 @@ struct brEngine {
 
 	slStack *drawContexts;
 
-	char *controllerName;
 	brInstance *controller;
 
 	brNamespace *objects;
 	brNamespace *internalMethods;
 
-	slStack *iterationInstances;
-	slStack *postIterationInstances;
-	slStack *instances;
+	std::vector<brInstance*> postIterationInstances;
+	std::vector<brInstance*> iterationInstances;
+	std::vector<brInstance*> instances;
+
+	std::vector<brInstance*> instancesToAdd;
+	std::vector<brInstance*> instancesToRemove;
+
+	std::vector<brEvent*> events;
 
 	brMenuList menu;
 
@@ -243,12 +253,6 @@ struct brEngine {
 
 	unsigned char keys[256];
 
-	// the stack pointer and memory for running steve code 
-
-	char stackBase[ST_STACK_SIZE];
-	char *stack;
-	stStackRecord *stackRecord;
-
 	// evalList sort data... 
 
 	void **sortVector;
@@ -287,7 +291,7 @@ struct brEngine {
 	// callback to setup and use the OS X interface features
 
 	int (*interfaceSetStringCallback)(char *string, int number);
-	void (*interfaceSetNibCallback)(char *file);
+	void (*interfaceSetCallback)(char *file);
 
 	// keypress callback 
 
@@ -297,10 +301,11 @@ struct brEngine {
 
 	int (*pauseCallback)(void *data);
 
-	void *(*newWindowCallback)(char *name, slGraph *graph);
+	void *(*newWindowCallback)(char *name, void *graph);
 	void (*freeWindowCallback)(void *g);
 	void (*renderWindowCallback)(void *g);
 };
+#endif
 
 enum versionRequiermentOperators {
 	VR_LT = 1,
@@ -311,10 +316,17 @@ enum versionRequiermentOperators {
 	VR_NE
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *name, double time);
 void brEventFree(brEvent *e);
 
 int brEngineSetController(brEngine *e, brInstance *controller);
+brInstance *brEngineGetController(brEngine *e);
+
+slStack *brEngineGetAllInstances(brEngine *e);
 
 int brEngineIterate(brEngine *e);
 
@@ -342,16 +354,7 @@ void brFreeSearchPath(brEngine *e);
 brMenuEntry *brAddMenuItem(brInstance *i, char *name, char *title);
 brMenuEntry *brAddContextualMenuItem(brObject *o, char *method, char *title);
 
-int brMenuCallback(brEngine *e, brInstance *i, int n);
-int brMenuCallbackByName(brEngine *e, char *name);
-brInstance *brClickCallback(brEngine *e, int n);
-int brDragCallback(brEngine *e, int x, int y);
-int brKeyCallback(brEngine *e, unsigned char keyCode, int isDown);
-int brInterfaceCallback(brEngine *e, int interfaceID, char *string);
-
 void stSetParseEngine(brEngine *e);
-
-void stParseError(brEngine *e, int type, char *proto, ...);
 
 void stSetParseString(char *string, int length);
 
@@ -361,8 +364,25 @@ void brFreeObjectSpace(brNamespace *ns);
 
 void brEngineRenderWorld(brEngine *e, int crosshair);
 
+brInternalFunction *brEngineInternalFunctionLookup(brEngine *e, char *name);
+
 void brFreeInternalFunction(void *d);
 
 void brEvalError(brEngine *e, int type, char *proto, ...);
+
+void brClearError(brEngine *e);
+int brGetError(brEngine *e);
+
+int brEngineSetInterface(brEngine *e, char *name);
+
+brErrorInfo *brEngineGetErrorInfo(brEngine *e);
+
+char *brEngineGetPath(brEngine *e);
+
+brNamespace *brEngineGetInternalMethods(brEngine *e);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -25,6 +25,7 @@
 
 #define MIXER_SAMPLE_RATE 44100
 
+#ifdef __cplusplus
 struct brSoundMixer {
 	brSoundPlayer **players;
 	int nPlayers;
@@ -48,6 +49,7 @@ struct brSoundPlayer {
 	float volume;
 	float balance;
 };
+#endif
 
 int *brSampleUp(int *in, long frames);
 

@@ -5,19 +5,13 @@
 */
 
 int stCWriteXMLEngine(brEval args[], brEval *target, brInstance *i) {
-	 char *filename = BRSTRING(&args[0]);
+	char *filename = BRSTRING(&args[0]);
+	char *path = brOutputPath(i->engine, filename);
 
-	 if(i->engine->outputPath) {
-		  char *newfilename;
-		  newfilename = slMalloc(strlen(i->engine->outputPath) + 2 + strlen(filename));
-		  sprintf(newfilename, "%s/%s", i->engine->outputPath, filename);
-		  BRINT(target) = stXMLWriteSimulationToFile(newfilename, i->engine);
-		  slFree(newfilename);
-	 } else {
-		  BRINT(target) = stXMLWriteSimulationToFile(filename, i->engine);
-	 }
+	BRINT(target) = stXMLWriteSimulationToFile(path, i->engine);
+	slFree(path);
 
-	 return EC_OK;
+	return EC_OK;
 }
 
 /*!
@@ -25,22 +19,15 @@ int stCWriteXMLEngine(brEval args[], brEval *target, brInstance *i) {
 */
 
 int stCArchiveXMLObject(brEval args[], brEval *target, brInstance *i) {
-	 char *filename = BRSTRING(&args[1]);
-	 stInstance *archive;
+	stInstance *archive;
+	char *filename = BRSTRING(&args[1]);
+	char *path = brOutputPath(i->engine, filename);
 
-	 archive = BRINSTANCE(&args[0])->userData;
+	archive = BRINSTANCE(&args[0])->userData;
+	BRINT(target) = stXMLWriteObjectToFile(archive, path, 0);
+	slFree(path);
 
-	 if(i->engine->outputPath) {
-		  char *newfilename;
-		  newfilename = slMalloc(strlen(i->engine->outputPath) + 2 + strlen(filename));
-		  sprintf(newfilename, "%s/%s", i->engine->outputPath, filename);
-		  BRINT(target) = stXMLWriteObjectToFile(archive, newfilename, 0);
-		  slFree(newfilename);
-	 } else {
-		  BRINT(target) = stXMLWriteObjectToFile(archive, filename, 0);
-	 }
-
-	 return EC_OK;
+	return EC_OK;
 }
 
 /*!

@@ -107,7 +107,7 @@ void breveInitMovieFunctions(brNamespace *n) {
 	brNewBreveCall(n, "movieClose", breveMovieClose, AT_INT, AT_POINTER, 0);
 #else 
 	brNewBreveCall(n, "movieCreate", breveMovieUnsupported, AT_POINTER, AT_STRING, 0);
-	brNewBreveCall(n, "movieAddGLFrame", breveMovieUnsupported, AT_INT, AT_POINTER, 0);
+	brNewBreveCall(n, "movieAddWorldFrame", breveMovieUnsupported, AT_INT, AT_POINTER, 0);
 	brNewBreveCall(n, "movieClose", breveMovieUnsupported, AT_INT, AT_POINTER, 0);
 #endif
 

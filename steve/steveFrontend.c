@@ -87,12 +87,16 @@ void stInstanceFreeCallback(void *i) {
 */
 
 stSteveData *stSteveInit(brEngine *engine) {
+	brNamespace *internal;
+
+	internal = brEngineGetInternalMethods(engine);
+
 	gSteveData = slMalloc(sizeof(stSteveData));
 	gSteveData->allObjects = NULL;
 
-	breveInitSteveDataObjectFuncs(engine->internalMethods);
-	breveInitSteveObjectFuncs(engine->internalMethods);
-	breveInitXMLFuncs(engine->internalMethods);
+	breveInitSteveDataObjectFuncs(internal);
+	breveInitSteveObjectFuncs(internal);
+	breveInitXMLFuncs(internal);
 
 	gSteveData->steveObjectType.callMethod = stCallMethodBreveCallback;
 	gSteveData->steveObjectType.findMethod = stFindMethodBreveCallback;
@@ -107,6 +111,8 @@ stSteveData *stSteveInit(brEngine *engine) {
 	gSteveData->allObjects = NULL;
 
 	gSteveData->defines = brNamespaceNew(64);
+
+	gSteveData->stackRecord = NULL;
 
 	return gSteveData; 
 }
@@ -183,7 +189,10 @@ int stLoadFiles(stSteveData *sdata, brEngine *engine, char *code, char *file) {
 	int r;
 	brObject *controller;
 	char *path = slStrdup(file);
+	char *enginePath;
 	int n = strlen(path) - 1;
+
+	enginePath = brEngineGetPath(engine);
 
 	while(n && path[n] != '/' && path[n] != '\\') n--;
 	path[n] = 0;
@@ -192,19 +201,19 @@ int stLoadFiles(stSteveData *sdata, brEngine *engine, char *code, char *file) {
 		/* absolute path */
 		
 		brAddSearchPath(engine, path);
-	} else if(engine->path && n != 0) {
+	} else if(n != 0) {
 		/* relative path */
 		
-		char *fullpath = slMalloc(strlen(engine->path) + strlen(path) + 2);
-		sprintf(fullpath, "%s/%s", engine->path, path);
+		char *fullpath = slMalloc(strlen(enginePath) + strlen(path) + 2);
+		sprintf(fullpath, "%s/%s", enginePath, path);
 		
 		brAddSearchPath(engine, fullpath);
 		
 		slFree(fullpath);
-	} else if(engine->path) { 
+	} else {
 		// no path--just a file in the current directory
 		
-		brAddSearchPath(engine, engine->path);
+		brAddSearchPath(engine, enginePath);
 	}
 	
 	slFree(path);
@@ -380,7 +389,7 @@ int stParseBuffer(stSteveData *s, brEngine *engine, char *buffer, char *filename
 	stParseSetEngine(engine);
 	stParseSetSteveData(s);
 
-	engine->error.type = 0;
+	brClearError(engine);
 	if(yyparse()) return BPE_SIM_ERROR;
 
 	return BPE_OK;
@@ -572,10 +581,10 @@ int stCheckVersionRequirement(float version, stVersionRequirement *r) {
 	\brief Reports on current object usage.
 */
 	
-void stObjectAllocationReport(brEngine *engine) {
+void stObjectAllocationReport() {
 	brObject *bo;
 	stObject *o;
-	slList *objects = brNamespaceSymbolList(engine->objects);
+	slList *objects = gSteveData->allObjects;
 	
 	while(objects) {
 		bo = objects->data;
@@ -598,21 +607,21 @@ void stObjectAllocationReport(brEngine *engine) {
 void stParseError(brEngine *e, int type, char *proto, ...) {
 	va_list vp;
 	char localMessage[BR_ERROR_TEXT_SIZE];
+	brErrorInfo *error = brEngineGetErrorInfo(e);
 
 	/* if there is no "primary" error defined, then we do the whole process */
 
-	if(e->error.type == 0) {
-		e->error.type = type;
-		e->error.file = slStrdup(yyfile);
-		e->error.line = lineno;
+	if(error->type == 0) {
+		error->type = type;
+		error->file = slStrdup(yyfile);
+		error->line = lineno;
 
 		va_start(vp, proto);
-		vsnprintf(e->error.message, BR_ERROR_TEXT_SIZE, proto, vp);
+		vsnprintf(error->message, BR_ERROR_TEXT_SIZE, proto, vp);
 		va_end(vp);
 
-		slMessage(DEBUG_ALL, "%s: %s", gErrorNames[type], e->error.message);
+		slMessage(DEBUG_ALL, "%s: %s", gErrorNames[type], error->message);
 		slMessage(DEBUG_ALL, " at line %d of file \"%s\"", lineno, yyfile);
-		//slMessage(DEBUG_ALL, "\n%s\n", gErrorMessages[type]);
 	} else {
 		va_start(vp, proto);
 		vsnprintf(localMessage, BR_ERROR_TEXT_SIZE, proto, vp);

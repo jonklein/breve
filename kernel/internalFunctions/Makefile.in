@@ -5,7 +5,7 @@ all: $(INTERNALO)
 INCLUDE	+= -I.. -I../../include/breve @CPPFLAGS@
 
 .c.o:
-	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
+	$(CXX) -fpermissive $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
 
 .cpp.o:
 	$(CXX) -fpermissive $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<

@@ -23,5 +23,3 @@ int brDataCopyArray(stVar *v, stInstance *src, stInstance *dst);
 
 int brDataCopyObject(stInstance *src, stInstance *dst);
 
-brData *brDataHexDecode(char *string);
-char *brDataHexEncode(brData *d);

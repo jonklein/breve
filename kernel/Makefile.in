@@ -6,9 +6,9 @@
 #
 
 LIBO	= engine.o breveEval.o breveObjectAPI.o frontendAPI.o \
-		evalList.o evalData.o evalListCopy.o \
+		evalList.o evalData.o network.o \
 		callback.o namespace.o color.o interface.o internal.o \
-		plugins.o evalHash.o sound.o multithread.o format.o
+		plugins.o evalHash.o sound.o multithread.o 
 
 INCLUDE	+=-I../include/breve @CPPFLAGS@
 
@@ -20,7 +20,7 @@ internal:
 	cd internalFunctions; $(MAKE)
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
+	$(CXX) -fpermissive $(CFLAGS) $(DEFINES) $(INCLUDE) -c $<
 
 libbrkernel.a: $(LIBO) $(INTERNALO)
 	$(AR) -crv libbrkernel.a $(LIBO) $(INTERNALO)

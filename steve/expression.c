@@ -554,13 +554,13 @@ void stFreeListIndexAssignExp(stListIndexAssignExp *s) {
 	slFree(s);
 }
 
-stExp *stNewCCallExp(brEngine *e, brNamespaceSymbol *s, slList *exps, char *file, int line) {
+stExp *stNewCCallExp(brEngine *e, brInternalFunction *s, slList *exps, char *file, int line) {
 	stCCallExp *c;
 	int passedArgs;
   
 	c = slMalloc(sizeof(stCCallExp));
 
-	c->function = s->data;
+	c->function = s;
 
 	if(exps) {
 		c->args = slListToArray(exps);

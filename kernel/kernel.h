@@ -72,7 +72,6 @@
 #include <fcntl.h>
 
 #include "simulation.h"
-#include "graph.h"
 
 #include "kernelTypedefs.h"
 
@@ -92,8 +91,6 @@
 #include "evalList.h"
 #include "evalHash.h"
 
-#include "evalListCopy.h"
-
 #include "callback.h"
 
 #include "plugins.h"
@@ -104,7 +101,6 @@
 
 #include "network.h"
 
-#include "format.h"
 #include "interface.h"
 
 #endif /* _KERNEL_H */

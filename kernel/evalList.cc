@@ -214,3 +214,101 @@ brEvalList *brEvalListIndexLookup(brEvalListHead *l, int index) {
 
 	return l->index[index];
 }
+
+brEvalListHead *brEvalListCopy(brEvalListHead *l) {
+	brEvalListHead *newList;
+	brEvalList *item = l->start;
+
+	newList = brEvalListNew();
+
+	while(item) {
+		brEvalListInsert(newList, newList->count, &item->eval);
+		item = item->next;
+	}
+
+	return newList;
+}
+
+brEvalListHead *brEvalListDeepCopy(brEvalListHead *l) {
+	slList *seen = NULL;
+	brEvalListHead *head;
+
+	head = brDoEvalListDeepCopy(l, &seen);
+
+	if(seen) {
+		brFreeListRecords(seen);
+		slListFree(seen);
+	}
+
+	return head;
+}
+
+brEvalListHead *brDoEvalListDeepCopy(brEvalListHead *l, slList **s) {
+	brEvalListHead *newList;
+	brEval newSubList;
+	brEvalList *item = l->start;
+
+	/* we're now officially copying this list -- all future occurences should */
+	/* refer to the copy, so we make a record entry for it */
+
+	newList = brEvalListNew();
+
+	*s = slListPrepend(*s, brMakeListCopyRecord(l, newList));
+
+	while(item) {
+		brEvalListHead *copy;
+
+		/* is this a list? have we seen it before? */
+
+		if(item->eval.type == AT_LIST) {
+			copy = brCopyRecordInList(*s, BRLIST(&item->eval));
+			newSubList.type = AT_LIST;
+
+			if(!copy) {
+				BRLIST(&newSubList) = brDoEvalListDeepCopy(BRLIST(&item->eval), s);
+				brEvalListInsert(newList, newList->count, &newSubList);
+			} else {
+				BRLIST(&newSubList) = copy;
+				brEvalListInsert(newList, newList->count, &newSubList);
+			}
+		} else {
+			brEvalListInsert(newList, newList->count, &item->eval);
+		}
+
+		item = item->next;
+	}
+
+	return newList;
+}
+
+brEvalListCopyRecord *brMakeListCopyRecord(brEvalListHead *original, brEvalListHead *copy) {
+	brEvalListCopyRecord *r;
+
+	r = slMalloc(sizeof(brEvalListCopyRecord));
+
+	r->original = original;
+	r->copy = copy;
+
+	return r;
+}
+
+brEvalListHead *brCopyRecordInList(slList *recordList, brEvalListHead *search) {
+	brEvalListCopyRecord *r;
+
+	while(recordList) {
+		r = recordList->data;
+
+		if(r->original == search) return r->copy;
+
+		recordList = recordList->next;
+	}
+
+	return NULL;
+}
+
+void brFreeListRecords(slList *records) {
+	while(records) {
+		slFree(records->data);
+		records = records->next;
+	}
+}

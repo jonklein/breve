@@ -22,6 +22,7 @@
 /*@{*/
 
 #include "kernel.h"
+#include "graph.h"
 
 /*!
 	\brief Creates a new graph.
@@ -126,7 +127,7 @@ int brIGraphAddLineValue(brEval args[], brEval *target, brInstance *i) {
 	int line = BRINT(&args[1]);
 	double yValue = BRDOUBLE(&args[2]);
 
-	if(line >= g->nLines) {
+	if(line >= g->lines.size()) {
 		/* error message */
 		return EC_OK;
 	}

@@ -21,19 +21,20 @@
 #ifndef _GRAPH_H
 #define _GRAPH_H
 
+#include <vector>
+
 #include "util.h"
 #include "glIncludes.h"
-
 #include "graphTypedefs.h"
 
+#include "draw.h"
+
 struct slGraph {
+	std::vector<slGraphLine*> lines;
+
 	slVector color;
-	slGraphLine **lines;
 
 	void *userData;
-
-	int nLines;
-	int maxLines;
 
 	char *title;
 	char *xAxis;
@@ -59,18 +60,21 @@ struct slGraphLine {
 
 	slGraph *graph;
 	
-	int nValues;
-	int maxValues;
-
 	int start;
 	int end;
 
-	float *xValues;
-	float *yValues;
+	int maxValues;
+
+	std::vector<float> xValues;
+	std::vector<float> yValues;
 
 	float lastX;
 	float lastY;
 };
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 slGraph *slGraphNew(slVector *color, float minX, float minY, float maxX, float maxY);
 
@@ -87,6 +91,7 @@ void slGraphAddLineValue(slGraph *graph, int ln, float x, float y);
 
 void slGraphLineFree(slGraphLine *graphLine);
 
-#include "draw.h"
-
+#ifdef __cplusplus
+}
+#endif
 #endif

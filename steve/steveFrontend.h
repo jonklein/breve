@@ -1,3 +1,4 @@
+#define ST_STACK_SIZE   0x4000
 
 struct stSteveData {
 	brObjectType steveObjectType;
@@ -14,6 +15,12 @@ struct stSteveData {
 
 	slList *freedInstances;
 	char retainFreedInstances;
+
+	// the stack pointer and memory for running steve code
+
+	char stackBase[ST_STACK_SIZE];
+	char *stack;
+	stStackRecord *stackRecord;
 };
 
 struct stVersionRequirement {
@@ -37,7 +44,7 @@ void stFreeParseTrack(stSteveData *e);
 char *stFindParseTrack(slList *l, char *name);
 stVersionRequirement *stMakeVersionRequirement(float version, int operation);
 int stCheckVersionRequirement(float version, stVersionRequirement *r);
-void stObjectAllocationReport(brEngine *engine);
+void stObjectAllocationReport();
 void stParseError(brEngine *e, int type, char *proto, ...);
 
 void stSteveCleanup(stSteveData *steveData);

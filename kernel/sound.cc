@@ -26,7 +26,7 @@ brSoundMixer *brNewSoundMixer() {
 	int error;
 	int n;
 
-	mixer = slMalloc(sizeof(brSoundMixer));
+	mixer = new brSoundMixer;
 	mixer->nPlayers = 0;
 	mixer->maxPlayers = 8;
 	mixer->players = slMalloc(mixer->maxPlayers * sizeof(brSoundPlayer*));
@@ -61,7 +61,8 @@ void brFreeSoundMixer(brSoundMixer *mixer) {
 	
 	for(n=0;n<mixer->maxPlayers;n++) slFree(mixer->players[n]);
 	slFree(mixer->players);
-	slFree(mixer);
+
+	delete mixer;
 }
 
 brSoundPlayer *brNextPlayer(brSoundMixer *mixer) {
@@ -130,9 +131,9 @@ brSoundData *brLoadSound(char *file) {
 	fp = sf_open(file, SFM_READ, &info);
 	if(!fp) return NULL;
 
-	data = slMalloc(sizeof(brSoundData));
+	data = new brSoundData;
 	data->length = (long)info.frames * info.channels;
-	data->data = slMalloc(data->length * sizeof(int));
+	data->data = new int[data->length];
 
 	sf_readf_int(fp, data->data, (long)info.frames);
 
@@ -168,8 +169,8 @@ int *brSampleUp(int *in, long frames) {
 }
 
 void brFreeSound(brSoundData *data) {
-	slFree(data->data);
-	slFree(data);
+	delete[] data->data;
+	delete data;
 }
 
 int brPASoundCallback(void *ibuf, void *obuf, unsigned long fbp, PaTimestamp outTime, void *data) {
@@ -198,7 +199,7 @@ int brPASoundCallback(void *ibuf, void *obuf, unsigned long fbp, PaTimestamp out
 
 				if(player->isSinewave) {
 					if(!player->finished) {
-						total += (0x7fffffff * sin(player->phase) * player->volume / (int)mixer->nPlayers);
+						total += (int)(0x7fffffff * sin(player->phase) * player->volume / (int)mixer->nPlayers);
 
 						// last channel -- update the phase 
 						if(channel) player->phase += player->frequency;

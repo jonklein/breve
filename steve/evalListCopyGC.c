@@ -42,7 +42,7 @@ brEvalListHead *brEvalListDeepCopyGC(brEvalListHead *l) {
 	head = stDoEvalListDeepCopyGC(l, &seen);
 
 	if(seen) {
-		stFreeListRecords(seen);
+		brFreeListRecords(seen);
 		slListFree(seen);
 	}
 
@@ -59,7 +59,7 @@ brEvalListHead *stDoEvalListDeepCopyGC(brEvalListHead *l, slList **s) {
 
 	newList = brEvalListNew();
 
-	*s = slListPrepend(*s, stMakeListCopyRecord(l, newList));
+	*s = slListPrepend(*s, brMakeListCopyRecord(l, newList));
 
 	while(item) {
 		brEvalListHead *copy;
@@ -67,11 +67,11 @@ brEvalListHead *stDoEvalListDeepCopyGC(brEvalListHead *l, slList **s) {
 		/* is this a list? have we seen it before? */
 
 		if(item->eval.type == AT_LIST) {
-			copy = stCopyRecordInList(*s, BRLIST(&item->eval));
+			copy = brCopyRecordInList(*s, BRLIST(&item->eval));
 			newSubList.type = AT_LIST;
 
 			if(!copy) {
-				BRLIST(&newSubList) = stDoEvalListDeepCopy(BRLIST(&item->eval), s);
+				BRLIST(&newSubList) = brDoEvalListDeepCopy(BRLIST(&item->eval), s);
 				brEvalListInsert(newList, newList->count, &newSubList);
 				stGCRetain(&newSubList);
 			} else {

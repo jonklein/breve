@@ -47,8 +47,6 @@ struct stStackRecord {
 	slStack *gcStack;
 };
 
-int brEvalCopy(brEval *s, brEval *d);
-
 __inline__ int stEvalFree(stExp *e, stRunInstance *i, brEval *t);
 __inline__ int stEvalArray(slArray *l, stRunInstance *i, brEval *target);
 __inline__ int stEvalMethodCall(stMethodExp *m, stRunInstance *i, brEval *t);
@@ -116,7 +114,7 @@ int stLoadVariable(void *variable, unsigned char type, brEval *e, stRunInstance 
 int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e, stRunInstance *i);
 
 int stStackTraceFrame(stStackRecord *r);
-void stStackTrace(brEngine *r);
+void stStackTrace(stSteveData *r);
 
 int stGC(brEval *e);
 

@@ -32,7 +32,7 @@ brMethod *brMethodFind(brObject *o, char *name, unsigned char *types, int argCou
 	int n;
 
 	if(!types && argCount) {
-		types = alloca(argCount);
+		types = (unsigned char*)alloca(argCount);
 		for(n=0;n<argCount;n++) types[n] = AT_UNDEFINED;
 	}
 
@@ -40,7 +40,7 @@ brMethod *brMethodFind(brObject *o, char *name, unsigned char *types, int argCou
 
 	if(!mp) return NULL;
 
-	m = slMalloc(sizeof(brMethod));
+	m = new brMethod;
 	m->userData = mp;
 	m->argumentCount = argCount;
 	m->name = slStrdup(name);
@@ -325,12 +325,6 @@ void brEngineAddObjectAlias(brEngine *e, char *name, brObject *o) {
 brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
 	brMethod *imethod, *pmethod;
 	brInstance *i;
-	int n;
-
-	for(n=0;n<e->instances->count;n++) {
-		i = e->instances->data[n];
-		if(i->userData == pointer) return NULL;
-	}
 
     i = slMalloc(sizeof(brInstance));
     i->engine = e;
@@ -358,10 +352,7 @@ brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
 	i->iterate = imethod;
 	i->postIterate = pmethod;
 
-	slStackPush(e->instances, i);
-
-	if(imethod) slStackPush(e->iterationInstances, i);
-	if(pmethod) slStackPush(e->postIterationInstances, i);
+	e->instancesToAdd.push_back(i);
 
 	return i;
 }
@@ -382,6 +373,7 @@ brInstance *brObjectInstantiate(brEngine *e, brObject *o, brEval **args, int arg
 void brInstanceRelease(brInstance *i) {
 	if(!i) return;
 
+	i->engine->instancesToRemove.push_back(i);
 	i->status = AS_RELEASED;
 }
 
@@ -395,11 +387,18 @@ void brInstanceRelease(brInstance *i) {
 void brEngineRemoveInstance(brEngine *e, brInstance *i) {
 	// inform the camera of the change
 
+	std::vector<brInstance*>::iterator bi;
+
 	if(e->camera) e->camera->recompile = 1;
 
-	slStackRemove(e->instances, i);
-	slStackRemove(e->iterationInstances, i);
-	slStackRemove(e->postIterationInstances, i);
+	bi = std::find(e->iterationInstances.begin(), e->iterationInstances.end(), i);
+	if(bi != e->iterationInstances.end()) e->iterationInstances.erase(bi);
+
+	bi = std::find(e->postIterationInstances.begin(), e->postIterationInstances.end(), i);
+	if(bi != e->postIterationInstances.end()) e->postIterationInstances.erase(bi);
+
+	bi = std::find(e->instances.begin(), e->instances.end(), i);
+	if(bi != e->instances.end()) e->instances.erase(bi);
 }
 
 /*!
@@ -411,7 +410,7 @@ void brEngineRemoveInstance(brEngine *e, brInstance *i) {
 
 void brMethodFree(brMethod *m) {
 	if(m->name) slFree(m->name);
-	slFree(m);
+	delete m;
 }
 
 /*!
@@ -504,7 +503,7 @@ void brInstanceFree(brInstance *i) {
 
 	i->userData = NULL;
 
-	i->engine->freedInstances = slListPrepend(i->engine->freedInstances, i);
+	i->engine->freedInstances.push_back(i);
 }
 
 /*!
@@ -518,7 +517,7 @@ void brInstanceFree(brInstance *i) {
 int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *name) {
 	brCollisionHandler *ch;
 	brMethod *method;
-	int n;
+	unsigned int n;
 	unsigned char types[] = { AT_INSTANCE, AT_DOUBLE };
 
 	for(n=0;n<handler->collisionHandlers->count;n++) {
@@ -548,7 +547,7 @@ int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *nam
 
 int brObjectSetIgnoreCollisionsWith(brObject *handler, brObject *collider, int ignore) {
 	brCollisionHandler *ch;
-	int n;
+	unsigned int n;
 
 	for(n=0;n<handler->collisionHandlers->count;n++) {
 		ch = handler->collisionHandlers->data[n];

@@ -72,7 +72,7 @@ void slDemoReshape(int x, int y) {
 }
 
 void slInitGlut(int argc, char **argv, char *title) {
-	glutInitWindowSize(400.0, 400.0);
+	glutInitWindowSize(400, 400);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH|GLUT_STENCIL);
 	glutCreateWindow(title);

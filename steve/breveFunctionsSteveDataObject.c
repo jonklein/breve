@@ -106,6 +106,7 @@ int stDDataCopyObject(brEval *args, brEval *result, brInstance *bi) {
 
 int stDDataWriteObject(brEval *args, brEval *result, brInstance *bi) {
     char *filename = BRSTRING(&args[0]);
+	char *path;
 	stInstance *i = bi->userData;
 
     result->type = AT_INT;
@@ -116,15 +117,9 @@ int stDDataWriteObject(brEval *args, brEval *result, brInstance *bi) {
         return EC_OK;
     }
 
-    if(i->type->engine->outputPath) {
-        char *newfilename;
-        newfilename = slMalloc(strlen(i->type->engine->outputPath) + 2 + strlen(filename));
-        sprintf(newfilename, "%s/%s", i->type->engine->outputPath, filename);
-        BRINT(result) = stWriteObject(i, newfilename);
-        slFree(newfilename);
-    } else {
-        BRINT(result) = stWriteObject(i, filename);
-    }
+	path = brOutputPath(i->type->engine, filename);	
+	BRINT(result) = stWriteObject(i, path);
+	slFree(path);
 
     return EC_OK;
 }
@@ -216,14 +211,10 @@ int stDDataWriteObjectWithDialog(brEval *args, brEval *result, brInstance *bi) {
     result->type = AT_INT;
     BRINT(result) = 1;
         
-    if(i->type->engine->getSavename) filename = i->type->engine->getSavename(i->type->engine->callbackData);
-    else {
-        slMessage(DEBUG_ALL, "Write dialog callback not set.  Cannot open dialog box.\n");
-        return EC_OK;
-    }   
+	filename = brEngineRunSaveDialog(i->type->engine);
 
     if(!filename) {  
-        slMessage(DEBUG_ALL, "Write cancelled.\n");
+        slMessage(DEBUG_ALL, "Could not retreive filename from user dialog: write cancelled.\n");
         return EC_OK;
     }
     
@@ -245,17 +236,12 @@ int stDDataReadXMLObject(brEval args[], brEval *target, brInstance *bi) {
 
 int stDWriteXMLObject(brEval args[], brEval *target, brInstance *bi) {
     char *filename = BRSTRING(&args[0]);
+    char *path;
 	stInstance *i = bi->userData;
 
-    if(i->type->engine->outputPath) {
-        char *newfilename;
-        newfilename = slMalloc(strlen(i->type->engine->outputPath) + 2 + strlen(filename));
-        sprintf(newfilename, "%s/%s", i->type->engine->outputPath, filename);
-    	BRINT(target) = stXMLWriteObjectToFile(i, newfilename, 1);
-        slFree(newfilename);
-	} else {
-    	BRINT(target) = stXMLWriteObjectToFile(i, filename, 1);
-	}
+	path = brOutputPath(i->type->engine, filename);
+   	BRINT(target) = stXMLWriteObjectToFile(i, path, 1);
+	slFree(path);
 
     return EC_OK;
 }
@@ -283,14 +269,10 @@ int stDDataReadObjectWithDialog(brEval *args, brEval *result, brInstance *bi) {
     result->type = AT_INT;
     BRINT(result) = 1;
 
-    if(i->type->engine->getLoadname) filename = i->type->engine->getLoadname(i->type->engine->callbackData);
-    else {
-        slMessage(DEBUG_ALL, "Load dialog callback not set.  Cannot open dialog box.\n");
-        return EC_OK;
-    }
+	filename = brEngineRunLoadDialog(i->type->engine);
 
     if(!filename) {
-        slMessage(DEBUG_ALL, "Load cancelled.\n");
+        slMessage(DEBUG_ALL, "Could not retrieve filename from load dialog: load cancelled.\n");
         return EC_OK;
     }
 

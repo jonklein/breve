@@ -130,7 +130,7 @@ int brISystem(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISleep(brEval args[], brEval *target, brInstance *i) {
-    usleep(1000000 * BRDOUBLE(&args[0]));
+    usleep((int)(1000000 * BRDOUBLE(&args[0])));
 
     return EC_OK;
 }
@@ -492,7 +492,7 @@ int brIGetSpectrumData(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIUniqueColor(brEval args[], brEval *target, brInstance *i) {
-	stUniqueColor(&BRVECTOR(target), BRINT(&args[0]));
+	brUniqueColor(&BRVECTOR(target), BRINT(&args[0]));
 	return EC_OK;
 }
 
@@ -503,7 +503,7 @@ int brIUniqueColor(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIHSVtoRGB(brEval args[], brEval *target, brInstance *i) {
-	stHSVtoRGB(&BRVECTOR(&args[0]), &BRVECTOR(target));
+	brHSVtoRGB(&BRVECTOR(&args[0]), &BRVECTOR(target));
 	return EC_OK;
 }
 
@@ -514,7 +514,7 @@ int brIHSVtoRGB(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIRGBtoHSV(brEval args[], brEval *target, brInstance *i) {
-	stRGBtoHSV(&BRVECTOR(&args[0]), &BRVECTOR(target));
+	brRGBtoHSV(&BRVECTOR(&args[0]), &BRVECTOR(target));
 	return EC_OK;
 }
 

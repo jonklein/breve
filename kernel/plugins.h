@@ -27,8 +27,15 @@ struct brDlPlugin {
 	void *handle;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int brEngineAddDlPlugin(char *filename, char *func, brEngine *engine);
 void brEngineRemoveDlPlugins(brEngine *engine);
 void *brDlLoadPlugin(char *filename, char *loadFunc, brNamespace *n);
 
 char *brPluginFindFile(char *file, void *i);
+
+#ifdef __cplusplus
+}
+#endif

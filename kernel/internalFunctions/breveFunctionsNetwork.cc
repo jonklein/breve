@@ -162,20 +162,6 @@ char *brHostnameFromAddr(struct in_addr *addr) {
 }
 
 /*!
-	\brief Get an address from a hostname.
-*/
-
-long brAddrFromHostname(char *name) {
-	struct hostent *e;
-
-	e = gethostbyname(name);
-
-	if(!e) return 0;
-
-	return *(long*)e->h_addr_list[0];
-}
-
-/*!
 	\brief Starts a network server on a given port.
 */
 

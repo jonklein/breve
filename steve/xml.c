@@ -62,11 +62,14 @@ enum states {
 int stXMLAssignIndices(brEngine *e) {
 	int n;
 	int top = 0;
+	slStack *instances = brEngineGetAllInstances(e);
 
-	for(n=0;n<e->instances->count;n++) {
-		stInstance *i = ((brInstance*)e->instances->data[n])->userData;
+	for(n=0;n<instances->count;n++) {
+		stInstance *i = ((brInstance*)instances->data[n])->userData;
 		i->index = n;
 	}
+
+	slStackFree(instances);
 
 	return top;
 }
@@ -161,8 +164,9 @@ int stXMLWriteSimulationToStream(FILE *file, brEngine *e) {
 	int spaces = 0;
 	stXMLArchiveRecord record;
 	stInstance *controller;
+	slStack *instances;
 
-	controller = e->controller->userData;
+	controller = brEngineGetController(e)->userData;
 
 	bzero(&record, sizeof(stXMLArchiveRecord));
 
@@ -172,7 +176,11 @@ int stXMLWriteSimulationToStream(FILE *file, brEngine *e) {
 	fprintf(file, "<engine controllerIndex=\"%d\">\n", controller->index);
 	spaces += XML_INDENT_SPACES;
 
-	for(n=0;n<e->instances->count;n++) stXMLWriteObject(&record, file, ((brObject*)e->instances->data[n])->userData, spaces, 0);
+	instances = brEngineGetAllInstances(e);
+
+	for(n=0;n<instances->count;n++) stXMLWriteObject(&record, file, ((brObject*)instances->data[n])->userData, spaces, 0);
+
+	slStackFree(instances);
 
 	spaces -= XML_INDENT_SPACES;
 	fprintf(file, "</engine>\n");
@@ -873,6 +881,7 @@ void stXMLObjectStartElementHandler(stXMLParserState *userData, const XML_Char *
 	int controllerIndex = 0, index = 0, archiveIndex = 0;
 	brNamespaceSymbol *symbol;
 	stInstance *steveInstance;
+	brObject *object;
 
 	if(userData->error != 0) return;
 
@@ -940,7 +949,11 @@ void stXMLObjectStartElementHandler(stXMLParserState *userData, const XML_Char *
 			state->eval.type = AT_POINTER;
 			break;
 		case XP_CLASS:
-			userData->currentObject = stObjectFind(userData->engine->objects, state->name);
+			object = brObjectFind(userData->engine, state->name);
+
+			if(object) userData->currentObject = object->userData;
+			else userData->currentObject = NULL;
+
 			break;
 	}
 }
@@ -1068,7 +1081,7 @@ void stXMLObjectEndElementHandler(stXMLParserState *userData, const XML_Char *na
 					o = brObjectFind(userData->engine, userData->currentInstance->type->name);
 
 					if(userData->controllerIndex == userData->currentInstance->index) 
-						userData->engine->controller = userData->currentInstance->breveInstance;
+						brEngineSetController(userData->engine, userData->currentInstance->breveInstance);
 				}
 				break;
 			case XP_CLASS:

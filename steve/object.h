@@ -25,6 +25,7 @@
 struct stObject {
 	char *name;
 	brEngine *engine;
+	stSteveData *steveData;
 
 	float version;
 

@@ -42,13 +42,7 @@
 
 // do not change the order of the includes--they depend on eachother
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include "util.h"
-#ifdef __cplusplus 
-}
-#endif
 
 #include "simulationTypedefs.h"
 

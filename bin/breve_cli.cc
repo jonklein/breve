@@ -30,6 +30,7 @@
 #include <signal.h>
 
 #include "steve.h"
+
 #include "breve.h"
 
 #include "glIncludes.h"

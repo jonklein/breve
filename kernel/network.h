@@ -29,4 +29,10 @@ struct brStringHeader {
     int32_t length;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 long brAddrFromHostname(char *name);
+#ifdef __cplusplus
+}
+#endif

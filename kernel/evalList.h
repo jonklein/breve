@@ -18,8 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-brEvalListHead *brEvalListNew();
-
 /*!
 	\brief A breve/steve list datatype.
 
@@ -52,9 +50,27 @@ struct brEvalList {
 	brEvalList *next;
 	brEvalList *previous;
 };
+ 
+/*!
+	\brief Used to store temporary data for list-copying.
 
-void brEmptyEvalList(brEvalListHead *lh);
+	Used to correctly copy circular list references.  Instead of recursively
+	copying a circular reference, we use the pointer to the previously made 
+	copy.
+*/
 
+struct brEvalListCopyRecord {
+    brEvalListHead *original;
+    brEvalListHead *copy;
+};
+
+typedef struct brEvalListCopyRecord brEvalListCopyRecord;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+brEvalListHead *brEvalListNew();
 void brEvalListFree(brEvalListHead *a);
 
 int brEvalListCompare(const void *a, const void *b);
@@ -73,3 +89,12 @@ int brEvalListRemove(brEvalListHead *head, int index, brEval *value);
 
 brEvalList *brEvalListIndexLookup(brEvalListHead *l, int index);
 
+brEvalListHead *brEvalListDeepCopy(brEvalListHead *l);
+brEvalListHead *brDoEvalListDeepCopy(brEvalListHead *l, slList **s);
+brEvalListHead *brCopyRecordInList(slList *recordList, brEvalListHead *search);
+brEvalListCopyRecord *brMakeListCopyRecord(brEvalListHead *original, brEvalListHead *copy);
+void brFreeListRecords(slList *records);
+
+#ifdef __cplusplus
+}
+#endif

@@ -87,8 +87,17 @@ struct brEval {
 #define BRHASH(e)		((e)->values.hashValue)
 #define BRLIST(e)		((e)->values.listValue)
 
-int brEvalCopy(brEval *s, brEval *d);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-int brEvalPointer(brEval *s, void **pointer);
+int brEvalCopy(brEval *s, brEval *d);
+char *brObjectDescription(brInstance *i);
+char *brFormatEvaluation(brEval *e, brInstance *i);
+char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _BREVEEVAL_H */
