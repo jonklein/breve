@@ -450,7 +450,7 @@ int brEngineIterate(brEngine *e) {
 			oldAge = e->world->age;
 			e->world->age = event->time;
 
-			rcode = brMethodCallByName(event->instance, event->name, &result);
+			if(event->instance->status == AS_ACTIVE) rcode = brMethodCallByName(event->instance, event->name, &result);
 
 			brEventFree(event);
 			slListFreeHead(eventList);
