@@ -29,7 +29,6 @@
 
 // for now we rely on libgsl--which will use either the unaccellerated blas
 // or an accellerated
-
 #include <gsl/gsl_matrix_float.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_blas.h>
@@ -121,6 +120,33 @@ class slVectorView {
          *  Multiply each element by a scalar factgor in place.
          */
         virtual slVectorView& inPlaceMultiply(const float scalar) = 0;
+        
+        /**
+         *  Convolve with general kernel (odd dimension).
+         *  
+         *  This method convolves this vector with another smaller
+         *  vector of odd dimensionality.  This convolution is zero
+         *  padded at the boundaries.
+         */
+        virtual slVectorView& convolve(const slVectorView&) = 0;
+
+        /**
+         *  Convolve with general kernel (odd dimension).
+         *  
+         *  This method convolves this vector with another smaller
+         *  vector of odd dimensionality.  This convolution is periodic
+         *  at the boundaries.
+         */
+        virtual slVectorView& convolvePeriodic(const slVectorView&) = 0;
+
+        /**
+         *  Convolve with general kernel (odd dimension).
+         *  
+         *  This method convolves this vector with another smaller
+         *  vector of odd dimensionality.  This convolution is implemented
+         *  by converting the vector to the frequency domain using a DFT.
+         */
+        virtual slVectorView& convolveFFT(const slVectorView&) = 0;
 
         /**
          *  Matrix in-place addition operator (must have common dimensions).
@@ -153,7 +179,7 @@ class slVectorView {
          *  it.  Down the road the interface/underlying data
          *  representation WILL change
          */
-        virtual inline gsl_vector_float* getGSLVector() const = 0;
+        virtual gsl_vector_float* getGSLVector() const = 0;
       
     protected:
       
@@ -170,9 +196,13 @@ class slVectorView {
 class slBigVector : public slVectorView {
     public:
     
+/*
+ *  virtual is apparently not supported by gcc 3.2 or 3.3
+*/
         virtual float get(const int x) const = 0;
 
         virtual void set(const int x, const float value) = 0;
+/**/
 
 };
 
@@ -186,10 +216,27 @@ class slBigMatrix2D : public slBigMatrix {
         virtual unsigned int xDim() const = 0;
         
         virtual unsigned int yDim() const = 0;
-        
+
+/*
+ *  virtual is apparently not supported by gcc 3.2 or 3.3
+     
         virtual float get(const int x, const int y) const = 0;
 
         virtual void set(const int x, const int y, const float value) = 0;
+*/
+/* ************* These methods will be implemented in the next release or sooner
+        virtual slBigMatrix2D& inPlaceConvolve(const slBigMatrix2D& kernel) = 0;
+
+        virtual slBigMatrix2D& inPlaceConvolvePeriodic(const slBigMatrix2D& kernel) = 0;
+
+        virtual slBigMatrix2D& inPlaceConvolve3x3(const slBigMatrix2D& kernel) = 0;
+
+        virtual slBigMatrix2D& convolve(const slBigMatrix2D& kernel) = 0;
+
+        virtual slBigMatrix2D& convolvePeriodic(const slBigMatrix2D& kernel) = 0;
+
+        virtual slBigMatrix2D& convolve3x3(const slBigMatrix2D& kernel) = 0;
+*/
 
 };
 
@@ -205,10 +252,23 @@ class slBigMatrix3D : public slBigMatrix {
         virtual unsigned int yDim() const = 0;
         
         virtual unsigned int zDim() const = 0;
-        
+
+/*
+ *  virtual is apparently not supported by gcc 3.2 or 3.3
+ 
         virtual float get(int x, int y, int z) const = 0;
 
         virtual void set(int x, int y, int z, float value) = 0;
+*/
+/* ************* These methods will be implemented in the next release or sooner
+        virtual slBigMatrix3D& inPlaceConvolve(const slBigMatrix3D& kernel) = 0;
+
+        virtual slBigMatrix3D& inPlaceConvolvePeriodic(const slBigMatrix3D& kernel) = 0;
+
+        virtual slBigMatrix3D& convolve(const slBigMatrix3D& kernel) = 0;
+
+        virtual slBigMatrix3D& convolvePeriodic(const slBigMatrix3D& kernel) = 0;
+*/
 
 };
 
@@ -235,6 +295,11 @@ class slVectorViewGSL : public slVectorView {
         slVectorViewGSL(const slVectorViewGSL& source);
 
         /**
+         *  Copy method
+         */
+        void copy(const slVectorViewGSL& source);
+        
+        /**
          *  Adds a scaled vector view (combined operations).
          */
         slVectorViewGSL& scaleAndAdd(const float scalar,
@@ -242,7 +307,7 @@ class slVectorViewGSL : public slVectorView {
         /**
          *  Returns the dimensionality of the vector.
          */
-        inline unsigned int dim() const;
+        unsigned int dim() const;
 
         /**
          *  Returns the absolute sum of the elements.
@@ -285,6 +350,26 @@ class slVectorViewGSL : public slVectorView {
         slVectorViewGSL& inPlaceAdd(const slVectorView& other);
 
         /**
+         *  Convolve with general kernel (odd dimension).
+         */
+        slVectorViewGSL& convolve(const slVectorView&);
+
+        /**
+         *  Convolve periodic with general kernel (odd dimension).
+        */
+        slVectorViewGSL& convolvePeriodic(const slVectorView&);
+
+        /**
+         *  Convolve with general kernel via DFT (odd dimension).
+         */
+        slVectorViewGSL& convolveFFT(const slVectorView&);
+
+        /**
+         *  Convolve with 3x3 kernel (odd dimension).
+         */
+        slVectorViewGSL& convolve3x3(const slVectorView&);
+
+        /**
          *  Addition operator (must have common dimensions).
          *  This is a proper matrix function.
          */
@@ -315,7 +400,7 @@ class slVectorViewGSL : public slVectorView {
          *  it.  Down the road the interface/underlying data
          *  representation WILL change
          */
-        inline gsl_vector_float* getGSLVector() const;
+        gsl_vector_float* getGSLVector() const;
 
     protected:
         
@@ -327,11 +412,27 @@ class slVectorViewGSL : public slVectorView {
         
 };
 
+class slBigVectorGSL : public slBigVector, public slVectorViewGSL {
+    public:
+    
+        slBigVectorGSL(const int x);
+        
+        slBigVectorGSL(const slBigVectorGSL& source);
+        
+        ~slBigVectorGSL();
+        
+        unsigned int dim();
+        
+        float get(const int x);
+        
+        void set(const int x, const float value);
+
+};
 
 class slBigMatrix2DGSL : public slBigMatrix2D, public slVectorViewGSL {
     public:
         
-        slBigMatrix2DGSL(int x, int y);
+        slBigMatrix2DGSL(const int x, const int y);
                 
 		slBigMatrix2DGSL(const slBigMatrix2DGSL& source);
 
@@ -344,7 +445,14 @@ class slBigMatrix2DGSL : public slBigMatrix2D, public slVectorViewGSL {
         float get(const int x, const int y) const;
 
         void set(const int x, const int y, const float value);
-        
+
+/*        
+        slBigMatrix2DGSL& inPlaceConvolve(const slBigMatrix2D& kernel);
+
+        slBigMatrix2DGSL& convolvePeriodic(const slBigMatrix2D& kernel);
+
+        slBigMatrix2DGSL& convolve3x3(const slBigMatrix2D& kernel);
+*/       
     protected:
     
         unsigned int _xdim, _ydim;
@@ -357,7 +465,7 @@ class slBigMatrix2DGSL : public slBigMatrix2D, public slVectorViewGSL {
 class slBigMatrix3DGSL : public slBigMatrix3D, public slVectorViewGSL {
     public:
 	
-		slBigMatrix3DGSL(int x, int y, int z);
+		slBigMatrix3DGSL(const int x, const int y, const int z);
 		
 		slBigMatrix3DGSL(const slBigMatrix3DGSL& source);
 		
@@ -372,7 +480,12 @@ class slBigMatrix3DGSL : public slBigMatrix3D, public slVectorViewGSL {
         float get(const int x, const int y, const int z) const;
 
         void set(const int x, const int y, const int z, const float value);
-    
+
+/*        
+        slBigMatrix3DGSL& convolve(const slBigMatrix3D& kernel);
+
+        slBigMatrix3DGSL& convolvePeriodic(const slBigMatrix3D& kernel);
+*/    
     protected:
 
 		unsigned int _xdim, _ydim, _zdim;

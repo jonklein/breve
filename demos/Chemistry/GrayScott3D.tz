@@ -1,0 +1,117 @@
+#
+# GrayScott -- the Gray Scott reaction diffusion model
+# jon klein <jk@spiderland.org>
+#
+# This is a simulation of the Gray Scott self-reproducing spots
+# reaction/diffusion model.
+#
+
+@use Control.
+@use Mobile.
+@use Matrix.
+
+@define F 0.01.
+@define K 0.04.
+@define RU .078.
+@define RV .022.
+
+@define TIMESTEP 1.0.
+
+@define XSIZE 64.
+@define YSIZE 64.
+@define ZSIZE 16.
+
+Controller GS.
+
+Control : GS {
+    + variables:
+        U (object).
+        V (object).
+        tempreact, temp, inflow (object).
+        texture (object).
+        textureList (list).
+        cube (object).
+        cubeList (list).
+        
+    + to init:
+        i, j, k, m, n (int).
+
+        self set-background-color to (0, 0, 0).
+
+        self set-iteration-step to TIMESTEP.
+        self set-integration-step to TIMESTEP.
+
+        self point-camera at (-10, 0, -5) from (45, 40, -80).
+
+		U = new Matrix3D.
+		V = new Matrix3D.
+		inflow = new Matrix3D.
+		temp = new Matrix3D.
+		tempreact = new Matrix3D.
+
+		U set-size x XSIZE y YSIZE z ZSIZE.
+		V set-size x XSIZE y YSIZE z ZSIZE.
+		temp set-size x XSIZE y YSIZE z ZSIZE.
+		tempreact set-size x XSIZE y YSIZE z ZSIZE.
+		inflow set-size x XSIZE y YSIZE z ZSIZE.
+
+        for i=0,i<ZSIZE,i++: {
+
+        insert ((new MatrixImage) init-with width XSIZE height YSIZE) at textureList{i}.
+        (textureList{i}) set-vp to V.
+        (textureList{i}) set-up to U.        
+        (textureList{i}) set-z-plane to i.        
+        
+        insert (new Mobile) at cubeList{i}.
+        cubeList{i} set-shape to (new Cube init-with size (40, 40, 1)).
+        cubeList{i} move to (0, 0, ((i * 4) - (ZSIZE * 2))).
+        cubeList{i} set-texture-image to textureList{i}.
+        cubeList{i} set-texture-scale to 40.
+
+        
+        }
+        for i=0,i<ZSIZE,i++:
+            for n=0,n<YSIZE,n++:
+                for m=0,m<XSIZE,m++: {
+                    U set-value to (0.5 + sqrt(|0.25 - F*(1.0 + K/F)*(1.0 + K/F)|) + 0.01*(random[1.0] - 0.5)) at-x m at-y n at-z i.
+                    V set-value to (1.0 - (U get-value at-x m at-y n at-z i))/(1.0 + K/F) + 0.01*(random[1.0] - 0.5) at-x m at-y n at-z i.
+                    inflow set-value to F at-x n at-y m at-z i.
+                }
+        
+    + to iterate:
+		tempreact copy from U.
+		tempreact multiply-with-values of V.
+		tempreact multiply-with-values of V.
+
+		temp compute-diffusion-matrix from U with-scale RU.
+
+		temp add-values of tempreact scaled-by -1.0.
+		temp add-values of U scaled-by -F.
+		temp add-values of inflow.
+		U add-values of temp scaled-by TIMESTEP.
+
+		temp compute-diffusion-matrix from V with-scale RV.
+
+		temp add-values of tempreact.
+		temp add-values of V scaled-by -(K + F).
+		V add-values of temp scaled-by TIMESTEP.
+		
+        super iterate.
+}
+
+Image : MatrixImage {
+    + variables:
+        vp (object).
+        up (object).
+        n, z (int).
+
+    + to set-vp to m (object): vp = m.
+    + to set-up to m (object): up = m.
+    + to set-z-plane to theZ (int): z = theZ.
+
+    + to iterate:
+		vp copy-to-red-channel z-plane z of-image self with-scale 2.0.
+		up copy-to-blue-channel z-plane z of-image self with-scale 2.0.
+        super iterate.
+}
+

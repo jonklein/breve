@@ -285,6 +285,40 @@ Matrix : Matrix3D (aka Matrices3D) {
 		% The optional scale argument may be used to scale the resulting scale 
 		% matrix.
 
-		# matrix3DDiffusePeriodic((chemicalMatrix get-matrix-pointer), matrixPointer, scale).
+		matrix3DDiffusePeriodic((chemicalMatrix get-matrix-pointer), matrixPointer, scale).
+		
+	+ to copy-to-red-channel z-plane thePlane (int) of-image theImage (Image object) with-scale scale = 1.0 (float):
+		% Copies the contents of this matrix to the red channel of theImage.  
+		% The optional
+		% argument scale specifies how the matrix elements should be scaled.
+		% <P>
+		% This method, and it's counterparts METHOD(copy-to-green-channel) and 
+		% METHOD(copy-to-blue-channel) are far faster than looping manually through
+		% the matrix values.
+
+		matrix3DCopyToImage(matrixPointer, thePlane, (theImage get-image-data), 0, scale).
+
+	+ to copy-to-green-channel z-plane thePlane (int) of-image theImage (Image object) with-scale scale = 1.0 (float):
+		% Copies the contents of this matrix to the green channel of theImage.  
+		% The optional
+		% argument scale specifies how the matrix elements should be scaled.
+		% <P>
+		% This method, and it's counterparts METHOD(copy-to-blue-channel) and 
+		% METHOD(copy-to-red-channel) are far faster than looping manually through
+		% the matrix values.
+
+		matrix3DCopyToImage(matrixPointer, thePlane, (theImage get-image-data), 1, scale).
+
+	+ to copy-to-blue-channel z-plane thePlane (int) of-image theImage (Image object) with-scale scale = 1.0 (float):
+		% Copies the contents of this matrix to the blue channel of theImage.  
+		% The optional
+		% argument scale specifies how the matrix elements should be scaled.
+		% <P>
+		% This method, and it's counterparts METHOD(copy-to-red-channel) and 
+		% METHOD(copy-to-green-channel) are far faster than looping manually through
+		% the matrix values.
+
+		matrix3DCopyToImage(matrixPointer, thePlane, (theImage get-image-data), 2, scale).
+
 
 }
