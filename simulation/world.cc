@@ -534,8 +534,8 @@ void slNeighborCheck(slWorld *w) {
 			slVectorSub(l1, l2, &diff);
 			dist = slVectorLength(&diff);
 
-			if(dist < o1->proximityRadius) o2->neighbors.push_back(o1);
-			if(dist < o2->proximityRadius) o1->neighbors.push_back(o2);
+			if(dist < o1->proximityRadius) o1->neighbors.push_back(o2);
+			if(dist < o2->proximityRadius) o2->neighbors.push_back(o1);
 		}
 	}
 }

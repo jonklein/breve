@@ -26,6 +26,9 @@
 
 /*!
     memory.cc defines a set of malloc wrappers
+
+	These could be replaced with macros, except that they are used 
+	by plugins which expect to find the actual symbols.
 */
 
 #ifdef __cplusplus

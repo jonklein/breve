@@ -51,8 +51,10 @@ slMovie *slMovieCreate(char *filename, int width, int height, int framerate, flo
 
 	m = new slMovie;
 
-	if(!(m->codec = avcodec_find_encoder(CODEC_ID_MPEG2VIDEO)) &&
-	   !(m->codec = avcodec_find_encoder(CODEC_ID_MPEG1VIDEO))) {
+	// MPEG 2 video not working with QuickTime [?!]
+	// if(!(m->codec = avcodec_find_encoder(CODEC_ID_MPEG2VIDEO)) &&
+
+	if( !(m->codec = avcodec_find_encoder(CODEC_ID_MPEG1VIDEO))) {
 		slMessage(DEBUG_ALL, "cannot locate video encoding codec\n");
 		return NULL;
 	}

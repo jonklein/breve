@@ -227,10 +227,10 @@ of breve is available for Mac OS X, Linux and Windows.
 </para>
 <note><title>For Windows and Linux Users</title>
 <para>
-In order to run the command-line breve on any of these platforms, you'll need 
+In order to run the command-line breve on Windows or Linux, you'll need 
 to have OpenGL and GLUT libraries installed on your system.  If you encounter
 problems running breve, you may need to install these libraries.  They are 
-free available from the internet.
+freely available from the internet.
 </para>
 </note>
 <sect2 id="cli_setup"><title>Setting Up Your Environment</title>
