@@ -124,7 +124,6 @@ AC_CHECK_LIB([l], [yywrap])
 AC_CHECK_LIB([png], [png_create_write_struct],,,[-lz -lm])
 AC_CHECK_LIB([portaudio], [Pa_OpenStream],,,$AUDIOLIBS)
 AC_CHECK_LIB([sndfile], [sf_open])
-AC_CHECK_LIB([OSMesa], [OSMesaCreateContext],,,$GLLIBS)
 AC_CHECK_LIB([termcap], [tputs])
 AC_CHECK_LIB([ncurses], [tputs])
 AC_CHECK_LIB([history], [add_history])
@@ -146,6 +145,8 @@ AC_LANG([C++])
 AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]),[-lstdc++])
 AC_CHECK_LIB([push], [pushEnvironmentNew],,,[-lstdc++])
 AC_LANG([C])
+
+AC_CHECK_LIB([OSMesa], [OSMesaCreateContext],,,$GLLIBS)
 
 # Checks for header files.
 AC_FUNC_ALLOCA
