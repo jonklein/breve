@@ -65,7 +65,7 @@ breve.dll: $(OBJ)
 	$(YACC) $(YFLAGS) -o $@ $<
 
 %.class: %.java
-	-@JAVAC@ $<
+	@JAVAC@ $<
 
 optimize:
 	$(MAKE) EXTRACFLAGS='-O3'

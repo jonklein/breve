@@ -8,4 +8,3 @@ SRC	+= steve/format.c steve/stevelex.c steve/steveparse.tab.c \
 		steve/stringexp.c steve/xml.c
 
 steve/steveparse.tab.h: steve/steveparse.tab.c
-	cp $@ include/breve/
