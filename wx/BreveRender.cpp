@@ -57,6 +57,7 @@ BEGIN_EVENT_TABLE( BreveRender, wxFrame )
     EVT_MENU( BREVE_FILEMENU_QUIT, BreveRender::OnMenuQuit )
     EVT_MENU( BREVE_WINDOWMENU_LOG, BreveRender::OnMenuLogWindow )
     EVT_MENU( BREVE_WINDOWMENU_INSPECTOR, BreveRender::OnMenuInspector )
+    EVT_MENU( BREVE_BREVEMENU_FULLSCREEN, BreveRender::OnFullScreen )
     EVT_MENU_RANGE( BREVE_BREVEMENU_SIM + 1500, BREVE_BREVEMENU_SIM + 2000, BreveRender::OnMenuSim )
     EVT_MENU_RANGE( BREVE_SIMMENU, BREVE_SIMMENU + 1000, BreveRender::OnSimMenu )
     EVT_CLOSE (BreveRender::OnClose)
@@ -247,7 +248,7 @@ void BreveRender::CreateControls()
 	windowmenu->Append(BREVE_WINDOWMENU_LOG, "Log Window");
 	windowmenu->Append(BREVE_WINDOWMENU_INSPECTOR, "Object Inspector");
 
-	wxMenu * brevemenu = new wxMenu;
+	wxMenu * demomenu = new wxMenu;
 
 	if (!app->GetBreveDir().IsEmpty())
 	{
@@ -264,8 +265,6 @@ void BreveRender::CreateControls()
 		wxString filename;
 		bool cont;
 		int count = 1501;
-
-		wxMenu * demomenu = new wxMenu;
 
 		cont = scan.GetFirst(&filename, "*.tz", wxDIR_FILES);
 
@@ -313,22 +312,27 @@ void BreveRender::CreateControls()
 
 		    cont = scan.GetNext(&filename);
 		}
-
-		brevemenu->Append(BREVE_BREVEMENU_SIM, "Demos", demomenu);
 	    }
 	}
+
+	wxMenu * brevemenu = new wxMenu;
+
+	brevemenu->Append(BREVE_BREVEMENU_FULLSCREEN, "Fullscreen");
 
 	defsimmenu = new wxMenu;
 
 	menubar->Append(filemenu, "&File");
 	menubar->Append(windowmenu, "&Window");
 	menubar->Append(brevemenu, "&Breve");
+	menubar->Append(demomenu, "&Demos");
 	menubar->Append(defsimmenu, "&Simulation");
     }
 
     SetMenuBar(menubar);
 
     runbutton->SetFocus();
+
+    canvas->Connect(-1, wxEVT_KEY_DOWN, wxKeyEventHandler(BreveRender::KeyDown));
 }
 
 int BreveRender::GetSimInt(SimInstance * s)
@@ -440,7 +444,7 @@ void BreveRender::ResetSim(int sim)
     if (sim != -2)
 	cursim = sim;
 
-    menubar->Remove(3);
+    menubar->Remove(4);
 
     if (cursim > -1)
     {
@@ -477,7 +481,7 @@ void BreveRender::SetMenu(int mode)
 {
     SimInstance * s = NULL;
 
-    menubar->Remove(3);
+    menubar->Remove(4);
 
     s = GetSimulation();
 
@@ -725,6 +729,35 @@ void BreveRender::OnMenuLogWindow(wxCommandEvent& event)
     }
 }
 
+void BreveRender::OnFullScreen(wxCommandEvent& event)
+{
+    ShowFullScreen(!IsFullScreen(), wxFULLSCREEN_ALL);
+
+    if (IsFullScreen())
+    {
+	GetSizer()->Show((unsigned int)1, FALSE);
+	canvas->SetFocus();
+	SetMenuBar(NULL);
+
+#ifndef __WXMSW__
+	GetSizer()->Detach(canvas);
+	GetSizer()->Prepend(canvas, 1, wxEXPAND|wxGROW|wxALL|wxADJUST_MINSIZE, 0);
+#endif
+    }
+    else
+    {
+	GetSizer()->Show((unsigned int)1, TRUE);
+	SetMenuBar(menubar);
+
+#ifndef __WXMSW__
+	GetSizer()->Detach(canvas);
+	GetSizer()->Prepend(canvas, 1, wxEXPAND|wxGROW|wxALL|wxADJUST_MINSIZE, 5);
+#endif
+    }
+
+    canvas->Refresh(TRUE, NULL);
+}
+
 void BreveRender::OnMenuInspector(wxCommandEvent& event)
 {
     if (inspector != NULL)
@@ -895,11 +928,23 @@ void BreveRender::OnKeyUp(wxKeyEvent&event)
     }
 }
 
+void BreveRender::KeyDown(wxKeyEvent &event)
+{
+    breverender->OnKeyDown(event);
+}
+
 void BreveRender::OnKeyDown(wxKeyEvent&event)
 {
+    if (event.m_keyCode == WXK_ESCAPE && IsFullScreen())
+    {
+	OnFullScreen((*(wxCommandEvent*)NULL));
+	return;
+    }
+
     event.Skip();
 
-    if (GetSimulation() != NULL && GetSimulation()->GetInterface()->Initialized())
+    if (GetSimulation() != NULL && GetSimulation()->GetInterface()->Initialized() &&
+	!GetSimulation()->GetInterface()->Paused())
     {
 	GetSimulation()->GetMutex()->Lock();
 	brKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, event.GetKeyCode(), 1);
@@ -921,7 +966,7 @@ void BreveRender::OnSelectClick(wxCommandEvent&event)
 
 void BreveRender::OnSize(wxSizeEvent &event)
 {
-    if (!IsMaximized())
+    if (!IsMaximized() && !IsFullScreen())
     {
 	wxConfigBase * config = wxConfigBase::Get();
 

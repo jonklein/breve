@@ -56,6 +56,7 @@ enum
     BREVE_FILEMENU_QUIT,
     BREVE_WINDOWMENU_LOG,
     BREVE_WINDOWMENU_INSPECTOR,
+    BREVE_BREVEMENU_FULLSCREEN,
     BREVE_FILEMENU_BOTTOM, // Must always be third to last
     BREVE_BREVEMENU_SIM, // Must always be second to last - uses +1500 to +2000
     BREVE_SIMMENU // Must -always- be last - uses this to +1000
@@ -123,6 +124,7 @@ public:
     void OnMenuOpen(wxCommandEvent& event);
     void OnMenuNew(wxCommandEvent& event);
     void OnMenuQuit(wxCommandEvent& event);
+    void OnFullScreen(wxCommandEvent &event);
     void OnMenuLogWindow(wxCommandEvent& event);
     void OnMenuInspector(wxCommandEvent& event);
     void OnMenuSim(wxCommandEvent &event);
@@ -136,6 +138,7 @@ public:
     void OnKeyDown(wxKeyEvent&event);
     void OnSize(wxSizeEvent &event);
     void OnMove(wxMoveEvent &event);
+    void KeyDown(wxKeyEvent&event);
 
     wxBitmap GetBitmapResource( const wxString& name );
     wxIcon GetIconResource( const wxString& name );
