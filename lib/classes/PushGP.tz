@@ -1,11 +1,6 @@
 @use Push.
 @use Control.
 
-@define POPULATION_SIZE 2000.
-@define TOURNAMENT_SIZE 7.
-@define MUTATE_PERCENT 45.
-@define CROSSOVER_PERCENT 45.
-
 Object : PushGP {
 	% This class is a special control class used to implement 
 	% experiments using the Push Genetic Programming (PushGP)
@@ -50,8 +45,20 @@ Object : PushGP {
 		tournamentSize (int).
 		populationSize (int).
 		currentIndividual (int).
+		generationLimit (int).
 
-	+ section "Setting and Retrieving Parameters"
+  + section "Setting and Retrieving GP Parameters"
+
+	+ to set-generation-limit to n (int):
+		% Sets the generation limit to n.  If no solution is found by
+		% the generation limit, the simulation with terminate.  The 
+		% default value is 300.
+		generationLimit = n.
+
+	+ to get-generation-limit:
+		% Returns the generation limit.  See METHOD(set-generation-limit)
+		% for more information.
+		return generationLimit.
 
 	+ to set-tournament-size to n (int):
 		% Sets the tournament size to n.  The tournament size determines 
@@ -106,7 +113,11 @@ Object : PushGP {
 		inited = 0.
 
 	+ to init:
-		populationSize = POPULATION_SIZE.
+		populationSize = 2000.
+		mutationPercent = 40.
+		crossoverPercent = 40.
+		tournamentSize = 7.
+		generationLimit = 300.
 
 		interpreter = new PushInterpreter.
 
@@ -151,7 +162,7 @@ Object : PushGP {
 
 		best = current{ random[populationSize - 1] }.
 
-		for n = 0, n < TOURNAMENT_SIZE - 1, n++: {
+		for n = 0, n < tournamentSize - 1, n++: {
 			test = random[populationSize - 1].
 
 			if (current{test} get-fitness) < (best get-fitness): best = current{test}.
@@ -188,6 +199,12 @@ Object : PushGP {
 			generation++.
 			bestOfGen = 0.
 			totalSize = 0.
+
+			if generation > generationLimit: {
+				print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;".
+				print ";; FAILURE: no solution found after $generation generations".
+				controller end-simulation.
+			}
 		}
 
 	- to compute-fitness for-program p (object):
@@ -283,7 +300,7 @@ Object : PushGP {
 		n (int).
 		p1, p2 (object).
 
-		while n < (MUTATE_PERCENT / 100.0) * populationSize: {
+		while n < (mutationPercent / 100.0) * populationSize: {
 			p1 = (self run-tournament).
 			next{n} copy-from program p1.
 			next{n} mutate with-max-new-code-size 10 with-interpreter interpreter.
@@ -291,7 +308,7 @@ Object : PushGP {
 			n++.
 		}
 
-		while n < ((CROSSOVER_PERCENT + MUTATE_PERCENT) / 100.0) * populationSize: {
+		while n < ((crossoverPercent + mutationPercent) / 100.0) * populationSize: {
 			p1 = (self run-tournament).
 			p2 = (self run-tournament).
 			next{n} crossover from-parent1 p1 from-parent2 p2.

@@ -387,7 +387,7 @@ void brObjectFree(brObject *o) {
 */
 
 void brInstanceFree(brInstance *i) {
-	slList *olist;
+	slList *olist, *events;
 	brObserver *observer;
 	int n;
 
@@ -422,6 +422,17 @@ void brInstanceFree(brInstance *i) {
 
     slListFree(i->observees);
 
+	// free the instance's events
+
+	events = i->events;
+
+	while(events) {
+		brEventFree(events->data);
+		events = events->next;
+	}
+
+	slListFree(i->events);
+
     for(n=0;n<i->menu.count;n++) {
         slFree(i->menu.list[n]->title);
         slFree(i->menu.list[n]->method);
@@ -444,27 +455,28 @@ void brInstanceFree(brInstance *i) {
     with the collider instance as an argument.
 */
 
-int brObjectAddCollisionHandler(brObject *handler, brObject *collider, brMethod *m) {
+int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *name) {
 	brCollisionHandler *ch;
+	brMethod *method;
 	int n;
 
 	for(n=0;n<handler->collisionHandlers->count;n++) {
 		ch = handler->collisionHandlers->data[n];
 
-		if(ch->object == collider && ch->method == m) return EC_STOP;
+		if(ch->object == collider) return EC_STOP;
 	}
 
-	if(m->argumentCount > 0) {
-		if(m->argumentCount > 1) {
-			slMessage(DEBUG_ALL, "Collision handlers expect (at most) a single argument of type object.\n");
-			return EC_ERROR;
-		}
-	}
+	method = brMethodFindWithArgRange(handler, name, 0, 1);
+
+	if(!method) {
+		slMessage(DEBUG_ALL, "Error adding collision handler: cannot locate method \"%s\" for class \"%s\"\n", handler->name, name);
+		return EC_ERROR;
+    }
 
 	ch = slMalloc(sizeof(brCollisionHandler));
 
 	ch->object = collider;
-	ch->method = m;
+	ch->method = method;
 
 	slStackPush(handler->collisionHandlers, ch);
 

@@ -63,7 +63,7 @@ provided with input data of the correct type.
 </para>
 <para>
 The version of push built into breve 2.0 provides support for the 
-following types: integer, float, name, vector, code, 
+following native types: integer, float, name, vector and code.
 </para>
 <para>
 A Push program is made up lists of the following elements: instructions, 
@@ -112,7 +112,7 @@ and features, see
 <sect1 id="push-environment"><title>Creating and Configuring Push Environments</title>
 <para>
 To create a new push interpreter, simply create a new instance of the 
-class PushInterpreter.
+class <ulink url="../classes/PushInterpreter.html">PushInterpreter</ulink>.
 </para>
 <para>
 An important decission in creating a PushGP experiment is deciding what
@@ -121,10 +121,10 @@ choose instructions that will give evolving programs the right tools to
 solve the problems they are given.  
 </para>
 <para>
-These instructions and other parameters must be specified using a Push 
-configuration file which is loaded into the interpreter with the 
+These instructions and other parameters must are specified using a 
+Push configuration file which is loaded into the interpreter with the 
 PushInterpreter method 
-<ulink url="classes/PushInterpreter.html#read-config">read-config</ulink>.
+<ulink url="../classes/PushInterpreter.html#read-config">read-config</ulink>.
 A full list of Push instructions and parameters, as well as instructions on
 setting up a Push configuration file are available 
 <ulink url="http://hampshire.edu/lspector/push.html">here</ulink>.
@@ -134,8 +134,8 @@ setting up a Push configuration file are available
 <sect1 id="push-programs"><title>Running and Evolving Push Programs</title>
 <para>
 A program in the Push language is stored in a 
-<ulink url="../classes/Push.tz">PushProgram</ulink> object.  This object
-provides methods for parsing Push programs, creating random programs, 
+<ulink url="../classes/PushProgram.html">PushProgram</ulink> object.  This 
+object provides methods for parsing Push programs, creating random programs, 
 breeding and mutating programs and more.  All of these features are 
 described in detail in the class documentation.
 </para>
@@ -148,24 +148,24 @@ object.  Typically, the steps involved in running a Push program are:
 
 <listitem><para>
 Clear the interpreter's stacks with the method
-<ulink url="classes/PushInterpreter.html#clear-stacks">clear-stacks</ulink>.
+<ulink url="../classes/PushInterpreter.html#clear-stacks">clear-stacks</ulink>.
 </para></listitem>
 
 <listitem><para>
 Push input values onto the interpreter's stacks (using various methods 
 in the PushInterpreter 
-<ulink url="classes/PushInterpreter.html">PushInterpreter</ulink> class).
+<ulink url="../classes/PushInterpreter.html">PushInterpreter</ulink> class).
 </para></listitem>
 
 <listitem><para>
 Run the push program with the method 
-<ulink url="classes/PushInterpreter.html#run">run</ulink>.
+<ulink url="../classes/PushInterpreter.html#run">run</ulink>.
 </para></listitem>
 
 <listitem><para>
 Read output values from the interpreter's stacks (using various methods 
 in the PushInterpreter 
-<ulink url="classes/PushInterpreter.html">PushInterpreter</ulink> class).
+<ulink url="../classes/PushInterpreter.html">PushInterpreter</ulink> class).
 </para></listitem>
 
 </itemizedlist>
@@ -176,14 +176,14 @@ in the PushInterpreter
 <para>
 The simplest way to run a basic genetic programming experiment with Push 
 is to override the included 
-<ulink url="classes/PushGP.html">PushGP</ulink> class.  Using this class,
+<ulink url="../classes/PushGP.html">PushGP</ulink> class.  Using this class,
 you need only to implement two simple methods to create a basic PushGP 
 experiment.  One method sets up the PushInterpreter before running a fitness 
 test, and the other inspects the interpreter after running the fitness test to 
 determine the fitness of the output.
 </para>
 <para>
-See the <ulink url="classes/PushGP.html">PushGP</ulink> class for more 
+See the <ulink url="../classes/PushGP.html">PushGP</ulink> class for more 
 information.
 </para>
 </sect1>
@@ -200,7 +200,7 @@ behavior ("actuators").
 </para>
 <para>
 Instructions are added to a PushInterpreter with the method 
-<ulink url="../classes/Push.html#add-instruction">add-instruction</ulink>. 
+<ulink url="../classes/PushInterpreter.html#add-instruction">add-instruction</ulink>. 
 The method is passed a name for the new instruction, the name of the
 "callback" method, and the breve instance which is to receive the 
 method call.  When the newly created instruction is called, the specified 

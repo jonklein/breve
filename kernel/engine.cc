@@ -234,15 +234,6 @@ void brEngineFree(brEngine *e) {
 	if(e->outputPath) slFree(e->outputPath);
 	if(e->iTunesData) slFree(e->iTunesData);
 
-	l = e->events;
-
-	while(l) {
-		brEventFree(l->data);
-		l = l->next;
-	}
-
-	slListFree(e->events);
-
 	l = e->windows;
 
 	while(l) {
@@ -349,21 +340,20 @@ brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *methodName, double t
 	event = slMalloc(sizeof(brEvent));
 
 	event->name = slStrdup(methodName);
-	event->instance = i;
 	event->time = time;
 
 	eventEntry = slListPrepend(NULL, event);
 
 	/* insert the event where it belongs according to the time it will be called */
 
-	if(e->events) {
-		l = e->events;
+	if(i->events) {
+		l = i->events;
 
 		/* are we less than the first entry? */
 
 		if(((brEvent*)l->data)->time > time) {
 			eventEntry->next = l;
-			e->events = eventEntry;
+			i->events = eventEntry;
 		} else {
 			while(l->next && ((brEvent*)l->next->data)->time < time) l = l->next;
 
@@ -371,7 +361,7 @@ brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *methodName, double t
 			l->next = eventEntry;
 		}
 	} else {
-		e->events = eventEntry;
+		i->events = eventEntry;
 	}
 
 	return event;
@@ -436,30 +426,31 @@ int brEngineIterate(brEngine *e) {
 
 			n--;
 		}
-	}
 
-	if(e->events) {
-		double oldAge;
+		if(i->status == AS_ACTIVE && i->events) {
+			double oldAge;
 
-		eventList = e->events;
-		event = eventList->data;
-		if((e->world->age + e->iterationStepSize) >= event->time) {
-			e->events = eventList->next;
+			eventList = i->events;
+			event = eventList->data;
 
-			oldAge = e->world->age;
-			e->world->age = event->time;
+			if((e->world->age + e->iterationStepSize) >= event->time) {
+				i->events = eventList->next;
 
-			if(event->instance->status == AS_ACTIVE) rcode = brMethodCallByName(event->instance, event->name, &result);
+				oldAge = e->world->age;
+				e->world->age = event->time;
 
-			brEventFree(event);
-			slListFreeHead(eventList);
+				if(i->status == AS_ACTIVE) rcode = brMethodCallByName(i, event->name, &result);
 
-			if(rcode < 0) {
-				pthread_mutex_unlock(&e->lock);
-				return rcode;
+				brEventFree(event);
+				slListFreeHead(eventList);
+
+				if(rcode != EC_OK) {
+					pthread_mutex_unlock(&e->lock);
+					return rcode;
+				}
+
+				e->world->age = oldAge;
 			}
-
-			e->world->age = oldAge;
 		}
 	}
 

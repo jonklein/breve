@@ -70,6 +70,7 @@ struct brInstance {
 	slList *dependencies;
 	slList *dependents;
 
+	slList *events;
 };
 
 /*!
@@ -132,7 +133,7 @@ brInstance *brEngineAddInstance(brEngine *e, brObject *o, void *pointer);
 void brEngineRemoveInstance(brEngine *e, brInstance *i);
 
 
-int brObjectAddCollisionHandler(brObject *handler, brObject *collider, brMethod *m);
+int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *name);
 
 // adding and removing dependencies and observers 
 

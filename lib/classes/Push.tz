@@ -23,15 +23,17 @@ Object : PushInterpreter (aka PushInterpreters) {
 		evaluationLimit = 200.
 		self set-list-limit to 200.
 
+	- to get-interpreter-pointer:
+		% Used internally.
+		return pushInterpreterPointer.
+
+  + section "Configuring and setting up a Push interpreter"
+
 	+ to add-instruction named instructionName (string) for-instance targetInstance (object) for-method methodName (string):
 		% Adds a custom callback instruction named instructionName to the push interpreter.  
 		% When instructionName is called, it will trigger the method methodName in targetInstance.
 
 		pushCallbackNew(pushInterpreterPointer, instructionName, methodName, targetInstance).
-
-	+ to clear-stacks:	
-		% Clears the stacks of the Push interpreter.
-		pushClearStacks(pushInterpreterPointer).
 
 	+ to read-config from-file configFile (string):
 		% Reads the push configuration file configFile.
@@ -42,16 +44,6 @@ Object : PushInterpreter (aka PushInterpreters) {
 		}
 
 		pushEnvironmentReadConfigFile(pushInterpreterPointer, findFile(configFile)).
-
-	+ to run code codeObject (object) for-steps steps = -1 (int):
-		% Runs the specified push code.  If the steps variable is provided, 
-		% evaluation will only run for the specified number of instructions.
-		% Otherwise, evaluation will run for the evaluation limit, which is 
-		% set with METHOD(set-evaluation-limit).
-
-		if steps == -1: steps = evaluationLimit.
-
-		pushRun(pushInterpreterPointer, (codeObject get-code-pointer), steps).
 
 	+ to set-list-limit to newLimit (int):
 		% Sets the size limit of lists constructed in push.  
@@ -66,6 +58,20 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 		evaluationLimit = newLimit.
 
+  + section "Running a Push program"
+
+	+ to run code codeObject (object) for-steps steps = -1 (int):
+		% Runs the specified push code.  If the steps variable is provided, 
+		% evaluation will only run for the specified number of instructions.
+		% Otherwise, evaluation will run for the evaluation limit, which is 
+		% set with METHOD(set-evaluation-limit).
+
+		if steps == -1: steps = evaluationLimit.
+
+		pushRun(pushInterpreterPointer, (codeObject get-code-pointer), steps).
+
+  + section "Getting Push interpreter configuration and state information"
+
 	+ to print-config:
 		% Prints out the current push configuration, including a list of the 
 		% active instructions.  Useful for debugging.
@@ -75,11 +81,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 		% Prints out the current contents of the stacks.  Useful for debugging.
 		print pushGetStacksString(pushInterpreterPointer).
 
-	- to get-interpreter-pointer:
-		% Used internally.
-		return pushInterpreterPointer.
-
-	+ section "Pushing Values onto Push Stacks"
+  + section "Pushing Values onto Push Stacks"
 
 	+ to push-code value codeObject (object):
 		% Pushes the code codeObject onto the code stack.
@@ -107,7 +109,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 		pushVectorStackPush(pushInterpreterPointer, vectorValue).
 
-	+ section "Getting the Sizes of Push Stacks"
+  + section "Getting the Sizes of Push Stacks"
 
 	+ to get-float-stack-size:
 		% Returns the size of the float stack.
@@ -170,7 +172,11 @@ Object : PushInterpreter (aka PushInterpreters) {
 	
 		program set-code-pointer to pushCodeStackTop(pushInterpreterPointer).
 
-	+ section "Popping the Push Stacks"
+  + section "Popping the Push Stacks"
+
+	+ to clear-stacks:	
+		% Clears the stacks of the Push interpreter.
+		pushClearStacks(pushInterpreterPointer).
 
 	+ to pop-float-stack:
 		% Pops the float stack.  If the float stack is empty, this 
@@ -215,6 +221,21 @@ Object : PushProgram (aka PushPrograms) {
 	+ variables:
 		codePointer (pointer).
 
+	- to get-code-pointer:
+		% Used internally.
+		return codePointer.
+
+	- to set-code-pointer to newCodePointer (pointer):
+		% Used internally.
+		if codePointer: pushCodeFree(codePointer).
+
+		if !newCodePointer: self parse program "()".
+		else codePointer = newCodePointer.		
+
+		return self.
+
+  + section "Reading and writing a Push program to a file"
+
     + to read from fileName (string):
 		% Reads a push program from a text file.
 
@@ -239,17 +260,13 @@ Object : PushProgram (aka PushPrograms) {
 
 		free f.
 
-	- to get-code-pointer:
-		% Used internally.
-		return codePointer.
+  + section "Parsing programs and making random code"
 
-	- to set-code-pointer to newCodePointer (pointer):
-		% Used internally.
-		if codePointer: pushCodeFree(codePointer).
+	+ to parse program codeString (string):
+		% Sets the content of this code to the newly parsed string.
+		% The with-interpreter keyword is no longer required.
 
-		if !newCodePointer: self parse program "()".
-		else codePointer = newCodePointer.		
-
+		self set-code-pointer to pushParse(codeString).
 		return self.
 
 	+ to make-random-code max-length size = 100 (int) with-interpreter interpreter (object): 
@@ -260,6 +277,8 @@ Object : PushProgram (aka PushPrograms) {
 		if size < 1: size = 1.
 
 		self set-code-pointer to pushCodeRandom((interpreter get-interpreter-pointer), size).
+
+  + section "Copying, mutating and evolving Push programs "
 
 	+ to mutate with-max-new-code-size treeSize = 50 (int) with-interpreter interpreter (object):
 		% Mutates this code object by adding a new subtree.  The maximum size of the
@@ -278,25 +297,11 @@ Object : PushProgram (aka PushPrograms) {
 
 		self parse program (otherProgram get-string).
 
-	+ to parse program codeString (string):
-		% Sets the content of this code to the newly parsed string.
-		% The with-interpreter keyword is no longer required.
-
-		self set-code-pointer to pushParse(codeString).
-		return self.
-
-	+ to get-string:
-		% Returns the string representation of this push program.
-		if !codePointer: return "()".
-
-		return pushCodeGetString(codePointer).
+  + section "Getting information about a Push program"
 
 	+ to get-size:
 		% Returns the size of this push program.
 		return pushCodeSize(codePointer).
-
-	+ to destroy:
-		if codePointer: pushCodeFree(codePointer).
 
 	+ to compute-discrepancy from otherProgram (object):
 		% CURRENTLY UNIMPLEMENTED.  Returns the point discrepency between this 
@@ -306,4 +311,14 @@ Object : PushProgram (aka PushPrograms) {
 		% the number of points unique to p2.
 
 		return 0.
+
+	+ to get-string:
+		% Returns the string representation of this push program.
+		if !codePointer: return "()".
+
+		return pushCodeGetString(codePointer).
+
+	+ to destroy:
+		if codePointer: pushCodeFree(codePointer).
+
 }

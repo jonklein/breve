@@ -225,6 +225,7 @@ void stInstanceFreeNoInstanceLists(stInstance *i) {
 	stInstanceFreeInternals(i);
 
 	i->status = AS_RELEASED;
+	i->breveInstance->status = AS_RELEASED;
 
 	if(gSteveData->retainFreedInstances) {
 		gSteveData->freedInstances = slListPrepend(gSteveData->freedInstances, i);

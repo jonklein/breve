@@ -60,17 +60,15 @@ brCollisionHandler *brCheckCollisionCallback(brInstance *o1, brInstance *o2) {
 	return NULL;
 }
 
-/*
-	+ brCollisionCallback
-	= is called when two instances actually collide.  this callback
-	= is triggered by the world code, and passes back the "userData"
-	= from the world objects.
-	= 
-	= for each instance we'll step through it's collision handlers.
-	= if the instance handles a collision with the other instance
-	= (depending on the type of the other instance), then we send 
-	= the proper "collision" method, specifiying the instance
-	= that is colliding with it as the argument.
+/*!
+	\brief Called when two instances actually collide, this triggers 
+	a frontend method call.
+
+	For each instance we'll step through it's collision handlers.
+	if the instance handles a collision with the other instance
+	(depending on the type of the other instance), then we send 
+	the proper "collision" method, specifiying the instance
+	that is colliding with it as the argument.
 */
 
 void brCollisionCallback(brInstance *o1, brInstance *o2, int type) {
@@ -81,7 +79,7 @@ void brCollisionCallback(brInstance *o1, brInstance *o2, int type) {
 
 	brEval *argPtr[1];
 
-	if(!o1 || !o2) return;
+	if(!o1 || !o2 || (o1->status != AS_ACTIVE) || (o2->status != AS_ACTIVE)) return;
 
 	for(n=0;n<o1->class->collisionHandlers->count;n++) {
 		h = o1->class->collisionHandlers->data[n];

@@ -120,8 +120,6 @@ struct brMenuEntry {
 */
 
 struct brEvent {
-	brInstance *instance;
-	brMethod *method;
 	char *name;
 	double time;
 };
@@ -234,11 +232,6 @@ struct brEngine {
 	// which keys are pressed?
 
 	unsigned char keys[256];
-
-	// a list of events and the date of the next event
-
-	slList *events;
-	double nextEvent;
 
 	// the stack pointer and memory for running steve code 
 

@@ -72,10 +72,6 @@
 <ulink url="../classes/Individual.html">Individual</ulink></para>
 </listitem>
 <listitem><para>
-<indexterm><primary>JavaObject class</primary></indexterm>
-<ulink url="../classes/JavaObject.html">JavaObject</ulink></para>
-</listitem>
-<listitem><para>
 <indexterm><primary>Joint class</primary></indexterm>
 <ulink url="../classes/Joint.html">Joint</ulink></para>
 </listitem>

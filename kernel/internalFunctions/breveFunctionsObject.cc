@@ -118,14 +118,7 @@ int brIAddCollisionHandler(brEval args[], brEval *target, brInstance *i) {
         return EC_ERROR;
     }
 
-    method = brMethodFindWithArgRange(handler, BRSTRING(&args[2]), 0, 1);
-
-    if(!method) {
-        slMessage(DEBUG_ALL, "addCollisionCallback: Cannot locate method \"%s\" for class \"%s\"\n", BRSTRING(&args[2]), handler->name);
-        return EC_ERROR;
-    }
-
-    brObjectAddCollisionHandler(handler, collider, method);
+    brObjectAddCollisionHandler(handler, collider, BRSTRING(&args[2]));
 
     return EC_OK;
 }

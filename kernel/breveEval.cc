@@ -42,6 +42,9 @@ int brEvalCopy(brEval *s, brEval *d) {
 		case AT_VECTOR:
 			slVectorCopy(&BRVECTOR(s), &BRVECTOR(d));
 			break;
+		case AT_MATRIX:
+			slMatrixCopy(BRMATRIX(s), BRMATRIX(d));
+			break;
 		case AT_STRING:
 			BRSTRING(d) = slStrdup(BRSTRING(s));
 			break;

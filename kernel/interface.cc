@@ -275,6 +275,8 @@ int brInterfaceCallback(brEngine *e, int interfaceID, char *string) {
 
 	sprintf(mname, "catch-interface-id-%d", interfaceID);
 
+	slMessage("calling %s\n", mname);
+
 	method = brMethodFind(e->controller->class, mname, 1);
 
 	if(!method) return EC_OK;
