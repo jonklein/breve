@@ -231,8 +231,6 @@ void *brListenOnSocket(void *data) {
 		}
 	}
 
-	delete serverData;
-
 	return NULL;
 }
 

@@ -218,9 +218,9 @@ int stSendXMLString(char *address, int port, char *object) {
 	// addr already in network order!
 	saddr.sin_addr.s_addr = addr;
 
-	request.type = NR_XML;
-	request.magic = NETWORK_MAGIC;
 	request.version = NETWORK_VERSION;
+	request.magic = NETWORK_MAGIC;
+	request.type = NR_XML;
 
 	if(connect(sockfd, (struct sockaddr*)&saddr, sizeof(saddr))) {
 		slMessage(DEBUG_ALL, "upload failed: cannot connect to server \"%s\"\n", address);
