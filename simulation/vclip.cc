@@ -158,6 +158,8 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 slCollisionEntry *slNextCollisionEntry(slVclipData *v) {
 	slCollisionEntry e;
 
+	bzero(&e, sizeof(slCollisionEntry));
+
 	v->collisions.push_back(e);
 	return &v->collisions.back();
 }
@@ -592,9 +594,9 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 	slPosition *p1 = vc->positions[x];
 	slPosition *p2 = vc->positions[y];
 
-	if(!*feat) *feat = s2->features[0];
+	if(!*feat) f = *feat = s2->features[0];
 
-	do {
+	while(n < s2->features.size()) {
 		switch((*feat)->type) {
 			case FT_FACE:
 				f = *feat;
@@ -746,7 +748,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 		}
 
 		n++;
-	} while(n < s2->features.size());
+	} 
 
 	// oh crap!  we're inside the sphere.  that's not a metaphor  
 	// or anything like "in the zone", or something--i mean, we're

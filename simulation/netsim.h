@@ -1,4 +1,5 @@
 
+#ifdef __cplusplus
 #include <vector>
 
 #ifdef HAVE_LIBENET
@@ -65,4 +66,5 @@ __inline__ void slNetsimVectorsToBoundsMessage(slNetsimBoundsMessage *m, slVecto
 
 int slNetsimBroadcastSyncMessage(slNetsimServerData *server, double time);
 int slNetsimSendBoundsMessage(slNetsimClientData *client, slVector *min, slVector *max);
+#endif
 #endif

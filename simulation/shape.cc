@@ -26,6 +26,7 @@ slShape *slNewShape() {
 	s = new slShape;
 	s->drawList = 0;
 	s->type = ST_NORMAL;
+	s->density = 1.0;
 
 	s->referenceCount = 1;
 
