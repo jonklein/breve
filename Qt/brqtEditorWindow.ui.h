@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include <iostream>
+#include <qfile.h>
 
 const char * brqtEditorWindow::getString()
 {
@@ -18,3 +19,24 @@ const char * brqtEditorWindow::getString()
 }
 
 
+
+
+void brqtEditorWindow::loadFile( QString &file )
+{
+    QString contents;
+    QFile f( file);
+   
+    f.open( IO_ReadOnly );
+    QTextStream stream( &f);
+ 
+    contents = stream.read();
+    
+    setCaption( file);
+    textEdit1->setText( contents);
+}
+
+
+void brqtEditorWindow::setupMethodPopup()
+{
+
+}

@@ -22,11 +22,15 @@
 breveFrontend *frontend;
 brqtEditorWindow *gW;
 
-void demoMenuForDirectory(QPopupMenu *menu, QString &directory) {
+std::map<int, QString> demoMap;
+
+int demoMenuForDirectory(QWidget *receiver, QPopupMenu *menu, QString &directory, int offset) {
 	int count, n;
 	struct dirent **demos;
 
 	count = scandir(directory.ascii(), &demos, NULL, alphasort);
+
+	QWidget::connect(menu, SIGNAL(activated(int)), receiver, SLOT(loadDemo(int)));
 
 	for(n=count-1;n>-1;n--) {
 		QString name = demos[n]->d_name;
@@ -37,20 +41,29 @@ void demoMenuForDirectory(QPopupMenu *menu, QString &directory) {
 			if(name != ".." && name != ".") {
 				QString subname = directory + "/" + name;
 				
-				demoMenuForDirectory(submenu, subname);
+				offset = demoMenuForDirectory(receiver, submenu, subname, offset);
 
-				if(submenu->count()) menu->insertItem( name, submenu, 0, 0);
+				if(submenu->count()) {
+					menu->insertItem( name, submenu, offset++, 0);
+				} else {
+					delete submenu;
+				}
 			}	
 
 		} else {
-			if(name.endsWith(".tz")) menu->insertItem( name, 0, 0);
+			demoMap[ offset] = directory + "/" + name;
+				
+			if(name.endsWith(".tz")) menu->insertItem( name, offset++, 0);	
 		}
 	}
+	
+	return offset;
 }
 
 void brqtMainWindow::init() {
 	QString directory = "/Users/jk/dev/breve/demos";
-	demoMenuForDirectory(Demos, directory);
+
+	demoMenuForDirectory(this, Demos, directory, 0);
 }
 
 void brqtMainWindow::fileNew()
@@ -160,4 +173,15 @@ void brqtMainWindow::toggleSimulation()
 
     new brqtEngine(frontend->engine, breveGLWidget1);
     
+}
+
+
+void brqtMainWindow::loadDemo(int n)
+{
+    brqtEditorWindow *w = new brqtEditorWindow( 0);
+	
+    w->loadFile(demoMap[n]);
+    w->show();
+    
+    gW = w;
 }

@@ -8,108 +8,107 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>544</width>
-            <height>479</height>
+            <width>722</width>
+            <height>617</height>
         </rect>
     </property>
     <property name="caption">
         <string>breve</string>
     </property>
-    <widget class="QPushButton">
+    <grid>
         <property name="name">
-            <cstring>pushButton2</cstring>
+            <cstring>unnamed</cstring>
         </property>
-        <property name="geometry">
-            <rect>
-                <x>270</x>
-                <y>390</y>
-                <width>120</width>
-                <height>32</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>Stop</string>
-        </property>
-    </widget>
-    <spacer>
-        <property name="name">
-            <cstring>spacer1_2</cstring>
-        </property>
-        <property name="orientation">
-            <enum>Horizontal</enum>
-        </property>
-        <property name="sizeType">
-            <enum>Expanding</enum>
-        </property>
-        <property name="sizeHint">
-            <size>
-                <width>30</width>
-                <height>20</height>
-            </size>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>520</x>
-                <y>160</y>
-                <width>30</width>
-                <height>20</height>
-            </rect>
-        </property>
-    </spacer>
-    <spacer>
-        <property name="name">
-            <cstring>spacer1</cstring>
-        </property>
-        <property name="orientation">
-            <enum>Horizontal</enum>
-        </property>
-        <property name="sizeType">
-            <enum>Expanding</enum>
-        </property>
-        <property name="sizeHint">
-            <size>
-                <width>30</width>
-                <height>20</height>
-            </size>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>0</x>
-                <y>160</y>
-                <width>30</width>
-                <height>20</height>
-            </rect>
-        </property>
-    </spacer>
-    <widget class="QPushButton">
-        <property name="name">
-            <cstring>pushButton1</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>150</x>
-                <y>390</y>
-                <width>120</width>
-                <height>32</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>&amp;Run</string>
-        </property>
-    </widget>
-    <widget class="breveGLWidget">
-        <property name="name">
-            <cstring>breveGLWidget1</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>30</x>
-                <y>10</y>
-                <width>490</width>
-                <height>360</height>
-            </rect>
-        </property>
-    </widget>
+        <spacer row="1" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>spacer8</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>280</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="QPushButton" row="1" column="2">
+            <property name="name">
+                <cstring>pushButton1</cstring>
+            </property>
+            <property name="text">
+                <string>&amp;Run</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="1" column="3">
+            <property name="name">
+                <cstring>pushButton2</cstring>
+            </property>
+            <property name="text">
+                <string>Stop</string>
+            </property>
+        </widget>
+        <spacer row="1" column="4" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>spacer9</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>280</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+        <spacer row="0" column="0">
+            <property name="name">
+                <cstring>spacer6</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Fixed</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="breveGLWidget" row="0" column="1" rowspan="1" colspan="4">
+            <property name="name">
+                <cstring>breveGLWidget1</cstring>
+            </property>
+        </widget>
+        <spacer row="0" column="5">
+            <property name="name">
+                <cstring>spacer7</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Fixed</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+    </grid>
 </widget>
 <menubar>
     <property name="name">
@@ -143,6 +142,8 @@
         <action name="helpIndexAction"/>
         <separator/>
         <action name="helpAboutAction"/>
+    </item>
+    <item text="new menu" name="qt_dead_widget_new_menu_4">
     </item>
 </menubar>
 <toolbars>
@@ -541,6 +542,7 @@
     <slot>helpContents()</slot>
     <slot>helpAbout()</slot>
     <slot>toggleSimulation()</slot>
+    <slot>loadDemo( int n )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
