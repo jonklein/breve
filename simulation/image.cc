@@ -549,7 +549,7 @@ unsigned char *slReadPNGImage(char *name, int *width, int *height, int *componen
 	bottom-to-top.
 */
 
-int slWritePNGImage(char *name, int width, int height, unsigned char *buffer, int channels, int reversed) {
+int slPNGWrite(char *name, int width, int height, unsigned char *buffer, int channels, int reversed) {
 	FILE *fp = fopen(name, "wb");
 	png_structp png_ptr;
 	png_infop info_ptr;
@@ -640,10 +640,26 @@ int slPNGSnapshot(slCamera *c, char *file) {
 
 	glReadPixels(c->ox, c->oy, c->x, c->y, GL_RGB, GL_UNSIGNED_BYTE, buffer);
 
-	r = slWritePNGImage(file, c->x, c->y, buffer, 3, 1);
+	r = slPNGWrite(file, c->x, c->y, buffer, 3, 1);
 
 	delete[] buffer;
 
 	return r;
 }
 #endif /* HAVW_LIBPNG */
+
+/*!
+	\brief Vertically reverses a pixel buffer.
+
+	Some (external) libraries and routines expect top-to-bottom pixel data, 
+	others bottom-to-top.  This function swaps between the two.  Width must
+	be the number of bytes in an entire row (taking into account the number
+	of channels), not just the number of pixels.
+*/
+
+void slReversePixelBuffer(unsigned char *source, unsigned char *dest, int width, int height) {
+	int n;
+
+	for(n=0;n<height;n++)
+		bcopy(&source[n * width], &dest[(height - (n + 1)) * width], width);
+}

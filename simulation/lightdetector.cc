@@ -83,7 +83,6 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 
 	for(wi = w->objects.begin(); wi != w->objects.end(); wi++) {
 		unsigned char br, bg, bb;
-		slVector color;
 
 		br = n / (256 * 256);
 		bg = n / 256;
@@ -94,7 +93,7 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 		wo = *wi;
 		wo->lightExposure = 0;
 
-		if(wo->shape) slDrawShape(c, wo->shape, &wo->position, &color, 0, 0, 0, 0, DO_NO_LIGHTING|DO_NO_COLOR|DO_NO_TEXTURE, 0, 1.0);
+		if(wo->shape) slDrawShape(c, wo->shape, &wo->position, 0, 0, 0);
 
 		n++;
 	}

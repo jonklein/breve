@@ -191,13 +191,13 @@ void slRenderShadowVolume(slWorld *w, slCamera *c) {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
 
 	// stencil up shadow volume front faces to 1 
-	slRenderObjects(w, c, 0, DO_NO_LIGHTING|DO_SHADOW_VOLUME|DO_NO_TERRAIN|DO_NO_REFLECT|DO_NO_STENCIL);
+	slWorldRenderObjectShadowVolumes(w, c);
 	
 	// stencil down shadow volume back faces to 0
 
 	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
 	glCullFace(GL_FRONT);
-	slRenderObjects(w, c, 0, DO_NO_LIGHTING|DO_SHADOW_VOLUME|DO_NO_TERRAIN|DO_NO_REFLECT|DO_NO_STENCIL);
+	slWorldRenderObjectShadowVolumes(w, c);
 
 	// glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -213,6 +213,7 @@ void slRenderShadowVolume(slWorld *w, slCamera *c) {
 
 	// draw the scene again, with lighting, only where the value is 0 
 	
+	// glColor3f(1, 0, 0);
 	slRenderObjects(w, c, 0, DO_NO_ALPHA);
 
 	// transparent objects cause problems, since they cannot simply 
@@ -233,4 +234,12 @@ void slRenderShadowVolume(slWorld *w, slCamera *c) {
 
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_LIGHTING);
+}
+
+void slWorldRenderObjectShadowVolumes(slWorld *w, slCamera *c) {
+	std::vector<slWorldObject*>::iterator wi;
+
+	for(wi = w->objects.begin(); wi !=w->objects.end(); wi++ ) {
+		if((*wi)->shape) (*wi)->shape->drawShadowVolume(c, &(*wi)->position);
+	}
 }

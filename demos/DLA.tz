@@ -90,10 +90,8 @@ Control : DLA {
 		newParticle = new Stationary.
 		newParticle register with-shape sphereShape at-location location.
 
-		# Setting texture to -1 turns off texturing.  We'll give it a 
-		# color similar to the object it hit.
-
 		newParticle set-color to c + (random[(.2, .2, .2)] - (.1, .1, .1)).
+		newParticle set-texture to -1.
 
 		# move the Diffuser agent to a random location in space, but not 
 		# too close to an existing object.

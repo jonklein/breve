@@ -75,7 +75,6 @@ slCamera *slNewCamera(int x, int y, int drawMode) {
 	c->maxBillboards = 8;
 	c->billboards = (slBillboardEntry**)slMalloc(sizeof(slBillboardEntry*) * c->maxBillboards);
 	c->billboardDrawList = 0;
-	c->onlyMultibodies = 0;
 
 	c->fogIntensity = .1;
 	c->fogStart = 10;	
@@ -165,24 +164,19 @@ void slCameraUpdateFrustum(slCamera *c) {
 	slVectorNormalize(&c->frustumPlanes[1].normal);
 	slVectorNormalize(&c->frustumPlanes[2].normal);
 	slVectorNormalize(&c->frustumPlanes[3].normal);
-
-	slVectorPrint(&c->frustumPlanes[0].normal);
-	slVectorPrint(&c->frustumPlanes[1].normal);
-	slVectorPrint(&c->frustumPlanes[2].normal);
-	slVectorPrint(&c->frustumPlanes[3].normal);
 }
 
-int slCameraFrustumTest(slCamera *c, slVector *test) {
+int slCameraPointInFrustum(slCamera *c, slVector *test) {
 	int n;
 
 	for(n=0;n<4;n++) {
-		if(slPlaneDistance(&c->frustumPlanes[n], test) < 0.0) return 1;
+		if(slPlaneDistance(&c->frustumPlanes[n], test) < 0.0) return 0;
 	}
 
-	return 0;
+	return 1;
 }
 
-int slCameraFrustumPolygonTest(slCamera *c, slVector *test, int n) {
+int slCameraPolygonInFrustum(slCamera *c, slVector *test, int n) {
 	int x;
 	char violations[4] = { 0, 0, 0, 0 };
 	int v = 0;
@@ -199,9 +193,15 @@ int slCameraFrustumPolygonTest(slCamera *c, slVector *test, int n) {
 		}
 	}
 
-	if(v == 0) return 0;
+	// no violations -- the polygon is entirely in the frustum
 
-	if((v == n) && violations[0] + violations[1] + violations[2] + violations[3] == 1) return 1;
+	if(v == 0) return 1;
+
+	// violation on only one side -- the polygon is perfectly excluded
+
+	if((v == n) && violations[0] + violations[1] + violations[2] + violations[3] == 1) return 0;
+
+	// multiple violations -- the polygon is possibly interesting the frustum
 
 	return 2;
 }
@@ -332,6 +332,8 @@ void slSetShadowCatcher(slCamera *c, slStationary *s, slVector *normal) {
 
 	c->recompile = 1;
 
+	c->shadowCatcher = s;
+
 	bestFace->drawFlags |= SD_STENCIL|SD_REFLECT;
 }
 
@@ -342,7 +344,7 @@ void slSetShadowCatcher(slCamera *c, slStationary *s, slVector *normal) {
 	them from back to front.
 */
 
-void slAddBillboard(slCamera *c, slVector *color, slVector *loc, float size, float rotation, float alpha, int bitmap, int textureMode, float z, unsigned char selected) {
+void slAddBillboard(slCamera *c, slWorldObject *object, float size, float z) {
 	int n, last;
 
 	if(c->billboardCount == c->maxBillboards) {
@@ -354,16 +356,9 @@ void slAddBillboard(slCamera *c, slVector *color, slVector *loc, float size, flo
 	    for(n=last;n<c->maxBillboards;n++) c->billboards[n] = new slBillboardEntry;
 	}
 
-	slVectorCopy(loc, &c->billboards[c->billboardCount]->location);
-	slVectorCopy(color, &c->billboards[c->billboardCount]->color);
-
-	c->billboards[c->billboardCount]->bitmap = bitmap;
 	c->billboards[c->billboardCount]->z = z;
 	c->billboards[c->billboardCount]->size = size;
-	c->billboards[c->billboardCount]->rotation = rotation;
-	c->billboards[c->billboardCount]->alpha = alpha;
-	c->billboards[c->billboardCount]->selected = selected;
-	c->billboards[c->billboardCount]->mode = textureMode;
+	c->billboards[c->billboardCount]->object = object;
 
 	c->billboardCount++;
 }
@@ -381,7 +376,7 @@ bool slBillboardCompare(const slBillboardEntry *a, const slBillboardEntry *b) {
 */
 
 void slSortBillboards(slCamera *c) {
-	std::sort(c->billboards, c->billboards + c->billboardCount + 1, slBillboardCompare);
+	std::sort(c->billboards, c->billboards + c->billboardCount, slBillboardCompare);
 }
 
 /*!

@@ -24,6 +24,8 @@ int slGISData::parseRT1File(std::string rt1) {
 
 	fs.open(rt1.c_str(), std::ios::in);
 
+	if(!fs.is_open()) return -1;
+
 	while(!fs.eof()) {
 		char name[31], tlid[11], type[5], clas[4], slat[11], slon[11], elat[11], elon[11];
 		double startLat, endLat, startLon, endLon;
@@ -102,6 +104,8 @@ int slGISData::parseRT2File(std::string rt2) {
 
 	fs.open(rt2.c_str(), std::ios::in);
 
+	if(!fs.is_open()) return -1;
+
 	while(!fs.eof()) {
 		double lat, lon;
 		std::map<int,slGISChain>::iterator mi;
@@ -137,44 +141,39 @@ int slGISData::parseRT2File(std::string rt2) {
 	return 0;
 }
 
-void slGISData::draw() {
-	static int inited = 0;
-
-	if(!inited) {
-		_list = glGenLists(1);
-		compile();
-	}
-
-	glCallList(_list);	
-}
-
-void slGISData::compile() {
+void slGISData::draw(slCamera *c) {
 	std::map<int, slGISChain>::iterator ci;
 	std::vector<slGISPoint>::iterator pi;
-
-	glNewList(_list, GL_COMPILE);
 
 	glEnable(GL_BLEND);
 	glColor4f(0.0, 0.0, 0.0, 0.8);
 
 	for(ci = _chains.begin(); ci != _chains.end(); ci++ ) {
 		if( ci->second._type < 60 ) {
+			slVector start, end;
+
 			float w = 4.0 - (double)((int)ci->second._type / 10);
 
 			if (w < 0.1) w = 0.1;
 
 			glLineWidth( w);
 
-			glBegin(GL_LINE_STRIP);
+			pi = ci->second._points.begin();
+			start.x = pi->_x - _center._x;
+			start.y = 0;
+			start.z = pi->_y - _center._y;
 
-			for(pi = ci->second._points.begin(); pi != ci->second._points.end(); pi++ ) {
-				glVertex3f(pi->_x - _center._x, 0, pi->_y - _center._y);
-				glVertex3f(pi->_x - _center._x, 0, pi->_y - _center._y);
-			}
+			if(slCameraPointInFrustum(c, &start)) {
+				glBegin(GL_LINE_STRIP);
+
+				glVertex3f(start.x, start.y, start.z);
+
+				for(pi = ci->second._points.begin() + 1; pi != ci->second._points.end(); pi++ ) {
+					glVertex3f(pi->_x - _center._x, 0, pi->_y - _center._y);
+				}
 	
-			glEnd();
+				glEnd();
+			}
 		}
 	}
-
-	glEndList();
 }

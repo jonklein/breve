@@ -53,7 +53,7 @@ class slGISData {
 		int parseRT1File(std::string filename);
 		int parseRT2File(std::string filename);
 
-		void draw();
+		void draw(slCamera *c);
 		void compile();
 
 		std::map<int, slGISChain> _chains;

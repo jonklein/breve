@@ -27,7 +27,7 @@ int brITerrainNew(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t;
 
 	// t = slTerrainNew(5, BRDOUBLE(&args[0]), i);
-	t = slTerrainNew(8, BRDOUBLE(&args[0]), i);
+	t = slTerrainNew(6, BRDOUBLE(&args[0]), i);
 
 	slWorldAddObject(i->engine->world, t, WO_TERRAIN);
 

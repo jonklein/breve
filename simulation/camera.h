@@ -67,19 +67,10 @@ struct slCameraText {
 
 #ifdef __cplusplus
 struct slBillboardEntry {
-	slVector location;
-
-	slVector color;
-
-	int bitmap;
-
-	unsigned char mode;
-	unsigned char selected;
-
-	float rotation;
 	float size;
 	float z;
-	float alpha;
+
+	slWorldObject *object;
 };
 #endif
 
@@ -95,6 +86,8 @@ struct slCamera {
 	int nLights;
 
 	unsigned char enabled;
+
+	slWorldObject *shadowCatcher;
 
 	// this flag specifies whether the data in this camera is 
 	// automatically being rendered.  In the normal graphical
@@ -118,9 +111,7 @@ struct slCamera {
 	slVector billboardY;
 	slVector billboardZ;
 
-	// used render all stationary objects at once 
-
-	int stationaryDrawList;
+	int cubeDrawList;
 
 	// recompile can be set to 1 at any time to force recompilation 
 	// of draw lists next time the world is drawn. 
@@ -142,7 +133,6 @@ struct slCamera {
 	unsigned char drawReflection;
 	unsigned char drawText;
 	unsigned char blur;
-	unsigned char onlyMultibodies;
 	double blurFactor;
 
 	slVector fogColor;
@@ -178,7 +168,7 @@ struct slCamera {
 	int x;
 	int y;
 
-	/* camera origin on screen view coords */
+	// camera origin on screen view coords 
 
 	int ox;
 	int oy;
@@ -189,8 +179,8 @@ struct slCamera {
 };
 
 void slCameraUpdateFrustum(slCamera *c);
-int slCameraFrustumTest(slCamera *c, slVector *test);
-int slCameraFrustumPolygonTest(slCamera *c, slVector *test, int n);
+int slCameraPointInFrustum(slCamera *c, slVector *test);
+int slCameraPolygonInFrustum(slCamera *c, slVector *test, int n);
 
 #ifdef __cplusplus
 extern "C" {
@@ -205,7 +195,7 @@ void slCameraFree(slCamera *c);
 void slSetCameraText(slCamera *c, int n, char *string, float x, float y, slVector *v);
 void slSetShadowCatcher(slCamera *c, slStationary *s, slVector *normal);
 
-void slAddBillboard(slCamera *c, slVector *color, slVector *loc, float size, float rotation, float alpha, int bitmap, int textureMode, float z, unsigned char selected);
+void slAddBillboard(slCamera *c, slWorldObject *object, float size, float z);
 
 void slSortBillboards(slCamera *c);
 

@@ -37,6 +37,8 @@ struct slSerializedTerrain {
 
 #ifdef __cplusplus
 
+void slNormalForFace(slVector *a, slVector *b, slVector *c, slVector *n);
+
 class slTerrainQuadtree;
 
 class slTerrain: public slWorldObject {
@@ -115,9 +117,9 @@ class slTerrainQuadtree {
 			_minDist = 100000;
 			_culled = true;
 
-			_clip = slCameraFrustumPolygonTest(c, _points, 4);
+			_clip = slCameraPolygonInFrustum(c, _points, 4);
 
-			if(_clip == 1) return _culled;
+			if(_clip == 0) return _culled;
 
 			_culled = false;
 
@@ -139,25 +141,41 @@ class slTerrainQuadtree {
 
 		inline int draw(slCamera *c) {
 			int m;
+			slVector n1, n2;
 
-			// if(_culled) return 0;
+			if(_culled) return 0;
 
-			if(!_culled && ((_clip == 0 && _minDist < 50.0) || _clip == 2) && _children[0]) {
+			if(((_clip == 1 && _minDist < 100.0) || _clip == 2) && _children[0]) {
 				int drawn = 0;
 				for(m=0;m<4;m++) drawn += _children[m]->draw(c);
 				return drawn;
 			}
 
+			slNormalForFace(&_points[0], &_points[1], &_points[3], &n1);
+			slNormalForFace(&_points[1], &_points[2], &_points[3], &n2);
+
 			glDisable(GL_BLEND);
 
-			if(_culled) glColor4f(0, 0, 0, 1);
-			else glColor4f(0, _minDist / 100.0, 0, 0.8);
+			glColor4f(0, 1.0, 0, 1.0);
 
-			glBegin(GL_LINE_LOOP);
+			glBegin(GL_TRIANGLE_STRIP);
+			glNormal3f(n1.x, n1.y, n1.z);
+			glColor4f(0, (_points[0].y - _terrain->heightMin) / _terrain->heightDelta, 0, 0.7);
+			glTexCoord2f(_points[0].x/_terrain->textureScale, _points[0].z/_terrain->textureScale);
 			glVertex3f(_points[0].x, _points[0].y, _points[0].z);
+
+			glColor4f(0, (_points[1].y - _terrain->heightMin) / _terrain->heightDelta, 0, 0.7);
+			glTexCoord2f(_points[1].x/_terrain->textureScale, _points[1].z/_terrain->textureScale);
 			glVertex3f(_points[1].x, _points[1].y, _points[1].z);
-			glVertex3f(_points[2].x, _points[2].y, _points[2].z);
+
+			glColor4f(0, (_points[3].y - _terrain->heightMin) / _terrain->heightDelta, 0, 0.7);
+			glTexCoord2f(_points[3].x/_terrain->textureScale, _points[3].z/_terrain->textureScale);
 			glVertex3f(_points[3].x, _points[3].y, _points[3].z);
+
+			glNormal3f(n2.x, n2.y, n2.z);
+			glColor4f(0, (_points[2].y - _terrain->heightMin) / _terrain->heightDelta, 0, 0.7);
+			glTexCoord2f(_points[2].x/_terrain->textureScale, _points[2].z/_terrain->textureScale);
+			glVertex3f(_points[2].x, _points[2].y, _points[2].z);
 			glEnd();
 
 			return 1;
@@ -232,6 +250,7 @@ void slTerrainSetBottomColor(slTerrain *t, slVector *color);
 double slTerrainGetHeightAtLocation(slTerrain *t, double x, double z);
 
 int slTerrainLoadGeoTIFF(slTerrain *t, char *file);
+
 
 #ifdef __cplusplus
 }

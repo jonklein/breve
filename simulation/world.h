@@ -23,6 +23,7 @@
 #ifdef __cplusplus
 #include <vector>
 #include <algorithm> 
+#include <stdexcept>
 #endif
 
 #define DV_VECTOR_COUNT	10
@@ -76,7 +77,7 @@ class slWorldObject {
 	public:
 		slWorldObject() {
 			drawMode = 0;
-			texture = -1;
+			texture = 0;
 			textureMode = 0;
 			textureScale = 16;
 			simulate = 0;
@@ -104,7 +105,9 @@ class slWorldObject {
 			slStackFree(neighbors);
 		}
 
-		virtual void draw(slCamera *camera) {};
+		virtual void draw(slCamera *camera) {
+			if(shape) slDrawShape(camera, shape, &position, textureScale, drawMode, 0);
+		};
 
 		virtual void step(slWorld *world, double step) {};
 

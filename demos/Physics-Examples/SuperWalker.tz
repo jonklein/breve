@@ -56,7 +56,6 @@ PhysicalControl : Walker {
 
 		self set-background-texture-image to (new Image load from "images/clouds.png").
 
-		self enable-shadows.
 		self enable-reflections.
 		
 		self set-background-color to (.4, .6, .9).

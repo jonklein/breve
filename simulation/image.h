@@ -26,8 +26,10 @@ unsigned char *slReadPNGImage(char *name, int *width, int *height, int *componen
 extern "C" {
 #endif
 unsigned char *slReadImage(char *name, int *height, int *width, int *components, int alpha);
-int slWritePNGImage(char *name, int w, int h, unsigned char *buffer, int channels, int reversed);
+int slPNGWrite(char *name, int w, int h, unsigned char *buffer, int channels, int reversed);
 int slPNGSnapshot(slCamera *c, char *file);
+
+void slReversePixelBuffer(unsigned char *source, unsigned char *dest, int width, int height);
 #ifdef __cplusplus
 }
 #endif

@@ -133,7 +133,7 @@ void slPatchGrid::draw(slCamera *camera) {
 
 					glScalef(patchSize.x, patchSize.y, patchSize.z);
 
-					glCallList(gCubeDrawList);
+					glCallList(camera->cubeDrawList);
 					glPopMatrix();
 				}
 			}

@@ -24,7 +24,16 @@ void slWorldObjectSetNeighborhoodSize(slWorldObject *wo, double size) {
 	wo->proximityRadius = size;
 }
 
+/*!
+	\brief Sets the texture number for this object.
+
+	Previous versions of this library used -1 to indicate no texture,
+	while the current version uses 0.  This function recognizes negative
+	numbers for backward compatability.
+*/
+
 void slWorldObjectSetTexture(slWorldObject *wo, int texture) {
+	if(texture < 0) texture = 0;
 	wo->texture = texture;
 }
 

@@ -76,14 +76,14 @@ PhysicalControl : Walker {
 
         self move-light to (0, 40, 0).
 
-        self enable-reflections.
         self enable-shadow-volumes.
 
         self set-background-color to (.4, .6, .9).
         self set-background-texture-image to (new Image load from "images/clouds.png").
 
         terrain = new Terrain.
-        terrain generate with-ruggedness .2 with-height 15.
+        terrain generate with-ruggedness .4 with-height 15.
+		terrain set-scale to 3.
 
         # Create the Creature.
 

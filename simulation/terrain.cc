@@ -298,6 +298,16 @@ void slTerrainMakeNormals(slTerrain *l) {
 	}
 }
 
+void slNormalForFace(slVector *a, slVector *b, slVector *c, slVector *n) {
+	slVector v1, v2;
+
+	slVectorSub(a, b, &v1);
+	slVectorSub(c, b, &v2);
+
+	slVectorCross(&v2, &v1, n);
+	slVectorNormalize(n);
+}
+
 float slAverageDiamondValues(slTerrain *l, int x, int y, int jump) {
 	// sideminus is the zero based array offset of side 
 
@@ -341,9 +351,14 @@ slTerrain::~slTerrain() {
 }
 
 void slTerrain::draw(slCamera *camera) {
+	if(!initialized) slTerrainInitialize(this);
+
 	quadtree->cull(camera);
-	printf("%d polygons\n", quadtree->draw(camera));
-	// slDrawTerrain(this, texture, textureScale, drawMode, 0);
+
+	glPushAttrib(GL_ENABLE_BIT);
+	glDisable(GL_CULL_FACE);
+	quadtree->draw(camera);
+	glPopAttrib();
 }
 
 void slDrawTerrain(slTerrain *l, int texture, double textureScale, int drawMode, int flags) {

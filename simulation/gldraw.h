@@ -66,13 +66,12 @@ void slRenderScene(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y, slVector *dragVector);
 int slGlSelect(slWorld *w, slCamera *c, int x, int y);
 
-void slReversePixelBuffer(unsigned char *source, unsigned char *dest, int width, int height);
 
 #ifdef __cplusplus 
 }
 #endif
 
-void slCompileCubeDrawList();
+void slCompileCubeDrawList(int l);
 
 void slRenderWorld(slWorld *w, slCamera *c, int recompile, int render_mode, int crosshair, int scissor);
 void slRenderWorldToBuffer(slWorld *w, slCamera *c, char *r, char *g, char *b, char *temp);
@@ -86,7 +85,7 @@ void slShadowPass(slWorld *w, slCamera *c);
 void slRenderLabels(slWorld *w);
 
 void slRenderObjects(slWorld *w, slCamera *c, int loadNames, int flags);
-void slRenderLines(slWorld *w, slCamera *c, int flags);
+void slRenderLines(slWorld *w, slCamera *c);
 
 void slRenderText(slWorld *w, slCamera *c, slVector *loc, slVector *target, int crosshair);
 
@@ -96,18 +95,19 @@ void slStrokeText(double x, double y, char *string, double scale, void *font);
 void slDrawLights(slCamera *c, int noDiff);
 void slShadowMatrix(GLfloat shadowMat[4][4], slPlane *plane, slVector *light);
 
-void slDrawShape(slCamera *c, slShape *s, slPosition *pos, slVector *color, int texture, double textureScale, int tmode, int mode, int flags, float bbRot, float alpha);
+void slDrawShape(slCamera *c, slShape *s, slPosition *pos, double textureScale, int mode, int flags);
 
-int slCompileShape(slShape *s, int drawMode, int texture, double textureScale, int flags);
-void slRenderShape(slShape *s, int drawMode, int texture, double textureScale, int flags);
+int slCompileShape(slShape *s, int drawMode, double textureScale, int flags);
+void slRenderShape(slShape *s, int drawMode, double textureScale, int flags);
 void slDrawAxis(double x, double y);
 void slComputeBillboardVectors(slWorld *w, slCamera *c);
-void slRenderBillboards(slCamera *c, int flags);
-void slProcessBillboard(slCamera *c, slVector *color, slVector *loc, int bitmap, int mode, float size, float bbAngle, float alpha, unsigned char selected);
-void slDrawFace(slFace *f, int drawMode, int texture, double textureScale, int flags);
 
-int slBreakdownFace(slFace *f, int texture, double textureScale);
-void slBreakdownTriangle(slVector *v, int texture, double textureScale, int level, slVector *xaxis, slVector *yaxis);
+void slProcessBillboards(slWorld *w, slCamera *c);
+void slRenderBillboards(slCamera *c, int flags);
+void slDrawFace(slFace *f, int drawMode, double textureScale, int flags);
+
+int slBreakdownFace(slFace *f, double textureScale);
+void slBreakdownTriangle(slVector *v, double textureScale, int level, slVector *xaxis, slVector *yaxis);
 
 int slCompileBox();
 

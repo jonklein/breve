@@ -36,13 +36,11 @@
 
 double gReflectionAlpha;
 
-int gCubeDrawList;
-
 int glActive = 0;
 
 void slDrawFog(slWorld *w, slCamera *c);
 
-void slMatrixToGLMatrix(double m[3][3]);
+void slMatrixGLMult(double m[3][3]);
 
 /*!
 	\brief Calls glMultMatrix with 3x3 orientation slMatrix.
@@ -51,7 +49,7 @@ void slMatrixToGLMatrix(double m[3][3]);
 	are the opposite of SL matrices).
 */
 
-inline void slMatrixToGLMatrix(double m[3][3]) {
+inline void slMatrixGLMult(double m[3][3]) {
 	double d[4][4];
 
 	d[0][0] = m[0][0]; d[0][1] = m[1][0]; d[0][2] = m[2][0]; d[0][3] = 0;
@@ -93,6 +91,7 @@ void slMakeLightTexture(GLubyte *lTexture, GLubyte *dlTexture) {
 }
   
 void slInitGL(slWorld *w, slCamera *c) {
+	GLfloat specularColor[4] = { 0.2, 0.2, 0.2, 0.0 };
 	GLubyte lt[LIGHTSIZE * LIGHTSIZE * 2];
 	GLubyte glt[LIGHTSIZE * LIGHTSIZE * 2];
 
@@ -134,18 +133,21 @@ void slInitGL(slWorld *w, slCamera *c) {
 
 	slClearGLErrors("init");
 
-	gCubeDrawList = glGenLists(1);
-	slCompileCubeDrawList();
+	c->cubeDrawList = glGenLists(1);
+	slCompileCubeDrawList(c->cubeDrawList);
+
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specularColor);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 90);
 }
 
 /*!
-	\brief Initializes the gCubeDrawList.
+	\brief Initializes a cube drawing list.
 
-	The gCubeDrawList is used in the patch drawing.  It's built as part of initialization. 
+	The cube list is used in the patch drawing.  It's built as part of initialization. 
 */
 
-void slCompileCubeDrawList() {
-	glNewList(gCubeDrawList, GL_COMPILE);
+void slCompileCubeDrawList(int l) {
+	glNewList(l, GL_COMPILE);
 
 	glBegin(GL_QUAD_STRIP);
 		// -x face 
@@ -276,6 +278,7 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 	int n;
 	unsigned int nearest = 0xffffffff, min;
 	unsigned int hit = w->objects.size() + 1;
+	slVector cam;
 
 	viewport[0] = c->ox;
 	viewport[1] = c->oy;
@@ -305,7 +308,12 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 	glLoadName(w->objects.size() + 1);
 
 	slClearGLErrors("about to select");
-	slRenderWorld(w, c, 0, GL_SELECT, 0, 0);
+
+    slVectorAdd(&c->location, &c->target, &cam);
+    
+    gluLookAt(cam.x, cam.y, cam.z, c->target.x, c->target.y, c->target.z, 0.0, 1.0, 0.0);
+
+	slRenderObjects(w, c, 1, DO_BILLBOARDS_AS_SPHERES);
 
 	hits = glRenderMode(GL_RENDER);
 
@@ -333,8 +341,6 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 		}
 	}
 
-	glMatrixMode(GL_MODELVIEW);
-
 	glPopName();
 
 	if(hit == w->objects.size() + 1) return -1;
@@ -361,7 +367,7 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 	slVector end;
 	double sD, eD;
 
-	/* set up the matrices for a regular draw--gluUnProject needs this */
+	// set up the matrices for a regular draw--gluUnProject needs this 
 
 	t = &c->target;
 
@@ -383,7 +389,7 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 
 	gluLookAt(cam.x, cam.y, cam.z, t->x, t->y, t->z, 0.0, 1.0, 0.0);
 
-	/* get the data for gluUnProject */
+	// get the data for gluUnProject
 
 	glGetDoublev(GL_MODELVIEW_MATRIX, model);
 	glGetDoublev(GL_PROJECTION_MATRIX, proj);
@@ -393,8 +399,8 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 	wx = x;
 	wy = y;
 
-	/* use gluUnProject to get the point in object space where we are clicking */
-	/* (and at the far reach of our zClip variable). */
+	// use gluUnProject to get the point in object space where we are clicking 
+	// (and at the far reach of our zClip variable). 
 
 	r = gluUnProject(wx, wy, 1.0, model, proj, view, &oxf, &oyf, &ozf);
 
@@ -402,7 +408,7 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 	end.y = oyf;
 	end.z = ozf;
 
-	/* define the plane where the object in question lies */
+	// define the plane where the object in question lies 
 
 	slVectorCopy(&c->location, &plane.normal);
 	slVectorNormalize(&plane.normal);
@@ -428,14 +434,10 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 
 	slVectorSub(&end, &cam, dragVector);
 
-	/* compute the point on the object plane of the drag vector */
+	// compute the point on the object plane of the drag vector 
 
 	slVectorMul(dragVector, (sD / (eD + sD)), dragVector);
 	slVectorAdd(dragVector, &cam, dragVector);
-
-	glLoadIdentity();
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
 
 	return 0;
 }
@@ -452,10 +454,7 @@ void slRenderWorldToBuffer(slWorld *w, slCamera *c, char *r, char *g, char *b, c
 }
 
 void slRenderScene(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor) {
-	if(w->detectLightExposure) {
-		if(!c->stationaryDrawList || recompile) slRenderWorld(w, c, recompile, mode, crosshair, scissor);
-		slDetectLightExposure(w, c, 200, NULL);
-	}
+	if(w->detectLightExposure) slDetectLightExposure(w, c, 200, NULL);
 
 	slRenderWorld(w, c, recompile, mode, crosshair, scissor);
 
@@ -508,13 +507,9 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 	int flags = 0;
 	std::vector<slPatchGrid*>::iterator pi;
 
-	// camera locataion and target 
-
 	if(!w || !c) return;
 
 	glViewport(c->ox, c->oy, c->x, c->y);
-
-	if(recompile) slCompileCubeDrawList();
 
 	if(scissor) {
 		flags |= DO_NO_AXIS | DO_NO_BOUND;
@@ -526,46 +521,24 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 		flags |= DO_OUTLINE;
 		glClearColor(1, 1, 1, 0);
 		flags |= DO_BILLBOARDS_AS_SPHERES;
-	} else glClearColor(w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 1.0);
-
-	if(c->enabled == CM_DISABLED) return;
-
-	c->billboardCount = 0;
-
-	if(mode != GL_SELECT) {
-		if(c->recompile) {
-			c->recompile = 0;
-			recompile = 1;
-		}
+	} else {
+		glClearColor(w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 1.0);
 	}
 
-	if(!c->drawLights) flags |= DO_NO_LIGHTING|DO_NO_STENCIL|DO_NO_REFLECT;
-
-	if(!c->stationaryDrawList || recompile) {
-		// draw once to make sure the draw lists are good...
-
-		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-		slRenderObjects(w, c, 0, flags|DO_RECOMPILE|DO_NO_LINK|DO_NO_TERRAIN|DO_NO_STENCIL);
-		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-		
-		if(!c->stationaryDrawList) c->stationaryDrawList = glGenLists(1);
-
-		glNewList(c->stationaryDrawList, GL_COMPILE);
-		slRenderObjects(w, c, 0, flags|DO_NO_LINK|DO_NO_NEIGHBOR_LINES);
-		glEndList();
-		slClearGLErrors("compiled stationary");
-	} 
+	if(c->recompile) {
+		c->recompile = 0;
+		recompile = 1;
+		slCompileCubeDrawList(c->cubeDrawList);
+	}
 
 	slClear(w, c);
 	
-	if(mode != GL_SELECT) {
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 
-		if(mode != GL_SELECT && w->backgroundTexture != -1 && !(flags & DO_OUTLINE) && !c->onlyMultibodies) slDrawBackground(c, w);
+	if(w->backgroundTexture > 0 && !(flags & DO_OUTLINE)) slDrawBackground(c, w);
 
-		gluPerspective(40.0, c->fov, 0.01, c->zClip);
-	}
+	gluPerspective(40.0, c->fov, 0.01, c->zClip);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -577,71 +550,45 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 
 	gluLookAt(cam.x, cam.y, cam.z, c->target.x, c->target.y, c->target.z, 0.0, 1.0, 0.0);
 
-	if(c->onlyMultibodies) {
-		if(c->drawLights) slDrawLights(c, 0);
-
-		slRenderObjects(w, c, 1, DO_NO_STATIONARY|DO_NO_TERRAIN|DO_NO_NEIGHBOR_LINES|DO_BILLBOARDS_AS_SPHERES);
-		slRenderLines(w, c, 0);
-
-		glPopMatrix();
-
-		return;
-	}
-
-	if(mode == GL_SELECT) {
-		slRenderObjects(w, c, 1, DO_NO_NEIGHBOR_LINES|DO_BILLBOARDS_AS_SPHERES);
-		glPopMatrix();
-		if(scissor) glDisable(GL_SCISSOR_TEST);
-
-		return;
-	}
-
 	slCameraUpdateFrustum(c);
 
 	if(c->drawFog && !(flags & DO_NO_FOG)) slDrawFog(w, c);
 	else glDisable(GL_FOG);
 
-	if(!(flags & DO_BILLBOARDS_AS_SPHERES)) {
-		slComputeBillboardVectors(w, c);
-		slRenderObjects(w, c, 0, DO_PROCESS_BILLBOARD|DO_NO_TERRAIN);
-		if(c->billboardCount) slSortBillboards(c);
-	}
-
 	// do a pass through to grab all the billboards--we want to sort them 
 	// so that they can be rendered back to front and blended correctly
 
+	if(!(flags & DO_BILLBOARDS_AS_SPHERES)) {
+		slComputeBillboardVectors(w, c);
+		slProcessBillboards(w, c);
+	}
+
 	if(c->drawLights) {
-		slVector toCam;
-
-		slVectorSub(&cam, &c->shadowPlane.vertex, &toCam);
-
 		if(c->drawShadowVolumes) slDrawLights(c, 1);
 		else slDrawLights(c, 0);
 
-		if(!c->drawReflection && !c->drawShadow) flags |= DO_NO_STENCIL|DO_NO_REFLECT;
-
 		if(c->drawReflection || c->drawShadow) slStencilFloor(w, c);
+
 		if(c->drawReflection && !(flags & DO_OUTLINE)) {
+			slVector toCam;
+
 			if(!c->drawShadowVolumes) gReflectionAlpha = REFLECTION_ALPHA;
 			else gReflectionAlpha = REFLECTION_ALPHA - 0.1;
+
+			slVectorSub(&cam, &c->shadowPlane.vertex, &toCam);
 
 			if(slVectorDot(&toCam, &c->shadowPlane.normal) > 0.0) {
 				slReflectionPass(w, c);
 				if(c->drawShadowVolumes) slDrawLights(c, 1);
 			}
 		}
-
 	} else {
 		glDisable(GL_LIGHTING);
-		flags |= DO_NO_LIGHTING|DO_NO_STENCIL|DO_NO_REFLECT;
+		flags |= DO_NO_REFLECT;
 	}
 
-	glColor4f(0, 0, 0, 0);
+	slRenderObjects(w, c, 0, flags|DO_NO_LINK|DO_NO_TERRAIN);
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glCallList(c->stationaryDrawList);
-	glDisable(GL_BLEND);
 	slClearGLErrors("drew stationary");
 
 	if(recompile) flags |= DO_RECOMPILE;
@@ -652,19 +599,18 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 		glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
 	}
 
-	if(w->gisData) w->gisData->draw();
-
 	slRenderObjects(w, c, 0, flags|DO_NO_STATIONARY|DO_NO_ALPHA);
-	slRenderLines(w, c, 0);
+	slRenderLines(w, c);
 	slClearGLErrors("drew multibodies and lines");
 
 	// now we do transparent objects and billboards.  they have to come last 
 	// because they are blended.
 
 	glDepthMask(GL_FALSE);
-	slRenderObjects(w, c, 0, flags|DO_NO_STATIONARY|DO_NO_TERRAIN|DO_ONLY_ALPHA);
+	slRenderObjects(w, c, 0, flags|DO_ONLY_ALPHA);
 	glDepthMask(GL_TRUE);
-	if(c->billboardCount && !(flags & DO_BILLBOARDS_AS_SPHERES)) slRenderBillboards(c, flags);
+
+	if(!(flags & DO_BILLBOARDS_AS_SPHERES)) slRenderBillboards(c, flags);
 
 	for(pi = w->patches.begin(); pi != w->patches.end(); pi++) (*pi)->draw(c);
 	
@@ -674,16 +620,21 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 		else if(c->drawShadow) slShadowPass(w, c);
 	}
 
+	// The following elements are one time renders with no special effects.
+
 	slWorldDrawSprings(w);
 
 	slRenderLabels(w);
 
 	slDrawNetsimBounds(w);
 
+	if(w->gisData) w->gisData->draw(c);
+
 	glPopMatrix();
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
+
 	if(c->drawText) slRenderText(w, c, &c->location, &c->target, crosshair);
 
 	if(c->drawText && crosshair && !scissor) {
@@ -727,7 +678,6 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 
 void slClear(slWorld *w, slCamera *c) {
 	if(!c->blur) {
-		if(c->onlyMultibodies) glClearColor(0.0f,0.0f,0.0f,0.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 	} else {
 		glEnable(GL_BLEND);
@@ -778,7 +728,9 @@ void slStencilFloor(slWorld *w, slCamera *c) {
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 	glStencilFunc(GL_ALWAYS, 1, 0xffffffff);
 	glStencilOp(GL_ZERO, GL_ZERO, GL_REPLACE);
-	glCallList(c->stationaryDrawList);
+
+	c->shadowCatcher->draw(c);
+
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_STENCIL_TEST);
@@ -797,22 +749,24 @@ void slReflectionPass(slWorld *w, slCamera *c) {
 
 	glCullFace(GL_FRONT);
 
-	/* render whereever the buffer is 1, but don't change the values */
+	// render whereever the buffer is 1, but don't change the values 
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
 	glEnable(GL_STENCIL_TEST);
+	glEnable(GL_BLEND);
 
 	glStencilFunc(GL_EQUAL, 1, 0xffffffff);  
 
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-	slRenderObjects(w, c, 0, DO_NO_NEIGHBOR_LINES|DO_NO_STATIONARY|DO_NO_BOUND|DO_NO_AXIS|DO_NO_BILLBOARD|DO_NO_TERRAIN);
+	slRenderObjects(w, c, 0, DO_NO_STATIONARY|DO_NO_BOUND|DO_NO_AXIS|DO_NO_TERRAIN);
 	slRenderBillboards(c, 0);
 
 	glDisable(GL_NORMALIZE);
 
 	glCullFace(GL_BACK);
 	glDisable(GL_STENCIL_TEST);
+	glDisable(GL_BLEND);
 
 	glPopMatrix();
 
@@ -831,6 +785,8 @@ void slShadowPass(slWorld *w, slCamera *c) {
 	GLfloat shadowMatrix[4][4];
 	slShadowMatrix(shadowMatrix, &c->shadowPlane, &c->lights[0].location);
 
+	glPushAttrib(GL_ENABLE_BIT);
+
 	glEnable(GL_STENCIL_TEST);
 	glEnable(GL_DEPTH_TEST);
 	glStencilFunc(GL_LESS, 0, 0xffffffff);  
@@ -841,20 +797,19 @@ void slShadowPass(slWorld *w, slCamera *c) {
 	glEnable(GL_POLYGON_OFFSET_FILL);
 
 	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glColor4f(0.0, 0.0, 0.0, 0.2);
+	glColor4f(0.0, 0.0, 0.0, 0.3);
 
 	glPushMatrix();
 	glMultMatrixf((GLfloat*)shadowMatrix);
-	slRenderObjects(w, c, 0, DO_NO_NEIGHBOR_LINES|DO_NO_COLOR|DO_NO_TEXTURE|DO_NO_STATIONARY|DO_NO_LIGHTING|DO_NO_BOUND|DO_NO_AXIS|DO_NO_TERRAIN|DO_NO_BILLBOARD);
+	slRenderObjects(w, c, 0, DO_NO_COLOR|DO_NO_TEXTURE|DO_NO_STATIONARY|DO_NO_BOUND|DO_NO_AXIS|DO_NO_TERRAIN);
+	glDisable(GL_LIGHTING);
 	glDisable(GL_CULL_FACE);
 	slRenderBillboards(c, DO_NO_COLOR|DO_NO_BOUND);
-	glEnable(GL_CULL_FACE);
 	glPopMatrix();
 
-	glDisable(GL_BLEND);
-	glDisable(GL_POLYGON_OFFSET_FILL);
-	glDisable(GL_STENCIL_TEST);
+	glPopAttrib();
 }
 
 /*!
@@ -1002,32 +957,39 @@ void slRenderBillboards(slCamera *c, int flags) {
 
 	glNewList(c->billboardDrawList, GL_COMPILE);
 
-	glBegin(GL_POLYGON);
+	glBegin(GL_TRIANGLE_STRIP);
 		glTexCoord2f(1.0, 1.0); 
 		glVertex3f(c->billboardX.x + c->billboardY.x, c->billboardX.y + c->billboardY.y, c->billboardX.z + c->billboardY.z);
 		glTexCoord2f(0.0, 1.0);
 		glVertex3f(-c->billboardX.x + c->billboardY.x, -c->billboardX.y + c->billboardY.y, -c->billboardX.z + c->billboardY.z);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(-c->billboardX.x - c->billboardY.x, -c->billboardX.y - c->billboardY.y, -c->billboardX.z - c->billboardY.z);
 		glTexCoord2f(1.0, 0.0); 
 		glVertex3f(c->billboardX.x - c->billboardY.x, c->billboardX.y - c->billboardY.y, c->billboardX.z - c->billboardY.z);
+		glTexCoord2f(0.0, 0.0);
+		glVertex3f(-c->billboardX.x - c->billboardY.x, -c->billboardX.y - c->billboardY.y, -c->billboardX.z - c->billboardY.z);
 	glEnd();
 
 	glEndList();
 
-	/* we do want to have a depth test against other object in the world. */
-	/* but we do our own back-to-front billboard sort and we do NOT want  */
-	/* them fighting in the depth buffer.  so we'll disable depth-buffer  */
-	/* writing so that no new info goes there. */
+	// we do want to have a depth test against other objects in the world. 
+	// but we do our own back-to-front billboard sort and we do not want  
+	// them fighting in the depth buffer.  so we'll disable depth-buffer  
+	// writing so that no new info goes there. 
 
 	glDepthMask(GL_FALSE);
 
 	for(n=0;n<c->billboardCount;n++) {
+		int bound;
+		slWorldObject *object;
+
 		glPushMatrix();
 
 		b = c->billboards[n];
 
-		if(b->mode == BBT_LIGHTMAP) {
+		object = b->object;
+
+		bound = (object->drawMode & DM_BOUND);
+
+		if(object->textureMode == BBT_LIGHTMAP) {
 			glBlendFunc(GL_ONE, GL_ONE);
 		} else {
 	    	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -1035,23 +997,22 @@ void slRenderBillboards(slCamera *c, int flags) {
 		}
 
 		if(!(flags & DO_NO_COLOR)) {
-			glColor4f(b->color.x, b->color.y, b->color.z, b->alpha);
+			glColor4f(object->color.x, object->color.y, object->color.z, object->alpha);
 		}
 
-		if(lastTexture != b->bitmap) {
-			// avoid rebinding the texture if possible 
-			glBindTexture(GL_TEXTURE_2D, b->bitmap);
+		if(lastTexture != object->texture) {
+			glBindTexture(GL_TEXTURE_2D, object->texture);
 		}
 
-		lastTexture = b->bitmap;
+		lastTexture = object->texture;
 
-		glTranslated(b->location.x, b->location.y, b->location.z);
-		glRotatef(b->rotation, normal.x, normal.y, normal.z);
+		glTranslated(object->position.location.x, object->position.location.y, object->position.location.z);
+		glRotatef(object->billboardRotation, normal.x, normal.y, normal.z);
 		glScalef(b->size, b->size, b->size);
 
 		glCallList(c->billboardDrawList);
 
-		if(b->selected && !(flags & DO_NO_BOUND)) {
+		if(bound && !(flags & DO_NO_BOUND)) {
 			if(!(flags & DO_NO_TEXTURE)) glDisable(GL_TEXTURE_2D);
 			glPushMatrix();
 			glScalef(1.1, 1.1, 1.1);
@@ -1064,14 +1025,6 @@ void slRenderBillboards(slCamera *c, int flags) {
 			glEnd();
 			glPopMatrix();
 			if(!(flags & DO_NO_TEXTURE)) glEnable(GL_TEXTURE_2D);
-		}
-
-		/* switch back to the expected defaults */
-
-		if(b->mode == BBT_LIGHTMAP) {
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		} else {
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		}
 
 		glPopMatrix();
@@ -1095,9 +1048,7 @@ void slStrokeText(double x, double y, char *string, double scale, void *font) {
 
 	glScalef(scale * 0.0005, scale * 0.0005, scale * 0.0005);
 	
-	while((c = *(string++)) != 0) {
-		glutStrokeCharacter(font, c);
-	}
+	while((c = *(string++)) != 0) glutStrokeCharacter(font, c);
 
 	glPopMatrix();
 }
@@ -1113,10 +1064,11 @@ void slText(double x, double y, char *string, void *font) {
 /*!
 	\brief Sets up lighting for a scene.
 
-	If noDiff is set, no diffusion color is used.
+	If noDiff is set, no diffusion color is used.  This is used for 
+	drawing the shadowed pass of a shadow volume algorithm.
 */
 
-void slDrawLights(slCamera *c, int noDiff) {
+void slDrawLights(slCamera *c, int noDiffuse) {
 	GLfloat dif[4];
 	GLfloat dir[4];
 	GLfloat amb[4];
@@ -1126,7 +1078,7 @@ void slDrawLights(slCamera *c, int noDiff) {
 	dir[2] = c->lights[0].location.z;
 	dir[3] = 1.0;
 
-	if(noDiff) {
+	if(noDiffuse) {
 		dif[0] = 0.0;
 		dif[1] = 0.0;
 		dif[2] = 0.0;
@@ -1150,14 +1102,12 @@ void slDrawLights(slCamera *c, int noDiff) {
 	glEnable(GL_LIGHT0);
 
 	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.1);
-	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.05);
+	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.03);
 
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, dif);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
 	glLightfv(GL_LIGHT0, GL_POSITION, dir);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, amb);
-
-	glDisable(GL_LIGHTING);
 }
 
 /*!
@@ -1179,7 +1129,7 @@ void slShadowMatrix(GLfloat matrix[4][4], slPlane *p, slVector *light) {
 	groundplane[2] = p->normal.z;
 	groundplane[3] = -slVectorDot(&p->normal, &p->vertex);
 	  
-	/* Find dot product between light position vector and ground plane normal. */
+	// Find dot product between light position vector and ground plane normal.
 
 	dot = groundplane[0] * lightpos[0] + groundplane[1] * lightpos[1] + groundplane[2] * lightpos[2] + groundplane[3] * lightpos[3];
    
@@ -1208,86 +1158,20 @@ void slShadowMatrix(GLfloat matrix[4][4], slPlane *p, slVector *light) {
 	\brief Draws a shape by setting up its transformations and calling its drawlist.
 */
 
-void slDrawShape(slCamera *c, slShape *s, slPosition *pos, slVector *color, int texture, double textureScale, int textureMode, int mode, int flags, float bbRot, float alpha) {
-	GLfloat specularColor[4] = { 0.2, 0.2, 0.2, 0.0 };
+void slDrawShape(slCamera *c, slShape *s, slPosition *pos, double textureScale, int mode, int flags) {
 	unsigned char bound, axis;
-
-	// printf("texture: %d\n", texture);
-
-	if(alpha != 1.0 && (flags & DO_NO_ALPHA)) return;
-	if(alpha == 1.0 && (flags & DO_ONLY_ALPHA)) return;
-
-	// if this is a sphere to be rendered as a billboard, but this is 
-	// not the billboard pass, then we don't do anything--return. 
-
-	if(s->_type == ST_SPHERE && textureMode != BBT_NONE && !(flags & DO_BILLBOARDS_AS_SPHERES) && !(flags & DO_PROCESS_BILLBOARD)) return;
-
-	if(textureMode != BBT_NONE && s->_type != ST_SPHERE) texture = 0;
-
-	/* if this is the billboard pass, and we're not a billboard, then we're done */
-
-	if((flags & DO_PROCESS_BILLBOARD) && (s->_type != ST_SPHERE || textureMode == BBT_NONE)) return;
 
 	bound = (mode & DM_BOUND) && !(flags & DO_NO_BOUND);
 	axis = (mode & DM_AXIS) && !(flags & DO_NO_AXIS);
 
-	if(flags & DO_SHADOW_VOLUME) {
-		s->drawShadowVolume(c, pos);
-		return;
-	}
-
-	if(alpha != 1.0) {
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		glDisable(GL_CULL_FACE);
-	}
-
-	if(flags & DO_OUTLINE) {
-		// outline drawing -- no effects, black & white
-
-		glColor4f(1, 1, 1, 0);
-	} else if(texture == 0 && !(flags & DO_NO_LIGHTING)) {
-		// no texture, but probably lighting 
-
-		glEnable(GL_LIGHTING);
-		glColor4f(color->x, color->y, color->z, alpha);
-		glMaterialfv(GL_FRONT, GL_SPECULAR, specularColor);
-		glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
-	} else if(texture == 0 && !(flags & DO_NO_COLOR) ) {
-		/* no texture, no lighting */
-
-		glColor4f(color->x, color->y, color->z, alpha);
-	} else if(texture != 0 && !(flags & DO_NO_TEXTURE) && !(flags & DO_PROCESS_BILLBOARD) && !(flags & DO_OUTLINE)) {
-		/* texture & lighting */
-
-		if(!(flags & DO_NO_LIGHTING)) glEnable(GL_LIGHTING);
-
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, texture);
-
-		glColor4f(color->x, color->y, color->z, alpha);
-
-    	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-	} else if(s->_type == ST_SPHERE && textureMode != BBT_NONE && (flags & DO_BILLBOARDS_AS_SPHERES)) {
-		texture = 0;
-		textureMode = 0;
-	}
-
-	if(s->_type == ST_SPHERE && textureMode != BBT_NONE && !(flags & DO_BILLBOARDS_AS_SPHERES)) {
-		slProcessBillboard(c, color, &pos->location, texture, textureMode, ((slSphere*)s)->_radius, bbRot, alpha, bound);
-		glDisable(GL_TEXTURE_2D);
-
-		return;
-	} 
-
-	if(s->drawList == 0 || s->recompile || (flags & DO_RECOMPILE)) slCompileShape(s, c->drawMode, texture, textureScale, flags);
+	if(s->drawList == 0 || s->recompile || (flags & DO_RECOMPILE)) slCompileShape(s, c->drawMode, textureScale, flags);
 
 	glPushMatrix();
 	glTranslated(pos->location.x, pos->location.y, pos->location.z);
-	slMatrixToGLMatrix(pos->rotation);
+	slMatrixGLMult(pos->rotation);
 
 	if(flags & DO_OUTLINE) {
-		glPushAttrib(GL_LIGHTING_BIT);
+		glPushAttrib(GL_ENABLE_BIT);
 		glDisable(GL_LIGHTING);
 		glPushMatrix();
 		glScalef(.99, .99, .99);
@@ -1299,7 +1183,7 @@ void slDrawShape(slCamera *c, slShape *s, slPosition *pos, slVector *color, int 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glColor4f(0, 0, 0, .5);
 		glDepthMask(GL_FALSE);
-		slRenderShape(s, GL_LINE_LOOP, 0, 0, 0);
+		slRenderShape(s, GL_LINE_LOOP, 0, 0);
 		glDepthMask(GL_TRUE);
 		glDisable(GL_POLYGON_OFFSET_FILL);
 
@@ -1311,30 +1195,19 @@ void slDrawShape(slCamera *c, slShape *s, slPosition *pos, slVector *color, int 
 			glEnable(GL_DEPTH_TEST);
 		}
 
-		glDisable(GL_BLEND);
-
 		glPopAttrib();
 	} else {
 		glCallList(s->drawList);
-	}
-
-	if(texture == 0 && !(flags & DO_NO_LIGHTING)) glDisable(GL_LIGHTING);
-	else if(texture) {
-		glDisable(GL_TEXTURE_2D);
-		glDisable(GL_LIGHTING);
 	}
 
 	if(bound || axis) {
 		glPushAttrib(GL_COLOR_BUFFER_BIT);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glPushMatrix();
 		glColor4f(0.0, 0.0, 0.0, 0.5);
 		glScalef(1.1, 1.1, 1.1);
 		if(axis) slDrawAxis(s->max.x, s->max.y);
-		if(bound) slRenderShape(s, GL_LINE_LOOP, 0, 0, 0);
-		glPopMatrix();
-		glDepthMask(GL_TRUE);
+		if(bound) slRenderShape(s, GL_LINE_LOOP, 0, 0);
 		glPopAttrib();
 	}
 
@@ -1345,6 +1218,32 @@ void slDrawShape(slCamera *c, slShape *s, slPosition *pos, slVector *color, int 
 	\brief Renders a stationary object.
 */
 
+void slProcessBillboards(slWorld *w, slCamera *c) {
+	GLfloat matrix[16];
+	slSphere *ss;
+	std::vector<slWorldObject*>::iterator wi;
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+
+	c->billboardCount = 0;
+
+	for(wi = w->objects.begin(); wi != w->objects.end(); wi++ ) {
+		slWorldObject *wo = *wi;
+
+		if(wo->textureMode != BBT_NONE && wo->shape && wo->shape->_type == ST_SPHERE) {
+			double z = 0;
+
+			ss = wo->shape;
+
+			z = matrix[2] * wo->position.location.x + matrix[6] * wo->position.location.y + matrix[10] * wo->position.location.z;
+
+			slAddBillboard(c, wo, ss->_radius, z);
+		}
+	}
+
+	slSortBillboards(c);
+}
+
 /*! 
 	\brief Renders the objects, assuming that all necessary transformations 
 	have been set up.
@@ -1352,43 +1251,56 @@ void slDrawShape(slCamera *c, slShape *s, slPosition *pos, slVector *color, int 
 
 void slRenderObjects(slWorld *w, slCamera *camera, int loadNames, int flags) {
 	unsigned int n;
-	int texture, textureMode;
 	slWorldObject *wo;
+	int color = 1;
+	int texture = 1;
+
+	if(flags & DO_NO_TEXTURE) texture = 0;
 
 	if(flags & DO_ONLY_ALPHA) {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}
+	} 
+
+	if((flags & DO_OUTLINE) || (flags & DO_NO_COLOR)) color = 0;
+	if(flags & DO_OUTLINE) glColor4f(1, 1, 1, 0);
+
+   	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	for(n=0;n<w->objects.size();n++) {
 		int skip = 0;
 		wo = w->objects[n];
 
 		if(!wo || (wo->drawMode & DM_INVISIBLE)) skip = 1;
+		if(wo->alpha != 1.0 && (flags & DO_NO_ALPHA)) skip = 1;
+		if(wo->alpha == 1.0 && (flags & DO_ONLY_ALPHA)) skip = 1;
+		if(wo->type == WO_STATIONARY && (flags & DO_NO_STATIONARY)) skip = 1;
+		if(wo->type == WO_LINK && (flags & DO_NO_LINK)) skip = 1;
+		if(wo->type == WO_TERRAIN && (flags & DO_NO_TERRAIN)) skip = 1;
+		if(wo->textureMode != BBT_NONE && !(flags & DO_BILLBOARDS_AS_SPHERES)) skip = 1;
 
 		if(!skip) {
 			if(loadNames) glLoadName(n);
 
-			if(wo->texture != -1) {
-				texture = wo->texture;
-				textureMode = wo->textureMode;
-			} else {
-				texture = 0;
-				textureMode = 0;
+			if(color) glColor4f(wo->color.x, wo->color.y, wo->color.z, wo->alpha);
+
+			if(wo->alpha != 1.0) {
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+				glDisable(GL_CULL_FACE);
 			}
 
-			switch(wo->type) {
-				case WO_TERRAIN:
-					if(!(flags & DO_NO_TERRAIN)) {
-						glBindTexture(GL_TEXTURE_2D, texture);
-						wo->draw(camera);
-					}
-					break;
-				default:
-					if(!(flags & DO_NO_LINK)) slDrawShape(camera, wo->shape, &wo->position, &wo->color, texture, wo->textureScale, textureMode, wo->drawMode, flags, wo->billboardRotation, wo->alpha);
+			// 0 or -1 can be used to indicate no texture
 
-					break;
-			}
+			if(texture && wo->texture > 0) {
+				glBindTexture(GL_TEXTURE_2D, wo->texture);
+				glEnable(GL_TEXTURE_2D);
+			} 
+
+			wo->draw(camera);
+
+			if(wo->alpha != 1.0) glEnable(GL_CULL_FACE);
+
+			if(wo->texture > 0) glDisable(GL_TEXTURE_2D);
 		}
 	}
 
@@ -1398,11 +1310,10 @@ void slRenderObjects(slWorld *w, slCamera *camera, int loadNames, int flags) {
 }
 
 /*!
-	\brief Renders object neighbor lines, assuming that all transformations have 
-	been set up.
+	\brief Renders object neighbor lines.
 */
 
-void slRenderLines(slWorld *w, slCamera *c, int flags) {
+void slRenderLines(slWorld *w, slCamera *c) {
 	unsigned int n;
 	unsigned int m;
 	slVector *x, *y;
@@ -1412,7 +1323,7 @@ void slRenderLines(slWorld *w, slCamera *c, int flags) {
 
 	for(n=0;n<w->objects.size();n++) {
 		if(w->objects[n] && !(w->objects[n]->drawMode & DM_INVISIBLE)) {
-			if((w->objects[n]->drawMode & DM_NEIGHBOR_LINES) && !(flags & DO_NO_NEIGHBOR_LINES)) {
+			if(w->objects[n]->drawMode & DM_NEIGHBOR_LINES) {
 				glEnable(GL_BLEND);
 				glColor4f(0.0, 0.0, 0.0, 0.5);
 
@@ -1501,13 +1412,13 @@ void slDrawAxis(double x, double y) {
 	The draw list is generated or updated as needed.
 */
 
-int slCompileShape(slShape *s, int drawMode, int texture, double textureScale, int flags) {
+int slCompileShape(slShape *s, int drawMode, double textureScale, int flags) {
 	if(s->drawList == 0) s->drawList = glGenLists(1);
 	s->recompile = 0;
 
 	glNewList(s->drawList, GL_COMPILE);
 
-	slRenderShape(s, drawMode, texture, textureScale, flags);
+	slRenderShape(s, drawMode, textureScale, flags);
 
 	glEndList();
 
@@ -1541,16 +1452,6 @@ void slComputeBillboardVectors(slWorld *w, slCamera *c) {
 	\brief Adds a billboard to the billboard list in preparation for sorting and rendering.
 */
 
-void slProcessBillboard(slCamera *c, slVector *color, slVector *loc, int bitmap, int textureMode, float size, float rotation, float alpha, unsigned char selected) {
-	GLfloat matrix[16];
-	double z = 0;
-
-	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-
-	z = matrix[2] * loc->x + matrix[6] * loc->y + matrix[10] * loc->z;
-
-	slAddBillboard(c, color, loc, size, rotation, alpha, bitmap, textureMode, z, selected);
-}
 
 /*!
 	\brief Render a shape.
@@ -1559,7 +1460,7 @@ void slProcessBillboard(slCamera *c, slVector *color, slVector *loc, int bitmap,
 	the actual rendering.
 */
 
-void slRenderShape(slShape *s, int drawMode, int texture, double textureScale, int flags) {
+void slRenderShape(slShape *s, int drawMode, double textureScale, int flags) {
 	int divisions;
 	GLUquadricObj *quad;
 
@@ -1572,7 +1473,6 @@ void slRenderShape(slShape *s, int drawMode, int texture, double textureScale, i
 		quad = gluNewQuadric();
 
 		if(drawMode != GL_POLYGON) gluQuadricDrawStyle(quad, GLU_LINE);
-		// if(texture) gluQuadricTexture(quad, GL_TRUE);
 		gluQuadricTexture(quad, GL_TRUE);
 
 		gluQuadricOrientation(quad, GLU_OUTSIDE);
@@ -1583,9 +1483,8 @@ void slRenderShape(slShape *s, int drawMode, int texture, double textureScale, i
 	} else {
 		std::vector<slFace*>::iterator fi;
 
-		for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
-			slDrawFace(*fi, drawMode, texture, textureScale, flags);
-		}
+		for(fi = s->faces.begin(); fi != s->faces.end(); fi++ )
+			slDrawFace(*fi, drawMode, textureScale, flags);
 	}
 }
 
@@ -1616,7 +1515,7 @@ void slPerpendicularVectors(slVector *v, slVector *p1, slVector *p2) {
 	\brief Draws a face, breaking it down into smaller triangles if necessary.
 */
 
-void slDrawFace(slFace *f, int drawMode, int texture, double textureScale, int flags) {
+void slDrawFace(slFace *f, int drawMode, double textureScale, int flags) {
 	slVector *v, *norm, xaxis, yaxis;
 	slPoint *p;
 	int edgeCount;
@@ -1626,13 +1525,11 @@ void slDrawFace(slFace *f, int drawMode, int texture, double textureScale, int f
 	slPerpendicularVectors(norm, &xaxis, &yaxis);
 
 	glNormal3f(norm->x, norm->y, norm->z);
-	// glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 90);
 
-	if(!(flags & DO_NO_STENCIL) && f->drawFlags & SD_STENCIL) 
-		glEnable(GL_STENCIL_TEST);
-
-	if(!(flags & DO_NO_REFLECT) && f->drawFlags & SD_REFLECT) {
+	if(f->drawFlags & SD_REFLECT) {
 		GLfloat v[4];
+
+		glPushAttrib(GL_ENABLE_BIT);
 
 		glGetFloatv(GL_CURRENT_COLOR, v);
 		v[3] = gReflectionAlpha;
@@ -1640,10 +1537,10 @@ void slDrawFace(slFace *f, int drawMode, int texture, double textureScale, int f
 		glEnable(GL_BLEND);
 	}
 
-	// if they're drawing lines, or if the face isn't broken down, 
-	// do a normal polygon
+	// if they're drawing lines, or if the face 
+	// isn't broken down, do a normal polygon
 
-	if(drawMode == GL_LINE_LOOP || !slBreakdownFace(f, texture, textureScale)) {
+	if(drawMode == GL_LINE_LOOP || !slBreakdownFace(f, textureScale)) {
 		glBegin(drawMode);
 	
 		for(edgeCount=0;edgeCount<f->edgeCount;edgeCount++) {
@@ -1651,8 +1548,7 @@ void slDrawFace(slFace *f, int drawMode, int texture, double textureScale, int f
 
 			v = &((slPoint*)p)->vertex;
 	
-			if(texture) 
-				glTexCoord2f(slVectorDot(v, &xaxis) / textureScale + 0.5, slVectorDot(v, &yaxis) / textureScale + 0.5);
+			glTexCoord2f(slVectorDot(v, &xaxis) / textureScale + 0.5, slVectorDot(v, &yaxis) / textureScale + 0.5);
 
 			glVertex3d(v->x, v->y, v->z);
 		} 
@@ -1660,8 +1556,9 @@ void slDrawFace(slFace *f, int drawMode, int texture, double textureScale, int f
 		glEnd();
 	}
 
-	if(!(flags & DO_NO_REFLECT) && f->drawFlags & SD_REFLECT) glDisable(GL_BLEND);
-	if(!(flags & DO_NO_STENCIL) && f->drawFlags & SD_STENCIL) glDisable(GL_STENCIL_TEST);
+	if(f->drawFlags & SD_REFLECT) {
+		glPopAttrib();
+	}
 }
 
 /*!
@@ -1671,7 +1568,7 @@ void slDrawFace(slFace *f, int drawMode, int texture, double textureScale, int f
 	the quality of lighting and other effects.
 */
 
-int slBreakdownFace(slFace *f, int texture, double textureScale) {
+int slBreakdownFace(slFace *f, double textureScale) {
 	slVector diff, total, subv[3], middle;
 	slVector *v1, *v2;
 	slVector xaxis, yaxis;
@@ -1720,13 +1617,13 @@ int slBreakdownFace(slFace *f, int texture, double textureScale) {
 		slVectorCopy(&middle, &subv[1]);
 		slVectorCopy(&total, &subv[2]);
 
-		slBreakdownTriangle(&subv[0], texture, textureScale, 0, &xaxis, &yaxis);
+		slBreakdownTriangle(&subv[0], textureScale, 0, &xaxis, &yaxis);
 
 		slVectorCopy(&middle, &subv[0]);
 		slVectorCopy(v2, &subv[1]);
 		slVectorCopy(&total, &subv[2]);
 
-		slBreakdownTriangle(&subv[0], texture, textureScale, 0, &xaxis, &yaxis);
+		slBreakdownTriangle(&subv[0], textureScale, 0, &xaxis, &yaxis);
 	}
 	
 	glEnd();
@@ -1741,7 +1638,7 @@ int slBreakdownFace(slFace *f, int texture, double textureScale) {
 	in order to improve the quality of lighting and other effects.
 */
 
-void slBreakdownTriangle(slVector *v, int texture, double textureScale, int level, slVector *xaxis, slVector *yaxis) {
+void slBreakdownTriangle(slVector *v, double textureScale, int level, slVector *xaxis, slVector *yaxis) {
 	slVector subv[3];
 	slVector mids[3];
 	slVector diff;
@@ -1762,9 +1659,7 @@ void slBreakdownTriangle(slVector *v, int texture, double textureScale, int leve
 
 	if(length < 200 || level > 3) {
 		for(n=0;n<3;n++) {
-			if(texture)
-				glTexCoord2f(slVectorDot(&v[n], xaxis) / textureScale + 0.5, slVectorDot(&v[n], yaxis) / textureScale + 0.5);
-
+			glTexCoord2f(slVectorDot(&v[n], xaxis) / textureScale + 0.5, slVectorDot(&v[n], yaxis) / textureScale + 0.5);
 			glVertex3f(v[n].x, v[n].y, v[n].z);
 		}
 
@@ -1774,25 +1669,25 @@ void slBreakdownTriangle(slVector *v, int texture, double textureScale, int leve
 		slVectorCopy(&mids[0], &subv[1]);
 		slVectorCopy(&mids[2], &subv[2]);
 
-		slBreakdownTriangle(&subv[0], texture, textureScale, level+1, xaxis, yaxis);
+		slBreakdownTriangle(&subv[0], textureScale, level+1, xaxis, yaxis);
 
 		slVectorCopy(&mids[0], &subv[0]);
 		slVectorCopy(&v[1], &subv[1]);
 		slVectorCopy(&mids[1], &subv[2]);
 
-		slBreakdownTriangle(&subv[0], texture, textureScale, level+1, xaxis, yaxis);
+		slBreakdownTriangle(&subv[0], textureScale, level+1, xaxis, yaxis);
 
 		slVectorCopy(&mids[1], &subv[0]);
 		slVectorCopy(&v[2], &subv[1]);
 		slVectorCopy(&mids[2], &subv[2]);
 
-		slBreakdownTriangle(&subv[0], texture, textureScale, level+1, xaxis, yaxis);
+		slBreakdownTriangle(&subv[0], textureScale, level+1, xaxis, yaxis);
 
 		slVectorCopy(&mids[0], &subv[0]);
 		slVectorCopy(&mids[1], &subv[1]);
 		slVectorCopy(&mids[2], &subv[2]);
 
-		slBreakdownTriangle(&subv[0], texture, textureScale, level+1, xaxis, yaxis);
+		slBreakdownTriangle(&subv[0], textureScale, level+1, xaxis, yaxis);
 	}
 }
 
@@ -1819,8 +1714,6 @@ int slClearGLErrors(char *id) {
 void slFreeGL(slWorld *w, slCamera *c) {
 	unsigned int n;
 
-	if(c->stationaryDrawList) glDeleteLists(c->stationaryDrawList, 1);
-
 	for(n=0;n<w->objects.size();n++) {
 		if(w->objects[n] && w->objects[n]->shape) {
 			glDeleteLists(w->objects[n]->shape->drawList, 1);
@@ -1828,20 +1721,3 @@ void slFreeGL(slWorld *w, slCamera *c) {
 		}
 	}
 }
-
-/*!
-	\brief Vertically reverses a pixel buffer.
-
-	Some (external) libraries and routines expect top-to-bottom pixel data, 
-	others bottom-to-top.  This function swaps between the two.  Width must
-	be the number of bytes in an entire row (taking into account the number
-	of channels), not just the number of pixels.
-*/
-
-void slReversePixelBuffer(unsigned char *source, unsigned char *dest, int width, int height) {
-	int n;
-
-	for(n=0;n<height;n++)
-		bcopy(&source[n * width], &dest[(height - (n + 1)) * width], width);
-}
-

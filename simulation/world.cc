@@ -86,7 +86,7 @@ slWorld *slWorldNew() {
 
 	w->boundingBoxOnly = 0;
 
-	w->backgroundTexture = -1;
+	w->backgroundTexture = 0;
 	slVectorSet(&w->backgroundTextureColor, 1, 1, 1);
 
 	slVectorSet(&w->lightExposureTarget, 0, 0, 0);
