@@ -26,10 +26,9 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #else
-#endif /* MINGW */
-
 #include <wininet.h>
 #include <winsock2.h>
+#endif /* MINGW */
 
 #define BRNETWORKSERVERPOINTER(p)	((brNetworkServer*)BRPOINTER(p))
 

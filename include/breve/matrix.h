@@ -68,21 +68,12 @@ typedef double slMatrix[3][3];
 void slMatrixMulScalar(double [3][3], double, double [3][3]);
 
 void slMatrixTranspose(slMatrix, slMatrix);
-
-void slSkewSymmetric(slVector *, double [3][3]);
-
-void slDetermanant(double [3][3]);
+double slMatrixDetermanant(double [3][3]);
 
 int slMatrixInvert(double [3][3], double [3][3]);
 
-void slMatrixPrint(double [3][3]);
-
 void slRotationMatrix(slVector *, double, double [3][3]);
 
-void slMatrixVectorSet(double [3][3], slVector *, slVector *);
-
 int slMatrixCompare(double [3][3], double [3][3]);
-
-double slDetermanent(double [3][3]);
 
 void slMatrixToQuat(double [3][3], slQuat *);

@@ -25,10 +25,12 @@
 
 #include "util.h"
 
-/* 
-    = slAngularVelocityToDeriv takes a rotation velocity vector and 
-    = turns it into a quaternion derivative which can be added to 
-    = an existing quaternion.
+#include <math.h>
+#include <stdlib.h>
+#include <strings.h>
+
+/*!
+	\brief Takes a rotation velocity vector and turns it into a quaternion derivative.
 */
 
 slQuat *slAngularVelocityToDeriv(slVector *av, slQuat *rot, slQuat *deriv) {
@@ -40,9 +42,8 @@ slQuat *slAngularVelocityToDeriv(slVector *av, slQuat *rot, slQuat *deriv) {
     return deriv;
 }
 
-/*
-    = slQuatToMatrix takes a normalized rotation quaternion and converts
-    = it to a standard rotation matrix.
+/*!
+    \brief Takes a normalized rotation quaternion and converts it to a standard rotation matrix.
 */
 
 void slQuatToMatrix(slQuat *q, double m[3][3]) {
@@ -64,8 +65,8 @@ void slQuatToMatrix(slQuat *q, double m[3][3]) {
     m[2][2] = 1.0 - (xx + yy);
 }
 
-/*
-    = slQuatIdentity sets the passed quaternion to the identity rotation.
+/*!
+    \brief Sets the passed quaternion to the identity rotation.
 */
 
 slQuat *slQuatIdentity(slQuat *q) {
@@ -78,8 +79,8 @@ slQuat *slQuatIdentity(slQuat *q) {
     return q;
 }
 
-/*
-    = slQuatIdentity normalizes the passed quaternion.
+/*! 
+    \brief Normalizes the passed quaternion.
 */
 
 slQuat *slQuatNormalize(slQuat *q) {
@@ -95,22 +96,8 @@ slQuat *slQuatNormalize(slQuat *q) {
     return q;
 }
 
-/*
-    = slQuatIdentity sets the passed quaternion with s, x, y and z values.
-*/
-
-slQuat *slQuatSet(slQuat *q, double s, double x, double y, double z) {
-    q->s = s;
-    q->x = x;
-    q->y = y;
-    q->z = z;
- 
-    return q;
-}
-
-/*
-    = slQuatSetFromAngle sets the passed quaternion to a rotation of 
-    = the passed angle about the passed vector.
+/*!
+    \brief Sets the passed quaternion to a rotation of the passed angle about the passed vector.
 */
 
 slQuat *slQuatSetFromAngle(slQuat *q, double angle, slVector *v) {

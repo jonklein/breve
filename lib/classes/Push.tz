@@ -358,6 +358,17 @@ Object : PushProgram (aka PushPrograms) {
 		% Returns the size of this push program.
 		return pushCodeSize(codePointer).
 
+	+ to get-top-level-size:
+		% Returns the "top-level" size of this push program, meaning that
+		% sublists are counted as one item, and not counted recursively.
+
+		return pushCodeTopLevelSize(codePointer).
+
+	+ to swap-sublists at-x x (int) at-y y (int):
+		% Swaps the positions of the top level sublists x and y.
+
+		return pushCodeSwapSublists(codePointer, x, y).
+
 	+ to get-string:
 		% Returns the string representation of this push program.
 		if !codePointer: return "()".

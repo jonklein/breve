@@ -61,20 +61,8 @@ struct slsVector {
 void slVectorCross(slVector *, slVector *, slVector *);
 double slVectorAngle(slVector *, slVector *);
 
-void slsVectorAdd(slsVector *, slsVector *, slsVector *);
-void slsVectorSub(slsVector *, slsVector *, slsVector *);
-void slsVectorMul(slsVector *, double, slsVector *);
-double slsVectorDot(slsVector *, slsVector *);
-
 void slVectorNormalize(slVector *);
 
 void slVectorSet(slVector *, double, double, double);
-void slsVectorSet(slsVector *, double, double, double, double, double, double);
-
 void slVectorPrint(slVector *);
-void slsVectorPrint(slsVector *);
-
-slVector *slNewVector(double, double, double);
-
 int slVectorCompare(slVector *, slVector *);
-int slVectorInArray(slVector *, slVector *, int);

@@ -36,6 +36,7 @@
 */ 
 
 #include "steve.h"
+#include "xml.h"
 #include "breveFunctionsSteveDataObject.h"
     
 /* check the variables of this object to make sure that it contains */

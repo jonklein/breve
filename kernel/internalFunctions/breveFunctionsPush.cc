@@ -216,6 +216,24 @@ int breveFunctionPushCodeSize(brEval arguments[], brEval *result, brInstance *in
 	return EC_OK;
 }
 
+int breveFunctionPushCodeTopLevelSize(brEval arguments[], brEval *result, brInstance *instance) {
+	push::Code *p1 = (push::Code*)BRPOINTER(&arguments[0]);
+
+	BRINT(result) = (*p1)->get_stack().size();
+
+	return EC_OK;
+}
+
+int breveFunctionPushCodeSwapSublists(brEval arguments[], brEval *result, brInstance *instance) {
+	push::Code *p1 = (push::Code*)BRPOINTER(&arguments[0]);
+	int x = BRINT(&arguments[1]);
+	int y = BRINT(&arguments[2]);
+
+	push::swap_sublist_position(*p1, x, y);
+
+	return EC_OK;
+}
+
 /*!
 	\brief A breve API function wrapper for the C-function \ref pushIntStackSize.
 
@@ -697,6 +715,8 @@ void breveInitPushFunctions(brNamespace *n) {
  	brNewBreveCall(n, "pushCodeGetString", breveFunctionPushCodeGetString, AT_STRING, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeFree", breveFunctionPushCodeFree, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeSize", breveFunctionPushCodeSize, AT_INT, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushCodeTopLevelSize", breveFunctionPushCodeTopLevelSize, AT_INT, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushCodeSwapSublists", breveFunctionPushCodeSwapSublists, AT_INT, AT_POINTER, AT_INT, AT_INT, 0);
  	brNewBreveCall(n, "pushIntStackSize", breveFunctionPushIntStackSize, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushIntStackPop", breveFunctionPushIntStackPop, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(n, "pushIntStackTop", breveFunctionPushIntStackTop, AT_INT, AT_POINTER, 0);

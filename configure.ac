@@ -198,7 +198,7 @@ AC_TYPE_SIZE_T
 
 AC_FUNC_STAT
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([bzero floor getcwd gethostbyaddr gethostbyname gettimeofday pow regcomp socket sqrt strcasecmp strchr strdup strerror strstr])
+AC_CHECK_FUNCS([bzero floor getcwd gethostbyaddr gethostbyname gettimeofday pow regcomp socket sqrt strcasecmp strchr strdup strerror strstr iswspace])
 
 AC_MSG_CHECKING(how to generate dependency info)
 if test "$ac_cv_c_compiler_gnu" = yes; then

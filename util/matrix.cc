@@ -46,6 +46,8 @@
 
 #include "util.h"
 
+#include <math.h>
+
 /*!
 	\brief Compare two 3x3 matrices.
 
@@ -60,21 +62,6 @@ int slMatrixCompare(double x[3][3], double y[3][3]) {
         for(m=0;m<3;m++) if(x[m][n] != y[m][n]) return 0;
 
     return 1;
-}
-
-/*!
-	\brief Set sets the values of a matrix using a diagonal
-    slVector and a symmetric slVector.
-*/
-
-void slMatrixVectorSet(double m[3][3], slVector *diag, slVector *sym) {
-    m[0][0] = diag->x;
-    m[1][1] = diag->y;
-    m[2][2] = diag->z;
-
-    m[0][1] = m[1][0] = sym->z;
-    m[0][2] = m[2][0] = sym->y;
-    m[1][2] = m[2][1] = sym->x;
 }
 
 /*!
@@ -102,22 +89,10 @@ void slMatrixTranspose(double s[3][3], double d[3][3]) {
 }
 
 /*!
-	\brief Create a skew-symmetric matrixc from a vector.
-
-    creates a 3x3 matrix m using the skew symmetric operation on vector v.
-*/
-
-inline void slSkewSymmetric(slVector *v, double m[3][3]) {
-    m[0][0] = 0;     m[0][1] = -v->z; m[0][2] = v->y;
-    m[1][0] = v->z;  m[1][1] = 0;     m[1][2] = -v->x;
-    m[2][0] = -v->y; m[2][1] = v->x;  m[2][2] = 0;
-}
-
-/*!
     \brief Gives the double determanent of a 3x3 matrix.
 */
 
-inline double slDetermanent(double m[3][3]) {
+inline double slMatrixDetermanent(double m[3][3]) {
     return 
         (m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])) +
         (m[0][1] * (m[1][2] * m[2][0] - m[1][0] * m[2][2])) +
@@ -132,7 +107,7 @@ inline double slDetermanent(double m[3][3]) {
 */
 
 int slMatrixInvert(double m[3][3], double d[3][3]) {
-    double det = slDetermanent(m);
+    double det = slMatrixDetermanent(m);
  
     if(fabs(det) < 10e-22) return -1;
 
@@ -149,19 +124,6 @@ int slMatrixInvert(double m[3][3], double d[3][3]) {
     d[2][2] = (m[0][0] * m[1][1] - m[0][1] * m[1][0]) / det;
 
     return 0;
-}
-
-/*!
-    \brief Prints out a matrix to stdout.  
-
-	For debugging.
-*/
-
-void slMatrixPrint(double m[3][3]) {
-    printf("%.15f\t%.15f\t%.15f\n", m[0][0], m[0][1], m[0][2]);
-    printf("%.15f\t%.15f\t%.15f\n", m[1][0], m[1][1], m[1][2]);
-    printf("%.15f\t%.15f\t%.15f\n", m[2][0], m[2][1], m[2][2]);
-    printf("\n");
 }
 
 /*!

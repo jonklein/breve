@@ -26,7 +26,9 @@
 
 #include "util.h"
 #include <string.h>
+#include <stdlib.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 
 #ifndef WINDOWS
 #include <sys/socket.h>

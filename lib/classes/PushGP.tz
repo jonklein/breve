@@ -547,7 +547,7 @@ PushGP : PushClusterGP {
 		while n < ((crossoverPercent + mutationPercent) / 100.0) * populationSize: {
 			p1 = (self run-tournament).
 			p2 = (self run-tournament).
-			next{n} crossover from-parent1 p1 from-parent2 p2.
+			next{n} crossover from-parent1 p1 from-parent2 p2 with-interpreter interpreter.
 			n++.
 		}
 

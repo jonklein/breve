@@ -36,7 +36,4 @@ slQuat *slAngularVelocityToDeriv(slVector *, slQuat *, slQuat *);
 void slQuatToMatrix(slQuat *, double [3][3]);
 slQuat *slQuatIdentity(slQuat *);
 slQuat *slQuatNormalize(slQuat *);
-
-slQuat *slQuatSet(slQuat *, double, double, double, double);
-
 slQuat *slQuatSetFromAngle(slQuat *, double, slVector *);
