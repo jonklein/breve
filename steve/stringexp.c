@@ -188,7 +188,8 @@ int stProcessString(stStringExp *s, stRunInstance *i, brEval *target) {
 	target->type = AT_STRING;
 
 	if(!s->substrings || s->substrings->count == 0) {
-		BRSTRING(target) = s->string;
+		BRSTRING(target) = slStrdup(s->string);
+		stGCMark(i->instance, target);
 		return EC_OK;
 	}
 
