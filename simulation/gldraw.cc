@@ -507,6 +507,47 @@ void slRenderWorld(slWorld *w, slCamera *c, int recompile, int mode, int crossha
 	if(w->cameras->count) slRenderWorldCameras(w);
 }
 
+void slDrawNetsimBounds(slWorld *w) {
+	int n;
+
+	if(!w->netsimData.remoteHosts) return;
+
+	for(n=0;n<w->netsimData.remoteHosts->count;n++) {
+		slNetsimRemoteHostData *data = w->netsimData.remoteHosts->data[n];
+
+		glEnable(GL_BLEND);
+		glColor4f(0.4, 0.0, 0.0, .3);
+
+		glBegin(GL_LINE_LOOP);
+			glVertex3f(data->min.x, data->min.y, data->min.z);
+			glVertex3f(data->max.x, data->min.y, data->min.z);
+			glVertex3f(data->max.x, data->max.y, data->min.z);
+			glVertex3f(data->min.x, data->max.y, data->min.z);
+		glEnd();
+
+		glBegin(GL_LINE_LOOP);
+			glVertex3f(data->min.x, data->min.y, data->max.z);
+			glVertex3f(data->min.x, data->max.y, data->max.z);
+			glVertex3f(data->max.x, data->max.y, data->max.z);
+			glVertex3f(data->max.x, data->min.y, data->max.z);
+		glEnd();
+
+		glBegin(GL_LINES);
+			glVertex3f(data->min.x, data->min.y, data->min.z);
+			glVertex3f(data->min.x, data->min.y, data->max.z);
+
+			glVertex3f(data->max.x, data->min.y, data->min.z);
+			glVertex3f(data->max.x, data->min.y, data->max.z);
+
+			glVertex3f(data->max.x, data->max.y, data->min.z);
+			glVertex3f(data->max.x, data->max.y, data->max.z);
+
+			glVertex3f(data->min.x, data->max.y, data->min.z);
+			glVertex3f(data->min.x, data->max.y, data->max.z);
+		glEnd();
+	}
+}
+
 void slDrawWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair, int scissor) {
 	slVector cam;
 	int flags = 0;
@@ -685,6 +726,8 @@ void slDrawWorld(slWorld *w, slCamera *c, int recompile, int mode, int crosshair
 	}
 
 	if(labels) slRenderLabels(w);
+
+	slDrawNetsimBounds(w);
 
 	glPopMatrix();
 

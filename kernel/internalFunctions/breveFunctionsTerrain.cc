@@ -29,7 +29,7 @@ int brINewTerrain(brEval args[], brEval *target, brInstance *i) {
 
 	t = slNewTerrain(5, BRDOUBLE(&args[0]));
 
-	wo = slAddObject(i->engine->world, t, WO_TERRAIN, NULL);
+	wo = slWorldAddObject(i->engine->world, t, WO_TERRAIN);
 
 	BRPOINTER(target) = wo;
 	wo->userData = i;

@@ -51,6 +51,9 @@
 /* Define to 1 if you have the `avcodec' library (-lavcodec). */
 #undef HAVE_LIBAVCODEC
 
+/* Define to 1 if you have the `enet' library (-lenet). */
+#undef HAVE_LIBENET
+
 /* Define to 1 if you have the `expat' library (-lexpat). */
 #undef HAVE_LIBEXPAT
 
@@ -240,10 +243,10 @@
 #undef inline
 
 /* Define to rpl_malloc if the replacement function should be used. */
-//#undef malloc
+#undef malloc
 
 /* Define to rpl_realloc if the replacement function should be used. */
-//#undef realloc
+#undef realloc
 
 /* Define to `unsigned' if <sys/types.h> does not define. */
 #undef size_t

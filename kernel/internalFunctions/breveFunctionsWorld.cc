@@ -107,6 +107,13 @@ int brIGetTime(brEval *args, brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+/*!
+	\brief Loads a texture from an image file [depreciated].  
+
+	USE OF THIS FUNCTION IS DEPRECIATED.  The image loading methods from
+	breveFunctionsImage.c are now used instead.
+*/
+
 int brILoadTexture(brEval *args, brEval *target, brInstance *i) {
 	unsigned char *path, *pixels = NULL;
 	int w, h, c;
@@ -240,31 +247,6 @@ int brIWorldObjectGetLightExposure(brEval *args, brEval *target, brInstance *i) 
 
 	BRINT(target) = wo->lightExposure;
 
-	return EC_OK;
-}
-
-int brIAddStationary(brEval *args, brEval *target, brInstance *i) {
-	slShape *sh = BRPOINTER(&args[0]);
-	slVector *v = &BRVECTOR(&args[1]);
-	slStationary *st;
-	slWorldObject *wo;
-
-	double id[3][3];
-
-	if(!sh) {
-		slMessage(DEBUG_ALL, "null pointer passed to addStationary\n");
-		return EC_ERROR;
-	}
-
-	slMatrixIdentity(id);
-
-	st = slNewStationary(sh, v, id);
-
-	wo = slAddObject(i->engine->world, st, WO_STATIONARY, NULL);
-	wo->userData = i;
-
-	BRPOINTER(target) = wo;
-   
 	return EC_OK;
 }
 
@@ -846,7 +828,7 @@ int brIAddObjectLine(brEval *args, brEval *target, brInstance *i) {
 	slVector *color = &BRVECTOR(&args[2]);
 	int style = BRINT(&args[3]);
 
-	slAddObjectLine(src, dst, style, color);
+	slWorldAddObjectLine(src, dst, style, color);
 
 	return EC_OK;
 }
@@ -912,7 +894,6 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "getNeighbors", brIGetNeighbors, AT_LIST, AT_POINTER, 0);
 	brNewBreveCall(n, "setNeighborhoodSize", brISetNeighborhoodSize, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 
-	brNewBreveCall(n, "addStationary", brIAddStationary, AT_POINTER, AT_POINTER, AT_VECTOR, 0);
 	brNewBreveCall(n, "removeObject", brIRemoveObject, AT_POINTER, AT_POINTER, 0);
 
 	brNewBreveCall(n, "setBoundingBox", brISetBoundingBox, AT_NULL, AT_POINTER, AT_INT, 0);

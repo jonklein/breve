@@ -344,7 +344,7 @@ Abstract : Control (aka Controls) [version 1.9] {
 		% Returns the "selected" object--the object which 
 		% has been clicked on in the simulation.
 
-		if (selectedObject is a "Link") && (selectedObject get-multibody):
+		if selectedObject && (selectedObject is a "Link") && (selectedObject get-multibody):
 			return (selectedObject get-multibody).
 
 		return selectedObject.

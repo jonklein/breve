@@ -45,6 +45,8 @@
 
 #include "util.h"
 
+#include "netsim.h"
+
 #include "shape.h"
 #include "volInt.h"
 
@@ -68,4 +70,3 @@
 #include "shadow.h"
 
 #include "movie.h"
-#include "netsim.h"

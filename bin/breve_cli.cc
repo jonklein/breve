@@ -203,7 +203,7 @@ int brParseArgs(int argc, char **argv) {
 	int r, error = 0;
 	int level;
 
-	while((r = getopt(argc, argv, "t:d:r:f:n:l:vh")) != EOF) {
+	while((r = getopt_long(argc, argv, "t:d:r:f:n:l:vh", gCLIOptions, NULL)) != EOF) {
 		switch(r) {
 			case 'd':
 				level = atoi(optarg);
@@ -246,13 +246,14 @@ int brParseArgs(int argc, char **argv) {
 void brPrintUsage(char *name) {
 	fprintf(stderr, "usage: %s [options] simulation_file\n", name);
 	fprintf(stderr, "options:\n");
-	fprintf(stderr, "  -t <seconds>    Stops the simulation after <sim_seconds>\n");
-	fprintf(stderr, "  -n <seconds>    Prints a message every time <notify_seconds> have passed\n");
-	fprintf(stderr, "  -r <seed>       Sets the random seed to <seed>.\n");
-	fprintf(stderr, "  -l <xml_file>   Dearchive simulation from <xml_file>.  <xml_file> should be\n");
-	fprintf(stderr, "                  an archive of the simulation contained in the input file.\n");
-	fprintf(stderr, "  -v              Display the current version number.\n");
-	fprintf(stderr, "  -h              Display this information.\n");
+	fprintf(stderr, "  -t, --terminate <seconds>  Stops the simulation after <sim_seconds>\n");
+	fprintf(stderr, "  -n, --notify <seconds>     Prints a message every time <notify_seconds>\n");
+	fprintf(stderr, "                             have passed\n");
+	fprintf(stderr, "  -r, --random <seed>        Sets the random seed to <seed>.\n");
+	fprintf(stderr, "  -a, --archive <xml_file>   Dearchive simulation from <xml_file>.  <xml_file> should be\n");
+	fprintf(stderr, "                             an archive of the simulation contained in the input file.\n");
+	fprintf(stderr, "  -v, --version              Display the current version number.\n");
+	fprintf(stderr, "  -h, --help                 Display this information.\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "For full documentation, or to submit a bug report, visit the breve homepage:\n");
 	fprintf(stderr, "http://www.spiderland.org/breve\n\n");

@@ -1,12 +1,12 @@
 <HTML>
 <HEAD>
-<TITLE>breve version history</TITLE>
+<TITLE>breve : version history</TITLE>
 </HEAD>
 <STYLE TYPE="text/css">
     BODY, P, LI {
         color: black;
         background: white;
-        font-family: Geneva,Arial,Helvetica,Swiss,SunSans-Regular;
+        font-family: Verdana,Arial,Helvetica,Swiss,SunSans-Regular;
         font-size: 90%;
     }
     BODY {
@@ -27,9 +27,11 @@
 
 #### IN PROGRESS
 
-The <b>breve</b> simulation environment change log.
+The <a href="http://www.spiderland.org/breve">breve</a> simulation environment change log.
 <p>
 <H2>version 2.0 [XX/XX/2004]</H2>
+<ul>
+<li>Mouse coordinates in window can be read with new Control methods get-mouse-x-coordinate and get-mouse-y-coordinate.
 
 <li>New "insert" operator for lists: insert <i>expression</i> at <i>list</i>{ <i>index</i> }.
 
@@ -53,7 +55,7 @@ The <b>breve</b> simulation environment change log.
 
 <li>Totally revamped garbage collection system.
 
-<li>Garbage collection works for objects, though it must be enabled on a per-object basis.
+<li>Garbage collection works for objects.  It is enabled on a per-object basis.
 
 <li>The depreciated "register with-shape" method has been removed for Mobile objects.  The method to use is now "set-shape to".
 
@@ -67,7 +69,7 @@ The <b>breve</b> simulation environment change log.
 
 <li>Fixed truncated read bug in the File class.
 
-<li>Links can be transparent.
+<li>Links and mobile objects can be transparent.
 
 <li>The depreciated Joint methods have been removed from the Link class&mdash;use the Joint classes instead.  
 
@@ -87,22 +89,19 @@ The <b>breve</b> simulation environment change log.
 
 <li>Mac OS X style plugins are no longer supported&mdash;switching to the common plugin structure is trivial.
 
-<li>Source code completely restructured.
-
 <li>New API for using the breve engine with other frontend languages.
+
+<li>Source code completely restructured.
 
 <li>Source code now fully documented with doxygen.
 
 <li>Window-position can be specified from the command line with the flag -w X,Y.
 
-<li>Window-side can be specified from the command line with the flag -s NxM.
+<li>Window-size can be specified from the command line with the flag -l NxM.
 
 <li>Plugin API: all "ST" macros and symbols have been changed to "BR" (i.e., STINT() is now BRINT()).
+</ul>
 
-### 
-
-
-The <b>breve</b> simulation environment change log.
 <p>
 <H2>version 1.9.1 [05/12/2004]</H2>
 <P>
@@ -357,8 +356,8 @@ The <b>breve</b> simulation environment change log.
 <blockquote>
  Though changes will need to be made to accommodate the changes,
  the new engine will offer much improved features and stability in the 
- long run.  <b>breve></b> is now using portions of the Open Dynamics Engine 
- library.  See the file <b>PhysicsNotes </b>for more information.
+ long run.  <b>breve</b> is now using portions of the Open Dynamics Engine 
+ library.  See the file <b>PhysicsNotes</b>for more information.
 </blockquote>
 </UL>
 <p>

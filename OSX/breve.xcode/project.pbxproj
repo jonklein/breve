@@ -53,6 +53,7 @@
 				48F3824D06133752000C8D20,
 				48551AEA057EDBC20025A643,
 				48D3949D0438C97E00000102,
+				485594AE06D289CF0036EAAD,
 				ACE554B6053451DE0084DE05,
 				480AB444053B881D00BB81CC,
 				48EF7AF5046FF85300000103,
@@ -793,6 +794,7 @@
 				4802DC7705616137008198B9,
 				48F3824E06133752000C8D20,
 				481A471B067E190B0096AF6E,
+				485594AF06D289CF0036EAAD,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -995,6 +997,20 @@
 		};
 		48551AEB057EDBC20025A643 = {
 			fileRef = 48551AEA057EDBC20025A643;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		485594AE06D289CF0036EAAD = {
+			isa = PBXFileReference;
+			lastKnownFileType = archive.ar;
+			name = libenet.a;
+			path = /usr/local/lib/libenet.a;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		485594AF06D289CF0036EAAD = {
+			fileRef = 485594AE06D289CF0036EAAD;
 			isa = PBXBuildFile;
 			settings = {
 			};

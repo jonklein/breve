@@ -18,6 +18,26 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#include <getopt.h>
+
+struct option gCLIOptions[] = {
+        { "debug",      required_argument, 0, 'd' },
+        { "random",     required_argument, 0, 'r' },
+        { "notify",     required_argument, 0, 'n' },
+        { "archive",    required_argument, 0, 'a' }, 
+        { "version",    no_argument,       0, 'v' }, 
+        { "terminate",  required_argument, 0, 't' },
+        { "fullscreen", no_argument,       0, 'f' },
+        { "format",     no_argument,       0, 'F' },
+        { "unpause",    no_argument,       0, 'u' },
+        { "size",       required_argument, 0, 's' },
+        { "position",   required_argument, 0, 'p' },
+        { "help",       no_argument,       0, 'h' },
+
+        { "slave",      required_argument, 0, 'S' },
+        { "master",     no_argument,       0, 'M' }
+};
+
 void steveInit(void);
 int brParseArgs(int argc, char **argv);
 
@@ -48,6 +68,5 @@ void slDemoKeyboardUp(unsigned char key, int x, int y);
 int brCLIDialogCallback(void *data, char *title, char *message, char *b1, char *b2);
 
 char *interfaceVersionCallback(void *data);
-
 char *getSavename(void *data);
 char *getLoadname(void *data);

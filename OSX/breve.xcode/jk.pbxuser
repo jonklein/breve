@@ -40,8 +40,8 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXErrorsWarningsDataSource_MessageID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					487.8799,
-					266.2085,
+					436.8799,
+					240.2085,
 				);
 				PBXFileTableDataSourceColumnsKey = (
 					PBXErrorsWarningsDataSource_TypeID,
@@ -66,9 +66,9 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					242,
+					452,
 					20,
-					48,
+					83,
 					43,
 					43,
 					20,
@@ -87,8 +87,8 @@
 				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
 				PBXFileTableDataSourceColumnSortingKey = PBXFindDataSource_LocationID;
 				PBXFileTableDataSourceColumnWidthsKey = (
-					270.2974,
-					273.2085,
+					349.2974,
+					351.2085,
 				);
 				PBXFileTableDataSourceColumnsKey = (
 					PBXFindDataSource_MessageID,
@@ -97,13 +97,13 @@
 			};
 			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
 				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
-				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_FiletypeID;
+				PBXFileTableDataSourceColumnSortingKey = PBXTargetDataSource_PrimaryAttribute;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					210,
-					50,
+					385,
+					85,
 					20,
-					50,
+					85,
 					43,
 					43,
 				);
@@ -117,7 +117,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 114372085;
+			PBXPerProjectTemplateStateSaveDate = 114460682;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -674,7 +674,11 @@
 				PBXModuleWindowStatusBarHidden = YES;
 				RubberWindowFrame = "267 380 745 408 0 0 1280 832 ";
 			};
-			PBXWorkspaceStateSaveDate = 114372085;
+			PBXWorkspaceStateSaveDate = 114460682;
+		};
+		perUserProjectItems = {
+			485594B106D28A1C0036EAAD = 485594B106D28A1C0036EAAD;
+			485594E206D2988C0036EAAD = 485594E206D2988C0036EAAD;
 		};
 		sourceControlManager = 48E065B3055C318700C40B45;
 		userBuildSettings = {
@@ -734,6 +738,23 @@
 		sourceDirectories = (
 		);
 	};
+	485594B106D28A1C0036EAAD = {
+		fRef = F5BD20C50397BFC001980AE4;
+		isa = PBXTextBookmark;
+		rLen = 1;
+		rLoc = 296;
+		rType = 1;
+	};
+	485594E206D2988C0036EAAD = {
+		fRef = F5BD20C50397BFC001980AE4;
+		isa = PBXTextBookmark;
+		name = "slBreveEngine.m: 297";
+		rLen = 0;
+		rLoc = 7287;
+		rType = 0;
+		vrLen = 327;
+		vrLoc = 7161;
+	};
 	48BB5D1405C9659B007C7301 = {
 		fileReference = 2A37F4ACFDCFA73011CA2CEA;
 		isa = PBXFileBreakpoint;
@@ -775,6 +796,14 @@
 			sepNavIntBoundsRect = "{{0, 0}, {852, 531}}";
 			sepNavSelRange = "{0, 0}";
 			sepNavVisRect = "{{0, 0}, {852, 231}}";
+		};
+	};
+	F5BD20A70397BEC801980AE4 = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {711, 531}}";
+			sepNavSelRange = "{545, 0}";
+			sepNavVisRect = "{{0, 0}, {711, 428}}";
+			sepNavWindowFrame = "{{38, 248}, {750, 558}}";
 		};
 	};
 	F5BD20AA0397BEC801980AE4 = {
@@ -830,9 +859,9 @@
 	};
 	F5BD20C50397BFC001980AE4 = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {812, 7503}}";
-			sepNavSelRange = "{4487, 0}";
-			sepNavVisRect = "{{0, 2014}, {762, 268}}";
+			sepNavIntBoundsRect = "{{0, 0}, {974, 7727}}";
+			sepNavSelRange = "{7287, 0}";
+			sepNavVisRect = "{{0, 4083}, {974, 137}}";
 		};
 	};
 	F5BD20C60397BFC001980AE4 = {

@@ -56,6 +56,9 @@ extern char *interfaceID;
 
 extern int gPaused;
 
+int gSlave = 0, gMaster = 0;
+char *gSlaveHost;
+
 int gWaiting = 0;
 
 int contextMenu, mainMenu;
@@ -198,6 +201,13 @@ int main(int argc, char **argv) {
 
 	pthread_mutex_lock(&gThreadMutex);
 	pthread_create(&thread, NULL, workerThread, NULL);
+
+	if(gMaster) slWorldStartNetsimServer(frontend->engine->world);
+
+	if(gSlave) {
+		slWorldStartNetsimSlave(frontend->engine->world, gSlaveHost);
+		slFree(gSlaveHost);
+	}
 
 	if(gFull) glutFullScreen();
 
@@ -357,7 +367,7 @@ int brParseArgs(int argc, char **argv) {
 	int r, error = 0;
 	int level;
 
-	while((r = getopt(argc, argv, "w:s:d:r:l:mvhfu")) != EOF) {
+	while((r = getopt_long(argc, argv, "w:s:d:r:l:vhfFuSM", gCLIOptions, NULL)) != EOF) {
 		switch(r) {
 			case 'd':
 				level = atoi(optarg);
@@ -377,7 +387,7 @@ int brParseArgs(int argc, char **argv) {
 					error++;
 				}
 				break;
-			case 'l':
+			case 'a':
 				gSimFile = slStrdup(optarg);
 				break;
 			case 'v':
@@ -392,11 +402,18 @@ int brParseArgs(int argc, char **argv) {
 			case 'u':
 				gPaused = 0;
 				break;
-			case 'm':
+			case 'F':
 				gFormat = 1;
 				break;
-			case 'w':
+			case 'p':
 				sscanf(optarg, "%d,%d", &xpos, &ypos);
+				break;
+			case 'S':
+				gSlaveHost = slStrdup(optarg);
+				gSlave = 1;
+				break;
+			case 'M':
+				gMaster = 1;
 				break;
 			default:
 				printf("unknown option: '%c'\n", r);

@@ -120,10 +120,13 @@ FILE *slGetLogFilePointer(brInstance *i) {
 
 /*!
 	\brief Loads internal functions into the breve engine.
+
+	Calls all of the loader functions for different groups of functions.
 */
 
 void brLoadInternalFunctions(brEngine *e) {
 	breveInitWorldFunctions(e->internalMethods);
+	breveInitStationaryFunctions(e->internalMethods);
 	breveInitObjectFunctions(e->internalMethods);
 	breveInitControlFunctions(e->internalMethods);
 	breveInitMathFunctions(e->internalMethods);

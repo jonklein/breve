@@ -30,9 +30,8 @@ void slODEErrorHandler(int errnum, const char *msg, va_list ap) {
 	gPhysicsErrorMessage = (char*)error;	
 }
 
-/*
-	+ slWorldNew 
-	= creates a new empty world.	
+/*!
+	\brief Creates a new empty world.	
 */
 
 slWorld *slWorldNew() {
@@ -94,10 +93,45 @@ slWorld *slWorldNew() {
 	return w;
 }
 
-/*
-	slWorldFree
+/*!
+	\brief Startup a netsim server.
+*/
 
-	frees an slWorld object, including all of its objects and its clipData.
+int slWorldStartNetsimServer(slWorld *w) {
+	enet_initialize();
+
+	w->netsimData.isMaster = 1;
+
+	w->netsimData.remoteHosts = slStackNew();
+	w->netsimData.server = slNetsimCreateServer(w);
+	slNetsimStartServer(w->netsimData.server);
+
+	if(!w->netsimData.server) return -1;
+
+	return 0;
+}
+
+/*!
+	\brief Startup as a netsim slave.
+*/
+
+int slWorldStartNetsimSlave(slWorld *w, char *host) {
+	enet_initialize();
+
+	w->netsimData.isMaster = 0;
+
+	w->netsimData.remoteHosts = slStackNew();
+	w->netsimData.server = slNetsimCreateClient(w);
+	w->netsimClient = slNetsimOpenConnection(w->netsimData.server->host, host, NETSIM_MASTER_PORT);
+	slNetsimStartServer(w->netsimData.server);
+
+	if(!w->netsimData.server) return -1;
+
+	return 0;
+}
+
+/*!  
+	\brief frees an slWorld object, including all of its objects and its clipData.
 */
 
 void slWorldFree(slWorld *w) {
@@ -116,17 +150,33 @@ void slWorldFree(slWorld *w) {
 	dJointGroupDestroy(w->odeCollisionGroupID);
 	dJointGroupDestroy(w->odeJointGroupID);
 
+#ifdef HAS_LIBENET
+	if(w->netsimData.server) enet_deinitialize();
+#endif
+
 	slFreeIntegrationVectors(w);
 	slFree(w);
 }
+
+/*!
+	\brief Adds a camera to the world.
+*/
 
 void slWorldAddCamera(slWorld *w, slCamera *camera) {
 	slStackPush(w->cameras, camera);
 }
 
+/*!
+	\brief Removes a camera from the world.
+*/
+
 void slWorldRemoveCamera(slWorld *w, slCamera *camera) {
 	slStackRemove(w->cameras, camera);
 }
+
+/*!
+	\brief Renders all of the cameras in the world .
+*/
 
 void slRenderWorldCameras(slWorld *w) {
 	int n;
@@ -137,13 +187,9 @@ void slRenderWorldCameras(slWorld *w) {
 	}
 }
 
-/*
-	slWorldFreeObject
-   
-	what do you think it does?
-
-	okay, i should tell you that it frees the object, and decreases the 
-	reference count on its slShape through freeShape
+/*!
+	\brief frees an object, and decreases the reference count on its slShape 
+	through freeShape
 */
 
 void slWorldFreeObject(slWorldObject *o) {
@@ -189,7 +235,11 @@ void slWorldFreeObject(slWorldObject *o) {
 	slFree(o);
 }
 
-slWorldObject *slAddObject(slWorld *w, void *p, int type, slVector *color) {
+/*!
+	\brief Adds an object to the world.
+*/
+
+slWorldObject *slWorldAddObject(slWorld *w, void *p, int type) {
 	slWorldObject *no;
 
 	w->initialized = 0;
@@ -199,7 +249,7 @@ slWorldObject *slAddObject(slWorld *w, void *p, int type, slVector *color) {
 		w->objects = slRealloc(w->objects, w->maxObjects*sizeof(slWorldObject*));
 	}
 
-	no = w->objects[w->objectCount] = slWorldNewObject(p, type, color);
+	no = w->objects[w->objectCount] = slWorldNewObject(p, type);
 
 	w->objectCount++;
 
@@ -208,6 +258,8 @@ slWorldObject *slAddObject(slWorld *w, void *p, int type, slVector *color) {
 
 slPatchGrid *slAddPatchGrid(slWorld *w, slVector *center, slVector *patchSize, int x, int y, int z) {
 	slPatchGrid *g = slNewPatchGrid(center, patchSize, x, y, z);
+
+	slStackPush(w->patchGridObjects, g);
 
 	if(w->patchGridCount == w->maxPatchGrids) {
 		w->patchGridCount *= 2;
@@ -250,7 +302,7 @@ void slRemoveObject(slWorld *w, slWorldObject *p) {
 	to be placed in the slWorld.
 */
 
-slWorldObject *slWorldNewObject(void *d, int type, slVector *color) {
+slWorldObject *slWorldNewObject(void *d, int type) {
 	slWorldObject *w;
 
 	w = slMalloc(sizeof(slWorldObject));
@@ -282,10 +334,9 @@ slWorldObject *slWorldNewObject(void *d, int type, slVector *color) {
 	w->eT = 0.2;
 	w->mu = 0.15;
 
-	if(color) slVectorCopy(color, &w->color);
-	else w->color.x = w->color.y = w->color.z = 1.0;
+	w->color.x = w->color.y = w->color.z = 1.0;
 
-	/* type specific initializations */
+	// make sure we understand this object type
 
 	switch(type) {
 		case WO_LINK:
@@ -346,6 +397,7 @@ int slObjectSortFunc(const void *a, const void *b) {
 
 double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 	double total = 0.0;
+	static int lastSecond = 0;
 
 	*error = 0;
 
@@ -355,6 +407,29 @@ double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 		total += slWorldStep(w, step, error);
 
 	w->age += total;
+
+	if(w->netsimData.isMaster && (int)w->age >= lastSecond) {
+		lastSecond = w->age + 1;
+
+		slNetsimBroadcastSyncMessage(w->netsimData.server, w->age);
+	}
+
+	if(!w->netsimData.isMaster && w->detectCollisions) {
+		int maxIndex;
+		slVector max, min;
+
+		maxIndex = (w->clipData->count * 2) - 1;
+
+		min.x = *w->clipData->xListPointers[0]->value;
+		min.y = *w->clipData->yListPointers[0]->value;
+		min.z = *w->clipData->zListPointers[0]->value;
+
+		max.x = *w->clipData->xListPointers[maxIndex]->value;
+		max.y = *w->clipData->yListPointers[maxIndex]->value;
+		max.z = *w->clipData->zListPointers[maxIndex]->value;
+
+		slNetsimSendBoundsMessage(w->netsimClient, &min, &max);
+	}
 
 	return total;
 }
@@ -609,14 +684,12 @@ void slWorldSetGravity(slWorld *w, slVector *gravity) {
 	dWorldSetGravity(w->odeWorldID, gravity->x, gravity->y, gravity->z);
 }
 
-slObjectLine *slAddObjectLine(slWorldObject *src, slWorldObject *dst, int stipple, slVector *color) {
+slObjectLine *slWorldAddObjectLine(slWorldObject *src, slWorldObject *dst, int stipple, slVector *color) {
 	slObjectLine *line;
 
 	if(src == dst) return NULL;
 
 	line = slFindObjectLine(src, dst);
-
-	// stipple = 0xfc;
 
 	if(line) {
 		slVectorCopy(color, &line->color);

@@ -327,6 +327,9 @@ int brISetDrawText(brEval args[], brEval *target, brInstance *i) {
 
 int brISetZClip(brEval args[], brEval *target, brInstance *i) {
     i->engine->camera->zClip = abs(BRINT(&args[0]));
+
+	if(i->engine->camera->zClip == 0) i->engine->camera->zClip = 1;
+
     return EC_OK;
 }
 

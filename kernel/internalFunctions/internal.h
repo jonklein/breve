@@ -15,6 +15,7 @@ void breveInitObjectFunctions(brNamespace *n);
 void breveInitPatchFunctions(brNamespace *n);
 void breveInitPhysicsFunctions(brNamespace *n);
 void breveInitShapeFunctions(brNamespace *n);
+void breveInitStationaryFunctions(brNamespace *n);
 void breveInitSoundFunctions(brNamespace *n);
 void breveInitTerrainFunctions(brNamespace *n);
 void breveInitWorldFunctions(brNamespace *n);

@@ -67,8 +67,6 @@
 
 - (void)setEngine:(brEngine*)e fullscreen:(BOOL)f;
 
-- (void)resetCamera;
-
 - (int)drawing;
 
 - (void)drawRect:(NSRect)aRect;

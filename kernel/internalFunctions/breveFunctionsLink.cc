@@ -56,7 +56,7 @@ int brILinkAddToWorld(brEval *args, brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	wo = slAddObject(i->engine->world, link, WO_LINK, NULL);
+	wo = slWorldAddObject(i->engine->world, link, WO_LINK);
 	wo->userData = i;
 
 	BRPOINTER(target) = wo;

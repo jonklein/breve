@@ -294,7 +294,6 @@ char *interfaceID = "aqua/1.2";
 		if(runState != BX_STOP) {
 			if(1 || engine->useMouse) {
 				NSPoint mouse = [NSEvent mouseLocation];
-				NSRect bounds = [displayView frame];
 
 				if(![displayView isFullScreen]) {
 					mouse = [[displayView window] convertScreenToBase: mouse];

@@ -171,11 +171,7 @@ struct slWorld {
 	int (*integrator)(slWorld *w, slLink *m, double *dt, int skip);
 
 	// the collision callback is called when the collision is detected --
-	// at the estimated time of collision.  it passes the userData of the
-	// world objects to this function which is specified by the program
-	// using the physics engine.  in the specific case of breve, the
-	// callback triggers a method call to the instances representing the 
-	// objects in the world. 
+	// at the estimated time of collision.  
 
 	void (*collisionCallback)(void *body1, void *body2, int type);
 
@@ -232,10 +228,16 @@ struct slWorld {
 
 	int backgroundTexture;
 	int isBackgroundImage;
+
+	slNetsimData netsimData;
+	slNetsimClientData *netsimClient;
 };
 
 slWorld *slWorldNew();
-slWorldObject *slWorldNewObject(void *d, int type, slVector *color);
+slWorldObject *slWorldNewObject(void *d, int type);
+
+int slWorldStartNetsimServer(slWorld *w);
+int slWorldStartNetsimSlave(slWorld *w, char *host);
 
 void slWorldAddCamera(slWorld *w, slCamera *camera);
 void slWorldRemoveCamera(slWorld *w, slCamera *camera);
@@ -247,7 +249,7 @@ void slWorldFreeObject(slWorldObject *o);
 void slFreeClipData(slVclipData *v);
 void slRenderWorldCameras(slWorld *w);
 
-slWorldObject *slAddObject(slWorld *w, void *p, int type, slVector *color);
+slWorldObject *slWorldAddObject(slWorld *w, void *p, int type);
 void slRemoveObject(slWorld *w, slWorldObject *p);
 
 double slRunWorld(slWorld *w, double deltaT, double stepSize, int *error);
@@ -271,7 +273,7 @@ void slSetBoundsOnlyCollisionDetection(slWorld *w, int value);
 
 void slInitProximityData(slWorld *w);
 
-slObjectLine *slAddObjectLine(slWorldObject *src, slWorldObject *dst, int stipple, slVector *color);
+slObjectLine *slWorldAddObjectLine(slWorldObject *src, slWorldObject *dst, int stipple, slVector *color);
 int slRemoveObjectLine(slWorldObject *src, slWorldObject *dst);
 int slRemoveAllObjectLines(slWorldObject *src);
 

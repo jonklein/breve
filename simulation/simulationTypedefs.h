@@ -54,3 +54,10 @@ typedef struct slWorld slWorld;
 typedef struct slWorldObject slWorldObject;
 typedef struct slStationary slStationary;
 typedef struct slObjectLine slObjectLine;
+
+typedef struct slNetsimData slNetsimData;
+typedef struct slNetsimServerData slNetsimServerData;
+typedef struct slNetsimClientData slNetsimClientData;
+typedef struct slNetsimBoundsMessage slNetsimBoundsMessage;
+typedef struct slNetsimSyncMessage slNetsimSyncMessage;
+typedef struct slNetsimRemoteHostData slNetsimRemoteHostData;

@@ -134,3 +134,6 @@ void slReversePixelBuffer(char *source, char *dest, int width, int height);
 void slTransposeGLMatrix(GLfloat *m);
 
 void slClear(slWorld *w, slCamera *c);
+
+void slDrawNetsimBounds(slWorld *w);
+
