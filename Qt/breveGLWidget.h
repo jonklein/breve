@@ -35,6 +35,8 @@ public:
 
 public slots: 
     virtual void setButtonMode(int mode) {
+		printf("setting button mode, bitches!\n");
+		printf("to %d, bitches!\n", mode);
 		_buttonMode = mode;
     }
   

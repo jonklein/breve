@@ -10,15 +10,21 @@
 ** destructor.
 *****************************************************************************/
 
-#include <sys/types.h>
-#include <dirent.h>
 #include <qstring.h>
-#include <vector>
 
-#include "steve.h"
+#undef Unsorted
+#include <qfiledialog.h>
+
 #include "brqtEditorWindow.h"
 #include "brqtErrorWindow.h"
+
+#include <sys/types.h>
+#include <dirent.h>
+#include <vector>
+
 #include "brqtEngine.h"
+
+#include "steve.h"
 
 breveFrontend *frontend;
 brqtEditorWindow *gW;
@@ -81,8 +87,7 @@ void brqtMainWindow::init() {
 	demoMenuForDirectory(this, Demos, directory, 0);
 }
 
-void brqtMainWindow::fileNew()
-{
+void brqtMainWindow::fileNew() {
     brqtEditorWindow *w = newDocument();
 
     w->show();
@@ -91,20 +96,34 @@ void brqtMainWindow::fileNew()
 }
 
 
-void brqtMainWindow::fileOpen()
-{
+void brqtMainWindow::fileOpen() {
+	QString s = QFileDialog::getOpenFileName(
+		"/home",
+		"breve files (*.tz)",
+		this,
+		"Open File...",
+		"Choose a file" );
 
+	// cout << s;
+
+	if( s != "") {
+		brqtEditorWindow *w = newDocument();
+		w->loadFile(s);
+	}
 }
 
 
-void brqtMainWindow::fileSave()
-{
-
+void brqtMainWindow::fileSave() {
 }
 
 
-void brqtMainWindow::fileSaveAs()
-{
+void brqtMainWindow::fileSaveAs() {
+	QString s = QFileDialog::getSaveFileName(
+		"/home",
+		"breve files (*.tz)",
+		this,
+		"Save File...",
+		"Choose a filename to save under" );
 
 }
 
@@ -254,7 +273,7 @@ void brqtMainWindow::buildDocumentMenu()
 {
     documentMenu->clear();
 
-	for(int n=0; n<documents.size(); n++) {
+	for(unsigned int n=0; n<documents.size(); n++) {
     	documentMenu->insertItem( documents[n]->caption() );
 	}
 }
