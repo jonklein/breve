@@ -214,13 +214,14 @@ frontends, or it can be any other application which creates and uses a breve
 engine.  This section describes using the existing breve application 
 frontends with your own custom language frontend.  If you instead wish to 
 implement your own custom application frontend, you'll need to use the 
-functions described in <xref linkend="breve_engine">.
+functions described in <xref linkend="custom_application_frontend">.
 </para>
 
 <para>
 To use the existing breve application frontends, you'll need to implement the 
 functions described below, and then link the breve executables against your 
-own language frontend and application frontend functions.  </para>
+own language frontend and application frontend functions.  
+</para>
 
 <sect2><title>The <function>brFrontend</function> structure</title>
 <para>
@@ -306,7 +307,7 @@ run your custom language frontend.
 
 </sect1>
 
-<sect1><title>Implementing a Custom Application Frontend</title>
+<sect1 id="custom_application_frontend"><title>Implementing a Custom Application Frontend</title>
 <para>
 To implement a custom application frontend, or to use breve 
 simulations as part of another program, you'll need to familiarize 
