@@ -47,6 +47,28 @@ struct stStackRecord {
 	slStack *gcStack;
 };
 
+#define USE_RTC 1
+
+#if USE_RTC
+#define EVAL_RTC_CALL_3(_s, _call, _arg0, _arg1, _arg2) \
+						(_s->block = stNewRtcBlock(), \
+						_s->block->_call = _call, \
+						_s->block->flags |= RTC_EVAL_ARG_3, \
+						_s->block->_call(_arg0, _arg1, _arg2))
+
+#define RTC_SET_LOAD_ROUTINE(_loadExp, _call, _type, _variable) \
+if (_loadExp) { \
+	_loadExp->stEvalLoadFunc = _call; \
+	_loadExp->type           = _type; \
+	_loadExp->variable       = _variable; \
+}
+#else
+#define EVAL_RTC_CALL_3(_s, _call, _arg0, _arg1, _arg2) _call(_arg0, _arg1, _arg2)
+#define RTC_SET_LOAD_ROUTINE(_loadExp, _call, _type, _variable)
+#endif
+
+int brEvalCopy(brEval *s, brEval *d);
+
 inline int stEvalFree(stExp *, stRunInstance *, brEval *);
 inline int stEvalArray(slArray *, stRunInstance *, brEval *);
 inline int stEvalMethodCall(stMethodExp *, stRunInstance *, brEval *);
@@ -106,7 +128,7 @@ inline int stEvalListIndexPointer(stListIndexExp *, stRunInstance *, void **, in
 inline int stEvalListIndexAssign(stListIndexAssignExp *, stRunInstance *, brEval *);
 
 int stCallMethodByNameWithArgs(stRunInstance *, char *, brEval **, int, brEval *);
-int stCallMethodByName(stRunInstance *, char *, brEval *);
+inline int stCallMethodByName(stRunInstance *, char *, brEval *);
 inline int stCallMethod(stRunInstance *, stRunInstance *, stMethod *, brEval **, int, brEval *);
 
 int stLoadVariable(void *, unsigned char, brEval *, stRunInstance *);
@@ -123,6 +145,8 @@ int stPrintEvaluation(brEval *, stRunInstance *);
 
 int stEvalBinaryEvalListExp(char, brEval *, brEval *, brEval *, stRunInstance *);
 brEvalList *stEvalListIndexLookup(brEvalListHead *, int);
+
+int stExpEval3(stExp *, stRunInstance *, brEval *);
 
 int stExpEval(stExp *, stRunInstance *, brEval *, stObject **);
 

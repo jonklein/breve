@@ -23,8 +23,10 @@
 
 #include <stdlib.h>
 
-#define slMalloc(n) calloc(1,n)
-#define slRealloc(p,n) realloc(p,n)
-#define slFree(p) free(p)
+// these functions MUST be defined -- they are part of the plugin API
+
+void *slMalloc(int n);
+void *slRealloc(void *p, int n);
+void slFree(void *p);
 
 #endif

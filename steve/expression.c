@@ -60,6 +60,8 @@ stExp *stExpNew(void *data, char type, char *file, int line) {
 
 	e->file = file;
  
+	e->block	= NULL;
+
 	return e;
 }
 
@@ -68,6 +70,9 @@ int stExpFree(stExp *e) {
 
 	if(!e) return result;
 
+	if (e->block)
+		free(e->block);
+		
 	switch(e->type) {
 		/* these elements have nothing additional allocated */
 
@@ -77,6 +82,8 @@ int stExpFree(stExp *e) {
 		case ET_DOUBLE:
 		case ET_DUPLICATE:
 			break;
+
+		/* these elements have only static buffers allocated */
 
 		case ET_ST_EVAL:
 			stGCCollect(e->values.pValue);
@@ -91,7 +98,7 @@ int stExpFree(stExp *e) {
 
 		case ET_RETURN:
 		case ET_FREE:
-		case ET_VLENGTH:
+		case ET_LENGTH:
 		case ET_RANDOM:
 		case ET_DIE:
 		case ET_COPYLIST:
@@ -312,6 +319,7 @@ stExp *stNewArrayIndexExp(stMethod *m, stObject *o, char *word, stExp *index, ch
 
 void stFreeArrayIndexExp(stArrayIndexExp *e) {
 	stExpFree(e->index);
+	if (e->block) free(e->block);
 	slFree(e);
 }
 
@@ -359,6 +367,7 @@ stExp *stNewArrayIndexAssignExp(stMethod *m, stObject *o, char *word, stExp *ind
 void stFreeArrayIndexAssignExp(stArrayIndexAssignExp *e) {
 	stExpFree(e->rvalue);
 	stExpFree(e->index);
+	if (e->block) free(e->block);
 	slFree(e);
 }
 
@@ -396,6 +405,7 @@ stExp *stNewLoadExp(stMethod *m, stObject *o, char *word, char *file, int line) 
 void stFreeAssignExp(stAssignExp *a) {
 	if(a->objectName) slFree(a->objectName);
 	if(a->rvalue) stExpFree(a->rvalue);
+	if (a->block) free(a->block);
 	slFree(a);
 }
 
@@ -459,6 +469,7 @@ void stFreeMethodExp(stMethodExp *m) {
 	stExpFree(m->objectExp);
 	stFreeKeywordArray(m->arguments);
 	slStackFree(m->positionedArguments);
+	if (m->block) free(m->block);
 	slFree(m);
 }
 
@@ -488,7 +499,10 @@ stExp *stNewListRemoveExp(stExp *list, stExp *index, char *file, int lineno) {
 
 void stFreeListRemoveExp(stListRemoveExp *p) {
 	stExpFree(p->listExp);
+	if (p->block)
+		free(p->block);
 	if(p->index) stExpFree(p->index);
+	if (p->block) free(p->block);
 	slFree(p);
 }
 
@@ -496,6 +510,7 @@ void stFreeListInsertExp(stListInsertExp *p) {
 	stExpFree(p->listExp);
 	stExpFree(p->exp);
 	if(p->index) stExpFree(p->index);
+	if (p->block) free(p->block);
 	slFree(p);
 }
 
@@ -513,6 +528,7 @@ void stFreeSortExp(stSortExp *s) {
 	stExpFree(s->listExp);
 
 	slFree(s->methodName);
+	if (s->block) free(s->block);
 	slFree(s);
 }
 
@@ -531,6 +547,7 @@ void stFreeListIndexExp(stListIndexExp *e) {
 	stExpFree(e->listExp);
 	stExpFree(e->indexExp);
 
+	if (e->block) free(e->block);
 	slFree(e);
 }
 
@@ -551,6 +568,7 @@ void stFreeListIndexAssignExp(stListIndexAssignExp *s) {
 	stExpFree(s->indexExp);
 	stExpFree(s->assignment);
 
+	if (s->block) free(s->block);
 	slFree(s);
 }
 
@@ -589,6 +607,7 @@ void stFreeCCallExp(stCCallExp *c) {
 
 	stExpFreeArray(c->args);
 
+	if (c->block) free(c->block);
 	slFree(c);
 }
 
@@ -603,6 +622,7 @@ stExp *stNewAllExp(char *object, char *file, int line) {
 
 void stFreeAllExp(stAllExp *e) {
 	slFree(e->name);
+	if (e->block) free(e->block);
 	slFree(e);
 }
 
@@ -621,6 +641,7 @@ void stFreeWhileExp(stWhileExp *w) {
 	stExpFree(w->cond);
 	stExpFree(w->code);
 
+	if (w->block) free(w->block);
 	slFree(w);
 }
 
@@ -641,6 +662,7 @@ void stFreeForeachExp(stForeachExp *f) {
 	stExpFree(f->list);
 	stExpFree(f->code);
 
+	if (f->block) free(f->block);
 	slFree(f);
 }
 
@@ -663,6 +685,7 @@ void stFreeForExp(stForExp *f) {
 	stExpFree(f->assignment);
 	stExpFree(f->code);
 
+	if (f->block) free(f->block);
 	slFree(f);
 }
 
@@ -683,6 +706,7 @@ void stFreeIfExp(stIfExp *f) {
 	stExpFree(f->falseCode);
 	stExpFree(f->cond);
 
+	if (f->block) free(f->block);
 	slFree(f);
 }
 
@@ -698,6 +722,7 @@ stExp *stNewPrintExp(slArray *array, int newline, char *file, int lineno) {
 
 void stFreePrintExp(stPrintExp *pe) {
 	stExpFreeArray(pe->expressions);
+	if (pe->block) free(pe->block);
 	slFree(pe);
 }
 
@@ -726,6 +751,7 @@ void stFreeKeyword(stKeyword *k) {
 	slFree(k->word);
 	stExpFree(k->value);
 
+	if (k->block) free(k->block);
 	slFree(k);
 }
 
@@ -746,6 +772,7 @@ void stFreeBinaryExp(stBinaryExp *b) {
 	stExpFree(b->left);
 	stExpFree(b->right);
 
+	if (b->block) free(b->block);
 	slFree(b);
 }
 
@@ -764,6 +791,7 @@ stExp *stNewUnaryExp(int type, stExp *exp, char *file, int line) {
 void stFreeUnaryExp(stUnaryExp *u) {
 	stExpFree(u->exp);
 
+	if (u->block) free(u->block);
 	slFree(u);
 }
 
@@ -804,6 +832,7 @@ void stFreeVectorExp(stVectorExp *v) {
 	stExpFree(v->y);
 	stExpFree(v->z);
 
+	if (v->block) free(v->block);
 	slFree(v);
 }
 
@@ -812,6 +841,7 @@ void stFreeMatrixExp(stMatrixExp *m) {
 
 	for(n=0;n<9;n++) stExpFree(m->expressions[n]);
 
+	if (m->block) free(m->block);
 	slFree(m);
 }
 
@@ -829,6 +859,7 @@ stExp *stNewVectorElementExp(stExp *v, char element, char *file, int line) {
 
 void stFreeVectorElementExp(stVectorElementExp *v) {
 	stExpFree(v->exp);
+	if (v->block) free(v->block);
 	slFree(v);
 }
 
@@ -847,6 +878,7 @@ stExp *stNewVectorElementAssignExp(stExp *v, stExp *rvalue, char element, char *
 void stFreeVectorElementAssignExp(stVectorElementAssignExp *v) {
 	stExpFree(v->exp);
 	stExpFree(v->assignExp);
+	if (v->block) free(v->block);
 	slFree(v);
 }
 
@@ -884,6 +916,7 @@ stExp *stNewIsaExp(stExp *e, stVarType *type, char *file, int line) {
 void stFreeIsaExp(stIsaExp *e) {
 	stExpFree(e->expression);
 	if(e->type->objectName) slFree(e->type->objectName);
+	if (e->block) free(e->block);
 	slFree(e->type);
 }
 

@@ -96,7 +96,7 @@ brInstance *stInstanceCreateAndRegister(brEngine *e, brObject *object) {
 	if(bi->object->type == &gSteveData->steveObjectType) {
 		newi = bi->userData;
 		newi->breveInstance = bi;
-		stInstanceInit(newi);
+		if(stInstanceInit(newi) != EC_OK) return NULL;
 	}
 
 	return bi;

@@ -240,7 +240,7 @@ To add your frontend object type to the breve engine, edit the file
 call this function to create a breve engine.  At the bottom of this function,
 you can create and register your custom language frontend.  
 <screen>
-brEngineRegisterObjectType(frontend->engine, <replaceable>>functionToCreateLanguageFrontend</replaceable>());
+brEngineRegisterObjectType(frontend->engine, <replaceable>functionToCreateLanguageFrontend</replaceable>());
 </screen>
 </para>
 <para>

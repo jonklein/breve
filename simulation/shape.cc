@@ -108,15 +108,16 @@ void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, 
 	glPopMatrix();
 }
 
-slShape *slSphereNew(double radius, double mass) {
+slShape *slSphereNew(double radius, double density) {
 	slSphere *s;
 
 	s = new slSphere(radius);
-	s->mass = mass;
+	s->density = density;
+	s->mass = density * M_PI * radius * radius * radius * 4.0/3.0;
 
 	slVectorSet(&s->max, radius, radius, radius);
 
-	slSphereInertiaMatrix(radius, mass, s->inertia);
+	slSphereInertiaMatrix(radius, s->mass, s->inertia);
 
 	return s;
 }
@@ -306,18 +307,18 @@ slShape *slShapeInitNeighbors(slShape *s, double density) {
 	the desired mass is achived.
 */
 
-void slShapeSetMass(slShape *shape, double mass) {
+void slShape::setMass(double newMass) {
 	double volume;
 
 	/* the existing volume... */
 
-	volume = shape->mass / shape->density;
+	volume = mass / density;
 
 	/* the desired density... */
 
-	shape->density = mass / volume;
+	density = newMass / volume;
 
-	slShapeSetDensity(shape, shape->density);
+	setDensity(density);
 }
 
 /*!
@@ -326,8 +327,22 @@ void slShapeSetMass(slShape *shape, double mass) {
 	Sets the density of the change, which modifies the mass.
 */
 
-void slShapeSetDensity(slShape *shape, double density) {
-	slSetMassProperties(shape, density);
+void slShape::setDensity(double newDensity) {
+	slSetMassProperties(this, newDensity);
+}
+
+/*!
+	\brief Sets the density of the sphere.
+
+	Sets the density of the change, which modifies the mass.
+*/
+void slSphere::setDensity(double newDensity) {
+	double volume = mass / density;
+	
+	mass = newDensity * volume;
+	density = newDensity;
+
+	slSphereInertiaMatrix(_radius, mass, inertia);
 }
 
 /*! 

@@ -86,6 +86,8 @@ AC_PATH_XTRA
 
 case ${host_os} in
 	darwin* )
+		custom_cblas="-framework vecLib"
+
 		LIBS="-framework OpenGL -framework GLUT -framework AppKit -framework vecLib -framework CoreAudio -framework AudioToolbox ${LIBS}"
 		PLUGINFLAGS="-bundle -undefined suppress -flat_namespace"
 		QUICKTIMEFLAGS="-framework QuickTime -framework Carbon"
@@ -221,7 +223,11 @@ AC_CHECK_LIB([termcap], [tputs])
 AC_CHECK_LIB([ncurses], [tputs])
 AC_CHECK_LIB([history], [add_history])
 AC_CHECK_LIB([readline], [readline])
-AC_CHECK_LIB([gslcblas], [cblas_ccopy])
+
+if test "x$custom_cblas" = x; then
+	AC_CHECK_LIB([gslcblas], [cblas_ccopy])
+fi
+
 AC_CHECK_LIB([gsl], [gsl_rng_alloc])
 AC_CHECK_LIB([avcodec], [avcodec_init])
 AC_CHECK_LIB([OSMesa], [OSMesaCreateContext])

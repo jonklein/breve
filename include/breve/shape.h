@@ -197,6 +197,9 @@ class slShape {
 
 		virtual void draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags);
 
+		virtual void setMass(double mass);
+		virtual void setDensity(double density);
+
 		int drawList;
 
 		unsigned char recompile;
@@ -236,6 +239,9 @@ class slSphere : public slShape {
 		int pointOnShape(slVector *dir, slVector *point);
                 int rayHitsShape(slVector *dir, slVector *target, slVector *point);
 		void scale(slVector *point);
+
+		virtual void setDensity(double density);
+
 		slSerializedShapeHeader *serialize(int *length);
 
 		void drawShadowVolume(slCamera *camera, slPosition *position);
@@ -281,9 +287,6 @@ slPlane *slSetPlane(slPlane *p, slVector *normal, slVector *vertex);
 int slFeatureSort(const void *a, const void *b);
 
 slShape *slShapeInitNeighbors(slShape *s, double density);
-
-void slShapeSetMass(slShape *shape, double mass);
-void slShapeSetDensity(slShape *shape, double density);
 
 void slDumpEdgeVoronoi(slShape *s);
 

@@ -1040,7 +1040,7 @@ atomic_expression
 : literal_value
 | atomic_expression vector_element { $$ = stNewVectorElementExp($1, $2, yyfile, lineno); }
 | '|' expression '|' { 
-		$$ = stExpNew($2, ET_VLENGTH, yyfile, lineno); 
+		$$ = stExpNew($2, ET_LENGTH, yyfile, lineno); 
 	}
 | ST_EVAL		{ $$ = stNewStEvalExp($1, yyfile, lineno); }
 | atomic_expression '{' expression '}' { 

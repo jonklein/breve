@@ -4730,6 +4730,8 @@ fi
 
 case ${host_os} in
 	darwin* )
+		custom_cblas="-framework vecLib"
+
 		LIBS="-framework OpenGL -framework GLUT -framework AppKit -framework vecLib -framework CoreAudio -framework AudioToolbox ${LIBS}"
 		PLUGINFLAGS="-bundle -undefined suppress -flat_namespace"
 		QUICKTIMEFLAGS="-framework QuickTime -framework Carbon"
@@ -8411,6 +8413,8 @@ _ACEOF
 fi
 
 
+if test "x$custom_cblas" = x; then
+
 echo "$as_me:$LINENO: checking for cblas_ccopy in -lgslcblas" >&5
 echo $ECHO_N "checking for cblas_ccopy in -lgslcblas... $ECHO_C" >&6
 if test "${ac_cv_lib_gslcblas_cblas_ccopy+set}" = set; then
@@ -8471,6 +8475,8 @@ if test $ac_cv_lib_gslcblas_cblas_ccopy = yes; then
 _ACEOF
 
   LIBS="-lgslcblas $LIBS"
+
+fi
 
 fi
 

@@ -18,6 +18,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#define RTC_INLINE
+
 enum stExpTypes {
 	// basic expression types 
 
@@ -67,8 +69,7 @@ enum stExpTypes {
 	ET_SUPER,
 	ET_SELF,
 	ET_RANDOM,
-	ET_VLENGTH,
-	ET_VNORM,
+	ET_LENGTH,
 	ET_INSTANCE,
 	ET_FREE,
 	ET_PRINT, 
@@ -133,6 +134,85 @@ enum stVectorElements {
 	VE_Z
 };
 
+enum stRtcBlockType	{
+	FRAG,		// code fragment
+	FUNC,		// function
+	PROC,		// procedure
+	LEAF_FUNC,	// function with no stack frame
+	LEAF_PROC	// procedure with no stack frame
+};
+
+enum stRtcGPRegs {
+	GP0		= 0,
+	SP		= 1,
+};
+
+enum stRtcFlags {
+	RTC_EVAL_ARG_3	= 0x1,
+	RTC_EVAL_ARG_4	= 0x2,
+};
+	
+typedef struct stRtcCodeBlock_t {
+	unsigned char	type;
+	unsigned char	flags;
+	unsigned short	length;
+	union {
+		unsigned int	*ptr;
+		int (*stRtcEval3)(void *arg0, void *arg1, void *arg2);
+		int (*stRtcEval4)(void *arg0, void *arg1, void *arg2, void *arg3);
+		int (*stExpEval3)(stExp *s, stRunInstance *i, brEval *target);
+		int (*stExpEval)(stExp *s, stRunInstance *i, brEval *target, stObject **tClass);
+		int (*stEvalLoadPointer)(stLoadExp *e, stRunInstance *i, void **pointer, int *type);
+		int (*stEvalTruth)(brEval *e, brEval *t, stRunInstance *i);
+		int (*stEvalFree)(stExp *s, stRunInstance *i, brEval *t);
+		int (*stEvalArray)(slArray *a, stRunInstance *i, brEval *target);
+		int (*stEvalMethodCall)(stMethodExp *mexp, stRunInstance *i, brEval *t);
+		int (*stEvalWhile)(stWhileExp *w, stRunInstance *i, brEval *target);
+		int (*stEvalFor)(stForExp *w, stRunInstance *i, brEval *target);
+		int (*stEvalForeach)(stForeachExp *w, stRunInstance *i, brEval *target);
+		int (*stEvalIf)(stIfExp *w, stRunInstance *i, brEval *target);
+		int (*stEvalListInsert)(stListInsertExp *w, stRunInstance *i, brEval *target);
+		int (*stEvalListRemove)(stListRemoveExp *l, stRunInstance *i, brEval *target);
+		int (*stEvalCopyList)(stExp *l, stRunInstance *i, brEval *target);
+		int (*stEvalAll)(stAllExp *e, stRunInstance *i, brEval *target);
+		int (*stEvalSort)(stSortExp *w, stRunInstance *i, brEval *target);
+		int (*stEvalListIndexPointer)(stListIndexExp *l, stRunInstance *i, void **pointer, int *type);
+		int (*stEvalListIndex)(stListIndexExp *l, stRunInstance *i, brEval *t);
+		int (*stEvalListIndexAssign)(stListIndexAssignExp *l, stRunInstance *i, brEval *t);
+		int (*stEvalPrint)(stPrintExp *exp, stRunInstance *i, brEval *t);
+		int (*stEvalVectorElementExp)(stVectorElementExp *s, stRunInstance *i, brEval *target);
+		int (*stEvalVectorElementAssignExp)(stVectorElementAssignExp *s, stRunInstance *i, brEval *target);
+		int (*stEvalCallFunc)(stCCallExp *c, stRunInstance *i, brEval *target);
+		int (*stEvalArrayIndexPointer)(stArrayIndexExp *a, stRunInstance *i, void **pointer, int *type);
+		int (*stEvalArrayIndex)(stArrayIndexExp *a, stRunInstance *i, brEval *target);
+		int (*stEvalArrayIndexAssign)(stArrayIndexAssignExp *a, stRunInstance *i, brEval *rvalue);
+		int (*stEvalAssignment)(stAssignExp *a, stRunInstance *i, brEval *t);
+		int (*stEvalLoad)(stLoadExp *e, stRunInstance *i, brEval *target);
+		int (*stEvalLoadInt)(stLoadExp *e, stRunInstance *i, brEval *target);
+		int (*stEvalLoadDouble)(stLoadExp *e, stRunInstance *i, brEval *target);
+		int (*stEvalLoadIndirect)(stLoadExp *e, stRunInstance *i, brEval *target);
+		int (*stEvalLoadList)(stLoadExp *e, stRunInstance *i, brEval *target);
+		int (*stEvalLoadHash)(stLoadExp *e, stRunInstance *i, brEval *target);
+		int (*stEvalLoadString)(stLoadExp *e, stRunInstance *i, brEval *target);
+		int (*stEvalLoadVector)(stLoadExp *e, stRunInstance *i, brEval *target);
+		int (*stEvalLoadMatrix)(stLoadExp *e, stRunInstance *i, brEval *target);
+		int (*stEvalUnaryExp)(stUnaryExp *b, stRunInstance *i, brEval *target);
+		int (*stEvalBinaryStringExp)(char op, brEval *l, brEval *r, brEval *target, stRunInstance *i);
+		int (*stEvalBinaryMatrixExp)(char op, brEval *l, brEval *r, brEval *t, stRunInstance *i);
+		int (*stEvalBinaryVectorExp)(char op, brEval *l, brEval *r, brEval *t, stRunInstance *i);
+		int (*stEvalBinaryDoubleExp)(char op, brEval *l, brEval *r, brEval *t, stRunInstance *i);
+		int (*stEvalBinaryIntExp)(char op, brEval *l, brEval *r, brEval *t, stRunInstance *i);
+		int (*stEvalBinaryExp)(stBinaryExp *b, stRunInstance *i, brEval *target);
+		int (*stEvalRandExp)(stExp *r, stRunInstance *i, brEval *target);
+		int (*stEvalBinaryExpWithEvals)(stRunInstance *i, unsigned char op, brEval *tl, brEval *tr, brEval *target);
+		int (*stEvalVectorExp)(stVectorExp *v, stRunInstance *i, brEval *target);
+		int (*stEvalMatrixExp)(stMatrixExp *v, stRunInstance *i, brEval *target);
+		int (*stEvalNewInstance)(stInstanceExp *ie, stRunInstance *i, brEval *t);
+		int (*stEvalBinaryEvalListExp)(char op, brEval *l, brEval *r, brEval *target, stRunInstance *i);
+	};
+	unsigned int	code[0];
+} stRtcCodeBlock;
+
 struct stExp {
 	union {
 		int iValue;
@@ -145,11 +225,15 @@ struct stExp {
 
 	int line;
 	char *file;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stIsaExp {
 	stExp *expression;
 	stVarType *type;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stStringExp {
@@ -157,6 +241,8 @@ struct stStringExp {
 	char *string;
 
 	slArray *substrings;
+	
+	stRtcCodeBlock	*block;
 };
 
 /* an stSubstringExp is a variable embedded in an stStringExp */
@@ -166,70 +252,96 @@ struct stSubstringExp {
 	char *string;
 	int offset;
 	unsigned char retain;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stBinaryExp {
 	unsigned char type;
 	stExp *left;
 	stExp *right;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stUnaryExp {
 	unsigned char type;
 	stExp *exp;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stVectorExp {
 	stExp *x;
 	stExp *y;
 	stExp *z;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stMatrixExp {
 	stExp *expressions[9];
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stPrintExp {
 	slArray *expressions;
 	unsigned char newline;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stVectorElementExp {
 	stExp *exp;
 	char element;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stVectorElementAssignExp {
 	stExp *exp;
 	stExp *assignExp;
 	char element;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stListInsertExp {
 	stExp *exp;
 	stExp *listExp;
 	stExp *index;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stListRemoveExp {
 	stExp *listExp;
 	stExp *index;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stSortExp {
 	stExp *listExp;
 	char *methodName;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stListIndexExp {
 	stExp *listExp;
 	stExp *indexExp;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stListIndexAssignExp {
 	stExp *listExp;
 	stExp *indexExp;
 	stExp *assignment;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stMethodExp {
@@ -243,6 +355,8 @@ struct stMethodExp {
 
 	stObject *objectCache;
 	stObject *objectTypeCache;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stAssignExp {
@@ -252,12 +366,16 @@ struct stAssignExp {
 	stExp *rvalue;
 	char *objectName;
 	stObject *objectType;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stLoadExp {
 	int offset;
 	char local;
 	unsigned char type;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stArrayIndexAssignExp {
@@ -269,6 +387,8 @@ struct stArrayIndexAssignExp {
 	stExp *index;
 
 	stExp *rvalue;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stArrayIndexExp {
@@ -278,17 +398,23 @@ struct stArrayIndexExp {
 	unsigned char type;
 	int typeSize;
 	stExp *index;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stWhileExp {
 	stExp *cond;
 	stExp *code;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stForeachExp {
 	stAssignExp *assignment;
 	stExp *list;
 	stExp *code;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stForExp {
@@ -296,34 +422,46 @@ struct stForExp {
 	stExp *condition;
 	stExp *iteration;
 	stExp *code;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stIfExp {
 	stExp *cond;
 	stExp *trueCode;
 	stExp *falseCode;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stAllExp {
 	char *name;
 	stObject *object;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stInstanceExp {
 	char *name;
 	stExp *count;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stCCallExp {
 	brInternalFunction *function;
 	slArray *args;
 	slArray *evals;
+	
+	stRtcCodeBlock	*block;
 };
 
 struct stKeyword {
 	char *word;
 	stExp *value;
 	int position;
+	
+	stRtcCodeBlock	*block;
 };
 
 int stExpFree(stExp *e);
@@ -367,7 +505,6 @@ void stFreeForExp(stForExp *e);
 
 stExp *stInstanceNewExp(char *name, stExp *count, char *file, int line);
 void stInstanceFreeExp(stInstanceExp *i);
-
 
 stExp *stNewForeachExp(stAssignExp *assignment, stExp *list, stExp *code, char *file, int lineno);
 void stFreeForeachExp(stForeachExp *e);

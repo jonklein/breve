@@ -90,7 +90,7 @@ int brIShapeSetDensity(brEval args[], brEval *target, brInstance *i) {
 	slShape *s = BRSHAPEPOINTER(&args[0]);
 	double density = BRDOUBLE(&args[1]);
 
-	slShapeSetDensity(s, density);
+	s->setDensity(density);
 
 	return EC_OK;
 }
@@ -99,7 +99,7 @@ int brIShapeSetMass(brEval args[], brEval *target, brInstance *i) {
 	slShape *s = BRSHAPEPOINTER(&args[0]);
 	double mass = BRDOUBLE(&args[1]);
 
-	slShapeSetMass(s, mass);
+	s->setMass(mass);
 
 	return EC_OK;
 }

@@ -344,14 +344,18 @@ brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *methodName, double t
 
 	// insert the event where it belongs according to the time it will be called 
 
+	ei = e->events.end() - 1;
+
 	if(e->events.size() == 0) {
 		e->events.push_back(event);
 		return event;
 	}
 
-	ei = e->events.end() - 1;
-
 	while(ei != e->events.begin() && (*ei)->time < time) ei--;
+
+	// we want to insert AFTER the current event...
+
+	if(((*ei)->time) > time) ei++;
 
 	e->events.insert(ei, event);
 
