@@ -139,6 +139,8 @@ brInstance *brClickCallback(brEngine *e, int n) {
 
 	brMethodFree(method);
 
+	if(!o) return NULL;
+
 	return o->userData;
 }
 
