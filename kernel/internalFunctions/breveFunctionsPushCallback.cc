@@ -14,6 +14,7 @@ void brPushFreeData(void *d);
 /*@{*/
 /*! \addtogroup InternalFunctions */
 
+#ifdef HAVE_LIBPUSH
 int breveFunctionPushCallbackNew(brEval arguments[], brEval *result, brInstance *instance) {
 	void *environment = BRPOINTER(&arguments[0]);
 	char *name = BRSTRING(&arguments[1]);
@@ -35,11 +36,14 @@ int breveFunctionPushCallbackNew(brEval arguments[], brEval *result, brInstance 
 
 	return EC_OK;
 }
+#endif */ HAVE_LIBPUSH */
 
 /*@}*/
 
 void breveInitPushCallbackFunctions(brNamespace *namespace) {
+#ifdef HAVE_LIBPUSH
 	brNewBreveCall(namespace, "pushCallbackNew", breveFunctionPushCallbackNew, AT_POINTER, AT_POINTER, AT_STRING, AT_STRING, AT_INSTANCE, 0);
+#endif
 }
 
 unsigned int brPushCallbackFunction(void *environment, brPushCallbackData *data) {

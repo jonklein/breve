@@ -15,11 +15,14 @@ if($#ARGV < 2 || $#ARGV > 3) {
 
 open(FILE, $ARGV[0]) || die "Cannot open $ARGV[0]: $!\n";
 
-$filename = $ARGV[2];
+$outputname = $ARGV[2];
 
-$filename =~ s/\.[ch]$//;
-$filename =~ s/^.*\///;
-$filename = ucfirst($filename);
+$outputname =~ s/\.[ch]$//;
+$outputname =~ s/^.*\///;
+$outputname = ucfirst($outputname);
+
+$libraryname = $outputname;
+$libraryname =~ tr/[a-z]/[A-Z]/;
 
 if($#ARGV == 3) {
 	open(CONFIGFILE, $ARGV[3]) || die "Cannot open $ARGV[3]: $!\n";
@@ -31,7 +34,7 @@ if($#ARGV == 3) {
 	close(CONFIGFILE);
 }
 
-open(CFILE, ">breveFunctions${filename}.c") || die "Cannot open breveFunctions${filename}.c for writing: $!\n";
+open(CFILE, ">breveFunctions${outputname}.c") || die "Cannot open breveFunctions${outputname}.c for writing: $!\n";
 
 # Some recursive regular expressions for parsing out a function definition
 
@@ -70,6 +73,7 @@ print CFILE<<__EOT__;
 
 /*\@{*/
 /*! \\addtogroup InternalFunctions */
+#ifdef HAVE_LIB${libraryname}
 __EOT__
 
 foreach $line (<FILE>) {
@@ -178,10 +182,13 @@ __EOT__
 #
 
 print CFILE<<__EOT__;
+#endif /* HAVE_LIB${libraryname} */
 /*@}*/
 
-void breveInit${filename}Functions(brNamespace *namespace) {
-@newcalls}
+void breveInit${outputname}Functions(brNamespace *namespace) {
+#ifdef HAVE_LIB$libraryname
+@newcalls#endif /* HAVE_LIB$libraryname */
+}
 __EOT__
 
 close(CFILE);

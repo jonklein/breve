@@ -257,7 +257,7 @@ int brIImageDataFree(brEval args[], brEval *result, brInstance *i) {
 	GLuint texture = dm->textureNumber;
 
 	if(dm->textureNumber != -1) {
-		printf("deleting texture %d\n", texture);
+		// slMessage("deleting texture %d\n", (unsigned int)texture);
 		glDeleteTextures(1, &texture);
 	}
 
