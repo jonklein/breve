@@ -1,7 +1,7 @@
 @use Real.
 
 Real : Terrain {
-	% Terrain is an experimental class to add terrains to simulations.
+	% Terrain is an experimental class to add terrains to simulations.  
 
 	+ variables:
 		location (vector).
@@ -13,8 +13,12 @@ Real : Terrain {
 		self set-valley-color to (0, .8, .1).
 		self set-texture-image to (new Image load from "images/grass.jpg").
 
+	# + to set-terrain-size to newSize (int):
+	#	% Sets the size of the terrain 
+
 	+ to set-scale to value (double):
-		% Changes the size of a single tile in the terrain.
+		% Changes the size of a single tile in the terrain.  This does not change
+		% the number of elevation points in the terrain.
 
 		setTerrainScale(realWorldPointer, value).
 

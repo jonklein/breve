@@ -89,7 +89,7 @@ slTerrain *slTerrainNew(int res, double xscale, void *data) {
 */
 
 void slTerrain::resize(int side) {
-	side = slNextPowerOfTwo(side);
+	side = slNextPowerOfTwo(side) + 1;
 
 	initialized = 0;
 }
