@@ -185,7 +185,7 @@ brEngine *brEngineNew() {
 	}
 
 #ifdef HAVE_LIBJAVA
-	brJavaInit(e);
+	// brJavaInit(e);
 #endif
 
 	return e;
@@ -440,9 +440,7 @@ int brEngineIterate(brEngine *e) {
 			// need to check number n again 
 
 			n--;
-		}
-
-		if(i->status == AS_ACTIVE && i->events) {
+		} else if(i->status == AS_ACTIVE && i->events) {
 			double oldAge;
 
 			eventList = i->events;

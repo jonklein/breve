@@ -31,6 +31,8 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <H2>version 2.1 [11/XX/2004]</H2>
 <P>
 <ul>
+<li>Introduced fully transparent steve to Java bridge.
+<li>Fixed disabled light detector
 <li>Fixed bug using "@define" with strings.
 <li>Fixed bug in Mobile method "set-label".
 <li>Various improvements to the Push programming language.
@@ -42,9 +44,10 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 </ul>
 <P>breve Object API Changes</P>
 <ul>
+<li>New object types can be directly instantiated and called from steve code.
 <li>The brObjectType findMethod function pointer now takes an additional argument: the method argument types. 
 <li>The "class" fields of structs have been changed to be called "object", to avoid conflicts with C++ compilers.
-<li>brObjectTypes should now include an "instantiate" function pointer.
+<li>brObjectTypes now require a few additional function callbacks.
 </ul>
 
 <p>

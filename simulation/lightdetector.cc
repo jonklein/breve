@@ -52,7 +52,8 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_FALSE);
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LESS);
 	glShadeModel(GL_FLAT);
 
 	glViewport(c->ox, c->oy, size, size);
@@ -69,7 +70,7 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	gluLookAt(sun->x, sun->y, sun->z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
 	glClearColor(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	for(n=0;n<w->objectCount;n++) {
 		unsigned char br, bg, bb;
@@ -94,8 +95,6 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	}
 
 	glPopMatrix();
-
-	return;
 
 	if(!buffer) {
 		glReadPixels(c->ox, c->oy, size, size, GL_RGB, GL_UNSIGNED_BYTE, staticBuffer);

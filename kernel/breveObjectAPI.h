@@ -22,8 +22,7 @@ typedef struct brObjectType brObjectType;
 */
 
 struct brObjectType {
-	void *(*findMethod)(brObject *object, char *name, 
-		unsigned char *types, int nargs);
+	void *(*findMethod)(brObject *object, char *name, unsigned char *types, int nargs);
 	void *(*findObject)(brObjectType *type, char *name);
 	void *(*instantiate)(brObject *class, brEval **constructorArgs, int argCount);
 

@@ -1,4 +1,4 @@
-INCLUDES = -I../include/breve
+INCLUDE +=-I../include/breve @CPPFLAGS@
 
 LIBO	= javaObjectType.o javaFunctions.o javaTypes.o
 

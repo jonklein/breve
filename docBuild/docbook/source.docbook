@@ -23,39 +23,45 @@ source code for that layer is found.
 </para>
 </sect1>
 
-<sect1 id="language_frontend"><title>Adding a front-end language to the breve engine: the breve object API</title>
+<sect1 id="language_frontend"><title>Adding a frontend language to the breve engine: the breve object API</title>
 
 <para>
-This section describes how to incorporate another front-end language with breve.  
+This section describes how to incorporate another frontend language with breve.  
 Using this information, you'll be able to use the breve engine from any language 
 which can interface a C library.
 </para>
 
 <para>
-The following steps are required to set up a language front-end in breve.
+The following steps are required to set up a language frontend in breve.
 <itemizedlist>
-<listitem><para>Write special callbacks for the language front-end (<xref linkend="breve_object_callbacks">).</para></listitem>
+<listitem><para>Write special callbacks for the language frontend (<xref linkend="breve_object_callbacks">).</para></listitem>
 <listitem><para>Construct a new breve object type, and add classes to the breve engine (<xref linkend="breve_object_type">).</para></listitem>
 <listitem><para>Add instances to the breve engine (<xref linkend="breve_object_api">).</para></listitem>
 <listitem><para>Connect the language frontend to an application frontend (<xref linkend="application_frontend">) or write your own customized frontend (<xref linkend="custom_application_frontend">).</para></listitem>
 </itemizedlist>
 </para>
 
-<sect2 id="breve_object_callbacks"><title>Callbacks required to add a new front-end language</title>
+<sect2 id="breve_object_structs"><title>Structures used by the breve Object API</title>
+<para>
+<itemizedlist>
+<listitem><para><function>brObjectType</function>: information and callbacks for a language frontend</para>
+<listitem><para><function>brObject</function>: a class in any frontend language</para>
+<listitem><para><function>brInstance</function>: an instance in any frontend language</para>
+<listitem><para><function>brMethod</function>: information about a method in an object</para>
+
+<sect2 id="breve_object_callbacks"><title>Callbacks required to add a new frontend language</title>
 <para>
 
-In order to provide a language front-end to breve, a set of callbacks must be defined.  
+In order to provide a language frontend to breve, a set of callbacks must be defined.  
 
 <itemizedlist>
 <listitem>
 <para>
 <function>findMethod</function>: locate a method for a class by name and argument count.
-	<screen>void *(*findMethod)(brObject *object, char *name, int nargs);</screen>
+	<screen>void *(*findMethod)(brObject *object, char *name, unsigned char *types, int nargs);</screen>
 </para>
 <para>
-The breve engine will need to be able to locate methods by name and argument count in order to preform
-certain callbacks.  Looking up methods by name may be time consuming, so breve will lookup the method 
-by name once, and then cache the result for future use.
+The breve engine will need to be able to locate methods 
 </para>
 <para>
 This callback method is given a breve object struct (<function>brObject</function>) a name character
@@ -69,11 +75,11 @@ method.  This <function>void*</function> pointer will be stored in the "pointer"
 
 <listitem>
 <para>
-<function>callMethod</function>: trigger a method call in the front-end language.
+<function>callMethod</function>: trigger a method call in the frontend language.
 	<screen>int (*callMethod)(brInstance *instancePointer, brMethod *method, brEval **arguments, brEval *result);</screen>
 </para>
 <para>
-The breve engine will need to trigger method calls in the front-end language for a number
+The breve engine will need to trigger method calls in the frontend language for a number
 of events such as iteration and collision handling.  This callback is used to trigger such
 events.
 </para>
@@ -117,24 +123,35 @@ This callback is given two breve object pointers, and must return 1 if
 <sect2 id="breve_object_type"><title>Specifying a new breve object type, and 
 registering objects</title>
 <para>
-Every object in a front-end language that will have instances in the breve engine 
+Every object in a frontend language that will have instances in the breve engine 
 must be registered with the breve engine.  Moreover, when an object is added 
 to the breve engine, it must also tell the engine what "type" of object it is.  
-Each object "type" corresponds to a different language front-end and a different 
-set of callbacks, so for each language front-end one creates, one must also create 
+Each object "type" corresponds to a different language frontend and a different 
+set of callbacks, so for each language frontend one creates, one must also create 
 a <function>brObjectType</function> structure which contains the proper callbacks.  
 The structure is shown below.
 <screen>
 struct brObjectType {
-	int (*callMethod)(brInstance *instancePointer, brMethod *method, brEval **arguments, brEval *result);
-	brMethod *(*findMethod)(brInstance *objectPointer, char *name, int nargs);
-	int (*isSubclass)(brObject *class1, brObject *class2);
+    void *(*findMethod)(brObject *object, char *name, unsigned char *types, int nargs);
+    void *(*findObject)(brObjectType *type, char *name);
+    void *(*instantiate)(brObject *class, brEval **constructorArgs, int argCount);
+
+    int (*callMethod)(brInstance *instance, brMethod *method, brEval **arguments, brEval *result);
+
+    int (*isSubclass)(brObject *class1, brObject *class2);
+
+    void (*destroyObject)(brObject *object);
+    void (*destoryMethod)(brMethod *method);
+    void (*destroyInstance)(brInstance *instance);
+    void (*destroyObjectType)(brObjectType *objectType);
+
+    void *data;
 };
 </screen>
-Only one <function>brObjectType</function> is required for each language front-end.
+Only one <function>brObjectType</function> is required for each language frontend.
 </para>
 <para>
-Once the language front-end is defined, objects can be registered with the breve engine.
+Once the language frontend is defined, objects can be registered with the breve engine.
 For each object that will be used in breve, the following function should be called once:
 <screen>
 brObject *brEngineAddObject(brEngine *e, brObjectType *t, char *name, void *pointer);
