@@ -684,7 +684,7 @@ inline int brEvalListExp(slList *list, stRunInstance *i, brEval *result) {
 		if(resultCode != EC_OK) return resultCode;
 
 		brEvalListInsert(BRLIST(result), BRLIST(result)->count, &index);
-		stGCUnmark(i->instance, &index);
+		// stGCUnmark(i->instance, &index);
 		stGCRetain(&index);
 
 		list = list->next;
