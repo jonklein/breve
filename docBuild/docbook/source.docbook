@@ -175,12 +175,15 @@ struct brObject {
     slStack *collisionHandlers;
 };
 
+// NOTE: the "object" field was previously called "class".  This has been
+// changed to avoid conflicts with C++ compilers.
+
 struct brInstance {
     void *pointer;
 
     char status;
 
-    brObject *class;
+    brObject *object;
     brEngine *engine;
     brMenuList menu;
 
@@ -192,13 +195,17 @@ struct brInstance {
 
 };
 
+// NOTE: the "object" field was previously called "class".  This has been
+// changed to avoid conflicts with C++ compilers.
+
 struct brMethod {
     void *pointer;
 
     char *name;
-    brObject *class;
+    brObject *object;
     int argumentCount;
 };
+
 </screen>
 </para>
 </sect2>

@@ -274,7 +274,7 @@ header
 
 		e = slMalloc(sizeof(brEval));
 		e->type = AT_STRING;
-		BRSTRING(e) = slStrdup($4);
+		BRSTRING(e) = slDequote($4);
 
 		brNamespaceStore(steveData->defines, $3, 0, e);
 
@@ -519,6 +519,7 @@ default_value
 		e->type = AT_STRING;
 
 		BRSTRING(e) = slDequote($2);
+
 		slFree($2);
 
 		$$ = e;

@@ -523,19 +523,16 @@ int brIVectorFromLinkPerspective(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brILinkSetLabel(brEval args[], brEval *target, brInstance *i) {
-	slWorldObject *w = BRPOINTER(&args[0]);
-	slLink *m;
+	slLink *link = BRPOINTER(&args[0]);
 
 	char *label = BRSTRING(&args[1]);
 
-	if(!w || !label) {
+	if(!link || !label) {
 		slMessage(DEBUG_ALL, "NULL pointer passed to linkSetLabel\n");
 		return EC_OK;
 	}
 
-	m = w->data;
-
-	slLinkSetLabel(m, label);
+	slLinkSetLabel(link, label);
 
 	return EC_OK;
 }

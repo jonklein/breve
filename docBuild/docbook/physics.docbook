@@ -28,9 +28,6 @@ to use physical simulation and possible alternatives to full physical
 simulation.  You should read this section first to help you decide whether
 physical simulation is necessary for your simulation.
 </para>
-<para>
-
-</para>
 
 <sect1 id="physics_vs_pseudo">
 <title>When to Use Physical Simulation</title>
@@ -111,8 +108,9 @@ components of physically simulated bodies.  There are three main components used
 physical simulations:
 <itemizedlist>
 <listitem><para>Links, the basic building blocks of physically simulated objects</para></listitem>
-<listitem><para>MultiBodies, physical bodies made up of one or more Link objects(<xref linkend="multibodies">)</para></listitem>
-<listitem><para>Joints, used to attach Link objects to one another (<xref linkend="joints">)</para></listitem>
+<listitem><para>MultiBodies, physical bodies made up of one or more Link objects (<xref linkend="multibodies">)</para></listitem>
+<listitem><para>Joints, rigid connections between Link objects (<xref linkend="joints">)</para></listitem>
+<listitem><para>Springs, flexible connections between Link objects (<xref linkend="springs">)</para></listitem>
 </itemizedlist>
 </para>
 
@@ -199,8 +197,6 @@ created and destroyed.
 <para>
 <indexterm><primary>dynamic joints</primary></indexterm>
 <indexterm><primary>breaking joints</primary></indexterm>
-<indexterm><primary>orphaned link</primary></indexterm>
-<indexterm><primary>orphaned link adoption</primary></indexterm>
 breve allows <ulink url="../classes/Joint.html">Joints</ulink> to 
 be created and destroyed dynamically over the course of the simulation.  
 </para>
@@ -220,6 +216,13 @@ in the simulated world, breaking joints were often accompanied by broken hearts:
 could cause entire subtrees of links to disappear into the ether because the links were orphaned.  
 In <emphasis>breve</emphasis> 2.0, links will go on living happily even if they are not associated 
 with a MultiBody.
+</para>
+</sect1>
+
+<sect1 id="springs">
+<title>Using Springs</title>
+<para>
+Documentation forthcoming.
 </para>
 </sect1>
 
