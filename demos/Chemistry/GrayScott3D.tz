@@ -67,6 +67,7 @@ Control : GS {
         cubeList{i} move to (0, 0, ((i * 4) - (ZSIZE * 2))).
         cubeList{i} set-texture-image to textureList{i}.
         cubeList{i} set-texture-scale to 40.
+		cubeList{i} set-transparency to 0.1.
 
         
         }
@@ -111,7 +112,7 @@ Image : MatrixImage {
 
     + to iterate:
 		vp copy-to-red-channel z-plane z of-image self with-scale 2.0.
-		up copy-to-blue-channel z-plane z of-image self with-scale 2.0.
+		# up copy-to-blue-channel z-plane z of-image self with-scale 2.0.
         super iterate.
 }
 

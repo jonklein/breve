@@ -79,6 +79,7 @@ Patch : LifePatch {
 		state, nextstate (int).
 		neighbors (list).
 		onCount (int).
+		liveNeighbors (int).
 
 	+ to get-state:
 		return state.
@@ -95,34 +96,31 @@ Patch : LifePatch {
 
 		neighbors = (self get-moore-neighborhood).
 
-	+ to iterate:
-		count, n (int).
+    + to increment-neighbor-count:
+		# a neighbor is telling us that it's alive
+		liveNeighbors++.
 
-		for n=0, n<8, n=n+1: {
-			if neighbors{n}: {
-				count += (neighbors{n} get-state).
+    + to iterate:
+		# if we're alive, tell our neighbors about it.
+		if state: neighbors increment-neighbor-count.
 
-				if count > 3: {
-					self set-transparency to 1.0.
-					nextstate = 0.
-					onCount = 0.
-					return.
-				}
-			}
-		}
+    + to post-iterate:
+		# all of our live neighbors have reported now -- compute the new state
 
-		if count == 3 || (count == 2 && state == 1): {
+		if (liveNeighbors == 3) || ((state == 1) && (liveNeighbors == 2)): {
 			self set-transparency to 0.3.
-			nextstate = 1.
+			state = 1.
+
+			onCount++.
 
 			self set-color to (1.0 - (onCount / 20.0), onCount / 20.0, 0).
 		} else {
 			self set-transparency to 1.0.
-			nextstate = 0.
+			state = 0.
 			onCount = 0.
 		}
 
-	+ to post-iterate:
-		state = nextstate.
-		onCount++.
+		# reset the neighbor counter for the next iteration
+
+		liveNeighbors = 0.
 }

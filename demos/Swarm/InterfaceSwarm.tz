@@ -122,7 +122,6 @@ Control : Swarm {
         velocity (vector).
         birdLocation (vector).
         topDiff (double).
-        highLoc (vector).
  
         self update-neighbors.
 
@@ -131,15 +130,12 @@ Control : Swarm {
         foreach item in birds: {
             item fly with-flock birds.
             location += (item get-location).
-
-			if | (item get-location) | > | highLoc |: highLoc = (item get-location).
         }
 
         # in the context of a number, the list represents the number of items 
         # in the list.
 
         location /= birds.
-		# print "the highest location is $location".
 
         topDiff = 0.0.
 
@@ -152,10 +148,10 @@ Control : Swarm {
         # flock, and zoom in and out depending on how spread out the 
         # flock is.  it's doesn't work very well :).
 
-	if cameraControl: {
+		if cameraControl: {
             self aim-camera at location.
-	    self zoom-camera to (.5 * topDiff) + 10.
-	}
+		    self zoom-camera to (.5 * topDiff) + 10.
+		}
 
         # call the superclass iterate method to step the simulation forward.
 
