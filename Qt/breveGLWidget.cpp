@@ -39,12 +39,12 @@ void breveGLWidget::paintGL()
 
 void breveGLWidget::initializeGL()
 {
-	startTimer(1);
+	startTimer(10);
 }
 
 void breveGLWidget::timerEvent( QTimerEvent *e) {
 	// update();
-	glDraw();
+	if (_engine) glDraw();
 }
 
 /*--------------------------------------------------------------------------*/

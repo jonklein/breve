@@ -2,8 +2,9 @@
 #ifndef BRQTENGINE
 #define BRQTENGINE
 
-#include "kernel.h"
 #include "breveGLWidget.h"
+
+#include "kernel.h"
 
 // #include "brqtThread.h"
 

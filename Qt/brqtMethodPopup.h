@@ -1,5 +1,5 @@
-#include <QComboBox.h>
-#include <QTextEdit.h>
+#include <qcombobox.h>
+#include <qtextedit.h>
 #include <vector>
 
 class brqtMethodPopup : public QComboBox {

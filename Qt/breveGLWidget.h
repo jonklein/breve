@@ -10,6 +10,7 @@
 #define GLFRACTAL_H
 
 #include <qgl.h>
+
 #include "kernel.h"
 
 class breveGLWidget : public QGLWidget

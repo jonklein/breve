@@ -201,7 +201,7 @@
 <customwidgets>
     <customwidget>
         <class>brqtMethodPopup</class>
-        <header location="local">/Users/jk/dev/breve/Qt/brqtMethodPopup.h</header>
+        <header location="local">brqtMethodPopup.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>
@@ -257,7 +257,7 @@
     <signal>nameChanged()</signal>
 </signals>
 <slots>
-    <slot returnType="const char *">getString()</slot>
+    <slot returnType="char *">getString()</slot>
     <slot>loadFile( QString &amp; file )</slot>
     <slot>setupMethodPopup()</slot>
     <slot>lineChanged( int para, int pos )</slot>

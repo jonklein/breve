@@ -64,10 +64,17 @@ int demoMenuForDirectory(QWidget *receiver, QPopupMenu *menu, QString &directory
 }
 
 void brqtMainWindow::init() {
-	QString directory = "/Users/jk/dev/breve/demos";
+	QString directory;
+	char *demoPath = getenv("BREVE_DEMO_PATH");
+
+	if(demoPath) directory = demoPath;
+	else directory = "demos";
+
 	QPoint p;
 	
+#ifdef MACOSX 
 	MenuBar->reparent(0, 0, p, true);
+#endif
 
 	demoMenuForDirectory(this, Demos, directory, 0);
 }

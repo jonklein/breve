@@ -1,10 +1,9 @@
 TEMPLATE	= app
 LANGUAGE	= C++
 
-CONFIG	+= qt warn_on debug
-# release
+CONFIG	+= qt warn_on release
 
-LIBS	+= -L../lib -lbreve -lqgame++ -lpush -lode -framework JavaVM -lavcodec -lgsl -lreadline -lhistory -lncurses -ltermcap -lsndfile -lportaudio -ltiff -ljpeg -lenet -lexpat -lz -lm -framework OpenGL -framework GLUT -framework AppKit -framework vecLib -framework CoreAudio -framework AudioToolbox
+LIBS	+= -L../lib -lbreve -lqgame++ -lpush -lode -lavcodec -lgsl -lgslcblas -lreadline -lhistory -lncurses -ltermcap -lsndfile -lportaudio -ltiff -ljpeg -lpng -lexpat -lz -pthread -lm -lglut -lGLU -lGL -lXmu -lXi  -lX11  -lSM -lICE
 
 mac:LIBS	+= -framework OpenGL
 
@@ -26,18 +25,19 @@ FORMS	= brqtMainWindow.ui \
 	brqtEditorWindow.ui \
 	brqtErrorWindow.ui
 
-IMAGES	= images/fileopen \
-	images/filesave \
-	images/undo \
-	images/redo \
-	images/editcut \
-	images/editcopy \
-	images/editpaste \
-	images/searchfind \
-	app_icon.png \
+IMAGES	= app_icon.png \
 	pause.png \
 	play.png \
 	stop.png
+
+# release
+
+
+
+
+
+
+
 
 LEXSOURCES	+= brqtQuickparser.l
 

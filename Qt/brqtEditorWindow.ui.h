@@ -24,7 +24,7 @@ void brqtEditorWindow::destroy() {
     closed(this);
 }
 
-const char * brqtEditorWindow::getString()
+char * brqtEditorWindow::getString()
 {
     return strdup(sourceTextArea->text().ascii());
 }
@@ -53,6 +53,8 @@ void brqtEditorWindow::setupMethodPopup()
 void brqtEditorWindow::lineChanged( int para, int pos )
 {
     QString s;
+
+    pos = 0;
     
     s.sprintf("%d", para + 1);
     lineBox->setText( s);

@@ -1,4 +1,5 @@
 #include <qsyntaxhighlighter.h>
+#include <vector>
 
 class brqtSteveSyntaxHighlighter : public QSyntaxHighlighter {
 public:
@@ -20,6 +21,7 @@ public:
 	};
 
     int highlightParagraph(const QString &text, int state) {
+		state = 0;
 	
 		for(unsigned int n=0;n<_types.size();n++) { 
 			int pos = 0;
