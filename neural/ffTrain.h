@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-void randomOrder(int *vector, int count);
-int randomSort(const void *a, const void *b);
+void randomOrder(int *, int);
+int randomSort(const void *, const void *);
 
-void backPropSets(snFFLayer *input, snFFLayer *output, double **inputs, double **outputs, int sets, int iterations);
-void testNet(snFFLayer *input, snFFLayer *output, double **inputs, double **outputs, int sets, int classes);
+void backPropSets(snFFLayer *, snFFLayer *, double **, double **, int, int);
+void testNet(snFFLayer *, snFFLayer *, double **, double **, int, int);
 
-void randomOrder(int *vector, int count);
-int randomSort(const void *a, const void *b);
+void randomOrder(int *, int);
+int randomSort(const void *, const void *);

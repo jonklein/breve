@@ -37,7 +37,9 @@
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#else
+#endif
+
+#ifndef MAXPATHLEN
 #define MAXPATHLEN 10240
 #endif
 
@@ -115,7 +117,7 @@ int main(int argc, char **argv) {
 	frontend->engine->interfaceTypeCallback = interfaceVersionCallback;
 
 #ifdef HAVE_LIBOSMESA
-	frontend->engine->osBuffer = slMalloc(OSMESA_WINDOW_SIZE * OSMESA_WINDOW_SIZE * 4 * sizeof(GLubyte));
+	frontend->engine->osBuffer = (GLubyte *)slMalloc(OSMESA_WINDOW_SIZE * OSMESA_WINDOW_SIZE * 4 * sizeof(GLubyte));
 	frontend->engine->osContext = OSMesaCreateContext(OSMESA_RGBA, NULL);
 
 	if(!OSMesaMakeCurrent(frontend->engine->osContext, frontend->engine->osBuffer, GL_UNSIGNED_BYTE, OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE)) 

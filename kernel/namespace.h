@@ -59,19 +59,19 @@ struct brNamespaceSymbol {
 extern "C" {
 #endif
 
-brNamespace *brNamespaceNew();
-void brNamespaceFree(brNamespace *ns);
-void brNamespaceFreeWithFunction(brNamespace *ns, void (*symFree)(void *s));
+brNamespace *brNamespaceNew(void);
+void brNamespaceFree(brNamespace *);
+void brNamespaceFreeWithFunction(brNamespace *, void (*)(void *));
 
-brNamespaceSymbol *brNamespaceStore(brNamespace *space, char *name, int type, void *data);
-brNamespaceSymbol *brNamespaceLookup(brNamespace *space, char *name);
+brNamespaceSymbol *brNamespaceStore(brNamespace *, char *, int, void *);
+brNamespaceSymbol *brNamespaceLookup(brNamespace *, char *);
 
-brNamespaceSymbol *brNamespaceSymbolNew(int type, void *data);
+brNamespaceSymbol *brNamespaceSymbolNew(int, void *);
 
-void brNamespaceSymbolFree(brNamespaceSymbol *s);
-void brNamespaceSymbolFreeWithFunction(brNamespaceSymbol *s, void (*symFree)(void *s));
+void brNamespaceSymbolFree(brNamespaceSymbol *);
+void brNamespaceSymbolFreeWithFunction(brNamespaceSymbol *s, void (*)(void *s));
 
-slList *brNamespaceSymbolList(brNamespace *space);
+slList *brNamespaceSymbolList(brNamespace *);
 
 #ifdef __cplusplus
 }

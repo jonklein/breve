@@ -55,71 +55,71 @@ enum drawOptions {
 #ifdef __cplusplus 
 extern "C" {
 #endif
-void slInitGL(slWorld *w, slCamera *c);
-unsigned int slTextureNew(slCamera *c);
-void slTextureFree(slCamera *c, unsigned int texture);
-int slUpdateTexture(slCamera *c, GLuint texNum, unsigned char *pixels, int width, int height, int p);
-void slRenderScene(slWorld *w, slCamera *c, int crosshair);
-int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y, slVector *dragVector);
-int slGlSelect(slWorld *w, slCamera *c, int x, int y);
+void slInitGL(slWorld *, slCamera *);
+unsigned int slTextureNew(slCamera *);
+void slTextureFree(slCamera *, unsigned int);
+int slUpdateTexture(slCamera *, GLuint, unsigned char *, int, int, int);
+void slRenderScene(slWorld *, slCamera *, int);
+int slVectorForDrag(slWorld *, slCamera *, slVector *, int, int, slVector *);
+int slGlSelect(slWorld *, slCamera *, int, int);
 
 
 #ifdef __cplusplus 
 }
 #endif
 
-void slDrawFog(slWorld *w, slCamera *c);
+void slDrawFog(slWorld *, slCamera *);
 
-void slMatrixGLMult(double m[3][3]);
+void slMatrixGLMult(double [3][3]);
 
-void slCompileCubeDrawList(int l);
-void slCompileSphereDrawList(int l);
+void slCompileCubeDrawList(int);
+void slCompileSphereDrawList(int);
 
-void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor);
-void slRenderWorldToBuffer(slWorld *w, slCamera *c, char *r, char *g, char *b, char *temp);
+void slRenderWorld(slWorld *, slCamera *, int, int);
+void slRenderWorldToBuffer(slWorld *, slCamera *, char *, char *, char *, char *);
 
-void slDrawBackground(slCamera *c, slWorld *w);
+void slDrawBackground(slCamera *, slWorld *);
 
-void slStencilFloor(slWorld *w, slCamera *c);
-void slReflectionPass(slWorld *w, slCamera *c);
-void slShadowPass(slWorld *w, slCamera *c);
+void slStencilFloor(slWorld *, slCamera *);
+void slReflectionPass(slWorld *, slCamera *);
+void slShadowPass(slWorld *, slCamera *);
 
-void slRenderLabels(slWorld *w);
+void slRenderLabels(slWorld *);
 
-void slRenderObjects(slWorld *w, slCamera *c, unsigned int flags);
-void slRenderLines(slWorld *w, slCamera *c);
+void slRenderObjects(slWorld *, slCamera *, unsigned int);
+void slRenderLines(slWorld *, slCamera *);
 
-void slRenderText(slWorld *w, slCamera *c, slVector *loc, slVector *target, int crosshair);
+void slRenderText(slWorld *, slCamera *, slVector *, slVector *, int);
 
-void slText(double x, double y, char *string, void *font);
-void slStrokeText(double x, double y, char *string, double scale, void *font);
+void slText(double, double, char *, void *);
+void slStrokeText(double, double, char *, double, void *);
 
-void slDrawLights(slCamera *c, int noDiff);
-void slShadowMatrix(GLfloat shadowMat[4][4], slPlane *plane, slVector *light);
+void slDrawLights(slCamera *, int);
+void slShadowMatrix(GLfloat [4][4], slPlane *, slVector *);
 
-void slDrawShape(slCamera *c, slShape *s, slPosition *pos, double textureScale, int mode, int flags);
+void slDrawShape(slCamera *, slShape *, slPosition *, double, int, int);
 
-int slCompileShape(slShape *s, int drawMode, double textureScale, int flags);
-void slRenderShape(slShape *s, int drawMode, double textureScale, int flags);
-void slDrawAxis(double x, double y);
+int slCompileShape(slShape *, int, double, int);
+void slRenderShape(slShape *, int, double, int);
+void slDrawAxis(double, double);
 
-void slProcessBillboards(slWorld *w, slCamera *c);
-void slRenderBillboards(slCamera *c, int flags);
-void slDrawFace(slFace *f, int drawMode, double textureScale, int flags);
+void slProcessBillboards(slWorld *, slCamera *);
+void slRenderBillboards(slCamera *, int);
+void slDrawFace(slFace *, int, double, int);
 
-int slBreakdownFace(slFace *f, double textureScale);
-void slBreakdownTriangle(slVector *v, double textureScale, int level, slVector *xaxis, slVector *yaxis);
+int slBreakdownFace(slFace *, double);
+void slBreakdownTriangle(slVector *, double, int, slVector *, slVector *);
 
-int slCompileBox();
+int slCompileBox(void);
 
-void slGlError();
+void slGlError(void);
 
-int slClearGLErrors(char *e);
+int slClearGLErrors(char *);
 
-void slFreeGL(slWorld *w, slCamera *c);
+void slFreeGL(slWorld *, slCamera *);
 
-void slDeleteMbGLLists(slMultibody *m);
+void slDeleteMbGLLists(slMultibody *);
 
-void slTransposeGLMatrix(GLfloat *m);
+void slTransposeGLMatrix(GLfloat *);
 
-void slClear(slWorld *w, slCamera *c);
+void slClear(slWorld *, slCamera *);

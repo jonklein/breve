@@ -1,78 +1,105 @@
-# 
-# The breve Simulation Environment Makefile
-# jon klein <jk@spiderland.org>
-#
+CC	= @CC@
+CXX	= @CXX@
+JAR	= @JAR@
+LEX	= @LEX@
+RANLIB	= @RANLIB@
+YACC	= @YACC@
 
-prefix = @prefix@
-exec_prefix = @exec_prefix@
+CPPFLAGS	= @CPPFLAGS@ @JAVAINCS@ @DEFS@
+LDFLAGS		= @LDFLAGS@
 
-OPTFLAGS	=-O3 @DEFS@
+EXTRACFLAGS	= -g
 
-CFLAGS		=-g -Wall -Winline @DEFS@
-
-CC			= @CC@
-RANLIB		= @RANLIB@
+CFLAGS		= $(EXTRACFLAGS) -pipe -Wall
+CXXFLAGS	= $(EXTRACFLAGS) -pipe -fpermissive -Wall
+YFLAGS		= -d
 
 PLATFORM	= @PLATFORM@
-LPLATFORM	= $(shell echo ${PLATFORM} | tr '[A-Z]' '[a-z]')
+LPLATFORM	= $(shell echo $(PLATFORM) | tr '[A-Z]' '[a-z]')
 
 DMG_FILE	= breve_@VERSION@.dmg
 CLI_FOLDER	= breve_@VERSION@
 
-export
+INCLUDE	= -Iinclude/breve
 
-all: 
-	-mkdir docs
-	cd util; $(MAKE) -f Makefile install
-	cd simulation; $(MAKE) -f Makefile install
-	cd neural; $(MAKE) -f Makefile install
-	cd graph; $(MAKE) -f Makefile install
-	cd kernel; $(MAKE) -f Makefile install
-	cd java; $(MAKE) -f Makefile install
-	cd steve; $(MAKE) -f Makefile install
-	cd bin; $(MAKE) -f Makefile install
+all: bin/breve@EXE_SUFFIX@ bin/breve_cli@EXE_SUFFIX@ bin/graphTest@EXE_SUFFIX@ \
+	lib/classes/MethodFinder.jar
 
-documentation:
-	rm -rf docs
-	cd docBuild; $(MAKE) -f Makefile install
+include docBuild/Makefile
+include graph/Makefile
+include java/Makefile
+include kernel/Makefile
+include neural/Makefile
+include simulation/Makefile
+include steve/Makefile
+include util/Makefile
+include .depend
 
-profile:
-	$(MAKE) CFLAGS='-pg $(OPTFLAGS)'
+OBJ	:= $(SRC:.cc=.o)
+OBJ	:= $(OBJ:.c=.o)
+
+bin/breve@EXE_SUFFIX@: bin/breve.o $(OBJ)
+	$(CXX) -o $@ $(LDFLAGS) $^ @LIBS@ @GLLIBS@ @AUDIOLIBS@
+
+bin/breve_cli@EXE_SUFFIX@: bin/breve_cli.o $(OBJ)
+	$(CXX) -o $@ $(LDFLAGS) $^ @LIBS@ @GLLIBS@ @AUDIOLIBS@
+
+bin/graphTest@EXE_SUFFIX@: graph/graphTest.o $(OBJ)
+	$(CXX) -o $@ $(LDFLAGS) $^ @LIBS@ @GLLIBS@
+
+%.o: %.c includes
+	$(CC) -c -o $@ $(CPPFLAGS) $(INCLUDE) $(CFLAGS) $<
+
+%.o: %.cc includes
+	$(CXX) -c -o $@ $(CPPFLAGS) $(INCLUDE) $(CXXFLAGS) $<
+
+%.tab.c: %.y
+	$(YACC) $(YFLAGS) -o $@ $<
+
+%.class: %.java
+	-@JAVAC@ $<
 
 optimize:
-	$(MAKE) CFLAGS='$(OPTFLAGS)'
+	$(MAKE) EXTRACFLAGS='-O3'
 
 optimize_debug:
-	$(MAKE) CFLAGS='-g $(OPTFLAGS)'
+	$(MAKE) EXTRACFLAGS='-g -O3'
+
+profile:
+	$(MAKE) EXTRACFLAGS='-pg -O3'
+
+.PHONY: includes depend clean OSX_build OSX_clean OSX_release CLI_release \
+		plugin_API install
+
+includes: $(HEADERS)
+	@ln -f $(HEADERS) include/breve/
+
+depend: includes $(SRC)
+	@MKDEP@ $(CPPFLAGS) $(INCLUDE) $(SRC) bin/breve.cc bin/breve_cli.cc \
+		graph/graphTest.cc > .depend
 
 clean:
+	rm -f bin/breve bin/breve_cli bin/graphTest
+	rm -f steve/format.c steve/stevelex.c steve/steveparse.tab.c
+	rm -f java/*.class lib/classes/*.jar
+	rm -rf docBuild/docs docs
 	rm -rf OSX/build
-	-cd util; $(MAKE) -f Makefile clean
-	-cd simulation; $(MAKE) -f Makefile clean
-	-cd kernel; $(MAKE) -f Makefile clean
-	-cd steve; $(MAKE) -f Makefile clean
-	-cd graph; $(MAKE) -f Makefile clean
-	-cd neural; $(MAKE) -f Makefile clean
-	-cd java; $(MAKE) -f Makefile clean
-	-cd docBuild; $(MAKE) -f Makefile clean
-	-cd bin; $(MAKE) -f Makefile clean
-
-	-cp include/breve/config.h include/breve/config.h.bak
-	rm -f lib/*.a include/breve/*.h bin/breve bin/breve_cli
+	-mv include/breve/config.h include/breve/config.h.bak
+	rm -f include/breve/*.h
 	-mv include/breve/config.h.bak include/breve/config.h
-	find . -name '.gdb*' -exec rm -f {} \;
-	find . -name 'core' -exec rm -f {} \;
 	find . -name '.DS_Store' -exec rm -f {} \;
+	find . -name 'core' -exec rm -f {} \;
+	find . -name '.gdb*' -exec rm -f {} \;
+	find . -name '*.core' -exec rm -f {} \;
+	find . -name '*.o' -exec rm -f {} \;
 
-OSX_build:
+OSX_build: optimize
 	-mkdir docs
-	$(MAKE) -f Makefile optimize
 	cd plugins; $(MAKE)
-	cd OSX ; xcodebuild -buildstyle Deployment CC= LIBS='@LDFLAGS@ @LIBS@'
+	cd OSX; xcodebuild -buildstyle Deployment CC= LIBS='@LDFLAGS@ @LIBS@'
 
-OSX_clean:
+OSX_clean: clean
 	rm -f $(DMG_FILE)
-	$(MAKE) -f Makefile clean
 	cd plugins; $(MAKE) clean
 	cd OSX; xcodebuild clean
 	rm -rf OSX/build plugins/*/build
@@ -81,29 +108,27 @@ OSX_release: OSX_clean documentation OSX_build
 	rm -f $(DMG_FILE)
 	rm -rf breve_image_folder
 	mkdir breve_image_folder
-	cp -r OSX/build/breve.app breve_image_folder
+	cp -R OSX/build/breve.app breve_image_folder
 	cp OSX/README.html breve_image_folder
 	cp OSX/Documentation.txt breve_image_folder
 	cp Changes.html breve_image_folder
 	mkdir breve_image_folder/plugins
-	cp -r plugins/samples plugins/slBrevePluginAPI.h plugins/README.txt breve_image_folder/plugins
+	cp -R plugins/samples plugins/slBrevePluginAPI.h plugins/README.txt breve_image_folder/plugins
 	make_dmg.sh $(DMG_FILE) breve_image_folder/*
 	rm -rf breve_image_folder
 
-CLI_release:
-	$(MAKE) -f Makefile clean
+CLI_release: clean optimize
 	rm -rf $(CLI_FOLDER)
 	mkdir $(CLI_FOLDER)
 	mkdir $(CLI_FOLDER)/bin
 	mkdir $(CLI_FOLDER)/lib
-	$(MAKE) -f Makefile optimize
 	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin/
 	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin/
-	cp -r lib/classes $(CLI_FOLDER)/lib/
-	cp -r docs $(CLI_FOLDER)/
-	cp -r demos $(CLI_FOLDER)/
+	cp -R lib/classes $(CLI_FOLDER)/lib/
+	cp -R docs $(CLI_FOLDER)/
+	cp -R demos $(CLI_FOLDER)/
 	mkdir $(CLI_FOLDER)/plugins
-	cp -r plugins/samples plugins/slBrevePluginAPI.h plugins/README.txt $(CLI_FOLDER)/plugins
+	cp -R plugins/samples plugins/slBrevePluginAPI.h plugins/README.txt $(CLI_FOLDER)/plugins
 	rm -rf $(CLI_FOLDER)/demos/Music
 	cp README.txt $(CLI_FOLDER)/
 	cp Changes.html $(CLI_FOLDER)/
@@ -112,20 +137,18 @@ CLI_release:
 	@ARCHIVER@ breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@ $(CLI_FOLDER)
 
 plugin_API:
-	-rm -rf breve_plugin_API
-	-mkdir breve_plugin_API
+	rm -rf breve_plugin_API
+	mkdir breve_plugin_API
 	cp plugins/slBrevePluginAPI.h breve_plugin_API
 	cp plugins/README.html breve_plugin_API
-	tar zcvf breve_plugin_API.tar.gz breve_plugin_API
+	@ARCHIVER@ breve_plugin_API.@ARCHIVE_SUFFIX@ breve_plugin_API
 	rm -rf breve_plugin_API
 
 install: optimize
-	-mkdir -p @bindir@
-	-mkdir -p @libdir@/breve
+	mkdir -p @bindir@
+	mkdir -p @libdir@/breve
 	cp bin/breve @bindir@
 	cp bin/breve_cli @bindir@
-	-rm -rf @libdir@/breve/classes
-	-mkdir @libdir@/breve
-	cp -r lib/classes @libdir@/breve/
-
-# thi s  Ma k e#$#fil e  iS me aN T   to  bE  li#st ened t0 On  vyN @ @@al
+	rm -rf @libdir@/breve/classes
+	mkdir @libdir@/breve
+	cp -R lib/classes @libdir@/breve

@@ -22,25 +22,25 @@
 #define _MEMORY_H
 #include <stdio.h>
 
-void *slMalloc(int n);
-void *slRealloc(void *p, int n);
-void slFree(void *p);
+void *slMalloc(int);
+void *slRealloc(void *, int);
+void slFree(void *);
 
-char *slDequeueMessage();
-int slCheckMessageQueue();
+char *slDequeueMessage(void);
+int slCheckMessageQueue(void);
 
-void slFatal(char *format, ...);
-void utilPause();
+void slFatal(char *, ...);
+void utilPause(void);
 
-void slMemoryReport();
-int slMemoryAllocated();
+void slMemoryReport(void);
+int slMemoryAllocated(void);
 
-void slDebugMatrix(int level, double m[3][3]);
+void slDebugMatrix(int, double [3][3]);
 
-slHash *slInitUtilMallocHash();
+slHash *slInitUtilMallocHash(void);
 
-void slPrintIfString(char *pointer, int length, int maxlen);
+void slPrintIfString(char *, int, int);
 
-unsigned int slUtilPointerCompare(void *a, void *b);
-unsigned int slUtilPointerHash(void *a, unsigned int n);
+unsigned int slUtilPointerCompare(void *, void *);
+unsigned int slUtilPointerHash(void *, unsigned int);
 #endif

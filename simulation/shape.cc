@@ -534,8 +534,6 @@ slPoint *slAddPoint(slShape *s, slVector *vertex) {
 		if(!slVectorCompare(vertex, &p->vertex)) { 
 			p->edgeCount++;
 	
-			std::vector<slFeature*>::iterator fi;
-
 			return p;
 		}
 	}
@@ -802,7 +800,6 @@ int slSphere::pointOnShape(slVector *dir, slVector *point) {
 }
 
 int slShape::pointOnShape(slVector *dir, slVector *point) {
-	int n;
 	double D, X, Y, Z, k;
 	slVector pointOnPlane;
 	slPosition pos;
@@ -849,7 +846,7 @@ int slShape::pointOnShape(slVector *dir, slVector *point) {
 
 			if(result == 1) {
 				slVectorCopy(&pointOnPlane, point);
-				return n;
+				return 0;
 			} 
 		}
 	}

@@ -1,22 +1,22 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void brBeginDrag(brEngine*, brInstance*);
-void brEndDrag(brEngine*, brInstance*);
-void brSetUpdateMenuCallback(brInstance *i, void (*updateMenu)(brInstance *l));
+void brBeginDrag(brEngine *, brInstance *);
+void brEndDrag(brEngine *, brInstance *);
+void brSetUpdateMenuCallback(brInstance *, void (*)(brInstance *));
 
-int brMenuCallback(brEngine *e, brInstance *i, unsigned int n);
-int brMenuCallbackByName(brEngine *e, char *name);
-brInstance *brClickCallback(brEngine *e, int n);
-brInstance *brClickAtLocation(brEngine *e, int x, int y);
-int brDragCallback(brEngine *e, int x, int y);
-int brKeyCallback(brEngine *e, unsigned char keyCode, int isDown);
-int brInterfaceCallback(brEngine *e, int interfaceID, char *string);
+int brMenuCallback(brEngine *, brInstance *, unsigned int);
+int brMenuCallbackByName(brEngine *, char *);
+brInstance *brClickCallback(brEngine *, int);
+brInstance *brClickAtLocation(brEngine *, int, int);
+int brDragCallback(brEngine *, int, int);
+int brKeyCallback(brEngine *, unsigned char, int);
+int brInterfaceCallback(brEngine *, int, char *);
 
-char *brEngineRunSaveDialog(brEngine *e);
-char *brEngineRunLoadDialog(brEngine *e);
+char *brEngineRunSaveDialog(brEngine *);
+char *brEngineRunLoadDialog(brEngine *);
 
-void brEngineSetMouseLocation(brEngine *e, int x, int y);
+void brEngineSetMouseLocation(brEngine *, int, int);
 
 #ifdef __cplusplus
 }

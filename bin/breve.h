@@ -60,35 +60,35 @@ struct option gCLIOptions[] = {
         { "master",     no_argument,       0, 'M' }
 };
 
-int brParseArgs(int argc, char **argv);
+int brParseArgs(int, char **);
 
-void brPrintUsage(char *name);
+void brPrintUsage(char *);
 
-void glutLoop();
+void glutLoop(void);
 
-void brQuit(brEngine *e);
-void brMainMenu(int n); 
-void brGLMenuStatus(int stat, int x, int y);
-void brContextualMenu(int n); 
-void brClick(int n);
+void brQuit(brEngine *);
+void brMainMenu(int); 
+void brGLMenuStatus(int, int, int);
+void brContextualMenu(int); 
+void brClick(int);
 
-void brGlutMenuUpdate(brInstance *l);
+void brGlutMenuUpdate(brInstance *);
 
-void slInitGlut(int argc, char **argv, char *name);
+void slInitGlut(int, char **, char *);
 
-void slDemoReshape(int x, int y);
-void slDemoDisplay();
-void slDemoMouse(int button, int state, int x, int y);
-void slDemoMotion(int x, int y);
-void slDemoPassiveMotion(int x, int y);
-void slDemoSpecial(int key, int x, int y);
-void slDemoSpecialUp(int key, int x, int y);
-void slDemoKeyboard(unsigned char key, int x, int y);
-void slDemoKeyboardUp(unsigned char key, int x, int y);
+void slDemoReshape(int, int);
+void slDemoDisplay(void);
+void slDemoMouse(int, int, int, int);
+void slDemoMotion(int, int);
+void slDemoPassiveMotion(int, int);
+void slDemoSpecial(int, int, int);
+void slDemoSpecialUp(int, int, int);
+void slDemoKeyboard(unsigned char, int, int);
+void slDemoKeyboardUp(unsigned char, int, int);
 
-int brCLIDialogCallback(char *title, char *message, char *b1, char *b2);
-char *interfaceVersionCallback();
-char *getSavename();
-char *getLoadname();
-int soundCallback();
-int pauseCallback();
+int brCLIDialogCallback(char *, char *, char *, char *);
+char *interfaceVersionCallback(void);
+char *getSavename(void);
+char *getLoadname(void);
+int soundCallback(void);
+int pauseCallback(void);

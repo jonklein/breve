@@ -36,20 +36,20 @@ struct brEvalHash {
 extern "C" {
 #endif
 
-brEvalHash *brEvalHashNew();
-void brEvalHashFree(brEvalHash *h);
+brEvalHash *brEvalHashNew(void);
+void brEvalHashFree(brEvalHash *);
 
-brEvalListHead *brEvalHashValues(brEvalHash *h);
-brEvalListHead *brEvalHashKeys(brEvalHash *h);
+brEvalListHead *brEvalHashValues(brEvalHash *);
+brEvalListHead *brEvalHashKeys(brEvalHash *);
 
-void stUnretainEvalHash(brEvalHash *h);
-void stRetainEvalHash(brEvalHash *h);
+void stUnretainEvalHash(brEvalHash *);
+void stRetainEvalHash(brEvalHash *);
 
-unsigned int brEvalHashFunction(void *e, unsigned int n);
-unsigned int brEvalHashCompareFunction(void *a, void *b);
+unsigned int brEvalHashFunction(void *, unsigned int);
+unsigned int brEvalHashCompareFunction(void *, void *);
 
-void brEvalHashLookup(brEvalHash *h, brEval *key, brEval *value);
-void brEvalHashStore(brEvalHash *h, brEval *key, brEval *value, brEval *oldValue);
+void brEvalHashLookup(brEvalHash *, brEval *, brEval *);
+void brEvalHashStore(brEvalHash *, brEval *, brEval *, brEval *);
 
 #ifdef __cplusplus
 }

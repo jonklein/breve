@@ -18,30 +18,30 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-char *slStrdup(char *o);
-char *slStrdupAndFree(char *str);
+char *slStrdup(char *);
+char *slStrdupAndFree(char *);
 
-char *slSplit(char *start, char *substr, int n);
+char *slSplit(char *, char *, int);
 
-int slUtilGzread(char *ptr, int count, gzFile stream);
-int slUtilGzwrite(void *ptr, size_t size, size_t nmemb, gzFile stream);
+int slUtilGzread(char *, int, gzFile);
+int slUtilGzwrite(void *, size_t, size_t, gzFile);
 
-int slUtilFread(void *ptr, size_t size, size_t nmemb, FILE *stream);
-int slUtilFwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
+int slUtilFread(void *, size_t, size_t, FILE *);
+int slUtilFwrite(const void *, size_t, size_t, FILE *);
 
-int slUtilRead(int socket, void *buffer, size_t size);
-int slUtilRecv(int socket, void *buffer, size_t size);
-int slUtilWrite(int socket, const void *buffer, size_t size);
+int slUtilRead(int, void *, size_t);
+int slUtilRecv(int, void *, size_t);
+int slUtilWrite(int, const void *, size_t);
 
-char *slUtilReadFile(char *path);
-int slUtilWriteFile(char *path, char *text);
+char *slUtilReadFile(char *);
+int slUtilWriteFile(char *, char *);
 
-char *slUtilReadStream(FILE *stream);
+char *slUtilReadStream(FILE *);
 
-char *slDequote(char *q);
+char *slDequote(char *);
 
-char *slStrcatM(char *start, char *end);
+char *slStrcatM(char *, char *);
 
-char *slFgets(char *str, int size, FILE *stream);
+char *slFgets(char *, int, FILE *);
 
-char *slUtilReadStdin();
+char *slUtilReadStdin(void);

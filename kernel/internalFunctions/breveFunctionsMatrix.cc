@@ -165,11 +165,11 @@ int brIMatrixDiffuse(brEval args[], brEval *target, brInstance *i) {
 	gsl_matrix_float *n = GSL_MATRIX_POINTER(&args[1]);
 	double scale = BRDOUBLE(&args[2]);
 
-	unsigned int x, y;
+	unsigned int x = 0, y;
 	int xp, xm, yp, ym;
 
-	for(y=0;x<m->size1;y++) {
-		for(x=0;x<m->size2;x++) {
+	for(y=0; x < m->size1; y++) {
+		for(x=0; x < m->size2; x++) {
 			xp = (x+1) % m->size2; yp = (y+1) % m->size1;
 			xm = (x-1) % m->size2; ym = (y-1) % m->size1;
 

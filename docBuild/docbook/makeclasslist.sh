@@ -1,4 +1,4 @@
-#!/bin/tcsh
+#!/bin/csh
 
 echo "<itemizedlist>"
 

@@ -10,6 +10,6 @@ struct slStringStream {
 	FILE *fp;
 };
 
-slStringStream *slOpenStringStream();
-char *slCloseStringStream(slStringStream *stream);
+slStringStream *slOpenStringStream(void);
+char *slCloseStringStream(slStringStream *);
 

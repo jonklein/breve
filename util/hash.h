@@ -41,17 +41,17 @@ struct slHashEntry {
 
 #define slDehashData(h, k) slDehashDataAndKey((h), (k), NULL)
 
-slHash *slNewHash(unsigned int size, unsigned int (*hf)(void *p, unsigned int n), unsigned int (*cf)(void *a, void *b));
-void slFreeHash(slHash *h);
+slHash *slNewHash(unsigned int, unsigned int (*)(void *, unsigned int), unsigned int (*)(void *, void *));
+void slFreeHash(slHash *);
 
-void *slHashData(slHash *h, void *data, void *key);
-void *slDehashDataAndKey(slHash *h, void *key, void **outkey);
+void *slHashData(slHash *, void *, void *);
+void *slDehashDataAndKey(slHash *, void *, void **);
 
-slList *slHashKeys(slHash *h);
-slList *slHashValues(slHash *h);
+slList *slHashKeys(slHash *);
+slList *slHashValues(slHash *);
 
-unsigned int slHashPointer(void *p, unsigned int n);
-unsigned int slCompPointer(void *a, void *b);
+unsigned int slHashPointer(void *, unsigned int);
+unsigned int slCompPointer(void *, void *);
 
-unsigned int slHashString(void *p, unsigned int n);
-unsigned int slCompString(void *a, void *b);
+unsigned int slHashString(void *, unsigned int);
+unsigned int slCompString(void *, void *);

@@ -36,20 +36,19 @@ struct slArray {
     int count;
 };
 
-slList *slListPrepend(slList *l, void *d);
-slList *slListAppend(slList *l, void *d);
-slList *slListReverse(slList *s);
-slList *slListCopy(slList *s);
+slList *slListPrepend(slList *, void *);
+slList *slListAppend(slList *, void *);
+slList *slListReverse(slList *);
+slList *slListCopy(slList *);
 
-slArray *slListToArray(slList *s);
+slArray *slListToArray(slList *);
 
-slList *slListRemoveData(slList *s, void *p);
+slList *slListRemoveData(slList *, void *);
 
-slList *slInList(slList *s, void *p);
+slList *slInList(slList *, void *);
 
-void slListFree(slList *l);
-void slListFreeHead(slList *l);
-int slListCount(slList *l);
+void slListFree(slList *);
+void slListFreeHead(slList *);
+int slListCount(slList *);
 
-void slFreeArray(slArray *a);
-
+void slFreeArray(slArray *);

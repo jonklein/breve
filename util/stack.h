@@ -31,10 +31,10 @@ struct slStack {
     unsigned int maxCount;
 };
 
-slStack *slStackNew();
-slStack *slStackNewWithSize(unsigned int size);
-void slStackFree(slStack *s);
-int slStackPush(slStack *s, void *data);
-int slStackRemove(slStack *s, void *remove);
+slStack *slStackNew(void);
+slStack *slStackNewWithSize(unsigned int);
+void slStackFree(slStack *);
+int slStackPush(slStack *, void *);
+int slStackRemove(slStack *, void *);
 
-void slStackClear(slStack *s);
+void slStackClear(slStack *);

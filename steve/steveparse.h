@@ -1,10 +1,10 @@
-void stStartParse();
-void stEndParse();
-void stParseSetSteveData(stSteveData *d);
-void stParseSetEngine(brEngine *e);
-void stParseSetObject(stObject *o);
-void stParseSetObjectAndMethod(stObject *o, stMethod *m);
+void stStartParse(void);
+void stEndParse(void);
+void stParseSetSteveData(stSteveData *);
+void stParseSetEngine(brEngine *);
+void stParseSetObject(stObject *);
+void stParseSetObjectAndMethod(stObject *, stMethod *);
 
-char *slFormatText(char *text);
+char *slFormatText(char *);
 
-int yyparse();
+int yyparse(void);

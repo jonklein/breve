@@ -275,7 +275,6 @@ void slAddBoundingBoxForVectors(slVclipData *data, int offset, slVector *min, sl
 void slInitProximityData(slWorld *w) {
 	unsigned int n, x, y;
 	slPairEntry *pe;
-	std::vector<slWorldObject*>::iterator wi;
 
 	slVclipDataRealloc(w->proximityData, w->objects.size());
 

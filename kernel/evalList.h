@@ -70,30 +70,30 @@ typedef struct brEvalListCopyRecord brEvalListCopyRecord;
 extern "C" {
 #endif
 
-brEvalListHead *brEvalListNew();
-void brEvalListFree(brEvalListHead *a);
+brEvalListHead *brEvalListNew(void);
+void brEvalListFree(brEvalListHead *);
 
-int brEvalListCompare(const void *a, const void *b);
+int brEvalListCompare(const void *, const void *);
 
-int stDoEvalListIndex(brEvalListHead *l, int n, brEval *newLoc);
-inline int stDoEvalListIndexPointer(brEvalListHead *l, int n, brEval **eval);
+int stDoEvalListIndex(brEvalListHead *, int, brEval *);
+inline int stDoEvalListIndexPointer(brEvalListHead *, int, brEval **);
 
-brEvalListHead *brEvalListDeepCopy(brEvalListHead *l);
-brEvalListHead *stDoEvalListDeepCopy(brEvalListHead *l, slList **seen);
-brEvalListHead *brEvalListCopy(brEvalListHead *l);
+brEvalListHead *brEvalListDeepCopy(brEvalListHead *);
+brEvalListHead *stDoEvalListDeepCopy(brEvalListHead *, slList **);
+brEvalListHead *brEvalListCopy(brEvalListHead *);
 
-brEvalList *brEvalListIndexLookup(brEvalListHead *l, int index);
+brEvalList *brEvalListIndexLookup(brEvalListHead *, int);
 
-int brEvalListInsert(brEvalListHead *head, int index, brEval *value);
-int brEvalListRemove(brEvalListHead *head, int index, brEval *value);
+int brEvalListInsert(brEvalListHead *, int, brEval *);
+int brEvalListRemove(brEvalListHead *, int, brEval *);
 
-brEvalList *brEvalListIndexLookup(brEvalListHead *l, int index);
+brEvalList *brEvalListIndexLookup(brEvalListHead *, int);
 
-brEvalListHead *brEvalListDeepCopy(brEvalListHead *l);
-brEvalListHead *brDoEvalListDeepCopy(brEvalListHead *l, slList **s);
-brEvalListHead *brCopyRecordInList(slList *recordList, brEvalListHead *search);
-brEvalListCopyRecord *brMakeListCopyRecord(brEvalListHead *original, brEvalListHead *copy);
-void brFreeListRecords(slList *records);
+brEvalListHead *brEvalListDeepCopy(brEvalListHead *);
+brEvalListHead *brDoEvalListDeepCopy(brEvalListHead *, slList **);
+brEvalListHead *brCopyRecordInList(slList *, brEvalListHead *);
+brEvalListCopyRecord *brMakeListCopyRecord(brEvalListHead *, brEvalListHead *);
+void brFreeListRecords(slList *);
 
 #ifdef __cplusplus
 }

@@ -56,8 +56,6 @@ slLink::~slLink() {
 		slMultibodyUpdate(multibody);
 	}
 
-	std::vector<slJoint*>::iterator ji;
-
 	// This is a bad situation here: slJointBreak modifies the 
 	// joint list.  I intend to fix this.
 

@@ -22,10 +22,10 @@
 
 #define RADTODEG(x)	((x)*180.0/M_PI)
 
-int slNextPowerOfTwo(int n);
+int slNextPowerOfTwo(int);
 
-double slPythag(double a, double b);
+double slPythag(double, double);
 
-int slQuadratic(double a, double b, double c, double *s1, double *s2);
+int slQuadratic(double, double, double, double *, double *);
 
-int slIsinf(double d);
+int slIsinf(double);

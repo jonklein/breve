@@ -62,14 +62,6 @@ foreach $in (@ARGV) {
 
 @method_index = sort @method_index;
 
-open(INDEX, ">index.txt") || die "Cannot open index.txt: $!\n";
-
-foreach $i (@all_methods) {
-	print INDEX "$i\n";
-}
-
-close(INDEX);
-
 foreach $i (@method_index) {
 	($meth, $class) = ($i =~ /^(.*)\<br\>.*\[\<a href.*\>(.*)\<\/a\>\]/s);
 	

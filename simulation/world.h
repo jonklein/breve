@@ -178,67 +178,67 @@ struct slWorld {
 #ifdef __cplusplus
 extern "C"{
 #endif
-slWorld *slWorldNew();
-slWorldObject *slWorldNewObject(void *d, int type);
+slWorld *slWorldNew(void);
+slWorldObject *slWorldNewObject(void *, int);
 
-int slWorldStartNetsimServer(slWorld *w);
-int slWorldStartNetsimSlave(slWorld *w, char *host);
+int slWorldStartNetsimServer(slWorld *);
+int slWorldStartNetsimSlave(slWorld *, char *);
 
-void slWorldAddCamera(slWorld *w, slCamera *camera);
-void slWorldRemoveCamera(slWorld *w, slCamera *camera);
+void slWorldAddCamera(slWorld *, slCamera *);
+void slWorldRemoveCamera(slWorld *, slCamera *);
 
-slPatchGrid *slPatchGridAdd(slWorld *w, slVector *center, slVector *patchSize, int x, int y, int z);
+slPatchGrid *slPatchGridAdd(slWorld *, slVector *, slVector *, int, int, int);
 
-void slWorldFree(slWorld *w);
-void slWorldFreeObject(slWorldObject *o);
-void slFreeClipData(slVclipData *v);
-void slRenderWorldCameras(slWorld *w);
+void slWorldFree(slWorld *);
+void slWorldFreeObject(slWorldObject *);
+void slFreeClipData(slVclipData *);
+void slRenderWorldCameras(slWorld *);
 
-slWorldObject *slWorldAddObject(slWorld *w, slWorldObject *p, int type);
-void slRemoveObject(slWorld *w, slWorldObject *p);
+slWorldObject *slWorldAddObject(slWorld *, slWorldObject *, int);
+void slRemoveObject(slWorld *, slWorldObject *);
 
-double slRunWorld(slWorld *w, double deltaT, double stepSize, int *error);
-double slWorldStep(slWorld *w, double stepSize, int *error);
-void slNeighborCheck(slWorld *w);
+double slRunWorld(slWorld *, double, double, int *);
+double slWorldStep(slWorld *, double, int *);
+void slNeighborCheck(slWorld *);
 
-slVclipData *slVclipDataNew();
+slVclipData *slVclipDataNew(void);
 
-slStationary *slNewStationary(slShape *s, slVector *loc, double rot[3][3], void *data);
+slStationary *slNewStationary(slShape *, slVector *, double [3][3], void *);
 
-void slWorldSetGravity(slWorld *w, slVector *gravity);
+void slWorldSetGravity(slWorld *, slVector *);
 
-void slWorldSetBoundsOnlyCollisionDetection(slWorld *w, int value);
+void slWorldSetBoundsOnlyCollisionDetection(slWorld *, int);
 
-void slInitProximityData(slWorld *w);
+void slInitProximityData(slWorld *);
 
-slObjectLine *slWorldAddObjectLine(slWorld *w, slWorldObject *src, slWorldObject *dst, int stipple, slVector *color);
-void slWorldRemoveConnection(slWorld *w, slObjectConnection *c);
-void slWorldAddConnection(slWorld *w, slObjectConnection *c);
+slObjectLine *slWorldAddObjectLine(slWorld *, slWorldObject *, slWorldObject *, int, slVector *);
+void slWorldRemoveConnection(slWorld *, slObjectConnection *);
+void slWorldAddConnection(slWorld *, slObjectConnection *);
 
-void slVclipDataAddPairEntry(slWorld *w, int x, int y);
+void slVclipDataAddPairEntry(slWorld *, int, int);
 
-double slWorldGetAge(slWorld *w);
-void slWorldSetAge(slWorld *w, double time);
+double slWorldGetAge(slWorld *);
+void slWorldSetAge(slWorld *, double);
 
-void slWorldSetUninitialized(slWorld *w);
-void slWorldSetCollisionResolution(slWorld *w, int n);
-void slWorldSetPhysicsMode(slWorld *w, int n);
+void slWorldSetUninitialized(slWorld *);
+void slWorldSetCollisionResolution(slWorld *, int);
+void slWorldSetPhysicsMode(slWorld *, int);
 
-void slWorldSetBackgroundColor(slWorld *w, slVector *v);
-void slWorldSetBackgroundTextureColor(slWorld *w, slVector *v);
-void slWorldSetBackgroundTexture(slWorld *w, int n, int mode);
+void slWorldSetBackgroundColor(slWorld *, slVector *);
+void slWorldSetBackgroundTextureColor(slWorld *, slVector *);
+void slWorldSetBackgroundTexture(slWorld *, int, int);
 
-void slWorldSetLightExposureDetection(slWorld *w, int n);
-void slWorldSetLightExposureSource(slWorld *w, slVector *v);
-int slWorldGetLightExposureDetection(slWorld *w);
+void slWorldSetLightExposureDetection(slWorld *, int);
+void slWorldSetLightExposureSource(slWorld *, slVector *);
+int slWorldGetLightExposureDetection(slWorld *);
 
-void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*, int t), void (*collide)(void*, void*, int t));
+void slWorldSetCollisionCallbacks(slWorld *, int (*)(void *, void *, int), void (*)(void *, void *, int));
 
-void slWorldSetQuickstepIterations(slWorld *w, int n);
+void slWorldSetQuickstepIterations(slWorld *, int);
 
-slWorldObject *slWorldGetObject(slWorld *w, unsigned int n);
+slWorldObject *slWorldGetObject(slWorld *, unsigned int);
 
-int slWorldLoadTigerFile(slWorld *w, char *f);
+int slWorldLoadTigerFile(slWorld *, char *);
 #ifdef __cplusplus
 }
 #endif

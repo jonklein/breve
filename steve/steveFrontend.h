@@ -28,29 +28,29 @@ struct stVersionRequirement {
     int operation;
 };
 
-stSteveData *stSteveInit(brEngine *engine);
+stSteveData *stSteveInit(brEngine *);
 
-int stSubclassCallback(void *c1, void *c2);
+int stSubclassCallback(void *, void *);
 
-int stLoadFiles(stSteveData *s, brEngine *engine, char *code, char *file);
-int stParseFile(stSteveData *s, brEngine *engine, char *filename);
+int stLoadFiles(stSteveData *, brEngine *, char *, char *);
+int stParseFile(stSteveData *, brEngine *, char *);
 
-int stLoadSimulation(stSteveData *sdata, brEngine *engine, char *code, char *file);
-int stLoadSavedSimulation(stSteveData *sdata, brEngine *engine, char *code, char *file, char *xmlfile);
+int stLoadSimulation(stSteveData *, brEngine *, char *, char *);
+int stLoadSavedSimulation(stSteveData *, brEngine *, char *, char *, char *);
 
-int stParseBuffer(stSteveData *s, brEngine *engine, char *buffer, char *filename);
-char *stNewStParseTrack(stSteveData *e, char *name);
-void stFreeParseTrack(stSteveData *e);
-char *stFindParseTrack(slList *l, char *name);
-stVersionRequirement *stMakeVersionRequirement(float version, int operation);
-int stCheckVersionRequirement(float version, stVersionRequirement *r);
-void stObjectAllocationReport();
-void stParseError(brEngine *e, int type, char *proto, ...);
+int stParseBuffer(stSteveData *, brEngine *, char *, char *);
+char *stNewStParseTrack(stSteveData *, char *);
+void stFreeParseTrack(stSteveData *);
+char *stFindParseTrack(slList *, char *);
+stVersionRequirement *stMakeVersionRequirement(float, int);
+int stCheckVersionRequirement(float, stVersionRequirement *);
+void stObjectAllocationReport(void);
+void stParseError(brEngine *, int, char *, ...);
 
-void stSteveCleanup(stSteveData *steveData);
+void stSteveCleanup(stSteveData *);
 
-int stPreprocess(stSteveData *steveData, brEngine *engine, char *line);
+int stPreprocess(stSteveData *, brEngine *, char *);
 
-void stFreeDefine(void *d);
+void stFreeDefine(void *);
 
-int stSetControllerName(stSteveData *steveData, brEngine *engine, char *controller);
+int stSetControllerName(stSteveData *, brEngine *, char *);

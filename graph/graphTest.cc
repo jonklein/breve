@@ -21,9 +21,9 @@
 #include "util.h"
 #include "graph.h"
 
-void slInitGlut(int argc, char **argv, char *title);
-void brGlutLoop();
-void slDemoDisplay();
+void slInitGlut(int, char **, char *);
+void brGlutLoop(void);
+void slDemoDisplay(void);
 
 slGraph *graph;
 int redLine, blueLine;

@@ -36,20 +36,20 @@ enum debugLevels {
 
 #define slDebug(format, args...)	{ slMessage(0, "Error at source file \"%s\", line %d:\n", __FILE__, __LINE__); slMessage(0, format, ##args ); }
 
-void slSetDebugLevel(int level);
+void slSetDebugLevel(int);
 
-void slDebugFunction(char *file, int line, char *text, ...);
+void slDebugFunction(char *, int, char *, ...);
 
-void slDebugMatrix(int level, double m[3][3]);
+void slDebugMatrix(int, double [3][3]);
 
-void slMessage(int level, char *format, ...);
-void slFormattedMessage(int level, char *string);
+void slMessage(int, char *, ...);
+void slFormattedMessage(int, char *);
 
-void slStderrMessageCallback(char *string);
+void slStderrMessageCallback(char *);
 
-void slFatal(char *format, ...);
-void slUtilPause();
+void slFatal(char *, ...);
+void slUtilPause(void);
 
-void slStackTrace();
+void slStackTrace(void);
 
-void slSetMessageCallbackFunction(void (f)(char *text));
+void slSetMessageCallbackFunction(void (*)(char *));

@@ -58,23 +58,23 @@ struct slsVector {
 #define slsVectorZero(a) (bzero((a), sizeof(slsVector)))
 #define slVectorZero(a) (bzero((a), sizeof(slVector)))
 
-void slVectorCross(slVector *s1, slVector *s2, slVector *d);
-double slVectorAngle(slVector *a, slVector *b);
+void slVectorCross(slVector *, slVector *, slVector *);
+double slVectorAngle(slVector *, slVector *);
 
-void slsVectorAdd(slsVector *s1, slsVector *s2, slsVector *d);
-void slsVectorSub(slsVector *s1, slsVector *s2, slsVector *d);
-void slsVectorMul(slsVector *s1, double n, slsVector *d);
-double slsVectorDot(slsVector *s1, slsVector *s2);
+void slsVectorAdd(slsVector *, slsVector *, slsVector *);
+void slsVectorSub(slsVector *, slsVector *, slsVector *);
+void slsVectorMul(slsVector *, double, slsVector *);
+double slsVectorDot(slsVector *, slsVector *);
 
-void slVectorNormalize(slVector *v);
+void slVectorNormalize(slVector *);
 
-void slVectorSet(slVector *v, double x, double y, double z);
-void slsVectorSet(slsVector *v, double x1, double y1, double z1, double x2, double y2, double z2);
+void slVectorSet(slVector *, double, double, double);
+void slsVectorSet(slsVector *, double, double, double, double, double, double);
 
-void slVectorPrint(slVector *v);
-void slsVectorPrint(slsVector *v);
+void slVectorPrint(slVector *);
+void slsVectorPrint(slsVector *);
 
-slVector *slNewVector(double x, double y, double z);
+slVector *slNewVector(double, double, double);
 
-int slVectorCompare(slVector *a, slVector *b);
-int slVectorInArray(slVector *v, slVector *a, int n);
+int slVectorCompare(slVector *, slVector *);
+int slVectorInArray(slVector *, slVector *, int);

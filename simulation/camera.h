@@ -180,39 +180,39 @@ class slCamera {
 };
 #endif
 
-void slCameraUpdateFrustum(slCamera *c);
+void slCameraUpdateFrustum(slCamera *);
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-slCamera *slCameraNew(int x, int y);
-void slUpdateCamera(slCamera *c);
+slCamera *slCameraNew(int, int);
+void slUpdateCamera(slCamera *);
 
-void slCameraResize(slCamera *c, int x, int y);
+void slCameraResize(slCamera *, int, int);
 
-void slCameraFree(slCamera *c);
+void slCameraFree(slCamera *);
 
-void slSetCameraText(slCamera *c, int n, char *string, float x, float y, slVector *v);
-void slSetShadowCatcher(slCamera *c, slStationary *s, slVector *normal);
+void slSetCameraText(slCamera *, int, char *, float, float, slVector *);
+void slSetShadowCatcher(slCamera *, slStationary *, slVector *);
 
-void slAddBillboard(slCamera *c, slWorldObject *object, float size, float z);
+void slAddBillboard(slCamera *, slWorldObject *, float, float);
 
-void slSortBillboards(slCamera *c);
+void slSortBillboards(slCamera *);
 
-int slBillboardSortFunc(const void *a, const void *b);
+int slBillboardSortFunc(const void *, const void *);
 
-void slRotateCameraWithMouseMovement(slCamera *c, double dx, double dy, double scamx);
-void slMoveCameraWithMouseMovement(slCamera *c, double dx, double dy);
-void slZoomCameraWithMouseMovement(slCamera *c, double dx, double dy);
+void slRotateCameraWithMouseMovement(slCamera *, double, double, double);
+void slMoveCameraWithMouseMovement(slCamera *, double, double);
+void slZoomCameraWithMouseMovement(slCamera *, double, double);
 
-void slCameraSetBounds(slCamera *c, unsigned int x, unsigned int y);
-void slCameraGetBounds(slCamera *c, unsigned int *x, unsigned int *y);
+void slCameraSetBounds(slCamera *, unsigned int, unsigned int);
+void slCameraGetBounds(slCamera *, unsigned int *, unsigned int *);
 
-void slCameraGetRotation(slCamera *c, double *x, double *y);
+void slCameraGetRotation(slCamera *, double *, double *);
 
-void slCameraSetRecompile(slCamera *c);
+void slCameraSetRecompile(slCamera *);
 
-void slCameraSetActivateContextCallback(slCamera *c, int (*f)());
+void slCameraSetActivateContextCallback(slCamera *, int (*)(void));
 #ifdef __cplusplus
 }
 #endif

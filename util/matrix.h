@@ -65,24 +65,24 @@ typedef double slMatrix[3][3];
      (d)[1][0] = (m)[1][0] - (n)[1][0], (d)[1][1] = (m)[1][1] - (n)[1][1], (d)[1][2] = (m)[1][2] - (n)[1][2], \
      (d)[2][0] = (m)[2][0] - (n)[2][0], (d)[2][1] = (m)[2][1] - (n)[2][1], (d)[2][2] = (m)[2][2] - (n)[2][2])
 
-void slMatrixMulScalar(double m1[3][3], double n, double d[3][3]);
+void slMatrixMulScalar(double [3][3], double, double [3][3]);
 
-void slMatrixTranspose(slMatrix m, slMatrix t);
+void slMatrixTranspose(slMatrix, slMatrix);
 
-void slSkewSymmetric(slVector *v, double m[3][3]);
+void slSkewSymmetric(slVector *, double [3][3]);
 
-void slDetermanant(double m[3][3]);
+void slDetermanant(double [3][3]);
 
-int slMatrixInvert(double m[3][3], double d[3][3]);
+int slMatrixInvert(double [3][3], double [3][3]);
 
-void slMatrixPrint(double m[3][3]);
+void slMatrixPrint(double [3][3]);
 
-void slRotationMatrix(slVector *v, double angle, double m[3][3]);
+void slRotationMatrix(slVector *, double, double [3][3]);
 
-void slMatrixVectorSet(double m[3][3], slVector *diag, slVector *sym);
+void slMatrixVectorSet(double [3][3], slVector *, slVector *);
 
-int slMatrixCompare(double x[3][3], double y[3][3]);
+int slMatrixCompare(double [3][3], double [3][3]);
 
-double slDetermanent(double m[3][3]);
+double slDetermanent(double [3][3]);
 
-void slMatrixToQuat(double mat[3][3], slQuat *q);
+void slMatrixToQuat(double [3][3], slQuat *);

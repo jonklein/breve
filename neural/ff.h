@@ -36,16 +36,16 @@ struct snFFLayer {
     snFFLayer *input;
 };
 
-snFFLayer *snNewLayer(int count, snFFLayer *previous);
-void snFreeNetwork(snFFLayer *previous);
+snFFLayer *snNewLayer(int, snFFLayer *);
+void snFreeNetwork(snFFLayer *);
 
-void snFeedForward(snFFLayer *output);
+void snFeedForward(snFFLayer *);
 
-double snFFActivation(double input);
-double snFFActivationDelta(double input);
+double snFFActivation(double);
+double snFFActivationDelta(double);
 
-double snBackProp(snFFLayer *output, double *desiredOutputs);
+double snBackProp(snFFLayer *, double *);
 
-void snRandomizeNetworkWeights(snFFLayer *output, int n);
+void snRandomizeNetworkWeights(snFFLayer *, int);
 
-void snPrintWeights(snFFLayer *out);
+void snPrintWeights(snFFLayer *);

@@ -81,7 +81,7 @@ void brEvalHashFree(brEvalHash *h) {
 void brEvalHashStore(brEvalHash *h, brEval *key, brEval *value, brEval *oldValue) {
 	brEval *v, *k;
 
-	v = slDehashDataAndKey(h->table, key, (void**)&k);
+	v = (brEval *)slDehashDataAndKey(h->table, key, (void**)&k);
 
 	if(!v) {
 		v = new brEval;

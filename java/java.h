@@ -76,34 +76,34 @@ struct brJavaBridgeData {
 	JNIEnv *env;
 };
 
-brJavaInstance *brJavaBootstrapMethodFinder(brJavaObject *object);
+brJavaInstance *brJavaBootstrapMethodFinder(brJavaObject *);
 
-brJavaMethod *brJavaMethodFind(brJavaBridgeData *bridge, brJavaObject *object, char *name, unsigned char *types, int nargs);
+brJavaMethod *brJavaMethodFind(brJavaBridgeData *, brJavaObject *, char *, unsigned char *, int);
 
 void brFreeJavaClassData(brJavaObject *data);
 void brFreeJavaBridgeData(brJavaBridgeData *data);
 void brFreeJavaMethodData(brJavaMethod *data);
 
-brJavaInstance *brJavaInstanceNew(brJavaObject *o, brEval **args, int argCount);
+brJavaInstance *brJavaInstanceNew(brJavaObject *, brEval **, int);
 
-int brJavaCallMethod(brInstance *i, brMethod *m, brEval **args, brEval *result);
+int brJavaCallMethod(brInstance *, brMethod *, brEval **, brEval *);
 
-brJavaBridgeData *brAttachJavaVM(brEngine *e);
-void brDetachJavaVM(brJavaBridgeData *bridge);
+brJavaBridgeData *brAttachJavaVM(brEngine *);
+void brDetachJavaVM(brJavaBridgeData *);
 
-void brInitJavaFuncs(brNamespace *n);
+void brInitJavaFuncs(brNamespace *);
 
-brJavaMethod *brJavaMakeMethod(brJavaBridgeData *bridge, brJavaObject *object, char *name, unsigned char *types, int nargs);
-brJavaMethod *brJavaMakeMethodData(char *name, jmethodID method, char returnType, char *argumentTypes, int nargs);
+brJavaMethod *brJavaMakeMethod(brJavaBridgeData *, brJavaObject *, char *, unsigned char *, int);
+brJavaMethod *brJavaMakeMethodData(char *, jmethodID, char, char *, int);
 
-int brEvalToJValue(brJavaBridgeData *bridge, brEval *e, jvalue *v, char javaType);
+int brEvalToJValue(brJavaBridgeData *, brEval *, jvalue *, char);
 
 brJavaObject *brJavaObjectFind(brJavaBridgeData *bridge, char *name);
 
-char *brReadJavaString(brJavaBridgeData *bridge, jstring string);
-jstring brMakeJavaString(brJavaBridgeData *bridge, char *string);
+char *brReadJavaString(brJavaBridgeData *, jstring);
+jstring brMakeJavaString(brJavaBridgeData *, char *);
 
-brInstance *brJavaObjectWrapper(brEngine *e, jobject object);
+brInstance *brJavaObjectWrapper(brEngine *, jobject);
 
-char brJTypeForType(unsigned char breve_type);
+char brJTypeForType(unsigned char);
 #endif

@@ -31,12 +31,12 @@ struct slQuat {
     double s;
 };
 
-slQuat *slAngularVelocityToDeriv(slVector *av, slQuat *rot, slQuat *deriv);
+slQuat *slAngularVelocityToDeriv(slVector *, slQuat *, slQuat *);
 
-void slQuatToMatrix(slQuat *q, double m[3][3]);
-slQuat *slQuatIdentity(slQuat *q);
-slQuat *slQuatNormalize(slQuat *q);
+void slQuatToMatrix(slQuat *, double [3][3]);
+slQuat *slQuatIdentity(slQuat *);
+slQuat *slQuatNormalize(slQuat *);
 
-slQuat *slQuatSet(slQuat *q, double s, double x, double y, double z);
+slQuat *slQuatSet(slQuat *, double, double, double, double);
 
-slQuat *slQuatSetFromAngle(slQuat *q, double angle, slVector *v);
+slQuat *slQuatSetFromAngle(slQuat *, double, slVector *);

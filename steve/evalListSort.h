@@ -18,6 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-int stSortEvalList(brEvalListHead *head, stInstance *caller, stMethod *method);
-int brEvalListCompare(const void *a, const void *b);
-void brEvalListFreeSortVars();
+int stSortEvalList(brEvalListHead *, stInstance *, stMethod *);
+int brEvalListCompare(const void *, const void *);
+void brEvalListFreeSortVars(void);

@@ -1369,14 +1369,14 @@ inline int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, brEv
 
 		stGCUnretainAndCollect(&old);
 	} else if(list.type == AT_STRING) {
-		char **stringptr, *newstring, *oldstring, *substring;
+		char *stringptr, *newstring, *oldstring, *substring;
 		int n, type;
 
 		n = BRINT(&index);
 
-		resultCode = stPointerForExp(l->listExp, i, &stringptr, &type);
+		resultCode = stPointerForExp(l->listExp, i, (void *)&stringptr, &type);
 
-		oldstring = *stringptr;
+		oldstring = stringptr;
 
 		if(!oldstring || n < 0 || n > strlen(oldstring) + 1) {
 			stEvalError(i->instance->type->engine, EE_BOUNDS, "string index \"%d\" out of bounds", BRINT(&index));
@@ -1398,8 +1398,8 @@ inline int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, brEv
 		if(n != strlen(oldstring) + 1) 
 			strcpy(&newstring[n + strlen(substring)], &oldstring[n + 1]);
 
-		if(*stringptr) slFree(*stringptr);
-		*stringptr = newstring;
+		if(stringptr) slFree(stringptr);
+		stringptr = newstring;
 
 		BRSTRING(t) = slStrdup(newstring);
 	} else {
@@ -1479,7 +1479,7 @@ inline int stEvalVectorElementAssignExp(stVectorElementAssignExp *s, stRunInstan
 	slVector *vector;
 	int type;
 
-	resultCode = stPointerForExp(s->exp, i, (void*)&vector, &type);
+	resultCode = stPointerForExp(s->exp, i, (void *)&vector, &type);
 
 	if(resultCode != EC_OK) return EC_ERROR;
 

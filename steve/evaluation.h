@@ -47,93 +47,91 @@ struct stStackRecord {
 	slStack *gcStack;
 };
 
-__inline__ int stEvalFree(stExp *e, stRunInstance *i, brEval *t);
-__inline__ int stEvalArray(slArray *l, stRunInstance *i, brEval *target);
-__inline__ int stEvalMethodCall(stMethodExp *m, stRunInstance *i, brEval *t);
-__inline__ int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *caller, stRunInstance *i, brEval *t);
-int stEvalForeignMethodCall(stMethodExp *mexp, brInstance *caller, stRunInstance *i, brEval *t);
+__inline__ int stEvalFree(stExp *, stRunInstance *, brEval *);
+__inline__ int stEvalArray(slArray *, stRunInstance *, brEval *);
+__inline__ int stEvalMethodCall(stMethodExp *, stRunInstance *, brEval *);
+__inline__ int stRealEvalMethodCall(stMethodExp *, stRunInstance *, stRunInstance *, brEval *);
+int stEvalForeignMethodCall(stMethodExp *, brInstance *, stRunInstance *, brEval *);
 
+__inline__ int stEvalCallFunc(stCCallExp *, stRunInstance *, brEval *);
 
-__inline__ int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *target);
+__inline__ int stEvalAssignment(stAssignExp *, stRunInstance *, brEval *);
 
-__inline__ int stEvalAssignment(stAssignExp *e, stRunInstance *i, brEval *rvalue);
+__inline__ int stEvalListExp(slList *, stRunInstance *, brEval *);
 
-__inline__ int stEvalListExp(slList *l, stRunInstance *i, brEval *rvalue);
+__inline__ int stPointerForExp(stExp *, stRunInstance *, void **, int *);
+__inline__ int stEvalLoadPointer(stLoadExp *, stRunInstance *, void **, int *);
+__inline__ int stEvalArrayIndexPointer(stArrayIndexExp *, stRunInstance *, void **, int *);
 
-__inline__ int stPointerForExp(stExp *expression, stRunInstance *i, void **pointer, int *type);
-__inline__ int stEvalLoadPointer(stLoadExp *e, stRunInstance *i, void **pointer, int *type);
-__inline__ int stEvalArrayIndexPointer(stArrayIndexExp *a, stRunInstance *i, void **pointer, int *type);
+int stEvalLoad(stLoadExp *, stRunInstance *, brEval *);
 
-int stEvalLoad(stLoadExp *e, stRunInstance *i, brEval *target);
+__inline__ int stEvalArrayIndexAssign(stArrayIndexAssignExp *, stRunInstance *, brEval *);
+__inline__ int stEvalArrayIndex(stArrayIndexExp *, stRunInstance *, brEval *);
 
-__inline__ int stEvalArrayIndexAssign(stArrayIndexAssignExp *e, stRunInstance *i, brEval *target);
-__inline__ int stEvalArrayIndex(stArrayIndexExp *e, stRunInstance *i, brEval *target);
+__inline__ int stEvalPrint(stPrintExp *, stRunInstance *, brEval *);
+__inline__ int stEvalRandExp(stExp *, stRunInstance *, brEval *);
 
-__inline__ int stEvalPrint(stPrintExp *printExp, stRunInstance *i, brEval *target);
-__inline__ int stEvalRandExp(stExp *e, stRunInstance *i, brEval *target);
+__inline__ int stToDouble(brEval *, brEval *, stRunInstance *);
+__inline__ int stToInt(brEval *, brEval *, stRunInstance *);
+__inline__ int stToType(brEval *, int, brEval *, stRunInstance *);
 
-__inline__ int stToDouble(brEval *e, brEval *t, stRunInstance *i);
-__inline__ int stToInt(brEval *e, brEval *t, stRunInstance *i);
-__inline__ int stToType(brEval *e, int type, brEval *t, stRunInstance *i);
+__inline__ int stEvalVectorExp(stVectorExp *, stRunInstance *, brEval *);
+__inline__ int stEvalMatrixExp(stMatrixExp *, stRunInstance *, brEval *);
+__inline__ int stEvalBinaryExp(stBinaryExp *, stRunInstance *, brEval *);
+__inline__ int stEvalBinaryExpWithEvals(stRunInstance *, unsigned char, brEval *, brEval *, brEval *);
 
-__inline__ int stEvalVectorExp(stVectorExp *s, stRunInstance *i, brEval *target);
-__inline__ int stEvalMatrixExp(stMatrixExp *s, stRunInstance *i, brEval *target);
-__inline__ int stEvalBinaryExp(stBinaryExp *b, stRunInstance *i, brEval *target);
-__inline__ int stEvalBinaryExpWithEvals(stRunInstance *i, unsigned char op, brEval *tr, brEval *tl, brEval *target);
+__inline__ int stEvalUnaryExp(stUnaryExp *, stRunInstance *, brEval *);
 
-__inline__ int stEvalUnaryExp(stUnaryExp *b, stRunInstance *i, brEval *target);
+__inline__ int stEvalBinaryStringExp(char, brEval *, brEval *, brEval *, stRunInstance *);
+__inline__ int stEvalBinaryVectorExp(char, brEval *, brEval *, brEval *, stRunInstance *);
+__inline__ int stEvalBinaryMatrixExp(char, brEval *, brEval *, brEval *, stRunInstance *);
+__inline__ int stEvalBinaryDoubleExp(char, brEval *, brEval *, brEval *, stRunInstance *);
+__inline__ int stEvalBinaryIntExp(char, brEval *, brEval *, brEval *, stRunInstance *);
 
-__inline__ int stEvalBinaryStringExp(char op, brEval *l, brEval *r, brEval *t, stRunInstance *i);
-__inline__ int stEvalBinaryVectorExp(char op, brEval *l, brEval *r, brEval *t, stRunInstance *i);
-__inline__ int stEvalBinaryMatrixExp(char op, brEval *l, brEval *r, brEval *t, stRunInstance *i);
-__inline__ int stEvalBinaryDoubleExp(char op, brEval *l, brEval *r, brEval *t, stRunInstance *i);
-__inline__ int stEvalBinaryIntExp(char op, brEval *l, brEval *r, brEval *t, stRunInstance *i);
+__inline__ int stEvalNewInstance(stInstanceExp *, stRunInstance *, brEval *);
 
-__inline__ int stEvalNewInstance(stInstanceExp *name, stRunInstance *i, brEval *t);
+__inline__ int stEvalVectorElementExp(stVectorElementExp *, stRunInstance *, brEval *);
+__inline__ int stEvalVectorElementAssignExp(stVectorElementAssignExp *, stRunInstance *, brEval *);
 
-__inline__ int stEvalVectorElementExp(stVectorElementExp *s, stRunInstance *i, brEval *t);
-__inline__ int stEvalVectorElementAssignExp(stVectorElementAssignExp *s, stRunInstance *i, brEval *target);
+__inline__ int stEvalWhile(stWhileExp *, stRunInstance *, brEval *);
+__inline__ int stEvalForeach(stForeachExp *, stRunInstance *, brEval *);
+__inline__ int stEvalFor(stForExp *, stRunInstance *, brEval *);
+__inline__ int stEvalIf(stIfExp *, stRunInstance *, brEval *);
 
-__inline__ int stEvalWhile(stWhileExp *w, stRunInstance *i, brEval *target);
-__inline__ int stEvalForeach(stForeachExp *w, stRunInstance *i, brEval *target);
-__inline__ int stEvalFor(stForExp *w, stRunInstance *i, brEval *target);
-__inline__ int stEvalIf(stIfExp *w, stRunInstance *i, brEval *target);
+__inline__ int stEvalListInsert(stListInsertExp *, stRunInstance *, brEval *);
+__inline__ int stEvalListRemove(stListRemoveExp *, stRunInstance *, brEval *);
+__inline__ int stEvalSort(stSortExp *, stRunInstance *, brEval *);
+__inline__ int stEvalListIndex(stListIndexExp *, stRunInstance *, brEval *);
+__inline__ int stEvalListIndexPointer(stListIndexExp *, stRunInstance *, void **, int *);
+__inline__ int stEvalListIndexAssign(stListIndexAssignExp *, stRunInstance *, brEval *);
 
-__inline__ int stEvalListInsert(stListInsertExp *w, stRunInstance *i, brEval *target);
-__inline__ int stEvalListRemove(stListRemoveExp *l, stRunInstance *i, brEval *target);
-__inline__ int stEvalSort(stSortExp *w, stRunInstance *i, brEval *target);
-__inline__ int stEvalListIndex(stListIndexExp *l, stRunInstance *i, brEval *t);
-__inline__ int stEvalListIndexPointer(stListIndexExp *l, stRunInstance *i, void **pointer, int *type);
-__inline__ int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, brEval *t);
+int stCallMethodByNameWithArgs(stRunInstance *, char *, brEval **, int, brEval *);
+int stCallMethodByName(stRunInstance *, char *, brEval *);
+__inline__ int stCallMethod(stRunInstance *, stRunInstance *, stMethod *, brEval **, int, brEval *);
 
-int stCallMethodByNameWithArgs(stRunInstance *newI, char *name, brEval **args, int argCount, brEval *result);
-int stCallMethodByName(stRunInstance *newI, char *name, brEval *result);
-__inline__ int stCallMethod(stRunInstance *old, stRunInstance *newI, stMethod *method, brEval **args, int count, brEval *result);
+int stLoadVariable(void *, unsigned char, brEval *, stRunInstance *);
+int stSetVariable(void *, unsigned char, stObject *, brEval *, stRunInstance *);
 
-int stLoadVariable(void *variable, unsigned char type, brEval *e, stRunInstance *i);
-int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e, stRunInstance *i);
+int stStackTraceFrame(stStackRecord *);
+void stStackTrace(stSteveData *);
 
-int stStackTraceFrame(stStackRecord *r);
-void stStackTrace(stSteveData *r);
+int stGC(brEval *);
 
-int stGC(brEval *e);
+__inline__ int stEvalTruth(brEval *, brEval *, stRunInstance *);
 
-__inline__ int stEvalTruth(brEval *e, brEval *t, stRunInstance *i);
+int stPrintEvaluation(brEval *, stRunInstance *);
 
-int stPrintEvaluation(brEval *e, stRunInstance *i);
+int stEvalBinaryEvalListExp(char, brEval *, brEval *, brEval *, stRunInstance *);
+brEvalList *stEvalListIndexLookup(brEvalListHead *, int);
 
-int stEvalBinaryEvalListExp(char op, brEval *l, brEval *r, brEval *target, stRunInstance *i);
-brEvalList *stEvalListIndexLookup(brEvalListHead *l, int index);
+int stExpEval(stExp *, stRunInstance *, brEval *, stObject **);
 
-int stExpEval(stExp *s, stRunInstance *i, brEval *target, stObject **tclass);
+void stConvertBreveInstanceToSteveInstance(brEval *);
 
-void stConvertBreveInstanceToSteveInstance(brEval *e);
+int stDoEvalListIndexAssign(brEvalListHead *, int, brEval *, stRunInstance *);
 
-int stDoEvalListIndexAssign(brEvalListHead *l, int n, brEval *newVal, stRunInstance *ri);
+void stEvalError(brEngine *, int, char *, ...);
 
-void stEvalError(brEngine *e, int type, char *proto, ...);
+void stConvertSteveInstanceToBreveInstance(brEval *);
 
-void stConvertSteveInstanceToBreveInstance(brEval *e);
-
-void stEvalWarn(stExp *exp, char *proto, ...);
-
+void stEvalWarn(stExp *, char *, ...);

@@ -293,83 +293,83 @@ enum versionRequiermentOperators {
 extern "C" {
 #endif
 
-void brEngineLock(brEngine *e);
-void brEngineUnlock(brEngine *e);
+void brEngineLock(brEngine *);
+void brEngineUnlock(brEngine *);
 
-brEvent *brEngineAddEvent(brEngine *e, brInstance *i, char *name, double time);
-void brEventFree(brEvent *e);
+brEvent *brEngineAddEvent(brEngine *, brInstance *, char *, double);
+void brEventFree(brEvent *);
 
-int brEngineSetController(brEngine *e, brInstance *controller);
-brInstance *brEngineGetController(brEngine *e);
+int brEngineSetController(brEngine *, brInstance *);
+brInstance *brEngineGetController(brEngine *);
 
-slStack *brEngineGetAllInstances(brEngine *e);
+slStack *brEngineGetAllInstances(brEngine *);
 
-int brEngineIterate(brEngine *e);
+int brEngineIterate(brEngine *);
 
-void brEngineSetIOPath(brEngine *e, char *path);
-char *brOutputPath(brEngine *e, char *filename);
+void brEngineSetIOPath(brEngine *, char *);
+char *brOutputPath(brEngine *, char *);
 
-brEngine *brEngineNew();
-void brMakeiTunesData(brEngine *e);
-void brEngineFree(brEngine *e);
+brEngine *brEngineNew(void);
+void brMakeiTunesData(brEngine *);
+void brEngineFree(brEngine *);
 
-void brPauseTimer(brEngine *e);
-void brUnpauseTimer(brEngine *e);
+void brPauseTimer(brEngine *);
+void brUnpauseTimer(brEngine *);
 
-void brAddToInstanceLists(brInstance *i);
-void brRemoveFromInstanceLists(brInstance *i);
+void brAddToInstanceLists(brInstance *);
+void brRemoveFromInstanceLists(brInstance *);
 
-int brFileLogWrite(void *m, const char *buffer, int length);
+int brFileLogWrite(void *, const char *, int);
 
-void brAddSearchPath(brEngine *e, char *name);
-char *brFindFile(brEngine *e, char *file, struct stat *st);
-void brFreeSearchPath(brEngine *e);
+void brAddSearchPath(brEngine *, char *);
+char *brFindFile(brEngine *, char *, struct stat *);
+void brFreeSearchPath(brEngine *);
 
-brMenuEntry *brAddMenuItem(brInstance *i, char *name, char *title);
-brMenuEntry *brAddContextualMenuItem(brObject *o, char *method, char *title);
+brMenuEntry *brAddMenuItem(brInstance *, char *, char *);
+brMenuEntry *brAddContextualMenuItem(brObject *, char *, char *);
 
-void stSetParseEngine(brEngine *e);
+void stSetParseEngine(brEngine *);
 
-void stSetParseString(char *string, int length);
+void stSetParseString(char *, int);
 
-void brPrintVersion();
+void brPrintVersion(void);
 
-void brFreeObjectSpace(brNamespace *ns);
-void brEngineFreeObjects(brEngine *e);
+void brFreeObjectSpace(brNamespace *);
+void brEngineFreeObjects(brEngine *);
 
-void brEngineRenderWorld(brEngine *e, int crosshair);
+void brEngineRenderWorld(brEngine *, int);
 
-brInternalFunction *brEngineInternalFunctionLookup(brEngine *e, char *name);
+brInternalFunction *brEngineInternalFunctionLookup(brEngine *, char *);
 
-void brEvalError(brEngine *e, int type, char *proto, ...);
+void brEvalError(brEngine *, int, char *, ...);
 
-void brClearError(brEngine *e);
-int brGetError(brEngine *e);
+void brClearError(brEngine *);
+int brGetError(brEngine *);
 
-int brEngineSetInterface(brEngine *e, char *name);
+int brEngineSetInterface(brEngine *, char *);
 
-brErrorInfo *brEngineGetErrorInfo(brEngine *e);
+brErrorInfo *brEngineGetErrorInfo(brEngine *);
 
-char *brEngineGetPath(brEngine *e);
+char *brEngineGetPath(brEngine *);
 
-brNamespace *brEngineGetInternalMethods(brEngine *e);
+brNamespace *brEngineGetInternalMethods(brEngine *);
 
-int brEngineGetDrawEveryFrame(brEngine *e);
+int brEngineGetDrawEveryFrame(brEngine *);
 
-void brEngineSetSoundCallback(brEngine *e, int (*callback)());
-void brEngineSetDialogCallback(brEngine *e, int (*callback)(char *, char *, char *, char *));
+void brEngineSetSoundCallback(brEngine *, int (*)(void));
+void brEngineSetDialogCallback(brEngine *, int (*)(char *, char *, char *, char *));
 
-void brEngineSetPauseCallback(brEngine *e, int (*callback)());
-void brEngineSetGetLoadnameCallback(brEngine *e, char *(*callback)());
-void brEngineSetGetSavenameCallback(brEngine *e, char *(*callback)());
+void brEngineSetPauseCallback(brEngine *, int (*)(void));
+void brEngineSetGetLoadnameCallback(brEngine *, char *(*)(void));
+void brEngineSetGetSavenameCallback(brEngine *, char *(*)(void));
 
-void brEngineSetInterfaceInterfaceTypeCallback(brEngine *e, char *(*interfaceTypeCallback)());
-void brEngineSetInterfaceSetStringCallback(brEngine *e, int (*interfaceSetStringCallback)(char *string, int number));
-void brEngineSetInterfaceSetNibCallback(brEngine *e, void (*interfaceSetCallback)(char *file));
-void brEngineSetUpdateMenuCallback(brEngine *e, void (*updateMenu)(brInstance *l));
+void brEngineSetInterfaceInterfaceTypeCallback(brEngine *, char *(*)(void));
+void brEngineSetInterfaceSetStringCallback(brEngine *, int (*)(char *, int));
+void brEngineSetInterfaceSetNibCallback(brEngine *, void (*)(char *));
+void brEngineSetUpdateMenuCallback(brEngine *, void (*)(brInstance *));
 
-slCamera *brEngineGetCamera(brEngine *e);
-slWorld *brEngineGetWorld(brEngine *e);
+slCamera *brEngineGetCamera(brEngine *);
+slWorld *brEngineGetWorld(brEngine *);
 
 #ifdef __cplusplus
 }
