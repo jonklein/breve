@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os AUDIOLIBS CC CXX RANLIB GLLIBS JAVALIBS JAVAINCS PLUGINFLAGS QUICKTIMEFLAGS EXTRALDFLAGS LDFLAGS CPPFLAGS YACC CXXFLAGS ac_ct_CXX EXEEXT OBJEXT CFLAGS ac_ct_CC LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE ac_ct_RANLIB ALLOCA CPP EGREP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os AUDIOLIBS CC CXX RANLIB GLLIBS JAVALIBS JAVAINCS PLUGINFLAGS QUICKTIMEFLAGS EXTRALDFLAGS LDFLAGS CPPFLAGS ARCHIVER ARCHIVE_SUFFIX PLATFORM YACC CXXFLAGS ac_ct_CXX EXEEXT OBJEXT CFLAGS ac_ct_CC LEX LEXLIB LEX_OUTPUT_ROOT SET_MAKE ac_ct_RANLIB ALLOCA CPP EGREP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1376,6 +1376,8 @@ cat >>confdefs.h <<\_ACEOF
 #define MACOSX
 _ACEOF
 
+		ARCHIVER="tar zcvf"
+		ARCHIVER_SUFFIX="tar.gz"
 
 		;;
 
@@ -1389,6 +1391,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E"
+		ARCHIVER="tar zcvf"
+		ARCHIVER_SUFFIX="tar.gz"
 
 		;;
 
@@ -1409,6 +1413,8 @@ _ACEOF
 
 		AUDIOLIBS="-lwinmm"
 		PTHREADLIBS="-lwsock32"
+		ARCHIVER="zip -r"
+		ARCHIVER_SUFFIX="zip"
 
 		;;
 
@@ -1426,6 +1432,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 		AUDIOLIBS="-lwinmm"
+		ARCHIVER="zip -r"
+		ARCHIVER_SUFFIX="zip"
 
 		;;
 
@@ -1433,6 +1441,12 @@ _ACEOF
 
 		;;
 esac
+
+PLATFORM=$host_cpu
+
+
+
+
 
 
 
@@ -6657,6 +6671,9 @@ s,@QUICKTIMEFLAGS@,$QUICKTIMEFLAGS,;t t
 s,@EXTRALDFLAGS@,$EXTRALDFLAGS,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t
 s,@CPPFLAGS@,$CPPFLAGS,;t t
+s,@ARCHIVER@,$ARCHIVER,;t t
+s,@ARCHIVE_SUFFIX@,$ARCHIVE_SUFFIX,;t t
+s,@PLATFORM@,$PLATFORM,;t t
 s,@YACC@,$YACC,;t t
 s,@CXXFLAGS@,$CXXFLAGS,;t t
 s,@ac_ct_CXX@,$ac_ct_CXX,;t t

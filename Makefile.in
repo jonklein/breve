@@ -13,7 +13,7 @@ CFLAGS		=-g -Wall -Winline @DEFS@
 CC			= @CC@
 RANLIB		= @RANLIB@
 
-PLATFORM	= $(shell uname)
+PLATFORM	= @PLATFORM@
 LPLATFORM	= $(shell echo ${PLATFORM} | tr '[A-Z]' '[a-z]')
 
 export
@@ -90,6 +90,7 @@ OSX_release: OSX_clean documentation OSX_build
 	rm -rf breve_image_folder
 
 CLI_release:
+	echo @PLATFORM@
 	make -f Makefile clean
 	rm -rf breve_$(LPLATFORM)
 	mkdir breve_$(LPLATFORM)
@@ -107,6 +108,7 @@ CLI_release:
 	cp README.txt breve_$(LPLATFORM)/
 	cp Changes.html breve_$(LPLATFORM)/
 	find breve_$(LPLATFORM) -name CVS -prune -exec rm -rf {} \;
+	@ARCHIVER@ breve_$(LPLATFORM).@ARCHIVE_SUFFIX breve_$(LPLATFORM)
 
 plugin_API:
 	-rm -rf breve_plugin_API

@@ -18,6 +18,8 @@ case "${host_os}" in
 		PLUGINFLAGS="-bundle -undefined suppress -flat_namespace"
 		QUICKTIMEFLAGS="-framework QuickTime -framework Carbon"
 		AC_DEFINE([MACOSX], [], [Mac OS X])
+		ARCHIVER="tar zcvf"
+		ARCHIVER_SUFFIX="tar.gz"
 
 		;;
 
@@ -28,6 +30,8 @@ case "${host_os}" in
 		PLUGINFLAGS="-shared"
 		AC_DEFINE([LINUX], [], [Linux])
 		LDFLAGS="${LDFLAGS} -rdynamic -Xlinker -E"
+		ARCHIVER="tar zcvf"
+		ARCHIVER_SUFFIX="tar.gz"
 
 		;;
 
@@ -41,6 +45,8 @@ case "${host_os}" in
 		AC_DEFINE([WINDOWS], [], [Windows])
 		AUDIOLIBS="-lwinmm"
 		PTHREADLIBS="-lwsock32"
+		ARCHIVER="zip -r"
+		ARCHIVER_SUFFIX="zip"
 
 		;;
 
@@ -51,6 +57,8 @@ case "${host_os}" in
 		AC_DEFINE([CYGWIN], [], [Cygwin])
 		AC_DEFINE([WINDOWS], [], [Windows])
 		AUDIOLIBS="-lwinmm"
+		ARCHIVER="zip -r"
+		ARCHIVER_SUFFIX="zip"
 
 		;;
 
@@ -59,6 +67,8 @@ case "${host_os}" in
 
 		;;
 esac
+
+PLATFORM=$host_cpu
 
 AC_SUBST(AUDIOLIBS)
 AC_SUBST(CC)
@@ -72,6 +82,10 @@ AC_SUBST(QUICKTIMEFLAGS)
 AC_SUBST(EXTRALDFLAGS)
 AC_SUBST(LDFLAGS)
 AC_SUBST(CPPFLAGS)
+
+AC_SUBST(ARCHIVER)
+AC_SUBST(ARCHIVE_SUFFIX)
+AC_SUBST(PLATFORM)
 
 # Checks for programs.
 AC_PROG_YACC
