@@ -5,8 +5,8 @@
 # s pi der la nd
 #
 
-INCLUDE += -I../include/breve
-LIBS	+= -L../lib -L. -lbrutil -lz
+INCLUDE += @CPPFLAGS@ -I../include/breve
+LIBS	+= @LDFLAGS@ -L../lib -L. -lbrutil -lz
 
 CFILES	= graph.c draw.c
 OFILES	= graph.o draw.o

@@ -20,5 +20,5 @@ clean:
 	$(CC) $(CFLAGS) -c $*.c $(INCLUDE) @JAVAINCS@
 
 MethodFinder.jar: MethodFinder.java
-	-javac *.java
-	-jar cf MethodFinder.jar *.class
+	-@JAVAC@ *.java
+	-@JAR@ cf MethodFinder.jar *.class
