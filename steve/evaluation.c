@@ -78,7 +78,8 @@ char *slAtomicTypeStrings[] = {
 
 stRtcCodeBlock *stNewRtcBlock()
 {
-	stRtcCodeBlock	*block = (stRtcCodeBlock *)malloc(sizeof(CODE_BLOCK_SIZE));
+	// stRtcCodeBlock	*block = (stRtcCodeBlock *)malloc(sizeof(CODE_BLOCK_SIZE));
+	stRtcCodeBlock	*block = (stRtcCodeBlock *)malloc(CODE_BLOCK_SIZE);
 	
 	block->length	= CODE_BLOCK_SIZE;
 	block->ptr		= block->code;

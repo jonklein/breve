@@ -357,6 +357,8 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 		(*li)->step(stepSize);
 
 	if(w->detectCollisions) {
+		if(!w->initialized) slVclipDataInit(w);
+
 		result = slVclip(w->clipData, 0.0, 0, w->boundingBoxOnly);
 
 		if(result == -1) {
