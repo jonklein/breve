@@ -381,7 +381,8 @@ int brIMatrix3DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
                 else if (zp >= (int)zDim)
                     zp -= zDim;
     
-                newVal = scale * ((-6.0f * chemData[(z * chemXY) + (x * chemTDA) + y]) +
+                newVal = scale * (
+                (-6.0f * chemData[(z * chemXY) + (x * chemTDA) + y]) +
                     chemData[(z * chemXY) + (xm * chemTDA) + y] +
                     chemData[(z * chemXY) + (xp * chemTDA) + y] + 
                     chemData[(z * chemXY) + (x * chemTDA) + ym] +
