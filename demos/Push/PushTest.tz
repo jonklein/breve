@@ -45,7 +45,7 @@ Object : myPushAgent (aka myPushAgents) {
 		print "Discrepancy", (code get-discrepancy from code2).
 		print "Top level diff", (code get-top-level-difference from code2).
 
-		interpreter run code code.
+		interpreter run program code.
 
 		interpreter print-stacks.
 		interpreter print-config.
