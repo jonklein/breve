@@ -118,8 +118,13 @@ bool BCTestApp::OnInit()
 
 	    while (!str.IsEmpty())
 	    {
+#ifdef __WXMSW__
+		xstr = str.BeforeFirst(';');
+		str = str.AfterFirst(';');
+#else
 		xstr = str.BeforeFirst(':');
 		str = str.AfterFirst(':');
+#endif
 
 		if (xstr.Last() != FILE_SEP_PATH)
 		    xstr << FILE_SEP_PATH;
