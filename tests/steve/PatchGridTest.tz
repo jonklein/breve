@@ -3,9 +3,12 @@
 @use PatchToroid.
 @use PatchChemical.
 
-@define SIZE 32.
-@define DIFFUSION_RATE .3.
-@define DECAY_RATE .1.
+@define SIZE 10.
+@define DIFFUSION_RATE .09.
+@define DECAY_RATE 0.01.
+@define EXP_INFLOW 200.
+@define LIN_INFLOW 200.
+@define INFLOW_END_TIME 10.
 
 Controller PatchGridTestControl.
 
@@ -15,9 +18,10 @@ Control : PatchGridTestControl {
 		grid (object).
 		expChem (object).
         linChem (object).
-        obj (object).
+
         
 	+ to init:
+        obj (object).
         grid = ((new PatchToroid) init-with with-x-count SIZE
                           with-y-count SIZE
                           with-z-count SIZE).
@@ -38,14 +42,35 @@ Control : PatchGridTestControl {
         }
         grid display-concentration-in-blue of-patch-chemical expChem.
         grid display-concentration-in-red of-patch-chemical linChem.
-        self point-camera at (0, 0, 0) from (-20, 8, 20).
+        self point-camera at (0, 0, 0) from (-40, 16, 40).
+        self add-menu named "Increase Diffusion" for-method "increase-diffusion".
+        self add-menu named "Decrease Diffusion" for-method "decrease-diffusion".
 	    
 	+ to iterate:
         grid diffuse-chemicals.
         grid decay-chemicals.
-        grid increase-concentration of expChem by 1 at-x 0 at-y 0 at-z 0.
-        grid increase-concentration of linChem by 1 at-x (SIZE - 1) at-y (SIZE - 1) at-z (SIZE - 1).
+        if (self get-time) < INFLOW_END_TIME:
+        {
+            (grid get-patch-at x 0 y 0 z 0) increase-concentration of expChem by EXP_INFLOW.
+            (grid get-patch-at x (SIZE - 1) y (SIZE - 1) z (SIZE - 1)) increase-concentration of linChem by LIN_INFLOW.
+        }
         grid set-patch-colors-to-chemical-concentrations.
         super iterate.
 
+    + to increase-diffusion:
+        obj (object).
+        for each obj in (grid get-patch-chemicals):
+        {
+            obj set-diffusion-rate to ((obj get-diffusion-rate) + .01).
+        }
+
+    + to decrease-diffusion:
+        obj (object).
+        for each obj in (grid get-patch-chemicals):
+        {
+            obj set-diffusion-rate to ((obj get-diffusion-rate) - .01).
+            
+        }
+
+        
 }
