@@ -1,176 +1,374 @@
 @use Abstract.
 @use Patch.
+@use Matrix.
+@use PatchChemical.
 
 Abstract : PatchGrid [version 2.2] {
-	% OBJECT(PatchGrid) is a class which allows you to create "patches".  
-	% A OBJECT(Patch) is a non-physical object which is associated with 
-	% a specific area in the 3D world.  This allows you to associate 
-	% information or actions with specific areas in space, such as the 
-	% presence of a chemical or nutrient at that area.
-	% <p>
-	% Use METHOD(init-with) or METHOD(init-at) the create a PatchGrid.
+    % OBJECT(PatchGrid) is a class which allows you to create "patches".  
+    % A OBJECT(Patch) is a non-physical object which is associated with 
+    % a specific area in the 3D world.  This allows you to associate 
+    % information or actions with specific areas in space, such as the 
+    % presence of a chemical or nutrient at that area.
+    % <p>
+    % Use METHOD(init-with) or METHOD(init-at) the create a PatchGrid.
 
-	+ variables:
-		grid (pointer).
-		patches (list).
-		location, patchSize (vector).
-		xSize, ySize, zSize (int).
+    + variables:
+        grid (pointer).
+        patches (list).
+        location, patchSize (vector).
+        patchVolume (float).
+        xSize, ySize, zSize (int).
+        chemicals (list).
+        linearlyDecayingChemicals (list).
+        exponentiallyDecayingChemicals (list).
+        diffusingChemicals (list).
+        chemicalConcentrationMatrix (hash).
+        chemicalNameLookUp (hash).
+#        chemicalCount (int).
+        tempMatrix (pointer).
+        redChemical, greenChemical, blueChemical (object).
+        
+    + to init:
+        
+        
+    - to init-with patch-size pSize = (1, 1, 1) (vector) 
+        with-x-count x (int) 
+        with-y-count y (int) 
+        with-z-count z (int) 
+        with-patch-class class = "Patch" (string):
 
-	- to init-with patch-size pSize = (1, 1, 1) (vector) 
-		with-x-count x (int) 
-		with-y-count y (int) 
-		with-z-count z (int) 
-		with-patch-class class = "Patch" (string):
+        % Like METHOD(init-at), but centers the patch grid at the origin of the world.
 
-		% Like METHOD(init-at), but centers the patch grid at the origin of the world.
+        return (self init-at location (0, 0, 0) with-patch-size pSize
+                                                with-x-count x
+                                                with-y-count y
+                                                with-z-count z
+                                                with-patch-class class).
 
-		return (self init-at location (0, 0, 0) with-patch-size pSize with-x-count x with-y-count y with-z-count z with-patch-class class).
+    + to init-at location gridCenter = (0, 0, 0) (vector) 
+        with-patch-size pSize = (1, 1, 1) (vector) 
+        with-x-count x (int) 
+        with-y-count y (int) 
+        with-z-count z (int) 
+        with-patch-class class = "Patch" (string):
 
-	+ to init-at location gridCenter = (0, 0, 0) (vector) 
-		with-patch-size pSize = (1, 1, 1) (vector) 
-		with-x-count x (int) 
-		with-y-count y (int) 
-		with-z-count z (int) 
-		with-patch-class class = "Patch" (string):
+        % Creates a PatchGrid in which each OBJECT(Patch) is a member of 
+        % class and is the size pSize and in which the total grid 
+        % dimensions are x by y by z.  
+        % <p> 
+        % Bear in mind that this will create a large number of objects: 
+        % x * y * z.  If you have an iterate method in your patch-class, 
+        % then this can amount to a great deal of computation which can
+        % slow down your simulation.
 
-		% Creates a PatchGrid in which each OBJECT(Patch) is a member of 
-		% class and is the size pSize and in which the total grid 
-		% dimensions are x by y by z.  
-		% <p> 
-		% Bear in mind that this will create a large number of objects: 
-		% x * y * z.  If you have an iterate method in your patch-class, 
-		% then this can amount to a great deal of computation which can
-		% slow down your simulation.
+        xCount, yCount, zCount (int).
+        patch (object).
 
-		xCount, yCount, zCount (int).
-		patch (object).
+        xSize = x.
+        ySize = y.
+        zSize = z.
 
-		xSize = x.
-		ySize = y.
-		zSize = z.
+        patchSize = pSize.
+        patchVolume = (patchSize::x * patchSize::y * patchSize::z).
 
-		patchSize = pSize.
+        location = gridCenter.
 
-		location = gridCenter.
+        grid = newPatchGrid(gridCenter, patchSize, x, y, z).
 
-		grid = newPatchGrid(gridCenter, patchSize, x, y, z).
+        xCount = 0.
+        yCount = 0.
+        zCount = 0.
 
-		xCount = 0.
-		yCount = 0.
-		zCount = 0.
+        while xCount < x: {
+            yCount = 0.
 
-		while xCount < x: {
-			yCount = 0.
+            while yCount < y: {
 
-			while yCount < y: {
+                zCount = 0.
 
-				zCount = 0.
+                while zCount < z: {
+                    patch = (controller make-new-instance of-class class).
+                    patch init-with grid-patch self x-pos xCount y-pos yCount z-pos zCount.
+                    push patch onto patches.
 
-				while zCount < z: {
-    				patch = (controller make-new-instance of-class class).
-					patch init-with grid-patch self x-pos xCount y-pos yCount z-pos zCount.
-					push patch onto patches.
+                    setPatchObjectAtIndex(grid, patch, xCount, yCount, zCount).
 
-					setPatchObjectAtIndex(grid, patch, xCount, yCount, zCount).
+                    patch set-patch-pointer to patchAtIndex(grid, xCount, yCount, zCount).
+                    self add-dependency on patch.
 
-					patch set-patch-pointer to patchAtIndex(grid, xCount, yCount, zCount).
-					self add-dependency on patch.
+                    zCount += 1.
+                }
 
-					zCount += 1.
-				}
+                yCount += 1.
+            }
 
-				yCount += 1.
-			}
+            xCount += 1.
+        }
 
-			xCount += 1.
-		}
+        xCount = 0.
+        yCount = 0.
+        zCount = 0.
 
-		xCount = 0.
-		yCount = 0.
-		zCount = 0.
+        while xCount < x: {
+            yCount = 0.
 
-		while xCount < x: {
-			yCount = 0.
+            while yCount < y: {
 
-			while yCount < y: {
+                zCount = 0.
 
-				zCount = 0.
+                while zCount < z: {
+                    patchObjectAtIndex(grid, xCount, yCount, zCount) init-neighbors.
+                    patchObjectAtIndex(grid, xCount, yCount, zCount) init-patch.
+                    zCount += 1.
+                }
 
-				while zCount < z: {
-					patchObjectAtIndex(grid, xCount, yCount, zCount) init-patch.
-					zCount += 1.
-				}
+                yCount += 1.
+            }
 
-				yCount += 1.
-			}
+            xCount += 1.
+        }
 
-			xCount += 1.
-		}
+        tempMatrix = matrix3DNew(x, y, z).
+        return self.
 
-		return self.
+    + to get-x-count:
+        % If the grid is initialized, returns the size of the grid on the X-axis.
+        return xSize.
 
-	+ to get-x-count:
-		% If the grid is initialized, returns the size of the grid on the X-axis.
-		return xSize.
+    + to get-y-count:
+        % If the grid is initialized, returns the size of the grid on the Y-axis.
+        return ySize.
 
-	+ to get-y-count:
-		% If the grid is initialized, returns the size of the grid on the Y-axis.
-		return ySize.
+    + to get-z-count:
+        % If the grid is initialized, returns the size of the grid on the Z-axis.
+        return zSize.
 
-	+ to get-z-count:
-		% If the grid is initialized, returns the size of the grid on the Z-axis.
-		return zSize.
+    + to get-patch-size:
+        % Returns the vector size of a single patch.
 
-	+ to get-patch-size:
-		% Returns the vector size of a single patch.
+        return patchSize.
 
-		return patchSize.
+    + to get-patch-at x xind (int) y yind (int) z zind (int):
+        % Returns the patch object associated with the specified indices.  Note
+        % that this method may return a NULL object in the case that the 
+        % indices given are out of bounds.
 
-	+ to get-patch-at x xind (int) y yind (int) z zind (int):
-		% Returns the patch object associated with the specified indices.  Note
-		% that this method may return a NULL object in the case that the 
-		% indices given are out of bounds.
+        return patchObjectAtIndex(grid, xind, yind, zind).
 
-		return patchObjectAtIndex(grid, xind, yind, zind).
+    + to get-patch at-location theLocation (vector):
+        % Returns the OBJECT(Patch) in which theLocation resides.  Make sure you
+        % test for the validity of the returned object, since it is possible that
+        % there is no patch at the specified location.
 
-	+ to get-patch at-location theLocation (vector):
-		% Returns the OBJECT(Patch) in which theLocation resides.  Make sure you
-		% test for the validity of the returned object, since it is possible that
-		% there is no patch at the specified location.
+        return objectAtLocation(grid, theLocation).
 
-		return objectAtLocation(grid, theLocation).
+    + to get-patches:
+        % Returns a list of all patch objects.
 
-	+ to get-patches:
-		% Returns a list of all patch objects.
+        return patches.
 
-		return patches.
+    # DIFFUSABLES
+    
+    + to track patch-chemical theDiffusable (object):
+        % Adds a new OBJECT(PatchChemical) to the patch grid.  This allows
+        % the patch grid to track the concentrations of the chemcial in
+        % each patch and allow diffusion between the patches.
+        if (chemicalConcentrationMatrix{theDiffusable}):
+        {
+            printf (theDiffusable get-name).
+            print " is already being tracked by the PatchGrid.".
+        }
+        else:
+        {
+            push theDiffusable onto chemicals.
+            if (theDiffusable get-decay-rate) > 0.0:
+            {
+                if (theDiffusable decay-is-linear):
+                     push theDiffusable onto linearlyDecayingChemicals.
+                else: if (theDiffusable decay-is-exponential):
+                    push theDiffusable onto exponentiallyDecayingChemicals.
+                else:
+                {
+                    printf "Error in the decay type for ".
+                    printf (theDiffusable get-name).
+                    print ".".
+                }
+            }
+            if (theDiffusable get-diffusion-rate) > 0.0: push theDiffusable onto diffusingChemicals.
+            chemicalNameLookUp{(theDiffusable get-name)} = theDiffusable.
+            chemicalConcentrationMatrix{theDiffusable} = ((new Matrix3D) 
+                                                                    init-with 
+                                                                        x-size (self get-x-count)
+                                                                        y-size (self get-y-count)
+                                                                        z-size (self get-z-count)).
+        }
+        
+    + to untrack patch-chemical theDiffusable (object):
+        % Removes a OBJECT(PatchChemcial) from the patch grid.
+        chem (object).
+        newChems (list).
+        
+        if (chemicalConcentrationMatrix{theDiffusable}): {
+            free chemicalConcentrationMatrix{theDiffusable}.
+            chemicalNameLookUp{(theDiffusable get-name)} = 0.
+            for each chem in chemicals:
+              if chem != theDiffusable: push chem onto newChems.
+            chemicals = newChems.
+            for each chem in diffusingChemicals:
+              if chem != theDiffusable: push chem onto newChems.
+            diffusingChemicals = newChems.
+            for each chem in linearlyDecayingChemicals:
+              if chem != theDiffusable: push chem onto newChems.
+            linearlyDecayingChemicals = newChems.
+            for each chem in exponentiallyDecayingChemicals:
+              if chem != theDiffusable: push chem onto newChems.
+            exponentiallyDecayingChemicals = newChems.
+        }
+        else: {
+            printf (theDiffusable get-name).
+            print " is not tracked in the PatchGrid.".
+        }
+    
+    + to display-concentration-in-red of-patch-chemical theDiffusable (object):
+        % Selects the OBJECT(PatchChemical)'s concentration to use as the red
+        % channel when METHOD(display-patch-chemical-concentrations) is called.
+        redChemical = theDiffusable.
+        
+    + to display-concentration-in-green of-patch-chemical theDiffusable (object):
+        % Selects the OBJECT(PatchChemical)'s concentration to use as the red
+        % channel when METHOD(display-patch-chemical-concentrations) is called.
+        greenChemical = theDiffusable.
+                
+    + to display-concentration-in-blue of-patch-chemical theDiffusable (object):
+        % Selects the OBJECT(PatchChemical)'s concentration to use as the red
+        % channel when METHOD(display-patch-chemical-concentrations) is called.
+        blueChemical = theDiffusable.
+                   
+    + to set-patch-colors-to-chemical-concentrations:
+        x,y,z (int).
+        color (vector).
+        color = (0,0,0).
+        
+        for x=0, x< xSize, x++:
+            for y=0, y<ySize, y++:
+                for z=0, z<zSize, z++:
+                {
+                    if (redChemical): color::x = ((chemicalConcentrationMatrix{redChemical}) get-value at-x x at-y y at-z z).
+                    if (greenChemical): color::y = ((chemicalConcentrationMatrix{greenChemical}) get-value at-x x at-y y at-z z).
+                    if (blueChemical): color::z = ((chemicalConcentrationMatrix{blueChemical}) get-value at-x x at-y y at-z z).
+                    (self get-patch-at x x y y z z) set-color to color.
+                }
+                
+    + to get-patch-chemicals:
+        % Returns all the chemicals currently being tracked in
+        % the patch grid.
+        return chemicals.
+        
+    + to get-patch-chemical by-name theName (string):
+        % Returns the OBJECT(PatchChemical) with the provided name.
+        return chemicalNameLookUp{theName}.
+        
+    + to update-concentrations:
+        % Updates the concentrations of each OBJECT(PatchChemical) being
+        % tracked in the patch grid.  All chemicals with a diffusion rate
+        % greater than 0 diffuse into adjacent patches at their given rate
+        % and all chemicals with a decay rate greater than 0 decay.
+        self diffuse-chemicals.
+        self decay-chemicals.
+        
+    + to diffuse-chemicals:
+        % Updates the concentration of each OBJECT(PatchChemical) being tracked
+        % in the patch grid by diffusing the chemicals according to their
+        % diffusion rates.  This method is called automatically by METHOD(update-concentrations). 
+        chem (object).
+        chemMatrixPointer (pointer).
+        
+        for each chem in diffusingChemicals: {
+            chemMatrixPointer = (chemicalConcentrationMatrix{chem} get-matrix-pointer).
+            matrix3DDiffuse(chemMatrixPointer, tempMatrix, (chem get-diffusion-rate)).
+            matrix3DAddScaled(chemMatrixPointer, tempMatrix, 1.0).
+        }
+                        
+    + to decay-chemicals:
+        % Updates the concentration of each OBJECT(PatchChemical) by reducing the
+        % current concentraion by the decay rate.  The decay rate is treated
+        % as either a linear or exponential rate depending on the chemical's
+        % decay type.  This method is called automatically by METHOD(update-concentrations).
+        chem (object).
+        chemMatrixPointer (pointer).
+        
+        for each chem in linearlyDecayingChemicals:
+            chemicalConcentrationMatrix{chem} add-scalar value ((chem get-decay-rate) * -1.0).
+        
+        for each chem in exponentiallyDecayingChemicals: {
+            chemMatrixPointer = (chemicalConcentrationMatrix{chem} get-matrix-pointer).
+            matrix3DCopy(chemMatrixPointer, tempMatrix).
+            matrix3DAddScaled(chemMatrixPointer, tempMatrix, ((chem get-decay-rate) * -1.0)).
+            }
+            
+    - to get-concentration of theDiffusable (object) at-x xIndex (int) at-y yIndex (int) at-z zIndex (int):
+        % Gets the concentration of the chemical in the patch.  Note
+        % that this is a normalized concentration.  If you want the
+        % total concentration, multiply by the OBJECT(Patch) size.
+        % You don't normally call this directly
+        return (chemicalConcentrationMatrix{theDiffusable} get-value at-x xIndex at-y yIndex at-z zIndex).
+        
+    - to set-concentration of theDiffusable (object) at-x xIndex (int) at-y yIndex (int) at-z zIndex (int) to theValue (float):
+        % Sets the concentration of the chemical in the patch.  Note
+        % that this is a normalized concentration.  If you want to
+        % use total concentration, multiply by the OBJECT(Patch) size first.
+        % You don't normally call this directly
+        chemicalConcentrationMatrix{theDiffusable} set-value to theValue
+                                                                     at-x xIndex
+                                                                     at-y yIndex
+                                                                     at-z zIndex.
+        
+    - to increase-concentration of theDiffusable (object) by theValue (float) at-x xIndex (int) at-y yIndex (int) at-z zIndex (int):
+        % Adds a quantify of the chemical to the patch.  The quantity is divided
+        % by the patch volume to get the concentration added.
+        % You don't normally call this directly
+        currentValue (int).
+        currentValue = chemicalConcentrationMatrix{theDiffusable} get-value at-x xIndex at-y yIndex at-z zIndex.
+        currentValue += (theValue / patchVolume).
+        chemicalConcentrationMatrix{theDiffusable} set-value to currentValue at-x xIndex at-y yIndex at-z zIndex.        
 
-	+ to get-description:
-		return "$xSize x $ySize x $zSize".
+    - to decrease-concentration of theDiffusable (object) by theValue (float) at-x xIndex (int) at-y yIndex (int) at-z zIndex (int):
+        % Removes a quantify of the chemical to the patch.  The quantity is divided
+        % by the patch volume to get the concentration removed.
+        % You don't normally call this directly
+        currentValue (int).
+        currentValue = chemicalConcentrationMatrix{theDiffusable} get-value at-x xIndex at-y yIndex at-z zIndex.
+        currentValue -= (theValue / patchVolume).
+        chemicalConcentrationMatrix{theDiffusable} set-value to currentValue at-x xIndex at-y yIndex at-z zIndex.        
 
-	+ to dearchive:
-		x, y, z (int).
-		index (int).
+    + to get-description:
+        return "$xSize x $ySize x $zSize".
 
-		grid = newPatchGrid(location, patchSize, xSize, ySize, zSize).
+    + to dearchive:
+        x, y, z (int).
+        index (int).
 
-		print "starting dearchive.".
-		for x=0,x<xSize,x++: {
-			for y=0,y<ySize,y++: {
-				for z=0,z<zSize,z++: {
-					setPatchObjectAtIndex(grid, patches{index}, x, y, z).
-					patches{index} set-patch-pointer to patchAtIndex(grid, x, y, z).
-					patches{index} update-colors.
+        grid = newPatchGrid(location, patchSize, xSize, ySize, zSize).
 
-					index++.
-				}
-			}
-		}
+        print "starting dearchive.".
+        for x=0,x<xSize,x++: {
+            for y=0,y<ySize,y++: {
+                for z=0,z<zSize,z++: {
+                    setPatchObjectAtIndex(grid, patches{index}, x, y, z).
+                    patches{index} set-patch-pointer to patchAtIndex(grid, x, y, z).
+                    patches{index} update-colors.
 
-		print "done dearchive.".
+                    index++.
+                }
+            }
+        }
 
-		return 1.
+        print "done dearchive.".
 
-	+ to archive:
-		return 1.
+        return 1.
+
+    + to archive:
+        return 1.
+        
+    
 }

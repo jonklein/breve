@@ -1,0 +1,51 @@
+@use Control.
+@use PatchGrid.
+@use PatchToroid.
+@use PatchChemical.
+
+@define SIZE 32.
+@define DIFFUSION_RATE .3.
+@define DECAY_RATE .1.
+
+Controller PatchGridTestControl.
+
+Control : PatchGridTestControl {
+
+	+variables:
+		grid (object).
+		expChem (object).
+        linChem (object).
+        obj (object).
+        
+	+ to init:
+        grid = ((new PatchToroid) init-with with-x-count SIZE
+                          with-y-count SIZE
+                          with-z-count SIZE).
+        expChem = ((new PatchChemical) init-with name "MyChemical"
+                               diffusion-rate DIFFUSION_RATE
+                              decay-rate DECAY_RATE
+                              decay-type "Exponential").
+        linChem = ((new PatchChemical) init-with name "MyChemical"
+                               diffusion-rate DIFFUSION_RATE
+                              decay-rate DECAY_RATE
+                              decay-type "Linear").
+        grid track patch-chemical expChem.
+        grid track patch-chemical linChem.
+        print (grid get-patch-chemicals).
+        for each obj in (grid get-patch-chemicals):
+        {
+            print (grid get-concentration of obj at-x 0 at-y 0 at-z 0).
+        }
+        grid display-concentration-in-blue of-patch-chemical expChem.
+        grid display-concentration-in-red of-patch-chemical linChem.
+        self point-camera at (0, 0, 0) from (-20, 8, 20).
+	    
+	+ to iterate:
+        grid diffuse-chemicals.
+        grid decay-chemicals.
+        grid increase-concentration of expChem by 1 at-x 0 at-y 0 at-z 0.
+        grid increase-concentration of linChem by 1 at-x (SIZE - 1) at-y (SIZE - 1) at-z (SIZE - 1).
+        grid set-patch-colors-to-chemical-concentrations.
+        super iterate.
+
+}

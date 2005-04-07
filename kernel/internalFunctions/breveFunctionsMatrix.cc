@@ -567,7 +567,7 @@ void breveInitMatrixFunctions(brNamespace *n) {
 	brNewBreveCall(n, "matrix3DCopy", brIMatrix3DCopy, AT_NULL, AT_POINTER, AT_POINTER, 0);
 	brNewBreveCall(n, "matrix3DDiffusePeriodic", brIMatrix3DDiffusePeriodic, AT_NULL, AT_POINTER, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix3DCopyToImage", brIMatrix3DCopyToImage, AT_NULL, AT_POINTER, AT_INT, AT_POINTER, AT_INT, AT_DOUBLE, 0);
-//	brNewBreveCall(n, "matrix3DDiffuse", brIMatrix3DDiffuse, AT_NULL, AT_POINTER, AT_POINTER, AT_DOUBLE, 0);
+	brNewBreveCall(n, "matrix3DDiffuse", brIMatrix3DDiffuse, AT_NULL, AT_POINTER, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix3DScale", brIMatrix3DScale, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix3DGetAbsoluteSum", brIMatrix3DGetAbsoluteSum, AT_DOUBLE, AT_POINTER, 0);
 	brNewBreveCall(n, "matrix3DAddScaled", brIMatrix3DAddScaled, AT_NULL, AT_POINTER, AT_POINTER, AT_DOUBLE, 0);

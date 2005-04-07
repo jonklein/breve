@@ -1,0 +1,96 @@
+@use Patch.
+@use PatchGrid.
+
+@define LINEAR 1.
+@define EXPONENTIAL 2.
+
+Abstract : PatchChemical (aka PatchChemcials) {
+    % This class provides information about a diffusable element
+    % in a simulation.  The checmial represents an element which
+    % diffuses to fill up a OBJECT(Patch).  The element will
+    % diffuse between patches when METHOD(PatchGrid:diffuse-chemicals) is called
+    % on OBJECT(PatchGrid).  This can be used to represent gas molecules,
+    % a nutrient, a signal or anything else you want to diffuse
+    % through space in your simulation.  Chemicals will decay at a
+    % given rate when the METHOD(PatchGrid:decay-chemicals) is called on OBJECT(PatchGrid).
+    % To update all concentrations using both decay and diffusion call
+    % METHOD(PatchGrid:update-concentrations) on OBJECT(PatchGrid) in the grid's METHOD(PatchGrid:iterate)
+    % method.
+
+    + variables:
+        name (string).                  # The name of the chemical
+        rateOfDiffusion (float).        # The diffusion rate of the chemical
+        rateOfDecay (float).            # The decay rate of the chemical
+        decayType (int).             # "Linear" or "Exponential"
+        
+    + to init:
+        
+        return self.
+        
+    + to init-with name theName (string)
+                   diffusion-rate theDiffusionRate = 0.0 (float)
+                   decay-rate theDecayRate = 0.0 (float)
+                   decay-type theDecayType = "Linear" (string):
+        % This is a complicated initialization function.  Normally
+        % you can simply specify diffusion and/or decay rates along
+        % with a name.  If you would like to use exponential decay
+        % rates, specify "Exponential" for the 'where-decay-is'
+        % parameter.
+        # % <p>
+        # % [Not currenlty implemnted]
+        # % If you would like to have stochastic decay and diffusion
+        # % you can specify "Stochastic" for the 'where-rates-are'
+        # % parameter.  These features will be availible in the next 
+        # % release.
+         
+        if (theDiffusionRate < 0.0): {
+            printf "Error instantiating ".
+            printf theName.
+            print ":".
+            print "Diffusion rates must be positive or zero.".
+            controller end-simulation.
+        }
+        if (theDecayRate < 0.0): {
+            printf "Error instantiating ".
+            printf theName.
+            print ":".
+            print "Decay rates must be positive or zero.".
+            controller end-simulation.
+        }
+            
+        name = theName.
+        rateOfDiffusion = theDiffusionRate.
+        rateOfDecay = theDecayRate.
+        if (theDecayType  == "Linear"):
+            decayType = LINEAR.
+        else: if (theDecayType  == "Exponential"):
+            decayType = EXPONENTIAL.
+        else: {
+            printf "Error instantiating ".
+            printf theName.
+            print ".".
+        }
+        
+        return self.
+        
+    + to get-diffusion-rate:
+        return rateOfDiffusion.
+        
+    + to get-decay-rate:
+        return rateOfDecay.
+        
+    + to get-decay-type:
+        return decayType.
+        
+    + to get-name:
+        return name.
+        
+    + to decay-is-linear:
+        if (decayType == LINEAR): return 1.
+        else: return 0.
+        
+    + to decay-is-exponential:
+        if (decayType == EXPONENTIAL): return 1.
+        else: return 0.
+
+}

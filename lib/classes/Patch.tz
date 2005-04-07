@@ -2,337 +2,391 @@
 @use PatchGrid.
 
 Abstract : Patch (aka Patches) [version 2.2] {
-	% A patch is a non-physical object which is associated with a specific 
-	% location in space.  A patch can hold information about the state of
-	% the world in that location, such as the presence of a nutrient, for
-	% example.  See the object OBJECT(PatchGrid) for more information on 
-	% setting up patches.  Patches must be set up as part of a OBJECT(PatchGrid).
-	% <p>
-	% Because patches are not physical, they cannot move and they cannot
-	% collide with other objects.  Though you can find the patch that an 
-	% object is in, there is no collision callback when an object enters
-	% the patch.
-	% <p>
-	% The methods used to find neighboring patches depends on the type of 
-	% simulation you're running.  Though many of the "get-patch" methods described
-	% below behave the same as one another, they are named differently to be 
-	% consistent with different types of simulations.  
-	% <p>
-	% <b>The neighbors are not fully initialized at the time that the init method
-	% is called.</b>  This is because the CLASS(PatchGrid) must create all of the
-	% patches before it can initialize the neighbors.  Instead of accessing the 
-	% neighbors in the init method, you should implement your own METHOD(init-patch)
-	% and place all initialization inside this method.  The neighbors for the patch
-	% will be fully initialized by the time the init-patch method is called.
-	% <p>
-	% When using a 2D XY style simulation, use the following methods to get the 
-	% four cardinal directions: METHOD(get-patch-to-left), METHOD(get-patch-to-right),
-	% METHOD(get-patch-above) and METHOD(get-patch-below).
-	% <p>
-	% When using a 3D style simulation with and XZ ground plane (such that the vector
-	% (0, 1, 0) is pointing up, use the following methods to get the 
-	% six cardinal directions: METHOD(get-patch-to-north), METHOD(get-patch-to-east),
-	% METHOD(get-patch-to-south), METHOD(get-patch-to-west), METHOD(get-patch-above)
-	% and METHOD(get-patch-below).
-	% <p>
-	% These two groups of methods should suffice for most simulations, but if for
-	% some reason you use another orientation for your simulation which doesn't 
-	% fit well with the vocabulary of these methods, you can use the following
-	% methods: METHOD(get-patch-towards-plus-x), METHOD(get-patch-towards-minus-x),
-	% METHOD(get-patch-towards-plus-y), METHOD(get-patch-towards-minus-y),
-	% METHOD(get-patch-towards-plus-z) and METHOD(get-patch-towards-minus-z).
-
-	+ variables:
-		color (vector).
-		transparency (double).
-		patchPointer (pointer).
-		grid (object).
-		xIndex, yIndex, zIndex (int).
-
-	- to init-with grid-patch gp (object) x-pos x (int) y-pos y (int) z-pos z (int):
-		% Used internally by the grid patch system when setting up the 
-		% patches.  Do not call this method.  Just don't.  I know it's 
-		% tempting, but it's really better for all of us that you don't
-		% call it.
-
-		grid = gp.
-
-		xIndex = x.
-		yIndex = y.
-		zIndex = z.
-
-	+ section "Getting Information About a Patch"
-
-	+ to get-location:
-		% Returns the location of the patch.
-
-		return getPatchLocation(patchPointer).
-
-	+ to get-x-index:
-		% Returns the x index of the patch.
-
-		return xIndex.
-
-	+ to get-y-index:
-		% Returns the y index of the patch.
-
-		return yIndex.
-
-	+ to get-z-index:
-		% Returns the z index of the patch.
-
-		return zIndex.
-
-	+ section "Methods to Initialize Patches"
-
-	+ to init-patch:
-		% This method does nothing in its default implementation.  You can implement your
-		% own init-patch method in your patch class in order to perform initialization on 
-		% the patch.  This method is called after all the neighbor objects have been 
-		% created--if you do initialization in the init method, the neighbors will not 
-		% be initialized.
-
-	- to init-neighbors:
-
-	- to set-patch-pointer to p (pointer):
-		% Used internally when setting up the patches.  Do not call
-		% this method.
-
-		patchPointer = p.
-		self set-transparency to 0.
-
-	+ section "Changing the Appearence of Patches"
-
-	+ to set-color to newColor (vector):
-		% Sets the color of the patch to newColor.  Bear in mind that you'll also 
-		% need to set the transparency of the patch if you want the
-		% patch to be displayed.  See the method METHOD(set-transparency)
-		% for more information.
-
-		if !patchPointer: {
-			print "set-color called for $self before patch was initialized".
-			print "use method \"init-patch\" instead of \"init\"".
-			return.
-		}
-
-		color = newColor.
-	
-		setPatchColor(patchPointer, newColor).
-
-	+ to set-transparency to theTransparency (float):
-		% Sets the transparency of the patch to theTransparency.  The 
-		% default value is 1.0, which is fully transparent.  No matter how
-		% much you set the color of the patch, it won't be visible until
-		% you've set the transparency to a value other than 1.0.  
-
-		if !patchPointer: {
-			print "set-transparency called for $self before patch was initialized".
-			print "use method \"init-patch\" instead of \"init\"".
-			return.
-		}
-
-		transparency = theTransparency.
-		setPatchTransparency(patchPointer, theTransparency).
-
-	+ section "Getting Groups of Neighbor Patches"
-
-	+ to get-3d-moore-neighborhood:
-		% Returns a list of the 3D Moore neighbors of this patch.  The 
-		% 3D Moore neighborhood consists of the 26 patches 
-		% adjacent to this patch, including diagonally, in three dimensions.
-		% <P>
-		% If you intend to use the neighborhood frequently, you should 
-		% call this method once and keep a copy of the list.
-
-		result (list).
-		x, y, z (int).
-		patch (object).
-
-		for x=-1, x<=1, x++: {
-			for y=-1, y<=1, y++: {
-				for z=-1, z<=1, z++: {
-					patch = (grid get-patch-at x x+xIndex y y+yIndex z z+zIndex).
-					if patch && patch != self: push patch onto result.
-				}
-			}
-		}
-
-		return result.
-
-	+ to get-3d-von-neumann-neighborhood:
-		% Returns a list of the 3D Von Neumann neighbors of this patch.  The 
-		% 3D Von Neumann neighborhood consists of the 6 patches directly
-		% adjacent to the faces of this patch, in three dimensions.
-		% <P>
-		% If you intend to use the neighborhood frequently, you should 
-		% call this method once and keep a copy of the list.
-
-		result (list).
-
-		result = (self get-von-neumann-neighborhood).
-
-		if (self get-patch-towards-plus-z): push (self get-patch-towards-plus-z) onto result.
-		if (self get-patch-towards-minus-z): push (self get-patch-towards-minus-z) onto result.
-
-	+ to get-moore-neighborhood: 
-		% Returns a list of the 2D Moore neighbors of this patch.  The
-		% 2D Moore neighbors are the 8 patches adjacent to this patch,
-		% including diagonally, on the X/Y plane.
-		% <P>
-		% If you intend to use the neighborhood frequently, you should 
-		% call this method once and keep a copy of the list.
-
-		result (list).
-
-		result = (self get-von-neumann-neighborhood).
-		if (self get-patch-to-upper-left): push (self get-patch-to-upper-left) onto result.
-		if (self get-patch-to-upper-right): push (self get-patch-to-upper-right) onto result.
-		if (self get-patch-to-lower-left): push (self get-patch-to-lower-left) onto result.
-		if (self get-patch-to-lower-right): push (self get-patch-to-lower-right) onto result.
-
-		return result.
-
-	+ to get-von-neumann-neighborhood: 
-		% Returns a list of the 2D Von Neumann neighbors of this patch.  The
-		% 2D Von Neumann neighbors are the 8 patches located above, below, 
-		% to the left of and to the right of this patch on the X/Y plane.
-		% <P>
-		% If you intend to use the neighborhood frequently, you should 
-		% call this method once and keep a copy of the list.
-
-		result (list).
-
-		if (self get-patch-above): push (self get-patch-above) onto result.
-		if (self get-patch-to-right): push (self get-patch-to-right) onto result.
-		if (self get-patch-below): push (self get-patch-below) onto result.
-		if (self get-patch-to-left): push (self get-patch-to-left) onto result.
-
-		return result.
-
-	+ section "Getting Specific Patch Neighbors"
-
-	+ to get-patch-to-north:
-		% Assumes that the patches are being observed from an XZ-plane.
-		% Returns the patch towards (0, 0, -1). 
-		# (0, 0, -1)
-		return (grid get-patch-at x xIndex y yIndex z (zIndex - 1) ).
-
-	+ to get-patch-to-south:
-		% Assumes that the patches are being observed from an XZ-plane.
-		% Returns the patch towards (0, 0, 1). 
-		# (0, 0, 1)
-		return (grid get-patch-at x xIndex y yIndex z (zIndex + 1) ).
-
-	+ to get-patch-to-east:
-		% Assumes that the patches are being observed from an XZ-plane.
-		% Returns the patch towards (1, 0, 0). 
-		# (1, 0, 0)
-		return (grid get-patch-at x (xIndex + 1) y yIndex z zIndex ).
-
-	+ to get-patch-to-west:
-		% Assumes that the patches are being observed from an XZ-plane.
-		% Returns the patch towards (-1, 0, 0). 
-		# (-1, 0, 0)
-		return (grid get-patch-at x (xIndex - 1) y yIndex z zIndex ).
-
-	+ to get-patch-above:
-		% Returns the patch towards (0, 1, 0).
-		# (0, 1, 0)
-		return (grid get-patch-at x xIndex y (yIndex + 1) z zIndex ).
-
-	+ to get-patch-below:
-		% Returns the patch towards (0, -1, 0).
-		# (0, -1, 0)
-		return (grid get-patch-at x xIndex y (yIndex - 1) z zIndex ).
-
-	+ to get-patch-to-left:
-		% Returns the patch towards (-1, 0, 0).
-		# (-1, 0, 0)
-		return (grid get-patch-at x (xIndex - 1) y yIndex z zIndex ).
-
-	+ to get-patch-to-right:
-		% Returns the patch towards (1, 0, 0).
-		# (1, 0, 0)
-		return (grid get-patch-at x (xIndex + 1) y yIndex z zIndex ).
-
-	+ to get-patch-to-upper-left:
-		% Returns the patch towards (-1, 1, 0).
-		# (-1, 1, 0)
-		return (grid get-patch-at x (xIndex - 1) y (yIndex + 1) z zIndex).
-
-	+ to get-patch-to-lower-left:
-		% Returns the patch towards (-1, -1, 0).
-		# (-1, -1, 0)
-		return (grid get-patch-at x (xIndex - 1) y (yIndex - 1) z zIndex).
-
-	+ to get-patch-to-upper-right:
-		% Returns the patch towards (1, 1, 0).
-		# (1, 1, 0)
-		return (grid get-patch-at x (xIndex + 1) y (yIndex + 1) z zIndex).
-
-	+ to get-patch-to-lower-right:
-		% Returns the patch towards (1, -1, 0).
-		# (1, -1, 0)
-		return (grid get-patch-at x (xIndex + 1) y (yIndex - 1) z zIndex).
-
-	+ to get-patch-towards-plus-x:
-		% Returns the patch towards (1, 0, 0).
-		# (1, 0, 0)
-		return (grid get-patch-at x (xIndex + 1) y yIndex z zIndex ).
-
-	+ to get-patch-towards-minus-x:
-		% Returns the patch towards (-1, 0, 0).
-		# (-1, 0, 0)
-		return (grid get-patch-at x (xIndex - 1) y yIndex z zIndex ).
-
-	+ to get-patch-towards-plus-y:
-		% Returns the patch towards (0, 1, 0).
-		# (0, 1, 0)
-		return (grid get-patch-at x xIndex y (yIndex + 1) z zIndex ).
-
-	+ to get-patch-towards-minus-y:
-		% Returns the patch towards (0, -1, 0).
-		# (0, -1, 0)
-		return (grid get-patch-at x xIndex y (yIndex - 1) z zIndex ).
-
-	+ to get-patch-towards-plus-z:
-		% Returns the patch towards (0, 0, 1).
-		# (0, 0, 1)
-		return (grid get-patch-at x xIndex y yIndex z (zIndex + 1) ).
-
-	+ to get-patch-towards-minus-z:
-		% Returns the patch towards (0, 0, -1).
-		# (0, 0, -1)
-		return (grid get-patch-at x xIndex y yIndex z (zIndex - 1) ).
-
-	# THE X/Y NEIGHBORS
-
-	+ to get-patch-towards-minus-x-minus-y:
-		% returns the patch towards (-1, -1, 0)
-		return (grid get-patch-at x (xIndex - 1) y (yIndex - 1) z zIndex).
-
-	+ to get-patch-towards-minus-x-plus-y:
-		% returns the patch towards (-1, 1, 0)
-		return (grid get-patch-at x (xIndex - 1) y (yIndex + 1) z zIndex).
-
-	+ to get-patch-towards-plus-x-minus-y:
-		% returns the patch towards (1, -1, 0)
-		return (grid get-patch-at x (xIndex + 1) y (yIndex - 1) z zIndex).
-
-	+ to get-patch-towards-plus-x-plus-y:
-		% returns the patch towards (1, 1, 0)
-		return (grid get-patch-at x (xIndex + 1) y (yIndex + 1) z zIndex).
-
-	+ to get-description:
-		return "patch at indices ($xIndex, $yIndex, $zIndex)".
-
-	+ to dearchive:
-		return 1.
-
-	- to update-colors:
-		% Used internally.  Synchronizes the patch's color with recently 
-		% dearchived values. 
-
-		self set-color to color.
-		self set-transparency to transparency.
+    % A patch is a non-physical object which is associated with a specific 
+    % location in space.  A patch can hold information about the state of
+    % the world in that location, such as the presence of a nutrient, for
+    % example.  See the object OBJECT(PatchGrid) for more information on 
+    % setting up patches.  Patches must be set up as part of a OBJECT(PatchGrid).
+    % <p>
+    % Because patches are not physical, they cannot move and they cannot
+    % collide with other objects.  Though you can find the patch that an 
+    % object is in, there is no collision callback when an object enters
+    % the patch.  Patches can track the concentration of objects in their
+    % space.  Currently this is limited to OBJECT(PatchChemical) objects which
+    % are used to track information about abstract diffusable elements in
+    % the world.  You can get the concentration, set the concentration, add and
+    % remove PatchChemcicals through the patch.  See OBJECT(PatchGrid) for adding
+    % PatchChemcials to the simulation and to iterate the diffusion.  It is 
+    % important to note that concentrations are stored in single precision
+    % floats currently to improve performance on hardware that supports 
+    % SIMD processing.
+    % <p>
+    % The methods used to find neighboring patches depends on the type of 
+    % simulation you're running.  Though many of the "get-patch" methods described
+    % below behave the same as one another, they are named differently to be 
+    % consistent with different types of simulations.  
+    % <p>
+    % <b>The neighbors are not fully initialized at the time that the init method
+    % is called.</b>  This is because the CLASS(PatchGrid) must create all of the
+    % patches before it can initialize the neighbors.  Instead of accessing the 
+    % neighbors in the init method, you should implement your own METHOD(init-patch)
+    % and place all initialization inside this method.  The neighbors for the patch
+    % will be fully initialized by the time the init-patch method is called.
+    % <p>
+    % When using a 2D XY style simulation, use the following methods to get the 
+    % four cardinal directions: METHOD(get-patch-to-left), METHOD(get-patch-to-right),
+    % METHOD(get-patch-above) and METHOD(get-patch-below).
+    % <p>
+    % When using a 3D style simulation with and XZ ground plane (such that the vector
+    % (0, 1, 0) is pointing up, use the following methods to get the 
+    % six cardinal directions: METHOD(get-patch-to-north), METHOD(get-patch-to-east),
+    % METHOD(get-patch-to-south), METHOD(get-patch-to-west), METHOD(get-patch-above)
+    % and METHOD(get-patch-below).
+    % <p>
+    % These two groups of methods should suffice for most simulations, but if for
+    % some reason you use another orientation for your simulation which doesn't 
+    % fit well with the vocabulary of these methods, you can use the following
+    % methods: METHOD(get-patch-towards-plus-x), METHOD(get-patch-towards-minus-x),
+    % METHOD(get-patch-towards-plus-y), METHOD(get-patch-towards-minus-y),
+    % METHOD(get-patch-towards-plus-z) and METHOD(get-patch-towards-minus-z).
+
+    + variables:
+        color (vector).
+        transparency (double).
+        patchPointer (pointer).
+        grid (object).
+        xIndex, yIndex, zIndex (int).
+        
+    - to init-with grid-patch gp (object) x-pos x (int) y-pos y (int) z-pos z (int):
+        % Used internally by the grid patch system when setting up the 
+        % patches.  Do not call this method.  Just don't.  I know it's 
+        % tempting, but it's really better for all of us that you don't
+        % call it.
+
+        grid = gp.
+
+        xIndex = x.
+        yIndex = y.
+        zIndex = z.
+
+    + section "Getting Information About a Patch"
+
+    + to get-location:
+        % Returns the location of the patch.
+
+        return getPatchLocation(patchPointer).
+
+    + to get-x-index:
+        % Returns the x index of the patch.
+
+        return xIndex.
+
+    + to get-y-index:
+        % Returns the y index of the patch.
+
+        return yIndex.
+
+    + to get-z-index:
+        % Returns the z index of the patch.
+
+        return zIndex.
+
+    + section "Methods to Initialize Patches"
+
+    + to init-patch:
+        % This method does nothing in its default implementation.  You can implement your
+        % own init-patch method in your patch class in order to perform initialization on 
+        % the patch.  This method is called after all the neighbor objects have been 
+        % created--if you do initialization in the init method, the neighbors will not 
+        % be initialized.
+
+    - to init-neighbors:
+
+    - to set-patch-pointer to p (pointer):
+        % Used internally when setting up the patches.  Do not call
+        % this method.
+
+        patchPointer = p.
+        self set-transparency to 0.
+
+    + section "Changing the Appearence of Patches"
+
+    + to set-color to newColor (vector):
+        % Sets the color of the patch to newColor.  Bear in mind that you'll also 
+        % need to set the transparency of the patch if you want the
+        % patch to be displayed.  See the method METHOD(set-transparency)
+        % for more information.
+
+        if !patchPointer: {
+            print "set-color called for $self before patch was initialized".
+            print "use method \"init-patch\" instead of \"init\"".
+            return.
+        }
+
+        color = newColor.
+    
+        setPatchColor(patchPointer, newColor).
+
+    + to set-transparency to theTransparency (float):
+        % Sets the transparency of the patch to theTransparency.  The 
+        % default value is 1.0, which is fully transparent.  No matter how
+        % much you set the color of the patch, it won't be visible until
+        % you've set the transparency to a value other than 1.0.  
+
+        if !patchPointer: {
+            print "set-transparency called for $self before patch was initialized".
+            print "use method \"init-patch\" instead of \"init\"".
+            return.
+        }
+
+        transparency = theTransparency.
+        setPatchTransparency(patchPointer, theTransparency).
+
+    + section "Getting Groups of Neighbor Patches"
+
+    + to get-3d-moore-neighborhood:
+        % Returns a list of the 3D Moore neighbors of this patch.  The 
+        % 3D Moore neighborhood consists of the 26 patches 
+        % adjacent to this patch, including diagonally, in three dimensions.
+        % <P>
+        % If you intend to use the neighborhood frequently, you should 
+        % call this method once and keep a copy of the list.
+
+        result (list).
+        x, y, z (int).
+        patch (object).
+
+        for x=-1, x<=1, x++: {
+            for y=-1, y<=1, y++: {
+                for z=-1, z<=1, z++: {
+                    patch = (grid get-patch-at x x+xIndex y y+yIndex z z+zIndex).
+                    if patch && patch != self: push patch onto result.
+                }
+            }
+        }
+
+        return result.
+
+    + to get-3d-von-neumann-neighborhood:
+        % Returns a list of the 3D Von Neumann neighbors of this patch.  The 
+        % 3D Von Neumann neighborhood consists of the 6 patches directly
+        % adjacent to the faces of this patch, in three dimensions.
+        % <P>
+        % If you intend to use the neighborhood frequently, you should 
+        % call this method once and keep a copy of the list.
+
+        result (list).
+
+        result = (self get-von-neumann-neighborhood).
+
+        if (self get-patch-towards-plus-z): push (self get-patch-towards-plus-z) onto result.
+        if (self get-patch-towards-minus-z): push (self get-patch-towards-minus-z) onto result.
+
+    + to get-moore-neighborhood: 
+        % Returns a list of the 2D Moore neighbors of this patch.  The
+        % 2D Moore neighbors are the 8 patches adjacent to this patch,
+        % including diagonally, on the X/Y plane.
+        % <P>
+        % If you intend to use the neighborhood frequently, you should 
+        % call this method once and keep a copy of the list.
+
+        result (list).
+
+        result = (self get-von-neumann-neighborhood).
+        if (self get-patch-to-upper-left): push (self get-patch-to-upper-left) onto result.
+        if (self get-patch-to-upper-right): push (self get-patch-to-upper-right) onto result.
+        if (self get-patch-to-lower-left): push (self get-patch-to-lower-left) onto result.
+        if (self get-patch-to-lower-right): push (self get-patch-to-lower-right) onto result.
+
+        return result.
+
+    + to get-von-neumann-neighborhood: 
+        % Returns a list of the 2D Von Neumann neighbors of this patch.  The
+        % 2D Von Neumann neighbors are the 8 patches located above, below, 
+        % to the left of and to the right of this patch on the X/Y plane.
+        % <P>
+        % If you intend to use the neighborhood frequently, you should 
+        % call this method once and keep a copy of the list.
+
+        result (list).
+
+        if (self get-patch-above): push (self get-patch-above) onto result.
+        if (self get-patch-to-right): push (self get-patch-to-right) onto result.
+        if (self get-patch-below): push (self get-patch-below) onto result.
+        if (self get-patch-to-left): push (self get-patch-to-left) onto result.
+
+        return result.
+
+    + section "Getting Specific Patch Neighbors"
+
+    + to get-patch-to-north:
+        % Assumes that the patches are being observed from an XZ-plane.
+        % Returns the patch towards (0, 0, -1). 
+        # (0, 0, -1)
+        return (grid get-patch-at x xIndex y yIndex z (zIndex - 1) ).
+
+    + to get-patch-to-south:
+        % Assumes that the patches are being observed from an XZ-plane.
+        % Returns the patch towards (0, 0, 1). 
+        # (0, 0, 1)
+        return (grid get-patch-at x xIndex y yIndex z (zIndex + 1) ).
+
+    + to get-patch-to-east:
+        % Assumes that the patches are being observed from an XZ-plane.
+        % Returns the patch towards (1, 0, 0). 
+        # (1, 0, 0)
+        return (grid get-patch-at x (xIndex + 1) y yIndex z zIndex ).
+
+    + to get-patch-to-west:
+        % Assumes that the patches are being observed from an XZ-plane.
+        % Returns the patch towards (-1, 0, 0). 
+        # (-1, 0, 0)
+        return (grid get-patch-at x (xIndex - 1) y yIndex z zIndex ).
+
+    + to get-patch-above:
+        % Returns the patch towards (0, 1, 0).
+        # (0, 1, 0)
+        return (grid get-patch-at x xIndex y (yIndex + 1) z zIndex ).
+
+    + to get-patch-below:
+        % Returns the patch towards (0, -1, 0).
+        # (0, -1, 0)
+        return (grid get-patch-at x xIndex y (yIndex - 1) z zIndex ).
+
+    + to get-patch-to-left:
+        % Returns the patch towards (-1, 0, 0).
+        # (-1, 0, 0)
+        return (grid get-patch-at x (xIndex - 1) y yIndex z zIndex ).
+
+    + to get-patch-to-right:
+        % Returns the patch towards (1, 0, 0).
+        # (1, 0, 0)
+        return (grid get-patch-at x (xIndex + 1) y yIndex z zIndex ).
+
+    + to get-patch-to-upper-left:
+        % Returns the patch towards (-1, 1, 0).
+        # (-1, 1, 0)
+        return (grid get-patch-at x (xIndex - 1) y (yIndex + 1) z zIndex).
+
+    + to get-patch-to-lower-left:
+        % Returns the patch towards (-1, -1, 0).
+        # (-1, -1, 0)
+        return (grid get-patch-at x (xIndex - 1) y (yIndex - 1) z zIndex).
+
+    + to get-patch-to-upper-right:
+        % Returns the patch towards (1, 1, 0).
+        # (1, 1, 0)
+        return (grid get-patch-at x (xIndex + 1) y (yIndex + 1) z zIndex).
+
+    + to get-patch-to-lower-right:
+        % Returns the patch towards (1, -1, 0).
+        # (1, -1, 0)
+        return (grid get-patch-at x (xIndex + 1) y (yIndex - 1) z zIndex).
+
+    + to get-patch-towards-plus-x:
+        % Returns the patch towards (1, 0, 0).
+        # (1, 0, 0)
+        return (grid get-patch-at x (xIndex + 1) y yIndex z zIndex ).
+
+    + to get-patch-towards-minus-x:
+        % Returns the patch towards (-1, 0, 0).
+        # (-1, 0, 0)
+        return (grid get-patch-at x (xIndex - 1) y yIndex z zIndex ).
+
+    + to get-patch-towards-plus-y:
+        % Returns the patch towards (0, 1, 0).
+        # (0, 1, 0)
+        return (grid get-patch-at x xIndex y (yIndex + 1) z zIndex ).
+
+    + to get-patch-towards-minus-y:
+        % Returns the patch towards (0, -1, 0).
+        # (0, -1, 0)
+        return (grid get-patch-at x xIndex y (yIndex - 1) z zIndex ).
+
+    + to get-patch-towards-plus-z:
+        % Returns the patch towards (0, 0, 1).
+        # (0, 0, 1)
+        return (grid get-patch-at x xIndex y yIndex z (zIndex + 1) ).
+
+    + to get-patch-towards-minus-z:
+        % Returns the patch towards (0, 0, -1).
+        # (0, 0, -1)
+        return (grid get-patch-at x xIndex y yIndex z (zIndex - 1) ).
+
+    # THE X/Y NEIGHBORS
+
+    + to get-patch-towards-minus-x-minus-y:
+        % returns the patch towards (-1, -1, 0)
+        return (grid get-patch-at x (xIndex - 1) y (yIndex - 1) z zIndex).
+
+    + to get-patch-towards-minus-x-plus-y:
+        % returns the patch towards (-1, 1, 0)
+        return (grid get-patch-at x (xIndex - 1) y (yIndex + 1) z zIndex).
+
+    + to get-patch-towards-plus-x-minus-y:
+        % returns the patch towards (1, -1, 0)
+        return (grid get-patch-at x (xIndex + 1) y (yIndex - 1) z zIndex).
+
+    + to get-patch-towards-plus-x-plus-y:
+        % returns the patch towards (1, 1, 0)
+        return (grid get-patch-at x (xIndex + 1) y (yIndex + 1) z zIndex).
+
+    + section "Getting Information About a PatchChemicals in the Patch"
+
+    + to get-concentration of theDiffusable (object):
+        % returns the concentration of a OBJECT(PatchChecmical) in this patch.
+        grid get-concentration of theDiffusable at-x xIndex at-y yIndex at-z zIndex.
+        
+    + to get-by-name-concentration of theDiffusable (string):
+        % returns the concentration of a OBJECT(PatchChecmical) in this patch.
+        obj (object).
+        obj = (grid get-patch-chemcial by-name theDiffusable).
+        grid get-by-name-concentration of obj at-x xIndex at-y yIndex at-z zIndex.
+
+    + to set-concentration of theDiffusable (object) to theValue (float):
+        % returns the concentration of a OBJECT(PatchChecmical) in this patch.
+        grid set-concentration of theDiffusable at-x xIndex at-y yIndex at-z zIndex to theValue.
+        
+    + to set-by-name-concentration of theDiffusable (string) to theValue (float):
+        % sets the concentration of a OBJECT(PatchChecmical) in this patch.
+        obj (object).
+        obj = (grid get-patch-chemcial by-name theDiffusable).
+        grid set-by-name-concentration of obj at-x xIndex at-y yIndex at-z zIndex to theValue.
+
+    + to increase-concentration of theDiffusable (object) by theValue (float):
+        % increases the amount of a OBJECT(PatchChecmical) in this patch.
+        grid increase-concentration of theDiffusable by theValue at-x xIndex at-y yIndex at-z zIndex.
+        
+    + to increase-by-name-concentration of theDiffusable (string) by theValue (float):
+        % increases the  of a OBJECT(PatchChecmical) in this patch.
+        obj (object).
+        obj = (grid get-patch-chemcial by-name theDiffusable).
+        grid increase-by-name-concentration of obj by theValue at-x xIndex at-y yIndex at-z zIndex.
+    
+    + to decrease-concentration of theDiffusable (object) by theValue (float):
+        % returns the concentration of a OBJECT(PatchChecmical) in this patch.
+        grid decrease-concentnration of theDiffusable by theValue at-x xIndex at-y yIndex at-z zIndex.
+        
+    + to decrease-by-name-concentration of theDiffusable (string) by theValue (float):
+        % returns the concentration of a OBJECT(PatchChecmical) in this patch.
+        obj (object).
+        obj = (grid get-patch-chemcial by-name theDiffusable).
+        grid decrease-by-name-concentnration of obj by theValue at-x xIndex at-y yIndex at-z zIndex.
+
+    + to get-patch-chemicals:
+        % returns a list of all patch chemicals in the simulation
+        grid get-patch-chemcials.
+        
+    + to get-description:
+        return "patch at indices ($xIndex, $yIndex, $zIndex)".
+
+    + to dearchive:
+        return 1.
+
+    - to update-colors:
+        % Used internally.  Synchronizes the patch's color with recently 
+        % dearchived values. 
+
+        self set-color to color.
+        self set-transparency to transparency.
 }

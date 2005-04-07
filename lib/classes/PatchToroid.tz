@@ -29,4 +29,18 @@ PatchGrid : PatchToroid (aka PatchToroids) [version 2.2] {
 		else if zind < 0: zind = zSize + (zind % zSize).
 
         return patchObjectAtIndex(grid, xind, yind, zind).
+        
+    + to diffuse-chemicals:
+        % Updates the concentration of each OBJECT(PatchChemical) being tracked
+        % in the patch grid by diffusing the chemicals according to their
+        % diffusion rates.  This method is called automatically by METHOD(update-concentrations). 
+        chem (object).
+        chemMatrixPointer (pointer).
+        
+        for each chem in diffusingChemicals: {
+            chemMatrixPointer = (chemicalConcentrationMatrix{chem} get-matrix-pointer).
+            matrix3DDiffusePeriodic(chemMatrixPointer, tempMatrix, (chem get-diffusion-rate)).
+            matrix3DAddScaled(chemMatrixPointer, tempMatrix, 1.0).
+        }
+
 }
