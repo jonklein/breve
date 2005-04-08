@@ -20,6 +20,8 @@
 
 #include "glIncludes.h"
 
+typedef float slColor[4];
+
 // options passed to slRenderObjects to control how objects are rendered. 
 
 enum drawOptions {

@@ -23,17 +23,21 @@
 	\brief Data associated with a certain region of 3D space.
 */
 
+#include "bigMatrix.hh"
+
 class slPatch {
 	public:
 		slPatch() {
-			transparency = 1.0;
+			color[0] = 0.0;
+			color[1] = 0.0;
+			color[2] = 0.0;
+			color[3] = 1.0;
 			data = NULL;
-			slVectorSet(&color, 0, 0, 0);
 		}
 
 		void *data;
-		float transparency;
-		slVector color;
+
+		slColor color;
 		slVector location;
 };
 
@@ -55,6 +59,11 @@ class slPatchGrid {
 			}
 
 			delete[] patches;
+
+			delete[] colors[0];
+			delete[] colors[1];
+			delete[] colors[2];
+			delete[] colors[3];
 		}
 
 		void draw(slCamera *camera);
@@ -65,6 +74,8 @@ class slPatchGrid {
 		slVector patchSize;
 
 		slPatch ***patches;
+
+		unsigned char *colors[4];
 };
 #endif
 
@@ -97,6 +108,9 @@ slPatch *slPatchAtIndex(slPatchGrid *patches, int x, int y, int z);
 void *slPatchGetDataAtIndex(slPatchGrid *grid, int x, int y, int z);
 
 void slPatchSetDataAtIndex(slPatchGrid *grid, int x, int y, int z, void *data);
+
+void slPatchGridCopyColorFrom3DMatrix(slPatchGrid *grid, slBigMatrix3DGSL *m, int channel, double scale);
+void slPatchGridCopyColorFrom2DMatrix(slPatchGrid *grid, slBigMatrix2DGSL *m, int slice, int channel, double scale);
 
 #ifdef __cplusplus
 }

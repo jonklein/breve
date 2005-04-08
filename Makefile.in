@@ -138,7 +138,7 @@ CLI_release: clean
 	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin
 	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin
 ifeq ($(PLATFORM),windows)
-	cp bin/glut32.dll $(CLI_FOLDER)
+	cp bin/glut32.dll $(CLI_FOLDER)/bin
 endif
 	cp -R lib $(CLI_FOLDER)
 	cp -R demos $(CLI_FOLDER)

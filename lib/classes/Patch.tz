@@ -107,7 +107,7 @@ Abstract : Patch (aka Patches) [version 2.2] {
         % this method.
 
         patchPointer = p.
-        self set-transparency to 0.
+        self set-transparency to 1.0.
 
     + section "Changing the Appearence of Patches"
 
@@ -337,42 +337,18 @@ Abstract : Patch (aka Patches) [version 2.2] {
         % returns the concentration of a OBJECT(PatchChecmical) in this patch.
         grid get-concentration of theDiffusable at-x xIndex at-y yIndex at-z zIndex.
         
-    + to get-by-name-concentration of theDiffusable (string):
-        % returns the concentration of a OBJECT(PatchChecmical) in this patch.
-        obj (object).
-        obj = (grid get-patch-chemcial by-name theDiffusable).
-        grid get-by-name-concentration of obj at-x xIndex at-y yIndex at-z zIndex.
-
     + to set-concentration of theDiffusable (object) to theValue (float):
         % returns the concentration of a OBJECT(PatchChecmical) in this patch.
         grid set-concentration of theDiffusable at-x xIndex at-y yIndex at-z zIndex to theValue.
         
-    + to set-by-name-concentration of theDiffusable (string) to theValue (float):
-        % sets the concentration of a OBJECT(PatchChecmical) in this patch.
-        obj (object).
-        obj = (grid get-patch-chemcial by-name theDiffusable).
-        grid set-by-name-concentration of obj at-x xIndex at-y yIndex at-z zIndex to theValue.
-
     + to increase-concentration of theDiffusable (object) by theValue (float):
         % increases the amount of a OBJECT(PatchChecmical) in this patch.
         grid increase-concentration of theDiffusable by theValue at-x xIndex at-y yIndex at-z zIndex.
-        
-    + to increase-by-name-concentration of theDiffusable (string) by theValue (float):
-        % increases the  of a OBJECT(PatchChecmical) in this patch.
-        obj (object).
-        obj = (grid get-patch-chemcial by-name theDiffusable).
-        grid increase-by-name-concentration of obj by theValue at-x xIndex at-y yIndex at-z zIndex.
     
     + to decrease-concentration of theDiffusable (object) by theValue (float):
         % returns the concentration of a OBJECT(PatchChecmical) in this patch.
         grid decrease-concentnration of theDiffusable by theValue at-x xIndex at-y yIndex at-z zIndex.
         
-    + to decrease-by-name-concentration of theDiffusable (string) by theValue (float):
-        % returns the concentration of a OBJECT(PatchChecmical) in this patch.
-        obj (object).
-        obj = (grid get-patch-chemcial by-name theDiffusable).
-        grid decrease-by-name-concentnration of obj by theValue at-x xIndex at-y yIndex at-z zIndex.
-
     + to get-patch-chemicals:
         % returns a list of all patch chemicals in the simulation
         grid get-patch-chemcials.

@@ -1,6 +1,6 @@
 @use Real.
 
-Real : Terrain {
+Real : Terrain [version 2.2] {
 	% Terrain is an experimental class to add terrains to simulations.  
 
 	+ variables:
@@ -13,16 +13,16 @@ Real : Terrain {
 		self set-valley-color to (0, .8, .1).
 		self set-texture-image to (new Image load from "images/grass.jpg").
 
-	# + to set-terrain-size to newSize (int):
-	#	% Sets the size of the terrain 
-
 	+ to set-scale to value (double):
 		% Changes the size of a single tile in the terrain.  This does not change
 		% the number of elevation points in the terrain.
 
 		setTerrainScale(realWorldPointer, value).
 
-	+ to generate with-ruggedness ruggedness (float) with-height terrainHeight (float):
+	- to generate with-ruggedness ruggedness = 0.2 (float) with-height terrainHeight = 5.0 (float):
+		self generate-fractal-terrain with-ruggedness ruggedness with-height terrainHeight.
+
+	+ to generate-fractal-terrain with-ruggedness ruggedness = 0.2 (float) with-height terrainHeight = 5.0 (float):
 		% Generates a fractal landscape with a ruggedness (between 0.0 and 1.0),
 		% and maximum height terrainHeight.
 	

@@ -18,17 +18,11 @@ Abstract : PatchChemical (aka PatchChemcials) {
     % method.
 
     + variables:
-        name (string).                  # The name of the chemical
         rateOfDiffusion (float).        # The diffusion rate of the chemical
         rateOfDecay (float).            # The decay rate of the chemical
-        decayType (int).             # "Linear" or "Exponential"
+        decayType (int).             	# Linear (1) or Exponential (2)
         
-    + to init:
-        
-        return self.
-        
-    + to init-with name theName (string)
-                   diffusion-rate theDiffusionRate = 0.0 (float)
+    + to init-with diffusion-rate theDiffusionRate = 0.0 (float)
                    decay-rate theDecayRate = 0.0 (float)
                    decay-type theDecayType = "Linear" (string):
         % This is a complicated initialization function.  Normally
@@ -44,32 +38,19 @@ Abstract : PatchChemical (aka PatchChemcials) {
         # % release.
          
         if (theDiffusionRate < 0.0): {
-            printf "Error instantiating ".
-            printf theName.
-            print ":".
-            print "Diffusion rates must be positive or zero.".
-            controller end-simulation.
+            die "Diffusion rates must be greater than or equal to zero.".
         }
+
         if (theDecayRate < 0.0): {
-            printf "Error instantiating ".
-            printf theName.
-            print ":".
-            print "Decay rates must be positive or zero.".
-            controller end-simulation.
+            die "Decay rates must be greater than or equal to zero.".
         }
             
-        name = theName.
         rateOfDiffusion = theDiffusionRate.
         rateOfDecay = theDecayRate.
         if (theDecayType  == "Linear"):
             decayType = LINEAR.
         else: if (theDecayType  == "Exponential"):
             decayType = EXPONENTIAL.
-        else: {
-            printf "Error instantiating ".
-            printf theName.
-            print ".".
-        }
         
         return self.
         
@@ -81,9 +62,6 @@ Abstract : PatchChemical (aka PatchChemcials) {
         
     + to get-decay-type:
         return decayType.
-        
-    + to get-name:
-        return name.
         
     + to decay-is-linear:
         if (decayType == LINEAR): return 1.

@@ -64,8 +64,8 @@ static char *gOptionArchiveFile = NULL;
 static int gOptionFormat = 0;
 static int gOptionFull = 0;
 static int gOptionStdin = 0;
-
 static int gMotionCrosshair = 0;
+static int gOptionNoGraphics = 0;
 
 static int gLastX, gLastY, gMods, gSpecial;
 static double gStartCamX;
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
 	int index;
 	char wd[MAXPATHLEN];
 
-	interfaceID = "glut/2.0";
+	interfaceID = "glut/2.2";
 
 	srandom(time(NULL));
 
@@ -105,8 +105,7 @@ int main(int argc, char **argv) {
 	argv += index;
 
 	if (!gOptionStdin) {
-		if (argc < 2)
-			brPrintUsage(argv[0]);
+		if (argc < 2) brPrintUsage(argv[0]);
 
 		text = slUtilReadFile(argv[1]);
 		simulationFile = argv[1];
@@ -150,7 +149,7 @@ int main(int argc, char **argv) {
 	frontend->engine->freeWindowCallback = freeWindowCallback;
 	frontend->engine->renderWindowCallback = renderWindowCallback;
 
-	slInitGlut(argc, argv, simulationFile);
+	if (!gOptionNoGraphics) slInitGlut(argc, argv, simulationFile);
 
 	if (gOptionArchiveFile) {
 		if (breveFrontendLoadSavedSimulation(frontend, text, simulationFile, gOptionArchiveFile) != EC_OK)
@@ -175,8 +174,12 @@ int main(int argc, char **argv) {
 		slFree(gSlaveHost);
 	}
 
-	if (gOptionFull)
-		glutFullScreen();
+	if (gOptionFull) glutFullScreen();
+
+	if (gOptionNoGraphics) {
+		gPaused = 0;
+		while(1) brGlutLoop();
+	}
 
 	glutMainLoop();
 
@@ -328,7 +331,9 @@ int brParseArgs(int argc, char **argv) {
 	int level, r;
 	int error = 0;
 
-	const char *optstring = "a:d:fhip:r:s:uvFMS:";
+	const char *name = argv[0];
+
+	const char *optstring = "a:d:fhip:r:s:xuvFMS:";
 
 #if HAVE_GETOPT_LONG
 	while((r = getopt_long(argc, argv, optstring, gCLIOptions, NULL)) != -1)
@@ -384,15 +389,18 @@ int brParseArgs(int argc, char **argv) {
 			gSlaveHost = slStrdup(optarg);
 			gSlave = 1;
 			break;
+		case 'x':
+			gOptionNoGraphics = 1;
+			break;
 		default:
 			printf("unknown option: '%c'\n", r);
 		case 'h':
 			error++;
+			break;
 		}
 	}
 
-	if (error)
-		brPrintUsage(argv[0]);
+	if (error) brPrintUsage(name);
 
 	return optind - 1;
 }
@@ -400,6 +408,7 @@ int brParseArgs(int argc, char **argv) {
 void brPrintUsage(char *name) {
 	fprintf(stderr, "usage: %s [options] simulation_file\n", name);
 	fprintf(stderr, "options:\n");
+	fprintf(stderr, "  -x              Run the simulation without graphical display.\n");
 	fprintf(stderr, "  -r <seed>       Sets the random seed to <seed>.\n");
 	fprintf(stderr, "  -a <xml_file>   Dearchive simulation from <xml_file>.  <xml_file> should be\n");
 	fprintf(stderr, "                  an archive of the simulation contained in the input file.\n");
@@ -422,8 +431,7 @@ void slInitGlut(int argc, char **argv, char *title) {
 	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH|GLUT_STENCIL);
 	glutCreateWindow(title);
 
-	if (xpos || ypos)
-		glutInitWindowPosition(xpos, ypos);
+	if (xpos || ypos) glutInitWindowPosition(xpos, ypos);
 
 	glutGetWindow();
 

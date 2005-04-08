@@ -35,6 +35,11 @@ slPatchGrid *slPatchGridNew(slVector *center, slVector *patchSize, int x, int y,
 	grid->ySize = y;
 	grid->zSize = z;
 
+	grid->colors[0] = new unsigned char[x * y * z];
+	grid->colors[1] = new unsigned char[x * y * z];
+	grid->colors[2] = new unsigned char[x * y * z];
+	grid->colors[3] = new unsigned char[x * y * z];
+
 	slVectorCopy(patchSize, &grid->patchSize);
 
 	grid->startPosition.x = (-(patchSize->x * x) / 2) + center->x;
@@ -69,6 +74,56 @@ slPatch *slPatchForLocation(slPatchGrid *g, slVector *location) {
 	if(z < 0 || z >= g->zSize) return NULL;
 
 	return &g->patches[z][y][x];
+}
+
+/*!
+	\brief Copies the contents of a 3D matrix to one z-slice of a PatchGrid.
+*/
+
+void slPatchGridCopyColorFrom3DMatrix(slPatchGrid *grid, slBigMatrix3DGSL *m, int channel, double scale) {
+	int x, y, z;
+	int xSize, ySize, zSize;
+	float* mData;
+
+	unsigned int chemTDA = m->xDim(); 
+	unsigned int chemXY = m->xDim() * m->yDim();
+
+	mData = m->getGSLVector()->data;
+
+	xSize = m->xDim();
+	ySize = m->yDim();
+	zSize = m->zDim();
+
+	for(x = 0; x < xSize; x++ ) {
+		for(y = 0; y < ySize; y++ ) {
+			for(z = 0; z < zSize; z++ ) {
+				grid->patches[x][y][z].color[channel] = scale * mData[ (z * chemXY) + (x * chemTDA) + y ];
+			}
+		}
+	}
+}
+
+/*!
+	\brief Copies the contents of a 2D matrix to one z-slice of a PatchGrid.
+*/
+
+void slPatchGridCopyColorFrom2DMatrix(slPatchGrid *grid, slBigMatrix2DGSL *m, int z, int channel, double scale) {
+	int x, y;
+	int xSize, ySize;
+	float* mData;
+
+	unsigned int chemTDA = m->xDim(); 
+
+	mData = m->getGSLVector()->data;
+
+	xSize = m->xDim();
+	ySize = m->yDim();
+
+	for(x = 0; x < xSize; x++ ) {
+		for(y = 0; y < ySize; y++ ) {
+			grid->patches[x][y][z].color[channel] = scale * mData[ (x * chemTDA) + y ];
+		}
+	}
 }
 
 /*!
@@ -120,7 +175,7 @@ void slPatchGrid::draw(slCamera *camera) {
 
 				patch = &patches[zVal][yVal][xVal];
 
-				if(patch->transparency != 1.0) {
+				if(patch->color[3] != 0.0) {
 					translation.x = startPosition.x + patchSize.x * xVal;
 					translation.y = startPosition.y + patchSize.y * yVal;
 					translation.z = startPosition.z + patchSize.z * zVal;
@@ -128,7 +183,7 @@ void slPatchGrid::draw(slCamera *camera) {
 					if(camera->pointInFrustum(&translation)) {
 						glPushMatrix();
 
-						glColor4f(patch->color.x, patch->color.y, patch->color.z, 1.0 - patch->transparency);
+						glColor4fv(patch->color);
 
 						glTranslatef(translation.x, translation.y, translation.z);
 
@@ -168,15 +223,19 @@ void slPatchGetLocation(slPatch *p, slVector *location) {
 }
 
 void slPatchSetColor(slPatch *p, slVector *color) {
-	slVectorCopy(color, &p->color);
+	p->color[0] = color->x;
+	p->color[1] = color->y;
+	p->color[2] = color->z;
 }
 
 void slPatchSetTransparency(slPatch *p, double transparency) {
-	p->transparency = transparency;
+	p->color[3] = transparency;
 }
 
 void slPatchGetColor(slPatch *p, slVector *color) {
-	slVectorCopy(&p->color, color);
+	color->x = p->color[0];
+	color->y = p->color[1];
+	color->z = p->color[2];
 }
 
 slPatch *slPatchAtIndex(slPatchGrid *grid, int x, int y, int z) {

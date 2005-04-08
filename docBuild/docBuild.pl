@@ -147,12 +147,12 @@ foreach $class (@classes) {
     select(STDOUT);
 }
 
-if(!open(DOC, ">classlist.html")) {
+if(!open(CLASSLIST, ">classlist.html")) {
     print STDOUT "error opening classlist.html: $!\n";
     exit(1);
 }
 
-select(DOC);
+select(CLASSLIST);
 
 print<<__EOT__;
 <HEAD>
@@ -188,7 +188,7 @@ print_subclasses("Object");
 
 footer();
 
-close DOC;
+close CLASSLIST;
 
 sub header() {
     my $parent = $_[0];
@@ -242,7 +242,7 @@ sub header() {
 <h2>$parent_link : $class</h2>
 This class is included as part of the file $filename.
 <br>
-To use this class, include the line \"<b>\@use $no_tz.</b>\"
+To use this class in a simulation, include the line \"<b>\@use $no_tz.</b>\"
 __EOT__
     if($classdesc =~ /\%/) {
         my @nothing = ();
@@ -307,7 +307,7 @@ sub sectionBody() {
 		}
 
         my $newdec = $declaration;
-        $declaration =~ s/$name/\<b\>$name\<\/b\>/;
+        # $declaration =~ s/$name/\<tt\>$name\<\/tt\>/;
 
         $newdec =~ s/(^[\w-]+)//;
 
@@ -316,7 +316,7 @@ sub sectionBody() {
         $declaration = process_docs($declaration, \@variables);
 
         print "<hr>\n";
-        print "<a name=\"$name\">$declaration<p></a>\n";
+        print "<a name=\"$name\"><font size=+1><tt>$declaration</tt></font><p></a>\n";
 
         # get rid of the name
 
@@ -355,7 +355,7 @@ sub process_docs() {
 
 		next if($word eq "");
 
-        $input =~ s/(\W)$word(\W)/$1<i>$word<\/i>$2/g;
+        $input =~ s/([^\w-])$word([^\w-])/$1<i>$word<\/i>$2/g;
     }
 
 	$input =~ s/(\s)breve(\W)/$1<b>breve<\/b>$2/g;

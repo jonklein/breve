@@ -57,6 +57,8 @@ typedef struct slObjectConnection slObjectConnection;
 typedef struct slObjectLine slObjectLine;
 
 typedef struct slSpring slSpring;
+typedef struct slBigMatrix3DGSL slBigMatrix3DGSL;
+typedef struct slBigMatrix2DGSL slBigMatrix2DGSL;
 
 typedef struct slNetsimData slNetsimData;
 typedef struct slNetsimServerData slNetsimServerData;

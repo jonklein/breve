@@ -672,12 +672,14 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 	slSphere *ss = (slSphere*)vc->objects[obX]->shape;
 	slPosition *sp = &vc->objects[obX]->position;
 
-	if(!flip) {
-		ce->n1 = obY;
-		ce->n2 = obX;
-	} else {
-		ce->n1 = obX;
-		ce->n2 = obY;
+	if(ce) {
+		if(!flip) {
+			ce->n1 = obY;
+			ce->n2 = obX;
+		} else {
+			ce->n1 = obX;
+			ce->n2 = obY;
+		}
 	}
 
 	slVectorSet(&aveNormal, 0, 0, 0);
@@ -739,6 +741,8 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 						if(dist < MC_TOLERANCE && dist > (-2 * ss->_radius)) {
 							collisions++;
 
+							if(!ce) return CT_PENETRATE;
+
 							slVectorMul(&landPlane.normal, ss->_radius, &toSphere);
 							slVectorSub(&sp->location, &toSphere, &terrainPoint);
 
@@ -774,6 +778,8 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 						if(dist < MC_TOLERANCE && dist > (-2 * ss->_radius)) {
 							collisions++;
 
+							if(!ce) return CT_PENETRATE;
+
 							if(dist < VC_WARNING_TOLERANCE)
 								slMessage(DEBUG_ALL, "deep edge collision (%f) in terrain/sphere clip, triangle violation %d\n", dist, trivi);
 
@@ -804,6 +810,8 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 
 						if(dist < MC_TOLERANCE && dist > (-2 * ss->_radius)) {
 							collisions++;
+
+							if(!ce) return CT_PENETRATE;
 
 							if(dist < VC_WARNING_TOLERANCE)
 								slMessage(DEBUG_ALL, "deep point collision (%f) in terrain/sphere clip, triangle violation %d\n", dist, trivi);
@@ -1053,6 +1061,8 @@ int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosit
 		if(hdist < VC_WARNING_TOLERANCE)
 			slMessage(DEBUG_ALL, "deep collision (%f) in terrain/edge clip\n", hdist);
 
+		if(!ce) return CT_PENETRATE;
+
 		ce->depths.push_back(hdist);
 		ce->points.push_back(headPoint);
 
@@ -1075,13 +1085,15 @@ int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosit
 		if(tdist < VC_WARNING_TOLERANCE)
 			slMessage(DEBUG_ALL, "deep collision (%f) in terrain/edge clip\n", tdist);
 
+		if(!ce) return CT_PENETRATE;
+
 		ce->depths.push_back(tdist);
 		ce->points.push_back(tailPoint);
 
 		slVectorSub(&ce->normal, &facePlane->normal, &ce->normal);
 	}
 
-	return 1;
+	return CT_DISJOINT;
 }
 
 /*!
@@ -1095,8 +1107,7 @@ double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollision 
 
 	slPositionVertex(pp, &p->vertex, &tp);
 
-	// if slTerrainAreaUnderPoint doesn't return 0, then the result is outside the 
-	// terrain
+	// if slTerrainAreaUnderPoint doesn't return 0, then the result is outside the terrain
 	
 	if(slTerrainAreaUnderPoint(t, &tp, &p->terrainX, &p->terrainZ, &p->terrainQuad)) {
 		return 1.0;
@@ -1109,6 +1120,8 @@ double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollision 
 	dist = slPlaneDistance(&landPlane, &tp);
 
 	if(dist < MC_TOLERANCE && dist > -1.0) {
+		if(!ce) return dist;
+
 		if(dist < VC_WARNING_TOLERANCE) 
 			slMessage(DEBUG_ALL, "deep collision (%f) in point/terrain clip\n", dist);
 
@@ -1213,7 +1226,4 @@ double slTerrainGetHeightAtLocation(slTerrain *t, double x, double z) {
 	slTerrainAreaUnderPoint(t, &point, &xoff, &zoff, &quad);
 
 	return t->matrix[xoff][zoff];
-}
-
-void slTerrainGetSlope(slTerrain *t, double x1, double z1, double x2, double z2, slVector *result) {
 }

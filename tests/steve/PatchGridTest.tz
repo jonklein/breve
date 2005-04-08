@@ -3,12 +3,12 @@
 @use PatchToroid.
 @use PatchChemical.
 
-@define SIZE 10.
+@define SIZE 20.
 @define DIFFUSION_RATE .09.
-@define DECAY_RATE 0.01.
+@define DECAY_RATE 0.0.
 @define EXP_INFLOW 200.
 @define LIN_INFLOW 200.
-@define INFLOW_END_TIME 10.
+@define INFLOW_END_TIME 100.
 
 Controller PatchGridTestControl.
 
@@ -25,12 +25,10 @@ Control : PatchGridTestControl {
         grid = ((new PatchToroid) init-with with-x-count SIZE
                           with-y-count SIZE
                           with-z-count SIZE).
-        expChem = ((new PatchChemical) init-with name "MyChemical"
-                               diffusion-rate DIFFUSION_RATE
+        expChem = ((new PatchChemical) init-with diffusion-rate DIFFUSION_RATE
                               decay-rate DECAY_RATE
                               decay-type "Exponential").
-        linChem = ((new PatchChemical) init-with name "MyChemical"
-                               diffusion-rate DIFFUSION_RATE
+        linChem = ((new PatchChemical) init-with diffusion-rate DIFFUSION_RATE
                               decay-rate DECAY_RATE
                               decay-type "Linear").
         grid track patch-chemical expChem.
@@ -45,6 +43,10 @@ Control : PatchGridTestControl {
         self point-camera at (0, 0, 0) from (-40, 16, 40).
         self add-menu named "Increase Diffusion" for-method "increase-diffusion".
         self add-menu named "Decrease Diffusion" for-method "decrease-diffusion".
+
+		self set-background-color to (1, 1, 1).
+
+		all Patches set-transparency to 0.2.
 	    
 	+ to iterate:
         grid diffuse-chemicals.

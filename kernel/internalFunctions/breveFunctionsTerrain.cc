@@ -104,15 +104,15 @@ int brIGetTerrainHeightAtLocation(brEval args[], brEval *target, brInstance *i) 
 
 int brIGetTerrainSlope(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t = BRTERRAINPOINTER(&args[0]);
-	double x1 = BRDOUBLE(&args[1]);
-	double y1 = BRDOUBLE(&args[2]);
-	double x2 = BRDOUBLE(&args[3]);
-	double y2 = BRDOUBLE(&args[4]);
+	// double x1 = BRDOUBLE(&args[1]);
+	// double y1 = BRDOUBLE(&args[2]);
+	// double x2 = BRDOUBLE(&args[3]);
+	// double y2 = BRDOUBLE(&args[4]);
 
 	if (!t)
 		return EC_OK;
 
-	slTerrainGetSlope(t, x1, y1, x2, y2, &BRVECTOR(target));
+	// slTerrainGetSlope(t, x1, y1, x2, y2, &BRVECTOR(target));
 
 	return EC_OK;
 }

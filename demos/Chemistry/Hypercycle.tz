@@ -1,0 +1,172 @@
+#
+# Hypercycle -- a simulation of a self-replicating hypercycle system.
+# jon klein <jk@spiderland.org>
+#
+# dx/dt = 
+#
+
+@use Control.
+@use Mobile.
+@use Matrix.
+
+@define TIMESTEP 0.25.
+
+@define SIZE 128.
+
+@define C 20.
+
+@define D 0.1.
+
+@define CHEMICAL_COUNT 6.
+
+Controller GS.
+
+Control : GS {
+    + variables:
+        U (object).
+        V (object).
+        tempreact, temp, inflow (object).
+        texture (object).
+        cube (object).
+
+		reactionRates (list).
+		chemicals (list).
+		reactions (list).
+		diffusion (object).
+		totalConcentration (object).
+
+		colors (list).
+
+		rgb (list).
+		
+    + to init:
+        m, n, c, x (int).
+
+		push (1.0, 0, 0) onto colors.
+		push (.5, 0, .5) onto colors.
+		push (0, 0, .5) onto colors.
+		push (0, .5, .5) onto colors.
+		push (1, 1, 1) onto colors.
+		push (1, 1, 0) onto colors.
+
+		# Here we specify the reaction rates between different chemicals.
+		# The reaction rate at position (x, y) specifies the rate at which
+		# chemical x catylizes the production of chemical y.
+
+		reactionRates = { { 0, C, 0, 0, 0, 0 },
+						  { 0, 0, C, 0, 0, 0 },
+						  { 0, 0, 0, C, 0, 0 },
+						  { 0, 0, 0, 0, C, 0 },
+						  { 0, 0, 0, 0, 0, C },
+						  { C, 0, 0, 0, 0, 0 }
+					}.
+
+		chemicals = CHEMICAL_COUNT new Matrix2D.
+		chemicals set-size x SIZE y SIZE.
+
+		diffusion = new Matrix2D.
+		diffusion set-size x SIZE y SIZE.
+
+		reactions = CHEMICAL_COUNT new Matrix2D.
+		reactions set-size x SIZE y SIZE.
+
+		rgb = 3 new Matrix2D.
+		rgb set-size x SIZE y SIZE.
+
+		totalConcentration = new Matrix2D.
+		totalConcentration set-size x SIZE y SIZE.
+
+        self set-background-color to (0, 0, 0).
+
+        self set-iteration-step to TIMESTEP.
+        self set-integration-step to TIMESTEP.
+
+        self point-camera at (0, 0, 0) from (0, 0, 80).
+
+		# setup some initial random patches of chemicals.
+
+		for x = 0, x < 3000, x++: {
+			c = random[ CHEMICAL_COUNT - 1 ].
+			n = 1 + random[ SIZE - 3 ].
+			m = 1 + random[ SIZE - 3 ].
+
+			chemicals{ c } set-value at-x n at-y m to 0.2.
+			chemicals{ c } set-value at-x n at-y m + 1 to .2.
+			chemicals{ c } set-value at-x n at-y m - 1 to .2.
+			chemicals{ c } set-value at-x n + 1 at-y m to .2.
+			chemicals{ c } set-value at-x n - 1 at-y m to .2.
+		}
+
+        texture = new MatrixImage.
+        texture init-with width SIZE height SIZE.
+        texture set-r to rgb{ 0 }.
+        texture set-g to rgb{ 1 }.
+        texture set-b to rgb{ 2 }.
+
+        cube = new Mobile.
+        cube set-shape to (new Cube init-with size (60, 60, 1)).
+        cube set-texture-image to texture.
+        cube set-texture-scale to 60.
+
+    + to iterate:
+		n, m (int).
+		sum (double).
+
+		totalConcentration set-all-values to 1.0.
+
+		# compute the reaction matrix for each chemical, as well as the 
+		# total concentration term.
+
+		for n = 0, n < CHEMICAL_COUNT, n++: {
+			totalConcentration subtract-values of chemicals{ n }.
+
+			# self replication rate = 2.0
+
+			reactions{ n } set-all-values to 2.0.
+
+			for m = 0, m < CHEMICAL_COUNT, m++: {
+				if reactionRates{ m }{ n } != 0.0: {
+					reactions{ n } add-values of chemicals{ m } scaled-by reactionRates{ m }{ n }.
+				}
+			}
+		}
+
+		rgb set-all-values to 0.0.
+
+		for n = 0, n < CHEMICAL_COUNT, n++: {
+			reactions{ n } multiply-with-values of chemicals{ n }.
+			reactions{ n } multiply-with-values of totalConcentration.
+
+			# decay term (scale by 1)
+			reactions{ n } subtract-values of chemicals{ n } scaled-by 1.0.
+
+			# diffusion rate = 1.0
+			diffusion compute-diffusion-matrix from chemicals{ n }.
+			reactions{ n } add-values of diffusion scaled-by D.
+
+			chemicals{ n } add-values of reactions{ n } scaled-by TIMESTEP.
+
+			rgb{ 0 } add-values of chemicals{ n } scaled-by colors{ n }::x.
+			rgb{ 1 } add-values of chemicals{ n } scaled-by colors{ n }::y.
+			rgb{ 2 } add-values of chemicals{ n } scaled-by colors{ n }::z.
+		}
+
+		super iterate.
+}
+
+Image : MatrixImage {
+    + variables:
+        r, g, b (object).
+        n (int).
+
+    + to set-r to m (object): r = m.
+    + to set-g to m (object): g = m.
+    + to set-b to m (object): b = m.
+
+    + to iterate:
+		r copy-to-red-channel of-image self.
+		g copy-to-green-channel of-image self.
+		b copy-to-blue-channel of-image self.
+        super iterate.
+}
+

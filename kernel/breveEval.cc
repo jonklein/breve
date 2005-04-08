@@ -66,6 +66,8 @@ char *brObjectDescription(brInstance *i) {
 	brEval result;
 	int r;
 
+	return slStrdup("");
+
 	if (!i || i->status != AS_ACTIVE)
 		return slStrdup("");
 

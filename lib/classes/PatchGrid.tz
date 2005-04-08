@@ -23,13 +23,8 @@ Abstract : PatchGrid [version 2.2] {
         exponentiallyDecayingChemicals (list).
         diffusingChemicals (list).
         chemicalConcentrationMatrix (hash).
-        chemicalNameLookUp (hash).
-#        chemicalCount (int).
         tempMatrix (pointer).
-        redChemical, greenChemical, blueChemical (object).
-        
-    + to init:
-        
+        redChemicalMatrix, greenChemicalMatrix, blueChemicalMatrix (object).
         
     - to init-with patch-size pSize = (1, 1, 1) (vector) 
         with-x-count x (int) 
@@ -173,35 +168,23 @@ Abstract : PatchGrid [version 2.2] {
         % Adds a new OBJECT(PatchChemical) to the patch grid.  This allows
         % the patch grid to track the concentrations of the chemcial in
         % each patch and allow diffusion between the patches.
-        if (chemicalConcentrationMatrix{theDiffusable}):
-        {
-            printf (theDiffusable get-name).
-            print " is already being tracked by the PatchGrid.".
+
+        if (chemicalConcentrationMatrix{theDiffusable}): {
+            print "$theDiffusable is already being tracked by the PatchGrid.".
+			return.
         }
-        else:
-        {
-            push theDiffusable onto chemicals.
-            if (theDiffusable get-decay-rate) > 0.0:
-            {
-                if (theDiffusable decay-is-linear):
-                     push theDiffusable onto linearlyDecayingChemicals.
-                else: if (theDiffusable decay-is-exponential):
-                    push theDiffusable onto exponentiallyDecayingChemicals.
-                else:
-                {
-                    printf "Error in the decay type for ".
-                    printf (theDiffusable get-name).
-                    print ".".
-                }
-            }
-            if (theDiffusable get-diffusion-rate) > 0.0: push theDiffusable onto diffusingChemicals.
-            chemicalNameLookUp{(theDiffusable get-name)} = theDiffusable.
-            chemicalConcentrationMatrix{theDiffusable} = ((new Matrix3D) 
-                                                                    init-with 
-                                                                        x-size (self get-x-count)
-                                                                        y-size (self get-y-count)
-                                                                        z-size (self get-z-count)).
-        }
+
+		push theDiffusable onto chemicals.
+
+		if (theDiffusable decay-is-linear): push theDiffusable onto linearlyDecayingChemicals.
+		else: if (theDiffusable decay-is-exponential): push theDiffusable onto exponentiallyDecayingChemicals.
+
+		if (theDiffusable get-diffusion-rate) > 0.0: push theDiffusable onto diffusingChemicals.
+
+		chemicalConcentrationMatrix{theDiffusable} = ((new Matrix3D) init-with 
+			x-size (self get-x-count)
+			y-size (self get-y-count)
+			z-size (self get-z-count)).
         
     + to untrack patch-chemical theDiffusable (object):
         % Removes a OBJECT(PatchChemcial) from the patch grid.
@@ -210,7 +193,7 @@ Abstract : PatchGrid [version 2.2] {
         
         if (chemicalConcentrationMatrix{theDiffusable}): {
             free chemicalConcentrationMatrix{theDiffusable}.
-            chemicalNameLookUp{(theDiffusable get-name)} = 0.
+
             for each chem in chemicals:
               if chem != theDiffusable: push chem onto newChems.
             chemicals = newChems.
@@ -224,49 +207,54 @@ Abstract : PatchGrid [version 2.2] {
               if chem != theDiffusable: push chem onto newChems.
             exponentiallyDecayingChemicals = newChems.
         }
-        else: {
-            printf (theDiffusable get-name).
-            print " is not tracked in the PatchGrid.".
-        }
     
     + to display-concentration-in-red of-patch-chemical theDiffusable (object):
         % Selects the OBJECT(PatchChemical)'s concentration to use as the red
         % channel when METHOD(display-patch-chemical-concentrations) is called.
-        redChemical = theDiffusable.
+
+		redChemicalMatrix = chemicalConcentrationMatrix{theDiffusable}.
         
     + to display-concentration-in-green of-patch-chemical theDiffusable (object):
         % Selects the OBJECT(PatchChemical)'s concentration to use as the red
         % channel when METHOD(display-patch-chemical-concentrations) is called.
-        greenChemical = theDiffusable.
+
+		greenChemicalMatrix = chemicalConcentrationMatrix{theDiffusable}.
                 
     + to display-concentration-in-blue of-patch-chemical theDiffusable (object):
         % Selects the OBJECT(PatchChemical)'s concentration to use as the red
         % channel when METHOD(display-patch-chemical-concentrations) is called.
-        blueChemical = theDiffusable.
+        blueChemicalMatrix = theDiffusable.
+
+		blueChemicalMatrix = chemicalConcentrationMatrix{theDiffusable}.
                    
     + to set-patch-colors-to-chemical-concentrations:
         x,y,z (int).
         color (vector).
         color = (0,0,0).
-        
-        for x=0, x< xSize, x++:
-            for y=0, y<ySize, y++:
-                for z=0, z<zSize, z++:
-                {
-                    if (redChemical): color::x = ((chemicalConcentrationMatrix{redChemical}) get-value at-x x at-y y at-z z).
-                    if (greenChemical): color::y = ((chemicalConcentrationMatrix{greenChemical}) get-value at-x x at-y y at-z z).
-                    if (blueChemical): color::z = ((chemicalConcentrationMatrix{blueChemical}) get-value at-x x at-y y at-z z).
-                    (self get-patch-at x x y y z z) set-color to color.
-                }
-                
+
+		matrix3DSetAll(tempMatrix, 0.0).
+
+		if redChemicalMatrix: {
+			patchGridCopyColorFrom3DMatrix(grid, (redChemicalMatrix get-matrix-pointer), 0, 1.0).
+			matrix3DAddScaled(tempMatrix, (redChemicalMatrix get-matrix-pointer), .33).
+		}
+
+		if greenChemicalMatrix: {
+			patchGridCopyColorFrom3DMatrix(grid, (greenChemicalMatrix get-matrix-pointer), 1, 1.0).
+			matrix3DAddScaled(tempMatrix, (greenChemicalMatrix get-matrix-pointer), .33).
+		}
+
+		if blueChemicalMatrix: {
+			patchGridCopyColorFrom3DMatrix(grid, (blueChemicalMatrix get-matrix-pointer), 2, 1.0).
+			matrix3DAddScaled(tempMatrix, (blueChemicalMatrix get-matrix-pointer), .33).
+		}
+
+		patchGridCopyColorFrom3DMatrix(grid, tempMatrix, 3, 1.0).
+
     + to get-patch-chemicals:
         % Returns all the chemicals currently being tracked in
         % the patch grid.
         return chemicals.
-        
-    + to get-patch-chemical by-name theName (string):
-        % Returns the OBJECT(PatchChemical) with the provided name.
-        return chemicalNameLookUp{theName}.
         
     + to update-concentrations:
         % Updates the concentrations of each OBJECT(PatchChemical) being
@@ -311,6 +299,9 @@ Abstract : PatchGrid [version 2.2] {
         % that this is a normalized concentration.  If you want the
         % total concentration, multiply by the OBJECT(Patch) size.
         % You don't normally call this directly
+
+		print chemicalConcentrationMatrix{theDiffusable}.
+
         return (chemicalConcentrationMatrix{theDiffusable} get-value at-x xIndex at-y yIndex at-z zIndex).
         
     - to set-concentration of theDiffusable (object) at-x xIndex (int) at-y yIndex (int) at-z zIndex (int) to theValue (float):
@@ -318,6 +309,7 @@ Abstract : PatchGrid [version 2.2] {
         % that this is a normalized concentration.  If you want to
         % use total concentration, multiply by the OBJECT(Patch) size first.
         % You don't normally call this directly
+
         chemicalConcentrationMatrix{theDiffusable} set-value to theValue
                                                                      at-x xIndex
                                                                      at-y yIndex
@@ -350,7 +342,6 @@ Abstract : PatchGrid [version 2.2] {
 
         grid = newPatchGrid(location, patchSize, xSize, ySize, zSize).
 
-        print "starting dearchive.".
         for x=0,x<xSize,x++: {
             for y=0,y<ySize,y++: {
                 for z=0,z<zSize,z++: {
@@ -362,8 +353,6 @@ Abstract : PatchGrid [version 2.2] {
                 }
             }
         }
-
-        print "done dearchive.".
 
         return 1.
 
