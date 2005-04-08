@@ -22,9 +22,9 @@ Control : JavaTestController {
         print "".
         print "Double test: ", (test doubleTest with-number random[10.0]).
         print "".
-        print "String test: ", (test stringTest with-string "string").
-        print "".
+        # print "String test: ", (test stringTest with-string "string").
+        # print "".
 
     + to iterate:
-        self end-simulation.
+        # self end-simulation.
 }

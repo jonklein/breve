@@ -84,7 +84,7 @@ jstring brMakeJavaString(brJavaBridgeData *bridge, char *string) {
 
 	s = (*bridge->env).NewString(characters, strlen(string));
 
-	delete[] characters;
+ 	delete[] characters;
 
 	return s;
 }

@@ -57,6 +57,8 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 
 	slMessage(DEBUG_GEN, "opts: %s\n", optstr);
 
+	vm_args.version = JNI_VERSION_1_2;
+
 	JNI_GetDefaultJavaVMInitArgs(&vm_args);
 
 	options[0].optionString = optstr;
