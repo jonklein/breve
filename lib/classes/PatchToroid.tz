@@ -28,7 +28,7 @@ PatchGrid : PatchToroid (aka PatchToroids) [version 2.2] {
 		if zind >= zSize: zind %= zSize.
 		else if zind < 0: zind = zSize + (zind % zSize).
 
-        return patchObjectAtIndex(grid, xind, yind, zind).
+        return patchObjectAtIndex(gridPointer, xind, yind, zind).
         
     + to diffuse-chemicals:
         % Updates the concentration of each OBJECT(PatchChemical) being tracked

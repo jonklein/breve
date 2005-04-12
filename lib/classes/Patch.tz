@@ -107,7 +107,7 @@ Abstract : Patch (aka Patches) [version 2.2] {
         % this method.
 
         patchPointer = p.
-        self set-transparency to 1.0.
+        self set-transparency to 0.0.
 
     + section "Changing the Appearence of Patches"
 
@@ -129,9 +129,9 @@ Abstract : Patch (aka Patches) [version 2.2] {
 
     + to set-transparency to theTransparency (float):
         % Sets the transparency of the patch to theTransparency.  The 
-        % default value is 1.0, which is fully transparent.  No matter how
-        % much you set the color of the patch, it won't be visible until
-        % you've set the transparency to a value other than 1.0.  
+        % default value is 1.0, which is fully transparent.  Regardless 
+		% of the color of the patch, it won't be visible until you've set the 
+		% transparency to a value other than 1.0.  
 
         if !patchPointer: {
             print "set-transparency called for $self before patch was initialized".
@@ -140,7 +140,7 @@ Abstract : Patch (aka Patches) [version 2.2] {
         }
 
         transparency = theTransparency.
-        setPatchTransparency(patchPointer, theTransparency).
+        setPatchTransparency(patchPointer, 1.0 - theTransparency).
 
     + section "Getting Groups of Neighbor Patches"
 

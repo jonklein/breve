@@ -34,7 +34,10 @@ Abstract : Image (aka Images) [version 2.0] {
         if imageData: imageDataFree(imageData).
 
         imageData = imageLoadFromFile(imageFile).
-        if !imageData: return 0.
+        if !imageData: {
+			print "Error loading image $imageFile!".
+			return 0.
+		}
 
         if textureNumber != -1: modified = 1.
 
@@ -67,6 +70,7 @@ Abstract : Image (aka Images) [version 2.0] {
     + to get-height:
         % Returns the width of the image.  
 
+		if !imageData: return 0.
         return imageGetHeight(imageData).
 
   + section "Getting the value of pixels"
@@ -75,24 +79,28 @@ Abstract : Image (aka Images) [version 2.0] {
         % Returns the red pixel at the image coordinates (x, y).
         % The pixel value is given on a scale from 0.0 to 1.0.
 
+		if !imageData: return 0.
         return imageGetValueAtCoordinates(imageData, x * 4, y).
 
     + to get-green-pixel at-x x (int) at-y y (int):
         % Returns the green pixel at the image coordinates (x, y).
         % The pixel value is given on a scale from 0.0 to 1.0.
 
+		if !imageData: return 0.
         return imageGetValueAtCoordinates(imageData, (x * 4) + 1, y).
 
     + to get-blue-pixel at-x x (int) at-y y (int):
         % Returns the blue pixel at the image coordinates (x, y).
         % The pixel value is given on a scale from 0.0 to 1.0.
 
+		if !imageData: return 0.
         return imageGetValueAtCoordinates(imageData, (x * 4) + 2, y).
 
     + to get-alpha-pixel at-x x (int) at-y y (int):
         % Returns the alpha channel pixel at the image coordinates (x, y).
         % The pixel value is given on a scale from 0.0 to 1.0.
 
+		if !imageData: return 0.
         return imageGetValueAtCoordinates(imageData, (x * 4) + 3, y).
 
     + to get-rgb-pixel at-x x (int) at-y y (int):
@@ -100,6 +108,8 @@ Abstract : Image (aka Images) [version 2.0] {
         % at image coordinates (x, y) as a vector.
 
         r, g, b (double).
+
+		if !imageData: return (0, 0, 0).
 
         r = imageGetValueAtCoordinates(imageData, x * 4, y).
         g = imageGetValueAtCoordinates(imageData, (x * 4) + 1, y).

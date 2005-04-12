@@ -181,27 +181,11 @@ int brIMatrix2DDiffuse(brEval args[], brEval *target, brInstance *i) {
 	unsigned int yDim = chemSource->yDim();    
 	unsigned int diffTDA = diffTarget->xDim(); // proxy for tda
 	unsigned int chemTDA = chemSource->xDim(); // proxy for tda
-	unsigned int x = 0, y = 0;
+	int x = 0, y = 0;
 
     // this will get moved to a seperate util class later
     // and will be converted to iterators when we migrate to gslmm based code
     
-    ///// VERY TEMP local optimization
-#if(0)
-       // f3x3 is an altivec optimized convolution, but does not handle periodic
-       // boundaries.  
-
-       float kernel[9];
-
-       kernel[0] = 0; kernel[1] = scale; kernel[2] = 0;
-       kernel[3] = scale; kernel[4] = scale * -4; kernel[5] = scale;
-       kernel[6] = 0; kernel[7] = scale; kernel[8] = 0;
-
-       f3x3(chemData, chemTDA, yDim, kernel, diffData);
-
-       return EC_OK;
-#endif
-
 	for(x=0; x < xDim; x++) {
 	    for(y=0; y < yDim; y++) {
             double dt, db, dl, dr;
@@ -218,7 +202,7 @@ int brIMatrix2DDiffuse(brEval args[], brEval *target, brInstance *i) {
 			if(y + 1 < yDim) db = chemData[ chemTDA * x + (y + 1) ];
 			else db = 0.0;
 
-            diffData[diffTDA * x + y] = scale * ((-4.0 * chemData[ chemTDA * x + y]) + dl + dr + dt + db);
+            diffData[diffTDA * x + y] = scale * ((-4.0f * chemData[ chemTDA * x + y]) + dl + dr + dt + db);
         }
     }
 
@@ -403,99 +387,44 @@ int brIMatrix3DDiffuse(brEval args[], brEval *target, brInstance *i) {
 	float* diffData = diffTarget->getGSLVector()->data;
 	float* chemData = chemSource->getGSLVector()->data;	
 	float newVal = 0.0;
+	unsigned int xDim = chemSource->xDim();
+	unsigned int yDim = chemSource->yDim();
+	unsigned int zDim = chemSource->zDim();
 	unsigned int diffTDA = diffTarget->xDim(); // proxy for tda
 	unsigned int chemTDA = chemSource->xDim(); // proxy for tda
-	unsigned int xDim = chemSource->xDim();
-	unsigned int yDim = chemSource->yDim();    
-	unsigned int x = 0, y = 0;
-	int xp, xm, yp, ym;
+	unsigned int chemXY = chemSource->xDim() * chemSource->yDim();
+	unsigned int x, y, z;
 
-    // this will get moved to a seperate util class later
-    // and will be converted to iterators when we migrate to gslmm based code
+    for (z = 0; z < zDim; z++)
+        for (y = 0; y < yDim; y++)
+            for (x = 0; x < xDim; x++) {
+				double xp, xm, ym, yp, zm, zp;
+
+				if( x - 1 < 0) xm = 0;
+				else xm = chemData[(z * chemXY) + ((x - 1) * chemTDA) + y];
+
+				if( y - 1 < 0) ym = 0;
+				else ym = chemData[(z * chemXY) + (x * chemTDA) + y - 1];
+
+				if( z - 1 < 0) zm = 0;
+				else zm = chemData[((z - 1) * chemXY) + (x * chemTDA) + y];
+		
+				if( x + 1 >= xDim) xp = 0;
+				else xp = chemData[(z * chemXY) + ((x+1) * chemTDA) + y];
+		
+				if( y + 1 >= yDim) yp = 0;
+				else yp = chemData[(z * chemXY) + (x * chemTDA) + y + 1];
+		
+				if( z + 1 >= zDim) zp = 0;
+				else zp = chemData[((z + 1) * chemXY) + (x * chemTDA) + y];
     
-    ///// VERY TEMP local optimization
-#ifdef MACOS
-#if(0)
-       // f3x3 is an altivec optimized convolution, but does not handle periodic
-       // boundaries.  
-
-       float kernel[9];
-
-       kernel[0] = 0; kernel[1] = scale; kernel[2] = 0;
-       kernel[3] = scale; kernel[4] = scale * -4; kernel[5] = scale;
-       kernel[6] = 0; kernel[7] = scale; kernel[8] = 0;
-
-       f3x3(m->data, m->tda, m->size2, kernel, n->data);
-
-       return EC_OK;
-#endif
-#endif
-
-    x = 0;
-	for (y = 0; y < yDim ; y++)
-	{
-			xp = (x + 1);
-			yp = (y + 1);
-			ym = (y - 1);
-			newVal = scale * ((-4.0f * chemData[x * chemTDA + y]) +
-			    chemData[xp * chemTDA + y] + 
-			    chemData[x  * chemTDA + ym] + chemData[x * chemTDA + yp]);
-
-			diffData[x * diffTDA + y] = newVal;
-    }
-    x = xDim;
-	for (y = 0; y < yDim; y++)
-	{
-			yp = (y + 1);
-			xm = (x - 1);
-			ym = (y - 1);
-			newVal = scale * ((-4.0f * chemData[x * chemTDA + y]) +
-			    chemData[xm * chemTDA + y] + 
-			    chemData[x  * chemTDA + ym] + chemData[x * chemTDA + yp]);
-
-			diffData[x * diffTDA + y] = newVal;
-	}
-	y = 0;
-	for (x = 1; x < yDim - 1; x++)
-	{
-			xp = (x + 1);
-			yp = (y + 1);
-			xm = (x - 1);
-			newVal = scale * ((-4.0f * chemData[x * chemTDA + y]) +
-			    chemData[xm * chemTDA + y] + chemData[xp * chemTDA + y] + 
-			    chemData[x * chemTDA + yp]);
-
-			diffData[x * diffTDA + y] = newVal;
-	}
-	y = yDim;
-	for (x = 1; x < yDim - 1; x++)
-	{
-			xp = (x + 1);
-			xm = (x - 1);
-			ym = (y - 1);
-			newVal = scale * ((-4.0f * chemData[x * chemTDA + y]) +
-			    chemData[xm * chemTDA + y] + chemData[xp * chemTDA + y] + 
-			    chemData[x  * chemTDA + ym]);
-
-			diffData[x * diffTDA + y] = newVal;
-    }
-	
-	for (y = 1; y < yDim - 1; y++)
-		for (x = 1; x < xDim - 1; x++) {
-			xp = (x + 1);
-			yp = (y + 1);
-			xm = (x - 1);
-			ym = (y - 1);
-
-			newVal = scale * ((-4.0f * chemData[x * chemTDA + y]) +
-			    chemData[xm * chemTDA + y] + chemData[xp * chemTDA + y] + 
-			    chemData[x  * chemTDA + ym] + chemData[x * chemTDA + yp]);
-
-			diffData[x * diffTDA + y] = newVal;
-		}
+                diffData[(z * chemXY) + x * diffTDA + y] = 
+					scale * ((-6.0f * chemData[(z * chemXY) + (x * chemTDA) + y]) +
+					xm + xp + ym + yp + zm + zp); 
+            }
 
 	return EC_OK;
-}
+} 
 
 int brIMatrix3DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 	brMatrix3D *sourceMatrix = BRBIGMATRIX3D(&args[0]);

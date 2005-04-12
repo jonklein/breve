@@ -30,15 +30,20 @@ slPatchGrid *slPatchGridNew(slVector *center, slVector *patchSize, int x, int y,
 
 	grid = new slPatchGrid;
 
+	glGenTextures(1, &grid->texture);
+
 	grid->patches = new slPatch**[z];
 	grid->xSize = x;
 	grid->ySize = y;
 	grid->zSize = z;
 
-	grid->colors[0] = new unsigned char[x * y * z];
-	grid->colors[1] = new unsigned char[x * y * z];
-	grid->colors[2] = new unsigned char[x * y * z];
-	grid->colors[3] = new unsigned char[x * y * z];
+	grid->textureX = slNextPowerOfTwo(x);
+	grid->textureY = slNextPowerOfTwo(y);
+	grid->textureZ = slNextPowerOfTwo(z);
+
+	grid->colors = new unsigned char[grid->textureX * grid->textureY * grid->textureZ * 4];
+
+	memset(grid->colors, 0, grid->textureX * grid->textureY * grid->textureZ * 4);
 
 	slVectorCopy(patchSize, &grid->patchSize);
 
@@ -56,6 +61,8 @@ slPatchGrid *slPatchGridNew(slVector *center, slVector *patchSize, int x, int y,
 				grid->patches[c][b][a].location.x = grid->startPosition.x + a * patchSize->x;
 				grid->patches[c][b][a].location.y = grid->startPosition.y + b * patchSize->y;
 				grid->patches[c][b][a].location.z = grid->startPosition.z + c * patchSize->z;
+				grid->patches[c][b][a].grid = grid;
+				grid->patches[c][b][a].colorOffset = (c * grid->textureX * grid->textureY * 4) + (b * grid->textureX * 4) + (a * 4);
 			}
 		}
 	}
@@ -97,7 +104,9 @@ void slPatchGridCopyColorFrom3DMatrix(slPatchGrid *grid, slBigMatrix3DGSL *m, in
 	for(x = 0; x < xSize; x++ ) {
 		for(y = 0; y < ySize; y++ ) {
 			for(z = 0; z < zSize; z++ ) {
-				grid->patches[x][y][z].color[channel] = scale * mData[ (z * chemXY) + (x * chemTDA) + y ];
+				grid->colors[(z * grid->textureX * grid->textureY * 4) + (y * grid->textureX * 4) + (x * 4) + channel] = 
+					(unsigned char)(255 * scale * mData[ (z * chemXY) + (x * chemTDA) + y ]);
+
 			}
 		}
 	}
@@ -121,8 +130,148 @@ void slPatchGridCopyColorFrom2DMatrix(slPatchGrid *grid, slBigMatrix2DGSL *m, in
 
 	for(x = 0; x < xSize; x++ ) {
 		for(y = 0; y < ySize; y++ ) {
-			grid->patches[x][y][z].color[channel] = scale * mData[ (x * chemTDA) + y ];
+				grid->colors[(z * grid->textureX * grid->textureY * 4) + (y * grid->textureX * 4) + (x * 4) + channel] = 
+					(unsigned char)(255 * scale * mData[ (x * chemTDA) + y ]);
 		}
+	}
+}
+
+void slPatchGrid::drawWith3DTexture(slCamera *camera) {
+	slVector origin, diff, size;
+
+	slVectorAdd(&camera->location, &camera->target, &origin);
+
+	diff.x = abs(origin.x - (startPosition.x + (xSize / 2) * patchSize.x));
+	diff.y = abs(origin.y - (startPosition.y + (ySize / 2) * patchSize.y));
+	diff.z = abs(origin.z - (startPosition.z + (zSize / 2) * patchSize.z));
+
+	glEnable(GL_TEXTURE_3D);
+
+	glDisable(GL_CULL_FACE);
+
+	glColor4f(1,1,1,1);
+
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
+
+	glBindTexture(GL_TEXTURE_3D, texture);
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, textureX, textureY, textureZ, 0, GL_RGBA, GL_UNSIGNED_BYTE, colors);
+
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+	glBegin(GL_QUADS);
+
+	size.x = patchSize.x * xSize;
+	size.y = patchSize.y * ySize;
+	size.z = patchSize.y * zSize;
+
+	// can this crap possible be right?
+
+	if(diff.x > diff.z) {
+		if(diff.y > diff.x) {
+			textureDrawYPass(size, 0);
+			textureDrawXPass(size, 0);
+			textureDrawZPass(size, 0);
+		} else if(diff.y < diff.z) {
+			textureDrawXPass(size, 0);
+			textureDrawZPass(size, 0);
+			textureDrawYPass(size, 0);
+		} else {
+			textureDrawXPass(size, 0);
+			textureDrawZPass(size, 0);
+			textureDrawYPass(size, 0);
+		}
+	} else if(diff.y > diff.z) {
+		textureDrawYPass(size, 0);
+		textureDrawZPass(size, 0);
+		textureDrawXPass(size, 0);
+	} else if(diff.x > diff.y) {
+		textureDrawZPass(size, 0);
+		textureDrawXPass(size, 0);
+		textureDrawYPass(size, 0);
+	} else {
+		textureDrawZPass(size, 0);
+		textureDrawYPass(size, 0);
+		textureDrawXPass(size, 0);
+	}
+	
+
+	glEnd();
+
+	glDisable(GL_TEXTURE_3D);
+
+	return;
+}
+
+void slPatchGrid::textureDrawYPass(slVector &size, int dir) {
+	int y;
+
+	for(y=0;y<ySize + 1;y++) {
+		double yp;
+
+		yp = startPosition.y + (y*patchSize.y);
+		// yp = startPosition.y + ((ySize - y)*patchSize.y);
+
+		glTexCoord3f(0, ((double)y / textureY), 0);
+		glVertex3f(startPosition.x, yp, startPosition.z);
+
+		glTexCoord3f(xSize / textureX, ((double)y / textureY), 0);
+		glVertex3f(startPosition.x + size.x, yp, startPosition.z);
+
+		glTexCoord3f(xSize / textureX, ((double)y / textureY), zSize / textureZ);
+		glVertex3f(startPosition.x + size.x, yp, startPosition.z + size.z);
+
+		glTexCoord3f(0, ((double)y / textureY), zSize / textureZ);
+		glVertex3f(startPosition.x, yp, startPosition.z + size.z);
+	}
+}
+
+void slPatchGrid::textureDrawXPass(slVector &size, int dir) {
+	int x;
+
+	for(x=0;x<xSize + 1;x++) {
+		double xp;
+
+		xp = startPosition.x + (x*patchSize.x);
+		// xp = startPosition.x + ((xSize - x)*patchSize.x);
+
+		glTexCoord3f(((double)x / textureX), 0, 0);
+		glVertex3f(xp, startPosition.y, startPosition.z);
+
+		glTexCoord3f(((double)x / textureX), ySize / textureY, 0);
+		glVertex3f(xp, startPosition.y + size.y, startPosition.z);
+
+		glTexCoord3f(((double)x / textureX), ySize / textureY, zSize / textureZ);
+		glVertex3f(xp, startPosition.y + size.y, startPosition.z + size.z);
+
+		glTexCoord3f(((double)x / textureX), 0, zSize / textureZ);
+		glVertex3f(xp, startPosition.y, startPosition.z + size.z);
+	}
+}
+
+void slPatchGrid::textureDrawZPass(slVector &size, int dir) {
+	int z;
+
+	for(z=0;z<zSize + 1;z++) {
+		double zp;
+
+		zp = startPosition.z + (z*patchSize.z);
+		// if(diff.z > 0) zp = startPosition.z + ((zSize - z)*patchSize.z);
+
+		glTexCoord3f(0, 0, ((double)z / textureZ));
+		glVertex3f(startPosition.x, startPosition.y, zp);
+
+		glTexCoord3f(xSize / textureX, 0, ((double)z / textureZ));
+		glVertex3f(startPosition.x + size.x, startPosition.y, zp);
+
+		glTexCoord3f(xSize / textureX, ySize / textureY, ((double)z / textureZ));
+		glVertex3f(startPosition.x + size.x, startPosition.y + size.y, zp);
+
+		glTexCoord3f(0, ySize / textureY, ((double)z / textureZ));
+		glVertex3f(startPosition.x, startPosition.y + size.y, zp);
 	}
 }
 
@@ -136,6 +285,8 @@ void slPatchGrid::draw(slCamera *camera) {
 	int zMid = 0, yMid = 0, xMid = 0;
 	slPatch *patch;
 	slVector translation, origin;
+
+	// return drawWith3DTexture(camera);
 
 	// we want to always draw from back to front for the 
 	// alpha blending to work.  figure out the points
@@ -157,10 +308,6 @@ void slPatchGrid::draw(slCamera *camera) {
 
 	glEnable(GL_BLEND);
 
-	glEnable(GL_CULL_FACE);
-
-	glPushMatrix();
-
 	for(z=0;z<zSize;z++) {
 		if(z < zMid) zVal = z;
 		else zVal = (zSize - 1) - (z - zMid);
@@ -175,7 +322,7 @@ void slPatchGrid::draw(slCamera *camera) {
 
 				patch = &patches[zVal][yVal][xVal];
 
-				if(patch->color[3] != 0.0) {
+				if(colors[patch->colorOffset + 3] != 0) {
 					translation.x = startPosition.x + patchSize.x * xVal;
 					translation.y = startPosition.y + patchSize.y * yVal;
 					translation.z = startPosition.z + patchSize.z * zVal;
@@ -183,7 +330,7 @@ void slPatchGrid::draw(slCamera *camera) {
 					if(camera->pointInFrustum(&translation)) {
 						glPushMatrix();
 
-						glColor4fv(patch->color);
+						glColor4ubv(&colors[patch->colorOffset]);
 
 						glTranslatef(translation.x, translation.y, translation.z);
 
@@ -197,8 +344,6 @@ void slPatchGrid::draw(slCamera *camera) {
 			}
 		}
 	}
-
-	glPopMatrix();
 }
 
 /*!
@@ -223,19 +368,19 @@ void slPatchGetLocation(slPatch *p, slVector *location) {
 }
 
 void slPatchSetColor(slPatch *p, slVector *color) {
-	p->color[0] = color->x;
-	p->color[1] = color->y;
-	p->color[2] = color->z;
+	p->grid->colors[p->colorOffset    ] = (unsigned char)(256 * color->x);
+	p->grid->colors[p->colorOffset + 1] = (unsigned char)(256 * color->y);
+	p->grid->colors[p->colorOffset + 2] = (unsigned char)(256 * color->z);
 }
 
 void slPatchSetTransparency(slPatch *p, double transparency) {
-	p->color[3] = transparency;
+	p->grid->colors[p->colorOffset + 3] = (unsigned char)(256 * transparency);
 }
 
 void slPatchGetColor(slPatch *p, slVector *color) {
-	color->x = p->color[0];
-	color->y = p->color[1];
-	color->z = p->color[2];
+	color->x = p->grid->colors[p->colorOffset    ] / 256.0;
+	color->y = p->grid->colors[p->colorOffset + 1] / 256.0;
+	color->z = p->grid->colors[p->colorOffset + 2] / 256.0;
 }
 
 slPatch *slPatchAtIndex(slPatchGrid *grid, int x, int y, int z) {

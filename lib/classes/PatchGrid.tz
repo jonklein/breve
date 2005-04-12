@@ -13,7 +13,7 @@ Abstract : PatchGrid [version 2.2] {
     % Use METHOD(init-with) or METHOD(init-at) the create a PatchGrid.
 
     + variables:
-        grid (pointer).
+        gridPointer (pointer).
         patches (list).
         location, patchSize (vector).
         patchVolume (float).
@@ -25,30 +25,20 @@ Abstract : PatchGrid [version 2.2] {
         chemicalConcentrationMatrix (hash).
         tempMatrix (pointer).
         redChemicalMatrix, greenChemicalMatrix, blueChemicalMatrix (object).
+
+	- to get-grid-pointer:
+		return gridPointer.
         
-    - to init-with patch-size pSize = (1, 1, 1) (vector) 
-        with-x-count x (int) 
-        with-y-count y (int) 
-        with-z-count z (int) 
-        with-patch-class class = "Patch" (string):
+    + to init-with 
+		location center = (0, 0, 0) (vector)
+		patch-size pSize = (1, 1, 1) (vector) 
+        x-count x (int) 
+        y-count y (int) 
+        z-count z (int) 
+        patch-class class = "Patch" (string):
 
-        % Like METHOD(init-at), but centers the patch grid at the origin of the world.
-
-        return (self init-at location (0, 0, 0) with-patch-size pSize
-                                                with-x-count x
-                                                with-y-count y
-                                                with-z-count z
-                                                with-patch-class class).
-
-    + to init-at location gridCenter = (0, 0, 0) (vector) 
-        with-patch-size pSize = (1, 1, 1) (vector) 
-        with-x-count x (int) 
-        with-y-count y (int) 
-        with-z-count z (int) 
-        with-patch-class class = "Patch" (string):
-
-        % Creates a PatchGrid in which each OBJECT(Patch) is a member of 
-        % class and is the size pSize and in which the total grid 
+        % Creates a PatchGrid centered at center, in which each OBJECT(Patch) 
+		% is a member of class and is the size pSize and in which the total grid 
         % dimensions are x by y by z.  
         % <p> 
         % Bear in mind that this will create a large number of objects: 
@@ -56,7 +46,21 @@ Abstract : PatchGrid [version 2.2] {
         % then this can amount to a great deal of computation which can
         % slow down your simulation.
 
+        return (self init-at location center with-patch-size pSize
+                                                with-x-count x
+                                                with-y-count y
+                                                with-z-count z
+                                                with-patch-class class).
+
+    - to init-at location gridCenter = (0, 0, 0) (vector) 
+        with-patch-size pSize = (1, 1, 1) (vector) 
+        with-x-count x (int) 
+        with-y-count y (int) 
+        with-z-count z (int) 
+        with-patch-class class = "Patch" (string):
+
         xCount, yCount, zCount (int).
+
         patch (object).
 
         xSize = x.
@@ -68,7 +72,7 @@ Abstract : PatchGrid [version 2.2] {
 
         location = gridCenter.
 
-        grid = newPatchGrid(gridCenter, patchSize, x, y, z).
+        gridPointer = newPatchGrid(gridCenter, patchSize, x, y, z).
 
         xCount = 0.
         yCount = 0.
@@ -86,9 +90,9 @@ Abstract : PatchGrid [version 2.2] {
                     patch init-with grid-patch self x-pos xCount y-pos yCount z-pos zCount.
                     push patch onto patches.
 
-                    setPatchObjectAtIndex(grid, patch, xCount, yCount, zCount).
+                    setPatchObjectAtIndex(gridPointer, patch, xCount, yCount, zCount).
 
-                    patch set-patch-pointer to patchAtIndex(grid, xCount, yCount, zCount).
+                    patch set-patch-pointer to patchAtIndex(gridPointer, xCount, yCount, zCount).
                     self add-dependency on patch.
 
                     zCount += 1.
@@ -112,8 +116,8 @@ Abstract : PatchGrid [version 2.2] {
                 zCount = 0.
 
                 while zCount < z: {
-                    patchObjectAtIndex(grid, xCount, yCount, zCount) init-neighbors.
-                    patchObjectAtIndex(grid, xCount, yCount, zCount) init-patch.
+                    patchObjectAtIndex(gridPointer, xCount, yCount, zCount) init-neighbors.
+                    patchObjectAtIndex(gridPointer, xCount, yCount, zCount) init-patch.
                     zCount += 1.
                 }
 
@@ -148,14 +152,14 @@ Abstract : PatchGrid [version 2.2] {
         % that this method may return a NULL object in the case that the 
         % indices given are out of bounds.
 
-        return patchObjectAtIndex(grid, xind, yind, zind).
+        return patchObjectAtIndex(gridPointer, xind, yind, zind).
 
     + to get-patch at-location theLocation (vector):
         % Returns the OBJECT(Patch) in which theLocation resides.  Make sure you
         % test for the validity of the returned object, since it is possible that
         % there is no patch at the specified location.
 
-        return objectAtLocation(grid, theLocation).
+        return objectAtLocation(gridPointer, theLocation).
 
     + to get-patches:
         % Returns a list of all patch objects.
@@ -164,7 +168,7 @@ Abstract : PatchGrid [version 2.2] {
 
     # DIFFUSABLES
     
-    + to track patch-chemical theDiffusable (object):
+    - to track patch-chemical theDiffusable (object):
         % Adds a new OBJECT(PatchChemical) to the patch grid.  This allows
         % the patch grid to track the concentrations of the chemcial in
         % each patch and allow diffusion between the patches.
@@ -186,7 +190,7 @@ Abstract : PatchGrid [version 2.2] {
 			y-size (self get-y-count)
 			z-size (self get-z-count)).
         
-    + to untrack patch-chemical theDiffusable (object):
+    - to untrack patch-chemical theDiffusable (object):
         % Removes a OBJECT(PatchChemcial) from the patch grid.
         chem (object).
         newChems (list).
@@ -208,55 +212,54 @@ Abstract : PatchGrid [version 2.2] {
             exponentiallyDecayingChemicals = newChems.
         }
     
-    + to display-concentration-in-red of-patch-chemical theDiffusable (object):
+    - to display-concentration-in-red of-patch-chemical theDiffusable (object):
         % Selects the OBJECT(PatchChemical)'s concentration to use as the red
         % channel when METHOD(display-patch-chemical-concentrations) is called.
 
 		redChemicalMatrix = chemicalConcentrationMatrix{theDiffusable}.
         
-    + to display-concentration-in-green of-patch-chemical theDiffusable (object):
+    - to display-concentration-in-green of-patch-chemical theDiffusable (object):
         % Selects the OBJECT(PatchChemical)'s concentration to use as the red
         % channel when METHOD(display-patch-chemical-concentrations) is called.
 
 		greenChemicalMatrix = chemicalConcentrationMatrix{theDiffusable}.
                 
-    + to display-concentration-in-blue of-patch-chemical theDiffusable (object):
+    - to display-concentration-in-blue of-patch-chemical theDiffusable (object):
         % Selects the OBJECT(PatchChemical)'s concentration to use as the red
         % channel when METHOD(display-patch-chemical-concentrations) is called.
         blueChemicalMatrix = theDiffusable.
 
 		blueChemicalMatrix = chemicalConcentrationMatrix{theDiffusable}.
                    
-    + to set-patch-colors-to-chemical-concentrations:
-        x,y,z (int).
+    - to set-patch-colors-to-chemical-concentrations:
         color (vector).
         color = (0,0,0).
 
 		matrix3DSetAll(tempMatrix, 0.0).
 
 		if redChemicalMatrix: {
-			patchGridCopyColorFrom3DMatrix(grid, (redChemicalMatrix get-matrix-pointer), 0, 1.0).
+			patchGridCopyColorFrom3DMatrix(gridPointer, (redChemicalMatrix get-matrix-pointer), 0, 1.0).
 			matrix3DAddScaled(tempMatrix, (redChemicalMatrix get-matrix-pointer), .33).
 		}
 
 		if greenChemicalMatrix: {
-			patchGridCopyColorFrom3DMatrix(grid, (greenChemicalMatrix get-matrix-pointer), 1, 1.0).
+			patchGridCopyColorFrom3DMatrix(gridPointer, (greenChemicalMatrix get-matrix-pointer), 1, 1.0).
 			matrix3DAddScaled(tempMatrix, (greenChemicalMatrix get-matrix-pointer), .33).
 		}
 
 		if blueChemicalMatrix: {
-			patchGridCopyColorFrom3DMatrix(grid, (blueChemicalMatrix get-matrix-pointer), 2, 1.0).
+			patchGridCopyColorFrom3DMatrix(gridPointer, (blueChemicalMatrix get-matrix-pointer), 2, 1.0).
 			matrix3DAddScaled(tempMatrix, (blueChemicalMatrix get-matrix-pointer), .33).
 		}
 
-		patchGridCopyColorFrom3DMatrix(grid, tempMatrix, 3, 1.0).
+		patchGridCopyColorFrom3DMatrix(gridPointer, tempMatrix, 3, 1.0).
 
-    + to get-patch-chemicals:
+    - to get-patch-chemicals:
         % Returns all the chemicals currently being tracked in
         % the patch grid.
         return chemicals.
         
-    + to update-concentrations:
+    - to update-concentrations:
         % Updates the concentrations of each OBJECT(PatchChemical) being
         % tracked in the patch grid.  All chemicals with a diffusion rate
         % greater than 0 diffuse into adjacent patches at their given rate
@@ -264,7 +267,7 @@ Abstract : PatchGrid [version 2.2] {
         self diffuse-chemicals.
         self decay-chemicals.
         
-    + to diffuse-chemicals:
+    - to diffuse-chemicals:
         % Updates the concentration of each OBJECT(PatchChemical) being tracked
         % in the patch grid by diffusing the chemicals according to their
         % diffusion rates.  This method is called automatically by METHOD(update-concentrations). 
@@ -277,7 +280,7 @@ Abstract : PatchGrid [version 2.2] {
             matrix3DAddScaled(chemMatrixPointer, tempMatrix, 1.0).
         }
                         
-    + to decay-chemicals:
+    - to decay-chemicals:
         % Updates the concentration of each OBJECT(PatchChemical) by reducing the
         % current concentraion by the decay rate.  The decay rate is treated
         % as either a linear or exponential rate depending on the chemical's
@@ -340,13 +343,13 @@ Abstract : PatchGrid [version 2.2] {
         x, y, z (int).
         index (int).
 
-        grid = newPatchGrid(location, patchSize, xSize, ySize, zSize).
+        gridPointer = newPatchGrid(location, patchSize, xSize, ySize, zSize).
 
         for x=0,x<xSize,x++: {
             for y=0,y<ySize,y++: {
                 for z=0,z<zSize,z++: {
-                    setPatchObjectAtIndex(grid, patches{index}, x, y, z).
-                    patches{index} set-patch-pointer to patchAtIndex(grid, x, y, z).
+                    setPatchObjectAtIndex(gridPointer, patches{index}, x, y, z).
+                    patches{index} set-patch-pointer to patchAtIndex(gridPointer, x, y, z).
                     patches{index} update-colors.
 
                     index++.

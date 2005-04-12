@@ -68,7 +68,7 @@ const struct option gCLIOptions[] = {
 
 int brParseArgs(int, char **);
 
-__dead void brPrintUsage(char *);
+__dead void brPrintUsage(const char *);
 
 __dead void brQuit(brEngine *);
 

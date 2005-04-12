@@ -320,9 +320,9 @@ Object : Real (aka Reals) [version 2.1] {
 
 	+ to set-transparency to alphaValue (float):
 		% Sets the transparency of this object to alphaValue, a number 
-		% between 0.0 (totally transparent) and 1.0 (fully opaque).
+		% between 0.0 (totally opaque) and 1.0 (fully transparent).
 
-		setAlpha(realWorldPointer, alphaValue).
+		setAlpha(realWorldPointer, 1.0 - alphaValue).
 
 	+ to set-lightmap-image to lightmapImage (object):
 		% Sets the object to be displayed using a "lightmap".  A 

@@ -22,9 +22,9 @@ Control : PatchGridTestControl {
         
 	+ to init:
         obj (object).
-        grid = ((new PatchToroid) init-with with-x-count SIZE
-                          with-y-count SIZE
-                          with-z-count SIZE).
+        grid = ((new PatchToroid) init-with x-count SIZE
+                          y-count SIZE
+                          z-count SIZE).
         expChem = ((new PatchChemical) init-with diffusion-rate DIFFUSION_RATE
                               decay-rate DECAY_RATE
                               decay-type "Exponential").

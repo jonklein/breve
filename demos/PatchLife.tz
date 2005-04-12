@@ -30,7 +30,7 @@ Control : PatchLife {
 		patches (object).
 
 	+ to init:
-		patches = (new PatchToroid init-with patch-size (.5, .5, .5) with-x-count X_SIZE with-y-count Y_SIZE with-z-count 1 with-patch-class "LifePatch").
+		patches = (new PatchToroid init-with patch-size (.5, .5, .5) x-count X_SIZE y-count Y_SIZE z-count 1 patch-class "LifePatch").
 
 		# since we're using patches with discrete timesteps, we can set the 
 		# timescale to 1.0 for each iteration.  because the patches update

@@ -25,20 +25,19 @@
 
 #include "bigMatrix.hh"
 
+class slPatchGrid;
+
 class slPatch {
 	public:
 		slPatch() {
-			color[0] = 0.0;
-			color[1] = 0.0;
-			color[2] = 0.0;
-			color[3] = 1.0;
 			data = NULL;
 		}
 
 		void *data;
 
-		slColor color;
 		slVector location;
+		int colorOffset;
+		slPatchGrid *grid;
 };
 
 /*!
@@ -60,13 +59,15 @@ class slPatchGrid {
 
 			delete[] patches;
 
-			delete[] colors[0];
-			delete[] colors[1];
-			delete[] colors[2];
-			delete[] colors[3];
+			delete[] colors;
 		}
 
 		void draw(slCamera *camera);
+		void drawWith3DTexture(slCamera *camera);
+
+		void textureDrawXPass(slVector &size, int dir);
+		void textureDrawYPass(slVector &size, int dir);
+		void textureDrawZPass(slVector &size, int dir);
 
 		int xSize, ySize, zSize;
 
@@ -75,7 +76,14 @@ class slPatchGrid {
 
 		slPatch ***patches;
 
-		unsigned char *colors[4];
+		// colors holds all of the color information for the patches.  it is a raw 
+		// array of char values so that we can use it as texture data if desired.
+
+		unsigned char *colors;
+
+		int textureX, textureY, textureZ;
+
+		int texture;
 };
 #endif
 

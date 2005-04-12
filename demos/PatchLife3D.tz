@@ -25,7 +25,7 @@ Control : PatchLife {
 		patches (object).
 
 	+ to init:
-		patches = (new PatchToroid init-with with-x-count X_SIZE with-y-count Y_SIZE with-z-count Z_SIZE with-patch-class "LifePatch").
+		patches = (new PatchToroid init-with x-count X_SIZE y-count Y_SIZE z-count Z_SIZE patch-class "LifePatch").
 
 		# since we're using patches with discrete timesteps, we can set the 
 		# timescale to 1.0 for each iteration.  because the patches update

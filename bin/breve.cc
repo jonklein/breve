@@ -405,7 +405,7 @@ int brParseArgs(int argc, char **argv) {
 	return optind - 1;
 }
 
-void brPrintUsage(char *name) {
+void brPrintUsage(const char *name) {
 	fprintf(stderr, "usage: %s [options] simulation_file\n", name);
 	fprintf(stderr, "options:\n");
 	fprintf(stderr, "  -x              Run the simulation without graphical display.\n");
