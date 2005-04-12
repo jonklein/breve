@@ -2,7 +2,7 @@
 # PatchLife -- Game of Life simulation
 # jon klein <jk@spiderland.org>
 #
-# This demos uses the "patches" to implement Conway's classic "Game of Life" 
+# This demos uses patches to implement Conway's classic "Game of Life" 
 # simulation.  This file demonstrates how patches can be used to partition 
 # space into smaller areas.  These patches can be used to implement cellular
 # automata (as in this simulation), or to associate certain areas of space 
@@ -92,6 +92,8 @@ Patch : LifePatch {
 		else self set-transparency to 1.0.
 
 	+ to init-patch:
+		o (object).
+
 		self set-state to random[1].
 
 		neighbors = (self get-moore-neighborhood).
@@ -102,13 +104,15 @@ Patch : LifePatch {
 
     + to iterate:
 		# if we're alive, tell our neighbors about it.
+
 		if state: neighbors increment-neighbor-count.
+		
 
     + to post-iterate:
 		# all of our live neighbors have reported now -- compute the new state
 
 		if (liveNeighbors == 3) || ((state == 1) && (liveNeighbors == 2)): {
-			self set-transparency to 0.3.
+			self set-transparency to 0.5.
 			state = 1.
 
 			onCount++.

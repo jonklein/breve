@@ -2,7 +2,7 @@
 # PatchLife -- Game of Life simulation
 # jon klein <jk@spiderland.org>
 #
-# This demos uses the "patches" to implement Conway's "Game of Life" in 3D
+# This demos uses patches to implement Conway's "Game of Life" in 3D
 # This file demonstrates how patches can be used to partition space into 
 # smaller areas.  These patches can be used to implement cellular automata 
 # (as in this simulation), or to associate certain areas of space with 
@@ -83,7 +83,7 @@ Patch : LifePatch {
 		self set-color to (1.0, 0, 0).
 		state = value.
 
-		if state: self set-transparency to 0.6.
+		if state: self set-transparency to 0.85.
 		else self set-transparency to 1.0.
 
 	+ to init-patch:
@@ -100,7 +100,7 @@ Patch : LifePatch {
 
 	+ to post-iterate:
 		if (state == 0 && liveNeighbors == 4) || ((state == 1) && (liveNeighbors == 4 || liveNeighbors == 6)): {
-			self set-transparency to 0.6.
+			self set-transparency to 0.85.
 			state = 1.
 
 			self set-color to (1.0 - (onCount / 20.0), onCount / 20.0, 0).

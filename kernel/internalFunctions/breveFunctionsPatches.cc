@@ -133,14 +133,6 @@ int brIPatchGridCopyColorFrom3DMatrix(brEval args[], brEval *target, brInstance 
 	return EC_OK;
 }
 
-int brIPatchGridCopyColorFrom2DMatrix(brEval args[], brEval *target, brInstance *i) {
-	slPatchGrid *g = BRPATCHGRIDPOINTER(&args[0]);
-
-	slPatchGridCopyColorFrom2DMatrix(g, BRPOINTER(&args[1]), BRINT(&args[2]), BRINT(&args[3]), BRDOUBLE(&args[4]));
-
-	return EC_OK;
-}
-
 /*!
 	\brief Sets the object which corresponds to the patch at a given
 	(x, y, z) indices.
@@ -208,6 +200,5 @@ void breveInitPatchFunctions(brNamespace *n) {
     brNewBreveCall(n, "setPatchColor", brISetPatchColor, AT_NULL, AT_POINTER, AT_VECTOR, 0);
     brNewBreveCall(n, "setPatchTransparency", brISetPatchTransparency, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
     brNewBreveCall(n, "patchGridCopyColorFrom3DMatrix", brIPatchGridCopyColorFrom3DMatrix, AT_NULL, AT_POINTER, AT_POINTER, AT_INT, AT_DOUBLE, 0);
-    brNewBreveCall(n, "patchGridCopyColorFrom2DMatrix", brIPatchGridCopyColorFrom2DMatrix, AT_NULL, AT_POINTER, AT_POINTER, AT_INT, AT_INT, AT_DOUBLE, 0);
     brNewBreveCall(n, "getPatchLocation", brIGetPatchLocation, AT_VECTOR, AT_POINTER, 0);
 }

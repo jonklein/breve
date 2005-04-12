@@ -130,6 +130,11 @@ Abstract : PatchGrid [version 2.2] {
         tempMatrix = matrix3DNew(x, y, z).
         return self.
 
+	- to enable-smooth-drawing:
+
+	- to disable-smooth-drawing:
+	
+
     + to get-x-count:
         % If the grid is initialized, returns the size of the grid on the X-axis.
         return xSize.
