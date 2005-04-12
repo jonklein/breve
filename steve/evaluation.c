@@ -3190,7 +3190,7 @@ int stDoEvalListIndexAssign(brEvalListHead *l, int n, brEval *newVal, stRunInsta
 
 	// if this is a new entry at the end, append it instead
 
-	if (n == l->count || n == 0) {
+	if (n == l->count || l->count == 0) {
 		if (brEvalListInsert(l, l->count, newVal) > -1)
 			return 0;
 		else
