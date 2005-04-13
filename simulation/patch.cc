@@ -20,8 +20,6 @@
 
 #include "simulation.h"
 
-extern int gCubeDrawList;
-
 slPatchGrid *slPatchGridNew(slVector *center, slVector *patchSize, int x, int y, int z) {
 	struct slPatchGrid *grid;
 	int a, b, c;

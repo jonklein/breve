@@ -20,7 +20,7 @@
 
 @define XSIZE 32.
 @define YSIZE 32.
-@define ZSIZE 8.
+@define ZSIZE 16.
 
 Controller GS.
 
@@ -55,7 +55,9 @@ Control : GS {
 		inflow set-size x XSIZE y YSIZE z ZSIZE.
 
 		grid = new PatchGrid.
-		grid init-with x-count XSIZE y-count YSIZE z-count ZSIZE.
+		grid init-with patch-size (.5, .5, .5) x-count XSIZE y-count YSIZE z-count ZSIZE.
+
+		grid enable-smooth-drawing.
 
 		inflow set-all-values to F.
 
@@ -86,9 +88,8 @@ Control : GS {
 		temp add-values of V scaled-by -(K + F).
 		V add-values of temp scaled-by TIMESTEP.
 
-		# U copy-to-red-channel of-patch-grid grid.
-		V copy-to-blue-channel of-patch-grid grid.
-		V copy-to-alpha-channel of-patch-grid grid with-scale 0.5.
+		V copy-to-red-channel of-patch-grid grid with-scale 2.0.
+		V copy-to-alpha-channel of-patch-grid grid with-scale 0.1.
 
         super iterate.
 }

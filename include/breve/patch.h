@@ -64,6 +64,8 @@ class slPatchGrid {
 
 		void draw(slCamera *camera);
 
+		void setSmoothDrawing(int d) { drawSmooth = d; }
+
 		void textureDrawXPass(slVector &size, int dir);
 		void textureDrawYPass(slVector &size, int dir);
 		void textureDrawZPass(slVector &size, int dir);

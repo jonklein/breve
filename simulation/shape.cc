@@ -24,34 +24,6 @@ slShape *slShapeNew() {
 	return new slShape;
 }
 
-void slSphere::xdraw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags) {
-	unsigned char bound, axis;
-
-	bound = (mode & DM_BOUND) && !(flags & DO_NO_BOUND);
-	axis = (mode & DM_AXIS) && !(flags & DO_NO_AXIS);
-
-	glPushMatrix();
-	glTranslated(pos->location.x, pos->location.y, pos->location.z);
-	slMatrixGLMult(pos->rotation);
-
-	glScalef(_radius / 100.0, _radius / 100.0, _radius / 100.0);
-
-	glCallList(c->sphereDrawLists + (SPHERE_RESOLUTIONS - 2));
-
-	if(bound || axis) {
-		glPushAttrib(GL_COLOR_BUFFER_BIT);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glColor4f(0.0, 0.0, 0.0, 0.5);
-		glScalef(1.1, 1.1, 1.1);
-		if(axis) slDrawAxis(max.x, max.y);
-		if(bound) slRenderShape(this, GL_LINE_LOOP, 0, 0);
-		glPopAttrib();
-	}
-
-	glPopMatrix();
-}
-
 void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags) {
 	unsigned char bound, axis;
 

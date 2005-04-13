@@ -131,11 +131,6 @@ void slInitGL(slWorld *w, slCamera *c) {
 
 	slClearGLErrors("init");
 
-	c->cubeDrawList = glGenLists(1);
-	slCompileCubeDrawList(c->cubeDrawList);
-	c->sphereDrawLists = glGenLists(SPHERE_RESOLUTIONS);
-	slCompileSphereDrawList(c->sphereDrawLists);
-
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specularColor);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 90);
 }
@@ -160,38 +155,6 @@ void slCompileSphereDrawList(int l) {
 
 		glEndList();
 	}
-}
-
-/*!
-	\brief Initializes a cube drawing list.
-
-	The cube list is used in the patch drawing.  It's built as part of initialization. 
-*/
-
-void slCompileCubeDrawList(int l) {
-	glNewList(l, GL_COMPILE);
-
-	// juh?
-
-	glBegin(GL_TRIANGLE_STRIP);
-		glVertex3f(0.0, 0.0, 0.0);
-		glVertex3f(1.0, 0.0, 0.0);
-		glVertex3f(0.0, 0.0, 1.0);
-		glVertex3f(1.0, 0.0, 1.0);
-		glVertex3f(1.0, 1.0, 1.0);
-		glVertex3f(1.0, 0.0, 0.0);
-		glVertex3f(1.0, 1.0, 0.0);
-		glVertex3f(0.0, 0.0, 0.0);
-		glVertex3f(0.0, 1.0, 0.0);
-		glVertex3f(0.0, 0.0, 1.0);
-		glVertex3f(0.0, 1.0, 1.0);
-		glVertex3f(1.0, 1.0, 1.0);
-		glVertex3f(0.0, 1.0, 0.0);
-		glVertex3f(1.0, 1.0, 0.0);
-
-	glEnd();
-
-	glEndList();
 }
 
 /*!
@@ -487,7 +450,6 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 
 	if (c->recompile) {
 		c->recompile = 0;
-		slCompileCubeDrawList(c->cubeDrawList);
 		flags |= DO_RECOMPILE;
 	}
 

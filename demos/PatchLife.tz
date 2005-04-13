@@ -92,8 +92,6 @@ Patch : LifePatch {
 		else self set-transparency to 1.0.
 
 	+ to init-patch:
-		o (object).
-
 		self set-state to random[1].
 
 		neighbors = (self get-moore-neighborhood).

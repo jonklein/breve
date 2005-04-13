@@ -59,6 +59,17 @@ int brIPatchGridFree(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
+	\brief Enables/disable smooth drawing for the patch grid.
+
+	void patchGridSetSmoothDrawing(slPatchGrid pointer).
+*/
+
+int brIPatchGridSetSmoothDrawing(brEval args[], brEval *target, brInstance *i) {
+	BRPATCHGRIDPOINTER(&args[0])->setSmoothDrawing(BRINT(&args[1]));
+	return EC_OK;
+}
+
+/*!
 	\brief Returns the patch at the given (x, y, z) indices.
 
 	slPatch pointer patchAtIndex(slPatchGrid pointer).
@@ -193,6 +204,7 @@ int brISetPatchTransparency(brEval args[], brEval *target, brInstance *i) {
 void breveInitPatchFunctions(brNamespace *n) {
     brNewBreveCall(n, "newPatchGrid", brIPatchGridNew, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_INT, AT_INT, AT_INT, 0);
     brNewBreveCall(n, "freePatchGrid", brIPatchGridFree, AT_NULL, AT_POINTER, 0);
+    brNewBreveCall(n, "patchGridSetSmoothDrawing", brIPatchGridSetSmoothDrawing, AT_NULL, AT_POINTER, AT_INT, 0);
     brNewBreveCall(n, "setPatchObjectAtIndex", brISetObjectAtIndex, AT_NULL, AT_POINTER, AT_INSTANCE, AT_INT, AT_INT, AT_INT, 0);
     brNewBreveCall(n, "patchObjectAtIndex", brIObjectAtIndex, AT_INSTANCE, AT_POINTER, AT_INT, AT_INT, AT_INT, 0);
     brNewBreveCall(n, "objectAtLocation", brIObjectAtLocation, AT_INSTANCE, AT_POINTER, AT_VECTOR, 0);

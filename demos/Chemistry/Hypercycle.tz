@@ -2,8 +2,6 @@
 # Hypercycle -- a simulation of a self-replicating hypercycle system.
 # jon klein <jk@spiderland.org>
 #
-# dx/dt = 
-#
 
 @use Control.
 @use Mobile.

@@ -113,9 +113,6 @@ class slCamera {
 		slVector billboardY;
 		slVector billboardZ;
 	
-		int cubeDrawList;
-		int sphereDrawLists;
-	
 		// recompile can be set to 1 at any time to force recompilation 
 		// of draw lists next time the world is drawn. 
 	
