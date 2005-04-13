@@ -216,7 +216,7 @@ void brGlutLoop() {
 		if (newD && brEngineIterate(frontend->engine) != EC_OK)
 			brQuit(frontend->engine);
 
-		glutPostRedisplay();
+		if (!gOptionNoGraphics) glutPostRedisplay();
 
 		if (!newD && oldD) {
 			pthread_mutex_unlock(&gThreadMutex);

@@ -30,10 +30,6 @@
 #include "kernel.h"
 #include "bigMatrix.hh"
 
-#ifdef MACOSX 
-#include <vecLib/vDSP.h>
-#endif
-
 #ifdef HAVE_LIBGSL
 typedef slBigMatrix2DGSL brMatrix2D;
 typedef slBigMatrix3DGSL brMatrix3D;
@@ -144,8 +140,8 @@ int brIMatrix2DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 	unsigned int x = 0, y = 0;
 	int xp, xm, yp, ym;
 
-	for (y = 0; y < yDim; y++)
-		for (x = 0; x < xDim; x++) {
+	for (y = 0; y < (int)yDim; y++)
+		for (x = 0; x < (int)xDim; x++) {
 			xp = (x + 1) % xDim;
 			yp = (y + 1) % yDim;
 			xm = (x - 1) % xDim;
@@ -186,8 +182,8 @@ int brIMatrix2DDiffuse(brEval args[], brEval *target, brInstance *i) {
     // this will get moved to a seperate util class later
     // and will be converted to iterators when we migrate to gslmm based code
     
-	for(x=0; x < xDim; x++) {
-	    for(y=0; y < yDim; y++) {
+	for(x=0; x < (int)xDim; x++) {
+	    for(y=0; y < (int)yDim; y++) {
             double dt, db, dl, dr;
 
 			if(x - 1 >= 0) dl = chemData[ chemTDA * (x - 1) + y ];
@@ -395,9 +391,9 @@ int brIMatrix3DDiffuse(brEval args[], brEval *target, brInstance *i) {
 	unsigned int chemXY = chemSource->xDim() * chemSource->yDim();
 	unsigned int x, y, z;
 
-    for (z = 0; z < zDim; z++)
-        for (y = 0; y < yDim; y++)
-            for (x = 0; x < xDim; x++) {
+	for (z = 0; z < zDim; z++)
+		for (y = 0; y < yDim; y++)
+			for (x = 0; x < xDim; x++) {
 				double xp, xm, ym, yp, zm, zp;
 
 				if( x - 1 < 0) xm = 0;
@@ -440,8 +436,8 @@ int brIMatrix3DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 
 	xmax = sourceMatrix->xDim();
 	ymax = sourceMatrix->yDim();
-    zmax = sourceMatrix->zDim();
-    zOffset = xmax * ymax * BRINT(&args[1]);
+	zmax = sourceMatrix->zDim();
+	zOffset = xmax * ymax * BRINT(&args[1]);
     
 	if (xmax > d->x)
 		xmax = d->x;

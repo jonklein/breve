@@ -62,10 +62,9 @@ brJavaBridgeData *brAttachJavaVM(brEngine *e) {
 	JNI_GetDefaultJavaVMInitArgs(&vm_args);
 
 	options[0].optionString = optstr;
-	options[1].optionString = "-verbose:jni,class";
-	vm_args.version = JNI_VERSION_1_2;
+	// options[1].optionString = "-verbose:jni,class";
 	vm_args.options = options;
-	vm_args.nOptions = 2;
+	vm_args.nOptions = 1;
 	vm_args.ignoreUnrecognized = JNI_FALSE;
 
 	// Create the Java VM 

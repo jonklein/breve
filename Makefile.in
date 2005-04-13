@@ -24,8 +24,8 @@ DMG_FILE	= breve_@VERSION@.dmg
 CLI_FOLDER	= breve_@VERSION@
 IDE_FOLDER	= breveIDE_@VERSION@
 
-exec_prefix	= @exec_prefix@
 prefix		= @prefix@
+exec_prefix	= @exec_prefix@
 
 all: .depend lib/libbreve.a bin/breve@EXE_SUFFIX@ bin/breve_cli@EXE_SUFFIX@ \
 	lib/classes/MethodFinder.jar
@@ -45,10 +45,10 @@ OBJ	:= $(SRC:.cc=.o)
 OBJ	:= $(OBJ:.c=.o)
 
 bin/breve@EXE_SUFFIX@: bin/breve.o $(OBJ)
-	$(CXX) -o $@ $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@
+	$(CC) -o $@ $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@ -lstdc++
 
 bin/breve_cli@EXE_SUFFIX@: bin/breve_cli.o $(OBJ)
-	$(CXX) -o $@ $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@
+	$(CC) -o $@ $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@ -lstdc++
 
 breve.dll: $(OBJ)
 	$(CXX) @PLUGINFLAGS@ -o $@ @PLUGINIMP@ $^ @LIBS@

@@ -37,6 +37,10 @@ To build the Mac OS X application:
 
 5) make OSX_build
 
+To build the wxWindows frontend for Linux and Windows:
+
+5) cd wx; make
+
                              -- BUILD NOTES -- 
 
 OS X Note #1: the OS X xcode project is setup to link against all of the 

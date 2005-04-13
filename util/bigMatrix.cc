@@ -172,22 +172,22 @@ slVectorViewGSL& slVectorViewGSL::scaleAndAdd(const float scalar,
 /**
  *  Convolve with general kernel (odd dimension).
  */
-slVectorViewGSL& slVectorViewGSL::convolve(const slVectorView&) {}
+slVectorViewGSL& slVectorViewGSL::convolve(const slVectorView& v) { }
 
 /**
  *  Convolve periodic with general kernel (odd dimension).
 */
-slVectorViewGSL& slVectorViewGSL::convolvePeriodic(const slVectorView&) {}
+slVectorViewGSL& slVectorViewGSL::convolvePeriodic(const slVectorView& v) { }
 
 /**
  *  Convolve with general kernel via DFT (odd dimension).
  */
-slVectorViewGSL& slVectorViewGSL::convolveFFT(const slVectorView&) {}
+slVectorViewGSL& slVectorViewGSL::convolveFFT(const slVectorView& v) { }
 
 /**
  *  Convolve with 3x3 kernel (odd dimension).
  */
-slVectorViewGSL& slVectorViewGSL::convolve3x3(const slVectorView&) {}
+slVectorViewGSL& slVectorViewGSL::convolve3x3(const slVectorView& v) { }
 
 /**
  *  Addition operator (must have common dimensions).
@@ -250,17 +250,17 @@ slBigVectorGSL::~slBigVectorGSL() {}
 
 inline unsigned int slBigVectorGSL::dim()
 {
-
+	return 0;
 }
 
 inline float slBigVectorGSL::get(const int x)
 {
-    return _vec->data[x];
+	return _vec->data[x];
 }
 
 inline void slBigVectorGSL::set(const int x, const float value)
 {
-    _vec->data[x] = value;
+	_vec->data[x] = value;
 }
 
 /**
@@ -349,7 +349,7 @@ float slBigMatrix2DGSL::get(const int x, const int y) const
  */
 
 void slBigMatrix2DGSL::clamp(const float low, const float tolerance, const float high) {
-	int x, y;
+	unsigned int x, y;
 
 	for(x = 0; x < _xdim; x++ ) {
 		for(y = 0; y < _ydim; y++ ) {

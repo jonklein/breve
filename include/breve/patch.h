@@ -24,6 +24,7 @@
 */
 
 #include "bigMatrix.hh"
+#include "glIncludes.h"
 
 class slPatchGrid;
 
@@ -84,7 +85,7 @@ class slPatchGrid {
 
 		int textureX, textureY, textureZ;
 
-		int texture;
+		GLuint texture;
 
 		int drawSmooth;
 };

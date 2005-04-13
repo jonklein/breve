@@ -125,9 +125,9 @@ void slPatchGrid::draw(slCamera *camera) {
 	diff.y = (origin.y - (startPosition.y + (ySize / 2) * patchSize.y));
 	diff.z = (origin.z - (startPosition.z + (zSize / 2) * patchSize.z));
 
-	adiff.x = abs(diff.x);
-	adiff.y = abs(diff.y);
-	adiff.z = abs(diff.z);
+	adiff.x = fabs(diff.x);
+	adiff.y = fabs(diff.y);
+	adiff.z = fabs(diff.z);
 
 	glEnable(GL_TEXTURE_3D);
 
