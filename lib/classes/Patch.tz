@@ -138,8 +138,8 @@ Abstract : Patch (aka Patches) [version 2.2] {
             return.
         }
 
-        transparency = theTransparency.
-        setPatchTransparency(patchPointer, theTransparency).
+        transparency = alphaValue.
+        setPatchTransparency(patchPointer, alphaValue).
 
     + section "Getting Groups of Neighbor Patches"
 
