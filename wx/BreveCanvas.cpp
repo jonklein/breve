@@ -33,10 +33,10 @@ END_EVENT_TABLE()
 
 int canvas_attrib[] =
 {
-    4,
-    1,
-    11, 16,
-    12, 2,
+    WX_GL_RGBA,
+    WX_GL_DOUBLEBUFFER,
+    WX_GL_DEPTH_SIZE, 16,
+    WX_GL_STENCIL_SIZE, 2,
     0
 };
 

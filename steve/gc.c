@@ -129,6 +129,8 @@ void stGCUnretain(brEval *e) {
 */
 
 void stGCUnretainPointer(void *pointer, int type) {
+	if(!pointer) return NULL;
+
 	switch(type) {
 		case AT_INSTANCE:
 			if(!pointer || ((brInstance*)pointer)->status != AS_ACTIVE) return;
