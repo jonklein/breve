@@ -139,7 +139,7 @@ int brIObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 int brIPatchGridCopyColorFrom3DMatrix(brEval args[], brEval *target, brInstance *i) {
 	slPatchGrid *g = BRPATCHGRIDPOINTER(&args[0]);
 
-	slPatchGridCopyColorFrom3DMatrix(g, BRPOINTER(&args[1]), BRINT(&args[2]), BRDOUBLE(&args[3]));
+	slPatchGridCopyColorFrom3DMatrix(g, (slBigMatrix3DGSL*)BRPOINTER(&args[1]), BRINT(&args[2]), BRDOUBLE(&args[3]));
 
 	return EC_OK;
 }

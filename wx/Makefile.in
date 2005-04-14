@@ -1,5 +1,6 @@
 WXVERSION:=$(shell echo `wx-config --version`)
 CXX=@CXX@
+CC=@CC@
 RESCOMP=windres.exe
 RCFILE=breveIDE
 RESOURCEOBJECT=
@@ -57,6 +58,7 @@ help:
 all:	$(OUTPUTPATH)/$(PROGRAM)
 
 $(OUTPUTPATH)/$(PROGRAM):	$(OBJECTS)
+	mkdir lib
 	$(CC) @PLUGINIMP@ -o $@ $(OBJECTS) $(LDFLAGS)
 	$(MACRESOURCECMD)
 

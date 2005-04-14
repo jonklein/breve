@@ -88,8 +88,8 @@ Patch : LifePatch {
 		self set-color to (1.0, 0, 0).
 		state = value.
 
-		if state: self set-transparency to 0.3.
-		else self set-transparency to 1.0.
+		if state: self set-transparency to 0.7.
+		else self set-transparency to 0.0.
 
 	+ to init-patch:
 		self set-state to random[1].
@@ -117,7 +117,7 @@ Patch : LifePatch {
 
 			self set-color to (1.0 - (onCount / 20.0), onCount / 20.0, 0).
 		} else {
-			self set-transparency to 1.0.
+			self set-transparency to 0.0.
 			state = 0.
 			onCount = 0.
 		}

@@ -20,9 +20,21 @@
 
 #include "simulation.h"
 
+#include "windows.h"
+#include "glIncludes.h"
+
+#ifdef WINDOWS
+PFNGLTEXIMAGE3DPROC wglTexImage3D;
+#endif
+
 slPatchGrid *slPatchGridNew(slVector *center, slVector *patchSize, int x, int y, int z) {
 	struct slPatchGrid *grid;
 	int a, b, c;
+
+#ifdef WINDOWS
+	// oh windows, why do you have to be such a douchebag about everything?!
+	wglTexImage3D = (PFNGLTEXIMAGE3DPROC)wglGetProcAddress("glTexImage3D");
+#endif
 
 	if(x < 1 || y < 1 || z < 1) return NULL;
 
@@ -129,11 +141,12 @@ void slPatchGrid::draw(slCamera *camera) {
 	adiff.y = fabs(diff.y);
 	adiff.z = fabs(diff.z);
 
-	glEnable(GL_TEXTURE_3D);
-
 	glDisable(GL_CULL_FACE);
 
 	glColor4f(1,1,1,1);
+
+	glEnable(GL_TEXTURE_3D);
+	glBindTexture(GL_TEXTURE_3D, texture);
 
 	if(drawSmooth) {
 		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -147,10 +160,13 @@ void slPatchGrid::draw(slCamera *camera) {
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
 
-	glBindTexture(GL_TEXTURE_3D, texture);
-	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, textureX, textureY, textureZ, 0, GL_RGBA, GL_UNSIGNED_BYTE, colors);
-
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+#ifdef WINDOWS
+	wglTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, textureX, textureY, textureZ, 0, GL_RGBA, GL_UNSIGNED_BYTE, colors);
+#else 
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, textureX, textureY, textureZ, 0, GL_RGBA, GL_UNSIGNED_BYTE, colors);
+#endif
 
 	glBegin(GL_QUADS);
 

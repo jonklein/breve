@@ -25,11 +25,13 @@
 #import <OpenGL/glext.h>
 #else
 #include <GL/gl.h>
-#include <GL/glu.h>
+// #include <GL/glu.h>
 #include <GL/glut.h>
-#if !WINDOWS
+#if WINDOWS
 #include <GL/glext.h>
+#else
 #include <GL/glx.h>
+#include <GL/glext.h>
 #endif
 #endif
 

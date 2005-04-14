@@ -83,8 +83,8 @@ Patch : LifePatch {
 		self set-color to (1.0, 0, 0).
 		state = value.
 
-		if state: self set-transparency to 0.85.
-		else self set-transparency to 1.0.
+		if state: self set-transparency to 0.2.
+		else self set-transparency to 0.0.
 
 	+ to init-patch:
 		if random[5] == 0: self set-state to 1.
@@ -100,12 +100,12 @@ Patch : LifePatch {
 
 	+ to post-iterate:
 		if (state == 0 && liveNeighbors == 4) || ((state == 1) && (liveNeighbors == 4 || liveNeighbors == 6)): {
-			self set-transparency to 0.85.
+			self set-transparency to 0.2.
 			state = 1.
 
 			self set-color to (1.0 - (onCount / 20.0), onCount / 20.0, 0).
 		} else {
-			self set-transparency to 1.0.
+			self set-transparency to 0.0.
 			state = 0.
 			onCount = 0.
 		}

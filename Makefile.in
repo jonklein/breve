@@ -4,6 +4,7 @@ JAR	= @JAR@
 JAVAC	= @JAVAC@
 LEX	= @LEX@
 RANLIB	= @RANLIB@
+AR	= @AR@
 YACC	= @YACC@
 
 @SET_MAKE@
@@ -48,7 +49,7 @@ bin/breve@EXE_SUFFIX@: bin/breve.o $(OBJ)
 	$(CC) -o $@ $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@ -lstdc++
 
 bin/breve_cli@EXE_SUFFIX@: bin/breve_cli.o $(OBJ)
-	$(CC) -o $@ $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@ -lstdc++
+	$(CXX) -o $@ $(LDFLAGS) $^ @LIBS@
 
 breve.dll: $(OBJ)
 	$(CXX) @PLUGINFLAGS@ -o $@ @PLUGINIMP@ $^ @LIBS@
