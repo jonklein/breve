@@ -19,8 +19,6 @@
  *****************************************************************************/
 
 #include "simulation.h"
-
-#include "windows.h"
 #include "glIncludes.h"
 
 #ifdef WINDOWS
