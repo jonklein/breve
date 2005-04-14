@@ -182,23 +182,28 @@ int brIMatrix2DDiffuse(brEval args[], brEval *target, brInstance *i) {
     // this will get moved to a seperate util class later
     // and will be converted to iterators when we migrate to gslmm based code
     
-	for(x=0; x < (int)xDim; x++) {
-	    for(y=0; y < (int)yDim; y++) {
-            double dt, db, dl, dr;
+	for(x=0; x < xDim; x++) {
+	    for(y=0; y < yDim; y++) {
+            float dym, dyp, dxm, dxp;
 
-			if(x - 1 >= 0) dl = chemData[ chemTDA * (x - 1) + y ];
-			else dl = 0.0;
+			if(x - 1 >= 0) dxm = chemData[ chemTDA * (x - 1) + y ];
+			else dxm = 0.0;
 
-			if(x + 1 < xDim) dr = chemData[ chemTDA * (x + 1) + y ];
-			else dr = 0.0;
+			if(x + 1 < xDim) dxp = chemData[ chemTDA * (x + 1) + y ];
+			else dxp = 0.0;
 
-			if(y - 1 >= 0) dt = chemData[ chemTDA * x + (y - 1) ];
-			else dt = 0.0;
+			if(y - 1 >= 0) dym = chemData[ chemTDA * x + (y - 1) ];
+			else dym = 0.0;
 
-			if(y + 1 < yDim) db = chemData[ chemTDA * x + (y + 1) ];
-			else db = 0.0;
+			if(y + 1 < yDim) dyp = chemData[ chemTDA * x + (y + 1) ];
+			else dyp = 0.0;
 
-            diffData[diffTDA * x + y] = scale * ((-4.0f * chemData[ chemTDA * x + y]) + dl + dr + dt + db);
+            diffData[diffTDA * x + y] = 
+                            scale * ((-4.0f * chemData[ (chemTDA * x) + y]) + 
+                            dxm + 
+                            dxp + 
+                            dym + 
+                            dyp);
         }
     }
 
@@ -211,7 +216,7 @@ int brIMatrix2DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 	float* sourceData = sourceMatrix->getGSLVector()->data;
 	unsigned int sourceTDA = sourceMatrix->xDim();
 	unsigned char *pdata;
-	double scale = 255.0 * BRDOUBLE(&args[3]);
+	float scale = 255.0 * BRDOUBLE(&args[3]);
 	int offset = BRINT(&args[2]);
 	int r;
 	int x, y, xmax, ymax;
@@ -389,34 +394,44 @@ int brIMatrix3DDiffuse(brEval args[], brEval *target, brInstance *i) {
 	unsigned int diffTDA = diffTarget->xDim(); // proxy for tda
 	unsigned int chemTDA = chemSource->xDim(); // proxy for tda
 	unsigned int chemXY = chemSource->xDim() * chemSource->yDim();
-	unsigned int x, y, z;
+	unsigned int x = 0, y = 0, z = 0;
 
-	for (z = 0; z < zDim; z++)
-		for (y = 0; y < yDim; y++)
-			for (x = 0; x < xDim; x++) {
-				double xp, xm, ym, yp, zm, zp;
-
-				if( x - 1 < 0) xm = 0;
-				else xm = chemData[(z * chemXY) + ((x - 1) * chemTDA) + y];
-
-				if( y - 1 < 0) ym = 0;
-				else ym = chemData[(z * chemXY) + (x * chemTDA) + y - 1];
-
-				if( z - 1 < 0) zm = 0;
-				else zm = chemData[((z - 1) * chemXY) + (x * chemTDA) + y];
-		
-				if( x + 1 >= xDim) xp = 0;
-				else xp = chemData[(z * chemXY) + ((x+1) * chemTDA) + y];
-		
-				if( y + 1 >= yDim) yp = 0;
-				else yp = chemData[(z * chemXY) + (x * chemTDA) + y + 1];
-		
-				if( z + 1 >= zDim) zp = 0;
-				else zp = chemData[((z + 1) * chemXY) + (x * chemTDA) + y];
+    // this will may moved to a seperate util class later
+    // and might be converted to iterators when we migrate to gslmm based code
+        	
+    for (z = 0; z < zDim; z++)
+        for (y = 0; y < yDim; y++)
+            for (x = 0; x < xDim; x++) {
+            float dxm, dxp, dym, dyp, dzm, dzp;
+            
+                if(x - 1 >= 0) dxm = chemData[ chemTDA * (x - 1) + y ];
+                else dxm = 0.0;
     
-                diffData[(z * chemXY) + x * diffTDA + y] = 
-					scale * ((-6.0f * chemData[(z * chemXY) + (x * chemTDA) + y]) +
-					xm + xp + ym + yp + zm + zp); 
+                if(x + 1 < xDim) dxp = chemData[ chemTDA * (x + 1) + y ];
+                else dxp = 0.0;
+    
+                if(y - 1 >= 0) dym = chemData[ chemTDA * x + (y - 1) ];
+                else dym = 0.0;
+    
+                if(y + 1 < yDim) dyp = chemData[ chemTDA * x + (y + 1) ];
+                else dyp = 0.0;
+
+                if(z - 1 >= 0) dzm = chemData[ chemTDA * z + (z - 1) ];
+                else dzm = 0.0;
+    
+                if(z + 1 < zDim) dzp = chemData[ chemTDA * z + (z + 1) ];
+                else dzp = 0.0;
+    
+                newVal = scale * (
+                (-6.0f * chemData[(z * chemXY) + (x * chemTDA) + y]) +
+                    dxm +
+                    dxp +
+                    dym +
+                    dyp +
+                    dzm +
+                    dzp);
+    
+                diffData[(z * chemXY) + x * diffTDA + y] = newVal;
             }
 
 	return EC_OK;
@@ -429,7 +444,7 @@ int brIMatrix3DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 	unsigned int sourceTDA = sourceMatrix->xDim();
 	unsigned int zOffset;
 	unsigned char *pdata;
-	double scale = 255.0 * BRDOUBLE(&args[4]);
+	float scale = 255.0 * BRDOUBLE(&args[4]);
 	unsigned int offset = BRINT(&args[3]);
 	int r;
 	int x, y, xmax, ymax, zmax;
