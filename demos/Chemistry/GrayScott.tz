@@ -31,6 +31,9 @@ Control : GS {
 
     + to init:
         m, n (int).
+        
+        # check for --periodic or --not-periodic
+        
 
         self set-background-color to (0, 0, 0).
 
@@ -74,20 +77,28 @@ Control : GS {
 		tempreact multiply-with-values of V.
 		tempreact multiply-with-values of V.
 
-		temp compute-diffusion-matrix from U with-scale RU.
+		temp compute-periodic-diffusion-matrix from U with-scale RU.
 
 		temp add-values of tempreact scaled-by -1.0.
 		temp add-values of U scaled-by -F.
 		temp add-values of inflow.
 		U add-values of temp scaled-by TIMESTEP.
 
-		temp compute-diffusion-matrix from V with-scale RV.
+		temp compute-periodic-diffusion-matrix from V with-scale RV.
 
 		temp add-values of tempreact.
 		temp add-values of V scaled-by -(K + F).
 		V add-values of temp scaled-by TIMESTEP.
 		
         super iterate.
+}
+
+Abstract: PeriodicIteration {
+
+}
+
+Abstract: APeriodicIteration {
+
 }
 
 Image : MatrixImage {
