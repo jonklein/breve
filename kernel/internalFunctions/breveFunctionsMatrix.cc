@@ -140,8 +140,8 @@ int brIMatrix2DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 	unsigned int x = 0, y = 0;
 	int xp, xm, yp, ym;
 
-	for (y = 0; y < (int)yDim; y++)
-		for (x = 0; x < (int)xDim; x++) {
+	for (y = 0; y < (unsigned int)yDim; y++)
+		for (x = 0; x < (unsigned int)xDim; x++) {
 			xp = (x + 1) % xDim;
 			yp = (y + 1) % yDim;
 			xm = (x - 1) % xDim;
@@ -182,8 +182,8 @@ int brIMatrix2DDiffuse(brEval args[], brEval *target, brInstance *i) {
     // this will get moved to a seperate util class later
     // and will be converted to iterators when we migrate to gslmm based code
     
-	for(x=0; x < xDim; x++) {
-	    for(y=0; y < yDim; y++) {
+	for(x=0; x < (unsigned int)xDim; x++) {
+	    for(y=0; y < (unsigned int)yDim; y++) {
             float dym, dyp, dxm, dxp;
 
 			if(x - 1 >= 0) dxm = chemData[ chemTDA * (x - 1) + y ];
@@ -341,9 +341,9 @@ int brIMatrix3DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 	unsigned int x = 0, y = 0, z = 0;
 	int xp, xm, yp, ym, zp, zm;
 
-    for (z = 0; z < zDim; z++)
-        for (y = 0; y < yDim; y++)
-            for (x = 0; x < xDim; x++) {
+    for (z = 0; z < (unsigned int)zDim; z++)
+        for (y = 0; y < (unsigned int)yDim; y++)
+            for (x = 0; x < (unsigned int)xDim; x++) {
                 xp = (x + 1) % xDim;
                 yp = (y + 1) % yDim;
                 zp = (z + 1) % zDim;
@@ -399,27 +399,27 @@ int brIMatrix3DDiffuse(brEval args[], brEval *target, brInstance *i) {
     // this will may moved to a seperate util class later
     // and might be converted to iterators when we migrate to gslmm based code
         	
-    for (z = 0; z < zDim; z++)
-        for (y = 0; y < yDim; y++)
-            for (x = 0; x < xDim; x++) {
+    for (z = 0; z < (unsigned int)zDim; z++)
+        for (y = 0; y < (unsigned int)yDim; y++)
+            for (x = 0; x < (unsigned int)xDim; x++) {
             float dxm, dxp, dym, dyp, dzm, dzp;
             
-                if(x - 1 >= 0) dxm = chemData[ chemTDA * (x - 1) + y ];
+                if(x - 1 >= 0) dxm = chemData[ (chemXY * z) + (chemTDA * (x - 1)) + y ];
                 else dxm = 0.0;
     
-                if(x + 1 < xDim) dxp = chemData[ chemTDA * (x + 1) + y ];
+                if(x + 1 < xDim) dxp = chemData[ (chemXY * z) + (chemTDA * (x + 1)) + y ];
                 else dxp = 0.0;
     
-                if(y - 1 >= 0) dym = chemData[ chemTDA * x + (y - 1) ];
+                if(y - 1 >= 0) dym = chemData[ (chemXY * z) + (chemTDA * x) + (y - 1) ];
                 else dym = 0.0;
     
-                if(y + 1 < yDim) dyp = chemData[ chemTDA * x + (y + 1) ];
+                if(y + 1 < yDim) dyp = chemData[ (chemXY * z) + (chemTDA * x) + (y + 1) ];
                 else dyp = 0.0;
 
-                if(z - 1 >= 0) dzm = chemData[ chemTDA * z + (z - 1) ];
+                if(z - 1 >= 0) dzm = chemData[ (chemXY * (z - 1)) + (chemTDA * x) + y ];
                 else dzm = 0.0;
     
-                if(z + 1 < zDim) dzp = chemData[ chemTDA * z + (z + 1) ];
+                if(z + 1 < zDim) dzp = chemData[ (chemXY * (z + 1)) + (chemTDA * x) + y ];
                 else dzp = 0.0;
     
                 newVal = scale * (
