@@ -31,6 +31,8 @@ class slObjectLine: public slObjectConnection {
 
 		slVector _color;
 		int _stipple;
+
+		void setStipple( int s) { _stipple = s; }
 };
 
 class slWorldObject {

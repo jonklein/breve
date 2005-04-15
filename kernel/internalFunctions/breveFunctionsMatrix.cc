@@ -341,42 +341,51 @@ int brIMatrix3DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 	unsigned int x = 0, y = 0, z = 0;
 	int xp, xm, yp, ym, zp, zm;
 
-    for (z = 0; z < (unsigned int)zDim; z++)
-        for (y = 0; y < (unsigned int)yDim; y++)
-            for (x = 0; x < (unsigned int)xDim; x++) {
-                xp = (x + 1) % xDim;
-                yp = (y + 1) % yDim;
-                zp = (z + 1) % zDim;
-                xm = (x - 1) % xDim;
-                ym = (y - 1) % yDim;
-                zm = (z - 1) % zDim;
+    for (z = 0; z < zDim; z++) {
+		int zmRow, zpRow, zRow;
+
+		zm = z - 1;
+		zp = z + 1;
+
+		if (zm < 0) zm += zDim;
+		if (zp >= (int)zDim) zp -= zDim;
+
+		zmRow = zm * chemXY;
+		zpRow = zp * chemXY;
+		zRow = z * chemXY;
+
+		for (x = 0; x < xDim; x++) {
+			int xRow, xpRow, xmRow;
+			xp = x + 1;
+			xm = x - 1;
     
-                if (xm < 0)
-                    xm += xDim;
-                else if (xp >= (int)xDim)
-                    xp -= xDim;
+			if (xm < 0) xm += xDim;
+			if (xp >= (int)xDim) xp -= xDim;
+
+			xRow = x * chemTDA;
+			xpRow = xp * chemTDA;
+			xmRow = xm * chemTDA;
     
-                if (ym < 0)
-                    ym += yDim;
-                else if (yp >= (int)yDim)
-                    yp -= yDim;
-    
-                if (zm < 0)
-                    zm += zDim;
-                else if (zp >= (int)zDim)
-                    zp -= zDim;
+	        for (y = 0; y < yDim; y++) {
+				yp = y + 1;
+				ym = y - 1;
+
+				if (ym < 0) ym += yDim;
+				if (yp >= (int)yDim) yp -= yDim;
     
                 newVal = scale * (
-                (-6.0f * chemData[(z * chemXY) + (x * chemTDA) + y]) +
-                    chemData[(z * chemXY) + (xm * chemTDA) + y] +
-                    chemData[(z * chemXY) + (xp * chemTDA) + y] + 
-                    chemData[(z * chemXY) + (x * chemTDA) + ym] +
-                    chemData[(z * chemXY) + (x * chemTDA) + yp] +
-                    chemData[(zm * chemXY) + (x  * chemTDA) + y] +
-                    chemData[(zp * chemXY) + (x * chemTDA) + y]);
+                (-6.0f * chemData[(zRow) + (xRow) + y]) +
+                    chemData[(zRow) + (xmRow) + y] +
+                    chemData[(zRow) + (xpRow) + y] + 
+                    chemData[(zRow) + (xRow) + ym] +
+                    chemData[(zRow) + (xRow) + yp] +
+                    chemData[(zmRow) + (xRow) + y] +
+                    chemData[(zpRow) + (xRow) + y]);
     
                 diffData[(z * chemXY) + x * diffTDA + y] = newVal;
             }
+		}
+	}
 
 	return EC_OK;
 }

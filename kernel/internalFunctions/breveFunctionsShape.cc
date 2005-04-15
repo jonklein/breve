@@ -19,6 +19,9 @@
  *****************************************************************************/
 
 #include "kernel.h"
+#include "steve.h"
+#include "expression.h"
+#include "evaluation.h"
 
 #define BRSHAPEPOINTER(p)	((slShape*)BRPOINTER(p))
 
@@ -27,12 +30,6 @@
 
 int brINewShape(brEval args[], brEval *target, brInstance *i) {
 	BRPOINTER(target) = slShapeNew();
-
-	if (!BRSHAPEPOINTER(target)) {
-		slMessage(DEBUG_ALL, "newShape() failed\n");
-		return EC_ERROR;
-	}
-
 	return EC_OK;
 }
 
@@ -47,14 +44,14 @@ int brIAddShapeFace(brEval args[], brEval *target, brInstance *i) {
 		return EC_OK;
 
 	if (list->count < 3) {
-		slMessage(DEBUG_ALL, "addShapeFace() requires a list of at least 3-vectors");
+		// stEvalError(i->engine, EE_TYPE, "Adding a face to a shape requires a list of at least 3 vectors");
 		return EC_ERROR;
 	}
 
 	for (h = list->start; h; h = h->next) {
 		if (h->eval.type != AT_VECTOR) {
 			slFree(face);
-			slMessage(DEBUG_ALL, "addShapeFace() list may contain only vectors");
+			stEvalError(i->engine, EE_TYPE, "Adding a face to a shape requires a list of vectors");
 			return EC_ERROR;
 		}
 
@@ -71,7 +68,7 @@ int brIFinishShape(brEval args[], brEval *target, brInstance *i) {
 	double density = BRDOUBLE(&args[1]);
 
 	if (!slShapeInitNeighbors(s, density)) {
-		slMessage(DEBUG_ALL, "finishShape() failed: error completing shape initialization\n");
+		stEvalError(i->engine, EE_SIMULATION, "An error occurred while initializing a shape object");
 		return EC_ERROR;
 	}
 
@@ -100,7 +97,7 @@ int brINewSphere(brEval args[], brEval *target, brInstance *i) {
 	BRPOINTER(target) = slSphereNew(BRDOUBLE(&args[0]), BRDOUBLE(&args[1]));
 
 	if (!BRINSTANCE(target)) {
-		slMessage(DEBUG_ALL, "newSphere() failed\n");
+		stEvalError(i->engine, EE_SIMULATION, "An error occurred while creating a new sphere");
 		return EC_ERROR;
 	}
 
@@ -111,7 +108,7 @@ int brINewCube(brEval args[], brEval *target, brInstance *i) {
 	BRPOINTER(target) = slNewCube(&BRVECTOR(&args[0]), BRDOUBLE(&args[1]));
 
 	if (!BRSHAPEPOINTER(target)) {
-		slMessage(DEBUG_ALL, "newCube() failed\n");
+		stEvalError(i->engine, EE_SIMULATION, "An error occurred while creating a new cube");
 		return EC_ERROR;
 	}
 
@@ -122,7 +119,7 @@ int brINewNGonDisc(brEval args[], brEval *target, brInstance *i) {
 	BRPOINTER(target) = slNewNGonDisc(BRINT(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]), BRDOUBLE(&args[3]));
 
 	if (!BRSHAPEPOINTER(target)) {
-		slMessage(DEBUG_ALL, "newNGonDisc() failed\n");
+		stEvalError(i->engine, EE_SIMULATION, "An error occurred while creating a new polygon disc");
 		return EC_ERROR;
 	}
 
@@ -133,7 +130,7 @@ int brINewNGonCone(brEval args[], brEval *target, brInstance *i) {
 	BRPOINTER(target) = slNewNGonCone(BRINT(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]), BRDOUBLE(&args[3]));
 
 	if (!BRSHAPEPOINTER(target)) {
-		slMessage(DEBUG_ALL, "newNGonCone() failed\n");
+		stEvalError(i->engine, EE_SIMULATION, "An error occurred while creating a new polygon cone");
 		return EC_ERROR;
 	}
 
@@ -163,8 +160,8 @@ int brIShapeForData(brEval args[], brEval *target, brInstance *i) {
 	brData *d = BRDATA(&args[0]);
 
 	if (!d) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to shapeForData\n");
-		return EC_ERROR;
+		BRPOINTER(target) = NULL;
+		return EC_OK;
 	}
 
 	BRPOINTER(target) = slDeserializeShape((slSerializedShapeHeader*)d->data, d->length);
@@ -176,10 +173,7 @@ int brIScaleShape(brEval args[], brEval *target, brInstance *i) {
 	slShape *s = BRSHAPEPOINTER(&args[0]);
 	slVector *scale = &BRVECTOR(&args[1]);
 
-	if (!s) {
-		slMessage(DEBUG_ALL, "scaleShape() called with invalid shape\n");
-		return EC_ERROR;
-	}
+	if (!s) return EC_OK;
 
 	slScaleShape(s, scale);
 
@@ -189,10 +183,7 @@ int brIScaleShape(brEval args[], brEval *target, brInstance *i) {
 int brIGetMass(brEval args[], brEval *target, brInstance *i) {
 	slShape *s = BRSHAPEPOINTER(&args[0]);
 
-	if (!s) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to getMass\n");
-		return EC_ERROR;
-	}
+	if (!s) return EC_OK;
 
 	BRDOUBLE(target) = slShapeGetMass(s);
 
@@ -202,10 +193,7 @@ int brIGetMass(brEval args[], brEval *target, brInstance *i) {
 int brIGetDensity(brEval args[], brEval *target, brInstance *i) {
 	slShape *s = BRSHAPEPOINTER(&args[0]);
 
-	if (!s) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to getDensity\n");
-		return EC_ERROR;
-	}
+	if (!s) return EC_OK;
 
 	BRDOUBLE(target) = slShapeGetDensity(s);
 

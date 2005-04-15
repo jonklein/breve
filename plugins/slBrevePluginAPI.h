@@ -183,11 +183,14 @@ brEvalListHead *brEvalListNew(void);
 #define BRHASH(e)	((e)->values.hashValue)
 #define BRLIST(e)	((e)->values.listValue)
 
+#define EC_ERROR -1
+#define EC_OK 1
+
 int brNewBreveCall(void *n, char *name, int (*call)(brEval argumentArray[],
 	brEval *returnValue, void *callingInstance), int rtype, ...);
 
 	/*
-	 * The stCallMethodByNameWithArgs() function calls the breve method
+	 * The brMethodCallByNameWithArgs() function calls the breve method
 	 * named by the string _name_ with _argcount_ number of arguments
 	 * in the array pointed to by _args_ and stores the return value of the
 	 * method (if any) in the brEval pointed to by _result_.
@@ -197,11 +200,7 @@ int brNewBreveCall(void *n, char *name, int (*call)(brEval argumentArray[],
 	 * returned and the simulation is halted.
 	 */
 
-#define EC_ERROR -1
-#define EC_OK 1
-
-int stCallMethodByNameWithArgs(void *instance, char *name, brEval *args[],
-	int argcount, brEval *result);
+int brMethodCallByNameWithArgs(void *instance, char *name, brEval **args, int count, brEval *result);
 
 	/*
 	 * The slMessage() function prints a formatted error message to the

@@ -219,6 +219,4 @@ NULL : Object (aka Objects) [version 2.1] {
 
 	+ to archive:
 		return 1.
-
-	- to iterate:
 }

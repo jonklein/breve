@@ -13,7 +13,7 @@ extern int lineno;
 
 void *breveFrontendInitData(brEngine *engine) {
 #if HAVE_LIBJAVA
-	brJavaInit(engine);
+	// brJavaInit(engine);
 #endif
 
 	return stSteveInit(engine);

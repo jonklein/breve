@@ -111,10 +111,12 @@ void slPatchGridCopyColorFrom3DMatrix(slPatchGrid *grid, slBigMatrix3DGSL *m, in
 	ySize = m->yDim();
 	zSize = m->zDim();
 
-	for(x = 0; x < xSize; x++ ) {
+	for(z = 0; z < zSize; z++ ) {
 		for(y = 0; y < ySize; y++ ) {
-			for(z = 0; z < zSize; z++ ) {
-				grid->colors[(z * grid->textureX * grid->textureY * 4) + (y * grid->textureX * 4) + (x * 4) + channel] = 
+			for(x = 0; x < xSize; x++ ) {
+				unsigned int crowOffset = (z * grid->textureX * grid->textureY * 4) + (y * grid->textureX * 4);
+
+				grid->colors[crowOffset + (x << 2) + channel] = 
 					(unsigned char)(255 * scale * mData[ (z * chemXY) + (x * chemTDA) + y ]);
 
 			}

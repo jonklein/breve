@@ -58,6 +58,8 @@ Object : Spring (aka Springs) {
 				(end get-link-pointer), 
 				point1, point2, length, strength, damping).
 
+		return springPointer.
+
 	+ to get-current-length:
 		% This method returns the <i>current</i> (stretched or compressed) 
 		% length of the spring, as opposed to the "natural" length.
