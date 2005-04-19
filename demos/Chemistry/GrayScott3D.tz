@@ -89,7 +89,10 @@ Control : GS {
 		V add-values of temp scaled-by TIMESTEP.
 
 		V copy-to-red-channel of-patch-grid grid with-scale 2.0.
-		V copy-to-alpha-channel of-patch-grid grid with-scale 0.1.
+
+		temp copy from V.
+		temp multiply-with-values of V.
+		temp copy-to-alpha-channel of-patch-grid grid with-scale 0.5.
 
         super iterate.
 }

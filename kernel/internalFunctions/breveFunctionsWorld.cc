@@ -197,7 +197,7 @@ int brIUpdateNeighbors(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Sets the neighborhood size for an object.
 
-	setNeighborhoodSize(slWorldObject pointer, double size).
+	setNeighborhoodSize(slWorld
 
 	The neighborhood size specifies how far an object looks when collecting 
 	neighbor information.
@@ -875,6 +875,30 @@ int brIAddObjectLine(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
+	\brief Sets the stipple pattern of an object line.
+*/
+
+int brIObjectLineSetStipple(brEval args[], brEval *target, brInstance *i) {
+	slObjectLine *line = (slObjectLine*)BRPOINTER(&args[0]);
+	char *patternString = BRSTRING(&args[1]);
+
+	int n, pattern = 0;
+
+	n = strlen(patternString);
+    
+	if(n > 16) n = 16;
+
+	while(n--) {
+		pattern <<= 1;
+		pattern |= (*(patternString++) == '-');
+	}
+
+	line->setStipple(pattern);
+
+	return EC_OK;
+}
+
+/*!
 	\brief Removes a specific object line between two objects.
 
 	void removeObjectLine(slWorldObject pointer source, slWorldObject pointer dest).
@@ -999,6 +1023,7 @@ void breveInitWorldFunctions(brNamespace *n) {
 
 	brNewBreveCall(n, "addObjectLine", brIAddObjectLine, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_STRING, 0);
 	brNewBreveCall(n, "removeObjectLine", brIRemoveObjectLine, AT_NULL, AT_POINTER, 0);
+	brNewBreveCall(n, "objectLineSetStipple", brIObjectLineSetStipple, AT_NULL, AT_POINTER, AT_STRING, 0);
 
 	brNewBreveCall(n, "setBoundsOnlyCollisionDetection", brISetBoundsOnlyCollisionDetection, AT_NULL, AT_INT, 0);
 

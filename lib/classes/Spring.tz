@@ -20,7 +20,7 @@ Object : Spring (aka Springs) {
 	% other undesirable behavior.  Keep spring strength and damping constants
 	% as low as possible to avoid this behavior.
 	% <P>
-	% The Spring class is new in version 2.1 and is considered experimental.
+	% The Spring class is new as of version 2.1.
 
 	+ variables:
 		springPointer (pointer).
@@ -28,7 +28,7 @@ Object : Spring (aka Springs) {
 		mode (int).
 		start, end (object).
 
-	+ section "Connecting Links Using a Spring"
+	+ section "Connecting Real Objects Using a Spring"
 
 	+ to connect from springLink1 (object) to springLink2 (object) 
 				from-point point1 = (0, 0, 0) (vector) 
@@ -67,6 +67,15 @@ Object : Spring (aka Springs) {
 		return 0.
 
 	+ section "Getting and Setting Spring Parameters"
+
+	+ to set-pattern to patternString (string):
+ 		% Sets the drawing style of this spring.  patternString is a string of 
+		% 16 spaces and/or dashes which specify the line pattern to be drawn.
+		% A thickly dashed spring, for example, would use the pattern 
+		% "--------        ".  The string " " can be used to make the spring
+		% invisible.  If no style is given, a dotted line is drawn.
+
+		objectLineSetStipple(springPointer, patternString).
 
 	+ to get-length:
 		% This method returns the natural length of the spring.  See also

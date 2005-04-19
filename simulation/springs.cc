@@ -37,14 +37,13 @@ void slSpring::draw(slCamera *camera) {
 	slVector x, y;
 
 	if(!_src || !_dst) return;
+	if(!_stipple) return;
 
 	slPositionVertex(&_src->position, &_point1, &x);
 	slPositionVertex(&_dst->position, &_point2, &y);
 
-	if(_stipple) {
-		glLineStipple(2, _stipple);
-		glEnable(GL_LINE_STIPPLE);
-	}
+	glLineStipple(2, _stipple);
+	glEnable(GL_LINE_STIPPLE);
 
 	glColor4f(_color.x, _color.y, _color.z, 0.8);
 
@@ -55,7 +54,7 @@ void slSpring::draw(slCamera *camera) {
 
 	glEnd();
 
-	if(_stipple) glDisable(GL_LINE_STIPPLE);
+	glDisable(GL_LINE_STIPPLE);
 }
 
 

@@ -26,6 +26,8 @@ class slObjectConnection {
 
 class slObjectLine: public slObjectConnection {
 	public:
+		slObjectLine() { _stipple = 0xffff; }
+
 		void draw(slCamera *c);
 		void step(double timestep) {};
 

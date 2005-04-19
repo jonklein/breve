@@ -1294,7 +1294,6 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *target, stRunI
 
 RTC_INLINE int stEvalWhile(stWhileExp *w, stRunInstance *i, brEval *result) {
 	brEval condition, conditionExp;
-	unsigned int evaluations = 0;
 	int r;
 
 	result->type = AT_NULL;
@@ -1308,8 +1307,6 @@ RTC_INLINE int stEvalWhile(stWhileExp *w, stRunInstance *i, brEval *result) {
 		    (r = stExpEval3(w->cond, i, &conditionExp)) != EC_OK ||
 		    (r = stEvalTruth(&conditionExp, &condition, i)) != EC_OK)
 			return r;
-
-		++evaluations;
 	}
 
 	result->type = AT_NULL;
@@ -1320,7 +1317,6 @@ RTC_INLINE int stEvalWhile(stWhileExp *w, stRunInstance *i, brEval *result) {
 RTC_INLINE int stEvalFor(stForExp *w, stRunInstance *i, brEval *result) {
 	brEval condition, conditionExp;
 	brEval assignment, iteration;
-	unsigned int evaluations = 0;
 	int r;
 
 	result->type = AT_NULL;
@@ -1331,13 +1327,11 @@ RTC_INLINE int stEvalFor(stForExp *w, stRunInstance *i, brEval *result) {
 		return r;
 
 	while (BRINT(&condition)) {
-		if ((r = stExpEval3(w->code, i, result)) != EC_OK ||
+		if ((w->code && (r = stExpEval3(w->code, i, result)) != EC_OK) ||
 		    (r = stExpEval3(w->iteration, i, &iteration)) != EC_OK ||
 		    (r = stExpEval3(w->condition, i, &conditionExp)) != EC_OK ||
 		    (r = stEvalTruth(&conditionExp, &condition, i)) != EC_OK)
 			return r;
-
-		++evaluations;
 	} 
 
 	result->type = AT_NULL;
@@ -1349,7 +1343,6 @@ RTC_INLINE int stEvalForeach(stForeachExp *w, stRunInstance *i, brEval *result) 
 	brEval list;
 	brEvalList *el;
 	void *iterationPointer;
-	unsigned int evaluations = 0;
 	int resultCode;
 
 	stAssignExp *assignExp = w->assignment;
@@ -1392,7 +1385,6 @@ RTC_INLINE int stEvalForeach(stForeachExp *w, stRunInstance *i, brEval *result) 
 		if (resultCode != EC_OK)
 			return resultCode;
 
-		++evaluations;
 		el = el->next;
 	} 
 

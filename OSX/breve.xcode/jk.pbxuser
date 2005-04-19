@@ -68,9 +68,9 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_FiletypeID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					348,
+					582,
 					20,
-					66,
+					105,
 					43,
 					43,
 					20,
@@ -142,10 +142,10 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_FiletypeID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					300,
-					67,
+					495,
+					106,
 					20,
-					67,
+					106,
 					43,
 					43,
 				);
@@ -159,7 +159,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 133559327;
+			PBXPerProjectTemplateStateSaveDate = 135617031;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -716,7 +716,7 @@
 				PBXModuleWindowStatusBarHidden = YES;
 				RubberWindowFrame = "267 380 745 408 0 0 1280 832 ";
 			};
-			PBXWorkspaceStateSaveDate = 133559327;
+			PBXWorkspaceStateSaveDate = 135617031;
 		};
 		sourceControlManager = 48E065B3055C318700C40B45;
 		userBuildSettings = {
@@ -791,6 +791,11 @@
 		isa = PBXFileBreakpoint;
 		lineNumber = 24;
 		state = 1;
+	};
+	48CE1CFB08155B1F0030CBB8 = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{38, 248}, {750, 558}}";
+		};
 	};
 	48D1C0D4046331F80093F8AA = {
 		uiCtxt = {

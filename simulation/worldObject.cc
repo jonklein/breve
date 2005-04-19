@@ -8,16 +8,15 @@ void slWorldObject::draw(slCamera *camera) {
 void slObjectLine::draw(slCamera *camera) {
 	slVector *x, *y;
 
-	if (!_src || !_dst)
-		return;
+	if (!_src || !_dst) return;
+
+	if (!_stipple) return 
 
 	x = &_src->position.location;
 	y = &_dst->position.location;
 
-	if (_stipple) {
-		glLineStipple(2, _stipple);
-		glEnable(GL_LINE_STIPPLE);
-	}
+	glLineStipple(2, _stipple);
+	glEnable(GL_LINE_STIPPLE);
 
 	glColor4f(_color.x, _color.y, _color.z, 0.8);
 
@@ -28,8 +27,7 @@ void slObjectLine::draw(slCamera *camera) {
 
 	glEnd();
 
-	if (_stipple)
-		glDisable(GL_LINE_STIPPLE);
+	glDisable(GL_LINE_STIPPLE);
 }
 
 void slWorldObjectSetCallbackData(slWorldObject *wo, void *data) {
