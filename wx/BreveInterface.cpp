@@ -120,6 +120,9 @@ BreveInterface::~BreveInterface()
 
     delete simmenu;
     free(simulationfile);
+
+    if (text != NULL)
+	free(text);
 }
 
 void BreveInterface::Pause(int pause)
@@ -149,6 +152,7 @@ bool BreveInterface::Initialize()
     }
 
     slFree(text);
+    text = NULL;
 
     ResizeView(x,y);
 
