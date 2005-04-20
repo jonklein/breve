@@ -26,19 +26,19 @@ Abstract : PatchGrid [version 2.2] {
         tempMatrix (pointer).
         redChemicalMatrix, greenChemicalMatrix, blueChemicalMatrix (object).
 
-	- to get-grid-pointer:
-		return gridPointer.
+    - to get-grid-pointer:
+        return gridPointer.
         
     + to init-with 
-		location center = (0, 0, 0) (vector)
-		patch-size pSize = (1, 1, 1) (vector) 
+        location center = (0, 0, 0) (vector)
+        patch-size pSize = (1, 1, 1) (vector) 
         x-count x (int) 
         y-count y (int) 
         z-count z (int) 
         patch-class class = "Patch" (string):
 
         % Creates a PatchGrid centered at center, in which each OBJECT(Patch) 
-		% is a member of class and is the size pSize and in which the total grid 
+        % is a member of class and is the size pSize and in which the total grid 
         % dimensions are x by y by z.  
         % <p> 
         % Bear in mind that this will create a large number of objects: 
@@ -130,26 +130,26 @@ Abstract : PatchGrid [version 2.2] {
         tempMatrix = matrix3DNew(x, y, z).
         return self.
 
-	+ to enable-smooth-drawing:
-		% Enables smooth drawing for this PatchGrid.  When smooth drawing is 
-		% enabled, colors are blended smoothly between patches.  Smooth drawing
-		% is disabled by default.
-		% <P>
-		% Smooth drawing is desirable when a PatchGrid's colors display 
-		% continuous gradients as with chemicals or temperature, but is 
-		% undesirable when dealing with discrete states, as in cellular 
-		% automata simulations.
-		% <P>
-		% The method METHOD(disable-smooth-drawing) can be used to disable
-		% smooth drawing.
+    + to enable-smooth-drawing:
+        % Enables smooth drawing for this PatchGrid.  When smooth drawing is 
+        % enabled, colors are blended smoothly between patches.  Smooth drawing
+        % is disabled by default.
+        % <P>
+        % Smooth drawing is desirable when a PatchGrid's colors display 
+        % continuous gradients as with chemicals or temperature, but is 
+        % undesirable when dealing with discrete states, as in cellular 
+        % automata simulations.
+        % <P>
+        % The method METHOD(disable-smooth-drawing) can be used to disable
+        % smooth drawing.
 
-		patchGridSetSmoothDrawing(gridPointer, 1).
+        patchGridSetSmoothDrawing(gridPointer, 1).
 
-	+ to disable-smooth-drawing:
-		% Disables smooth drawing for this PatchGrid.  This is the default.
-		% See METHOD(enable-smooth-drawing) for details on smooth drawing.
+    + to disable-smooth-drawing:
+        % Disables smooth drawing for this PatchGrid.  This is the default.
+        % See METHOD(enable-smooth-drawing) for details on smooth drawing.
 
-		patchGridSetSmoothDrawing(gridPointer, 0).
+        patchGridSetSmoothDrawing(gridPointer, 0).
 
     + to get-x-count:
         % If the grid is initialized, returns the size of the grid on the X-axis.
@@ -196,20 +196,20 @@ Abstract : PatchGrid [version 2.2] {
 
         if (chemicalConcentrationMatrix{theDiffusable}): {
             print "$theDiffusable is already being tracked by the PatchGrid.".
-			return.
+            return.
         }
 
-		push theDiffusable onto chemicals.
+        push theDiffusable onto chemicals.
 
-		if (theDiffusable decay-is-linear): push theDiffusable onto linearlyDecayingChemicals.
-		else: if (theDiffusable decay-is-exponential): push theDiffusable onto exponentiallyDecayingChemicals.
+        if (theDiffusable decay-is-linear): push theDiffusable onto linearlyDecayingChemicals.
+        else: if (theDiffusable decay-is-exponential): push theDiffusable onto exponentiallyDecayingChemicals.
 
-		if (theDiffusable get-diffusion-rate) > 0.0: push theDiffusable onto diffusingChemicals.
+        if (theDiffusable get-diffusion-rate) > 0.0: push theDiffusable onto diffusingChemicals.
 
-		chemicalConcentrationMatrix{theDiffusable} = ((new Matrix3D) init-with 
-			x-size (self get-x-count)
-			y-size (self get-y-count)
-			z-size (self get-z-count)).
+        chemicalConcentrationMatrix{theDiffusable} = ((new Matrix3D) init-with 
+            x-size (self get-x-count)
+            y-size (self get-y-count)
+            z-size (self get-z-count)).
         
     - to untrack patch-chemical theDiffusable (object):
         % Removes a OBJECT(PatchChemcial) from the patch grid.
@@ -237,43 +237,43 @@ Abstract : PatchGrid [version 2.2] {
         % Selects the OBJECT(PatchChemical)'s concentration to use as the red
         % channel when METHOD(display-patch-chemical-concentrations) is called.
 
-		redChemicalMatrix = chemicalConcentrationMatrix{theDiffusable}.
+        redChemicalMatrix = chemicalConcentrationMatrix{theDiffusable}.
         
     - to display-concentration-in-green of-patch-chemical theDiffusable (object):
         % Selects the OBJECT(PatchChemical)'s concentration to use as the red
         % channel when METHOD(display-patch-chemical-concentrations) is called.
 
-		greenChemicalMatrix = chemicalConcentrationMatrix{theDiffusable}.
+        greenChemicalMatrix = chemicalConcentrationMatrix{theDiffusable}.
                 
     - to display-concentration-in-blue of-patch-chemical theDiffusable (object):
         % Selects the OBJECT(PatchChemical)'s concentration to use as the red
         % channel when METHOD(display-patch-chemical-concentrations) is called.
         blueChemicalMatrix = theDiffusable.
 
-		blueChemicalMatrix = chemicalConcentrationMatrix{theDiffusable}.
+        blueChemicalMatrix = chemicalConcentrationMatrix{theDiffusable}.
                    
     - to set-patch-colors-to-chemical-concentrations:
         color (vector).
         color = (0,0,0).
 
-		matrix3DSetAll(tempMatrix, 0.0).
+        matrix3DSetAll(tempMatrix, 0.0).
 
-		if redChemicalMatrix: {
-			patchGridCopyColorFrom3DMatrix(gridPointer, (redChemicalMatrix get-matrix-pointer), 0, 1.0).
-			matrix3DAddScaled(tempMatrix, (redChemicalMatrix get-matrix-pointer), .33).
-		}
+        if redChemicalMatrix: {
+            patchGridCopyColorFrom3DMatrix(gridPointer, (redChemicalMatrix get-matrix-pointer), 0, 1.0).
+            matrix3DAddScaled(tempMatrix, (redChemicalMatrix get-matrix-pointer), .33).
+        }
 
-		if greenChemicalMatrix: {
-			patchGridCopyColorFrom3DMatrix(gridPointer, (greenChemicalMatrix get-matrix-pointer), 1, 1.0).
-			matrix3DAddScaled(tempMatrix, (greenChemicalMatrix get-matrix-pointer), .33).
-		}
+        if greenChemicalMatrix: {
+            patchGridCopyColorFrom3DMatrix(gridPointer, (greenChemicalMatrix get-matrix-pointer), 1, 1.0).
+            matrix3DAddScaled(tempMatrix, (greenChemicalMatrix get-matrix-pointer), .33).
+        }
 
-		if blueChemicalMatrix: {
-			patchGridCopyColorFrom3DMatrix(gridPointer, (blueChemicalMatrix get-matrix-pointer), 2, 1.0).
-			matrix3DAddScaled(tempMatrix, (blueChemicalMatrix get-matrix-pointer), .33).
-		}
+        if blueChemicalMatrix: {
+            patchGridCopyColorFrom3DMatrix(gridPointer, (blueChemicalMatrix get-matrix-pointer), 2, 1.0).
+            matrix3DAddScaled(tempMatrix, (blueChemicalMatrix get-matrix-pointer), .33).
+        }
 
-		patchGridCopyColorFrom3DMatrix(gridPointer, tempMatrix, 3, 1.0).
+        patchGridCopyColorFrom3DMatrix(gridPointer, tempMatrix, 3, 1.0).
 
     - to get-patch-chemicals:
         % Returns all the chemicals currently being tracked in
@@ -298,7 +298,20 @@ Abstract : PatchGrid [version 2.2] {
         for each chem in diffusingChemicals: {
             chemMatrixPointer = (chemicalConcentrationMatrix{chem} get-matrix-pointer).
             matrix3DDiffuse(chemMatrixPointer, tempMatrix, (chem get-diffusion-rate)).
-            matrix3DAddScaled(chemMatrixPointer, tempMatrix, 1.0).
+            matrix3DAddScaled(chemMatrixPointer, tempMatrix, (controller get-iteration-step)).
+        }
+
+    - to diffuse-chemicals-periodically:
+        % Updates the concentration of each OBJECT(PatchChemical) being tracked
+        % in the patch grid by diffusing the chemicals according to their
+        % diffusion rates.  This method is called automatically by METHOD(update-concentrations). 
+        chem (object).
+        chemMatrixPointer (pointer).
+        
+        for each chem in diffusingChemicals: {
+            chemMatrixPointer = (chemicalConcentrationMatrix{chem} get-matrix-pointer).
+            matrix3DDiffusePeriodic(chemMatrixPointer, tempMatrix, (chem get-diffusion-rate)).
+            matrix3DAddScaled(chemMatrixPointer, tempMatrix, (controller get-iteration-step)).
         }
                         
     - to decay-chemicals:
@@ -323,8 +336,6 @@ Abstract : PatchGrid [version 2.2] {
         % that this is a normalized concentration.  If you want the
         % total concentration, multiply by the OBJECT(Patch) size.
         % You don't normally call this directly
-
-		print chemicalConcentrationMatrix{theDiffusable}.
 
         return (chemicalConcentrationMatrix{theDiffusable} get-value at-x xIndex at-y yIndex at-z zIndex).
         
@@ -372,7 +383,6 @@ Abstract : PatchGrid [version 2.2] {
                     setPatchObjectAtIndex(gridPointer, patches{index}, x, y, z).
                     patches{index} set-patch-pointer to patchAtIndex(gridPointer, x, y, z).
                     patches{index} update-colors.
-
                     index++.
                 }
             }
