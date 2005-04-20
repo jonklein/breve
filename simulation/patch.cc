@@ -22,6 +22,8 @@
 #include "glIncludes.h"
 
 #ifdef WINDOWS
+#include <windows.h>
+
 PFNGLTEXIMAGE3DPROC wglTexImage3D;
 #endif
 

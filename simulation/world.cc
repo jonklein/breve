@@ -27,7 +27,7 @@ char *gPhysicsErrorMessage;
 void *operator new (size_t size) {
 	void *p = calloc(1, size); 
 
-	bzero(p, size);
+	memset(p, 0, size);
 
  	if (p == NULL) throw std::bad_alloc(); 
  
