@@ -199,7 +199,7 @@ int brIMatrix2DDiffuse(brEval args[], brEval *target, brInstance *i) {
 			else dyp = 0.0;
 
             diffData[diffTDA * x + y] = 
-                            scale * ((-4.0f * chemData[ (chemTDA * x) + y]) + 
+                            scale * ((-4.0f * chemData[ (x * chemTDA) + y]) + 
                             dxm + 
                             dxp + 
                             dym + 
@@ -336,6 +336,7 @@ int brIMatrix3DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 	unsigned int yDim = chemSource->yDim();
 	unsigned int zDim = chemSource->zDim();
 	unsigned int diffTDA = diffTarget->xDim(); // proxy for tda
+    unsigned int diffXY = diffTarget->xDim() * diffTarget->yDim(); // proxy for tda
 	unsigned int chemTDA = chemSource->xDim(); // proxy for tda
 	unsigned int chemXY = chemSource->xDim() * chemSource->yDim();
 	unsigned int x = 0, y = 0, z = 0;
@@ -382,7 +383,7 @@ int brIMatrix3DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
                     chemData[(zmRow) + (xRow) + y] +
                     chemData[(zpRow) + (xRow) + y]);
     
-                diffData[(z * chemXY) + x * diffTDA + y] = newVal;
+                diffData[(z * diffXY) + (x * diffTDA) + y] = newVal;
             }
 		}
 	}
@@ -401,46 +402,42 @@ int brIMatrix3DDiffuse(brEval args[], brEval *target, brInstance *i) {
 	unsigned int yDim = chemSource->yDim();
 	unsigned int zDim = chemSource->zDim();
 	unsigned int diffTDA = diffTarget->xDim(); // proxy for tda
+	unsigned int diffXY = diffTarget->xDim() * diffTarget->yDim(); // proxy for tda
 	unsigned int chemTDA = chemSource->xDim(); // proxy for tda
 	unsigned int chemXY = chemSource->xDim() * chemSource->yDim();
-	unsigned int x = 0, y = 0, z = 0;
+    int x = 0, y = 0, z = 0;
 
     // this will may moved to a seperate util class later
     // and might be converted to iterators when we migrate to gslmm based code
         	
-    for (z = 0; z < (unsigned int)zDim; z++)
-        for (y = 0; y < (unsigned int)yDim; y++)
-            for (x = 0; x < (unsigned int)xDim; x++) {
+    for (z = 0; z < zDim; z++)
+        for (y = 0; y < yDim; y++)
+            for (x = 0; x < xDim; x++) {
             float dxm, dxp, dym, dyp, dzm, dzp;
             
-                if(x - 1 >= 0) dxm = chemData[ (chemXY * z) + (chemTDA * (x - 1)) + y ];
-                else dxm = 0.0;
+                if(x - 1 >= 0) dxm = chemData[ (z * chemXY) + ((x - 1) * chemTDA) + y ];
+                else dxm = 0.0f;
     
-                if(x + 1 < xDim) dxp = chemData[ (chemXY * z) + (chemTDA * (x + 1)) + y ];
-                else dxp = 0.0;
+                if(x + 1 < xDim) dxp = chemData[ (z * chemXY) + ((x + 1) * chemTDA) + y ];
+                else dxp = 0.0f;
     
-                if(y - 1 >= 0) dym = chemData[ (chemXY * z) + (chemTDA * x) + (y - 1) ];
-                else dym = 0.0;
+                if(y - 1 >= 0) dym = chemData[ (z * chemXY) + (x * chemTDA) + (y - 1) ];
+                else dym = 0.0f;
     
-                if(y + 1 < yDim) dyp = chemData[ (chemXY * z) + (chemTDA * x) + (y + 1) ];
-                else dyp = 0.0;
+                if(y + 1 < yDim) dyp = chemData[ (z * chemXY) + (x * chemTDA) + (y + 1) ];
+                else dyp = 0.0f;
 
-                if(z - 1 >= 0) dzm = chemData[ (chemXY * (z - 1)) + (chemTDA * x) + y ];
-                else dzm = 0.0;
+                if(z - 1 >= 0) dzm = chemData[ ((z - 1) * chemXY) + (x * chemTDA) + y ];
+                else dzm = 0.0f;
     
-                if(z + 1 < zDim) dzp = chemData[ (chemXY * (z + 1)) + (chemTDA * x) + y ];
-                else dzp = 0.0;
+                if(z + 1 < zDim) dzp = chemData[ ((z + 1) * chemXY) + (x * chemTDA) + y ];
+                else dzp = 0.0f;
     
                 newVal = scale * (
                 (-6.0f * chemData[(z * chemXY) + (x * chemTDA) + y]) +
-                    dxm +
-                    dxp +
-                    dym +
-                    dyp +
-                    dzm +
-                    dzp);
+                    dxm + dxp + dym + dyp + dzm + dzp);
     
-                diffData[(z * chemXY) + x * diffTDA + y] = newVal;
+                diffData[(z * diffXY) + (x * diffTDA)  + y] = newVal;
             }
 
 	return EC_OK;
