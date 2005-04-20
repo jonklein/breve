@@ -6,7 +6,7 @@
 @define SIZE 20.
 @define DIFFUSION_RATE .09.
 @define DECAY_RATE 0.0.
-@define EXP_INFLOW 200.
+@define EXP_INFLOW 0.
 @define LIN_INFLOW 200.
 @define INFLOW_END_TIME 100.
 
@@ -14,15 +14,18 @@ Controller PatchGridTestControl.
 
 Control : PatchGridTestControl {
 
-	+variables:
-		grid (object).
-		expChem (object).
+    +variables:
+        grid (object).
+        expChem (object).
         linChem (object).
 
         
-	+ to init:
+    + to init:
         obj (object).
-        grid = ((new PatchToroid) init-with x-count SIZE
+
+        self set-iteration-step to 1.0.
+
+        grid = ((new PatchGrid) init-with x-count SIZE
                           y-count SIZE
                           z-count SIZE).
         expChem = ((new PatchChemical) init-with diffusion-rate DIFFUSION_RATE
@@ -40,24 +43,39 @@ Control : PatchGridTestControl {
         }
         grid display-concentration-in-blue of-patch-chemical expChem.
         grid display-concentration-in-red of-patch-chemical linChem.
-        self point-camera at (0, 0, 0) from (-40, 16, 40).
+
         self add-menu named "Increase Diffusion" for-method "increase-diffusion".
         self add-menu named "Decrease Diffusion" for-method "decrease-diffusion".
+        self add-menu named "Increment Diffusion" for-method "increment-diffusion".        
 
-		self set-background-color to (1, 1, 1).
+        self point-camera at (0, 0, 0) from (-40, 16, 40).
+        self set-background-color to (1, 1, 1).
+        all Patches set-transparency to 0.2.
+                
+    + to iterate:
+        obj (object).
+        self increment-diffusion.
+        super iterate.
 
-		all Patches set-transparency to 0.2.
-	    
-	+ to iterate:
+    + to increment-diffusion:        
         grid diffuse-chemicals.
         grid decay-chemicals.
         if (self get-time) < INFLOW_END_TIME:
         {
+#            printf "Patch (SIZE - 1, SIZE - 1, SIZE - 1) has concentration: ".
+#            printf ((grid get-patch-at x (SIZE - 1) y (SIZE - 1) z (SIZE - 1)) get-concentration of linChem).
+#            printf " before increase and concentration ".
             (grid get-patch-at x 0 y 0 z 0) increase-concentration of expChem by EXP_INFLOW.
             (grid get-patch-at x (SIZE - 1) y (SIZE - 1) z (SIZE - 1)) increase-concentration of linChem by LIN_INFLOW.
+#            printf ((grid get-patch-at x (SIZE - 1) y (SIZE - 1) z (SIZE - 1)) get-concentration of linChem).
+#            print " after increase.".
         }
         grid set-patch-colors-to-chemical-concentrations.
-        super iterate.
+#        for each obj in (grid get-patch-chemicals):
+#        {
+#            print (grid get-concentration of obj at-x (SIZE - 1) at-y 0 at-z (SIZE - 1)).
+#        }
+
 
     + to increase-diffusion:
         obj (object).
