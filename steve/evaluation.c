@@ -1491,8 +1491,7 @@ RTC_INLINE int stEvalCopyList(stCopyListExp *l, stRunInstance *i, brEval *result
 	brEval listEval;
 	int resultCode;
 
-	if ((resultCode = stExpEval3(l->expression, i, &listEval)))
-		return resultCode;
+	if ((resultCode = stExpEval3(l->expression, i, &listEval)) != EC_OK) return resultCode;
 
 	if (listEval.type != AT_LIST) {
 		stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"list\" during \"copylist\" evaluation"); 
