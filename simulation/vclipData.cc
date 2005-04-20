@@ -110,7 +110,7 @@ void slVclipDataInit(slWorld *w) {
 	not.
 */
 
-void slVclipDataInitPairFlags(slWorld *w, int x, int y) {
+void slVclipDataInitPairFlags(slVclipData *clipData, int x, int y) {
 	void *c1, *c2;
 	slPairFlags *flags;
 	int t1, t2;
@@ -118,12 +118,17 @@ void slVclipDataInitPairFlags(slWorld *w, int x, int y) {
 	int callback = 0;
 	int simulate = 0;
 
-	flags = slVclipPairFlags(w->clipData, x, y);
+	flags = slVclipPairFlags(clipData, x, y);
+
+	if(!flags) {
+		slMessage(0, "Cannot locate pair flags %d, %d\n", x, y);
+		return;
+	}
 
 	*flags &= ~BT_UNKNOWN;
 
-	t1 = w->objects[x]->type;
-	t2 = w->objects[y]->type;
+	t1 = clipData->world->objects[x]->type;
+	t2 = clipData->world->objects[y]->type;
 
 	// collision detection is never turned on for 2 non-link objects.
 	   
@@ -135,26 +140,26 @@ void slVclipDataInitPairFlags(slWorld *w, int x, int y) {
 	sim1 = 1;
 	sim2 = 1;
 
-	c1 = w->objects[x]->userData;
-	c2 = w->objects[y]->userData;
+	c1 = clipData->world->objects[x]->userData;
+	c2 = clipData->world->objects[y]->userData;
 
 	// see if simulation is enabled for both of these objects 
 
 	if (t1 == WO_LINK)
-		sim1 = ((slLink *)w->objects[x])->simulate;
+		sim1 = ((slLink *)clipData->world->objects[x])->simulate;
 	if (t2 == WO_LINK)
-		sim2 = ((slLink *)w->objects[y])->simulate;
+		sim2 = ((slLink *)clipData->world->objects[y])->simulate;
 
 	// see if the user wants to simulate them and/or callback for them
 
-	if (c1 && c2 && w->collisionCheckCallback) {
+	if (c1 && c2 && clipData->world->collisionCheckCallback) {
 		if (sim1 && sim2)
-			simulate = w->collisionCheckCallback(c1, c2, CC_SIMULATE);
-		callback = w->collisionCheckCallback(c1, c2, CC_CALLBACK);
+			simulate = clipData->world->collisionCheckCallback(c1, c2, CC_SIMULATE);
+		callback = clipData->world->collisionCheckCallback(c1, c2, CC_CALLBACK);
 	}
 
 	if (simulate || callback) {
-		w->detectCollisions = 1;
+		clipData->world->detectCollisions = 1;
 		*flags |= BT_CHECK;
 
 		if (simulate)
@@ -207,8 +212,9 @@ void slVclipDataRealloc(slVclipData *v, unsigned int count) {
 
 	v->pairArray = new unsigned char*[v->maxCount];
 
-	for (unsigned int n = 0; n < v->maxCount; ++n)
+	for (unsigned int n = 0; n < v->maxCount; ++n) 
 		v->pairArray[n] = new unsigned char[v->maxCount];
+
 }
 
 /*!

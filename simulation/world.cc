@@ -25,15 +25,17 @@ char *gPhysicsErrorMessage;
 #include "tiger.h"
 
 void *operator new (size_t size) {
-	void *p = slMalloc(size); 
- 
+	void *p = calloc(1, size); 
+
+	bzero(p, size);
+
  	if (p == NULL) throw std::bad_alloc(); 
  
  	return p;
 }
 
 void operator delete (void *p) {
-	slFree(p); 
+	free(p); 
 }
 
 void slODEErrorHandler(int errnum, const char *msg, va_list ap) {

@@ -59,7 +59,7 @@ void slAddCollisionCandidate(slVclipData *vc, slPairFlags flags, int x, int y) {
 		// the UNKNOWN flag indicates that we have not yet preformed a callback to 
 		// determine whether further collision detection is necessary.
 
-		slVclipDataInitPairFlags(vc->world, x, y);
+		slVclipDataInitPairFlags(vc, x, y);
 		flags = *slVclipPairFlags(vc, x, y);
 	}
 

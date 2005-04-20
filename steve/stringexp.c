@@ -44,6 +44,7 @@ stStringExp::stStringExp(char *theString, stMethod *m, stObject *o, char *file, 
 	stSubstringExp *sub;
 
 	s = theString;
+	baseSize = 0;
 
 	while((sym = *s)) {
 		// if we find a '$' that is NOT preceeded by a '\'

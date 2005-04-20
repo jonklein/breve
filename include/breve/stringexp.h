@@ -18,8 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-stExp *stNewStringExp(char *theString, stMethod *m, stObject *o, char *file, int line);
-
 int stProcessString(stStringExp *s, stRunInstance *i, brEval *target);
 
 void stFreeStringExp(stStringExp *s);

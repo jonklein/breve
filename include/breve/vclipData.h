@@ -1,5 +1,5 @@
-void slAddBoundingBoxForVectors(slVclipData *w, int offset, slVector *max, slVector *min);
-void slVclipDataInit(slWorld *w); 
-void slVclipDataRealloc(slVclipData *v, unsigned int count);
-void slVclipDataInitPairFlags(slWorld *, int, int);
+void slAddBoundingBoxForVectors(slVclipData *, int , slVector *, slVector *);
+void slVclipDataInit(slWorld *); 
+void slVclipDataRealloc(slVclipData *, unsigned int);
+void slVclipDataInitPairFlags(slVclipData *, int, int);
 
