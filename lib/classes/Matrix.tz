@@ -32,15 +32,17 @@ Object : Matrix (aka Matricies) {
 
 Matrix : Matrix2D (aka Matrices2D) {
 
-	+ to init:
-		matrixPointer = matrix2DNew(32, 32).
+    + to init:
+        matrixPointer = matrix2DNew(32, 32).
         return self.
                 
-    + to init-with x-size xSize (int) y-size ySize (int): 
+    + to init-with x-size xSize (int) y-size ySize (int):
+        % sets the size to of this matrix to (sSize, ySize).
         self set-size x xSize y ySize.
-
-	+ to set-size x xSize (int) y ySize (int):
-		% Sets the size of this matrix to (xSize, ySize).        
+        return self.
+        
+    + to set-size x xSize (int) y ySize (int):
+        % Sets the size of this matrix to (xSize, ySize).        
         matrix2DFree(matrixPointer).
         matrixPointer = matrix2DNew(xSize, ySize).
 
@@ -59,49 +61,49 @@ Matrix : Matrix2D (aka Matrices2D) {
 
         matrix2DMulElements(matrixPointer, (otherMatrix get-matrix-pointer)).
 
-	+ to set-all-values to value (float):
-		% Sets all of the values in the matrix to value.
+    + to set-all-values to value (float):
+        % Sets all of the values in the matrix to value.
 
-		matrix2DSetAll(matrixPointer, value).
+        matrix2DSetAll(matrixPointer, value).
 
-	+ to get-value at-x x (int) at-y y (int):
-		% Returns the matrix value at position (x, y).
+    + to get-value at-x x (int) at-y y (int):
+        % Returns the matrix value at position (x, y).
 
-		return matrix2DGet(matrixPointer, x, y).
+        return matrix2DGet(matrixPointer, x, y).
 
-	+ to set-value to value (double) at-x x (int) at-y y (int):
-		% Sets the matrix value at position (x, y).
+    + to set-value to value (double) at-x x (int) at-y y (int):
+        % Sets the matrix value at position (x, y).
 
-		return matrix2DSet(matrixPointer, x, y, value).
+        return matrix2DSet(matrixPointer, x, y, value).
 
-	+ to add-scalar value scalarValue (double):
-		% Adds the number scalarValue to each element in the matrix.
-		
-		matrix2DAddScalar(matrixPointer, scalarValue).
+    + to add-scalar value scalarValue (double):
+        % Adds the number scalarValue to each element in the matrix.
+        
+        matrix2DAddScalar(matrixPointer, scalarValue).
 
-	+ to add-values of otherMatrix (object) scaled-by scale = 1.0 (double):
-		% Adds this matrix to otherMatrix leaving the result in otherMatrix.
-		% The matrices must be of the same size.  The 
-		% optional argument scale allows otherMatrix to be scaled before 
-		% adding it to this matrix.
-		% <P>
-		% This method is hardware accelerated where supported.
+    + to add-values of otherMatrix (object) scaled-by scale = 1.0 (double):
+        % Adds this matrix to otherMatrix leaving the result in otherMatrix.
+        % The matrices must be of the same size.  The 
+        % optional argument scale allows otherMatrix to be scaled before 
+        % adding it to this matrix.
+        % <P>
+        % This method is hardware accelerated where supported.
 
-		matrix2DAddScaled(matrixPointer, (otherMatrix get-matrix-pointer), scale).
+        matrix2DAddScaled(matrixPointer, (otherMatrix get-matrix-pointer), scale).
 
-	+ to scale by scaleValue (float):
-		% Scales all elements in the matrix by scaleValue.
-		% <P>
-		% This method is hardware accelerated where supported.
+    + to scale by scaleValue (float):
+        % Scales all elements in the matrix by scaleValue.
+        % <P>
+        % This method is hardware accelerated where supported.
 
-		matrix2DScale(matrixPointer, scaleValue).
+        matrix2DScale(matrixPointer, scaleValue).
 
-	+ to copy from otherMatrix (object):
-		% Copies the contents of otherMatrix to thisMatrix.
-		% <P>
-		% This method is hardware accelerated where supported.
+    + to copy from otherMatrix (object):
+        % Copies the contents of otherMatrix to thisMatrix.
+        % <P>
+        % This method is hardware accelerated where supported.
 
-		matrix2DCopy((otherMatrix get-matrix-pointer), matrixPointer).
+        matrix2DCopy((otherMatrix get-matrix-pointer), matrixPointer).
 
     + to subtract-values of otherMatrix (object) scaled-by scale = 1.0 (double):
         % Subtracts this matrix from this otherMatrix, leaving the result
@@ -215,11 +217,12 @@ Matrix : Matrix3D (aka Matrices3D) {
     % floats, while much of the rest of the breve simulation environment uses 
     % double precision floating point math.
 
-	+ to init:
-		matrixPointer = matrix3DNew(32, 32, 32).
+    + to init:
+        matrixPointer = matrix3DNew(32, 32, 32).
         return self.
         
     + to init-with x-size xSize (int) y-size ySize (int) z-size zSize (int): 
+        % sets the size to of this matrix to (sSize, ySize, zSize).
         self set-size x xSize y ySize z zSize.
         return self.
         
@@ -254,10 +257,10 @@ Matrix : Matrix3D (aka Matrices3D) {
 
         return matrix3DSet(matrixPointer, x, y, z, value).
 
-	+ to set-all-values to value (float):
-		% Sets all of the values in the matrix to value.
+    + to set-all-values to value (float):
+        % Sets all of the values in the matrix to value.
 
-		matrix3DSetAll(matrixPointer, value).
+        matrix3DSetAll(matrixPointer, value).
 
     + to add-scalar value scalarValue (double):
         % Adds the number scalarValue to each element in the matrix.
@@ -345,11 +348,11 @@ Matrix : Matrix3D (aka Matrices3D) {
 
         matrix3DDiffuse((chemicalMatrix get-matrix-pointer), matrixPointer, scale).
 
-	+ section "Copying Slices of the 3D Matrix to Images"
+    + section "Copying Slices of the 3D Matrix to Images"
         
     + to copy-slice-to-red-channel z-plane thePlane (int) of-image theImage (Image object) with-scale scale = 1.0 (float):
         % Copies the contents of this matrix to the red channel of theImage,
-		% scaled by the optional scale argument.
+        % scaled by the optional scale argument.
         % <P>
         % This method, and it's counterparts METHOD(copy-to-green-channel) and 
         % METHOD(copy-to-blue-channel) are far faster than looping manually through
@@ -359,7 +362,7 @@ Matrix : Matrix3D (aka Matrices3D) {
 
     + to copy-sliced-to-green-channel z-plane thePlane (int) of-image theImage (Image object) with-scale scale = 1.0 (float):
         % Copies the contents of this matrix to the green channel of theImage,
-		% scaled by the optional scale argument.
+        % scaled by the optional scale argument.
         % <P>
         % This method, and it's counterparts METHOD(copy-to-blue-channel) and 
         % METHOD(copy-to-red-channel) are far faster than looping manually through
@@ -369,7 +372,7 @@ Matrix : Matrix3D (aka Matrices3D) {
 
     + to copy-slice-to-blue-channel z-plane thePlane (int) of-image theImage (Image object) with-scale scale = 1.0 (float):
         % Copies the contents of this matrix to the blue channel of theImage.  
-		% scaled by the optional scale argument.
+        % scaled by the optional scale argument.
         % <P>
         % This method, and it's counterparts METHOD(copy-to-red-channel) and 
         % METHOD(copy-to-green-channel) are far faster than looping manually through
@@ -379,7 +382,7 @@ Matrix : Matrix3D (aka Matrices3D) {
 
     + to copy-slice-to-alpha-channel z-plane thePlane (int) of-image theImage (Image object) with-scale scale = 1.0 (float):
         % Copies the contents of this matrix to the alpha channel of theImage,
-		% scaled by the optional scale argument.
+        % scaled by the optional scale argument.
         % <P>
         % This method, and it's counterparts METHOD(copy-to-red-channel) and 
         % METHOD(copy-to-green-channel) are far faster than looping manually through
@@ -387,29 +390,29 @@ Matrix : Matrix3D (aka Matrices3D) {
 
         matrix3DCopyToImage(matrixPointer, thePlane, (theImage get-image-data), 3, scale).
 
-	+ section "Copying the Contents of the 3D Matrix to PatchGrids"
+    + section "Copying the Contents of the 3D Matrix to PatchGrids"
 
-	+ to copy-to-red-channel of-patch-grid grid (PatchGrid object) with-scale scale = 1.0 (float):
-		% Copies the contents of this matrix to the red channel of the OBJECT(PatchGrid),
-		% scaled by the optional scale value.
+    + to copy-to-red-channel of-patch-grid grid (PatchGrid object) with-scale scale = 1.0 (float):
+        % Copies the contents of this matrix to the red channel of the OBJECT(PatchGrid),
+        % scaled by the optional scale value.
 
-		patchGridCopyColorFrom3DMatrix((grid get-grid-pointer), matrixPointer, 0, scale).
+        patchGridCopyColorFrom3DMatrix((grid get-grid-pointer), matrixPointer, 0, scale).
 
-	+ to copy-to-green-channel of-patch-grid grid (PatchGrid object) with-scale scale = 1.0 (float):
-		% Copies the contents of this matrix to the green channel of the OBJECT(PatchGrid),
-		% scaled by the optional scale value.
+    + to copy-to-green-channel of-patch-grid grid (PatchGrid object) with-scale scale = 1.0 (float):
+        % Copies the contents of this matrix to the green channel of the OBJECT(PatchGrid),
+        % scaled by the optional scale value.
 
-		patchGridCopyColorFrom3DMatrix((grid get-grid-pointer), matrixPointer, 1, scale).
+        patchGridCopyColorFrom3DMatrix((grid get-grid-pointer), matrixPointer, 1, scale).
 
-	+ to copy-to-blue-channel of-patch-grid grid (PatchGrid object) with-scale scale = 1.0 (float):
-		% Copies the contents of this matrix to the blue channel of the OBJECT(PatchGrid),
-		% scaled by the optional scale value.
+    + to copy-to-blue-channel of-patch-grid grid (PatchGrid object) with-scale scale = 1.0 (float):
+        % Copies the contents of this matrix to the blue channel of the OBJECT(PatchGrid),
+        % scaled by the optional scale value.
 
-		patchGridCopyColorFrom3DMatrix((grid get-grid-pointer), matrixPointer, 2, scale).
+        patchGridCopyColorFrom3DMatrix((grid get-grid-pointer), matrixPointer, 2, scale).
 
-	+ to copy-to-alpha-channel of-patch-grid grid (PatchGrid object) with-scale scale = 1.0 (float):
-		% Copies the contents of this matrix to the alpha channel of the OBJECT(PatchGrid),
-		% scaled by the optional scale value.
+    + to copy-to-alpha-channel of-patch-grid grid (PatchGrid object) with-scale scale = 1.0 (float):
+        % Copies the contents of this matrix to the alpha channel of the OBJECT(PatchGrid),
+        % scaled by the optional scale value.
 
-		patchGridCopyColorFrom3DMatrix((grid get-grid-pointer), matrixPointer, 3, scale).
+        patchGridCopyColorFrom3DMatrix((grid get-grid-pointer), matrixPointer, 3, scale).
 }
