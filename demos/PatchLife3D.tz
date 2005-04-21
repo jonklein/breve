@@ -41,9 +41,6 @@ Control : PatchLife {
 	+ to catch-key-r-down:
 		self randomize.
 
-	+ to catch-key-g-down:
-		self make-glider.
-
 	+ to catch-key-c-down:
 		self clear.
 
@@ -53,13 +50,6 @@ Control : PatchLife {
 
 		patchList = (patches get-patches).
 		foreach patch in patchList: patch set-state to 0.
-
-	+ to make-glider:
-		(patches get-patch-at x X_SIZE - 3 y 1 z 0) set-state to 1.
-		(patches get-patch-at x X_SIZE - 3 y 2 z 0) set-state to 1.
-		(patches get-patch-at x X_SIZE - 3 y 3 z 0) set-state to 1.
-		(patches get-patch-at x X_SIZE - 2 y 3 z 0) set-state to 1.
-		(patches get-patch-at x X_SIZE - 1 y 1 z 0) set-state to 1.
 
 	+ to randomize:
 		patch (object).
