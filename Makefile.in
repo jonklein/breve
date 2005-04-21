@@ -164,6 +164,8 @@ WX_release: clean
 ifeq ($(PLATFORM),windows)
 	cp bin/glut32.dll $(IDE_FOLDER)
 endif
+	-mkdir docs
+	cp -R docs $(IDE_FOLDER)
 	cp -R lib/classes $(IDE_FOLDER)/lib
 	cp -R demos $(IDE_FOLDER)
 	rm -rf $(IDE_FOLDER)/demos/Music

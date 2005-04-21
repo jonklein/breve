@@ -1,43 +1,33 @@
-<chapter id="version-2.0"> <title>What's New in Version 2.1</title>
+<chapter id="version-2.0"> <title>What's New in Version 2.2</title>
 
 <para>
 breve version 2.1 introduces several new features and changes.  
 </para>
 
-<sect1 id="new_features"> <title>New Features in Version 2.1</title>
+<sect1 id="new_features"> <title>New Features in Version 2.2</title>
 <para>
 
-Below are some of the major new features found in breve 2.1.  For a full 
+Below are some of the major new features found in breve 2.2.  For a full 
 list of new features, see the "Changes" file that is included with the 
 breve distribution.
 
 <itemizedlist>
   <listitem><para>
-    Significant improvements and bug fixes related to the <ulink url="http://hampshire.edu/lspector/push.html">"Push"</ulink> programming language for evolutionary computation (<xref linkend="push">).
+New breveIDE graphical user interface for Linux and Windows (thanks to Gabriel Tarasuk-Levin)
   </para></listitem>
 
   <listitem><para>
-    New custom drawing class (see documentation for class <ulink url="docs/classes/Drawing.html">Drawing</ulink>).
+steve code evaluation greatly optimized (thanks to Michael Larson).
   </para></listitem>
 
   <listitem><para>
-    New elastic Spring simulation class (see documentation for class <ulink url="docs/classes/Spring.html">Spring</ulink>).
+New hardware accelerated Matrix3D class (thanks to Eric DeWitt).
   </para></listitem>
 
   <listitem><para>
-    New fast 2D matrix class (see documentation for class <ulink url="docs/classes/Matrix2D.html">Matrix2D</ulink>).
-  </para></listitem>
-
-  <listitem><para>
-    Updated breve Object API allows programmers to interface with breve from other programming languages (<xref linkend="language_frontend">).
-  </para></listitem>
-
-  <listitem><para>
-    Faster physical simulation.
-  </para></listitem>
-
-  <listitem><para>
-    Improved string manipulation support.
+Memory requirements, initialization time and collision detection costs greatly reduced for 
+large simulations.  breve is now capable of simulating far more objects than previously 
+possible.
   </para></listitem>
 
 </itemizedlist> 

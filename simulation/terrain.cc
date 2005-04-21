@@ -780,8 +780,8 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 
 							if(!ce) return CT_PENETRATE;
 
-							if(dist < VC_WARNING_TOLERANCE)
-								slMessage(DEBUG_ALL, "deep edge collision (%f) in terrain/sphere clip, triangle violation %d\n", dist, trivi);
+							// if(dist < VC_WARNING_TOLERANCE)
+							// 	slMessage(DEBUG_ALL, "deep edge collision (%f) in terrain/sphere clip, triangle violation %d\n", dist, trivi);
 
 							ce->depths.push_back(dist);
 							ce->points.push_back(collisionPoint);
@@ -813,8 +813,8 @@ int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int obX, int obY, slColli
 
 							if(!ce) return CT_PENETRATE;
 
-							if(dist < VC_WARNING_TOLERANCE)
-								slMessage(DEBUG_ALL, "deep point collision (%f) in terrain/sphere clip, triangle violation %d\n", dist, trivi);
+							// if(dist < VC_WARNING_TOLERANCE)
+							// 	slMessage(DEBUG_ALL, "deep point collision (%f) in terrain/sphere clip, triangle violation %d\n", dist, trivi);
 
 							ce->depths.push_back(dist);
 							ce->points.push_back(*point);
@@ -1058,8 +1058,8 @@ int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosit
 	hdist = slPlaneDistance(facePlane, &headPoint);
 
 	if(hdist < MC_TOLERANCE && hdist > -0.1) {
-		if(hdist < VC_WARNING_TOLERANCE)
-			slMessage(DEBUG_ALL, "deep collision (%f) in terrain/edge clip\n", hdist);
+		// if(hdist < VC_WARNING_TOLERANCE)
+		// 	slMessage(DEBUG_ALL, "deep collision (%f) in terrain/edge clip\n", hdist);
 
 		if(!ce) return CT_PENETRATE;
 
@@ -1082,8 +1082,8 @@ int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosit
 	tdist = slPlaneDistance(facePlane, &tailPoint);
 
 	if(tdist < MC_TOLERANCE && tdist > -0.1) {
-		if(tdist < VC_WARNING_TOLERANCE)
-			slMessage(DEBUG_ALL, "deep collision (%f) in terrain/edge clip\n", tdist);
+		// if(tdist < VC_WARNING_TOLERANCE)
+		// 	slMessage(DEBUG_ALL, "deep collision (%f) in terrain/edge clip\n", tdist);
 
 		if(!ce) return CT_PENETRATE;
 
@@ -1122,8 +1122,8 @@ double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollision 
 	if(dist < MC_TOLERANCE && dist > -1.0) {
 		if(!ce) return dist;
 
-		if(dist < VC_WARNING_TOLERANCE) 
-			slMessage(DEBUG_ALL, "deep collision (%f) in point/terrain clip\n", dist);
+		// if(dist < VC_WARNING_TOLERANCE) 
+		//	slMessage(DEBUG_ALL, "deep collision (%f) in point/terrain clip\n", dist);
 
 		ce->depths.push_back(dist);
 		ce->points.push_back(tp);

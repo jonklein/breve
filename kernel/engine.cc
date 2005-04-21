@@ -281,8 +281,8 @@ slStack *brEngineGetAllInstances(brEngine *e) {
 */
 
 void brEngineSetIOPath(brEngine *e, char *path) {
-	if (e->outputPath)
-		slFree(e->outputPath);
+	if (e->outputPath) slFree(e->outputPath);
+
 	e->outputPath = slStrdup(path);
 	brAddSearchPath(e, path);
 }
