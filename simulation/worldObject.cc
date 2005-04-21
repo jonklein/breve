@@ -10,7 +10,7 @@ void slObjectLine::draw(slCamera *camera) {
 
 	if (!_src || !_dst) return;
 
-	if (!_stipple) return 
+	if (!_stipple) return;
 
 	x = &_src->position.location;
 	y = &_dst->position.location;
