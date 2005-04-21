@@ -152,9 +152,9 @@ void *brObjectGetUserData(brInstance *);
 
 // functions for calling methods with breve instances
 
-int brMethodCall(brInstance *, brMethod *, brEval **, brEval *);
-int brMethodCallByName(brInstance *, char *, brEval *);
-int brMethodCallByNameWithArgs(brInstance *, char *, brEval **, int, brEval *);
+DLLEXPORT int brMethodCall(brInstance *, brMethod *, brEval **, brEval *);
+DLLEXPORT int brMethodCallByName(brInstance *, char *, brEval *);
+DLLEXPORT int brMethodCallByNameWithArgs(brInstance *, char *, brEval **, int, brEval *);
 
 // functions related to adding and removing classes and instances to the breve engine
 
