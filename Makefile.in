@@ -97,7 +97,7 @@ clean:
 	rm -f steve/format.c steve/stevelex.c
 	rm -f steve/steveparse.tab.c steve/steveparse.tab.h
 	rm -f java/*.class lib/classes/*.jar
-	rm -rf docs docBuild/docs OSX/build
+	rm -rf docBuild/docs OSX/build
 	find . -name '.DS_Store' -exec rm -f {} \;
 	find . -name 'core' -exec rm -f {} \;
 	find . -name '.gdb*' -exec rm -f {} \;
@@ -138,15 +138,16 @@ CLI_release: clean
 	mkdir $(CLI_FOLDER)/lib
 	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin
 	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin
-ifeq ($(PLATFORM),windows)
-	cp bin/glut32.dll $(CLI_FOLDER)/bin
-endif
 	cp -R lib $(CLI_FOLDER)
 	cp -R demos $(CLI_FOLDER)
 	rm -rf $(CLI_FOLDER)/demos/Music
 	mkdir $(CLI_FOLDER)/plugins
 	cp -R plugins/samples $(CLI_FOLDER)/plugins
-	rm -f plugins/samples/Makefile.in
+	rm -f $(CLI_FOLDER)/plugins/samples/Makefile.in
+ifeq ($(PLATFORM),windows)
+	cp lib/brevePlugin.a $(CLI_FOLDER)/plugins
+	cp bin/glut32.dll $(CLI_FOLDER)/bin
+endif
 	cp plugins/slBrevePluginAPI.h plugins/README.txt $(CLI_FOLDER)/plugins
 	cp Changes.html GPL.txt README.txt $(CLI_FOLDER)
 	find $(CLI_FOLDER) -name CVS -prune -exec rm -rf {} \;
@@ -161,9 +162,6 @@ WX_release: clean
 	mkdir $(IDE_FOLDER)
 	mkdir $(IDE_FOLDER)/lib
 	cp wx/breveIDE@EXE_SUFFIX@ $(IDE_FOLDER)
-ifeq ($(PLATFORM),windows)
-	cp bin/glut32.dll $(IDE_FOLDER)
-endif
 	-mkdir docs
 	cp -R docs $(IDE_FOLDER)
 	cp -R lib/classes $(IDE_FOLDER)/lib
@@ -171,7 +169,11 @@ endif
 	rm -rf $(IDE_FOLDER)/demos/Music
 	mkdir $(IDE_FOLDER)/plugins
 	cp -R plugins/samples $(IDE_FOLDER)/plugins
-	rm -f plugins/samples/Makefile.in
+	rm -f $(IDE_FOLDER)/plugins/samples/Makefile.in
+ifeq ($(PLATFORM),windows)
+	cp wx/lib/brevePlugin.a $(IDE_FOLDER)/plugins
+	cp bin/glut32.dll $(IDE_FOLDER)
+endif
 	cp plugins/slBrevePluginAPI.h plugins/README.txt $(IDE_FOLDER)/plugins
 	cp Changes.html GPL.txt README.txt $(IDE_FOLDER)
 	find $(IDE_FOLDER) -name CVS -prune -exec rm -rf {} \;
