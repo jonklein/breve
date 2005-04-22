@@ -1,7 +1,6 @@
 @use Abstract.
 @use Patch.
 @use Matrix.
-@use PatchChemical.
 
 Abstract : PatchGrid [version 2.2] {
     % OBJECT(PatchGrid) is a class which allows you to create "patches".  
