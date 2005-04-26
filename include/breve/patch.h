@@ -63,7 +63,10 @@ class slPatchGrid {
 			delete[] colors;
 		}
 
+		void compileCubeList();
+
 		void draw(slCamera *camera);
+		void drawWithout3DTexture(slCamera *camera);
 
 		void setSmoothDrawing(int d) { drawSmooth = d; }
 
@@ -88,6 +91,8 @@ class slPatchGrid {
 		GLuint texture;
 
 		int drawSmooth;
+
+		GLuint _cubeDrawList;
 };
 #endif
 

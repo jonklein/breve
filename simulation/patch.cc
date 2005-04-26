@@ -40,6 +40,8 @@ slPatchGrid *slPatchGridNew(slVector *center, slVector *patchSize, int x, int y,
 
 	grid = new slPatchGrid;
 
+	grid->compileCubeList();
+
 	glGenTextures(1, &grid->texture);
 
 	grid->patches = new slPatch**[z];
@@ -127,11 +129,90 @@ void slPatchGridCopyColorFrom3DMatrix(slPatchGrid *grid, slBigMatrix3DGSL *m, in
 }
 
 /*!
+	\brief Draws the patch grid without using 3D textures.
+*/
+
+void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
+	int z, y, x;
+	int zVal, yVal, xVal;
+	int zMid = 0, yMid = 0, xMid = 0;
+	slPatch *patch;
+	slVector translation, origin;
+
+	// we want to always draw from back to front for the
+	// alpha blending to work.  figure out the points
+	// closest to the camera.
+
+	slVectorAdd(&camera->location, &camera->target, &origin);
+
+	xMid = (int)((origin.x - startPosition.x) / patchSize.x);
+	if(xMid < 0) xMid = 0;
+	if(xMid > xSize) xMid = xSize - 1;
+
+	yMid = (int)((origin.y - startPosition.y) / patchSize.y);
+	if(yMid < 0) yMid = 0;
+	if(yMid > ySize) yMid = ySize - 1;
+
+	zMid = (int)((origin.z - startPosition.z) / patchSize.z);
+	if(zMid < 0) zMid = 0;
+	if(zMid > zSize) zMid = zSize - 1;
+
+	glEnable(GL_BLEND);
+
+	glEnable(GL_CULL_FACE);
+
+	for(z=0;z<zSize;z++) {
+		if(z < zMid) zVal = z;
+		else zVal = (zSize - 1) - (z - zMid);
+
+		translation.z = startPosition.z + patchSize.z * zVal;
+
+		for(y=0;y<ySize;y++) {
+			if(y < yMid) yVal = y;
+			else yVal = (ySize - 1) - (y - yMid);
+
+			translation.y = startPosition.y + patchSize.y * yVal;
+
+			for(x=0;x<xSize;x++) {
+				if(x < xMid) xVal = x;
+				else xVal = (xSize - 1) - (x - xMid);
+
+				patch = &patches[zVal][yVal][xVal];
+
+				if(colors[patch->colorOffset + 3] != 255) {
+					glPushMatrix();
+
+					translation.x = startPosition.x + patchSize.x * xVal;
+
+					glColor4ubv(&colors[patch->colorOffset]);
+
+					glTranslatef(translation.x, translation.y, translation.z);
+
+					glScalef(patchSize.x, patchSize.y, patchSize.z);
+
+					glCallList(_cubeDrawList);
+
+					glPopMatrix();
+				}
+			}
+		}
+	}
+}
+
+/*!
 	\brief Draws a set of patches using a volumetric 3D texture.
+
+	This may not be supported on older OpenGL implementations, so the alternative 
+	\ref drawWithout3DTexture may be used instead.  Drawing without the 3D texture
+	is slower than drawing with a 3D texture.
 */
 
 void slPatchGrid::draw(slCamera *camera) {
 	slVector origin, diff, adiff, size;
+
+#ifdef WINDOWS
+	return drawWithout3DTexture(camera);
+#endif
 
 	slVectorAdd(&camera->location, &camera->target, &origin);
 
@@ -350,4 +431,30 @@ void slPatchSetDataAtIndex(slPatchGrid *grid, int x, int y, int z, void *data) {
 	if(y < 0 || y >= grid->ySize) return;
 	if(z < 0 || z >= grid->zSize) return;
 	grid->patches[z][y][x].data = data;
+}
+
+void slPatchGrid::compileCubeList() {
+	_cubeDrawList = glGenLists(1);
+
+	glNewList(_cubeDrawList, GL_COMPILE);
+	
+	glBegin(GL_TRIANGLE_STRIP);
+		glVertex3f(0.0, 0.0, 0.0);
+		glVertex3f(1.0, 0.0, 0.0);
+		glVertex3f(0.0, 0.0, 1.0);
+		glVertex3f(1.0, 0.0, 1.0);
+		glVertex3f(1.0, 1.0, 1.0);
+		glVertex3f(1.0, 0.0, 0.0);
+		glVertex3f(1.0, 1.0, 0.0);
+		glVertex3f(0.0, 0.0, 0.0);
+		glVertex3f(0.0, 1.0, 0.0);
+		glVertex3f(0.0, 0.0, 1.0);
+		glVertex3f(0.0, 1.0, 1.0);
+		glVertex3f(1.0, 1.0, 1.0);
+		glVertex3f(0.0, 1.0, 0.0);
+		glVertex3f(1.0, 1.0, 0.0);
+	
+	glEnd();
+    
+	glEndList();
 }
