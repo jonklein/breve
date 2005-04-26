@@ -75,7 +75,11 @@ int brICloseServer(brEval args[], brEval *target, brInstance *i) {
 	data->terminate = 1;
 
 	shutdown(data->socket, 2);
+#if WINDOWS
+	closesocket(data->socket);
+#else
 	close(data->socket);
+#endif
 
 	if(data->index) slFree(data->index);
 
@@ -176,8 +180,8 @@ brNetworkServer *brListenOnPort(int port, brEngine *engine) {
 	int l = 1024;
 	struct sockaddr_in saddr;
 
-	if((ssock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		perror("Cannot create socket");
+	if((ssock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+		perror("Can't create socket");
 		return NULL;
 	}
 
@@ -229,7 +233,11 @@ void *brListenOnSocket(void *data) {
 		if(clientData.socket != -1) {
 			// fcntl(clientData.socket, F_SETFL, O_NONBLOCK);
 			brHandleConnection(&clientData);
+#if WINDOWS
+			closesocket(clientData.socket);
+#else
 			close(clientData.socket);
+#endif
 		}
 	}
 
@@ -253,7 +261,11 @@ void *brHandleConnection(void *p) {
 
 	// slMessage(DEBUG_ALL, "network connection from %s\n", hostname);
 
+#if WINDOWS
+	count = recv(data->socket, (char*)&request, sizeof(brNetworkRequest), 0);
+#else 
 	count = slUtilRead(data->socket, &request, sizeof(brNetworkRequest));
+#endif
 
 	if(!strncasecmp((char*)&request, "GET ", 4)) {
 		char *http;
@@ -282,11 +294,21 @@ void *brHandleConnection(void *p) {
 
 	switch(request.type) {
 		case NR_XML:
+#if WINDOWS
+			recv(data->socket, (char*)&header, sizeof(brStringHeader), 0);
+#else 
 			slUtilRead(data->socket, &header, sizeof(brStringHeader));
+#endif
 			length = header.length;
 			// slMessage(DEBUG_ALL, "received XML message of length %d from host %s\n", length, hostname); 
 			buffer = new char[length+1];
+
+#if WINDOWS
+			recv(data->socket, buffer, length, 0);
+#else 
 			slUtilRead(data->socket, buffer, length);
+#endif
+
 			buffer[length] = 0;
 			pthread_mutex_lock(&data->engine->lock);
 
@@ -334,14 +356,21 @@ char *brFinishNetworkRead(brNetworkClientData *data, brNetworkRequest *request) 
 
 	memcpy(d, request, size);
 
-	while (d[size - 1] != '\n' ||
-	      (d[size - 2] != '\n' && d[size - 3] != '\n')) {
+    while(!strchr("\r\n", d[size - 1]) || (!strchr("\r\n", d[size - 2]) && !strchr("\r\n", d[size - 3]))) {
+#if WINDOWS
+		count = recv(data->socket, buffer, sizeof(buffer), 0);
+#else 
 		count = read(data->socket, buffer, sizeof(buffer));
+#endif
+
 		if (count < 1)
 			break;
 
 		d = (char *)slRealloc(d, size + count + 1);
 		memcpy(&d[size], buffer, count);
+
+        d[size + count] = 0;
+
 		size += count;
 	}
 	d[size] = 0;
@@ -403,13 +432,13 @@ int brHandleHTTPConnection(brNetworkClientData *data, char *request) {
 	slFree(method);
 
 	if(result != EC_OK) {
-		slUtilWrite(data->socket, SL_NET_FAILURE, strlen(SL_NET_FAILURE));
+		send(data->socket, SL_NET_FAILURE, strlen(SL_NET_FAILURE), 0);
 		return 0;
 	}
 
 	if(target.type == AT_NULL) {
 		if(data->server->index) brSendPage(data, data->server->index);
-		else slUtilWrite(data->socket, SL_NET_SUCCESS, strlen(SL_NET_SUCCESS));
+		else send(data->socket, SL_NET_SUCCESS, strlen(SL_NET_SUCCESS), 0);
 
 		return 0;
 	}	
@@ -421,7 +450,7 @@ int brHandleHTTPConnection(brNetworkClientData *data, char *request) {
 		return 0;
 	}
 
-	slUtilWrite(data->socket, string, strlen(string));
+	send(data->socket, string, strlen(string), 0);
 
 	return 0;
 }
@@ -436,7 +465,7 @@ void brSendPage(brNetworkClientData *data, char *page) {
 	file = brFindFile(data->engine, page, NULL);
 
 	if(!file) {
-		slUtilWrite(data->socket, SL_NET_404, strlen(SL_NET_404));
+		send(data->socket, SL_NET_404, strlen(SL_NET_404), 0);
 		slMessage(DEBUG_ALL, "network request for unknown file: %s\n", page);
 		return;
 	}
@@ -444,7 +473,7 @@ void brSendPage(brNetworkClientData *data, char *page) {
 	text = slUtilReadFile(file);
 
 	// slMessage(DEBUG_ALL, "network request for file: %s\n", page);
-	slUtilWrite(data->socket, text, strlen(text));
+	send(data->socket, text, strlen(text), 0);
 
 	slFree(file);
 	slFree(text);

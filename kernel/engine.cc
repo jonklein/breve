@@ -56,6 +56,15 @@ brEngine *brEngineNew(void) {
 	char *envpath, *dir;
 	int n = 0;
 
+#if WINDOWS
+	// WORD wVersionRequested;
+	WSADATA wsaData;
+
+	// wVersionRequested = MAKEWORD( 1, 1 );
+
+	WSAStartup(0x0101, &wsaData);
+#endif
+
 #if MINGW
 	pthread_win32_process_attach_np();
 #endif
