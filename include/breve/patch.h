@@ -63,6 +63,11 @@ class slPatchGrid {
 			delete[] colors;
 		}
 
+		slPatchGrid() {
+			_texture = -1;
+			_cubeDrawList = -1;
+		}
+
 		void compileCubeList();
 
 		void draw(slCamera *camera);
@@ -88,11 +93,10 @@ class slPatchGrid {
 
 		int textureX, textureY, textureZ;
 
-		GLuint texture;
-
 		int drawSmooth;
 
-		GLuint _cubeDrawList;
+		int _texture;
+		int _cubeDrawList;
 };
 #endif
 

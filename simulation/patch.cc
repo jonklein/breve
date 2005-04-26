@@ -40,10 +40,6 @@ slPatchGrid *slPatchGridNew(slVector *center, slVector *patchSize, int x, int y,
 
 	grid = new slPatchGrid;
 
-	grid->compileCubeList();
-
-	glGenTextures(1, &grid->texture);
-
 	grid->patches = new slPatch**[z];
 	grid->xSize = x;
 	grid->ySize = y;
@@ -139,6 +135,8 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 	slPatch *patch;
 	slVector translation, origin;
 
+	if(_cubeDrawList == -1) compileCubeList();
+
 	// we want to always draw from back to front for the
 	// alpha blending to work.  figure out the points
 	// closest to the camera.
@@ -210,6 +208,8 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 void slPatchGrid::draw(slCamera *camera) {
 	slVector origin, diff, adiff, size;
 
+	if(_texture == -1) _texture = slTextureNew(camera);
+
 #ifdef WINDOWS
 	return drawWithout3DTexture(camera);
 #endif
@@ -229,7 +229,7 @@ void slPatchGrid::draw(slCamera *camera) {
 	glColor4f(1,1,1,1);
 
 	glEnable(GL_TEXTURE_3D);
-	glBindTexture(GL_TEXTURE_3D, texture);
+	glBindTexture(GL_TEXTURE_3D, _texture);
 
 	if(drawSmooth) {
 		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
