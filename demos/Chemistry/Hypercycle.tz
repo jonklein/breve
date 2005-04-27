@@ -21,8 +21,6 @@ Controller GS.
 
 Control : GS {
     + variables:
-        U (object).
-        V (object).
         tempreact, temp, inflow (object).
         texture (object).
         cube (object).
