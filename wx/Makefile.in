@@ -16,7 +16,7 @@ OPTFLAGS=
 DEBUGFLAGS=
 LIBPATH=
 CPPINC=`@WXCONFIG@ --inplace --cxxflags` @CPPFLAGS@ -I../include/breve @DEFS@
-LDFLAGS=$(LIBS) -Xlinker -Bstatic -lstdc++ $(LIBPATH) $(LINKERFLAGS) 
+LDFLAGS=$(LIBS) $(LIBPATH) $(LINKERFLAGS) 
 CPPFLAGS=$(CPPINC) $(GCCFLAGS) $(DEBUGFLAGS) $(OPTFLAGS) $(WARNINGFLAGS) 
 
 OBJECTS=$(OBJECTPATH)/Main.o $(OBJECTPATH)/BreveCanvas.o $(OBJECTPATH)/gluthack.o $(OBJECTPATH)/BreveInterface.o $(OBJECTPATH)/SimInstance.o $(OBJECTPATH)/LogWindow.o $(OBJECTPATH)/FindDialog.o $(OBJECTPATH)/CodeWindow.o $(OBJECTPATH)/CodeCtrl.o $(OBJECTPATH)/BreveRender.o $(OBJECTPATH)/Inspector.o $(OBJECTPATH)/BDialog.o $(RESOURCEOBJECT)
