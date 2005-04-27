@@ -229,9 +229,9 @@ void slMessage(int level, const char *fmt, ...);
 	 * The slMalloc() and slRealloc() functions return NULL on error.
 	 */
 
-void *slMalloc(size_t size);
-void *slRealloc(void *ptr, size_t size);
-void slFree(void *ptr);
+#define slMalloc(n) calloc(1,n)
+#define slRealloc(p,n) realloc(p,n)
+#define slFree(p) free(p)
 
 	/*
 	 * The slStrdup() function allocates space for a copy of the string

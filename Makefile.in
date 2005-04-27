@@ -46,10 +46,10 @@ OBJ	:= $(SRC:.cc=.o)
 OBJ	:= $(OBJ:.c=.o)
 
 bin/breve@EXE_SUFFIX@: bin/breve.o $(OBJ)
-	$(CC) -o $@ $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@ -Xlinker -static -lstdc++
+	$(CC) -o $@ $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@ 
 
 bin/breve_cli@EXE_SUFFIX@: bin/breve_cli.o $(OBJ)
-	$(CC) -o $@ $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@ -Xlinker -static -lstdc++
+	$(CC) -o $@ $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@
 
 breve.dll: $(OBJ)
 	$(CXX) @PLUGINFLAGS@ -o $@ @PLUGINIMP@ $^ @LIBS@
