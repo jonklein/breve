@@ -2,7 +2,10 @@ DOCBOOKDIR	= /sw/share/sgml/dsssl/docbook-dsssl-nwalsh/bin
 
 .PHONY: classes docbook documentation source spell tidy
 
-documentation: docbook
+documentation: docclean docbook
+
+docclean: 
+	rm -rf docs
 
 classes: docBuild/docExtract
 	mkdir -p docs/classes

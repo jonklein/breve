@@ -34,7 +34,7 @@ Object : Spring (aka Springs) {
 				from-point point1 = (0, 0, 0) (vector) 
 				to-point point2 = (0, 0, 0) (vector)
 				with-length springLength = 0 (float)
-				with-strength springStrength (float)
+				with-strength springStrength = 100 (float)
 				with-damping springDamping = 0.2 (float):
 
 		% Connects the spring from springLink1 to springLink2.  
