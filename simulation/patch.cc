@@ -80,17 +80,18 @@ slPatchGrid *slPatchGridNew(slVector *center, slVector *patchSize, int x, int y,
 	return grid;
 }
 
-slPatch *slPatchForLocation(slPatchGrid *g, slVector *location) {
+slPatch *slPatchGrid::patchAtLocation(slVector *location) {
 	int x, y, z;
-	x = (int)((location->x - g->startPosition.x) / g->patchSize.x);
-	y = (int)((location->y - g->startPosition.y) / g->patchSize.y);
-	z = (int)((location->z - g->startPosition.z) / g->patchSize.z);
+	
+	x = (int)((location->x - startPosition.x) / patchSize.x);
+	y = (int)((location->y - startPosition.y) / patchSize.y);
+	z = (int)((location->z - startPosition.z) / patchSize.z);
 
-	if(x < 0 || x >= g->xSize) return NULL;
-	if(y < 0 || y >= g->ySize) return NULL;
-	if(z < 0 || z >= g->zSize) return NULL;
+	if(x < 0 || x >= xSize) return NULL;
+	if(y < 0 || y >= ySize) return NULL;
+	if(z < 0 || z >= zSize) return NULL;
 
-	return &g->patches[z][y][x];
+	return &patches[z][y][x];
 }
 
 /*!
@@ -412,18 +413,11 @@ void slPatchGetColor(slPatch *p, slVector *color) {
 	color->z = p->grid->colors[p->colorOffset + 2] / 255.0;
 }
 
-slPatch *slPatchAtIndex(slPatchGrid *grid, int x, int y, int z) {
-	if(x < 0 || x >= grid->xSize) return NULL;
-	if(y < 0 || y >= grid->ySize) return NULL;
-	if(z < 0 || z >= grid->zSize) return NULL;
-	return &grid->patches[z][y][x];
-}
-
-void *slPatchGetDataAtIndex(slPatchGrid *grid, int x, int y, int z) {
-	if(x < 0 || x >= grid->xSize) return NULL;
-	if(y < 0 || y >= grid->ySize) return NULL;
-	if(z < 0 || z >= grid->zSize) return NULL;
-	return grid->patches[z][y][x].data;
+slPatch *slPatchGrid::patchAtIndex(int x, int y, int z) {
+	if(x < 0 || x >= xSize) return NULL;
+	if(y < 0 || y >= ySize) return NULL;
+	if(z < 0 || z >= zSize) return NULL;
+	return &patches[z][y][x];
 }
 
 void slPatchSetDataAtIndex(slPatchGrid *grid, int x, int y, int z, void *data) {

@@ -79,6 +79,10 @@ class slPatchGrid {
 		void textureDrawYPass(slVector &size, int dir);
 		void textureDrawZPass(slVector &size, int dir);
 
+		slPatch *patchAtIndex(int x, int y, int z);
+		slPatch *patchAtLocation(slVector *location);
+
+
 		int xSize, ySize, zSize;
 
 		slVector startPosition;
@@ -121,12 +125,7 @@ void slPatchSetColor(slPatch *p, slVector *color);
 
 void slPatchSetTransparency(slPatch *p, double transparency);
 
-slPatch *slPatchForLocation(slPatchGrid *g, slVector *location);
-
 void slDrawPatches(slPatchGrid *patches, slVector *cam, slVector *target);
-slPatch *slPatchAtIndex(slPatchGrid *patches, int x, int y, int z);
-
-void *slPatchGetDataAtIndex(slPatchGrid *grid, int x, int y, int z);
 
 void slPatchSetDataAtIndex(slPatchGrid *grid, int x, int y, int z, void *data);
 

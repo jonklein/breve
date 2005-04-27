@@ -259,13 +259,9 @@ void *brHandleConnection(void *p) {
   
 	hostname = brHostnameFromAddr(&data->addr.sin_addr);
 
-	// slMessage(DEBUG_ALL, "network connection from %s\n", hostname);
+	if(hostname) slMessage(DEBUG_ALL, "network connection from %s\n", hostname);
 
-#if WINDOWS
 	count = recv(data->socket, (char*)&request, sizeof(brNetworkRequest), 0);
-#else 
-	count = slUtilRead(data->socket, &request, sizeof(brNetworkRequest));
-#endif
 
 	if(!strncasecmp((char*)&request, "GET ", 4)) {
 		char *http;
@@ -294,20 +290,13 @@ void *brHandleConnection(void *p) {
 
 	switch(request.type) {
 		case NR_XML:
-#if WINDOWS
 			recv(data->socket, (char*)&header, sizeof(brStringHeader), 0);
-#else 
-			slUtilRead(data->socket, &header, sizeof(brStringHeader));
-#endif
+
 			length = header.length;
 			// slMessage(DEBUG_ALL, "received XML message of length %d from host %s\n", length, hostname); 
 			buffer = new char[length+1];
 
-#if WINDOWS
 			recv(data->socket, buffer, length, 0);
-#else 
-			slUtilRead(data->socket, buffer, length);
-#endif
 
 			buffer[length] = 0;
 			pthread_mutex_lock(&data->engine->lock);
@@ -357,11 +346,8 @@ char *brFinishNetworkRead(brNetworkClientData *data, brNetworkRequest *request) 
 	memcpy(d, request, size);
 
     while(!strchr("\r\n", d[size - 1]) || (!strchr("\r\n", d[size - 2]) && !strchr("\r\n", d[size - 3]))) {
-#if WINDOWS
+
 		count = recv(data->socket, buffer, sizeof(buffer), 0);
-#else 
-		count = read(data->socket, buffer, sizeof(buffer));
-#endif
 
 		if (count < 1)
 			break;

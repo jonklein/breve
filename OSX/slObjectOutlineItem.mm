@@ -91,11 +91,12 @@
 - (void)updateChildCount:(int)newChildCount {
 	int n;
 
-	for(n=0;n<childCount;n++) {
-        [childObjects[n] setList: BRLIST(&eval) index: n];
-	}
-
 	if(newChildCount == childCount) return;
+
+	if(eval.type == AT_LIST) {
+		for(n=0;n<childCount;n++) 
+	        [childObjects[n] setList: BRLIST(&eval) index: n];
+	}
 
 	childObjects = realloc(childObjects, sizeof(id) * newChildCount);
 
@@ -116,39 +117,43 @@
 /* if we have a regular variable, load it and return it.  if we are a list */
 /* element, then load the proper element of the list. */
 
-- (void)getEval:(brEval*)e {
+- (void)getEval {
     int n;
 
     if(isArray) {
-        e->type = NULL;
+        eval.type = NULL;
 		return;
     } 
 
 	if(instance && instance->status == AS_ACTIVE && offset != -1) {
 		stRunInstance ri;
+		stInstance *evalInstance;
 	
 		ri.instance = instance;
 		ri.type = instance->type;
 
-        stLoadVariable(&instance->variables[offset], eval.type, e, &ri);
-    } else if(theEvalList) {
-        stDoEvalListIndex(theEvalList, theIndex, e);
-    } else {
-		bcopy(&eval, e, sizeof(brEval));
-	}
+        stLoadVariable(&instance->variables[offset], eval.type, &eval, &ri);
 
-	if(e->type == AT_LIST) {
-		[self updateChildCount: BRLIST(e)->count];
-	}
-
-    if(e->type == AT_INSTANCE) {
-		if(BRINSTANCE(e) && BRINSTANCE(e)->status != AS_ACTIVE) {
-			[self updateChildCount: 0];
+		if(eval.type == AT_INSTANCE && BRINSTANCE(&eval) && BRINSTANCE(&eval)->status == AS_ACTIVE) {
+			evalInstance = BRINSTANCE(&eval)->userData;
+			[self setEvalObject: evalInstance->type];
 		}
+    } else if(theEvalList) {
+        stDoEvalListIndex(theEvalList, theIndex, &eval);
+    } 
 
-		e->type = AT_INSTANCE;
+	if(eval.type == AT_LIST) {
+		[self updateChildCount: BRLIST(&eval)->count];
+	}
 
-        for(n=0;n<childCount;n++) if(childObjects[n]) [childObjects[n] setInstance: BRINSTANCE(e)->userData];
+    if(eval.type == AT_INSTANCE) {
+		if(BRINSTANCE(&eval) && BRINSTANCE(&eval)->status != AS_ACTIVE) {
+			[self updateChildCount: 0];
+		} 
+
+		eval.type = AT_INSTANCE;
+
+        for(n=0;n<childCount;n++) if(childObjects[n]) [childObjects[n] setInstance: BRINSTANCE(&eval)->userData];
     }
 }
 
@@ -159,7 +164,12 @@
 - (BOOL)getExpandable {
     if(isArray) return YES;
 
-    return(((eval.type == AT_INSTANCE) || eval.type == AT_LIST) && BRPOINTER(&eval) != NULL);
+	[self getEval];
+
+	if(eval.type == AT_INSTANCE && BRPOINTER(&eval) && BRINSTANCE(&eval)->status == AS_ACTIVE) return YES;
+	if(eval.type == AT_LIST && BRPOINTER(&eval)) return YES;
+	
+	return NO;
 }
 
 /*!
@@ -177,12 +187,11 @@
 
 - (NSString*)getValue {
     NSString *result;
-	brEval evaluation;
     char *cstr;
 
-	[self getEval: &evaluation];
+	[self getEval];
 
-    cstr = brFormatEvaluation(&evaluation, NULL);
+    cstr = brFormatEvaluation(&eval, NULL);
 
     result = [NSString stringWithCString: cstr];
 
@@ -203,6 +212,8 @@
     brEval newEval;
     stVar *var;
     int i, off;
+
+	[self getEval];
 
     // make sure the child request is within the bounds of the number of children 
 
@@ -226,6 +237,11 @@
 		stRunInstance ri;
 		ri.instance = instance;
 		ri.type = instance->type;
+
+		if(BRINSTANCE(&eval)->status != AS_ACTIVE) {
+			slMessage(DEBUG_ALL, "warning: freed instance in object inspector\n");
+			return NULL;
+		}
 
 		if(index == object->variables.size() ) {
 			newEval.type = AT_INSTANCE;

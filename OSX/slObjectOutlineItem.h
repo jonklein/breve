@@ -53,7 +53,7 @@
 
 - (NSString*)getName;
 - (NSString*)getValue;
-- (void)getEval:(brEval*)eval;
+- (void)getEval;
 - (void)setInstance:(struct stInstance*)i;
 
 - (void)updateChildCount:(int)newChildCount;
