@@ -59,7 +59,7 @@ all:	$(OUTPUTPATH)/$(PROGRAM)
 
 $(OUTPUTPATH)/$(PROGRAM):	$(OBJECTS)
 	-mkdir lib
-	$(CC) @PLUGINIMP@ -o $@ $(OBJECTS) $(LDFLAGS)
+	$(CXX) @PLUGINIMP@ -o $@ $(OBJECTS) $(LDFLAGS)
 	$(MACRESOURCECMD)
 
 # Windows only
