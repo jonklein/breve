@@ -710,7 +710,7 @@ int stUnusedInstanceVarWarning(stObject *o) {
 				e = method->keywords[n];
 
 				if(!e->var->used) {
-					slMessage(DEBUG_ALL, "warning: unused keyword \"%s\" in method %s of class %s\n", e->var->name, method->name, o->name);
+					// slMessage(DEBUG_ALL, "warning: unused keyword \"%s\" in method %s of class %s\n", e->var->name, method->name, o->name);
 				} else {
 					used++;
 				}

@@ -1,0 +1,203 @@
+@use Object.
+
+Object : GeneticAlgorithm {
+	% The GeneticAlgorithm class allows you to set up a genetic algorithm, in which
+	% solutions to a problem can be evolved.
+
+	+ variables:
+		populations (list).
+		testDuration (double).
+		tournamentSize (int).
+		populationSize (int).
+		individualClass (string).
+		currentPopulation (int).
+		currentIndividual (int).
+		crossoverPercent (int).
+		mutationPercent (int).
+		generation (int).
+
+	+ to init:
+		testDuration = 20.
+		populationSize = 30.
+		currentIndividual = 0.
+		mutationPercent = 75.
+		tournamentSize = 5.
+
+		populations = { { }, { } }.
+
+	+ to set-individual-class to className (string):
+		% Call this method to specify the class representing an individual in your
+		% genetic algorithm.  className must be a string representing a subclass
+		% of OBJECT(GeneticAlgorithmIndividual).
+
+		individualClass = className.
+
+	+ to iterate:
+		if | populations { 0 } | == 0: self generate-population.
+
+	+ to generate-population:
+		n (int).
+
+		if populations{ 0 }: free populations{ 0 }.
+		if populations{ 1 }: free populations{ 1 }.
+
+		if individualClass == "": die "A GeneticAlgorithmIndividual subclass must be specified using the method \"set-individual-class\"".
+
+		populations = { { }, { } }.
+
+		for n = 0, n < populationSize, n++ : {
+			push (controller make-new-instance of-class individualClass) onto populations{ 0 }.
+			push (controller make-new-instance of-class individualClass) onto populations{ 1 }.
+		}
+
+		currentIndividual = -1.
+		self switch-individual.
+
+	+ to set-test-duration to duration (double):
+		% Sets the duration of a single fitness test.  Specifies that a single
+		% individual should be allowed to run for duration simulated seconds 
+		% before assessing its fitness and switching to the next individual.
+
+		testDuration = duration.
+
+	+ to get-current-individual:
+		% Returns the current GeneticAlgorithmIndividual subclass instance being evaluated.
+
+		if | populations{ currentPopulation } | == 0: self generate-population.
+
+		if currentIndividual == -1: return 0.
+
+		return populations{ currentPopulation }{ currentIndividual }.
+
+	+ to switch-individual: 
+		% Switches to the next indivisual
+
+		if currentIndividual != -1: self end-fitness-test of populations{ currentPopulation }{ currentIndividual }.
+
+		currentIndividual++.
+
+		if currentIndividual >= | populations{ currentPopulation } |: {
+			self reproduce.
+		}
+
+		self start-fitness-test of populations{ currentPopulation }{ currentIndividual }.
+
+		self schedule method-call "switch-individual" at-time (controller get-time) + testDuration.
+
+	+ to reproduce:
+		r, i, best (int).
+
+		if | populations{ !currentPopulation } | != populationSize: {
+			free populations{ !currentPopulation }.
+			populations{ !currentPopulation } = populationSize new individualClass.
+		}
+
+		best = 0.
+
+		for i = 1, i < | populations{ currentPopulation } |, i++: {
+			if (populations{ currentPopulation }{ i } get-fitness) >
+					(populations{ currentPopulation }{ best } get-fitness): best = i.
+		}
+		
+		generation++.
+
+		print "### Generation $generation, best fitness: ", (populations{ currentPopulation }{ best } get-fitness).
+		self examine individual populations{ currentPopulation }{ best }.
+
+		for i = 0, i < populationSize, i++: {
+			r = random[100].
+
+			if r < mutationPercent: {
+				populations{ !currentPopulation }{ i } copy from (self tournament-select).
+				populations{ !currentPopulation }{ i } mutate.
+			} else if r < (mutationPercent + crossoverPercent): {
+				populations{ !currentPopulation }{ i } crossover 
+					from-parent1 (self touranment-select) from-parent2 (self tournament-select).
+			} else {
+				populations{ !currentPopulation }{ i } copy from (self tournament-select).
+			}
+		}
+
+		currentPopulation = !currentPopulation.
+		currentIndividual = 0.
+
+	+ to examine individual currentIndividual (object):
+		print currentIndividual.
+
+	+ to tournament-select:
+		% This method performs a tournament selection for reproduction.  It 
+		% is used internally and typically not called by any other object.  
+
+		n (int).
+		best, test (int).
+
+		best = random[ | populations{ currentPopulation } | - 1 ].
+
+		for n=0, n<(tournamentSize - 1), n++: {
+			test = random[ | populations{ currentPopulation } | - 1 ].
+
+			if (populations{ currentPopulation }{ test } get-fitness) > 
+					(populations{ currentPopulation }{ best } get-fitness): { 
+				best = test.
+			}
+		}
+
+		return populations{ currentPopulation }{ best }.
+
+	+ section "Methods to Override in Custom Subclasses"
+
+	+ to start-fitness-test of individual (object):
+		% Implement this method to perform any setup necessary when the 
+		% fitness test begins.
+
+	+ to end-fitness-test of individual (object):
+		% In this method, you should perform any cleanup neccessary when the 
+		% fitness test ends.  You should also make sure that the individual's
+		% fitness value is set using 
+		% OBJECTMETHOD(GeneticAlgorithmIndividual:set-fitness).
+}
+
+Object : GeneticAlgorithmIndividual {
+	% This object represents a single individual in a OBJECT(GeneticAlgorithm).
+	% To use the class OBJECT(GeneticAlgorithm), you must also implement a 
+	% custom subclass of this class.  Your custom subclass should contain the
+	% variables which will represent the genes for the genetic algorithm, and
+	% must also implement a few methods used for genetic operators.
+	% <P>
+	% At a very minimum, you must implement your own versions of the methods
+	% METHOD(compute-fitness), METHOD(copy) and METHOD(mutate).  If you intend 
+	% to use the crossover 
+	% genetic operator, you must also implement the method METHOD(crossover).
+	% If these methods are not implemented by your subclass, the object will
+	% trigger a runtime error.
+
+	+ variables:
+		fitness (double).
+
+	+ to get-fitness:
+		return fitness.
+
+	+ to set-fitness to fitnessValue (double):
+		fitness = fitnessValue.
+
+	+ section "Methods to Override in Custom Subclasses"
+
+	+ to copy from otherIndividual (object):
+		% Implement this method to copy the genes from otherIndividual.  This method
+		% must be implemented by your subclass.
+
+		die "The method \"copy\" must be implemented in your GeneticAlgorithmIndividual subclass!".
+
+	+ to mutate:
+		% Implement this method to mutate the genes of this object.  This method
+		% must be implemented by your subclass.
+
+		die "The method \"mutate\" must be implemented in your GeneticAlgorithmIndividual subclass!".
+
+	+ to crossover from-parent1 parent1 (object) from-parent2 parent2 (object):
+		% Implement this method to make this object become a crossover of parent1 
+		% and parent2.  This method must be implemented by your subclass if 
+		% crossover is enabled.
+
+		die "The method \"crossover\" must be implemented in your GeneticAlgorithmIndividual subclass!".
+}

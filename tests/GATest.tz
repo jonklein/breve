@@ -1,0 +1,49 @@
+@use GeneticAlgorithm.
+@use Control.
+
+Controller GATest.
+
+Control : GATest {
+	+ variables:
+		ga (object).
+
+	+ to init:
+		ga = new myGA.
+
+		ga set-individual-class to "myIndividual".
+
+	+ to iterate:
+		super iterate.
+}
+
+GeneticAlgorithm : myGA {
+	+ variables:
+		individual (object).
+
+	+ to end-fitness-test of o (object):
+		o set-fitness to (o compute-fitness).
+}
+
+GeneticAlgorithmIndividual : myIndividual {
+	+ variables:
+		genes (list).
+
+	+ to init:
+		genes{ 0 } = random[1.0].
+		genes{ 1 } = random[1.0].
+		genes{ 2 } = random[1.0].
+
+	+ to get-genes:
+		return genes.
+		
+	+ to copy from other (object):
+		genes = copylist (other get-genes).
+
+	+ to mutate:
+		genes{ 0 } += random[.1] - 0.05.
+		genes{ 1 } += random[.1] - 0.05.
+		genes{ 2 } += random[.1] - 0.05.
+
+	+ to compute-fitness:
+		return (genes{ 0 } * genes{ 1 }) - genes{ 2 }.
+}
