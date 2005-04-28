@@ -123,6 +123,7 @@ OSX_release: OSX_clean
 	mkdir breve_image_folder
 	cp -R OSX/build/breve.app breve_image_folder
 	cp OSX/README.html breve_image_folder
+	cp docBuild/docbook/images/breve_icon.jpg breve_image_folder/breve_icon.jpg
 	cp OSX/Documentation.txt breve_image_folder
 	cp Changes.html GPL.txt breve_image_folder
 	mkdir breve_image_folder/plugins

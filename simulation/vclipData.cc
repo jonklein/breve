@@ -263,7 +263,7 @@ void slInitProximityData(slWorld *w) {
 	w->proximityData->boundLists[2].clear();
 
 	for(n = 0; n < w->proximityData->maxCount; ++n) 
-		memset(w->proximityData->pairArray[n], (BT_CHECK | BT_UNKNOWN), w->proximityData->maxCount);
+		memset(w->proximityData->pairArray[n], BT_CHECK, w->proximityData->maxCount);
 
 	for(n = 0; n < w->objects.size(); ++n) {
 		slWorldObject *wo = w->objects[n];
