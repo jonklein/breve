@@ -1613,6 +1613,19 @@ is used to execute a block of code if a certain condition is true and,
 optionally, a different piece of code if the statement is false.
 </para>
 <para>
+The conditional statements are be comprised of C-style comparison operators.  The following comparison operators are available: 
+<itemizedlist>
+<listitem><para><function>==</function>, Equals</para></listitem>
+<listitem><para><function>!=</function>, Not equals</para></listitem>
+<listitem><para><function>\>=</function>, Greater than or Equals</para></listitem>
+<listitem><para><function>\<=</function>, Less than or Equals</para></listitem>
+<listitem><para><function>\></function>, Greater than</para></listitem>
+<listitem><para><function>\<</function>, Less than</para></listitem>
+<listitem><para><function>&&</function>, And</para></listitem>
+<listitem><para><function>||</function>, Or</para></listitem>
+</itemizedlist>
+</para>
+<para>
 For all of these structures, the code to be executed may be either a single
 statement, or several statements enclosed in braces ('{' and '}').
 </para>
