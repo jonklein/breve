@@ -2741,7 +2741,7 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 		stGCUnretain(result);
 		stGCMark(caller->instance, result);
 	} else {
-		stGCUnretainAndCollect(result);
+		if (result->type != AT_NULL) stGCUnretainAndCollect(result);
 	}
 
 	// restore the previous stack and stack records
