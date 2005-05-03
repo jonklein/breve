@@ -26,14 +26,67 @@
 #include "bigMatrix.hh"
 #include "glIncludes.h"
 
+/* Forward declaration */
 class slPatchGrid;
 
+/**
+ *  slPatch represent a region of space.  This class is used to represent
+ *  the location, breve object and color for display rendering.
+ *
+ *  slPatch classes only instantiated as a part of a slPatchGrid object.
+ */
 class slPatch {
 	public:
-		slPatch() {
-			data = NULL;
-		}
+        
+        /** default constructor */
+		slPatch();
+		
+		// //// the costructors are outlined below for possible
+		// //// future use and/or to convert from using array
+		// //// default constructor initialization
+		/**
+		 *    slPatch grid constructor.
+		 *
+		 *    slPatch base constructor requires a parent grid
+		 */
+		 slPatch( slPatchGrid* theGrid);
 
+		/**
+         *    slPatch full constructor.
+		 *
+		 *    slPatch base constructor requires a parent grid
+		 *    location and color offset
+		 */
+		 slPatch( slPatchGrid* theGrid,
+		          slVector* theLocation,
+		          const int theColorOffset);
+
+        void slPatchSetData(void *data);
+        void* slPatchGetData();
+        void slPatchGetLocation(slVector *location);
+
+        // //// further refactoring in the future should reduce
+        // //// these names to 'setColor()', etc.
+		/**
+		 *    slPatchSetColor sets the color of the patch to color
+		 *
+		 */        
+        void slPatchSetColor(slVector *color);
+
+		/**
+		 *    slPatchGetColor sets the color of the patch to color
+		 *
+		 */
+		 // ///// shouldn't this be a return value
+        void slPatchGetColor(slVector *color);
+
+		/**
+		 *    slPatchSetTransparency sets the transparency level
+		 *
+		 */
+        void slPatchSetTransparency(double transparency);
+        
+    // these should become private/protected
 		void *data;
 
 		slVector location;
@@ -47,26 +100,15 @@ class slPatch {
 
 class slPatchGrid {
 	public:
-		~slPatchGrid() {
-			int b, c;
+		slPatchGrid();
 
-			for(c=0;c<zSize;c++) {
-				for(b=0;b<ySize;b++) {
-					delete[] patches[c][b];
-				}
+        slPatchGrid(const slVector *center,
+                    const slVector *patchSize,
+                    const int x,
+                    const int y,
+                    const int z);
 
-				delete[] patches[c];
-			}
-
-			delete[] patches;
-
-			delete[] colors;
-		}
-
-		slPatchGrid() {
-			_texture = -1;
-			_cubeDrawList = -1;
-		}
+		~slPatchGrid();
 
 		void compileCubeList();
 
@@ -81,7 +123,10 @@ class slPatchGrid {
 
 		slPatch *patchAtIndex(int x, int y, int z);
 		slPatch *patchAtLocation(slVector *location);
+		void slPatchSetDataAtIndex(int x, int y, int z, void *data);
+		void slPatchGridCopyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double scale);
 
+        // below should be private/protected
 
 		int xSize, ySize, zSize;
 
@@ -101,19 +146,22 @@ class slPatchGrid {
 
 		int _texture;
 		int _cubeDrawList;
+		
 };
 #endif
 
 typedef struct slPatchGrid slPatchGrid;
 typedef struct slPatch slPatch;
 
+//???
+/*
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-slPatchGrid *slPatchGridNew(slVector *center, slVector *size, int x, int y, int z);
+slPatchGrid& slPatchGrid(slVector *center, slVector *size, int x, int y, int z);
 
-void slPatchGridFree(slPatchGrid *g);
+void slPatchGridFree();
 void slInitPatch(slPatch *p);
 
 void slPatchSetData(slPatch *p, void *data);
@@ -135,4 +183,4 @@ void slPatchGridCopyColorFrom2DMatrix(slPatchGrid *grid, slBigMatrix2DGSL *m, in
 #ifdef __cplusplus
 }
 #endif
-
+*/

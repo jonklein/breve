@@ -37,9 +37,9 @@
 */
 
 int brIPatchGridNew(brEval args[], brEval *target, brInstance *i) {
-	slVector center;
+	slVector center; // is this obsolete?
 
-	slVectorSet(&center, 0, 0, 0);
+	slVectorSet(&center, 0, 0, 0); // is this obsolete?
 
 	BRPOINTER(target) = slPatchGridAdd(i->engine->world, &BRVECTOR(&args[0]), &BRVECTOR(&args[1]), BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]));
 
@@ -53,7 +53,7 @@ int brIPatchGridNew(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIPatchGridFree(brEval args[], brEval *target, brInstance *i) {
-	slPatchGridFree(BRPATCHGRIDPOINTER(&args[0]));
+	 delete (BRPATCHGRIDPOINTER(&args[0]));
 
 	return EC_OK;
 }
@@ -105,7 +105,7 @@ int brIObjectAtLocation(brEval args[], brEval *target, brInstance *i) {
 
 	patch = grid->patchAtLocation(&BRVECTOR(&args[1]));
 
-	if (patch) BRINSTANCE(target) = slPatchGetData(patch);
+	if (patch) BRINSTANCE(target) = patch->slPatchGetData();
 	else BRINSTANCE(target) = NULL;
 
 	return EC_OK;
@@ -128,7 +128,7 @@ int brIObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 	
 	patch = grid->patchAtIndex(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]));
 
-	if(patch) BRINSTANCE(target) = slPatchGetData(patch);
+	if(patch) BRINSTANCE(target) = patch->slPatchGetData();
 	else BRINSTANCE(target) = NULL;
 
 	return EC_OK;
@@ -141,7 +141,7 @@ int brIObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 int brIPatchGridCopyColorFrom3DMatrix(brEval args[], brEval *target, brInstance *i) {
 	slPatchGrid *g = BRPATCHGRIDPOINTER(&args[0]);
 
-	slPatchGridCopyColorFrom3DMatrix(g, (slBigMatrix3DGSL*)BRPOINTER(&args[1]), BRINT(&args[2]), BRDOUBLE(&args[3]));
+	g->slPatchGridCopyColorFrom3DMatrix((slBigMatrix3DGSL*)BRPOINTER(&args[1]), BRINT(&args[2]), BRDOUBLE(&args[3]));
 
 	return EC_OK;
 }
@@ -161,7 +161,7 @@ int brISetObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 		return EC_OK;
 	}
 
-	slPatchSetDataAtIndex(grid, BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]), BRINSTANCE(&args[1]));
+	grid->slPatchSetDataAtIndex(BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]), BRINSTANCE(&args[1]));
 
 	return EC_OK;
 }
@@ -173,7 +173,7 @@ int brISetObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetPatchColor(brEval args[], brEval *target, brInstance *i) {
-	slPatchSetColor(BRPATCHPOINTER(&args[0]), &BRVECTOR(&args[1]));
+	BRPATCHPOINTER(&args[0])->slPatchSetColor(&BRVECTOR(&args[1]));
 
 	return EC_OK;
 }
@@ -185,7 +185,7 @@ int brISetPatchColor(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetPatchLocation(brEval args[], brEval *target, brInstance *i) {
-	slPatchGetLocation(BRPATCHPOINTER(&args[0]), &BRVECTOR(target));
+	BRPATCHPOINTER(&args[0])->slPatchGetLocation(&BRVECTOR(target));
 
 	return EC_OK;
 }
@@ -197,7 +197,7 @@ int brIGetPatchLocation(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetPatchTransparency(brEval args[], brEval *target, brInstance *i) {
-	slPatchSetTransparency(BRPATCHPOINTER(&args[0]), BRDOUBLE(&args[1]));
+	BRPATCHPOINTER(&args[0])->slPatchSetTransparency(BRDOUBLE(&args[1]));
 
 	return EC_OK;
 }

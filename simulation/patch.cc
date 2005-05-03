@@ -21,66 +21,203 @@
 #include "simulation.h"
 #include "glIncludes.h"
 
+/* ********
+ *  TODO: 
+ *      change to row-major
+ *      to c++
+ */
+
+
 #ifdef WINDOWS
 #include <windows.h>
 
 PFNGLTEXIMAGE3DPROC wglTexImage3D;
 #endif
 
-slPatchGrid *slPatchGridNew(slVector *center, slVector *patchSize, int x, int y, int z) {
-	struct slPatchGrid *grid;
+/**
+ *  slPatch default constructor.
+ */
+slPatch::slPatch()
+    :   data(NULL) // NULL is deprecated in c++
+{
+    // your code here ;-)
+}
+
+/**
+ *  slPatch base constructor.
+ *
+ * 
+ *  @param theGrid the slPatchGrid parent object.
+ */
+slPatch::slPatch(slPatchGrid* theGrid)
+    :   grid(theGrid)
+{
+    // your code here ;-)
+}
+
+slPatch::slPatch(   slPatchGrid* theGrid,
+                    slVector* theLocation,
+                    const int theColorOffset)
+    :   colorOffset(theColorOffset),
+        grid(theGrid)
+{
+    slVectorCopy(theLocation, &this->location);
+}
+
+/**
+ *    slPatchSetColor sets the color of the patch to color
+ *
+ */
+void slPatch::slPatchSetColor(slVector *color) {
+	if (color->x > 1.0) color->x = 1.0;
+	else if(color->x < 0.0) color->x = 0.0;
+
+	if (color->y > 1.0) color->y = 1.0;
+	else if(color->x < 0.0) color->x = 0.0;
+
+	if (color->z > 1.0) color->z = 1.0;
+	else if(color->x < 0.0) color->x = 0.0;
+
+	grid->colors[this->colorOffset    ] = (unsigned char)(255 * color->x);
+	grid->colors[this->colorOffset + 1] = (unsigned char)(255 * color->y);
+	grid->colors[this->colorOffset + 2] = (unsigned char)(255 * color->z);
+}
+
+/**
+ *    slPatchSetTransparency sets the transparency of the
+ *    patch to transparency
+ *
+ */
+void slPatch::slPatchSetTransparency(double transparency) {
+	if (transparency > 1.0) transparency = 1.0;
+	else if(transparency < 0.0) transparency = 0.0;
+
+	grid->colors[this->colorOffset + 3] = (unsigned char)(255 * transparency);
+}
+
+/**
+ *    slPatchGetColor gets the color of the patch
+ *
+ *    slPatch base constructor requires a parent grid
+ *    location and color offset
+ */
+void slPatch::slPatchGetColor(slVector *color) {
+	color->x = grid->colors[this->colorOffset    ] / 255.0;
+	color->y = grid->colors[this->colorOffset + 1] / 255.0;
+	color->z = grid->colors[this->colorOffset + 2] / 255.0;
+}
+
+void slPatch::slPatchSetData(void *data) {
+	this->data = data;
+
+}
+
+void* slPatch::slPatchGetData() {
+	return this->data;
+}
+
+/// why isn't this a return value?
+void slPatch::slPatchGetLocation(slVector *location) {
+	slVectorCopy(&this->location, location);
+}
+
+/**
+ *  slPatchGrid default constructor.
+ *
+ */		
+slPatchGrid::slPatchGrid()
+    :   _texture(-1),
+		_cubeDrawList(-1)
+{
+
+}
+
+/**
+ *  slPatch base constructor.
+ *
+ *  @param theLocation the location as a vector.
+ *  @param theGrid the slPatchGrid parent object.
+ *  @param theColorOffset the texture offset for GL display
+ */
+slPatchGrid::slPatchGrid(const slVector *center, const slVector *patchSize, const int x, const int y, const int z)
+    :  xSize(x),
+	   ySize(y),
+	   zSize(z)
+{
 	int a, b, c;
 
 #ifdef WINDOWS
 	// oh windows, why do you have to be such a douchebag about everything?!
 	wglTexImage3D = (PFNGLTEXIMAGE3DPROC)wglGetProcAddress("glTexImage3D");
 #endif
+    
+    // I don't know what do do about this code--
+    // before it would have left a dangling grid object I think
+    // and it should be an exception now...
+	if(x < 1 || y < 1 || z < 1) printf("Error instantiating PatchGrid!");
 
-	if(x < 1 || y < 1 || z < 1) return NULL;
+	this->patches = new slPatch**[z];
 
-	grid = new slPatchGrid;
+	this->textureX = slNextPowerOfTwo(x);
+	this->textureY = slNextPowerOfTwo(y);
+	this->textureZ = slNextPowerOfTwo(z);
 
-	grid->patches = new slPatch**[z];
-	grid->xSize = x;
-	grid->ySize = y;
-	grid->zSize = z;
+	this->colors = new unsigned char[this->textureX * this->textureY * this->textureZ * 4];
 
-	grid->textureX = slNextPowerOfTwo(x);
-	grid->textureY = slNextPowerOfTwo(y);
-	grid->textureZ = slNextPowerOfTwo(z);
+	memset(this->colors, 0, this->textureX * this->textureY * this->textureZ * 4);
 
-	grid->colors = new unsigned char[grid->textureX * grid->textureY * grid->textureZ * 4];
+	slVectorCopy(patchSize, &this->patchSize);
 
-	memset(grid->colors, 0, grid->textureX * grid->textureY * grid->textureZ * 4);
-
-	slVectorCopy(patchSize, &grid->patchSize);
-
-	grid->startPosition.x = (-(patchSize->x * x) / 2) + center->x;
-	grid->startPosition.y = (-(patchSize->y * y) / 2) + center->y;
-	grid->startPosition.z = (-(patchSize->z * z) / 2) + center->z;
+	this->startPosition.x = (-(patchSize->x * x) / 2) + center->x;
+	this->startPosition.y = (-(patchSize->y * y) / 2) + center->y;
+	this->startPosition.z = (-(patchSize->z * z) / 2) + center->z;
 
 	for(c=0;c<z;c++) {
-		grid->patches[c] = new slPatch*[y];
+		this->patches[c] = new slPatch*[x];
 
-		for(b=0;b<y;b++) {
-			grid->patches[c][b] = new slPatch[x];
-		
-			for(a=0;a<x;a++) {
-				grid->patches[c][b][a].location.x = grid->startPosition.x + a * patchSize->x;
-				grid->patches[c][b][a].location.y = grid->startPosition.y + b * patchSize->y;
-				grid->patches[c][b][a].location.z = grid->startPosition.z + c * patchSize->z;
-				grid->patches[c][b][a].grid = grid;
-				grid->patches[c][b][a].colorOffset = (c * grid->textureX * grid->textureY * 4) + (b * grid->textureX * 4) + (a * 4);
+		for(b=0;b<x;b++) {
+			this->patches[c][b] = new slPatch[y]; // still defautl constructor
+            
+			for(a=0;a<y;a++) {
+				this->patches[c][b][a].grid = this;
+				this->patches[c][b][a].location.z = this->startPosition.z + c * patchSize->z;
+				this->patches[c][b][a].location.x = this->startPosition.x + b * patchSize->x;
+				this->patches[c][b][a].location.y = this->startPosition.y + a * patchSize->y;
+				this->patches[c][b][a].colorOffset = (c * this->textureZ * this->textureX * 4) + (b * this->textureX * 4) + (a * 4);
 			}
 		}
 	}
 
-	grid->drawSmooth = 0;
+	this->drawSmooth = 0;
 
-	return grid;
 }
 
-slPatch *slPatchGrid::patchAtLocation(slVector *location) {
+/**
+ *  slPatch destructor.
+ *
+ */
+slPatchGrid::~slPatchGrid()
+{
+    int b, c;
+
+    for(c=0;c<zSize;c++) {
+        for(b=0;b<xSize;b++) {
+            delete[] patches[c][b];
+        }
+
+        delete[] patches[c];
+    }
+
+    delete[] patches;
+
+    delete[] colors;
+}
+
+/**
+ *  patchAtLocation returns the patch which contains the point.
+ *
+ */
+slPatch* slPatchGrid::slPatchGrid::patchAtLocation(slVector *location) {
 	int x, y, z;
 	
 	x = (int)((location->x - startPosition.x) / patchSize.x);
@@ -94,11 +231,10 @@ slPatch *slPatchGrid::patchAtLocation(slVector *location) {
 	return &patches[z][y][x];
 }
 
-/*!
-	\brief Copies the contents of a 3D matrix to one z-slice of a PatchGrid.
-*/
-
-void slPatchGridCopyColorFrom3DMatrix(slPatchGrid *grid, slBigMatrix3DGSL *m, int channel, double scale) {
+/**
+ *	\brief Copies the contents of a 3D matrix to one z-slice of a PatchGrid.
+ */
+void slPatchGrid::slPatchGridCopyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double scale) {
 	int x, y, z;
 	int xSize, ySize, zSize;
 	float* mData;
@@ -113,11 +249,11 @@ void slPatchGridCopyColorFrom3DMatrix(slPatchGrid *grid, slBigMatrix3DGSL *m, in
 	zSize = m->zDim();
 
 	for(z = 0; z < zSize; z++ ) {
-		for(y = 0; y < ySize; y++ ) {
-			for(x = 0; x < xSize; x++ ) {
-				unsigned int crowOffset = (z * grid->textureX * grid->textureY * 4) + (y * grid->textureX * 4);
+		for(y = 0; y < xSize; x++ ) {
+			for(x = 0; x < ySize; y++ ) {
+				unsigned int crowOffset = (z * this->textureX * this->textureY * 4) + (x * this->textureX * 4);
 
-				grid->colors[crowOffset + (x << 2) + channel] = 
+				this->colors[crowOffset + (y << 2) + channel] = 
 					(unsigned char)(255 * scale * mData[ (z * chemXY) + (x * chemTDA) + y ]);
 
 			}
@@ -125,9 +261,9 @@ void slPatchGridCopyColorFrom3DMatrix(slPatchGrid *grid, slBigMatrix3DGSL *m, in
 	}
 }
 
-/*!
-	\brief Draws the patch grid without using 3D textures.
-*/
+/**
+ *	\brief Draws the patch grid without using 3D textures.
+ */
 
 void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 	int z, y, x;
@@ -136,7 +272,7 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 	slPatch *patch;
 	slVector translation, origin;
 
-	if(_cubeDrawList == -1) compileCubeList();
+	if(_cubeDrawList == -1) this->compileCubeList();
 
 	// we want to always draw from back to front for the
 	// alpha blending to work.  figure out the points
@@ -166,22 +302,22 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 
 		translation.z = startPosition.z + patchSize.z * zVal;
 
-		for(y=0;y<ySize;y++) {
-			if(y < yMid) yVal = y;
-			else yVal = (ySize - 1) - (y - yMid);
+		for(x=0;x<xSize;x++) {
+			if(x < xMid) xVal = x;
+			else xVal = (xSize - 1) - (x - xMid);
 
-			translation.y = startPosition.y + patchSize.y * yVal;
+			translation.x = startPosition.x + patchSize.x * xVal;
 
-			for(x=0;x<xSize;x++) {
-				if(x < xMid) xVal = x;
-				else xVal = (xSize - 1) - (x - xMid);
+			for(y=0;y<ySize;y++) {
+				if(y < yMid) yVal = y;
+				else yVal = (ySize - 1) - (y - yMid);
 
-				patch = &patches[zVal][yVal][xVal];
+				patch = &patches[zVal][xVal][yVal];
 
 				if(colors[patch->colorOffset + 3] != 255) {
 					glPushMatrix();
 
-					translation.x = startPosition.x + patchSize.x * xVal;
+					translation.y = startPosition.y + patchSize.y * yVal;
 
 					glColor4ubv(&colors[patch->colorOffset]);
 
@@ -198,13 +334,13 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 	}
 }
 
-/*!
-	\brief Draws a set of patches using a volumetric 3D texture.
-
-	This may not be supported on older OpenGL implementations, so the alternative 
-	\ref drawWithout3DTexture may be used instead.  Drawing without the 3D texture
-	is slower than drawing with a 3D texture.
-*/
+/**
+ *	\brief Draws a set of patches using a volumetric 3D texture.
+ *
+ *	This may not be supported on older OpenGL implementations, so the alternative 
+ *	\ref drawWithout3DTexture may be used instead.  Drawing without the 3D texture
+ *	is slower than drawing with a 3D texture.
+ */
 
 void slPatchGrid::draw(slCamera *camera) {
 	slVector origin, diff, adiff, size;
@@ -368,63 +504,24 @@ void slPatchGrid::textureDrawZPass(slVector &size, int dir) {
 	}
 }
 
+// ????
 void slPatchGridFree(slPatchGrid *g) {
 	delete g;
 }
 
-void slPatchSetData(slPatch *p, void *data) {
-	p->data = data;
-}
-
-void *slPatchGetData(slPatch *p) {
-	if(!p) return NULL;
-	return p->data;
-}
-
-void slPatchGetLocation(slPatch *p, slVector *location) {
-	slVectorCopy(&p->location, location);
-}
-
-void slPatchSetColor(slPatch *p, slVector *color) {
-	if (color->x > 1.0) color->x = 1.0;
-	else if(color->x < 0.0) color->x = 0.0;
-
-	if (color->y > 1.0) color->y = 1.0;
-	else if(color->x < 0.0) color->x = 0.0;
-
-	if (color->z > 1.0) color->z = 1.0;
-	else if(color->x < 0.0) color->x = 0.0;
-
-	p->grid->colors[p->colorOffset    ] = (unsigned char)(255 * color->x);
-	p->grid->colors[p->colorOffset + 1] = (unsigned char)(255 * color->y);
-	p->grid->colors[p->colorOffset + 2] = (unsigned char)(255 * color->z);
-}
-
-void slPatchSetTransparency(slPatch *p, double transparency) {
-	if (transparency > 1.0) transparency = 1.0;
-	else if(transparency < 0.0) transparency = 0.0;
-
-	p->grid->colors[p->colorOffset + 3] = (unsigned char)(255 * transparency);
-}
-
-void slPatchGetColor(slPatch *p, slVector *color) {
-	color->x = p->grid->colors[p->colorOffset    ] / 255.0;
-	color->y = p->grid->colors[p->colorOffset + 1] / 255.0;
-	color->z = p->grid->colors[p->colorOffset + 2] / 255.0;
-}
 
 slPatch *slPatchGrid::patchAtIndex(int x, int y, int z) {
 	if(x < 0 || x >= xSize) return NULL;
 	if(y < 0 || y >= ySize) return NULL;
 	if(z < 0 || z >= zSize) return NULL;
-	return &patches[z][y][x];
+	return &patches[z][x][y];
 }
 
-void slPatchSetDataAtIndex(slPatchGrid *grid, int x, int y, int z, void *data) {
-	if(x < 0 || x >= grid->xSize) return;
-	if(y < 0 || y >= grid->ySize) return;
-	if(z < 0 || z >= grid->zSize) return;
-	grid->patches[z][y][x].data = data;
+void slPatchGrid::slPatchSetDataAtIndex(int x, int y, int z, void *data) {
+	if(x < 0 || x >= this->xSize) return;
+	if(y < 0 || y >= this->ySize) return;
+	if(z < 0 || z >= this->zSize) return;
+	this->patches[z][x][y].data = data;
 }
 
 void slPatchGrid::compileCubeList() {

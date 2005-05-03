@@ -174,7 +174,7 @@ void slWorldFree(slWorld *w) {
 		slWorldFreeObject( *wi );
 
 	for( pi = w->patches.begin(); pi != w->patches.end(); pi++ ) 
-		slPatchGridFree( *pi );
+		delete *pi;
 
 	if(w->clipData) slFreeClipData(w->clipData);
 	if(w->proximityData) slFreeClipData(w->proximityData);
@@ -250,14 +250,6 @@ slWorldObject *slWorldAddObject(slWorld *w, slWorldObject *no, int type) {
 	return no;
 }
 
-slPatchGrid *slPatchGridAdd(slWorld *w, slVector *center, slVector *patchSize, int x, int y, int z) {
-	slPatchGrid *g = slPatchGridNew(center, patchSize, x, y, z);
-
-	w->patches.push_back(g);
-
-	return g;
-}
-
 /*!
 	\brief Removes an object from the world.
 */
@@ -271,6 +263,34 @@ void slRemoveObject(slWorld *w, slWorldObject *p) {
 		w->objects.erase(wi);
 		w->initialized = 0;
 	}
+
+}
+
+/**
+ *  \brief Adds a patch grid to the world
+ */
+slPatchGrid *slPatchGridAdd(slWorld *w, slVector *center, slVector *patchSize, int x, int y, int z) {
+	slPatchGrid *g = &(slPatchGrid(center, patchSize, x, y, z));
+
+	w->patches.push_back(g);
+
+	return g;
+}
+
+/**
+ *  \brief Removes a patch grid from the world
+ */
+void slPatchGridRemove(slWorld *w, slPatchGrid *g) {
+	std::vector<slPatchGrid*>::iterator pi;
+
+	pi = std::find(w->patches.begin(), w->patches.end(), g);
+
+	if(pi != w->patches.end()) {
+        delete *pi;
+        w->patches.erase(pi);
+		w->initialized = 0;
+	}
+
 }
 
 /*!
