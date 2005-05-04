@@ -61,30 +61,30 @@ class slPatch {
 		          slVector* theLocation,
 		          const int theColorOffset);
 
-        void slPatchSetData(void *data);
-        void* slPatchGetData();
-        void slPatchGetLocation(slVector *location);
+        void setData(void *data);
+        void* getData();
+        void getLocation(slVector *location);
 
         // //// further refactoring in the future should reduce
         // //// these names to 'setColor()', etc.
 		/**
-		 *    slPatchSetColor sets the color of the patch to color
+		 *    setColor sets the color of the patch to color
 		 *
 		 */        
-        void slPatchSetColor(slVector *color);
+        void setColor(slVector *color);
 
 		/**
-		 *    slPatchGetColor sets the color of the patch to color
+		 *    getColor sets the color of the patch to color
 		 *
 		 */
 		 // ///// shouldn't this be a return value
-        void slPatchGetColor(slVector *color);
+        void getColor(slVector *color);
 
 		/**
-		 *    slPatchSetTransparency sets the transparency level
+		 *    SetTransparency sets the transparency level
 		 *
 		 */
-        void slPatchSetTransparency(double transparency);
+        void setTransparency(double transparency);
         
     // these should become private/protected
 		void *data;
@@ -121,10 +121,10 @@ class slPatchGrid {
 		void textureDrawYPass(slVector &size, int dir);
 		void textureDrawZPass(slVector &size, int dir);
 
-		slPatch *patchAtIndex(int x, int y, int z);
-		slPatch *patchAtLocation(slVector *location);
-		void slPatchSetDataAtIndex(int x, int y, int z, void *data);
-		void slPatchGridCopyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double scale);
+		slPatch *getPatchAtIndex(int x, int y, int z);
+		slPatch *getPatchAtLocation(slVector *location);
+		void setDataAtIndex(int x, int y, int z, void *data);
+		void copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double scale);
 
         // below should be private/protected
 

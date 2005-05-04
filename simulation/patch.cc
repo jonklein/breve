@@ -65,10 +65,10 @@ slPatch::slPatch(   slPatchGrid* theGrid,
 }
 
 /**
- *    slPatchSetColor sets the color of the patch to color
+ *    setColor sets the color of the patch to color
  *
  */
-void slPatch::slPatchSetColor(slVector *color) {
+void slPatch::setColor(slVector *color) {
 	if (color->x > 1.0) color->x = 1.0;
 	else if(color->x < 0.0) color->x = 0.0;
 
@@ -84,11 +84,11 @@ void slPatch::slPatchSetColor(slVector *color) {
 }
 
 /**
- *    slPatchSetTransparency sets the transparency of the
+ *    setTransparence sets the transparency of the
  *    patch to transparency
  *
  */
-void slPatch::slPatchSetTransparency(double transparency) {
+void slPatch::setTransparency(double transparency) {
 	if (transparency > 1.0) transparency = 1.0;
 	else if(transparency < 0.0) transparency = 0.0;
 
@@ -96,28 +96,28 @@ void slPatch::slPatchSetTransparency(double transparency) {
 }
 
 /**
- *    slPatchGetColor gets the color of the patch
+ *    getColor gets the color of the patch
  *
  *    slPatch base constructor requires a parent grid
  *    location and color offset
  */
-void slPatch::slPatchGetColor(slVector *color) {
+void slPatch::getColor(slVector *color) {
 	color->x = grid->colors[this->colorOffset    ] / 255.0;
 	color->y = grid->colors[this->colorOffset + 1] / 255.0;
 	color->z = grid->colors[this->colorOffset + 2] / 255.0;
 }
 
-void slPatch::slPatchSetData(void *data) {
+void slPatch::setData(void *data) {
 	this->data = data;
 
 }
 
-void* slPatch::slPatchGetData() {
+void* slPatch::getData() {
 	return this->data;
 }
 
 /// why isn't this a return value?
-void slPatch::slPatchGetLocation(slVector *location) {
+void slPatch::getLocation(slVector *location) {
 	slVectorCopy(&this->location, location);
 }
 
@@ -176,7 +176,7 @@ slPatchGrid::slPatchGrid(const slVector *center, const slVector *patchSize, cons
 		this->patches[c] = new slPatch*[x];
 
 		for(b=0;b<x;b++) {
-			this->patches[c][b] = new slPatch[y]; // still defautl constructor
+			this->patches[c][b] = new slPatch[y]; // uses default constructor
             
 			for(a=0;a<y;a++) {
 				this->patches[c][b][a].grid = this;
@@ -214,10 +214,10 @@ slPatchGrid::~slPatchGrid()
 }
 
 /**
- *  patchAtLocation returns the patch which contains the point.
+ *  getPatchAtLocation returns the patch which contains the point.
  *
  */
-slPatch* slPatchGrid::slPatchGrid::patchAtLocation(slVector *location) {
+slPatch* slPatchGrid::slPatchGrid::getPatchAtLocation(slVector *location) {
 	int x, y, z;
 	
 	x = (int)((location->x - startPosition.x) / patchSize.x);
@@ -234,7 +234,7 @@ slPatch* slPatchGrid::slPatchGrid::patchAtLocation(slVector *location) {
 /**
  *	\brief Copies the contents of a 3D matrix to one z-slice of a PatchGrid.
  */
-void slPatchGrid::slPatchGridCopyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double scale) {
+void slPatchGrid::copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double scale) {
 	int x, y, z;
 	int xSize, ySize, zSize;
 	float* mData;
@@ -510,14 +510,16 @@ void slPatchGridFree(slPatchGrid *g) {
 }
 
 
-slPatch *slPatchGrid::patchAtIndex(int x, int y, int z) {
+slPatch* slPatchGrid::getPatchAtIndex(int x, int y, int z)
+{
 	if(x < 0 || x >= xSize) return NULL;
 	if(y < 0 || y >= ySize) return NULL;
 	if(z < 0 || z >= zSize) return NULL;
 	return &patches[z][x][y];
 }
 
-void slPatchGrid::slPatchSetDataAtIndex(int x, int y, int z, void *data) {
+void slPatchGrid::setDataAtIndex(int x, int y, int z, void *data)
+{
 	if(x < 0 || x >= this->xSize) return;
 	if(y < 0 || y >= this->ySize) return;
 	if(z < 0 || z >= this->zSize) return;

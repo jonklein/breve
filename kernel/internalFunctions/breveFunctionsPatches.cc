@@ -72,7 +72,7 @@ int brIPatchGridSetSmoothDrawing(brEval args[], brEval *target, brInstance *i) {
 /*!
 	\brief Returns the patch at the given (x, y, z) indices.
 
-	slPatch pointer patchAtIndex(slPatchGrid pointer).
+	slPatch pointer getPatchAtIndex(slPatchGrid pointer).
 */
 
 int brIPatchAtIndex(brEval args[], brEval *target, brInstance *i) {
@@ -83,7 +83,7 @@ int brIPatchAtIndex(brEval args[], brEval *target, brInstance *i) {
 		return EC_OK;
 	}
 
-	BRPOINTER(target) = grid->patchAtIndex(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]));
+	BRPOINTER(target) = grid->getPatchAtIndex(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]));
 
 	return EC_OK;
 }
@@ -103,9 +103,9 @@ int brIObjectAtLocation(brEval args[], brEval *target, brInstance *i) {
 		return EC_OK;
 	}
 
-	patch = grid->patchAtLocation(&BRVECTOR(&args[1]));
+	patch = grid->getPatchAtLocation(&BRVECTOR(&args[1]));
 
-	if (patch) BRINSTANCE(target) = patch->slPatchGetData();
+	if (patch) BRINSTANCE(target) = static_cast<brInstance*>(patch->getData());
 	else BRINSTANCE(target) = NULL;
 
 	return EC_OK;
@@ -126,9 +126,9 @@ int brIObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 		return EC_OK;
 	}
 	
-	patch = grid->patchAtIndex(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]));
+	patch = grid->getPatchAtIndex(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]));
 
-	if(patch) BRINSTANCE(target) = patch->slPatchGetData();
+	if(patch) BRINSTANCE(target) = static_cast<brInstance*>(patch->getData());
 	else BRINSTANCE(target) = NULL;
 
 	return EC_OK;
@@ -141,7 +141,7 @@ int brIObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 int brIPatchGridCopyColorFrom3DMatrix(brEval args[], brEval *target, brInstance *i) {
 	slPatchGrid *g = BRPATCHGRIDPOINTER(&args[0]);
 
-	g->slPatchGridCopyColorFrom3DMatrix((slBigMatrix3DGSL*)BRPOINTER(&args[1]), BRINT(&args[2]), BRDOUBLE(&args[3]));
+	g->copyColorFrom3DMatrix((slBigMatrix3DGSL*)BRPOINTER(&args[1]), BRINT(&args[2]), BRDOUBLE(&args[3]));
 
 	return EC_OK;
 }
@@ -161,7 +161,7 @@ int brISetObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 		return EC_OK;
 	}
 
-	grid->slPatchSetDataAtIndex(BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]), BRINSTANCE(&args[1]));
+	grid->setDataAtIndex(BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]), BRINSTANCE(&args[1]));
 
 	return EC_OK;
 }
@@ -173,7 +173,7 @@ int brISetObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetPatchColor(brEval args[], brEval *target, brInstance *i) {
-	BRPATCHPOINTER(&args[0])->slPatchSetColor(&BRVECTOR(&args[1]));
+	BRPATCHPOINTER(&args[0])->setColor(&BRVECTOR(&args[1]));
 
 	return EC_OK;
 }
@@ -185,7 +185,7 @@ int brISetPatchColor(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetPatchLocation(brEval args[], brEval *target, brInstance *i) {
-	BRPATCHPOINTER(&args[0])->slPatchGetLocation(&BRVECTOR(target));
+	BRPATCHPOINTER(&args[0])->getLocation(&BRVECTOR(target));
 
 	return EC_OK;
 }
@@ -197,7 +197,7 @@ int brIGetPatchLocation(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetPatchTransparency(brEval args[], brEval *target, brInstance *i) {
-	BRPATCHPOINTER(&args[0])->slPatchSetTransparency(BRDOUBLE(&args[1]));
+	BRPATCHPOINTER(&args[0])->setTransparency(BRDOUBLE(&args[1]));
 
 	return EC_OK;
 }
@@ -210,7 +210,7 @@ void breveInitPatchFunctions(brNamespace *n) {
     brNewBreveCall(n, "setPatchObjectAtIndex", brISetObjectAtIndex, AT_NULL, AT_POINTER, AT_INSTANCE, AT_INT, AT_INT, AT_INT, 0);
     brNewBreveCall(n, "patchObjectAtIndex", brIObjectAtIndex, AT_INSTANCE, AT_POINTER, AT_INT, AT_INT, AT_INT, 0);
     brNewBreveCall(n, "objectAtLocation", brIObjectAtLocation, AT_INSTANCE, AT_POINTER, AT_VECTOR, 0);
-    brNewBreveCall(n, "patchAtIndex", brIPatchAtIndex, AT_POINTER, AT_POINTER, AT_INT, AT_INT, AT_INT, 0);
+    brNewBreveCall(n, "getPatchAtIndex", brIPatchAtIndex, AT_POINTER, AT_POINTER, AT_INT, AT_INT, AT_INT, 0);
     brNewBreveCall(n, "setPatchColor", brISetPatchColor, AT_NULL, AT_POINTER, AT_VECTOR, 0);
     brNewBreveCall(n, "setPatchTransparency", brISetPatchTransparency, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
     brNewBreveCall(n, "patchGridCopyColorFrom3DMatrix", brIPatchGridCopyColorFrom3DMatrix, AT_NULL, AT_POINTER, AT_POINTER, AT_INT, AT_DOUBLE, 0);

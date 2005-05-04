@@ -269,9 +269,11 @@ void slRemoveObject(slWorld *w, slWorldObject *p) {
 /**
  *  \brief Adds a patch grid to the world
  */
-slPatchGrid *slPatchGridAdd(slWorld *w, slVector *center, slVector *patchSize, int x, int y, int z) {
-	slPatchGrid *g = &(slPatchGrid(center, patchSize, x, y, z));
+slPatchGrid *slPatchGridAdd(slWorld *w, slVector *center, slVector *patchSize, int x, int y, int z)
+{
 
+	slPatchGrid *g = new slPatchGrid(center, patchSize, x, y, z);
+    
 	w->patches.push_back(g);
 
 	return g;
