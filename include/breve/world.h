@@ -186,6 +186,7 @@ void slWorldAddCamera(slWorld *, slCamera *);
 void slWorldRemoveCamera(slWorld *, slCamera *);
 
 slPatchGrid *slPatchGridAdd(slWorld *, slVector *, slVector *, int, int, int);
+void slPatchGridRemove(slWorld *w, slPatchGrid *g);
 
 void slWorldFree(slWorld *);
 void slWorldFreeObject(slWorldObject *);

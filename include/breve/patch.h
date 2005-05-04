@@ -153,15 +153,20 @@ class slPatchGrid {
 typedef struct slPatchGrid slPatchGrid;
 typedef struct slPatch slPatch;
 
-//???
-/*
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+void slPatchGridFree();
+
+#ifdef __cplusplus
+}
+#endif
+//???
+/*
+
 slPatchGrid& slPatchGrid(slVector *center, slVector *size, int x, int y, int z);
 
-void slPatchGridFree();
 void slInitPatch(slPatch *p);
 
 void slPatchSetData(slPatch *p, void *data);
@@ -180,7 +185,4 @@ void slPatchSetDataAtIndex(slPatchGrid *grid, int x, int y, int z, void *data);
 void slPatchGridCopyColorFrom3DMatrix(slPatchGrid *grid, slBigMatrix3DGSL *m, int channel, double scale);
 void slPatchGridCopyColorFrom2DMatrix(slPatchGrid *grid, slBigMatrix2DGSL *m, int slice, int channel, double scale);
 
-#ifdef __cplusplus
-}
-#endif
 */

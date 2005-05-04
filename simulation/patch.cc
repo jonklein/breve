@@ -75,7 +75,7 @@ void slPatch::setColor(slVector *color) {
 	else if(color->x < 0.0) color->x = 0.0;
 
 	if (color->z > 1.0) color->z = 1.0;
-	else if(color->x < 0.0) color->x = 0.0;
+	else if(color->z < 0.0) color->z = 0.0;
 
 	grid->colors[this->colorOffset    ] = (unsigned char)(255 * color->x);
 	grid->colors[this->colorOffset + 1] = (unsigned char)(255 * color->y);
@@ -182,7 +182,7 @@ slPatchGrid::slPatchGrid(const slVector *center, const slVector *patchSize, cons
 				this->patches[c][b][a].location.z = this->startPosition.z + c * patchSize->z;
 				this->patches[c][b][a].location.x = this->startPosition.x + b * patchSize->x;
 				this->patches[c][b][a].location.y = this->startPosition.y + a * patchSize->y;
-				this->patches[c][b][a].colorOffset = (c * this->textureZ * this->textureX * 4) + (b * this->textureX * 4) + (a * 4);
+				this->patches[c][b][a].colorOffset = (c * this->textureX * this->textureY * 4) + (b * this->textureX * 4) + (a * 4);
 			}
 		}
 	}

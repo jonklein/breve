@@ -282,7 +282,9 @@ slPatchGrid *slPatchGridAdd(slWorld *w, slVector *center, slVector *patchSize, i
 /**
  *  \brief Removes a patch grid from the world
  */
-void slPatchGridRemove(slWorld *w, slPatchGrid *g) {
+void slPatchGridRemove(slWorld *w, slPatchGrid *g)
+{
+
 	std::vector<slPatchGrid*>::iterator pi;
 
 	pi = std::find(w->patches.begin(), w->patches.end(), g);

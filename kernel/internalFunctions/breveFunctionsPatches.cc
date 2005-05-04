@@ -53,7 +53,8 @@ int brIPatchGridNew(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIPatchGridFree(brEval args[], brEval *target, brInstance *i) {
-	 delete (BRPATCHGRIDPOINTER(&args[0]));
+
+	  slPatchGridRemove(i->engine->world, BRPATCHGRIDPOINTER(&args[0]));
 
 	return EC_OK;
 }
