@@ -60,7 +60,7 @@ Control : PatchGridTestControl {
         (all Patches) set-transparency to 0.2.
         
         
-        self schedule method-call "rotate-patch-grid" at-time ((self get-time) + 30).
+        (self schedule method-call "rotate-patch-grid" at-time ((self get-time) + (30 / (self get-iteration-step)))).
                 
     + to iterate:
         obj (object).

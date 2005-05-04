@@ -248,8 +248,8 @@ void slPatchGrid::copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double
 	zSize = m->zDim();
 
 	for(z = 0; z < zSize; z++ ) {
-		for(y = 0; y < xSize; x++ ) {
-			for(x = 0; x < ySize; y++ ) {
+		for(x = 0; x < xSize; x++ ) {
+			for(y = 0; y < ySize; y++ ) {
 				unsigned int crowOffset = (z * this->textureX * this->textureY * 4) + (x * this->textureX * 4);
 
 				this->colors[crowOffset + (y << 2) + channel] = 
