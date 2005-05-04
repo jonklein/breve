@@ -130,8 +130,8 @@ Abstract : PatchGrid [version 2.2] {
         return self.
 
     + to destroy:
-#        freePatchGrid(gridPointer).
-#        free(patches).
+        free patches.
+        freePatchGrid(gridPointer).
         
     + to enable-smooth-drawing:
         % Enables smooth drawing for this PatchGrid.  When smooth drawing is 

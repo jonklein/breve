@@ -227,7 +227,7 @@ slPatch* slPatchGrid::slPatchGrid::getPatchAtLocation(slVector *location) {
 	if(y < 0 || y >= ySize) return NULL;
 	if(z < 0 || z >= zSize) return NULL;
 
-	return &patches[z][y][x];
+	return &patches[z][x][y];
 }
 
 /**
