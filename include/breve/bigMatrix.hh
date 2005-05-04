@@ -128,7 +128,7 @@ class slVectorView {
          *  vector of odd dimensionality.  This convolution is zero
          *  padded at the boundaries.
          */
-        virtual slVectorView& convolve(const slVectorView&) = 0;
+        //virtual slVectorView& convolve(const slVectorView&) = 0;
 
         /**
          *  Convolve with general kernel (odd dimension).
@@ -137,7 +137,7 @@ class slVectorView {
          *  vector of odd dimensionality.  This convolution is periodic
          *  at the boundaries.
          */
-        virtual slVectorView& convolvePeriodic(const slVectorView&) = 0;
+        //virtual slVectorView& convolvePeriodic(const slVectorView&) = 0;
 
         /**
          *  Convolve with general kernel (odd dimension).
@@ -146,7 +146,7 @@ class slVectorView {
          *  vector of odd dimensionality.  This convolution is implemented
          *  by converting the vector to the frequency domain using a DFT.
          */
-        virtual slVectorView& convolveFFT(const slVectorView&) = 0;
+        //virtual slVectorView& convolveFFT(const slVectorView&) = 0;
 
         /**
          *  Matrix in-place addition operator (must have common dimensions).
@@ -356,17 +356,17 @@ class slVectorViewGSL : public slVectorView {
         /**
          *  Convolve with general kernel (odd dimension).
          */
-        slVectorViewGSL& convolve(const slVectorView&);
+        // slVectorViewGSL& convolve(const slVectorView&);
 
         /**
          *  Convolve periodic with general kernel (odd dimension).
         */
-        slVectorViewGSL& convolvePeriodic(const slVectorView&);
+        // slVectorViewGSL& convolvePeriodic(const slVectorView&);
 
         /**
          *  Convolve with general kernel via DFT (odd dimension).
          */
-        slVectorViewGSL& convolveFFT(const slVectorView&);
+        // slVectorViewGSL& convolveFFT(const slVectorView&);
 
         /**
          *  Convolve with 3x3 kernel (odd dimension).

@@ -172,22 +172,22 @@ slVectorViewGSL& slVectorViewGSL::scaleAndAdd(const float scalar,
 /**
  *  Convolve with general kernel (odd dimension).
  */
-slVectorViewGSL& slVectorViewGSL::convolve(const slVectorView& v) { }
+// slVectorViewGSL& slVectorViewGSL::convolve(const slVectorView& v) { }
 
 /**
  *  Convolve periodic with general kernel (odd dimension).
 */
-slVectorViewGSL& slVectorViewGSL::convolvePeriodic(const slVectorView& v) { }
+// slVectorViewGSL& slVectorViewGSL::convolvePeriodic(const slVectorView& v) { }
 
 /**
  *  Convolve with general kernel via DFT (odd dimension).
  */
-slVectorViewGSL& slVectorViewGSL::convolveFFT(const slVectorView& v) { }
+// slVectorViewGSL& slVectorViewGSL::convolveFFT(const slVectorView& v) { }
 
 /**
  *  Convolve with 3x3 kernel (odd dimension).
  */
-slVectorViewGSL& slVectorViewGSL::convolve3x3(const slVectorView& v) { }
+// slVectorViewGSL& slVectorViewGSL::convolve3x3(const slVectorView& v) { }
 
 /**
  *  Addition operator (must have common dimensions).
