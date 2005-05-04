@@ -1,4 +1,4 @@
-DOCBOOKDIR	= /sw/share/sgml/dsssl/docbook-dsssl-nwalsh/bin
+DOCBOOKDIR	= /sw/bin
 
 .PHONY: classes docbook documentation source spell tidy
 
@@ -24,7 +24,7 @@ docbook: classes
 		$(DOCBOOKDIR)/collateindex.pl -g HTML.index > index.docbook
 	cd docBuild/docbook; \
 		openjade -t sgml -d breve.dsl breve.docbook
-	mv docBuild/docbook/index.html docBuild/docbook/docs docs/
+	cp -R docBuild/docbook/index.html docBuild/docbook/docs docs/
 	mkdir docs/docs/images
 	cp docBuild/docbook/images/*.jpg docs/docs/images/
 	cp docBuild/docbook/images/*.gif docs/docs/images/
