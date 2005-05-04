@@ -90,6 +90,9 @@ Abstract : Patch (aka Patches) [version 2.2] {
         % Returns the z index of the patch.
 
         return zIndex.
+        
+    + to get-index-vector:
+        return (xIndex, yIndex, zIndex).
 
     + section "Methods to Initialize Patches"
 
@@ -334,7 +337,7 @@ Abstract : Patch (aka Patches) [version 2.2] {
 
     - to get-concentration of theDiffusable (object):
         % returns the concentration of a OBJECT(PatchChecmical) in this patch.
-        grid get-concentration of theDiffusable at-x xIndex at-y yIndex at-z zIndex.
+        return (grid get-concentration of theDiffusable at-x xIndex at-y yIndex at-z zIndex).
         
     - to set-concentration of theDiffusable (object) to theValue (float):
         % returns the concentration of a OBJECT(PatchChecmical) in this patch.

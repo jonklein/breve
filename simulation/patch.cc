@@ -23,8 +23,7 @@
 
 /* ********
  *  TODO: 
- *      change to row-major
- *      to c++
+ *
  */
 
 

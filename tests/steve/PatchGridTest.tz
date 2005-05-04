@@ -3,7 +3,7 @@
 @use PatchToroid.
 @use PatchChemical.
 
-@define SIZE 20.
+@define SIZE 12.
 @define DIFFUSION_RATE .09.
 @define DECAY_RATE 0.0.
 @define EXP_INFLOW 0.
@@ -18,12 +18,25 @@ Control : PatchGridTestControl {
         grid (object).
         expChem (object).
         linChem (object).
-
+        index (int).
         
     + to init:
-        obj (object).
-
         self set-iteration-step to 1.0.
+        self add-menu named "Increase Diffusion" for-method "increase-diffusion".
+        self add-menu named "Decrease Diffusion" for-method "decrease-diffusion".
+        self add-menu named "Increment Diffusion" for-method "increment-diffusion".        
+
+        self point-camera at (0, 0, 0) from (-40, 16, 40).
+        self set-background-color to (1, 1, 1).
+
+        self rotate-patch-grid.
+        
+    + to rotate-patch-grid:
+        obj (object).
+        
+        if expChem: free(expChem).
+        if linChem: free(linChem).
+        if grid: { free(grid). free((all Patches)). }
 
         grid = ((new PatchGrid) init-with x-count SIZE
                           y-count SIZE
@@ -44,13 +57,10 @@ Control : PatchGridTestControl {
         grid display-concentration-in-blue of-patch-chemical expChem.
         grid display-concentration-in-red of-patch-chemical linChem.
 
-        self add-menu named "Increase Diffusion" for-method "increase-diffusion".
-        self add-menu named "Decrease Diffusion" for-method "decrease-diffusion".
-        self add-menu named "Increment Diffusion" for-method "increment-diffusion".        
-
-        self point-camera at (0, 0, 0) from (-40, 16, 40).
-        self set-background-color to (1, 1, 1).
-        all Patches set-transparency to 0.2.
+        (all Patches) set-transparency to 0.2.
+        
+        
+        self schedule method-call "rotate-patch-grid" at-time ((self get-time) + 30).
                 
     + to iterate:
         obj (object).
@@ -92,5 +102,7 @@ Control : PatchGridTestControl {
             
         }
 
-        
+
+    + to do-foo3 :
+        return 0.        
 }

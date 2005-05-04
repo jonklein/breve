@@ -121,8 +121,8 @@ class slPatchGrid {
 		void textureDrawYPass(slVector &size, int dir);
 		void textureDrawZPass(slVector &size, int dir);
 
-		slPatch *getPatchAtIndex(int x, int y, int z);
-		slPatch *getPatchAtLocation(slVector *location);
+		slPatch* getPatchAtIndex(int x, int y, int z);
+		slPatch* getPatchAtLocation(slVector *location);
 		void setDataAtIndex(int x, int y, int z, void *data);
 		void copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double scale);
 

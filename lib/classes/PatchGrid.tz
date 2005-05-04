@@ -72,7 +72,7 @@ Abstract : PatchGrid [version 2.2] {
         location = gridCenter.
 
         gridPointer = newPatchGrid(gridCenter, patchSize, x, y, z).
-
+        
         xCount = 0.
         yCount = 0.
         zCount = 0.
@@ -91,7 +91,7 @@ Abstract : PatchGrid [version 2.2] {
 
                     setPatchObjectAtIndex(gridPointer, patch, xCount, yCount, zCount).
 
-                    patch set-patch-pointer to patchAtIndex(gridPointer, xCount, yCount, zCount).
+                    patch set-patch-pointer to getPatchAtIndex(gridPointer, xCount, yCount, zCount).
                     self add-dependency on patch.
 
                     zCount += 1.
@@ -129,6 +129,10 @@ Abstract : PatchGrid [version 2.2] {
         tempMatrix = matrix3DNew(x, y, z).
         return self.
 
+    + to destroy:
+#        freePatchGrid(gridPointer).
+#        free(patches).
+        
     + to enable-smooth-drawing:
         % Enables smooth drawing for this PatchGrid.  When smooth drawing is 
         % enabled, colors are blended smoothly between patches.  Smooth drawing
@@ -149,6 +153,10 @@ Abstract : PatchGrid [version 2.2] {
         % See METHOD(enable-smooth-drawing) for details on smooth drawing.
 
         patchGridSetSmoothDrawing(gridPointer, 0).
+
+	+ to get-location:
+		% returns the center of the grid.
+		return location.
 
     + to get-x-count:
         % If the grid is initialized, returns the size of the grid on the X-axis.
@@ -380,7 +388,7 @@ Abstract : PatchGrid [version 2.2] {
             for y=0,y<ySize,y++: {
                 for z=0,z<zSize,z++: {
                     setPatchObjectAtIndex(gridPointer, patches{index}, x, y, z).
-                    patches{index} set-patch-pointer to patchAtIndex(gridPointer, x, y, z).
+                    patches{index} set-patch-pointer to getPatchAtIndex(gridPointer, x, y, z).
                     patches{index} update-colors.
                     index++.
                 }
