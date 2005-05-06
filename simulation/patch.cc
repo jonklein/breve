@@ -182,7 +182,7 @@ slPatchGrid::slPatchGrid(const slVector *center, const slVector *patchSize, cons
 				this->patches[c][b][a].location.z = this->startPosition.z + c * patchSize->z;
 				this->patches[c][b][a].location.x = this->startPosition.x + b * patchSize->x;
 				this->patches[c][b][a].location.y = this->startPosition.y + a * patchSize->y;
-				this->patches[c][b][a].colorOffset = (c * this->textureX * this->textureY * 4) + (b * this->textureX * 4) + (a * 4);
+				this->patches[c][b][a].colorOffset = (c * this->textureX * this->textureY * 4) + (a * this->textureY * 4) + (b * 4);
 			}
 		}
 	}
@@ -247,15 +247,16 @@ void slPatchGrid::copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double
 	ySize = m->yDim();
 	zSize = m->zDim();
 
-	for(z = 0; z < zSize; z++ ) {
-		for(x = 0; x < xSize; x++ ) {
-			for(y = 0; y < ySize; y++ ) {
-				unsigned int crowOffset = (z * this->textureX * this->textureY * 4) + (x * this->textureX * 4);
-
-				this->colors[crowOffset + (y << 2) + channel] = 
+	for(z = 0; z < zSize; z++ )
+	{
+		for(x = 0; x < xSize; x++ )
+		{
+			// unsigned int crowOffset = ;
+			for(y = 0; y < ySize; y++ )
+			{
+				this->colors[(z * this->textureX * this->textureY * 4) + (y * this->textureY * 4) + (x << 2) + channel] = 
 					(unsigned char)(255 * scale * mData[ (z * chemXY) + (x * chemTDA) + y ]);
-
-			}
+            }
 		}
 	}
 }
@@ -301,7 +302,7 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 
 		translation.z = startPosition.z + patchSize.z * zVal;
 
-		for(x=0;x<xSize;x++) {
+		for(x=(xSize - 1);x >= 0;x--) {
 			if(x < xMid) xVal = x;
 			else xVal = (xSize - 1) - (x - xMid);
 
@@ -502,12 +503,6 @@ void slPatchGrid::textureDrawZPass(slVector &size, int dir) {
 		glVertex3f(startPosition.x, startPosition.y + size.y, zp);
 	}
 }
-
-// ????
-void slPatchGridFree(slPatchGrid *g) {
-	delete g;
-}
-
 
 slPatch* slPatchGrid::getPatchAtIndex(int x, int y, int z)
 {
