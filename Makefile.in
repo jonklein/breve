@@ -9,13 +9,14 @@ YACC	= @YACC@
 
 @SET_MAKE@
 
+CFLAGS		= @CFLAGS@
 CPPFLAGS	= @CPPFLAGS@ -Iinclude/breve @DEFS@
 LDFLAGS		= @LDFLAGS@
 
 EXTRACFLAGS	= -g
 OPTFLAGS	= -O3 @EXTRAOPTFLAGS@
 
-CXXFLAGS	= $(EXTRACFLAGS) -pipe -Wall -fpermissive
+CXXFLAGS	= $(EXTRACFLAGS) @CXXFLAGS@ -pipe -Wall -fpermissive
 YFLAGS		= -d
 
 PLATFORM	= @PLATFORM@
@@ -111,6 +112,11 @@ OSX_build: optimize lib/libbreve.a
 	-mkdir docs
 	cd plugins; $(MAKE)
 	cd OSX; xcodebuild -buildstyle Deployment CC= LIBS='@LDFLAGS@ @LIBS@'
+
+OSX_debug: optimize_debug lib/libbreve.a
+	-mkdir docs
+	cd plugins; $(MAKE)
+	cd OSX; xcodebuild -buildstyle Deployment CC= LIBS='-L/sw/lib -L/opt/local/lib -L/usr/local/incldue -lpush -lode -framework JavaVM -lavformat -lavcodec -lgsl -lreadline -lhistory -lncurses -ltermcap -lsndfile -ljpeg -lpng -lexpat -lz  -lm -framework OpenGL -framework GLUT -framework AppKit -framework vecLib -framework CoreAudio -framework AudioToolbox '
 
 OSX_clean: clean
 	rm -f $(DMG_FILE)
