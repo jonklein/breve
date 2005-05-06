@@ -45,6 +45,8 @@ typedef slBigMatrix2DGSL brMatrix2D;
 typedef slBigMatrix3DGSL brMatrix3D;
 #endif
 
+// #define BOUNDS_CHECK
+
 #include "breveFunctionsImage.h"
 
 int brIMatrix2DNew(brEval args[], brEval *target, brInstance *i) {
@@ -149,12 +151,12 @@ int brIMatrix2DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 
 			if (xm < 0)
 				xm += xDim;
-			else if (xp >= (int)xDim)
+			else if (xp >= static_cast<int>(xDim))
 				xp -= xDim;
 
 			if (ym < 0)
 				ym += yDim;
-			else if (yp >= (int)yDim)
+			else if (yp >= static_cast<int>(yDim))
 				yp -= yDim;
 
 			newVal = scale * ((-4.0f * chemData[x * chemTDA + y]) +
@@ -182,20 +184,20 @@ int brIMatrix2DDiffuse(brEval args[], brEval *target, brInstance *i) {
     // this will get moved to a seperate util class later
     // and will be converted to iterators when we migrate to gslmm based code
     
-	for(x=0; x < (unsigned int)xDim; x++) {
-	    for(y=0; y < (unsigned int)yDim; y++) {
+	for(x=0; x < static_cast<int>(xDim); x++) {
+	    for(y=0; y < static_cast<int>(yDim); y++) {
             float dym, dyp, dxm, dxp;
 
 			if(x - 1 >= 0) dxm = chemData[ chemTDA * (x - 1) + y ];
 			else dxm = 0.0;
 
-			if(x + 1 < xDim) dxp = chemData[ chemTDA * (x + 1) + y ];
+			if(x + 1 < static_cast<int>(xDim)) dxp = chemData[ chemTDA * (x + 1) + y ];
 			else dxp = 0.0;
 
 			if(y - 1 >= 0) dym = chemData[ chemTDA * x + (y - 1) ];
 			else dym = 0.0;
 
-			if(y + 1 < yDim) dyp = chemData[ chemTDA * x + (y + 1) ];
+			if(y + 1 < static_cast<int>(yDim)) dyp = chemData[ chemTDA * x + (y + 1) ];
 			else dyp = 0.0;
 
             diffData[diffTDA * x + y] = 
@@ -264,6 +266,16 @@ int brIMatrix3DFree(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrix3DGet(brEval args[], brEval *target, brInstance *i) {
+#ifdef BOUNDS_CHECK
+	brMatrix3D *m = BRBIGMATRIX3D(&args[0]);
+	if ((BRINT(&args[1]) > static_cast<int>(m->xDim())) || (BRINT(&args[2]) > static_cast<int>(m->yDim())) || (BRINT(&args[3]) > static_cast<int>(m->zDim())) ||
+	(BRINT(&args[1]) < 0) || (BRINT(&args[2]) < 0) || (BRINT(&args[3]) < 0)
+	)
+	{
+		slMessage(DEBUG_ALL, "Bounds error: brIMatrix3DGet index out of bounds.\n");
+		return EC_ERROR;
+	}
+#endif
 	BRDOUBLE(target) = double(BRBIGMATRIX3D(&args[0])->get(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3])));
 
 	return EC_OK;
@@ -349,7 +361,7 @@ int brIMatrix3DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 		zp = z + 1;
 
 		if (zm < 0) zm += zDim;
-		if (zp >= (int)zDim) zp -= zDim;
+		if (zp >= static_cast<int>(zDim)) zp -= zDim;
 
 		zmRow = zm * chemXY;
 		zpRow = zp * chemXY;
@@ -361,7 +373,7 @@ int brIMatrix3DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 			xm = x - 1;
     
 			if (xm < 0) xm += xDim;
-			if (xp >= (int)xDim) xp -= xDim;
+			if (xp >= static_cast<int>(xDim)) xp -= xDim;
 
 			xRow = x * chemTDA;
 			xpRow = xp * chemTDA;
@@ -372,7 +384,7 @@ int brIMatrix3DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 				ym = y - 1;
 
 				if (ym < 0) ym += yDim;
-				if (yp >= (int)yDim) yp -= yDim;
+				if (yp >= static_cast<int>(yDim)) yp -= yDim;
     
                 newVal = scale * (
                 (-6.0f * chemData[(zRow) + (xRow) + y]) +
@@ -410,27 +422,27 @@ int brIMatrix3DDiffuse(brEval args[], brEval *target, brInstance *i) {
     // this will may moved to a seperate util class later
     // and might be converted to iterators when we migrate to gslmm based code
         	
-    for (z = 0; z < zDim; z++)
-        for (y = 0; y < yDim; y++)
-            for (x = 0; x < xDim; x++) {
+    for (z = 0; z < static_cast<int>(zDim); z++)
+        for (y = 0; y < static_cast<int>(yDim); y++)
+            for (x = 0; x < static_cast<int>(xDim); x++) {
             float dxm, dxp, dym, dyp, dzm, dzp;
             
                 if(x - 1 >= 0) dxm = chemData[ (z * chemXY) + ((x - 1) * chemTDA) + y ];
                 else dxm = 0.0f;
     
-                if(x + 1 < xDim) dxp = chemData[ (z * chemXY) + ((x + 1) * chemTDA) + y ];
+                if(x + 1 < static_cast<int>(xDim)) dxp = chemData[ (z * chemXY) + ((x + 1) * chemTDA) + y ];
                 else dxp = 0.0f;
     
                 if(y - 1 >= 0) dym = chemData[ (z * chemXY) + (x * chemTDA) + (y - 1) ];
                 else dym = 0.0f;
-    
-                if(y + 1 < yDim) dyp = chemData[ (z * chemXY) + (x * chemTDA) + (y + 1) ];
+                
+                if(y + 1 < static_cast<int>(yDim)) dyp = chemData[ (z * chemXY) + (x * chemTDA) + (y + 1) ];
                 else dyp = 0.0f;
 
                 if(z - 1 >= 0) dzm = chemData[ ((z - 1) * chemXY) + (x * chemTDA) + y ];
                 else dzm = 0.0f;
     
-                if(z + 1 < zDim) dzp = chemData[ ((z + 1) * chemXY) + (x * chemTDA) + y ];
+                if(z + 1 < static_cast<int>(zDim)) dzp = chemData[ ((z + 1) * chemXY) + (x * chemTDA) + y ];
                 else dzp = 0.0f;
     
                 newVal = scale * (
