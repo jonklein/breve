@@ -21,6 +21,8 @@
 #ifndef _SHAPE_H
 #define _SHAPE_H
 
+#include "mesh.h"
+
 enum shapeTypes {
 	ST_NORMAL,
 	ST_SPHERE
@@ -180,17 +182,14 @@ class slFace : public slFeature {
 
 class slShape {
 	public:
-		int referenceCount;
-
 		slShape() {
-			drawList = 0;
+			_drawList = 0;
 			_type = ST_NORMAL;
-			density = 1.0;
-			referenceCount = 1;
+			_density = 1.0;
+			_referenceCount = 1;
 		}
 
-		virtual ~slShape() {
-		}
+		virtual ~slShape();
 
 		virtual void bounds(slPosition *position, slVector *min, slVector *max);
 		virtual int pointOnShape(slVector *dir, slVector *point);
@@ -205,17 +204,22 @@ class slShape {
 		virtual void setMass(double mass);
 		virtual void setDensity(double density);
 
-		int drawList;
+		double getMass();
+		double getDensity();
 
-		unsigned char recompile;
+		int _referenceCount;
 
-		double inertia[3][3];
-		double mass;
-		double density;
+		int _drawList;
+
+		unsigned char _recompile;
+
+		double _inertia[3][3];
+		double _mass;
+		double _density;
 
 		// the max reach on each axis 
 
-		slVector max;
+		slVector _max;
 
 		// add support for this shape to be a sphere, in which case the 
 		// normal features below are ignored 
@@ -231,12 +235,8 @@ class slShape {
 
 class slSphere : public slShape {
 	public:
-		slSphere(double radius) : slShape() {
-			_type = ST_SPHERE;
-			_radius = radius;
-		}
-
-		double _radius;
+		/*! \brief Creates a new sphere of a given radius and density.  */
+		slSphere(double radius, double density);
 
 		void xdraw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags);
 
@@ -250,6 +250,52 @@ class slSphere : public slShape {
 		slSerializedShapeHeader *serialize(int *length);
 
 		void drawShadowVolume(slCamera *camera, slPosition *position);
+
+		double _radius;
+};
+
+class slMeshShape : public slSphere {
+	public:
+		slMeshShape(char *filename, char *name) : slSphere(1, 1) {
+#ifdef HAVE_LIB3DS
+			_mesh = new slMesh(filename, name);
+
+			// get the new radius, and force the mass to update
+
+			_radius = _mesh->maxReach();
+			setDensity(1.0);
+#else 
+			throw 1;
+#endif
+		}
+
+#ifdef HAVE_LIB3DS
+		~slMeshShape() {
+			delete _mesh;
+		}
+	
+		void draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags) {
+    		glPushMatrix();
+		    glTranslated(pos->location.x, pos->location.y, pos->location.z);
+		    slMatrixGLMult(pos->rotation);
+
+			if(_drawList == 0 || _recompile) {
+				if( _drawList == 0) _drawList = glGenLists(1);
+				
+				glNewList(_drawList, GL_COMPILE);
+
+				_mesh->draw();
+	
+				glEndList();
+			}
+
+			glCallList(_drawList);
+
+			glPopMatrix();
+		}
+
+		slMesh *_mesh;
+#endif
 };
 #endif
 
@@ -268,7 +314,6 @@ typedef struct slSerializedFaceHeader slSerializedFaceHeader;
 #ifdef __cplusplus
 extern "C" {
 #endif
-slShape *slShapeNew(void);
 
 slShape *slNewCube(slVector *size, double density);
 slShape *slNewNGonDisc(int count, double radius, double height, double density);
@@ -308,9 +353,6 @@ void slScaleShape(slShape *s, slVector *scale);
 slSerializedShapeHeader *slSerializeShape(slShape *s, int *length);
 slShape *slDeserializeShape(slSerializedShapeHeader *header, int length);
 void slShapeBounds(slShape *shape, slPosition *position, slVector *min, slVector *max);
-
-double slShapeGetMass(slShape *shape);
-double slShapeGetDensity(slShape *shape);
 
 #ifdef __cplusplus
 }

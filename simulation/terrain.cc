@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "simulation.h"
+#include "roam.h"
 
 #if HAVE_LIBTIFF
 namespace tiff {
@@ -28,7 +29,9 @@ using namespace tiff;
 using namespace tiff;
 #endif
 
-/* based on tutorial and code from Paul E. Martz */
+/*
+	fractal terrain code based on tutorial and code from Paul E. Martz.
+*/
 
 /*
 	1 5 3 5 1
@@ -38,49 +41,54 @@ using namespace tiff;
 	1 5 3 5 1
 */
 
-slTerrain *slTerrainNew(int res, double xscale, void *data) {
+slTerrain::slTerrain(int res, double scale, void *data) : slWorldObject() {
 	slVector location;
-	slTerrain *l;
 	int n;
 
-	l = new slTerrain;
+	userData = data;
 
-	l->userData = data;
+	side = (int)pow(2, res) + 1;
 
-	l->side = (int)pow(2, res) + 1;
+	matrix = new float*[side];
 
-	l->matrix = new float*[l->side];
+	fnormals[0] = new slVector*[side - 1];
+	fnormals[1] = new slVector*[side - 1];
 
-	l->fnormals[0] = new slVector*[l->side - 1];
-	l->fnormals[1] = new slVector*[l->side - 1];
-
-	l->vnormals = new slVector*[l->side];
-
-	l->drawList = 0;
-
-	for(n=0;n<l->side - 1;n++) {
-		l->fnormals[0][n] = new slVector[l->side - 1];
-		l->fnormals[1][n] = new slVector[l->side - 1];
+	for(n=0;n<side - 1;n++) {
+		fnormals[0][n] = new slVector[side - 1];
+		fnormals[1][n] = new slVector[side - 1];
 	}
 
-	for(n=0;n<l->side;n++) {
-		l->vnormals[n] = new slVector[l->side];
-		l->matrix[n] = new float[l->side];
-		// bzero(l->matrix[n], sizeof(float) * l->side);
-		// printf("[%d] 0: %f\n", n, l->matrix[0][0]);
+	for(n=0;n<side;n++) {
+		matrix[n] = new float[side];
 	}
 
-	l->xscale = xscale;
+	_roam = new slRoamPatch(this);
+	_roam->setDetailLevel(10);
 
-	l->initialized = 0;
+	_drawMode = 1;
 
-	l->quadtree = new slTerrainQuadtree(0, 0, l->side - 1, l->side - 1, l);
+	_desiredPolygons = 5000;
+
+	xscale = scale;
+
+	textureScale = side;
+
+	_initialized = 0;
 
 	slVectorSet(&location, 0, 0, 0);
 
-	slTerrainSetLocation(l, &location);
+	setLocation(&location);
+}
 
-	return l;
+/*!
+	\brief Sets the draw mode of the terrain.
+
+	0 = wireframe, 1 = fill.
+*/
+
+void slTerrain::setDrawMode(int m) {
+	_drawMode = m;
 }
 
 /*!
@@ -88,210 +96,230 @@ slTerrain *slTerrainNew(int res, double xscale, void *data) {
 	The actual size will be the next power of two above side.
 */
 
-void slTerrain::resize(int side) {
-	side = slNextPowerOfTwo(side) + 1;
+void slTerrain::resize(int s) {
+	int n;
 
-	initialized = 0;
-}
+	for(n=0;n<side;n++) {
+		delete[] matrix[n];
 
-void slGenerateFractalTerrain(slTerrain *l, double h, double height) {
-	slFractalTerrainMatrix(l, h, height);
-	l->initialized = 0;
-}
-
-void slTerrainSetScale(slTerrain *l, double scale) {
-	double x;
-	slVector half, p;
-
-	x = l->side * l->xscale / 2;
-
-	slVectorSet(&half, x, 0, x);
-	slVectorAdd(&l->position.location, &half, &p);
-
-	l->xscale = scale;
-
-	slTerrainSetLocation(l, &p);
-
-	l->initialized = 0;
-}
-
-void slTerrainSetLocation(slTerrain *l, slVector *location) {
-	slVector half;
-	double x;
-
-	x = l->side * l->xscale / 2;
-
-	slVectorSet(&half, x, 0, x);
-	slVectorSub(location, &half, &l->position.location);
-
-	slTerrainInitialize(l);
-}
-
-void slTerrainInitialize(slTerrain *l) {
-	slTerrainMakeNormals(l);
-	slTerrainBoundingBox(l);
-
-	l->initialized = 1;
-	l->repeating = 0;
-
-	l->quadtree->update();
-}
-
-void slTerrainBoundingBox(slTerrain *l) {
-	int x, z;
-	double hmax = 0.0, hmin = 0.0;
-
-	for(x=0;x<l->side;x++) {
-		for(z=0;z<l->side;z++) {
-			if(l->matrix[x][z] > hmax) hmax = l->matrix[x][z];
-			if(l->matrix[x][z] < hmin) hmin = l->matrix[x][z];
+		if(n != side - 1) {
+			delete[] fnormals[0][n];
+			delete[] fnormals[1][n];
 		}
 	}
 
-	l->max.x = l->max.z = (l->side * l->xscale);
-	l->max.y = hmax;
+	delete[] fnormals[0];
+	delete[] fnormals[1];
+	delete[] matrix;
 
-	l->min.x = l->min.z = 0.0;
-	l->min.y = hmin;
+	delete _roam;
+	
+	side = slNextPowerOfTwo(s) + 1;
+	textureScale = side;
 
-	if(l->repeating) {
-		l->min.x = l->min.z = -DBL_MAX;
-		l->max.x = l->max.z = DBL_MAX;
+	matrix = new float*[side];
+	fnormals[0] = new slVector*[side - 1];
+	fnormals[1] = new slVector*[side - 1];
+
+	for(n=0;n<side;n++) {
+		matrix[n] = new float[side];
+
+		if ( n != side - 1) { 
+			fnormals[0][n] = new slVector[side - 1];
+			fnormals[1][n] = new slVector[side - 1];
+		}
 	}
 
-	slVectorAdd(&l->min, &l->position.location, &l->min);
-	slVectorAdd(&l->max, &l->position.location, &l->max);
+	_roam = new slRoamPatch(this);
+	_roam->setDetailLevel(14);
+
+	_initialized = 0;
 }
 
-void slFractalTerrainMatrix(slTerrain *l, double h, double height) {
+/*!
+	\brief Sets the x/z scale of the terrain.
+*/
+
+void slTerrain::setScale(double scale) {
+	double x;
+	slVector half, p;
+
+	x = side * xscale / 2;
+
+	slVectorSet(&half, x, 0, x);
+	slVectorAdd(&position.location, &half, &p);
+
+	xscale = scale;
+
+	setLocation(&p);
+
+	_initialized = 0;
+}
+
+/*!
+	\brief Sets the midpoint location of the terrain.
+*/
+
+void slTerrain::setLocation(slVector *location) {
+	slVector half;
+	double x;
+
+	x = side * xscale / 2;
+
+	slVectorSet(&half, x, 0, x);
+	slVectorSub(location, &half, &position.location);
+
+	initialize();
+}
+
+void slTerrain::initialize() {
+	makeNormals();
+	updateBoundingBox();
+
+	_initialized = 1;
+	_repeating = 0;
+}
+
+void slTerrain::updateBoundingBox() {
+	int x, z;
+	double hmax = 0.0, hmin = 0.0;
+
+	for(x=0;x<side;x++) {
+		for(z=0;z<side;z++) {
+			if(matrix[x][z] > hmax) hmax = matrix[x][z];
+			if(matrix[x][z] < hmin) hmin = matrix[x][z];
+		}
+	}
+
+	max.x = max.z = (side * xscale);
+	max.y = hmax;
+
+	min.x = min.z = 0.0;
+	min.y = hmin;
+
+	if(_repeating) {
+		min.x = min.z = -DBL_MAX;
+		max.x = max.z = DBL_MAX;
+	}
+
+	slVectorAdd(&min, &position.location, &min);
+	slVectorAdd(&max, &position.location, &max);
+}
+
+/*!
+	\brief Initializes this terrain with a fractal generated heightmap.
+*/
+
+void slTerrain::generateFractalTerrain(double h, double height) {
 	float ratio;
 	int x, y, jump;
 	int oddline;
 	float scale;
 
-	/* matrix should be square, and each side should be 2^n + 1 */
+	// matrix should be square, and each side should be 2^n + 1 
 
-	jump = l->side / 2;
+	side = slNextPowerOfTwo(side);
+	resize(side);
+
+	jump = side / 2;
 	ratio = pow(2.0, -h);
 
-	l->matrix[0][l->side - 1] = l->matrix[l->side - 1][0] = 0.0;
-	l->matrix[0][0] = l->matrix[l->side - 1][l->side - 1] = 0.0;
+	matrix[0][side - 1] = matrix[side - 1][0] = 0.0;
+	matrix[0][0] = matrix[side - 1][side - 1] = 0.0;
 
 	scale = 1.0;
 
 	while(jump) {
 		scale *= ratio;
 
-		for(x=jump;x<l->side - 1;x+=2*jump) {
-			for(y=jump;y<l->side - 1;y+=2*jump) {
-				l->matrix[x][y] = (l->matrix[x - jump][y - jump] + l->matrix[x + jump][y - jump] +
-					   l->matrix[x - jump][y + jump] + l->matrix[x + jump][y + jump]) / 4;
+		for(x=jump;x<side - 1;x+=2*jump) {
+			for(y=jump;y<side - 1;y+=2*jump) {
+				matrix[x][y] = (matrix[x - jump][y - jump] + matrix[x + jump][y - jump] +
+					   matrix[x - jump][y + jump] + matrix[x + jump][y + jump]) / 4;
 
-				l->matrix[x][y] += (slRandomDouble() -.5) * scale;
+				matrix[x][y] += (slRandomDouble() -.5) * scale;
 			}
 		}
 
 		oddline = 0;
 
-		for(x=0;x<l->side - 1;x+=jump) {
+		for(x=0;x<side - 1;x+=jump) {
 			oddline = !oddline;
 		  
 			if(oddline) y = jump;
 			else y = 0;
 
-			for(;y<l->side - 1;y+=2*jump) {
-				l->matrix[x][y] = slAverageDiamondValues(l, x, y, jump);
-				l->matrix[x][y] += (slRandomDouble() - .5) * scale;
+			for(;y<side - 1;y+=2*jump) {
+				matrix[x][y] = averageDiamondValues(x, y, jump);
+				matrix[x][y] += (slRandomDouble() - .5) * scale;
 
-				if(!x) l->matrix[l->side - 1][y] = l->matrix[x][y];
-				if(!y) l->matrix[x][l->side - 1] = l->matrix[x][y];
+				if(!x) matrix[side - 1][y] = matrix[x][y];
+				if(!y) matrix[x][side - 1] = matrix[x][y];
 			}
 		}
 
 		jump /= 2;
 	}
 
-	for(x=0;x<l->side;x++) 
-		for(y=0;y<l->side;y++) 
-			l->matrix[x][y] *= height;
+	for(x=0;x<side;x++) 
+		for(y=0;y<side;y++) 
+			matrix[x][y] *= height;
+
+	_initialized = 0;
 }
 
-void slTerrainMakeNormals(slTerrain *l) {
+/*
+	\brief Used internally to generate normals for the terrain faces.
+*/
+
+void slTerrain::makeNormals() {
 	slVector a, b, c, d;
-	slVector v1, v2, average;
+	slVector v1, v2;
 	slVector yAxis;
 	double max = 0;
 
 	int x, z;
 
-	l->heightMin = DBL_MAX;
+	heightMin = DBL_MAX;
 
 	slVectorSet(&yAxis, 0, 1, 0);
 
-	for(x=0;x<(l->side - 1);x++) {
-		for(z=0;z<(l->side - 1);z++) {
-			a.x = x * l->xscale;
-			a.y = l->matrix[x][z];
-			a.z = z * l->xscale;
+	for(x=0;x<(side - 1);x++) {
+		for(z=0;z<(side - 1);z++) {
+			a.x = x * xscale;
+			a.y = matrix[x][z];
+			a.z = z * xscale;
 
-			b.x = x * l->xscale;
-			b.y = l->matrix[x][z + 1];
-			b.z = (z + 1) * l->xscale;
+			b.x = x * xscale;
+			b.y = matrix[x][z + 1];
+			b.z = (z + 1) * xscale;
 
-			c.x = (x + 1) * l->xscale;
-			c.y = l->matrix[x + 1][z];
-			c.z = z * l->xscale;
+			c.x = (x + 1) * xscale;
+			c.y = matrix[x + 1][z];
+			c.z = z * xscale;
 
-			d.x = (x + 1) * l->xscale;
-			d.y = l->matrix[x + 1][z + 1];
-			d.z = (z + 1) * l->xscale;
+			d.x = (x + 1) * xscale;
+			d.y = matrix[x + 1][z + 1];
+			d.z = (z + 1) * xscale;
 
 			slVectorSub(&a, &b, &v1);
 			slVectorSub(&c, &b, &v2);
 
-			slVectorCross(&v2, &v1, &l->fnormals[0][x][z]);
-			slVectorNormalize(&l->fnormals[0][x][z]);
+			slVectorCross(&v2, &v1, &fnormals[0][x][z]);
+			slVectorNormalize(&fnormals[0][x][z]);
 
 			slVectorSub(&c, &b, &v1);
 			slVectorSub(&d, &b, &v2);
 
-			slVectorCross(&v2, &v1, &l->fnormals[1][x][z]);
-			slVectorNormalize(&l->fnormals[1][x][z]);
+			slVectorCross(&v2, &v1, &fnormals[1][x][z]);
+			slVectorNormalize(&fnormals[1][x][z]);
 
-			if(l->matrix[x][z] < l->heightMin) l->heightMin = l->matrix[x][z];
-			if(l->matrix[x][z] > max) max = l->matrix[x][z];
+			if(matrix[x][z] < heightMin) heightMin = matrix[x][z];
+			if(matrix[x][z] > max) max = matrix[x][z];
 		}
 	}
 
-	l->heightDelta = max - l->heightMin;
-
-	for(x=0;x<l->side;++x) {
-		for(z=0;z<l->side;++z) {
-			slVectorSet(&average, 0, 0, 0);
-
-			if(x < l->side - 1 && z < l->side - 1) {
-				slVectorAdd(&average, &l->fnormals[0][x][z], &average);
-			}
-		   
-			if(x > 0 && z < l->side - 1) {
-				slVectorAdd(&average, &l->fnormals[0][x-1][z], &average);
-				slVectorAdd(&average, &l->fnormals[1][x-1][z], &average);
-			}
-
-			if(x < l->side - 1 && z > 0) {
-				slVectorAdd(&average, &l->fnormals[0][x][z-1], &average);
-				slVectorAdd(&average, &l->fnormals[1][x][z-1], &average);
-			}
-
-			if(x > 0 && z > 0) {
-				slVectorAdd(&average, &l->fnormals[1][x-1][z-1], &average);
-			}
-
-			slVectorNormalize(&average);
-
-			slVectorCopy(&average, &l->vnormals[x][z]);
-		}
-	}
+	heightDelta = max - heightMin;
 }
 
 void slNormalForFace(slVector *a, slVector *b, slVector *c, slVector *n) {
@@ -304,26 +332,26 @@ void slNormalForFace(slVector *a, slVector *b, slVector *c, slVector *n) {
 	slVectorNormalize(n);
 }
 
-float slAverageDiamondValues(slTerrain *l, int x, int y, int jump) {
+float slTerrain::averageDiamondValues(int x, int y, int jump) {
 	// sideminus is the zero based array offset of side 
 
-	int sideminus = l->side - 1;
+	int sideminus = side - 1;
 
 	if(x == 0) {
-		return (l->matrix[x][y - jump] + l->matrix[x + jump][y] +
-				l->matrix[sideminus - jump][y] + l->matrix[x][y + jump]) / 4.0;
+		return (matrix[x][y - jump] + matrix[x + jump][y] +
+				matrix[sideminus - jump][y] + matrix[x][y + jump]) / 4.0;
 	} else if(y == 0) {
-		return (l->matrix[x][sideminus - jump] + l->matrix[x + jump][y] +
-				l->matrix[x - jump][y] + l->matrix[x][y + jump]) / 4.0;
+		return (matrix[x][sideminus - jump] + matrix[x + jump][y] +
+				matrix[x - jump][y] + matrix[x][y + jump]) / 4.0;
 	} else if(x == sideminus) {
-		return (l->matrix[x][y - jump] + l->matrix[jump][y] +
-				l->matrix[x - jump][y] + l->matrix[x][y + jump]) / 4.0;
+		return (matrix[x][y - jump] + matrix[jump][y] +
+				matrix[x - jump][y] + matrix[x][y + jump]) / 4.0;
 	} else if(y == sideminus) {
-		return (l->matrix[x][y - jump] + l->matrix[x + jump][y] +
-				l->matrix[x - jump][y] + l->matrix[x][jump]) / 4.0;
+		return (matrix[x][y - jump] + matrix[x + jump][y] +
+				matrix[x - jump][y] + matrix[x][jump]) / 4.0;
 	} else {
-		return (l->matrix[x][y - jump] + l->matrix[x + jump][y] +
-				l->matrix[x - jump][y] + l->matrix[x][y + jump]) / 4.0;
+		return (matrix[x][y - jump] + matrix[x + jump][y] +
+				matrix[x - jump][y] + matrix[x][y + jump]) / 4.0;
 	}
 }
 
@@ -336,178 +364,32 @@ slTerrain::~slTerrain() {
 	}
 
 	for(n=0; n < side;n++) {
-		delete[] vnormals[n];
 		delete[] matrix[n];
 	}
 
 	delete[] fnormals[0];
 	delete[] fnormals[1];
-	delete[] vnormals;
 	delete[] matrix;
 }
 
 void slTerrain::draw(slCamera *camera) {
-	if(!initialized) slTerrainInitialize(this);
+	if(!_initialized) initialize();
 
-	quadtree->cull(camera);
-
-	glShadeModel(GL_SMOOTH);
+	char text[256];
 
 	glPushAttrib(GL_ENABLE_BIT);
-	glDisable(GL_CULL_FACE);
-	quadtree->draw(camera);
+
+	_roam->tessellate(camera);
+
+	_polygonsDrawn = _roam->render( camera, _drawMode);
+
+	sprintf(text, "%d polygons, %f variance\n", _polygonsDrawn, _roam->_frameVariance);
+
+	camera->text[0].text = text;
+	camera->text[0].x = -.8;
+	camera->text[0].y = -.8;
+
 	glPopAttrib();
-}
-
-void slDrawTerrain(slTerrain *l, int texture, double textureScale, int drawMode, int flags) {
-	if(l->repeating) {
-		// int x, y;
-		// double size;
-		// int xoff, yoff;
-		// size = l->side * l->xscale;
-		//
-		// xoff = (int)(c->target.x/size);
-		// yoff = (int)(c->target.z/size);
-		//
-		// for(x=xoff-1;x<xoff+2;x++) {
-		//	for(y=yoff-1;y<yoff+2;y++) {
-		//		glPushMatrix();
-		//		glTranslatef(size * x, 0, size * y);
-		//		slDrawTerrainSide(l, texture, textureScale, drawMode, flags, 0);
-		//		glPopMatrix();
-		//	}
-		// }
-	} else {
-		slDrawTerrainSide(l, texture, textureScale, drawMode, flags, 0);
-	}
-}
-
-void slDrawTerrainSide(slTerrain *l, int texture, double textureScale, int drawMode, int flags, int bottom) {
-	int i, j;
-	slVector *norm, cdelta;
-
-	GLfloat ambientColor[4], diffuseColor[4], specularColor[4];
-
-	if(l->drawList && !(flags & DO_RECOMPILE)) {
-		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
-		glCallList(l->drawList);
-		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 0);
-		return;
-	}
-
-	if(!l->initialized) slTerrainInitialize(l);
-
-	ambientColor[0] = 0.1;
-	ambientColor[1] = 0.1;
-	ambientColor[2] = 0.1;
-	ambientColor[3] = 1.0;
-
-	diffuseColor[0] = 0.1;
-	diffuseColor[1] = 0.1;
-	diffuseColor[2] = 0.1; 
-	diffuseColor[3] = 1.0;
-
-	specularColor[0] = 0.0;
-	specularColor[1] = 0.0;
-	specularColor[2] = 0.0;
-	specularColor[3] = 1.0;
-
-	slVectorSub(&l->topColor, &l->bottomColor, &cdelta);
-
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
-
-	if(!l->drawList) l->drawList = glGenLists(1);
-
-	glNewList(l->drawList, GL_COMPILE);
-
-	glPushMatrix();
-
-	if(bottom) glTranslatef(l->position.location.x, l->position.location.y - 1, l->position.location.z);
-	else glTranslatef(l->position.location.x, l->position.location.y, l->position.location.z);
-
-	glDisable(GL_CULL_FACE);
-
-	glColor4f(0, 0, 0, 0.5);
-
-	glEnable(GL_COLOR_MATERIAL);
-
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuseColor);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specularColor);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambientColor);
-
-	if(texture) {
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, texture);
-	}
-
-#define DRAW_SKIP 1
-
-	for(i=0;i<l->side-1;i+=DRAW_SKIP) {
-		glBegin(GL_TRIANGLE_STRIP);
-		// glBegin(GL_LINE_STRIP);
-
-		for(j=0;j<l->side;j+=DRAW_SKIP) {
-			if(l->drawMode) ambientColor[0] = ambientColor[1] = ambientColor[2] = 0.0;
-			else {
-				ambientColor[0] = l->bottomColor.x;
-				ambientColor[1] = l->bottomColor.y;
-				ambientColor[2] = l->bottomColor.z;
-					
-				ambientColor[0] += (l->matrix[i+DRAW_SKIP][j] - l->heightMin) * cdelta.x / l->heightDelta;
-				ambientColor[1] += (l->matrix[i+DRAW_SKIP][j] - l->heightMin) * cdelta.y / l->heightDelta;
-				ambientColor[2] += (l->matrix[i+DRAW_SKIP][j] - l->heightMin) * cdelta.z / l->heightDelta;
-			}
-
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambientColor);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ambientColor);
-			glColor3f(ambientColor[0], ambientColor[1], ambientColor[2]);
-
-			norm = &l->vnormals[i+DRAW_SKIP][j];
-
-			if(bottom) glNormal3f(-norm->x, -norm->y, -norm->z);
-			else glNormal3f(norm->x, norm->y, norm->z);
-
-			if(texture) glTexCoord2f((i+DRAW_SKIP)/textureScale, j/textureScale); 
-
-			glVertex3f((i+DRAW_SKIP) * l->xscale, l->matrix[i+DRAW_SKIP][j], j * l->xscale);
-
-			if(l->drawMode) ambientColor[0] = ambientColor[1] = ambientColor[2] = 1.0;
-			else {
-				ambientColor[0] = l->bottomColor.x;
-				ambientColor[1] = l->bottomColor.y;
-				ambientColor[2] = l->bottomColor.z;
-					
-				ambientColor[0] += (l->matrix[i][j] - l->heightMin) * cdelta.x / l->heightDelta;
-				ambientColor[1] += (l->matrix[i][j] - l->heightMin) * cdelta.y / l->heightDelta;
-				ambientColor[2] += (l->matrix[i][j] - l->heightMin) * cdelta.z / l->heightDelta;
-			}
-
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambientColor);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ambientColor);
-			glColor3f(ambientColor[0], ambientColor[1], ambientColor[2]);
-
-			norm = &l->vnormals[i][j];
-
-			if(bottom) glNormal3f(-norm->x, -norm->y, -norm->z);
-			else glNormal3f(norm->x, norm->y, norm->z);
-
-			if(texture) glTexCoord2f(i/textureScale, j/textureScale); 
-
-			glVertex3f(i * l->xscale, l->matrix[i][j], j * l->xscale);
-		}
-
-		glEnd();
-	}
-
-	glDisable(GL_TEXTURE_2D);
-
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 0);
-
-	glPopMatrix();
-
-	glEnable(GL_CULL_FACE);
-
-	glEndList();
 }
 
 /*
@@ -644,13 +526,13 @@ int slTerrainTestPair(slVclipData *vc, int x, int y, slCollision *ce) {
 	if(w1->type != WO_TERRAIN) {
 		slShape *s = w1->shape;
 		terrain = (slTerrain*)w2;
-		if(!terrain->initialized) slTerrainInitialize(terrain);
+		if(!terrain->_initialized) terrain->initialize();
 		if(s->_type == ST_SPHERE) return slTerrainSphereClip(vc, terrain, x, y, ce, 0);
 		else return slTerrainShapeClip(vc, terrain, x, y, ce, 0);
 	} else {
 		slShape *s = w2->shape;
 		terrain = (slTerrain*)w1;
-		if(!terrain->initialized) slTerrainInitialize(terrain);
+		if(!terrain->_initialized) terrain->initialize();
 		if(s->_type == ST_SPHERE) return slTerrainSphereClip(vc, terrain, y, x, ce, 1);
 		else return slTerrainShapeClip(vc, terrain, y, x, ce, 1);
 	}
@@ -1159,7 +1041,7 @@ double slTerrainGetHeight(slTerrain *t, int x, int y) {
 void slTerrainSetHeight(slTerrain *t, int x, int y, double height) {
 	if(x < 0 || y < 0 || x >= t->side || y >= t->side) return;
 	t->matrix[x][y] = height;
-	t->initialized = 0;
+	t->_initialized = 0;
 }
 
 void slTerrainSetTopColor(slTerrain *t, slVector *color) {
@@ -1170,7 +1052,7 @@ void slTerrainSetBottomColor(slTerrain *t, slVector *color) {
 	slVectorCopy(color, &t->bottomColor);
 }
 
-int slTerrainLoadGeoTIFF(slTerrain *t, char *file) {
+int slTerrain::loadGeoTIFF(char *file) {
 #if HAVE_LIBTIFF
 	TIFF* tif;
 	float *row;
@@ -1185,45 +1067,47 @@ int slTerrainLoadGeoTIFF(slTerrain *t, char *file) {
 	TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &depth);
 	TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples);
 
-	printf("%d x %d x %d x %d\n", height, width, depth, samples);
+	printf("Loading GeoTIFF data (%d x %d) x %d x %d\n", height, width, depth, samples);
 
-	t->resize(width);
+	if(height < width) resize(height);
+	else resize(width);
 
 	row = new float[width];
 
-	if (width > t->side)
-		width = t->side;
+	if (width > side) width = side;
+	if (height > side) height = side;
 
-	if (height > t->side)
-		height = t->side;
+	for (y = 0; y < height; y++) {
+		TIFFReadScanline(tif, row, y, 0);
 
-	for (x = 0; x < height; ++x) {
-		TIFFReadScanline(tif, row, x, 0);
+		for (x = 0; x < width; x++) {
+			matrix[x][y] = row[x * samples];
 
-		for (y = 0; y < width; ++y) {
-			t->matrix[x][y] = (float)row[y];
-			// printf("t->matrix[%d][%d]  = %f\n", x, y, t->matrix[x][y] );
+			if(matrix[x][y] < 30) matrix[x][y] = 10;
 		}
 	}
 
 	delete row;
 	
-	slTerrainInitialize(t);
+	initialize();
 
 	TIFFClose(tif);
 
+	_roam->computeVariance();
 #endif
 	return 0;
 }
 
-double slTerrainGetHeightAtLocation(slTerrain *t, double x, double z) {
+double slTerrain::getHeightAtLocation(double x, double z) {
 	slVector point;
 	int xoff, zoff, quad;
 
 	point.x = x;
 	point.z = z;
 
-	slTerrainAreaUnderPoint(t, &point, &xoff, &zoff, &quad);
+	slTerrainAreaUnderPoint(this, &point, &xoff, &zoff, &quad);
 
-	return t->matrix[xoff][zoff];
-}
+	if(xoff < 0 || xoff >= side || zoff < 0 || zoff >= side) return 0.0;
+
+	return matrix[xoff][zoff] + position.location.y;
+} 

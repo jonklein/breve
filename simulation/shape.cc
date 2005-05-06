@@ -20,17 +20,13 @@
 
 #include "simulation.h"
 
-slShape *slShapeNew() {
-	return new slShape;
-}
-
 void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags) {
 	unsigned char bound, axis;
 
 	bound = (mode & DM_BOUND) && !(flags & DO_NO_BOUND);
 	axis = (mode & DM_AXIS) && !(flags & DO_NO_AXIS);
 
-	if(drawList == 0 || recompile || (flags & DO_RECOMPILE)) slCompileShape(this, c->drawMode, textureScale, flags);
+	if(_drawList == 0 || _recompile || (flags & DO_RECOMPILE)) slCompileShape(this, c->drawMode, textureScale, flags);
 
 	glPushMatrix();
 	glTranslated(pos->location.x, pos->location.y, pos->location.z);
@@ -43,7 +39,7 @@ void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, 
 		glScalef(.99, .99, .99);
 		glPolygonOffset(1, 2);
 		glEnable(GL_POLYGON_OFFSET_FILL);
-		glCallList(drawList);
+		glCallList(_drawList);
 		glPopMatrix();
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -57,7 +53,7 @@ void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, 
 			glColor4f(1, 1, 1, 0);
 			glDisable(GL_DEPTH_TEST);
 			glScalef(.96, .96, .96);
-			glCallList(drawList);
+			glCallList(_drawList);
 			glEnable(GL_DEPTH_TEST);
 		}
 
@@ -66,7 +62,7 @@ void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, 
 		// glBegin(GL_POINTS);
 		// glVertex3f(0, 0, 0);
 		// glEnd();
-		glCallList(drawList);
+		glCallList(_drawList);
 	}
 
 	if(bound || axis) {
@@ -75,7 +71,7 @@ void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glColor4f(0.0, 0.0, 0.0, 0.5);
 		glScalef(1.1, 1.1, 1.1);
-		if(axis) slDrawAxis(max.x, max.y);
+		if(axis) slDrawAxis(_max.x, _max.y);
 		if(bound) slRenderShape(this, GL_LINE_LOOP, 0, 0);
 		glPopAttrib();
 	}
@@ -83,28 +79,49 @@ void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, 
 	glPopMatrix();
 }
 
+/*!
+	\brief TO BE DEPRECATED Creates a sphere.
+
+	This method will be removed once a suitable handling system is in
+	place to allow for an error from the constructor.
+*/
+
 slShape *slSphereNew(double radius, double density) {
 	slSphere *s;
 
 	if(radius <= 0.0 || density <= 0.0) return NULL;
 
-	s = new slSphere(radius);
-	s->density = density;
-	s->mass = density * M_PI * radius * radius * radius * 4.0/3.0;
-
-	slVectorSet(&s->max, radius, radius, radius);
-
-	slSphereInertiaMatrix(radius, s->mass, s->inertia);
+	s = new slSphere(radius, density);
 
 	return s;
 }
+
+slSphere::slSphere(double radius, double density) : slShape() {
+	_type = ST_SPHERE;
+	_radius = radius;
+        
+	_density = density;
+            
+	slVectorSet(&_max, _radius, _radius, _radius);
+
+	_mass = _density * M_PI * _radius * _radius * _radius * 4.0/3.0;
+
+	slSphereInertiaMatrix(_radius, _mass, _inertia);
+}
+
+/*!
+	\brief TO BE DEPRECATED Creates a cube.
+
+	This method will be removed once a suitable handling system is in
+	place to allow for an error from the constructor.
+*/
 
 slShape *slNewCube(slVector *size, double density) {
 	slShape *s;
 
 	if(density < 0.0 || slVectorLength(size) <= 0.0) return NULL;
 
-	s = slShapeNew();
+	s = new slShape();
 
 	if(!slSetCube(s, size, density)) {
 		slShapeFree(s);
@@ -119,7 +136,7 @@ slShape *slNewNGonDisc(int count, double radius, double height, double density) 
 
 	if(radius <= 0.0 || height <= 0.0 || density <= 0.0 || count < 3) return NULL;
 
-	s = slShapeNew();
+	s = new slShape();
 
 	if(!slSetNGonDisc(s, count, radius, height, density)) {
 		slShapeFree(s);
@@ -134,7 +151,7 @@ slShape *slNewNGonCone(int count, double radius, double height, double density) 
 
 	if(radius <= 0.0 || height <= 0.0 || density <= 0.0 || count < 3) return NULL;
 
-	s = slShapeNew();
+	s = new slShape();
 
 	if(!slSetNGonCone(s, count, radius, height, density)) {
 		slShapeFree(s);
@@ -149,15 +166,17 @@ slShape *slNewNGonCone(int count, double radius, double height, double density) 
 */
 
 void slShapeFree(slShape *s) {
-	std::vector<slFeature*>::iterator fi;
-
-	if(--s->referenceCount) return;
-
-	for(fi = s->features.begin() ; fi != s->features.end(); fi++ ) delete *fi;
-
-	if(s->drawList) glDeleteLists(s->drawList, 1);
+	if(--s->_referenceCount) return;
 
 	delete s;
+}
+
+slShape::~slShape() {
+	std::vector<slFeature*>::iterator fi;
+
+	for(fi = features.begin() ; fi != features.end(); fi++ ) delete *fi;
+
+	if(_drawList) glDeleteLists(_drawList, 1);
 }
 
 slShape *slShapeInitNeighbors(slShape *s, double density) {
@@ -171,7 +190,7 @@ slShape *slShapeInitNeighbors(slShape *s, double density) {
 	std::vector<slPoint*>::iterator pi;
 	std::vector<slFace*>::iterator fi;
 
-	s->density = density;
+	s->_density = density;
 
 	for(pi = s->points.begin(); pi != s->points.end(); pi++ ) {
 		p = *pi;
@@ -182,9 +201,9 @@ slShape *slShapeInitNeighbors(slShape *s, double density) {
 
 		// now check to see if it's a maximum for the shape 
 
-		if(p->vertex.x > s->max.x) s->max.x = p->vertex.x;
-		if(p->vertex.y > s->max.y) s->max.y = p->vertex.y;
-		if(p->vertex.z > s->max.z) s->max.z = p->vertex.z;
+		if(p->vertex.x > s->_max.x) s->_max.x = p->vertex.x;
+		if(p->vertex.y > s->_max.y) s->_max.y = p->vertex.y;
+		if(p->vertex.z > s->_max.z) s->_max.z = p->vertex.z;
 
 		// reset edgeCount to 0 so it can act as a counter 
 		// as the actual edges are added below
@@ -293,15 +312,15 @@ slShape *slShapeInitNeighbors(slShape *s, double density) {
 void slShape::setMass(double newMass) {
 	double volume;
 
-	/* the existing volume... */
+	// the existing volume...
 
-	volume = mass / density;
+	volume = _mass / _density;
 
-	/* the desired density... */
+	// the desired density...
 
-	density = newMass / volume;
+	_density = newMass / volume;
 
-	setDensity(density);
+	setDensity(_density);
 }
 
 /*!
@@ -320,12 +339,12 @@ void slShape::setDensity(double newDensity) {
 	Sets the density of the change, which modifies the mass.
 */
 void slSphere::setDensity(double newDensity) {
-	double volume = mass / density;
+	double volume = _mass / _density;
 	
-	mass = newDensity * volume;
-	density = newDensity;
+	_mass = newDensity * volume;
+	_density = newDensity;
 
-	slSphereInertiaMatrix(_radius, mass, inertia);
+	slSphereInertiaMatrix(_radius, _mass, _inertia);
 }
 
 /*! 
@@ -987,9 +1006,9 @@ void slScaleShape(slShape *s, slVector *scale) {
 }
 
 void slSphere::scale(slVector *scale) {
-	recompile = 1;
+	_recompile = 1;
 	_radius *= scale->x;
-	slShapeInitNeighbors(this, this->density);
+	slShapeInitNeighbors(this, this->_density);
 }
 
 void slShape::scale(slVector *scale) {
@@ -1006,7 +1025,7 @@ void slShape::scale(slVector *scale) {
 	m[1][1] = scale->y;
 	m[2][2] = scale->z;
 
-	recompile = 1;
+	_recompile = 1;
 
 	for(pi = points.begin(); pi != points.end(); pi++ ) {
 		p = *pi;
@@ -1026,7 +1045,7 @@ void slShape::scale(slVector *scale) {
 		slVectorXform(m, &v, &f->plane.vertex);
 	}
 
-	slShapeInitNeighbors(this, density);
+	slShapeInitNeighbors(this, _density);
 }
 
 /*!
@@ -1047,8 +1066,8 @@ slSerializedShapeHeader *slSphere::serialize(int *length) {
 
 	header->type = ST_SPHERE;
 	header->radius = _radius;
-	header->mass = mass;
-	header->density = density;
+	header->mass = _mass;
+	header->density = _density;
 
 	return header;
 }
@@ -1087,10 +1106,10 @@ slSerializedShapeHeader *slShape::serialize(int *length) {
 
 	header->faceCount = faceCount;
 	header->type = _type;
-	slMatrixCopy(inertia, header->inertia);
-	header->density = density;
-	header->mass = mass;
-	slVectorCopy(&max, &header->max);
+	slMatrixCopy(_inertia, header->inertia);
+	header->density = _density;
+	header->mass = _mass;
+	slVectorCopy(&_max, &header->max);
 
 	/* skip over the header */
 
@@ -1124,7 +1143,7 @@ slShape *slDeserializeShape(slSerializedShapeHeader *header, int length) {
 
 	if(header->type == ST_SPHERE) return slSphereNew(header->radius, header->mass);
 
-	s = slShapeNew();
+	s = new slShape();
 
 	// offset the pointer to the endge of the header
 
@@ -1193,10 +1212,10 @@ void slShape::bounds(slPosition *position, slVector *min, slVector *max) {
     }
 }
 
-double slShapeGetMass(slShape *shape) {
-	return shape->mass;
+double slShape::getMass() {
+	return _mass;
 }
 
-double slShapeGetDensity(slShape *shape) {
-	return shape->density;
+double slShape::getDensity() {
+	return _density;
 }

@@ -18,6 +18,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+class slRoamPatch;
+
 /*!
 	\brief Serialized \ref slTerrain data.
 */
@@ -43,7 +45,7 @@ class slTerrainQuadtree;
 
 class slTerrain: public slWorldObject {
 	public:
-		slTerrain() : slWorldObject() {}
+		slTerrain(int res, double scale, void *data);
 		~slTerrain();
 
 		inline void terrainPoint(int x, int z, slVector *point) {
@@ -52,26 +54,36 @@ class slTerrain: public slWorldObject {
 			point->z = z * xscale + position.location.z;
 		}
 
+		void setLocation(slVector *location);
+		void setScale(double scale);
+
+		double getHeightAtLocation(double x, double z);
+
+		void updateBoundingBox();
+		void setDrawMode(int mode);
+
 		void resize(int side);
 
 		void draw(slCamera *camera);
 
+		void generateFractalTerrain(double h, double height);
+		float averageDiamondValues(int x, int y, int jump);
+
+		int loadGeoTIFF(char *file);
+
 		float **matrix;
 		slVector **fnormals[2];
-		slVector **vnormals;
 
-		int initialized;
+		int _initialized;
 
 		int side;
-		int repeating;
+		int _repeating;
 
-		int drawList;
-		int drawMode;
+		int _drawMode;
 
 		double xscale;
-		double yscale;
 
-		float h;
+		// float h;
 	
 		double heightDelta;
 		double heightMin;
@@ -81,123 +93,14 @@ class slTerrain: public slWorldObject {
 		slVector bottomColor;
 		slVector topColor;
 
-		slTerrainQuadtree *quadtree;
-};
+		slRoamPatch *_roam;
 
-class slTerrainQuadtree {
-	public:
-		slTerrainQuadtree(int xmin, int ymin, int xmax, int ymax, slTerrain *t) {
-			_xmin = xmin;
-			_xmax = xmax;
-			_ymin = ymin;
-			_ymax = ymax;
-			
-			_x = (xmax + xmin) / 2;
-			_y = (ymax + ymin) / 2;
+		int _polygonsDrawn;
+		int _desiredPolygons;
 
-			_terrain = t;	
 
-			if(_xmax - _xmin <= 1 || _ymax - _ymin <= 1) {
-				_children[0] = NULL;
-				_children[1] = NULL;
-				_children[2] = NULL;
-				_children[3] = NULL;
-				return;
-			}
-
-			_children[0] = new slTerrainQuadtree(xmin, ymin, _x, _y, t);
-			_children[1] = new slTerrainQuadtree(_x, ymin, xmax, _y, t);
-			_children[2] = new slTerrainQuadtree(xmin, _y, _x, ymax, t);
-			_children[3] = new slTerrainQuadtree(_x, _y, xmax, ymax, t);
-		}
-		
-		int cull(slCamera *c) {
-			int m;
-
-			_minDist = 100000;
-			_culled = true;
-
-			_clip = c->polygonInFrustum(_points, 4);
-
-			if(_clip == 0) return _culled;
-
-			_culled = false;
-
-			for(m=0;m<4;m++) {
-				slVector toCamera;
-				double distance;
-
-				if(_children[m]) _children[m]->cull(c);
-
-				slVectorAdd(&c->target, &c->location, &toCamera);
-				slVectorSub(&toCamera, &_points[m], &toCamera);
-				distance = slVectorLength(&toCamera);
-			
-				if(distance < _minDist) _minDist = distance;
-			}
-
-			return _culled;
-		}
-
-		inline int draw(slCamera *c) {
-			int m;
-			slVector n1, n2;
-
-			if(_culled) return 0;
-
-			if(((_clip == 1 && _minDist < 100.0) || _clip == 2) && _children[0]) {
-				int drawn = 0;
-				for(m=0;m<4;m++) drawn += _children[m]->draw(c);
-				return drawn;
-			}
-
-			slNormalForFace(&_points[0], &_points[1], &_points[3], &n1);
-			slNormalForFace(&_points[1], &_points[2], &_points[3], &n2);
-
-			glDisable(GL_BLEND);
-
-			glColor4f(0, 1.0, 0, 1.0);
-
-			glBegin(GL_TRIANGLE_STRIP);
-			glNormal3f(n1.x, n1.y, n1.z);
-			glColor4f(0, (_points[0].y - _terrain->heightMin) / _terrain->heightDelta, 0, 0.7);
-			glTexCoord2f(_points[0].x/_terrain->textureScale, _points[0].z/_terrain->textureScale);
-			glVertex3f(_points[0].x, _points[0].y, _points[0].z);
-
-			glColor4f(0, (_points[1].y - _terrain->heightMin) / _terrain->heightDelta, 0, 0.7);
-			glTexCoord2f(_points[1].x/_terrain->textureScale, _points[1].z/_terrain->textureScale);
-			glVertex3f(_points[1].x, _points[1].y, _points[1].z);
-
-			glColor4f(0, (_points[3].y - _terrain->heightMin) / _terrain->heightDelta, 0, 0.7);
-			glTexCoord2f(_points[3].x/_terrain->textureScale, _points[3].z/_terrain->textureScale);
-			glVertex3f(_points[3].x, _points[3].y, _points[3].z);
-
-			glNormal3f(n2.x, n2.y, n2.z);
-			glColor4f(0, (_points[2].y - _terrain->heightMin) / _terrain->heightDelta, 0, 0.7);
-			glTexCoord2f(_points[2].x/_terrain->textureScale, _points[2].z/_terrain->textureScale);
-			glVertex3f(_points[2].x, _points[2].y, _points[2].z);
-			glEnd();
-
-			return 1;
-		}
-
-		void update() {
-			int m;
-			_terrain->terrainPoint(_xmin, _ymin, &_points[0]);
-			_terrain->terrainPoint(_xmin, _ymax, &_points[1]);
-			_terrain->terrainPoint(_xmax, _ymax, &_points[2]);
-			_terrain->terrainPoint(_xmax, _ymin, &_points[3]);
-			if(_children[0]) for(m=0;m<4;m++) _children[m]->update();
-		}
-
-		bool _culled;
-		int _clip;
-		double _minDist;
-		int _x, _y;
-		int _xmin, _xmax, _ymin, _ymax;
-		slTerrainQuadtree *_children[4];
-		slTerrain *_terrain;
-		slVector _points[4];
+		void makeNormals();
+		void initialize();
 };
 
 #endif
@@ -205,20 +108,6 @@ class slTerrainQuadtree {
 #ifdef __cplusplus
 extern "C" {
 #endif
-slTerrain *slTerrainNew(int res, double xscale, void *userData);
-void slGenerateFractalTerrain(slTerrain *l, double h, double height);
-
-void slTerrainSetLocation(slTerrain *l, slVector *location);
-void slTerrainSetScale(slTerrain *l, double scale);
-
-void slFractalTerrainMatrix(slTerrain *l, double h, double height);
-void slTerrainBoundingBox(slTerrain *l);
-float slAverageDiamondValues(slTerrain *l, int x, int y, int jump);
-
-void slTerrainInitialize(slTerrain *l);
-
-void slTerrainFree(slTerrain *l);
-void slTerrainMakeNormals(slTerrain *l);
 
 int slTerrainTestPair(slVclipData *vc, int x, int y, slCollision *ce);
 
@@ -234,9 +123,6 @@ double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollision 
 
 int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosition *position, slPlane *facePlane, slCollision *ce);
 
-void slDrawTerrain(slTerrain *l, int texture, double textureScale, int drawMode, int flags);
-void slDrawTerrainSide(slTerrain *l, int texture, double textureScale, int drawMode, int flags, int bottom);
-
 int slPointIn2DTriangle(slVector *vertex, slVector *a, slVector *b, slVector *c);
 
 slSerializedTerrain *slSerializeTerrain(slTerrain *t, int *size);
@@ -247,12 +133,7 @@ double slTerrainGetHeight(slTerrain *t, int x, int y);
 void slTerrainSetTopColor(slTerrain *t, slVector *color);
 void slTerrainSetBottomColor(slTerrain *t, slVector *color);
 
-double slTerrainGetHeightAtLocation(slTerrain *t, double x, double z);
-
 void slTerrainGetSlope(slTerrain *t, double x1, double z1, double x2, double z2, slVector *result);
-
-int slTerrainLoadGeoTIFF(slTerrain *t, char *file);
-
 
 #ifdef __cplusplus
 }
