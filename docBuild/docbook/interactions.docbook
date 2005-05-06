@@ -55,8 +55,8 @@ piece of food with which the agent has collided:
 + to setup-collision-handler:
 	self handle-collisions with-type "Food" with-method "eat".
 
-+ to eat food foodObject
-	print "I just ate $foodObject.  It was yummy
++ to eat foodObject (object):
+	print "I just ate $foodObject.  It was yummy.".
 	free foodObject.
 </screen>
 </para>
