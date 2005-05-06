@@ -14,6 +14,7 @@ Object : GeneticAlgorithm {
 		currentIndividual (int).
 		crossoverPercent (int).
 		mutationPercent (int).
+		migrationPercent (int).
 		generation (int).
 
 	+ to init:
@@ -25,6 +26,29 @@ Object : GeneticAlgorithm {
 
 		populations = { { }, { } }.
 
+	+ section "Getting and Setting Parameters for the Genetic Algorithm"
+
+	+ to set-population-size to size (int):
+		% Sets the number of individuals in the population to size.
+		populationSize = size.
+
+	+ to get-population-size:
+		% Returns the size of the population.  The default value is 30, and
+		% can be set with METHOD(set-population-size).
+
+		return populationSize.
+
+	+ to set-mutation-percent to percent (int): 
+		% Sets the probability of mutation to percent%.  This specifies the 
+		% approximate percentage of agents to be generated through mutation.
+
+		mutationPercent = percent.
+
+	+ to get-mutation-percent:
+		% Returns the percent probability of mutation during reproduction.
+
+		return mutationPercent.
+
 	+ to set-individual-class to className (string):
 		% Call this method to specify the class representing an individual in your
 		% genetic algorithm.  className must be a string representing a subclass
@@ -34,6 +58,8 @@ Object : GeneticAlgorithm {
 
 	+ to iterate:
 		if | populations { 0 } | == 0: self generate-population.
+
+	+ section "Methods Used Internally by the Genetic Algorithm"
 
 	+ to generate-population:
 		n (int).
@@ -113,6 +139,7 @@ Object : GeneticAlgorithm {
 			} else if r < (mutationPercent + crossoverPercent): {
 				populations{ !currentPopulation }{ i } crossover 
 					from-parent1 (self touranment-select) from-parent2 (self tournament-select).
+			} else if r < (mutationPercent + crossoverPercent + migrationPercent): {
 			} else {
 				populations{ !currentPopulation }{ i } copy from (self tournament-select).
 			}

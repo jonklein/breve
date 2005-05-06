@@ -1,6 +1,6 @@
 @use Abstract.
 
-Abstract : Camera (aka Cameras) [version 2.0] {
+Abstract : Camera (aka Cameras) [version 2.2] {
 	% Summary: creates a new rendering perspective in the simulated world.
 	% <P>
 	% The Camera class is used to set up a viewing perspective in a simulation.
@@ -9,6 +9,15 @@ Abstract : Camera (aka Cameras) [version 2.0] {
 
 	+ variables:
 		cameraPointer (pointer).
+		shared (int).
+
+	- to set-camera-pointer to p (pointer):
+		% Used internally.
+
+		if !shared: cameraFree(cameraPointer).
+
+		cameraPointer = p.
+		shared = 1.
 
 	+ to init:
 		cameraPointer = cameraNew().
@@ -73,6 +82,15 @@ Abstract : Camera (aka Cameras) [version 2.0] {
 
 		cameraSetZClip(cameraPointer, distance).
 
+	+ to get-rotation:
+		% Returns a vector containing the rotation of the camera about the X- 
+		% and Y-axes return cameraGetRotation(cameraPointer).
+		return cameraGetRotation(cameraPointer).
+
+	+ to set-rotation x rx (float) y ry (float):
+		% Sets the rotation of the camera about the X- and Y-axes.
+		cameraSetRotation(cameraPointer, rx, ry).
+
 	- to delete:
-		cameraFree(cameraPointer).
+		if !shared: cameraFree(cameraPointer).
 }

@@ -1,3 +1,6 @@
+#ifndef _VOLINT_H
+#define _VOLINT_H
+
 /*
    ============================================================================
    constants
@@ -34,3 +37,5 @@ struct slMPPolyhedron {
 int slFindPointNumber(slShape *s, slPoint *p);
 int slConvertShapeToPolyhedron(slShape *s, slMPPolyhedron *p);
 int slSetMassProperties(slShape *s, double density);
+
+#endif

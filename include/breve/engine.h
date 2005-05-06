@@ -185,7 +185,7 @@ class brEngine {
 
 		brErrorInfo error;
 
-		char *outputPath;
+		std::string outputPath;
 		char *path;
 
 		// plugin, plugins, plugins!
@@ -303,6 +303,7 @@ brEvent *brEngineAddEvent(brEngine *, brInstance *, char *, double, double);
 void brEventFree(brEvent *);
 
 int brEngineSetController(brEngine *, brInstance *);
+
 brInstance *brEngineGetController(brEngine *);
 
 slStack *brEngineGetAllInstances(brEngine *);

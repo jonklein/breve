@@ -88,8 +88,7 @@ void slVclipDataInit(slWorld *w) {
 				*flags &= ~BT_CHECK;
 			}
 
-	 		if (link->multibody)
-				slMultibodyInitCollisionFlags(link->multibody, w->clipData);
+	 		if (link->multibody) link->multibody->initCollisionFlags(w->clipData);
 		}
 	}
 

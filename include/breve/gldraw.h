@@ -18,6 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _GLDRAW_H
+#define _GLDRAW_H
+
 #include "glIncludes.h"
 
 typedef float slColor[4];
@@ -90,8 +93,8 @@ void slRenderLines(slWorld *, slCamera *);
 
 void slRenderText(slWorld *, slCamera *, slVector *, slVector *, int);
 
-void slText(double, double, char *, void *);
-void slStrokeText(double, double, char *, double, void *);
+void slText(double, double, const char *, void *);
+void slStrokeText(double, double, const char *, double, void *);
 
 void slDrawLights(slCamera *, int);
 void slShadowMatrix(GLfloat [4][4], slPlane *, slVector *);
@@ -122,3 +125,5 @@ void slDeleteMbGLLists(slMultibody *);
 void slTransposeGLMatrix(GLfloat *);
 
 void slClear(slWorld *, slCamera *);
+
+#endif _GLDRAW_H

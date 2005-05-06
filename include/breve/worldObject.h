@@ -7,6 +7,7 @@
 #include "shape.h"
 
 #include <vector>
+#include <string>
 
 class slWorld;
 class slWorldObject;
@@ -81,7 +82,7 @@ class slWorldObject {
 
 		slShape *shape;
 
-		char *label;
+		std::string label;
 
 		unsigned char simulate;
 		unsigned char update;

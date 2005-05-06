@@ -23,10 +23,11 @@
 #include <strings.h>
 #include <math.h>
 
+#include "util.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "util.h"
 
 #include "ff.h"
 #include "ffTrain.h"

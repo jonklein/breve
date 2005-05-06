@@ -28,8 +28,8 @@
 /*! \addtogroup InternalFunctions */
 /*@{*/
 
-int brINewShape(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slShapeNew();
+int brIShapeNew(brEval args[], brEval *target, brInstance *i) {
+	BRPOINTER(target) = new slShape();
 	return EC_OK;
 }
 
@@ -93,10 +93,10 @@ int brIShapeSetMass(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
-int brINewSphere(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slSphereNew(BRDOUBLE(&args[0]), BRDOUBLE(&args[1]));
+int brIMeshShapeNew(brEval args[], brEval *target, brInstance *i) {
+	BRPOINTER(target) = new slMeshShape(BRSTRING(&args[0]), BRSTRING(&args[1]));
 
-	if (!BRINSTANCE(target)) {
+	if (!BRPOINTER(target)) {
 		stEvalError(i->engine, EE_SIMULATION, "An error occurred while creating a new sphere");
 		return EC_ERROR;
 	}
@@ -104,10 +104,21 @@ int brINewSphere(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
-int brINewCube(brEval args[], brEval *target, brInstance *i) {
+int brISphereNew(brEval args[], brEval *target, brInstance *i) {
+	BRPOINTER(target) = slSphereNew(BRDOUBLE(&args[0]), BRDOUBLE(&args[1]));
+
+	if (!BRPOINTER(target)) {
+		stEvalError(i->engine, EE_SIMULATION, "An error occurred while creating a new sphere");
+		return EC_ERROR;
+	}
+
+	return EC_OK;
+}
+
+int brICubeNew(brEval args[], brEval *target, brInstance *i) {
 	BRPOINTER(target) = slNewCube(&BRVECTOR(&args[0]), BRDOUBLE(&args[1]));
 
-	if (!BRSHAPEPOINTER(target)) {
+	if (!BRPOINTER(target)) {
 		stEvalError(i->engine, EE_SIMULATION, "An error occurred while creating a new cube");
 		return EC_ERROR;
 	}
@@ -115,10 +126,10 @@ int brINewCube(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
-int brINewNGonDisc(brEval args[], brEval *target, brInstance *i) {
+int brINGonDiscNew(brEval args[], brEval *target, brInstance *i) {
 	BRPOINTER(target) = slNewNGonDisc(BRINT(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]), BRDOUBLE(&args[3]));
 
-	if (!BRSHAPEPOINTER(target)) {
+	if (!BRPOINTER(target)) {
 		stEvalError(i->engine, EE_SIMULATION, "An error occurred while creating a new polygon disc");
 		return EC_ERROR;
 	}
@@ -126,7 +137,7 @@ int brINewNGonDisc(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
-int brINewNGonCone(brEval args[], brEval *target, brInstance *i) {
+int brINGonConeNew(brEval args[], brEval *target, brInstance *i) {
 	BRPOINTER(target) = slNewNGonCone(BRINT(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]), BRDOUBLE(&args[3]));
 
 	if (!BRSHAPEPOINTER(target)) {
@@ -173,8 +184,6 @@ int brIScaleShape(brEval args[], brEval *target, brInstance *i) {
 	slShape *s = BRSHAPEPOINTER(&args[0]);
 	slVector *scale = &BRVECTOR(&args[1]);
 
-	if (!s) return EC_OK;
-
 	slScaleShape(s, scale);
 
 	return EC_OK;
@@ -183,9 +192,7 @@ int brIScaleShape(brEval args[], brEval *target, brInstance *i) {
 int brIGetMass(brEval args[], brEval *target, brInstance *i) {
 	slShape *s = BRSHAPEPOINTER(&args[0]);
 
-	if (!s) return EC_OK;
-
-	BRDOUBLE(target) = slShapeGetMass(s);
+	BRDOUBLE(target) = s->getMass();
 
 	return EC_OK;
 }
@@ -193,9 +200,7 @@ int brIGetMass(brEval args[], brEval *target, brInstance *i) {
 int brIGetDensity(brEval args[], brEval *target, brInstance *i) {
 	slShape *s = BRSHAPEPOINTER(&args[0]);
 
-	if (!s) return EC_OK;
-
-	BRDOUBLE(target) = slShapeGetDensity(s);
+	BRDOUBLE(target) = s->getDensity();
 
 	return EC_OK;
 }
@@ -205,7 +210,7 @@ int brIPointOnShape(brEval args[], brEval *target, brInstance *i) {
 	slShape *shape = BRSHAPEPOINTER(&args[0]);
 	slVector *location = &BRVECTOR(&args[1]);
 
-	(void)slPointOnShape(shape, location, &BRVECTOR(target));
+	slPointOnShape(shape, location, &BRVECTOR(target));
 
 	return EC_OK;
 }
@@ -218,9 +223,9 @@ int brIRayHitsShape(brEval args[], brEval *target, brInstance *i) {
 
 	result = slRayHitsShape(shape, direction, location, &BRVECTOR(target));
 
-        // The shape was not hit by the ray
-        if (result < 0)
-           slVectorSet(&BRVECTOR(target), -1.0, -1.0, -1.0);
+	// The shape was not hit by the ray
+
+	if (result < 0) slVectorSet(&BRVECTOR(target), -1.0, -1.0, -1.0);
         
 	return EC_OK;
 }
@@ -232,16 +237,17 @@ int brIRayHitsShape(brEval args[], brEval *target, brInstance *i) {
 */
 
 void breveInitShapeFunctions(brNamespace *n) {
-	brNewBreveCall(n, "newShape", brINewShape, AT_POINTER, 0);
+	brNewBreveCall(n, "newShape", brIShapeNew, AT_POINTER, 0);
 	brNewBreveCall(n, "addShapeFace", brIAddShapeFace, AT_NULL, AT_POINTER, AT_LIST, 0);
 	brNewBreveCall(n, "finishShape", brIFinishShape, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "shapeSetDensity", brIShapeSetDensity, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "shapeSetMass", brIShapeSetMass, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "scaleShape", brIScaleShape, AT_NULL, AT_POINTER, AT_VECTOR, 0);
-	brNewBreveCall(n, "newSphere", brINewSphere, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0);
-	brNewBreveCall(n, "newCube", brINewCube, AT_POINTER, AT_VECTOR, AT_DOUBLE, 0);
-	brNewBreveCall(n, "newNGonDisc", brINewNGonDisc, AT_POINTER, AT_INT, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0);
-	brNewBreveCall(n, "newNGonCone", brINewNGonCone, AT_POINTER, AT_INT, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0);
+	brNewBreveCall(n, "newSphere", brISphereNew, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0);
+	brNewBreveCall(n, "meshShapeNew", brIMeshShapeNew, AT_POINTER, AT_STRING, AT_STRING, 0);
+	brNewBreveCall(n, "newCube", brICubeNew, AT_POINTER, AT_VECTOR, AT_DOUBLE, 0);
+	brNewBreveCall(n, "newNGonDisc", brINGonDiscNew, AT_POINTER, AT_INT, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0);
+	brNewBreveCall(n, "newNGonCone", brINGonConeNew, AT_POINTER, AT_INT, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "freeShape", brIFreeShape, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "pointOnShape", brIPointOnShape, AT_VECTOR, AT_POINTER, AT_VECTOR, 0);
 //	brNewBreveCall(n, "rayHitsShape", brIRayHitsShape, AT_VECTOR, AT_POINTER, AT_VECTOR, AT_VECTOR, 0);

@@ -105,12 +105,10 @@ slWorld *slWorldNew() {
 	return w;
 }
 
-int slWorldLoadTigerFile(slWorld *w, char *f) {
-	w->gisData = new slGISData(f);
+slGISData *slWorldLoadTigerFile(slWorld *w, char *f, slTerrain *t) {
+	w->gisData = new slGISData(f, t);
 
-	if(!w->gisData) return -1;
-
-	return 0;
+	return w->gisData;
 }
 
 /*!
@@ -304,7 +302,7 @@ void slPatchGridRemove(slWorld *w, slPatchGrid *g)
 slStationary *slNewStationary(slShape *s, slVector *loc, double rot[3][3], void *data) {
 	slStationary *so;
 
-	s->referenceCount++;
+	s->_referenceCount++;
  
 	so = new slStationary;
 

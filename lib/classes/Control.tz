@@ -3,6 +3,7 @@
 @use Shape.
 @use Movie.
 @use Image.
+@use Camera.
 
 Abstract : Control (aka Controls) [version 2.0] {
 	% Summary: a parent class for the "controller" object required for all simulations.
@@ -86,11 +87,17 @@ Abstract : Control (aka Controls) [version 2.0] {
 		movieMenu (object).
 
 		cameraPointer (pointer).
+		camera (object).
 
 	+ to init:
 		% Initializes the Control object by setting up default values for 
 		% variables such as the size of the integration timestep.  Subclasses
 		% of Control may override these defaults in their own init functions.
+
+		cameraPointer = getMainCameraPointer().
+
+		camera = new Camera.
+		camera set-camera-pointer to cameraPointer.
 
 		floorDefined = 0.
 
@@ -105,8 +112,6 @@ Abstract : Control (aka Controls) [version 2.0] {
 
 		xRot = 0.0.
 		yRot = 0.0.
-
-		cameraPointer = getMainCameraPointer().
 
 		self move-light to (0, 0, 0).		
 		self point-camera at (0, 0, 0) from (0, 0, 30).
@@ -421,6 +426,12 @@ Abstract : Control (aka Controls) [version 2.0] {
 
   + section "Camera & Lighting Options"
 
+	+ to get-main-camera:
+		% Returns the OBJECT(Camera) object corresponding to the main camera.
+		% This allows you to directly control camera options.
+
+		return camera.
+
 	+ to watch item theObject (object):
 		% Points the camera at the OBJECT(Mobile) object theObject.  If 
 		% theObject is passed in as 0, then the camera will stop watching
@@ -512,23 +523,23 @@ Abstract : Control (aka Controls) [version 2.0] {
 		self set-camera-target to location.
 		self set-camera-offset to offset.
 
-	+ to pivot-camera x vx (float) y vy (float):
-		% Rotates the camera (from it's current position) on the x-axis by vx and on the y-axis by vy.
+	+ to pivot-camera x dx (float) y dy (float):
+		% Rotates the camera (from it's current position) on the x-axis by dx and on the y-axis by dy.
 
-		xRot += vx.
-		yRot += vy.
-		cameraSetRotation(xRot, yRot).
+		rot (vector).
 
-	+ to set-camera-rotation x vx (float) y vy (float):
-		% Sets the camera rotation on the x-axis to vx and the y-axis to vy.  
+		rot = (camera get-rotation).
+		rot::x += dx.
+		rot::y += dy.
+		camera set-rotation x rot::x y rot::y.
+
+	+ to set-camera-rotation x rx (float) y ry (float):
+		% Sets the camera rotation on the x-axis to rx and the y-axis to ry.  
 		% This method sets the rotation without regard for the current rotation.
 		% If you want to offset the camera rotation from the current position, 
 		% use the method METHOD(pivot-camera) instead.
 
-		xRot = vx.
-		yRot = vy.
-
-		cameraSetRotation(xRot, yRot).
+		camera set-rotation x rx y ry.
 
 	+ to zoom-camera to theDistance (float):
 		% Zooms the camera to theDistance away from the current target--

@@ -20,6 +20,8 @@
 
 #include "kernel.h"
 
+#include <dlfcn.h>
+
 char *interfaceID;
 
 /** \defgroup breveEngineAPI The breve engine API: using a breve simulation from another program or application frontend */
@@ -69,7 +71,7 @@ brEngine *brEngineNew(void) {
 
 	e->simulationWillStop = 0;
 
-	e->camera = slCameraNew(400, 400);
+	e->camera = new slCamera(400, 400);
 
 #if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
 	Pa_Initialize();
@@ -177,10 +179,26 @@ brEngine *brEngineNew(void) {
 	return e;
 }
 
+/*!
+	\brief Looks up an internal breve function.
+
+	Searches in the engine for a brInternalFunction corresponding with the 
+	given name.
+*/
+
 brInternalFunction *brEngineInternalFunctionLookup(brEngine *e, char *name) {
 	brNamespaceSymbol *s = brNamespaceLookup(e->internalMethods, name);
+	void *dlsymbol;
 
-	return s ? (brInternalFunction *)s->data : NULL;
+	if (s) return (brInternalFunction *)s->data;
+
+	dlsymbol = dlsym(0, name);
+
+	if(dlsymbol) {
+		slMessage(DEBUG_ALL, "registered function %s not found, but symbol was found\n", name);
+	}
+
+	return NULL;
 }
 
 
@@ -219,9 +237,8 @@ void brEngineFree(brEngine *e) {
 		e->error.type = 0;
 	}
 
-	if(e->camera) slCameraFree(e->camera);
+	if(e->camera) delete e->camera;
 	if(e->world) slWorldFree(e->world);
-	if(e->outputPath) slFree(e->outputPath);
 	if(e->iTunesData) delete e->iTunesData;
 
 	for(wi = e->windows.begin(); wi != e->windows.end(); wi++ ) 
@@ -286,9 +303,7 @@ slStack *brEngineGetAllInstances(brEngine *e) {
 */
 
 void brEngineSetIOPath(brEngine *e, char *path) {
-	if (e->outputPath) slFree(e->outputPath);
-
-	e->outputPath = slStrdup(path);
+	e->outputPath = path;
 	brAddSearchPath(e, path);
 }
 
@@ -302,9 +317,9 @@ char *brOutputPath(brEngine *e, char *filename) {
 	if (*filename == '/')
 		return slStrdup(filename);
 
-	f = (char *)slMalloc(strlen(filename) + strlen(e->outputPath) + 2);
+	f = (char *)slMalloc(strlen(filename) + e->outputPath.length() + 2);
 
-	sprintf(f, "%s/%s", e->outputPath, filename);
+	sprintf(f, "%s/%s", e->outputPath.c_str(), filename);
 
 	return f;
 }

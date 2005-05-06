@@ -25,10 +25,6 @@
 	\brief Creates a new link struct.
 */
 
-slLink *slLinkNew(slWorld *w) {
-	return new slLink(w);
-}
-
 slLink::slLink(slWorld *w) : slWorldObject() {
 	odeBodyID = dBodyCreate(w->odeWorldID);
 
@@ -53,10 +49,7 @@ slLink::slLink(slWorld *w) : slWorldObject() {
 }
 
 slLink::~slLink() {
-	if(multibody && multibody->root == this) {
-		multibody->root = NULL;
-		slMultibodyUpdate(multibody);
-	}
+	if(multibody && multibody->_root == this) multibody->setRoot(NULL);
 
 	// This is a bad situation here: slJointBreak modifies the 
 	// joint list.  I intend to fix this.
@@ -86,46 +79,45 @@ void slLink::step(slWorld *world, double step) {
 	Shapes may be shared among several objects.
 */
 
-void slLinkSetShape(slLink *l, slShape *s) {
-	if(l->shape) slShapeFree(l->shape);
+void slLink::setShape(slShape *s) {
+	if(shape) slShapeFree(shape);
 
-	l->shape = s;
-	s->referenceCount++;
+	shape = s;
+	s->_referenceCount++;
 
 	// The ODE docs call dMatrix3 a 3x3 matrix.  but it's actually 4x3.  
 	// go figure.
 
-	l->massData.mass = l->shape->mass;
-	l->massData.c[0] = 0.0;
-	l->massData.c[1] = 0.0;
-	l->massData.c[2] = 0.0;
-	l->massData.c[3] = 0.0;
+	massData.mass = shape->_mass;
+	massData.c[0] = 0.0;
+	massData.c[1] = 0.0;
+	massData.c[2] = 0.0;
+	massData.c[3] = 0.0;
 
-	l->massData.I[0] = s->inertia[0][0];
-	l->massData.I[1] = s->inertia[0][1];
-	l->massData.I[2] = s->inertia[0][2];
-	l->massData.I[3] = 0.0;
+	massData.I[0] = s->_inertia[0][0];
+	massData.I[1] = s->_inertia[0][1];
+	massData.I[2] = s->_inertia[0][2];
+	massData.I[3] = 0.0;
 
-	l->massData.I[4] = s->inertia[1][0];
-	l->massData.I[5] = s->inertia[1][1];
-	l->massData.I[6] = s->inertia[1][2];
-	l->massData.I[7] = 0.0;
+	massData.I[4] = s->_inertia[1][0];
+	massData.I[5] = s->_inertia[1][1];
+	massData.I[6] = s->_inertia[1][2];
+	massData.I[7] = 0.0;
 
-	l->massData.I[8] = s->inertia[2][0];
-	l->massData.I[9] = s->inertia[2][1];
-	l->massData.I[10] = s->inertia[2][2];
-	l->massData.I[11] = 0.0;
+	massData.I[8] = s->_inertia[2][0];
+	massData.I[9] = s->_inertia[2][1];
+	massData.I[10] = s->_inertia[2][2];
+	massData.I[11] = 0.0;
 
-	dBodySetMass(l->odeBodyID, &l->massData);
+	dBodySetMass(odeBodyID, &massData);
 }
 
 /*
 	\brief Sets the label associated with this link.
 */
 
-void slLinkSetLabel(slLink *l, char *label) {
-	if(l->label) slFree(l->label);
-	l->label = slStrdup(label);
+void slLink::setLabel(char *l) {
+	label = l;
 }
 
 /*! 
@@ -634,8 +626,9 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 	joint->child = child;
 	joint->type = jointType;
 
-	if(parent && parent->multibody) slMultibodyUpdate(parent->multibody);
-	if(child->multibody && (!parent || (child->multibody != parent->multibody))) slMultibodyUpdate(child->multibody);
+	if(parent && parent->multibody) parent->multibody->update();
+
+	if(child->multibody && (!parent || (child->multibody != parent->multibody))) child->multibody->update();
 
 	return joint;
 }
@@ -662,11 +655,52 @@ void slLinkGetAcceleration(slLink *l, slVector *linear, slVector *rotational) {
 	if(rotational) slVectorCopy(&l->acceleration.a, rotational);
 }
 
-void slLinkGetBounds(slLink *l, slVector *min, slVector *max) {
-	if(min) slVectorCopy(&l->min, min);
-	if(max) slVectorCopy(&l->max, max);
+void slLink::getBounds(slVector *minBounds, slVector *maxBounds) {
+	if(minBounds) slVectorCopy(&min, minBounds);
+	if(maxBounds) slVectorCopy(&max, maxBounds);
 }
 
 void slLinkSetForce(slLink *l, slVector *force) {
 	slVectorCopy(force, &l->externalForce);
+}
+
+/*!
+	\brief Converts a breve matrix to an ODE matrix.
+
+	Used when getting/setting rotation from the ODE body.
+*/
+
+
+void slSlToODEMatrix(double m[3][3], dReal *r) {
+	r[0] = m[0][0];
+	r[1] = m[0][1];
+	r[2] = m[0][2];
+
+	r[4] = m[1][0];
+	r[5] = m[1][1];
+	r[6] = m[1][2];
+
+	r[8] = m[2][0];
+	r[9] = m[2][1];
+	r[10] = m[2][2];
+}
+
+/*!
+	\brief Converts an ODE matrix to a breve matrix.
+
+	Used when getting/setting rotation from the ODE body.
+*/
+
+void slODEToSlMatrix(dReal *r, double m[3][3]) {
+	m[0][0] = r[0];
+	m[0][1] = r[1];
+	m[0][2] = r[2];
+
+	m[1][0] = r[4];
+	m[1][1] = r[5];
+	m[1][2] = r[6];
+
+	m[2][0] = r[8];
+	m[2][1] = r[9];
+	m[2][2] = r[10];
 }

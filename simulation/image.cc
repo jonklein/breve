@@ -52,10 +52,9 @@ void slJPEGErrorExit(j_common_ptr);
 	\brief An error structure for the JPEG library.
 */
 
-/*
-	+ slReadImage
-	= opens up the specified image which can be a SGI, PNG or JPG 
-	= image, and must be square
+/*!
+	\brief Opens up the specified image which can be a SGI, PNG or JPG 
+	image.
 */
 
 unsigned char *slReadImage(char *name, int *width, int *height, int *components, int alpha) {

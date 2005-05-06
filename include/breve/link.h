@@ -68,7 +68,10 @@ class slLink: public slWorldObject {
 		void draw() {
 		}
 
+		void getBounds(slVector *min, slVector *max);
+		void setShape(slShape *s);
 		void step(slWorld *world, double step);
+		void setLabel(char *label);
 
 		slMultibody *multibody;
 
@@ -99,11 +102,8 @@ class slLink: public slWorldObject {
 #ifdef __cplusplus
 extern "C" {
 #endif
-slLink *slLinkNew(slWorld *w);
-void slLinkSetShape(slLink *l, slShape *s);
 
 slLinkIntegrationPosition *slLinkGetCurrentConfig(slLink *m);
-void slLinkFree(slLink *l);
 
 void slLinkSetLocation(slLink *m, slVector *rotation);
 void slLinkSetRotation(slLink *m, double rotation[3][3]);
@@ -112,8 +112,6 @@ void slLinkGetRotation(slLink *root, double m[3][3]);
 
 int slLinkCheckSelfPenetration(slWorld *w, slLink *l);
 int slLinkCheckPenetration(slWorld *w, slLink *l);
-
-void slLinkSetLabel(slLink *m, char *label);
 
 void slLinkApplyForce(slLink *m, slVector *f, slVector *t);
 
@@ -125,6 +123,9 @@ void slLinkDisableSimulation(slLink *r);
 void slLinkEnableSimulation(slLink *r);
 
 void slLinkUpdatePosition(slLink *r);
+void slLinkUpdatePositions(slLink *r);
+
+void slLinkList(slLink *root, std::vector<slLink*> *list, int mbOnly);
 
 slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child,
 		int jointType, slVector *normal, 
@@ -144,9 +145,10 @@ slMultibody *slLinkGetMultibody(slLink *l);
 
 void slLinkSetTexture(slLink *l, int texture);
 
-void slLinkGetBounds(slLink *l, slVector *min, slVector *max);
-
 void slLinkSetForce(slLink *l, slVector *force);
+
+void slSlToODEMatrix(double m[3][3], dReal *r);
+void slODEToSlMatrix(dReal *r, double m[3][3]);
 
 #ifdef __cplusplus
 }

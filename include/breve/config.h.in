@@ -12,6 +12,9 @@
 /* Define to 1 if you have the `iswspace' function. */
 #undef HAVE_ISWSPACE
 
+/* Define to 1 if you have the `3ds' library (-l3ds). */
+#undef HAVE_LIB3DS
+
 /* Define to 1 if you have the `avcodec' library (-lavcodec). */
 #undef HAVE_LIBAVCODEC
 
@@ -23,6 +26,9 @@
 
 /* Define to 1 if you have the `expat' library (-lexpat). */
 #undef HAVE_LIBEXPAT
+
+/* Define to 1 if you have the `ftgl' library (-lftgl). */
+#undef HAVE_LIBFTGL
 
 /* Define to 1 if you have the `gsl' library (-lgsl). */
 #undef HAVE_LIBGSL

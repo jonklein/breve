@@ -38,7 +38,7 @@ int brISetMultibodyRoot(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *mb = BRMULTIBODYPOINTER(&args[0]);
 	slLink *root = BRLINKPOINTER(&args[1]);
 
-	slMultibodySetRoot(mb, root);
+	mb->setRoot(root);
 
 	return EC_OK;
 }
@@ -54,8 +54,8 @@ int brISetMultibodyRoot(brEval args[], brEval *target, brInstance *i) {
 int brIMultibodyNew(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *mb;
 
-	mb = slMultibodyNew(i->engine->world);
-	slMultibodySetCallbackData(mb, i);
+	mb = new slMultibody(i->engine->world);
+	mb->setCallbackData(i);
 
 	BRPOINTER(target) = mb;
 
@@ -75,9 +75,11 @@ int brIMultibodyAllObjects(brEval args[], brEval *target, brInstance *i) {
 	brEvalListHead *all;
 	slList *l, *start;
 
+	slMultibody *m = BRMULTIBODYPOINTER(&args[0]);
+
 	all = brEvalListNew();
 
-	start = slMultibodyAllCallbackData(BRMULTIBODYPOINTER(&args[0]));
+	start = m->allCallbackData();
 
 	for (l = start; l; l = l->next) {
 		e.type = AT_INSTANCE;
@@ -107,8 +109,7 @@ int brIMultibodyFree(brEval args[], brEval *target, brInstance *i) {
 
 	slWorldSetUninitialized(i->engine->world);
 
-	if (m)
-		slMultibodyFree(m);
+	delete m;
 
 	return EC_OK;
 }
@@ -191,8 +192,7 @@ int brIMultibodyRotateRelative(brEval args[], brEval *target, brInstance *i) {
 int brIMultibodySetHandleSelfCollisions(brEval args[], brEval *target, brInstance *i) { 
 	slMultibody *m = BRMULTIBODYPOINTER(&args[0]);
 
-	if (m)
-		slMultibodySetHandleSelfCollisions(m, BRINT(&args[1]));
+	if (m) m->setHandleSelfCollisions(BRINT(&args[1]));
    
 	return EC_OK;
 }
@@ -203,11 +203,10 @@ int brIMultibodySetHandleSelfCollisions(brEval args[], brEval *target, brInstanc
 	int multibodyCheckSelfPenetration(slWorldObject pointer body).
 */
 
-int brIMultibodyCheckSelfPenetration(brEval args[], brEval *target, brInstance *i) { 
+int brIMultibodyCheckSelfPenetration(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *m = BRMULTIBODYPOINTER(&args[0]);
 
-	if (m)
-		BRINT(target) = slMultibodyCheckSelfPenetration(i->engine->world, m);
+	if (m) BRINT(target) = m->checkSelfPenetration();
    
 	return EC_OK;
 }

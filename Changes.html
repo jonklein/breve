@@ -27,6 +27,19 @@
 
 The <a href="http://www.spiderland.org/breve">breve</a> simulation environment change log.
 
+<li>New level-of-detail renderer for terrains
+
+<li>Added basic support for loading 3D meshes from 3DS files.
+
+<li>Adjusted camera movements so that they are more sensitive to the zoom factor, having a larger influence when the camera is zoomed out.
+
+<li>Arrow keypresses can now be caught with methods such as "catch-key-left-down".  This works for both "down" and "up", and for the directions "left", "right", "down", "up".
+
+<li>More of simulation backend converted to C++.
+
+<li>For developers: passing a NULL pointer from steve to an internal function 
+will now trigger a runtime error.  
+
 <h5>version 2.2.1 [04/28/2005]</h5>
 <ul>
 <li>Fixed neighbor detection bug.

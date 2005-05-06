@@ -16,6 +16,15 @@ class slSpring: public slObjectLine {
 
 		void step(double step);
 
+		void setLength(double length);
+		void setStrength(double strength);
+		void setDamping(double damping);
+		void setMode(int mode);
+
+		double getCurrentLength();
+		double getLength();
+		double getForce();
+
 		double _length;
 		double _strength;
 		double _damping;
@@ -36,14 +45,6 @@ void slSpringApplyForce(slSpring *spring);
 extern "C" {
 #endif
 slSpring *slSpringNew(slWorld *w, slLink *l1, slLink *l2, slVector *v1, slVector *v2, double length, double strength, double damping);
-
-double slSpringGetCurrentLength(slSpring *s);
-double slSpringGetLength(slSpring *s);
-
-void slSpringSetLength(slSpring *s, double length);
-void slSpringSetStrength(slSpring *s, double strength);
-void slSpringSetDamping(slSpring *s, double damping);
-void slSpringSetMode(slSpring *s, int mode);
 
 void slWorldRemoveSpring(slWorld *w, slSpring *s);
 void slWorldAddSpring(slWorld *w, slSpring *s);

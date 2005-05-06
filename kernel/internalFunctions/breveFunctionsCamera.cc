@@ -134,10 +134,8 @@ int brICameraPositionDisplay(brEval args[], brEval *target, brInstance *i) {
 
 int brICameraResizeDisplay(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	int x = BRINT(&args[1]);
-	int y = BRINT(&args[2]);
 
-	slCameraResize(camera, x, y);
+	camera->resize(BRINT(&args[1]), BRINT(&args[2]));
 
 	return EC_OK;
 }
@@ -151,7 +149,7 @@ int brICameraResizeDisplay(brEval args[], brEval *target, brInstance *i) {
 int brICameraNew(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera;
 
-	camera = slCameraNew(0, 0);
+	camera = new slCamera(0, 0);
 
 	slVectorSet(&camera->target, 1, 0, 0);
 	slVectorSet(&camera->location, 0, 0, 0);
@@ -174,7 +172,7 @@ int brICameraFree(brEval args[], brEval *target, brInstance *i) {
 
 	slWorldRemoveCamera(i->engine->world, camera);
 
-	slCameraFree(camera);
+	delete camera;
 
 	return EC_OK;
 }
@@ -206,8 +204,39 @@ int brICameraPosition(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraSetEnabled(brEval args[], brEval *target, brInstance *i) {
-	// camera->enabled = BRINT(&args[1]);
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
+	// camera->_enabled = BRINT(&args[1]);
 
+	return EC_OK;
+}
+
+/*!
+	\brief Sets the rotation for a camera
+
+	void cameraSetRotation(slCamera pointer, float, float).
+*/
+
+int brICameraSetRotation(brEval args[], brEval *target, brInstance *i) {
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
+	camera->rx = BRDOUBLE(&args[1]);
+	camera->ry = BRDOUBLE(&args[2]);
+
+	camera->update();
+
+	return EC_OK;
+}
+
+/*!
+	\brief Gets the rotation for a camera
+
+	void cameraGetRotation(slCamera pointer, int).
+*/
+
+int brICameraGetRotation(brEval args[], brEval *target, brInstance *i) {
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
+	BRVECTOR(target).x = camera->rx;
+	BRVECTOR(target).y = camera->ry;
+	BRVECTOR(target).z = 0;
 	return EC_OK;
 }
 
@@ -231,6 +260,8 @@ void breveInitCameraFunctions(brNamespace *n) {
 	brNewBreveCall(n, "cameraSetZClip", brICameraSetZClip, AT_NULL, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "cameraPositionDisplay", brICameraPositionDisplay, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
 	brNewBreveCall(n, "cameraResizeDisplay", brICameraResizeDisplay, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
+	brNewBreveCall(n, "cameraSetRotation", brICameraSetRotation, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0);
+	brNewBreveCall(n, "cameraGetRotation", brICameraGetRotation, AT_VECTOR, AT_POINTER, 0);
 	brNewBreveCall(n, "cameraNew", brICameraNew, AT_POINTER, 0);
 	brNewBreveCall(n, "cameraSetBlur", brICameraSetBlur, AT_NULL, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "cameraClear", brICameraClear, AT_NULL, AT_POINTER, 0);

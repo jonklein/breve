@@ -33,7 +33,7 @@
 int brILinkNew(brEval args[], brEval *target, brInstance *i) {
 	slLink *l;
 
-	l = slLinkNew(i->engine->world);
+	l = new slLink(i->engine->world);
 
 	slWorldObjectSetCallbackData(l, i);
 
@@ -74,7 +74,7 @@ int brILinkSetShape(brEval args[], brEval *target, brInstance *i) {
 	slLink *l = BRLINKPOINTER(&args[0]);
 	slShape *s = (slShape*)BRPOINTER(&args[1]);
 
-	slLinkSetShape(l, s);
+	l->setShape(s);
 
 	return EC_OK;
 }
@@ -382,7 +382,7 @@ int brILinkGetMultibody(brEval args[], brEval *target, brInstance *i) {
 	}
 
 	if ((mb = slLinkGetMultibody(link)))
-		BRINSTANCE(target) = (brInstance *)slMultibodyGetCallbackData(mb);
+		BRINSTANCE(target) = (brInstance *)mb->getCallbackData();
 	else
 		BRINSTANCE(target) = NULL;
 
@@ -456,7 +456,7 @@ int brILinkGetMax(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slLinkGetBounds(l, NULL, &BRVECTOR(target));
+	l->getBounds(NULL, &BRVECTOR(target));
 
 	return EC_OK;
 }
@@ -477,7 +477,7 @@ int brILinkGetMin(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slLinkGetBounds(l, &BRVECTOR(target), NULL);
+	l->getBounds(&BRVECTOR(target), NULL);
 
 	return EC_OK;
 }
@@ -536,7 +536,7 @@ int brILinkSetLabel(brEval args[], brEval *target, brInstance *i) {
 		return EC_OK;
 	}
 
-	slLinkSetLabel(link, label);
+	link->setLabel(label);
 
 	return EC_OK;
 }
@@ -548,14 +548,14 @@ int brILinkSetLabel(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brILinkRemoveLabel(brEval args[], brEval *target, brInstance *i) {
-	slLink *m = BRLINKPOINTER(&args[0]);
+	slLink *link = BRLINKPOINTER(&args[0]);
 
-	if(!m) {
+	if(!link) {
 		slMessage(DEBUG_ALL, "NULL pointer passed to linkSetLabel\n");
 		return EC_OK;
 	}
 
-	slLinkSetLabel(m, NULL);
+	link->setLabel("");
 
 	return EC_OK;
 }

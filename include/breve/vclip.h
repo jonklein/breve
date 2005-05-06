@@ -18,6 +18,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _VCLIP_H
+#define _VCLIP_H
+
+#include "vclipData.h"
+
 #define MC_TOLERANCE	0.00
 #define VC_WARNING_TOLERANCE -0.1
 
@@ -184,3 +189,5 @@ void slEdgeFaceCountCollisionPoints(slCollision *p, int pairFlip, slEdge *e, slP
 int slEdgePointOnFace(slEdge *e, slPosition *ep, slFace *f, slPosition *fp, slVector *point);
 
 double slPointLineDist(slVector *p1, slVector *p2, slVector *point, slVector *i);
+
+#endif /* _VCLIP_H */

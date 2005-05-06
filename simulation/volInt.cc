@@ -268,30 +268,28 @@ int slSetMassProperties(slShape *s, double density) {
  
   compVolumeIntegrals(&p);
 
-  s->mass = density * T0;
+  s->_mass = density * T0;
 
   /* compute center of mass */
   r[X] = T1[X] / T0;
   r[Y] = T1[Y] / T0;
   r[Z] = T1[Z] / T0;
 
-  // printf("%f, %f, %f: %f\n", r[X], r[Y], r[Z], s->mass);
-
-  /* compute inertia tensor */
-  s->inertia[X][X] = density * (T2[Y] + T2[Z]);
-  s->inertia[Y][Y] = density * (T2[Z] + T2[X]);
-  s->inertia[Z][Z] = density * (T2[X] + T2[Y]);
-  s->inertia[X][Y] = s->inertia[Y][X] = - density * TP[X];
-  s->inertia[Y][Z] = s->inertia[Z][Y] = - density * TP[Y];
-  s->inertia[Z][X] = s->inertia[X][Z] = - density * TP[Z];
+  // compute inertia tensor 
+  s->_inertia[X][X] = density * (T2[Y] + T2[Z]);
+  s->_inertia[Y][Y] = density * (T2[Z] + T2[X]);
+  s->_inertia[Z][Z] = density * (T2[X] + T2[Y]);
+  s->_inertia[X][Y] = s->_inertia[Y][X] = - density * TP[X];
+  s->_inertia[Y][Z] = s->_inertia[Z][Y] = - density * TP[Y];
+  s->_inertia[Z][X] = s->_inertia[X][Z] = - density * TP[Z];
 
   /* translate inertia tensor to center of mass */
-  s->inertia[X][X] -= s->mass * (r[Y]*r[Y] + r[Z]*r[Z]);
-  s->inertia[Y][Y] -= s->mass * (r[Z]*r[Z] + r[X]*r[X]);
-  s->inertia[Z][Z] -= s->mass * (r[X]*r[X] + r[Y]*r[Y]);
-  s->inertia[X][Y] = s->inertia[Y][X] += s->mass * r[X] * r[Y]; 
-  s->inertia[Y][Z] = s->inertia[Z][Y] += s->mass * r[Y] * r[Z]; 
-  s->inertia[Z][X] = s->inertia[X][Z] += s->mass * r[Z] * r[X]; 
+  s->_inertia[X][X] -= s->_mass * (r[Y]*r[Y] + r[Z]*r[Z]);
+  s->_inertia[Y][Y] -= s->_mass * (r[Z]*r[Z] + r[X]*r[X]);
+  s->_inertia[Z][Z] -= s->_mass * (r[X]*r[X] + r[Y]*r[Y]);
+  s->_inertia[X][Y] = s->_inertia[Y][X] += s->_mass * r[X] * r[Y]; 
+  s->_inertia[Y][Z] = s->_inertia[Z][Y] += s->_mass * r[Y] * r[Z]; 
+  s->_inertia[Z][X] = s->_inertia[X][Z] += s->_mass * r[Z] * r[X]; 
 
   return 0;
 }

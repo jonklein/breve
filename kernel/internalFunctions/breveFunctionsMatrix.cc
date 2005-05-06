@@ -435,7 +435,6 @@ int brIMatrix3DDiffuse(brEval args[], brEval *target, brInstance *i) {
     
                 if(y - 1 >= 0) dym = chemData[ (z * chemXY) + (x * chemTDA) + (y - 1) ];
                 else dym = 0.0f;
-                
                 if(y + 1 < static_cast<int>(yDim)) dyp = chemData[ (z * chemXY) + (x * chemTDA) + (y + 1) ];
                 else dyp = 0.0f;
 

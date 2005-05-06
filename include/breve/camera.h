@@ -18,6 +18,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _CAMERA_H
+#define _CAMERA_H
+
+#include <vector>
+
 #define SPHERE_RESOLUTIONS	10
 
 enum billboardType {
@@ -45,9 +50,9 @@ struct slLight {
 #ifdef __cplusplus
 class slCameraText {
 	public:
-		slCameraText() { text = NULL; }
+		slCameraText() { }
 
-		char *text;
+		std::string text;
 		float x;
 		float y;
 		slVector color;
@@ -86,11 +91,23 @@ class slCamera {
 		slLight lights[8];
 		int nLights;
 
+		slCamera(int width, int height);
+		~slCamera();
+
 		void updateFrustum();
 
-		int pointInFrustum(slVector *test);
-		int minMaxInFrustum(slVector *min, slVector *max);
-		int polygonInFrustum(slVector *test, int n);
+		void resize(int, int);
+
+		int pointInFrustum(slVector *);
+		int minMaxInFrustum(slVector *, slVector *);
+		int polygonInFrustum(slVector *, int);
+
+		void setBounds(unsigned int, unsigned int);
+		void getBounds(unsigned int *, unsigned int *);
+		void getRotation(double *, double *);
+		void setRecompile();
+
+		void update();
 
 		std::vector< std::pair< slVector, slVector> > _points;
 
@@ -179,17 +196,9 @@ class slCamera {
 };
 #endif
 
-void slCameraUpdateFrustum(slCamera *);
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-slCamera *slCameraNew(int, int);
-void slUpdateCamera(slCamera *);
-
-void slCameraResize(slCamera *, int, int);
-
-void slCameraFree(slCamera *);
 
 void slSetCameraText(slCamera *, int, char *, float, float, slVector *);
 void slSetShadowCatcher(slCamera *, slStationary *, slVector *);
@@ -204,14 +213,9 @@ void slRotateCameraWithMouseMovement(slCamera *, double, double);
 void slMoveCameraWithMouseMovement(slCamera *, double, double);
 void slZoomCameraWithMouseMovement(slCamera *, double, double);
 
-void slCameraSetBounds(slCamera *, unsigned int, unsigned int);
-void slCameraGetBounds(slCamera *, unsigned int *, unsigned int *);
-
-void slCameraGetRotation(slCamera *, double *, double *);
-
-void slCameraSetRecompile(slCamera *);
-
 void slCameraSetActivateContextCallback(slCamera *, int (*)(void));
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* _CAMERA_H */

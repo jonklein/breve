@@ -235,7 +235,7 @@ void slWorldSetQuickstepIterations(slWorld *, int);
 
 slWorldObject *slWorldGetObject(slWorld *, unsigned int);
 
-int slWorldLoadTigerFile(slWorld *, char *);
+slGISData *slWorldLoadTigerFile(slWorld *, char *, slTerrain *);
 #ifdef __cplusplus
 }
 #endif

@@ -40,13 +40,14 @@
 #define srandom srand
 #endif
 
+#include "error.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "utilTypedefs.h"
 
-#include "error.h"
 #include "hash.h"
 #include "list.h"
 #include "matrix.h"

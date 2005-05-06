@@ -26,6 +26,15 @@
 /*@{*/
 
 /*!
+	\brief Loads a GIS data file.
+*/
+
+int brIWorldLoadTigerFile(brEval args[], brEval *target, brInstance *i) {
+	BRPOINTER(target) = slWorldLoadTigerFile(i->engine->world, BRSTRING(&args[0]), (slTerrain*)BRPOINTER(&args[1]));
+	return EC_OK;
+}
+
+/*!
 	\brief Enables or disables fast-physics.
 
 	setStepFast(int).
@@ -547,7 +556,7 @@ int brICameraSetTarget(brEval args[], brEval *target, brInstance *i) {
 
 	slVectorCopy(tar, &i->engine->camera->target);
 
-	slUpdateCamera(i->engine->camera);
+	i->engine->camera->update();
 
 	return EC_OK;
 }
@@ -596,25 +605,7 @@ int brICameraSetOffset(brEval args[], brEval *target, brInstance *i) {
 
 	if(loc->z < 0.0) i->engine->camera->ry = M_PI - i->engine->camera->ry;
 
-	slUpdateCamera(i->engine->camera);
-
-	return EC_OK;
-}
-
-/*!
-	\brief Set the rotation of the camera.
-
-	void cameraSetRotation(double x, double y).
-*/
-
-int brICameraSetRotation(brEval args[], brEval *target, brInstance *i) {
-	double rx = BRDOUBLE(&args[0]);
-	double ry = BRDOUBLE(&args[1]);
-
-	i->engine->camera->rx = rx;
-	i->engine->camera->ry = ry;
-
-	slUpdateCamera(i->engine->camera);
+	i->engine->camera->update();
 
 	return EC_OK;
 }
@@ -653,7 +644,7 @@ int brICameraSetZoom(brEval args[], brEval *target, brInstance *i) {
 
 	i->engine->camera->zoom = z;
 
-	slUpdateCamera(i->engine->camera);
+	i->engine->camera->update();
 
 	return EC_OK;
 }
@@ -664,28 +655,6 @@ int brICameraSetZoom(brEval args[], brEval *target, brInstance *i) {
 
 int brICameraGetZoom(brEval args[], brEval *target, brInstance *i) {
 	BRDOUBLE(target) = i->engine->camera->zoom;
-	return EC_OK;
-}
-
-/*!
-	\brief Returns the y-rotation of the camera.
-
-	double cameraGetRY().
-*/
-
-int brICameraGetRY(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = i->engine->camera->ry;
-	return EC_OK;
-}
-
-/*!
-	\brief Returns the x-rotation of the camera.
-
-	double cameraGetRX().
-*/
-
-int brICameraGetRX(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = i->engine->camera->rx;
 	return EC_OK;
 }
 
@@ -927,30 +896,18 @@ int brISetBoundsOnlyCollisionDetection(brEval args[], brEval *target, brInstance
 }
 
 /*!
-	\brief Loads data from a Tiger/Line file.
+	\brief Raytraces from an object in a given direction -- implementation not complete [?] 
 */
-
-int brILoadTigerData(brEval args[], brEval *target, brInstance *i) {
-	slWorldLoadTigerFile(i->engine->world, BRSTRING(&args[0]));
-	return EC_OK;
-
-}
 
 int brIRaytrace(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *o    = BRWORLDOBJECTPOINTER(&args[0]);
  	slVector *location  = &BRVECTOR(&args[1]);
-        slVector *direction = &BRVECTOR(&args[2]); 
-
-	if(!o) {
-		slMessage(DEBUG_ALL, "null pointer passed to raytrace\n");
-		return EC_ERROR;
-	}
+	slVector *direction = &BRVECTOR(&args[2]); 
 
 	int error = slWorldObjectRaytrace(o, location, direction, &BRVECTOR(target));
 
-        if (error == -2)
-           return EC_ERROR;
-        
+	if (error == -2) return EC_ERROR;
+
 	return EC_OK;
 }
 
@@ -961,6 +918,8 @@ int brIRaytrace(brEval args[], brEval *target, brInstance *i) {
 */
 
 void breveInitWorldFunctions(brNamespace *n) {
+	brNewBreveCall(n, "worldLoadTigerFile", brIWorldLoadTigerFile, AT_POINTER, AT_STRING, AT_POINTER, 0);
+
 	brNewBreveCall(n, "worldObjectGetLightExposure", brIWorldObjectGetLightExposure, AT_INT, AT_POINTER, 0);
 
 	brNewBreveCall(n, "setStepFast", brISetStepFast, AT_POINTER, AT_INT, 0);
@@ -995,11 +954,8 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "cameraSetOffset", brICameraSetOffset, AT_NULL, AT_VECTOR, 0);
 	brNewBreveCall(n, "cameraSetTarget", brICameraSetTarget, AT_NULL, AT_VECTOR, 0);
 
-	brNewBreveCall(n, "cameraSetRotation", brICameraSetRotation, AT_NULL, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "cameraSetZoom", brICameraSetZoom, AT_NULL, AT_DOUBLE, 0);
 	brNewBreveCall(n, "cameraGetZoom", brICameraGetZoom, AT_DOUBLE, 0);
-	brNewBreveCall(n, "cameraGetRX", brICameraGetRX, AT_DOUBLE, 0);
-	brNewBreveCall(n, "cameraGetRY", brICameraGetRY, AT_DOUBLE, 0);
 	brNewBreveCall(n, "cameraGetTarget", brICameraGetTarget, AT_VECTOR, 0);
 	brNewBreveCall(n, "cameraGetOffset", brICameraGetOffset, AT_VECTOR, 0);
 	brNewBreveCall(n, "cameraSetText", brICameraSetText, AT_NULL, AT_STRING, AT_INT, AT_DOUBLE, AT_DOUBLE, AT_VECTOR, 0);
@@ -1026,8 +982,6 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "objectLineSetStipple", brIObjectLineSetStipple, AT_NULL, AT_POINTER, AT_STRING, 0);
 
 	brNewBreveCall(n, "setBoundsOnlyCollisionDetection", brISetBoundsOnlyCollisionDetection, AT_NULL, AT_INT, 0);
-
-	brNewBreveCall(n, "loadTigerData", brILoadTigerData, AT_NULL, AT_STRING, 0);
 
 	brNewBreveCall(n, "setCollisionProperties", brISetCollisionProperties, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0);
 

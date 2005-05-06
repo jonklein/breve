@@ -8,16 +8,19 @@ Real : Terrain [version 2.2] {
 		peakColor, valleyColor (vector).
 
 	+ to init:
-		realWorldPointer = newTerrain(1).
+		realWorldPointer = terrainNew(1).
 		self set-peak-color to (1, 1, 1).
 		self set-valley-color to (0, .8, .1).
 		self set-texture-image to (new Image load from "images/grass.jpg").
+
+	- to load-geo-tiff from geoTIFFFile (string):
+		if realWorldPointer: terrainLoadGeoTIFF(realWorldPointer, geoTIFFFile).
 
 	+ to set-scale to value (double):
 		% Changes the size of a single tile in the terrain.  This does not change
 		% the number of elevation points in the terrain.
 
-		setTerrainScale(realWorldPointer, value).
+		terrainSetScale(realWorldPointer, value).
 
 	- to generate with-ruggedness ruggedness = 0.2 (float) with-height terrainHeight = 5.0 (float):
 		self generate-fractal-terrain with-ruggedness ruggedness with-height terrainHeight.
@@ -26,7 +29,7 @@ Real : Terrain [version 2.2] {
 		% Generates a fractal landscape with a ruggedness (between 0.0 and 1.0),
 		% and maximum height terrainHeight.
 	
-		generateFractalTerrain(realWorldPointer, 1.0 - ruggedness, terrainHeight).
+		terrainGenerateFractalTerrain(realWorldPointer, 1.0 - ruggedness, terrainHeight).
 
 	+ to get-location:
 		% Returns the location of this Terrain object.
@@ -40,28 +43,34 @@ Real : Terrain [version 2.2] {
 
 		location = newLocation.
 
-		setTerrainPosition(realWorldPointer, newLocation).
+		terrainSetPosition(realWorldPointer, newLocation).
 
 	+ to set-height at-x xCoordinate (int) at-y yCoordinate (int) to height (double):
 		% Sets the height of the terrain at (xCoordinate, yCoordinate) to height.
 		% The coordinates refer to the polygons on the terrain, not to the real
 		% world location of points on the terrain.
 
-		setTerrainHeight(realWorldPointer, xCoordinate, yCoordinate, height).
+		terrainSetHeight(realWorldPointer, xCoordinate, yCoordinate, height).
 
 	+ to get-height at-x xCoordinate (int) at-y yCoordinate (int):
 		% Returns the height of the terrain at (xCoordinate, yCoordinate).
 		% The coordinates refer to the polygons on the terrain, not to the real
 		% world location of points on the terrain.
 
-		return getTerrainHeight(realWorldPointer, xCoordinate, yCoordinate).
+		return terrainGetHeight(realWorldPointer, xCoordinate, yCoordinate).
 
 	+ to get-height-in-world at-x xCoordinate (double) at-z zCoordinate (double):
 		% This method returns the height of the terrain at the <b>real world</b> 
 		% (xCoordinate, zCoodinate) location.  This is in contrast to the height
 		% in terrain grid coordinates given give with METHOD(get-height)
 
-		return getTerrainHeightAtLocation(realWorldPointer, xCoordinate, zCoordinate).
+		return terrainGetHeightAtLocation(realWorldPointer, xCoordinate, zCoordinate).
+
+	+ to draw-solid:
+		terrainSetDrawMode(realWorldPointer, 1).
+
+	+ to draw-wireframe:
+		terrainSetDrawMode(realWorldPointer, 0).
 
 	+ to set-peak-color to color (vector):
 		% Sets the color of the highest regions of the terrain to color.
@@ -69,7 +78,7 @@ Real : Terrain [version 2.2] {
 		% towards the color specified with METHOD(set-valley-color).
 
 		peakColor = color.
-		setPeakColor(realWorldPointer, color).
+		terrainSetPeakColor(realWorldPointer, color).
 
 	+ to set-valley-color to color (vector):
 		% Sets the color of the lowest regions of the terrain to color.
@@ -77,7 +86,7 @@ Real : Terrain [version 2.2] {
 		% towards the color specified with METHOD(set-peak-color).
 
 		valleyColor = color.
-		setValleyColor(realWorldPointer, color).
+		terrainSetValleyColor(realWorldPointer, color).
 
 	+ to set-color to color (vector):
 		% Sets the color of this terrain object.  The peak and valley colors
@@ -91,7 +100,7 @@ Real : Terrain [version 2.2] {
 		return 1.
 
 	+ to dearchive:
-		realWorldPointer = newTerrain(1).
+		realWorldPointer = terrainNew(1).
 		self set-peak-color to peakColor.
 		self set-valley-color to valleyColor.
 

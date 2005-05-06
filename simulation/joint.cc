@@ -1,6 +1,8 @@
 #include "simulation.h"
 
-// is this really correct?
+/*!
+	\brief Applies a torque to a revolute joint.
+*/
 
 void slJointApplyTorque(slJoint *j, slVector *torque) {
 	slVector t;
@@ -14,6 +16,20 @@ void slJointApplyTorque(slJoint *j, slVector *torque) {
 
 	if(j->parent) dBodySetTorque(j->parent->odeBodyID, t.x, t.y, t.z);
    	if(j->child) dBodySetTorque(j->child->odeBodyID, -t.x, -t.y, -t.z);
+}
+
+/*!
+	\brief Sets the normal vector of a prismatic or revolute joint.
+*/
+
+int slJointSetNormal(slJoint *joint, slVector *normal) {
+	if(joint->type == JT_REVOLUTE) {
+		dJointSetHingeAxis(joint->odeJointID, normal->x, normal->y, normal->z);
+	} else if(joint->type == JT_PRISMATIC) {
+		dJointSetSliderAxis(joint->odeJointID, normal->x, normal->y, normal->z);
+	}	
+
+	return 0;
 }
 
 /*!
@@ -61,20 +77,20 @@ void slJointBreak(slJoint *joint) {
 	joint->child = NULL;
 	joint->parent = NULL;
 
-	if(parentBody) slMultibodyUpdate(parentBody);
-	if(childBody && childBody != parentBody) slMultibodyUpdate(childBody);
+	if(parentBody) parentBody->update();
+	if(childBody && childBody != parentBody) childBody->update();
 
 	// figure out if the broken links are still part of those bodies
 	// ... if not, then try to adopt the links 
 	// ... if not, then NULL the multibody entries 
 
-	if(parent && parentBody && (std::find(parentBody->links.begin(), parentBody->links.end(), parent) != parentBody->links.end())) {
-		if((newMb = slLinkFindMultibody(parent))) slMultibodyUpdate(newMb);
+	if(parent && parentBody && (std::find(parentBody->_links.begin(), parentBody->_links.end(), parent) != parentBody->_links.end())) {
+		if((newMb = slLinkFindMultibody(parent))) newMb->update();
 		else slNullOrphanMultibodies(parent);
 	}
 
-	if(child && childBody && (std::find(childBody->links.begin(), childBody->links.end(), child) != childBody->links.end())) {
-		if((newMb = slLinkFindMultibody(child))) slMultibodyUpdate(newMb);
+	if(child && childBody && (std::find(childBody->_links.begin(), childBody->_links.end(), child) != childBody->_links.end())) {
+		if((newMb = slLinkFindMultibody(child))) newMb->update();
 		else slNullOrphanMultibodies(child);
 	}
 }
@@ -222,4 +238,76 @@ void slJointSetMaxTorque(slJoint *joint, double max) {
 			dJointSetAMotorParam(joint->odeMotorID, dParamFMax3, max);
 			break;
 	}
+}
+
+/*!
+	\brief Modifies the link points of a joint.
+*/
+
+int slJointSetLinkPoints(slJoint *joint, slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3]) {
+	const double *childR;
+	dReal idealR[16];
+	dReal savedChildR[16];
+	slVector hingePosition, childPosition;
+	double ideal[3][3];
+
+	childR = dBodyGetRotation(joint->child->odeBodyID);
+	memcpy(savedChildR, childR, sizeof(savedChildR));
+
+	if (joint->parent)
+	   slMatrixMulMatrix(joint->parent->position.rotation, rotation, ideal);
+	else
+	   slMatrixCopy(rotation, ideal);		
+
+	slSlToODEMatrix(ideal, idealR);
+
+	/* compute the hinge position--the plinkPoint in world coordinates */
+
+	if(joint->parent) {
+		slVectorXform(joint->parent->position.rotation, plinkPoint, &hingePosition);
+		slVectorAdd(&hingePosition, &joint->parent->position.location, &hingePosition);
+	} else {
+		slVectorCopy(plinkPoint, &hingePosition);
+	}
+
+	/* set the ideal positions, so that the anchor command registers the native position */
+
+	slVectorXform(ideal, clinkPoint, &childPosition);
+	slVectorSub(&hingePosition, &childPosition, &childPosition);
+
+	dJointAttach(joint->odeJointID, NULL, NULL);
+
+	dBodySetRotation(joint->child->odeBodyID, idealR);
+	dBodySetPosition(joint->child->odeBodyID, childPosition.x, childPosition.y, childPosition.z);
+
+	if(joint->parent) dJointAttach(joint->odeJointID, joint->parent->odeBodyID, joint->child->odeBodyID);
+	else dJointAttach(joint->odeJointID, NULL, joint->child->odeBodyID);
+
+	switch(joint->type) {
+		case JT_REVOLUTE:
+			dJointSetHingeAnchor(joint->odeJointID, hingePosition.x, hingePosition.y, hingePosition.z);
+			break;
+		case JT_FIX:
+			dJointSetFixed(joint->odeJointID);
+			break;
+		case JT_UNIVERSAL:
+			dJointSetUniversalAnchor(joint->odeJointID, hingePosition.x, hingePosition.y, hingePosition.z);
+			break;
+		case JT_BALL:
+			dJointSetBallAnchor(joint->odeJointID, hingePosition.x, hingePosition.y, hingePosition.z);
+			break;
+		default:
+			break;
+	}
+
+	/* set the proper positions where the link should actually be at this time */
+
+	slVectorXform(joint->child->position.rotation, clinkPoint, &childPosition);
+	slVectorSub(&hingePosition, &childPosition, &childPosition);
+
+	dBodySetRotation(joint->child->odeBodyID, savedChildR);
+	dBodySetPosition(joint->child->odeBodyID, childPosition.x, childPosition.y, childPosition.z);
+	slVectorCopy(&childPosition, &joint->child->position.location);
+
+	return 0;
 }

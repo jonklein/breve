@@ -10,37 +10,49 @@ int brISpringNew(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISpringSetStrength(brEval args[], brEval *target, brInstance *i) {
-	slSpringSetStrength(BRSPRINGPOINTER(&args[0]), BRDOUBLE(&args[1]));
+	slSpring *s = (slSpring*)BRPOINTER(&args[0]);
+
+	s->setStrength(BRDOUBLE(&args[1]));
 
 	return EC_OK;
 }
 
 int brISpringSetLength(brEval args[], brEval *target, brInstance *i) {
-	slSpringSetLength(BRSPRINGPOINTER(&args[0]), BRDOUBLE(&args[1]));
+	slSpring *s = (slSpring*)BRPOINTER(&args[0]);
+
+	s->setLength(BRDOUBLE(&args[1]));
 
 	return EC_OK;
 }
 
 int brISpringGetCurrentLength(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = slSpringGetCurrentLength(BRSPRINGPOINTER(&args[0]));
+	slSpring *s = (slSpring*)BRPOINTER(&args[0]);
+
+	BRDOUBLE(target) = s->getCurrentLength();
 
 	return EC_OK;
 }
 
 int brISpringGetForce(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = slSpringGetForce(BRSPRINGPOINTER(&args[0]));
+	slSpring *s = (slSpring*)BRPOINTER(&args[0]);
+
+	BRDOUBLE(target) = s->getForce();
 
 	return EC_OK;
 }
 
 int brISpringSetDamping(brEval args[], brEval *target, brInstance *i) {
-	slSpringSetDamping(BRSPRINGPOINTER(&args[0]), BRDOUBLE(&args[1]));
+	slSpring *s = (slSpring*)BRPOINTER(&args[0]);
+
+	s->setDamping(BRDOUBLE(&args[1]));
 
 	return EC_OK;
 }
 
 int brISpringSetMode(brEval args[], brEval *target, brInstance *i) {
-	slSpringSetMode(BRSPRINGPOINTER(&args[0]), BRINT(&args[1]));
+	slSpring *s = (slSpring*)BRPOINTER(&args[0]);
+
+	s->setMode(BRINT(&args[1]));
 
 	return EC_OK;
 }
