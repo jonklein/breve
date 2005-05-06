@@ -217,17 +217,17 @@ slPatchGrid::~slPatchGrid()
  *
  */
 slPatch* slPatchGrid::slPatchGrid::getPatchAtLocation(slVector *location) {
-	int x, y, z;
+	double x, y, z;
 	
-	x = (int)((location->x - startPosition.x) / patchSize.x);
-	y = (int)((location->y - startPosition.y) / patchSize.y);
-	z = (int)((location->z - startPosition.z) / patchSize.z);
+	x = ((location->x - startPosition.x) / patchSize.x);
+	y = ((location->y - startPosition.y) / patchSize.y);
+	z = ((location->z - startPosition.z) / patchSize.z);
 
 	if(x < 0 || x >= xSize) return NULL;
 	if(y < 0 || y >= ySize) return NULL;
 	if(z < 0 || z >= zSize) return NULL;
 
-	return &patches[z][x][y];
+	return &patches[int(z)][int(x)][int(y)];
 }
 
 /**
