@@ -183,11 +183,9 @@ void slCenterPixelsInSquareBuffer(unsigned char *pixels, int width, int height, 
 unsigned int slTextureNew(slCamera *c) {
 	GLuint texture;
 
-	if (!glActive)
-		return 0;
+	if (!glActive) return 0;
 
-	if (c->activateContextCallback)
-		c->activateContextCallback();
+	if (c->activateContextCallback) c->activateContextCallback();
 
 	glGenTextures(1, &texture);
 	return texture;
@@ -197,8 +195,7 @@ void slTextureFree(slCamera *c, const unsigned int n) {
 	if (!glActive)
 		return;
 
-	if (c->activateContextCallback)
-		c->activateContextCallback();
+	if (c->activateContextCallback) c->activateContextCallback();
 
 	glDeleteTextures(1, (GLuint *)&n);
 }
@@ -421,13 +418,15 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 }
 
 void slRenderScene(slWorld *w, slCamera *c, int crosshair) {
+	std::vector< slCamera* >::iterator ci;
+
 	if (w->detectLightExposure)
 		slDetectLightExposure(w, c, 200, NULL);
 
 	slRenderWorld(w, c, crosshair, 0);
-
-	if (w->cameras.size() != 0)
-		slRenderWorldCameras(w);
+ 
+	for(ci = w->cameras.begin(); ci != w->cameras.end(); ci++)
+        if (c != *ci) slRenderWorld(w, *ci, 0, 1);
 }
 
 void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
@@ -767,12 +766,12 @@ void slRenderText(slWorld *w, slCamera *c, slVector *location, slVector *target,
 		snprintf(textStr, sizeof(textStr), "target: (%.1f, %.1f, %.1f)",
 		    target->x, target->y, target->z);
 		slText(fromLeft, -1.0 + (30.0 / c->y), textStr, GLUT_BITMAP_HELVETICA_10);
-	} else
-		for(n = 0; n < c->text.size(); ++n)
-			if (c->text[n].text) {
-				glColor4f(c->text[n].color.x, c->text[n].color.y, c->text[n].color.z, 0.9);
-				slStrokeText(c->text[n].x, c->text[n].y, c->text[n].text, c->textScale, GLUT_STROKE_ROMAN);
-			}
+	} else {
+		for(n = 0; n < c->text.size(); n++) {
+			glColor4f(c->text[n].color.x, c->text[n].color.y, c->text[n].color.z, 0.9);
+			slStrokeText(c->text[n].x, c->text[n].y, c->text[n].text.c_str(), c->textScale, GLUT_STROKE_ROMAN);
+		}
+	}
 }
 
 /*!
@@ -851,11 +850,11 @@ void slRenderLabels(slWorld *w) {
 	for(wi = w->objects.begin(); wi != w->objects.end(); wi++) {
 		wo = *wi;
 
-		if (wo->label) {
+		if (! wo->label.empty()) {
 			l = &wo->position.location;
 			glPushMatrix();
 			glTranslatef(l->x, l->y, l->z);
-			slText(0, 0, wo->label, GLUT_BITMAP_HELVETICA_10);
+			slText(0, 0, wo->label.c_str() , GLUT_BITMAP_HELVETICA_10);
 			glPopMatrix();
 		}
 	}
@@ -948,7 +947,7 @@ void slRenderBillboards(slCamera *c, int flags) {
 		glPopAttrib();
 }
 
-void slStrokeText(double x, double y, char *string, double scale, void *font) {
+void slStrokeText(double x, double y, const char *string, double scale, void *font) {
 	int c;
 
 	glPushMatrix();
@@ -967,7 +966,7 @@ void slStrokeText(double x, double y, char *string, double scale, void *font) {
 	glPopMatrix();
 }
 
-void slText(double x, double y, char *string, void *font) {
+void slText(double x, double y, const char *string, void *font) {
 	int c;
 
 	glRasterPos2f(x, y);
@@ -1018,8 +1017,8 @@ void slDrawLights(slCamera *c, int noDiffuse) {
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 
-	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.1);
-	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.03);
+	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 1.0);
+	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.00);
 
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, dif);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
@@ -1316,17 +1315,17 @@ void slDrawAxis(double x, double y) {
 */
 
 int slCompileShape(slShape *s, int drawMode, double textureScale, int flags) {
-	if (!s->drawList)
-		s->drawList = glGenLists(1);
-	s->recompile = 0;
+	if (!s->_drawList)
+		s->_drawList = glGenLists(1);
+	s->_recompile = 0;
 
-	glNewList(s->drawList, GL_COMPILE);
+	glNewList(s->_drawList, GL_COMPILE);
 
 	slRenderShape(s, drawMode, textureScale, flags);
 
 	glEndList();
 
-	return s->drawList;
+	return s->_drawList;
 }
 
 /*!
@@ -1597,8 +1596,8 @@ void slFreeGL(slWorld *w, slCamera *c) {
 
 	for (n = 0; n < w->objects.size(); ++n) {
 		if (w->objects[n] && w->objects[n]->shape) {
-			glDeleteLists(w->objects[n]->shape->drawList, 1);
-			w->objects[n]->shape->drawList = 0;
+			glDeleteLists(w->objects[n]->shape->_drawList, 1);
+			w->objects[n]->shape->_drawList = 0;
 		}
 	}
 }

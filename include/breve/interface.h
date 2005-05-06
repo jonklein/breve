@@ -11,6 +11,8 @@ brInstance *brClickCallback(brEngine *, int);
 brInstance *brClickAtLocation(brEngine *, int, int);
 int brDragCallback(brEngine *, int, int);
 int brKeyCallback(brEngine *, unsigned char, int);
+int brSpecialKeyCallback(brEngine *e, char *name, int isDown);
+
 int brInterfaceCallback(brEngine *, int, char *);
 
 char *brEngineRunSaveDialog(brEngine *);

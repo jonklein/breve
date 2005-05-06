@@ -50,6 +50,7 @@ static int xpos = 0, ypos = 0;
 static breveFrontend *frontend;
 
 static char keyDown[256];
+static char specialDown[256];
 
 static int gPaused = 1;
 static int gWaiting = 0;
@@ -162,6 +163,7 @@ int main(int argc, char **argv) {
 	brEngineSetUpdateMenuCallback(frontend->engine, brGlutMenuUpdate);
 
 	memset(keyDown, 0, sizeof(keyDown));
+	memset(specialDown, 0, sizeof(specialDown));
 
 	pthread_mutex_lock(&gThreadMutex);
 	pthread_create(&thread, NULL, workerThread, NULL);
@@ -526,22 +528,26 @@ void slDemoMotion(int x, int y) {
 void slDemoSpecial(int key, int x, int y) {
 	gSpecial = key;
 
+	if(specialDown[key]) return;
+
+	specialDown[key] = 1;
+
 	switch(key) {
 		case GLUT_KEY_F1:
 			if (brEngineIterate(frontend->engine) != EC_OK)
 				slFatal("engine iteration failed\n");
 			break;
 		case GLUT_KEY_UP:
-			slDemoMotion(0, -10);
+			brSpecialKeyCallback(frontend->engine, "up", 1);
 			break;
 		case GLUT_KEY_DOWN:
-			slDemoMotion(0, 10);
+			brSpecialKeyCallback(frontend->engine, "down", 1);
 			break;
 		case GLUT_KEY_LEFT:
-			slDemoMotion(-10, 0);
+			brSpecialKeyCallback(frontend->engine, "left", 1);
 			break;
 		case GLUT_KEY_RIGHT:
-			slDemoMotion(10, 0);
+			brSpecialKeyCallback(frontend->engine, "right", 1);
 			break;
 	}
 
@@ -549,12 +555,28 @@ void slDemoSpecial(int key, int x, int y) {
 }
 
 void slDemoSpecialUp(int key, int x, int y) {
+	specialDown[key] = 0;
+
+	switch(key) {
+		case GLUT_KEY_UP:
+			brSpecialKeyCallback(frontend->engine, "up", 0);
+			break;
+		case GLUT_KEY_DOWN:
+			brSpecialKeyCallback(frontend->engine, "down", 0);
+			break;
+		case GLUT_KEY_LEFT:
+			brSpecialKeyCallback(frontend->engine, "left", 0);
+			break;
+		case GLUT_KEY_RIGHT:
+			brSpecialKeyCallback(frontend->engine, "right", 0);
+			break;
+	}
+
 	gSpecial = 0;
 }
 
 void slDemoKeyboard(unsigned char key, int x, int y) {
-	if (keyDown[key])
-		return;
+	if (keyDown[key]) return;
 
 	keyDown[key] = 1;
 

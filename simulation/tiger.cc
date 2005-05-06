@@ -1,17 +1,46 @@
 #include "simulation.h"
 #include "tiger.h"
 
+#include <iostream>
+
+#define MAX(x,y)    ((x)>(y)?(x):(y))
+
+#define LAT_MUL 111079.81083422346
+#define LON_MUL 111079.81083422346
+
+#define LAT_OFF 42.33062596
+#define LON_OFF -72.64883895
+
 //
 // This is some simple code to read rudimentary data from
 // Tiger/Line files
 //
 
-slGISData::slGISData(char *file) {
+/*!
+	Loads GISData from a set of Tiger/Line files.
+
+	\param file is the root pathname of a set of Tiger files, without the 
+	.RTn extensions.  Currently, only files 1 and 2 are used.
+*/
+
+#define TOLERANCE 0.001
+
+bool operator==(const slGISPoint &a, const slGISPoint &b) {
+	return (a._x - b._x < TOLERANCE) && (a._y - b._y < TOLERANCE);
+}
+
+bool operator<(const slGISPoint &a, const slGISPoint &b) {
+	return ((a._x - b._x) < -TOLERANCE);
+}
+
+slGISData::slGISData(char *file, slTerrain *t) {
 	std::string rt1(file);
 	std::string rt2(file);
 
 	rt1 += ".RT1";
 	rt2 += ".RT2";
+
+	_terrain = t;
 
 	parseRT1File(rt1);
 	parseRT2File(rt2);
@@ -20,7 +49,6 @@ slGISData::slGISData(char *file) {
 int slGISData::parseRT1File(std::string rt1) {
 	char line[256];
 	std::fstream fs;
-	double totalLat = 0, totalLon = 0;
 
 	fs.open(rt1.c_str(), std::ios::in);
 
@@ -46,15 +74,15 @@ int slGISData::parseRT1File(std::string rt1) {
 		strncpy(clas, &line[55], 3);
 		clas[3] = 0;
 
-		strncpy(slat, &line[190], 10);
-		slat[10] = 0;
-		strncpy(slon, &line[200], 9);
-		slon[9] = 0;
+		strncpy(slon, &line[190], 10);
+		slon[10] = 0;
+		strncpy(slat, &line[200], 9);
+		slat[9] = 0;
 
-		strncpy(elat, &line[209], 10);
-		elat[10] = 0;
-		strncpy(elon, &line[219], 9);
-		elon[9] = 0;
+		strncpy(elon, &line[209], 10);
+		elon[10] = 0;
+		strncpy(elat, &line[219], 9);
+		elat[9] = 0;
 
 		int n = 29;
 
@@ -64,31 +92,46 @@ int slGISData::parseRT1File(std::string rt1) {
 		}
 
 		if(clas[0] == 'A') {
+			std::set< slGISPoint >::iterator ei, si;
+
+			double h1, h2;
+
 			short rType = strtol(&clas[1], NULL, 10);
 			int tlidID = strtol( tlid, NULL, 10);
 
-			startLat = strtod(slat, NULL) / 1000.0;
-			endLat = strtod(elat, NULL) / 1000.0;
-			startLon = strtod(slon, NULL) / 1000.0;
-			endLon = strtod(elon, NULL) / 1000.0;
+			startLat = strtod(slat, NULL) / 1000000.0;
+			endLat = strtod(elat, NULL) /   1000000.0;
+			startLon = strtod(slon, NULL) / 1000000.0;
+			endLon = strtod(elon, NULL) /   1000000.0;
 
-			slGISPoint sp( startLon, startLat);
-			slGISPoint ep( endLon, endLat);
+			slGISPoint sp( LON_MUL * (startLon - LON_OFF), -LAT_MUL * (startLat - LAT_OFF));
+			slGISPoint ep( LON_MUL * (endLon - LON_OFF), -LAT_MUL * (endLat - LAT_OFF));
 
-			slGISChain chain( sp, ep, rType);
+			h1 = _terrain->getHeightAtLocation(sp._x, sp._y);
+			h2 = _terrain->getHeightAtLocation(ep._x, ep._y);
+	
+			if(h1 != 0.0 || h2 != 0.0) {
+				if((ei = _points.find( ep)) == _points.end()) {
+					ei = _points.insert( ep).first;
+				} else {
+					std::cout << "making existing point " << "\n";
+				}
 
-			_chains[ tlidID] = chain;
+				if((si = _points.find( sp)) == _points.end()) {
+					si = _points.insert( sp).first;
+				} else {
+					std::cout << "making existing point " << "\n";
+				}
 
-			totalLat += startLat + endLat;
-			totalLon += startLon + endLon;
+				slGISChain chain( *ei, *si, rType);
+
+				_chains[ tlidID] = chain;
+			}
 		}
 	}
 
-	totalLon /= _chains.size() * 2;
-	totalLat /= _chains.size() * 2;
-
-	_center._x = totalLon;
-	_center._y = totalLat;
+	_center._x = 0;
+	_center._y = 0;
 
 	fs.close();
 
@@ -126,10 +169,10 @@ int slGISData::parseRT2File(std::string rt2) {
 			chain = &mi->second;
 
 			do {
-				lat = strtod(&line[offset], NULL) / 1000.0;
-				lon = strtod(&line[offset + 10], NULL) / 1000.0;
+				lon = strtod(&line[offset], NULL) /      1000000.0;
+				lat = strtod(&line[offset + 10], NULL) / 1000000.0;
 
-				slGISPoint point( lon, lat);
+				slGISPoint point( LON_MUL * (lon - LON_OFF), -LAT_MUL * (lat - LAT_OFF));
 	
 				if(lat != 0.0 && lon != 0.0) chain->insertPoint( point);
 	
@@ -142,34 +185,84 @@ int slGISData::parseRT2File(std::string rt2) {
 }
 
 void slGISData::draw(slCamera *c) {
+	int n;
+
 	std::map<int, slGISChain>::iterator ci;
 	std::vector<slGISPoint>::iterator pi;
 
-	glEnable(GL_BLEND);
-	glColor4f(0.0, 0.0, 0.0, 0.8);
+	// glDisable(GL_DEPTH_TEST);
+	glColor4f(0.1, 0.1, 0.1, 1.0);
+
+	glTranslatef(-_center._x, 0, -_center._y);
 
 	for(ci = _chains.begin(); ci != _chains.end(); ci++ ) {
 		if( ci->second._type < 60 ) {
-			slVector start;
+			slVector first, last;
+			double h1, h2;
+	
+			float w = 20.0 - (double)((int)ci->second._type / 10);
 
-			float w = 4.0 - (double)((int)ci->second._type / 10);
+			if (w < 5.0) w = 5.0;
 
-			if (w < 0.1) w = 0.1;
+			ci->second._points[0].getVector(&first);
+			ci->second._points.back().getVector(&last);
 
-			glLineWidth( w);
+			h1 = _terrain->getHeightAtLocation(last.x, last.z);
+			h2 = _terrain->getHeightAtLocation(first.x, first.z);
 
-			pi = ci->second._points.begin();
-			start.x = pi->_x - _center._x;
-			start.y = 0;
-			start.z = pi->_y - _center._y;
+			last.y = h1 + 2;
+			first.y = h1 + 2;
 
-			if(c->pointInFrustum(&start)) {
-				glBegin(GL_LINE_STRIP);
+			if((h1 != 0.0 || h2 != 0.0) && (c->pointInFrustum(&first) || c->pointInFrustum(&last))) {
+				glBegin(GL_TRIANGLE_STRIP);
 
-				glVertex3f(start.x, start.y, start.z);
+				for(n = 0; n < (int)ci->second._points.size() - 1; n++) {
+					slVector tmp, yAxis, left, right, offset, diff;
+					float lastY;
 
-				for(pi = ci->second._points.begin() + 1; pi != ci->second._points.end(); pi++ ) {
-					glVertex3f(pi->_x - _center._x, 0, pi->_y - _center._y);
+					yAxis.x = 0;
+					yAxis.y = 1;
+					yAxis.z = 0;
+
+
+					ci->second._points[n].getVector(&tmp);
+
+					offset.x = ci->second._points[n + 1]._x - ci->second._points[n]._x;
+					offset.y = 0;
+					offset.z = ci->second._points[n + 1]._y - ci->second._points[n]._y;
+
+					slVectorNormalize(&offset);
+
+					if(n == 0) {
+						ci->second._points[n].getNormal(&offset);
+
+						slVectorAdd(&tmp, &offset, &right);
+
+						lastY = right.y = MAX(_terrain->getHeightAtLocation(tmp.x + offset.x, tmp.z + offset.z),
+												_terrain->getHeightAtLocation(tmp.x - offset.x, tmp.z - offset.z)) + 2.0;
+						glVertex3f(right.x, right.y, right.z);
+					}
+
+					slVectorSub(&tmp, &offset, &left);
+
+					ci->second._points[n + 1].getVector(&tmp);
+					slVectorAdd(&tmp, &offset, &right);
+
+					if( _terrain ) { 
+						left.y = lastY;
+
+						lastY = right.y = MAX(_terrain->getHeightAtLocation(tmp.x + offset.x, tmp.z + offset.z),
+												_terrain->getHeightAtLocation(tmp.x - offset.x, tmp.z - offset.z)) + 2.0;
+					}
+
+					glVertex3f(left.x, left.y, left.z);
+					glVertex3f(right.x, right.y, right.z);
+
+					if(n == ci->second._points.size() - 2) {
+						slVectorSub(&tmp, &offset, &left);
+						left.y = lastY;
+						glVertex3f(left.x, left.y, left.z);
+					}
 				}
 	
 				glEnd();

@@ -1827,6 +1827,11 @@ RTC_INLINE int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *result) {
 		if (e[n].type != c->function->argtypes[n])
 			resultCode = stToType(&e[n], c->function->argtypes[n], &e[n], i);
 
+		if(c->function->argtypes[n] == AT_POINTER && BRPOINTER(&e[n]) == NULL) {
+			stEvalError(i->instance->type->engine, EE_TYPE, "NULL pointer passed as argument %d to internal function %s", n, c->function->name);
+			return EC_ERROR;
+		}
+
 		if (resultCode != EC_OK) {
 			stEvalError(i->instance->type->engine, EE_TYPE, "expected type \"%s\" for argument #%d to internal method \"%s\", got type \"%s\"", slAtomicTypeStrings[c->function->argtypes[n]], n + 1, c->function->name, slAtomicTypeStrings[e[n].type]);
 			return resultCode;
@@ -1838,7 +1843,15 @@ RTC_INLINE int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *result) {
 #ifdef MULTITHREAD
 	pthread_mutex_lock(&(i->instance->lock));
 #endif
-	resultCode = c->function->call(e, result, i->instance->breveInstance);
+
+	try {
+		resultCode = c->function->call(e, result, i->instance->breveInstance);
+	} catch(int error) {
+		stEvalError(i->instance->type->engine, EE_SIMULATION, "an error occurred executing the internal function \"%s\"", c->function->name);
+
+		return EC_ERROR;
+	}
+
 #ifdef MULTITHREAD
 	pthread_mutex_unlock(&(i->instance->lock));
 #endif

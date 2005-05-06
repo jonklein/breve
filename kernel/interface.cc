@@ -219,8 +219,7 @@ int brKeyCallback(brEngine *e, unsigned char keyCode, int isDown) {
 	int r;
 	char mname[128];
 
-	if (isDown)
-		e->keys[keyCode] = 5;
+	if (isDown) e->keys[keyCode] = 5;
 
 	/*
 	 * call catch-key-X-down or catch-key-X-up, depending on isDown.
@@ -249,6 +248,40 @@ int brKeyCallback(brEngine *e, unsigned char keyCode, int isDown) {
 
 	if (!method)
 		return EC_OK;
+
+	r = brMethodCall(e->controller, method, NULL, &eval);
+
+	brMethodFree(method);
+
+	return r;
+}
+
+/*!
+	\brief Handles a special key event.
+
+	Handles key events which do not have ASCII codes.  This method
+	will accept any "name" for a key, but the officially supported
+	keys are, at the moment, the arrow keys: up, down, left and right.
+
+	The breve interface is expected to relay these key events to the 
+	simulation.
+*/
+
+int brSpecialKeyCallback(brEngine *e, char *name, int isDown) {
+	brEval eval;
+	brMethod *method;
+	int r;
+	char mname[128];
+
+	if (isDown) {
+		snprintf(mname, sizeof(mname), "catch-key-%s-down", name);
+		method = brMethodFind(e->controller->object, mname, NULL, 0);
+	} else {
+		snprintf(mname, sizeof(mname), "catch-key-%s-up", name);
+		method = brMethodFind(e->controller->object, mname, NULL, 0);
+	}
+
+	if (!method) return EC_OK;
 
 	r = brMethodCall(e->controller, method, NULL, &eval);
 
