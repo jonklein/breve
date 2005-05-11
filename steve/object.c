@@ -215,7 +215,14 @@ void stInstanceCollect(stInstance *i) {
 
 void stInstanceFree(stInstance *i) {
 	stInstanceFreeNoInstanceLists(i);
+
 	stRemoveFromInstanceLists(i);
+
+	if(i->type->steveData->retainFreedInstances) {
+		i->type->steveData->freedInstances.push_back( i);
+	} else {
+		delete i;
+	}
 }
 
 /*!
@@ -226,8 +233,6 @@ void stInstanceFree(stInstance *i) {
 */
 
 void stInstanceFreeNoInstanceLists(stInstance *i) {
-	brEngine *e;
-
 	brEval result;
 	stRunInstance ri;
 
@@ -237,17 +242,9 @@ void stInstanceFreeNoInstanceLists(stInstance *i) {
 	stCallMethodByName(&ri, "destroy", &result);
 	stMethodTrace(&ri, "delete");
 
-	e = i->type->engine;
-
 	stInstanceFreeInternals(i);
 
 	i->status = AS_RELEASED;
-
-	if(i->type->steveData->retainFreedInstances) {
-		i->type->steveData->freedInstances.push_back( i);
-	} else {
-		delete i;
-	}
 }
 
 /*!
