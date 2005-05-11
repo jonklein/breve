@@ -129,7 +129,7 @@ void stGCUnretain(brEval *e) {
 */
 
 void stGCUnretainPointer(void *pointer, int type) {
-	if(!pointer) return;
+	if(type == AT_NULL || !pointer) return;
 
 	switch(type) {
 		case AT_INSTANCE:
