@@ -31,11 +31,15 @@ Object : Matrix (aka Matricies) {
 }
 
 Matrix : Matrix2D (aka Matrices2D) {
+    + variables:
+        xDim, yDim (int).
 
     + to init:
         matrixPointer = matrix2DNew(32, 32).
         return self.
-                
+    
+    + section "Setting the Matrix Size"
+    
     + to init-with x-size xSize (int) y-size ySize (int):
         % sets the size to of this matrix to (sSize, ySize).
         self set-size x xSize y ySize.
@@ -45,22 +49,17 @@ Matrix : Matrix2D (aka Matrices2D) {
         % Sets the size of this matrix to (xSize, ySize).        
         matrix2DFree(matrixPointer).
         matrixPointer = matrix2DNew(xSize, ySize).
+        xDim = xSize.
+        yDim = ySize.
+        
+    + section "Methods to Get and Set Values"
 
-   + to get-absolute-sum:
-        % Returns the sum of the absolute values of all elements in this 
-        % matrix.
-        % <P>
-        % This method is hardware accelerated where supported.
-
-        return matrix2DGetAbsoluteSum(matrixPointer).
-
-    + to multiply-with-values of otherMatrix (Matrix2D object):
-        % Multiplies each element in this matrix with the corresponding 
-        % element in otherMatrix.  This is not regular matrix multiplication;
-        % rather, it is a way to scale each element in otherMatrix.
-
-        matrix2DMulElements(matrixPointer, (otherMatrix get-matrix-pointer)).
-
+    + to get-x-dimension:
+        return xDim.
+        
+    + to get-y-dimension:
+        return yDim.
+        
     + to set-all-values to value (float):
         % Sets all of the values in the matrix to value.
 
@@ -75,6 +74,23 @@ Matrix : Matrix2D (aka Matrices2D) {
         % Sets the matrix value at position (x, y).
 
         return matrix2DSet(matrixPointer, x, y, value).
+
+    + section "Matrix Match Methods"
+    
+    + to get-absolute-sum:
+        % Returns the sum of the absolute values of all elements in this 
+        % matrix.
+        % <P>
+        % This method is hardware accelerated where supported.
+
+        return matrix2DGetAbsoluteSum(matrixPointer).
+
+    + to multiply-with-values of otherMatrix (Matrix2D object):
+        % Multiplies each element in this matrix with the corresponding 
+        % element in otherMatrix.  This is not regular matrix multiplication;
+        % rather, it is a way to scale each element in otherMatrix.
+
+        matrix2DMulElements(matrixPointer, (otherMatrix get-matrix-pointer)).
 
     + to add-scalar value scalarValue (double):
         % Adds the number scalarValue to each element in the matrix.
@@ -162,6 +178,8 @@ Matrix : Matrix2D (aka Matrices2D) {
 
         matrix2DDiffuse((chemicalMatrix get-matrix-pointer), matrixPointer, scale).
 
+    + section "Methods for using Displaying Matrices"
+    
     + to copy-to-red-channel of-image theImage (Image object) with-scale scale = 1.0 (float):
         % Copies the contents of this matrix to the red channel of theImage.  
         % The optional
