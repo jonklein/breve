@@ -113,6 +113,7 @@ class slWorldObject {
 		slVector neighborMin;
 		slVector max;
 		slVector min;
+		bool _moved;
 	
 		double e;
 		double eT;

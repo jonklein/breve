@@ -465,15 +465,20 @@ int brEngineIterate(brEngine *e) {
 
 			int rcode = brMethodCallByName(event->_instance, event->_name, &result);
 
-			delete event;
-
 			slWorldSetAge(e->world, oldAge);
 
 			if(rcode != EC_OK) {
 				pthread_mutex_unlock(&e->lock);
 				return rcode;
 			}
+
 		}
+
+		if(event->_interval != 0.0) {
+			brEngineAddEvent(e, event->_instance, event->_name, event->_time + event->_interval, event->_interval);
+		}
+
+		delete event;
 
 		e->events.pop_back();
 	}

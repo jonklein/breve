@@ -14,8 +14,8 @@ void slJointApplyTorque(slJoint *j, slVector *torque) {
 	t.y = axis[1] * torque->x;
 	t.z = axis[2] * torque->x;
 
-	if(j->parent) dBodySetTorque(j->parent->odeBodyID, t.x, t.y, t.z);
-   	if(j->child) dBodySetTorque(j->child->odeBodyID, -t.x, -t.y, -t.z);
+	if(j->parent) dBodySetTorque(j->parent->_odeBodyID, t.x, t.y, t.z);
+   	if(j->child) dBodySetTorque(j->child->_odeBodyID, -t.x, -t.y, -t.z);
 }
 
 /*!
@@ -251,7 +251,7 @@ int slJointSetLinkPoints(slJoint *joint, slVector *plinkPoint, slVector *clinkPo
 	slVector hingePosition, childPosition;
 	double ideal[3][3];
 
-	childR = dBodyGetRotation(joint->child->odeBodyID);
+	childR = dBodyGetRotation(joint->child->_odeBodyID);
 	memcpy(savedChildR, childR, sizeof(savedChildR));
 
 	if (joint->parent)
@@ -277,11 +277,11 @@ int slJointSetLinkPoints(slJoint *joint, slVector *plinkPoint, slVector *clinkPo
 
 	dJointAttach(joint->odeJointID, NULL, NULL);
 
-	dBodySetRotation(joint->child->odeBodyID, idealR);
-	dBodySetPosition(joint->child->odeBodyID, childPosition.x, childPosition.y, childPosition.z);
+	dBodySetRotation(joint->child->_odeBodyID, idealR);
+	dBodySetPosition(joint->child->_odeBodyID, childPosition.x, childPosition.y, childPosition.z);
 
-	if(joint->parent) dJointAttach(joint->odeJointID, joint->parent->odeBodyID, joint->child->odeBodyID);
-	else dJointAttach(joint->odeJointID, NULL, joint->child->odeBodyID);
+	if(joint->parent) dJointAttach(joint->odeJointID, joint->parent->_odeBodyID, joint->child->_odeBodyID);
+	else dJointAttach(joint->odeJointID, NULL, joint->child->_odeBodyID);
 
 	switch(joint->type) {
 		case JT_REVOLUTE:
@@ -305,8 +305,8 @@ int slJointSetLinkPoints(slJoint *joint, slVector *plinkPoint, slVector *clinkPo
 	slVectorXform(joint->child->position.rotation, clinkPoint, &childPosition);
 	slVectorSub(&hingePosition, &childPosition, &childPosition);
 
-	dBodySetRotation(joint->child->odeBodyID, savedChildR);
-	dBodySetPosition(joint->child->odeBodyID, childPosition.x, childPosition.y, childPosition.z);
+	dBodySetRotation(joint->child->_odeBodyID, savedChildR);
+	dBodySetPosition(joint->child->_odeBodyID, childPosition.x, childPosition.y, childPosition.z);
 	slVectorCopy(&childPosition, &joint->child->position.location);
 
 	return 0;

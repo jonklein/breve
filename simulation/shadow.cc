@@ -194,7 +194,7 @@ void slSphere::drawShadowVolume(slCamera *c, slPosition *p) {
 	glEnd();
 }
 
-void slRenderShadowVolume(slWorld *w, slCamera *c) {
+void slWorld::renderShadowVolume(slCamera *c) {
 	glClear(GL_STENCIL_BUFFER_BIT);
 
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
@@ -207,13 +207,13 @@ void slRenderShadowVolume(slWorld *w, slCamera *c) {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
 
 	// stencil up shadow volume front faces to 1 
-	slWorldRenderObjectShadowVolumes(w, c);
+	renderObjectShadowVolumes(c);
 	
 	// stencil down shadow volume back faces to 0
 
 	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
 	glCullFace(GL_FRONT);
-	slWorldRenderObjectShadowVolumes(w, c);
+	renderObjectShadowVolumes(c);
 
 	// glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -230,7 +230,7 @@ void slRenderShadowVolume(slWorld *w, slCamera *c) {
 	// draw the scene again, with lighting, only where the value is 0 
 	
 	// glColor3f(1, 0, 0);
-	slRenderObjects(w, c, DO_NO_ALPHA);
+	slRenderObjects(this, c, DO_NO_ALPHA);
 
 	// transparent objects cause problems, since they cannot simply 
 	// be "drawn over" the way we do with the rest of the scene.  
@@ -239,23 +239,25 @@ void slRenderShadowVolume(slWorld *w, slCamera *c) {
 	// 1) do not render the alphas at all for the first pass
 	// 2) render the unlit alphas where the stencil != 0 
 
-	slRenderObjects(w, c, DO_ONLY_ALPHA);
+	slRenderObjects(this, c, DO_ONLY_ALPHA);
 	if(c->billboardCount) slRenderBillboards(c, 0);
 
 	glStencilFunc(GL_NOTEQUAL, 0, 0xffffffff);
 	if(c->billboardCount) slRenderBillboards(c, 0);
 	
 	slDrawLights(c, 1);
-	slRenderObjects(w, c, DO_ONLY_ALPHA);
+	slRenderObjects(this, c, DO_ONLY_ALPHA);
 
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_LIGHTING);
 }
 
-void slWorldRenderObjectShadowVolumes(slWorld *w, slCamera *c) {
+void slWorld::renderObjectShadowVolumes(slCamera *c) {
 	std::vector<slWorldObject*>::iterator wi;
 
-	for(wi = w->objects.begin(); wi !=w->objects.end(); wi++ ) {
-		if((*wi)->shape) (*wi)->shape->drawShadowVolume(c, &(*wi)->position);
+	for(wi = objects.begin(); wi != objects.end(); wi++ ) {
+		if((*wi)->shape && !(*wi)->_drawAsPoint) {
+			(*wi)->shape->drawShadowVolume(c, &(*wi)->position);
+		}
 	}
 }

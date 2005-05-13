@@ -63,8 +63,8 @@ int slEuler(slWorld *w, slLink *r, double *deltaT, int skipFirst) {
 
 	if(r->mobile < 1) {
 		if(r->mobile == -1) {
-			memcpy(&r->stateVector[!r->currentState],
-				&r->stateVector[r->currentState],
+			memcpy(&r->_stateVector[!r->_currentState],
+				&r->_stateVector[r->_currentState],
 				sizeof(slLinkIntegrationPosition));
 			r->mobile = 0;
 		}
@@ -72,8 +72,8 @@ int slEuler(slWorld *w, slLink *r, double *deltaT, int skipFirst) {
 		return 0;
 	}
 
-	osv = (double*)&r->stateVector[!r->currentState];
-	sv = (double*)&r->stateVector[r->currentState];
+	osv = (double*)&r->_stateVector[!r->_currentState];
+	sv = (double*)&r->_stateVector[r->_currentState];
 
 	if(!skipFirst) err = slCalculateDerivs(r, sv, w->dv[0], w);
 
@@ -103,8 +103,8 @@ int slRK4(slWorld *w, slLink *r, double *deltaT, int skipFirst) {
 
 	/* old state slVector and new */
 
-	osv = (double *)&r->stateVector[!r->currentState];
-	sv = (double *)&r->stateVector[r->currentState];
+	osv = (double *)&r->_stateVector[!r->_currentState];
+	sv = (double *)&r->_stateVector[r->_currentState];
 
 	if (r->mobile < 1) {
 		if (r->mobile == -1) {
@@ -162,8 +162,8 @@ int slRKCK(slWorld *w, slLink *m, double *x, double acc, double stepSize, double
 	int err = 0;
 	unsigned int i;
 
-	osv = (double*)&m->stateVector[!m->currentState];
-	sv = (double*)&m->stateVector[m->currentState];
+	osv = (double*)&m->_stateVector[!m->_currentState];
+	sv = (double*)&m->_stateVector[m->_currentState];
 
 	h = stepSize;
 
@@ -300,8 +300,8 @@ int slIntRKF(slWorld *w, slLink *m, double *deltaT, int skipFirst) {
 	double delta = 0;
 	double *sv, *osv;
 
-	osv = (double*)&m->stateVector[!m->currentState];
-	sv = (double*)&m->stateVector[m->currentState];
+	osv = (double*)&m->_stateVector[!m->_currentState];
+	sv = (double*)&m->_stateVector[m->_currentState];
 
 	//-- get w->dv[8] values from object at current time --//
 	// Derive( sizeof(slLinkIntegrationPosition), y, w->dv[8], time );

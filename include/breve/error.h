@@ -25,16 +25,23 @@
 /* iteration--for example, every feature pair tested in collision */
 /* detection */
 
+
+#ifdef __cplusplus
 #include <string>
 
 class slException {
 	public:
+		slException( std::string m) {
+			_message = m;
+		}
+
 		slException( std::string &m) {
 			_message = m;
 		}
 
 		std::string _message;
 };
+#endif
 
 enum debugLevels {
     NORMAL_OUTPUT = 0,  /* normal output                */

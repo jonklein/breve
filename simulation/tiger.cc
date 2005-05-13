@@ -217,7 +217,7 @@ void slGISData::draw(slCamera *c) {
 				glBegin(GL_TRIANGLE_STRIP);
 
 				for(n = 0; n < (int)ci->second._points.size() - 1; n++) {
-					slVector tmp, yAxis, left, right, offset, diff;
+					slVector tmp, yAxis, left, right, offset;
 					float lastY;
 
 					yAxis.x = 0;
@@ -258,7 +258,7 @@ void slGISData::draw(slCamera *c) {
 					glVertex3f(left.x, left.y, left.z);
 					glVertex3f(right.x, right.y, right.z);
 
-					if(n == ci->second._points.size() - 2) {
+					if(n == (int)ci->second._points.size() - 2) {
 						slVectorSub(&tmp, &offset, &left);
 						left.y = lastY;
 						glVertex3f(left.x, left.y, left.z);

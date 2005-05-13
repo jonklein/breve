@@ -1081,9 +1081,9 @@ int slTerrain::loadGeoTIFF(char *file) {
 		TIFFReadScanline(tif, row, y, 0);
 
 		for (x = 0; x < width; x++) {
-			matrix[x][y] = row[x * samples];
+			matrix[x][y] = 3 * row[x * samples];
 
-			if(matrix[x][y] < 30) matrix[x][y] = 10;
+			if(matrix[x][y] < 90) matrix[x][y] = 10;
 		}
 	}
 

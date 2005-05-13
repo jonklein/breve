@@ -1846,8 +1846,8 @@ RTC_INLINE int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *result) {
 
 	try {
 		resultCode = c->function->call(e, result, i->instance->breveInstance);
-	} catch(int error) {
-		stEvalError(i->instance->type->engine, EE_SIMULATION, "an error occurred executing the internal function \"%s\"", c->function->name);
+	} catch(slException &error) {
+		stEvalError(i->instance->type->engine, EE_SIMULATION, "an error occurred executing the internal function \"%s\": %s", c->function->name, error._message.c_str());
 
 		return EC_ERROR;
 	}

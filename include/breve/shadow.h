@@ -20,6 +20,3 @@
 
 #define MIN_SPHERE_VOLUME_DIVISIONS 20
 #define MAX_SPHERE_VOLUME_DIVISIONS 40
-
-void slRenderShadowVolume(slWorld *w, slCamera *c);
-void slWorldRenderObjectShadowVolumes(slWorld *w, slCamera *c);
