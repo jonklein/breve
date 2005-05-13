@@ -79,13 +79,11 @@ NULL : Object (aka Objects) [version 2.1] {
 
         return isa(className).
 
-    + to is-a-subclass of className (string):
+    - to is-a-subclass of className (string):
 		% Returns 1 if this object is a subclass of the class specified with
 		% className, returns 0 otherwise.
 
-        if className == (self get-type): return 1.
-        else if super: return (super is-a-subclass of className).
-        else return 0.
+		return (self is a className).
 
     + to can-respond to methodName (string):
         % Returns true or false (1 or 0) depending on whether this instance

@@ -1116,7 +1116,7 @@ For example, in the Controller's iterate method, the superclass iterate method i
 <para>
 <indexterm><primary>controller variable</primary></indexterm>
 The controller variable is defined for all instances.  It always refers to the simulation's 
-controller instance. 
+controller instance.  
 </para>
 </listitem>
 

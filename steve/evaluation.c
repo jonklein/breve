@@ -1163,7 +1163,8 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *target, stRunI
 			return EC_ERROR;
 		}
 
-		target->type = newType;
+		// target->type = newType;
+		// target->type = newType;
 
 		mexp->method = method;
 		mexp->objectCache = target->instance->type;
@@ -2774,8 +2775,9 @@ int stCallMethodByNameWithArgs(stRunInstance *target, char *name, brEval **args,
 	stRunInstance ri;
 
 	ri.instance = target->instance;
+	ri.type = ri.instance->type;
 
-	method = stFindInstanceMethod(target->instance->type, name, argcount, &ri.type);
+	method = stFindInstanceMethod(target->instance->type, name, argcount, NULL);
 	resultCode->type = AT_NULL;
 
 	if(!method) {
@@ -2884,8 +2886,7 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *result, stObject **tClass) {
 	brEval t;
 	int resultCode = EC_OK;
 
-	if (tClass)
-		*tClass = NULL;
+	if (tClass) *tClass = NULL;
 
 	result->type = AT_NULL;
 
@@ -3008,8 +3009,14 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *result, stObject **tClass) {
 		break;
 	case ET_SUPER:
 		result->type = AT_INSTANCE;
-		BRINSTANCE(result) = i->instance->breveInstance;
-		*tClass = i->type->super;
+
+		if(i->type->super) {
+			BRINSTANCE(result) = i->instance->breveInstance;
+			if( tClass) *tClass = i->type->super;
+		} else {
+			BRINSTANCE(result) = NULL;
+		}
+
 		break;
 	case ET_SELF:
 		result->type = AT_INSTANCE;
