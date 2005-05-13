@@ -92,6 +92,7 @@ Abstract : Patch (aka Patches) [version 2.2] {
         return zIndex.
         
     + to get-index-vector:
+		% Returns the x, y and z indices of this patch as a vector.
         return (xIndex, yIndex, zIndex).
 
     + section "Methods to Initialize Patches"

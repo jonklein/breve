@@ -168,8 +168,7 @@ Object : GeneticAlgorithm {
 		
 		generation++.
 
-		print "### Generation $generation, best fitness: ", (populations{ currentPopulation }{ best } get-fitness).
-		self examine individual populations{ currentPopulation }{ best }.
+		self report at-generation generation with-best-individual populations{ currentPopulation }{ best }.
 
 		for i = 0, i < populationSize, i++: {
 			r = random[100].
@@ -189,8 +188,7 @@ Object : GeneticAlgorithm {
 		currentPopulation = !currentPopulation.
 		currentIndividual = 0.
 
-	+ to examine individual theIndividual (object):
-		print theIndividual.
+		self prepare-for-generation number generation.
 
 	+ to tournament-select:
 		% This method performs a tournament selection for reproduction.  It 
@@ -214,6 +212,23 @@ Object : GeneticAlgorithm {
 
 	+ section "Methods to Override in Custom Subclasses"
 
+	+ to report at-generation generation (int) with-best-individual bestIndividual (object):
+		% Prints out a report of the progress at each generation, with the most 
+		% fit object passed in as bestIndividual.  The default implementation of 
+		% this method simply prints out the generation number, best fitness and 
+		% calls METHOD(examine) on the best individual, but you may override the 
+		% method to print out any other desired information.
+
+		print "### Generation $generation, best fitness: ", (bestIndividual get-fitness).
+		self examine individual bestIndividual.
+
+	+ to examine individual currentIndividual (object):
+		% Called automatically during each generation's report, this method examines
+		% and outputs information about an individual in the population.  The default
+		% implementation simply prints out the object variable, but you may override 
+		% this method to print out more information about the individual.
+		print currentIndividual.
+
 	+ to start-fitness-test of individual (object):
 		% Implement this method to perform any setup necessary when the 
 		% fitness test begins.
@@ -223,6 +238,12 @@ Object : GeneticAlgorithm {
 		% fitness test ends.  You should also make sure that the individual's
 		% fitness value is set using 
 		% OBJECTMETHOD(GeneticAlgorithmIndividual:set-fitness).
+
+	+ to prepare-for-generation number n (int):
+		% This method is called when a generation is setup.  The default
+		% implementation does nothing, but the method may be overriden
+		% in order to carry out any preparations necessary for a new 
+		% generation.
 }
 
 Object : GeneticAlgorithmIndividual {

@@ -51,12 +51,22 @@ FILE *docHandle = NULL;
     result = ((parseLoc == parseLength) ? YY_NULL : (buf[0] = parseString[parseLoc++], 1))
 %}
 
-DIGIT	[0-9]
+DIGIT		[0-9]
 WORDBREAK	[^0-9a-zA-Z\-_]
 
 WHITESPACE	[\ \t]+
 
+%x COMMENT
+
 %%
+
+#!						{ BEGIN(COMMENT); }
+
+<COMMENT>\r\n			{ lineno++; }
+<COMMENT>\r				{ lineno++; }
+<COMMENT>\n				{ lineno++; }
+<COMMENT>.				{ /* block comment */ }
+<COMMENT>!#				{ BEGIN(0); }
 
 #.*						{ /* comment */ };
 

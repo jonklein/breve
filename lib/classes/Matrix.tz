@@ -55,9 +55,11 @@ Matrix : Matrix2D (aka Matrices2D) {
     + section "Methods to Get and Set Values"
 
     + to get-x-dimension:
+		% Returns the x size of this matrix.
         return xDim.
         
     + to get-y-dimension:
+		% Returns the y size of this matrix.
         return yDim.
         
     + to set-all-values to value (float):

@@ -96,8 +96,6 @@ step of the simulation.  Thus, "Hello, World!".  Ad nauseum.
 <sect1 id="simple_example">
 <title>A Simple Example</title>
 <para>
-<indexterm><primary>comments</primary></indexterm>
-<indexterm><primary>#</primary></indexterm>
 "Hello, World" is a very simple example which can be used for any programming 
 language.  It does not, however, give any insight into how 3D multiagent simulations 
 are written in steve.  This section shows the code for a simple 3D multiagent 
@@ -111,7 +109,7 @@ a simple simulation containing hundreds of independent agents.</para></caption>
 The simulation below is very heavily commented&mdash;all of the lines 
 beginning with the # character are descriptive comments which do not effect 
 the execution of the simulation, but clarify for the user what the simulation 
-is doing.
+is doing.  Comments are described in more detail below.
 </para>
 <para>
 The simple simulation below features a number of agents which perform a 
@@ -189,6 +187,31 @@ Mobile : RandomWalker {
         self set-velocity to random[(60, 60, 60)] - (30, 30, 30).
 }
 </screen>
+
+<sect2>
+<title>Comments</title>
+<indexterm><primary>comments</primary></indexterm>
+<indexterm><primary>#</primary></indexterm>
+<indexterm><primary>#!</primary></indexterm>
+<indexterm><primary>!#</primary></indexterm>
+<para>
+When writing code in any language, it is typically useful to include <firstterm>comments</firstterm> which clarify what the code is doing.  In steve, there are two ways to include comments in code.  A "single line" comment starts with a "#" is and continues to the end of the line; "multiline comments" are written starting with "#!" and ending with "!#".  Some example of both kinds of comments are shown below:  
+<screen>
+	# this is a simple one-line comment.
+
+	print "this is not a comment..." 		# but this is.
+
+	#!
+		this
+		is 
+		a 
+		multiline 
+		comment
+	!#
+</screen>
+</para>
+</sect2>
+
 </sect1>
 
 <sect1 id="controller_object">
