@@ -130,9 +130,14 @@ Abstract : PatchGrid (aka PatchGrids) [version 2.2] {
         return self.
 
     + to destroy:
-        print "Free Patches".
+        chem (object).
+        if |diffusingChemicals| > 0:
+        {    
+            for each chem in diffusingChemicals:
+                free(chemicalConcentrationMatrix{chem}).
+            free(tempMatrix).
+        }
         free (patches).
-        print "Free Patches".
         freePatchGrid(gridPointer).
         
     + to enable-smooth-drawing:
