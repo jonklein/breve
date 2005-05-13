@@ -148,8 +148,8 @@ Object : GeneticAlgorithm {
 		currentPopulation = !currentPopulation.
 		currentIndividual = 0.
 
-	+ to examine individual currentIndividual (object):
-		print currentIndividual.
+	+ to examine individual theIndividual (object):
+		print theIndividual.
 
 	+ to tournament-select:
 		% This method performs a tournament selection for reproduction.  It 
