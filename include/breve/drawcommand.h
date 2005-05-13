@@ -1,4 +1,9 @@
-#include "simulation.h"
+#include "config.h"
+#include "glIncludes.h"
+#include "camera.h"
+
+#ifndef _DRAWCOMMAND_H
+#define _DRAWCOMMAND_H
 
 #ifdef __cplusplus
 class slDrawCommand;
@@ -123,3 +128,5 @@ class slDrawCommandColor : slDrawCommand {
 		double _alpha;
 };
 #endif
+
+#endif /* _DRAWCOMMAND_H */

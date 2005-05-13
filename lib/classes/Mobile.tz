@@ -252,7 +252,7 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 		% force will remain in effect until it is disabled with a 
 		% new call to METHOD(set-force).
 
-		if !realWorldPointer: {
+		if !linkPointer: {
 			print "set-force called with uninitialized Mobile object".
 			return.
 		}
@@ -263,6 +263,11 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 		% Sets the torque acting on the object to newTorque.  This 
 		% torque will remain in effect until it is disabled with a 
 		% new call to METHOD(set-torque).
+
+		if !linkPointer: {
+			print "set-torque called with uninitialized Mobile object".
+			return.
+		}
 
 		linkSetTorque(linkPointer, newTorque).
 

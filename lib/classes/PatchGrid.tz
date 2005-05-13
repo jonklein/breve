@@ -71,7 +71,7 @@ Abstract : PatchGrid (aka PatchGrids) [version 2.2] {
 
         location = gridCenter.
 
-        gridPointer = newPatchGrid(gridCenter, patchSize, x, y, z).
+        gridPointer = patchGridNew(gridCenter, patchSize, x, y, z).
         
         xCount = 0.
         yCount = 0.
@@ -137,8 +137,7 @@ Abstract : PatchGrid (aka PatchGrids) [version 2.2] {
                 free(chemicalConcentrationMatrix{chem}).
             free(tempMatrix).
         }
-        free (patches).
-        freePatchGrid(gridPointer).
+        patchGridFree(gridPointer).
         
     + to enable-smooth-drawing:
         % Enables smooth drawing for this PatchGrid.  When smooth drawing is 
@@ -390,7 +389,7 @@ Abstract : PatchGrid (aka PatchGrids) [version 2.2] {
         x, y, z (int).
         index (int).
 
-        gridPointer = newPatchGrid(location, patchSize, xSize, ySize, zSize).
+        gridPointer = patchGridNew(location, patchSize, xSize, ySize, zSize).
 
         for x=0,x<xSize,x++: {
             for y=0,y<ySize,y++: {
@@ -407,6 +406,4 @@ Abstract : PatchGrid (aka PatchGrids) [version 2.2] {
 
     + to archive:
         return 1.
-        
-    
 }

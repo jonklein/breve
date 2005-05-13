@@ -75,11 +75,11 @@ void slSpring::step(double step) {
 	////////////////////////////////////////////////
 
 	slVectorXform(l1->position.rotation, &_point1, &point);
-	slLinkGetVelocity(l1, &linearVel, &angularVel);
+	l1->getVelocity(&linearVel, &angularVel);
 	slVelocityAtPoint(&linearVel, &angularVel, &point, &vel1);
 
 	slVectorXform(l2->position.rotation, &_point2, &point);
-	slLinkGetVelocity(l2, &linearVel, &angularVel);
+	l2->getVelocity(&linearVel, &angularVel);
 	slVelocityAtPoint(&linearVel, &angularVel, &point, &vel2);
 
 	slVectorSub(&vel1, &vel2, &velocity);
@@ -102,10 +102,10 @@ void slSpring::step(double step) {
 
 	////////////////////////////////////////////////
 
-	dBodyAddForceAtPos(l2->odeBodyID, 
+	dBodyAddForceAtPos(l2->_odeBodyID, 
 			force.x, force.y, force.z, pos1.x, pos1.y, pos1.z);
 
-	dBodyAddForceAtPos(l1->odeBodyID, 
+	dBodyAddForceAtPos(l1->_odeBodyID, 
 			-force.x, -force.y, -force.z, pos2.x, pos2.y, pos2.z);
 }
 

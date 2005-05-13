@@ -43,7 +43,7 @@ struct slsVector {
 };
 
 #define slVectorLength(V)		(sqrt((V)->x * (V)->x + (V)->y * (V)->y + (V)->z * (V)->z))
-#define slVectorZeroTest(V)		((V)->x == 0.0 && (V)->y == 0.0 && (V)->z == 0.0)
+#define slVectorIsZero(V)		((V)->x == 0.0 && (V)->y == 0.0 && (V)->z == 0.0)
 
 /*
     = VECTOR_FUNCTIONS are no longer supported, so the inline macros below are

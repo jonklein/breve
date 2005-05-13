@@ -118,10 +118,6 @@ Mobile : Diffuser {
 		maxDist = max.
 
 	+ to init:
-		sphereShape = new Sphere init-with radius 1.
-
-		self set-shape to sphereShape.
-
 		# register to catch collisions with any Stationary objects.  If we 
 		# collide with one, the method "collide" will be called.
 

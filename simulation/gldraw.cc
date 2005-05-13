@@ -530,10 +530,13 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 	if (c->drawLights) {
 		// do the shadows
 		if (c->drawShadowVolumes)
-			slRenderShadowVolume(w, c);
+			w->renderShadowVolume(c);
 		else if (c->drawShadow)
 			slShadowPass(w, c);
 	}
+
+	std::vector<slDrawCommandList*>::iterator di;
+	for(di = w->drawings.begin(); di != w->drawings.end(); di++) (*di)->draw(c);
 
 	glDepthMask(GL_FALSE);
 	slRenderObjects(w, c, flags | DO_ONLY_ALPHA);
@@ -545,11 +548,7 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 	slDrawNetsimBounds(w);
 #endif
 
-	std::vector<slDrawCommandList*>::iterator di;
-	for(di = w->drawings.begin(); di != w->drawings.end(); di++) (*di)->draw(c);
-
-	if (w->gisData)
-		w->gisData->draw(c);
+	if (w->gisData) w->gisData->draw(c);
 
 	glPopMatrix();
 
@@ -1137,7 +1136,7 @@ void slProcessBillboards(slWorld *w, slCamera *c) {
 void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 	slWorldObject *wo;
 	unsigned int n;
-	int color = 1;
+	bool color = 1;
 
 	const int loadNames = (flags & DO_LOAD_NAMES);
 	const int doNoAlpha = (flags & DO_NO_ALPHA);
@@ -1154,10 +1153,9 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 		// glBlendFunc(GL_ONE_MINUS_DST_ALPHA,GL_DST_ALPHA);
 	} 
 
-	if (flags & (DO_OUTLINE | DO_NO_COLOR))
-		color = 0;
-	if (flags & DO_OUTLINE)
-		glColor4f(1, 1, 1, 0);
+	if (flags & (DO_OUTLINE | DO_NO_COLOR)) color = 0;
+
+	if (flags & DO_OUTLINE) glColor4f(1, 1, 1, 0);
 
    	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
    	// glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
@@ -1210,17 +1208,19 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 		}	
 	}
 
-	glEnable(GL_BLEND);
-	glPointSize(2.0);
-	glBegin(GL_POINTS);
-	for (n = 0; n < camera->_points.size(); ++n) {
-		slVector &v = camera->_points[n].first;
-		slVector &c = camera->_points[n].second;
+	if( !doOnlyAlpha) {
+		glEnable(GL_BLEND);
+		glPointSize(2.0);
+		glBegin(GL_POINTS);
+		for (n = 0; n < camera->_points.size(); ++n) {
+			slVector &v = camera->_points[n].first;
+			slVector &c = camera->_points[n].second;
 
-		glColor3d(c.x, c.y, c.z);
-		glVertex3d(v.x, v.y, v.z);
+			glColor3d(c.x, c.y, c.z);
+			glVertex3d(v.x, v.y, v.z);
+		}
+		glEnd();
 	}
-	glEnd();
 
 	if (doOnlyAlpha)
 		glDisable(GL_BLEND);

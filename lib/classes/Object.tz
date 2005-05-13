@@ -120,7 +120,7 @@ NULL : Object (aka Objects) [version 2.1] {
 
         addEvent(theMethod, theTime, 0).
 
-	- to schedule-repeated method-call theMethod (string) with-interval theInterval (double): 
+	- to schedule-repeating method-call theMethod (string) with-interval theInterval (double): 
         addEvent(theMethod, theInterval, theInterval).
 
     + to observe instance theObject (object) for-notification theNotification (string) with-method theMethod (string):

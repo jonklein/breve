@@ -61,16 +61,16 @@ slWorld *slWorldNew() {
 
 	slAllocIntegrationVectors(w);
 
-	w->odeWorldID = dWorldCreate();
-	dWorldSetQuickStepNumIterations(w->odeWorldID, 60);
+	w->_odeWorldID = dWorldCreate();
+	dWorldSetQuickStepNumIterations(w->_odeWorldID, 60);
 
-	dWorldSetCFM (w->odeWorldID,1e-6);
-	dWorldSetERP(w->odeWorldID,0.1);
+	dWorldSetCFM (w->_odeWorldID,1e-6);
+	dWorldSetERP(w->_odeWorldID,0.1);
 	dSetErrorHandler(slODEErrorHandler);
 	dSetMessageHandler(slODEErrorHandler);
 
-	w->odeCollisionGroupID = dJointGroupCreate(0);
-	w->odeJointGroupID = dJointGroupCreate(0);
+	w->_odeCollisionGroupID = dJointGroupCreate(0);
+	w->_odeJointGroupID = dJointGroupCreate(0);
 
 	w->resolveCollisions = 0;
 	w->detectCollisions = 0;
@@ -177,9 +177,9 @@ void slWorldFree(slWorld *w) {
 	if(w->clipData) slFreeClipData(w->clipData);
 	if(w->proximityData) slFreeClipData(w->proximityData);
 
-	dWorldDestroy(w->odeWorldID);
-	dJointGroupDestroy(w->odeCollisionGroupID);
-	dJointGroupDestroy(w->odeJointGroupID);
+	dWorldDestroy(w->_odeWorldID);
+	dJointGroupDestroy(w->_odeCollisionGroupID);
+	dJointGroupDestroy(w->_odeJointGroupID);
 
 #if HAS_LIBENET
 	if (w->netsimData.server)
@@ -388,7 +388,12 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 	if(w->detectCollisions) {
 		if(!w->initialized) slVclipDataInit(w);
 
-		result = slVclip(w->clipData, 0.0, 0, w->boundingBoxOnly);
+		if(w->_clipGrid) {
+			w->_clipGrid->assignObjectsToPatches(w);
+		} else {
+			slVclipPruneAndSweep(w->clipData);
+			result = slVclip(w->clipData, 0.0, 0, w->boundingBoxOnly);
+		}
 
 		if(result == -1) {
 			slMessage(DEBUG_ALL, "warning: error in vclip\n");
@@ -396,10 +401,10 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 			return 0;
 		}
 	
-		std::vector<slCollision>::iterator ci;
+		int cn;	
 
-		for(ci = w->clipData->collisions.begin(); ci != w->clipData->collisions.end(); ci++ ) {
-			slCollision *c = &(*ci);
+		for(cn = 0; cn < w->clipData->collisionCount; cn++ ) {
+			slCollision *c = &w->clipData->collisions[ cn];
 			slWorldObject *w1;
 			slWorldObject *w2;
 			slPairFlags *flags;
@@ -421,7 +426,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 
 				if(w1->type == WO_LINK) {
 					slLink *l = (slLink*)w1;
-					bodyX = l->odeBodyID;
+					bodyX = l->_odeBodyID;
 				}
 				
 				mu = w1->mu + w2->mu;
@@ -429,7 +434,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 
 				if(w2->type == WO_LINK) {
 					slLink *l = (slLink*)w2;
-					bodyY = l->odeBodyID;
+					bodyY = l->_odeBodyID;
 				}
 
 				mu /= 2;
@@ -483,7 +488,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 
 					// printf("contacting %p, %p\n", bodyX, bodyY);
 	
-					id = dJointCreateContact(w->odeWorldID, w->odeCollisionGroupID, contact);
+					id = dJointCreateContact(w->_odeWorldID, w->_odeCollisionGroupID, contact);
 					dJointAttach(id, bodyY, bodyX);
 				}
 			}
@@ -496,12 +501,12 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 
 	if(simulate != 0) {
 		if(w->odeStepMode == 0) {
-			dWorldStep(w->odeWorldID, stepSize);
+			dWorldStep(w->_odeWorldID, stepSize);
 		} else {
-			dWorldQuickStep(w->odeWorldID, stepSize);
+			dWorldQuickStep(w->_odeWorldID, stepSize);
 		}
 
-		dJointGroupEmpty(w->odeCollisionGroupID);
+		dJointGroupEmpty(w->_odeCollisionGroupID);
 
 		if(gPhysicsError) (*error)++;
 	}
@@ -542,9 +547,9 @@ void slNeighborCheck(slWorld *w) {
 
 	// vclip, but stop after the pruning stage 
 
-	slVclip(w->proximityData, 0.0, 1, 0);
+	slVclipPruneAndSweep(w->proximityData);
 
-	std::map< std::pair< int, int>, slCollisionCandidate >::iterator ci;
+	std::map< slPairFlags* , slCollisionCandidate >::iterator ci;
 
 	for(ci = w->proximityData->candidates.begin(); 
 		ci != w->proximityData->candidates.end(); ci++) {
@@ -562,7 +567,7 @@ void slNeighborCheck(slWorld *w) {
 }
 
 void slWorldSetGravity(slWorld *w, slVector *gravity) {
-	dWorldSetGravity(w->odeWorldID, gravity->x, gravity->y, gravity->z);
+	dWorldSetGravity(w->_odeWorldID, gravity->x, gravity->y, gravity->z);
 }
 
 slObjectLine *slWorldAddObjectLine(slWorld *w, slWorldObject *src, slWorldObject *dst, int stipple, slVector *color) {
@@ -690,5 +695,5 @@ slWorldObject *slWorldGetObject(slWorld *w, unsigned int n) {
 }
 
 void slWorldSetQuickstepIterations(slWorld *w, int n) {
-	dWorldSetQuickStepNumIterations(w->odeWorldID, n);
+	dWorldSetQuickStepNumIterations(w->_odeWorldID, n);
 }

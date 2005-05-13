@@ -92,84 +92,89 @@ class slStationary: public slWorldObject {
 #ifdef __cplusplus
 class slGISData;
 
-struct slWorld {
-	// when objects are added or removed from the world, this flag must be 
-	// set to 0 so that vclip structures are reinitialized.
+class slWorld {
+	public:
+		// when objects are added or removed from the world, this flag must be 
+		// set to 0 so that vclip structures are reinitialized.
+	
+		bool initialized;
+		unsigned char odeStepMode;
+	
+		dWorldID _odeWorldID;
+		dJointGroupID _odeCollisionGroupID;
+		dJointGroupID _odeJointGroupID;
+	
+		// sunlight detection
+	
+		unsigned char detectLightExposure;
+		unsigned char drawLightExposure;
+	
+		slVector lightExposureSource;
+		slVector lightExposureTarget;
+	
+		// integration vectors -- DV_VECTOR_COUNT depends on the requirements
+		// of the integration algorithm we're using... mbEuler requires only 
+		// a single derivation vector, while RK4 needs about 6.
+	
+		double *dv[DV_VECTOR_COUNT];
+	
+		int (*integrator)(slWorld *w, slLink *m, double *dt, int skip);
+	
+		// the collision callback is called when the collision is detected --
+		// at the estimated time of collision.  
+	
+		void (*collisionCallback)(void *body1, void *body2, int type);
+	
+		// the collisionCheckCallback is a callback defined by the program
+		// using the physics engine.  it takes two userData (see slWorldObject)
+		// pointers and returns whether collision detection should be preformed
+		// on the objects or not.
+	
+		int (*collisionCheckCallback)(void *body1, void *body2, int type);
+	
+		bool boundingBoxOnly;
+	
+		// age is the simulation time of the world.
+	
+		double age;
+	
+		std::vector<slWorldObject*> objects;
+		std::vector<slPatchGrid*> patches;
+		std::vector<slCamera*> cameras;
+		std::vector<slObjectConnection*> connections;
+		std::vector<slDrawCommandList*> drawings;
+	
+		// we have one slVclipData for the regular collision detection
+		// and one which will be used to answer "proximity" questions:
+		// to allow objects to ask for all objects within a certain radius
+	
+		slPatchGrid *_clipGrid;
+		slVclipData *clipData;
+		slVclipData *proximityData;
+	
+		slVector gravity;
+	
+		bool detectCollisions;
+		bool resolveCollisions;
+	
+		// drawing the world...
+	
+		slVector backgroundColor;
+		slVector backgroundTextureColor;
+		slVector shadowColor;
+		
+		int backgroundTexture;
+		int isBackgroundImage;
 
-	bool initialized;
-	unsigned char odeStepMode;
-
-	dWorldID odeWorldID;
-	dJointGroupID odeCollisionGroupID;
-	dJointGroupID odeJointGroupID;
-
-	// sunlight detection
-
-	unsigned char detectLightExposure;
-	unsigned char drawLightExposure;
-
-	slVector lightExposureSource;
-	slVector lightExposureTarget;
-
-	// integration vectors -- DV_VECTOR_COUNT depends on the requirements
-	// of the integration algorithm we're using... mbEuler requires only 
-	// a single derivation vector, while RK4 needs about 6.
-
-	double *dv[DV_VECTOR_COUNT];
-
-	int (*integrator)(slWorld *w, slLink *m, double *dt, int skip);
-
-	// the collision callback is called when the collision is detected --
-	// at the estimated time of collision.  
-
-	void (*collisionCallback)(void *body1, void *body2, int type);
-
-	// the collisionCheckCallback is a callback defined by the program
-	// using the physics engine.  it takes two userData (see slWorldObject)
-	// pointers and returns whether collision detection should be preformed
-	// on the objects or not.
-
-	int (*collisionCheckCallback)(void *body1, void *body2, int type);
-
-	unsigned char boundingBoxOnly;
-
-	// age is the simulation time of the world.
-
-	double age;
-
-	std::vector<slWorldObject*> objects;
-	std::vector<slPatchGrid*> patches;
-	std::vector<slCamera*> cameras;
-	std::vector<slObjectConnection*> connections;
-	std::vector<slDrawCommandList*> drawings;
-
-	// we have one slVclipData for the regular collision detection
-	// and one which will be used to answer "proximity" questions:
-	// to allow objects to ask for all objects within a certain radius
-
-	slVclipData *clipData;
-	slVclipData *proximityData;
-
-	slVector gravity;
-
-	bool detectCollisions;
-	bool resolveCollisions;
-
-	// drawing the world...
-
-	slVector backgroundColor;
-	slVector backgroundTextureColor;
-	slVector shadowColor;
-
-	int backgroundTexture;
-	int isBackgroundImage;
-
-	slGISData *gisData;
+		slGISData *gisData;
 
 #if HAVE_LIBENET
-	slNetsimData netsimData;
-	slNetsimClientData *netsimClient;
+		slNetsimData netsimData;
+		slNetsimClientData *netsimClient;
 #endif
+
+		void slWorld::renderShadowVolume(slCamera *c);
+		void slWorld::renderObjectShadowVolumes(slCamera *c);
 };
 #endif
 

@@ -18,10 +18,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#include "util.h"
+#include "simulation.h"
+
 #ifndef _CAMERA_H
 #define _CAMERA_H
-
-#include <vector>
 
 #define SPHERE_RESOLUTIONS	10
 
@@ -86,6 +87,9 @@ struct slBillboardEntry {
 */
 
 #ifdef __cplusplus
+
+#include <vector>
+
 class slCamera {
 	public:
 		slLight lights[8];

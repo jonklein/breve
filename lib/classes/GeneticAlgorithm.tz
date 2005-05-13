@@ -1,8 +1,17 @@
 @use Object.
 
 Object : GeneticAlgorithm {
-	% The GeneticAlgorithm class allows you to set up a genetic algorithm, in which
-	% solutions to a problem can be evolved.
+	% The GeneticAlgorithm class allows you to set up a genetic algorithm, 
+	% in which strategies can be evolved to solve a wide variety of problems.
+	% <P>
+	% To run a genetic algorithm, you will need to a create custom subclass
+	% of this object, GeneticAlgorithm, and of its companion object 
+	% OBJECT(GeneticProgrammingIndividual).
+	% <P>
+	% Your subclass of GeneticAlgorithm must implement two important methods:	
+	% METHOD(start-fitness-test) and METHOD(end-fitness-test).  These methods
+	% are automatically called at the beginning and end of the fitness tests	
+	% respectively.
 
 	+ variables:
 		populations (list).
@@ -22,11 +31,25 @@ Object : GeneticAlgorithm {
 		populationSize = 30.
 		currentIndividual = 0.
 		mutationPercent = 75.
+		crossoverPercent = 0.
 		tournamentSize = 5.
 
 		populations = { { }, { } }.
 
 	+ section "Getting and Setting Parameters for the Genetic Algorithm"
+
+	+ to set-test-duration to duration (double):
+		% Sets the duration of a single fitness test.  Specifies that a single
+		% individual should be allowed to run for duration simulated seconds 
+		% before assessing its fitness and switching to the next individual.
+		% The default value is 20.
+		testDuration = duration.
+
+	+ to get-test-duration:
+		% Returns the duration of a single fitness test.  This value can be
+		% set with the method METHOD(set-test-duration).  The default value
+		% is 20.
+		return testDuration.
 
 	+ to set-population-size to size (int):
 		% Sets the number of individuals in the population to size.
@@ -35,19 +58,44 @@ Object : GeneticAlgorithm {
 	+ to get-population-size:
 		% Returns the size of the population.  The default value is 30, and
 		% can be set with METHOD(set-population-size).
-
 		return populationSize.
 
 	+ to set-mutation-percent to percent (int): 
 		% Sets the probability of mutation to percent%.  This specifies the 
 		% approximate percentage of agents to be generated through mutation.
-
+		% The default value is 75%.
 		mutationPercent = percent.
 
 	+ to get-mutation-percent:
 		% Returns the percent probability of mutation during reproduction.
-
+		% The default value is 75%.
 		return mutationPercent.
+
+	+ to set-crossover-percent to percent (int):
+		% Sets the probability of crossover to percent%.  This specifies the 
+		% approximate percentage of agents to be generated through crossover
+		% during reproduction.  Crossover is not enabled by default, so the 
+		% default value is 0%.
+		crossoverPercent = percent.
+
+	+ to get-crossover-percent:
+		% Returns the probability of crossover during reproduction.
+		return crossoverPercent.
+
+	+ to set-tournament-size to tsize (int):
+		% Sets the tournament size to tsize.  The tournament size specifies
+		% how many individuals are considered in a single selection "tournament".
+		% The larger the tournament size, the more competative selection becomes.
+		% The default value is 5.  
+		tournamentSize = size.
+
+	+ to get-tournament-size:
+		% Returns the tournament size.  The tournament size specifies
+		% how many individuals are considered in a single selection "tournament".
+		% The larger the tournament size, the more competative selection becomes.
+		% The tournament size can be set with METHOD(set-tournament-size).
+		% The default value is 5.  
+		return tournamentSize.
 
 	+ to set-individual-class to className (string):
 		% Call this method to specify the class representing an individual in your
@@ -78,13 +126,6 @@ Object : GeneticAlgorithm {
 
 		currentIndividual = -1.
 		self switch-individual.
-
-	+ to set-test-duration to duration (double):
-		% Sets the duration of a single fitness test.  Specifies that a single
-		% individual should be allowed to run for duration simulated seconds 
-		% before assessing its fitness and switching to the next individual.
-
-		testDuration = duration.
 
 	+ to get-current-individual:
 		% Returns the current GeneticAlgorithmIndividual subclass instance being evaluated.
