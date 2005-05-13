@@ -126,7 +126,7 @@ Object : PushGP {
 		interpreter read-config from-file file.
 		inited = 0.
 
-	+ to set-fitness-test-duration to d (double):
+	- to set-fitness-test-duration to d (double):
 		% Sets the duration of the fitness test to d.  The duration of the 
 		% fitness test determines how much simulation time is allowed for 
 		% each fitness test.  
@@ -140,7 +140,7 @@ Object : PushGP {
 		% Undocumented until that paper is complete ?!
 		spatialRadius = n.
 
-	+ to get-fitness-test-duration:
+	- to get-fitness-test-duration:
 		return fitnessTestDuration.
 
 	+ to init:

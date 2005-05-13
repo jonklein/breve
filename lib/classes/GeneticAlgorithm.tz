@@ -36,6 +36,8 @@ Object : GeneticAlgorithm {
 
 		populations = { { }, { } }.
 
+		self prepare-for-generation number 0.
+
 	+ section "Getting and Setting Parameters for the Genetic Algorithm"
 
 	+ to set-test-duration to duration (double):
@@ -87,7 +89,7 @@ Object : GeneticAlgorithm {
 		% how many individuals are considered in a single selection "tournament".
 		% The larger the tournament size, the more competative selection becomes.
 		% The default value is 5.  
-		tournamentSize = size.
+		tournamentSize = tsize.
 
 	+ to get-tournament-size:
 		% Returns the tournament size.  The tournament size specifies
@@ -178,7 +180,7 @@ Object : GeneticAlgorithm {
 				populations{ !currentPopulation }{ i } mutate.
 			} else if r < (mutationPercent + crossoverPercent): {
 				populations{ !currentPopulation }{ i } crossover 
-					from-parent1 (self touranment-select) from-parent2 (self tournament-select).
+					from-parent1 (self tournament-select) from-parent2 (self tournament-select).
 			} else if r < (mutationPercent + crossoverPercent + migrationPercent): {
 			} else {
 				populations{ !currentPopulation }{ i } copy from (self tournament-select).
