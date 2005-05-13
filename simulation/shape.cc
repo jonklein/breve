@@ -79,29 +79,14 @@ void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, 
 	glPopMatrix();
 }
 
-/*!
-	\brief TO BE DEPRECATED Creates a sphere.
-
-	This method will be removed once a suitable handling system is in
-	place to allow for an error from the constructor.
-*/
-
-slShape *slSphereNew(double radius, double density) {
-	slSphere *s;
-
-	if(radius <= 0.0 || density <= 0.0) return NULL;
-
-	s = new slSphere(radius, density);
-
-	return s;
-}
-
 slSphere::slSphere(double radius, double density) : slShape() {
 	_type = ST_SPHERE;
 	_radius = radius;
         
 	_density = density;
-            
+
+	if(radius <= 0.0 || density <= 0.0) throw slException(std::string("invalid parameters for new sphere object"));
+
 	slVectorSet(&_max, _radius, _radius, _radius);
 
 	_mass = _density * M_PI * _radius * _radius * _radius * 4.0/3.0;
@@ -1141,7 +1126,7 @@ slShape *slDeserializeShape(slSerializedShapeHeader *header, int length) {
 	int n, vind;
 	slVector *v, *vectors, **vectorp;
 
-	if(header->type == ST_SPHERE) return slSphereNew(header->radius, header->mass);
+	if(header->type == ST_SPHERE) return new slSphere(header->radius, header->mass);
 
 	s = new slShape();
 

@@ -28,7 +28,7 @@
 // class slMultibody;
 // class slJoint;
 
-#define slLinkSwapConfig(r)		((r)->currentState = !(r)->currentState)
+#define slLinkSwapConfig(r)		((r)->_currentState = !(r)->_currentState)
 
 /*!
 	\brief Holds link state data in an integratable structure.
@@ -68,6 +68,32 @@ class slLink: public slWorldObject {
 		void draw() {
 		}
 
+		void setLocation(slVector *rotation);
+		void setRotation(double rotation[3][3]);
+		void getRotation(double m[3][3]);
+		int checkSelfPenetration(slWorld *w);
+		int checkPenetration(slWorld *w);
+		void applyForce(slVector *f, slVector *t);
+		void applyJointControls();
+		void updateBoundingBox();
+		void disableSimulation();
+		void enableSimulation();
+		void updatePosition();
+		void updatePositions();
+
+		void setForce(slVector *f);
+		void setTorque(slVector *t);
+
+		void getVelocity(slVector *velocity, slVector *rotational);
+		void setVelocity(slVector *velocity, slVector *rotational);
+
+		void getAcceleration(slVector *linear, slVector *rotational);
+		void setAcceleration(slVector *linear, slVector *rotational);
+
+		slMultibody *getMultibody();
+
+		slPosition *getPosition();
+
 		void getBounds(slVector *min, slVector *max);
 		void setShape(slShape *s);
 		void step(slWorld *world, double step);
@@ -80,16 +106,18 @@ class slLink: public slWorldObject {
 
 		char mobile;
 
-		slLinkIntegrationPosition stateVector[2];
+		bool _justMoved;
 
-		unsigned char currentState;
+		slLinkIntegrationPosition _stateVector[2];
+
+		unsigned char _currentState;
 
 		unsigned int clipNumber;
 
-		dBodyID odeBodyID;
-		dMass massData;
+		dBodyID _odeBodyID;
+		dMass _massData;
 
-		slVector externalForce;
+		slsVector _externalForce;
 
 		unsigned char drawOptions;
 
@@ -103,28 +131,6 @@ class slLink: public slWorldObject {
 extern "C" {
 #endif
 
-slLinkIntegrationPosition *slLinkGetCurrentConfig(slLink *m);
-
-void slLinkSetLocation(slLink *m, slVector *rotation);
-void slLinkSetRotation(slLink *m, double rotation[3][3]);
-
-void slLinkGetRotation(slLink *root, double m[3][3]);
-
-int slLinkCheckSelfPenetration(slWorld *w, slLink *l);
-int slLinkCheckPenetration(slWorld *w, slLink *l);
-
-void slLinkApplyForce(slLink *m, slVector *f, slVector *t);
-
-void slLinkApplyJointControls(slLink *l);
-
-void slLinkUpdateBoundingBox(slLink *r);
-
-void slLinkDisableSimulation(slLink *r);
-void slLinkEnableSimulation(slLink *r);
-
-void slLinkUpdatePosition(slLink *r);
-void slLinkUpdatePositions(slLink *r);
-
 void slLinkList(slLink *root, std::vector<slLink*> *list, int mbOnly);
 
 slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child,
@@ -133,19 +139,8 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child,
 
 void slVelocityAtPoint(slVector *vel, slVector *avel, slVector *atPoint, slVector *d);
 
-void slLinkGetAcceleration(slLink *l, slVector *linear, slVector *rotational);
-void slLinkSetAcceleration(slLink *m, slVector *linear, slVector *rotational);
-
-void slLinkGetVelocity(slLink *m, slVector *velocity, slVector *rotational);
-void slLinkSetVelocity(slLink *m, slVector *velocity, slVector *rotational);
-
-slPosition *slLinkGetPosition(slLink *l);
-
-slMultibody *slLinkGetMultibody(slLink *l);
 
 void slLinkSetTexture(slLink *l, int texture);
-
-void slLinkSetForce(slLink *l, slVector *force);
 
 void slSlToODEMatrix(double m[3][3], dReal *r);
 void slODEToSlMatrix(dReal *r, double m[3][3]);

@@ -46,6 +46,8 @@ void slVclipDataInit(slWorld *w) {
 	w->clipData->objects = w->objects;
 	w->clipData->world = w;
 
+	w->clipData->collisionCount = 0;
+
 	// for each object in the world, fill in it's shape, position and 
 	// min/max vectors
 
@@ -58,7 +60,7 @@ void slVclipDataInit(slWorld *w) {
 			case WO_LINK:
 				link = (slLink *)w->objects[x];
 				link->clipNumber = x;
-				slLinkUpdateBoundingBox(link);
+				link->updateBoundingBox();
 
 				break;
 			case WO_STATIONARY:
@@ -109,22 +111,17 @@ void slVclipDataInit(slWorld *w) {
 	not.
 */
 
-void slVclipDataInitPairFlags(slVclipData *clipData, int x, int y) {
+slPairFlags slVclipDataInitPairFlags(slVclipData *clipData, int x, int y) {
 	void *c1, *c2;
-	slPairFlags *flags;
+	slPairFlags flags;
 	int t1, t2;
 	int sim1, sim2;
 	int callback = 0;
 	int simulate = 0;
 
-	flags = slVclipPairFlags(clipData, x, y);
+	flags = slVclipPairFlagValue(clipData, x, y);
 
-	if(!flags) {
-		slMessage(0, "Cannot locate pair flags %d, %d\n", x, y);
-		return;
-	}
-
-	*flags &= ~BT_UNKNOWN;
+	flags &= ~BT_UNKNOWN;
 
 	t1 = clipData->world->objects[x]->type;
 	t2 = clipData->world->objects[y]->type;
@@ -132,8 +129,11 @@ void slVclipDataInitPairFlags(slVclipData *clipData, int x, int y) {
 	// collision detection is never turned on for 2 non-link objects.
 	   
 	if (t1 != WO_LINK && t2 != WO_LINK) {
-		*flags &= ~BT_CHECK;
-		return;
+		flags &= ~BT_CHECK;
+
+		slVclipPairFlagValue(clipData, x, y) = flags;
+
+		return flags;
 	}
 	
 	sim1 = 1;
@@ -154,19 +154,24 @@ void slVclipDataInitPairFlags(slVclipData *clipData, int x, int y) {
 	if (c1 && c2 && clipData->world->collisionCheckCallback) {
 		if (sim1 && sim2)
 			simulate = clipData->world->collisionCheckCallback(c1, c2, CC_SIMULATE);
+
 		callback = clipData->world->collisionCheckCallback(c1, c2, CC_CALLBACK);
 	}
 
 	if (simulate || callback) {
 		clipData->world->detectCollisions = 1;
-		*flags |= BT_CHECK;
+		flags |= BT_CHECK;
 
 		if (simulate)
-			*flags |= BT_SIMULATE;
+			flags |= BT_SIMULATE;
 		if (callback)
-			*flags |= BT_CALLBACK;
+			flags |= BT_CALLBACK;
 	} else
-		*flags &= ~BT_CHECK;
+		flags &= ~BT_CHECK;
+
+	slVclipPairFlagValue(clipData, x, y) = flags;
+
+	return flags;
 }
 
 /* 
@@ -256,6 +261,7 @@ void slInitProximityData(slWorld *w) {
 	slVclipDataRealloc(w->proximityData, w->objects.size());
 
 	w->proximityData->world = w;
+	w->proximityData->objects = w->objects;
 
 	w->proximityData->boundLists[0].clear();
 	w->proximityData->boundLists[1].clear();

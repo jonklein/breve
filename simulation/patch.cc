@@ -187,6 +187,28 @@ slPatchGrid::slPatchGrid(const slVector *center, const slVector *patchSize, cons
 		}
 	}
 
+	for(c=0;c<z;c++) {
+		for(b=0;b<x;b++) {
+			for(a=0;a<y;a++) {
+				int dx, dy, dz;
+
+				for(dx=-1;dx<2;dx++) {
+					if(dx + a != -1 && dx + a != xSize) {
+						for(dy=-1;dy<2;dy++) {
+							if(dy + b != -1 && dy + b != ySize) {
+								for(dz=-1;dz<2;dz++) {
+									if(dz + c != -1 && dz + c != zSize) {
+										this->patches[c][b][a]._neighbors.push_back( &patches[c + dz][b + dy][a + dx]);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	this->drawSmooth = 0;
 
 }
@@ -216,7 +238,7 @@ slPatchGrid::~slPatchGrid()
  *  getPatchAtLocation returns the patch which contains the point.
  *
  */
-slPatch* slPatchGrid::slPatchGrid::getPatchAtLocation(slVector *location) {
+slPatch* slPatchGrid::getPatchAtLocation(slVector *location) {
 	double x, y, z;
 	
 	x = ((location->x - startPosition.x) / patchSize.x);
@@ -228,6 +250,93 @@ slPatch* slPatchGrid::slPatchGrid::getPatchAtLocation(slVector *location) {
 	if(z < 0 || z >= zSize) return NULL;
 
 	return &patches[int(z)][int(x)][int(y)];
+}
+
+/*!
+	\brief Preforms a basic cell-based collision detection -- currently 
+	experimental.
+*/
+
+void slPatchGrid::assignObjectsToPatches(slWorld *w) {
+	int x, y, z;
+	std::vector< slWorldObject* >::iterator wo;
+
+	slVclipData *vc = w->clipData;
+
+	slCollision *ce = slNextCollision(vc);
+
+	for(z = 0; z < zSize; z++) {
+		for(y = 0; y < ySize; y++) {
+			for(x = 0; x < xSize; x++) {
+				patches[z][x][y]._objectsInPatch.clear();
+			}
+		}
+	}
+
+	for(x = 0; x < w->objects.size(); x++ ) {
+		slWorldObject *w1 = w->objects[x];
+		slPatch *p = getPatchAtLocation( &w1->position.location);
+
+		if(p) {
+			std::vector< slPatch* >::iterator pi;
+
+			for(pi=p->_neighbors.begin(); pi != p->_neighbors.end(); pi++) {
+				slPatch *neighbor = *pi;
+
+				std::vector< int >::iterator ii;
+
+				for(ii = neighbor->_objectsInPatch.begin(); ii != neighbor->_objectsInPatch.end(); ii++ ) {
+					y = *ii;
+
+					slPairFlags flags = slVclipPairFlagValue(vc, x, y);
+
+				    slCollisionCandidate c;
+
+				    if(flags & BT_UNKNOWN) {
+				        // the UNKNOWN flag indicates that we have not yet preformed a callback to
+				        // determine whether further collision detection is necessary.
+
+				        flags = slVclipDataInitPairFlags(vc, x, y);
+				    }
+
+				    if(flags & BT_CHECK) {
+						slWorldObject *w2;
+
+    					c.x = x;
+					    c.y = y;
+
+					    c.f1 = NULL;
+					    c.f2 = NULL;
+
+					    w1 = vc->objects[x];
+					    w2 = vc->objects[y];
+
+					    if(!w1 || !w2) return;
+
+					    c.s1 = w1->shape;
+					    c.s2 = w2->shape;
+
+					    c.p1 = &w1->position;
+					    c.p2 = &w2->position;
+
+					    if(vc->objects.size() != 0) {
+					        if(w1->shape && w1->shape->_type == ST_NORMAL)
+					            c.f1 = w1->shape->features[0];
+
+					        if(w2->shape && w2->shape->_type == ST_NORMAL)
+					            c.f2 = w2->shape->features[0];
+					    }
+
+						if(vc->testPair(&c, ce) == CT_PENETRATE) ce = slNextCollision(vc);
+					}
+				}
+			}
+
+			p->_objectsInPatch.push_back( x);
+		}
+	}
+
+	vc->collisionCount--;
 }
 
 /**

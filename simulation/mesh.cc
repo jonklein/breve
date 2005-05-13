@@ -14,7 +14,7 @@ slMesh::slMesh(char *filename, char *meshname) {
 
 	file = lib3ds_file_load(filename);
 
-	if(!file) throw -1;
+	if(!file) throw slException(std::string("cannot open file \"") + meshname + "\"");
 
 	meshname = "faucet";
 
@@ -26,13 +26,15 @@ slMesh::slMesh(char *filename, char *meshname) {
 
 	_mesh = lib3ds_file_mesh_by_name(file, meshname);
 
-	if( ! _mesh) throw -1;
+	if( ! _mesh) throw slException(std::string("cannot locate mesh in file \"") + meshname + "\"");
 
 	if(_mesh) {
 		int n;
 
 		printf("found node %s, %d faces\n", meshname, _mesh->faces);
 		printf("at: %f, %f, %f\n", _mesh->matrix[3][0], _mesh->matrix[3][1], _mesh->matrix[3][2]);
+
+		// translate the mesh to the origin
 
 		for(n = 0; n < _mesh->points; n++ ) {
 			_mesh->pointL[n].pos[0] -= _mesh->matrix[3][0];
@@ -49,7 +51,7 @@ slMesh::~slMesh() {
 double slMesh::maxReach() {
 	Lib3dsFace *f;
 	double maxD = 0;
-	int n, m;
+	unsigned int n, m;
 
 	for(n = 0; n < _mesh->faces; n++ ) {
 		slVector d;
@@ -69,16 +71,13 @@ double slMesh::maxReach() {
 }
 
 void slMesh::draw() {
-	int n;
+	unsigned int n;
 	Lib3dsFace *f;
-
-	glColor3f(1, 1, 1);
 
 	glDisable(GL_CULL_FACE);
 	glBegin(GL_TRIANGLES);
 		
 	for(n = 0; n < _mesh->faces; n++ ) {
-
 		f = &_mesh->faceL[n];
 
 		glVertex3fv(_mesh->pointL[f->points[0]].pos);
@@ -88,8 +87,8 @@ void slMesh::draw() {
 
 	glEnd();	
 
-	// printf("drew %d faces\n", mesh->faces);
-	// printf("last at %f, %f, %f\n", mesh->pointL[f->points[2]].pos[0], mesh->pointL[f->points[2]].pos[1], mesh->pointL[f->points[2]].pos[2]);
+	// printf("drew %d faces\n", _mesh->faces);
+	// printf("last at %f, %f, %f\n", _mesh->pointL[f->points[2]].pos[0], _mesh->pointL[f->points[2]].pos[1], _mesh->pointL[f->points[2]].pos[2]);
 }
 
 #endif

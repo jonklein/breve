@@ -21,6 +21,8 @@
 #ifndef _VCLIP_H
 #define _VCLIP_H
 
+typedef unsigned char slPairFlags;
+
 #include "vclipData.h"
 
 #define MC_TOLERANCE	0.00
@@ -45,12 +47,6 @@ enum slBoundSortTypes {
 	BT_MIN = 0,
 	BT_MAX
 };
-
-/*!
-	\brief Data on whether a certain pair of objects should be simulated.
-*/
-
-typedef unsigned char slPairFlags;
 
 enum slCollisionFlags {
 	BT_XAXIS 	= 0x01, // 0000001 
@@ -94,6 +90,12 @@ class slCollisionCandidate {
 		slFeature *f1;
 		slFeature *f2;
 
+		slShape *s1;
+		slShape *s2;
+
+		slPosition *p1;
+		slPosition *p2;
+
 		unsigned int x;
 		unsigned int y;
 };
@@ -124,6 +126,8 @@ class slCollision {
 
 class slVclipData {
 	public:
+		int testPair(slCollisionCandidate *e, slCollision *ce);
+
 		slWorld *world;
 
 		std::vector<slBoundSort*> boundListPointers[3];
@@ -132,10 +136,11 @@ class slVclipData {
 		std::vector<slWorldObject*> objects;
 
 		std::vector<slCollision> collisions;
+		int collisionCount;
 
 		slPairFlags **pairArray;
 
-		std::map< std::pair< int, int>, slCollisionCandidate > candidates;
+		std::map< slPairFlags* , slCollisionCandidate > candidates;
 
 		unsigned int count;
 		unsigned int maxCount;
@@ -156,10 +161,11 @@ void slRemoveCollisionCandidate(slVclipData *d, int x, int y);
 slVector *slPositionVertex(slPosition *p, slVector *i, slVector *o);
 slPlane *slPositionPlane(slPosition *p, slPlane *p1, slPlane *pt);
 
-int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollision *ce);
+int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollision *ce, slPosition *p1, slSphere *s1, slPosition *p2, slSphere *p2);
 
 int slSphereShapeCheck(slVclipData *vc, slFeature **f, int flip, int x, int y, slCollision *ce);
 
+int slVclipPruneAndSweep(slVclipData *d);
 int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly);
 
 int slVclipTestPair(slVclipData *, slCollisionCandidate*, slCollision *);

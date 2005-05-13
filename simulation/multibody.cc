@@ -143,7 +143,7 @@ void slMultibodyRotate(slMultibody *mb, double rotation[3][3]) {
 		slVectorSub(&link->position.location, &mb->_root->position.location, &toLink);
 		slVectorXform(rotation, &toLink, &newToLink);
 		slVectorAdd(&newToLink, &mb->_root->position.location, &newToLink);
-		dBodySetPosition(link->odeBodyID, newToLink.x, newToLink.y, newToLink.z);
+		dBodySetPosition(link->_odeBodyID, newToLink.x, newToLink.y, newToLink.z);
 	
 		slMatrixMulMatrix(rotation, link->position.rotation, newRot);
 
@@ -158,7 +158,7 @@ void slMultibodyRotate(slMultibody *mb, double rotation[3][3]) {
 		Q[2] = q.y;
 		Q[3] = q.z;
 
-		if(link->simulate) dBodySetQuaternion(link->odeBodyID, Q);
+		if(link->simulate) dBodySetQuaternion(link->_odeBodyID, Q);
 	}
 }
 
@@ -178,13 +178,13 @@ void slMultibodyOffsetPosition(slMultibody *mb, slVector *offset) {
 		slVectorAdd(&link->position.location, offset, &link->position.location);
 
 		if(link->simulate) {
-			oldP = dBodyGetPosition(link->odeBodyID);
+			oldP = dBodyGetPosition(link->_odeBodyID);
 
 			newP[0] = oldP[0] + offset->x;
 			newP[1] = oldP[1] + offset->y;
 			newP[2] = oldP[2] + offset->z;
 			
-			dBodySetPosition(link->odeBodyID, newP[0], newP[1], newP[2]);
+			dBodySetPosition(link->_odeBodyID, newP[0], newP[1], newP[2]);
 		}
 	}
 }
@@ -201,7 +201,7 @@ void slMultibody::setVelocity(slVector *linear, slVector *rotational) {
 	for(i=_links.begin(); i != _links.end(); i++) {
 		link = *i;
 
-		slLinkSetVelocity(link, linear, rotational);
+		link->setVelocity(linear, rotational);
 	}
 }
 
@@ -217,7 +217,7 @@ void slMultibody::setAcceleration(slVector *linear, slVector *rotational) {
 	for(i=_links.begin(); i != _links.end(); i++) {
 		link = *i;
 
-		slLinkSetAcceleration(link, linear, rotational);
+		link->setAcceleration(linear, rotational);
 	}
 }
 
@@ -388,8 +388,8 @@ void slMultibody::updatePositions() {
 	for(i = _links.begin(); i != _links.end(); i++ ) {
 		slLink *link = *i;
 
-		slLinkUpdatePositions(link);
-		slLinkUpdateBoundingBox(link);
+		link->updatePositions();
+		link->updateBoundingBox();
 	}
 }
 
@@ -424,7 +424,7 @@ int slMultibody::checkSelfPenetration() {
 
 				flags = slVclipPairFlags(vc, link1->clipNumber, link2->clipNumber);
 
-				if(slVclipFlagsShouldTest(*flags) && slVclipTestPair(vc, &c, NULL)) return 1;
+				if(slVclipFlagsShouldTest(*flags) && vc->testPair(&c, NULL)) return 1;
 			}
 		}
 	}

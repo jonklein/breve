@@ -60,6 +60,16 @@ int brIPatchGridFree(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
+	\brief Sets the patch grid to be responsible for the collision detection
+	pruning stage.
+*/
+
+int brIPatchGridSetClipGrid(brEval args[], brEval *target, brInstance *i) {
+	i->engine->world->_clipGrid = BRPATCHGRIDPOINTER(&args[0]);
+	return EC_OK;
+}
+
+/*!
 	\brief Enables/disable smooth drawing for the patch grid.
 
 	void patchGridSetSmoothDrawing(slPatchGrid pointer).
@@ -205,8 +215,9 @@ int brISetPatchTransparency(brEval args[], brEval *target, brInstance *i) {
 /*@}*/
 
 void breveInitPatchFunctions(brNamespace *n) {
-    brNewBreveCall(n, "newPatchGrid", brIPatchGridNew, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_INT, AT_INT, AT_INT, 0);
-    brNewBreveCall(n, "freePatchGrid", brIPatchGridFree, AT_NULL, AT_POINTER, 0);
+    brNewBreveCall(n, "patchGridNew", brIPatchGridNew, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_INT, AT_INT, AT_INT, 0);
+    brNewBreveCall(n, "patchGridFree", brIPatchGridFree, AT_NULL, AT_POINTER, 0);
+    brNewBreveCall(n, "patchGridSetClipGrid", brIPatchGridSetClipGrid, AT_NULL, AT_POINTER, 0);
     brNewBreveCall(n, "patchGridSetSmoothDrawing", brIPatchGridSetSmoothDrawing, AT_NULL, AT_POINTER, AT_INT, 0);
     brNewBreveCall(n, "setPatchObjectAtIndex", brISetObjectAtIndex, AT_NULL, AT_POINTER, AT_INSTANCE, AT_INT, AT_INT, AT_INT, 0);
     brNewBreveCall(n, "patchObjectAtIndex", brIObjectAtIndex, AT_INSTANCE, AT_POINTER, AT_INT, AT_INT, AT_INT, 0);

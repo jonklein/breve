@@ -52,11 +52,6 @@ int brILinkAddToWorld(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 	slWorldObject *wo;
 
-	if(!link) {
-		slMessage(DEBUG_ALL, "null pointer passed to linkAddToWorld\n");
-		return EC_ERROR;
-	}
-
 	wo = slWorldAddObject(i->engine->world, link, WO_LINK);
 
 	BRPOINTER(target) = wo;
@@ -89,7 +84,7 @@ int brILinkSetLocation(brEval args[], brEval *target, brInstance *i) {
 	slLink *l = BRLINKPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(&args[1]);
 
-	slLinkSetLocation(l, v);
+	l->setLocation(v);
 
 	return EC_OK;
 }
@@ -106,7 +101,7 @@ int brILinkSetRotationMatrix(brEval args[], brEval *target, brInstance *i) {
 
 	slMatrixCopy(BRMATRIX(&args[1]), m);
 
-	slLinkSetRotation(l, m);
+	l->setRotation(m);
 
 	return EC_OK;
 }
@@ -124,7 +119,7 @@ int brILinkSetRotation(brEval args[], brEval *target, brInstance *i) {
 	double m[3][3];
 
 	slRotationMatrix(v, len, m);
-	slLinkSetRotation(l, m);
+	l->setRotation(m);
 
 	return EC_OK;
 }
@@ -142,9 +137,9 @@ int brILinkRotateRelative(brEval args[], brEval *target, brInstance *i) {
 	double m[3][3], nm[3][3];
 
 	slRotationMatrix(v, len, m);
-	slMatrixMulMatrix(m, slLinkGetPosition(l)->rotation, nm);
+	slMatrixMulMatrix(m, l->getPosition()->rotation, nm);
 
-	slLinkSetRotation(l, nm);
+	l->setRotation(nm);
 
 	return EC_OK;
 }
@@ -158,12 +153,7 @@ int brILinkRotateRelative(brEval args[], brEval *target, brInstance *i) {
 int brILinkGetLocation(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]); 
 
-	if(!link) {
-		slMessage(DEBUG_ALL, "null pointer passed to getLocation\n");
-		return EC_ERROR;
-	}
-
-	slVectorCopy(&slLinkGetPosition(link)->location, &BRVECTOR(target));
+	slVectorCopy(&link->getPosition()->location, &BRVECTOR(target));
 
 	return EC_OK;
 }
@@ -177,12 +167,7 @@ int brILinkGetLocation(brEval args[], brEval *target, brInstance *i) {
 int brILinkGetRotation(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]); 
 
-	if(!link) {
-		slMessage(DEBUG_ALL, "null pointer passed to getRotation\n");
-		return EC_ERROR;
-	}
-
-	slMatrixCopy(&slLinkGetPosition(link)->rotation, BRMATRIX(target));
+	slMatrixCopy(&link->getPosition()->rotation, BRMATRIX(target));
 
 	return EC_OK;
 }
@@ -197,12 +182,7 @@ int brILinkSetVelocity(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 	slVector *vl = &BRVECTOR(&args[1]);
 
-	if(!link) {
-		slMessage(DEBUG_ALL, "null pointer passed to linkSetVelocity\n");
-		return EC_ERROR;
-	}
-
-	slLinkSetVelocity(link, vl, NULL);
+	link->setVelocity(vl, NULL);
 
 	return EC_OK;
 }
@@ -215,15 +195,8 @@ int brILinkSetVelocity(brEval args[], brEval *target, brInstance *i) {
 int brILinkSetPhysics(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 	
-	if (!link) {
-		slMessage(DEBUG_ALL, "null pointer passed to setPhysics\n");
-		return EC_ERROR;
-	}
-
-	if (BRINT(&args[1]))
-		slLinkEnableSimulation(link);
-	else
-		slLinkDisableSimulation(link);
+	if (BRINT(&args[1])) link->enableSimulation();
+	else link->disableSimulation();
 	
 	return EC_OK;
 }
@@ -238,12 +211,7 @@ int brILinkSetRotationalVelocity(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 	slVector *vl = &BRVECTOR(&args[1]);
 
-	if(!link) {
-		slMessage(DEBUG_ALL, "null pointer passed to linkSetRotationalVelocity\n");
-		return EC_ERROR;
-	}
-
-	slLinkSetVelocity(link, NULL, vl);
+	link->setVelocity(NULL, vl);
 
 	return EC_OK;
 }
@@ -258,12 +226,7 @@ int brILinkSetAcceleration(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(&args[1]);
  
-	if(!link) {
-		slMessage(DEBUG_ALL, "null pointer passed to linkSetAcceleration\n");
-		return EC_ERROR;
-	}
- 
-	slLinkSetAcceleration(link, v, NULL);
+	link->setAcceleration(v, NULL);
  
 	return EC_OK;
 }
@@ -277,12 +240,7 @@ int brILinkSetAcceleration(brEval args[], brEval *target, brInstance *i) {
 int brILinkGetAcceleration(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 
-	if(!link) {
-		slMessage(DEBUG_ALL, "null pointer passed to getAcceleration\n");
-		return EC_ERROR;
-	}
-
-	slLinkGetAcceleration(link, &BRVECTOR(target), NULL);
+	link->getAcceleration(&BRVECTOR(target), NULL);
 
 	return EC_OK;
 }   
@@ -297,12 +255,7 @@ int brILinkSetRotationalAcceleration(brEval args[], brEval *target, brInstance *
 	slLink *link = BRLINKPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(&args[1]);
  
-	if(!link) {
-		slMessage(DEBUG_ALL, "null pointer passed to setRotationalAcceleration\n");
-		return EC_ERROR;
-	}
- 
-	slLinkSetAcceleration(link, NULL, v);
+	link->setAcceleration(NULL, v);
  
 	return EC_OK;
 }
@@ -316,12 +269,7 @@ int brILinkSetRotationalAcceleration(brEval args[], brEval *target, brInstance *
 int brILinkGetVelocity(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 
-	if(!link) {
-		slMessage(DEBUG_ALL, "null pointer passed to linkGetVelocity\n");
-		return EC_ERROR;
-	}
-
-	slLinkGetVelocity(link, &BRVECTOR(target), NULL);
+	link->getVelocity(&BRVECTOR(target), NULL);
 
 	return EC_OK;
 }
@@ -335,12 +283,7 @@ int brILinkGetVelocity(brEval args[], brEval *target, brInstance *i) {
 int brILinkGetRotationalVelocity(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 	
-	if(!link) {
-		slMessage(DEBUG_ALL, "stationary object passed to getRotationalVelocity\n");
-		return EC_ERROR;
-	}
-
-	slLinkGetVelocity(link, NULL, &BRVECTOR(target));
+	link->getVelocity(NULL, &BRVECTOR(target));
 
 	return EC_OK;
 }
@@ -354,12 +297,7 @@ int brILinkGetRotationalVelocity(brEval args[], brEval *target, brInstance *i) {
 int brILinkSetForce(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 
-	if(!link) {
-		slMessage(DEBUG_ALL, "null pointer passed to setLinkForce\n");
-		return EC_ERROR;
-	}
-
-	slLinkSetForce(link, &BRVECTOR(&args[1]));
+	link->setForce(&BRVECTOR(&args[1]));
 
 	return EC_OK;
 }
@@ -376,15 +314,8 @@ int brILinkGetMultibody(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 	slMultibody *mb;
 
-	if (!link) {
-		slMessage(DEBUG_ALL, "null pointer passed to setLinkTorque\n");
-		return EC_ERROR;
-	}
-
-	if ((mb = slLinkGetMultibody(link)))
-		BRINSTANCE(target) = (brInstance *)mb->getCallbackData();
-	else
-		BRINSTANCE(target) = NULL;
+	if ((mb = link->getMultibody())) BRINSTANCE(target) = (brInstance *)mb->getCallbackData();
+	else BRINSTANCE(target) = NULL;
 
 	return EC_OK;
 }
@@ -398,12 +329,7 @@ int brILinkGetMultibody(brEval args[], brEval *target, brInstance *i) {
 int brILinkSetTorque(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 
-	if(!link) {
-		slMessage(DEBUG_ALL, "null pointer passed to setLinkTorque\n");
-		return EC_ERROR;
-	}
-
-	slLinkApplyForce(link, NULL, &BRVECTOR(&args[1]));
+	link->setTorque(&BRVECTOR(&args[1]));
 
 	return EC_OK;
 }
@@ -417,9 +343,7 @@ int brILinkSetTorque(brEval args[], brEval *target, brInstance *i) {
 int brILinkCheckPenetration(brEval args[], brEval *target, brInstance *i) { 
 	slLink *l = BRLINKPOINTER(&args[0]);
 
-	if(!l) return EC_OK;
-
-	BRINT(target) = slLinkCheckPenetration(i->engine->world, l);
+	BRINT(target) = l->checkPenetration(i->engine->world);
    
 	return EC_OK;
 }
@@ -433,9 +357,7 @@ int brILinkCheckPenetration(brEval args[], brEval *target, brInstance *i) {
 int brILinkCheckSelfPenetration(brEval args[], brEval *target, brInstance *i) { 
 	slLink *l = BRLINKPOINTER(&args[0]);
 
-	if(!l) return EC_OK;
-
-	BRINT(target) = slLinkCheckSelfPenetration(i->engine->world, l);
+	BRINT(target) = l->checkSelfPenetration(i->engine->world);
    
 	return EC_OK;
 }
@@ -516,7 +438,7 @@ int brIVectorFromLinkPerspective(brEval args[], brEval *target, brInstance *i) {
 	}
 
 	target->type = AT_VECTOR;
-	slVectorInvXform(slLinkGetPosition(link)->rotation, vector, &BRVECTOR(target));
+	slVectorInvXform(link->getPosition()->rotation, vector, &BRVECTOR(target));
 
 	return EC_OK;
 } 

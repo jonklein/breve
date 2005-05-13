@@ -265,7 +265,7 @@ class slMeshShape : public slSphere {
 			_radius = _mesh->maxReach();
 			setDensity(1.0);
 #else 
-			throw 1;
+			throw "this software was compiled without lib3ds mesh support";
 #endif
 		}
 
@@ -275,9 +275,19 @@ class slMeshShape : public slSphere {
 		}
 	
 		void draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags) {
+			float scale[4] = { 1.0/textureScale, 1.0/textureScale, 1.0/textureScale, 1.0/textureScale };
+
     		glPushMatrix();
 		    glTranslated(pos->location.x, pos->location.y, pos->location.z);
 		    slMatrixGLMult(pos->rotation);
+
+			glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+			glTexGenfv(GL_S, GL_OBJECT_PLANE, scale);
+			glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+			glTexGenfv(GL_T, GL_OBJECT_PLANE, scale);
+
+			glEnable(GL_TEXTURE_GEN_S);
+			glEnable(GL_TEXTURE_GEN_T);
 
 			if(_drawList == 0 || _recompile) {
 				if( _drawList == 0) _drawList = glGenLists(1);
@@ -290,6 +300,9 @@ class slMeshShape : public slSphere {
 			}
 
 			glCallList(_drawList);
+
+			glDisable(GL_TEXTURE_GEN_S);
+			glDisable(GL_TEXTURE_GEN_T);
 
 			glPopMatrix();
 		}

@@ -105,7 +105,7 @@ int brIMeshShapeNew(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISphereNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slSphereNew(BRDOUBLE(&args[0]), BRDOUBLE(&args[1]));
+	BRPOINTER(target) = new slSphere(BRDOUBLE(&args[0]), BRDOUBLE(&args[1]));
 
 	if (!BRPOINTER(target)) {
 		stEvalError(i->engine, EE_SIMULATION, "An error occurred while creating a new sphere");

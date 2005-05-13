@@ -54,14 +54,12 @@ void slInitBoundSort(slVclipData *d) {
 
 void slAddCollisionCandidate(slVclipData *vc, slPairFlags flags, int x, int y) {
 	slCollisionCandidate c;
+	slWorldObject *w1, *w2;
 
-	if(flags & BT_UNKNOWN) {
-		// the UNKNOWN flag indicates that we have not yet preformed a callback to 
-		// determine whether further collision detection is necessary.
+	// the UNKNOWN flag indicates that we have not yet preformed a callback to 
+	// determine whether further collision detection is necessary.
 
-		slVclipDataInitPairFlags(vc, x, y);
-		flags = *slVclipPairFlags(vc, x, y);
-	}
+	if(flags & BT_UNKNOWN) flags = slVclipDataInitPairFlags(vc, x, y);
 
 	if(!(flags & BT_CHECK)) return;
 
@@ -71,21 +69,26 @@ void slAddCollisionCandidate(slVclipData *vc, slPairFlags flags, int x, int y) {
 	c.f1 = NULL;
 	c.f2 = NULL;
 
+	w1 = vc->objects[x];
+	w2 = vc->objects[y];
+
+	if(!w1 || !w2) return;
+
+	c.s1 = w1->shape;
+	c.s2 = w2->shape;
+
+	c.p1 = &w1->position;
+	c.p2 = &w2->position;
+
 	if(vc->objects.size() != 0) {
-		if(vc->objects[x]->shape && vc->objects[x]->shape->_type == ST_NORMAL) 
-			c.f1 = vc->objects[x]->shape->features[0];
+		if(w1->shape && w1->shape->_type == ST_NORMAL) 
+			c.f1 = w1->shape->features[0];
 
-		if(vc->objects[y]->shape && vc->objects[y]->shape->_type == ST_NORMAL) 
-			c.f2 = vc->objects[y]->shape->features[0];
+		if(w2->shape && w2->shape->_type == ST_NORMAL) 
+			c.f2 = w2->shape->features[0];
 	}
 
-	if(x < y) {
-		int temp = x;
-		x = y;
-		y = temp;
-	}
-
-	vc->candidates[ std::pair<int, int>(x, y) ] = c;
+	vc->candidates[ slVclipPairFlags(vc, x, y) ] = c;
 }
 
 /*! 
@@ -93,19 +96,21 @@ void slAddCollisionCandidate(slVclipData *vc, slPairFlags flags, int x, int y) {
 */
 
 void slRemoveCollisionCandidate(slVclipData *vc, int x, int y) {
-	if(x < y) {
-		int temp = x;
-		x = y;
-		y = temp;
-	}
-
-	vc->candidates.erase( std::pair<int, int>(x, y));
+	vc->candidates.erase( slVclipPairFlags(vc, x, y) );
 }
 
 bool slBoundSortCompare(const slBoundSort *a, const slBoundSort *b) {
 	if(*a->value == *b->value) return (a->number < b->number);
 
 	return (*a->value < *b->value);
+}
+
+int slVclipPruneAndSweep(slVclipData *d) {
+	slIsort(d, d->boundListPointers[0], BT_XAXIS);
+	slIsort(d, d->boundListPointers[1], BT_YAXIS);
+	slIsort(d, d->boundListPointers[2], BT_ZAXIS);
+
+	return 0;
 }
 
 /*!
@@ -122,17 +127,9 @@ bool slBoundSortCompare(const slBoundSort *a, const slBoundSort *b) {
 int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly) {
 	int result;
 	slCollision *ce;
-	std::map< std::pair<int, int>, slCollisionCandidate >::iterator ci;
+	std::map< slPairFlags* , slCollisionCandidate >::iterator ci;
 
-	d->collisions.clear();
-
-	// return 0;
-
-	slIsort(d, d->boundListPointers[0], BT_XAXIS);
-	slIsort(d, d->boundListPointers[1], BT_YAXIS);
-	slIsort(d, d->boundListPointers[2], BT_ZAXIS);
-
-	if(pruneOnly) return 0;
+	d->collisionCount = 0;
 
 	ce = slNextCollision(d);
 
@@ -147,7 +144,7 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 				ce = slNextCollision(d);
 			}
 		} else {
-			result = slVclipTestPair(d, &c, ce);
+			result = d->testPair(&c, ce);
 
 			if(result == CT_ERROR) return -1;
 			if(result == CT_PENETRATE) ce = slNextCollision(d);
@@ -157,9 +154,9 @@ int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly
 	// d->collisionCount is pointing to the next empty collision 
 	// in other words, 1 + the actual number of collisions
 
-	d->collisions.pop_back();
+	d->collisionCount--;
 
-	return d->collisions.size();
+	return d->collisionCount;
 }
 
 slCollision *slNextCollision(slVclipData *v, int x, int y) {
@@ -172,12 +169,19 @@ slCollision *slNextCollision(slVclipData *v, int x, int y) {
 }
 
 slCollision *slNextCollision(slVclipData *v) {
-	slCollision e;
+	slCollision *e;
 
-	memset(&e, 0, sizeof(slCollision));
+	if( v->collisionCount >= v->collisions.size()) {
+		v->collisions.resize( v->collisions.size() + 10);
+	}
 
-	v->collisions.push_back(e);
-	return &v->collisions.back();
+	e = &v->collisions[ v->collisionCount++ ];
+	e->points.clear();
+	e->depths.clear();
+
+	slVectorSet(&e->normal, 0, 0, 0);
+
+	return e;
 }
 
 /*!
@@ -217,60 +221,61 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, char boundTypeFlag
 
 		x = currentSort->number; 
 
-		// NaNs mess up the logic of the sort since they are not =, < or > than
-		// any other value, meaning they have no proper place in the list.  
-		// -Infinity does have a proper (yet "meaningless") place in the list
+		if( d->objects[ x]->_moved) {
+			// NaNs mess up the logic of the sort since they are not =, < or > than
+			// any other value, meaning they have no proper place in the list.  
+			// -Infinity does have a proper (yet "meaningless") place in the list
 
-		if (isnan(*currentSort->value))
-			*currentSort->value = -HUGE_VAL;
+			if (isnan(*currentSort->value)) *currentSort->value = -HUGE_VAL;
 
-		// Keep moving to the left; until:
-		// 1) there are no more entries to the left
-		// 2) this entry is greater than the entry to the left 
-		// 3) this entry is equal to the entry on the left AND has a larger number
+			// Keep moving to the left; until:
+			// 1) there are no more entries to the left
+			// 2) this entry is greater than the entry to the left 
+			// 3) this entry is equal to the entry on the left AND has a larger number
 		
-		leftI = currentI;
-		leftSort = *(leftI - 1);
+			leftI = currentI;
+			leftSort = *(leftI - 1);
 
-		while(leftI > list.begin() && ((*currentSort->value < *leftSort->value) ||
-			(*currentSort->value == *leftSort->value && currentSort->number < leftSort->number))) {
+			while(leftI > list.begin() && ((*currentSort->value < *leftSort->value) ||
+				(*currentSort->value == *leftSort->value && currentSort->number < leftSort->number))) {
 
-			y = leftSort->number;
+				y = leftSort->number;
 
-			if(currentSortType != leftSort->type && x != y) {
-				slPairFlags *flags = slVclipPairFlags(d, x, y);
+				if(currentSortType != leftSort->type && x != y) {
+					slPairFlags flags = slVclipPairFlagValue(d, x, y);
 
-				if(currentSortType == BT_MIN && *flags & BT_CHECK) {
-					// the min moving to the left a max -- overlap, turn on the flag.
-
-#ifdef DEBUG
-					if((*flags & boundTypeFlag) && *currentSort->value != *leftSort->value) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already on]!\n");
-#endif
-
-					*flags |= boundTypeFlag;
-
-					if(slVclipFlagsShouldTest(*flags)) slAddCollisionCandidate(d, *flags, x, y);
-
-				} else if(currentSortType == BT_MAX && *flags & BT_CHECK && *currentSort->value != *leftSort->value) {
-					// the max moving to the left a min -- no overlap, turn off the flag.
+					if(currentSortType == BT_MIN && flags & BT_CHECK) {
+						// the min moving to the left a max -- overlap, turn on the flag.
 
 #ifdef DEBUG
-					if(!(*flags & boundTypeFlag)) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already off]!\n");
+						if((flags & boundTypeFlag) && *currentSort->value != *leftSort->value) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already on]!\n");
 #endif
+						flags |= boundTypeFlag;
+						slVclipPairFlagValue(d, x, y) = flags;
 
-					if(slVclipFlagsShouldTest(*flags)) slRemoveCollisionCandidate(d, x, y);
+						if(slVclipFlagsShouldTest(flags)) slAddCollisionCandidate(d, flags, x, y);
 
-					*flags ^= boundTypeFlag;
+					} else if(currentSortType == BT_MAX && flags & BT_CHECK && *currentSort->value != *leftSort->value) {
+						// the max moving to the left a min -- no overlap, turn off the flag.
+	
+#ifdef DEBUG
+						if(!(flags & boundTypeFlag)) slMessage(DEBUG_WARN, "vclip inconsistancy [flag already off]!\n");
+#endif
+	
+						if(slVclipFlagsShouldTest(flags)) slRemoveCollisionCandidate(d, x, y);
+	
+						slVclipPairFlagValue(d, x, y) ^= boundTypeFlag;
+					}
 				}
-			}
 
-			*(leftI - 1) = (slBoundSort*)currentSort;
-			*leftI = leftSort;
+				*(leftI - 1) = (slBoundSort*)currentSort;
+				*leftI = leftSort;
 
-			leftI--;
+				leftI--;
 
-			if(leftI != list.begin()) {
-				leftSort = *(leftI - 1);
+				if(leftI != list.begin()) {
+					leftSort = *(leftI - 1);
+				}
 			}
 		}
 	}
@@ -365,8 +370,8 @@ slPlane *slPositionPlane(slPosition *p, slPlane *p1, slPlane *pt) {
 	\brief Preforms a second-stage collision check on the specified object pair.
 */
 
-int slVclipTestPair(slVclipData *vc, slCollisionCandidate *e, slCollision *ce) {
-	int result = 0, iterations = 0, limit;
+int slVclipData::testPair(slCollisionCandidate *e, slCollision *ce) {
+	int result = 0, iterations = 0;
 	int x, y;
 
 	slPosition *p1, *p2;
@@ -376,41 +381,39 @@ int slVclipTestPair(slVclipData *vc, slCollisionCandidate *e, slCollision *ce) {
 	x = e->x;
 	y = e->y;
 
-	if(!vc->objects[x] || !vc->objects[y]) return 0;
-
 	/* 
 		this here is dirty, because we're not supposed to expect the object
 		fields to necessarily be slWorldObjects, but that's what the terrain
 		checker is expecting.
 	*/
 
-	s1 = vc->objects[x]->shape;
-	s2 = vc->objects[y]->shape;
+	s1 = e->s1;
+	s2 = e->s2;
 
-	p1 = &vc->objects[x]->position;
-	p2 = &vc->objects[y]->position;
+	p1 = e->p1;
+	p2 = e->p2;
 
-	if(!s1 || !s2) return slTerrainTestPair(vc, x, y, ce);
+	if(!s1 || !s2) return slTerrainTestPair(this, x, y, ce);
 
 	f1 = &e->f1;
 	f2 = &e->f2;
 
-	limit = 2 * ((s1->features.size() * s2->features.size()) + 1);
-
 	if(s1->_type == ST_SPHERE && s2->_type == ST_SPHERE) {
-		result = slSphereSphereCheck(vc, x, y, ce);
+		result = slSphereSphereCheck(this, x, y, ce, p1, (slSphere*)s1, p2, (slSphere*)s2);
 	} else if(s1->_type == ST_SPHERE && s2->_type == ST_NORMAL) {
-		result = slSphereShapeCheck(vc, f2, 0, x, y, ce);
+		result = slSphereShapeCheck(this, f2, 0, x, y, ce);
 	} else if(s1->_type == ST_NORMAL && s2->_type == ST_SPHERE) {
-		result = slSphereShapeCheck(vc, f1, 1, y, x, ce);
+		result = slSphereShapeCheck(this, f1, 1, y, x, ce);
 	} else {
+		int limit = 2 * ((s1->features.size() * s2->features.size()) + 1);
+
 		do {
 			if(iterations == limit) {
 				// this is the worst-case scenario.  it indicates serious 
 				// problems in the logic (by which i mean my implementation) 
 				// of the vclip algorithm.
 				// slMessage(DEBUG_ALL, "warning: vclip feature loop detected, using brute force detection\n");
-				return slVclipTestPairAllFeatures(vc, e, ce);
+				return slVclipTestPairAllFeatures(this, e, ce);
 			}
 
 			if(((*f1)->type == FT_POINT) && ((*f2)->type == FT_POINT)) {
@@ -420,17 +423,17 @@ int slVclipTestPair(slVclipData *vc, slCollisionCandidate *e, slCollision *ce) {
 			} else if(((*f1)->type == FT_EDGE) && ((*f2)->type == FT_POINT)) {
 				result = slEdgePointClip(f1, p1, s1, f2, p2, s2, ce);
 			} else if(((*f1)->type == FT_POINT) && ((*f2)->type == FT_FACE)) {
-				result = slPointFaceClip(f1, p1, s1, f2, p2, s2, vc, 0, x, y, ce);
+				result = slPointFaceClip(f1, p1, s1, f2, p2, s2, this, 0, x, y, ce);
 			} else if(((*f1)->type == FT_FACE) && ((*f2)->type == FT_POINT)) {
-				result = slPointFaceClip(f2, p2, s2, f1, p1, s1, vc, 1, y, x, ce);
+				result = slPointFaceClip(f2, p2, s2, f1, p1, s1, this, 1, y, x, ce);
 			} else if(((*f1)->type == FT_EDGE) && ((*f2)->type == FT_EDGE)) {
 				result = slEdgeEdgeClip(f1, p1, s1, f2, p2, s2, ce);
 			} else if(((*f1)->type == FT_EDGE) && ((*f2)->type == FT_FACE)) {
-				result = slEdgeFaceClip(f1, f2, vc, 0, x, y, ce);
+				result = slEdgeFaceClip(f1, f2, this, 0, x, y, ce);
 			} else if(((*f1)->type == FT_FACE) && ((*f2)->type == FT_EDGE)) {
-				result = slEdgeFaceClip(f2, f1, vc, 1, y, x, ce);
+				result = slEdgeFaceClip(f2, f1, this, 1, y, x, ce);
 			} else if(((*f1)->type == FT_FACE) && ((*f2)->type == FT_FACE)) {
-				result = slFaceFaceClip(f1, p1, s1, f2, p2, s2, vc, x, y);
+				result = slFaceFaceClip(f1, p1, s1, f2, p2, s2, this, x, y);
 			} else {
 				slMessage(DEBUG_ALL, "INTERNAL ERROR: invalid slFeature types in slTestPair\n");
 				return CT_ERROR;
@@ -521,34 +524,34 @@ int slVclipTestPairAllFeatures(slVclipData *vc, slCollisionCandidate *e, slColli
 	return CT_DISJOINT;
 }
 
-int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollision *ce) {
+int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollision *ce, slPosition *p1, slSphere *s1, slPosition *p2, slSphere *s2) {
 	slVector diff, tempV1;
-	double totalLen, depth;
+	double totalLen, totalDiff, sqrtDiff, depth;
 
-	slSphere *s1 = (slSphere*)vc->objects[x]->shape;
-	slSphere *s2 = (slSphere*)vc->objects[y]->shape;
-	slPosition *p1 = &vc->objects[x]->position;
-	slPosition *p2 = &vc->objects[y]->position;
+	totalLen = (s1->_radius + s2->_radius);
 
-	slVectorSub(&p2->location, &p1->location, &diff);
+	slVectorSub(&p1->location, &p2->location, &diff);
 
-	totalLen = slVectorLength(&diff);
+	// the actual diff is sqrt(totalDiff), but we'll avoid the sqrt if possible 
 
-	depth = totalLen - (s1->_radius + s2->_radius);
+	totalDiff = (diff.x * diff.x) + (diff.y * diff.y) + (diff.z * diff.z);
 
-	if(depth > MC_TOLERANCE) {
-		// if(ce) ce->distance = depth;
-		return CT_DISJOINT;
-	}
+	depth = totalDiff - (totalLen * totalLen);
+
+	if(depth > 0.0) return CT_DISJOINT;
 
 	if(!ce) return CT_PENETRATE;
- 
+
+	// collision detected, do the sqrt to find the actual depth.
+
+	sqrtDiff = sqrt(totalDiff);
+
+	depth = (totalLen - sqrtDiff);
+
 	ce->n1 = x;
 	ce->n2 = y;
 
-	slVectorCopy(&diff, &ce->normal);
-
-	slVectorNormalize(&ce->normal);
+	slVectorMul(&diff, 1.0/sqrtDiff, &ce->normal);
 
 	slVectorMul(&ce->normal, s1->_radius, &tempV1);
 

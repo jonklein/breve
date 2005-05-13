@@ -85,13 +85,19 @@ class slPatch {
 		 *
 		 */
         void setTransparency(double transparency);
-        
+
     // these should become private/protected
 		void *data;
 
 		slVector location;
 		int colorOffset;
 		slPatchGrid *grid;
+
+		// this vector can be used for an optional patch-based collision
+		// pruning phase
+
+		std::vector< int > _objectsInPatch;
+		std::vector< slPatch* > _neighbors;
 };
 
 /*!
@@ -126,6 +132,8 @@ class slPatchGrid {
 		void setDataAtIndex(int x, int y, int z, void *data);
 		void copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double scale);
 
+		void assignObjectsToPatches(slWorld *w);
+        
         // below should be private/protected
 
 		int xSize, ySize, zSize;
