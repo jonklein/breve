@@ -132,6 +132,7 @@ Abstract : PatchGrid (aka PatchGrids) [version 2.2] {
     + to destroy:
         chem (object).
         if |diffusingChemicals| > 0:
+	free (patches).
         {    
             for each chem in diffusingChemicals:
                 free(chemicalConcentrationMatrix{chem}).
