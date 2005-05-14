@@ -25,7 +25,8 @@ Object : GeneticAlgorithm {
 		mutationPercent (int).
 		migrationPercent (int).
 		generation (int).
-
+        seed (object).
+        
 	+ to init:
 		testDuration = 20.
 		populationSize = 30.
@@ -52,6 +53,12 @@ Object : GeneticAlgorithm {
 		% set with the method METHOD(set-test-duration).  The default value
 		% is 20.
 		return testDuration.
+		
+    + to set-seed-individual to theSeed (object):
+        % The seed individual is used to start the genetic algorithm
+        % at a specfic location in the search space by using the seed
+        % individual's paramters as a starting point.
+    
 
 	+ to set-population-size to size (int):
 		% Sets the number of individuals in the population to size.
@@ -126,6 +133,8 @@ Object : GeneticAlgorithm {
 			push (controller make-new-instance of-class individualClass) onto populations{ 1 }.
 		}
 
+        if seed: populations{ 0 } copy from seed.
+        
 		currentIndividual = -1.
 		self switch-individual.
 
