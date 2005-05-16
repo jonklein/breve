@@ -139,6 +139,11 @@ Object : Real (aka Reals) [version 2.1] {
 
 		neighborhoodSize = size.
 		setNeighborhoodSize(realWorldPointer, size).
+		
+	+ to get-neighborhood-size:
+		% gets the neighborhood size for the current object.
+		
+		return neighborhoodSize.
 
   + section "Changing the Appearence of Agents"
 
