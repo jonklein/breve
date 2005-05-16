@@ -46,7 +46,7 @@ int brICameraSetZClip(brEval args[], brEval *target, brInstance *i) {
 int brICameraSetDrawSmooth(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	camera->drawSmooth = BRINT(&args[0]);
-	camera->recompile = 1;
+	camera->setRecompile();
 	return EC_OK;
 }
 
@@ -79,7 +79,7 @@ int brICameraSetBlur(brEval args[], brEval *target, brInstance *i) {
 	slClear(i->engine->world, camera);
 
 	camera->blur = BRINT(&args[1]);
-	camera->recompile = 1;
+	camera->setRecompile();
 	return EC_OK;
 }
 
@@ -92,7 +92,7 @@ int brICameraSetBlur(brEval args[], brEval *target, brInstance *i) {
 int brICameraSetBlurFactor(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	camera->blurFactor = BRDOUBLE(&args[1]);
-	camera->recompile = 1;
+	camera->setRecompile();
 	return EC_OK;
 }
 
@@ -105,7 +105,31 @@ int brICameraSetBlurFactor(brEval args[], brEval *target, brInstance *i) {
 int brICameraSetDrawFog(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	camera->drawFog = BRINT(&args[0]);
-	camera->recompile = 1;
+	camera->setRecompile();
+	return EC_OK;
+}
+
+/*! 
+	\brief Set OpenGL fog intensity for a camera.
+    
+	void setFogIntensity(double intensity).
+*/          
+
+int brICameraSetFogIntensity(brEval args[], brEval *target, brInstance *i) {
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
+	camera->fogIntensity = BRDOUBLE(&args[1]);
+	return EC_OK;
+}
+
+/*!
+	\brief Set OpenGL fog color for a camera.
+
+	void setFogColor(vector color).
+*/
+
+int brICameraSetFogColor(brEval args[], brEval *target, brInstance *i) {
+	slCamera *camera = BRCAMERAPOINTER(&args[0]);
+	slVectorCopy(&BRVECTOR(&args[1]), &camera->fogColor);
 	return EC_OK;
 }
 
@@ -265,6 +289,12 @@ void breveInitCameraFunctions(brNamespace *n) {
 	brNewBreveCall(n, "cameraNew", brICameraNew, AT_POINTER, 0);
 	brNewBreveCall(n, "cameraSetBlur", brICameraSetBlur, AT_NULL, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "cameraClear", brICameraClear, AT_NULL, AT_POINTER, 0);
+
+	brNewBreveCall(n, "cameraSetDrawSmooth", brICameraSetDrawSmooth, AT_NULL, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "cameraSetDrawFog", brICameraSetDrawFog, AT_NULL, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "cameraSetFogIntensity", brICameraSetDrawFog, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
+	brNewBreveCall(n, "cameraSetFogColor", brICameraSetFogColor, AT_NULL, AT_POINTER, AT_VECTOR, 0);
+
 	brNewBreveCall(n, "cameraSetBlurFactor", brICameraSetBlurFactor, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "cameraFree", brICameraFree, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "cameraPosition", brICameraPosition, AT_NULL, AT_POINTER, AT_VECTOR, AT_VECTOR, 0);

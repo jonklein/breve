@@ -18,8 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-class slRoamPatch;
-
 /*!
 	\brief Serialized \ref slTerrain data.
 */
@@ -42,6 +40,7 @@ struct slSerializedTerrain {
 void slNormalForFace(slVector *a, slVector *b, slVector *c, slVector *n);
 
 class slTerrainQuadtree;
+class slRoamPatch;
 
 class slTerrain: public slWorldObject {
 	public:

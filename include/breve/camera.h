@@ -137,7 +137,7 @@ class slCamera {
 		// recompile can be set to 1 at any time to force recompilation 
 		// of draw lists next time the world is drawn. 
 	
-		unsigned char recompile;
+		unsigned char _recompile;
 	
 		std::vector<slCameraText> text;
 	
@@ -218,6 +218,12 @@ void slMoveCameraWithMouseMovement(slCamera *, double, double);
 void slZoomCameraWithMouseMovement(slCamera *, double, double);
 
 void slCameraSetActivateContextCallback(slCamera *, int (*)(void));
+
+void slCameraUpdate(slCamera *);
+void slCameraSetRecompile(slCamera *);
+void slCameraSetBounds(slCamera*, int, int);
+void slCameraGetBounds(slCamera*, int*, int*);
+
 #ifdef __cplusplus
 }
 #endif

@@ -1776,9 +1776,10 @@ RTC_INLINE int stEvalVectorElementExp(stVectorElementExp *s, stRunInstance *i, b
 RTC_INLINE int stEvalVectorElementAssignExp(stVectorElementAssignExp *s, stRunInstance *i, brEval *result) {
 	slVector *vector;
 	int resultCode;
-	int type;
+	int type = AT_NULL;
 
 	resultCode = stPointerForExp(s->exp, i, (void **)&vector, &type);
+
 	if (resultCode != EC_OK)
 		return EC_ERROR;
 

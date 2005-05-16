@@ -351,7 +351,7 @@ int brISetDrawAxis(brEval args[], brEval *target, brInstance *i) {
 	if(value) slWorldObjectAddDrawMode(o, DM_AXIS);
 	else slWorldObjectRemoveDrawMode(o, DM_AXIS);
 
-	i->engine->camera->recompile = 1;
+	// i->engine->camera->setRecompile();
 
 	return EC_OK;
 }
@@ -383,7 +383,7 @@ int brISetVisible(brEval args[], brEval *target, brInstance *i) {
 	if(!visible) slWorldObjectAddDrawMode(o, DM_INVISIBLE);
 	else slWorldObjectRemoveDrawMode(o, DM_INVISIBLE);
 
-	i->engine->camera->recompile = 1;
+	// i->engine->camera->setRecompile();
 
 	return EC_OK;
 }
@@ -399,7 +399,7 @@ int brISetTexture(brEval args[], brEval *target, brInstance *i) {
 
 	slWorldObjectSetTexture(o, value);
 	slWorldObjectSetTextureMode(o, BBT_NONE);
-	i->engine->camera->recompile = 1;
+	// i->engine->camera->setRecompile();
 
 	return EC_OK;
 }

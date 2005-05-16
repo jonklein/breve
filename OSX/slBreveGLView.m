@@ -362,7 +362,7 @@
 				break;
 		}
 		
-		slUpdateCamera(camera);
+		slCameraUpdate(camera);
 		[self setNeedsDisplay: YES];
 
 	} while([theEvent type] != NSLeftMouseUp);

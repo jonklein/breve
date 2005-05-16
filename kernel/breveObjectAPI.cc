@@ -325,7 +325,7 @@ brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
 	// new objects in the world.  the code which adds objects to the
 	// world doesn't have a pointer to the camera, so we'll do it here
 
-	if(e->camera) e->camera->recompile = 1;
+	if(e->camera) e->camera->setRecompile();
 
 	// find the iterate method which we will call at each iteration
 
@@ -376,7 +376,7 @@ void brEngineRemoveInstance(brEngine *e, brInstance *i) {
 
 	std::vector<brInstance*>::iterator bi;
 
-	if(e->camera) e->camera->recompile = 1;
+	if(e->camera) e->camera->setRecompile();
 
 	bi = std::find(e->iterationInstances.begin(), e->iterationInstances.end(), i);
 	if(bi != e->iterationInstances.end()) e->iterationInstances.erase(bi);

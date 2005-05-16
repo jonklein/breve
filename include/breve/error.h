@@ -54,6 +54,10 @@ enum debugLevels {
 
 #define slDebug(format, args...)	{ slMessage(0, "Error at source file \"%s\", line %d:\n", __FILE__, __LINE__); slMessage(0, format, ##args ); }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void slSetDebugLevel(int);
 
 void slDebugFunction(char *, int, char *, ...);
@@ -70,3 +74,7 @@ void slUtilPause(void);
 void slStackTrace(void);
 
 void slSetMessageCallbackFunction(void (*)(char *));
+
+#ifdef __cplusplus
+}
+#endif

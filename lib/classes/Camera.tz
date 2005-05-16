@@ -24,6 +24,26 @@ Abstract : Camera (aka Cameras) [version 2.2] {
 		self set-size with-height 100 with-width 100.
 		self set-position with-x 0 with-y 0.
 
+  + section "Configuring the Camera"
+
+	+ to enable-smooth-drawing:
+		% Enable smooth drawing for the camera.  Smooth drawing enables
+		% a smoother blending of colors, textures and lighting.  This feature
+		% is especially noticeable when dealing with spheres or large objects.
+		% <p>
+		% The disadvantage of smooth drawing is a potential performance hit.
+		% The degree of this performance hit depends on the number of polygons
+		% in the scene.  If speed is an issue, it is often best to disable
+		% both lighting and smooth drawing.
+            
+        cameraSetDrawSmooth(cameraPointer, 1).
+
+	+ to disable-smooth-drawing:
+		% Disable smooth drawing for the main camera.  
+		% See METHOD(enable-smooth-drawing) for more information.
+
+		cameraSetDrawSmooth(cameraPointer, 0).
+
   + section "Enabling and Disabling the Camera"
 
 	+ to disable:

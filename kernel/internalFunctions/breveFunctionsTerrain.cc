@@ -85,8 +85,6 @@ int brITerrainSetHeight(brEval args[], brEval *target, brInstance *i) {
 
 	slTerrainSetHeight(t, x, y, h);
 
-	i->engine->camera->recompile = 1;
-
 	return EC_OK;
 }
 

@@ -5,7 +5,7 @@
 @use Image.
 @use Camera.
 
-Abstract : Control (aka Controls) [version 2.0] {
+Abstract : Control (aka Controls) [version 2.3] {
 	% Summary: a parent class for the "controller" object required for all simulations.
 	% <P>
 	% The Control object sets up and controls simulations.  Every simulation
@@ -690,7 +690,7 @@ Abstract : Control (aka Controls) [version 2.0] {
 		% both lighting and smooth drawing.
 
 		smoothFlag = 1.
-		setDrawSmooth(smoothFlag).
+		cameraSetDrawSmooth(cameraPointer, smoothFlag).
 		drawMenu check.
 		 
 	+ to disable-smooth-drawing:
@@ -698,7 +698,7 @@ Abstract : Control (aka Controls) [version 2.0] {
 		% for more information.
 
 		smoothFlag = 0.
-		setDrawSmooth(smoothFlag).
+		cameraSetDrawSmooth(cameraPointer, smoothFlag).
 		drawMenu uncheck.
 
 	+ to toggle-shadows:
@@ -865,14 +865,14 @@ Abstract : Control (aka Controls) [version 2.0] {
 		% METHOD(enable-lighting) before fog is displayed.
 
 		fogIntensity = newIntensity.
-		setFogIntensity(newIntensity).
+		cameraSetFogIntensity(cameraPointer, newIntensity).
 
 	+ to set-fog-color to newColor (vector):
 		% Sets the fog color to newColor.  Fog must first be turned on with
 		% METHOD(enable-lighting) before fog is displayed.
 
 		fogColor = newColor.
-		setFogColor(newColor).
+		cameraSetFogColor(cameraPointer, newColor).
 
 	+ to enable-fog:
 		% Enables fog for the main camera.  This adds the visual effect of fog to the
@@ -882,13 +882,13 @@ Abstract : Control (aka Controls) [version 2.0] {
 		% Fog and lightmap effects don't mix.
 
 		fogFlag = 1.
-		setDrawFog(1).
+		cameraSetDrawFog(cameraPointer, 1).
 		fogMenu check.
 
 	+ to disable-fog:
 		% Disables fog for the main camera.  See METHOD(enable-fog) for more information.
 		fogFlag = 0.
-		setDrawFog(0).
+		cameraSetDrawFog(cameraPointer, 0).
 		fogMenu uncheck.
 
 	+ to toggle-fog:

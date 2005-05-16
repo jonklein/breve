@@ -161,7 +161,7 @@ void slRemoveCollisionCandidate(slVclipData *d, int x, int y);
 slVector *slPositionVertex(slPosition *p, slVector *i, slVector *o);
 slPlane *slPositionPlane(slPosition *p, slPlane *p1, slPlane *pt);
 
-int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollision *ce, slPosition *p1, slSphere *s1, slPosition *p2, slSphere *p2);
+int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollision *ce, slPosition *p1, slSphere *s1, slPosition *p2, slSphere *s2);
 
 int slSphereShapeCheck(slVclipData *vc, slFeature **f, int flip, int x, int y, slCollision *ce);
 

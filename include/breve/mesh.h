@@ -12,6 +12,8 @@
 #include <lib3ds/vector.h>
 #include <lib3ds/light.h>
 
+#ifdef __cplusplus
+
 class sl3DSScene {
 	
 };
@@ -28,4 +30,6 @@ class slMesh {
 		Lib3dsMesh *_mesh;
 };
 
-#endif
+#endif /* __cplusplus */
+
+#endif /* HAVE_LIB3DS */

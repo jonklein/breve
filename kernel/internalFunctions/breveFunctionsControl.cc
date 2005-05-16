@@ -173,52 +173,6 @@ int brIAddEvent(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
-    \brief Sets OpenGL smoothing for the main camera.  
-
-	void setDrawSmooth(int smooth).
-*/
-
-int brISetDrawSmooth(brEval args[], brEval *target, brInstance *i) {
-    i->engine->camera->drawSmooth = BRINT(&args[0]);
-    i->engine->camera->recompile = 1;
-    return EC_OK;
-}
-
-/*!
-    \brief Sets OpenGL fog for the main camera.  
-	
-	void setDrawFog(int fog).
-*/
-
-int brISetDrawFog(brEval args[], brEval *target, brInstance *i) {
-    i->engine->camera->drawFog = BRINT(&args[0]);
-    i->engine->camera->recompile = 1;
-    return EC_OK;
-}
-
-/*!
-    \brief Set OpenGL fog intensity.
-	
-	void setFogIntensity(double intensity).
-*/
-
-int brISetFogIntensity(brEval args[], brEval *target, brInstance *i) {
-    i->engine->camera->fogIntensity = BRDOUBLE(&args[0]);
-    return EC_OK;
-}
-
-/*!
-    \brief Set OpenGL fog color.
-	
-	void setFogColor(vector color).
-*/
-
-int brISetFogColor(brEval args[], brEval *target, brInstance *i) {
-	slVectorCopy(&BRVECTOR(&args[0]), &i->engine->camera->fogColor);
-    return EC_OK;
-}
-
-/*!
 	\brief Set the starting and ending distances for fog.
 
 	void setFogDistances(double start, double end).
@@ -238,7 +192,7 @@ int brISetFogDistances(brEval args[], brEval *target, brInstance *i) {
 
 int brISetDrawLights(brEval args[], brEval *target, brInstance *i) {
     i->engine->camera->drawLights = BRINT(&args[0]);
-    i->engine->camera->recompile = 1;
+    i->engine->camera->setRecompile();
     return EC_OK;
 }
 
@@ -250,7 +204,7 @@ int brISetDrawLights(brEval args[], brEval *target, brInstance *i) {
 
 int brISetDrawShadow(brEval args[], brEval *target, brInstance *i) {
     i->engine->camera->drawShadow = BRINT(&args[0]);
-    i->engine->camera->recompile = 1;
+    i->engine->camera->setRecompile();
     return EC_OK;
 }
 
@@ -262,7 +216,7 @@ int brISetDrawShadow(brEval args[], brEval *target, brInstance *i) {
 
 int brISetDrawShadowVolumes(brEval args[], brEval *target, brInstance *i) {
     i->engine->camera->drawShadowVolumes = BRINT(&args[0]);
-    i->engine->camera->recompile = 1;
+    i->engine->camera->setRecompile();
     return EC_OK;
 }
 
@@ -277,7 +231,7 @@ int brISetDrawShadowVolumes(brEval args[], brEval *target, brInstance *i) {
 
 int brISetDrawOutline(brEval args[], brEval *target, brInstance *i) {
     i->engine->camera->drawOutline = BRINT(&args[0]);
-    i->engine->camera->recompile = 1;
+    i->engine->camera->setRecompile();
     return EC_OK;
 }
 
@@ -289,7 +243,7 @@ int brISetDrawOutline(brEval args[], brEval *target, brInstance *i) {
 
 int brISetDrawReflection(brEval args[], brEval *target, brInstance *i) {
     i->engine->camera->drawReflection = BRINT(&args[0]);
-    i->engine->camera->recompile = 1;
+    i->engine->camera->setRecompile();
     return EC_OK;
 }
 
@@ -536,12 +490,8 @@ void breveInitControlFunctions(brNamespace *n) {
     brNewBreveCall(n, "pauseSimulation", brIPause, AT_NULL, 0);
 
     brNewBreveCall(n, "addEvent", brIAddEvent, AT_NULL, AT_STRING, AT_DOUBLE, AT_DOUBLE, 0);
-    brNewBreveCall(n, "setFogColor", brISetFogColor, AT_NULL, AT_VECTOR, 0);
-    brNewBreveCall(n, "setFogIntensity", brISetFogIntensity, AT_NULL, AT_DOUBLE, 0);
     brNewBreveCall(n, "setFogDistances", brISetFogDistances, AT_NULL, AT_DOUBLE, AT_DOUBLE, 0);
-    brNewBreveCall(n, "setDrawFog", brISetDrawFog, AT_NULL, AT_INT, 0);
     brNewBreveCall(n, "setDrawLights", brISetDrawLights, AT_NULL, AT_INT, 0);
-    brNewBreveCall(n, "setDrawSmooth", brISetDrawSmooth, AT_NULL, AT_INT, 0);
     brNewBreveCall(n, "setDrawShadow", brISetDrawShadow, AT_NULL, AT_INT, 0);
     brNewBreveCall(n, "setDrawShadowVolumes", brISetDrawShadowVolumes, AT_NULL, AT_INT, 0);
     brNewBreveCall(n, "setDrawOutline", brISetDrawOutline, AT_NULL, AT_INT, 0);

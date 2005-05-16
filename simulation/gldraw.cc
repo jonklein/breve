@@ -447,8 +447,8 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 	if (c->drawOutline)
 		flags |= DO_OUTLINE | DO_BILLBOARDS_AS_SPHERES;
 
-	if (c->recompile) {
-		c->recompile = 0;
+	if (c->_recompile) {
+		c->_recompile = 0;
 		flags |= DO_RECOMPILE;
 	}
 

@@ -16,10 +16,10 @@ PhysicalControl : Gravity {
 
 	+ to init:
 		# This demo is actually so fast that we're going to intentionally
-		# slow it down by setting the integration step to be small.  This 
-		# will also increase the accuracy of the simulation.
+		# slow it down by setting the integration step to be very very small.  
+		# This will also increase the accuracy of the simulation.
 
-		self set-integration-step to .0001.
+		self set-integration-step to .00001.
 
 		# create a bunch of steps.
 
@@ -55,9 +55,8 @@ Stationary : Step {
 }
 
 Mobile : Ball {
-	# the iterate method is called each timestep...
-
 	+ to iterate:
+		# The iterate method is called each timestep...
 		# if the Y component (height) of our position is less than -20, 
 		# then the ball has passed the steps and is continuing to fall,
 		# so we'll reset the ball with new starting conditions.

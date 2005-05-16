@@ -316,7 +316,7 @@ void slSetShadowCatcher(slCamera *c, slStationary *s, slVector *normal) {
 
 	slVectorAdd(&c->shadowPlane.vertex, &s->position.location, &c->shadowPlane.vertex);
 
-	c->recompile = 1;
+	c->_recompile = 1;
 
 	c->shadowCatcher = s;
 
@@ -383,7 +383,7 @@ void slCamera::getRotation(double *x, double *y) {
 */
 
 void slCamera::setRecompile() {
-	recompile = 1;
+	_recompile = 1;
 }
 
 void slCameraSetActivateContextCallback(slCamera *c, int (*f)()) {
@@ -464,4 +464,20 @@ void slZoomCameraWithMouseMovement(slCamera *camera, double dx, double dy) {
 		camera->zoom -= 0.002 * camera->zoom * dy;
 		camera->update();
 	} 
+}
+
+void slCameraSetBounds(slCamera *camera, int dx, int dy) {
+	camera->setBounds(dx, dy);
+}
+
+void slCameraGetBounds(slCamera *camera, int *dx, int *dy) {
+	camera->getBounds(dx, dy);
+}
+
+void slCameraSetRecompile(slCamera *camera) {
+	camera->_recompile = 1;
+}
+
+void slCameraUpdate(slCamera *camera) {
+	camera->update();
 }

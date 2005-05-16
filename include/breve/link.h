@@ -125,13 +125,13 @@ class slLink: public slWorldObject {
 		std::vector<slJoint*> outJoints;
 };
 
+void slLinkList(slLink *root, std::vector<slLink*> *list, int mbOnly);
+
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-void slLinkList(slLink *root, std::vector<slLink*> *list, int mbOnly);
 
 slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child,
 		int jointType, slVector *normal, 

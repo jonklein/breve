@@ -68,7 +68,7 @@
 
 	if(childCount < 1) childCount = 1;
 
-	childObjects = malloc(sizeof(id) * childCount);
+	childObjects = (id*)malloc(sizeof(id) * childCount);
 	for(c=0;c<childCount;c++) childObjects[c] = NULL;
 
     return self;
@@ -98,7 +98,7 @@
 	        [childObjects[n] setList: BRLIST(&eval) index: n];
 	}
 
-	childObjects = realloc(childObjects, sizeof(id) * newChildCount);
+	childObjects = (id*)realloc(childObjects, sizeof(id) * newChildCount);
 
 	for(n=childCount;n<newChildCount;n++) childObjects[n] = NULL;
 
@@ -135,7 +135,7 @@
         stLoadVariable(&instance->variables[offset], eval.type, &eval, &ri);
 
 		if(eval.type == AT_INSTANCE && BRINSTANCE(&eval) && BRINSTANCE(&eval)->status == AS_ACTIVE) {
-			evalInstance = BRINSTANCE(&eval)->userData;
+			evalInstance = (stInstance*)BRINSTANCE(&eval)->userData;
 			[self setEvalObject: evalInstance->type];
 		}
     } else if(theEvalList) {
@@ -153,7 +153,7 @@
 
 		eval.type = AT_INSTANCE;
 
-        for(n=0;n<childCount;n++) if(childObjects[n]) [childObjects[n] setInstance: BRINSTANCE(&eval)->userData];
+        for(n=0;n<childCount;n++) if(childObjects[n]) [childObjects[n] setInstance: (stInstance*)BRINSTANCE(&eval)->userData];
     }
 }
 

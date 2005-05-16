@@ -9,6 +9,8 @@
 	\brief A class used for recursive subdivisions of a \ref slTerrain.
 */
 
+#ifdef __cplusplus
+
 class slRoamTriangle {
 	public:
 		slRoamTriangle() { 
@@ -92,4 +94,6 @@ class slRoamPatch {
 		double _frameVariance;
 };
 
-#endif 
+#endif /* __cplusplus */
+
+#endif /* _ROAM_H */

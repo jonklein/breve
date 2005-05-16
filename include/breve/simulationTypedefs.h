@@ -43,6 +43,7 @@ typedef struct slFace slFace;
 typedef struct slPlane slPlane;
 typedef struct slPosition slPosition;
 typedef struct slShape slShape;
+typedef struct slSphere slSphere;
 typedef struct slCollisionHeap slCollisionHeap;
 typedef struct slBoundSort slBoundSort;
 typedef struct slCollision slCollision;
@@ -66,3 +67,7 @@ typedef struct slNetsimClientData slNetsimClientData;
 typedef struct slNetsimBoundsMessage slNetsimBoundsMessage;
 typedef struct slNetsimSyncMessage slNetsimSyncMessage;
 typedef struct slNetsimRemoteHostData slNetsimRemoteHostData;
+
+typedef struct slRoamPatch slRoamPatch;
+typedef struct sl3DSScene sl3DSScene;
+typedef struct slGISData slGISData;
