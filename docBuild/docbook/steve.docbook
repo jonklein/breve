@@ -581,7 +581,7 @@ Unlike the <function>init</function> and <function>destroy</function> methods, <
 <listitem>
 <para>
 <indexterm><primary>destroy (special method)</primary></indexterm>
-<function>destroy</function>, if it exists, is called automatically when a class is being freed.  As with the init method, destroy is automatically called for all  superclasses as well.  If your class needs to perform certain tasks before being destroyed, you should implement this method.  However, as with init, this method should never be called manually.  
+<function>destroy</function>, if it exists, is called automatically when a class is being freed.  However, unlike init, and like iterate, you must explicitly call the super class destroy method if you need it to be called as well.  If your class needs to perform certain tasks before being destroyed, you should implement this method.  Be warned the you need to be carefull not to free an object referenced in the base class if it is needed for the base class destroy method.
 </para>
 </listitem>
 </itemizedlist>
@@ -1633,7 +1633,9 @@ the result.  In the case of <function>for</function> (<xref linkend="for">),
 as loops to repeat execution of a piece of code a certain number of times 
 or while a certain condition is met.  The <function>if</function> statement
 is used to execute a block of code if a certain condition is true and,
-optionally, a different piece of code if the statement is false.
+optionally, a different piece of code if the statement is false.  A call to
+<function>return</function> will exit any control structure's block immediately 
+and exit the method.
 </para>
 <para>
 The conditional statements are be comprised of C-style comparison operators.  The following comparison operators are available: 
@@ -1644,8 +1646,9 @@ The conditional statements are be comprised of C-style comparison operators.  Th
 <listitem><para><function>\<=</function>, Less than or Equals</para></listitem>
 <listitem><para><function>\></function>, Greater than</para></listitem>
 <listitem><para><function>\<</function>, Less than</para></listitem>
-<listitem><para><function>&&</function>, And</para></listitem>
-<listitem><para><function>||</function>, Or</para></listitem>
+<listitem><para><function>&&</function>, And (short circuit operator)</para></listitem>
+<listitem><para><function>||</function>, Or (short circuit operator)</para></listitem>
+<listitem><para><function>!</function>, Negation</para></listitem>
 </itemizedlist>
 </para>
 <para>
