@@ -137,8 +137,8 @@ int brIMatrix2DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 	float newVal = 0.0;
 	unsigned int xDim = chemSource->xDim();
 	unsigned int yDim = chemSource->yDim();
-	unsigned int diffTDA = diffTarget->xDim(); // proxy for tda
-	unsigned int chemTDA = chemSource->xDim(); // proxy for tda
+	unsigned int diffTDA = diffTarget->yDim(); // proxy for tda
+	unsigned int chemTDA = chemSource->yDim(); // proxy for tda
 	unsigned int x = 0, y = 0;
 	int xp, xm, yp, ym;
 
@@ -177,8 +177,8 @@ int brIMatrix2DDiffuse(brEval args[], brEval *target, brInstance *i) {
 	float* chemData = chemSource->getGSLVector()->data;	
 	unsigned int xDim = chemSource->xDim();
 	unsigned int yDim = chemSource->yDim();    
-	unsigned int diffTDA = diffTarget->xDim(); // proxy for tda
-	unsigned int chemTDA = chemSource->xDim(); // proxy for tda
+	unsigned int diffTDA = diffTarget->yDim(); // proxy for tda
+	unsigned int chemTDA = chemSource->yDim(); // proxy for tda
 	int x = 0, y = 0;
 
     // this will get moved to a seperate util class later
@@ -216,7 +216,7 @@ int brIMatrix2DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 	brMatrix2D *sourceMatrix = BRBIGMATRIX2D(&args[0]);
 	brImageData *d = (brImageData*)BRPOINTER(&args[1]);
 	float* sourceData = sourceMatrix->getGSLVector()->data;
-	unsigned int sourceTDA = sourceMatrix->xDim();
+	unsigned int sourceTDA = sourceMatrix->yDim();
 	unsigned char *pdata;
 	float scale = 255.0 * BRDOUBLE(&args[3]);
 	int offset = BRINT(&args[2]);
@@ -347,9 +347,9 @@ int brIMatrix3DDiffusePeriodic(brEval args[], brEval *target, brInstance *i) {
 	unsigned int xDim = chemSource->xDim();
 	unsigned int yDim = chemSource->yDim();
 	unsigned int zDim = chemSource->zDim();
-	unsigned int diffTDA = diffTarget->xDim(); // proxy for tda
+	unsigned int diffTDA = diffTarget->yDim(); // proxy for tda
     unsigned int diffXY = diffTarget->xDim() * diffTarget->yDim(); // proxy for tda
-	unsigned int chemTDA = chemSource->xDim(); // proxy for tda
+	unsigned int chemTDA = chemSource->yDim(); // proxy for tda
 	unsigned int chemXY = chemSource->xDim() * chemSource->yDim();
 	unsigned int x = 0, y = 0, z = 0;
 	int xp, xm, yp, ym, zp, zm;
@@ -413,9 +413,9 @@ int brIMatrix3DDiffuse(brEval args[], brEval *target, brInstance *i) {
 	unsigned int xDim = chemSource->xDim();
 	unsigned int yDim = chemSource->yDim();
 	unsigned int zDim = chemSource->zDim();
-	unsigned int diffTDA = diffTarget->xDim(); // proxy for tda
+	unsigned int diffTDA = diffTarget->yDim(); // proxy for tda
 	unsigned int diffXY = diffTarget->xDim() * diffTarget->yDim(); // proxy for tda
-	unsigned int chemTDA = chemSource->xDim(); // proxy for tda
+	unsigned int chemTDA = chemSource->yDim(); // proxy for tda
 	unsigned int chemXY = chemSource->xDim() * chemSource->yDim();
     int x = 0, y = 0, z = 0;
 
@@ -458,7 +458,7 @@ int brIMatrix3DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 	brMatrix3D *sourceMatrix = BRBIGMATRIX3D(&args[0]);
 	brImageData *d = (brImageData*)BRPOINTER(&args[2]);
 	float* sourceData = sourceMatrix->getGSLVector()->data;
-	unsigned int sourceTDA = sourceMatrix->xDim();
+	unsigned int sourceTDA = sourceMatrix->yDim();
 	unsigned int zOffset;
 	unsigned char *pdata;
 	float scale = 255.0 * BRDOUBLE(&args[4]);
