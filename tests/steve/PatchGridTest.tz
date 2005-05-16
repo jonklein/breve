@@ -7,8 +7,8 @@
 @define DIFFUSION_RATE .09.
 @define DECAY_RATE 0.0.
 @define EXP_INFLOW 0.
-@define LIN_INFLOW 200.
-@define INFLOW_END_TIME 100.
+@define LIN_INFLOW 400.
+@define INFLOW_END_TIME 500.
 
 Controller PatchGridTestControl.
 
@@ -60,7 +60,7 @@ Control : PatchGridTestControl {
         (all Patches) set-transparency to 0.2.
         
         
-        (self schedule method-call "rotate-patch-grid" at-time ((self get-time) + (30 / (self get-iteration-step)))).
+        (self schedule method-call "rotate-patch-grid" at-time ((self get-time) + (300 / (self get-iteration-step)))).
                 
     + to iterate:
         obj (object).
