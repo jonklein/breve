@@ -222,7 +222,7 @@ int stLoadFiles(stSteveData *sdata, brEngine *engine, char *code, char *file) {
 		return EC_ERROR;
 	}
 
-	sdata->singleStatementMethod = stNewMethod("internal-user-input-method", NULL, "<user-input>", 0);
+	sdata->singleStatementMethod = new stMethod("internal-user-input-method", NULL, "<user-input>", 0);
 	stStoreInstanceMethod((stObject*)controller->userData, "internal-user-input-method", sdata->singleStatementMethod);
 
 	return EC_OK;

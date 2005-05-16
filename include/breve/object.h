@@ -81,25 +81,27 @@ struct stInstance {
 	\brief Holds a steve method.
 */
 
-struct stMethod {
-	char *name;
+class stMethod {
+	public:
+		stMethod(char *n, std::vector< stKeywordEntry* > *k, char *file, int line);
+		~stMethod();
 
-	unsigned char inlined;
+		char *name;
 
-	int lineno;
-	char *filename;
+		unsigned char inlined;
 
-	std::vector< stKeywordEntry* > keywords;
-	std::vector< stExp* > code;
-	std::vector< stVar* > variables;
+		int lineno;
+		char *filename;
+	
+		std::vector< stKeywordEntry* > keywords;
+		std::vector< stExp* > code;
+		std::vector< stVar* > variables;
 
-	// how much space does this method need on the stack for inputs and locals? 
+		// how much space does this method need on the stack for inputs and locals? 
 
-	int stackOffset;
+		int stackOffset;
 };
 #endif
-
-
 
 /*!
 	\brief Holds the type of a variable.
@@ -130,13 +132,17 @@ struct stVarType {
 	It also holds a flag indicating whether the variable is used or not.
 */
 
-struct stVar {
-	char *name;
-	int offset;
+class stVar {
+	public:
+		stVar(char *n, stVarType *t);
+		~stVar();
 
-	stVarType *type;
+		char *name;
+		int offset;
 
-	unsigned char used;
+		stVarType *type;
+
+		unsigned char used;
 };
 
 /*!
@@ -178,8 +184,6 @@ void stInstanceFreeInternals(stInstance *i);
 
 stVarType *stVarTypeNew(unsigned char type, unsigned char atype, int count, char *otype);
 stVarType *stVarTypeCopy(stVarType *original);
-
-stVar *stVarNew(char *name, stVarType *type);
 
 void stFreeStVar(stVar *v);
 

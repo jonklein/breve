@@ -747,7 +747,7 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 			if (*(char **)variable)
 				slFree(*(void **)variable);	
 
-			*(char **)variable = BRSTRING(e) = newstr;
+			*(char **)variable = newstr;
 
 			break;
 		case AT_LIST:
@@ -985,10 +985,15 @@ int stEvalExpVector(std::vector< stExp* > *a, stRunInstance *i, brEval *result) 
 				slMessage(DEBUG_ALL, "... error in file \"%s\" at line %d\n", expression->file, expression->line);
 
 				return EC_ERROR_HANDLED;
-			} else if (resultCode == EC_ERROR_HANDLED)
+			} else if (resultCode == EC_ERROR_HANDLED) {
 				return EC_ERROR_HANDLED;
-			else if (resultCode == EC_STOP)
+			} else if (resultCode == EC_STOP) {
+				// an EC_STOP indicates a return value or other interruption
 				return EC_STOP;
+			} else {
+				// collect the leftovers.
+				stGCCollect(result);
+			}
 		}
 	}
 
@@ -1729,6 +1734,8 @@ RTC_INLINE int stEvalPrint(stPrintExp *exp, stRunInstance *i, brEval *t) {
 
 		if (n != exp->expressions.size() - 1)
 			slMessage(NORMAL_OUTPUT, " ");
+
+		stGCCollect(&arg);
 	}
 
 	if (exp->newline)
@@ -1852,6 +1859,10 @@ RTC_INLINE int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *result) {
 		stEvalError(i->instance->type->engine, EE_SIMULATION, "an error occurred executing the internal function \"%s\": %s", c->function->name, error._message.c_str());
 
 		return EC_ERROR;
+	}
+
+	for(n = 0; n < c->function->nargs; ++n) {
+		stGCUnretainAndCollect(&e[n]);
 	}
 
 #ifdef MULTITHREAD
@@ -2682,6 +2693,12 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 		}
 
 		resultCode = stSetVariable(&newStStack[keyEntry->var->offset], keyEntry->var->type->type, keyEntry->var->type->objectType, args[n], caller);
+
+		// most things will be retained by the stSetVariable so the collect does 
+		// nothing.  the exception is strings, which are copied -- we need to free
+		// the original now.
+
+		stGCCollect(args[n]);
 
 		if(resultCode != EC_OK) {
 			slMessage(DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", keyEntry->keyword, method->name);

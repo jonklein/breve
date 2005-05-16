@@ -342,13 +342,13 @@ void stObjectFree(stObject *o) {
 		std::vector< stMethod* > &mlist = li->second;
 		std::vector< stMethod* >::iterator mi;
 
-		for(mi = mlist.begin(); mi != mlist.end(); mi++ ) stFreeMethod(*mi);
+		for(mi = mlist.begin(); mi != mlist.end(); mi++ ) delete *mi;
 	}
 
 	std::map< std::string, stVar* >::iterator vi;
 
 	for(vi = o->variables.begin(); vi != o->variables.end(); vi++) {
-		stFreeStVar(vi->second);
+		delete vi->second;
 	}
 
 	slFree(o->name);
@@ -471,7 +471,7 @@ stKeywordEntry *stNewKeywordEntry(char *keyword, stVar *v, brEval *defValue) {
 
 void stFreeKeywordEntry(stKeywordEntry *k) {
 	slFree(k->keyword);
-	stFreeStVar(k->var);
+	delete k->var;
 
 	if(k->defaultKey) delete k->defaultKey;
 
@@ -488,59 +488,52 @@ void stFreeKeywordEntry(stKeywordEntry *k) {
 	be filled in later.
 */
 
-stMethod *stNewMethod(char *name, std::vector< stKeywordEntry* > *keywords, char *file, int line) {
-	stMethod *method;
+stMethod::stMethod(char *n, std::vector< stKeywordEntry* > *k, char *file, int line) {
 	unsigned int count;
 	stKeywordEntry *e;
 
-	method = new stMethod;
+	name = slStrdup(n);
+	stackOffset = 0;
+	lineno = line;
+	filename = slStrdup(file);
 
-	method->name = slStrdup(name);
-	method->stackOffset = 0;
-	method->lineno = line;
-	method->filename = slStrdup(file);
-
-	if(keywords) method->keywords = *keywords;
+	if(k) keywords = *k;
 
 	// step through the keywords, calculation their offsets and required storage space 
 
-	for(count=0;count<method->keywords.size();count++) {
-		e = method->keywords[count];
+	for(count=0;count<keywords.size();count++) {
+		e = keywords[count];
 
 		// we may not be aligned for this data type, so possibly
 		// add another 4 bytes or so (it could be a double)...
 
-		method->stackOffset += (method->stackOffset % stAlign(e->var->type));
+		stackOffset += (stackOffset % stAlign(e->var->type));
 
-		e->var->offset = method->stackOffset;
-		method->stackOffset += stSizeof(e->var->type);
+		e->var->offset = stackOffset;
+		stackOffset += stSizeof(e->var->type);
 	} 
 
 	// make sure the stack offset is aligned to any possible data 
 
-	method->stackOffset += (method->stackOffset % stAlignAtomic(AT_DOUBLE));
-
-	return method;
+	stackOffset += (stackOffset % stAlignAtomic(AT_DOUBLE));
 }
 
 /*!
 	\brief Frees an stMethod structure.
 */
 
-void stFreeMethod(stMethod *meth) {
+stMethod::~stMethod() {
 	std::vector< stVar* >::iterator vi;
 	unsigned int n;
 
-	for(n=0;n<meth->code.size();n++) delete meth->code[n];
-	for(n=0;n<meth->keywords.size();n++) stFreeKeywordEntry(meth->keywords[n]);
+	for(n=0;n<code.size();n++) delete code[n];
+	for(n=0;n<keywords.size();n++) stFreeKeywordEntry(keywords[n]);
 
-	slFree(meth->filename);
+	slFree(filename);
 
-	for(vi = meth->variables.begin(); vi != meth->variables.end(); vi++) stFreeStVar( *vi );
+	for(vi = variables.begin(); vi != variables.end(); vi++) delete *vi;
 
-	slFree(meth->name);
-
-	delete meth;
+	slFree(name);
 }
 
 /*!
@@ -607,32 +600,22 @@ stVarType *stVarTypeCopy(stVarType *t) {
 	\brief Allocates and fills in an stVar.
 */
 
-stVar *stVarNew(char *name, stVarType *type) {
-	stVar *v;
-
-	v = new stVar;
-
-	v->name = slStrdup(name);
-	v->type = type;
-	v->used = 0;
-
-	return v;
+stVar::stVar(char *n, stVarType *t) {
+	name = slStrdup(n);
+	type = t;
+	used = 0;
 }
 
 /*!
 	\brief Frees an stVar.
 */
 
-void stFreeStVar(stVar *v) {
-	if(!v) return;
+stVar::~stVar() {
+	slFree(name);
 
-	slFree(v->name);
+	if(type->objectName) slFree(type->objectName);
 
-	if(v->type->objectName) slFree(v->type->objectName);
-
-	delete v->type;
-
-	delete v;
+	delete type;
 }
 
 /*!

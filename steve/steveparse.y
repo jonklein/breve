@@ -451,11 +451,13 @@ methoddef
 : method_head method_code {
 		if($2) currentMethod->code = *$2;
 
+		delete $2;
+
 		stMethodAlignStack(currentMethod);
 		
 		if(stStoreInstanceMethod(currentObject, $1, currentMethod)) {
 			stParseError(parseEngine, PE_REDEFINITION, "Symbol \"%s\" already defined for class \"%s\"", $1, currentObject->name);
-			stFreeMethod(currentMethod);
+			delete currentMethod;
 		}
 
 		slFree($1);
@@ -469,11 +471,13 @@ methoddef
 | method_head variable_list method_code {
 		if($3) currentMethod->code = *$3;
 
+		delete $3;
+
 		stMethodAlignStack(currentMethod);
 
 		if(stStoreInstanceMethod(currentObject, $1, currentMethod)) {
 			stParseError(parseEngine, PE_REDEFINITION, "Symbol \"%s\" already defined for class \"%s\"", $1, currentObject->name);
-			stFreeMethod(currentMethod);
+			delete currentMethod;
 		}
 
 		slFree($1);
@@ -490,7 +494,9 @@ to
 
 method_head
 : to WORD_VALUE keyword_and_variables ':' { 
-		currentMethod = stNewMethod($2, $3, yyfile, lineno);
+		currentMethod = new stMethod($2, $3, yyfile, lineno);
+
+		delete $3;
 
 		$$ = $2; 
 	}
@@ -535,19 +541,19 @@ variable_list
 
 variable
 : WORD_VALUE type END {
-		stVar *var = stVarNew($1, $2);
+		stVar *var = new stVar($1, $2);
 
 		slFree($1);
 
 		if(!currentMethod) {
 			if(!stInstanceNewVar(var, currentObject)) {
 				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in class \"%s\"", var->name, currentObject->name);
-				stFreeStVar(var);
+				delete var;
 			}
 		} else {
 			if(!stMethodAddVar(var, currentMethod)) {
 				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in method \"%s\"", var->name, currentMethod->name);
-				stFreeStVar(var);
+				delete var;
 			}
 		}
 
@@ -563,19 +569,19 @@ variable
 
 		newType = stVarTypeCopy(otherVar->type);
 		
-		thisVar = stVarNew($1, newType);
+		thisVar = new stVar($1, newType);
 
 		slFree($1);
 
 		if(!currentMethod) {
 			if(!stInstanceNewVar(thisVar, currentObject)) {
 				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in class \"%s\"", thisVar->name, currentObject->name);
-				stFreeStVar(thisVar);
+				delete thisVar;
 			}
 		} else {
 			if(!stMethodAddVar(thisVar, currentMethod)) {
 				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in method \"%s\"", thisVar->name, currentMethod->name);
-				stFreeStVar(thisVar);
+				delete thisVar;
 			}
 		}
 
@@ -601,7 +607,7 @@ keyword_and_variable_list
 
 keyword_and_variable
 : WORD_VALUE WORD_VALUE default_value type {
-		stVar *v = stVarNew($2, $4);
+		stVar *v = new stVar($2, $4);
 
 		$$ = stNewKeywordEntry($1, v, $3);
 
@@ -610,7 +616,7 @@ keyword_and_variable
 		delete $3;
 	}
 | WORD_VALUE WORD_VALUE type {
-		stVar *v = stVarNew($2, $3);
+		stVar *v = new stVar($2, $3);
 
 		$$ = stNewKeywordEntry($1, v, NULL);
 
@@ -627,6 +633,7 @@ method_code
 compound_statement
 : '{' code '}' { 
 		$$ = new stCodeArrayExp($2, yyfile, lineno);
+		delete $2;
 	}
 ;
 
@@ -711,9 +718,11 @@ simple_statement
 : method_call 		{ $$ = $1; }
 | PRINT exp_list { 
 		$$ = new stPrintExp($2, 1, yyfile, lineno); 
+		delete $2;
 	}
 | PRINTF exp_list { 
 		$$ = new stPrintExp($2, 0, yyfile, lineno); 
+		delete $2;
 	}
 | DIE { 
 		stParseError(parseEngine, PE_SYNTAX, "'die' requires an error message string");
@@ -752,6 +761,8 @@ exp_list
 method_call
 : atomic_expression WORD_VALUE keyword_list { 
 		$$ = new stMethodExp($1, $2, $3, yyfile, lineno);
+
+		delete $3;
 
 		slFree($2);
 	}
@@ -1049,6 +1060,7 @@ atomic_expression
 	}
 | '{' exp_list '}' {
 		$$ = new stListExp($2, yyfile, lineno);
+		delete $2;
 	}
 | EMPTY_LIST {
 		$$ = new stListExp(NULL, yyfile, lineno);
@@ -1067,6 +1079,7 @@ atomic_expression
 			$$ = NULL;
 		} else {
 			$$ = new stCCallExp(parseEngine, func, $3, yyfile, lineno); 
+			delete $3;
 			slFree($1);
 		}
 	}
@@ -1092,8 +1105,10 @@ atomic_expression
 		slFree($2);
 	}
 | WORD_VALUE '.' WORD_VALUE '(' exp_list ')' {
-	/* hey, this could be a java call! */
-	$$ = NULL;
+		// hey, this could be a java call! 
+
+		delete $3;
+		$$ = NULL;
 	}
 ;
 
