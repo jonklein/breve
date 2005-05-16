@@ -272,7 +272,7 @@ slBigMatrix2DGSL::slBigMatrix2DGSL(const int x, const int y)
     _xdim (x),
     _ydim (y)
 {
-    _matrix = gsl_matrix_float_alloc_from_block(slVectorViewGSL::_vec->block, 0, _ydim, _xdim, _xdim);
+    _matrix = gsl_matrix_float_alloc_from_block(slVectorViewGSL::_vec->block, 0, _xdim, _ydim, _ydim);
 }
 
 slBigMatrix2DGSL::slBigMatrix2DGSL(const slBigMatrix2DGSL& source) 
@@ -281,7 +281,7 @@ slBigMatrix2DGSL::slBigMatrix2DGSL(const slBigMatrix2DGSL& source)
     _ydim (source._ydim)
 {
     
-    _matrix = gsl_matrix_float_alloc_from_block(slVectorViewGSL::_vec->block, 0, _ydim, _xdim, _xdim);
+    _matrix = gsl_matrix_float_alloc_from_block(slVectorViewGSL::_vec->block, 0, _xdim, _ydim, _ydim);
     
 }
 
@@ -493,7 +493,7 @@ slBigMatrix3DGSL::slBigMatrix3DGSL(const int x, const int y, const int z)
     
     _matrix = new gsl_matrix_float*[_zdim];
     for (i = 0; i < _zdim; i++) {
-        _matrix[i] = gsl_matrix_float_alloc_from_block(slVectorViewGSL::_vec->block, (i * _xdim * _ydim), _ydim, _xdim, _xdim);
+        _matrix[i] = gsl_matrix_float_alloc_from_block(slVectorViewGSL::_vec->block, (i * _xdim * _ydim), _xdim, _ydim, _ydim);
     }
 }
 
