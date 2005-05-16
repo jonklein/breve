@@ -1735,7 +1735,7 @@ RTC_INLINE int stEvalPrint(stPrintExp *exp, stRunInstance *i, brEval *t) {
 		if (n != exp->expressions.size() - 1)
 			slMessage(NORMAL_OUTPUT, " ");
 
-		stGCCollect(&arg);
+		// stGCCollect(&arg);
 	}
 
 	if (exp->newline)
@@ -2698,7 +2698,7 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 		// nothing.  the exception is strings, which are copied -- we need to free
 		// the original now.
 
-		stGCCollect(args[n]);
+		// stGCCollect(args[n]);
 
 		if(resultCode != EC_OK) {
 			slMessage(DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", keyEntry->keyword, method->name);

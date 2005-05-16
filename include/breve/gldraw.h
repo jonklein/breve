@@ -126,4 +126,4 @@ void slTransposeGLMatrix(GLfloat *);
 
 void slClear(slWorld *, slCamera *);
 
-#endif _GLDRAW_H
+#endif /* _GLDRAW_H */
