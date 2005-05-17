@@ -598,6 +598,8 @@ static int stEvalLoadString(stLoadExp *e, stRunInstance *i, brEval *target) {
 
 	BRSTRING(target) = slStrdup(*(char **)pointer);
 
+	stGCMark(i->instance, target);
+
 	return EC_OK;
 }
 
@@ -726,7 +728,7 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 			*(brInstance **)variable = BRINSTANCE(e);
 			break;
 		case AT_DATA:
-			// overwriting an old data variable
+			// overwriting an old data variable?
 
 			if (*(brData **)variable != BRDATA(e))
 				stGCUnretainAndCollectPointer(*(void **)variable, AT_DATA);
@@ -741,11 +743,11 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 			*(void **)variable = BRPOINTER(e);
 			break;
 		case AT_STRING:
-			newstr = slStrdup(BRSTRING(e));
-
-			// are we overwriting an old string in memory?
+			// overwriting an old string?
 			if (*(char **)variable)
 				slFree(*(void **)variable);	
+
+			newstr = slStrdup(BRSTRING(e));
 
 			*(char **)variable = newstr;
 
@@ -763,14 +765,6 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 				stGCUnretainAndCollectPointer(*(void **)variable, AT_LIST);
 			} 
 
-			if (e->type != AT_LIST) {
-				slMessage(DEBUG_ALL, "Cannot convert \"%s\" to type \"list\" for assignment\n", slAtomicTypeStrings[e->type]);
-#ifdef MULTITHREAD
-				if(i) pthread_mutex_unlock(&i->lock);
-#endif
-				return EC_ERROR;
-			}
-
 			*(brEvalListHead **)variable = BRLIST(e);
 
 			break;
@@ -784,14 +778,6 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 				// overwriting an old hash at this location
 				stGCUnretainAndCollectPointer(*(void **)variable, AT_HASH);
 			} 
-
-			if (e->type != AT_HASH) {
-				slMessage(DEBUG_ALL, "Cannot convert \"%s\" to type \"hash\" for assignment\n", slAtomicTypeStrings[e->type]);
-#ifdef MULTITHREAD
-				if(i) pthread_mutex_unlock(&i->lock);
-#endif
-				return EC_ERROR;
-			}
 
 			*(brEvalHash **)variable = BRHASH(e);
 
@@ -830,8 +816,7 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 */
 
 RTC_INLINE int stEvalTruth(brEval *e, brEval *t, stRunInstance *i) {
-	/* because e may equal t, put the type in a local variable */
-	/* before changing it... */
+	// e may equal t, so put the type in a local variable before changing it... 
 
 	char *str;
 	int type = e->type;
@@ -859,22 +844,22 @@ RTC_INLINE int stEvalTruth(brEval *e, brEval *t, stRunInstance *i) {
 			if (BRINSTANCE(e) && (BRINSTANCE(e))->status != AS_ACTIVE)
 				BRINT(t) = 0;
 			else
-				BRINT(t) = (BRINSTANCE(e) != 0x0);
+				BRINT(t) = (BRINSTANCE(e) != NULL);
 
 			return EC_OK;
 			break;
 		case AT_POINTER:
 		case AT_HASH:
 		case AT_DATA:
-			BRINT(t) = (BRPOINTER(e) != 0x0);
+			BRINT(t) = (BRPOINTER(e) != NULL);
 			return EC_OK;
 			break;
 		case AT_LIST:
-			BRINT(t) = (BRPOINTER(e) != 0 && (BRLIST(e))->count != 0);
+			BRINT(t) = (BRPOINTER(e) != NULL && (BRLIST(e))->count != 0);
 			return EC_OK;
 			break;
 		case AT_VECTOR:
-			BRINT(t) = (slVectorLength(&BRVECTOR(e)) != 0.0);
+			BRINT(t) = !(slVectorIsZero(&BRVECTOR(e)));
 			return EC_OK;
 			break;
 		case AT_MATRIX:
@@ -1861,10 +1846,6 @@ RTC_INLINE int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *result) {
 		return EC_ERROR;
 	}
 
-	for(n = 0; n < c->function->nargs; ++n) {
-		stGCUnretainAndCollect(&e[n]);
-	}
-
 #ifdef MULTITHREAD
 	pthread_mutex_unlock(&(i->instance->lock));
 #endif
@@ -2685,11 +2666,10 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 	for(n=0;n<argcount;n++) {
 		keyEntry = method->keywords[n];
 
-        if(keyEntry->var->type->objectName && !keyEntry->var->type->objectType) {
+		if(keyEntry->var->type->objectName && !keyEntry->var->type->objectType) {
 			brObject *o = brObjectFind(target->instance->type->engine, keyEntry->var->type->objectName);
 
 			if(o) keyEntry->var->type->objectType = (stObject*)o->userData;
-			else keyEntry->var->type->objectType = NULL;
 		}
 
 		resultCode = stSetVariable(&newStStack[keyEntry->var->offset], keyEntry->var->type->type, keyEntry->var->type->objectType, args[n], caller);
@@ -2699,6 +2679,7 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 		// the original now.
 
 		// stGCCollect(args[n]);
+		// BRPOINTER(args[n]) = 0xdeadbeef;
 
 		if(resultCode != EC_OK) {
 			slMessage(DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", keyEntry->keyword, method->name);
