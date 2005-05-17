@@ -221,8 +221,8 @@ void slCameraSetActivateContextCallback(slCamera *, int (*)(void));
 
 void slCameraUpdate(slCamera *);
 void slCameraSetRecompile(slCamera *);
-void slCameraSetBounds(slCamera*, int, int);
-void slCameraGetBounds(slCamera*, int*, int*);
+void slCameraSetBounds(slCamera*, unsigned int, unsigned int);
+void slCameraGetBounds(slCamera*, unsigned int*, unsigned int*);
 
 #ifdef __cplusplus
 }

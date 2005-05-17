@@ -359,7 +359,7 @@ int slMakeCurrentContext();
 
 - (void)doSelectionAt:(NSPoint)p {
 	slCamera *c;
-	int x, y;
+	unsigned int x, y;
 
 	if(!frontend) return;
 
@@ -369,14 +369,6 @@ int slMakeCurrentContext();
 	slCameraGetBounds(c, &x, &y);
 	brClickAtLocation(frontend->engine, p.x, y - p.y);
 	[interfaceController updateObjectSelection];
-	if(runState == BX_RUN) [engineLock unlock];
-}
-
-- (void)doKeyEvent:(char)key isDown:(int)d {
-	if(!frontend || !frontend->engine) return;
-
-	if(runState == BX_RUN) [engineLock lock];
-	brKeyCallback(frontend->engine, key, d);
 	if(runState == BX_RUN) [engineLock unlock];
 }
 

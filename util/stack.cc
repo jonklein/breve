@@ -95,6 +95,6 @@ void *slStackGet(slStack *s, int index) {
 	\brief Returns the number of elements in the stack.
 */
 
-int slStackSize(slStack *s) {
+unsigned int slStackSize(slStack *s) {
 	return s->count;
 }

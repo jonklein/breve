@@ -136,7 +136,7 @@ class slVclipData {
 		std::vector<slWorldObject*> objects;
 
 		std::vector<slCollision> collisions;
-		int collisionCount;
+		unsigned int collisionCount;
 
 		slPairFlags **pairArray;
 

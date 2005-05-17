@@ -390,6 +390,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 
 		if(w->_clipGrid) {
 			w->_clipGrid->assignObjectsToPatches(w);
+			result = 0;
 		} else {
 			slVclipPruneAndSweep(w->clipData);
 			result = slVclip(w->clipData, 0.0, 0, w->boundingBoxOnly);

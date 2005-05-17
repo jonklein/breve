@@ -51,4 +51,4 @@ int slStackPush(slStack *, void *);
 #define slStackClear(s)	((s)->count = 0)
 
 void *slStackGet(slStack *, int);
-int slStackSize(slStack *);
+unsigned int slStackSize(slStack *);

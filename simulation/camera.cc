@@ -466,11 +466,11 @@ void slZoomCameraWithMouseMovement(slCamera *camera, double dx, double dy) {
 	} 
 }
 
-void slCameraSetBounds(slCamera *camera, int dx, int dy) {
+void slCameraSetBounds(slCamera *camera, unsigned int dx, unsigned int dy) {
 	camera->setBounds(dx, dy);
 }
 
-void slCameraGetBounds(slCamera *camera, int *dx, int *dy) {
+void slCameraGetBounds(slCamera *camera, unsigned int *dx, unsigned int *dy) {
 	camera->getBounds(dx, dy);
 }
 

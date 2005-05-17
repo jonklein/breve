@@ -101,7 +101,6 @@ enum {
 - (int)runCommand:(char*)command;
 
 - (void)doSelectionAt:(NSPoint)p;
-- (void)doKeyEvent:(char)key isDown:(int)d;
 
 - (void)interfaceActionTag:(int)tag stringValue:(NSString*)s;
 

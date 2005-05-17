@@ -216,6 +216,8 @@
 
 - (void)dealloc {
     if(defaultPath) slFree(defaultPath);
+
+	[super dealloc];
 }
 
 

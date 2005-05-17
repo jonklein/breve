@@ -147,7 +147,6 @@ enum {
 - (IBAction)simMenu:sender;
 - (IBAction)contextualMenu:sender;
 
-- (void)doKeyEvent:(char)key isDown:(int)d;
 - (void)doSelectionAt:(NSPoint)p;
 
 - (void)doMenuCallbackForInstance:(brInstance*)i item:(int)n;

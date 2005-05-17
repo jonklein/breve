@@ -419,10 +419,6 @@ static NSRecursiveLock *gLogLock;
 	[breveEngine doSelectionAt: p];
 }
 
-- (void)doKeyEvent:(char)key isDown:(int)d {
-	[breveEngine doKeyEvent: key isDown: d];
-}
-
 - (brInstance*)getSelectedInstance {
 	return [breveEngine getSelectedInstance];
 }

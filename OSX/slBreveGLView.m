@@ -369,7 +369,7 @@
 }
 
 - (void)keyDown:(NSEvent *)theEvent {
-	char key;
+	unichar key;
 	NSString *str;
 
 	if([theEvent isARepeat]) return;
@@ -377,6 +377,8 @@
 	str = [theEvent characters];
 	if([str length] != 1) return;
 	key = [str characterAtIndex: 0];
+
+	if(!viewEngine) return;
 
 	if(fullScreen && key == '\t') {
 		[fullScreenView toggleCursor];
@@ -390,19 +392,57 @@
 		return;
 	}
 
-	[theController doKeyEvent: key isDown: 1];
+	brEngineLock(viewEngine);
+	switch(key) {
+		case NSUpArrowFunctionKey:
+			brSpecialKeyCallback(viewEngine, "up", 1);
+			break;
+		case NSLeftArrowFunctionKey:
+			brSpecialKeyCallback(viewEngine, "left", 1);
+			break;
+		case NSDownArrowFunctionKey:
+			brSpecialKeyCallback(viewEngine, "down", 1);
+			break;
+		case NSRightArrowFunctionKey:
+			brSpecialKeyCallback(viewEngine, "right", 1);
+			break;
+		default:
+			brKeyCallback(viewEngine, key, 1);
+			break;
+	}
+	brEngineUnlock(viewEngine);
 }
 
 - (void)keyUp:(NSEvent *)theEvent {
-	char key;
+	unichar key;
 	NSString *str;
+
+	if(!viewEngine) return;
 
 	str = [theEvent characters];
 	if([str length] != 1) return;
 	key = [str characterAtIndex: 0];
 
-	[theController doKeyEvent: key isDown: 0];
-
+	brEngineLock(viewEngine);
+	switch(key) {
+		case NSUpArrowFunctionKey:
+			brSpecialKeyCallback(viewEngine, "up", 0);
+			break;
+		case NSLeftArrowFunctionKey:
+			brSpecialKeyCallback(viewEngine, "left", 0);
+			break;
+		case NSDownArrowFunctionKey:
+			brSpecialKeyCallback(viewEngine, "down", 0);
+			break;
+		case NSRightArrowFunctionKey:
+			brSpecialKeyCallback(viewEngine, "right", 0);
+			break;
+		default:
+			brKeyCallback(viewEngine, key, 0);
+			break;
+	}
+	brEngineUnlock(viewEngine);
+}
 
 - (char*)RGBAPixels {
 	NSRect bounds = [self bounds];
@@ -494,6 +534,7 @@
 
 - (void)dealloc {
 	[fullScreenView release];
+	[super dealloc];
 }
 
 - (void)print:(id)sender {
