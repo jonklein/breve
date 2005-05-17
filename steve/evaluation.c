@@ -799,6 +799,8 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 
 	stGCRetain(e);
 
+	if(e->type != AT_STRING) stGCUnmark(i->instance, e);
+
 #ifdef MULTITHREAD
 	if(i) pthread_mutex_unlock(&i->lock);
 #endif
