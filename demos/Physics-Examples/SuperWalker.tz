@@ -328,6 +328,7 @@ MultiBody : Creature {
 		bodyLink (object).
 		links (list).
 		joints (list).
+		linkShape, lowerLinkShape, bodyShape (object).
 
 	+ to get-root:
 		return bodyLink.
@@ -337,7 +338,6 @@ MultiBody : Creature {
 		lowerLimbSize, upperLimbSize (vector).
 		lowerLimbLinkPoint, upperLimbLinkPoint (vector).
 		counter (int).
-		linkShape, lowerLinkShape, bodyShape (object).
 
 		self add-menu named "Send to Center" for-method "center".
 		
@@ -441,4 +441,12 @@ MultiBody : Creature {
 
 	+ to set-joint-velocity number jointNum (int) to value (float):
 		joints{jointNum} set-joint-velocity to value.
+
+	+ to destroy:
+		free links.
+		free joints.
+		free bodyLink.
+		free linkShape.
+		free lowerLinkShape.
+		free bodyShape.
 }

@@ -798,7 +798,6 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 	}
 
 	stGCRetain(e);
-	if (i) stGCUnmark(i->instance, e);
 
 #ifdef MULTITHREAD
 	if(i) pthread_mutex_unlock(&i->lock);
@@ -977,7 +976,7 @@ int stEvalExpVector(std::vector< stExp* > *a, stRunInstance *i, brEval *result) 
 				return EC_STOP;
 			} else {
 				// collect the leftovers.
-				stGCCollect(result);
+				// stGCCollect(result);
 			}
 		}
 	}

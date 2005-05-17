@@ -269,11 +269,19 @@ inline void stGCMarkPointer(stInstance *i, void *pointer, int type) {
 			break;
 	}
 
+	int n;
 
+	for(n=0;n<i->gcStack->count;n++) {
+		r = i->gcStack->data[n];
+		if(r->pointer == pointer) {
+			slMessage(DEBUG_ALL, "double mark of pointer %p\n", r->pointer);
+		}
+	}
+	
 	r = new stGCRecord;
 	r->pointer = pointer;
 	r->type = type;
-	
+
 	slStackPush(i->gcStack, r);
 }
 
