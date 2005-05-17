@@ -922,8 +922,30 @@ void BreveRender::OnKeyUp(wxKeyEvent&event)
 
     if (GetSimulation() != NULL && GetSimulation()->GetInterface()->Initialized())
     {
+	int keycode = event.GetKeyCode();
+
+	if(isalpha(keycode) && ! event.m_shiftDown) keycode = tolower(keycode);
+
 	GetSimulation()->GetMutex()->Lock();
-	brKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, event.GetKeyCode(), 0);
+
+	switch(keycode) {
+		case WXK_LEFT:
+			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "left", 0);
+			break;
+		case WXK_RIGHT:
+			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "right", 0);
+			break;
+		case WXK_UP:
+			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "up", 0);
+			break;
+		case WXK_DOWN:
+			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "down", 0);
+			break;
+		default:
+			brKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, keycode, 0);
+			break;
+	}
+
 	GetSimulation()->GetMutex()->Unlock();
     }
 }
@@ -946,8 +968,30 @@ void BreveRender::OnKeyDown(wxKeyEvent&event)
     if (GetSimulation() != NULL && GetSimulation()->GetInterface()->Initialized() &&
 	!GetSimulation()->GetInterface()->Paused())
     {
+	int keycode = event.GetKeyCode();
+
+	if(isalpha(keycode) && ! event.m_shiftDown) keycode = tolower(keycode);
+
 	GetSimulation()->GetMutex()->Lock();
-	brKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, event.GetKeyCode(), 1);
+
+	switch(keycode) {
+		case WXK_LEFT:
+			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "left", 1);
+			break;
+		case WXK_RIGHT:
+			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "right", 1);
+			break;
+		case WXK_UP:
+			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "up", 1);
+			break;
+		case WXK_DOWN:
+			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "down", 1);
+			break;
+		default:
+			brKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, keycode, 1);
+			break;
+	}
+
 	GetSimulation()->GetMutex()->Unlock();
     }
 }

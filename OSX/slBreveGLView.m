@@ -125,8 +125,6 @@
 
 	[self updateSize: self];
 
-	for(n=0;n<256;n++) keyDown[n] = 0;
-
 	drawLock = [[NSLock alloc] init];
 
 	return [super initWithFrame: frameRect pixelFormat: format];
@@ -374,6 +372,8 @@
 	char key;
 	NSString *str;
 
+	if([theEvent isARepeat]) return;
+
 	str = [theEvent characters];
 	if([str length] != 1) return;
 	key = [str characterAtIndex: 0];
@@ -390,9 +390,6 @@
 		return;
 	}
 
-	if(keyDown[(int)key]) return;
-	keyDown[(int)key] = 1;
-
 	[theController doKeyEvent: key isDown: 1];
 }
 
@@ -406,8 +403,6 @@
 
 	[theController doKeyEvent: key isDown: 0];
 
-	keyDown[(int)key] = 0;
-}
 
 - (char*)RGBAPixels {
 	NSRect bounds = [self bounds];

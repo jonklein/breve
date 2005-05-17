@@ -51,8 +51,6 @@
 
     id selectionMenu;
 
-    char keyDown[256];
-
     BOOL fullScreen;
     BOOL firstFullScreen;
 
