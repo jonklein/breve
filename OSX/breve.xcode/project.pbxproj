@@ -1033,9 +1033,9 @@
 			isa = PBXFileReference;
 			lastKnownFileType = text;
 			name = Digitizer.tz;
-			path = /Users/jk/dev/breve/plugins/slDigitizerPlugin/Digitizer.tz;
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../../../breve/plugins/slDigitizerPlugin/Digitizer.tz;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		48ECC164071C13C100596F93 = {
 			isa = PBXFileReference;
@@ -1074,9 +1074,9 @@
 			isa = PBXFileReference;
 			lastKnownFileType = text;
 			name = Instrument.tz;
-			path = /Users/jk/dev/breve/plugins/slQTMusicPlugin/Instrument.tz;
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../../../breve/plugins/slQTMusicPlugin/Instrument.tz;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		48ECC16F071C13F400596F93 = {
 			isa = PBXFileReference;

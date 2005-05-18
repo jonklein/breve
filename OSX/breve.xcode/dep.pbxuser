@@ -50,9 +50,9 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					359,
+					242,
 					20,
-					68,
+					48,
 					43,
 					43,
 					20,
@@ -125,7 +125,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 137810933;
+			PBXPerProjectTemplateStateSaveDate = 138121872;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -302,7 +302,7 @@
 					};
 				},
 			);
-			PBXWorkspaceStateSaveDate = 137810933;
+			PBXWorkspaceStateSaveDate = 138121872;
 		};
 		perUserProjectItems = {
 			BFC1D27A0837B76B00A07E11 = BFC1D27A0837B76B00A07E11;
@@ -338,9 +338,6 @@
 			sepNavWindowFrame = "{{38, 248}, {750, 558}}";
 		};
 	};
-	BFC1D2620837AD0E00A07E11 = {
-		activeExec = 0;
-	};
 	BFC1D2730837B5E900A07E11 = {
 		isa = PBXFileReference;
 		lastKnownFileType = sourcecode.c.h;
@@ -348,11 +345,6 @@
 		path = /System/Library/Frameworks/QuickTime.framework/Headers/QuickTime.h;
 		refType = 0;
 		sourceTree = "<absolute>";
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {834, 1231}}";
-			sepNavSelRange = "{384, 22}";
-			sepNavVisRect = "{{0, 0}, {0, 0}}";
-		};
 	};
 	BFC1D27A0837B76B00A07E11 = {
 		fRef = BFC1D2730837B5E900A07E11;
@@ -373,6 +365,7 @@
 	};
 	BFC1D2910837BFA100A07E11 = {
 		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
 		name = QuickTime.h;
 		path = /System/Library/Frameworks/QuickTime.framework/Versions/A/Headers/QuickTime.h;
 		refType = 0;
@@ -390,6 +383,7 @@
 	};
 	BFC1D2930837BFA200A07E11 = {
 		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
 		name = QuickTime.h;
 		path = /System/Library/Frameworks/QuickTime.framework/Versions/A/Headers/QuickTime.h;
 		refType = 0;
