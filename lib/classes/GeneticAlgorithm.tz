@@ -41,7 +41,7 @@ Object : GeneticAlgorithm {
 
 	+ section "Getting and Setting Parameters for the Genetic Algorithm"
 
-	+ to set-test-duration to duration (double):
+	+ to set-fitness-test-duration to duration (double):
 		% Sets the duration of a single fitness test.  Specifies that a single
 		% individual should be allowed to run for duration simulated seconds 
 		% before assessing its fitness and switching to the next individual.
@@ -164,6 +164,7 @@ Object : GeneticAlgorithm {
 
 	+ to reproduce:
 		r, i, best (int).
+		totalFitness, fitness (double).
 
 		if | populations{ !currentPopulation } | != populationSize: {
 			free populations{ !currentPopulation }.
@@ -172,14 +173,21 @@ Object : GeneticAlgorithm {
 
 		best = 0.
 
-		for i = 1, i < | populations{ currentPopulation } |, i++: {
-			if (populations{ currentPopulation }{ i } get-fitness) >
-					(populations{ currentPopulation }{ best } get-fitness): best = i.
+		for i = 0, i < | populations{ currentPopulation } |, i++: {
+			fitness = (populations{ currentPopulation }{ i } get-fitness).
+
+			if fitness > (populations{ currentPopulation }{ best } get-fitness): best = i.
+
+			totalFitness += fitness.
 		}
+
+		totalFitness /= | populations{ currentPopulation } |.
 		
 		generation++.
 
-		self report at-generation generation with-best-individual populations{ currentPopulation }{ best }.
+		self report at-generation generation 
+			with-best-individual populations{ currentPopulation }{ best }
+			with-average-fitness totalFitness.
 
 		for i = 0, i < populationSize, i++: {
 			r = random[100].
@@ -191,6 +199,7 @@ Object : GeneticAlgorithm {
 				populations{ !currentPopulation }{ i } crossover 
 					from-parent1 (self tournament-select) from-parent2 (self tournament-select).
 			} else if r < (mutationPercent + crossoverPercent + migrationPercent): {
+				# do migration here...
 			} else {
 				populations{ !currentPopulation }{ i } copy from (self tournament-select).
 			}
@@ -223,14 +232,18 @@ Object : GeneticAlgorithm {
 
 	+ section "Methods to Override in Custom Subclasses"
 
-	+ to report at-generation generation (int) with-best-individual bestIndividual (object):
+	+ to report at-generation generation (int) with-best-individual bestIndividual (object) with-average-fitness fitness (double):
 		% Prints out a report of the progress at each generation, with the most 
 		% fit object passed in as bestIndividual.  The default implementation of 
 		% this method simply prints out the generation number, best fitness and 
 		% calls METHOD(examine) on the best individual, but you may override the 
 		% method to print out any other desired information.
 
-		print "### Generation $generation, best fitness: ", (bestIndividual get-fitness).
+		bf (double).
+
+		bf = (bestIndividual get-fitness).
+
+		print "### Generation $generation; average fitness: $fitness; best fitness: $bf".
 		self examine individual bestIndividual.
 
 	+ to examine individual currentIndividual (object):
