@@ -1,4 +1,8 @@
-#include "simulation.h"
+#include <math.h>
+
+#include "util.h"
+#include "shape.h"
+#include "volInt.h"
 
 /*
 	Revision history

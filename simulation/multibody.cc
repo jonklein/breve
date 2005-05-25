@@ -29,6 +29,9 @@
 */
 
 #include "simulation.h"
+#include "joint.h"
+#include "vclip.h"
+#include "vclipData.h"
 
 /*!
 	\brief Ignores collisions between adjacent multibody links.

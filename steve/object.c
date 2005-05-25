@@ -138,6 +138,7 @@ stInstance *stInstanceNew(stObject *o) {
 */
 
 int stInstanceInit(stInstance *i) {
+	int r;
 	stRunInstance ri;
 
 	ri.instance = i;
@@ -145,7 +146,7 @@ int stInstanceInit(stInstance *i) {
 
 	// "trace" the init method (call it for this instance and all supers)
 
-	if(stMethodTrace(&ri, "init") != EC_OK) return EC_ERROR;
+	if((r = stMethodTrace(&ri, "init")) != EC_OK) return r;
 
 	return EC_OK;
 }
@@ -379,7 +380,7 @@ int stMethodTrace(stRunInstance *i, char *name) {
 	ri.type = i->type->super;
 
 	result = stMethodTrace(&ri, name);
-	if(result != EC_OK) return EC_ERROR;
+	if(result != EC_OK) return result;
 
 	meth = stFindInstanceMethodNoSuper(i->type, name, 0);
 

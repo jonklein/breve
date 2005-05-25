@@ -19,6 +19,8 @@
  *****************************************************************************/
 
 #include "simulation.h"
+#include "vclip.h"
+#include "vclipData.h"
 
 /*!
 	\brief Initialize the slVclipData bound lists.
@@ -345,17 +347,6 @@ void slInitBoundSortList(std::vector<slBoundSort*> &list, slVclipData *v, char b
 }
 
 /*!
-	\brief Transform vector v with position p, placing output in o.
-*/
-
-slVector *slPositionVertex(slPosition *p, slVector *v, slVector *o) {
-	slVectorXform(p->rotation, v, o);
-	slVectorAdd(&p->location, o, o);
-
-	return o;
-}
-
-/*!
 	\brief transforms p1 with the position p, placing the transformed plane in pt.
 */
 
@@ -401,9 +392,9 @@ int slVclipData::testPair(slCollisionCandidate *e, slCollision *ce) {
 	if(s1->_type == ST_SPHERE && s2->_type == ST_SPHERE) {
 		result = slSphereSphereCheck(this, x, y, ce, p1, (slSphere*)s1, p2, (slSphere*)s2);
 	} else if(s1->_type == ST_SPHERE && s2->_type == ST_NORMAL) {
-		result = slSphereShapeCheck(this, f2, 0, x, y, ce);
+		result = slSphereShapeCheck(this, f2, x, y, ce);
 	} else if(s1->_type == ST_NORMAL && s2->_type == ST_SPHERE) {
-		result = slSphereShapeCheck(this, f1, 1, y, x, ce);
+		result = slSphereShapeCheck(this, f1, y, x, ce);
 	} else {
 		int limit = 2 * ((s1->features.size() * s2->features.size()) + 1);
 
@@ -423,15 +414,15 @@ int slVclipData::testPair(slCollisionCandidate *e, slCollision *ce) {
 			} else if(((*f1)->type == FT_EDGE) && ((*f2)->type == FT_POINT)) {
 				result = slEdgePointClip(f1, p1, s1, f2, p2, s2, ce);
 			} else if(((*f1)->type == FT_POINT) && ((*f2)->type == FT_FACE)) {
-				result = slPointFaceClip(f1, p1, s1, f2, p2, s2, this, 0, x, y, ce);
+				result = slPointFaceClip(f1, p1, s1, f2, p2, s2, this, x, y, ce);
 			} else if(((*f1)->type == FT_FACE) && ((*f2)->type == FT_POINT)) {
-				result = slPointFaceClip(f2, p2, s2, f1, p1, s1, this, 1, y, x, ce);
+				result = slPointFaceClip(f2, p2, s2, f1, p1, s1, this, y, x, ce);
 			} else if(((*f1)->type == FT_EDGE) && ((*f2)->type == FT_EDGE)) {
 				result = slEdgeEdgeClip(f1, p1, s1, f2, p2, s2, ce);
 			} else if(((*f1)->type == FT_EDGE) && ((*f2)->type == FT_FACE)) {
-				result = slEdgeFaceClip(f1, f2, this, 0, x, y, ce);
+				result = slEdgeFaceClip(f1, f2, this, x, y, ce);
 			} else if(((*f1)->type == FT_FACE) && ((*f2)->type == FT_EDGE)) {
-				result = slEdgeFaceClip(f2, f1, this, 1, y, x, ce);
+				result = slEdgeFaceClip(f2, f1, this, y, x, ce);
 			} else if(((*f1)->type == FT_FACE) && ((*f2)->type == FT_FACE)) {
 				result = slFaceFaceClip(f1, p1, s1, f2, p2, s2, this, x, y);
 			} else {
@@ -498,15 +489,15 @@ int slVclipTestPairAllFeatures(slVclipData *vc, slCollisionCandidate *e, slColli
 			} else if(((*f1)->type == FT_EDGE) && ((*f2)->type == FT_POINT)) {
 				result = slEdgePointClip(f1, p1, s1, f2, p2, s2, ce);
 			} else if(((*f1)->type == FT_POINT) && ((*f2)->type == FT_FACE)) {
-				result = slPointFaceClip(f1, p1, s1, f2, p2, s2, vc, 0, x, y, ce);
+				result = slPointFaceClip(f1, p1, s1, f2, p2, s2, vc, x, y, ce);
 			} else if(((*f1)->type == FT_FACE) && ((*f2)->type == FT_POINT)) {
-				result = slPointFaceClip(f2, p2, s2, f1, p1, s1, vc, 1, y, x, ce);
+				result = slPointFaceClip(f2, p2, s2, f1, p1, s1, vc, y, x, ce);
 			} else if(((*f1)->type == FT_EDGE) && ((*f2)->type == FT_EDGE)) {
 				result = slEdgeEdgeClip(f1, p1, s1, f2, p2, s2, ce);
 			} else if(((*f1)->type == FT_EDGE) && ((*f2)->type == FT_FACE)) {
-				result = slEdgeFaceClip(f1, f2, vc, 0, x, y, ce);
+				result = slEdgeFaceClip(f1, f2, vc, x, y, ce);
 			} else if(((*f1)->type == FT_FACE) && ((*f2)->type == FT_EDGE)) {
-				result = slEdgeFaceClip(f2, f1, vc, 1, y, x, ce);
+				result = slEdgeFaceClip(f2, f1, vc, y, x, ce);
 			} else if(((*f1)->type == FT_FACE) && ((*f2)->type == FT_FACE)) {
 				/* this is not currently implemented and would only print an error, so skip it */
 
@@ -564,7 +555,7 @@ int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollision *ce, slPositi
 	return CT_PENETRATE;
 }
 
-int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y, slCollision *ce) {
+int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int x, int y, slCollision *ce) {
 	unsigned int n = 0;
 	int included, update;
 	slFeature *minFeature = 0;
@@ -624,15 +615,8 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 						slVectorSub(&tempV1, &p2->location, &tempV1);
 						slVectorInvXform(p2->rotation, &tempV1, &shPoint);
 
-						if(flip) {
-							ce->n1 = x;
-							ce->n2 = y;
-						} else {
-							slVectorMul(&ce->normal, -1, &ce->normal);
-
-							ce->n1 = y;
-							ce->n2 = x;
-						}
+						ce->n1 = x;
+						ce->n2 = y;
 
 						return CT_PENETRATE;
 					} 
@@ -677,15 +661,8 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 						slVectorInvXform(p1->rotation, &tempV1, &spPoint);
 						slVectorInvXform(p2->rotation, &tempV1, &shPoint);
 
-						if(flip) {
-							ce->n1 = x;
-							ce->n2 = y;
-						} else {
-							slVectorMul(&ce->normal, -1, &ce->normal);
-
-							ce->n1 = y;
-							ce->n2 = x;
-						}
+						ce->n1 = x;
+						ce->n2 = y;
 
 						return CT_PENETRATE;
 					}
@@ -718,15 +695,8 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 						ce->points.push_back(vertex);
 						ce->depths.push_back(dist);
 
-						if(flip) {
-							ce->n1 = x;
-							ce->n2 = y;
-						} else {
-							slVectorMul(&ce->normal, -1, &ce->normal);
-
-							ce->n1 = y;
-							ce->n2 = x;
-						}
+						ce->n1 = x;
+						ce->n2 = y;
 
 						return CT_PENETRATE;
 					}
@@ -759,13 +729,8 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int flip, int x, int y
 
 	/* give an arbitrary VERY DEEP collision */
 	
-	if(flip) {
-		ce->n1 = x;
-		ce->n2 = y;
-	} else {
-		ce->n1 = y;
-		ce->n2 = x;
-	}
+	ce->n1 = y;
+	ce->n2 = x;
 
 	ce->depths.push_back(-10);
 
@@ -800,7 +765,7 @@ int slPointPointClip(slFeature **nf1, slPosition *p1p, slShape *s1, slFeature **
 	return CT_DISJOINT;
 }
 
-int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int pairFlip, int x, int y, slCollision *ce) {
+int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int x, int y, slCollision *ce) {
 	int update1, update2, startEdge, total, included, n;
 	double l1, l2, eD, sD;
 	slVector edgeVector, tempV1, eLambda, sLambda, transEdgeVector, eStart;
@@ -879,15 +844,9 @@ int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int pairFli
 			}
 		}
 
-		if(!pairFlip) {
-			slCountFaceCollisionPoints(ce, *nf1, *nf2, ep, fp, s1, s2);
-			ce->n1 = x;
-			ce->n2 = y;
-		} else {
-			slCountFaceCollisionPoints(ce, *nf2, *nf1, fp, ep, s2, s1);
-			ce->n1 = y;
-			ce->n2 = x;
-		}
+		slCountFaceCollisionPoints(ce, *nf1, *nf2, ep, fp, s1, s2);
+		ce->n1 = x;
+		ce->n2 = y;
 
 		return CT_PENETRATE;
 	} 
@@ -1260,7 +1219,7 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 /* belongs to because handleLocalMinima needs to traverse through all the */
 /* slFaces in the entire slShape											  */
 
-int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf2, slPosition *fp, slShape *fs, slVclipData *v, int pairFlip, int x, int y, slCollision *ce) {
+int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf2, slPosition *fp, slShape *fs, slVclipData *v, int x, int y, slCollision *ce) {
 	int update;
 	int n;
 	slVector tPoint, tEnd;
@@ -1349,17 +1308,10 @@ int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf
 
 		slVectorXform(fp->rotation, &f->plane.normal, &ce->normal);
 
-		if(!pairFlip) {
-			ce->n1 = x;
-			ce->n2 = y;
+		ce->n1 = x;
+		ce->n2 = y;
 
-			slCountFaceCollisionPoints(ce, *nf1, *nf2, pp, fp, ps, fs);
-		} else {
-			ce->n1 = y;
-			ce->n2 = x;
-
-			slCountFaceCollisionPoints(ce, *nf2, *nf1, fp, pp, fs, ps);
-		}
+		slCountFaceCollisionPoints(ce, *nf1, *nf2, pp, fp, ps, fs);
 		
 		return CT_PENETRATE;
 	}
@@ -1562,6 +1514,7 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 	slFeature *f1, *f2;
 	slFace **faces1, **faces2;
 	double best2depth = -DBL_MAX, best1depth = -DBL_MAX;
+	double bestDist;
 	slFace *face1, *face2;
 	slPlane plane1, plane2;
 
@@ -1577,10 +1530,8 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 		count1 = 2;
 		faces1 = ((slEdge*)f1)->faces;
 	} else {
-		// count1 = ((slFace*)f1)->edgeCount + 1;
-		// faces1 = ((slFace*)f1)->faces;
-		count1 = 1;
-		faces1 = (slFace**)&f1;
+        count1 = ((slFace*)f1)->edgeCount + 1;
+        faces1 = ((slFace*)f1)->faces;
 	}
 
 	if(f2->type == FT_POINT) {
@@ -1590,82 +1541,115 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 		count2 = 2;
 		faces2 = ((slEdge*)f2)->faces;
 	} else {
-		// count2 = ((slFace*)f2)->edgeCount + 1;
-		// faces2 = ((slFace*)f2)->faces;
-		count2 = 1;
-		faces2 = (slFace**)&f2;
+        count2 = ((slFace*)f2)->edgeCount + 1;
+        faces2 = ((slFace*)f2)->faces;
 	}
 
+	*f1p = NULL;
+	*f2p = NULL;
+
+	//
+	// STEP 1: find any face which has the other shape's center on the positive 
+	// side and inside its voronoi region
+	//
+
+	bestDist = -DBL_MAX;
+
 	for(x=0;x<count1;x++) {
-		double d1, d2;
+		double dist, d2;
+		int included, update;
 
 		face1 = faces1[x];
 		slPositionPlane(p1, &face1->plane, &plane1);
 
-		d1 = slPlaneDistance(&plane1, &p2->location);
+		dist = slPlaneDistance(&plane1, &p2->location);
 
-		if(d1 > 0.0) {
-			for(y=0;y<count2;y++) {
-				face2 = faces2[y];
-				slPositionPlane(p2, &face2->plane, &plane2);
+		included = slClipPoint(&p2->location, face1->voronoi, p1, face1->edgeCount, &update, &d2);
 
-				d2 = slPlaneDistance(&plane2, &p1->location);
-
-				if(d2 > 0.0) {
-					slPoint *point;
-					slVector tv;
-					double dist;
-					double p1depths = 0, p2depths = 0;
-					int pC = 0;
-					std::vector<slPoint*>::iterator pi;
-
-					for(pi = s1->points.begin(); pi != s1->points.end(); pi++ ) {
-						point = *pi;
-						slPositionVertex(p1, &point->vertex, &tv);
-						dist = slPlaneDistance(&plane2, &tv);
-
-						if(dist < 0.0) {
-							pC++;
-							p2depths += dist;
-						}
-					}
-
-					if(pC) p2depths /= pC;
-
-					if(p2depths < 0.0 && p2depths < best2depth) {
-						best2depth = p2depths;
-						*f2p = faces2[y];
-
-						// slVectorPrint(&plane2.normal);
-					}
-
-					pC = 0;
-
-					for(pi = s1->points.begin(); pi != s1->points.end(); pi++ ) {
-						point = *pi;
-						slPositionVertex(p2, &point->vertex, &tv);
-						dist = slPlaneDistance(&plane1, &tv);
-
-						if(dist < 0.0) {
-							pC++;
-							p1depths += dist;
-						}
-					}
-
-					if(pC) p1depths /= pC;
-
-					if(p1depths < 0.0 && p1depths < best1depth) {
-						best1depth = p1depths;
-						*f1p = faces1[x];
-
-						// slVectorPrint(&plane1.normal);
-					}
-				} 
-			}
+		if(included && dist > 0) {
+			*f1p = face1;
 		}
 	}
 
-	if((*f1p)->type == FT_FACE && (*f2p)->type == FT_FACE) return;
+	bestDist = -DBL_MAX;
+
+	for(x=0;x<count2;x++) {
+		double dist, d2;
+		int included, update;
+
+		face2 = faces2[x];
+		slPositionPlane(p2, &face2->plane, &plane2);
+
+		dist = slPlaneDistance(&plane2, &p1->location);
+
+		included = slClipPoint(&p1->location, face2->voronoi, p2, face2->edgeCount, &update, &d2);
+
+		if(included && dist > 0) {
+			*f2p = face2;
+		}
+	}
+
+	//
+	// If we find two faces which fit this requirement, then we're done.
+	//
+
+	if(*f2p && *f1p) return;
+
+	//
+	// STEP 2: If we've only found one plane which contains the other shape's 
+	// center, then there are many candidates for the other plane.  Pick one
+	// with the most negative dot(norm1, norm2).
+	//
+
+	if(*f1p) {
+		slPositionPlane(p1, &((slFace*)*f1p)->plane, &plane1);
+
+		bestDist = 0.0;
+
+		for(x=0;x<count2;x++) {
+			double dot;
+
+			face2 = faces2[x];
+			slPositionPlane(p2, &face2->plane, &plane2);
+
+			dot = slVectorDot(&plane2.normal, &plane1.normal);
+
+			if(dot < bestDist) {
+				*f2p = face2;
+				bestDist = dot;
+			}
+		}
+
+		if(*f2p) return;
+	}
+
+	if(*f2p) {
+		slPositionPlane(p2, &((slFace*)*f2p)->plane, &plane2);
+
+		bestDist = 0.0;
+
+		for(x=0;x<count1;x++) {
+			double dot;
+
+			face1 = faces1[x];
+			slPositionPlane(p1, &face1->plane, &plane1);
+
+			dot = slVectorDot(&plane2.normal, &plane1.normal);
+
+			if(dot < bestDist) {
+				*f1p = face1;
+				bestDist = dot;
+			}
+		}
+	
+		if(*f1p) return;
+	}
+
+	//
+	// STEP 3: go through all N*M face pairs.
+	//
+
+	slDebug("face finding step 3: no obvious collision faces found\n");
 
 	best1depth = -DBL_MAX;
 	best2depth = -DBL_MAX;
@@ -1740,6 +1724,7 @@ int slFaceFaceCollisionPoints(slCollision *ce, slShape *s1, slPosition *p1, slFa
 	int useNorm1 = 0;
 	double maxDepth;
 	double distance;
+	slVector zero;
 
 	slPositionPlane(p1, &face1->plane, &plane1);
 	slPositionPlane(p2, &face2->plane, &plane2);
@@ -1770,9 +1755,9 @@ int slFaceFaceCollisionPoints(slCollision *ce, slShape *s1, slPosition *p1, slFa
 			slPositionVertex(p1, &thePoint->vertex, &point);
 			distance = slPlaneDistance(&plane2, &point);
 
-			// if(distance < -1 && distance > maxDepth) {
-			// 	slDebug("point depth less than 1!\n");
-			// }
+			if(distance < -1 && distance > maxDepth) {
+				slDebug("point depth less than 1!\n");
+			}
 
 			if(distance <= MC_TOLERANCE && distance > maxDepth) {
 				ce->points.push_back(point);
@@ -1833,6 +1818,9 @@ int slFaceFaceCollisionPoints(slCollision *ce, slShape *s1, slPosition *p1, slFa
 
 	// for face2, it's a bit easier--we're only interested in the vertices 
 
+	slVectorSet(&zero, 0, 0, 0);
+	maxDepth = slPlaneDistance(&face1->plane, &zero);
+
 	for(n=0;n<face2->edgeCount;n++) {
 		thePoint = face2->points[n];
 		slPositionVertex(p2, &thePoint->vertex, &point);
@@ -1840,16 +1828,20 @@ int slFaceFaceCollisionPoints(slCollision *ce, slShape *s1, slPosition *p1, slFa
 		distance = slPlaneDistance(&plane1, &point);
 
 		if(distance <= MC_TOLERANCE) {
-			included = slClipPoint(&point, face1->voronoi, p1, face1->edgeCount, &update1, &distance);
+			double d2;
 
-			if(included) {
+			included = slClipPoint(&point, face1->voronoi, p1, face1->edgeCount, &update1, &d2);
+
+			if(included && distance > maxDepth) {
 				ce->points.push_back(point);
 				ce->depths.push_back(distance);
 
 				// we're piercing plane1, so we'll use its normal 
 
 				useNorm1 = 1;
-			}
+			} else if(included) { 
+				// slDebug("crazy collison %f [%f]\n", distance, maxDepth);
+			} 
 		}
 	}
 

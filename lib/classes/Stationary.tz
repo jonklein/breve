@@ -103,3 +103,8 @@ Real : Stationary (aka Stationaries) [version 2.0] {
         if shadowCatcher: self catch-shadows.
         return 1.
 }
+
+Stationary : Floor {
+	+ to init:
+		self register with-shape (new Cube init-with size (50000, 5, 50000)) at-location (0, -2.5, 0).
+}

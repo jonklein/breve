@@ -20,6 +20,9 @@
 
 #include "simulation.h"
 #include "world.h"
+#include "joint.h"
+#include "vclip.h"
+#include "vclipData.h"
 
 /*!
 	\brief Creates a new slLink.
@@ -97,6 +100,8 @@ void slLink::setShape(slShape *s) {
 
 	// The ODE docs call dMatrix3 a 3x3 matrix.  but it's actually 4x3.  
 	// go figure.
+
+	dMassSetZero(&_massData);
 
 	_massData.mass = shape->_mass;
 	_massData.c[0] = 0.0;

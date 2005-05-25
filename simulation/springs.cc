@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "simulation.h"
+#include "shape.h"
 
 /*!
 	\brief Draws the spring connecting two objects.
@@ -97,6 +98,11 @@ void slSpring::step(double step) {
 
 	_force = (distance * _strength) + damping;
 
+	if(_maxForce != 0.0) {
+		 if(_force > _maxForce) _force = _maxForce;
+		else if(_force < -_maxForce) _force = -_maxForce;
+	}
+
 	slVectorNormalize(&toV1);
 	slVectorMul(&toV1, _force, &force);
 
@@ -136,12 +142,6 @@ void slSpring::setLength(double length) {
 	_length = length;
 }
 
-/*!
-	\brief Sets the action mode for this spring.
-
-	The mode should be one of three values:
-*/
-
 void slSpring::setMode(int mode) {
 	_mode = mode;
 }
@@ -150,34 +150,25 @@ void slSpring::setMode(int mode) {
 	\brief Creates a new spring.
 */
 
-slSpring *slSpringNew(slWorld *w, slLink *l1, slLink *l2, slVector *p1, slVector *p2, double length, double strength, double damping) {
-	slSpring *spring;
+slSpring::slSpring(slWorld *w, slLink *l1, slLink *l2, slVector *p1, slVector *p2, double length, double strength, double damping) {
+	slVectorSet(&_color, 0, 0, 0);
 
-	spring = new slSpring;
+	_stipple = 0xaaaa;
+	_maxForce = 0;
 
-	slVectorCopy(p1, &spring->_point1);
-	slVectorCopy(p2, &spring->_point2);
+	slVectorCopy(p1, &_point1);
+	slVectorCopy(p2, &_point2);
 
-	spring->_src = l1;
-	spring->_dst = l2;
+	_src = l1;
+	_dst = l2;
 
-	spring->_length = length;
-	spring->_strength = strength;
-	spring->_damping = damping;
-	spring->_force = 0;
+	_length = length;
+	_strength = strength;
+	_damping = damping;
+	_force = 0;
 
-	slWorldAddConnection(w, spring);
-
-	return spring;
+	slWorldAddConnection(w, this);
 }
-
-/*!
-	\brief Returns the current length of the spring.
-
-	The current length of the spring is the actual length of the spring,
-	stretched or compressed from it "natural" length.  To get the natural
-	length of the spring, see \ref getLength.
-*/
 
 double slSpring::getCurrentLength() {
 	slVector pos1, pos2, toV1;
@@ -192,35 +183,14 @@ double slSpring::getCurrentLength() {
 	return slVectorLength(&toV1);
 }
 
-/*!
-	\brief Returns the "natural" length of the spring.
-
-	The natural length of the spring is the spring length at which the 
-	spring applies no force on the objects--it is the "resting" length
-	of the spring.  To get the actual current length of the spring, see
-	\ref getCurrentLength.
-*/
+void slSpring::setMaxForce(double f) {
+	_maxForce = f;
+}
 
 double slSpring::getLength() {
 	return _length;
 }
 
-/*!
-	\brief Returns the level of force applies by this spring at the most
-	recent timestep.
-
-	The force is returned as a double magnatude.  The direction of the 
-	force is defined by the vector between the two bodies.
-*/
-
 double slSpring::getForce() {
 	return _force;
-}
-
-/*!
-	\brief Delete this spring object.
-*/
-
-void slSpringFree(slSpring *s) {
-	delete s;
 }

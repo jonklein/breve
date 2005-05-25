@@ -1,7 +1,7 @@
 /*****************************************************************************
  *                                                                           *
  * The breve Simulation Environment                                          *
- * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
+ * Copyright (C) 2000-2005 Jonathan Klein                                    *
  *                                                                           *
  * This program is free software; you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -19,6 +19,9 @@
  *****************************************************************************/
 
 #include "simulation.h"
+#include "vclip.h"
+#include "vclipData.h"
+#include "joint.h"
 
 /*!
 	\brief Initializes collision data for the world.

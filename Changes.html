@@ -25,7 +25,15 @@
 </STYLE>
 <BODY>
 
+<h5>version 2.3 [06/XX/2005]</h5>
+
+<ul>
+
 The <a href="http://www.spiderland.org/breve">breve</a> simulation environment change log.
+
+<li>Fixed incorrect bounce for multi-point collisions.
+
+<li>Improved collision-face finding for more accurate collision response.
 
 <li>Fixed lowercase key event processing for Linux &amp; Windows breveIDE frontend
 
@@ -37,14 +45,15 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 
 <li>New level-of-detail renderer for terrains
 
-<li>Added basic support for loading 3D meshes from 3DS files.
-
 <li>Adjusted camera movements so that they are more sensitive to the zoom factor, having a larger influence when the camera is zoomed out.
 
 <li>More of simulation backend converted to C++.
 
-<li>For developers: passing a NULL pointer from steve to an internal function 
-will now trigger a runtime error.  
+<li>Fixed get-real-time precision bug.
+
+<li>Added max-force setting for springs.
+
+<li>For developers: passing a NULL pointer from steve to an internal function will now trigger a runtime error.  
 
 <h5>version 2.2.1 [04/28/2005]</h5>
 <ul>

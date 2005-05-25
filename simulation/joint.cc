@@ -1,4 +1,5 @@
 #include "simulation.h"
+#include "joint.h"
 
 /*!
 	\brief Applies a torque to a revolute joint.

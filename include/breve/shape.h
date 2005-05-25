@@ -84,6 +84,8 @@ typedef struct slSerializedShapeHeader slSerializedShapeHeader;
 #ifdef __cplusplus
 #include <vector>
 
+class slCamera;
+
 class slPoint;
 class slFace;
 class slEdge;
@@ -274,38 +276,7 @@ class slMeshShape : public slSphere {
 			delete _mesh;
 		}
 	
-		void draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags) {
-			float scale[4] = { 1.0/textureScale, 1.0/textureScale, 1.0/textureScale, 1.0/textureScale };
-
-    		glPushMatrix();
-		    glTranslated(pos->location.x, pos->location.y, pos->location.z);
-		    slMatrixGLMult(pos->rotation);
-
-			glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-			glTexGenfv(GL_S, GL_OBJECT_PLANE, scale);
-			glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-			glTexGenfv(GL_T, GL_OBJECT_PLANE, scale);
-
-			glEnable(GL_TEXTURE_GEN_S);
-			glEnable(GL_TEXTURE_GEN_T);
-
-			if(_drawList == 0 || _recompile) {
-				if( _drawList == 0) _drawList = glGenLists(1);
-				
-				glNewList(_drawList, GL_COMPILE);
-
-				_mesh->draw();
-	
-				glEndList();
-			}
-
-			glCallList(_drawList);
-
-			glDisable(GL_TEXTURE_GEN_S);
-			glDisable(GL_TEXTURE_GEN_T);
-
-			glPopMatrix();
-		}
+		void draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags);
 
 		slMesh *_mesh;
 #endif
@@ -327,6 +298,12 @@ typedef struct slSerializedFaceHeader slSerializedFaceHeader;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*!
+ * \brief Transforms a vector with the given position.
+ */
+
+slVector *slPositionVertex(slPosition *p, slVector *v, slVector *o);
 
 slShape *slNewCube(slVector *size, double density);
 slShape *slNewNGonDisc(int count, double radius, double height, double density);

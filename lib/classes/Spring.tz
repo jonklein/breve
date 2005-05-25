@@ -24,7 +24,7 @@ Object : Spring (aka Springs) {
 
 	+ variables:
 		springPointer (pointer).
-		length, strength, damping (float).
+		maxForce, length, strength, damping (float).
 		mode (int).
 		start, end (object).
 
@@ -57,6 +57,9 @@ Object : Spring (aka Springs) {
 		springPointer = springNew((start get-link-pointer), 
 				(end get-link-pointer), 
 				point1, point2, length, strength, damping).
+
+		self add-dependency on start.
+		self add-dependency on end.
 
 		return springPointer.
 
@@ -106,6 +109,17 @@ Object : Spring (aka Springs) {
 		% Sets the spring's damping to newDamping.
 		damping = newDamping.
 		if springPointer: springSetDamping(springPointer, newDamping).
+
+	+ to set-maximum-force to newMax (double): 
+		% Sets an optional maximum force that the spring can apply.  This can 
+		% be used as a safegaurd to prevent unrealistically large forces from
+		% causing instability in simulations. 
+		% <p>
+		% If the maximum force value is set to 0, which is the default, then
+		% the springs forces are unlimited.
+		
+		maxForce = newMax.
+		if springPointer: springSetMaxForce(springPointer, newMax).
 
 	+ to set-expand-and-contract:
 		% This sets a spring to apply forces to expand when the spring is pushed

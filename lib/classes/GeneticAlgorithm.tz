@@ -118,7 +118,7 @@ Object : GeneticAlgorithm {
 
 	+ section "Methods Used Internally by the Genetic Algorithm"
 
-	+ to generate-population:
+	- to generate-population:
 		n (int).
 
 		if populations{ 0 }: free populations{ 0 }.
@@ -162,7 +162,7 @@ Object : GeneticAlgorithm {
 
 		self schedule method-call "switch-individual" at-time (controller get-time) + testDuration.
 
-	+ to reproduce:
+	- to reproduce:
 		r, i, best (int).
 		totalFitness, fitness (double).
 
@@ -288,9 +288,14 @@ Object : GeneticAlgorithmIndividual {
 		fitness (double).
 
 	+ to get-fitness:
+		% Returns the fitness value associated with this individual, which
+		% has been previously assigned using METHOD(set-fitness).
 		return fitness.
 
 	+ to set-fitness to fitnessValue (double):
+		% Assigns a fitness value to this individual.  This method should be
+		% called by the user at the end of the fitness test.
+
 		fitness = fitnessValue.
 
 	+ section "Methods to Override in Custom Subclasses"

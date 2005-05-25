@@ -471,7 +471,7 @@ int brIGetRealTime(brEval args[], brEval *target, brInstance *i) {
 
 	gettimeofday(&now, NULL);
 
-	seconds = now.tv_sec + now.tv_usec / 1000000;
+	seconds = now.tv_sec + now.tv_usec / 1000000.0;
 
 	BRDOUBLE(target) = seconds;
 

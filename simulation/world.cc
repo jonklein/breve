@@ -23,6 +23,8 @@ char *gPhysicsErrorMessage;
  
 #include "simulation.h"
 #include "tiger.h"
+#include "vclip.h"
+#include "vclipData.h"
 
 void *operator new (size_t size) {
 	void *p = calloc(1, size); 
@@ -410,8 +412,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 			slWorldObject *w2;
 			slPairFlags *flags;
 			unsigned int x;
-
-			w1 = w2 = NULL;
+			const dReal *r;
 
 			w1 = w->objects[c->n1];
 			w2 = w->objects[c->n2];
@@ -421,7 +422,6 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 			if(w1 && w2 && (*flags & BT_SIMULATE)) {
 				dBodyID bodyX = NULL, bodyY = NULL;
 				dJointID id;
-				double maxDepth = 0.0;
 				double mu = 0;
 				double e = 0;
 
@@ -430,66 +430,51 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 					bodyX = l->_odeBodyID;
 				}
 				
-				mu = w1->mu + w2->mu;
-				e = w1->e + w2->e;
-
 				if(w2->type == WO_LINK) {
 					slLink *l = (slLink*)w2;
 					bodyY = l->_odeBodyID;
 				}
 
-				mu /= 2;
-				e /= 2;
-
-				mu += 1.0;
+				mu = 1.0 + (w1->mu + w2->mu) / 2.0;
+				e = (w1->e + w2->e) / (2.0 * c->points.size());
 
 				// printf("collision with %d points\n", c->pointCount);
 
 				for(x=0;x<c->points.size();x++) {
-					dContact *contact, con;
+					dContact contact;
 
-					contact = &con;
+					memset(&contact, 0, sizeof(dContact));
+					contact.surface.mode = dContactSoftERP|dContactApprox1|dContactBounce;
 
-					memset(contact, 0, sizeof(dContact));
-					contact->surface.mode = dContactSoftERP|dContactApprox1|dContactBounce;
-					// contact->surface.mode = dContactSoftERP|dContactBounce;
+					contact.surface.soft_cfm = 0.01;
+					contact.surface.soft_erp = 0.05;
+					contact.surface.mu = mu;
+					contact.surface.mu2 = 0;
+					contact.surface.bounce = e;
+					contact.surface.bounce_vel = 0.05;
 
-					//contact->surface.soft_erp = 0.05;
-					contact->surface.soft_cfm = 0.001;
-					contact->surface.soft_erp = 0.05;
-					contact->surface.mu = mu;
-					// contact->surface.soft_cfm = 0.01;
-					contact->surface.bounce = e;
-					contact->surface.bounce_vel = .05;
+					if(c->depths[x] < -0.25) {
+						// this is a scenerio we might want to look at... it may indicate 
+						// problems with the collision detection code.
 
-					if(c->depths[x] < -0.10) {
-						/* this is a scenerio we might want to analyze */
-
-						c->depths[x] = -0.05;
-
-						slMessage(DEBUG_WARN, "warning: point depth = %f for pair (%d, %d) -- cheating\n", c->depths[x], c->n1, c->n2);
+						slDebug("warning: point depth = %f for pair (%d, %d) -- cheating\n", c->depths[x], c->n1, c->n2);
 					}
 
-					if(c->depths[x] < maxDepth) maxDepth = c->depths[x];
-	
-					contact->geom.depth = -c->depths[x];
-					// contact->geom.depth = -.001;
-					contact->geom.g1 = NULL;
-					contact->geom.g2 = NULL;
+					contact.geom.depth = -c->depths[x];
+					contact.geom.g1 = NULL;
+					contact.geom.g2 = NULL;
 
-					contact->geom.normal[0] = -c->normal.x;
-					contact->geom.normal[1] = -c->normal.y;
-					contact->geom.normal[2] = -c->normal.z;
+					contact.geom.normal[0] = -c->normal.x;
+					contact.geom.normal[1] = -c->normal.y;
+					contact.geom.normal[2] = -c->normal.z;
 
 					slVector *v = &c->points[x];
 
-					contact->geom.pos[0] = v->x;
-					contact->geom.pos[1] = v->y;
-					contact->geom.pos[2] = v->z;
+					contact.geom.pos[0] = v->x;
+					contact.geom.pos[1] = v->y;
+					contact.geom.pos[2] = v->z;
 
-					// printf("contacting %p, %p\n", bodyX, bodyY);
-	
-					id = dJointCreateContact(w->_odeWorldID, w->_odeCollisionGroupID, contact);
+					id = dJointCreateContact(w->_odeWorldID, w->_odeCollisionGroupID, &contact);
 					dJointAttach(id, bodyY, bodyX);
 				}
 			}
@@ -510,6 +495,18 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 		dJointGroupEmpty(w->_odeCollisionGroupID);
 
 		if(gPhysicsError) (*error)++;
+	}
+
+	int cn;
+
+	for(cn = 0; cn < w->clipData->collisionCount; cn++ ) {
+		slCollision *c = &w->clipData->collisions[ cn];
+		slWorldObject *w1;
+		slWorldObject *w2;
+		const dReal *r;
+
+		w1 = w->objects[c->n1];
+		w2 = w->objects[c->n2];
 	}
 
 	return stepSize;

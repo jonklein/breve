@@ -90,3 +90,28 @@ Abstract : Drawing {
 	+ to destroy:
 		drawListFree(drawPointer).
 }
+
+Drawing : Tracer {
+	% Tracer is a subclass of drawing that can be used to trace the motion of an agent over 
+	% time.  By default, it has an instruction limit of 50000 and the color is black, but 
+	% these and other variables can be controlled using methods available in OBJECT(Drawing).
+	
+	+ variables:
+		agent (object).
+
+	+ to init:
+		self set-instruction-limit to 50000.
+
+	+ to trace agent theAgent (object):
+		% Sets the tracer to follow theAgent.
+		self clear.
+
+		if !theAgent: return.
+
+		agent = theAgent.
+
+		self draw-line from (theAgent get-location) to (theAgent get-location).
+
+	+ to iterate:
+		if agent: self add-line-point at (agent get-location).
+}

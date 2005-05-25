@@ -20,6 +20,8 @@
 
 #include "simulation.h"
 #include "roam.h"
+#include "vclip.h"
+#include "vclipData.h"
 
 #if HAVE_LIBTIFF
 namespace tiff {

@@ -976,10 +976,7 @@ int stEvalExpVector(std::vector< stExp* > *a, stRunInstance *i, brEval *result) 
 			} else if (resultCode == EC_STOP) {
 				// an EC_STOP indicates a return value or other interruption
 				return EC_STOP;
-			} else {
-				// collect the leftovers.
-				// stGCCollect(result);
-			}
+			} 
 		}
 	}
 
@@ -1203,7 +1200,7 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *target, stRunI
 			if (mexp->arguments[n]->position == -1) {
 				tmpkey = mexp->arguments[n];
 
-				stEvalError(target->type->engine, EE_UNKNOWN_KEYWORD, "unknown keyword \"%s\" in call to method \"%s\"", tmpkey->word, mexp->method->name);
+				stEvalError(target->type->engine, EE_UNKNOWN_KEYWORD, "Unknown keyword \"%s\" in call to method \"%s\"", tmpkey->word, mexp->method->name);
 				mexp->objectCache = NULL;
 				return EC_ERROR;
 			}
@@ -1267,8 +1264,8 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *target, stRunI
 		resultCode = stExpEval3(key->value, caller, argps[n]);
 
 		if (resultCode != EC_OK) {
-			slMessage(DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", key->word, mexp->method->name);
-			return EC_ERROR;
+			if(resultCode != EC_ERROR_HANDLED) slMessage(DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", key->word, mexp->method->name);
+			return resultCode;
 		}
 	}
 
@@ -1924,10 +1921,8 @@ RTC_INLINE int stEvalArrayIndexAssign(stArrayIndexAssignExp *a, stRunInstance *i
 	}
 
 	r =  stExpEval3(a->rvalue, i, rvalue);
-	if (r != EC_OK) {
-		slMessage(DEBUG_ALL, "Error evaluating right hand side of assignment expression.\n");
-		return r;
-	}
+
+	if (r != EC_OK) return r;
 
 	if(indexExp.type != AT_INT && !(r = stToInt(&indexExp, &indexExp, i))) {
 		slMessage(DEBUG_ALL, "Array index must be of type \"int\".\n");
@@ -1955,10 +1950,7 @@ RTC_INLINE int stEvalAssignment(stAssignExp *a, stRunInstance *i, brEval *t) {
 
 	resultCode = stExpEval3(a->rvalue, i, t);
 
-	if (resultCode != EC_OK) {
-		slMessage(DEBUG_ALL, "Error evaluating right hand side of assignment expression.\n");
-		return resultCode;
-	}
+	if (resultCode != EC_OK) return resultCode;
 
 	if (a->local)
 		pointer = &i->instance->type->steveData->stack[a->offset];
@@ -2853,7 +2845,7 @@ RTC_INLINE int stEvalNewInstance(stInstanceExp *ie, stRunInstance *i, brEval *t)
 
 		BRINSTANCE(t) = stInstanceCreateAndRegister(i->instance->type->steveData, i->instance->type->engine, object);
 
-		if(BRINSTANCE(t) == NULL) return EC_ERROR;
+		if(BRINSTANCE(t) == NULL) return EC_ERROR_HANDLED;
 	} else {
 		listItem.type = AT_INSTANCE;
 		list = brEvalListNew();
@@ -2861,7 +2853,7 @@ RTC_INLINE int stEvalNewInstance(stInstanceExp *ie, stRunInstance *i, brEval *t)
 		for(n=0;n<BRINT(&count);n++) {
 			BRINSTANCE(&listItem) = stInstanceCreateAndRegister(i->instance->type->steveData, i->instance->type->engine, object);
 
-			if(BRINSTANCE(&listItem) == NULL) return EC_ERROR;
+			if(BRINSTANCE(&listItem) == NULL) return EC_ERROR_HANDLED;
 
 			brEvalListInsert(list, 0, &listItem);
 		}
@@ -3309,5 +3301,5 @@ void stEvalWarn(stExp *exp, char *proto, ...) {
 	vsnprintf(localMessage, BR_ERROR_TEXT_SIZE, proto, vp);
 	va_end(vp); 
 	slMessage(DEBUG_ALL, localMessage);
-	slMessage(DEBUG_ALL, "... at in file \"%s\" at line %d\n", exp->file, exp->line);
+	slMessage(DEBUG_ALL, "... in file \"%s\" at line %d\n", exp->file, exp->line);
 }

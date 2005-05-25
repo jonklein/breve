@@ -20,6 +20,7 @@
 
 #include "simulation.h"
 #include "shadow.h"
+#include "shape.h"
 
 void slShape::drawShadowVolume(slCamera *c, slPosition *p) {
 	std::vector<slEdge*>::iterator ei;

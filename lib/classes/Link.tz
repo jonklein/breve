@@ -9,7 +9,8 @@ Mobile : Link (aka Links) [version 2.1] {
 	% Links may also be associated with OBJECT(MultiBody) objects, <b>but this is 
 	% not required</b> (as they were prior to breve 2.0).
 	% <P>
-	% In breve 2.0 and later, Link is a subclass of OBJECT(Mobile), and OBJECT(MultiBody) 
+	% In breve 2.0 and later, Link is a subclass of OBJECT(Mobile), and 
+	% OBJECT(MultiBody) 
 	% objects can be constructed out of any Mobile objects.  This means that a 
 	% great deal of the methods and functionality that used to be a part of 
 	% OBJECT(Link) are now accessed via the superclasses OBJECT(Mobile) and 

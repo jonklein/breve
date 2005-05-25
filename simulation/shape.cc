@@ -19,6 +19,11 @@
  *****************************************************************************/
 
 #include "simulation.h"
+#include "glIncludes.h"
+#include "camera.h"
+#include "volInt.h"
+#include "vclip.h"
+#include "vclipData.h"
 
 void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags) {
 	unsigned char bound, axis;
@@ -757,11 +762,8 @@ void slCubeInertiaMatrix(slVector *c, double mass, double i[3][3]) {
 }
 
 void slSphereInertiaMatrix(double r, double mass, double i[3][3]) {
-	slVector q;
-
-	q.x = q.y = q.z = r;
-
-	slCubeInertiaMatrix(&q, mass, i);
+	slMatrixZero(i);
+	i[0][0] = i[1][1] = i[2][2] = 0.4 * mass * r * r;
 }
 
 /*!
@@ -1204,3 +1206,43 @@ double slShape::getMass() {
 double slShape::getDensity() {
 	return _density;
 }
+
+void slMeshShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags) {
+	float scale[4] = { 1.0/textureScale, 1.0/textureScale, 1.0/textureScale, 1.0/textureScale };
+
+	glPushMatrix();
+	glTranslated(pos->location.x, pos->location.y, pos->location.z);
+	slMatrixGLMult(pos->rotation);
+
+	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+	glTexGenfv(GL_S, GL_OBJECT_PLANE, scale);
+	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+	glTexGenfv(GL_T, GL_OBJECT_PLANE, scale);
+
+	glEnable(GL_TEXTURE_GEN_S);
+	glEnable(GL_TEXTURE_GEN_T);
+
+	if(_drawList == 0 || _recompile) {
+		if( _drawList == 0) _drawList = glGenLists(1);
+				
+		glNewList(_drawList, GL_COMPILE);
+
+		_mesh->draw();
+	
+		glEndList();
+	}
+
+	glCallList(_drawList);
+
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+
+	glPopMatrix();
+}
+
+slVector *slPositionVertex(slPosition *p, slVector *v, slVector *o) {
+	slVectorXform(p->rotation, v, o);
+	slVectorAdd(&p->location, o, o);
+    
+	return o;
+}   

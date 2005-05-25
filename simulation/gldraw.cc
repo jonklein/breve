@@ -1457,6 +1457,7 @@ int slBreakdownFace(slFace *f, double textureScale) {
 	slPerpendicularVectors(&f->plane.normal, &xaxis, &yaxis);
 
 	slVectorZero(&total);
+
 	for (n = 0; n < f->edgeCount; ++n) {
 		n2 = n+1;
 		if (n2 == f->edgeCount)
@@ -1475,8 +1476,7 @@ int slBreakdownFace(slFace *f, double textureScale) {
 
 	slVectorMul(&total, 1.0 / f->edgeCount, &total);
 
-	if (length < 30)
-		return 0;
+	if (length < 30) return 0;
 
 	glBegin(GL_TRIANGLES);
 	

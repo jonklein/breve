@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "kernel.h"
+#include "joint.h"
 
 /*! \addtogroup InternalFunctions */
 /*@{*/

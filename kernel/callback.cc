@@ -27,6 +27,8 @@
 */
 
 #include "kernel.h"
+#include "vclip.h"
+#include "vclipData.h"
 
 /*!
 	\brief Checks whether collisions should be detected between two objects.

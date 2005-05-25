@@ -20,14 +20,17 @@
 #define SQR(x) ((x)*(x))
 #define CUBE(x) ((x)*(x)*(x))
 
+typedef struct slMPFace slMPFace;
+typedef struct slMPPolyhedron slMPPolyhedron; 
+        
 struct slMPFace {
   int numVerts;         
   double norm[3];
   double w;
   int verts[MAX_POLYGON_SZ];
   slMPPolyhedron *poly; 
-} ;
-        
+};
+
 struct slMPPolyhedron {
   int numVerts, numFaces;
   double verts[MAX_VERTS][3];

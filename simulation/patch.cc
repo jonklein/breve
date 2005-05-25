@@ -20,6 +20,8 @@
 
 #include "simulation.h"
 #include "glIncludes.h"
+#include "vclip.h"
+#include "vclipData.h"
 
 /* ********
  *  TODO: 

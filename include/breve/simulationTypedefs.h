@@ -49,8 +49,6 @@ typedef struct slBoundSort slBoundSort;
 typedef struct slCollision slCollision;
 typedef struct slCollisionCandidate slCollisionCandidate;
 typedef struct slVclipData slVclipData;
-typedef struct slMPFace slMPFace;
-typedef struct slMPPolyhedron slMPPolyhedron;
 typedef struct slWorld slWorld;
 typedef struct slWorldObject slWorldObject;
 typedef struct slStationary slStationary;

@@ -24,11 +24,17 @@ docbook: classes
 		$(DOCBOOKDIR)/collateindex.pl -g HTML.index > index.docbook
 	cd docBuild/docbook; \
 		openjade -t sgml -d breve.dsl breve.docbook
+	-cd docBuild/docbook; \
+		openjade -t tex -d /sw/share/sgml/dsssl/docbook-dsssl-nwalsh/print/docbook.dsl breve.docbook
 	cp -R docBuild/docbook/index.html docBuild/docbook/docs docs/
 	mkdir docs/docs/images
 	cp docBuild/docbook/images/*.jpg docs/docs/images/
 	cp docBuild/docbook/images/*.gif docs/docs/images/
 	cp docBuild/docbook/images/*.eps docs/docs/images/
+	-cd docBuild/docbook; \
+		pdfjadetex breve.docbook.tex
+	-cd docBuild/docbook; \
+		pdfjadetex breve.docbook.tex
 
 source:
 	mkdir -p ../docs/source
