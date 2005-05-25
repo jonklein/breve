@@ -167,6 +167,7 @@ void brDataFree(brData *data);
 */
 
 brEvalListHead *brEvalListNew(void);
+int brEvalListInsert(brEvalListHead *head, int index, brEval *value);
 #define brEvalListAppend(a, eval) brEvalListInsert((a), (a)->count, (eval))
 
 /* Use these macros to treat brEval pointers as specific types. */
