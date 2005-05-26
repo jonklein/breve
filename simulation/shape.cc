@@ -1207,6 +1207,7 @@ double slShape::getDensity() {
 	return _density;
 }
 
+#ifdef _HAVE_LIB3DS
 void slMeshShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags) {
 	float scale[4] = { 1.0/textureScale, 1.0/textureScale, 1.0/textureScale, 1.0/textureScale };
 
@@ -1239,6 +1240,7 @@ void slMeshShape::draw(slCamera *c, slPosition *pos, double textureScale, int mo
 
 	glPopMatrix();
 }
+#endif
 
 slVector *slPositionVertex(slPosition *p, slVector *v, slVector *o) {
 	slVectorXform(p->rotation, v, o);

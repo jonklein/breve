@@ -228,7 +228,7 @@ int brICameraPosition(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraSetEnabled(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
+	// slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	// camera->_enabled = BRINT(&args[1]);
 
 	return EC_OK;
