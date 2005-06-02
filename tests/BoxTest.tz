@@ -1,0 +1,30 @@
+@use Mobile.
+@use PhysicalControl.
+@use Stationary.
+@use Link.
+@use Shape.
+
+Controller BoxTest.
+
+PhysicalControl : BoxTest {
+	+ to init:
+		l (list).
+
+		self enable-smooth-drawing.
+
+		new Floor.
+
+		l = 2 new Links.
+
+		self schedule-repeating method-call "catch-key-b-down" with-interval 6.
+		self enable-fast-physics.
+
+	+ to catch-key-b-down:
+		l (object).
+
+		l = new Link.
+
+		l set-shape to (new PolygonCone init-with radius 1.0 + random[1.0] sides 3 + random[10] height .5 + random[.8]).
+		l move to random[(6, 0, 6)] + (-3, 10, -3).
+		l set-color to random[(1, 1, 1)].
+}

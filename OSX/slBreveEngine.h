@@ -61,9 +61,10 @@ enum {
 	double speedFactor;
 
 	char *outputPath;
+	BOOL useSimDirForOutput;
 }
 
-- (void)setOutputPath:(char*)path;
+- (void)setOutputPath:(char*)path useSimDir:(BOOL)sim;
 
 /* returns the current brEngine, if it exists */
 

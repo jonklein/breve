@@ -64,7 +64,6 @@ PhysicalControl : Walker {
 		cloudTexture (object).
 
 	+ to init:
-		floorShape (object).
 		floor (object).
 		number (int).
 		item (object).
@@ -85,13 +84,9 @@ PhysicalControl : Walker {
 
 		# Create the floor for the critter to walk on.
 
-		floorShape = (new Cube init-with size (1000, 2, 1000)).
-		floor = new Stationary.
-
-		floor register with-shape floorShape at-location (0, 0, 0).
+		floor = new Floor.
 		floor catch-shadows.
 		floor set-color to (1.0, 1.0, 1.0).
-
 		floor set-eT to .9.
 
 		cloudTexture = (new Image load from "images/clouds.png").

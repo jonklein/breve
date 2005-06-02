@@ -203,7 +203,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 	+ to get-real-time:
 		% Returns the number of seconds since January 1st, 1970 with microsecond
-		% accuracy.
+		% precision.
 
 		return getRealTime().
 

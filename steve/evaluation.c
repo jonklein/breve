@@ -424,8 +424,9 @@ inline int stToType(brEval *e, int type, brEval *t, stRunInstance *i) {
 			return stToInt(e, t, i);
 			break;
 		case AT_STRING:
-			stEvalError(i->instance->type->engine, EE_CONVERT, "cannot convert type \"%s\" to type \"string\"", slAtomicTypeStrings[e->type]);
-			return EC_ERROR;
+			BRSTRING(t) = stFormatEvaluation(e, i->instance);
+			t->type = AT_STRING;
+			return EC_OK;
 			break;
 		case AT_VECTOR:
 			stEvalError(i->instance->type->engine, EE_CONVERT, "cannot convert type \"%s\" to type \"vector\"", slAtomicTypeStrings[e->type]);

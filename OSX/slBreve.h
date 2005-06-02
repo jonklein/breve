@@ -172,8 +172,8 @@ void updateMenu(brInstance *i);
 
 - (void)setWindowTitleMessage:(NSString*)s;
 
-- (NSString*)saveNameForType:(NSString *)type withAccView:(id)view;
-- (NSString*)loadNameForTypes:(NSArray*)types withAccView:(id)view;
+- (NSString*)saveNameForType:(NSString *)type withAccView:(NSView*)view;
+- (NSString*)loadNameForTypes:(NSArray*)types withAccView:(NSView*)view;
 
 int isTZfile(struct dirent *d);
 int isHTMLfile(struct dirent *d);

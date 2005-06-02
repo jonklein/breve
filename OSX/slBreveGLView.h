@@ -39,8 +39,8 @@
     id motionSelector;
     id theMovie;
 
-    char *pixelBuffer;
-    char *tempPixelBuffer;
+    unsigned char *pixelBuffer;
+    unsigned char *tempPixelBuffer;
 
     id theController;
     slFullScreen *fullScreenView;

@@ -72,8 +72,9 @@ int slMakeCurrentContext();
 	oldSpeedMenuItem = sender;
 }
 
-- (void)setOutputPath:(char*)path {
+- (void)setOutputPath:(char*)path useSimDir:(BOOL)sim {
 	outputPath = path;
+	useSimDirForOutput = sim;
 }
 
 - (void)lock {
@@ -149,6 +150,11 @@ int slMakeCurrentContext();
 	[self initEngine];
 
 	if(!name) name = "<untitled>";
+	else {
+		NSString *inputDir = [[NSString stringWithCString: name] stringByDeletingLastPathComponent];
+
+		if(useSimDirForOutput) brEngineSetIOPath(frontend->engine, (char*)[inputDir cString]);
+	}
 
 	[displayView setEngine: frontend->engine fullscreen: full];
 

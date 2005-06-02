@@ -86,8 +86,7 @@ Control : Swarm {
 
         # Add a huge floor.
 
-        floor = new Stationary.
-        floor register with-shape (new Cube init-with size (100, 2, 100)) at-location (0, -5, 0).
+        floor = new Floor.
         floor catch-shadows.
 
         birds = 60 new Birds.

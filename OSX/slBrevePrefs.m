@@ -110,6 +110,7 @@
     [defaults setBool: [matchBraces intValue] forKey: @"matchBraces"];
     [defaults setBool: [syntaxColor intValue] forKey: @"syntaxColor"];
     [defaults setBool: [useSpaces intValue] forKey: @"useSpaces"];
+    [defaults setBool: [simDirForOutput intValue] forKey: @"simDirForOutput"];
 
     [defaults setBool: [lineWrapping intValue] forKey: @"lineWrapping"];
     
@@ -178,6 +179,8 @@
     [autoIndent setState: [defaults boolForKey: @"autoIndent"]];
     [updateLineBox setState: [defaults boolForKey: @"updateLineBox"]];
     [useSpaces setState: [defaults boolForKey: @"useSpaces"]];
+    [simDirForOutput setState: [defaults boolForKey: @"simDirForOutput"]];
+
     [lineWrapping setState: [defaults boolForKey: @"lineWrapping"]];
     [extraIndent setState: [defaults boolForKey: @"extraIndent"]];
     [matchBraces setState: [defaults boolForKey: @"matchBraces"]];
@@ -214,11 +217,14 @@
     return showOpenOnLaunch;
 }
 
+- (BOOL)shouldUseSimDirForOutput {
+	return [simDirForOutput intValue];
+}
+
 - (void)dealloc {
     if(defaultPath) slFree(defaultPath);
 
 	[super dealloc];
 }
-
 
 @end

@@ -123,6 +123,7 @@
                 numberColor = id; 
                 openOnLaunchBox = id; 
                 pathField = id; 
+                simDirForOutput = id; 
                 spacesPerTab = id; 
                 stringColor = id; 
                 syntaxColor = id; 

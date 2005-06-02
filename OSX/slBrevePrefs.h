@@ -51,6 +51,8 @@
     id useSpaces;
     id syntaxColor;
 
+    id simDirForOutput;
+
     id lineWrapping;
     
     id spacesPerTab;
@@ -73,7 +75,9 @@
 
 - (BOOL)shouldAutoSimStart;
 - (BOOL)shouldShowOpenOnLaunch;
+- (BOOL)shouldUseSimDirForOutput;
 - (char*)defaultPath;
+
 
 - (void)updateTextView:(id)textView;
 

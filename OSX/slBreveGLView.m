@@ -97,11 +97,9 @@
 }
 
 - (id)initWithFrame:(NSRect)frameRect {
-	int n;
-
-	/* the default attribute values from IB don't seem to work on a lot   */
-	/* of machines.  that's dumb.  we'll use our own values here and hope */
-	/* for the best. */
+	// the default attribute values from IB don't seem to work on a lot  
+	// of machines.  that's dumb.  we'll use our own values here and hope 
+	// for the best. 
 
 	NSOpenGLPixelFormatAttribute attribs[] = {
 		NSOpenGLPFAAccelerated,
@@ -346,7 +344,7 @@
 					firstTime = NO;
 					drawCrosshair = 0;
 				} else {
-					int x, y;
+					unsigned int x, y;
 
 					[drawLock lock];
 					slCameraGetBounds(camera, &x, &y);

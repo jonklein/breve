@@ -275,7 +275,7 @@ static NSRecursiveLock *gLogLock;
 	[self clearLog: self];
 
 	chdir([preferences defaultPath]);
-	[breveEngine setOutputPath: [preferences defaultPath]];
+	[breveEngine setOutputPath: [preferences defaultPath] useSimDir: [preferences shouldUseSimDirForOutput]];
 
 	if([breveEngine startSimulationWithText: buffer withFilename: name withSavedSimulationFile: csaved fullscreen: fullscreen]) {
 		[self runErrorWindow];
@@ -356,7 +356,7 @@ static NSRecursiveLock *gLogLock;
 	[self clearLog: self];
 
 	chdir([preferences defaultPath]);
-	[breveEngine setOutputPath: [preferences defaultPath]];
+	[breveEngine setOutputPath: [preferences defaultPath] useSimDir:  [preferences shouldUseSimDirForOutput]];
 
 	if([breveEngine startSimulationWithText: buffer withFilename: name withSavedSimulationFile: NULL fullscreen: fullscreen]) {
 		[self runErrorWindow];
@@ -733,7 +733,7 @@ int isHTMLfile(struct dirent *d) {
 
 void updateMenu(brInstance *i) {
 	id menuItem;
-	int n;
+	unsigned int n;
 
 	if(!i->engine || i != brEngineGetController(i->engine)) return;
 
@@ -755,7 +755,7 @@ void updateMenu(brInstance *i) {
 	}
 }
 
-- (NSString*)saveNameForType:(NSString *)type withAccView:(id)view {
+- (NSString*)saveNameForType:(NSString *)type withAccView:(NSView*)view {
 	NSSavePanel *savePanel;
 
 	savePanel = [NSSavePanel savePanel];

@@ -1410,54 +1410,54 @@ int slClipPointMax(slVector *p, slPlane *v, slPosition *vp, int vcount, int *upd
 int slClipEdge(slEdge *e, slPosition *ep, slPlane *voronoi, slPosition *vp, int vcount, int *sf, int *ef, double *hLambda, double *tLambda) {
 	slVector transformedStart, transformedEnd;
 	slPoint *start, *end;
+	double dS, dE, lambda;
+	slPlane tVoronoi; /* transformed voronoi plane */
+	int n;
 	
 	start = e->points[0];
 	end = e->points[1];
 
 	slPositionVertex(ep, &start->vertex, &transformedStart);
 	slPositionVertex(ep, &end->vertex, &transformedEnd);
-	
+
 	return slClipEdgePoints(&transformedStart, &transformedEnd, voronoi, vp, vcount, sf, ef, hLambda, tLambda);
 }
 
-/*
-	\brief Does the work for slClipEdge, after the transformed points have been computed.
-*/
-
 int slClipEdgePoints(slVector *transformedStart, slVector *transformedEnd, slPlane *voronoi, slPosition *vp, int vcount, int *sf, int *ef, double *hLambda, double *tLambda) {
-	double dS, dE, lambda;
-	slPlane tVoronoi; /* transformed voronoi plane */
-	int n;
-	
-	/* initialize tail lambda and head lambda */
+    double dS, dE, lambda;
+    slPlane tVoronoi; 
+    int n;
+
+	// initialize tail lambda and head lambda 
 	
 	*tLambda = 0;
 	*hLambda = 1;
 	
 	*sf = -1;
 	*ef = -1;
+
 	for(n=0;n<vcount;n++) {
 		slPositionPlane(vp, &voronoi[n], &tVoronoi);
 
 		dS = slPlaneDistance(&tVoronoi, transformedStart);
 		dE = slPlaneDistance(&tVoronoi, transformedEnd);
 	
-		/* both sides of the edge violate one of the planes */
+		// both sides of the edge violate one of the planes 
 	
-		if(dS < 0 && dE < 0) {
+		if(dS < 0.0 && dE < 0.0) {
 			*ef = n;
 			*sf = n;
 			
 			return 0;
 		}
    
-		/* figure out where each plane clips this edge.  if the  */
-		/* tLambda and the hLambda cross it means that one plane */
-		/* clips from 0 to eLambda and another from sLambda to 1 */
-		/* and thus no part of the edge satisfies both planes	*/
+		// figure out where each plane clips this edge.  if the  
+		// tLambda and the hLambda cross it means that one plane 
+		// clips from 0 to eLambda and another from sLambda to 1 
+		// and thus no part of the edge satisfies both planes	
 		
-		if(dE < 0) {
-			/* everything from 0 to lambda is clipped by this plane */
+		if(dE < 0.0) {
+			// everything from 0 to lambda is clipped by this plane 
   
 			lambda = dE / (dE - dS);
 			
@@ -1468,7 +1468,7 @@ int slClipEdgePoints(slVector *transformedStart, slVector *transformedEnd, slPla
 				
 				if(*tLambda > *hLambda) return 0;
 			} 
-		} else if(dS < 0) {
+		} else if(dS < 0.0) {
 			/* everything from 1 to lambda is clipped by this plane */
 
 			lambda = dE / (dE - dS);
@@ -1483,7 +1483,7 @@ int slClipEdgePoints(slVector *transformedStart, slVector *transformedEnd, slPla
 		}	   
 	} 
 
-	/* the edge runs through the voronoi region */
+	// the edge runs through the voronoi region 
 
 	return 1;
 }
@@ -1649,7 +1649,7 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 	// STEP 3: go through all N*M face pairs.
 	//
 
-	slDebug("face finding step 3: no obvious collision faces found\n");
+	// slDebug("face finding step 3: no obvious collision faces found\n");
 
 	best1depth = -DBL_MAX;
 	best2depth = -DBL_MAX;

@@ -1033,7 +1033,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = text;
 			name = Digitizer.tz;
-			path = ../../../breve/plugins/slDigitizerPlugin/Digitizer.tz;
+			path = ../plugins/slDigitizerPlugin/Digitizer.tz;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -1074,7 +1074,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = text;
 			name = Instrument.tz;
-			path = ../../../breve/plugins/slQTMusicPlugin/Instrument.tz;
+			path = ../plugins/slQTMusicPlugin/Instrument.tz;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
