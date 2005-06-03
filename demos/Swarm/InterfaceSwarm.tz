@@ -35,9 +35,9 @@
 
 @nib_file "SwarmInterface".
 
-@include "Stationary.tz"
-@include "Control.tz"
-@include "Mobile.tz"
+@include Stationary.
+@include Control.
+@include Mobile.
 
 @define SWARM_SIZE	80.
 
@@ -98,8 +98,7 @@ Control : Swarm {
 
         # Add a huge floor.
 
-        floor = new Stationary.
-        floor register with-shape (new Cube init-with size (100, 2, 100)) at-location (0, -5, 0).
+        floor = new Floor.
         floor catch-shadows.
 
         birds = SWARM_SIZE new Birds.
@@ -212,7 +211,7 @@ Mobile : Bird (aka Birds) {
         # when we hit the ground, we want to land on it using the method "land".
         # it gets called automatically when the collision occurs.
 
-        self handle-collisions with-type "Stationary" with-method "land".
+        self handle-collisions with-type "Floor" with-method "land".
 
         # set the neighborhood radius that we will look in to find neighbors.
 

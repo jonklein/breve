@@ -105,10 +105,11 @@ Real : Stationary (aka Stationaries) [version 2.0] {
 }
 
 Stationary : Floor {
-	% A floor is a special case of the class OBJECT(Stationary).  It is a box of size 
-	% (1000, 5, 1000) with location (0, -2.5, 0), such that the ground plane is placed
-	% at Y = 0.
+	% A floor is a special case of the class OBJECT(Stationary).  It is a box 
+	% of size (1000, 5, 1000) with location (0, -2.5, 0), such that the ground 
+	% plane is placed at Y = 0.
 
 	+ to init:
-		self register with-shape (new Cube init-with size (1000, 5, 1000)) at-location (0, -2.5, 0).
+		self register with-shape (new Cube init-with size (1000, 5, 1000)) 
+			at-location (0, -2.5, 0).
 }

@@ -22,11 +22,10 @@
 
 @path "classes"
 
-@include "Object.tz"
-@include "Stationary.tz"
-@include "Control.tz"
-@include "Mobile.tz"
-
+@use Object.
+@use Stationary.
+@use Control.
+@use Mobile.
 
 Controller Swarm.
 
@@ -85,8 +84,7 @@ Control : Swarm {
 		self set-background-texture-image to cloudTexture.
 
 		# Add a huge floor.
-		floor = new Stationary.
-		floor register with-shape (new Shape init-with-cube size (100, 2, 100)) at-location (0, -5, 0).
+		floor = new Floor.
 		floor catch-shadows.
 
 		# Create the birds and feeders.
@@ -278,7 +276,7 @@ Mobile : Birds {
 		}
 
 		energy = 0.5 + random[0.2].
-		self handle-collisions with-type "Stationary" with-method "land".
+		self handle-collisions with-type "Floor" with-method "land".
 		self handle-collisions with-type "Feeders" with-method "eat".
 		# self handle-collisions with-type "Birds" with-method "bump".
 		self set-neighborhood-size to 3.0.

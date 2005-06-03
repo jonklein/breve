@@ -267,8 +267,7 @@ Control : Swarm {
         randomBirdsAdded = MIN_BIRDS.
 
         # Create the floor.
-        floor = new Stationary.
-        floor register with-shape (new Cube init-with size (100, 2, 100)) at-location (0, -5, 0).
+        floor = new Floor.
         floor catch-shadows.
 
         # Initialize other variables.
@@ -607,7 +606,7 @@ Mobile : Corpse {
         landed (int).
     + to init:
         self set-shape to (controller get-corpseShape). 
-        self handle-collisions with-type "Stationary" with-method "land".
+        self handle-collisions with-type "Floor" with-method "land".
         self set-color to (0.2, 0.2, 0.2).
         age = 0.
         landed = 0.
@@ -679,7 +678,7 @@ Mobile : Bird (aka Birds) {
         shape = (new PolygonCone init-with radius .1 sides 5 height .2).
         self set-shape to shape.
 
-        self handle-collisions with-type "Stationary" with-method "land".
+        self handle-collisions with-type "Floor" with-method "land".
         self handle-collisions with-type "Feeders" with-method "eat".
         self handle-collisions with-type "Birds" with-method "bump".
         self set-neighborhood-size to NEIGHBORHOOD_SIZE.

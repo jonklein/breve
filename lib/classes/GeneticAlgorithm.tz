@@ -25,7 +25,9 @@ Object : GeneticAlgorithm {
 		mutationPercent (int).
 		migrationPercent (int).
 		generation (int).
+		generationLimit (int).
         seed (object).
+
         
 	+ to init:
 		testDuration = 20.
@@ -112,6 +114,18 @@ Object : GeneticAlgorithm {
 		% of OBJECT(GeneticAlgorithmIndividual).
 
 		individualClass = className.
+
+	+ to set-generation-limit to newLimit (int):
+		% Sets the generation limit to newLimit.  The simulation will end after
+		% newLimit generations have passed.  If newLimit is 0, then the 
+		% generation limit is disabled.
+
+		generationLimit = newLimit.
+
+	+ to get-generation-limit:
+		% Returns the generation limit.  See METHOD(get-generation-limit) for 
+		% details.
+		return generationLimit.
 
 	+ to iterate:
 		if | populations { 0 } | == 0: self generate-population.
@@ -207,6 +221,8 @@ Object : GeneticAlgorithm {
 
 		currentPopulation = !currentPopulation.
 		currentIndividual = 0.
+
+		if generationLimit && generation >= generationLimit: self end-simulation.
 
 		self prepare-for-generation number generation.
 
