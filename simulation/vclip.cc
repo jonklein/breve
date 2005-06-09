@@ -766,6 +766,7 @@ int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int x, int 
 	slShape *s2 = v->objects[y]->shape;
 
 	double maxDist;
+	slFeature *maxFeat;
    
 	f = (slFace*)*nf2;
 	e = (slEdge*)*nf1;
@@ -857,6 +858,8 @@ int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int x, int 
 		
 		slPositionVertex(ep, &start->vertex, &tStart);
 		slPositionVertex(ep, &end->vertex, &tEnd);
+
+		maxFeat = f->points[0];
 
 		for(n = 0; n < f->edgeCount ; n++ ) {
 			start = f->points[n];
