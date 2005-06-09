@@ -65,10 +65,7 @@ int brDataCopyVar(stVar *v, stInstance *src, stInstance *dst) {
 			stLoadVariable(&src->variables[v->offset], v->type->type, &load, &ri);
 			assign.type = AT_LIST;
 			BRLIST(&assign) = brEvalListCopy(BRLIST(&load));
-			stSetVariable(&dst->variables[v->offset], v->type->type, NULL, &assign, &ri);
-
-			brEvalListUnretain(BRLIST(&load));
-			brEvalListUnretain(BRLIST(&assign));
+			stSetVariable(&dst->variables[v->offset], AT_LIST, NULL, &assign, &ri);
 
 			break;
 

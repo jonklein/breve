@@ -86,7 +86,7 @@ void slVclipDataInit(slWorld *w) {
 	 
 			for(ji = link->outJoints.begin(); ji != link->outJoints.end(); ji++ ) {
 				slPairFlags *flags;
-				slLink *link2 = (*ji)->child;
+				slLink *link2 = (*ji)->_child;
 
 				flags = slVclipPairFlags(w->clipData, link->clipNumber, link2->clipNumber);
 
@@ -99,7 +99,7 @@ void slVclipDataInit(slWorld *w) {
 
 	if (w->detectCollisions) {
 		slInitBoundSort(w->clipData);
-		slVclip(w->clipData, 0.0, 0, w->boundingBoxOnly);
+		w->clipData->clip(0.0, 0, w->boundingBoxOnly);
 	}
 }
 

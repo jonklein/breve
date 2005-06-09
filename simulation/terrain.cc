@@ -215,13 +215,13 @@ void slTerrain::updateBoundingBox() {
 void slTerrain::generateFractalTerrain(double h, double height) {
 	float ratio;
 	int x, y, jump;
-	int oddline;
+	int oddline, newside;
 	float scale;
 
 	// matrix should be square, and each side should be 2^n + 1 
 
-	side = slNextPowerOfTwo(side);
-	resize(side);
+	newside = slNextPowerOfTwo(side);
+	resize(newside);
 
 	jump = side / 2;
 	ratio = pow(2.0, -h);

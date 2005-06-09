@@ -261,6 +261,7 @@ slPatch* slPatchGrid::getPatchAtLocation(slVector *location) {
 
 void slPatchGrid::assignObjectsToPatches(slWorld *w) {
 	int x, y, z;
+	unsigned int ob;
 	std::vector< slWorldObject* >::iterator wo;
 
 	slVclipData *vc = w->clipData;
@@ -292,8 +293,6 @@ void slPatchGrid::assignObjectsToPatches(slWorld *w) {
 
 					slPairFlags flags = slVclipPairFlagValue(vc, x, y);
 
-				    slCollisionCandidate c;
-
 				    if(flags & BT_UNKNOWN) {
 				        // the UNKNOWN flag indicates that we have not yet preformed a callback to
 				        // determine whether further collision detection is necessary.
@@ -302,32 +301,7 @@ void slPatchGrid::assignObjectsToPatches(slWorld *w) {
 				    }
 
 				    if(flags & BT_CHECK) {
-						slWorldObject *w2;
-
-    					c.x = x;
-					    c.y = y;
-
-					    c.f1 = NULL;
-					    c.f2 = NULL;
-
-					    w1 = vc->objects[x];
-					    w2 = vc->objects[y];
-
-					    if(!w1 || !w2) return;
-
-					    c.s1 = w1->shape;
-					    c.s2 = w2->shape;
-
-					    c.p1 = &w1->position;
-					    c.p2 = &w2->position;
-
-					    if(vc->objects.size() != 0) {
-					        if(w1->shape && w1->shape->_type == ST_NORMAL)
-					            c.f1 = w1->shape->features[0];
-
-					        if(w2->shape && w2->shape->_type == ST_NORMAL)
-					            c.f2 = w2->shape->features[0];
-					    }
+				    	slCollisionCandidate c( vc, x, y);
 
 						if(vc->testPair(&c, ce) == CT_PENETRATE) ce = slNextCollision(vc);
 					}

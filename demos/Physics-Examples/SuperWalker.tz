@@ -36,10 +36,9 @@ PhysicalControl : Walker {
 
 		locked (int).
 
-		lockMenu, symMenu (object).
+		lockMenu (object).
 
 	+ to init:
-		floorShape (object).
 		floor (object).
 		number (int).
 		item (object).

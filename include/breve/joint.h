@@ -34,39 +34,79 @@ class slLink;
 	\brief A joint connecting two links.
 */
 
-struct slJoint {
-	slLink *parent;
-	slLink *child;
-	dJointID odeJointID;
-	dJointID odeMotorID;
+class slJoint {
+	public:
+		~slJoint();
+	
+		/*!
+		 * Updates the link points and relative rotation between two joined objects.
+		 */
 
-	double kDamp;
-	double kSpring;
-	double sMax;
-	double sMin;
-	double torque;
-	double targetSpeed;
+		void setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3]);
 
-	unsigned char type;
-	unsigned char isMbJoint;
+		/*!
+		 * Sets the normal vector of a prismatic or revolute joint.
+		 */
 
-	void *userData;
+		void setNormal(slVector *normal);
+
+		/*!
+		 * Sets the min and max limits of the joint.  Depending on the joint 
+		 * type, these may be 1, 2 or 3 values.
+		 */
+
+		void setLimits(slVector *min, slVector *max);
+
+		/*!
+		 * Gets the velocity of the joint.  Depending on the joint type, this may be 1, 2 or 3 values.
+		 */
+
+		void getVelocity(slVector *velocity);
+
+		/*!
+		 * Sets the velocity of the joint.  Depending on the joint type, this may be 1, 2 or 3 values.
+		 */
+
+		void setVelocity(slVector *velocity);
+
+		/*!
+		 * Gets the position of the joint.  Depending on the joint type, this may be 1, 2 or 3 values.
+		 */
+
+		void getPosition(slVector *v);
+
+		/*
+		 * Sets the maximum torque for this joint.  Depending on the joint type, this may be 1, 2 or 3 values.
+		 */
+
+		void setMaxTorque(double max);
+
+		/* 
+		 * Breaks (but does not destroy) the joint.
+		 */
+
+		void breakJoint();
+
+		/*
+		 * Applies torque to the joint.  Depending on the joint type, this may be 1, 2 or 3 values.
+		 */
+	
+		void applyTorque(slVector *torque);
+
+		slLink *_parent;
+		slLink *_child;
+		dJointID _odeJointID;
+		dJointID _odeMotorID;
+
+		double _kDamp;
+		double _kSpring;
+		double _sMax;
+		double _sMin;
+		double _torque;
+		double _targetSpeed;
+	
+		unsigned char _type;
+		unsigned char _isMbJoint;
+	
+		void *userData;
 };
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-void slJointGetVelocity(slJoint *m, slVector *v);
-void slJointSetVelocity(slJoint *j, slVector *speed);
-void slJointGetPosition(slJoint *m, slVector *v);
-int slJointSetNormal(slJoint *joint, slVector *normal);
-int slJointSetLinkPoints(slJoint *joint, slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3]);
-void slJointSetMaxTorque(slJoint *joint, double max);
-void slJointSetLimits(slJoint *joint, slVector *min, slVector *max);
-void slJointBreak(slJoint *joint);
-void slJointFree(slJoint *joint);
-void slJointApplyTorque(slJoint *j, slVector *torque);
-
-#ifdef __cplusplus
-}
-#endif

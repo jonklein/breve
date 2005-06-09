@@ -86,7 +86,7 @@ slMovie *slMovieCreate(char *filename, int width, int height) {
 		return NULL;
 	}
 
-#if FFMPEG_VERSION_INT <= 0x408
+#if FFMPEG_VERSION_INT <= 0x409
 	c->pix_fmt = PIX_FMT_YUV420P;
 #else
 	c->pix_fmt = codec->pix_fmts[0];
@@ -115,10 +115,10 @@ slMovie *slMovieCreate(char *filename, int width, int height) {
 
 	/* Give the muxer the magic numbers. */
 
-	m->context->max_delay = (int)(0.7 * AV_TIME_BASE);
-	m->context->mux_rate = 1411200;
-	m->context->packet_size = 2324;
-	m->context->preload = (int)(0.44 * AV_TIME_BASE);
+	// m->context->max_delay = (int)(0.7 * AV_TIME_BASE);
+	// m->context->mux_rate = 1411200;
+	// m->context->packet_size = 2324;
+	// m->context->preload = (int)(0.44 * AV_TIME_BASE);
 #endif
 
 	if (av_set_parameters(m->context, NULL) < 0 ||

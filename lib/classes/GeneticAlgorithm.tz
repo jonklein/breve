@@ -222,7 +222,7 @@ Object : GeneticAlgorithm {
 		currentPopulation = !currentPopulation.
 		currentIndividual = 0.
 
-		if generationLimit && generation >= generationLimit: self end-simulation.
+		if generationLimit && generation >= generationLimit: controller end-simulation.
 
 		self prepare-for-generation number generation.
 

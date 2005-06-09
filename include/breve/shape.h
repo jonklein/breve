@@ -258,26 +258,13 @@ class slSphere : public slShape {
 
 class slMeshShape : public slSphere {
 	public:
-		slMeshShape(char *filename, char *name) : slSphere(1, 1) {
-#ifdef HAVE_LIB3DS
-			_mesh = new slMesh(filename, name);
+		slMeshShape(char *filename, char *name);
 
-			// get the new radius, and force the mass to update
-
-			_radius = _mesh->maxReach();
-			setDensity(1.0);
-#else 
-			throw "this software was compiled without lib3ds mesh support";
-#endif
-		}
-
-#ifdef HAVE_LIB3DS
-		~slMeshShape() {
-			delete _mesh;
-		}
+		~slMeshShape();
 	
 		void draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags);
 
+#ifdef HAVE_LIB3DS
 		slMesh *_mesh;
 #endif
 };

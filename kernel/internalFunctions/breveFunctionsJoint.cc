@@ -46,7 +46,7 @@ int brIJointApplyTorque(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slJointApplyTorque(j, &BRVECTOR(&args[1]));
+	j->applyTorque(&BRVECTOR(&args[1]));
 
 	return EC_OK;
 }
@@ -102,7 +102,7 @@ int brIJointSetNormal(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slJointSetNormal(j, n);
+	j->setNormal(n);
 
 	return EC_OK;
 }
@@ -119,13 +119,9 @@ int brIJointSetLinkPoints(brEval args[], brEval *target, brInstance *i) {
 	slVector *n2 = &BRVECTOR(&args[2]);
 	double rot[3][3];
 
-	if (!j) {
-		slMessage(DEBUG_ALL, "jointSetLinkPoints called with uninitialized joint\n");
-		return EC_ERROR;
-	}
 
 	slMatrixCopy(BRMATRIX(&args[3]), rot);
-	slJointSetLinkPoints(j, n1, n2, rot);
+	j->setLinkPoints(n1, n2, rot);
 
 	return EC_OK;
 }
@@ -252,11 +248,6 @@ int brJointILinkStatic(brEval args[], brEval *target, brInstance *i) {
 	slVector *cpoint = &BRVECTOR(&args[4]);
 	slJoint *joint;
 
-	if (!child) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to jointLinkStatic\n");
-		return EC_ERROR;
-	}
- 
 	if (!(joint = slLinkLinks(i->engine->world, parent, child, JT_FIX, normal, ppoint, cpoint, BRMATRIX(&args[5])))) {
 		slMessage(DEBUG_ALL, "error creating joint: jointLinkStatic failed\n");
 		return EC_ERROR;
@@ -279,13 +270,8 @@ int brJointILinkStatic(brEval args[], brEval *target, brInstance *i) {
 int brIJointBreak(brEval args[], brEval *target, brInstance *i) {
 	slJoint *joint = BRJOINTPOINTER(&args[0]);
 
-	if (!joint) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to breakJoint\n");
-		return EC_ERROR;
-	}
+	delete joint;
 
-	slJointBreak(joint);
-	slJointFree(joint);
 	slWorldSetUninitialized(i->engine->world);
 
 	return EC_OK;
@@ -302,12 +288,7 @@ int brIJointBreak(brEval args[], brEval *target, brInstance *i) {
 int brIJointGetPosition(brEval args[], brEval *target, brInstance *i) {
 	slJoint *j = BRJOINTPOINTER(&args[0]);
 
-	if (!j) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to getJointPosition\n");
-		return EC_ERROR;
-	}
-
-	slJointGetPosition(j, &BRVECTOR(target));
+	j->getPosition(&BRVECTOR(target));
 
 	return EC_OK;
 }
@@ -325,10 +306,7 @@ int brIJointSetVelocity(brEval args[], brEval *target, brInstance *i) {
 	slJoint *j = BRJOINTPOINTER(&args[0]);
 	slVector *velocity = &BRVECTOR(&args[1]);
 
-	if (!j)
-		return EC_OK;
-
-	slJointSetVelocity(j, velocity);
+	j->setVelocity(velocity);
 
 	return EC_OK;
 }
@@ -345,12 +323,7 @@ int brIJointSetVelocity(brEval args[], brEval *target, brInstance *i) {
 int brIJointGetVelocity(brEval args[], brEval *target, brInstance *i) {
 	slJoint *j = BRJOINTPOINTER(&args[0]);
 
-	if (!j) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to getJointVelocity\n");
-		return EC_ERROR;
-	}
-
-	slJointGetVelocity(j, &BRVECTOR(target));
+	j->getVelocity(&BRVECTOR(target));
 
 	return EC_OK;
 }
@@ -370,7 +343,7 @@ int brIJointSetDamping(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	j->kDamp = value;
+	j->_kDamp = value;
 
 	return EC_OK;
 }
@@ -387,14 +360,9 @@ int brIJointSetSpring(brEval args[], brEval *target, brInstance *i) {
 	double min = BRDOUBLE(&args[2]);
 	double max = BRDOUBLE(&args[3]);
 
-	if (!j) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to jointSetSpring\n");
-		return EC_ERROR;
-	}
-
-	j->kSpring = strength;
-	j->sMin = min;
-	j->sMax = max;
+	j->_kSpring = strength;
+	j->_sMin = min;
+	j->_sMax = max;
 
 	return EC_OK;
 }
@@ -413,12 +381,7 @@ int brIJointSetLimits(brEval args[], brEval *target, brInstance *i) {
 	slVector *min = &BRVECTOR(&args[1]);
 	slVector *max = &BRVECTOR(&args[2]);
 
-	if (!j) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to jointSetLimits\n");
-		return EC_ERROR;
-	}
-
-	slJointSetLimits(j, min, max);
+	j->setLimits(min, max);
 
 	return EC_OK;
 }
@@ -433,7 +396,7 @@ int brIJointSetMaxStrength(brEval args[], brEval *target, brInstance *i) {
 	slJoint *j = BRJOINTPOINTER(&args[0]);
 	double strength = BRDOUBLE(&args[1]);
 	
-	slJointSetMaxTorque(j, strength);
+	j->setMaxTorque(strength);
 
 	return EC_OK;
 }

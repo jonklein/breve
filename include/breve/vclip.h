@@ -78,30 +78,6 @@ struct slBoundSort {
 #include <vector>
 #include <map>
 
-class slCollisionCandidate {
-	public:
-		slCollisionCandidate() { f1 = NULL; f2 = NULL; };
-
-		slCollisionCandidate(int i1, int i2) {
-			if(i1 < i2) { x = i1; y = i2; }
-			else { x = i2; y = i1; }
-		}
-
-		slFeature *f1;
-		slFeature *f2;
-
-		slShape *s1;
-		slShape *s2;
-
-		slPosition *p1;
-		slPosition *p2;
-
-		unsigned int x;
-		unsigned int y;
-};
-
-typedef struct slCollisionCandidate slCollisionCandidate;
-
 /*!
 	\brief A record of a collision.
 
@@ -126,6 +102,16 @@ class slCollision {
 
 class slVclipData {
 	public:
+		/*!
+		 * Runs collision detection for all candidate pairs.
+		 */
+
+		int clip(double tolerance, int pruneOnly, int boundingBoxOnly);
+
+		/*!
+		 * Tests a single pair stored in a \ref slCollisionCandidate.
+		 */
+
 		int testPair(slCollisionCandidate *e, slCollision *ce);
 
 		slWorld *world;
@@ -144,6 +130,41 @@ class slVclipData {
 
 		unsigned int count;
 		unsigned int maxCount;
+};
+
+class slCollisionCandidate {
+	public:
+		slCollisionCandidate() {};
+
+		slCollisionCandidate(slVclipData *vc, int o1, int o2) {
+			slWorldObject *w1, *w2;
+
+			_x = o1; _y = o2;
+
+			w1 = vc->objects[_x];
+			w2 = vc->objects[_y];
+
+			_position1 = &w1->position;	
+			_position2 = &w2->position;	
+
+			_shape1 = w1->shape;
+			_shape2 = w2->shape;
+
+			if(_shape1 && _shape1->_type == ST_NORMAL) _feature1 = _shape1->features[0];
+			if(_shape2 && _shape2->_type == ST_NORMAL) _feature2 = _shape2->features[0];
+		}
+
+		slFeature *_feature1;
+		slFeature *_feature2;
+
+		slShape *_shape1;
+		slShape *_shape2;
+
+		slPosition *_position1;
+		slPosition *_position2;
+
+		unsigned int _x;
+		unsigned int _y;
 };
 
 slCollision *slNextCollision(slVclipData *v);

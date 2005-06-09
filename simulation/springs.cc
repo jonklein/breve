@@ -68,9 +68,7 @@ void slSpring::step(double step) {
 
 	slPositionVertex(&_src->position, &_point1, &pos1);
 	slPositionVertex(&_dst->position, &_point2, &pos2);
-
 	slVectorSub(&pos1, &pos2, &toV1);
-
 	distance = slVectorLength(&toV1);
 
 	////////////////////////////////////////////////

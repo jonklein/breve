@@ -144,6 +144,7 @@ Abstract : Joint (aka Joints) [version 2.0] {
 		% involved are in contact with other bodies at the time of the change.
 
 		relativeRotation = newRotation.
+		jointSetLinkPoints(jointPointer, plinkPoint, clinkPoint, relativeRotation).
 
 	+ to set-relative-rotation around-axis theAxis (vector) by theAngle (float):
 		% This method must be called <b>before</b> linking the joint.
@@ -161,6 +162,7 @@ Abstract : Joint (aka Joints) [version 2.0] {
 		% involved are in contact with other bodies at the time of the change.
 
 		relativeRotation = rotationMatrix(theAxis, theAngle).
+		jointSetLinkPoints(jointPointer, plinkPoint, clinkPoint, relativeRotation).
 
 	+ to set-child-link-point to linkPoint (vector):
 		% Dynamically sets the child's link point for this joint.  This method can
@@ -170,7 +172,7 @@ Abstract : Joint (aka Joints) [version 2.0] {
 		% If the Joint is not linked, this call has no effect.
 
 		clinkPoint = linkPoint.
-		if jointPointer: jointSetLinkPoints(jointPointer, plinkPoint, linkPoint, relativeRotation).
+		jointSetLinkPoints(jointPointer, plinkPoint, clinkPoint, relativeRotation).
 
 	+ to set-parent-link-point to linkPoint (vector):
 		% Dynamically sets the parent's link point for this joint.  This method can
@@ -180,7 +182,7 @@ Abstract : Joint (aka Joints) [version 2.0] {
 		% If the Joint is not linked, this call has no effect.
 
 		plinkPoint = linkPoint.
-		if jointPointer: jointSetLinkPoints(jointPointer, linkPoint, clinkPoint, relativeRotation).
+		jointSetLinkPoints(jointPointer, plinkPoint, clinkPoint, relativeRotation).
 
 	+ to set-joint-normal to normalVector (vector):
 		% If this type of joint supports it (OBJECT(PrismaticJoint) and OBJECT(RevoluteJoint)), 

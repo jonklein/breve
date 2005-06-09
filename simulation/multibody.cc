@@ -69,7 +69,7 @@ void slMultibody::initCollisionFlags(slVclipData *cd) {
 		std::vector<slJoint*>::iterator ji;
 
 		for(ji = link1->outJoints.begin(); ji != link1->outJoints.end(); ji++) {
-			link2 = (*ji)->child;
+			link2 = (*ji)->_child;
 
 			if(link1 != link2) {
 				flags = slVclipPairFlags(cd, link1->clipNumber, link2->clipNumber);
@@ -282,8 +282,8 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 			for(ji = root->inJoints.begin(); ji != root->inJoints.end(); ji++ ) {
 				joint = *ji;
 
-				if(joint->parent && joint->parent->multibody == root->multibody) {
-					joint->isMbJoint = 1;
+				if(joint->_parent && joint->_parent->multibody == root->multibody) {
+					joint->_isMbJoint = 1;
 					return link->multibody;
 				}
 			}
@@ -291,8 +291,8 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 			for(ji = root->outJoints.begin(); ji != root->outJoints.end(); ji++ ) {
 				joint = *ji;
 
-				if(joint->child->multibody == root->multibody) {
-					joint->isMbJoint = 1;
+				if(joint->_child->multibody == root->multibody) {
+					joint->_isMbJoint = 1;
 					return link->multibody;
 				}
 			}
@@ -314,13 +314,13 @@ void slLinkList(slLink *root, std::vector<slLink*> *list, int mbOnly) {
 	list->push_back(root);
 
 	for(ji = root->outJoints.begin(); ji != root->outJoints.end(); ji++ ) {
-		if(!mbOnly || (*ji)->isMbJoint) 
-			slLinkList((*ji)->child, list, mbOnly);
+		if(!mbOnly || (*ji)->_isMbJoint) 
+			slLinkList((*ji)->_child, list, mbOnly);
 	}
 
 	for(ji = root->inJoints.begin(); ji != root->inJoints.end(); ji++ ) {
-		if(!mbOnly || (*ji)->isMbJoint) 
-			slLinkList((*ji)->parent, list, mbOnly);
+		if(!mbOnly || (*ji)->_isMbJoint) 
+			slLinkList((*ji)->_parent, list, mbOnly);
 	}
 }
 
@@ -420,10 +420,7 @@ int slMultibody::checkSelfPenetration() {
 			slLink *link2 = *i2;
 
 			if(link1 != link2) {
-				slCollisionCandidate c;
-
-				c.x = link1->clipNumber;
-				c.y = link2->clipNumber;
+				slCollisionCandidate c( vc, link1->clipNumber, link2->clipNumber);
 
 				flags = slVclipPairFlags(vc, link1->clipNumber, link2->clipNumber);
 

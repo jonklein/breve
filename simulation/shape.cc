@@ -90,7 +90,9 @@ slSphere::slSphere(double radius, double density) : slShape() {
         
 	_density = density;
 
-	if(radius <= 0.0 || density <= 0.0) throw slException(std::string("invalid parameters for new sphere object"));
+	if(radius <= 0.0) throw slException(std::string("invalid size for new sphere (density <= 0.0)"));
+
+	if(density <= 0.0) throw slException(std::string("invalid density for new sphere (radius <= 0.0)"));
 
 	slVectorSet(&_max, _radius, _radius, _radius);
 
@@ -109,7 +111,9 @@ slSphere::slSphere(double radius, double density) : slShape() {
 slShape *slNewCube(slVector *size, double density) {
 	slShape *s;
 
-	if(density < 0.0 || slVectorLength(size) <= 0.0) return NULL;
+	if(density < 0.0) throw slException(std::string("invalid density for new cube (density <= 0.0)"));
+
+	if(size->x <= 0.0 || size->y <= 0.0 || size->z <= 0) throw slException(std::string("invalid size for new sphere (side <= 0.0)"));
 
 	s = new slShape();
 
@@ -1207,8 +1211,28 @@ double slShape::getDensity() {
 	return _density;
 }
 
+slMeshShape::slMeshShape(char *filename, char *name) : slSphere(1, 1) {
+#ifdef HAVE_LIB3DS
+            _mesh = new slMesh(filename, name);
+        
+            // get the new radius, and force the mass to update
+
+            _radius = _mesh->maxReach();
+            setDensity(1.0);
+#else   
+            throw "this software was compiled without lib3ds mesh support";
+#endif  
+}
+
+
+slMeshShape::~slMeshShape() {
 #ifdef _HAVE_LIB3DS
+	delete _mesh;
+#endif
+}
+
 void slMeshShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags) {
+#ifdef _HAVE_LIB3DS
 	float scale[4] = { 1.0/textureScale, 1.0/textureScale, 1.0/textureScale, 1.0/textureScale };
 
 	glPushMatrix();
@@ -1239,8 +1263,8 @@ void slMeshShape::draw(slCamera *c, slPosition *pos, double textureScale, int mo
 	glDisable(GL_TEXTURE_GEN_T);
 
 	glPopMatrix();
-}
 #endif
+}
 
 slVector *slPositionVertex(slPosition *p, slVector *v, slVector *o) {
 	slVectorXform(p->rotation, v, o);

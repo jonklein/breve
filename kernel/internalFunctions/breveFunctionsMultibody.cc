@@ -192,7 +192,9 @@ int brIMultibodyRotateRelative(brEval args[], brEval *target, brInstance *i) {
 int brIMultibodySetHandleSelfCollisions(brEval args[], brEval *target, brInstance *i) { 
 	slMultibody *m = BRMULTIBODYPOINTER(&args[0]);
 
-	if (m) m->setHandleSelfCollisions(BRINT(&args[1]));
+	m->setHandleSelfCollisions(BRINT(&args[1]));
+
+	m->initCollisionFlags(i->engine->world->clipData);
    
 	return EC_OK;
 }

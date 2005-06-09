@@ -72,7 +72,10 @@ struct brEval {
 	} values;
 
 	unsigned char type;
+
+	bool operator<(brEval*);
 };
+
 
 #define BRINT(e)		((e)->values.intValue)
 #define BRFLOAT(e)		((e)->values.doubleValue)

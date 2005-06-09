@@ -18,6 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#include "world.h"
+#include "camera.h"
+
 unsigned char *slReadSGIImage(char *name, int *width, int *height, int *components, int usealpha);
 unsigned char *slReadJPEGImage(char *name, int *width, int *height, int *components, int usealpha);
 unsigned char *slReadPNGImage(char *name, int *width, int *height, int *components, int usealpha);

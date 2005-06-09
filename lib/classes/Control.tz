@@ -439,9 +439,8 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		watchObject = theObject.
 
-	+ to aim-camera at location (vector):
-		% To be replaced by METHOD(set-camera-target), which has a better
-		% name.
+	- to aim-camera at location (vector):
+		% Depricated.
 
 		self set-camera-target to location.
 
@@ -451,9 +450,8 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		cameraSetTarget(location).
 
-	+ to offset-camera by amount (vector):
-		% To be replaced by METHOD(set-camera-offset), which has a 
-		% better name.
+	- to offset-camera by amount (vector):
+		% Depricated.  
 
 		self set-camera-offset to amount.
 
@@ -512,16 +510,18 @@ Abstract : Control (aka Controls) [version 2.3] {
 		deltaOffset = (amount - (self get-camera-offset)) / stepCount.
 		offsetting = stepCount + 1.
 
-	+ to point-camera at location (vector) from offset (vector):
-		% Points the camera at vector location and positions it at
-		% vector offset (relative to location).  Same as calling 
-		% aim-camera and offset-camera.
+	+ to point-camera at location (vector) from offset = (0, 0, 0) (vector):
+		% Points the camera at the vector location.  The optional
+		% argument offset specifies the offset of the camera relative
+		% to the location target.
 
 		camTarget = location.
-		camOffset = offset.
- 
 		self set-camera-target to location.
-		self set-camera-offset to offset.
+
+		if | offset | != 0.0: {
+			camOffset = offset.
+			self set-camera-offset to offset.
+		} 
 
 	+ to pivot-camera x dx (float) y dy (float):
 		% Rotates the camera (from it's current position) on the x-axis by dx and on the y-axis by dy.

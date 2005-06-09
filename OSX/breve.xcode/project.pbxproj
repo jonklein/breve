@@ -36,7 +36,6 @@
 		1058C7A6FEA54F5311CA2CBB = {
 			children = (
 				48E1722307AAAF370072492B,
-				4862155C07944AB9009195E5,
 				48620C9107944552009195E5,
 				F5BD20F30397BFE301980AE4,
 				F5BD21540397C2DA01980AE4,
@@ -790,7 +789,6 @@
 				48619FB8071475A500E0A1B6,
 				48619FB9071475A500E0A1B6,
 				48620C9207944552009195E5,
-				4862155D07944AB9009195E5,
 				48E1722407AAAF370072492B,
 			);
 			isa = PBXFrameworksBuildPhase;
@@ -837,7 +835,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# This is a shell script that attempts to complete the entire\n# breve build process for Mac OS X, including the configure\n# step, the building of the breve libraries, and the building \n# of the final breve.app with the proper external libraries.\n\n### first do the configure, if neccessary\n\nif [ ! -f \"ConfigureLibraryList\" ]; then\n\techo \"ConfigureLibraryList not found!  Running configure...\"\n\t(cd ..; ./configure)\nfi\n\n### now build the breve engine libraries\n\n(cd ..; make lib/libbreve.a)\n\n### use the libraries provided by \"configure\" to build the \n### OS X application using xcodebuild\n\nexport LIBS=`cat ConfigureLibraryList`\n\nxcodebuild -activebuildstyle -target real_breve.app";
+			shellScript = "# This is a shell script that attempts to complete the entire\n# breve build process for Mac OS X, including the configure\n# step, the building of the breve libraries, and the building \n# of the final breve.app with the proper external libraries.\n\n### first do the configure, if neccessary\n\nif [ ! -f \"ConfigureLibraryList\" ]; then\n\techo \"ConfigureLibraryList not found!  Running configure...\"\n\t(cd ..; ./configure)\nfi\n\n### now build the breve engine libraries\n\n(cd ..; make lib/libbreve.a)\n\n### use the libraries provided by \"configure\" to build the \n### OS X application using xcodebuild\n\n### The ncurses library is required for command-line breve, but not \n### the OSX build.  Unforunately, it also breaks backwards compatabilty \n### for the OSX build, so we have to remove it from the library list\n\nexport LIBS=`cat ConfigureLibraryList | sed 's/-lncurses//' | sed 's/-ltermcap//'`\n\nxcodebuild -activebuildstyle -target real_breve.app";
 		};
 		480F31AA071472AD00E71420 = {
 			buildPhases = (
@@ -922,20 +920,6 @@
 		};
 		48620C9207944552009195E5 = {
 			fileRef = 48620C9107944552009195E5;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		4862155C07944AB9009195E5 = {
-			isa = PBXFileReference;
-			lastKnownFileType = archive.ar;
-			name = "libstdc++.a";
-			path = "/usr/lib/libstdc++.a";
-			refType = 0;
-			sourceTree = "<absolute>";
-		};
-		4862155D07944AB9009195E5 = {
-			fileRef = 4862155C07944AB9009195E5;
 			isa = PBXBuildFile;
 			settings = {
 			};

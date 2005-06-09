@@ -395,7 +395,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 			result = 0;
 		} else {
 			slVclipPruneAndSweep(w->clipData);
-			result = slVclip(w->clipData, 0.0, 0, w->boundingBoxOnly);
+			result = w->clipData->clip(0.0, 0, w->boundingBoxOnly);
 		}
 
 		if(result == -1) {
@@ -412,7 +412,6 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 			slWorldObject *w2;
 			slPairFlags *flags;
 			unsigned int x;
-			const dReal *r;
 
 			w1 = w->objects[c->n1];
 			w2 = w->objects[c->n2];
@@ -456,8 +455,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 					if(c->depths[x] < -0.25) {
 						// this is a scenerio we might want to look at... it may indicate 
 						// problems with the collision detection code.
-
-						slDebug("warning: point depth = %f for pair (%d, %d) -- cheating\n", c->depths[x], c->n1, c->n2);
+						// slDebug("warning: point depth = %f for pair (%d, %d) -- cheating\n", c->depths[x], c->n1, c->n2);
 					}
 
 					contact.geom.depth = -c->depths[x];
@@ -497,18 +495,6 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 		if(gPhysicsError) (*error)++;
 	}
 
-	int cn;
-
-	for(cn = 0; cn < w->clipData->collisionCount; cn++ ) {
-		slCollision *c = &w->clipData->collisions[ cn];
-		slWorldObject *w1;
-		slWorldObject *w2;
-		const dReal *r;
-
-		w1 = w->objects[c->n1];
-		w2 = w->objects[c->n2];
-	}
-
 	return stepSize;
 }
 
@@ -525,7 +511,7 @@ void slNeighborCheck(slWorld *w) {
 		slVclipDataRealloc(w->proximityData, w->objects.size());
 		slInitProximityData(w);
 		slInitBoundSort(w->proximityData);
-		slVclip(w->proximityData, 0.0, 1, 0);
+		w->proximityData->clip(0.0, 1, 0);
 	}
 
 	// update all the bounding boxes first 
@@ -553,8 +539,8 @@ void slNeighborCheck(slWorld *w) {
 		ci != w->proximityData->candidates.end(); ci++) {
 		slCollisionCandidate c = ci->second;
 
-		o1 = w->objects[c.x];
-		o2 = w->objects[c.y];
+		o1 = w->objects[c._x];
+		o2 = w->objects[c._y];
 
 		slVectorSub(&o1->position.location, &o2->position.location, &diff);
 		dist = slVectorLength(&diff);

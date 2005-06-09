@@ -18,6 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _TERRAIN_H
+#define _TERRAIN_H
+
 /*!
 	\brief Serialized \ref slTerrain data.
 */
@@ -137,3 +140,5 @@ void slTerrainGetSlope(slTerrain *t, double x1, double z1, double x2, double z2,
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* _TERRAIN_H */

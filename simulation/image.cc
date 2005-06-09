@@ -21,8 +21,15 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <string.h>
+#include <errno.h>
 
 #include "simulation.h"
+
+// #include "util.h"
+// #include "world.h"
+// #include "camera.h"
+// #include "image.h"
+// #include "glIncludes.h"
 
 #if HAVE_LIBPNG
 #include <png.h>

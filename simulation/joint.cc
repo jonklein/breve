@@ -5,41 +5,37 @@
 	\brief Applies a torque to a revolute joint.
 */
 
-void slJointApplyTorque(slJoint *j, slVector *torque) {
+void slJoint::applyTorque(slVector *torque) {
 	slVector t;
 	dVector3 axis;
 
-	dJointGetHingeAxis(j->odeJointID, axis);
+	dJointGetHingeAxis(_odeJointID, axis);
 
 	t.x = axis[0] * torque->x;
 	t.y = axis[1] * torque->x;
 	t.z = axis[2] * torque->x;
 
-	if(j->parent) dBodySetTorque(j->parent->_odeBodyID, t.x, t.y, t.z);
-   	if(j->child) dBodySetTorque(j->child->_odeBodyID, -t.x, -t.y, -t.z);
+	if(_parent) dBodySetTorque(_parent->_odeBodyID, t.x, t.y, t.z);
+   	if(_child) dBodySetTorque(_child->_odeBodyID, -t.x, -t.y, -t.z);
 }
 
-/*!
-	\brief Sets the normal vector of a prismatic or revolute joint.
-*/
+void slJoint::setNormal(slVector *normal) {
+	slVector tn;
 
-int slJointSetNormal(slJoint *joint, slVector *normal) {
-	if(joint->type == JT_REVOLUTE) {
-		dJointSetHingeAxis(joint->odeJointID, normal->x, normal->y, normal->z);
-	} else if(joint->type == JT_PRISMATIC) {
-		dJointSetSliderAxis(joint->odeJointID, normal->x, normal->y, normal->z);
+	// transform the normal to the parent's frame
+
+	if(_parent) slVectorXform(_parent->position.rotation, normal, &tn);
+	else slVectorCopy(normal, &tn);
+
+	if(_type == JT_REVOLUTE) {
+		dJointSetHingeAxis(_odeJointID, tn.x, tn.y, tn.z);
+	} else if(_type == JT_PRISMATIC) {
+		dJointSetSliderAxis(_odeJointID, tn.x, tn.y, tn.z);
 	}	
-
-	return 0;
 }
 
-/*!
-	\brief Frees an slJoint struct.
-*/
-
-void slJointFree(slJoint *joint) {
-	slJointBreak(joint);
-	delete joint;
+slJoint::~slJoint() {
+	breakJoint();
 }
 
 /*!
@@ -48,35 +44,35 @@ void slJointFree(slJoint *joint) {
 	This triggers an automatic recomputation of multibodies.
 */
 
-void slJointBreak(slJoint *joint) {
-	slLink *parent = joint->parent, *child = joint->child;
+void slJoint::breakJoint() {
+	slLink *parent = _parent, *child = _child;
 	slMultibody *parentBody = NULL, *childBody, *newMb;
 	std::vector<slJoint*>::iterator ji;
 
 	if(!parent && !child) return;
 
-	childBody = joint->child->multibody;
+	childBody = _child->multibody;
 
 	if(parent) parentBody = parent->multibody;
 
 	if(parent) {
-		ji = std::find(parent->outJoints.begin(), parent->outJoints.end(), joint);
+		ji = std::find(parent->outJoints.begin(), parent->outJoints.end(), this);
 		if(ji != parent->outJoints.end()) parent->outJoints.erase(ji);
 	}
 
-	ji = std::find(child->inJoints.begin(), child->inJoints.end(), joint);
+	ji = std::find(child->inJoints.begin(), child->inJoints.end(), this);
 	if(ji != child->inJoints.end()) child->inJoints.erase(ji);
 
-	dJointAttach(joint->odeJointID, NULL, NULL);
-	dJointDestroy(joint->odeJointID);
+	dJointAttach(_odeJointID, NULL, NULL);
+	dJointDestroy(_odeJointID);
 
-	if(joint->odeMotorID) {
-		dJointAttach(joint->odeMotorID, NULL, NULL);
-		dJointDestroy(joint->odeMotorID);
+	if(_odeMotorID) {
+		dJointAttach(_odeMotorID, NULL, NULL);
+		dJointDestroy(_odeMotorID);
 	}
 
-	joint->child = NULL;
-	joint->parent = NULL;
+	_child = NULL;
+	_parent = NULL;
 
 	if(parentBody) parentBody->update();
 	if(childBody && childBody != parentBody) childBody->update();
@@ -96,27 +92,23 @@ void slJointBreak(slJoint *joint) {
 	}
 }
 
-/*!
-	\brief Gives the position of a joint, relative to its native position.
-*/
-
-void slJointGetPosition(slJoint *j, slVector *r) {
-	switch(j->type) {
+void slJoint::getPosition(slVector *r) {
+	switch(_type) {
 		case JT_REVOLUTE:
-			r->x = dJointGetHingeAngle(j->odeJointID);
+			r->x = dJointGetHingeAngle(_odeJointID);
 			r->y = 0;
 			r->z = 0;
 			break;
 		case JT_PRISMATIC:
-			r->x = dJointGetSliderPosition(j->odeJointID);
+			r->x = dJointGetSliderPosition(_odeJointID);
 			r->y = 0;
 			r->z = 0;
 			break;
 		case JT_BALL:
 		case JT_UNIVERSAL:
-			r->x = dJointGetAMotorAngle(j->odeMotorID, dParamVel);
-			r->y = dJointGetAMotorAngle(j->odeMotorID, dParamVel2);
-			r->z = dJointGetAMotorAngle(j->odeMotorID, dParamVel3);
+			r->x = dJointGetAMotorAngle(_odeMotorID, dParamVel);
+			r->y = dJointGetAMotorAngle(_odeMotorID, dParamVel2);
+			r->z = dJointGetAMotorAngle(_odeMotorID, dParamVel3);
 			break;
 		default:
 			break;
@@ -125,50 +117,36 @@ void slJointGetPosition(slJoint *j, slVector *r) {
 	return;
 }
 
-/*!
-	\brief Gets the joint velocity of a joint.
-
-	Returns the 1-DOF value for backwards compatability, but also
-	fills in the velocity vector.
-*/
-
-void slJointGetVelocity(slJoint *j, slVector *velocity) {
-	switch(j->type) {
+void slJoint::getVelocity(slVector *velocity) {
+	switch(_type) {
 		case JT_REVOLUTE:
-			velocity->x = dJointGetHingeAngleRate(j->odeJointID);
+			velocity->x = dJointGetHingeAngleRate(_odeJointID);
 			break;
 		case JT_PRISMATIC:
-			velocity->x = dJointGetSliderPositionRate(j->odeJointID);
+			velocity->x = dJointGetSliderPositionRate(_odeJointID);
 			break;
 		case JT_BALL:
-			velocity->z = dJointGetAMotorParam(j->odeMotorID, dParamVel3);
+			velocity->z = dJointGetAMotorParam(_odeMotorID, dParamVel3);
 		case JT_UNIVERSAL:
-			velocity->x = dJointGetAMotorParam(j->odeMotorID, dParamVel);
-			velocity->y = dJointGetAMotorParam(j->odeMotorID, dParamVel2);
+			velocity->x = dJointGetAMotorParam(_odeMotorID, dParamVel);
+			velocity->y = dJointGetAMotorParam(_odeMotorID, dParamVel2);
 			break;
 	}
 }
 
-/*!
-	\brief Sets the velocity of a joint.
+void slJoint::setVelocity(slVector *speed) {
+	_targetSpeed = speed->x;
 
-	The joint may be 1-, 2- or 3DOF, so only the relevant fields 
-	of the speed vector are used.
-*/
+	// if(j->_type == JT_REVOLUTE) dJointSetHingeParam (j->_odeJointID, dParamVel, speed->x);
+	// else if(j->_type == JT_PRISMATIC) dJointSetSliderParam (j->_odeJointID, dParamVel, speed->x);
 
-void slJointSetVelocity(slJoint *j, slVector *speed) {
-	j->targetSpeed = speed->x;
-
-	// if(j->type == JT_REVOLUTE) dJointSetHingeParam (j->odeJointID, dParamVel, speed->x);
-	// else if(j->type == JT_PRISMATIC) dJointSetSliderParam (j->odeJointID, dParamVel, speed->x);
-
-	if(j->type == JT_UNIVERSAL) {
-		dJointSetAMotorParam(j->odeMotorID, dParamVel, speed->x);
-		dJointSetAMotorParam(j->odeMotorID, dParamVel3, speed->y);
-	} else if(j->type == JT_BALL) {
-		dJointSetAMotorParam(j->odeMotorID, dParamVel, speed->x);
-		dJointSetAMotorParam(j->odeMotorID, dParamVel2, speed->y);
-		dJointSetAMotorParam(j->odeMotorID, dParamVel3, speed->z);
+	if(_type == JT_UNIVERSAL) {
+		dJointSetAMotorParam(_odeMotorID, dParamVel, speed->x);
+		dJointSetAMotorParam(_odeMotorID, dParamVel3, speed->y);
+	} else if(_type == JT_BALL) {
+		dJointSetAMotorParam(_odeMotorID, dParamVel, speed->x);
+		dJointSetAMotorParam(_odeMotorID, dParamVel2, speed->y);
+		dJointSetAMotorParam(_odeMotorID, dParamVel3, speed->z);
 	}
 }
 
@@ -180,39 +158,39 @@ void slJointSetVelocity(slJoint *j, slVector *speed) {
 	of the vectors are used.
 */
 
-void slJointSetLimits(slJoint *joint, slVector *min, slVector *max) {
-	switch(joint->type) {
+void slJoint::setLimits(slVector *min, slVector *max) {
+	switch(_type) {
 		case JT_PRISMATIC:	
-			dJointSetSliderParam(joint->odeJointID, dParamStopERP, .1);
-			dJointSetSliderParam(joint->odeJointID, dParamLoStop, min->x);
-			dJointSetSliderParam(joint->odeJointID, dParamHiStop, max->x);
+			dJointSetSliderParam(_odeJointID, dParamStopERP, .1);
+			dJointSetSliderParam(_odeJointID, dParamLoStop, min->x);
+			dJointSetSliderParam(_odeJointID, dParamHiStop, max->x);
 			break;
 		case JT_REVOLUTE:	
-			dJointSetHingeParam(joint->odeJointID, dParamStopERP, .1);
-			dJointSetHingeParam(joint->odeJointID, dParamLoStop, min->x);
-			dJointSetHingeParam(joint->odeJointID, dParamHiStop, max->x);
+			dJointSetHingeParam(_odeJointID, dParamStopERP, .1);
+			dJointSetHingeParam(_odeJointID, dParamLoStop, min->x);
+			dJointSetHingeParam(_odeJointID, dParamHiStop, max->x);
 			break;
 		case JT_BALL:	
 			if(max->y >= M_PI/2.0 - 0.001) max->y = M_PI/2.0 - 0.001;
 			if(min->y <= -M_PI/2.0 - 0.001) min->y = -M_PI/2.0 + 0.001;
 
-			dJointSetAMotorParam(joint->odeMotorID, dParamLoStop, min->x);
-			dJointSetAMotorParam(joint->odeMotorID, dParamLoStop2, min->y);
-			dJointSetAMotorParam(joint->odeMotorID, dParamLoStop3, min->z);
-			dJointSetAMotorParam(joint->odeMotorID, dParamStopERP, .1);
-			dJointSetAMotorParam(joint->odeMotorID, dParamStopERP2, .1);
-			dJointSetAMotorParam(joint->odeMotorID, dParamStopERP3, .1);
-			dJointSetAMotorParam(joint->odeMotorID, dParamHiStop, max->x);
-			dJointSetAMotorParam(joint->odeMotorID, dParamHiStop2, max->y);
-			dJointSetAMotorParam(joint->odeMotorID, dParamHiStop3, max->z);
+			dJointSetAMotorParam(_odeMotorID, dParamLoStop, min->x);
+			dJointSetAMotorParam(_odeMotorID, dParamLoStop2, min->y);
+			dJointSetAMotorParam(_odeMotorID, dParamLoStop3, min->z);
+			dJointSetAMotorParam(_odeMotorID, dParamStopERP, .1);
+			dJointSetAMotorParam(_odeMotorID, dParamStopERP2, .1);
+			dJointSetAMotorParam(_odeMotorID, dParamStopERP3, .1);
+			dJointSetAMotorParam(_odeMotorID, dParamHiStop, max->x);
+			dJointSetAMotorParam(_odeMotorID, dParamHiStop2, max->y);
+			dJointSetAMotorParam(_odeMotorID, dParamHiStop3, max->z);
 			break;
 		case JT_UNIVERSAL:
-			dJointSetAMotorParam(joint->odeMotorID, dParamLoStop, min->x);
-			dJointSetAMotorParam(joint->odeMotorID, dParamLoStop3, min->y);
-			dJointSetAMotorParam(joint->odeMotorID, dParamStopERP, .1);
-			dJointSetAMotorParam(joint->odeMotorID, dParamStopERP3, .1);
-			dJointSetAMotorParam(joint->odeMotorID, dParamHiStop, max->x);
-			dJointSetAMotorParam(joint->odeMotorID, dParamHiStop3, max->y);
+			dJointSetAMotorParam(_odeMotorID, dParamLoStop, min->x);
+			dJointSetAMotorParam(_odeMotorID, dParamLoStop3, min->y);
+			dJointSetAMotorParam(_odeMotorID, dParamStopERP, .1);
+			dJointSetAMotorParam(_odeMotorID, dParamStopERP3, .1);
+			dJointSetAMotorParam(_odeMotorID, dParamHiStop, max->x);
+			dJointSetAMotorParam(_odeMotorID, dParamHiStop3, max->y);
 			break;
 	}
 }
@@ -221,22 +199,22 @@ void slJointSetLimits(slJoint *joint, slVector *min, slVector *max) {
 	\brief Set the maximum torque that a joint can affect.
 */
 
-void slJointSetMaxTorque(slJoint *joint, double max) {
-	switch(joint->type) {
+void slJoint::setMaxTorque(double max) {
+	switch(_type) {
 		case JT_REVOLUTE:
-			dJointSetHingeParam(joint->odeJointID, dParamFMax, max);
+			dJointSetHingeParam(_odeJointID, dParamFMax, max);
 			break;
 		case JT_PRISMATIC:
-			dJointSetSliderParam(joint->odeJointID, dParamFMax, max);
+			dJointSetSliderParam(_odeJointID, dParamFMax, max);
 			break;
 		case JT_UNIVERSAL:
-			dJointSetAMotorParam(joint->odeMotorID, dParamFMax, max);
-			dJointSetAMotorParam(joint->odeMotorID, dParamFMax3, max);
+			dJointSetAMotorParam(_odeMotorID, dParamFMax, max);
+			dJointSetAMotorParam(_odeMotorID, dParamFMax3, max);
 			break;
 		case JT_BALL:
-			dJointSetAMotorParam(joint->odeMotorID, dParamFMax, max);
-			dJointSetAMotorParam(joint->odeMotorID, dParamFMax2, max);
-			dJointSetAMotorParam(joint->odeMotorID, dParamFMax3, max);
+			dJointSetAMotorParam(_odeMotorID, dParamFMax, max);
+			dJointSetAMotorParam(_odeMotorID, dParamFMax2, max);
+			dJointSetAMotorParam(_odeMotorID, dParamFMax3, max);
 			break;
 	}
 }
@@ -245,70 +223,71 @@ void slJointSetMaxTorque(slJoint *joint, double max) {
 	\brief Modifies the link points of a joint.
 */
 
-int slJointSetLinkPoints(slJoint *joint, slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3]) {
+void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3]) {
 	const double *childR;
 	dReal idealR[16];
 	dReal savedChildR[16];
 	slVector hingePosition, childPosition;
 	double ideal[3][3];
 
-	childR = dBodyGetRotation(joint->child->_odeBodyID);
+	childR = dBodyGetRotation(_child->_odeBodyID);
 	memcpy(savedChildR, childR, sizeof(savedChildR));
 
-	if (joint->parent)
-	   slMatrixMulMatrix(joint->parent->position.rotation, rotation, ideal);
+	if (_parent)
+	   slMatrixMulMatrix(_parent->position.rotation, rotation, ideal);
 	else
 	   slMatrixCopy(rotation, ideal);		
 
 	slSlToODEMatrix(ideal, idealR);
 
-	/* compute the hinge position--the plinkPoint in world coordinates */
+	// compute the hinge position--the plinkPoint in world coordinates 
 
-	if(joint->parent) {
-		slVectorXform(joint->parent->position.rotation, plinkPoint, &hingePosition);
-		slVectorAdd(&hingePosition, &joint->parent->position.location, &hingePosition);
+	if(_parent) {
+		slVectorXform(_parent->position.rotation, plinkPoint, &hingePosition);
+		slVectorAdd(&hingePosition, &_parent->position.location, &hingePosition);
 	} else {
 		slVectorCopy(plinkPoint, &hingePosition);
 	}
 
-	/* set the ideal positions, so that the anchor command registers the native position */
+	// set the ideal positions, so that the anchor 
+	// command registers the native position 
 
 	slVectorXform(ideal, clinkPoint, &childPosition);
 	slVectorSub(&hingePosition, &childPosition, &childPosition);
 
-	dJointAttach(joint->odeJointID, NULL, NULL);
+	dJointAttach(_odeJointID, NULL, NULL);
 
-	dBodySetRotation(joint->child->_odeBodyID, idealR);
-	dBodySetPosition(joint->child->_odeBodyID, childPosition.x, childPosition.y, childPosition.z);
+	dBodySetRotation(_child->_odeBodyID, idealR);
+	dBodySetPosition(_child->_odeBodyID, childPosition.x, childPosition.y, childPosition.z);
 
-	if(joint->parent) dJointAttach(joint->odeJointID, joint->parent->_odeBodyID, joint->child->_odeBodyID);
-	else dJointAttach(joint->odeJointID, NULL, joint->child->_odeBodyID);
+	if(_parent) dJointAttach(_odeJointID, _parent->_odeBodyID, _child->_odeBodyID);
+	else dJointAttach(_odeJointID, NULL, _child->_odeBodyID);
 
-	switch(joint->type) {
+	switch(_type) {
 		case JT_REVOLUTE:
-			dJointSetHingeAnchor(joint->odeJointID, hingePosition.x, hingePosition.y, hingePosition.z);
+			dJointSetHingeAnchor(_odeJointID, hingePosition.x, hingePosition.y, hingePosition.z);
 			break;
 		case JT_FIX:
-			dJointSetFixed(joint->odeJointID);
+			dJointSetFixed(_odeJointID);
 			break;
 		case JT_UNIVERSAL:
-			dJointSetUniversalAnchor(joint->odeJointID, hingePosition.x, hingePosition.y, hingePosition.z);
+			dJointSetUniversalAnchor(_odeJointID, hingePosition.x, hingePosition.y, hingePosition.z);
 			break;
 		case JT_BALL:
-			dJointSetBallAnchor(joint->odeJointID, hingePosition.x, hingePosition.y, hingePosition.z);
+			dJointSetBallAnchor(_odeJointID, hingePosition.x, hingePosition.y, hingePosition.z);
 			break;
 		default:
 			break;
 	}
 
-	/* set the proper positions where the link should actually be at this time */
+	// set the proper positions where the link should actually be at this time 
 
-	slVectorXform(joint->child->position.rotation, clinkPoint, &childPosition);
+	slVectorXform(_child->position.rotation, clinkPoint, &childPosition);
 	slVectorSub(&hingePosition, &childPosition, &childPosition);
 
-	dBodySetRotation(joint->child->_odeBodyID, savedChildR);
-	dBodySetPosition(joint->child->_odeBodyID, childPosition.x, childPosition.y, childPosition.z);
-	slVectorCopy(&childPosition, &joint->child->position.location);
+	// dBodySetRotation(_child->_odeBodyID, savedChildR);
+	dBodySetPosition(_child->_odeBodyID, childPosition.x, childPosition.y, childPosition.z);
 
-	return 0;
+	if(_parent) _parent->updatePositions();
+	_child->updatePositions();
 }

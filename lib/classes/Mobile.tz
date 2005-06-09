@@ -73,6 +73,11 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 
 		return self.
 
+	+ to get-shape:
+		% Returns the OBJECT(Shape) associated with this Mobile object.
+
+		return worldObjectShape.
+
   + section "Configuring Physics Parameters"
 
 	+ to enable-physics:
