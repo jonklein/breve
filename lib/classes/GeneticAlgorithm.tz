@@ -50,7 +50,7 @@ Object : GeneticAlgorithm {
 		% The default value is 20.
 		testDuration = duration.
 
-	+ to get-test-duration:
+	+ to get-fitness-test-duration:
 		% Returns the duration of a single fitness test.  This value can be
 		% set with the method METHOD(set-test-duration).  The default value
 		% is 20.
