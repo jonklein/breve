@@ -81,12 +81,12 @@ void slJoint::breakJoint() {
 	// ... if not, then try to adopt the links 
 	// ... if not, then NULL the multibody entries 
 
-	if(parent && parentBody && (std::find(parentBody->_links.begin(), parentBody->_links.end(), parent) != parentBody->_links.end())) {
+	if(parentBody && (std::find(parentBody->_links.begin(), parentBody->_links.end(), parent) == parentBody->_links.end())) {
 		if((newMb = slLinkFindMultibody(parent))) newMb->update();
 		else slNullOrphanMultibodies(parent);
 	}
 
-	if(child && childBody && (std::find(childBody->_links.begin(), childBody->_links.end(), child) != childBody->_links.end())) {
+	if(childBody && (std::find(childBody->_links.begin(), childBody->_links.end(), child) == childBody->_links.end())) {
 		if((newMb = slLinkFindMultibody(child))) newMb->update();
 		else slNullOrphanMultibodies(child);
 	}

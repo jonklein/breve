@@ -324,23 +324,19 @@ void slLinkList(slLink *root, std::vector<slLink*> *list, int mbOnly) {
 	}
 }
 
-/*!
-	\brief Counts multibody links and sets the links' mb fields.
-*/
-
-int slMultibody::countLinks() {
-	int number = 0;
-	std::vector<slLink*>::iterator i;
-
-	for( i = _links.begin(); i != _links.end(); i++ ) {	
-		slLink *link = *i;
-
-		link->multibody = this;
-		number++;
-	}
-
-	return number;
-}
+// int slMultibody::countLinks() {
+// 	int number = 0;
+// 	std::vector<slLink*>::iterator i;
+// 
+// 	for( i = _links.begin(); i != _links.end(); i++ ) {	
+// 		slLink *link = *i;
+// 
+// 		link->multibody = this;
+// 		number++;
+// 	}
+// 
+// 	return number;
+// }
 
 /*!
 	\brief Creates an empty new multibody struct associated with a world.
@@ -374,9 +370,15 @@ void slMultibody::setRoot(slLink *root) {
 */
 
 void slMultibody::update() {
+	std::vector<slLink*>::iterator i;
+
 	_links.clear();
 
 	slLinkList(_root, &_links, 1);
+
+	for(i = _links.begin(); i != _links.end(); i++ ) {
+		(*i)->multibody = this;
+	}
 
 	if(_world->initialized) initCollisionFlags(_world->clipData);
 }
