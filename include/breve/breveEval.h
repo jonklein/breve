@@ -73,8 +73,9 @@ struct brEval {
 
 	unsigned char type;
 
-	bool operator<(brEval*);
 };
+
+//	bool operator<(brEval*);
 
 
 #define BRINT(e)		((e)->values.intValue)

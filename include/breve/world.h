@@ -24,6 +24,7 @@
 #include "ode/ode.h"
 #include "worldObject.h"
 #include "netsim.h"
+#include "patch.h"
 
 #ifdef __cplusplus
 #include <vector>
@@ -34,6 +35,7 @@ class slPatchGrid;
 class slSpring;
 class slVclipData;
 class slDrawCommandList;
+#else
 #endif
 
 

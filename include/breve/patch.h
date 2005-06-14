@@ -18,6 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _PATCH_H
+#define _PATCH_H
+
 #ifdef __cplusplus
 /*!
 	\brief Data associated with a certain region of 3D space.
@@ -156,41 +159,9 @@ class slPatchGrid {
 		int _cubeDrawList;
 		
 };
-#endif
-
+#else 
 typedef struct slPatchGrid slPatchGrid;
 typedef struct slPatch slPatch;
+#endif /* __cplusplus */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void slPatchGridFree();
-
-#ifdef __cplusplus
-}
-#endif
-//???
-/*
-
-slPatchGrid& slPatchGrid(slVector *center, slVector *size, int x, int y, int z);
-
-void slInitPatch(slPatch *p);
-
-void slPatchSetData(slPatch *p, void *data);
-void *slPatchGetData(slPatch *p);
-
-void slPatchGetLocation(slPatch *p, slVector *location);
-void slPatchGetColor(slPatch *p, slVector *color);
-void slPatchSetColor(slPatch *p, slVector *color);
-
-void slPatchSetTransparency(slPatch *p, double transparency);
-
-void slDrawPatches(slPatchGrid *patches, slVector *cam, slVector *target);
-
-void slPatchSetDataAtIndex(slPatchGrid *grid, int x, int y, int z, void *data);
-
-void slPatchGridCopyColorFrom3DMatrix(slPatchGrid *grid, slBigMatrix3DGSL *m, int channel, double scale);
-void slPatchGridCopyColorFrom2DMatrix(slPatchGrid *grid, slBigMatrix2DGSL *m, int slice, int channel, double scale);
-
-*/
+#endif /* _PATCH_H */

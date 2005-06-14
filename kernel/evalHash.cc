@@ -20,6 +20,7 @@
 
 #include "kernel.h"
 
+/*
 bool brEval::operator<(brEval *b) {
 	if(type < b->type) return true;
 
@@ -42,6 +43,7 @@ bool brEval::operator<(brEval *b) {
 			break;
 	}
 }
+*/
 
 /*!
 	\brief Creates a breve eval hash table.
