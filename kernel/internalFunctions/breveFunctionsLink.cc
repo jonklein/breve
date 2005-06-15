@@ -342,9 +342,12 @@ int brILinkSetTorque(brEval args[], brEval *target, brInstance *i) {
 
 int brILinkCheckPenetration(brEval args[], brEval *target, brInstance *i) { 
 	slLink *l = BRLINKPOINTER(&args[0]);
+	std::vector< void* > penetrations;
 
-	BRINT(target) = l->checkPenetration(i->engine->world);
+	penetrations = l->userDataForPenetratingObjects(i->engine->world);
    
+	BRINT(target) = penetrations.size();
+
 	return EC_OK;
 }
 

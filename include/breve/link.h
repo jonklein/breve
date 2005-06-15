@@ -72,7 +72,9 @@ class slLink: public slWorldObject {
 		void setRotation(double rotation[3][3]);
 		void getRotation(double m[3][3]);
 		int checkSelfPenetration(slWorld *w);
-		int checkPenetration(slWorld *w);
+
+		std::vector< void* > userDataForPenetratingObjects(slWorld *w);
+
 		void applyForce(slVector *f, slVector *t);
 		void applyJointControls();
 		void updateBoundingBox();

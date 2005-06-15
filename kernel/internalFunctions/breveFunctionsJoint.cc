@@ -404,7 +404,7 @@ int brIJointSetMaxStrength(brEval args[], brEval *target, brInstance *i) {
 /*@}*/
 
 void breveInitJointFunctions(brNamespace *n) {
-	brNewBreveCall(n, "jointApplyTorque", brIJointApplyTorque, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
+	brNewBreveCall(n, "jointApplyTorque", brIJointApplyTorque, AT_NULL, AT_POINTER, AT_VECTOR, 0);
 	brNewBreveCall(n, "jointLinkRevolute", brJointILinkRevolute, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
 	brNewBreveCall(n, "jointLinkPrismatic", brJointILinkPrismatic, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
 	brNewBreveCall(n, "jointLinkBall", brJointILinkBall, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
