@@ -1,0 +1,156 @@
+@use Drawing.
+
+@use Mobile.
+@use Matrix.
+
+
+Mobile : isAgent  (aka isAgents){
+	+ variables:
+		shapee        (object).
+		sensor_front  (object).
+		sensor_left_fr   (object).
+		sensor_right_fr  (object).
+		hoodSize      (float).
+		df, dlf, drf    (float).
+		draw            (object).
+
+	+ to init:
+		shapee = (controller get-walker-shape).
+		self set-shape to shapee.
+		self set-color to (0,1,0.3).
+
+		hoodSize = 30.
+
+		sensor_front    = (new Sensor init-with id 0 direction (1,0, 0) max-distance hoodSize and-owner self).
+		sensor_right_fr = (new Sensor init-with id 1 direction (0.5,0, 0.87) max-distance hoodSize and-owner self).
+		sensor_left_fr = (new Sensor init-with id 2 direction (0.5,0,-0.87) max-distance hoodSize and-owner self).
+
+		self move to (0,-1.8 ,0).
+		self rotate around-axis (0,1,0) by random[6.2].
+
+		self set-neighborhood-size to hoodSize.
+		
+		self show-neighbor-lines.
+
+		draw = new Drawing.
+		draw set-color to (1,0,0) with-transparency 1.0.
+		
+		return self.
+
+	+ to iterate:
+		self set-neighborhood-size to hoodSize.
+
+		dlf = (sensor_left_fr get-data).
+		df = (sensor_front get-data).
+		drf = (sensor_right_fr  get-data).
+
+		printf "left-f: ".
+		print dlf.
+		printf "front: ".
+		print df.
+		printf "right-f: ".
+		print drf.
+
+		if (dlf > 10 && df > 10 && drf > 10) : {
+		   self set-rotational-velocity to (0, 0, 0).
+		   self set-velocity to (self get-rotation)*(1,0,0).		
+		} else {
+		   if (dlf > drf) : {
+		      self set-rotational-velocity to (0, 1, 0).
+		      self set-velocity to (0,0,0).		
+		   } else {
+		      self set-rotational-velocity to (0, -1, 0).
+		      self set-velocity to (0,0,0).		
+		   }
+		}  
+
+}
+
+Abstract : Sensor {
+    + variables:
+	 direction (vector).
+	 owner     (object).
+	 maxDist   (float).
+	 draw      (object).	 
+	 id        (double).
+	
+    + to init-with id theID (double) direction theDirection (vector) max-distance theMaxDistance (float) and-owner theOwner (object):
+         direction = theDirection/|theDirection|.
+	 owner     = theOwner.
+	 maxDist   = theMaxDistance.
+	 id        = theID.
+	 draw = new Drawing.
+	 return self.
+
+    + to get-data:
+	 item (object).
+	 world_dir (vector).
+	 location  (vector).
+	 hit (vector).
+	 min (float).
+	 mat (matrix).
+	 bestHit (vector).
+
+	 min = maxDist + 1.
+
+	 mat = (owner get-rotation).
+
+	 world_dir = mat*direction.
+	 location  = (owner get-location).
+
+	 print |(owner get-neighbors)|.
+
+	 foreach item in (owner get-neighbors) : {		 
+		    #item set-color to random[(1,1,1)].
+	  	 hit = (item raytrace from-location location with-direction world_dir).
+		 if ((hit != (0,0,0)) && (|hit| < min)) :  {
+		    min = |hit|. 
+		    bestHit = hit.
+		 }
+         }
+	 draw clear.
+#	 if (min < 20) : {
+	          draw draw-line from location to (location + bestHit).
+#	 }
+	 return (min + (random[7] - 3.5)).
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
