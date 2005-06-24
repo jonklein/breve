@@ -4,7 +4,7 @@
 @include "isAgent.tz"
 
 # include some required breve class files
-@use PhysicalControl.
+@use Control.
 
 # First tell the breve engine the name of our controller class
 Controller myControl.             
