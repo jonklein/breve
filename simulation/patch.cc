@@ -261,7 +261,7 @@ slPatch* slPatchGrid::getPatchAtLocation(slVector *location) {
 
 void slPatchGrid::assignObjectsToPatches(slWorld *w) {
 	int x, y, z;
-	unsigned int ob;
+	// unsigned int ob;
 	std::vector< slWorldObject* >::iterator wo;
 
 	slVclipData *vc = w->clipData;

@@ -197,7 +197,8 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, char boundTypeFlag
 
 		x = currentSort->number; 
 
-		if( d->objects[ x]->_moved) {
+		if( d->objects[ x]->_moved || 1) {
+
 			// NaNs mess up the logic of the sort since they are not =, < or > than
 			// any other value, meaning they have no proper place in the list.  
 			// -Infinity does have a proper (yet "meaningless") place in the list
@@ -220,7 +221,7 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, char boundTypeFlag
 				if(currentSortType != leftSort->type && x != y) {
 					slPairFlags flags = slVclipPairFlagValue(d, x, y);
 
-					if(currentSortType == BT_MIN && flags & BT_CHECK) {
+					if(currentSortType == BT_MIN && (flags & BT_CHECK)) {
 						// the min moving to the left a max -- overlap, turn on the flag.
 
 #ifdef DEBUG
@@ -258,14 +259,6 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, char boundTypeFlag
 }
 
 /* 
-	our pair flags is an array of (x^2 + x)/2 
-
-	the larger number is the column, the smaller the row:
-
-		x x x
-		x x
-		x
-
 	+ slInitBoundSortList
 	=
 	= initializes a slBoundSort list by sorting it.  unlike the normal
@@ -507,7 +500,7 @@ int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollision *ce, slPositi
 
 	totalLen = (s1->_radius + s2->_radius);
 
-	slVectorSub(&p1->location, &p2->location, &diff);
+	slVectorSub(&p2->location, &p1->location, &diff);
 
 	// the actual diff is sqrt(totalDiff), but we'll avoid the sqrt if possible 
 
@@ -565,6 +558,8 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int x, int y, slCollis
 	minFeature = s2->faces[0];
 
 	while(n < s2->features.size()) {
+		*feat = s2->features[n];
+
 		switch((*feat)->type) {
 			case FT_FACE:
 				f = (slFace*)*feat;
@@ -701,7 +696,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int x, int y, slCollis
 	}
 
 	// oh crap!  we're inside the sphere.  that's not a metaphor  
-	// or anything like "in the zone", or something--i mean, we're
+	// or anything like "in the zone", or something--i mean, we are
 	// inside the sphere, or the sphere is inside us.
 
 	f = (slFace*)minFeature;
@@ -730,13 +725,6 @@ int slPointPointClip(slFeature **nf1, slPosition *p1p, slShape *s1, slFeature **
 	slPoint *p1 = (slPoint*)*nf1;
 	slPoint *p2 = (slPoint*)*nf2;
 
-	slPositionVertex(p1p, &p1->vertex, &v1);
-
-	if(!slClipPoint(&v1, p2->voronoi, p2p, p2->edgeCount, &update, NULL)) {
-		*nf2 = p2->neighbors[update];
-		return CT_CONTINUE;
-	}
-
 	slPositionVertex(p2p, &p2->vertex, &v2);
 
 	if(!slClipPoint(&v2, p1->voronoi, p1p, p1->edgeCount, &update, NULL)) {
@@ -744,8 +732,13 @@ int slPointPointClip(slFeature **nf1, slPosition *p1p, slShape *s1, slFeature **
 		return CT_CONTINUE;
 	} 
 
-	if(ce) slVectorSub(&v1, &v2, &dist);
-	
+	slPositionVertex(p1p, &p1->vertex, &v1);
+
+	if(!slClipPoint(&v1, p2->voronoi, p2p, p2->edgeCount, &update, NULL)) {
+		*nf2 = p2->neighbors[update];
+		return CT_CONTINUE;
+	}
+
 	return CT_DISJOINT;
 }
 

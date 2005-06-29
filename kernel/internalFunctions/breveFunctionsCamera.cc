@@ -45,7 +45,7 @@ int brICameraSetZClip(brEval args[], brEval *target, brInstance *i) {
 
 int brICameraSetDrawSmooth(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->drawSmooth = BRINT(&args[0]);
+	camera->drawSmooth = BRINT(&args[1]);
 	camera->setRecompile();
 	return EC_OK;
 }
@@ -104,7 +104,7 @@ int brICameraSetBlurFactor(brEval args[], brEval *target, brInstance *i) {
 
 int brICameraSetDrawFog(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->drawFog = BRINT(&args[0]);
+	camera->drawFog = BRINT(&args[1]);
 	camera->setRecompile();
 	return EC_OK;
 }

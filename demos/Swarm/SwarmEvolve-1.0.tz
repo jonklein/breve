@@ -84,9 +84,11 @@ Control : Swarm {
 		self set-background-texture-image to cloudTexture.
 
 		# Add a huge floor.
-		floor = new Floor.
-		floor catch-shadows.
 
+		floor = new Stationary.
+		floor register with-shape (new Cube init-with size (100, 2, 100)) at-location (0, -5, 0).
+		floor catch-shadows.
+		
 		# Create the birds and feeders.
 		birds = 60 new Birds.
 		feeders = 2 new Feeders.
@@ -276,7 +278,7 @@ Mobile : Birds {
 		}
 
 		energy = 0.5 + random[0.2].
-		self handle-collisions with-type "Floor" with-method "land".
+		self handle-collisions with-type "Stationary" with-method "land".
 		self handle-collisions with-type "Feeders" with-method "eat".
 		# self handle-collisions with-type "Birds" with-method "bump".
 		self set-neighborhood-size to 3.0.

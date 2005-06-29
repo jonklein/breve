@@ -39,14 +39,14 @@ BraitenbergControl : AggressorController {
 
 		vehicle move to (0, 2, 18).
 
-		leftWheel = (vehicle add-wheel at (-.5, 0, 1.5)).
-		rightWheel = (vehicle add-wheel at (-.5, 0, -1.5)).
+		leftWheel = (vehicle add-wheel at (-.5, 0, -1.5)).
+		rightWheel = (vehicle add-wheel at (-.5, 0, 1.5)).
 
 		leftWheel set-natural-velocity to 0.0.
 		rightWheel set-natural-velocity to 0.0.
 
-		rightSensor = (vehicle add-sensor at (2.0, .4, -1.5)).
-		leftSensor = (vehicle add-sensor at (2.0, .4, 1.5)).
+		rightSensor = (vehicle add-sensor at (2.0, .4, 1.5)).
+		leftSensor = (vehicle add-sensor at (2.0, .4, -1.5)).
 		leftSensor link to rightWheel.
 		rightSensor link to leftWheel.
 

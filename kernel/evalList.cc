@@ -199,6 +199,10 @@ int brEvalListRemove(brEvalListHead *head, int index, brEval *value) {
 	return index;
 }
 
+int brEvalListIndex(brEvalListHead *l, int index, brEval *value) {
+
+}
+
 /*!
 	\brief Looks up a lists index, using the index if possible.
 

@@ -83,12 +83,12 @@ void slJoint::breakJoint() {
 
 	if(parentBody && (std::find(parentBody->_links.begin(), parentBody->_links.end(), parent) == parentBody->_links.end())) {
 		if((newMb = slLinkFindMultibody(parent))) newMb->update();
-		else slNullOrphanMultibodies(parent);
+		else parent->nullMultibodiesForConnectedLinks();
 	}
 
 	if(childBody && (std::find(childBody->_links.begin(), childBody->_links.end(), child) == childBody->_links.end())) {
 		if((newMb = slLinkFindMultibody(child))) newMb->update();
-		else slNullOrphanMultibodies(child);
+		else child->nullMultibodiesForConnectedLinks();
 	}
 }
 
@@ -137,8 +137,8 @@ void slJoint::getVelocity(slVector *velocity) {
 void slJoint::setVelocity(slVector *speed) {
 	_targetSpeed = speed->x;
 
-	// if(j->_type == JT_REVOLUTE) dJointSetHingeParam (j->_odeJointID, dParamVel, speed->x);
-	// else if(j->_type == JT_PRISMATIC) dJointSetSliderParam (j->_odeJointID, dParamVel, speed->x);
+	// if(_type == JT_REVOLUTE) dJointSetHingeParam (_odeJointID, dParamVel, speed->x);
+	// else if(_type == JT_PRISMATIC) dJointSetSliderParam (_odeJointID, dParamVel, speed->x);
 
 	if(_type == JT_UNIVERSAL) {
 		dJointSetAMotorParam(_odeMotorID, dParamVel, speed->x);
@@ -223,7 +223,7 @@ void slJoint::setMaxTorque(double max) {
 	\brief Modifies the link points of a joint.
 */
 
-void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3]) {
+void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3], int first = 0) {
 	const double *childR;
 	dReal idealR[16];
 	dReal savedChildR[16];
@@ -260,8 +260,13 @@ void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double r
 	dBodySetRotation(_child->_odeBodyID, idealR);
 	dBodySetPosition(_child->_odeBodyID, childPosition.x, childPosition.y, childPosition.z);
 
-	if(_parent) dJointAttach(_odeJointID, _parent->_odeBodyID, _child->_odeBodyID);
-	else dJointAttach(_odeJointID, NULL, _child->_odeBodyID);
+	//
+	// NOTE: the child is first in the attachment because of a bug in an older version
+	// of ODE.
+	//
+
+	if(_parent) dJointAttach(_odeJointID, _child->_odeBodyID, _parent->_odeBodyID);
+	else dJointAttach(_odeJointID, _child->_odeBodyID, NULL);
 
 	switch(_type) {
 		case JT_REVOLUTE:
@@ -285,7 +290,7 @@ void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double r
 	slVectorXform(_child->position.rotation, clinkPoint, &childPosition);
 	slVectorSub(&hingePosition, &childPosition, &childPosition);
 
-	// dBodySetRotation(_child->_odeBodyID, savedChildR);
+	if( !first) dBodySetRotation(_child->_odeBodyID, savedChildR);
 	dBodySetPosition(_child->_odeBodyID, childPosition.x, childPosition.y, childPosition.z);
 
 	if(_parent) _parent->updatePositions();

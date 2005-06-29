@@ -245,19 +245,6 @@ slList *slMultibody::allCallbackData() {
 }
 
 /*!
-	\brief NULL out the multibody fields of orphaned link subtrees.
-*/
-
-void slNullOrphanMultibodies(slLink *orphan) {
-	std::vector<slLink*> links;
-	std::vector<slLink*>::iterator li;
-
-	slLinkList(orphan, &links, 0);
-	
-	for(li = links.begin(); li != links.end(); li++) (*li)->multibody = NULL;
-}
-
-/*!
 	\brief Find a multibody that a link is attached to.
 
 	This function is only used when a link must recompute its own 
@@ -270,7 +257,7 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 	std::vector<slLink*> links;
 	std::vector<slLink*>::iterator li;
 
-	slLinkList(root, &links, 0);
+	root->connectedLinks(&links, 0);
 
 	for(li = links.begin(); li != links.end(); li++ ) {
 		slLink *link = *li;
@@ -301,42 +288,6 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 
 	return NULL;
 }
-
-/*!
-	\brief Returns a list of links connected to a root link.
-*/
-
-void slLinkList(slLink *root, std::vector<slLink*> *list, int mbOnly) {
-	std::vector<slJoint*>::iterator ji;
-
-	if(!root || std::find(list->begin(), list->end(), root) != list->end()) return;
-
-	list->push_back(root);
-
-	for(ji = root->outJoints.begin(); ji != root->outJoints.end(); ji++ ) {
-		if(!mbOnly || (*ji)->_isMbJoint) 
-			slLinkList((*ji)->_child, list, mbOnly);
-	}
-
-	for(ji = root->inJoints.begin(); ji != root->inJoints.end(); ji++ ) {
-		if(!mbOnly || (*ji)->_isMbJoint) 
-			slLinkList((*ji)->_parent, list, mbOnly);
-	}
-}
-
-// int slMultibody::countLinks() {
-// 	int number = 0;
-// 	std::vector<slLink*>::iterator i;
-// 
-// 	for( i = _links.begin(); i != _links.end(); i++ ) {	
-// 		slLink *link = *i;
-// 
-// 		link->multibody = this;
-// 		number++;
-// 	}
-// 
-// 	return number;
-// }
 
 /*!
 	\brief Creates an empty new multibody struct associated with a world.
@@ -372,9 +323,11 @@ void slMultibody::setRoot(slLink *root) {
 void slMultibody::update() {
 	std::vector<slLink*>::iterator i;
 
+	if(!_root) return;
+
 	_links.clear();
 
-	slLinkList(_root, &_links, 1);
+	_root->connectedLinks(&_links, 1);
 
 	for(i = _links.begin(); i != _links.end(); i++ ) {
 		(*i)->multibody = this;
@@ -478,7 +431,7 @@ void slMultibody::setHandleSelfCollisions(int n) {
 */
 
 slMultibody::~slMultibody() {
-	slNullOrphanMultibodies(_root);
+	if( _root) _root->nullMultibodiesForConnectedLinks();
 	_links.empty();
 }
 

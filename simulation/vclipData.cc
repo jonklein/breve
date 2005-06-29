@@ -58,7 +58,7 @@ void slVclipDataInit(slWorld *w) {
 	w->clipData->boundLists[1].clear();
 	w->clipData->boundLists[2].clear();
 
-	for(x = 0; x < w->objects.size(); ++x) {
+	for(x = 0; x < w->objects.size(); x++) {
 		switch(w->objects[x]->type) {
 			case WO_LINK:
 				link = (slLink *)w->objects[x];
@@ -75,10 +75,10 @@ void slVclipDataInit(slWorld *w) {
 		slAddBoundingBoxForVectors(w->clipData, x, &w->objects[x]->min, &w->objects[x]->max);
 	}
 
-	for (x = 0; x < w->clipData->maxCount; ++x) 
+	for (x = 0; x < w->clipData->maxCount; x++) 
 		memset(w->clipData->pairArray[x], (BT_CHECK | BT_UNKNOWN), w->clipData->maxCount);
 
-	for(x = 0; x < w->objects.size(); ++x) {
+	for(x = 0; x < w->objects.size(); x++) {
 	 	if (w->objects[x]->type == WO_LINK) {
 			std::vector<slJoint*>::iterator ji;
 

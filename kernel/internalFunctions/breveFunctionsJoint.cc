@@ -121,7 +121,7 @@ int brIJointSetLinkPoints(brEval args[], brEval *target, brInstance *i) {
 
 
 	slMatrixCopy(BRMATRIX(&args[3]), rot);
-	j->setLinkPoints(n1, n2, rot);
+	j->setLinkPoints(n1, n2, rot, 0);
 
 	return EC_OK;
 }

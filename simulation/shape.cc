@@ -189,9 +189,9 @@ slShape *slShapeInitNeighbors(slShape *s, double density) {
 	for(pi = s->points.begin(); pi != s->points.end(); pi++ ) {
 		p = *pi;
 
-		p->neighbors = new slEdge*[p->edgeCount];
-		p->faces = new slFace*[p->edgeCount];
-		p->voronoi = new slPlane[p->edgeCount];
+		if(! p->neighbors ) p->neighbors = new slEdge*[p->edgeCount];
+		if(! p->faces ) p->faces = new slFace*[p->edgeCount];
+		if(! p->voronoi ) p->voronoi = new slPlane[p->edgeCount];
 
 		// now check to see if it's a maximum for the shape 
 
@@ -218,14 +218,19 @@ slShape *slShapeInitNeighbors(slShape *s, double density) {
 		start->neighbors[start->edgeCount] = e;
 		end->neighbors[end->edgeCount] = e;
 
+		// update the voronoi planes for the points and edges
+
 		slVectorSub(&start->vertex, &end->vertex, &normal);
 		slVectorNormalize(&normal);
 		slSetPlane(&start->voronoi[start->edgeCount], &normal, &start->vertex);
+
+		slSetPlane(&e->voronoi[1], &normal, &end->vertex);
 		
-		slVectorSub(&end->vertex, &start->vertex, &normal);
-		slVectorNormalize(&normal);
+		slVectorMul(&normal, -1, &normal);
 		slSetPlane(&end->voronoi[end->edgeCount], &normal, &end->vertex);
-		
+
+		slSetPlane(&e->voronoi[0], &normal, &start->vertex);
+
 		start->edgeCount++;
 		end->edgeCount++;
 
@@ -242,21 +247,39 @@ slShape *slShapeInitNeighbors(slShape *s, double density) {
 	// add the face neighbors for the all the faces 
 
 	for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
+		slVector v1, v2, normal, origin;
+
 		face = *fi;
 
-		for(m=0;m<face->edgeCount;m++) {
-			slVector *eStart, *eFinish, edgeVector, normal;
+		// slVectorSet(&origin, 0, 0, 0);
+		// slVectorSub(&face->points[0]->vertex, &face->points[1]->vertex, &v1);
+		// slVectorSub(&face->points[1]->vertex, &face->points[2]->vertex, &v2);
+		// slVectorCross(&v1, &v2, &face->plane.normal);
+		// slVectorNormalize(&face->plane.normal);
 
-			/* grab the edge its vertices */
+		// if(slPlaneDistance(&face->plane, &origin) > 0.0) {
+			// slVectorMul(&face->plane.normal, -1, &face->plane.normal);
+		// }
+
+		for(m=0;m<face->edgeCount;m++) {
+			slVector *eStart, *eFinish, edgeVector;
+			int edgeNeighborIndex;
+
+			// grab the edge's vertices 
 
 			e = face->neighbors[m];
 			eStart = &((slPoint*)e->neighbors[0])->vertex;
 			eFinish = &((slPoint*)e->neighbors[1])->vertex;
 
-			if(e->neighbors[2] != face) face->faces[m] = e->faces[0];
-			else face->faces[m] = e->faces[1];
+			if(e->neighbors[2] == face) {
+				face->faces[m] = e->faces[1];
+				edgeNeighborIndex = 2;
+			} else {
+				face->faces[m] = e->faces[0];
+				edgeNeighborIndex = 3;
+			}
 
-			/* set the voronoi plane for this edge */
+			// set the voronoi plane for this edge
 
 			slVectorSub(eStart, eFinish, &edgeVector);
 			slVectorCross(&face->plane.normal, &edgeVector, &normal);
@@ -264,6 +287,10 @@ slShape *slShapeInitNeighbors(slShape *s, double density) {
 			if(slVectorDot(&normal, eStart) > 0.0) slVectorMul(&normal, -1, &normal);
 
 			slSetPlane(&face->voronoi[m], &normal, eFinish);
+
+			slVectorMul(&normal, -1, &normal);
+
+			slSetPlane(&e->voronoi[edgeNeighborIndex], &normal, eFinish);
 		}
 
 		face->faces[face->edgeCount] = *fi;
@@ -556,7 +583,6 @@ slPoint *slAddPoint(slShape *s, slVector *vertex) {
 
 	slVectorCopy(vertex, &p->vertex);
 	p->edgeCount = 1;
-	p->neighbors = NULL;
 
 	s->points.push_back(p);
 	s->features.push_back(p);
@@ -852,7 +878,7 @@ int slShape::pointOnShape(slVector *dir, slVector *point) {
 			/* if this point is within the voronoi region of the plane, it must be */
 			/* on the face */
 
-			if(result == 1) {
+			if(result == 1 || distance > -0.01) {
 				slVectorCopy(&pointOnPlane, point);
 				return 0;
 			} 
@@ -1021,10 +1047,6 @@ void slShape::scale(slVector *scale) {
 	for(pi = points.begin(); pi != points.end(); pi++ ) {
 		p = *pi;
 
-		delete[] p->neighbors;
-		delete[] p->faces;
-		delete[] p->voronoi;
-
 		slVectorCopy(&p->vertex, &v);
 		slVectorXform(m, &v, &p->vertex);
 	}
@@ -1034,6 +1056,9 @@ void slShape::scale(slVector *scale) {
 
 		slVectorCopy(&f->plane.vertex, &v);
 		slVectorXform(m, &v, &f->plane.vertex);
+		slVectorCopy(&f->plane.normal, &v);
+		slVectorXform(m, &v, &f->plane.normal);
+		slVectorNormalize(&f->plane.normal);
 	}
 
 	slShapeInitNeighbors(this, _density);

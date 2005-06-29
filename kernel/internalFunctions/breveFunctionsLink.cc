@@ -340,13 +340,25 @@ int brILinkSetTorque(brEval args[], brEval *target, brInstance *i) {
 	int linkCheckPenetration(slLink pointer body).
 */
 
-int brILinkCheckPenetration(brEval args[], brEval *target, brInstance *i) { 
+int brILinkGetPenetratingObjects(brEval args[], brEval *target, brInstance *i) { 
 	slLink *l = BRLINKPOINTER(&args[0]);
 	std::vector< void* > penetrations;
+	brEvalListHead *head;
+	brEval object;
+	unsigned int n;
+
+	object.type = AT_INSTANCE;
+
+	head = brEvalListNew(); 
 
 	penetrations = l->userDataForPenetratingObjects(i->engine->world);
+
+	for(n = 0; n < penetrations.size(); n++) {
+		BRINSTANCE(&object) = (brInstance*)penetrations[ n];
+		brEvalListInsert(head, n, &object);
+	}
    
-	BRINT(target) = penetrations.size();
+	BRLIST(target) = head;
 
 	return EC_OK;
 }
@@ -490,7 +502,7 @@ int brILinkRemoveLabel(brEval args[], brEval *target, brInstance *i) {
 void breveInitLinkFunctions(brNamespace *n) {
 	brNewBreveCall(n, "linkSetPhysics", brILinkSetPhysics, AT_NULL, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "linkCheckSelfPenetration", brILinkCheckSelfPenetration, AT_INT, AT_POINTER, 0);
-	brNewBreveCall(n, "linkCheckPenetration", brILinkCheckPenetration, AT_INT, AT_POINTER, 0);
+	brNewBreveCall(n, "linkGetPenetratingObjects", brILinkGetPenetratingObjects, AT_LIST, AT_POINTER, 0);
 	brNewBreveCall(n, "linkGetMax", brILinkGetMax, AT_VECTOR, AT_POINTER, 0);
 	brNewBreveCall(n, "linkGetMin", brILinkGetMin, AT_VECTOR, AT_POINTER, 0);
 

@@ -64,6 +64,24 @@ slLink::~slLink() {
 	dBodyDestroy(_odeBodyID);
 }
 
+void slLink::connectedLinks(std::vector<slLink*> *list, int mbOnly) {
+	std::vector<slJoint*>::iterator ji;
+
+	if(std::find(list->begin(), list->end(), this) != list->end()) return;
+
+	list->push_back( this );
+
+	for(ji = outJoints.begin(); ji != outJoints.end(); ji++ ) {
+		if((*ji)->_child && (!mbOnly || (*ji)->_isMbJoint)) 
+			(*ji)->_child->connectedLinks(list, mbOnly);
+	}
+
+	for(ji = inJoints.begin(); ji != inJoints.end(); ji++ ) {
+		if((*ji)->_parent && (!mbOnly || (*ji)->_isMbJoint))
+			(*ji)->_parent->connectedLinks(list, mbOnly);
+	}
+}
+
 void slLink::step(slWorld *world, double step) {
 	_moved = 1;
 
@@ -309,7 +327,7 @@ int slLink::checkSelfPenetration(slWorld *world) {
 	if(!world->initialized) slVclipDataInit(world);
 	vc = world->clipData;
 
-	slLinkList(this, &links, 0);
+	this->connectedLinks(&links, 0);
 
 	for(li = links.begin(); li != links.end(); li++ ) {
 		slLink *link2 = *li;
@@ -352,7 +370,7 @@ std::vector< void* > slLink::userDataForPenetratingObjects(slWorld *w) {
 			slPairFlags *flags = slVclipPairFlags(vc, ln, n);
 
 			if((slVclipFlagsShouldTest(*flags) && *flags & BT_SIMULATE) && vc->testPair(&c, NULL)) {
-				penetrations.push_back( NULL );
+				penetrations.push_back( slWorldObjectGetCallbackData(w->objects[ n]) );
 			}
 		}
 	}
@@ -404,6 +422,10 @@ void slLink::applyJointControls() {
 
 		if(joint->_type == JT_REVOLUTE) dJointSetHingeParam (joint->_odeJointID, dParamVel, newSpeed);
 		else if(joint->_type == JT_PRISMATIC) dJointSetSliderParam (joint->_odeJointID, dParamVel, newSpeed);
+
+		dVector3 v;
+
+		dJointGetHingeAxis( joint->_odeJointID, v);
 	}
 }
 
@@ -580,8 +602,8 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 			dJointSetAMotorAxis(joint->_odeMotorID, 2, 2, axis2.x, axis2.y, axis2.z);
 			break;
 		case JT_REVOLUTE:
-			dJointSetHingeAxis(joint->_odeJointID, tn.x, tn.y, tn.z);
-			dJointSetHingeAnchor(joint->_odeJointID, tp.x + position.x, tp.y + position.y, tp.z + position.z);
+			// dJointSetHingeAxis(joint->_odeJointID, tn.x, tn.y, tn.z);
+			// dJointSetHingeAnchor(joint->_odeJointID, tp.x + position.x, tp.y + position.y, tp.z + position.z);
 			break;
 		case JT_PRISMATIC:
 			dJointSetSliderAxis(joint->_odeJointID, tn.x, tn.y, tn.z);
@@ -598,7 +620,7 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 	joint->_child = child;
 	joint->_type = jointType;
 
-	joint->setLinkPoints(plinkPoint, clinkPoint, rotation);
+	joint->setLinkPoints(plinkPoint, clinkPoint, rotation, 1);
 	joint->setNormal(normal);
 
 	if(parent && parent->multibody) parent->multibody->update();
@@ -643,6 +665,14 @@ void slLink::setTorque(slVector *torque) {
 	slVectorCopy(torque, &_externalForce.b);
 }
 
+void slLink::nullMultibodiesForConnectedLinks() {
+	std::vector<slLink*> links;
+	std::vector<slLink*>::iterator li;
+
+	connectedLinks(&links, 0);
+	
+	for(li = links.begin(); li != links.end(); li++) (*li)->multibody = NULL;
+}
 
 /*!
 	\brief Converts a breve matrix to an ODE matrix.

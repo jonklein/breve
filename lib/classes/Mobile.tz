@@ -350,29 +350,23 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 
   + section "Determining Whether an Object is Colliding"
 
-	+ to check-for-penetrations:
-		% Determines whether this link is currently penetrating with other objects
-		% in the simulation.  This is not meant as a general purpose collision
+	- to check-for-penetrations:
+		% Depricated.
+		return (self get-colliding-objects).
+
+	+ to get-colliding-objects:
+		% Returns a list of objects currently colliding with this object.
+		% This is not meant as a general purpose collision
 		% detection tool -- it is meant to detect potentially troublesome
 		% configurations of links when they are created.
-		% <P>
-		% In order for this method to work properly, the Link must be part of a
-		% OBJECT(MultiBody).  Links that are not associated with MultiBody objects
-		% do not appear in the simulated world, and thus cannot be tested for
-		% collisions.
 
-		return linkCheckPenetration(linkPointer).
+		return linkGetPenetratingObjects(linkPointer).
 
 	+ to check-for-self-penetrations:
 		% Determines whether this link is currently penetrating with other links
 		% in the same multibody.  This is not meant as a general purpose collision
 		% detection tool -- it is meant to detect potentially troublesome
 		% configurations of links when they are created.
-		% <P>
-		% In order for this method to work properly, the Link must be part of a
-		% OBJECT(MultiBody).  Links that are not associated with MultiBody objects
-		% do not appear in the simulated world, and thus cannot be tested for
-		% collisions.
 
 		return linkCheckSelfPenetration(linkPointer).
 }

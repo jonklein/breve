@@ -92,14 +92,54 @@ class slLink: public slWorldObject {
 		void getAcceleration(slVector *linear, slVector *rotational);
 		void setAcceleration(slVector *linear, slVector *rotational);
 
+		/**
+		 * Sets the multibody field to NULL for all connected links.  This 
+		 * is done when a joint is broken which dissociates the links from
+		 * the multibody.
+		 */
+
+		void nullMultibodiesForConnectedLinks();
+
+		/**
+		 * Returns the multibody this link is associated with, if any.
+		 */
+
 		slMultibody *getMultibody();
+
+		/*
+		 * Returns an \ref slPosition pointer holding this link's position.
+		 */
 
 		slPosition *getPosition();
 
+		/**
+		 * Returns the minimum and maximum reach of this link, taking current
+		 * rotation into account.
+		 */
+
 		void getBounds(slVector *min, slVector *max);
+
+		/**
+		 * Sets the shape of this link.
+		 */
+
 		void setShape(slShape *s);
 		void step(slWorld *world, double step);
+
+		/**
+		 * Sets a label to be drawn with this link.
+		 */
+
 		void setLabel(char *label);
+
+		/**
+		 * Recursively builds a list of all directly and indirectly 
+		 * connected links.  
+		 * @param mbOnly determines whether only multibody links should followed.
+		 */
+
+		void connectedLinks(std::vector<slLink*> *list, int mbOnly);
+
 
 		slMultibody *multibody;
 
@@ -125,9 +165,8 @@ class slLink: public slWorldObject {
 
 		std::vector<slJoint*> inJoints;
 		std::vector<slJoint*> outJoints;
-};
 
-void slLinkList(slLink *root, std::vector<slLink*> *list, int mbOnly);
+};
 
 #endif
 

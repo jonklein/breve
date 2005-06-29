@@ -42,7 +42,7 @@ class slJoint {
 		 * Updates the link points and relative rotation between two joined objects.
 		 */
 
-		void setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3]);
+		void setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3], int first);
 
 		/*!
 		 * Sets the normal vector of a prismatic or revolute joint.
