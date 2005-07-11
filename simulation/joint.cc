@@ -105,10 +105,14 @@ void slJoint::getPosition(slVector *r) {
 			r->z = 0;
 			break;
 		case JT_BALL:
+			r->x = dJointGetAMotorAngle(_odeMotorID, 0);
+			r->y = dJointGetAMotorAngle(_odeMotorID, 1);
+			r->z = dJointGetAMotorAngle(_odeMotorID, 2);
+			break;
 		case JT_UNIVERSAL:
-			r->x = dJointGetAMotorAngle(_odeMotorID, dParamVel);
-			r->y = dJointGetAMotorAngle(_odeMotorID, dParamVel2);
-			r->z = dJointGetAMotorAngle(_odeMotorID, dParamVel3);
+			r->x = dJointGetAMotorAngle(_odeMotorID, 0);
+			r->y = dJointGetAMotorAngle(_odeMotorID, 2);
+			r->z = 0;
 			break;
 		default:
 			break;
@@ -144,6 +148,8 @@ void slJoint::setVelocity(slVector *speed) {
 		dJointSetAMotorParam(_odeMotorID, dParamVel, speed->x);
 		dJointSetAMotorParam(_odeMotorID, dParamVel3, speed->y);
 	} else if(_type == JT_BALL) {
+		dVector3 result;
+
 		dJointSetAMotorParam(_odeMotorID, dParamVel, speed->x);
 		dJointSetAMotorParam(_odeMotorID, dParamVel2, speed->y);
 		dJointSetAMotorParam(_odeMotorID, dParamVel3, speed->z);
@@ -171,8 +177,13 @@ void slJoint::setLimits(slVector *min, slVector *max) {
 			dJointSetHingeParam(_odeJointID, dParamHiStop, max->x);
 			break;
 		case JT_BALL:	
-			if(max->y >= M_PI/2.0 - 0.001) max->y = M_PI/2.0 - 0.001;
-			if(min->y <= -M_PI/2.0 - 0.001) min->y = -M_PI/2.0 + 0.001;
+			// The ODE user manual states that there is a singularity when
+			// the a1 angle goes outside of the range (-pi / 2, pi / 2).  I
+			// see clearly incorrect behaviors already at -pi / 2 + 0.2 and
+			// oddities even earlier, so we'll stay far away from that area.
+
+			if(max->y >= (M_PI/2.0) - 0.35) max->y = (M_PI/2.0) - 0.35;
+			if(min->y <= (-M_PI/2.0) + 0.35) min->y = -(M_PI/2.0) + 0.35;
 
 			dJointSetAMotorParam(_odeMotorID, dParamLoStop, min->x);
 			dJointSetAMotorParam(_odeMotorID, dParamLoStop2, min->y);

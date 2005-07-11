@@ -328,6 +328,26 @@ int brIJointGetVelocity(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+int brIJointGetForce(brEval args[], brEval *target, brInstance *i) {
+	slJoint *j = BRJOINTPOINTER(&args[0]);
+
+	BRVECTOR(target).x = j->_feedback.f1[0] - j->_feedback.f2[0];
+	BRVECTOR(target).y = j->_feedback.f1[1] - j->_feedback.f2[1];
+	BRVECTOR(target).z = j->_feedback.f1[2] - j->_feedback.f2[2];
+
+	return EC_OK;
+}
+
+int brIJointGetTorque(brEval args[], brEval *target, brInstance *i) {
+	slJoint *j = BRJOINTPOINTER(&args[0]);
+
+	BRVECTOR(target).x = j->_feedback.t1[0] - j->_feedback.t2[0];
+	BRVECTOR(target).y = j->_feedback.t1[1] - j->_feedback.t2[1];
+	BRVECTOR(target).z = j->_feedback.t1[2] - j->_feedback.t2[2];
+
+	return EC_OK;
+}
+
 /*!
 	\brief Set joint damping.
 
@@ -405,11 +425,11 @@ int brIJointSetMaxStrength(brEval args[], brEval *target, brInstance *i) {
 
 void breveInitJointFunctions(brNamespace *n) {
 	brNewBreveCall(n, "jointApplyTorque", brIJointApplyTorque, AT_NULL, AT_POINTER, AT_VECTOR, 0);
-	brNewBreveCall(n, "jointLinkRevolute", brJointILinkRevolute, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
-	brNewBreveCall(n, "jointLinkPrismatic", brJointILinkPrismatic, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
-	brNewBreveCall(n, "jointLinkBall", brJointILinkBall, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
-	brNewBreveCall(n, "jointLinkStatic", brJointILinkStatic, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
-	brNewBreveCall(n, "jointLinkUniversal", brJointILinkUniversal, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
+	brNewBreveCall(n, "jointLinkRevolute", brJointILinkRevolute, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
+	brNewBreveCall(n, "jointLinkPrismatic", brJointILinkPrismatic, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
+	brNewBreveCall(n, "jointLinkBall", brJointILinkBall, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
+	brNewBreveCall(n, "jointLinkStatic", brJointILinkStatic, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
+	brNewBreveCall(n, "jointLinkUniversal", brJointILinkUniversal, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
 
 	brNewBreveCall(n, "jointBreak", brIJointBreak, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "jointSetVelocity", brIJointSetVelocity, AT_NULL, AT_POINTER, AT_VECTOR, 0);
@@ -422,4 +442,7 @@ void breveInitJointFunctions(brNamespace *n) {
 
 	brNewBreveCall(n, "jointGetPosition", brIJointGetPosition, AT_VECTOR, AT_POINTER, 0);
 	brNewBreveCall(n, "jointGetVelocity", brIJointGetVelocity, AT_VECTOR, AT_POINTER, 0);
+
+	brNewBreveCall(n, "jointGetForce", brIJointGetForce, AT_VECTOR, AT_POINTER, 0);
+	brNewBreveCall(n, "jointGetTorque", brIJointGetTorque, AT_VECTOR, AT_POINTER, 0);
 }

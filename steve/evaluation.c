@@ -1817,7 +1817,7 @@ RTC_INLINE int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *result) {
 
 		/* if the types don't match, try to convert them */
 
-		if (e[n].type != c->function->argtypes[n])
+		if (e[n].type != c->function->argtypes[n] && c->function->argtypes[n] != AT_UNDEFINED)
 			resultCode = stToType(&e[n], c->function->argtypes[n], &e[n], i);
 
 		if(c->function->argtypes[n] == AT_POINTER && BRPOINTER(&e[n]) == NULL) {

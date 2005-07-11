@@ -25,11 +25,16 @@
 </STYLE>
 <BODY>
 
-<h5>version 2.3 [06/XX/2005]</h5>
+<h5>version 2.3 [07/XX/2005]</h5>
 
 <ul>
 
 The <a href="http://www.spiderland.org/breve">breve</a> simulation environment change log.
+
+<li>Added Joint methods "get-force" and "get-torque" to get the forces and torques that joints apply to bodies.
+
+<li>BallJoint support enhanced--joint limits now functional.  Axes of rotation for BallJoints have changed,
+see the BallJoint documentation for details.
 
 <li>Added "get-colliding-objects" method to Mobile class (replacing "check-for-penetrations").
 
@@ -69,7 +74,10 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 
 <li>Added max-force setting for springs.
 
-<li>For developers: passing a NULL pointer from steve to an internal function will now trigger a runtime error.  
+<li>For developers and plugin authors: passing a NULL pointer from steve to an internal function will now trigger a runtime error.  
+
+<li>For developers and plugin authors: the constant AT_UNDEFINED has changed.  Plugins using this contstant should be recompiled.
+
 
 <h5>version 2.2.1 [04/28/2005]</h5>
 <ul>

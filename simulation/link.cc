@@ -549,7 +549,6 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 		case JT_BALL:
 			joint->_odeJointID = dJointCreateBall(world->_odeWorldID, world->_odeJointGroupID);
 			joint->_odeMotorID = dJointCreateAMotor(world->_odeWorldID, world->_odeJointGroupID);
-			// dJointSetAMotorMode(joint->_odeMotorID, dAMotorEuler);
 			dJointAttach(joint->_odeMotorID, cBodyID, pBodyID);
 			break;
 		case JT_UNIVERSAL:
@@ -575,19 +574,32 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 
 	// transform the normal to the parent coordinates.
 
-    if(parent) slVectorXform(parent->position.rotation, normal, &tn);
-    else slVectorCopy(normal, &tn);
+    if(parent) {
+		slVectorXform(parent->position.rotation, normal, &tn);
+    	slVectorXform(parent->position.rotation, plinkPoint, &tp);
+	} else {
+		slVectorCopy(normal, &tn);
+		slVectorCopy(plinkPoint, &tp);
+	}
 
 	switch(jointType) {
 		case JT_BALL:
 			slVectorCross(&tp, &tn, &axis2);
 			slVectorNormalize(&axis2);
+			slVectorNormalize(&tp);
 			dJointSetBallAnchor(joint->_odeJointID, tp.x + position.x, tp.y + position.y, tp.z + position.z);
 
-			dJointSetAMotorNumAxes(joint->_odeMotorID, 3);
-			dJointSetAMotorAxis(joint->_odeMotorID, 0, 1, 1, 0, 0);
-			dJointSetAMotorAxis(joint->_odeMotorID, 1, 1, 0, 1, 0);
-			dJointSetAMotorAxis(joint->_odeMotorID, 2, 1, 0, 0, 1);
+			dJointSetAMotorNumAxes (joint->_odeMotorID,3);
+			dJointSetAMotorMode(joint->_odeMotorID, dAMotorEuler);
+			dJointSetAMotorAxis(joint->_odeMotorID, 0, 1, tn.x, tn.y, tn.z);
+			dJointSetAMotorAxis(joint->_odeMotorID, 1, 0, 0, 0, 0);
+			dJointSetAMotorAxis(joint->_odeMotorID, 2, 2, tp.x, tp.y, tp.z);
+			dJointSetAMotorMode(joint->_odeMotorID, dAMotorEuler);
+
+			// See the note in \ref slJoint::setLimits.  These odd stops are required for stability.
+
+			dJointSetAMotorParam(joint->_odeMotorID, dParamLoStop2, -(M_PI / 2.0) + 0.35);
+			dJointSetAMotorParam(joint->_odeMotorID, dParamHiStop2, (M_PI / 2.0) - 0.35);
 
 			break;
 		case JT_UNIVERSAL:
@@ -598,7 +610,7 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 			dJointSetUniversalAxis2(joint->_odeJointID, axis2.x, axis2.y, axis2.z);
 			dJointSetUniversalAnchor(joint->_odeJointID, tp.x + position.x, tp.y + position.y, tp.z + position.z);
 
-			dJointSetAMotorAxis(joint->_odeMotorID, 0, 1, tn.x, tn.y, tn.z);
+			dJointSetAMotorAxis(joint->_odeMotorID, 0, 2, tn.x, tn.y, tn.z);
 			dJointSetAMotorAxis(joint->_odeMotorID, 2, 2, axis2.x, axis2.y, axis2.z);
 			break;
 		case JT_REVOLUTE:
@@ -626,6 +638,8 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 	if(parent && parent->multibody) parent->multibody->update();
 
 	if(child->multibody && (!parent || (child->multibody != parent->multibody))) child->multibody->update();
+
+	dJointSetFeedback(joint->_odeJointID, &joint->_feedback);
 
 	return joint;
 }

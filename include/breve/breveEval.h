@@ -31,7 +31,7 @@ enum evaluationCodes {
 };
 
 enum atomicTypes {
-	AT_UNDEFINED = 0,
+	AT_INVALID = 0,
 	AT_NULL,
 	AT_INT,
 	AT_DOUBLE,
@@ -45,7 +45,8 @@ enum atomicTypes {
 	AT_ARRAY,
 	AT_DATA,
 	AT_HASH,
-	AT_TYPE
+	AT_TYPE,
+	AT_UNDEFINED
 };
 
 /*!

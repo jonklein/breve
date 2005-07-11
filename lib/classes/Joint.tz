@@ -1,6 +1,6 @@
 @use Object.
 
-Abstract : Joint (aka Joints) [version 2.0] {
+Abstract : Joint (aka Joints) [version 2.3] {
 	% Joint a is class used to connect two OBJECT(Mobile) objects together.  The
 	% Joint class itself is actually never instantiated--instead, one of the
 	% following joint subclasses should be used.
@@ -69,7 +69,7 @@ Abstract : Joint (aka Joints) [version 2.0] {
 
 		jointSetDamping(jointPointer, dampingValue).
 
-  + section "Getting and setting the velocity of a joint"
+  + section "Getting and Setting the Velocity of a Joint"
 
 	+ to set-joint-velocity to newVelocity (float):
 		% Sets the joint velocity to newVelocity.
@@ -121,7 +121,7 @@ Abstract : Joint (aka Joints) [version 2.0] {
 		% Note that this method is just an alternative to the set-joint-limit
 		% methods which exist in all of the joints which support limits.
 
-		jointSetLimits(jointPointer, minV, maxV).
+		if jointPointer: jointSetLimits(jointPointer, minV, maxV).
 
 	+ to get-strength-hard-limit:
 		% Returns the "hard" limit of the joint--the maximum torque that you
@@ -130,6 +130,28 @@ Abstract : Joint (aka Joints) [version 2.0] {
 		if !child: return 0.
 
 		return (child get-mass) * 500.
+
+	+ to get-force:
+		% Returns the force applied by this joint to maintain the desired
+		% relationships of the connected bodies.  In other words, the stress 
+		% force on the joint.  
+		% <P>
+		% The forces applied to connected bodies are generally equal and 
+		% opposite, so this value is computed as f1 + -f2, where f1 and f2
+		% are the forces acting on the first and second bodies.
+
+		if jointPointer: return jointGetForce(jointPointer).
+
+	+ to get-torque:
+		% Returns the torque applied by this joint to maintain the desired
+		% relationships of the connected bodies.  In other words, the stress 
+		% torque on the joint.
+		% <P>
+		% The torques applied to connected bodies are generally equal and 
+		% opposite, so this value is computed as t1 + -t2, where t1 and t2
+		% are the torques acting on the first and second bodies.
+
+		if jointPointer: return jointGetTorque(jointPointer).
 
   + section "Manipulating Relative Joint Position & Orientation"
 
@@ -278,7 +300,7 @@ Abstract : Joint (aka Joints) [version 2.0] {
 		self break.
 }
 
-Joint : PrismaticJoint (aka PrismaticJoints) [version 2.0] {
+Joint : PrismaticJoint (aka PrismaticJoints) [version 2.3] {
 	% This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects
 	% together using a sliding linear joint.  
 	% <P>
@@ -286,8 +308,6 @@ Joint : PrismaticJoint (aka PrismaticJoints) [version 2.0] {
 	% example of an object that uses multiple prismatic joints.
 	% <P>
 	% <CENTER><IMG SRC="PrismaticJoint.jpg" BORDER=1></CENTER>
-	% <P>
-	% <b>NOTE: this class is included as part of the file "Joint.tz".</b>
 
 	+ to link parent parentLink (object) to-child childLink (object)
 			with-normal theNormal (vector) with-parent-point parentPoint (vector) 
@@ -343,7 +363,7 @@ Joint : PrismaticJoint (aka PrismaticJoints) [version 2.0] {
 		return (super dearchive).
 }
 
-Joint : RevoluteJoint (aka RevoluteJoints) [version 2.0] {
+Joint : RevoluteJoint (aka RevoluteJoints) [version 2.3] {
 	% This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects
 	% together using a rotating joint.  
 	% <P>
@@ -352,8 +372,6 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 2.0] {
 	% or bend side-to-side.
 	% <P>
 	% <CENTER><IMG SRC="RevoluteJoint.jpg" BORDER=1></CENTER>
-	% <P>
-	% <b>NOTE: this class is included as part of the file "Joint.tz".</b>
 
 	+ to link parent parentLink (object) to-child childLink (object)
 			with-normal theNormal (vector) with-parent-point parentPoint (vector) 
@@ -420,7 +438,7 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 2.0] {
 		return (super dearchive).
 }
 
-Joint : FixedJoint (aka FixedJoints) [version 2.0] {
+Joint : FixedJoint (aka FixedJoints) [version 2.3] {
 	% This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects
 	% together using a static, or fixed, joint.
 	% <P>
@@ -428,8 +446,6 @@ Joint : FixedJoint (aka FixedJoints) [version 2.0] {
 	% <P>
 	% <b>Fixed joints do not currently support a relative rotation the way
 	% other joint types do.</b>  I'm so sorry.  
-	% <P>
-	% <b>NOTE: this class is included as part of the file "Joint.tz".</b>
 
 	+ to link parent parentLink = 0 (object) 
 			to-child childLink (object)
@@ -478,7 +494,7 @@ Joint : FixedJoint (aka FixedJoints) [version 2.0] {
 		return (super dearchive).
 }
 
-Joint : UniversalJoint (aka UniversalJoints) [version 2.0] {
+Joint : UniversalJoint (aka UniversalJoints) [version 2.3] {
 	% This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects
 	% together using a universal joint.  
 	% <P>
@@ -488,8 +504,6 @@ Joint : UniversalJoint (aka UniversalJoints) [version 2.0] {
 	% rotate without the rest of your arm.
 	% <P>
 	% <CENTER><IMG SRC="UniversalJoint.jpg" BORDER=1></CENTER>
-	% <P>
-	% <b>NOTE: this class is included as part of the file "Joint.tz".</b>
 
 	+ to link parent parentLink (object) to-child childLink (object)
 			with-normal normalVector (vector)
@@ -563,7 +577,7 @@ Joint : UniversalJoint (aka UniversalJoints) [version 2.0] {
 		return (super dearchive).
 }
 
-Joint : BallJoint (aka BallJoints) [version 2.0] {
+Joint : BallJoint (aka BallJoints) [version 2.3] {
 	% This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects
 	% together using a ball joint.
 	% <p>
@@ -576,15 +590,24 @@ Joint : BallJoint (aka BallJoints) [version 2.0] {
 	% <P>
 	% <CENTER><IMG SRC="BallJoint.jpg" BORDER=1></CENTER>
 	% <P>
-	% BallJoints always move in a motion relative to the parent's coordinate
-	% frame.  So setting the X rotation will cause rotation about the parent's
-	% X-axis.
+	% This joint uses a scheme of 3 Euler angles to represent the 
+	% relative rotation between two objects.  The Z-axis of rotation is automatically 
+	% derived from the parent link point, meaning that the Z-axis rotation is always 
+	% a "twist".  The X-axis of rotation is specified by the user with the normal 
+	% argument.  The Y-axis is automatically derived from the other two.
 	% <P>
-	% <b>NOTE: this class is included as part of the file "Joint.tz".</b>
+	% Because of a limitation of the physics engine, the Y-axis rotation is limited 
+	% to a range of approximately +/- 80 degrees of rotation.
+	% <P>
+	% If versions of breve prior to 2.3, there was no normal argument because the 
+	% axes of rotation were automatically defined.  The argument is therefore optional
+	% for backwards compatibility <b>only</b>, and should <b>always</b> be specified
+	% when writing new code.
 
 	+ to link parent parentLink (object) to-child childLink (object)
 			with-parent-point parentPoint (vector) 
-			with-child-point childPoint (vector):
+			with-child-point childPoint (vector)
+			with-normal normal = (1, 0, 0) (vector):
 
 		% Creates a ball (rotation on three axes) joint between parentLink and childLink.  
 		% The joint will be lcoated at parentPoint on the parent's body, and at
@@ -604,7 +627,7 @@ Joint : BallJoint (aka BallJoints) [version 2.0] {
 		if jointPointer:
 			die "attempt to link previously linked Joint object.".
 
-		jointPointer = jointLinkBall(ppointer, cpointer, (0, 0, 0), parentPoint, childPoint, relativeRotation).
+		jointPointer = jointLinkBall(ppointer, cpointer, normal, parentPoint, childPoint, relativeRotation).
 
 		plinkPoint = parentPoint.
 		clinkPoint = childPoint.

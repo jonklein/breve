@@ -109,4 +109,6 @@ class slJoint {
 		unsigned char _isMbJoint;
 	
 		void *userData;
+
+		dJointFeedback _feedback;
 };
