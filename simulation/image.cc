@@ -25,6 +25,8 @@
 
 #include "simulation.h"
 
+#include <setjmp.h>
+
 // #include "util.h"
 // #include "world.h"
 // #include "camera.h"
@@ -52,8 +54,6 @@ struct slJPEGError {
 void slJPEGErrorExit(j_common_ptr);
 
 #endif
-
-#include <setjmp.h>
 
 /*!
 	\brief An error structure for the JPEG library.

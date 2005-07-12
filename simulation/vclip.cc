@@ -1685,7 +1685,7 @@ int slFaceFaceCollisionPoints(slCollision *ce, slShape *s1, slPosition *p1, slFa
 			distance = slPlaneDistance(&plane2, &point);
 
 			if(distance < -1 && distance > maxDepth) {
-				slDebug("point depth less than 1!\n");
+				// slDebug("point depth less than 1!\n");
 			}
 
 			if(distance <= MC_TOLERANCE && distance > maxDepth) {
