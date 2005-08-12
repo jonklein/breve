@@ -367,7 +367,7 @@ int slVclipData::testPair(slCollisionCandidate *candidate, slCollision *ce) {
 		int limit = ((s1->features.size() * s2->features.size()) + 1);
 
 		do {
-			if(brute) slDebug("loop %p [%d] %p [%d]\n", *f1, (*f1)->type, *f2, (*f2)->type);
+			if(brute) slMessage(DEBUG_WARN, "loop %p [%d] %p [%d]\n", *f1, (*f1)->type, *f2, (*f2)->type);
 
 			if(iterations == limit) {
 				// this is the worst-case scenario.  it indicates serious 
@@ -869,7 +869,7 @@ int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int x, int 
 
 		*nf2 = maxFeat;
 
-		if(! maxFeat) slDebug("No included feature\n");
+		if(! maxFeat) slMessage(DEBUG_WARN, "vclip edge/face error: no max feature found\n");
 
 		return CT_CONTINUE;
 	}
@@ -1578,8 +1578,6 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 	// STEP 3: go through all N*M face pairs.
 	//
 
-	// slDebug("face finding step 3: no obvious collision faces found\n");
-
 	best1depth = -DBL_MAX;
 	best2depth = -DBL_MAX;
 
@@ -1685,7 +1683,7 @@ int slFaceFaceCollisionPoints(slCollision *ce, slShape *s1, slPosition *p1, slFa
 			distance = slPlaneDistance(&plane2, &point);
 
 			if(distance < -1 && distance > maxDepth) {
-				// slDebug("point depth less than 1!\n");
+				slMessage(DEBUG_WARN, "vclip deep collision: point depth less than 1\n");
 			}
 
 			if(distance <= MC_TOLERANCE && distance > maxDepth) {
@@ -1709,9 +1707,9 @@ int slFaceFaceCollisionPoints(slCollision *ce, slShape *s1, slPosition *p1, slFa
 
 			distance = slPlaneDistance(&plane2, &point);
 
-			// if(distance < -1 && distance > maxDepth) {
-			// 	slDebug("depth less than 1!\n");
-			// }
+			if(distance < -1 && distance > maxDepth) {
+				slMessage(DEBUG_WARN, "depth less than 1!\n");
+			}
 
 			if(distance <= MC_TOLERANCE && distance > maxDepth) {
 				ce->points.push_back(point);
@@ -1734,9 +1732,9 @@ int slFaceFaceCollisionPoints(slCollision *ce, slShape *s1, slPosition *p1, slFa
 
 			distance = slPlaneDistance(&plane2, &point);
 
-			// if(distance < -1 && distance > maxDepth) {
-			// 	slDebug("depth less than 10!\n");
-			// }
+			if(distance < -1 && distance > maxDepth) {
+				slMessage(DEBUG_WARN, "vclip deep collision: point depth less than 10!\n");
+			}
 
 			if(distance <= MC_TOLERANCE && distance > maxDepth) {
 				ce->points.push_back(point);

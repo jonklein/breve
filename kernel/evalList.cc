@@ -56,14 +56,6 @@ brEvalListHead *brEvalListNew() {
 }
 
 /*!
-	\brief Returns the number of elements in an eval-list.
-*/
-
-int brEvalListCount(brEvalListHead *lh) {
-	return lh->count;
-}
-
-/*!
 	\brief Frees an eval-list.
 
 	If the eval-list has been retained using \ref brEvalListRetain, 
@@ -166,11 +158,6 @@ int brEvalListInsert(brEvalListHead *head, int index, brEval *value) {
 	return index;
 }
 
-/*!
-	\brief Removes an arbitrary element from the list, with its value placed in
-	the given pointer.
-*/
-
 int brEvalListRemove(brEvalListHead *head, int index, brEval *value) {
 	brEvalList *start = head->start;
 
@@ -198,16 +185,6 @@ int brEvalListRemove(brEvalListHead *head, int index, brEval *value) {
 
 	return index;
 }
-
-int brEvalListIndex(brEvalListHead *l, int index, brEval *value) {
-
-}
-
-/*!
-	\brief Looks up a lists index, using the index if possible.
-
-	Updates the index as far as it can as it traverses the list.
-*/
 
 brEvalList *brEvalListIndexLookup(brEvalListHead *l, int index) {
 	brEvalList *list;

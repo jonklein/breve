@@ -23,7 +23,7 @@ slRoamPatch::slRoamPatch(slTerrain *t) {
 	_baseRight._apexX = t->side - 1;
 	_baseRight._apexY = 0;
 
-	_frameVariance = 500.0;
+	_frameVariance = 600.0;
 
 	computeVariance();
 }
@@ -210,9 +210,9 @@ void slRoamPatch::tessellate(slCamera *c) {
 
 	// printf("%d polygons drawn, %f variance\n", _terrain->_polygonsDrawn, _frameVariance);
 
-	if( abs( _terrain->_polygonsDrawn - _terrain->_desiredPolygons ) > 1000) {
+	if( abs( _terrain->_polygonsDrawn - _terrain->_desiredPolygons ) > 100 ) {
 		delta = (_terrain->_polygonsDrawn - _terrain->_desiredPolygons) / _terrain->_desiredPolygons;
-		_frameVariance += 5 * delta;
+		_frameVariance += delta;
 
 		if(_frameVariance < 0.0) _frameVariance = 0.0;
 	}

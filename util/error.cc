@@ -32,38 +32,14 @@ static int gDebugLevel;
 
 static void (*gMessageOutputFunction)(char *) = slStderrMessageCallback;
 
-/*!
-	\brief Set the level of detail of error output.
-
-    This should be 0, except for developers who may choose to use 
-    another value to get more detail about certain processes.
-
-    The error reporting functions report every message under the 
-    current gDebugLevel, so an important error should be reported
-    (using slMessage) with value DEBUG_ALL (0) while a developer 
-    debugging message might use DEBUG_INFO (50).
-*/
 
 void slSetDebugLevel(int level) {
     gDebugLevel = level;
 }
 
-/*!
-	\brief Set the message-output callback function.
-
-	When output is produced, it will be passed to the message-output
-	callback function.  By default, the data will be printed to 
-	stderr, but the callback function could ignore it, print it 
-	to a file, etc.
-*/
-
 void slSetMessageCallbackFunction(void (f)(char *)) {
 	gMessageOutputFunction = f;
 }
-
-/*!
-	\brief The default message-output callback function.
-*/
 
 void slStderrMessageCallback(char *string) {
 	fprintf(stderr, "%s", string);
@@ -92,38 +68,6 @@ void slFatal(char *format, ...) {
     exit(0);
 }
 
-/*!
-    \brief Pauses execution of the program -- for debugging only.
-*/
-
-void slUtilPause() {
-    fprintf(stderr, "[hit enter to continue]\n");
-    getchar();
-}
-
-/*!
-    \brief A stub to break on during debugging.
-*/
-
-void slDebugFunction(char *file, int line, char *text, ...) {
-    va_list vp;   
-
-    va_start(vp, text);
-
-	slMessage(0 , text, vp);
-	slMessage(0, "error at line %d of source file \"%s\"\n", line, file);
-
-    va_end(vp);
-}
-
-/*!
-	\brief Prints printf style output to the output log.
-
-	Uses the global message output function.  Uses the same argument
-	formatting as printf to interpret arguments and build an output
-	string.
-*/
-
 void slMessage(int level, const char *format, ...) {
 	if (level > gDebugLevel || !gMessageOutputFunction)
 		return;
@@ -144,28 +88,4 @@ void slMessage(int level, const char *format, ...) {
 
 	gMessageOutputFunction(queueMessage);
 	free(queueMessage);
-}
-
-/*!
-	\brief Does a stack-trace of the current running program on Mac OS X 
-	only.
-
-	This is a hack.  It uses the malloc_history program which does a 
-	stack trace.  One of the following environment variables must be 
-	set: MallocStackLogging or MallocStackLoggingNoCompact.
-*/
-
-void slStackTrace() {
-	char command[1024];
-
-	/* this is a hack */
-
-	if (getenv("MallocStackLogging") || getenv("MallocStackLoggingNoCompact")) {
-		void *test = malloc(1);
-
-		snprintf(command, sizeof(command), "malloc_history %d %p | tail -1 2> /dev/null", getpid(), test);
-		system(command);
-
-		free(test);
-	}
 }

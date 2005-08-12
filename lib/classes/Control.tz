@@ -1175,6 +1175,17 @@ Abstract : Control (aka Controls) [version 2.3] {
 
   + section "Debugging & Performance"
 
+	+ to set-output-filter to filterLevel (int):
+		% Sets the output filter level.  This value determines the level of 
+		% detail used in printing simulation engine errors and messages.
+		% The default value, 0, prints only regular output.  An output filter
+		% of 50 will print out all normal output as well as some warnings and 
+		% other information useful mostly to breve developers.  Other values
+		% may be added in the future to allow for more granularity of error 
+		% detail.
+
+		setOutputFilter(filterLevel).
+
 	+ to enable-freed-instance-protection:
 		% Freed instance protection means that the breve engine retains 
 		% instances which have been freed in order to make sure that they

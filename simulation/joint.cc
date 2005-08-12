@@ -148,8 +148,6 @@ void slJoint::setVelocity(slVector *speed) {
 		dJointSetAMotorParam(_odeMotorID, dParamVel, speed->x);
 		dJointSetAMotorParam(_odeMotorID, dParamVel3, speed->y);
 	} else if(_type == JT_BALL) {
-		dVector3 result;
-
 		dJointSetAMotorParam(_odeMotorID, dParamVel, speed->x);
 		dJointSetAMotorParam(_odeMotorID, dParamVel2, speed->y);
 		dJointSetAMotorParam(_odeMotorID, dParamVel3, speed->z);

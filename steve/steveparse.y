@@ -41,15 +41,10 @@ stMethod *currentMethod = NULL;
 stSteveData *steveData;
 
 extern int lineno;
-
-extern double doubleValue;
-
 extern char *yyfile;
 
 int gReparse;
 
-void stStartParse(void);
-void stEndParse(void);
 void stParseSetSteveData(stSteveData *);
 void stParseSetEngine(brEngine *);
 void stParseSetObject(stObject *);
@@ -1184,10 +1179,6 @@ number
 ;
 
 %%
-
-void stStartParse() {
-
-}
 
 void stParseSetEngine(brEngine *e) {
 	parseEngine = e;

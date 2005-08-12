@@ -86,7 +86,9 @@ Object : Real (aka Reals) [version 2.1] {
 		setCollisionProperties(realWorldPointer, e, eT, mu).
 
 	+ to set-mu to newMu (float):
-		% Sets the coefficient of friction to newMu.  
+		% Sets the coefficient of friction to newMu.  mu is a 
+		% parameter controlling friction between two bodies and 
+		% may be any value between 0 and infinity.
 
 		mu = newMu.
 		setCollisionProperties(realWorldPointer, e, eT, mu).

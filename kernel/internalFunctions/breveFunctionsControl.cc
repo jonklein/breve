@@ -478,6 +478,16 @@ int brIGetRealTime(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+/*!
+	\brief Sets the output filter level, one of \ref slDebugLevels.
+*/
+
+int brISetOutputFilter(brEval args[], brEval *target, brInstance *i) {
+	slSetDebugLevel( BRINT(&args[0]));
+
+	return EC_OK;
+}
+
 /*@}*/
 
 // initialize the control related functions
@@ -522,4 +532,6 @@ void breveInitControlFunctions(brNamespace *n) {
 
     brNewBreveCall(n, "findFile", brIFindFile, AT_STRING, AT_STRING, 0);
     brNewBreveCall(n, "getRealTime", brIGetRealTime, AT_DOUBLE, 0);
+
+    brNewBreveCall(n, "setOutputFilter", brISetOutputFilter, AT_NULL, AT_INT, 0);
 }

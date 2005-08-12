@@ -926,7 +926,6 @@ int slSphere::rayHitsShape(slVector *dir, slVector *target, slVector *point) {
    if ((x1 < 0) && (x2 < 0))
       return -1;
 
-   //slMessage(DEBUG_ALL, " [ %f, %f ]", x1, x2);
    double erg = x1 < x2 ? x1:x2;
 
    slVectorNormalize(&current);

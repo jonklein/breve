@@ -82,12 +82,27 @@ brEvalListHead *brEvalListDeepCopy(brEvalListHead *);
 brEvalListHead *stDoEvalListDeepCopy(brEvalListHead *, slList **);
 brEvalListHead *brEvalListCopy(brEvalListHead *);
 
+/** 
+    \brief Looks up a lists index, using the index if possible.
+    
+    Updates the index as far as it can as it traverses the list.
+*/  
+
 brEvalList *brEvalListIndexLookup(brEvalListHead *, int);
 
+/*!
+	\brief Inserts an element into the list, with its value taken from
+	the given pointer.
+*/  
+        
 DLLEXPORT int brEvalListInsert(brEvalListHead *, int, brEval *);
-int brEvalListRemove(brEvalListHead *, int, brEval *);
 
-brEvalList *brEvalListIndexLookup(brEvalListHead *, int);
+/*!
+	\brief Removes an arbitrary element from the list and places the removed
+	element in the provided brEval.
+*/
+
+int brEvalListRemove(brEvalListHead *, int, brEval *);
 
 brEvalListHead *brEvalListDeepCopy(brEvalListHead *);
 brEvalListHead *brDoEvalListDeepCopy(brEvalListHead *, slList **);
