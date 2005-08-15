@@ -25,8 +25,6 @@
 
 #include "simulation.h"
 
-#include <setjmp.h>
-
 // #include "util.h"
 // #include "world.h"
 // #include "camera.h"
@@ -36,6 +34,8 @@
 #if HAVE_LIBPNG
 #include <png.h>
 #endif 
+
+#include <setjmp.h>
 
 #if HAVE_LIBJPEG
 #ifdef __cplusplus      // make jpeglib C++ safe
