@@ -20,7 +20,9 @@
 
 #include "kernel.h"
 
+#ifndef WINDOWS
 #include <dlfcn.h>
+#endif
 
 char *interfaceID;
 
@@ -192,11 +194,11 @@ brInternalFunction *brEngineInternalFunctionLookup(brEngine *e, char *name) {
 
 	if (s) return (brInternalFunction *)s->data;
 
-	dlsymbol = dlsym(0, name);
-
-	if(dlsymbol) {
-		slMessage(DEBUG_ALL, "registered function %s not found, but symbol was found\n", name);
-	}
+	// dlsymbol = dlsym(0, name);
+	// 
+	// if(dlsymbol) {
+	// 	slMessage(DEBUG_ALL, "registered function %s not found, but symbol was found\n", name);
+	// }
 
 	return NULL;
 }

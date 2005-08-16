@@ -1,4 +1,4 @@
-#if HAVE_LIBAVFORMAT
+#if HAVE_LIBAVCODEC
 
 #include <ffmpeg/avformat.h>
 
