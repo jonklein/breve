@@ -746,10 +746,9 @@ char *slStripSpaces(char *text) {
 
 /* syntax coloring functions */
 
-/*
-    + syntaxColorEntireFile:
-    = do syntax coloring.  if wholeFile is true, the entire file is done, otherwise,
-    = just the line where the cursor is.
+/*!
+    Do the syntax coloring.  if wholeFile is true, the entire file is done, otherwise,
+    just the line where the cursor is found is done.
 */
 
 - (void)syntaxColorEntireFile:(BOOL)wholeFile {
@@ -795,7 +794,7 @@ char *slStripSpaces(char *text) {
 
         if(c == '#' || (lineStart && c == '%')) {
             m = n+1;
-            while(m < end && [text characterAtIndex: m] != '\n' && m < end) m++;
+            while(m < end && [text characterAtIndex: m] != '\n') m++;
             color = commentColor;
         } else if(c == '.' || isdigit(c)) {
             m = n+1;
@@ -811,7 +810,7 @@ char *slStripSpaces(char *text) {
             x = 0;
             m = n;
 
-            while((isalpha(c) || c == '-' || c == '_') && m <= end) {
+            while((isalpha(c) || c == '-' || c == '_') && m < end - 1) {
                 token[x++] = c;
                 m++;
                 c = [text characterAtIndex: m];
@@ -909,6 +908,8 @@ char *slStripSpaces(char *text) {
     [typeColor release];
     [commentColor release];
     [numberColor release];
+
+	[super dealloc];
 }
 
 - (void)setDocDictionary:(id)d {

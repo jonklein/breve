@@ -35,6 +35,10 @@ class slPatchGrid;
 class slSpring;
 class slVclipData;
 class slDrawCommandList;
+
+class slLink;
+class slTerrain;
+class slMultibody;
 #else
 #endif
 

@@ -247,7 +247,7 @@ slShape *slShapeInitNeighbors(slShape *s, double density) {
 	// add the face neighbors for the all the faces 
 
 	for(fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
-		slVector v1, v2, normal, origin;
+		slVector normal;
 
 		face = *fi;
 

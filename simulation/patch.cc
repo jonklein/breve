@@ -195,11 +195,11 @@ slPatchGrid::slPatchGrid(const slVector *center, const slVector *patchSize, cons
 				int dx, dy, dz;
 
 				for(dx=-1;dx<2;dx++) {
-					if(dx + a != -1 && dx + a != xSize) {
+					if(dx + a != -1 && dx + a != (int)xSize) {
 						for(dy=-1;dy<2;dy++) {
-							if(dy + b != -1 && dy + b != ySize) {
+							if(dy + b != -1 && dy + b != (int)ySize) {
 								for(dz=-1;dz<2;dz++) {
-									if(dz + c != -1 && dz + c != zSize) {
+									if(dz + c != -1 && dz + c != (int)zSize) {
 										this->patches[c][b][a]._neighbors.push_back( &patches[c + dz][b + dy][a + dx]);
 									}
 								}
@@ -219,9 +219,8 @@ slPatchGrid::slPatchGrid(const slVector *center, const slVector *patchSize, cons
  *  slPatch destructor.
  *
  */
-slPatchGrid::~slPatchGrid()
-{
-    int b, c;
+slPatchGrid::~slPatchGrid() {
+    unsigned int b, c;
 
     for(c=0;c<zSize;c++) {
         for(b=0;b<xSize;b++) {
@@ -260,7 +259,7 @@ slPatch* slPatchGrid::getPatchAtLocation(slVector *location) {
 */
 
 void slPatchGrid::assignObjectsToPatches(slWorld *w) {
-	int x, y, z;
+	unsigned int x, y, z;
 	// unsigned int ob;
 	std::vector< slWorldObject* >::iterator wo;
 
@@ -351,7 +350,7 @@ void slPatchGrid::copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double
  */
 
 void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
-	int z, y, x;
+	unsigned int z, y, x;
 	int zVal, yVal, xVal;
 	int zMid = 0, yMid = 0, xMid = 0;
 	slPatch *patch;
@@ -367,15 +366,15 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 
 	xMid = (int)((origin.x - startPosition.x) / patchSize.x);
 	if(xMid < 0) xMid = 0;
-	if(xMid > xSize) xMid = xSize - 1;
+	if(xMid > (int)xSize) xMid = xSize - 1;
 
 	yMid = (int)((origin.y - startPosition.y) / patchSize.y);
 	if(yMid < 0) yMid = 0;
-	if(yMid > ySize) yMid = ySize - 1;
+	if(yMid > (int)ySize) yMid = ySize - 1;
 
 	zMid = (int)((origin.z - startPosition.z) / patchSize.z);
 	if(zMid < 0) zMid = 0;
-	if(zMid > zSize) zMid = zSize - 1;
+	if(zMid > (int)zSize) zMid = zSize - 1;
 
 	glEnable(GL_BLEND);
 
@@ -591,17 +590,17 @@ void slPatchGrid::textureDrawZPass(slVector &size, int dir) {
 
 slPatch* slPatchGrid::getPatchAtIndex(int x, int y, int z)
 {
-	if(x < 0 || x >= xSize) return NULL;
-	if(y < 0 || y >= ySize) return NULL;
-	if(z < 0 || z >= zSize) return NULL;
+	if(x < 0 || x >= (int)xSize) return NULL;
+	if(y < 0 || y >= (int)ySize) return NULL;
+	if(z < 0 || z >= (int)zSize) return NULL;
 	return &patches[z][x][y];
 }
 
 void slPatchGrid::setDataAtIndex(int x, int y, int z, void *data)
 {
-	if(x < 0 || x >= this->xSize) return;
-	if(y < 0 || y >= this->ySize) return;
-	if(z < 0 || z >= this->zSize) return;
+	if(x < 0 || x >= (int)xSize) return;
+	if(y < 0 || y >= (int)ySize) return;
+	if(z < 0 || z >= (int)zSize) return;
 	this->patches[z][x][y].data = data;
 }
 

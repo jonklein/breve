@@ -29,10 +29,10 @@ slMesh::slMesh(char *filename, char *meshname) {
 	if( ! _mesh) throw slException(std::string("cannot locate mesh in file \"") + meshname + "\"");
 
 	if(_mesh) {
-		int n;
+		unsigned int n;
 
-		printf("found node %s, %d faces\n", meshname, _mesh->faces);
-		printf("at: %f, %f, %f\n", _mesh->matrix[3][0], _mesh->matrix[3][1], _mesh->matrix[3][2]);
+		// printf("found node %s, %ld faces\n", meshname, _mesh->faces);
+		// printf("at: %f, %f, %f\n", _mesh->matrix[3][0], _mesh->matrix[3][1], _mesh->matrix[3][2]);
 
 		// translate the mesh to the origin
 

@@ -18,8 +18,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include "util.h"
+#include <stdio.h>
 #include <math.h>
+
+#include "vector.h"
 
 /*!
 	\brief computes the cross product of 3x1 vectors s1 and s2, storing the 

@@ -404,7 +404,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 			return 0;
 		}
 	
-		int cn;	
+		unsigned int cn;	
 
 		for(cn = 0; cn < w->clipData->collisionCount; cn++ ) {
 			slCollision *c = &w->clipData->collisions[ cn];

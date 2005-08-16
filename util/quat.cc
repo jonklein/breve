@@ -18,12 +18,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-/*
-    = quat.c gives utility functions to support quaternions for 
-    = storing and manipulating rotations.
+/**
+    Utility functions to support quaternions for manipulating rotations.
 */
 
-#include "util.h"
+#include "vector.h"
+#include "quat.h"
 
 #include <math.h>
 #include <stdlib.h>

@@ -6,6 +6,7 @@
 #define _DRAWCOMMAND_H
 
 #ifdef __cplusplus
+
 class slDrawCommand;
 
 #include <list>

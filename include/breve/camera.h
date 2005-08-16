@@ -19,7 +19,9 @@
  *****************************************************************************/
 
 #include "util.h"
-#include "simulation.h"
+// #include "simulation.h"
+
+#include "gldraw.h"
 
 #ifndef _CAMERA_H
 #define _CAMERA_H

@@ -22,6 +22,8 @@
 #define _ENGINE_H
 
 #include <pthread.h>
+#include <sys/stat.h>
+
 
 #include "simulation.h"
 #include "timeval.h"

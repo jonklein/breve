@@ -22,6 +22,7 @@
 #define _GLDRAW_H
 
 #include "glIncludes.h"
+#include "world.h"
 
 typedef float slColor[4];
 

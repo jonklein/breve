@@ -139,7 +139,7 @@ class slPatchGrid {
         
         // below should be private/protected
 
-		int xSize, ySize, zSize;
+		unsigned int xSize, ySize, zSize;
 
 		slVector startPosition;
 		slVector patchSize;

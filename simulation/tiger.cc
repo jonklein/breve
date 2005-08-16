@@ -218,7 +218,7 @@ void slGISData::draw(slCamera *c) {
 
 				for(n = 0; n < (int)ci->second._points.size() - 1; n++) {
 					slVector tmp, yAxis, left, right, offset;
-					float lastY;
+					float lastY = 0;
 
 					yAxis.x = 0;
 					yAxis.y = 1;

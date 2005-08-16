@@ -53,14 +53,15 @@ extern "C" {
 #include "matrix.h"
 #include "memory.h"
 #include "nr.h"
-#include "quat.h"
 #include "stack.h"
 #include "stringstream.h"
 #include "text.h"
-#include "vector.h"
 
 #ifdef __cplusplus
 }
 #endif
+
+#include "quat.h"
+#include "vector.h"
 
 #endif

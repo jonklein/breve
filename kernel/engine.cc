@@ -190,10 +190,12 @@ brEngine *brEngineNew(void) {
 
 brInternalFunction *brEngineInternalFunctionLookup(brEngine *e, char *name) {
 	brNamespaceSymbol *s = brNamespaceLookup(e->internalMethods, name);
-	void *dlsymbol;
-
 	if (s) return (brInternalFunction *)s->data;
 
+	// The following could be a way for us to try to load functions without the 
+	// prototypes.  Not sure it's a good idea.
+
+	// void *dlsymbol;
 	// dlsymbol = dlsym(0, name);
 	// 
 	// if(dlsymbol) {

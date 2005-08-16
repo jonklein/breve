@@ -31,7 +31,7 @@
 
 #include "graph.h"
 
-#if defined(__GNUC__) && !defined(__STRICT_ANSI__)
+#if defined(__GNUC__) && !defined(__STRICT_ANSI__) && !defined(__dead)
 #define __dead __attribute__((__noreturn__))
 #else
 #define __dead

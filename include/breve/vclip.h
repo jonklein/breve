@@ -151,7 +151,10 @@ class slCollisionCandidate {
 			_shape2 = w2->shape;
 
 			if(_shape1 && _shape1->_type == ST_NORMAL) _feature1 = _shape1->features[0];
+			else _feature1 = NULL;
+
 			if(_shape2 && _shape2->_type == ST_NORMAL) _feature2 = _shape2->features[0];
+			else _feature2 = NULL;
 		}
 
 		slFeature *_feature1;

@@ -512,9 +512,7 @@ void slLink::updatePosition() {
 
 slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointType, slVector *normal, slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3]) {
 	slJoint *joint;
-	slVector position, newPosition, tp, tc, tn, axis2;
-	dReal R[16];
-	double pR[3][3], cR[3][3];
+	slVector tp, tn, axis2;
 	dBodyID pBodyID, cBodyID;
 
 	// No parent is okay.  No child is bad news.
@@ -582,12 +580,14 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 		slVectorCopy(plinkPoint, &tp);
 	}
 
+	// Note: most of the joint configuration is now done with by calling
+	// setNormal and setLinkPoints below, instead of doing it in this method.
+
 	switch(jointType) {
 		case JT_BALL:
 			slVectorCross(&tp, &tn, &axis2);
 			slVectorNormalize(&axis2);
 			slVectorNormalize(&tp);
-			dJointSetBallAnchor(joint->_odeJointID, tp.x + position.x, tp.y + position.y, tp.z + position.z);
 
 			dJointSetAMotorNumAxes (joint->_odeMotorID,3);
 			dJointSetAMotorMode(joint->_odeMotorID, dAMotorEuler);
@@ -608,17 +608,9 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 
 			dJointSetUniversalAxis1(joint->_odeJointID, tn.x, tn.y, tn.z);
 			dJointSetUniversalAxis2(joint->_odeJointID, axis2.x, axis2.y, axis2.z);
-			dJointSetUniversalAnchor(joint->_odeJointID, tp.x + position.x, tp.y + position.y, tp.z + position.z);
 
 			dJointSetAMotorAxis(joint->_odeMotorID, 0, 2, tn.x, tn.y, tn.z);
 			dJointSetAMotorAxis(joint->_odeMotorID, 2, 2, axis2.x, axis2.y, axis2.z);
-			break;
-		case JT_REVOLUTE:
-			// dJointSetHingeAxis(joint->_odeJointID, tn.x, tn.y, tn.z);
-			// dJointSetHingeAnchor(joint->_odeJointID, tp.x + position.x, tp.y + position.y, tp.z + position.z);
-			break;
-		case JT_PRISMATIC:
-			dJointSetSliderAxis(joint->_odeJointID, tn.x, tn.y, tn.z);
 			break;
 		case JT_FIX:
 			dJointSetFixed(joint->_odeJointID);

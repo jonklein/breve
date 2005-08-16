@@ -720,7 +720,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int x, int y, slCollis
 
 int slPointPointClip(slFeature **nf1, slPosition *p1p, slShape *s1, slFeature **nf2, slPosition *p2p, slShape *s2, slCollision *ce) {
 	int update;
-	slVector v1, v2, dist;
+	slVector v1, v2;
    
 	slPoint *p1 = (slPoint*)*nf1;
 	slPoint *p2 = (slPoint*)*nf2;
