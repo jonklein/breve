@@ -23,7 +23,7 @@ slRoamPatch::slRoamPatch(slTerrain *t) {
 	_baseRight._apexX = t->side - 1;
 	_baseRight._apexY = 0;
 
-	_frameVariance = 600.0;
+	_frameVariance = 10.0;
 
 	computeVariance();
 }
@@ -208,11 +208,11 @@ void slRoamPatch::tessellate(slCamera *c) {
 
 	_triangleCount = 0;
 
-	// printf("%d polygons drawn, %f variance\n", _terrain->_polygonsDrawn, _frameVariance);
-
 	if( abs( _terrain->_polygonsDrawn - _terrain->_desiredPolygons ) > 100 ) {
-		delta = (_terrain->_polygonsDrawn - _terrain->_desiredPolygons) / _terrain->_desiredPolygons;
+		delta = (_terrain->_polygonsDrawn - _terrain->_desiredPolygons) / (float)_terrain->_desiredPolygons;
 		_frameVariance += delta;
+
+		// printf("delta = %f, var = %f\n", delta, _frameVariance);
 
 		if(_frameVariance < 0.0) _frameVariance = 0.0;
 	}
@@ -318,12 +318,11 @@ void slRoamPatch::tessellate(slCamera *c, slRoamTriangle *t, int node) {
 int slRoamPatch::render( slCamera *c, int mode) {
 	int n;
 
-	glEnable(GL_CULL_FACE);
-	glDisable(GL_LIGHTING);
-	// glDisable(GL_TEXTURE_2D);
+	glDisable(GL_CULL_FACE);
+	//glDisable(GL_LIGHTING);
 
 	if( mode) {
-		glPolygonMode(GL_FRONT, GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glDisable(GL_BLEND);
 		glColor4f(1, 1, 1, 1.0);
 		glLineWidth(0.8);
@@ -368,7 +367,7 @@ int slRoamPatch::render( slRoamTriangle *triangle, slCamera *c) {
 
 	glColor3f(1.0 - color, 1.0, 1.0 - color);
 
-	if( triangle->_clipped) return 0;
+	// if( triangle->_clipped) return 0;
 
 	glTexCoord3f(triangle->_leftX / _terrain->textureScale,  triangle->_leftY / _terrain->textureScale, 0);
 	glVertex3f(triangle->_points[0].x, triangle->_points[0].y, triangle->_points[0].z);
@@ -378,27 +377,6 @@ int slRoamPatch::render( slRoamTriangle *triangle, slCamera *c) {
 
 	glTexCoord3f(triangle->_rightX / _terrain->textureScale, triangle->_rightY / _terrain->textureScale, 0);
 	glVertex3f(triangle->_points[2].x, triangle->_points[2].y, triangle->_points[2].z);
-
-	/*
-	glEnd();
-
-	slVector tmp;
-	slVectorAdd(&triangle->_points[2], &triangle->_points[1], &tmp);
-	slVectorAdd(&triangle->_points[0], &tmp, &tmp);
-	slVectorMul(&tmp, .333, &tmp);
-
-	glDisable(GL_TEXTURE_2D);
-	glColor3f(0, 0, 0);
-	glBegin(GL_LINES);
-	glVertex3f(tmp.x, tmp.y, tmp.z);
-	slVectorAdd(&triangle->_normal, &tmp, &tmp);
-	glVertex3f(tmp.x, tmp.y, tmp.z);
-	glEnd();
-	glColor3f(1, 1, 1);
-	glEnable(GL_TEXTURE_2D);
-
-	glBegin(GL_TRIANGLES);
-	*/
 
 	return 1;
 }

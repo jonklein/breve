@@ -1,7 +1,7 @@
 #ifndef _ROAM_H
 #define _ROAM_H
 
-#define VARIANCE_DEPTH 21 
+#define VARIANCE_DEPTH 9
 
 #define TRIANGLE_COUNT 50000
 

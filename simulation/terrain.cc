@@ -70,7 +70,7 @@ slTerrain::slTerrain(int res, double scale, void *data) : slWorldObject() {
 
 	_drawMode = 1;
 
-	_desiredPolygons = 5000;
+	_desiredPolygons = 8000;
 
 	xscale = scale;
 
@@ -377,19 +377,11 @@ slTerrain::~slTerrain() {
 void slTerrain::draw(slCamera *camera) {
 	if(!_initialized) initialize();
 
-	char text[256];
-
 	glPushAttrib(GL_ENABLE_BIT);
 
 	_roam->tessellate(camera);
 
 	_polygonsDrawn = _roam->render( camera, _drawMode);
-
-	sprintf(text, "%d polygons, %f variance\n", _polygonsDrawn, _roam->_frameVariance);
-
-	camera->text[0].text = text;
-	camera->text[0].x = -.8;
-	camera->text[0].y = -.8;
 
 	glPopAttrib();
 }
