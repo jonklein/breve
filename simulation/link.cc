@@ -55,6 +55,8 @@ slLink::slLink(slWorld *w) : slWorldObject() {
 slLink::~slLink() {
 	if(multibody && multibody->_root == this) multibody->setRoot(NULL);
 
+	printf("freeing %p from multibody %p\n", this, multibody);
+
 	// This is a bad situation here: slJointBreak modifies the 
 	// joint list.  I intend to fix this.
 

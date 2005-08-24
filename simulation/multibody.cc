@@ -236,6 +236,8 @@ slList *slMultibody::allCallbackData() {
 	for( li = _links.begin(); li != _links.end(); li++ ) {
 		list = slListPrepend(list, (*li)->userData);
 
+		printf("adding callback data %p for multibody %p\n", (*li), this);
+
 		for(ji = (*li)->inJoints.begin(); ji != (*li)->inJoints.end(); ji++ ) {
 			list = slListPrepend(list, (*ji)->userData);
 		}
@@ -311,6 +313,7 @@ slMultibody::slMultibody(slWorld *w) {
 
 void slMultibody::setRoot(slLink *root) {
 	_root = root;
+
 	if(_root) _root->multibody = this;
 
 	update();
@@ -323,9 +326,9 @@ void slMultibody::setRoot(slLink *root) {
 void slMultibody::update() {
 	std::vector<slLink*>::iterator i;
 
-	if(!_root) return;
-
 	_links.clear();
+
+	if(!_root) return;
 
 	_root->connectedLinks(&_links, 1);
 

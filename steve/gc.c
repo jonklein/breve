@@ -129,7 +129,7 @@ void stGCUnretain(brEval *e) {
 */
 
 void stGCUnretainPointer(void *pointer, int type) {
-	if(type == AT_NULL || !pointer) return;
+	if(type == AT_NULL || type == AT_INT || type == AT_DOUBLE || type == AT_MATRIX || type == AT_VECTOR || !pointer) return;
 
 	switch(type) {
 		case AT_INSTANCE:
@@ -165,7 +165,7 @@ void stGCCollect(brEval *e) {
 */
 
 inline void stGCCollectPointer(void *pointer, int type) {
-	if(type == AT_NULL || !pointer) return;
+	if(type == AT_NULL || type == AT_INT || type == AT_DOUBLE || type == AT_MATRIX || type == AT_VECTOR || !pointer) return;
 
 	switch(type) {
 		case AT_INSTANCE:
