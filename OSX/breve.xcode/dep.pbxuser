@@ -3,7 +3,7 @@
 	2A37F4A9FDCFA73011CA2CEA = {
 		activeBuildStyle = 4A9504D0FFE6A4CB11CA0CBA;
 		activeExecutable = BFC8AEE507A5EDB800ED6F38;
-		activeTarget = 4802DC1A05616137008198B9;
+		activeTarget = 480F31AA071472AD00E71420;
 		breakpoints = (
 			BFFA7E5407DFF8D000A4A9EB,
 		);
@@ -50,7 +50,7 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					242,
+					395,
 					20,
 					48,
 					43,
@@ -85,7 +85,7 @@
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
 					20,
-					299,
+					368,
 					20,
 					51,
 					43,
@@ -108,10 +108,10 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					309,
-					69,
+					192,
+					46,
 					20,
-					69,
+					46,
 					43,
 					43,
 				);
@@ -125,7 +125,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 138121872;
+			PBXPerProjectTemplateStateSaveDate = 146606454;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -302,12 +302,7 @@
 					};
 				},
 			);
-			PBXWorkspaceStateSaveDate = 138121872;
-		};
-		perUserProjectItems = {
-			BFC1D27A0837B76B00A07E11 = BFC1D27A0837B76B00A07E11;
-			BFC1D2900837BFA100A07E11 = BFC1D2900837BFA100A07E11;
-			BFC1D2920837BFA200A07E11 = BFC1D2920837BFA200A07E11;
+			PBXWorkspaceStateSaveDate = 146606454;
 		};
 		sourceControlManager = BFC8AF8907A5EDF400ED6F38;
 		userBuildSettings = {
@@ -338,57 +333,6 @@
 			sepNavWindowFrame = "{{38, 248}, {750, 558}}";
 		};
 	};
-	BFC1D2730837B5E900A07E11 = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.c.h;
-		name = QuickTime.h;
-		path = /System/Library/Frameworks/QuickTime.framework/Headers/QuickTime.h;
-		refType = 0;
-		sourceTree = "<absolute>";
-	};
-	BFC1D27A0837B76B00A07E11 = {
-		fRef = BFC1D2730837B5E900A07E11;
-		isa = PBXTextBookmark;
-		rLen = 1;
-		rLoc = 15;
-		rType = 1;
-	};
-	BFC1D2900837BFA100A07E11 = {
-		fRef = BFC1D2910837BFA100A07E11;
-		isa = PBXTextBookmark;
-		name = "#ifndef __QUICKTIME__\n";
-		rLen = 22;
-		rLoc = 384;
-		rType = 0;
-		vrLen = 0;
-		vrLoc = 0;
-	};
-	BFC1D2910837BFA100A07E11 = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.c.h;
-		name = QuickTime.h;
-		path = /System/Library/Frameworks/QuickTime.framework/Versions/A/Headers/QuickTime.h;
-		refType = 0;
-		sourceTree = "<absolute>";
-	};
-	BFC1D2920837BFA200A07E11 = {
-		fRef = BFC1D2930837BFA200A07E11;
-		isa = PBXTextBookmark;
-		name = "#ifndef __QUICKTIME__\n";
-		rLen = 22;
-		rLoc = 384;
-		rType = 0;
-		vrLen = 0;
-		vrLoc = 0;
-	};
-	BFC1D2930837BFA200A07E11 = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.c.h;
-		name = QuickTime.h;
-		path = /System/Library/Frameworks/QuickTime.framework/Versions/A/Headers/QuickTime.h;
-		refType = 0;
-		sourceTree = "<absolute>";
-	};
 	BFC8AEE507A5EDB800ED6F38 = {
 		activeArgIndex = 2147483647;
 		activeArgIndices = (
@@ -406,12 +350,16 @@
 		enableDebugStr = 1;
 		environmentEntries = (
 		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
 		isa = PBXExecutable;
 		libgmallocEnabled = 0;
 		name = breve.app;
 		savedGlobals = {
 		};
 		shlibInfoDictList = (
+		);
+		shlibInfoDictList_v2 = (
 		);
 		sourceDirectories = (
 		);
@@ -427,16 +375,6 @@
 	BFC8AF8A07A5EDF400ED6F38 = {
 		indexTemplatePath = "";
 		isa = PBXCodeSenseManager;
-		usesDefaults = 1;
-		wantsCodeCompletion = 1;
-		wantsCodeCompletionAutoSuggestions = 0;
-		wantsCodeCompletionCaseSensitivity = 1;
-		wantsCodeCompletionListAlways = 1;
-		wantsCodeCompletionOnlyMatchingItems = 1;
-		wantsCodeCompletionParametersIncluded = 1;
-		wantsCodeCompletionPlaceholdersInserted = 1;
-		wantsCodeCompletionTabCompletes = 1;
-		wantsIndex = 1;
 	};
 	BFFA7E5207DFF8D000A4A9EB = {
 		isa = PBXFileReference;
