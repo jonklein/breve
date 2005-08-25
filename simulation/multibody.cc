@@ -236,6 +236,8 @@ slList *slMultibody::allCallbackData() {
 	for( li = _links.begin(); li != _links.end(); li++ ) {
 		list = slListPrepend(list, (*li)->userData);
 
+		slLink *l = *li;
+
 		for(ji = (*li)->inJoints.begin(); ji != (*li)->inJoints.end(); ji++ ) {
 			list = slListPrepend(list, (*ji)->userData);
 		}

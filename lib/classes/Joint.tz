@@ -30,13 +30,15 @@ Abstract : Joint (aka Joints) [version 2.3] {
 
 		plinkEdgeDistance, clinkEdgeDistance (vector).
 
-	+ to get-parent-object:
+  + section "Getting the Objects Connected by a Joint"
+
+	+ to get-parent:
 		% Returns the object identified as the "parent" ojbect.
 		return parent. 
 
-	+ to get-child-object:
+	+ to get-child:
 		% Returns the object identified as the "child" ojbect.
-		return parent. 
+		return child. 
 
 	+ to init:
 		normalVector. # ditch the unused variable warning.
@@ -153,7 +155,15 @@ Abstract : Joint (aka Joints) [version 2.3] {
 
 		if jointPointer: return jointGetTorque(jointPointer).
 
-  + section "Manipulating Relative Joint Position & Orientation"
+  + section "Getting and Setting Joint Position & Orientation"
+
+	+ to get-child-link-point:
+		% Returns the child link point.
+		return clinkPoint.
+
+	+ to get-parent-link-point:
+		% Returns the child link point.
+		return plinkPoint.
 
 	+ to set-relative-rotation-matrix to newRotation (matrix):
 		% This method must be called <b>before</b> linking the joint.
