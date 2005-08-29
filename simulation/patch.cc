@@ -23,12 +23,6 @@
 #include "vclip.h"
 #include "vclipData.h"
 
-/* ********
- *  TODO: 
- *
- */
-
-
 #ifdef WINDOWS
 #include <windows.h>
 
@@ -130,7 +124,8 @@ slPatchGrid::slPatchGrid()
     :   _texture(-1),
 		_cubeDrawList(-1)
 {
-
+	_drawWithTexture = 1;
+	_cubeDrawList = -1;
 }
 
 /**
@@ -147,6 +142,9 @@ slPatchGrid::slPatchGrid(const slVector *center, const slVector *patchSize, cons
 {
 	int a, b, c;
 
+	_drawWithTexture = 1;
+	_cubeDrawList = -1;
+
 #ifdef WINDOWS
 	// oh windows, why do you have to be such a douchebag about everything?!
 	wglTexImage3D = (PFNGLTEXIMAGE3DPROC)wglGetProcAddress("glTexImage3D");
@@ -155,7 +153,8 @@ slPatchGrid::slPatchGrid(const slVector *center, const slVector *patchSize, cons
     // I don't know what do do about this code--
     // before it would have left a dangling grid object I think
     // and it should be an exception now...
-	if(x < 1 || y < 1 || z < 1) printf("Error instantiating PatchGrid!");
+	if(x < 1 || y < 1 || z < 1) 
+		throw slException( std::string("error instantiating PatchGrid: invalid dimensions"));
 
 	this->patches = new slPatch**[z];
 
@@ -350,11 +349,14 @@ void slPatchGrid::copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double
  */
 
 void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
-	unsigned int z, y, x;
+	int z, y, x;
 	int zVal, yVal, xVal;
 	int zMid = 0, yMid = 0, xMid = 0;
 	slPatch *patch;
 	slVector translation, origin;
+
+    glDisable(GL_LIGHTING);
+	glDepthMask(GL_FALSE);
 
 	if(_cubeDrawList == -1) this->compileCubeList();
 
@@ -377,8 +379,6 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 	if(zMid > (int)zSize) zMid = zSize - 1;
 
 	glEnable(GL_BLEND);
-
-	glEnable(GL_CULL_FACE);
 
 	for(z=0;z<zSize;z++) {
 		if(z < zMid) zVal = z;
@@ -416,6 +416,13 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 			}
 		}
 	}
+
+	glDepthMask(GL_TRUE);
+}
+
+
+void slPatchGrid::setDrawWithTexture(bool t) {
+	_drawWithTexture = t;
 }
 
 /**
@@ -430,6 +437,8 @@ void slPatchGrid::draw(slCamera *camera) {
 	slVector origin, diff, adiff, size;
 
 	if(_texture == -1) _texture = slTextureNew(camera);
+
+	if( !_drawWithTexture) return drawWithout3DTexture(camera);
 
 #ifdef WINDOWS
 	return drawWithout3DTexture(camera);

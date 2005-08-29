@@ -161,6 +161,23 @@ Abstract : PatchGrid (aka PatchGrids) [version 2.2] {
 
         patchGridSetSmoothDrawing(gridPointer, 0).
 
+	+ to enable-volumetric-drawing:
+		% Enables texture drawing for this PatchGrid.  This is the default.
+		% With volumetric rendering, the grid is drawn as a series of overlapping
+		% textured planes.  The rendering is fast, but the overlapping planes may 
+		% leave some visual artifacts.  To revert to the older style of cube 
+		% rendering, see the method METHOD(disable-volumetric-drawing).
+
+		patchGridSetDrawWithTexture(gridPointer, 1).
+		
+	+ to disable-volumetric-drawing:
+		% Disables volumetric drawing for this PatchGrid.  The grid is drawn
+		% as individual cubes.  This technique may produce better results 
+		% visually, but is far slower than the volumetric rendering.  See 
+		% METHOD(enable-volumetric-drawing) for more details.
+
+		patchGridSetDrawWithTexture(gridPointer, 0).
+
 	+ to get-location:
 		% returns the center of the grid.
 		return location.

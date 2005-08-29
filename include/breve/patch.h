@@ -137,6 +137,11 @@ class slPatchGrid {
 
 		void assignObjectsToPatches(slWorld *w);
         
+		/**
+		 * Sets the PatchGrid to be drawn with or without volumetric texturing.
+		 */
+		void setDrawWithTexture(bool t);
+
         // below should be private/protected
 
 		unsigned int xSize, ySize, zSize;
@@ -158,6 +163,8 @@ class slPatchGrid {
 		int _texture;
 		int _cubeDrawList;
 		
+		bool _drawWithTexture;
+
 };
 #else 
 typedef struct slPatchGrid slPatchGrid;

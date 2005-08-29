@@ -374,7 +374,7 @@ int slVclipData::testPair(slCollisionCandidate *candidate, slCollision *ce) {
 				// problems in the logic (by which i mean my implementation) 
 				// of the vclip algorithm.
 
-				slMessage(DEBUG_ALL, "warning: vclip feature loop detected [%d iterations], using brute force detection\n", iterations);
+				slMessage(DEBUG_WARN, "warning: vclip feature loop detected [%d iterations], using brute force detection\n", iterations);
 
 				return slVclipTestPairAllFeatures(this, candidate, ce);
 	

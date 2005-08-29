@@ -81,6 +81,15 @@ int brIPatchGridSetSmoothDrawing(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
+	\brief Enables/disables textured patchgrid drawing.
+*/
+
+int brIPatchGridSetDrawWithTexture(brEval args[], brEval *target, brInstance *i) {
+	BRPATCHGRIDPOINTER(&args[0])->setDrawWithTexture(BRINT(&args[1]));
+	return EC_OK;
+}
+
+/*!
 	\brief Returns the patch at the given (x, y, z) indices.
 
 	slPatch pointer getPatchAtIndex(slPatchGrid pointer).
@@ -219,6 +228,7 @@ void breveInitPatchFunctions(brNamespace *n) {
     brNewBreveCall(n, "patchGridFree", brIPatchGridFree, AT_NULL, AT_POINTER, 0);
     brNewBreveCall(n, "patchGridSetClipGrid", brIPatchGridSetClipGrid, AT_NULL, AT_POINTER, 0);
     brNewBreveCall(n, "patchGridSetSmoothDrawing", brIPatchGridSetSmoothDrawing, AT_NULL, AT_POINTER, AT_INT, 0);
+    brNewBreveCall(n, "patchGridSetDrawWithTexture", brIPatchGridSetDrawWithTexture, AT_NULL, AT_POINTER, AT_INT, 0);
     brNewBreveCall(n, "setPatchObjectAtIndex", brISetObjectAtIndex, AT_NULL, AT_POINTER, AT_INSTANCE, AT_INT, AT_INT, AT_INT, 0);
     brNewBreveCall(n, "patchObjectAtIndex", brIObjectAtIndex, AT_INSTANCE, AT_POINTER, AT_INT, AT_INT, AT_INT, 0);
     brNewBreveCall(n, "objectAtLocation", brIObjectAtLocation, AT_INSTANCE, AT_POINTER, AT_VECTOR, 0);

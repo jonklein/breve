@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
 
 	srandom(time(NULL));
 
-	interfaceID = "cli/2.2.1";
+	interfaceID = "cli/2.3";
 
 	gSimFile = NULL;
 

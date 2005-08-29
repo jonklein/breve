@@ -25,42 +25,33 @@
 </STYLE>
 <BODY>
 
-<h5>version 2.3 [07/XX/2005]</h5>
+The <a href="http://www.spiderland.org/breve">breve</a> simulation environment change log.
+
+<h5>version 2.3 [08/30/2005]</h5>
 
 <ul>
 
-The <a href="http://www.spiderland.org/breve">breve</a> simulation environment change log.
-
-<li>Added Joint methods "get-force" and "get-torque" to get the forces and torques that joints apply to bodies.
-
-<li>BallJoint support enhanced--joint limits now functional.  Axes of rotation for BallJoints have changed,
-see the BallJoint documentation for details.
-
-<li>Fixed "get-angles" for UniversalJoints.
-
-<li>Added "get-colliding-objects" method to Mobile class (replacing "check-for-penetrations").
-
-<li>Fixed crash when freeing disconnected Multibody
-
-<li>Added new GeneticAlgorithm class.
-
 <li>Major optimizations and improvements to collision detection and response.
-
-<li>Fixed MPEG Movie recording on Windows
-
-<li>Fixed set-relative-rotation method for Joints (when called after the joint has been connected).
-
-<li>Mac OS X breve can now save output files to the same diretory as the simulation file.
-
-<li>Added a "Floor" class, which is just a flat stationary object.
-
-<li>Added support for automatic conversion to strings in steve when necessary.
-
-<li>Fixed incorrect bounce for multi-point collisions.
 
 <li>Improved collision-face finding for more accurate collision response.
 
-<li>Fixed lowercase key event processing for Linux &amp; Windows breveIDE frontend
+<li>Added new GeneticAlgorithm class.
+
+<li>Added Joint methods "get-force" and "get-torque" to get the forces and torques that joints apply to bodies.
+
+<li>Added Joint methods to retreive information about parent/child links and link-points.
+
+<li>BallJoint support enhanced&mdash;joint limits now functional.  Axes of rotation for BallJoints have changed, see the BallJoint documentation for details.
+
+<li>Added "get-colliding-objects" method to Mobile class (replacing "check-for-penetrations").
+
+<li>PatchGrids can now be drawn either as individual cubes (better quality) or as a volumetric display (much faster).
+
+<li>Mac OS X breve can now save output files to the same diretory as the simulation file.
+
+<li>Added a "Floor" class&mdash;a flat stationary object.
+
+<li>Added support for automatic conversion to strings in steve when necessary.
 
 <li>Arrow keypresses can now be caught with methods such as "catch-key-left-down".  This works for both "down" and "up", and for the directions "left", "right", "down", "up".
 
@@ -68,19 +59,39 @@ see the BallJoint documentation for details.
 
 <li>Repeating events can now be scheduled using the Object method "schedule-repeated".
 
-<li>New level-of-detail renderer for terrains
+<li>New level-of-detail renderer for terrains.
 
 <li>Adjusted camera movements so that they are more sensitive to the zoom factor, having a larger influence when the camera is zoomed out.
-
-<li>More of simulation backend converted to C++.
-
-<li>Fixed get-real-time precision bug.
-
-<li>Added max-force setting for springs.
 
 <li>For developers and plugin authors: passing a NULL pointer from steve to an internal function will now trigger a runtime error.  
 
 <li>For developers and plugin authors: the constant AT_UNDEFINED has changed.  Plugins using this contstant should be recompiled.
+
+<li>Added max-force setting for springs.
+
+<li>More of simulation backend converted to C++.
+
+</ul>
+
+<h5>Bug fixes</h5>
+
+<ul>
+
+<li>Fixed "get-angles" for UniversalJoints.
+
+<li>Fixed crash when freeing disconnected Multibody
+
+<li>Fixed MPEG Movie recording on Windows
+
+<li>Fixed set-relative-rotation method for Joints (when called after the joint has been connected).
+
+<li>Fixed incorrect bounce for multi-point collisions.
+
+<li>Fixed lowercase key event processing for Linux &amp; Windows breveIDE frontend
+
+<li>Fixed get-real-time precision bug.
+
+</ul>
 
 
 <h5>version 2.2.1 [04/28/2005]</h5>
@@ -266,7 +277,7 @@ see the BallJoint documentation for details.
 <li>New API for using the breve engine with other frontend languages.
 <li>Source code completely restructured.
 <li>Plugin API: all "ST" macros and symbols have been changed to "BR" (i.e., STINT() is now BRINT()).
-<li>Various other changes to the API--plugins must be recompiled using the new API header.
+<li>Various other changes to the API&mdash;plugins must be recompiled using the new API header.
 <li>Source code now documented with doxygen.
 </ul>
 <HR>

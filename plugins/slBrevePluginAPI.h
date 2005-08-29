@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*
-	The breve Simulation Environment plugin API version 2.2
+	The breve Simulation Environment plugin API version 2.3
 
 	Documentation on using the breve plugin API is included in
 	the documentation distributed with breve.
@@ -82,21 +82,22 @@ typedef struct brInstance brInstance;
 /* These entries appear in the brEval type field. */
 
 enum atomicTypes {
-	AT_UNDEFINED = 0, 
-	AT_NULL,
-	AT_INT,
-	AT_DOUBLE,
-	AT_STRING,
-	AT_INSTANCE,
-	AT_BRIDGE_INSTANCE,
-	AT_POINTER,
-	AT_VECTOR,
-	AT_MATRIX,
-	AT_LIST,
-	AT_ARRAY,
-	AT_DATA,
-	AT_HASH,
-	AT_TYPE
+    AT_INVALID = 0,
+    AT_NULL,
+    AT_INT,
+    AT_DOUBLE,
+    AT_STRING,
+    AT_INSTANCE,
+    AT_BRIDGE_INSTANCE,
+    AT_POINTER,
+    AT_VECTOR,
+    AT_MATRIX,
+    AT_LIST,
+    AT_ARRAY,
+    AT_DATA,
+    AT_HASH,
+    AT_TYPE,
+    AT_UNDEFINED
 };
 
 struct slVector {

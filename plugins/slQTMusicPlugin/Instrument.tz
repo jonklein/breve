@@ -40,13 +40,13 @@ Abstract : Instrument {
         instrumentInfo = instrumentNew(n).
         return self.
 
-    + to play-note number n (int) for-duration duration (double) with-volume v = 80 (int):
+    + to play-note number n (int) for-duration duration (double) with-velocity v = 80 (int):
         instrumentPlayNote(instrumentInfo, n, v, duration).
 
-    + to play-chord with-notes notes (list) for-duration duration (double) with-volume v = 80 (int):
+    + to play-chord with-notes notes (list) for-duration duration (double) with-velocity v = 80 (int):
         instrumentPlayChord(instrumentInfo, notes, v, duration).
 
-    + to start-note number n (int) with-volume v = 80 (int):
+    + to start-note number n (int) with-velocity v = 80 (int):
         if lastNote != -1 && autoStop: instrumentStopNote(instrumentInfo, lastNote).
         instrumentStartNote(instrumentInfo, n, v).
         lastNote = n.
