@@ -1,33 +1,27 @@
-<chapter id="version-2.0"> <title>What's New in Version 2.2</title>
+<chapter id="version-2.0"> <title>What's New in Version 2.3</title>
 
 <para>
-breve version 2.1 introduces several new features and changes.  
+breve version 2.3 introduces several new features and changes.  
 </para>
 
-<sect1 id="new_features"> <title>New Features in Version 2.2</title>
+<sect1 id="new_features"> <title>New Features in Version 2.3</title>
 <para>
 
-Below are some of the major new features found in breve 2.2.  For a full 
+Below are some of the major new features found in breve 2.3.  For a full 
 list of new features, see the "Changes" file that is included with the 
 breve distribution.
 
 <itemizedlist>
   <listitem><para>
-New breveIDE graphical user interface for Linux and Windows (thanks to Gabriel Tarasuk-Levin)
+Major improvements to physical simulation performance and accuracy.
   </para></listitem>
 
   <listitem><para>
-steve code evaluation greatly optimized (thanks to Michael Larson).
+New generic GeneticAlgorithm class.
   </para></listitem>
 
   <listitem><para>
-New hardware accelerated Matrix3D class (thanks to Eric DeWitt).
-  </para></listitem>
-
-  <listitem><para>
-Memory requirements, initialization time and collision detection costs greatly reduced for 
-large simulations.  breve is now capable of simulating far more objects than previously 
-possible.
+Improved support for Joint objects.
   </para></listitem>
 
 </itemizedlist> 

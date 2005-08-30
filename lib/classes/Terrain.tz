@@ -67,9 +67,15 @@ Real : Terrain [version 2.2] {
 		return terrainGetHeightAtLocation(realWorldPointer, xCoordinate, zCoordinate).
 
 	+ to draw-solid:
+		% Draws the terrain as solid polygons.  This is the default mode.  
+		% Alternatively, the terrain can be drawn as wireframe only using 
+		% the method METHOD(draw-wireframe).
+
 		terrainSetDrawMode(realWorldPointer, 1).
 
 	+ to draw-wireframe:
+		% Draws the terrain as a wireframe outline only.  See also METHOD(draw-solid).
+
 		terrainSetDrawMode(realWorldPointer, 0).
 
 	+ to set-peak-color to color (vector):
