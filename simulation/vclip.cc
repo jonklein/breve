@@ -821,7 +821,7 @@ int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int x, int 
 					*nf2 = *fi;
 				}
 			}
-	
+
 			slCountFaceCollisionPoints(ce, *nf1, *nf2, ep, fp, s1, s2);
 			ce->n1 = x;
 			ce->n2 = y;
@@ -1652,6 +1652,16 @@ int slFaceFaceCollisionPoints(slCollision *ce, slShape *s1, slPosition *p1, slFa
 	double maxDepth;
 	double distance;
 	slVector zero;
+	
+	if( !face1 ) {
+		slMessage(DEBUG_WARN, "warning: missing face counting in collision points\n");
+		return 0;
+	}
+
+	if( !face2 ) {
+		slMessage(DEBUG_WARN, "warning: missing face counting in collision points\n");
+		return 0;
+	}
 
 	slPositionPlane(p1, &face1->plane, &plane1);
 	slPositionPlane(p2, &face2->plane, &plane2);
