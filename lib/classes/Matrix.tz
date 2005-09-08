@@ -1,7 +1,11 @@
+#
+#
+#
+
 @use Object.
+@use Image.
 
-
-Object : Matrix (aka Matricies) {
+Object : Matrix (aka Matricies) [version 2.0] {
     % Matrix2D objects store an arbitrary sized 2D grid of arbitrary floating 
     % point data.
     % <P>
@@ -31,11 +35,12 @@ Object : Matrix (aka Matricies) {
 }
 
 Matrix : Matrix2D (aka Matrices2D) {
+
     + variables:
         xDim, yDim (int).
 
     + to init:
-        matrixPointer = matrix2DNew(32, 32).
+        #matrixPointer = matrix2DNew(32, 32).
         return self.
     
     + section "Setting the Matrix Size"
@@ -47,8 +52,16 @@ Matrix : Matrix2D (aka Matrices2D) {
         
     + to set-size x xSize (int) y ySize (int):
         % Sets the size of this matrix to (xSize, ySize).        
-        matrix2DFree(matrixPointer).
+        if matrixPointer: matrix2DFree(matrixPointer).
         matrixPointer = matrix2DNew(xSize, ySize).
+        xDim = xSize.
+        yDim = ySize.
+        
+    - to set-matrix-pointer to newPointer (pointer)
+                            x-size xSize (int)
+                            y-size ySize (int):
+        if matrixPointer: matrix2DFree(matrixPointer).
+        matrixPointer = newPointer.
         xDim = xSize.
         yDim = ySize.
         
@@ -214,6 +227,28 @@ Matrix : Matrix2D (aka Matrices2D) {
         % the matrix values.
 
         matrix2DCopyToImage(matrixPointer, (theImage get-image-data), 2, scale).
+        
+    - to print-matlab-style:
+        i, j (int).
+        printf "[".
+        for i = 0, i < (xDim - 1), i++:
+        {
+            for j = 0, j < (yDim - 1), j++:
+            {
+                printf matrix2DGet(matrixPointer, i, j).
+                printf " ".
+            }
+            printf matrix2DGet(matrixPointer, i, j).
+            print ";".
+            printf " ".
+        }
+        for j = 0, j < (yDim - 1), j++:
+        {
+            printf matrix2DGet(matrixPointer, i, j).
+            printf " ".
+        }
+        printf matrix2DGet(matrixPointer, i, j).
+        print "]".               
 }
 
 Matrix : Matrix3D (aka Matrices3D) {
@@ -237,19 +272,26 @@ Matrix : Matrix3D (aka Matrices3D) {
     % floats, while much of the rest of the breve simulation environment uses 
     % double precision floating point math.
 
+    + variables:
+        xDim, yDim, zDim (int).
+
     + to init:
-        matrixPointer = matrix3DNew(32, 32, 32).
+        #matrixPointer = matrix3DNew(32, 32, 32).
         return self.
         
     + to init-with x-size xSize (int) y-size ySize (int) z-size zSize (int): 
         % sets the size to of this matrix to (sSize, ySize, zSize).
         self set-size x xSize y ySize z zSize.
+        xDim = xSize.
+        yDim = ySize.
+        zDim = zSize.
+        
         return self.
         
     + to set-size x xSize (int) y ySize (int) z zSize (int):
         % Sets the size of this matrix to (xSize, ySize, zSize).
 
-        matrix2DFree(matrixPointer).
+        if matrixPointer: matrix2DFree(matrixPointer).
         matrixPointer = matrix3DNew(xSize, ySize, zSize).
 
     + to get-absolute-sum:
@@ -435,4 +477,36 @@ Matrix : Matrix3D (aka Matrices3D) {
         % scaled by the optional scale value.
 
         patchGridCopyColorFrom3DMatrix((grid get-grid-pointer), matrixPointer, 3, scale).
+}
+
+Image : MatrixImage {
+    + variables:
+        red (object).
+        green (object).
+        blue (object).
+        scale (float).
+        
+    + to init-with the-matrix theMatrix (object) scale theScale = 1.0 (float):
+    
+        super init-with width (theMatrix get-x-dimension)
+                        height (theMatrix get-y-dimension).
+        scale = theScale.
+
+        return self.
+        
+    + to set-red to m (object): red = m.
+
+    + to set-green to m (object): green = m.
+
+    + to set-blue to m (object): blue = m.
+
+    + to set-scale-to-max-value of theMatrix (object):
+        scale = (theMatrix get-max-value).
+        
+    + to iterate:
+		if red: red copy-to-red-channel of-image self with-scale scale.
+		if green: green copy-to-blue-channel of-image self with-scale scale.
+		if blue: blue copy-to-blue-channel of-image self with-scale scale.
+        super iterate.
+        
 }
