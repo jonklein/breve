@@ -1,0 +1,126 @@
+#
+#
+#
+
+
+@use Abstract.
+@use NeuralNetwork.
+
+Abstract : NNLearningAlgorithm [version 2.3] {
+
+    %
+    %
+    %
+    
+    + variables:
+        algorithm (pointer).
+        iterationStep (float).
+        timeConstant (float).
+        boundLower (float).
+        boundUpper (float).
+        normalizationRateConstant(float).
+        
+    + to init:
+    
+    + to init-with network theNetwork (object):
+    
+        die "NNLearningAlgorithm needs to be subclassesed before it is used.".
+       + section "Network Parameter Accessors":
+    
+    + to get-iteration-step:
+        return iterationStep.
+        
+    + to set-iteration-step to newTimeStep (float):
+        iterationStep = newTimeStep.
+        nnLearningAlgorithmSetTimeStep(algorithm, newTimeStep).
+    
+    + to get-time-constant:
+        return timeConstant.
+        
+    + to set-time-constant to newTimeConstant (float):
+        timeConstant = newTimeConstant.
+        nnLearningAlgorithmSetTimeConstant(algorithm, newTimeConstant).
+        
+    + to get-lower-saturation-boundry:
+        return boundLower.
+        
+    + to get-upper-saturation-boundry:
+        return boundUpper.
+    
+    + to set-saturation-bounds between lower (float)
+                                and upper (float):
+        boundLower = lower.
+        boundUpper = upper.
+        nnLearningAlgorithmSetWeightBounds(algorithm, lower, upper).
+
+    + to disable-weight-normalization:
+        nnHebbianAlgorithmNormalizeOff(algorithm).
+        
+    + to enable-subtractive-weight-normalization:
+        nnHebbianAlgorithmNormalizeSubtractive(algorithm).
+
+    + to enable-multiplicitive-weight-normalization:
+        nnHebbianAlgorithmNormalizeMultiplicitive(algorithm).
+        
+    + to enable-vector-magnitude-weight-normalization:
+        nnHebbianAlgorithmNormalizeVectorMagnitude(algorithm).
+
+    + to set-normalization-rate-constant to scalar (float):
+        normalizationRateConstant = scalar.
+        nnHebbianAlgorithmNormalizeAlpha(algorithm, scalar).
+        
+    + to update-network-connections:
+        nnLearningAlgorithmUpdateConnectionWeights(algorithm).
+
+}
+
+NNLearningAlgorithm : NNHebbianLearning [version 2.3] {
+
+    + to init:
+    
+    + to init-with network theNetwork (object):
+        if (theNetwork is a "RecurrentNetwork"):
+            self attach-recurrent to theNetwork.
+        else:
+            self attach to theNetwork.
+        return self.
+            
+    - to attach to theNetwork (NeuralNetwork object):
+        algorithm = nnHebbianAlgorithmNNNew((theNetwork get-network-pointer)).
+
+    - to attach-recurrent to theNetwork (RecurrentNetwork object):
+        algorithm = nnHebbianAlgorithmRNNew((theNetwork get-network-pointer)).
+        
+    + to unit-normalize-weight-columns:
+        nnHebbianAlgorithmNormalizeVectorMagnitude(algorithm).
+
+}
+
+NNHebbianLearning : NNBCMLearning [version 2.3] {
+
+    + to init:
+    
+    + to init-with network theNetwork (object):
+        if (theNetwork is a "RecurrentNetwork"):
+            self attach-recurrent to theNetwork.
+        else:
+            self attach to theNetwork.
+        return self.
+        
+    - to attach to theNetwork (NeuralNetwork object):
+        algorithm = nnBCMAlgorithmNNNew((theNetwork get-network)).
+
+    - to attach-recurrent to theNetwork (RecurrentNetwork object):
+        algorithm = nnBCMAlgorithmRNNew((theNetwork get-network-pointer)).
+
+}
+
+NNHebbianLearning : NNSupervisedHebbianLearning [version 2.3] {
+
+
+}
+
+NNLearningAlgorithm : NNBackPropagation [version 2.3] {
+
+
+}
