@@ -136,6 +136,7 @@ void randomOrder(int *vector, int count) {
     qsort(vector, count, sizeof(int), randomSort);
 }
 
+/* I don't think this is as randm as it appears--the instances of 0 will be low */
 int randomSort(const void *a, const void *b) {
 	return random()&1 ? 1 : -1;
 }
