@@ -368,7 +368,6 @@ Abstract : PatchGrid (aka PatchGrids) [version 2.2] {
         % total concentration, multiply by the OBJECT(Patch) size.
         % You don't normally call this directly
         
-        print (chemicalConcentrationMatrix{theDiffusable} get-value at-x xIndex at-y yIndex at-z zIndex).
         return (chemicalConcentrationMatrix{theDiffusable} get-value at-x xIndex at-y yIndex at-z zIndex).
         
     - to set-concentration of theDiffusable (object) at-x xIndex (int) at-y yIndex (int) at-z zIndex (int) to theValue (float):
