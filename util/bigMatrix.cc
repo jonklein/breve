@@ -24,6 +24,7 @@
  *  Copyright (C) 2005 Eric DeWitt, Jonathan Klein
  */
 
+#include "error.h"
 #include "bigMatrix.hh"
 
 /**
@@ -43,14 +44,27 @@ slVectorViewGSL::slVectorViewGSL(const int length)
 /**
  *  slVectorViewGSL copy constructor.
  * 
- *  @param source the number of elements in the matrix.
+ *  @param other the number of elements in the matrix.
  */
-slVectorViewGSL::slVectorViewGSL(const slVectorViewGSL& source)
-    :   _vec(gsl_vector_float_alloc(source._dim)),
+slVectorViewGSL::slVectorViewGSL(const slVectorViewGSL& other)
+    :   _vec(gsl_vector_float_alloc(other._dim)),
         _block(_vec->block),
-        _dim(source._dim)
+        _dim(other._dim)
 {
-    gsl_blas_scopy(source._vec, _vec);
+    gsl_blas_scopy(other._vec, _vec);
+}
+
+/**
+ *  slVectorViewGSL sub vector copy constructor.
+ * 
+ *  @param other the number of elements in the matrix.
+ */
+slVectorViewGSL::slVectorViewGSL(const slVectorViewGSL& other, const int offset,  const int length)
+    :   _vec(gsl_vector_float_alloc(other._dim)),
+        _block(_vec->block),
+        _dim(other._dim)
+{
+    gsl_blas_scopy(other._vec, _vec);
 }
 
 /**
@@ -63,16 +77,46 @@ slVectorViewGSL::~slVectorViewGSL()
 }
 
 // inline 
-void slVectorViewGSL::copy(const slVectorViewGSL& source)
+void slVectorViewGSL::copyData(const slVectorView& other)
 {
-    gsl_blas_scopy(source._vec, _vec);
+    gsl_blas_scopy(other.getGSLVector(), this->getGSLVector());
 }
+
+//inline
+void slVectorViewGSL::setAll(const float value)
+{
+	gsl_vector_float_set_all( _vec, value);
+}
+
+/**
+ * 
+ * clamp(low, tolerance, high)
+ *
+ * Clamps the values in the matrix to be between low and high.  If the value
+ * is below tolerance, then it is set to low.
+ * TODO: shouldn't this be if between high and high-tolerance -> high
+ * and if between low and low+tolerance -> low?
+ */
+
+void slVectorViewGSL::clamp(const float low, const float tolerance, const float high) {
+	unsigned int x;
+
+	for(x = 0; x < static_cast<unsigned int>(_dim); x++ ) {
+        if( _vec->data[x] > high) {
+             _vec->data[x] = high;
+        } else if( _vec->data[x] < tolerance) {
+            _vec->data[x] = low;
+        }
+    }	
+}
+
 
 /**
  *  Returns the VectorView's vector elements as a gsl_vector
  *
  */
-inline gsl_vector_float* slVectorViewGSL::getGSLVector() const {
+inline gsl_vector_float* slVectorViewGSL::getGSLVector() const
+{
     return _vec;
 }
 
@@ -80,8 +124,24 @@ inline gsl_vector_float* slVectorViewGSL::getGSLVector() const {
  *  Returns the dimensionality of the vector.
  *
  */
-inline unsigned int slVectorViewGSL::dim() const {
+inline unsigned int slVectorViewGSL::dim() const
+{
     return _dim;
+}
+
+/**
+ *  Returns the sum of the elements in the vector.
+ */
+inline float slVectorViewGSL::sum() const
+{
+    float result = 0;
+    int i;
+    for (i = 0; i < _dim; i++)
+    {
+        result += _vec->data[i];
+    }
+    return result;
+    
 }
 
 /**
@@ -93,11 +153,19 @@ inline float slVectorViewGSL::absoluteSum() const
 }
 
 /**
+ *  Returns the max of the absolute value of the elements in the vector.
+ */
+inline float slVectorViewGSL::maxAbsolute() const
+{
+    return gsl_vector_float_get(_vec, gsl_blas_isamax(_vec));
+}
+
+/**
  *  Returns the max of the elements in the vector.
  */
 inline float slVectorViewGSL::max() const
 {
-    return gsl_blas_isamax(_vec);
+    return gsl_vector_float_max(_vec);
 }
 
 /**
@@ -162,7 +230,7 @@ slVectorViewGSL& slVectorViewGSL::inPlaceAdd(const slVectorView& other)
  * 
  *  @param scalar the value used to scale each element.
  */
-slVectorViewGSL& slVectorViewGSL::scaleAndAdd(const float scalar, 
+slVectorViewGSL& slVectorViewGSL::inPlaceScaleAndAdd(const float scalar, 
                                               const slVectorView& other)
 {
     gsl_blas_saxpy(scalar, other.getGSLVector(), this->getGSLVector());
@@ -170,24 +238,60 @@ slVectorViewGSL& slVectorViewGSL::scaleAndAdd(const float scalar,
 }
 
 /**
- *  Convolve with general kernel (odd dimension).
+ *  dot product
  */
-// slVectorViewGSL& slVectorViewGSL::convolve(const slVectorView& v) { }
+float slVectorViewGSL::dotProduct(const slVectorView& other) const
+{
+    float result = 0;
+    gsl_blas_sdot(_vec, other.getGSLVector(), &result);
+    return result;
+}
 
 /**
- *  Convolve periodic with general kernel (odd dimension).
-*/
-// slVectorViewGSL& slVectorViewGSL::convolvePeriodic(const slVectorView& v) { }
+ *  outer product
+ */
+slBigMatrix2DGSL& slVectorViewGSL::outerProduct(const slVectorView& other) const
+{
+    unsigned int i, j;
+    float  *v = _vec->data;
+    float  *u = other.getGSLVector()->data; 
+    slBigMatrix2DGSL* result = new slBigMatrix2DGSL(_dim, other.dim());
+    
+    for (i = 0; i < _dim; i++)
+    {
+        for (j = 0; j < other.dim(); j++)
+        {
+            result->_matrix->data[i * result->_matrix->tda + j] = (v[i] * u[j]);
+        }
+    }
+    return *result;
+}
 
 /**
- *  Convolve with general kernel via DFT (odd dimension).
+ *  outer product
  */
-// slVectorViewGSL& slVectorViewGSL::convolveFFT(const slVectorView& v) { }
-
-/**
- *  Convolve with 3x3 kernel (odd dimension).
- */
-// slVectorViewGSL& slVectorViewGSL::convolve3x3(const slVectorView& v) { }
+slBigMatrix2DGSL& slVectorViewGSL::outerProductInto(const slVectorView& other, slBigMatrix2DGSL& result) const
+{
+    unsigned int i, j;
+    float  *v = _vec->data;
+    float  *u = other.getGSLVector()->data; 
+    
+    if (result._xdim == _dim && result._ydim == other.dim())
+    {
+        for (i = 0; i < _dim; i++)
+        {
+            for (j = 0; j < other.dim(); j++)
+            {
+                result._matrix->data[i * result._matrix->tda + j] = (v[i] * u[j]);
+            }
+        }
+    }
+    else
+    {
+        throw slException("slVectorViewGSL::outerProductInto: Dimension Mismatch");
+    }
+    return result;
+}
 
 /**
  *  Addition operator (must have common dimensions).
@@ -229,39 +333,94 @@ slVectorViewGSL& slVectorViewGSL::operator*(const float scalar)
     return *tmp;
 }
 
+/**
+ *  Vector euclidian norm.
+ */
+float slVectorViewGSL::magnitude() const
+{
+    return gsl_blas_snrm2(_vec);
+}
+
+/**
+ *  Convolve with general kernel (odd dimension).
+ */
+// slVectorViewGSL& slVectorViewGSL::convolve(const slVectorView& v) { }
+
+/**
+ *  Convolve periodic with general kernel (odd dimension).
+*/
+// slVectorViewGSL& slVectorViewGSL::convolvePeriodic(const slVectorView& v) { }
+
+/**
+ *  Convolve with general kernel via DFT (odd dimension).
+ */
+// slVectorViewGSL& slVectorViewGSL::convolveFFT(const slVectorView& v) { }
+
+/**
+ *  Convolve with 3x3 kernel (odd dimension).
+ */
+// slVectorViewGSL& slVectorViewGSL::convolve3x3(const slVectorView& v) { }
 
 /**
  *  Base 1D matrix/vector class using GSL
  */
-
 slBigVectorGSL::slBigVectorGSL(const int x)
     : slVectorViewGSL(x)
 {
 
 }
 
-slBigVectorGSL::slBigVectorGSL(const slBigVectorGSL& source)
-    : slVectorViewGSL(static_cast<slVectorViewGSL>(source))
+/**
+ *
+ */
+slBigVectorGSL::slBigVectorGSL(const slBigVectorGSL& other)
+    : slVectorViewGSL(static_cast<const slVectorViewGSL&>(other))
 {
 
 }
+
+/**
+ *
+ */
+slBigVectorGSL::slBigVectorGSL(const slVectorViewGSL& other, const int offset, const int length)
+    : slVectorViewGSL(other, offset, length)
+{
+
+}
+
+/**
+ *
+ *
+slBigVectorGSL::slBigVectorGSL(gsl_vector_float* other)
+    :   _vec(other),
+        _block(_vec->block),
+        _dim(other->size)
+{
+
+}
+*/
+
 
 slBigVectorGSL::~slBigVectorGSL() {}
 
-inline unsigned int slBigVectorGSL::dim()
-{
-	return 0;
-}
-
-inline float slBigVectorGSL::get(const int x)
+/**
+ *
+ */
+//inline 
+float slBigVectorGSL::get(const int x) const
 {
 	return _vec->data[x];
 }
 
-inline void slBigVectorGSL::set(const int x, const float value)
+/**
+ *
+ */
+//inline 
+void slBigVectorGSL::set(const int x, const float value)
 {
 	_vec->data[x] = value;
 }
+
 
 /**
  *  Base 2D matrix class using GSL
@@ -275,10 +434,10 @@ slBigMatrix2DGSL::slBigMatrix2DGSL(const int x, const int y)
     _matrix = gsl_matrix_float_alloc_from_block(slVectorViewGSL::_vec->block, 0, _xdim, _ydim, _ydim);
 }
 
-slBigMatrix2DGSL::slBigMatrix2DGSL(const slBigMatrix2DGSL& source) 
-    : slVectorViewGSL(static_cast<slVectorViewGSL>(source)),
-    _xdim (source._xdim),
-    _ydim (source._ydim)
+slBigMatrix2DGSL::slBigMatrix2DGSL(const slBigMatrix2DGSL& other) 
+    : slVectorViewGSL(static_cast<slVectorViewGSL>(other)),
+    _xdim (other._xdim),
+    _ydim (other._ydim)
 {
     
     _matrix = gsl_matrix_float_alloc_from_block(slVectorViewGSL::_vec->block, 0, _xdim, _ydim, _ydim);
@@ -322,45 +481,71 @@ float slBigMatrix2DGSL::get(const int x, const int y) const
  *  subclass with range checking can be provided.
  */ 
 //inline
- void slBigMatrix2DGSL::set(const int x, const int y,const float value)
+ void slBigMatrix2DGSL::set(const int x, const int y, const float value)
 {
     _matrix->data[x * _matrix->tda + y] = value;
 }
 
-/**
- *  set(x, y) - sets the matrix element at x,y without range checking
- *
- *  The basic slBigMatrix classes do not implement range checking.  When used
- *  in steve code, the range checking should occur there.  In the future a
- *  subclass with range checking can be provided.
- */ 
-//inline
- void slBigMatrix2DGSL::setAll(const float value)
+slBigVectorGSL& slBigMatrix2DGSL::vectorMultiply(const slVectorViewGSL& vector) const
 {
-	gsl_matrix_float_set_all( _matrix, value);
+    slBigVectorGSL* result = new slBigVectorGSL(vector.dim());
+    gsl_blas_sgemv(CblasNoTrans, 1.0, _matrix, vector.getGSLVector(), 1.0, result->getGSLVector());
+    return *result;
 }
 
-/**
- * 
- * clamp(low, tolerance, high)
- *
- * Clamps the values in the matrix to be between low and high.  If the value is below 
- * tolerance, then it is set to low.
- */
-
-void slBigMatrix2DGSL::clamp(const float low, const float tolerance, const float high) {
-	unsigned int x, y;
-
-	for(x = 0; x < _xdim; x++ ) {
-		for(y = 0; y < _ydim; y++ ) {
-			if( _matrix->data[x * _matrix->tda + y] > high) {
-			 	_matrix->data[x * _matrix->tda + y] = high;
-			} else if( _matrix->data[x * _matrix->tda + y] < tolerance) {
-				_matrix->data[x * _matrix->tda + y] = low;
-			}
-		}
-	}
+slBigMatrix2DGSL& slBigMatrix2DGSL::vectorMultiplyInto(const slVectorViewGSL& sourceVector, slVectorViewGSL& resultVector)
+{
+    gsl_blas_sgemv(CblasNoTrans, 1.0, _matrix, sourceVector.getGSLVector(), 1.0, resultVector.getGSLVector());
+    return *this;
 }
+
+slBigMatrix2DGSL& slBigMatrix2DGSL::vectorMultiplyInto(const slVectorViewGSL& sourceVector, const float scalar, slVectorViewGSL& resultVector)
+{
+    gsl_blas_sgemv(CblasNoTrans, 1.0, _matrix, sourceVector.getGSLVector(), scalar, resultVector.getGSLVector());
+    return *this;
+}
+/*
+slBigVectorGSL& slBigMatrix2DGSL::getRowVector(const int x)
+{
+    _gsl_vector_float_view *row = &gsl_matrix_float_row(_matrix, x);
+    slBigVectorGSL *result = new slBigVectorGSL((gsl_vector_float *)row);
+    return *result;
+}
+*/      
+float slBigMatrix2DGSL::getRowMagnitude(const int x)
+{
+    gsl_vector_float *row = &gsl_matrix_float_row(_matrix, x).vector;
+    return gsl_blas_snrm2(row);
+}
+
+slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceRowMultiply(const int x, const float scalar)
+{
+    gsl_vector_float *row = &gsl_matrix_float_row(_matrix, x).vector;
+    gsl_blas_sscal(scalar, row);
+    return *this;
+}
+
+/*        
+slBigVectorGSL& slBigMatrix2DGSL::getColumnVector(const int y)
+{
+    return new slBigVectorGSL(&gsl_matrix_float_column(_matrix, y));
+}
+*/        
+float slBigMatrix2DGSL::getColumnMagnitude(const int y)
+{
+    gsl_vector_float *column = &gsl_matrix_float_column(_matrix, y).vector;
+    return gsl_blas_snrm2(column);
+}
+
+slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceColumnMultiply(const int y, const float scalar)
+{
+    gsl_vector_float *column = &gsl_matrix_float_column(_matrix, y).vector;
+    gsl_blas_sscal(scalar, column);
+    return *this;
+
+}
+
+
 
 /*
 slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceConvolve(const slBigMatrix2D& kernel)
@@ -497,11 +682,11 @@ slBigMatrix3DGSL::slBigMatrix3DGSL(const int x, const int y, const int z)
     }
 }
 
-slBigMatrix3DGSL::slBigMatrix3DGSL(const slBigMatrix3DGSL& source) 
-    : slVectorViewGSL(static_cast<slVectorViewGSL>(source)),
-    _xdim (source._xdim),
-    _ydim (source._ydim),
-    _zdim (source._zdim)
+slBigMatrix3DGSL::slBigMatrix3DGSL(const slBigMatrix3DGSL& other) 
+    : slVectorViewGSL(static_cast<slVectorViewGSL>(other)),
+    _xdim (other._xdim),
+    _ydim (other._ydim),
+    _zdim (other._zdim)
 {
     unsigned int i = 0;
     
@@ -542,12 +727,6 @@ float slBigMatrix3DGSL::get(const int x, const int y, const int z) const
 void slBigMatrix3DGSL::set(const int x, const int y, const int z, const float value)
 {
     (_matrix[z])->data[x * (_matrix[z])->tda + y] = value;
-}
-
-//inline 
-void slBigMatrix3DGSL::setAll(const float value)
-{
-	for( unsigned int n = 0; n < _zdim; n++ ) gsl_matrix_float_set_all( _matrix[n], value);
 }
 
 //slBigMatrix3DGSL& slBigMatrix3DGSL::convolve(const slBigMatrix3D& kernel) {}
