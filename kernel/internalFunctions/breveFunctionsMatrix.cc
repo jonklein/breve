@@ -1,4 +1,4 @@
-/*****************************************************************************
+ /*****************************************************************************
  * The breve Simulation Environment                                          *
  * Copyright (C) 2000-2004 Jonathan Klein                                    *
  *                                                                           *
@@ -17,7 +17,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-/*
+/**
+ *  @file breveFunctionsMatrix.cc
+ *  @breif A matrix manipulation class.
+ *  @author Eric DeWitt
+ *  Copyright (C) 2005 Eric DeWitt, Jonathan Klein
+ *
  * This library of breve functions provide robust matrix routines for
  * 2D and 3D matrices of large sizes.  The goal is to provide hardware
  * acceleration and eventually a full complement of matrix routines.
@@ -28,6 +33,7 @@
  */
 
 #include "kernel.h"
+#include "breveFunctionsImage.h"
 #include "bigMatrix.hh"
 
 #ifdef HAVE_LIBGSL
@@ -47,7 +53,7 @@ typedef slBigMatrix3DGSL brMatrix3D;
 
 // #define BOUNDS_CHECK
 
-#include "breveFunctionsImage.h"
+
 
 int brIMatrix2DNew(brEval args[], brEval *target, brInstance *i) {
 	BRPOINTER(target) = new brMatrix2D(BRINT(&args[0]), BRINT(&args[1]));
@@ -74,7 +80,7 @@ int brIMatrix2DSet(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrix2DSetAll(brEval args[], brEval *target, brInstance *i) {
-	BRBIGMATRIX2D(&args[0])->setAll(float(BRDOUBLE(&args[1])));
+	static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->setAll(float(BRDOUBLE(&args[1])));
 
 	return EC_OK;
 }
@@ -87,7 +93,7 @@ int brIMatrix2DClamp(brEval args[], brEval *target, brInstance *i) {
 
 int brIMatrix2DCopy(brEval args[], brEval *target, brInstance *i) {
 
-	static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[1]))->copy(*static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0])));
+	static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[1]))->copyData(*static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0])));
 
 	return EC_OK;
 }
@@ -98,8 +104,14 @@ int brIMatrix2DGetAbsoluteSum(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+int brIMatrix2DGetMax(brEval args[], brEval *target, brInstance *i) {
+	BRDOUBLE(target) = double(static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->max());
+
+	return EC_OK;
+}
+
 int brIMatrix2DAddScaled(brEval args[], brEval *target, brInstance *i) {
-	static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->scaleAndAdd(float(BRDOUBLE(&args[2])), *static_cast<slVectorView*>(BRBIGMATRIX2D(&args[1])));
+	static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->inPlaceScaleAndAdd(float(BRDOUBLE(&args[2])), *static_cast<slVectorView*>(BRBIGMATRIX2D(&args[1])));
 
 	return EC_OK;
 }
@@ -222,7 +234,9 @@ int brIMatrix2DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 	int offset = BRINT(&args[2]);
 	int r;
 	int x, y, xmax, ymax;
-
+    int yStride = d->x * 4;
+    int xStride = d->y * 4;
+    
 	xmax = sourceMatrix->xDim();
 	ymax = sourceMatrix->yDim();
 
@@ -231,14 +245,17 @@ int brIMatrix2DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 	if (ymax > d->y)
 		ymax = d->y;
 
+//	pdata = d->data;
 	pdata = d->data + offset;
 
 	for (y = 0; y < ymax; y++)
 	 	for (x = 0; x < xmax; x++) {
 			r = (int)(sourceData[x * sourceTDA + y] * scale);
 			if (r > 255)
+//				pdata[(x * xStride) + (y << 2) + offset] = 255;
 				*pdata = 255;
 			else
+//				pdata[(x * xStride) + (y << 2) + offset] = r;
 				*pdata = r;
 			pdata += 4;
 	 	}
@@ -288,14 +305,14 @@ int brIMatrix3DSet(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrix3DSetAll(brEval args[], brEval *target, brInstance *i) {
-	BRBIGMATRIX3D(&args[0])->setAll(float(BRDOUBLE(&args[1])));
+	static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->setAll(float(BRDOUBLE(&args[1])));
 
 	return EC_OK;
 }
 
 int brIMatrix3DCopy(brEval args[], brEval *target, brInstance *i) {
 
-	static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[1]))->copy(*static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[0])));
+	static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[1]))->copyData(*static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[0])));
 
 	return EC_OK;
 }
@@ -307,7 +324,7 @@ int brIMatrix3DGetAbsoluteSum(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrix3DAddScaled(brEval args[], brEval *target, brInstance *i) {
-	static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[0]))->scaleAndAdd(float(BRDOUBLE(&args[2])), *static_cast<slVectorView*>(BRBIGMATRIX3D(&args[1])));
+	static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[0]))->inPlaceScaleAndAdd(float(BRDOUBLE(&args[2])), *static_cast<slVectorView*>(BRBIGMATRIX3D(&args[1])));
 
 	return EC_OK;
 }
@@ -465,6 +482,7 @@ int brIMatrix3DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 	unsigned int offset = BRINT(&args[3]);
 	int r;
 	int x, y, xmax, ymax, zmax;
+	int yStride = d->x * 4;
 
 	xmax = sourceMatrix->xDim();
 	ymax = sourceMatrix->yDim();
@@ -476,14 +494,17 @@ int brIMatrix3DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 	if (ymax > d->y)
 		ymax = d->y;
 		
+//	pdata = d->data;
 	pdata = d->data + offset;
 
 	for (y = 0; y < ymax; y++)
 	 	for (x = 0; x < xmax; x++) {
 			r = (int)(sourceData[zOffset + x * sourceTDA + y] * scale);
 			if (r > 255)
+//				pdata[(x * xStride) + (y << 2) + offset] = 255;
 				*pdata = 255;
 			else
+//				pdata[(x * xStride) + (y << 2) + offset] = r;
 				*pdata = r;
 			pdata += 4;
 	 	}
@@ -512,6 +533,7 @@ void breveInitMatrixFunctions(brNamespace *n) {
 	brNewBreveCall(n, "matrix2DCopyToImage", brIMatrix2DCopyToImage, AT_NULL, AT_POINTER, AT_POINTER, AT_INT, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix2DScale", brIMatrix2DScale, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix2DGetAbsoluteSum", brIMatrix2DGetAbsoluteSum, AT_DOUBLE, AT_POINTER, 0);
+	brNewBreveCall(n, "matrix2DGetMax", brIMatrix2DGetMax, AT_DOUBLE, AT_POINTER, 0);
 	brNewBreveCall(n, "matrix2DAddScaled", brIMatrix2DAddScaled, AT_NULL, AT_POINTER, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix2DAddScalar", brIMatrix2DAddScalar, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix2DMulElements", brIMatrix2DMulElements, AT_NULL, AT_POINTER, AT_POINTER, 0);
