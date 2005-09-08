@@ -15,16 +15,8 @@ Controller TestRunner.
 
 Control : TestRunner {
     + variables:
-        U (object).
-        V (object).
-        W, R (object).
-        texture (object).
-        cube (object).
 
     + to init:
-        m, n, i, j, k (int).
-        testSuccess (int).
-        q, r, s (double).
         
         self set-background-color to (0, 0, 0).
 
@@ -32,6 +24,20 @@ Control : TestRunner {
         self set-integration-step to TIMESTEP.
 
         self point-camera at (0, 0, 0) from (0, 0, 70).
+        
+        self test-matrix-matrix-operations.
+        
+    + to test-vector-scalar-operations:
+    + to test-vector-vector-operations:
+    + to test-vector-matrix-operations:
+        U (object).
+        V (object).
+        W, R (object).
+        texture (object).
+        cube (object).
+        m, n, i, j, k (int).
+        testSuccess (int).
+        q, r, s (double).
 
         U = new Matrix2D.
         V = new Matrix2D.
@@ -282,27 +288,277 @@ Control : TestRunner {
         }
         print ")".
 
+    }
+
+    ### ###########################
+    ### This needs to be divided up into matrix-scalar, matrix-matrix
+    + to test-matrix-matrix-operations:
+        U (object).
+        V (object).
+        W, R (object).
+        texture (object).
+        cube (object).
+        m, n, i, j, k (int).
+        testSuccess (int).
+        q, r, s (double).
+
+
+        U = new Matrix2D.
+        V = new Matrix2D.
+        W = new Matrix3D.
+        R = new Matrix3D.
+        
+        U set-size x SIZE y SIZE.
+        V set-size x SIZE y SIZE.
+        W set-size x SIZE y SIZE z SIZE.
+        R set-size x SIZE y SIZE z SIZE.
+         
+        texture = new MatrixImage.
+        texture init-with the-matrix U.
+        texture set-red to U.
+        texture set-green to V.
+
+        cube = new Mobile.
+        cube set-shape to (new Cube init-with size (400, 400, 1)).
+        cube set-texture-image to texture.
+        cube set-texture-scale to 40.
+        
+        testSuccess = 0.
+        q = 1.
+        # get-set
+        for n=0,n<SIZE,n++:
+            for m=0,m<SIZE,m++: {
+                U set-value to q at-x n at-y m.
+                if q == (U get-value at-x n at-y m): testSuccess++.
+                q++.
+            }
+        printf testSuccess.
+        printf " tests out of ".
+        printf (SIZE*SIZE).
+        print " get and set function tests succeeded.".
+
+        testSuccess = 0.
+        q = 1.
+        # get-set
+        for i=0,i<SIZE,i++: 
+            for j=0,j<SIZE,j++: 
+                for k=0,k<SIZE,k++: {
+                W set-value to q at-x i at-y j at-z k.
+                if q == (W get-value at-x i at-y j at-z k): testSuccess++.
+                q++.
+            }
+        printf testSuccess.
+        printf " tests out of ".
+        printf (SIZE*SIZE*SIZE).
+        print " get and set function tests succeeded.".
+
+
+        # the basics
+        for n=0,n<SIZE,n++:
+            for m=0,m<SIZE,m++: {
+                U set-value to 1.0 at-x n at-y m.
+                V set-value to -1.0 at-x n at-y m.
+            }
+
+        for i=0,i<SIZE,i++:
+            for j=0,j<SIZE,j++: 
+                for k=0,k<SIZE,k++: {
+                W set-value to 1.0 at-x i at-y j at-z k.
+                R set-value to -1.0 at-x i at-y j at-z k.
+            }
+            
+        testSuccess = 0.
+        # absolute sum
+        if (SIZE*SIZE) == (U get-absolute-sum): testSuccess++.
+        else: print (U get-absolute-sum).
+        if (SIZE*SIZE) == (V get-absolute-sum): testSuccess++.
+        else: print (V get-absolute-sum).
+        if (SIZE*SIZE*SIZE) == (W get-absolute-sum): testSuccess++.
+        else: print (W get-absolute-sum).
+        if (SIZE*SIZE*SIZE) == (R get-absolute-sum): testSuccess++.
+        else: print (R get-absolute-sum).
+        if testSuccess == 4: print "get-absolute-sum succeeded.".
+        else: print "get-absolute-sum failed.".
+        
+        testSuccess = 0.
+        # add scalar
+        U add-scalar value 1.0.
+        for n=0,n<SIZE,n++:
+            for m=0,m<SIZE,m++: {
+                if 2.0 == (U get-value at-x n at-y m): testSuccess++.
+            }
+        if testSuccess == (SIZE*SIZE): print "matrix2D add-scalar succeeded".
+        else: print "matrix2D add-scalar failed.".
+        testSuccess = 0.
+        W add-scalar value 1.0.
+        for i=0,i<SIZE,i++:
+            for j=0,j<SIZE,j++: 
+                for k=0,k<SIZE,k++: {
+                if 2.0 == (W get-value at-x i at-y j at-z k): testSuccess++.
+            }
+        if testSuccess == (SIZE*SIZE*SIZE): print "matrix3D add-scalar succeeded".
+        else: print "matrix3D add-scalar failed.".
+        
+        testSuccess = 0.
+        # multiply-with-values
+        for n=0,n<SIZE,n++:
+            for m=0,m<SIZE,m++: {
+                U set-value to 1.0 at-x n at-y m.
+                V set-value to 2.0 at-x n at-y m.
+            }
+                for i=0,i<SIZE,i++:
+            for j=0,j<SIZE,j++: 
+                for k=0,k<SIZE,k++: {
+                W set-value to 1.0 at-x i at-y j at-z k.
+                R set-value to 2.0 at-x i at-y j at-z k.
+            }
+        U multiply-with-values of V.
+        W multiply-with-values of R.
+        for n=0,n<SIZE,n++:
+            for m=0,m<SIZE,m++: {
+                if 2.0 == (U get-value at-x n at-y m): testSuccess++.
+        }
+        if testSuccess == (SIZE*SIZE): print "matrix2D multiply-with-values succeeded.".
+        else: print "matrix2D multiply-with-values failed.".
+        testSuccess = 0.
+        for i=0,i<SIZE,i++:
+            for j=0,j<SIZE,j++: 
+                for k=0,k<SIZE,k++: {
+                if 2.0 == (W get-value at-x i at-y j at-z k): testSuccess++.
+            }
+        if testSuccess == (SIZE*SIZE*SIZE): print "matrix3D multiply-with-values succeeded".
+        else: print "matrix3D multiply-with-values failed.".
+
+        testSuccess = 0.
+        # add-values
+        for n=0,n<SIZE,n++:
+            for m=0,m<SIZE,m++: {
+                U set-value to 1 at-x n at-y m.
+                V set-value to 1 at-x n at-y m.
+            }
+                for i=0,i<SIZE,i++:
+            for j=0,j<SIZE,j++: 
+                for k=0,k<SIZE,k++: {
+                W set-value to 1.0 at-x i at-y j at-z k.
+                R set-value to 1.0 at-x i at-y j at-z k.
+            }
+        W add-values of R scaled-by 2.0.
+        U add-values of V scaled-by 2.0.
+        for n=0,n<SIZE,n++:
+            for m=0,m<SIZE,m++: {
+                if 3.0 == (U get-value at-x n at-y m): testSuccess++.
+        }
+        if testSuccess == (SIZE*SIZE): print "matrix2D add-values succeeded.".
+        else: print "matrix2D add-values failed.".
+        testSuccess = 0.
+        for i=0,i<SIZE,i++:
+            for j=0,j<SIZE,j++: 
+                for k=0,k<SIZE,k++: {
+                if 3.0 == (W get-value at-x i at-y j at-z k): testSuccess++.
+            }
+        if testSuccess == (SIZE*SIZE*SIZE): print "matrix3D add-values succeeded".
+        else: print "matrix3D add-values failed.".
+
+        testSuccess = 0.
+        # scale
+        for n=0,n<SIZE,n++:
+            for m=0,m<SIZE,m++: {
+                U set-value to 1 at-x n at-y m.
+            }
+        for i=0,i<SIZE,i++:
+            for j=0,j<SIZE,j++: 
+                for k=0,k<SIZE,k++: {
+                W set-value to 1.0 at-x i at-y j at-z k.
+            }
+        W scale by 2.0.
+        U scale by 2.0.
+        for n=0,n<SIZE,n++:
+            for m=0,m<SIZE,m++: {
+                if 2.0 == (U get-value at-x n at-y m): testSuccess++.
+        }
+        if testSuccess == (SIZE*SIZE): print "matrix2D scale by succeeded.".
+        else: print "matrix2D scale by failed.".
+        testSuccess = 0.
+        for i=0,i<SIZE,i++:
+            for j=0,j<SIZE,j++: 
+                for k=0,k<SIZE,k++: {
+                if 2.0 == (W get-value at-x i at-y j at-z k): testSuccess++.
+            }
+        if testSuccess == (SIZE*SIZE*SIZE): print "matrix3D scale by succeeded".
+        else: print "matrix3D scale by failed.".
+        
+        testSuccess = 0.
+        # diffusion
+        U set-all-values to 0.0.
+        W set-all-values to 0.0.
+        U set-value to 8.0 at-x 3 at-y 3.
+        W set-value to 12.0 at-x 3 at-y 3 at-z 3.       
+        V set-all-values to 3.0.
+        R set-all-values to 3.0.
+        V compute-diffusion-matrix from U with-scale 1.0.
+        R compute-diffusion-matrix from W with-scale 1.0.
+        
+        for n=0,n<SIZE,n++: 
+            for m=0,m<SIZE,m++: {
+                if (n == 2): if (m == 3): if (V get-value at-x 2 at-y 3) == 8.0: testSuccess++.
+                if (n == 3): if (m == 2): if (V get-value at-x 3 at-y 2) == 8.0: testSuccess++.
+                if (n == 3): if (m == 3): if (V get-value at-x 4 at-y 3) == 8.0: testSuccess++.
+                if (n == 3): if (m == 4): if (V get-value at-x 3 at-y 4) == 8.0: testSuccess++.
+                if (n == 2): if (m == 3): if (V get-value at-x 3 at-y 3) == -32.0: testSuccess++.
+                if (V get-value at-x n at-y m) == 0.0: testSuccess++.
+            }
+        if testSuccess == (SIZE*SIZE): print "matrix2D diffuse pass 1 succeeded.".
+        else: {
+             print "matrix2D scale by failed.".
+             print "(".
+        for n=0,n<SIZE,n++: {
+                printf "(".
+            for m=0,m<SIZE,m++: {
+                printf (V get-value at-x n at-y m).
+                printf " ".
+        }
+        print ")".
+        }
+        print ")".
+        }
+        testSuccess = 0.
+        for i=0,i<SIZE,i++:
+            for j=0,j<SIZE,j++: 
+                for k=0,k<SIZE,k++: {
+                    if (i == 2): if (j == 3): if (k == 3): if (R get-value at-x 2 at-y 3 at-z 3) == 12.0: testSuccess++.
+                    if (i == 2): if (j == 3): if (k == 3): if (R get-value at-x 3 at-y 2 at-z 3) == 12.0: testSuccess++.
+                    if (i == 2): if (j == 3): if (k == 3): if (R get-value at-x 3 at-y 3 at-z 2) == 12.0: testSuccess++.
+                    if (i == 2): if (j == 3): if (k == 3): if (R get-value at-x 4 at-y 3 at-z 3) == 12.0: testSuccess++.
+                    if (i == 2): if (j == 3): if (k == 3): if (R get-value at-x 3 at-y 4 at-z 3) == 12.0: testSuccess++.
+                    if (i == 2): if (j == 3): if (k == 3): if (R get-value at-x 3 at-y 3 at-z 4) == 12.0: testSuccess++.
+                    if (i == 2): if (j == 3): if (k == 3): if (R get-value at-x 3 at-y 3 at-z 3) == -72.0: testSuccess++.
+                    if (R get-value at-x i at-y j at-z k) == 0.0: testSuccess++.
+        }
+        if testSuccess == (SIZE*SIZE*SIZE): print "matrix3D diffuse pass 1 succeeded".
+        else: {
+            print "matrix3D scale by failed.".
+            print "(".
+        for i=0,i<SIZE,i++:{
+             print "(".
+            for j=0,j<SIZE,j++:{ 
+             printf "(".
+                for k=0,k<SIZE,k++: {
+                printf (R get-value at-x i at-y j at-z k).
+                printf " ".
+        }
+        print ")".
+        }
+        print ")".
+        }
+        print ")".
+
 }
+
     + to iterate:
                 
         super iterate.
 
-    controller end-simulation.             
+        controller end-simulation.             
 
-}
-
-Image : MatrixImage {
-    + variables:
-        vp (object).
-        up (object).
-        n (int).
-
-    + to set-vp to m (object): vp = m.
-    + to set-up to m (object): up = m.
-
-    + to iterate:
-        if vp: vp copy-to-red-channel of-image self with-scale 2.0.
-        if up: up copy-to-blue-channel of-image self with-scale 2.0.
-        super iterate.
 }
 
