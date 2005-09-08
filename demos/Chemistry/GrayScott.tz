@@ -35,7 +35,7 @@ Control : GS {
         # check for --periodic or --not-periodic
         
 
-        self set-background-color to (0, 0, 0).
+        self set-background-color to (1, 1, 1).
 
         self set-iteration-step to TIMESTEP.
         self set-integration-step to TIMESTEP.
@@ -55,9 +55,9 @@ Control : GS {
 		inflow set-size x SIZE y SIZE.
 
         texture = new MatrixImage.
-        texture init-with width SIZE height SIZE.
-        texture set-vp to V.
-        texture set-up to U.
+        texture init-with the-matrix U scale 2.0.
+        texture set-red to V.
+        texture set-blue to U.
 
         cube = new Mobile.
         cube set-shape to (new Cube init-with size (400, 400, 1)).
@@ -100,19 +100,3 @@ Abstract: PeriodicIteration {
 Abstract: APeriodicIteration {
 
 }
-
-Image : MatrixImage {
-    + variables:
-        vp (object).
-        up (object).
-        n (int).
-
-    + to set-vp to m (object): vp = m.
-    + to set-up to m (object): up = m.
-
-    + to iterate:
-		vp copy-to-red-channel of-image self with-scale 2.0.
-		up copy-to-blue-channel of-image self with-scale 2.0.
-        super iterate.
-}
-
