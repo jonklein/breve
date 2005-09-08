@@ -1,0 +1,72 @@
+@include "NeuralNetwork.tz"
+
+NeuralNetwork : FFNetwork [version 1.8] {
+	% A new experimental class for simple feed-forward neural networks.
+	% This class is now derived from NeuralNetwork.tz which is the base
+	% of a complete set of neural network classes.
+
+    + variables:
+        layers (list).
+		inputLayer (pointer).
+		outputLayer (pointer).
+
+	+ to set-weight to-layer theLayer (int) from-node fn (int) to-node tn (int) to-weight weight (float):
+		% Sets the input to the node number tn on layer theLayer, coming from
+		% node number fn on layer number theLayer - 1 to weight.
+
+		setWeight(layers{theLayer}, tn, fn, weight).
+
+	+ to get-weight on-layer theLayer (int) from-node fn (int) to-node tn (int):
+		% Sets the input to the node number tn on layer theLayer, coming from
+		% node number fn on layer number theLayer - 1 to weight.  Normally
+		% you wouldn't need to use this method, since the method 
+		% METHOD(get-output) is the preferred way to retrieve network output.
+
+		return getWeight(layers{theLayer}, tn, fn).
+		
+	+ to add-layer with-neuron-count count (int):
+		% Adds a layer to the output end of the neural network, with 
+		% count neurons.  The first layer added serves as the input
+		% layer, and then subsequent layers serve as hidden or output
+		% layers.  
+		% <p>
+		% To create a network with one hidden layer, for example, you 
+		% would first call METHOD(add-layer) for the input layer, then
+		% the hidden layer, then the output layer.
+
+		newLayer (pointer).
+
+		if count < 1: {
+			print "cannot add neural network layer with $count nodes\n".
+			return.
+		}
+
+		newLayer = newFFLayer(count, outputLayer).
+
+		if layers == 0: inputLayer = newLayer.
+
+		# what the hell does this do?  it adds newLayer onto the end of 
+		# layers.  because lists give their lengths when interpreted as 
+		# ints.
+
+		layers{ layers } = newLayer.
+
+		outputLayer = newLayer.
+
+	+ to run-with inputs inputList (list):
+		% Sets the inputs of the neural network to the values in inputList,
+		% and runs the network.  Output values can then be retrieved with
+		% METHOD(get-output).
+
+		feedForward(outputLayer, inputList).
+
+	+ to get-output at-position position (int):
+		% Returns the value at index position of the output layer.  This 
+		% assumes that METHOD(run-with) has already been called to actually
+		% run the neural network.
+
+		return getValue(outputLayer, position).
+
+	+ to destroy:
+		freeNetwork(outputLayer).
+}
