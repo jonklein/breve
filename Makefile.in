@@ -36,6 +36,7 @@ include simulation/Makefile
 include kernel/Makefile
 include graph/Makefile
 include neural/Makefile
+include neural/Network/Makefile
 include steve/Makefile
 include java/Makefile
 include docBuild/Makefile
@@ -116,7 +117,7 @@ OSX_build: optimize lib/libbreve.a
 OSX_debug: optimize_debug lib/libbreve.a
 	-mkdir docs
 	cd plugins; $(MAKE)
-	cd OSX; xcodebuild -buildstyle Deployment CC= LIBS='-L/sw/lib -L/opt/local/lib -L/usr/local/incldue -lpush -lode -framework JavaVM -lavformat -lavcodec -lgsl -lreadline -lhistory -lncurses -ltermcap -lsndfile -ljpeg -lpng -lexpat -lz  -lm -framework OpenGL -framework GLUT -framework AppKit -framework vecLib -framework CoreAudio -framework AudioToolbox '
+	cd OSX; xcodebuild -buildstyle Deployment CC= LIBS='@LDFLAGS@ @LIBS@'
 
 OSX_clean: clean
 	rm -f $(DMG_FILE)
