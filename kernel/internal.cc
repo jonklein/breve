@@ -133,6 +133,7 @@ void brLoadInternalFunctions(brEngine *e) {
 	breveInitNetworkFunctions(e->internalMethods);
 	breveInitPatchFunctions(e->internalMethods);
 	breveInitNeuralFunctions(e->internalMethods);
+	breveInitNeuralNetworkFunctions(e->internalMethods);
 	breveInitCameraFunctions(e->internalMethods);
 	breveInitFileFunctions(e->internalMethods);
 	breveInitSoundFunctions(e->internalMethods);
@@ -144,6 +145,8 @@ void brLoadInternalFunctions(brEngine *e) {
 	breveInitSpringFunctions(e->internalMethods);
 	breveInitPushCallbackFunctions(e->internalMethods);
 	breveInitMatrixFunctions(e->internalMethods);
+	breveInitVectorFunctions(e->internalMethods);
+	breveInitStatisticsFunctions(e->internalMethods);
 	breveInitQGAMEFunctions(e->internalMethods);
 	breveInitDrawFunctions(e->internalMethods);
 }
