@@ -50,7 +50,7 @@ slNeuralNetwork::slNeuralNetwork(const unsigned size)
         _connectionStructure(size, size),
         _inputOffset(0),
         _inputSize(0),
-        _outputOffset(0),
+        _outputOffset((size - 1)),
         _outputSize(0),
         _deltaTime (1.0),
         _timeConstant(1.0),
@@ -151,16 +151,17 @@ slBigVectorGSL* slNeuralNetwork::getNeuronStateVector()
     return &_currentNeuronStates;
 }
 
-void slNeuralNetwork::setInputNeurons(const unsigned offset, const unsigned length)
+slBigVectorGSL* slNeuralNetwork::setInputNeurons(const unsigned offset, const unsigned length)
 {
     if (((offset + length) > this->getNeuronCount()) || (offset < 0)) throw slException(std::string("Input neurons out of bounds."));
     if((offset > (_outputOffset + _outputSize)) || (offset + length) <= _outputOffset)
     {
         _inputNeuronStates = new slBigVectorGSL(static_cast<slVectorViewGSL>(_currentNeuronStates), offset, length);
+        return _inputNeuronStates;
     }
     else
     {  
-        throw slException(std::string("Input neurons must no overlap output neurons."));
+        throw slException(std::string("Input neurons must not overlap output neurons."));
     }
 }
 
@@ -175,12 +176,13 @@ int slNeuralNetwork::getInputNeuronCount() const
     else return 0;
 }
 
-void slNeuralNetwork::setOutputNeurons(const unsigned offset, const unsigned length)
+slBigVectorGSL* slNeuralNetwork::setOutputNeurons(const unsigned offset, const unsigned length)
 {
     if (((offset + length) > this->getNeuronCount()) || (offset < (unsigned)0)) throw slException(std::string("Output neurons out of bounds."));
     if((offset > (_inputOffset + _inputSize)) || (offset + length) <= _inputOffset)
     {
         _outputNeuronStates = new slBigVectorGSL(static_cast<slVectorViewGSL>(_currentNeuronStates), offset, length);
+        return _outputNeuronStates;
     }
     else
     {  
