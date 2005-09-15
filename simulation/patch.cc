@@ -183,7 +183,7 @@ slPatchGrid::slPatchGrid(const slVector *center, const slVector *patchSize, cons
 				this->patches[c][b][a].location.z = this->startPosition.z + c * patchSize->z;
 				this->patches[c][b][a].location.x = this->startPosition.x + b * patchSize->x;
 				this->patches[c][b][a].location.y = this->startPosition.y + a * patchSize->y;
-				this->patches[c][b][a].colorOffset = (c * this->textureX * this->textureY * 4) + (a * this->textureY * 4) + (b * 4);
+				this->patches[c][b][a].colorOffset = (c * this->textureX * this->textureY * 4) + (b * this->textureY * 4) + (a * 4);
 			}
 		}
 	}
@@ -321,15 +321,17 @@ void slPatchGrid::copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double
 	int xSize, ySize, zSize;
 	float* mData;
 
-	unsigned int chemTDA = m->xDim(); 
+	unsigned int chemTDA = m->yDim(); 
 	unsigned int chemXY = m->xDim() * m->yDim();
-
+    unsigned int yStride = this->textureX * 4;
+    unsigned int zStride = this->textureX * this->textureY * 4;
+    
 	mData = m->getGSLVector()->data;
 
 	xSize = m->xDim();
 	ySize = m->yDim();
-	zSize = m->zDim();
-
+	zSize = m->zDim(); 
+    
 	for(z = 0; z < zSize; z++ )
 	{
 		for(x = 0; x < xSize; x++ )
@@ -337,7 +339,7 @@ void slPatchGrid::copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double
 			// unsigned int crowOffset = ;
 			for(y = 0; y < ySize; y++ )
 			{
-				this->colors[(z * this->textureX * this->textureY * 4) + (y * this->textureY * 4) + (x << 2) + channel] = 
+				this->colors[(z * zStride) + (y * yStride) + (x << 2) + channel] = 
 					(unsigned char)(255 * scale * mData[ (z * chemXY) + (x * chemTDA) + y ]);
             }
 		}
@@ -349,9 +351,9 @@ void slPatchGrid::copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double
  */
 
 void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
-	int z, y, x;
-	int zVal, yVal, xVal;
-	int zMid = 0, yMid = 0, xMid = 0;
+	unsigned int z, y, x;
+	unsigned int zVal, yVal, xVal;
+	unsigned int zMid = 0, yMid = 0, xMid = 0;
 	slPatch *patch;
 	slVector translation, origin;
 
@@ -368,15 +370,15 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 
 	xMid = (int)((origin.x - startPosition.x) / patchSize.x);
 	if(xMid < 0) xMid = 0;
-	if(xMid > (int)xSize) xMid = xSize - 1;
+	if(xMid > (unsigned int)xSize) xMid = xSize - 1;
 
 	yMid = (int)((origin.y - startPosition.y) / patchSize.y);
 	if(yMid < 0) yMid = 0;
-	if(yMid > (int)ySize) yMid = ySize - 1;
+	if(yMid > (unsigned int)ySize) yMid = ySize - 1;
 
 	zMid = (int)((origin.z - startPosition.z) / patchSize.z);
 	if(zMid < 0) zMid = 0;
-	if(zMid > (int)zSize) zMid = zSize - 1;
+	if(zMid > (unsigned int)zSize) zMid = zSize - 1;
 
 	glEnable(GL_BLEND);
 
