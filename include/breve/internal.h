@@ -23,6 +23,7 @@ void breveInitMovieFunctions(brNamespace *);
 void breveInitMultibodyFunctions(brNamespace *);
 void breveInitNetworkFunctions(brNamespace *);
 void breveInitNeuralFunctions(brNamespace *);
+void breveInitNeuralNetworkFunctions(brNamespace *);
 void breveInitObjectFunctions(brNamespace *);
 void breveInitPatchFunctions(brNamespace *);
 void breveInitPhysicsFunctions(brNamespace *);
@@ -35,6 +36,8 @@ void breveInitPushFunctions(brNamespace *);
 void breveInitPushCallbackFunctions(brNamespace *);
 void breveInitSpringFunctions(brNamespace *);
 void breveInitMatrixFunctions(brNamespace *);
+void breveInitVectorFunctions(brNamespace *);
+void breveInitStatisticsFunctions(brNamespace *n);
 void breveInitQGAMEFunctions(brNamespace *);
 void breveInitDrawFunctions(brNamespace *);
 
