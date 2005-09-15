@@ -7,6 +7,8 @@
 @use Matrix.
 @use Vector.
 
+@use Mobile.
+
 Abstract : NeuralNetwork [version 2.3] {
     % An experimental neural network class for different types of neural
     % networks whose goal is to provide efficient computation and the
@@ -24,8 +26,8 @@ Abstract : NeuralNetwork [version 2.3] {
         outputNeuronCount (int).
         iterationStep (float).
         timeConstant (float).
-        boundLower (float).
-        boundUpper (float).
+        stateBoundLower (float).
+        stateBoundUpper (float).
     
     + to init:
         iterationStep = 1.0.
@@ -69,16 +71,16 @@ Abstract : NeuralNetwork [version 2.3] {
         timeConstant = newTimeConstant.
         neuralNetworkSetTimeConstant(network, newTimeConstant).
         
-    + to get-lower-saturation-boudry:
-        return boundLower.
+    + to get-lower-saturation-boundry:
+        return stateBoundLower.
         
-    + to get-upper-saturation-boudry:
-        return boundUpper.
+    + to get-upper-saturation-boundry:
+        return stateBoundUpper.
     
     + to set-saturation-bounds between lower (float)
                                 and upper (float):
-        boundLower = lower.
-        boundUpper = upper.
+        stateBoundLower = lower.
+        stateBoundUpper = upper.
         neuralNetworkSetNeuronStateBounds(network, lower, upper).
     
     + section "Network State Variable and Vector Accessors":
@@ -89,23 +91,25 @@ Abstract : NeuralNetwork [version 2.3] {
     + to get-neuron-state at index (int):
         return neuralNetworkGetNeuronState(network, index).
         
-    + to set-input-nodes from first (int) to last (int):
+    + to set-input-state-vector from first (int) to last (int):
     % returns a vector which contains the input nodes
         inputNodes = new Vector.
-        inputNodes set-vector-pointer to neuralNetworkSetInputNeurons(network, first, ((last + 1) - first)).
+        inputNodes set-vector-pointer to neuralNetworkSetInputNeurons(network, first, (last - first)) with-size (last - first).
+        inputNeuronCount = (last - first).
         return inputNodes.
         
-    + to get-input-nodes:
+    + to get-input-state-vector:
     % returns a vector which contains the input nodes
         return inputNodes.
     
-    + to set-output-nodes from first (int) to last (int):
+    + to set-output-state-vector from first (int) to last (int):
     % returns a vector which contains the output nodes
         outputNodes = new Vector.
-        outputNodes set-vector-pointer to (neuralNetworkSetInputNeurons(network, first, ((last + 1) - first))).
+        outputNodes set-vector-pointer to neuralNetworkSetInputNeurons(network, first, (last - first)) with-size (last - first).
+        outputNeuronCount = (last - first).
         return outputNodes.
                     
-    + to get-output-nodes:
+    + to get-output-state-vector:
     % returns a vector which contains the output nodes
         return outputNodes.
 
@@ -122,7 +126,7 @@ Abstract : NeuralNetwork [version 2.3] {
     
     + to randomize-states between lowerBound = -1.0 (float)
                            and upperBound = 1.0 (float):
-        i, j (int).
+        i (int).
         
         for i = 0, i < neuronCount, i++:
                     nodes set-value to (lowerBound + random[(upperBound - lowerBound)]) at-x i.
@@ -213,9 +217,6 @@ Mobile : NeuronImage [version 2.3] {
 
     + variables:
         texture (object).
-        red (object).
-        green (object).
-        blue (object).
         neurons (object).
 
     + to init-with nodes theVector (object) 
@@ -226,7 +227,7 @@ Mobile : NeuronImage [version 2.3] {
         neurons = theVector.
         texture = ((new VectorImage) init-with the-vector neurons scale valueScale).
    
-        self set-shape to ((new Cube) init-with size ((shapeScale * ((neurons get-dimension) / 10.0)), (shapeScale * (neurons get-dimension)), shapeScale)).
+        self set-shape to ((new Cube) init-with size ((shapeScale * ((neurons get-dimension) / 10.0)), (shapeScale * (neurons get-dimension)), 1)).
         self set-texture-image to texture.
         self set-texture-scale to (((neurons get-dimension) * shapeScale)).
         
@@ -255,16 +256,12 @@ Mobile : WeightImage [version 2.3] {
 
     + variables:
         texture (object).
-        red (object).
-        green (object).
-        blue (object).
         weights (object).
         weightColor (string).
         weightToggle (int).
         connections (object).
         connectionColor (string).
         connectionToggle (int).
-        display (object).
 
     + to init:
         weightToggle = 0.
@@ -284,7 +281,7 @@ Mobile : WeightImage [version 2.3] {
         
         texture = ((new MatrixImage) init-with the-matrix weights scale valueScale).
         
-        self set-shape to ((new Cube) init-with size ((shapeScale * (weights get-x-dimension)), (shapeScale * (weights get-y-dimension)), shapeScale)).
+        self set-shape to ((new Cube) init-with size ((shapeScale * (weights get-x-dimension)), (shapeScale * (weights get-y-dimension)), 1)).
         self set-texture-image to texture.
         self set-texture-scale to (((weights get-x-dimension) * shapeScale)).
     
