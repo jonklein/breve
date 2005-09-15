@@ -304,7 +304,7 @@ void breveInitNeuralNetworkFunctions(brNamespace *n)
     brNewBreveCall(n, "neuralNetworkGetNeuronState", brINeuralNetworkGetNeuronState, AT_DOUBLE, AT_POINTER, AT_INT, 0);
     brNewBreveCall(n, "neuralNetworkSetNeuronState", brINeuralNetworkSetNeuronState, AT_NULL, AT_POINTER, AT_INT, AT_DOUBLE, 0);
     brNewBreveCall(n, "neuralNetworkGetNeuronStateVector", brINeuralNetworkGetNeuronStateVector, AT_POINTER, AT_POINTER, 0);    
-    brNewBreveCall(n, "neuralNetworkSetInputNeurons", brINeuralNetworkSetInputNeurons, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
+    brNewBreveCall(n, "neuralNetworkSetInputNeurons", brINeuralNetworkSetInputNeurons, AT_POINTER, AT_POINTER, AT_INT, AT_INT, 0);
     brNewBreveCall(n, "neuralNetworkSetOutputNeurons", brINeuralNetworkSetOutputNeurons, AT_POINTER, AT_POINTER, AT_INT, AT_INT, 0);
     brNewBreveCall(n, "neuralNetworkGetConnectionWeightMatrix", brINeuralNetworkGetConnectionWeightMatrix, AT_POINTER, AT_POINTER, 0);
     brNewBreveCall(n, "neuralNetworkGetConnectionStructureMatrix", brINeuralNetworkGetConnectionStructureMatrix, AT_POINTER, AT_POINTER, 0);
