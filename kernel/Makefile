@@ -12,10 +12,13 @@ SRC	+= kernel/breveEval.cc kernel/breveObjectAPI.cc kernel/callback.cc \
 		kernel/internalFunctions/breveFunctionsLink.cc \
 		kernel/internalFunctions/breveFunctionsMath.cc \
 		kernel/internalFunctions/breveFunctionsMatrix.cc \
+		kernel/internalFunctions/breveFunctionsVector.cc \
+		kernel/internalFunctions/breveFunctionsStatistics.cc \
 		kernel/internalFunctions/breveFunctionsMenu.cc \
 		kernel/internalFunctions/breveFunctionsMovie.cc \
 		kernel/internalFunctions/breveFunctionsMultibody.cc \
 		kernel/internalFunctions/breveFunctionsNetwork.cc \
+		kernel/internalFunctions/breveFunctionsNeuralNetwork.cc \
 		kernel/internalFunctions/breveFunctionsNeural.cc \
 		kernel/internalFunctions/breveFunctionsObject.cc \
 		kernel/internalFunctions/breveFunctionsPatches.cc \
