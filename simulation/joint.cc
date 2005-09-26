@@ -234,7 +234,7 @@ void slJoint::setMaxTorque(double max) {
 
 void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3], int first = 0) {
 	const double *childR;
-	dReal *childP;
+	const dReal *childP;
 	dReal idealR[16];
 	dReal savedChildR[16], savedChildP[3];
 	slVector hingePosition, childPosition;

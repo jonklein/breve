@@ -25,7 +25,7 @@
  */
 
 
-#include "error.h"
+#include "util.h"
 #include <string>
 #include <iostream>
 #include "neuralNetwork.hh"
@@ -314,3 +314,5 @@ slFeedForwardNetwork::~slFeedForwardNetwork()
 {
 
 }
+
+

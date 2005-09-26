@@ -198,4 +198,4 @@ class slFeedForwardNetwork: public slNeuralNetwork {
 };
 
  
-#endif _BREVE_NEURAL_NET_H
+#endif /* _BREVE_NEURAL_NET_H */

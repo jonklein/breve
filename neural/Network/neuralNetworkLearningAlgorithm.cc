@@ -24,7 +24,7 @@
  *  Copyright (C) 2005 Eric DeWitt, Jonathan Klein
  */
 
-#include "error.h"
+#include "util.h"
 #include "neuralNetworkLearningAlgorithm.hh"
 #include "bigMatrix.hh"
 
