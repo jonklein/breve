@@ -480,6 +480,7 @@ Matrix : Matrix3D (aka Matrices3D) {
 }
 
 Image : MatrixImage {
+
     + variables:
         red (object).
         green (object).
@@ -493,6 +494,10 @@ Image : MatrixImage {
         scale = theScale.
 
         return self.
+        
+    - to destroy:
+        print "Destroying MatrixImage $self.".
+        super destroy.
         
     + to set-red to m (object): red = m.
 

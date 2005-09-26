@@ -218,7 +218,8 @@ Mobile : NeuronImage [version 2.3] {
     + variables:
         texture (object).
         neurons (object).
-
+        myShape (object).
+        
     + to init-with nodes theVector (object) 
                    color theColor = "Green" (string)
                    shape-scale shapeScale = 1 (int)
@@ -226,13 +227,11 @@ Mobile : NeuronImage [version 2.3] {
     
         neurons = theVector.
         texture = ((new VectorImage) init-with the-vector neurons scale valueScale).
-   
-        self set-shape to ((new Cube) init-with size ((shapeScale * ((neurons get-dimension) / 10.0)), (shapeScale * (neurons get-dimension)), 1)).
+        myShape = ((new Cube) init-with size ((shapeScale * ((neurons get-dimension) / 10.0)), (shapeScale * (neurons get-dimension)), 1)).
+        self set-shape to myShape.
         self set-texture-image to texture.
         self set-texture-scale to (((neurons get-dimension) * shapeScale)).
         
-
-
         if theColor == "Red":
             texture set-red to neurons.
         else: if theColor == "Green":
@@ -245,6 +244,12 @@ Mobile : NeuronImage [version 2.3] {
         
         return self.
 
+    + to destroy:
+        free(texture).
+        free(myShape).
+        free(neurons).
+        super destroy.
+        
     + to update-display:
         texture iterate.
         
@@ -266,6 +271,13 @@ Mobile : WeightImage [version 2.3] {
     + to init:
         weightToggle = 0.
         connectionToggle = 0.
+        
+    + to destroy:
+        free(texture).
+        free(weights).
+        free(connections).
+        super destroy.
+    
         
     + to init-with weights theWeights (object)
                    connections theConnections (object) 

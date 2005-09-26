@@ -157,6 +157,7 @@ Object : Vector (aka Vectors) [version 2.3] {
 }
 
 Image : VectorImage {
+
     + variables:
         red (object).
         green (object).
@@ -169,6 +170,10 @@ Image : VectorImage {
         scale = theScale.
     
         return self.
+        
+    - to destroy:
+        print "Destroying VectorImage $self.".
+        super destroy.
         
     + to set-red to m (object): red = m.
 
