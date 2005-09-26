@@ -452,7 +452,7 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 2.3] {
 		% Applies torque on one or more axes.  This method can be used when setting the torque
 		% of ball or universal joints.
 
-		jointApplyTorque(jointPointer, torqueVector)).
+		jointApplyTorque(jointPointer, torqueVector).
 
 	- to get-joint-position:
 		return (self get-joint-angle).
