@@ -26,6 +26,7 @@ Abstract : Joint (aka Joints) [version 2.3] {
 		jointPointer (pointer).
 		strengthLimit (float).
 		normalVector (vector).
+		maxVector, minVector (vector).
 		springMin, springMax, springStrength (float).
 
 		plinkEdgeDistance, clinkEdgeDistance (vector).
@@ -123,7 +124,18 @@ Abstract : Joint (aka Joints) [version 2.3] {
 		% Note that this method is just an alternative to the set-joint-limit
 		% methods which exist in all of the joints which support limits.
 
+		minVector = minV.
+		maxVector = maxV.
+
 		if jointPointer: jointSetLimits(jointPointer, minV, maxV).
+
+	+ to get-max-joint-limit-vector:
+		% Returns the maximum joint limit vector, if it has been set.
+		return maxVector.
+
+	+ to get-min-joint-limit-vector:
+		% Returns the minimum joint limit vector, if it has been set.
+		return minVector.
 
 	+ to get-strength-hard-limit:
 		% Returns the "hard" limit of the joint--the maximum torque that you
@@ -225,12 +237,21 @@ Abstract : Joint (aka Joints) [version 2.3] {
 		plinkPoint = linkPoint.
 		if jointPointer: jointSetLinkPoints(jointPointer, plinkPoint, clinkPoint, relativeRotation).
 
-	+ to set-joint-normal to normalVector (vector):
-		% If this type of joint supports it (OBJECT(PrismaticJoint) and OBJECT(RevoluteJoint)), 
-		% this method sets the normal of motion for the joint.
+	+ to set-joint-normal to normal (vector):
+		% If this type of joint supports it this method sets the 
+		% normal vector for the motion for the joint.  The precise meaning 
+		% of the normal vector depends on the exact type of joint.  See each
+		% joint's link method documentation for more details.
+
+		normalVector = normal.
 
 		if jointPointer: jointSetNormal(jointPointer, normalVector).
 	
+	+ to get-joint-normal:
+		% Returns the joint's normal vector.
+
+		return normalVector.
+
 	+ to dearchive:
 		if jointPointer: {
 			self set-strength-limit to strengthLimit.
@@ -268,6 +289,8 @@ Abstract : Joint (aka Joints) [version 2.3] {
 		% to be desirable whenever "growth" of OBJECT(MultiBody) objects is simulated.
 		% <P>
 		% This can be later disabled using METHOD(disable-automatic-joint-scaling).
+
+		self disable-automatic-joint-scaling.
 
 		if parent: plinkEdgeDistance = ((parent get-shape) get-point-on-shape on-vector plinkPoint) - plinkPoint.
 
@@ -516,7 +539,7 @@ Joint : UniversalJoint (aka UniversalJoints) [version 2.3] {
 	% <CENTER><IMG SRC="UniversalJoint.jpg" BORDER=1></CENTER>
 
 	+ to link parent parentLink (object) to-child childLink (object)
-			with-normal normalVector (vector)
+			with-normal normal (vector)
 			with-parent-point parentPoint (vector) 
 			with-child-point childPoint (vector):
 
@@ -547,8 +570,9 @@ Joint : UniversalJoint (aka UniversalJoints) [version 2.3] {
 		if jointPointer:
 			die "attempt to link previously linked Joint object.".
 
-		jointPointer = jointLinkUniversal(ppointer, cpointer, normalVector, parentPoint, childPoint, relativeRotation).
+		jointPointer = jointLinkUniversal(ppointer, cpointer, normal, parentPoint, childPoint, relativeRotation).
 
+		normalVector = normal.
 		plinkPoint = parentPoint.
 		clinkPoint = childPoint.
 
@@ -592,7 +616,7 @@ Joint : BallJoint (aka BallJoints) [version 2.3] {
 	% together using a ball joint.
 	% <p>
 	% A universal joint has three degrees of
-	% freedom.  It can rotate "up-and-down" and "side-to-side", and can
+	% freedom.  It can tilt "up-and-down" and "side-to-side", and can
 	% "twist".  Your neck is basically a ball joint--your head tilt 
 	% up-and-down, side-to-side, and can twist (although not all the 
 	% way around--if your head turns all the way around, please consult 
@@ -603,8 +627,9 @@ Joint : BallJoint (aka BallJoints) [version 2.3] {
 	% This joint uses a scheme of 3 Euler angles to represent the 
 	% relative rotation between two objects.  The Z-axis of rotation is automatically 
 	% derived from the parent link point, meaning that the Z-axis rotation is always 
-	% a "twist".  The X-axis of rotation is specified by the user with the normal 
-	% argument.  The Y-axis is automatically derived from the other two.
+	% a "twist" relative to the link point.  The X-axis of rotation is specified by 
+	% the user with the normal argument.  The Y-axis is automatically derived from the 
+	% other two.
 	% <P>
 	% Because of a limitation of the physics engine, the Y-axis rotation is limited 
 	% to a range of approximately +/- 80 degrees of rotation.
@@ -639,6 +664,7 @@ Joint : BallJoint (aka BallJoints) [version 2.3] {
 
 		jointPointer = jointLinkBall(ppointer, cpointer, normal, parentPoint, childPoint, relativeRotation).
 
+		normalVector = normal.
 		plinkPoint = parentPoint.
 		clinkPoint = childPoint.
 

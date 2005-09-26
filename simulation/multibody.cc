@@ -81,53 +81,44 @@ void slMultibody::initCollisionFlags(slVclipData *cd) {
 }
 
 /*!
-	\brief Sets the location and/or rotation of a multibody.  
-
-	The location and/or rotation may be NULL.
+	\brief Sets the rotation of a multibody.  
 */
 
-void slMultibodyPosition(slMultibody *m, slVector *location, double rot[3][3]) {
-	slVector offset;
+void slMultibody::setRotation(double rot[3][3]) {
+	double invR[3][3], transform[3][3];
 
-	if(!m->_root) return;
+	updatePositions();
 
-	m->updatePositions();
+	// figure out the relative rotation required to get to the new rot 
 
-	if(location) {
-		slVectorSub(location, &m->_root->position.location, &offset);
-		slMultibodyOffsetPosition(m, &offset);
-	}
+	slMatrixTranspose(_root->position.rotation, invR);
+	slMatrixMulMatrix(rot, invR, transform);
 
-	if(rot) {
-		double invR[3][3], transform[3][3];
+	rotate(transform);
 
-		/* figure out the relative rotation required to take us from the 
-		 * current rotation to the new one */
-
-		slMatrixTranspose(m->_root->position.rotation, invR);
-		slMatrixMulMatrix(rot, invR, transform);
-
-		slMultibodyRotate(m, transform);
-	}
-
-	m->updatePositions();
+	updatePositions();
 }
 
-/*!
-	\brief Gives a rotation matrix from an axis and an angle.
+/**
+	\brief Sets the location of this multibody.
 */
 
-// void slMultibodyRotAngleToMatrix(slVector *axis, double r, double rot[3][3]) {
-// 	slQuat q;
-// 	slQuatSetFromAngle(&q, r, axis);
-// 	slQuatToMatrix(&q, rot);
-// }
+void slMultibody::setLocation(slVector *location) {
+	slVector offset;
+
+	if( !_root) return;
+
+	updatePositions();
+	slVectorSub(location, &_root->position.location, &offset);
+	offsetLocation(&offset);
+	updatePositions();
+}
 
 /*!
 	\brief Preforms a relative rotation.
 */
 
-void slMultibodyRotate(slMultibody *mb, double rotation[3][3]) {
+void slMultibody::rotate(double rotation[3][3]) {
 	slLink *link;
 	slVector toLink, newToLink;
 	double newRot[3][3];
@@ -135,7 +126,7 @@ void slMultibodyRotate(slMultibody *mb, double rotation[3][3]) {
 	slQuat q;
 	std::vector<slLink*>::iterator i1;
 
-	for(i1 = mb->_links.begin(); i1 != mb->_links.end(); i1++) {	
+	for(i1 = _links.begin(); i1 != _links.end(); i1++) {	
 		link = *i1;
 
 		// first, since the whole body is making this rotation, 
@@ -143,9 +134,9 @@ void slMultibodyRotate(slMultibody *mb, double rotation[3][3]) {
 		// the new position based on the rotation angle and our
 		// location relative to the root link.
 
-		slVectorSub(&link->position.location, &mb->_root->position.location, &toLink);
+		slVectorSub(&link->position.location, &_root->position.location, &toLink);
 		slVectorXform(rotation, &toLink, &newToLink);
-		slVectorAdd(&newToLink, &mb->_root->position.location, &newToLink);
+		slVectorAdd(&newToLink, &_root->position.location, &newToLink);
 		dBodySetPosition(link->_odeBodyID, newToLink.x, newToLink.y, newToLink.z);
 	
 		slMatrixMulMatrix(rotation, link->position.rotation, newRot);
@@ -167,15 +158,17 @@ void slMultibodyRotate(slMultibody *mb, double rotation[3][3]) {
 
 /*!
 	\brief Offsets the position of a multibody.
+
+	Offsets each link in the body individually.
 */
 
-void slMultibodyOffsetPosition(slMultibody *mb, slVector *offset) {
+void slMultibody::offsetLocation(slVector *offset) {
 	slLink *link;
 	const dReal *oldP;
 	dReal newP[3];
 	std::vector<slLink*>::iterator i1;
 
-	for(i1 = mb->_links.begin(); i1 != mb->_links.end(); i1++) {	
+	for(i1 = _links.begin(); i1 != _links.end(); i1++) {	
 		link = *i1;
 
 		slVectorAdd(&link->position.location, offset, &link->position.location);
@@ -235,8 +228,6 @@ slList *slMultibody::allCallbackData() {
 
 	for( li = _links.begin(); li != _links.end(); li++ ) {
 		list = slListPrepend(list, (*li)->userData);
-
-		slLink *l = *li;
 
 		for(ji = (*li)->inJoints.begin(); ji != (*li)->inJoints.end(); ji++ ) {
 			list = slListPrepend(list, (*ji)->userData);
@@ -302,6 +293,8 @@ slMultibody::slMultibody(slWorld *w) {
 	_world = w;
 	_handleSelfCollisions = 0;
 	_root = NULL;
+
+	_erp = _cfm = 0.0;
 }
 
 /*!
@@ -423,7 +416,7 @@ void slMultibody::setCallbackData(void *c) {
 */
 
 void slMultibody::setHandleSelfCollisions(int n) {
-	_handleSelfCollisions = 1;
+	_handleSelfCollisions = n;
 }
 
 /*!
@@ -438,3 +431,26 @@ slMultibody::~slMultibody() {
 	_links.empty();
 }
 
+/**
+	\brief Sets the intrabody ERP value for collision contacts.
+*/
+
+void slMultibody::setERP(float e) {
+	_erp = e;
+}
+
+/**
+	\brief Sets the intrabody CFM value for collision contacts.
+*/
+
+void slMultibody::setCFM(float c) {
+	_cfm = c;
+}
+
+/**
+	\brief Returns the root object of the multibody.
+*/
+
+slLink *slMultibody::getRoot() {
+	return _root;
+}

@@ -62,6 +62,19 @@ int brIMultibodyNew(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+/**
+	\brief Sets the intra-body CFM and ERP values for contact collisions.
+*/
+
+int brIMultibodySetERPCFM(brEval args[], brEval *target, brInstance *i) {
+	slMultibody *mb = BRPOINTER(&args[0]);
+
+	mb->setERP(BRFLOAT(&args[1]));
+	mb->setCFM(BRFLOAT(&args[2]));
+
+	return EC_OK;
+}
+
 /*!
 	\brief Returns a list of all objects in a multibody.
 
@@ -124,7 +137,7 @@ int brIMultibodySetLocation(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *mb = BRMULTIBODYPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(&args[1]);
 
-	slMultibodyPosition(mb, v, NULL);
+	mb->setLocation(v);
 
 	return EC_OK;
 }
@@ -146,7 +159,7 @@ int brIMultibodySetRotation(brEval args[], brEval *target, brInstance *i) {
 
 	slRotationMatrix(v, len, rot);
 
-	slMultibodyPosition(mb, NULL, rot);
+	mb->setRotation(rot);
 
 	return EC_OK;
 }
@@ -154,7 +167,7 @@ int brIMultibodySetRotation(brEval args[], brEval *target, brInstance *i) {
 int brIMultibodySetRotationMatrix(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *mb = BRMULTIBODYPOINTER(&args[0]);
 
-	slMultibodyPosition(mb, NULL, BRMATRIX(&args[1]));
+	mb->setRotation(BRMATRIX(&args[1]));
 
 	return EC_OK;
 }
@@ -178,7 +191,7 @@ int brIMultibodyRotateRelative(brEval args[], brEval *target, brInstance *i) {
 	}
 
 	slRotationMatrix(v, len, rotation);
-	slMultibodyRotate(mb, rotation);
+	mb->rotate(rotation);
 
 	return EC_OK;
 }
@@ -221,6 +234,7 @@ void breveInitMultibodyFunctions(brNamespace *n) {
 	brNewBreveCall(n, "multibodySetRotation", brIMultibodySetRotation, AT_NULL, AT_POINTER, AT_VECTOR, AT_DOUBLE, 0);
 	brNewBreveCall(n, "multibodySetRotationMatrix", brIMultibodySetRotationMatrix, AT_NULL, AT_POINTER, AT_MATRIX, 0);
 	brNewBreveCall(n, "multibodyNew", brIMultibodyNew, AT_POINTER, 0);
+	brNewBreveCall(n, "multibodySetERPCFM", brIMultibodySetERPCFM, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "multibodySetRoot", brISetMultibodyRoot, AT_NULL, AT_POINTER, AT_POINTER, 0);
 	brNewBreveCall(n, "multibodyAllObjects", brIMultibodyAllObjects, AT_LIST, AT_POINTER, 0);
 	brNewBreveCall(n, "multibodyFree", brIMultibodyFree, AT_NULL, AT_POINTER, 0);

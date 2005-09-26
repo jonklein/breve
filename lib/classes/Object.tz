@@ -129,7 +129,7 @@ NULL : Object (aka Objects) [version 2.1] {
 
         addObserver(theObject, theNotification, theMethod).
 
-    + to unobserve instance theObject (object) for-notificiation theNotification (string):
+    + to unobserve instance theObject (object) for-notification theNotification (string):
         % Unregisters the current object as an observer of theObject with 
         % notification theNotification.
 

@@ -151,6 +151,16 @@ Object : MultiBody (aka MultiBodies) [version 2.0] {
 
 		return multibodyCheckSelfPenetration(multibodyPointer).
 
+	+ to set-self-collision-parameters erp erpValue (float) cfm cfmValue (float):
+		% Sets two contact parameters which effect the hardness of intra-body
+		% contacts.
+		% <li>
+		% Currently experimental and for advanced users only.  See the ODE 
+		% user's manual for a description of these values and how they should
+		% be used.
+
+		multibodySetERPCFM(multibodyPointer, erpValue, cfmValue).
+
 	+ section "Getting and Setting Information About Connected Objects"
 
 	- to register with-link root (object):
@@ -180,6 +190,8 @@ Object : MultiBody (aka MultiBodies) [version 2.0] {
 
 		if selfCollisions: self enable-self-collisions.
 
+		return self.
+
 	+ to get-all-connected-links:
 		% Returns all of the OBJECT(Link) objects which comprise the 
 		% MultiBody.
@@ -206,6 +218,11 @@ Object : MultiBody (aka MultiBodies) [version 2.0] {
 		% comprise this MultiBody.
 
 		free (self get-all-connected-objects).
+
+	- to get-multibody-pointer:
+		% Used internally.
+
+		return multibodyPointer.
 
 	- to suspend-physics:
 

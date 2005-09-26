@@ -234,13 +234,16 @@ void slJoint::setMaxTorque(double max) {
 
 void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3], int first = 0) {
 	const double *childR;
+	dReal *childP;
 	dReal idealR[16];
-	dReal savedChildR[16];
+	dReal savedChildR[16], savedChildP[3];
 	slVector hingePosition, childPosition;
 	double ideal[3][3];
 
+	childP = dBodyGetPosition(_child->_odeBodyID);
 	childR = dBodyGetRotation(_child->_odeBodyID);
 	memcpy(savedChildR, childR, sizeof(savedChildR));
+	memcpy(savedChildP, childP, sizeof(savedChildP));
 
 	if (_parent)
 	   slMatrixMulMatrix(_parent->position.rotation, rotation, ideal);
@@ -299,7 +302,10 @@ void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double r
 	slVectorXform(_child->position.rotation, clinkPoint, &childPosition);
 	slVectorSub(&hingePosition, &childPosition, &childPosition);
 
-	if( !first) dBodySetRotation(_child->_odeBodyID, savedChildR);
+	if( !first) {
+		dBodySetRotation(_child->_odeBodyID, savedChildR);
+	}
+
 	dBodySetPosition(_child->_odeBodyID, childPosition.x, childPosition.y, childPosition.z);
 
 	if(_parent) _parent->updatePositions();

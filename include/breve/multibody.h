@@ -45,21 +45,42 @@ class slMultibody {
 
 		void setAcceleration(slVector *linear, slVector *rotational);
 		void setVelocity(slVector *linear, slVector *rotational);
+		void rotate(double rotation[3][3]);
 
 		void updatePositions();
+
+		void offsetLocation(slVector*);
+
+		void setLocation(slVector*);
+		void setRotation(double[3][3]);
 
 		int checkSelfPenetration();
 		int countLinks();
 		void update();
 
-		slWorld *_world;
-		slLink *_root;
+		void setCFM(float);
+		void setERP(float);
+
+		float getCFM() { return _cfm; };
+		float getERP() { return _erp; };
 
 		std::vector<slLink*> _links;
 
-		unsigned char _handleSelfCollisions;
+		slLink *getRoot();
 
+	private:
 		void *_userData;
+		slWorld *_world;
+		slLink *_root;
+
+		bool _handleSelfCollisions;
+
+		/**
+		 * Intra-body ERP and CFM values for the physics engine.
+		 */
+
+		float _erp, _cfm;
+
 };
 
 #endif
@@ -70,14 +91,9 @@ extern "C"{
 
 int slInitShapeList(slShape **slist, slPosition **plist, slMultibody *root);
 
-void slMultibodyPosition(slMultibody *m, slVector *location, double rotation[3][3]);
 void slMultibodyRotAngleToMatrix(slVector *axis, double r, double rot[3][3]);
 
-void slMultibodyOffsetPosition(slMultibody *m, slVector *offset);
-
 slMultibody *slLinkFindMultibody(slLink *root);
-
-void slMultibodyRotate(slMultibody *m, double rotation[3][3]);
 
 void slNullOrphanMultibodies(slLink *orphan);
 

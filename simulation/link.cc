@@ -53,7 +53,7 @@ slLink::slLink(slWorld *w) : slWorldObject() {
 }
 
 slLink::~slLink() {
-	if(multibody && multibody->_root == this) multibody->setRoot(NULL);
+	if(multibody && multibody->getRoot() == this) multibody->setRoot(NULL);
 
 	// This is a bad situation here: slJointBreak modifies the 
 	// joint list.  I intend to fix this.
@@ -624,7 +624,7 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 	joint->_child = child;
 	joint->_type = jointType;
 
-	joint->setLinkPoints(plinkPoint, clinkPoint, rotation, 1);
+	joint->setLinkPoints(plinkPoint, clinkPoint, rotation, 0);
 	joint->setNormal(normal);
 
 	if(parent && parent->multibody) parent->multibody->update();

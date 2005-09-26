@@ -437,25 +437,34 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 				mu = 1.0 + (w1->mu + w2->mu) / 2.0;
 				e = (w1->e + w2->e) / (2.0 * c->points.size());
 
-				// printf("collision with %d points\n", c->pointCount);
-
 				for(x=0;x<c->points.size();x++) {
 					dContact contact;
 
 					memset(&contact, 0, sizeof(dContact));
 					contact.surface.mode = dContactSoftERP|dContactApprox1|dContactBounce;
 
-					contact.surface.soft_cfm = 0.01;
+					// contact.surface.soft_cfm = 0.01;
 					contact.surface.soft_erp = 0.05;
 					contact.surface.mu = mu;
 					contact.surface.mu2 = 0;
 					contact.surface.bounce = e;
 					contact.surface.bounce_vel = 0.05;
 
-					if(c->depths[x] < -0.25) {
+					if(w1->type == WO_LINK && w2->type == WO_LINK) {
+						slMultibody *mb1 = ((slLink*)w1)->getMultibody();
+						slMultibody *mb2 = ((slLink*)w2)->getMultibody();
+
+						if(mb1 && mb1 == mb2 && mb1->getCFM() != 0.0) {
+							contact.surface.mode = dContactSoftERP|dContactApprox1|dContactBounce|dContactSoftCFM;
+							contact.surface.soft_cfm = mb1->getCFM();
+							contact.surface.soft_erp = mb1->getERP();
+						}
+					}
+
+					if(c->depths[x] < -0.5) {
 						// this is a scenerio we might want to look at... it may indicate 
 						// problems with the collision detection code.
-						// slDebug("warning: point depth = %f for pair (%d, %d) -- cheating\n", c->depths[x], c->n1, c->n2);
+						slMessage(50, "warning: collision depth = %f for pair (%d, %d)\n", c->depths[x], c->n1, c->n2);
 					}
 
 					contact.geom.depth = -c->depths[x];

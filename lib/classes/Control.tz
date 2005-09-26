@@ -897,20 +897,17 @@ Abstract : Control (aka Controls) [version 2.3] {
 		if fogFlag == 1: self disable-fog.
 		else self enable-fog.
 
-	+ to set-display-text to theString (string) at-x xLoc (float) at-y yLoc (float):
+	+ to set-display-text number messageNumber = 0 (int) to theString (string) at-x xLoc = -.95 (float) at-y yLoc = -.95 (float):
 		% Sets a text string in the simulation display.  xLoc and yLoc 
 		% represent the location of the text.  The coordinate system 
 		% used goes from (-1, -1) to (1, 1) with (-1, -1) at the lower 
 		% left hand corner, (0, 0) in the center of the window and 
 		% (1, 1) in the top right hand corner.
 		% <p>
-		% Up to 8 messages can be placed on the display using 
-		% METHOD(set-display-message), but set-display-text will always
-		% use message #0.  If you wish to use more than one message,
-		% or if you wish to specify the color of the text, use the 
-		% method METHOD(set-display-message).
+		% The optional argument messageNumber may be used to specify 
+		% up to 8 different messages.
 
-		cameraSetText(theString, 0, xLoc, yLoc, (0, 0, 0)).
+		cameraSetText(theString, messageNumber, xLoc, yLoc, (0, 0, 0)).
 
 	+ to set-display-text-scale to scale (double):
 		% Sets the scaling factor for text in the display window.  
@@ -920,7 +917,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		cameraSetTextScale(scale).
 
-	+ to set-display-message to theString (string) with-number messageNumber (int) at-x xLoc (float) at-y yLoc (float) with-color textColor = (0, 0, 0) (vector):
+	- to set-display-message to theString (string) with-number messageNumber (int) at-x xLoc (float) at-y yLoc (float) with-color textColor = (0, 0, 0) (vector):
 		% Sets a text string in the simulation display.  xLoc and yLoc 
 		% represent the location of the text.  The coordinate system used
 		% goes from (-1, -1) to (1, 1) with (-1, -1) at the lower left hand 

@@ -179,6 +179,7 @@ Object : GeneticAlgorithm {
 	- to reproduce:
 		r, i, best (int).
 		totalFitness, fitness (double).
+		ind (object).
 
 		if | populations{ !currentPopulation } | != populationSize: {
 			free populations{ !currentPopulation }.
@@ -215,7 +216,10 @@ Object : GeneticAlgorithm {
 			} else if r < (mutationPercent + crossoverPercent + migrationPercent): {
 				# do migration here...
 			} else {
-				populations{ !currentPopulation }{ i } copy from (self tournament-select).
+				ind = (self tournament-select).
+				populations{ !currentPopulation }{ i } copy from ind.
+
+				# print "Copying individual with fitness ", (ind get-fitness).
 			}
 		}
 
@@ -306,6 +310,7 @@ Object : GeneticAlgorithmIndividual {
 	+ to get-fitness:
 		% Returns the fitness value associated with this individual, which
 		% has been previously assigned using METHOD(set-fitness).
+
 		return fitness.
 
 	+ to set-fitness to fitnessValue (double):
