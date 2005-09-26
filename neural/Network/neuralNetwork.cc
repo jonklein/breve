@@ -61,6 +61,10 @@ slNeuralNetwork::slNeuralNetwork(const unsigned size)
 {
     _inputNeuronStates = 0;
     _outputNeuronStates = 0;
+    _previousNeuronStates.setAll(0.0);
+    _currentNeuronStates.setAll(0.0);
+    _connectionWeights.setAll(0.0);
+    _connectionStructure.setAll(0.0);
 }
 
 void slNeuralNetwork::setNeuronTimeStep(const float scalar)
