@@ -448,6 +448,12 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 2.3] {
 
 		jointApplyTorque(jointPointer, (torqueValue, 0, 0)).
 
+	+ to set-joint-torque-vector to torqueVector (vector):
+		% Applies torque on one or more axes.  This method can be used when setting the torque
+		% of ball or universal joints.
+
+		jointApplyTorque(jointPointer, torqueVector)).
+
 	- to get-joint-position:
 		return (self get-joint-angle).
 
