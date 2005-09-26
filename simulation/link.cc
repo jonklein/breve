@@ -422,10 +422,6 @@ void slLink::applyJointControls() {
 
 		if(joint->_type == JT_REVOLUTE) dJointSetHingeParam (joint->_odeJointID, dParamVel, newSpeed);
 		else if(joint->_type == JT_PRISMATIC) dJointSetSliderParam (joint->_odeJointID, dParamVel, newSpeed);
-
-		dVector3 v;
-
-		dJointGetHingeAxis( joint->_odeJointID, v);
 	}
 }
 
