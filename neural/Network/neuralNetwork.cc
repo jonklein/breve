@@ -225,19 +225,34 @@ void slNeuralNetwork::applyStructureToWeights()
 
 void slNeuralNetwork::updateNeuronStates()
 {
+//    int i, j;
+    
+//    slMessage(DEBUG_ALL, "_tauState is %g.\n", _tauState);
+
     _previousNeuronStates.copyData(_currentNeuronStates);
     
+//    slMessage(DEBUG_ALL, "v(t-1) state of neuron 0 is %f.\n", _previousNeuronStates.get(0));
+//    slMessage(DEBUG_ALL, "v(t) state of neuron 0 is %f.\n", _currentNeuronStates.get(0));    
+    
     // update according to tr * (dV[] / dt) = -V[] + (M[][]V[])
-
+//    slMessage(DEBUG_ALL, "Weights:\n");
+//    for (i = 0; i < _connectionWeights.xDim(); i++)
+//    {
+//        for (j = 0; j < _connectionWeights.yDim(); j++)
+//            slMessage(DEBUG_ALL, "%f ", _connectionWeights.get(i, j));
+//        slMessage(DEBUG_ALL, "\n");
+//    }        
     _connectionWeights.vectorMultiplyInto(_previousNeuronStates, _tauState, _currentNeuronStates);
     
-//    slMessage(DEBUG_ALL, "Mv state of neuron 0 is %f and _tauState is %g.\n", _currentNeuronStates.get(0), _tauState);
+//    slMessage(DEBUG_ALL, "After Mv(t-w), v(t) for neuron 0 is %f.\n", _currentNeuronStates.get(0));
         
     _currentNeuronStates.inPlaceScaleAndAdd((-1.0 * _tauState), _previousNeuronStates);
     
-//    slMessage(DEBUG_ALL, "Mv + -v state of neuron 0 is %f and _tauState is %g.\n", _currentNeuronStates.get(0), _tauState);
+//    slMessage(DEBUG_ALL, "After -_tauState * v(t-1), v(t) for neuron 0 is %f.\n", _currentNeuronStates.get(0));
     
     _currentNeuronStates.inPlaceAdd(_previousNeuronStates);
+
+//    slMessage(DEBUG_ALL, "After +v(t-1), v(t) for neuron 0 is %f.\n", _currentNeuronStates.get(0));
     
     if (_boundStates) _currentNeuronStates.clamp(_boundLower, _boundLower, _boundUpper);
     
