@@ -478,6 +478,9 @@ class slVectorViewGSL : public slVectorView {
         
         
         slBigMatrix2DGSL& outerProductInto(const slVectorView& other, slBigMatrix2DGSL& result) const;
+        
+        slVectorViewGSL& inPlaceAddVectorMatrixProduct(const float scalar, const slBigMatrix2DGSL& matrix, const slVectorViewGSL& other);
+        
         /**
          *  Convolve with general kernel (odd dimension).
          */
@@ -593,7 +596,6 @@ class slBigMatrix2DGSL : public slBigMatrix2D, public slVectorViewGSL {
         slBigMatrix2DGSL& vectorMultiplyInto(const slVectorViewGSL& sourceVector, slVectorViewGSL& resultVector);
         
         slBigMatrix2DGSL& vectorMultiplyInto(const slVectorViewGSL& sourceVector, const float scalar, slVectorViewGSL& resultVector);
-
 
 /*        
         slBigMatrix2DGSL& inPlaceConvolve(const slBigMatrix2D& kernel);

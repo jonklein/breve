@@ -293,6 +293,13 @@ slBigMatrix2DGSL& slVectorViewGSL::outerProductInto(const slVectorView& other, s
     return result;
 }
 
+slVectorViewGSL& slVectorViewGSL::inPlaceAddVectorMatrixProduct(const float scalar, const slBigMatrix2DGSL& matrix, const slVectorViewGSL& other)
+{
+    gsl_blas_sgemv(CblasNoTrans, scalar, matrix._matrix, other.getGSLVector(), 1.0, this->getGSLVector());
+    return *this;
+
+}
+
 /**
  *  Addition operator (must have common dimensions).
  */
@@ -489,21 +496,22 @@ float slBigMatrix2DGSL::get(const int x, const int y) const
 slBigVectorGSL& slBigMatrix2DGSL::vectorMultiply(const slVectorViewGSL& vector) const
 {
     slBigVectorGSL* result = new slBigVectorGSL(vector.dim());
-    gsl_blas_sgemv(CblasNoTrans, 1.0, _matrix, vector.getGSLVector(), 1.0, result->getGSLVector());
+    gsl_blas_sgemv(CblasNoTrans, 1.0, _matrix, vector.getGSLVector(), 0.0, result->getGSLVector());
     return *result;
 }
 
 slBigMatrix2DGSL& slBigMatrix2DGSL::vectorMultiplyInto(const slVectorViewGSL& sourceVector, slVectorViewGSL& resultVector)
 {
-    gsl_blas_sgemv(CblasNoTrans, 1.0, _matrix, sourceVector.getGSLVector(), 1.0, resultVector.getGSLVector());
+    gsl_blas_sgemv(CblasNoTrans, 1.0, _matrix, sourceVector.getGSLVector(), 0.0, resultVector.getGSLVector());
     return *this;
 }
 
 slBigMatrix2DGSL& slBigMatrix2DGSL::vectorMultiplyInto(const slVectorViewGSL& sourceVector, const float scalar, slVectorViewGSL& resultVector)
 {
-    gsl_blas_sgemv(CblasNoTrans, 1.0, _matrix, sourceVector.getGSLVector(), scalar, resultVector.getGSLVector());
+    gsl_blas_sgemv(CblasNoTrans, scalar, _matrix, sourceVector.getGSLVector(), 0.0, resultVector.getGSLVector());
     return *this;
 }
+
 /*
 slBigVectorGSL& slBigMatrix2DGSL::getRowVector(const int x)
 {
