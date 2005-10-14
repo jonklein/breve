@@ -902,7 +902,7 @@ void slRenderBillboards(slCamera *c, int flags) {
 		if (object->textureMode == BBT_LIGHTMAP)
 			glBlendFunc(GL_ONE, GL_ONE);
 		else {
-	    		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	   		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 

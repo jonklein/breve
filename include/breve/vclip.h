@@ -195,7 +195,7 @@ int slVclipTestPair(slVclipData *, slCollisionCandidate*, slCollision *);
 int slVclipTestPairAllFeatures(slVclipData*, slCollisionCandidate*, slCollision *);
 
 int slClipPoint(slVector *p, slPlane *v, slPosition *vp, int count, int *update, double *dist);
-int slClipPointMax(slVector *p, slPlane *v, slPosition *vpos, int vcount, int *update);
+int slClipPointMax(slVector *p, slPlane *v, slPosition *vpos, int vcount, int *update, double *dist);
 int slClipEdge(slEdge *e, slPosition *ep, slPlane *v, slPosition *vp, int vcount, int *sf, int *ef, double *sL, double *eL);
 int slClipEdgePoints(slVector *s, slVector *e, slPlane *v, slPosition *vp, int vcount, int *sf, int *ef, double *sL, double *eL);
 int slClipFace(slFace *f, slPosition *fp, slPlane *v, slPosition *vp, int count, int *update);

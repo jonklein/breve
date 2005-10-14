@@ -617,7 +617,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int x, int y, slCollis
 			case FT_EDGE:
 				e = (slEdge*)*feat;
 
-				included = slClipPointMax(&p1->location, e->voronoi, p2, 4, &update);
+				included = slClipPointMax(&p1->location, e->voronoi, p2, 4, &update, NULL);
 
 				if(included) {
 					start = e->points[0];
@@ -1175,7 +1175,7 @@ int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf
 	
 	slPositionVertex(pp, &p->vertex, &tPoint);
 
-	if(!slClipPointMax(&tPoint, f->voronoi, fp, f->edgeCount, &update)) {
+	if(!slClipPointMax(&tPoint, f->voronoi, fp, f->edgeCount, &update, NULL)) {
 		*nf2 = f->neighbors[update];
 		return CT_CONTINUE;
 	}
@@ -1289,7 +1289,7 @@ int slClipPoint(slVector *p, slPlane *v, slPosition *vp, int vcount, int *update
 	\brief Find the maximally violated voronoi plane.
 */
 
-int slClipPointMax(slVector *p, slPlane *v, slPosition *vp, int vcount, int *update) {
+int slClipPointMax(slVector *p, slPlane *v, slPosition *vp, int vcount, int *update, double *dist) {
 	slPlane tVoronoi;	 /* transformed voronoi plane */
 	int n, minFeature = 0;
 	double minScore = 0.0, m;
@@ -1308,6 +1308,7 @@ int slClipPointMax(slVector *p, slPlane *v, slPosition *vp, int vcount, int *upd
 
 	if(minScore < 0.0) {
 		*update = minFeature;
+		if(dist) *dist = minScore;
 		return 0;
 	}
 

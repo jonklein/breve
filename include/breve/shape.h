@@ -244,7 +244,7 @@ class slSphere : public slShape {
 
 		void bounds(slPosition *position, slVector *min, slVector *max);
 		int pointOnShape(slVector *dir, slVector *point);
-                int rayHitsShape(slVector *dir, slVector *target, slVector *point);
+		int rayHitsShape(slVector *dir, slVector *target, slVector *point);
 		void scale(slVector *point);
 
 		virtual void setDensity(double density);
@@ -322,7 +322,6 @@ int slCountPoints(slShape *s);
 void slCubeInertiaMatrix(slVector *c, double mass, double i[3][3]);
 void slSphereInertiaMatrix(double radius, double mass, double i[3][3]);
 
-int slPointOnShape(slShape *s, slVector *dir, slVector *point);
 int slRayHitsShape(slShape *s, slVector *dir, slVector *target, slVector *point);
 
 void slScaleShape(slShape *s, slVector *scale);

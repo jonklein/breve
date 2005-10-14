@@ -2,21 +2,31 @@
 #include "joint.h"
 
 /*!
-	\brief Applies a torque to a revolute joint.
+	\brief Applies a torque to a rotational joint.
+
+	We do this not by setting the torque directly, because it will be cleared
+	after the next physics engine step.  Instead, we compute the values and 
+	store them in the externalForce vectors for each body.
 */
 
 void slJoint::applyTorque(slVector *torque) {
-	slVector t;
-	dVector3 axis;
+	const dReal *t;
 
-	dJointGetHingeAxis(_odeJointID, axis);
+	if( _type == JT_REVOLUTE ) {
+		dJointAddHingeTorque( _odeJointID, torque->x);
+	} else {
+		dJointAddAMotorTorques( _odeMotorID, torque->x, torque->y, torque->z);
+	}
 
-	t.x = axis[0] * torque->x;
-	t.y = axis[1] * torque->x;
-	t.z = axis[2] * torque->x;
+	t = dBodyGetTorque( _parent->_odeBodyID);
+	_parent->_externalForce.b.x = t[0];
+	_parent->_externalForce.b.y = t[1];
+	_parent->_externalForce.b.z = t[2];
 
-	if(_parent) dBodySetTorque(_parent->_odeBodyID, t.x, t.y, t.z);
-   	if(_child) dBodySetTorque(_child->_odeBodyID, -t.x, -t.y, -t.z);
+	t = dBodyGetTorque( _child->_odeBodyID);
+	_child->_externalForce.b.x = t[0];
+	_child->_externalForce.b.y = t[1];
+	_child->_externalForce.b.z = t[2];
 }
 
 void slJoint::setNormal(slVector *normal) {
@@ -130,10 +140,10 @@ void slJoint::getVelocity(slVector *velocity) {
 			velocity->x = dJointGetSliderPositionRate(_odeJointID);
 			break;
 		case JT_BALL:
-			velocity->z = dJointGetAMotorParam(_odeMotorID, dParamVel3);
+			// velocity->z = dJointGetAMotorAngleRate(_odeMotorID, 2);
 		case JT_UNIVERSAL:
-			velocity->x = dJointGetAMotorParam(_odeMotorID, dParamVel);
-			velocity->y = dJointGetAMotorParam(_odeMotorID, dParamVel2);
+			// velocity->x = dJointGetAMotorAngleRate(_odeMotorID, 0);
+			// velocity->y = dJointGetAMotorAngleRate(_odeMotorID, 1);
 			break;
 	}
 }

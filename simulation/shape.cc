@@ -251,16 +251,6 @@ slShape *slShapeInitNeighbors(slShape *s, double density) {
 
 		face = *fi;
 
-		// slVectorSet(&origin, 0, 0, 0);
-		// slVectorSub(&face->points[0]->vertex, &face->points[1]->vertex, &v1);
-		// slVectorSub(&face->points[1]->vertex, &face->points[2]->vertex, &v2);
-		// slVectorCross(&v1, &v2, &face->plane.normal);
-		// slVectorNormalize(&face->plane.normal);
-
-		// if(slPlaneDistance(&face->plane, &origin) > 0.0) {
-			// slVectorMul(&face->plane.normal, -1, &face->plane.normal);
-		// }
-
 		for(m=0;m<face->edgeCount;m++) {
 			slVector *eStart, *eFinish, edgeVector;
 			int edgeNeighborIndex;
@@ -824,10 +814,6 @@ void slSphereInertiaMatrix(double r, double mass, double i[3][3]) {
 	k = D/(X+Y+Z).
 */
 
-int slPointOnShape(slShape *s, slVector *dir, slVector *point) {
-	return s->pointOnShape(dir, point);
-}
-
 int slSphere::pointOnShape(slVector *dir, slVector *point) {
 	slVectorMul(dir, _radius, point);
 	return 0;
@@ -835,10 +821,10 @@ int slSphere::pointOnShape(slVector *dir, slVector *point) {
 
 int slShape::pointOnShape(slVector *dir, slVector *point) {
 	double D, X, Y, Z, k;
-	slVector pointOnPlane;
+	slVector pointOnPlane, candidate;
 	slPosition pos;
 	int update, result, planes = 0;
-	double distance;
+	double distance, best = -10000;
 	std::vector<slFace*>::iterator fi;
 
 	slVectorSet(point, 0.0, 0.0, 0.0);
@@ -864,26 +850,31 @@ int slShape::pointOnShape(slVector *dir, slVector *point) {
 		k = D/(X+Y+Z);
 
 		if((X+Y+Z) != 0.0 && k > 0.0) {
-			/* we have the length of the matching vector on the plane of this */
-			/* face. */
+			// we have the length of the matching vector on the plane of this face. 
 
 			slVectorMul(dir, k, &pointOnPlane);
 
 			// distance = slPlaneDistance(&f->plane, &pointOnPlane);
 
-			/* now figure out if the point in question is within the face */
+			// now figure out if the point in question is within the face 
 
-			result = slClipPoint(&pointOnPlane, f->voronoi, &pos, f->edgeCount, &update, &distance);
+			result = slClipPointMax(&pointOnPlane, f->voronoi, &pos, f->edgeCount, &update, &distance);
 
-			/* if this point is within the voronoi region of the plane, it must be */
-			/* on the face */
+			// if this point is within the voronoi region of the plane, it must be on the face.
+			// even if it's not, it might be due to small mathematical error, so we'll keep track
+			// of the best of the failures.
 
-			if(result == 1 || distance > -0.01) {
+			if(result == 1) {
 				slVectorCopy(&pointOnPlane, point);
 				return 0;
-			} 
+			} else if(distance > best) {
+				best = distance;
+				slVectorCopy(&pointOnPlane, point);
+			}
 		}
 	}
+
+	printf("warning: no shape point could be found\n");
 
 	return -1;
 }

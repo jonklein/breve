@@ -288,8 +288,13 @@ void slLink::setAcceleration(slVector *linear, slVector *rotational) {
 */
 
 void slLink::applyForce(slVector *f, slVector *t) {
-	if(f) dBodyAddForce(_odeBodyID, f->x, f->y, f->z);
-	if(t) dBodyAddTorque(_odeBodyID, t->x, t->y, t->z);
+	if(f) dBodySetForce(_odeBodyID, f->x, f->y, f->z);
+	if(t) dBodySetTorque(_odeBodyID, t->x, t->y, t->z);
+
+	const dReal *tt = dBodyGetTorque( _odeBodyID);
+	
+	printf("Applied torque = %f %f %f\n", tt[0], tt[1], tt[2]);
+
 }
 
 /*!
@@ -388,6 +393,9 @@ void slLink::applyJointControls() {
 	double newSpeed;
 	std::vector<slJoint*>::iterator ji;
 
+	dBodySetTorque( _odeBodyID, 0, 0, 0);
+	dBodySetForce( _odeBodyID, 0, 0, 0);
+
 	applyForce(&_externalForce.a, &_externalForce.b);
 
 	for(ji = inJoints.begin(); ji != inJoints.end(); ji++ ) {
@@ -398,7 +406,7 @@ void slLink::applyJointControls() {
 			speed = dJointGetHingeAngleRate(joint->_odeJointID);
 		} else if(joint->_type == JT_PRISMATIC) {
 			angle = dJointGetSliderPosition(joint->_odeJointID);
-				speed = dJointGetSliderPositionRate(joint->_odeJointID);
+			speed = dJointGetSliderPositionRate(joint->_odeJointID);
 		} else {
 			angle = 0;
 			speed = 0;

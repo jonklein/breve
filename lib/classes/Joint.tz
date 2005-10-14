@@ -29,8 +29,6 @@ Abstract : Joint (aka Joints) [version 2.3] {
 		maxVector, minVector (vector).
 		springMin, springMax, springStrength (float).
 
-		plinkEdgeDistance, clinkEdgeDistance (vector).
-
   + section "Getting the Objects Connected by a Joint"
 
 	+ to get-parent:
@@ -95,6 +93,12 @@ Abstract : Joint (aka Joints) [version 2.3] {
 		return jointGetVelocity(jointPointer)::x.
 
   + section "Manipulating Joint Strength"
+
+	+ to set-joint-torque-vector to torqueVector (vector):
+		% Applies torque on one or more axes.  This method can be used when setting the torque
+		% of ball or universal joints.
+
+		if jointPointer: jointApplyTorque(jointPointer, torqueVector).
 
 	+ to set-strength-limit to newLimit (float):
 		% Sets the maximum torque to be used by this joint when attempting 
@@ -213,7 +217,6 @@ Abstract : Joint (aka Joints) [version 2.3] {
 		% behavior</b> if the change is not made gradually, or if the bodies 
 		% involved are in contact with other bodies at the time of the change.
 
-
 		relativeRotation = rotationMatrix(theAxis, theAngle).
 		if jointPointer: jointSetLinkPoints(jointPointer, plinkPoint, clinkPoint, relativeRotation).
 
@@ -277,6 +280,8 @@ Abstract : Joint (aka Joints) [version 2.3] {
 		% that it can be used again.  If you do not with to use the Joint object again,
 		% then simply freeing the Joint object will break the joint and delete the object.
 
+		self disable-automatic-joint-scaling.
+
 		if jointPointer: jointBreak(jointPointer).
 		jointPointer = 0.
 
@@ -292,37 +297,46 @@ Abstract : Joint (aka Joints) [version 2.3] {
 
 		self disable-automatic-joint-scaling.
 
-		if parent: plinkEdgeDistance = ((parent get-shape) get-point-on-shape on-vector plinkPoint) - plinkPoint.
+		if parent: self observe instance (parent get-shape) for-notification "size-changed" with-method "rescale-parent-link-point".
 
-		clinkEdgeDistance = ((child get-shape) get-point-on-shape on-vector clinkPoint) - clinkPoint.
-
-		if parent: self observe instance (parent get-shape) for-notification "size-changed" with-method "rescale-link-points".
-
-		self observe instance (child get-shape) for-notification "size-changed" with-method "rescale-link-points".
+		self observe instance (child get-shape) for-notification "size-changed" with-method "rescale-child-link-point".
 
 	+ to disable-automatic-joint-scaling:
 		% Disables automatic joint scaling, if it had previously been enabled using
 		% METHOD(enable-automatic-joint-scaling).
 
-		self unobserve instance (parent get-shape) for-notification "size-changed".
-		self unobserve instance (child get-shape) for-notification "size-changed".
+		if parent: self unobserve instance (parent get-shape) for-notification "size-changed".
+		if child: self unobserve instance (child get-shape) for-notification "size-changed".
 
-	- to rescale-link-points:
+	- to rescale-parent-link-point:
 		% Used internally to rescale link points when joint scaling is enabled.
 
-		newPlinkPoint, newClinkPoint (vector).
+		scale (vector).
+
+		if !parent: return.
+
+		scale = ((parent get-shape) get-last-scale).
+	
+		plinkPoint::x *= scale::x.
+		plinkPoint::y *= scale::y.
+		plinkPoint::z *= scale::z.
+
+		self set-parent-link-point to plinkPoint.
+
+	- to rescale-child-link-point:
+		% Used internally to rescale link points when joint scaling is enabled.
+
+		scale (vector).
 
 		if !child: return.
 
-		if parent: newPlinkPoint = ((parent get-shape) get-point-on-shape on-vector plinkPoint) - plinkEdgeDistance.
-		else newPlinkPoint = plinkPoint.
+		scale = ((child get-shape) get-last-scale).
+	
+		clinkPoint::x *= scale::x.
+		clinkPoint::y *= scale::y.
+		clinkPoint::z *= scale::z.
 
-		newClinkPoint = ((child get-shape) get-point-on-shape on-vector clinkPoint) - clinkEdgeDistance.
-
-		if child && parent: {
-			self set-child-link-point to newClinkPoint.
-			self set-parent-link-point to newPlinkPoint.
-		}
+		self set-child-link-point to clinkPoint.
 
 	- to get-joint-pointer:
 		% Internal use only.
@@ -447,12 +461,6 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 2.3] {
 		% Applies a torque of torqueValue to the revolute joint. 
 
 		jointApplyTorque(jointPointer, (torqueValue, 0, 0)).
-
-	+ to set-joint-torque-vector to torqueVector (vector):
-		% Applies torque on one or more axes.  This method can be used when setting the torque
-		% of ball or universal joints.
-
-		jointApplyTorque(jointPointer, torqueVector).
 
 	- to get-joint-position:
 		return (self get-joint-angle).

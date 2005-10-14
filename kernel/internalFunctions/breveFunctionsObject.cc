@@ -67,7 +67,7 @@ int brIRemoveObserver(brEval args[], brEval *target, brInstance *i) {
 	brInstance *observer = BRINSTANCE(&args[0]);
 	char *notification = BRSTRING(&args[1]);
 
-	brEngineRemoveInstanceObserver(i, observer, notification);
+	brEngineRemoveInstanceObserver(observer, i, notification);
 	return EC_OK;
 }
 

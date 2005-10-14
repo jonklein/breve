@@ -210,7 +210,7 @@ int brIPointOnShape(brEval args[], brEval *target, brInstance *i) {
 	slShape *shape = BRSHAPEPOINTER(&args[0]);
 	slVector *location = &BRVECTOR(&args[1]);
 
-	slPointOnShape(shape, location, &BRVECTOR(target));
+	shape->pointOnShape(location, &BRVECTOR(target));
 
 	return EC_OK;
 }

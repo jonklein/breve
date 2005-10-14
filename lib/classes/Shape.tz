@@ -13,6 +13,7 @@ Abstract : Shape (aka Shapes) [version 2.0] {
 		shapePointer (pointer).
 		density (float).
 		shapeData (data).
+		lastScale (vector).
 
 	+ to init:
 		density = 1.0.
@@ -59,7 +60,13 @@ Abstract : Shape (aka Shapes) [version 2.0] {
 
 		scaleShape(shapePointer, scale).
 
+		lastScale = scale.
+
 		self announce message "size-changed".
+
+	- to get-last-scale:
+		% Used internally...
+		return lastScale.
 
   + section "Initializing the Shape"
 		
