@@ -226,6 +226,8 @@ slList *slMultibody::allCallbackData() {
 	std::vector<slLink*>::iterator li;
 	std::vector<slJoint*>::iterator ji;
 
+	int n = 0;
+
 	for( li = _links.begin(); li != _links.end(); li++ ) {
 		list = slListPrepend(list, (*li)->userData);
 
@@ -305,6 +307,11 @@ slMultibody::slMultibody(slWorld *w) {
 */
 
 void slMultibody::setRoot(slLink *root) {
+	if(root) {
+		root->multibody = NULL;
+		root->nullMultibodiesForConnectedLinks();
+	}
+
 	_root = root;
 
 	if(_root) _root->multibody = this;

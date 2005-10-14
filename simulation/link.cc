@@ -53,6 +53,10 @@ slLink::slLink(slWorld *w) : slWorldObject() {
 }
 
 slLink::~slLink() {
+	void *r = NULL;
+
+	if(multibody) r = multibody->getRoot();
+
 	if(multibody && multibody->getRoot() == this) multibody->setRoot(NULL);
 
 	// This is a bad situation here: slJointBreak modifies the 
@@ -290,11 +294,6 @@ void slLink::setAcceleration(slVector *linear, slVector *rotational) {
 void slLink::applyForce(slVector *f, slVector *t) {
 	if(f) dBodySetForce(_odeBodyID, f->x, f->y, f->z);
 	if(t) dBodySetTorque(_odeBodyID, t->x, t->y, t->z);
-
-	const dReal *tt = dBodyGetTorque( _odeBodyID);
-	
-	printf("Applied torque = %f %f %f\n", tt[0], tt[1], tt[2]);
-
 }
 
 /*!
@@ -678,6 +677,8 @@ void slLink::setTorque(slVector *torque) {
 void slLink::nullMultibodiesForConnectedLinks() {
 	std::vector<slLink*> links;
 	std::vector<slLink*>::iterator li;
+	
+	multibody = NULL;
 
 	connectedLinks(&links, 0);
 	
