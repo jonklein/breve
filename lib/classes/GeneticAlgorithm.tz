@@ -1,4 +1,7 @@
 @use Object.
+@use NetworkServer.
+
+@define GENETIC_ALGORITHM_SERVER_PORT 59142.
 
 Object : GeneticAlgorithm {
 	% The GeneticAlgorithm class allows you to set up a genetic algorithm, 
@@ -24,6 +27,11 @@ Object : GeneticAlgorithm {
 		crossoverPercent (int).
 		mutationPercent (int).
 		migrationPercent (int).
+		migrationHosts (list).
+		server (object).
+		port (int).
+		transferIn (object).
+		transferOut (object).
 		generation (int).
 		generationLimit (int).
         seed (object).
@@ -34,6 +42,7 @@ Object : GeneticAlgorithm {
 		populationSize = 30.
 		currentIndividual = 0.
 		mutationPercent = 75.
+		migrationPercent = 0.
 		crossoverPercent = 0.
 		tournamentSize = 5.
 
@@ -93,6 +102,29 @@ Object : GeneticAlgorithm {
 		% Returns the probability of crossover during reproduction.
 		return crossoverPercent.
 
+
+    + to set-migration-percent to percent (int):
+    
+        if percent == 0:
+            free server.
+        else:
+            if !server:
+            {
+                port = GENETIC_ALGORITHM_SERVER_PORT.
+                server = new NetworkServer.
+                server listen on-port port.
+                server set-upload-recipient to self.
+            }
+            transferOut = new GAIndividualTransporter.
+            
+            migrationPercent = percent.
+            
+    + to get-migration-percent:
+        return migrationPercent.
+        
+    + to set-migration-hosts to hosts (list):
+        migrationHosts = copylist hosts.
+            
 	+ to set-tournament-size to tsize (int):
 		% Sets the tournament size to tsize.  The tournament size specifies
 		% how many individuals are considered in a single selection "tournament".
@@ -177,9 +209,10 @@ Object : GeneticAlgorithm {
 		self schedule method-call "switch-individual" at-time (controller get-time) + testDuration.
 
 	- to reproduce:
-		r, i, best (int).
+		r, i, best, n (int).
 		totalFitness, fitness (double).
 		ind (object).
+		recipientHost (string).
 
 		if | populations{ !currentPopulation } | != populationSize: {
 			free populations{ !currentPopulation }.
@@ -214,7 +247,20 @@ Object : GeneticAlgorithm {
 				populations{ !currentPopulation }{ i } crossover 
 					from-parent1 (self tournament-select) from-parent2 (self tournament-select).
 			} else if r < (mutationPercent + crossoverPercent + migrationPercent): {
-				# do migration here...
+
+				# migration...
+				if transferIn:
+				{
+				    if (transferIn get-individual number n):
+				        ind = (transferIn get-individual number n).
+				    else:
+				        ind = (self tournament-select).				    
+				}
+				else:
+				{
+				    ind = (self tournament-select).
+				}
+                populations{ !currentPopulation }{ i } copy from ind.				
 			} else {
 				ind = (self tournament-select).
 				populations{ !currentPopulation }{ i } copy from ind.
@@ -222,7 +268,18 @@ Object : GeneticAlgorithm {
 				# print "Copying individual with fitness ", (ind get-fitness).
 			}
 		}
+        
 
+        if | migrationHosts | != 0:
+        {
+            transferOut clear.
+            for n=0, n<populationSize * (migrationPercent / 100.0), n++:
+                transferOut add individual (self tournament-select).
+            #print "Migrating individuals...".
+            recipientHost = migrationHosts{ random[ | migrationHosts | - 1 ] }.
+            transferOut send-over-network to recipientHost on GENETIC_ALGORITHM_SERVER_PORT.
+        }
+        
 		currentPopulation = !currentPopulation.
 		currentIndividual = 0.
 
@@ -250,6 +307,12 @@ Object : GeneticAlgorithm {
 
 		return populations{ currentPopulation }{ best }.
 
+    + section "Methods for Cluster Migration"
+    
+    + to accept-upload of migrants (object) from other (string):
+        free transferIn.
+        transferIn = migrants.
+    
 	+ section "Methods to Override in Custom Subclasses"
 
 	+ to report at-generation generation (int) with-best-individual bestIndividual (object) with-average-fitness fitness (double):
@@ -339,4 +402,20 @@ Object : GeneticAlgorithmIndividual {
 		% crossover is enabled.
 
 		die "The method \"crossover\" must be implemented in your GeneticAlgorithmIndividual subclass!".
+}
+
+Object : GAIndividualTransporter {
+
+    + variables:
+        individuals (list).
+        
+    - to add individual i (object):
+        push i onto individuals.
+        
+    - to clear:
+        individuals = {}.
+        
+    - to get-individual number n (int):
+        if n < | individuals | : return individuals{n}.
+
 }
