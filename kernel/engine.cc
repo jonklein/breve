@@ -60,6 +60,8 @@ brEngine *brEngineNew(void) {
 	char *envpath, *dir;
 	int n = 0;
 
+	char wd[MAXPATHLEN];
+
 #if WINDOWS
 	WSADATA wsaData;
 	WSAStartup(0x0101, &wsaData);
@@ -146,7 +148,7 @@ brEngine *brEngineNew(void) {
 
 	// set up the initial search paths 
 
-	brEngineSetIOPath(e, ".");
+	brEngineSetIOPath(e, getcwd(wd, MAXPATHLEN));
 
 	// load all of the internal breve functions
 

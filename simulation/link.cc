@@ -53,10 +53,6 @@ slLink::slLink(slWorld *w) : slWorldObject() {
 }
 
 slLink::~slLink() {
-	void *r = NULL;
-
-	if(multibody) r = multibody->getRoot();
-
 	if(multibody && multibody->getRoot() == this) multibody->setRoot(NULL);
 
 	// This is a bad situation here: slJointBreak modifies the 
