@@ -80,6 +80,7 @@ int brISetDrawEveryFrame(brEval args[], brEval *target, brInstance *i) {
 
 int brIRandomSeed(brEval args[], brEval *target, brInstance *i) {
 	srandom(BRINT(&args[0]));
+	dRandSetSeed(BRINT(&args[0]));
 
 	return EC_OK;
 }
@@ -110,6 +111,7 @@ int brIRandomSeedFromDevRandom(brEval args[], brEval *target, brInstance *i) {
 		BRINT(target) = 0;
 		slMessage(DEBUG_ALL, "read seed %u from random device\n", seed);
 		srandom(seed);
+		dRandSetSeed(seed);
 	} else BRINT(target) = -1;
 
 	return EC_OK;

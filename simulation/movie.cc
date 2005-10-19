@@ -58,9 +58,10 @@ slMovie *slMovieCreate(char *filename, int width, int height) {
 	}
 
 	n = snprintf(m->context->filename, sizeof(m->context->filename), "file:%s", filename);
+
 	if (n < 0 || (size_t)n >= sizeof(m->context->filename) ||
 	    url_fopen(&m->context->pb, m->context->filename, URL_WRONLY) < 0) {
-		slMessage(DEBUG_ALL, "Could not open file \"%s\" for writing: %s\n", filename, strerror(errno));
+		slMessage(DEBUG_ALL, "Could not open file \"%s\" (%s) for writing: %s\n", filename, m->context->filename, strerror(errno));
 		av_free(st);
 		av_free(m->context);
 		delete m;
