@@ -53,6 +53,10 @@ slLink::slLink(slWorld *w) : slWorldObject() {
 }
 
 slLink::~slLink() {
+	// slLink *r = NULL;
+	// if(multibody) r = multibody->getRoot();
+	// printf("deleting link %p [%p root %p]\n", this, multibody, r);
+
 	if(multibody && multibody->getRoot() == this) multibody->setRoot(NULL);
 
 	// This is a bad situation here: slJointBreak modifies the 
@@ -674,11 +678,13 @@ void slLink::nullMultibodiesForConnectedLinks() {
 	std::vector<slLink*> links;
 	std::vector<slLink*>::iterator li;
 	
-	multibody = NULL;
-
-	connectedLinks(&links, 0);
+	connectedLinks(&links, 1);
 	
-	for(li = links.begin(); li != links.end(); li++) (*li)->multibody = NULL;
+	for(li = links.begin(); li != links.end(); li++) {
+		(*li)->multibody = NULL;
+	}
+
+	multibody = NULL;
 }
 
 /*!

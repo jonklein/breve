@@ -226,9 +226,10 @@ slList *slMultibody::allCallbackData() {
 	std::vector<slLink*>::iterator li;
 	std::vector<slJoint*>::iterator ji;
 
-	int n = 0;
+	// printf("%p [root %p] reading callback data for %d links\n", this, _root, _links.size());
 
 	for( li = _links.begin(); li != _links.end(); li++ ) {
+		// printf("adding callback data for %p\n", *li);
 		list = slListPrepend(list, (*li)->userData);
 
 		for(ji = (*li)->inJoints.begin(); ji != (*li)->inJoints.end(); ji++ ) {
@@ -329,6 +330,8 @@ void slMultibody::update() {
 	_links.clear();
 
 	if(!_root) return;
+
+	// printf("updating %p with root %p [%p]\n", this, _root, _root->multibody);
 
 	_root->connectedLinks(&_links, 1);
 
