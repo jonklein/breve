@@ -28,8 +28,8 @@ Object : GeneticAlgorithm {
 		mutationPercent (int).
 		migrationPercent (int).
 		migrationHosts (list).
-		server (object).
-		port (int).
+		migrationServer (object).
+		migrationPort (int).
 		transferIn (object).
 		transferOut (object).
 		generation (int).
@@ -45,6 +45,7 @@ Object : GeneticAlgorithm {
 		migrationPercent = 0.
 		crossoverPercent = 0.
 		tournamentSize = 5.
+		migrationPort = GENETIC_ALGORITHM_SERVER_PORT.
 
 		populations = { { }, { } }.
 
@@ -101,19 +102,20 @@ Object : GeneticAlgorithm {
 	+ to get-crossover-percent:
 		% Returns the probability of crossover during reproduction.
 		return crossoverPercent.
-
+    
+    + to set-migration-port to port (int):
+        migrationPort = port.
 
     + to set-migration-percent to percent (int):
     
         if percent == 0:
-            free server.
+            free migrationServer.
         else:
-            if !server:
+            if !migrationServer:
             {
-                port = GENETIC_ALGORITHM_SERVER_PORT.
-                server = new NetworkServer.
-                server listen on-port port.
-                server set-upload-recipient to self.
+                migrationServer = new NetworkServer.
+                migrationServer listen on-port migrationPort.
+                migrationServer set-upload-recipient to self.
             }
             transferOut = new GAIndividualTransporter.
             
