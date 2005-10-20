@@ -36,6 +36,11 @@ Object : GeneticAlgorithm {
 		generationLimit (int).
         seed (object).
 
+	+ to dearchive:
+		currentIndividual = -1.
+		self switch-individual.
+
+		return 1.
         
 	+ to init:
 		testDuration = 20.
@@ -70,8 +75,9 @@ Object : GeneticAlgorithm {
         % The seed individual is used to start the genetic algorithm
         % at a specfic location in the search space by using the seed
         % individual's paramters as a starting point.
-    
 
+		seed = theSeed.
+    
 	+ to set-population-size to size (int):
 		% Sets the number of individuals in the population to size.
 		populationSize = size.
@@ -168,6 +174,7 @@ Object : GeneticAlgorithm {
 
 	- to generate-population:
 		n (int).
+		newI (object).
 
 		if populations{ 0 }: free populations{ 0 }.
 		if populations{ 1 }: free populations{ 1 }.
@@ -177,8 +184,13 @@ Object : GeneticAlgorithm {
 		populations = { { }, { } }.
 
 		for n = 0, n < populationSize, n++ : {
-			push (controller make-new-instance of-class individualClass) onto populations{ 0 }.
-			push (controller make-new-instance of-class individualClass) onto populations{ 1 }.
+			newI = (controller make-new-instance of-class individualClass).
+			push newI onto populations{ 0 }.
+			self add-dependency on newI.
+
+			newI = (controller make-new-instance of-class individualClass).
+			push newI onto populations{ 1 }.
+			self add-dependency on newI.
 		}
 
         if seed: populations{ 0 } copy from seed.

@@ -1,0 +1,385 @@
+@use GeneticAlgorithm.
+
+GeneticAlgorithmIndividual : GADirectedGraph {
+	% GADirectedGraph is a special subclass of OBJECT(GeneticAlgorithmIndividual) 
+	% which maages directed networks of nodes for evolution.  The primary use
+	% of these networks is to evolve creature morphologies.  The networks are
+	% based on the the directed graphs used by Karl Sims in "Evolving Virtual 
+	% Creatures" (1994).  Multiple connections may exist between nodes, and nodes 
+	% may have connections back to themselves.
+	% <P>
+	% GAGraph makes use of a number of other classes.  The GAGraph itself holds 
+	% a reference to the graph's root node, which is an object of 
+	% OBJECT(GADirectedGraphNode).  This root node may be connected directly or 
+	% indirectly to any other number of OBJECT(GADirectedGraphNode) objects,
+	% using the connection class OBJECT(GADirectedGraphConnection).
+	% <P>
+	% Because OBJECT(GADirectedGraphNode) and OBJECT(GADirectedGraphConnection) 
+	% are intended to be used as general evolutionary objects, it is often 
+	% neccessary to associate a set of parameters with these objects, above 
+	% and beyond the information coded in the connected graph.  For this reason,
+	% both classes are subclasses of an object which can hold a list of parameters,
+	% OBJECT(GADirectedGraphParameterObject).
+	% <P>
+	% OBJECT(GADirectedGraphParameterObject) holds a list of float values between
+	% -1.0 and 1.0.  These parameters can be interpreted in whatever way the 
+	% user desires.  In the example of directed graphs being used to specify
+	% creature morphologies, the parameters hold information about the size and
+	% orientation of limbs relative to one another.
+
+	+ variables:
+		rootNode (object).
+
+	+ to init:
+		rootNode = new GADirectedGraphNode.
+		self add-dependency on rootNode.
+
+	+ to copy from other (object):
+		% Copies the contents of the directed graph other.
+
+		self delete-root-node.
+		rootNode = ((other get-root) duplicate).
+		self add-dependency on rootNode.
+
+	+ to mutate:
+		% Mutates the directed graph.
+
+		rootNode mutate.
+
+	+ to crossover from-parent1 p1 (object) from-parent2 p2 (object):
+		positions (hash).
+		nodes1, nodes2, childnodes (list).
+		connection, temp, source (object).
+		n, index (int).
+
+		first, max, cross (int).
+
+		if random[1]: {
+			# randomly swap the two lists.
+
+			temp = p1.
+			p1 = p2.
+			p2 = temp.
+		}
+
+		nodes1 = ((p1 get-root) get-connected-nodes).
+		nodes2 = ((p2 get-root) get-connected-nodes).
+
+		# make hash tables which link the node object to its index 
+
+		for n = 0, n < | nodes1 |, n++: positions{ nodes1{ n } } = n.
+		for n = 0, n < | nodes2 |, n++: positions{ nodes2{ n } } = n.
+		
+		first = random[1].	
+
+		max = | nodes2 |.
+
+		cross = random[ max - 1 ].
+
+		if cross >= | nodes1 |: cross = | nodes1 |.
+
+		if max < 2: {
+			push new GADirectedGraphNodes onto childnodes.
+		} else 
+			childnodes = max new GADirectedGraphNodes.
+
+		for n = 0, n < max, n++ : {
+			if n < cross: source = nodes1{ n }.
+			else source = nodes2{ n }.
+
+			childnodes{ n } set-parameters to (source get-parameters).
+
+			foreach connection in (source get-connections): {
+				index = positions{ (connection get-target) }.
+
+				if index >= | childnodes |: {
+					index = random[ | childnodes | - 1 ].
+				} 
+
+				childnodes{ n } connect to childnodes{ index } with-parameters (connection get-parameters).
+			}
+		}
+
+	+ to print-graph:
+		% Prints out a text representation of the network.
+
+		print "#### Graph $self".
+
+		(rootNode print-connected-objects).
+
+	+ to get-root:
+		% Returns the root node of the directed graph.
+
+		return rootNode.
+
+	+ to randomize with-max-nodes nMax (int) with-node-parameters np (int) with-connection-parameters cp (int) with-connection-probability p = 0.5 (double):
+		% Randomizes this genome by creating a directed graph containing up to 
+		% nMax nodes.  Sets the number of node and connection parameters to np 
+		% and cp, respectively.  The optional connection probability, p, specifies
+		% the probability that a connection will be made from one node to another.
+
+		count (int).
+		nodes (list).
+		connection, n, m (object).
+		keep (hash).
+
+		self delete-root-node.
+
+		count = random[nMax - 1] + 1.
+		if count < 2: count++.
+
+		nodes = count new GADirectedGraphNodes.
+		nodes set-parameter-length to np.
+		nodes randomize-parameters.
+
+		foreach n in nodes: {
+			foreach m in nodes: {
+				if n != m && random[1.0] < p: {
+					connection = (n connect to m).
+					connection set-parameter-length to cp.
+					connection randomize-parameters.
+
+					keep{ n } = keep{ m } = 1.
+				}
+			}
+		}
+
+		foreach n in nodes: {
+			if !keep{ n } : free n.
+			else rootNode = n.
+		}
+
+		# bad luck -- no connections, just make an empty node.
+
+		if !rootNode: {
+			rootNode = new GADirectedGraphNode.
+			rootNode set-parameter-length to np.
+			rootNode randomize-parameters.
+		}
+
+		# self print-graph.
+
+		self add-dependency on rootNode.
+
+	+ to destroy:
+		self delete-root-node.
+		
+	+ to delete-root-node:
+		if rootNode: self remove-dependency on rootNode.
+		rootNode destroy-connected-objects.
+		free rootNode.
+
+		rootNode = 0.
+}
+
+Abstract : GADirectedGraphParameterObject (aka GADirectedGraphParameterObjects) {
+	% A GADirectedGraphParameterObject is a subclass of object which holds a parameter list
+	% for use with the OBJECT(GADirectedGraphNode) and OBJECT(GADirectedGraphConnection)
+	% objects.  The elements in the parameter list are to be interpreted as evolving genome
+	% values which control how the graph nodes and connections are used.
+
+	+ variables:
+		parameters (list).
+
+	+ to get-parameters:
+		% Returns the parameter list.
+		return parameters.
+	
+	+ to set-parameters to plist (list):
+		% Sets the parameter list to plist.
+
+		parameters = copylist plist.
+
+	+ to set-parameter-length to length (int):
+		% Extends the size of the parameter list include at least length items by adding 
+		% zeros to the end of the list.
+
+		while | parameters | < length: push 0 onto parameters.
+
+	+ to randomize-parameters:
+		% Randomizes all of the parameters in the list to values between -1.0 and 1.0.
+		n (int).
+
+		for n = 0, n < | parameters |, n++: {
+			parameters{ n } = random[2.0] - 1.0.
+		}
+
+	+ to mutate with-variation variation = 0.1 (double) with-replacement-probability replace = 0.1 (int):
+		% Mutates the list of parameters in the list with a gaussian distribution 
+		% of size variation, and a replace proability chance of total replacement.
+	
+		n (int).
+
+		for n = 0, n < | parameters |, n++: {
+			parameters{ n } += randomGauss() * variation.
+
+			if parameters{ n } < -1.0: parameters{ n } = -1.0.
+			if parameters{ n } > 1.0: parameters{ n } = 1.0.
+
+			if random[1.0] < replace: parameters{ n } = random[2.0] - 1.0.
+		}
+}
+
+GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) {
+	% OBJECT(GADirectedGraphNode) is a node in a directed graph.  It is a subclass of 
+	% OBJECT(GADirectedGraphParameterObject) which can be used to associate it with 
+	% a set of parameters.
+
+	+ variables:
+		connections (list).
+
+	+ to duplicate:
+		% Duplicates the object, which triggers recursive duplication of all connected
+		% objects.  To be used on root nodes only.
+
+		h (hash).
+
+		return (self duplicate with-seen h).
+
+	- to duplicate with-seen seenhash (hash): 
+		newNode, connection (object).
+
+		if seenhash{ self }: return seenhash{ self }.
+
+		newNode = new GADirectedGraphNode.
+
+		seenhash{ self } = newNode.
+
+		foreach connection in connections: {
+			newNode connect to ((connection get-target) duplicate with-seen seenhash) with-parameters (connection get-parameters).
+		}
+
+		newNode set-parameters to (self get-parameters).
+
+		return newNode.
+
+	+ to mutate:
+		% Mutates the object, which triggers recursive mutation of all connected
+		% objects.  To be used on root nodes only.
+		h (hash).
+	
+		return (self mutate with-seen h).
+
+	- to mutate with-seen seenhash (hash): 
+		connection (object).
+
+		if seenhash{ self }: return.
+
+		seenhash{ self } = 1.
+
+		super mutate.
+
+		foreach connection in connections: {
+			connection mutate.
+			(connection get-target) mutate with-seen seenhash.
+		}
+	
+	+ to destroy-connected-objects:
+		% Initiates a recursive freeing of this object and all connected
+		% objects, both directly and indiretly connected.
+
+		h (hash).
+
+		self destroy-connected-objects with-seen h.
+
+	- to destroy-connected-objects with-seen seenhash (hash):
+		connection (object).
+
+		if seenhash{ self }: return.
+
+		seenhash{ self } = 1.
+
+		foreach connection in connections: {
+			if (connection get-target): (connection get-target) destroy-connected-objects with-seen seenhash.
+			free connection.
+		}
+
+		free self.
+
+	+ to print-connected-objects:
+		% Initiates a recursive printing of all connected objects in the graph.
+
+		h (hash).
+	
+		self print-connected-objects with-seen h.
+
+	- to print-connected-objects with-seen seenhash (hash):
+		connection (object).
+
+		if seenhash{ self }: return.
+
+		seenhash { self } = 1.
+
+		print "## $self parameters $parameters".
+
+		foreach connection in connections: {
+			print "## $self connected to ", (connection get-target), " with parameters: ", (connection get-parameters).
+			(connection get-target) print-connected-objects with-seen seenhash.
+		}
+
+	+ to get-connected-nodes:
+		% Recursively generates a list of all nodes connected to this 
+		% root node, both directly and indirectly.
+
+		h (hash).
+
+		return (self get-connected-nodes with-seen h with-list {}).
+
+	- to get-connected-nodes with-seen seenhash (hash) with-list seenlist (list):
+		connection (object).
+		nodelist (list).
+
+		if seenhash{ self }: return {}.
+
+		push self onto seenlist.
+		seenhash{ self } = 1.
+
+		foreach connection in connections: {
+			if (connection get-target): (connection get-target) get-connected-nodes with-seen seenhash with-list seenlist.
+		}
+
+		return seenlist.
+
+	+ to connect to child (object):
+		% Makes a connection to child with an empty parameter list.
+
+		return (self connect to child with-parameters {}).
+
+	+ to connect to child (object) with-parameters plist (list):
+		% Makes a connection to child with the parameter list plist.
+		connection (object).
+
+		connection = new GADirectedGraphConnection.
+		connection set-target to child.
+		connection set-parameters to plist.
+
+		self add-dependency on connection.
+
+		push connection onto connections.
+
+		return connection.
+
+	+ to get-connections:
+		% Returns the list of connections from this node.
+
+		return connections.
+}
+
+GADirectedGraphParameterObject : GADirectedGraphConnection (aka GADirectedGraphConnections) {
+	% A OBJECT(GADirectedGraphConnection) is a connection from one 
+	% OBJECT(GADirectedGraphNode) to another.  As a subclass of 
+	% OBJECT(GADirectedGraphParameterObject), it can be associated 
+	% with a list of parameters.
+
+	+ variables:
+		target (object).
+
+	+ to set-target to t (object):
+		% Sets the target of this connection to t.
+		self add-dependency on t.
+		target = t.
+
+	+ to get-target:
+		% Returns the target of this connection.
+		return target.
+}

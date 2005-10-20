@@ -66,7 +66,7 @@ int stXMLAssignIndices(brEngine *e, std::map< stInstance*, int > &instanceToInde
 	unsigned int n;
 
 	for(n=0; n<e->instances.size(); n++) instanceToIndexMap[ (stInstance*)e->instances[n]->userData ] = n;
-	for(n=0; n<e->instancesToAdd.size(); n++) instanceToIndexMap[ (stInstance*)e->instancesToAdd[n]->userData ] = n;
+	for(n=0; n<e->instancesToAdd.size(); n++) instanceToIndexMap[ (stInstance*)e->instancesToAdd[n]->userData ] = n + e->instances.size();
 
 	return n;
 }
