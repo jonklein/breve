@@ -31,6 +31,7 @@ PhysicalControl : VirtualCreatures {
         running (int).
         dg (object).
         body (object).
+		bestDistance (float).
 
         startlocation (vector).
 
@@ -40,6 +41,8 @@ PhysicalControl : VirtualCreatures {
 
     + to init:
         new Floor.
+
+		self set-background-texture-image to (new Image load from "images/clouds.png").
 
         self enable-fast-physics.
 
@@ -90,6 +93,8 @@ PhysicalControl : VirtualCreatures {
         return | t - startlocation | .
 
     + to setup-test with i (object):
+		gen (int). 
+
         free all Links.
         free all Joints.
         if body: free body.
@@ -103,6 +108,15 @@ PhysicalControl : VirtualCreatures {
 
         self schedule method-call "check-penetration" at-time (self get-time) + 8.0.
         self set-display-text to "Preparing to test $i..." at-x -.95 at-y -.95.
+
+		if ga: {
+			gen = (ga get-generation).
+
+			if (ga get-best-individual) && ((ga get-best-individual) get-fitness) > bestDistance: bestDistance = ((ga get-best-individual) get-fitness).
+
+			self set-display-text number 1 to "Generation: $gen" at-x -.95 at-y -.75.
+			self set-display-text number 2 to "Best distance: $bestDistance" at-x -.95 at-y -.85.
+		}
 
         running = 0.
 

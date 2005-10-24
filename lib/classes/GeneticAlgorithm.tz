@@ -35,6 +35,7 @@ Object : GeneticAlgorithm {
 		generation (int).
 		generationLimit (int).
         seed (object).
+		currentBestIndividual (object).
 
 	+ to dearchive:
 		currentIndividual = -1.
@@ -166,6 +167,14 @@ Object : GeneticAlgorithm {
 		% Returns the generation limit.  See METHOD(get-generation-limit) for 
 		% details.
 		return generationLimit.
+
+	+ to get-generation: 
+		% Returns the current generation.
+		return generation.
+
+	+ to get-best-individual:
+		% Returns the current best individual.
+		return currentBestIndividual.
 
 	+ to iterate:
 		if | populations { 0 } | == 0: self generate-population.
@@ -342,6 +351,8 @@ Object : GeneticAlgorithm {
 
 		print "### Generation $generation; average fitness: $fitness; best fitness: $bf".
 		self examine individual bestIndividual.
+
+		currentBestIndividual = bestIndividual.
 
 	+ to examine individual currentIndividual (object):
 		% Called automatically during each generation's report, this method examines
