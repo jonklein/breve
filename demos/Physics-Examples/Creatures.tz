@@ -31,7 +31,7 @@ PhysicalControl : VirtualCreatures {
         running (int).
         dg (object).
         body (object).
-		bestDistance (float).
+		flag (object).
 
         startlocation (vector).
 
@@ -42,9 +42,16 @@ PhysicalControl : VirtualCreatures {
     + to init:
         new Floor.
 
+		flag = new Mobile.
+		flag disable-physics.
+		flag set-shape to (new Sphere init-with radius .2).
+		flag set-color to (1, 0, 0).
+		flag set-label to "Start".
+
 		self set-background-texture-image to (new Image load from "images/clouds.png").
 
         self enable-fast-physics.
+		self set-fast-physics-iterations to 20.
 
         parser = new MorphologyParser.
 
@@ -53,12 +60,29 @@ PhysicalControl : VirtualCreatures {
 		if !ga: {
         	ga = new SimsGA.
 
-	        ga set-fitness-test-duration to 50.
+	        ga set-fitness-test-duration to 30.
 	        ga set-individual-class to "SimsGAIndividual".
 			ga set-population-size to 25.
 			ga set-crossover-percent to 30.
 			ga set-mutation-percent to 30.
 		}
+
+		self update-text.
+
+	+ to update-text:
+		gen, total, index (int).
+		bestDistance (float).
+
+		if ga: {
+			gen = (ga get-generation) + 1.
+			bestDistance = (ga get-best-fitness).
+
+			total = (ga get-population-size).
+			index = (ga get-current-individual-index) + 1.
+		}
+
+		self set-display-text number 1 to "Generation: $gen ($index/$total)" at-x -.95 at-y -.75.
+		self set-display-text number 2 to "Best distance: $bestDistance" at-x -.95 at-y -.85.
 
     + to iterate:
         t (vector).
@@ -93,7 +117,9 @@ PhysicalControl : VirtualCreatures {
         return | t - startlocation | .
 
     + to setup-test with i (object):
-		gen (int). 
+		l (object).
+
+		foreach l in (all Links): free (l get-shape).
 
         free all Links.
         free all Joints.
@@ -109,14 +135,7 @@ PhysicalControl : VirtualCreatures {
         self schedule method-call "check-penetration" at-time (self get-time) + 8.0.
         self set-display-text to "Preparing to test $i..." at-x -.95 at-y -.95.
 
-		if ga: {
-			gen = (ga get-generation).
-
-			if (ga get-best-individual) && ((ga get-best-individual) get-fitness) > bestDistance: bestDistance = ((ga get-best-individual) get-fitness).
-
-			self set-display-text number 1 to "Generation: $gen" at-x -.95 at-y -.75.
-			self set-display-text number 2 to "Best distance: $bestDistance" at-x -.95 at-y -.85.
-		}
+		self update-text.
 
         running = 0.
 
@@ -136,7 +155,7 @@ PhysicalControl : VirtualCreatures {
         }
 
         if |all Links|: startlocation /= |all Links|.
-
+		flag move to startlocation - (0, startlocation::y - 2, 0).
 }
 
 GeneticAlgorithm : SimsGA {
@@ -154,8 +173,6 @@ GeneticAlgorithm : SimsGA {
         if isnan((o get-fitness)): o set-fitness to 0.
         print "fitness of $o: ", (o get-fitness).
 
-	+ to reproduce:
-		(super reproduce).
 		(self archive-as-xml file "breveCreatures.xml").
 }
 
@@ -165,7 +182,7 @@ GeneticAlgorithmIndividual : SimsGAIndividual {
 
     + to init:
         genome = new GADirectedGraph.
-        genome randomize with-max-nodes 5 with-node-parameters 10 with-connection-parameters 10.
+        self randomize.
 
 		self add-dependency on genome.
 
@@ -177,6 +194,9 @@ GeneticAlgorithmIndividual : SimsGAIndividual {
 
     + to mutate:
         genome mutate.
+
+	+ to randomize:
+        genome randomize with-max-nodes 5 with-node-parameters 10 with-connection-parameters 10.
 
     + to get-genome:
         return genome.

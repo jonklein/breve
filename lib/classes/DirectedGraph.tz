@@ -47,12 +47,14 @@ GeneticAlgorithmIndividual : GADirectedGraph {
 		rootNode mutate.
 
 	+ to crossover from-parent1 p1 (object) from-parent2 p2 (object):
-		positions (hash).
+		keep, positions (hash).
 		nodes1, nodes2, childnodes (list).
 		connection, temp, source (object).
 		n, index (int).
 
 		first, max, cross (int).
+
+		self delete-root-node.
 
 		if random[1]: {
 			# randomly swap the two lists.
@@ -100,6 +102,45 @@ GeneticAlgorithmIndividual : GADirectedGraph {
 			}
 		}
 
+		rootNode = (self pick-root-node from childnodes).
+
+		if !rootNode: {
+			rootNode = nodes1{ 0 }.
+		}
+
+		keep{ rootNode } = 1.
+
+		# keep the connected nodes, toss the orphans
+
+		foreach temp in (rootNode get-connected-nodes): {
+			keep{ temp } = 1.
+		}
+
+		foreach temp in childnodes: {
+			if !keep{ temp }: {
+				print "freeing ", temp.
+				free temp.
+			}
+		}
+
+		self add-dependency on rootNode.
+
+	- to pick-root-node from nodes (list):
+		# The root node will be the node or nodes with the maximum number of connected nodes.
+		# This way, we won't get a subnetwork.
+
+		best, node (object).
+		bestCount (int).
+
+		foreach node in nodes: {
+			if | (node get-connected-nodes) | > bestCount: {
+				best = node.
+				bestCount = (node get-connected-nodes).
+			}
+		}
+
+		return best.
+
 	+ to print-graph:
 		% Prints out a text representation of the network.
 
@@ -138,26 +179,28 @@ GeneticAlgorithmIndividual : GADirectedGraph {
 					connection = (n connect to m).
 					connection set-parameter-length to cp.
 					connection randomize-parameters.
-
-					keep{ n } = keep{ m } = 1.
 				}
 			}
 		}
 
-		foreach n in nodes: {
-			if !keep{ n } : free n.
-			else rootNode = n.
-		}
+		rootNode = (self pick-root-node from nodes).
 
 		# bad luck -- no connections, just make an empty node.
-
 		if !rootNode: {
 			rootNode = new GADirectedGraphNode.
 			rootNode set-parameter-length to np.
 			rootNode randomize-parameters.
 		}
 
-		# self print-graph.
+		# keep the connected nodes, toss the orphans
+
+		foreach n in (rootNode get-connected-nodes): {
+			keep{ n } = 1.
+		}
+
+		foreach n in nodes: {
+			if !keep{ n } : free n.
+		}
 
 		self add-dependency on rootNode.
 
@@ -180,6 +223,9 @@ Abstract : GADirectedGraphParameterObject (aka GADirectedGraphParameterObjects) 
 
 	+ variables:
 		parameters (list).
+
+	+ to init:
+		# self enable-auto-free.
 
 	+ to get-parameters:
 		% Returns the parameter list.
@@ -363,6 +409,9 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 		% Returns the list of connections from this node.
 
 		return connections.
+
+	+ to destroy:
+		free connections.
 }
 
 GADirectedGraphParameterObject : GADirectedGraphConnection (aka GADirectedGraphConnections) {

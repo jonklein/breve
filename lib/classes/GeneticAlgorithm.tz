@@ -26,6 +26,7 @@ Object : GeneticAlgorithm {
 		currentIndividual (int).
 		crossoverPercent (int).
 		mutationPercent (int).
+		randomizePercent (int).
 		migrationPercent (int).
 		migrationHosts (list).
 		migrationServer (object).
@@ -35,10 +36,13 @@ Object : GeneticAlgorithm {
 		generation (int).
 		generationLimit (int).
         seed (object).
-		currentBestIndividual (object).
+		bestFitness (float).
+
 
 	+ to dearchive:
-		currentIndividual = -1.
+		# we'll need to retest the current individual.
+		currentIndividual--.
+
 		self switch-individual.
 
 		return 1.
@@ -50,6 +54,7 @@ Object : GeneticAlgorithm {
 		mutationPercent = 75.
 		migrationPercent = 0.
 		crossoverPercent = 0.
+		randomizePercent = 5.
 		tournamentSize = 5.
 		migrationPort = GENETIC_ALGORITHM_SERVER_PORT.
 
@@ -99,6 +104,16 @@ Object : GeneticAlgorithm {
 		% The default value is 75%.
 		return mutationPercent.
 
+	+ to set-randomize-percent to percent (int): 
+		% Sets the probability of creating a new random individual to percent%.  
+		% The default value is 5%.
+		randomizePercent = percent.
+
+	+ to get-randomize-percent:
+		% Returns the percent probability of a new random individual during reproduction.
+		% The default value is 5%.
+		return randomizePercent.
+
 	+ to set-crossover-percent to percent (int):
 		% Sets the probability of crossover to percent%.  This specifies the 
 		% approximate percentage of agents to be generated through crossover
@@ -114,6 +129,9 @@ Object : GeneticAlgorithm {
         migrationPort = port.
 
     + to set-migration-percent to percent (int):
+		% Sets the probability of migration to percent%.  This specifies the 
+		% approximate percentage that individuals will migrate to another host
+		% during reproduction, if migration is enabled.
     
         if percent == 0:
             free migrationServer.
@@ -169,12 +187,28 @@ Object : GeneticAlgorithm {
 		return generationLimit.
 
 	+ to get-generation: 
-		% Returns the current generation.
+		% Returns the current generation.  The generation count begins at 0.
 		return generation.
 
-	+ to get-best-individual:
-		% Returns the current best individual.
-		return currentBestIndividual.
+	+ to get-best-fitness:
+		% Returns the best fitness seen so far.
+		return bestFitness.
+
+	+ to get-current-individual-index:
+		% Returns the index of the individual currently being tested.  Returns -1
+		% before any fitness tests have been run.
+		% See also METHOD(get-current-individual).
+		return currentIndividual.
+
+	+ to get-current-individual:
+		% Returns the current GeneticAlgorithmIndividual subclass instance being evaluated.
+		% See also METHOD(get-current-individual-index).
+
+		if | populations{ currentPopulation } | == 0: self generate-population.
+
+		if currentIndividual == -1: return 0.
+
+		return populations{ currentPopulation }{ currentIndividual }.
 
 	+ to iterate:
 		if | populations { 0 } | == 0: self generate-population.
@@ -202,24 +236,22 @@ Object : GeneticAlgorithm {
 			self add-dependency on newI.
 		}
 
-        if seed: populations{ 0 } copy from seed.
+        if seed: populations{ 0 }{ 0 } copy from seed.
+		
         
 		currentIndividual = -1.
 		self switch-individual.
 
-	+ to get-current-individual:
-		% Returns the current GeneticAlgorithmIndividual subclass instance being evaluated.
-
-		if | populations{ currentPopulation } | == 0: self generate-population.
-
-		if currentIndividual == -1: return 0.
-
-		return populations{ currentPopulation }{ currentIndividual }.
-
 	+ to switch-individual: 
 		% Switches to the next indivisual
 
-		if currentIndividual != -1: self end-fitness-test of populations{ currentPopulation }{ currentIndividual }.
+		if currentIndividual != -1: {
+			self end-fitness-test of populations{ currentPopulation }{ currentIndividual }.
+
+			if (populations{ currentPopulation }{ currentIndividual } get-fitness) > bestFitness: {
+				bestFitness = (populations{ currentPopulation }{ currentIndividual } get-fitness).
+			}
+		}
 
 		currentIndividual++.
 
@@ -269,7 +301,9 @@ Object : GeneticAlgorithm {
 			} else if r < (mutationPercent + crossoverPercent): {
 				populations{ !currentPopulation }{ i } crossover 
 					from-parent1 (self tournament-select) from-parent2 (self tournament-select).
-			} else if r < (mutationPercent + crossoverPercent + migrationPercent): {
+			} else if r < (mutationPercent + crossoverPercent + randomizePercent): {
+				populations{ !currentPopulation }{ i } randomize.
+			} else if r < (mutationPercent + crossoverPercent + randomizePercent + migrationPercent): {
 
 				# migration...
 				if transferIn:
@@ -352,8 +386,6 @@ Object : GeneticAlgorithm {
 		print "### Generation $generation; average fitness: $fitness; best fitness: $bf".
 		self examine individual bestIndividual.
 
-		currentBestIndividual = bestIndividual.
-
 	+ to examine individual currentIndividual (object):
 		% Called automatically during each generation's report, this method examines
 		% and outputs information about an individual in the population.  The default
@@ -395,6 +427,9 @@ Object : GeneticAlgorithmIndividual {
 	+ variables:
 		fitness (double).
 
+	+ to init:
+		# self enable-auto-free.
+
 	+ to get-fitness:
 		% Returns the fitness value associated with this individual, which
 		% has been previously assigned using METHOD(set-fitness).
@@ -420,6 +455,12 @@ Object : GeneticAlgorithmIndividual {
 		% must be implemented by your subclass.
 
 		die "The method \"mutate\" must be implemented in your GeneticAlgorithmIndividual subclass!".
+
+	+ to randomize:
+		% Implement this method to randomize the genes of this object.  This method
+		% must be implemented by your subclass.
+
+		die "The method \"randomize\" must be implemented in your GeneticAlgorithmIndividual subclass!".
 
 	+ to crossover from-parent1 parent1 (object) from-parent2 parent2 (object):
 		% Implement this method to make this object become a crossover of parent1 
