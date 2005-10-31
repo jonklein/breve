@@ -182,7 +182,8 @@ Abstract : Joint (aka Joints) [version 2.3] {
 		return plinkPoint.
 
 	+ to set-relative-rotation-matrix to newRotation (matrix):
-		% This method must be called <b>before</b> linking the joint.
+		% To avoid undesirable "jumping" behavior, this method should be called 
+		% <b>before</b> linking the joint.
 		% <p>
 		% Sets the relative rotation between the child and parent OBJECT(Link)
 		% to newRotation.  This rotation specifies the rotation of the child
@@ -203,7 +204,8 @@ Abstract : Joint (aka Joints) [version 2.3] {
 		if jointPointer: jointSetLinkPoints(jointPointer, plinkPoint, clinkPoint, relativeRotation).
 
 	+ to set-relative-rotation around-axis theAxis (vector) by theAngle (float):
-		% This method must be called <b>before</b> linking the joint.
+		% To avoid undesirable "jumping" behavior, this method should be called 
+		% <b>before</b> linking the joint.
 		% <p>
 		% Sets the relative rotation between the child and parent OBJECT(Link)
 		% to newRotation.  This rotation specifies the rotation of the child
@@ -307,6 +309,9 @@ Abstract : Joint (aka Joints) [version 2.3] {
 
 		if parent: self unobserve instance (parent get-shape) for-notification "size-changed".
 		if child: self unobserve instance (child get-shape) for-notification "size-changed".
+
+	- to enable-children-reposition: 
+		jointSetRepositionAll(jointPointer, 1).
 
 	- to rescale-parent-link-point:
 		% Used internally to rescale link points when joint scaling is enabled.

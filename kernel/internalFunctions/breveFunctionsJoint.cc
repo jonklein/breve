@@ -421,6 +421,20 @@ int brIJointSetMaxStrength(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+/*!
+	\brief Sets the repositionAll flag for the joint.
+
+	jointSetMaxStrength(slJoint pointer joint, double max torque).
+*/
+
+int brIJointSetRepositionAll(brEval args[], brEval *target, brInstance *i) {
+	slJoint *j = BRJOINTPOINTER(&args[0]);
+
+	j->setRepositionAll( BRINT(&args[1]));
+
+	return EC_OK;
+}
+
 /*@}*/
 
 void breveInitJointFunctions(brNamespace *n) {
@@ -439,6 +453,7 @@ void breveInitJointFunctions(brNamespace *n) {
 	brNewBreveCall(n, "jointSetMaxStrength", brIJointSetMaxStrength, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "jointSetLinkPoints", brIJointSetLinkPoints, AT_NULL, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
 	brNewBreveCall(n, "jointSetNormal", brIJointSetNormal, AT_NULL, AT_POINTER, AT_VECTOR, 0);
+	brNewBreveCall(n, "jointSetRepositionAll", brIJointSetRepositionAll, AT_NULL, AT_POINTER, AT_INT, 0);
 
 	brNewBreveCall(n, "jointGetPosition", brIJointGetPosition, AT_VECTOR, AT_POINTER, 0);
 	brNewBreveCall(n, "jointGetVelocity", brIJointGetVelocity, AT_VECTOR, AT_POINTER, 0);

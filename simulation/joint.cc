@@ -244,16 +244,20 @@ void slJoint::setMaxTorque(double max) {
 
 void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3], int first = 0) {
 	const double *childR;
-	const dReal *childP;
+	const dReal *childP, *linkP;
 	dReal idealR[16];
-	dReal savedChildR[16], savedChildP[3];
+	dReal savedChildR[16], savedChildP[3], offset[3];
 	slVector hingePosition, childPosition;
 	double ideal[3][3];
+	std::vector< slLink*> childChain;
+	std::vector< slLink*>::iterator li;
 
 	childP = dBodyGetPosition(_child->_odeBodyID);
 	childR = dBodyGetRotation(_child->_odeBodyID);
 	memcpy(savedChildR, childR, sizeof(savedChildR));
 	memcpy(savedChildP, childP, sizeof(savedChildP));
+
+	_child->connectedLinks( &childChain, 0);
 
 	if (_parent)
 	   slMatrixMulMatrix(_parent->position.rotation, rotation, ideal);
@@ -314,6 +318,22 @@ void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double r
 
 	if( !first) {
 		dBodySetRotation(_child->_odeBodyID, savedChildR);
+	}
+
+	offset[0] = childPosition.x - savedChildP[0];
+	offset[1] = childPosition.y - savedChildP[1];
+	offset[2] = childPosition.z - savedChildP[2];
+
+	if( _repositionAll ) {
+		for( li = childChain.begin(); li != childChain.end(); li++ ) {
+			if( *li != _parent) {
+				linkP = dBodyGetPosition( (*li)->_odeBodyID);
+
+				dBodySetPosition( (*li)->_odeBodyID, linkP[0] + offset[0], linkP[1] + offset[1], linkP[2] + offset[2]);
+
+				(*li)->updatePositions();
+			}
+		}
 	}
 
 	dBodySetPosition(_child->_odeBodyID, childPosition.x, childPosition.y, childPosition.z);

@@ -118,6 +118,8 @@ PhysicalControl : VirtualCreatures {
 
     + to setup-test with i (object):
 		l (object).
+		low (vector).
+		lowest (double).
 
 		foreach l in (all Links): free (l get-shape).
 
@@ -127,10 +129,30 @@ PhysicalControl : VirtualCreatures {
 
         # (i get-genome) print-graph.
 
-        body = (new MultiBody).
+		body = new MultiBody.
+
         body set-root to (parser parse from ((i get-genome) get-root)).
 
-        # body disable-self-collisions.
+		# offset the body so it's just above the ground.
+
+		body move to (0, 20, 0).
+
+		lowest = 100.
+
+		foreach l in (all Links): {
+			low = (l get-bound-minimum).
+
+			print (l get-location).
+
+			if low::y < lowest: lowest = low::y.
+		}
+
+		low = (body get-location).
+		low::y -= (lowest - 1).
+
+		body move to low.
+
+        body disable-self-collisions.
 
         self schedule method-call "check-penetration" at-time (self get-time) + 8.0.
         self set-display-text to "Preparing to test $i..." at-x -.95 at-y -.95.
@@ -213,6 +235,7 @@ Object : MorphologyParser {
         connectionParams, nodeParams, connections (list).
         rootNode, child, childNode, joint (object).
         cpoint, ppoint, point, size, norm (vector).
+		multibody (object).
 
         if n > 3: return 0.
 
@@ -250,12 +273,12 @@ Object : MorphologyParser {
 
                 joint = new SineJoint.
 
+                # joint set-relative-rotation around-axis norm by connectionParams{3}.
+
                 joint link parent childNode to-child rootNode 
                     with-parent-point cpoint
                     with-child-point ppoint
                     with-normal norm.
-
-                joint set-relative-rotation around-axis norm by connectionParams{3}.
 
                 joint set-phaseshift to 3.14 * connectionParams{7}.
                 joint set-double-spring with-strength 600 with-max 2.6 with-min -2.6.

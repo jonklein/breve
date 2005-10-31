@@ -36,6 +36,11 @@ class slLink;
 
 class slJoint {
 	public:
+		slJoint() {
+			_isMbJoint = false;
+			_repositionAll = false;
+		}
+
 		~slJoint();
 	
 		/*!
@@ -93,6 +98,12 @@ class slJoint {
 	
 		void applyTorque(slVector *torque);
 
+		/*
+		 * Sets the _repositionAll flag of the joint.
+		 */
+
+		void setRepositionAll( bool r) { _repositionAll = r; }
+
 		slLink *_parent;
 		slLink *_child;
 		dJointID _odeJointID;
@@ -106,7 +117,15 @@ class slJoint {
 		double _targetSpeed;
 	
 		unsigned char _type;
-		unsigned char _isMbJoint;
+
+		bool _isMbJoint;
+
+		/**
+		 * This flag indicates whether child links should be repositioned when
+		 * a joint is created or moved.
+		 */
+
+		bool _repositionAll;
 	
 		void *userData;
 
