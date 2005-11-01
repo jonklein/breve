@@ -82,6 +82,8 @@ int brIRandomSeed(brEval args[], brEval *target, brInstance *i) {
 	srandom(BRINT(&args[0]));
 	dRandSetSeed(BRINT(&args[0]));
 
+	gsl_rng_set(i->engine->RNG, BRINT(&args[0]));
+
 	return EC_OK;
 }
 
@@ -112,6 +114,7 @@ int brIRandomSeedFromDevRandom(brEval args[], brEval *target, brInstance *i) {
 		slMessage(DEBUG_ALL, "read seed %u from random device\n", seed);
 		srandom(seed);
 		dRandSetSeed(seed);
+		gsl_rng_set(i->engine->RNG, seed);
 	} else BRINT(target) = -1;
 
 	return EC_OK;

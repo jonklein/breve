@@ -23,7 +23,7 @@
 
 #include <pthread.h>
 #include <sys/stat.h>
-
+#include <gsl/gsl_rng.h>
 
 #include "simulation.h"
 #include "timeval.h"
@@ -147,9 +147,11 @@ class brEngine {
 		slWorld *world;
 		slCamera *camera;
 
+		gsl_rng *RNG;
+
 		std::vector<brObjectType*> objectTypes;
 
-		char simulationWillStop;
+		bool simulationWillStop;
 
 		brSoundMixer *soundMixer;
 

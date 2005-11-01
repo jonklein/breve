@@ -351,14 +351,15 @@ void slPatchGrid::copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double
  */
 
 void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
-	unsigned int z, y, x;
+	int z, y, x;
 	unsigned int zVal, yVal, xVal;
 	unsigned int zMid = 0, yMid = 0, xMid = 0;
 	slPatch *patch;
 	slVector translation, origin;
 
     glDisable(GL_LIGHTING);
-	// glDepthMask(GL_FALSE);
+	glDisable(GL_CULL_FACE);
+	glDepthMask(GL_FALSE);
 
 	if(_cubeDrawList == -1) this->compileCubeList();
 

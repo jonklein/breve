@@ -73,6 +73,8 @@ brEngine *brEngineNew(void) {
 
 	e = new brEngine;
 
+	e->RNG = gsl_rng_alloc( gsl_rng_mt19937);
+
 	e->simulationWillStop = 0;
 
 	e->camera = new slCamera(400, 400);
@@ -226,6 +228,8 @@ void brEngineFree(brEngine *e) {
 #if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
 	Pa_Terminate();
 #endif
+
+	gsl_rng_free( e->RNG);
 
 	for(bi = e->instances.begin(); bi != e->instances.end(); bi++ )
 		brInstanceRelease(*bi);
