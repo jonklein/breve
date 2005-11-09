@@ -1,0 +1,137 @@
+@use Drawing.
+
+Drawing : TurtleDrawing {
+	% The TurtleDrawing class is a subclass of OBJECT(Drawing) which allows 
+	% drawing via a series of "logo turtle"-like commands.  Drawing is 
+	% accomplished by giving commands to a turtle moving around in 3D space.
+	% All commands are interpreted from the turtle's perspective, taking into
+	% account its current position and orientation.
+	% <P>
+	% Unlike other angles used by breve, this class refers to angles as degrees
+	% and not radians to more closely match the behavior of traditional Logo 
+	% implementations.
+
+	+ variables:
+		currentDirection, currentPoint, currentColor (vector).
+		turtle (object).
+		penDown (int).
+		states (list).
+
+	+ to init:
+		penDown = 1.
+		currentDirection = (0, 1, 0).
+		currentPoint = (0, 0, 0).
+
+		turtle = (new Mobile set-shape to (new PolygonCone init-with radius .2 sides 5 height .8)).
+		turtle set-color to (.5, .5, .5).
+
+	+ section "Manipulating the Turtle Avatar"
+
+	+ to show-turtle:
+		% Shows the agent representing the turtle's current position and location. 
+		% The turtle is visible by default, but can be hidden using METHOD(hide-turtle).
+		turtle make-visible.
+
+	+ to hide-turtle:
+		% Hides the agent representing the turtle's current position and location. 
+		% The turtle can be shown again using the method METHOD(show-turtle).
+		turtle make-invisible.
+
+	+ to get-turtle:
+		% Returns the turtle agent object (an instance of OBJECT(Mobile)).
+		return turtle.
+
+	+ section "Moving the Turtle"
+
+	+ to push-state:
+		% "Pushes" the 
+		push { currentPoint, currentDirection, currentColor, 0, penDown } onto states.
+
+	+ to pop-state:
+		% "Pops" a state from the state stack and makes it current.  This method
+		% reenables the most recen
+
+		state (list).
+
+		if | states | < 1: return.
+
+		state = pop states.	
+
+		currentPoint = state{ 0 }.
+		currentDirection = state{ 1 }.
+		currentColor = state{ 2 }.
+		penDown = state{ 4 }.
+
+		self set-current-color to currentColor.
+	
+	+ to turn-up by angle (double):
+		% Rotates the Turtle right by angle degrees.
+
+		rotation (matrix).
+
+		angle *= 2 * 3.1415923 / 360.
+
+		rotation = [ (1, 0, 0),  
+					( 0, cos(angle), sin(angle)),
+					( 0, -sin(angle), cos(angle)) ].
+
+		currentDirection = rotation * currentDirection.
+
+	+ to turn-down by angle (double):
+		% Rotates the Turtle left by angle degrees.
+
+		self turn-up by -angle.
+
+	+ to turn-right by angle (double):
+		% Rotates the Turtle right by angle degrees.
+
+		rotation (matrix).
+
+		angle *= 2 * 3.1415923 / 360.
+
+		rotation = [ ( cos(angle), sin(angle), 0 ),
+					( -sin(angle), cos(angle), 0 ),
+					( 0, 0, 1) ].
+
+		currentDirection = rotation * currentDirection.
+
+	+ to turn-left by angle (double):
+		% Rotates the Turtle left by angle degrees.
+
+		self turn-right by -angle.
+
+	+ to forward by length (double):
+		newPoint (vector).
+
+		newPoint = currentPoint + length * currentDirection.
+
+		self draw-line from currentPoint to newPoint.
+		turtle move to newPoint.
+		turtle point vertex (0, 1, 0) at currentDirection.
+
+		currentPoint = newPoint.
+
+	+ to back by length (double):
+		self forward by -length.
+
+	+ to set-color to color (vector) with-transparency t = 1.0 (double):
+		currentColor = color.
+
+		if !penDown: t = 0.0.
+
+		super set-color to color with-transparency t.
+
+	+ to pen-up:
+		% Lifts the pen so that no turtle is drawn.  This is done by setting 
+		% transparency to 0.0.  
+		penDown = 0.
+		self set-color to currentColor with-transparency 0.0.
+
+	+ to pen-down:
+		penDown = 1.
+		self set-color to currentColor with-transparency 1.0.
+
+	+ to destroy:
+		free (turtle get-shape).
+		free turtle.
+}

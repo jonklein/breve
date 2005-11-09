@@ -133,25 +133,6 @@ PhysicalControl : VirtualCreatures {
 
         body set-root to (parser parse from ((i get-genome) get-root)).
 
-		# offset the body so it's just above the ground.
-
-		body move to (0, 20, 0).
-
-		lowest = 100.
-
-		foreach l in (all Links): {
-			low = (l get-bound-minimum).
-
-			print (l get-location).
-
-			if low::y < lowest: lowest = low::y.
-		}
-
-		low = (body get-location).
-		low::y -= (lowest - 1).
-
-		body move to low.
-
         body disable-self-collisions.
 
         self schedule method-call "check-penetration" at-time (self get-time) + 8.0.
@@ -235,7 +216,6 @@ Object : MorphologyParser {
         connectionParams, nodeParams, connections (list).
         rootNode, child, childNode, joint (object).
         cpoint, ppoint, point, size, norm (vector).
-		multibody (object).
 
         if n > 3: return 0.
 

@@ -14,6 +14,8 @@ class slDrawCommand;
 class slDrawCommandList {
 	public:
 		slDrawCommandList(slWorld *w) {
+			slVectorSet( &_origin, 0, 0, 0);
+			slMatrixIdentity( _rotation);
 			_limit = 0;
 			_drawingPolygon = 0;
 			w->drawings.push_back(this);
@@ -32,6 +34,9 @@ class slDrawCommandList {
 		std::list<slDrawCommand*> _commands;
 		bool _drawingPolygon;
 		unsigned int _limit;
+
+		slVector _origin;
+		double _rotation[3][3];
 
 		friend class slDrawEndPolygon;
 		friend class slDrawCommandPoint;

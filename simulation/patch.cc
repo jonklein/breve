@@ -358,7 +358,7 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 	slVector translation, origin;
 
     glDisable(GL_LIGHTING);
-	glDisable(GL_CULL_FACE);
+	// glDisable(GL_CULL_FACE);
 	glDepthMask(GL_FALSE);
 
 	if(_cubeDrawList == -1) this->compileCubeList();

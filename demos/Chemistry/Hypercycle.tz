@@ -11,7 +11,7 @@
 
 @define SIZE 128.
 
-@define C 20.
+@define C 23.
 
 @define D 0.1.
 
@@ -93,7 +93,7 @@ Control : GS {
 			chemicals{ c } set-value at-x n - 1 at-y m to .2.
 		}
 
-        texture = new MatrixImage.
+        texture = new MatrixTextureImage.
         texture init-with width SIZE height SIZE.
         texture set-r to rgb{ 0 }.
         texture set-g to rgb{ 1 }.
@@ -150,7 +150,7 @@ Control : GS {
 		super iterate.
 }
 
-Image : MatrixImage {
+Image : MatrixTextureImage {
     + variables:
         r, g, b (object).
         n (int).

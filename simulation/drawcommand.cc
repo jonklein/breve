@@ -26,6 +26,10 @@ void slDrawCommandList::addCommand(slDrawCommand *command) {
 void slDrawCommandList::draw(slCamera *c) {
 	std::list<slDrawCommand*>::iterator di;
 
+	glPushMatrix();
+
+	glTranslatef(_origin.x, _origin.y, _origin.z);
+
 	glEnable(GL_BLEND);
 	glLineWidth(1.2);
 	glDisable(GL_CULL_FACE);
@@ -40,4 +44,6 @@ void slDrawCommandList::draw(slCamera *c) {
 	}
 
 	if( _drawingPolygon) glEnd();
+
+	glPopMatrix();
 }
