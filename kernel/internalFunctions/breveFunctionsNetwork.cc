@@ -296,7 +296,7 @@ void *brHandleConnection(void *p) {
 			// slMessage(DEBUG_ALL, "received XML message of length %d from host %s\n", length, hostname); 
 			buffer = new char[length+1];
 
-			recv(data->socket, buffer, length, 0);
+			count = slUtilRead(data->socket, buffer, length);
 
 			buffer[length] = 0;
 			pthread_mutex_lock(&data->engine->lock);

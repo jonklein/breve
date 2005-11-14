@@ -54,8 +54,12 @@ Object : myPushAgent (aka myPushAgents) {
 		interpreter clear-stacks.
 		print (interpreter get-integer-stack-top).
 
+		code make-random-code max-length 200 with-interpreter interpreter.
+
 		print "Should free the interpreter now.".
 		free interpreter.
+
+		print (code get-string).
 
 		controller end-simulation.
 
