@@ -7,6 +7,8 @@ VERSION=2.3
 
 AC_CANONICAL_HOST
 
+AC_ARG_ENABLE([engineonly], [], engine_only=yes)
+
 AC_DEFUN([AC_PROG_JAVAC_WORKS],[
 AC_CACHE_CHECK([if $JAVAC works], ac_cv_prog_javac_works, [
 JAVA_TEST=Test.java
@@ -215,27 +217,41 @@ fi
 AC_CHECK_LIB([z], [gzopen],,AC_MSG_FAILURE([Missing zlib library -- see http://www.zlib.org]))
 AC_CHECK_LIB([regex], [regcomp], [REGEXLIB=-lregex])
 AC_CHECK_LIB([expat], [XML_ParserCreate],,AC_MSG_FAILURE([Missing expat library -- see http://www.jclark.com/xml/expat.html]))
-AC_CHECK_LIB([enet], [enet_initialize])
-AC_CHECK_LIB([png], [png_create_write_struct])
-AC_CHECK_LIB([jpeg], [jpeg_read_header])
-AC_CHECK_LIB([tiff], [TIFFOpen])
-AC_CHECK_LIB([portaudio], [Pa_OpenStream])
-AC_CHECK_LIB([sndfile], [sf_open])
-AC_CHECK_LIB([termcap], [tputs])
-AC_CHECK_LIB([ncurses], [tputs])
-AC_CHECK_LIB([history], [add_history])
-AC_CHECK_LIB([readline], [readline])
-AC_CHECK_LIB([3ds], [lib3ds_io_new])
-AC_CHECK_LIB([ftgl], [main])
 
-if test "x$custom_cblas" = x; then
-	AC_CHECK_LIB([gslcblas], [cblas_ccopy])
+# the engine_only flag means to ignore all of the extra libraries.
+
+AC_LANG(C++)
+
+if test "x$engine_only" = "x"; then
+	AC_CHECK_LIB([enet], [enet_initialize])
+	AC_CHECK_LIB([jpeg], [jpeg_read_header])
+	AC_CHECK_LIB([tiff], [TIFFOpen])
+	AC_CHECK_LIB([portaudio], [Pa_OpenStream])
+	AC_CHECK_LIB([sndfile], [sf_open])
+	AC_CHECK_LIB([termcap], [tputs])
+	AC_CHECK_LIB([ncurses], [tputs])
+	AC_CHECK_LIB([history], [add_history])
+	AC_CHECK_LIB([readline], [readline])
+	AC_CHECK_LIB([3ds], [lib3ds_io_new])
+	AC_CHECK_LIB([ftgl], [main])
+
+	if test "x$custom_cblas" = x; then
+		AC_CHECK_LIB([gslcblas], [cblas_ccopy])
+	fi
+
+	AC_CHECK_LIB([avcodec], [avcodec_init])
+	AC_CHECK_LIB([avformat], [av_write_frame])
+
+	AC_CHECK_LIB([push], [pushEnvironmentNew])
+	AC_CHECK_HEADER([qgame++.h])
+	AC_CHECK_LIB([qgame++], [main])
 fi
 
+AC_CHECK_LIB([png], [png_create_write_struct])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc])
-AC_CHECK_LIB([avcodec], [avcodec_init])
-AC_CHECK_LIB([avformat], [av_write_frame])
 AC_CHECK_LIB([OSMesa], [OSMesaCreateContext])
+
+AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]))
 
 AC_CHECK_FUNCS([getopt_long gettimeofday iswspace mkstemp strdup vasprintf])
 
@@ -291,12 +307,6 @@ else
 AC_MSG_RESULT([yes])
 AC_DEFINE([HAVE_LIBJAVA],[1],[JVM library for JNI])
 fi
-
-AC_LANG(C++)
-AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]))
-AC_CHECK_LIB([push], [pushEnvironmentNew])
-AC_CHECK_HEADER([qgame++.h])
-AC_CHECK_LIB([qgame++], [main])
 
 AC_CONFIG_FILES([Makefile
 		 plugins/slDigitizerPlugin/Makefile

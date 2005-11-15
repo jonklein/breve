@@ -40,7 +40,7 @@ Control : GS {
         self set-iteration-step to TIMESTEP.
         self set-integration-step to TIMESTEP.
 
-        self point-camera at (0, 0, 0) from (40, 9, -40).
+        self point-camera at (0, 0, 0) from (30, 6, -30).
 
 		U = new Matrix3D.
 		V = new Matrix3D.
