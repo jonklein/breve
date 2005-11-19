@@ -4,8 +4,8 @@
 	This file was generated automatically by the script /Users/jk/dev/breve/tools/apiwrap.pl.
 */
 
-#include "internal.h"
 #include "util.h"
+#include "kernel.h"
 
 void breveInitPushFunctions(brNamespace *n);
 
@@ -187,6 +187,47 @@ int breveFunctionPushCodeGetString(brEval arguments[], brEval *result, brInstanc
 
 	return EC_OK;
 }
+
+/*!
+	\brief A function to convert a push program to a brEvalList, recursively if necessary.
+*/
+
+brEvalListHead *brevePushCodeToEvalList(push::Code *code) {
+	brEvalListHead *l;
+	brEval e;
+	unsigned int n;
+
+	l = brEvalListNew();
+
+	for(n = 0; n < (*code)->get_stack().size(); n++ ) {
+		if( ((*code)->get_stack()[n])->get_stack().size() == 0 ) {
+			e.type = AT_STRING;
+
+			BRSTRING(&e) = (char*)(*code)->get_stack()[n]->to_string().c_str();
+		} else {
+			e.type = AT_LIST;
+
+			BRLIST(&e) = brevePushCodeToEvalList( &(*code)->get_stack()[n]);
+		}
+
+		brEvalListInsert(l, 0, &e);
+	}
+
+	return l;
+}
+
+/*!
+	\brief A breve API function wrapper for \ref brevePushCodeToEvalList.
+*/
+
+int breveFunctionPushCodeGetEvalList( brEval arguments[], brEval *result, brInstance *instance) {
+	push::Code *code = (push::Code*)BRPOINTER(&arguments[0]);
+
+	BRLIST(result) = brevePushCodeToEvalList( code);
+
+	return EC_OK;
+}
+
 
 /*!
 	\brief A breve API function wrapper for the C-function \ref pushCodeFree.
@@ -751,6 +792,7 @@ void breveInitPushFunctions(brNamespace *n) {
  	brNewBreveCall(n, "pushEnvironmentSetListLimit", breveFunctionPushEnvironmentSetListLimit, AT_NULL, AT_POINTER, AT_INT, 0);
  	brNewBreveCall(n, "pushParse", breveFunctionPushParse, AT_POINTER, AT_STRING, 0);
  	brNewBreveCall(n, "pushCodeGetString", breveFunctionPushCodeGetString, AT_STRING, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushCodeGetEvalList", breveFunctionPushCodeGetEvalList, AT_LIST, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeFree", breveFunctionPushCodeFree, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeSize", breveFunctionPushCodeSize, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeTopLevelSize", breveFunctionPushCodeTopLevelSize, AT_INT, AT_POINTER, 0);

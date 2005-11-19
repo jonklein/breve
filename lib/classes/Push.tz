@@ -398,6 +398,12 @@ Object : PushProgram (aka PushPrograms) {
 
 		return pushCodeGetString(codePointer).
 
+	+ to get-list:
+		% Returns a list representation of this push program.
+		if !codePointer: return { }.
+
+		return pushCodeGetEvalList(codePointer).
+
 	+ to get-discrepancy from otherProgram (object):
 		% Determines the discrepancy between this program and otherProgram.
 		% This is defined as the number of points (atoms and subtrees) found

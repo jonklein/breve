@@ -8,6 +8,7 @@ VERSION=2.3
 AC_CANONICAL_HOST
 
 AC_ARG_ENABLE([engineonly], [], engine_only=yes)
+AC_ARG_ENABLE([static], [], static=yes)
 
 AC_DEFUN([AC_PROG_JAVAC_WORKS],[
 AC_CACHE_CHECK([if $JAVAC works], ac_cv_prog_javac_works, [
@@ -245,6 +246,10 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([push], [pushEnvironmentNew])
 	AC_CHECK_HEADER([qgame++.h])
 	AC_CHECK_LIB([qgame++], [main])
+fi
+
+if test "x$static" = "x"; then 
+	
 fi
 
 AC_CHECK_LIB([png], [png_create_write_struct])

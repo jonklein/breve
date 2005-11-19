@@ -2,6 +2,8 @@
 
 use strict;
 
+my @method_index;
+
 my $bgcolor = "#ffffff";
 my $ignore_methods = "^init\$|^delete\$|^destroy\$|^iterate\$|^post-iterate\$|^archive\$|^dearchive\$|^get-description\$";
 
@@ -112,6 +114,7 @@ foreach $class (@classes) {
    	header($parent, $classname, $filename, $classdesc, $bgcolor);
 
 	print "<BLOCKQUOTE>\n";
+
 	foreach $section (@sections) {
 		my $title;
 
@@ -125,12 +128,10 @@ foreach $class (@classes) {
 
 	    @methods = sort @methods;
 
-    	sectionHeader($title, \@methods);
+    	sectionHeader($classname, $filename, $title, \@methods);
 	}
-	print "</BLOCKQUOTE>\n";
 
-	# foreach $section (@sections) {
-	#	(my $title) = ($section =~ /\"([^\"]*)\"/);
+	print "</BLOCKQUOTE>\n";
 
 	$class =~ s/\+\s+section.*\n//g;
 
@@ -189,6 +190,8 @@ print_subclasses("Object");
 footer();
 
 close CLASSLIST;
+
+output_index();
 
 sub header() {
     my $parent = $_[0];
@@ -259,8 +262,10 @@ __EOT__
 }
 
 sub sectionHeader() {
-	my $title = $_[0];
-    my $method_ref = $_[1];
+	my $classname = $_[0];
+	my $filename = $_[1];
+	my $title = $_[2];
+    my $method_ref = $_[3];
     my @methods = @$method_ref;
     my $method;
 
@@ -269,9 +274,14 @@ sub sectionHeader() {
 
     foreach $method (@methods) {
         my $name;
+		my $declaration;
+
+		($declaration) = ($method =~ /^(.*)/);
 
         ($name) = ($method =~ /(^[\w-]+)/);
         next if($name eq "" || $name =~ /$ignore_methods/);
+
+		push @method_index, "$declaration:$classname:$filename";
 
         print "<li><a href=\"#$name\">$name</a></li>\n";
     }
@@ -393,4 +403,29 @@ sub print_subclasses() {
 	}
 
 	# print "</ul>"
+}
+
+sub output_index() {
+	my $method;
+
+	@method_index = sort @method_index;
+
+	if(!open(INDEX, ">method_index.html")) {
+		print STDERR "Cannot open method_index.html: $!";
+		return;
+	}
+
+	print INDEX $WARNING;
+
+	foreach $method (@method_index) {
+		my ($class, $file, $desc, $methodname);
+
+		($desc, $class, $file) = split(/:/, $method);
+
+		($methodname) = ($desc =~ /^([\w+-_]*)/);
+
+		print INDEX "$methodname<br>\n<font size=-2>$desc [<a href=\"${class}.html\">$class</a>]</font><p>\n";
+	}
+
+	close(INDEX);
 }
