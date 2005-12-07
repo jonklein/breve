@@ -271,12 +271,13 @@ inline void stGCMarkPointer(stInstance *i, void *pointer, int type) {
 
 	unsigned int n;
 
-	for(n=0;n<i->gcStack->count;n++) {
-		r = (stGCRecord*)i->gcStack->data[n];
-		if(r->pointer == pointer) {
-			// slMessage(DEBUG_INFO, "double mark of pointer %p\n", r->pointer);
-		}
-	}
+
+//	for(n=0;n<i->gcStack->count;n++) {
+//		r = (stGCRecord*)i->gcStack->data[n];
+//		if(r->pointer == pointer) {
+//			slMessage(DEBUG_ALL, "double mark of pointer %p\n", r->pointer);
+//		}
+//	}
 	
 	r = new stGCRecord;
 	r->pointer = pointer;
