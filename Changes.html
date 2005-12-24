@@ -27,7 +27,9 @@
 
 The <a href="http://www.spiderland.org/breve">breve</a> simulation environment change log.
 
-<li>Fixed large XML network reads.
+<li>New garbage collection system, far faster and more robust than ever.
+
+<li>Fixed truncation of large XML network reads.
 
 <li>Fixed links in method_index documentation.
 
@@ -47,7 +49,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 
 <li>Corrected link points for automatic joint scaling with non-uniform scales.
 
-<li>get-point-on-shape method now more accurate in degenerate situations.
+<li>get-point-on-shape method now more accurate in degenerate situations (near vertices).
 
 <li>Added set-joint-torque-vector method for universal and ball joints.
 
@@ -57,9 +59,13 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 
 <li>Fixed reverse-ordering of "unobserved" notifications.
 
+<li>Fixed disabling of multibody self-collisions.
+
 <li>Added control of Multibody self-collision parameters.
 
-<li>Fixed disabling of multibody self-collisions.
+<li>Added independent texture scales for X and Y directions.
+
+<li>Added methods to get the height and width of a camera's view
 
 <h5>version 2.3 [08/31/2005]</h5>
 

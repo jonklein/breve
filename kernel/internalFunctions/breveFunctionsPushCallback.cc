@@ -34,7 +34,7 @@ int breveFunctionPushCallbackNew(brEval arguments[], brEval *result, brInstance 
 		return EC_ERROR;
 	}
 
-	BRPOINTER(result) = pushAddCallbackInstruction(environment, brPushCallbackFunction, brPushFreeData, name, data);
+	result->set( pushAddCallbackInstruction(environment, brPushCallbackFunction, brPushFreeData, name, data) );
 
 	return EC_OK;
 }

@@ -37,7 +37,7 @@ Object : GeneticAlgorithm {
 		generationLimit (int).
         seed (object).
 		bestFitness (float).
-
+		spatialRadius (int).
 
 	+ to dearchive:
 		# we'll need to retest the current individual.
@@ -56,6 +56,7 @@ Object : GeneticAlgorithm {
 		crossoverPercent = 0.
 		randomizePercent = 5.
 		tournamentSize = 5.
+		spatialRadius = 0.
 		migrationPort = GENETIC_ALGORITHM_SERVER_PORT.
 
 		populations = { { }, { } }.
@@ -83,6 +84,13 @@ Object : GeneticAlgorithm {
         % individual's paramters as a starting point.
 
 		seed = theSeed.
+
+	- to set-spatial-radius to n (int):
+		% Undocumented: it will be our little secret!
+		spatialRadius = n.
+
+	- to get-spatial-radius:
+		return spatialRadius.
     
 	+ to set-population-size to size (int):
 		% Sets the number of individuals in the population to size.
@@ -296,11 +304,11 @@ Object : GeneticAlgorithm {
 			r = random[100].
 
 			if r < mutationPercent: {
-				populations{ !currentPopulation }{ i } copy from (self tournament-select).
+				populations{ !currentPopulation }{ i } copy from (self tournament-select for-index i).
 				populations{ !currentPopulation }{ i } mutate.
 			} else if r < (mutationPercent + crossoverPercent): {
 				populations{ !currentPopulation }{ i } crossover 
-					from-parent1 (self tournament-select) from-parent2 (self tournament-select).
+					from-parent1 (self tournament-select for-index i) from-parent2 (self tournament-select for-index i).
 			} else if r < (mutationPercent + crossoverPercent + randomizePercent): {
 				populations{ !currentPopulation }{ i } randomize.
 			} else if r < (mutationPercent + crossoverPercent + randomizePercent + migrationPercent): {
@@ -311,15 +319,15 @@ Object : GeneticAlgorithm {
 				    if (transferIn get-individual number n):
 				        ind = (transferIn get-individual number n).
 				    else:
-				        ind = (self tournament-select).				    
+				        ind = (self tournament-select for-index i).				    
 				}
 				else:
 				{
-				    ind = (self tournament-select).
+				    ind = (self tournament-select for-index i).
 				}
                 populations{ !currentPopulation }{ i } copy from ind.				
 			} else {
-				ind = (self tournament-select).
+				ind = (self tournament-select for-index i).
 				populations{ !currentPopulation }{ i } copy from ind.
 
 				# print "Copying individual with fitness ", (ind get-fitness).
@@ -331,7 +339,7 @@ Object : GeneticAlgorithm {
         {
             transferOut clear.
             for n=0, n<populationSize * (migrationPercent / 100.0), n++:
-                transferOut add individual (self tournament-select).
+                transferOut add individual (self tournament-select for-index i).
             #print "Migrating individuals...".
             recipientHost = migrationHosts{ random[ | migrationHosts | - 1 ] }.
             transferOut send-over-network to recipientHost on GENETIC_ALGORITHM_SERVER_PORT.
@@ -343,6 +351,31 @@ Object : GeneticAlgorithm {
 		if generationLimit && generation >= generationLimit: controller end-simulation.
 
 		self prepare-for-generation number generation.
+
+	- to tournament-select for-index i (int):
+		if spatialRadius == 0: return (self tournament-select).
+		else return (self spatial-tournament-select with-index i).
+
+	- to spatial-tournament-select with-index index (int): 
+		n (int).
+		best, test (int).
+
+		best = index + (random[2 * spatialRadius - 1] - spatialRadius).
+		if best >= populationSize: best -= populationSize.
+		if best < 0: best += populationSize.
+
+		for n=0, n<(tournamentSize - 1), n++: {
+			test = index + (random[2 * spatialRadius - 1] - spatialRadius).
+			if test >= populationSize: test -= populationSize.
+			if test < 0: test += populationSize.
+
+			if (populations{ currentPopulation }{ test } get-fitness) > 
+					(populations{ currentPopulation }{ best } get-fitness): { 
+				best = test.
+			}
+		}
+
+		return populations{ currentPopulation }{ best }.
 
 	+ to tournament-select:
 		% This method performs a tournament selection for reproduction.  It 

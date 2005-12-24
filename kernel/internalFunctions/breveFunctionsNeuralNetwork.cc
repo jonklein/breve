@@ -52,7 +52,7 @@ typedef slNNBackPropagationAlgorithm brNNBackPropagationAlgorithm;
 
 int brINeuralNetworkNew(brEval args[], brEval *target, brInstance *i)
 {
-    BRPOINTER(target) = new brNeuralNetwork(BRINT(&args[0]));
+    target->set( new brNeuralNetwork(BRINT(&args[0])) );
     return EC_OK;
 }
 
@@ -82,38 +82,38 @@ int brINeuralNetworkSetNeuronStateBounds(brEval args[], brEval *target, brInstan
 
 int brINeuralNetworkGetNeuronStateVector(brEval args[], brEval *target, brInstance *i)
 {
-    BRPOINTER(target) = (BRNEURALNETWORK(&args[0]))->getNeuronStateVector();
+    target->set( (BRNEURALNETWORK(&args[0]))->getNeuronStateVector() );
     return EC_OK;
 }
 
 int brINeuralNetworkGetMaxWeight(brEval args[], brEval *target, brInstance *i)
 {
-    BRDOUBLE(target) = double(BRNEURALNETWORK(&args[0])->getMaxWeight());
+    target->set( double(BRNEURALNETWORK(&args[0])->getMaxWeight()) );
     return EC_OK;
 }
 
 int brINeuralNetworkGetMinWeight(brEval args[], brEval *target, brInstance *i)
 {
-    BRDOUBLE(target) = double(BRNEURALNETWORK(&args[0])->getMinWeight());
+    target->set( double(BRNEURALNETWORK(&args[0])->getMinWeight()) );
     return EC_OK;
 }
 
 int brINeuralNetworkGetMaxActivity(brEval args[], brEval *target, brInstance *i)
 {
-    BRDOUBLE(target) = double(BRNEURALNETWORK(&args[0])->getMaxNeuralActivity());
+    target->set( double(BRNEURALNETWORK(&args[0])->getMaxNeuralActivity()) );
     return EC_OK;
 }
 
 int brINeuralNetworkGetMinActivity(brEval args[], brEval *target, brInstance *i)
 {
-    BRDOUBLE(target) = double(BRNEURALNETWORK(&args[0])->getMinNeuralActivity());
+    target->set( double(BRNEURALNETWORK(&args[0])->getMinNeuralActivity()) );
     return EC_OK;
 }
 
 
 int brINeuralNetworkGetNeuronState(brEval args[], brEval *target, brInstance *i)
 {
-    BRDOUBLE(target) = (BRNEURALNETWORK(&args[0]))->getNeuronState(BRINT(&args[1]));
+    target->set( (BRNEURALNETWORK(&args[0]))->getNeuronState(BRINT(&args[1])) );
     return EC_OK;
 }
 
@@ -126,26 +126,26 @@ int brINeuralNetworkSetNeuronState(brEval args[], brEval *target, brInstance *i)
 int brINeuralNetworkSetInputNeurons(brEval args[], brEval *target, brInstance *i)
 {
     (BRNEURALNETWORK(&args[0]))->setInputNeurons(BRINT(&args[1]), BRINT(&args[2]));
-    BRPOINTER(target) = (BRNEURALNETWORK(&args[0]))->getInputNeurons();
+    target->set( (BRNEURALNETWORK(&args[0]))->getInputNeurons() );
     return EC_OK;
 }
 
 int brINeuralNetworkSetOutputNeurons(brEval args[], brEval *target, brInstance *i)
 {
     (BRNEURALNETWORK(&args[0]))->setOutputNeurons(BRINT(&args[1]), BRINT(&args[2]));
-    BRPOINTER(target) = (BRNEURALNETWORK(&args[0]))->getOutputNeurons();
+    target->set( (BRNEURALNETWORK(&args[0]))->getOutputNeurons() );
     return EC_OK;
 }
 
 int brINeuralNetworkGetConnectionWeightMatrix(brEval args[], brEval *target, brInstance *i)
 {
-    BRPOINTER(target) = (BRNEURALNETWORK(&args[0]))->getConnectionWeightMatrix();
+    target->set( (BRNEURALNETWORK(&args[0]))->getConnectionWeightMatrix() );
     return EC_OK;
 }
 
 int brINeuralNetworkGetConnectionStructureMatrix(brEval args[], brEval *target, brInstance *i)
 {
-    BRPOINTER(target) = (BRNEURALNETWORK(&args[0]))->getConnectionStructureMatrix();
+    target->set( (BRNEURALNETWORK(&args[0]))->getConnectionStructureMatrix() );
     return EC_OK;
 }
 
@@ -164,7 +164,7 @@ int brINeuralNetworkUpdateState(brEval args[], brEval *target, brInstance *i)
 /****** Recurrent Network Interface *******/
 int brIRecurrentNetworkNew(brEval args[], brEval *target, brInstance *i)
 {
-    BRPOINTER(target) = new brRecurrentNetwork(BRINT(&args[0]), BRINT(&args[1]));
+    target->set( new brRecurrentNetwork(BRINT(&args[0]), BRINT(&args[1])) );
     return EC_OK;
 }
 
@@ -190,7 +190,7 @@ int brINeuralRecurrentApplyStructure(brEval args[], brEval *target, brInstance *
 
 int brINNHebbianAlgorithmNNNew(brEval args[], brEval *target, brInstance *i)
 {
-    BRPOINTER(target) = new brNNHebbianAlgorithm(*BRNEURALNETWORK(&args[0]));
+    target->set( new brNNHebbianAlgorithm(*BRNEURALNETWORK(&args[0])) );
     return EC_OK;
 }
 
@@ -202,7 +202,7 @@ int brINNHebbianAlgorithmNNFree(brEval args[], brEval *target, brInstance *i)
 
 int brINNHebbianAlgorithmRNNew(brEval args[], brEval *target, brInstance *i)
 {
-    BRPOINTER(target) = new brNNHebbianAlgorithm(*BRRECURRENTNETWORK(&args[0]));
+    target->set( new brNNHebbianAlgorithm(*BRRECURRENTNETWORK(&args[0])) );
     return EC_OK;
 }
 
@@ -244,7 +244,7 @@ int brIHebbianAlgorithmNormalizeAlpha(brEval args[], brEval *target, brInstance 
 
 int brINNBCMAlgorithmNNNew(brEval args[], brEval *target, brInstance *i)
 {
-    BRPOINTER(target) = new brNNBCMAlgorithm(*BRNEURALNETWORK(&args[0]));
+    target->set( new brNNBCMAlgorithm(*BRNEURALNETWORK(&args[0])) );
     return EC_OK;
 }
 
@@ -256,7 +256,7 @@ int brINNBCMAlgorithmNNFree(brEval args[], brEval *target, brInstance *i)
 
 int brINNBCMAlgorithmRNNew(brEval args[], brEval *target, brInstance *i)
 {
-    BRPOINTER(target) = new brNNBCMAlgorithm(*BRRECURRENTNETWORK(&args[0]));
+    target->set( new brNNBCMAlgorithm(*BRRECURRENTNETWORK(&args[0])) );
     return EC_OK;
 }
 

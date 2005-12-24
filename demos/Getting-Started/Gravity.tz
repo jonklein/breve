@@ -19,7 +19,7 @@ PhysicalControl : Gravity {
 		# slow it down by setting the integration step to be very very small.  
 		# This will also increase the accuracy of the simulation.
 
-		self set-integration-step to .00001.
+		self set-integration-step to .0001.
 
 		# create a bunch of steps.
 

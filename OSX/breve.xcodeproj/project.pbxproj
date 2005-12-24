@@ -1,0 +1,959 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		480F31AA071472AD00E71420 /* breve.app */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 48C93582094B452400B48959 /* Build configuration list for PBXAggregateTarget "breve.app" */;
+			buildPhases = (
+				480F31A9071472AD00E71420 /* ShellScript */,
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = fake;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			dependencies = (
+			);
+			name = breve.app;
+			productName = fake;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		4802DC1C05616137008198B9 /* slBreveSourceDocument.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A37F4AEFDCFA73011CA2CEA /* slBreveSourceDocument.h */; };
+		4802DC1D05616137008198B9 /* slLogView.h in Headers */ = {isa = PBXBuildFile; fileRef = F5BD20A60397BEC801980AE4 /* slLogView.h */; };
+		4802DC1E05616137008198B9 /* slMovieRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = F5BD20A80397BEC801980AE4 /* slMovieRecord.h */; };
+		4802DC1F05616137008198B9 /* slObjectOutline.h in Headers */ = {isa = PBXBuildFile; fileRef = F5BD20AA0397BEC801980AE4 /* slObjectOutline.h */; };
+		4802DC2005616137008198B9 /* slObjectOutlineItem.h in Headers */ = {isa = PBXBuildFile; fileRef = F5BD20AC0397BEC801980AE4 /* slObjectOutlineItem.h */; };
+		4802DC2205616137008198B9 /* slTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = F5BD20B10397BEC801980AE4 /* slTextView.h */; };
+		4802DC2305616137008198B9 /* slBreve.h in Headers */ = {isa = PBXBuildFile; fileRef = F5BD20C00397BFC001980AE4 /* slBreve.h */; };
+		4802DC2405616137008198B9 /* slBreveApplication.h in Headers */ = {isa = PBXBuildFile; fileRef = F5BD20C20397BFC001980AE4 /* slBreveApplication.h */; };
+		4802DC2505616137008198B9 /* slBreveEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = F5BD20C40397BFC001980AE4 /* slBreveEngine.h */; };
+		4802DC2605616137008198B9 /* slBreveGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = F5BD20C60397BFC001980AE4 /* slBreveGLView.h */; };
+		4802DC2905616137008198B9 /* slBrevePrefs.h in Headers */ = {isa = PBXBuildFile; fileRef = F5BD20D10397BFC001980AE4 /* slBrevePrefs.h */; };
+		4802DC2A05616137008198B9 /* slCommandTextField.h in Headers */ = {isa = PBXBuildFile; fileRef = F5BD20D30397BFC001980AE4 /* slCommandTextField.h */; };
+		4802DC2B05616137008198B9 /* slDemoMenu.h in Headers */ = {isa = PBXBuildFile; fileRef = F5BD20D50397BFC001980AE4 /* slDemoMenu.h */; };
+		4802DC2C05616137008198B9 /* slFullScreen.h in Headers */ = {isa = PBXBuildFile; fileRef = F5BD20D70397BFC001980AE4 /* slFullScreen.h */; };
+		4802DC2D05616137008198B9 /* slGraphWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = 48D1C0BC04632D760093F8AA /* slGraphWindowController.h */; };
+		4802DC2E05616137008198B9 /* slBreveNibLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = F5BD20CA0397BFC001980AE4 /* slBreveNibLoader.h */; };
+		4802DC2F05616137008198B9 /* slGraphWindowView.h in Headers */ = {isa = PBXBuildFile; fileRef = 48D1C0D4046331F80093F8AA /* slGraphWindowView.h */; };
+		4802DC3105616137008198B9 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */; };
+		4802DC3205616137008198B9 /* slBreveSourceDocument.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B4FDCFA73011CA2CEA /* slBreveSourceDocument.nib */; };
+		4802DC3305616137008198B9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
+		4802DC3405616137008198B9 /* app_icon.tiff in Resources */ = {isa = PBXBuildFile; fileRef = F5BD21F60397C43E01980AE4 /* app_icon.tiff */; };
+		4802DC3505616137008198B9 /* Camera.tiff in Resources */ = {isa = PBXBuildFile; fileRef = F5BD21F80397C43E01980AE4 /* Camera.tiff */; };
+		4802DC3605616137008198B9 /* move.tiff in Resources */ = {isa = PBXBuildFile; fileRef = F5BD21F90397C43E01980AE4 /* move.tiff */; };
+		4802DC3705616137008198B9 /* pause.tiff in Resources */ = {isa = PBXBuildFile; fileRef = F5BD21FA0397C43E01980AE4 /* pause.tiff */; };
+		4802DC3805616137008198B9 /* play.tiff in Resources */ = {isa = PBXBuildFile; fileRef = F5BD21FB0397C43E01980AE4 /* play.tiff */; };
+		4802DC3905616137008198B9 /* pointer.tiff in Resources */ = {isa = PBXBuildFile; fileRef = F5BD21FC0397C43E01980AE4 /* pointer.tiff */; };
+		4802DC3A05616137008198B9 /* rotate.tiff in Resources */ = {isa = PBXBuildFile; fileRef = F5BD21FD0397C43E01980AE4 /* rotate.tiff */; };
+		4802DC3B05616137008198B9 /* stop.tiff in Resources */ = {isa = PBXBuildFile; fileRef = F5BD21FE0397C43E01980AE4 /* stop.tiff */; };
+		4802DC3C05616137008198B9 /* zoom.tiff in Resources */ = {isa = PBXBuildFile; fileRef = F5BD21FF0397C43E01980AE4 /* zoom.tiff */; };
+		4802DC3D05616137008198B9 /* docs in Resources */ = {isa = PBXBuildFile; fileRef = F5BD220A0397C57D01980AE4 /* docs */; };
+		4802DC3E05616137008198B9 /* demos in Resources */ = {isa = PBXBuildFile; fileRef = F5BD223E0397C59E01980AE4 /* demos */; };
+		4802DC3F05616137008198B9 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = F5BD22640397C69401980AE4 /* AppIcon.icns */; };
+		4802DC4005616137008198B9 /* Template.tz in Resources */ = {isa = PBXBuildFile; fileRef = F569DDB00398039F01B2CBA0 /* Template.tz */; };
+		4802DC4105616137008198B9 /* Errors.strings in Resources */ = {isa = PBXBuildFile; fileRef = F569DDB203980C9101B2CBA0 /* Errors.strings */; };
+		4802DC4205616137008198B9 /* General.strings in Resources */ = {isa = PBXBuildFile; fileRef = F569DDB403980C9101B2CBA0 /* General.strings */; };
+		4802DC4305616137008198B9 /* classes in Resources */ = {isa = PBXBuildFile; fileRef = F5F64877039868A20154B402 /* classes */; };
+		4802DC4405616137008198B9 /* slGLWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = 481D2181042A2D2100FFA442 /* slGLWindow.nib */; };
+		4802DC4905616137008198B9 /* breve.scriptSuite in Resources */ = {isa = PBXBuildFile; fileRef = 485C2C350559830F005859E4 /* breve.scriptSuite */; };
+		4802DC4A05616137008198B9 /* breve.scriptTerminology in Resources */ = {isa = PBXBuildFile; fileRef = 482D1689055989F800230BBF /* breve.scriptTerminology */; };
+		4802DC4C05616137008198B9 /* slBreveSourceDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4ACFDCFA73011CA2CEA /* slBreveSourceDocument.m */; settings = {ATTRIBUTES = (); }; };
+		4802DC4D05616137008198B9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
+		4802DC4E05616137008198B9 /* slLogView.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20A70397BEC801980AE4 /* slLogView.m */; };
+		4802DC4F05616137008198B9 /* slMovieRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20A90397BEC801980AE4 /* slMovieRecord.m */; };
+		4802DC5005616137008198B9 /* slObjectOutline.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20AB0397BEC801980AE4 /* slObjectOutline.m */; };
+		4802DC5105616137008198B9 /* slObjectOutlineItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20AD0397BEC801980AE4 /* slObjectOutlineItem.mm */; };
+		4802DC5205616137008198B9 /* slQuickparser.l in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20AE0397BEC801980AE4 /* slQuickparser.l */; };
+		4802DC5405616137008198B9 /* slTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20B20397BEC801980AE4 /* slTextView.m */; };
+		4802DC5505616137008198B9 /* slBreve.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20C10397BFC001980AE4 /* slBreve.m */; };
+		4802DC5605616137008198B9 /* slBreveApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20C30397BFC001980AE4 /* slBreveApplication.m */; };
+		4802DC5705616137008198B9 /* slBreveEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20C50397BFC001980AE4 /* slBreveEngine.m */; };
+		4802DC5805616137008198B9 /* slBreveGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20C70397BFC001980AE4 /* slBreveGLView.m */; };
+		4802DC5905616137008198B9 /* slBreveNibLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20CB0397BFC001980AE4 /* slBreveNibLoader.m */; };
+		4802DC5C05616137008198B9 /* slBrevePrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20D20397BFC001980AE4 /* slBrevePrefs.m */; };
+		4802DC5D05616137008198B9 /* slCommandTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20D40397BFC001980AE4 /* slCommandTextField.m */; };
+		4802DC5E05616137008198B9 /* slDemoMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20D60397BFC001980AE4 /* slDemoMenu.m */; };
+		4802DC5F05616137008198B9 /* slFullScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20D80397BFC001980AE4 /* slFullScreen.m */; };
+		4802DC6005616137008198B9 /* slGraphWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 48D1C0BD04632D760093F8AA /* slGraphWindowController.m */; };
+		4802DC6105616137008198B9 /* slGraphWindowView.m in Sources */ = {isa = PBXBuildFile; fileRef = 48D1C0D5046331F80093F8AA /* slGraphWindowView.m */; };
+		480F317807146D7900E71420 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48807AB004DF1E2C00A8D232 /* AudioToolbox.framework */; };
+		480F317907146D7900E71420 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BD21540397C2DA01980AE4 /* Carbon.framework */; };
+		480F317A07146D7A00E71420 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
+		480F317B07146D8000E71420 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48807AA104DF1DB800A8D232 /* CoreAudio.framework */; };
+		480F317D07146D8200E71420 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BD20F20397BFE301980AE4 /* GLUT.framework */; };
+		48619FB8071475A500E0A1B6 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BD20F40397BFE301980AE4 /* QuickTime.framework */; };
+		48619FB9071475A500E0A1B6 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BD20F30397BFE301980AE4 /* OpenGL.framework */; };
+		48620C9207944552009195E5 /* libbreve.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 48620C9107944552009195E5 /* libbreve.a */; };
+		48CE1D0408155BDE0030CBB8 /* DocumentIcons.icns in Resources */ = {isa = PBXBuildFile; fileRef = 48CE1CFB08155B1F0030CBB8 /* DocumentIcons.icns */; };
+		48E1722407AAAF370072492B /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48E1722307AAAF370072492B /* JavaVM.framework */; };
+		48ECC165071C13C100596F93 /* Digitizer.tz in CopyFiles */ = {isa = PBXBuildFile; fileRef = 48ECC163071C13C100596F93 /* Digitizer.tz */; };
+		48ECC166071C13C100596F93 /* DigitizerPlugin.o in CopyFiles */ = {isa = PBXBuildFile; fileRef = 48ECC164071C13C100596F93 /* DigitizerPlugin.o */; };
+		48ECC170071C13F400596F93 /* Instrument.tz in CopyFiles */ = {isa = PBXBuildFile; fileRef = 48ECC16E071C13F400596F93 /* Instrument.tz */; };
+		48ECC171071C13F400596F93 /* QTInstrumentPlugin.o in CopyFiles */ = {isa = PBXBuildFile; fileRef = 48ECC16F071C13F400596F93 /* QTInstrumentPlugin.o */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXBuildStyle section */
+		4802D7F905616080008198B9 /* 10.2 */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+			};
+			name = 10.2;
+		};
+		4A9504D0FFE6A4CB11CA0CBA /* Development */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OPTIMIZATION_CFLAGS = "-O0 -g";
+				ZERO_LINK = NO;
+			};
+			name = Development;
+		};
+		4A9504D1FFE6A4CB11CA0CBA /* Deployment */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+/* End PBXBuildStyle section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		48ECC160071C137300596F93 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = plugins;
+			dstSubfolderSpec = 7;
+			files = (
+				48ECC165071C13C100596F93 /* Digitizer.tz in CopyFiles */,
+				48ECC166071C13C100596F93 /* DigitizerPlugin.o in CopyFiles */,
+				48ECC170071C13F400596F93 /* Instrument.tz in CopyFiles */,
+				48ECC171071C13F400596F93 /* QTInstrumentPlugin.o in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		2A37F4ACFDCFA73011CA2CEA /* slBreveSourceDocument.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = slBreveSourceDocument.m; sourceTree = SOURCE_ROOT; };
+		2A37F4AEFDCFA73011CA2CEA /* slBreveSourceDocument.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = slBreveSourceDocument.h; sourceTree = SOURCE_ROOT; };
+		2A37F4B0FDCFA73011CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
+		2A37F4B5FDCFA73011CA2CEA /* slBreveSourceDocument.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = slBreveSourceDocument.nib; path = English.lproj/slBreveSourceDocument.nib; sourceTree = "<group>"; };
+		2A37F4B7FDCFA73011CA2CEA /* MainMenu.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MainMenu.nib; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		4802DC7905616137008198B9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		4802DC7A05616137008198B9 /* breve.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = breve.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		481D2182042A2D2100FFA442 /* slGraphWindow.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = slGraphWindow.nib; path = English.lproj/slGraphWindow.nib; sourceTree = "<group>"; };
+		482D168A055989F800230BBF /* English */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = English; path = English.lproj/breve.scriptTerminology; sourceTree = "<group>"; };
+		485C2C350559830F005859E4 /* breve.scriptSuite */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = breve.scriptSuite; sourceTree = "<group>"; };
+		48620C9107944552009195E5 /* libbreve.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbreve.a; path = ../lib/libbreve.a; sourceTree = SOURCE_ROOT; };
+		48807AA104DF1DB800A8D232 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
+		48807AB004DF1E2C00A8D232 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
+		48CE1CFB08155B1F0030CBB8 /* DocumentIcons.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = DocumentIcons.icns; sourceTree = SOURCE_ROOT; };
+		48D1C0BC04632D760093F8AA /* slGraphWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slGraphWindowController.h; sourceTree = SOURCE_ROOT; };
+		48D1C0BD04632D760093F8AA /* slGraphWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = slGraphWindowController.m; sourceTree = SOURCE_ROOT; };
+		48D1C0D4046331F80093F8AA /* slGraphWindowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slGraphWindowView.h; sourceTree = SOURCE_ROOT; };
+		48D1C0D5046331F80093F8AA /* slGraphWindowView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = slGraphWindowView.m; sourceTree = SOURCE_ROOT; };
+		48E1722307AAAF370072492B /* JavaVM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaVM.framework; path = /System/Library/Frameworks/JavaVM.framework; sourceTree = "<absolute>"; };
+		48ECC163071C13C100596F93 /* Digitizer.tz */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = Digitizer.tz; path = ../plugins/slDigitizerPlugin/Digitizer.tz; sourceTree = SOURCE_ROOT; };
+		48ECC164071C13C100596F93 /* DigitizerPlugin.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = DigitizerPlugin.o; path = ../plugins/slDigitizerPlugin/DigitizerPlugin.o; sourceTree = SOURCE_ROOT; };
+		48ECC16E071C13F400596F93 /* Instrument.tz */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = Instrument.tz; path = ../plugins/slQTMusicPlugin/Instrument.tz; sourceTree = SOURCE_ROOT; };
+		48ECC16F071C13F400596F93 /* QTInstrumentPlugin.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = QTInstrumentPlugin.o; path = ../plugins/slQTMusicPlugin/QTInstrumentPlugin.o; sourceTree = SOURCE_ROOT; };
+		F569DDB00398039F01B2CBA0 /* Template.tz */ = {isa = PBXFileReference; lastKnownFileType = text; name = Template.tz; path = ../lib/Template.tz; sourceTree = SOURCE_ROOT; };
+		F569DDB303980C9101B2CBA0 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Errors.strings; sourceTree = "<group>"; };
+		F569DDB503980C9101B2CBA0 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/General.strings; sourceTree = "<group>"; };
+		F5BD20A60397BEC801980AE4 /* slLogView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slLogView.h; path = ../OSX/slLogView.h; sourceTree = SOURCE_ROOT; };
+		F5BD20A70397BEC801980AE4 /* slLogView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slLogView.m; path = ../OSX/slLogView.m; sourceTree = SOURCE_ROOT; };
+		F5BD20A80397BEC801980AE4 /* slMovieRecord.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slMovieRecord.h; path = ../OSX/slMovieRecord.h; sourceTree = SOURCE_ROOT; };
+		F5BD20A90397BEC801980AE4 /* slMovieRecord.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slMovieRecord.m; path = ../OSX/slMovieRecord.m; sourceTree = SOURCE_ROOT; };
+		F5BD20AA0397BEC801980AE4 /* slObjectOutline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slObjectOutline.h; path = ../OSX/slObjectOutline.h; sourceTree = SOURCE_ROOT; };
+		F5BD20AB0397BEC801980AE4 /* slObjectOutline.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slObjectOutline.m; path = ../OSX/slObjectOutline.m; sourceTree = SOURCE_ROOT; };
+		F5BD20AC0397BEC801980AE4 /* slObjectOutlineItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slObjectOutlineItem.h; path = ../OSX/slObjectOutlineItem.h; sourceTree = SOURCE_ROOT; };
+		F5BD20AD0397BEC801980AE4 /* slObjectOutlineItem.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slObjectOutlineItem.mm; sourceTree = SOURCE_ROOT; };
+		F5BD20AE0397BEC801980AE4 /* slQuickparser.l */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.lex; name = slQuickparser.l; path = ../OSX/slQuickparser.l; sourceTree = SOURCE_ROOT; };
+		F5BD20B10397BEC801980AE4 /* slTextView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slTextView.h; path = ../OSX/slTextView.h; sourceTree = SOURCE_ROOT; };
+		F5BD20B20397BEC801980AE4 /* slTextView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slTextView.m; path = ../OSX/slTextView.m; sourceTree = SOURCE_ROOT; };
+		F5BD20C00397BFC001980AE4 /* slBreve.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slBreve.h; path = ../OSX/slBreve.h; sourceTree = SOURCE_ROOT; };
+		F5BD20C10397BFC001980AE4 /* slBreve.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slBreve.m; path = ../OSX/slBreve.m; sourceTree = SOURCE_ROOT; };
+		F5BD20C20397BFC001980AE4 /* slBreveApplication.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slBreveApplication.h; path = ../OSX/slBreveApplication.h; sourceTree = SOURCE_ROOT; };
+		F5BD20C30397BFC001980AE4 /* slBreveApplication.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slBreveApplication.m; path = ../OSX/slBreveApplication.m; sourceTree = SOURCE_ROOT; };
+		F5BD20C40397BFC001980AE4 /* slBreveEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slBreveEngine.h; path = ../OSX/slBreveEngine.h; sourceTree = SOURCE_ROOT; };
+		F5BD20C50397BFC001980AE4 /* slBreveEngine.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slBreveEngine.m; path = ../OSX/slBreveEngine.m; sourceTree = SOURCE_ROOT; };
+		F5BD20C60397BFC001980AE4 /* slBreveGLView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slBreveGLView.h; path = ../OSX/slBreveGLView.h; sourceTree = SOURCE_ROOT; };
+		F5BD20C70397BFC001980AE4 /* slBreveGLView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slBreveGLView.m; path = ../OSX/slBreveGLView.m; sourceTree = SOURCE_ROOT; };
+		F5BD20CA0397BFC001980AE4 /* slBreveNibLoader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slBreveNibLoader.h; path = ../OSX/slBreveNibLoader.h; sourceTree = SOURCE_ROOT; };
+		F5BD20CB0397BFC001980AE4 /* slBreveNibLoader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slBreveNibLoader.m; path = ../OSX/slBreveNibLoader.m; sourceTree = SOURCE_ROOT; };
+		F5BD20D10397BFC001980AE4 /* slBrevePrefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slBrevePrefs.h; path = ../OSX/slBrevePrefs.h; sourceTree = SOURCE_ROOT; };
+		F5BD20D20397BFC001980AE4 /* slBrevePrefs.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slBrevePrefs.m; path = ../OSX/slBrevePrefs.m; sourceTree = SOURCE_ROOT; };
+		F5BD20D30397BFC001980AE4 /* slCommandTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slCommandTextField.h; path = ../OSX/slCommandTextField.h; sourceTree = SOURCE_ROOT; };
+		F5BD20D40397BFC001980AE4 /* slCommandTextField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slCommandTextField.m; path = ../OSX/slCommandTextField.m; sourceTree = SOURCE_ROOT; };
+		F5BD20D50397BFC001980AE4 /* slDemoMenu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slDemoMenu.h; path = ../OSX/slDemoMenu.h; sourceTree = SOURCE_ROOT; };
+		F5BD20D60397BFC001980AE4 /* slDemoMenu.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slDemoMenu.m; path = ../OSX/slDemoMenu.m; sourceTree = SOURCE_ROOT; };
+		F5BD20D70397BFC001980AE4 /* slFullScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slFullScreen.h; path = ../OSX/slFullScreen.h; sourceTree = SOURCE_ROOT; };
+		F5BD20D80397BFC001980AE4 /* slFullScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slFullScreen.m; path = ../OSX/slFullScreen.m; sourceTree = SOURCE_ROOT; };
+		F5BD20F20397BFE301980AE4 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
+		F5BD20F30397BFE301980AE4 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		F5BD20F40397BFE301980AE4 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
+		F5BD21540397C2DA01980AE4 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		F5BD21F60397C43E01980AE4 /* app_icon.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = app_icon.tiff; path = icons/app_icon.tiff; sourceTree = "<group>"; };
+		F5BD21F80397C43E01980AE4 /* Camera.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Camera.tiff; path = icons/Camera.tiff; sourceTree = "<group>"; };
+		F5BD21F90397C43E01980AE4 /* move.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = move.tiff; path = icons/move.tiff; sourceTree = SOURCE_ROOT; };
+		F5BD21FA0397C43E01980AE4 /* pause.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pause.tiff; path = icons/pause.tiff; sourceTree = "<group>"; };
+		F5BD21FB0397C43E01980AE4 /* play.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = play.tiff; path = icons/play.tiff; sourceTree = "<group>"; };
+		F5BD21FC0397C43E01980AE4 /* pointer.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = pointer.tiff; path = icons/pointer.tiff; sourceTree = "<group>"; };
+		F5BD21FD0397C43E01980AE4 /* rotate.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = rotate.tiff; path = icons/rotate.tiff; sourceTree = "<group>"; };
+		F5BD21FE0397C43E01980AE4 /* stop.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = stop.tiff; path = icons/stop.tiff; sourceTree = "<group>"; };
+		F5BD21FF0397C43E01980AE4 /* zoom.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = zoom.tiff; path = icons/zoom.tiff; sourceTree = "<group>"; };
+		F5BD220A0397C57D01980AE4 /* docs */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = docs; path = ../docs; sourceTree = SOURCE_ROOT; };
+		F5BD223E0397C59E01980AE4 /* demos */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = demos; path = ../demos; sourceTree = SOURCE_ROOT; };
+		F5BD22640397C69401980AE4 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = SOURCE_ROOT; };
+		F5F64877039868A20154B402 /* classes */ = {isa = PBXFileReference; explicitFileType = folder; includeInIndex = 1; name = classes; path = ../lib/classes; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		480F316807146AFB00E71420 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				480F317807146D7900E71420 /* AudioToolbox.framework in Frameworks */,
+				480F317907146D7900E71420 /* Carbon.framework in Frameworks */,
+				480F317A07146D7A00E71420 /* Cocoa.framework in Frameworks */,
+				480F317B07146D8000E71420 /* CoreAudio.framework in Frameworks */,
+				480F317D07146D8200E71420 /* GLUT.framework in Frameworks */,
+				48619FB8071475A500E0A1B6 /* QuickTime.framework in Frameworks */,
+				48619FB9071475A500E0A1B6 /* OpenGL.framework in Frameworks */,
+				48620C9207944552009195E5 /* libbreve.a in Frameworks */,
+				48E1722407AAAF370072492B /* JavaVM.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				48E1722307AAAF370072492B /* JavaVM.framework */,
+				48620C9107944552009195E5 /* libbreve.a */,
+				F5BD20F30397BFE301980AE4 /* OpenGL.framework */,
+				F5BD21540397C2DA01980AE4 /* Carbon.framework */,
+				F5BD20F20397BFE301980AE4 /* GLUT.framework */,
+				F5BD20F40397BFE301980AE4 /* QuickTime.framework */,
+				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
+				48807AA104DF1DB800A8D232 /* CoreAudio.framework */,
+				48807AB004DF1E2C00A8D232 /* AudioToolbox.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FB0FE9D524F11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4802DC7A05616137008198B9 /* breve.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2A37F4AAFDCFA73011CA2CEA /* OSX2 */ = {
+			isa = PBXGroup;
+			children = (
+				48ECC16B071C13D200596F93 /* Plugins */,
+				2A37F4ABFDCFA73011CA2CEA /* Classes */,
+				2A37F4B8FDCFA73011CA2CEA /* Resources */,
+				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
+				19C28FB0FE9D524F11CA2CBB /* Products */,
+				4802DC7905616137008198B9 /* Info.plist */,
+			);
+			name = OSX2;
+			sourceTree = "<group>";
+		};
+		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				F5BD20A60397BEC801980AE4 /* slLogView.h */,
+				F5BD20A70397BEC801980AE4 /* slLogView.m */,
+				F5BD20A80397BEC801980AE4 /* slMovieRecord.h */,
+				F5BD20A90397BEC801980AE4 /* slMovieRecord.m */,
+				F5BD20AA0397BEC801980AE4 /* slObjectOutline.h */,
+				F5BD20AB0397BEC801980AE4 /* slObjectOutline.m */,
+				F5BD20AC0397BEC801980AE4 /* slObjectOutlineItem.h */,
+				2A37F4AEFDCFA73011CA2CEA /* slBreveSourceDocument.h */,
+				2A37F4ACFDCFA73011CA2CEA /* slBreveSourceDocument.m */,
+				F5BD20AD0397BEC801980AE4 /* slObjectOutlineItem.mm */,
+				F5BD20AE0397BEC801980AE4 /* slQuickparser.l */,
+				F5BD20B10397BEC801980AE4 /* slTextView.h */,
+				F5BD20B20397BEC801980AE4 /* slTextView.m */,
+				2A37F4B0FDCFA73011CA2CEA /* main.m */,
+				F5BD20C00397BFC001980AE4 /* slBreve.h */,
+				F5BD20C10397BFC001980AE4 /* slBreve.m */,
+				F5BD20C20397BFC001980AE4 /* slBreveApplication.h */,
+				F5BD20C30397BFC001980AE4 /* slBreveApplication.m */,
+				F5BD20C40397BFC001980AE4 /* slBreveEngine.h */,
+				F5BD20C50397BFC001980AE4 /* slBreveEngine.m */,
+				48D1C0D4046331F80093F8AA /* slGraphWindowView.h */,
+				48D1C0D5046331F80093F8AA /* slGraphWindowView.m */,
+				48D1C0BC04632D760093F8AA /* slGraphWindowController.h */,
+				48D1C0BD04632D760093F8AA /* slGraphWindowController.m */,
+				F5BD20C60397BFC001980AE4 /* slBreveGLView.h */,
+				F5BD20C70397BFC001980AE4 /* slBreveGLView.m */,
+				F5BD20CA0397BFC001980AE4 /* slBreveNibLoader.h */,
+				F5BD20CB0397BFC001980AE4 /* slBreveNibLoader.m */,
+				F5BD20D10397BFC001980AE4 /* slBrevePrefs.h */,
+				F5BD20D20397BFC001980AE4 /* slBrevePrefs.m */,
+				F5BD20D30397BFC001980AE4 /* slCommandTextField.h */,
+				F5BD20D40397BFC001980AE4 /* slCommandTextField.m */,
+				F5BD20D50397BFC001980AE4 /* slDemoMenu.h */,
+				F5BD20D60397BFC001980AE4 /* slDemoMenu.m */,
+				F5BD20D70397BFC001980AE4 /* slFullScreen.h */,
+				F5BD20D80397BFC001980AE4 /* slFullScreen.m */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				48CE1CFB08155B1F0030CBB8 /* DocumentIcons.icns */,
+				F5BD22640397C69401980AE4 /* AppIcon.icns */,
+				F569DDB00398039F01B2CBA0 /* Template.tz */,
+				481D2181042A2D2100FFA442 /* slGLWindow.nib */,
+				2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */,
+				2A37F4B4FDCFA73011CA2CEA /* slBreveSourceDocument.nib */,
+				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
+				F5BD21F60397C43E01980AE4 /* app_icon.tiff */,
+				F5BD21F80397C43E01980AE4 /* Camera.tiff */,
+				F5BD21F90397C43E01980AE4 /* move.tiff */,
+				F5BD21FA0397C43E01980AE4 /* pause.tiff */,
+				F5BD21FB0397C43E01980AE4 /* play.tiff */,
+				F5BD21FD0397C43E01980AE4 /* rotate.tiff */,
+				F5BD21FC0397C43E01980AE4 /* pointer.tiff */,
+				F5BD21FE0397C43E01980AE4 /* stop.tiff */,
+				F5BD21FF0397C43E01980AE4 /* zoom.tiff */,
+				F5BD220A0397C57D01980AE4 /* docs */,
+				F5BD223E0397C59E01980AE4 /* demos */,
+				F5F64877039868A20154B402 /* classes */,
+				F569DDB203980C9101B2CBA0 /* Errors.strings */,
+				F569DDB403980C9101B2CBA0 /* General.strings */,
+				485C2C350559830F005859E4 /* breve.scriptSuite */,
+				482D1689055989F800230BBF /* breve.scriptTerminology */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		48ECC16B071C13D200596F93 /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				48ECC16E071C13F400596F93 /* Instrument.tz */,
+				48ECC16F071C13F400596F93 /* QTInstrumentPlugin.o */,
+				48ECC163071C13C100596F93 /* Digitizer.tz */,
+				48ECC164071C13C100596F93 /* DigitizerPlugin.o */,
+			);
+			name = Plugins;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		4802DC1B05616137008198B9 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4802DC1C05616137008198B9 /* slBreveSourceDocument.h in Headers */,
+				4802DC1D05616137008198B9 /* slLogView.h in Headers */,
+				4802DC1E05616137008198B9 /* slMovieRecord.h in Headers */,
+				4802DC1F05616137008198B9 /* slObjectOutline.h in Headers */,
+				4802DC2005616137008198B9 /* slObjectOutlineItem.h in Headers */,
+				4802DC2205616137008198B9 /* slTextView.h in Headers */,
+				4802DC2305616137008198B9 /* slBreve.h in Headers */,
+				4802DC2405616137008198B9 /* slBreveApplication.h in Headers */,
+				4802DC2505616137008198B9 /* slBreveEngine.h in Headers */,
+				4802DC2605616137008198B9 /* slBreveGLView.h in Headers */,
+				4802DC2905616137008198B9 /* slBrevePrefs.h in Headers */,
+				4802DC2A05616137008198B9 /* slCommandTextField.h in Headers */,
+				4802DC2B05616137008198B9 /* slDemoMenu.h in Headers */,
+				4802DC2C05616137008198B9 /* slFullScreen.h in Headers */,
+				4802DC2D05616137008198B9 /* slGraphWindowController.h in Headers */,
+				4802DC2E05616137008198B9 /* slBreveNibLoader.h in Headers */,
+				4802DC2F05616137008198B9 /* slGraphWindowView.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		4802DC1A05616137008198B9 /* real_breve.app */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 48C93587094B452400B48959 /* Build configuration list for PBXNativeTarget "real_breve.app" */;
+			buildPhases = (
+				4802DC1B05616137008198B9 /* Headers */,
+				48ECC160071C137300596F93 /* CopyFiles */,
+				4802DC3005616137008198B9 /* Resources */,
+				4802DC4B05616137008198B9 /* Sources */,
+				480F316807146AFB00E71420 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			buildSettings = {
+				CC_VERSION = 3.x;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_PEDANTIC = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/breve,
+					/usr/local/include,
+					/sw/include,
+				);
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = /Applications;
+				LIBRARY_SEARCH_PATHS = (
+					../lib,
+					/usr/local/lib,
+					/Users/jk/dev/breve/lib,
+					/usr/lib/gcc/darwin/3.3,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.1;
+				OTHER_CFLAGS = "$(CPPFLAGS)";
+				OTHER_LDFLAGS = (
+					"$(LIBS)",
+					/usr/local/lib/libdl.a,
+				);
+				PRODUCT_NAME = breve;
+				SECTORDER_FLAGS = "";
+				UNSTRIPPED_PRODUCT = YES;
+				WARNING_CFLAGS = "-Wmost";
+				WRAPPER_EXTENSION = app;
+			};
+			comments = "This target should not be built directly.  It is intended to be built by the \"breve.app\" target, which uses a library list generated by \"./configure\".\n\nThis target does not include several libraries required for linking and will likely fail if built directly.";
+			dependencies = (
+			);
+			name = real_breve.app;
+			productInstallPath = "$(HOME)/Applications";
+			productName = OSX2;
+			productReference = 4802DC7A05616137008198B9 /* breve.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 48C9358C094B452400B48959 /* Build configuration list for PBXProject "breve" */;
+			buildSettings = {
+			};
+			buildStyles = (
+				4A9504D0FFE6A4CB11CA0CBA /* Development */,
+				4A9504D1FFE6A4CB11CA0CBA /* Deployment */,
+				4802D7F905616080008198B9 /* 10.2 */,
+			);
+			hasScannedForEncodings = 1;
+			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* OSX2 */;
+			projectDirPath = "";
+			targets = (
+				480F31AA071472AD00E71420 /* breve.app */,
+				4802DC1A05616137008198B9 /* real_breve.app */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4802DC3005616137008198B9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4802DC3105616137008198B9 /* MainMenu.nib in Resources */,
+				4802DC3205616137008198B9 /* slBreveSourceDocument.nib in Resources */,
+				4802DC3305616137008198B9 /* InfoPlist.strings in Resources */,
+				4802DC3405616137008198B9 /* app_icon.tiff in Resources */,
+				4802DC3505616137008198B9 /* Camera.tiff in Resources */,
+				4802DC3605616137008198B9 /* move.tiff in Resources */,
+				4802DC3705616137008198B9 /* pause.tiff in Resources */,
+				4802DC3805616137008198B9 /* play.tiff in Resources */,
+				4802DC3905616137008198B9 /* pointer.tiff in Resources */,
+				4802DC3A05616137008198B9 /* rotate.tiff in Resources */,
+				4802DC3B05616137008198B9 /* stop.tiff in Resources */,
+				4802DC3C05616137008198B9 /* zoom.tiff in Resources */,
+				4802DC3D05616137008198B9 /* docs in Resources */,
+				4802DC3E05616137008198B9 /* demos in Resources */,
+				48CE1D0408155BDE0030CBB8 /* DocumentIcons.icns in Resources */,
+				4802DC3F05616137008198B9 /* AppIcon.icns in Resources */,
+				4802DC4005616137008198B9 /* Template.tz in Resources */,
+				4802DC4105616137008198B9 /* Errors.strings in Resources */,
+				4802DC4205616137008198B9 /* General.strings in Resources */,
+				4802DC4305616137008198B9 /* classes in Resources */,
+				4802DC4405616137008198B9 /* slGLWindow.nib in Resources */,
+				4802DC4905616137008198B9 /* breve.scriptSuite in Resources */,
+				4802DC4A05616137008198B9 /* breve.scriptTerminology in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		480F31A9071472AD00E71420 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 12;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This is a shell script that attempts to complete the entire\n# breve build process for Mac OS X, including the configure\n# step, the building of the breve libraries, and the building \n# of the final breve.app with the proper external libraries.\n\n### first do the configure, if neccessary\n\nif [ ! -f \"ConfigureLibraryList\" ]; then\n\techo \"ConfigureLibraryList not found!  Running configure...\"\n\t(cd ..; ./configure)\nfi\n\n### now build the breve engine libraries\n\n(cd ..; make lib/libbreve.a)\n\n### use the libraries provided by \"configure\" to build the \n### OS X application using xcodebuild\n\n### The ncurses library is required for command-line breve, but not \n### the OSX build.  Unforunately, it also breaks backwards compatabilty \n### for the OSX build, so we have to remove it from the library list\n\nexport LIBS=`cat ConfigureLibraryList | sed 's/-lncurses//' | sed 's/-ltermcap//'`\n\nxcodebuild -configuration Deployment -target real_breve.app";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4802DC4B05616137008198B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4802DC4C05616137008198B9 /* slBreveSourceDocument.m in Sources */,
+				4802DC4D05616137008198B9 /* main.m in Sources */,
+				4802DC4E05616137008198B9 /* slLogView.m in Sources */,
+				4802DC4F05616137008198B9 /* slMovieRecord.m in Sources */,
+				4802DC5005616137008198B9 /* slObjectOutline.m in Sources */,
+				4802DC5105616137008198B9 /* slObjectOutlineItem.mm in Sources */,
+				4802DC5205616137008198B9 /* slQuickparser.l in Sources */,
+				4802DC5405616137008198B9 /* slTextView.m in Sources */,
+				4802DC5505616137008198B9 /* slBreve.m in Sources */,
+				4802DC5605616137008198B9 /* slBreveApplication.m in Sources */,
+				4802DC5705616137008198B9 /* slBreveEngine.m in Sources */,
+				4802DC5805616137008198B9 /* slBreveGLView.m in Sources */,
+				4802DC5905616137008198B9 /* slBreveNibLoader.m in Sources */,
+				4802DC5C05616137008198B9 /* slBrevePrefs.m in Sources */,
+				4802DC5D05616137008198B9 /* slCommandTextField.m in Sources */,
+				4802DC5E05616137008198B9 /* slDemoMenu.m in Sources */,
+				4802DC5F05616137008198B9 /* slFullScreen.m in Sources */,
+				4802DC6005616137008198B9 /* slGraphWindowController.m in Sources */,
+				4802DC6105616137008198B9 /* slGraphWindowView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		089C165FFE840EACC02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C1660FE840EACC02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		2A37F4B4FDCFA73011CA2CEA /* slBreveSourceDocument.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2A37F4B5FDCFA73011CA2CEA /* slBreveSourceDocument.nib */,
+			);
+			name = slBreveSourceDocument.nib;
+			sourceTree = "<group>";
+		};
+		2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2A37F4B7FDCFA73011CA2CEA /* MainMenu.nib */,
+			);
+			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+		481D2181042A2D2100FFA442 /* slGLWindow.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				481D2182042A2D2100FFA442 /* slGraphWindow.nib */,
+			);
+			name = slGLWindow.nib;
+			sourceTree = "<group>";
+		};
+		482D1689055989F800230BBF /* breve.scriptTerminology */ = {
+			isa = PBXVariantGroup;
+			children = (
+				482D168A055989F800230BBF /* English */,
+			);
+			name = breve.scriptTerminology;
+			sourceTree = "<group>";
+		};
+		F569DDB203980C9101B2CBA0 /* Errors.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F569DDB303980C9101B2CBA0 /* English */,
+			);
+			name = Errors.strings;
+			sourceTree = "<group>";
+		};
+		F569DDB403980C9101B2CBA0 /* General.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F569DDB503980C9101B2CBA0 /* English */,
+			);
+			name = General.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		48C93583094B452400B48959 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OPTIMIZATION_CFLAGS = "-O0 -g";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = fake;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = Development;
+		};
+		48C93584094B452400B48959 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = fake;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		48C93585094B452400B48959 /* 10.2 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = fake;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = 10.2;
+		};
+		48C93586094B452400B48959 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = fake;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Default;
+		};
+		48C93588094B452400B48959 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CC_VERSION = 3.x;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_PEDANTIC = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/breve,
+					/usr/local/include,
+					/sw/include,
+				);
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = /Applications;
+				LIBRARY_SEARCH_PATHS = (
+					../lib,
+					/usr/local/lib,
+					/Users/jk/dev/breve/lib,
+					/usr/lib/gcc/darwin/3.3,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.1;
+				OPTIMIZATION_CFLAGS = "-O0 -g";
+				OTHER_CFLAGS = "$(CPPFLAGS)";
+				OTHER_LDFLAGS = (
+					"$(LIBS)",
+					/usr/local/lib/libdl.a,
+				);
+				PRODUCT_NAME = breve;
+				SECTORDER_FLAGS = "";
+				UNSTRIPPED_PRODUCT = YES;
+				WARNING_CFLAGS = "-Wmost";
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Development;
+		};
+		48C93589094B452400B48959 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CC_VERSION = 3.x;
+				COPY_PHASE_STRIP = YES;
+				DEAD_CODE_STRIPPING = NO;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_PEDANTIC = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/breve,
+					/usr/local/include,
+					/sw/include,
+				);
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = /Applications;
+				LIBRARY_SEARCH_PATHS = (
+					../lib,
+					/usr/local/lib,
+					/Users/jk/dev/breve/lib,
+					/usr/lib/gcc/darwin/3.3,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.1;
+				OTHER_CFLAGS = "$(CPPFLAGS)";
+				OTHER_LDFLAGS = (
+					"$(LIBS)",
+					/usr/local/lib/libdl.a,
+				);
+				PRODUCT_NAME = breve;
+				SECTORDER_FLAGS = "";
+				UNSTRIPPED_PRODUCT = YES;
+				WARNING_CFLAGS = "-Wmost";
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		48C9358A094B452400B48959 /* 10.2 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CC_VERSION = 3.x;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_PEDANTIC = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/breve,
+					/usr/local/include,
+					/sw/include,
+				);
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = /Applications;
+				LIBRARY_SEARCH_PATHS = (
+					../lib,
+					/usr/local/lib,
+					/Users/jk/dev/breve/lib,
+					/usr/lib/gcc/darwin/3.3,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.1;
+				OTHER_CFLAGS = "$(CPPFLAGS)";
+				OTHER_LDFLAGS = (
+					"$(LIBS)",
+					/usr/local/lib/libdl.a,
+				);
+				PRODUCT_NAME = breve;
+				SECTORDER_FLAGS = "";
+				UNSTRIPPED_PRODUCT = YES;
+				WARNING_CFLAGS = "-Wmost";
+				WRAPPER_EXTENSION = app;
+			};
+			name = 10.2;
+		};
+		48C9358B094B452400B48959 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CC_VERSION = 3.x;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_PEDANTIC = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/breve,
+					/usr/local/include,
+					/sw/include,
+				);
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = /Applications;
+				LIBRARY_SEARCH_PATHS = (
+					../lib,
+					/usr/local/lib,
+					/Users/jk/dev/breve/lib,
+					/usr/lib/gcc/darwin/3.3,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.1;
+				OTHER_CFLAGS = "$(CPPFLAGS)";
+				OTHER_LDFLAGS = (
+					"$(LIBS)",
+					/usr/local/lib/libdl.a,
+				);
+				PRODUCT_NAME = breve;
+				SECTORDER_FLAGS = "";
+				UNSTRIPPED_PRODUCT = YES;
+				WARNING_CFLAGS = "-Wmost";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Default;
+		};
+		48C9358D094B452400B48959 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Development;
+		};
+		48C9358E094B452400B48959 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Deployment;
+		};
+		48C9358F094B452400B48959 /* 10.2 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = 10.2;
+		};
+		48C93590094B452400B48959 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Default;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		48C93582094B452400B48959 /* Build configuration list for PBXAggregateTarget "breve.app" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				48C93583094B452400B48959 /* Development */,
+				48C93584094B452400B48959 /* Deployment */,
+				48C93585094B452400B48959 /* 10.2 */,
+				48C93586094B452400B48959 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		48C93587094B452400B48959 /* Build configuration list for PBXNativeTarget "real_breve.app" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				48C93588094B452400B48959 /* Development */,
+				48C93589094B452400B48959 /* Deployment */,
+				48C9358A094B452400B48959 /* 10.2 */,
+				48C9358B094B452400B48959 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		48C9358C094B452400B48959 /* Build configuration list for PBXProject "breve" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				48C9358D094B452400B48959 /* Development */,
+				48C9358E094B452400B48959 /* Deployment */,
+				48C9358F094B452400B48959 /* 10.2 */,
+				48C93590094B452400B48959 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
+}

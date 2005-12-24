@@ -26,50 +26,14 @@
 	interaction or an "all" statement) even if they are not 
 	referenced in memory.
 
-	Any time new collectable data is allocated, it is given a 
-	retain count of 0 and is added to a local variable collection 
-	pool.  The collection pool is traversed at the end of the 
-	local method.  If the retain count is still at 0, the data 
-	is released.
+	All garbage collection is now handled through the brEval 
+	class using reference counting hooks in the set() and 
+	destructor methods.  This means that GC happens automatically
+	when using brEval objects.
 
-	When any kind of variable assignment occurs, the retain count 
-	is incremented.  When any kind of variable overwrite or release
-	is preformed, the retain count is decremented.  If a variable
-	overwrite causes a retain count to reach 0, the data is 
-	released.
-
-
-	Strings are a bit of a special case.  They piggy-back on the
-	GC system, but do not work like the other types.  When a string 
-	is set, it is always copied.  When it is unretained, it does
-	not have a retain count--it is simply freed.  This system relies
-	on the fact that a string will never be referenced by more than
-	one memory location.
-
-
-	all variable sets require a retain (hash, simple, list):
-		- hash set 
-		- simple set
-		- list set
-		- list push
-
-	all variable overwrites or releases require immediate unretain and 
-	collection:
-		- hash set 
-		- simple set
-		- list set
-		- method arguments at end of method call
-		- local variables at end of method call
-
-	creation of new collectable variables requires marking for collection:
-		- new Object
-		- new list
-		- C-style function calls
-
-	special treatment is needed for list operators which remove objects 
-	and return them -- they are unretained and marked, but not immediately 
-	collected.
-		- list pop
+	When not using brEval objects, while setting breve instance
+	variables directly in memory, for example, the retain
+	and unretain methods must be called automatically.
 */
 
 #include "steve.h"
@@ -81,7 +45,7 @@
 */
 
 void stGCRetain(brEval *e) {
-	stGCRetainPointer(e->values.pointerValue, e->type);
+	stGCRetainPointer( e->getPointer(), e->type() );
 }
 
 /*!
@@ -119,7 +83,7 @@ void stGCRetainPointer(void *pointer, int type) {
 */
 
 void stGCUnretain(brEval *e) {
-	stGCUnretainPointer(BRPOINTER(e), e->type);
+	stGCUnretainPointer( e->getPointer(), e->type() );
 }
 
 /*!
@@ -157,14 +121,14 @@ void stGCUnretainPointer(void *pointer, int type) {
 */
 
 void stGCCollect(brEval *e) {
-	stGCCollectPointer(e->values.pointerValue, e->type);
+	stGCCollectPointer( e->getPointer(), e->type() );
 }
 
 /*!
 	\brief Collects memory if the retain count of a pointer is 0.
 */
 
-inline void stGCCollectPointer(void *pointer, int type) {
+void stGCCollectPointer(void *pointer, int type) {
 	if(type == AT_NULL || type == AT_INT || type == AT_DOUBLE || type == AT_MATRIX || type == AT_VECTOR || !pointer) return;
 
 	switch(type) {
@@ -197,7 +161,7 @@ inline void stGCCollectPointer(void *pointer, int type) {
 */
 
 void stGCUnretainAndCollect(brEval *e) {
-	stGCUnretainAndCollectPointer(e->values.pointerValue, e->type);	
+	stGCUnretainAndCollectPointer( e->getPointer(), e->type() );	
 }
 
 /*!
@@ -208,112 +172,6 @@ void stGCUnretainAndCollect(brEval *e) {
 void stGCUnretainAndCollectPointer(void *pointer, int type) {
 	stGCUnretainPointer(pointer, type);
 	stGCCollectPointer(pointer, type);
-}
-
-/*!
-	\brief Collects multiple expressions in an slStack structure.
-
-	Uses \ref stGCCollect.
-*/
-
-void stGCCollectStack(slStack *gc) {
-	unsigned int n;
-
-	for(n=0;n<gc->count;n++) {
-		stGCRecord *r = (stGCRecord*)gc->data[n];
-
-		stGCCollectPointer(r->pointer, r->type);
-		delete r;
-	}
-
-	gc->count = 0;
-}
-
-/*!
-	\brief Marks a brEval for collection, by adding it to an instance's
-	collection stack.
-*/
-
-void stGCMark(stInstance *i, brEval *collect) {
-	stGCMarkPointer(i, BRPOINTER(collect), collect->type);
-}
-
-/*!
-	\brief Marks a pointer for collect by adding it to an instance's
-	collection stack.
-*/
-
-inline void stGCMarkPointer(stInstance *i, void *pointer, int type) {
-	stGCRecord *r;
-	stInstance *collect;
-
-	switch(type) {
-		case AT_NULL:
-		case AT_INT:
-		case AT_DOUBLE:
-		case AT_VECTOR:
-		case AT_MATRIX:
-		case AT_POINTER:
-			return;
-			break;
-		case AT_INSTANCE:
-			if(!pointer) return;
-
-			if(((brInstance*)pointer)->status != AS_ACTIVE) return;
-			collect = (stInstance*)((brInstance*)pointer)->userData;
-			if(!collect->gc) return;
-			break;
-		default:
-			if(!pointer) return;
-
-			break;
-	}
-
-	unsigned int n;
-
-
-//	for(n=0;n<i->gcStack->count;n++) {
-//		r = (stGCRecord*)i->gcStack->data[n];
-//		if(r->pointer == pointer) {
-//			slMessage(DEBUG_ALL, "double mark of pointer %p\n", r->pointer);
-//		}
-//	}
-	
-	r = new stGCRecord;
-	r->pointer = pointer;
-	r->type = type;
-
-	slStackPush(i->gcStack, r);
-}
-
-/*!
-	\brief Unmark a brEval for collection, by removing it from an instance's
-	collection stack.
-*/
-
-void stGCUnmark(stInstance *i, brEval *collect) {
-	unsigned int n;
-	stGCRecord *r;
-
-	if(!i->gcStack || collect->type == AT_NULL || collect->type == AT_INT || 
-		collect->type == AT_DOUBLE || collect->type == AT_MATRIX || 
-		collect->type == AT_VECTOR || !collect->values.pointerValue) return;
-
-	if(collect->type == AT_INSTANCE) {
-		stInstance *i;
-
-		if(BRINSTANCE(collect)->status != AS_ACTIVE) return;
-
-		i = (stInstance*)BRINSTANCE(collect)->userData;
-
-		if(!i->gc) return;
-	} 
-
-	for(n=0;n<i->gcStack->count;n++) {
-		r = (stGCRecord*)i->gcStack->data[n];
-	
-		if(r->pointer == collect->values.pointerValue) r->pointer = NULL;
-	}
 }
 
 /*!
@@ -347,25 +205,7 @@ void brEvalListUnretain(brEvalListHead *lh) {
 */  
 
 void brEvalListCollect(brEvalListHead *lh) {
-	if(lh->retainCount < 1) brEvalListFreeGC(lh);
-}
-
-/*!
-	\brief Garbage-collects and frees a brEvalList.
-
-	Unretains and collects all list members, and then preforms a 
-	regular dealocation.	
-*/
-
-void brEvalListFreeGC(brEvalListHead *lh) {
-	brEvalList *list = lh->start;
-
-	while(list) {
-		stGCUnretainAndCollect(&list->eval);
-		list = list->next;
-	}
-
-	brEvalListFree(lh);
+	if(lh->retainCount < 1) brEvalListFree(lh);
 }
 
 /*!
@@ -392,36 +232,5 @@ void brEvalHashUnretain(brEvalHash *h) {
 */
 
 void brEvalHashCollect(brEvalHash *h) {
-	if(h->retainCount < 1) brEvalHashFreeGC(h);
-}
-
-/*!
-	\brief Garbage-collects and frees a brEvalHash.
-
-	Unretains and collects all hash keys and value, then 
-	preforms a regular dealocation.	
-*/
-
-void brEvalHashFreeGC(brEvalHash *h) {
-	slList *all, *start;
-
-	start = all = slHashValues(h->table);
-
-	while(all) {
-		stGCUnretainAndCollect((brEval*)all->data);
-		all = all->next;
-	}
-
-	slListFree(start);
-
-	start = all = slHashKeys(h->table);
-
-	while(all) {
-		stGCUnretainAndCollect((brEval*)all->data);
-		all = all->next;
-	}
-
-	slListFree(start);
-
-	brEvalHashFree(h);
+	if(h->retainCount < 1) brEvalHashFree(h);
 }

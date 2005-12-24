@@ -58,6 +58,8 @@ class <ulink url="../classes/Real.html">Real.tz</ulink> are used.
 <indexterm><primary>keyboard events</primary></indexterm>
 <indexterm><primary>catch-key-X-down (method)</primary></indexterm>
 <indexterm><primary>catch-key-X-up (method)</primary></indexterm>
+<indexterm><primary>catch-key-left-up (method)</primary></indexterm>
+<indexterm><primary>catch-key-left-down (method)</primary></indexterm>
 <indexterm><primary>ASCII</primary></indexterm>
 <indexterm><primary>hexadecimal</primary></indexterm>
 
@@ -80,8 +82,22 @@ this case, you can still catch the event using the <firstterm>hexadecimal
 ASCII equivalent</firstterm> for the character.  In this case of the space
 bar, the valid breve method name would be 
 <function>catch-key-0x20-down</function>.  Consult an ASCII table for more
-information.  And don't for get the <function>0x</function> in front of 
-hexadecimal values!
+information.  Don't forget to add <function>0x</function> in front of 
+hexadecimal values.
+</para>
+<para>
+In addition to catching regular ASCII characters, similar methods may
+be used to catch the arrow keys:
+<screen>
+catch-key-left-down
+catch-key-left-up
+catch-key-right-down
+catch-key-right-up
+catch-key-up-down
+catch-key-up-up
+catch-key-down-down
+catch-key-down-up
+</screen>
 </para>
 <para>
 When a key is pressed down, only one call to the "down" method is made
@@ -89,8 +105,7 @@ When a key is pressed down, only one call to the "down" method is made
 only a single call to the "up" method is made.  If you wish for an action
 to continue for as long as a key is pressed down, then you should have 
 the "down" callback set a flag or call a method which will trigger a 
-repeating or constant event, then have the "up" callback deactivate the 
-event.
+continuous event, then use the "up" callback to deactivate the event.
 </para>
 </sect1>
 

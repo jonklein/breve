@@ -4,7 +4,7 @@
 #define BRLINKPOINTER(p)	((slLink*)BRPOINTER(p))
 
 int brISpringNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = new slSpring(i->engine->world, BRLINKPOINTER(&args[0]), BRLINKPOINTER(&args[1]), &BRVECTOR(&args[2]), &BRVECTOR(&args[3]), BRDOUBLE(&args[4]), BRDOUBLE(&args[5]), BRDOUBLE(&args[6]));
+	target->set( new slSpring(i->engine->world, BRLINKPOINTER(&args[0]), BRLINKPOINTER(&args[1]), &BRVECTOR(&args[2]), &BRVECTOR(&args[3]), BRDOUBLE(&args[4]), BRDOUBLE(&args[5]), BRDOUBLE(&args[6])) );
 
 	return EC_OK;
 }
@@ -28,7 +28,7 @@ int brISpringSetLength(brEval args[], brEval *target, brInstance *i) {
 int brISpringGetCurrentLength(brEval args[], brEval *target, brInstance *i) {
 	slSpring *s = (slSpring*)BRPOINTER(&args[0]);
 
-	BRDOUBLE(target) = s->getCurrentLength();
+	target->set( s->getCurrentLength() );
 
 	return EC_OK;
 }
@@ -36,7 +36,7 @@ int brISpringGetCurrentLength(brEval args[], brEval *target, brInstance *i) {
 int brISpringGetForce(brEval args[], brEval *target, brInstance *i) {
 	slSpring *s = (slSpring*)BRPOINTER(&args[0]);
 
-	BRDOUBLE(target) = s->getForce();
+	target->set( s->getForce() );
 
 	return EC_OK;
 }

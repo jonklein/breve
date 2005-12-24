@@ -249,8 +249,8 @@ brEvalListHead *brDoEvalListDeepCopy(brEvalListHead *l, slList **s) {
 	brEval newSubList;
 	brEvalList *item = l->start;
 
-	/* we're now officially copying this list -- all future occurences should */
-	/* refer to the copy, so we make a record entry for it */
+	// we're now officially copying this list -- all future occurences should 
+	// refer to the copy, so we make a record entry for it 
 
 	newList = brEvalListNew();
 
@@ -259,17 +259,16 @@ brEvalListHead *brDoEvalListDeepCopy(brEvalListHead *l, slList **s) {
 	while(item) {
 		brEvalListHead *copy;
 
-		/* is this a list? have we seen it before? */
+		// is this a list? have we seen it before? 
 
-		if(item->eval.type == AT_LIST) {
+		if( item->eval.type() == AT_LIST ) {
 			copy = brCopyRecordInList(*s, BRLIST(&item->eval));
-			newSubList.type = AT_LIST;
 
 			if(!copy) {
-				BRLIST(&newSubList) = brDoEvalListDeepCopy(BRLIST(&item->eval), s);
+				newSubList.set( brDoEvalListDeepCopy(BRLIST(&item->eval), s) );
 				brEvalListInsert(newList, newList->count, &newSubList);
 			} else {
-				BRLIST(&newSubList) = copy;
+				newSubList.set( copy );
 				brEvalListInsert(newList, newList->count, &newSubList);
 			}
 		} else {

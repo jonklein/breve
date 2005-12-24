@@ -29,7 +29,7 @@
 /*@{*/
 
 int brIShapeNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = new slShape();
+	target->set( new slShape() );
 	return EC_OK;
 }
 
@@ -40,8 +40,7 @@ int brIAddShapeFace(brEval args[], brEval *target, brInstance *i) {
 	slVector *face[list->count];
 	int n = 0;
 
-	if (!s)
-		return EC_OK;
+	if (!s) return EC_OK;
 
 	if (list->count < 3) {
 		// stEvalError(i->engine, EE_TYPE, "Adding a face to a shape requires a list of at least 3 vectors");
@@ -49,7 +48,7 @@ int brIAddShapeFace(brEval args[], brEval *target, brInstance *i) {
 	}
 
 	for (h = list->start; h; h = h->next) {
-		if (h->eval.type != AT_VECTOR) {
+		if ( h->eval.type() != AT_VECTOR ) {
 			slFree(face);
 			stEvalError(i->engine, EE_TYPE, "Adding a face to a shape requires a list of vectors");
 			return EC_ERROR;
@@ -94,7 +93,7 @@ int brIShapeSetMass(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMeshShapeNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = new slMeshShape(BRSTRING(&args[0]), BRSTRING(&args[1]));
+	target->set( new slMeshShape(BRSTRING(&args[0]), BRSTRING(&args[1])) );
 
 	if (!BRPOINTER(target)) {
 		stEvalError(i->engine, EE_SIMULATION, "An error occurred while creating a new sphere");
@@ -105,7 +104,7 @@ int brIMeshShapeNew(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISphereNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = new slSphere(BRDOUBLE(&args[0]), BRDOUBLE(&args[1]));
+	target->set( new slSphere(BRDOUBLE(&args[0]), BRDOUBLE(&args[1])) );
 
 	if (!BRPOINTER(target)) {
 		stEvalError(i->engine, EE_SIMULATION, "An error occurred while creating a new sphere");
@@ -116,7 +115,7 @@ int brISphereNew(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brICubeNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slNewCube(&BRVECTOR(&args[0]), BRDOUBLE(&args[1]));
+	target->set( slNewCube(&BRVECTOR(&args[0]), BRDOUBLE(&args[1])) );
 
 	if (!BRPOINTER(target)) {
 		stEvalError(i->engine, EE_SIMULATION, "An error occurred while creating a new cube");
@@ -127,7 +126,7 @@ int brICubeNew(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brINGonDiscNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slNewNGonDisc(BRINT(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]), BRDOUBLE(&args[3]));
+	target->set( slNewNGonDisc(BRINT(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]), BRDOUBLE(&args[3])) );
 
 	if (!BRPOINTER(target)) {
 		stEvalError(i->engine, EE_SIMULATION, "An error occurred while creating a new polygon disc");
@@ -138,7 +137,7 @@ int brINGonDiscNew(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brINGonConeNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slNewNGonCone(BRINT(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]), BRDOUBLE(&args[3]));
+	target->set( slNewNGonCone(BRINT(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]), BRDOUBLE(&args[3])) );
 
 	if (!BRSHAPEPOINTER(target)) {
 		stEvalError(i->engine, EE_SIMULATION, "An error occurred while creating a new polygon cone");
@@ -160,7 +159,7 @@ int brIDataForShape(brEval args[], brEval *target, brInstance *i) {
 
 	serialShape = slSerializeShape(BRSHAPEPOINTER(&args[0]), &length);
 
-	BRDATA(target) = brDataNew(serialShape, length);
+	target->set( brDataNew(serialShape, length) );
 
 	slFree(serialShape);
 
@@ -171,11 +170,11 @@ int brIShapeForData(brEval args[], brEval *target, brInstance *i) {
 	brData *d = BRDATA(&args[0]);
 
 	if (!d) {
-		BRPOINTER(target) = NULL;
+		target->set( (void*)NULL );
 		return EC_OK;
 	}
 
-	BRPOINTER(target) = slDeserializeShape((slSerializedShapeHeader*)d->data, d->length);
+	target->set( slDeserializeShape((slSerializedShapeHeader*)d->data, d->length) );
 
 	return EC_OK;
 }
@@ -192,7 +191,7 @@ int brIScaleShape(brEval args[], brEval *target, brInstance *i) {
 int brIGetMass(brEval args[], brEval *target, brInstance *i) {
 	slShape *s = BRSHAPEPOINTER(&args[0]);
 
-	BRDOUBLE(target) = s->getMass();
+	target->set( s->getMass() );
 
 	return EC_OK;
 }
@@ -200,7 +199,7 @@ int brIGetMass(brEval args[], brEval *target, brInstance *i) {
 int brIGetDensity(brEval args[], brEval *target, brInstance *i) {
 	slShape *s = BRSHAPEPOINTER(&args[0]);
 
-	BRDOUBLE(target) = s->getDensity();
+	target->set( s->getDensity() );
 
 	return EC_OK;
 }
@@ -209,8 +208,11 @@ int brIGetDensity(brEval args[], brEval *target, brInstance *i) {
 int brIPointOnShape(brEval args[], brEval *target, brInstance *i) {
 	slShape *shape = BRSHAPEPOINTER(&args[0]);
 	slVector *location = &BRVECTOR(&args[1]);
+	slVector v;
 
-	shape->pointOnShape(location, &BRVECTOR(target));
+	shape->pointOnShape( location, &v );
+
+	target->set( v );
 
 	return EC_OK;
 }
@@ -219,22 +221,25 @@ int brIRayHitsShape(brEval args[], brEval *target, brInstance *i) {
 	slShape *shape = BRSHAPEPOINTER(&args[0]);
 	slVector *direction = &BRVECTOR(&args[1]);
 	slVector *location  = &BRVECTOR(&args[2]);
+	slVector v;
 	int result;
 
-	result = slRayHitsShape(shape, direction, location, &BRVECTOR(target));
+	result = slRayHitsShape( shape, direction, location, &v );
 
 	// The shape was not hit by the ray
 
-	if (result < 0) slVectorSet(&BRVECTOR(target), -1.0, -1.0, -1.0);
+	if (result < 0) slVectorSet( &v, -1.0, -1.0, -1.0 );
+
+	target->set( v );
         
 	return EC_OK;
 }
 
 /*@}*/
 
-/*!
-	\brief Initializes internal breve functions related to shapes.
-*/
+/**
+ * Initializes internal breve functions related to shapes.
+ */
 
 void breveInitShapeFunctions(brNamespace *n) {
 	brNewBreveCall(n, "newShape", brIShapeNew, AT_POINTER, 0);

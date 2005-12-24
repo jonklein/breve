@@ -71,8 +71,6 @@ struct stInstance {
 	bool gc;
 	int retainCount;
 
-	slStack *gcStack;
-
 	std::set< stInstance*, stInstanceCompare > dependencies;
 	std::set< stInstance*, stInstanceCompare > dependents;
 };

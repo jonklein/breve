@@ -316,7 +316,7 @@ void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double r
 	slVectorXform(_child->position.rotation, clinkPoint, &childPosition);
 	slVectorSub(&hingePosition, &childPosition, &childPosition);
 
-	if( !first) {
+	if( !first ) {
 		dBodySetRotation(_child->_odeBodyID, savedChildR);
 	}
 
@@ -336,7 +336,7 @@ void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double r
 		}
 	}
 
-	dBodySetPosition(_child->_odeBodyID, childPosition.x, childPosition.y, childPosition.z);
+	dBodySetPosition( _child->_odeBodyID, childPosition.x, childPosition.y, childPosition.z );
 
 	if(_parent) _parent->updatePositions();
 	_child->updatePositions();

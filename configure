@@ -1432,6 +1432,11 @@ if test "${enable_engineonly+set}" = set; then
   enableval="$enable_engineonly"
   engine_only=yes
 fi;
+# Check whether --enable-static or --disable-static was given.
+if test "${enable_static+set}" = set; then
+  enableval="$enable_static"
+  static=yes
+fi;
 
 
 
@@ -2914,7 +2919,7 @@ else
 JAVA_TEST=Test.java
 CLASS_TEST=Test.class
 cat << \EOF > $JAVA_TEST
-/* #line 2917 "configure" */
+/* #line 2922 "configure" */
 public class Test {
 }
 EOF
@@ -5116,7 +5121,7 @@ cat >>confdefs.h <<\_ACEOF
 #define MACOSX 1
 _ACEOF
 
-		EXTRAOPTFLAGS="-mdynamic-no-pic -falign-loops=16"
+		EXTRAOPTFLAGS="-mdynamic-no-pic -falign-loops=16 -ftree-vectorize -funroll-loops"
 		;;
 
 	cygwin* | mingw* )
@@ -9675,6 +9680,10 @@ _ACEOF
 
 fi
 
+fi
+
+if test "x$static" = "x"; then
+	MISSING='xxx'
 fi
 
 

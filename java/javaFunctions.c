@@ -241,62 +241,51 @@ brJavaMethod *brJavaMakeMethodData(char *name, jmethodID method, char returnType
 int brJavaMethodCall(brJavaBridgeData *bridge, brJavaInstance *instance, brJavaMethod *method, jvalue *jargs, brEval *result) {
 	jvalue returnValue;
 
-	switch(method->returnType) {
+	switch( method->returnType ) {
 		case 'V':
 			(*bridge->env).CallVoidMethodA(instance->instance, method->method, jargs);
-			result->type = AT_NULL;
 			break;
 		case 'I':
 			returnValue.i = (*bridge->env).CallIntMethodA(instance->instance, method->method, jargs);
-			result->type = AT_INT;
-			BRINT(result) = returnValue.i;
+			result->set( (int)returnValue.i );
 			break;
 		case 'J':
 			returnValue.j = (*bridge->env).CallLongMethodA(instance->instance, method->method, jargs);
-			result->type = AT_INT;
-			BRINT(result) = returnValue.j;
+			result->set( (int)returnValue.j );
 			break;
 		case 'C':
 			returnValue.c = (*bridge->env).CallCharMethodA(instance->instance, method->method, jargs);
-			result->type = AT_INT;
-			BRINT(result) = returnValue.c;
+			result->set( returnValue.c );
 			break;
 		case 'B':
 			returnValue.b = (*bridge->env).CallByteMethodA(instance->instance, method->method, jargs);
-			result->type = AT_INT;
-			BRINT(result) = returnValue.b;
+			result->set( returnValue.b );
 			break;
 		case 'Z':
 			returnValue.z = (*bridge->env).CallBooleanMethodA(instance->instance, method->method, jargs);
-			result->type = AT_INT;
-			BRINT(result) = returnValue.z;
+			result->set( returnValue.z );
 			break;
 		case 'S':
 			returnValue.s = (*bridge->env).CallShortMethodA(instance->instance, method->method, jargs);
-			result->type = AT_INT;
-			BRINT(result) = returnValue.s;
+			result->set( returnValue.s );
 			break;
 		case 'F':
 			returnValue.f = (*bridge->env).CallFloatMethodA(instance->instance, method->method, jargs);
-			result->type = AT_DOUBLE;
-			BRDOUBLE(result) = returnValue.f;
+			result->set( returnValue.f );
 			break;
 		case 'D':
 			returnValue.d = (*bridge->env).CallDoubleMethodA(instance->instance, method->method, jargs);
-			result->type = AT_DOUBLE;
-			BRDOUBLE(result) = returnValue.d;
+			result->set( returnValue.d );
 			break;
 		case 'T':
 			// 'T' is breve's code for a string object
 			returnValue.l = (*bridge->env).CallObjectMethodA(instance->instance, method->method, jargs);
-			result->type = AT_STRING;
-			BRSTRING(result) = brReadJavaString(bridge, (jstring)returnValue.l);
+			result->set( brReadJavaString(bridge, (jstring)returnValue.l) );
 			break;
 		case 'O':
 			// 'O' is breve's code for an object
 			returnValue.l = (*bridge->env).CallObjectMethodA(instance->instance, method->method, jargs);
-			result->type = AT_POINTER;
-			BRPOINTER(result) = returnValue.l;
+			result->set( (void*)returnValue.l );
 			break;
 		default:
 			slMessage(DEBUG_ALL, "error: undefined Java type (%c) returned from method \"\"\n", method->returnType);
@@ -309,7 +298,6 @@ int brJavaMethodCall(brJavaBridgeData *bridge, brJavaInstance *instance, brJavaM
 		(*bridge->env).ExceptionDescribe();
 		(*bridge->env).ExceptionClear();
 		slMessage(DEBUG_ALL, "Exception occured in Java execution of method \"%s\"\n", method->name);
-		result->type = AT_NULL;
 		return EC_ERROR;			
 	}
 
@@ -375,7 +363,7 @@ brJavaInstance *brJavaInstanceNew(brJavaObject *object, brEval **args, int argCo
 
 	instance->object = object;
 
-	for(n=0;n<argCount;n++) types[n] = args[n]->type;
+	for(n=0;n<argCount;n++) types[n] = args[n]->type();
 
 	method = brJavaMethodFind(object->bridge, instance->object, "<init>", types, argCount);
 

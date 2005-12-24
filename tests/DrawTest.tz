@@ -42,5 +42,8 @@ Control : myController {
 		point += random[(1, 1, 1)] - (0.5, 0.5, 0.5).
 		drawing draw-line from point1 to point.
 
+		if ( self get-time ) > 20.0: self end-simulation.
+
+		super iterate.
 }
 

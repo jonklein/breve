@@ -42,7 +42,7 @@ int brIAddStationary(brEval args[], brEval *target, brInstance *i) {
 
 	wo = slWorldAddObject(i->engine->world, st, WO_STATIONARY);
 
-	BRPOINTER(target) = wo;
+	target->set( wo );
    
 	return EC_OK;
 }

@@ -164,6 +164,30 @@ int brICameraResizeDisplay(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+/**
+ * Gets the camera X-size.
+ */
+
+int brICameraGetWidth( brEval args[], brEval *target, brInstance *i ) {
+    slCamera *camera = BRCAMERAPOINTER(&args[0]);
+
+	target->set( camera->x );
+
+	return EC_OK;
+}
+
+/**
+ * Gets the camera Y-size.
+ */
+
+int brICameraGetHeight( brEval args[], brEval *target, brInstance *i ) {
+    slCamera *camera = BRCAMERAPOINTER(&args[0]);
+
+	target->set( camera->y );
+
+	return EC_OK;
+}
+
 /*!
 	\brief Creates a new vision.
 
@@ -178,7 +202,7 @@ int brICameraNew(brEval args[], brEval *target, brInstance *i) {
 	slVectorSet(&camera->target, 1, 0, 0);
 	slVectorSet(&camera->location, 0, 0, 0);
 
-	BRPOINTER(target) = camera;
+	target->set( camera );
 
 	slWorldAddCamera(i->engine->world, camera);
 
@@ -258,9 +282,14 @@ int brICameraSetRotation(brEval args[], brEval *target, brInstance *i) {
 
 int brICameraGetRotation(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	BRVECTOR(target).x = camera->rx;
-	BRVECTOR(target).y = camera->ry;
-	BRVECTOR(target).z = 0;
+	slVector v;
+
+	v.x = camera->rx;
+	v.y = camera->ry;
+	v.z = 0;
+
+	target->set( v );
+
 	return EC_OK;
 }
 
@@ -289,6 +318,9 @@ void breveInitCameraFunctions(brNamespace *n) {
 	brNewBreveCall(n, "cameraNew", brICameraNew, AT_POINTER, 0);
 	brNewBreveCall(n, "cameraSetBlur", brICameraSetBlur, AT_NULL, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "cameraClear", brICameraClear, AT_NULL, AT_POINTER, 0);
+
+	brNewBreveCall(n, "cameraGetHeight", brICameraGetHeight, AT_INT, AT_POINTER, 0);
+	brNewBreveCall(n, "cameraGetWidth", brICameraGetWidth, AT_INT, AT_POINTER, 0);
 
 	brNewBreveCall(n, "cameraSetDrawSmooth", brICameraSetDrawSmooth, AT_NULL, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "cameraSetDrawFog", brICameraSetDrawFog, AT_NULL, AT_POINTER, AT_INT, 0);

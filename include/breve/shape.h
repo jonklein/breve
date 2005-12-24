@@ -191,6 +191,8 @@ class slShape {
 			_referenceCount = 1;
 		}
 
+		void recompile() { _recompile = 1; }
+
 		virtual ~slShape();
 
 		virtual void bounds(slPosition *position, slVector *min, slVector *max);
@@ -201,7 +203,7 @@ class slShape {
 
 		virtual void drawShadowVolume(slCamera *camera, slPosition *position);
 
-		virtual void draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags);
+		virtual void draw(slCamera *c, slPosition *pos, double textureScaleX, double textureScaleY, int mode, int flags);
 
 		virtual void setMass(double mass);
 		virtual void setDensity(double density);
@@ -213,7 +215,7 @@ class slShape {
 
 		int _drawList;
 
-		unsigned char _recompile;
+		bool _recompile;
 
 		double _inertia[3][3];
 		double _mass;

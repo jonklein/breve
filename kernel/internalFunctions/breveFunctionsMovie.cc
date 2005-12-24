@@ -39,7 +39,7 @@ int breveMovieCreate(brEval args[], brEval *result, brInstance *i) {
 	movie = slMovieCreate(path, camera->x, camera->y);
 	slFree(path);
 
-	BRPOINTER(result) = movie;
+	result->set( movie );
 
 	return EC_OK;
 #else
@@ -56,7 +56,7 @@ int breveMovieAddWorldFrame(brEval args[], brEval *result, brInstance *i) {
 	if (!movie)
 		slMessage(DEBUG_ALL, "warning: attempt to add frame to null movie pointer\n");
 	else
-		BRINT(result) = slMovieAddWorldFrame(movie, i->engine->world, i->engine->camera);
+		result->set( slMovieAddWorldFrame(movie, i->engine->world, i->engine->camera) );
 #endif
 
 	return EC_OK;

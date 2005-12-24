@@ -119,7 +119,7 @@ int brIGetServerURL(brEval args[], brEval *target, brInstance *i) {
 
 	snprintf(url, sizeof(url), "http://%s:%d", hostname, data->port);
 
-	BRSTRING(target) = slStrdup(url);
+	target->set( url );
 
 	return EC_OK;
 }
@@ -131,7 +131,7 @@ int brIGetServerURL(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIListenOnPort(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = brListenOnPort(BRINT(&args[0]), i->engine);
+	target->set( brListenOnPort(BRINT(&args[0]), i->engine) );
 
 	return EC_OK;
 }
@@ -304,15 +304,13 @@ void *brHandleConnection(void *p) {
 			args[0] = &eval[0];
 			args[1] = &eval[1];
 
-			BRSTRING(&eval[0]) = buffer;
-			eval[0].type = AT_STRING;
+			eval[0].set( buffer );
 
 			brMethodCallByNameWithArgs(data->engine->controller, "parse-xml-network-request", args, 1, &result);
 
 			args[0] = &result;
 
-			BRSTRING(&eval[1]) = hostname;
-			eval[1].type = AT_STRING;
+			eval[1].set( hostname );
 
 			method = brMethodFindWithArgRange(data->server->recipient->object, "accept-upload", NULL, 0, 2);
 
@@ -408,8 +406,9 @@ int brHandleHTTPConnection(brNetworkClientData *data, char *request) {
 	evals = (brEval*)alloca(sizeof(brEval) * count);
 
 	for(n=0;n<count;n++) {
-		evals[n].type = AT_STRING;
-		BRSTRING(&evals[n]) = slSplit(request, "_", n + 1);
+		char *str = slSplit(request, "_", n + 1);
+		evals[n].set( str );
+		delete[] str;
 		evalPtrs[n] = &evals[n];
 	}
 
@@ -422,7 +421,7 @@ int brHandleHTTPConnection(brNetworkClientData *data, char *request) {
 		return 0;
 	}
 
-	if(target.type == AT_NULL) {
+	if( target.type() == AT_NULL ) {
 		if(data->server->index) brSendPage(data, data->server->index);
 		else send(data->socket, SL_NET_SUCCESS, strlen(SL_NET_SUCCESS), 0);
 

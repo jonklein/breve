@@ -25,17 +25,24 @@
 #include "vclip.h"
 #include "vclipData.h"
 
-void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags) {
+void slShape::draw(slCamera *c, slPosition *pos, double textureScaleX, double textureScaleY, int mode, int flags) {
 	unsigned char bound, axis;
 
 	bound = (mode & DM_BOUND) && !(flags & DO_NO_BOUND);
 	axis = (mode & DM_AXIS) && !(flags & DO_NO_AXIS);
 
-	if(_drawList == 0 || _recompile || (flags & DO_RECOMPILE)) slCompileShape(this, c->drawMode, textureScale, flags);
+	if(_drawList == 0 || _recompile || (flags & DO_RECOMPILE)) slCompileShape(this, c->drawMode, flags);
 
 	glPushMatrix();
 	glTranslated(pos->location.x, pos->location.y, pos->location.z);
 	slMatrixGLMult(pos->rotation);
+
+	glPushAttrib(GL_TRANSFORM_BIT);
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+	glTranslatef(0.5, 0.5, 0.0);
+	glScalef(1.0 / textureScaleX, 1.0 / textureScaleY, 1.0);
+	glPopAttrib();
 
 	if(flags & DO_OUTLINE) {
 		glPushAttrib(GL_ENABLE_BIT);
@@ -50,7 +57,7 @@ void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glColor4f(0, 0, 0, .5);
 		glDepthMask(GL_FALSE);
-		slRenderShape(this, GL_LINE_LOOP, 0, 0);
+		slRenderShape(this, GL_LINE_LOOP, 0);
 		glDepthMask(GL_FALSE);
 		glDisable(GL_POLYGON_OFFSET_FILL);
 
@@ -64,9 +71,6 @@ void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, 
 
 		glPopAttrib();
 	} else {
-		// glBegin(GL_POINTS);
-		// glVertex3f(0, 0, 0);
-		// glEnd();
 		glCallList(_drawList);
 	}
 
@@ -77,7 +81,7 @@ void slShape::draw(slCamera *c, slPosition *pos, double textureScale, int mode, 
 		glColor4f(0.0, 0.0, 0.0, 0.5);
 		glScalef(1.1, 1.1, 1.1);
 		if(axis) slDrawAxis(_max.x, _max.y);
-		if(bound) slRenderShape(this, GL_LINE_LOOP, 0, 0);
+		if(bound) slRenderShape(this, GL_LINE_LOOP, 0);
 		glPopAttrib();
 	}
 
@@ -111,9 +115,11 @@ slSphere::slSphere(double radius, double density) : slShape() {
 slShape *slNewCube(slVector *size, double density) {
 	slShape *s;
 
-	if(density < 0.0) throw slException(std::string("invalid density for new cube (density <= 0.0)"));
+	if(density < 0.0) 
+		throw slException(std::string("invalid density for new cube (density <= 0.0)"));
 
-	if(size->x <= 0.0 || size->y <= 0.0 || size->z <= 0) throw slException(std::string("invalid size for new sphere (side <= 0.0)"));
+	if(size->x <= 0.0 || size->y <= 0.0 || size->z <= 0) 
+		throw slException(std::string("invalid size for new sphere (side <= 0.0)"));
 
 	s = new slShape();
 
@@ -154,10 +160,6 @@ slShape *slNewNGonCone(int count, double radius, double height, double density) 
 
 	return s;
 }
-
-/*!
-	\brief Decrement a shapes reference count, freeing if the count reaches 0.
-*/
 
 void slShapeFree(slShape *s) {
 	if(--s->_referenceCount) return;
@@ -821,7 +823,7 @@ int slSphere::pointOnShape(slVector *dir, slVector *point) {
 
 int slShape::pointOnShape(slVector *dir, slVector *point) {
 	double D, X, Y, Z, k;
-	slVector pointOnPlane, candidate;
+	slVector pointOnPlane;
 	slPosition pos;
 	int update, result, planes = 0;
 	double distance, best = -10000;

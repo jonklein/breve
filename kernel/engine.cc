@@ -73,6 +73,10 @@ brEngine *brEngineNew(void) {
 
 	e = new brEngine;
 
+#ifdef HAVE_LIBGSL
+	gsl_set_error_handler_off();
+#endif
+
 	e->RNG = gsl_rng_alloc( gsl_rng_mt19937);
 
 	e->simulationWillStop = 0;

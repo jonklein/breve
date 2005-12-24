@@ -30,7 +30,7 @@ Object : myPushAgent (aka myPushAgents) {
 
 		interpreter clear-stacks.
 
-		interpreter read-config from-file "PushTest.config".
+		# interpreter read-config from-file "PushTest.config".
 
 		interpreter add-instruction named "CALLBACK2-TEST" for-method "callback2" for-instance self.
 		interpreter add-instruction named "CALLBACK-TEST" for-method "callback" for-instance self.
@@ -39,7 +39,8 @@ Object : myPushAgent (aka myPushAgents) {
 		interpreter push-integer value 100.
 		interpreter clear-stacks.
 
-		code = (new PushProgram parse program "( 1 2 3 4 5 6 CALLBACK2-TEST CALLBACK-TEST CALLBACK2-TEST CALLBACK-TEST ( 0 0 ) )").
+		# code = (new PushProgram parse program "( 1 2 3 4 5 6 CALLBACK2-TEST CALLBACK-TEST CALLBACK2-TEST CALLBACK-TEST ( 0 0 ) )").
+		code = (new PushProgram parse program "( 3.5 3.6 3.7 10.1 POINT.SETZ FLOAT.FROMPOINTZ)").
 		code2 = (new PushProgram parse program "( 1 2 3 4 8 4 CALLBACK-TEST CALLBACK2-TEST )").
 
 		print "Discrepancy", (code get-discrepancy from code2).

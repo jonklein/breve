@@ -39,11 +39,11 @@ int brILoadSoundData(brEval args[], brEval *target, brInstance *i) {
 	path = brFindFile(i->engine, BRSTRING(&args[0]), NULL);
 
 	if(path) {
-		BRPOINTER(target) = brLoadSound(path);
+		target->set( brLoadSound(path) );
 		slFree(path);
 	} else {
 		slMessage(DEBUG_ALL, "warning: cannot locate sound file \"%s\"\n", BRSTRING(&args[0]));
-		BRPOINTER(target) = NULL;
+		target->set( (void*)NULL );
 	}
 
 	return EC_OK;
@@ -78,7 +78,7 @@ int brIPlaySoundData(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brINewSinewave(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = brNewSinewave(i->engine->soundMixer, BRINT(&args[0]));
+	target->set( brNewSinewave(i->engine->soundMixer, BRINT(&args[0])) );
 	return EC_OK;
 }
 

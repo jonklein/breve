@@ -123,7 +123,7 @@ stInstance *stInstanceNew(stObject *o) {
 
 	i->status = AS_ACTIVE;
 	i->gc = 0;
-	i->retainCount = 0;
+	i->retainCount = 1;
 
 	// if(pthread_mutex_init(&i->lock, NULL)) 
 	// 	slMessage(0, "warning: error creating mutex for instance %p\n", i);
@@ -202,7 +202,11 @@ void stInstanceUnretain(stInstance *i) {
 */
 
 void stInstanceCollect(stInstance *i) {
-	if(i->gc && i->retainCount < 1) brInstanceRelease(i->breveInstance);
+	if(i->gc && i->retainCount < 1) {
+		// Release, but also prevent re-collecting when the destructor runs!
+		i->gc = false;
+		brInstanceRelease(i->breveInstance);
+	}
 }
 
 /*!
@@ -459,7 +463,8 @@ stKeywordEntry *stNewKeywordEntry(char *keyword, stVar *v, brEval *defValue) {
 
 	if(defValue) {
 		copy = new brEval;
-		memcpy(copy, defValue, sizeof(brEval));
+		brEvalCopy(defValue, copy);
+
 		e->defaultKey = new stKeyword(keyword, new stEvalExp(copy, NULL, 0));
 	}
 

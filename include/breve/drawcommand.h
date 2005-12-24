@@ -45,6 +45,8 @@ class slDrawCommandList {
 
 class slDrawCommand {
 	public:
+		virtual ~slDrawCommand() { };
+
 		virtual void execute(slDrawCommandList &list) = 0;
 };
 

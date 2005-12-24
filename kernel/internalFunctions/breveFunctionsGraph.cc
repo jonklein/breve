@@ -43,7 +43,7 @@ int brIGraphNew(brEval args[], brEval *target, brInstance *i) {
 
 	if (!i->engine->newWindowCallback) {
 		slMessage(DEBUG_ALL, "cannot create new window\n");
-		BRPOINTER(target) = NULL;
+		target->set( (void*)NULL );
 		return EC_OK;
 	}
 
@@ -54,7 +54,7 @@ int brIGraphNew(brEval args[], brEval *target, brInstance *i) {
 	} else
 		i->engine->windows.push_back(p);
 
-	BRPOINTER(target) = graph;
+	target->set( graph );
 	graph->userData = p;
 
 	return EC_OK;
@@ -121,8 +121,7 @@ int brIGraphAddLine(brEval args[], brEval *target, brInstance *i) {
 	slGraph *g = BRGRAPHPOINTER(&args[0]);
 	slVector *color = &BRVECTOR(&args[1]);
 
-	if (g)
-		BRINT(target) = slGraphAddLine(g, color);
+	if (g) target->set( (void*)slGraphAddLine(g, color) );
 
 	return EC_OK;
 }

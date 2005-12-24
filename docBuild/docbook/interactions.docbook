@@ -102,7 +102,9 @@ in three steps:
 </para>
 <para>
 The neighborhood size specifies the distance that each agent will look in 
-order to find any neighbors.  This is typically done during object 
+order to find any neighbors.  The distance between two objects is, in this
+case, defined as the distance between the center-points of the objects.
+Setting the neighborhood size is typically done during object 
 initialization, but it may be changed at any time during the simulation.  
 Neighborhood size is set using the method 
 <ulink url="../classes/Real.html#set-neighborhood-size">set-neighborhood-size</ulink> in <ulink url="../classes/Real.html">Real.tz</ulink>.  Real is the parent class of both 
@@ -200,7 +202,7 @@ The observe method expects the object to be observed, the name of the announceme
 for, and the method to call when the announcement occurs.  For example, an instance 
 interested in monitoring the controller for a (fictional) "New Object" notification would call: 
 <screen>
-self observe controller for-notification "New Object" with-method "new-of-new-object".
+self observe instance controller for-notification "New Object" with-method "new-of-new-object".
 </screen>
 The observing object would then get a call to the method notify-of-new-object whenever 
 the controller made the announcement "New Object". 

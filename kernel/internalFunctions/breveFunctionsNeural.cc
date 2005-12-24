@@ -45,7 +45,7 @@ int brIFreeNetwork(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brINewFFLayer(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = snNewLayer(BRINT(&args[0]), BRFFLAYERPOINTER(&args[1]));
+	target->set( snNewLayer(BRINT(&args[0]), BRFFLAYERPOINTER(&args[1])) );
 
 	if (!BRFFLAYERPOINTER(target))
 		return EC_ERROR;
@@ -119,7 +119,7 @@ int brIGetWeight(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	BRDOUBLE(target) = layer->weights[toNode][fromNode];
+	target->set( layer->weights[toNode][fromNode] );
 
 	return EC_OK;
 }
@@ -139,7 +139,7 @@ int brIGetValue(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	BRDOUBLE(target) = layer->values[node];
+	target->set( layer->values[node] );
 
 	return EC_OK;
 }
@@ -179,7 +179,7 @@ int brIFeedForward(brEval args[], brEval *target, brInstance *i) {
 /*@}*/
 
 void breveInitNeuralFunctions(brNamespace *n) {
-    brNewBreveCall(n, "newFFLayer", brINewFFLayer, AT_POINTER, AT_INT, AT_POINTER, 0);
+    brNewBreveCall(n, "newFFLayer", brINewFFLayer, AT_POINTER, AT_INT, AT_UNDEFINED, 0);
     brNewBreveCall(n, "freeNetwork", brIFreeNetwork, AT_NULL, AT_POINTER, 0);
     brNewBreveCall(n, "randomizeFFWeights", brIRandomizeWeights, AT_NULL, AT_POINTER, 0);
     brNewBreveCall(n, "getValue", brIGetValue, AT_DOUBLE, AT_POINTER, AT_INT, 0);

@@ -54,8 +54,6 @@ int stDDataCheckVariables(brEval *args, brEval *result, brInstance *bi) {
 
 	// check all subinstances of i for the proper types
 
-    result->type = AT_INT;
-
 	while(o && strcmp(o->name, "Data")) {
 		for(vi = o->variables.begin(); vi != o->variables.end(); vi++ ) {
 			v = vi->second;
@@ -65,7 +63,7 @@ int stDDataCheckVariables(brEval *args, brEval *result, brInstance *bi) {
 
         	if(type == AT_INSTANCE || type == AT_POINTER) {
 				slMessage(DEBUG_ALL, "variable \"%s\" is not allowed in Data subclass class \"%s\"\n", v->name, i->type->name);
-				BRINT(result) = -1;
+				result->set( -1 );
 				return EC_OK;
 			}
 		}
@@ -73,7 +71,7 @@ int stDDataCheckVariables(brEval *args, brEval *result, brInstance *bi) {
 		o = o->super;
 	}
 
-    BRINT(result) = 0;
+    result->set( 0 );
 
     return EC_OK;
 }
@@ -83,20 +81,20 @@ int stDDataCopyObject(brEval *args, brEval *result, brInstance *bi) {
     stInstance *otherObject = (stInstance*)BRINSTANCE(&args[0])->userData;
 
 	if(!otherObject) {
-        BRINT(result) = -1;
+        result->set( -1 );
         slMessage(DEBUG_ALL, "cannot copy instance of type \"%s\" to uninitialized instance\n", i->type->name, otherObject->type->name);
         return EC_OK;
 	}
 
     if(otherObject->type != i->type) {
-        BRINT(result) = -1;
+        result->set( -1 );
         slMessage(DEBUG_ALL, "cannot copy instance of type \"%s\" to instance of class \"%s\"\n", i->type->name, otherObject->type->name);
         return EC_OK;
     }
 
 	brDataCopyObject(i, otherObject);
 
-    BRINT(result) = 0;
+    result->set( 0 );
 
     return EC_OK;
 }
@@ -106,16 +104,14 @@ int stDDataWriteObject(brEval *args, brEval *result, brInstance *bi) {
 	char *path;
 	stInstance *i = (stInstance*)bi->userData;
 
-    result->type = AT_INT;
-
     if(!filename) {
         slMessage(DEBUG_ALL, "NULL string passed to dataWriteObject.  Write cancelled.\n");
-        BRINT(result) = -1;
+        result->set( -1 );
         return EC_OK;
     }
 
 	path = brOutputPath(i->type->engine, filename);	
-	BRINT(result) = stWriteObject(i, path);
+	result->set( stWriteObject(i, path) );
 	slFree(path);
 
     return EC_OK;
@@ -206,8 +202,7 @@ int stDDataWriteObjectWithDialog(brEval *args, brEval *result, brInstance *bi) {
     char *filename = NULL;
 	stInstance *i = (stInstance*)bi->userData;
     
-    result->type = AT_INT;
-    BRINT(result) = 1;
+    result->set( 1 );
         
 	filename = brEngineRunSaveDialog(i->type->engine);
 
@@ -216,7 +211,7 @@ int stDDataWriteObjectWithDialog(brEval *args, brEval *result, brInstance *bi) {
         return EC_OK;
     }
     
-    BRINT(result) = stXMLWriteObjectToFile(i, filename, 1);
+	result->set( stXMLWriteObjectToFile(i, filename, 1) );
     
     slFree(filename);
 
@@ -227,7 +222,8 @@ int stDDataReadXMLObject(brEval args[], brEval *target, brInstance *bi) {
 	stInstance *i = (stInstance*)bi->userData;
 
     char *filename = brFindFile(bi->engine, BRSTRING(&args[0]), NULL);
-    BRINT(target) = stXMLReadObjectFromFile(i, filename);
+
+    target->set( stXMLReadObjectFromFile(i, filename) );
 
     return EC_OK;
 }
@@ -238,7 +234,7 @@ int stDWriteXMLObject(brEval args[], brEval *target, brInstance *bi) {
 	stInstance *i = (stInstance*)bi->userData;
 
 	path = brOutputPath(i->type->engine, filename);
-   	BRINT(target) = stXMLWriteObjectToFile(i, path, 1);
+   	target->set( stXMLWriteObjectToFile(i, path, 1) );
 	slFree(path);
 
     return EC_OK;
@@ -250,22 +246,20 @@ int stDDataReadObject(brEval *args, brEval *result, brInstance *bi) {
 
     if(!filename) {
         slMessage(DEBUG_ALL, "NULL string passed to dataReadObject.  Read cancelled.\n");
-        BRINT(result) = -1;
+        result->set( -1 );
         return EC_OK;
     }
 
-    result->type = AT_INT;
-    BRINT(result) = stReadObject(i, filename);
+	result->set( stReadObject(i, filename) );
 
-    return EC_OK;
+	return EC_OK;
 }
 
 int stDDataReadObjectWithDialog(brEval *args, brEval *result, brInstance *bi) {
     char *filename = NULL;
 	stInstance *i = (stInstance*)bi->userData;
 
-    result->type = AT_INT;
-    BRINT(result) = 1;
+    result->set( 1 );
 
 	filename = brEngineRunLoadDialog(i->type->engine);
 
@@ -274,7 +268,7 @@ int stDDataReadObjectWithDialog(brEval *args, brEval *result, brInstance *bi) {
         return EC_OK;
     }
 
-    BRINT(result) = stXMLReadObjectFromFile(i, filename);
+    result->set( stXMLReadObjectFromFile(i, filename) );
 
     if(BRINT(result) < 0) {
         slMessage(DEBUG_ALL, "load failed for file \"%s\"\n", filename);

@@ -34,7 +34,7 @@ double stEmRandomGamma(int ithEvent);
 */
 
 int brIRandomGauss(brEval arguments[], brEval *result, brInstance *instance) {
-	BRDOUBLE(result)  = stEmRandomGauss();
+	result->set( stEmRandomGauss() );
 	// BRDOUBLE(result) = gsl_ran_gaussian( RNG, 1.0);
 	return EC_OK; 
 }
@@ -46,7 +46,7 @@ int brIRandomGauss(brEval arguments[], brEval *result, brInstance *instance) {
 */
 
 int brIRandomExponential(brEval arguments[], brEval *result, brInstance *instance) {
-	BRDOUBLE(result)  = stEmRandomExponential();
+	result->set( stEmRandomExponential() );
 	// BRDOUBLE(result)  = stEmRandomExponential(RNG);
 	return EC_OK; 
 }
@@ -59,7 +59,7 @@ int brIRandomExponential(brEval arguments[], brEval *result, brInstance *instanc
 
 int brIRandomGamma(brEval arguments[], brEval *result, brInstance *instance) {
 	int ithEvent = BRINT(&arguments[0]);
-	BRDOUBLE(result)  = stEmRandomGamma(ithEvent);
+	result->set( stEmRandomGamma(ithEvent) );
 	// BRDOUBLE(result) = gsl_ran_gamma(RNG, A, B);
   
 	return EC_OK; 
@@ -72,7 +72,7 @@ int brIRandomGamma(brEval arguments[], brEval *result, brInstance *instance) {
 */
 
 int brIIsinf(brEval args[], brEval *target, brInstance *i) {
-	BRINT(target) = isinf(BRDOUBLE(&args[0]));
+	target->set( isinf(BRDOUBLE(&args[0])) );
 	return EC_OK;
 }
 
@@ -84,7 +84,7 @@ int brIIsinf(brEval args[], brEval *target, brInstance *i) {
 
 int brILog(brEval arguments[], brEval *result, brInstance *instance) {
 	double x = BRDOUBLE(&arguments[0]);
-	BRDOUBLE(result) = log(x);  
+	result->set( log(x) ); 
 	return EC_OK; 
 }
 
@@ -95,7 +95,7 @@ int brILog(brEval arguments[], brEval *result, brInstance *instance) {
 */
 
 int brIIsnan(brEval args[], brEval *target, brInstance *i) {
-	BRINT(target) = isnan(BRDOUBLE(&args[0]));
+	target->set( isnan(BRDOUBLE(&args[0])) );
 	return EC_OK;
 }
 
@@ -106,7 +106,7 @@ int brIIsnan(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIAbs(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = fabs(BRDOUBLE(&args[0]));
+	target->set( fabs(BRDOUBLE(&args[0])) );
 	return EC_OK;
 }
 
@@ -117,7 +117,7 @@ int brIAbs(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISin(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = sin(BRDOUBLE(&args[0]));
+	target->set( sin(BRDOUBLE(&args[0])) );
 	return EC_OK;
 }
 
@@ -128,7 +128,7 @@ int brISin(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICos(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = cos(BRDOUBLE(&args[0]));
+	target->set( cos(BRDOUBLE(&args[0])) );
 	return EC_OK;
 }
 
@@ -139,7 +139,7 @@ int brICos(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brITan(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = tan(BRDOUBLE(&args[0]));
+	target->set( tan(BRDOUBLE(&args[0])) );
 	return EC_OK;
 }
 
@@ -150,7 +150,7 @@ int brITan(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIAsin(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = asin(BRDOUBLE(&args[0]));
+	target->set( asin(BRDOUBLE(&args[0])) );
 	return EC_OK;
 }
 
@@ -161,7 +161,7 @@ int brIAsin(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIAcos(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = acos(BRDOUBLE(&args[0]));
+	target->set( acos(BRDOUBLE(&args[0])) );
 	return EC_OK;
 }
 
@@ -172,7 +172,7 @@ int brIAcos(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIAtan(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = atan(BRDOUBLE(&args[0]));
+	target->set( atan(BRDOUBLE(&args[0])) );
 	return EC_OK;
 }
 
@@ -183,7 +183,7 @@ int brIAtan(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIAtan2(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = atan2(BRDOUBLE(&args[0]), BRDOUBLE(&args[1]));
+	target->set( atan2(BRDOUBLE(&args[0]), BRDOUBLE(&args[1])) );
 	return EC_OK;
 }
 
@@ -194,7 +194,7 @@ int brIAtan2(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISqrt(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = sqrt(BRDOUBLE(&args[0]));
+	target->set( sqrt(BRDOUBLE(&args[0])) );
 	return EC_OK;
 }
 
@@ -208,7 +208,7 @@ int brIDot(brEval args[], brEval *target, brInstance *i) {
 	slVector *a = &BRVECTOR(&args[0]);
 	slVector *b = &BRVECTOR(&args[1]);
 
-	BRDOUBLE(target) = slVectorDot(a, b);
+	target->set( slVectorDot(a, b) );
 
 	return EC_OK;
 }
@@ -223,7 +223,7 @@ int brIAngle(brEval args[], brEval *target, brInstance *i) {
 	slVector *a = &BRVECTOR(&args[0]);
 	slVector *b = &BRVECTOR(&args[1]);
 
-	BRDOUBLE(target) = slVectorAngle(a, b);
+	target->set( slVectorAngle(a, b) );
 
 	return EC_OK;
 }
@@ -237,8 +237,11 @@ int brIAngle(brEval args[], brEval *target, brInstance *i) {
 int brICross(brEval args[], brEval *target, brInstance *i) {
 	slVector *a = &BRVECTOR(&args[0]);
 	slVector *b = &BRVECTOR(&args[1]);
+	slVector v;
 
-	slVectorCross(a, b, &BRVECTOR(target));
+	slVectorCross( a, b, &v );
+
+	target->set( v );
 
 	return EC_OK;
 }
@@ -250,8 +253,8 @@ int brICross(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIMax(brEval args[], brEval *target, brInstance *i) {
-	if(BRDOUBLE(&args[0]) > BRDOUBLE(&args[1])) BRDOUBLE(target) = BRDOUBLE(&args[0]);
-	else BRDOUBLE(target) = BRDOUBLE(&args[1]);
+	if(BRDOUBLE(&args[0]) > BRDOUBLE(&args[1])) target->set( BRDOUBLE(&args[0]) );
+	else target->set( BRDOUBLE(&args[1]) );
 
 	return EC_OK;
 }
@@ -263,11 +266,22 @@ int brIMax(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIMin(brEval args[], brEval *target, brInstance *i) {
-	if(BRDOUBLE(&args[0]) < BRDOUBLE(&args[1])) BRDOUBLE(target) = BRDOUBLE(&args[0]);
-	else BRDOUBLE(target) = BRDOUBLE(&args[1]);
+	if(BRDOUBLE(&args[0]) < BRDOUBLE(&args[1])) target->set( BRDOUBLE(&args[0]) );
+	else target->set( BRDOUBLE(&args[1]) );
 
 	return EC_OK;
 }
+
+/**
+ * exp() wrapper
+ */
+
+int brIExp(brEval args[], brEval *target, brInstance *i) {
+	target->set( exp( BRDOUBLE(&args[0]) ) );
+
+	return EC_OK;
+}
+
 
 /*!
 	\brief Gives the transpose of an input matrix.
@@ -276,7 +290,12 @@ int brIMin(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brITranspose(brEval args[], brEval *target, brInstance *i) {
-	slMatrixTranspose(BRMATRIX(&args[0]), BRMATRIX(target));
+	slMatrix m;
+
+	slMatrixTranspose(BRMATRIX(&args[0]), m );
+
+	target->set( m );
+
 	return EC_OK;
 }
 
@@ -295,9 +314,9 @@ int brIStddev(brEval args[], brEval *target, brInstance *i) {
 	while(start) {
 		double value;
 
-		if(start->eval.type == AT_INT) {
+		if( start->eval.type() == AT_INT ) {
 			value = BRINT(&start->eval);
-		} else if(start->eval.type == AT_DOUBLE) {
+		} else if( start->eval.type() == AT_DOUBLE ) {
 			value = BRDOUBLE(&start->eval);
 		} else {
 			slMessage(DEBUG_ALL, "Internal function stddev expects a list of number values\n");
@@ -314,7 +333,7 @@ int brIStddev(brEval args[], brEval *target, brInstance *i) {
 	sum /= n;
 	top = sumsq - (n * sum * sum);
 
-	BRDOUBLE(target) = sqrt(top / (double)(n - 1));
+	target->set( sqrt(top / (double)(n - 1)) );
 
 	return EC_OK;
 }
@@ -330,6 +349,7 @@ void breveInitMathFunctions(brNamespace *n) {
 	brNewBreveCall(n, "tan", brITan, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "asin", brIAsin, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "acos", brIAcos, AT_DOUBLE, AT_DOUBLE, 0);
+	brNewBreveCall(n, "exp", brIExp, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "atan", brIAtan, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "atan2", brIAtan2, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "sqrt", brISqrt, AT_DOUBLE, AT_DOUBLE, 0);

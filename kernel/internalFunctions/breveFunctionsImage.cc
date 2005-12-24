@@ -47,7 +47,8 @@ struct brImageData {
 int brIImageGetWidth(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
 
-	BRINT(result) = dm->x;
+	result->set( dm->x );
+
 	return EC_OK;
 }
 
@@ -60,7 +61,8 @@ int brIImageGetWidth(brEval args[], brEval *result, brInstance *i) {
 int brIImageGetHeight(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
 
-	BRINT(result) = dm->y;
+	result->set( dm->y );
+
 	return EC_OK;
 }
 
@@ -85,7 +87,7 @@ int brIImageGetValueAtCoordinates(brEval args[], brEval *result, brInstance *i) 
 		return EC_OK;
 	}
 
-	BRDOUBLE(result) = dm->data[y * (dm->x * 4) + x] / 255.0;
+	result->set( dm->data[y * (dm->x * 4) + x] / 255.0 );
 
 	return EC_OK;
 }
@@ -151,7 +153,7 @@ int brIImageLoadFromFile(brEval args[], brEval *result, brInstance *i) {
 
 	if (!file) {
 		slMessage(DEBUG_ALL, "Error loading image file \"%s\": no such file\n", BRSTRING(&args[0]));
-		BRPOINTER(result) = NULL;
+		result->set( (void*)NULL );
 		return EC_OK;
 	}
 
@@ -163,13 +165,13 @@ int brIImageLoadFromFile(brEval args[], brEval *result, brInstance *i) {
 	if (!file) {
 		slMessage(DEBUG_ALL, "Error reading image from file \"%s\": unrecognized format or corrupt file\n", file);
 		slFree(file);
-		BRPOINTER(result) = NULL;
+		result->set( (void*)NULL );
 		return EC_OK;
 	}
 
 	slFree(file);
 
-	BRPOINTER(result) = dm;
+	result->set( (void*)dm );
 
 	return EC_OK;
 }
@@ -182,7 +184,7 @@ int brIImageUpdateTexture(brEval args[], brEval *result, brInstance *i) {
 	brImageData *image = BRIMAGEDATAPOINTER(&args[0]);
 
 	if (!image) {
-		BRINT(result) = -1;
+		result->set( -1 );
 		return EC_OK;
 	}
 
@@ -191,7 +193,7 @@ int brIImageUpdateTexture(brEval args[], brEval *result, brInstance *i) {
 
 	slUpdateTexture(i->engine->camera, image->textureNumber, image->data, image->x, image->y, GL_RGBA);
 
-	BRINT(result) = image->textureNumber;
+	result->set( image->textureNumber );
 
 	return EC_OK;
 }
@@ -212,7 +214,7 @@ int brIImageGetPixelPointer(brEval args[], brEval *result, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	BRPOINTER(result) = dm->data;
+	result->set( dm->data );
 
 	return EC_OK;
 }
@@ -229,7 +231,7 @@ int brIImageWriteToFile(brEval args[], brEval *result, brInstance *i) {
 	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
 
 	file = brOutputPath(i->engine, BRSTRING(&args[1]));
-	BRINT(result) = slPNGWrite(file, dm->x, dm->y, dm->data, 4, 1);
+	result->set( slPNGWrite(file, dm->x, dm->y, dm->data, 4, 1) );
 
 	slFree(file);
 #else
@@ -245,7 +247,7 @@ int brISnapshot(brEval args[], brEval *result, brInstance *i) {
 	char *f;
 
 	f = brOutputPath(i->engine, BRSTRING(&args[0]));
-	BRINT(result) = slPNGSnapshot(i->engine->world, i->engine->camera, f);
+	result->set( slPNGSnapshot(i->engine->world, i->engine->camera, f) );
 	slFree(f);
 
 	return EC_OK;
@@ -279,7 +281,7 @@ int brIImageDataInit(brEval args[], brEval *result, brInstance *i) {
 		for (x = 0; x < width; ++x)
 			dm->data[(y * width * 4) + (x * 4) + 3] = 255;
 
-	BRPOINTER(result) = dm;
+	result->set( dm );
 
 	return EC_OK;
 }

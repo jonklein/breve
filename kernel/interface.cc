@@ -110,9 +110,8 @@ brInstance *brClickCallback(brEngine *e, int n) {
 	
 	if(!method) return NULL;
 
-	theArg.type = AT_INSTANCE;
-	if(o) BRINSTANCE(&theArg) = (brInstance*)slWorldObjectGetCallbackData(o);
-	else BRINSTANCE(&theArg) = NULL;
+	if(o) theArg.set( (brInstance*)slWorldObjectGetCallbackData(o) );
+	else theArg.set( (brInstance*)NULL );
 
 	argPtr[0] = &theArg;
 	brMethodCall(e->controller, method, argPtr, &eval);
@@ -152,6 +151,7 @@ int brDragCallback(brEngine *e, int x, int y) {
 	brInstance *i;
 	int n;
 	unsigned char types[] = { AT_VECTOR };
+	slVector v;
 
 	pthread_mutex_lock(&e->lock);
 
@@ -185,7 +185,10 @@ int brDragCallback(brEngine *e, int x, int y) {
 		return n;
 	}
 
-	slVectorForDrag(e->world, e->camera, &BRVECTOR(&eval), x, y, &BRVECTOR(&theArg));
+	slVectorForDrag(e->world, e->camera, &BRVECTOR(&eval), x, y, &v );
+
+	theArg.set( v );
+	
 	method = brMethodFind(i->object, "move", types, 1);
 
 	if(!method) {
@@ -193,7 +196,6 @@ int brDragCallback(brEngine *e, int x, int y) {
 		return EC_ERROR;
 	}
 
-	theArg.type = AT_VECTOR;
 	argPtr[0] = &theArg;
 	n = brMethodCall(i, method, argPtr, &eval);
 
@@ -305,8 +307,7 @@ int brInterfaceCallback(brEngine *e, int interfaceID, char *string) {
 	char mname[128];
 
 	args = &a;
-	BRSTRING(args) = string;
-	args->type = AT_STRING;
+	a.set( string );
 
 	snprintf(mname, sizeof(mname), "catch-interface-id-%d", interfaceID);
 

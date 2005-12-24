@@ -2,7 +2,7 @@
 
 void slWorldObject::draw(slCamera *camera) {
 	if (shape)
-		shape->draw(camera, &position, textureScale, drawMode, 0);
+		shape->draw(camera, &position, textureScaleX, textureScaleY, drawMode, 0);
 }
 
 void slObjectLine::draw(slCamera *camera) {
@@ -70,8 +70,11 @@ void slWorldObjectSetTextureMode(slWorldObject *wo, int mode) {
 	wo->textureMode = mode;
 }
 
-void slWorldObjectSetTextureScale(slWorldObject *wo, double scale) {
-	wo->textureScale = scale;
+void slWorldObjectSetTextureScale(slWorldObject *wo, double sx, double sy) {
+	wo->textureScaleX = sx;
+	wo->textureScaleY = sy;
+
+	wo->shape->recompile();
 }
 
 void slWorldObjectSetBitmapRotation(slWorldObject *wo, double rot) {

@@ -18,7 +18,7 @@ Object : Real (aka Reals) [version 2.1] {
 		color (vector).
 		lines (list).
 
-		textureScale (float).
+		textureScaleX, textureScaleY (float).
 		neighborhoodSize (float).
 
 		eT (float).
@@ -30,7 +30,8 @@ Object : Real (aka Reals) [version 2.1] {
 		lightmap = -1.
 		bitmap = -1.
 
-		textureScale = 16.
+		textureScaleX = 16.
+		textureScaleY = 16.
 
 		self add-menu named "Delete Instance" for-method "delete-instance".
 		self add-menu named "Follow With Camera" for-method "watch".
@@ -280,7 +281,7 @@ Object : Real (aka Reals) [version 2.1] {
 
 		setDrawAsPoint(realWorldPointer, 1).
 
-	+ to set-texture-scale to scaleSize (int):
+	+ to set-texture-scale to scaleSize (float):
 		% Changes the "scale" of the texture.  When a texture is applied
 		% over a shape, this value is used to decide how large the texture
 		% will be in terms of breve-world units.  The default value is 16,
@@ -288,8 +289,21 @@ Object : Real (aka Reals) [version 2.1] {
 		% For smaller objects, this number will have to be decreased, or else
 		% the texture will be too big and will not be visible.
 
-		textureScale = scaleSize.
-		setTextureScale(realWorldPointer, scaleSize).
+		textureScaleX = scaleSize.
+		setTextureScale(realWorldPointer, scaleSize, scaleSize).
+
+	+ to set-texture-scale-x to scaleSize (float):
+		% Sets the texture scale in the X dimension.  The Y texture scale 
+		% value is unchanged.  See METHOD(set-texture-scale) for more information.
+
+		textureScaleX = scaleSize.
+		setTextureScale(realWorldPointer, scaleSize, textureScaleY).
+
+	+ to set-texture-scale-y to scaleSize (float):
+		% Sets the texture scale in the Y dimension.  The X texture scale 
+		% value is unchanged.  See METHOD(set-texture-scale) for more information.
+		textureScaleY = scaleSize.
+		setTextureScale(realWorldPointer, textureScaleX, scaleSize).
 
 	+ to set-bitmap-image to bitmapImage (object):
 		% Changes the bitmap of this object to bitmapImage, an instance of 
@@ -391,7 +405,8 @@ Object : Real (aka Reals) [version 2.1] {
 		if texture > -1: self set-texture to texture.
 		if lightmap > -1: self set-lightmap to lightmap.
 		if bitmap > -1: self set-bitmap to bitmap.
-		self set-texture-scale to textureScale.
+		self set-texture-scale-x to textureScaleX.
+		self set-texture-scale-y to textureScaleY.
 		self set-neighborhood-size to neighborhoodSize.
 
 		return (super dearchive).

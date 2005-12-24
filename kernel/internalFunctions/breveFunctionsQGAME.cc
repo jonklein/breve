@@ -10,7 +10,7 @@
 #include <qgame++.h>
 
 int brIQSysNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = (void *)new qgame::QSys;
+	target->set( new qgame::QSys );
 
 	return EC_OK;
 }
@@ -27,7 +27,7 @@ int brIQSysRunProgram(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIQProgramNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = (void *)new qgame::QProgram;
+	target->set( new qgame::QProgram );
 
 	return EC_OK;
 }
@@ -45,10 +45,10 @@ int brIQProgramAddInstruction(brEval args[], brEval *target, brInstance *i) {
 
 	try {
 		program->addInstruction(s);
-		BRINT(target) = 0;
+		target->set( 0 );
 	} catch(qgame::Error e) {
 		slMessage(DEBUG_ALL, "error adding QGAME instruction: %s\n", e.s.c_str());
-		BRINT(target) = 1;
+		target->set( 1 );
 	}
 
 	return EC_OK;
@@ -60,7 +60,7 @@ int brIQProgramGetString(brEval args[], brEval *target, brInstance *i) {
 
 	os << *program;
 
-	BRSTRING(target) = slStrdup((char *)os.str().c_str());
+	target->set( slStrdup((char *)os.str().c_str()) );
 
 	return EC_OK;
 }
@@ -118,27 +118,22 @@ int brIQSysTestProgram(brEval args[], brEval *target, brInstance *i) {
 
 	brEval eval;
 
-	eval.type = AT_INT;
-	BRINT(&eval) = result.misses;
+	eval.set( result.misses );
 	brEvalListInsert(list, list->count, &eval);
 
-	eval.type = AT_DOUBLE;
-	BRDOUBLE(&eval) = result.maxError;
+	eval.set( result.maxError );
 	brEvalListInsert(list, list->count, &eval);
 
-	eval.type = AT_DOUBLE;
-	BRDOUBLE(&eval) = result.avgError;
+	eval.set( result.avgError );
 	brEvalListInsert(list, list->count, &eval);
 
-	eval.type = AT_DOUBLE;
-	BRDOUBLE(&eval) = result.maxExpOracles;
+	eval.set( result.maxExpOracles );
 	brEvalListInsert(list, list->count, &eval);
 
-	eval.type = AT_DOUBLE;
-	BRDOUBLE(&eval) = result.avgExpOracles;
+	eval.set( result.avgExpOracles );
 	brEvalListInsert(list, list->count, &eval);
 
-	BRLIST(target) = list;
+	target->set( list );
 
 	return EC_OK;
 }

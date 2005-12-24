@@ -44,7 +44,7 @@ int brIGetAllPressedKeys(brEval args[], brEval *target, brInstance *i) {
 	
 	down[index] = 0;
 
-	BRSTRING(target) = slStrdup(down);
+	target->set( down );
 
 	return EC_OK;
 }
@@ -54,7 +54,7 @@ int brIGetAllPressedKeys(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetMouseX(brEval args[], brEval *target, brInstance *i) {
-	BRINT(target) = i->engine->mouseX;
+	target->set( i->engine->mouseX );
 	return EC_OK;
 }
 
@@ -63,7 +63,7 @@ int brIGetMouseX(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetMouseY(brEval args[], brEval *target, brInstance *i) {
-	BRINT(target) = i->engine->mouseY;
+	target->set( i->engine->mouseY );
 	return EC_OK;
 }
 
@@ -113,7 +113,7 @@ int brISystem(brEval args[], brEval *target, brInstance *i) {
         }
     } while(totalRead == PIPE_READ_SIZE);
 
-    BRSTRING(target) = result;
+	target->set( result );
 
     pclose(stream);
 
@@ -293,7 +293,7 @@ int brISetZClip(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetInterfaceVersion(brEval args[], brEval *target, brInstance *i) {
-    BRSTRING(target) = slStrdup(i->engine->interfaceTypeCallback());
+    target->set( i->engine->interfaceTypeCallback() );
     return EC_OK;
 }
 
@@ -308,11 +308,12 @@ int brIGetInterfaceVersion(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIDialogBox(brEval args[], brEval *target, brInstance *i) {
-    BRINT(target) = 0;
+    if(!i->engine->dialogCallback) {
+    	target->set( 0 );
+		return EC_OK;
+	}
 
-    if(!i->engine->dialogCallback) return EC_OK;
-
-    BRINT(target) = i->engine->dialogCallback(BRSTRING(&args[0]), BRSTRING(&args[1]), BRSTRING(&args[2]), BRSTRING(&args[3]));
+    target->set( i->engine->dialogCallback( BRSTRING(&args[0]), BRSTRING(&args[1]), BRSTRING(&args[2]), BRSTRING(&args[3]) ) );
 
     return EC_OK;
 }
@@ -338,7 +339,7 @@ int brIPlaySound(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetArgc(brEval args[], brEval *target, brInstance *i) {
-	BRINT(target) = i->engine->argc;
+	target->set( i->engine->argc );
 
 	return EC_OK;
 }
@@ -352,11 +353,10 @@ int brIGetArgc(brEval args[], brEval *target, brInstance *i) {
 int brIGetArgv(brEval args[], brEval *target, brInstance *i) {
 	if(BRINT(&args[0]) < 0 || BRINT(&args[0]) >= i->engine->argc) {
 		slMessage(DEBUG_ALL, "Request for command-line input argument %d is out of range\n", i->engine->argc);
-		target->type = AT_NULL;
 		return EC_ERROR;
 	}
 
-	BRSTRING(target) = slStrdup(i->engine->argv[BRINT(&args[0])]);
+	target->set( i->engine->argv[BRINT(&args[0])] );
 
 	return EC_OK;
 }
@@ -369,9 +369,9 @@ int brIGetArgv(brEval args[], brEval *target, brInstance *i) {
 
 int brISetInterfaceString(brEval args[], brEval *target, brInstance *i) {
 	if(i->engine->interfaceSetStringCallback) {
-		BRINT(target) = i->engine->interfaceSetStringCallback(BRSTRING(&args[0]), BRINT(&args[1]));
+		target->set( i->engine->interfaceSetStringCallback(BRSTRING(&args[0]), BRINT(&args[1])) );
 	} else {
-		BRINT(target) = 0;
+		target->set( 0 );
 	}
 
 	return EC_OK;
@@ -388,11 +388,11 @@ int brIGetWaveformData(brEval args[], brEval *target, brInstance *i) {
 	int sample = BRINT(&args[1]);
 
 	if(!i->engine->iTunesData || !i->engine->iTunesData->data || sample < 0 || sample > 511 || channel < 0 || channel > 1) {
-		BRINT(target) = 0;
+		target->set( 0 );
 		return EC_OK;
 	}
 
-	BRINT(target) = i->engine->iTunesData->data->waveformData[channel][sample];
+	target->set( i->engine->iTunesData->data->waveformData[channel][sample] );
 	return EC_OK;
 }
 
@@ -407,11 +407,11 @@ int brIGetSpectrumData(brEval args[], brEval *target, brInstance *i) {
 	int sample = BRINT(&args[1]);
 
 	if(!i->engine->iTunesData || !i->engine->iTunesData->data || sample < 0 || sample > 511 || channel < 0 || channel > 1) {
-		BRINT(target) = 0;
+		target->set( 0 );
 		return EC_OK;
 	}
 
-	BRINT(target) = i->engine->iTunesData->data->spectrumData[channel][sample];
+	target->set( i->engine->iTunesData->data->spectrumData[channel][sample] );
 	return EC_OK;
 }
 
@@ -422,7 +422,9 @@ int brIGetSpectrumData(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIUniqueColor(brEval args[], brEval *target, brInstance *i) {
-	brUniqueColor(&BRVECTOR(target), BRINT(&args[0]));
+	slVector v;
+	brUniqueColor( &v, BRINT(&args[0]) );
+	target->set( v );
 	return EC_OK;
 }
 
@@ -433,7 +435,9 @@ int brIUniqueColor(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIHSVtoRGB(brEval args[], brEval *target, brInstance *i) {
-	brHSVtoRGB(&BRVECTOR(&args[0]), &BRVECTOR(target));
+	slVector v;
+	brHSVtoRGB(&BRVECTOR(&args[0]), &v );
+	target->set( v );
 	return EC_OK;
 }
 
@@ -444,7 +448,9 @@ int brIHSVtoRGB(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIRGBtoHSV(brEval args[], brEval *target, brInstance *i) {
-	brRGBtoHSV(&BRVECTOR(&args[0]), &BRVECTOR(target));
+	slVector v;
+	brRGBtoHSV(&BRVECTOR(&args[0]), &v );
+	target->set( v );
 	return EC_OK;
 }
 
@@ -456,7 +462,11 @@ int brIRGBtoHSV(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIFindFile(brEval args[], brEval *target, brInstance *i) {
-	BRSTRING(target) = brFindFile(i->engine, BRSTRING(&args[0]), NULL);
+	char *file = brFindFile(i->engine, BRSTRING(&args[0]), NULL);
+	
+	target->set( file );
+
+	slFree( file );
 
 	return EC_OK;
 }
@@ -473,7 +483,7 @@ int brIGetRealTime(brEval args[], brEval *target, brInstance *i) {
 
 	seconds = now.tv_sec + now.tv_usec / 1000000.0;
 
-	BRDOUBLE(target) = seconds;
+	target->set( seconds );
 
 	return EC_OK;
 }

@@ -74,7 +74,8 @@ slTerrain::slTerrain(int res, double scale, void *data) : slWorldObject() {
 
 	xscale = scale;
 
-	textureScale = side;
+	textureScaleX = side;
+	textureScaleY = side;
 
 	_initialized = 0;
 
@@ -117,7 +118,8 @@ void slTerrain::resize(int s) {
 	delete _roam;
 	
 	side = slNextPowerOfTwo(s) + 1;
-	textureScale = side;
+	textureScaleX = side;
+	textureScaleY = side;
 
 	matrix = new float*[side];
 	fnormals[0] = new slVector*[side - 1];

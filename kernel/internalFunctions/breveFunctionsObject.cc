@@ -30,7 +30,7 @@
 */
 
 int brIObjectName(brEval args[], brEval *target, brInstance *i) {
-    BRSTRING(target) = slStrdup(BRINSTANCE(&args[0])->object->name);
+    target->set( BRINSTANCE(&args[0])->object->name );
 
     return EC_OK;
 }
@@ -50,7 +50,7 @@ int brIAddObserver(brEval args[], brEval *target, brInstance *bi) {
 	char *notification = BRSTRING(&args[1]);
 	char *method = BRSTRING(&args[2]);
 
-	BRINT(target) = brInstanceAddObserver(observedObject, bi, notification, method);
+	target->set( brInstanceAddObserver(observedObject, bi, notification, method) );
 
 	return EC_OK;
 }
@@ -135,11 +135,8 @@ int brINotify(brEval args[], brEval *target, brInstance *i) {
 
     observers = i->observers;
 
-    BRSTRING(&sEval) = notification;
-    sEval.type = AT_STRING;
-
-    BRINSTANCE(&iEval) = i;
-    iEval.type = AT_INSTANCE;
+    sEval.set( notification );
+    iEval.set( i );
 
     newargs[0] = &iEval;
     newargs[1] = &sEval;
@@ -158,8 +155,6 @@ int brINotify(brEval args[], brEval *target, brInstance *i) {
         observers = observers->next;
     }
 
-    slFree(BRSTRING(&sEval));
-
     return EC_OK;
 }
 
@@ -170,7 +165,7 @@ int brINotify(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetController(brEval args[], brEval *target, brInstance *i) {
-    BRINSTANCE(target) = i->engine->controller;
+    target->set( i->engine->controller );
     return EC_OK;
 }
 

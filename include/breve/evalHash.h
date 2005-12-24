@@ -27,14 +27,13 @@
 	forth, but I wouldn't want to say it's never going to happen.
 */
 
-struct brEvalHash {
-	slHash *table;
-	int retainCount;
-};
+class brEvalHash {
+	public:
+		brEvalHash();
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+		slHash *table;
+		int retainCount;
+};
 
 brEvalHash *brEvalHashNew(void);
 void brEvalHashFree(brEvalHash *);
@@ -48,9 +47,5 @@ void stRetainEvalHash(brEvalHash *);
 unsigned int brEvalHashFunction(void *, unsigned int);
 unsigned int brEvalHashCompareFunction(void *, void *);
 
-void brEvalHashLookup(brEvalHash *, brEval *, brEval *);
-void brEvalHashStore(brEvalHash *, brEval *, brEval *, brEval *);
-
-#ifdef __cplusplus
-}
-#endif
+int brEvalHashLookup(brEvalHash *, brEval *, brEval *);
+void brEvalHashStore(brEvalHash *, brEval *, brEval *);

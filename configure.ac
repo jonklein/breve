@@ -100,7 +100,7 @@ case ${host_os} in
 		ARCHIVE_SUFFIX="tar.gz"
 		PLATFORM="macosx"
 		AC_DEFINE([MACOSX], [1], [Mac OS X])
-		EXTRAOPTFLAGS="-mdynamic-no-pic -falign-loops=16"
+		EXTRAOPTFLAGS="-mdynamic-no-pic -falign-loops=16 -ftree-vectorize -funroll-loops"
 		;;
 
 	cygwin* | mingw* )
@@ -249,7 +249,7 @@ if test "x$engine_only" = "x"; then
 fi
 
 if test "x$static" = "x"; then 
-	
+	MISSING='xxx'
 fi
 
 AC_CHECK_LIB([png], [png_create_write_struct])

@@ -18,6 +18,8 @@ class slWorldObject;
 
 class slObjectConnection {
 	public:
+		virtual ~slObjectConnection() { };
+
 		virtual void draw(slCamera *c) = 0;
 		virtual void step(double timestep) = 0;
 
@@ -44,7 +46,7 @@ class slWorldObject {
 			drawMode = 0;
 			texture = 0;
 			textureMode = 0;
-			textureScale = 16;
+			textureScaleX = textureScaleY = 16;
 			simulate = 0;
 			_drawAsPoint = 0;
 
@@ -105,7 +107,7 @@ class slWorldObject {
 		float billboardRotation;
 		float alpha;
 	
-		float textureScale;
+		float textureScaleX, textureScaleY;
 
 		// bounding box information here is used for "proximity" data
 	
@@ -150,7 +152,7 @@ void slWorldObjectSetAlpha(slWorldObject *wo, double alpha);
 
 void slWorldObjectSetTexture(slWorldObject *wo, int texture);
 void slWorldObjectSetTextureMode(slWorldObject *wo, int mode);
-void slWorldObjectSetTextureScale(slWorldObject *wo, double scale);
+void slWorldObjectSetTextureScale(slWorldObject *wo, double scaleX, double scaleY);
 void slWorldObjectSetBitmapRotation(slWorldObject *wo, double rot);
 
 void slWorldObjectAddDrawMode(slWorldObject *wo, int mode);

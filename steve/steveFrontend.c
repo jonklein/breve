@@ -55,18 +55,9 @@ int stCallMethodBreveCallback(void *instanceData, void *methodData, brEval **arg
 
 	count = method->keywords.size();
 
-	previous = ri.instance->gcStack;
-
-	ri.instance->gcStack = &newStack;
-
 	ri.type = ri.instance->type;
 
 	r = stCallMethod(&ri, &ri, method, arguments, count, result);
-
-	stGCUnmark(ri.instance, result);
-
-	stGCCollectStack(ri.instance->gcStack);
-	ri.instance->gcStack = previous;
 
 	return r;
 }

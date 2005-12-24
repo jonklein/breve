@@ -38,8 +38,6 @@
 int brIMenuItemNew(brEval args[], brEval *target, brInstance *i) {
 	brInstance *m;
 
-	target->type = AT_POINTER;
-
 	if (!BRINSTANCE(&args[0])) {
 		slMessage(DEBUG_ALL, "addMenuItem called with uninitialized object\n");
 		return EC_ERROR;
@@ -47,7 +45,7 @@ int brIMenuItemNew(brEval args[], brEval *target, brInstance *i) {
 
 	m = BRINSTANCE(&args[0]);
 
-	BRPOINTER(target) = brAddMenuItem(m, BRSTRING(&args[1]), BRSTRING(&args[2]));
+	target->set( brAddMenuItem(m, BRSTRING(&args[1]), BRSTRING(&args[2])) );
     
 	if (i->engine->updateMenu)
 		i->engine->updateMenu(m);

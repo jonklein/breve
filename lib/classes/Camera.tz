@@ -69,6 +69,16 @@ Abstract : Camera (aka Cameras) [version 2.2] {
 		cameraTextSetEnabled(cameraPointer, 0).
 
   + section "Changing the Size, Position and Perspective of the Viewing Window"
+
+	+ to get-width:
+		% Returns the current camera width.
+
+		return cameraGetWidth( cameraPointer ).
+	
+	+ to get-height:
+		% Returns the current camera width.
+
+		return cameraGetHeight( cameraPointer ).
 	
 	+ to set-size with-height newHeight (double) with-width newWidth (double):
 		% Sets the size of the camera viewing area.

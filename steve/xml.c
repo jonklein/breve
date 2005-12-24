@@ -422,7 +422,7 @@ int stXMLPrintEval(stXMLArchiveRecord *record, FILE *file, char *name, brEval *t
 	int index;
 	char *data, *encoded;
 
-	switch(target->type) {
+	switch( target->type() ) {
 		case AT_LIST:
 			return stXMLPrintList(record, file, name, BRLIST(target), spaces);
 			break;
@@ -472,7 +472,7 @@ int stXMLPrintEval(stXMLArchiveRecord *record, FILE *file, char *name, brEval *t
 			fprintf(file, "<object name=\"%s\" index=\"%d\"/>\n", name, index);
 			break;
 		default:
-			slMessage(DEBUG_ALL, "warning: unknown atomic type (%d) while writing XML object\n", target->type);
+			slMessage( DEBUG_ALL, "warning: unknown atomic type (%d) while writing XML object\n", target->type() );
 			break;
 	}
 
@@ -895,28 +895,24 @@ void stXMLObjectStartElementHandler(void *userData, const XML_Char *name, const 
 
 			break;
 		case XP_LIST:
-			BRLIST(&state->eval) = brEvalListNew();
-			state->eval.type = AT_LIST;
+			state->eval.set( brEvalListNew() );
 			break;
 		case XP_HASH:
-			BRHASH(&state->eval) = brEvalHashNew();
-			state->eval.type = AT_HASH;
+			state->eval.set( brEvalHashNew() );
 			break;
 		case XP_OBJECT:
 			// we don't see the character data for this one 
-			state->eval.type = AT_INSTANCE;
 
 			steveInstance = parserState->indexToInstanceMap[ index];
 			if(steveInstance) {
-				BRINSTANCE(&state->eval) = steveInstance->breveInstance;
+				state->eval.set( steveInstance->breveInstance );
 			} else {
-				BRINSTANCE(&state->eval) = NULL;
+				state->eval.set( (brInstance*)NULL );
 			}
 
 			break;
 		case XP_POINTER:
-			BRINSTANCE(&state->eval) = 0;
-			state->eval.type = AT_POINTER;
+			state->eval.set( (void*)NULL );
 			break;
 		case XP_CLASS:
 			object = brObjectFind(parserState->engine, state->name);
@@ -984,9 +980,7 @@ void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
 	stXMLParserState *parserState = (stXMLParserState*)userData;
 	stXMLStackEntry *state = NULL, *lastState = NULL;
 	stRunInstance ri;
-	double x, y, z;
-	double *m;
-	stVar *v;
+	stVar *var;
 
 	if(parserState->error != 0) return;
 
@@ -995,7 +989,9 @@ void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
 	// finish up the current state by parsing the character string
 
 	if(state->string) {
-		// variable states, read into the eval 
+		slVector v;
+		slMatrix m;
+		char *str;
 
 		switch(state->state) {
 			case XP_INSTANCE:
@@ -1003,39 +999,32 @@ void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
 					brEngineSetController(parserState->engine, parserState->currentInstance->breveInstance);
 				break;
 			case XP_DATA:
-				state->eval.type = AT_DATA;
-				BRDATA(&state->eval) = brDataHexDecode(state->string);
+				state->eval.set( brDataHexDecode(state->string) );
 				break;
 			case XP_POINTER:
-				state->eval.type = AT_POINTER;
-				BRPOINTER(&state->eval) = NULL;
+				state->eval.set( (void*)NULL );
 				break;
 			case XP_INT:
-				state->eval.type = AT_INT;
-				BRINT(&state->eval) = atoi(state->string);
+				state->eval.set( atoi(state->string) );
 				break;
 			case XP_DOUBLE:
-				state->eval.type = AT_DOUBLE;
-				BRDOUBLE(&state->eval) = atof(state->string);
+				state->eval.set( atof(state->string) );
 				break;
 			case XP_STRING:
-				state->eval.type = AT_STRING;
-				BRSTRING(&state->eval) = stXMLDecodeString(state->string);
+				str = stXMLDecodeString(state->string);
+				state->eval.set( str );
+				slFree( str );
 				break;
 			case XP_VECTOR:
-				state->eval.type = AT_VECTOR;
-				sscanf(state->string, "(%lf, %lf, %lf)", &x, &y, &z);
-				BRVECTOR(&state->eval).x = x;
-				BRVECTOR(&state->eval).y = y;
-				BRVECTOR(&state->eval).z = z;
+				sscanf(state->string, "(%lf, %lf, %lf)", &v.x, &v.y, &v.z);
+				state->eval.set( v );
+
 				break;
 			case XP_MATRIX:
-				state->eval.type = AT_MATRIX;
-				m = &BRMATRIX(&state->eval)[0][0];
-				sscanf(state->string, "[ (%lf, %lf, %lf), (%lf, %lf, %lf), (%lf, %lf, %lf) ]", &m[0], &m[1], &m[2], &m[3], &m[4], &m[5], &m[6], &m[7], &m[8]);
+				sscanf( state->string, "[ (%lf, %lf, %lf), (%lf, %lf, %lf), (%lf, %lf, %lf) ]", &m[0][0], &m[0][1], &m[0][2], &m[1][0], &m[1][1], &m[1][2], &m[2][0], &m[2][1], &m[2][2] );
+				state->eval.set( m );
 				break;
 			default:
-				state->eval.type = AT_NULL;
 				slMessage(DEBUG_ALL, "warning: unknown tag (%d) while parsing XML\n", state->state);
 				break;
 		}
@@ -1059,17 +1048,15 @@ void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
 					stInstance *i = parserState->currentInstance;
 					stVar *var;
 
-					var = stObjectLookupVariable(i->type, lastState->name);
+					var = stObjectLookupVariable( i->type, lastState->name );
 
-					if(var && lastState->eval.type) {
+					if(var && lastState->eval.type() ) {
 						stRunInstance ri;
 
 						ri.instance = parserState->currentInstance;
 						ri.type = ri.instance->type;
 
 						stSetVariable(&parserState->currentInstance->variables[var->offset], var->type->type, NULL, &lastState->eval, &ri);	
-
-						// stGCCollect(&lastState->eval);
 					}
 				}
 				break;
@@ -1081,26 +1068,21 @@ void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
 				if(lastState->state == XP_KEY) {
 					brEvalCopy(&lastState->eval, &state->key);
 				} else if(lastState->state == XP_VALUE) {
-					brEvalHashStore(BRHASH(&state->eval), &state->key, &lastState->eval, NULL);
+					brEvalHashStore( BRHASH(&state->eval), &state->key, &lastState->eval );
 				}
-
-				stGCRetain(&lastState->eval);
-				stGCCollect(&lastState->eval);
 
 				break;
 			case XP_LIST:
 				brEvalListInsert(BRLIST(&state->eval), BRLIST(&state->eval)->count, &lastState->eval);
-				stGCRetain(&lastState->eval);
-				stGCCollect(&lastState->eval);
 
 				break;
 			case XP_ARRAY:
-				v = state->variable;
+				var = state->variable;
 
 				ri.instance = parserState->currentInstance;
 				ri.type = ri.instance->type; 
 
-				stSetVariable(&parserState->currentInstance->variables[v->offset + state->arrayIndex * stSizeofAtomic(v->type->arrayType)], v->type->arrayType, NULL, &lastState->eval, &ri);	
+				stSetVariable(&parserState->currentInstance->variables[var->offset + state->arrayIndex * stSizeofAtomic(var->type->arrayType)], var->type->arrayType, NULL, &lastState->eval, &ri);	
 
 				state->arrayIndex++;
 				break;

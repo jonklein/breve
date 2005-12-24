@@ -98,22 +98,41 @@ void slText(double, double, const char *, void *);
 void slStrokeText(double, double, const char *, double, void *);
 
 void slDrawLights(slCamera *, int);
-void slShadowMatrix(GLfloat [4][4], slPlane *, slVector *);
 
-void slDrawShape(slCamera *, slShape *, slPosition *, double, int, int);
+/**
+ * Computes the flat shadow matrix for a plane and lightsource.
+ * @param[out] matrix      The resulting shadow matrix.
+ * @param[in] shadowPlane  The plane catching the shadows.
+ * @param[in] lightSource  The location of the light source.
+ */
 
-int slCompileShape(slShape *, int, double, int);
-void slRenderShape(slShape *, int, double, int);
+void slShadowMatrix(GLfloat matrix[4][4], slPlane *shadowPlane, slVector *lightSource);
+
+int slCompileShape(slShape *, int, int);
+void slRenderShape(slShape *, int, int);
 void slDrawAxis(double, double);
 
 void slProcessBillboards(slWorld *, slCamera *);
 void slRenderBillboards(slCamera *, int);
-void slDrawFace(slFace *, int, double, int);
 
-int slBreakdownFace(slFace *, double);
-void slBreakdownTriangle(slVector *, double, int, slVector *, slVector *);
+void slDrawFace(slFace *face, int drawMode, int flags);
 
-int slCompileBox(void);
+/**
+ * Recursively breaks down a face for rendering.
+ * @param[in] face  The face to break down.
+ */
+
+int slBreakdownFace(slFace *face);
+
+/**
+ * Recursively breaks down a triangle into smaller polygons.
+ * @param[in] vertices       The 3 vertices defining the triangle.
+ * @param[in] level          The current recursion depth.
+ * @param[in] xaxis          A unit vector along the X axis for texturing.
+ * @param[in] yaxis          A unit vector along the Y axis for texturing.
+ */
+
+void slBreakdownTriangle(slVector *vertices, int depth, slVector *xaxis, slVector *yaxis);
 
 void slGlError(void);
 

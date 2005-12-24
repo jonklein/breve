@@ -19,13 +19,22 @@
 
 /**
  *  @file bigMatrix.cc
- *  @breif A large matrix manipulation class.
+ *  @brief A large matrix manipulation class.
  *  @author Eric DeWitt
  *  Copyright (C) 2005 Eric DeWitt, Jonathan Klein
  */
 
 #include "util.h"
 #include "bigMatrix.hh"
+
+/**
+ * A custom GSL Error handler to trigger an abort in a breve simulation
+ * without exiting the program.
+ */
+
+void slGSLErrorHandler (const char * reason, const char * file, int line, int gsl_errno) {
+	throw slException( std::string( "GSL Error" ) );
+}
 
 /**
  *  slVectorViewGSL vector length constructor.
@@ -503,6 +512,12 @@ slBigVectorGSL& slBigMatrix2DGSL::vectorMultiply(const slVectorViewGSL& vector) 
 slBigMatrix2DGSL& slBigMatrix2DGSL::vectorMultiplyInto(const slVectorViewGSL& sourceVector, slVectorViewGSL& resultVector)
 {
     gsl_blas_sgemv(CblasNoTrans, 1.0, _matrix, sourceVector.getGSLVector(), 0.0, resultVector.getGSLVector());
+    return *this;
+}
+
+slBigMatrix2DGSL& slBigMatrix2DGSL::matrixMultiplyInto(const slBigMatrix2DGSL& sourceMatrix, slBigMatrix2DGSL& resultMatrix)
+{
+    gsl_blas_sgemm(CblasNoTrans, CblasNoTrans, 1.0, _matrix, sourceMatrix._matrix, 0.0, resultMatrix._matrix);
     return *this;
 }
 

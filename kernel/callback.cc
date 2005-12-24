@@ -119,8 +119,7 @@ void brCollisionCallback(void *p1, void *p2, int type) {
 		if(o2->object->type == h->object->type && o2->object->type->isSubclass(o2->object->userData, h->object->userData)) {
 			meth = h->method;
 
-			collider.type = AT_INSTANCE;
-			BRINSTANCE(&collider) = o2;
+			collider.set( o2 );
 			argPtr[0] = &collider;
 
 			if(brMethodCall(o1, meth, argPtr, &result) == EC_ERROR) {
@@ -128,7 +127,7 @@ void brCollisionCallback(void *p1, void *p2, int type) {
 				return;
 			}
 
-			if(result.type == AT_INT && BRINT(&result)) return;
+			if( result.type() == AT_INT && BRINT(&result) ) return;
 		}
 	}
 
@@ -143,8 +142,7 @@ void brCollisionCallback(void *p1, void *p2, int type) {
 		if(o1->object->type == h->object->type && o1->object->type->isSubclass(o1->object->userData, h->object->userData)) {
 			meth = h->method;
 
-			collider.type = AT_INSTANCE;
-			BRINSTANCE(&collider) = o1;
+			collider.set( o1 );
 			argPtr[0] = &collider;
 
 			if(brMethodCall(o2, meth, argPtr, &result) == EC_ERROR) {
@@ -152,7 +150,7 @@ void brCollisionCallback(void *p1, void *p2, int type) {
 				return;
 			}
 
-			if(result.type == AT_INT && BRINT(&result)) return;
+			if( result.type() == AT_INT && BRINT(&result) ) return;
 		}
 	}
 }

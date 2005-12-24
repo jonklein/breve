@@ -66,16 +66,15 @@ brEvalListHead *stDoEvalListDeepCopyGC(brEvalListHead *l, slList **s) {
 
 		/* is this a list? have we seen it before? */
 
-		if(item->eval.type == AT_LIST) {
+		if( item->eval.type() == AT_LIST ) {
 			copy = brCopyRecordInList(*s, BRLIST(&item->eval));
-			newSubList.type = AT_LIST;
 
 			if(!copy) {
-				BRLIST(&newSubList) = brDoEvalListDeepCopy(BRLIST(&item->eval), s);
+				newSubList.set( brDoEvalListDeepCopy(BRLIST(&item->eval), s) );
 				brEvalListInsert(newList, newList->count, &newSubList);
 				stGCRetain(&newSubList);
 			} else {
-				BRLIST(&newSubList) = copy;
+				newSubList.set( copy );
 				brEvalListInsert(newList, newList->count, &newSubList);
 				stGCRetain(&newSubList);
 			}

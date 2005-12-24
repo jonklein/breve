@@ -178,11 +178,8 @@ int stProcessString(stStringExp *s, stRunInstance *i, brEval *target) {
 	unsigned int n; 
 	int length, currentPosition;
 
-	target->type = AT_STRING;
-
 	if(s->substrings.size() == 0) {
-		BRSTRING(target) = slStrdup(s->string);
-		stGCMark(i->instance, target);
+		target->set( s->string );
 		return EC_OK;
 	}
 
@@ -220,9 +217,9 @@ int stProcessString(stStringExp *s, stRunInstance *i, brEval *target) {
 
 	strcat(newstr, &s->string[currentPosition]);
 
-	BRSTRING(target) = newstr;
+	target->set( newstr );
 
-	stGCMark(i->instance, target);
+	slFree( newstr );
 
 	return EC_OK;
 }

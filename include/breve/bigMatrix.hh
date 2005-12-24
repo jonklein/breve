@@ -248,6 +248,7 @@ class slVectorView {
 
 class slBigVector {
     public:
+		virtual ~slBigVector() { };
     
         virtual float get(const int x) const = 0;
 
@@ -259,7 +260,10 @@ class slBigVector {
  *  slBigMatrix is the super class for 2 and 3 dimensional matricies
  */
 class slBigMatrix {
-    
+	public:
+		// need a virtual destructor
+
+		virtual ~slBigMatrix() { };
 };
 
 class slBigVectorGSL;   // forward declaration protection
@@ -271,7 +275,6 @@ class slBigMatrix2DGSL; // forward declaration protection
  */
 class slBigMatrix2D : public slBigMatrix {
 	public:
-	
         virtual unsigned int xDim() const = 0;
         
         virtual unsigned int yDim() const = 0;
@@ -594,6 +597,8 @@ class slBigMatrix2DGSL : public slBigMatrix2D, public slVectorViewGSL {
         slBigVectorGSL& vectorMultiply(const slVectorViewGSL& vector) const;
 
         slBigMatrix2DGSL& vectorMultiplyInto(const slVectorViewGSL& sourceVector, slVectorViewGSL& resultVector);
+
+        slBigMatrix2DGSL& matrixMultiplyInto(const slBigMatrix2DGSL& sourceMatrix, slBigMatrix2DGSL& resultMatrix);
         
         slBigMatrix2DGSL& vectorMultiplyInto(const slVectorViewGSL& sourceVector, const float scalar, slVectorViewGSL& resultVector);
 

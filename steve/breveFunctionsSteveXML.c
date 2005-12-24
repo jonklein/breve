@@ -9,7 +9,7 @@ int stCWriteXMLEngine(brEval args[], brEval *target, brInstance *i) {
 	char *filename = BRSTRING(&args[0]);
 	char *path = brOutputPath(i->engine, filename);
 
-	BRINT(target) = stXMLWriteSimulationToFile(path, i->engine);
+	target->set( stXMLWriteSimulationToFile(path, i->engine) );
 	slFree(path);
 
 	return EC_OK;
@@ -23,7 +23,7 @@ int stCArchiveXMLObject(brEval args[], brEval *target, brInstance *i) {
 	char *filename = BRSTRING(&args[1]);
 	char *path = brOutputPath(i->engine, filename);
 
-	BRINT(target) = stXMLWriteObjectToFile((stInstance*)(BRINSTANCE(&args[0])->userData), path, 0);
+	target->set( stXMLWriteObjectToFile((stInstance*)(BRINSTANCE(&args[0])->userData), path, 0) );
 	slFree(path);
 
 	return EC_OK;
@@ -39,7 +39,7 @@ int stCDearchiveXMLObject(brEval args[], brEval *target, brInstance *i) {
 
 	if(!filename) {
 		slMessage(DEBUG_ALL, "Cannot locate file \"%s\" for object dearchive\n", BRSTRING(&args[0]));
-		BRINSTANCE(target) = NULL;
+		target->set( (brInstance*)NULL );
 		return EC_OK;
 	}
 
@@ -47,11 +47,11 @@ int stCDearchiveXMLObject(brEval args[], brEval *target, brInstance *i) {
 
 	if(!si) {
 		slMessage(DEBUG_ALL, "error decoding XML message from file\n");
-		BRINSTANCE(target) = NULL;
+		target->set( (brInstance*)NULL );
 		return EC_ERROR;
 	}
 
-	BRINSTANCE(target) = si->breveInstance;
+	target->set( si->breveInstance );
 
 	slFree(filename);
 
@@ -67,11 +67,11 @@ int stCDearchiveXMLObjectFromString(brEval args[], brEval *target, brInstance *i
 
 	if(!si) {
 		slMessage(DEBUG_ALL, "error decoding XML message from string\n");
-		BRINSTANCE(target) = NULL;
+		target->set( (brInstance*)NULL );
 		return EC_ERROR;
 	}
 
-	 BRINSTANCE(target) = si->breveInstance;
+	 target->set( si->breveInstance );
 
 	 return EC_OK;
 }

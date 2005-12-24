@@ -32,7 +32,7 @@ int brITerrainNew(brEval args[], brEval *target, brInstance *i) {
 
 	slWorldAddObject(i->engine->world, t, WO_TERRAIN);
 
-	BRPOINTER(target) = t;
+	target->set( t );
 
 	return EC_OK;
 }
@@ -89,7 +89,7 @@ int brITerrainGetHeight(brEval args[], brEval *target, brInstance *i) {
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
-	BRDOUBLE(target) = slTerrainGetHeight(t, x, y);
+	target->set( slTerrainGetHeight(t, x, y) );
 
 	return EC_OK;
 }
@@ -99,7 +99,7 @@ int brITerrainGetHeightAtLocation(brEval args[], brEval *target, brInstance *i) 
 	double x = BRDOUBLE(&args[1]);
 	double y = BRDOUBLE(&args[2]);
 
-	BRDOUBLE(target) = t->getHeightAtLocation(x, y);
+	target->set( t->getHeightAtLocation(x, y) );
 
 	return EC_OK;
 }
@@ -111,8 +111,7 @@ int brITerrainGetSlope(brEval args[], brEval *target, brInstance *i) {
 	// double x2 = BRDOUBLE(&args[3]);
 	// double y2 = BRDOUBLE(&args[4]);
 
-	if (!t)
-		return EC_OK;
+	if (!t) return EC_OK;
 
 	// slTerrainGetSlope(t, x1, y1, x2, y2, &BRVECTOR(target));
 

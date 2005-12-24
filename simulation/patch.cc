@@ -314,8 +314,9 @@ void slPatchGrid::assignObjectsToPatches(slWorld *w) {
 }
 
 /**
- *	\brief Copies the contents of a 3D matrix to one z-slice of a PatchGrid.
+ * Copies the contents of a 3D matrix to one z-slice of a PatchGrid.
  */
+
 void slPatchGrid::copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double scale) {
 	int x, y, z;
 	int xSize, ySize, zSize;
@@ -332,15 +333,20 @@ void slPatchGrid::copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double
 	ySize = m->yDim();
 	zSize = m->zDim(); 
     
-	for(z = 0; z < zSize; z++ )
-	{
+	for(z = 0; z < zSize; z++ ) {
+
+		int zOff = (z * zStride);
+
 		for(x = 0; x < xSize; x++ )
 		{
 			// unsigned int crowOffset = ;
 			for(y = 0; y < ySize; y++ )
 			{
-				this->colors[(z * zStride) + (y * yStride) + (x << 2) + channel] = 
-					(unsigned char)(255 * scale * mData[ (z * chemXY) + (x * chemTDA) + y ]);
+				float value = scale * mData[ (z * chemXY) + (x * chemTDA) + y ];
+
+				if( value > 1.0 ) value = 1.0;
+
+				this->colors[zOff + (y * yStride) + (x << 2) + channel] = (unsigned char)(255 * value);
             }
 		}
 	}
@@ -383,7 +389,7 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 
 	glEnable(GL_BLEND);
 
-	for(z=0;z<zSize;z++) {
+	for(z=0;z<(int)zSize;z++) {
 		if(z < zMid) zVal = z;
 		else zVal = (zSize - 1) - (z - zMid);
 
@@ -395,7 +401,7 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 
 			translation.x = startPosition.x + patchSize.x * xVal;
 
-			for(y=0;y<ySize;y++) {
+			for(y=0;y<(int)ySize;y++) {
 				if(y < yMid) yVal = y;
 				else yVal = (ySize - 1) - (y - yMid);
 

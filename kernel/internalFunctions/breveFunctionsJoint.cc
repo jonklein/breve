@@ -81,8 +81,7 @@ int brJointILinkRevolute(brEval args[], brEval *target, brInstance *i) {
 
 	slWorldSetUninitialized(i->engine->world);
 
-	BRPOINTER(target) = joint;
-	target->type = AT_POINTER;
+	target->set( joint );
 	
 	return EC_OK;
 }   
@@ -156,8 +155,7 @@ int brJointILinkPrismatic(brEval args[], brEval *target, brInstance *i) {
 
 	slWorldSetUninitialized(i->engine->world);
 
-	BRPOINTER(target) = joint;
-	target->type = AT_POINTER;
+	target->set( joint );
 	
 	return EC_OK;
 }
@@ -190,8 +188,7 @@ int brJointILinkBall(brEval args[], brEval *target, brInstance *i) {
 
 	slWorldSetUninitialized(i->engine->world);
 
-	BRPOINTER(target) = joint;
-	target->type = AT_POINTER;
+	target->set( joint );
 	
 	return EC_OK;
 }
@@ -224,8 +221,7 @@ int brJointILinkUniversal(brEval args[], brEval *target, brInstance *i) {
 
 	slWorldSetUninitialized(i->engine->world);
 
-	BRPOINTER(target) = joint;
-	target->type = AT_POINTER;
+	target->set( joint );
 	
 	return EC_OK;
 }
@@ -255,8 +251,7 @@ int brJointILinkStatic(brEval args[], brEval *target, brInstance *i) {
 
 	slWorldSetUninitialized(i->engine->world);
 
-	BRPOINTER(target) = joint;
-	target->type = AT_POINTER;
+	target->set( joint );
 	
 	return EC_OK;
 }

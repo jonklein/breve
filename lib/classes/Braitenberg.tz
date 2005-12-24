@@ -86,7 +86,7 @@ MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
 
 		joint = new RevoluteJoint.
 
-		joint set-relative-rotation around-axis (1, 0, 0) by 1.57.
+		joint set-relative-rotation around-axis (1, 0, 0) by 1.5708.
 		joint link parent bodyLink to-child wheel with-normal (0, 0, 1)
 					with-parent-point location with-child-point (0, 0, 0).
 
@@ -94,7 +94,7 @@ MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
 		wheel set-texture to 0.
 		wheel set-joint to joint.
 		joint set-strength-limit to (joint get-strength-hard-limit).
-		wheel set-color to (.3, .2, .2).
+		wheel set-color to (.6, .6, .6).
 		wheel set-mu to 100000.
 
 		self add-dependency on joint.

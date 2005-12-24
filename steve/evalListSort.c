@@ -150,8 +150,6 @@ int brEvalListCompare(const void *a, const void *b) {
 
 	/* pass the two evals as arguments to the sort method */
 
-	result.type = AT_NULL;
-	
 	ri.instance = gSortObject;
 	ri.type = gSortObject->type;
 
@@ -162,7 +160,7 @@ int brEvalListCompare(const void *a, const void *b) {
 
 	/* convert the answer to an AT_DOUBLE */
 
-	if (result.type != AT_DOUBLE) {
+	if ( result.type() != AT_DOUBLE ) {
 		rcode = stToDouble(&result, &result, &ri);
 		if (rcode == EC_ERROR)
 			gEvalListSortError = 1;

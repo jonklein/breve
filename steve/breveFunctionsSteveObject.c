@@ -123,14 +123,14 @@ int stOIsa(brEval args[], brEval *target, brInstance *bi) {
 
 	while(io) {
 		if(o == io) {
-			BRINT(target) = 1;
+			target->set( 1 );
 			return EC_OK;
 		}
 
 		io = io->super;
 	}
 
-	BRINT(target) = 0;
+	target->set( 0 );
 	return EC_OK;
 }
 
@@ -142,12 +142,8 @@ int stORespondsTo(brEval args[], brEval *target, brInstance *i) {
 	stInstance *instance = (stInstance*)BRINSTANCE(&args[0])->userData;
 	char *method = BRSTRING(&args[1]);
 
-	target->type = AT_INT;
-
-	if( stFindInstanceMethodWithMinArgs( instance->type, method, 0, NULL)) 
-		BRINT(target) = 1;
-	else 
-		BRINT(target) = 0;
+	if( stFindInstanceMethodWithMinArgs( instance->type, method, 0, NULL)) target->set( 1 );
+	else target->set( 0 );
 
 	return EC_OK;
 }
@@ -170,7 +166,7 @@ int stOSetGC(brEval args[], brEval *target, brInstance *bi) {
 
 int stOGetRetainCount(brEval args[], brEval *target, brInstance *bi) {
 	stInstance *i = (stInstance*)bi->userData;
-	BRINT(target) = i->retainCount;
+	target->set( i->retainCount );
 	return EC_OK;
 }
 
@@ -190,7 +186,7 @@ int stNewInstanceForClassString(brEval args[], brEval *target, brInstance *bi) {
 		return EC_ERROR;
 	} 
 
-	BRINSTANCE(target) = stInstanceCreateAndRegister(i->type->steveData, bi->engine, o);
+	target->set( stInstanceCreateAndRegister(i->type->steveData, bi->engine, o) );
     
 	return EC_OK;
 }   
@@ -245,7 +241,7 @@ int stNSendXMLObject(brEval *args, brEval *target, brInstance *i) {
 	stXMLWriteObjectToStream((stInstance*)archive->userData, file, 0);
 	buffer = slCloseStringStream(xmlBuffer);
 
-	BRINT(target) = stSendXMLString(addr, port, buffer);
+	target->set( stSendXMLString(addr, port, buffer) );
 
 	slFree(buffer);
 
@@ -279,9 +275,10 @@ int stIAddDependency(brEval args[], brEval *target, brInstance *i) {
 */
 
 int stIRemoveDependency(brEval args[], brEval *target, brInstance *i) {
-	if( !BRINSTANCE(&args[0]) ) return;
+	if( !BRINSTANCE(&args[0]) ) return EC_OK;
 
 	stInstanceRemoveDependency((stInstance*)i->userData, (stInstance*)BRINSTANCE(&args[0])->userData);
+
 	return EC_OK;
 }
 

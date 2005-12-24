@@ -48,7 +48,7 @@ typedef slBigVectorGSL brVector;
 #endif
 
 int brIVectorNew(brEval args[], brEval *target, brInstance *i) {
-    BRPOINTER(target) = new brVector(BRINT(&args[0]));
+    target->set( new brVector(BRINT(&args[0])) );
     
     return EC_OK;
 }
@@ -58,7 +58,7 @@ int brIVectorFree(brEval args[], brEval *target, brInstance *i) {
     return EC_OK;
 }
 int brIVectorGet(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = double(BRBIGVECTOR(&args[0])->get(BRINT(&args[1])));
+	target->set( double(BRBIGVECTOR(&args[0])->get(BRINT(&args[1]))) );
 
 	return EC_OK;
 }
@@ -89,7 +89,7 @@ int brIVectorCopy(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIVectorGetAbsoluteSum(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = double(static_cast<slVectorViewGSL*>(BRBIGVECTOR(&args[0]))->absoluteSum());
+	target->set( double(static_cast<slVectorViewGSL*>(BRBIGVECTOR(&args[0]))->absoluteSum()) );
 
 	return EC_OK;
 }
@@ -127,8 +127,8 @@ int brIVectorCopyToImage(brEval args[], brEval *result, brInstance *i) {
 	int offset = BRINT(&args[2]);
 	int r;
 	int x, y, xmax, ymax;
-    int yStride = d->x * 4;
-    int xStride = d->y * 4;
+    // int yStride = d->x * 4;
+    // int xStride = d->y * 4;
 
 	xmax = sourceVector->dim();
 	ymax = d->y;

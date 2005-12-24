@@ -259,8 +259,11 @@ header
 		brEval *e;
 
 		e = new brEval;
-		e->type = AT_STRING;
-		BRSTRING(e) = slDequote($4);
+	
+		char *str = slDequote($4);
+		e->set( str );
+
+		slFree(str);
 
 		steveData->defines[ $3] = e;
 
@@ -271,8 +274,7 @@ header
 		brEval *e;
 
 		e = new brEval;
-		e->type = AT_DOUBLE;
-		BRDOUBLE(e) = $4;
+		e->set( $4 );
 
 		steveData->defines[ $3] = e;
 
@@ -282,8 +284,7 @@ header
 		brEval *e;
 
 		e = new brEval;
-		e->type = AT_INT;
-		BRINT(e) = $4;
+		e->set( $4 );
 
 		steveData->defines[ $3] = e;
 
@@ -308,13 +309,15 @@ header
 vector_value
 : '(' number ',' number ',' number ')'  {
 		brEval *e;
+		slVector v;
 
 		e = new brEval;
-		e->type = AT_VECTOR;
 
-		BRVECTOR(e).x = stDoubleFromIntOrDoubleExp($2); delete $2;
-		BRVECTOR(e).y = stDoubleFromIntOrDoubleExp($4); delete $4;
-		BRVECTOR(e).z = stDoubleFromIntOrDoubleExp($6); delete $6;
+		v.x = stDoubleFromIntOrDoubleExp($2); delete $2;
+		v.y = stDoubleFromIntOrDoubleExp($4); delete $4;
+		v.z = stDoubleFromIntOrDoubleExp($6); delete $6;
+
+		e->set( v );
 
 		$$ = e;
 	}
@@ -324,20 +327,23 @@ matrix_value
 : '[' '(' number ',' number ',' number ')' ',' '(' number ',' number ',' number ')' ',' '(' number ',' number ',' number ')' ']' {
 		brEval *e;
 
+		double m[3][3];
+
 		e = new brEval;
-		e->type = AT_MATRIX;
 
-		BRMATRIX(e)[0][0] = stDoubleFromIntOrDoubleExp($3); delete $3;
-		BRMATRIX(e)[0][1] = stDoubleFromIntOrDoubleExp($5); delete $5;
-		BRMATRIX(e)[0][2] = stDoubleFromIntOrDoubleExp($7); delete $7;
+		m[0][0] = stDoubleFromIntOrDoubleExp($3); delete $3;
+		m[0][1] = stDoubleFromIntOrDoubleExp($5); delete $5;
+		m[0][2] = stDoubleFromIntOrDoubleExp($7); delete $7;
 		
-		BRMATRIX(e)[1][0] = stDoubleFromIntOrDoubleExp($11); delete $11;
-		BRMATRIX(e)[1][1] = stDoubleFromIntOrDoubleExp($13); delete $13;
-		BRMATRIX(e)[1][2] = stDoubleFromIntOrDoubleExp($15); delete $15;
+		m[1][0] = stDoubleFromIntOrDoubleExp($11); delete $11;
+		m[1][1] = stDoubleFromIntOrDoubleExp($13); delete $13;
+		m[1][2] = stDoubleFromIntOrDoubleExp($15); delete $15;
 
-		BRMATRIX(e)[2][0] = stDoubleFromIntOrDoubleExp($19); delete $19;
-		BRMATRIX(e)[2][1] = stDoubleFromIntOrDoubleExp($21); delete $21;
-		BRMATRIX(e)[2][2] = stDoubleFromIntOrDoubleExp($23); delete $23;
+		m[2][0] = stDoubleFromIntOrDoubleExp($19); delete $19;
+		m[2][1] = stDoubleFromIntOrDoubleExp($21); delete $21;
+		m[2][2] = stDoubleFromIntOrDoubleExp($23); delete $23;
+
+		e->set( m );
 	}
 ;
 
@@ -502,17 +508,20 @@ default_value
 | '=' matrix_value { $$ = $2; }
 | '=' number { 
 		brEval *e = new brEval;
-		e->type = AT_DOUBLE;
 
-		BRDOUBLE(e) = stDoubleFromIntOrDoubleExp($2); delete $2;
+		e->set( stDoubleFromIntOrDoubleExp($2) ); delete $2;
 
 		$$ = e;
 	}
 | '=' STRING_VALUE {
 		brEval *e = new brEval;
-		e->type = AT_STRING;
+		char *str;
 
-		BRSTRING(e) = slDequote($2);
+		str = slDequote($2);
+
+		e->set( str );
+
+		slFree( str );
 
 		slFree($2);
 

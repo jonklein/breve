@@ -41,7 +41,7 @@ int brIPatchGridNew(brEval args[], brEval *target, brInstance *i) {
 
 	slVectorSet(&center, 0, 0, 0); // is this obsolete?
 
-	BRPOINTER(target) = slPatchGridAdd(i->engine->world, &BRVECTOR(&args[0]), &BRVECTOR(&args[1]), BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]));
+	target->set( slPatchGridAdd(i->engine->world, &BRVECTOR(&args[0]), &BRVECTOR(&args[1]), BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4])) );
 
 	return EC_OK;
 }
@@ -103,7 +103,7 @@ int brIPatchAtIndex(brEval args[], brEval *target, brInstance *i) {
 		return EC_OK;
 	}
 
-	BRPOINTER(target) = grid->getPatchAtIndex(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]));
+	target->set( grid->getPatchAtIndex(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3])) );
 
 	return EC_OK;
 }
@@ -125,8 +125,8 @@ int brIObjectAtLocation(brEval args[], brEval *target, brInstance *i) {
 
 	patch = grid->getPatchAtLocation(&BRVECTOR(&args[1]));
 
-	if (patch) BRINSTANCE(target) = static_cast<brInstance*>(patch->getData());
-	else BRINSTANCE(target) = NULL;
+	if (patch) target->set( static_cast<brInstance*>( patch->getData() ) );
+	else target->set( (void*)NULL );
 
 	return EC_OK;
 }
@@ -148,8 +148,8 @@ int brIObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 	
 	patch = grid->getPatchAtIndex(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]));
 
-	if(patch) BRINSTANCE(target) = static_cast<brInstance*>(patch->getData());
-	else BRINSTANCE(target) = NULL;
+	if(patch) target->set( static_cast<brInstance*>(patch->getData()) );
+	else target->set( (void*)NULL );
 
 	return EC_OK;
 }

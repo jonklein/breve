@@ -369,13 +369,13 @@ int slRoamPatch::render( slRoamTriangle *triangle, slCamera *c) {
 
 	// if( triangle->_clipped) return 0;
 
-	glTexCoord3f(triangle->_leftX / _terrain->textureScale,  triangle->_leftY / _terrain->textureScale, 0);
+	glTexCoord3f(triangle->_leftX / _terrain->textureScaleX,  triangle->_leftY / _terrain->textureScaleY, 0);
 	glVertex3f(triangle->_points[0].x, triangle->_points[0].y, triangle->_points[0].z);
 
-	glTexCoord3f(triangle->_apexX / _terrain->textureScale, triangle->_apexY / _terrain->textureScale, 0);
+	glTexCoord3f(triangle->_apexX / _terrain->textureScaleX, triangle->_apexY / _terrain->textureScaleY, 0);
 	glVertex3f(triangle->_points[1].x, triangle->_points[1].y, triangle->_points[1].z);
 
-	glTexCoord3f(triangle->_rightX / _terrain->textureScale, triangle->_rightY / _terrain->textureScale, 0);
+	glTexCoord3f(triangle->_rightX / _terrain->textureScaleX, triangle->_rightY / _terrain->textureScaleY, 0);
 	glVertex3f(triangle->_points[2].x, triangle->_points[2].y, triangle->_points[2].z);
 
 	return 1;

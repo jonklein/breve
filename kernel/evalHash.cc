@@ -52,14 +52,12 @@ bool brEval::operator<(brEval *b) {
 */
 
 brEvalHash *brEvalHashNew() {
-	brEvalHash *h;
+	return new brEvalHash;
+}
 
-	h = new brEvalHash;
-
-	h->table = slNewHash(1024, brEvalHashFunction, brEvalHashCompareFunction);
-	h->retainCount = 0;
-
-	return h;
+brEvalHash::brEvalHash() {
+	table = slNewHash(1024, brEvalHashFunction, brEvalHashCompareFunction);
+	retainCount = 0;
 }
 
 /*!
@@ -96,14 +94,11 @@ void brEvalHashFree(brEvalHash *h) {
 	delete h;
 }
 
-/*!
-	\brief Stores an entry in a breve hash table.
+/**
+ * Stores an entry in a breve hash table.
+ */
 
-	If the store overwrites an older value, the it is placed in oldValue.
-	This is to allow for garbage-collection of the old value.
-*/
-
-void brEvalHashStore(brEvalHash *h, brEval *key, brEval *value, brEval *oldValue) {
+void brEvalHashStore(brEvalHash *h, brEval *key, brEval *value) {
 	brEval *v, *k;
 
 	v = (brEval *)slDehashDataAndKey(h->table, key, (void**)&k);
@@ -112,11 +107,7 @@ void brEvalHashStore(brEvalHash *h, brEval *key, brEval *value, brEval *oldValue
 		v = new brEval;
 		k = new brEval;
 		brEvalCopy(key, k);
-
-		if(oldValue) oldValue->type = AT_NULL;
-	} else if(oldValue) {
-		brEvalCopy(v, oldValue);
-	}
+	} 
 
 	brEvalCopy(value, v);
 
@@ -165,17 +156,16 @@ brEvalListHead *brEvalHashValues(brEvalHash *h) {
 	\brief Returns a brEvalList of all of the values in the hash table.
 */
 
-void brEvalHashLookup(brEvalHash *h, brEval *key, brEval *value) {
+int brEvalHashLookup(brEvalHash *h, brEval *key, brEval *value) {
 	brEval *v;
 
 	v = (brEval*)slDehashData(h->table, key);
 
-	if(!v) {
-		value->type = AT_NULL;
-		return;
-	}
+	if(!v) return -1;
 
 	brEvalCopy(v, value);
+
+	return 0;
 }
 
 unsigned int brEvalHashFunction(void *e, unsigned int hsize) {
@@ -185,21 +175,24 @@ unsigned int brEvalHashFunction(void *e, unsigned int hsize) {
 	int total = 0;
 	unsigned char *p;
 
-	switch(ee->type) {
+	switch( ee->type() ) {
 		case AT_INSTANCE:
 		case AT_POINTER:
 		case AT_DATA:
 		case AT_HASH:
 		case AT_LIST:
-			p = (unsigned char*)&BRPOINTER(ee);
+			void *vp = ee->getPointer();
+			p = (unsigned char*)&vp;
 			dataSize = sizeof(void*);
 			break;
 		case AT_INT:
-			p = (unsigned char*)&BRINT(ee);
+			int i = ee->getInt();
+			p = (unsigned char*)&i;
 			dataSize = sizeof(int);
 			break;
 		case AT_DOUBLE:
-			p = (unsigned char*)&BRDOUBLE(ee);
+			double d = ee->getDouble();
+			p = (unsigned char*)&d;
 			dataSize = sizeof(double);
 			break;
 		case AT_STRING:
@@ -229,9 +222,9 @@ unsigned int brEvalHashFunction(void *e, unsigned int hsize) {
 unsigned int brEvalHashCompareFunction(void *a, void *b) {
 	brEval *ae = (brEval*)a, *be = (brEval*)b;
 
-	if(ae->type != be->type) return 1;
+	if( ae->type() != be->type() ) return 1;
 
-	switch(ae->type) {
+	switch( ae->type() ) {
 		case AT_LIST:
 		case AT_DATA:
 		case AT_POINTER:
@@ -255,7 +248,7 @@ unsigned int brEvalHashCompareFunction(void *a, void *b) {
 			return strcmp(BRSTRING(ae), BRSTRING(be));
 			break;
 		default:
-			slMessage(0, "unknown expression type in brEvalCompareFunction: %d\n", ae->type);
+			slMessage( 0, "unknown expression type in brEvalCompareFunction: %d\n", ae->type() );
 			return 0;
 			break;
 	}

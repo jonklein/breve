@@ -627,12 +627,12 @@ slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child, int jointTyp
 	joint->_child = child;
 	joint->_type = jointType;
 
-	joint->setLinkPoints(plinkPoint, clinkPoint, rotation, 0);
-	joint->setNormal(normal);
+	joint->setLinkPoints( plinkPoint, clinkPoint, rotation, 1 );
+	joint->setNormal( normal );
 
-	if(parent && parent->multibody) parent->multibody->update();
+	if( parent && parent->multibody ) parent->multibody->update();
 
-	if(child->multibody && (!parent || (child->multibody != parent->multibody))) child->multibody->update();
+	if( child->multibody && (!parent || (child->multibody != parent->multibody) ) ) child->multibody->update();
 
 	dJointSetFeedback(joint->_odeJointID, &joint->_feedback);
 

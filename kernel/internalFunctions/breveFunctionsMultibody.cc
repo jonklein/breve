@@ -57,7 +57,7 @@ int brIMultibodyNew(brEval args[], brEval *target, brInstance *i) {
 	mb = new slMultibody(i->engine->world);
 	mb->setCallbackData(i);
 
-	BRPOINTER(target) = mb;
+	target->set( mb );
 
 	return EC_OK;
 }
@@ -67,7 +67,7 @@ int brIMultibodyNew(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIMultibodySetERPCFM(brEval args[], brEval *target, brInstance *i) {
-	slMultibody *mb = BRPOINTER(&args[0]);
+	slMultibody *mb = (slMultibody*)BRPOINTER(&args[0]);
 
 	mb->setERP(BRFLOAT(&args[1]));
 	mb->setCFM(BRFLOAT(&args[2]));
@@ -95,8 +95,7 @@ int brIMultibodyAllObjects(brEval args[], brEval *target, brInstance *i) {
 	start = m->allCallbackData();
 
 	for (l = start; l; l = l->next) {
-		e.type = AT_INSTANCE;
-		BRINSTANCE(&e) = (brInstance *)l->data;
+		e.set( (brInstance *)l->data );
 
 		if (l->data)
 			brEvalListInsert(all, 0, &e);
@@ -104,7 +103,7 @@ int brIMultibodyAllObjects(brEval args[], brEval *target, brInstance *i) {
 
 	slListFree(start);
 
-	BRLIST(target) = all;
+	target->set( all );
 
 	return EC_OK;
 }
@@ -221,7 +220,7 @@ int brIMultibodySetHandleSelfCollisions(brEval args[], brEval *target, brInstanc
 int brIMultibodyCheckSelfPenetration(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *m = BRMULTIBODYPOINTER(&args[0]);
 
-	if (m) BRINT(target) = m->checkSelfPenetration();
+	if (m) target->set( m->checkSelfPenetration() );
    
 	return EC_OK;
 }

@@ -231,7 +231,8 @@ int slUpdateTexture(slCamera *c, GLuint texture, unsigned char *pixels, int widt
 
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glTexImage2D(GL_TEXTURE_2D, 0, format, newwidth, newheight, 0, format, GL_UNSIGNED_BYTE, newpixels);
+	// glTexImage2D(GL_TEXTURE_2D, 0, format, newwidth, newheight, 0, format, GL_UNSIGNED_BYTE, newpixels);
+	gluBuild2DMipmaps(GL_TEXTURE_2D, format, newwidth, newheight, format, GL_UNSIGNED_BYTE, newpixels);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -796,8 +797,8 @@ void slDrawBackground(slCamera *c, slWorld *w) {
 
 	glDisable(GL_LIGHTING);
 	glMatrixMode(GL_TEXTURE);
-	glPushMatrix();
 	glLoadIdentity();
+	glPushMatrix();
 
 	// this is likely an Apple driver bug, but on my machine it's
 	// taking the color from the glColor, while on Nils' machine it's
@@ -879,6 +880,11 @@ void slRenderBillboards(slCamera *c, int flags) {
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
 	}
+
+	glPushAttrib(GL_TRANSFORM_BIT);
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+	glPopAttrib();
 
 	// we do want to have a depth test against other objects in the world. 
 	// but we do our own back-to-front billboard sort and we do not want  
@@ -1314,14 +1320,14 @@ void slDrawAxis(double x, double y) {
 	The draw list is generated or updated as needed.
 */
 
-int slCompileShape(slShape *s, int drawMode, double textureScale, int flags) {
+int slCompileShape(slShape *s, int drawMode, int flags) {
 	if (!s->_drawList)
 		s->_drawList = glGenLists(1);
 	s->_recompile = 0;
 
 	glNewList(s->_drawList, GL_COMPILE);
 
-	slRenderShape(s, drawMode, textureScale, flags);
+	slRenderShape(s, drawMode, flags);
 
 	glEndList();
 
@@ -1335,7 +1341,7 @@ int slCompileShape(slShape *s, int drawMode, double textureScale, int flags) {
 	the actual rendering.
 */
 
-void slRenderShape(slShape *s, int drawMode, double textureScale, int flags) {
+void slRenderShape(slShape *s, int drawMode, int flags) {
 	GLUquadricObj *quad;
 	int divisions;
 
@@ -1362,7 +1368,7 @@ void slRenderShape(slShape *s, int drawMode, double textureScale, int flags) {
 		std::vector<slFace*>::iterator fi;
 
 		for (fi = s->faces.begin(); fi != s->faces.end(); fi++ )
-			slDrawFace(*fi, drawMode, textureScale, flags);
+			slDrawFace(*fi, drawMode, flags);
 	}
 }
 
@@ -1394,7 +1400,7 @@ void slPerpendicularVectors(slVector *v, slVector *p1, slVector *p2) {
 	\brief Draws a face, breaking it down into smaller triangles if necessary.
 */
 
-void slDrawFace(slFace *f, int drawMode, double textureScale, int flags) {
+void slDrawFace(slFace *f, int drawMode, int flags) {
 	slVector xaxis, yaxis;
 	slVector *norm, *v;
 	slPoint *p;
@@ -1420,7 +1426,7 @@ void slDrawFace(slFace *f, int drawMode, double textureScale, int flags) {
 	// if they're drawing lines, or if the face 
 	// isn't broken down, do a normal polygon
 
-	if (drawMode == GL_LINE_LOOP || !slBreakdownFace(f, textureScale)) {
+	if (drawMode == GL_LINE_LOOP || !slBreakdownFace(f ) ) {
 		glBegin(drawMode);
 	
 		for (edgeCount=0;edgeCount<f->edgeCount;edgeCount++) {
@@ -1428,7 +1434,7 @@ void slDrawFace(slFace *f, int drawMode, double textureScale, int flags) {
 
 			v = &((slPoint *)p)->vertex;
 	
-			glTexCoord2f(slVectorDot(v, &xaxis) / textureScale + 0.5, slVectorDot(v, &yaxis) / textureScale + 0.5);
+			glTexCoord2f(slVectorDot(v, &xaxis), slVectorDot(v, &yaxis));
 
 			glVertex3d(v->x, v->y, v->z);
 		} 
@@ -1447,7 +1453,7 @@ void slDrawFace(slFace *f, int drawMode, double textureScale, int flags) {
 	the quality of lighting and other effects.
 */
 
-int slBreakdownFace(slFace *f, double textureScale) {
+int slBreakdownFace( slFace *f ) {
 	slVector diff, middle, subv[3], total, xaxis, yaxis;
 	double length = 0;
 	slVector *v1, *v2;
@@ -1498,13 +1504,13 @@ int slBreakdownFace(slFace *f, double textureScale) {
 		slVectorCopy(&middle, &subv[1]);
 		slVectorCopy(&total, &subv[2]);
 
-		slBreakdownTriangle(&subv[0], textureScale, 0, &xaxis, &yaxis);
+		slBreakdownTriangle(&subv[0], 0, &xaxis, &yaxis);
 
 		slVectorCopy(&middle, &subv[0]);
 		slVectorCopy(v2, &subv[1]);
 		slVectorCopy(&total, &subv[2]);
 
-		slBreakdownTriangle(&subv[0], textureScale, 0, &xaxis, &yaxis);
+		slBreakdownTriangle(&subv[0], 0, &xaxis, &yaxis);
 	}
 	
 	glEnd();
@@ -1512,14 +1518,7 @@ int slBreakdownFace(slFace *f, double textureScale) {
 	return 1;
 }
 
-/*!
-	\brief Recursively break down and draw a triangle.
-
-	Used by \ref slBreakdownFace to break down and draw large polygons
-	in order to improve the quality of lighting and other effects.
-*/
-
-void slBreakdownTriangle(slVector *v, double textureScale, int level, slVector *xaxis, slVector *yaxis) {
+void slBreakdownTriangle(slVector *v, int level, slVector *xaxis, slVector *yaxis) {
 	slVector diff, mids[3], subv[3];
 	double length = 0;
 	int n, n2;
@@ -1539,7 +1538,7 @@ void slBreakdownTriangle(slVector *v, double textureScale, int level, slVector *
 
 	if (length < 200 || level > 3) {
 		for (n = 0; n < 3; ++n) {
-			glTexCoord2f(slVectorDot(&v[n], xaxis) / textureScale + 0.5, slVectorDot(&v[n], yaxis) / textureScale + 0.5);
+			glTexCoord2f(slVectorDot(&v[n], xaxis), slVectorDot(&v[n], yaxis));
 			glVertex3f(v[n].x, v[n].y, v[n].z);
 		}
 
@@ -1549,25 +1548,25 @@ void slBreakdownTriangle(slVector *v, double textureScale, int level, slVector *
 		slVectorCopy(&mids[0], &subv[1]);
 		slVectorCopy(&mids[2], &subv[2]);
 
-		slBreakdownTriangle(&subv[0], textureScale, level+1, xaxis, yaxis);
+		slBreakdownTriangle(&subv[0], level+1, xaxis, yaxis);
 
 		slVectorCopy(&mids[0], &subv[0]);
 		slVectorCopy(&v[1], &subv[1]);
 		slVectorCopy(&mids[1], &subv[2]);
 
-		slBreakdownTriangle(&subv[0], textureScale, level+1, xaxis, yaxis);
+		slBreakdownTriangle(&subv[0], level+1, xaxis, yaxis);
 
 		slVectorCopy(&mids[1], &subv[0]);
 		slVectorCopy(&v[2], &subv[1]);
 		slVectorCopy(&mids[2], &subv[2]);
 
-		slBreakdownTriangle(&subv[0], textureScale, level+1, xaxis, yaxis);
+		slBreakdownTriangle(&subv[0], level+1, xaxis, yaxis);
 
 		slVectorCopy(&mids[0], &subv[0]);
 		slVectorCopy(&mids[1], &subv[1]);
 		slVectorCopy(&mids[2], &subv[2]);
 
-		slBreakdownTriangle(&subv[0], textureScale, level+1, xaxis, yaxis);
+		slBreakdownTriangle(&subv[0], level+1, xaxis, yaxis);
 	}
 }
 

@@ -107,6 +107,12 @@ Matrix : Matrix2D (aka Matrices2D) {
 
         matrix2DMulElements(matrixPointer, (otherMatrix get-matrix-pointer)).
 
+	+ to transform with-matrix transformation (Matrix2D object) with-result result (Matrix2D object):
+		% Transforms this OBJECT(Vector) with the OBJECT(Matrix2D) matrix, storing the
+		% output in result.
+
+        matrix2DMatrixMultiply( (transformation get-matrix-pointer), matrixPointer, (result get-matrix-pointer) ).
+
     + to add-scalar value scalarValue (double):
         % Adds the number scalarValue to each element in the matrix.
         
@@ -228,7 +234,9 @@ Matrix : Matrix2D (aka Matrices2D) {
 
         matrix2DCopyToImage(matrixPointer, (theImage get-image-data), 2, scale).
         
-    - to print-matlab-style:
+    + to print-matlab-style:
+		% Prints the matrix in a style similar to MATLAB.
+
         i, j (int).
         printf "[".
         for i = 0, i < (xDim - 1), i++:

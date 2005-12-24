@@ -23,27 +23,26 @@
 #if HAVE_LIBJAVA
 int brEvalToJValue(brJavaBridgeData *bridge, brEval *e, jvalue *v, char javaType) {
 	switch(javaType) {
-	case 'V':	
-		e->type = AT_NULL;
-		break;
-	case 'I':
-		v->i = BRINT(e);
-		break;
-	case 'D':
+		case 'V':	
+			break;
+		case 'I':
+			v->i = BRINT(e);
+			break;
+		case 'D':
 			v->d = BRDOUBLE(e);
 			break;
-	case 'F':
-		v->f = BRDOUBLE(e);
-		break;
-	case 'T':
-		v->l = brMakeJavaString(bridge, BRSTRING(e));
-		break;
-	case 'O':
-		// extract the java instance
-		v->l = ((brJavaInstance*)(BRINSTANCE(e)->userData))->instance;
-		break;
-	default:
-		return EC_ERROR;
+		case 'F':
+			v->f = BRDOUBLE(e);
+			break;
+		case 'T':
+			v->l = brMakeJavaString(bridge, BRSTRING(e));
+			break;
+		case 'O':
+			// extract the java instance
+			v->l = ((brJavaInstance*)(BRINSTANCE(e)->userData))->instance;
+			break;
+		default:
+			return EC_ERROR;
 	}
 
 	return EC_OK;

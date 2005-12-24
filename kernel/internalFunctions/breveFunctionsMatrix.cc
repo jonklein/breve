@@ -41,6 +41,8 @@ typedef slBigMatrix2DGSL brMatrix2D;
 typedef slBigMatrix3DGSL brMatrix3D;
 #define BRBIGMATRIX2D(ptr) (reinterpret_cast<brMatrix2D*>(BRPOINTER(ptr)))
 #define BRBIGMATRIX3D(ptr) (reinterpret_cast<brMatrix3D*>(BRPOINTER(ptr)))
+#define BRBIGVECTOR(ptr) (reinterpret_cast<slBigVectorGSL*>(BRPOINTER(ptr)))
+
 //inline brMatrix2D* BRBIGMATRIX2D(brEval* ptr) { return reinterpret_cast<brMatrix2D*>(((ptr)->values.pointerValue)); }
 #else
 // This can be replaced with alternative optimzation code 
@@ -56,7 +58,7 @@ typedef slBigMatrix3DGSL brMatrix3D;
 
 
 int brIMatrix2DNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = new brMatrix2D(BRINT(&args[0]), BRINT(&args[1]));
+	target->set( new brMatrix2D(BRINT(&args[0]), BRINT(&args[1])) );
 
 	return EC_OK;
 }
@@ -68,7 +70,7 @@ int brIMatrix2DFree(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrix2DGet(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = double(BRBIGMATRIX2D(&args[0])->get(BRINT(&args[1]), BRINT(&args[2])));
+	target->set( (double)BRBIGMATRIX2D(&args[0])->get(BRINT(&args[1]), BRINT(&args[2])) );
 
 	return EC_OK;
 }
@@ -99,13 +101,13 @@ int brIMatrix2DCopy(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrix2DGetAbsoluteSum(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = double(static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->absoluteSum());
+	target->set( (double)static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->absoluteSum() );
 
 	return EC_OK;
 }
 
 int brIMatrix2DGetMax(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = double(static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->max());
+	target->set( (double)static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->max() );
 
 	return EC_OK;
 }
@@ -136,6 +138,23 @@ int brIMatrixBlasMul(brEval args[], brEval *target, brInstance *i) {
 
 int brIMatrix2DScale(brEval args[], brEval *target, brInstance *i) {
 	static_cast<slVectorViewGSL*>(BRBIGMATRIX2D(&args[0]))->inPlaceMultiply(BRDOUBLE(&args[1]));
+
+	return EC_OK;
+}
+
+int brIMatrix2DVectorMultiply( brEval args[], brEval *target, brInstance *i ) {
+	slVectorViewGSL *in, *out;
+
+	in = static_cast< slVectorViewGSL* >( BRBIGVECTOR( &args[1] ) );
+	out = static_cast< slVectorViewGSL* >( BRBIGVECTOR( &args[2] ) );
+
+	BRBIGMATRIX2D(&args[0])->vectorMultiplyInto( *in, *out );
+
+	return EC_OK;
+}
+
+int brIMatrix2DMatrix2DMultiply( brEval args[], brEval *target, brInstance *i ) {
+	BRBIGMATRIX2D(&args[0])->matrixMultiplyInto( *BRBIGMATRIX2D( &args[1] ), *BRBIGMATRIX2D( &args[2] ) );
 
 	return EC_OK;
 }
@@ -234,8 +253,8 @@ int brIMatrix2DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 	int offset = BRINT(&args[2]);
 	int r;
 	int x, y, xmax, ymax;
-    int yStride = d->x * 4;
-    int xStride = d->y * 4;
+    // int yStride = d->x * 4;
+    // int xStride = d->y * 4;
     
 	xmax = sourceMatrix->xDim();
 	ymax = sourceMatrix->yDim();
@@ -269,8 +288,7 @@ int brIMatrix2DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 }
 
 int brIMatrix3DNew(brEval args[], brEval *target, brInstance *i) {
-
-	BRPOINTER(target) = new brMatrix3D(BRINT(&args[0]), BRINT(&args[1]), BRINT(&args[2]));
+	target->set( new brMatrix3D(BRINT(&args[0]), BRINT(&args[1]), BRINT(&args[2])) );
 
 	return EC_OK;
 }
@@ -293,7 +311,7 @@ int brIMatrix3DGet(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 #endif
-	BRDOUBLE(target) = double(BRBIGMATRIX3D(&args[0])->get(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3])));
+	target->set( (double)BRBIGMATRIX3D(&args[0])->get(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3])) );
 
 	return EC_OK;
 }
@@ -318,7 +336,7 @@ int brIMatrix3DCopy(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brIMatrix3DGetAbsoluteSum(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = double(static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[0]))->absoluteSum());
+	target->set( (double)static_cast<slVectorViewGSL*>(BRBIGMATRIX3D(&args[0]))->absoluteSum() );
 
 	return EC_OK;
 }
@@ -482,7 +500,7 @@ int brIMatrix3DCopyToImage(brEval args[], brEval *result, brInstance *i) {
 	unsigned int offset = BRINT(&args[3]);
 	int r;
 	int x, y, xmax, ymax, zmax;
-	int yStride = d->x * 4;
+	// int yStride = d->x * 4;
 
 	xmax = sourceMatrix->xDim();
 	ymax = sourceMatrix->yDim();
@@ -532,6 +550,8 @@ void breveInitMatrixFunctions(brNamespace *n) {
 	brNewBreveCall(n, "matrix2DDiffuse", brIMatrix2DDiffuse, AT_NULL, AT_POINTER, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix2DCopyToImage", brIMatrix2DCopyToImage, AT_NULL, AT_POINTER, AT_POINTER, AT_INT, AT_DOUBLE, 0);
 	brNewBreveCall(n, "matrix2DScale", brIMatrix2DScale, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
+	brNewBreveCall(n, "matrix2DVectorMultiply", brIMatrix2DVectorMultiply, AT_NULL, AT_POINTER, AT_POINTER, AT_POINTER, 0);
+	brNewBreveCall(n, "matrix2DMatrixMultiply", brIMatrix2DMatrix2DMultiply, AT_NULL, AT_POINTER, AT_POINTER, AT_POINTER, 0);
 	brNewBreveCall(n, "matrix2DGetAbsoluteSum", brIMatrix2DGetAbsoluteSum, AT_DOUBLE, AT_POINTER, 0);
 	brNewBreveCall(n, "matrix2DGetMax", brIMatrix2DGetMax, AT_DOUBLE, AT_POINTER, 0);
 	brNewBreveCall(n, "matrix2DAddScaled", brIMatrix2DAddScaled, AT_NULL, AT_POINTER, AT_POINTER, AT_DOUBLE, 0);

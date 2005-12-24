@@ -1,7 +1,7 @@
 #include "kernel.h"
 
 int brIDrawListNew(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = (void*)(new slDrawCommandList(i->engine->world));
+	target->set( (void*)( new slDrawCommandList(i->engine->world) ) );
 	return EC_OK;
 }
 

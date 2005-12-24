@@ -20,7 +20,7 @@
 
 @define XSIZE 32.
 @define YSIZE 32.
-@define ZSIZE 16.
+@define ZSIZE 32.
 
 Controller GS.
 

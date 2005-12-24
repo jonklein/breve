@@ -19,8 +19,6 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 	+ variables:
 		pushInterpreterPointer (pointer).
-		evaluationLimit (int).
-		listLimit (int).
 
 	+ to init:
 		pushInterpreterPointer = pushEnvironmentNew(random[2000000000]).
@@ -59,29 +57,29 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 	+ to set-list-limit to newLimit (int):
 		% Sets the size limit of lists constructed in push.  This limit
-		% also applies to programs created using genetic operators.
+		% also applies to programs created using genetic operators.  The
+		% default limit is 200.
 
-		listLimit = newLimit.
 		pushEnvironmentSetListLimit(pushInterpreterPointer, newLimit).	
 
 	+ to get-list-limit:
 		% Returns the size limit of lists constructed in push.  See 
 		% METHOD(set-list-limit) for more information.
 
-		return listLimit.
+		return pushEnvironmentGetListLimit(pushInterpreterPointer).
 
 	+ to set-evaluation-limit to newLimit (int):
 		% Sets the evaluation limit to newLimit.  This specifies the number of 
 		% instructions to run when the METHOD(run) is called.  The default value
-		% for a new interpreter is 100.
+		% for a new interpreter is 200.
 
-		evaluationLimit = newLimit.
+		pushEnvironmentSetEvalLimit(pushInterpreterPointer, newLimit).
 
 	+ to get-evaluation-limit:
 		% Returns the current push evaluation limit.  See METHOD(set-evaluation-limit) 
 		% for more information on the evaluation limit.
 
-		return evaluationLimit.
+		return pushEnvironmentGetEvalLimit(pushInterpreterPointer).
 
   + section "Running a Push program"
 	+ to run program codeObject (object) for-steps steps = -1 (int):
@@ -100,7 +98,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 		% this method with steps = 0 in order to load the program, then using 
 		% METHOD(step) to step the simulatation forward.
 
-		if steps == -1: steps = evaluationLimit.
+		if steps == -1: steps = pushEnvironmentGetEvalLimit(pushInterpreterPointer).
 
 		return pushRun(pushInterpreterPointer, (codeObject get-code-pointer), steps).
 
@@ -115,7 +113,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 		n (int).
 
-		if steps == -1: steps = evaluationLimit.
+		if steps == -1: steps = pushEnvironmentGetEvalLimit(pushInterpreterPointer).
 
 		self run program codeObject for-steps 0.
 
@@ -341,8 +339,12 @@ Object : PushProgram (aka PushPrograms) {
 
 	+ to make-random-code max-length size = 100 (int) with-interpreter interpreter (object): 
 		% Makes a random push program of length size.  Size is an optional argument
-		% with a default value of 100.   The interpreter provided specifies the instruction
+		% with a default value of 100.  The size may also be equal to -1, which indicates 
+		% that the MAX-POINTS-IN-RANDOM-EXPRESSION value from the Push configuration file
+		% should be used.  The interpreter provided specifies the instruction
 		% set used to generate the random code. 
+
+		if size == -1: size = pushEnvironmentGetRandomPointLimit( (interpreter get-interpreter-pointer ) ).
 
 		if size < 1: size = 1.
 
@@ -353,8 +355,12 @@ Object : PushProgram (aka PushPrograms) {
 	+ to mutate with-max-new-code-size treeSize = 50 (int) with-interpreter interpreter (object):
 		% Mutates this code object by adding a new subtree.  The maximum size of the
 		% subtree is specified in the optional argument treeSize, which has a default
-		% value of 50.  The interpreter provided determines the instruction
+		% value of 50.  The size may also be equal to -1, which indidates that the 
+		% MAX-POINTS-IN-RANDOM-EXPRESSION value from the Push configuration file 
+		% should be used.  The interpreter argument determines the instruction
 		% set used to generate the random code.  
+
+		if treeSize == -1: treeSize = pushEnvironmentGetRandomPointLimit( (interpreter get-interpreter-pointer) ).
 
 		self set-code-pointer to pushCodeSubtreeMutate((interpreter get-interpreter-pointer), codePointer, treeSize).
 

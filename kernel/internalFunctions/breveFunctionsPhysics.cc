@@ -47,8 +47,11 @@ int brIWorldSetGravity(brEval args[], brEval *target, brInstance *i) {
 int brIRotationMatrix(brEval args[], brEval *target, brInstance *i) {
 	slVector *vector = &BRVECTOR(&args[0]);
 	double rotation = BRDOUBLE(&args[1]);
+	slMatrix m;
 
-	slRotationMatrix(vector, rotation, BRMATRIX(target));
+	slRotationMatrix( vector, rotation, m );
+	
+	target->set( m );
 
 	return EC_OK;
 }
@@ -61,8 +64,6 @@ int brIRotationMatrix(brEval args[], brEval *target, brInstance *i) {
 
 int brIWorldSetCollisionResolution(brEval args[], brEval *target, brInstance *i) {
 	slWorldSetCollisionResolution(i->engine->world, BRINT(&args[0]));
-	
-	target->type = AT_NULL;
 	
 	return EC_OK;
 }

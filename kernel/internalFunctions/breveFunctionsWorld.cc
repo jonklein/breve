@@ -30,7 +30,7 @@
 */
 
 int brIWorldLoadTigerFile(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = slWorldLoadTigerFile(i->engine->world, BRSTRING(&args[0]), (slTerrain*)BRPOINTER(&args[1]));
+	target->set( slWorldLoadTigerFile(i->engine->world, BRSTRING(&args[0]), (slTerrain*)BRPOINTER(&args[1])) );
 	return EC_OK;
 }
 
@@ -110,12 +110,12 @@ int brIRandomSeedFromDevRandom(brEval args[], brEval *target, brInstance *i) {
 	if (f) fclose(f);
 
 	if (seed) {
-		BRINT(target) = 0;
+		target->set( 0 );
 		slMessage(DEBUG_ALL, "read seed %u from random device\n", seed);
 		srandom(seed);
 		dRandSetSeed(seed);
 		gsl_rng_set(i->engine->RNG, seed);
-	} else BRINT(target) = -1;
+	} else target->set( -1 );
 
 	return EC_OK;
 }
@@ -127,7 +127,7 @@ int brIRandomSeedFromDevRandom(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetTime(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = slWorldGetAge(i->engine->world);
+	target->set( slWorldGetAge(i->engine->world) );
 
 	return EC_OK;
 }
@@ -149,7 +149,7 @@ int brILoadTexture(brEval args[], brEval *target, brInstance *i) {
 
 	if(!path) {
 		slMessage(DEBUG_ALL, "Cannot locate image file for \"%s\"\n", BRSTRING(&args[0]));
-		BRINT(target) = -1;
+		target->set( -1 );
 		return EC_OK;
 	}
 
@@ -159,11 +159,11 @@ int brILoadTexture(brEval args[], brEval *target, brInstance *i) {
 
 	if(!pixels) {
 		slMessage(DEBUG_ALL, "Unrecognized image format in file \"%s\"\n", BRSTRING(&args[0]));
-		BRINT(target) = -1;
+		target->set( -1 );
 		return EC_OK;
 	}
 
-	BRINT(target) = slTextureNew(i->engine->camera);
+	target->set( (int)slTextureNew(i->engine->camera) );
 	slUpdateTexture(i->engine->camera, BRINT(target), pixels, w, h, GL_RGBA);
 
 	slFree(pixels);
@@ -186,7 +186,7 @@ int brIWorldStep(brEval args[], brEval *target, brInstance *i) {
 	int error;
 
 	i->engine->iterationStepSize = totalTime;
-	BRDOUBLE(target) = slRunWorld(i->engine->world, totalTime, stepSize, &error);
+	target->set( slRunWorld(i->engine->world, totalTime, stepSize, &error) );
 
 	if(error) {
 		brEvalError(i->engine, EE_SIMULATION, "Error in world simulation");
@@ -221,11 +221,6 @@ int brISetNeighborhoodSize(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *wo = BRWORLDOBJECTPOINTER(&args[0]);
 	double size = BRDOUBLE(&args[1]);
 
-	if(!wo) {
-		brEvalError(i->engine, EE_SIMULATION, "uninitialized pointer passed to setNeighborhoodSize");
-		return EC_ERROR;
-	}
-
 	slWorldObjectSetNeighborhoodSize(wo, size);
 
 	return EC_OK;
@@ -243,11 +238,6 @@ int brISetCollisionProperties(brEval args[], brEval *target, brInstance *i) {
 	double e = BRDOUBLE(&args[1]);
 	double eT = BRDOUBLE(&args[2]);
 	double mu = BRDOUBLE(&args[3]);
-
-	if(!o) {
-		slMessage(DEBUG_ALL, "null pointer passed to setCollisionProperties\n");
-		return EC_ERROR;
-	}
 
 	slWorldObjectSetCollisionE(o, e);
 	slWorldObjectSetCollisionET(o, eT);
@@ -267,21 +257,14 @@ int brIGetNeighbors(brEval args[], brEval *target, brInstance *i) {
 	std::vector<slWorldObject*>::iterator wi;
 	brEval eval;
 
-	if(!wo) {
-		brEvalError(i->engine, EE_SIMULATION, "uninitialized pointer passed to getNeighbors");
-		return EC_ERROR;
-	}
-	
-	BRLIST(target) = brEvalListNew();
-
-	eval.type = AT_INSTANCE;
+	target->set( brEvalListNew() );
 
 	std::vector<slWorldObject*> &neighbors = slWorldObjectGetNeighbors(wo);
 
 	for(wi = neighbors.begin(); wi != neighbors.end(); wi++ ) {
 		// grab the neighbor instances from the userData of the neighbors
 
-		BRINSTANCE(&eval) = (brInstance*)slWorldObjectGetCallbackData(*wi);
+		eval.set( (brInstance*)slWorldObjectGetCallbackData(*wi) );
 
 		if(BRINSTANCE(&eval) && BRINSTANCE(&eval)->status == AS_ACTIVE) brEvalListInsert(BRLIST(target), 0, &eval);
 	}
@@ -299,7 +282,7 @@ int brIGetNeighbors(brEval args[], brEval *target, brInstance *i) {
 int brIWorldObjectGetLightExposure(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *wo = BRWORLDOBJECTPOINTER(&args[0]);
 
-	BRINT(target) = slWorldObjectGetLightExposure(wo);
+	target->set( slWorldObjectGetLightExposure(wo) );
 
 	return EC_OK;
 }
@@ -327,11 +310,6 @@ int brISetBoundingBox(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	int value = BRINT(&args[1]);
 
-	if(!o) {
-		slMessage(DEBUG_ALL, "null pointer passed to setBoundingBox\n");
-		return EC_ERROR;
-	}
-
 	if(value) slWorldObjectAddDrawMode(o, DM_BOUND);
 	else slWorldObjectRemoveDrawMode(o, DM_BOUND);
 
@@ -356,19 +334,12 @@ int brISetDrawAxis(brEval args[], brEval *target, brInstance *i) {
 	if(value) slWorldObjectAddDrawMode(o, DM_AXIS);
 	else slWorldObjectRemoveDrawMode(o, DM_AXIS);
 
-	// i->engine->camera->setRecompile();
-
 	return EC_OK;
 }
 
 int brISetNeighborLines(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	int value = BRINT(&args[1]);
-
-	if(!o) {
-		slMessage(DEBUG_ALL, "null pointer passed to setNeighborLines\n");
-		return EC_ERROR;
-	}
 
 	if(value) slWorldObjectAddDrawMode(o, DM_NEIGHBOR_LINES);
 	else slWorldObjectRemoveDrawMode(o, DM_NEIGHBOR_LINES);
@@ -380,15 +351,8 @@ int brISetVisible(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	int visible = BRINT(&args[1]);
 
-	if(!o) {
-		slMessage(DEBUG_ALL, "null pointer passed to setVisible\n");
-		return EC_ERROR;
-	}
-
 	if(!visible) slWorldObjectAddDrawMode(o, DM_INVISIBLE);
 	else slWorldObjectRemoveDrawMode(o, DM_INVISIBLE);
-
-	// i->engine->camera->setRecompile();
 
 	return EC_OK;
 }
@@ -397,33 +361,28 @@ int brISetTexture(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	int value = BRINT(&args[1]);
 
-	if(!o) {
-		slMessage(DEBUG_ALL, "null pointer passed to setTexture\n");
-		return EC_ERROR;
-	}
-
 	slWorldObjectSetTexture(o, value);
 	slWorldObjectSetTextureMode(o, BBT_NONE);
-	// i->engine->camera->setRecompile();
 
 	return EC_OK;
 }
 
 int brISetTextureScale(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
-	int value = BRINT(&args[1]);
+	float valueX = BRDOUBLE(&args[1]);
+	float valueY = BRDOUBLE(&args[2]);
 
-	if(!o) {
-		slMessage(DEBUG_ALL, "null pointer passed to setTexture\n");
-		return EC_ERROR;
-	}
-
-	if(value < 1) {
-		slMessage(DEBUG_ALL, "warning: texture scale must be positive #%d\n", value);
-		value = 1;
+	if(valueX < 0.0) {
+		slMessage(DEBUG_ALL, "warning: texture scale must be positive (%f)\n", valueX);
+		valueX = 0.001;
 	} 
 
-	slWorldObjectSetTextureScale(o, value);
+	if(valueY < 0.0) {
+		slMessage(DEBUG_ALL, "warning: texture scale must be positive (%f)\n", valueY);
+		valueY = 0.001;
+	} 
+
+	slWorldObjectSetTextureScale(o, valueX, valueY);
 
 	return EC_OK;
 }
@@ -431,11 +390,6 @@ int brISetTextureScale(brEval args[], brEval *target, brInstance *i) {
 int brISetBitmap(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	int texture = BRINT(&args[1]);
-
-	if(!o) {
-		slMessage(DEBUG_ALL, "null pointer passed to setBitmap\n");
-		return EC_ERROR;
-	}
 
 	slWorldObjectSetTexture(o, texture);
 	slWorldObjectSetTextureMode(o, BBT_BITMAP);
@@ -445,11 +399,6 @@ int brISetBitmap(brEval args[], brEval *target, brInstance *i) {
 
 int brISetBitmapRotation(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
-
-	if(!o) {
-		slMessage(DEBUG_ALL, "null pointer passed to setBitmapRotation\n");
-		return EC_ERROR;
-	}
 
 	slWorldObjectSetBitmapRotation(o, RADTODEG(BRDOUBLE(&args[1])));
 
@@ -489,12 +438,7 @@ int brISetBitmapRotationTowardsVector(brEval args[], brEval *target, brInstance 
 	slVectorMul(&offset, dot, &vdiff);
 	slVectorAdd(&vdiff, v, &vproj);
 	
-	if(!o) {
-		slMessage(DEBUG_ALL, "null pointer passed to setBitmapRotationTowardsVector\n");
-		return EC_ERROR;
-	}
-
-	/* we need to get the scalar rotation of v about offset vector */
+	// we need to get the scalar rotation of v about offset vector
 
 	rotation = acos(slVectorDot(&up, &vproj));
 
@@ -508,11 +452,6 @@ int brISetBitmapRotationTowardsVector(brEval args[], brEval *target, brInstance 
 int brISetAlpha(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 
-	if(!o) {
-		slMessage(DEBUG_ALL, "null pointer passed to setAlpha\n");
-		return EC_ERROR;
-	}
-
 	slWorldObjectSetAlpha(o, BRDOUBLE(&args[1]));
 
 	return EC_OK;
@@ -521,11 +460,6 @@ int brISetAlpha(brEval args[], brEval *target, brInstance *i) {
 int brISetLightmap(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	int value = BRINT(&args[1]);
-
-	if(!o) {
-		slMessage(DEBUG_ALL, "null pointer passed to setLightmap\n");
-		return EC_ERROR;
-	}
 
 	slWorldObjectSetTexture(o, value);
 	slWorldObjectSetTextureMode(o, BBT_LIGHTMAP);
@@ -541,18 +475,13 @@ int brISetColor(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *o = BRWORLDOBJECTPOINTER(&args[0]);
 	slVector *color = &BRVECTOR(&args[1]);
 
-	if(!o) {
-		slMessage(DEBUG_ALL, "null pointer passed to setColor\n");
-		return EC_ERROR;
-	}
-
 	slWorldObjectSetColor(o, color);
 
 	return EC_OK;
 }
 
 int brIGetMainCameraPointer(brEval args[], brEval *target, brInstance *i) {
-	BRPOINTER(target) = i->engine->camera;
+	target->set( i->engine->camera );
 	return EC_OK;
 }
 
@@ -659,7 +588,7 @@ int brICameraSetZoom(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraGetZoom(brEval args[], brEval *target, brInstance *i) {
-	BRDOUBLE(target) = i->engine->camera->zoom;
+	target->set( i->engine->camera->zoom );
 	return EC_OK;
 }
 
@@ -670,7 +599,7 @@ int brICameraGetZoom(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraGetOffset(brEval args[], brEval *target, brInstance *i) {
-	slVectorCopy(&i->engine->camera->location, &BRVECTOR(target));
+	target->set( i->engine->camera->location );
 	return EC_OK;
 }
 
@@ -681,7 +610,7 @@ int brICameraGetOffset(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraGetTarget(brEval args[], brEval *target, brInstance *i) {
-	slVectorCopy(&i->engine->camera->target, &BRVECTOR(target));
+	target->set( i->engine->camera->target );
 	return EC_OK;
 }
 
@@ -730,7 +659,7 @@ int brISetBackgroundImage(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetLightPosition(brEval args[], brEval *target, brInstance *i) {
-	slVectorCopy(&i->engine->camera->lights[0].location, &BRVECTOR(target));
+	target->set( i->engine->camera->lights[0].location );
 	return EC_OK;
 }
 
@@ -780,11 +709,10 @@ int brISetLightAmbientColor(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
-/*!
-	\brief Sets a the diffuse color for the light.
-
-	setLightDiffuseColor(vector color).
-*/
+/**
+ *	\brief Sets a the diffuse color for the light.
+ *	setLightDiffuseColor(vector color).
+ */
 
 int brISetLightDiffuseColor(brEval args[], brEval *target, brInstance *i) {
 	slVectorCopy(&BRVECTOR(&args[0]), &i->engine->camera->lights[0].diffuse);
@@ -843,7 +771,7 @@ int brIAddObjectLine(brEval args[], brEval *target, brInstance *i) {
 		pattern |= (*(patternString++) == '-');
 	}
 
-	BRPOINTER(target) = slWorldAddObjectLine(i->engine->world, src, dst, pattern, color);
+	target->set( slWorldAddObjectLine(i->engine->world, src, dst, pattern, color) );
 
 	return EC_OK;
 }
@@ -945,7 +873,7 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "setNeighborLines", brISetNeighborLines, AT_NULL, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "setVisible", brISetVisible, AT_NULL, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "setTexture", brISetTexture, AT_NULL, AT_POINTER, AT_INT, 0);
-	brNewBreveCall(n, "setTextureScale", brISetTextureScale, AT_NULL, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "setTextureScale", brISetTextureScale, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0);
 	brNewBreveCall(n, "setBitmap", brISetBitmap, AT_NULL, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "setBitmapRotation", brISetBitmapRotation, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "setBitmapRotationTowardsVector", brISetBitmapRotationTowardsVector, AT_NULL, AT_POINTER, AT_VECTOR, 0);

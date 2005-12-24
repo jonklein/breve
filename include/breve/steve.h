@@ -7,11 +7,12 @@
 
 #include "object.h"
 
+#include "gc.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "gc.h"
 
 #include "stringexp.h"
 #include "dataObject.h"

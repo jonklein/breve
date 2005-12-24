@@ -18,7 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include "kernel.h"
+#include <math.h>
+
+#include "util.h"
 
 #define MIN3(x, y, z)	(((x)<(y) && (x)<(z))?(x):((y)<(z)?(y):(z)))
 #define MAX3(x, y, z)	(((x)>(y) && (x)>(z))?(x):((y)>(z)?(y):(z)))

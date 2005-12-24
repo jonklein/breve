@@ -12,7 +12,8 @@ Object : Vector (aka Vectors) [version 2.3] {
         dim (int).
     
     + to init:
-        #vectorPointer = vectorNew(16).
+		# arbitrary default size.
+		self set-size to 3.
         return self.
         
     - to get-vector-pointer:
@@ -30,7 +31,7 @@ Object : Vector (aka Vectors) [version 2.3] {
         
     + to set-size to newDim (int):
         % Sets the size of this vector to the new dimension.
-        vectorFree(vectorPointer).
+        if vectorPointer: vectorFree(vectorPointer).
         vectorPointer = vectorNew(newDim).
         dim = newDim.
 
@@ -44,21 +45,27 @@ Object : Vector (aka Vectors) [version 2.3] {
         % <P>
         % This method is hardware accelerated where supported.
         print "error".
-#        return vectorGetAbsoluteSum(vectorPointer).
+        return vectorGetAbsoluteSum(vectorPointer).
 
-    + to multiply-with-values of otherMatrix (Matrix3D object):
+    + to multiply-with-values of otherVector (Vector object):
         % Multiplies each element in this vector with the corresponding 
-        % element in otherMatrix.  This is not regular vector multiplication;
-        % rather, it is a way to scale each element in otherMatrix.
+        % element in otherVector.  This is not regular vector multiplication;
+        % rather, it is a way to scale each element in otherVector.
         print "error".
-#        vectorMulElements(vectorPointer, (otherMatrix get-vector-pointer)).
+        vectorMulElements(vectorPointer, (otherVector get-vector-pointer)).
 
-    + to get-value at-x x (int):
+	+ to transform with-matrix transformation (Matrix2D object) with-result result (Vector object):
+		% Transforms this OBJECT(Vector) with the OBJECT(Matrix2D) matrix, storing the 
+		% output in result.
+
+		matrix2DVectorMultiply( (transformation get-matrix-pointer), vectorPointer, (result get-vector-pointer) ).
+
+    + to get-value at x (int):
         % Returns the vector value at position (x).
         
         return vectorGet(vectorPointer, x).
 
-    + to set-value to value (double) at-x x (int):
+    + to set-value to value (double) at x (int):
         % Sets the vector value at position (x, y, z).
 
         return vectorSet(vectorPointer, x, value).
@@ -71,43 +78,43 @@ Object : Vector (aka Vectors) [version 2.3] {
     + to add-scalar value scalarValue (double):
         % Adds the number scalarValue to each element in the vector.
         print "error".        
-#        vectorAddScalar(vectorPointer, scalarValue).
+        vectorAddScalar(vectorPointer, scalarValue).
 
-    + to add-values of otherMatrix (object) scaled-by scale = 1.0 (double):
-        % Adds this vector to otherMatrix leaving the result in otherMatrix.
+    + to add-values of otherVector (object) scaled-by scale = 1.0 (double):
+        % Adds this vector to otherVector leaving the result in otherVector.
         % The matrices must be of the same size.  The 
-        % optional argument scale allows otherMatrix to be scaled before 
+        % optional argument scale allows otherVector to be scaled before 
         % adding it to this vector.
         % <P>
         % This method is hardware accelerated where supported.
         print "error".
-#        vectorAddScaled(vectorPointer, (otherMatrix get-vector-pointer), scale).
+        vectorAddScaled(vectorPointer, (otherVector get-vector-pointer), scale).
 
-    + to subtract-values of otherMatrix (object) scaled-by scale = 1.0 (double):
-        % Subtracts this vector from this otherMatrix, leaving the result
-        % in otherMatrix.  This method uses the
+    + to subtract-values of otherVector (object) scaled-by scale = 1.0 (double):
+        % Subtracts this vector from this otherVector, leaving the result
+        % in otherVector.  This method uses the
         % same mechanism as METHOD(add), but using a negative scale 
         % argument.
-        % The optional argument scale allows otherMatrix to be scaled before 
+        % The optional argument scale allows otherVector to be scaled before 
         % subtracting it from this vector.
         % <P>
         % This method is hardware accelerated where supported.
         print "error".
-#        vectorAddScaled(vectorPointer, (otherMatrix get-vector-pointer), -1.0 * scale).
+        vectorAddScaled(vectorPointer, (otherVector get-vector-pointer), -1.0 * scale).
 
     + to scale by scaleValue (float):
         % Scales all elements in the vector by scaleValue.
         % <P>
         % This method is hardware accelerated where supported.
         print "error".
-#        vectorScale(vectorPointer, scaleValue).
+        vectorScale(vectorPointer, scaleValue).
 
-    + to copy from otherMatrix (object):
-        % Copies the contents of otherMatrix to thisMatrix.
+    + to copy from otherVector (object):
+        % Copies the contents of otherVector to thisVector.
         % <P>
         % This method is hardware accelerated where supported.
         print "error".
-#        vectorCopy((otherMatrix get-vector-pointer), vectorPointer).
+        vectorCopy((otherVector get-vector-pointer), vectorPointer).
         
     ### the following display a colum vector as rows of the image
     + to copy-to-red-channel of-image theImage (Image object) with-scale scale = 1.0 (float):
@@ -143,7 +150,9 @@ Object : Vector (aka Vectors) [version 2.3] {
 
         vectorCopyToImage(vectorPointer, (theImage get-image-data), 2, scale).
 
-    - to print-matlab-style:
+    + to print-matlab-style:
+		% Prints the vector in a style similar to MATLAB.
+
         i (int).
         printf "[".
         for i = 0, i < (dim - 1), i++:

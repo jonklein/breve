@@ -37,7 +37,7 @@ int brILinkNew(brEval args[], brEval *target, brInstance *i) {
 
 	slWorldObjectSetCallbackData(l, i);
 
-	BRPOINTER(target) = l;
+	target->set( l );
 
 	return EC_OK;
 }
@@ -54,7 +54,7 @@ int brILinkAddToWorld(brEval args[], brEval *target, brInstance *i) {
 
 	wo = slWorldAddObject(i->engine->world, link, WO_LINK);
 
-	BRPOINTER(target) = wo;
+	target->set( wo );
 
 	return EC_OK;
 }
@@ -136,10 +136,10 @@ int brILinkRotateRelative(brEval args[], brEval *target, brInstance *i) {
 	double len = BRDOUBLE(&args[2]);
 	double m[3][3], nm[3][3];
 
-	slRotationMatrix(v, len, m);
-	slMatrixMulMatrix(m, l->getPosition()->rotation, nm);
+	slRotationMatrix( v, len, m );
+	slMatrixMulMatrix( m, l->getPosition()->rotation, nm );
 
-	l->setRotation(nm);
+	l->setRotation( nm );
 
 	return EC_OK;
 }
@@ -153,7 +153,7 @@ int brILinkRotateRelative(brEval args[], brEval *target, brInstance *i) {
 int brILinkGetLocation(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]); 
 
-	slVectorCopy(&link->getPosition()->location, &BRVECTOR(target));
+	target->set( link->getPosition()->location );
 
 	return EC_OK;
 }
@@ -167,7 +167,7 @@ int brILinkGetLocation(brEval args[], brEval *target, brInstance *i) {
 int brILinkGetRotation(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]); 
 
-	slMatrixCopy(&link->getPosition()->rotation, BRMATRIX(target));
+	target->set( link->getPosition()->rotation );
 
 	return EC_OK;
 }
@@ -255,7 +255,7 @@ int brILinkSetRotationalAcceleration(brEval args[], brEval *target, brInstance *
 	slLink *link = BRLINKPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(&args[1]);
  
-	link->setAcceleration(NULL, v);
+	link->setAcceleration( NULL, v );
  
 	return EC_OK;
 }
@@ -268,8 +268,11 @@ int brILinkSetRotationalAcceleration(brEval args[], brEval *target, brInstance *
 
 int brILinkGetVelocity(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
+	slVector v;
 
-	link->getVelocity(&BRVECTOR(target), NULL);
+	link->getVelocity( &v, NULL );
+
+	target->set( v );
 
 	return EC_OK;
 }
@@ -282,8 +285,11 @@ int brILinkGetVelocity(brEval args[], brEval *target, brInstance *i) {
 
 int brILinkGetRotationalVelocity(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
+	slVector v;
 	
-	link->getVelocity(NULL, &BRVECTOR(target));
+	link->getVelocity( NULL, &v );
+
+	target->set( v );
 
 	return EC_OK;
 }
@@ -297,7 +303,7 @@ int brILinkGetRotationalVelocity(brEval args[], brEval *target, brInstance *i) {
 int brILinkSetForce(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 
-	link->setForce(&BRVECTOR(&args[1]));
+	link->setForce( &BRVECTOR( &args[1] ) );
 
 	return EC_OK;
 }
@@ -314,8 +320,8 @@ int brILinkGetMultibody(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 	slMultibody *mb;
 
-	if ((mb = link->getMultibody())) BRINSTANCE(target) = (brInstance *)mb->getCallbackData();
-	else BRINSTANCE(target) = NULL;
+	if ((mb = link->getMultibody())) target->set( (brInstance *)mb->getCallbackData() );
+	else target->set( (void*)NULL );
 
 	return EC_OK;
 }
@@ -329,7 +335,7 @@ int brILinkGetMultibody(brEval args[], brEval *target, brInstance *i) {
 int brILinkSetTorque(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 
-	link->setTorque(&BRVECTOR(&args[1]));
+	link->setTorque( &BRVECTOR( &args[1] ) );
 
 	return EC_OK;
 }
@@ -347,18 +353,16 @@ int brILinkGetPenetratingObjects(brEval args[], brEval *target, brInstance *i) {
 	brEval object;
 	unsigned int n;
 
-	object.type = AT_INSTANCE;
-
 	head = brEvalListNew(); 
 
 	penetrations = l->userDataForPenetratingObjects(i->engine->world);
 
 	for(n = 0; n < penetrations.size(); n++) {
-		BRINSTANCE(&object) = (brInstance*)penetrations[ n];
+		object.set( (brInstance*)penetrations[ n] );
 		brEvalListInsert(head, n, &object);
 	}
    
-	BRLIST(target) = head;
+	target->set( head );
 
 	return EC_OK;
 }
@@ -372,7 +376,7 @@ int brILinkGetPenetratingObjects(brEval args[], brEval *target, brInstance *i) {
 int brILinkCheckSelfPenetration(brEval args[], brEval *target, brInstance *i) { 
 	slLink *l = BRLINKPOINTER(&args[0]);
 
-	BRINT(target) = l->checkSelfPenetration(i->engine->world);
+	target->set( l->checkSelfPenetration(i->engine->world) );
    
 	return EC_OK;
 }
@@ -452,7 +456,6 @@ int brIVectorFromLinkPerspective(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	target->type = AT_VECTOR;
 	slVectorInvXform(link->getPosition()->rotation, vector, &BRVECTOR(target));
 
 	return EC_OK;

@@ -1,11 +1,11 @@
-CC	= @CC@
-CXX	= @CXX@
-JAR	= @JAR@
-JAVAC	= @JAVAC@
-LEX	= @LEX@
-RANLIB	= @RANLIB@
-AR	= @AR@
-YACC	= @YACC@
+CC			= @CC@
+CXX			= @CXX@
+JAR			= @JAR@
+JAVAC		= @JAVAC@
+LEX			= @LEX@
+RANLIB		= @RANLIB@
+AR			= @AR@
+YACC		= @YACC@
 
 @SET_MAKE@
 
@@ -107,6 +107,8 @@ clean:
 	rm -rf docBuild/docs OSX/build
 	find . -name 'core' -exec rm -f {} \;
 	find . -name '*.o' -exec rm -f {} \;
+
+clean_all: clean
 	find . -name '*.d' -exec rm -f {} \;
 
 OSX_build: optimize lib/libbreve.a
