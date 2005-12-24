@@ -174,6 +174,8 @@ unsigned int brEvalHashFunction(void *e, unsigned int hsize) {
 	int dataSize = 0;
 	int total = 0;
 	unsigned char *p;
+	void *vp;
+	double d;
 
 	switch( ee->type() ) {
 		case AT_INSTANCE:
@@ -181,17 +183,17 @@ unsigned int brEvalHashFunction(void *e, unsigned int hsize) {
 		case AT_DATA:
 		case AT_HASH:
 		case AT_LIST:
-			void *vp = ee->getPointer();
+			vp = ee->getPointer();
 			p = (unsigned char*)&vp;
 			dataSize = sizeof(void*);
 			break;
 		case AT_INT:
-			int i = ee->getInt();
+			i = ee->getInt();
 			p = (unsigned char*)&i;
 			dataSize = sizeof(int);
 			break;
 		case AT_DOUBLE:
-			double d = ee->getDouble();
+			d = ee->getDouble();
 			p = (unsigned char*)&d;
 			dataSize = sizeof(double);
 			break;
