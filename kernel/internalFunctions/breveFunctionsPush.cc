@@ -839,8 +839,8 @@ void breveInitPushFunctions(brNamespace *n) {
  	brNewBreveCall(n, "pushEnvironmentSetListLimit", breveFunctionPushEnvironmentSetListLimit, AT_NULL, AT_POINTER, AT_INT, 0);
  	brNewBreveCall(n, "pushEnvironmentSetEvalLimit", breveFunctionPushEnvironmentSetEvalLimit, AT_NULL, AT_POINTER, AT_INT, 0);
  	brNewBreveCall(n, "pushEnvironmentSetRandomPointLimit", breveFunctionPushEnvironmentSetRandomPointLimit, AT_NULL, AT_POINTER, AT_INT, 0);
- 	brNewBreveCall(n, "pushEnvironmentGetListLimit", breveFunctionPushEnvironmentGetEvalLimit, AT_INT, AT_POINTER, 0);
- 	brNewBreveCall(n, "pushEnvironmentGetEvalLimit", breveFunctionPushEnvironmentGetListLimit, AT_INT, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushEnvironmentGetEvalLimit", breveFunctionPushEnvironmentGetEvalLimit, AT_INT, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushEnvironmentGetListLimit", breveFunctionPushEnvironmentGetListLimit, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushEnvironmentGetRandomPointLimit", breveFunctionPushEnvironmentGetRandomPointLimit, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushParse", breveFunctionPushParse, AT_POINTER, AT_STRING, 0);
  	brNewBreveCall(n, "pushCodeGetString", breveFunctionPushCodeGetString, AT_STRING, AT_POINTER, 0);

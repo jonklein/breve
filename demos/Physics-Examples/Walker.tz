@@ -70,6 +70,8 @@ PhysicalControl : Walker {
 
 		locked = 0.
 
+		new TouchSensor.
+
 		self set-random-seed-from-dev-random.
 
 		self enable-fast-physics.
@@ -443,5 +445,3 @@ MultiBody : Creature {
 		free links.
 		free bodyLink.
 }
-
-# stars of track & field are beautiful people.

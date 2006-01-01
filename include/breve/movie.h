@@ -8,11 +8,13 @@
 
 class slMovie {
 	public:
-		AVFormatContext *context;
-		AVFrame *rgb_pic, *yuv_pic;
+		AVCodecContext *_context;
+		AVFrame *_rgb_pic, *_yuv_pic;
 
-		uint8_t *enc_buf, *rgb_buf, *yuv_buf, *line;
-		unsigned int enc_len, rgb_len, yuv_len;
+		FILE *_fp;
+
+		uint8_t *_enc_buf, *_rgb_buf, *_yuv_buf, *_line;
+		unsigned int _enc_len, _rgb_len, _yuv_len;
 };
 
 slMovie *slMovieCreate(char *, int, int);
