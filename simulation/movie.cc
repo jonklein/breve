@@ -37,7 +37,7 @@ slMovie *slMovieCreate(char *filename, int width, int height) {
 	width &= ~1;
 
 	if (width < 1 || height < 1) {
-		slMessage(DEBUG_ALL, "invalid parameters for new movie\n");
+		slMessage(DEBUG_ALL, "Invalid export size for new movie\n");
 		return NULL;
 	}
 

@@ -239,8 +239,11 @@ int brILinkSetAcceleration(brEval args[], brEval *target, brInstance *i) {
 
 int brILinkGetAcceleration(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
+	slVector v;
 
-	link->getAcceleration(&BRVECTOR(target), NULL);
+	link->getAcceleration(&v, NULL);
+
+	target->set( v );
 
 	return EC_OK;
 }   

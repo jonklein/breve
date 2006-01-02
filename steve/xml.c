@@ -859,7 +859,8 @@ void stXMLObjectStartElementHandler(void *userData, const XML_Char *name, const 
 	state = new stXMLStackEntry;
 	state->state = stXMLStateForElement((char*)name);
 
-	state->string = NULL;
+	state->string = slMalloc(1);
+	state->string[ 0 ] = 0;
 
 	parserState->stateStack.push_back( state);
 
@@ -995,7 +996,7 @@ void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
 
 		switch(state->state) {
 			case XP_INSTANCE:
-				if(parserState->currentInstance == parserState->indexToInstanceMap[ parserState->controllerIndex ]) 
+				if( parserState->currentInstance == parserState->indexToInstanceMap[ parserState->controllerIndex ] ) 
 					brEngineSetController(parserState->engine, parserState->currentInstance->breveInstance);
 				break;
 			case XP_DATA:
@@ -1023,9 +1024,6 @@ void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
 			case XP_MATRIX:
 				sscanf( state->string, "[ (%lf, %lf, %lf), (%lf, %lf, %lf), (%lf, %lf, %lf) ]", &m[0][0], &m[0][1], &m[0][2], &m[1][0], &m[1][1], &m[1][2], &m[2][0], &m[2][1], &m[2][2] );
 				state->eval.set( m );
-				break;
-			default:
-				slMessage(DEBUG_ALL, "warning: unknown tag (%d) while parsing XML\n", state->state);
 				break;
 		}
 

@@ -381,9 +381,12 @@ void slTerrain::draw(slCamera *camera) {
 
 	glPushAttrib(GL_ENABLE_BIT);
 
+	glEnable( GL_LIGHTING );
+
 	_roam->tessellate(camera);
 
 	_polygonsDrawn = _roam->render( camera, _drawMode);
+
 
 	glPopAttrib();
 }

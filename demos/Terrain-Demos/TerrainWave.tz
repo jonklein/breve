@@ -34,6 +34,8 @@ PhysicalControl : TerrainWave {
 
 		self point-camera at (0, 0, 0) from (19, 30, 34).
 
+		self move-light to (0, 30, 0).
+
 	+ to iterate:
 		if random[50] == 0: self drop-ball.
 

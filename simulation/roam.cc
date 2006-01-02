@@ -65,7 +65,7 @@ void slRoamPatch::split(slRoamTriangle *triangle) {
 	}
 
 	// can this triangle not be split any further?
-	if(abs(triangle->_leftX - triangle->_rightX) == 1) return; 
+	if( abs(triangle->_leftX - triangle->_rightX) == 1 ) return; 
 
 	centerX = (triangle->_leftX + triangle->_rightX) >> 1;
 	centerY = (triangle->_leftY + triangle->_rightY) >> 1;
@@ -182,7 +182,7 @@ double slRoamPatch::computeVariance(int lx, int lz, float lh,
 
 	float ch = _terrain->matrix[cx][cz];
 
-	variance = fabs(ch - (lh + rh) / 2.0);
+	variance = fabs( ch - (lh + rh) / 2.0 );
 
 	if(abs(lx - rx) >= 8 || abs(lz - rz) >= 8) {
 		double c; 
