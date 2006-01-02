@@ -155,29 +155,29 @@ wxString VarData::String()
 {
     wxString str;
 
-    switch (eval.type)
+    switch ( eval.type() )
     {
 	case AT_INT:
-	    str << eval.values.intValue;
+	    str << eval.getInt();
 	    break;
 
 	case AT_DOUBLE:
-	    str << eval.values.doubleValue;
+	    str << eval.getDouble();
 	    break;
 
 	case AT_STRING:
-	    str << eval.values.stringValue;
+	    str << eval.getString();
 	    break;
 
 	case AT_POINTER:
-	    str.Printf("%p", eval.values.pointerValue);
+	    str.Printf( "%p", eval.getPointer() );
 	    break;
 
 	case AT_INSTANCE:
-	    if (eval.values.instanceValue == NULL)
+	    if (eval.getInstance() == NULL)
 		str << "(null)";
 	    else
-		str << ((stInstance*)(eval.values.instanceValue->userData))->type->name;
+		str << ((stInstance*)(eval.getInstance()->userData))->type->name;
 	    break;
 
 	case AT_DATA:
@@ -185,17 +185,17 @@ wxString VarData::String()
 	    break;
 
 	case AT_VECTOR:
-	    str << "(" << eval.values.vectorValue.x << ", " <<
-		eval.values.vectorValue.y << ", " <<
-		eval.values.vectorValue.z << ")";
+	    str << "(" << eval.getVector().x << ", " <<
+		eval.getVector().y << ", " <<
+		eval.getVector().z << ")";
 	    break;
 
 	case AT_LIST:
-	    str << "List (" << eval.values.listValue->count << ")";
+	    str << "List (" << eval.getList()->count << ")";
 	    break;
 
 	case AT_HASH:
-	    str << "Hash (" << eval.values.hashValue->table->size << ")";
+	    str << "Hash (" << eval.getHash()->table->size << ")";
 	    break;
 
 	case AT_MATRIX:
@@ -205,9 +205,9 @@ wxString VarData::String()
 		for (i = 0; i < 3; i++)
 		{
 		    str << "(" <<
-			eval.values.matrixValue[i][0] <<
-			eval.values.matrixValue[i][1] <<
-			eval.values.matrixValue[i][2] <<
+			eval.getMatrix()[i][0] <<
+			eval.getMatrix()[i][1] <<
+			eval.getMatrix()[i][2] <<
 			")";
 		}
 
@@ -246,21 +246,21 @@ VarData * SimInstance::ExpandChild(VarData * dlist, wxString named)
 
 		d->SetChildren(ProcessObject(d->GetInstance(), d->GetObject()->super, &ri, &eval));
 	    }
-	    else if (d->GetEval()->type == AT_INSTANCE)
+	    else if (d->GetEval()->type() == AT_INSTANCE)
 	    {
-		if (d->GetEval()->values.instanceValue == NULL)
+		if (d->GetEval()->getInstance() == NULL)
 		    return NULL;
 
-		ri.instance = (stInstance*)d->GetEval()->values.instanceValue->userData;
-		ri.type = ((stInstance*)(d->GetEval()->values.instanceValue->userData))->type;
+		ri.instance = (stInstance*)d->GetEval()->getInstance()->userData;
+		ri.type = ((stInstance*)(d->GetEval()->getInstance()->userData))->type;
 
-		d->SetChildren(ProcessObject((stInstance*)d->GetEval()->values.instanceValue->userData, ((stInstance*)(d->GetEval()->values.instanceValue->userData))->type, &ri, &eval));
+		d->SetChildren(ProcessObject((stInstance*)d->GetEval()->getInstance()->userData, ((stInstance*)(d->GetEval()->getInstance()->userData))->type, &ri, &eval));
 	    }
-	    else if (d->GetEval()->type == AT_LIST)
+	    else if (d->GetEval()->type() == AT_LIST)
 	    {
-		d->SetChildren(ProcessList(d->GetInstance(), d->GetObject(), d->GetEval()->values.listValue));
+		d->SetChildren(ProcessList(d->GetInstance(), d->GetObject(), d->GetEval()->getList() ));
 	    }
-	    else if (d->GetEval()->type == AT_ARRAY)
+	    else if (d->GetEval()->type() == AT_ARRAY)
 	    {
 		d->SetChildren(ProcessArray(d, d->GetInstance(), d->GetObject(), &ri, &eval));
 	    }
@@ -314,7 +314,7 @@ VarData * SimInstance::ProcessArray(VarData * top, stInstance * instance, stObje
     int i = 0;
     int off;
 
-    if (top->GetACount() < 1 || top->GetEval()->values.intValue == AT_ARRAY)
+    if (top->GetACount() < 1 || top->GetEval()->getInt() == AT_ARRAY)
 	return NULL;
 
     off = top->GetOffset();
@@ -325,10 +325,10 @@ VarData * SimInstance::ProcessArray(VarData * top, stInstance * instance, stObje
 	str << i;
 
 	mutex.Lock();
-	stLoadVariable(&instance->variables[off], top->GetEval()->values.intValue, eval, ri);
+	stLoadVariable(&instance->variables[off], top->GetEval()->getInt(), eval, ri);
 	mutex.Unlock();
 
-	off += stSizeofAtomic(top->GetEval()->values.intValue);
+	off += stSizeofAtomic( top->GetEval()->getInt() );
 
 	d = new VarData(eval, str, instance, object);
 
@@ -367,13 +367,14 @@ VarData * SimInstance::ProcessObject(stInstance * instance, stObject * object, s
 	}
 	else
 	{
-	    eval->type = AT_ARRAY;
-	    eval->values.intValue = var->type->arrayType;
+	    // eval->set( var->type->arrayType );
+	    // eval->setType( AT_ARRAY );
+		eval->set( 0 );
 	}
 
 	d = new VarData(eval, var->name, instance, object);
 
-	if (eval->type == AT_ARRAY)
+	if ( eval->type() == AT_ARRAY )
 	{
 	    d->SetOffset(var->offset);
 	    d->SetACount(var->type->arrayCount);
@@ -406,8 +407,7 @@ VarData * SimInstance::ProcessObject(stInstance * instance, stObject * object, s
 
 VarData::VarData(brEval * e, wxString name, stInstance * instance, stObject * object, int issuper)
 {
-    this->eval.values = e->values;
-    this->eval.type = e->type;
+	brEvalCopy( e, &this->eval );
     this->name = name;
     next = NULL;
     children = NULL;
@@ -415,7 +415,7 @@ VarData::VarData(brEval * e, wxString name, stInstance * instance, stObject * ob
     this->instance = instance;
     this->object = object;
 
-    switch (eval.type)
+    switch ( eval.type() )
     {
 	default:
 	    expandable = 0;

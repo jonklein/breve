@@ -1,6 +1,6 @@
 <!--
     The breve Simulation Environment documentation
-    Copyright (C) 2003 Jonathan Klein
+    Copyright (C) 2003-2006 Jonathan Klein
 -->
 
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V3.1//EN" [
@@ -28,9 +28,9 @@
 <mediaobject role="online">
 <imageobject><imagedata fileref="images/breve_icon.jpg" align="center"></imageobject>
 </mediaobject>
-<date>2005-08-30</date>
+<date>2006-01-01</date>
 <title>breve Documentation</title>
-<subtitle>version 2.3</subtitle>
+<subtitle>version 2.4b</subtitle>
 </bookinfo>
 
 <toc>

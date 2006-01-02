@@ -1,27 +1,27 @@
-<chapter id="version-2.0"> <title>What's New in Version 2.3</title>
+<chapter id="version-2.0"> <title>What's New in Version 2.4</title>
 
 <para>
-breve version 2.3 introduces several new features and changes.  
+breve version 2.4 introduces several new features and changes.  
 </para>
 
-<sect1 id="new_features"> <title>New Features in Version 2.3</title>
+<sect1 id="new_features"> <title>New Features in Version 2.4</title>
 <para>
 
-Below are some of the major new features found in breve 2.3.  For a full 
+Below are some of the major new features found in breve 2.4.  For a full 
 list of new features, see the "Changes" file that is included with the 
 breve distribution.
 
 <itemizedlist>
   <listitem><para>
-Major improvements to physical simulation performance and accuracy.
+Complete overhaul of garbage collection for faster and more stable simulations.
   </para></listitem>
 
   <listitem><para>
-New generic GeneticAlgorithm class.
+New evolvable DirectedGraph object.
   </para></listitem>
 
   <listitem><para>
-Improved support for Joint objects.
+Added TurtleDrawing class for drawing via Logo-like turtle commands
   </para></listitem>
 
 </itemizedlist> 

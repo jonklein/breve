@@ -32,7 +32,6 @@ static int slMovieEncodeFrame(slMovie *m);
 slMovie *slMovieCreate(char *filename, int width, int height) {
 	AVCodec *codec;
 	slMovie *m;
-	int n;
 
 	height &= ~1;
 	width &= ~1;
@@ -73,7 +72,11 @@ slMovie *slMovieCreate(char *filename, int width, int height) {
 
 	m->_context->width = width;
 	m->_context->height = height;
+#if (LIBAVCODEC_VERSION_INT>>16)>=51
 	m->_context->time_base = (AVRational){1,25};
+#else
+	m->_context->frame_rate = 1000 * m->_context->frame_rate_base;
+#endif
 	m->_context->bit_rate = 800 * 1000;
 	m->_context->gop_size = 15;
 	m->_context->max_b_frames = 1;
