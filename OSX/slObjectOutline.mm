@@ -58,13 +58,10 @@
     // if this is a valid and active instance, create a data item for it
 
     if(i && i->status == AS_ACTIVE) {
-		BRINSTANCE(&newEval) = i;
-        newEval.type = AT_INSTANCE;
+		newEval.set( i );
         instance = i;
-        root = [[slObjectOutlineItem alloc] initWithEval: &newEval name: NULL withVar: NULL withOffset: NULL instance: i];
-
-		// root = [[slObjectOutlineObject alloc] initWithInstance: i object: i->object];
-    } else {
+        root = [ [ slObjectOutlineItem alloc ] initWithEval: &newEval name: NULL withVar: NULL withOffset: 0 instance: (stInstance*)i ];
+	} else {
         root = NULL;
         instance = NULL;
     }

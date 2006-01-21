@@ -116,15 +116,15 @@
 				//We must set this, because we want to run the context full screen.
 				kCGLPFAFullScreen,
 				//These two attributes set which screen we want to run on.
-				kCGLPFADisplayMask, CGDisplayIDToOpenGLDisplayMask(displayID),
+				kCGLPFADisplayMask, (CGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(displayID),
 				//We want a context with a depth buffer of any size.
-				kCGLPFADepthSize, 8,
+				kCGLPFADepthSize, (CGLPixelFormatAttribute)8,
 				//We want a context with a depth buffer of any size.
-				kCGLPFAStencilSize, 2,
-				kCGLPFASampleBuffers, 1,
-				kCGLPFASamples, 4,
+				kCGLPFAStencilSize, (CGLPixelFormatAttribute)2,
+				kCGLPFASampleBuffers, (CGLPixelFormatAttribute)1,
+				kCGLPFASamples, (CGLPixelFormatAttribute)4,
 				//The list must always end with 0.
-				0
+				(CGLPixelFormatAttribute)0
 		};
 
 		CGLPixelFormatObj pix;

@@ -65,7 +65,7 @@ static NSRecursiveLock *gLogLock;
 	return YES;
 }
 
-- (void)applicationWillFinishLaunching:(NSNotification*)not {
+- (void)applicationWillFinishLaunching:(NSNotification*)note {
 	struct direct **docsArray;
 	int demoCount, n;
 	NSString *name;
@@ -164,7 +164,7 @@ static NSRecursiveLock *gLogLock;
 	[menu setPath: [NSString stringWithCString: directory]];
 
 	for(n=0;n<demoCount;n++) {
-		fullpath = slMalloc(strlen(directory) + strlen(demoArray[n]->d_name) + 2);
+		fullpath = (char*)slMalloc(strlen(directory) + strlen(demoArray[n]->d_name) + 2);
 
 		sprintf(fullpath, "%s/%s", directory, demoArray[n]->d_name);
 
@@ -186,7 +186,7 @@ static NSRecursiveLock *gLogLock;
 			[menu insertItemWithTitle: name action: @selector(demoMenu:) keyEquivalent: @"" atIndex: menuCount++];
 		}
 		
-		slFree(fullpath);
+		slFree( fullpath );
 
 		free(demoArray[n]);
 	}
@@ -199,7 +199,7 @@ static NSRecursiveLock *gLogLock;
 	= actions to be called on quit
 */
 
-- (void)applicationWillTerminate:(NSNotification*)not {
+- (void)applicationWillTerminate:(NSNotification*)note {
 	[breveEngine stopSimulation];
 	[preferences savePrefs];
 }
@@ -511,16 +511,16 @@ static NSRecursiveLock *gLogLock;
 }
 
 - (IBAction)newWithTemplate:sender {
-	NSString *template, *type;
+	NSString *templateFile, *type;
 	NSDocument *d;
 
-	template = [NSString stringWithFormat: @"%@/Template.tz", 
+	templateFile = [NSString stringWithFormat: @"%@/Template.tz", 
 					[[NSBundle mainBundle] resourcePath]];
 
 	type = [[NSDocumentController sharedDocumentController] typeFromFileExtension: @"tz"];
 
 	d = [[[NSDocumentController sharedDocumentController] 
-		openDocumentWithContentsOfFile: template display: YES] retain];
+		openDocumentWithContentsOfFile: templateFile display: YES] retain];
 
 	[d setFileName: NULL];
 }
@@ -740,7 +740,7 @@ void updateMenu(brInstance *i) {
 	[gSelf clearSimulationMenu];
 
 	for(n=0;n<slStackSize(i->menus);n++) {
-		brMenuEntry *entry = slStackGet(i->menus, n);
+		brMenuEntry *entry = ( brMenuEntry* )slStackGet(i->menus, n);
 
 		if(!strcmp(entry->title, "")) {
 			[gSimMenu addItem: [NSMenuItem separatorItem]];

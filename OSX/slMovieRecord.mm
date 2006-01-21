@@ -107,7 +107,7 @@
         return NULL;
     }
 
-    SetRect(&theBounds, 0, 0, bounds.size.width, bounds.size.height);
+    SetRect(&theBounds, 0, 0, (int)bounds.size.width, (int)bounds.size.height);
     err = NewGWorld(&theGWorld, 32, &theBounds, NULL, NULL, 0);
 
     if(err) {
@@ -144,7 +144,7 @@
         return NULL;
     }
 
-    theTrack = NewMovieTrack(theMovie, FixRatio(bounds.size.width, 1), FixRatio(bounds.size.height, 1), kNoVolume);
+    theTrack = NewMovieTrack(theMovie, FixRatio((int)bounds.size.width, 1), FixRatio((int)bounds.size.height, 1), kNoVolume);
 
     if(e = GetMoviesError()) {
         NSLog(@"Movie error %d during NewMovieTrack\n", e);
@@ -191,7 +191,7 @@
     return theDuration;
 }
 
-- (void)queueFrameFromRGBAPixels:(char*)ptr {
+- (void)queueFrameFromRGBAPixels:(unsigned char*)ptr {
     int length;
     NSData *data;
 
@@ -213,7 +213,7 @@
 
     for(n=0;n<[theFrameArray count];n++) {
         data = [theFrameArray objectAtIndex: n];
-        result = [self addFrameFromRGBAPixels: (char*)[data bytes]];
+        result = [self addFrameFromRGBAPixels: (unsigned char*)[data bytes]];
 
         if(result) return result;
     }
@@ -222,7 +222,7 @@
 }
 
 - (int)addFrameFromQueue:(int)n {
-    return [self addFrameFromRGBAPixels: (char*)[[theFrameArray objectAtIndex: n] bytes]];
+    return [self addFrameFromRGBAPixels: (unsigned char*)[[theFrameArray objectAtIndex: n] bytes]];
 }
 
 /* 
@@ -234,9 +234,9 @@
     zero.
 */
 
-- (int)addFrameFromRGBAPixels:(char*)ptr {
+- (int)addFrameFromRGBAPixels:(unsigned char*)ptr {
     PixMapHandle pmh;
-    char *pmhPixels;
+    unsigned char *pmhPixels;
     int result;
     int x, y;
     int rowBytes;
@@ -247,7 +247,7 @@
     pmh = GetPortPixMap(theGWorld);
 
     LockPixels(pmh);
-    pmhPixels = GetPixBaseAddr(pmh);
+    pmhPixels = (unsigned char*)GetPixBaseAddr(pmh);
 
     rowBytes = (**pmh).rowBytes & 0x3fff;
 
@@ -351,8 +351,8 @@
     FSRef fsRef;
     FILE *fp;
 
-    /* this FSSpec code will fail if the file doesn't already exist. */
-    /* Make the file exist. */
+    // this FSSpec code will fail if the file doesn't already exist,
+	// so create the file.
 
     if(!(fp = fopen([self cString], "w"))) {
         NSLog(@"Error creating file\n");
@@ -361,7 +361,7 @@
 
     fclose(fp);
 
-    if (FSPathMakeRef([self UTF8String], &fsRef, NULL)) {
+    if (FSPathMakeRef( (UInt8*)[self UTF8String], &fsRef, NULL)) {
         NSLog(@"Error in FSPathMakeRef\n");
         return -1;
     }

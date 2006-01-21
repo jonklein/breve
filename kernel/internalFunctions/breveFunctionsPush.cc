@@ -290,7 +290,7 @@ float brevePushCodeFirstFloat(const push::Code *code, bool *found ) {
 }
 
 int breveFunctionPushCodeFirstFloat(brEval arguments[], brEval *result, brInstance *instance) {
-	const PushCode *code = BRPOINTER(&arguments[0]);
+	const push::Code *code = (push::Code*)BRPOINTER(&arguments[0]);
 	bool found;
 
 	result->set( brevePushCodeFirstFloat( code, &found ) );

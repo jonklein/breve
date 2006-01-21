@@ -19,59 +19,28 @@
  *****************************************************************************/
 
 //
-//  slGLWindowView.m
+//  slGLWindowController.m
 //  breve
 //
 //  Created by jon klein on Fri May 02 2003.
 //  Copyright (c) 2003 artificial. All rights reserved.
 //
 
-#import "slGraphWindowView.h"
-#import "glIncludes.h"
-// #import "graph.h"
+#import "slGraphWindowController.h"
 
-@implementation slGraphWindowView
+@implementation slGraphWindowController
 
-- (id)initWithFrame:(NSRect)frameRect {
-    /* the default attribute values from IB don't seem to work on a lot   */
-    /* of machines.  that's dumb.  we'll use our own values here and hope */
-    /* for the best. */
-
-    NSOpenGLPixelFormatAttribute attribs[] = {
-        NSOpenGLPFAAccelerated,
-        NSOpenGLPFADepthSize, 16,
-        NSOpenGLPFAMinimumPolicy,
-        0
-    };
-
-    NSOpenGLPixelFormat *format = [[[NSOpenGLPixelFormat alloc] initWithAttributes: attribs] autorelease];
-
-	graph = NULL;
-
-    return [super initWithFrame: frameRect pixelFormat: format];
+- window {
+	return window;
 }
 
-- (void)setGraph:(void*)g {
-    graph = g;
+- graphView {
+    return graphView;
 }
 
-- (void)drawRect:(NSRect)r {
-	NSRect bounds = [self bounds];
-
-	[[self openGLContext] makeCurrentContext];
-
-	glViewport(0, 0, bounds.size.width, bounds.size.height);
-
-	if(!graph) {
-    	glClearColor(0.0, 0.0, 0.0, 0.0);
-    	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	} else {
-		// graph->width = bounds.size.width;
-		// graph->height = bounds.size.height;
-		// slDrawGraph(graph);
-	}
-
-	glFlush();
+- (void)dealloc {
+	[window release];
+	[super dealloc];
 }
 
 @end

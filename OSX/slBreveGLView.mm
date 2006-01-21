@@ -20,6 +20,10 @@
 
 #import "slBreveGLView.h"
 #import "slBreveApplication.h"
+#import "interface.h"
+#import "camera.h"
+#import "gldraw.h"
+#import "image.h"
 
 @implementation slBreveGLView
 
@@ -104,10 +108,10 @@
 	NSOpenGLPixelFormatAttribute attribs[] = {
 		NSOpenGLPFAAccelerated,
 		NSOpenGLPFAWindow,
-		NSOpenGLPFADepthSize, 24,
-		NSOpenGLPFAAlphaSize, 8,
-		NSOpenGLPFAStencilSize, 8,
-		0,0
+		NSOpenGLPFADepthSize, (NSOpenGLPixelFormatAttribute)24,
+		NSOpenGLPFAAlphaSize, (NSOpenGLPixelFormatAttribute)8,
+		NSOpenGLPFAStencilSize, (NSOpenGLPixelFormatAttribute)8,
+		(NSOpenGLPixelFormatAttribute)0, (NSOpenGLPixelFormatAttribute)0
 	};
 
 	NSOpenGLPixelFormat *format = [[[NSOpenGLPixelFormat alloc] initWithAttributes: attribs] autorelease];
@@ -141,21 +145,21 @@
 	bounds = [self bounds];
 
 	if(!pixelBuffer || !tempPixelBuffer) {
-		pixelBuffer = malloc(bounds.size.width * bounds.size.height * 4);
-		tempPixelBuffer = malloc(bounds.size.width * bounds.size.height * 4);
+		pixelBuffer = (unsigned char*)slMalloc( (int)( bounds.size.width * bounds.size.height * 4 ) );
+		tempPixelBuffer = (unsigned char*)slMalloc( (int)( bounds.size.width * bounds.size.height * 4 ) );
 	} else {
-		pixelBuffer = realloc(pixelBuffer, bounds.size.width * bounds.size.height * 4);
-		tempPixelBuffer = realloc(tempPixelBuffer, bounds.size.width * bounds.size.height * 4);
+		pixelBuffer = (unsigned char*)slRealloc(pixelBuffer, (int)( bounds.size.width * bounds.size.height * 4 ) );
+		tempPixelBuffer = (unsigned char*)slRealloc(tempPixelBuffer, (int)( bounds.size.width * bounds.size.height * 4 ) );
 	}
 
 	if(!viewEngine) return;
 
 	if(fullScreen) {
-		x = [fullScreenView width];
-		y = [fullScreenView height];
+		x = (int)[fullScreenView width];
+		y = (int)[fullScreenView height];
 	} else {
-		x = bounds.size.width;
-		y = bounds.size.height;
+		x = (int)bounds.size.width;
+		y = (int)bounds.size.height;
 		[[self openGLContext] makeCurrentContext];
 	}
 
@@ -250,7 +254,7 @@
 	if(viewEngine) {
 	   	if(!fullScreen) {
 			slRenderScene(world, camera, drawCrosshair);
-			if(theMovie) [theMovie addFrameFromRGBAPixels: [self RGBAPixels]];
+			if(theMovie) [theMovie addFrameFromRGBAPixels: [self updateRGBAPixels]];
 		}
 	} else {
 		glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -442,14 +446,14 @@
 	brEngineUnlock(viewEngine);
 }
 
-- (char*)RGBAPixels {
+- (unsigned char*)updateRGBAPixels {
 	NSRect bounds = [self bounds];
 
 	if(!pixelBuffer || !tempPixelBuffer) [self updateSize: self];
 
-	glReadPixels(0, 0, bounds.size.width, bounds.size.height, GL_RGBA, GL_UNSIGNED_BYTE, tempPixelBuffer);
+	glReadPixels(0, 0, (int)bounds.size.width, (int)bounds.size.height, GL_RGBA, GL_UNSIGNED_BYTE, tempPixelBuffer);
 
-	slReversePixelBuffer(tempPixelBuffer, pixelBuffer, bounds.size.width * 4, bounds.size.height);
+	slReversePixelBuffer(tempPixelBuffer, pixelBuffer, (int)bounds.size.width * 4, (int)bounds.size.height);
 
 	return pixelBuffer;
 }
@@ -478,12 +482,12 @@
 
 	bounds = [self bounds];
 
-	x = bounds.size.width;
-	y = bounds.size.height;
+	x = (int)bounds.size.width;
+	y = (int)bounds.size.height;
 
 	i = [NSBitmapImageRep alloc];
 
-	[self RGBAPixels];
+	[self updateRGBAPixels];
 
 	[i initWithBitmapDataPlanes: &pixelBuffer
 	   pixelsWide: x

@@ -23,6 +23,11 @@
 #import "slGraphWindowController.h"
 #import "slGraphWindowView.h"
 
+#import "steve.h"
+#import "interface.h"
+#import "interactive.h"
+#import "camera.h"
+
 id simNib;
 id mySelf;
 
@@ -256,7 +261,7 @@ int slMakeCurrentContext();
 
 	if(runState == BX_RUN) [engineLock lock];
 	slMessage(DEBUG_ALL, "> %s\n", command);
-	stRunSingleStatement(frontend->data, frontend->engine, command);
+	stRunSingleStatement( (stSteveData*)frontend->data, frontend->engine, command);
 	if(runState == BX_RUN) [engineLock unlock];
 
 	return 0;
@@ -284,8 +289,8 @@ int slMakeCurrentContext();
 }
 
 - (void)runWorld:sender {
+	NSRect nothing = NSMakeRect( 0, 0, 1, 1 );
 	id pool;
-	NSRect nothing;
 
 	int frame = 0;
 
@@ -307,7 +312,7 @@ int slMakeCurrentContext();
 					mouse = [[[displayView window] contentView] convertPoint: mouse toView: displayView];
 				}
 
-				brEngineSetMouseLocation(frontend->engine, mouse.x, mouse.y);
+				brEngineSetMouseLocation(frontend->engine, (int)mouse.x, (int)mouse.y);
 			}
 
 			if((result = brEngineIterate(frontend->engine)) != EC_OK) {
@@ -340,7 +345,7 @@ int slMakeCurrentContext();
 
 				}
 
-				if(speedFactor > 1) usleep(speedFactor * 10000);
+				if(speedFactor > 1) usleep( (int)( speedFactor * 10000 ) );
 			}
 		}
 
@@ -373,7 +378,7 @@ int slMakeCurrentContext();
 
 	if(runState == BX_RUN) [engineLock lock];
 	slCameraGetBounds(c, &x, &y);
-	brClickAtLocation(frontend->engine, p.x, y - p.y);
+	brClickAtLocation(frontend->engine, (int)p.x, (int)(y - p.y) );
 	[interfaceController updateObjectSelection];
 	if(runState == BX_RUN) [engineLock unlock];
 }
@@ -434,7 +439,7 @@ int slMakeCurrentContext();
  
 	if(method) {
 		if(brMethodCall(controller, method, NULL, &result) == EC_OK) {
-			if(result.type = AT_INSTANCE) {
+			if( result.type() == AT_INSTANCE ) {
 				i = BRINSTANCE(&result);
 
 				if(i && i->status == AS_ACTIVE) return i;

@@ -25,13 +25,15 @@
 extern char *slObjectParseText;
 extern int slObjectParseLine;
 
-void slObjectParseSetBuffer(char *b);
+extern "C" {
+	void slObjectParseSetBuffer(char *b);
+	int slYylex();
+}
+
 
 char *slStripSpaces(char *text);
 
 @implementation slTextView
-
-int slYylex();
 
 /*
     + slTextView.m
@@ -634,11 +636,11 @@ int slYylex();
     [methodMenuArray removeAllObjects];
     [methodMenuArray addObject: [NSNumber numberWithInt: -1]];
 
-    text = (void*)[[self string] cString];
+    text = (char*)[[self string] cString];
 
-    slObjectParseSetBuffer(text);
+    slObjectParseSetBuffer( text );
 
-    while(type = slYylex()) {
+    while( type = slYylex() ) {
         if(type != 1) {
 			char *objectText;
 
@@ -663,9 +665,9 @@ char *slStripSpaces(char *text) {
 	char last = 0;
 	int index = 0, doubleSpace = 0;
 
-	out = slMalloc(strlen(text) + 1);
+	out = (char*)slMalloc( strlen( text ) + 1 );
 
-	while(*text) {
+	while( *text ) {
 		if(*text == ' ' && last == ' ') doubleSpace = 1;
 		else doubleSpace = 0;
 
@@ -676,7 +678,7 @@ char *slStripSpaces(char *text) {
 		text++;
 	}
 
-	out[index] = 0;
+	out[ index ] = 0;
 
 	return out;
 }

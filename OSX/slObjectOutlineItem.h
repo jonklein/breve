@@ -29,7 +29,9 @@
 
 @interface slObjectOutlineItem : NSObject {
     NSString *name;
-    brEval eval;
+
+    brEval *mEval;
+
     int offset;
     struct stInstance *instance;
 	struct stObject *object;
