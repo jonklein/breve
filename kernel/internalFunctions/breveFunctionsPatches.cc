@@ -22,6 +22,8 @@
 /*@{*/
 
 #include "kernel.h"
+#include "patch.h"
+#include "world.h"
 
 #define BRPATCHGRIDPOINTER(p)	((slPatchGrid*)BRPOINTER(p))
 #define BRPATCHPOINTER(p)	((slPatch*)BRPOINTER(p))

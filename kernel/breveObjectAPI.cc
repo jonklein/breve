@@ -1,4 +1,5 @@
 #include "kernel.h"
+#include "camera.h"
 
 /** \defgroup breveObjectAPI The breve object API: constructing a new language frontend for breve
 

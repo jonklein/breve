@@ -19,6 +19,9 @@
  *****************************************************************************/
 
 #include "kernel.h"
+#include "world.h"
+#include "gldraw.h"
+#include "camera.h"
 
 #ifndef WINDOWS
 #include <dlfcn.h>

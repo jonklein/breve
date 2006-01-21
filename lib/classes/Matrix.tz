@@ -488,6 +488,9 @@ Matrix : Matrix3D (aka Matrices3D) {
 }
 
 Image : MatrixImage {
+	% The MatrixImage allows three 2D matrices to be copied into the red, green and blue 
+	% channels of an image for efficient display.  The image is automatically updated 	
+	% with new matrix values at each iteration.
 
     + variables:
         red (object).
@@ -496,6 +499,7 @@ Image : MatrixImage {
         scale (float).
         
     + to init-with the-matrix theMatrix (object) scale theScale = 1.0 (float):
+		% Initializes the MatrixImage with sizes taken from theMatrix.
     
         super init-with width (theMatrix get-x-dimension)
                         height (theMatrix get-y-dimension).
@@ -503,23 +507,31 @@ Image : MatrixImage {
 
         return self.
         
-    - to destroy:
-        print "Destroying MatrixImage $self.".
-        super destroy.
-        
-    + to set-red to m (object): red = m.
+    + to set-red to m (Matrix2D object): 
+		% Sets the red channel to the matrix m.
+		red = m.
 
-    + to set-green to m (object): green = m.
+    + to set-green to m (Matrix2D object): 
+		% Sets the green channel to the Matrix m.
+		green = m.
 
-    + to set-blue to m (object): blue = m.
+    + to set-blue to m (Matrix2D object): 
+		% Sets the green channel to the Matrix m.
+		blue = m.
 
     + to set-scale-to-max-value of theMatrix (object):
+		% Sets the scale of this matrix image object to the maximum value in the specified matrix.
         scale = (theMatrix get-max-value).
         
     + to iterate:
 		if red: red copy-to-red-channel of-image self with-scale scale.
 		if green: green copy-to-blue-channel of-image self with-scale scale.
 		if blue: blue copy-to-blue-channel of-image self with-scale scale.
+
         super iterate.
+        
+    - to destroy:
+        print "Destroying MatrixImage $self.".
+        super destroy.
         
 }

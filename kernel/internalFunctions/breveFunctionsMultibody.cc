@@ -22,6 +22,8 @@
 /*@{*/
 
 #include "kernel.h"
+#include "world.h"
+#include "multibody.h"
 
 #define BRMULTIBODYPOINTER(p) ((slMultibody*)BRPOINTER(p))
 #define BRLINKPOINTER(p) ((slLink*)BRPOINTER(p))

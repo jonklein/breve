@@ -21,12 +21,10 @@
 #ifndef _LINK_H
 #define _LINK_H
 
-// #include "util.h"
-// #include "worldObject.h"
-// #include "ode/ode.h"
+#include <ode/ode.h>
 
-// class slMultibody;
-// class slJoint;
+#include "worldObject.h"
+#include "multibody.h"
 
 #define slLinkSwapConfig(r)		((r)->_currentState = !(r)->_currentState)
 
@@ -56,7 +54,6 @@ struct slLinkIntegrationPosition {
 	linked bodies called multibodies.
 */
 
-#ifdef __cplusplus
 #include <vector>
 
 class slLink: public slWorldObject {
@@ -168,12 +165,6 @@ class slLink: public slWorldObject {
 
 };
 
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child,
 		int jointType, slVector *normal, 
 		slVector *plinkPoint, slVector *clinkPoint, double m[3][3]);
@@ -185,9 +176,5 @@ void slLinkSetTexture(slLink *l, int texture);
 
 void slSlToODEMatrix(double m[3][3], dReal *r);
 void slODEToSlMatrix(dReal *r, double m[3][3]);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* LINK_H */

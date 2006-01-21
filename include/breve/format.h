@@ -1,7 +1,7 @@
 /*****************************************************************************
  *                                                                           *
  * The breve Simulation Environment                                          *
- * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
+ * Copyright (C) 2000-2006 Jonathan Klein                                    *
  *                                                                           *
  * This program is free software; you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -18,21 +18,4 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-class slCamera;
-class slWorld;
-
-unsigned char *slReadSGIImage(char *name, int *width, int *height, int *components, int usealpha);
-unsigned char *slReadJPEGImage(char *name, int *width, int *height, int *components, int usealpha);
-unsigned char *slReadPNGImage(char *name, int *width, int *height, int *components, int usealpha);
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-unsigned char *slReadImage(char *name, int *height, int *width, int *components, int alpha);
-int slPNGWrite(char *name, int w, int h, unsigned char *buffer, int channels, int reversed);
-int slPNGSnapshot(slWorld *w, slCamera *c, char *file);
-
-void slReversePixelBuffer(unsigned char *source, unsigned char *dest, int width, int height);
-#ifdef __cplusplus
-}
-#endif
+char *slFormatText(char *text);

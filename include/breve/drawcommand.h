@@ -5,21 +5,14 @@
 #ifndef _DRAWCOMMAND_H
 #define _DRAWCOMMAND_H
 
-#ifdef __cplusplus
-
 class slDrawCommand;
+class slWorld;
 
 #include <list>
 
 class slDrawCommandList {
 	public:
-		slDrawCommandList(slWorld *w) {
-			slVectorSet( &_origin, 0, 0, 0);
-			slMatrixIdentity( _rotation);
-			_limit = 0;
-			_drawingPolygon = 0;
-			w->drawings.push_back(this);
-		}
+		slDrawCommandList(slWorld *w);
 
 		~slDrawCommandList();
 
@@ -135,6 +128,5 @@ class slDrawCommandColor : slDrawCommand {
 		slVector _color;
 		double _alpha;
 };
-#endif
 
 #endif /* _DRAWCOMMAND_H */

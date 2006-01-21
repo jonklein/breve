@@ -18,17 +18,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#ifdef __cplusplus
-#include <vector>
-#include <algorithm>
+#ifndef _MULTIBODY_H
+#define _MULTIBODY_H
 
 #include "simulation.h"
+#include "link.h"
+
+#include "ode/ode.h"
+
+#include <vector>
 
 /*!
 	\brief A logical collection of attached links.
 */
 
-class slMultibody { 
+class slMultibody {
 	public:
 		slMultibody(slWorld *w);
 		~slMultibody();
@@ -64,7 +68,7 @@ class slMultibody {
 		float getCFM() { return _cfm; };
 		float getERP() { return _erp; };
 
-		std::vector<slLink*> _links;
+		std::vector< slLink* > _links;
 
 		slLink *getRoot();
 
@@ -83,12 +87,6 @@ class slMultibody {
 
 };
 
-#endif
-
-#ifdef __cplusplus
-extern "C"{
-#endif
-
 int slInitShapeList(slShape **slist, slPosition **plist, slMultibody *root);
 
 void slMultibodyRotAngleToMatrix(slVector *axis, double r, double rot[3][3]);
@@ -97,7 +95,4 @@ slMultibody *slLinkFindMultibody(slLink *root);
 
 void slNullOrphanMultibodies(slLink *orphan);
 
-#ifdef __cplusplus
-}
 #endif
-

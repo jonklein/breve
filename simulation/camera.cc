@@ -19,6 +19,9 @@
  *****************************************************************************/
 
 #include "simulation.h"
+#include "camera.h"
+#include "world.h"
+#include "gldraw.h"
 
 /*!
 	\brief Creates a new camera of a given size.

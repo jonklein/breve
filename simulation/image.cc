@@ -25,11 +25,10 @@
 
 #include "simulation.h"
 
-// #include "util.h"
-// #include "world.h"
-// #include "camera.h"
-// #include "image.h"
-// #include "glIncludes.h"
+#include "glIncludes.h"
+
+#include "image.h"
+#include "camera.h"
 
 #if HAVE_LIBPNG
 #include <png.h>

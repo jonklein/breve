@@ -20,6 +20,8 @@
 
 #include "simulation.h"
 #include "glIncludes.h"
+#include "gldraw.h"
+#include "camera.h"
 #include "vclip.h"
 #include "vclipData.h"
 
@@ -32,10 +34,8 @@ PFNGLTEXIMAGE3DPROC wglTexImage3D;
 /**
  *  slPatch default constructor.
  */
-slPatch::slPatch()
-    :   data(NULL) // NULL is deprecated in c++
-{
-    // your code here ;-)
+
+slPatch::slPatch() :  data(NULL) {
 }
 
 /**
@@ -44,9 +44,8 @@ slPatch::slPatch()
  * 
  *  @param theGrid the slPatchGrid parent object.
  */
-slPatch::slPatch(slPatchGrid* theGrid)
-    :   grid(theGrid)
-{
+
+slPatch::slPatch(slPatchGrid* theGrid) :  grid(theGrid) {
     // your code here ;-)
 }
 
@@ -60,9 +59,9 @@ slPatch::slPatch(   slPatchGrid* theGrid,
 }
 
 /**
- *    setColor sets the color of the patch to color
- *
+ * Sets the color of a patch.
  */
+
 void slPatch::setColor(slVector *color) {
 	if (color->x > 1.0) color->x = 1.0;
 	else if(color->x < 0.0) color->x = 0.0;
@@ -79,10 +78,9 @@ void slPatch::setColor(slVector *color) {
 }
 
 /**
- *    setTransparence sets the transparency of the
- *    patch to transparency
- *
+ * sets the transparency of a patch.
  */
+
 void slPatch::setTransparency(double transparency) {
 	if (transparency > 1.0) transparency = 1.0;
 	else if(transparency < 0.0) transparency = 0.0;
@@ -96,6 +94,7 @@ void slPatch::setTransparency(double transparency) {
  *    slPatch base constructor requires a parent grid
  *    location and color offset
  */
+
 void slPatch::getColor(slVector *color) {
 	color->x = grid->colors[this->colorOffset    ] / 255.0;
 	color->y = grid->colors[this->colorOffset + 1] / 255.0;
@@ -111,30 +110,28 @@ void* slPatch::getData() {
 	return this->data;
 }
 
-/// why isn't this a return value?
 void slPatch::getLocation(slVector *location) {
 	slVectorCopy(&this->location, location);
 }
 
 /**
  *  slPatchGrid default constructor.
- *
  */		
-slPatchGrid::slPatchGrid()
-    :   _texture(-1),
-		_cubeDrawList(-1)
+
+slPatchGrid::slPatchGrid() : _texture(-1), _cubeDrawList(-1)
 {
 	_drawWithTexture = 1;
 	_cubeDrawList = -1;
 }
 
 /**
- *  slPatch base constructor.
+ *  base constructor.
  *
  *  @param theLocation the location as a vector.
  *  @param theGrid the slPatchGrid parent object.
  *  @param theColorOffset the texture offset for GL display
  */
+
 slPatchGrid::slPatchGrid(const slVector *center, const slVector *patchSize, const int x, const int y, const int z)
     :  xSize(x),
 	   ySize(y),
@@ -389,21 +386,21 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 
 	glEnable(GL_BLEND);
 
-	for(z=0;z<(int)zSize;z++) {
-		if(z < zMid) zVal = z;
+	for( z = 0; z < (int)zSize; z++ ) {
+		if( z < (int)zMid ) zVal = z;
 		else zVal = (zSize - 1) - (z - zMid);
 
 		translation.z = startPosition.z + patchSize.z * zVal;
 
 		for(x=(xSize - 1);x >= 0;x--) {
-			if(x < xMid) xVal = x;
-			else xVal = (xSize - 1) - (x - xMid);
+			if( x < (int)xMid ) xVal = x;
+			else xVal = ( xSize - 1 ) - ( x - xMid );
 
 			translation.x = startPosition.x + patchSize.x * xVal;
 
 			for(y=0;y<(int)ySize;y++) {
-				if(y < yMid) yVal = y;
-				else yVal = (ySize - 1) - (y - yMid);
+				if( y < (int)yMid ) yVal = y;
+				else yVal = ( ySize - 1 ) - ( y - yMid );
 
 				patch = &patches[zVal][xVal][yVal];
 

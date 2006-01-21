@@ -22,6 +22,8 @@
 /*@{*/
 
 #include "kernel.h"
+#include "gldraw.h"
+#include "image.h"
 
 typedef struct brImageData brImageData;
 
@@ -133,7 +135,11 @@ int brIImageReadPixels(brEval args[], brEval *result, brInstance *i) {
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
+	// Alpha channel washed out on Windows?!  Fix it with a 1.0 bias
+
+	glPixelStoref( GL_ALPHA_BIAS, 1.0 );
 	glReadPixels(x, y, dm->x, dm->y, GL_RGBA, GL_UNSIGNED_BYTE, dm->data);
+	glPixelStoref( GL_ALPHA_BIAS, 0.0 );
 
 	return EC_OK;
 }

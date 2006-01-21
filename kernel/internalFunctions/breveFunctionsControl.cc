@@ -25,6 +25,8 @@
 
 #include <unistd.h>
 #include "kernel.h"
+#include "world.h"
+#include "camera.h"
 
 /*!
 	\brief Gets all the keys pressed down.

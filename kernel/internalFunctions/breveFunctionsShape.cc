@@ -22,6 +22,8 @@
 #include "steve.h"
 #include "expression.h"
 #include "evaluation.h"
+#include "world.h"
+#include "shape.h"
 
 #define BRSHAPEPOINTER(p)	((slShape*)BRPOINTER(p))
 

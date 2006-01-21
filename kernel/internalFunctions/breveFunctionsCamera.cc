@@ -22,6 +22,9 @@
 /*@{*/
 
 #include "kernel.h"
+#include "camera.h"
+#include "world.h"
+#include "gldraw.h"
 
 #define BRCAMERAPOINTER(p)	((slCamera*)BRPOINTER(p))
 

@@ -25,15 +25,15 @@
 #include <sys/stat.h>
 #include <gsl/gsl_rng.h>
 
-#include "simulation.h"
-#include "timeval.h"
-
-#ifdef __cplusplus
 #include <vector>
 #include <map>
 #include <string>
 #include <algorithm>
-#endif
+
+#include "simulation.h"
+#include "timeval.h"
+
+class slCamera;
 
 // the maximum error size 
 

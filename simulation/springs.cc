@@ -19,6 +19,10 @@
  *****************************************************************************/
 
 #include "simulation.h"
+#include "glIncludes.h"
+#include "springs.h"
+#include "world.h"
+#include "link.h"
 #include "shape.h"
 
 /*!

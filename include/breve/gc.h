@@ -18,19 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-/**
- *	A record for the steve garbage collector
- */
-
-struct stGCRecord {
-	stGCRecord() { pointer = NULL; type = AT_NULL; }
-
-	stGCRecord( void *p, int t ) { pointer = p; type = t; };
-
-	void *pointer;
-	int type;
-};
-
 void stGCRetain(brEval *eval);
 void stGCRetainPointer(void *pointer, int type);
 
@@ -42,13 +29,6 @@ void stGCCollectPointer(void *pointer, int type);
 
 void stGCUnretainAndCollect(brEval *eval);
 void stGCUnretainAndCollectPointer(void *pointer, int type);
-
-void stGCMark(stInstance *instance, brEval *collect);
-inline void stGCMarkPointer(stInstance *instance, void *pointer, int type);
-
-void stGCUnmark(stInstance *instance, brEval *collect);
-
-void stGCCollectStack(slStack *gcStack);
 
 void brEvalListRetain(brEvalListHead *h);
 void brEvalListUnretain(brEvalListHead *h);

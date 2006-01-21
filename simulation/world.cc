@@ -22,9 +22,14 @@ int gPhysicsError;
 char *gPhysicsErrorMessage;
  
 #include "simulation.h"
+#include "world.h"
 #include "tiger.h"
+#include "link.h"
+#include "multibody.h"
+#include "integrate.h"
 #include "vclip.h"
 #include "vclipData.h"
+#include "gldraw.h"
 
 void *operator new (size_t size) {
 	void *p = calloc(1, size); 

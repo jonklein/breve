@@ -33,6 +33,8 @@
 #include <unistd.h>
 #include <errno.h>
 
+#include <vector>
+
 // M_PI not defined on some platforms?  bastards.
 
 #ifndef M_PI
@@ -44,21 +46,5 @@
 #include "util.h"
 
 #include "simulationTypedefs.h"
-
-#include "image.h"
-#include "integrate.h"
-#include "gldraw.h"
-#include "shape.h"
-#include "patch.h"
-#include "world.h"
-#include "netsim.h"
-#include "link.h"
-#include "lightdetector.h"
-#include "camera.h"
-#include "multibody.h"
-#include "springs.h"
-#include "worldObject.h"
-#include "terrain.h"
-#include "drawcommand.h"
 
 #endif /* _SIMULATION_H */

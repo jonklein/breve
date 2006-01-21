@@ -1,5 +1,7 @@
 #include "simulation.h"
 #include "roam.h"
+#include "camera.h"
+#include "glIncludes.h"
 
 #define MAX(x,y)    ((x)>(y)?(x):(y))
 

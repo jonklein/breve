@@ -1,6 +1,3 @@
-#ifdef __cplusplus
-extern "C" {
-#endif
 void brBeginDrag(brEngine *, brInstance *);
 void brEndDrag(brEngine *, brInstance *);
 void brSetUpdateMenuCallback(brInstance *, void (*)(brInstance *));
@@ -19,7 +16,3 @@ char *brEngineRunSaveDialog(brEngine *);
 char *brEngineRunLoadDialog(brEngine *);
 
 void brEngineSetMouseLocation(brEngine *, int, int);
-
-#ifdef __cplusplus
-}
-#endif

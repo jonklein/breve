@@ -21,7 +21,6 @@
 #ifndef _KERNEL_H
 #define _KERNEL_H
 
-
 /*!
 	\mainpage The breve Simulation Environment: source documentation
 

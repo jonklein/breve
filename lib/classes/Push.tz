@@ -19,6 +19,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 	+ variables:
 		pushInterpreterPointer (pointer).
+		effort (int).
 
 	+ to init:
 		pushInterpreterPointer = pushEnvironmentNew(random[2000000000]).
@@ -100,12 +101,29 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 		if steps == -1: steps = pushEnvironmentGetEvalLimit(pushInterpreterPointer).
 
-		return pushRun(pushInterpreterPointer, (codeObject get-code-pointer), steps).
+		effort += pushRun(pushInterpreterPointer, (codeObject get-code-pointer), steps).
+
+		return !pushInterpreterDone( pushInterpreterPointer ).
 
 	+ to step for-steps steps = 1 (int):
 		% Steps the interpreter forward by the specified number of instructions.
 
-		return pushStep(pushInterpreterPointer, steps).
+		effort += pushStep(pushInterpreterPointer, steps).
+
+		return !pushInterpreterDone( pushInterpreterPointer ).
+
+	+ to get-effort:
+		% Returns the "effort" of the Push interpreter--the running tally of instructions 
+		% the 
+		% interpreter has executed.
+		% for associating energy costs with computation in evolving populations.
+		
+		return effort.
+
+	+ to reset-effort:
+		% Clears the effort counter to 0.
+
+		effort = 0.
 
 	+ to run-with-exec-stack-dump program codeObject (object) for-steps steps = -1 (int):
 		% Dumps out the exec stack at every instruction step.  Extremely 
@@ -184,6 +202,10 @@ Object : PushInterpreter (aka PushInterpreters) {
 		% Returns the size of the code stack.
 		return pushCodeStackSize(pushInterpreterPointer).
 
+	+ to get-exec-stack-size:
+		% Returns the size of the code stack.
+		return pushExecStackSize(pushInterpreterPointer).
+
 	+ to get-vector-stack-size:
 		% Returns the size of the vector stack.
 		return pushVectorStackSize(pushInterpreterPointer).
@@ -238,6 +260,22 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 		program parse program pushCodeGetString(other).
 
+	+ to copy-exec-stack-top to program (object):
+		% Copies the top of the code stack to an existing program.
+		% Use METHOD(get-exec-stack-size) to determine whether the 
+		% code stack is empty or not.
+
+		other (pointer).
+
+		other = pushExecStackTop(pushInterpreterPointer).
+
+		if !other: {
+			program parse program "( )".
+			return.
+		}
+
+		program parse program pushCodeGetString( other ).
+
   + section "Popping the Push Stacks"
 
 	+ to clear-stacks:	
@@ -271,6 +309,12 @@ Object : PushInterpreter (aka PushInterpreters) {
 		% method has no effect.
 
 		pushCodeStackPop(pushInterpreterPointer).
+
+	+ to pop-exec-stack:
+		% Pops the exec stack.  If the code stack is empty, this 
+		% method has no effect.
+
+		pushExecStackPop(pushInterpreterPointer).
 
 	+ to archive:
 
@@ -382,6 +426,9 @@ Object : PushProgram (aka PushPrograms) {
 		self parse program (otherProgram get-string).
 
   + section "Getting information about a Push program"
+
+	+ to get-first-float:
+		return pushCodeFirstFloat( codePointer ).
 
 	+ to get-size:
 		% Returns the size of this push program.

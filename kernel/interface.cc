@@ -19,6 +19,8 @@
  *****************************************************************************/
 
 #include "kernel.h"
+#include "world.h"
+#include "gldraw.h"
 
 /*!
 	\brief Adds an item to an object's menu.

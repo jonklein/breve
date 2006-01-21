@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "kernel.h"
+#include "world.h"
 
 /*! \addtogroup InternalFunctions */
 /*@{*/

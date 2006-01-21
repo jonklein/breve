@@ -9,11 +9,6 @@
 
 #include "gc.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
 #include "stringexp.h"
 #include "dataObject.h"
 #include "genetic.h"
@@ -25,7 +20,3 @@ extern "C" {
 #include "evalListCopyGC.h"
 
 #include "steveparse.h"
-
-#ifdef __cplusplus
-}
-#endif

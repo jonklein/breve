@@ -21,6 +21,8 @@
 #include "simulation.h"
 #include "vclip.h"
 #include "vclipData.h"
+#include "link.h"
+#include "multibody.h"
 #include "joint.h"
 
 /*!

@@ -19,6 +19,9 @@
  *****************************************************************************/
 
 #include "simulation.h"
+#include "world.h"
+#include "link.h"
+#include "integrate.h"
 
 /*
 	\brief Calculates the acceleration/velocity derivatives for a link.

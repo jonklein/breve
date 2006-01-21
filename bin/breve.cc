@@ -25,9 +25,12 @@
 	steve-frontend version of the breve simulation environment.
 */
 
+#include "simulation.h"
 #include "steve.h"
 #include "breve.h"
+#include "world.h"
 #include "movie.h"
+#include "gldraw.h"
 
 static void brInterrupt(brEngine *);
 static void graphDisplay(void);
@@ -535,7 +538,7 @@ void slDemoSpecial(int key, int x, int y) {
 	switch(key) {
 		case GLUT_KEY_F1:
 			if (brEngineIterate(frontend->engine) != EC_OK)
-				slFatal("engine iteration failed\n");
+				brQuit(frontend->engine);
 			break;
 		case GLUT_KEY_UP:
 			brSpecialKeyCallback(frontend->engine, "up", 1);

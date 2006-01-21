@@ -1100,6 +1100,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 		images (list).
 
 		cameraPointer = getMainCameraPointer().
+		camera set-camera-pointer to cameraPointer.
 
 		foreach image in loadedImages: images{ images } = image.
 		foreach image in images: (self load-image from image).

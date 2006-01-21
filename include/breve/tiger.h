@@ -1,3 +1,6 @@
+#ifndef _TIGER_H
+#define _TIGER_H
+
 // i <heart> public class members
 
 #include <vector>
@@ -8,6 +11,8 @@
 #include <iostream>
 #include <map>
 #include <set>
+
+#include "glIncludes.h"
 
 class slGISPoint {
 	public:
@@ -48,12 +53,11 @@ class slGISPoint {
 class slGISChain {
 	public:
 		slGISChain( const slGISPoint &start, const slGISPoint &end, short type) {
-			_points.push_back(start);
-			_points.push_back(end);
+			_points.push_back( start );
+			_points.back().setNormal( end );
+			_points.push_back( end );
+			_points.back().setNormal( start );
 			_type = type;
-
-			start.setNormal(end);
-			end.setNormal(start);
 		}
 
 		slGISChain() {};
@@ -65,8 +69,8 @@ class slGISChain {
 			_points.insert( pi, point);
 		}
 
-		std::vector<slGISPoint > _points;
-		std::vector<slGISPoint> _normals;
+		std::vector< slGISPoint > _points;
+		std::vector< slGISPoint > _normals;
 		std::string _name;
 		short _type;
 };
@@ -93,3 +97,5 @@ class slGISData {
 		slGISPoint _center;
 		GLuint _list;
 };
+
+#endif /* _TIGER_H */

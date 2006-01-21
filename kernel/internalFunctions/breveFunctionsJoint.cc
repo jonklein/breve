@@ -20,6 +20,7 @@
 
 #include "kernel.h"
 #include "joint.h"
+#include "world.h"
 
 /*! \addtogroup InternalFunctions */
 /*@{*/
@@ -325,20 +326,26 @@ int brIJointGetVelocity(brEval args[], brEval *target, brInstance *i) {
 
 int brIJointGetForce(brEval args[], brEval *target, brInstance *i) {
 	slJoint *j = BRJOINTPOINTER(&args[0]);
+	slVector r;
 
-	BRVECTOR(target).x = j->_feedback.f1[0] - j->_feedback.f2[0];
-	BRVECTOR(target).y = j->_feedback.f1[1] - j->_feedback.f2[1];
-	BRVECTOR(target).z = j->_feedback.f1[2] - j->_feedback.f2[2];
+	r.x = j->_feedback.f1[0] - j->_feedback.f2[0];
+	r.y = j->_feedback.f1[1] - j->_feedback.f2[1];
+	r.z = j->_feedback.f1[2] - j->_feedback.f2[2];
+
+	target->set( r );
 
 	return EC_OK;
 }
 
 int brIJointGetTorque(brEval args[], brEval *target, brInstance *i) {
 	slJoint *j = BRJOINTPOINTER(&args[0]);
+	slVector r;
 
-	BRVECTOR(target).x = j->_feedback.t1[0] - j->_feedback.t2[0];
-	BRVECTOR(target).y = j->_feedback.t1[1] - j->_feedback.t2[1];
-	BRVECTOR(target).z = j->_feedback.t1[2] - j->_feedback.t2[2];
+	r.x = j->_feedback.t1[0] - j->_feedback.t2[0];
+	r.y = j->_feedback.t1[1] - j->_feedback.t2[1];
+	r.z = j->_feedback.t1[2] - j->_feedback.t2[2];
+
+	target->set( r );
 
 	return EC_OK;
 }

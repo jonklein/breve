@@ -1,5 +1,8 @@
 #if HAVE_LIBAVCODEC
 
+#include "glIncludes.h"
+#include "camera.h"
+
 #include <ffmpeg/avformat.h>
 
 /*!

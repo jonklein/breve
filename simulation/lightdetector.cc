@@ -19,6 +19,9 @@
  *****************************************************************************/
 
 #include "simulation.h"
+#include "glIncludes.h"
+#include "world.h"
+#include "camera.h"
 
 #define WHITE_PIXEL	0x00ffffff
 

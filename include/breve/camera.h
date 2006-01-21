@@ -19,14 +19,16 @@
  *****************************************************************************/
 
 #include "util.h"
-// #include "simulation.h"
-
-#include "gldraw.h"
+#include "shape.h"
 
 #ifndef _CAMERA_H
 #define _CAMERA_H
 
 #define SPHERE_RESOLUTIONS	10
+
+class slWorldObject;
+class slWorld;
+class slStationary;
 
 enum billboardType {
 	BBT_NONE = 0,
@@ -50,7 +52,6 @@ struct slLight {
 	\brief A string of text printed to the GL view.
 */
 
-#ifdef __cplusplus
 class slCameraText {
 	public:
 		slCameraText() { }
@@ -79,7 +80,6 @@ struct slBillboardEntry {
 
 	slWorldObject *object;
 };
-#endif
 
 /*!
 	\brief The camera for the graphical display.
@@ -87,8 +87,6 @@ struct slBillboardEntry {
 	Holds camera position/location, as well as a variety of other
 	rendering data.
 */
-
-#ifdef __cplusplus
 
 #include <vector>
 
@@ -200,11 +198,6 @@ class slCamera {
 		int (*activateContextCallback)();
 		void (*renderContextCallback)(slWorld *w, slCamera *c);
 };
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 void slSetCameraText(slCamera *, int, char *, float, float, slVector *);
 void slSetShadowCatcher(slCamera *, slStationary *, slVector *);
@@ -225,9 +218,5 @@ void slCameraUpdate(slCamera *);
 void slCameraSetRecompile(slCamera *);
 void slCameraSetBounds(slCamera*, unsigned int, unsigned int);
 void slCameraGetBounds(slCamera*, unsigned int*, unsigned int*);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _CAMERA_H */

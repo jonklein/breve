@@ -1,4 +1,6 @@
 #include "kernel.h"
+#include "world.h"
+#include "springs.h"
 
 #define BRSPRINGPOINTER(p)	((slSpring*)BRPOINTER(p))
 #define BRLINKPOINTER(p)	((slLink*)BRPOINTER(p))

@@ -28,8 +28,10 @@
 
 
 #import <Cocoa/Cocoa.h>
+
 #import "slBreve.h"
 #import "slTextView.h"
+#import "format.h"
 
 @interface slBreveSourceDocument : NSDocument
 {

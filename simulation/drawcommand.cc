@@ -1,4 +1,13 @@
 #include "drawcommand.h"
+#include "world.h"
+
+slDrawCommandList::slDrawCommandList(slWorld *w) {
+	slVectorSet( &_origin, 0, 0, 0);
+	slMatrixIdentity( _rotation);
+	_limit = 0;
+	_drawingPolygon = 0;
+	w->drawings.push_back(this);
+}
 
 slDrawCommandList::~slDrawCommandList() {
 	clear();

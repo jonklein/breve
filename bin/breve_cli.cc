@@ -26,9 +26,11 @@
 
 #define OSMESA_WINDOW_SIZE 300
 
-#include "steve.h"
-
 #include <signal.h>
+
+#include "steve.h"
+#include "world.h"
+#include "camera.h"
 
 #include "breve.h"
 #include "glIncludes.h"

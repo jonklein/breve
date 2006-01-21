@@ -18,6 +18,8 @@
  *****************************************************************************/
 
 #include "kernel.h"
+#include "link.h"
+#include "world.h"
 
 /*! \addtogroup InternalFunctions */
 /*@{*/

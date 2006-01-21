@@ -18,11 +18,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _OBJECT_H
+#define _OBJECT_H
+
 /*!
 	\brief A steve object type.
 */
-
-#ifdef __cplusplus
 
 #include <vector>
 #include <set>
@@ -99,7 +100,6 @@ class stMethod {
 
 		int stackOffset;
 };
-#endif
 
 /*!
 	\brief Holds the type of a variable.
@@ -225,3 +225,5 @@ void stRemoveFromInstanceLists(stInstance *);
 brInstance *stInstanceCreateAndRegister(stSteveData *d, brEngine *, brObject *);
 
 void stObjectFreeAllInstances(stObject *);
+
+#endif _OBJECT_H

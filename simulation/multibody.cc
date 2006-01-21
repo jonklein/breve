@@ -29,6 +29,9 @@
 */
 
 #include "simulation.h"
+#include "world.h"
+#include "link.h"
+#include "multibody.h"
 #include "joint.h"
 #include "vclip.h"
 #include "vclipData.h"

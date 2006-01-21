@@ -24,6 +24,7 @@
 typedef unsigned char slPairFlags;
 
 #include "vclipData.h"
+#include "world.h"
 
 #define MC_TOLERANCE	0.00
 #define VC_WARNING_TOLERANCE -0.1

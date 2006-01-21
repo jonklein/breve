@@ -22,6 +22,8 @@
 /*@{*/
 
 #include "kernel.h"
+#include "terrain.h"
+#include "world.h"
 
 #define BRTERRAINPOINTER(p)  ((slTerrain*)BRPOINTER(p))
 

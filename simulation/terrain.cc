@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "simulation.h"
+#include "terrain.h"
 #include "roam.h"
 #include "vclip.h"
 #include "vclipData.h"

@@ -19,6 +19,8 @@
  *****************************************************************************/
 
 #include "ode/ode.h"
+#include "link.h"
+#include "multibody.h"
 
 enum jointTypes {
 	JT_REVOLUTE = 1,

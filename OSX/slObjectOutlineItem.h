@@ -91,16 +91,3 @@
 - initWithInstance:(struct stInstance*)i type:(int)t offset:(int)o name:(NSString*)name;
 
 @end
-
-@interface slObjectOutlineListIndex : slObjectOutlineEvaluation {
-	brEvalListHead *list;
-	int index;
-}
-
-@end
-
-@interface slObjectOutlineHashIndex : slObjectOutlineEvaluation {
-	brEvalHash *hash;
-}
-
-@end

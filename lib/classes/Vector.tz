@@ -44,14 +44,12 @@ Object : Vector (aka Vectors) [version 2.3] {
         % vector.
         % <P>
         % This method is hardware accelerated where supported.
-        print "error".
         return vectorGetAbsoluteSum(vectorPointer).
 
     + to multiply-with-values of otherVector (Vector object):
         % Multiplies each element in this vector with the corresponding 
         % element in otherVector.  This is not regular vector multiplication;
         % rather, it is a way to scale each element in otherVector.
-        print "error".
         vectorMulElements(vectorPointer, (otherVector get-vector-pointer)).
 
 	+ to transform with-matrix transformation (Matrix2D object) with-result result (Vector object):
@@ -72,12 +70,10 @@ Object : Vector (aka Vectors) [version 2.3] {
 
     + to set-all-values to value (float):
         % Sets all of the values in the vector to value.
-        print "error".
         vectorSetAll(vectorPointer, value).
 
     + to add-scalar value scalarValue (double):
         % Adds the number scalarValue to each element in the vector.
-        print "error".        
         vectorAddScalar(vectorPointer, scalarValue).
 
     + to add-values of otherVector (object) scaled-by scale = 1.0 (double):
@@ -87,7 +83,6 @@ Object : Vector (aka Vectors) [version 2.3] {
         % adding it to this vector.
         % <P>
         % This method is hardware accelerated where supported.
-        print "error".
         vectorAddScaled(vectorPointer, (otherVector get-vector-pointer), scale).
 
     + to subtract-values of otherVector (object) scaled-by scale = 1.0 (double):
@@ -99,21 +94,18 @@ Object : Vector (aka Vectors) [version 2.3] {
         % subtracting it from this vector.
         % <P>
         % This method is hardware accelerated where supported.
-        print "error".
         vectorAddScaled(vectorPointer, (otherVector get-vector-pointer), -1.0 * scale).
 
     + to scale by scaleValue (float):
         % Scales all elements in the vector by scaleValue.
         % <P>
         % This method is hardware accelerated where supported.
-        print "error".
         vectorScale(vectorPointer, scaleValue).
 
     + to copy from otherVector (object):
         % Copies the contents of otherVector to thisVector.
         % <P>
         % This method is hardware accelerated where supported.
-        print "error".
         vectorCopy((otherVector get-vector-pointer), vectorPointer).
         
     ### the following display a colum vector as rows of the image

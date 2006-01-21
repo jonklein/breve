@@ -47,9 +47,6 @@ int stCallMethodBreveCallback(void *instanceData, void *methodData, brEval **arg
 	int r, count = 0;
 	stMethod *method = (stMethod*)methodData;
 	stRunInstance ri;
-	slStack *previous;
-
-	slStack newStack;
 
 	ri.instance = (stInstance*)instanceData;
 

@@ -19,6 +19,10 @@
  *****************************************************************************/
 
 #include "simulation.h"
+#include "glIncludes.h"
+#include "gldraw.h"
+#include "world.h"
+#include "camera.h"
 #include "shadow.h"
 #include "shape.h"
 
@@ -31,6 +35,7 @@ void slShape::drawShadowVolume(slCamera *c, slPosition *p) {
 	slVectorCopy(&light, &lNormal);
 	slVectorNormalize(&lNormal);
 	slVectorMul(&light, 5, &light);
+
 
 	glBegin(GL_QUADS);
 
@@ -255,6 +260,9 @@ void slWorld::renderShadowVolume(slCamera *c) {
 
 void slWorld::renderObjectShadowVolumes(slCamera *c) {
 	std::vector<slWorldObject*>::iterator wi;
+
+	glDisable( GL_BLEND );
+	glColor4f( 0, 0, 0, 1 );
 
 	for(wi = objects.begin(); wi != objects.end(); wi++ ) {
 		if((*wi)->shape && !(*wi)->_drawAsPoint) {

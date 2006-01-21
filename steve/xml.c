@@ -859,7 +859,7 @@ void stXMLObjectStartElementHandler(void *userData, const XML_Char *name, const 
 	state = new stXMLStackEntry;
 	state->state = stXMLStateForElement((char*)name);
 
-	state->string = slMalloc(1);
+	state->string = (char*)slMalloc( 1 );
 	state->string[ 0 ] = 0;
 
 	parserState->stateStack.push_back( state);

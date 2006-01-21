@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#ifdef __cplusplus
 #include <string>
 
 /*!
@@ -38,7 +37,6 @@ class slException {
 
 		std::string _message;
 };
-#endif
 
 /*!
 	\brief Debug levels to allow different levels of output detail.
@@ -55,47 +53,38 @@ enum slDebugLevels {
 
 #define slDebug(format, args...)	{ slMessage(0, "Error at source file \"%s\", line %d:\n", __FILE__, __LINE__); slMessage(0, format, ##args ); }
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/*!
-	\brief Sets the debug filter level to one of \ref slDebugLevels.
-*/
+/**
+ * Sets the debug filter level to one of \ref slDebugLevels.
+ */
 
 void slSetDebugLevel(int);
 
-/*!
-	\brief Outputs a 3x3 matrix to the debug output.
-*/
+/**
+ *Outputs a 3x3 matrix to the debug output.
+ */
 
 void slDebugMatrix(int, double [3][3]);
 
-/*!
-	\brief Outputs a printf style message of a given error level to the active output function.
-*/
+/**
+ * Outputs a printf style message of a given error level to the active 
+ * output function.
+ */
 
 DLLEXPORT void slMessage(int, const char *, ...);
 
-/*!
-	\brief The default output function, prints text to stderr.
-*/
+/**
+ * The default output function, prints text to stderr.
+ */
 
 void slStderrMessageCallback(char *);
 
-void slFatal(char *, ...);
-
-/*!
-	\brief Set the message-output callback function.
-
-	When output is produced, it will be passed to the message-output
-	callback function.  By default, the data will be printed to
-	stderr, but the callback function could ignore it, print it
-	to a file, etc.
-*/
+/**
+ * \brief Set the message-output callback function.
+ *
+ * When output is produced, it will be passed to the message-output
+ * callback function.  By default, the data will be printed to
+ * stderr, but the callback function could ignore it, print it
+ * to a file, etc.
+ */
 
 void slSetMessageCallbackFunction(void (*)(char *));
-
-#ifdef __cplusplus
-}
-#endif

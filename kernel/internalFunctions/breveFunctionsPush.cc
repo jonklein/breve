@@ -16,6 +16,7 @@ void breveInitPushFunctions(brNamespace *n);
 #include "pushC.h" /**** MOVE TO push/pushC.h ??? */
 #include "push/Code.h"
 #include "push/Env.h"
+#include "push/Literal.h"
 #include "push/CodeUtils.h"
 
 /*!
@@ -71,6 +72,14 @@ int breveFunctionPushRun(brEval arguments[], brEval *result, brInstance *instanc
  	int steps = BRINT(&arguments[2]);
 
 	result->set( pushRun(environment, code, steps) );
+
+	return EC_OK;
+}
+
+int breveFunctionPushInterpreterDone(brEval arguments[], brEval *result, brInstance *instance) {
+	push::Env *env = static_cast< push::Env* >( BRPOINTER(&arguments[0]) );
+
+	result->set( (int)env->done() );
 
 	return EC_OK;
 }
@@ -257,6 +266,36 @@ brEvalListHead *brevePushCodeToEvalList(const push::Code *code) {
 	}
 
 	return l;
+}
+
+float brevePushCodeFirstFloat(const push::Code *code, bool *found ) {
+	int n;
+
+	for(n = (int)(*code)->get_stack().size() - 1; n > -1; n-- ) {
+		if( ((*code)->get_stack()[n])->get_stack().size() == 0 ) {
+			const push::Literal<double> *d;
+
+			if( ( d = dynamic_cast< const push::Literal<double>* >( &*(*code)->get_stack()[n] ) ) ) {
+				*found = 1;
+				return d->get();
+			}
+		} else {
+			float r = brevePushCodeFirstFloat( &(*code)->get_stack()[n], found );
+
+			if( *found ) return r;
+		}
+	}
+
+	return 0;
+}
+
+int breveFunctionPushCodeFirstFloat(brEval arguments[], brEval *result, brInstance *instance) {
+	const PushCode *code = BRPOINTER(&arguments[0]);
+	bool found;
+
+	result->set( brevePushCodeFirstFloat( code, &found ) );
+
+	return EC_OK;
 }
 
 /*!
@@ -560,6 +599,14 @@ int breveFunctionPushCodeStackSize(brEval arguments[], brEval *result, brInstanc
 	return EC_OK;
 }
 
+int breveFunctionPushExecStackSize(brEval arguments[], brEval *result, brInstance *instance) {
+	PushEnvironment *environment = BRPOINTER(&arguments[0]);
+
+	result->set( (int) push::get_stack<push::Exec>( ( (push::Env*)environment )->next() ).size() );
+
+	return EC_OK;
+}
+
 /*!
 	\brief A breve API function wrapper for the C-function \ref pushCodeStackPop.
 
@@ -570,6 +617,15 @@ int breveFunctionPushCodeStackPop(brEval arguments[], brEval *result, brInstance
 	PushEnvironment *environment = BRPOINTER(&arguments[0]);
 
 	pushCodeStackPop(environment);
+
+	return EC_OK;
+}
+
+int breveFunctionPushExecStackPop(brEval arguments[], brEval *result, brInstance *instance) {
+	PushEnvironment *environment = BRPOINTER(&arguments[0]);
+
+	if( push::get_stack<push::Exec>( ( (push::Env*)environment )->next() ).size() > 0) 
+		push::get_stack<push::Exec>( ( (push::Env*)environment )->next() ).size();
 
 	return EC_OK;
 }
@@ -588,6 +644,14 @@ int breveFunctionPushCodeStackTop(brEval arguments[], brEval *result, brInstance
 	return EC_OK;
 }
 
+int breveFunctionPushExecStackTop(brEval arguments[], brEval *result, brInstance *instance) {
+	PushEnvironment *environment = BRPOINTER(&arguments[0]);
+
+	result->set( new push::Code( push::get_stack<push::Exec>( ( ( push::Env* )environment )->next() ).back() ) );
+
+	return EC_OK;
+}
+
 /*!
 	\brief A breve API function wrapper for the C-function \ref pushCodeStackPush.
 
@@ -599,6 +663,15 @@ int breveFunctionPushCodeStackPush(brEval arguments[], brEval *result, brInstanc
  	PushCode *value = BRPOINTER(&arguments[1]);
 
 	pushCodeStackPush(environment, value);
+
+	return EC_OK;
+}
+
+int breveFunctionPushExecStackPush(brEval arguments[], brEval *result, brInstance *instance) {
+	PushEnvironment *environment = BRPOINTER(&arguments[0]);
+ 	PushCode *value = BRPOINTER(&arguments[1]);
+
+	push::get_stack<push::Exec>( ( ( push::Env* )environment )->next() ).push_back( *(push::Exec*)value );
 
 	return EC_OK;
 }
@@ -831,6 +904,7 @@ void breveInitPushFunctions(brNamespace *n) {
  	brNewBreveCall(n, "pushEnvironmentFree", breveFunctionPushEnvironmentFree, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(n, "pushEnvironmentReadConfigFile", breveFunctionPushEnvironmentReadConfigFile, AT_NULL, AT_POINTER, AT_STRING, 0);
  	brNewBreveCall(n, "pushRun", breveFunctionPushRun, AT_INT, AT_POINTER, AT_POINTER, AT_INT, 0);
+ 	brNewBreveCall(n, "pushInterpreterDone", breveFunctionPushInterpreterDone, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushStep", breveFunctionPushStep, AT_INT, AT_POINTER, AT_INT, 0);
  	brNewBreveCall(n, "pushGetConfigString", breveFunctionPushGetConfigString, AT_STRING, AT_POINTER, 0);
  	brNewBreveCall(n, "pushGetStacksString", breveFunctionPushGetStacksString, AT_STRING, AT_POINTER, 0);
@@ -840,6 +914,7 @@ void breveInitPushFunctions(brNamespace *n) {
  	brNewBreveCall(n, "pushEnvironmentSetEvalLimit", breveFunctionPushEnvironmentSetEvalLimit, AT_NULL, AT_POINTER, AT_INT, 0);
  	brNewBreveCall(n, "pushEnvironmentSetRandomPointLimit", breveFunctionPushEnvironmentSetRandomPointLimit, AT_NULL, AT_POINTER, AT_INT, 0);
  	brNewBreveCall(n, "pushEnvironmentGetEvalLimit", breveFunctionPushEnvironmentGetEvalLimit, AT_INT, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushCodeFirstFloat", breveFunctionPushCodeFirstFloat, AT_DOUBLE, AT_POINTER, 0);
  	brNewBreveCall(n, "pushEnvironmentGetListLimit", breveFunctionPushEnvironmentGetListLimit, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushEnvironmentGetRandomPointLimit", breveFunctionPushEnvironmentGetRandomPointLimit, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushParse", breveFunctionPushParse, AT_POINTER, AT_STRING, 0);
@@ -849,26 +924,37 @@ void breveInitPushFunctions(brNamespace *n) {
  	brNewBreveCall(n, "pushCodeSize", breveFunctionPushCodeSize, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeTopLevelSize", breveFunctionPushCodeTopLevelSize, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeSwapSublists", breveFunctionPushCodeSwapSublists, AT_INT, AT_POINTER, AT_INT, AT_INT, 0);
+
  	brNewBreveCall(n, "pushIntStackSize", breveFunctionPushIntStackSize, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushIntStackPop", breveFunctionPushIntStackPop, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(n, "pushIntStackTop", breveFunctionPushIntStackTop, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushIntStackPush", breveFunctionPushIntStackPush, AT_NULL, AT_POINTER, AT_INT, 0);
+
  	brNewBreveCall(n, "pushBoolStackSize", breveFunctionPushBoolStackSize, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushBoolStackPop", breveFunctionPushBoolStackPop, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(n, "pushBoolStackTop", breveFunctionPushBoolStackTop, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushBoolStackPush", breveFunctionPushBoolStackPush, AT_NULL, AT_POINTER, AT_INT, 0);
+
  	brNewBreveCall(n, "pushFloatStackSize", breveFunctionPushFloatStackSize, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushFloatStackPop", breveFunctionPushFloatStackPop, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(n, "pushFloatStackTop", breveFunctionPushFloatStackTop, AT_DOUBLE, AT_POINTER, 0);
  	brNewBreveCall(n, "pushFloatStackPush", breveFunctionPushFloatStackPush, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
+
  	brNewBreveCall(n, "pushNameStackSize", breveFunctionPushNameStackSize, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushNameStackPop", breveFunctionPushNameStackPop, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(n, "pushNameStackTop", breveFunctionPushNameStackTop, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushNameStackPush", breveFunctionPushNameStackPush, AT_NULL, AT_POINTER, AT_INT, 0);
+
  	brNewBreveCall(n, "pushCodeStackSize", breveFunctionPushCodeStackSize, AT_INT, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeStackPop", breveFunctionPushCodeStackPop, AT_NULL, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeStackTop", breveFunctionPushCodeStackTop, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeStackPush", breveFunctionPushCodeStackPush, AT_NULL, AT_POINTER, AT_POINTER, 0);
+
+ 	brNewBreveCall(n, "pushExecStackSize", breveFunctionPushExecStackSize, AT_INT, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushExecStackPop", breveFunctionPushExecStackPop, AT_NULL, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushExecStackTop", breveFunctionPushExecStackTop, AT_POINTER, AT_POINTER, 0);
+ 	brNewBreveCall(n, "pushExecStackPush", breveFunctionPushExecStackPush, AT_NULL, AT_POINTER, AT_POINTER, 0);
+
  	brNewBreveCall(n, "pushCodeDiscrepancy", breveFunctionPushCodeDiscrepancy, AT_INT, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(n, "pushCodeTopLevelDiff", breveFunctionPushCodeTopLevelDiff, AT_INT, AT_POINTER, AT_POINTER, 0);
  	brNewBreveCall(n, "pushVectorStackSize", breveFunctionPushVectorStackSize, AT_INT, AT_POINTER, 0);

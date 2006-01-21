@@ -1,4 +1,6 @@
 #include "simulation.h"
+#include "worldObject.h"
+#include "glIncludes.h"
 
 void slWorldObject::draw(slCamera *camera) {
 	if (shape)

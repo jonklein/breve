@@ -1,6 +1,8 @@
 #ifndef _ROAM_H
 #define _ROAM_H
 
+#include "terrain.h"
+
 #define VARIANCE_DEPTH 9
 
 #define TRIANGLE_COUNT 50000

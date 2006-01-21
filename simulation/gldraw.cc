@@ -25,12 +25,13 @@
 #define BUFFER_SIZE 512
  
 #include "simulation.h"
-
-#include "glIncludes.h"
-
-#include "asciiart.h"
-#include "shadow.h"
+#include "gldraw.h"
+#include "drawcommand.h"
+#include "world.h"
+#include "lightdetector.h"
 #include "tiger.h"
+#include "shadow.h"
+#include "asciiart.h"
 
 #define REFLECTION_ALPHA	.75
 

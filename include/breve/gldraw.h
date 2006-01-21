@@ -22,7 +22,10 @@
 #define _GLDRAW_H
 
 #include "glIncludes.h"
-#include "world.h"
+#include "camera.h"
+
+class slWorld;
+class slStationary;
 
 typedef float slColor[4];
 
@@ -58,9 +61,6 @@ enum drawOptions {
     DO_RECOMPILE				= 0x008000
 };
 
-#ifdef __cplusplus 
-extern "C" {
-#endif
 void slInitGL(slWorld *, slCamera *);
 unsigned int slTextureNew(slCamera *);
 void slTextureFree(slCamera *, unsigned int);
@@ -68,11 +68,6 @@ int slUpdateTexture(slCamera *, GLuint, unsigned char *, int, int, int);
 void slRenderScene(slWorld *, slCamera *, int);
 int slVectorForDrag(slWorld *, slCamera *, slVector *, int, int, slVector *);
 int slGlSelect(slWorld *, slCamera *, int, int);
-
-
-#ifdef __cplusplus 
-}
-#endif
 
 void slDrawFog(slWorld *, slCamera *);
 

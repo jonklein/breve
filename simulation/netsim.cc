@@ -1,13 +1,15 @@
 #include <pthread.h>
 #include "simulation.h"
+#include "netsim.h"
+#include "world.h"
 
 #if HAVE_LIBENET
 
-enum {
+enum slNetsimMessageType {
 	MT_SYNC = 0,
 	MT_BOUNDS = 1,
 	MT_START
-} messageTypes;
+};
 
 #include <enet/enet.h>
 

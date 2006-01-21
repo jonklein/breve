@@ -72,25 +72,25 @@
 		4802DC4405616137008198B9 /* slGLWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = 481D2181042A2D2100FFA442 /* slGLWindow.nib */; };
 		4802DC4905616137008198B9 /* breve.scriptSuite in Resources */ = {isa = PBXBuildFile; fileRef = 485C2C350559830F005859E4 /* breve.scriptSuite */; };
 		4802DC4A05616137008198B9 /* breve.scriptTerminology in Resources */ = {isa = PBXBuildFile; fileRef = 482D1689055989F800230BBF /* breve.scriptTerminology */; };
-		4802DC4C05616137008198B9 /* slBreveSourceDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4ACFDCFA73011CA2CEA /* slBreveSourceDocument.m */; settings = {ATTRIBUTES = (); }; };
+		4802DC4C05616137008198B9 /* slBreveSourceDocument.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4ACFDCFA73011CA2CEA /* slBreveSourceDocument.mm */; settings = {ATTRIBUTES = (); }; };
 		4802DC4D05616137008198B9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
-		4802DC4E05616137008198B9 /* slLogView.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20A70397BEC801980AE4 /* slLogView.m */; };
-		4802DC4F05616137008198B9 /* slMovieRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20A90397BEC801980AE4 /* slMovieRecord.m */; };
-		4802DC5005616137008198B9 /* slObjectOutline.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20AB0397BEC801980AE4 /* slObjectOutline.m */; };
+		4802DC4E05616137008198B9 /* slLogView.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20A70397BEC801980AE4 /* slLogView.mm */; };
+		4802DC4F05616137008198B9 /* slMovieRecord.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20A90397BEC801980AE4 /* slMovieRecord.mm */; };
+		4802DC5005616137008198B9 /* slObjectOutline.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20AB0397BEC801980AE4 /* slObjectOutline.mm */; };
 		4802DC5105616137008198B9 /* slObjectOutlineItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20AD0397BEC801980AE4 /* slObjectOutlineItem.mm */; };
 		4802DC5205616137008198B9 /* slQuickparser.l in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20AE0397BEC801980AE4 /* slQuickparser.l */; };
-		4802DC5405616137008198B9 /* slTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20B20397BEC801980AE4 /* slTextView.m */; };
-		4802DC5505616137008198B9 /* slBreve.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20C10397BFC001980AE4 /* slBreve.m */; };
-		4802DC5605616137008198B9 /* slBreveApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20C30397BFC001980AE4 /* slBreveApplication.m */; };
-		4802DC5705616137008198B9 /* slBreveEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20C50397BFC001980AE4 /* slBreveEngine.m */; };
-		4802DC5805616137008198B9 /* slBreveGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20C70397BFC001980AE4 /* slBreveGLView.m */; };
-		4802DC5905616137008198B9 /* slBreveNibLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20CB0397BFC001980AE4 /* slBreveNibLoader.m */; };
-		4802DC5C05616137008198B9 /* slBrevePrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20D20397BFC001980AE4 /* slBrevePrefs.m */; };
-		4802DC5D05616137008198B9 /* slCommandTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20D40397BFC001980AE4 /* slCommandTextField.m */; };
-		4802DC5E05616137008198B9 /* slDemoMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20D60397BFC001980AE4 /* slDemoMenu.m */; };
-		4802DC5F05616137008198B9 /* slFullScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20D80397BFC001980AE4 /* slFullScreen.m */; };
-		4802DC6005616137008198B9 /* slGraphWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 48D1C0BD04632D760093F8AA /* slGraphWindowController.m */; };
-		4802DC6105616137008198B9 /* slGraphWindowView.m in Sources */ = {isa = PBXBuildFile; fileRef = 48D1C0D5046331F80093F8AA /* slGraphWindowView.m */; };
+		4802DC5405616137008198B9 /* slTextView.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20B20397BEC801980AE4 /* slTextView.mm */; };
+		4802DC5505616137008198B9 /* slBreve.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20C10397BFC001980AE4 /* slBreve.mm */; };
+		4802DC5605616137008198B9 /* slBreveApplication.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20C30397BFC001980AE4 /* slBreveApplication.mm */; };
+		4802DC5705616137008198B9 /* slBreveEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20C50397BFC001980AE4 /* slBreveEngine.mm */; };
+		4802DC5805616137008198B9 /* slBreveGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20C70397BFC001980AE4 /* slBreveGLView.mm */; };
+		4802DC5905616137008198B9 /* slBreveNibLoader.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20CB0397BFC001980AE4 /* slBreveNibLoader.mm */; };
+		4802DC5C05616137008198B9 /* slBrevePrefs.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20D20397BFC001980AE4 /* slBrevePrefs.mm */; };
+		4802DC5D05616137008198B9 /* slCommandTextField.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20D40397BFC001980AE4 /* slCommandTextField.mm */; };
+		4802DC5E05616137008198B9 /* slDemoMenu.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20D60397BFC001980AE4 /* slDemoMenu.mm */; };
+		4802DC5F05616137008198B9 /* slFullScreen.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5BD20D80397BFC001980AE4 /* slFullScreen.mm */; };
+		4802DC6005616137008198B9 /* slGraphWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 48D1C0BD04632D760093F8AA /* slGraphWindowController.mm */; };
+		4802DC6105616137008198B9 /* slGraphWindowView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 48D1C0D5046331F80093F8AA /* slGraphWindowView.mm */; };
 		480F317807146D7900E71420 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48807AB004DF1E2C00A8D232 /* AudioToolbox.framework */; };
 		480F317907146D7900E71420 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BD21540397C2DA01980AE4 /* Carbon.framework */; };
 		480F317A07146D7A00E71420 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
@@ -157,13 +157,13 @@
 /* Begin PBXFileReference section */
 		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		2A37F4ACFDCFA73011CA2CEA /* slBreveSourceDocument.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = slBreveSourceDocument.m; sourceTree = SOURCE_ROOT; };
+		2A37F4ACFDCFA73011CA2CEA /* slBreveSourceDocument.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreveSourceDocument.mm; sourceTree = "<group>"; };
 		2A37F4AEFDCFA73011CA2CEA /* slBreveSourceDocument.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = slBreveSourceDocument.h; sourceTree = SOURCE_ROOT; };
 		2A37F4B0FDCFA73011CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
 		2A37F4B5FDCFA73011CA2CEA /* slBreveSourceDocument.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = slBreveSourceDocument.nib; path = English.lproj/slBreveSourceDocument.nib; sourceTree = "<group>"; };
 		2A37F4B7FDCFA73011CA2CEA /* MainMenu.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MainMenu.nib; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		4802DC7905616137008198B9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		4802DC7A05616137008198B9 /* breve.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = breve.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4802DC7A05616137008198B9 /* breve.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = breve.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		481D2182042A2D2100FFA442 /* slGraphWindow.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = slGraphWindow.nib; path = English.lproj/slGraphWindow.nib; sourceTree = "<group>"; };
 		482D168A055989F800230BBF /* English */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = English; path = English.lproj/breve.scriptTerminology; sourceTree = "<group>"; };
 		485C2C350559830F005859E4 /* breve.scriptSuite */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = breve.scriptSuite; sourceTree = "<group>"; };
@@ -172,9 +172,9 @@
 		48807AB004DF1E2C00A8D232 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
 		48CE1CFB08155B1F0030CBB8 /* DocumentIcons.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = DocumentIcons.icns; sourceTree = SOURCE_ROOT; };
 		48D1C0BC04632D760093F8AA /* slGraphWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slGraphWindowController.h; sourceTree = SOURCE_ROOT; };
-		48D1C0BD04632D760093F8AA /* slGraphWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = slGraphWindowController.m; sourceTree = SOURCE_ROOT; };
+		48D1C0BD04632D760093F8AA /* slGraphWindowController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = slGraphWindowController.mm; sourceTree = "<group>"; };
 		48D1C0D4046331F80093F8AA /* slGraphWindowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slGraphWindowView.h; sourceTree = SOURCE_ROOT; };
-		48D1C0D5046331F80093F8AA /* slGraphWindowView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = slGraphWindowView.m; sourceTree = SOURCE_ROOT; };
+		48D1C0D5046331F80093F8AA /* slGraphWindowView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = slGraphWindowView.mm; sourceTree = "<group>"; };
 		48E1722307AAAF370072492B /* JavaVM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaVM.framework; path = /System/Library/Frameworks/JavaVM.framework; sourceTree = "<absolute>"; };
 		48ECC163071C13C100596F93 /* Digitizer.tz */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = Digitizer.tz; path = ../plugins/slDigitizerPlugin/Digitizer.tz; sourceTree = SOURCE_ROOT; };
 		48ECC164071C13C100596F93 /* DigitizerPlugin.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = DigitizerPlugin.o; path = ../plugins/slDigitizerPlugin/DigitizerPlugin.o; sourceTree = SOURCE_ROOT; };
@@ -184,34 +184,34 @@
 		F569DDB303980C9101B2CBA0 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Errors.strings; sourceTree = "<group>"; };
 		F569DDB503980C9101B2CBA0 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/General.strings; sourceTree = "<group>"; };
 		F5BD20A60397BEC801980AE4 /* slLogView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slLogView.h; path = ../OSX/slLogView.h; sourceTree = SOURCE_ROOT; };
-		F5BD20A70397BEC801980AE4 /* slLogView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slLogView.m; path = ../OSX/slLogView.m; sourceTree = SOURCE_ROOT; };
+		F5BD20A70397BEC801980AE4 /* slLogView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slLogView.mm; sourceTree = "<group>"; };
 		F5BD20A80397BEC801980AE4 /* slMovieRecord.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slMovieRecord.h; path = ../OSX/slMovieRecord.h; sourceTree = SOURCE_ROOT; };
-		F5BD20A90397BEC801980AE4 /* slMovieRecord.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slMovieRecord.m; path = ../OSX/slMovieRecord.m; sourceTree = SOURCE_ROOT; };
+		F5BD20A90397BEC801980AE4 /* slMovieRecord.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slMovieRecord.mm; sourceTree = "<group>"; };
 		F5BD20AA0397BEC801980AE4 /* slObjectOutline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slObjectOutline.h; path = ../OSX/slObjectOutline.h; sourceTree = SOURCE_ROOT; };
-		F5BD20AB0397BEC801980AE4 /* slObjectOutline.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slObjectOutline.m; path = ../OSX/slObjectOutline.m; sourceTree = SOURCE_ROOT; };
+		F5BD20AB0397BEC801980AE4 /* slObjectOutline.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slObjectOutline.mm; sourceTree = "<group>"; };
 		F5BD20AC0397BEC801980AE4 /* slObjectOutlineItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slObjectOutlineItem.h; path = ../OSX/slObjectOutlineItem.h; sourceTree = SOURCE_ROOT; };
 		F5BD20AD0397BEC801980AE4 /* slObjectOutlineItem.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slObjectOutlineItem.mm; sourceTree = SOURCE_ROOT; };
 		F5BD20AE0397BEC801980AE4 /* slQuickparser.l */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.lex; name = slQuickparser.l; path = ../OSX/slQuickparser.l; sourceTree = SOURCE_ROOT; };
 		F5BD20B10397BEC801980AE4 /* slTextView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slTextView.h; path = ../OSX/slTextView.h; sourceTree = SOURCE_ROOT; };
-		F5BD20B20397BEC801980AE4 /* slTextView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slTextView.m; path = ../OSX/slTextView.m; sourceTree = SOURCE_ROOT; };
+		F5BD20B20397BEC801980AE4 /* slTextView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slTextView.mm; sourceTree = "<group>"; };
 		F5BD20C00397BFC001980AE4 /* slBreve.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slBreve.h; path = ../OSX/slBreve.h; sourceTree = SOURCE_ROOT; };
-		F5BD20C10397BFC001980AE4 /* slBreve.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slBreve.m; path = ../OSX/slBreve.m; sourceTree = SOURCE_ROOT; };
+		F5BD20C10397BFC001980AE4 /* slBreve.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreve.mm; sourceTree = "<group>"; };
 		F5BD20C20397BFC001980AE4 /* slBreveApplication.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slBreveApplication.h; path = ../OSX/slBreveApplication.h; sourceTree = SOURCE_ROOT; };
-		F5BD20C30397BFC001980AE4 /* slBreveApplication.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slBreveApplication.m; path = ../OSX/slBreveApplication.m; sourceTree = SOURCE_ROOT; };
+		F5BD20C30397BFC001980AE4 /* slBreveApplication.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreveApplication.mm; sourceTree = "<group>"; };
 		F5BD20C40397BFC001980AE4 /* slBreveEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slBreveEngine.h; path = ../OSX/slBreveEngine.h; sourceTree = SOURCE_ROOT; };
-		F5BD20C50397BFC001980AE4 /* slBreveEngine.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slBreveEngine.m; path = ../OSX/slBreveEngine.m; sourceTree = SOURCE_ROOT; };
+		F5BD20C50397BFC001980AE4 /* slBreveEngine.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreveEngine.mm; sourceTree = "<group>"; };
 		F5BD20C60397BFC001980AE4 /* slBreveGLView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slBreveGLView.h; path = ../OSX/slBreveGLView.h; sourceTree = SOURCE_ROOT; };
-		F5BD20C70397BFC001980AE4 /* slBreveGLView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slBreveGLView.m; path = ../OSX/slBreveGLView.m; sourceTree = SOURCE_ROOT; };
+		F5BD20C70397BFC001980AE4 /* slBreveGLView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreveGLView.mm; sourceTree = "<group>"; };
 		F5BD20CA0397BFC001980AE4 /* slBreveNibLoader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slBreveNibLoader.h; path = ../OSX/slBreveNibLoader.h; sourceTree = SOURCE_ROOT; };
-		F5BD20CB0397BFC001980AE4 /* slBreveNibLoader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slBreveNibLoader.m; path = ../OSX/slBreveNibLoader.m; sourceTree = SOURCE_ROOT; };
+		F5BD20CB0397BFC001980AE4 /* slBreveNibLoader.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreveNibLoader.mm; sourceTree = "<group>"; };
 		F5BD20D10397BFC001980AE4 /* slBrevePrefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slBrevePrefs.h; path = ../OSX/slBrevePrefs.h; sourceTree = SOURCE_ROOT; };
-		F5BD20D20397BFC001980AE4 /* slBrevePrefs.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slBrevePrefs.m; path = ../OSX/slBrevePrefs.m; sourceTree = SOURCE_ROOT; };
+		F5BD20D20397BFC001980AE4 /* slBrevePrefs.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slBrevePrefs.mm; sourceTree = "<group>"; };
 		F5BD20D30397BFC001980AE4 /* slCommandTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slCommandTextField.h; path = ../OSX/slCommandTextField.h; sourceTree = SOURCE_ROOT; };
-		F5BD20D40397BFC001980AE4 /* slCommandTextField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slCommandTextField.m; path = ../OSX/slCommandTextField.m; sourceTree = SOURCE_ROOT; };
+		F5BD20D40397BFC001980AE4 /* slCommandTextField.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slCommandTextField.mm; sourceTree = "<group>"; };
 		F5BD20D50397BFC001980AE4 /* slDemoMenu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slDemoMenu.h; path = ../OSX/slDemoMenu.h; sourceTree = SOURCE_ROOT; };
-		F5BD20D60397BFC001980AE4 /* slDemoMenu.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slDemoMenu.m; path = ../OSX/slDemoMenu.m; sourceTree = SOURCE_ROOT; };
+		F5BD20D60397BFC001980AE4 /* slDemoMenu.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slDemoMenu.mm; sourceTree = "<group>"; };
 		F5BD20D70397BFC001980AE4 /* slFullScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = slFullScreen.h; path = ../OSX/slFullScreen.h; sourceTree = SOURCE_ROOT; };
-		F5BD20D80397BFC001980AE4 /* slFullScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = slFullScreen.m; path = ../OSX/slFullScreen.m; sourceTree = SOURCE_ROOT; };
+		F5BD20D80397BFC001980AE4 /* slFullScreen.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = slFullScreen.mm; sourceTree = "<group>"; };
 		F5BD20F20397BFE301980AE4 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
 		F5BD20F30397BFE301980AE4 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		F5BD20F40397BFE301980AE4 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
@@ -254,8 +254,8 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				48E1722307AAAF370072492B /* JavaVM.framework */,
 				48620C9107944552009195E5 /* libbreve.a */,
+				48E1722307AAAF370072492B /* JavaVM.framework */,
 				F5BD20F30397BFE301980AE4 /* OpenGL.framework */,
 				F5BD21540397C2DA01980AE4 /* Carbon.framework */,
 				F5BD20F20397BFE301980AE4 /* GLUT.framework */,
@@ -292,41 +292,41 @@
 			isa = PBXGroup;
 			children = (
 				F5BD20A60397BEC801980AE4 /* slLogView.h */,
-				F5BD20A70397BEC801980AE4 /* slLogView.m */,
+				F5BD20A70397BEC801980AE4 /* slLogView.mm */,
 				F5BD20A80397BEC801980AE4 /* slMovieRecord.h */,
-				F5BD20A90397BEC801980AE4 /* slMovieRecord.m */,
+				F5BD20A90397BEC801980AE4 /* slMovieRecord.mm */,
 				F5BD20AA0397BEC801980AE4 /* slObjectOutline.h */,
-				F5BD20AB0397BEC801980AE4 /* slObjectOutline.m */,
+				F5BD20AB0397BEC801980AE4 /* slObjectOutline.mm */,
 				F5BD20AC0397BEC801980AE4 /* slObjectOutlineItem.h */,
 				2A37F4AEFDCFA73011CA2CEA /* slBreveSourceDocument.h */,
-				2A37F4ACFDCFA73011CA2CEA /* slBreveSourceDocument.m */,
+				2A37F4ACFDCFA73011CA2CEA /* slBreveSourceDocument.mm */,
 				F5BD20AD0397BEC801980AE4 /* slObjectOutlineItem.mm */,
 				F5BD20AE0397BEC801980AE4 /* slQuickparser.l */,
 				F5BD20B10397BEC801980AE4 /* slTextView.h */,
-				F5BD20B20397BEC801980AE4 /* slTextView.m */,
+				F5BD20B20397BEC801980AE4 /* slTextView.mm */,
 				2A37F4B0FDCFA73011CA2CEA /* main.m */,
 				F5BD20C00397BFC001980AE4 /* slBreve.h */,
-				F5BD20C10397BFC001980AE4 /* slBreve.m */,
+				F5BD20C10397BFC001980AE4 /* slBreve.mm */,
 				F5BD20C20397BFC001980AE4 /* slBreveApplication.h */,
-				F5BD20C30397BFC001980AE4 /* slBreveApplication.m */,
+				F5BD20C30397BFC001980AE4 /* slBreveApplication.mm */,
 				F5BD20C40397BFC001980AE4 /* slBreveEngine.h */,
-				F5BD20C50397BFC001980AE4 /* slBreveEngine.m */,
+				F5BD20C50397BFC001980AE4 /* slBreveEngine.mm */,
 				48D1C0D4046331F80093F8AA /* slGraphWindowView.h */,
-				48D1C0D5046331F80093F8AA /* slGraphWindowView.m */,
+				48D1C0D5046331F80093F8AA /* slGraphWindowView.mm */,
 				48D1C0BC04632D760093F8AA /* slGraphWindowController.h */,
-				48D1C0BD04632D760093F8AA /* slGraphWindowController.m */,
+				48D1C0BD04632D760093F8AA /* slGraphWindowController.mm */,
 				F5BD20C60397BFC001980AE4 /* slBreveGLView.h */,
-				F5BD20C70397BFC001980AE4 /* slBreveGLView.m */,
+				F5BD20C70397BFC001980AE4 /* slBreveGLView.mm */,
 				F5BD20CA0397BFC001980AE4 /* slBreveNibLoader.h */,
-				F5BD20CB0397BFC001980AE4 /* slBreveNibLoader.m */,
+				F5BD20CB0397BFC001980AE4 /* slBreveNibLoader.mm */,
 				F5BD20D10397BFC001980AE4 /* slBrevePrefs.h */,
-				F5BD20D20397BFC001980AE4 /* slBrevePrefs.m */,
+				F5BD20D20397BFC001980AE4 /* slBrevePrefs.mm */,
 				F5BD20D30397BFC001980AE4 /* slCommandTextField.h */,
-				F5BD20D40397BFC001980AE4 /* slCommandTextField.m */,
+				F5BD20D40397BFC001980AE4 /* slCommandTextField.mm */,
 				F5BD20D50397BFC001980AE4 /* slDemoMenu.h */,
-				F5BD20D60397BFC001980AE4 /* slDemoMenu.m */,
+				F5BD20D60397BFC001980AE4 /* slDemoMenu.mm */,
 				F5BD20D70397BFC001980AE4 /* slFullScreen.h */,
-				F5BD20D80397BFC001980AE4 /* slFullScreen.m */,
+				F5BD20D80397BFC001980AE4 /* slFullScreen.mm */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -549,25 +549,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4802DC4C05616137008198B9 /* slBreveSourceDocument.m in Sources */,
+				4802DC4C05616137008198B9 /* slBreveSourceDocument.mm in Sources */,
 				4802DC4D05616137008198B9 /* main.m in Sources */,
-				4802DC4E05616137008198B9 /* slLogView.m in Sources */,
-				4802DC4F05616137008198B9 /* slMovieRecord.m in Sources */,
-				4802DC5005616137008198B9 /* slObjectOutline.m in Sources */,
+				4802DC4E05616137008198B9 /* slLogView.mm in Sources */,
+				4802DC4F05616137008198B9 /* slMovieRecord.mm in Sources */,
+				4802DC5005616137008198B9 /* slObjectOutline.mm in Sources */,
 				4802DC5105616137008198B9 /* slObjectOutlineItem.mm in Sources */,
 				4802DC5205616137008198B9 /* slQuickparser.l in Sources */,
-				4802DC5405616137008198B9 /* slTextView.m in Sources */,
-				4802DC5505616137008198B9 /* slBreve.m in Sources */,
-				4802DC5605616137008198B9 /* slBreveApplication.m in Sources */,
-				4802DC5705616137008198B9 /* slBreveEngine.m in Sources */,
-				4802DC5805616137008198B9 /* slBreveGLView.m in Sources */,
-				4802DC5905616137008198B9 /* slBreveNibLoader.m in Sources */,
-				4802DC5C05616137008198B9 /* slBrevePrefs.m in Sources */,
-				4802DC5D05616137008198B9 /* slCommandTextField.m in Sources */,
-				4802DC5E05616137008198B9 /* slDemoMenu.m in Sources */,
-				4802DC5F05616137008198B9 /* slFullScreen.m in Sources */,
-				4802DC6005616137008198B9 /* slGraphWindowController.m in Sources */,
-				4802DC6105616137008198B9 /* slGraphWindowView.m in Sources */,
+				4802DC5405616137008198B9 /* slTextView.mm in Sources */,
+				4802DC5505616137008198B9 /* slBreve.mm in Sources */,
+				4802DC5605616137008198B9 /* slBreveApplication.mm in Sources */,
+				4802DC5705616137008198B9 /* slBreveEngine.mm in Sources */,
+				4802DC5805616137008198B9 /* slBreveGLView.mm in Sources */,
+				4802DC5905616137008198B9 /* slBreveNibLoader.mm in Sources */,
+				4802DC5C05616137008198B9 /* slBrevePrefs.mm in Sources */,
+				4802DC5D05616137008198B9 /* slCommandTextField.mm in Sources */,
+				4802DC5E05616137008198B9 /* slDemoMenu.mm in Sources */,
+				4802DC5F05616137008198B9 /* slFullScreen.mm in Sources */,
+				4802DC6005616137008198B9 /* slGraphWindowController.mm in Sources */,
+				4802DC6105616137008198B9 /* slGraphWindowView.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

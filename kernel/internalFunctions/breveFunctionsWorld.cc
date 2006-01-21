@@ -19,6 +19,9 @@
  *****************************************************************************/
 
 #include "kernel.h"
+#include "world.h"
+#include "gldraw.h"
+#include "image.h"
 
 #define BRWORLDOBJECTPOINTER(p)	((slWorldObject*)BRPOINTER(p))
 

@@ -1,6 +1,8 @@
 #ifndef _SPRINGS_H
 #define _SPRINGS_H
 
+#include "worldObject.h"
+
 enum slSpringModes {
 	SPRING_MODE_NORMAL = 0,
 	SPRING_MODE_EXPAND_ONLY,

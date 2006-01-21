@@ -1,5 +1,8 @@
 #include "simulation.h"
+#include "glIncludes.h"
+#include "camera.h"
 #include "tiger.h"
+#include "terrain.h"
 
 #include <iostream>
 

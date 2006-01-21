@@ -21,6 +21,7 @@
 #include "simulation.h"
 #include "vclip.h"
 #include "vclipData.h"
+#include "terrain.h"
 
 /*!
 	\brief Initialize the slVclipData bound lists.

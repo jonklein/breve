@@ -240,13 +240,17 @@ if test "x$engine_only" = "x"; then
 		AC_CHECK_LIB([gslcblas], [cblas_ccopy])
 	fi
 
+	AC_CHECK_LIB([avutil], [av_add_i])
 	AC_CHECK_LIB([avcodec], [avcodec_init])
 	AC_CHECK_LIB([avformat], [av_write_frame])
-	AC_CHECK_LIB([avutil], [av_add_i])
 
 	AC_CHECK_LIB([push], [pushEnvironmentNew])
 	AC_CHECK_HEADER([qgame++.h])
+
+	# look for main in the C++ only libraries, since the function names are mangled.
+
 	AC_CHECK_LIB([qgame++], [main])
+	AC_CHECK_LIB([ftgl], [main])
 fi
 
 if test "x$static" = "x"; then 

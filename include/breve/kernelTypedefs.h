@@ -21,8 +21,6 @@
 #ifndef _BREVETYPEDEFS_H
 #define _BREVETYPEDEFS_H
 
-/* yeeeeeeeeeeeeeeeeeeeeeehaw! look at 'em all! */
-
 typedef struct brEngine brEngine;
 typedef struct brVersionRequirement brVersionRequirement;
 typedef struct brVisualData brVisualData;

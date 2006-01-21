@@ -23,6 +23,8 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 		archiveRvelocity (vector).
 		archiveAcceleration (vector).
 
+		linkForce, linkTorque (vector).
+
 		physicsEnabled (int).
 
 	+ to init:
@@ -262,7 +264,15 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 			return.
 		}
 
-		linkSetForce(linkPointer, newForce).
+		linkForce = newForce.
+
+		linkSetForce(linkPointer, linkForce).
+
+	+ to get-force:
+		% Returns the force acting on the object, which was previously 
+		% set using METHOD(set-force).  
+
+		return linkForce.
 
 	+ to set-torque to newTorque (vector):
 		% Sets the torque acting on the object to newTorque.  This 
@@ -274,7 +284,15 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 			return.
 		}
 
-		linkSetTorque(linkPointer, newTorque).
+		linkTorque = newTorque.
+
+		linkSetTorque(linkPointer, linkTorque).
+
+	+ to get-torque:
+		% Returns the torque acting on the object, which was previously 
+		% set using METHOD(set-torque).  
+
+		return linkTorque.
 
 	+ to set-rotational-velocity to angularVelocity (vector):
 		% Sets the rotational velocity of this object to 
@@ -345,7 +363,6 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 		self set-velocity to archiveVelocity.
 		self set-rotational-velocity to archiveRvelocity.
 		self set-acceleration to archiveAcceleration.
-		self set-color to color.
 		return (super dearchive).
 
   + section "Determining Whether an Object is Colliding"

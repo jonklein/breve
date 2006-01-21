@@ -1,6 +1,5 @@
 #define ST_STACK_SIZE   0x4000
 
-#ifdef __cplusplus
 #include <vector>
 #include <map>
 
@@ -27,7 +26,6 @@ struct stSteveData {
 
 	stStackRecord *stackRecord;
 };
-#endif
 
 struct stVersionRequirement {
     float version;

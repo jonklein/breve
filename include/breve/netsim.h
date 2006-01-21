@@ -1,9 +1,6 @@
 #ifndef _NETSIM_H
 #define _NETSIM_H
 
-#ifdef __cplusplus
-#include <vector>
-
 #if HAVE_LIBENET
 #include <enet/enet.h>
 
@@ -77,7 +74,6 @@ int slNetsimSendBoundsMessage(slNetsimClientData *, slVector *, slVector *);
 
 void slDrawNetsimBounds(slWorld *);
 
-#endif
 #endif
 
 #endif

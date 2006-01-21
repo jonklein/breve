@@ -3,6 +3,10 @@
 Abstract : Movie {
 	% Records MPEG movies of breve runs.
 	% <P>
+	% The dimensions of the movie are determined by the size of the simulation
+	% viewing area when the movie export begins.  Resizing the viewing area 
+	% while the movie is exporting will produce undesirable results.
+	% <P>
 	% The Movie class does not work when using the non-graphical 
 	% ("breve_cli") breve.
 

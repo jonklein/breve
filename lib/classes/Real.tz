@@ -408,6 +408,7 @@ Object : Real (aka Reals) [version 2.1] {
 		self set-texture-scale-x to textureScaleX.
 		self set-texture-scale-y to textureScaleY.
 		self set-neighborhood-size to neighborhoodSize.
+		self set-color to color.
 
 		return (super dearchive).
 

@@ -50,12 +50,12 @@
 
     instance = i;
 
-    if([self getExpandable] && eval.type == AT_INSTANCE) {
+    if( [self getExpandable] && eval.type() == AT_INSTANCE) {
     	stInstance *evalInstance;
 
 		evalInstance = (stInstance*)BRINSTANCE(&eval)->userData;
 		[self setEvalObject: evalInstance->type];
-    } else if([self getExpandable] && eval.type == AT_LIST) {
+    } else if([self getExpandable] && eval.type() == AT_LIST) {
         childCount = BRLIST(&eval)->count;
     } else if([self getExpandable] && isArray) {
         childCount = stv->type->arrayCount;
@@ -93,7 +93,7 @@
 
 	if(newChildCount == childCount) return;
 
-	if(eval.type == AT_LIST) {
+	if(eval.type() == AT_LIST) {
 		for(n=0;n<childCount;n++) 
 	        [childObjects[n] setList: BRLIST(&eval) index: n];
 	}
@@ -121,7 +121,6 @@
     int n;
 
     if(isArray) {
-        eval.type = NULL;
 		return;
     } 
 
@@ -132,9 +131,9 @@
 		ri.instance = instance;
 		ri.type = instance->type;
 
-        stLoadVariable(&instance->variables[offset], eval.type, &eval, &ri);
+        stLoadVariable( &instance->variables[offset], eval.type(), &eval, &ri);
 
-		if(eval.type == AT_INSTANCE && BRINSTANCE(&eval) && BRINSTANCE(&eval)->status == AS_ACTIVE) {
+		if(eval.type() == AT_INSTANCE && BRINSTANCE(&eval) && BRINSTANCE(&eval)->status == AS_ACTIVE) {
 			evalInstance = (stInstance*)BRINSTANCE(&eval)->userData;
 			[self setEvalObject: evalInstance->type];
 		}
@@ -142,16 +141,14 @@
         stDoEvalListIndex(theEvalList, theIndex, &eval);
     } 
 
-	if(eval.type == AT_LIST) {
+	if( eval.type() == AT_LIST ) {
 		[self updateChildCount: BRLIST(&eval)->count];
 	}
 
-    if(eval.type == AT_INSTANCE) {
+    if(eval.type() == AT_INSTANCE) {
 		if(BRINSTANCE(&eval) && BRINSTANCE(&eval)->status != AS_ACTIVE) {
 			[self updateChildCount: 0];
 		} 
-
-		eval.type = AT_INSTANCE;
 
         for(n=0;n<childCount;n++) if(childObjects[n]) [childObjects[n] setInstance: (stInstance*)BRINSTANCE(&eval)->userData];
     }
@@ -166,8 +163,8 @@
 
 	[self getEval];
 
-	if(eval.type == AT_INSTANCE && BRPOINTER(&eval) && BRINSTANCE(&eval)->status == AS_ACTIVE) return YES;
-	if(eval.type == AT_LIST && BRPOINTER(&eval)) return YES;
+	if(eval.type() == AT_INSTANCE && BRPOINTER(&eval) && BRINSTANCE(&eval)->status == AS_ACTIVE) return YES;
+	if(eval.type() == AT_LIST && BRPOINTER(&eval)) return YES;
 	
 	return NO;
 }
@@ -225,7 +222,7 @@
     // effect the children of this object 
 
     if(childObjects[index]) {
-        if(eval.type == AT_INSTANCE) [childObjects[index] setInstance: (stInstance*)BRINSTANCE(&eval)->userData];
+        if( eval.type() == AT_INSTANCE ) [childObjects[index] setInstance: (stInstance*)BRINSTANCE(&eval)->userData];
         return childObjects[index];
     }
 
@@ -233,7 +230,7 @@
 
     evalInstance = (stInstance*)BRINSTANCE(&eval)->userData;
 
-    if(eval.type == AT_INSTANCE) {
+    if( eval.type() == AT_INSTANCE ) {
 		stRunInstance ri;
 		ri.instance = instance;
 		ri.type = instance->type;
@@ -244,8 +241,7 @@
 		}
 
 		if(index == object->variables.size() ) {
-			newEval.type = AT_INSTANCE;
-			BRINSTANCE(&newEval) = BRINSTANCE(&eval);
+			newEval.set( eval.getInstance() );
 
             childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: @"super" withVar: NULL withOffset: -1 instance: instance];
 
@@ -264,12 +260,12 @@
 
 		if(var->type->type != AT_ARRAY)
 			stLoadVariable(&evalInstance->variables[var->offset], var->type->type, &newEval, &ri);
-		else
-			newEval.type = AT_ARRAY;
+//		else 
+//			newEval.type = AT_ARRAY;
 
 		childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: newTitle withVar: var withOffset: var->offset instance: evalInstance];
 
-    } else if(eval.type == AT_LIST) {
+    } else if(eval.type() == AT_LIST) {
         stDoEvalListIndex(BRLIST(&eval), index, &newEval);
 
         newTitle = [[NSString stringWithFormat: @"list index %d", index] retain];
@@ -277,7 +273,7 @@
         childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: newTitle withVar: NULL withOffset: -1 instance: instance];
 
         [childObjects[index] setList: BRLIST(&eval) index: index];
-    } else if(eval.type == AT_ARRAY) {
+    } else if( eval.type() == AT_ARRAY ) {
 		stRunInstance ri;
 		ri.instance = instance;
 		ri.type = instance->type;
@@ -335,10 +331,10 @@
 }
 
 - (id)childAtIndex:(int)index {
-	if(index == object->variables.size() ) {
-		return [[slObjectOutlineObject alloc] initWithInstance: instance object: object->super];
+	if( index == (int)object->variables.size() ) {
+		return [ [slObjectOutlineObject alloc] initWithInstance: instance object: object->super ];
 	} else {
-		return [[slObjectOutlineVariable alloc] initWithInstance: instance type: AT_INT offset: 0];	
+		return [ [slObjectOutlineVariable alloc] initWithInstance: instance type: AT_INT offset: 0];	
 	}
 }
 
@@ -356,7 +352,6 @@
 
 - (NSString*)getName {
 	return @"variable name";
-	// return [NSString stringWithFormat: @"%s", var->name ];
 }
 
 - (BOOL)getExpandable {
@@ -368,35 +363,3 @@
 }
 
 @end
-
-@implementation slObjectOutlineListIndex;
-
-- initWithList:(brEvalListHead*)l index:(int)i {
-
-}
-
-- (void*)setList:(brEvalListHead*)l {
-
-}
-
-- (NSString*)getName {
-	return @"list index 4";
-}
-
-@end 
-
-@implementation slObjectOutlineHashIndex;
-
-- initWithHash:(brEvalHash*)l index:(int)i {
-
-}
-
-- (void*)setHash:(brEvalHash*)l {
-
-}
-
-- (NSString*)getName {
-	return @"hash index 3";
-}
-
-@end 

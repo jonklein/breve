@@ -21,6 +21,8 @@
 #ifndef _TERRAIN_H
 #define _TERRAIN_H
 
+#include "worldObject.h"
+
 /*!
 	\brief Serialized \ref slTerrain data.
 */

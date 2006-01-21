@@ -62,7 +62,7 @@ Drawing : TurtleDrawing {
 		currentColor = state{ 2 }.
 		penDown = state{ 4 }.
 
-		self set-current-color to currentColor.
+		self set-color to currentColor.
 	
 	+ to turn-up by angle (double):
 		% Rotates the Turtle right by angle degrees.
@@ -101,6 +101,8 @@ Drawing : TurtleDrawing {
 		self turn-right by -angle.
 
 	+ to forward by length (double):
+		% Moves the turtle forward by length.
+
 		newPoint (vector).
 
 		newPoint = currentPoint + length * currentDirection.
@@ -112,22 +114,29 @@ Drawing : TurtleDrawing {
 		currentPoint = newPoint.
 
 	+ to back by length (double):
+		% Moves the turtle back by length.
+
 		self forward by -length.
 
-	+ to set-color to color (vector) with-transparency t = 1.0 (double):
+	+ to set-color to color (vector) with-transparency trans = 1.0 (double):
+		% Sets the current pen color to color, with optional transparency value trans.
 		currentColor = color.
 
-		if !penDown: t = 0.0.
+		if !penDown: trans = 0.0.
 
-		super set-color to color with-transparency t.
+		super set-color to color with-transparency trans.
 
 	+ to pen-up:
-		% Lifts the pen so that no turtle is drawn.  This is done by setting 
+		% Lifts the pen so that no lines are drawn as the turtle moves.  This is done by setting 
 		% transparency to 0.0.  
+
 		penDown = 0.
 		self set-color to currentColor with-transparency 0.0.
 
 	+ to pen-down:
+		% Puts the pen down so that lines are drawn as the turtle moves.  This is done by setting 
+		% transparency to 1.0.  
+
 		penDown = 1.
 		self set-color to currentColor with-transparency 1.0.
 
