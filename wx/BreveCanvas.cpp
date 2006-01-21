@@ -17,6 +17,8 @@
 #include "BreveInterface.h"
 #include "Main.h"
 #include "steve.h"
+#include "camera.h"
+#include "gldraw.h"
 #include "SimInstance.h"
 
 BEGIN_EVENT_TABLE(BreveCanvas, wxGLCanvas)

@@ -226,4 +226,4 @@ brInstance *stInstanceCreateAndRegister(stSteveData *d, brEngine *, brObject *);
 
 void stObjectFreeAllInstances(stObject *);
 
-#endif _OBJECT_H
+#endif /* _OBJECT_H */

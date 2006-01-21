@@ -26,7 +26,7 @@
  */
  
  #include "kernel.h"
-
  
- void breveInitStatisticsFunctions(brNamespace *n) {
- }
+void breveInitStatisticsFunctions(brNamespace *n) {
+
+}
