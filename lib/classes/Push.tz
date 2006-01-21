@@ -163,6 +163,11 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 		pushCodeStackPush(pushInterpreterPointer, (codeObject get-code-pointer)).
 
+	+ to push-exec value codeObject (object):
+		% Pushes the code codeObject onto the exec stack.
+
+		pushExecStackPush(pushInterpreterPointer, (codeObject get-code-pointer)).
+
 	+ to push-float value floatValue (float):
 		% Pushes the float floatValue onto the float stack.
 
