@@ -270,28 +270,34 @@ brEvalListHead *brevePushCodeToEvalList(const push::Code *code) {
 
 float brevePushCodeFirstFloat(const push::Code *code, bool *found ) {
 	int n;
+	const push::CodeArray &stack = (*code)->get_stack();
+	push::Env env;
 
-	for(n = (int)(*code)->get_stack().size() - 1; n > -1; n-- ) {
-		if( ((*code)->get_stack()[n])->get_stack().size() == 0 ) {
-			const push::Literal<double> *d;
+	for(n = (int)stack.size() - 1; n >= 0; n-- ) {
+		if( stack[ n ]->get_stack().size() == 0 ) {
+			push::Code c = stack[ n ];
+			push::Literal< double > d( 0.0 );
 
-			if( ( d = dynamic_cast< const push::Literal<double>* >( &*(*code)->get_stack()[n] ) ) ) {
+			if( typeid( d ) == typeid( c ) ) {
 				*found = 1;
-				return d->get();
+				( *c )( env );
+				return push::get_stack<double>( env )[ 0 ];
 			}
+
+			env.clear_stacks();
 		} else {
-			float r = brevePushCodeFirstFloat( &(*code)->get_stack()[n], found );
+			float r = brevePushCodeFirstFloat( &stack[ n ], found );
 
 			if( *found ) return r;
 		}
 	}
 
-	return 0;
+	return 0.0;
 }
 
 int breveFunctionPushCodeFirstFloat(brEval arguments[], brEval *result, brInstance *instance) {
 	const push::Code *code = (push::Code*)BRPOINTER(&arguments[0]);
-	bool found;
+	bool found = false;
 
 	result->set( brevePushCodeFirstFloat( code, &found ) );
 
