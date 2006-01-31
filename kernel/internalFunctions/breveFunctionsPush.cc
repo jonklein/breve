@@ -276,12 +276,16 @@ float brevePushCodeFirstFloat(const push::Code *code, bool *found ) {
 	for(n = (int)stack.size() - 1; n >= 0; n-- ) {
 		if( stack[ n ]->get_stack().size() == 0 ) {
 			push::Code c = stack[ n ];
-			push::Literal< double > d( 0.0 );
 
-			if( typeid( d ) == typeid( c ) ) {
+			// if( typeid( c ) == typeid( push::Literal< double > ) ) {
+			//	*found = 1;
+			//	( *c )( env );
+			//	return push::get_stack<double>( env )[ 0 ];
+			//}
+
+			if( push::Literal< double > *d = dynamic_cast< push::Literal< double >* >( c.get() ) ) {
 				*found = 1;
-				( *c )( env );
-				return push::get_stack<double>( env )[ 0 ];
+				return d->get();
 			}
 
 			env.clear_stacks();
@@ -586,7 +590,7 @@ int breveFunctionPushNameStackPush(brEval arguments[], brEval *result, brInstanc
 	PushEnvironment *environment = BRPOINTER(&arguments[0]);
  	int value = BRINT(&arguments[1]);
 
-	pushNameStackPush(environment, value);
+	pushNameStackPush( environment, value );
 
 	return EC_OK;
 }
@@ -676,8 +680,10 @@ int breveFunctionPushCodeStackPush(brEval arguments[], brEval *result, brInstanc
 int breveFunctionPushExecStackPush(brEval arguments[], brEval *result, brInstance *instance) {
 	PushEnvironment *environment = BRPOINTER(&arguments[0]);
  	PushCode *value = BRPOINTER(&arguments[1]);
+	// push::Exec *evalu = (push::Exec*)value 
 
-	push::get_stack<push::Exec>( ( ( push::Env* )environment )->next() ).push_back( *(push::Exec*)value );
+	// push::get_stack<push::Exec>( ( ( push::Env* )environment )->next() ).push_guarded( push::Exec( *(push::Code*)value ) );
+	( ( push::Env* )environment )->next().push_guarded( *(push::Code*)value );
 
 	return EC_OK;
 }

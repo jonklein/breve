@@ -47,7 +47,7 @@ int brIJointApplyTorque(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	j->applyTorque(&BRVECTOR(&args[1]));
+	j->applyTorque( &BRVECTOR(&args[1]) );
 
 	return EC_OK;
 }

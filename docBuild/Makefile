@@ -10,7 +10,6 @@ docclean:
 classes: docBuild/docExtract
 	mkdir -p docs/classes
 	docBuild/docExtract lib/classes/*.tz | docBuild/docBuild.pl docs/classes
-	# docBuild/indexBuild.pl lib/classes/*.tz > docs/classes/method_index.html
 	cp docBuild/classImages/*.jpg docs/classes/
 
 docbook: classes

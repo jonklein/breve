@@ -352,8 +352,7 @@ VarData * SimInstance::ProcessObject(stInstance * instance, stObject * object, s
     stVar * var;
 	std::map< std::string, stVar* >::iterator vi;
 
-    if (instance->status != AS_ACTIVE)
-	return NULL;
+    if ( (int)instance->status != (int)AS_ACTIVE ) return NULL;
 
 	for ( vi = object->variables.begin(); vi != object->variables.end(); vi++ )
     {

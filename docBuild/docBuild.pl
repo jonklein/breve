@@ -424,7 +424,7 @@ sub output_index() {
 
 		($methodname) = ($desc =~ /^([\w+-_]*)/);
 
-		print INDEX "$methodname<br>\n<font size=-2>$desc [<a href=\"${class}.html\">$class</a>]</font><p>\n";
+		print INDEX "<a href=\"${class}.html#$methodname\">$methodname</a><br>\n<font size=-1>$desc [<a href=\"${class}.html\">$class</a>]</font><p>\n";
 	}
 
 	close(INDEX);
