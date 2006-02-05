@@ -275,7 +275,7 @@ void slRoamPatch::tessellate(slCamera *c, slRoamTriangle *t, int node) {
 		return;
 	}
 
-	slVectorAdd(&c->location, &c->target, &loc);
+	slVectorAdd(&c->_location, &c->_target, &loc);
 
 	slVectorSub(&t->_points[1], &loc, &toPoly);
 

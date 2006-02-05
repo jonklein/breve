@@ -25,6 +25,7 @@
 #include "worldObject.h"
 #include "netsim.h"
 #include "patch.h"
+#include "camera.h"
 
 #ifdef __cplusplus
 #include <vector>
@@ -100,23 +101,22 @@ class slGISData;
 
 class slWorld {
 	public:
-		// when objects are added or removed from the world, this flag must be 
-		// set to 0 so that vclip structures are reinitialized.
-	
-		bool initialized;
-		unsigned char odeStepMode;
-	
-		dWorldID _odeWorldID;
-		dJointGroupID _odeCollisionGroupID;
 		dJointGroupID _odeJointGroupID;
 	
 		// sunlight detection
 	
-		unsigned char detectLightExposure;
-		unsigned char drawLightExposure;
-	
-		slVector lightExposureSource;
-		slVector lightExposureTarget;
+		bool _detectLightExposure;
+		bool _drawLightExposure;
+
+		bool detectLightExposure() { return _detectLightExposure; }
+		bool drawLightExposure() { return _detectLightExposure; }
+
+		void setDetectLightExposure( bool d ) { _detectLightExposure = d; }
+		void setDrawLightExposure( bool d ) { _drawLightExposure = d; }
+
+		void setLightExposureSource( slVector *src );
+
+		slCamera *getLightExposureCamera( ) { return &_lightExposureCamera; }
 	
 		// integration vectors -- DV_VECTOR_COUNT depends on the requirements
 		// of the integration algorithm we're using... mbEuler requires only 
@@ -138,11 +138,9 @@ class slWorld {
 	
 		int (*collisionCheckCallback)(void *body1, void *body2, int type);
 	
-		bool boundingBoxOnly;
-	
 		// age is the simulation time of the world.
 	
-		double age;
+		double _age;
 	
 		std::vector<slWorldObject*> objects;
 		std::vector<slPatchGrid*> patches;
@@ -158,10 +156,7 @@ class slWorld {
 		slVclipData *clipData;
 		slVclipData *proximityData;
 	
-		slVector gravity;
-	
-		bool detectCollisions;
-		bool resolveCollisions;
+		slVector _gravity;
 	
 		// drawing the world...
 	
@@ -179,8 +174,26 @@ class slWorld {
 		slNetsimClientData *netsimClient;
 #endif
 
-		void slWorld::renderShadowVolume(slCamera *c);
-		void slWorld::renderObjectShadowVolumes(slCamera *c);
+		void renderShadowVolume(slCamera *c);
+		void renderObjectShadowVolumes(slCamera *c);
+	
+		void setQuickstepIterations( int );
+
+		dWorldID _odeWorldID;
+		dJointGroupID _odeCollisionGroupID;
+
+		bool _detectCollisions;
+		bool _resolveCollisions;
+		bool _boundingBoxOnlyCollisions;
+	
+		// when objects are added or removed from the world, this flag must be 
+		// set to 0 so that vclip structures are reinitialized.
+	
+		bool _initialized;
+		unsigned char _odeStepMode;
+
+		slCamera _lightExposureCamera;
+	private:
 };
 #endif
 
@@ -236,13 +249,7 @@ void slWorldSetBackgroundColor(slWorld *, slVector *);
 void slWorldSetBackgroundTextureColor(slWorld *, slVector *);
 void slWorldSetBackgroundTexture(slWorld *, int, int);
 
-void slWorldSetLightExposureDetection(slWorld *, int);
-void slWorldSetLightExposureSource(slWorld *, slVector *);
-int slWorldGetLightExposureDetection(slWorld *);
-
 void slWorldSetCollisionCallbacks(slWorld *, int (*)(void *, void *, int), void (*)(void *, void *, int));
-
-void slWorldSetQuickstepIterations(slWorld *, int);
 
 slWorldObject *slWorldGetObject(slWorld *, unsigned int);
 

@@ -342,7 +342,7 @@ void slMultibody::update() {
 		(*i)->multibody = this;
 	}
 
-	if(_world->initialized) initCollisionFlags(_world->clipData);
+	if( _world->_initialized ) initCollisionFlags( _world->clipData );
 }
 
 /*!
@@ -371,7 +371,7 @@ int slMultibody::checkSelfPenetration() {
 	std::vector<slLink*>::iterator i1;
 	std::vector<slLink*>::iterator i2;
 
-	if(!_world->initialized) slVclipDataInit(_world);
+	if( !_world->_initialized ) slVclipDataInit( _world );
 	vc = _world->clipData;
 
 	for(i1 = _links.begin(); i1 != _links.end(); i1++ ) {

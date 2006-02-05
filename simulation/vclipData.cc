@@ -34,14 +34,14 @@
 	Sets the slWorld field initialized to 1.
 */
 
-void slVclipDataInit(slWorld *w) {
+void slVclipDataInit( slWorld *w ) {
 	slStationary *st;
 	slLink *link;
 	unsigned int x;
 
-	w->initialized = 1;
+	w->_initialized = 1;
 
-	if (w->proximityData) {
+	if ( w->proximityData ) {
 		slInitProximityData(w);
 		slInitBoundSort(w->proximityData);
 	}
@@ -99,9 +99,9 @@ void slVclipDataInit(slWorld *w) {
 		}
 	}
 
-	if (w->detectCollisions) {
-		slInitBoundSort(w->clipData);
-		w->clipData->clip(0.0, 0, w->boundingBoxOnly);
+	if ( w->_detectCollisions ) {
+		slInitBoundSort( w->clipData );
+		w->clipData->clip( 0.0, 0, w->_boundingBoxOnlyCollisions );
 	}
 }
 
@@ -164,7 +164,7 @@ slPairFlags slVclipDataInitPairFlags(slVclipData *clipData, int x, int y) {
 	}
 
 	if (simulate || callback) {
-		clipData->world->detectCollisions = 1;
+		clipData->world->_detectCollisions = 1;
 		flags |= BT_CHECK;
 
 		if (simulate)

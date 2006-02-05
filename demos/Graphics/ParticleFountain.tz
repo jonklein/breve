@@ -28,7 +28,7 @@ Control : Fountain {
 
 		lightmap = (new Image load from "images/dirtylightmap.png").
 
-		particles = 600 new Particles.
+		particles = 6000 new Particles.
 
 		self point-camera at (0, 9, 0) from (80.0, 2.1, 0.0).
 
@@ -55,7 +55,8 @@ Mobile : Particle (aka Particles) {
 		# texture #3 happens to be a built-in texture which nicely illustrates the 
 		# lightmap effect.
 
-		self set-lightmap-image to (controller get-lightmap-image).
+		# self set-lightmap-image to (controller get-lightmap-image).
+		self draw-as-point.
 		range = 5.
 		self reset.
 

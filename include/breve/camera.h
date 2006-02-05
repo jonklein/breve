@@ -95,7 +95,7 @@ class slCamera {
 		slLight lights[8];
 		int nLights;
 
-		slCamera(int width, int height);
+		slCamera(int width = 200, int height = 200);
 		~slCamera();
 
 		void updateFrustum();
@@ -144,15 +144,16 @@ class slCamera {
 		double textScale;
 	
 		unsigned char drawMode;
-		unsigned char drawLights;
-		unsigned char drawFog;
-		unsigned char drawSmooth;
-		unsigned char drawShadow;
-		unsigned char drawShadowVolumes;
-		unsigned char drawOutline;
-		unsigned char drawReflection;
-		unsigned char drawText;
-		unsigned char blur;
+		bool drawLights;
+		bool drawFog;
+		bool drawSmooth;
+		bool drawShadow;
+		bool drawShadowVolumes;
+		bool drawOutline;
+		bool drawReflection;
+		bool drawText;
+		bool blur;
+
 		double blurFactor;
 	
 		slVector fogColor;
@@ -165,8 +166,8 @@ class slCamera {
 	
 		// offset & target of camera
 	
-		slVector location;
-		slVector target; 
+		slVector _location;
+		slVector _target; 
 		double rotation[3][3];
 	
 		// rotation & zoom 

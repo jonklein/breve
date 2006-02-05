@@ -370,7 +370,7 @@ void slPatchGrid::drawWithout3DTexture(slCamera *camera) {
 	// alpha blending to work.  figure out the points
 	// closest to the camera.
 
-	slVectorAdd(&camera->location, &camera->target, &origin);
+	slVectorAdd( &camera->_location, &camera->_target, &origin );
 
 	xMid = (int)((origin.x - startPosition.x) / patchSize.x);
 	if(xMid < 0) xMid = 0;
@@ -450,7 +450,7 @@ void slPatchGrid::draw(slCamera *camera) {
 	return drawWithout3DTexture(camera);
 #endif
 
-	slVectorAdd(&camera->location, &camera->target, &origin);
+	slVectorAdd( &camera->_location, &camera->_target, &origin);
 
 	diff.x = (origin.x - (startPosition.x + (xSize / 2) * patchSize.x));
 	diff.y = (origin.y - (startPosition.y + (ySize / 2) * patchSize.y));

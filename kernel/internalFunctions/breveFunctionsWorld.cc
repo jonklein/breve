@@ -55,7 +55,7 @@ int brISetStepFast(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetStepFastIterations(brEval args[], brEval *target, brInstance *i) {
-	slWorldSetQuickstepIterations(i->engine->world, BRINT(&args[0]));
+	i->engine->world->setQuickstepIterations( BRINT(&args[0]) );
 	return EC_OK;
 }
 
@@ -427,7 +427,7 @@ int brISetBitmapRotationTowardsVector(brEval args[], brEval *target, brInstance 
 
 	slVectorSet(&up, 0, 1, 0);
 
-	slVectorCopy(&i->engine->camera->location, &offset);
+	slVectorCopy( &i->engine->camera->_location, &offset );
 	slVectorNormalize(&offset);
 	slVectorNormalize(v);
 
@@ -491,7 +491,7 @@ int brIGetMainCameraPointer(brEval args[], brEval *target, brInstance *i) {
 int brICameraSetTarget(brEval args[], brEval *target, brInstance *i) {
 	slVector *tar = &BRVECTOR(&args[0]);
 
-	slVectorCopy(tar, &i->engine->camera->target);
+	slVectorCopy( tar, &i->engine->camera->_target );
 
 	i->engine->camera->update();
 
@@ -602,7 +602,7 @@ int brICameraGetZoom(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraGetOffset(brEval args[], brEval *target, brInstance *i) {
-	target->set( i->engine->camera->location );
+	target->set( i->engine->camera->_location );
 	return EC_OK;
 }
 
@@ -613,7 +613,7 @@ int brICameraGetOffset(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraGetTarget(brEval args[], brEval *target, brInstance *i) {
-	target->set( i->engine->camera->target );
+	target->set( i->engine->camera->_target );
 	return EC_OK;
 }
 
@@ -678,14 +678,18 @@ int brISetLightPosition(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
-/*!
-	\brief Sets light exposure detection on/off.
-
-	setDetectLightExposure(int state).
-*/
-
 int brISetDetectLightExposure(brEval args[], brEval *target, brInstance *i) {
-	slWorldSetLightExposureDetection(i->engine->world, BRINT(&args[0]));
+	i->engine->world->setDetectLightExposure( BRINT(&args[0]) );
+	return EC_OK;
+}
+
+int brISetDrawLightExposure(brEval args[], brEval *target, brInstance *i) {
+	i->engine->world->setDrawLightExposure( BRINT(&args[0]) );
+	return EC_OK;
+}
+
+int brIGetLightExposureCamera(brEval args[], brEval *target, brInstance *i) {
+	target->set( i->engine->world->getLightExposureCamera( ) );
 	return EC_OK;
 }
 
@@ -696,7 +700,7 @@ int brISetDetectLightExposure(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetLightExposureSource(brEval args[], brEval *target, brInstance *i) {
-	slWorldSetLightExposureSource(i->engine->world, &BRVECTOR(&args[0]));
+	i->engine->world->setLightExposureSource( &BRVECTOR( &args[0] ) );
 	return EC_OK;
 }
 
@@ -900,7 +904,9 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "getLightPosition", brIGetLightPosition, AT_VECTOR, 0);
 	brNewBreveCall(n, "setLightPosition", brISetLightPosition, AT_NULL, AT_VECTOR, 0);
 	brNewBreveCall(n, "setDetectLightExposure", brISetDetectLightExposure, AT_NULL, AT_INT, 0);
+	brNewBreveCall(n, "setDrawLightExposure", brISetDrawLightExposure, AT_NULL, AT_INT, 0);
 	brNewBreveCall(n, "setLightExposureSource", brISetLightExposureSource, AT_NULL, AT_VECTOR, 0);
+	brNewBreveCall(n, "getLightExposureCamera", brIGetLightExposureCamera, AT_POINTER, 0);
 
 	brNewBreveCall(n, "setBackgroundColor", brISetBackgroundColor, AT_NULL, AT_VECTOR, 0);
 	brNewBreveCall(n, "setBackgroundTexture", brISetBackgroundTexture, AT_NULL, AT_INT, 0);

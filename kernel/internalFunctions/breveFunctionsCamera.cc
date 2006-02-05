@@ -202,8 +202,8 @@ int brICameraNew(brEval args[], brEval *target, brInstance *i) {
 
 	camera = new slCamera(0, 0);
 
-	slVectorSet(&camera->target, 1, 0, 0);
-	slVectorSet(&camera->location, 0, 0, 0);
+	slVectorSet(&camera->_target, 1, 0, 0);
+	slVectorSet(&camera->_location, 0, 0, 0);
 
 	target->set( camera );
 
@@ -242,8 +242,8 @@ int brICameraPosition(brEval args[], brEval *target, brInstance *i) {
 	slVector *l = &BRVECTOR(&args[1]);
 	slVector *t = &BRVECTOR(&args[2]);
 
-	slVectorCopy(l, &camera->location);
-	slVectorCopy(t, &camera->target);
+	slVectorCopy(l, &camera->_location);
+	slVectorCopy(t, &camera->_target);
 
 	return EC_OK;
 }

@@ -57,6 +57,11 @@ wrapper to build real_breve.app using the correct libraries from the
 configure script.  Building real_breve.app directly will fail, because 
 it is missing these library settings.
 
+For the record, I am well aware that this source is a pretty messy.  This
+project and code, in one form or another has spanned much of my undergraduate 
+education, a Master's degree and several years in research and industry.  
+Parts of this code are now almost 10 years old.  I
+
                            --- PLATFORMS ---
 
 breve is actively developed and maintained on three platforms:

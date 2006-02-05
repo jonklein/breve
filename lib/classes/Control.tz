@@ -1173,6 +1173,15 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		setLightExposureSource(source).
 
+	+ to enable-light-exposure-drawing:
+		setDrawLightExposure( 1 ).
+	+ to disable-light-exposure-drawing:
+		setDrawLightExposure( 0 ).
+
+	+ to get-light-exposure-camera:
+		camera = new Camera.
+		camera set-camera-pointer to getLightExposureCamera().
+
   + section "Debugging & Performance"
 
 	+ to set-output-filter to filterLevel (int):

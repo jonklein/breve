@@ -57,9 +57,8 @@ slCamera::slCamera(int x, int y) {
 
 	drawMode = GL_POLYGON;
 
-	slVectorSet(&target, 0, 0, 0);
-
-	slVectorSet(&location, 0, 10, 100);
+	slVectorSet(&_target, 0, 0, 0);
+	slVectorSet(&_location, 0, 10, 100);
 
 	drawSmooth = 0;
 	drawLights = 0;
@@ -116,7 +115,7 @@ void slCamera::updateFrustum() {
 	frust[14] = modl[12] * proj[ 2] + modl[13] * proj[ 6] + modl[14] * proj[10] + modl[15] * proj[14];
 	frust[15] = modl[12] * proj[ 3] + modl[13] * proj[ 7] + modl[14] * proj[11] + modl[15] * proj[15];
 
-	slVectorAdd(&target, &location, &loc);
+	slVectorAdd(&_target, &_location, &loc);
 	slVectorCopy(&loc, &frustumPlanes[0].vertex);
 	slVectorCopy(&loc, &frustumPlanes[1].vertex);
 	slVectorCopy(&loc, &frustumPlanes[2].vertex);
@@ -140,7 +139,7 @@ void slCamera::updateFrustum() {
 	frustumPlanes[3].normal.y = frust[7 ] + frust[5];
 	frustumPlanes[3].normal.z = frust[11] + frust[9];
 
-	slVectorMul(&location, -1.0, &frustumPlanes[4].normal);
+	slVectorMul(&_location, -1.0, &frustumPlanes[4].normal);
 
 	slVectorNormalize(&frustumPlanes[0].normal);
 	slVectorNormalize(&frustumPlanes[1].normal);
@@ -260,11 +259,11 @@ void slCamera::update() {
 
 	// preform the rotation around the unit vector 
 
-	slVectorXform(rotation, &unit, &location);
+	slVectorXform(rotation, &unit, &_location);
 
 	// apply the zoom
 	
-	slVectorMul(&location, zoom, &location);
+	slVectorMul(&_location, zoom, &_location);
 }
 
 /*!
@@ -423,18 +422,18 @@ void slMoveCameraWithMouseMovement(slCamera *camera, double dx, double dy) {
 
     slVectorSet(&yaxis, 0, 1, 0);
 
-	slVectorCopy(&camera->location, &location);
+	slVectorCopy(&camera->_location, &location);
 
 	slVectorCross(&location, &yaxis, &xaxis);
 	slVectorNormalize(&xaxis);
 	slVectorMul(&xaxis, camera->zoom * -dx / 100.0, &tempV);
-	slVectorSub(&camera->target, &tempV, &camera->target);
+	slVectorSub(&camera->_target, &tempV, &camera->_target);
 
 	slVectorCross(&location, &xaxis, &tempV);
 	slVectorNormalize(&tempV);                
 	if(tempV.y > 0) slVectorMul(&tempV, -1, &tempV);
 	slVectorMul(&tempV, camera->zoom * -dy / 100.0, &tempV);
-	slVectorAdd(&camera->target, &tempV, &camera->target);    
+	slVectorAdd(&camera->_target, &tempV, &camera->_target);    
 }
 
 /*!

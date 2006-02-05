@@ -271,12 +271,11 @@ brEvalListHead *brevePushCodeToEvalList(const push::Code *code) {
 float brevePushCodeFirstFloat(const push::Code *code, bool *found ) {
 	int n;
 	const push::CodeArray &stack = (*code)->get_stack();
-	push::Env env;
 
 	for(n = (int)stack.size() - 1; n >= 0; n-- ) {
 		if( stack[ n ]->get_stack().size() == 0 ) {
 			push::Code c = stack[ n ];
-
+			// 
 			// if( typeid( c ) == typeid( push::Literal< double > ) ) {
 			//	*found = 1;
 			//	( *c )( env );
@@ -287,8 +286,6 @@ float brevePushCodeFirstFloat(const push::Code *code, bool *found ) {
 				*found = 1;
 				return d->get();
 			}
-
-			env.clear_stacks();
 		} else {
 			float r = brevePushCodeFirstFloat( &stack[ n ], found );
 
@@ -635,7 +632,7 @@ int breveFunctionPushExecStackPop(brEval arguments[], brEval *result, brInstance
 	PushEnvironment *environment = BRPOINTER(&arguments[0]);
 
 	if( push::get_stack<push::Exec>( ( (push::Env*)environment )->next() ).size() > 0) 
-		push::get_stack<push::Exec>( ( (push::Env*)environment )->next() ).size();
+		push::get_stack<push::Exec>( ( (push::Env*)environment )->next() ).pop_back();
 
 	return EC_OK;
 }

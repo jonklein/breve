@@ -79,28 +79,29 @@ slWorld *slWorldNew() {
 	w->_odeCollisionGroupID = dJointGroupCreate(0);
 	w->_odeJointGroupID = dJointGroupCreate(0);
 
-	w->resolveCollisions = 0;
-	w->detectCollisions = 0;
+	w->_resolveCollisions = 0;
+	w->_detectCollisions = 0;
 
-	w->initialized = 0;
+	w->_initialized = 0;
 
-	w->age = 0.0;
+	w->_age = 0.0;
 
-	w->detectCollisions = 1;
+	w->_detectCollisions = 1;
 
 	w->collisionCallback = NULL;
 	w->collisionCheckCallback = NULL;
 
 	w->integrator = slEuler;
 
-	w->boundingBoxOnly = 0;
+	w->_boundingBoxOnlyCollisions = 0;
 
-	w->odeStepMode = 0;
+	w->_odeStepMode = 0;
 
 	w->backgroundTexture = 0;
+
 	slVectorSet(&w->backgroundTextureColor, 1, 1, 1);
 
-	slVectorSet(&w->lightExposureTarget, 0, 0, 0);
+	slVectorSet(&w->_lightExposureCamera._target, 0, 0, 0);
 
 	w->clipData = slVclipDataNew();
 
@@ -250,7 +251,7 @@ slWorldObject *slWorldAddObject(slWorld *w, slWorldObject *no, int type) {
 
 	w->objects.push_back(no);
 
-	w->initialized = 0;
+	w->_initialized = 0;
 
 	return no;
 }
@@ -266,7 +267,7 @@ void slRemoveObject(slWorld *w, slWorldObject *p) {
 
 	if(wi != w->objects.end()) {
 		w->objects.erase(wi);
-		w->initialized = 0;
+		w->_initialized = 0;
 	}
 
 }
@@ -297,7 +298,7 @@ void slPatchGridRemove(slWorld *w, slPatchGrid *g)
 	if(pi != w->patches.end()) {
         delete *pi;
         w->patches.erase(pi);
-		w->initialized = 0;
+		w->_initialized = 0;
 	}
 
 }
@@ -337,23 +338,23 @@ double slRunWorld(slWorld *w, double deltaT, double step, int *error) {
 
 	*error = 0;
 
-	if (!w->initialized)
-		slVclipDataInit(w);
+	if ( !w->_initialized ) slVclipDataInit( w );
 
-	while (total < deltaT && !*error) 
+	while ( total < deltaT && !*error ) 
 		total += slWorldStep(w, step, error);
 
-	w->age += total;
+	w->_age += total;
 
 #if HAVE_LIBENET
 	if (w->netsimData.server && w->netsimData.isMaster &&
-	    (int)w->age >= lastSecond) {
-		lastSecond = (int)w->age + 1;
+	    (int)w->_age >= lastSecond) {
+		lastSecond = (int)w->_age + 1;
 
-		slNetsimBroadcastSyncMessage(w->netsimData.server, w->age);
+		slNetsimBroadcastSyncMessage( w->netsimData.server, w->_age );
 	}
+
 	if (w->netsimData.server && !w->netsimData.isMaster &&
-	    w->detectCollisions) {
+	    w->_detectCollisions) {
 		int maxIndex;
 		slVector max, min;
 
@@ -392,15 +393,15 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 	for(li = w->connections.begin(); li != w->connections.end(); li++ ) 
 		(*li)->step(stepSize);
 
-	if(w->detectCollisions) {
-		if(!w->initialized) slVclipDataInit(w);
+	if( w->_detectCollisions ) {
+		if( !w->_initialized ) slVclipDataInit(w);
 
 		if(w->_clipGrid) {
 			w->_clipGrid->assignObjectsToPatches(w);
 			result = 0;
 		} else {
 			slVclipPruneAndSweep(w->clipData);
-			result = w->clipData->clip(0.0, 0, w->boundingBoxOnly);
+			result = w->clipData->clip( 0.0, 0, w->_boundingBoxOnlyCollisions );
 		}
 
 		if(result == -1) {
@@ -498,7 +499,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 	}
 
 	if(simulate != 0) {
-		if(w->odeStepMode == 0) {
+		if( w->_odeStepMode == 0 ) {
 			dWorldStep(w->_odeWorldID, stepSize);
 		} else {
 			dWorldQuickStep(w->_odeWorldID, stepSize);
@@ -518,9 +519,9 @@ void slNeighborCheck(slWorld *w) {
 	slWorldObject *o1, *o2;
 	std::vector<slWorldObject*>::iterator wi;
 
-	if(!w->initialized) slVclipDataInit(w);
+	if( !w->_initialized ) slVclipDataInit(w);
 
-	if(!w->proximityData) {
+	if( !w->proximityData ) {
 		w->proximityData = slVclipDataNew();
 		slVclipDataRealloc(w->proximityData, w->objects.size());
 		slInitProximityData(w);
@@ -617,7 +618,7 @@ void slWorldRemoveConnection(slWorld *w, slObjectConnection *c) {
 */
 
 double slWorldGetAge(slWorld *w) {
-	return w->age;
+	return w->_age;
 }
 
 /*!
@@ -625,7 +626,7 @@ double slWorldGetAge(slWorld *w) {
 */
 
 void slWorldSetAge(slWorld *w, double a) {
-	w->age = a;
+	w->_age = a;
 }
 
 /*!
@@ -633,7 +634,7 @@ void slWorldSetAge(slWorld *w, double a) {
 */
 
 void slWorldSetUninitialized(slWorld *w) {
-	w->initialized = 0;
+	w->_initialized = 0;
 }
 
 /*!
@@ -641,7 +642,7 @@ void slWorldSetUninitialized(slWorld *w) {
 */
 
 void slWorldSetCollisionResolution(slWorld *w, int n) {
-	w->resolveCollisions = n;
+	w->_resolveCollisions = n;
 }
 
 /*!
@@ -649,12 +650,12 @@ void slWorldSetCollisionResolution(slWorld *w, int n) {
 */
 
 void slWorldSetBoundsOnlyCollisionDetection(slWorld *w, int b) {
-    w->boundingBoxOnly = b;
+    w->_boundingBoxOnlyCollisions = b;
 }
 
 
 void slWorldSetPhysicsMode(slWorld *w, int n) {
-	w->odeStepMode = n;
+	w->_odeStepMode = n;
 }
 
 void slWorldSetBackgroundColor(slWorld *w, slVector *v) {
@@ -671,15 +672,15 @@ void slWorldSetBackgroundTexture(slWorld *w, int n, int mode) {
 }
 
 void slWorldSetLightExposureDetection(slWorld *w, int n) {
-	w->detectLightExposure = n;
+	w->_detectLightExposure = n;
 }
 
 int slWorldGetLightExposureDetection(slWorld *w) {
-	return w->detectLightExposure;
+	return w->_detectLightExposure;
 }
 
-void slWorldSetLightExposureSource(slWorld *w, slVector *v) {
-	slVectorCopy(v, &w->lightExposureSource);
+void slWorld::setLightExposureSource( slVector *v ) {
+	slVectorCopy( v, &_lightExposureCamera._location );
 }
 
 void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*, int t), void (*collide)(void*, void*, int t)) {
@@ -692,6 +693,9 @@ slWorldObject *slWorldGetObject(slWorld *w, unsigned int n) {
 	return w->objects[n];
 }
 
-void slWorldSetQuickstepIterations(slWorld *w, int n) {
-	dWorldSetQuickStepNumIterations(w->_odeWorldID, n);
+void slWorld::setQuickstepIterations( int n ) {
+	dWorldSetQuickStepNumIterations( _odeWorldID, n );
 }
+
+
+

@@ -95,14 +95,14 @@ void slLink::step(slWorld *world, double step) {
 		updatePositions();
 		applyJointControls();
 
-		if(world->detectCollisions) updateBoundingBox();
+		if( world->_detectCollisions ) updateBoundingBox();
 	} else {
 		if(mobile) { 
 			world->integrator(world, this, &step, 0);
 			slLinkSwapConfig(this);
 			updatePosition();
 
-			if(world->detectCollisions) updateBoundingBox();
+			if( world->_detectCollisions ) updateBoundingBox();
 		} else {
 			// if( !_justMoved) _moved = 0;
 			// else _justMoved = 0;
@@ -330,7 +330,7 @@ int slLink::checkSelfPenetration(slWorld *world) {
 	std::vector<slLink*> links;
 	std::vector<slLink*>::iterator li;
 
-	if(!world->initialized) slVclipDataInit(world);
+	if( !world->_initialized ) slVclipDataInit(world);
 	vc = world->clipData;
 
 	this->connectedLinks(&links, 0);
@@ -364,7 +364,7 @@ std::vector< void* > slLink::userDataForPenetratingObjects(slWorld *w) {
 	unsigned int n;
 	std::vector< void* > penetrations;
 
-	if(!w->initialized) slVclipDataInit(w);
+	if( !w->_initialized ) slVclipDataInit(w);
 
 	ln = clipNumber;
 

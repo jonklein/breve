@@ -287,8 +287,8 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 
 	slClearGLErrors("about to select");
 
-	slVectorAdd(&c->location, &c->target, &cam);
-	gluLookAt(cam.x, cam.y, cam.z, c->target.x, c->target.y, c->target.z, 0.0, 1.0, 0.0);
+	slVectorAdd(&c->_location, &c->_target, &cam);
+	gluLookAt(cam.x, cam.y, cam.z, c->_target.x, c->_target.y, c->_target.z, 0.0, 1.0, 0.0);
 
 	// Render the objects in the world, with name loading, and with billboards as spheres
 
@@ -349,7 +349,7 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 
 	// set up the matrices for a regular draw--gluUnProject needs this 
 
-	t = &c->target;
+	t = &c->_target;
 
 	view[0] = c->ox;
 	view[1] = c->oy;
@@ -365,7 +365,7 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	slVectorAdd(&c->location, t, &cam);
+	slVectorAdd(&c->_location, t, &cam);
 	gluLookAt(cam.x, cam.y, cam.z, t->x, t->y, t->z, 0.0, 1.0, 0.0);
 
 	// get the data for gluUnProject
@@ -389,7 +389,7 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 
 	// define the plane where the object in question lies 
 
-	slVectorCopy(&c->location, &plane.normal);
+	slVectorCopy(&c->_location, &plane.normal);
 	slVectorNormalize(&plane.normal);
 	slVectorCopy(dragVertex, &plane.vertex);
 
@@ -411,8 +411,8 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 
 	// compute the point on the object plane of the drag vector 
 
-	slVectorMul(dragVector, (sD / (eD + sD)), dragVector);
-	slVectorAdd(dragVector, &cam, dragVector);
+	slVectorMul( dragVector, ( sD / ( eD + sD ) ), dragVector );
+	slVectorAdd( dragVector, &cam, dragVector );
 
 	glLoadIdentity();
 
@@ -422,34 +422,37 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 void slRenderScene(slWorld *w, slCamera *c, int crosshair) {
 	std::vector< slCamera* >::iterator ci;
 
-	if (w->detectLightExposure)
+	if ( w->_detectLightExposure && !w->_drawLightExposure )
 		slDetectLightExposure(w, c, 200, NULL);
 
 	slRenderWorld(w, c, crosshair, 0);
  
 	for(ci = w->cameras.begin(); ci != w->cameras.end(); ci++)
-        if (c != *ci) slRenderWorld(w, *ci, 0, 1);
+        if (c != *ci) slRenderWorld( w, *ci, 0, 1 );
+
+	if ( w->_detectLightExposure && w->_drawLightExposure )
+		slDetectLightExposure(w, c, 200, NULL);
 }
 
-void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
+void slRenderWorld( slWorld *w, slCamera *c, int crosshair, int scissor ) {
 	slVector cam;
 	int flags = 0;
 
 	if (!w || !c)
 		return;
 
-	glViewport(c->ox, c->oy, c->x, c->y);
+	glViewport( c->ox, c->oy, c->x, c->y );
 
-	if (scissor) {
+	if ( scissor ) {
 		flags |= DO_NO_AXIS | DO_NO_BOUND;
 		glEnable(GL_SCISSOR_TEST);
-		glScissor(c->ox, c->oy, c->x, c->y);
+		glScissor( c->ox, c->oy, c->x, c->y );
 	}
 
 	if (c->drawOutline)
 		flags |= DO_OUTLINE | DO_BILLBOARDS_AS_SPHERES;
 
-	if (c->_recompile) {
+	if ( c->_recompile ) {
 		c->_recompile = 0;
 		flags |= DO_RECOMPILE;
 	}
@@ -470,8 +473,8 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 	glPushMatrix();
 	glLoadIdentity();
 
-	slVectorAdd(&c->location, &c->target, &cam);
-	gluLookAt(cam.x, cam.y, cam.z, c->target.x, c->target.y, c->target.z, 0.0, 1.0, 0.0);
+	slVectorAdd(&c->_location, &c->_target, &cam);
+	gluLookAt(cam.x, cam.y, cam.z, c->_target.x, c->_target.y, c->_target.z, 0.0, 1.0, 0.0);
 
 	c->updateFrustum();
 
@@ -558,7 +561,7 @@ void slRenderWorld(slWorld *w, slCamera *c, int crosshair, int scissor) {
 	glLoadIdentity();
 
 	if (c->drawText)
-		slRenderText(w, c, &c->location, &c->target, crosshair);
+		slRenderText(w, c, &c->_location, &c->_target, crosshair);
 
 	if (c->drawText && crosshair && !scissor) {
 		glPushMatrix();
@@ -755,7 +758,7 @@ void slRenderText(slWorld *w, slCamera *c, slVector *location, slVector *target,
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_BLEND);
 	glColor4f(0.0, 0.0, 0.0, 1.0);
-	snprintf(textStr, sizeof(textStr), "%.2f", w->age);
+	snprintf( textStr, sizeof(textStr), "%.2f", w->_age );
 
 	fromLeft = -1.0 + (5.0 / c->x);
 	slText(fromLeft, 1.0 - (20.0 / c->y), textStr, GLUT_BITMAP_HELVETICA_10);
@@ -873,7 +876,7 @@ void slRenderBillboards(slCamera *c, int flags) {
 	unsigned int n;
 	int lastTexture = -1;
 
-	slVectorCopy(&c->location, &normal);
+	slVectorCopy(&c->_location, &normal);
 	slVectorNormalize(&normal);
 
 	if (!(flags & DO_NO_TEXTURE)) {
@@ -1217,7 +1220,8 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 
 	if( !doOnlyAlpha) {
 		glEnable(GL_BLEND);
-		glPointSize(2.0);
+		glPointSize(30.0);
+		glEnable(GL_POINT_SMOOTH);
 		glBegin(GL_POINTS);
 		for (n = 0; n < camera->_points.size(); ++n) {
 			slVector &v = camera->_points[n].first;
