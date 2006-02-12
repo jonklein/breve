@@ -670,18 +670,6 @@ void slWorldSetBackgroundTexture(slWorld *w, int n, int mode) {
 	w->isBackgroundImage = mode;
 }
 
-void slWorldSetLightExposureDetection(slWorld *w, int n) {
-	w->_detectLightExposure = n;
-}
-
-int slWorldGetLightExposureDetection(slWorld *w) {
-	return w->_detectLightExposure;
-}
-
-void slWorld::setLightExposureSource( slVector *v ) {
-	slVectorCopy( v, &_lightExposureCamera._location );
-}
-
 void slWorldSetCollisionCallbacks(slWorld *w, int (*check)(void*, void*, int t), void (*collide)(void*, void*, int t)) {
 	w->collisionCallback = collide;
 	w->collisionCheckCallback = check;

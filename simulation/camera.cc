@@ -33,6 +33,8 @@ slCamera::slCamera(int x, int y) {
 
 	unsigned int n;
 
+	activateContextCallback = NULL;
+
 	text.insert(text.begin(), 8, t);
 
 	textScale = 1;
@@ -62,6 +64,7 @@ slCamera::slCamera(int x, int y) {
 
 	zoom = 10;
 
+	drawFog = 0;
 	drawSmooth = 0;
 	drawLights = 0;
 	drawShadow = 0;
@@ -142,6 +145,9 @@ void slCamera::updateFrustum() {
 	frustumPlanes[3].normal.z = frust[11] + frust[9];
 
 	slVectorMul(&_location, -1.0, &frustumPlanes[4].normal);
+
+	// Is this correct?  I don't believe it is!
+	slVectorCopy(&_location, &frustumPlanes[5].normal);
 
 	slVectorNormalize(&frustumPlanes[0].normal);
 	slVectorNormalize(&frustumPlanes[1].normal);

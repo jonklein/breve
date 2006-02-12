@@ -34,6 +34,9 @@
 
 #include "breve.h"
 #include "glIncludes.h"
+#include "gldraw.h"
+#include "lightdetector.h"
+#include "world.h"
 
 double gNotify = 40.0;
 double gSimMax = 0.0;
@@ -150,7 +153,7 @@ int main(int argc, char **argv) {
 		}
 
 #if HAVE_LIBOSMESA
-		if (slWorldGetLightExposureDetection(frontend->engine->world)) 
+		if ( frontend->engine->world->detectLightExposure() ) 
 			slDetectLightExposure(frontend->engine->world,
 			    frontend->engine->camera, OSMESA_WINDOW_SIZE,
 			    frontend->engine->osBuffer);

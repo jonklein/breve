@@ -30,6 +30,7 @@
 #include <string>
 #include <algorithm>
 
+#include "glIncludes.h"
 #include "simulation.h"
 #include "timeval.h"
 
@@ -111,8 +112,8 @@ struct brMenuEntry {
 	slStack *submenus;
 	char *method;
 	char *title;
-	unsigned char enabled;
-	unsigned char checked;
+	bool enabled;
+	bool checked;
 };
 
 

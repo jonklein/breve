@@ -114,7 +114,7 @@ class slWorld {
 		void setDetectLightExposure( bool d ) { _detectLightExposure = d; }
 		void setDrawLightExposure( bool d ) { _drawLightExposure = d; }
 
-		void setLightExposureSource( slVector *src );
+		void setLightExposureSource( slVector *src ) { slVectorCopy( src, &_lightExposureCamera._location); }
 
 		slCamera *getLightExposureCamera( ) { return &_lightExposureCamera; }
 	

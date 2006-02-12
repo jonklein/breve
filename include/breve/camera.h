@@ -54,7 +54,7 @@ struct slLight {
 
 class slCameraText {
 	public:
-		slCameraText() { }
+		slCameraText() { slVectorZero( &color ); x = 0; y = 0; size = 0; }
 
 		std::string text;
 		float x;
