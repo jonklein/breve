@@ -30,7 +30,8 @@ prefix		= @prefix@
 exec_prefix	= @exec_prefix@
 
 all: depend lib/libbreve.a bin/breve_cli@EXE_SUFFIX@ bin/breve@EXE_SUFFIX@ \
-	lib/classes/MethodFinder.jar
+	lib/classes/MethodFinder.jar \
+	bin/osmesaloader.o
 
 include simulation/Makefile
 include kernel/Makefile
@@ -56,6 +57,9 @@ bin/breve@EXE_SUFFIX@: bin/breve.o $(OBJ)
 
 bin/breve_cli@EXE_SUFFIX@: bin/breve_cli.o $(OBJ)
 	$(CXX) -o $@ $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@
+
+bin/osmesaloader.o: bin/osmesaloader.cc
+	-$(CXX) -shared -o $@ $(LDFLAGS) $^ -lOSMesa
 
 breve.dll: $(OBJ)
 	$(CXX) @PLUGINFLAGS@ -o $@ @PLUGINIMP@ $^ @LIBS@

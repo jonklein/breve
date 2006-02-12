@@ -107,11 +107,6 @@ brEngine *brEngineNew(void) {
 	e->soundMixer = brNewSoundMixer();
 #endif
 
-#if HAVE_LIBOSMESA
-	e->osBuffer = NULL;
-	e->osContext = NULL;
-#endif
-
 	e->nThreads = 1;
 
 	// under OSX we'll connect a file handle to the output queue to allow
@@ -279,11 +274,6 @@ void brEngineFree(brEngine *e) {
 
 	for(bi = e->freedInstances.begin(); bi != e->freedInstances.end(); bi++ )
 		delete *bi;
-
-#if HAVE_LIBOSMESA
-	slFree(e->osBuffer);
-	OSMesaDestroyContext(e->osContext);
-#endif
 
 	brNamespaceFreeWithFunction(e->internalMethods, (void(*)(void*))brFreeBreveCall);
 

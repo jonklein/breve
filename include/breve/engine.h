@@ -30,7 +30,6 @@
 #include <string>
 #include <algorithm>
 
-#include "glIncludes.h"
 #include "simulation.h"
 #include "timeval.h"
 
@@ -159,11 +158,6 @@ class brEngine {
 		brSoundMixer *soundMixer;
 
 		std::vector<brInstance*> freedInstances;
-
-#if HAVE_LIBOSMESA
-		GLubyte *osBuffer;
-		OSMesaContext osContext;
-#endif 
 
 		int useMouse;
 		int mouseX;

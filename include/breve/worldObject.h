@@ -50,6 +50,8 @@ class slWorldObject {
 			simulate = 0;
 			_drawAsPoint = 0;
 
+			lightExposure = 0;
+
 			shape = NULL;
 
 			proximityRadius = 0.00001;

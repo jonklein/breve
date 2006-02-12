@@ -18,6 +18,23 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifdef MINGW
+
+#include <windows.h>
+#define dlopen(P,G) (void*)LoadLibrary(P)
+#define dlsym(D,F) (void*)GetProcAddress((HMODULE)D, F)
+#define dlclose(D) FreeLibrary((HMODULE)D)
+
+const char *dlerror(void)
+
+#else
+
+#include <dlfcn.h>
+
+#endif /* MINGW */
+
+
+
 /*!
 	\brief Holds data about a loaded plugin.
 */
@@ -27,15 +44,8 @@ struct brDlPlugin {
 	void *handle;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 int brEngineAddDlPlugin(char *, char *, brEngine *);
 void brEngineRemoveDlPlugins(brEngine *);
 void *brDlLoadPlugin(char *, char *, brNamespace *);
 
 DLLEXPORT char *brPluginFindFile(char *, void *);
-
-#ifdef __cplusplus
-}
-#endif

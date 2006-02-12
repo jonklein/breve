@@ -28,6 +28,9 @@
 
 #include <signal.h>
 
+#include <libgen.h>
+
+
 #include "steve.h"
 #include "world.h"
 #include "camera.h"
@@ -43,6 +46,8 @@ double gSimMax = 0.0;
 
 char *gSimFile;
 
+unsigned char *gOffscreenBuffer;
+
 int gSlave = 0, gMaster = 0;
 char *gSlaveHost;
 
@@ -53,6 +58,8 @@ breveFrontend *frontend;
 static int activateContext(void);
 static void brCatchSignal(int);
 static void renderContext(slWorld *, slCamera *);
+
+int slLoadOSMesaPlugin( char *execPath );
 
 int main(int argc, char **argv) {
 	int index;
@@ -70,19 +77,22 @@ int main(int argc, char **argv) {
 
 	gSimFile = NULL;
 
-	/* parse the command line args. */
+	//
+	// Parse the command line args. 
+	//
 
 	index = brParseArgs(argc, argv);
 
-	/* offset argc and argv to account for the options parsed out */
+	// offset argc and argv to account for the options parsed out.
 
 	argc -= index;
 	argv += index;
 
-	if (argc < 2)
-		brPrintUsage(argv[0]);
+	if (argc < 2) brPrintUsage(argv[0]);
 
-	signal(SIGINT, brCatchSignal);
+	//
+	// Initialize the frontend and engine and their associated callbacks.
+	//
 
 	frontend = breveFrontendInit(argc, argv);
 	frontend->data = breveFrontendInitData(frontend->engine);
@@ -90,6 +100,7 @@ int main(int argc, char **argv) {
 	brEngineSetIOPath(frontend->engine, getcwd(wd, MAXPATHLEN));
 
 	frontend->engine->camera->activateContextCallback = activateContext;
+
 	frontend->engine->camera->renderContextCallback = renderContext;
 
 	frontend->engine->argc = argc - 1;
@@ -100,18 +111,22 @@ int main(int argc, char **argv) {
 	frontend->engine->dialogCallback = brCLIDialogCallback;
 	frontend->engine->interfaceTypeCallback = interfaceVersionCallback;
 
-#if HAVE_LIBOSMESA
-	frontend->engine->osBuffer = (GLubyte *)slMalloc(OSMESA_WINDOW_SIZE * OSMESA_WINDOW_SIZE * 4 * sizeof(GLubyte));
-	frontend->engine->osContext = OSMesaCreateContext(OSMESA_RGBA, NULL);
+	signal(SIGINT, brCatchSignal);
 
-	if (!OSMesaMakeCurrent(frontend->engine->osContext, frontend->engine->osBuffer, GL_UNSIGNED_BYTE, OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE)) 
-		slMessage(DEBUG_ALL, "Could not activate offscreen rendering context\n");
+	//
+	// Attempt to load an offscreen Mesa buffer.
+	//
 
-	slInitGL(frontend->engine->world, frontend->engine->camera);
+	gOffscreenBuffer = (GLubyte *)slMalloc( OSMESA_WINDOW_SIZE * OSMESA_WINDOW_SIZE * 4 * sizeof(GLubyte));
 
-	frontend->engine->camera->x = OSMESA_WINDOW_SIZE;
-	frontend->engine->camera->y = OSMESA_WINDOW_SIZE;
-#endif
+	if( slLoadOSMesaPlugin( argv[ 0 ] ) ) {
+		slFree( gOffscreenBuffer );
+		gOffscreenBuffer = NULL;
+	}
+
+	//
+	// Load the input file and prepare the simulation.
+	//
 
 	text = slUtilReadFile(argv[1]);
 
@@ -152,12 +167,10 @@ int main(int argc, char **argv) {
 			brQuit(frontend->engine);
 		}
 
-#if HAVE_LIBOSMESA
 		if ( frontend->engine->world->detectLightExposure() ) 
-			slDetectLightExposure(frontend->engine->world,
+			slDetectLightExposure( frontend->engine->world,
 			    frontend->engine->camera, OSMESA_WINDOW_SIZE,
-			    frontend->engine->osBuffer);
-#endif
+			    gOffscreenBuffer );
 	}
 
 	brQuit(frontend->engine);
@@ -358,20 +371,41 @@ char *getLoadname() {
 }
 
 int activateContext() {
-#if HAVE_LIBOSMESA
-	if (!OSMesaMakeCurrent(frontend->engine->osContext, frontend->engine->osBuffer, GL_UNSIGNED_BYTE, OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE)) {
-		slMessage(DEBUG_ALL, "Could not activate offscreen rendering context\n");
-		return -1;
-	}
-
-	return 0;
-#endif
-
 	return -1;
 }
 
 void renderContext(slWorld *w, slCamera *c) {
-#if HAVE_LIBOSMESA
 	slRenderScene(w, c, 0);
-#endif
+}
+
+int slLoadOSMesaPlugin( char *execPath ) {
+	void *handle;
+	void (*create)( unsigned char *, int );
+	int (*activate)();
+
+	std::string path = dirname( execPath );
+
+	path += "/osmesaloader.o";
+
+	handle = dlopen( path.c_str(), RTLD_NOW );
+
+	if( !handle ) return -1;
+        
+	create = (void(*)(unsigned char*,int))dlsym( handle, "slOSMesaCreate" );
+
+        if( !create ) return -1;
+
+        create ( gOffscreenBuffer, OSMESA_WINDOW_SIZE );
+
+        activate = (int(*)())dlsym( handle, "slOSMesaMakeCurrentContext" );
+
+	if( !activate ) return -1;
+
+	frontend->engine->camera->activateContextCallback = activate;
+
+	activate();
+
+	slInitGL( frontend->engine->world, frontend->engine->camera );
+
+	return 0;
 }

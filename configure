@@ -10049,7 +10049,7 @@ if test $ac_cv_lib_OSMesa_OSMesaCreateContext = yes; then
 #define HAVE_LIBOSMESA 1
 _ACEOF
 
-  LIBS="-lOSMesa $LIBS"
+# LIBS="-lOSMesa $LIBS"
 
 fi
 
