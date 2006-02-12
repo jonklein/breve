@@ -103,13 +103,19 @@ class slCollision {
 
 class slVclipData {
 	public:
-		/*!
+		/**
+ 		 * Runs the prune and sweep phase of the collision detection.
+		 */
+
+		int pruneAndSweep();
+
+		/**
 		 * Runs collision detection for all candidate pairs.
 		 */
 
 		int clip(double tolerance, int pruneOnly, int boundingBoxOnly);
 
-		/*!
+		/**
 		 * Tests a single pair stored in a \ref slCollisionCandidate.
 		 */
 
@@ -189,7 +195,6 @@ int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollision *ce, slPositi
 
 int slSphereShapeCheck(slVclipData *vc, slFeature **f, int x, int y, slCollision *ce);
 
-int slVclipPruneAndSweep(slVclipData *d);
 int slVclip(slVclipData *d, double tolerance, int pruneOnly, int boundingBoxOnly);
 
 int slVclipTestPair(slVclipData *, slCollisionCandidate*, slCollision *);

@@ -41,9 +41,6 @@ PhysicalControl : Gravity {
 
 		self add-menu named "Reset Ball" for-method "reset-ball".
 
-	+ to iterate:
-		self toggle-recording-to-movie.
-
 	+ to reset-ball:
 		theBall reset.
 }

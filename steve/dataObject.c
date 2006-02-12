@@ -41,7 +41,7 @@ int brDataCopyVar(stVar *v, stInstance *src, stInstance *dst) {
 	ri.instance = src;
 	ri.type = src->type;
 
-	switch(v->type->type) {
+	switch(v->type->_type) {
 		case AT_ARRAY:
 			return brDataCopyArray(v, src, dst);
 			break;
@@ -50,19 +50,19 @@ int brDataCopyVar(stVar *v, stInstance *src, stInstance *dst) {
 		case AT_DOUBLE:
 		case AT_VECTOR:
 		case AT_MATRIX:
-			memcpy(&dst->variables[v->offset], &src->variables[v->offset], stSizeofAtomic(v->type->type));
+			memcpy(&dst->variables[v->offset], &src->variables[v->offset], stSizeofAtomic(v->type->_type));
 			break;
 
 		case AT_STRING:
-			stLoadVariable(&src->variables[v->offset], v->type->type, &load, &ri);
-			stSetVariable(&dst->variables[v->offset], v->type->type, NULL, &load, &ri);
+			stLoadVariable(&src->variables[v->offset], v->type->_type, &load, &ri);
+			stSetVariable(&dst->variables[v->offset], v->type->_type, NULL, &load, &ri);
 
 			slFree(BRSTRING(&load));
 
 			break;
 
 		case AT_LIST:
-			stLoadVariable(&src->variables[v->offset], v->type->type, &load, &ri);
+			stLoadVariable(&src->variables[v->offset], v->type->_type, &load, &ri);
 			assign.set( brEvalListCopy(BRLIST(&load)) );
 			stSetVariable(&dst->variables[v->offset], AT_LIST, NULL, &assign, &ri);
 
@@ -83,22 +83,22 @@ int brDataCopyArray(stVar *v, stInstance *src, stInstance *dst) {
 	ri.instance = src;
 	ri.type = src->type;
 
-	switch(v->type->arrayType) {
+	switch(v->type->_arrayType) {
 		case AT_INT:
 		case AT_DOUBLE:
 		case AT_VECTOR:
 		case AT_MATRIX:
-			memcpy(&dst->variables[v->offset], &src->variables[v->offset], stSizeofAtomic(v->type->arrayType) * v->type->arrayCount);
+			memcpy(&dst->variables[v->offset], &src->variables[v->offset], stSizeofAtomic(v->type->_arrayType) * v->type->_arrayCount);
 			break;
 		case AT_STRING:
-			for(n=0;n<v->type->arrayCount;n++) {
-				stLoadVariable(&src->variables[v->offset + n * stSizeofAtomic(v->type->arrayType)], v->type->type, &load, &ri);
+			for(n=0;n<v->type->_arrayCount;n++) {
+				stLoadVariable(&src->variables[v->offset + n * stSizeofAtomic(v->type->_arrayType)], v->type->_type, &load, &ri);
 				brEvalCopy(&load, &assign);
-				stSetVariable(&dst->variables[v->offset + n * stSizeofAtomic(v->type->arrayType)], v->type->type, NULL, &assign, &ri);
+				stSetVariable(&dst->variables[v->offset + n * stSizeofAtomic(v->type->_arrayType)], v->type->_type, NULL, &assign, &ri);
 			}
 			break;
 		case AT_LIST:
-			for(n=0;n<v->type->arrayCount;n++) {
+			for(n=0;n<v->type->_arrayCount;n++) {
 
 			}
 			break;

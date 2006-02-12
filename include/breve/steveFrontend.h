@@ -4,6 +4,16 @@
 #include <map>
 
 struct stSteveData {
+	stSteveData() {
+		controllerName = NULL;
+		singleStatement = NULL;
+		singleStatementMethod = NULL;
+		stack = NULL;
+		stackRecord = NULL;
+
+		retainFreedInstances = true;
+	}
+
 	brObjectType steveObjectType;
 
 	char *controllerName;

@@ -1269,10 +1269,10 @@ RTC_INLINE int stEvalForeach(stForeachExp *w, stRunInstance *i, brEval *result) 
 
 	stAssignExp *assignExp = w->assignment;
 
-	if (assignExp->local)
-		iterationPointer = &i->instance->type->steveData->stack[assignExp->offset];
+	if ( assignExp->_local )
+		iterationPointer = &i->instance->type->steveData->stack[assignExp->_offset];
 	else
-		iterationPointer = &i->instance->variables[assignExp->offset];
+		iterationPointer = &i->instance->variables[assignExp->_offset];
 
 	stExpEval3(w->list, i, &list);
 
@@ -1289,16 +1289,16 @@ RTC_INLINE int stEvalForeach(stForeachExp *w, stRunInstance *i, brEval *result) 
 		if ((resultCode = brEvalCopy(&el->eval, &eval)) != EC_OK)
 			return resultCode;
 
-		if (assignExp->objectName && !assignExp->objectType) {
-			brObject *object = brObjectFind(i->instance->type->engine, assignExp->objectName);
+		if (assignExp->_objectName && !assignExp->_objectType) {
+			brObject *object = brObjectFind(i->instance->type->engine, assignExp->_objectName);
 
 			if (object)
-				assignExp->objectType = (stObject*)object->userData;
+				assignExp->_objectType = (stObject*)object->userData;
 			else
-				assignExp->objectType = NULL;
+				assignExp->_objectType = NULL;
 		}
 
-		if ((resultCode = stSetVariable(iterationPointer, assignExp->assignType, assignExp->objectType, &eval, i)) != EC_OK)
+		if ((resultCode = stSetVariable(iterationPointer, assignExp->_assignType, assignExp->_objectType, &eval, i)) != EC_OK)
 			return resultCode;
 
 		resultCode = stExpEval3(w->code, i, result); 
@@ -1834,23 +1834,23 @@ RTC_INLINE int stEvalAssignment(stAssignExp *a, stRunInstance *i, brEval *t) {
 	char *pointer;
 	int resultCode;
 
-	resultCode = stExpEval3(a->rvalue, i, t);
+	resultCode = stExpEval3(a->_rvalue, i, t);
 
 	if (resultCode != EC_OK) return resultCode;
 
-	if (a->local)
-		pointer = &i->instance->type->steveData->stack[a->offset];
+	if (a->_local)
+		pointer = &i->instance->type->steveData->stack[a->_offset];
 	else
-		pointer = &i->instance->variables[a->offset];
+		pointer = &i->instance->variables[a->_offset];
 
-	if (a->objectName && !a->objectType) {
-		brObject *object = brObjectFind(i->instance->type->engine, a->objectName);
+	if (a->_objectName && !a->_objectType) {
+		brObject *object = brObjectFind(i->instance->type->engine, a->_objectName);
 
 		if (object)
-			a->objectType = (stObject *)object->userData;
+			a->_objectType = (stObject *)object->userData;
 	}
 
-	resultCode = stSetVariable(pointer, a->assignType, a->objectType, t, i);
+	resultCode = stSetVariable(pointer, a->_assignType, a->_objectType, t, i);
 
 	return resultCode;
 }
@@ -2549,13 +2549,13 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 	for(n=0;n<argcount;n++) {
 		keyEntry = method->keywords[n];
 
-		if(keyEntry->var->type->objectName && !keyEntry->var->type->objectType) {
-			brObject *o = brObjectFind(target->instance->type->engine, keyEntry->var->type->objectName);
+		if(keyEntry->var->type->_objectName && !keyEntry->var->type->_objectType) {
+			brObject *o = brObjectFind(target->instance->type->engine, keyEntry->var->type->_objectName);
 
-			if(o) keyEntry->var->type->objectType = (stObject*)o->userData;
+			if(o) keyEntry->var->type->_objectType = (stObject*)o->userData;
 		}
 
-		resultCode = stSetVariable(&newStStack[keyEntry->var->offset], keyEntry->var->type->type, keyEntry->var->type->objectType, args[n], caller);
+		resultCode = stSetVariable(&newStStack[keyEntry->var->offset], keyEntry->var->type->_type, keyEntry->var->type->_objectType, args[n], caller);
 
 		if(resultCode != EC_OK) {
 			slMessage(DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", keyEntry->keyword, method->name);
@@ -2583,8 +2583,8 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 	for(vi = method->variables.begin(); vi != method->variables.end(); vi++ ) {
 		brEval e;
 
-		if((*vi)->type->type != AT_STRING || *(void**)&newStStack[(*vi)->offset] != BRSTRING( result ) ) 
-			stGCUnretainAndCollectPointer(*(void**)&newStStack[(*vi)->offset], (*vi)->type->type);
+		if((*vi)->type->_type != AT_STRING || *(void**)&newStStack[(*vi)->offset] != BRSTRING( result ) ) 
+			stGCUnretainAndCollectPointer(*(void**)&newStStack[(*vi)->offset], (*vi)->type->_type);
 	}
 
 	if(resultCode == EC_STOP) resultCode = EC_OK;
@@ -2594,7 +2594,7 @@ int stCallMethod(stRunInstance *caller, stRunInstance *target, stMethod *method,
 	std::vector< stKeywordEntry* >::iterator ki;
 
 	for(ki = method->keywords.begin(); ki != method->keywords.end(); ki++ ) {
-		stGCUnretainAndCollectPointer(*(void**)&newStStack[ (*ki)->var->offset ], (*ki)->var->type->type );
+		stGCUnretainAndCollectPointer(*(void**)&newStStack[ (*ki)->var->offset ], (*ki)->var->type->_type );
 	}
 
 	// restore the previous stack and stack records
@@ -2753,10 +2753,10 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *result, stObject **tClass) {
 		return EC_ERROR;
 	}
 
-	if (s->debug == 1)
+	if ( s->debug == 1 )
 		slDebug("debug called from within steve evaluation\n");
 
-	if (s->block)
+	if ( s->block )
 		return s->block->calls.stRtcEval3(s, i, result);
 	
 	switch(s->type) {

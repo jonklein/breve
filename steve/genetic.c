@@ -70,7 +70,7 @@ int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
 	for(vi = a->type->variables.begin(); vi != a->type->variables.end(); vi++ ) {
 		var = vi->second;
 
-		if(var->type->type == AT_ARRAY) varCount += var->type->arrayCount;
+		if(var->type->_type == AT_ARRAY) varCount += var->type->_arrayCount;
 		else varCount++;
 	}
 
@@ -89,26 +89,26 @@ int stObjectSimpleCrossover(stInstance *a, stInstance *b, stInstance *child) {
 
 		if(n >= crossoverCount) source = b;
 
-		if(var->type->type == AT_ARRAY) {
+		if(var->type->_type == AT_ARRAY) {
 			int index;
 
-			for(index=0;index<var->type->arrayCount;index++) {
-				int offset = var->offset + (index * stSizeofAtomic(var->type->arrayType));
+			for(index=0;index<var->type->_arrayCount;index++) {
+				int offset = var->offset + (index * stSizeofAtomic(var->type->_arrayType));
 
-				stLoadVariable(&source->variables[offset], var->type->arrayType, &value, NULL);
+				stLoadVariable(&source->variables[offset], var->type->_arrayType, &value, NULL);
 
 				// if(var->type->type == AT_LIST) BRLIST(&value) = brEvalListCopy(&value);
 
-				stSetVariable(&child->variables[offset], var->type->arrayType, NULL, &value, NULL);
+				stSetVariable(&child->variables[offset], var->type->_arrayType, NULL, &value, NULL);
 			}
 
-			n += (var->type->arrayCount - 1);
+			n += (var->type->_arrayCount - 1);
 		} else {
-			stLoadVariable(&source->variables[var->offset], var->type->type, &value, NULL);
+			stLoadVariable(&source->variables[var->offset], var->type->_type, &value, NULL);
 
 			// if(var->type->type == AT_LIST) BRLIST(&value) = brEvalListCopy(&value);
 
-			stSetVariable(&child->variables[var->offset], var->type->type, NULL, &value, NULL);
+			stSetVariable(&child->variables[var->offset], var->type->_type, NULL, &value, NULL);
 		}
 	}
 

@@ -561,7 +561,7 @@ void stParseError(brEngine *e, int type, char *proto, ...) {
 */
 
 int stSetControllerName(stSteveData *data, brEngine *engine, char *controller) {
-    if(data->controllerName) {
+    if( data->controllerName) {
         stParseError(engine, PE_REDEFINITION, "Redefinition of \"Controller\" object");
         return -1;
     }

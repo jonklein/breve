@@ -158,6 +158,8 @@ slSpring::slSpring(slWorld *w, slLink *l1, slLink *l2, slVector *p1, slVector *p
 	_stipple = 0xaaaa;
 	_maxForce = 0;
 
+	_mode = 0;
+
 	slVectorCopy(p1, &_point1);
 	slVectorCopy(p2, &_point2);
 

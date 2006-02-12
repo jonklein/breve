@@ -152,7 +152,7 @@ slList *slListReverse(slList *s) {
 slList *slListCopy(slList *s) {
 	slList *result = NULL;
 
-	while(s) {
+	while( s ) {
 		result = slListAppend(result, s->data);
 		s = s->next;
 	}

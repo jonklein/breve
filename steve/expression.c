@@ -87,16 +87,20 @@ stDoubleExp::stDoubleExp(double d, char *file, int line) : stExp(file, line) {
 
 stMethodExp::stMethodExp(stExp *o, char *n, std::vector< stKeyword* > *a, char *f, int l) : stExp(f, l) {
 	objectExp = o;
-	methodName = strdup(n);
+	methodName = slStrdup(n);
 	arguments = *a;
 	method = NULL;
 	type = ET_METHOD;
+
+	objectCache = NULL;
+	objectTypeCache = NULL;
 }
 
 stMethodExp::~stMethodExp() {
 	std::vector< stKeyword* >::iterator ki;
 
-	free(methodName);
+	slFree(methodName);
+
 	delete objectExp;
 
 	for(ki = arguments.begin(); ki != arguments.end(); ki++ )
@@ -123,14 +127,14 @@ stArrayIndexExp::stArrayIndexExp(stMethod *m, stObject *o, char *word, stExp *i,
 		local = 0;
 	}
 
-	if(var->type->type != AT_ARRAY) {
+	if(var->type->_type != AT_ARRAY) {
 		stParseError(o->engine, PE_TYPE, "Variable \"%s\" is not an array", word);
 		return;
 	}
 
 	offset = var->offset;
-	loadType = var->type->arrayType;
-	maxIndex = var->type->arrayCount;
+	loadType = var->type->_arrayType;
+	maxIndex = var->type->_arrayCount;
 	typeSize = stSizeofAtomic(loadType);
 	var->used = 1;
 
@@ -162,14 +166,14 @@ stArrayIndexAssignExp::stArrayIndexAssignExp(stMethod *m, stObject *o, char *wor
 		local = 0;
 	}
 
-	if(var->type->type != AT_ARRAY) {
+	if(var->type->_type != AT_ARRAY) {
 		stParseError(o->engine, PE_TYPE, "Variable \"%s\" is not an array");
 		return;
 	}
 
 	offset = var->offset;
-	assignType = var->type->arrayType;
-	maxIndex = var->type->arrayCount;
+	assignType = var->type->_arrayType;
+	maxIndex = var->type->_arrayCount;
 	typeSize = stSizeofAtomic(assignType);
 	var->used = 1;
 
@@ -186,7 +190,7 @@ stLoadExp::stLoadExp(stMethod *m, stObject *o, char *word, char *file, int line)
  
 	// we don't know if this variable is local or not 
 
-	if((var = stFindLocal(word, m))) {
+	if( ( var = stFindLocal( word, m ) ) ) {
 		local = 1;
 	} else {
 		var = stObjectLookupVariable(o, word);
@@ -200,7 +204,7 @@ stLoadExp::stLoadExp(stMethod *m, stObject *o, char *word, char *file, int line)
 	}
 
 	offset = var->offset;
-	loadType = var->type->type;
+	loadType = var->type->_type;
 	var->used = 1;
 
 	type = ET_LOAD;
@@ -223,26 +227,28 @@ stAssignExp::stAssignExp(stMethod *m, stObject *o, char *word, stExp *r, char *f
  
 	// check to see if the variable is local
 
-	if((var = stFindLocal(word, m))) {
-		local = 1;
+	if( ( var = stFindLocal( word, m ) ) ) {
+		_local = 1;
 	} else {
-		var = stObjectLookupVariable(o, word);
+		var = stObjectLookupVariable( o, word );
 
 		if(!var) {
-			stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name);
+			stParseError( o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name );
 			return;
 		}
 
-		local = 0;
+		_local = 0;
 	}
 
-	rvalue = r;
+	_rvalue = r;
 
-	offset = var->offset;
-	assignType = var->type->type;
+	_offset = var->offset;
+	_assignType = var->type->_type;
 
-	if(var->type->objectName) objectName = slStrdup(var->type->objectName);
-	else objectName = NULL;
+	if( var->type->_objectName ) _objectName = slStrdup( var->type->_objectName );
+	else _objectName = NULL;
+
+	_objectType = NULL;
 
 	var->used = 1;
 
@@ -250,9 +256,9 @@ stAssignExp::stAssignExp(stMethod *m, stObject *o, char *word, stExp *r, char *f
 }
 
 stAssignExp::~stAssignExp() {
-	if(objectName) slFree(objectName);
+	if( _objectName) slFree(_objectName);
 
-	delete rvalue;
+	delete _rvalue;
 }
 
 stListInsertExp::stListInsertExp(stExp *l, stExp *e, stExp *i, char *file, int lineno) : stExp(file, lineno) {
@@ -280,7 +286,7 @@ stListInsertExp::~stListInsertExp() {
 	delete listExp;
 	delete exp;
 
-	if(index) delete index;
+	if( index ) delete index;
 }
 
 stSortExp::stSortExp(stExp *list, char *method, char *file, int lineno) : stExp(file, lineno) {
@@ -346,6 +352,7 @@ stAllExp::stAllExp(char *objectName, char *file, int line) : stExp(file, line) {
 	name = slStrdup(objectName);
 
 	type = ET_ALL;
+	object = NULL;
 }
 
 stAllExp::~stAllExp() {
@@ -495,10 +502,10 @@ stDuplicateExp::stDuplicateExp(stExp *e, char *file, int line) : stExp(file, lin
 }
 
 int stSizeof(stVarType *v) {
-	if(v->type == AT_ARRAY) 
-		return v->arrayCount * stSizeofAtomic(v->arrayType);
+	if(v->_type == AT_ARRAY) 
+		return v->_arrayCount * stSizeofAtomic(v->_arrayType);
 
-	return stSizeofAtomic(v->type);
+	return stSizeofAtomic( v->_type );
 }
 
 int stSizeofAtomic(int type) {

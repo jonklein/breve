@@ -44,6 +44,8 @@ class slCamera;
 */
 
 struct brErrorInfo {
+	brErrorInfo() { file = NULL; }
+
 	char *file;
 	int line;
 	unsigned char type;

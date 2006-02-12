@@ -87,7 +87,7 @@ class stMethod {
 
 		char *name;
 
-		unsigned char inlined;
+		bool inlined;
 
 		int lineno;
 		char *filename;
@@ -112,14 +112,17 @@ class stMethod {
 	and a name of a specific object type.
 */
 
+class stVarType {
+	public:
+		stVarType(unsigned char type, unsigned char arrayType, int arrayCount, char *objectType);
+		stVarType *copy();
 
-struct stVarType {
-	char *objectName;
-	stObject *objectType;
+		char *_objectName;
+        	stObject *_objectType;
 
-	unsigned char type;
-	unsigned char arrayType;
-	int arrayCount;
+		unsigned char _type;
+		unsigned char _arrayType;
+		int _arrayCount;
 };
 
 /*!
@@ -179,9 +182,6 @@ int stMethodTrace(stRunInstance *i, char *name);
 void stInstanceFree(stInstance *i);
 void stInstanceFreeNoInstanceLists(stInstance *i);
 void stInstanceFreeInternals(stInstance *i);
-
-stVarType *stVarTypeNew(unsigned char type, unsigned char atype, int count, char *otype);
-stVarType *stVarTypeCopy(stVarType *original);
 
 void stFreeStVar(stVar *v);
 

@@ -224,6 +224,9 @@ class stExp {
 			block = NULL;
 			line = l;
 			file = f;
+
+			debug = false;
+			block = NULL;
 		}
 
 		virtual ~stExp() { 
@@ -232,7 +235,8 @@ class stExp {
 		}
 
 		unsigned char type;
-		unsigned char debug;
+
+		bool debug;
 
 		int line;
 		char *file;
@@ -511,12 +515,12 @@ class stAssignExp : public stExp {
 		stAssignExp(stMethod *m, stObject *o, char *word, stExp *rvalue, char *file, int line);
 		~stAssignExp();
 
-		int offset;
-		char local;
-		unsigned char assignType;
-		stExp *rvalue;
-		char *objectName;
-		stObject *objectType;
+		int _offset;
+		char _local;
+		unsigned char _assignType;
+		stExp *_rvalue;
+		char *_objectName;
+		stObject *_objectType;
 };
 
 class stLoadExp : public stExp {

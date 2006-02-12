@@ -320,17 +320,17 @@ int stXMLVariablePrint(stXMLArchiveRecord *record, FILE *file, stVar *variable, 
 	ri.instance = i;
 	ri.type = i->type;
 
-	if(variable->type->type == AT_ARRAY) {
+	if(variable->type->_type == AT_ARRAY) {
 		int n, typeSize;
 
 		XMLPutSpaces(spaces, file);
 		fprintf(file, "<array name=\"%s\">\n", variable->name);
 		spaces += XML_INDENT_SPACES;
 
-		typeSize = stSizeofAtomic(variable->type->arrayType);
+		typeSize = stSizeofAtomic(variable->type->_arrayType);
 
-		for(n=0;n<variable->type->arrayCount;n++) {
-			stLoadVariable(&i->variables[variable->offset + n * typeSize], variable->type->arrayType, &target, &ri);
+		for(n=0;n<variable->type->_arrayCount;n++) {
+			stLoadVariable(&i->variables[variable->offset + n * typeSize], variable->type->_arrayType, &target, &ri);
 			stXMLPrintEval(record, file, "", &target, spaces);
 		}
 
@@ -342,7 +342,7 @@ int stXMLVariablePrint(stXMLArchiveRecord *record, FILE *file, stVar *variable, 
 		return 0;
 	} 
 
-	stLoadVariable(&i->variables[variable->offset], variable->type->type, &target, &ri);
+	stLoadVariable(&i->variables[variable->offset], variable->type->_type, &target, &ri);
 	stXMLPrintEval(record, file, variable->name, &target, spaces);
 
 	return 0;
@@ -858,6 +858,7 @@ void stXMLObjectStartElementHandler(void *userData, const XML_Char *name, const 
 
 	state = new stXMLStackEntry;
 	state->state = stXMLStateForElement((char*)name);
+	state->name = NULL;
 
 	state->string = (char*)slMalloc( 1 );
 	state->string[ 0 ] = 0;
@@ -1054,7 +1055,7 @@ void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
 						ri.instance = parserState->currentInstance;
 						ri.type = ri.instance->type;
 
-						stSetVariable(&parserState->currentInstance->variables[var->offset], var->type->type, NULL, &lastState->eval, &ri);	
+						stSetVariable(&parserState->currentInstance->variables[var->offset], var->type->_type, NULL, &lastState->eval, &ri);	
 					}
 				}
 				break;
@@ -1080,7 +1081,7 @@ void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
 				ri.instance = parserState->currentInstance;
 				ri.type = ri.instance->type; 
 
-				stSetVariable(&parserState->currentInstance->variables[var->offset + state->arrayIndex * stSizeofAtomic(var->type->arrayType)], var->type->arrayType, NULL, &lastState->eval, &ri);	
+				stSetVariable(&parserState->currentInstance->variables[var->offset + state->arrayIndex * stSizeofAtomic(var->type->_arrayType)], var->type->_arrayType, NULL, &lastState->eval, &ri);	
 
 				state->arrayIndex++;
 				break;

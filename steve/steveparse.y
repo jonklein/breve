@@ -571,7 +571,7 @@ variable
 
 		otherVar = $3;
 
-		newType = stVarTypeCopy(otherVar->type);
+		newType = otherVar->type->copy();
 		
 		thisVar = new stVar($1, newType);
 
@@ -1157,26 +1157,26 @@ string
 
 type
 : '(' TYPE ')' {
-		$$ = stVarTypeNew($2, AT_NULL, 0, NULL);
+		$$ = new stVarType($2, AT_NULL, 0, NULL);
 	}
 | '(' WORD_VALUE TYPE ')' {
 		if($3 != AT_INSTANCE) {
 			stParseError(parseEngine, PE_SYNTAX, "Expected \"object\" after class name");
 			slFree($2);
 		} else {
-			$$ = stVarTypeNew($3, AT_NULL, 0, $2);
+			$$ = new stVarType($3, AT_NULL, 0, $2);
 			slFree($2);
 		}
 	}
 | '(' INT_VALUE PLURAL_TYPE ')' {
-		$$ = stVarTypeNew(AT_ARRAY, $3, $2, NULL);
+		$$ = new stVarType(AT_ARRAY, $3, $2, NULL);
 	}
 | '(' INT_VALUE WORD_VALUE PLURAL_TYPE ')' {
 		if($4 != AT_INSTANCE) {
 			stParseError(parseEngine, PE_SYNTAX, "Expected \"objects\" after class name");
 			slFree($3);
 		} else {
-			$$ = stVarTypeNew(AT_ARRAY, $4, $2, $3);
+			$$ = new stVarType(AT_ARRAY, $4, $2, $3);
 			slFree($3);
 		}
 	}

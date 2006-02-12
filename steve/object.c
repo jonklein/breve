@@ -280,17 +280,17 @@ void stInstanceFreeInternals(stInstance *i) {
 			if(var) {
 				varpointer = &i->variables[var->offset];
 
-				stGCUnretainAndCollectPointer(*(void**)varpointer, var->type->type);
+				stGCUnretainAndCollectPointer( *(void**)varpointer, var->type->_type );
 
 				// arrays still suck.
 
-				if(var->type->type == AT_ARRAY) {
+				if(var->type->_type == AT_ARRAY) {
 					char *arraypointer = varpointer;
 
-					for(n=0;n<var->type->arrayCount;n++) {
-						varpointer = arraypointer + (n * stSizeofAtomic(var->type->arrayType));
+					for(n=0;n<var->type->_arrayCount;n++) {
+						varpointer = arraypointer + (n * stSizeofAtomic(var->type->_arrayType));
 			
-						stGCUnretainAndCollectPointer(*(void**)varpointer, var->type->arrayType);
+						stGCUnretainAndCollectPointer(*(void**)varpointer, var->type->_arrayType);
 					}
 				}
 			}
@@ -503,6 +503,8 @@ stMethod::stMethod(char *n, std::vector< stKeywordEntry* > *k, char *file, int l
 	lineno = line;
 	filename = slStrdup(file);
 
+	inlined = false;
+
 	if(k) keywords = *k;
 
 	// step through the keywords, calculation their offsets and required storage space 
@@ -580,26 +582,23 @@ void stMethodAlignStack(stMethod *method) {
 	objectType is the optional object type.
 */
 
-stVarType *stVarTypeNew(unsigned char type, unsigned char arrayType, int arrayCount, char *objectType) {
-	stVarType *t;
+stVarType::stVarType(unsigned char type, unsigned char arrayType, int arrayCount, char *objectType) {
+	_type = type;
+	_arrayType = arrayType;
+	_arrayCount = arrayCount;
 
-	t = new stVarType;
+	if(objectType) _objectName = slStrdup(objectType);
+	else _objectName = NULL;
 
-	t->type = type;
-	t->arrayType = arrayType;
-	t->arrayCount = arrayCount;
-
-	if(objectType) t->objectName = slStrdup(objectType);
-
-	return t;
+	_objectType = NULL;
 }
 
-/*!
-	\brief Copies an existing stVarType.
-*/
+/**
+ * Copies an existing stVarType.
+ */
 
-stVarType *stVarTypeCopy(stVarType *t) {
-	return stVarTypeNew(t->type, t->arrayType, t->arrayCount, t->objectName);	
+stVarType *stVarType::copy() {
+	return new stVarType( _type, _arrayType, _arrayCount, _objectName );
 }
 
 /*!
@@ -619,7 +618,7 @@ stVar::stVar(char *n, stVarType *t) {
 stVar::~stVar() {
 	slFree(name);
 
-	if(type->objectName) slFree(type->objectName);
+	if(type->_objectName) slFree(type->_objectName);
 
 	delete type;
 }
@@ -888,8 +887,8 @@ void stRemoveFromInstanceLists(stInstance *i) {
 */
 
 int stAlign(stVarType *var) {
-	if(var->type == AT_ARRAY) return stAlignAtomic(var->arrayType);
-	return stAlignAtomic(var->type);
+	if(var->_type == AT_ARRAY) return stAlignAtomic(var->_arrayType);
+	return stAlignAtomic(var->_type);
 }
 
 /*!

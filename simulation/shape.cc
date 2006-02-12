@@ -189,6 +189,8 @@ slShape *slShapeInitNeighbors(slShape *s, double density) {
 
 	s->_density = density;
 
+	slVectorZero( &s->_max );
+
 	for(pi = s->points.begin(); pi != s->points.end(); pi++ ) {
 		p = *pi;
 

@@ -39,6 +39,8 @@ slLink::slLink(slWorld *w) : slWorldObject() {
 	_moved = 1;
 	_justMoved = 1;
 
+	clipNumber = 0;
+
 	mobile = -1;
 
 	memset(&_stateVector[0], 0, sizeof(slLinkIntegrationPosition));

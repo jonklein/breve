@@ -80,6 +80,22 @@ brEngine *brEngineNew(void) {
 	gsl_set_error_handler_off();
 #endif
 
+	e->updateMenu = NULL;
+	e->getSavename = NULL;
+	e->getLoadname = NULL;
+	e->dialogCallback = NULL;
+	e->soundCallback = NULL;
+	e->interfaceTypeCallback = NULL;
+	e->interfaceSetStringCallback = NULL;
+	e->interfaceSetCallback = NULL;
+	e->pauseCallback = NULL;
+	e->newWindowCallback = NULL;
+	e->freeWindowCallback = NULL;
+	e->renderWindowCallback = NULL;
+
+	e->controller = NULL;
+	e->iTunesData = NULL;
+
 	e->RNG = gsl_rng_alloc( gsl_rng_mt19937);
 
 	e->simulationWillStop = 0;
@@ -248,7 +264,7 @@ void brEngineFree(brEngine *e) {
 
 	brEngineRemoveDlPlugins(e);
 
-	if(e->error.file) {
+	if( e->error.file ) {
 		slFree(e->error.file);
 		e->error.file = NULL;
 		e->error.type = 0;

@@ -36,10 +36,6 @@
 #include "vclip.h"
 #include "vclipData.h"
 
-/*!
-	\brief Ignores collisions between adjacent multibody links.
-*/
-
 void slMultibody::initCollisionFlags(slVclipData *cd) {
 	slLink *link1, *link2;
 	slPairFlags *flags;

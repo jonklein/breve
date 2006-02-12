@@ -58,8 +58,8 @@ int stDDataCheckVariables(brEval *args, brEval *result, brInstance *bi) {
 		for(vi = o->variables.begin(); vi != o->variables.end(); vi++ ) {
 			v = vi->second;
 
-			if(v->type->type == AT_ARRAY) type = v->type->arrayType;
-			else type = v->type->type;
+			if(v->type->_type == AT_ARRAY) type = v->type->_arrayType;
+			else type = v->type->_type;
 
         	if(type == AT_INSTANCE || type == AT_POINTER) {
 				slMessage(DEBUG_ALL, "variable \"%s\" is not allowed in Data subclass class \"%s\"\n", v->name, i->type->name);

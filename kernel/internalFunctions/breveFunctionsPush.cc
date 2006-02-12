@@ -275,17 +275,19 @@ float brevePushCodeFirstFloat(const push::Code *code, bool *found ) {
 	for(n = (int)stack.size() - 1; n >= 0; n-- ) {
 		if( stack[ n ]->get_stack().size() == 0 ) {
 			push::Code c = stack[ n ];
-			// 
-			// if( typeid( c ) == typeid( push::Literal< double > ) ) {
-			//	*found = 1;
-			//	( *c )( env );
-			//	return push::get_stack<double>( env )[ 0 ];
-			//}
+			
+			if( typeid( c ) == typeid( push::Literal< double > ) ) {
+				push::Env env;
 
-			if( push::Literal< double > *d = dynamic_cast< push::Literal< double >* >( c.get() ) ) {
 				*found = 1;
-				return d->get();
+				( *c )( env );
+				return push::get_stack<double>( env )[ 0 ];
 			}
+
+			//if( push::Literal< double > *d = dynamic_cast< push::Literal< double >* >( c.get() ) ) {
+			//	*found = 1;
+			//	return d->get();
+			//}
 		} else {
 			float r = brevePushCodeFirstFloat( &stack[ n ], found );
 

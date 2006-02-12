@@ -313,14 +313,18 @@ brInstance *brEngineAddInstance(brEngine *e, brObject *object, void *pointer) {
 	brMethod *imethod, *pmethod;
 	brInstance *i;
 
-    i = new brInstance;
-    i->engine = e;
+	i = new brInstance;
+
+	i->engine = e;
 	i->object = object;
 	i->status = AS_ACTIVE;
     
 	i->menus = slStackNew();
 
-    i->userData = pointer;
+	i->observers = NULL;
+	i->observees = NULL;
+
+    	i->userData = pointer;
 
 	// it's a bit of a hack, but we need the camera to be informed of
 	// new objects in the world.  the code which adds objects to the

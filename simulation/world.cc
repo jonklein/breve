@@ -32,9 +32,8 @@ char *gPhysicsErrorMessage;
 #include "gldraw.h"
 
 void *operator new (size_t size) {
-	void *p = calloc(1, size); 
-
-	// memset(p, 0, size);
+	// void *p = calloc(1, size); 
+	void *p = malloc( size ); 
 
  	if (p == NULL) throw std::bad_alloc(); 
  
@@ -400,7 +399,7 @@ double slWorldStep(slWorld *w, double stepSize, int *error) {
 			w->_clipGrid->assignObjectsToPatches(w);
 			result = 0;
 		} else {
-			slVclipPruneAndSweep(w->clipData);
+			w->clipData->pruneAndSweep();
 			result = w->clipData->clip( 0.0, 0, w->_boundingBoxOnlyCollisions );
 		}
 
@@ -546,7 +545,7 @@ void slNeighborCheck(slWorld *w) {
 
 	// vclip, but stop after the pruning stage 
 
-	slVclipPruneAndSweep(w->proximityData);
+	w->proximityData->pruneAndSweep();
 
 	std::map< slPairFlags* , slCollisionCandidate >::iterator ci;
 

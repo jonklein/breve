@@ -49,6 +49,16 @@ struct stXMLArchiveRecord {
 */
 
 struct stXMLStackEntry {
+	stXMLStackEntry() {
+		state = 0;
+		name = NULL;
+		variable = NULL;
+		string = NULL;
+
+		arrayIndex = 0;
+		objectIndex = 0;
+	}
+
 	int state;
 	brEval eval;
 
@@ -68,6 +78,17 @@ struct stXMLStackEntry {
 */
 
 struct stXMLParserState {
+	stXMLParserState() {
+		currentInstance = NULL;
+		currentObject = NULL;
+		instances = NULL;
+		engine = NULL;
+		mode = 0;
+		error = 0;
+		controllerIndex = 0;
+		archiveIndex = 0;
+	}
+
 	int mode;
 	int error;
 	brEngine *engine;

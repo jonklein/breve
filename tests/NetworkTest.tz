@@ -65,6 +65,8 @@ Mobile : Agent {
 		result = (super dearchive).
 
 		self set-velocity to (0, 1, 0).
+
+		return result.
 }
 
 Mobile : SubordinateAgent {

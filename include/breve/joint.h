@@ -41,6 +41,19 @@ class slJoint {
 		slJoint() {
 			_isMbJoint = false;
 			_repositionAll = false;
+
+			_parent = NULL;
+			_child = NULL;
+			
+			_odeJointID = NULL; 
+			_odeMotorID = NULL;
+
+			_kDamp = 0.0;
+			_kSpring = 0.0;
+			_sMax = 0.0;
+			_sMin = 0.0;
+			_torque = 0.0;
+			_targetSpeed = 0.0;
 		}
 
 		~slJoint();

@@ -60,6 +60,8 @@ slCamera::slCamera(int x, int y) {
 	slVectorSet(&_target, 0, 0, 0);
 	slVectorSet(&_location, 0, 10, 100);
 
+	zoom = 10;
+
 	drawSmooth = 0;
 	drawLights = 0;
 	drawShadow = 0;
