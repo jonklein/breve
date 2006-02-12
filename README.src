@@ -163,8 +163,7 @@ Optional:
   On Mac OS X, the System vecLib framework is used, which provides AltiVec
   hardware acceleration on supported chips.
 
-+ [optional] libgsl, The GNU Scientific Library
-  http://www.gnu.org/software/gsl/
+
 
 + [optional] libjpeg, JPEG I/O library 
   http://www.ijg.org/
@@ -197,8 +196,8 @@ Optional:
   Provides support for exporting MPEG movies of simulations.  This library
   is optional.  If it is not available, movie export will not be supported.
 
-  Use most recent CVS source for ffmpeg.  breve will not compile with the 
-  most recent official ffmpeg release.
+  Use most recent CVS source for ffmpeg.  As of the breve 2.4 release, breve 
+  will not compile with the most recent official ffmpeg release.
 
 + [optional] libpush, push language libary 
   http://push-evolve.sourceforge.net
@@ -206,9 +205,6 @@ Optional:
   Provides support for the Push programming language for evolutionary
   computation.  This library is optional.  If it is not available, the 
   Push language will not be supported.  Requires GCC 3.3 or higher.
-
-  Use most recent CVS source for ffmpeg.  breve will not compile with the 
-  most recent official Push release.
 
 + [optional] libenet, networking library 
   http://enet.cubik.org/

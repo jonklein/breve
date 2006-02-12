@@ -10544,6 +10544,14 @@ _ACEOF
 
 fi
 
+#
+# For some reason CXXFLAGS is getting set to -O2 without my express
+# written consent.
+#
+
+CXXFLAGS=''
+CFLAGS=''
+
                                                                                           ac_config_files="$ac_config_files Makefile plugins/slDigitizerPlugin/Makefile plugins/slQTMusicPlugin/Makefile plugins/slRegexPlugin/Makefile plugins/slURLPlugin/Makefile plugins/samples/Makefile OSX/ConfigureLibraryList Qt/breve.pro wx/Makefile"
 
 

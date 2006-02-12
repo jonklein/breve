@@ -10,7 +10,14 @@
 <indexterm><primary>dearchiving</primary></indexterm>
 <indexterm><primary>XML files</primary></indexterm>
 breve allows simulations and individual objects within simulations to be
-archived into human-readable XML files, and then later extracted.  This chapter 
+archived into human-readable XML files, and then later extracted.  The 
+XML archive/dearchive process applies both to saving simulation objects
+to files and to sending objects over the network.  Both techniques 
+require object encoding and decoding, and the discussion in this chapter
+applies to both.
+</para>
+<para>
+This chapter 
 first describes how individual objects can be archived and dearchived 
 (<xref linkend="object_archiving">) and then how entire simulations can 
 be archived and dearchived (<xref linkend="simulation_archiving">).
@@ -23,23 +30,73 @@ be archived and dearchived (<xref linkend="simulation_archiving">).
 <indexterm><primary>object dearchiving</primary></indexterm>
 <indexterm><primary>archive-as-xml (method)</primary></indexterm>
 <indexterm><primary>dearchive-xml (method)</primary></indexterm>
+<indexterm><primary>dependency</primary></indexterm>
 <indexterm><primary>dependencies</primary></indexterm>
 <indexterm><primary>add-dependency (method)</primary></indexterm>
 <indexterm><primary>archive (method)</primary></indexterm>
 <indexterm><primary>dearchive (method)</primary></indexterm>
 
-This method of saving and loading instances can be done with any type of object.  When
-an object is dearchived with this method, a new instance is created for the saved object.
-This is in contrast to the method described in <xref linkend="simulation_archiving">, which 
-loads data into the contents of existing objects.
+This method is used to export and import individual objects or subsets of objects in
+a simulation.  When an object is dearchived with this method, a new instance 
+is created for the saved object and loaded into a running simulation.  
+This technique is in contrast to the method described in <xref linkend="simulation_archiving">, 
+which creates an entirely new simulation from an archived world.  The steps described here 
+also apply to sending and receiving objects over a network as described in <xref linkend="network_send_receive">.
+</para>
+
+<sect2 id="archive_methods">
+<title>Methods Called During Archiving/Dearchiving</title>
+<para>
+The special methods <function>archive</function> and <function>dearchive</function> are 
+called during archiving and dearchiving respectively.  The "archive" method is used, if necessary, 
+to prepare an object for archiving.  The "dearchive" method is used, if necessary, after an
+object has been loaded to prepare it for being loaded into the simulation.
 </para>
 <para>
+For most users, these methods are not required and should not be implemented.  If they are 
+implemented, however, they <emphasis>must return 1 to indicate success</emphasis> and unless 
+the methods are specifically intended to override superclass behaviors, they <emphasis>must 
+call the superclass implementation</emphasis>.  In most cases, it is desirable to return the 
+same value as the superclass implementation so that errors are handled correctly.  Example 
+<function>archive</function> and 
+<function>dearchive</function> methods are shown below.  These methods do no special preparation
+for archiving and dearchiving, but instead fulfill the requirements lists above and print a
+message.
+<screen>
++ to archive:
+	print "Archiving $self...".
+
+	return (super archive).
+
++ to dearchive:
+	print "Dearchiving $self...".
+
+	return (super archive).
+</screen>
+
+</para>
+</sect2>
+
+<sect2 id="simple_object_archiving">
+<title>Saving and Loading Objects With No Dependencies</title>
+<para>
+In a "simple" object archive, only a single object is encoded.  If the object has variable 
+<function>object</function> variables or <function>pointer</function> variables, they will 
+be set to 0 when the object is dearchived.  All other variable types will be restored to 
+their pre-archiving values.  For this type of object archiving and dearchiving, no additional
+code or preparation is required. 
+</para>
+</sect2>
+
+<sect2 id="complex_object_archiving">
+<title>Saving and Loading Objects With Dependencies</title>
+<para>
 Variables of type <function>object</function> and 
-<function>pointer</function> can not be automatically maintained without 
+<function>pointer</function> cannot be automatically maintained without 
 special treatment.  This is because an <function>object</function> may 
 reference another, which in turn references several others, and so forth.  
 If all <function>object</function> variables were maintained, then a huge 
-chain reaction would result every time an instance was saved.
+chain reaction would result every time an instance was saved.  
 </para>
 <para>
 To avoid this, saving objects does not include an object variable 
@@ -66,8 +123,7 @@ method <function>archive</function> is executed for the object.  In your
 might be needed to prepare the object for archiving such as updating variables
 which will be required when the object is dearchived.  <emphasis>Your 
 <function>archive</function> method must, on success, return 1</emphasis>.  Any 
-other return value is considered failure
-and will abort the archive.
+other return value is considered failure and will abort the archive.
 </para>
 <para>
 When an object is to be dearchived using this method, the user-supplied method 
@@ -92,6 +148,7 @@ To dearchive an object previously archived with this technique, use the
 Note that this creates new instances of the objects in the archived file,
 instead of "filling" an existing object.
 </para>
+</sect2>
 </sect1>
 
 <sect1 id="simulation_archiving">

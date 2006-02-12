@@ -39,6 +39,14 @@ client and the server breve users can agree to.
 </sect1>
 
 <sect1 id="network_send_receive"><title>Sending and Receiving breve Objects</title>
+
+<para>
+In order to send and receive objects over the network, the objects must be prepared
+for archiving and dearchiving as described in <xref linkend="object_archiving">.
+Read that section first to be certain that your objects can be properly encoded and 
+decoded.
+</para>
+
 <para>
 When sending an instance over the network, breve recreates the 
 instance on the server machine.  It recreates the object and the 

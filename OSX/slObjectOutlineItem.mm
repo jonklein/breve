@@ -43,9 +43,9 @@
     if(!n) name = [[NSString stringWithCString: "(null)"] retain];
     else name = n;
 	
-    if(stv && stv->type->type == AT_ARRAY) {
+    if(stv && stv->type->_type == AT_ARRAY) {
         isArray = YES;
-        arrayType = stv->type->arrayType;
+        arrayType = stv->type->_arrayType;
     } 
 
 	offset = off;
@@ -60,7 +60,7 @@
     } else if([self getExpandable] && mEval->type() == AT_LIST) {
         childCount = BRLIST( mEval )->count;
     } else if([self getExpandable] && isArray) {
-        childCount = stv->type->arrayCount;
+        childCount = stv->type->_arrayCount;
     } else {
         childCount = 0;
         childObjects = NULL;
@@ -261,8 +261,8 @@
 
 		newTitle = [[NSString stringWithCString: var->name] retain];
 
-		if(var->type->type != AT_ARRAY)
-			stLoadVariable(&evalInstance->variables[var->offset], var->type->type, &newEval, &ri);
+		if(var->type->_type != AT_ARRAY)
+			stLoadVariable(&evalInstance->variables[var->offset], var->type->_type, &newEval, &ri);
 //		else 
 //			newEval.type = AT_ARRAY;
 

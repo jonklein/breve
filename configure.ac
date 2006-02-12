@@ -318,6 +318,14 @@ AC_MSG_RESULT([yes])
 AC_DEFINE([HAVE_LIBJAVA],[1],[JVM library for JNI])
 fi
 
+#
+# For some reason CXXFLAGS is getting set to -O2 without my express
+# written consent.
+#
+
+CXXFLAGS=''
+CFLAGS=''
+
 AC_CONFIG_FILES([Makefile
 		 plugins/slDigitizerPlugin/Makefile
 		 plugins/slQTMusicPlugin/Makefile

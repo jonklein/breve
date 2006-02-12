@@ -358,10 +358,10 @@ VarData * SimInstance::ProcessObject(stInstance * instance, stObject * object, s
     {
 	var = vi->second;
 
-	if (var->type->type != AT_ARRAY)
+	if (var->type->_type != AT_ARRAY)
 	{
 	    mutex.Lock();
-	    stLoadVariable(&instance->variables[var->offset], var->type->type, eval, ri);
+	    stLoadVariable(&instance->variables[var->offset], var->type->_type, eval, ri);
 	    mutex.Unlock();
 	}
 	else
@@ -376,7 +376,7 @@ VarData * SimInstance::ProcessObject(stInstance * instance, stObject * object, s
 	if ( eval->type() == AT_ARRAY )
 	{
 	    d->SetOffset(var->offset);
-	    d->SetACount(var->type->arrayCount);
+	    d->SetACount(var->type->_arrayCount);
 	}
 
 	if (first == NULL)

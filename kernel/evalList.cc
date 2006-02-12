@@ -95,15 +95,15 @@ int brEvalListInsert(brEvalListHead *head, int index, brEval *value) {
 
 	// were moving elements -- update the index top
 
-	if(head->indexTop < index) {
+	if( head->indexTop < index ) {
 		// skip to the highest indexed element
 
 		int skip = index;
 
 		int newIndex = 0;
 
-		if(head->indexTop > 0) {
-			start = head->index[ head->indexTop];
+		if( head->indexTop > 0 ) {
+			start = head->index[ head->indexTop ];
 			skip -= head->indexTop;
 			newIndex = head->indexTop;
 		}
@@ -111,8 +111,8 @@ int brEvalListInsert(brEvalListHead *head, int index, brEval *value) {
 
 		// and now step through the list, updating the index because we can
 
-		while(skip--) {
-			if(!start) return -1;
+		while( skip-- ) {
+			if( !start ) return -1;
 
 			head->index[ newIndex++ ] = start;
 			start = start->next;
@@ -127,7 +127,7 @@ int brEvalListInsert(brEvalListHead *head, int index, brEval *value) {
 
 	if(head->count >= head->indexSize) {
 		head->indexSize += 128;
-		head->index = (brEvalList**)slRealloc(head->index, sizeof(brEvalList*) * head->indexSize);
+		head->index = (brEvalList**)slRealloc( head->index, sizeof(brEvalList*) * head->indexSize);
 	}
 
 	newList = new brEvalList;

@@ -118,7 +118,7 @@ class stVarType {
 		stVarType *copy();
 
 		char *_objectName;
-        	stObject *_objectType;
+		stObject *_objectType;
 
 		unsigned char _type;
 		unsigned char _arrayType;

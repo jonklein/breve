@@ -1220,14 +1220,14 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 
 	if( !doOnlyAlpha) {
 		glEnable(GL_BLEND);
-		glPointSize(30.0);
+		glPointSize(2.0);
 		glEnable(GL_POINT_SMOOTH);
 		glBegin(GL_POINTS);
 		for (n = 0; n < camera->_points.size(); ++n) {
 			slVector &v = camera->_points[n].first;
 			slVector &c = camera->_points[n].second;
 
-			glColor3d(c.x, c.y, c.z);
+			glColor4d(c.x, c.y, c.z, 1.0);
 			glVertex3d(v.x, v.y, v.z);
 		}
 		glEnd();
