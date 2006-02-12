@@ -130,10 +130,6 @@ int main(int argc, char **argv) {
 		exit(0);
 	}
 
-#if HAVE_LIBAVFORMAT
-	av_register_all();
-#endif
-
 	frontend = breveFrontendInit(argc, argv);
 
 	brEngineSetIOPath(frontend->engine, getcwd(wd, sizeof(wd)));
@@ -461,10 +457,8 @@ void slInitGlut(int argc, char **argv, char *title) {
 }
 
 void slDemoReshape(int x, int y) {
-	frontend->engine->camera->x = x;
-	frontend->engine->camera->y = y;
+	frontend->engine->camera->setBounds( x, y );
 
-	frontend->engine->camera->fov = x / (double)y;
 	glViewport(0, 0, x, y);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
@@ -506,7 +500,7 @@ void slDemoMouse(int button, int state, int x, int y) {
 
 void slDemoPassiveMotion(int x, int y) {
 	frontend->engine->mouseX = x;
-	frontend->engine->mouseY = frontend->engine->camera->y - y;
+	frontend->engine->mouseY = frontend->engine->camera->_height - y;
 }
 
 void slDemoMotion(int x, int y) {

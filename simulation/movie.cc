@@ -178,7 +178,7 @@ int slMovieAddWorldFrame(slMovie *m, slWorld *w, slCamera *cam) {
 	tmp = (unsigned char *)m->_line;
 	for (y = 0; y < c->height >> 1; ++y) {
 		a = (unsigned char *)&m->_rgb_buf[y * len];
-		b = (unsigned char *)&m->_rgb_buf[(c->height - y) * len];
+		b = (unsigned char *)&m->_rgb_buf[ (c->height - ( y + 1 ) ) * len ];
 
 		memcpy(tmp, a, len);
 		memcpy(a, b, len);

@@ -147,8 +147,8 @@ int brICameraPositionDisplay(brEval args[], brEval *target, brInstance *i) {
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
-	camera->ox = x;
-	camera->oy = y;
+	camera->_originx = x;
+	camera->_originy = y;
 
 	return EC_OK;
 }
@@ -162,7 +162,7 @@ int brICameraPositionDisplay(brEval args[], brEval *target, brInstance *i) {
 int brICameraResizeDisplay(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 
-	camera->resize(BRINT(&args[1]), BRINT(&args[2]));
+	camera->setBounds( BRINT(&args[1]), BRINT(&args[2]) );
 
 	return EC_OK;
 }
@@ -174,7 +174,7 @@ int brICameraResizeDisplay(brEval args[], brEval *target, brInstance *i) {
 int brICameraGetWidth( brEval args[], brEval *target, brInstance *i ) {
     slCamera *camera = BRCAMERAPOINTER(&args[0]);
 
-	target->set( camera->x );
+	target->set( camera->_width );
 
 	return EC_OK;
 }
@@ -186,7 +186,7 @@ int brICameraGetWidth( brEval args[], brEval *target, brInstance *i ) {
 int brICameraGetHeight( brEval args[], brEval *target, brInstance *i ) {
     slCamera *camera = BRCAMERAPOINTER(&args[0]);
 
-	target->set( camera->y );
+	target->set( camera->_height );
 
 	return EC_OK;
 }

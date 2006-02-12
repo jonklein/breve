@@ -118,9 +118,10 @@ void slPatch::getLocation(slVector *location) {
  *  slPatchGrid default constructor.
  */		
 
-slPatchGrid::slPatchGrid() : _texture(-1), _cubeDrawList(-1)
-{
+slPatchGrid::slPatchGrid() {
 	_drawWithTexture = 1;
+	_cubeDrawList = -1;
+	_texture = -1;
 	_cubeDrawList = -1;
 }
 
@@ -140,6 +141,8 @@ slPatchGrid::slPatchGrid(const slVector *center, const slVector *patchSize, cons
 	int a, b, c;
 
 	_drawWithTexture = 1;
+	_cubeDrawList = -1;
+	_texture = -1;
 	_cubeDrawList = -1;
 
 #ifdef WINDOWS
@@ -442,9 +445,9 @@ void slPatchGrid::setDrawWithTexture(bool t) {
 void slPatchGrid::draw(slCamera *camera) {
 	slVector origin, diff, adiff, size;
 
-	if(_texture == -1) _texture = slTextureNew(camera);
-
 	if( !_drawWithTexture) return drawWithout3DTexture(camera);
+
+	if( _texture == -1 ) _texture = slTextureNew( camera );
 
 #ifdef WINDOWS
 	return drawWithout3DTexture(camera);

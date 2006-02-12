@@ -100,8 +100,6 @@ class slCamera {
 
 		void updateFrustum();
 
-		void resize(int, int);
-
 		int pointInFrustum(slVector *);
 		int minMaxInFrustum(slVector *, slVector *);
 		int polygonInFrustum(slVector *, int);
@@ -186,15 +184,15 @@ class slCamera {
 	
 		// camera size 
 		
-		int x;
-		int y;
+		int _width;
+		int _height;
 	
 		// camera origin on screen view coords 
 	
-		int ox;
-		int oy;
+		int _originx;
+		int _originy;
 	
-		double fov;
+		double _fov;
 	
 		int (*activateContextCallback)();
 		void (*renderContextCallback)(slWorld *w, slCamera *c);

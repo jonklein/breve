@@ -34,20 +34,21 @@ slCamera::slCamera(int x, int y) {
 	unsigned int n;
 
 	activateContextCallback = NULL;
+	renderContextCallback = NULL;
 
 	text.insert(text.begin(), 8, t);
 
 	textScale = 1;
 
-	x = x;
-	y = y;
-	ox = 0;
-	oy = 0;
+	_width = x;
+	_height = y;
+	_originx = 0;
+	_originy = 0;
 
 	zClip = 500.0;
 
-	if(y != 0.0) fov = (double)x/(double)y;
-	else fov = 40;
+	if(y != 0.0) _fov = (double)x/(double)y;
+	else _fov = 40;
 
 	// billboarding works poorly when all the billboards 
 	// are on the same plane, so we'll offset the camera 
@@ -212,16 +213,6 @@ int slCamera::polygonInFrustum(slVector *test, int n) {
 }
 
 /*!
-	\brief Resizes the camera.
-*/
-
-void slCamera::resize(int nx, int ny) {
-	x = nx; 
-	y = ny;
-	fov = (double)x/(double)y;
-}
-
-/*!
 	\brief Frees the camera.
 */
 
@@ -364,9 +355,9 @@ void slAddBillboard(slCamera *c, slWorldObject *object, float size, float z) {
 */
 
 void slCamera::setBounds(unsigned int nx, unsigned int ny) {
-	x = nx;
-	y = ny;
-	fov = (double)x/(double)y;
+	_width = nx;
+	_height = ny;
+	_fov = (double)_width/(double)_height;
 }
 
 /*!
@@ -374,8 +365,8 @@ void slCamera::setBounds(unsigned int nx, unsigned int ny) {
 */
 
 void slCamera::getBounds(unsigned int *nx, unsigned int *ny) {
-	*nx = x;
-	*ny = y;	
+	*nx = _width;
+	*ny = _height;	
 }
 
 /*!

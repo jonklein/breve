@@ -124,6 +124,8 @@ int main(int argc, char **argv) {
 		gOffscreenBuffer = NULL;
 	}
 
+	frontend->engine->camera->setBounds( OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE );
+
 	//
 	// Load the input file and prepare the simulation.
 	//

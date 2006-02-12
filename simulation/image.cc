@@ -642,11 +642,12 @@ int slPNGSnapshot(slWorld *w, slCamera *c, char *file) {
 	if (c->renderContextCallback)
 		c->renderContextCallback(w, c);
 
-	buf = new unsigned char[c->x * c->y * 3];
+	buf = new unsigned char[c->_width * c->_height * 3];
 
-	glReadPixels(c->ox, c->oy, c->x, c->y, GL_RGB, GL_UNSIGNED_BYTE, buf);
+	glReadPixels(c->_originx, c->_originy, c->_width, c->_height, 
+		GL_RGB, GL_UNSIGNED_BYTE, buf);
 
-	r = slPNGWrite(file, c->x, c->y, buf, 3, 1);
+	r = slPNGWrite(file, c->_width, c->_height, buf, 3, 1);
 
 	delete[] buf;
 

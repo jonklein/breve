@@ -22,6 +22,7 @@
 #include "world.h"
 #include "gldraw.h"
 #include "camera.h"
+#include "movie.h"
 
 #ifndef WINDOWS
 #include <dlfcn.h>
@@ -75,6 +76,10 @@ brEngine *brEngineNew(void) {
 #endif
 
 	e = new brEngine;
+
+#if HAVE_LIBAVFORMAT
+        av_register_all();
+#endif
 
 #ifdef HAVE_LIBGSL
 	gsl_set_error_handler_off();

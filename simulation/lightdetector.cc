@@ -74,9 +74,9 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 
 
 	glEnable(GL_SCISSOR_TEST);
-	glScissor( c->ox, c->oy, size, size );
+	glScissor( c->_originx, c->_originy, size, size );
 
-	glViewport(c->ox, c->oy, size, size);
+	glViewport(c->_originx, c->_originy, size, size);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -116,7 +116,7 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	glPopMatrix();
 
 	if(!buffer) {
-		glReadPixels(c->ox, c->oy, size, size, GL_RGB, GL_UNSIGNED_BYTE, staticBuffer);
+		glReadPixels(c->_originx, c->_originy, size, size, GL_RGB, GL_UNSIGNED_BYTE, staticBuffer);
 		expMap = staticBuffer;
 	} else {
 		expMap = buffer;

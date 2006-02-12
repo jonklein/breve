@@ -258,10 +258,10 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 	unsigned int min, nearest = 0xffffffff;
 	unsigned int hit = w->objects.size() + 1;
 
-	viewport[0] = c->ox;
-	viewport[1] = c->oy;
-	viewport[2] = c->x;
-	viewport[3] = c->y;
+	viewport[0] = c->_originx;
+	viewport[1] = c->_originy;
+	viewport[2] = c->_width;
+	viewport[3] = c->_height;
 
 	glSelectBuffer(BUFFER_SIZE, selection_buffer);
 	glRenderMode(GL_SELECT);
@@ -277,7 +277,7 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 	gluPickMatrix((GLdouble)x, (GLdouble)(viewport[3] - y), 5.0, 5.0, viewport);
 	slClearGLErrors("picked matrix");
 
-	gluPerspective(40.0, c->fov, 0.01, c->zClip);
+	gluPerspective(40.0, c->_fov, 0.01, c->zClip);
 
 	// since the selection buffer uses unsigned ints for names, we can't 
 	// use -1 to mean no selection -- we'll use the number of objects 
@@ -351,16 +351,16 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 
 	t = &c->_target;
 
-	view[0] = c->ox;
-	view[1] = c->oy;
-	view[2] = c->x;
-	view[3] = c->y;
+	view[0] = c->_originx;
+	view[1] = c->_originy;
+	view[2] = c->_width;
+	view[3] = c->_height;
 
-	glViewport(c->ox, c->oy, c->x, c->y);
+	glViewport(c->_originx, c->_originy, c->_width, c->_height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	gluPerspective(40.0, c->fov, 0.1, c->zClip);
+	gluPerspective(40.0, c->_fov, 0.1, c->zClip);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -441,12 +441,12 @@ void slRenderWorld( slWorld *w, slCamera *c, int crosshair, int scissor ) {
 	if (!w || !c)
 		return;
 
-	glViewport( c->ox, c->oy, c->x, c->y );
+	glViewport( c->_originx, c->_originy, c->_width, c->_height );
 
 	if ( scissor ) {
 		flags |= DO_NO_AXIS | DO_NO_BOUND;
 		glEnable(GL_SCISSOR_TEST);
-		glScissor( c->ox, c->oy, c->x, c->y );
+		glScissor( c->_originx, c->_originy, c->_width, c->_height );
 	}
 
 	if (c->drawOutline)
@@ -465,7 +465,7 @@ void slRenderWorld( slWorld *w, slCamera *c, int crosshair, int scissor ) {
 	if (w->backgroundTexture > 0 && !(flags & DO_OUTLINE))
 		slDrawBackground(c, w);
 
-	gluPerspective(40.0, c->fov, 0.01, c->zClip);
+	gluPerspective(40.0, c->_fov, 0.01, c->zClip);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -619,7 +619,7 @@ void slClear(slWorld *w, slCamera *c) {
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
-		gluPerspective(40.0, c->fov, 0.01, c->zClip);
+		gluPerspective(40.0, c->_fov, 0.01, c->zClip);
 		glBegin(GL_TRIANGLE_STRIP);
 			glVertex3f(-5, -4, -3);
 			glVertex3f(5, -4, -3);
@@ -760,16 +760,16 @@ void slRenderText(slWorld *w, slCamera *c, slVector *location, slVector *target,
 	glColor4f(0.0, 0.0, 0.0, 1.0);
 	snprintf( textStr, sizeof(textStr), "%.2f", w->_age );
 
-	fromLeft = -1.0 + (5.0 / c->x);
-	slText(fromLeft, 1.0 - (20.0 / c->y), textStr, GLUT_BITMAP_HELVETICA_10);
+	fromLeft = -1.0 + (5.0 / c->_width);
+	slText(fromLeft, 1.0 - (20.0 / c->_height), textStr, GLUT_BITMAP_HELVETICA_10);
 
 	if (crosshair) {
 		snprintf(textStr, sizeof(textStr), "camera: (%.1f, %.1f, %.1f)",
 		    location->x, location->y, location->z);
-		slText(fromLeft, -1.0 + (5.0 / c->y), textStr, GLUT_BITMAP_HELVETICA_10);
+		slText(fromLeft, -1.0 + (5.0 / c->_height), textStr, GLUT_BITMAP_HELVETICA_10);
 		snprintf(textStr, sizeof(textStr), "target: (%.1f, %.1f, %.1f)",
 		    target->x, target->y, target->z);
-		slText(fromLeft, -1.0 + (30.0 / c->y), textStr, GLUT_BITMAP_HELVETICA_10);
+		slText(fromLeft, -1.0 + (30.0 / c->_height), textStr, GLUT_BITMAP_HELVETICA_10);
 	} else {
 		for(n = 0; n < c->text.size(); n++) {
 			glColor4f(c->text[n].color.x, c->text[n].color.y, c->text[n].color.z, 0.9);
