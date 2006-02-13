@@ -381,6 +381,9 @@ void renderContext(slWorld *w, slCamera *c) {
 }
 
 int slLoadOSMesaPlugin( char *execPath ) {
+#ifdef MINGW
+	return -1;
+#else
 	void *handle;
 	void (*create)( unsigned char *, int );
 	int (*activate)();
@@ -410,4 +413,5 @@ int slLoadOSMesaPlugin( char *execPath ) {
 	slInitGL( frontend->engine->world, frontend->engine->camera );
 
 	return 0;
+#endif
 }

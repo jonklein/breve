@@ -165,8 +165,7 @@ bool BreveInterface::Initialize()
 
 void BreveInterface::ResizeView(int x, int y)
 {
-    frontend->engine->camera->x = x; frontend->engine->camera->y = y;
-    frontend->engine->camera->fov = (double)x/(double)y;
+	frontend->engine->camera->setBounds( x, y );
 }
 
 void BreveInterface::Iterate()
