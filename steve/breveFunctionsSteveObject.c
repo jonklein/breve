@@ -251,8 +251,8 @@ int stNSendXMLObject(brEval *args, brEval *target, brInstance *i) {
 int stCStacktrace(brEval args[], brEval *target, brInstance *i) {
 	stInstance *si = (stInstance*)i->userData;
 
-    stStackTrace(si->type->steveData);
-    return EC_OK;
+	stStackTrace( si->type->steveData );
+	return EC_OK;
 }
 
 /*!

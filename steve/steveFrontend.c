@@ -8,13 +8,30 @@
 #include "breveFunctionsSteveObject.h"
 #include "breveFunctionsSteveXML.h"
 
+#include "signal.h"
+
 extern char *yyfile;
 extern int lineno;
+
+stSteveData *currentData;
+
+void stCrashCatcher( int s ) {
+	signal( s, SIG_DFL );
+
+	printf("Signal %d detected -- attempting steve stack trace:\n", s );
+	stStackTrace( currentData );
+
+	raise( s );
+}
 
 void *breveFrontendInitData(brEngine *engine) {
 #if HAVE_LIBJAVA
 	// brJavaInit(engine);
 #endif
+
+	signal( SIGSEGV, stCrashCatcher );
+	signal( SIGILL, stCrashCatcher );
+	signal( SIGBUS, stCrashCatcher );
 
 	return stSteveInit(engine);
 }
@@ -114,6 +131,8 @@ stSteveData *stSteveInit(brEngine *engine) {
 	sd->retainFreedInstances = 1;
 
 	sd->stackRecord = NULL;
+
+	currentData = sd;
 
 	return sd; 
 }

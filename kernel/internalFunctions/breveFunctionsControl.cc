@@ -490,12 +490,25 @@ int brIGetRealTime(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
-/*!
-	\brief Sets the output filter level, one of \ref slDebugLevels.
-*/
+/**
+ * Sets the output filter level, one of \ref slDebugLevels.
+ */
 
 int brISetOutputFilter(brEval args[], brEval *target, brInstance *i) {
 	slSetDebugLevel( BRINT(&args[0]));
+
+	return EC_OK;
+}
+
+/**
+ * Why would I even let such a function exist?  It's downright
+ * irresponsible.
+ */
+
+int brICrash(brEval args[], brEval *target, brInstance *i) {
+	char *uhoh = NULL;
+
+	*uhoh = 1;
 
 	return EC_OK;
 }
@@ -546,4 +559,6 @@ void breveInitControlFunctions(brNamespace *n) {
     brNewBreveCall(n, "getRealTime", brIGetRealTime, AT_DOUBLE, 0);
 
     brNewBreveCall(n, "setOutputFilter", brISetOutputFilter, AT_NULL, AT_INT, 0);
+    
+    brNewBreveCall(n, "crash", brICrash, AT_NULL, 0);
 }

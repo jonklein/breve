@@ -57,8 +57,6 @@ PhysicalControl : VirtualCreatures {
 
 		ga = (controller dearchive-xml file "breveCreatures.xml").	
 
-		ga set-spatial-radius to 4.
-
 		if !ga: {
         	ga = new SimsGA.
 

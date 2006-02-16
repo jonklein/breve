@@ -155,6 +155,7 @@ CLI_release: clean
 	mkdir $(CLI_FOLDER)/lib
 	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin
 	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin
+	-cp bin/osmesaloader.o $(CLI_FOLDER)/bin
 	cp -R docs $(CLI_FOLDER)
 	cp -R lib $(CLI_FOLDER)
 	cp -R demos $(CLI_FOLDER)
