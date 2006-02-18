@@ -45,6 +45,7 @@ class slWorldObject {
 		friend class slWorld;
 		friend class slSpring;
 		friend class slTerrain;
+		friend class slVclipData;
 
 		slWorldObject() {
 			_drawMode = 0;
@@ -125,6 +126,9 @@ class slWorldObject {
 		slVector _neighborMax;
 		slVector _neighborMin;
 
+		slVector _max;
+		slVector _min;
+
 	protected:
 		slShape *_shape;
 
@@ -155,8 +159,6 @@ class slWorldObject {
 
 		// bounding box information here is used for "proximity" data
 	
-		slVector _max;
-		slVector _min;
 		bool _moved;
 	
 		double _e;

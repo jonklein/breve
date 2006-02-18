@@ -111,7 +111,7 @@ int breveFunctionPushGetConfigString(brEval arguments[], brEval *result, brInsta
 
 	result->set( str );
 
-	delete[] str;
+	free( str );
 
 	return EC_OK;
 }
@@ -128,7 +128,7 @@ int breveFunctionPushGetStacksString(brEval arguments[], brEval *result, brInsta
 
 	result->set( str );
 
-	delete[] str;
+	free( str );
 
 	return EC_OK;
 }

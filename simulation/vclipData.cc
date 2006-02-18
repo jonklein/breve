@@ -53,20 +53,17 @@ void slVclipDataInit( slWorld *w ) {
 	// for each object in the world, fill in it's shape, position and 
 	// min/max vectors
 
-	w->_clipData->boundLists[0].clear();
-	w->_clipData->boundLists[1].clear();
-	w->_clipData->boundLists[2].clear();
+	w->_clipData->boundLists[ 0 ].clear();
+	w->_clipData->boundLists[ 1 ].clear();
+	w->_clipData->boundLists[ 2 ].clear();
 
 	for(x = 0; x < w->objects.size(); x++) {
-		slVector min, max;
-
 		w->objects[ x ]->updateBoundingBox();
-		w->objects[ x ]->getBounds( &min, &max );
 
-		slAddBoundingBoxForVectors( w->_clipData, x, &min, &max );
+		w->_clipData->addBoundingBoxPointers( x, &w->objects[x]->_min, &w->objects[x]->_max );
 
-		if( w->objects[x]->getType() == WO_LINK ) {
-			slLink *link = (slLink *)w->objects[x];
+		if( w->objects[ x ]->getType() == WO_LINK ) {
+			slLink *link = (slLink *)w->objects[ x ];
 			link->_clipNumber = x;
 		}
 	}
@@ -227,7 +224,7 @@ void slVclipDataRealloc(slVclipData *v, unsigned int count) {
 	vclip algorithm is run.
 */
 
-void slAddBoundingBoxForVectors(slVclipData *data, int offset, slVector *min, slVector *max) {
+void slVclipData::addBoundingBoxPointers( int offset, slVector *min, slVector *max ) {
 	slBoundSort minB, maxB;
 
 	minB.type = BT_MIN;
@@ -238,18 +235,18 @@ void slAddBoundingBoxForVectors(slVclipData *data, int offset, slVector *min, sl
 
 	minB.value = &min->x;
 	maxB.value = &max->x;
-	data->boundLists[0].push_back(minB);
-	data->boundLists[0].push_back(maxB);
+	boundLists[0].push_back(minB);
+	boundLists[0].push_back(maxB);
 
 	minB.value = &min->y;
 	maxB.value = &max->y;
-	data->boundLists[1].push_back(minB);
-	data->boundLists[1].push_back(maxB);
+	boundLists[1].push_back(minB);
+	boundLists[1].push_back(maxB);
 
 	minB.value = &min->z;
 	maxB.value = &max->z;
-	data->boundLists[2].push_back(minB);
-	data->boundLists[2].push_back(maxB);
+	boundLists[2].push_back(minB);
+	boundLists[2].push_back(maxB);
 }
 
 void slInitProximityData(slWorld *w) {
@@ -271,7 +268,7 @@ void slInitProximityData(slWorld *w) {
 		slWorldObject *wo = w->objects[n];
 		const slPosition &p = wo->getPosition();
 
-		slAddBoundingBoxForVectors( w->_proximityData, n, &wo->_neighborMin, &wo->_neighborMax );
+		w->_proximityData->addBoundingBoxPointers( n, &wo->_neighborMin, &wo->_neighborMax );
 
 		wo->_neighborMin.x = p.location.x - wo->_proximityRadius;
 		wo->_neighborMin.y = p.location.y - wo->_proximityRadius;

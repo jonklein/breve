@@ -188,11 +188,6 @@ class slWorld {
 		slWorldObject *addObject( slWorldObject* );
 		void removeObject( slWorldObject* );
 
-#if HAVE_LIBENET
-		slNetsimData netsimData;
-		slNetsimClientData *netsimClient;
-#endif
-
 		void renderShadowVolume(slCamera *c);
 		void renderObjectShadowVolumes(slCamera *c);
 	
@@ -212,6 +207,12 @@ class slWorld {
 		unsigned char _odeStepMode;
 
 		slCamera _lightExposureCamera;
+
+#if HAVE_LIBENET
+		slNetsimData netsimData;
+		slNetsimClientData *netsimClient;
+#endif
+
 	private:
 };
 #endif

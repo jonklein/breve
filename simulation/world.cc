@@ -83,8 +83,6 @@ slWorld::slWorld() {
 
 	_detectCollisions = 1;
 
-	netsimData.server = NULL;
-
 	_collisionCallback = NULL;
 	_collisionCheckCallback = NULL;
 

@@ -83,9 +83,9 @@ bool slBoundSortCompare(const slBoundSort *a, const slBoundSort *b) {
 }
 
 int slVclipData::pruneAndSweep() {
-	slIsort(this, boundListPointers[0], BT_XAXIS);
-	slIsort(this, boundListPointers[1], BT_YAXIS);
-	slIsort(this, boundListPointers[2], BT_ZAXIS);
+	slIsort(this, boundListPointers[ 0 ], BT_XAXIS);
+	slIsort(this, boundListPointers[ 1 ], BT_YAXIS);
+	slIsort(this, boundListPointers[ 2 ], BT_ZAXIS);
 
 	return 0;
 }

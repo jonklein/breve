@@ -9,6 +9,10 @@
 
 class slNetsimRemoteHostData {
 	public:
+		slNetsimRemoteHostData() {
+			peer = NULL;
+		}
+
 		slVector min, max;
 		double simTime;
 		double syncTime;
@@ -27,6 +31,11 @@ class slNetsimServerData {
 
 class slNetsimData {
 	public:
+		slNetsimData() {
+			server = NULL;
+			slave = NULL;
+		}
+
 		int isMaster;
 		slNetsimServerData *server;
 		slNetsimServerData *slave;
@@ -36,6 +45,11 @@ class slNetsimData {
 
 class slNetsimClientData {
 	public:
+		slNetsimClientData() {
+			host = NULL;
+			peer = NULL;
+		}
+
 		ENetHost *host;
 		ENetPeer *peer;
 		int terminate;

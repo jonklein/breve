@@ -115,6 +115,8 @@ class slVclipData {
 
 		int clip(double tolerance, int pruneOnly, int boundingBoxOnly);
 
+		void addBoundingBoxPointers( int offset, slVector *min, slVector *max );
+
 		/**
 		 * Tests a single pair stored in a \ref slCollisionCandidate.
 		 */
