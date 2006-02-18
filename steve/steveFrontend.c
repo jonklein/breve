@@ -18,6 +18,8 @@ stSteveData *currentData;
 void stCrashCatcher( int s ) {
 	signal( s, SIG_DFL );
 
+	slSetMessageCallbackFunction( slStderrMessageCallback );
+
 	printf("Signal %d detected -- attempting steve stack trace:\n", s );
 	stStackTrace( currentData );
 
@@ -32,6 +34,9 @@ void *breveFrontendInitData(brEngine *engine) {
 	signal( SIGSEGV, stCrashCatcher );
 	signal( SIGILL, stCrashCatcher );
 	signal( SIGBUS, stCrashCatcher );
+	signal( SIGABRT, stCrashCatcher );
+	signal( SIGTRAP, stCrashCatcher );
+	signal( SIGQUIT, stCrashCatcher );
 
 	return stSteveInit(engine);
 }

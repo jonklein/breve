@@ -35,73 +35,67 @@
 */
 
 void slVclipDataInit( slWorld *w ) {
-	slStationary *st;
-	slLink *link;
 	unsigned int x;
 
 	w->_initialized = 1;
 
-	if ( w->proximityData ) {
+	if ( w->_proximityData ) {
 		slInitProximityData(w);
-		slInitBoundSort(w->proximityData);
+		slInitBoundSort(w->_proximityData);
 	}
 	
-	slVclipDataRealloc(w->clipData, w->objects.size());
+	slVclipDataRealloc( w->_clipData, w->objects.size() );
 
-	w->clipData->objects = w->objects;
-	w->clipData->world = w;
-
-	w->clipData->collisionCount = 0;
+	w->_clipData->objects = w->objects;
+	w->_clipData->world = w;
+	w->_clipData->collisionCount = 0;
 
 	// for each object in the world, fill in it's shape, position and 
 	// min/max vectors
 
-	w->clipData->boundLists[0].clear();
-	w->clipData->boundLists[1].clear();
-	w->clipData->boundLists[2].clear();
+	w->_clipData->boundLists[0].clear();
+	w->_clipData->boundLists[1].clear();
+	w->_clipData->boundLists[2].clear();
 
 	for(x = 0; x < w->objects.size(); x++) {
-		switch(w->objects[x]->type) {
-			case WO_LINK:
-				link = (slLink *)w->objects[x];
-				link->clipNumber = x;
-				link->updateBoundingBox();
+		slVector min, max;
 
-				break;
-			case WO_STATIONARY:
-				st = (slStationary *)w->objects[x];
-				st->shape->bounds(&st->position, &st->min, &st->max);
-				break;
+		w->objects[ x ]->updateBoundingBox();
+		w->objects[ x ]->getBounds( &min, &max );
+
+		slAddBoundingBoxForVectors( w->_clipData, x, &min, &max );
+
+		if( w->objects[x]->getType() == WO_LINK ) {
+			slLink *link = (slLink *)w->objects[x];
+			link->_clipNumber = x;
 		}
-
-		slAddBoundingBoxForVectors(w->clipData, x, &w->objects[x]->min, &w->objects[x]->max);
 	}
 
-	for (x = 0; x < w->clipData->maxCount; x++) 
-		memset(w->clipData->pairArray[x], (BT_CHECK | BT_UNKNOWN), w->clipData->maxCount);
+	for (x = 0; x < w->_clipData->maxCount; x++) 
+		memset(w->_clipData->pairArray[x], (BT_CHECK | BT_UNKNOWN), w->_clipData->maxCount);
 
 	for(x = 0; x < w->objects.size(); x++) {
-	 	if (w->objects[x]->type == WO_LINK) {
+	 	if ( w->objects[x]->getType() == WO_LINK ) {
 			std::vector<slJoint*>::iterator ji;
 
-	 		link = (slLink *)w->objects[x];
+	 		slLink *link = (slLink *)w->objects[x];
 	 
-			for(ji = link->outJoints.begin(); ji != link->outJoints.end(); ji++ ) {
+			for(ji = link->_outJoints.begin(); ji != link->_outJoints.end(); ji++ ) {
 				slPairFlags *flags;
 				slLink *link2 = (*ji)->_child;
 
-				flags = slVclipPairFlags(w->clipData, link->clipNumber, link2->clipNumber);
+				flags = slVclipPairFlags(w->_clipData, link->_clipNumber, link2->_clipNumber);
 
 				*flags &= ~BT_CHECK;
 			}
 
-	 		if (link->multibody) link->multibody->initCollisionFlags(w->clipData);
+	 		if ( link->getMultibody() ) link->getMultibody()->initCollisionFlags(w->_clipData);
 		}
 	}
 
 	if ( w->_detectCollisions ) {
-		slInitBoundSort( w->clipData );
-		w->clipData->clip( 0.0, 0, w->_boundingBoxOnlyCollisions );
+		slInitBoundSort( w->_clipData );
+		w->_clipData->clip( 0.0, 0, w->_boundingBoxOnlyCollisions );
 	}
 }
 
@@ -124,12 +118,12 @@ slPairFlags slVclipDataInitPairFlags(slVclipData *clipData, int x, int y) {
 	int callback = 0;
 	int simulate = 0;
 
-	flags = slVclipPairFlagValue(clipData, x, y);
+	flags = slVclipPairFlagValue( clipData, x, y );
 
 	flags &= ~BT_UNKNOWN;
 
-	t1 = clipData->world->objects[x]->type;
-	t2 = clipData->world->objects[y]->type;
+	t1 = clipData->world->objects[x]->getType();
+	t2 = clipData->world->objects[y]->getType();
 
 	// collision detection is never turned on for 2 non-link objects.
 	   
@@ -144,23 +138,21 @@ slPairFlags slVclipDataInitPairFlags(slVclipData *clipData, int x, int y) {
 	sim1 = 1;
 	sim2 = 1;
 
-	c1 = clipData->world->objects[x]->userData;
-	c2 = clipData->world->objects[y]->userData;
+	c1 = clipData->world->objects[x]->getCallbackData();
+	c2 = clipData->world->objects[y]->getCallbackData();
 
 	// see if simulation is enabled for both of these objects 
 
-	if (t1 == WO_LINK)
-		sim1 = ((slLink *)clipData->world->objects[x])->simulate;
-	if (t2 == WO_LINK)
-		sim2 = ((slLink *)clipData->world->objects[y])->simulate;
+	if ( t1 == WO_LINK ) sim1 = clipData->world->objects[x]->isSimulated();
+	if ( t2 == WO_LINK ) sim2 = clipData->world->objects[y]->isSimulated();
 
 	// see if the user wants to simulate them and/or callback for them
 
-	if (c1 && c2 && clipData->world->collisionCheckCallback) {
+	if ( c1 && c2 && clipData->world->_collisionCheckCallback ) {
 		if (sim1 && sim2)
-			simulate = clipData->world->collisionCheckCallback(c1, c2, CC_SIMULATE);
+			simulate = clipData->world->_collisionCheckCallback( c1, c2, CC_SIMULATE );
 
-		callback = clipData->world->collisionCheckCallback(c1, c2, CC_CALLBACK);
+		callback = clipData->world->_collisionCheckCallback( c1, c2, CC_CALLBACK );
 	}
 
 	if (simulate || callback) {
@@ -263,29 +255,30 @@ void slAddBoundingBoxForVectors(slVclipData *data, int offset, slVector *min, sl
 void slInitProximityData(slWorld *w) {
 	unsigned int n;
 
-	slVclipDataRealloc(w->proximityData, w->objects.size());
+	slVclipDataRealloc(w->_proximityData, w->objects.size());
 
-	w->proximityData->world = w;
-	w->proximityData->objects = w->objects;
+	w->_proximityData->world = w;
+	w->_proximityData->objects = w->objects;
 
-	w->proximityData->boundLists[0].clear();
-	w->proximityData->boundLists[1].clear();
-	w->proximityData->boundLists[2].clear();
+	w->_proximityData->boundLists[0].clear();
+	w->_proximityData->boundLists[1].clear();
+	w->_proximityData->boundLists[2].clear();
 
-	for(n = 0; n < w->proximityData->maxCount; ++n) 
-		memset(w->proximityData->pairArray[n], BT_CHECK, w->proximityData->maxCount);
+	for( n = 0; n < w->_proximityData->maxCount; n++ ) 
+		memset( w->_proximityData->pairArray[n], BT_CHECK, w->_proximityData->maxCount );
 
-	for(n = 0; n < w->objects.size(); ++n) {
+	for( n = 0; n < w->objects.size(); n++ ) {
 		slWorldObject *wo = w->objects[n];
+		const slPosition &p = wo->getPosition();
 
-		slAddBoundingBoxForVectors(w->proximityData, n, &wo->neighborMin, &wo->neighborMax);
+		slAddBoundingBoxForVectors( w->_proximityData, n, &wo->_neighborMin, &wo->_neighborMax );
 
-		wo->neighborMin.x = wo->position.location.x - wo->proximityRadius;
-		wo->neighborMin.y = wo->position.location.y - wo->proximityRadius;
-		wo->neighborMin.z = wo->position.location.z - wo->proximityRadius;
-		wo->neighborMax.x = wo->position.location.x + wo->proximityRadius;
-		wo->neighborMax.y = wo->position.location.y + wo->proximityRadius;
-		wo->neighborMax.z = wo->position.location.z + wo->proximityRadius;
+		wo->_neighborMin.x = p.location.x - wo->_proximityRadius;
+		wo->_neighborMin.y = p.location.y - wo->_proximityRadius;
+		wo->_neighborMin.z = p.location.z - wo->_proximityRadius;
+		wo->_neighborMax.x = p.location.x + wo->_proximityRadius;
+		wo->_neighborMax.y = p.location.y + wo->_proximityRadius;
+		wo->_neighborMax.z = p.location.z + wo->_proximityRadius;
 	}
 }
 

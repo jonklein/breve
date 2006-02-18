@@ -25,7 +25,7 @@
 
 #define WHITE_PIXEL	0x00ffffff
 
-void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
+void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 	slWorldObject *wo;
 	std::vector< slWorldObject* >::iterator wi;
 	unsigned int n = 0;
@@ -41,15 +41,15 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	sun = &w->_lightExposureCamera._location;
 	target = &w->_lightExposureCamera._target;
 
-	if(c->activateContextCallback && c->activateContextCallback() != 0) {
+	if( activateContextCallback && activateContextCallback() != 0) {
 		slMessage(DEBUG_ALL, "Cannot simulate light exposure: no OpenGL context available\n");
 		return;
 	}
 
-	if(sun->y < target->y) {
+	if( sun->y < target->y ) {
 		// no exposure -- zero out the existing values
 		for(wi = w->objects.begin(); wi != w->objects.end(); wi++ )
-			(*wi)->lightExposure = 0;
+			(*wi)->_lightExposure = 0;
 
 		return;
 	}
@@ -74,11 +74,10 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 
 
 	glEnable(GL_SCISSOR_TEST);
-	glScissor( c->_originx, c->_originy, size, size );
+	glScissor(  _originx, _originy, size, size );
+	glViewport( _originx, _originy, size, size );
 
-	glViewport(c->_originx, c->_originy, size, size);
-
-	glMatrixMode(GL_PROJECTION);
+	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
 
 	glOrtho(-155, 155, -155, 155, 1.0, 1000.0);
@@ -106,9 +105,9 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 		glColor4ub(br, bg, bb, 0xff);
 
 		wo = *wi;
-		wo->lightExposure = 0;
+		wo->_lightExposure = 0;
 
-		if( wo->shape ) wo->shape->draw( c, &wo->position, wo->textureScaleX, wo->textureScaleY, 0, 0 );
+		if( wo->_shape ) wo->_shape->draw( this, &wo->_position, 0, 0, 0, 0 );
 
 		n++;
 	}
@@ -116,7 +115,7 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 	glPopMatrix();
 
 	if(!buffer) {
-		glReadPixels(c->_originx, c->_originy, size, size, GL_RGB, GL_UNSIGNED_BYTE, staticBuffer);
+		glReadPixels( _originx, _originy, size, size, GL_RGB, GL_UNSIGNED_BYTE, staticBuffer);
 		expMap = staticBuffer;
 	} else {
 		expMap = buffer;
@@ -129,7 +128,7 @@ void slDetectLightExposure(slWorld *w, slCamera *c, int size, GLubyte *buffer) {
 
 		if(label != WHITE_PIXEL && label < w->objects.size()) {
 			wo = w->objects[label];
-			wo->lightExposure++;
+			wo->_lightExposure++;
 		}
 	}
 

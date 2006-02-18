@@ -32,9 +32,7 @@ int brITerrainNew(brEval args[], brEval *target, brInstance *i) {
 
 	t = new slTerrain(5, BRDOUBLE(&args[0]), i);
 
-	slWorldAddObject(i->engine->world, t, WO_TERRAIN);
-
-	target->set( t );
+	target->set( i->engine->world->addObject( t ) );
 
 	return EC_OK;
 }
@@ -81,7 +79,7 @@ int brITerrainSetHeight(brEval args[], brEval *target, brInstance *i) {
 	int y = BRINT(&args[2]);
 	double h = BRDOUBLE(&args[3]);
 
-	slTerrainSetHeight(t, x, y, h);
+	t->setHeight( x, y, h );
 
 	return EC_OK;
 }
@@ -91,7 +89,7 @@ int brITerrainGetHeight(brEval args[], brEval *target, brInstance *i) {
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
-	target->set( slTerrainGetHeight(t, x, y) );
+	target->set( t->getHeight( x, y ) );
 
 	return EC_OK;
 }
@@ -123,7 +121,7 @@ int brITerrainGetSlope(brEval args[], brEval *target, brInstance *i) {
 int brITerrainSetPosition(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 
-	t->setLocation(&BRVECTOR(&args[1]));
+	t->setLocation( &BRVECTOR(&args[1]) );
 
 	return EC_OK;
 }
@@ -131,7 +129,7 @@ int brITerrainSetPosition(brEval args[], brEval *target, brInstance *i) {
 int brITerrainSetPeakColor(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 
-	slTerrainSetTopColor(t, &BRVECTOR(&args[1]));
+	t->setTopColor( &BRVECTOR(&args[1]) );
 
 	return EC_OK;
 }
@@ -139,7 +137,7 @@ int brITerrainSetPeakColor(brEval args[], brEval *target, brInstance *i) {
 int brITerrainSetValleyColor(brEval args[], brEval *target, brInstance *i) {
 	slTerrain *t = BRTERRAINPOINTER(&args[0]);
 
-	slTerrainSetBottomColor(t, &BRVECTOR(&args[1]));
+	t->setBottomColor( &BRVECTOR(&args[1]) );
 
 	return EC_OK;
 }

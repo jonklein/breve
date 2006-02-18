@@ -35,8 +35,8 @@ void slSpring::draw(slCamera *camera) {
 	if(!_src || !_dst) return;
 	if(!_stipple) return;
 
-	slPositionVertex(&_src->position, &_point1, &x);
-	slPositionVertex(&_dst->position, &_point2, &y);
+	slPositionVertex(&_src->_position, &_point1, &x);
+	slPositionVertex(&_dst->_position, &_point2, &y);
 
 	glLineStipple(2, _stipple);
 	glEnable(GL_LINE_STIPPLE);
@@ -70,18 +70,18 @@ void slSpring::step(double step) {
 	l1 = (slLink*)_src;
 	l2 = (slLink*)_dst;
 
-	slPositionVertex(&_src->position, &_point1, &pos1);
-	slPositionVertex(&_dst->position, &_point2, &pos2);
+	slPositionVertex(&_src->_position, &_point1, &pos1);
+	slPositionVertex(&_dst->_position, &_point2, &pos2);
 	slVectorSub(&pos1, &pos2, &toV1);
 	distance = slVectorLength(&toV1);
 
 	////////////////////////////////////////////////
 
-	slVectorXform(l1->position.rotation, &_point1, &point);
+	slVectorXform(l1->_position.rotation, &_point1, &point);
 	l1->getVelocity(&linearVel, &angularVel);
 	slVelocityAtPoint(&linearVel, &angularVel, &point, &vel1);
 
-	slVectorXform(l2->position.rotation, &_point2, &point);
+	slVectorXform(l2->_position.rotation, &_point2, &point);
 	l2->getVelocity(&linearVel, &angularVel);
 	slVelocityAtPoint(&linearVel, &angularVel, &point, &vel2);
 
@@ -171,7 +171,7 @@ slSpring::slSpring(slWorld *w, slLink *l1, slLink *l2, slVector *p1, slVector *p
 	_damping = damping;
 	_force = 0;
 
-	slWorldAddConnection(w, this);
+	w->addConnection( this );
 }
 
 double slSpring::getCurrentLength() {
@@ -179,8 +179,8 @@ double slSpring::getCurrentLength() {
 
 	if(!_src || !_dst) return 0.0;
 
-	slPositionVertex(&_src->position, &_point1, &pos1);
-	slPositionVertex(&_dst->position, &_point2, &pos2);
+	slPositionVertex(&_src->_position, &_point1, &pos1);
+	slPositionVertex(&_dst->_position, &_point2, &pos2);
 
 	slVectorSub(&pos1, &pos2, &toV1);
 

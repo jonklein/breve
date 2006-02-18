@@ -82,11 +82,11 @@ class brEval {
 
 		inline unsigned char type() { return _type; }
 
-		inline void set( double d )          { collect(); _values.doubleValue = d;                _type = AT_DOUBLE;   }
-		inline void set( int i )             { collect(); _values.intValue = i;                   _type = AT_INT;      }
-		inline void set( slVector &v )       { collect(); slVectorCopy(&v, &_values.vectorValue); _type = AT_VECTOR;   }
-		inline void set( slMatrix &m )       { collect(); slMatrixCopy(m, _values.matrixValue);   _type = AT_MATRIX;   }
-		inline void set( char *s )           { collect(); _values.stringValue = slStrdup(s);      _type = AT_STRING;   }
+		inline void set( const double d )    { collect(); _values.doubleValue = d;                _type = AT_DOUBLE;   }
+		inline void set( const int i )       { collect(); _values.intValue = i;                   _type = AT_INT;      }
+		inline void set( const slVector &v ) { collect(); slVectorCopy(&v, &_values.vectorValue); _type = AT_VECTOR;   }
+		inline void set( const slMatrix &m ) { collect(); slMatrixCopy(m, _values.matrixValue);   _type = AT_MATRIX;   }
+		inline void set( const char *s )     { collect(); _values.stringValue = slStrdup(s);      _type = AT_STRING;   }
 		inline void set( void *p )           { collect(); _values.pointerValue = p;               _type = AT_POINTER;  retain(); }
 		inline void set( brEvalHash *h )     { collect(); _values.hashValue = h;                  _type = AT_HASH;     retain(); }
 		inline void set( brData *d )         { collect(); _values.dataValue = d;                  _type = AT_DATA;     retain(); }

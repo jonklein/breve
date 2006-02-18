@@ -1,8 +1,6 @@
 #ifndef _WORLDOBJECT_H
 #define _WORLDOBJECT_H
 
-#ifdef __cplusplus
-
 #include "util.h"
 #include "shape.h"
 
@@ -42,130 +40,136 @@ class slObjectLine: public slObjectConnection {
 
 class slWorldObject {
 	public:
+		friend class slCamera;
+		friend class slJoint;
+		friend class slWorld;
+		friend class slSpring;
+		friend class slTerrain;
+
 		slWorldObject() {
-			drawMode = 0;
-			texture = 0;
-			textureMode = 0;
-			textureScaleX = textureScaleY = 16;
-			simulate = 0;
+			_drawMode = 0;
+			_texture = 0;
+			_textureMode = 0;
+			_textureScaleX = 16;
+			_textureScaleY = 16;
+			_simulate = 0;
 			_drawAsPoint = 0;
 
-			lightExposure = 0;
+			_lightExposure = 0;
 
-			shape = NULL;
+			_shape = NULL;
 
-			proximityRadius = 0.00001;
+			_proximityRadius = 0.00001;
 
-			billboardRotation = 0;
-			alpha = 1.0;
+			_billboardRotation = 0;
+			_alpha = 1.0;
 
-			e = 0.4;
-			eT = 0.2;
-			mu = 0.15;
+			_e = 0.4;
+			_eT = 0.2;
+			_mu = 0.15;
 
-			slVectorSet(&color, 1, 1, 1);
+			slVectorSet(&_color, 1, 1, 1);
 
-			slMatrixIdentity(position.rotation);
-			slVectorSet(&position.location, 0, 0, 0);
+			slMatrixIdentity(_position.rotation);
+			slVectorSet(&_position.location, 0, 0, 0);
 		}
 
 		virtual ~slWorldObject() {
 			std::vector<slObjectConnection*>::iterator ci;
 
-			for(ci = connections.begin(); ci != connections.end(); ci++ ) {
+			for(ci = _connections.begin(); ci != _connections.end(); ci++ ) {
 				(*ci)->_src = NULL;
 				(*ci)->_dst = NULL;
 			}
 
-			if(shape) slShapeFree(shape);
+			if( _shape ) slShapeFree( _shape );
 		}
 
-		virtual void draw(slCamera *camera);
+		virtual void draw( slCamera *camera );
 
-		virtual void step(slWorld *world, double step) {};
+		virtual void step( slWorld *world, double step ) {};
 
-		slShape *shape;
+		void setCallbackData( void *data );
+		void *getCallbackData();
+		void setCollisionE( double e );
+		void setCollisionET( double eT );
+		void setCollisionMU( double mu );
+		void setNeighborhoodSize( double size );
+		void setColor( slVector *color );
+		void setAlpha( double alpha );
+		void setTexture( int texture );
+		void setTextureMode( int mode );
+		void setTextureScale( double scaleX, double scaleY );
+		void setBitmapRotation( double rot );
+		void setDrawAsPoint( bool p );
+		void addDrawMode( int mode );
+		void removeDrawMode( int mode );
 
-		std::string label;
+		void getBounds( slVector *min, slVector *max );
 
-		unsigned char simulate;
-		unsigned char update;
+		int getLightExposure( );
+		int raytrace( slVector *location, slVector* direction, slVector *erg_dir );
 
-		slPosition position;
+		std::vector<slWorldObject*> &getNeighbors();
+
+		inline const slPosition &getPosition() { return _position; }
+		inline const slShape *getShape() { return _shape; }
+
+		void updateBoundingBox();
+
+		inline unsigned char getType() { return _type; }
+
+		inline bool isSimulated() { return _simulate; }
+
+		double _proximityRadius;
+		slVector _neighborMax;
+		slVector _neighborMin;
+
+	protected:
+		slShape *_shape;
+
+		std::string _label;
+
+		bool _simulate;
+		bool _update;
+
+		slPosition _position;
 
 		// type is one of the slWorldObjectTypes -- a stationary or a multibody
 		// the data pointer is thus a pointer to the corresponding structure.
 
-		unsigned char type;
+		unsigned char _type;
 
-		slVector color;
+		slVector _color;
 
-		int lightExposure;
+		int _lightExposure;
 
 		bool _drawAsPoint;
-		int texture;
-		char textureMode;
-		unsigned char drawMode;
-		float billboardRotation;
-		float alpha;
+		int _texture;
+		char _textureMode;
+		unsigned char _drawMode;
+		float _billboardRotation;
+		float _alpha;
 	
-		float textureScaleX, textureScaleY;
+		float _textureScaleX, _textureScaleY;
 
 		// bounding box information here is used for "proximity" data
 	
-		slVector neighborMax;
-		slVector neighborMin;
-		slVector max;
-		slVector min;
+		slVector _max;
+		slVector _min;
 		bool _moved;
 	
-		double e;
-		double eT;
-		double mu;
+		double _e;
+		double _eT;
+		double _mu;
 
-		double proximityRadius;
-		std::vector<slWorldObject*> neighbors;
+		std::vector<slWorldObject*> _neighbors;
 
 		// the list of lines that this object makes to other objects
 
-		std::vector<slObjectConnection*> connections;
+		std::vector<slObjectConnection*> _connections;
 
-		void *userData;
+		void *_userData;
 };
-
-std::vector<slWorldObject*> &slWorldObjectGetNeighbors(slWorldObject *wo);
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void slWorldObjectSetCallbackData(slWorldObject *wo, void *data);
-void *slWorldObjectGetCallbackData(slWorldObject *wo);
-
-void slWorldObjectSetCollisionE(slWorldObject *wo, double e);
-void slWorldObjectSetCollisionET(slWorldObject *wo, double eT);
-void slWorldObjectSetCollisionMU(slWorldObject *wo, double mu);
-
-void slWorldObjectSetNeighborhoodSize(slWorldObject *wo, double size);
-
-void slWorldObjectSetColor(slWorldObject *wo, slVector *color);
-void slWorldObjectSetAlpha(slWorldObject *wo, double alpha);
-
-void slWorldObjectSetTexture(slWorldObject *wo, int texture);
-void slWorldObjectSetTextureMode(slWorldObject *wo, int mode);
-void slWorldObjectSetTextureScale(slWorldObject *wo, double scaleX, double scaleY);
-void slWorldObjectSetBitmapRotation(slWorldObject *wo, double rot);
-
-void slWorldObjectAddDrawMode(slWorldObject *wo, int mode);
-void slWorldObjectRemoveDrawMode(slWorldObject *wo, int mode);
-
-int slWorldObjectGetLightExposure(slWorldObject *wo);
-
-int slWorldObjectRaytrace(slWorldObject *wo, slVector *location, slVector* direction, slVector *erg_dir);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _WORLDOBJECT_H */

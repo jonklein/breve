@@ -36,7 +36,7 @@
 
 int brICameraSetZClip(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->zClip = abs(BRINT(&args[1]));
+	camera->_zClip = abs(BRINT(&args[1]));
 	return EC_OK;
 }
 
@@ -48,7 +48,7 @@ int brICameraSetZClip(brEval args[], brEval *target, brInstance *i) {
 
 int brICameraSetDrawSmooth(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->drawSmooth = BRINT(&args[1]);
+	camera->_drawSmooth = BRINT(&args[1]);
 	camera->setRecompile();
 	return EC_OK;
 }
@@ -79,9 +79,9 @@ int brICameraSetBlur(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 
 	if(camera->activateContextCallback) camera->activateContextCallback();
-	slClear(i->engine->world, camera);
+	camera->clear( i->engine->world );
 
-	camera->blur = BRINT(&args[1]);
+	camera->_drawBlur = BRINT(&args[1]);
 	camera->setRecompile();
 	return EC_OK;
 }
@@ -94,7 +94,7 @@ int brICameraSetBlur(brEval args[], brEval *target, brInstance *i) {
 
 int brICameraSetBlurFactor(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->blurFactor = BRDOUBLE(&args[1]);
+	camera->_blurFactor = BRDOUBLE(&args[1]);
 	camera->setRecompile();
 	return EC_OK;
 }
@@ -107,7 +107,7 @@ int brICameraSetBlurFactor(brEval args[], brEval *target, brInstance *i) {
 
 int brICameraSetDrawFog(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->drawFog = BRINT(&args[1]);
+	camera->_drawFog = BRINT(&args[1]);
 	camera->setRecompile();
 	return EC_OK;
 }
@@ -120,7 +120,7 @@ int brICameraSetDrawFog(brEval args[], brEval *target, brInstance *i) {
 
 int brICameraSetFogIntensity(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->fogIntensity = BRDOUBLE(&args[1]);
+	camera->_fogIntensity = BRDOUBLE(&args[1]);
 	return EC_OK;
 }
 
@@ -132,7 +132,7 @@ int brICameraSetFogIntensity(brEval args[], brEval *target, brInstance *i) {
 
 int brICameraSetFogColor(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	slVectorCopy(&BRVECTOR(&args[1]), &camera->fogColor);
+	slVectorCopy(&BRVECTOR(&args[1]), &camera->_fogColor);
 	return EC_OK;
 }
 
@@ -269,8 +269,8 @@ int brICameraSetEnabled(brEval args[], brEval *target, brInstance *i) {
 
 int brICameraSetRotation(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->rx = BRDOUBLE(&args[1]);
-	camera->ry = BRDOUBLE(&args[2]);
+	camera->_rx = BRDOUBLE(&args[1]);
+	camera->_ry = BRDOUBLE(&args[2]);
 
 	camera->update();
 
@@ -287,8 +287,8 @@ int brICameraGetRotation(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	slVector v;
 
-	v.x = camera->rx;
-	v.y = camera->ry;
+	v.x = camera->_rx;
+	v.y = camera->_ry;
 	v.z = 0;
 
 	target->set( v );
@@ -305,7 +305,7 @@ int brICameraGetRotation(brEval args[], brEval *target, brInstance *i) {
 int brICameraTextSetEnabled(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 
-	camera->drawText = BRINT(&args[1]);
+	camera->_drawText = BRINT(&args[1]);
 
 	return EC_OK;
 }

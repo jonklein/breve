@@ -3,19 +3,19 @@
 #include "glIncludes.h"
 
 void slWorldObject::draw(slCamera *camera) {
-	if (shape)
-		shape->draw(camera, &position, textureScaleX, textureScaleY, drawMode, 0);
+	if ( _shape )
+		_shape->draw( camera, &_position, _textureScaleX, _textureScaleY, _drawMode, 0 );
 }
 
 void slObjectLine::draw(slCamera *camera) {
-	slVector *x, *y;
+	const slVector *x, *y;
 
 	if (!_src || !_dst) return;
 
 	if (!_stipple) return;
 
-	x = &_src->position.location;
-	y = &_dst->position.location;
+	x = &_src->getPosition().location;
+	y = &_dst->getPosition().location;
 
 	glLineStipple(2, _stipple);
 	glEnable(GL_LINE_STIPPLE);
@@ -24,36 +24,36 @@ void slObjectLine::draw(slCamera *camera) {
 
 	glBegin(GL_LINES);
 
-	glVertex3f(x->x, x->y, x->z);
-	glVertex3f(y->x, y->y, y->z);
+	glVertex3f( x->x, x->y, x->z );
+	glVertex3f( y->x, y->y, y->z );
 
 	glEnd();
 
 	glDisable(GL_LINE_STIPPLE);
 }
 
-void slWorldObjectSetCallbackData(slWorldObject *wo, void *data) {
-	wo->userData = data;
+void slWorldObject::setCallbackData( void *data ) {
+	_userData = data;
 }
 
-void *slWorldObjectGetCallbackData(slWorldObject *wo) {
-	return wo->userData;
+void *slWorldObject::getCallbackData() {
+	return _userData;
 }
 
-void slWorldObjectSetCollisionE(slWorldObject *wo, double e) {
-	wo->e = e;
+void slWorldObject::setCollisionE( double e ) {
+	_e = e;
 }
 
-void slWorldObjectSetCollisionET(slWorldObject *wo, double eT) {
-	wo->eT = eT;
+void slWorldObject::setCollisionET( double eT ) {
+	_eT = eT;
 }
 
-void slWorldObjectSetCollisionMU(slWorldObject *wo, double mu) {
-	wo->mu = mu;
+void slWorldObject::setCollisionMU( double mu ) {
+	_mu = mu;
 }
 
-void slWorldObjectSetNeighborhoodSize(slWorldObject *wo, double size) {
-	wo->proximityRadius = size;
+void slWorldObject::setNeighborhoodSize( double size ) {
+	_proximityRadius = size;
 }
 
 /*!
@@ -64,53 +64,56 @@ void slWorldObjectSetNeighborhoodSize(slWorldObject *wo, double size) {
 	numbers for backward compatability.
 */
 
-void slWorldObjectSetTexture(slWorldObject *wo, int texture) {
-	wo->texture = (texture > 0) ? texture : 0;
+void slWorldObject::setTexture( int t ) {
+	_texture = ( t > 0) ? t : 0;
 }
 
-void slWorldObjectSetTextureMode(slWorldObject *wo, int mode) {
-	wo->textureMode = mode;
+void slWorldObject::setTextureMode( int m ) {
+	_textureMode = m;
 }
 
-void slWorldObjectSetTextureScale(slWorldObject *wo, double sx, double sy) {
-	wo->textureScaleX = sx;
-	wo->textureScaleY = sy;
-
-	wo->shape->recompile();
+void slWorldObject::setDrawAsPoint( bool p ) {
+	_drawAsPoint = p;
 }
 
-void slWorldObjectSetBitmapRotation(slWorldObject *wo, double rot) {
-	wo->billboardRotation = rot;
+void slWorldObject::setTextureScale( double sx, double sy ) {
+	_textureScaleX = sx;
+	_textureScaleY = sy;
+
+	_shape->recompile();
 }
 
-void slWorldObjectAddDrawMode(slWorldObject *wo, int mode) {
-	wo->drawMode |= mode;
+void slWorldObject::setBitmapRotation( double rot ) {
+	_billboardRotation = rot;
 }
 
-void slWorldObjectRemoveDrawMode(slWorldObject *wo, int mode) {
-	if (wo->drawMode & mode)
-		wo->drawMode ^= mode;
+void slWorldObject::addDrawMode( int mode ) {
+	_drawMode |= mode;
 }
 
-std::vector<slWorldObject*> &slWorldObjectGetNeighbors(slWorldObject *wo) {
-	return wo->neighbors;
+void slWorldObject::removeDrawMode( int mode ) {
+	if ( _drawMode & mode ) _drawMode ^= mode;
 }
 
-int slWorldObjectGetLightExposure(slWorldObject *wo) {
-	return wo->lightExposure;
+std::vector<slWorldObject*> &slWorldObject::getNeighbors() {
+	return _neighbors;
 }
 
-void slWorldObjectSetAlpha(slWorldObject *wo, double alpha) {
-	wo->alpha = alpha;
+int slWorldObject::getLightExposure() {
+	return _lightExposure;
 }
 
-void slWorldObjectSetColor(slWorldObject *wo, slVector *color) {
-	slVectorCopy(color, &wo->color);
+void slWorldObject::setAlpha( double alpha ) {
+	_alpha = alpha;
 }
 
-int slWorldObjectRaytrace(slWorldObject *wo, slVector *location, slVector* direction, slVector *erg_dir) {
+void slWorldObject::setColor( slVector *c ) {
+	slVectorCopy( c, &_color);
+}
 
-	if (!(wo->shape)) {
+int slWorldObject::raytrace( slVector *location, slVector* direction, slVector *erg_dir ) {
+
+	if ( !_shape ) {
 		slMessage(DEBUG_ALL, "slWorldObjectRaytrace: This WorldObject has no shape\n");
 		return -2;
 	}
@@ -124,17 +127,18 @@ int slWorldObjectRaytrace(slWorldObject *wo, slVector *location, slVector* direc
 	slVectorCopy(direction, &direction_norm);
 	slVectorNormalize(&direction_norm);
  
-	slVectorInvXform(wo->position.rotation, &direction_norm, &dir_wo_help);
+	slVectorInvXform( _position.rotation, &direction_norm, &dir_wo_help);
 	slVectorMul(&dir_wo_help, -1, &dir_wo);   
 
-	slVectorSub(location, &wo->position.location, &loc_wo_help);
-	slVectorInvXform(wo->position.rotation, &loc_wo_help, &loc_wo);
+	slVectorSub(location, &_position.location, &loc_wo_help);
+	slVectorInvXform( _position.rotation, &loc_wo_help, &loc_wo);
 
 //   slMessage(DEBUG_ALL, " [ %f, %f, %f ] %f %f ", dir_wo.x, dir_wo.y, dir_wo.z, atan2(dir_wo.z, dir_wo.x)*180/M_PI, atan2(direction->z, direction->x)*180/M_PI );
 //   slMessage(DEBUG_ALL, " [ %f, %f, %f ] ", loc_wo.x, loc_wo.y, loc_wo.z );
 
 	slVector point;
-	if (wo->shape->rayHitsShape(&dir_wo, &loc_wo, &point) < 0) {
+
+	if ( _shape->rayHitsShape( &dir_wo, &loc_wo, &point ) < 0 ) {
 		slVectorSet(erg_dir, 0.0, 0.0, 0.0); //no hit
 		return -1;
 	}
@@ -144,3 +148,14 @@ int slWorldObjectRaytrace(slWorldObject *wo, slVector *location, slVector* direc
 
 	return 0;
 }
+
+void slWorldObject::updateBoundingBox() {
+	_shape->bounds( &_position, &_min, &_max );
+}
+
+void slWorldObject::getBounds(slVector *minBounds, slVector *maxBounds) {
+	if( minBounds ) slVectorCopy( &_min, minBounds );
+	if( maxBounds ) slVectorCopy( &_max, maxBounds );
+}
+
+

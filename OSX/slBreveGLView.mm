@@ -163,7 +163,7 @@
 		[[self openGLContext] makeCurrentContext];
 	}
 
-	slCameraSetBounds(camera, x, y);
+	camera->setBounds( x, y );
 
 	glViewport(0, 0, x, y);
 }
@@ -253,7 +253,7 @@
 
 	if(viewEngine) {
 	   	if(!fullScreen) {
-			slRenderScene(world, camera, drawCrosshair);
+			camera->renderScene( world, drawCrosshair );
 			if(theMovie) [theMovie addFrameFromRGBAPixels: [self updateRGBAPixels]];
 		}
 	} else {
@@ -279,7 +279,7 @@
 			slCameraSetRecompile(camera);
 		}
 
-		slRenderScene(world, camera, drawCrosshair);
+		camera->renderScene( world, drawCrosshair );
 		firstFullScreen = 0;
 		CGLFlushDrawable([fullScreenView context]);
 		brEngineUnlock(viewEngine);
@@ -328,21 +328,21 @@
 		lastp = p;
 
 		switch(mode) {
-			case 0: /* rotation */
+			case 0: // rotation
 				drawCrosshair = 1;
-				slRotateCameraWithMouseMovement(camera, d.x, d.y);
+				camera->rotateWithMouseMovement( d.x, d.y );
 				break;
 
-			case 1: /* zoom */
+			case 1: // zoom
 				drawCrosshair = 1;
-				slZoomCameraWithMouseMovement(camera, d.x, d.y);
+				camera->zoomWithMouseMovement( d.x, d.y );
 				break;
 
-			case 2: /* motion */
+			case 2: // motion 
 				drawCrosshair = 1;
-				slMoveCameraWithMouseMovement(camera, d.x, d.y);
+				camera->moveWithMouseMovement( d.x, d.y );
 				break;
-			case 3: /* select */
+			case 3: // select
 				if(firstTime) {
 					[theController doSelectionAt: p];
 					firstTime = NO;
@@ -351,7 +351,7 @@
 					unsigned int x, y;
 
 					[drawLock lock];
-					slCameraGetBounds(camera, &x, &y);
+					camera->getBounds( &x, &y );
 					brDragCallback(viewEngine, (int)p.x, (int)(y - p.y));
 					[drawLock unlock];
 				}
@@ -362,7 +362,7 @@
 				break;
 		}
 		
-		slCameraUpdate(camera);
+		camera->update();
 		[self setNeedsDisplay: YES];
 
 	} while([theEvent type] != NSLeftMouseUp);

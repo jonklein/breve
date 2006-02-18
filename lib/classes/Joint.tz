@@ -363,7 +363,8 @@ Joint : PrismaticJoint (aka PrismaticJoints) [version 2.3] {
 
 	+ to link parent parentLink (object) to-child childLink (object)
 			with-normal theNormal (vector) with-parent-point parentPoint (vector) 
-			with-child-point childPoint (vector):
+			with-child-point childPoint (vector)
+			use-current-relative-rotation currentRotation = 0 (int):
 
 		% Creates a prismatic (sliding) joint between parentLink and childLink.  
 		% The joint will be locoated at parentPoint on the parent's body, and at
@@ -383,7 +384,7 @@ Joint : PrismaticJoint (aka PrismaticJoints) [version 2.3] {
 		if childLink && !cpointer:
 			die "attempting to link uninitialized Link object $childLink.".
 
-		jointPointer = jointLinkPrismatic(ppointer, cpointer, theNormal, parentPoint, childPoint, relativeRotation).
+		jointPointer = jointLinkPrismatic(ppointer, cpointer, theNormal, parentPoint, childPoint, relativeRotation, currentRotation).
 
 		normalVector = theNormal.
 		plinkPoint = parentPoint.
@@ -427,7 +428,8 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 2.3] {
 
 	+ to link parent parentLink (object) to-child childLink (object)
 			with-normal theNormal (vector) with-parent-point parentPoint (vector) 
-			with-child-point childPoint (vector):
+			with-child-point childPoint (vector)
+			use-current-relative-rotation currentRotation = 0 (int):
 
 		% Creates a revolute (rotating) joint between parentLink and childLink.  
 		% The joint will be lcoated at parentPoint on the parent's body, and at
@@ -450,7 +452,7 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 2.3] {
 		if jointPointer:
 			die "attempt to link previously linked Joint object.".
 
-		jointPointer = jointLinkRevolute(ppointer, cpointer, theNormal, parentPoint, childPoint, relativeRotation).
+		jointPointer = jointLinkRevolute(ppointer, cpointer, theNormal, parentPoint, childPoint, relativeRotation, currentRotation).
 
 		normalVector = theNormal.
 		plinkPoint = parentPoint.
@@ -502,7 +504,8 @@ Joint : FixedJoint (aka FixedJoints) [version 2.3] {
 	+ to link parent parentLink = 0 (object) 
 			to-child childLink (object)
 			with-parent-point parentPoint = (0, 0, 0) (vector) 
-			with-child-point childPoint = (0, 0, 0) (vector):
+			with-child-point childPoint = (0, 0, 0) (vector)
+			use-current-relative-rotation currentRotation = 0 (int):
 
 		% Creates a fixed joint between parentLink and childLink.  
 		% The joint will be located at parentPoint on the parent's body, and at
@@ -525,7 +528,7 @@ Joint : FixedJoint (aka FixedJoints) [version 2.3] {
 		if childLink && !cpointer:
 			die "attempting to link uninitialized Link object $childLink.".
 
-		jointPointer = jointLinkStatic(ppointer, cpointer, (0, 0, 0), parentPoint, childPoint, relativeRotation).
+		jointPointer = jointLinkStatic(ppointer, cpointer, (0, 0, 0), parentPoint, childPoint, relativeRotation, currentRotation).
 
 		normalVector = (1, 0, 0).
 		plinkPoint = parentPoint.
@@ -560,7 +563,8 @@ Joint : UniversalJoint (aka UniversalJoints) [version 2.3] {
 	+ to link parent parentLink (object) to-child childLink (object)
 			with-normal normal (vector)
 			with-parent-point parentPoint (vector) 
-			with-child-point childPoint (vector):
+			with-child-point childPoint (vector)
+			use-current-relative-rotation currentRotation = 0 (int):
 
 		% Creates a universal (rotation on two axes) joint between parentLink and childLink.  
 		% The joint will be lcoated at parentPoint on the parent's body, and at
@@ -589,7 +593,7 @@ Joint : UniversalJoint (aka UniversalJoints) [version 2.3] {
 		if jointPointer:
 			die "attempt to link previously linked Joint object.".
 
-		jointPointer = jointLinkUniversal(ppointer, cpointer, normal, parentPoint, childPoint, relativeRotation).
+		jointPointer = jointLinkUniversal(ppointer, cpointer, normal, parentPoint, childPoint, relativeRotation, currentRotation).
 
 		normalVector = normal.
 		plinkPoint = parentPoint.
@@ -661,7 +665,8 @@ Joint : BallJoint (aka BallJoints) [version 2.3] {
 	+ to link parent parentLink (object) to-child childLink (object)
 			with-parent-point parentPoint (vector) 
 			with-child-point childPoint (vector)
-			with-normal normal = (1, 0, 0) (vector):
+			with-normal normal = (1, 0, 0) (vector)
+			use-current-relative-rotation currentRotation = 0 (int):
 
 		% Creates a ball (rotation on three axes) joint between parentLink and childLink.  
 		% The joint will be lcoated at parentPoint on the parent's body, and at
@@ -681,7 +686,7 @@ Joint : BallJoint (aka BallJoints) [version 2.3] {
 		if jointPointer:
 			die "attempt to link previously linked Joint object.".
 
-		jointPointer = jointLinkBall(ppointer, cpointer, normal, parentPoint, childPoint, relativeRotation).
+		jointPointer = jointLinkBall(ppointer, cpointer, normal, parentPoint, childPoint, relativeRotation, currentRotation).
 
 		normalVector = normal.
 		plinkPoint = parentPoint.

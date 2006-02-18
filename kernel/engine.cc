@@ -130,7 +130,7 @@ brEngine *brEngineNew(void) {
 	e->path = new char[MAXPATHLEN + 1];
 	getcwd(e->path, MAXPATHLEN);
 
-	e->world = slWorldNew();
+	e->world = new slWorld();
 
 	slWorldSetCollisionCallbacks(e->world, brCheckCollisionCallback, brCollisionCallback);
 
@@ -483,17 +483,17 @@ int brEngineIterate(brEngine *e) {
 		}
 	}
 
-	double oldAge = slWorldGetAge(e->world);
+	double oldAge = e->world->getAge();
 
 	while(!e->events.empty() && (oldAge + e->iterationStepSize) >= e->events.back()->_time) {
 		event = e->events.back();
 
 		if(event->_instance->status == AS_ACTIVE) {
-			slWorldSetAge(e->world, event->_time);
+			e->world->setAge( event->_time );
 
 			int rcode = brMethodCallByName(event->_instance, event->_name, &result);
 
-			slWorldSetAge(e->world, oldAge);
+			e->world->setAge( oldAge );
 
 			if(rcode != EC_OK) {
 				pthread_mutex_unlock(&e->lock);
@@ -571,7 +571,7 @@ char *brFindFile(brEngine *e, char *file, struct stat *st) {
 */
 
 void brEngineRenderWorld(brEngine *e, int crosshair) {
-	slRenderScene(e->world, e->camera, crosshair);
+	e->camera->renderScene( e->world, crosshair);
 }
 
 /*@}*/

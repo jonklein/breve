@@ -377,7 +377,7 @@ int slMakeCurrentContext();
 	c = brEngineGetCamera(frontend->engine);
 
 	if(runState == BX_RUN) [engineLock lock];
-	slCameraGetBounds(c, &x, &y);
+	c->getBounds( &x, &y );
 	brClickAtLocation(frontend->engine, (int)p.x, (int)(y - p.y) );
 	[interfaceController updateObjectSelection];
 	if(runState == BX_RUN) [engineLock unlock];

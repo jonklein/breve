@@ -65,34 +65,14 @@ void slInitGL(slWorld *, slCamera *);
 unsigned int slTextureNew(slCamera *);
 void slTextureFree(slCamera *, unsigned int);
 int slUpdateTexture(slCamera *, GLuint, unsigned char *, int, int, int);
-void slRenderScene(slWorld *, slCamera *, int);
-int slVectorForDrag(slWorld *, slCamera *, slVector *, int, int, slVector *);
-int slGlSelect(slWorld *, slCamera *, int, int);
-
-void slDrawFog(slWorld *, slCamera *);
 
 void slMatrixGLMult(double [3][3]);
 
-void slRenderWorld(slWorld *, slCamera *, int, int);
 void slRenderWorldToBuffer(slWorld *, slCamera *, char *, char *, char *, char *);
 
-void slDrawBackground(slCamera *, slWorld *);
-
-void slStencilFloor(slWorld *, slCamera *);
-void slReflectionPass(slWorld *, slCamera *);
-void slShadowPass(slWorld *, slCamera *);
-
-void slRenderLabels(slWorld *);
-
-void slRenderObjects(slWorld *, slCamera *, unsigned int);
-void slRenderLines(slWorld *, slCamera *);
-
-void slRenderText(slWorld *, slCamera *, slVector *, slVector *, int);
 
 void slText(double, double, const char *, void *);
 void slStrokeText(double, double, const char *, double, void *);
-
-void slDrawLights(slCamera *, int);
 
 /**
  * Computes the flat shadow matrix for a plane and lightsource.
@@ -138,7 +118,5 @@ void slFreeGL(slWorld *, slCamera *);
 void slDeleteMbGLLists(slMultibody *);
 
 void slTransposeGLMatrix(GLfloat *);
-
-void slClear(slWorld *, slCamera *);
 
 #endif /* _GLDRAW_H */

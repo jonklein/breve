@@ -83,7 +83,7 @@ int brMenuCallback(brEngine *e, brInstance *i, unsigned int n) {
 }
 
 brInstance *brClickAtLocation(brEngine *e, int x, int y) {
-	return brClickCallback(e, slGlSelect(e->world, e->camera, x, y));
+	return brClickCallback(e, e->camera->select( e->world, x, y ) );
 }
 
 /*!
@@ -112,7 +112,7 @@ brInstance *brClickCallback(brEngine *e, int n) {
 	
 	if(!method) return NULL;
 
-	if(o) theArg.set( (brInstance*)slWorldObjectGetCallbackData(o) );
+	if(o) theArg.set( (brInstance*)o->getCallbackData() );
 	else theArg.set( (brInstance*)NULL );
 
 	argPtr[0] = &theArg;
@@ -122,7 +122,7 @@ brInstance *brClickCallback(brEngine *e, int n) {
 
 	if(!o) return NULL;
 
-	return (brInstance*)slWorldObjectGetCallbackData(o);
+	return (brInstance*)o->getCallbackData();
 }
 
 void brBeginDrag(brEngine *e, brInstance *i) {
@@ -187,7 +187,7 @@ int brDragCallback(brEngine *e, int x, int y) {
 		return n;
 	}
 
-	slVectorForDrag(e->world, e->camera, &BRVECTOR(&eval), x, y, &v );
+	e->camera->vectorForDrag( e->world, &BRVECTOR(&eval), x, y, &v );
 
 	theArg.set( v );
 	

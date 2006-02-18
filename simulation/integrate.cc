@@ -27,7 +27,7 @@
 	\brief Calculates the acceleration/velocity derivatives for a link.
 */
 
-inline int slCalculateDerivs(slLink *r, double *sv, double *dv, slWorld *w) {
+inline int slCalculateDerivs( slLink *r, double *sv, double *dv, slWorld *w ) {
 	slLinkIntegrationPosition *df, *sf;
 
 	df = (slLinkIntegrationPosition*)&dv[0];
@@ -36,7 +36,7 @@ inline int slCalculateDerivs(slLink *r, double *sv, double *dv, slWorld *w) {
 	slVectorCopy(&sf->velocity.b, &df->location);
 	slAngularVelocityToDeriv(&sf->velocity.a, &sf->rotQuat, &df->rotQuat);
 
-	slsVectorCopy(&r->acceleration, &df->velocity);
+	slsVectorCopy( &r->_acceleration, &df->velocity );
 
 	return 0;
 }
@@ -64,12 +64,12 @@ int slEuler(slWorld *w, slLink *r, double *deltaT, int skipFirst) {
 	double *osv, *sv;
 	int err = 0;
 
-	if(r->mobile < 1) {
-		if(r->mobile == -1) {
+	if( r->_mobile < 1 ) {
+		if( r->_mobile == -1 ) {
 			memcpy(&r->_stateVector[!r->_currentState],
 				&r->_stateVector[r->_currentState],
 				sizeof(slLinkIntegrationPosition));
-			r->mobile = 0;
+			r->_mobile = 0;
 		}
 
 		return 0;
@@ -109,10 +109,10 @@ int slRK4(slWorld *w, slLink *r, double *deltaT, int skipFirst) {
 	osv = (double *)&r->_stateVector[!r->_currentState];
 	sv = (double *)&r->_stateVector[r->_currentState];
 
-	if (r->mobile < 1) {
-		if (r->mobile == -1) {
-			memcpy(osv, sv, sizeof(slLinkIntegrationPosition));
-			r->mobile = 0;
+	if (r->_mobile < 1) {
+		if (r->_mobile == -1) {
+			memcpy( osv, sv, sizeof(slLinkIntegrationPosition) );
+			r->_mobile = 0;
 		}
 
 		return 0;

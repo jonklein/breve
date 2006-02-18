@@ -52,7 +52,7 @@ void slMultibody::initCollisionFlags(slVclipData *cd) {
 			link2 = *i2;
 
 			if(link1 != link2) {
-				flags = slVclipPairFlags(cd, link1->clipNumber, link2->clipNumber);
+				flags = slVclipPairFlags(cd, link1->_clipNumber, link2->_clipNumber);
 
 				if(_handleSelfCollisions) *flags |= BT_CHECK;
 				else if(*flags & BT_CHECK) *flags ^= BT_CHECK;
@@ -67,11 +67,11 @@ void slMultibody::initCollisionFlags(slVclipData *cd) {
 
 		std::vector<slJoint*>::iterator ji;
 
-		for(ji = link1->outJoints.begin(); ji != link1->outJoints.end(); ji++) {
+		for(ji = link1->_outJoints.begin(); ji != link1->_outJoints.end(); ji++) {
 			link2 = (*ji)->_child;
 
 			if(link1 != link2) {
-				flags = slVclipPairFlags(cd, link1->clipNumber, link2->clipNumber);
+				flags = slVclipPairFlags(cd, link1->_clipNumber, link2->_clipNumber);
 
 				if(*flags & BT_CHECK) *flags ^= BT_CHECK;
 			}
@@ -90,7 +90,7 @@ void slMultibody::setRotation(double rot[3][3]) {
 
 	// figure out the relative rotation required to get to the new rot 
 
-	slMatrixTranspose(_root->position.rotation, invR);
+	slMatrixTranspose(_root->_position.rotation, invR);
 	slMatrixMulMatrix(rot, invR, transform);
 
 	rotate(transform);
@@ -108,7 +108,7 @@ void slMultibody::setLocation(slVector *location) {
 	if( !_root) return;
 
 	updatePositions();
-	slVectorSub(location, &_root->position.location, &offset);
+	slVectorSub(location, &_root->_position.location, &offset);
 	offsetLocation(&offset);
 	updatePositions();
 }
@@ -133,14 +133,14 @@ void slMultibody::rotate(double rotation[3][3]) {
 		// the new position based on the rotation angle and our
 		// location relative to the root link.
 
-		slVectorSub(&link->position.location, &_root->position.location, &toLink);
+		slVectorSub(&link->_position.location, &_root->_position.location, &toLink);
 		slVectorXform(rotation, &toLink, &newToLink);
-		slVectorAdd(&newToLink, &_root->position.location, &newToLink);
+		slVectorAdd(&newToLink, &_root->_position.location, &newToLink);
 		dBodySetPosition(link->_odeBodyID, newToLink.x, newToLink.y, newToLink.z);
 	
-		slMatrixMulMatrix(rotation, link->position.rotation, newRot);
+		slMatrixMulMatrix(rotation, link->_position.rotation, newRot);
 
-		slMatrixCopy(newRot, link->position.rotation);
+		slMatrixCopy(newRot, link->_position.rotation);
 
 		// update the ODE state
 
@@ -151,7 +151,7 @@ void slMultibody::rotate(double rotation[3][3]) {
 		Q[2] = q.y;
 		Q[3] = q.z;
 
-		if(link->simulate) dBodySetQuaternion(link->_odeBodyID, Q);
+		if( link->_simulate ) dBodySetQuaternion(link->_odeBodyID, Q);
 	}
 }
 
@@ -170,9 +170,9 @@ void slMultibody::offsetLocation(slVector *offset) {
 	for(i1 = _links.begin(); i1 != _links.end(); i1++) {	
 		link = *i1;
 
-		slVectorAdd(&link->position.location, offset, &link->position.location);
+		slVectorAdd(&link->_position.location, offset, &link->_position.location);
 
-		if(link->simulate) {
+		if( link->_simulate ) {
 			oldP = dBodyGetPosition(link->_odeBodyID);
 
 			newP[0] = oldP[0] + offset->x;
@@ -229,10 +229,10 @@ slList *slMultibody::allCallbackData() {
 
 	for( li = _links.begin(); li != _links.end(); li++ ) {
 		// printf("adding callback data for %p\n", *li);
-		list = slListPrepend(list, (*li)->userData);
+		list = slListPrepend(list, (*li)->getCallbackData() );
 
-		for(ji = (*li)->inJoints.begin(); ji != (*li)->inJoints.end(); ji++ ) {
-			list = slListPrepend(list, (*ji)->userData);
+		for(ji = (*li)->_inJoints.begin(); ji != (*li)->_inJoints.end(); ji++ ) {
+			list = slListPrepend(list, (*ji)->getCallbackData() );
 		}
 	}
 
@@ -257,25 +257,25 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 	for(li = links.begin(); li != links.end(); li++ ) {
 		slLink *link = *li;
 
-		if(link != root && root->multibody != link->multibody) {
+		if(link != root && root->_multibody != link->_multibody) {
 			/* okay!  link has another mb for us!  we need to find the joint */
 			/* connecting this new multibody to our old one! */
 
-			for(ji = root->inJoints.begin(); ji != root->inJoints.end(); ji++ ) {
+			for( ji = root->_inJoints.begin(); ji != root->_inJoints.end(); ji++ ) {
 				joint = *ji;
 
-				if(joint->_parent && joint->_parent->multibody == root->multibody) {
+				if(joint->_parent && joint->_parent->_multibody == root->_multibody) {
 					joint->_isMbJoint = 1;
-					return link->multibody;
+					return link->_multibody;
 				}
 			}
 
-			for(ji = root->outJoints.begin(); ji != root->outJoints.end(); ji++ ) {
+			for(ji = root->_outJoints.begin(); ji != root->_outJoints.end(); ji++ ) {
 				joint = *ji;
 
-				if(joint->_child->multibody == root->multibody) {
+				if(joint->_child->_multibody == root->_multibody) {
 					joint->_isMbJoint = 1;
-					return link->multibody;
+					return link->_multibody;
 				}
 			}
 		}
@@ -308,13 +308,13 @@ slMultibody::slMultibody(slWorld *w) {
 
 void slMultibody::setRoot(slLink *root) {
 	if(root) {
-		root->multibody = NULL;
+		root->_multibody = NULL;
 		root->nullMultibodiesForConnectedLinks();
 	}
 
 	_root = root;
 
-	if(_root) _root->multibody = this;
+	if(_root) _root->_multibody = this;
 
 	update();
 }
@@ -330,15 +330,15 @@ void slMultibody::update() {
 
 	if(!_root) return;
 
-	// printf("updating %p with root %p [%p]\n", this, _root, _root->multibody);
+	// printf("updating %p with root %p [%p]\n", this, _root, _root->_multibody);
 
 	_root->connectedLinks(&_links, 1);
 
 	for(i = _links.begin(); i != _links.end(); i++ ) {
-		(*i)->multibody = this;
+		(*i)->_multibody = this;
 	}
 
-	if( _world->_initialized ) initCollisionFlags( _world->clipData );
+	if( _world->_initialized ) initCollisionFlags( _world->_clipData );
 }
 
 /*!
@@ -368,7 +368,7 @@ int slMultibody::checkSelfPenetration() {
 	std::vector<slLink*>::iterator i2;
 
 	if( !_world->_initialized ) slVclipDataInit( _world );
-	vc = _world->clipData;
+	vc = _world->_clipData;
 
 	for(i1 = _links.begin(); i1 != _links.end(); i1++ ) {
 		slLink *link1 = *i1;
@@ -380,9 +380,9 @@ int slMultibody::checkSelfPenetration() {
 			slLink *link2 = *i2;
 
 			if(link1 != link2) {
-				slCollisionCandidate c( vc, link1->clipNumber, link2->clipNumber);
+				slCollisionCandidate c( vc, link1->_clipNumber, link2->_clipNumber);
 
-				flags = slVclipPairFlags(vc, link1->clipNumber, link2->clipNumber);
+				flags = slVclipPairFlags(vc, link1->_clipNumber, link2->_clipNumber);
 
 				if(slVclipFlagsShouldTest(*flags) && vc->testPair(&c, NULL)) return 1;
 			}

@@ -161,12 +161,12 @@ int brIPause(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIAddEvent(brEval args[], brEval *target, brInstance *i) {
-    if(BRDOUBLE(&args[1]) <= slWorldGetAge(i->engine->world)) {
+    if( BRDOUBLE(&args[1]) <= i->engine->world->getAge( ) ) {
         slMessage(DEBUG_ALL, "warning: attempt to add event to the past\n");
         return EC_OK;
     }
 
-    if(!brEngineAddEvent(i->engine, i, BRSTRING(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]))) {
+    if( !brEngineAddEvent( i->engine, i, BRSTRING(&args[0]), BRDOUBLE(&args[1]), BRDOUBLE(&args[2]) ) ) {
         slMessage(DEBUG_ALL, "unable to add new event to engine: brEngineAddEvent() failed\n");
         return EC_ERROR;
     }
@@ -181,8 +181,8 @@ int brIAddEvent(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetFogDistances(brEval args[], brEval *target, brInstance *i) {
-    i->engine->camera->fogStart = BRDOUBLE(&args[0]);
-    i->engine->camera->fogEnd = BRDOUBLE(&args[1]);
+    i->engine->camera->_fogStart = BRDOUBLE(&args[0]);
+    i->engine->camera->_fogEnd = BRDOUBLE(&args[1]);
     return EC_OK;
 }
 
@@ -193,7 +193,7 @@ int brISetFogDistances(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetDrawLights(brEval args[], brEval *target, brInstance *i) {
-    i->engine->camera->drawLights = BRINT(&args[0]);
+    i->engine->camera->_drawLights = BRINT(&args[0]);
     i->engine->camera->setRecompile();
     return EC_OK;
 }
@@ -205,7 +205,7 @@ int brISetDrawLights(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetDrawShadow(brEval args[], brEval *target, brInstance *i) {
-    i->engine->camera->drawShadow = BRINT(&args[0]);
+    i->engine->camera->_drawShadow = BRINT(&args[0]);
     i->engine->camera->setRecompile();
     return EC_OK;
 }
@@ -217,7 +217,7 @@ int brISetDrawShadow(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetDrawShadowVolumes(brEval args[], brEval *target, brInstance *i) {
-    i->engine->camera->drawShadowVolumes = BRINT(&args[0]);
+    i->engine->camera->_drawShadowVolumes = BRINT(&args[0]);
     i->engine->camera->setRecompile();
     return EC_OK;
 }
@@ -232,7 +232,7 @@ int brISetDrawShadowVolumes(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetDrawOutline(brEval args[], brEval *target, brInstance *i) {
-    i->engine->camera->drawOutline = BRINT(&args[0]);
+    i->engine->camera->_drawOutline = BRINT(&args[0]);
     i->engine->camera->setRecompile();
     return EC_OK;
 }
@@ -244,7 +244,7 @@ int brISetDrawOutline(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetDrawReflection(brEval args[], brEval *target, brInstance *i) {
-    i->engine->camera->drawReflection = BRINT(&args[0]);
+    i->engine->camera->_drawReflection = BRINT(&args[0]);
     i->engine->camera->setRecompile();
     return EC_OK;
 }
@@ -256,8 +256,8 @@ int brISetDrawReflection(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetBackgroundScroll(brEval args[], brEval *target, brInstance *i) {
-    i->engine->camera->backgroundScrollX = BRDOUBLE(&args[0]);
-    i->engine->camera->backgroundScrollY = BRDOUBLE(&args[1]);
+    i->engine->camera->_backgroundScrollX = BRDOUBLE(&args[0]);
+    i->engine->camera->_backgroundScrollY = BRDOUBLE(&args[1]);
 
     return EC_OK;
 }
@@ -269,7 +269,7 @@ int brISetBackgroundScroll(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetDrawText(brEval args[], brEval *target, brInstance *i) {
-    i->engine->camera->drawText = BRINT(&args[0]);
+    i->engine->camera->_drawText = BRINT(&args[0]);
 
 	return EC_OK;
 }
@@ -281,9 +281,9 @@ int brISetDrawText(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetZClip(brEval args[], brEval *target, brInstance *i) {
-    i->engine->camera->zClip = abs(BRINT(&args[0]));
+    i->engine->camera->_zClip = abs(BRINT(&args[0]));
 
-	if(i->engine->camera->zClip == 0) i->engine->camera->zClip = 1;
+	if( i->engine->camera->_zClip == 0 ) i->engine->camera->_zClip = 1;
 
     return EC_OK;
 }

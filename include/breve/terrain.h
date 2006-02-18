@@ -49,13 +49,15 @@ class slRoamPatch;
 
 class slTerrain: public slWorldObject {
 	public:
+		friend class slRoamPatch;
+
 		slTerrain(int res, double scale, void *data);
 		~slTerrain();
 
 		inline void terrainPoint(int x, int z, slVector *point) {
-			point->x = x * xscale + position.location.x;
-			point->y = matrix[x][z] +  position.location.y;
-			point->z = z * xscale + position.location.z;
+			point->x =   x * _xscale + _position.location.x;
+			point->y = _matrix[x][z] + _position.location.y;
+			point->z =   z * _xscale + _position.location.z;
 		}
 
 		void setLocation(slVector *location);
@@ -75,36 +77,51 @@ class slTerrain: public slWorldObject {
 
 		int loadGeoTIFF(char *file);
 
-		float **matrix;
+		float **_matrix;
 		slVector **fnormals[2];
 
 		int _initialized;
 
-		int side;
+		int _side;
 		int _repeating;
 
 		int _drawMode;
 
-		double xscale;
+		double _xscale;
 
 		// float h;
 	
-		double heightDelta;
-		double heightMin;
+		double _heightDelta;
+		double _heightMin;
 
 		// color at the valleys and peaks
 
-		slVector bottomColor;
-		slVector topColor;
+		void setTopColor( slVector *color );
+		void setBottomColor( slVector *color );
+
+		slVector _bottomColor;
+		slVector _topColor;
 
 		slRoamPatch *_roam;
 
 		int _polygonsDrawn;
 		int _desiredPolygons;
 
-
 		void makeNormals();
 		void initialize();
+
+		int  shapeClip( slVclipData *vc, int x, int y, slCollision *ce, int flip );
+		int sphereClip( slVclipData *vc, int x, int y, slCollision *ce, int flip );
+
+		double pointClip( slPosition *pp, slPoint *p, slCollision *ce );
+
+		void facesUnderRange( double minX, double maxX, double minZ, double maxZ,
+    		int *startX, int *endX, int *startZ, int *endZ, int *earlyStart, int *lateEnd);
+
+		void setHeight( int x, int y, double height );
+		double getHeight( int x, int y );
+
+		int areaUnderPoint( slVector *origpoint, int *x, int *z, int *quad );
 };
 
 #endif
@@ -115,14 +132,7 @@ extern "C" {
 
 int slTerrainTestPair(slVclipData *vc, int x, int y, slCollision *ce);
 
-void slTerrainFacesUnderRange(slTerrain *l, 
-	double minX, double maxX, double minZ, double maxZ,
-	int *startx, int *endx, int *startz, int *endz,
-	int *earlyStart, int *lateEnd);
-
 int slTerrainPlaneUnderPoint(slTerrain *l, slVector *point, slPlane *plane);
-int slTerrainSphereClip(slVclipData *vc, slTerrain *l, int x, int y, slCollision *ce, int flip);
-int slTerrainShapeClip(slVclipData *vc, slTerrain *l, int obX, int obY, slCollision *ce, int flip);
 double slPointTerrainClip(slTerrain *t, slPosition *pp, slPoint *p, slCollision *ce);
 
 int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosition *position, slPlane *facePlane, slCollision *ce);
@@ -130,12 +140,6 @@ int slTerrainEdgePlaneClip(slVector *start, slVector *end, slFace *face, slPosit
 int slPointIn2DTriangle(slVector *vertex, slVector *a, slVector *b, slVector *c);
 
 slSerializedTerrain *slSerializeTerrain(slTerrain *t, int *size);
-
-void slTerrainSetHeight(slTerrain *t, int x, int y, double height);
-double slTerrainGetHeight(slTerrain *t, int x, int y);
-
-void slTerrainSetTopColor(slTerrain *t, slVector *color);
-void slTerrainSetBottomColor(slTerrain *t, slVector *color);
 
 void slTerrainGetSlope(slTerrain *t, double x1, double z1, double x2, double z2, slVector *result);
 

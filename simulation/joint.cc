@@ -34,7 +34,7 @@ void slJoint::setNormal(slVector *normal) {
 
 	// transform the normal to the parent's frame
 
-	if(_parent) slVectorXform(_parent->position.rotation, normal, &tn);
+	if(_parent) slVectorXform(_parent->_position.rotation, normal, &tn);
 	else slVectorCopy(normal, &tn);
 
 	if(_type == JT_REVOLUTE) {
@@ -61,17 +61,17 @@ void slJoint::breakJoint() {
 
 	if(!parent && !child) return;
 
-	childBody = _child->multibody;
+	childBody = _child->_multibody;
 
-	if(parent) parentBody = parent->multibody;
+	if(parent) parentBody = parent->_multibody;
 
 	if(parent) {
-		ji = std::find(parent->outJoints.begin(), parent->outJoints.end(), this);
-		if(ji != parent->outJoints.end()) parent->outJoints.erase(ji);
+		ji = std::find(parent->_outJoints.begin(), parent->_outJoints.end(), this);
+		if(ji != parent->_outJoints.end()) parent->_outJoints.erase(ji);
 	}
 
-	ji = std::find(child->inJoints.begin(), child->inJoints.end(), this);
-	if(ji != child->inJoints.end()) child->inJoints.erase(ji);
+	ji = std::find(child->_inJoints.begin(), child->_inJoints.end(), this);
+	if(ji != child->_inJoints.end()) child->_inJoints.erase(ji);
 
 	dJointAttach(_odeJointID, NULL, NULL);
 	dJointDestroy(_odeJointID);
@@ -260,7 +260,7 @@ void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double r
 	_child->connectedLinks( &childChain, 0);
 
 	if (_parent)
-	   slMatrixMulMatrix(_parent->position.rotation, rotation, ideal);
+	   slMatrixMulMatrix(_parent->_position.rotation, rotation, ideal);
 	else
 	   slMatrixCopy(rotation, ideal);		
 
@@ -269,8 +269,8 @@ void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double r
 	// compute the hinge position--the plinkPoint in world coordinates 
 
 	if(_parent) {
-		slVectorXform(_parent->position.rotation, plinkPoint, &hingePosition);
-		slVectorAdd(&hingePosition, &_parent->position.location, &hingePosition);
+		slVectorXform(_parent->_position.rotation, plinkPoint, &hingePosition);
+		slVectorAdd(&hingePosition, &_parent->_position.location, &hingePosition);
 	} else {
 		slVectorCopy(plinkPoint, &hingePosition);
 	}
@@ -313,7 +313,7 @@ void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double r
 
 	// set the proper positions where the link should actually be at this time 
 
-	slVectorXform(_child->position.rotation, clinkPoint, &childPosition);
+	slVectorXform(_child->_position.rotation, clinkPoint, &childPosition);
 	slVectorSub(&hingePosition, &childPosition, &childPosition);
 
 	if( !first ) {

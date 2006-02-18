@@ -208,7 +208,7 @@ int brIMultibodySetHandleSelfCollisions(brEval args[], brEval *target, brInstanc
 
 	m->setHandleSelfCollisions(BRINT(&args[1]));
 
-	m->initCollisionFlags(i->engine->world->clipData);
+	m->initCollisionFlags( i->engine->world->_clipData );
    
 	return EC_OK;
 }

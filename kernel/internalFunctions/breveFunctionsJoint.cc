@@ -73,12 +73,12 @@ int brJointILinkRevolute(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	if (!(joint = slLinkLinks(i->engine->world, parent, child, JT_REVOLUTE, normal, ppoint, cpoint, BRMATRIX(&args[5])))) {
+	if (!(joint = child->link( i->engine->world, parent, JT_REVOLUTE, normal, ppoint, cpoint, BRMATRIX(&args[5]), BRINT(&args[6]) ) ) ) {
 		slMessage(DEBUG_ALL, "error creating joint: jointLinkRevolute failed\n");
 		return EC_ERROR;
 	}
 
-	joint->userData = i;
+	joint->_userData = i;
 
 	slWorldSetUninitialized(i->engine->world);
 
@@ -149,7 +149,7 @@ int brJointILinkPrismatic(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
  
-	if (!(joint = slLinkLinks(i->engine->world, parent, child, JT_PRISMATIC, normal, ppoint, cpoint, BRMATRIX(&args[5])))) {
+	if (!(joint = child->link( i->engine->world, parent, JT_PRISMATIC, normal, ppoint, cpoint, BRMATRIX(&args[5]), BRINT(&args[6]) ) ) ) {
 		slMessage(DEBUG_ALL, "error creating joint: jointLinkPrismatic failed\n");
 		return EC_ERROR;
 	}
@@ -182,7 +182,7 @@ int brJointILinkBall(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
  
-	if (!(joint = slLinkLinks(i->engine->world, parent, child, JT_BALL, normal, ppoint, cpoint, BRMATRIX(&args[5])))) {
+	if (!(joint = child->link(i->engine->world, parent, JT_BALL, normal, ppoint, cpoint, BRMATRIX(&args[5]), BRINT(&args[6]) ))) {
 		slMessage(DEBUG_ALL, "error creating joint: jointLinkBall failed\n");
 		return EC_ERROR;
 	}
@@ -215,7 +215,7 @@ int brJointILinkUniversal(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
  
-	if (!(joint = slLinkLinks(i->engine->world, parent, child, JT_UNIVERSAL, normal, ppoint, cpoint, BRMATRIX(&args[5])))) {
+	if (!(joint = child->link( i->engine->world, parent, JT_UNIVERSAL, normal, ppoint, cpoint, BRMATRIX(&args[5]), BRINT(&args[6]) ) ) ) {
 		slMessage(DEBUG_ALL, "error creating joint: jointLinkUniversal\n");
 		return EC_ERROR;
 	}
@@ -245,7 +245,7 @@ int brJointILinkStatic(brEval args[], brEval *target, brInstance *i) {
 	slVector *cpoint = &BRVECTOR(&args[4]);
 	slJoint *joint;
 
-	if (!(joint = slLinkLinks(i->engine->world, parent, child, JT_FIX, normal, ppoint, cpoint, BRMATRIX(&args[5])))) {
+	if (!(joint = child->link( i->engine->world, parent, JT_FIX, normal, ppoint, cpoint, BRMATRIX(&args[5]), BRINT(&args[6]) ) ) ) {
 		slMessage(DEBUG_ALL, "error creating joint: jointLinkStatic failed\n");
 		return EC_ERROR;
 	}
@@ -441,11 +441,11 @@ int brIJointSetRepositionAll(brEval args[], brEval *target, brInstance *i) {
 
 void breveInitJointFunctions(brNamespace *n) {
 	brNewBreveCall(n, "jointApplyTorque", brIJointApplyTorque, AT_NULL, AT_POINTER, AT_VECTOR, 0);
-	brNewBreveCall(n, "jointLinkRevolute", brJointILinkRevolute, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
-	brNewBreveCall(n, "jointLinkPrismatic", brJointILinkPrismatic, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
-	brNewBreveCall(n, "jointLinkBall", brJointILinkBall, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
-	brNewBreveCall(n, "jointLinkStatic", brJointILinkStatic, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
-	brNewBreveCall(n, "jointLinkUniversal", brJointILinkUniversal, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, 0);
+	brNewBreveCall(n, "jointLinkRevolute", brJointILinkRevolute, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, AT_INT, 0);
+	brNewBreveCall(n, "jointLinkPrismatic", brJointILinkPrismatic, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, AT_INT, 0);
+	brNewBreveCall(n, "jointLinkBall", brJointILinkBall, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, AT_INT, 0);
+	brNewBreveCall(n, "jointLinkStatic", brJointILinkStatic, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, AT_INT, 0);
+	brNewBreveCall(n, "jointLinkUniversal", brJointILinkUniversal, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, AT_INT, 0);
 
 	brNewBreveCall(n, "jointBreak", brIJointBreak, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "jointSetVelocity", brIJointSetVelocity, AT_NULL, AT_POINTER, AT_VECTOR, 0);

@@ -36,16 +36,16 @@ slCamera::slCamera(int x, int y) {
 	activateContextCallback = NULL;
 	renderContextCallback = NULL;
 
-	text.insert(text.begin(), 8, t);
+	_text.insert( _text.begin(), 8, t );
 
-	textScale = 1;
+	_textScale = 1;
 
 	_width = x;
 	_height = y;
 	_originx = 0;
 	_originy = 0;
 
-	zClip = 500.0;
+	_zClip = 500.0;
 
 	if(y != 0.0) _fov = (double)x/(double)y;
 	else _fov = 40;
@@ -55,42 +55,42 @@ slCamera::slCamera(int x, int y) {
 	// just slightly.  enough so that the alpha bending 
 	// works correctly, but not so that it's visable. 
 
-	rx = 0.001;
-	ry = 0.001;
+	_rx = 0.001;
+	_ry = 0.001;
 
-	drawMode = GL_POLYGON;
+	_drawMode = GL_POLYGON;
 
 	slVectorSet(&_target, 0, 0, 0);
 	slVectorSet(&_location, 0, 10, 100);
 
-	zoom = 10;
+	_zoom = 10;
 
-	drawFog = 0;
-	drawSmooth = 0;
-	drawLights = 0;
-	drawShadow = 0;
-	drawOutline = 0;
-	drawReflection = 0;
-	drawText = 1;
-	blur = 0;
-	blurFactor = 0.1;
+	_drawFog = false;
+	_drawSmooth = false;
+	_drawLights = false;
+	_drawShadow = false;
+	_drawOutline = false;
+	_drawReflection = false;
+	_drawText = true;
+	_drawBlur = false;
+	_blurFactor = 0.1;
 
-	billboardCount = 0;
-	maxBillboards = 8;
-	billboards = (slBillboardEntry**)slMalloc(sizeof(slBillboardEntry*) * maxBillboards);
-	billboardDrawList = 0;
+	_billboardCount = 0;
+	_maxBillboards = 8;
+	_billboards = (slBillboardEntry**)slMalloc(sizeof(slBillboardEntry*) * _maxBillboards);
+	_billboardDrawList = 0;
 
-	fogIntensity = .1;
-	fogStart = 10;	
-	fogEnd = 40;	
+	_fogIntensity = .1;
+	_fogStart = 10;	
+	_fogEnd = 40;	
 
-	for(n=0;n<maxBillboards;n++) billboards[n] = new slBillboardEntry;
+	for( n=0; n < _maxBillboards; n++ ) _billboards[n] = new slBillboardEntry;
 
-	nLights = 1;
+	_nLights = 1;
 
-	slVectorSet(&lights[0].location, 0, 0, 0);
-	slVectorSet(&lights[0].ambient, .6, .6, .6);
-	slVectorSet(&lights[0].diffuse, .6, .9, .9);
+	slVectorSet(&_lights[0].location, 0, 0, 0);
+	slVectorSet(&_lights[0].ambient, .6, .6, .6);
+	slVectorSet(&_lights[0].diffuse, .6, .9, .9);
 }
 
 void slCamera::updateFrustum() {
@@ -122,40 +122,40 @@ void slCamera::updateFrustum() {
 	frust[15] = modl[12] * proj[ 3] + modl[13] * proj[ 7] + modl[14] * proj[11] + modl[15] * proj[15];
 
 	slVectorAdd(&_target, &_location, &loc);
-	slVectorCopy(&loc, &frustumPlanes[0].vertex);
-	slVectorCopy(&loc, &frustumPlanes[1].vertex);
-	slVectorCopy(&loc, &frustumPlanes[2].vertex);
-	slVectorCopy(&loc, &frustumPlanes[3].vertex);
-	slVectorCopy(&loc, &frustumPlanes[4].vertex);
-	slVectorCopy(&loc, &frustumPlanes[5].vertex);
+	slVectorCopy(&loc, &_frustumPlanes[0].vertex);
+	slVectorCopy(&loc, &_frustumPlanes[1].vertex);
+	slVectorCopy(&loc, &_frustumPlanes[2].vertex);
+	slVectorCopy(&loc, &_frustumPlanes[3].vertex);
+	slVectorCopy(&loc, &_frustumPlanes[4].vertex);
+	slVectorCopy(&loc, &_frustumPlanes[5].vertex);
 
-	frustumPlanes[0].normal.x = frust[3 ] - frust[0];
-	frustumPlanes[0].normal.y = frust[7 ] - frust[4];
-	frustumPlanes[0].normal.z = frust[11] - frust[8];
+	_frustumPlanes[0].normal.x = frust[3 ] - frust[0];
+	_frustumPlanes[0].normal.y = frust[7 ] - frust[4];
+	_frustumPlanes[0].normal.z = frust[11] - frust[8];
 
-	frustumPlanes[1].normal.x = frust[3 ] + frust[0];
-	frustumPlanes[1].normal.y = frust[7 ] + frust[4];
-	frustumPlanes[1].normal.z = frust[11] + frust[8];
+	_frustumPlanes[1].normal.x = frust[3 ] + frust[0];
+	_frustumPlanes[1].normal.y = frust[7 ] + frust[4];
+	_frustumPlanes[1].normal.z = frust[11] + frust[8];
 
-	frustumPlanes[2].normal.x = frust[3 ] - frust[1];
-	frustumPlanes[2].normal.y = frust[7 ] - frust[5];
-	frustumPlanes[2].normal.z = frust[11] - frust[9];
+	_frustumPlanes[2].normal.x = frust[3 ] - frust[1];
+	_frustumPlanes[2].normal.y = frust[7 ] - frust[5];
+	_frustumPlanes[2].normal.z = frust[11] - frust[9];
 
-	frustumPlanes[3].normal.x = frust[3 ] + frust[1];
-	frustumPlanes[3].normal.y = frust[7 ] + frust[5];
-	frustumPlanes[3].normal.z = frust[11] + frust[9];
+	_frustumPlanes[3].normal.x = frust[3 ] + frust[1];
+	_frustumPlanes[3].normal.y = frust[7 ] + frust[5];
+	_frustumPlanes[3].normal.z = frust[11] + frust[9];
 
-	slVectorMul(&_location, -1.0, &frustumPlanes[4].normal);
+	slVectorMul(&_location, -1.0, &_frustumPlanes[4].normal);
 
 	// Is this correct?  I don't believe it is!
-	slVectorCopy(&_location, &frustumPlanes[5].normal);
+	slVectorCopy(&_location, &_frustumPlanes[5].normal);
 
-	slVectorNormalize(&frustumPlanes[0].normal);
-	slVectorNormalize(&frustumPlanes[1].normal);
-	slVectorNormalize(&frustumPlanes[2].normal);
-	slVectorNormalize(&frustumPlanes[3].normal);
-	slVectorNormalize(&frustumPlanes[4].normal);
-	slVectorNormalize(&frustumPlanes[5].normal);
+	slVectorNormalize(&_frustumPlanes[0].normal);
+	slVectorNormalize(&_frustumPlanes[1].normal);
+	slVectorNormalize(&_frustumPlanes[2].normal);
+	slVectorNormalize(&_frustumPlanes[3].normal);
+	slVectorNormalize(&_frustumPlanes[4].normal);
+	slVectorNormalize(&_frustumPlanes[5].normal);
 }
 
 /*
@@ -166,7 +166,7 @@ int slCamera::pointInFrustum(slVector *test) {
 	int n;
 
 	for(n=0;n<5;n++) 
-		if(slPlaneDistance(&frustumPlanes[n], test) < 0.0) return 0;
+		if(slPlaneDistance(&_frustumPlanes[n], test) < 0.0) return 0;
 
 	return 1;
 }
@@ -192,7 +192,7 @@ int slCamera::polygonInFrustum(slVector *test, int n) {
 		int plane;
 
 		for(plane=0;plane<5;plane++) {
-			if(slPlaneDistance(&frustumPlanes[plane], &test[x]) < 0.0) {
+			if(slPlaneDistance(&_frustumPlanes[plane], &test[x]) < 0.0) {
 				violations[plane]++;
 				v++;
 			} 
@@ -219,8 +219,8 @@ int slCamera::polygonInFrustum(slVector *test, int n) {
 slCamera::~slCamera() {
 	unsigned int n;
 
-	for(n=0;n<maxBillboards;n++) delete billboards[n];
-	slFree(billboards);
+	for( n = 0; n< _maxBillboards; n++ ) delete _billboards[ n ];
+	slFree( _billboards );
 }
 
 /*!
@@ -236,33 +236,33 @@ void slCamera::update() {
 
 	slVectorSet(&unit, 0, 0, 1);
 
-	/* build individual rotation matrices for rotation around */
-	/* x and y, and then multiply them together */
+	// build individual rotation matrices for rotation around
+	// x and y, and then multiply them together
 
 	slVectorSet(&yaxis, 0, 1, 0);
 	slVectorSet(&xaxis, 1, 0, 0);
 
-	if(isnan(rx)) rx = 0.0;
-	if(isnan(ry)) ry = 0.0;
+	if( isnan(_rx) ) _rx = 0.0;
+	if( isnan(_ry) ) _ry = 0.0;
 
-	rx = fmod(rx, M_PI * 2.0);
-	ry = fmod(ry, M_PI * 2.0);
+	_rx = fmod( _rx, M_PI * 2.0);
+	_ry = fmod( _ry, M_PI * 2.0);
 
-	if(rx < 0.0) rx += 2.0 * M_PI;
-	if(ry < 0.0) ry += 2.0 * M_PI;
+	if( _rx < 0.0) _rx += 2.0 * M_PI;
+	if( _ry < 0.0) _ry += 2.0 * M_PI;
 
-	slRotationMatrix(&yaxis, ry, m);
-	slRotationMatrix(&xaxis, rx, n);
+	slRotationMatrix( &yaxis, _ry, m );
+	slRotationMatrix( &xaxis, _rx, n );
 
-	slMatrixMulMatrix(m, n, rotation);
+	slMatrixMulMatrix( m, n, _rotation );
 
 	// preform the rotation around the unit vector 
 
-	slVectorXform(rotation, &unit, &_location);
+	slVectorXform( _rotation, &unit, &_location );
 
 	// apply the zoom
 	
-	slVectorMul(&_location, zoom, &_location);
+	slVectorMul( &_location, _zoom, &_location );
 }
 
 /*!
@@ -270,17 +270,17 @@ void slCamera::update() {
 */
 
 void slSetCameraText(slCamera *c, int n, char *string, float x, float y, slVector *v) {
-	if((unsigned int)n >= c->text.size() || n < 0) {
+	if((unsigned int)n >= c->_text.size() || n < 0) {
 	    slMessage(DEBUG_ALL, "out of bounds text position %d in slSetCameraText\n", n);
 	    return;
 	}
 
-	c->text[n].text = string;
-	c->text[n].x = x;
-	c->text[n].y = y;
+	c->_text[n].text = string;
+	c->_text[n].x = x;
+	c->_text[n].y = y;
 
-	if(v) slVectorCopy(v, &c->text[n].color);
-	else slVectorZero(&c->text[n].color);
+	if(v) slVectorCopy( v, &c->_text[n].color );
+	else slVectorZero( &c->_text[n].color );
 }
 
 /*!
@@ -291,12 +291,15 @@ void slSetCameraText(slCamera *c, int n, char *string, float x, float y, slVecto
 	catcher.
 */
 
-void slSetShadowCatcher(slCamera *c, slStationary *s, slVector *normal) {
-	slFace *face, *bestFace = NULL;
+void slCamera::setShadowCatcher( slStationary *s, slVector *normal ) {
+	slFace *face;
 	double best = 0.0, dot;
-	std::vector<slFace*>::iterator fi;
+	std::vector< slFace* >::iterator fi;
+	slFace *bestFace = NULL;
 
-	for(fi = s->shape->faces.begin(); fi != s->shape->faces.end(); fi++ ) {
+	const slPosition &position = s->getPosition();
+
+	for( fi = s->_shape->faces.begin(); fi != s->_shape->faces.end(); fi++ ) {
         face = *fi;
 
         dot = slVectorDot(&face->plane.normal, normal);
@@ -309,17 +312,16 @@ void slSetShadowCatcher(slCamera *c, slStationary *s, slVector *normal) {
 
 	if(!bestFace) {
 	    // this shouldn't happen 
-	    c->drawShadow = 0;
+	    _drawShadow = 0;
 	    return;
 	}
 
-	memcpy(&c->shadowPlane, &bestFace->plane, sizeof(slPlane));
+	memcpy( &_shadowPlane, &bestFace->plane, sizeof(slPlane) );
 
-	slVectorAdd(&c->shadowPlane.vertex, &s->position.location, &c->shadowPlane.vertex);
+	slVectorAdd( &_shadowPlane.vertex, &position.location, &_shadowPlane.vertex );
 
-	c->_recompile = 1;
-
-	c->shadowCatcher = s;
+	_recompile = 1;
+	_shadowCatcher = s;
 
 	bestFace->drawFlags |= SD_STENCIL|SD_REFLECT;
 }
@@ -331,23 +333,23 @@ void slSetShadowCatcher(slCamera *c, slStationary *s, slVector *normal) {
 	them from back to front.
 */
 
-void slAddBillboard(slCamera *c, slWorldObject *object, float size, float z) {
+void slCamera::addBillboard( slWorldObject *object, float size, float z ) {
 	unsigned int n, last;
 
-	if(c->billboardCount == c->maxBillboards) {
-	    last = c->maxBillboards;
-	    c->maxBillboards *= 2;
+	if( _billboardCount == _maxBillboards) {
+	    last = _maxBillboards;
+	    _maxBillboards *= 2;
 
-	    c->billboards = (slBillboardEntry**)slRealloc(c->billboards, sizeof(slBillboardEntry*) * c->maxBillboards);
+	    _billboards = (slBillboardEntry**)slRealloc( _billboards, sizeof(slBillboardEntry*) * _maxBillboards);
 
-	    for(n=last;n<c->maxBillboards;n++) c->billboards[n] = new slBillboardEntry;
+	    for( n=last; n< _maxBillboards; n++ ) _billboards[n] = new slBillboardEntry;
 	}
 
-	c->billboards[c->billboardCount]->z = z;
-	c->billboards[c->billboardCount]->size = size;
-	c->billboards[c->billboardCount]->object = object;
+	_billboards[ _billboardCount ]->z = z;
+	_billboards[ _billboardCount ]->size = size;
+	_billboards[ _billboardCount ]->object = object;
 
-	c->billboardCount++;
+	_billboardCount++;
 }
 
 /*!
@@ -374,8 +376,8 @@ void slCamera::getBounds(unsigned int *nx, unsigned int *ny) {
 */
 
 void slCamera::getRotation(double *x, double *y) {
-	*x = rx;
-	*y = ry;
+	*x = _rx;
+	*y = _ry;
 }
 
 /*!
@@ -404,8 +406,8 @@ bool slBillboardCompare(const slBillboardEntry *a, const slBillboardEntry *b) {
 	\brief Sorts the billboards from back to front.
 */
 
-void slSortBillboards(slCamera *c) {
-	std::sort(c->billboards, c->billboards + c->billboardCount, slBillboardCompare);
+void slCamera::sortBillboards( ) {
+	std::sort( _billboards, _billboards + _billboardCount, slBillboardCompare );
 }
 
 /*!
@@ -416,23 +418,23 @@ void slSortBillboards(slCamera *c) {
 	selected.
 */
 
-void slMoveCameraWithMouseMovement(slCamera *camera, double dx, double dy) {
+void slCamera::moveWithMouseMovement( double dx, double dy ) {
 	slVector xaxis, yaxis, tempV, location;
 
-    slVectorSet(&yaxis, 0, 1, 0);
+    slVectorSet( &yaxis, 0, 1, 0 );
+	slVectorCopy( &_location, &location );
 
-	slVectorCopy(&camera->_location, &location);
+	slVectorCross( &location, &yaxis, &xaxis );
+	slVectorNormalize( &xaxis );
+	slVectorMul( &xaxis, _zoom * -dx / 100.0, &tempV );
+	slVectorSub( &_target, &tempV, &_target );
 
-	slVectorCross(&location, &yaxis, &xaxis);
-	slVectorNormalize(&xaxis);
-	slVectorMul(&xaxis, camera->zoom * -dx / 100.0, &tempV);
-	slVectorSub(&camera->_target, &tempV, &camera->_target);
+	slVectorCross( &location, &xaxis, &tempV );
+	slVectorNormalize( &tempV );
 
-	slVectorCross(&location, &xaxis, &tempV);
-	slVectorNormalize(&tempV);                
-	if(tempV.y > 0) slVectorMul(&tempV, -1, &tempV);
-	slVectorMul(&tempV, camera->zoom * -dy / 100.0, &tempV);
-	slVectorAdd(&camera->_target, &tempV, &camera->_target);    
+	if(tempV.y > 0) slVectorMul( &tempV, -1, &tempV );
+	slVectorMul( &tempV, _zoom * -dy / 100.0, &tempV );
+	slVectorAdd( &_target, &tempV, &_target ); 
 }
 
 /*!
@@ -443,13 +445,13 @@ void slMoveCameraWithMouseMovement(slCamera *camera, double dx, double dy) {
 	sineelected.
 */
 
-void slRotateCameraWithMouseMovement(slCamera *camera, double dx, double dy) {
-	if(camera->rx > M_PI/2.0 && camera->rx < 3.0/2.0 * M_PI) dy *= -1;
+void slCamera::rotateWithMouseMovement( double dx, double dy ) {
+	if( _rx > M_PI/2.0 && _rx < 3.0/2.0 * M_PI ) dy *= -1;
 
-	camera->ry -= dx * .01;
-	camera->rx -= dy * .01;
+	_ry -= dx * .01;
+	_rx -= dy * .01;
 
-	camera->update();
+	update();
 }
 
 /*!
@@ -460,19 +462,11 @@ void slRotateCameraWithMouseMovement(slCamera *camera, double dx, double dy) {
 	selected.
 */
 
-void slZoomCameraWithMouseMovement(slCamera *camera, double dx, double dy) {
-	if(0.1 * dy < camera->zoom) {
-		camera->zoom -= 0.002 * camera->zoom * dy;
-		camera->update();
+void slCamera::zoomWithMouseMovement( double dx, double dy ) {
+	if( 0.1 * dy < _zoom ) {
+		_zoom -= 0.002 * _zoom * dy;
+		update();
 	} 
-}
-
-void slCameraSetBounds(slCamera *camera, unsigned int dx, unsigned int dy) {
-	camera->setBounds(dx, dy);
-}
-
-void slCameraGetBounds(slCamera *camera, unsigned int *dx, unsigned int *dy) {
-	camera->getBounds(dx, dy);
 }
 
 void slCameraSetRecompile(slCamera *camera) {

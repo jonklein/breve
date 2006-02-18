@@ -1174,11 +1174,16 @@ Abstract : Control (aka Controls) [version 2.3] {
 		setLightExposureSource(source).
 
 	+ to enable-light-exposure-drawing:
+		% Enables drawing of the light exposure buffer to the screen.
 		setDrawLightExposure( 1 ).
+
 	+ to disable-light-exposure-drawing:
+		% Disables drawing of the light exposure buffer to the screen.
 		setDrawLightExposure( 0 ).
 
 	+ to get-light-exposure-camera:
+		% Returns a camera that can be used to control the light detection
+		% light-source.
 		camera = new Camera.
 		camera set-camera-pointer to getLightExposureCamera().
 

@@ -119,6 +119,8 @@ class slJoint {
 
 		void setRepositionAll( bool r) { _repositionAll = r; }
 
+		void *getCallbackData() { return _userData; }
+
 		slLink *_parent;
 		slLink *_child;
 		dJointID _odeJointID;
@@ -142,7 +144,7 @@ class slJoint {
 
 		bool _repositionAll;
 	
-		void *userData;
+		void *_userData;
 
 		dJointFeedback _feedback;
 };

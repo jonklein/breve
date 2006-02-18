@@ -1,0 +1,45 @@
+#
+# A simple recursive 3D turtle-drawing fern demo.
+# by Lee Spector <lspector [at] hampshire.edu >
+#
+
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use TurtleDrawing.
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+    + variables:
+        drawing (object).
+
+    + to init:
+		self set-background-color to (1, 1, 1).
+        drawing = new TurtleDrawing.
+        drawing move to (0, -5, 0).
+        drawing set-line-width to 2.0.
+        self fern size 30.
+
+    + to fern size s (float):
+        if (s >= .4): {
+			drawing push-state.
+            drawing set-color to (random[1.0], random[1.0], random[1.0]).
+            drawing turn-up by 5.
+            drawing forward by s / 25.
+            drawing turn-left by 88.
+            self fern size s * 0.3.
+            drawing turn-right by 82.
+            drawing forward by s / 25.
+            drawing turn-right by 98.
+            self fern size s * 0.3.
+            drawing turn-left by 79.
+            self fern size s * 0.9.
+			drawing pop-state.
+        }
+}
+

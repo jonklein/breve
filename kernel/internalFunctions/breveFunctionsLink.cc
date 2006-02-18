@@ -35,9 +35,9 @@
 int brILinkNew(brEval args[], brEval *target, brInstance *i) {
 	slLink *l;
 
-	l = new slLink(i->engine->world);
+	l = new slLink( i->engine->world );
 
-	slWorldObjectSetCallbackData(l, i);
+	l->setCallbackData( i );
 
 	target->set( l );
 
@@ -51,12 +51,7 @@ int brILinkNew(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brILinkAddToWorld(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
-	slWorldObject *wo;
-
-	wo = slWorldAddObject(i->engine->world, link, WO_LINK);
-
-	target->set( wo );
+	target->set( i->engine->world->addObject( BRLINKPOINTER(&args[0]) ) );
 
 	return EC_OK;
 }
@@ -139,7 +134,8 @@ int brILinkRotateRelative(brEval args[], brEval *target, brInstance *i) {
 	double m[3][3], nm[3][3];
 
 	slRotationMatrix( v, len, m );
-	slMatrixMulMatrix( m, l->getPosition()->rotation, nm );
+
+	slMatrixMulMatrix( m, l->getPosition().rotation, nm );
 
 	l->setRotation( nm );
 
@@ -155,7 +151,7 @@ int brILinkRotateRelative(brEval args[], brEval *target, brInstance *i) {
 int brILinkGetLocation(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]); 
 
-	target->set( link->getPosition()->location );
+	target->set( link->getPosition().location );
 
 	return EC_OK;
 }
@@ -169,7 +165,7 @@ int brILinkGetLocation(brEval args[], brEval *target, brInstance *i) {
 int brILinkGetRotation(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]); 
 
-	target->set( link->getPosition()->rotation );
+	target->set( link->getPosition().rotation );
 
 	return EC_OK;
 }
@@ -441,7 +437,7 @@ int brILinkSetTexture(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slLinkSetTexture(m, texture);
+	m->setTexture( texture );
 
 	return EC_OK;
 }
@@ -461,7 +457,7 @@ int brIVectorFromLinkPerspective(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slVectorInvXform(link->getPosition()->rotation, vector, &BRVECTOR(target));
+	slVectorInvXform( link->getPosition().rotation, vector, &BRVECTOR(target) );
 
 	return EC_OK;
 } 

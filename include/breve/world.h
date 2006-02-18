@@ -88,6 +88,7 @@ enum collisionCallbackTypes {
 
 class slStationary: public slWorldObject {
 	public:
+		slStationary( slShape *s, slVector *loc, double rot[3][3], void *data );
 };
 
 #endif
@@ -101,6 +102,8 @@ class slGISData;
 
 class slWorld {
 	public:
+		slWorld();
+
 		dJointGroupID _odeJointGroupID;
 	
 		// sunlight detection
@@ -117,7 +120,7 @@ class slWorld {
 		void setLightExposureSource( slVector *src ) { slVectorCopy( src, &_lightExposureCamera._location); }
 
 		slCamera *getLightExposureCamera( ) { return &_lightExposureCamera; }
-	
+
 		// integration vectors -- DV_VECTOR_COUNT depends on the requirements
 		// of the integration algorithm we're using... mbEuler requires only 
 		// a single derivation vector, while RK4 needs about 6.
@@ -129,32 +132,32 @@ class slWorld {
 		// the collision callback is called when the collision is detected --
 		// at the estimated time of collision.  
 	
-		void (*collisionCallback)(void *body1, void *body2, int type);
+		void (*_collisionCallback)(void *body1, void *body2, int type);
 	
 		// the collisionCheckCallback is a callback defined by the program
 		// using the physics engine.  it takes two userData (see slWorldObject)
 		// pointers and returns whether collision detection should be preformed
 		// on the objects or not.
 	
-		int (*collisionCheckCallback)(void *body1, void *body2, int type);
+		int (*_collisionCheckCallback)(void *body1, void *body2, int type);
 	
 		// age is the simulation time of the world.
 	
 		double _age;
 	
-		std::vector<slWorldObject*> objects;
-		std::vector<slPatchGrid*> patches;
-		std::vector<slCamera*> cameras;
-		std::vector<slObjectConnection*> connections;
-		std::vector<slDrawCommandList*> drawings;
+		std::vector< slWorldObject* > objects;
+		std::vector< slPatchGrid* > patches;
+		std::vector< slCamera* > cameras;
+		std::vector< slObjectConnection* > _connections;
+		std::vector< slDrawCommandList* > drawings;
 	
 		// we have one slVclipData for the regular collision detection
 		// and one which will be used to answer "proximity" questions:
 		// to allow objects to ask for all objects within a certain radius
 	
 		slPatchGrid *_clipGrid;
-		slVclipData *clipData;
-		slVclipData *proximityData;
+		slVclipData *_clipData;
+		slVclipData *_proximityData;
 	
 		slVector _gravity;
 	
@@ -168,6 +171,22 @@ class slWorld {
 		int isBackgroundImage;
 
 		slGISData *gisData;
+
+		void updateNeighbors();
+
+		double getAge();
+		void setAge( double age );
+
+		void removeConnection( slObjectConnection* );
+		void addConnection( slObjectConnection* );
+
+		double runWorld( double, double, int* );
+		double step( double, int* );
+
+		void setGravity( slVector* );
+
+		slWorldObject *addObject( slWorldObject* );
+		void removeObject( slWorldObject* );
 
 #if HAVE_LIBENET
 		slNetsimData netsimData;
@@ -200,8 +219,6 @@ class slWorld {
 #ifdef __cplusplus
 extern "C"{
 #endif
-slWorld *slWorldNew(void);
-slWorldObject *slWorldNewObject(void *, int);
 
 int slWorldStartNetsimServer(slWorld *);
 int slWorldStartNetsimSlave(slWorld *, char *);
@@ -217,29 +234,13 @@ void slWorldFreeObject(slWorldObject *);
 void slFreeClipData(slVclipData *);
 void slRenderWorldCameras(slWorld *);
 
-slWorldObject *slWorldAddObject(slWorld *, slWorldObject *, int);
-void slRemoveObject(slWorld *, slWorldObject *);
-
-double slRunWorld(slWorld *, double, double, int *);
-double slWorldStep(slWorld *, double, int *);
-void slNeighborCheck(slWorld *);
-
 slVclipData *slVclipDataNew(void);
-
-slStationary *slNewStationary(slShape *, slVector *, double [3][3], void *);
-
-void slWorldSetGravity(slWorld *, slVector *);
 
 void slWorldSetBoundsOnlyCollisionDetection(slWorld *, int);
 
 void slInitProximityData(slWorld *);
 
 slObjectLine *slWorldAddObjectLine(slWorld *, slWorldObject *, slWorldObject *, int, slVector *);
-void slWorldRemoveConnection(slWorld *, slObjectConnection *);
-void slWorldAddConnection(slWorld *, slObjectConnection *);
-
-double slWorldGetAge(slWorld *);
-void slWorldSetAge(slWorld *, double);
 
 void slWorldSetUninitialized(slWorld *);
 void slWorldSetCollisionResolution(slWorld *, int);

@@ -20,6 +20,7 @@
 
 #include "util.h"
 #include "shape.h"
+#include "glIncludes.h"
 
 #ifndef _CAMERA_H
 #define _CAMERA_H
@@ -92,11 +93,31 @@ struct slBillboardEntry {
 
 class slCamera {
 	public:
-		slLight lights[8];
-		int nLights;
-
 		slCamera(int width = 200, int height = 200);
 		~slCamera();
+
+		void renderWorld( slWorld *w, int crosshair, int scissor );
+		void renderScene( slWorld *w, int crosshair );
+		void renderObjects( slWorld *w, unsigned int flags );
+		void renderText( slWorld *w, int crosshair );
+		void renderLabels( slWorld *w );
+		void renderLines( slWorld *w );
+		void drawLights( int noDiffuse );
+		void drawBackground( slWorld *w );
+
+		void clear( slWorld *w );
+
+		void stencilFloor();
+
+		void reflectionPass( slWorld *w );
+		void shadowPass( slWorld *w );
+
+		int select( slWorld *w, int x, int y );
+		int vectorForDrag( slWorld *w, slVector *dragVertex, int x, int y, slVector *dragVector );
+
+		void detectLightExposure( slWorld *w, int size, GLubyte *buffer );
+
+		void drawFog( );
 
 		void updateFrustum();
 
@@ -109,78 +130,89 @@ class slCamera {
 		void getRotation(double *, double *);
 		void setRecompile();
 
+		void renderBillboards( int flags );
+		void processBillboards( slWorld *w );
+		void addBillboard( slWorldObject *object, float size, float z );
+		void sortBillboards();	
+	
 		void update();
 
+		void rotateWithMouseMovement( double, double );
+		void moveWithMouseMovement( double, double );
+		void zoomWithMouseMovement( double, double );
+
+		void setShadowCatcher( slStationary *, slVector * );
+				
 		std::vector< std::pair< slVector, slVector> > _points;
 
-		// unsigned char enabled;
+		slWorldObject *_shadowCatcher;
 
-		slWorldObject *shadowCatcher;
+		int _flags;
 
-		int flags;
-
-		double zClip;
+		double _zClip;
 
 		// used during drawing
 
-		slBillboardEntry **billboards;
-		unsigned int billboardCount;
-		unsigned int maxBillboards;
-		int billboardDrawList;
+		slBillboardEntry **_billboards;
+		unsigned int _billboardCount;
+		unsigned int _maxBillboards;
+		GLuint _billboardDrawList;
 	
-		slVector billboardX;
-		slVector billboardY;
-		slVector billboardZ;
+		slVector _billboardX;
+		slVector _billboardY;
+		slVector _billboardZ;
 	
 		// recompile can be set to 1 at any time to force recompilation 
 		// of draw lists next time the world is drawn. 
 	
 		unsigned char _recompile;
 	
-		std::vector<slCameraText> text;
+		std::vector<slCameraText> _text;
 	
-		double textScale;
+		double _textScale;
 	
-		unsigned char drawMode;
-		bool drawLights;
-		bool drawFog;
-		bool drawSmooth;
-		bool drawShadow;
-		bool drawShadowVolumes;
-		bool drawOutline;
-		bool drawReflection;
-		bool drawText;
-		bool blur;
+		unsigned char _drawMode;
+		bool _drawLights;
+		bool _drawFog;
+		bool _drawSmooth;
+		bool _drawShadow;
+		bool _drawShadowVolumes;
+		bool _drawOutline;
+		bool _drawReflection;
+		bool _drawText;
+		bool _drawBlur;
 
-		double blurFactor;
+		double _blurFactor;
 	
-		slVector fogColor;
+		slVector _fogColor;
 	
-		double fogIntensity;
-		double fogStart;
-		double fogEnd;
+		double _fogIntensity;
+		double _fogStart;
+		double _fogEnd;
 	
-		slPlane shadowPlane;
+		slPlane _shadowPlane;
+		slLight _lights[8];
+		int _nLights;
 	
 		// offset & target of camera
 	
 		slVector _location;
 		slVector _target; 
-		double rotation[3][3];
+		double _rotation[3][3];
 	
 		// rotation & zoom 
 
-		double rx, ry;
-		double zoom;
+		double _rx, _ry;
+		double _zoom;
 	
-		double backgroundScrollX, backgroundScrollY;
+		double _backgroundScrollX, _backgroundScrollY;
 	
 		// the window's perspective of x and y axis at the current rotation 
 	
-		slVector xAxis;
-		slVector yAxis;
+		slVector _xAxis;
+		slVector _yAxis;
 	
-		slPlane frustumPlanes[6];
+		slPlane _frustumPlanes[6];
 	
 		// camera size 
 		
@@ -196,26 +228,15 @@ class slCamera {
 	
 		int (*activateContextCallback)();
 		void (*renderContextCallback)(slWorld *w, slCamera *c);
+
+
 };
 
 void slSetCameraText(slCamera *, int, char *, float, float, slVector *);
-void slSetShadowCatcher(slCamera *, slStationary *, slVector *);
-
-void slAddBillboard(slCamera *, slWorldObject *, float, float);
-
-void slSortBillboards(slCamera *);
 
 int slBillboardSortFunc(const void *, const void *);
-
-void slRotateCameraWithMouseMovement(slCamera *, double, double);
-void slMoveCameraWithMouseMovement(slCamera *, double, double);
-void slZoomCameraWithMouseMovement(slCamera *, double, double);
-
 void slCameraSetActivateContextCallback(slCamera *, int (*)(void));
 
-void slCameraUpdate(slCamera *);
 void slCameraSetRecompile(slCamera *);
-void slCameraSetBounds(slCamera*, unsigned int, unsigned int);
-void slCameraGetBounds(slCamera*, unsigned int*, unsigned int*);
 
 #endif /* _CAMERA_H */

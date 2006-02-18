@@ -68,7 +68,7 @@ int brISpringSetMode(brEval args[], brEval *target, brInstance *i) {
 }
 
 int brISpringRemove(brEval args[], brEval *target, brInstance *i) {
-	slWorldRemoveConnection(i->engine->world, BRSPRINGPOINTER(&args[0]));
+	i->engine->world->removeConnection( BRSPRINGPOINTER(&args[0]) );
 
 	return EC_OK;
 }

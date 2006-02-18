@@ -70,8 +70,6 @@ PhysicalControl : Walker {
 
 		locked = 0.
 
-		new TouchSensor.
-
 		self set-random-seed-from-dev-random.
 
 		self enable-fast-physics.

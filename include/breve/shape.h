@@ -292,7 +292,7 @@ extern "C" {
  * \brief Transforms a vector with the given position.
  */
 
-slVector *slPositionVertex(slPosition *p, slVector *v, slVector *o);
+slVector *slPositionVertex( const slPosition *p, const slVector *v, slVector *o );
 
 slShape *slNewCube(slVector *size, double density);
 slShape *slNewNGonDisc(int count, double radius, double height, double density);

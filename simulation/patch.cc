@@ -238,7 +238,7 @@ slPatchGrid::~slPatchGrid() {
  *  getPatchAtLocation returns the patch which contains the point.
  *
  */
-slPatch* slPatchGrid::getPatchAtLocation(slVector *location) {
+slPatch* slPatchGrid::getPatchAtLocation( const slVector *location ) {
 	double x, y, z;
 	
 	x = ((location->x - startPosition.x) / patchSize.x);
@@ -262,7 +262,7 @@ void slPatchGrid::assignObjectsToPatches(slWorld *w) {
 	// unsigned int ob;
 	std::vector< slWorldObject* >::iterator wo;
 
-	slVclipData *vc = w->clipData;
+	slVclipData *vc = w->_clipData;
 
 	slCollision *ce = slNextCollision(vc);
 
@@ -276,7 +276,7 @@ void slPatchGrid::assignObjectsToPatches(slWorld *w) {
 
 	for(x = 0; x < w->objects.size(); x++ ) {
 		slWorldObject *w1 = w->objects[x];
-		slPatch *p = getPatchAtLocation( &w1->position.location);
+		slPatch *p = getPatchAtLocation( &w1->getPosition().location);
 
 		if(p) {
 			std::vector< slPatch* >::iterator pi;

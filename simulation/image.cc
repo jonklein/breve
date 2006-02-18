@@ -63,10 +63,10 @@ void slJPEGErrorExit(j_common_ptr);
 	image.
 */
 
-unsigned char *slReadImage(char *name, int *width, int *height, int *components, int alpha) {
-	char *last;
+unsigned char *slReadImage( const char *name, int *width, int *height, int *components, int alpha ) {
+	const char *last;
 
-	last = &name[strlen(name) - 1];
+	last = &name[ strlen(name) - 1 ];
 
 	while (last >= name && *last != '.')
 		--last;
@@ -298,7 +298,7 @@ void slSGIImageGetRow(slSGIImageRec *image, unsigned char *buf, int y, int z) {
     }
 }
 
-unsigned char *slReadSGIImage(char *name, int *width, int *height, int *components, int usealpha) {
+unsigned char *slReadSGIImage( const char *name, int *width, int *height, int *components, int usealpha ) {
     unsigned char *base;
 	unsigned *lptr;
     unsigned char *rbuf, *gbuf, *bbuf, *abuf;
@@ -358,7 +358,7 @@ unsigned char *slReadSGIImage(char *name, int *width, int *height, int *componen
 }
 
 #if HAVE_LIBJPEG
-unsigned char *slReadJPEGImage(char *name, int *width, int *height, int *components, int usealpha) {
+unsigned char *slReadJPEGImage( const char *name, int *width, int *height, int *components, int usealpha) {
 	struct jpeg_decompress_struct cinfo;
 	slJPEGError jerr;
 	JSAMPARRAY buffer;
@@ -448,7 +448,7 @@ void slJPEGErrorExit(j_common_ptr cinfo)
 #endif
 
 #if HAVE_LIBPNG
-unsigned char *slReadPNGImage(char *name, int *width, int *height, int *components, int usealpha) {
+unsigned char *slReadPNGImage( const char *name, int *width, int *height, int *components, int usealpha ) {
 	FILE *f;
 	png_byte header[8];
 	png_structp png_ptr;
@@ -555,7 +555,7 @@ unsigned char *slReadPNGImage(char *name, int *width, int *height, int *componen
 	bottom-to-top.
 */
 
-int slPNGWrite(char *name, int width, int height, unsigned char *buffer, int channels, int reversed) {
+int slPNGWrite( const char *name, int width, int height, unsigned char *buffer, int channels, int reversed ) {
 	FILE *fp;
 	png_structp png_ptr;
 	png_infop info_ptr;
@@ -631,7 +631,7 @@ int slPNGWrite(char *name, int width, int height, unsigned char *buffer, int cha
 	\brief Takes a PNG snapshot of the current screen output and writes it to a file.
 */
 
-int slPNGSnapshot(slWorld *w, slCamera *c, char *file) {
+int slPNGSnapshot( slWorld *w, slCamera *c, const char *file ) {
 	unsigned char *buf;
 	int r;
 
@@ -664,7 +664,7 @@ int slPNGSnapshot(slWorld *w, slCamera *c, char *file) {
 	of channels), not just the number of pixels.
 */
 
-void slReversePixelBuffer(unsigned char *source, unsigned char *dest, int width, int height) {
+void slReversePixelBuffer( const unsigned char *source, unsigned char *dest, int width, int height ) {
 	for (int n = 0; n < height; ++n)
 		memcpy(&dest[(height - (n + 1)) * width],
 		    &source[n * width], width);

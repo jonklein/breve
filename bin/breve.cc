@@ -276,7 +276,7 @@ void brQuit(brEngine *e) {
 
 	diff = e->realTime.tv_sec + (e->realTime.tv_usec / 1000000.0);
 
-	age = slWorldGetAge(e->world);
+	age = e->world->getAge();
 
 	if (age != 0.0) {
 		printf("%f simulated seconds elapsed\n", age);
@@ -477,9 +477,9 @@ void slDemoMouse(int button, int state, int x, int y) {
 	if (state == GLUT_DOWN) { 
 		gLastX = x;
 		gLastY = y;
-		gStartCamX = frontend->engine->camera->rx;
+		gStartCamX = frontend->engine->camera->_rx;
 
-		brClick(slGlSelect(frontend->engine->world, frontend->engine->camera, x, y));
+		brClick( frontend->engine->camera->select( frontend->engine->world, x, y ) );
 		brGlutMenuUpdate(frontend->engine->controller);
 
 		gMotionCrosshair = 1;
@@ -508,11 +508,11 @@ void slDemoMotion(int x, int y) {
 		if((gMods & GLUT_ACTIVE_SHIFT) || (gSpecial == GLUT_KEY_F4)) { 
 			brDragCallback(frontend->engine, x, y);
 		} else if((gMods & GLUT_ACTIVE_ALT) || (gSpecial == GLUT_KEY_F2)) {
-			slZoomCameraWithMouseMovement(frontend->engine->camera, x - gLastX, y - gLastY);
+			frontend->engine->camera->zoomWithMouseMovement( x - gLastX, y - gLastY);
 		} else if((gMods & GLUT_ACTIVE_CTRL) || (gSpecial == GLUT_KEY_F3)) {
-			slMoveCameraWithMouseMovement(frontend->engine->camera, x - gLastX, y - gLastY);
+			frontend->engine->camera->moveWithMouseMovement( x - gLastX, y - gLastY );
 		} else {
-			slRotateCameraWithMouseMovement(frontend->engine->camera, x - gLastX, y - gLastY);
+			frontend->engine->camera->rotateWithMouseMovement( x - gLastX, y - gLastY);
 		}
 
 		gLastX = x; 

@@ -198,7 +198,7 @@ void slIsort(slVclipData *d, std::vector<slBoundSort*> &list, char boundTypeFlag
 
 		x = currentSort->number; 
 
-		if( d->objects[ x]->_moved || 1) {
+		if( 1 ) {
 
 			// NaNs mess up the logic of the sort since they are not =, < or > than
 			// any other value, meaning they have no proper place in the list.  
@@ -318,7 +318,7 @@ void slInitBoundSortList(std::vector<slBoundSort*> &list, slVclipData *v, char b
 	\brief transforms p1 with the position p, placing the transformed plane in pt.
 */
 
-slPlane *slPositionPlane(slPosition *p, slPlane *p1, slPlane *pt) {
+slPlane *slPositionPlane( const slPosition *p, const slPlane *p1, slPlane *pt ) {
 	slVectorXform(p->rotation, &p1->normal, &pt->normal);
 	slPositionVertex(p, &p1->vertex, &pt->vertex);
 
@@ -329,13 +329,13 @@ slPlane *slPositionPlane(slPosition *p, slPlane *p1, slPlane *pt) {
 	\brief Preforms a second-stage collision check on the specified object pair.
 */
 
-int slVclipData::testPair(slCollisionCandidate *candidate, slCollision *ce) {
+int slVclipData::testPair( slCollisionCandidate *candidate, slCollision *ce ) {
 	int result = 0, iterations = 0;
 	int x, y;
 	int brute = 0;
 
-	slPosition *p1, *p2;
-	slShape *s1, *s2;
+	const slPosition *p1, *p2;
+	const slShape *s1, *s2;
 	slFeature **f1, **f2;
 
 	x = candidate->_x;
@@ -429,10 +429,11 @@ int slVclipData::testPair(slCollisionCandidate *candidate, slCollision *ce) {
 
 int slVclipTestPairAllFeatures(slVclipData *vc, slCollisionCandidate *candidate, slCollision *ce) {
 	int result;
-	slPosition *p1, *p2;
-	slShape *s1, *s2;
-	slFeature **f1, **f2, *fp1, *fp2;
-	std::vector<slFeature*>::iterator fi1, fi2;
+	const slPosition *p1, *p2;
+	const slShape *s1, *s2;
+	slFeature **f1, **f2;
+	const slFeature *fp1, *fp2;
+	std::vector< slFeature* >::iterator fi1, fi2;
 
 	int x, y;
 	
@@ -495,7 +496,7 @@ double slSignEdgePlaneDistanceDeriv(slPlane *p, slVector *edgeVector, slVector *
 	return d * slVectorDot(edgeVector, &p->normal);
 }
 
-int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollision *ce, slPosition *p1, slSphere *s1, slPosition *p2, slSphere *s2) {
+int slSphereSphereCheck(slVclipData *vc, int x, int y, slCollision *ce, const slPosition *p1, slSphere *s1, const slPosition *p2, slSphere *s2) {
 	slVector diff, tempV1;
 	double totalLen, totalDiff, sqrtDiff, depth;
 
@@ -550,10 +551,10 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int x, int y, slCollis
 
 	slPlane transformedPlane;
 
-	slSphere *s1 = (slSphere*)vc->objects[x]->shape;
-	slShape *s2 = vc->objects[y]->shape;
-	slPosition *p1 = &vc->objects[x]->position;
-	slPosition *p2 = &vc->objects[y]->position;
+	const slSphere *s1 = (slSphere*)vc->objects[x]->getShape();
+	const slShape *s2 = vc->objects[y]->getShape();
+	const slPosition *p1 = &vc->objects[x]->getPosition();
+	const slPosition *p2 = &vc->objects[y]->getPosition();
 
 	if(!*feat) *feat = s2->features[0];
 	minFeature = s2->faces[0];
@@ -565,7 +566,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int x, int y, slCollis
 			case FT_FACE:
 				f = (slFace*)*feat;
 
-				included = slClipPoint(&p1->location, f->voronoi, p2, f->edgeCount, &update, NULL);
+				included = slClipPoint( &p1->location, f->voronoi, p2, f->edgeCount, &update, NULL );
 
 				slPositionPlane(p2, &f->plane, &transformedPlane);
 				centerDist = slPlaneDistance(&transformedPlane, &p1->location);
@@ -624,10 +625,10 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int x, int y, slCollis
 					start = e->points[0];
 					end = e->points[1];
 
-					slPositionVertex(p2, &start->vertex, &tStart);
-					slPositionVertex(p2, &end->vertex, &tEnd);
+					slPositionVertex( p2, &start->vertex, &tStart );
+					slPositionVertex( p2, &end->vertex, &tEnd );
 		   
-					dist = slPointLineDist(&tStart, &tEnd, &p1->location, &shPoint) - s1->_radius;
+					dist = slPointLineDist( &tStart, &tEnd, &p1->location, &shPoint ) - s1->_radius;
 
 					if(dist <= MC_TOLERANCE) {
 						if(!ce) return CT_PENETRATE;
@@ -719,7 +720,7 @@ int slSphereShapeCheck(slVclipData *vc, slFeature **feat, int x, int y, slCollis
 	return CT_PENETRATE;
 }
 
-int slPointPointClip(slFeature **nf1, slPosition *p1p, slShape *s1, slFeature **nf2, slPosition *p2p, slShape *s2, slCollision *ce) {
+int slPointPointClip(slFeature **nf1, const slPosition *p1p, const slShape *s1, slFeature **nf2, const slPosition *p2p, const slShape *s2, slCollision *ce) {
 	int update;
 	slVector v1, v2;
    
@@ -754,10 +755,10 @@ int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int x, int 
 	slFace *f;
 	slEdge *e;
 
-	slPosition *ep = &v->objects[x]->position;
-	slPosition *fp = &v->objects[y]->position;
-	slShape *s1 = v->objects[x]->shape;
-	slShape *s2 = v->objects[y]->shape;
+	const slPosition *ep = &v->objects[x]->getPosition();
+	const slPosition *fp = &v->objects[y]->getPosition();
+	const slShape *s1 = v->objects[x]->getShape();
+	const slShape *s2 = v->objects[y]->getShape();
 
 	double maxDist;
 	slFeature *maxFeat;
@@ -878,7 +879,7 @@ int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int x, int 
 	return CT_CONTINUE;
 }
 
-int slEdgePointClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf2, slPosition *pp, slShape *s2, slCollision *ce) {
+int slEdgePointClip(slFeature **nf1, const slPosition *ep, const slShape *s1, slFeature **nf2, const slPosition *pp, const slShape *s2, slCollision *ce) {
 	int update1, update2;
 	double l1, l2; /* edge clip lambdas */
 	slVector edgeVector, eLambda, transEdgeVector, tempV1;
@@ -948,7 +949,7 @@ int slEdgePointClip(slFeature **nf1, slPosition *ep, slShape *s1, slFeature **nf
 	return CT_DISJOINT;
 }
 
-int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2, slPosition *p2, slShape *s2, slCollision *ce) {
+int slEdgeEdgeClip(slFeature **nf1, const slPosition *p1, const slShape *s1, slFeature **nf2, const slPosition *p2, const slShape *s2, slCollision *ce) {
 	int update1, update2;
 	double l1, l2; /* edge lambdas */
 	slPoint *start, *end;
@@ -1160,7 +1161,7 @@ int slEdgeEdgeClip(slFeature **nf1, slPosition *p1, slShape *s1, slFeature **nf2
 /* belongs to because handleLocalMinima needs to traverse through all the */
 /* slFaces in the entire slShape											  */
 
-int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf2, slPosition *fp, slShape *fs, slVclipData *v, int x, int y, slCollision *ce) {
+int slPointFaceClip(slFeature **nf1, const slPosition *pp, const slShape *ps, slFeature **nf2, const slPosition *fp, const slShape *fs, slVclipData *v, int x, int y, slCollision *ce) {
 	int update;
 	int n;
 	slVector tPoint, tEnd;
@@ -1264,7 +1265,7 @@ int slPointFaceClip(slFeature **nf1, slPosition *pp, slShape *ps, slFeature **nf
 	dist will be the violation distance.
 */
 
-int slClipPoint(slVector *p, slPlane *v, slPosition *vp, int vcount, int *update, double *dist) {
+int slClipPoint( const slVector *p, const slPlane *v, const slPosition *vp, const int vcount, int *update, double *dist) {
 	slPlane tVoronoi;	
 	int n;
 	double d;
@@ -1290,8 +1291,8 @@ int slClipPoint(slVector *p, slPlane *v, slPosition *vp, int vcount, int *update
 	\brief Find the maximally violated voronoi plane.
 */
 
-int slClipPointMax(slVector *p, slPlane *v, slPosition *vp, int vcount, int *update, double *dist) {
-	slPlane tVoronoi;	 /* transformed voronoi plane */
+int slClipPointMax( const slVector *p, const slPlane *v, const slPosition *vp, int vcount, int *update, double *dist) {
+	slPlane tVoronoi; // transformed voronoi plane 
 	int n, minFeature = 0;
 	double minScore = 0.0, m;
 
@@ -1339,7 +1340,7 @@ int slClipPointMax(slVector *p, slPlane *v, slPosition *vp, int vcount, int *upd
 	edge the violation occured.  
 */
 
-int slClipEdge(slEdge *e, slPosition *ep, slPlane *voronoi, slPosition *vp, int vcount, int *sf, int *ef, double *hLambda, double *tLambda) {
+int slClipEdge(slEdge *e, const slPosition *ep, slPlane *voronoi, const slPosition *vp, int vcount, int *sf, int *ef, double *hLambda, double *tLambda) {
 	slVector transformedStart, transformedEnd;
 	slPoint *start, *end;
 	
@@ -1352,7 +1353,7 @@ int slClipEdge(slEdge *e, slPosition *ep, slPlane *voronoi, slPosition *vp, int 
 	return slClipEdgePoints(&transformedStart, &transformedEnd, voronoi, vp, vcount, sf, ef, hLambda, tLambda);
 }
 
-int slClipEdgePoints(slVector *transformedStart, slVector *transformedEnd, slPlane *voronoi, slPosition *vp, int vcount, int *sf, int *ef, double *hLambda, double *tLambda) {
+int slClipEdgePoints(slVector *transformedStart, slVector *transformedEnd, slPlane *voronoi, const slPosition *vp, int vcount, int *sf, int *ef, double *hLambda, double *tLambda) {
     double dS, dE, lambda;
     slPlane tVoronoi; 
     int n;
@@ -1438,7 +1439,7 @@ int slClipEdgePoints(slVector *transformedStart, slVector *transformedEnd, slPla
 	combinations.
 */
 
-void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape *s2, slPosition *p2, slFeature **f2p) {
+void slFindCollisionFaces( const slShape *s1, slPosition *p1, slFeature **f1p, const slShape *s2, slPosition *p2, slFeature **f2p) {
 	int count1, count2, x, y;
 	slFeature *f1, *f2;
 	slFace **faces1, **faces2;
@@ -1597,7 +1598,7 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 			face2 = faces2[y];
 			slPositionPlane(p2, &face2->plane, &plane2);
 
-			for(pi = s1->points.begin(); pi != s1->points.end(); pi++ ) {
+			for( pi = s1->points.begin(); pi != s1->points.end(); pi++ ) {
 				point = *pi;
 				slPositionVertex(p1, &point->vertex, &tv);
 				dist = slPlaneDistance(&plane2, &tv);
@@ -1641,7 +1642,7 @@ void slFindCollisionFaces(slShape *s1, slPosition *p1, slFeature **f1p, slShape 
 	the vertices and we compute points on edges that go through the suspect plane.
 */
 
-int slFaceFaceCollisionPoints(slCollision *ce, slShape *s1, slPosition *p1, slFace *face1, slShape *s2, slPosition *p2, slFace *face2) {
+int slFaceFaceCollisionPoints(slCollision *ce, const slShape *s1, slPosition *p1, slFace *face1, const slShape *s2, slPosition *p2, slFace *face2) {
 	int n, update1, update2, included;
 	double l1, l2;
 
@@ -1797,7 +1798,7 @@ int slFaceFaceCollisionPoints(slCollision *ce, slShape *s1, slPosition *p1, slFa
 	\brief Find colliding faces and count collision points for colliding objects.
 */
 
-int slCountFaceCollisionPoints(slCollision *ce, slFeature *f1, slFeature *f2, slPosition *p1, slPosition *p2, slShape *s1, slShape *s2) {
+int slCountFaceCollisionPoints(slCollision *ce, slFeature *f1, slFeature *f2, const slPosition *p1, const slPosition *p2, const slShape *s1, const slShape *s2) {
 	slFeature *newF1 = f1, *newF2 = f2;
 
 	slFindCollisionFaces(s1, p1, &newF1, s2, p2, &newF2);
@@ -1822,7 +1823,7 @@ int slCountFaceCollisionPoints(slCollision *ce, slFeature *f1, slFeature *f2, sl
 	whew.
 */
 
-double slPointLineDist(slVector *p1, slVector *p2, slVector *src, slVector *i) {
+double slPointLineDist( const slVector *p1, const slVector *p2, const slVector *src, slVector *i) {
 	slVector p2m1, srcm1, tempV1;
 	double u, top, bottom;
 

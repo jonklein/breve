@@ -232,8 +232,8 @@ int slUpdateTexture(slCamera *c, GLuint texture, unsigned char *pixels, int widt
 
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	// glTexImage2D(GL_TEXTURE_2D, 0, format, newwidth, newheight, 0, format, GL_UNSIGNED_BYTE, newpixels);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, format, newwidth, newheight, format, GL_UNSIGNED_BYTE, newpixels);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, format, newwidth, newheight, 0, format, GL_UNSIGNED_BYTE, newpixels);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -250,20 +250,20 @@ int slUpdateTexture(slCamera *c, GLuint texture, unsigned char *pixels, int widt
 	return texture;
 }
 
-int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
+int slCamera::select(slWorld *w, int x, int y) {
 	slVector cam;
 	GLuint *selections;
-	GLuint namesInHit, selection_buffer[BUFFER_SIZE];
+	GLuint namesInHit, selection_buffer[ BUFFER_SIZE ];
 	GLint hits, viewport[4];
 	unsigned int min, nearest = 0xffffffff;
 	unsigned int hit = w->objects.size() + 1;
 
-	viewport[0] = c->_originx;
-	viewport[1] = c->_originy;
-	viewport[2] = c->_width;
-	viewport[3] = c->_height;
+	viewport[0] = _originx;
+	viewport[1] = _originy;
+	viewport[2] = _width;
+	viewport[3] = _height;
 
-	glSelectBuffer(BUFFER_SIZE, selection_buffer);
+	glSelectBuffer( BUFFER_SIZE, selection_buffer);
 	glRenderMode(GL_SELECT);
 	slClearGLErrors("selected buffer");
 
@@ -277,7 +277,7 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 	gluPickMatrix((GLdouble)x, (GLdouble)(viewport[3] - y), 5.0, 5.0, viewport);
 	slClearGLErrors("picked matrix");
 
-	gluPerspective(40.0, c->_fov, 0.01, c->zClip);
+	gluPerspective( 40.0, _fov, 0.01, _zClip );
 
 	// since the selection buffer uses unsigned ints for names, we can't 
 	// use -1 to mean no selection -- we'll use the number of objects 
@@ -287,12 +287,12 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 
 	slClearGLErrors("about to select");
 
-	slVectorAdd(&c->_location, &c->_target, &cam);
-	gluLookAt(cam.x, cam.y, cam.z, c->_target.x, c->_target.y, c->_target.z, 0.0, 1.0, 0.0);
+	slVectorAdd( &_location, &_target, &cam);
+	gluLookAt( cam.x, cam.y, cam.z, _target.x, _target.y, _target.z, 0.0, 1.0, 0.0 );
 
 	// Render the objects in the world, with name loading, and with billboards as spheres
 
-	slRenderObjects(w, c, DO_BILLBOARDS_AS_SPHERES | DO_LOAD_NAMES);
+	renderObjects(w, DO_BILLBOARDS_AS_SPHERES | DO_LOAD_NAMES);
 
 	hits = glRenderMode(GL_RENDER);
 
@@ -336,7 +336,7 @@ int slGlSelect(slWorld *w, slCamera *c, int x, int y) {
 	is being dragged to when the window mouse coordinates are x and y.
 */
 
-int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y, slVector *dragVector) {
+int slCamera::vectorForDrag(slWorld *w, slVector *dragVertex, int x, int y, slVector *dragVector) {
 	slPlane plane;
 	slVector cam, end;
 	GLdouble model[16];
@@ -349,24 +349,24 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 
 	// set up the matrices for a regular draw--gluUnProject needs this 
 
-	t = &c->_target;
+	t = &_target;
 
-	view[0] = c->_originx;
-	view[1] = c->_originy;
-	view[2] = c->_width;
-	view[3] = c->_height;
+	view[0] = _originx;
+	view[1] = _originy;
+	view[2] = _width;
+	view[3] = _height;
 
-	glViewport(c->_originx, c->_originy, c->_width, c->_height);
+	glViewport( _originx, _originy, _width, _height );
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	gluPerspective(40.0, c->_fov, 0.1, c->zClip);
+	gluPerspective(40.0, _fov, 0.1, _zClip);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	slVectorAdd(&c->_location, t, &cam);
-	gluLookAt(cam.x, cam.y, cam.z, t->x, t->y, t->z, 0.0, 1.0, 0.0);
+	slVectorAdd( &_location, t, &cam );
+	gluLookAt( cam.x, cam.y, cam.z, t->x, t->y, t->z, 0.0, 1.0, 0.0 );
 
 	// get the data for gluUnProject
 
@@ -389,7 +389,7 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 
 	// define the plane where the object in question lies 
 
-	slVectorCopy(&c->_location, &plane.normal);
+	slVectorCopy( &_location, &plane.normal);
 	slVectorNormalize(&plane.normal);
 	slVectorCopy(dragVertex, &plane.vertex);
 
@@ -419,53 +419,52 @@ int slVectorForDrag(slWorld *w, slCamera *c, slVector *dragVertex, int x, int y,
 	return 0;
 }
 
-void slRenderScene(slWorld *w, slCamera *c, int crosshair) {
+void slCamera::renderScene(slWorld *w, int crosshair) {
 	std::vector< slCamera* >::iterator ci;
 
 	if ( w->_detectLightExposure && !w->_drawLightExposure )
-		slDetectLightExposure(w, c, 200, NULL);
+		detectLightExposure(w, 200, NULL);
 
-	slRenderWorld(w, c, crosshair, 0);
+	renderWorld(w, crosshair, 0);
  
-	for(ci = w->cameras.begin(); ci != w->cameras.end(); ci++)
-        if (c != *ci) slRenderWorld( w, *ci, 0, 1 );
+	for( ci = w->cameras.begin(); ci != w->cameras.end(); ci++)
+        if ( *ci != this ) ( *ci )->renderWorld( w, 0, 1 );
 
 	if ( w->_detectLightExposure && w->_drawLightExposure )
-		slDetectLightExposure(w, c, 200, NULL);
+		detectLightExposure(w, 200, NULL);
 }
 
-void slRenderWorld( slWorld *w, slCamera *c, int crosshair, int scissor ) {
+void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 	slVector cam;
 	int flags = 0;
 
-	if (!w || !c)
-		return;
+	if ( !w ) return;
 
-	glViewport( c->_originx, c->_originy, c->_width, c->_height );
+	glViewport( _originx, _originy, _width, _height );
 
 	if ( scissor ) {
 		flags |= DO_NO_AXIS | DO_NO_BOUND;
 		glEnable(GL_SCISSOR_TEST);
-		glScissor( c->_originx, c->_originy, c->_width, c->_height );
+		glScissor( _originx, _originy, _width, _height );
 	}
 
-	if (c->drawOutline)
+	if ( _drawOutline )
 		flags |= DO_OUTLINE | DO_BILLBOARDS_AS_SPHERES;
 
-	if ( c->_recompile ) {
-		c->_recompile = 0;
+	if ( _recompile ) {
+		_recompile = 0;
 		flags |= DO_RECOMPILE;
 	}
 
-	slClear(w, c);
+	clear( w );
 	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
 	if (w->backgroundTexture > 0 && !(flags & DO_OUTLINE))
-		slDrawBackground(c, w);
+		drawBackground( w );
 
-	gluPerspective(40.0, c->_fov, 0.01, c->zClip);
+	gluPerspective( 40.0, _fov, 0.01, _zClip );
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -473,42 +472,33 @@ void slRenderWorld( slWorld *w, slCamera *c, int crosshair, int scissor ) {
 	glPushMatrix();
 	glLoadIdentity();
 
-	slVectorAdd(&c->_location, &c->_target, &cam);
-	gluLookAt(cam.x, cam.y, cam.z, c->_target.x, c->_target.y, c->_target.z, 0.0, 1.0, 0.0);
+	slVectorAdd(&_location, &_target, &cam);
+	gluLookAt(cam.x, cam.y, cam.z, _target.x, _target.y, _target.z, 0.0, 1.0, 0.0);
 
-	c->updateFrustum();
+	updateFrustum();
 
-	if (c->drawFog)
-		slDrawFog(w, c);
-	else
-		glDisable(GL_FOG);
+	drawFog();
 
 	// do a pass through to grab all the billboards--we want to sort them 
 	// so that they can be rendered back to front and blended correctly
 
-	if (c->drawLights) {
-		if (c->drawShadowVolumes)
-			slDrawLights(c, 1);
-		else
-			slDrawLights(c, 0);
+	if ( _drawLights) {
+		if ( _drawShadowVolumes ) drawLights( 1 );
+		else drawLights( 0 );
 
-		if (c->drawReflection || c->drawShadow)
-			slStencilFloor(w, c);
+		if ( _drawReflection || _drawShadow) stencilFloor( );
 
-		if (c->drawReflection && !(flags & DO_OUTLINE)) {
+		if ( _drawReflection && !(flags & DO_OUTLINE) ) {
 			slVector toCam;
 
-			if (!c->drawShadowVolumes)
-				gReflectionAlpha = REFLECTION_ALPHA;
-			else
-				gReflectionAlpha = REFLECTION_ALPHA - 0.1;
+			if ( !_drawShadowVolumes ) gReflectionAlpha = REFLECTION_ALPHA;
+			else gReflectionAlpha = REFLECTION_ALPHA - 0.1;
 
-			slVectorSub(&cam, &c->shadowPlane.vertex, &toCam);
+			slVectorSub( &cam, &_shadowPlane.vertex, &toCam );
 
-			if (slVectorDot(&toCam, &c->shadowPlane.normal) > 0.0) {
-				slReflectionPass(w, c);
-				if (c->drawShadowVolumes)
-					slDrawLights(c, 1);
+			if ( slVectorDot( &toCam, &_shadowPlane.normal ) > 0.0 ) {
+				reflectionPass( w );
+				if ( _drawShadowVolumes) drawLights( 1 );
 			}
 		}
 	} else
@@ -516,54 +506,50 @@ void slRenderWorld( slWorld *w, slCamera *c, int crosshair, int scissor ) {
 
 	// render the mobile objects
 
-	slRenderObjects(w, c, flags | DO_NO_ALPHA);
-	slRenderLines(w, c);
+	renderObjects( w, flags | DO_NO_ALPHA );
+	renderLines( w );
 	slClearGLErrors("drew multibodies and lines");
 
 	// now we do transparent objects and billboards.  they have to come last 
 	// because they are blended.
 
 	if (!(flags & DO_BILLBOARDS_AS_SPHERES)) {
-		slProcessBillboards(w, c);
-		slRenderBillboards(c, flags);
+		processBillboards( w );
+		renderBillboards( flags );
 	}
 
 	std::vector<slPatchGrid*>::iterator pi;
 	for (pi = w->patches.begin(); pi != w->patches.end(); pi++)
-		(*pi)->draw(c);
+		(*pi)->draw( this );
 
-	if (c->drawLights) {
-		// do the shadows
-		if (c->drawShadowVolumes)
-			w->renderShadowVolume(c);
-		else if (c->drawShadow)
-			slShadowPass(w, c);
+	if ( _drawLights ) {
+		if ( _drawShadowVolumes ) w->renderShadowVolume( this );
+		else if ( _drawShadow ) shadowPass( w );
 	}
 
 	std::vector<slDrawCommandList*>::iterator di;
-	for(di = w->drawings.begin(); di != w->drawings.end(); di++) (*di)->draw(c);
+	for(di = w->drawings.begin(); di != w->drawings.end(); di++) (*di)->draw( this );
 
 	glDepthMask(GL_FALSE);
-	slRenderObjects(w, c, flags | DO_ONLY_ALPHA);
+	renderObjects(w, flags | DO_ONLY_ALPHA);
 	glDepthMask(GL_TRUE);
 
-	slRenderLabels(w);
+	renderLabels(w);
 
 #if HAVE_LIBENET
 	slDrawNetsimBounds(w);
 #endif
 
-	if (w->gisData) w->gisData->draw(c);
+	if (w->gisData) w->gisData->draw( this );
 
 	glPopMatrix();
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	if (c->drawText)
-		slRenderText(w, c, &c->_location, &c->_target, crosshair);
+	if ( _drawText ) renderText( w, crosshair );
 
-	if (c->drawText && crosshair && !scissor) {
+	if ( _drawText && crosshair && !scissor) {
 		glPushMatrix();
 		glColor3f(0, 0, 0);
 		slText(0, 0, "+", GLUT_BITMAP_9_BY_15);
@@ -602,24 +588,24 @@ void slRenderWorld( slWorld *w, slCamera *c, int crosshair, int scissor ) {
 	}
 }
 
-void slClear(slWorld *w, slCamera *c) {
-	if (c->drawOutline)
+void slCamera::clear( slWorld *w ) {
+	if ( _drawOutline )
 		glClearColor(1, 1, 1, 0);
 	else
 		glClearColor(w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 1.0);
 
-	if (!c->blur)
+	if ( !_drawBlur )
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 	else {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		glColor4f(w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 0.5f - (c->blurFactor / 2.0));
+		glColor4f(w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 0.5f - ( _blurFactor / 2.0));
 
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
-		gluPerspective(40.0, c->_fov, 0.01, c->zClip);
+		gluPerspective(40.0, _fov, 0.01, _zClip);
 		glBegin(GL_TRIANGLE_STRIP);
 			glVertex3f(-5, -4, -3);
 			glVertex3f(5, -4, -3);
@@ -632,35 +618,39 @@ void slClear(slWorld *w, slCamera *c) {
 	}
 }
 
-void slDrawFog(slWorld *w, slCamera *c) {
-	GLfloat fog_color[4];
+void slCamera::drawFog() {
+	if( _drawFog ) {
+		GLfloat color[4];
 
-	fog_color[0] = c->fogColor.x;
-	fog_color[1] = c->fogColor.y;
-	fog_color[2] = c->fogColor.z;
-	fog_color[3] = 1.0;
+		color[0] = _fogColor.x;
+		color[1] = _fogColor.y;
+		color[2] = _fogColor.z;
+		color[3] = 1.0;
 
-	glEnable(GL_FOG);
-	glFogf(GL_FOG_DENSITY, c->fogIntensity);
-	glHint(GL_FOG_HINT, GL_NICEST);
-	glFogi(GL_FOG_MODE, GL_LINEAR);
-	glFogf(GL_FOG_START, c->fogStart);
-	glFogf(GL_FOG_END, c->fogEnd);
-	glFogfv(GL_FOG_COLOR, fog_color);
+		glEnable(GL_FOG);
+		glFogf( GL_FOG_DENSITY, _fogIntensity );
+		glHint( GL_FOG_HINT, GL_NICEST );
+		glFogi( GL_FOG_MODE, GL_LINEAR );
+		glFogf( GL_FOG_START, _fogStart) ;
+		glFogf( GL_FOG_END, _fogEnd );
+		glFogfv( GL_FOG_COLOR, color );
+	} else {
+		glDisable( GL_FOG );
+	}
 }
 
 /*!
 	\brief Puts 1 into the stencil buffer where the shadows and reflections should fall.
 */
 
-void slStencilFloor(slWorld *w, slCamera *c) {
+void slCamera::stencilFloor() {
 	glEnable(GL_STENCIL_TEST);
 	glDisable(GL_DEPTH_TEST);
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 	glStencilFunc(GL_ALWAYS, 1, 0xffffffff);
 	glStencilOp(GL_ZERO, GL_ZERO, GL_REPLACE);
 
-	c->shadowCatcher->draw(c);
+	_shadowCatcher->draw( this );
 
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glEnable(GL_DEPTH_TEST);
@@ -671,12 +661,12 @@ void slStencilFloor(slWorld *w, slCamera *c) {
 	\brief Draws a reflection of all multibody objects whereever the stencil buffer is equal to 1.
 */
 
-void slReflectionPass(slWorld *w, slCamera *c) {
+void slCamera::reflectionPass( slWorld *w ) {
 	glPushMatrix();
 
 	glScalef(1.0, -1.0, 1.0);
-	glTranslatef(0.0, -2*c->shadowPlane.vertex.y, 0.0);
-	slDrawLights(c, 0);
+	glTranslatef( 0.0, -2 * _shadowPlane.vertex.y, 0.0 );
+	drawLights( 0 );
 
 	glCullFace(GL_FRONT);
 
@@ -690,8 +680,9 @@ void slReflectionPass(slWorld *w, slCamera *c) {
 	glStencilFunc(GL_EQUAL, 1, 0xffffffff);  
 
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-	slRenderObjects(w, c, DO_NO_STATIONARY|DO_NO_BOUND|DO_NO_AXIS|DO_NO_TERRAIN);
-	slRenderBillboards(c, 0);
+	renderObjects( w, DO_NO_STATIONARY|DO_NO_BOUND|DO_NO_AXIS|DO_NO_TERRAIN );
+	
+	renderBillboards( 0 );
 
 	glDisable(GL_NORMALIZE);
 
@@ -701,7 +692,7 @@ void slReflectionPass(slWorld *w, slCamera *c) {
 
 	glPopMatrix();
 
-	slDrawLights(c, 0);
+	drawLights( 0 );
 }
 
 /*!
@@ -712,10 +703,10 @@ void slReflectionPass(slWorld *w, slCamera *c) {
 	drawn.
 */
 
-void slShadowPass(slWorld *w, slCamera *c) {
+void slCamera::shadowPass( slWorld *w ) {
 	GLfloat shadowMatrix[4][4];
 
-	slShadowMatrix(shadowMatrix, &c->shadowPlane, &c->lights[0].location);
+	slShadowMatrix( shadowMatrix, &_shadowPlane, &_lights[0].location );
 
 	glPushAttrib(GL_ENABLE_BIT);
 
@@ -732,14 +723,14 @@ void slShadowPass(slWorld *w, slCamera *c) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glColor4f(0.0, 0.0, 0.0, 0.3);
-	// glColor4f(1.0, 0.0, 0.0, 1.0);
 
 	glPushMatrix();
 	glMultMatrixf((GLfloat *)shadowMatrix);
-	slRenderObjects(w, c, DO_NO_COLOR|DO_NO_TEXTURE|DO_NO_STATIONARY|DO_NO_BOUND|DO_NO_AXIS|DO_NO_TERRAIN);
+	renderObjects( w, DO_NO_COLOR|DO_NO_TEXTURE|DO_NO_STATIONARY|DO_NO_BOUND|DO_NO_AXIS|DO_NO_TERRAIN );
 	glDisable(GL_LIGHTING);
-	// glDisable(GL_CULL_FACE);
-	slRenderBillboards(c, DO_NO_COLOR | DO_NO_BOUND);
+
+	renderBillboards( DO_NO_COLOR | DO_NO_BOUND );
+	
 	glPopMatrix();
 
 	glPopAttrib();
@@ -749,7 +740,7 @@ void slShadowPass(slWorld *w, slCamera *c) {
 	\brief Render the text associated with the current display.
 */
 
-void slRenderText(slWorld *w, slCamera *c, slVector *location, slVector *target, int crosshair) {
+void slCamera::renderText( slWorld *w, int crosshair ) {
 	double fromLeft;
 	unsigned int n;
 	char textStr[128];
@@ -760,20 +751,20 @@ void slRenderText(slWorld *w, slCamera *c, slVector *location, slVector *target,
 	glColor4f(0.0, 0.0, 0.0, 1.0);
 	snprintf( textStr, sizeof(textStr), "%.2f", w->_age );
 
-	fromLeft = -1.0 + (5.0 / c->_width);
-	slText(fromLeft, 1.0 - (20.0 / c->_height), textStr, GLUT_BITMAP_HELVETICA_10);
+	fromLeft = -1.0 + (5.0 / _width);
+	slText(fromLeft, 1.0 - (20.0 / _height), textStr, GLUT_BITMAP_HELVETICA_10);
 
-	if (crosshair) {
-		snprintf(textStr, sizeof(textStr), "camera: (%.1f, %.1f, %.1f)",
-		    location->x, location->y, location->z);
-		slText(fromLeft, -1.0 + (5.0 / c->_height), textStr, GLUT_BITMAP_HELVETICA_10);
-		snprintf(textStr, sizeof(textStr), "target: (%.1f, %.1f, %.1f)",
-		    target->x, target->y, target->z);
-		slText(fromLeft, -1.0 + (30.0 / c->_height), textStr, GLUT_BITMAP_HELVETICA_10);
+	if ( crosshair ) {
+		snprintf(textStr, sizeof( textStr ), "camera: (%.1f, %.1f, %.1f)",
+		    _location.x, _location.y, _location.z);
+		slText( fromLeft, -1.0 + (5.0 / _height), textStr, GLUT_BITMAP_HELVETICA_10);
+		snprintf( textStr, sizeof(textStr), "target: (%.1f, %.1f, %.1f)",
+		    _target.x, _target.y, _target.z );
+		slText(fromLeft, -1.0 + (30.0 / _height), textStr, GLUT_BITMAP_HELVETICA_10);
 	} else {
-		for(n = 0; n < c->text.size(); n++) {
-			glColor4f(c->text[n].color.x, c->text[n].color.y, c->text[n].color.z, 0.9);
-			slStrokeText(c->text[n].x, c->text[n].y, c->text[n].text.c_str(), c->textScale, GLUT_STROKE_ROMAN);
+		for(n = 0; n < _text.size(); n++) {
+			glColor4f( _text[n].color.x, _text[n].color.y, _text[n].color.z, 0.9);
+			slStrokeText( _text[n].x, _text[n].y, _text[n].text.c_str(), _textScale, GLUT_STROKE_ROMAN);
 		}
 	}
 }
@@ -782,7 +773,7 @@ void slRenderText(slWorld *w, slCamera *c, slVector *location, slVector *target,
 	\brief Draw a texture as a background.
 */
 
-void slDrawBackground(slCamera *c, slWorld *w) {
+void slCamera::drawBackground( slWorld *w ) {
 	static float transX = 0.0, transY = 0.0;
 	GLfloat textColor[4];
 
@@ -809,7 +800,7 @@ void slDrawBackground(slCamera *c, slWorld *w) {
 	// taking in the color from the GL_TEXTURE_ENV_COLOR--we'll just 
 	// set both.
 
-	if (w->isBackgroundImage) {
+	if ( w->isBackgroundImage ) {
 		textColor[0] = 1.0;
 		textColor[1] = 1.0;
 		textColor[2] = 1.0;
@@ -821,10 +812,10 @@ void slDrawBackground(slCamera *c, slWorld *w) {
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
 	}
 
-	transX += c->backgroundScrollX;
-	transY += c->backgroundScrollY;
+	transX += _backgroundScrollX;
+	transY += _backgroundScrollY;
 
-	glTranslated(transX - (.8 * 2*c->ry), (.8 * 2*c->rx) - transY, 0);
+	glTranslated(transX - (.8 * 2*_ry), (.8 * 2*_rx) - transY, 0);
 	glDepthRange(1, .9);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, w->backgroundTexture);
@@ -842,7 +833,7 @@ void slDrawBackground(slCamera *c, slWorld *w) {
 	glEnable(GL_DEPTH_TEST);
 }
 
-void slRenderLabels(slWorld *w) {
+void slCamera::renderLabels( slWorld *w ) {
 	slWorldObject *wo;
 	slVector *l;
 	std::vector<slWorldObject*>::iterator wi;
@@ -854,11 +845,11 @@ void slRenderLabels(slWorld *w) {
 	for(wi = w->objects.begin(); wi != w->objects.end(); wi++) {
 		wo = *wi;
 
-		if (! wo->label.empty()) {
-			l = &wo->position.location;
+		if ( !wo->_label.empty() ) {
+			l = &wo->_position.location;
 			glPushMatrix();
 			glTranslatef(l->x, l->y, l->z);
-			slText(0, 0, wo->label.c_str() , GLUT_BITMAP_HELVETICA_10);
+			slText( 0, 0, wo->_label.c_str() , GLUT_BITMAP_HELVETICA_10 );
 			glPopMatrix();
 		}
 	}
@@ -870,13 +861,13 @@ void slRenderLabels(slWorld *w) {
 	\brief Renders preprocessed billboards.
 */
 
-void slRenderBillboards(slCamera *c, int flags) {
+void slCamera::renderBillboards( int flags ) {
 	slVector normal;
 	slBillboardEntry *b;
 	unsigned int n;
 	int lastTexture = -1;
 
-	slVectorCopy(&c->_location, &normal);
+	slVectorCopy(&_location, &normal);
 	slVectorNormalize(&normal);
 
 	if (!(flags & DO_NO_TEXTURE)) {
@@ -897,19 +888,19 @@ void slRenderBillboards(slCamera *c, int flags) {
 
 	glDepthMask(GL_FALSE);
 
-	for(n = 0; n < c->billboardCount; ++n) {
+	for(n = 0; n < _billboardCount; ++n) {
 		slWorldObject *object;
 		int bound;
 
 		glPushMatrix();
 
-		b = c->billboards[n];
+		b = _billboards[n];
 
 		object = b->object;
 
-		bound = (object->drawMode & DM_BOUND);
+		bound = (object->_drawMode & DM_BOUND);
 
-		if (object->textureMode == BBT_LIGHTMAP)
+		if ( object->_textureMode == BBT_LIGHTMAP )
 			glBlendFunc(GL_ONE, GL_ONE);
 		else {
 	   		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -917,34 +908,34 @@ void slRenderBillboards(slCamera *c, int flags) {
 		}
 
 		if (!(flags & DO_NO_COLOR))
-			glColor4f(object->color.x, object->color.y, object->color.z, object->alpha);
+			glColor4f( object->_color.x, object->_color.y, object->_color.z, object->_alpha );
 
-		if (lastTexture != object->texture)
-			glBindTexture(GL_TEXTURE_2D, object->texture);
+		if (lastTexture != object->_texture )
+			glBindTexture(GL_TEXTURE_2D, object->_texture );
 
-		lastTexture = object->texture;
+		lastTexture = object->_texture;
 
-		glTranslated(object->position.location.x, object->position.location.y, object->position.location.z);
-		glRotatef(object->billboardRotation, normal.x, normal.y, normal.z);
+		glTranslated( object->_position.location.x, object->_position.location.y, object->_position.location.z);
+		glRotatef( object->_billboardRotation, normal.x, normal.y, normal.z);
 		glScalef(b->size, b->size, b->size);
 
-		glCallList(c->billboardDrawList);
+		glCallList(_billboardDrawList);
 
 		if (bound && !(flags & DO_NO_BOUND)) {
-			if (!(flags & DO_NO_TEXTURE))
-				glDisable(GL_TEXTURE_2D);
+			if ( !(flags & DO_NO_TEXTURE) ) glDisable(GL_TEXTURE_2D);
+			
 			glPushMatrix();
 			glScalef(1.1, 1.1, 1.1);
 			glColor4f(0.0, 0.0, 0.0, 1.0);
 			glBegin(GL_LINE_LOOP);
-				glVertex3f(c->billboardX.x + c->billboardY.x, c->billboardX.y + c->billboardY.y, c->billboardX.z + c->billboardY.z);
-				glVertex3f(-c->billboardX.x + c->billboardY.x, -c->billboardX.y + c->billboardY.y, -c->billboardX.z + c->billboardY.z);
-				glVertex3f(-c->billboardX.x - c->billboardY.x, -c->billboardX.y - c->billboardY.y, -c->billboardX.z - c->billboardY.z);
-				glVertex3f(c->billboardX.x - c->billboardY.x, c->billboardX.y - c->billboardY.y, c->billboardX.z - c->billboardY.z);
+				glVertex3f(  _billboardX.x + _billboardY.x,  _billboardX.y + _billboardY.y,  _billboardX.z + _billboardY.z );
+				glVertex3f( -_billboardX.x + _billboardY.x, -_billboardX.y + _billboardY.y, -_billboardX.z + _billboardY.z );
+				glVertex3f( -_billboardX.x - _billboardY.x, -_billboardX.y - _billboardY.y, -_billboardX.z - _billboardY.z );
+				glVertex3f(  _billboardX.x - _billboardY.x,  _billboardX.y - _billboardY.y,  _billboardX.z - _billboardY.z );
 			glEnd();
 			glPopMatrix();
-			if (!(flags & DO_NO_TEXTURE))
-				glEnable(GL_TEXTURE_2D);
+			
+			if (!(flags & DO_NO_TEXTURE)) glEnable(GL_TEXTURE_2D);
 		}
 
 		glPopMatrix();
@@ -952,8 +943,7 @@ void slRenderBillboards(slCamera *c, int flags) {
 
 	glDepthMask(GL_TRUE);
 
-	if (!(flags & DO_NO_TEXTURE))
-		glPopAttrib();
+	if (!(flags & DO_NO_TEXTURE)) glPopAttrib();
 }
 
 void slStrokeText(double x, double y, const char *string, double scale, void *font) {
@@ -980,8 +970,7 @@ void slText(double x, double y, const char *string, void *font) {
 
 	glRasterPos2f(x, y);
 
-	while ((c = *(string++)) != 0)
-		glutBitmapCharacter(font, c);
+	while ((c = *(string++)) != 0) glutBitmapCharacter(font, c);
 }
 
 /*!
@@ -991,14 +980,14 @@ void slText(double x, double y, const char *string, void *font) {
 	drawing the shadowed pass of a shadow volume algorithm.
 */
 
-void slDrawLights(slCamera *c, int noDiffuse) {
+void slCamera::drawLights( int noDiffuse ) {
 	GLfloat dif[4];
 	GLfloat dir[4];
 	GLfloat amb[4];
 
-	dir[0] = c->lights[0].location.x;
-	dir[1] = c->lights[0].location.y;
-	dir[2] = c->lights[0].location.z;
+	dir[0] = _lights[0].location.x;
+	dir[1] = _lights[0].location.y;
+	dir[2] = _lights[0].location.z;
 	dir[3] = 1.0;
 
 	if (noDiffuse) {
@@ -1007,21 +996,19 @@ void slDrawLights(slCamera *c, int noDiffuse) {
 		dif[2] = 0.0;
 		dif[3] = 0.0;
 	} else {
-		dif[0] = c->lights[0].diffuse.x;
-		dif[1] = c->lights[0].diffuse.y;
-		dif[2] = c->lights[0].diffuse.z;
+		dif[0] = _lights[0].diffuse.x;
+		dif[1] = _lights[0].diffuse.y;
+		dif[2] = _lights[0].diffuse.z;
 		dif[3] = 0.0;
 	}
 
-	amb[0] = c->lights[0].ambient.x;
-	amb[1] = c->lights[0].ambient.y;
-	amb[2] = c->lights[0].ambient.z;
+	amb[0] = _lights[0].ambient.x;
+	amb[1] = _lights[0].ambient.y;
+	amb[2] = _lights[0].ambient.z;
 	amb[3] = 0.0;
 
-	if (c->drawSmooth)
-		glShadeModel(GL_SMOOTH);
-	else
-		glShadeModel(GL_FLAT);
+	if ( _drawSmooth ) glShadeModel( GL_SMOOTH );
+	else glShadeModel( GL_FLAT );
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -1081,58 +1068,52 @@ void slShadowMatrix(GLfloat matrix[4][4], slPlane *p, slVector *light) {
 	\brief Renders a stationary object.
 */
 
-void slProcessBillboards(slWorld *w, slCamera *c) {
+void slCamera::processBillboards( slWorld *w ) {
 	GLfloat matrix[16];
 	std::vector<slWorldObject*>::iterator wi;
 	slSphere *ss;
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 
-	c->billboardCount = 0;
+	_billboardCount = 0;
 
 	for (wi = w->objects.begin(); wi != w->objects.end(); wi++ ) {
 		slWorldObject *wo = *wi;
 
-		if (wo->textureMode != BBT_NONE && wo->shape &&
-		    wo->shape->_type == ST_SPHERE) {
+		if (wo->_textureMode != BBT_NONE && wo->_shape && wo->_shape->_type == ST_SPHERE) {
 			double z = 0;
 
-			ss = static_cast<slSphere*>(wo->shape);
+			ss = static_cast<slSphere*>( wo->_shape );
 
-			z = matrix[2] * wo->position.location.x + matrix[6] * wo->position.location.y + matrix[10] * wo->position.location.z;
+			z = matrix[2] * wo->_position.location.x + matrix[6] * wo->_position.location.y + matrix[10] * wo->_position.location.z;
 
-			slAddBillboard(c, wo, ss->_radius, z);
+			addBillboard( wo, ss->_radius, z );
 		}
 	}
 
-	slSortBillboards(c);
+	sortBillboards();
 
-	c->billboardX.x = matrix[0];
-	c->billboardX.y = matrix[4];
-	c->billboardX.z = matrix[8];
+	_billboardX.x = matrix[0];
+	_billboardX.y = matrix[4];
+	_billboardX.z = matrix[8];
 
-	c->billboardY.x = matrix[1];
-	c->billboardY.y = matrix[5];
-	c->billboardY.z = matrix[9];
+	_billboardY.x = matrix[1];
+	_billboardY.y = matrix[5];
+	_billboardY.z = matrix[9];
 
-	c->billboardZ.x = matrix[2];
-	c->billboardZ.y = matrix[6];
-	c->billboardZ.z = matrix[10];
+	_billboardZ.x = matrix[2];
+	_billboardZ.y = matrix[6];
+	_billboardZ.z = matrix[10];
 
-	if (c->billboardDrawList == 0)
-		c->billboardDrawList = glGenLists(1);
+	if ( _billboardDrawList == 0) _billboardDrawList = glGenLists( 1 );
 
-	glNewList(c->billboardDrawList, GL_COMPILE);
+	glNewList( _billboardDrawList, GL_COMPILE);
 
 	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(1.0, 1.0);
-		glVertex3f(c->billboardX.x + c->billboardY.x, c->billboardX.y + c->billboardY.y, c->billboardX.z + c->billboardY.z);
-		glTexCoord2f(0.0, 1.0);
-		glVertex3f(-c->billboardX.x + c->billboardY.x, -c->billboardX.y + c->billboardY.y, -c->billboardX.z + c->billboardY.z);
-		glTexCoord2f(1.0, 0.0);
-		glVertex3f(c->billboardX.x - c->billboardY.x, c->billboardX.y - c->billboardY.y, c->billboardX.z - c->billboardY.z);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(-c->billboardX.x - c->billboardY.x, -c->billboardX.y - c->billboardY.y, -c->billboardX.z - c->billboardY.z);
+		glTexCoord2f(1.0, 1.0);	glVertex3f(  _billboardX.x + _billboardY.x,  _billboardX.y + _billboardY.y,  _billboardX.z + _billboardY.z);
+		glTexCoord2f(0.0, 1.0); glVertex3f( -_billboardX.x + _billboardY.x, -_billboardX.y + _billboardY.y, -_billboardX.z + _billboardY.z);
+		glTexCoord2f(1.0, 0.0); glVertex3f(  _billboardX.x - _billboardY.x,  _billboardX.y - _billboardY.y,  _billboardX.z - _billboardY.z);
+		glTexCoord2f(0.0, 0.0); glVertex3f( -_billboardX.x - _billboardY.x, -_billboardX.y - _billboardY.y, -_billboardX.z - _billboardY.z);
 	glEnd();
 
 	glEndList();
@@ -1143,7 +1124,7 @@ void slProcessBillboards(slWorld *w, slCamera *c) {
 	have been set up.
 */
 
-void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
+void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 	slWorldObject *wo;
 	unsigned int n;
 	bool color = 1;
@@ -1155,12 +1136,11 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 	const int doNoTerrain = (flags & DO_NO_TERRAIN);
 	const int doNoTexture = (flags & DO_NO_TEXTURE);
 
-	camera->_points.clear();
+	_points.clear();
 
 	if (doOnlyAlpha) {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		// glBlendFunc(GL_ONE_MINUS_DST_ALPHA,GL_DST_ALPHA);
 	} 
 
 	if (flags & (DO_OUTLINE | DO_NO_COLOR)) color = 0;
@@ -1174,13 +1154,13 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 		int skip = 0;
 		wo = w->objects[n];
 
-		if (wo->_drawAsPoint) skip = 0;
-		else if(wo->drawMode == DM_INVISIBLE) skip = 1;
-		else if(doNoAlpha && wo->alpha != 1.0) skip = 1;
-		else if(doOnlyAlpha && wo->alpha == 1.0) skip = 1;
-		else if(doNoStationary && wo->type == WO_STATIONARY) skip = 1;
-		else if(doNoTerrain && wo->type == WO_TERRAIN) skip = 1;
-		else if(wo->textureMode != BBT_NONE && !(flags & DO_BILLBOARDS_AS_SPHERES)) skip = 1;
+		if ( wo->_drawAsPoint ) skip = 0;
+		else if( wo->_drawMode == DM_INVISIBLE ) skip = 1;
+		else if( doNoAlpha && wo->_alpha != 1.0 ) skip = 1;
+		else if( doOnlyAlpha && wo->_alpha == 1.0 ) skip = 1;
+		else if( doNoStationary && wo->_type == WO_STATIONARY ) skip = 1;
+		else if( doNoTerrain && wo->_type == WO_TERRAIN ) skip = 1;
+		else if( wo->_textureMode != BBT_NONE && !(flags & DO_BILLBOARDS_AS_SPHERES) ) skip = 1;
 
 		if (!skip) {
 			if (loadNames)
@@ -1188,10 +1168,10 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 
 			if (!wo->_drawAsPoint ) {
 				if (color)
-					glColor4d(wo->color.x, wo->color.y, wo->color.z, wo->alpha);
+					glColor4d( wo->_color.x, wo->_color.y, wo->_color.z, wo->_alpha );
 
-				if (wo->alpha != 1.0) {
-					if (!doNoTexture && wo->texture > 0)
+				if (wo->_alpha != 1.0) {
+					if ( !doNoTexture && wo->_texture > 0 )
 						glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 					else
 						glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1201,20 +1181,20 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 	
 				// 0 or -1 can be used to indicate no texture
 	
-				if (!doNoTexture && wo->texture > 0) {
-					glBindTexture(GL_TEXTURE_2D, wo->texture);
-					glEnable(GL_TEXTURE_2D);
+				if ( !doNoTexture && wo->_texture > 0 ) {
+					glBindTexture( GL_TEXTURE_2D, wo->_texture );
+					glEnable( GL_TEXTURE_2D );
 				} 
 	
-				wo->draw(camera);
+				wo->draw( this );
 	
-				if (wo->alpha != 1.0)
+				if ( wo->_alpha != 1.0 )
 					glEnable(GL_CULL_FACE);
 	
-				if (wo->texture > 0)
+				if ( wo->_texture > 0 )
 					glDisable(GL_TEXTURE_2D);
 			} else
-				camera->_points.push_back( std::pair< slVector, slVector>(wo->position.location, wo->color ) );
+				_points.push_back( std::pair< slVector, slVector>(wo->getPosition().location, wo->_color ) );
 		}	
 	}
 
@@ -1223,9 +1203,9 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 		glPointSize(2.0);
 		glEnable(GL_POINT_SMOOTH);
 		glBegin(GL_POINTS);
-		for (n = 0; n < camera->_points.size(); ++n) {
-			slVector &v = camera->_points[n].first;
-			slVector &c = camera->_points[n].second;
+		for (n = 0; n < _points.size(); ++n) {
+			slVector &v = _points[n].first;
+			slVector &c = _points[n].second;
 
 			glColor4d(c.x, c.y, c.z, 1.0);
 			glVertex3d(v.x, v.y, v.z);
@@ -1244,7 +1224,7 @@ void slRenderObjects(slWorld *w, slCamera *camera, unsigned int flags) {
 	\brief Renders object neighbor lines.
 */
 
-void slRenderLines(slWorld *w, slCamera *c) {
+void slCamera::renderLines( slWorld *w ) {
 	slWorldObject *neighbor;
 	slVector *x, *y;
 	unsigned int n;
@@ -1252,25 +1232,25 @@ void slRenderLines(slWorld *w, slCamera *c) {
 	glLineWidth(1.2);
 
 	for (n = 0; n < w->objects.size(); ++n) {
-		if(w->objects[n] && !(w->objects[n]->drawMode & DM_INVISIBLE)) {
-			if (w->objects[n]->drawMode & DM_NEIGHBOR_LINES) {
+		if(w->objects[n] && !(w->objects[n]->_drawMode & DM_INVISIBLE)) {
+			if (w->objects[n]->_drawMode & DM_NEIGHBOR_LINES) {
 				std::vector<slWorldObject*>::iterator wi;
 
 				glEnable(GL_BLEND);
 				glColor4f(0.0, 0.0, 0.0, 0.5);
 
-				x = &w->objects[n]->position.location;
+				x = &w->objects[n]->_position.location;
 
 				glBegin(GL_LINES);
 
-				for (wi = w->objects[n]->neighbors.begin(); wi != w->objects[n]->neighbors.end(); wi++) { 
+				for ( wi = w->objects[n]->_neighbors.begin(); wi != w->objects[n]->_neighbors.end(); wi++ ) { 
 					neighbor = *wi;
 
 					if (neighbor) {
-						y = &neighbor->position.location;
+						y = &neighbor->_position.location;
 
-						glVertex3f(x->x, x->y, x->z);
-						glVertex3f(y->x, y->y, y->z);
+						glVertex3f( x->x, x->y, x->z );
+						glVertex3f( y->x, y->y, y->z );
 					}
 				}
 
@@ -1286,8 +1266,8 @@ void slRenderLines(slWorld *w, slCamera *c) {
 
 	std::vector<slObjectConnection*>::iterator li;
 
-	for (li = w->connections.begin(); li != w->connections.end(); li++ ) {
-		(*li)->draw(c);
+	for (li = w->_connections.begin(); li != w->_connections.end(); li++ ) {
+		(*li)->draw( this );
 	}
 }
 
@@ -1326,8 +1306,8 @@ void slDrawAxis(double x, double y) {
 */
 
 int slCompileShape(slShape *s, int drawMode, int flags) {
-	if (!s->_drawList)
-		s->_drawList = glGenLists(1);
+	if ( !s->_drawList ) s->_drawList = glGenLists(1);
+
 	s->_recompile = 0;
 
 	glNewList(s->_drawList, GL_COMPILE);
@@ -1589,19 +1569,4 @@ inline int slClearGLErrors(char *id) {
 	}
 
 	return c;
-}
-
-/*
-	\brief Frees memory associated with OpenGL draw lists and textures
-*/
-
-void slFreeGL(slWorld *w, slCamera *c) {
-	unsigned int n;
-
-	for (n = 0; n < w->objects.size(); ++n) {
-		if (w->objects[n] && w->objects[n]->shape) {
-			glDeleteLists(w->objects[n]->shape->_drawList, 1);
-			w->objects[n]->shape->_drawList = 0;
-		}
-	}
 }

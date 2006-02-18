@@ -7,4 +7,5 @@ SRC	+= simulation/camera.cc simulation/drawcommand.cc simulation/gldraw.cc \
 		simulation/terrain.cc simulation/tiger.cc simulation/vclip.cc \
 		simulation/vclipData.cc simulation/volInt.cc \
 		simulation/world.cc simulation/worldObject.cc \
-		simulation/roam.cc simulation/mesh.cc simulation/fonts.cc
+		simulation/roam.cc simulation/mesh.cc simulation/fonts.cc \
+		simulation/texture.cc

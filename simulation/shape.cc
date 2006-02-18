@@ -32,7 +32,7 @@ void slShape::draw(slCamera *c, slPosition *pos, double textureScaleX, double te
 	bound = (mode & DM_BOUND) && !(flags & DO_NO_BOUND);
 	axis = (mode & DM_AXIS) && !(flags & DO_NO_AXIS);
 
-	if(_drawList == 0 || _recompile || (flags & DO_RECOMPILE)) slCompileShape(this, c->drawMode, flags);
+	if(_drawList == 0 || _recompile || (flags & DO_RECOMPILE)) slCompileShape( this, c->_drawMode, flags );
 
 	glPushMatrix();
 	glTranslated(pos->location.x, pos->location.y, pos->location.z);
@@ -1286,7 +1286,7 @@ void slMeshShape::draw(slCamera *c, slPosition *pos, double textureScale, int mo
 #endif
 }
 
-slVector *slPositionVertex(slPosition *p, slVector *v, slVector *o) {
+slVector *slPositionVertex( const slPosition *p, const slVector *v, slVector *o ) {
 	slVectorXform(p->rotation, v, o);
 	slVectorAdd(&p->location, o, o);
     

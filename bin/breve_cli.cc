@@ -157,22 +157,21 @@ int main(int argc, char **argv) {
 
 	while (!gShouldQuit && brEngineIterate(frontend->engine) == EC_OK) {
 		if (gNotify &&
-		    slWorldGetAge(frontend->engine->world) > nextNotify) {
+		    frontend->engine->world->getAge() > nextNotify) {
 			printf("%f seconds elapsed\n",
-			    slWorldGetAge(frontend->engine->world));
+			    frontend->engine->world->getAge() );
 			nextNotify += gNotify;
 		}
 
 		if (gSimMax > 0.0 &&
-		    slWorldGetAge(frontend->engine->world) >= gSimMax) {
+		    frontend->engine->world->getAge() >= gSimMax) {
 			printf("%f simulation seconds completed\n", gSimMax);
 			brQuit(frontend->engine);
 		}
 
 		if ( frontend->engine->world->detectLightExposure() ) 
-			slDetectLightExposure( frontend->engine->world,
-			    frontend->engine->camera, OSMESA_WINDOW_SIZE,
-			    gOffscreenBuffer );
+			frontend->engine->camera->detectLightExposure( 
+				frontend->engine->world, OSMESA_WINDOW_SIZE, gOffscreenBuffer );
 	}
 
 	brQuit(frontend->engine);
@@ -308,7 +307,7 @@ void brQuit(brEngine *e) {
 
 	diff = e->realTime.tv_sec + (e->realTime.tv_usec / 1000000.0);
 
-	age = slWorldGetAge(e->world);
+	age = e->world->getAge();
 
 	if (age != 0.0) {
 		printf("%f simulated seconds elapsed\n", age);
@@ -377,7 +376,7 @@ int activateContext() {
 }
 
 void renderContext(slWorld *w, slCamera *c) {
-	slRenderScene(w, c, 0);
+	c->renderScene( w, 0 );
 }
 
 int slLoadOSMesaPlugin( char *execPath ) {

@@ -20,14 +20,7 @@
 
 #include "kernel.h"
 
-#if !MINGW
-#include <dlfcn.h>
-#else 
-#include <windows.h>
-#define dlopen(P,G) (void*)LoadLibrary(P)
-#define dlsym(D,F) (void*)GetProcAddress((HMODULE)D, F)
-#define dlclose(D) FreeLibrary((HMODULE)D)
-
+#ifdef MINGW
 const char *dlerror(void) {
 	static char message[256];
 
@@ -41,7 +34,7 @@ const char *dlerror(void) {
 
 	return message;
 }
-#endif
+#endif /* MINGW */
 
 /*!
 	\brief Opens a plugin and loads it into the engine.

@@ -33,7 +33,7 @@
 int brIWorldSetGravity(brEval args[], brEval *target, brInstance *i) {
 	slVector *v = &BRVECTOR(&args[0]);
  
-	slWorldSetGravity(i->engine->world, v);
+	i->engine->world->setGravity( v );
 	
 	return EC_OK;
 }   

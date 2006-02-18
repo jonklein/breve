@@ -12,17 +12,17 @@ slRoamPatch::slRoamPatch(slTerrain *t) {
 	_baseLeft._baseNeighbor = &_baseRight;	
 	_baseLeft._leftX = 0;
 	_baseLeft._leftY = 0;
-	_baseLeft._rightX = t->side - 1;
-	_baseLeft._rightY = t->side - 1;
+	_baseLeft._rightX = t->_side - 1;
+	_baseLeft._rightY = t->_side - 1;
 	_baseLeft._apexX = 0;
-	_baseLeft._apexY = t->side - 1;
+	_baseLeft._apexY = t->_side - 1;
 
 	_baseRight._baseNeighbor = &_baseLeft;	
-	_baseRight._leftX = t->side - 1;
-	_baseRight._leftY = t->side - 1;
+	_baseRight._leftX = t->_side - 1;
+	_baseRight._leftY = t->_side - 1;
 	_baseRight._rightX = 0;
 	_baseRight._rightY = 0;
-	_baseRight._apexX = t->side - 1;
+	_baseRight._apexX = t->_side - 1;
 	_baseRight._apexY = 0;
 
 	_frameVariance = 10.0;
@@ -155,17 +155,17 @@ slRoamTriangle *slRoamPatch::nextTriangle() {
 }
 
 double slRoamPatch::computeVariance() {
-	int size = _terrain->side - 1;
+	int size = _terrain->_side - 1;
 
 	_currentVariance = _varianceLeft;
-	computeVariance(0, 0, _terrain->matrix[0][0],
-					size, size, _terrain->matrix[size][size],
-					0, size, _terrain->matrix[0][size], 1);
+	computeVariance(0, 0, _terrain->_matrix[0][0],
+					size, size, _terrain->_matrix[size][size],
+					0, size, _terrain->_matrix[0][size], 1);
 
 	_currentVariance = _varianceRight;
-	computeVariance(size, size, _terrain->matrix[size][size],
-					0, 0, _terrain->matrix[0][0],
-					size, 0, _terrain->matrix[size][0], 1);
+	computeVariance(size, size, _terrain->_matrix[size][size],
+					0, 0, _terrain->_matrix[0][0],
+					size, 0, _terrain->_matrix[size][0], 1);
 
 	return 0;
 }
@@ -182,7 +182,7 @@ double slRoamPatch::computeVariance(int lx, int lz, float lh,
 	int cx = (lx + rx) >> 1;
 	int cz = (lz + rz) >> 1;
 
-	float ch = _terrain->matrix[cx][cz];
+	float ch = _terrain->_matrix[cx][cz];
 
 	variance = fabs( ch - (lh + rh) / 2.0 );
 
@@ -242,17 +242,17 @@ void slRoamPatch::tessellate(slCamera *c) {
 void slRoamPatch::makePoints(slRoamTriangle *t) {
 	slVector tmp, tmp2;
 
-	t->_points[0].x = t->_leftX * _terrain->xscale + _terrain->position.location.x;
-	t->_points[0].y = _terrain->matrix[t->_leftX][t->_leftY] + _terrain->position.location.y;
-	t->_points[0].z = t->_leftY * _terrain->xscale + _terrain->position.location.z;
+	t->_points[0].x = t->_leftX * _terrain->_xscale + _terrain->_position.location.x;
+	t->_points[0].y = _terrain->_matrix[t->_leftX][t->_leftY] + _terrain->_position.location.y;
+	t->_points[0].z = t->_leftY * _terrain->_xscale + _terrain->_position.location.z;
 
-	t->_points[1].x = t->_apexX * _terrain->xscale + _terrain->position.location.x;
-	t->_points[1].y = _terrain->matrix[t->_apexX][t->_apexY] + _terrain->position.location.y;
-	t->_points[1].z = t->_apexY * _terrain->xscale + _terrain->position.location.z;
+	t->_points[1].x = t->_apexX * _terrain->_xscale + _terrain->_position.location.x;
+	t->_points[1].y = _terrain->_matrix[t->_apexX][t->_apexY] + _terrain->_position.location.y;
+	t->_points[1].z = t->_apexY * _terrain->_xscale + _terrain->_position.location.z;
 
-	t->_points[2].x = t->_rightX * _terrain->xscale + _terrain->position.location.x;
-	t->_points[2].y = _terrain->matrix[t->_rightX][t->_rightY] + _terrain->position.location.y;
-	t->_points[2].z = t->_rightY * _terrain->xscale + _terrain->position.location.z;
+	t->_points[2].x = t->_rightX * _terrain->_xscale + _terrain->_position.location.x;
+	t->_points[2].y = _terrain->_matrix[t->_rightX][t->_rightY] + _terrain->_position.location.y;
+	t->_points[2].z = t->_rightY * _terrain->_xscale + _terrain->_position.location.z;
 
 	slVectorSub(&t->_points[2], &t->_points[1], &tmp);
 	slVectorSub(&t->_points[2], &t->_points[0], &tmp2);
@@ -298,7 +298,7 @@ void slRoamPatch::tessellate(slCamera *c, slRoamTriangle *t, int node) {
 		slVectorSub(&center, &loc, &dist);
 		distance = 1.0 + slVectorLength(&dist);
 
-		variance = (_currentVariance[node] * _terrain->xscale * (_terrain->side - 1)) / distance;	
+		variance = (_currentVariance[node] * _terrain->_xscale * (_terrain->_side - 1)) / distance;	
 	} 
 
 	if( node >= (1 << VARIANCE_DEPTH) || variance > _frameVariance) {
@@ -371,13 +371,13 @@ int slRoamPatch::render( slRoamTriangle *triangle, slCamera *c) {
 
 	// if( triangle->_clipped) return 0;
 
-	glTexCoord3f(triangle->_leftX / _terrain->textureScaleX,  triangle->_leftY / _terrain->textureScaleY, 0);
+	glTexCoord3f(triangle->_leftX / _terrain->_textureScaleX,  triangle->_leftY / _terrain->_textureScaleY, 0);
 	glVertex3f(triangle->_points[0].x, triangle->_points[0].y, triangle->_points[0].z);
 
-	glTexCoord3f(triangle->_apexX / _terrain->textureScaleX, triangle->_apexY / _terrain->textureScaleY, 0);
+	glTexCoord3f(triangle->_apexX / _terrain->_textureScaleX, triangle->_apexY / _terrain->_textureScaleY, 0);
 	glVertex3f(triangle->_points[1].x, triangle->_points[1].y, triangle->_points[1].z);
 
-	glTexCoord3f(triangle->_rightX / _terrain->textureScaleX, triangle->_rightY / _terrain->textureScaleY, 0);
+	glTexCoord3f(triangle->_rightX / _terrain->_textureScaleX, triangle->_rightY / _terrain->_textureScaleY, 0);
 	glVertex3f(triangle->_points[2].x, triangle->_points[2].y, triangle->_points[2].z);
 
 	return 1;

@@ -1,353 +1,70 @@
-#
-#
-#
+@include "Abstract.tz"
 
-
-@use Abstract.
-@use Matrix.
-@use Vector.
-
-@use Mobile.
-
-Abstract : NeuralNetwork [version 2.3] {
-    % An experimental neural network class for different types of neural
-    % networks whose goal is to provide efficient computation and the
-    % ability to manipulate the parameters and connections using evolution
-    
-    + variables:
-        network (pointer).
-        nodes (object).
-        inputNodes (object).
-        outputNodes (object).
-        weights (object).
-        connections (object).
-        neuronCount (int).
-        inputNeuronCount (int).
-        outputNeuronCount (int).
-        iterationStep (float).
-        timeConstant (float).
-        stateBoundLower (float).
-        stateBoundUpper (float).
-    
-    + to init:
-        iterationStep = 1.0.
-        timeConstant = 1.0.
-        
-    + to init-with neuron-count theNetworkSize (int):
-        
-        network = neuralNetworkNew(theNetworkSize).
-        neuronCount = theNetworkSize.
-        nodes = new Vector.
-        nodes set-vector-pointer to neuralNetworkGetNeuronStateVector(network) with-size neuronCount.
-        weights = new Matrix2D.
-        weights set-matrix-pointer to neuralNetworkGetConnectionWeightMatrix(network) x-size neuronCount y-size neuronCount.
-        connections = new Matrix2D.
-        connections set-matrix-pointer to neuralNetworkGetConnectionStructureMatrix(network) x-size neuronCount y-size neuronCount.
-        
-        return self.
-        
-    - to get-network-pointer:
-        return network.
-    
-    + to get-neuron-state-vector:
-        return nodes.
-
-    + section "Network Parameter Accessors":
-    
-    + to get-neuron-count:
-        return neuronCount.
-        
-    + to get-iteration-step:
-        return iterationStep.
-        
-    + to set-iteration-step to newTimeStep (float):
-        iterationStep = newTimeStep.
-        neuralNetworkSetTimeStep(network, newTimeStep).
-    
-    + to get-time-constant:
-        return timeConstant.
-        
-    + to set-time-constant to newTimeConstant (float):
-        timeConstant = newTimeConstant.
-        neuralNetworkSetTimeConstant(network, newTimeConstant).
-        
-    + to get-lower-saturation-boundry:
-        return stateBoundLower.
-        
-    + to get-upper-saturation-boundry:
-        return stateBoundUpper.
-    
-    + to set-saturation-bounds between lower (float)
-                                and upper (float):
-        stateBoundLower = lower.
-        stateBoundUpper = upper.
-        neuralNetworkSetNeuronStateBounds(network, lower, upper).
-    
-    + section "Network State Variable and Vector Accessors":
-        
-    + to set-neuron-state at index (int) to value (float):
-        neuralNetworkSetNeuronState(network, index, value).
-
-    + to get-neuron-state at index (int):
-        return neuralNetworkGetNeuronState(network, index).
-        
-    + to set-input-state-vector from first (int) to last (int):
-    % returns a vector which contains the input nodes
-        inputNodes = new Vector.
-        inputNodes set-vector-pointer to neuralNetworkSetInputNeurons(network, first, (last - first)) with-size (last - first).
-        inputNeuronCount = (last - first).
-        return inputNodes.
-        
-    + to get-input-state-vector:
-    % returns a vector which contains the input nodes
-        return inputNodes.
-    
-    + to set-output-state-vector from first (int) to last (int):
-    % returns a vector which contains the output nodes
-        outputNodes = new Vector.
-        outputNodes set-vector-pointer to neuralNetworkSetInputNeurons(network, first, (last - first)) with-size (last - first).
-        outputNeuronCount = (last - first).
-        return outputNodes.
-                    
-    + to get-output-state-vector:
-    % returns a vector which contains the output nodes
-        return outputNodes.
-
-    + to get-connection-structure-matrix:
-    % returns a matrix of synaptic connections [0,1]
-        return connections.        
-    
-    + to apply-structure-to-weights:
-        neuralNetworkApplyStructure(network).
-        
-    + to get-connection-weight-matrix:
-    % returns a matrix of the synaptic strengths
-        return weights.        
-    
-    + to randomize-states between lowerBound = -1.0 (float)
-                           and upperBound = 1.0 (float):
-        i (int).
-        
-        for i = 0, i < neuronCount, i++:
-                    nodes set-value to (lowerBound + random[(upperBound - lowerBound)]) at-x i.
-        
-    + to randomize-weights between lowerBound = -1.0 (float)
-                           and upperBound = 1.0 (float)
-                           with-autapses autapsesBool = 0 (int):
-        i, j (int).
-        
-        for i = 0, i < neuronCount, i++:
-            for j = 0, j < neuronCount, j++:
-                if autapsesBool:
-                {
-                    weights set-value to (lowerBound + random[(upperBound - lowerBound)]) at-x i at-y j.
-                }
-                else:
-                {
-                    if i == j: weights set-value to 0.0 at-x i at-y j.
-                    else: weights set-value to (lowerBound + random[(upperBound - lowerBound)]) at-x i at-y j.
-                }
-                
-    + to init-random-structure with-connectivity-percent thePercent = 0.5 (float) with-autapses autapsesBool = 0 (int):
-        i, j (int).
-        edge (int).
-        
-        for i = 0, i < neuronCount, i++:
-            for j = 0, j < neuronCount, j++:
-                if autapsesBool:
-                {
-                    if random[1.0] < thePercent:
-                        edge = 1.0.
-                    else:
-                        edge = 0.0.
-                    connections set-value to edge at-x i at-y j.
-                }
-                else:
-                {
-                    if i != j:
-                    {
-                        if random[1.0] < thePercent:
-                            edge = 1.0.
-                        else:
-                            edge = 0.0.
-                        connections set-value to edge at-x i at-y j.
-                    }
-                    else: connections set-value to 0.0 at-x i at-y j.
-                }
-                
-    + to init-fully-connected-structure with-autapses autapsesBool = 0 (int):
-        i, j (int).
-        
-        for i = 0, i < neuronCount, i++:
-            for j = 0, j < neuronCount, j++:
-                if autapsesBool:
-                {
-                    connections set-value to 1.0 at-x i at-y j.
-                }
-                else:
-                {
-                    if i != j: connections set-value to 1.0 at-x i at-y j.
-                    else: connections set-value to 0.0 at-x i at-y j.
-                }
-        
-            
-    + to update-state:
-    % updates the network's state based on current state and
-    % inputs
-        neuralNetworkUpdateState(network).
-    
-}
-
-NeuralNetwork : RecurrentNetwork [version 2.3] {
-
-    + to update-state:
-    % updates the network's state based on current state and
-    % inputs
-        neuralRecurrentUpdateState(network).
-
-    
-}
-
-NeuralNetwork : FeedForwardNetwork [version 2.3] {
-
-
-}
-
-Mobile : NeuronImage [version 2.3] {
+Abstract : NeuralNetwork [version 1.8] {
+	% A new experimental class for simple feed-forward neural networks.
 
     + variables:
-        texture (object).
-        neurons (object).
-        myShape (object).
-        
-    + to init-with nodes theVector (object) 
-                   color theColor = "Green" (string)
-                   shape-scale shapeScale = 1 (int)
-                   value-scale valueScale = 1.0 (float):
-    
-        neurons = theVector.
-        texture = ((new VectorImage) init-with the-vector neurons scale valueScale).
-        myShape = ((new Cube) init-with size ((shapeScale * ((neurons get-dimension) / 10.0)), (shapeScale * (neurons get-dimension)), 1)).
-        self set-shape to myShape.
-        self set-texture-image to texture.
-        self set-texture-scale to (((neurons get-dimension) * shapeScale)).
-        
-        if theColor == "Red":
-            texture set-red to neurons.
-        else: if theColor == "Green":
-            texture set-green to neurons.
-        else: if theColor == "Blue":
-            texture set-blue to neurons.
-        else: print "Please use 'Green,' 'Red' or 'Blue' for NodeImage.".
-        
-        self add-menu named "Print Activity" for-method "print-neuron-activity".
-        
-        return self.
+        layers (list).
+		inputLayer (pointer).
+		outputLayer (pointer).
 
-    + to destroy:
-        free(texture).
-        free(myShape).
-        free(neurons).
-        super destroy.
-        
-    + to update-display:
-        texture iterate.
-        
-    + to print-neuron-activity:
-        neurons print-matlab-style.
-}
+	+ to set-weight to-layer theLayer (int) from-node fn (int) to-node tn (int) to-weight weight (float):
+		% Sets the input to the node number tn on layer theLayer, coming from
+		% node number fn on layer number theLayer - 1 to weight.
 
-Mobile : WeightImage [version 2.3] {
+		setWeight(layers{theLayer}, tn, fn, weight).
 
-    + variables:
-        texture (object).
-        weights (object).
-        weightColor (string).
-        weightToggle (int).
-        connections (object).
-        connectionColor (string).
-        connectionToggle (int).
+	+ to get-weight on-layer theLayer (int) from-node fn (int) to-node tn (int):
+		% Sets the input to the node number tn on layer theLayer, coming from
+		% node number fn on layer number theLayer - 1 to weight.  Normally
+		% you wouldn't need to use this method, since the method 
+		% METHOD(get-output) is the preferred way to retrieve network output.
 
-    + to init:
-        weightToggle = 0.
-        connectionToggle = 0.
-        
-    + to destroy:
-        free(texture).
-        free(weights).
-        free(connections).
-        super destroy.
-    
-        
-    + to init-with weights theWeights (object)
-                   connections theConnections (object) 
-                   weight-color theWeightColor = "Blue" (string)
-                   connection-color theConnectionColor = "Red" (string)
-                   shape-scale shapeScale = 1.0 (float)
-                   value-scale valueScale = 1.0 (float):
-    
-        weights = theWeights.
-        weightColor = theWeightColor.
-        connections = theConnections.
-        connectionColor = theConnectionColor.
-        
-        texture = ((new MatrixImage) init-with the-matrix weights scale valueScale).
-        
-        self set-shape to ((new Cube) init-with size ((shapeScale * (weights get-x-dimension)), (shapeScale * (weights get-y-dimension)), 1)).
-        self set-texture-image to texture.
-        self set-texture-scale to (((weights get-x-dimension) * shapeScale)).
-    
-        self toggle-weights.
-                
-        self add-menu named "Print Weights" for-method "print-weights".
-        self add-menu named "Toggle Weight Display" for-method "toggle-weights".
-        self add-menu named "Print Connections" for-method "print-connections".
-        self add-menu named "Toggle Connection Display" for-method "toggle-connections".
-        
-        return self.
-        
-    + to update-display:
-        texture iterate.
+		return getWeight(layers{theLayer}, tn, fn).
+		
+	+ to add-layer with-neuron-count count (int):
+		% Adds a layer to the output end of the neural network, with 
+		% count neurons.  The first layer added serves as the input
+		% layer, and then subsequent layers serve as hidden or output
+		% layers.  
+		% <p>
+		% To create a network with one hidden layer, for example, you 
+		% would first call METHOD(add-layer) for the input layer, then
+		% the hidden layer, then the output layer.
 
-    - to switch-display on-color theColor (string) to theObject (object):
-            
-        if theColor == "Red":
-            texture set-red to theObject.
-        else: if theColor == "Green":
-            texture set-green to theObject.
-        else: if theColor == "Blue":
-            texture set-blue to theObject.
-        else: print "Please use 'Green,' 'Red' or 'Blue' for WeightImage.".
+		newLayer (pointer).
 
+		if count < 1: {
+			print "cannot add neural network layer with $count nodes\n".
+			return.
+		}
 
-    + to toggle-weights:
-        if weightToggle:
-        {
-            self switch-display on-color weightColor to 0.
-            weightToggle = 0.
-        }
-        else:
-        {
-            self switch-display on-color weightColor to weights.
-            weightToggle = 1.
-        }
-            
-    + to toggle-connections:
-        if connectionToggle:
-        {
-            self switch-display on-color connectionColor to 0.
-            connectionToggle = 0.
-        }
-        else:
-        {
-            self switch-display on-color connectionColor to connections.
-            connectionToggle = 1.
-        }
-                
-    + to print-weights:
-        weights print-matlab-style.
-        
-    + to print-connections:
-        connections print-matlab-style.
-                   
+		newLayer = newFFLayer(count, outputLayer).
+
+		if layers == 0: inputLayer = newLayer.
+
+		# what the hell does this do?  it adds newLayer onto the end of 
+		# layers.  because lists give their lengths when interpreted as 
+		# ints.
+
+		layers{ layers } = newLayer.
+
+		outputLayer = newLayer.
+
+	+ to run-with inputs inputList (list):
+		% Sets the inputs of the neural network to the values in inputList,
+		% and runs the network.  Output values can then be retrieved with
+		% METHOD(get-output).
+
+		feedForward(outputLayer, inputList).
+
+	+ to get-output at-position position (int):
+		% Returns the value at index position of the output layer.  This 
+		% assumes that METHOD(run-with) has already been called to actually
+		% run the neural network.
+
+		return getValue(outputLayer, position).
+
+	+ to destroy:
+		freeNetwork(outputLayer).
 }

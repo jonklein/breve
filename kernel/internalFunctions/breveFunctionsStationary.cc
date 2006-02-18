@@ -39,11 +39,9 @@ int brIAddStationary(brEval args[], brEval *target, brInstance *i) {
 
 	slMatrixIdentity(id);
 
-	st = slNewStationary(sh, v, id, i);
+	st = new slStationary( sh, v, id, i );
 
-	wo = slWorldAddObject(i->engine->world, st, WO_STATIONARY);
-
-	target->set( wo );
+	target->set( i->engine->world->addObject( st ) );
    
 	return EC_OK;
 }

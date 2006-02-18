@@ -26,8 +26,6 @@
 #include "worldObject.h"
 #include "multibody.h"
 
-#define slLinkSwapConfig(r)		((r)->_currentState = !(r)->_currentState)
-
 /*!
 	\brief Holds link state data in an integratable structure.
 
@@ -58,6 +56,9 @@ struct slLinkIntegrationPosition {
 
 class slLink: public slWorldObject {
 	public:
+		friend class slJoint;
+		friend class slMultibody;
+
 		slLink(slWorld *w);
 
 		~slLink();
@@ -74,7 +75,6 @@ class slLink: public slWorldObject {
 
 		void applyForce(slVector *f, slVector *t);
 		void applyJointControls();
-		void updateBoundingBox();
 		void disableSimulation();
 		void enableSimulation();
 		void updatePosition();
@@ -89,6 +89,10 @@ class slLink: public slWorldObject {
 		void getAcceleration(slVector *linear, slVector *rotational);
 		void setAcceleration(slVector *linear, slVector *rotational);
 
+		slJoint *link(slWorld *world, slLink *parent, int jointType, slVector *normal, slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3], bool useCurrentRotation );
+
+		inline void swapConfig() { _currentState = !_currentState; }
+
 		/**
 		 * Sets the multibody field to NULL for all connected links.  This 
 		 * is done when a joint is broken which dissociates the links from
@@ -101,20 +105,7 @@ class slLink: public slWorldObject {
 		 * Returns the multibody this link is associated with, if any.
 		 */
 
-		slMultibody *getMultibody();
-
-		/*
-		 * Returns an \ref slPosition pointer holding this link's position.
-		 */
-
-		slPosition *getPosition();
-
-		/**
-		 * Returns the minimum and maximum reach of this link, taking current
-		 * rotation into account.
-		 */
-
-		void getBounds(slVector *min, slVector *max);
+		inline slMultibody *getMultibody() { return _multibody; }
 
 		/**
 		 * Sets the shape of this link.
@@ -138,12 +129,12 @@ class slLink: public slWorldObject {
 		void connectedLinks(std::vector<slLink*> *list, int mbOnly);
 
 
-		slMultibody *multibody;
+		slMultibody *_multibody;
 
-		slsVector acceleration;
-		slsVector velocity;
+		slsVector _acceleration;
+		slsVector _velocity;
 
-		char mobile;
+		char _mobile;
 
 		bool _justMoved;
 
@@ -151,29 +142,21 @@ class slLink: public slWorldObject {
 
 		unsigned char _currentState;
 
-		unsigned int clipNumber;
+		unsigned int _clipNumber;
 
 		dBodyID _odeBodyID;
 		dMass _massData;
 
 		slsVector _externalForce;
 
-		unsigned char drawOptions;
+		unsigned char _drawOptions;
 
-		std::vector<slJoint*> inJoints;
-		std::vector<slJoint*> outJoints;
+		std::vector<slJoint*> _inJoints;
+		std::vector<slJoint*> _outJoints;
 
 };
 
-slJoint *slLinkLinks(slWorld *world, slLink *parent, slLink *child,
-		int jointType, slVector *normal, 
-		slVector *plinkPoint, slVector *clinkPoint, double m[3][3]);
-
 void slVelocityAtPoint(slVector *vel, slVector *avel, slVector *atPoint, slVector *d);
-
-
-void slLinkSetTexture(slLink *l, int texture);
-
 void slSlToODEMatrix(double m[3][3], dReal *r);
 void slODEToSlMatrix(dReal *r, double m[3][3]);
 
