@@ -78,7 +78,7 @@ class slLink: public slWorldObject {
 		void disableSimulation();
 		void enableSimulation();
 		void updatePosition();
-		void updatePositions();
+		void updatePositionFromODE();
 
 		void setForce(slVector *f);
 		void setTorque(slVector *t);

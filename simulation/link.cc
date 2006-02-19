@@ -96,7 +96,7 @@ void slLink::step(slWorld *world, double step) {
 	_moved = 1;
 
 	if( _simulate ) {
-		updatePositions();
+		updatePositionFromODE();
 		applyJointControls();
 
 		if( world->_detectCollisions ) updateBoundingBox();
@@ -306,7 +306,7 @@ void slLink::applyForce(slVector *f, slVector *t) {
 	\brief Updates the link positions from the ODE positions.
 */
 
-void slLink::updatePositions() {
+void slLink::updatePositionFromODE() {
 	const dReal *positionV;
 	const dReal *rotationV;
 	

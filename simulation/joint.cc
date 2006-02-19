@@ -331,13 +331,13 @@ void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double r
 
 				dBodySetPosition( (*li)->_odeBodyID, linkP[0] + offset[0], linkP[1] + offset[1], linkP[2] + offset[2]);
 
-				(*li)->updatePositions();
+				(*li)->updatePositionFromODE();
 			}
 		}
 	}
 
 	dBodySetPosition( _child->_odeBodyID, childPosition.x, childPosition.y, childPosition.z );
 
-	if(_parent) _parent->updatePositions();
-	_child->updatePositions();
+	if(_parent) _parent->updatePositionFromODE();
+	_child->updatePositionFromODE();
 }

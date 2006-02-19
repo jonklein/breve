@@ -351,7 +351,7 @@ void slMultibody::updatePositions() {
 	for(i = _links.begin(); i != _links.end(); i++ ) {
 		slLink *link = *i;
 
-		link->updatePositions();
+		link->updatePositionFromODE();
 		link->updateBoundingBox();
 	}
 }
