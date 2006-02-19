@@ -39,11 +39,7 @@
 */
 
 int brIPatchGridNew(brEval args[], brEval *target, brInstance *i) {
-	slVector center; // is this obsolete?
-
-	slVectorSet(&center, 0, 0, 0); // is this obsolete?
-
-	target->set( slPatchGridAdd(i->engine->world, &BRVECTOR(&args[0]), &BRVECTOR(&args[1]), BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4])) );
+	target->set( i->engine->world->addPatchGrid( &BRVECTOR(&args[0]), &BRVECTOR(&args[1]), BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]) ) );
 
 	return EC_OK;
 }
@@ -55,8 +51,7 @@ int brIPatchGridNew(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIPatchGridFree(brEval args[], brEval *target, brInstance *i) {
-
-	  slPatchGridRemove(i->engine->world, BRPATCHGRIDPOINTER(&args[0]));
+	i->engine->world->removePatchGrid( BRPATCHGRIDPOINTER(&args[0]) );
 
 	return EC_OK;
 }

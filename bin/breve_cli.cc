@@ -99,9 +99,9 @@ int main(int argc, char **argv) {
 
 	brEngineSetIOPath(frontend->engine, getcwd(wd, MAXPATHLEN));
 
-	frontend->engine->camera->activateContextCallback = activateContext;
+	frontend->engine->camera->_activateContextCallback = activateContext;
 
-	frontend->engine->camera->renderContextCallback = renderContext;
+	frontend->engine->camera->_renderContextCallback = renderContext;
 
 	frontend->engine->argc = argc - 1;
 	frontend->engine->argv = argv + 1;
@@ -148,11 +148,11 @@ int main(int argc, char **argv) {
 	nextNotify = gNotify;
 
 	if (gMaster)
-		slWorldStartNetsimServer(frontend->engine->world);
+		frontend->engine->world->startNetsimServer();
 
 	if (gSlave) {
-		slWorldStartNetsimSlave(frontend->engine->world, gSlaveHost);
-		slFree(gSlaveHost);
+		frontend->engine->world->startNetsimSlave( gSlaveHost );
+		slFree( gSlaveHost );
 	}
 
 	while (!gShouldQuit && brEngineIterate(frontend->engine) == EC_OK) {
@@ -405,7 +405,7 @@ int slLoadOSMesaPlugin( char *execPath ) {
 
 	if( !activate ) return -1;
 
-	frontend->engine->camera->activateContextCallback = activate;
+	frontend->engine->camera->_activateContextCallback = activate;
 
 	activate();
 

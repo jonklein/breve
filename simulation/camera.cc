@@ -33,8 +33,8 @@ slCamera::slCamera(int x, int y) {
 
 	unsigned int n;
 
-	activateContextCallback = NULL;
-	renderContextCallback = NULL;
+	_activateContextCallback = NULL;
+	_renderContextCallback = NULL;
 
 	_text.insert( _text.begin(), 8, t );
 
@@ -269,18 +269,18 @@ void slCamera::update() {
 	\brief Adds a string of text to the camera's output display. 
 */
 
-void slSetCameraText(slCamera *c, int n, char *string, float x, float y, slVector *v) {
-	if((unsigned int)n >= c->_text.size() || n < 0) {
+void slCamera::setCameraText( int n, char *string, float x, float y, slVector *v ) {
+	if((unsigned int)n >= _text.size() || n < 0) {
 	    slMessage(DEBUG_ALL, "out of bounds text position %d in slSetCameraText\n", n);
 	    return;
 	}
 
-	c->_text[n].text = string;
-	c->_text[n].x = x;
-	c->_text[n].y = y;
+	_text[n].text = string;
+	_text[n].x = x;
+	_text[n].y = y;
 
-	if(v) slVectorCopy( v, &c->_text[n].color );
-	else slVectorZero( &c->_text[n].color );
+	if(v) slVectorCopy( v, &_text[n].color );
+	else slVectorZero( &_text[n].color );
 }
 
 /*!
@@ -389,8 +389,8 @@ void slCamera::setRecompile() {
 	_recompile = 1;
 }
 
-void slCameraSetActivateContextCallback(slCamera *c, int (*f)()) {
-	c->activateContextCallback = f;
+void slCamera::setActivateContextCallback( int (*f)() ) {
+	_activateContextCallback = f;
 }
 
 
@@ -406,7 +406,7 @@ bool slBillboardCompare(const slBillboardEntry *a, const slBillboardEntry *b) {
 	\brief Sorts the billboards from back to front.
 */
 
-void slCamera::sortBillboards( ) {
+void slCamera::sortBillboards() {
 	std::sort( _billboards, _billboards + _billboardCount, slBillboardCompare );
 }
 
@@ -467,12 +467,4 @@ void slCamera::zoomWithMouseMovement( double dx, double dy ) {
 		_zoom -= 0.002 * _zoom * dy;
 		update();
 	} 
-}
-
-void slCameraSetRecompile(slCamera *camera) {
-	camera->_recompile = 1;
-}
-
-void slCameraUpdate(slCamera *camera) {
-	camera->update();
 }

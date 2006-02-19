@@ -64,7 +64,7 @@ int brIRotationMatrix(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIWorldSetCollisionResolution(brEval args[], brEval *target, brInstance *i) {
-	slWorldSetCollisionResolution(i->engine->world, BRINT(&args[0]));
+	i->engine->world->setCollisionResolution( BRINT(&args[0]) );
 	
 	return EC_OK;
 }

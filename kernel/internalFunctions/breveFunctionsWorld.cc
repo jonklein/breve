@@ -44,7 +44,7 @@ int brIWorldLoadTigerFile(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetStepFast(brEval args[], brEval *target, brInstance *i) {
-	slWorldSetPhysicsMode(i->engine->world, BRINT(&args[0]));
+	i->engine->world->setPhysicsMode( BRINT(&args[0]) );
 	return EC_OK;
 }
 
@@ -299,7 +299,7 @@ int brIWorldObjectGetLightExposure(brEval args[], brEval *target, brInstance *i)
 int brIRemoveObject(brEval args[], brEval *target, brInstance *i) {
 	i->engine->world->removeObject( BRWORLDOBJECTPOINTER(&args[0]) );
 
-	slWorldFreeObject(BRWORLDOBJECTPOINTER(&args[0]));
+	delete BRWORLDOBJECTPOINTER( &args[0] );
  
 	return EC_OK;
 }
@@ -566,7 +566,7 @@ int brICameraSetTextScale(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brICameraSetText(brEval args[], brEval *target, brInstance *i) {
-	slSetCameraText(i->engine->camera, BRINT(&args[1]), BRSTRING(&args[0]), BRDOUBLE(&args[2]), BRDOUBLE(&args[3]), &BRVECTOR(&args[4]));
+	i->engine->camera->setCameraText( BRINT(&args[1]), BRSTRING(&args[0]), BRDOUBLE(&args[2]), BRDOUBLE(&args[3]), &BRVECTOR(&args[4]) );
 
 	return EC_OK;
 }
@@ -625,12 +625,12 @@ int brICameraGetTarget(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetBackgroundColor(brEval args[], brEval *target, brInstance *i) {
-	slWorldSetBackgroundColor(i->engine->world, &BRVECTOR(&args[0]));
+	i->engine->world->setBackgroundColor( &BRVECTOR(&args[0]) );
 	return EC_OK;
 }
 
 int brISetBackgroundTextureColor(brEval args[], brEval *target, brInstance *i) {
-	slWorldSetBackgroundTextureColor(i->engine->world, &BRVECTOR(&args[0]));
+	i->engine->world->setBackgroundTextureColor( &BRVECTOR(&args[0]) );
 	return EC_OK;
 }
 
@@ -641,7 +641,7 @@ int brISetBackgroundTextureColor(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetBackgroundTexture(brEval args[], brEval *target, brInstance *i) {
-	slWorldSetBackgroundTexture(i->engine->world, BRINT(&args[0]), 0);
+	i->engine->world->setBackgroundTexture( BRINT(&args[0]), 0 );
 	return EC_OK;
 }
 
@@ -652,7 +652,7 @@ int brISetBackgroundTexture(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brISetBackgroundImage(brEval args[], brEval *target, brInstance *i) {
-	slWorldSetBackgroundTexture(i->engine->world, BRINT(&args[0]), 1);
+	i->engine->world->setBackgroundTexture( BRINT(&args[0]), 1 );
 	return EC_OK;
 }
 
@@ -779,7 +779,7 @@ int brIAddObjectLine(brEval args[], brEval *target, brInstance *i) {
 		pattern |= (*(patternString++) == '-');
 	}
 
-	target->set( slWorldAddObjectLine(i->engine->world, src, dst, pattern, color) );
+	target->set( i->engine->world->addObjectLine( src, dst, pattern, color ) );
 
 	return EC_OK;
 }
@@ -831,7 +831,7 @@ int brIRemoveObjectLine(brEval args[], brEval *target, brInstance *i) {
 int brISetBoundsOnlyCollisionDetection(brEval args[], brEval *target, brInstance *i) {
 	int value = BRINT(&args[0]);
 
-	slWorldSetBoundsOnlyCollisionDetection(i->engine->world, value);
+	i->engine->world->setBoundsOnlyCollisionDetection( value );
 
 	return EC_OK;
 }

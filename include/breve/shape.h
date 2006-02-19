@@ -326,8 +326,6 @@ void slSphereInertiaMatrix(double radius, double mass, double i[3][3]);
 
 int slRayHitsShape(slShape *s, slVector *dir, slVector *target, slVector *point);
 
-void slScaleShape(slShape *s, slVector *scale);
-
 slSerializedShapeHeader *slSerializeShape(slShape *s, int *length);
 slShape *slDeserializeShape(slSerializedShapeHeader *header, int length);
 void slShapeBounds(slShape *shape, slPosition *position, slVector *min, slVector *max);

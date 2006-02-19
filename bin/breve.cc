@@ -168,10 +168,10 @@ int main(int argc, char **argv) {
 	pthread_create(&thread, NULL, workerThread, NULL);
 
 	if (gMaster)
-		slWorldStartNetsimServer(frontend->engine->world);
+		frontend->engine->world->startNetsimServer();
 
 	if (gSlave) {
-		slWorldStartNetsimSlave(frontend->engine->world, gSlaveHost);
+		frontend->engine->world->startNetsimSlave( gSlaveHost );
 		slFree(gSlaveHost);
 	}
 

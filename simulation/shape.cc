@@ -990,31 +990,25 @@ int slShape::rayHitsShape(slVector *dir, slVector *target, slVector *point) {
 			/* on the face */
 
 			if (result == 1) {
-                           // sets the first one found as minDistance
-                           if (isFirst) {                            
-                              minDistance = k;
-                              isFirst = false;
-                              slVectorCopy(&pointOnPlane, point);
-                           } else if (k < minDistance) {
-                             //slMessage(DEBUG_ALL, "\n [ %f, %f, %f ] %f %d\n", f->plane.vertex.x, f->plane.vertex.y, f->plane.vertex.z, k, result );
-                              slVectorCopy(&pointOnPlane, point);
-                              minDistance = k;
-                           }
+				// sets the first one found as minDistance
+				if (isFirst) {                            
+					minDistance = k;
+					isFirst = false;
+					slVectorCopy(&pointOnPlane, point);
+				} else if (k < minDistance) {
+					//slMessage(DEBUG_ALL, "\n [ %f, %f, %f ] %f %d\n", f->plane.vertex.x, f->plane.vertex.y, f->plane.vertex.z, k, result );
+					slVectorCopy(&pointOnPlane, point);
+					minDistance = k;
+				}
 			} 
 		}
 	}
 
-        // we hit a face
-        if (!isFirst)
-           return 0;
+	// we hit a face
+
+	if (!isFirst) return 0;
 
 	return -1;
-}
-
-
-
-void slScaleShape(slShape *s, slVector *scale) {
-	s->scale(scale);
 }
 
 void slSphere::scale(slVector *scale) {

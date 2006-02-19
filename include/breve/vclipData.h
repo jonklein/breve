@@ -23,8 +23,6 @@
 
 #include "vclip.h"
 
-void slVclipDataInit(slWorld *); 
-void slVclipDataRealloc(slVclipData *, unsigned int);
-slPairFlags slVclipDataInitPairFlags(slVclipData *, int, int);
+void slVclipDataInit( slWorld *w );
 
 #endif /* _VCLIPDATA_H */

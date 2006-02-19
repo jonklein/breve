@@ -61,7 +61,7 @@ int brICameraClear(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	slWorld *w = i->engine->world;
 	
-	if(camera->activateContextCallback) camera->activateContextCallback();
+	if( camera->_activateContextCallback ) camera->_activateContextCallback();
 	
 	glClearColor(w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
@@ -78,7 +78,7 @@ int brICameraClear(brEval args[], brEval *target, brInstance *i) {
 int brICameraSetBlur(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 
-	if(camera->activateContextCallback) camera->activateContextCallback();
+	if( camera->_activateContextCallback ) camera->_activateContextCallback();
 	camera->clear( i->engine->world );
 
 	camera->_drawBlur = BRINT(&args[1]);
@@ -200,14 +200,14 @@ int brICameraGetHeight( brEval args[], brEval *target, brInstance *i ) {
 int brICameraNew(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera;
 
-	camera = new slCamera(0, 0);
+	camera = new slCamera( 0, 0 );
 
-	slVectorSet(&camera->_target, 1, 0, 0);
-	slVectorSet(&camera->_location, 0, 0, 0);
+	slVectorSet( &camera->_target, 1, 0, 0 );
+	slVectorSet( &camera->_location, 0, 0, 0 );
 
 	target->set( camera );
 
-	slWorldAddCamera(i->engine->world, camera);
+	i->engine->world->addCamera( camera );
 
 	return EC_OK;
 }
@@ -221,7 +221,7 @@ int brICameraNew(brEval args[], brEval *target, brInstance *i) {
 int brICameraFree(brEval args[], brEval *target, brInstance *i) {
 	slCamera *camera = BRCAMERAPOINTER(&args[0]);
 
-	slWorldRemoveCamera(i->engine->world, camera);
+	i->engine->world->removeCamera( camera );
 
 	delete camera;
 

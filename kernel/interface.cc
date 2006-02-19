@@ -106,7 +106,7 @@ brInstance *brClickCallback(brEngine *e, int n) {
 	slWorldObject *o;
 
 	if(n == -1) o = NULL;
-	else o = slWorldGetObject(e->world, n);
+	else o = e->world->getObject( n );
 
 	method = brMethodFind(e->controller->object, "click", types, 1);
 	

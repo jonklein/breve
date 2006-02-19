@@ -121,7 +121,7 @@ int brIMultibodyAllObjects(brEval args[], brEval *target, brInstance *i) {
 int brIMultibodyFree(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *m = BRMULTIBODYPOINTER(&args[0]);
 
-	slWorldSetUninitialized(i->engine->world);
+	i->engine->world->setUninitialized();
 
 	delete m;
 
@@ -168,7 +168,7 @@ int brIMultibodySetRotation(brEval args[], brEval *target, brInstance *i) {
 int brIMultibodySetRotationMatrix(brEval args[], brEval *target, brInstance *i) {
 	slMultibody *mb = BRMULTIBODYPOINTER(&args[0]);
 
-	mb->setRotation(BRMATRIX(&args[1]));
+	mb->setRotation( BRMATRIX(&args[1]) );
 
 	return EC_OK;
 }

@@ -26,22 +26,9 @@
 
 int brIAddStationary(brEval args[], brEval *target, brInstance *i) {
 	slShape *sh = (slShape*)BRPOINTER(&args[0]);
-	slVector *v = &BRVECTOR(&args[1]);
-	slStationary *st;
-	slWorldObject *wo;
 
-	double id[3][3];
-
-	if(!sh) {
-		slMessage(DEBUG_ALL, "null shape passed to addStationary\n");
-		return EC_ERROR;
-	}
-
-	slMatrixIdentity(id);
-
-	st = new slStationary( sh, v, id, i );
-
-	target->set( i->engine->world->addObject( st ) );
+	target->set( i->engine->world->addObject( 
+		new slStationary( sh, &BRVECTOR(&args[1]), BRMATRIX(&args[2] ), i ) ) );
    
 	return EC_OK;
 }
@@ -49,5 +36,5 @@ int brIAddStationary(brEval args[], brEval *target, brInstance *i) {
 /*@}*/
 
 void breveInitStationaryFunctions(brNamespace *n) {
-	brNewBreveCall(n, "addStationary", brIAddStationary, AT_POINTER, AT_POINTER, AT_VECTOR, 0);
+	brNewBreveCall(n, "addStationary", brIAddStationary, AT_POINTER, AT_POINTER, AT_VECTOR, AT_MATRIX, 0);
 }

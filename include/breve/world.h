@@ -103,6 +103,7 @@ class slGISData;
 class slWorld {
 	public:
 		slWorld();
+		~slWorld();
 
 		dJointGroupID _odeJointGroupID;
 	
@@ -120,6 +121,23 @@ class slWorld {
 		void setLightExposureSource( slVector *src ) { slVectorCopy( src, &_lightExposureCamera._location); }
 
 		slCamera *getLightExposureCamera( ) { return &_lightExposureCamera; }
+
+		/**
+		 * Indicates that collision detection structures must be reinitialized.
+		 */
+
+		void setUninitialized();
+
+		/**
+    	 * Enables/disables collision resolution.  
+		 */
+
+		void setCollisionResolution( bool );
+		void setBoundsOnlyCollisionDetection( bool );
+		void setPhysicsMode( int );
+		void setBackgroundColor( slVector* );
+		void setBackgroundTextureColor( slVector* );
+		void setBackgroundTexture( int, int );
 
 		// integration vectors -- DV_VECTOR_COUNT depends on the requirements
 		// of the integration algorithm we're using... mbEuler requires only 
@@ -141,15 +159,21 @@ class slWorld {
 	
 		int (*_collisionCheckCallback)(void *body1, void *body2, int type);
 	
+		slObjectLine *addObjectLine( slWorldObject*, slWorldObject*, int, slVector* );
+
+		slPatchGrid *addPatchGrid( slVector *center, slVector *patchSize, int x, int y, int z );
+		void removePatchGrid( slPatchGrid *g );
+
+
 		// age is the simulation time of the world.
 	
 		double _age;
 	
-		std::vector< slWorldObject* > objects;
-		std::vector< slPatchGrid* > patches;
-		std::vector< slCamera* > cameras;
+		std::vector< slWorldObject* > _objects;
+		std::vector< slPatchGrid* > _patches;
+		std::vector< slCamera* > _cameras;
 		std::vector< slObjectConnection* > _connections;
-		std::vector< slDrawCommandList* > drawings;
+		std::vector< slDrawCommandList* > _drawings;
 	
 		// we have one slVclipData for the regular collision detection
 		// and one which will be used to answer "proximity" questions:
@@ -188,10 +212,18 @@ class slWorld {
 		slWorldObject *addObject( slWorldObject* );
 		void removeObject( slWorldObject* );
 
-		void renderShadowVolume(slCamera *c);
-		void renderObjectShadowVolumes(slCamera *c);
-	
 		void setQuickstepIterations( int );
+
+		slWorldObject *getObject( unsigned int );
+
+		void setCollisionCallbacks( int (*)(void *, void *, int), void (*)(void *, void *, int) );
+
+		void renderCameras();
+
+		int startNetsimServer();
+		int startNetsimSlave( char* );
+		void addCamera( slCamera* );
+		void removeCamera( slCamera* );
 
 		dWorldID _odeWorldID;
 		dJointGroupID _odeCollisionGroupID;
@@ -209,8 +241,8 @@ class slWorld {
 		slCamera _lightExposureCamera;
 
 #if HAVE_LIBENET
-		slNetsimData netsimData;
-		slNetsimClientData *netsimClient;
+		slNetsimData _netsimData;
+		slNetsimClientData *_netsimClient;
 #endif
 
 	private:
@@ -221,39 +253,7 @@ class slWorld {
 extern "C"{
 #endif
 
-int slWorldStartNetsimServer(slWorld *);
-int slWorldStartNetsimSlave(slWorld *, char *);
-
-void slWorldAddCamera(slWorld *, slCamera *);
-void slWorldRemoveCamera(slWorld *, slCamera *);
-
-slPatchGrid *slPatchGridAdd(slWorld *, slVector *, slVector *, int, int, int);
-void slPatchGridRemove(slWorld *w, slPatchGrid *g);
-
-void slWorldFree(slWorld *);
-void slWorldFreeObject(slWorldObject *);
-void slFreeClipData(slVclipData *);
-void slRenderWorldCameras(slWorld *);
-
-slVclipData *slVclipDataNew(void);
-
-void slWorldSetBoundsOnlyCollisionDetection(slWorld *, int);
-
 void slInitProximityData(slWorld *);
-
-slObjectLine *slWorldAddObjectLine(slWorld *, slWorldObject *, slWorldObject *, int, slVector *);
-
-void slWorldSetUninitialized(slWorld *);
-void slWorldSetCollisionResolution(slWorld *, int);
-void slWorldSetPhysicsMode(slWorld *, int);
-
-void slWorldSetBackgroundColor(slWorld *, slVector *);
-void slWorldSetBackgroundTextureColor(slWorld *, slVector *);
-void slWorldSetBackgroundTexture(slWorld *, int, int);
-
-void slWorldSetCollisionCallbacks(slWorld *, int (*)(void *, void *, int), void (*)(void *, void *, int));
-
-slWorldObject *slWorldGetObject(slWorld *, unsigned int);
 
 slGISData *slWorldLoadTigerFile(slWorld *, char *, slTerrain *);
 #ifdef __cplusplus

@@ -1,0 +1,84 @@
+@use Control.
+@use Real.
+@use Braitenberg.
+
+Controller BraitenbergDemolition.
+
+BraitenbergControl : BraitenbergDemolition {
+	+ variables:
+		vehicle, leftWheel, rightWheel (object).
+		blocks (list).
+
+	+ to init:
+		rampShape (object).
+		ramp (object).
+
+		rampShape = new Cube init-with size ( 10, .1, 8 ).
+
+		self enable-fast-physics.
+		self set-fast-physics-iterations to 10.
+
+		ramp = new Stationary.
+		ramp register with-shape rampShape
+			at-location ( 50, 1.4, 0 )
+			with-rotation [ (0.96596, -0.25869, 0.00000), (0.25869, 0.96596, 0.00000), (0.00000, 0.00000, 1.00000) ].
+
+		vehicle = new BraitenbergHeavyVehicle.
+
+		leftWheel = (vehicle add-wheel at (1.5, 0, -1.5)).
+		rightWheel = (vehicle add-wheel at (1.5, 0, 1.5)).
+		leftWheel set-natural-velocity to 50.0.
+		rightWheel set-natural-velocity to 50.0.
+
+		leftWheel = (vehicle add-wheel at (-1.5, 0, -1.5)).
+		rightWheel = (vehicle add-wheel at (-1.5, 0, 1.5)).
+		leftWheel set-natural-velocity to 50.0.
+		rightWheel set-natural-velocity to 50.0.
+
+		all Stationaries set-mu to 40.0.
+		all BraitenbergWheels set-mu to 40.0.
+
+		blocks = 10 new Bricks.
+
+		self watch item vehicle.
+
+		self set-camera-offset to ( -11.0, 4.5, 5.5 ).
+		self pan-camera-offset by ( 20, 10, 9 ) steps 80.
+
+		self reset.
+
+	+ to reset:
+		all Mobiles set-velocity to ( 0, 0, 0 ).
+
+		vehicle rotate around-axis ( 1, 0, 0 ) by 0.
+
+		blocks{ 0 } move to ( 65, 0.6, -1.65 ).
+		blocks{ 1 } move to ( 65, 0.6,  -.55 ).
+		blocks{ 2 } move to ( 65, 0.6,   .55 ).
+		blocks{ 3 } move to ( 65, 0.6,  1.65 ).
+
+		blocks{ 4 } move to ( 65, 1.61, -1.1 ).
+		blocks{ 5 } move to ( 65, 1.61,    0 ).
+		blocks{ 6 } move to ( 65, 1.61,  1.1 ).
+
+		blocks{ 7 } move to ( 65, 2.62, -.55 ).
+		blocks{ 8 } move to ( 65, 2.62,  .55 ).
+
+		blocks{ 9 } move to ( 65, 3.63,   0 ).
+
+		blocks set-rotation to [ ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) ].
+
+		vehicle move to ( 0, .8, 0 ).
+
+	+ to catch-key-r-down:
+		self reset.
+}
+
+Mobile : Brick (aka Bricks) {
+	+ variables:
+		shape (object).
+
+	+ to init:
+		self set-shape to ( new Cube init-with size ( 1, 1, 1 ) ).
+		self enable-physics.
+}

@@ -41,14 +41,14 @@ void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 	sun = &w->_lightExposureCamera._location;
 	target = &w->_lightExposureCamera._target;
 
-	if( activateContextCallback && activateContextCallback() != 0) {
+	if( _activateContextCallback && _activateContextCallback() != 0) {
 		slMessage(DEBUG_ALL, "Cannot simulate light exposure: no OpenGL context available\n");
 		return;
 	}
 
 	if( sun->y < target->y ) {
 		// no exposure -- zero out the existing values
-		for(wi = w->objects.begin(); wi != w->objects.end(); wi++ )
+		for( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ )
 			(*wi)->_lightExposure = 0;
 
 		return;
@@ -62,7 +62,7 @@ void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 		bufferSize = size * size * 3;
 	}
 
-	if(w->objects.size() == 0) return;
+	if( w->_objects.size() == 0 ) return;
 
 	glDisable( GL_LIGHTING );
 	glDisable( GL_BLEND );
@@ -95,7 +95,7 @@ void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 	glClearColor( 1, 1, 1, 1 );
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	for(wi = w->objects.begin(); wi != w->objects.end(); wi++) {
+	for(wi = w->_objects.begin(); wi != w->_objects.end(); wi++) {
 		unsigned char br, bg, bb;
 
 		br = n / (256 * 256);
@@ -126,8 +126,8 @@ void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 
 		label = (expMap[x] << 16) + (expMap[x+1] << 8) + expMap[x+2];
 
-		if(label != WHITE_PIXEL && label < w->objects.size()) {
-			wo = w->objects[label];
+		if( label != WHITE_PIXEL && label < w->_objects.size() ) {
+			wo = w->_objects[label];
 			wo->_lightExposure++;
 		}
 	}

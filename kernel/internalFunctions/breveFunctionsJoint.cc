@@ -80,7 +80,7 @@ int brJointILinkRevolute(brEval args[], brEval *target, brInstance *i) {
 
 	joint->_userData = i;
 
-	slWorldSetUninitialized(i->engine->world);
+	i->engine->world->setUninitialized();
 
 	target->set( joint );
 	
@@ -154,7 +154,7 @@ int brJointILinkPrismatic(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slWorldSetUninitialized(i->engine->world);
+	i->engine->world->setUninitialized();
 
 	target->set( joint );
 	
@@ -187,7 +187,7 @@ int brJointILinkBall(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slWorldSetUninitialized(i->engine->world);
+	i->engine->world->setUninitialized();
 
 	target->set( joint );
 	
@@ -220,7 +220,7 @@ int brJointILinkUniversal(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slWorldSetUninitialized(i->engine->world);
+	i->engine->world->setUninitialized();
 
 	target->set( joint );
 	
@@ -250,7 +250,7 @@ int brJointILinkStatic(brEval args[], brEval *target, brInstance *i) {
 		return EC_ERROR;
 	}
 
-	slWorldSetUninitialized(i->engine->world);
+	i->engine->world->setUninitialized();
 
 	target->set( joint );
 	
@@ -268,7 +268,7 @@ int brIJointBreak(brEval args[], brEval *target, brInstance *i) {
 
 	delete joint;
 
-	slWorldSetUninitialized(i->engine->world);
+	i->engine->world->setUninitialized();
 
 	return EC_OK;
 }

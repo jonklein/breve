@@ -105,7 +105,7 @@ brEngine *brEngineNew(void) {
 
 	e->simulationWillStop = 0;
 
-	e->camera = new slCamera(400, 400);
+	e->camera = new slCamera( 400, 400 );
 
 #if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
 	Pa_Initialize();
@@ -132,7 +132,7 @@ brEngine *brEngineNew(void) {
 
 	e->world = new slWorld();
 
-	slWorldSetCollisionCallbacks(e->world, brCheckCollisionCallback, brCollisionCallback);
+	e->world->setCollisionCallbacks( brCheckCollisionCallback, brCollisionCallback );
 
 	gettimeofday(&e->startTime, NULL);
 
@@ -271,7 +271,7 @@ void brEngineFree(brEngine *e) {
 	}
 
 	if(e->camera) delete e->camera;
-	if(e->world) slWorldFree(e->world);
+	if(e->world) delete e->world;
 	if(e->iTunesData) delete e->iTunesData;
 
 	for(wi = e->windows.begin(); wi != e->windows.end(); wi++ ) 

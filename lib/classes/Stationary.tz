@@ -1,7 +1,7 @@
 @include "Real.tz"
-@include "MenuItem.tz"
+# @include "MenuItem.tz"
 
-Real : Stationary (aka Stationaries) [version 2.0] {
+Real : Stationary (aka Stationaries) [version 2.4] {
     % Stationary objects are objects such as floors and walls that may 
     % collide with other objects but will never move.  Stationary objects
     % require much less computation than OBJECT(Mobile) objects, so it is 
@@ -10,6 +10,14 @@ Real : Stationary (aka Stationaries) [version 2.0] {
 	% <P>
 	% To setup a stationary object, you'll need to associate it with a
 	% OBJECT(Shape) object using the method METHOD(register).
+
+	# Notes for future implementation: 
+	# Beginning in breve 2.5, Stationary functionality has been enhanced
+	# to allow repositioning at any time.  The distinction between Stationary
+	# and OBJECT(Mobile) objects is that Stationary objects do not react
+	# to physics and thus do not move <i>on their own</i>.  They can be 
+	# repositioned explicitly by simulation code at any time, but do not 
+	# have their own velocities or react to physics in any other way.
 
     + variables:
         color (vector).
@@ -20,7 +28,7 @@ Real : Stationary (aka Stationaries) [version 2.0] {
 
   + section "Setting Up the Stationary Object"
 
-    + to register with-shape theShape (object) at-location theLocation = (0, 0, 0) (vector):
+    + to register with-shape theShape (object) at-location theLocation = (0, 0, 0) (vector) with-rotation theRotation = [ ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) ] (matrix) :
         % Registers a stationary object using shape theShape at the location
         % specified by theLocation.
 
@@ -34,7 +42,7 @@ Real : Stationary (aka Stationaries) [version 2.0] {
 		self add-dependency on shape.
 
         objectLocation = theLocation.
-        realWorldPointer = addStationary((theShape get-pointer), theLocation).
+        realWorldPointer = addStationary( ( theShape get-pointer ), theLocation, theRotation ).
         self set-texture to 0.
 
 		return self.
@@ -110,6 +118,6 @@ Stationary : Floor {
 	% plane is placed at Y = 0.
 
 	+ to init:
-		self register with-shape (new Cube init-with size (1000, 5, 1000)) 
-			at-location (0, -2.5, 0).
+		self register with-shape (new Cube init-with size (1000, 5, 1000)) at-location (0, -2.5, 0).
+			# with-rotation [ ( .707, .707, 0 ), ( -.707, .707, 0 ), ( 0, 0, 1 ) ].
 }

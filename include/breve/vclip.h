@@ -103,6 +103,11 @@ class slCollision {
 
 class slVclipData {
 	public:
+		slVclipData();
+		~slVclipData();
+
+		void realloc( int count );
+
 		/**
  		 * Runs the prune and sweep phase of the collision detection.
 		 */
@@ -139,6 +144,9 @@ class slVclipData {
 
 		unsigned int count;
 		unsigned int maxCount;
+
+		slPairFlags initPairFlags( int, int );
+
 };
 
 class slCollisionCandidate {

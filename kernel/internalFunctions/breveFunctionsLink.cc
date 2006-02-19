@@ -94,11 +94,8 @@ int brILinkSetLocation(brEval args[], brEval *target, brInstance *i) {
 
 int brILinkSetRotationMatrix(brEval args[], brEval *target, brInstance *i) {
 	slLink *l = BRLINKPOINTER(&args[0]);
-	double m[3][3];
 
-	slMatrixCopy(BRMATRIX(&args[1]), m);
-
-	l->setRotation(m);
+	l->setRotation( BRMATRIX(&args[1]) );
 
 	return EC_OK;
 }

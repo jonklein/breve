@@ -199,7 +199,7 @@ void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
 	glEnd();
 }
 
-void slWorld::renderShadowVolume(slCamera *c) {
+void slCamera::renderShadowVolume( slWorld *w ) {
 	glClear(GL_STENCIL_BUFFER_BIT);
 
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
@@ -212,17 +212,17 @@ void slWorld::renderShadowVolume(slCamera *c) {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
 
 	// stencil up shadow volume front faces to 1 
-	renderObjectShadowVolumes(c);
+	renderObjectShadowVolumes( w );
 	
 	// stencil down shadow volume back faces to 0
 
 	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
 	glCullFace(GL_FRONT);
-	renderObjectShadowVolumes(c);
+	renderObjectShadowVolumes( w );
 
 	// glClear(GL_DEPTH_BUFFER_BIT);
 
-	c->drawLights( 0 );
+	drawLights( 0 );
 
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glDepthMask(GL_TRUE);
@@ -235,7 +235,7 @@ void slWorld::renderShadowVolume(slCamera *c) {
 	// draw the scene again, with lighting, only where the value is 0 
 	
 	// glColor3f(1, 0, 0);
-	c->renderObjects( this, DO_NO_ALPHA );
+	renderObjects( w, DO_NO_ALPHA );
 
 	// transparent objects cause problems, since they cannot simply 
 	// be "drawn over" the way we do with the rest of the scene.  
@@ -244,28 +244,28 @@ void slWorld::renderShadowVolume(slCamera *c) {
 	// 1) do not render the alphas at all for the first pass
 	// 2) render the unlit alphas where the stencil != 0 
 
-	c->renderObjects( this, DO_ONLY_ALPHA );
-	if( c->_billboardCount ) c->renderBillboards( 0 );
+	renderObjects( w, DO_ONLY_ALPHA );
+	if( _billboardCount ) renderBillboards( 0 );
 
 	glStencilFunc( GL_NOTEQUAL, 0, 0xffffffff );
-	if( c->_billboardCount ) c->renderBillboards( 0 );
+	if( _billboardCount ) renderBillboards( 0 );
 	
-	c->drawLights( 1 );
-	c->renderObjects( this, DO_ONLY_ALPHA );
+	drawLights( 1 );
+	renderObjects( w, DO_ONLY_ALPHA );
 
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_LIGHTING);
 }
 
-void slWorld::renderObjectShadowVolumes(slCamera *c) {
+void slCamera::renderObjectShadowVolumes( slWorld *w ) {
 	std::vector<slWorldObject*>::iterator wi;
 
 	glDisable( GL_BLEND );
 	glColor4f( 0, 0, 0, 1 );
 
-	for(wi = objects.begin(); wi != objects.end(); wi++ ) {
+	for( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ ) {
 		if((*wi)->_shape && !(*wi)->_drawAsPoint) {
-			(*wi)->_shape->drawShadowVolume( c, &(*wi)->_position );
+			(*wi)->_shape->drawShadowVolume( this, &(*wi)->_position );
 		}
 	}
 }

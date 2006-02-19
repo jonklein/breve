@@ -274,8 +274,8 @@ void slPatchGrid::assignObjectsToPatches(slWorld *w) {
 		}
 	}
 
-	for(x = 0; x < w->objects.size(); x++ ) {
-		slWorldObject *w1 = w->objects[x];
+	for( x = 0; x < w->_objects.size(); x++ ) {
+		slWorldObject *w1 = w->_objects[ x ];
 		slPatch *p = getPatchAtLocation( &w1->getPosition().location);
 
 		if(p) {
@@ -295,7 +295,7 @@ void slPatchGrid::assignObjectsToPatches(slWorld *w) {
 				        // the UNKNOWN flag indicates that we have not yet preformed a callback to
 				        // determine whether further collision detection is necessary.
 
-				        flags = slVclipDataInitPairFlags(vc, x, y);
+				        flags = vc->initPairFlags( x, y );
 				    }
 
 				    if(flags & BT_CHECK) {

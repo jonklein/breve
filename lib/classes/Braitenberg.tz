@@ -57,11 +57,12 @@ MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
 		bodyShape init-with-cube size (4.0, .75, 3.0).	
 
 		wheelShape = new Shape.
-		wheelShape init-with-polygon-disk radius .6 sides 40 height .1.
+		wheelShape init-with-polygon-disk radius ( self get-wheel-radius ) sides 40 height ( self get-wheel-width ).
 
 		sensorShape = new Shape.
 		sensorShape init-with-polygon-cone radius .2 sides 10 height .5.
 
+		bodyShape set-density to ( self get-density ).
 		bodyLink = new Link.
 		bodyLink set-shape to bodyShape.	
 		bodyLink set-mu to -1.0.
@@ -69,8 +70,17 @@ MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
 
 		self set-root to bodyLink.
 
-		self move to (0, 1.0, 0).
+		self move to (0, 0.9, 0).
 		self set-texture-scale to 1.5.
+
+	- to get-density:
+		return 1.0.
+
+	- to get-wheel-width:
+		return 0.1.
+
+	- to get-wheel-radius:
+		return 0.6.
 
 	+ section "Adding Wheels and Sensors to a Vehicle"
 
@@ -137,6 +147,21 @@ MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
 		free bodyShape.
 
 		super destroy.
+}
+
+BraitenbergVehicle : BraitenbergHeavyVehicle (aka BraitenbergHeavyVehicles) {
+	% A heavy duty version of OBJECT(BraitenbergVehicle), this vehicle
+	% is heavier and harder to control, but more stable at higher 
+	% speeds.
+
+	- to get-density:
+		return 20.0.
+
+	- to get-wheel-width:
+		return 0.4.
+
+	- to get-wheel-radius:
+		return 0.8.
 }
 
 Mobile : BraitenbergLight (aka BraitenbergLights) {

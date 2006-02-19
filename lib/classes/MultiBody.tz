@@ -192,6 +192,11 @@ Object : MultiBody (aka MultiBodies) [version 2.0] {
 
 		return self.
 
+	+ to get-root:
+		% Returns the root link.
+
+		return rootLink.
+
 	+ to get-all-connected-links:
 		% Returns all of the OBJECT(Link) objects which comprise the 
 		% MultiBody.

@@ -6,7 +6,7 @@ slDrawCommandList::slDrawCommandList(slWorld *w) {
 	slMatrixIdentity( _rotation);
 	_limit = 0;
 	_drawingPolygon = 0;
-	w->drawings.push_back(this);
+	w->_drawings.push_back(this);
 }
 
 slDrawCommandList::~slDrawCommandList() {

@@ -93,31 +93,14 @@ struct slBillboardEntry {
 
 class slCamera {
 	public:
-		slCamera(int width = 200, int height = 200);
+		slCamera( int width = 200, int height = 200 );
 		~slCamera();
 
 		void renderWorld( slWorld *w, int crosshair, int scissor );
 		void renderScene( slWorld *w, int crosshair );
-		void renderObjects( slWorld *w, unsigned int flags );
-		void renderText( slWorld *w, int crosshair );
-		void renderLabels( slWorld *w );
-		void renderLines( slWorld *w );
-		void drawLights( int noDiffuse );
-		void drawBackground( slWorld *w );
 
-		void clear( slWorld *w );
-
-		void stencilFloor();
-
-		void reflectionPass( slWorld *w );
-		void shadowPass( slWorld *w );
-
-		int select( slWorld *w, int x, int y );
-		int vectorForDrag( slWorld *w, slVector *dragVertex, int x, int y, slVector *dragVector );
 
 		void detectLightExposure( slWorld *w, int size, GLubyte *buffer );
-
-		void drawFog( );
 
 		void updateFrustum();
 
@@ -143,7 +126,16 @@ class slCamera {
 
 		void setShadowCatcher( slStationary *, slVector * );
 				
-		std::vector< std::pair< slVector, slVector> > _points;
+		void setActivateContextCallback( int (*f)() );
+		void setCameraText( int n, char *string, float x, float y, slVector *v );
+	
+		int select( slWorld *w, int x, int y );
+		int vectorForDrag( slWorld *w, slVector *dragVertex, int x, int y, slVector *dragVector );
+
+		void renderShadowVolume( slWorld *w );
+		void renderObjectShadowVolumes( slWorld *w );
+
+		std::vector< std::pair< slVector, slVector > > _points;
 
 		slWorldObject *_shadowCatcher;
 
@@ -225,18 +217,27 @@ class slCamera {
 		int _originy;
 	
 		double _fov;
-	
-		int (*activateContextCallback)();
-		void (*renderContextCallback)(slWorld *w, slCamera *c);
+
+		int  (*_activateContextCallback)();
+		void (*_renderContextCallback)(slWorld *w, slCamera *c);
+
+		void clear( slWorld *w );
+
+	private:
+		void stencilFloor();
+		void reflectionPass( slWorld *w );
+		void shadowPass( slWorld *w );
+		void renderObjects( slWorld *w, unsigned int flags );
+		void renderText( slWorld *w, int crosshair );
+		void renderLabels( slWorld *w );
+		void renderLines( slWorld *w );
+		void drawLights( int noDiffuse );
+		void drawBackground( slWorld *w );
+		void drawFog();
 
 
 };
 
-void slSetCameraText(slCamera *, int, char *, float, float, slVector *);
-
 int slBillboardSortFunc(const void *, const void *);
-void slCameraSetActivateContextCallback(slCamera *, int (*)(void));
-
-void slCameraSetRecompile(slCamera *);
 
 #endif /* _CAMERA_H */

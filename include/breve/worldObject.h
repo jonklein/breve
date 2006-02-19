@@ -116,7 +116,7 @@ class slWorldObject {
 		inline const slPosition &getPosition() { return _position; }
 		inline const slShape *getShape() { return _shape; }
 
-		void updateBoundingBox();
+		virtual void updateBoundingBox();
 
 		inline unsigned char getType() { return _type; }
 

@@ -74,12 +74,12 @@ void *slNetsimThread(void *d) {
 				remoteHost = new slNetsimRemoteHostData;
 				remoteHost->peer = event.peer;
 
-				serverData->world->netsimData.remoteHosts.push_back(remoteHost);
+				serverData->world->_netsimData.remoteHosts.push_back(remoteHost);
 				
 				break;
 
 			case ENET_EVENT_TYPE_RECEIVE:
-				remoteHost = serverData->world->netsimData.remoteHosts[ (int)event.peer->data ];
+				remoteHost = serverData->world->_netsimData.remoteHosts[ (int)event.peer->data ];
 
 				switch(event.channelID) {
 					case MT_SYNC:
@@ -226,7 +226,7 @@ inline void slNetsimVectorsToBoundsMessage(slNetsimBoundsMessage *m, slVector *m
 void slDrawNetsimBounds(slWorld *w) {
 	std::vector<slNetsimRemoteHostData*>::iterator hi;
 
-	for(hi = w->netsimData.remoteHosts.begin(); hi != w->netsimData.remoteHosts.end(); hi++ ) {
+	for( hi = w->_netsimData.remoteHosts.begin(); hi != w->_netsimData.remoteHosts.end(); hi++ ) {
 		slNetsimRemoteHostData *data = *hi;
 
 		glEnable(GL_BLEND);

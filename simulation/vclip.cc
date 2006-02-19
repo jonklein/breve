@@ -61,7 +61,7 @@ void slAddCollisionCandidate(slVclipData *vc, slPairFlags flags, int x, int y) {
 	// the UNKNOWN flag indicates that we have not yet preformed a callback to 
 	// determine whether further collision detection is necessary.
 
-	if(flags & BT_UNKNOWN) flags = slVclipDataInitPairFlags(vc, x, y);
+	if(flags & BT_UNKNOWN) flags = vc->initPairFlags( x, y );
 
 	if(!(flags & BT_CHECK)) return;
 
@@ -1439,7 +1439,7 @@ int slClipEdgePoints(slVector *transformedStart, slVector *transformedEnd, slPla
 	combinations.
 */
 
-void slFindCollisionFaces( const slShape *s1, slPosition *p1, slFeature **f1p, const slShape *s2, slPosition *p2, slFeature **f2p) {
+void slFindCollisionFaces( const slShape *s1, const slPosition *p1, slFeature **f1p, const slShape *s2, const slPosition *p2, slFeature **f2p) {
 	int count1, count2, x, y;
 	slFeature *f1, *f2;
 	slFace **faces1, **faces2;
@@ -1642,7 +1642,7 @@ void slFindCollisionFaces( const slShape *s1, slPosition *p1, slFeature **f1p, c
 	the vertices and we compute points on edges that go through the suspect plane.
 */
 
-int slFaceFaceCollisionPoints(slCollision *ce, const slShape *s1, slPosition *p1, slFace *face1, const slShape *s2, slPosition *p2, slFace *face2) {
+int slFaceFaceCollisionPoints(slCollision *ce, const slShape *s1, const slPosition *p1, const slFace *face1, const slShape *s2, const slPosition *p2, const slFace *face2) {
 	int n, update1, update2, included;
 	double l1, l2;
 

@@ -635,12 +635,12 @@ int slPNGSnapshot( slWorld *w, slCamera *c, const char *file ) {
 	unsigned char *buf;
 	int r;
 
-	if (c->activateContextCallback && c->activateContextCallback()) {
+	if ( c->_activateContextCallback && c->_activateContextCallback() ) {
 		slMessage(DEBUG_ALL, "Cannot generate PNG snapshot: no OpenGL context available\n");
 		return -1;
 	}
-	if (c->renderContextCallback)
-		c->renderContextCallback(w, c);
+
+	if ( c->_renderContextCallback ) c->_renderContextCallback(w, c);
 
 	buf = new unsigned char[c->_width * c->_height * 3];
 

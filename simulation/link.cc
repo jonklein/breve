@@ -170,8 +170,6 @@ void slLink::setLabel(char *l) {
 void slLink::setLocation(slVector *location) {
 	_justMoved = 1;
 
-	slVectorCopy( location, &_position.location );
-
 	if( _simulate ) {
 		if(_odeBodyID) dBodySetPosition( _odeBodyID, location->x, location->y, location->z );
 	} else {
@@ -179,6 +177,7 @@ void slLink::setLocation(slVector *location) {
 		slVectorCopy( location, &_stateVector[!_currentState].location );
 	}
 
+	slVectorCopy( location, &_position.location );
 	updateBoundingBox();
 }
 
@@ -197,7 +196,7 @@ void slLink::setRotation( double rotation[3][3] ) {
 	} else {
 		slQuat q;
 
-		slMatrixToQuat(rotation, &q);
+		slMatrixToQuat( rotation, &q );
 
 		slQuatCopy( &q, &_stateVector[ _currentState].rotQuat );
 		slQuatCopy( &q, &_stateVector[!_currentState].rotQuat );
@@ -380,7 +379,7 @@ std::vector< void* > slLink::userDataForPenetratingObjects(slWorld *w) {
 			slPairFlags *flags = slVclipPairFlags( vc, ln, n );
 
 			if((slVclipFlagsShouldTest(*flags) && *flags & BT_SIMULATE) && vc->testPair(&c, NULL)) {
-				penetrations.push_back( w->objects[ n ]->getCallbackData() );
+				penetrations.push_back( w->_objects[ n ]->getCallbackData() );
 			}
 		}
 	}

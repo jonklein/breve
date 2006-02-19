@@ -186,7 +186,7 @@ unsigned int slTextureNew(slCamera *c) {
 
 	if (!glActive) return 0;
 
-	if (c->activateContextCallback) c->activateContextCallback();
+	if ( c->_activateContextCallback ) c->_activateContextCallback();
 
 	glGenTextures(1, &texture);
 	return texture;
@@ -196,7 +196,7 @@ void slTextureFree(slCamera *c, const unsigned int n) {
 	if (!glActive)
 		return;
 
-	if (c->activateContextCallback) c->activateContextCallback();
+	if (c->_activateContextCallback) c->_activateContextCallback();
 
 	glDeleteTextures(1, (GLuint *)&n);
 }
@@ -214,8 +214,8 @@ int slUpdateTexture(slCamera *c, GLuint texture, unsigned char *pixels, int widt
 	if (!glActive)
 		return -1;
 
-	if (c->activateContextCallback)
-		c->activateContextCallback();
+	if ( c->_activateContextCallback )
+		c->_activateContextCallback();
 
 	newwidth = slNextPowerOfTwo(width); 
 	newheight = slNextPowerOfTwo(height);
@@ -256,7 +256,7 @@ int slCamera::select(slWorld *w, int x, int y) {
 	GLuint namesInHit, selection_buffer[ BUFFER_SIZE ];
 	GLint hits, viewport[4];
 	unsigned int min, nearest = 0xffffffff;
-	unsigned int hit = w->objects.size() + 1;
+	unsigned int hit = w->_objects.size() + 1;
 
 	viewport[0] = _originx;
 	viewport[1] = _originy;
@@ -283,7 +283,7 @@ int slCamera::select(slWorld *w, int x, int y) {
 	// use -1 to mean no selection -- we'll use the number of objects 
 	// plus 1 to indicate that no selectable object was selected.
 
-	glLoadName(w->objects.size() + 1);
+	glLoadName(w->_objects.size() + 1);
 
 	slClearGLErrors("about to select");
 
@@ -323,7 +323,7 @@ int slCamera::select(slWorld *w, int x, int y) {
 
 	glPopName();
 
-	if (hit == w->objects.size() + 1)
+	if (hit == w->_objects.size() + 1)
 		return -1;
 
 	return hit;
@@ -427,7 +427,7 @@ void slCamera::renderScene(slWorld *w, int crosshair) {
 
 	renderWorld(w, crosshair, 0);
  
-	for( ci = w->cameras.begin(); ci != w->cameras.end(); ci++)
+	for( ci = w->_cameras.begin(); ci != w->_cameras.end(); ci++)
         if ( *ci != this ) ( *ci )->renderWorld( w, 0, 1 );
 
 	if ( w->_detectLightExposure && w->_drawLightExposure )
@@ -486,7 +486,7 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 		if ( _drawShadowVolumes ) drawLights( 1 );
 		else drawLights( 0 );
 
-		if ( _drawReflection || _drawShadow) stencilFloor( );
+		if ( _drawReflection || _drawShadow ) stencilFloor( );
 
 		if ( _drawReflection && !(flags & DO_OUTLINE) ) {
 			slVector toCam;
@@ -498,7 +498,7 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 
 			if ( slVectorDot( &toCam, &_shadowPlane.normal ) > 0.0 ) {
 				reflectionPass( w );
-				if ( _drawShadowVolumes) drawLights( 1 );
+				if ( _drawShadowVolumes ) drawLights( 1 );
 			}
 		}
 	} else
@@ -519,16 +519,16 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 	}
 
 	std::vector<slPatchGrid*>::iterator pi;
-	for (pi = w->patches.begin(); pi != w->patches.end(); pi++)
+	for (pi = w->_patches.begin(); pi != w->_patches.end(); pi++)
 		(*pi)->draw( this );
 
 	if ( _drawLights ) {
-		if ( _drawShadowVolumes ) w->renderShadowVolume( this );
+		if ( _drawShadowVolumes ) renderShadowVolume( w );
 		else if ( _drawShadow ) shadowPass( w );
 	}
 
 	std::vector<slDrawCommandList*>::iterator di;
-	for(di = w->drawings.begin(); di != w->drawings.end(); di++) (*di)->draw( this );
+	for( di = w->_drawings.begin(); di != w->_drawings.end(); di++) (*di)->draw( this );
 
 	glDepthMask(GL_FALSE);
 	renderObjects(w, flags | DO_ONLY_ALPHA);
@@ -842,7 +842,7 @@ void slCamera::renderLabels( slWorld *w ) {
 
 	glColor3f(0, 0, 0);
 
-	for(wi = w->objects.begin(); wi != w->objects.end(); wi++) {
+	for(wi = w->_objects.begin(); wi != w->_objects.end(); wi++) {
 		wo = *wi;
 
 		if ( !wo->_label.empty() ) {
@@ -1077,7 +1077,7 @@ void slCamera::processBillboards( slWorld *w ) {
 
 	_billboardCount = 0;
 
-	for (wi = w->objects.begin(); wi != w->objects.end(); wi++ ) {
+	for (wi = w->_objects.begin(); wi != w->_objects.end(); wi++ ) {
 		slWorldObject *wo = *wi;
 
 		if (wo->_textureMode != BBT_NONE && wo->_shape && wo->_shape->_type == ST_SPHERE) {
@@ -1150,9 +1150,9 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
    	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
    	// glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
-	for (n = 0; n < w->objects.size(); ++n) {
+	for (n = 0; n < w->_objects.size(); ++n) {
 		int skip = 0;
-		wo = w->objects[n];
+		wo = w->_objects[n];
 
 		if ( wo->_drawAsPoint ) skip = 0;
 		else if( wo->_drawMode == DM_INVISIBLE ) skip = 1;
@@ -1217,7 +1217,7 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 		glDisable(GL_BLEND);
 
 	if (loadNames)
-		glLoadName(w->objects.size() + 1);
+		glLoadName(w->_objects.size() + 1);
 }
 
 /*!
@@ -1231,19 +1231,19 @@ void slCamera::renderLines( slWorld *w ) {
 
 	glLineWidth(1.2);
 
-	for (n = 0; n < w->objects.size(); ++n) {
-		if(w->objects[n] && !(w->objects[n]->_drawMode & DM_INVISIBLE)) {
-			if (w->objects[n]->_drawMode & DM_NEIGHBOR_LINES) {
+	for (n = 0; n < w->_objects.size(); ++n) {
+		if(w->_objects[n] && !(w->_objects[n]->_drawMode & DM_INVISIBLE)) {
+			if (w->_objects[n]->_drawMode & DM_NEIGHBOR_LINES) {
 				std::vector<slWorldObject*>::iterator wi;
 
 				glEnable(GL_BLEND);
 				glColor4f(0.0, 0.0, 0.0, 0.5);
 
-				x = &w->objects[n]->_position.location;
+				x = &w->_objects[n]->_position.location;
 
 				glBegin(GL_LINES);
 
-				for ( wi = w->objects[n]->_neighbors.begin(); wi != w->objects[n]->_neighbors.end(); wi++ ) { 
+				for ( wi = w->_objects[n]->_neighbors.begin(); wi != w->_objects[n]->_neighbors.end(); wi++ ) { 
 					neighbor = *wi;
 
 					if (neighbor) {

@@ -291,15 +291,15 @@ header
 		slFree($3);
 	}
 | '@' DEFINE WORD_VALUE vector_value END {
-		steveData->defines[ $3] = $4;
-		slFree($3);
+		steveData->defines[ $3 ] = $4;
+		slFree( $3 );
 	}
 | '@' DEFINE WORD_VALUE matrix_value END {
-		steveData->defines[ $3] = $4;
-		slFree($3);
+		steveData->defines[ $3 ] = $4;
+		slFree( $3 );
 	}
 | CONTROLLER WORD_VALUE END {
-		if(!gReparse && stSetControllerName(steveData, parseEngine, $2))
+		if( !gReparse && stSetControllerName( steveData, parseEngine, $2 ) )
 			stParseError(parseEngine, PE_INTERNAL, "Error defining \"Controller\" object");
 
 		slFree($2);
@@ -344,6 +344,8 @@ matrix_value
 		m[2][2] = stDoubleFromIntOrDoubleExp($23); delete $23;
 
 		e->set( m );
+
+		$$ = e;
 	}
 ;
 
@@ -613,7 +615,7 @@ keyword_and_variable
 : WORD_VALUE WORD_VALUE default_value type {
 		stVar *v = new stVar($2, $4);
 
-		$$ = stNewKeywordEntry($1, v, $3);
+		$$ = stNewKeywordEntry( $1, v, $3 );
 
 		slFree($1);
 		slFree($2);
