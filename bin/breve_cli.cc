@@ -174,7 +174,7 @@ int main(int argc, char **argv) {
 				frontend->engine->world, OSMESA_WINDOW_SIZE, gOffscreenBuffer );
 	}
 
-	brQuit(frontend->engine);
+	brQuit( frontend->engine );
 }
 
 void brCatchSignal(int signal) {

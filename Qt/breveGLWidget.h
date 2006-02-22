@@ -9,6 +9,7 @@
 #include <QMouseEvent>
 
 #include "kernel.h"
+#include "camera.h"
 
 class breveGLWidget : public QGLWidget
 {
@@ -21,10 +22,8 @@ public:
 		_engine = e; 
 
 		if(_engine) {
-			slInitGL(_engine->world, _engine->camera);
-
-			_engine->camera->x = width();
-			_engine->camera->y = height();
+			_engine->camera->_originx = width();
+			_engine->camera->_originy = height();
 		} 
 
 		updateGL();

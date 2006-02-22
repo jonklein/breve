@@ -1,6 +1,8 @@
 
 #include "breveGLWidget.h"
 #include "glIncludes.h"
+//Added by qt3to4:
+#include <QMouseEvent>
 
 /**
  * Constructor that creates a breveGLWidget widget
@@ -48,9 +50,9 @@ void breveGLWidget::initializeGL()
  */
 void breveGLWidget::resizeGL( int w, int h )
 {
-  if( _engine) {
-    _engine->camera->x = w;
-    _engine->camera->y = h;
+  if( _engine ) {
+    _engine->camera->_originx = w;
+    _engine->camera->_originy = h;
   }
 }
 
@@ -75,16 +77,16 @@ void breveGLWidget::mouseMoveEvent ( QMouseEvent *e ) {
 
 	switch( _buttonMode) {
 		case 0:
-			slRotateCameraWithMouseMovement(_engine->camera, dx, dy);
+			_engine->camera->rotateWithMouseMovement( dx, dy );
 			break;
 		case 1:
-			slZoomCameraWithMouseMovement(_engine->camera, dx, dy);
+			_engine->camera->zoomWithMouseMovement( dx, dy );
 			break;
 		case 2:
-			slMoveCameraWithMouseMovement(_engine->camera, dx, dy);
+			_engine->camera->moveWithMouseMovement( dx, dy );
 			break;
 		case 3:
-			brDragCallback(_engine, pos.x(), pos.y());
+			brDragCallback( _engine, pos.x(), pos.y() );
 			break;
 	}
 

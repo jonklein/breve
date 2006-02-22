@@ -8,7 +8,7 @@ int cSampleListTest(brEval [], brEval *, void *);
 
 /* our entry-point function: one call to brNewBreveCall for each function */
 
-DLLEXPORT cSampleLoadFunctions(void *data) {
+DLLEXPORT void cSampleLoadFunctions(void *data) {
 	brNewBreveCall(data, "cSampleTest", cSampleTest, AT_NULL, AT_INT, AT_STRING, 0);
 	brNewBreveCall(data, "cSampleTestII", cSampleTestII, AT_DOUBLE, 0);
 	brNewBreveCall(data, "cSampleListTest", cSampleListTest, AT_NULL, AT_LIST, 0);
@@ -20,7 +20,7 @@ DLLEXPORT cSampleLoadFunctions(void *data) {
  */
 
 int cSampleTest(brEval args[], brEval *result, void *i) {
-	slMessage(0, "plugin function called with int %d and string \"%s\"\n", BRINT(&args[0]), BRSTRING(&args[1]));
+	printf("plugin function called with int %d and string \"%s\"\n", BRINT(&args[0]), BRSTRING(&args[1]));
 
 	return EC_OK;
 }
@@ -28,7 +28,7 @@ int cSampleTest(brEval args[], brEval *result, void *i) {
 /* The second test function just returns a value and has no inputs. */
 
 int cSampleTestII(brEval args[], brEval *result, void *i) {
-	BRDOUBLE(result) = 3.14159;
+	result->set( 3.14159 );
 
 	return EC_OK;
 }

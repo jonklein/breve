@@ -36,7 +36,7 @@ int cppSampleMakeTestClass(brEval args[], brEval *target, void *i) {
 
 	// we create an instance, and return it to breve as a pointer type
 
-	BRPOINTER(target) = tc;
+	target->set( tc );
 
 	return EC_OK;
 }
@@ -62,7 +62,7 @@ int cppSampleGetSum(brEval args[], brEval *target, void *i) {
 
 	// we return the result as a breve integer
 
-	BRINT(target) = tc->getSum();
+	target->set( tc->getSum() );
 
 	return EC_OK;
 }

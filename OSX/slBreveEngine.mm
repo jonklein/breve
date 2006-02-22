@@ -107,7 +107,7 @@ int slMakeCurrentContext();
 	brEngineSetDialogCallback(frontend->engine, dialogCallback);
 
 	camera = brEngineGetCamera(frontend->engine);
-	slCameraSetActivateContextCallback(camera, slMakeCurrentContext);
+	camera->setActivateContextCallback( slMakeCurrentContext );
 
 	if(outputPath) brEngineSetIOPath(frontend->engine, outputPath);
 

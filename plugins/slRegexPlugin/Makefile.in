@@ -5,7 +5,7 @@ CFLAGS		= @CPPFLAGS@ -I..
 all: RegexPlugin.o
 
 RegexPlugin.o: RegexFuncs.o @PLUGINLIB@
-	$(CC) @PLUGINFLAGS@ -o $@ $^ @REGEXLIB@
+	$(CXX) @PLUGINFLAGS@ -o $@ $^ @REGEXLIB@
 
 clean:
 	rm -f *.o

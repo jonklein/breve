@@ -82,10 +82,10 @@ int brISetDrawEveryFrame(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIRandomSeed(brEval args[], brEval *target, brInstance *i) {
-	srandom(BRINT(&args[0]));
-	dRandSetSeed(BRINT(&args[0]));
+	srandom( BRINT(&args[0]) );
+	dRandSetSeed( BRINT(&args[0]) );
 
-	gsl_rng_set(i->engine->RNG, BRINT(&args[0]));
+	gsl_rng_set( i->engine->RNG, BRINT(&args[0]) );
 
 	return EC_OK;
 }

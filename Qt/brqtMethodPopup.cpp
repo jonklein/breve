@@ -4,16 +4,16 @@ extern char *slObjectParseText;
 extern int slObjectParseLine;
 
 int brqtQuickparserlex();
-void slObjectParseSetBuffer(char *b);
+void slObjectParseSetBuffer( char *b );
 
-void brqtMethodPopup::popup() {
-    char *text;
+void brqtMethodPopup::showPopup() {
+    char *simulationText;
     clear();
     
 	_lineMap.clear();
-    text = strdup(_textArea->text().ascii());
+    simulationText = strdup( _textArea->toPlainText().toAscii() );
     
-	slObjectParseSetBuffer(text);
+	slObjectParseSetBuffer( simulationText );
 
 	int t;
     
@@ -22,25 +22,24 @@ void brqtMethodPopup::popup() {
 			QString item;
 
 			item.sprintf("%s (line %d)", slObjectParseText, slObjectParseLine);
-			item.simplifyWhiteSpace();
 
-			insertItem(item);
+			insertItem( count(), item.simplified() );
 
-			_lineMap.push_back(slObjectParseLine);
+			_lineMap.push_back( slObjectParseLine );
 		}
 	}
 
-	if( count() == 0) insertItem("Go to method...");
+	if( count() == 0) insertItem( count(), "Go to method..." );
     
-	free(text);
+	free( simulationText );
 
-    QComboBox::popup();
+    QComboBox::showPopup();
 }
 
-void brqtMethodPopup::go(int index) {
+void brqtMethodPopup::go( unsigned int index ) {
 	clear();
-	insertItem("Go to method...");
+	insertItem( count(), "Go to method..." );
 
-	if(index >= _lineMap.size()) return;
-	_textArea->setSelection( _lineMap[index] - 1, 0, _lineMap[index], 0);
+	if( index >= _lineMap.size() ) return;
+	// _textArea->setSelection( _lineMap[ index ] - 1, 0, _lineMap[ index ], 0 );
 }

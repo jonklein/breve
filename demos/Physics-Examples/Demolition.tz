@@ -6,8 +6,8 @@ Controller BraitenbergDemolition.
 
 BraitenbergControl : BraitenbergDemolition {
 	+ variables:
-		vehicle, leftWheel, rightWheel (object).
-		blocks (list).
+		vehicle (object).
+		blocks, wheels (list).
 
 	+ to init:
 		rampShape (object).
@@ -25,15 +25,12 @@ BraitenbergControl : BraitenbergDemolition {
 
 		vehicle = new BraitenbergHeavyVehicle.
 
-		leftWheel = (vehicle add-wheel at (1.5, 0, -1.5)).
-		rightWheel = (vehicle add-wheel at (1.5, 0, 1.5)).
-		leftWheel set-natural-velocity to 50.0.
-		rightWheel set-natural-velocity to 50.0.
+		push (vehicle add-wheel at (1.5, 0, -1.5)) onto wheels.
+		push (vehicle add-wheel at (1.5, 0, 1.5)) onto wheels.
+		push (vehicle add-wheel at (-1.5, 0, -1.5)) onto wheels.
+		push (vehicle add-wheel at (-1.5, 0, 1.5)) onto wheels.
 
-		leftWheel = (vehicle add-wheel at (-1.5, 0, -1.5)).
-		rightWheel = (vehicle add-wheel at (-1.5, 0, 1.5)).
-		leftWheel set-natural-velocity to 50.0.
-		rightWheel set-natural-velocity to 50.0.
+		wheels set-natural-velocity to 50.0.
 
 		all Stationaries set-mu to 40.0.
 		all BraitenbergWheels set-mu to 40.0.

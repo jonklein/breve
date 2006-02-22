@@ -84,6 +84,8 @@ slWorld::slWorld() {
 	_age = 0.0;
 
 	_detectCollisions = 1;
+	_detectLightExposure = 0;
+	_drawLightExposure = 0;
 
 	_collisionCallback = NULL;
 	_collisionCheckCallback = NULL;

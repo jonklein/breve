@@ -4,9 +4,6 @@
  <exportmacro></exportmacro>
  <class>brqtEditorWindow</class>
  <widget class="QWidget" name="brqtEditorWindow" >
-  <property name="objectName" >
-   <string notr="true" >brqtEditorWindow</string>
-  </property>
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -33,9 +30,6 @@
    <string>Form1</string>
   </property>
   <layout class="QGridLayout" >
-   <property name="objectName" >
-    <string notr="true" >unnamed</string>
-   </property>
    <property name="margin" >
     <number>0</number>
    </property>
@@ -44,20 +38,9 @@
    </property>
    <item row="1" column="4" >
     <widget class="brqtMethodPopup" name="popupMenu" >
-     <property name="objectName" >
-      <string notr="true" >popupMenu</string>
-     </property>
-     <property name="geometry" >
-      <rect>
-       <x>359</x>
-       <y>26</y>
-       <width>104</width>
-       <height>22</height>
-      </rect>
-     </property>
      <property name="font" >
       <font>
-       <family></family>
+       <family>Lucida Grande</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <italic>false</italic>
@@ -70,17 +53,6 @@
    </item>
    <item row="0" column="4" >
     <spacer>
-     <property name="objectName" >
-      <string notr="true" />
-     </property>
-     <property name="geometry" >
-      <rect>
-       <x>359</x>
-       <y>0</y>
-       <width>104</width>
-       <height>20</height>
-      </rect>
-     </property>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
@@ -94,17 +66,6 @@
    </item>
    <item row="1" column="5" >
     <spacer>
-     <property name="objectName" >
-      <string notr="true" />
-     </property>
-     <property name="geometry" >
-      <rect>
-       <x>469</x>
-       <y>26</y>
-       <width>105</width>
-       <height>22</height>
-      </rect>
-     </property>
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
@@ -118,17 +79,6 @@
    </item>
    <item row="1" column="0" >
     <spacer>
-     <property name="objectName" >
-      <string notr="true" />
-     </property>
-     <property name="geometry" >
-      <rect>
-       <x>0</x>
-       <y>26</y>
-       <width>105</width>
-       <height>22</height>
-      </rect>
-     </property>
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
@@ -142,17 +92,6 @@
    </item>
    <item row="1" column="1" >
     <widget class="QLabel" name="textLabel1" >
-     <property name="objectName" >
-      <string notr="true" >textLabel1</string>
-     </property>
-     <property name="geometry" >
-      <rect>
-       <x>111</x>
-       <y>29</y>
-       <width>65</width>
-       <height>16</height>
-      </rect>
-     </property>
      <property name="sizePolicy" >
       <sizepolicy>
        <hsizetype>0</hsizetype>
@@ -168,17 +107,6 @@
    </item>
    <item row="1" column="3" >
     <spacer>
-     <property name="objectName" >
-      <string notr="true" />
-     </property>
-     <property name="geometry" >
-      <rect>
-       <x>248</x>
-       <y>26</y>
-       <width>105</width>
-       <height>22</height>
-      </rect>
-     </property>
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
@@ -192,17 +120,6 @@
    </item>
    <item row="1" column="2" >
     <widget class="QLineEdit" name="lineBox" >
-     <property name="objectName" >
-      <string notr="true" >lineBox</string>
-     </property>
-     <property name="geometry" >
-      <rect>
-       <x>182</x>
-       <y>26</y>
-       <width>60</width>
-       <height>22</height>
-      </rect>
-     </property>
      <property name="sizePolicy" >
       <sizepolicy>
        <hsizetype>0</hsizetype>
@@ -224,17 +141,6 @@
    </item>
    <item row="3" column="0" colspan="6" >
     <widget class="Q3TextEdit" name="sourceTextArea" >
-     <property name="objectName" >
-      <string notr="true" >sourceTextArea</string>
-     </property>
-     <property name="geometry" >
-      <rect>
-       <x>0</x>
-       <y>74</y>
-       <width>574</width>
-       <height>412</height>
-      </rect>
-     </property>
      <property name="sizePolicy" >
       <sizepolicy>
        <hsizetype>7</hsizetype>
@@ -255,9 +161,6 @@
       </font>
      </property>
      <widget class="QTextEdit" name="textEdit" >
-      <property name="objectName" >
-       <string notr="true" >textEdit</string>
-      </property>
       <property name="geometry" >
        <rect>
         <x>20</x>
@@ -265,9 +168,6 @@
         <width>381</width>
         <height>201</height>
        </rect>
-      </property>
-      <property name="frameShape" >
-       <enum>QFrame::GroupBoxPanel</enum>
       </property>
       <property name="frameShadow" >
        <enum>QFrame::Sunken</enum>
@@ -278,14 +178,28 @@
       <property name="horizontalScrollBarPolicy" >
        <enum>Qt::ScrollBarAsNeeded</enum>
       </property>
-      <property name="wordWrap" >
-       <enum>QTextEdit::WidgetWidth</enum>
-      </property>
      </widget>
     </widget>
    </item>
   </layout>
  </widget>
  <pixmapfunction></pixmapfunction>
+ <customwidgets>
+  <customwidget>
+   <class>brqtMethodPopup</class>
+   <extends>QWidget</extends>
+   <header>brqtmethodpopup.h</header>
+   <container>1</container>
+   <pixmap></pixmap>
+  </customwidget>
+  <customwidget>
+   <class>Q3TextEdit</class>
+   <extends></extends>
+   <header>q3textedit.h</header>
+   <container>0</container>
+   <pixmap></pixmap>
+  </customwidget>
+ </customwidgets>
+ <resources/>
  <connections/>
 </ui>

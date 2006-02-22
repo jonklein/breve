@@ -6,8 +6,8 @@ class brqtMethodPopup : public QComboBox {
   Q_OBJECT
 
   public:
-    brqtMethodPopup(QWidget *p, const char *name) : QComboBox(p, name) {
-      insertItem("Go to method...");
+    brqtMethodPopup( QWidget *p ) : QComboBox( p ) {
+      insertItem( count(), "Go to method..." );
     };
 		
     void setTextArea( QTextEdit *e) {
@@ -15,10 +15,10 @@ class brqtMethodPopup : public QComboBox {
     }
 
   public slots:
-	virtual void go( int );
+	virtual void go( unsigned int );
 
   private:
-    void popup();    
+    void showPopup();    
     QTextEdit *_textArea;
 	std::vector<int> _lineMap;
 

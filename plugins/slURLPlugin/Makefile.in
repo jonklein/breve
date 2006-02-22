@@ -5,7 +5,7 @@ CFLAGS		= @CPPFLAGS@ -I..
 all: URLPlugin.o
 
 URLPlugin.o: URLFunctions.o @PLUGINLIB@
-	$(CC) @PLUGINFLAGS@ @LDFLAGS@ -o $@ $^ -lcurl
+	$(CXX) @PLUGINFLAGS@ @LDFLAGS@ -o $@ $^ -lcurl
 
 clean:
 	rm -f *.o

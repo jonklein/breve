@@ -18,6 +18,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 /*
 	The breve Simulation Environment plugin API version 2.3
 
@@ -106,21 +110,64 @@ struct slVector {
 
 typedef double slMatrix[3][3];
 
-struct brEval {
-    union {
-        double doubleValue;
-        int intValue;
-        slVector vectorValue;
-        slMatrix matrixValue;
-        void *pointerValue;
-        char *stringValue;
-        brEvalHash *hashValue;
-        brData *dataValue;
-        brInstance *instanceValue;
-        brEvalListHead *listValue;
-    } values;
+class brEval {
+	public:
+		brEval() { _type = AT_NULL; }
 
-    unsigned char type;
+		~brEval() { collect(); }
+
+		inline void collect() {
+			// if ( _type == AT_NULL || _type == AT_INT || _type == AT_MATRIX || _type == AT_VECTOR || _type == AT_DOUBLE ) return;
+			// stGCUnretainAndCollectPointer( _values.pointerValue, _type );
+		}
+
+		inline void retain() {
+			// if ( _type == AT_NULL || _type == AT_INT || _type == AT_MATRIX || _type == AT_VECTOR || _type == AT_DOUBLE ) return;
+			// stGCRetainPointer( _values.pointerValue, _type );
+		}
+
+
+		void clear() { collect(); _type = AT_NULL; }
+
+		inline unsigned char type() { return _type; }
+
+		inline void set( const double d )    { collect(); _values.doubleValue = d;                _type = AT_DOUBLE;   }
+		inline void set( const int i )       { collect(); _values.intValue = i;                   _type = AT_INT;      }
+		inline void set( const slVector &v ) { collect(); memcpy(&_values.vectorValue, &v, sizeof( slVector ) ); _type = AT_VECTOR;   }
+		inline void set( const slMatrix &m ) { collect(); memcpy( _values.matrixValue, m, sizeof( slMatrix ) );   _type = AT_MATRIX;   }
+		inline void set( const char *s )     { collect(); _values.stringValue = strdup(s);         _type = AT_STRING;   }
+		inline void set( void *p )           { collect(); _values.pointerValue = p;               _type = AT_POINTER;  retain(); }
+		inline void set( brEvalHash *h )     { collect(); _values.hashValue = h;                  _type = AT_HASH;     retain(); }
+		inline void set( brData *d )         { collect(); _values.dataValue = d;                  _type = AT_DATA;     retain(); }
+		inline void set( brInstance *i )     { collect(); _values.instanceValue = i;              _type = AT_INSTANCE; retain(); }
+		inline void set( brEvalListHead *l ) { collect(); _values.listValue = l;                  _type = AT_LIST;     retain(); }
+
+		inline int             getInt()      { return _values.intValue;      }
+		inline double          getDouble()   { return _values.doubleValue;   }
+		inline slVector       &getVector()   { return _values.vectorValue;  }
+		inline slMatrix       &getMatrix()   { return _values.matrixValue;  }
+		inline void           *getPointer()  { return _values.pointerValue;  }
+		inline char           *getString()   { return _values.stringValue;   }
+		inline brEvalHash     *getHash()     { return _values.hashValue;     }
+		inline brData         *getData()     { return _values.dataValue;     }
+		inline brInstance     *getInstance() { return _values.instanceValue; }
+		inline brEvalListHead *getList()     { return _values.listValue;     }
+
+	private:
+		union {
+			double doubleValue;  
+			int intValue;
+			slVector vectorValue;
+			slMatrix matrixValue;
+			void *pointerValue;
+			char *stringValue;
+			brEvalHash *hashValue;
+			brData *dataValue;
+			brInstance *instanceValue;
+			brEvalListHead *listValue;
+		} _values;
+
+		unsigned char _type;
 };
 
 /*
@@ -169,21 +216,22 @@ void brDataFree(brData *data);
 
 brEvalListHead *brEvalListNew(void);
 int brEvalListInsert(brEvalListHead *head, int index, brEval *value);
+
 #define brEvalListAppend(a, eval) brEvalListInsert((a), (a)->count, (eval))
 
 /* Use these macros to treat brEval pointers as specific types. */
 
-#define BRINT(e)	((e)->values.intValue)
-#define BRFLOAT(e)	((e)->values.doubleValue)
-#define BRDOUBLE(e)	((e)->values.doubleValue)
-#define BRSTRING(e)	((e)->values.stringValue)
-#define BRVECTOR(e)	((e)->values.vectorValue)
-#define BRMATRIX(e)	((e)->values.matrixValue)
-#define BRINSTANCE(e)	((e)->values.instanceValue)
-#define BRPOINTER(e)	((e)->values.pointerValue)
-#define BRDATA(e)	((e)->values.dataValue)
-#define BRHASH(e)	((e)->values.hashValue)
-#define BRLIST(e)	((e)->values.listValue)
+#define BRINT(e)		( (e)->getInt() )
+#define BRFLOAT(e)		( (e)->getDouble() )
+#define BRDOUBLE(e)		( (e)->getDouble() )
+#define BRSTRING(e)		( (e)->getString() )
+#define BRVECTOR(e)		( (e)->getVector() )
+#define BRMATRIX(e)		( (e)->getMatrix() )
+#define BRINSTANCE(e)	( (e)->getInstance() )
+#define BRPOINTER(e)	( (e)->getPointer() )
+#define BRDATA(e)		( (e)->getData() )
+#define BRHASH(e)		( (e)->getHash() )
+#define BRLIST(e)		( (e)->getList() )
 
 #define EC_ERROR -1
 #define EC_OK 1
