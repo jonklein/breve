@@ -232,7 +232,9 @@ void *brListenOnSocket(void *data) {
 
 		if(clientData.socket != -1) {
 			// fcntl(clientData.socket, F_SETFL, O_NONBLOCK);
+			pthread_mutex_lock(&clientData.engine->lock);
 			brHandleConnection(&clientData);
+			pthread_mutex_unlock(&clientData.engine->lock);
 #if WINDOWS
 			closesocket(clientData.socket);
 #else
@@ -276,7 +278,9 @@ void *brHandleConnection(void *p) {
 			http = slStrdup((char*)&request);
 		}
 
+		pthread_mutex_lock(&data->engine->lock);
 		brHandleHTTPConnection(data, http);
+		pthread_mutex_unlock(&data->engine->lock);
 
 		slFree(http);
 

@@ -39,24 +39,24 @@ enum {
 };
 
 @interface slBreveEngine : NSObject {
-    IBOutlet id movieSaveAccView;
-    IBOutlet id movieFrameNumberText;
-    IBOutlet id movieQualityPopup;
-    IBOutlet id movieQualityMessageText;
+	IBOutlet id movieSaveAccView;
+	IBOutlet id movieFrameNumberText;
+	IBOutlet id movieQualityPopup;
+	IBOutlet id movieQualityMessageText;
 
-    IBOutlet id displayView;
-    IBOutlet id interfaceController;
+	IBOutlet id displayView;
+	IBOutlet id interfaceController;
 
 	IBOutlet id oldSpeedMenuItem;
 
-    slMovieRecord *displayMovie;
+	slMovieRecord *displayMovie;
     
-    NSRecursiveLock *engineLock;
-    NSRecursiveLock *threadLock;
+	NSRecursiveLock *engineLock;
+	NSRecursiveLock *threadLock;
     
 	breveFrontend *frontend;
 
-    int runState;
+	int runState;
 
 	double speedFactor;
 
@@ -111,6 +111,7 @@ int dialogCallback(char *title, char *message, char *b1, char *b2);
 char *interfaceVersionCallback();
 int soundCallback();
 int pauseCallback();
+int unpauseCallback();
 void setNibCallback(char *n);
 int interfaceSetStringCallback(char *string, int tag);
 

@@ -87,6 +87,9 @@ slWorld::slWorld() {
 	_detectLightExposure = 0;
 	_drawLightExposure = 0;
 
+	_drawLightExposure = 0;
+	_detectLightExposure = 0;
+
 	_collisionCallback = NULL;
 	_collisionCheckCallback = NULL;
 

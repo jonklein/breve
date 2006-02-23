@@ -737,6 +737,10 @@ void brEngineSetPauseCallback(brEngine *e, int (callback)(void)) {
 	e->pauseCallback = callback;
 }
 
+void brEngineSetUnpauseCallback(brEngine *e, int (callback)(void)) {
+	e->unpauseCallback = callback;
+}
+
 void brEngineSetInterfaceInterfaceTypeCallback(brEngine *e, char *(*callback)(void)) {
 	e->interfaceTypeCallback = callback;
 }

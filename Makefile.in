@@ -29,9 +29,8 @@ IDE_FOLDER	= breveIDE_@VERSION@
 prefix		= @prefix@
 exec_prefix	= @exec_prefix@
 
-all: depend lib/libbreve.a bin/breve_cli@EXE_SUFFIX@ bin/breve@EXE_SUFFIX@ \
-	lib/classes/MethodFinder.jar \
-	bin/osmesaloader.o
+all: depend lib/libbreve.a bin/osmesaloader.o bin/breve_cli@EXE_SUFFIX@ bin/breve@EXE_SUFFIX@ \
+	lib/classes/MethodFinder.jar
 
 include simulation/Makefile
 include kernel/Makefile

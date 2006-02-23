@@ -1,7 +1,7 @@
 /*****************************************************************************
  *                                                                           *
  * The breve Simulation Environment                                          *
- * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
+ * Copyright (C) 2000-2006 Jonathan Klein                                    *
  *                                                                           *
  * This program is free software; you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -120,6 +120,7 @@ int slMakeCurrentContext();
 	brEngineSetGetSavenameCallback(frontend->engine, getSaveNameCallback);
 	brEngineSetGetLoadnameCallback(frontend->engine, getLoadNameCallback);
 	brEngineSetPauseCallback(frontend->engine, pauseCallback);
+	brEngineSetUnpauseCallback(frontend->engine, unpauseCallback);
 	brEngineSetUpdateMenuCallback(frontend->engine, updateMenu);
 
 	brAddSearchPath(frontend->engine, classPath);
@@ -504,7 +505,7 @@ int soundCallback() {
 }
 
 char *interfaceVersionCallback() {
-	return "cocoa/2.0";
+	return "cocoa/2.4";
 }
 
 int interfaceSetStringCallback(char *string, int tag) {
@@ -516,6 +517,11 @@ int interfaceSetStringCallback(char *string, int tag) {
 
 int pauseCallback() {
 	engineWillPause = YES;
+	return 1;
+}
+
+int pauseCallback() {
+	engineWillPause = NO;
 	return 1;
 }
 

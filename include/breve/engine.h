@@ -262,6 +262,7 @@ class brEngine {
 		void (*interfaceSetCallback)(char *);
 
 		int (*pauseCallback)(void);
+		int (*unpauseCallback)(void);
 
 		void *(*newWindowCallback)(char *, void *);
 		void (*freeWindowCallback)(void *);
@@ -363,6 +364,7 @@ void brEngineSetSoundCallback(brEngine *, int (*)(void));
 void brEngineSetDialogCallback(brEngine *, int (*)(char *, char *, char *, char *));
 
 void brEngineSetPauseCallback(brEngine *, int (*)(void));
+void brEngineSetUnpauseCallback(brEngine *, int (*)(void));
 void brEngineSetGetLoadnameCallback(brEngine *, char *(*)(void));
 void brEngineSetGetSavenameCallback(brEngine *, char *(*)(void));
 

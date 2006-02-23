@@ -153,6 +153,21 @@ int brIPause(brEval args[], brEval *target, brInstance *i) {
 }
 
 /*!
+	\brief Causes the simulation to pause, if supported by the interface.
+
+	Pauses the simulation as though the user had requested that the simulation
+	pause.  This function has no effect if the interface does not support
+	pausing.  In particular, the breve_cli program does not support pausing.
+
+	void pause().
+*/
+
+int brIUnpause(brEval args[], brEval *target, brInstance *i) {
+    if(i->engine->unpauseCallback) i->engine->unpauseCallback();
+    return EC_OK;
+}
+
+/*!
 	\brief Add an event to the breve engine to be executed at a certain time.
 
 	The method will be executed for the calling object.
@@ -523,6 +538,7 @@ void breveInitControlFunctions(brNamespace *n) {
     brNewBreveCall(n, "system", brISystem, AT_STRING, AT_STRING, 0);
     brNewBreveCall(n, "sleep", brISleep, AT_NULL, AT_DOUBLE, 0);
     brNewBreveCall(n, "pauseSimulation", brIPause, AT_NULL, 0);
+    brNewBreveCall(n, "unpauseSimulation", brIUnpause, AT_NULL, 0);
 
     brNewBreveCall(n, "addEvent", brIAddEvent, AT_NULL, AT_STRING, AT_DOUBLE, AT_DOUBLE, 0);
     brNewBreveCall(n, "setFogDistances", brISetFogDistances, AT_NULL, AT_DOUBLE, AT_DOUBLE, 0);

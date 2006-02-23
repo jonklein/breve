@@ -225,6 +225,9 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		pauseSimulation().
 
+	+ to unpause:
+		unpauseSimulation().
+
 	+ to sleep for-seconds s (float):
 		% Pauses execution for s seconds.  s does not have to be a whole 
 		% number.  Sleeping for a fraction of a second at each iteration

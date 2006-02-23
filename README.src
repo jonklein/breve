@@ -43,6 +43,11 @@ To build the wxWindows frontend for Linux and Windows:
 
                              -- BUILD NOTES -- 
 
+What are those errors about bin/osmesaloader.cc?  Those are harmless.
+osmesaloader is a completely optional extension which allows CLI 
+versions of breve to use features like light-exposure detection and 
+movie exporting.  It will only compile when Mesa libraries are found.
+
 OS X Note #1: the OS X xcode project is setup to link against all of the 
 breve libraries, even though some of the libraries are optional.  If you
 configure and build breve with some of the optional libraries missing, 
@@ -57,8 +62,9 @@ wrapper to build real_breve.app using the correct libraries from the
 configure script.  Building real_breve.app directly will fail, because 
 it is missing these library settings.
 
-For the record, I am well aware that this source is a pretty messy.  This
-project and code, in one form or another has spanned much of my undergraduate 
+
+For the record, I am well aware that parts of this source are a bit of a mess.  
+This project and code, in one form or another has spanned much of my undergraduate 
 education, a Master's degree and several years in research and industry.  
 Parts of this code are now almost 10 years old.  Piece by piece I'm updating
 the code and moving it to C++.
