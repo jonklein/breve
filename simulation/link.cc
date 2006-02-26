@@ -628,6 +628,7 @@ slJoint *slLink::link(slWorld *world, slLink *parent, int jointType, slVector *n
 
 	if( _multibody && (!parent || ( _multibody != parent->_multibody) ) ) _multibody->update();
 
+	bzero( &joint->_feedback, sizeof( dJointFeedback ) );
 	dJointSetFeedback(joint->_odeJointID, &joint->_feedback);
 
 	return joint;

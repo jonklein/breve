@@ -283,8 +283,11 @@ int brIJointBreak(brEval args[], brEval *target, brInstance *i) {
 
 int brIJointGetPosition(brEval args[], brEval *target, brInstance *i) {
 	slJoint *j = BRJOINTPOINTER(&args[0]);
+	slVector result;
 
-	j->getPosition(&BRVECTOR(target));
+	j->getPosition( &result );
+
+	target->set( result );
 
 	return EC_OK;
 }

@@ -39,6 +39,9 @@ void slInitBoundSort(slVclipData *d) {
 	for(x=0;x<3;x++) {
 		d->boundListPointers[x].clear();
 
+		if( listSize != d->boundLists[x].size() ) 
+			slMessage( DEBUG_ALL, "error in init bound sort: list size mismatch %d != %d\n", listSize, d->boundLists[x].size() );
+
 		for(y=0;y<listSize;y++) d->boundListPointers[x].push_back(&d->boundLists[x][y]);
 	}
 
@@ -273,7 +276,7 @@ void slInitBoundSortList(std::vector<slBoundSort*> &list, slVclipData *v, char b
 	int otherSide;
 	slPairFlags *flags;
 
-	std::sort(list.begin(), list.end(), slBoundSortCompare);
+	std::sort( list.begin(), list.end(), slBoundSortCompare );
 
 	// zero out this entry for all pairs 
 
@@ -283,6 +286,10 @@ void slInitBoundSortList(std::vector<slBoundSort*> &list, slVclipData *v, char b
 			extend = n+1;
 
 			x = list[n]->number;
+
+			if( x < 0 || x >= list.size() ) {
+				slMessage( DEBUG_ALL, "vclip init error!  x = %d\n", x );
+			}
 
 			// we move to the right until the end of the list, or until
 			// the corresponding BT_MAX has been found AND the extend 
@@ -296,6 +303,10 @@ void slInitBoundSortList(std::vector<slBoundSort*> &list, slVclipData *v, char b
 					y = list[extend]->number;   
 			
 					flags = slVclipPairFlags(v, x, y);
+
+					if( x < 0 || x >= list.size() || y < 0 || y >= list.size() ) {
+						slMessage( DEBUG_ALL, "isort init error!  looked up pair ( %d, %d )\n", x, y );
+					}
 
 					if(list[extend]->type == BT_MIN) {
 						if(*flags & boundTypeFlag) {
