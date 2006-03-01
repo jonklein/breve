@@ -20,7 +20,7 @@ PhysicalControl : JointTest {
         self set-background-color to (.4, .4, .4).
         new Stationary register with-shape (new Cube init-with size (100, 0.1, 100)) at-location (0, 0, 0).
         body = new JointTestBody.
-        
+
         body show-bounding-box.
         body show-axis.
         
@@ -85,11 +85,14 @@ MultiBody : JointTestBody {
         links{0} set-color to (.8, 0, 0).
         links{1} set-color to (.6, 0, 0).
 
+		links{ 0 } move to ( 0, 8, 0 ).
+		links{ 1 } move to ( 0, 10, 0 ).
+
         self make-fixed-joint.
 
         worldJoint = new FixedJoint.
         worldJoint link parent 0 to-child links{0} 
-            with-parent-point (0, 10, 0) with-child-point (0, -1.0, 0).
+           with-parent-point (0, 10, 0) with-child-point (0, -1.0, 0).
 
         return self.
 
@@ -98,7 +101,7 @@ MultiBody : JointTestBody {
 	# 
 
     + to get-joint:
-	return joint.
+		return joint.
 
     + to make-fixed-joint:
         if joint: free joint.
@@ -114,7 +117,7 @@ MultiBody : JointTestBody {
         joint link parent links{0} to-child links{1}
             with-parent-point (0, -1.0, 0) with-child-point (0, 1.0, 0) with-normal (1, 0, 0).
 
-        joint set-strength-limit to 100.
+        joint set-strength-limit to 1000.
 
     + to make-prismatic-joint:
         if joint: free joint.
@@ -123,7 +126,7 @@ MultiBody : JointTestBody {
         joint link parent links{0} to-child links{1}
             with-parent-point (0, -1.0, 0) with-child-point (0, 1.0, 0) with-normal (0, 1, 0).
 
-        joint set-strength-limit to 100.
+        joint set-strength-limit to 1000.
 
     + to make-ball-joint:
         if joint: free joint.
@@ -154,7 +157,7 @@ MultiBody : JointTestBody {
 
 RevoluteJoint : ExampleRevoluteJoint {
     + to iterate:
-        self set-joint-velocity to sin((controller get-time) / 4) / 2.    
+       self set-joint-velocity to sin((controller get-time) / 4) / 2.
 }
 
 PrismaticJoint : ExamplePrismaticJoint {
@@ -176,7 +179,4 @@ UniversalJoint : ExampleUniversalJoint {
 		x = sin((controller get-time) / 15) / 2.
 
         self set-joint-velocity axis-1 x axis-2 0.01.
-
-		print (self get-joint-angles).
-
 }

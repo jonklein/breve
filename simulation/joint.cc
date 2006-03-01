@@ -45,6 +45,7 @@ void slJoint::setNormal(slVector *normal) {
 }
 
 slJoint::~slJoint() {
+	printf(" breaking %p\n", this );
 	breakJoint();
 }
 

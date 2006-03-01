@@ -427,5 +427,5 @@ Object : Real (aka Reals) [version 2.1] {
 		% The location and direction vector must be given relative to the world's
 		% coordinate frame. 
 
-		return raytrace(realWorldPointer, theLocation, theDirection).
+		return raytrace( realWorldPointer, theLocation, theDirection ).
 }

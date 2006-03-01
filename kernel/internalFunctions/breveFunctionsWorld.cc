@@ -845,7 +845,11 @@ int brIRaytrace(brEval args[], brEval *target, brInstance *i) {
  	slVector *location  = &BRVECTOR(&args[1]);
 	slVector *direction = &BRVECTOR(&args[2]); 
 
-	int error = o->raytrace( location, direction, &BRVECTOR( target ) );
+	slVector result;
+
+	int error = o->raytrace( location, direction, &result );
+
+	target->set( result );
 
 	if (error == -2) return EC_ERROR;
 

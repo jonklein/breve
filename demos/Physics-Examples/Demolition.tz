@@ -1,3 +1,8 @@
+#
+# A demo of things smashing into eachother.
+# jon klein <jk [at] spiderland.org>
+#
+
 @use Control.
 @use Real.
 @use Braitenberg.
@@ -21,7 +26,9 @@ BraitenbergControl : BraitenbergDemolition {
 		ramp = new Stationary.
 		ramp register with-shape rampShape
 			at-location ( 50, 1.4, 0 )
-			with-rotation [ (0.96596, -0.25869, 0.00000), (0.25869, 0.96596, 0.00000), (0.00000, 0.00000, 1.00000) ].
+			with-rotation [ (0.96596, -0.25869, 0.00000), 
+							(0.25869, 0.96596, 0.00000), 
+							(0.00000, 0.00000, 1.00000) ].
 
 		vehicle = new BraitenbergHeavyVehicle.
 
@@ -30,17 +37,23 @@ BraitenbergControl : BraitenbergDemolition {
 		push (vehicle add-wheel at (-1.5, 0, -1.5)) onto wheels.
 		push (vehicle add-wheel at (-1.5, 0, 1.5)) onto wheels.
 
-		wheels set-natural-velocity to 50.0.
+		wheels set-natural-velocity to 20.0.
+
+		# It can be tricky getting wheeled vehicles to work at high speeds
+		# without the wheels slipping or becoming unstable.  The friction
+		# settings below help out in this respect.
 
 		all Stationaries set-mu to 40.0.
 		all BraitenbergWheels set-mu to 40.0.
-
-		blocks = 10 new Bricks.
 
 		self watch item vehicle.
 
 		self set-camera-offset to ( -11.0, 4.5, 5.5 ).
 		self pan-camera-offset by ( 20, 10, 9 ) steps 80.
+
+		# create the blocks, then put them in place in the "reset" method
+
+		blocks = 10 new Bricks.
 
 		self reset.
 

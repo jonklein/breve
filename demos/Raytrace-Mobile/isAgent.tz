@@ -98,10 +98,11 @@ Abstract : Sensor {
 	 world_dir = mat*direction.
 	 location  = (owner get-location).
 
-	 print |(owner get-neighbors)|.
+	 print (owner get-neighbors).
 
 	 foreach item in (owner get-neighbors) : {		 
 		    #item set-color to random[(1,1,1)].
+			print location, world_dir.
 	  	 hit = (item raytrace from-location location with-direction world_dir).
 		 if ((hit != (0,0,0)) && (|hit| < min)) :  {
 		    min = |hit|. 

@@ -32,16 +32,16 @@ char *gPhysicsErrorMessage;
 #include "gldraw.h"
 
 void *operator new (size_t size) {
-	// void *p = calloc(1, size); 
-	void *p = malloc( size ); 
+	void *p = calloc(1, size); 
+	// void *p = malloc( size ); 
 
- 	if (p == NULL) throw std::bad_alloc(); 
+ 	if ( p == NULL ) throw std::bad_alloc(); 
  
  	return p;
 }
 
 void operator delete (void *p) {
-	free(p); 
+	free( p ); 
 }
 
 void slODEErrorHandler(int errnum, const char *msg, va_list ap) {
@@ -49,6 +49,8 @@ void slODEErrorHandler(int errnum, const char *msg, va_list ap) {
 
 	vsnprintf(error, 2047, msg, ap);
 	gPhysicsErrorMessage = (char*)error;	
+
+	slMessage( DEBUG_ALL, "ODE Engine error: %s\n", error );
 }
 
 /*!
@@ -73,8 +75,8 @@ slWorld::slWorld() {
 	dSetErrorHandler(slODEErrorHandler);
 	dSetMessageHandler(slODEErrorHandler);
 
-	_odeCollisionGroupID = dJointGroupCreate(0);
-	_odeJointGroupID = dJointGroupCreate(0);
+	_odeCollisionGroupID = dJointGroupCreate( 0 );
+	_odeJointGroupID = dJointGroupCreate( 0 );
 
 	_resolveCollisions = 0;
 	_detectCollisions = 0;
@@ -345,7 +347,7 @@ double slWorld::runWorld( double deltaT, double timestep, int *error ) {
 */
 
 double slWorld::step( double stepSize, int *error ) {
-	unsigned simulate = 0;
+	unsigned int simulate = 0;
 	std::vector<slWorldObject*>::iterator wi;
 	std::vector<slObjectConnection*>::iterator li;
 	int result;

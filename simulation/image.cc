@@ -644,8 +644,7 @@ int slPNGSnapshot( slWorld *w, slCamera *c, const char *file ) {
 
 	buf = new unsigned char[c->_width * c->_height * 3];
 
-	glReadPixels(c->_originx, c->_originy, c->_width, c->_height, 
-		GL_RGB, GL_UNSIGNED_BYTE, buf);
+	glReadPixels(c->_originx, c->_originy, c->_width, c->_height, GL_RGB, GL_UNSIGNED_BYTE, buf);
 
 	r = slPNGWrite(file, c->_width, c->_height, buf, 3, 1);
 
@@ -665,7 +664,6 @@ int slPNGSnapshot( slWorld *w, slCamera *c, const char *file ) {
 */
 
 void slReversePixelBuffer( const unsigned char *source, unsigned char *dest, int width, int height ) {
-	for (int n = 0; n < height; ++n)
-		memcpy(&dest[(height - (n + 1)) * width],
-		    &source[n * width], width);
+	for ( int n = 0; n < height; n++ )
+		memcpy(&dest[ ( height - (n + 1) ) * width], &source[n * width], width);
 }

@@ -305,7 +305,7 @@ int brIJointSetVelocity(brEval args[], brEval *target, brInstance *i) {
 	slJoint *j = BRJOINTPOINTER(&args[0]);
 	slVector *velocity = &BRVECTOR(&args[1]);
 
-	j->setVelocity(velocity);
+	j->setVelocity( velocity );
 
 	return EC_OK;
 }
@@ -321,8 +321,12 @@ int brIJointSetVelocity(brEval args[], brEval *target, brInstance *i) {
 
 int brIJointGetVelocity(brEval args[], brEval *target, brInstance *i) {
 	slJoint *j = BRJOINTPOINTER(&args[0]);
+	slVector velocity;
 
-	j->getVelocity(&BRVECTOR(target));
+	j->getVelocity( &velocity );
+
+	target->set( velocity );
+	
 
 	return EC_OK;
 }

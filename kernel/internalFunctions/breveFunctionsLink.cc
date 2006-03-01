@@ -448,13 +448,16 @@ int brILinkSetTexture(brEval args[], brEval *target, brInstance *i) {
 int brIVectorFromLinkPerspective(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 	slVector *vector = &BRVECTOR(&args[1]);
+	slVector result;
 
 	if(!link) {
 		slMessage(DEBUG_ALL, "vectorFromLinkPerspective called with NULL pointer\n");
 		return EC_ERROR;
 	}
 
-	slVectorInvXform( link->getPosition().rotation, vector, &BRVECTOR(target) );
+	slVectorInvXform( link->getPosition().rotation, vector, &result );
+
+	target->set( result );
 
 	return EC_OK;
 } 

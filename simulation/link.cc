@@ -318,7 +318,7 @@ void slLink::updatePositionFromODE() {
 	_position.location.y = positionV[1];
 	_position.location.z = positionV[2];
 
-	slODEToSlMatrix((dReal*)rotationV, _position.rotation);
+	slODEToSlMatrix( (dReal*)rotationV, _position.rotation );
 }
 
 /*!
@@ -526,7 +526,7 @@ slJoint *slLink::link(slWorld *world, slLink *parent, int jointType, slVector *n
 
 	// figure out if this is a multibody joint or not.
 
-	if( ! parent || ( _multibody && parent->_multibody) ) {
+	if( !parent || ( _multibody && parent->_multibody) ) {
 		joint->_isMbJoint = 0;
 	} else {
 		if( _multibody ) parent->_multibody = _multibody;
@@ -610,7 +610,7 @@ slJoint *slLink::link(slWorld *world, slLink *parent, int jointType, slVector *n
 			dJointSetAMotorAxis(joint->_odeMotorID, 2, 2, axis2.x, axis2.y, axis2.z);
 			break;
 		case JT_FIX:
-			dJointSetFixed(joint->_odeJointID);
+			dJointSetFixed( joint->_odeJointID );
 			break;
 	}
 
@@ -628,7 +628,7 @@ slJoint *slLink::link(slWorld *world, slLink *parent, int jointType, slVector *n
 
 	if( _multibody && (!parent || ( _multibody != parent->_multibody) ) ) _multibody->update();
 
-	bzero( &joint->_feedback, sizeof( dJointFeedback ) );
+//	bzero( &joint->_feedback, sizeof( dJointFeedback ) );
 	dJointSetFeedback(joint->_odeJointID, &joint->_feedback);
 
 	return joint;

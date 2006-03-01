@@ -686,8 +686,10 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 		}
 	}
 
-	if ( (resultCode = stToType(e, type, e, i) ) != EC_OK)
+	if ( (resultCode = stToType(e, type, e, i) ) != EC_OK) {
+		slMessage( DEBUG_ALL, "error in assignment\n" );
 		return resultCode;
+	}
 
 #ifdef MULTITHREAD
 	if(i) pthread_mutex_lock(&i->lock);
@@ -1101,6 +1103,11 @@ inline int stRealEvalMethodCall(stMethodExp *mexp, stRunInstance *target, stRunI
 		method = stFindInstanceMethodWithMinArgs(target->type, mexp->methodName, mexp->arguments.size(), &newType);
 
 		if (!method) {
+			// for backwards compatibility, we'll make missing iterate methods be a no-op
+			// instead of an error. 
+
+			if( !strcmp( mexp->methodName, "iterate" ) ) return EC_OK;
+
 			// can't find the method!
 
 			char *kstring = "keywords";

@@ -48,6 +48,8 @@ slTerrain::slTerrain( int res, double scale, void *data ) : slWorldObject() {
 	slVector location;
 	int n;
 
+	_type = WO_TERRAIN;
+
 	_userData = data;
 
 	_side = (int)pow(2, res) + 1;

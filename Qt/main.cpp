@@ -1,12 +1,20 @@
-#include <qapplication.h>
-#include "ui_brqtMainWindow.h"
+#include <QApplication>
+#include <QMainWindow>
+#include <QSlider>
+#include <QComboBox>
+
+#include "brqtMainWindow.h"
+#include "brqtEditorWindow.h"
+#include "brqtMoveableWidgets.h"
 
 int main( int argc, char ** argv ) {
     QApplication a( argc, argv );
-    brqtMainWindow w( NULL );
 
-	w.move( QPoint(2, 24) );
-    w.show();
+	brqtMainWindow *window = new brqtMainWindow;
+
+	window->show();
+
     a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
+
     return a.exec();
 }

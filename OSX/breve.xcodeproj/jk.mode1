@@ -263,8 +263,7 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>20</integer>
-									<integer>18</integer>
+									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
@@ -370,9 +369,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>48C35C7B097DE04B00BE1E37</string>
+				<string>483B82AD09AE530A0063BCF8</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>48C35C7C097DE04B00BE1E37</string>
+				<string>483B82AE09AE530A0063BCF8</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -506,8 +505,6 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>1C0AD2B3069F1EA900FABCE6</string>
-		<string>48C35C6E097DDF6600BE1E37</string>
 		<string>487AAB1F084F74BE00633A19</string>
 		<string>/Users/jk/dev/breve/OSX/breve.xcodeproj</string>
 	</array>
@@ -533,7 +530,7 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>1CD0528F0623707200166675</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>odecpp_collision.h</string>
+								<string></string>
 								<key>StatusBarVisibility</key>
 								<true/>
 							</dict>
@@ -555,7 +552,7 @@
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXBuildLogShowsTranscriptDefaultKey</key>
-								<string>{{0, 58}, {768, 390}}</string>
+								<string>{{0, 5}, {768, 443}}</string>
 								<key>PBXProjectModuleGUID</key>
 								<string>XCMainBuildResultsModuleGUID</string>
 								<key>PBXProjectModuleLabel</key>
@@ -593,7 +590,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>487AAB1F084F74BE00633A19</string>
-				<string>48C35C68097DDF6100BE1E37</string>
+				<string>483B82AF09AE530A0063BCF8</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>
@@ -604,7 +601,7 @@
 			<key>WindowToolGUID</key>
 			<string>487AAB1F084F74BE00633A19</string>
 			<key>WindowToolIsVisible</key>
-			<false/>
+			<true/>
 		</dict>
 		<dict>
 			<key>Identifier</key>

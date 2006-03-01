@@ -520,7 +520,7 @@ int pauseCallback() {
 	return 1;
 }
 
-int pauseCallback() {
+int unpauseCallback() {
 	engineWillPause = NO;
 	return 1;
 }

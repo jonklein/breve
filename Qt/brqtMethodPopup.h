@@ -10,7 +10,7 @@ class brqtMethodPopup : public QComboBox {
       insertItem( count(), "Go to method..." );
     };
 		
-    void setTextArea( QTextEdit *e) {
+    void setTextArea( QTextEdit *e ) {
       _textArea = e;
     }
 

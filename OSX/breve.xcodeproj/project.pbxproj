@@ -102,9 +102,7 @@
 		48CE1D0408155BDE0030CBB8 /* DocumentIcons.icns in Resources */ = {isa = PBXBuildFile; fileRef = 48CE1CFB08155B1F0030CBB8 /* DocumentIcons.icns */; };
 		48E1722407AAAF370072492B /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48E1722307AAAF370072492B /* JavaVM.framework */; };
 		48ECC165071C13C100596F93 /* Digitizer.tz in CopyFiles */ = {isa = PBXBuildFile; fileRef = 48ECC163071C13C100596F93 /* Digitizer.tz */; };
-		48ECC166071C13C100596F93 /* DigitizerPlugin.o in CopyFiles */ = {isa = PBXBuildFile; fileRef = 48ECC164071C13C100596F93 /* DigitizerPlugin.o */; };
 		48ECC170071C13F400596F93 /* Instrument.tz in CopyFiles */ = {isa = PBXBuildFile; fileRef = 48ECC16E071C13F400596F93 /* Instrument.tz */; };
-		48ECC171071C13F400596F93 /* QTInstrumentPlugin.o in CopyFiles */ = {isa = PBXBuildFile; fileRef = 48ECC16F071C13F400596F93 /* QTInstrumentPlugin.o */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildStyle section */
@@ -146,9 +144,7 @@
 			dstSubfolderSpec = 7;
 			files = (
 				48ECC165071C13C100596F93 /* Digitizer.tz in CopyFiles */,
-				48ECC166071C13C100596F93 /* DigitizerPlugin.o in CopyFiles */,
 				48ECC170071C13F400596F93 /* Instrument.tz in CopyFiles */,
-				48ECC171071C13F400596F93 /* QTInstrumentPlugin.o in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

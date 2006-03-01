@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>574</width>
-    <height>486</height>
+    <width>542</width>
+    <height>610</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -29,130 +29,128 @@
   <property name="windowTitle" >
    <string>Form1</string>
   </property>
-  <layout class="QGridLayout" >
+  <layout class="QVBoxLayout" >
    <property name="margin" >
     <number>0</number>
    </property>
    <property name="spacing" >
-    <number>6</number>
+    <number>2</number>
    </property>
-   <item row="1" column="4" >
-    <widget class="brqtMethodPopup" name="popupMenu" >
-     <property name="font" >
-      <font>
-       <family>Lucida Grande</family>
-       <pointsize>11</pointsize>
-       <weight>50</weight>
-       <italic>false</italic>
-       <bold>false</bold>
-       <underline>false</underline>
-       <strikeout>false</strikeout>
-      </font>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="4" >
+   <item>
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
      <property name="sizeHint" >
       <size>
-       <width>20</width>
-       <height>5</height>
+       <width>520</width>
+       <height>2</height>
       </size>
      </property>
     </spacer>
    </item>
-   <item row="1" column="5" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
+   <item>
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>1</number>
      </property>
-     <property name="sizeHint" >
-      <size>
-       <width>16</width>
-       <height>20</height>
-      </size>
+     <property name="spacing" >
+      <number>6</number>
      </property>
-    </spacer>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType" >
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>20</width>
+         <height>23</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="textLabel1" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>0</hsizetype>
+         <vsizetype>0</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text" >
+        <string>Go to line:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineBox" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>0</hsizetype>
+         <vsizetype>0</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize" >
+        <size>
+         <width>60</width>
+         <height>32767</height>
+        </size>
+       </property>
+       <property name="text" >
+        <string>1</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType" >
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>69</width>
+         <height>23</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="brqtMethodPopup" name="methodPopup" >
+       <property name="font" >
+        <font>
+         <family>Lucida Grande</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
+         <underline>false</underline>
+         <strikeout>false</strikeout>
+        </font>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
-   <item row="1" column="0" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>16</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="1" >
-    <widget class="QLabel" name="textLabel1" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>0</hsizetype>
-       <vsizetype>0</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text" >
-      <string>Go to line:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>310</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="2" >
-    <widget class="QLineEdit" name="lineBox" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>0</hsizetype>
-       <vsizetype>0</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize" >
-      <size>
-       <width>60</width>
-       <height>32767</height>
-      </size>
-     </property>
-     <property name="text" >
-      <string>1</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="6" >
-    <widget class="Q3TextEdit" name="sourceTextArea" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>7</vsizetype>
-       <horstretch>232</horstretch>
-       <verstretch>232</verstretch>
-      </sizepolicy>
-     </property>
+   <item>
+    <widget class="QTextEdit" name="textEdit" >
      <property name="font" >
       <font>
        <family>Monaco</family>
-       <pointsize>10</pointsize>
+       <pointsize>9</pointsize>
        <weight>50</weight>
        <italic>false</italic>
        <bold>false</bold>
@@ -160,42 +158,42 @@
        <strikeout>false</strikeout>
       </font>
      </property>
-     <widget class="QTextEdit" name="textEdit" >
-      <property name="geometry" >
-       <rect>
-        <x>20</x>
-        <y>20</y>
-        <width>381</width>
-        <height>201</height>
-       </rect>
-      </property>
-      <property name="frameShadow" >
-       <enum>QFrame::Sunken</enum>
-      </property>
-      <property name="verticalScrollBarPolicy" >
-       <enum>Qt::ScrollBarAsNeeded</enum>
-      </property>
-      <property name="horizontalScrollBarPolicy" >
-       <enum>Qt::ScrollBarAsNeeded</enum>
-      </property>
-     </widget>
+     <property name="midLineWidth" >
+      <number>-5</number>
+     </property>
+     <property name="verticalScrollBarPolicy" >
+      <enum>Qt::ScrollBarAlwaysOn</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy" >
+      <enum>Qt::ScrollBarAlwaysOn</enum>
+     </property>
+     <property name="lineWrapMode" >
+      <enum>QTextEdit::NoWrap</enum>
+     </property>
+     <property name="lineWrapColumnOrWidth" >
+      <number>0</number>
+     </property>
+     <property name="html" >
+      <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Monaco; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Courier; font-size:12pt;">&lt;/p>&lt;/body>&lt;/html></string>
+     </property>
+     <property name="tabStopWidth" >
+      <number>15</number>
+     </property>
+     <property name="acceptRichText" >
+      <bool>false</bool>
+     </property>
     </widget>
    </item>
   </layout>
  </widget>
+ <layoutdefault spacing="0" margin="0" />
+ <layoutfunction spacing="0" margin="0" />
  <pixmapfunction></pixmapfunction>
  <customwidgets>
   <customwidget>
    <class>brqtMethodPopup</class>
-   <extends>QWidget</extends>
+   <extends>QComboBox</extends>
    <header>brqtmethodpopup.h</header>
-   <container>1</container>
-   <pixmap></pixmap>
-  </customwidget>
-  <customwidget>
-   <class>Q3TextEdit</class>
-   <extends></extends>
-   <header>q3textedit.h</header>
    <container>0</container>
    <pixmap></pixmap>
   </customwidget>

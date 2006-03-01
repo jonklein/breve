@@ -451,9 +451,10 @@
 
 	if(!pixelBuffer || !tempPixelBuffer) [self updateSize: self];
 
-	glReadPixels(0, 0, (int)bounds.size.width, (int)bounds.size.height, GL_RGBA, GL_UNSIGNED_BYTE, tempPixelBuffer);
+	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
+	glReadPixels( 0, 0, (int)bounds.size.width, (int)bounds.size.height, GL_RGB, GL_UNSIGNED_BYTE, tempPixelBuffer );
 
-	slReversePixelBuffer(tempPixelBuffer, pixelBuffer, (int)bounds.size.width * 4, (int)bounds.size.height);
+	slReversePixelBuffer( tempPixelBuffer, pixelBuffer, (int)bounds.size.width * 3, (int)bounds.size.height );
 
 	return pixelBuffer;
 }
@@ -490,15 +491,15 @@
 	[self updateRGBAPixels];
 
 	[i initWithBitmapDataPlanes: &pixelBuffer
-	   pixelsWide: x
-	   pixelsHigh: y
-	   bitsPerSample: 8
-	   samplesPerPixel: 4
-	   hasAlpha: YES
-	   isPlanar: NO 
-	   colorSpaceName: @"NSDeviceRGBColorSpace"
-	   bytesPerRow: 0
-		bitsPerPixel: 0];
+		pixelsWide: x
+		pixelsHigh: y
+		bitsPerSample: 8
+		samplesPerPixel: 3
+		hasAlpha: NO
+		isPlanar: NO 
+		colorSpaceName: @"NSDeviceRGBColorSpace"
+		bytesPerRow: x * 3  
+		bitsPerPixel: 24 ];
 
 	return i;
 }

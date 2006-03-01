@@ -43,7 +43,6 @@
 
 @define SPEED_K 10.
 
-
 Controller Walker.
 
 PhysicalControl : Walker {

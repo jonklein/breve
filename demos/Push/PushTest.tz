@@ -40,13 +40,11 @@ Object : myPushAgent (aka myPushAgents) {
 		interpreter clear-stacks.
 
 		# code = (new PushProgram parse program "( 1 2 3 4 5 6 CALLBACK2-TEST CALLBACK-TEST CALLBACK2-TEST CALLBACK-TEST ( 0 0 ) )").
-		code = (new PushProgram parse program "( 3.5 3.6 3.7 10.1 POINT.SETZ FLOAT.FROMPOINTZ)").
+		code = (new PushProgram parse program "( 0 0 INTEGER./ 3.5 3.6 3.7 10.1 POINT.SETZ FLOAT.FROMPOINTZ)").
 		code2 = (new PushProgram parse program "( 1 2 3 4 8 4 CALLBACK-TEST CALLBACK2-TEST )").
 
 		print "Discrepancy", (code get-discrepancy from code2).
 		print "Top level diff", (code get-top-level-difference from code2).
-
-		print "IN BREVE LIST FORM", pushCodeGetEvalList((code get-code-pointer)).
 
 		interpreter run program code.
 

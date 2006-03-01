@@ -17,11 +17,11 @@ void brqtMethodPopup::showPopup() {
 
 	int t;
     
-	while((t = brqtQuickparserlex())) {
-		if(t != 1) {
+	while( ( t = brqtQuickparserlex() ) ) {
+		if( t != 1 ) {
 			QString item;
 
-			item.sprintf("%s (line %d)", slObjectParseText, slObjectParseLine);
+			item.sprintf( "%s (line %d)", slObjectParseText, slObjectParseLine );
 
 			insertItem( count(), item.simplified() );
 
@@ -40,6 +40,7 @@ void brqtMethodPopup::go( unsigned int index ) {
 	clear();
 	insertItem( count(), "Go to method..." );
 
-	if( index >= _lineMap.size() ) return;
+	if ( index >= _lineMap.size() ) return;
+
 	// _textArea->setSelection( _lineMap[ index ] - 1, 0, _lineMap[ index ], 0 );
 }

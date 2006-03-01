@@ -12,7 +12,7 @@
 		activeBuildConfigurationName = Development;
 		activeBuildStyle = 4A9504D0FFE6A4CB11CA0CBA /* Development */;
 		activeExecutable = 4802DC7B05616137008198B9 /* real_breve.app */;
-		activeTarget = 480F31AA071472AD00E71420 /* breve.app */;
+		activeTarget = 4802DC1A05616137008198B9 /* real_breve.app */;
 		addToTargets = (
 			4802DC1A05616137008198B9 /* real_breve.app */,
 			480F31AA071472AD00E71420 /* breve.app */,
@@ -161,7 +161,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 159244072;
+			PBXPerProjectTemplateStateSaveDate = 162419425;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -718,7 +718,7 @@
 				PBXModuleWindowStatusBarHidden = YES;
 				RubberWindowFrame = "267 380 745 408 0 0 1280 832 ";
 			};
-			PBXWorkspaceStateSaveDate = 159244072;
+			PBXWorkspaceStateSaveDate = 162419425;
 		};
 		sourceControlManager = 48E065B3055C318700C40B45 /* Source Control */;
 		userBuildSettings = {
