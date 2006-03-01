@@ -63,7 +63,7 @@ void stGCRetainPointer(void *pointer, int type);
 	
 class brEval {
 	public:
-		brEval() { _type = AT_NULL; }
+		brEval() { _type = AT_NULL; _values.pointerValue = NULL; }
 
 		~brEval() { collect(); }
 

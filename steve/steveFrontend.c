@@ -34,6 +34,7 @@ void *breveFrontendInitData(brEngine *engine) {
 	signal( SIGSEGV, stCrashCatcher );
 	signal( SIGILL, stCrashCatcher );
 	signal( SIGBUS, stCrashCatcher );
+	signal( 8 , stCrashCatcher );
 	signal( SIGABRT, stCrashCatcher );
 	signal( SIGTRAP, stCrashCatcher );
 	signal( SIGQUIT, stCrashCatcher );

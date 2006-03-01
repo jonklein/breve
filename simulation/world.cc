@@ -68,7 +68,7 @@ slWorld::slWorld() {
 	_odeWorldID = dWorldCreate();
 	dWorldSetQuickStepNumIterations( _odeWorldID, 60 );
 	
-	dWorldSetAutoDisableFlag( _odeWorldID, 1 );
+	//dWorldSetAutoDisableFlag( _odeWorldID, 1 );
 
 	dWorldSetCFM ( _odeWorldID, 1e-6 );
 	dWorldSetERP( _odeWorldID, 0.1 );
