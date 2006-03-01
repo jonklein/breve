@@ -1,0 +1,162 @@
+<ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
+ <class>brqtWidgetPalette</class>
+ <widget class="QDialog" name="brqtWidgetPalette" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>327</width>
+    <height>214</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Interface Palette</string>
+  </property>
+  <property name="sizeGripEnabled" >
+   <bool>false</bool>
+  </property>
+  <widget class="brqtDragableLabel" name="checkbox" >
+   <property name="geometry" >
+    <rect>
+     <x>50</x>
+     <y>140</y>
+     <width>100</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string/>
+   </property>
+   <property name="pixmap" >
+    <pixmap>interfaceImages/checkbox.png</pixmap>
+   </property>
+  </widget>
+  <widget class="brqtDragableLabel" name="lineedit" >
+   <property name="geometry" >
+    <rect>
+     <x>40</x>
+     <y>10</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string/>
+   </property>
+   <property name="pixmap" >
+    <pixmap>interfaceImages/text.png</pixmap>
+   </property>
+  </widget>
+  <widget class="brqtDragableLabel" name="vslider" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>21</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string/>
+   </property>
+   <property name="pixmap" >
+    <pixmap>interfaceImages/vslider.png</pixmap>
+   </property>
+  </widget>
+  <widget class="brqtDragableLabel" name="button" >
+   <property name="geometry" >
+    <rect>
+     <x>50</x>
+     <y>90</y>
+     <width>100</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string/>
+   </property>
+   <property name="pixmap" >
+    <pixmap>interfaceImages/button.png</pixmap>
+   </property>
+  </widget>
+  <widget class="brqtDragableLabel" name="label" >
+   <property name="geometry" >
+    <rect>
+     <x>50</x>
+     <y>50</y>
+     <width>111</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string/>
+   </property>
+   <property name="pixmap" >
+    <pixmap>interfaceImages/inputtext.png</pixmap>
+   </property>
+  </widget>
+  <widget class="brqtDragableLabel" name="radiobutton" >
+   <property name="geometry" >
+    <rect>
+     <x>170</x>
+     <y>0</y>
+     <width>151</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string/>
+   </property>
+   <property name="pixmap" >
+    <pixmap>interfaceImages/radiobuttons.png</pixmap>
+   </property>
+  </widget>
+  <widget class="brqtDragableLabel" name="hslider" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>180</y>
+     <width>171</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string/>
+   </property>
+   <property name="pixmap" >
+    <pixmap>interfaceImages/hslider.png</pixmap>
+   </property>
+  </widget>
+  <widget class="brqtDragableLabel" name="glwidget" >
+   <property name="geometry" >
+    <rect>
+     <x>180</x>
+     <y>110</y>
+     <width>131</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string/>
+   </property>
+   <property name="pixmap" >
+    <pixmap>interfaceImages/glwidget.png</pixmap>
+   </property>
+  </widget>
+ </widget>
+ <pixmapfunction></pixmapfunction>
+ <customwidgets>
+  <customwidget>
+   <class>brqtDragableLabel</class>
+   <extends>QLabel</extends>
+   <header>brqtDragableLabel.h</header>
+   <container>0</container>
+   <pixmap></pixmap>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

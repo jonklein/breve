@@ -7,6 +7,11 @@ documentation: docclean docbook
 docclean: 
 	rm -rf docs
 
+docBuild/docExtract: docBuild/docExtract.c
+	# g++ chokes here?!
+
+	$(CC) -o docBuild/docExtract docBuild/docExtract.c
+
 classes: docBuild/docExtract
 	mkdir -p docs/classes
 	docBuild/docExtract lib/classes/*.tz | docBuild/docBuild.pl docs/classes
