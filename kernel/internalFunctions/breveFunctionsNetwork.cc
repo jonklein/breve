@@ -232,6 +232,7 @@ void *brListenOnSocket(void *data) {
 
 		if(clientData.socket != -1) {
 			// fcntl(clientData.socket, F_SETFL, O_NONBLOCK);
+
 			pthread_mutex_lock(&clientData.engine->lock);
 			brHandleConnection(&clientData);
 			pthread_mutex_unlock(&clientData.engine->lock);
@@ -278,9 +279,7 @@ void *brHandleConnection(void *p) {
 			http = slStrdup((char*)&request);
 		}
 
-		pthread_mutex_lock(&data->engine->lock);
 		brHandleHTTPConnection(data, http);
-		pthread_mutex_unlock(&data->engine->lock);
 
 		slFree(http);
 
@@ -303,7 +302,6 @@ void *brHandleConnection(void *p) {
 			count = slUtilRead(data->socket, buffer, length);
 
 			buffer[length] = 0;
-			pthread_mutex_lock(&data->engine->lock);
 
 			args[0] = &eval[0];
 			args[1] = &eval[1];
@@ -325,7 +323,6 @@ void *brHandleConnection(void *p) {
 
 			delete[] buffer;
 
-			pthread_mutex_unlock(&data->engine->lock);
 			break;
 	}
 

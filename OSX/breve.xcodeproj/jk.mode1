@@ -286,7 +286,7 @@
 							<real>186</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>122 220 867 612 0 0 1280 832 </string>
+						<string>303 220 867 612 0 0 1280 832 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -323,7 +323,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {659, 0}}</string>
 								<key>RubberWindowFrame</key>
-								<string>122 220 867 612 0 0 1280 832 </string>
+								<string>303 220 867 612 0 0 1280 832 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -345,7 +345,7 @@
 								<key>Frame</key>
 								<string>{{0, 5}, {659, 566}}</string>
 								<key>RubberWindowFrame</key>
-								<string>122 220 867 612 0 0 1280 832 </string>
+								<string>303 220 867 612 0 0 1280 832 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
@@ -369,9 +369,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>483B82AD09AE530A0063BCF8</string>
+				<string>484CFF6509B5436F0038B9B3</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>483B82AE09AE530A0063BCF8</string>
+				<string>484CFF6609B5436F0038B9B3</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -505,11 +505,10 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>487AAB1F084F74BE00633A19</string>
 		<string>/Users/jk/dev/breve/OSX/breve.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>122 220 867 612 0 0 1280 832 </string>
+	<string>303 220 867 612 0 0 1280 832 </string>
 	<key>WindowTools</key>
 	<array>
 		<dict>

@@ -1,9 +1,7 @@
 @use Object.
 @use Stationary.
 
-#@define FLOOR_X 170.
 @define FLOOR_Y 0.3.
-#@define FLOOR_Z 170.
 
 @define COLOR (0,0.9,0.1).
 
@@ -19,42 +17,27 @@ Object : Stage {
 
 	+ to init-with size-x FLOOR_X (double) with-size-z FLOOR_Z (double):
 		floor-shape = (new Cube init-with size (FLOOR_X, FLOOR_Y, FLOOR_Z)).
-#		floor = new Mobile.
-#		floor move to (0, -FLOOR_Y/2, 0).
-#		floor set-shape to floor-shape.
 		floor = new Stationary.
 		floor register with-shape floor-shape at-location (0, -FLOOR_Y/2, 0).
 		floor set-e to BOUNCE.
 
 		wall-shape0 = (new Cube init-with size (WALL_W, WALL_H, FLOOR_Z + WALL_W)).
-#		wallN = new Mobile.
-#		wallN move to (FLOOR_X/2, WALL_H/2 - FLOOR_Y/2, 0).
-#		wallN set-shape to wall-shape0.
 		wallN = new Stationary.
 		wallN register with-shape wall-shape0 at-location (FLOOR_X/2, WALL_H/2 - FLOOR_Y/2, 0).
 		wallN set-e to BOUNCE.
 		wallN set-color to COLOR.
 
-#		wallS = new Mobile.
-#		wallS move to (-FLOOR_X/2, WALL_H/2 - FLOOR_Y/2, 0).
-#		wallS set-shape to wall-shape0.
 		wallS = new Stationary.
 		wallS register with-shape wall-shape0 at-location (-FLOOR_X/2, WALL_H/2 - FLOOR_Y/2, 0).
 		wallS set-e to BOUNCE.
 		wallS set-color to (0.5,0,0).
 
 		wall-shape1 = (new Cube init-with size (FLOOR_X + WALL_W, WALL_H, WALL_W)).
-#		wallN = new Mobile.
-#		wallN move to (0, WALL_H/2 - FLOOR_Y/2, FLOOR_Z/2).
-#		wallN set-shape to wall-shape1.
 		wallN = new Stationary.
 		wallN register with-shape wall-shape1 at-location (0, WALL_H/2 - FLOOR_Y/2, FLOOR_Z/2).
 		wallN set-e to BOUNCE.
 		wallN set-color to (0.5,0,0).
 
-#		wallS = new Mobile.
-#		wallS move to (0, WALL_H/2 - FLOOR_Y/2, -FLOOR_Z/2).
-#		wallS set-shape to wall-shape1.
 		wallS = new Stationary.
 		wallS register with-shape wall-shape1 at-location (0, WALL_H/2 - FLOOR_Y/2, -FLOOR_Z/2).
 		wallS set-e to BOUNCE.
@@ -74,15 +57,9 @@ Object : LabyStage2 {
 		floor = new Stationary.
 		floor register with-shape floor-shape at-location (0, -FLOOR_Y/2, 0).
 		floor set-e to BOUNCE.
-#		floor set-color to (144/255, 198/255, 144/255).
 
 		wall-shape0 = (new Cube init-with size (20, WALL_H,  1)).
 		wall-shape1 = (new Cube init-with size ( 1, WALL_H, 20)).
-
-#		wallN = new Stationary.
-#		wallN register with-shape wall-shape0 at-location (0, WALL_H/2 - FLOOR_Y/2, 0).
-#		wallN set-e to BOUNCE.
-#		wallN set-color to COLOR.
 
 		wallN = new Stationary.
 		wallN register with-shape wall-shape0 at-location (-20, WALL_H/2 - FLOOR_Y/2, 0).
@@ -98,11 +75,6 @@ Object : LabyStage2 {
 		wallN register with-shape wall-shape0 at-location (0, WALL_H/2 - FLOOR_Y/2, 20).
 		wallN set-e to BOUNCE.
 		wallN set-color to COLOR.
-
-#		wallN = new Stationary.
-#		wallN register with-shape wall-shape0 at-location (20, WALL_H/2 - FLOOR_Y/2, 20).
-#		wallN set-e to BOUNCE.
-#		wallN set-color to COLOR.
 
 		wallN = new Stationary.
 		wallN register with-shape wall-shape0 at-location (-20, WALL_H/2 - FLOOR_Y/2, 40).
@@ -205,7 +177,6 @@ Object : LabyStage3 {
 		floor = new Stationary.
 		floor register with-shape floor-shape at-location (0, -FLOOR_Y/2, 0).
 		floor set-e to BOUNCE.
-#		floor set-color to (144/255, 198/255, 144/255).
 
 		wall-shape0 = (new Cube init-with size (20, WALL_H,  1)).
 		wall-shape1 = (new Cube init-with size ( 1, WALL_H, 20)).
@@ -322,7 +293,6 @@ Object : LabyStage4 {
 		floor = new Stationary.
 		floor register with-shape floor-shape at-location (0, -FLOOR_Y/2, 0).
 		floor set-e to BOUNCE.
-#		floor set-color to (144/255, 198/255, 144/255).
 
 		wall-shape0 = (new Cube init-with size (20, WALL_H,  1)).
 		wall-shape1 = (new Cube init-with size ( 1, WALL_H, 20)).
@@ -550,7 +520,6 @@ Object : DemoStage {
 		floor = new Stationary.
 		floor register with-shape floor-shape at-location (0, -FLOOR_Y/2, 0).
 		floor set-e to BOUNCE.
-#		floor set-color to (144/255, 198/255, 144/255).
 
 		wall-shape0 = (new Cube init-with size (20, WALL_H,  1)).
 		wall-shape1 = (new Cube init-with size ( 1, WALL_H, 20)).

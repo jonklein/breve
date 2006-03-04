@@ -4,7 +4,7 @@
 @use Matrix.
 
 
-Mobile : isAgent  (aka isAgents){
+Mobile : isAgent (aka isAgents) {
 	+ variables:
 		shapee        (object).
 		sensor_front  (object).
@@ -29,12 +29,12 @@ Mobile : isAgent  (aka isAgents){
 		self rotate around-axis (0,1,0) by random[6.2].
 
 		self set-neighborhood-size to hoodSize.
-		
+
 		self show-neighbor-lines.
 
 		draw = new Drawing.
 		draw set-color to (1,0,0) with-transparency 1.0.
-		
+
 		return self.
 
 	+ to iterate:
@@ -52,106 +52,68 @@ Mobile : isAgent  (aka isAgents){
 		print drf.
 
 		if (dlf > 10 && df > 10 && drf > 10) : {
-		   self set-rotational-velocity to (0, 0, 0).
-		   self set-velocity to (self get-rotation)*(1,0,0).		
+			self set-rotational-velocity to (0, 0, 0).
+			self set-velocity to (self get-rotation)*(1,0,0).		
 		} else {
-		   if (dlf > drf) : {
-		      self set-rotational-velocity to (0, 1, 0).
-		      self set-velocity to (0,0,0).		
-		   } else {
-		      self set-rotational-velocity to (0, -1, 0).
-		      self set-velocity to (0,0,0).		
-		   }
+			if (dlf > drf) : {
+				self set-rotational-velocity to (0, 1, 0).
+				self set-velocity to (0,0,0).		
+			} else {
+				self set-rotational-velocity to (0, -1, 0).
+				self set-velocity to (0,0,0).		
+			}
 		}  
 
 }
 
 Abstract : Sensor {
-    + variables:
-	 direction (vector).
-	 owner     (object).
-	 maxDist   (float).
-	 draw      (object).	 
-	 id        (double).
-	
-    + to init-with id theID (double) direction theDirection (vector) max-distance theMaxDistance (float) and-owner theOwner (object):
-         direction = theDirection/|theDirection|.
-	 owner     = theOwner.
-	 maxDist   = theMaxDistance.
-	 id        = theID.
-	 draw = new Drawing.
-	 return self.
+	+ variables:
+		direction (vector).
+		owner     (object).
+		maxDist   (float).
+		draw      (object).	 
+		id        (double).
 
-    + to get-data:
-	 item (object).
-	 world_dir (vector).
-	 location  (vector).
-	 hit (vector).
-	 min (float).
-	 mat (matrix).
-	 bestHit (vector).
+	+ to init-with id theID (double) direction theDirection (vector) max-distance theMaxDistance (float) and-owner theOwner (object):
+		direction = theDirection/|theDirection|.
+		owner     = theOwner.
+		maxDist   = theMaxDistance.
+		id        = theID.
+		draw = new Drawing.
+		return self.
 
-	 min = maxDist + 1.
+	+ to get-data:
+		item (object).
+		world_dir (vector).
+		location  (vector).
+		hit (vector).
+		min (float).
+		mat (matrix).
+		bestHit (vector).
 
-	 mat = (owner get-rotation).
+		min = maxDist + 1.
 
-	 world_dir = mat*direction.
-	 location  = (owner get-location).
+		mat = (owner get-rotation).
 
-	 print (owner get-neighbors).
+		world_dir = mat*direction.
+		location  = (owner get-location).
 
-	 foreach item in (owner get-neighbors) : {		 
-		    #item set-color to random[(1,1,1)].
-			print location, world_dir.
-	  	 hit = (item raytrace from-location location with-direction world_dir).
-		 if ((hit != (0,0,0)) && (|hit| < min)) :  {
-		    min = |hit|. 
-		    bestHit = hit.
-		 }
-         }
-	 draw clear.
-#	 if (min < 20) : {
-	          draw draw-line from location to (location + bestHit).
-#	 }
-	 return (min + (random[7] - 3.5)).
+		print (owner get-neighbors).
+
+		foreach item in (owner get-neighbors) : {		 
+			hit = (item raytrace from-location location with-direction world_dir).
+
+			if ((hit != (0,0,0)) && (|hit| < min)) :  {
+				min = |hit|. 
+				bestHit = hit.
+			}
+		}
+
+		draw clear.
+
+		draw draw-line from location to (location + bestHit).
+
+		return (min + (random[7] - 3.5)).
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

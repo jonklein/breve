@@ -159,7 +159,7 @@
 		2A37F4B5FDCFA73011CA2CEA /* slBreveSourceDocument.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = slBreveSourceDocument.nib; path = English.lproj/slBreveSourceDocument.nib; sourceTree = "<group>"; };
 		2A37F4B7FDCFA73011CA2CEA /* MainMenu.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MainMenu.nib; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		4802DC7905616137008198B9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		4802DC7A05616137008198B9 /* breve.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = breve.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4802DC7A05616137008198B9 /* breve.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = breve.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		481D2182042A2D2100FFA442 /* slGraphWindow.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = slGraphWindow.nib; path = English.lproj/slGraphWindow.nib; sourceTree = "<group>"; };
 		482D168A055989F800230BBF /* English */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = English; path = English.lproj/breve.scriptTerminology; sourceTree = "<group>"; };
 		485C2C350559830F005859E4 /* breve.scriptSuite */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = breve.scriptSuite; sourceTree = "<group>"; };
