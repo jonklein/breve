@@ -12,10 +12,15 @@ breve simulation.  By loading external code into breve, you can add customized
 types of computation, bridges to other languages, connections to other input 
 and output methods and much more.  
 </para>
+<para>
+Effective breve release 2.4, all plugins must be compiled with a C++ compiler.
+Plugins may still be written using C, but must be compiled with a C++ compiler
+to accomodate changes made to the plugin API.
+</para>
 <note>
 <title>Programming Experience Required</title>
 <para>
-Building plugins for breve does require some programming experience in C, 
+Building plugins for breve does require some programming experience in C/C++, 
 plus access to and familiarity with the GCC compiler.
 </para>
 </note>
@@ -78,8 +83,8 @@ int function(brEval arguments[], brEval *result, void *instance);
 </screen>
 Arguments are passed in as the <parameter>arguments</parameter> array of 
 <function>brEval</function> structs.  The function output is returned by 
-setting the contents of the <structname>brEval</structname> structure pointed to by 
-<parameter>result</parameter>.  <parameter>instance</parameter> is an
+setting the contents of the <structname>brEval</structname> structure pointed 
+to by <parameter>result</parameter>.  <parameter>instance</parameter> is an
 internal pointer to the calling instance&mdash;this can be ignored.
 </para>
 <para>
@@ -103,7 +108,7 @@ internal pointer to the calling instance&mdash;this can be ignored.
 <indexterm><primary>AT_HASH constant</primary></indexterm>
 <indexterm><primary>BRLIST plugin macro</primary></indexterm>
 <indexterm><primary>AT_LIST constant</primary></indexterm>
-To access native C types stored in the <structname>brEval</structname> struct, you'll
+To access native C types stored in the <structname>brEval</structname> class, you'll
 need to use the following macros, which are defined in the header file distributed 
 with the API.
 <itemizedlist>
@@ -166,6 +171,28 @@ with the API.
 </itemizedlist>
 </para>
 <para>
+In order to set the result, use the overloaded method <function>set()</function> in the brEval class.  This method can take any of the C types listed above and will set the brEval's type according to the input type.  Some examples are shown below.
+<function>
+	// for a function returning an integer
+	result->set( 10 );
+
+	// for a function returning a string
+	char *myString = "look at me, I'm returning a string!";
+	result->set( myString );
+</function>
+In most cases, passing data to <function>set()</function> is as simple as the examples above.  However, care must be taken to ensure that the C-type being passed in corresponds to the desired brEval type.  This may become an issue, for example, if a plugin calculation uses floating point math, but desires to return an integer, or when returning NULL pointers.  It is therefore necessary to explicitly typecast values which do not match the expected return type.  Some examples are shown below.  In each example, the wrong type would be used without the typecast.
+<function>
+	// our calculation creates a double, but we wish to return an AT_INT type to breve:
+	result->set( (int)pow( x, y ) );
+
+	// we want to return an AT_STRING type, but the value is NULL:
+	result->set( (char*)NULL );
+
+	// now we want to return an AT_LIST type, but the value is NULL:
+	result->set( (brEvalListHead*)NULL );
+</function>
+</para>
+<para>
 The following list of constants specifies the types for plugin function input 
 arguments and output types.  The "AT" prefix stands for "atomic type".
 <itemizedlist>
@@ -204,13 +231,15 @@ resulting string in the structure pointed to by result.  Here's how the
 wrapper function might look.
 <screen>
 int breveDownloadURL(brEval *arguments, brEval *result, void *instance) {
-	char *url;
+	char *url, *urlData;
 	int timeout;
 
 	url = BRBRRING(&amp;arguments[0]);
 	timeout = BRINT(&amp;arguments[1]);
 
-	BRBRRING(result) = downloadURL(url, timeout);
+	urlData = downloadURL(url, timeout);
+
+	result->set( urlData );
 		
 	return EC_OK;
 }

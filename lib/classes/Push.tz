@@ -432,7 +432,8 @@ Object : PushProgram (aka PushPrograms) {
 
   + section "Getting information about a Push program"
 
-	+ to get-first-float:
+	- to get-first-float:
+		% Returns the first float value found in the Push program.  
 		return pushCodeFirstFloat( codePointer ).
 
 	+ to get-size:

@@ -9,10 +9,10 @@ OFILES = DigitizerFunctions.o
 all: $(OFILES) DigitizerPlugin.o
 
 DigitizerPlugin.o: $(OFILES)
-	$(CC) @PLUGINFLAGS@ -o DigitizerPlugin.o DigitizerFunctions.o @QUICKTIMEFLAGS@
+	$(CXX) @PLUGINFLAGS@ -o DigitizerPlugin.o DigitizerFunctions.o @QUICKTIMEFLAGS@
 
 clean:
 	-rm -f *.o
 
 .c.o:
-	$(CC) -g -c $*.c $(INCLUDES)
+	$(CXX) -g -c $*.c $(INCLUDES)

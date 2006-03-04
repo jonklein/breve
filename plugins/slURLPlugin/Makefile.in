@@ -1,6 +1,5 @@
 BREVEDIR	= ../..
-CC		= @CC@
-CFLAGS		= @CPPFLAGS@ -I..
+CPPFLAGS	+= -I..
 
 all: URLPlugin.o
 

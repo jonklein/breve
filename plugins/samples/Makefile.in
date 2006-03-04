@@ -1,22 +1,13 @@
 BREVEDIR	= ../..
-CC		= @CC@
-CXX		= @CXX@
+CPPFLAGS	+= -I..
 
 all: cSample_plugin.o c++Sample_plugin.o
 
 cSample_plugin.o: cSample.o @PLUGINLIB@
-	$(CXX) @PLUGINFLAGS@ -o $@ cSample.o @PLUGINLIB@
+	$(CXX) $(CPPFLAGS) @PLUGINFLAGS@ -o $@ cSample.o @PLUGINLIB@ 
 
 c++Sample_plugin.o: c++Sample.o @PLUGINLIB@
-	$(CXX) @PLUGINFLAGS@ -o $@ c++Sample.o @PLUGINLIB@
-
-c++Sample.o: c++Sample.cpp
-
-.c.o:
-	$(CC) -I.. -c -o $@ $<
-
-.cpp.o:
-	$(CXX) -I.. -c -o $@ $<
+	$(CXX) $(CPPFLAGS) @PLUGINFLAGS@ -o $@ c++Sample.o @PLUGINLIB@
 
 clean:
 	rm -f *.o

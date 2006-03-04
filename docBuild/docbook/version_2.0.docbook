@@ -26,7 +26,21 @@ Added TurtleDrawing class for drawing via Logo-like turtle commands
 
 </itemizedlist> 
 
+
 </para> </sect1>
+
+<sect1 id="upgrading_plugins"> <title>Important Notes on Plugins in Version 2.4</title>
+<para>
+The inner workings of the breve plugin API have changed in version 2.4.  Plugins compiled
+for earlier versions of breve will not work with 2.3.  
+</para>
+<para>
+In most cases, plugins simply need to be recompiled, but should generally not require any 
+changes to code.  Additionally, plugins must now be compiled using a C++ compiler (though 
+code written in C will continue to function).  See the updated documentation on Plugins 
+<xref linkend="plugins"> for more information.
+</para>
+</sect1>
 
 <sect1 id="upgrading_simulations"> <title>Upgrading Simulations From Version 1.x</title>
 

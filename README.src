@@ -48,16 +48,11 @@ osmesaloader is a completely optional extension which allows CLI
 versions of breve to use features like light-exposure detection and 
 movie exporting.  It will only compile when Mesa libraries are found.
 
-OS X Note #1: the OS X xcode project is setup to link against all of the 
-breve libraries, even though some of the libraries are optional.  If you
-configure and build breve with some of the optional libraries missing, 
-you need to open the xcode project and disable the missing libraries.
-
-OS X Note #2: if a library is installed, but cannot be found with the 
+OS X Note #1: if a library is installed, but cannot be found with the 
 configure script, you may have to run "ranlib" on the library before
 it can be found.  See the ranlib manpage for more information.
 
-OS X Note #3: the Xcode build targets breve.app is a simple shell script 
+OS X Note #2: the Xcode build targets breve.app is a simple shell script 
 wrapper to build real_breve.app using the correct libraries from the 
 configure script.  Building real_breve.app directly will fail, because 
 it is missing these library settings.

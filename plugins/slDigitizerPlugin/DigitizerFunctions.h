@@ -35,7 +35,7 @@ struct ccIntensityMap {
 
 struct brDigitizer {
     ComponentInstance instance;
-    char *pixels;
+    unsigned char *pixels;
 
     ccIntensityMap *map;
 

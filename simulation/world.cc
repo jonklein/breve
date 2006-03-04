@@ -50,7 +50,7 @@ void slODEErrorHandler(int errnum, const char *msg, va_list ap) {
 	vsnprintf(error, 2047, msg, ap);
 	gPhysicsErrorMessage = (char*)error;	
 
-	slMessage( DEBUG_ALL, "ODE Engine error: %s\n", error );
+	slMessage( DEBUG_WARN, "ODE Engine message: %s\n", error );
 }
 
 /*!

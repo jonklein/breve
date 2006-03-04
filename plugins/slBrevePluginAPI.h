@@ -142,16 +142,16 @@ class brEval {
 		inline void set( brInstance *i )     { collect(); _values.instanceValue = i;              _type = AT_INSTANCE; retain(); }
 		inline void set( brEvalListHead *l ) { collect(); _values.listValue = l;                  _type = AT_LIST;     retain(); }
 
-		inline int             getInt()      { return _values.intValue;      }
-		inline double          getDouble()   { return _values.doubleValue;   }
-		inline slVector       &getVector()   { return _values.vectorValue;  }
-		inline slMatrix       &getMatrix()   { return _values.matrixValue;  }
-		inline void           *getPointer()  { return _values.pointerValue;  }
-		inline char           *getString()   { return _values.stringValue;   }
-		inline brEvalHash     *getHash()     { return _values.hashValue;     }
-		inline brData         *getData()     { return _values.dataValue;     }
-		inline brInstance     *getInstance() { return _values.instanceValue; }
-		inline brEvalListHead *getList()     { return _values.listValue;     }
+		inline int             &getInt()      { return _values.intValue;      }
+		inline double          &getDouble()   { return _values.doubleValue;   }
+		inline slVector        &getVector()   { return _values.vectorValue;  }
+		inline slMatrix        &getMatrix()   { return _values.matrixValue;  }
+		inline void*           &getPointer()  { return _values.pointerValue;  }
+		inline char*           &getString()   { return _values.stringValue;   }
+		inline brEvalHash*     &getHash()     { return _values.hashValue;     }
+		inline brData*         &getData()     { return _values.dataValue;     }
+		inline brInstance*     &getInstance() { return _values.instanceValue; }
+		inline brEvalListHead* &getList()     { return _values.listValue;     }
 
 	private:
 		union {

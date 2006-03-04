@@ -1,10 +1,10 @@
-SRC	+= steve/format.c steve/stevelex.c steve/steveparse.tab.c \
-		steve/breveFunctionsSteveDataObject.c \
-		steve/breveFunctionsSteveObject.c \
-		steve/breveFunctionsSteveXML.c steve/dataObject.c \
-		steve/evalListCopyGC.c steve/evalListSort.c steve/evaluation.c \
-		steve/expression.c steve/gc.c steve/genetic.c \
-		steve/interactive.c steve/object.c steve/steveFrontend.c \
-		steve/stringexp.c steve/xml.c
+SRC	+= steve/format.cc steve/stevelex.c steve/steveparse.tab.c \
+		steve/breveFunctionsSteveDataObject.cc \
+		steve/breveFunctionsSteveObject.cc \
+		steve/breveFunctionsSteveXML.cc steve/dataObject.cc \
+		steve/evalListCopyGC.cc steve/evalListSort.cc steve/evaluation.cc \
+		steve/expression.cc steve/gc.cc steve/genetic.cc \
+		steve/interactive.cc steve/object.cc steve/steveFrontend.cc \
+		steve/stringexp.cc steve/xml.cc
 
 steve/steveparse.tab.h: steve/steveparse.tab.c

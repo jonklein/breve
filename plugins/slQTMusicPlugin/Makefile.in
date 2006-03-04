@@ -1,12 +1,11 @@
 BREVEDIR	=	../..
 
+CPPFLAGS	= -I..
+
 all: QTInstrumentPlugin.o
 
 QTInstrumentPlugin.o: QTInstrumentFunctions.o
 	$(CXX) @PLUGINFLAGS@ -o QTInstrumentPlugin.o QTInstrumentFunctions.o @QUICKTIMEFLAGS@
-
-.c.o:
-	$(CXX) $(CFLAGS) -c $*.c -I.. 
 
 clean:
 	-rm -f *.o

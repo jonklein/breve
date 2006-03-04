@@ -36,11 +36,11 @@ adequately describe any features or techniques.
 
 <sect1 id="getting_help">
 <title>Getting Help With breve</title>
-<para>There are several ways to get help with using breve:
+<para>There are several ways to get help using breve:
 <itemizedlist>
 <listitem><para>Read the class documentation for more detailed information about each class.  These class files are listed in <xref linkend="classes">.</para></listitem> 
-<listitem><para>Join the breve mailing list at 
-<ulink url="http://lists.spiderland.org/mailman/listinfo/breve">http://lists.spiderland.org/mailman/listinfo/breve</ulink>.</para></listitem>
+<listitem><para>Visit the breve discussion forums at 
+<ulink url="http://www.spiderland.org/forums/">http://www.spiderland.org/forums/</ulink>.</para></listitem>
 <listitem><para>Mail the author at <ulink url="mailto:jk [at] spiderland.org">jk [at] spiderland.org</ulink></para></listitem>
 </itemizedlist>
 </para>

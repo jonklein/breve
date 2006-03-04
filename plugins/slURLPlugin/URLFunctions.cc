@@ -41,7 +41,7 @@ size_t slURLWrite(void *p, size_t s, size_t n, struct slURLWriteData *data) {
 
 	if (data->maxSize <= newSize) {
 		data->maxSize = newSize + 1;
-		data->string = slRealloc(data->string, data->maxSize);
+		data->string = (char*)slRealloc(data->string, data->maxSize);
 	}
 	memcpy(&data->string[data->size], p, len);
 	data->size = newSize;
@@ -55,7 +55,7 @@ int slUGetURL(brEval args[], brEval *target, void *i) {
 
 	data.maxSize = 4096;
 	data.size = 0;
-	data.string = slMalloc(data.maxSize);
+	data.string = (char*)slMalloc(data.maxSize);
 
 	handle = curl_easy_init();
 	curl_easy_setopt(handle, CURLOPT_URL, BRSTRING(&args[0]));

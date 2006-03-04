@@ -64,23 +64,26 @@ int slRSplit(brEval args[], brEval *output, void *instance) {
 
     /* keep running the regular expression and spliting out new fields */
 
-    stringEval.type = AT_STRING; 
-
     while(*string && regexec(&exp, string, 1, matches, 0) != REG_NOMATCH) {
         if(matches[0].rm_eo != 0) {
-            /* we've found the beginning of the split field... copy from the start */
-            /* of the search string, up to the start pointer. */
+            // we've found the beginning of the split field... copy from the 
+			// start of the search string, up to the start pointer. 
 
-            BRSTRING(&stringEval) = slMalloc(matches[0].rm_so + 1);
-        
-            strncpy(BRSTRING(&stringEval), string, matches[0].rm_so);
-            (BRSTRING(&stringEval))[matches[0].rm_so] = 0;
+			char *match = new char[ matches[0].rm_so + 1 ];
 
-            brEvalListAppend(list, &stringEval);
+            strncpy( match, string, matches[0].rm_so );
+            match[ matches[0].rm_so ] = 0;
 
-            /* advance the string pointer to the end of the previously matched expression */
+			stringEval.set( match );
+
+            brEvalListAppend( list, &stringEval );
+
+            // advance the string pointer to the end of the previously matched 
+			// expression 
 
             string += matches[0].rm_eo;
+
+			delete[] match;
         } else {
             /* if we match a zero length regexp, just move one character */
             /* forward without adding anything */
@@ -90,12 +93,17 @@ int slRSplit(brEval args[], brEval *output, void *instance) {
     }
 
     if(*string) {
-        /* it's possible that we've eaten up the last regexp match, but that there */
-        /* is still text left--we want this to be included as well */
+        // it's possible that we've eaten up the last regexp match, but that 
+		// there is still text left--we want this to be included as well 
 
-        BRSTRING(&stringEval) = slMalloc(strlen(string) + 1);
-        strcpy(BRSTRING(&stringEval), string);
+		char *match = new char[ strlen(string) + 1 ];
+        strcpy( match, string);
+
+		stringEval.set( match );
+
         brEvalListAppend(list, &stringEval);
+
+		delete[] match;
     }
     
     regfree(&exp);
@@ -115,7 +123,7 @@ int slRRegex(brEval args[], brEval *output, void *instance) {
     result = regcomp(&exp, expstr, REG_EXTENDED);
 
     if(result != 0) {
-        /* couldn't compile regular expression */
+        // couldn't compile regular expression 
 
         slMessage(DEBUG_ALL, "error compiling regular expression \"%s\"", expstr);
         BRLIST(output) = NULL;

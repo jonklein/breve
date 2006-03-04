@@ -22,7 +22,7 @@
 #include "DigitizerFunctions.h"
 
 int brDigitizerOpenCamera(brEval args[], brEval *target, void *i) {
-	brDigitizer *data = slMalloc(sizeof(brDigitizer));
+	brDigitizer *data = new brDigitizer;
 
 	data->instance = ccOpenCamera(data, BRINT(&args[0]), BRINT(&args[1]));
 
@@ -43,7 +43,7 @@ int brDigitizerOpenCamera(brEval args[], brEval *target, void *i) {
 }
 
 int brDigitizerFlip(brEval args[], brEval *target, void *i) {
-	brDigitizer *b = BRPOINTER(&args[0]);
+	brDigitizer *b = (brDigitizer*)BRPOINTER(&args[0]);
 
 	if(!b) return EC_ERROR;
 
@@ -55,15 +55,15 @@ int brDigitizerFlip(brEval args[], brEval *target, void *i) {
 }
 
 int brDigitizerUpdateFrame(brEval args[], brEval *target, void *i) { 
-	brDigitizer *b = BRPOINTER(&args[0]);
-	char *output = BRPOINTER(&args[1]);
+	brDigitizer *b = (brDigitizer*)BRPOINTER(&args[0]);
+	unsigned char *output = (unsigned char*)BRPOINTER( &args[1] );
 	int value;
 
 	if(!b) return EC_ERROR;
 
 	value = SGIdle(b->instance);
 
-	ccGetPixels(b, output);
+	ccGetPixels( b, output );
 
 	ccIntensityMapARGB(b, b->map->active);
 	ccIntensityMapDeltaARGB(b);
@@ -72,7 +72,7 @@ int brDigitizerUpdateFrame(brEval args[], brEval *target, void *i) {
 }
 
 int brDigitizerReferenceMap(brEval args[], brEval *target, void *i) { 
-	brDigitizer *b = BRPOINTER(&args[0]);
+	brDigitizer *b = (brDigitizer*)BRPOINTER(&args[0]);
 
 	if(!b) return EC_ERROR;
 	ccIntensityMapARGB(b, !b->map->active);
@@ -81,14 +81,14 @@ int brDigitizerReferenceMap(brEval args[], brEval *target, void *i) {
 }
 
 int brDigitizerHighestDelta(brEval args[], brEval *target, void *i) { 
-	brDigitizer *b = BRPOINTER(&args[0]);
+	brDigitizer *b = (brDigitizer*)BRPOINTER(&args[0]);
 	if(!b) return EC_ERROR;
 	BRINT(target) = b->map->delta[b->map->highest];
 	return EC_OK;
 }
 
 int brDigitizerAverageDelta(brEval args[], brEval *target, void *i) { 
-	brDigitizer *b = BRPOINTER(&args[0]);
+	brDigitizer *b = (brDigitizer*)BRPOINTER(&args[0]);
 	if(!b) return EC_ERROR;
 	BRINT(target) = b->map->average;
 	return EC_OK;
@@ -96,7 +96,7 @@ int brDigitizerAverageDelta(brEval args[], brEval *target, void *i) {
 
 
 int brDigitizerHighestDeltaLocation(brEval args[], brEval *target, void *i) { 
-	brDigitizer *b = BRPOINTER(&args[0]);
+	brDigitizer *b = (brDigitizer*)BRPOINTER(&args[0]);
 	slVector *v = &BRVECTOR(target);	
 
 	if(!b) return EC_ERROR;
@@ -115,7 +115,7 @@ int brDigitizerHighestDeltaLocation(brEval args[], brEval *target, void *i) {
 }
 
 int brDigitizerIntensityMapValue(brEval args[], brEval *target, void *i) { 
-	brDigitizer *b = BRPOINTER(&args[0]);
+	brDigitizer *b = (brDigitizer*)BRPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
@@ -127,7 +127,7 @@ int brDigitizerIntensityMapValue(brEval args[], brEval *target, void *i) {
 	
 }
 int brDigitizerDeltaMapValue(brEval args[], brEval *target, void *i) { 
-	brDigitizer *b = BRPOINTER(&args[0]);
+	brDigitizer *b = (brDigitizer*)BRPOINTER(&args[0]);
 	int x = BRINT(&args[1]);
 	int y = BRINT(&args[2]);
 
@@ -139,7 +139,7 @@ int brDigitizerDeltaMapValue(brEval args[], brEval *target, void *i) {
 	
 
 int brDigitizerCloseCamera(brEval args[], brEval *target, void *i) { 
-	brDigitizer *b = BRPOINTER(&args[0]);
+	brDigitizer *b = (brDigitizer*)BRPOINTER(&args[0]);
 
 	if(!b) return EC_OK;
 
@@ -171,10 +171,10 @@ ComponentInstance ccOpenCamera(brDigitizer *data, int width, int height) {
 	
 	SetRect(&theBounds, 0, 0, width, height);
 	
-	NewGWorld(&pixelWorld, 32, &theBounds, NULL, NULL, NULL);
+	NewGWorld( &pixelWorld, 32, &theBounds, NULL, NULL, 0 );
 	
 	data->rowBytes = (*GetGWorldPixMap(pixelWorld))->rowBytes & 0x3FFF;
-	data->pixels = GetPixBaseAddr(GetGWorldPixMap(pixelWorld));
+	data->pixels = (unsigned char*)GetPixBaseAddr(GetGWorldPixMap(pixelWorld));
 	
 	co = OpenDefaultComponent('barg', 0);
 	
@@ -327,10 +327,10 @@ void ccFilterMaskRGB(unsigned char *source, unsigned char *dest, int width, int 
 ccIntensityMap *ccNewIntensityMap(int size) {
 	ccIntensityMap *map;
 
-	map = malloc(sizeof(ccIntensityMap));
-	map->map[0] = malloc(size * size * sizeof(int));
-	map->map[1] = malloc(size * size * sizeof(int));
-	map->delta = malloc(size * size * sizeof(int));
+	map = new ccIntensityMap;
+	map->map[0] = new int[ size * size ];
+	map->map[1] = new int[ size * size ];
+	map->delta = new int[ size * size ];
 
 	memset(map->delta, 0, size * size * sizeof(int));
 	memset(map->map[0], 0, size * size * sizeof(int));
@@ -354,8 +354,10 @@ void ccIntensityMapDeltaARGB(brDigitizer *b) {
 	map->average = 0;
 
 	for(n=0;n<map->size*map->size;n++) {
-		map->delta[n] *= .7;
-		map->delta[n] += (map->map[0][n] - map->map[1][n]);
+		// Honestly, who knows what's going on here?
+		
+		map->delta[n] = ( int )( map->delta[ n ] * .7 );
+		map->delta[n] += ( map->map[0][n] - map->map[1][n] );
 
 		map->average += abs(map->delta[n]);
 
