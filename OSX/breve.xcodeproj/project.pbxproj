@@ -96,6 +96,8 @@
 		480F317A07146D7A00E71420 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 		480F317B07146D8000E71420 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48807AA104DF1DB800A8D232 /* CoreAudio.framework */; };
 		480F317D07146D8200E71420 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BD20F20397BFE301980AE4 /* GLUT.framework */; };
+		4832D4A409B9FFC200443499 /* DigitizerPlugin.o in Resources */ = {isa = PBXBuildFile; fileRef = 48ECC164071C13C100596F93 /* DigitizerPlugin.o */; };
+		4832D4A509B9FFC400443499 /* QTInstrumentPlugin.o in Resources */ = {isa = PBXBuildFile; fileRef = 48ECC16F071C13F400596F93 /* QTInstrumentPlugin.o */; };
 		48619FB8071475A500E0A1B6 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BD20F40397BFE301980AE4 /* QuickTime.framework */; };
 		48619FB9071475A500E0A1B6 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BD20F30397BFE301980AE4 /* OpenGL.framework */; };
 		48620C9207944552009195E5 /* libbreve.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 48620C9107944552009195E5 /* libbreve.a */; };
@@ -159,7 +161,7 @@
 		2A37F4B5FDCFA73011CA2CEA /* slBreveSourceDocument.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = slBreveSourceDocument.nib; path = English.lproj/slBreveSourceDocument.nib; sourceTree = "<group>"; };
 		2A37F4B7FDCFA73011CA2CEA /* MainMenu.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MainMenu.nib; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		4802DC7905616137008198B9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		4802DC7A05616137008198B9 /* breve.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = breve.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4802DC7A05616137008198B9 /* breve.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = breve.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		481D2182042A2D2100FFA442 /* slGraphWindow.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = slGraphWindow.nib; path = English.lproj/slGraphWindow.nib; sourceTree = "<group>"; };
 		482D168A055989F800230BBF /* English */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = English; path = English.lproj/breve.scriptTerminology; sourceTree = "<group>"; };
 		485C2C350559830F005859E4 /* breve.scriptSuite */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = breve.scriptSuite; sourceTree = "<group>"; };
@@ -519,6 +521,8 @@
 				4802DC4405616137008198B9 /* slGLWindow.nib in Resources */,
 				4802DC4905616137008198B9 /* breve.scriptSuite in Resources */,
 				4802DC4A05616137008198B9 /* breve.scriptTerminology in Resources */,
+				4832D4A409B9FFC200443499 /* DigitizerPlugin.o in Resources */,
+				4832D4A509B9FFC400443499 /* QTInstrumentPlugin.o in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
