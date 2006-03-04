@@ -37,7 +37,7 @@ slQTInstrumentInfo *slQTNewInstrumentInfo(int instrument) {
 
     /* initialize qt music */
 
-    i = malloc(sizeof(slQTInstrumentInfo));
+    i = new slQTInstrumentInfo;
 
     i->allocator = OpenDefaultComponent('nota', 0);
 
@@ -65,7 +65,7 @@ slQTInstrumentInfo *slQTNewInstrumentInfo(int instrument) {
 }
 
 int brQTInstrumentFree(brEval args[], brEval *result, void *i) {
-    slQTInstrumentInfo *info = BRPOINTER(&args[0]);
+    slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
 
 	printf("freeing %p and %p\n", info->channel, info->allocator);
     if (info->channel) NADisposeNoteChannel(info->allocator, info->channel);
@@ -81,13 +81,13 @@ int brQTInstrumentNew(brEval args[], brEval *result, void *i) {
 }
 
 int brQTInstrumentPlayNote(brEval args[], brEval *result, void *i) {
-    slQTInstrumentInfo *info = BRPOINTER(&args[0]);
+    slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
 
     if(BRDOUBLE(&args[3]) <= 0.0) return EC_OK;
 
     if(info->allocator && info->channel) {
         NAPlayNote(info->allocator, info->channel, BRINT(&args[1]), BRINT(&args[2]));
-        usleep(BRDOUBLE(&args[3]) * 1000000);
+        usleep( ( int )( BRDOUBLE(&args[3]) * 1000000 ) );
         NAPlayNote(info->allocator, info->channel, BRINT(&args[1]), 0);
     }
 
@@ -95,7 +95,7 @@ int brQTInstrumentPlayNote(brEval args[], brEval *result, void *i) {
 }
 
 int brQTInstrumentSetController(brEval args[], brEval *result, void *i) {
-    slQTInstrumentInfo *info = BRPOINTER(&args[0]);
+    slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
 	long number = BRINT(&args[1]);
 	long value = BRINT(&args[2]);
 
@@ -107,7 +107,7 @@ int brQTInstrumentSetController(brEval args[], brEval *result, void *i) {
 }
 
 int brQTInstrumentPlayChord(brEval args[], brEval *result, void *i) {
-    slQTInstrumentInfo *info = BRPOINTER(&args[0]);
+    slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
     brEvalList *list, *head = BRLIST(&args[1])->start;
 
     if(BRDOUBLE(&args[3]) <= 0.0) return EC_OK;
@@ -121,7 +121,7 @@ int brQTInstrumentPlayChord(brEval args[], brEval *result, void *i) {
         list = list->next;
     }
 
-    usleep(BRDOUBLE(&args[3]) * 100000);
+    usleep( ( int )( BRDOUBLE(&args[3]) * 100000 ) );
     list = head;
 
     /* release */
@@ -135,7 +135,7 @@ int brQTInstrumentPlayChord(brEval args[], brEval *result, void *i) {
 }
 
 int brQTInstrumentStartNote(brEval args[], brEval *result, void *i) {
-    slQTInstrumentInfo *info = BRPOINTER(&args[0]);
+    slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
 
     if(info->allocator && info->channel) {
         NAPlayNote(info->allocator, info->channel, BRINT(&args[1]), BRINT(&args[2]));
@@ -145,7 +145,7 @@ int brQTInstrumentStartNote(brEval args[], brEval *result, void *i) {
 }
 
 int brQTInstrumentStopNote(brEval args[], brEval *result, void *i) {
-    slQTInstrumentInfo *info = BRPOINTER(&args[0]);
+    slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
 
     if(info->allocator && info->channel) {
         NAPlayNote(info->allocator, info->channel, BRINT(&args[1]), 0);
