@@ -21,6 +21,8 @@ PhysicalControl : JointTest {
         new Stationary register with-shape (new Cube init-with size (100, 0.1, 100)) at-location (0, 0, 0).
         body = new JointTestBody.
 
+		self enable-auto-disable.
+
         body show-bounding-box.
         body show-axis.
         

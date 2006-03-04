@@ -59,6 +59,11 @@ int brISetStepFastIterations(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+int brISetAutoDisableFlag(brEval args[], brEval *target, brInstance *i) {
+	i->engine->world->setAutoDisableFlag( BRINT(&args[0]) );
+	return EC_OK;
+}
+
 /*!
 	\brief Enables or disables drawing of every frame.  
 
@@ -869,6 +874,7 @@ void breveInitWorldFunctions(brNamespace *n) {
 
 	brNewBreveCall(n, "setStepFast", brISetStepFast, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "setStepFastIterations", brISetStepFastIterations, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "setAutoDisableFlag", brISetAutoDisableFlag, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "setDrawEveryFrame", brISetDrawEveryFrame, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "randomSeed", brIRandomSeed, AT_NULL, AT_INT, 0);
 	brNewBreveCall(n, "randomSeedFromDevRandom", brIRandomSeedFromDevRandom, AT_INT, 0);

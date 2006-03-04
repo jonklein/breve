@@ -1,7 +1,9 @@
 #
+# Raytracer
 # by Marc Szymanski
 #
-# This demo 
+# This demo shows how raytracing can be used to implement 
+# simple sensor objects.
 #
 
 # include some required breve class files
@@ -17,9 +19,7 @@ Controller myControl.
 
 Control : myControl {
 	+ variables:
-		walkerShape, irshape, wheelshape, helpwshape, puckshape   (object).
-		walkerTexture (object).
-		wallTexture (object).
+		walkerShape (object).
 		agent         (object).
 
 	+ to init:
@@ -28,11 +28,10 @@ Control : myControl {
 		new DemoStage.
 		self point-camera at (0, 0, 0) from (0, 100, 0).
 
-		walkerShape   = (new Cube init-with size (2.53, 2.8, 2.5)).#(new Shape init-with-polygon-disk radius 2 sides 40 height 2.3).
+		walkerShape   = (new Cube init-with size (2.53, 2.8, 2.5)).
 
-		agent = 1 new isAgents.
+		agent = new isAgent.
 		agent move to (0, 1.8, 0).
-
 
 	+ to iterate:
 		super iterate.
@@ -40,7 +39,6 @@ Control : myControl {
 
 	+ to get-walker-shape:
 		return walkerShape.
-
 }
 
 @define FLOOR_Y 0.3.
