@@ -68,8 +68,6 @@ slWorld::slWorld() {
 	_odeWorldID = dWorldCreate();
 	dWorldSetQuickStepNumIterations( _odeWorldID, 60 );
 	
-	//dWorldSetAutoDisableFlag( _odeWorldID, 1 );
-
 	dWorldSetCFM ( _odeWorldID, 1e-6 );
 	dWorldSetERP( _odeWorldID, 0.1 );
 	dSetErrorHandler(slODEErrorHandler);
@@ -647,3 +645,9 @@ slWorldObject *slWorld::getObject( unsigned int n ) {
 void slWorld::setQuickstepIterations( int n ) {
 	dWorldSetQuickStepNumIterations( _odeWorldID, n );
 }
+
+void slWorld::setAutoDisableFlag( bool f ) {
+	printf(" setting auto disable %d\n", f );
+    dWorldSetAutoDisableFlag( _odeWorldID, f );
+}
+

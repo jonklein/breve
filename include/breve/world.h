@@ -214,6 +214,8 @@ class slWorld {
 
 		void setQuickstepIterations( int );
 
+	    void setAutoDisableFlag( bool f );
+
 		slWorldObject *getObject( unsigned int );
 
 		void setCollisionCallbacks( int (*)(void *, void *, int), void (*)(void *, void *, int) );
