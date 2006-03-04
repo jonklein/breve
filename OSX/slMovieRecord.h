@@ -59,13 +59,13 @@
 - (void)setDuration:(int)duration;
 - (int)duration;
 
-- (void)queueFrameFromRGBAPixels:(unsigned char*)ptr;
+- (void)queueFrameFromRGBPixels:(unsigned char*)ptr;
 
 - (int)getQueueSize;
 - (int)addFramesFromQueue;
 - (int)addFrameFromQueue:(int)n;
 
-- (int)addFrameFromRGBAPixels:(unsigned char*)ptr;
+- (int)addFrameFromRGBPixels:(unsigned char*)ptr;
 - (int)addFrameFromPixMapHandle:(PixMapHandle)pmh;
 
 - (int)closeMovie;

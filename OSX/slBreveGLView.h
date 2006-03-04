@@ -73,7 +73,7 @@
 
 - (void)mouseDown:(NSEvent*)theEvent;
 
-- (unsigned char*)updateRGBAPixels;
+- (unsigned char*)updateRGBPixels;
 - (int)snapshotToFile:(NSString*)filename;
 
 - (void)setContextMenuEnabled:(BOOL)c;
