@@ -45,7 +45,7 @@ Control : PhysicalControl [version 1.8] {
 		% The default value is 40.
 
 		setStepFastIterations(iterations).
-    
+
     + to disable-fast-physics:
 		% Returns to the default physics simulation.  This is slower, but 
 		% more accurate than fast physics, which are enabled using 
@@ -53,6 +53,12 @@ Control : PhysicalControl [version 1.8] {
 
         setStepFast(0).
 
+	- to enable-auto-disable:
+		setAutoDisableFlag( 1 ).
+
+	- to disable-auto-disable:
+		setAutoDisableFlag( 0 ).
+    
     + to set-gravity to newGravity (vector):
         % Sets the gravity affecting a physical world to newGravity.  If you
         % simply want a realistic earth-like gravity, use the convenience 

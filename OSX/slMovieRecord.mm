@@ -28,7 +28,7 @@
     movies from OpenGL glReadPixel data.
 
     Current limitations include the assumption that the data is 
-    8 bit per sample RGBA.
+    8 bit per sample RGB.
 
     1) Create a movie with initWithPath:::.  If this fails, the 
        object will deallocate itself and return NULL.  The bounds 
@@ -36,14 +36,14 @@
        the value passed in now will determine how large a pixel buffer
        the object will expect later.
 
-    2) Add frames using either addFrameFromRGBAPixels:
+    2) Add frames using either addFrameFromRGBPixels:
        addFrameFromPixMapHandle::.  If either returns a value other
        than 0, the frame was not added and it is likely that future
        frame additions will fail.
 
        or 
 
-    2) Queue frames using queueFrameFromRGBAPixels:, add them later with 
+    2) Queue frames using queueFrameFromRGBPixels:, add them later with 
        addFramesFromQueue.  
 
     3) Close the movie using closeMovie.
@@ -191,7 +191,7 @@
     return theDuration;
 }
 
-- (void)queueFrameFromRGBAPixels:(unsigned char*)ptr {
+- (void)queueFrameFromRGBPixels:(unsigned char*)ptr {
     int length;
     NSData *data;
 
@@ -213,7 +213,7 @@
 
     for(n=0;n<[theFrameArray count];n++) {
         data = [theFrameArray objectAtIndex: n];
-        result = [self addFrameFromRGBAPixels: (unsigned char*)[data bytes]];
+        result = [self addFrameFromRGBPixels: (unsigned char*)[data bytes]];
 
         if(result) return result;
     }
@@ -222,11 +222,11 @@
 }
 
 - (int)addFrameFromQueue:(int)n {
-    return [self addFrameFromRGBAPixels: (unsigned char*)[[theFrameArray objectAtIndex: n] bytes]];
+    return [self addFrameFromRGBPixels: (unsigned char*)[[theFrameArray objectAtIndex: n] bytes]];
 }
 
 /* 
-    Add an image of RGBA (8-bits per sample) data to the movie.  
+    Add an image of RGB (8-bits per sample) data to the movie.  
     It is not uncommon for this type of data to be padded at the 
     end (empty bytes past the actual data for each row of pixels),
     so we can account for this using the rowPadding arg.  If you 
@@ -234,7 +234,7 @@
     zero.
 */
 
-- (int)addFrameFromRGBAPixels:(unsigned char*)ptr {
+- (int)addFrameFromRGBPixels:(unsigned char*)ptr {
     PixMapHandle pmh;
     unsigned char *pmhPixels;
     int result;
@@ -253,15 +253,15 @@
 
     ptrRowBytes = theRowPadding + theBounds.right;
 
-    /* This function works with RGBA data.  Problem is that our GWorld */
+    /* This function works with RGB data.  Problem is that our GWorld */
     /* Apparently wants ARGB.  Usch. */
 
     for(x=0;x<theBounds.bottom;x++) {
-        for(y=0;y<rowBytes;y+=4) {
-            pmhPixels[rowBytes * x + y + 0] = ptr[4 * ptrRowBytes * x + y + 3];
-            pmhPixels[rowBytes * x + y + 1] = ptr[4 * ptrRowBytes * x + y + 0];
-            pmhPixels[rowBytes * x + y + 2] = ptr[4 * ptrRowBytes * x + y + 1];
-            pmhPixels[rowBytes * x + y + 3] = ptr[4 * ptrRowBytes * x + y + 2];
+        for(y=0;y<(rowBytes / 4);y++) {
+            pmhPixels[rowBytes * x + y * 4 + 0] = 0xff;
+            pmhPixels[rowBytes * x + y * 4 + 1] = ptr[3 * ptrRowBytes * x + y * 3 + 0];
+            pmhPixels[rowBytes * x + y * 4 + 2] = ptr[3 * ptrRowBytes * x + y * 3 + 1];
+            pmhPixels[rowBytes * x + y * 4 + 3] = ptr[3 * ptrRowBytes * x + y * 3 + 2];
         }
     }
 

@@ -254,7 +254,7 @@
 	if(viewEngine) {
 	   	if(!fullScreen) {
 			camera->renderScene( world, drawCrosshair );
-			if(theMovie) [theMovie addFrameFromRGBAPixels: [self updateRGBAPixels]];
+			if(theMovie) [theMovie addFrameFromRGBPixels: [self updateRGBPixels]];
 		}
 	} else {
 		glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -446,7 +446,7 @@
 	brEngineUnlock(viewEngine);
 }
 
-- (unsigned char*)updateRGBAPixels {
+- (unsigned char*)updateRGBPixels {
 	NSRect bounds = [self bounds];
 
 	if(!pixelBuffer || !tempPixelBuffer) [self updateSize: self];
@@ -488,7 +488,7 @@
 
 	i = [NSBitmapImageRep alloc];
 
-	[self updateRGBAPixels];
+	[self updateRGBPixels];
 
 	[i initWithBitmapDataPlanes: &pixelBuffer
 		pixelsWide: x
