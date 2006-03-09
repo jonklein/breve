@@ -324,8 +324,8 @@ static NSRecursiveLock *gLogLock;
 	mode = [breveEngine getRunState];
 
 	if(mode == BX_STOPPED) [self startSimulation];
-	if(mode == BX_RUN) [breveEngine pauseSimulation];
-	if(mode == BX_PAUSE) [breveEngine unpauseSimulation];
+	if(mode == BX_RUN) [breveEngine pauseSimulation: self];
+	if(mode == BX_PAUSE) [breveEngine unpauseSimulation: self];
 
 }
 
@@ -581,7 +581,7 @@ void slPrintLog(char *text) {
 }
 
 - (int)updateLog:sender {
-	if(breveEngine && engineWillPause) [breveEngine pauseSimulation];
+	if(breveEngine && engineWillPause) [breveEngine pauseSimulation: self];
 
 	if([gLogString length] == 0) return 0;
 

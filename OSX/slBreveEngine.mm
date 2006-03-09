@@ -31,6 +31,8 @@
 id simNib;
 id mySelf;
 
+id mainRunLoop;
+
 id gDisplayView;
 
 id gInterfaceController;
@@ -96,6 +98,8 @@ int slMakeCurrentContext();
 	slCamera *camera;
 
 	if(frontend) return;
+
+	mainRunLoop = [NSRunLoop currentRunLoop];
 
 	bundlePath = [[NSBundle mainBundle] resourcePath];
 	classPath = (char*)[[NSString stringWithFormat: @"%@/classes", bundlePath] cString];
@@ -210,7 +214,8 @@ int slMakeCurrentContext();
 }
 
 
-- (void)pauseSimulation {
+- (void)pauseSimulation:sender {
+	printf(" Pausing...\n " );
 	[engineLock lock];
 	runState = BX_PAUSE;
 
@@ -221,7 +226,7 @@ int slMakeCurrentContext();
 	}
 }
 
-- (void)unpauseSimulation {
+- (void)unpauseSimulation:sender {
 	if([displayView isFullScreen]) {
 		[displayView unpauseFullScreen];
 	}
@@ -233,7 +238,7 @@ int slMakeCurrentContext();
 - (void)stopSimulation {
 	if([displayView isFullScreen]) [displayView stopFullScreen];
 
-	if(runState == BX_PAUSE) [self unpauseSimulation];
+	if( runState == BX_PAUSE ) [self unpauseSimulation: self];
 
 	if(simNib) {
 		[simNib release];
@@ -516,12 +521,12 @@ int interfaceSetStringCallback(char *string, int tag) {
 }
 
 int pauseCallback() {
-	engineWillPause = YES;
+	[mainRunLoop performSelector: @selector(pauseSimulation:) target: mySelf argument: NULL order: 0 modes: [ NSArray arrayWithObject: NSDefaultRunLoopMode ] ];
 	return 1;
 }
 
 int unpauseCallback() {
-	engineWillPause = NO;
+	[mainRunLoop performSelector: @selector(unpauseSimulation:) target: mySelf argument: NULL order: 0 modes: [ NSArray arrayWithObject: NSDefaultRunLoopMode ] ];
 	return 1;
 }
 

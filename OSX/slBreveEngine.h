@@ -83,8 +83,8 @@ enum {
 /* start, pause, unpause, stop the simulation */
 
 - (int)startSimulationWithText:(char*)buffer withFilename:(char*)name withSavedSimulationFile:(char*)saved fullscreen:(BOOL)full;
-- (void)pauseSimulation;
-- (void)unpauseSimulation;
+- (void)pauseSimulation:sender;
+- (void)unpauseSimulation:sender;
 - (void)stopSimulation;
 
 - (int)checkSyntax:(char*)buffer withFilename:(char*)name;
