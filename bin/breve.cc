@@ -453,6 +453,8 @@ void slInitGlut(int argc, char **argv, char *title) {
 
 	slInitGL(frontend->engine->world, frontend->engine->camera);
 
+	glutIgnoreKeyRepeat( 1 );
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

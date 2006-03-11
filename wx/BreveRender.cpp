@@ -334,6 +334,7 @@ void BreveRender::CreateControls()
     runbutton->SetFocus();
 
     canvas->Connect(-1, wxEVT_KEY_DOWN, wxKeyEventHandler(BreveRender::KeyDown));
+    canvas->Connect(-1, wxEVT_KEY_UP, wxKeyEventHandler(BreveRender::KeyUp));
 }
 
 int BreveRender::GetSimInt(SimInstance * s)
@@ -925,8 +926,6 @@ void BreveRender::KeyUp(wxKeyEvent &event)
 void BreveRender::OnKeyUp(wxKeyEvent&event)
 {
     event.Skip();
-
-    printf(" Got key up callback\n" );
 
     if (GetSimulation() != NULL && GetSimulation()->GetInterface()->Initialized())
     {
