@@ -573,7 +573,7 @@ void slDemoSpecialUp(int key, int x, int y) {
 }
 
 void slDemoKeyboard(unsigned char key, int x, int y) {
-	if (keyDown[key]) return;
+	if ( keyDown[key] ) return;
 
 	keyDown[key] = 1;
 

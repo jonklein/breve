@@ -254,7 +254,7 @@ void BreveCanvas::OnMouseRDown(wxMouseEvent &event)
 
 	breverender->GetSimulation()->GetMutex()->Lock();
 
-	i = slGlSelect(breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->world, breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->camera, x, y);
+	i = breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->camera->select( breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->world, x, y );
 
 	selected = brClickCallback(breverender->GetSimulation()->GetInterface()->GetFrontend()->engine, i);
 
@@ -348,7 +348,7 @@ void BreveCanvas::OnMouseUp(wxMouseEvent &event)
 
 	breverender->GetSimulation()->GetMutex()->Lock();
 
-	i = slGlSelect(breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->world, breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->camera, x, y);
+	i = breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->camera->select( breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->world, x, y );
 
 	selected = brClickCallback(breverender->GetSimulation()->GetInterface()->GetFrontend()->engine, i);
 
@@ -417,15 +417,15 @@ void BreveCanvas::OnMouseMotion(wxMouseEvent &event)
     switch (parent->GetMouseMode())
     {
 	case 0:
-	    slRotateCameraWithMouseMovement(engine->camera, event.GetX() - mLastX, event.GetY() - mLastY);
+	    engine->camera->rotateWithMouseMovement( event.GetX() - mLastX, event.GetY() - mLastY );
 	    break;
 
 	case 1:
-	    slZoomCameraWithMouseMovement(engine->camera, event.GetX() - mLastX, event.GetY() - mLastY);
+	    engine->camera->zoomWithMouseMovement( event.GetX() - mLastX, event.GetY() - mLastY );
 	    break;
 
 	case 2:
-	    slMoveCameraWithMouseMovement(engine->camera, event.GetX() - mLastX, event.GetY() - mLastY);
+	    engine->camera->moveWithMouseMovement( event.GetX() - mLastX, event.GetY() - mLastY );
 	    break;
 
 	case 3:

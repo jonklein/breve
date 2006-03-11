@@ -46,6 +46,8 @@
 IMPLEMENT_CLASS( BreveRender, wxFrame )
 
 BEGIN_EVENT_TABLE( BreveRender, wxFrame )
+    EVT_KEY_UP(BreveRender::OnKeyUp)
+    EVT_KEY_DOWN(BreveRender::OnKeyDown)
     EVT_BUTTON( ID_RENDER_RUN, BreveRender::OnRenderRunClick )
     EVT_BUTTON( ID_RENDER_STOP, BreveRender::OnRenderStopClick )
     EVT_TOGGLEBUTTON( ID_ROTATE,	BreveRender::OnRotateClick )
@@ -62,14 +64,13 @@ BEGIN_EVENT_TABLE( BreveRender, wxFrame )
     EVT_MENU_RANGE( BREVE_SIMMENU, BREVE_SIMMENU + 1000, BreveRender::OnSimMenu )
     EVT_CLOSE (BreveRender::OnClose)
     EVT_CHOICE(ID_SIM_SELECT, BreveRender::OnSimSelect)
-    EVT_KEY_UP(BreveRender::OnKeyUp)
-    EVT_KEY_DOWN(BreveRender::OnKeyDown)
     EVT_MOVE(BreveRender::OnMove)
     EVT_SIZE(BreveRender::OnSize)
 END_EVENT_TABLE()
 
 BreveRender::BreveRender( )
 {
+	for( int i = 0; i < 256; i++ ) mKeysDown[ i ] = false;
 }
 
 BreveRender::BreveRender( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
@@ -916,9 +917,16 @@ void BreveRender::OnMoveClick(wxCommandEvent&event)
     event.Skip();
 }
 
+void BreveRender::KeyUp(wxKeyEvent &event)
+{
+    breverender->OnKeyUp(event);
+}
+
 void BreveRender::OnKeyUp(wxKeyEvent&event)
 {
     event.Skip();
+
+    printf(" Got key up callback\n" );
 
     if (GetSimulation() != NULL && GetSimulation()->GetInterface()->Initialized())
     {
@@ -927,6 +935,8 @@ void BreveRender::OnKeyUp(wxKeyEvent&event)
 	if(isalpha(keycode) && ! event.m_shiftDown) keycode = tolower(keycode);
 
 	GetSimulation()->GetMutex()->Lock();
+
+	mKeysDown[ keycode ] = false;
 
 	switch(keycode) {
 		case WXK_LEFT:
@@ -963,7 +973,7 @@ void BreveRender::OnKeyDown(wxKeyEvent&event)
 	return;
     }
 
-    event.Skip();
+    // event.Skip();
 
     if (GetSimulation() != NULL && GetSimulation()->GetInterface()->Initialized() &&
 	!GetSimulation()->GetInterface()->Paused())
@@ -971,6 +981,10 @@ void BreveRender::OnKeyDown(wxKeyEvent&event)
 	int keycode = event.GetKeyCode();
 
 	if(isalpha(keycode) && ! event.m_shiftDown) keycode = tolower(keycode);
+
+	if( mKeysDown[ keycode ] ) return;
+
+	mKeysDown[ keycode ] = true;
 
 	GetSimulation()->GetMutex()->Lock();
 

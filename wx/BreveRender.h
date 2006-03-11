@@ -98,6 +98,8 @@ private:
     int cursim;
     int mousemode;
 
+    bool mKeysDown[ 256 ];
+
 public:
     BreveRender( );
     ~BreveRender();
@@ -139,6 +141,7 @@ public:
     void OnSize(wxSizeEvent &event);
     void OnMove(wxMoveEvent &event);
     void KeyDown(wxKeyEvent&event);
+    void KeyUp(wxKeyEvent&event);
 
     wxBitmap GetBitmapResource( const wxString& name );
     wxIcon GetIconResource( const wxString& name );
