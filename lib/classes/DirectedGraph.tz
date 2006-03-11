@@ -47,6 +47,8 @@ GeneticAlgorithmIndividual : GADirectedGraph {
 		rootNode mutate.
 
 	+ to crossover from-parent1 p1 (object) from-parent2 p2 (object):
+		% Sets this child's genome to be a genetic crossover of p1 and p2.
+
 		keep, positions (hash).
 		nodes1, nodes2, childnodes (list).
 		connection, temp, source (object).
@@ -208,6 +210,9 @@ GeneticAlgorithmIndividual : GADirectedGraph {
 		self delete-root-node.
 		
 	+ to delete-root-node:
+		% Deletes the root node and all connected objects.  This method
+		% "clears" the GADirectedGraph so that it may be reused.
+
 		if rootNode: self remove-dependency on rootNode.
 		rootNode destroy-connected-objects.
 		free rootNode.

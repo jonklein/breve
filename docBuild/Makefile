@@ -10,7 +10,7 @@ docclean:
 docBuild/docExtract: docBuild/docExtract.c
 	# g++ chokes here?!
 
-	$(CC) -o docBuild/docExtract docBuild/docExtract.c
+	$(CC) -o docExtract docExtract.c
 
 classes: docBuild/docExtract
 	mkdir -p docs/classes
@@ -31,6 +31,7 @@ docbook: classes
 	-cd docBuild/docbook; \
 		openjade -t tex -d /sw/share/sgml/dsssl/docbook-dsssl-nwalsh/print/docbook.dsl breve.docbook
 	cp -R docBuild/docbook/index.html docBuild/docbook/docs docs/
+	cp docBuild/docbook/images/breve_icon.jpg docs/
 	mkdir docs/docs/images
 	cp docBuild/docbook/images/*.jpg docs/docs/images/
 	cp docBuild/docbook/images/*.gif docs/docs/images/

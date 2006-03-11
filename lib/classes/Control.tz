@@ -221,11 +221,16 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 	+ to pause:
 		% Pauses the simulation as though the user had done so through
-		% the user interface.
+		% the user interface.  This method is not supported on all 
+		% breve client interfaces.
 
 		pauseSimulation().
 
 	+ to unpause:
+		% Pauses the simulation as though the user had done so through
+		% the user interface.  This method is not supported on all 
+		% breve client interfaces.
+
 		unpauseSimulation().
 
 	+ to sleep for-seconds s (float):
