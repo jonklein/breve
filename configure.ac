@@ -10,6 +10,12 @@ AC_CANONICAL_HOST
 AC_ARG_ENABLE([engineonly], [], engine_only=yes)
 AC_ARG_ENABLE([static], [], static=yes)
 
+if test "x$static" != "x"; then 
+	BEGIN_STATIC="-Xlinker -Bstatic"
+	BEGIN_DYNAMIC="-Xlinker -Bdynamic"
+fi
+
+
 AC_DEFUN([AC_PROG_JAVAC_WORKS],[
 AC_CACHE_CHECK([if $JAVAC works], ac_cv_prog_javac_works, [
 JAVA_TEST=Test.java
@@ -124,6 +130,14 @@ case ${host_os} in
 		PLATFORM=${host_os}
 		;;
 esac
+
+#
+# These required system libraries are assumed to require dynamic linking even 
+# when static linking is requested.  Other (optional) libraries may be linked
+# statically if present and if requested with --enable-static
+#
+
+LIBS="$BEGIN_DYNAMIC $LIBS"
 
 case ${host_os} in
 	*bsd* )
@@ -253,10 +267,6 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([ftgl], [main])
 fi
 
-if test "x$static" = "x"; then 
-	MISSING='xxx'
-fi
-
 AC_CHECK_LIB([png], [png_create_write_struct])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc])
 
@@ -275,14 +285,14 @@ _old_libs=${LIBS}
 case ${host_os} in darwin*)
 CPPFLAGS="-I/System/Library/Frameworks/JavaVM.framework/Headers ${_old_cppflags}"
 LDFLAGS=${_old_ldflags}
-LIBS="-framework JavaVM ${_old_libs}"
+LIBS="${_old_libs} -framework JavaVM"
 AC_LINK_IFELSE([AC_LANG_CALL([],[JNI_CreateJavaVM])],[_have_jvm=yes])
 ;; esac
 
 if test "x$_have_jvm" = x ; then
 CPPFLAGS="-I/usr/local/jdk-1.4.2/include -I/usr/local/jdk-1.4.2/include/\$(LPLATFORM) ${_old_cppflags}"
 LDFLAGS="${_old_ldflags} -L/usr/local/jdk-1.4.2/jre/lib/i386 -L/usr/local/jdk-1.4.2/jre/lib/i386/server"
-LIBS="-ljvm -ljava ${_old_libs}"
+LIBS="${_old_libs} -ljvm -ljava"
 AC_LINK_IFELSE([AC_LANG_CALL([],[JNI_CreateJavaVM])],[_have_jvm=yes])
 fi
 
@@ -290,7 +300,7 @@ case "${host_os}" in linux*)
 if test "x$_have_jvm" = x ; then
 CPPFLAGS="-I/usr/local/linux-sun-jdk1.4.2/include -I/usr/local/linux-sun-jdk1.4.2/include/linux ${_old_cppflags}"
 LDFLAGS="${_old_ldflags} -L/usr/local/linux-sun-jdk1.4.2/jre/lib/i386 -L/usr/local/linux-sun-jdk1.4.2/jre/lib/i386/server -Wl,-rpath-link -Wl,/usr/local/linux-sun-jdk1.4.2/jre/lib/i386:/compat/linux/lib:/compat/linux/usr/lib"
-LIBS="-ljvm -lverify -ljava ${_old_libs}"
+LIBS="${_old_libs} -ljvm -lverify -ljava"
 AC_LINK_IFELSE([AC_LANG_CALL([],[JNI_CreateJavaVM])],[_have_jvm=yes])
 fi
 ;; esac
@@ -326,6 +336,13 @@ fi
 
 CXXFLAGS=''
 CFLAGS=''
+
+#
+# If static linking is requested, add a flag for all non-system libraries.  The
+# system libraries have alreay been set to allow dynamic linking.
+# 
+
+LIBS="$BEGIN_STATIC $LIBS"
 
 AC_CONFIG_FILES([Makefile
 		 plugins/slDigitizerPlugin/Makefile

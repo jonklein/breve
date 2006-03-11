@@ -1438,6 +1438,12 @@ if test "${enable_static+set}" = set; then
   static=yes
 fi;
 
+if test "x$static" != "x"; then
+	BEGIN_STATIC="-Xlinker -Bstatic"
+	BEGIN_DYNAMIC="-Xlinker -Bdynamic"
+fi
+
+
 
 
 
@@ -2919,7 +2925,7 @@ else
 JAVA_TEST=Test.java
 CLASS_TEST=Test.class
 cat << \EOF > $JAVA_TEST
-/* #line 2922 "configure" */
+/* #line 2928 "configure" */
 public class Test {
 }
 EOF
@@ -5149,6 +5155,14 @@ _ACEOF
 		PLATFORM=${host_os}
 		;;
 esac
+
+#
+# These required system libraries are assumed to require dynamic linking even
+# when static linking is requested.  Other (optional) libraries may be linked
+# statically if present and if requested with --enable-static
+#
+
+LIBS="$BEGIN_DYNAMIC $LIBS"
 
 case ${host_os} in
 	*bsd* )
@@ -9827,10 +9841,6 @@ fi
 
 fi
 
-if test "x$static" = "x"; then
-	MISSING='xxx'
-fi
-
 
 echo "$as_me:$LINENO: checking for png_create_write_struct in -lpng" >&5
 echo $ECHO_N "checking for png_create_write_struct in -lpng... $ECHO_C" >&6
@@ -9980,6 +9990,7 @@ _ACEOF
 fi
 
 
+//
 echo "$as_me:$LINENO: checking for OSMesaCreateContext in -lOSMesa" >&5
 echo $ECHO_N "checking for OSMesaCreateContext in -lOSMesa... $ECHO_C" >&6
 if test "${ac_cv_lib_OSMesa_OSMesaCreateContext+set}" = set; then
@@ -10049,7 +10060,7 @@ if test $ac_cv_lib_OSMesa_OSMesaCreateContext = yes; then
 #define HAVE_LIBOSMESA 1
 _ACEOF
 
-# LIBS="-lOSMesa $LIBS"
+  LIBS="-lOSMesa $LIBS"
 
 fi
 
@@ -10253,7 +10264,7 @@ _old_libs=${LIBS}
 case ${host_os} in darwin*)
 CPPFLAGS="-I/System/Library/Frameworks/JavaVM.framework/Headers ${_old_cppflags}"
 LDFLAGS=${_old_ldflags}
-LIBS="-framework JavaVM ${_old_libs}"
+LIBS="${_old_libs} -framework JavaVM"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -10311,7 +10322,7 @@ rm -f conftest.err conftest.$ac_objext \
 if test "x$_have_jvm" = x ; then
 CPPFLAGS="-I/usr/local/jdk-1.4.2/include -I/usr/local/jdk-1.4.2/include/\$(LPLATFORM) ${_old_cppflags}"
 LDFLAGS="${_old_ldflags} -L/usr/local/jdk-1.4.2/jre/lib/i386 -L/usr/local/jdk-1.4.2/jre/lib/i386/server"
-LIBS="-ljvm -ljava ${_old_libs}"
+LIBS="${_old_libs} -ljvm -ljava"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -10370,7 +10381,7 @@ case "${host_os}" in linux*)
 if test "x$_have_jvm" = x ; then
 CPPFLAGS="-I/usr/local/linux-sun-jdk1.4.2/include -I/usr/local/linux-sun-jdk1.4.2/include/linux ${_old_cppflags}"
 LDFLAGS="${_old_ldflags} -L/usr/local/linux-sun-jdk1.4.2/jre/lib/i386 -L/usr/local/linux-sun-jdk1.4.2/jre/lib/i386/server -Wl,-rpath-link -Wl,/usr/local/linux-sun-jdk1.4.2/jre/lib/i386:/compat/linux/lib:/compat/linux/usr/lib"
-LIBS="-ljvm -lverify -ljava ${_old_libs}"
+LIBS="${_old_libs} -ljvm -lverify -ljava"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -10551,6 +10562,13 @@ fi
 
 CXXFLAGS=''
 CFLAGS=''
+
+#
+# If static linking is requested, add a flag for all non-system libraries.  The
+# system libraries have alreay been set to allow dynamic linking.
+#
+
+LIBS="$BEGIN_STATIC $LIBS"
 
                                                                                           ac_config_files="$ac_config_files Makefile plugins/slDigitizerPlugin/Makefile plugins/slQTMusicPlugin/Makefile plugins/slRegexPlugin/Makefile plugins/slURLPlugin/Makefile plugins/samples/Makefile OSX/ConfigureLibraryList Qt/breve.pro wx/Makefile"
 
