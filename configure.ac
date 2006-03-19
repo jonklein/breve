@@ -269,6 +269,7 @@ fi
 
 AC_CHECK_LIB([png], [png_create_write_struct])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc])
+AC_CHECK_LIB([gsl], [gsl_rng_alloc],,AC_MSG_FAILURE([Missing GSL library -- see http://www.gnu.org/software/gsl/]))
 
 // AC_CHECK_LIB([OSMesa], [OSMesaCreateContext])
 
@@ -334,8 +335,6 @@ fi
 # written consent.
 #
 
-CXXFLAGS=''
-CFLAGS=''
 
 #
 # If static linking is requested, add a flag for all non-system libraries.  The

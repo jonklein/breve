@@ -31,13 +31,13 @@ void *breveFrontendInitData(brEngine *engine) {
 	// brJavaInit(engine);
 #endif
 
-	signal( SIGSEGV, stCrashCatcher );
-	signal( SIGILL, stCrashCatcher );
-	signal( SIGBUS, stCrashCatcher );
-	signal( 8 , stCrashCatcher );
-	signal( SIGABRT, stCrashCatcher );
-	signal( SIGTRAP, stCrashCatcher );
-	signal( SIGQUIT, stCrashCatcher );
+	// signal( SIGSEGV, stCrashCatcher );
+	// signal( SIGILL, stCrashCatcher );
+	// signal( SIGBUS, stCrashCatcher );
+	// signal( 8 , stCrashCatcher );
+	// signal( SIGABRT, stCrashCatcher );
+	// signal( SIGTRAP, stCrashCatcher );
+	// signal( SIGQUIT, stCrashCatcher );
 
 	return stSteveInit(engine);
 }

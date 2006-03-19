@@ -23,79 +23,87 @@
 #include "slBrevePluginAPI.h"
 
 struct slQTInstrumentInfo {
-    NoteAllocator allocator;
-    NoteChannel channel;
-    NoteRequest request;
+	NoteAllocator allocator;
+	NoteChannel channel;
+	NoteRequest request;
 };
 
 typedef struct slQTInstrumentInfo slQTInstrumentInfo;
 
 slQTInstrumentInfo *slQTNewInstrumentInfo(int instrument) {
-    ComponentResult componentError;
-    slQTInstrumentInfo *i;
-    NoteRequest request;
+	ComponentResult componentError;
+	slQTInstrumentInfo *i;
+	NoteRequest request;
 
-    /* initialize qt music */
+	/* initialize qt music */
 
-    i = new slQTInstrumentInfo;
+	i = new slQTInstrumentInfo;
 
-    i->allocator = OpenDefaultComponent('nota', 0);
+	i->allocator = OpenDefaultComponent('nota', 0);
 
-    if (!i->allocator) {
-        if (i->channel) NADisposeNoteChannel(i->allocator, i->channel);
-        if (i->allocator) CloseComponent(i->allocator);
-        return NULL;
-    }
+	if (!i->allocator) {
+		if (i->channel) NADisposeNoteChannel(i->allocator, i->channel);
+		if (i->allocator) CloseComponent(i->allocator);
+		return NULL;
+	}
 
-    request.info.flags = 0;
-    request.info.midiChannelAssignment = 0;
-    request.info.polyphony = 3; // simultaneous tones
-    request.info.typicalPolyphony = 0x00020000;
-    componentError = NAStuffToneDescription(i->allocator, instrument, &request.tone);
-    componentError = NANewNoteChannel(i->allocator, &request, &i->channel);
+	BigEndianShort wtf;
+	BigEndianFixed againwtf;
 
-    if(componentError || !i->channel) {
-        if (i->channel) NADisposeNoteChannel(i->allocator, i->channel);
-        if (i->allocator) CloseComponent(i->allocator);
+	request.info.flags = 0;
+	request.info.midiChannelAssignment = 0;
 
-        return NULL;
-    }
+	wtf.bigEndianValue = 3;
+	request.info.polyphony = wtf; // wtf?
 
-    return i;
+	againwtf.bigEndianValue = 0x00020000;
+	request.info.typicalPolyphony = againwtf; // again, wtf?
+
+	componentError = NAStuffToneDescription(i->allocator, instrument, &request.tone);
+	componentError = NANewNoteChannel(i->allocator, &request, &i->channel);
+
+	if(componentError || !i->channel) {
+		if (i->channel) NADisposeNoteChannel(i->allocator, i->channel);
+		if (i->allocator) CloseComponent(i->allocator);
+
+		return NULL;
+	}
+
+	return i;
 }
 
 int brQTInstrumentFree(brEval args[], brEval *result, void *i) {
-    slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
+	slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
 
 	printf("freeing %p and %p\n", info->channel, info->allocator);
-    if (info->channel) NADisposeNoteChannel(info->allocator, info->channel);
-    if (info->allocator) CloseComponent(info->allocator);
+	if (info->channel) NADisposeNoteChannel(info->allocator, info->channel);
+	if (info->allocator) CloseComponent(info->allocator);
 
-    return EC_OK;
+	return EC_OK;
 }
 
 int brQTInstrumentNew(brEval args[], brEval *result, void *i) {
-    BRPOINTER(result) = slQTNewInstrumentInfo(BRINT(&args[0]));
+	BRPOINTER(result) = slQTNewInstrumentInfo(BRINT(&args[0]));
 
-    return EC_OK;
+	return EC_OK;
 }
 
 int brQTInstrumentPlayNote(brEval args[], brEval *result, void *i) {
-    slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
+	slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
 
-    if(BRDOUBLE(&args[3]) <= 0.0) return EC_OK;
+	if(BRDOUBLE(&args[3]) <= 0.0) return EC_OK;
 
-    if(info->allocator && info->channel) {
-        NAPlayNote(info->allocator, info->channel, BRINT(&args[1]), BRINT(&args[2]));
-        usleep( ( int )( BRDOUBLE(&args[3]) * 1000000 ) );
-        NAPlayNote(info->allocator, info->channel, BRINT(&args[1]), 0);
-    }
+	if(info->allocator && info->channel) {
+		NAPlayNote(info->allocator, info->channel, BRINT(&args[1]), BRINT(&args[2]));
+		usleep( ( int )( BRDOUBLE(&args[3]) * 1000000 ) );
+		NAPlayNote(info->allocator, info->channel, BRINT(&args[1]), 0);
+	}
 
-    return EC_OK;
+	return EC_OK;
 }
 
 int brQTInstrumentSetController(brEval args[], brEval *result, void *i) {
-    slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
+	slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
 	long number = BRINT(&args[1]);
 	long value = BRINT(&args[2]);
 
@@ -107,60 +115,60 @@ int brQTInstrumentSetController(brEval args[], brEval *result, void *i) {
 }
 
 int brQTInstrumentPlayChord(brEval args[], brEval *result, void *i) {
-    slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
-    brEvalList *list, *head = BRLIST(&args[1])->start;
+	slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
+	brEvalList *list, *head = BRLIST(&args[1])->start;
 
-    if(BRDOUBLE(&args[3]) <= 0.0) return EC_OK;
+	if(BRDOUBLE(&args[3]) <= 0.0) return EC_OK;
 
-    list = head;
+	list = head;
 
-    /* push down */
+	/* push down */
 
-    while(list) {
-        NAPlayNote(info->allocator, info->channel, BRINT(&list->eval), BRINT(&args[2]));
-        list = list->next;
-    }
+	while(list) {
+		NAPlayNote(info->allocator, info->channel, BRINT(&list->eval), BRINT(&args[2]));
+		list = list->next;
+	}
 
-    usleep( ( int )( BRDOUBLE(&args[3]) * 100000 ) );
-    list = head;
+	usleep( ( int )( BRDOUBLE(&args[3]) * 100000 ) );
+	list = head;
 
-    /* release */
+	/* release */
 
-    while(list) {
-        NAPlayNote(info->allocator, info->channel, BRINT(&list->eval), 0);
-        list = list->next;
-    }
+	while(list) {
+		NAPlayNote(info->allocator, info->channel, BRINT(&list->eval), 0);
+		list = list->next;
+	}
 
-    return EC_OK;
+	return EC_OK;
 }
 
 int brQTInstrumentStartNote(brEval args[], brEval *result, void *i) {
-    slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
+	slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
 
-    if(info->allocator && info->channel) {
-        NAPlayNote(info->allocator, info->channel, BRINT(&args[1]), BRINT(&args[2]));
-    }
+	if(info->allocator && info->channel) {
+		NAPlayNote(info->allocator, info->channel, BRINT(&args[1]), BRINT(&args[2]));
+	}
 
-    return EC_OK;
+	return EC_OK;
 }
 
 int brQTInstrumentStopNote(brEval args[], brEval *result, void *i) {
-    slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
+	slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
 
-    if(info->allocator && info->channel) {
-        NAPlayNote(info->allocator, info->channel, BRINT(&args[1]), 0);
-    }
+	if(info->allocator && info->channel) {
+		NAPlayNote(info->allocator, info->channel, BRINT(&args[1]), 0);
+	}
 
-    return EC_OK;
+	return EC_OK;
 }
 
 void slInitQTInstrumentFuncs(void *n) {
-    brNewBreveCall(n, "instrumentNew", brQTInstrumentNew, AT_POINTER, AT_INT, 0);
-    brNewBreveCall(n, "instrumentFree", brQTInstrumentFree, AT_NULL, AT_POINTER, 0);
-    brNewBreveCall(n, "instrumentPlayNote", brQTInstrumentPlayNote, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_DOUBLE, 0);
-    brNewBreveCall(n, "instrumentStartNote", brQTInstrumentStartNote, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
-    brNewBreveCall(n, "instrumentStopNote", brQTInstrumentStopNote, AT_NULL, AT_POINTER, AT_INT, 0);
-    brNewBreveCall(n, "instrumentPlayChord", brQTInstrumentPlayChord, AT_NULL, AT_POINTER, AT_LIST, AT_INT, AT_DOUBLE, 0);
-    brNewBreveCall(n, "instrumentSetController", brQTInstrumentSetController, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
+	brNewBreveCall(n, "instrumentNew", brQTInstrumentNew, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "instrumentFree", brQTInstrumentFree, AT_NULL, AT_POINTER, 0);
+	brNewBreveCall(n, "instrumentPlayNote", brQTInstrumentPlayNote, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_DOUBLE, 0);
+	brNewBreveCall(n, "instrumentStartNote", brQTInstrumentStartNote, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
+	brNewBreveCall(n, "instrumentStopNote", brQTInstrumentStopNote, AT_NULL, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "instrumentPlayChord", brQTInstrumentPlayChord, AT_NULL, AT_POINTER, AT_LIST, AT_INT, AT_DOUBLE, 0);
+	brNewBreveCall(n, "instrumentSetController", brQTInstrumentSetController, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
 }
 
