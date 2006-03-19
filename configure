@@ -9990,6 +9990,86 @@ _ACEOF
 fi
 
 
+echo "$as_me:$LINENO: checking for gsl_rng_alloc in -lgsl" >&5
+echo $ECHO_N "checking for gsl_rng_alloc in -lgsl... $ECHO_C" >&6
+if test "${ac_cv_lib_gsl_gsl_rng_alloc+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgsl  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char gsl_rng_alloc ();
+int
+main ()
+{
+gsl_rng_alloc ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_gsl_gsl_rng_alloc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_gsl_gsl_rng_alloc=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_gsl_gsl_rng_alloc" >&5
+echo "${ECHO_T}$ac_cv_lib_gsl_gsl_rng_alloc" >&6
+if test $ac_cv_lib_gsl_gsl_rng_alloc = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBGSL 1
+_ACEOF
+
+  LIBS="-lgsl $LIBS"
+
+else
+  { { echo "$as_me:$LINENO: error: Missing GSL library -- see http://www.gnu.org/software/gsl/
+See \`config.log' for more details." >&5
+echo "$as_me: error: Missing GSL library -- see http://www.gnu.org/software/gsl/
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+
 //
 echo "$as_me:$LINENO: checking for OSMesaCreateContext in -lOSMesa" >&5
 echo $ECHO_N "checking for OSMesaCreateContext in -lOSMesa... $ECHO_C" >&6
@@ -10560,8 +10640,6 @@ fi
 # written consent.
 #
 
-CXXFLAGS=''
-CFLAGS=''
 
 #
 # If static linking is requested, add a flag for all non-system libraries.  The

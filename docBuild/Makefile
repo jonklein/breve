@@ -10,7 +10,7 @@ docclean:
 docBuild/docExtract: docBuild/docExtract.c
 	# g++ chokes here?!
 
-	$(CC) -o docExtract docExtract.c
+	$(CC) -o docBuild/docExtract docBuild/docExtract.c
 
 classes: docBuild/docExtract
 	mkdir -p docs/classes
