@@ -35,9 +35,9 @@
 
 @nib_file "SwarmInterface".
 
-@include Stationary.
-@include Control.
-@include Mobile.
+@use Stationary.
+@use Control.
+@use Mobile.
 
 @define SWARM_SIZE	80.
 
