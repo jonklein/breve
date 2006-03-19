@@ -350,14 +350,18 @@ int slMakeCurrentContext();
 					} else [displayView setNeedsDisplay: YES];
 
 				}
-
-				if(speedFactor > 1) usleep( (int)( speedFactor * 10000 ) );
 			}
 		}
 
 		[engineLock unlock];
 
-		while(engineWillPause) usleep(10000);
+		// A tiny little sleep here will help ensure that other threads get a shot
+		// at taking the lock on a multiprocessor system. 
+
+		if(speedFactor > 1) usleep( (int)( speedFactor * 10000 ) );
+		else usleep( 50 );
+
+		// while(engineWillPause) usleep(10000);
 	}
 
 	[displayView setNeedsDisplay: YES];
