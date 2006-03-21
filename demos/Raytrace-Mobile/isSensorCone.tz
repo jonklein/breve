@@ -1,0 +1,17 @@
+@use Drawing.
+
+
+Mobile:IRSensorCone (aka IRSensorCones){
+	+variables: 
+ 		sensor(object).
+ 		
+ 	+to set-sensor to owner(object):
+ 		sensor = owner.
+ 		
+    +to collide with obstacle(object) with position(vector) with face(vector):
+	    sensor detect a obstacle at position facing face.
+	    
+	+to collide with obstacle(object):
+		#print"collide with ".
+		#print obstacle.
+}

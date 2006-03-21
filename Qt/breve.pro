@@ -5,7 +5,7 @@ CONFIG  += qt warn_on release opengl thread
 
 REQUIRES	= opengl
 
-LIBS    += -L../lib -lbreve  -lode -lgsl -lgsl -lpng -lpush -lavformat -lavcodec -lavutil -lreadline -lncurses -ltermcap -lsndfile -lportaudio -ljpeg -lexpat -lz  -lm  -framework OpenGL -framework GLUT -framework AppKit -framework vecLib -framework CoreAudio -framework AudioToolbox  -framework JavaVM
+LIBS    += -L../lib -lbreve  -lode -lgsl -lgsl -lpng -lavformat -lavcodec -lavutil -lgslcblas -lreadline -lhistory -lncurses -lsndfile -ltiff -ljpeg -lexpat -lz -pthread -lm  -lglut -lGLU -lGL -lXmu -lXi  -lX11  -lSM -lICE 
 
 mac:LIBS        += -framework OpenGL
 

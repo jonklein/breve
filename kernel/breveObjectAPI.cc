@@ -498,31 +498,41 @@ void brInstanceFree(brInstance *i) {
 
 int brObjectAddCollisionHandler(brObject *handler, brObject *collider, char *name) {
 	brCollisionHandler *ch;
-	brMethod *method;
+	bool nomethods = true;
+	const int maxargs = 5;
+	brMethod* method[maxargs+1];
 	unsigned int n;
 	unsigned char types[] = { AT_INSTANCE, AT_DOUBLE };
-
+	for(int i=0; i<=maxargs; i++) method[i] = NULL;
+	
+	//Dont add a second collisionHandler for the same collider?
 	for(n=0;n<handler->collisionHandlers->count;n++) {
 		ch = (brCollisionHandler*)handler->collisionHandlers->data[n];
-
 		if(ch->object == collider) return EC_STOP;
 	}
-
-	method = brMethodFindWithArgRange(handler, name, types, 0, 1);
-
-	if(!method) {
+	
+	//searching for methods
+	for(int i=0; i<=maxargs; i++){
+		method[i] = brMethodFindWithArgRange(handler, name, types, i, i);
+		if(method[i])nomethods = false;
+	}
+	
+	
+	if(nomethods) {
 		slMessage(DEBUG_ALL, "Error adding collision handler: cannot locate method \"%s\" for class \"%s\"\n", name, handler->name);
 		return EC_ERROR;
     }
 
-	ch = new brCollisionHandler;
-
-	ch->object = collider;
-	ch->method = method;
-	ch->ignore = 0;
-
-	slStackPush(handler->collisionHandlers, ch);
-
+	//Adding all methods
+	for(int i=0; i<=maxargs; i++){
+		if(method[i]){
+			ch = new brCollisionHandler;
+			ch->object = collider;
+			ch->method = method[i];
+			ch->ignore = 0;
+			slStackPush(handler->collisionHandlers, ch);
+		}
+	}
 	return EC_OK;
 }
 

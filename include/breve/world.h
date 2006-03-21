@@ -147,10 +147,12 @@ class slWorld {
 	
 		int (*integrator)(slWorld *w, slLink *m, double *dt, int skip);
 	
+
 		// the collision callback is called when the collision is detected --
 		// at the estimated time of collision.  
 	
-		void (*_collisionCallback)(void *body1, void *body2, int type);
+		void (*_collisionCallback)(void *body1, void *body2, int type, slVector *position, slVector *face);
+		
 	
 		// the collisionCheckCallback is a callback defined by the program
 		// using the physics engine.  it takes two userData (see slWorldObject)
@@ -218,7 +220,7 @@ class slWorld {
 
 		slWorldObject *getObject( unsigned int );
 
-		void setCollisionCallbacks( int (*)(void *, void *, int), void (*)(void *, void *, int) );
+		void setCollisionCallbacks( int (*)(void *, void *, int), void (*)(void *, void *, int, slVector* , slVector* ) );
 
 		void renderCameras();
 

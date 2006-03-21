@@ -19,4 +19,5 @@
  *****************************************************************************/
 
 int brCheckCollisionCallback(void *o1, void *o2, int type);
-void brCollisionCallback(void *o1, void *o2, int type);
+void brCollisionCallback(void *o1, void *o2, int type, slVector *pos, slVector *face);
+

@@ -455,11 +455,25 @@ double slWorld::step( double stepSize, int *error ) {
 					id = dJointCreateContact(_odeWorldID, _odeCollisionGroupID, &contact);
 					dJointAttach(id, bodyY, bodyX);
 				}
+			} 
+
+			if((*flags & BT_CALLBACK) && _collisionCallback && w1 && w2 && (&c->points[x] != NULL) ) {
+				slVector *pos = new slVector();
+				slVector *face = new slVector();
+				pos->x = c->points[0].x;
+				pos->y = c->points[0].y;
+				pos->z = c->points[0].z;
+				face->x = c->normal.x;
+				face->y = c->normal.y;
+				face->z = c->normal.z;
+				
+				_collisionCallback( w1->getCallbackData(), w2->getCallbackData(), CC_NORMAL, pos, face );
 			}
 
-			if((*flags & BT_CALLBACK) && _collisionCallback && w1 && w2) {
-				 _collisionCallback( w1->getCallbackData(), w2->getCallbackData(), CC_NORMAL );
-			}
+			//if((*flags & BT_CALLBACK) && _collisionCallback && w1 && w2) {
+			//	 _collisionCallback( w1->getCallbackData(), w2->getCallbackData(), CC_NORMAL );
+			//}
+			
 		}
 	}
 
@@ -631,7 +645,8 @@ void slWorld::setBackgroundTexture( int n, int mode ) {
 	isBackgroundImage = mode;
 }
 
-void slWorld::setCollisionCallbacks( int (*check)(void*, void*, int t), void (*collide)(void*, void*, int t)) {
+
+void slWorld::setCollisionCallbacks( int (*check)(void*, void*, int t), void (*collide)(void*, void*, int t, slVector*, slVector*)) {
 	_collisionCallback = collide;
 	_collisionCheckCallback = check;
 }

@@ -1,0 +1,44 @@
+@use Movie.
+
+@include "isStage.tz"
+@include "isAgent.tz"
+
+# include some required breve class files
+@use Control.
+
+# First tell the breve engine the name of our controller class
+Controller myControl.             
+
+Control : myControl {
+	+ variables:
+		walkerShape(object).#, irshape, wheelshape, helpwshape, puckshape   (object).
+#		walkerTexture (object).
+#		wallTexture (object).
+		agent         (object).
+		#agent2 (object).
+		
+	+ to init:
+		print "Setting up the simulation.".
+
+		new DemoStage.
+		self point-camera at (0, 0, 0) from (0, 100, 0).
+
+		walkerShape   = (new Cube init-with size (2.53, 2.8, 2.5)).
+		#(new Shape init-with-polygon-disk radius 2 sides 40 height 2.3).
+
+		agent = 1 new isAgents.
+		agent move to (0, 1.8, 0).
+		
+		#agent2 = 1 new isAgents.
+		#agent2 move to (4, 1.8, 0).
+
+
+	+ to iterate:
+		super iterate.
+		self update-neighbors.
+
+	+ to get-walker-shape:
+		return walkerShape.
+
+}
+

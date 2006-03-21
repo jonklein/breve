@@ -89,6 +89,7 @@ int brCheckCollisionCallback(void *p1, void *p2, int type) {
 	return 1;
 }
 
+
 /*!
 	\brief Called when two instances actually collide, this triggers 
 	a frontend method call.
@@ -100,16 +101,19 @@ int brCheckCollisionCallback(void *p1, void *p2, int type) {
 	that is colliding with it as the argument.
 */
 
-void brCollisionCallback(void *p1, void *p2, int type) {
+void brCollisionCallback(void *p1, void *p2, int type, slVector *pos, slVector *face) {
 	unsigned int n;
 	brMethod *meth;
 	brEval collider, result;
+	brEval position, facing;
 	brCollisionHandler *h;
+	brEval *argPtr[3];//Sometimes we only need brEval *argPtr[1];
 
-	brEval *argPtr[1];
 
 	brInstance *o1 = (brInstance*)p1;
 	brInstance *o2 = (brInstance*)p2;
+	//brInstance *o3 = (brInstance*)pos;
+	//brInstance *o4 = (brInstance*)face;
 
 	if(!o1 || !o2 || (o1->status != AS_ACTIVE) || (o2->status != AS_ACTIVE)) return;
 
@@ -118,10 +122,24 @@ void brCollisionCallback(void *p1, void *p2, int type) {
 
 		if(o2->object->type == h->object->type && o2->object->type->isSubclass(o2->object->userData, h->object->userData)) {
 			meth = h->method;
-
-			collider.set( o2 );
-			argPtr[0] = &collider;
-
+			// Only call methods with the right count of parameters
+			if(meth->argumentCount==3){
+					
+				collider.set( o2 );
+				position.set((*pos));
+				facing.set((*face));
+				argPtr[0] = &collider;
+				argPtr[1] = &position;
+				argPtr[2] = &facing;
+			}
+			// Only 1 paramerter so not position and facing direction is needed
+			else if(meth->argumentCount==1){
+				collider.set( o2 );
+				argPtr[0] = &collider;
+			}
+			else{
+				slMessage(DEBUG_ALL, "Error during collision callback: wrong method arguments count\n");
+			}
 			if(brMethodCall(o1, meth, argPtr, &result) == EC_ERROR) {
 				slMessage(DEBUG_ALL, "Error during collision callback\n");
 				return;
@@ -142,15 +160,29 @@ void brCollisionCallback(void *p1, void *p2, int type) {
 		if(o1->object->type == h->object->type && o1->object->type->isSubclass(o1->object->userData, h->object->userData)) {
 			meth = h->method;
 
-			collider.set( o1 );
-			argPtr[0] = &collider;
-
+			// Only call methods with the right count of parameters
+			if(meth->argumentCount==3){
+					
+				collider.set( o2 );
+				position.set((*pos));
+				facing.set((*face));
+				argPtr[0] = &collider;
+				argPtr[1] = &position;
+				argPtr[2] = &facing;
+			}
+			// Only 1 paramerter so not position and facing direction is needed
+			else if(meth->argumentCount==1){
+				collider.set( o2 );
+				argPtr[0] = &collider;
+			}
+			
 			if(brMethodCall(o2, meth, argPtr, &result) == EC_ERROR) {
-				slMessage(DEBUG_ALL, "Error during collision callback\n");
+				slMessage(DEBUG_ALL, "Error during collision callback4\n");
 				return;
 			}
 
 			if( result.type() == AT_INT && BRINT(&result) ) return;
 		}
 	}
+	
 }
