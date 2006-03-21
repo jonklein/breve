@@ -1,4 +1,7 @@
 #include <stdio.h>
+#define GLAPI extern
+#define GLAPIENTRY
+
 #include <GL/osmesa.h>
 #include <GL/gl.h>
 

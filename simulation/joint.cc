@@ -253,7 +253,7 @@ void slJoint::setLinkPoints(slVector *plinkPoint, slVector *clinkPoint, double r
 	std::vector< slLink*>::iterator li;
 
 	childP = dBodyGetPosition(_child->_odeBodyID);
-	childR = dBodyGetRotation(_child->_odeBodyID);
+	childR = (double*)dBodyGetRotation(_child->_odeBodyID);
 	memcpy(savedChildR, childR, sizeof(savedChildR));
 	memcpy(savedChildP, childP, sizeof(savedChildP));
 
