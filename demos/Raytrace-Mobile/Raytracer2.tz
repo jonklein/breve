@@ -1,0 +1,888 @@
+#
+# Raytracer
+# by Marc Szymanski
+#
+# This demo shows how raytracing can be used to implement 
+# simple sensor objects.
+#
+
+# include some required breve class files
+
+@use Control.
+@use Drawing.
+@use Mobile.
+@use Stationary.
+@define PI 3.141592653.
+
+# First tell the breve engine the name of our controller class
+
+Controller myControl.             
+
+Control : myControl {
+	+ variables:
+		walkerShape (object).
+		agents         (list).
+
+	+ to init:
+		print "Setting up the simulation.".
+
+		new LabyStage4.
+		self point-camera at (0, 0, 0) from (0, 200, 0).
+
+		walkerShape   = (new Cube init-with size (2.53, 2.8, 2.5)).
+
+		agents = 10 new isAgent.
+
+
+	+ to iterate:
+		super iterate.
+		self update-neighbors.
+
+	+ to get-walker-shape:
+		return walkerShape.
+}
+
+Mobile : isAgent (aka isAgents) {
+	+ variables:
+		shapee        (object).
+		sensors		(list).
+		sensor_front  (object).
+		sensor_left_fr   (object).
+		sensor_right_fr  (object).
+		hoodSize      (float).
+		df, dlf, drf    (float).
+		draw (object).
+				
+	+ to sensor-for location location(vector):
+		angle (float).
+		i (int).
+		sensor(object).
+		toSensor, transDir (vector).
+		i = 0.
+		foreach sensor in (sensors) : {
+			transDir = (self get-rotation) * (sensor get-direction).
+			toSensor = (location) - (self get-location).
+			angle = angle(toSensor, transDir).
+			if(angle < (sensor get-sensorAngle)):{ return i.}
+			i++.
+		}
+		print "no sensor for this direction".
+		i=0.
+		foreach sensor in (sensors) : {
+			transDir = (self get-rotation) * (sensor get-direction).
+			toSensor = (location) - (self get-location).
+			angle = angle(toSensor, transDir).
+			if(angle < (sensor get-sensorAngle)):{ return i.}
+			i++.
+			print "transdir: $transDir".
+			print "toSensor: $toSensor".
+			print "angle: $angle".
+			
+		}
+		
+		return -1.
+
+	+ to detect-Agent at-Sensor mySensor(int) :
+	
+		agent(object).
+		foreach agent in (all isAgent) : {	
+			if (agent != self):{
+				if (sensors{mySensor} can-see the agent):{
+				
+					draw set-color to (0, 1, 0).
+					draw draw-line from (self get-location)to (agent get-location).
+					
+					return (agent sensor-for location (self get-location)).
+				}
+			}
+		}
+		#nobody there
+		return -1.
+		
+		
+	+ to sendMessage message message(string) mySensor mySensor(int):
+	
+	+ to receiveMessage message message(string) mySensor mySensor(int) hisSensor hisSensor(int) :
+	
+
+	+ to init:
+		draw = new Drawing.
+		shapee = (controller get-walker-shape).
+		self set-shape to shapee.
+		self set-color to (0,1,0.3).
+		self move to random[(15, 0, 15)]+(0,1.8,0).
+		hoodSize = 30.
+		sensors{0} = (new Sensor init-with id 0 direction (1, 0, 0) max-distance hoodSize and-owner self).
+		sensors{1} = (new Sensor init-with id 1 direction (0.5, 0, 0.87) max-distance hoodSize and-owner self).
+		sensors{2} = (new Sensor init-with id 2 direction (0.5, 0, -0.87) max-distance hoodSize and-owner self).
+		sensors{3} = (new Sensor init-with id 3 direction (-1, 0, 0) max-distance hoodSize and-owner self).
+		sensors{4} = (new Sensor init-with id 4 direction (-0.5, 0, 0.87) max-distance hoodSize and-owner self).
+		sensors{5} = (new Sensor init-with id 5 direction (-0.5, 0, -0.87) max-distance hoodSize and-owner self).
+		
+		sensor_front    = (new Sensor init-with id 0 direction (1, 0, 0) max-distance hoodSize and-owner self).
+		sensor_right_fr = (new Sensor init-with id 1 direction (0.5, 0, 0.87) max-distance hoodSize and-owner self).
+		sensor_left_fr = (new Sensor init-with id 2 direction (0.5, 0, -0.87) max-distance hoodSize and-owner self).
+
+		#self move to (0,-1.8 ,0).
+		self rotate around-axis (0,1,0) by random[6.2].
+
+		self set-neighborhood-size to hoodSize.
+
+#		self show-neighbor-lines.
+		self set-neighborhood-size to hoodSize.
+
+		return self.
+
+	+ to iterate:
+		s0,s1,s2,s3,s4,s5(int).
+
+		dlf = (sensor_left_fr get-data).
+		df = (sensor_front get-data).
+		drf = (sensor_right_fr  get-data).
+
+		# printf "left-f: ".
+		# print dlf.
+		# printf "front: ".
+		# print df.
+		# printf "right-f: ".
+		# print drf.
+
+		if (dlf > 10 && df > 10 && drf > 10) : {
+			self set-rotational-velocity to (0, 0, 0).
+			self set-velocity to (self get-rotation)*(1,0,0).		
+		} else {
+			if (dlf > drf) : {
+				self set-rotational-velocity to (0, 1, 0).
+				self set-velocity to (0,0,0).		
+			} else {
+				self set-rotational-velocity to (0, -1, 0).
+				self set-velocity to (0,0,0).		
+			}
+		}  
+		draw clear.
+		
+		# eigentlich darf man diese fkt nur einmal aufrufen
+		# es kann immer nur auf einem sensor gesucht werden
+		# sonst sollte man die fkt umschreiben detect-All-Agents
+		
+		s0 = self detect-Agent at-Sensor 0.
+		s1 = self detect-Agent at-Sensor 1.
+		s2 = self detect-Agent at-Sensor 2.
+		s3 = self detect-Agent at-Sensor 3.
+		s4 = self detect-Agent at-Sensor 4.
+		s5 = self detect-Agent at-Sensor 5.
+		
+#		if(-1 != s0):{
+#			print s0.
+#		}
+		
+}
+
+Abstract : Sensor {
+	+ variables:
+		direction (vector).
+		sensorAngle(float).
+		owner     (object).
+		maxDist   (float).
+		draw      (object).	 
+		id        (double).
+
+	+ to init-with id theID (double) direction theDirection (vector) max-distance theMaxDistance (float) and-owner theOwner (object):
+		direction = theDirection/|theDirection|.
+		owner     = theOwner.
+		maxDist   = theMaxDistance.
+		id        = theID.
+		sensorAngle = 60*PI/180.0.
+		draw = new Drawing.
+		return self.
+		
+		
+
+	+ to can-see the item (object):
+		angle (float).
+		bestHit, hit, toItem, transDir (vector).
+		min (float).
+		min = 999999999.
+
+		draw clear.
+		transDir = (owner get-rotation) * direction.
+		toItem = (item get-location) - (owner get-location).
+		angle = angle(toItem, transDir).
+		if angle > sensorAngle: {return 0.}
+		if maxDist < |toItem|: {return 0.}
+		#raytracen um zu sehen ob wir den anderen sehen können
+		
+		foreach item in (owner get-neighbors) : {	
+			hit = (item raytrace from-location (owner get-location) with-direction (toItem)).
+			if ((hit != (0,0,0)) && (|hit| < min)) :  {
+				min = |hit|. 
+				bestHit = hit.
+			}
+		}
+
+	
+		
+		# there must be a obstacle blocking our sensor
+		if(|bestHit - toItem|>3):{
+			draw set-color to (.5, 0, .5).
+			#draw draw-line from (owner get-location) to ((owner get-location) + bestHit).
+			return 0.
+		}
+		
+		return 1.
+		
+	
+	
+	+ to get-data:
+		item (object).
+		world_dir (vector).
+		location  (vector).
+		hit (vector).
+		min (float).
+		mat (matrix).
+		bestHit (vector).
+
+		min = maxDist + 1.
+
+		mat = (owner get-rotation).
+
+		world_dir = mat*direction.
+		location  = (owner get-location).
+
+		foreach item in (owner get-neighbors) : {		 
+			hit = (item raytrace from-location location with-direction world_dir).
+			if ((hit != (0,0,0)) && (|hit| < min)) :  {
+				min = |hit|. 
+				bestHit = hit.
+			}
+		}
+
+		draw clear.
+
+		draw set-color to (1, 0, 0).
+		draw draw-line from location to (location + bestHit).
+
+		return (min + (random[7] - 3.5)).
+		
+	+ to get-direction:
+		return direction.
+	+ to get-sensorAngle:
+		return sensorAngle.
+}
+
+@define FLOOR_Y 0.3.
+@define COLOR (0,0.9,0.1).
+@define WALL_W 1.
+@define WALL_H 2.5.
+@define BOUNCE 0.1.
+
+Object : Stage {
+	+ variables:
+		floor, floor-shape (object).
+		wallN, wallS, wall-shape0, wall-shape1 (object).
+
+	+ to init-with size-x FLOOR_X (double) with-size-z FLOOR_Z (double):
+		floor-shape = (new Cube init-with size (FLOOR_X, FLOOR_Y, FLOOR_Z)).
+		floor = new Stationary.
+		floor register with-shape floor-shape at-location (0, -FLOOR_Y/2, 0).
+		floor set-e to BOUNCE.
+
+		wall-shape0 = (new Cube init-with size (WALL_W, WALL_H, FLOOR_Z + WALL_W)).
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (FLOOR_X/2, WALL_H/2 - FLOOR_Y/2, 0).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape0 at-location (-FLOOR_X/2, WALL_H/2 - FLOOR_Y/2, 0).
+		wallS set-e to BOUNCE.
+		wallS set-color to (0.5,0,0).
+
+		wall-shape1 = (new Cube init-with size (FLOOR_X + WALL_W, WALL_H, WALL_W)).
+		wallN = new Stationary.
+		wallN register with-shape wall-shape1 at-location (0, WALL_H/2 - FLOOR_Y/2, FLOOR_Z/2).
+		wallN set-e to BOUNCE.
+		wallN set-color to (0.5,0,0).
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (0, WALL_H/2 - FLOOR_Y/2, -FLOOR_Z/2).
+		wallS set-e to BOUNCE.
+		wallS set-color to (0.5,0,0).
+		
+		return self.
+
+}
+
+Object : LabyStage2 {
+	+ variables:
+		floor, floor-shape (object).
+		wallN, wallS, wall-shape0, wall-shape1 (object).
+
+	+ to init-with size-x FLOOR_X (double) with-size-z FLOOR_Z (double):
+		floor-shape = (new Cube init-with size (FLOOR_X, FLOOR_Y, FLOOR_Z)).
+		floor = new Stationary.
+		floor register with-shape floor-shape at-location (0, -FLOOR_Y/2, 0).
+		floor set-e to BOUNCE.
+
+		wall-shape0 = (new Cube init-with size (20, WALL_H,  1)).
+		wall-shape1 = (new Cube init-with size ( 1, WALL_H, 20)).
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-20, WALL_H/2 - FLOOR_Y/2, 0).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (0, WALL_H/2 - FLOOR_Y/2, -20).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (0, WALL_H/2 - FLOOR_Y/2, 20).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-20, WALL_H/2 - FLOOR_Y/2, 40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (0, WALL_H/2 - FLOOR_Y/2, 40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (20, WALL_H/2 - FLOOR_Y/2, 40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-20, WALL_H/2 - FLOOR_Y/2, -40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (0, WALL_H/2 - FLOOR_Y/2, -40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (20, WALL_H/2 - FLOOR_Y/2, -40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape1 at-location (30, WALL_H/2 - FLOOR_Y/2, 30).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (30, WALL_H/2 - FLOOR_Y/2, 10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+		wallN = new Stationary.
+		wallN register with-shape wall-shape1 at-location (30, WALL_H/2 - FLOOR_Y/2, -10).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (30, WALL_H/2 - FLOOR_Y/2, -30).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+		wallN = new Stationary.
+		wallN register with-shape wall-shape1 at-location (-30, WALL_H/2 - FLOOR_Y/2, 30).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (-30, WALL_H/2 - FLOOR_Y/2, 10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+		wallN = new Stationary.
+		wallN register with-shape wall-shape1 at-location (-30, WALL_H/2 - FLOOR_Y/2, -10).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (-30, WALL_H/2 - FLOOR_Y/2, -30).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (10, WALL_H/2 - FLOOR_Y/2, -10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (10, WALL_H/2 - FLOOR_Y/2, 10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+
+		return self.
+
+}
+
+Object : LabyStage3 {
+	+ variables:
+		floor, floor-shape (object).
+		wallN, wallS, wall-shape0, wall-shape1 (object).
+
+	+ to init:
+		FLOOR_X (double).
+		FLOOR_Z (double).
+	        FLOOR_X = 100.
+		FLOOR_Z = 80.
+		floor-shape = (new Cube init-with size (FLOOR_X, FLOOR_Y, FLOOR_Z)).
+		floor = new Stationary.
+		floor register with-shape floor-shape at-location (0, -FLOOR_Y/2, 0).
+		floor set-e to BOUNCE.
+
+		wall-shape0 = (new Cube init-with size (20, WALL_H,  1)).
+		wall-shape1 = (new Cube init-with size ( 1, WALL_H, 20)).
+
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-40, WALL_H/2 - FLOOR_Y/2, -40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-40, WALL_H/2 - FLOOR_Y/2, 40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (40, WALL_H/2 - FLOOR_Y/2, -40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (40, WALL_H/2 - FLOOR_Y/2, 40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-20, WALL_H/2 - FLOOR_Y/2, 40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (0, WALL_H/2 - FLOOR_Y/2, 40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (20, WALL_H/2 - FLOOR_Y/2, 40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-20, WALL_H/2 - FLOOR_Y/2, -40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (0, WALL_H/2 - FLOOR_Y/2, -40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (20, WALL_H/2 - FLOOR_Y/2, -40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (-50, WALL_H/2 - FLOOR_Y/2, 30).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (-50, WALL_H/2 - FLOOR_Y/2, 10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (-50, WALL_H/2 - FLOOR_Y/2, -10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (-50, WALL_H/2 - FLOOR_Y/2, -30).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (50, WALL_H/2 - FLOOR_Y/2, 30).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (50, WALL_H/2 - FLOOR_Y/2, 10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (50, WALL_H/2 - FLOOR_Y/2, -10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (50, WALL_H/2 - FLOOR_Y/2, -30).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+
+		return self.
+
+}
+
+Object : LabyStage4 {
+	+ variables:
+		floor, floor-shape (object).
+		wallN, wallS, wall-shape0, wall-shape1 (object).
+
+	+ to init:
+		FLOOR_X (double).
+		FLOOR_Z (double).
+	        FLOOR_X = 160.
+		FLOOR_Z = 120.
+		floor-shape = (new Cube init-with size (FLOOR_X, FLOOR_Y, FLOOR_Z)).
+		floor = new Stationary.
+		floor register with-shape floor-shape at-location (0, -FLOOR_Y/2, 0).
+		floor set-e to BOUNCE.
+
+		wall-shape0 = (new Cube init-with size (20, WALL_H,  1)).
+		wall-shape1 = (new Cube init-with size ( 1, WALL_H, 20)).
+
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-80, WALL_H/2 - FLOOR_Y/2, -60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-60, WALL_H/2 - FLOOR_Y/2, -60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-40, WALL_H/2 - FLOOR_Y/2, -60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-20, WALL_H/2 - FLOOR_Y/2, -60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (0, WALL_H/2 - FLOOR_Y/2, -60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (20, WALL_H/2 - FLOOR_Y/2, -60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (40, WALL_H/2 - FLOOR_Y/2, -60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (60, WALL_H/2 - FLOOR_Y/2, -60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (80, WALL_H/2 - FLOOR_Y/2, -60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-80, WALL_H/2 - FLOOR_Y/2, 60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-60, WALL_H/2 - FLOOR_Y/2, 60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-40, WALL_H/2 - FLOOR_Y/2, 60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-20, WALL_H/2 - FLOOR_Y/2, 60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (0, WALL_H/2 - FLOOR_Y/2, 60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (20, WALL_H/2 - FLOOR_Y/2, 60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (40, WALL_H/2 - FLOOR_Y/2, 60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (60, WALL_H/2 - FLOOR_Y/2, 60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (80, WALL_H/2 - FLOOR_Y/2, 60).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (-80, WALL_H/2 - FLOOR_Y/2, 50).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (-80, WALL_H/2 - FLOOR_Y/2, 30).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (-80, WALL_H/2 - FLOOR_Y/2, 10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (-80, WALL_H/2 - FLOOR_Y/2, -10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (-80, WALL_H/2 - FLOOR_Y/2, -30).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (-80, WALL_H/2 - FLOOR_Y/2, -50).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (80, WALL_H/2 - FLOOR_Y/2, 50).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (80, WALL_H/2 - FLOOR_Y/2, 30).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (80, WALL_H/2 - FLOOR_Y/2, 10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (80, WALL_H/2 - FLOOR_Y/2, -10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (80, WALL_H/2 - FLOOR_Y/2, -30).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (80, WALL_H/2 - FLOOR_Y/2, -50).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		#end -- outer border 
+
+
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (40, WALL_H/2 - FLOOR_Y/2, 40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (20, WALL_H/2 - FLOOR_Y/2, 40).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (20, WALL_H/2 - FLOOR_Y/2, -20).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (40, WALL_H/2 - FLOOR_Y/2, -20).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+
+
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (50, WALL_H/2 - FLOOR_Y/2, 30).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (50, WALL_H/2 - FLOOR_Y/2, 10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (50, WALL_H/2 - FLOOR_Y/2, -10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (20, WALL_H/2 - FLOOR_Y/2, 30).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (20, WALL_H/2 - FLOOR_Y/2, -10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+
+		
+
+		return self.
+
+}
+
+Object : DemoStage {
+	+ variables:
+		floor, floor-shape (object).
+		wallN, wallS, wall-shape0, wall-shape1 (object).
+
+	+ to init:
+		floor-shape = (new Cube init-with size (45, FLOOR_Y, 55)).
+		floor = new Stationary.
+		floor register with-shape floor-shape at-location (0, -FLOOR_Y/2, 0).
+		floor set-e to BOUNCE.
+
+		wall-shape0 = (new Cube init-with size (20, WALL_H,  1)).
+		wall-shape1 = (new Cube init-with size ( 1, WALL_H, 20)).
+
+		#horizontale innenwände
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (13, WALL_H/2 - FLOOR_Y/2, 13).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-13, WALL_H/2 - FLOOR_Y/2, 0).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (13, WALL_H/2 - FLOOR_Y/2, -13).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		#horizontale Außenwände
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-13, WALL_H/2 - FLOOR_Y/2, 28).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (0, WALL_H/2 - FLOOR_Y/2, 28).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (13, WALL_H/2 - FLOOR_Y/2, 28).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (-13, WALL_H/2 - FLOOR_Y/2, -28).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (0, WALL_H/2 - FLOOR_Y/2, -28).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape0 at-location (13, WALL_H/2 - FLOOR_Y/2, -28).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+
+		#vertikale Außenwände
+
+		wallN = new Stationary.
+		wallN register with-shape wall-shape1 at-location (23, WALL_H/2 - FLOOR_Y/2, 18.5).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (23, WALL_H/2 - FLOOR_Y/2, 10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+		wallN = new Stationary.
+		wallN register with-shape wall-shape1 at-location (23, WALL_H/2 - FLOOR_Y/2, -10).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (23, WALL_H/2 - FLOOR_Y/2, -18.5).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+		wallN = new Stationary.
+		wallN register with-shape wall-shape1 at-location (-23, WALL_H/2 - FLOOR_Y/2, 18.5).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (-23, WALL_H/2 - FLOOR_Y/2, 10).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+		
+		wallN = new Stationary.
+		wallN register with-shape wall-shape1 at-location (-23, WALL_H/2 - FLOOR_Y/2, -10).
+		wallN set-e to BOUNCE.
+		wallN set-color to COLOR.
+
+		wallS = new Stationary.
+		wallS register with-shape wall-shape1 at-location (-23, WALL_H/2 - FLOOR_Y/2, -18.5).
+		wallS set-e to BOUNCE.
+		wallS set-color to COLOR.
+				
+
+		return self.
+
+}
