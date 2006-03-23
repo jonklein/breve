@@ -8,7 +8,7 @@
 @define COLOR (0,0.9,0.1).
 
 @define WALL_W 1.
-@define WALL_H 2.5.
+@define WALL_H 4.5.
 
 @define BOUNCE 0.1.
 

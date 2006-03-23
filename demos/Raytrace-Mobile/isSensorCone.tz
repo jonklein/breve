@@ -14,4 +14,7 @@ Mobile:IRSensorCone (aka IRSensorCones){
 	+to collide with obstacle(object):
 		#print"collide with ".
 		#print obstacle.
+		
+	+to agent-collide with agent(object):
+		sensor detect a agent.
 }

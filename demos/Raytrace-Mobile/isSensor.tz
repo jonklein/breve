@@ -13,6 +13,7 @@
 Mobile:IRSensor (aka IRSensors){
 
 	+variables:
+		sensornumber(int).
 		sensordata(float).
 		distance(float).
 		sensorShape(object).
@@ -31,7 +32,8 @@ Mobile:IRSensor (aka IRSensors){
 		rel_position = v+(SENSORSIZE,0,0).
 	
 				
-	+to init with-pos position(vector) and-rot rotation(matrix) and-owner o(object):
+	+to init with-pos position(vector) and-rot rotation(matrix) and-owner o(object) and-number n(int):
+		sensornumber = n.
 		self set-rel-position to position.
 		self set-rel-rotation to rotation.
 		owner = o.
@@ -49,7 +51,7 @@ Mobile:IRSensor (aka IRSensors){
 		self set-color to (1,1,0).
 
 		sensorCone handle-collisions with-type "Stationary" with-method "collide".
-		#sensorCone handle-collisions with-type "Mobile" with-method "collide".
+	#	sensorCone handle-collisions with-type "isAgent" with-method "agent-collide".
 		sensordata = 0.
 		self update-pos.
 		return self.
@@ -68,6 +70,9 @@ Mobile:IRSensor (aka IRSensors){
 		#print sensordata.
 		#d = new Drawing.
 		#d draw-line from (10,10,10) to (position).
+	
+	+to detect a agent(object):
+		owner detect a agent at (sensornumber).
 	        
 	+to get-data:
 		return sensordata.

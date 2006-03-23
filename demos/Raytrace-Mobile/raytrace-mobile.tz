@@ -26,8 +26,8 @@ Control : myControl {
 		walkerShape   = (new Cube init-with size (2.53, 2.8, 2.5)).
 		#(new Shape init-with-polygon-disk radius 2 sides 40 height 2.3).
 
-		agent = 1 new isAgents.
-		agent move to (0, 1.8, 0).
+		agent =  1 new isAgents.
+		#agent move to (0, 2.8, 0).
 		
 		#agent2 = 1 new isAgents.
 		#agent2 move to (4, 1.8, 0).

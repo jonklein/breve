@@ -4,6 +4,20 @@
 @use Matrix.
 @include "isSensor.tz"
 
+
+#          \         /
+#           \   1   /
+#        0   \     /  2
+#             \+=+/ 
+# x     -------| |-------
+# ^           /+=+\             
+# |      5   /     \  3
+# |         /   4   \
+# |        /         \
+# |
+# |
+# +-------------------> z
+
 Mobile : isAgent  (aka isAgents){
 	+ variables:
 		shapee        (object).
@@ -13,40 +27,56 @@ Mobile : isAgent  (aka isAgents){
 		hoodSize      (float).
 		df, dlf, drf    (float).
 		draw            (object).
-		irSensor-f(object).
-		irSensor-lf(object).
-		irSensor-rf(object).
+		irSensors(list).
 		
 		
+	+to init-sensors:
+		
+		irSensors {0} = (new IRSensor init with-pos( 2, 2,-2) and-rot [(1,0,0),(0,1,0),(0,0,1)]and-owner self and-number 0).
+		irSensors {1} = (new IRSensor init with-pos( 2, 2, 0) and-rot [(1,0,0),(0,1,0),(0,0,1)]and-owner self and-number 1).
+		irSensors {2} = (new IRSensor init with-pos( 2, 2, 2) and-rot [(1,0,0),(0,1,0),(0,0,1)]and-owner self and-number 2).
+		irSensors {3} = (new IRSensor init with-pos(-2, 2, 2) and-rot [(1,0,0),(0,1,0),(0,0,1)]and-owner self and-number 3).
+		irSensors {4} = (new IRSensor init with-pos(-2, 2, 0) and-rot [(1,0,0),(0,1,0),(0,0,1)]and-owner self and-number 4).
+		irSensors {5} = (new IRSensor init with-pos(-2, 2,-2) and-rot [(1,0,0),(0,1,0),(0,0,1)]and-owner self and-number 5).
 
+		irSensors {0}  set-rel-y-rotation to (300*PI/180).
+		irSensors {1}  set-rel-y-rotation to (0*PI/180).
+		irSensors {2}  set-rel-y-rotation to (60*PI/180).
+		irSensors {3}  set-rel-y-rotation to (120*PI/180).
+		irSensors {4}  set-rel-y-rotation to (180*PI/180).
+		irSensors {5}  set-rel-y-rotation to (240*PI/180).
+		self update-sensor-pos.
+		
+	+ to update-sensor-pos:
+		irSensors {0}  update-pos.
+		irSensors {1}  update-pos.
+		irSensors {2}  update-pos.
+		irSensors {3}  update-pos.
+		irSensors {4}  update-pos.
+		irSensors {5}  update-pos.
+	
 	+ to init:
+		self init-sensors.
 		shapee = (controller get-walker-shape).
 		self set-shape to shapee.
 		self set-color to (0,1,0.3).
-		self move to (0,-1.8 ,0).
+		#self move to random[(100, 0, 100)]+(-50,1.8,-50).
+		self move to (5,1.8,5).
+
 		self rotate around-axis (0,1,0) by random[6.2].
 
-		irSensor-f 	= (new IRSensor init with-pos(0,2,0) and-rot [(1,0,0),(0,1,0),(0,0,1)]and-owner self).
-		irSensor-lf = (new IRSensor init with-pos(0,2,-1) and-rot [(1,0,0),(0,1,0),(0,0,1)]and-owner self).
-		irSensor-rf = (new IRSensor init with-pos(0,2,1) and-rot [(1,0,0),(0,1,0),(0,0,1)]and-owner self).
 		
-		irSensor-lf set-rel-y-rotation to (-60*PI/180).
-		irSensor-lf update-pos.
-		irSensor-rf set-rel-y-rotation to (60*PI/180).
-		irSensor-rf update-pos.
-		
-		#irSensor1 set-rel-position to (0, 1, 2).
-		#irSensor1 set-rel-rotation to [(1,0,0),(0,1,0),(0,0,1)].
-		hoodSize = 30.
+	
 
+		hoodSize = 30.
 		sensor_front    = (new Sensor init-with id 0 direction (1,0, 0) max-distance hoodSize and-owner self).
 		sensor_right_fr = (new Sensor init-with id 1 direction (0.5,0, 0.87) max-distance hoodSize and-owner self).
 		sensor_left_fr = (new Sensor init-with id 2 direction (0.5,0,-0.87) max-distance hoodSize and-owner self).
 
 
-		self set-neighborhood-size to hoodSize.
+		#self set-neighborhood-size to hoodSize.
 		
-		self show-neighbor-lines.
+		#self show-neighbor-lines.
 
 		draw = new Drawing.
 		draw set-color to (1,0,0) with-transparency 1.0.
@@ -54,37 +84,34 @@ Mobile : isAgent  (aka isAgents){
 		return self.
 		
 	+ to move to pos(vector):
-		#TODO liste von Sensoren
 		super move to pos.
-		if irSensor-f: irSensor-f update-pos.
-		if irSensor-lf: irSensor-lf update-pos.
-		if irSensor-rf: irSensor-rf update-pos.
+		self update-sensor-pos.
+				
+	+ to detect a agent(object) at sensornumber(int):
+		#print " detected a agent $agent at sensor $sensornumber".
 		
+	+ to receive the message (string) at sensor(int) from emitter(int):
+		print"receive".
+	
 	+ to iterate:
-		self set-neighborhood-size to hoodSize.
+		dlf = (irSensors{0} get-data).
+		df  = (irSensors{1} get-data).
+		drf = (irSensors{2} get-data).
 
-		dlf = (irSensor-lf get-data).
-		df = (irSensor-f get-data).
-		drf = (irSensor-rf  get-data).
+#		printf "left-f: ".
+#		print dlf.
+#		printf "front: ".
+#		print df.
+#		printf "right-f: ".
+#		print drf.
 
-		printf "left-f: ".
-		print dlf.
-		printf "front: ".
-		print df.
-		printf "right-f: ".
-		print drf.
-
-		if (dlf < 0.2 && df < 0.2 && drf < 0.2) : {
+		if (df < 0.2): {
 		   self set-rotational-velocity to (0, 0, 0).
 		   self set-velocity to (self get-rotation)*(1,0,0).		
+		
 		} else {
-		   if (dlf < drf) : {
 		      self set-rotational-velocity to (0, 1, 0).
 		      self set-velocity to (0,0,0).		
-		   } else {
-		      self set-rotational-velocity to (0, -1, 0).
-		      self set-velocity to (0,0,0).		
-		   }
 		}  
 
 }
