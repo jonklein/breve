@@ -101,17 +101,17 @@ void brEvalHashFree(brEvalHash *h) {
 void brEvalHashStore(brEvalHash *h, brEval *key, brEval *value) {
 	brEval *v, *k;
 
-	v = (brEval *)slDehashDataAndKey(h->table, key, (void**)&k);
+	v = (brEval*)slDehashDataAndKey( h->table, key, (void**)&k );
 
 	if(!v) {
 		v = new brEval;
 		k = new brEval;
-		brEvalCopy(key, k);
+		brEvalCopy( key, k );
 	} 
 
 	brEvalCopy(value, v);
 
-	slHashData(h->table, k, v);
+	slHashData( h->table, k, v );
 }
 
 /*!

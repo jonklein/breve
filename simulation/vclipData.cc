@@ -50,7 +50,7 @@ void slVclipDataInit( slWorld *w ) {
 	w->_clipData->world = w;
 	w->_clipData->collisionCount = 0;
 
-	// for each object in the world, fill in it's shape, position and 
+	// for each object in the world, fill in its shape, position and 
 	// min/max vectors
 
 	w->_clipData->boundLists[ 0 ].clear();

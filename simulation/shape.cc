@@ -169,7 +169,7 @@ void slShapeFree(slShape *s) {
 }
 
 slShape::~slShape() {
-	std::vector<slFeature*>::iterator fi;
+	std::vector< slFeature* >::iterator fi;
 
 	for(fi = features.begin() ; fi != features.end(); fi++ ) delete *fi;
 

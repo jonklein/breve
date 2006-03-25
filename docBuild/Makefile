@@ -25,11 +25,11 @@ docbook: classes
 	cd docBuild/docbook; \
 		openjade -t sgml -V html-index -d breve.dsl breve.docbook
 	cd docBuild/docbook; \
-		$(DOCBOOKDIR)/collateindex.pl -g HTML.index > index.docbook
+		collateindex.pl -g HTML.index > index.docbook
 	cd docBuild/docbook; \
 		openjade -t sgml -d breve.dsl breve.docbook
 	-cd docBuild/docbook; \
-		openjade -t tex -d /sw/share/sgml/dsssl/docbook-dsssl-nwalsh/print/docbook.dsl breve.docbook
+		openjade -t tex -d /opt/fink/share/sgml/dsssl/docbook-dsssl-nwalsh/print/docbook.dsl breve.docbook
 	cp -R docBuild/docbook/index.html docBuild/docbook/docs docs/
 	cp docBuild/docbook/images/breve_icon.jpg docs/
 	mkdir docs/docs/images

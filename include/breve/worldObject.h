@@ -111,7 +111,7 @@ class slWorldObject {
 		int getLightExposure( );
 		int raytrace( slVector *location, slVector* direction, slVector *erg_dir );
 
-		std::vector<slWorldObject*> &getNeighbors();
+		std::vector< void* > &getNeighborData();
 
 		inline const slPosition &getPosition() { return _position; }
 		inline const slShape *getShape() { return _shape; }
@@ -166,6 +166,7 @@ class slWorldObject {
 		double _mu;
 
 		std::vector<slWorldObject*> _neighbors;
+		std::vector< void* > _neighborData;
 
 		// the list of lines that this object makes to other objects
 

@@ -230,11 +230,11 @@ class slShape {
 
 		int _type;
 
-		std::vector<slFeature*> features;
+		std::vector< slFeature* > features;
 
-		std::vector<slFace*> faces;
-		std::vector<slEdge*> edges;
-		std::vector<slPoint*> points;
+		std::vector< slFace* > faces;
+		std::vector< slEdge* > edges;
+		std::vector< slPoint* > points;
 };
 
 class slSphere : public slShape {

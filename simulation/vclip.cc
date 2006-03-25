@@ -287,7 +287,7 @@ void slInitBoundSortList(std::vector<slBoundSort*> &list, slVclipData *v, char b
 
 			x = list[n]->number;
 
-			if( x < 0 || x >= list.size() ) {
+			if( x < 0 || x >= (int)list.size() ) {
 				slMessage( DEBUG_ALL, "vclip init error!  x = %d\n", x );
 			}
 
@@ -304,7 +304,7 @@ void slInitBoundSortList(std::vector<slBoundSort*> &list, slVclipData *v, char b
 			
 					flags = slVclipPairFlags(v, x, y);
 
-					if( x < 0 || x >= list.size() || y < 0 || y >= list.size() ) {
+					if( x < 0 || x >= (int)list.size() || y < 0 || y >= (int)list.size() ) {
 						slMessage( DEBUG_ALL, "isort init error!  looked up pair ( %d, %d )\n", x, y );
 					}
 
@@ -443,8 +443,8 @@ int slVclipTestPairAllFeatures(slVclipData *vc, slCollisionCandidate *candidate,
 	const slPosition *p1, *p2;
 	const slShape *s1, *s2;
 	slFeature **f1, **f2;
-	const slFeature *fp1, *fp2;
-	std::vector< slFeature* >::iterator fi1, fi2;
+	slFeature *fp1, *fp2;
+	std::vector< slFeature* >::const_iterator fi1, fi2;
 
 	int x, y;
 	
@@ -462,7 +462,7 @@ int slVclipTestPairAllFeatures(slVclipData *vc, slCollisionCandidate *candidate,
 	f1 = &fp1;
 	f2 = &fp2;
 
-	for(fi1 = s1->features.begin(); fi1 != s1->features.end(); fi1++ ) {
+	for( fi1 = s1->features.begin(); fi1 != s1->features.end(); fi1++ ) {
 		for(fi2 = s1->features.begin(); fi2 != s1->features.end(); fi2++ ) {
 			fp1 = *fi1;
 			fp2 = *fi2;
@@ -803,7 +803,7 @@ int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int x, int 
 		if((eD <= MC_TOLERANCE && sD >= MC_TOLERANCE) || (sD <= MC_TOLERANCE && eD >= MC_TOLERANCE)) {
 			slVector theVertex;
 			double dist;
-			std::vector<slFace*>::iterator fi;
+			std::vector< slFace* >::const_iterator fi;
 
 			maxDist = -DBL_MAX;
 	
@@ -821,7 +821,7 @@ int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int x, int 
 	
 			// find the shallowest penetration plane for this point 
 	
-			for(fi = s2->faces.begin(); fi != s2->faces.end(); fi++ ) {
+			for( fi = s2->faces.begin(); fi != s2->faces.end(); fi++ ) {
 				slFace *face = *fi;
 				slPlane p;
 	
@@ -1178,14 +1178,13 @@ int slPointFaceClip(slFeature **nf1, const slPosition *pp, const slShape *ps, sl
 	slVector tPoint, tEnd;
 	slPoint *endPoint;
 	double sD, asD, eD, max;
-	slFace *newFace;
+	const slFace *newFace;
 	slPlane transformedPlane;
+	std::vector< slFace* >::const_iterator fi;
 
 	slFace *f = (slFace*)*nf2;
 	slPoint *p = (slPoint*)*nf1;
 
-	std::vector<slFace*>::iterator fi;
-	
 	slPositionVertex(pp, &p->vertex, &tPoint);
 
 	if(!slClipPointMax(&tPoint, f->voronoi, fp, f->edgeCount, &update, NULL)) {
@@ -1237,7 +1236,7 @@ int slPointFaceClip(slFeature **nf1, const slPosition *pp, const slShape *ps, sl
 
 	max = -DBL_MAX;
 
-	for(fi = fs->faces.begin(); fi != fs->faces.end(); fi++ ) {
+	for( fi = fs->faces.begin(); fi != fs->faces.end(); fi++ ) {
 		newFace = *fi;
 
 		slPositionPlane(fp, &newFace->plane, &transformedPlane); 
@@ -1515,7 +1514,7 @@ void slFindCollisionFaces( const slShape *s1, const slPosition *p1, slFeature **
 
 	bestDist = -DBL_MAX;
 
-	for(x=0;x<count2;x++) {
+	for( x=0; x<count2; x++) {
 		double dist, d2;
 		int included, update;
 
@@ -1604,7 +1603,7 @@ void slFindCollisionFaces( const slShape *s1, const slPosition *p1, slFeature **
 			slVector tv;
 			double dist;
 			double p1depths = 0, p2depths = 0;
-			std::vector<slPoint*>::iterator pi;
+			std::vector< slPoint* >::const_iterator pi;
 
 			face2 = faces2[y];
 			slPositionPlane(p2, &face2->plane, &plane2);
@@ -1622,7 +1621,7 @@ void slFindCollisionFaces( const slShape *s1, const slPosition *p1, slFeature **
 				*f2p = faces2[y];
 			}
 
-			for(pi = s2->points.begin(); pi != s2->points.end(); pi++ ) {
+			for( pi = s2->points.begin(); pi != s2->points.end(); pi++ ) {
 				point = *pi;
 				slPositionVertex(p2, &point->vertex, &tv);
 				dist = slPlaneDistance(&plane1, &tv);

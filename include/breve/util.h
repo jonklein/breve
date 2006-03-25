@@ -27,6 +27,7 @@
 #include "config.h"
 
 #if WINDOWS
+#include <malloc.h>
 #define DLLEXPORT __declspec(dllexport)
 #elif defined(__GNUC__) && (__GNUC__ >= 4)
 #define DLLEXPORT __attribute__ ((visibility("default")))

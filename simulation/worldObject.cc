@@ -95,8 +95,8 @@ void slWorldObject::removeDrawMode( int mode ) {
 	if ( _drawMode & mode ) _drawMode ^= mode;
 }
 
-std::vector<slWorldObject*> &slWorldObject::getNeighbors() {
-	return _neighbors;
+std::vector< void* > &slWorldObject::getNeighborData() {
+	return _neighborData;
 }
 
 int slWorldObject::getLightExposure() {

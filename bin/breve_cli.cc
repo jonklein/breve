@@ -28,9 +28,6 @@
 
 #include <signal.h>
 
-#include <libgen.h>
-
-
 #include "steve.h"
 #include "world.h"
 #include "camera.h"
@@ -40,6 +37,11 @@
 #include "gldraw.h"
 #include "lightdetector.h"
 #include "world.h"
+
+#ifndef WINDOWS
+#include <libgen.h>
+#endif
+
 
 double gNotify = 40.0;
 double gSimMax = 0.0;
@@ -381,6 +383,7 @@ void renderContext(slWorld *w, slCamera *c) {
 
 int slLoadOSMesaPlugin( char *execPath ) {
 #ifdef MINGW
+	// I'm not even going to try.
 	return -1;
 #else
 	void *handle;

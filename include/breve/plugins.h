@@ -25,7 +25,7 @@
 #define dlsym(D,F) (void*)GetProcAddress((HMODULE)D, F)
 #define dlclose(D) FreeLibrary((HMODULE)D)
 
-const char *dlerror(void)
+const char *dlerror(void);
 
 #else
 

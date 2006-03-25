@@ -271,7 +271,7 @@ AC_CHECK_LIB([png], [png_create_write_struct])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc],,AC_MSG_FAILURE([Missing GSL library -- see http://www.gnu.org/software/gsl/]))
 
-// AC_CHECK_LIB([OSMesa], [OSMesaCreateContext])
+# AC_CHECK_LIB([OSMesa], [OSMesaCreateContext])
 
 AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]))
 

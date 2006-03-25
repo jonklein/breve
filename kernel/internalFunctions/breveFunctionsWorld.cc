@@ -262,19 +262,20 @@ int brISetCollisionProperties(brEval args[], brEval *target, brInstance *i) {
 
 int brIGetNeighbors(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject *wo = BRWORLDOBJECTPOINTER(&args[0]);
-	std::vector<slWorldObject*>::iterator wi;
+	std::vector< void* >::iterator wi;
 	brEval eval;
 
 	target->set( brEvalListNew() );
 
-	std::vector<slWorldObject*> &neighbors = wo->getNeighbors();
+	std::vector< void* > &neighbors = wo->getNeighborData();
 
 	for(wi = neighbors.begin(); wi != neighbors.end(); wi++ ) {
 		// grab the neighbor instances from the userData of the neighbors
 
-		eval.set( (brInstance*)(*wi)->getCallbackData() );
+		eval.set( (brInstance*)(*wi) );
 
-		if(BRINSTANCE(&eval) && BRINSTANCE(&eval)->status == AS_ACTIVE) brEvalListInsert(BRLIST(target), 0, &eval);
+		if( BRINSTANCE(&eval) && BRINSTANCE(&eval)->status == AS_ACTIVE ) 
+			brEvalListInsert(BRLIST(target), 0, &eval);
 	}
 
 	return EC_OK;

@@ -521,6 +521,7 @@ void slWorld::updateNeighbors() {
 		wo->_neighborMax.y = location->y + wo->_proximityRadius;
 		wo->_neighborMax.z = location->z + wo->_proximityRadius;
 		wo->_neighbors.clear();
+		wo->_neighborData.clear();
 	}
 
 	// vclip, but stop after the pruning stage 
@@ -538,8 +539,15 @@ void slWorld::updateNeighbors() {
 		slVectorSub( &o1->_position.location, &o2->_position.location, &diff );
 		dist = slVectorLength(&diff);
 
-		if( dist < o1->_proximityRadius ) o1->_neighbors.push_back(o2);
-		if( dist < o2->_proximityRadius ) o2->_neighbors.push_back(o1);
+		if( dist < o1->_proximityRadius ) {
+			o1->_neighbors.push_back( o2 );
+			o1->_neighborData.push_back( o2->getCallbackData() );
+		}
+
+		if( dist < o2->_proximityRadius ) {
+			o2->_neighbors.push_back( o1 );
+			o2->_neighborData.push_back( o1->getCallbackData() );
+		}
 	}
 }
 
