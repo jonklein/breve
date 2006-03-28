@@ -3,7 +3,7 @@
     Copyright (C) 2003 Jonathan Klein
 -->
 
-<chapter id="graphics_and_sound">
+<chapter id="graphics-and-sound">
 <title>Graphics and Sound</title>
 <para>
 <indexterm><primary>graphics</primary></indexterm>
@@ -11,11 +11,11 @@ This chapter discusses customizing graphics and sound in a breve simulation.
 </para>
 <para>
 The first section, Lighting (<xref linkend="lighting">) shows how to enable 
-and use lighting.  (<xref linkend="shadows_and_relections">) 
+and use lighting.  (<xref linkend="shadows-and-relections">) 
 shows how shadows and reflections can be added to simulated objects.  
 </para>
 <para>
-(<xref linkend="loading_images">) shows how to load images into a simulation.  Once
+(<xref linkend="loading-images">) shows how to load images into a simulation.  Once
 an object has been loaded into a simulation, it can be used to display an agent as 
 an image (<xref linkend="bitmapping">), to texture an object (<xref linkend="texturing">) 
 or to display an object as a translucent "lightmap" (<xref linkend="lightmapping">).  
@@ -61,7 +61,7 @@ method:</para>
 </screen>
 </para>
 </sect1>
-<sect1 id="shadows_and_relections">
+<sect1 id="shadows-and-relections">
 <title>Shadows and Reflections</title>
 <para>
 <indexterm><primary>shadows</primary></indexterm>
@@ -127,7 +127,7 @@ and later disabled using
 </para>
 </sect2>
 
-<sect2 id="shadow_volumes">
+<sect2 id="shadow-volumes">
 <title>Better Shadows With Shadow Volumes</title>
 <para>
 <indexterm><primary>shadow volumes</primary></indexterm>
@@ -170,7 +170,7 @@ Shadow volumes can be disabled using
 
 </sect1>
 
-<sect1 id="loading_images"><title>Loading Image Files</title>
+<sect1 id="loading-images"><title>Loading Image Files</title>
 
 <note><title>Changed in breve 2.0</title>
 <para>
@@ -249,7 +249,7 @@ is described in the next section, <xref linkend="texturing">.
 <para>
 To set a bitmap image for an object in breve, the image must be 
 loaded into breve as described in the previous section 
-<xref linkend="loading_images">.  Once the image has been loaded,
+<xref linkend="loading-images">.  Once the image has been loaded,
 you can set the bitmap image of an object by passing the image 
 to the method "set-bitmap-image" found in
 <ulink url="../classes/Real.html">Real.tz</ulink> 
@@ -315,7 +315,7 @@ of object texturing is shown below, with a semi-transparent textured cube:
 <para>
 The first step in texturing an object is loading in the texture from
 an image file.  Instructions for loading image files for texturing are
-given in <xref linkend="loading_images">.  Once the texture image has 
+given in <xref linkend="loading-images">.  Once the texture image has 
 been loaded, texturing can be done by passing the texture image to 
 the method <ulink url="../classes/Real.html#set-texture">set-texture-image</ulink>
 for any <ulink url="../classes/Real.html">Real</ulink> object.  
@@ -349,7 +349,7 @@ from the included <function>ParticleFountain</function> demo is shown below.
 <para>
 The first step in applying a lightmap to a object is loading in the texture 
 from an image file.  Instructions for loading image files for lightmapping are
-given in <xref linkend="loading_images">.  Once the image has been loaded, 
+given in <xref linkend="loading-images">.  Once the image has been loaded, 
 lightmapping can be done by passing the image to the method 
 <ulink url="../classes/Real.html#set-texture">set-lightmap-image</ulink>
 for any <ulink url="../classes/Real.html">Real</ulink> object.  
@@ -373,7 +373,7 @@ should reuse the same Image object.  An example of this is shown in
 <sect1 id="imageclass"><title>Using the "Image" Class</title>
 <para>
 Once an image file has been loaded in to an Image object 
-(as described in <xref linkend="loading_images">), the image data can be 
+(as described in <xref linkend="loading-images">), the image data can be 
 accessed or manipulated directly via methods in the class 
 <ulink url="../classes/Image.html">Image.tz</ulink>.
 </para>
@@ -432,7 +432,7 @@ sound editor (such as QuickTime Player on Mac OS X), and re-exporting the sound.
 </para>
 </sect1>
 
-<sect1 id="included_sounds"><title>Sounds Included With breve</title>
+<sect1 id="included-sounds"><title>Sounds Included With breve</title>
 <para>
 A few sounds are included in the breve distribution for use in any simulation.  The are 
 located in the <function>classes</function> directory, in a subdirectory called 

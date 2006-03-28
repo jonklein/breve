@@ -26,7 +26,7 @@ the controller variable, as this will have unexpected results on the simulation.
 </para>
 </sect1>
 
-<sect1 id="collision_callback">
+<sect1 id="collision-callback">
 <title>Triggering Events When Agents Collide</title>
 <para>
 <indexterm><primary>collisions</primary></indexterm>
@@ -75,7 +75,7 @@ executed.
 </para>
 </sect1>
 
-<sect1 id="neighbor_checking">
+<sect1 id="neighbor-checking">
 <title>Finding Neighboring Objects</title>
 <para>
 <indexterm><primary>neighbor detection</primary></indexterm>
@@ -137,7 +137,7 @@ being updated:
 </para>
 </sect1>
 
-<sect1 id="closest_object">
+<sect1 id="closest-object">
 <title>Finding the Closest Object</title>
 <para>
 <indexterm><primary>closest object</primary></indexterm>
@@ -232,7 +232,7 @@ myMobile = all Mobiles
 </para>
 </sect1>
 
-<sect1 id="can_respond">
+<sect1 id="can-respond">
 <title>Testing Whether an Object Responds to a Method Call</title>
 <para>
 <indexterm><primary>can-respond (method)</primary></indexterm>
@@ -246,7 +246,7 @@ used like a statement that returns true or false:
 </para>
 </sect1>
 
-<sect1 id="object_types">
+<sect1 id="object-types">
 <title>Testing the Type of an Object</title>
 <para>
 <indexterm><primary>is (method)</primary></indexterm>

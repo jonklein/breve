@@ -15,7 +15,7 @@ This chapter contains a brief overview on how to get started using breve to
 run simulations and how to get started on constructing your own.
 </para>
 
-<sect1 id="what_is_breve">
+<sect1 id="what-is-breve">
 <title>What is breve?</title>
 <para>
 breve is a free simulation environment designed for multi-agent simulation.  breve 
@@ -93,7 +93,7 @@ learns to walk.
 </sect2>
 </sect1>
 
-<sect1 id="install_os_x">
+<sect1 id="install-os-x">
 <title>Installing and Running the breve Application on Mac OS X</title>
 <para>
 <indexterm><primary>Mac OS X</primary></indexterm>
@@ -151,12 +151,12 @@ simulation.
 <para>
 The final tool, the selection and motion tool, is used to select objects in 
 the simulation.  Once selected, an object can be inspected using the 
-selection inspector window (described in <xref linkend="selection_inspector">), 
+selection inspector window (described in <xref linkend="selection-inspector">), 
 or dragged around the simulation.
 </para>
 </sect2>
 
-<sect2 id="selection_inspector">
+<sect2 id="selection-inspector">
 <title>The Selection Inspector</title>
 <para>
 The "selection inspector" allows simulation objects to be inspected in 
@@ -173,7 +173,7 @@ state of simulation variables is always shown.
 </para>
 </sect2>
 
-<sect2 id="log_window">
+<sect2 id="log-window">
 <title>The Log Window and Command-Input Field</title>
 <para>
 Text messages and output from the simulation are printed to the log window.
@@ -188,7 +188,7 @@ described in the next chapter (<xref linkend="steve">).
 </para>
 </sect2>
 
-<sect2 id="app_menus"> 
+<sect2 id="app-menus"> 
 <title>The Simulation Menu and Object Contextual Menus</title>
 <para>
 Users can also interact with a running simulation via the 
@@ -206,7 +206,7 @@ able to add your own custom options to the simulation and contextual menus.
 
 </sect1>
 
-<sect1 id="install_command_line">
+<sect1 id="install-command-line">
 <title>Installing and Running Command-Line breve on Mac OS X, Linux and Windows</title>
 <para>
 <indexterm><primary>Mac OS X</primary></indexterm>
@@ -233,7 +233,7 @@ problems running breve, you may need to install these libraries.  They are
 freely available from the internet.
 </para>
 </note>
-<sect2 id="cli_setup"><title>Setting Up Your Environment</title>
+<sect2 id="cli-setup"><title>Setting Up Your Environment</title>
 <para>
 Before running breve, you'll need to set up the environment variable 
 <function>BREVE_CLASS_PATH</function>.  This variable must contain
@@ -299,7 +299,7 @@ prompt, and will be executed in the simulation's controller object.  The steve l
 </para>
 </sect2>
 
-<sect2 id="cli_menus"> 
+<sect2 id="cli-menus"> 
 <title>The Simulation Menu and Object Contextual Menus</title>
 <para>
 Users can also interact with a running simulation via the 
@@ -332,12 +332,12 @@ how simulations are written.
 </para>
 </sect2>
 
-<sect2 id="cli_no_graphics">
+<sect2 id="cli-no-graphics">
 <title>Command-Line breve Without Graphical Display</title>
 <para>
 If you wish to run a simulation without graphical display, you can use the 
 program <function>breve_cli</function>.  Follow the same setup directions 
-described above (<xref linkend="cli_setup">) in order to setup your environment,
+described above (<xref linkend="cli-setup">) in order to setup your environment,
 and then run the simulation:
 <screen>
 % ./bin/breve_cli ./demos/Push/PushRegression.tz

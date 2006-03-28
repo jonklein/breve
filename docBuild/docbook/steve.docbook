@@ -37,8 +37,8 @@ in this chapter.
 </para>
 <para>
 First, the classic "Hello, World" program is constructed in steve 
-(<xref linkend="hello_world">).  Then, a simple multiagent 3D simulation 
-written in steve is presented (<xref linkend="simple_example">).  This 
+(<xref linkend="hello-world">).  Then, a simple multiagent 3D simulation 
+written in steve is presented (<xref linkend="simple-example">).  This 
 sample should give the basic idea of what a breve simulation looks like.
 </para>
 <para>
@@ -46,17 +46,17 @@ As discussed above, all agents in the simulated world are represented by program
 objects.  These objects are defined in terms of object templates called 
 <firstterm>classes</firstterm>.  The most important object, called the 
 <firstterm>Controller</firstterm> is described in the section The Controller Object 
-(<xref linkend="controller_object">).  The section Building Classes 
-(<xref linkend="building_classes">) describes how to construct basic classes in steve.
+(<xref linkend="controller-object">).  The section Building Classes 
+(<xref linkend="building-classes">) describes how to construct basic classes in steve.
 </para>
 <para>
 In order to define the data and behaviors of your classes, you'll need to be familiar
 with types (<xref linkend="types">) and expressions (<xref linkend="expressions">).
-The section Program Control Structures (<xref linkend="control_structures">) discusses
+The section Program Control Structures (<xref linkend="control-structures">) discusses
 loops and conditional statements.
 </para>
 
-<sect1 id="hello_world">
+<sect1 id="hello-world">
 <title>Hello, World</title>
 <para>
 <indexterm><primary>Hello, World!</primary></indexterm>
@@ -93,7 +93,7 @@ step of the simulation.  Thus, "Hello, World!".  Ad nauseum.
 </sect1>
 
 
-<sect1 id="simple_example">
+<sect1 id="simple-example">
 <title>A Simple Example</title>
 <para>
 "Hello, World" is a very simple example which can be used for any programming 
@@ -214,7 +214,7 @@ When writing code in any language, it is typically useful to include <firstterm>
 
 </sect1>
 
-<sect1 id="controller_object">
+<sect1 id="controller-object">
 <title>The Controller Object</title>
 <para>
 <indexterm><primary>controller object</primary></indexterm>
@@ -234,7 +234,7 @@ or one of its subclasses</emphasis>.  Details on how to do this is described in 
 this chapter.
 </para>
 <para>
-As shown in the previous section (<xref linkend="simple_example">), the controller object is
+As shown in the previous section (<xref linkend="simple-example">), the controller object is
 specified at the top of your simulation file using the word <emphasis>controller</emphasis>:
 <screen>
 Controller <replaceable>myControllerClass</replaceable>.
@@ -258,7 +258,7 @@ of these concepts will become clearer in the rest of the documentation.
 </para>
 </sect1>
 
-<sect1 id="building_classes">
+<sect1 id="building-classes">
 <title>Building Classes</title>
 <para>
 <indexterm><primary>#</primary></indexterm>
@@ -270,7 +270,7 @@ template which defines the agent's behaviors.  This section describes how to
 construct and use these classes.
 </para>
 <para>
-The section Defining Classes (<xref linkend="defining_classes">) describes 
+The section Defining Classes (<xref linkend="defining-classes">) describes 
 how to define an empty class.  
 </para>
 <para>
@@ -279,9 +279,9 @@ define a class's behavior and <firstterm>variables</firstterm> which define
 the data that the class can hold.  This data can be used both to store 
 information about the state of the agent, or information required for 
 computation.  The section Defining Instance Variables 
-(<xref linkend="defining_instance_variables">) details how variables
+(<xref linkend="defining-instance-variables">) details how variables
 can be added to objects, while the section Defining Class Methods 
-(<xref linkend="defining_methods">) shows how method
+(<xref linkend="defining-methods">) shows how method
 are defined.  
 </para>
 <para>
@@ -289,7 +289,7 @@ Two special methods are critical for an agents behavior: one that
 gets called automatically when the agent is created, <function>init</function>, and another which is run automatically at every step of the simulation, 
 <function>iterate</function>.  These methods, and a few other special methods 
 are discussed in the section Special Method 
-Names (<xref linkend="special_method_names">)
+Names (<xref linkend="special-method-names">)
 </para>
 <para>
 Even after the class is defined, it will still not be present in the 
@@ -298,10 +298,10 @@ an agent.  In order to bring agents into the simulation, you must use the
 template to create <firstterm>instances</firstterm> 
 <indexterm><primary>instance</primary></indexterm>
 of the class.  The section on Creating and Destroying 
-Instances (<xref linkend="creating_destroying_instances">) describes how 
+Instances (<xref linkend="creating-destroying-instances">) describes how 
 instances of classes are created and destroyed.  
 </para>
-<sect2 id="defining_classes"><title>Defining Classes</title>
+<sect2 id="defining-classes"><title>Defining Classes</title>
 <para>
 <indexterm><primary>subclass</primary></indexterm>
 <indexterm><primary>aka</primary></indexterm>
@@ -372,7 +372,7 @@ the class' behavior by adding in methods and variables.
 </para>
 </sect2>
 
-<sect2 id="defining_instance_variables"><title>Defining Instance Variables</title>
+<sect2 id="defining-instance-variables"><title>Defining Instance Variables</title>
 <para>
 <indexterm><primary>instance variable</primary></indexterm>
 An <firstterm>instance variable</firstterm> 
@@ -409,7 +409,7 @@ Mobile : myMobile {
 </para>
 </sect2>
 
-<sect2 id="defining_methods"><title>Defining Methods</title>
+<sect2 id="defining-methods"><title>Defining Methods</title>
 <para>
 <indexterm><primary>keyword</primary></indexterm>
 <indexterm><primary>method definition</primary></indexterm>
@@ -503,7 +503,7 @@ other methods, their use in user simulations is discouraged.
 </note>
 </sect2>
 
-<sect2 id="optional_arguments"><title>Optional Arguments in Methods</title>
+<sect2 id="optional-arguments"><title>Optional Arguments in Methods</title>
 <indexterm><primary>instance variable</primary></indexterm>
 <para>
 Methods definitions may also specify <firstterm>optional arguments</firstterm>.  Optional
@@ -548,7 +548,7 @@ excluding each of the arguments:
 </para>
 </sect2>
 
-<sect2 id="special_method_names"><title>Special Method Names</title>
+<sect2 id="special-method-names"><title>Special Method Names</title>
 <para>
 Certain method names have special meaning in steve, in that they are called automatically
 by the simulation at special times.  These methods, in particular <function>init</function>
@@ -587,7 +587,7 @@ Unlike the <function>init</function> and <function>destroy</function> methods, <
 </itemizedlist>
 </sect2>
 
-<sect2 id="creating_destroying_instances"><title>Creating and Destroying Instances</title>
+<sect2 id="creating-destroying-instances"><title>Creating and Destroying Instances</title>
 <para>
 Creating a new instance of an object is called instantiating the object. Instantiating in steve is done using the new command.  Instantiation  creates a single new instance if no number is given, or as many objects as you want by preceding the command with a number.  The syntax follows: 
 <screen>
@@ -688,14 +688,14 @@ An <function>object</function> is an <emphasis>instance</emphasis> of a steve cl
 <para>
 <function>objects</function> cannot used in mathematical expressions as some of the other types can.
 Instead, <function>objects</function> are mainly used for one type of expression: method calling.
-Method calling is outlined in the section Method Calls (<xref linkend="method_calls">).
+Method calling is outlined in the section Method Calls (<xref linkend="method-calls">).
 </para>
 </sect3>
 <sect3><title>Conversion to Other Types</title>
 <para>
 Objects cannot be explicitly converted to other types.  
 They do, however, have meaning as "boolean" (true or false) expressions in control
-structures (<xref linkend="control_structures">).  If used in the context of a 
+structures (<xref linkend="control-structures">).  If used in the context of a 
 boolean expression (like an <function>if</function> statement,
 <xref linkend="if">), the expression is true only if the variable refers to an 
 active object.  This means that an object variable which has not yet been 
@@ -732,7 +732,7 @@ v = v / |v|.    # normalizes the vector by dividing it by it's own
 <para>
 Vectors cannot be converted to any other types.  
 They do, however, have meaning as "boolean" (true or false) expressions in control 
-structures (<xref linkend="control_structures">).  If used in the 
+structures (<xref linkend="control-structures">).  If used in the 
 context of a boolean expression (like an <function>if</function> statement,
 <xref linkend="if">), the vector will be true if it's length is greater
 than 0, and false if its length is equal to 0.  This is to say that only 
@@ -785,7 +785,7 @@ result of this operation is a vector.
 <para>
 Matrices cannot be converted to any other types.
 They do, however, have meaning as "boolean" (true or false) expressions in control 
-structures (<xref linkend="control_structures">).  If used in the 
+structures (<xref linkend="control-structures">).  If used in the 
 context of a boolean expression (like an <function>if</function> statement,
 <xref linkend="if">), the expression will be true if there are any non-zero values 
 in the matrix.  This means that a matrix of all zeros will be false, while all 
@@ -815,7 +815,7 @@ myList = { 1, "a", { "dog", "cow" } }.  # a list with a nested list
 </screen>
 </para>
 
-<sect3 id="list_operators"><title><function>list</function> Operators</title>
+<sect3 id="list-operators"><title><function>list</function> Operators</title>
 <indexterm><primary>operators</primary><secondary>list</secondary></indexterm> 
 <indexterm><primary>list operators</primary><secondary>push</secondary></indexterm> 
 <indexterm><primary>list operators</primary><secondary>pop</secondary></indexterm> 
@@ -1020,6 +1020,18 @@ the same exact variable key.  This means that two different lists, even if they
 contain "equal" data, will access different values in the hash.
 </para>
 
+<sect3><title><function>hash</function> Operators</title>
+<para>
+A list of the keys in a hash may be retrieved using the built-in function <function>keys</function>.
+This key list is often used to iterate through the items in a hash:
+<screen>
+foreach key in keys( myHash ): {
+	print myHash{ key }.
+}
+</screen>
+</para>
+</sect3>
+
 <sect3><title>Conversion to Other Types</title>
 <para>
 hashes cannot be converted to any other types.  
@@ -1081,7 +1093,7 @@ means that <function>data</function> variables can be successfully archived, whi
 cannot.  <emphasis>The only use for <function>data</function> variables is archiving 
 and dearchiving internal data</emphasis>.  For more information on using the 
 <function>data</function> type with plugins, see the section on 
-Archiving Plugin Data With The <function>data</function> Type (<xref linkend="archiving_data">).
+Archiving Plugin Data With The <function>data</function> Type (<xref linkend="archiving-data">).
 </para>
 </sect2>
 
@@ -1432,7 +1444,7 @@ for more information on automatically picking unique random seeds on systems whi
 </para>
 </sect2>
 
-<sect2 id="method_calls">
+<sect2 id="method-calls">
 <title>Method Calls</title>
 <para>
 <indexterm><primary>method calls</primary></indexterm>
@@ -1615,7 +1627,7 @@ is for certain mathematical functions.
 
 </sect1>
 
-<sect1 id="control_structures">
+<sect1 id="control-structures">
 <title>Program Control Structures</title>
 <para>
 <indexterm><primary>control structures</primary></indexterm>
@@ -1776,7 +1788,7 @@ for n=2, n<30, n+=2: {
 
 </sect1>
 
-<sect1 id="garbage_collection"><title>Garbage Collection and Memory Management</title>
+<sect1 id="garbage-collection"><title>Garbage Collection and Memory Management</title>
 <indexterm><primary>garbage collection</primary></indexterm>
 <indexterm><primary>memory management</primary></indexterm>
 
@@ -1852,7 +1864,7 @@ that no circular references exist.
 </sect1>
 
 
-<sect1 id="at_directives"><title>@-Directives</title>
+<sect1 id="at-directives"><title>@-Directives</title>
 <para>
 Before getting started with the code for a simulation or class, there are 
 often a few special lines at the top of a steve file which begin with an
@@ -1895,12 +1907,12 @@ There is no different between <function>@include</function> and
 <function>@include</function> directives are not only used to include 
 classes which come with the breve distribution, but also potentially classes 
 that you construct yourself.  It is often used in conjunction with the 
-<function>@path</function> directive (<xref linkend="at_path">) to specify 
+<function>@path</function> directive (<xref linkend="at-path">) to specify 
 the location of classes before loading them.
 </para>
 </sect2>
 
-<sect2 id="at_path">
+<sect2 id="at-path">
 <title><function>@path</function>: Specify a Search Path</title>
 <para>
 <indexterm><primary>@path</primary></indexterm>

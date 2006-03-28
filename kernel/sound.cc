@@ -29,9 +29,10 @@ brSoundMixer *brNewSoundMixer() {
 
 	mixer->streamShouldEnd = 0;
 
-	error = Pa_OpenDefaultStream(&mixer->stream, 0, 2, paInt32, MIXER_SAMPLE_RATE, 256, 0, brPASoundCallback, mixer);
+	error = Pa_OpenDefaultStream( &mixer->stream, 0, 2, paFloat32, MIXER_SAMPLE_RATE, 256, 0, brPASoundCallback, mixer );
 
 	if(error) {
+		// const Pa_GetLastHostErrorInfo *info = 
 		slMessage(DEBUG_ALL, "Error (%d) opening new sound stream!\n", error);
 		delete mixer;
 		return NULL;
@@ -105,12 +106,16 @@ brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency) {
 	return player;
 }
 
-brSoundPlayer *brNewPlayer(brSoundMixer *mixer, brSoundData *data) {
+brSoundPlayer *brNewPlayer( brSoundMixer *mixer, brSoundData *data, float speed ) {
 	brSoundPlayer *player = NULL;
 
 	if(!mixer) return NULL;
 
 	player = brNextPlayer(mixer);
+
+	if( speed <= 0.0 ) speed = 1.0;
+
+	player->speed = speed;
 
 	player->isSinewave = 0;
 	player->sound = data;
@@ -133,17 +138,17 @@ brSoundData *brLoadSound(char *file) {
 
 	data = new brSoundData;
 	data->length = (long)info.frames * info.channels;
-	data->data = new int[data->length];
+	data->data = new float[data->length];
 
-	sf_readf_int(fp, data->data, (long)info.frames);
+	sf_readf_float( fp, data->data, (long)info.frames );
 
 	upsample = MIXER_SAMPLE_RATE / info.samplerate;
 	if(info.channels == 1) upsample *= 2;
 
 	while(upsample != 1) {
-		int *newData;
+		float *newData;
 
-		newData = brSampleUp(data->data, data->length);
+		newData = brSampleUp( data->data, data->length );
 		delete[] data->data;
 		data->data = newData;
 		data->length *= 2;
@@ -156,8 +161,8 @@ brSoundData *brLoadSound(char *file) {
 	return data;
 }
 
-int *brSampleUp(int *in, long frames) {
-	int *out = new int[frames * 2 * sizeof(int)];
+float *brSampleUp( float *in, long frames ) {
+	float *out = new float[frames * 2 * sizeof(int)];
 	int n;
 
 	for(n=0;n<frames;n++) {
@@ -173,12 +178,12 @@ void brFreeSoundData(brSoundData *data) {
 	delete data;
 }
 
-int brPASoundCallback(void *ibuf, void *obuf, unsigned long fbp, PaTimestamp outTime, void *data) {
+int brPASoundCallback( void *ibuf, void *obuf, unsigned long fbp, PaTimestamp outTime, void *data ) {
 	brSoundMixer *mixer = (brSoundMixer*)data;
 	brSoundPlayer *player;
 	unsigned int n, p;
-	int *out = (int*)obuf;
-	int total;
+	float *out = (float*)obuf;
+	float total;
 	int channel;
 	unsigned int size = mixer->players.size();
 
@@ -199,14 +204,14 @@ int brPASoundCallback(void *ibuf, void *obuf, unsigned long fbp, PaTimestamp out
 
 			if(player->isSinewave) {
 				if(!player->finished) {
-					total += (int)(0x7fffffff * sin(player->phase) * player->volume / (int)size);
+					total += sin(player->phase) * player->volume / (float)size;
 
 					// last channel -- update the phase 
 					if(channel) player->phase += player->frequency;
 				}
 			} else { 
 				if(!player->finished) {
-					total += (player->sound->data[player->offset++] / (int)size);
+					total += ( player->sound->data[ (int)( player->offset += player->speed ) ] / (float)size );
 
 					if(player->offset >= player->sound->length) player->finished = 1;
 				}

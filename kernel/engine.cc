@@ -75,6 +75,10 @@ brEngine *brEngineNew(void) {
 	pthread_win32_process_attach_np();
 #endif
 
+	int zero = 0;
+
+	glutInit( &zero, NULL );
+
 	e = new brEngine;
 
 #if HAVE_LIBAVFORMAT

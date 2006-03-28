@@ -10,7 +10,7 @@
 
 <para>
 breve allows you to save snapshots of your simulation as PNG
-files (<xref linkend="saving_snapshots">), and movies as MPEG files (<xref linkend="saving_movies">).
+files (<xref linkend="saving-snapshots">), and movies as MPEG files (<xref linkend="saving-movies">).
 </para>
 
 <note><title>Note Available When Using breve_cli</title>
@@ -20,7 +20,7 @@ of breve, breve_cli.
 </para>
 </note>
 
-<sect1 id="saving_movies"><title>Saving Movies</title>
+<sect1 id="saving-movies"><title>Saving Movies</title>
 <para>
 You can save MPEG movies of <emphasis>breve</emphasis> simulations using the 
 class <ulink url="../classes/Movie.html">Movie.tz</ulink>.  First create an
@@ -31,7 +31,7 @@ option for exporting an MPEG movie.
 </para>
 </sect1>
 
-<sect1 id="saving_snapshots"><title>Saving Snapshots</title>
+<sect1 id="saving-snapshots"><title>Saving Snapshots</title>
 <para>
 To save a PNG snapshot of a running <emphasis>breve</emphasis> simulation, use the method 
 <ulink url="../classes/Control.html#save-snapshot">save-snapshot</ulink>

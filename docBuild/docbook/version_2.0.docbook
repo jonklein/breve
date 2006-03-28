@@ -4,7 +4,7 @@
 breve version 2.4 introduces several new features and changes.  
 </para>
 
-<sect1 id="new_features"> <title>New Features in Version 2.4</title>
+<sect1 id="new-features"> <title>New Features in Version 2.4</title>
 <para>
 
 Below are some of the major new features found in breve 2.4.  For a full 
@@ -29,7 +29,7 @@ Added TurtleDrawing class for drawing via Logo-like turtle commands
 
 </para> </sect1>
 
-<sect1 id="upgrading_plugins"> <title>Important Notes on Plugins in Version 2.4</title>
+<sect1 id="upgrading-plugins"> <title>Important Notes on Plugins in Version 2.4</title>
 <para>
 The inner workings of the breve plugin API have changed in version 2.4.  Plugins compiled
 for earlier versions of breve will not work with 2.3.  
@@ -42,23 +42,23 @@ code written in C will continue to function).  See the updated documentation on 
 </para>
 </sect1>
 
-<sect1 id="upgrading_simulations"> <title>Upgrading Simulations From Version 1.x</title>
+<sect1 id="upgrading-simulations"> <title>Upgrading Simulations From Version 1.x</title>
 
 <para>A number of changes introduced in breve 2.0 may require small changes to simulations written
 in previous versions of breve (1.x).  These changes and instructions on upgrading simulations 
 are discussed below.
 
 <itemizedlist> 
-<listitem><para>MultiBody functionality has been changed <xref linkend="multibody_changes"></para></listitem>
-<listitem><para>Arrays are now deprecated <xref linkend="array_depreciated"></para></listitem> 
-<listitem><para>The Data class has been removed <xref linkend="data_removed"></para></listitem> 
-<listitem><para>The Vision class has been removed <xref linkend="visions_removed"></para></listitem>
-<listitem><para>Texture loading has been changed <xref linkend="texture_changes"></para></listitem> 
+<listitem><para>MultiBody functionality has been changed <xref linkend="multibody-changes"></para></listitem>
+<listitem><para>Arrays are now deprecated <xref linkend="array-depreciated"></para></listitem> 
+<listitem><para>The Data class has been removed <xref linkend="data-removed"></para></listitem> 
+<listitem><para>The Vision class has been removed <xref linkend="visions-removed"></para></listitem>
+<listitem><para>Texture loading has been changed <xref linkend="texture-changes"></para></listitem> 
 </itemizedlist> 
 
 </para>
 
-<sect2 id="multibody_changes">
+<sect2 id="multibody-changes">
 <title>Changes to MultiBody Functionality</title>
 
 <para>MultiBodies are now optional.  Some MultiBody functionality has
@@ -94,7 +94,7 @@ MultiBody.</para>
 need to modify your simulation to account for the changes described
 above.</para> </sect2>
 
-<sect2 id="array_depreciated"> <title>Arrays Are Now
+<sect2 id="array-depreciated"> <title>Arrays Are Now
 Decprecated</title> <para>The use of arrays has now been deprecated
 and will be removed from a future release of breve: use lists
 instead</para>
@@ -109,7 +109,7 @@ repeated list accesses are as fast as array accesses. </para>
 <para>If your simulation uses arrays, you should convert them to lists
 to ensure compatibility in the future.</para> </sect2>
 
-<sect2 id="data_removed">
+<sect2 id="data-removed">
 <title>The Data Class is Now Obsolete</title>
 
 <para>The Data class has been deprecated and will be removed from a
@@ -121,7 +121,7 @@ now obsolete.  It will be removed from a future version of breve.</para>
 
 </sect2>
 
-<sect2 id="visions_removed">
+<sect2 id="visions-removed">
 <title>The "Visions" class has been removed</title>
 
 <para>The same functionality can be reproduced using the new "Camera"
@@ -150,7 +150,7 @@ containing interleaved red, green, blue and alpha pixels.</para>
 breve, it will need to use the Camera and Image objects to preform the
 same functionality in the current version of breve.</para></sect2>
 
-<sect2 id="texture_changes">
+<sect2 id="texture-changes">
 <title>Loading Textures From the Controller Class is Now Deprecated</title>
 
 <para>Obtaining a "texture number" by loading an image from the Control

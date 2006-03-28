@@ -26,7 +26,7 @@ The most complete support is the Mac OS X
 breve application.  In addition to the techniques described above, the 
 Mac OS X implementation also allows fully customized user interfaces to
 be loaded into running simulations.  The section on loading "nib" files
-(<xref linkend="nib_files">) describes how this is done.
+(<xref linkend="nib-files">) describes how this is done.
 </para>
 
 <sect1 id="menus"><title>The Simulation Menu and Contextual Menus</title>
@@ -127,7 +127,7 @@ to standard output.
 </para>
 </sect1>
 
-<sect1 id="nib_files"><title>Loading ".nib" Files for Customized Interfaces</title>
+<sect1 id="nib-files"><title>Loading ".nib" Files for Customized Interfaces</title>
 <note>
 <title>Mac OS X only</title>
 <para>

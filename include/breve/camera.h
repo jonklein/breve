@@ -141,7 +141,8 @@ class slCamera {
 
 		int _flags;
 
-		double _zClip;
+		float _zClip;
+		float _frontClip;
 
 		// used during drawing
 

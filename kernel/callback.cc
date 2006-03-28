@@ -163,7 +163,7 @@ void brCollisionCallback(void *p1, void *p2, int type, slVector *pos, slVector *
 			// Only call methods with the right count of parameters
 			if(meth->argumentCount==3){
 					
-				collider.set( o2 );
+				collider.set( o1 );
 				position.set((*pos));
 				facing.set((*face));
 				argPtr[0] = &collider;
@@ -172,7 +172,7 @@ void brCollisionCallback(void *p1, void *p2, int type, slVector *pos, slVector *
 			}
 			// Only 1 paramerter so not position and facing direction is needed
 			else if(meth->argumentCount==1){
-				collider.set( o2 );
+				collider.set( o1 );
 				argPtr[0] = &collider;
 			}
 			

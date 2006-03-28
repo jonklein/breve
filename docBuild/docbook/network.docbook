@@ -14,13 +14,13 @@ running breve simulations using a web browser.
 </para>
 <para>
 This chapter starts by describing how to create a NetworkServer object 
-which is used for both of these networking features (<xref linkend="network_server">).
+which is used for both of these networking features (<xref linkend="network-server">).
 Next, sending and receiving breve objects over the network is 
-described (<xref linkend="network_send_receive">).  The final
+described (<xref linkend="network-send-receive">).  The final
 section describes how to allow the control of a breve simulation
-via a web interface (<xref linkend="network_web">).
+via a web interface (<xref linkend="network-web">).
 </para>
-<sect1 id="network_server"><title>Starting a Network Server</title>
+<sect1 id="network-server"><title>Starting a Network Server</title>
 <para>
 To start a network server, make a new instance of the class 
 <ulink url="../classes/NetworkServer.html">NetworkServer</ulink>.
@@ -38,11 +38,11 @@ client and the server breve users can agree to.
 </para>
 </sect1>
 
-<sect1 id="network_send_receive"><title>Sending and Receiving breve Objects</title>
+<sect1 id="network-send-receive"><title>Sending and Receiving breve Objects</title>
 
 <para>
 In order to send and receive objects over the network, the objects must be prepared
-for archiving and dearchiving as described in <xref linkend="object_archiving">.
+for archiving and dearchiving as described in <xref linkend="object-archiving">.
 Read that section first to be certain that your objects can be properly encoded and 
 decoded.
 </para>
@@ -53,7 +53,7 @@ instance on the server machine.  It recreates the object and the
 state of all of its variables, except that variables of type <function>object</function> and
 <function>pointer</function> can not be automatically maintained without
 special treatment.  The reason for this and the solution are described in
-<xref linkend="object_archiving">.
+<xref linkend="object-archiving">.
 </para>
 
 <para>
@@ -80,7 +80,7 @@ in as arguments.
 
 </sect1>
 
-<sect1 id="network_web"><title>Using a Web-interface to a breve Simulation</title>
+<sect1 id="network-web"><title>Using a Web-interface to a breve Simulation</title>
 <para>
 The NetworkServer object can accept connections from regular web-browsers.  
 After the NetworkServer starts running, you can get the address that clients 
@@ -94,7 +94,7 @@ When a web-client connects to the server, it may do one of two things: it
 may execute a command in the simulation's controller object, or it 
 may request an HTML page.
 </para>
-<sect2 id="web_method_execution"><title>Executing Controller Commands Via Web Requests</title>
+<sect2 id="web-method-execution"><title>Executing Controller Commands Via Web Requests</title>
 <para>
 To execute a method in the controller instance, simply append the
 method name to the end of the URL.  If you wish to pass in either
@@ -119,7 +119,7 @@ Otherwise, the string itself is returned to the web-broswer.
 </para>
 </sect2>
 
-<sect2 id="serving_html_pages"><title>Serving HTML Pages Via Web Requests</title>
+<sect2 id="serving-html-pages"><title>Serving HTML Pages Via Web Requests</title>
 <para>
 If an HTTP request to a breve network server ends with ".html", 
 breve will try to provide the web-browser with an HTML file from
@@ -127,7 +127,7 @@ the local disk.  This feature is not typically used to serve
 informational web files as a normal web server might&mdash;instead,
 it should be used to serve files containing "links" that will 
 execute controller commands in the simulation, as described 
-above (<xref linkend="web_method_execution">).
+above (<xref linkend="web-method-execution">).
 </para>
 <para>
 Additionally, you can set an "index" page that will be served to

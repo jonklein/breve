@@ -23,13 +23,13 @@ the excellent ODE physical simulation engine.
 Even though it is incredibly useful, physical simulation can add complexity 
 and potential instabilities to a simulation.  This chapter begins by 
 with the section When to Use Physical Simulation 
-(<xref linkend="physics_vs_pseudo">), which discusses when it is appropriate 
+(<xref linkend="physics-vs-pseudo">), which discusses when it is appropriate 
 to use physical simulation and possible alternatives to full physical 
 simulation.  You should read this section first to help you decide whether
 physical simulation is necessary for your simulation.
 </para>
 
-<sect1 id="physics_vs_pseudo">
+<sect1 id="physics-vs-pseudo">
 <title>When to Use Physical Simulation</title>
 <para>
 <indexterm><primary>pseudo-physics</primary></indexterm>
@@ -69,7 +69,7 @@ true physical simulation and consider using your own "pseudo-physics" instead.
 
 </sect1>
 
-<sect1 id="enabling_physics">
+<sect1 id="enabling-physics">
 <title>Enabling Physical Simulation</title>
 <para>
 To write a simulation with physical simulation, your controller object
@@ -89,7 +89,7 @@ which physical simulation is automatically enabled.
 </para>
 </sect1>
 
-<sect1 id="fast_physics">
+<sect1 id="fast-physics">
 <title>Fast Physical Simulation</title>
 <para>
 The ODE simulation library supports an accelerated physics simulation which 
@@ -110,7 +110,7 @@ accuracy, or downwards for better performance.
 </para>
 </sect1>
 
-<sect1 id="stable_simulations">
+<sect1 id="stable-simulations">
 <title>Writing Stable Physical Simulations</title>
 <para>
 <indexterm><primary>stability</primary></indexterm>
@@ -133,7 +133,7 @@ Below are some things to watch out for when dealing with physical simulation.
 </para>
 </sect1>
 
-<sect1 id="physical_simulation_parts"><title>The Components of Physically Simulated Bodies</title>
+<sect1 id="physical-simulation-parts"><title>The Components of Physically Simulated Bodies</title>
 <para>
 <note><title>Changed in breve 2.0</title>
 <para>
@@ -233,7 +233,7 @@ created and destroyed.
 </sect2>
 </sect1>
 
-<sect1 id="dynamic_joints">
+<sect1 id="dynamic-joints">
 <title>Dynamically Creating and Destroying Joints</title>
 <para>
 <indexterm><primary>dynamic joints</primary></indexterm>

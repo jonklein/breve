@@ -20,10 +20,11 @@ Abstract : Sound (aka Sounds) {
 		soundPointer = loadSoundData(file).
 		return self.
 
-	+ to play:
-		% Begins playing this sound.
+	+ to play with-speed speed = 1.0 (float):
+		% Begins playing this sound.  The optional argument speed specifies 
+		% the speed (and accompanying frequency change) of the sound. 
 
-		if soundPointer: playSoundData(soundPointer).
+		if soundPointer: playSoundData(soundPointer, speed).
 
 	+ to destroy:
 		freeSoundData(soundPointer).

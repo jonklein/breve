@@ -18,6 +18,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#include <gsl/gsl_randist.h>
+
 double stEmRandomGauss();
 double stEmRandomExponential();
 double stEmRandomGamma(int ithEvent);
@@ -27,6 +29,13 @@ double stEmRandomGamma(int ithEvent);
 
 #include "kernel.h"
 
+int brIKeys(brEval arguments[], brEval *result, brInstance *instance) {
+	result->set( brEvalHashKeys( BRHASH( &arguments[ 0 ] ) ) );
+
+	return EC_OK;
+}
+
+
 /*!
 	\brief Returns a Gaussian random number.
 
@@ -34,8 +43,7 @@ double stEmRandomGamma(int ithEvent);
 */
 
 int brIRandomGauss(brEval arguments[], brEval *result, brInstance *instance) {
-	result->set( stEmRandomGauss() );
-	// BRDOUBLE(result) = gsl_ran_gaussian( RNG, 1.0);
+	result->set( gsl_ran_gaussian( instance->engine->RNG, 1.0) );
 	return EC_OK; 
 }
 
@@ -47,7 +55,7 @@ int brIRandomGauss(brEval arguments[], brEval *result, brInstance *instance) {
 
 int brIRandomExponential(brEval arguments[], brEval *result, brInstance *instance) {
 	result->set( stEmRandomExponential() );
-	// BRDOUBLE(result)  = stEmRandomExponential(RNG);
+	// BRDOUBLE(result)  = stEmRandomExponentialRNG);
 	return EC_OK; 
 }
 
@@ -60,7 +68,7 @@ int brIRandomExponential(brEval arguments[], brEval *result, brInstance *instanc
 int brIRandomGamma(brEval arguments[], brEval *result, brInstance *instance) {
 	int ithEvent = BRINT(&arguments[0]);
 	result->set( stEmRandomGamma(ithEvent) );
-	// BRDOUBLE(result) = gsl_ran_gamma(RNG, A, B);
+	// BRDOUBLE(result) = gsl_ran_gamma( instance->engine->RNG, A, B );
   
 	return EC_OK; 
 }
@@ -341,6 +349,8 @@ int brIStddev(brEval args[], brEval *target, brInstance *i) {
 /*@}*/
 
 void breveInitMathFunctions(brNamespace *n) {
+	brNewBreveCall(n, "keys", brIKeys, AT_LIST, AT_HASH, 0);
+
 	brNewBreveCall(n, "isinf", brIIsinf, AT_INT, AT_DOUBLE, 0);
 	brNewBreveCall(n, "isnan", brIIsnan, AT_INT, AT_DOUBLE, 0);
 	brNewBreveCall(n, "abs", brIAbs, AT_DOUBLE, AT_DOUBLE, 0);

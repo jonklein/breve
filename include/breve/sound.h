@@ -34,13 +34,14 @@ class brSoundMixer {
 };
 
 struct brSoundData {
-	int *data;
+	float *data;
 	unsigned long length;
 };
 
 struct brSoundPlayer {
 	brSoundData *sound;
-	unsigned int offset;
+	float offset;
+	float speed;
 	char finished;
 	char isSinewave;
 	double frequency;
@@ -50,14 +51,14 @@ struct brSoundPlayer {
 };
 #endif
 
-int *brSampleUp(int *in, long frames);
+float *brSampleUp( float *in, long frames );
 
 brSoundMixer *brNewSoundMixer();
 void brFreeSoundMixer(brSoundMixer *mixer);
 
 brSoundPlayer *brNextPlayer(brSoundMixer *mixer);
 
-brSoundPlayer *brNewPlayer(brSoundMixer *mixer, brSoundData *data);
+brSoundPlayer *brNewPlayer( brSoundMixer *mixer, brSoundData *data, float speed );
 brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency);
 
 brSoundData *brLoadSound(char *file);

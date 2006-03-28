@@ -19,11 +19,11 @@ applies to both.
 <para>
 This chapter 
 first describes how individual objects can be archived and dearchived 
-(<xref linkend="object_archiving">) and then how entire simulations can 
-be archived and dearchived (<xref linkend="simulation_archiving">).
+(<xref linkend="object-archiving">) and then how entire simulations can 
+be archived and dearchived (<xref linkend="simulation-archiving">).
 </para>
 
-<sect1 id="object_archiving">
+<sect1 id="object-archiving">
 <title>Saving and Loading Individual Objects</title>
 <para>
 <indexterm><primary>object archiving</primary></indexterm>
@@ -39,12 +39,12 @@ be archived and dearchived (<xref linkend="simulation_archiving">).
 This method is used to export and import individual objects or subsets of objects in
 a simulation.  When an object is dearchived with this method, a new instance 
 is created for the saved object and loaded into a running simulation.  
-This technique is in contrast to the method described in <xref linkend="simulation_archiving">, 
+This technique is in contrast to the method described in <xref linkend="simulation-archiving">, 
 which creates an entirely new simulation from an archived world.  The steps described here 
-also apply to sending and receiving objects over a network as described in <xref linkend="network_send_receive">.
+also apply to sending and receiving objects over a network as described in <xref linkend="network-send-receive">.
 </para>
 
-<sect2 id="archive_methods">
+<sect2 id="archive-methods">
 <title>Methods Called During Archiving/Dearchiving</title>
 <para>
 The special methods <function>archive</function> and <function>dearchive</function> are 
@@ -77,7 +77,7 @@ message.
 </para>
 </sect2>
 
-<sect2 id="simple_object_archiving">
+<sect2 id="simple-object-archiving">
 <title>Saving and Loading Objects With No Dependencies</title>
 <para>
 In a "simple" object archive, only a single object is encoded.  If the object has variable 
@@ -88,7 +88,7 @@ code or preparation is required.
 </para>
 </sect2>
 
-<sect2 id="complex_object_archiving">
+<sect2 id="complex-object-archiving">
 <title>Saving and Loading Objects With Dependencies</title>
 <para>
 Variables of type <function>object</function> and 
@@ -151,7 +151,7 @@ instead of "filling" an existing object.
 </sect2>
 </sect1>
 
-<sect1 id="simulation_archiving">
+<sect1 id="simulation-archiving">
 <title>Saving and Loading the Entire State of a Simulation</title>
 <para>
 <indexterm><primary>simulation archiving</primary></indexterm>
@@ -166,7 +166,7 @@ simulation</emphasis>.
 </para>
 <para>
 As with the archiving discussed in the previous section 
-(<xref linkend="object_archiving">, dependencies can also be used when 
+(<xref linkend="object-archiving">, dependencies can also be used when 
 archiving entire simulations.  In this case, the dependencies effect only 
 the order in which objects are dearchived, an issue that should not effect 
 most users.

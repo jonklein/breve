@@ -5,8 +5,15 @@ Controller ListTest.
 Control : ListTest {
 	+ to init:
 		newlist (list).
+		newhash (hash).
 
 		newlist = (self make-list).
+
+		newhash{ "dog" } = 1.
+		newhash{ 10 } = 2.
+		newhash{ self } = 2.
+
+		print keys( newhash ).
 
 		if | newlist | != 2: die "Wrong number of elements in $newlist".
 

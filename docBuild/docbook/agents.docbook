@@ -27,16 +27,16 @@ and Physically simulated Link objects (and their companion class, MultiBody)
 are described in the chapter on physical simulation (<xref linkend="physics">).
 </para>
 <para>
-The section A Simple Mobile agent (<xref linkend="mobile_agent">) shows a very basic
+The section A Simple Mobile agent (<xref linkend="mobile-agent">) shows a very basic
 mobile agent template which can be used to any mobile agent.  The appearance of the 
 agent can be customized in a number of ways&mdash;some basic options are described
-in the section Changing the Appearance of Agents (<xref linkend="agent_appearence">).
+in the section Changing the Appearance of Agents (<xref linkend="agent-appearence">).
 Controlling the motion of agents is described in the section Moving Agents Around
-the 3D World (<xref linkend="agent_motion">).  The final section describes how 
-events can be scheduled for specific times (<xref linkend="scheduling_events">).
+the 3D World (<xref linkend="agent-motion">).  The final section describes how 
+events can be scheduled for specific times (<xref linkend="scheduling-events">).
 </para>
 
-<sect1 id="mobile_agent">
+<sect1 id="mobile-agent">
 <title>A Simple Mobile Agent</title>
 <para>
 The majority of agents created in breve are simple mobile agents.  
@@ -80,7 +80,7 @@ chapter we'll see how to customize the appearance, motion and behavior of an age
 </para>
 </sect1>
 
-<sect1 id="agent_appearence">
+<sect1 id="agent-appearence">
 <title>Changing the Appearance of Agents</title>
 <para>
 There are a number of ways to customize the appearance of an agent.  As mentioned
@@ -104,11 +104,11 @@ self set-color to (0.0, 1.0, 0.0).
 <para>
 Objects can also be textured, represented as images or even as translucent glowing 
 blobs called "lightmaps".  All of these techniques are covered in detail in the 
-chapter on Graphics and Sound (<xref linkend="graphics_and_sound">).
+chapter on Graphics and Sound (<xref linkend="graphics-and-sound">).
 </para>
 </sect1>
 
-<sect1 id="agent_motion">
+<sect1 id="agent-motion">
 <title>Moving Agents Around the 3D World</title>
 <para>
 <indexterm><primary>move (method)</primary></indexterm>
@@ -154,7 +154,7 @@ self set-acceleration to (0, -9.8, 0).
 </para>
 </sect1>
 
-<sect1 id="scheduling_events">
+<sect1 id="scheduling-events">
 <title>Scheduling Events for a Specific Time</title>
 <para>
 <indexterm><primary>get-time (method)</primary></indexterm>

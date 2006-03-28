@@ -277,7 +277,7 @@ int slCamera::select(slWorld *w, int x, int y) {
 	gluPickMatrix((GLdouble)x, (GLdouble)(viewport[3] - y), 5.0, 5.0, viewport);
 	slClearGLErrors("picked matrix");
 
-	gluPerspective( 40.0, _fov, 0.01, _zClip );
+	gluPerspective( 40.0, _fov, _frontClip, _zClip );
 
 	// since the selection buffer uses unsigned ints for names, we can't 
 	// use -1 to mean no selection -- we'll use the number of objects 
@@ -360,7 +360,7 @@ int slCamera::vectorForDrag(slWorld *w, slVector *dragVertex, int x, int y, slVe
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	gluPerspective(40.0, _fov, 0.1, _zClip);
+	gluPerspective( 40.0, _fov, _frontClip, _zClip );
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -464,7 +464,7 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 	if (w->backgroundTexture > 0 && !(flags & DO_OUTLINE))
 		drawBackground( w );
 
-	gluPerspective( 40.0, _fov, 0.01, _zClip );
+	gluPerspective( 40.0, _fov, _frontClip, _zClip );
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -605,7 +605,7 @@ void slCamera::clear( slWorld *w ) {
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
-		gluPerspective(40.0, _fov, 0.01, _zClip);
+		gluPerspective(40.0, _fov, _frontClip, _zClip);
 		glBegin(GL_TRIANGLE_STRIP);
 			glVertex3f(-5, -4, -3);
 			glVertex3f(5, -4, -3);

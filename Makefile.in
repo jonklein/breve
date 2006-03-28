@@ -94,6 +94,7 @@ optimize_debug:
 	$(MAKE) EXTRACFLAGS='-g $(OPTFLAGS)'
 
 lib/libbreve.a: $(OBJ)
+	rm $@
 	$(AR) -cr $@ $(OBJ)
 	$(RANLIB) $@
 

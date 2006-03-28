@@ -67,7 +67,7 @@ int brIFreeSoundData(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIPlaySoundData(brEval args[], brEval *target, brInstance *i) {
-	brNewPlayer(i->engine->soundMixer, BRSOUNDDATAPOINTER(&args[0]));
+	brNewPlayer(i->engine->soundMixer, BRSOUNDDATAPOINTER(&args[0]), BRFLOAT(&args[1]) );
 	return EC_OK;
 }
 
@@ -159,7 +159,7 @@ int brISoundUnsupported(brEval args[], brEval *target, brInstance *i) {
 void breveInitSoundFunctions(brNamespace *n) {
 #if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
 	brNewBreveCall(n, "loadSoundData", brILoadSoundData, AT_POINTER, AT_STRING, 0);
-	brNewBreveCall(n, "playSoundData", brIPlaySoundData, AT_NULL, AT_POINTER, 0);
+	brNewBreveCall(n, "playSoundData", brIPlaySoundData, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
 	brNewBreveCall(n, "freeSoundData", brIFreeSoundData, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "newSinewave", brINewSinewave, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "freeSinewave", brIFreeSinewave, AT_NULL, AT_POINTER, 0);

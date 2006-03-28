@@ -21,7 +21,7 @@
 <!ENTITY network SYSTEM "network.docbook">
 <!ENTITY push SYSTEM "push.docbook">
 <!ENTITY source SYSTEM "source.docbook">
-<!ENTITY version_2.0 SYSTEM "version_2.0.docbook">
+<!ENTITY version-2.0 SYSTEM "version_2.0.docbook">
 ]>
 <book>
 <bookinfo>
@@ -38,7 +38,7 @@
 
 &preface;
 
-&version_2.0;
+&version-2.0;
 &introduction;
 &steve; 
 &agents;

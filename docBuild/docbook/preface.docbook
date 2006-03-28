@@ -29,12 +29,12 @@ by collecting it and organizing it into a single document.
 </para>
 <para>
 This document is a work in progress.  See the section on "Getting
-Help With breve" (<xref linkend="getting_help">) if this document fails to 
+Help With breve" (<xref linkend="getting-help">) if this document fails to 
 adequately describe any features or techniques.
 </para>
 </sect1>
 
-<sect1 id="getting_help">
+<sect1 id="getting-help">
 <title>Getting Help With breve</title>
 <para>There are several ways to get help using breve:
 <itemizedlist>

@@ -25,7 +25,7 @@ plus access to and familiarity with the GCC compiler.
 </para>
 </note>
 
-<sect1 id="plugin_api">
+<sect1 id="plugin-api">
 <title>The Plugin API: Writing Plugins</title>
 <note><title>The breve Plugin API</title>
 <para>
@@ -48,13 +48,13 @@ the 2.0 header file to ensure continued compatibility.
 <para>
 In order to write plugins for breve, you'll need to follow a few simple steps.
 <orderedlist>
-<listitem><para>compose C wrapper functions around your external code (C or C++), <xref linkend="c_wrappers"></para></listitem>
+<listitem><para>compose C wrapper functions around your external code (C or C++), <xref linkend="c-wrappers"></para></listitem>
 <listitem><para>create an "entry point function" in C which will load your functions into the breve engine <xref linkend="entrypoint"></para></listitem>
 <listitem><para>write a class (or classes) to interface with your newly created functions</para></listitem>
 </orderedlist>
 </para>
 
-<sect2 id="c_wrappers">
+<sect2 id="c-wrappers">
 <title>Writing C Wrapper Functions Around Existing Code</title>
 <para>
 The first step in composing a breve plugin is to write wrapper functions
@@ -379,7 +379,7 @@ Object : myNeuralNetwork {
 
 </sect1>
 
-<sect1 id="building_plugins">
+<sect1 id="building-plugins">
 <title>Building Plugins</title>
 <para>
 Once you've written your wrapper functions as described in the previous section, you'll need
@@ -448,7 +448,7 @@ require code from the standard math library, you may need to add <function>-lm</
 
 </sect1>
 
-<sect1 id="archiving_data">
+<sect1 id="archiving-data">
 <title>Archiving Plugin Data With The <function>data</function> Type</title>
 <para>
 <indexterm><primary>data archiving</primary></indexterm>
@@ -525,7 +525,7 @@ new functions:
 </para>
 </sect1>
 
-<sect1 id="using_plugins">
+<sect1 id="using-plugins">
 <title>Using Plugins in Simulations</title>
 <para>
 <indexterm><primary>@plugin</primary></indexterm>
