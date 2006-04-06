@@ -28,6 +28,7 @@ int cSampleTest(brEval args[], brEval *result, void *i) {
 /* The second test function just returns a value and has no inputs. */
 
 int cSampleTestII(brEval args[], brEval *result, void *i) {
+	BRPOINTER( result ) = NULL;
 	result->set( 3.14159 );
 
 	return EC_OK;

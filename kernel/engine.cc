@@ -77,8 +77,6 @@ brEngine *brEngineNew(void) {
 
 	int zero = 0;
 
-	glutInit( &zero, NULL );
-
 	e = new brEngine;
 
 #if HAVE_LIBAVFORMAT
