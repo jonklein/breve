@@ -79,7 +79,11 @@ int brMenuCallback(brEngine *e, brInstance *i, unsigned int n) {
 	if(!menu->enabled) return EC_OK;
 	if(!strcmp(menu->method, "")) return EC_OK;
 
-	return brMethodCallByName(i, menu->method, &eval);
+	brEngineLock( e );
+	int result = brMethodCallByName(i, menu->method, &eval);
+	brEngineUnlock( e );
+
+	return result;
 }
 
 brInstance *brClickAtLocation(brEngine *e, int x, int y) {
@@ -116,7 +120,10 @@ brInstance *brClickCallback(brEngine *e, int n) {
 	else theArg.set( (brInstance*)NULL );
 
 	argPtr[0] = &theArg;
+
+	brEngineLock( e );
 	brMethodCall(e->controller, method, argPtr, &eval);
+	brEngineUnlock( e );
 
 	brMethodFree(method);
 
