@@ -208,9 +208,9 @@ void slVclipData::realloc( int c ) {
 	// Delete the old pair arrays and resize
 
 	for ( unsigned int n = 0; n < maxCount; n++ )
-		delete pairArray[ n ];
+		delete[] pairArray[ n ];
 
-	delete pairArray;
+	delete[] pairArray;
 
 	// Create the new ones...
 
