@@ -76,27 +76,24 @@ int brIQProgramClear(brEval args[], brEval *target, brInstance *i) {
 int brIQSysTestProgram(brEval args[], brEval *target, brInstance *i) {
 	qgame::QSys *sys = (qgame::QSys *)BRPOINTER(&args[0]);
 	qgame::QProgram *prog = (qgame::QProgram *)BRPOINTER(&args[1]);
-	std::vector<qgame::TestCase> cases;
+	std::vector< qgame::TestCase > cases;
+	std::vector< brEval* >::iterator li;
 	qgame::QubitList qb;
 
 	// get the final measurement qubits...
 
 	brEvalListHead *list = BRLIST(&args[4]);
-	brEvalList *start = list->start;
 
-	while (start) {
-		qb.append( BRINT(&start->eval) );
-		start = start->next;
+	for( li = list->_vector.begin(); li != list->_vector.end(); li++ ) {
+		qb.append( BRINT( *li ) );
 	}
 
 	list = BRLIST(&args[2]);
-	start = list->start;
 
 	// generate the test cases... 
 
-	while(start) {
-		cases.push_back( qgame::TestCase( BRSTRING(&start->eval)));
-		start = start->next;
+	for( li = list->_vector.begin(); li != list->_vector.end(); li++ ) {
+		cases.push_back( qgame::TestCase( BRSTRING( *li ) ) );
 	}
 
 	qgame::Result result;
@@ -114,24 +111,24 @@ int brIQSysTestProgram(brEval args[], brEval *target, brInstance *i) {
  		result.avgExpOracles = -1;
  	}
 
-	list = brEvalListNew();
+	list = new brEvalListHead();
 
 	brEval eval;
 
 	eval.set( result.misses );
-	brEvalListInsert(list, list->count, &eval);
+	brEvalListInsert(list, list->_vector.size(), &eval);
 
 	eval.set( result.maxError );
-	brEvalListInsert(list, list->count, &eval);
+	brEvalListInsert(list, list->_vector.size(), &eval);
 
 	eval.set( result.avgError );
-	brEvalListInsert(list, list->count, &eval);
+	brEvalListInsert(list, list->_vector.size(), &eval);
 
 	eval.set( result.maxExpOracles );
-	brEvalListInsert(list, list->count, &eval);
+	brEvalListInsert(list, list->_vector.size(), &eval);
 
 	eval.set( result.avgExpOracles );
-	brEvalListInsert(list, list->count, &eval);
+	brEvalListInsert(list, list->_vector.size(), &eval);
 
 	target->set( list );
 

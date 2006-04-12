@@ -33,26 +33,11 @@
 	= evalList.c provides the interface to this data type.
 */
 
-/*!
-	\brief returns a new empty brEvalListHead.
+/**
+	Creates a new brEvalListHead
 */
 
-#define LIST_INDEX_SIZE	16
-
-brEvalListHead *brEvalListNew() {
-	brEvalListHead *head;
-
-	head = new brEvalListHead;
-
-	head->start = head->end = NULL;
-	head->count = 0;
-	head->retainCount = 0;
-
-	head->index = (brEvalList**)slMalloc(sizeof(brEvalList*) * LIST_INDEX_SIZE);
-	head->indexSize = LIST_INDEX_SIZE;
-	head->indexTop = -1;
-
-	return head;
+brEvalListHead::brEvalListHead() : brEvalObject() {
 }
 
 /*!
@@ -64,24 +49,11 @@ brEvalListHead *brEvalListNew() {
 	sets the retain count to 0.
 */
 
-void brEvalListFree(brEvalListHead *lh) {
-	brEvalList *list, *next;
+brEvalListHead::~brEvalListHead() {
+	std::vector< brEval* >::iterator i;
 
-	list = lh->start;
-
-	if(lh->retainCount > 0) return;
-
-	while(list) {
-		next = list->next;
-
-		delete list;
-
-		list = next;
-	}
-
-	if(lh->index) slFree(lh->index);
-
-	delete lh;
+	for( i = _vector.begin(); i != _vector.end(); i++ )
+		delete *i;
 }
 
 /*!
@@ -89,142 +61,56 @@ void brEvalListFree(brEvalListHead *lh) {
 	the given pointer.
 */
 
-int brEvalListInsert(brEvalListHead *head, int index, brEval *value) {
-	brEvalList *start = head->start;
-	brEvalList *newList;
+int brEvalListInsert( brEvalListHead *head, int index, brEval *value ) {
+	brEval *newEval;
 
-	// were moving elements -- update the index top
+	newEval = new brEval;
 
-	if( head->indexTop < index ) {
-		// skip to the highest indexed element
+	brEvalCopy( value, newEval );
 
-		int skip = index;
-
-		int newIndex = 0;
-
-		if( head->indexTop > 0 ) {
-			start = head->index[ head->indexTop ];
-			skip -= head->indexTop;
-			newIndex = head->indexTop;
-		}
-
-
-		// and now step through the list, updating the index because we can
-
-		while( skip-- ) {
-			if( !start ) return -1;
-
-			head->index[ newIndex++ ] = start;
-			start = start->next;
-		}
+	if( index > (int)head->_vector.size() ) {
+		return EC_ERROR;
+	} else if( index == (int)head->_vector.size() ) {
+		head->_vector.push_back( newEval );
 	} else {
-		start = head->index[ index];
+		std::vector< brEval* >::iterator i = head->_vector.begin() + index;
+
+		head->_vector.insert( i, 1, newEval );
 	}
 
-	head->indexTop = index - 1;
-
-	head->count++;
-
-	if(head->count >= head->indexSize) {
-		head->indexSize += 128;
-		head->index = (brEvalList**)slRealloc( head->index, sizeof(brEvalList*) * head->indexSize);
-	}
-
-	newList = new brEvalList;
-
-	brEvalCopy(value, &newList->eval);
-
-	if(start) {
-		newList->previous = start->previous;
-		newList->next = start;
-
-		if(start->previous) start->previous->next = newList;
-
-		start->previous = newList;
-
-		if(start == head->start) head->start = newList;
-	} else {
-		// after the last element of the list.
-		newList->previous = head->end;
-		newList->next = NULL;
-
-		if(head->end) head->end->next = newList;
-
-		head->end = newList;
-
-		if(head->start == NULL) head->start = newList;
-	}
-
-	return index;
+	return EC_OK;
 }
 
 int brEvalListRemove(brEvalListHead *head, int index, brEval *value) {
-	brEvalList *start = head->start;
+	std::vector< brEval* >::iterator i = head->_vector.begin() + index;
+	
+	brEvalCopy( *i, value );
 
-	if(head->indexTop >= index) head->indexTop = index - 1;
+	delete *i;
 
-	while(index--) {
-		if(!start) return -1;
-
-		start = start->next;
-	}
-
-	if(!start) return -1;
-
-	head->count--;
-
-	if(start->previous) start->previous->next = start->next;
-	else head->start = start->next;
-
-	if(start->next) start->next->previous = start->previous;
-	else head->end = start->previous;
-
-	brEvalCopy(&start->eval, value);
-
-	delete start;
+	head->_vector.erase( i );
 
 	return index;
 }
 
-brEvalList *brEvalListIndexLookup(brEvalListHead *l, int index) {
-	brEvalList *list;
+brEval *brEvalListIndexLookup( brEvalListHead *head, int index ) {
+	std::vector< brEval* >::iterator i = head->_vector.begin() + index;
 
-	if(index >= l->count || index < 0) return NULL;
-
-	if(l->indexTop > -1 && l->start != l->index[0]) {
-		printf("WARNING!  List index corrupted\n");
-	}
-
-	if(index > l->indexTop) {
-		if(l->indexTop < 0) {
-			l->indexTop = 0;
-			l->index[0] = l->start;
-		}
-
-		// start at the current top
-
-		list = l->index[l->indexTop];
-
-		// go until we find our index
-
-		while(index > l->indexTop) {
-			l->index[++l->indexTop] = list->next;
-			list = list->next;
-		}
-	}
-
-	return l->index[index];
+	return *i;
 }
 
-brEvalListHead *brEvalListCopy(brEvalListHead *l) {
+brEvalListHead *brEvalListCopy( brEvalListHead *head ) {
 	brEvalListHead *newList;
-	brEvalList *item = l->start;
+	std::vector< brEval* >::iterator i;
 
-	newList = brEvalListNew();
+	newList = new brEvalListHead();
 
-	while(item) {
-		brEvalListInsert(newList, newList->count, &item->eval);
-		item = item->next;
+	for( i = head->_vector.begin(); i != head->_vector.end(); i++ ) {
+		brEval *e = new brEval;
+
+		brEvalCopy( *i, e );
+
+		newList->_vector.push_back( e );
 	}
 
 	return newList;
@@ -247,35 +133,33 @@ brEvalListHead *brEvalListDeepCopy(brEvalListHead *l) {
 brEvalListHead *brDoEvalListDeepCopy(brEvalListHead *l, slList **s) {
 	brEvalListHead *newList;
 	brEval newSubList;
-	brEvalList *item = l->start;
+	std::vector< brEval* >::iterator i;
 
 	// we're now officially copying this list -- all future occurences should 
 	// refer to the copy, so we make a record entry for it 
 
-	newList = brEvalListNew();
+	newList = new brEvalListHead();
 
 	*s = slListPrepend(*s, brMakeListCopyRecord(l, newList));
 
-	while(item) {
+	for( i = l->_vector.begin(); i != l->_vector.end(); i++ ) {
 		brEvalListHead *copy;
 
 		// is this a list? have we seen it before? 
 
-		if( item->eval.type() == AT_LIST ) {
-			copy = brCopyRecordInList(*s, BRLIST(&item->eval));
+		if( (*i)->type() == AT_LIST ) {
+			copy = brCopyRecordInList(*s, BRLIST( *i ));
 
 			if(!copy) {
-				newSubList.set( brDoEvalListDeepCopy(BRLIST(&item->eval), s) );
-				brEvalListInsert(newList, newList->count, &newSubList);
+				newSubList.set( brDoEvalListDeepCopy(BRLIST( *i ), s) );
+				brEvalListInsert( newList, newList->_vector.size(), &newSubList );
 			} else {
 				newSubList.set( copy );
-				brEvalListInsert(newList, newList->count, &newSubList);
+				brEvalListInsert( newList, newList->_vector.size(), &newSubList );
 			}
 		} else {
-			brEvalListInsert(newList, newList->count, &item->eval);
+			brEvalListInsert( newList, newList->_vector.size(), *i );
 		}
-
-		item = item->next;
 	}
 
 	return newList;

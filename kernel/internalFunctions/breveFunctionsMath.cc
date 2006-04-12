@@ -316,16 +316,16 @@ int brITranspose(brEval args[], brEval *target, brInstance *i) {
 int brIStddev(brEval args[], brEval *target, brInstance *i) {
 	double sum = 0, sumsq = 0, top;
 	brEvalListHead *list = BRLIST(&args[0]);
-	brEvalList *start = list->start;
 	int n = 0;
+	std::vector< brEval* >::iterator li;
 
-	while(start) {
+	for( li = list->_vector.begin(); li != list->_vector.end(); li++ ) {
 		double value;
 
-		if( start->eval.type() == AT_INT ) {
-			value = BRINT(&start->eval);
-		} else if( start->eval.type() == AT_DOUBLE ) {
-			value = BRDOUBLE(&start->eval);
+		if( ( *li )->type() == AT_INT ) {
+			value = BRINT( *li );
+		} else if( ( *li )->type() == AT_DOUBLE ) {
+			value = BRDOUBLE( *li );
 		} else {
 			slMessage(DEBUG_ALL, "Internal function stddev expects a list of number values\n");
 			return EC_ERROR;
@@ -333,7 +333,6 @@ int brIStddev(brEval args[], brEval *target, brInstance *i) {
 
 		sum += value;
 		sumsq += value * value;
-		start = start->next;
 
 		n++;
 	}

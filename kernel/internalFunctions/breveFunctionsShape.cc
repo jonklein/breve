@@ -38,28 +38,28 @@ int brIShapeNew(brEval args[], brEval *target, brInstance *i) {
 int brIAddShapeFace(brEval args[], brEval *target, brInstance *i) {
 	slShape *s = BRSHAPEPOINTER(&args[0]);
 	brEvalListHead *list = BRLIST(&args[1]);
-	brEvalList *h;
-	slVector *face[list->count];
+	slVector *face[ list->_vector.size() ];
+	std::vector< brEval* >::iterator li;
 	int n = 0;
 
 	if (!s) return EC_OK;
 
-	if (list->count < 3) {
+	if ( list->_vector.size() < 3 ) {
 		// stEvalError(i->engine, EE_TYPE, "Adding a face to a shape requires a list of at least 3 vectors");
 		return EC_ERROR;
 	}
 
-	for (h = list->start; h; h = h->next) {
-		if ( h->eval.type() != AT_VECTOR ) {
+	for( li = list->_vector.begin(); li != list->_vector.end(); li++ ) {
+		if ( ( *li )->type() != AT_VECTOR ) {
 			slFree(face);
 			stEvalError(i->engine, EE_TYPE, "Adding a face to a shape requires a list of vectors");
 			return EC_ERROR;
 		}
 
-		face[n++] = &BRVECTOR(&h->eval);
+		face[ n++ ] = &BRVECTOR( *li );
 	}
 
-	slAddFace(s, face, list->count);
+	slAddFace( s, face, list->_vector.size() );
 
 	return EC_OK;
 }
@@ -161,7 +161,7 @@ int brIDataForShape(brEval args[], brEval *target, brInstance *i) {
 
 	serialShape = slSerializeShape(BRSHAPEPOINTER(&args[0]), &length);
 
-	target->set( brDataNew(serialShape, length) );
+	target->set( new brData( serialShape, length ) );
 
 	slFree(serialShape);
 

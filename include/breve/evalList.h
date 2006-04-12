@@ -1,5 +1,4 @@
-/*****************************************************************************
- *                                                                           *
+/***************************************************************************** *                                                                           *
  * The breve Simulation Environment                                          *
  * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
  *                                                                           *
@@ -18,6 +17,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#include <vector>
+
 /*!
 	\brief A breve/steve list datatype.
 
@@ -26,31 +27,16 @@
 	random-access.  Reference counting enabled.
 */
 
-struct brEvalListHead {
-	int count;
-	int retainCount;
-	brEvalList *start;
-	brEvalList *end;
+class brEvalListHead: public brEvalObject {
+	public:
+		brEvalListHead();
+		~brEvalListHead();
 
-	int indexSize;
-	int indexTop;
-	brEvalList **index;
+		std::vector< brEval* > _vector;
+
+		inline std::vector< brEval* > &getVector() { return _vector; }
 };
 
-/*!
-	\brief An element in an eval-list.
-
-	Used in conjunction with brEvalListHead, these are the elements of the 
-	doubly-linked list.
-*/
-
-struct brEvalList {
-	brEval eval;
-
-	brEvalList *next;
-	brEvalList *previous;
-};
- 
 /*!
 	\brief Used to store temporary data for list-copying.
 
@@ -70,9 +56,6 @@ typedef struct brEvalListCopyRecord brEvalListCopyRecord;
 extern "C" {
 #endif
 
-DLLEXPORT brEvalListHead *brEvalListNew(void);
-void brEvalListFree(brEvalListHead *);
-
 int brEvalListCompare(const void *, const void *);
 
 int stDoEvalListIndex(brEvalListHead *, int, brEval *);
@@ -88,7 +71,7 @@ brEvalListHead *brEvalListCopy(brEvalListHead *);
     Updates the index as far as it can as it traverses the list.
 */  
 
-brEvalList *brEvalListIndexLookup(brEvalListHead *, int);
+brEval *brEvalListIndexLookup( brEvalListHead*, int );
 
 /*!
 	\brief Inserts an element into the list, with its value taken from

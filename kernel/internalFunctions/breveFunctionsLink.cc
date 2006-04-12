@@ -351,7 +351,7 @@ int brILinkGetPenetratingObjects(brEval args[], brEval *target, brInstance *i) {
 	brEval object;
 	unsigned int n;
 
-	head = brEvalListNew(); 
+	head = new brEvalListHead(); 
 
 	penetrations = l->userDataForPenetratingObjects(i->engine->world);
 

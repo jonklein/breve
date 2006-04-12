@@ -181,9 +181,7 @@ void stGCUnretainAndCollectPointer(void *pointer, int type) {
 */
 	
 void brEvalListRetain(brEvalListHead *lh) {
-	if(!lh) return;
-
-	lh->retainCount++;
+	lh->retain();
 }
 	
 /*!
@@ -193,9 +191,7 @@ void brEvalListRetain(brEvalListHead *lh) {
 */
 	
 void brEvalListUnretain(brEvalListHead *lh) {
-	if(!lh) return;
-
-	lh->retainCount--;
+	lh->unretain();
 }	   
 		
 /*! 
@@ -205,7 +201,7 @@ void brEvalListUnretain(brEvalListHead *lh) {
 */  
 
 void brEvalListCollect(brEvalListHead *lh) {
-	if(lh->retainCount < 1) brEvalListFree(lh);
+	if( lh->_retainCount < 1 ) delete lh;
 }
 
 /*!
@@ -213,7 +209,7 @@ void brEvalListCollect(brEvalListHead *lh) {
 */
 
 void brEvalHashRetain(brEvalHash *h) {
-	h->retainCount++;
+	h->retain();
 }
 
 /*!
@@ -221,7 +217,7 @@ void brEvalHashRetain(brEvalHash *h) {
 */
 
 void brEvalHashUnretain(brEvalHash *h) {
-	h->retainCount--;
+	h->unretain();
 }
 
 /*!
@@ -232,5 +228,5 @@ void brEvalHashUnretain(brEvalHash *h) {
 */
 
 void brEvalHashCollect(brEvalHash *h) {
-	if(h->retainCount < 1) brEvalHashFree(h);
+	if( h->_retainCount < 1 ) delete h;
 }

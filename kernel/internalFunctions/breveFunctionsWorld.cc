@@ -265,7 +265,7 @@ int brIGetNeighbors(brEval args[], brEval *target, brInstance *i) {
 	std::vector< void* >::iterator wi;
 	brEval eval;
 
-	target->set( brEvalListNew() );
+	target->set( new brEvalListHead() );
 
 	std::vector< void* > &neighbors = wo->getNeighborData();
 

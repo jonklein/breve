@@ -24,26 +24,18 @@
 	\brief Creates a new brData struct from a pointer and a data length.
 */
 
-brData *brDataNew(void *info, int length) {
-	brData *d;
-
-	d = new brData;
-
-	d->length = length;
-	d->retainCount = 0;
-	d->data = new unsigned char[length];
-	memcpy(d->data, info, d->length);
-
-	return d;
+brData::brData(void *inData, int inLen ) : brEvalObject() {
+	length = inLen;
+	data = new unsigned char[ inLen ];
+	memcpy( data, inData, length );
 }
 
 /*!
 	\brief Frees a brData struct.
 */
 
-void brDataFree(brData *d) {
-	delete[] d->data;
-	delete d;
+brData::~brData() {
+	delete[] data;
 }
 
 /*!
@@ -51,8 +43,7 @@ void brDataFree(brData *d) {
 */
 
 void brDataRetain(brData *d) {
-	if(!d) return;
-	d->retainCount++;
+	d->retain();
 }
 
 /*!
@@ -62,8 +53,7 @@ void brDataRetain(brData *d) {
 */
 
 void brDataUnretain(brData *d) {
-	if(!d) return;
-	d->retainCount--;
+	d->unretain();
 }
 
 /*!
@@ -73,7 +63,7 @@ void brDataUnretain(brData *d) {
 */
 
 void brDataCollect(brData *d) {
-	if(d->retainCount < 1) brDataFree(d);
+	if(d->_retainCount < 1) delete d;
 }
 
 /*!
@@ -100,8 +90,8 @@ char *brDataHexEncode(brData *d) {
 	Used for archiving and XML networking.
 */
 
-brData *brDataHexDecode(char *string) {
-    brData *d;
+brData *brDataHexDecode( char *string ) {
+	unsigned char *tmpData;
     int length;
     int n;
     int l;
@@ -109,21 +99,18 @@ brData *brDataHexDecode(char *string) {
     if(!string) return NULL;
 
     length = strlen(string);
+
     if((length % 2) || length < 0) {
         slMessage(DEBUG_ALL, "warning: error decoding hex data string (length = %d)\n", length);
         return NULL;
     }
 
-    d = new brData;
+	tmpData = new unsigned char[ length ];
 
-    d->length = length / 2;
-    d->data = new unsigned char[d->length];
-	d->retainCount = 0;
-
-    for(n=0;n<d->length;n++) {
+    for( n = 0; n < length; n++ ) {
         sscanf(&string[n * 2], "%2x", &l);
-        ((char*)d->data)[n] = l & 0xff;
+        tmpData[ n ] = l & 0xff;
     }
 
-    return d;
+    return new brData( tmpData, length );
 }

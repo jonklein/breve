@@ -18,10 +18,10 @@ BraitenbergControl : BraitenbergDemolition {
 		rampShape (object).
 		ramp (object).
 
-		rampShape = new Cube init-with size ( 10, .1, 8 ).
+		rampShape = new Cube init-with size ( 10, .1, 15 ).
 
 		self enable-fast-physics.
-		self set-fast-physics-iterations to 10.
+		self set-fast-physics-iterations to 15.
 
 		ramp = new Stationary.
 		ramp register with-shape rampShape

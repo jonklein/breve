@@ -21,6 +21,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <vector>
+
+#include "breveEval.h"
 
 /*
 	The breve Simulation Environment plugin API version 2.3
@@ -38,7 +41,8 @@
 #define stHash brEvalHash
 #define stEvalList brEvalList
 #define stEvalListHead brEvalListHead
-#define stNewEvalList brEvalListNew
+#define stNewEvalList() 	(new brEvalListHead())
+#define brEvalListNew() 	(new brEvalListHead())
 #define stPluginFindFile brPluginFindFile
 
 #define STINT		BRINT
@@ -170,29 +174,14 @@ class brEval {
 		unsigned char _type;
 };
 
-/*
-	Lists in breve are held internally by the brEvalListHead which
-	holds a doubly-linked list of brEvalList structures.  
-
-	Do not modify this structure.
-*/
-
 struct brEvalListHead {
-    int count;
+	// Warning: these variables may become private in the future -- use 
+	// the getVector() accessor to ensure forward compatibility.
     int retainCount;
-    brEvalList *start;
-    brEvalList *end;
+    std::vector< brEval* > _vector;
 
-    int indexSize;
-    int indexTop;
-    brEvalList **index;
-};
 
-struct brEvalList {
-    brEval eval;
-
-    brEvalList *next;
-    brEvalList *previous;
+    inline std::vector< brEval* > &getVector() { return _vector; }
 };
 
 /*
@@ -214,10 +203,9 @@ void brDataFree(brData *data);
 	Don't worry about freeing brEvalLists, this is done by the engine.
 */
 
-brEvalListHead *brEvalListNew(void);
-int brEvalListInsert(brEvalListHead *head, int index, brEval *value);
+int brEvalListInsert( brEvalListHead *head, int index, brEval *value );
 
-#define brEvalListAppend(a, eval) brEvalListInsert((a), (a)->count, (eval))
+#define brEvalListAppend( a, eval ) brEvalListInsert( (a), (a)->_vector.size(), (eval) )
 
 /* Use these macros to treat brEval pointers as specific types. */
 
@@ -264,19 +252,7 @@ int brMethodCallByNameWithArgs(void *instance, char *name, brEval **args, int co
 void slMessage(int level, const char *fmt, ...);
 
 	/*
-	 * The slMalloc() function allocates space for an object of _size_ bytes
-	 * and initializes the space to all bits zero.
-	 *
-	 * The slFree() function makes the space allocated to the object
-	 * pointed to by _ptr_ available for further allocation.
-	 *
-	 * The slRealloc() function changes the size of the object pointed to
-	 * by _ptr_ to _size_ bytes and returns a pointer to the object.
-	 *
-	 * It is an error to call slFree() or slRealloc() for an object which
-	 * was not returned by a previous call to slMalloc() or slRealloc().
-	 *
-	 * The slMalloc() and slRealloc() functions return NULL on error.
+	 * Macros for obsolete functions.
 	 */
 
 #define slMalloc(n) calloc(1,n)

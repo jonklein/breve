@@ -153,26 +153,25 @@ int brIGetValue(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIFeedForward(brEval args[], brEval *target, brInstance *i) {
-	brEvalListHead *inputs, *outputs;
-	brEvalList *list;
+	brEvalListHead *inputs;
 	snFFLayer *outputLayer, *inputLayer;
+	std::vector< brEval* >::iterator li;
 	int n = 0;
 
 	outputLayer = BRFFLAYERPOINTER(&args[0]);
 	inputLayer = outputLayer->input;
 
 	inputs = BRLIST(&args[1]);
-	outputs = BRLIST(&args[2]);
 
-	if (inputs->count != inputLayer->count) {
-		slMessage(DEBUG_ALL, "feedForward expects list matching size of network input layer (%d inputs, list is size %d)", inputLayer->count, inputs->count);
+	if ( inputs->_vector.size() != inputLayer->count ) {
+		slMessage(DEBUG_ALL, "feedForward expects list matching size of network input layer (%d inputs, list is size %d)", inputLayer->count, inputs->_vector.size() );
 		return EC_ERROR;
 	}
 
-	for (list = inputs->start; list; list = list->next)
-		inputLayer->values[n++] = BRDOUBLE(&list->eval);
+	for( li = inputs->_vector.begin(); li != inputs->_vector.end(); li++ ) 
+		inputLayer->values[n++] = BRDOUBLE( *li );
 
-	snFeedForward(outputLayer);
+	snFeedForward( outputLayer );
 
 	return EC_OK;
 }

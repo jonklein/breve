@@ -169,14 +169,13 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 		{
 			std::vector<char*> textList;
 			std::vector<char*>::iterator ti;
+			std::vector< brEval* >::iterator li;
 			brEvalListHead *listHead;
-			brEvalList *list;
 			size_t len = 5;
 	
 			listHead = BRLIST(e);
-			list = listHead->start;
 	
-			if (!list)
+			if ( listHead->_vector.size() == 0 )
 				return slStrdup("{ }");
 	
 			if (slInList(*seen, listHead)) {
@@ -189,14 +188,13 @@ char *brFormatEvaluationWithSeenList(brEval *e, brInstance *i, slList **seen) {
 	
 			*seen = slListPrepend(*seen, listHead);
 	
-			while (list) {
+			for( li = listHead->_vector.begin(); li != listHead->_vector.end(); li++ ) {
 				char *newString;
 	
-				newString = brFormatEvaluationWithSeenList(&list->eval, i, seen);
+				newString = brFormatEvaluationWithSeenList( *li, i, seen);
 				textList.push_back(newString);
 	
 				len += strlen(newString) + 2;
-				list = list->next;
 			}
 			result = (char *)slMalloc(len);
 	

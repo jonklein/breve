@@ -181,7 +181,7 @@ slVclipData::slVclipData() {
 	pairArray = new unsigned char*[ maxCount ];
 
 	for ( unsigned int n = 0; n < maxCount; ++n)
-		pairArray[n] = new unsigned char[ maxCount ];
+		pairArray[ n ] = new unsigned char[ maxCount ];
 }
 
 slVclipData::~slVclipData() {
@@ -205,12 +205,21 @@ void slVclipData::realloc( int c ) {
 
 	if ( count < maxCount ) return;
 
+	// Delete the old pair arrays and resize
+
+	for ( unsigned int n = 0; n < maxCount; n++ )
+		delete pairArray[ n ];
+
+	delete pairArray;
+
+	// Create the new ones...
+
 	while ( count >= maxCount ) maxCount *= 2;
 
 	pairArray = new unsigned char*[ maxCount ];
 
 	for (unsigned int n = 0; n < maxCount; ++n) {
-		pairArray[n] = new unsigned char[ maxCount ];
+		pairArray[ n ] = new unsigned char[ maxCount ];
 	}
 }
 

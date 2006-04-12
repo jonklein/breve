@@ -39,8 +39,8 @@ plugin files included with the breve distribution.  These samples show how to
 build simple plugins for Mac OS X, Linux and Windows.
 </para>
 <para>
-A number of the names and symbols have been changed from versions of the breve plugin API
-prior to version 2.0, though the older symbols should be preserved for backward
+A number of the names and symbols have been changed from versions of the breve plugin 
+API prior to version 2.0, though the older symbols should be preserved for backward
 compatibility.  Still, you will most likely have to rebuild your plugin using 
 the 2.0 header file to ensure continued compatibility.
 </para>

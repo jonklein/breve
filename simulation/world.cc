@@ -457,23 +457,18 @@ double slWorld::step( double stepSize, int *error ) {
 				}
 			} 
 
-			if((*flags & BT_CALLBACK) && _collisionCallback && w1 && w2 && (&c->points[x] != NULL) ) {
-				slVector *pos = new slVector();
-				slVector *face = new slVector();
-				pos->x = c->points[0].x;
-				pos->y = c->points[0].y;
-				pos->z = c->points[0].z;
-				face->x = c->normal.x;
-				face->y = c->normal.y;
-				face->z = c->normal.z;
+			if( (*flags & BT_CALLBACK) && _collisionCallback && w1 && w2 && (&c->points[x] != NULL) ) {
+				slVector pos;
+				slVector face;
+				pos.x = c->points[0].x;
+				pos.y = c->points[0].y;
+				pos.z = c->points[0].z;
+				face.x = c->normal.x;
+				face.y = c->normal.y;
+				face.z = c->normal.z;
 				
-				_collisionCallback( w1->getCallbackData(), w2->getCallbackData(), CC_NORMAL, pos, face );
+				_collisionCallback( w1->getCallbackData(), w2->getCallbackData(), CC_NORMAL, &pos, &face );
 			}
-
-			//if((*flags & BT_CALLBACK) && _collisionCallback && w1 && w2) {
-			//	 _collisionCallback( w1->getCallbackData(), w2->getCallbackData(), CC_NORMAL );
-			//}
-			
 		}
 	}
 

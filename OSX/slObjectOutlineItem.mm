@@ -58,7 +58,7 @@
 		evalInstance = (stInstance*)BRINSTANCE( mEval )->userData;
 		[self setEvalObject: evalInstance->type];
     } else if([self getExpandable] && mEval->type() == AT_LIST) {
-        childCount = BRLIST( mEval )->count;
+        childCount = BRLIST( mEval )->_vector.size();
     } else if([self getExpandable] && isArray) {
         childCount = stv->type->_arrayCount;
     } else {
@@ -145,7 +145,7 @@
     } 
 
 	if( mEval->type() == AT_LIST ) {
-		[self updateChildCount: BRLIST( mEval )->count];
+		[self updateChildCount: BRLIST( mEval )->getVector().size() ];
 	}
 
     if(mEval->type() == AT_INSTANCE) {

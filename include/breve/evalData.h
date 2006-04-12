@@ -22,18 +22,18 @@
 	\brief Holds arbitrary data of a given length.
 */
 
-struct brData {
-	unsigned char *data;
-	int length;
-	int retainCount;
+class brData: public brEvalObject {
+	public:
+		brData( void *inData, int inLength );
+		~brData();
+
+		unsigned char *data;
+		int length;
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-DLLEXPORT brData *brDataNew(void *, int);
-DLLEXPORT void brDataFree(brData *);
-
 void brDataRetain(brData *);
 void brDataUnretain(brData *);
 void brDataCollect(brData *);

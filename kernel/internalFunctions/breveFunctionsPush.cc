@@ -253,7 +253,7 @@ brEvalListHead *brevePushCodeToEvalList(const push::Code *code) {
 	brEval e;
 	unsigned int n;
 
-	l = brEvalListNew();
+	l = new brEvalListHead();
 
 	for(n = 0; n < (*code)->get_stack().size(); n++ ) {
 		if( ((*code)->get_stack()[n])->get_stack().size() == 0 ) {

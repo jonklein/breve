@@ -322,7 +322,7 @@ inline int stToInt(brEval *e, brEval *t, stRunInstance *i) {
 			else resultCode = 0;
 			break;
 		case AT_LIST:
-			resultCode = BRLIST(e)->count;
+			resultCode = BRLIST(e)->_vector.size();
 			break;
 		case AT_VECTOR:
 			stEvalError(i->instance->type->engine, EE_CONVERT, "cannot convert type \"vector\" to type \"int\"");
@@ -378,7 +378,7 @@ int stToDouble(brEval *e, brEval *t, stRunInstance *i) {
 			break;
 		case AT_LIST:
 			theList = BRLIST(e);
-			resultCode = (double)theList->count;
+			resultCode = (double)theList->_vector.size();
 			break;
 		case AT_VECTOR:
 			stEvalError(i->instance->type->engine, EE_CONVERT, "cannot convert vector expression to type \"double\"");
@@ -534,7 +534,7 @@ static int stEvalLoadList(stLoadExp *e, stRunInstance *i, brEval *target) {
 		// if there is nothing here (uninitialized list), then we create an empty one.  
 		// we retain it, since it's already stored as a variable.
 
-		*(brEvalListHead **)pointer = brEvalListNew();
+		*(brEvalListHead **)pointer = new brEvalListHead();
 		stGCRetainPointer( *(void **)pointer, AT_LIST );
 	}
 
@@ -553,8 +553,8 @@ static int stEvalLoadHash(stLoadExp *e, stRunInstance *i, brEval *target) {
 		// if there is nothing here (uninitialized list), then we create an empty one.  
 		// we retain it, since it's already stored as a variable.
 
-		*(brEvalHash **)pointer = brEvalHashNew();
-		stGCRetainPointer(*(void **)pointer, AT_LIST);
+		*(brEvalHash **)pointer = new brEvalHash();
+		stGCRetainPointer( *(void **)pointer, AT_HASH );
 	}
 
 	target->set( *(brEvalHash **)pointer );
@@ -624,7 +624,7 @@ int stLoadVariable(void *variable, unsigned char type, brEval *e, stRunInstance 
 			// we retain it, since it's now stored as a variable.
 
 			if (!*(brEvalListHead **)variable) {
-				*(brEvalListHead **)variable = brEvalListNew();
+				*(brEvalListHead **)variable = new brEvalListHead();
 				stGCRetainPointer(*(void **)variable, AT_LIST);
 			}
 
@@ -635,7 +635,7 @@ int stLoadVariable(void *variable, unsigned char type, brEval *e, stRunInstance 
 				// if there is nothing here (uninitialized hash), then we create an empty hash.  
 				// we retain it, since it's stored as a variable.
 
-				*(brEvalHash **)variable = brEvalHashNew();
+				*(brEvalHash **)variable = new brEvalHash();
 				stGCRetainPointer(*(void **)variable, AT_HASH);
 			}
 
@@ -737,11 +737,11 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 
 			break;
 		case AT_LIST:
-			if (!BRLIST(e)) {
+			if ( !BRLIST(e) ) {
 				// if this is an empty list, just allocate some space,
 				// and mark it.  it will be retained later.
 
-				e->set( brEvalListNew() );
+				e->set( new brEvalListHead() );
 			} else if (*(brEvalListHead **)variable != BRLIST(e)) {
 				// overwriting an old list at this location
 
@@ -755,7 +755,7 @@ int stSetVariable(void *variable, unsigned char type, stObject *otype, brEval *e
 			// if this is an empty hash, just allocate some space...
 
 			if (!BRHASH(e)) {
-				e->set( brEvalHashNew() );
+				e->set( new brEvalHash() );
 			} else if(*(brEvalHash **)variable != BRHASH(e)) {
 				// overwriting an old hash at this location
 				stGCUnretainAndCollectPointer(*(void **)variable, AT_HASH);
@@ -834,7 +834,7 @@ RTC_INLINE int stEvalTruth(brEval *e, brEval *t, stRunInstance *i) {
 			return EC_OK;
 			break;
 		case AT_LIST:
-			t->set( (BRPOINTER(e) != NULL && (BRLIST(e))->count != 0) );
+			t->set( ( BRPOINTER(e) != NULL && ( BRLIST( e ) )->_vector.size() != 0 ) );
 			return EC_OK;
 			break;
 		case AT_VECTOR:
@@ -864,11 +864,11 @@ RTC_INLINE int stEvalTruth(brEval *e, brEval *t, stRunInstance *i) {
 
 RTC_INLINE int stEvalFree(stFreeExp *s, stRunInstance *i, brEval *t) {
 	brEval result;
-	brEvalList *list;
 	int resultCode;
 	int finished = 0;
 
 	resultCode = stExpEval3(s->expression, i, &result);
+
 	if (resultCode != EC_OK) return EC_ERROR;
 
 	if (result.type() == AT_INSTANCE) {
@@ -885,21 +885,19 @@ RTC_INLINE int stEvalFree(stFreeExp *s, stRunInstance *i, brEval *t) {
 		if (BRINSTANCE(&result)->status == AS_ACTIVE)
 			brInstanceRelease(BRINSTANCE(&result));
 	} else if (result.type() == AT_LIST) {
-		list = (BRLIST(&result))->start;
+		std::vector< brEval* >::iterator li;
 
-		while (list) {
-			if (list->eval.type() == AT_INSTANCE) {
-				if (!BRINSTANCE(&list->eval))
+		for( li = BRLIST( &result )->_vector.begin(); li != BRLIST( &result )->_vector.end(); li++ ) {
+			if ( ( *li )->type()  == AT_INSTANCE) {
+				if ( !BRINSTANCE( *li ) )
 					slMessage(DEBUG_ALL, "warning: attempt to free uninitialized object\n");
 				else {
 					// if we're freeing ourself (the calling instance) then we will return EC_STOP
-					if (BRINSTANCE(&list->eval)->userData == i->instance) finished = 1;
+					if (BRINSTANCE( *li )->userData == i->instance) finished = 1;
 
-					if (BRINSTANCE(&list->eval)->status == AS_ACTIVE) brInstanceRelease(BRINSTANCE(&list->eval));
+					if (BRINSTANCE( *li )->status == AS_ACTIVE) brInstanceRelease(BRINSTANCE( *li ) );
 				}
 			}
-
-			list = list->next;
 		}
 	}
 
@@ -970,14 +968,14 @@ inline int brEvalListExp(stListExp *le, stRunInstance *i, brEval *result) {
 	int resultCode;
 	unsigned int n;
 
-	result->set( brEvalListNew() );
+	result->set( new brEvalListHead() );
 
 	for(n = 0; n < le->expressions.size(); n++ ) {
 		resultCode = stExpEval3(le->expressions[n], i, &index);
 
 		if(resultCode != EC_OK) return resultCode;
 
-		brEvalListInsert(BRLIST(result), BRLIST(result)->count, &index);
+		brEvalListInsert( BRLIST(result), BRLIST(result)->_vector.size(), &index );
 	}
 
 	return EC_OK;
@@ -1023,24 +1021,23 @@ RTC_INLINE int stEvalMethodCall(stMethodExp *mexp, stRunInstance *i, brEval *t) 
 	}
 
 	if ( obj.type() == AT_LIST ) {
-		brEvalList *listStart = BRLIST(&obj)->start;
+		std::vector< brEval* >::iterator li;
 
-		while (listStart) {
-			if (!BRINSTANCE(&listStart->eval) || BRINSTANCE(&listStart->eval)->status != AS_ACTIVE) {
+		for( li = BRLIST( &obj )->_vector.begin(); li != BRLIST( &obj )->_vector.end(); li++ ) {
+			if (!BRINSTANCE( *li ) || BRINSTANCE( *li )->status != AS_ACTIVE) {
 				stEvalError(i->type->engine, EE_NULL_INSTANCE, "method \"%s\" called with uninitialized object", mexp->methodName);
 				return EC_ERROR;
 			}
 
 			// if the new instance is not a steve object, it's a foreign method call
 
-			if (BRINSTANCE(&listStart->eval)->object->type != &i->instance->type->steveData->steveObjectType)
-				return stEvalForeignMethodCall(mexp, BRINSTANCE(&listStart->eval), i, t);
+			if (BRINSTANCE( *li )->object->type != &i->instance->type->steveData->steveObjectType)
+				return stEvalForeignMethodCall(mexp, BRINSTANCE( *li ), i, t);
 
-			ri.instance = (stInstance *)BRINSTANCE(&listStart->eval)->userData;
+			ri.instance = (stInstance *)BRINSTANCE( *li )->userData;
 			ri.type = ri.instance->type;
 
 			r = stRealEvalMethodCall(mexp, &ri, i, t);
-			listStart = listStart->next;
 		}
 
 		return r;
@@ -1270,9 +1267,9 @@ RTC_INLINE int stEvalFor(stForExp *w, stRunInstance *i, brEval *result) {
 
 RTC_INLINE int stEvalForeach(stForeachExp *w, stRunInstance *i, brEval *result) {
 	brEval list;
-	brEvalList *el;
 	void *iterationPointer;
 	int resultCode;
+	std::vector< brEval* >::iterator ei;
 
 	stAssignExp *assignExp = w->assignment;
 
@@ -1288,12 +1285,10 @@ RTC_INLINE int stEvalForeach(stForeachExp *w, stRunInstance *i, brEval *result) 
 		return EC_ERROR;
 	}
 
-	el = BRLIST(&list)->start;
-
-	while (el) {
+	for( ei = BRLIST( &list )->_vector.begin(); ei != BRLIST( &list )->_vector.end(); ei++ ) {
 		brEval eval;
 
-		if ((resultCode = brEvalCopy(&el->eval, &eval)) != EC_OK)
+		if ( (resultCode = brEvalCopy( *ei, &eval) ) != EC_OK)
 			return resultCode;
 
 		if (assignExp->_objectName && !assignExp->_objectType) {
@@ -1309,10 +1304,8 @@ RTC_INLINE int stEvalForeach(stForeachExp *w, stRunInstance *i, brEval *result) 
 			return resultCode;
 
 		resultCode = stExpEval3(w->code, i, result); 
-		if (resultCode != EC_OK)
-			return resultCode;
 
-		el = el->next;
+		if (resultCode != EC_OK) return resultCode;
 	} 
 
 	return EC_OK;
@@ -1361,7 +1354,7 @@ RTC_INLINE int stEvalListInsert(stListInsertExp *w, stRunInstance *i, brEval *re
 		if (resultCode != EC_OK)
 			return resultCode;
 	} else {
-		index.set( BRLIST(result)->count );
+		index.set( (int)BRLIST(result)->_vector.size() );
 	}
 
 	brEvalListInsert(BRLIST(result), BRINT(&index), &pushEval);
@@ -1388,7 +1381,7 @@ RTC_INLINE int stEvalListRemove(stListRemoveExp *l, stRunInstance *i, brEval *re
 		if (resultCode != EC_OK)
 			return resultCode;
 	} else {
-		index.set( BRLIST(&listEval)->count - 1 );
+		index.set( (int)BRLIST(&listEval)->_vector.size() - 1 );
 	}
 
 	brEvalListRemove(BRLIST(&listEval), BRINT(&index), result);
@@ -1407,7 +1400,7 @@ RTC_INLINE int stEvalCopyList(stCopyListExp *l, stRunInstance *i, brEval *result
 		return EC_ERROR;
 	}
 
-	result->set( brEvalListDeepCopyGC(BRLIST(&listEval)) );
+	// result->set( brEvalListDeepCopyGC(BRLIST(&listEval)) );
 
 	return EC_OK;
 }
@@ -1427,7 +1420,7 @@ RTC_INLINE int stEvalAll(stAllExp *e, stRunInstance *i, brEval *result) {
 		e->object = (stObject *)type->userData;
 	}
 
-	result->set( brEvalListNew() );
+	result->set( new brEvalListHead() );
 
 	for (ii = e->object->allInstances.begin(); ii != e->object->allInstances.end(); ii++ ) {
 		stInstance *i = *ii;
@@ -1556,7 +1549,7 @@ RTC_INLINE int stEvalListIndexAssign(stListIndexAssignExp *l, stRunInstance *i, 
 	} else if (list.type() == AT_HASH) {
 		brEval old;
 
-		brEvalHashStore(BRHASH(&list), &index, t);
+		brEvalHashStore( BRHASH(&list), &index, t );
 	} else if (list.type() == AT_STRING) {
 		char **stringptr, *newstring, *oldstring, *substring;
 		unsigned int n;
@@ -1730,7 +1723,7 @@ RTC_INLINE int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *result) {
 		}
 	}
 
-	memset(result, 0, sizeof(brEval));
+	result->clear();
 
 #ifdef MULTITHREAD
 	pthread_mutex_lock(&(i->instance->lock));
@@ -2699,7 +2692,7 @@ RTC_INLINE int stEvalNewInstance(stInstanceExp *ie, stRunInstance *i, brEval *t)
 		stInstanceUnretain( (stInstance*)BRINSTANCE( t )->userData );
 
 	} else {
-		list = brEvalListNew();
+		list = new brEvalListHead();
 
 		for(n=0;n<BRINT(&count);n++) {
 			listItem.set( stInstanceCreateAndRegister(i->instance->type->steveData, i->instance->type->engine, object) );
@@ -2880,11 +2873,11 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *result, stObject **tClass) {
 		resultCode = stExpEval3(((stLengthExp *)s)->expression, i, result);
 		switch( result->type() ) {
 			case AT_VECTOR:
-	 			result->set( slVectorLength( &BRVECTOR(result) ) );
+	 			result->set( slVectorLength( &BRVECTOR( result ) ) );
 				resultCode = EC_OK;
 				break;
 			case AT_LIST:
-				result->set( BRLIST(result)->count );
+				result->set( (int) BRLIST(result)->_vector.size() );
 				resultCode = EC_OK;
 				break;
 			case AT_INT:
@@ -2982,15 +2975,12 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *result, stObject **tClass) {
 
 
 int stDoEvalListIndexPointer(brEvalListHead *l, int n, brEval **eval) {
-	brEvalList *list;
-
-	if (n > (l->count - 1) || n < 0) {
+	if ( n > (int)( l->_vector.size() - 1) || n < 0) {
 		*eval = NULL;
 		return -1;
 	}
 
-	list = brEvalListIndexLookup(l, n);
-	*eval = &list->eval;
+	*eval = brEvalListIndexLookup(l, n);
 
 	return 0;
 }
@@ -3016,67 +3006,65 @@ int stDoEvalListIndex(brEvalListHead *l, int n, brEval *newLoc) {
 }
    
 int stDoEvalListIndexAssign(brEvalListHead *l, int n, brEval *newVal, stRunInstance *ri) {
-	brEvalList *list;
+	brEval *eval;
 
-	if (n > l->count || n < 0)
+	if ( n > (int)l->_vector.size() || n < 0)
 		return -1;
 
 	// if this is a new entry at the end, append it instead
 
-	if (n == l->count || l->count == 0) {
-		if (brEvalListInsert(l, l->count, newVal) > -1)
+	if ( n == (int)l->_vector.size() || l->_vector.size() == 0) {
+		if (brEvalListInsert(l, l->_vector.size(), newVal) > -1)
 			return 0;
 		else
 			return -1;
 	}
 
-	// overwriting a previous evaluation -- lookup, unretain and replace
+	eval = brEvalListIndexLookup(l, n);
 
-	list = brEvalListIndexLookup(l, n);
-
-	brEvalCopy(newVal, &list->eval);
+	brEvalCopy( newVal, eval );
 
 	return 0;
 }
 
 RTC_INLINE int stEvalBinaryEvalListExp(char op, brEval *l, brEval *r, brEval *result, stRunInstance *i) {
 	brEvalListHead *h1, *h2;
-	brEvalList *l1, *l2;
+	std::vector< brEval* >::iterator l1, l2;
 	int same;
 	int ret;
 
 	h1 = BRLIST(l);
 	h2 = BRLIST(r);
 
-	if (h1->count != h2->count)
+	if ( h1->_vector.size() != h2->_vector.size() )
 		same = 0;
 	else {
-		l1 = h1->start;
-		l2 = h2->start;
-
 		same = 1;
 
-		while (l1 && l2 && same) {
-			ret = stEvalBinaryExpWithEvals(i, BT_EQ, &l1->eval, &l2->eval, result);
+		l1 = h1->_vector.begin();
+		l2 = h2->_vector.begin();
+
+		while ( l1 != h1->_vector.end() && l2 != h2->_vector.end() && same ) {
+			ret = stEvalBinaryExpWithEvals(i, BT_EQ, *l1, *l2, result);
 
 			if (ret != EC_OK || !BRINT(result))
 				same = 0;
 
-			l1 = l1->next;
-			l2 = l2->next;
+			l1++;
+			l2++;
 		}
 	}
 
 	switch(op) {
-	case BT_EQ:
-		result->set( same );
-		break;
-	case BT_NE:
-		result->set( !same );
-		break;
-	default:
-		stEvalError(i->instance->type->engine, EE_INTERNAL, "unknown binary expression operator (%d) in stEvalBinaryDoubleExp", op);
-		return EC_ERROR;
+		case BT_EQ:
+			result->set( same );
+			break;
+		case BT_NE:
+			result->set( !same );
+			break;
+		default:
+			stEvalError(i->instance->type->engine, EE_INTERNAL, "unknown binary expression operator (%d) in stEvalBinaryDoubleExp", op);
+			return EC_ERROR;
 	}
 
 	return EC_OK;

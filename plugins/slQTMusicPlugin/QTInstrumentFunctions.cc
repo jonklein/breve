@@ -53,10 +53,13 @@ slQTInstrumentInfo *slQTNewInstrumentInfo(int instrument) {
 	request.info.flags = 0;
 	request.info.midiChannelAssignment = 0;
 
-	wtf.bigEndianValue = 3;
+	// wtf.bigEndianValue = 3;
+	wtf = 3;
 	request.info.polyphony = wtf; // wtf?
 
-	againwtf.bigEndianValue = 0x00020000;
+	// againwtf.bigEndianValue = 0x00020000;
+	againwtf = 0x00020000;
+
 	request.info.typicalPolyphony = againwtf; // again, wtf?
 
 	componentError = NAStuffToneDescription(i->allocator, instrument, &request.tone);
@@ -115,28 +118,23 @@ int brQTInstrumentSetController(brEval args[], brEval *result, void *i) {
 }
 
 int brQTInstrumentPlayChord(brEval args[], brEval *result, void *i) {
-	slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER(&args[0]);
-	brEvalList *list, *head = BRLIST(&args[1])->start;
+	slQTInstrumentInfo *info = (slQTInstrumentInfo*)BRPOINTER( &args[0] );
+	brEvalListHead *list = BRLIST( &args[1] );
 
 	if(BRDOUBLE(&args[3]) <= 0.0) return EC_OK;
 
-	list = head;
-
 	/* push down */
 
-	while(list) {
-		NAPlayNote(info->allocator, info->channel, BRINT(&list->eval), BRINT(&args[2]));
-		list = list->next;
+	for( int n = 0; n < list->_vector.size(); n++ ) {
+		NAPlayNote(info->allocator, info->channel, BRINT( list->_vector[ n ] ), BRINT(&args[2]));
 	}
 
 	usleep( ( int )( BRDOUBLE(&args[3]) * 100000 ) );
-	list = head;
 
 	/* release */
 
-	while(list) {
-		NAPlayNote(info->allocator, info->channel, BRINT(&list->eval), 0);
-		list = list->next;
+	for( int n = 0; n < list->_vector.size(); n++ ) {
+		NAPlayNote(info->allocator, info->channel, BRINT( list->_vector[ n ] ), 0);
 	}
 
 	return EC_OK;

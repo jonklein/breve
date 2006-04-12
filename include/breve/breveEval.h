@@ -60,7 +60,21 @@ enum atomicTypes {
 
 void stGCUnretainAndCollectPointer(void *pointer, int type);
 void stGCRetainPointer(void *pointer, int type);
-	
+
+class brEvalObject {
+	public:
+		brEvalObject() { _retainCount = 0; } ;
+
+		virtual ~brEvalObject() { };
+
+		int _retainCount;
+
+		void retain() { _retainCount++; }
+		void unretain() { _retainCount--; }
+
+		void collect() { if( _retainCount < 1 ) delete this; }
+};
+
 class brEval {
 	public:
 		brEval() { _type = AT_NULL; _values.pointerValue = NULL; }

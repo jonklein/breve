@@ -27,9 +27,10 @@
 	forth, but I wouldn't want to say it's never going to happen.
 */
 
-class brEvalHash {
+class brEvalHash : public brEvalObject {
 	public:
 		brEvalHash();
+		~brEvalHash();
 
 		slHash *table;
 		int retainCount;

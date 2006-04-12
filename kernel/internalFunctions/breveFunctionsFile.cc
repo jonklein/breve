@@ -194,7 +194,7 @@ int brIReadDelimitedList(brEval args[], brEval *target, brInstance *i) {
 
 	p = BRFILEPOINTER(&args[0]);
 
-	head = brEvalListNew();
+	head = new brEvalListHead();
 
 	target->set( head );
 
@@ -211,7 +211,7 @@ int brIReadDelimitedList(brEval args[], brEval *target, brInstance *i) {
 
 	while( ( str = slSplit( line, BRSTRING(&args[1]), n++ ) ) ) {
 		eval.set( str );
-		brEvalListInsert(head, head->count, &eval);
+		brEvalListInsert( head, head->_vector.size(), &eval);
 		delete[] str;
 	}
 
@@ -233,7 +233,7 @@ int brIReadWhitespaceDelimitedList(brEval args[], brEval *target, brInstance *i)
 
 	p = BRFILEPOINTER(&args[0]);
 
-	head = brEvalListNew();
+	head = new brEvalListHead();
 
 	target->set( head );
 
@@ -262,7 +262,7 @@ int brIReadWhitespaceDelimitedList(brEval args[], brEval *target, brInstance *i)
 
 			eval.set( field );
 
-			brEvalListInsert(head, head->count, &eval);
+			brEvalListInsert(head, head->_vector.size(), &eval);
 
 			start = n;
 		} else
@@ -291,7 +291,7 @@ int brIReadFileAsData(brEval args[], brEval *target, brInstance *i) {
 
 	text = new char[p->st.st_size + 1];
 
-	target->set( brDataNew(text, p->st.st_size) );
+	target->set( new brData(text, p->st.st_size) );
 
 	delete text;
 

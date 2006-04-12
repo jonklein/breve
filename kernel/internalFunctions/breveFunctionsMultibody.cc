@@ -92,7 +92,7 @@ int brIMultibodyAllObjects(brEval args[], brEval *target, brInstance *i) {
 
 	slMultibody *m = BRMULTIBODYPOINTER(&args[0]);
 
-	all = brEvalListNew();
+	all = new brEvalListHead();
 
 	start = m->allCallbackData();
 

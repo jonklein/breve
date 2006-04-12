@@ -45,17 +45,7 @@ bool brEval::operator<(brEval *b) {
 }
 */
 
-/*!
-	\brief Creates a breve eval hash table.
-
-	The breve eval hash structure is typically used only in the steve language.
-*/
-
-brEvalHash *brEvalHashNew() {
-	return new brEvalHash;
-}
-
-brEvalHash::brEvalHash() {
+brEvalHash::brEvalHash() : brEvalObject() {
 	table = slNewHash(1024, brEvalHashFunction, brEvalHashCompareFunction);
 	retainCount = 0;
 }
@@ -68,30 +58,28 @@ brEvalHash::brEvalHash() {
 	the steve library, not the breve library.
 */
 
-void brEvalHashFree(brEvalHash *h) {
+brEvalHash::~brEvalHash() {
 	slList *all, *start;
 
-	start = all = slHashValues(h->table);
+	start = all = slHashValues( table );
 
 	while(all) {
 		delete (brEval*)all->data;
 		all = all->next;
 	}
 
-	slListFree(start);
+	slListFree( start );
 
-	start = all = slHashKeys(h->table);
+	start = all = slHashKeys( table );
 
 	while(all) {
 		delete (brEval*)all->data;
 		all = all->next;
 	}
 
-	slListFree(start);
+	slListFree( start );
 
-	slFreeHash(h->table);
-
-	delete h;
+	slFreeHash( table );
 }
 
 /**
@@ -123,7 +111,7 @@ brEvalListHead *brEvalHashKeys(brEvalHash *h) {
 	slList *l;
 
 	l = slHashKeys(h->table);
-	el = brEvalListNew();
+	el = new brEvalListHead();
 
 	while(l) {
 		brEvalListInsert(el, 0, (brEval*)l->data);
@@ -142,7 +130,7 @@ brEvalListHead *brEvalHashValues(brEvalHash *h) {
 	slList *l;
 
 	l = slHashKeys(h->table);
-	el = brEvalListNew();
+	el = new brEvalListHead();
 
 	while(l) {
 		brEvalListInsert(el, 0, (brEval*)l->data);
