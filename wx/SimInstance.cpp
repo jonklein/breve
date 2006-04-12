@@ -191,7 +191,7 @@ wxString VarData::String()
 	    break;
 
 	case AT_LIST:
-	    str << "List (" << eval.getList()->count << ")";
+	    str << "List (" << eval.getList()->_vector.size() << ")";
 	    break;
 
 	case AT_HASH:
@@ -279,27 +279,24 @@ VarData * SimInstance::ProcessList(stInstance * instance, stObject * object, brE
     VarData * first = NULL;
     VarData * d = NULL;
     VarData * last = NULL;
-    brEvalList * scan;
     wxString str;
     int count = 0;
 
-    if (head == NULL || head->count < 1)
+    if (head == NULL || head->_vector.size() < 1)
 	return NULL;
 
-    for (scan = head->start; scan != NULL; scan = scan->next)
-    {
-	str = "Item ";
-	str << count++;
+	for( int c = 0; c < head->_vector.size(); c++ ) {
+		str = "Item ";
+		str << count++;
 
-	d = new VarData(&scan->eval, str, instance, object);
+		d = new VarData( head->_vector[ c ], str, instance, object);
 
-	if (first == NULL)
-	    first = d;
+		if (first == NULL) first = d;
 
-	if (last != NULL)
-	    last->SetNext(d);
+		if (last != NULL)
+		    last->SetNext(d);
 
-	last = d;
+		last = d;
     }
 
     return first;

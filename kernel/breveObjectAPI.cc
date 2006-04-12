@@ -33,7 +33,7 @@ brMethod *brMethodFind(brObject *o, char *name, unsigned char *types, int argCou
 	int n;
 
 	if(!types && argCount) {
-		types = (unsigned char*)alloca(argCount);
+		types = new unsigned char[ argCount ];
 		for(n=0;n<argCount;n++) types[n] = AT_UNDEFINED;
 	}
 
@@ -45,6 +45,8 @@ brMethod *brMethodFind(brObject *o, char *name, unsigned char *types, int argCou
 	m->userData = mp;
 	m->argumentCount = argCount;
 	m->name = slStrdup(name);
+
+	if( types ) delete[] types;
 
 	return m;
 }

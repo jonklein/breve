@@ -18,6 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+
 #include "steve.h"
 #include "xml.h"
 #include "breveFunctionsSteveObject.h"
@@ -30,6 +31,7 @@
 #else
 #include <winsock2.h>
 #include <wininet.h>
+#include <malloc.h>
 #endif
 
 #define NETWORK_MAGIC   0x0b00b1e5

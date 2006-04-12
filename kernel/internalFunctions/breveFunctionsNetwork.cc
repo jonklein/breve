@@ -26,6 +26,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #else
+#include <malloc.h>
 #include <wininet.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>

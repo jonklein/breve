@@ -81,8 +81,10 @@ slMovie *slMovieCreate(char *filename, int width, int height) {
 	m->_context->gop_size = 15;
 	m->_context->max_b_frames = 1;
 
-	if ( avcodec_open( m->_context, codec ) < 0 ) {
-		slMessage(DEBUG_ALL, "Error opening video output codec\n");
+	int err = 0;
+
+	if ( ( err = avcodec_open( m->_context, codec ) ) < 0 ) {
+		slMessage( DEBUG_ALL, "Error opening video output codec: %d\n", err );
 		av_free(m->_context);
 		delete m;
 		return NULL;

@@ -33,6 +33,8 @@
 #define DLLEXPORT __attribute__ ((visibility("default")))
 #else
 #define DLLEXPORT
+
+#include <malloc.h>
 #endif
 
 #if MINGW
