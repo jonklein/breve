@@ -29,11 +29,13 @@ void brEngineRegisterObjectType(brEngine *e, brObjectType *t) {
 
 brMethod *brMethodFind(brObject *o, char *name, unsigned char *types, int argCount) {
 	brMethod *m;
+	unsigned char *t = NULL;
 	void *mp;
 	int n;
 
 	if(!types && argCount) {
-		types = new unsigned char[ argCount ];
+		t = new unsigned char[ argCount ];
+		types = t;
 		for(n=0;n<argCount;n++) types[n] = AT_UNDEFINED;
 	}
 
@@ -46,7 +48,7 @@ brMethod *brMethodFind(brObject *o, char *name, unsigned char *types, int argCou
 	m->argumentCount = argCount;
 	m->name = slStrdup(name);
 
-	if( types ) delete[] types;
+	if( t ) delete[] t;
 
 	return m;
 }
@@ -222,10 +224,7 @@ int brInstanceAddObserver(brInstance *i, brInstance *observer, char *notificatio
         return -1; 
     }
  
-    o = new brObserver;
-    o->instance = observer; 
-    o->method = method;
-    o->notification = slStrdup(notification);
+    o = new brObserver( observer, method, notification );
  
     i->observers = slListPrepend(i->observers, o);
     observer->observees = slListPrepend(observer->observees, i);
@@ -261,6 +260,7 @@ void brEngineRemoveInstanceObserver(brInstance *i, brInstance *observerInstance,
 
             observerList = observerList->next;
 
+	    delete observer;
             slFree(match);
         } else {
             last = observerList;

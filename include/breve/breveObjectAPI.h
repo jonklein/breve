@@ -122,6 +122,17 @@ struct brMethod {
 */
 
 struct brObserver {
+	brObserver( brInstance *obs, brMethod *meth, char *note ) {
+		instance = obs;
+		method = meth;
+		notification = slStrdup( note );
+	}
+
+	~brObserver() {
+		delete method;
+		delete[] notification;
+	}
+
     brInstance *instance;
     brMethod *method;
     char *notification;
