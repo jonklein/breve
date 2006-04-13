@@ -32,10 +32,14 @@ char *gPhysicsErrorMessage;
 #include "gldraw.h"
 
 void *operator new (size_t size) {
-	void *p = calloc(1, size); 
-	// void *p = malloc( size ); 
+	// void *p = calloc(1, size); 
+	void *p = malloc( size ); 
 
- 	if ( p == NULL ) throw std::bad_alloc(); 
+ 	if ( p == NULL ) {
+		fprintf( stderr, "Error: memory allocation failed.  Catastrophic failure seems inevitable.\n" );
+		slMessage( DEBUG_ALL, "Error: memory allocation failed.  Catastrophic failure seems inevitable.\n" );
+		throw std::bad_alloc(); 
+	}
  
  	return p;
 }

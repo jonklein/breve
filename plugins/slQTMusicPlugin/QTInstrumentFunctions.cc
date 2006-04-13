@@ -20,6 +20,9 @@
 
 #include <unistd.h>
 #include <QuickTime/QuickTime.h>
+
+#include <TargetConditionals.h>
+
 #include "slBrevePluginAPI.h"
 
 struct slQTInstrumentInfo {
@@ -53,13 +56,16 @@ slQTInstrumentInfo *slQTNewInstrumentInfo(int instrument) {
 	request.info.flags = 0;
 	request.info.midiChannelAssignment = 0;
 
-	// wtf.bigEndianValue = 3;
+
+#ifdef TARGET_RT_LITTLE_ENDIAN
+	wtf.bigEndianValue = 3;
+	againwtf.bigEndianValue = 0x00020000;
+#else 
 	wtf = 3;
-	request.info.polyphony = wtf; // wtf?
-
-	// againwtf.bigEndianValue = 0x00020000;
 	againwtf = 0x00020000;
+#endif
 
+	request.info.polyphony = wtf; // wtf?
 	request.info.typicalPolyphony = againwtf; // again, wtf?
 
 	componentError = NAStuffToneDescription(i->allocator, instrument, &request.tone);

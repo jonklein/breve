@@ -39,9 +39,8 @@ Matrix : Matrix2D (aka Matrices2D) {
     + variables:
         xDim, yDim (int).
 
-    + to init:
-        #matrixPointer = matrix2DNew(32, 32).
-        return self.
+	+ to destroy:
+		if matrixPointer: matrix2DFree( matrixPointer ).
     
     + section "Setting the Matrix Size"
     
@@ -283,9 +282,8 @@ Matrix : Matrix3D (aka Matrices3D) {
     + variables:
         xDim, yDim, zDim (int).
 
-    + to init:
-        #matrixPointer = matrix3DNew(32, 32, 32).
-        return self.
+	+ to destroy:
+		if matrixPointer: matrix3DFree( matrixPointer ).
         
     + to init-with x-size xSize (int) y-size ySize (int) z-size zSize (int): 
         % sets the size to of this matrix to (sSize, ySize, zSize).
@@ -531,7 +529,6 @@ Image : MatrixImage {
         super iterate.
         
     - to destroy:
-        print "Destroying MatrixImage $self.".
         super destroy.
         
 }

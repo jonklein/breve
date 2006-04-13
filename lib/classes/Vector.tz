@@ -15,6 +15,9 @@ Object : Vector (aka Vectors) [version 2.3] {
 		# arbitrary default size.
 		self set-size to 3.
         return self.
+
+	+ to delete:
+		if vectorPointer: vectorFree( vectorPointer ).
         
     - to get-vector-pointer:
         return vectorPointer.
@@ -173,7 +176,6 @@ Image : VectorImage {
         return self.
         
     - to destroy:
-        print "Destroying VectorImage $self.".
         super destroy.
         
     + to set-red to m (object): red = m.
