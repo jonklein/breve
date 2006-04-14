@@ -375,7 +375,7 @@ int stParseBuffer(stSteveData *s, brEngine *engine, char *buffer, char *filename
 
 	// preprocess changes the yyfile and lineno globals -- reset them 
 
-	yyfile = strdup(thisFile);
+	yyfile = strdup( thisFile );
 	lineno = 1;
 
 	stSetParseData(s, buffer, strlen(buffer));
@@ -388,6 +388,8 @@ int stParseBuffer(stSteveData *s, brEngine *engine, char *buffer, char *filename
 
 	brClearError(engine);
 	if(yyparse()) return BPE_SIM_ERROR;
+
+	free( yyfile );
 
 	return BPE_OK;
 }

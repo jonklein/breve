@@ -669,7 +669,6 @@ void slWorld::setQuickstepIterations( int n ) {
 }
 
 void slWorld::setAutoDisableFlag( bool f ) {
-	printf(" setting auto disable %d\n", f );
-    dWorldSetAutoDisableFlag( _odeWorldID, f );
+	dWorldSetAutoDisableFlag( _odeWorldID, f );
 }
 

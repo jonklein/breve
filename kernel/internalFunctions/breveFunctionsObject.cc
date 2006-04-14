@@ -128,7 +128,7 @@ int brISetIgnoreCollisionsWith(brEval args[], brEval *target, brInstance *i) {
 
 int brINotify(brEval args[], brEval *target, brInstance *i) {
     brEval *newargs[2], sEval, iEval, t;
-    char *notification = slStrdup(BRSTRING(&args[0]));
+    char *notification = BRSTRING( &args[0] );
     brObserver *observer;
     int r, count;
     slList *observers;

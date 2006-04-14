@@ -46,7 +46,7 @@ brMethod *brMethodFind(brObject *o, char *name, unsigned char *types, int argCou
 	m = new brMethod;
 	m->userData = mp;
 	m->argumentCount = argCount;
-	m->name = slStrdup(name);
+	m->name = slStrdup( name );
 
 	if( t ) delete[] t;
 
@@ -403,8 +403,6 @@ void brEngineRemoveInstance(brEngine *e, brInstance *i) {
 */
 
 void brMethodFree(brMethod *m) {
-	if(m->name)
-		slFree(m->name);
 	delete m;
 }
 
@@ -446,7 +444,6 @@ void brInstanceFree(brInstance *i) {
 
     while(olist) {
         observer = (brObserver*)olist->data;
-        slFree(observer->notification);
         delete observer;
         olist = olist->next;
     }

@@ -107,6 +107,11 @@ struct brCollisionHandler {
 */
 
 struct brMethod {
+	~brMethod() {
+		if( name )
+			slFree( name );
+	}
+
 	void *userData;
 
 	char *name;
