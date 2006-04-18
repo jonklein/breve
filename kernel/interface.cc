@@ -116,6 +116,8 @@ brInstance *brClickCallback(brEngine *e, int n) {
 	
 	if(!method) return NULL;
 
+	brEngineLock( e );
+
 	if(o) theArg.set( (brInstance*)o->getCallbackData() );
 	else theArg.set( (brInstance*)NULL );
 
@@ -128,6 +130,8 @@ brInstance *brClickCallback(brEngine *e, int n) {
 	brMethodFree(method);
 
 	if(!o) return NULL;
+
+	brEngineUnlock( e );
 
 	return (brInstance*)o->getCallbackData();
 }

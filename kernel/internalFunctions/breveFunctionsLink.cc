@@ -389,13 +389,16 @@ int brILinkCheckSelfPenetration(brEval args[], brEval *target, brInstance *i) {
 
 int brILinkGetMax(brEval args[], brEval *target, brInstance *i) {
 	slLink *l = BRLINKPOINTER(&args[0]);
+	slVector v;
 
 	if(!l) {
 		slMessage(DEBUG_ALL, "linkGetMax() called with uninitialized link\n");
 		return EC_ERROR;
 	}
 
-	l->getBounds(NULL, &BRVECTOR(target));
+	l->getBounds( NULL, &v );
+
+	target->set( v );
 
 	return EC_OK;
 }
@@ -410,13 +413,16 @@ int brILinkGetMax(brEval args[], brEval *target, brInstance *i) {
 
 int brILinkGetMin(brEval args[], brEval *target, brInstance *i) {
 	slLink *l = BRLINKPOINTER(&args[0]);
+	slVector v;
 
 	if(!l) {
 		slMessage(DEBUG_ALL, "linkGetMin() called with uninitialized link\n");
 		return EC_ERROR;
 	}
 
-	l->getBounds(&BRVECTOR(target), NULL);
+	l->getBounds( &v, NULL);
+
+	target->set( v );
 
 	return EC_OK;
 }

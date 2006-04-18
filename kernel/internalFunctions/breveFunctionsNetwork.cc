@@ -410,7 +410,7 @@ int brHandleHTTPConnection(brNetworkClientData *data, char *request) {
 	for(n=0;n<count;n++) {
 		char *str = slSplit(request, "_", n + 1);
 		evals[n].set( str );
-		delete[] str;
+		slFree( str );
 		evalPtrs[n] = &evals[n];
 	}
 
