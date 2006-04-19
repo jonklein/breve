@@ -36,6 +36,22 @@
 #include "vclip.h"
 #include "vclipData.h"
 
+/**
+ * Creates an empty new multibody struct associated with a world.
+ *
+ * Calling this method does NOT automatically add the multibody to the specified world.
+ */
+
+slMultibody::slMultibody(slWorld *w) {
+	_world = w;
+	_handleSelfCollisions = 0;
+	_root = NULL;
+
+	_userData = NULL;
+
+	_erp = _cfm = 0.0;
+}
+
 void slMultibody::initCollisionFlags(slVclipData *cd) {
 	slLink *link1, *link2;
 	slPairFlags *flags;
@@ -282,21 +298,6 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 	}
 
 	return NULL;
-}
-
-/*!
-	\brief Creates an empty new multibody struct associated with a world.
-
-	Calling this method does not automatically add the multibody to the
-	specified world.
-*/
-
-slMultibody::slMultibody(slWorld *w) {
-	_world = w;
-	_handleSelfCollisions = 0;
-	_root = NULL;
-
-	_erp = _cfm = 0.0;
 }
 
 /*!
