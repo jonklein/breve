@@ -939,6 +939,7 @@ int stEvalExpVector(std::vector< stExp* > *a, stRunInstance *i, brEval *result) 
 
 				if (error->file)
 					slFree(error->file);
+
 				error->file = slStrdup(expression->file);
 
 				slMessage(DEBUG_ALL, "... error in file \"%s\" at line %d\n", expression->file, expression->line);

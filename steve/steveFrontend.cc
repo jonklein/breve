@@ -389,7 +389,7 @@ int stParseBuffer(stSteveData *s, brEngine *engine, char *buffer, char *filename
 	brClearError(engine);
 	if(yyparse()) return BPE_SIM_ERROR;
 
-	free( yyfile );
+	// free( yyfile );
 
 	return BPE_OK;
 }
