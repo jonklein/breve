@@ -50,7 +50,7 @@ class brEvalVectorSorter {
 				// if (rcode == EC_ERROR) gEvalListSortError = 1;
 			}
 
-			return( BRDOUBLE(&result) > 0.0 );
+			return( BRDOUBLE(&result) < 0.0 );
 		};
 
 	private:
