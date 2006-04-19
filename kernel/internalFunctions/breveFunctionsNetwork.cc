@@ -177,8 +177,6 @@ char *brHostnameFromAddr(struct in_addr *addr) {
 brNetworkServer *brListenOnPort(int port, brEngine *engine) {
 	int ssock;
 	brNetworkServer *serverData;
-	char hostname[1024];
-	int l = 1024;
 	struct sockaddr_in saddr;
 
 	if((ssock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -208,9 +206,8 @@ brNetworkServer *brListenOnPort(int port, brEngine *engine) {
 	serverData->port = port;
 	serverData->socket = ssock;
 	serverData->terminate = 0;
-	pthread_create(&serverData->thread, NULL, brListenOnSocket, serverData);
 
-	gethostname(hostname, l);
+	pthread_create( &serverData->thread, NULL, brListenOnSocket, serverData );
 
 	return serverData;
 }
@@ -373,7 +370,7 @@ int brHandleHTTPConnection(brNetworkClientData *data, char *request) {
 	brEval target;
 	int count, n;
 	int result;
-	brEval *evals, **evalPtrs;
+	brEval **evalPtrs;
 
 	// remove the "GET ", skip forward to the request
 
@@ -405,16 +402,22 @@ int brHandleHTTPConnection(brNetworkClientData *data, char *request) {
 	}
 
 	evalPtrs = (brEval**)alloca(sizeof(brEval*) * count);
-	evals = (brEval*)alloca(sizeof(brEval) * count);
 
 	for(n=0;n<count;n++) {
 		char *str = slSplit(request, "_", n + 1);
-		evals[n].set( str );
+		
+		evalPtrs[ n ] = new brEval;
+
+		evalPtrs[n]->set( str );
+
 		slFree( str );
-		evalPtrs[n] = &evals[n];
 	}
 
 	result = brMethodCallByNameWithArgs(data->engine->controller, method, evalPtrs, count, &target);
+
+	for(n=0;n<count;n++) {
+		delete evalPtrs[ n ];
+	}
 
 	slFree(method);
 
