@@ -54,6 +54,8 @@ class slJoint {
 			_sMin = 0.0;
 			_torque = 0.0;
 			_targetSpeed = 0.0;
+
+			_userData = NULL;
 		}
 
 		~slJoint();

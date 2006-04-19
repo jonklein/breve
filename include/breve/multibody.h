@@ -84,7 +84,6 @@ class slMultibody {
 		 */
 
 		float _erp, _cfm;
-
 };
 
 int slInitShapeList(slShape **slist, slPosition **plist, slMultibody *root);

@@ -65,6 +65,8 @@ class slWorldObject {
 			_billboardRotation = 0;
 			_alpha = 1.0;
 
+			_userData = NULL;
+
 			_e = 0.4;
 			_eT = 0.2;
 			_mu = 0.15;
