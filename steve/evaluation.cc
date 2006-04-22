@@ -1401,7 +1401,7 @@ RTC_INLINE int stEvalCopyList(stCopyListExp *l, stRunInstance *i, brEval *result
 		return EC_ERROR;
 	}
 
-	// result->set( brEvalListDeepCopyGC(BRLIST(&listEval)) );
+	result->set( brEvalListDeepCopy(BRLIST(&listEval)) );
 
 	return EC_OK;
 }

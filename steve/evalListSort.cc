@@ -31,8 +31,12 @@ class brEvalVectorSorter {
 		bool operator()( const brEval *a, const brEval *b ) {
 			stRunInstance ri;
 			brEval result;
-			const brEval *args[2];
+			brEval *args[ 2 ];
 			int rcode;
+
+			std::pair< const brEval*, const brEval* > pair( a, b );
+
+			if( mSeenMap.find( pair ) != mSeenMap.end() ) return mSeenMap[ pair ];
 
 			args[0] = a;
 			args[1] = b;
@@ -50,18 +54,28 @@ class brEvalVectorSorter {
 				// if (rcode == EC_ERROR) gEvalListSortError = 1;
 			}
 
-			return( BRDOUBLE(&result) < 0.0 );
+			mSeenMap[ pair ] = ( BRDOUBLE(&result) > 0.0 );
+
+			return mSeenMap[ pair ];
 		};
 
 	private:
 		stInstance *mInstance;
 		stMethod *mMethod;
+
+		std::map< std::pair< const brEval*, const brEval* >, bool > mSeenMap;
+
 };
 
-int stSortEvalList(brEvalListHead *head, stInstance *caller, stMethod *method) {
+int stSortEvalList( brEvalListHead *head, stInstance *caller, stMethod *method ) {
 	brEvalVectorSorter sorter( caller, method );
 
+	// So it turns out that std::sort requires strict weak ordering and will crash[!]
+	// if you don't have it!  That is strictly weak!
+
 	std::sort( head->_vector.begin(), head->_vector.end(), sorter );
+
+	// qsort( head[ 0 ], head->_vector.size(), stSortCallback );
 
 	return 1;
 }

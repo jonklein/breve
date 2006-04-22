@@ -21,6 +21,8 @@ Control : ListTest {
 
 		sort newlist with sorter.
 
+		print newlist.
+
 		self end-simulation.
 
 	+ to sorter with-a a (int) with-b b (int):
@@ -39,5 +41,17 @@ Control : ListTest {
 		remove local{2}.
 
 		return local.
+
+	+ to sort-list: 
+		l (list).
+
+		l = { 1,3,5,7,2,4,6,8 }. 
+		sort l with by-val. 
+		print l. 
+        
+	+ to by-val of a (int) to b (int): 
+		if a < b: return -1. 
+		if a == b: return 0. 
+		if a > b: return  1. 
 }
 
