@@ -355,9 +355,13 @@ void BreveInterface::menuCallback(brInstance *binterface)
 
 int BreveInterface::dialogCallback(char *title, char *message, char *b1, char *b2)
 {
-    BDialog * d = new BDialog(breverender, title, message, b1, b2);
+    BDialog d(breverender, title, message, b1, b2);
 
-    return !d->ShowModal();
+	pthread_t ttt = pthread_self( );
+
+	printf(" Running in thread %d\n", ttt );
+
+    return !d.ShowModal();
 }
 
 int dialogCallback(char *title, char *message, char *b1, char *b2)

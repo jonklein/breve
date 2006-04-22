@@ -27,6 +27,8 @@
 #define ID_FIND_MATCHCASE 10003
 #define ID_FIND_SEARCH 10004
 #define ID_FIND_CANCEL 10005
+#define ID_FIND_REPLACE 10006
+#define ID_FIND_REPLACE_ALL 10007
 
 #ifndef wxCLOSE_BOX
 #define wxCLOSE_BOX 0x1000
@@ -47,39 +49,37 @@ public:
     bool Create( wxWindow* parent, int mode, wxWindowID id = SYMBOL_FINDDIALOG_IDNAME, const wxString& caption = SYMBOL_FINDDIALOG_TITLE, const wxPoint& pos = SYMBOL_FINDDIALOG_POSITION, const wxSize& size = SYMBOL_FINDDIALOG_SIZE, long style = SYMBOL_FINDDIALOG_STYLE );
 
     void CreateControls();
-    void OnFindFindctrlEnter( wxCommandEvent& event );
-    void OnFindReplacectrlEnter( wxCommandEvent& event );
     void OnFindSearchClick( wxCommandEvent& event );
+    void OnFindSearchCtrlEnter( wxCommandEvent& event );
+    void OnFindReplaceCtrlEnter( wxCommandEvent& event );
+	void OnFindReplaceClick( wxCommandEvent& event );
+	void OnFindReplaceAllClick( wxCommandEvent& event );
     void OnFindCancelClick( wxCommandEvent& event );
 
-    void SetCodeCtrl(CodeCtrl * ctrl)
-    {
-	codectrl = ctrl;
+	bool DoFind( bool replace, bool fromTop );
+
+    void SetCodeCtrl(CodeCtrl * ctrl) {
+		codectrl = ctrl;
     }
 
-    wxString LastSearch()
-    {
-	return lastsearch;
+    wxString LastSearch() {
+		return lastsearch;
     }
 
-    wxString LastReplace()
-    {
-	return lastreplace;
+    wxString LastReplace() {
+		return lastreplace;
     }
 
-    bool Searched()
-    {
-	return !lastsearch.IsEmpty();
+    bool Searched() {
+		return !lastsearch.IsEmpty();
     }
 
-    bool Replaced()
-    {
-	return !lastreplace.IsEmpty();
+    bool Replaced() {
+		return !lastreplace.IsEmpty();
     }
 
-    int LastFlags()
-    {
-	return lastflags;
+    int LastFlags() {
+		return lastflags;
     }
 
     wxBitmap GetBitmapResource( const wxString& name );
@@ -92,6 +92,7 @@ private:
     wxCheckBox* MatchCheckBox;
     wxButton* ButtonSearch;
     wxButton* ButtonCancel;
+    wxButton* ButtonNext;
 
     CodeCtrl * codectrl;
 

@@ -130,6 +130,7 @@ public:
     void OnMenuLogWindow(wxCommandEvent& event);
     void OnMenuInspector(wxCommandEvent& event);
     void OnMenuSim(wxCommandEvent &event);
+    void OnIdle(wxIdleEvent &event);
     void OnRenderRunClick( wxCommandEvent& event );
     void OnRenderStopClick( wxCommandEvent& event );
     void OnRotateClick(wxCommandEvent&event);

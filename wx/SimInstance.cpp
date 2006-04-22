@@ -38,7 +38,6 @@ SimInstance::SimInstance(wxString simdir, wxString simfile, wxString text)
 
 SimInstance::~SimInstance()
 {
-    delete binterface;
     codewindow->Destroy();
 
     VarData * n, * d;
@@ -49,6 +48,8 @@ SimInstance::~SimInstance()
 
 	delete d;
     }
+
+    delete binterface;
 
     iroot = NULL;
 }

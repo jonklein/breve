@@ -57,6 +57,7 @@ BEGIN_EVENT_TABLE( BreveRender, wxFrame )
     EVT_MENU( BREVE_FILEMENU_NEW, BreveRender::OnMenuNew )
     EVT_MENU( BREVE_FILEMENU_OPEN, BreveRender::OnMenuOpen )
     EVT_MENU( BREVE_FILEMENU_QUIT, BreveRender::OnMenuQuit )
+    EVT_IDLE(BreveRender::OnIdle)
     EVT_MENU( BREVE_WINDOWMENU_LOG, BreveRender::OnMenuLogWindow )
     EVT_MENU( BREVE_WINDOWMENU_INSPECTOR, BreveRender::OnMenuInspector )
     EVT_MENU( BREVE_BREVEMENU_FULLSCREEN, BreveRender::OnFullScreen )
@@ -81,6 +82,8 @@ BreveRender::BreveRender( wxWindow* parent, wxWindowID id, const wxString& capti
 BreveRender::~BreveRender()
 {
     SimInstance * s,* n;
+
+    if( GetSimulation() ) GetSimulation()->RegenSim();
 
     for (s = simlist; s != NULL; s = n)
     {
@@ -843,8 +846,12 @@ void BreveRender::OnRenderRunClick( wxCommandEvent& event )
 
     sim = GetSimulation();
 
-    if (sim == NULL)
-	return;
+    if (sim == NULL) return;
+
+	if( !sim->GetInterface()->Initialized() ) {
+		sim->UpdateSimCode();
+		sim->GetInterface()->Initialize();
+	}
 
     sim->GetInterface()->Pause(3);
 
@@ -855,6 +862,17 @@ void BreveRender::OnRenderRunClick( wxCommandEvent& event )
 
     runbutton->Refresh(TRUE, NULL);
 }
+
+void BreveRender::OnIdle( wxIdleEvent&event ) {
+    SimInstance * sim;
+
+    sim = GetSimulation();
+
+    if (sim == NULL) return;
+
+    sim->GetInterface()->Iterate();
+}
+
 
 void BreveRender::OnRenderStopClick( wxCommandEvent& event )
 {

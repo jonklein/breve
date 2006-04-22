@@ -100,25 +100,17 @@ void BreveCanvas::OnIdle(wxIdleEvent&event)
 
 	if (!sim->GetInterface()->Initialized())
 	{
-	    sim->UpdateSimCode();
-
-	    if (!sim->GetInterface()->Initialize())
-	    {
-		sim->GetMutex()->Unlock();
-		return;
-	    }
-
-	    sim->GetMutex()->Unlock();
-
 	    glViewport(0, 0, sim->GetInterface()->GetX(), sim->GetInterface()->GetY());
 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+
+		return;
 	}
 
 	event.RequestMore(TRUE);
 
-	sim->GetInterface()->Iterate();
-
 	sim->GetMutex()->Unlock();
+
+	// sim->GetInterface()->Iterate();
 
 	Refresh(false);
     }
@@ -455,8 +447,5 @@ void BreveCanvas::OnRightMenu(wxCommandEvent &event)
 void BreveCanvas::ResetSelection()
 {
     selected = NULL;
-
-    if (breverender->GetSimulation() != NULL)
-	breverender->GetSimulation()->SetSelected(NULL);
 }
 
