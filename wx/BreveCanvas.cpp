@@ -82,37 +82,48 @@ void BreveCanvas::OnIdle(wxIdleEvent&event)
 	}
     }
 
-    if (requestlogreset)
-    {
-	requestlogreset = 0;
-	breverender->ResetLog();
+    if (requestlogreset) {
+		requestlogreset = 0;
+		breverender->ResetLog();
     }
 
-    if (sim != NULL && sim->GetInterface()->Paused() == 0)
-    {
-	if (sim->GetMutex()->TryLock() == wxMUTEX_BUSY)
-	{
-	    event.RequestMore(TRUE);
-	    return;
-	}
+    if (sim != NULL && sim->GetInterface()->Paused() == 0) {
+		// The wxMutex documentation states that the default mutex behavior is non
+		// recursive, meaning that the same thread cannot lock the mutex twice.  But
+		// sure enough, the same thread is able to lock this mutex twice!  When a 
+		// breve dialog callback triggers a modal dialog, control is returned to the
+		// thread and the engine gets iterated a second time, resulting in a deadlock.
+		// So we'll use a mLocked boolean ghetto lock to prevent this.  Note that in
+		// a true multithread situation there would be a deadlock here, but since we 
+		// are specifically trying to avoid the *same* thread from getting control
+		// twice, we're in the clear (this function cannot be run twice from the same
+		// thread simultaneously).
 
-	SetCurrent();
+		if ( mLocked || sim->GetMutex()->TryLock() != wxMUTEX_NO_ERROR ) {
+			event.RequestMore(TRUE);
+		    return;
+		}
 
-	if (!sim->GetInterface()->Initialized())
-	{
-	    glViewport(0, 0, sim->GetInterface()->GetX(), sim->GetInterface()->GetY());
-	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+		mLocked = true;
 
-		return;
-	}
+		SetCurrent();
 
-	event.RequestMore(TRUE);
+		if (!sim->GetInterface()->Initialized()) {
+		    glViewport(0, 0, sim->GetInterface()->GetX(), sim->GetInterface()->GetY());
+		    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
-	sim->GetMutex()->Unlock();
+			return;
+		}
 
-	// sim->GetInterface()->Iterate();
+		event.RequestMore(TRUE);
 
-	Refresh(false);
+		sim->GetInterface()->Iterate();
+
+		sim->GetMutex()->Unlock();
+
+		Refresh(false);
+
+		mLocked = false;
     }
 }
 
@@ -141,6 +152,8 @@ BreveCanvas::BreveCanvas(BreveRender*parent)
     requestlogreset = 0;
     mousedown = 0;
     selected = NULL;
+
+	mLocked = false;
 
     SetSizeHints(400, 300);
 //    SetMinSize(size);

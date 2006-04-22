@@ -58,6 +58,8 @@ class BreveCanvas : public wxGLCanvas
 	int wasdrag, mLastX, mLastY, mousedown;
 	double StartCamX;
 
+	bool mLocked;
+
 DECLARE_EVENT_TABLE()
 };
 

@@ -864,13 +864,6 @@ void BreveRender::OnRenderRunClick( wxCommandEvent& event )
 }
 
 void BreveRender::OnIdle( wxIdleEvent&event ) {
-    SimInstance * sim;
-
-    sim = GetSimulation();
-
-    if (sim == NULL) return;
-
-    sim->GetInterface()->Iterate();
 }
 
 
