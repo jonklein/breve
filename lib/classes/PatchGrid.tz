@@ -138,7 +138,8 @@ Abstract : PatchGrid (aka PatchGrids) [version 2.2] {
                 free(chemicalConcentrationMatrix{chem}).
             free(tempMatrix).
         }
-        patchGridFree(gridPointer).
+
+        if gridPointer: patchGridFree(gridPointer).
         
     + to enable-smooth-drawing:
         % Enables smooth drawing for this PatchGrid.  When smooth drawing is 
