@@ -42,7 +42,7 @@ void slVectorCross(slVector *s1, slVector *s2, slVector *d) {
 void slVectorNormalize(slVector *v) {
 	double d;
 	
-	d = slVectorLength(v);
+	d = slVectorLength( v );
 	if(d == 0.0 || d == 1.0) return;
 
 	v->x /= d;

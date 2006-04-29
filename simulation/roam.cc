@@ -9,6 +9,8 @@
 slRoamPatch::slRoamPatch(slTerrain *t) {
 	_terrain = t;
 
+	_triangleCount = 0;
+
 	_baseLeft._baseNeighbor = &_baseRight;	
 	_baseLeft._leftX = 0;
 	_baseLeft._leftY = 0;
@@ -258,6 +260,7 @@ void slRoamPatch::makePoints(slRoamTriangle *t) {
 	slVectorSub(&t->_points[2], &t->_points[0], &tmp2);
 
 	slVectorCross(&tmp2, &tmp, &t->_normal);
+
 	slVectorNormalize(&t->_normal);
 }
 
