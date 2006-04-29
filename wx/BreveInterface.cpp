@@ -357,10 +357,6 @@ int BreveInterface::dialogCallback(char *title, char *message, char *b1, char *b
 {
     BDialog d(breverender, title, message, b1, b2);
 
-	pthread_t ttt = pthread_self( );
-
-	printf(" Running in thread %d\n", ttt );
-
     return !d.ShowModal();
 }
 

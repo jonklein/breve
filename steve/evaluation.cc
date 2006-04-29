@@ -1286,10 +1286,11 @@ RTC_INLINE int stEvalForeach(stForeachExp *w, stRunInstance *i, brEval *result) 
 		return EC_ERROR;
 	}
 
-	for( ei = BRLIST( &list )->_vector.begin(); ei != BRLIST( &list )->_vector.end(); ei++ ) {
+	// for( ei = BRLIST( &list )->_vector.begin(); ei != BRLIST( &list )->_vector.end(); ei++ ) {
+	for( int n = 0; n < BRLIST( &list )->_vector.size(); n++ ) {
 		brEval eval;
 
-		if ( (resultCode = brEvalCopy( *ei, &eval) ) != EC_OK)
+		if ( (resultCode = brEvalCopy( BRLIST( &list )->_vector[ n ], &eval) ) != EC_OK)
 			return resultCode;
 
 		if (assignExp->_objectName && !assignExp->_objectType) {
@@ -2862,7 +2863,8 @@ int stExpEval(stExp *s, stRunInstance *i, brEval *result, stObject **tClass) {
 		resultCode = EVAL_RTC_CALL_3(s, stEvalUnaryExp, (stUnaryExp *)s, i, result);
 		break;
 	case ET_ST_EVAL:
-		memcpy(result, ((stEvalExp *)s)->eval, sizeof(brEval));
+		// memcpy(result, ((stEvalExp *)s)->eval, sizeof(brEval));
+		brEvalCopy( ((stEvalExp *)s)->eval, result );
 		break;
 	case ET_LIST:
 		resultCode = brEvalListExp((stListExp *)s, i, result);

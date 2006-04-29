@@ -77,7 +77,7 @@ int stOCallMethodNamed(brEval args[], brEval *target, brInstance *i) {
 	char *method = BRSTRING(&args[1]);
 	brEvalListHead *l = BRLIST(&args[2]);
 	std::vector< brEval* >::iterator li;
-	int argCount = 0, n;
+	int argCount = 0;
 	brEval **newargs = NULL;
 	stRunInstance ri;
 
@@ -86,9 +86,9 @@ int stOCallMethodNamed(brEval args[], brEval *target, brInstance *i) {
 	if(argCount != 0) {
 		newargs = (brEval**)alloca(sizeof(brEval*) * argCount);
 
-		for( li = l->_vector.begin(); li != l->_vector.end(); li++ ) {
-			newargs[n] = (brEval*)alloca(sizeof(brEval));
-			brEvalCopy( *li, newargs[n]);
+		for( int n = 0; n < argCount; n++ ) {
+			newargs[ n ] = new brEval;
+			brEvalCopy( l->_vector[ n ], newargs[ n ] );
 		}
 	}
 
@@ -96,6 +96,9 @@ int stOCallMethodNamed(brEval args[], brEval *target, brInstance *i) {
 	ri.type = newI->type;
 
 	stCallMethodByNameWithArgs(&ri, method, newargs, argCount, target);
+
+	for( int n = 0; n < argCount; n++ ) 
+		delete newargs[ n ];
 
 	return EC_OK;
 }
