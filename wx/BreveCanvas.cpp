@@ -461,4 +461,3 @@ void BreveCanvas::ResetSelection()
 {
     selected = NULL;
 }
-
