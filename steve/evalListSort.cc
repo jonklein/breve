@@ -46,15 +46,11 @@ class brEvalVectorSorter {
 
 			rcode = stCallMethod( &ri, &ri, mMethod, args, 2, &result );
 
-			// if (rcode == EC_ERROR) gEvalListSortError = 1;
-
 			if ( result.type() != AT_DOUBLE ) {
 				rcode = stToDouble(&result, &result, &ri);
-
-				// if (rcode == EC_ERROR) gEvalListSortError = 1;
 			}
 
-			mSeenMap[ pair ] = ( BRDOUBLE(&result) > 0.0 );
+			mSeenMap[ pair ] = ( BRDOUBLE(&result) < 0.0 );
 
 			return mSeenMap[ pair ];
 		};
@@ -74,8 +70,6 @@ int stSortEvalList( brEvalListHead *head, stInstance *caller, stMethod *method )
 	// if you don't have it!  That is strictly weak!
 
 	std::sort( head->_vector.begin(), head->_vector.end(), sorter );
-
-	// qsort( head[ 0 ], head->_vector.size(), stSortCallback );
 
 	return 1;
 }
