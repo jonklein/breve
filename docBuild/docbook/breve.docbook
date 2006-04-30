@@ -22,15 +22,17 @@
 <!ENTITY push SYSTEM "push.docbook">
 <!ENTITY source SYSTEM "source.docbook">
 <!ENTITY version-2.0 SYSTEM "version_2.0.docbook">
+<!ENTITY version-string SYSTEM "version.txt">
+<!ENTITY date-string SYSTEM "date.txt">
 ]>
 <book>
 <bookinfo>
 <mediaobject role="online">
-<imageobject><imagedata fileref="images/breve_icon.jpg" align="center"></imageobject>
+<imageobject><imagedata fileref="docs/images/breve_icon.jpg" align="center"></imageobject>
 </mediaobject>
-<date>2006-03-11</date>
+<date>&date-string;</date>
 <title>breve Documentation</title>
-<subtitle>version 2.4</subtitle>
+<subtitle>version &version-string;</subtitle>
 </bookinfo>
 
 <toc>

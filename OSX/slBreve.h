@@ -87,6 +87,8 @@ enum {
 	IBOutlet id savePictureMenuItem;
 	IBOutlet id syntaxMenuItem;
 
+	IBOutlet id _versionField;
+
 	IBOutlet id logText;
 	
 	IBOutlet id variableOutlineView;
@@ -105,10 +107,12 @@ enum {
 	char *classPath;
 	char *docsPath;
 	char *classDocsPath;
-
+	
 	IBOutlet id preferences;
 
 	IBOutlet id runCommandButton;
+
+	NSString *_versionString;
 }
 
 - (void)simulateRunClick;

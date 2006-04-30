@@ -18,6 +18,10 @@ classes: docBuild/docExtract
 	cp docBuild/classImages/*.jpg docs/classes/
 
 docbook: classes
+	echo $(VERSION) > docBuild/docbook/version.txt
+	date +'%m-%d-%Y' > docBuild/docbook/date.txt
+
+
 	mkdir -p docBuild/docbook/docs
 	touch docBuild/docbook/index.docbook
 	cd docBuild/docbook; \
@@ -29,7 +33,7 @@ docbook: classes
 	cd docBuild/docbook; \
 		openjade -t sgml -d breve.dsl breve.docbook
 	-cd docBuild/docbook; \
-		openjade -t tex -d /opt/fink/share/sgml/dsssl/docbook-dsssl-nwalsh/print/docbook.dsl breve.docbook
+		openjade -t tex -d /opt/fink/share/sgml/dsssl/docbook-dsssl-nwalsh/print/docbook.dsl breve.docbook 
 	cp -R docBuild/docbook/index.html docBuild/docbook/docs docs/
 	cp docBuild/docbook/images/breve_icon.jpg docs/
 	mkdir docs/docs/images

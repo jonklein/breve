@@ -1,13 +1,13 @@
-<chapter id="version-2.0"> <title>What's New in Version 2.4</title>
+<chapter id="version-2.0"> <title>What's New in Version &version-string;</title>
 
 <para>
-breve version 2.4 introduces several new features and changes.  
+breve version &version-string; introduces several new features and changes.  
 </para>
 
-<sect1 id="new-features"> <title>New Features in Version 2.4</title>
+<sect1 id="new-features"> <title>New Features in Version &version-string;</title>
 <para>
 
-Below are some of the major new features found in breve 2.4.  For a full 
+Below are some of the major new features found in breve &version-string;.  For a full 
 list of new features, see the "Changes" file that is included with the 
 breve distribution.
 
@@ -29,10 +29,10 @@ Added TurtleDrawing class for drawing via Logo-like turtle commands
 
 </para> </sect1>
 
-<sect1 id="upgrading-plugins"> <title>Important Notes on Plugins in Version 2.4</title>
+<sect1 id="upgrading-plugins"> <title>Important Notes on Plugins in Version &version-string;</title>
 <para>
-The inner workings of the breve plugin API have changed in version 2.4.  Plugins compiled
-for earlier versions of breve will not work with 2.3.  
+The inner workings of the breve plugin API have changed as of breve version 2.4.  Plugins compiled
+for earlier versions of breve will not work with breve 2.4 or later.  
 </para>
 <para>
 In most cases, plugins simply need to be recompiled, but should generally not require any 

@@ -37,6 +37,7 @@
             CLASS = slBreve; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                "_versionField" = id; 
                 aboutBox = id; 
                 archiveOpenAccView = id; 
                 breveEngine = id; 

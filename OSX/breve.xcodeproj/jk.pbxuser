@@ -1,13 +1,5 @@
 // !$*UTF8*$!
 {
-	089C1660FE840EACC02AAC07 /* English */ = {
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {711, 429}}";
-			sepNavSelRange = "{177, 0}";
-			sepNavVisRect = "{{0, 0}, {711, 429}}";
-			sepNavWindowFrame = "{{15, 269}, {750, 558}}";
-		};
-	};
 	2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 		activeBuildConfigurationName = "Deployment-Universal";
 		activeBuildStyle = 4A9504D0FFE6A4CB11CA0CBA /* Development */;
@@ -161,7 +153,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 166537438;
+			PBXPerProjectTemplateStateSaveDate = 168104083;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -718,7 +710,7 @@
 				PBXModuleWindowStatusBarHidden = YES;
 				RubberWindowFrame = "267 380 745 408 0 0 1280 832 ";
 			};
-			PBXWorkspaceStateSaveDate = 166537438;
+			PBXWorkspaceStateSaveDate = 168104083;
 		};
 		sourceControlManager = 48E065B3055C318700C40B45 /* Source Control */;
 		userBuildSettings = {
@@ -749,8 +741,8 @@
 	4802DC7905616137008198B9 /* Info.plist */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {711, 1316}}";
-			sepNavSelRange = "{1676, 0}";
-			sepNavVisRect = "{{0, 818}, {711, 429}}";
+			sepNavSelRange = "{1641, 4}";
+			sepNavVisRect = "{{0, 675}, {711, 429}}";
 			sepNavWindowFrame = "{{61, 227}, {750, 558}}";
 		};
 	};
@@ -848,10 +840,10 @@
 	};
 	F569DDB503980C9101B2CBA0 /* English */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {2132, 428}}";
-			sepNavSelRange = "{0, 0}";
-			sepNavVisRect = "{{0, 0}, {711, 428}}";
-			sepNavWindowFrame = "{{38, 248}, {750, 558}}";
+			sepNavIntBoundsRect = "{{0, 0}, {2126, 536}}";
+			sepNavSelRange = "{652, 0}";
+			sepNavVisRect = "{{98, 0}, {1342, 536}}";
+			sepNavWindowFrame = "{{38, 141}, {1381, 665}}";
 		};
 	};
 	F5BD20A70397BEC801980AE4 /* slLogView.mm */ = {
@@ -880,8 +872,8 @@
 	F5BD20AB0397BEC801980AE4 /* slObjectOutline.mm */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {922, 1904}}";
-			sepNavSelRange = "{2466, 0}";
-			sepNavVisRect = "{{0, 670}, {922, 690}}";
+			sepNavSelRange = "{2103, 0}";
+			sepNavVisRect = "{{0, 530}, {922, 690}}";
 			sepNavWindowFrame = "{{354, 13}, {961, 819}}";
 		};
 	};
@@ -918,18 +910,18 @@
 	};
 	F5BD20C00397BFC001980AE4 /* slBreve.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1044, 2842}}";
-			sepNavSelRange = "{0, 0}";
-			sepNavVisRect = "{{0, 0}, {1044, 683}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1044, 2898}}";
+			sepNavSelRange = "{3055, 0}";
+			sepNavVisRect = "{{0, 1078}, {1044, 683}}";
 			sepNavWindowFrame = "{{15, 15}, {1083, 812}}";
 		};
 	};
 	F5BD20C10397BFC001980AE4 /* slBreve.mm */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1172, 13593}}";
-			sepNavSelRange = "{1887, 0}";
-			sepNavVisRect = "{{0, 406}, {767, 205}}";
-			sepNavWindowFrame = "{{61, 283}, {750, 502}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1172, 13762}}";
+			sepNavSelRange = "{3523, 0}";
+			sepNavVisRect = "{{0, 855}, {845, 572}}";
+			sepNavWindowFrame = "{{61, 84}, {884, 701}}";
 		};
 	};
 	F5BD20C40397BFC001980AE4 /* slBreveEngine.h */ = {

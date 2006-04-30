@@ -1,6 +1,7 @@
 <!DOCTYPE style-sheet PUBLIC "-//James Clark//DTD DSSSL Style Sheet//EN" [
 <!ENTITY dbstyle SYSTEM "/opt/fink/share/sgml/dsssl/docbook-dsssl-nwalsh/html/docbook.dsl" CDATA DSSSL>
 <!ENTITY nav-prev        "[previous]">
+
 ]>
 
 <style-sheet>

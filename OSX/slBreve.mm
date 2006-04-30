@@ -52,8 +52,8 @@ static NSMutableString *gLogString;
 static NSRecursiveLock *gLogLock;
 
 - (void)showWelcomeMessage {
-	NSString *message = NSLocalizedStringFromTable(@"Welcome Message", @"General", @"");
-	NSString *title = NSLocalizedStringFromTable(@"Welcome Title", @"General", @"");
+	NSString *message = [ NSString stringWithFormat: NSLocalizedStringFromTable(@"Welcome Message", @"General", @""), _versionString ];
+	NSString *title = [ NSString stringWithFormat: NSLocalizedStringFromTable(@"Welcome Title", @"General", @""), _versionString ];
 
 	NSBeginInformationalAlertSheet(title, @"Okay", NULL, NULL, runWindow, self, NULL, NULL, NULL, message);
 }
@@ -70,11 +70,19 @@ static NSRecursiveLock *gLogLock;
 	int demoCount, n;
 	NSString *name;
 	NSString *bundlePath;
-
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
-	engineWillPause = NO;
+#define stringify(x) #x
+#define expand_macro_stringify(x) stringify(x)
 
+	_versionString = [ [ NSString stringWithCString: expand_macro_stringify( BREVE_VERSION ) ] retain ];
+
+	[_versionField setStringValue: [ NSString stringWithFormat: @"version %@", _versionString ] ];
+	
+	NSLog(@ " version = %@\n", [ NSString stringWithFormat: @"version %@", _versionString ]  );
+
+	engineWillPause = NO;
+	
 	documents = [[NSMutableArray arrayWithCapacity: 20] retain];
         
 	/* we have a C function here that needs access to a class variable   */
@@ -135,8 +143,8 @@ static NSRecursiveLock *gLogLock;
 
 	[runWindow makeKeyAndOrderFront: nil];
 
-	if(![[defaults stringForKey: @"ShowedWelcomeMessage"] isEqualTo: @"2.3"]) {
-		[defaults setObject: @"2.3" forKey: @"ShowedWelcomeMessage"];
+	if(![[defaults stringForKey: @"ShowedWelcomeMessage"] isEqualTo: _versionString ] ) {
+		[defaults setObject: _versionString forKey: @"ShowedWelcomeMessage"];
 		[self showWelcomeMessage];
 	}
 

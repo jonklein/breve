@@ -52,7 +52,6 @@
 		4802DC2F05616137008198B9 /* slGraphWindowView.h in Headers */ = {isa = PBXBuildFile; fileRef = 48D1C0D4046331F80093F8AA /* slGraphWindowView.h */; };
 		4802DC3105616137008198B9 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */; };
 		4802DC3205616137008198B9 /* slBreveSourceDocument.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B4FDCFA73011CA2CEA /* slBreveSourceDocument.nib */; };
-		4802DC3305616137008198B9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		4802DC3405616137008198B9 /* app_icon.tiff in Resources */ = {isa = PBXBuildFile; fileRef = F5BD21F60397C43E01980AE4 /* app_icon.tiff */; };
 		4802DC3505616137008198B9 /* Camera.tiff in Resources */ = {isa = PBXBuildFile; fileRef = F5BD21F80397C43E01980AE4 /* Camera.tiff */; };
 		4802DC3605616137008198B9 /* move.tiff in Resources */ = {isa = PBXBuildFile; fileRef = F5BD21F90397C43E01980AE4 /* move.tiff */; };
@@ -154,7 +153,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		2A37F4ACFDCFA73011CA2CEA /* slBreveSourceDocument.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreveSourceDocument.mm; sourceTree = "<group>"; };
 		2A37F4AEFDCFA73011CA2CEA /* slBreveSourceDocument.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = slBreveSourceDocument.h; sourceTree = SOURCE_ROOT; };
@@ -342,7 +340,6 @@
 				481D2181042A2D2100FFA442 /* slGLWindow.nib */,
 				2A37F4B6FDCFA73011CA2CEA /* MainMenu.nib */,
 				2A37F4B4FDCFA73011CA2CEA /* slBreveSourceDocument.nib */,
-				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
 				F5BD21F60397C43E01980AE4 /* app_icon.tiff */,
 				F5BD21F80397C43E01980AE4 /* Camera.tiff */,
 				F5BD21F90397C43E01980AE4 /* move.tiff */,
@@ -504,7 +501,6 @@
 			files = (
 				4802DC3105616137008198B9 /* MainMenu.nib in Resources */,
 				4802DC3205616137008198B9 /* slBreveSourceDocument.nib in Resources */,
-				4802DC3305616137008198B9 /* InfoPlist.strings in Resources */,
 				4802DC3405616137008198B9 /* app_icon.tiff in Resources */,
 				4802DC3505616137008198B9 /* Camera.tiff in Resources */,
 				4802DC3605616137008198B9 /* move.tiff in Resources */,
@@ -544,7 +540,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# This is a shell script that attempts to complete the entire\n# breve build process for Mac OS X, including the configure\n# step, the building of the breve libraries, and the building \n# of the final breve.app with the proper external libraries.\n\n### first do the configure, if neccessary\n\nif [ ! -f \"ConfigureLibraryList\" ]; then\n\techo \"ConfigureLibraryList not found!  Running configure...\"\n\t(cd ..; ./configure)\nfi\n\n### now build the breve engine libraries\n\n(cd ..; make lib/libbreve.a)\n\n### use the libraries provided by \"configure\" to build the \n### OS X application using xcodebuild\n\n### The ncurses library is required for command-line breve, but not \n### the OSX build.  Unforunately, it also breaks backwards compatabilty \n### for the OSX build, so we have to remove it from the library list\n\nexport LIBS=`cat ConfigureLibraryList | sed 's/-lncurses//' | sed 's/-ltermcap//'`\n\nxcodebuild -activeconfiguration -target real_breve.app";
+			shellScript = "# This is a shell script that attempts to complete the entire\n# breve build process for Mac OS X, including the configure\n# step, the building of the breve libraries, and the building \n# of the final breve.app with the proper external libraries.\n\n### first do the configure, if neccessary\n\nif [ ! -f \"ConfigureLibraryList\" ]; then\n\techo \"ConfigureLibraryList not found!  Running configure...\"\n\t(cd ..; ./configure)\nfi\n\n### now build the breve engine libraries\n\n(cd ..; make lib/libbreve.a)\n\n### use the libraries provided by \"configure\" to build the \n### OS X application using xcodebuild\n\n### The ncurses library is required for command-line breve, but not \n### the OSX build.  Unforunately, it also breaks backwards compatabilty \n### for the OSX build, so we have to remove it from the library list\n\nexport LIBS=`cat ConfigureLibraryList | sed 's/-lncurses//' | sed 's/-ltermcap//'`\n\nxcodebuild -activeconfiguration -target real_breve.app BREVE_VERSION=$BREVE_VERSION";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -578,14 +574,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		089C165FFE840EACC02AAC07 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				089C1660FE840EACC02AAC07 /* English */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 		2A37F4B4FDCFA73011CA2CEA /* slBreveSourceDocument.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -682,6 +670,7 @@
 		48C93588094B452400B48959 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BREVE_VERSION = 2.4manual;
 				CC_VERSION = 3.x;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = NO;
@@ -694,7 +683,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					MACOSX,
+					"BREVE_VERSION=$(BREVE_VERSION)",
+				);
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_PEDANTIC = NO;
 				GCC_WARN_SHADOW = NO;
@@ -708,6 +700,7 @@
 					/sw/include,
 				);
 				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_PREPROCESS = YES;
 				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = (
 					../lib,
@@ -731,6 +724,7 @@
 		48C93589094B452400B48959 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BREVE_VERSION = 2.4manual;
 				CC_VERSION = 3.x;
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = NO;
@@ -742,7 +736,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
-				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					MACOSX,
+					"BREVE_VERSION=$(BREVE_VERSION)",
+				);
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_PEDANTIC = NO;
 				GCC_WARN_SHADOW = NO;
@@ -756,6 +753,7 @@
 					/sw/include,
 				);
 				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_PREPROCESS = YES;
 				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = (
 					../lib,
@@ -809,6 +807,7 @@
 		48F0A4DD09CCE98700B52C28 /* Deployment-Universal */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BREVE_VERSION = 2.4manual;
 				CC_VERSION = 3.x;
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = NO;
@@ -820,7 +819,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
-				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					MACOSX,
+					"BREVE_VERSION=$(BREVE_VERSION)",
+				);
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_PEDANTIC = NO;
 				GCC_WARN_SHADOW = NO;
@@ -834,6 +836,7 @@
 					/sw/include,
 				);
 				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_PREPROCESS = YES;
 				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = (
 					../lib,
