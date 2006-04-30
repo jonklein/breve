@@ -82,11 +82,12 @@ Wrapper functions have the following prototype:
 int function(brEval arguments[], brEval *result, void *instance);
 </screen>
 Arguments are passed in as the <parameter>arguments</parameter> array of 
-<function>brEval</function> structs.  The function output is returned by 
-setting the contents of the <structname>brEval</structname> structure pointed 
+<function>brEval</function> objects.  The function output is returned by 
+setting the contents of the <structname>brEval</structname> object pointed 
 to by <parameter>result</parameter>.  <parameter>instance</parameter> is an
 internal pointer to the calling instance&mdash;this can be ignored.
 </para>
+<sect3><title>Getting Values from the <function>brEval</function> Class</title>
 <para>
 <indexterm><primary>BRINT plugin macro</primary></indexterm>
 <indexterm><primary>AT_INT plugin constant</primary></indexterm>
@@ -170,18 +171,20 @@ with the API.
 </listitem>
 </itemizedlist>
 </para>
+</sect3>
+<sect3><title>Setting Values in the <function>brEval</function> Class</title>
 <para>
 In order to set the result, use the overloaded method <function>set()</function> in the brEval class.  This method can take any of the C types listed above and will set the brEval's type according to the input type.  Some examples are shown below.
-<function>
+<screen>
 	// for a function returning an integer
 	result->set( 10 );
 
 	// for a function returning a string
 	char *myString = "look at me, I'm returning a string!";
 	result->set( myString );
-</function>
+</screen>
 In most cases, passing data to <function>set()</function> is as simple as the examples above.  However, care must be taken to ensure that the C-type being passed in corresponds to the desired brEval type.  This may become an issue, for example, if a plugin calculation uses floating point math, but desires to return an integer, or when returning NULL pointers.  It is therefore necessary to explicitly typecast values which do not match the expected return type.  Some examples are shown below.  In each example, the wrong type would be used without the typecast.
-<function>
+<screen>
 	// our calculation creates a double, but we wish to return an AT_INT type to breve:
 	result->set( (int)pow( x, y ) );
 
@@ -190,8 +193,10 @@ In most cases, passing data to <function>set()</function> is as simple as the ex
 
 	// now we want to return an AT_LIST type, but the value is NULL:
 	result->set( (brEvalListHead*)NULL );
-</function>
+</screen>
 </para>
+</sect3>
+<sect3><title>Types in the <function>brEval</function> Class</title>
 <para>
 The following list of constants specifies the types for plugin function input 
 arguments and output types.  The "AT" prefix stands for "atomic type".
@@ -215,10 +220,12 @@ should be <function>EC_OK</function> in the event of successful execution, or <f
 a fatal error.  Returning <function>EC_ERROR</function> will cause the simulation to stop, so you 
 should generally not return this value.  In many cases it is better to indicate 
 the error using a special return value of the internal function (that is to say, 
-buy putting a special value in the "result" struct, not actually returning from 
+by putting a special value in the "result" struct, not actually returning from 
 your C code with a special value).  You can then handle the error from within
 steve.
 </para>
+</sect3>
+<sect3><title>An Example Wrapper Function</title>
 <para>
 As an example of a breve function wrapper around an existing function, imagine a 
 function with the following prototype:
@@ -245,6 +252,8 @@ int breveDownloadURL(brEval *arguments, brEval *result, void *instance) {
 }
 </screen>
 </para>
+
+</sect3>
 
 </sect2>
 

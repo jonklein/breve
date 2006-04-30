@@ -5,7 +5,8 @@ Controller URLReaderExample.
 
 Control : URLReaderExample {
 	+ to init:
-		print "Grabbing data from http://www.google.com...".
-		print (new URLReader get url "http://www.google.com").
-		die "+ test executed successfully".
+		print "Grabbing data from http://www.spiderland.org...".
+		print (new URLReader get url "http://www.spiderland.org").
+		print "+ test executed successfully".
+		self end-simulation.
 }

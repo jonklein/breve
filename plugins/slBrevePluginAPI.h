@@ -23,17 +23,12 @@
 #include <string.h>
 #include <vector>
 
-// #include "breveEval.h"
+// The breve Simulation Environment plugin API version 2.4
+//
+// Documentation on using the breve plugin API is included in
+// the documentation distributed with breve.
 
-/*
-	The breve Simulation Environment plugin API version 2.4
-
-	Documentation on using the breve plugin API is included in
-	the documentation distributed with breve.
-*/
-
-/* These are deprecated symbol names, 
-   included here for backwards compatability */
+// These are deprecated symbol names, included here for backwards compatability 
 
 #define stNewBreveCall brNewBreveCall
 #define stNewSteveCall brNewBreveCall
@@ -74,10 +69,6 @@
 #define DLLEXPORT extern
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct slVector slVector;
 typedef struct brEval brEval;
 typedef struct brEvalListHead brEvalListHead;
@@ -87,7 +78,7 @@ typedef struct brData brData;
 typedef struct stInstance stInstance;
 typedef struct brInstance brInstance;
 
-/* These entries appear in the brEval type field. */
+// These entries appear in the brEval type field. 
 
 enum atomicTypes {
     AT_INVALID = 0,
@@ -114,6 +105,13 @@ struct slVector {
 
 typedef double slMatrix[3][3];
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void stGCUnretainAndCollectPointer(void *pointer, int type);
+void stGCRetainPointer(void *pointer, int type);
+
 class brEval {
 	public:
 		brEval() { _type = AT_NULL; }
@@ -121,13 +119,13 @@ class brEval {
 		~brEval() { collect(); }
 
 		inline void collect() {
-			// if ( _type == AT_NULL || _type == AT_INT || _type == AT_MATRIX || _type == AT_VECTOR || _type == AT_DOUBLE ) return;
-			// stGCUnretainAndCollectPointer( _values.pointerValue, _type );
+			if ( _type == AT_NULL || _type == AT_INT || _type == AT_MATRIX || _type == AT_VECTOR || _type == AT_DOUBLE ) return;
+			stGCUnretainAndCollectPointer( _values.pointerValue, _type );
 		}
 
 		inline void retain() {
-			// if ( _type == AT_NULL || _type == AT_INT || _type == AT_MATRIX || _type == AT_VECTOR || _type == AT_DOUBLE ) return;
-			// stGCRetainPointer( _values.pointerValue, _type );
+			if ( _type == AT_NULL || _type == AT_INT || _type == AT_MATRIX || _type == AT_VECTOR || _type == AT_DOUBLE ) return;
+			stGCRetainPointer( _values.pointerValue, _type );
 		}
 
 
@@ -174,24 +172,37 @@ class brEval {
 		unsigned char _type;
 };
 
-struct brEvalListHead {
-	// Warning: these variables may become private in the future -- use 
-	// the getVector() accessor to ensure forward compatibility.
-    int retainCount;
-    std::vector< brEval* > _vector;
+class brEvalObject {
+	public:
+		brEvalObject();
 
+		virtual ~brEvalObject();
 
-    inline std::vector< brEval* > &getVector() { return _vector; }
+		int _retainCount;
+
+		void retain();
+		void unretain();
+
+		void collect();
 };
 
-/*
- * The brData struct and associated functions.
- */
+class brEvalListHead: public brEvalObject {
+    public:
+        brEvalListHead();
+        ~brEvalListHead();
 
-struct brData {
-    void *data;
-    int length;
-    int retainCount;
+        std::vector< brEval* > _vector;
+
+        inline std::vector< brEval* > &getVector() { return _vector; }
+};
+
+class brData: public brEvalObject {
+    public:
+        brData( void *inData, int inLength );
+        ~brData();
+
+        unsigned char *data;
+        int length;
 };
 
 brData *brDataNew(void *data, int length);

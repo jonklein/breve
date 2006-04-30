@@ -55,7 +55,7 @@ int slUGetURL(brEval args[], brEval *target, void *i) {
 
 	data.maxSize = 4096;
 	data.size = 0;
-	data.string = (char*)slMalloc(data.maxSize);
+	data.string = new char[ data.maxSize ];
 
 	handle = curl_easy_init();
 	curl_easy_setopt(handle, CURLOPT_URL, BRSTRING(&args[0]));
@@ -65,7 +65,10 @@ int slUGetURL(brEval args[], brEval *target, void *i) {
 	curl_easy_cleanup(handle);
 
 	data.string[data.size] = '\0';
-	BRSTRING(target) = data.string;
+	
+	target->set( data.string );
+
+	delete data.string;
     
 	return EC_OK;
 }

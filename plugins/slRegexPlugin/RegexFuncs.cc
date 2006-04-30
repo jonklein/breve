@@ -28,7 +28,7 @@
 int slRSplit(brEval args[], brEval *output, void *instance);
 int slRRegex(brEval args[], brEval *output, void *instance);
 
-void slInitRegexFuncs(void *n) {
+DLLEXPORT void slInitRegexFuncs(void *n) {
     brNewBreveCall(n, "split", slRSplit, AT_LIST, AT_STRING, AT_STRING, 0);
     brNewBreveCall(n, "regex", slRRegex, AT_INT, AT_STRING, AT_STRING, 0);
 }

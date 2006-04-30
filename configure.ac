@@ -3,7 +3,7 @@ AC_PREREQ(2.57)
 AC_INIT([the breve simulation environment], [2.4], [jk@spiderland.org])
 AC_CONFIG_HEADER([include/breve/config.h])
 
-VERSION=2.4VersionTest
+VERSION=2.4
 
 AC_CANONICAL_HOST
 

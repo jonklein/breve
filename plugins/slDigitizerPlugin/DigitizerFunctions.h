@@ -69,6 +69,6 @@ int brDigitizerUpdateFrame(brEval args[], brEval *target, void *i);
 int brDigitizerHighestIntensityDelta(brEval args[], brEval *target, void *i);
 int brDigitizerHighestIntensityDeltaLocation(brEval args[], brEval *target, void *i);
 int brDigitizerCloseCamera(brEval args[], brEval *target, void *i);
-int slInitDigitizerFuncs(void *n);
+DLLEXPORT int slInitDigitizerFuncs(void *n);
 
 

@@ -876,7 +876,7 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "setStepFast", brISetStepFast, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "setStepFastIterations", brISetStepFastIterations, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "setAutoDisableFlag", brISetAutoDisableFlag, AT_POINTER, AT_INT, 0);
-	brNewBreveCall(n, "setDrawEveryFrame", brISetDrawEveryFrame, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "setDrawEveryFrame", brISetDrawEveryFrame, AT_NULL, AT_INT, 0);
 	brNewBreveCall(n, "randomSeed", brIRandomSeed, AT_NULL, AT_INT, 0);
 	brNewBreveCall(n, "randomSeedFromDevRandom", brIRandomSeedFromDevRandom, AT_INT, 0);
 	brNewBreveCall(n, "getTime", brIGetTime, AT_DOUBLE, 0);

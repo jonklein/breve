@@ -37,7 +37,7 @@ int brDigitizerOpenCamera(brEval args[], brEval *target, void *i) {
 
 	data->map = ccNewIntensityMap(20);
 
-	BRPOINTER(target) = data;
+	target->set( data );
 
 	return EC_OK;
 }
@@ -49,7 +49,7 @@ int brDigitizerFlip(brEval args[], brEval *target, void *i) {
 
 	b->flip = !b->flip;
 
-	BRINT(target) = b->flip;
+	target->set( b->flip );
 
 	return EC_OK;
 }
@@ -83,14 +83,14 @@ int brDigitizerReferenceMap(brEval args[], brEval *target, void *i) {
 int brDigitizerHighestDelta(brEval args[], brEval *target, void *i) { 
 	brDigitizer *b = (brDigitizer*)BRPOINTER(&args[0]);
 	if(!b) return EC_ERROR;
-	BRINT(target) = b->map->delta[b->map->highest];
+	target->set( b->map->delta[b->map->highest] );
 	return EC_OK;
 }
 
 int brDigitizerAverageDelta(brEval args[], brEval *target, void *i) { 
 	brDigitizer *b = (brDigitizer*)BRPOINTER(&args[0]);
 	if(!b) return EC_ERROR;
-	BRINT(target) = b->map->average;
+	target->set( b->map->average );
 	return EC_OK;
 }
 
@@ -121,7 +121,7 @@ int brDigitizerIntensityMapValue(brEval args[], brEval *target, void *i) {
 
 	if(!b) return EC_ERROR;
 
-	BRINT(target) = b->map->map[b->map->active][(b->map->size * y) + x];
+	target->set( b->map->map[b->map->active][(b->map->size * y) + x] );
 
 	return EC_OK;
 	
@@ -132,7 +132,7 @@ int brDigitizerDeltaMapValue(brEval args[], brEval *target, void *i) {
 	int y = BRINT(&args[2]);
 
 	if(!b) return EC_ERROR;
-	BRINT(target) = b->map->delta[(b->map->size * y) + x];
+	target->set( b->map->delta[(b->map->size * y) + x] );
 
 	return EC_OK;
 }
@@ -149,9 +149,9 @@ int brDigitizerCloseCamera(brEval args[], brEval *target, void *i) {
 	return EC_OK;
 }
 
-int slInitDigitizerFuncs(void *n) {
+DLLEXPORT int slInitDigitizerFuncs(void *n) {
 	brNewBreveCall(n, "digitizerOpenCamera", brDigitizerOpenCamera, AT_POINTER, AT_INT, AT_INT, 0);
-	brNewBreveCall(n, "digitizerUpdateFrame", brDigitizerUpdateFrame, AT_INT, AT_POINTER, AT_POINTER, 0);
+	brNewBreveCall(n, "digitizerUpdateFrame", brDigitizerUpdateFrame, AT_NULL, AT_POINTER, AT_POINTER, 0);
 	brNewBreveCall(n, "digitizerReferenceMap", brDigitizerReferenceMap, AT_NULL, AT_POINTER, 0);
 	brNewBreveCall(n, "digitizerFlip", brDigitizerFlip, AT_INT, AT_POINTER, 0);
 	brNewBreveCall(n, "digitizerHighestDelta", brDigitizerHighestDelta, AT_INT, AT_POINTER, 0);
