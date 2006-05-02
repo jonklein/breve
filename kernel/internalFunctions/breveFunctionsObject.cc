@@ -177,8 +177,8 @@ void breveInitObjectFunctions(brNamespace *n) {
 	brNewBreveCall(n, "removeObserver", brIRemoveObserver, AT_NULL, AT_INSTANCE, AT_STRING, 0);
 	brNewBreveCall(n, "notify", brINotify, AT_NULL, AT_STRING, 0);
 
-	brNewBreveCall(n, "addCollisionHandler", brIAddCollisionHandler, AT_INT, AT_INSTANCE, AT_STRING, AT_STRING, 0);
-	brNewBreveCall(n, "setIgnoreCollisionsWith", brISetIgnoreCollisionsWith, AT_INT, AT_INSTANCE, AT_STRING, AT_INT, 0);
+	brNewBreveCall(n, "addCollisionHandler", brIAddCollisionHandler, AT_NULL, AT_INSTANCE, AT_STRING, AT_STRING, 0);
+	brNewBreveCall(n, "setIgnoreCollisionsWith", brISetIgnoreCollisionsWith, AT_NULL, AT_INSTANCE, AT_STRING, AT_INT, 0);
 
 	brNewBreveCall(n, "getController", brIGetController, AT_INSTANCE, 0);
 }
