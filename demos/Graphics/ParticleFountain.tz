@@ -38,8 +38,6 @@ Control : Fountain {
 	+ to iterate:
 		self pivot-camera x .001 y .001.
 		super iterate. 
-
-		print (all Particles).
 }
 
 Mobile : Particle (aka Particles) {
