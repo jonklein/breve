@@ -484,8 +484,8 @@ void brInstanceFree(brInstance *i) {
 
 	i->userData = NULL;
 
-	delete i;
-	// i->engine->freedInstances.push_back(i);
+	// delete i;
+	i->engine->freedInstances.push_back(i);
 }
 
 /*!
