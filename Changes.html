@@ -27,64 +27,56 @@
 
 The <a href="http://www.spiderland.org/breve">breve</a> simulation environment change log.
 
-<h5>version 2.4 [03/20/2006]</h5>
+<h5>version 2.4 [05/13/2006]</h5>
 
-<li>Memory allocation optimizations.
+<h5>New Features</h5>
 
-<li>Added TurtleDrawing class for drawing via Logo-like turtle commands.
-
-<li>Added GADirectedGraph class for evolving graph structures.
-
-<li>Stationary objects can now be rotated.
-
+<ul>
+<li>Changes to plugin architecture: plugin developers will need to recompile plugins for 2.4 and minor source code changes may be required.
 <li>Official support for breve_cli movie export, image snapshots and light detection with Mesa on Linux (if Mesa libraries are present)
-
-<li>New garbage collection system, far faster and more robust than before.
-
-<li>Fixed truncation of large XML network reads.
-
-<li>Fixed links in method_index documentation.
-
-<li>Removed double-mark debugging message.
-
-<li>Fixed non-volumetric patch rendering crash.
-
-<li>Fixed XML archiving of objects created in same timestep as archiving event.
-
-<li>Fixed bug in setting joint torques (torques may now appear to be more powerful than previously)
-
-<li>Corrected link points for automatic joint scaling with non-uniform scales.
-
-<li>get-point-on-shape method now more accurate in degenerate situations (near vertices).
-
-<li>Added set-joint-torque-vector method for universal and ball joints.
-
-<li>Link rotations are no longer modified when being linked by joints.
-
-<li>Fixed spelling of "for-notification" keyword in unobserve method.
-
-<li>Fixed reverse-ordering of "unobserved" notifications.
-
-<li>Fixed disabling of multibody self-collisions.
-
-<li>Added control of Multibody self-collision parameters.
-
-<li>Added independent texture scales for X and Y directions.
-
-<li>Fixed delayed update of texture scaling.
-
-<li>Added methods to get the height and width of a camera's view.
-
-<li>Enhanced support for setting parameters from Push configuration files.
-
+<li>Added TurtleDrawing class for drawing via Logo-like turtle commands.
+<li>Added GADirectedGraph class for evolving graph structures.
 <li>New demo: Creatures.   Evolves morphology and behaviors of evolved virtual creatures.
+<li>New demo: Demolition.
+<li>Stationary objects can now be rotated.
+<li>New garbage collection system, far faster and more robust than before.
+<li>Memory allocation optimizations.
+<li>Added set-joint-torque-vector method for universal and ball joints.
+<li>Link rotations are no longer modified when being linked by joints.
+<li>Added control of Multibody self-collision parameters.
+<li>Added independent texture scales for X and Y directions.
+<li>Added methods to get the height and width of a camera's view.
+<li>Enhanced support for setting parameters from Push configuration files.
+</ul>
 
-<li>New demo: Demolition! 
+<h5>Bug Fixes</h5>
+<ul>
+<li>Fixed potential Windows garbage collection crashes.
+<li>Fixed truncation of large XML network reads.
+<li>Fixed links in method_index documentation.
+<li>Removed double-mark debugging message.
+<li>Fixed non-volumetric patch rendering crash.
+<li>Fixed XML archiving of objects created in same timestep as archiving event.
+<li>Fixed bug in setting joint torques (torques may now appear to be more powerful than previously)
+<li>Corrected link points for automatic joint scaling with non-uniform scales.
+<li>get-point-on-shape method now more accurate in degenerate situations (near vertices).
+<li>Fixed spelling of "for-notification" keyword in unobserve method.
+<li>Fixed reverse-ordering of "unobserved" notifications.
+<li>Fixed disabling of multibody self-collisions.
+<li>Fixed delayed update of texture scaling.
+</ul>
 
+<h5>Source Code Changes</h5>
+<ul>
 <li>Ongoing conversion of source code to C++.
+<li>Plugin architecture updated
+</ul>
+
+<hr>
 
 <h5>version 2.3 [08/31/2005]</h5>
 
+<h5>New Features</h5>
 <ul>
 
 <li>Major optimizations and improvements to collision detection and response.
@@ -149,6 +141,7 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 
 </ul>
 
+<hr>
 
 <h5>version 2.2.1 [04/28/2005]</h5>
 <ul>

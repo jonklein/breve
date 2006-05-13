@@ -66,7 +66,7 @@ slTerrain::slTerrain( int res, double scale, void *data ) : slWorldObject() {
 
 	for(n=0;n<_side;n++) {
 		_matrix[n] = new float[_side];
-		bzero( _matrix[n], sizeof( float ) * _side );
+		memset( _matrix[n], 0, sizeof( float ) * _side );
 	}
 
 	_drawMode = 1;
@@ -139,7 +139,7 @@ void slTerrain::resize(int s) {
 			fnormals[1][n] = new slVector[_side - 1];
 		}
 
-		bzero( _matrix[n], sizeof( float ) * _side );
+		memset( _matrix[n], 0, sizeof( float ) * _side );
 	}
 
 	_roam = new slRoamPatch(this);

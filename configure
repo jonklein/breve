@@ -1345,7 +1345,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
           ac_config_headers="$ac_config_headers include/breve/config.h"
 
 
-VERSION=2.4RC1
+VERSION=2.4
 
 ac_aux_dir=
 for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do

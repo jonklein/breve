@@ -18,6 +18,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+extern "C" {
+
 void stGCRetain(brEval *eval);
 void stGCRetainPointer(void *pointer, int type);
 
@@ -28,7 +30,7 @@ void stGCCollect(brEval *eval);
 void stGCCollectPointer(void *pointer, int type);
 
 void stGCUnretainAndCollect(brEval *eval);
-void stGCUnretainAndCollectPointer(void *pointer, int type);
+DLLEXPORT void stGCUnretainAndCollectPointer(void *pointer, int type);
 
 void brEvalListRetain(brEvalListHead *h);
 void brEvalListUnretain(brEvalListHead *h);
@@ -40,3 +42,5 @@ void brEvalHashCollect(brEvalHash *h);
 
 void brEvalHashFreeGC(brEvalHash *h);
 void brEvalListFreeGC(brEvalListHead *h);
+
+}

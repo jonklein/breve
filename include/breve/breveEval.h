@@ -58,8 +58,12 @@ enum atomicTypes {
 	the steve language frontend.
 */
 
-void stGCUnretainAndCollectPointer(void *pointer, int type);
-void stGCRetainPointer(void *pointer, int type);
+extern "C" {
+
+DLLEXPORT void stGCUnretainAndCollectPointer(void *pointer, int type);
+DLLEXPORT void stGCRetainPointer(void *pointer, int type);
+
+}
 
 class brEvalObject {
 	public:

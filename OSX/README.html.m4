@@ -24,7 +24,7 @@
 <img src="breve_icon.jpg">
 <h4>
 <a href="http://www.spiderland.org/breve">http://www.spiderland.org/breve</a><br>
-OSX release 2.3 - 08.30.2005<br>
+OSX release _VERSION_ - _DATE_<br>
 <a href="jk@spiderland.org">jk@spiderland.org</a>
 </h4>
 </CENTER>
@@ -40,7 +40,7 @@ Agent behaviors are written in a simple object oriented language called "steve".
 <P>
 For a more detailed introduction of the <I>breve</I> environment, refer to the introductory paper at: <A HREF="http://www.spiderland.org/breve">http://www.spiderland.org/breve</a>.
 <P>
-This release is version 2.3.  Many changes have been made from previous releases, so please read the Changes file to find out what's new.
+This release is version _VERSION_.  Many changes have been made from previous releases, so please read the Changes file to find out what's new.
 </BLOCKQUOTE>
 <P>
 <h4><b>getting started</b></h4>
@@ -75,7 +75,7 @@ If you would like to join the <I>breve</I> users mailing list, you can subscribe
 <BLOCKQUOTE>
 <pre>
 The breve Simulation Environment                                           
-Copyright (C) 2003, 2004 Jonathan Klein                        
+Copyright (C) 2003-2006 Jonathan Klein                        
 
 This program is free software; you can redistribute it and/or modify       
 it under the terms of the GNU General Public License as published by       

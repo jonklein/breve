@@ -120,6 +120,7 @@ clean:
 	find . -name '*.d' -exec rm -f {} \;
 
 OSX_build: optimize lib/libbreve.a
+	m4 -D_VERSION_=$(VERSION) -D_DATE_=`date +'%m-%d-%y'` OSX/README.html.m4 > OSX/README.html
 	-mkdir docs
 	cd plugins; $(MAKE)
 	cd OSX; xcodebuild -buildstyle Deployment-Universal CC= LIBS='@LDFLAGS@ @LIBS@' BREVE_VERSION=$(VERSION)
@@ -149,6 +150,7 @@ OSX_release: OSX_clean
 	mkdir breve_image_folder/plugins
 	cp -R plugins/samples breve_image_folder/plugins
 	cp plugins/slBrevePluginAPI.h plugins/README.txt breve_image_folder/plugins
+	find breve_image_folder -name '.svn' -prune -exec rm -rf {} \;
 	make_dmg.sh $(DMG_FILE) breve_image_folder/*
 	rm -rf breve_image_folder
 
@@ -175,6 +177,7 @@ endif
 	cp Changes.html GPL.txt README.txt $(CLI_FOLDER)
 	find $(CLI_FOLDER) -name CVS -prune -exec rm -rf {} \;
 	find $(CLI_FOLDER) -name '.cvsignore' -prune -exec rm -rf {} \;
+	find $(CLI_FOLDER) -name '.svn' -prune -exec rm -rf {} \;
 	rm -f breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@
 	@ARCHIVER@ breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@ $(CLI_FOLDER)
 
@@ -201,6 +204,7 @@ endif
 	cp Changes.html GPL.txt README.txt $(IDE_FOLDER)
 	find $(IDE_FOLDER) -name CVS -prune -exec rm -rf {} \;
 	find $(IDE_FOLDER) -name '.cvsignore' -prune -exec rm -rf {} \;
+	find $(IDE_FOLDER) -name '.svn' -prune -exec rm -rf {} \;
 	rm -f breveIDE_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@
 	@ARCHIVER@ breveIDE_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@ $(IDE_FOLDER)
 
