@@ -1,37 +1,39 @@
 TEMPLATE        = app
 LANGUAGE        = C++
 
-CONFIG  += qt warn_on release opengl thread
+CONFIG  += qt warn_on release opengl thread opengl
 
-REQUIRES	= opengl
+QT		+= opengl
 
-LIBS    += -L../lib -lbreve @LIBS@
+LIBS    += -L../lib -lbreve @LIBS@ 
 
 mac:LIBS        += -framework OpenGL
 
 INCLUDEPATH     += ../include/breve
 
-HEADERS += breveGLWidget.h \
+HEADERS += brqtGLWidget.h \
         brqtEngine.h \
         brqtMethodPopup.h \
+        brqtMainWindow.h \
+        brqtEditorWindow.h \
         brqtSteveSyntaxHighlighter.h
 
-SOURCES += breveGLWidget.cpp \
+SOURCES += brqtGLWidget.cpp \
         main.cpp \
         brqtEngine.cpp \
+        brqtMainWindow.cpp \
+		brqtMoveableWidgets.cpp \
+		brqtEditorWindow.cpp \
         brqtMethodPopup.cpp
 
 FORMS   = brqtMainWindow.ui \
         brqtLogWindow.ui \
         brqtObjectInspector.ui \
         brqtEditorWindow.ui \
-        brqtErrorWindow.ui
+        brqtErrorWindow.ui \
+		brqtWidgetPalette.ui
 
-IMAGES  = app_icon.png \
-        pause.png \
-        play.png \
-        stop.png
-
+RESOURCES = breve.qrc
 
 LEXSOURCES      += brqtQuickparser.l
 

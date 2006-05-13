@@ -2,7 +2,7 @@
 #ifndef BRQTENGINE
 #define BRQTENGINE
 
-#include "breveGLWidget.h"
+#include "brqtGLWidget.h"
 
 #include "kernel.h"
 
@@ -10,7 +10,7 @@ void *brqtEngineLoop(void *e);
 
 class brqtEngine : public QObject {
 public:
-    brqtEngine(brEngine *e, breveGLWidget *w) {
+    brqtEngine( brEngine *e, brqtGLWidget *w ) {
 		_engine = e;
 		_glwidget = w;
 		w->setEngine(e);
@@ -32,7 +32,7 @@ public:
 	}
 
     brEngine *_engine;
-    breveGLWidget *_glwidget;
+    brqtGLWidget *_glwidget;
     
     void pause() {
 		if(_paused) {
