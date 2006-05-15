@@ -710,6 +710,8 @@ associated with an instance in the simulation is false.
  A vector is used to represent a point or vector in 3D space. A vector is expressed as three floating point numbers, such as (1.0, 2.0, 5.0). 
 </para>
 <sect3><title><function>vector</function> Operators</title>
+<indexterm><primary>vector components, setting and extracting</primary></indexterm> 
+<indexterm><primary>vector operators</primary></indexterm> 
 <para>
 Vectors may be added (+) to and subtracted (-) from other vectors, which yields another vector.
 Vectors may be multiplied (*) or divided (/) by ints or floats, which also results in other vectors.
@@ -726,6 +728,15 @@ v = v / |v|.    # normalizes the vector by dividing it by it's own
 				# length such that the new length is 1.
 </screen>
 </para>
+<para>
+Individual vector components can be extracted or set using the following notation:
+<screen>
+xValue = myVector::x.
+
+myVector::y = 100.
+</screen>
+</para>
+
 </sect3>
 
 <sect3><title>Conversions to Other Types</title>

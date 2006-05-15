@@ -79,5 +79,5 @@ int breveMovieClose(brEval args[], brEval *result, brInstance *i) {
 void breveInitMovieFunctions(brNamespace *n) {
 	brNewBreveCall(n, "movieCreate", breveMovieCreate, AT_POINTER, AT_STRING, 0);
 	brNewBreveCall(n, "movieAddWorldFrame", breveMovieAddWorldFrame, AT_INT, AT_POINTER, 0);
-	brNewBreveCall(n, "movieClose", breveMovieClose, AT_INT, AT_POINTER, 0);
+	brNewBreveCall(n, "movieClose", breveMovieClose, AT_NULL, AT_POINTER, 0);
 }
