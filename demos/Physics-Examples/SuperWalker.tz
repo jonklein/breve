@@ -299,7 +299,7 @@ Genome : MonkeyGenome {
 	+ to calculate-torque number jointNum (int) at time (float):
 		# calculates the torque for a certain joint number.
 
-		return .5 * sin(waveCompression * (time + phaseShifts[jointNum]) - (ampShifts[jointNum])).
+		return .5 * sin(waveCompression * (time + phaseShifts[jointNum]) ) - (ampShifts[jointNum]).
 		
 	+ to get-limb-length number n (int):
 		return limbLengths[n].
