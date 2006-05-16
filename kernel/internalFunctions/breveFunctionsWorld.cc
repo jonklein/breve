@@ -873,8 +873,8 @@ void breveInitWorldFunctions(brNamespace *n) {
 
 	brNewBreveCall(n, "worldObjectGetLightExposure", brIWorldObjectGetLightExposure, AT_INT, AT_POINTER, 0);
 
-	brNewBreveCall(n, "setStepFast", brISetStepFast, AT_POINTER, AT_INT, 0);
-	brNewBreveCall(n, "setStepFastIterations", brISetStepFastIterations, AT_POINTER, AT_INT, 0);
+	brNewBreveCall(n, "setStepFast", brISetStepFast, AT_NULL, AT_INT, 0);
+	brNewBreveCall(n, "setStepFastIterations", brISetStepFastIterations, AT_NULL, AT_INT, 0);
 	brNewBreveCall(n, "setAutoDisableFlag", brISetAutoDisableFlag, AT_POINTER, AT_INT, 0);
 	brNewBreveCall(n, "setDrawEveryFrame", brISetDrawEveryFrame, AT_NULL, AT_INT, 0);
 	brNewBreveCall(n, "randomSeed", brIRandomSeed, AT_NULL, AT_INT, 0);

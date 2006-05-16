@@ -50,7 +50,7 @@ The best way to get started and learn about programming in steve is to examine t
 <P>
 To run a demo, simply select the demo from the "Demo" menu, and push the play button.  Make changes in the code window and restart the demo to see how your changes affect the simulation.
 <P>
-After trying the demos, you can consult the <a href="http://www.spiderland.org/breve/docs">breve documentation</a> to learn more about writing simulations in breve.
+After trying the demos, you can consult the <a href="http://www.spiderland.org/breve/breve_docs">breve documentation</a> to learn more about writing simulations in breve.
 </BLOCKQUOTE>
 <P>
 <H4><b>known bugs</b></H4>

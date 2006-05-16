@@ -78,7 +78,7 @@ int stCDearchiveXMLObjectFromString(brEval args[], brEval *target, brInstance *i
 
 void breveInitXMLFuncs(brNamespace *n) {
 	 brNewBreveCall(n, "writeXMLEngine", stCWriteXMLEngine, AT_INT, AT_STRING, 0);
-	 brNewBreveCall(n, "archiveXMLObject", stCArchiveXMLObject, AT_NULL, AT_INSTANCE, AT_STRING, 0);
+	 brNewBreveCall(n, "archiveXMLObject", stCArchiveXMLObject, AT_INT, AT_INSTANCE, AT_STRING, 0);
 	 brNewBreveCall(n, "dearchiveXMLObject", stCDearchiveXMLObject, AT_INSTANCE, AT_STRING, 0);
 	 brNewBreveCall(n, "dearchiveXMLObjectFromString", stCDearchiveXMLObjectFromString, AT_INSTANCE, AT_STRING, 0);
 }
