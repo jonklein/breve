@@ -318,8 +318,8 @@ int brILinkGetMultibody(brEval args[], brEval *target, brInstance *i) {
 	slLink *link = BRLINKPOINTER(&args[0]);
 	slMultibody *mb;
 
-	if ((mb = link->getMultibody())) target->set( (brInstance *)mb->getCallbackData() );
-	else target->set( (void*)NULL );
+	if ((mb = link->getMultibody())) target->set( (brInstance*)mb->getCallbackData() );
+	else target->set( (brInstance*)NULL );
 
 	return EC_OK;
 }
