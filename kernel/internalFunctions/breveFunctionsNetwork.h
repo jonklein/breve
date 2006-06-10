@@ -32,6 +32,8 @@
 
 void breveInitNetworkFuncs(brNamespace *);
 
+int brSendBackXMLString(int, char *);
+int brSendBackXMLObject(int, brInstance *);
 void *brHandleConnection(void *);
 
 brNetworkServer *brListenOnPort(int, brEngine *);

@@ -34,8 +34,6 @@
 #include <malloc.h>
 #endif
 
-#define NETWORK_MAGIC   0x0b00b1e5
-#define NETWORK_VERSION 1
 
 /*  
 	+ steveFuncsObject.c 
@@ -188,13 +186,70 @@ int stNewInstanceForClassString(brEval args[], brEval *target, brInstance *bi) {
 	return EC_OK;
 }   
 
-int stSendXMLString(char *address, int port, char *object) {
+int stWaitForServerReply(int sockfd, brEval *target, brInstance *i) {
+	ssize_t count;
+	brNetworkRequest request;
+	brStringHeader header;
+
+	count = recv(sockfd, (char*)&request, sizeof(brNetworkRequest), 0);
+	if (count < 1) {
+		slMessage(DEBUG_ALL, "error while waiting for Server reply (brNetworkRequest)...\n");
+		return -1;
+	}
+	if(request.magic != NETWORK_MAGIC) {
+		slMessage(DEBUG_ALL, "network connection from invalid Server\n");
+		return -1;
+	}
+
+	switch(request.type) {
+		case NR_XML:
+			count = recv(sockfd, (char*)&header, sizeof(brStringHeader), 0);
+			if (count < 1) {
+				slMessage(DEBUG_ALL, "error while waiting for Server reply (brStringHeader)...\n");
+				return -1;
+			}
+
+			if (header.length) {
+				char *buffer;
+				buffer = new char[header.length+1];
+				count = slUtilRead(sockfd, buffer, header.length);
+				if (count != header.length) {
+					slMessage(DEBUG_ALL, "error while waiting for Server reply (incomplete data)...\n");
+					delete[] buffer;
+					return -1;
+				}
+				buffer[header.length] = 0;
+				brEval *args[2], eval[2];
+	
+				eval[0].set( buffer );
+				args[0] = &eval[0];
+				args[1] = &eval[1];
+	
+				brMethodCallByNameWithArgs(i->engine->controller, "parse-xml-network-request", args, 1, target);
+				delete[] buffer;
+			} else {  // Empty request, Server did not send object...
+				// Do nothing, brEval is set to AT_NULL by default...
+			}
+
+			break;
+		default:
+			slMessage(DEBUG_ALL, "received unknown request type from Server: type = %d\n",request.type);
+			return -1;
+			break;
+	}
+
+	return 0;
+}
+
+//int stSendXMLString(char *address, int port, char *object) {
+int stSendXMLString(char *address, int port, char *object, brEval *target, brInstance *i) {
 	brNetworkRequest request;
 	brStringHeader header;
 	int sockfd;
 	struct sockaddr_in saddr;
 	long addr = brAddrFromHostname(address);
 	header.length = strlen(object);
+	int returnedValue = 0;
 
 	if(!addr) {
 		slMessage(DEBUG_ALL, "upload failed: cannot find address for host \"%s\"\n", address);
@@ -222,14 +277,20 @@ int stSendXMLString(char *address, int port, char *object) {
 	write(sockfd, &request, sizeof(brNetworkRequest));
 	write(sockfd, &header, sizeof(brStringHeader));
 	write(sockfd, object, header.length);
+
+	// And now lets wait for server reply...
+        returnedValue = stWaitForServerReply(sockfd, target, i);
+
 	close(sockfd);
-	return 0;
+	//return 0;
+	return returnedValue;
 }
 
 int stNSendXMLObject(brEval *args, brEval *target, brInstance *i) {
 	char *addr = BRSTRING(&args[0]);
 	int port = BRINT(&args[1]);
 	brInstance *archive = BRINSTANCE(&args[2]);
+	int returnedValue = 0;
 
 	slStringStream *xmlBuffer = slOpenStringStream();
 	FILE *file = xmlBuffer->fp;
@@ -238,11 +299,18 @@ int stNSendXMLObject(brEval *args, brEval *target, brInstance *i) {
 	stXMLWriteObjectToStream((stInstance*)archive->userData, file, 0);
 	buffer = slCloseStringStream(xmlBuffer);
 
-	target->set( stSendXMLString(addr, port, buffer) );
+	//target->set( stSendXMLString(addr, port, buffer) );
+	returnedValue = stSendXMLString(addr, port, buffer, target, i);
 
 	slFree(buffer);
 
-	return EC_OK;
+	//return EC_OK;
+	if (returnedValue) {
+		returnedValue = EC_ERROR;
+	} else {
+		returnedValue = EC_OK;
+	}
+	return returnedValue;
 }
 
 int stCStacktrace(brEval args[], brEval *target, brInstance *i) {
@@ -291,7 +359,8 @@ void breveInitSteveObjectFuncs(brNamespace *n) {
     brNewBreveCall(n, "objectAllocationReport", stCObjectAllocationReport, AT_NULL, 0);
 	brNewBreveCall(n, "newInstanceForClassString", stNewInstanceForClassString, AT_INSTANCE, AT_STRING, 0);
 
-	brNewBreveCall(n, "sendXMLObject", stNSendXMLObject, AT_INT, AT_STRING, AT_INT, AT_INSTANCE, 0);
+	//brNewBreveCall(n, "sendXMLObject", stNSendXMLObject, AT_INT, AT_STRING, AT_INT, AT_INSTANCE, 0);
+	brNewBreveCall(n, "sendXMLObject", stNSendXMLObject, AT_INSTANCE, AT_STRING, AT_INT, AT_INSTANCE, 0);
 	brNewBreveCall(n, "stacktrace", stCStacktrace, AT_NULL, 0);
 
 	brNewBreveCall(n, "addDependency", stIAddDependency, AT_NULL, AT_INSTANCE, 0);

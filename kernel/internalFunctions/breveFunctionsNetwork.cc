@@ -20,6 +20,8 @@
 
 #include "kernel.h"
 #include "breveFunctionsNetwork.h"
+#include "steve.h"
+#include "xml.h"
 
 #if !MINGW
 #include <sys/socket.h>
@@ -246,6 +248,54 @@ void *brListenOnSocket(void *data) {
 }
 
 /*!
+	\brief Sending back an XML encoded instance to the client.
+*/
+
+int brSendBackXMLString(int sockfd, char *object) {
+	brNetworkRequest request;
+	brStringHeader header;
+
+	if (object) {
+		header.length = strlen(object);
+	} else {
+		header.length = 0;
+	}
+
+	request.version = NETWORK_VERSION;
+	request.magic = NETWORK_MAGIC;
+	request.type = NR_XML;
+
+	header.length = strlen(object);
+	write(sockfd, &request, sizeof(brNetworkRequest));
+	write(sockfd, &header, sizeof(brStringHeader));
+	if (header.length) write(sockfd, object, header.length);
+
+	return 0;
+}
+
+/*!
+	\brief XML encoding instance and sending back to client.
+*/
+
+int brSendBackXMLObject(int sockfd, brInstance *i) {
+	char *buffer = NULL;
+	int returnedValue = 0;
+
+	if (i) {  // If we have an instance, let XML encode it...
+		slStringStream *xmlBuffer = slOpenStringStream();
+		FILE *file = xmlBuffer->fp;
+	        stXMLWriteObjectToStream((stInstance*)i->userData, file, 0);
+		buffer = slCloseStringStream(xmlBuffer);
+	}
+
+	returnedValue = brSendBackXMLString(sockfd, buffer);
+
+	if (buffer) slFree(buffer);
+
+	return returnedValue;
+}
+
+/*!
 	\brief Handles a network connection.
 */
 
@@ -298,6 +348,11 @@ void *brHandleConnection(void *p) {
 			buffer = new char[length+1];
 
 			count = slUtilRead(data->socket, buffer, length);
+			if (count != length) {
+				slMessage(DEBUG_ALL, "Received less data then expected: (received = %d, expected = %d)\n",count,length);
+				delete[] buffer;
+				return NULL;
+			}
 
 			buffer[length] = 0;
 
@@ -317,6 +372,16 @@ void *brHandleConnection(void *p) {
 			if(method) {
 				brMethodCall(data->server->recipient, method, args, &result);
 				brMethodFree(method);	
+				if (request.version >= 2) { // for backward compatibility, send nothing to earlier NETWORK_VERSION...
+					// send back an answer based on accept-upload returned value...
+					if (result.type() == AT_INSTANCE) {
+						brSendBackXMLObject(data->socket, result.getInstance());
+					} else { // Nothing to send... Send an empty request...
+						if (result.type() != AT_NULL) 
+							slMessage(DEBUG_ALL, "accept-upload method should return an instance;  Will return an empty object to client: returned type = %d\n", result.type()); 
+						brSendBackXMLObject(data->socket, (brInstance *)NULL);
+					}
+				}
 			}
 
 			delete[] buffer;

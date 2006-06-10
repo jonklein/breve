@@ -181,7 +181,7 @@ NULL : Object (aka Objects) [version 2.1] {
 		% Sends this object over the network to a breve server on host hostName
 		% listening on port portNumber.
 
-		sendXMLObject(hostName, portNumber, self).
+		return sendXMLObject(hostName, portNumber, self).
 
 	+ to add-dependency on i (object):
 		% Makes this instance depend on instance i when archiving and 

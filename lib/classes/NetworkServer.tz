@@ -1,4 +1,4 @@
-@include "Object.tz"
+@include "Abstract.tz"
 
 Abstract : NetworkServer (aka NetworkServers) [version 2.1] {
     % NetworkServer sets up a breve simulation to listen on a port

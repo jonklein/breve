@@ -1,3 +1,6 @@
+#ifndef _BREVE_NETWORK_H
+#define _BREVE_NETWORK_H
+
 enum networkRequests {
     NR_UPLOAD,
     NR_METHOD,
@@ -17,7 +20,7 @@ struct brNetworkServer {
 // tee hee hee hee hee hpwee hah haha hahehehhe hah hehah ahahahahahh!#
 
 #define NETWORK_MAGIC   0x0b00b1e5
-#define NETWORK_VERSION 1
+#define NETWORK_VERSION 2
 
 struct brNetworkRequest {
     int32_t version;
@@ -36,3 +39,5 @@ long brAddrFromHostname(char *name);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* _BREVE_NETWORK_H */
