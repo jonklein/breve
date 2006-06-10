@@ -1,0 +1,139 @@
+#!/Users/jk/dev/breve/bin/breve --version
+
+# include some frequently used classes and specify common classpaths
+
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use Stationary.
+@use NetworkServer.
+
+@define I_AM_THE_SERVER 1.
+@define BREVE_SERVER_IP "192.168.1.134".
+@define BREVE_SERVER_PORT 30304.
+@define Y_LIMIT 5.
+
+# tell the engine the name of the controller
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+    + variables:
+        agent1 (object).
+        agent2 (object).
+        agent3 (object).
+        current (int).
+
+    + to init:
+        if I_AM_THE_SERVER: {
+            new NetworkServer listen on-port BREVE_SERVER_PORT.
+            print "NetworkServer is ready...".
+        } else {
+            agent1 = new Agent.
+            agent2 = new Agent.
+            agent3 = new Agent.
+            
+            agent1 init-with x-shift -5.
+            agent2 init-with x-shift 0.
+            agent3 init-with x-shift 5.
+
+            self schedule method-call "send" at-time 5.0.
+        }
+
+
+    + to iterate:
+        super iterate.
+
+    + to send:
+        if current == 0: {
+            print "Sending $agent1 over Network to", BREVE_SERVER_IP, "at port", BREVE_SERVER_PORT.
+            agent1 send-over-network to BREVE_SERVER_IP on BREVE_SERVER_PORT.
+            current++.
+            self schedule method-call "send" at-time (self get-time) + 120.0.
+        } else if current == 1: {
+            print "Sending $agent2 over Network to", BREVE_SERVER_IP, "at port", BREVE_SERVER_PORT.
+            agent2 send-over-network to BREVE_SERVER_IP on BREVE_SERVER_PORT.
+            current++.
+            self schedule method-call "send" at-time (self get-time) + 120.0.
+        } else {
+            print "Sending $agent3 over Network to", BREVE_SERVER_IP, "at port", BREVE_SERVER_PORT.
+            agent3 send-over-network to BREVE_SERVER_IP on BREVE_SERVER_PORT.
+        }
+
+    + to accept-upload of theObject (object) from host (string):
+        print "received upload of $theObject from $host".
+
+        if ((theObject get-sub) get-list-string) == "cat": {
+            print "Upload of subordinate object successful".
+        } else {
+            die "Error dearchiving networked object".
+        }
+        
+        if current == 0: {
+            if agent1: free agent1.
+            agent1 = theObject.
+            current++.
+        } else if current == 1: {
+            if agent2: free agent2.
+            agent2 = theObject.
+            current++.
+        } else {
+            if agent3: free agent3.
+            agent3 = theObject.
+            current = 0.
+        }
+}
+
+Mobile : Agent {
+    + variables:
+        sub (object).
+        subShift (vector).
+        xShift (float).
+
+    + to init-with x-shift x (float):
+        sub = new SubordinateAgent.
+
+        xShift = x.
+        self add-dependency on sub.
+        self set-velocity to (0, -.5, 0).
+        subShift = (0, .5, 0).
+        self move to (xShift, Y_LIMIT, 0).
+
+    + to iterate:
+        if (self get-location)::y > Y_LIMIT: self move to (xShift, -Y_LIMIT, 0).
+        else if (self get-location)::y < -Y_LIMIT: self move to (xShift, Y_LIMIT, 0).
+        sub move to (self get-location) + subShift.
+
+    + to get-sub:
+        return sub.
+
+    + to dearchive:
+        result (int).
+
+        result = (super dearchive).
+
+        self set-velocity to (0, .5, 0).
+        subShift = (0, -.5, 0).
+        self move to (xShift, -Y_LIMIT, 0).
+
+        return result.
+        
+    + to destroy:
+        free sub.
+}
+
+Mobile : SubordinateAgent {
+    + variables:
+        l (list).
+
+    + to init:
+        l = { 1, "cat" }.
+        self set-color to (1, 0, 0).
+
+    + to get-list-string:
+        return l{1}.
+}
