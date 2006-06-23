@@ -107,7 +107,7 @@ GeneticAlgorithmIndividual : GADirectedGraph {
 		rootNode = (self pick-root-node from childnodes).
 
 		if !rootNode: {
-			rootNode = nodes1{ 0 }.
+			rootNode = childnodes{ 0 }.
 		}
 
 		keep{ rootNode } = 1.
@@ -213,9 +213,11 @@ GeneticAlgorithmIndividual : GADirectedGraph {
 		% Deletes the root node and all connected objects.  This method
 		% "clears" the GADirectedGraph so that it may be reused.
 
-		if rootNode: self remove-dependency on rootNode.
-		rootNode destroy-connected-objects.
-		free rootNode.
+		if rootNode: { 
+			self remove-dependency on rootNode.
+			rootNode destroy-connected-objects.
+			free rootNode.
+		}
 
 		rootNode = 0.
 }

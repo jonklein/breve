@@ -151,6 +151,8 @@ int main(int argc, char **argv) {
 
 	if (!gOptionNoGraphics) slInitGlut(argc, argv, simulationFile);
 
+	frontend->engine->camera->setBounds( width, height );
+
 	if (gOptionArchiveFile) {
 		if (breveFrontendLoadSavedSimulation(frontend, text, simulationFile, gOptionArchiveFile) != EC_OK)
 			brQuit(frontend->engine);

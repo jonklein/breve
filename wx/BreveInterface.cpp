@@ -25,142 +25,146 @@
 
 BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text)
 {
-    char buf[2048];
-    wxString str;
-    int i = 0;
+	char buf[2048];
+	wxString str;
+	int i = 0;
 
-    this->simulationfile = simfile;
-    this->text = text;
-    this->next = NULL;
+	int zero = 0;
 
-    // frontend = breveFrontendInit(0, NULL);
-    // Due to the annoying java error I'm unable to track down, it isn't safe
-    // to call this function.  It calls brJavaInit, which doesn't actually
-    // do anything when using the directory layout of the CVS tree.  However,
-    // if you happen to have breveIDE living in a directory with lib/classes,
-    // brJavaInit will attempt to create a VM - failing due to searchpaths
-    // not yet being setup.  We don't want that - it'll eventually cause
-    // the client to crash.  Note that even if searchpaths are configured
-    // correctly before brJavaInit is called, java will still eventually
-    // crash the client due to some internal error.  I have no idea how to
-    // resolve this.
+	this->simulationfile = simfile;
+	this->text = text;
+	this->next = NULL;
 
-    frontend = new breveFrontend;
-    frontend->engine = brEngineNew();
-    frontend->engine->argc = 0;
-    frontend->engine->argv = NULL;
+	glutInit( &zero, NULL );
 
-    frontend->data = breveFrontendInitData(frontend->engine);
+	// frontend = breveFrontendInit(0, NULL);
+	// Due to the annoying java error I'm unable to track down, it isn't safe
+	// to call this function.  It calls brJavaInit, which doesn't actually
+	// do anything when using the directory layout of the CVS tree.  However,
+	// if you happen to have breveIDE living in a directory with lib/classes,
+	// brJavaInit will attempt to create a VM - failing due to searchpaths
+	// not yet being setup.  We don't want that - it'll eventually cause
+	// the client to crash.  Note that even if searchpaths are configured
+	// correctly before brJavaInit is called, java will still eventually
+	// crash the client due to some internal error.  I have no idea how to
+	// resolve this.
 
-    strncpy(buf, app->GetLocalDir(), 2047);
-    buf[2047] = '\0';
-    brAddSearchPath(frontend->engine, (char*)&buf);
+	frontend = new breveFrontend;
+	frontend->engine = brEngineNew();
+	frontend->engine->argc = 0;
+	frontend->engine->argv = NULL;
 
-    this->simmenu = new wxMenu;
-    paused = 1;
-    valid = 1;
-    initialized = 0;
-    x = 400;
-    y = 300;
+	frontend->data = breveFrontendInitData(frontend->engine);
 
-    frontend->engine->getLoadname = ::getLoadname;
-    frontend->engine->getSavename = ::getSavename;
-    frontend->engine->soundCallback = soundCallback;
-    frontend->engine->pauseCallback = pauseCallback;
-    frontend->engine->dialogCallback = ::dialogCallback;
-    frontend->engine->interfaceTypeCallback = interfaceVersionCallback;
-    frontend->engine->newWindowCallback = newWindowCallback;
-    frontend->engine->freeWindowCallback = freeWindowCallback;
-    frontend->engine->renderWindowCallback = renderWindowCallback;
-    brEngineSetUpdateMenuCallback(frontend->engine, ::menuCallback);
+	strncpy(buf, app->GetLocalDir(), 2047);
+	buf[2047] = '\0';
+	brAddSearchPath(frontend->engine, (char*)&buf);
 
-    slSetMessageCallbackFunction(::messageCallback);
+	this->simmenu = new wxMenu;
+	paused = 1;
+	valid = 1;
+	initialized = 0;
+	x = 400;
+	y = 300;
 
-    for (i = 0; i < app->GetSearchPathArray()->Count(); i++)
-    {
+	frontend->engine->getLoadname = ::getLoadname;
+	frontend->engine->getSavename = ::getSavename;
+	frontend->engine->soundCallback = soundCallback;
+	frontend->engine->pauseCallback = pauseCallback;
+	frontend->engine->dialogCallback = ::dialogCallback;
+	frontend->engine->interfaceTypeCallback = interfaceVersionCallback;
+	frontend->engine->newWindowCallback = newWindowCallback;
+	frontend->engine->freeWindowCallback = freeWindowCallback;
+	frontend->engine->renderWindowCallback = renderWindowCallback;
+	brEngineSetUpdateMenuCallback(frontend->engine, ::menuCallback);
+
+	slSetMessageCallbackFunction(::messageCallback);
+
+	for (i = 0; i < app->GetSearchPathArray()->Count(); i++)
+	{
 	strncpy(buf, app->GetSearchPathArray()->Item(i), 2047);
 	buf[2047] = '\0';
 	brAddSearchPath(frontend->engine, (char*)&buf);
-    }
+	}
 
-    if (!simdir.IsEmpty())
-    {
+	if (!simdir.IsEmpty())
+	{
 	strncpy(buf, simdir, 2047);
 	buf[2047] = '\0';
 	brAddSearchPath(frontend->engine, (char*)&buf);
-    }
+	}
 
-    strncpy(buf, app->GetBreveDir(), 2047);
-    buf[2047] = '\0';
-    brAddSearchPath(frontend->engine, (char*)&buf);
+	strncpy(buf, app->GetBreveDir(), 2047);
+	buf[2047] = '\0';
+	brAddSearchPath(frontend->engine, (char*)&buf);
 
-    strncpy(buf, app->GetBreveDir() + "plugins" + FILE_SEP_PATH, 2047);
-    buf[2047] = '\0';
-    brAddSearchPath(frontend->engine, (char*)&buf);
+	strncpy(buf, app->GetBreveDir() + "plugins" + FILE_SEP_PATH, 2047);
+	buf[2047] = '\0';
+	brAddSearchPath(frontend->engine, (char*)&buf);
 
-    strncpy(buf, app->GetBreveDir() + "java" + FILE_SEP_PATH, 2047);
-    buf[2047] = '\0';
-    brAddSearchPath(frontend->engine, (char*)&buf);
+	strncpy(buf, app->GetBreveDir() + "java" + FILE_SEP_PATH, 2047);
+	buf[2047] = '\0';
+	brAddSearchPath(frontend->engine, (char*)&buf);
 }
 
 BreveInterface::~BreveInterface()
 {
-    if (frontend != NULL)
-    {
+	if (frontend != NULL)
+	{
 	brEngineFree(frontend->engine);
 	breveFrontendCleanupData(frontend->data);
 	breveFrontendDestroy(frontend);
 
 	frontend = NULL;
-    }
+	}
 
-    if (simmenu != NULL)
-    {
+	if (simmenu != NULL)
+	{
 	while (simmenu->GetMenuItemCount() > 0)
-	    simmenu->Destroy(simmenu->FindItemByPosition(0));
-    }
+		simmenu->Destroy(simmenu->FindItemByPosition(0));
+	}
 
-    delete simmenu;
-    free(simulationfile);
+	delete simmenu;
+	free(simulationfile);
 
-    if (text != NULL)
+	if (text != NULL)
 	free(text);
 }
 
 void BreveInterface::Pause(int pause)
 {
-    if (pause == paused)
+	if (pause == paused)
 	return;
 
-    paused = !paused;
+	paused = !paused;
 
-    if (paused)
+	if (paused)
 	brPauseTimer(frontend->engine);
-    else
+	else
 	brUnpauseTimer(frontend->engine);
 }
 
 bool BreveInterface::Initialize()
 {
-    slInitGL(frontend->engine->world, frontend->engine->camera);
+	slInitGL(frontend->engine->world, frontend->engine->camera);
 
-    if (breveFrontendLoadSimulation(frontend, text, simulationfile) != EC_OK)
-    {
+	if (breveFrontendLoadSimulation(frontend, text, simulationfile) != EC_OK)
+	{
 	reportError();
 	slFree(text);
 	text = NULL;
 	Abort();
 	return 0;
-    }
+	}
 
-    slFree(text);
-    text = NULL;
+	slFree(text);
+	text = NULL;
 
-    ResizeView(x,y);
+	ResizeView(x,y);
 
-    initialized = 1;
+	initialized = 1;
 
-    return 1;
+	return 1;
 }
 
 void BreveInterface::ResizeView(int x, int y)
@@ -170,231 +174,231 @@ void BreveInterface::ResizeView(int x, int y)
 
 void BreveInterface::Iterate()
 {
-    if (frontend == NULL || !initialized)
+	if (frontend == NULL || !initialized)
 	return;
 
-    if (brEngineIterate(frontend->engine) != EC_OK)
-    {
+	if (brEngineIterate(frontend->engine) != EC_OK)
+	{
 	reportError();
 	Abort();
-    }
+	}
 }
 
 void BreveInterface::Render()
 {
-    if (frontend == NULL || !initialized)
+	if (frontend == NULL || !initialized)
 	return;
 
-    brEngineLock(frontend->engine);
-    brEngineRenderWorld(frontend->engine,breverender->MouseDown());
-    brEngineUnlock(frontend->engine);
+	brEngineLock(frontend->engine);
+	brEngineRenderWorld(frontend->engine,breverender->MouseDown());
+	brEngineUnlock(frontend->engine);
 }
 
 void BreveInterface::Abort()
 {
-    if (valid == 0)
+	if (valid == 0)
 	return;
 
-    valid = 0;
+	valid = 0;
 }
 
 char * getLoadname()
 {
-    return breverender->GetSimulation()->GetInterface()->getLoadname();
+	return breverender->GetSimulation()->GetInterface()->getLoadname();
 }
 
 char * getSavename()
 {
-    return breverender->GetSimulation()->GetInterface()->getSavename();
+	return breverender->GetSimulation()->GetInterface()->getSavename();
 }
 
 char * BreveInterface::getLoadname()
 {
-    wxTextEntryDialog d(breverender, "Loadname required.", "Please enter filename to load:");
-    char * buf;
+	wxTextEntryDialog d(breverender, "Loadname required.", "Please enter filename to load:");
+	char * buf;
 
-    buf = (char*)slMalloc(1024);
+	buf = (char*)slMalloc(1024);
 
-    if (d.ShowModal() == wxID_OK)
-    {
+	if (d.ShowModal() == wxID_OK)
+	{
 	strncpy(buf, d.GetValue(), 1023);
 
 	if (d.GetValue().Length() > 1023)
-	    buf[1023] = '\0';
-    }
-    else
+		buf[1023] = '\0';
+	}
+	else
 	buf[0] = '\0';
 
-    return buf;
+	return buf;
 }
 
 char * BreveInterface::getSavename()
 {
-    wxTextEntryDialog d(breverender, "Savename required.", "Please enter filename to save:");
-    char * buf;
+	wxTextEntryDialog d(breverender, "Savename required.", "Please enter filename to save:");
+	char * buf;
 
-    buf = (char*)slMalloc(1024);
+	buf = (char*)slMalloc(1024);
 
-    if (d.ShowModal() == wxID_OK)
-    {
+	if (d.ShowModal() == wxID_OK)
+	{
 	strncpy(buf, d.GetValue(), 1023);
 
 	if (d.GetValue().Length() > 1023)
-	    buf[1023] = '\0';
-    }
-    else
+		buf[1023] = '\0';
+	}
+	else
 	buf[0] = '\0';
 
-    return buf;
+	return buf;
 }
 
 void BreveInterface::reportError()
 {
-    brErrorInfo * error;
+	brErrorInfo * error;
 
-    if (frontend->engine == NULL)
+	if (frontend->engine == NULL)
 	return;
 
-    error = brEngineGetErrorInfo(frontend->engine);
+	error = brEngineGetErrorInfo(frontend->engine);
 
-    breverender->queMsg(error->message);
+	breverender->queMsg(error->message);
 }
 
 void BreveInterface::messageCallback(char *text)
 {
-    breverender->AppendLog(text);
+	breverender->AppendLog(text);
 }
 
 void messageCallback(char *text)
 {
-    if (breverender->GetSimulation() == NULL)
+	if (breverender->GetSimulation() == NULL)
 	return;
 
-    breverender->GetSimulation()->GetInterface()->messageCallback(text);
+	breverender->GetSimulation()->GetInterface()->messageCallback(text);
 }
 
 int soundCallback()
 {
-    wxBell();
-    return 0;
+	wxBell();
+	return 0;
 }
 
 int pauseCallback()
 {
-    if (breverender->GetSimulation() == NULL)
+	if (breverender->GetSimulation() == NULL)
 	return 0;
 
-    if (breverender->GetSimulation()->GetInterface()->Paused())
+	if (breverender->GetSimulation()->GetInterface()->Paused())
 	return 0;
 
-    breverender->OnRenderRunClick(*((wxCommandEvent*)NULL));
+	breverender->OnRenderRunClick(*((wxCommandEvent*)NULL));
 
-    return 0;
+	return 0;
 }
 
 void *newWindowCallback(char *name, void *graph)
 {
-    printf("newWindowCallback stub\n\r");
+	printf("newWindowCallback stub\n\r");
 }
 
 void freeWindowCallback(void *w)
 {
-    printf("freeWindowCallback stub\n\r");
+	printf("freeWindowCallback stub\n\r");
 }
 
 void renderWindowCallback(void *w)
 {
-    printf("renderWindowCallback\n\r");
+	printf("renderWindowCallback\n\r");
 }
 
 void graphDisplay()
 {
-    printf("graphDisplay stub\n\r");
+	printf("graphDisplay stub\n\r");
 }
 
 void menuCallback(brInstance *i)
 {
-    breverender->GetSimulation()->GetInterface()->menuCallback(i);
+	breverender->GetSimulation()->GetInterface()->menuCallback(i);
 }
 
 void BreveInterface::menuCallback(brInstance *binterface)
 {
-    brMenuEntry * e;
-    int i = 0;
+	brMenuEntry * e;
+	int i = 0;
 
-    if(!binterface->engine || binterface != brEngineGetController(binterface->engine))
+	if(!binterface->engine || binterface != brEngineGetController(binterface->engine))
 	return;
 
-    breverender->SetMenu(0);
+	breverender->SetMenu(0);
 
-    delete simmenu;
+	delete simmenu;
 
-    simmenu = new wxMenu;
+	simmenu = new wxMenu;
 
-    for (i = 0; i < binterface->menus->count; i++)
-    {
+	for (i = 0; i < binterface->menus->count; i++)
+	{
 	e = (brMenuEntry*)binterface->menus->data[i];
 
 	if (e->title[0] == '\0')
 	{
-	    simmenu->AppendSeparator();
-	    continue;
+		simmenu->AppendSeparator();
+		continue;
 	}
 
 	simmenu->Append(BREVE_SIMMENU + i, e->title, "", wxITEM_CHECK);
 
 	if (!e->enabled)
-	    simmenu->Enable(BREVE_SIMMENU + i, FALSE);
+		simmenu->Enable(BREVE_SIMMENU + i, FALSE);
 
 	if (e->checked)
-	    simmenu->Check(BREVE_SIMMENU + i, TRUE);
-    }
+		simmenu->Check(BREVE_SIMMENU + i, TRUE);
+	}
 
-    breverender->SetMenu(1);
+	breverender->SetMenu(1);
 }
 
 int BreveInterface::dialogCallback(char *title, char *message, char *b1, char *b2)
 {
-    BDialog d(breverender, title, message, b1, b2);
+	BDialog d(breverender, title, message, b1, b2);
 
-    return !d.ShowModal();
+	return !d.ShowModal();
 }
 
 int dialogCallback(char *title, char *message, char *b1, char *b2)
 {
-    return breverender->GetSimulation()->GetInterface()->dialogCallback(title, message, b1, b2);
+	return breverender->GetSimulation()->GetInterface()->dialogCallback(title, message, b1, b2);
 }
 
 char *interfaceVersionCallback()
 {
-    return "wxwidgets/2.0";
+	return "wxwidgets/2.0";
 }
 
 void BreveInterface::RunMenu(int id, brInstance *n)
 {
-    int i;
+	int i;
 
-    if (brMenuCallback(frontend->engine, n, id) != EC_OK)
-    {
+	if (brMenuCallback(frontend->engine, n, id) != EC_OK)
+	{
 	reportError();
 	Abort();
-    }
+	}
 }
 
 void BreveInterface::ExecuteCommand(wxString str)
 {
-    wxString nstr;
+	wxString nstr;
 
-    nstr << "> " << str << "\n";
+	nstr << "> " << str << "\n";
 
-    breverender->AppendLog(nstr);
+	breverender->AppendLog(nstr);
 
-    breverender->queCmd(str);
+	breverender->queCmd(str);
 
-    //stRunSingleStatement((stSteveData*)frontend->data, frontend->engine, bstr);
+	//stRunSingleStatement((stSteveData*)frontend->data, frontend->engine, bstr);
 }
 
 void BreveInterface::RunCommand(char * str)
 {
-    stRunSingleStatement((stSteveData*)frontend->data, frontend->engine, str);
+	stRunSingleStatement((stSteveData*)frontend->data, frontend->engine, str);
 }

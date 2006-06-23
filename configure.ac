@@ -95,6 +95,8 @@ AC_SUBST(MKDEP)
 
 AC_PATH_XTRA
 
+AC_LANG(C++)
+
 case ${host_os} in
 	darwin* )
 		custom_cblas="-framework vecLib"
@@ -122,7 +124,12 @@ case ${host_os} in
 		;;
 
 	linux* | *bsd* )
-		LIBS="-lglut -lGLU -lGL -lXmu -lXi ${X_EXTRA_LIBS} -lX11 ${X_PRE_LIBS} ${LIBS}"
+		LIBS="${X_LIBS} -lXmu -lXi ${X_EXTRA_LIBS} -lX11 ${X_PRE_LIBS} ${LIBS}"
+
+		AC_CHECK_LIB([GL], [glGetIntegerv],,AC_MSG_FAILURE([Missing OpenGL Library]))
+		AC_CHECK_LIB([GLU], [gluGetString],,AC_MSG_FAILURE([Missing GLU Library]))
+		AC_CHECK_LIB([glut], [glutInit],,AC_MSG_FAILURE([Missing GLUT Library]))
+
 		PLUGINFLAGS="-shared"
 		PLUGINIMP="-Wl,-E"
 		ARCHIVER="tar czf"
@@ -235,8 +242,6 @@ AC_CHECK_LIB([expat], [XML_ParserCreate],,AC_MSG_FAILURE([Missing expat library 
 
 # the engine_only flag means to ignore all of the extra libraries.
 
-AC_LANG(C++)
-
 if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([enet], [enet_initialize])
 	AC_CHECK_LIB([jpeg], [jpeg_read_header])
@@ -254,7 +259,7 @@ if test "x$engine_only" = "x"; then
 		AC_CHECK_LIB([gslcblas], [cblas_ccopy])
 	fi
 
-	AC_CHECK_LIB([avutil], [av_add_i])
+	AC_CHECK_LIB([avutil], [av_crc])
 	AC_CHECK_LIB([avcodec], [avcodec_init])
 	AC_CHECK_LIB([avformat], [av_write_frame])
 

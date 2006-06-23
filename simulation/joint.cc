@@ -140,10 +140,10 @@ void slJoint::getVelocity(slVector *velocity) {
 			velocity->x = dJointGetSliderPositionRate(_odeJointID);
 			break;
 		case JT_BALL:
-			// velocity->z = dJointGetAMotorAngleRate(_odeMotorID, 2);
 		case JT_UNIVERSAL:
-			// velocity->x = dJointGetAMotorAngleRate(_odeMotorID, 0);
-			// velocity->y = dJointGetAMotorAngleRate(_odeMotorID, 1);
+			velocity->z = 0.0;
+			velocity->x = 0.0;
+			velocity->y = 0.0;
 			break;
 	}
 }
