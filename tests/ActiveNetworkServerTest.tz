@@ -1,0 +1,216 @@
+#
+# ActiveNetworkServerTest.tz
+#
+# This piece of code demonstrate the Network Server "reply" functionality.
+# Namely, when the client is sending an object to the Server, the user can
+# send an object back in the accept-upload method.  This could easely be done
+# by adding the line "return myObject." at the end of the accept-upload method.
+#
+# NOTE: The same code is used for the Server and the Client.  You must set
+# I_AM_THE_SERVER to 0 to create a client and leave it to 1 to create a Server.
+# You must also set BREVE_SERVER_IP according ot your own Server IP address.
+#
+# NOTE that objects sent are not destroyed.  It is the responsibility of the user
+# to free objects if they are no more useful or to handle them properly.
+# 
+# NOTE that in the current implementation you won't know if sending back an object to
+# the client succeeded or failed (for example the client is not reachable anymore).
+# This might be fixed in future "release" by adding methods like:
+#     + to dispose-object-on-network-success
+#     + to dispose-object-on-network-failure
+# These methods must be implemented by user in the Network Server part of his code
+# and would be called automatically by breve if sending an object back to the client
+# succeded or failed, respectively.  Typical implementation could be to delete instances
+# that were successfuly sent to client and keep those that failed.
+#
+# PS: There is a glitch with Mobile when they are destroy/created...  
+#     White circles are left behind...  Don't know the exact cause yet...
+#
+# - ptero
+
+@use Mobile.
+@use Control.
+@use Stationary.
+@use NetworkServer.
+
+@define I_AM_THE_SERVER 1.
+@define BREVE_SERVER_IP "192.168.1.134".
+@define BREVE_SERVER_PORT 30304.
+@define Y_LIMIT 5.
+
+# tell the engine the name of the controller
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+    + variables:
+        networkServer (object).
+        agent1 (object).
+        agent2 (object).
+        agent3 (object).
+        current (int).
+
+    + to init:
+        if I_AM_THE_SERVER: {
+            networkServer = new NetworkServer.
+            if (networkServer listen on-port BREVE_SERVER_PORT): print "NetworkServer is ready...".
+            else print "NetworkServer is not ready...".
+        } else {
+            agent1 = new Agent.
+            agent2 = new Agent.
+            agent3 = new Agent.
+            
+            agent1 init-with x-shift -5.
+            agent2 init-with x-shift 0.
+            agent3 init-with x-shift 5.
+
+            self schedule method-call "send" at-time 5.0.
+        }
+
+
+    + to iterate:
+        super iterate.
+
+    + to send:
+        newAgent (object).
+        
+        if current == 0: {
+            print "Sending Agent 1 over Network to", BREVE_SERVER_IP, "at port", BREVE_SERVER_PORT.
+            newAgent = (agent1 send-over-network to BREVE_SERVER_IP on BREVE_SERVER_PORT).
+            if newAgent: {
+                print "Getting new agent back...".
+                free agent1.
+                agent1 = newAgent.
+            } else {
+                print "Getting nothing back...".
+            }
+            current++.
+            self schedule method-call "send" at-time (self get-time) + 120.0.
+        } else if current == 1: {
+            print "Sending Agent 2 over Network to", BREVE_SERVER_IP, "at port", BREVE_SERVER_PORT.
+            newAgent = ( agent2 send-over-network to BREVE_SERVER_IP on BREVE_SERVER_PORT).
+            if newAgent: {
+                print "Getting new agent back...".
+                free agent2.
+                agent2 = newAgent.
+            } else {
+                print "Getting nothing back...".
+            }
+            current++.
+            self schedule method-call "send" at-time (self get-time) + 120.0.
+        } else {
+            print "Sending Agent 3 over Network to", BREVE_SERVER_IP, "at port", BREVE_SERVER_PORT.
+            newAgent = ( agent3 send-over-network to BREVE_SERVER_IP on BREVE_SERVER_PORT).
+            if newAgent: {
+                print "Getting new agent back...".
+                free agent3.
+                agent3 = newAgent.
+            } else {
+                print "Getting nothing back...".
+            }
+            current = 0.
+            self schedule method-call "send" at-time (self get-time) + 120.0.
+        }
+
+    + to accept-upload of theObject (object) from host (string):
+        
+
+        if ((theObject get-sub) get-list-string) != "cat": {
+            die "Error dearchiving networked object".
+        }
+        
+        if current == 0: {
+            print "received upload for Agent 1 from $host".
+            if agent1: free agent1.
+            agent1 = theObject.
+            current++.
+        } else if current == 1: {
+            print "received upload for Agent 2 from $host".
+            if agent2: free agent2.
+            agent2 = theObject.
+            current++.
+        } else {
+            print "received upload for Agent 3 from $host".
+            if agent3: free agent3.
+            agent3 = theObject.
+            current = 0.
+        }
+        
+        # change color before sending it back...
+        theObject change-color.
+        
+        return theObject.
+}
+
+Mobile : Agent {
+    + variables:
+        sub (object).
+        subShift (vector).
+        xShift (float).
+        theSign (2 ints).
+        velocitySign (int).
+        positionSign (int).
+
+    + to init-with x-shift x (float):
+        sub = new SubordinateAgent.
+
+        theSign[0] = -1.
+        theSign[1] =  1.
+        velocitySign = 0.
+        positionSign = 1.
+        
+        xShift = x.
+        self add-dependency on sub.
+        self set-velocity to (0, theSign[velocitySign] * .5, 0).
+        subShift = (0, theSign[positionSign] * .5, 0).
+        self move to (xShift, theSign[positionSign] * Y_LIMIT, 0).
+
+    + to iterate:
+        if (self get-location)::y > Y_LIMIT: self move to (xShift, -Y_LIMIT, 0).
+        else if (self get-location)::y < -Y_LIMIT: self move to (xShift, Y_LIMIT, 0).
+        sub move to (self get-location) + subShift.
+
+    + to get-sub:
+        return sub.
+
+    + to dearchive:
+        result (int).
+
+        result = (super dearchive).
+
+        # inverse velocity direction and starting position when dearchiving...
+        if velocitySign == 0: velocitySign = 1.
+        else if velocitySign == 1: velocitySign = 0.
+        if positionSign == 0: positionSign = 1.
+        else if positionSign == 1: positionSign = 0.
+        
+        self set-velocity to (0, theSign[velocitySign] * .5, 0).
+        subShift = (0, theSign[positionSign] * .5, 0).
+        self move to (xShift, theSign[positionSign] * Y_LIMIT, 0).
+
+        return result.
+        
+    + to change-color:
+        theColor (vector).
+        
+        theColor = random[(1, 1, 1)].
+        self set-color to theColor.
+        sub set-color to (1.0 - theColor::x, 1.0 - theColor::y, 1.0 - theColor::z).
+        
+    + to destroy:
+        free sub.
+}
+
+Mobile : SubordinateAgent {
+    + variables:
+        l (list).
+
+    + to init:
+        l = { 1, "cat" }.
+        self set-color to (1, 0, 0).
+
+    + to get-list-string:
+        return l{1}.
+}
