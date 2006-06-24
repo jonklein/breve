@@ -265,7 +265,6 @@ int brSendBackXMLString(int sockfd, char *object) {
 	request.magic = NETWORK_MAGIC;
 	request.type = NR_XML;
 
-	header.length = strlen(object);
 	write(sockfd, &request, sizeof(brNetworkRequest));
 	write(sockfd, &header, sizeof(brStringHeader));
 	if (header.length) write(sockfd, object, header.length);
@@ -373,11 +372,11 @@ void *brHandleConnection(void *p) {
 				brMethodCall(data->server->recipient, method, args, &result);
 				brMethodFree(method);	
 				if (request.version >= 2) { // for backward compatibility, send nothing to earlier NETWORK_VERSION...
-					// send back an answer based on accept-upload returned value...
+					// send back an object based on accept-upload returned value...
 					if (result.type() == AT_INSTANCE) {
 						brSendBackXMLObject(data->socket, result.getInstance());
 					} else { // Nothing to send... Send an empty request...
-						if (result.type() != AT_NULL) 
+						if (result.type() != AT_NULL && result.type() != AT_INT) 
 							slMessage(DEBUG_ALL, "accept-upload method should return an instance;  Will return an empty object to client: returned type = %d\n", result.type()); 
 						brSendBackXMLObject(data->socket, (brInstance *)NULL);
 					}
