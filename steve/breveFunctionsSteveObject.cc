@@ -292,6 +292,9 @@ int stNSendXMLObject(brEval *args, brEval *target, brInstance *i) {
 	brInstance *archive = BRINSTANCE(&args[2]);
 	int returnedValue = 0;
 
+	// Set target to null instance to avoid problem when it fails...
+	target->set((brInstance *)NULL);
+
 	slStringStream *xmlBuffer = slOpenStringStream();
 	FILE *file = xmlBuffer->fp;
 	char *buffer;
@@ -300,17 +303,15 @@ int stNSendXMLObject(brEval *args, brEval *target, brInstance *i) {
 	buffer = slCloseStringStream(xmlBuffer);
 
 	//target->set( stSendXMLString(addr, port, buffer) );
-	returnedValue = stSendXMLString(addr, port, buffer, target, i);
+	if (stSendXMLString(addr, port, buffer, target, i)) {
+		// Something went wrong, we are not happy, but returning EC_ERROR
+		// is no good, so lets just print one more message...
+		slMessage(DEBUG_ALL, "ERROR - Sending object over network failed...  Simulation is going on anyway...\n");
+	}
 
 	slFree(buffer);
 
-	//return EC_OK;
-	if (returnedValue) {
-		returnedValue = EC_ERROR;
-	} else {
-		returnedValue = EC_OK;
-	}
-	return returnedValue;
+	return EC_OK;
 }
 
 int stCStacktrace(brEval args[], brEval *target, brInstance *i) {
