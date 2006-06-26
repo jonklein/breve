@@ -1,6 +1,7 @@
 #include "simulation.h"
 #include "worldObject.h"
 #include "glIncludes.h"
+#include "sensor.h"
 
 void slWorldObject::draw(slCamera *camera) {
 	if ( _shape )
@@ -111,13 +112,24 @@ void slWorldObject::setColor( slVector *c ) {
 	slVectorCopy( c, &_color);
 }
 
+double slWorldObject::irSense(slPosition *sensorPos, std::string sensorType){
+	//ProximitySensor::getProximitySensor();
+//	printf("proximiy Radius%f\n",_proximityRadius);
+	return irSense2(&_neighbors, sensorPos, sensorType);
+}
+
 int slWorldObject::raytrace( slVector *location, slVector* direction, slVector *erg_dir ) {
 
 	if ( !_shape ) {
-		slMessage(DEBUG_ALL, "slWorldObjectRaytrace: This WorldObject has no shape\n");
+		slMessage(DEBUG_ALL, "slWorldObject::raytrace: This WorldObject has no shape\n");
 		return -2;
 	}
-   
+	//printf("proximiy Radius%f\n",_proximityRadius); // ahh falsches objekt!
+
+   //slMessage(DEBUG_ALL, "slWorldObjectRaytrace: irSense:");
+  // double r = irSense(direction, "PROXIMITY");
+  // slMessage(DEBUG_ALL, "slWorldObject::raytrace: irSense: %f \n",r);
+
 	//direction and location in wo's coordinates
 	slVector dir_wo, dir_wo_help;
 	slVector loc_wo_help;
@@ -135,7 +147,7 @@ int slWorldObject::raytrace( slVector *location, slVector* direction, slVector *
 
 //   slMessage(DEBUG_ALL, " [ %f, %f, %f ] %f %f ", dir_wo.x, dir_wo.y, dir_wo.z, atan2(dir_wo.z, dir_wo.x)*180/M_PI, atan2(direction->z, direction->x)*180/M_PI );
 //   slMessage(DEBUG_ALL, " [ %f, %f, %f ] ", loc_wo.x, loc_wo.y, loc_wo.z );
-
+ 
 	slVector point;
 
 	if ( _shape->rayHitsShape( &dir_wo, &loc_wo, &point ) < 0 ) {
@@ -145,6 +157,8 @@ int slWorldObject::raytrace( slVector *location, slVector* direction, slVector *
 
 	double d = slVectorLength(&point);
 	slVectorMul(&direction_norm, d, erg_dir);
+    
+//	slMessage(DEBUG_ALL, "wo: erg_dir: [ %f, %f, %f ] distance:%f \n", erg_dir->x, erg_dir->y, erg_dir->z ,slVectorLength(erg_dir));
 
 	return 0;
 }

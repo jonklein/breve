@@ -197,8 +197,9 @@ class slShape {
 
 		virtual void bounds(slPosition *position, slVector *min, slVector *max);
 		virtual int pointOnShape(slVector *dir, slVector *point);
-                virtual int rayHitsShape(slVector *dir, slVector *target, slVector *point);
-                virtual void scale(slVector *point);
+        virtual int rayHitsShape(slVector *dir, slVector *target, slVector *point);
+        //virtual int irReflect(slVector *pos, slVector *dir, double maxAngle);
+        virtual void scale(slVector *point);
 		virtual slSerializedShapeHeader *serialize(int *length);
 
 		virtual void drawShadowVolume(slCamera *camera, slPosition *position);

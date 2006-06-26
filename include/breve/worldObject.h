@@ -112,7 +112,8 @@ class slWorldObject {
 
 		int getLightExposure( );
 		int raytrace( slVector *location, slVector* direction, slVector *erg_dir );
-
+		double irSense(slPosition *sensorPos, std::string sensorType);
+		
 		std::vector< void* > &getNeighborData();
 
 		inline const slPosition &getPosition() { return _position; }

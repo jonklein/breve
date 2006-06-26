@@ -533,7 +533,7 @@ int stSizeofAtomic(int type) {
 			return sizeof(char*);
 			break;
 		case AT_LIST:
-			return sizeof(brEvalList*);
+			return sizeof(brEvalList*); 
 			break;
 		case AT_MATRIX:
 			return sizeof(double) * 9;

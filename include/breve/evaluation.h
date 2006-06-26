@@ -146,7 +146,7 @@ inline int stEvalTruth(brEval *, brEval *, stRunInstance *);
 int stPrintEvaluation(brEval *, stRunInstance *);
 
 int stEvalBinaryEvalListExp(char, brEval *, brEval *, brEval *, stRunInstance *);
-brEvalList *stEvalListIndexLookup(brEvalListHead *, int);
+//brEvalList* stEvalListIndexLookup(brEvalListHead *, int);
 
 int stExpEval3(stExp *, stRunInstance *, brEval *);
 

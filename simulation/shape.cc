@@ -181,7 +181,7 @@ slShape *slShapeInitNeighbors(slShape *s, double density) {
 	slPoint *p, *start, *end;
 	slEdge *e;
 	slFace *face;
-	slVector normal;
+	slVector normal;	// for the voronoi not the normal of the face
 	int edges = 0, en;
 	std::vector<slEdge*>::iterator ei;
 	std::vector<slPoint*>::iterator pi;
@@ -930,6 +930,7 @@ int slSphere::rayHitsShape(slVector *dir, slVector *target, slVector *point) {
    return 0;
 }
 
+
 int slShape::rayHitsShape(slVector *dir, slVector *target, slVector *point) {
         double D, X, Y, Z, k;
 	slVector pointOnPlane;
@@ -939,6 +940,8 @@ int slShape::rayHitsShape(slVector *dir, slVector *target, slVector *point) {
         double minDistance = 1.0e10;
         bool isFirst = true;        
 	std::vector<slFace*>::iterator fi;
+	 //printf("xxx");
+//	 irReflect(target, dir, 0.5);
 //       slMessage(DEBUG_ALL, " [ %f, %f, %f ] %f", dir->x, dir->y, dir->z, atan2(dir->z, dir->x)*180/M_PI);
 //        slMessage(DEBUG_ALL, " [ %f, %f, %f ] ", target->x, target->y, target->z );
    
@@ -996,7 +999,7 @@ int slShape::rayHitsShape(slVector *dir, slVector *target, slVector *point) {
 					isFirst = false;
 					slVectorCopy(&pointOnPlane, point);
 				} else if (k < minDistance) {
-					//slMessage(DEBUG_ALL, "\n [ %f, %f, %f ] %f %d\n", f->plane.vertex.x, f->plane.vertex.y, f->plane.vertex.z, k, result );
+					//slMessage(DEBUG_ALL, " Raytrace plane:[ %f, %f, %f ]  vector: [%f, %f, %f] distance: %f result: %d\n\n", f->plane.vertex.x, f->plane.vertex.y, f->plane.vertex.z, dir->x, dir->y, dir->z, k, result );
 					slVectorCopy(&pointOnPlane, point);
 					minDistance = k;
 				}
@@ -1010,6 +1013,86 @@ int slShape::rayHitsShape(slVector *dir, slVector *target, slVector *point) {
 
 	return -1;
 }
+
+/*
+float calculateArea(slFace *face){
+	for(int i=0; i< face->edgeCount-1; i++){
+
+		//slMessage(DEBUG_ALL, "normal(%f|%f|%f)\n",i, 
+		//		f->plane.normal.x, f->plane.normal.y, f->plane.normal.z, area);
+		//slMessage(DEBUG_ALL, "i:%d edgeCount:%d area:%f\n",i, f->edgeCount,area);
+		slMessage(DEBUG_ALL, "p%d(%f|%f|%f)\n",i, face->points[i]->vertex.x , 
+				face->points[i]->vertex.y,face->points[i]->vertex.z);
+	}
+	slMessage(DEBUG_ALL, "p%d(%f|%f|%f)\n",i, face->points[i]->vertex.x ,
+			face->points[i]->vertex.y,face->points[i]->vertex.z);
+	return 5;
+}
+*/
+/*
+int slShape::irReflect(slVector *pos, slVector *dir, double maxAngle){
+	
+
+	double angle, area, sum_area = 0;
+	slVector face_normal;
+	slVector v1;
+	slVector v2;
+	slPoint p1;
+	area = 0;
+	slVectorSet(&v1, 0.0, 0.0, 0.0);
+	slVectorSet(&v2, 0.0, 0.0, 0.0);
+	std::vector<slFace*>::iterator fi;
+//	slMessage(DEBUG_ALL, " irReflect start:\n");
+	
+	for(fi = faces.begin(); fi != faces.end(); fi++ ) {
+		area = 0;
+		slFace *f = *fi;
+	//	p1 = f->points[0];
+	//	v1 = &f->points[0]->vertex;
+
+		slVectorSub(&f->points[0]->vertex, &f->points[1]->vertex, &v1);
+		slVectorSub(&f->points[2]->vertex, &f->points[1]->vertex, &v2);
+	
+		slVectorCross(&v1, &v2, &face_normal);
+		angle = slVectorAngle(&face_normal, dir);//evtl einen Vector invertieren
+
+		//slVectorPrint(&f->points[0]->vertex);
+		//slVectorPrint(&f->points[1]->vertex);
+
+		//slVectorPrint(&v1);
+		//slVectorPrint(&v2);
+		//slVectorPrint(&face_normal);
+		slVectorNormalize(&face_normal);
+		slVectorPrint(&face_normal);
+		slVectorPrint(dir);
+		slMessage(DEBUG_ALL, " irReflect angle: %f\n",angle);
+	//	slMessage(DEBUG_ALL, " irReflect maxangle: %f\n",maxAngle);
+
+	//	if(angle < maxAngle){
+			//Fläche des Polygons berechnen 
+		area = calculateArea(f);
+			
+			//slMessage(DEBUG_ALL, "abc");
+		slMessage(DEBUG_ALL, "area:%f\n",area);
+
+			//Projektionsfläche auf Sichtebene
+			area *= cos(angle);
+			// Reflektion abhängig von Winkel
+
+			//Reflektion abhängig von Abstand zur Sensorachse/SensorHauptrichtung
+			
+			sum_area += area;
+	//	}
+	//	  slMessage(DEBUG_ALL, " irReflect sum_area: %f\n",sum_area);
+		
+	}
+	
+	return 0;
+}
+
+
+*/
+
 
 void slSphere::scale(slVector *scale) {
 	_recompile = 1;

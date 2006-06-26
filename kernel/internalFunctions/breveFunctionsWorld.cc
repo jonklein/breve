@@ -22,7 +22,7 @@
 #include "world.h"
 #include "gldraw.h"
 #include "image.h"
-
+#include "sensor.h"
 #define BRWORLDOBJECTPOINTER(p)	((slWorldObject*)BRPOINTER(p))
 
 /*! \addtogroup InternalFunctions */
@@ -862,6 +862,115 @@ int brIRaytrace(brEval args[], brEval *target, brInstance *i) {
 	return EC_OK;
 }
 
+/*!
+	\brief returns the value a IRSensor would return at the position location and the direction only objects in the neighborhood of the worldobject are detected
+	
+	double slWorldObject::irSense(slVector* direction, slVector* up, std::string sensorType)
+
+*/
+int brIIRSense(brEval args[], brEval *target, brInstance *i) {
+//	
+	slPosition sensorPos;
+	slWorldObject *o    = BRWORLDOBJECTPOINTER(&args[0]);
+	sensorPos.location = BRVECTOR(&args[1]); 
+	slMatrixCopy(BRMATRIX(&args[2]), sensorPos.rotation); 
+
+	// Hier Matrix übergeben
+	double result = o->irSense(&sensorPos, BRSTRING(&args[3]));
+
+	target->set( result );
+	//TODO exceptions
+	//        slMessage(DEBUG_ALL, "Error!\n");
+
+	//if (error == -2) return EC_ERROR;
+
+	return EC_OK;
+}
+
+	/*
+   * This function convertes a list of double and/or ints
+   * to a double array.
+   */
+
+double* listToDoubleArray(const brEvalListHead* list){
+	std::vector<brEval*> v = list->getVector();
+//	brEvalList *start = list->start;
+//	printf("listcount: %d\n", list->count);
+	double* result = (double*)malloc(v.size() * sizeof(double));
+
+//		ew double[list->count];
+	for(unsigned int i=0; i< v.size(); i++){
+		if(v[i]->type() == AT_DOUBLE){
+			result[i] = v[i]->getDouble();
+		}
+	else if(v[i]->type() == AT_INT){
+			result[i] = v[i]->getInt();
+		}
+	else 
+		{
+			slMessage(DEBUG_ALL, "List of Doubles and/or Ints needed! (function listToDoubleArray)\n");
+			printf("eval.type()= %d \n",v[i]->type());
+		}
+//			printf("result[%d]= %f\n", i, result[i]);
+
+	}
+	return result;
+}
+
+
+	/*
+    * SensorBuilder::createSensor(const char* name, const int rows, const int columns, const double max_range, const double max_angle, 
+	*			const int distance_length, const double* distance, const double* distance_factor,
+	*			const int azimut_length, const double* azimut, const double* azimut_factor,
+	*			const int incidence_length, const double* incidence, const double* incidence_factor){
+	*
+	*/
+int brICreateUserSensor(brEval args[], brEval *target, brInstance *i) {
+	//*(brEvalListHead **)variable = BRLIST(e);
+	brEvalListHead* list;
+	double* distance = 0		;
+	double* distance_factor = 0	;
+	double* azimut = 0			;
+	double* azimut_factor = 0	;
+	double* incidence = 0		;
+	double* incidence_factor = 0;
+	list = BRLIST(&args[6]);
+	distance = listToDoubleArray(list);
+	list = BRLIST(&args[7]);
+	distance_factor =  listToDoubleArray(list);
+	list = BRLIST(&args[9]);
+	azimut = listToDoubleArray(list);
+	list = BRLIST(&args[10]);
+	azimut_factor = listToDoubleArray(list);
+	list = BRLIST(&args[12]);
+	incidence = listToDoubleArray(list);
+	list = BRLIST(&args[13]);
+	incidence_factor = listToDoubleArray(list);
+
+	int error = 0;
+//printf("<<< 2 >>>\n");
+
+	SensorBuilder::createUserSensor(BRSTRING(&args[0]), BRINT(&args[1]), BRINT(&args[2]), BRDOUBLE(&args[3]), BRDOUBLE(&args[4]), 
+				BRINT(&args[5]), distance, distance_factor,
+				BRINT(&args[8]), azimut, azimut_factor,
+				BRINT(&args[11]), incidence, incidence_factor, error);
+//printf("<<< 3 >>>\n");
+
+	if(error != 0){
+		 slMessage(0, "Error creating a UserSensor: ");
+		 if (error == -1){
+
+		 }else if (error ==-2){
+
+		 }else{
+			slMessage(0, "Unknown Error\n");
+		 }
+		 return EC_ERROR;
+	}
+	return EC_OK;
+}
+
+ 
 /*@}*/
 
 /*!
@@ -940,4 +1049,11 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "setCollisionProperties", brISetCollisionProperties, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0);
 
 	brNewBreveCall(n, "raytrace", brIRaytrace, AT_VECTOR, AT_POINTER, AT_VECTOR, AT_VECTOR, 0);
+	
+	brNewBreveCall(n, "irSense", brIIRSense, AT_DOUBLE, AT_POINTER, AT_VECTOR, AT_MATRIX, AT_STRING, 0);
+	brNewBreveCall(n, "createUserSensor", brICreateUserSensor, AT_NULL, AT_STRING, AT_INT, AT_INT, AT_DOUBLE, AT_DOUBLE,
+																 AT_INT, AT_LIST, AT_LIST,
+																 AT_INT, AT_LIST, AT_LIST,
+																 AT_INT, AT_LIST, AT_LIST, 0);
+
 }
