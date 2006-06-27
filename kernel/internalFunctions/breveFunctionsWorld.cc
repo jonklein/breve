@@ -948,13 +948,11 @@ int brICreateUserSensor(brEval args[], brEval *target, brInstance *i) {
 	incidence_factor = listToDoubleArray(list);
 
 	int error = 0;
-//printf("<<< 2 >>>\n");
 
 	SensorBuilder::createUserSensor(BRSTRING(&args[0]), BRINT(&args[1]), BRINT(&args[2]), BRDOUBLE(&args[3]), BRDOUBLE(&args[4]), 
 				BRINT(&args[5]), distance, distance_factor,
 				BRINT(&args[8]), azimut, azimut_factor,
 				BRINT(&args[11]), incidence, incidence_factor, error);
-//printf("<<< 3 >>>\n");
 
 	if(error != 0){
 		 slMessage(0, "Error creating a UserSensor: ");

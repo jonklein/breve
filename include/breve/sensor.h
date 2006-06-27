@@ -14,24 +14,6 @@ struct pair{
     double factor;
 };
 
-struct angles{
-    double alpha;
-    double beta;
-};
-
-class Singleton 
-  {
-  public:
-      static Singleton* Instance();
-  protected:
-      Singleton();
-      Singleton(const Singleton&);
-      Singleton& operator= (const Singleton&);
-  private:
-      static Singleton* pinstance;
-  };
-
-
 class Sensor{
 	public:
 		double sense(std::vector<slWorldObject*>* neighbors, slPosition *sensorPos);
@@ -79,27 +61,6 @@ class Sensor{
 
 };
 
-class RaySensor : public Sensor{
-	
-	public:
-		RaySensor::RaySensor();
-
-		RaySensor::~RaySensor(){}
-	protected:
-
-
-};
-
-class ProximitySensor : public Sensor{
-	public:
-		static ProximitySensor* getProximitySensor();
-	protected :
-		 ProximitySensor::ProximitySensor();
-
-	private:
- 		static ProximitySensor* pinstance;
-
-};
 
 class UserSensor : public Sensor{
 	friend class SensorBuilder;

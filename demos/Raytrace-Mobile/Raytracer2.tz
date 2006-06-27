@@ -169,7 +169,7 @@ print "...sensor created!".
 #		vtest = irSense(realWorldPointer, (self get-location),((self get-rotation)*[(0,0,1),(0,1,0),(1,0,0)]) , "PROXIMITY").
 print "Raytracer: start sensing...".
 
-		vtest = irSense(realWorldPointer, (self get-location),((self get-rotation)*[(0,0,1),(0,1,0),(1,0,0)]) , "USERTEST").
+		vtest = irSense(realWorldPointer, (self get-location),((self get-rotation)*[(0,0,1),(0,1,0),(1,0,0)]) , "USERTEST3").
 print "Raytracer: ...sensing done".
 
 #print ((self get-rotation)*(0,1,0)).
