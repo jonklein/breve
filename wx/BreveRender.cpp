@@ -38,6 +38,7 @@
 #include "steve.h"
 #include "SimInstance.h"
 #include "Inspector.h"
+#include "gldraw.h"
 
 #include "images/stop.xpm"
 #include "images/play.xpm"
@@ -76,6 +77,9 @@ BreveRender::BreveRender( )
 
 BreveRender::BreveRender( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
+	int zero = 0;
+	glutInit( &zero, NULL );
+
     Create( parent, id, caption, pos, size, style );
 }
 

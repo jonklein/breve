@@ -70,7 +70,11 @@ void slDebugMatrix(int, double [3][3]);
  * output function.
  */
 
+extern "C" {
+
 DLLEXPORT void slMessage(int, const char *, ...);
+
+}
 
 /**
  * The default output function, prints text to stderr.

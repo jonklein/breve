@@ -122,25 +122,18 @@ void brCollisionCallback(void *p1, void *p2, int type, slVector *pos, slVector *
 
 		if(o2->object->type == h->object->type && o2->object->type->isSubclass(o2->object->userData, h->object->userData)) {
 			meth = h->method;
-			// Only call methods with the right count of parameters
-			if(meth->argumentCount==3){
 					
-				collider.set( o2 );
-				position.set((*pos));
-				facing.set((*face));
-				argPtr[0] = &collider;
-				argPtr[1] = &position;
-				argPtr[2] = &facing;
-			}
-			// Only 1 paramerter so not position and facing direction is needed
-			else if(meth->argumentCount==1){
-				collider.set( o2 );
-				argPtr[0] = &collider;
-			}
-			else{
-				slMessage(DEBUG_ALL, "Error during collision callback: wrong method arguments count\n");
-			}
-			if(brMethodCall(o1, meth, argPtr, &result) == EC_ERROR) {
+			collider.set( o2 );
+			position.set((*pos));
+			facing.set((*face));
+			argPtr[0] = &collider;
+			argPtr[1] = &position;
+			argPtr[2] = &facing;
+
+			if( meth->argumentCount < 1 || meth->argumentCount > 3 ){
+				slMessage(DEBUG_ALL, "Error during collision callback: wrong number of arguments in callback method\n");
+				return;
+			} else if(brMethodCall(o1, meth, argPtr, &result) == EC_ERROR) {
 				slMessage(DEBUG_ALL, "Error during collision callback\n");
 				return;
 			}

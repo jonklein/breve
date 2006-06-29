@@ -29,13 +29,9 @@ BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text)
 	wxString str;
 	int i = 0;
 
-	int zero = 0;
-
 	this->simulationfile = simfile;
 	this->text = text;
 	this->next = NULL;
-
-	glutInit( &zero, NULL );
 
 	// frontend = breveFrontendInit(0, NULL);
 	// Due to the annoying java error I'm unable to track down, it isn't safe
