@@ -106,15 +106,47 @@ Mobile : isAgent (aka isAgents) {
 	
 	+ to receiveMessage message message(string) mySensor mySensor(int) hisSensor hisSensor(int) :
 	
-
-	+ to init:
-		distance (list).
+	+ to createSensor:
+	  	distance (list).
 		distance_factor (list).
+		distance_length(int).
 		azimut (list).
 		azimut_factor (list).
+		azimut_length(int).
 		incidence (list).
 		incidence_factor (list).
+		incidence_length(int).
+		rows(int).
+		columns(int).
+		maxrange (double).
+		maxangle(double).
+		rows = 5.
+		columns = 5.
+		maxrange = 30.
+		maxangle = 60/3.1415 * 180.
+# * SensorBuilder::createSensor(const char* name, const int rows, const int columns, const double max_range, const double max_angle, 
+#	*			const int distance_length, const double* distance, const double* distance_factor,
+#	*			const int azimut_length, const double* azimut, const double* azimut_factor,
+#	*			const int incidence_length, const double* incidence, const double* incidence_factor){
 
+		distance =        { 0,   5,  10,  15,  20,  25,  30,  35 }.
+		distance_factor = { 1, 0.9, 0.8, 0.7, 0.4, 0.3, 0.2, 0.0 }.
+		distance_length = 8.
+		azimut =		{-65, -60, -30, -20, -10, 0,  10,  20,  30, 60, 65}.
+		azimut_factor = {  0,   0, 0.2, 0.5, 0.8, 1, 0.8, 0.5, 0.2,  0, 0 }.
+		azimut_length = 11.
+		incidence =        {-180, -90, -60, -30, -20, -10, 0,  10,  20,  30,  60, 90, 180}.
+		incidence_factor = {   0,   0, 0.2, 0.4, 0.6, 0.8, 1, 0.8, 0.6, 0.4, 0.2,  0,   0}.
+		incidence_length = 13.
+		print "Raytracer: Creating sensor...".
+		createUserSensor("USERTEST", rows, columns, maxrange, maxangle,
+						distance_length, distance, distance_factor,
+						azimut_length, azimut, azimut_factor,
+						incidence_length, incidence, incidence_factor).
+		print "...sensor created!".
+
+	+ to init:
+		self createSensor.
 		draw = new Drawing.
 		shapee = (controller get-walker-shape).
 		self set-shape to shapee.
@@ -141,23 +173,6 @@ Mobile : isAgent (aka isAgents) {
 		self set-neighborhood-size to hoodSize.
 
 
-# * SensorBuilder::createSensor(const char* name, const int rows, const int columns, const double max_range, const double max_angle, 
-#	*			const int distance_length, const double* distance, const double* distance_factor,
-#	*			const int azimut_length, const double* azimut, const double* azimut_factor,
-#	*			const int incidence_length, const double* incidence, const double* incidence_factor){
-
-distance = { 11.1, 22, 33.0 }.
-distance_factor = { 1, 2, 3.0 }.
-azimut = {1, 2, 3}.
-azimut_factor = {-1,-2,-3}.
-incidence = {1, 2, 3, 4, 5}.
-incidence_factor = {1, 4, 9, 10, 10}.
-print "Raytracer: Creating sensor...".
-createUserSensor("USERTEST", 5, 5, 300.1, 1.14,
-				3, distance, distance_factor,
-				3, azimut, azimut_factor,
-				5, incidence, incidence_factor).
-print "...sensor created!".
 
 		return self.
 
@@ -169,7 +184,8 @@ print "...sensor created!".
 #		vtest = irSense(realWorldPointer, (self get-location),((self get-rotation)*[(0,0,1),(0,1,0),(1,0,0)]) , "PROXIMITY").
 print "Raytracer: start sensing...".
 
-		vtest = irSense(realWorldPointer, (self get-location),((self get-rotation)*[(0,0,1),(0,1,0),(1,0,0)]) , "USERTEST3").
+		vtest = irSense(realWorldPointer, (self get-location),((self get-rotation)*[(0,0,1),(0,1,0),(1,0,0)]) , "USERTEST").
+		print vtest.
 print "Raytracer: ...sensing done".
 
 #print ((self get-rotation)*(0,1,0)).
