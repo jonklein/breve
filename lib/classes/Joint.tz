@@ -263,9 +263,6 @@ Abstract : Joint (aka Joints) [version 2.3] {
 			self set-double-spring with-strength springStrength with-max springMax with-min springMin.
 		}
 
-		if parent: parent restore-link-position.
-		if child: child restore-link-position.
-
 		return 1.
 
   + section "Breaking Joints"

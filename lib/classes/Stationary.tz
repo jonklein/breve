@@ -38,14 +38,14 @@ Real : Stationary (aka Stationaries) [version 2.4] {
         if !(theShape get-pointer):
             die "attempt to register Stationary object with uninitialized Shape.".
 
-		shape = theShape.
-		self add-dependency on shape.
+	shape = theShape.
+	self add-dependency on shape.
 
         objectLocation = theLocation.
         realWorldPointer = addStationary( ( theShape get-pointer ), theLocation, theRotation ).
         self set-texture to 0.
 
-		return self.
+	return self.
 
     + to get-location:
         % Returns the location of the Stationary object.

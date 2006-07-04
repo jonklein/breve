@@ -24,4 +24,10 @@ Mobile : Link (aka Links) [version 2.1] {
 		% Returns the OBJECT(MultiBody) that this link is a part of, if any.
 
 		return linkGetMultibody(linkPointer).
+
+	+ to dearchive:
+		return (super dearchive).
+
+	+ to destroy:
+		super destroy.
 }

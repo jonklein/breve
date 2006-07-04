@@ -92,25 +92,27 @@ char *brDataHexEncode(brData *d) {
 
 brData *brDataHexDecode( char *string ) {
 	unsigned char *tmpData;
-    int length;
-    int n;
-    int l;
+	int length;
+	int n;
+	int l;
 
-    if(!string) return NULL;
+	if(!string) return NULL;
 
-    length = strlen(string);
+	length = strlen( string );
 
-    if((length % 2) || length < 0) {
-        slMessage(DEBUG_ALL, "warning: error decoding hex data string (length = %d)\n", length);
-        return NULL;
-    }
+	if( (length % 2) || length < 1 ) {
+		slMessage(DEBUG_ALL, "warning: error decoding hex data string (length = %d)\n", length);
+		return NULL;
+	}
+
+	length >>= 1;
 
 	tmpData = new unsigned char[ length ];
 
-    for( n = 0; n < length; n++ ) {
-        sscanf(&string[n * 2], "%2x", &l);
-        tmpData[ n ] = l & 0xff;
-    }
+	for( n = 0; n < length; n++ ) {
+		sscanf(&string[ n * 2 ], "%2x", &l);
+		tmpData[ n ] = l & 0xff;
+	}
 
-    return new brData( tmpData, length );
+	return new brData( tmpData, length );
 }

@@ -33,6 +33,8 @@ enum states {
 	XP_VARIABLES,
 	XP_DEPENDENCIES,
 	XP_OBSERVERS,
+	XP_NOTIFICATION,
+	XP_METHOD,
 	XP_INDEX,
 
 	XP_ARRAY,
@@ -171,7 +173,7 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 	if( record->written.find( i) != record->written.end()) return 0;
 
 	if(i->status != AS_ACTIVE) {
-		slMessage(DEBUG_ALL, "warning: requested archive of freed instance %p of class %s, skipping...\n", i, i->type->name);
+		slMessage( DEBUG_WARN, "warning: requested archive of freed instance %p of class %s, skipping...\n", i, i->type->name );
 		return -1;
 	}
 
@@ -216,13 +218,14 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 	// write out the observers 
 
 	if(!isDataObject) {
-		XMLPutSpaces(spaces, file);
-		fprintf(file, "<observers>\n");
-		spaces += XML_INDENT_SPACES;
 
 		list = i->breveInstance->observers;
 
 		while(list) {
+			XMLPutSpaces(spaces, file);
+			fprintf(file, "<observers>\n");
+			spaces += XML_INDENT_SPACES;
+
 			brObserver *obs = (brObserver*)list->data;
 			int index;
 	
@@ -240,16 +243,16 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 			fprintf(file, "<method name=\"%s\"/>\n", obs->method->name);
 			
 			list = list->next;
+
+			spaces -= XML_INDENT_SPACES;
+			XMLPutSpaces(spaces, file);
+			fprintf(file, "</observers>\n");
 		}
-		
-		spaces -= XML_INDENT_SPACES;
-		XMLPutSpaces(spaces, file);
-		fprintf(file, "</observers>\n");
 	}
 
 	// write out the dependencies
 
-	if(!isDataObject) {
+	if( !isDataObject ) {
 		XMLPutSpaces(spaces, file);
 		fprintf(file, "<dependencies>\n");
 		spaces += XML_INDENT_SPACES;
@@ -773,12 +776,13 @@ int stXMLRunDearchiveMethods(stXMLParserState *s) {
 	brEval result;
 	std::map< int, stInstance* >::iterator ii;
 
-	for(ii = s->indexToInstanceMap.begin(); ii != s->indexToInstanceMap.end(); ii++ ) {
+	for( unsigned int n = 0; n < s->dearchiveOrder.size(); n++ ) {
 		stRunInstance ri;
 
-		if(ii->second) {
+		ri.instance = s->dearchiveOrder[ n ];
 
-			ri.instance = ii->second;
+		if( ri.instance ) {
+
 			ri.type = ri.instance->type;
 
 			r = stCallMethodByName(&ri, "post-dearchive-set-controller", &result);
@@ -878,6 +882,10 @@ void stXMLObjectStartElementHandler(void *userData, const XML_Char *name, const 
 			break;
 		case XP_INSTANCE:
 			parserState->currentInstance = parserState->indexToInstanceMap[ index];
+			if( !parserState->currentInstance ) slMessage( DEBUG_ALL, "warning: cannot locate instance #%d\n", index );
+
+			parserState->dearchiveOrder.push_back( parserState->currentInstance );
+
 			break;
 		case XP_ARRAY:
 			state->variable = stObjectLookupVariable(parserState->currentObject, state->name);
@@ -901,6 +909,7 @@ void stXMLObjectStartElementHandler(void *userData, const XML_Char *name, const 
 			// we don't see the character data for this one 
 
 			steveInstance = parserState->indexToInstanceMap[ index];
+
 			if(steveInstance) {
 				state->eval.set( steveInstance->breveInstance );
 			} else {
@@ -917,6 +926,16 @@ void stXMLObjectStartElementHandler(void *userData, const XML_Char *name, const 
 			if(object) parserState->currentObject = (stObject*)object->userData;
 			else parserState->currentObject = NULL;
 
+			break;
+		case XP_NOTIFICATION:
+			state->eval.set( state->name );
+			break;
+		case XP_METHOD:
+			state->eval.set( state->name );
+
+			break;
+		case XP_DEPENDENCIES:
+			state->eval.set( (brInstance*)NULL );
 			break;
 	}
 }
@@ -964,7 +983,7 @@ void stXMLObjectCharacterDataHandler(void *userData, const XML_Char *data, int l
 		e->string = (char*)slMalloc(len + 1);
 	} else {
 		oldLen = strlen(e->string);
-		e->string = (char*)slRealloc(e->string, oldLen + len + 1);
+		e->string = (char*)slRealloc( e->string, oldLen + len + 1 );
 	}
 
 	// copy in the new data
@@ -994,6 +1013,7 @@ void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
 			case XP_INSTANCE:
 				if( parserState->currentInstance == parserState->indexToInstanceMap[ parserState->controllerIndex ] ) 
 					brEngineSetController(parserState->engine, parserState->currentInstance->breveInstance);
+				state->eval.set( parserState->currentInstance );
 				break;
 			case XP_DATA:
 				state->eval.set( brDataHexDecode(state->string) );
@@ -1020,6 +1040,12 @@ void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
 			case XP_MATRIX:
 				sscanf( state->string, "[ (%lf, %lf, %lf), (%lf, %lf, %lf), (%lf, %lf, %lf) ]", &m[0][0], &m[0][1], &m[0][2], &m[1][0], &m[1][1], &m[1][2], &m[2][0], &m[2][1], &m[2][2] );
 				state->eval.set( m );
+				break;
+
+
+			case XP_OBSERVERS:
+				if( BRINSTANCE( &state->eval ) && BRSTRING( &state->key ) && BRSTRING( &state->value ) )  
+					brInstanceAddObserver( parserState->currentInstance->breveInstance, BRINSTANCE( &state->eval ), BRSTRING( &state->key ), BRSTRING( &state->value ) );
 				break;
 		}
 
@@ -1056,7 +1082,7 @@ void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
 				break;
 			case XP_KEY:
 			case XP_VALUE:
-				brEvalCopy(&lastState->eval, &state->eval);
+				brEvalCopy( &lastState->eval, &state->eval );
 				break;
 			case XP_HASH:
 				if(lastState->state == XP_KEY) {
@@ -1080,8 +1106,20 @@ void stXMLObjectEndElementHandler(void *userData, const XML_Char *name) {
 
 				state->arrayIndex++;
 				break;
+			case XP_OBSERVERS:
+				if( lastState->state == XP_NOTIFICATION ) {
+					brEvalCopy( &lastState->eval, &state->key );
+				}
+				if( lastState->state == XP_METHOD ) {
+					brEvalCopy( &lastState->eval, &state->value );
+				}
+				if( lastState->state == XP_OBJECT ) {
+					brEvalCopy( &lastState->eval, &state->eval );
+				}
+				break;
+
 			case XP_DEPENDENCIES:
-				stInstanceAddDependency(parserState->currentInstance, (stInstance*)BRINSTANCE(&lastState->eval)->userData);
+				if( BRINSTANCE(&lastState->eval) ) stInstanceAddDependency( parserState->currentInstance, (stInstance*)BRINSTANCE(&lastState->eval)->userData );
 				break;
 		} 
 	}
@@ -1101,6 +1139,9 @@ int stXMLStateForElement(char *name) {
 	if(!strcasecmp(name, "variables")) return XP_VARIABLES;
 	if(!strcasecmp(name, "dependencies")) return XP_DEPENDENCIES;
 	if(!strcasecmp(name, "index")) return XP_INDEX;
+
+	if(!strcasecmp(name, "notification")) return XP_NOTIFICATION;
+	if(!strcasecmp(name, "method")) return XP_METHOD;
 
 	if(!strcasecmp(name, "array")) return XP_ARRAY;
 	if(!strcasecmp(name, "int")) return XP_INT;

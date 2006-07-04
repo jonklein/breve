@@ -6,7 +6,6 @@
 @use Vector.
 
 Object : Vector (aka Vectors) [version 2.3] {
-	
 	+ variables:
 		vectorPointer (pointer).
 		vectorList (list).
@@ -17,7 +16,7 @@ Object : Vector (aka Vectors) [version 2.3] {
 		self set-size to 3.
 		return self.
 
-	+ to delete:
+	+ to destroy:
 		if vectorPointer: vectorFree( vectorPointer ).
 		
 	- to get-vector-pointer:
@@ -160,6 +159,7 @@ Object : Vector (aka Vectors) [version 2.3] {
 		print "]".			   
 
 	+ to archive:
+		n (int).
 		for n = 0, n < dim, n++: {
 			vectorList{ n } = ( self get-value at n ).
 		}
@@ -167,11 +167,11 @@ Object : Vector (aka Vectors) [version 2.3] {
 		return ( super archive ).
 
 	+ to dearchive:
-		print "Dearchiving with $vectorList".
+		n (int).
 		self set-size to | vectorList |.
 
 		for n = 0, n < dim, n++: {
-			( self get-value at n to vectorList{ n } ).
+			( self set-value at n to vectorList{ n } ).
 		}
 
 		return ( super archive ).

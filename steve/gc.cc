@@ -55,7 +55,8 @@ void stGCRetain(brEval *e) {
 */
 
 void stGCRetainPointer(void *pointer, int type) {
-	if(type == AT_NULL || !pointer) return;
+	if( type == AT_NULL 
+		|| !pointer ) return;
 
 	switch(type) {
 		case AT_INSTANCE:

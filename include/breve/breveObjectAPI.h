@@ -135,7 +135,7 @@ struct brObserver {
 
 	~brObserver() {
 		delete method;
-		delete[] notification;
+		free( notification );
 	}
 
     brInstance *instance;

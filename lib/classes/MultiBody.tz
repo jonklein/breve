@@ -234,6 +234,8 @@ Object : MultiBody (aka MultiBodies) [version 2.0] {
 	- to resume-physics:
 
 	+ to dearchive:
+		multibodyPointer = multibodyNew().
+
 		self set-root to rootLink.
 
 		multibodySetHandleSelfCollisions(multibodyPointer, selfCollisions).
@@ -244,4 +246,5 @@ Object : MultiBody (aka MultiBodies) [version 2.0] {
 		free (self get-all-connected-objects).
 		multibodyFree(multibodyPointer).
 		free menus.
+
 }

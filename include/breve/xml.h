@@ -81,7 +81,6 @@ struct stXMLParserState {
 	stXMLParserState() {
 		currentInstance = NULL;
 		currentObject = NULL;
-		instances = NULL;
 		engine = NULL;
 		mode = 0;
 		error = 0;
@@ -97,15 +96,15 @@ struct stXMLParserState {
 	std::vector< stXMLStackEntry* > stateStack;
 	int controllerIndex;
 	int archiveIndex;
-	slList *instances;
 	std::map< int, stInstance* > indexToInstanceMap;
+	std::vector< stInstance* > dearchiveOrder;
 };
 
-typedef struct stXMLArchiveRecord stXMLArchiveRecord;
-typedef struct stXMLDearchiveRecord stXMLDearchiveRecord;
+// typedef struct stXMLArchiveRecord stXMLArchiveRecord;
+// typedef struct stXMLDearchiveRecord stXMLDearchiveRecord;
 
-typedef struct stXMLParserState stXMLParserState;
-typedef struct stXMLStackEntry stXMLStackEntry;
+// typedef struct stXMLParserState stXMLParserState;
+// typedef struct stXMLStackEntry stXMLStackEntry;
 
 int stXMLAssignIndices(brEngine *, std::map< stInstance*, int>&);
 

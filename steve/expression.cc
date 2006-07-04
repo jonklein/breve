@@ -225,6 +225,9 @@ stBinaryExp::~stBinaryExp() {
 stAssignExp::stAssignExp(stMethod *m, stObject *o, char *word, stExp *r, char *file, int line) : stExp(file, line) {
 	stVar *var;
  
+	_objectName = NULL;
+	_rvalue = NULL;
+
 	// check to see if the variable is local
 
 	if( ( var = stFindLocal( word, m ) ) ) {
@@ -246,7 +249,6 @@ stAssignExp::stAssignExp(stMethod *m, stObject *o, char *word, stExp *r, char *f
 	_assignType = var->type->_type;
 
 	if( var->type->_objectName ) _objectName = slStrdup( var->type->_objectName );
-	else _objectName = NULL;
 
 	_objectType = NULL;
 
@@ -257,8 +259,7 @@ stAssignExp::stAssignExp(stMethod *m, stObject *o, char *word, stExp *r, char *f
 
 stAssignExp::~stAssignExp() {
 	if( _objectName) slFree(_objectName);
-
-	delete _rvalue;
+	if( _rvalue ) delete _rvalue;
 }
 
 stListInsertExp::stListInsertExp(stExp *l, stExp *e, stExp *i, char *file, int lineno) : stExp(file, lineno) {

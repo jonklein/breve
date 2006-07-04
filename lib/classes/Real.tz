@@ -36,6 +36,10 @@ Object : Real (aka Reals) [version 2.1] {
 		self add-menu named "Delete Instance" for-method "delete-instance".
 		self add-menu named "Follow With Camera" for-method "watch".
 
+	- to delete:
+		if realWorldPointer: removeObject(realWorldPointer).
+		free menus.
+
 	- to get-world-object-pointer:
 		% Used internally.
 
@@ -411,10 +415,6 @@ Object : Real (aka Reals) [version 2.1] {
 		self set-color to color.
 
 		return (super dearchive).
-
-	- to delete:
-		if realWorldPointer: removeObject(realWorldPointer).
-		free menus.
 
   + section "Useful Funtions for Sensors"
 

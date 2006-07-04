@@ -112,6 +112,6 @@ Abstract : File (aka Files) [version 2.0] {
 		if filePointer: closeFile(filePointer).
 		filePointer = 0.
 
-	- to delete:
+	- to destroy:
 		if filePointer: (self close).
 }

@@ -175,7 +175,6 @@ PhysicalControl : Walker {
 		newDriver = (seats{currentSeat} get-number).
 		
 		if wigglyThing: {
-			wigglyThing free-all-connected-objects.
 			free wigglyThing.
 		}
 		
@@ -445,4 +444,6 @@ MultiBody : Creature {
 		free linkShape.
 		free lowerLinkShape.
 		free bodyShape.
+
+		super destroy.
 }
