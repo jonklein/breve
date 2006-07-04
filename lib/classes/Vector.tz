@@ -6,54 +6,55 @@
 @use Vector.
 
 Object : Vector (aka Vectors) [version 2.3] {
-    
-    + variables:
-        vectorPointer (pointer).
-        dim (int).
-    
-    + to init:
+	
+	+ variables:
+		vectorPointer (pointer).
+		vectorList (list).
+		dim (int).
+	
+	+ to init:
 		# arbitrary default size.
 		self set-size to 3.
-        return self.
+		return self.
 
 	+ to delete:
 		if vectorPointer: vectorFree( vectorPointer ).
-        
-    - to get-vector-pointer:
-        return vectorPointer.
-        
-    - to set-vector-pointer to newPointer (pointer) with-size newDim (int):
-        if vectorPointer: vectorFree(vectorPointer).
-        vectorPointer = newPointer.
-        dim = newDim.
-        
-    + to init-with size newDim (int):
-        % Set the dimension of the vector to size.  Clears contents.
-        self set-size to newDim.
-        return self.
-        
-    + to set-size to newDim (int):
-        % Sets the size of this vector to the new dimension.
-        if vectorPointer: vectorFree(vectorPointer).
-        vectorPointer = vectorNew(newDim).
-        dim = newDim.
+		
+	- to get-vector-pointer:
+		return vectorPointer.
+		
+	- to set-vector-pointer to newPointer (pointer) with-size newDim (int):
+		if vectorPointer: vectorFree(vectorPointer).
+		vectorPointer = newPointer.
+		dim = newDim.
+		
+	+ to init-with size newDim (int):
+		% Set the dimension of the vector to size.  Clears contents.
+		self set-size to newDim.
+		return self.
+		
+	+ to set-size to newDim (int):
+		% Sets the size of this vector to the new dimension.
+		if vectorPointer: vectorFree(vectorPointer).
+		vectorPointer = vectorNew(newDim).
+		dim = newDim.
 
-    + to get-dimension:
+	+ to get-dimension:
 		% Returns the x size of this vector.
-        return dim.
-        
-    + to get-absolute-sum:
-        % Returns the sum of the absolute values of all elements in this 
-        % vector.
-        % <P>
-        % This method is hardware accelerated where supported.
-        return vectorGetAbsoluteSum(vectorPointer).
+		return dim.
+		
+	+ to get-absolute-sum:
+		% Returns the sum of the absolute values of all elements in this 
+		% vector.
+		% <P>
+		% This method is hardware accelerated where supported.
+		return vectorGetAbsoluteSum(vectorPointer).
 
-    + to multiply-with-values of otherVector (Vector object):
-        % Multiplies each element in this vector with the corresponding 
-        % element in otherVector.  This is not regular vector multiplication;
-        % rather, it is a way to scale each element in otherVector.
-        vectorMulElements(vectorPointer, (otherVector get-vector-pointer)).
+	+ to multiply-with-values of otherVector (Vector object):
+		% Multiplies each element in this vector with the corresponding 
+		% element in otherVector.  This is not regular vector multiplication;
+		% rather, it is a way to scale each element in otherVector.
+		vectorMulElements(vectorPointer, (otherVector get-vector-pointer)).
 
 	+ to transform with-matrix transformation (Matrix2D object) with-result result (Vector object):
 		% Transforms this OBJECT(Vector) with the OBJECT(Matrix2D) matrix, storing the 
@@ -61,132 +62,148 @@ Object : Vector (aka Vectors) [version 2.3] {
 
 		matrix2DVectorMultiply( (transformation get-matrix-pointer), vectorPointer, (result get-vector-pointer) ).
 
-    + to get-value at x (int):
-        % Returns the vector value at position (x).
-        
-        return vectorGet(vectorPointer, x).
+	+ to get-value at x (int):
+		% Returns the vector value at position (x).
+		
+		return vectorGet(vectorPointer, x).
 
-    + to set-value to value (double) at x (int):
-        % Sets the vector value at position (x, y, z).
+	+ to set-value to value (double) at x (int):
+		% Sets the vector value at position (x, y, z).
 
-        return vectorSet(vectorPointer, x, value).
+		return vectorSet(vectorPointer, x, value).
 
-    + to set-all-values to value (float):
-        % Sets all of the values in the vector to value.
-        vectorSetAll(vectorPointer, value).
+	+ to set-all-values to value (float):
+		% Sets all of the values in the vector to value.
+		vectorSetAll(vectorPointer, value).
 
-    + to add-scalar value scalarValue (double):
-        % Adds the number scalarValue to each element in the vector.
-        vectorAddScalar(vectorPointer, scalarValue).
+	+ to add-scalar value scalarValue (double):
+		% Adds the number scalarValue to each element in the vector.
+		vectorAddScalar(vectorPointer, scalarValue).
 
-    + to add-values of otherVector (object) scaled-by scale = 1.0 (double):
-        % Adds this vector to otherVector leaving the result in otherVector.
-        % The matrices must be of the same size.  The 
-        % optional argument scale allows otherVector to be scaled before 
-        % adding it to this vector.
-        % <P>
-        % This method is hardware accelerated where supported.
-        vectorAddScaled(vectorPointer, (otherVector get-vector-pointer), scale).
+	+ to add-values of otherVector (object) scaled-by scale = 1.0 (double):
+		% Adds this vector to otherVector leaving the result in otherVector.
+		% The matrices must be of the same size.  The 
+		% optional argument scale allows otherVector to be scaled before 
+		% adding it to this vector.
+		% <P>
+		% This method is hardware accelerated where supported.
+		vectorAddScaled(vectorPointer, (otherVector get-vector-pointer), scale).
 
-    + to subtract-values of otherVector (object) scaled-by scale = 1.0 (double):
-        % Subtracts this vector from this otherVector, leaving the result
-        % in otherVector.  This method uses the
-        % same mechanism as METHOD(add), but using a negative scale 
-        % argument.
-        % The optional argument scale allows otherVector to be scaled before 
-        % subtracting it from this vector.
-        % <P>
-        % This method is hardware accelerated where supported.
-        vectorAddScaled(vectorPointer, (otherVector get-vector-pointer), -1.0 * scale).
+	+ to subtract-values of otherVector (object) scaled-by scale = 1.0 (double):
+		% Subtracts this vector from this otherVector, leaving the result
+		% in otherVector.  This method uses the
+		% same mechanism as METHOD(add), but using a negative scale 
+		% argument.
+		% The optional argument scale allows otherVector to be scaled before 
+		% subtracting it from this vector.
+		% <P>
+		% This method is hardware accelerated where supported.
+		vectorAddScaled(vectorPointer, (otherVector get-vector-pointer), -1.0 * scale).
 
-    + to scale by scaleValue (float):
-        % Scales all elements in the vector by scaleValue.
-        % <P>
-        % This method is hardware accelerated where supported.
-        vectorScale(vectorPointer, scaleValue).
+	+ to scale by scaleValue (float):
+		% Scales all elements in the vector by scaleValue.
+		% <P>
+		% This method is hardware accelerated where supported.
+		vectorScale(vectorPointer, scaleValue).
 
-    + to copy from otherVector (object):
-        % Copies the contents of otherVector to thisVector.
-        % <P>
-        % This method is hardware accelerated where supported.
-        vectorCopy((otherVector get-vector-pointer), vectorPointer).
-        
-    ### the following display a colum vector as rows of the image
-    + to copy-to-red-channel of-image theImage (Image object) with-scale scale = 1.0 (float):
-        % Copies the contents of this vector to the red channel of theImage.  
-        % The optional
-        % argument scale specifies how the vector elements should be scaled.
-        % <P>
-        % This method, and it's counterparts METHOD(copy-to-green-channel) and 
-        % METHOD(copy-to-blue-channel) are far faster than looping manually through
-        % the vector values.
+	+ to copy from otherVector (object):
+		% Copies the contents of otherVector to thisVector.
+		% <P>
+		% This method is hardware accelerated where supported.
+		vectorCopy((otherVector get-vector-pointer), vectorPointer).
+		
+	### the following display a colum vector as rows of the image
+	+ to copy-to-red-channel of-image theImage (Image object) with-scale scale = 1.0 (float):
+		% Copies the contents of this vector to the red channel of theImage.  
+		% The optional
+		% argument scale specifies how the vector elements should be scaled.
+		% <P>
+		% This method, and it's counterparts METHOD(copy-to-green-channel) and 
+		% METHOD(copy-to-blue-channel) are far faster than looping manually through
+		% the vector values.
 
-        vectorCopyToImage(vectorPointer, (theImage get-image-data), 0, scale).
+		vectorCopyToImage(vectorPointer, (theImage get-image-data), 0, scale).
 
-    + to copy-to-green-channel of-image theImage (Image object) with-scale scale = 1.0 (float):
-        % Copies the contents of this vector to the green channel of theImage.  
-        % The optional
-        % argument scale specifies how the vector elements should be scaled.
-        % <P>
-        % This method, and it's counterparts METHOD(copy-to-blue-channel) and 
-        % METHOD(copy-to-red-channel) are far faster than looping manually through
-        % the vector values.
+	+ to copy-to-green-channel of-image theImage (Image object) with-scale scale = 1.0 (float):
+		% Copies the contents of this vector to the green channel of theImage.  
+		% The optional
+		% argument scale specifies how the vector elements should be scaled.
+		% <P>
+		% This method, and it's counterparts METHOD(copy-to-blue-channel) and 
+		% METHOD(copy-to-red-channel) are far faster than looping manually through
+		% the vector values.
 
-        vectorCopyToImage(vectorPointer, (theImage get-image-data), 1, scale).
+		vectorCopyToImage(vectorPointer, (theImage get-image-data), 1, scale).
 
-    + to copy-to-blue-channel of-image theImage (Image object) with-scale scale = 1.0 (float):
-        % Copies the contents of this vector to the blue channel of theImage.  
-        % The optional
-        % argument scale specifies how the vector elements should be scaled.
-        % <P>
-        % This method, and it's counterparts METHOD(copy-to-red-channel) and 
-        % METHOD(copy-to-green-channel) are far faster than looping manually through
-        % the vector values.
+	+ to copy-to-blue-channel of-image theImage (Image object) with-scale scale = 1.0 (float):
+		% Copies the contents of this vector to the blue channel of theImage.  
+		% The optional
+		% argument scale specifies how the vector elements should be scaled.
+		% <P>
+		% This method, and it's counterparts METHOD(copy-to-red-channel) and 
+		% METHOD(copy-to-green-channel) are far faster than looping manually through
+		% the vector values.
 
-        vectorCopyToImage(vectorPointer, (theImage get-image-data), 2, scale).
+		vectorCopyToImage(vectorPointer, (theImage get-image-data), 2, scale).
 
-    + to print-matlab-style:
+	+ to print-matlab-style:
 		% Prints the vector in a style similar to MATLAB.
 
-        i (int).
-        printf "[".
-        for i = 0, i < (dim - 1), i++:
-        {
-            printf vectorGet(vectorPointer, i).
-            printf " ".
-        }
-        printf vectorGet(vectorPointer, i).
-        print "]".               
+		i (int).
+		printf "[".
+		for i = 0, i < (dim - 1), i++:
+		{
+			printf vectorGet(vectorPointer, i).
+			printf " ".
+		}
+		printf vectorGet(vectorPointer, i).
+		print "]".			   
 
+	+ to archive:
+		for n = 0, n < dim, n++: {
+			vectorList{ n } = ( self get-value at n ).
+		}
+
+		return ( super archive ).
+
+	+ to dearchive:
+		print "Dearchiving with $vectorList".
+		self set-size to | vectorList |.
+
+		for n = 0, n < dim, n++: {
+			( self get-value at n to vectorList{ n } ).
+		}
+
+		return ( super archive ).
 }
 
 Image : VectorImage {
 
-    + variables:
-        red (object).
-        green (object).
-        blue (object).
-        scale (float).
-    
-    + to init-with the-vector theVector (object) scale theScale = 1.0 (float):
-    
-        super init-with width (theVector get-dimension) height (theVector get-dimension).
-        scale = theScale.
-    
-        return self.
-        
-    - to destroy:
-        super destroy.
-        
-    + to set-red to m (object): red = m.
+	+ variables:
+		red (object).
+		green (object).
+		blue (object).
+		scale (float).
+	
+	+ to init-with the-vector theVector (object) scale theScale = 1.0 (float):
+	
+		super init-with width (theVector get-dimension) height (theVector get-dimension).
+		scale = theScale.
+	
+		return self.
+		
+	- to destroy:
+		super destroy.
+		
+	+ to set-red to m (object): red = m.
 
-    + to set-green to m (object): green = m.
+	+ to set-green to m (object): green = m.
 
-    + to set-blue to m (object): blue = m.
+	+ to set-blue to m (object): blue = m.
 
-    + to iterate:
+	+ to iterate:
 		if red: red copy-to-red-channel of-image self with-scale scale.
 		if green: green copy-to-blue-channel of-image self with-scale scale.
 		if blue: blue copy-to-blue-channel of-image self with-scale scale.
-        super iterate.
+		super iterate.
 }
