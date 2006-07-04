@@ -219,15 +219,22 @@ void stInstanceCollect(stInstance *i) {
 */
 
 void stInstanceFree(stInstance *i) {
+	while( i->dependencies.size() )
+		stInstanceRemoveDependency( i, *i->dependencies.begin() );
+
+	while( i->dependents.size() )
+		stInstanceRemoveDependency( *i->dependents.begin(), i );
+
 	stInstanceFreeNoInstanceLists(i);
 
 	stRemoveFromInstanceLists(i);
 
-	if(i->type->steveData->retainFreedInstances) {
+
+	if(i->type->steveData->retainFreedInstances)
 		i->type->steveData->freedInstances.push_back( i);
-	} else {
+	else
 		delete i;
-	}
+
 }
 
 /*!

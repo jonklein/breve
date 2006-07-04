@@ -173,7 +173,7 @@ int stXMLWriteObject(stXMLArchiveRecord *record, FILE *file, stInstance *i, int 
 	if( record->written.find( i) != record->written.end()) return 0;
 
 	if(i->status != AS_ACTIVE) {
-		slMessage( DEBUG_WARN, "warning: requested archive of freed instance %p of class %s, skipping...\n", i, i->type->name );
+		slMessage( DEBUG_ALL, "warning: requested archive of freed instance %p of class %s, skipping...\n", i, i->type->name );
 		return -1;
 	}
 

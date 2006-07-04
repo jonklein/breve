@@ -162,7 +162,7 @@ char *slUtilReadFile(char *path) {
 
 	buffer = (char *)slMalloc(1);
 
-	while((n = slUtilGzread(temp, sizeof(temp), fp))) {
+	while( ( n = slUtilGzread( temp, sizeof(temp), fp) ) ) {
 		if(n == -1) {
 			slMessage(DEBUG_ALL, "slUtilGzread %s: error)\n", path);
 			return NULL;
@@ -170,10 +170,11 @@ char *slUtilReadFile(char *path) {
 
 		buffer = (char *)slRealloc(buffer, total + n + 1);
 
-		memcpy(&buffer[total], temp, n);
+		memcpy( &buffer[total], temp, n);
 		
 		total += n;
 	}
+
 	buffer[total] = 0;
 
 	gzclose(fp);
