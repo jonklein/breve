@@ -16,6 +16,7 @@ Abstract : Image (aka Images) [version 2.0] {
         imageData (pointer).
         textureNumber (int).
         modified (int).
+		currentHeight, currentWidth (int).
 
     + to init:
         textureNumber = -1.
@@ -43,9 +44,15 @@ Abstract : Image (aka Images) [version 2.0] {
 
         return self.
 
-    + to init-with width imageWidth (int) height imageHeight (int):
+    - to init-with width imageWidth (int) height imageHeight (int):
+		self set-size width imageWidth height imageHeight.
+
+    + to set-size width imageWidth (int) height imageHeight (int):
         % Creates an empty image buffer with width imageWidth
         % and length imageLength.
+
+		currentHeight = imageHeight.
+		currentWidth = imageWidth.
 
         if imageData: imageDataFree(imageData).
 
@@ -197,4 +204,11 @@ Abstract : Image (aka Images) [version 2.0] {
 
         imageWriteToFile(imageData, imageFile).
 
+	+ to archive:
+        textureNumber = -1.
+		return (super archive).
+
+	+ to dearchive:
+		self set-size width currentWidth height currentHeight.
+		return (super dearchive).
 }
