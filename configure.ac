@@ -259,7 +259,7 @@ if test "x$engine_only" = "x"; then
 		AC_CHECK_LIB([gslcblas], [cblas_ccopy])
 	fi
 
-	AC_CHECK_LIB([avutil], [av_crc])
+	AC_CHECK_LIB([avutil], [av_mod_i])
 	AC_CHECK_LIB([avcodec], [avcodec_init])
 	AC_CHECK_LIB([avformat], [av_write_frame])
 
