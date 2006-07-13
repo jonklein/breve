@@ -12,6 +12,10 @@
 <ulink url="../classes/BraitenbergControl.html">BraitenbergControl</ulink></para>
 </listitem>
 <listitem><para>
+<indexterm><primary>BraitenbergHeavyVehicle class</primary></indexterm>
+<ulink url="../classes/BraitenbergHeavyVehicle.html">BraitenbergHeavyVehicle</ulink></para>
+</listitem>
+<listitem><para>
 <indexterm><primary>BraitenbergLight class</primary></indexterm>
 <ulink url="../classes/BraitenbergLight.html">BraitenbergLight</ulink></para>
 </listitem>
@@ -52,12 +56,48 @@
 <ulink url="../classes/Drawing.html">Drawing</ulink></para>
 </listitem>
 <listitem><para>
+<indexterm><primary>FFNetwork class</primary></indexterm>
+<ulink url="../classes/FFNetwork.html">FFNetwork</ulink></para>
+</listitem>
+<listitem><para>
 <indexterm><primary>File class</primary></indexterm>
 <ulink url="../classes/File.html">File</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>FixedJoint class</primary></indexterm>
 <ulink url="../classes/FixedJoint.html">FixedJoint</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>Floor class</primary></indexterm>
+<ulink url="../classes/Floor.html">Floor</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>GADirectedGraphConnection class</primary></indexterm>
+<ulink url="../classes/GADirectedGraphConnection.html">GADirectedGraphConnection</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>GADirectedGraph class</primary></indexterm>
+<ulink url="../classes/GADirectedGraph.html">GADirectedGraph</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>GADirectedGraphNode class</primary></indexterm>
+<ulink url="../classes/GADirectedGraphNode.html">GADirectedGraphNode</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>GADirectedGraphParameterObject class</primary></indexterm>
+<ulink url="../classes/GADirectedGraphParameterObject.html">GADirectedGraphParameterObject</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>GAIndividualTransporter class</primary></indexterm>
+<ulink url="../classes/GAIndividualTransporter.html">GAIndividualTransporter</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>GeneticAlgorithm class</primary></indexterm>
+<ulink url="../classes/GeneticAlgorithm.html">GeneticAlgorithm</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>GeneticAlgorithmIndividual class</primary></indexterm>
+<ulink url="../classes/GeneticAlgorithmIndividual.html">GeneticAlgorithmIndividual</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>Genome class</primary></indexterm>
@@ -88,8 +128,24 @@
 <ulink url="../classes/Matrix2D.html">Matrix2D</ulink></para>
 </listitem>
 <listitem><para>
+<indexterm><primary>Matrix3D class</primary></indexterm>
+<ulink url="../classes/Matrix3D.html">Matrix3D</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>Matrix class</primary></indexterm>
+<ulink url="../classes/Matrix.html">Matrix</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>MatrixImage class</primary></indexterm>
+<ulink url="../classes/MatrixImage.html">MatrixImage</ulink></para>
+</listitem>
+<listitem><para>
 <indexterm><primary>MenuItem class</primary></indexterm>
 <ulink url="../classes/MenuItem.html">MenuItem</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>MeshShape class</primary></indexterm>
+<ulink url="../classes/MeshShape.html">MeshShape</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>Mobile class</primary></indexterm>
@@ -116,12 +172,12 @@
 <ulink url="../classes/Object.html">Object</ulink></para>
 </listitem>
 <listitem><para>
-<indexterm><primary>Patch class</primary></indexterm>
-<ulink url="../classes/Patch.html">Patch</ulink></para>
-</listitem>
-<listitem><para>
 <indexterm><primary>PatchGrid class</primary></indexterm>
 <ulink url="../classes/PatchGrid.html">PatchGrid</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>Patch class</primary></indexterm>
+<ulink url="../classes/Patch.html">Patch</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>PatchToroid class</primary></indexterm>
@@ -146,6 +202,10 @@
 <listitem><para>
 <indexterm><primary>PushClusterGP class</primary></indexterm>
 <ulink url="../classes/PushClusterGP.html">PushClusterGP</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>PushDiversityPool class</primary></indexterm>
+<ulink url="../classes/PushDiversityPool.html">PushDiversityPool</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>PushGP class</primary></indexterm>
@@ -212,8 +272,24 @@
 <ulink url="../classes/Tone.html">Tone</ulink></para>
 </listitem>
 <listitem><para>
+<indexterm><primary>Tracer class</primary></indexterm>
+<ulink url="../classes/Tracer.html">Tracer</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>TurtleDrawing class</primary></indexterm>
+<ulink url="../classes/TurtleDrawing.html">TurtleDrawing</ulink></para>
+</listitem>
+<listitem><para>
 <indexterm><primary>UniversalJoint class</primary></indexterm>
 <ulink url="../classes/UniversalJoint.html">UniversalJoint</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>Vector class</primary></indexterm>
+<ulink url="../classes/Vector.html">Vector</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>VectorImage class</primary></indexterm>
+<ulink url="../classes/VectorImage.html">VectorImage</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>Wanderer class</primary></indexterm>

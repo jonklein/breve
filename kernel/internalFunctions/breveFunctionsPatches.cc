@@ -145,8 +145,8 @@ int brIObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 	
 	patch = grid->getPatchAtIndex(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]));
 
-	if(patch) target->set( static_cast<brInstance*>(patch->getData()) );
-	else target->set( (void*)NULL );
+	if(patch) target->set( (brInstance*)patch->getData() );
+	else target->set( (brInstance*)NULL );
 
 	return EC_OK;
 }
