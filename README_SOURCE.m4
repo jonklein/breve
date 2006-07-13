@@ -43,26 +43,28 @@ To build the wxWindows frontend for Linux and Windows:
 
                              -- BUILD NOTES -- 
 
-What are those errors about bin/osmesaloader.cc?  Those are harmless.
-osmesaloader is a completely optional extension which allows CLI 
-versions of breve to use features like light-exposure detection and 
-movie exporting.  It will only compile when Mesa libraries are found.
+* For build notes on specific libraries that breve uses, please see the 
+  "EXTERNAL LIBRARIES: DETAILS" section below.
 
-OS X Note #1: if a library is installed, but cannot be found with the 
-configure script, you may have to run "ranlib" on the library before
-it can be found.  See the ranlib manpage for more information.
+* What are those errors about bin/osmesaloader.cc?  Those are harmless.
+  osmesaloader is a completely optional extension which allows CLI 
+  versions of breve to use features like light-exposure detection and 
+  movie exporting.  It will only compile when Mesa libraries are found.
 
-OS X Note #2: the Xcode build targets breve.app is a simple shell script 
-wrapper to build real_breve.app using the correct libraries from the 
-configure script.  Building real_breve.app directly will fail, because 
-it is missing these library settings.
+* OS X Note #1: if a library is installed, but cannot be found with the 
+  configure script, you may have to run "ranlib" on the library before
+  it can be found.  See the ranlib manpage for more information.
 
+* OS X Note #2: the Xcode build targets breve.app is a simple shell script 
+  wrapper to build real_breve.app using the correct libraries from the 
+  configure script.  Building real_breve.app directly will fail, because 
+  it is missing these library settings.
 
-For the record, I am well aware that parts of this source are a bit of a mess.  
-This project and code, in one form or another has spanned much of my undergraduate 
-education, a Master's degree and several years in research and industry.  
-Parts of this code are now almost 10 years old.  Piece by piece I'm updating
-the code and moving it to C++.
+* For the record, I am well aware that parts of this source are a bit of a mess.  
+  This project and code, in one form or another has spanned much of my undergraduate 
+  education, a Master's degree and several years in research and industry.  
+  Parts of this code are now almost 10 years old.  Piece by piece I'm updating
+  the code and moving it to C++.
 
                            --- PLATFORMS ---
 
@@ -134,6 +136,14 @@ Optional:
   simulation becomes too complex and causes a stack overflow.  For this 
   reason, official builds of breve use a modified version of the ODE source.
 
++ [required for breveIDE build] wxwidgets, wx Interface Library
+  http://www.wxwidgets.org
+
+  This library provides the user interface functionality used by breveIDE
+  on Linux and Windows.
+
+  This library may need to be compiled with the flag --disable-unicode .
+
 + [required] libdl, dynamic loading library 
 
   This library is already installed on most platforms.  A notable 
@@ -151,8 +161,6 @@ Optional:
   http://www.gnu.org
 
   Provides support for the Matrix and Random Number Generation classes.
-  If libgsl is present, libgslblas or another BLAS library must also be 
-  present.
 
 + [required] libgslblas, or other Basic Linear Algebra Subroutines library
   http://www.gnu.org
@@ -161,8 +169,8 @@ Optional:
   This library may be replaced by other implementations of the BLAS 
   library.
 
-  On Mac OS X, the System vecLib framework is used, which provides AltiVec
-  hardware acceleration on supported chips.
+  On Mac OS X, the System vecLib framework is used, which provides 
+  hardware vector acceleration on supported chips.
 
 
 

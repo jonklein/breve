@@ -25,7 +25,7 @@ docbook: classes
 	mkdir -p docBuild/docbook/docs
 	touch docBuild/docbook/index.docbook
 	cd docBuild/docbook; \
-		./makeclasslist.sh ../../docs/classes > docs/classlist.docbook
+		./makeclasslist.sh ../../docs/classes > classlist.docbook
 	cd docBuild/docbook; \
 		openjade -t sgml -V html-index -d breve.dsl breve.docbook
 	cd docBuild/docbook; \
