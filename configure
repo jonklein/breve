@@ -9507,9 +9507,9 @@ fi
 	fi
 
 
-echo "$as_me:$LINENO: checking for av_mod_i in -lavutil" >&5
-echo $ECHO_N "checking for av_mod_i in -lavutil... $ECHO_C" >&6
-if test "${ac_cv_lib_avutil_av_mod_i+set}" = set; then
+echo "$as_me:$LINENO: checking for av_crc in -lavutil" >&5
+echo $ECHO_N "checking for av_crc in -lavutil... $ECHO_C" >&6
+if test "${ac_cv_lib_avutil_av_crc+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -9527,11 +9527,11 @@ extern "C"
 #endif
 /* We use char because int might match the return type of a gcc2
    builtin and then its argument prototype would still apply.  */
-char av_mod_i ();
+char av_crc ();
 int
 main ()
 {
-av_mod_i ();
+av_crc ();
   ;
   return 0;
 }
@@ -9558,20 +9558,20 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_lib_avutil_av_mod_i=yes
+  ac_cv_lib_avutil_av_crc=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_cv_lib_avutil_av_mod_i=no
+ac_cv_lib_avutil_av_crc=no
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_avutil_av_mod_i" >&5
-echo "${ECHO_T}$ac_cv_lib_avutil_av_mod_i" >&6
-if test $ac_cv_lib_avutil_av_mod_i = yes; then
+echo "$as_me:$LINENO: result: $ac_cv_lib_avutil_av_crc" >&5
+echo "${ECHO_T}$ac_cv_lib_avutil_av_crc" >&6
+if test $ac_cv_lib_avutil_av_crc = yes; then
   cat >>confdefs.h <<_ACEOF
 #define HAVE_LIBAVUTIL 1
 _ACEOF

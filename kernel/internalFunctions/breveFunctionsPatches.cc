@@ -122,8 +122,8 @@ int brIObjectAtLocation(brEval args[], brEval *target, brInstance *i) {
 
 	patch = grid->getPatchAtLocation(&BRVECTOR(&args[1]));
 
-	if (patch) target->set( static_cast<brInstance*>( patch->getData() ) );
-	else target->set( (void*)NULL );
+	if (patch) target->set( (brInstance*)patch->getData() );
+	else target->set( (brInstance*)NULL );
 
 	return EC_OK;
 }
