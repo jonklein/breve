@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 	int index;
 	char wd[MAXPATHLEN];
 
-	interfaceID = "glut/2.3";
+	interfaceID = "glut/2.5";
 
 	srandom(time(NULL));
 

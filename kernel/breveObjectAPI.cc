@@ -150,7 +150,9 @@ int brMethodCall(brInstance *i, brMethod *m, brEval **args, brEval *result) {
 		return EC_OK;
 	}
 
-	return i->object->type->callMethod(i->userData, m->userData, args, result);
+	int r = i->object->type->callMethod(i->userData, m->userData, args, result);
+
+	return r;
 }
 
 /*!

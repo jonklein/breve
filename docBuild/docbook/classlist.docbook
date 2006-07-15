@@ -72,12 +72,12 @@
 <ulink url="../classes/Floor.html">Floor</ulink></para>
 </listitem>
 <listitem><para>
-<indexterm><primary>GADirectedGraphConnection class</primary></indexterm>
-<ulink url="../classes/GADirectedGraphConnection.html">GADirectedGraphConnection</ulink></para>
-</listitem>
-<listitem><para>
 <indexterm><primary>GADirectedGraph class</primary></indexterm>
 <ulink url="../classes/GADirectedGraph.html">GADirectedGraph</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>GADirectedGraphConnection class</primary></indexterm>
+<ulink url="../classes/GADirectedGraphConnection.html">GADirectedGraphConnection</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>GADirectedGraphNode class</primary></indexterm>
@@ -124,16 +124,16 @@
 <ulink url="../classes/Link.html">Link</ulink></para>
 </listitem>
 <listitem><para>
+<indexterm><primary>Matrix class</primary></indexterm>
+<ulink url="../classes/Matrix.html">Matrix</ulink></para>
+</listitem>
+<listitem><para>
 <indexterm><primary>Matrix2D class</primary></indexterm>
 <ulink url="../classes/Matrix2D.html">Matrix2D</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>Matrix3D class</primary></indexterm>
 <ulink url="../classes/Matrix3D.html">Matrix3D</ulink></para>
-</listitem>
-<listitem><para>
-<indexterm><primary>Matrix class</primary></indexterm>
-<ulink url="../classes/Matrix.html">Matrix</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>MatrixImage class</primary></indexterm>
@@ -172,12 +172,12 @@
 <ulink url="../classes/Object.html">Object</ulink></para>
 </listitem>
 <listitem><para>
-<indexterm><primary>PatchGrid class</primary></indexterm>
-<ulink url="../classes/PatchGrid.html">PatchGrid</ulink></para>
-</listitem>
-<listitem><para>
 <indexterm><primary>Patch class</primary></indexterm>
 <ulink url="../classes/Patch.html">Patch</ulink></para>
+</listitem>
+<listitem><para>
+<indexterm><primary>PatchGrid class</primary></indexterm>
+<ulink url="../classes/PatchGrid.html">PatchGrid</ulink></para>
 </listitem>
 <listitem><para>
 <indexterm><primary>PatchToroid class</primary></indexterm>
