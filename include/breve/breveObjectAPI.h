@@ -149,22 +149,25 @@ struct brObserver {
 extern "C" {
 #endif
 
+DLLEXPORT void brEngineLock(brEngine *);
+DLLEXPORT void brEngineUnlock(brEngine *);
+
 // registering a new object type
 
-void brEngineRegisterObjectType(brEngine *, brObjectType *);
+DLLEXPORT void brEngineRegisterObjectType(brEngine *, brObjectType *);
 
 // locating objects and methods within objects
 
-brMethod *brMethodFind(brObject *, char *, unsigned char *, int);
-brMethod *brMethodFindWithArgRange(brObject *, char *, unsigned char *, int, int);
+DLLEXPORT brMethod *brMethodFind(brObject *, char *, unsigned char *, int);
+DLLEXPORT brMethod *brMethodFindWithArgRange(brObject *, char *, unsigned char *, int, int);
 
-brObject *brObjectFind(brEngine *, char *);
-brObject *brUnknownObjectFind(brEngine *, char *);
+DLLEXPORT brObject *brObjectFind(brEngine *, char *);
+DLLEXPORT brObject *brUnknownObjectFind(brEngine *, char *);
 
 // functions for getting user data
 
-void *brInstanceGetUserData(brInstance *);
-void *brObjectGetUserData(brInstance *);
+DLLEXPORT void *brInstanceGetUserData(brInstance *);
+DLLEXPORT void *brObjectGetUserData(brInstance *);
 
 // functions for calling methods with breve instances
 
@@ -174,29 +177,29 @@ DLLEXPORT int brMethodCallByNameWithArgs(brInstance *, char *, brEval **, int, b
 
 // functions related to adding and removing classes and instances to the breve engine
 
-brObject *brEngineAddObject(brEngine *, brObjectType *, char *, void *);
-void brEngineAddObjectAlias(brEngine *, char *, brObject *);
-brInstance *brEngineAddInstance(brEngine *, brObject *, void *);
-brInstance *brObjectInstantiate(brEngine *, brObject *, brEval **, int);
-void brEngineRemoveInstance(brEngine *, brInstance *);
+DLLEXPORT brObject *brEngineAddObject(brEngine *, brObjectType *, char *, void *);
+DLLEXPORT void brEngineAddObjectAlias(brEngine *, char *, brObject *);
+DLLEXPORT brInstance *brEngineAddInstance(brEngine *, brObject *, void *);
+DLLEXPORT brInstance *brObjectInstantiate(brEngine *, brObject *, brEval **, int);
+DLLEXPORT void brEngineRemoveInstance(brEngine *, brInstance *);
 
-int brObjectAddCollisionHandler(brObject *, brObject *, char *);
-int brObjectSetIgnoreCollisionsWith(brObject *, brObject *, int);
+DLLEXPORT int brObjectAddCollisionHandler(brObject *, brObject *, char *);
+DLLEXPORT int brObjectSetIgnoreCollisionsWith(brObject *, brObject *, int);
 
 // adding and removing dependencies and observers 
 
-int brInstanceAddDependency(brInstance *i, brInstance *dependency);
-int brInstanceAddObserver(brInstance *i, brInstance *observer, char *notification, char *mname);
-int brEngineRemoveInstanceDependency(brInstance *i, brInstance *dependency);
-void brEngineRemoveInstanceObserver(brInstance *i, brInstance *observerInstance, char *notification);
+DLLEXPORT int brInstanceAddDependency(brInstance *i, brInstance *dependency);
+DLLEXPORT int brInstanceAddObserver(brInstance *i, brInstance *observer, char *notification, char *mname);
+DLLEXPORT int brEngineRemoveInstanceDependency(brInstance *i, brInstance *dependency);
+DLLEXPORT void brEngineRemoveInstanceObserver(brInstance *i, brInstance *observerInstance, char *notification);
 
 // cleaning up 
 
-void brInstanceRelease(brInstance *i);
+DLLEXPORT void brInstanceRelease(brInstance *i);
 
-void brObjectFree(brObject *o);
-void brInstanceFree(brInstance *i);
-void brMethodFree(brMethod *i);
+DLLEXPORT void brObjectFree(brObject *o);
+DLLEXPORT void brInstanceFree(brInstance *i);
+DLLEXPORT void brMethodFree(brMethod *i);
 
 #ifdef __cplusplus
 }

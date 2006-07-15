@@ -298,9 +298,6 @@ enum versionRequiermentOperators {
 extern "C" {
 #endif
 
-void brEngineLock(brEngine *);
-void brEngineUnlock(brEngine *);
-
 brEvent *brEngineAddEvent(brEngine *, brInstance *, char *, double, double);
 void brEventFree(brEvent *);
 

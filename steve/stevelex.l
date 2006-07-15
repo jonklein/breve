@@ -220,7 +220,7 @@ int yywrap() {
 
 void yyerror(char *c) {
     stParseError(parseEngine, PE_PARSE, "%s in file \"%s\" at line %d near \"%s\"", c, yyfile, lineno, yytext);
-    YY_FLUSH_BUFFER;
+    // YY_FLUSH_BUFFER;
 
     gErrorLine = lineno;
 }
