@@ -29,6 +29,8 @@ BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text)
 	wxString str;
 	int i = 0;
 
+	mSleepMS = 100;
+
 	this->simulationfile = simfile;
 	this->text = text;
 	this->next = NULL;
@@ -173,11 +175,12 @@ void BreveInterface::Iterate()
 	if (frontend == NULL || !initialized)
 	return;
 
-	if (brEngineIterate(frontend->engine) != EC_OK)
-	{
-	reportError();
-	Abort();
+	if (brEngineIterate(frontend->engine) != EC_OK) {
+		reportError();
+		Abort();
 	}
+
+	usleep( gBreverender->GetSleepMS() * 1000 );
 }
 
 void BreveInterface::Render()
@@ -186,7 +189,7 @@ void BreveInterface::Render()
 	return;
 
 	brEngineLock(frontend->engine);
-	brEngineRenderWorld(frontend->engine,breverender->MouseDown());
+	brEngineRenderWorld(frontend->engine,gBreverender->MouseDown());
 	brEngineUnlock(frontend->engine);
 }
 
@@ -200,17 +203,17 @@ void BreveInterface::Abort()
 
 char * getLoadname()
 {
-	return breverender->GetSimulation()->GetInterface()->getLoadname();
+	return gBreverender->GetSimulation()->GetInterface()->getLoadname();
 }
 
 char * getSavename()
 {
-	return breverender->GetSimulation()->GetInterface()->getSavename();
+	return gBreverender->GetSimulation()->GetInterface()->getSavename();
 }
 
 char * BreveInterface::getLoadname()
 {
-	wxTextEntryDialog d(breverender, "Loadname required.", "Please enter filename to load:");
+	wxTextEntryDialog d(gBreverender, "Loadname required.", "Please enter filename to load:");
 	char * buf;
 
 	buf = (char*)slMalloc(1024);
@@ -230,7 +233,7 @@ char * BreveInterface::getLoadname()
 
 char * BreveInterface::getSavename()
 {
-	wxTextEntryDialog d(breverender, "Savename required.", "Please enter filename to save:");
+	wxTextEntryDialog d(gBreverender, "Savename required.", "Please enter filename to save:");
 	char * buf;
 
 	buf = (char*)slMalloc(1024);
@@ -257,20 +260,20 @@ void BreveInterface::reportError()
 
 	error = brEngineGetErrorInfo(frontend->engine);
 
-	breverender->queMsg(error->message);
+	gBreverender->queMsg(error->message);
 }
 
 void BreveInterface::messageCallback(char *text)
 {
-	breverender->AppendLog(text);
+	gBreverender->AppendLog(text);
 }
 
 void messageCallback(char *text)
 {
-	if (breverender->GetSimulation() == NULL)
+	if (gBreverender->GetSimulation() == NULL)
 	return;
 
-	breverender->GetSimulation()->GetInterface()->messageCallback(text);
+	gBreverender->GetSimulation()->GetInterface()->messageCallback(text);
 }
 
 int soundCallback()
@@ -281,13 +284,13 @@ int soundCallback()
 
 int pauseCallback()
 {
-	if (breverender->GetSimulation() == NULL)
+	if (gBreverender->GetSimulation() == NULL)
 	return 0;
 
-	if (breverender->GetSimulation()->GetInterface()->Paused())
+	if (gBreverender->GetSimulation()->GetInterface()->Paused())
 	return 0;
 
-	breverender->OnRenderRunClick(*((wxCommandEvent*)NULL));
+	gBreverender->OnRenderRunClick(*((wxCommandEvent*)NULL));
 
 	return 0;
 }
@@ -314,7 +317,7 @@ void graphDisplay()
 
 void menuCallback(brInstance *i)
 {
-	breverender->GetSimulation()->GetInterface()->menuCallback(i);
+	gBreverender->GetSimulation()->GetInterface()->menuCallback(i);
 }
 
 void BreveInterface::menuCallback(brInstance *binterface)
@@ -325,7 +328,7 @@ void BreveInterface::menuCallback(brInstance *binterface)
 	if(!binterface->engine || binterface != brEngineGetController(binterface->engine))
 	return;
 
-	breverender->SetMenu(0);
+	gBreverender->SetMenu(0);
 
 	delete simmenu;
 
@@ -350,19 +353,19 @@ void BreveInterface::menuCallback(brInstance *binterface)
 		simmenu->Check(BREVE_SIMMENU + i, TRUE);
 	}
 
-	breverender->SetMenu(1);
+	gBreverender->SetMenu(1);
 }
 
 int BreveInterface::dialogCallback(char *title, char *message, char *b1, char *b2)
 {
-	BDialog d(breverender, title, message, b1, b2);
+	BDialog d(gBreverender, title, message, b1, b2);
 
 	return !d.ShowModal();
 }
 
 int dialogCallback(char *title, char *message, char *b1, char *b2)
 {
-	return breverender->GetSimulation()->GetInterface()->dialogCallback(title, message, b1, b2);
+	return gBreverender->GetSimulation()->GetInterface()->dialogCallback(title, message, b1, b2);
 }
 
 char *interfaceVersionCallback()
@@ -387,9 +390,9 @@ void BreveInterface::ExecuteCommand(wxString str)
 
 	nstr << "> " << str << "\n";
 
-	breverender->AppendLog(nstr);
+	gBreverender->AppendLog(nstr);
 
-	breverender->queCmd(str);
+	gBreverender->queCmd(str);
 
 	//stRunSingleStatement((stSteveData*)frontend->data, frontend->engine, bstr);
 }

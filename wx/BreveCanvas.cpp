@@ -84,7 +84,7 @@ void BreveCanvas::OnIdle(wxIdleEvent&event)
 
     if (requestlogreset) {
 		requestlogreset = 0;
-		breverender->ResetLog();
+		gBreverender->ResetLog();
     }
 
     if (sim != NULL && sim->GetInterface()->Paused() == 0) {
@@ -248,7 +248,7 @@ void BreveCanvas::OnMouseRDown(wxMouseEvent &event)
 
     event.Skip();
 
-    if (breverender->GetSimulation() == NULL || !breverender->GetSimulation()->GetInterface()->Initialized())
+    if (gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized())
 	return;
 
     x = event.GetX();
@@ -257,15 +257,15 @@ void BreveCanvas::OnMouseRDown(wxMouseEvent &event)
     {
 	int i = 0;
 
-	breverender->GetSimulation()->GetMutex()->Lock();
+	gBreverender->GetSimulation()->GetMutex()->Lock();
 
-	i = breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->camera->select( breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->world, x, y );
+	i = gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine->camera->select( gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine->world, x, y );
 
-	selected = brClickCallback(breverender->GetSimulation()->GetInterface()->GetFrontend()->engine, i);
+	selected = brClickCallback(gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine, i);
 
-	breverender->GetSimulation()->GetMutex()->Unlock();
+	gBreverender->GetSimulation()->GetMutex()->Unlock();
 
-	breverender->GetSimulation()->SetSelected(selected);
+	gBreverender->GetSimulation()->SetSelected(selected);
 
 	delete rightmenu;
 	rightmenu = new wxMenu("Rightclick Menu");
@@ -299,11 +299,11 @@ void BreveCanvas::OnMouseRDown(wxMouseEvent &event)
 	}
 
 	//brClickAtLocation(
-	//    breverender->GetSimulation()->GetInterface()->GetFrontend()->engine,
+	//    gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine,
 	//    x, y);
 
-	breverender->GetSimulation()->GetInterface()->menuCallback(
-	    breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->controller);
+	gBreverender->GetSimulation()->GetInterface()->menuCallback(
+	    gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine->controller);
 
 	Refresh(TRUE, NULL);
 
@@ -320,7 +320,7 @@ void BreveCanvas::OnMouseLDown(wxMouseEvent &event)
 
     mousedown = 1;
 
-    if (breverender->GetSimulation() == NULL || !breverender->GetSimulation()->GetInterface()->Initialized())
+    if (gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized())
 	return;
 
     wasdrag = 0;
@@ -341,7 +341,7 @@ void BreveCanvas::OnMouseUp(wxMouseEvent &event)
 
     Refresh(TRUE, NULL);
 
-    if (breverender->GetSimulation() == NULL || !breverender->GetSimulation()->GetInterface()->Initialized())
+    if (gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized())
 	return;
 
     x = event.GetX();
@@ -351,15 +351,15 @@ void BreveCanvas::OnMouseUp(wxMouseEvent &event)
     {
 	int i = 0;
 
-	breverender->GetSimulation()->GetMutex()->Lock();
+	gBreverender->GetSimulation()->GetMutex()->Lock();
 
-	i = breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->camera->select( breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->world, x, y );
+	i = gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine->camera->select( gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine->world, x, y );
 
-	selected = brClickCallback(breverender->GetSimulation()->GetInterface()->GetFrontend()->engine, i);
+	selected = brClickCallback(gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine, i);
 
-	breverender->GetSimulation()->GetMutex()->Unlock();
+	gBreverender->GetSimulation()->GetMutex()->Unlock();
 
-	breverender->GetSimulation()->SetSelected(selected);
+	gBreverender->GetSimulation()->SetSelected(selected);
 
 	delete rightmenu;
 	rightmenu = new wxMenu("Rightclick Menu");
@@ -393,11 +393,11 @@ void BreveCanvas::OnMouseUp(wxMouseEvent &event)
 	}
 
 	//brClickAtLocation(
-	//    breverender->GetSimulation()->GetInterface()->GetFrontend()->engine,
+	//    gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine,
 	//    x, y);
 
-	breverender->GetSimulation()->GetInterface()->menuCallback(
-	    breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->controller);
+	gBreverender->GetSimulation()->GetInterface()->menuCallback(
+	    gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine->controller);
 
 	Refresh(TRUE, NULL);
 	return;
@@ -410,14 +410,14 @@ void BreveCanvas::OnMouseMotion(wxMouseEvent &event)
 
     event.Skip();
 
-    if (!event.Dragging() || breverender->GetSimulation() == NULL || !breverender->GetSimulation()->GetInterface()->Initialized())
+    if (!event.Dragging() || gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized())
 	return;
 
     wasdrag = 1;
 
-    engine = breverender->GetSimulation()->GetInterface()->GetFrontend()->engine;
+    engine = gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine;
 
-    breverender->GetSimulation()->GetMutex()->Lock();
+    gBreverender->GetSimulation()->GetMutex()->Lock();
 
     switch (parent->GetMouseMode())
     {
@@ -438,7 +438,7 @@ void BreveCanvas::OnMouseMotion(wxMouseEvent &event)
 	    break;
     }
 
-    breverender->GetSimulation()->GetMutex()->Unlock();
+    gBreverender->GetSimulation()->GetMutex()->Unlock();
 
     Refresh(TRUE, NULL);
 
@@ -448,12 +448,12 @@ void BreveCanvas::OnMouseMotion(wxMouseEvent &event)
 
 void BreveCanvas::OnRightMenu(wxCommandEvent &event)
 {
-    if (breverender->GetSimulation() == NULL || !breverender->GetSimulation()->GetInterface()->Initialized() || !selected)
+    if (gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized() || !selected)
 	return;
 
-    breverender->GetSimulation()->GetMutex()->Lock();
-    breverender->GetSimulation()->GetInterface()->RunMenu(event.m_id - 10100, selected);
-    breverender->GetSimulation()->GetMutex()->Unlock();
+    gBreverender->GetSimulation()->GetMutex()->Lock();
+    gBreverender->GetSimulation()->GetInterface()->RunMenu(event.m_id - 10100, selected);
+    gBreverender->GetSimulation()->GetMutex()->Unlock();
 }
 
         

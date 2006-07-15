@@ -144,8 +144,8 @@ void CodeCtrl::OnMarginClick(wxStyledTextEvent &event)
 
 bool CodeCtrl::IsModified()
 {
-    if (breverender->GetSimulation() != NULL &&
-	breverender->GetSimulation()->GetOriginCode().IsSameAs(GetText()))
+    if (gBreverender->GetSimulation() != NULL &&
+	gBreverender->GetSimulation()->GetOriginCode().IsSameAs(GetText()))
 	return FALSE;
 
     return TRUE;

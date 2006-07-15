@@ -45,7 +45,7 @@ BCTestApp::BCTestApp()
 }
 
 char FILE_SEP_PATH;
-BreveRender * breverender;
+BreveRender * gBreverender;
 BCTestApp * app;
 
 bool BCTestApp::OnInit()
@@ -264,7 +264,7 @@ bool BCTestApp::OnInit()
 
     renderwindow = new BreveRender(NULL, -1, "breve");
 
-    breverender = renderwindow;
+    gBreverender = renderwindow;
 
     SetTopWindow(renderwindow);
 

@@ -271,14 +271,14 @@ void Inspector::OnClose(wxCloseEvent& event)
 	return;
     }
 
-    breverender->KillInspector();
+    gBreverender->KillInspector();
     event.Skip();
 }
 
 void Inspector::OnUpdateClick( wxCommandEvent& event )
 {
-    if (breverender->GetSimulation() != NULL)
-	breverender->GetSimulation()->SetSelected(breverender->GetSimulation()->GetSelected(),1);
+    if (gBreverender->GetSimulation() != NULL)
+	gBreverender->GetSimulation()->SetSelected(gBreverender->GetSimulation()->GetSelected(),1);
 }
 
 void Inspector::OnInspectorctrlSelected( wxListEvent& event )
@@ -501,9 +501,9 @@ void ExpData::Expand(VarData * loc)
     s->SetExpanded(1);
 
     if (loc->IsSuper())
-	breverender->GetSimulation()->ExpandChild(loc, "");
+	gBreverender->GetSimulation()->ExpandChild(loc, "");
     else
-	breverender->GetSimulation()->ExpandChild(loc, loc->GetName().c_str());
+	gBreverender->GetSimulation()->ExpandChild(loc, loc->GetName().c_str());
 
     for (d = loc->GetChildren(); d != NULL; d = d->GetNext())
     {

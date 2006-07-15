@@ -179,7 +179,7 @@ class SimInstance
 	    this->simdir = dir;
 	    this->simulationfile = file;
 
-	    breverender->UpdateChoice(breverender->GetSimInt(this));
+	    gBreverender->UpdateChoice(gBreverender->GetSimInt(this));
 	}
 
 	brInstance * GetSelected()

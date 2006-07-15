@@ -65,10 +65,10 @@ void SimInstance::RegenSim()
 {
     int i = -1;
 
-    if (breverender->GetSimulation() == this)
+    if (gBreverender->GetSimulation() == this)
     {
-	i = breverender->GetSimInt(this);
-	breverender->ResetSim(-1);
+	i = gBreverender->GetSimInt(this);
+	gBreverender->ResetSim(-1);
     }
     
     delete binterface;
@@ -76,7 +76,7 @@ void SimInstance::RegenSim()
     binterface = new BreveInterface(strdup(simulationfile), simdir, strdup(text));
 
     if (i > -1)
-	breverender->ResetSim(i);
+	gBreverender->ResetSim(i);
 }
 
 void SimInstance::SetSelected(brInstance*i, int type)
@@ -106,8 +106,8 @@ void SimInstance::SetSelected(brInstance*i, int type)
 
     selected = i;
 
-    if (selected == NULL && breverender->GetSimulation() != NULL && breverender->GetSimulation()->GetInterface()->Initialized())
-	instance = (stInstance*)breverender->GetSimulation()->GetInterface()->GetFrontend()->engine->controller->userData;
+    if (selected == NULL && gBreverender->GetSimulation() != NULL && gBreverender->GetSimulation()->GetInterface()->Initialized())
+	instance = (stInstance*)gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine->controller->userData;
     else if (selected != NULL)
 	instance = (stInstance*)(selected->userData);
 
@@ -125,8 +125,8 @@ void SimInstance::SetSelected(brInstance*i, int type)
 	//    tempfunc(iroot, 0);
     }
 
-    if (breverender->GetInspector() != NULL)
-	breverender->GetInspector()->SetRoot(iroot, type);
+    if (gBreverender->GetInspector() != NULL)
+	gBreverender->GetInspector()->SetRoot(iroot, type);
 }
 
 void SimInstance::tempfunc(VarData * d, int level)

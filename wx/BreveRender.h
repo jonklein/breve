@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        BreveRender.h
-// Purpose:     
-// Author:      
+// Name:		BreveRender.h
+// Purpose:	 
+// Author:	  
 // Modified by: 
-// Created:     Tue 01 Mar 2005 10:16:35 PM EST
-// RCS-ID:      
+// Created:	 Tue 01 Mar 2005 10:16:35 PM EST
+// RCS-ID:	  
 // Copyright:   
-// Licence:     
+// Licence:	 
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef _BREVERENDER_H_
@@ -22,8 +22,8 @@
 #include "LogWindow.h"
 
 #if !wxUSE_TOGGLEBTN
-    #define wxToggleButton wxCheckBox
-    #define EVT_TOGGLEBUTTON EVT_CHECKBOX
+	#define wxToggleButton wxCheckBox
+	#define EVT_TOGGLEBUTTON EVT_CHECKBOX
 #endif
 
 #define ID_FRAME 10000
@@ -50,16 +50,22 @@
 
 enum
 {
-    BREVE_FILEMENU_TOP = 10000, // Must always be first
-    BREVE_FILEMENU_NEW,
-    BREVE_FILEMENU_OPEN,
-    BREVE_FILEMENU_QUIT,
-    BREVE_WINDOWMENU_LOG,
-    BREVE_WINDOWMENU_INSPECTOR,
-    BREVE_BREVEMENU_FULLSCREEN,
-    BREVE_FILEMENU_BOTTOM, // Must always be third to last
-    BREVE_BREVEMENU_SIM, // Must always be second to last - uses +1500 to +2000
-    BREVE_SIMMENU // Must -always- be last - uses this to +1000
+	BREVE_FILEMENU_TOP = 10000, // Must always be first
+	BREVE_FILEMENU_NEW,
+	BREVE_FILEMENU_OPEN,
+	BREVE_FILEMENU_QUIT,
+	BREVE_WINDOWMENU_LOG,
+	BREVE_WINDOWMENU_INSPECTOR,
+	BREVE_BREVEMENU_FULLSCREEN,
+
+	BREVE_FULLSPEED,
+	BREVE_MEDIUMSPEED,
+	BREVE_SLOWSPEED,
+
+	BREVE_FILEMENU_BOTTOM, // Must always be third to last
+	BREVE_BREVEMENU_SIM, // Must always be second to last - uses +1500 to +2000
+	BREVE_SIMMENU // Must -always- be last - uses this to +1000
+
 };
 
 class BreveCanvas;
@@ -69,138 +75,117 @@ class Inspector;
 class wxToggleButton;
 
 class BreveRender: public wxFrame
-{    
-    DECLARE_CLASS( BreveRender )
-    DECLARE_EVENT_TABLE()
+{	
+	DECLARE_CLASS( BreveRender )
+	DECLARE_EVENT_TABLE()
 
 private:
-    BreveCanvas * canvas;
-    wxBitmapButton * stopbutton;
-    wxBitmapButton * runbutton;
+	BreveCanvas * canvas;
+	wxBitmapButton * stopbutton;
+	wxBitmapButton * runbutton;
 
-    wxToggleButton * rotatebutton;
-    wxToggleButton * zoombutton;
-    wxToggleButton * movebutton;
-    wxToggleButton * selectbutton;
+	wxToggleButton * rotatebutton;
+	wxToggleButton * zoombutton;
+	wxToggleButton * movebutton;
+	wxToggleButton * selectbutton;
 
-    wxChoice * simselect;
+	wxChoice * simselect;
 
-    wxBitmap pausebitmap;
-    wxBitmap playbitmap;
-    wxBitmap stopbitmap;
+	wxBitmap pausebitmap;
+	wxBitmap playbitmap;
+	wxBitmap stopbitmap;
 
-    wxMenuBar * menubar;
-    wxMenu * defsimmenu;
+	wxMenuBar * menubar;
+	wxMenu * defsimmenu;
 
-    Inspector * inspector;
-    LogWindow * logwindow;
-    SimInstance * simlist;
-    int cursim;
-    int mousemode;
+	Inspector * inspector;
+	LogWindow * logwindow;
+	SimInstance * simlist;
+	int cursim;
+	int mousemode;
 
-    bool mKeysDown[ 256 ];
+	long mSleepMS;
+
+	bool mKeysDown[ 256 ];
 
 public:
-    BreveRender( );
-    ~BreveRender();
-    BreveRender( wxWindow* parent, wxWindowID id = SYMBOL_BREVERENDER_IDNAME, const wxString& caption = SYMBOL_BREVERENDER_TITLE, const wxPoint& pos = SYMBOL_BREVERENDER_POSITION, const wxSize& size = SYMBOL_BREVERENDER_SIZE, long style = SYMBOL_BREVERENDER_STYLE );
+	BreveRender( );
+	~BreveRender();
+	BreveRender( wxWindow* parent, wxWindowID id = SYMBOL_BREVERENDER_IDNAME, const wxString& caption = SYMBOL_BREVERENDER_TITLE, const wxPoint& pos = SYMBOL_BREVERENDER_POSITION, const wxSize& size = SYMBOL_BREVERENDER_SIZE, long style = SYMBOL_BREVERENDER_STYLE );
 
-    bool Create( wxWindow* parent, wxWindowID id = SYMBOL_BREVERENDER_IDNAME, const wxString& caption = SYMBOL_BREVERENDER_TITLE, const wxPoint& pos = SYMBOL_BREVERENDER_POSITION, const wxSize& size = SYMBOL_BREVERENDER_SIZE, long style = SYMBOL_BREVERENDER_STYLE );
+	bool Create( wxWindow* parent, wxWindowID id = SYMBOL_BREVERENDER_IDNAME, const wxString& caption = SYMBOL_BREVERENDER_TITLE, const wxPoint& pos = SYMBOL_BREVERENDER_POSITION, const wxSize& size = SYMBOL_BREVERENDER_SIZE, long style = SYMBOL_BREVERENDER_STYLE );
 
-    void CreateControls();
+	void CreateControls();
 
-    void ResetSim(int sim = -2);
-    void SetMenu(int mode);
+	void ResetSim(int sim = -2);
+	void SetMenu(int mode);
 
-    SimInstance * GetSimulation(int i = -1);
-    int GetSimInt(SimInstance * s);
-    void KillSimulation(int i = -1);
-    void NewSimulation();
-    void LoadSimulation(wxString, wxString, wxString);
-    void LoadSimFile(wxString ffile);
-    void UpdateChoice(int i);
+	SimInstance * GetSimulation(int i = -1);
+	int GetSimInt(SimInstance * s);
+	void KillSimulation(int i = -1);
+	void NewSimulation();
+	void LoadSimulation(wxString, wxString, wxString);
+	void LoadSimFile(wxString ffile);
+	void UpdateChoice(int i);
 
-    void OnSimMenu(wxCommandEvent &event);
-    void OnSimSelect(wxCommandEvent& event);
-    void OnClose(wxCloseEvent& event);
-    void OnMenuOpen(wxCommandEvent& event);
-    void OnMenuNew(wxCommandEvent& event);
-    void OnMenuQuit(wxCommandEvent& event);
-    void OnFullScreen(wxCommandEvent &event);
-    void OnMenuLogWindow(wxCommandEvent& event);
-    void OnMenuInspector(wxCommandEvent& event);
-    void OnMenuSim(wxCommandEvent &event);
-    void OnIdle(wxIdleEvent &event);
-    void OnRenderRunClick( wxCommandEvent& event );
-    void OnRenderStopClick( wxCommandEvent& event );
-    void OnRotateClick(wxCommandEvent&event);
-    void OnZoomClick(wxCommandEvent&event);
-    void OnMoveClick(wxCommandEvent&event);
-    void OnSelectClick(wxCommandEvent&event);
-    void OnKeyUp(wxKeyEvent&event);
-    void OnKeyDown(wxKeyEvent&event);
-    void OnSize(wxSizeEvent &event);
-    void OnMove(wxMoveEvent &event);
-    void KeyDown(wxKeyEvent&event);
-    void KeyUp(wxKeyEvent&event);
+	void OnSimMenu(wxCommandEvent &event);
+	void OnSimSelect(wxCommandEvent& event);
+	void OnClose(wxCloseEvent& event);
+	void OnMenuOpen(wxCommandEvent& event);
+	void OnMenuNew(wxCommandEvent& event);
+	void OnMenuQuit(wxCommandEvent& event);
+	void OnMenuSpeed(wxCommandEvent& event);
+	void OnFullScreen(wxCommandEvent &event);
+	void OnMenuLogWindow(wxCommandEvent& event);
+	void OnMenuInspector(wxCommandEvent& event);
+	void OnMenuSim(wxCommandEvent &event);
+	void OnIdle(wxIdleEvent &event);
+	void OnRenderRunClick( wxCommandEvent& event );
+	void OnRenderStopClick( wxCommandEvent& event );
+	void OnRotateClick(wxCommandEvent&event);
+	void OnZoomClick(wxCommandEvent&event);
+	void OnMoveClick(wxCommandEvent&event);
+	void OnSelectClick(wxCommandEvent&event);
+	void OnKeyUp(wxKeyEvent&event);
+	void OnKeyDown(wxKeyEvent&event);
+	void OnSize(wxSizeEvent &event);
+	void OnMove(wxMoveEvent &event);
+	void KeyDown(wxKeyEvent&event);
+	void KeyUp(wxKeyEvent&event);
 
-    wxBitmap GetBitmapResource( const wxString& name );
-    wxIcon GetIconResource( const wxString& name );
+	wxBitmap GetBitmapResource( const wxString& name );
+	wxIcon GetIconResource( const wxString& name );
 
-    static bool ShowToolTips();
+	static bool ShowToolTips();
 
-    Inspector * GetInspector()
-    {
-	return inspector;
-    }
+	inline int GetSleepMS() { return mSleepMS; }
 
-    int GetMouseMode()
-    {
-	return mousemode;
-    }
+	Inspector * GetInspector() { return inspector; }
 
-    void queMsg(const char*m)
-    {
-	canvas->queMsg(m);
-    }
+	int GetMouseMode() { return mousemode; }
 
-    void queCmd(const char*m)
-    {
-	canvas->queCmd(m);
-    }
+	void queMsg(const char*m) { canvas->queMsg(m); }
 
-    void KillLog()
-    {
-	logwindow = NULL;
-    }
+	void queCmd(const char*m) { canvas->queCmd(m); }
 
-    void KillInspector()
-    {
-	inspector = NULL;
-    }
+	void KillLog() { logwindow = NULL; }
 
-    void AppendLog(const char * text)
-    {
-	if (logwindow != NULL)
-	    logwindow->Append(text);
-    }
+	void KillInspector() { inspector = NULL; }
 
-    void RequestLogWindowReset()
-    {
-	canvas->RequestLogWindowReset();
-    }
+	void AppendLog(const char * text) {
+		if (logwindow != NULL)
+			logwindow->Append(text);
+	}
 
-    void ResetLog()
-    {
-	if (logwindow != NULL)
-	    logwindow->ResetLog();
-    }
+	void RequestLogWindowReset() { canvas->RequestLogWindowReset(); }
 
-    bool MouseDown()
-    {
-	return canvas->MouseDown();
-    }
+	void ResetLog() {
+		if (logwindow != NULL)
+			logwindow->ResetLog();
+	}
+
+	bool MouseDown() { return canvas->MouseDown(); }
 };
 
 #endif
-    // _BREVERENDER_H_
+	// _BREVERENDER_H_

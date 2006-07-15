@@ -139,7 +139,7 @@ void LogWindow::OnClose(wxCloseEvent& event)
 	return;
     }
 
-    breverender->KillLog();
+    gBreverender->KillLog();
     event.Skip();
 }
 
@@ -147,7 +147,7 @@ void LogWindow::Append(const char * text)
 {
     textctrl->AppendText(text);
     textctrl->ShowPosition(textctrl->GetLastPosition() - 1);
-    breverender->RequestLogWindowReset();
+    gBreverender->RequestLogWindowReset();
 }
 
 void LogWindow::ResetLog()
@@ -163,10 +163,10 @@ void LogWindow::RunEvent(wxCommandEvent &event)
 
     cmdinput->SetSelection(-1, -1);
 
-    if (str.Length() < 1 || breverender->GetSimulation() == NULL || !breverender->GetSimulation()->GetInterface()->Initialized())
+    if (str.Length() < 1 || gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized())
 	return;
 
-    breverender->GetSimulation()->GetInterface()->ExecuteCommand(str);
+    gBreverender->GetSimulation()->GetInterface()->ExecuteCommand(str);
 }
 
 

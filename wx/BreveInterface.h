@@ -110,6 +110,8 @@ class BreveInterface
 	BreveInterface * next;
 	breveFrontend *frontend;
 	wxMenu * simmenu;
+
+	long mSleepMS;
 };
 
 char * getLoadname();

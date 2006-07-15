@@ -22,7 +22,7 @@
 class BCTestApp;
 class wxFileConfig;
 
-extern BreveRender * breverender;
+extern BreveRender * gBreverender;
 extern BCTestApp * app;
 extern char FILE_SEP_PATH;
 

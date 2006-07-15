@@ -232,7 +232,7 @@ void CodeWindow::OnClose(wxCloseEvent& event)
 		return;
 	}
 
-	breverender->KillSimulation(breverender->GetSimInt(sim));
+	gBreverender->KillSimulation(gBreverender->GetSimInt(sim));
 	return;
     }
 
