@@ -1,6 +1,6 @@
 #include "brqtMainWindow.h"
-#include "brqtMoveableWidgets.h"
 #include "brqtEditorWindow.h"
+#include "brqtMoveableWidgets.h"
 
 brqtMainWindow::brqtMainWindow() {
 	brqtEditorWindow *editor;
@@ -10,7 +10,7 @@ brqtMainWindow::brqtMainWindow() {
 
 	_palette.hide();
 
-    connect( _ui.editButton, SIGNAL( pressed() ), this, SLOT( toggleEditing() ) );
+	connect( _ui.editButton, SIGNAL( pressed() ), this, SLOT( toggleEditing() ) );
 
 	editor = new brqtEditorWindow( this );
 	editor->show();

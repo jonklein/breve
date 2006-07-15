@@ -193,7 +193,7 @@
   <customwidget>
    <class>brqtMethodPopup</class>
    <extends>QComboBox</extends>
-   <header>brqtmethodpopup.h</header>
+   <header>brqtMethodPopup.h</header>
    <container>0</container>
    <pixmap></pixmap>
   </customwidget>
