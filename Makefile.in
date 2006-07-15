@@ -172,6 +172,7 @@ CLI_release: clean
 ifeq ($(PLATFORM),windows)
 	cp lib/brevePlugin.a $(CLI_FOLDER)/plugins
 	cp bin/glut32.dll $(CLI_FOLDER)/bin
+	cp bin/mingwm10.dll $(CLI_FOLDER)/bin
 endif
 	cp plugins/slBrevePluginAPI.h plugins/README.txt $(CLI_FOLDER)/plugins
 	cp Changes.html GPL.txt README.txt $(CLI_FOLDER)
@@ -199,6 +200,7 @@ WX_release: clean
 ifeq ($(PLATFORM),windows)
 	cp wx/lib/brevePlugin.a $(IDE_FOLDER)/plugins
 	cp bin/glut32.dll $(IDE_FOLDER)
+	cp bin/mingwm10.dll $(IDE_FOLDER)
 endif
 	cp plugins/slBrevePluginAPI.h plugins/README.txt $(IDE_FOLDER)/plugins
 	cp Changes.html GPL.txt README.txt $(IDE_FOLDER)

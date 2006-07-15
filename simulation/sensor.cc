@@ -13,6 +13,8 @@ using std::map;
 using std::vector;
 using std::string;
 
+#include <assert.h>
+
 int SensorBuilder::test = 3;
 map <string, UserSensor*> SensorBuilder::sensors = map<string, UserSensor*>();
 
@@ -319,13 +321,13 @@ double Sensor::sense(vector<slWorldObject*>* neighbors, slPosition* sensorPos){
  * up is for the orientation
  *
  */
-double Sensor::sense(const slShape *shape, slPosition *shapePos, slPosition *sensorPos){
+double Sensor::sense( slShape *shape, slPosition *shapePos, slPosition *sensorPos ){
 	double distance;
 	slVector v1;
 	slVector v2;
 	slVectorSet(&v1, 0.0, 0.0, 0.0);
 	slVectorSet(&v2, 0.0, 0.0, 0.0);
-	vector<slFace*>::iterator fi;
+	std::vector< slFace* >::iterator fi;
 //	slMessage(DEBUG_ALL, " Sensor::sense start:\n");
 	double D, X, Y, Z, k;
 	slVector pointOnPlane;
@@ -341,7 +343,7 @@ double Sensor::sense(const slShape *shape, slPosition *shapePos, slPosition *sen
 
 	slVectorSet(&result_point, 0.0, 0.0, 0.0);
 
-	for(fi = (shape->faces.begin()); fi != (shape->faces.end()); fi++ ) {
+	for( fi = ((slShape*)shape)->faces.begin(); fi < ((slShape*)shape)->faces.end(); fi++ ) {
 		slFace *f = *fi;
 		planes++;
 		D = slVectorDot(&f->plane.normal, &f->plane.vertex);
@@ -427,7 +429,7 @@ double Sensor::evaluate(){
    * planes, representing a case, in wich the bounding box is larger than the sensor cone
    * so the bounding box points are outside, but parts of the shape are still inside.
    */
-bool Sensor::insideSensorBorder(const slShape *shape, slPosition *shapePos, slPosition *sensorPos){
+bool Sensor::insideSensorBorder( slShape *shape, slPosition *shapePos, slPosition *sensorPos){
 	slVector min ,max;
 	shape->bounds(shapePos, &min, &max);
 //	slVectorPrint(&min);

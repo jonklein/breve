@@ -893,7 +893,7 @@ int brIIRSense(brEval args[], brEval *target, brInstance *i) {
    */
 
 double* listToDoubleArray(const brEvalListHead* list){
-	std::vector<brEval*> v = list->getVector();
+	std::vector< brEval* > v = list->getVector();
 //	brEvalList *start = list->start;
 //	printf("listcount: %d\n", list->count);
 	double* result = (double*)malloc(v.size() * sizeof(double));

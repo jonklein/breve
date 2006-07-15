@@ -1,9 +1,9 @@
 AC_PREREQ(2.57)
 
-AC_INIT([the breve simulation environment], [2.4], [jk@spiderland.org])
-AC_CONFIG_HEADER([include/breve/config.h])
-
 VERSION=2.5d1
+
+AC_INIT([the breve simulation environment], [2.5d1], [jk@spiderland.org])
+AC_CONFIG_HEADER([include/breve/config.h])
 
 AC_CANONICAL_HOST
 
@@ -198,6 +198,8 @@ AC_TYPE_SIZE_T
 AC_CHECK_LIB([m], [isnan])
 
 AC_CHECK_HEADERS(pthread.h)
+
+AC_CHECK_LIB([pthread], [main])
 
 ol_link_threads=no
 

@@ -35,8 +35,8 @@ class Sensor{
 		double apply_distance_factor(double input, double dist);	
 		double apply_azimut_factor(double input, double angle);
 		double apply_incidence_factor(double input, double angle);
-		double sense(const slShape *shape, slPosition *shapePos, slPosition *sensorPos);
-		bool insideSensorBorder(const slShape *shape, slPosition *shapePos, slPosition *sensorPos);
+		double sense( slShape *shape, slPosition *shapePos, slPosition *sensorPos );
+		bool insideSensorBorder( slShape *shape, slPosition *shapePos, slPosition *sensorPos);
 		slVector baseDirection;
 		slVector baseUpDirection;
 		slVector borderNormal[4];
@@ -65,7 +65,7 @@ class Sensor{
 class UserSensor : public Sensor{
 	friend class SensorBuilder;
 	public:
-		UserSensor::UserSensor();
+		UserSensor();
 	protected :
 		UserSensor(const char* name, const int rows, const int columns, const double max_range, const double max_angle, 
 				const int distance_length, const double* distance, const double* distance_factor,
