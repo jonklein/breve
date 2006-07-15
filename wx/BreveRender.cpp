@@ -82,8 +82,10 @@ BreveRender::BreveRender( )
 
 BreveRender::BreveRender( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style ) {
 	int zero = 0;
-	glutInit( &zero, NULL );
+	char *argv[] = { "breveIDE" };
+	glutInit( &zero, argv );
 
+	mSleepMS = 0;
 	Create( parent, id, caption, pos, size, style );
 }
 
@@ -802,6 +804,10 @@ void BreveRender::OnMenuSpeed(wxCommandEvent &event) {
 			break;
 		case BREVE_SLOWSPEED:
 			mSleepMS = 50;
+			break;
+
+		default:
+			mSleepMS = 0;
 			break;
 	}
 }
