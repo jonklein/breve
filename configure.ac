@@ -3,7 +3,7 @@ AC_PREREQ(2.57)
 AC_INIT([the breve simulation environment], [2.5d1], [jk@spiderland.org])
 AC_CONFIG_HEADER([include/breve/config.h])
 
-VERSION=2.5d1
+VERSION=$PACKAGE_VERSION
 
 AC_CANONICAL_HOST
 
@@ -263,6 +263,7 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([readline], [readline])
 	AC_CHECK_LIB([3ds], [lib3ds_io_new])
 	AC_CHECK_LIB([ftgl], [main])
+	AC_CHECK_LIB([python], [Py_Initialize])
 
 	if test "x$custom_cblas" = x; then
 		AC_CHECK_LIB([gslcblas], [cblas_ccopy])

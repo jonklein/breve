@@ -249,7 +249,7 @@ int brNewBreveCall(void *n, char *name, int (*call)(brEval argumentArray[],
 	 * returned and the simulation is halted.
 	 */
 
-int brMethodCallByNameWithArgs(void *instance, char *name, brEval **args, int count, brEval *result);
+// int brMethodCallByNameWithArgs(void *instance, char *name, brEval **args, int count, brEval *result);
 
 	/*
 	 * The slMessage() function prints a formatted error message to the

@@ -11,6 +11,11 @@ typedef struct brObjectType brObjectType;
 typedef struct brMethod brMethod;
 typedef struct brCollisionHandler brCollisionHandler;
 
+class brEngine;
+class brEval;
+struct slList;
+struct slStack;
+
 /*! \addtogroup breveObjectAPI */
 /*@{*/
 

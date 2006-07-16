@@ -97,6 +97,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 		cameraPointer = getMainCameraPointer().
 
 		camera = new Camera.
+		self add-dependency on camera.
 		camera set-camera-pointer to cameraPointer.
 
 		floorDefined = 0.
@@ -971,12 +972,12 @@ Abstract : Control (aka Controls) [version 2.3] {
 		% the instance for which it is called, meaning that each instance of a
 		% certain class may have a different menu.
 
-		return ((new MenuItem) create-menu named menuName for-object self for-method theMethod).
+		return ( (new MenuItem) create-menu named menuName for-object self for-method theMethod).
 
 	+ to add-menu-separator:
 		% Adds a separator menu item--really just an empty menu item.
 
-		return ((new MenuItem) create-menu named "" for-object self for-method "").
+		return ( (new MenuItem) create-menu named "" for-object self for-method "").
 
 	+ to show-dialog with-title title (string) with-message message (string) with-yes-button yesString (string) with-no-button noString (string):
 		% Shows a dialog box (if supported by the current breve environment)

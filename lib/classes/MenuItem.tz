@@ -22,7 +22,7 @@ Abstract : MenuItem (aka MenuItems) [version 2.0] {
 		method = methodName.
 
 		owner = theObject.
-		self add-dependency on owner.
+		owner add-dependency on self.
 
 		menuPointer = menuItemNew( owner, method, name ).
 

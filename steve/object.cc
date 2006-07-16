@@ -156,6 +156,8 @@ int stInstanceInit(stInstance *i) {
 */
 
 void stInstanceAddDependency(stInstance *i, stInstance *dependency) {
+	if( !i || !dependency ) return;
+
 	i->dependencies.insert( dependency);
 	dependency->dependents.insert( i);
 }
@@ -166,6 +168,8 @@ void stInstanceAddDependency(stInstance *i, stInstance *dependency) {
 
 void stInstanceRemoveDependency(stInstance *i, stInstance *dependency) {
 	std::set< stInstance*, stInstanceCompare>::iterator ii;
+
+	if( !i || !dependency ) return;
 
 	ii = i->dependencies.find( dependency);
 	if(ii != i->dependencies.end()) i->dependencies.erase( ii);
