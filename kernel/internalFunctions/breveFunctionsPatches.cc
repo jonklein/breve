@@ -100,7 +100,7 @@ int brIPatchAtIndex(brEval args[], brEval *target, brInstance *i) {
 		return EC_OK;
 	}
 
-	target->set( grid->getPatchAtIndex(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3])) );
+	target->set( grid->getPatchAtIndex( BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]) ) );
 
 	return EC_OK;
 }
@@ -202,7 +202,11 @@ int brISetPatchColor(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetPatchLocation(brEval args[], brEval *target, brInstance *i) {
-	BRPATCHPOINTER(&args[0])->getLocation(&BRVECTOR(target));
+	slVector v;
+
+	BRPATCHPOINTER( &args[0] )->getLocation( &v );
+
+	target->set( v );
 
 	return EC_OK;
 }
