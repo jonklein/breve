@@ -456,42 +456,40 @@ void BreveRender::KillSimulation(int num)
 	}
 }
 
-void BreveRender::ResetSim(int sim)
+void BreveRender::ResetSim( int sim )
 {
 	SimInstance * s = NULL;
 
 	if (sim != -2)
-	cursim = sim;
+		cursim = sim;
 
 	menubar->Remove( menubar->FindMenu( "Simulation" ) );
 
-	if (cursim > -1)
-	{
-	s = GetSimulation();
+	if (cursim > -1) {
+		s = GetSimulation();
 
-	if (s == NULL)
-		cursim = -1;
+		if (s == NULL)
+			cursim = -1;
 	}
 
-	if (cursim == -1)
-	menubar->Append(defsimmenu, "Simulation");
-	else
-	{
-	int w, h;
+	if (cursim == -1) {
+		menubar->Append(defsimmenu, "Simulation");
+	} else {
+		int w, h;
 
-	menubar->Append(s->GetInterface()->GetMenu(), "Simulation");
+		menubar->Append(s->GetInterface()->GetMenu(), "Simulation");
 
-	canvas->GetClientSize(&w, &h);
+		canvas->GetClientSize(&w, &h);
 
-	s->GetInterface()->SetX(w);
-	s->GetInterface()->SetY(h);
-	s->GetInterface()->ResizeView(w, h);
+		s->GetInterface()->SetX(w);
+		s->GetInterface()->SetY(h);
+		s->GetInterface()->ResizeView(w, h);
 	}
 
 	simselect->SetSelection(cursim);
 
-	runbutton->SetBitmapLabel(playbitmap);
-	runbutton->Refresh(TRUE,NULL);
+	runbutton->SetBitmapLabel( playbitmap );
+	runbutton->Refresh( TRUE, NULL );
 
 	canvas->ResetSelection();
 }
@@ -889,15 +887,15 @@ void BreveRender::OnRenderRunClick( wxCommandEvent& event )
 
 	if( !sim->GetInterface()->Initialized() ) {
 		sim->UpdateSimCode();
-		sim->GetInterface()->Initialize();
+		if( !sim->GetInterface()->Initialize() ) return;
 	}
 
 	sim->GetInterface()->Pause(3);
 
 	if (sim->GetInterface()->Paused())
-	runbutton->SetBitmapLabel(playbitmap);
+		runbutton->SetBitmapLabel(playbitmap);
 	else
-	runbutton->SetBitmapLabel(pausebitmap);
+		runbutton->SetBitmapLabel(pausebitmap);
 
 	runbutton->Refresh(TRUE, NULL);
 }

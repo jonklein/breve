@@ -107,13 +107,12 @@ BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text)
 
 BreveInterface::~BreveInterface()
 {
-	if (frontend != NULL)
-	{
-	brEngineFree(frontend->engine);
-	breveFrontendCleanupData(frontend->data);
-	breveFrontendDestroy(frontend);
+	if (frontend != NULL) {
+		brEngineFree(frontend->engine);
+		breveFrontendCleanupData(frontend->data);
+		breveFrontendDestroy(frontend);
 
-	frontend = NULL;
+		frontend = NULL;
 	}
 
 	if (simmenu != NULL)
@@ -129,30 +128,29 @@ BreveInterface::~BreveInterface()
 	free(text);
 }
 
-void BreveInterface::Pause(int pause)
+void BreveInterface::Pause( int pause )
 {
-	if (pause == paused)
-	return;
+	if ( pause == paused )
+		return;
 
 	paused = !paused;
 
-	if (paused)
-	brPauseTimer(frontend->engine);
+	if ( paused )
+		brPauseTimer( frontend->engine );
 	else
-	brUnpauseTimer(frontend->engine);
+		brUnpauseTimer( frontend->engine );
 }
 
 bool BreveInterface::Initialize()
 {
-	slInitGL(frontend->engine->world, frontend->engine->camera);
+	slInitGL( frontend->engine->world, frontend->engine->camera );
 
-	if (breveFrontendLoadSimulation(frontend, text, simulationfile) != EC_OK)
-	{
-	reportError();
-	slFree(text);
-	text = NULL;
-	Abort();
-	return 0;
+	if ( breveFrontendLoadSimulation( frontend, text, simulationfile ) != EC_OK ) {
+		reportError();
+		slFree( text );
+		text = NULL;
+		Abort();
+		return 0;
 	}
 
 	slFree(text);
@@ -183,20 +181,19 @@ void BreveInterface::Iterate()
 	usleep( gBreverender->GetSleepMS() * 1000 );
 }
 
-void BreveInterface::Render()
-{
+void BreveInterface::Render() {
 	if (frontend == NULL || !initialized)
 	return;
 
 	brEngineLock(frontend->engine);
-	brEngineRenderWorld(frontend->engine,gBreverender->MouseDown());
+	brEngineRenderWorld( frontend->engine,gBreverender->MouseDown() );
 	brEngineUnlock(frontend->engine);
 }
 
-void BreveInterface::Abort()
-{
-	if (valid == 0)
-	return;
+void BreveInterface::Abort() {
+	if ( valid == 0 ) return;
+
+	gBreverender->ResetSim();
 
 	valid = 0;
 }
@@ -373,19 +370,16 @@ char *interfaceVersionCallback()
 	return "wxwidgets/2.0";
 }
 
-void BreveInterface::RunMenu(int id, brInstance *n)
-{
+void BreveInterface::RunMenu(int id, brInstance *n) {
 	int i;
 
-	if (brMenuCallback(frontend->engine, n, id) != EC_OK)
-	{
-	reportError();
-	Abort();
+	if (brMenuCallback(frontend->engine, n, id) != EC_OK) {
+		reportError();
+		Abort();
 	}
 }
 
-void BreveInterface::ExecuteCommand(wxString str)
-{
+void BreveInterface::ExecuteCommand(wxString str) {
 	wxString nstr;
 
 	nstr << "> " << str << "\n";
@@ -393,11 +387,8 @@ void BreveInterface::ExecuteCommand(wxString str)
 	gBreverender->AppendLog(nstr);
 
 	gBreverender->queCmd(str);
-
-	//stRunSingleStatement((stSteveData*)frontend->data, frontend->engine, bstr);
 }
 
-void BreveInterface::RunCommand(char * str)
-{
+void BreveInterface::RunCommand(char * str) {
 	stRunSingleStatement((stSteveData*)frontend->data, frontend->engine, str);
 }

@@ -61,12 +61,10 @@ void SimInstance::UpdateSimCode()
     binterface->UpdateCode(strdup(text));
 }
 
-void SimInstance::RegenSim()
-{
+void SimInstance::RegenSim() {
     int i = -1;
 
-    if (gBreverender->GetSimulation() == this)
-    {
+    if ( gBreverender->GetSimulation() == this ) {
 	i = gBreverender->GetSimInt(this);
 	gBreverender->ResetSim(-1);
     }
