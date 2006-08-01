@@ -20,53 +20,45 @@
 
 #include "kernel.h"
 
+#ifdef WINDOWS
+#include "Winbase.h"
+#include "Windows.h"
+#endif
+
 #if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
-brSoundMixer *brNewSoundMixer() {
-	brSoundMixer *mixer;
+
+brSoundMixer::brSoundMixer() {
 	int error;
 
-	mixer = new brSoundMixer;
+	_streamShouldEnd = false;
 
-	mixer->streamShouldEnd = 0;
-
-	error = Pa_OpenDefaultStream( &mixer->stream, 0, 2, paFloat32, MIXER_SAMPLE_RATE, 256, 0, brPASoundCallback, mixer );
+	error = Pa_OpenDefaultStream( &_stream, 0, 2, paFloat32, MIXER_SAMPLE_RATE, 256, 0, brPASoundCallback, this );
 
 	if(error) {
-		// const Pa_GetLastHostErrorInfo *info = 
 		slMessage(DEBUG_ALL, "Error (%d) opening new sound stream!\n", error);
-		delete mixer;
-		return NULL;
 	}
-
-	if(!Pa_StreamActive(mixer->stream)) Pa_StartStream(mixer->stream);
-
-	return mixer;
 }
 
-void brFreeSoundMixer(brSoundMixer *mixer) {
-	if(!mixer) return;
+brSoundMixer::~brSoundMixer() {
+	_streamShouldEnd = true;
 
-	mixer->streamShouldEnd = 1;
+	Pa_StopStream( _stream );
+	while( _stream && Pa_StreamActive( _stream ) );
 
-	Pa_StopStream(mixer->stream);
-	while(mixer->stream && Pa_StreamActive(mixer->stream));
-
-	if(mixer->stream) Pa_CloseStream(mixer->stream);
+	if( _stream ) Pa_CloseStream( _stream );
 	
-	mixer->players.clear();
-
-	delete mixer;
+	_players.clear();
 }
 
-brSoundPlayer *brNextPlayer(brSoundMixer *mixer) {
+brSoundPlayer *brSoundMixer::NextPlayer() {
 	brSoundPlayer *player = NULL;
 	unsigned int n = 0;
 
-	if(!mixer) return NULL;
+	StartStream();
 
-	for(n=0;n<mixer->players.size();n++) {
-		if(mixer->players[n]->finished) {
-			player = mixer->players[n];
+	for( n=0; n< _players.size(); n++ ) {
+		if( _players[n]->finished ) {
+			player = _players[ n ];
 			break;
 		}
 	}
@@ -77,7 +69,7 @@ brSoundPlayer *brNextPlayer(brSoundMixer *mixer) {
 		p->finished = 1;
 		p->sound = NULL;
 	
-		mixer->players.push_back(p);
+		_players.push_back(p);
 
 		player = p;
 	}
@@ -87,12 +79,24 @@ brSoundPlayer *brNextPlayer(brSoundMixer *mixer) {
 	return player;
 }
 
-brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency) {
+bool brSoundMixer::StartStream() {
+	if( !Pa_StreamActive( _stream ) ) {
+		Pa_StartStream( _stream );
+#ifdef WINDOWS
+		SetPriorityClass( GetCurrentProcess(), NORMAL_PRIORITY_CLASS );
+#endif
+		return true;
+	}
+
+	return false;
+}
+
+brSoundPlayer *brSoundMixer::NewSinewave( double frequency ) {
 	brSoundPlayer *player;
 	
-	if(!mixer) return NULL;
+	StartStream();
 
-	player = brNextPlayer(mixer);
+	player = NextPlayer();
 
 	player->sound = NULL;
 
@@ -106,12 +110,10 @@ brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency) {
 	return player;
 }
 
-brSoundPlayer *brNewPlayer( brSoundMixer *mixer, brSoundData *data, float speed ) {
+brSoundPlayer *brSoundMixer::NewPlayer( brSoundData *data, float speed ) {
 	brSoundPlayer *player = NULL;
 
-	if(!mixer) return NULL;
-
-	player = brNextPlayer(mixer);
+	player = NextPlayer();
 
 	if( speed <= 0.0 ) speed = 1.0;
 
@@ -125,7 +127,7 @@ brSoundPlayer *brNewPlayer( brSoundMixer *mixer, brSoundData *data, float speed 
 	return player;
 }
 
-brSoundData *brLoadSound(char *file) {
+brSoundData *brLoadSound( char *file ) {
 	SF_INFO info;
 	SNDFILE *fp;
 	brSoundData *data;
@@ -185,12 +187,12 @@ int brPASoundCallback( void *ibuf, void *obuf, unsigned long fbp, PaTimestamp ou
 	float *out = (float*)obuf;
 	float total;
 	int channel;
-	unsigned int size = mixer->players.size();
+	unsigned int size = mixer->_players.size();
 
 	fbp *= 2;
 
-	if(mixer->streamShouldEnd) {
-		mixer->streamShouldEnd = 0;
+	if( mixer->_streamShouldEnd ) {
+		mixer->_streamShouldEnd = false;
 		return 1;
 	}
 
@@ -199,8 +201,8 @@ int brPASoundCallback( void *ibuf, void *obuf, unsigned long fbp, PaTimestamp ou
 
 		channel = (n & 1);
 
-		for(p=0;p<mixer->players.size();p++) {
-			player = mixer->players[p];
+		for(p=0;p<mixer->_players.size();p++) {
+			player = mixer->_players[p];
 
 			if(player->isSinewave) {
 				if(!player->finished) {

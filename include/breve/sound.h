@@ -25,12 +25,23 @@
 
 #define MIXER_SAMPLE_RATE 44100
 
-#ifdef __cplusplus
 class brSoundMixer {
 	public:
-		std::vector< brSoundPlayer* > players;
-		PortAudioStream *stream;
-		int streamShouldEnd;
+						brSoundMixer();
+						~brSoundMixer();
+
+		bool 				StartStream();
+
+		brSoundPlayer*			NextPlayer();
+		brSoundPlayer*			NewSinewave( double frequency );
+		brSoundPlayer*			NewPlayer( brSoundData *data, float speed );
+
+
+		std::vector< brSoundPlayer* > 	_players;
+		PortAudioStream 		*_stream;
+		bool 				_streamShouldEnd;
+
+	private:
 };
 
 struct brSoundData {
@@ -49,17 +60,8 @@ struct brSoundPlayer {
 	float volume;
 	float balance;
 };
-#endif
 
 float *brSampleUp( float *in, long frames );
-
-brSoundMixer *brNewSoundMixer();
-void brFreeSoundMixer(brSoundMixer *mixer);
-
-brSoundPlayer *brNextPlayer(brSoundMixer *mixer);
-
-brSoundPlayer *brNewPlayer( brSoundMixer *mixer, brSoundData *data, float speed );
-brSoundPlayer *brNewSinewave(brSoundMixer *mixer, double frequency);
 
 brSoundData *brLoadSound(char *file);
 void brFreeSoundData(brSoundData *data);

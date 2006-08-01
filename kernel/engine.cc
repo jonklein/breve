@@ -111,7 +111,7 @@ brEngine *brEngineNew(void) {
 
 #if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
 	Pa_Initialize();
-	e->soundMixer = brNewSoundMixer();
+	e->soundMixer = new brSoundMixer();
 #endif
 
 	e->nThreads = 1;
@@ -246,8 +246,7 @@ void brEngineFree(brEngine *e) {
 	std::vector<void*>::iterator wi;
 
 #if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
-	if (e->soundMixer)
-		brFreeSoundMixer(e->soundMixer);
+	if (e->soundMixer) delete e->soundMixer;
 #endif
 
 #if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE

@@ -127,10 +127,10 @@ case ${host_os} in
 ###		The old non-checking version of the X libs
 ###		LIBS="${X_LIBS} -lXmu -lXi ${X_EXTRA_LIBS} -lX11 ${X_PRE_LIBS} ${LIBS}"
 
-		LIBS+="${X_LIBS}"
+		LIBS="${LIBS} ${X_LIBS}"
 		AC_CHECK_LIB([Xmu], [main],,AC_MSG_FAILURE([Missing Xmu Library]))
 		AC_CHECK_LIB([Xi], [main],,AC_MSG_FAILURE([Missing Xi Library]))
-		LIBS+="${X_EXTRA_LIBS}"
+		LIBS="${LIBS} ${X_EXTRA_LIBS}"
 		AC_CHECK_LIB([X11], [main],,AC_MSG_FAILURE([Missing X11 Library]))
 
 		AC_CHECK_LIB([GL], [glGetIntegerv],,AC_MSG_FAILURE([Missing OpenGL Library]))
@@ -199,7 +199,7 @@ AC_CHECK_LIB([m], [isnan])
 
 AC_CHECK_HEADERS(pthread.h)
 
-AC_CHECK_LIB([pthread], [main])
+# AC_CHECK_LIB([pthread], [main])
 
 ol_link_threads=no
 
