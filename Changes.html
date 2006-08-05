@@ -28,12 +28,21 @@
 The <a href="http://www.spiderland.org/breve">breve</a> simulation environment change log.
 
 
-<li>Added simulation speed menu to Windows and Linux breveIDE
+<li>Network communication is now a two-way process: objects can be both sent and received in a single network connection call.
 
-<li>For plugin developers: exported additional breveEngineAPI.h functions
+<li>Networking stability improvements.
+
+<li>Archiving/dearchiving bug fixes.
+
+<li>Fixed double-call of "dearchive" method (which could lead to "ghosts")
 
 <li>Improved simulation archiving/dearchiving complience for many built-in classes
 
+<li>Windows "priority" bug fixed -- breve will now run at the default priority.
+
+<li>Windows and Linux IDE graphics bug fixed: simulations now display properly after a previous runtime error.
+
+<li>For plugin developers: exported additional breveEngineAPI.h functions
 
 
 

@@ -255,19 +255,19 @@ int brSendBackXMLString(int sockfd, char *object) {
 	brNetworkRequest request;
 	brStringHeader header;
 
-	if (object) {
-		header.length = strlen(object);
-	} else {
+	if (object)
+		header.length = strlen( object );
+	else
 		header.length = 0;
-	}
 
 	request.version = NETWORK_VERSION;
 	request.magic = NETWORK_MAGIC;
 	request.type = NR_XML;
 
-	write(sockfd, &request, sizeof(brNetworkRequest));
-	write(sockfd, &header, sizeof(brStringHeader));
-	if (header.length) write(sockfd, object, header.length);
+	write( sockfd, &request, sizeof( brNetworkRequest ) );
+	write( sockfd, &header, sizeof( brStringHeader ) );
+
+	if ( header.length ) write( sockfd, object, header.length );
 
 	return 0;
 }
@@ -289,7 +289,7 @@ int brSendBackXMLObject(int sockfd, brInstance *i) {
 
 	returnedValue = brSendBackXMLString(sockfd, buffer);
 
-	if (buffer) slFree(buffer);
+	if ( buffer ) slFree(buffer);
 
 	return returnedValue;
 }
@@ -360,23 +360,23 @@ void *brHandleConnection(void *p) {
 
 			eval[0].set( buffer );
 
-			brMethodCallByNameWithArgs(data->engine->controller, "parse-xml-network-request", args, 1, &result);
+			brMethodCallByNameWithArgs( data->engine->controller, "parse-xml-network-request", args, 1, &result );
 
 			args[0] = &result;
 
 			eval[1].set( hostname );
 
-			method = brMethodFindWithArgRange(data->server->recipient->object, "accept-upload", NULL, 0, 2);
+			method = brMethodFindWithArgRange( data->server->recipient->object, "accept-upload", NULL, 0, 2 );
 
 			if(method) {
 				brMethodCall(data->server->recipient, method, args, &result);
 				brMethodFree(method);	
 				if (request.version >= 2) { // for backward compatibility, send nothing to earlier NETWORK_VERSION...
 					// send back an object based on accept-upload returned value...
-					if (result.type() == AT_INSTANCE) {
-						brSendBackXMLObject(data->socket, result.getInstance());
+					if ( result.type() == AT_INSTANCE ) {
+						brSendBackXMLObject( data->socket, result.getInstance() );
 					} else { // Nothing to send... Send an empty request...
-						if (result.type() != AT_NULL && result.type() != AT_INT) 
+						if ( result.type() != AT_NULL && result.type() != AT_INT ) 
 							slMessage(DEBUG_ALL, "accept-upload method should return an instance;  Will return an empty object to client: returned type = %d\n", result.type()); 
 						brSendBackXMLObject(data->socket, (brInstance *)NULL);
 					}

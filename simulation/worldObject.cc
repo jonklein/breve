@@ -81,7 +81,8 @@ void slWorldObject::setTextureScale( double sx, double sy ) {
 	_textureScaleX = sx;
 	_textureScaleY = sy;
 
-	_shape->recompile();
+	if( _shape )
+		_shape->recompile();
 }
 
 void slWorldObject::setBitmapRotation( double rot ) {
@@ -164,7 +165,8 @@ int slWorldObject::raytrace( slVector *location, slVector* direction, slVector *
 }
 
 void slWorldObject::updateBoundingBox() {
-	_shape->bounds( &_position, &_min, &_max );
+	if( !_shape ) 
+		_shape->bounds( &_position, &_min, &_max );
 }
 
 void slWorldObject::getBounds(slVector *minBounds, slVector *maxBounds) {

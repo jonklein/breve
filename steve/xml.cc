@@ -663,11 +663,11 @@ stInstance *stXMLDearchiveObjectFromString(brEngine *e, char *buffer) {
 
 	result = stXMLRunDearchiveMethods(&parserState);
 
-	if(parserState.error) result = -1;
+	if( parserState.error ) result = -1;
 
 	XML_ParserFree(parser);
 
-	if(result == -1) return NULL;
+	if( result == -1 ) return NULL;
 	else return dearchivedInstance;
 }
 
@@ -750,15 +750,18 @@ int stXMLInitSimulationFromString(brEngine *e, char *buffer) {
 	XML_SetUserData(parser, &parserState);
 
 	if(!XML_Parse(parser, buffer, strlen(buffer), 1)) {
-		slMessage(DEBUG_ALL, "Error loading archived simulation\n");
-		stPrintXMLError(parser);
+		slMessage(DEBUG_ALL, "Error loading archived simulation: parsing failed\n");
+		stPrintXMLError( parser );
 		result = -1;
 	}
 
-	stXMLRunDearchiveMethods(&parserState);
+	if( stXMLRunDearchiveMethods(&parserState) ) {
+		slMessage( DEBUG_ALL, "Error loading archived simulation: dearchive commands failed\n" );
+		result = -1;
+	}
 
 	if(parserState.error) {
-		slMessage(DEBUG_ALL, "Error loading archived simulation\n");
+		slMessage( DEBUG_ALL, "Error loading archived simulation: parsing failed\n" );
 		result = -1;
 	}
 
@@ -782,11 +785,12 @@ int stXMLRunDearchiveMethods(stXMLParserState *s) {
 		ri.instance = s->dearchiveOrder[ n ];
 
 		if( ri.instance ) {
+			printf(" Dearchiving instance %p\n", ri.instance );
 
 			ri.type = ri.instance->type;
 
-			r = stCallMethodByName(&ri, "post-dearchive-set-controller", &result);
-			r = stCallMethodByName(&ri, "dearchive", &result);
+			r = stCallMethodByName( &ri, "post-dearchive-set-controller", &result );
+			r = stCallMethodByName( &ri, "dearchive", &result );
 
 			if(r != EC_OK || BRINT(&result) != 1) {
 				slMessage(DEBUG_ALL, "dearchive of instance %p (%s) failed\n", ri.instance, ri.instance->type->name);

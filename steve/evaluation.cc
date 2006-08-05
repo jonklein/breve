@@ -2622,9 +2622,9 @@ int stCallMethodByNameWithArgs(stRunInstance *target, char *name, brEval **args,
 	ri.instance = target->instance;
 	ri.type = ri.instance->type;
 
-	method = stFindInstanceMethod(target->instance->type, name, argcount, NULL);
+	method = stFindInstanceMethod( target->instance->type, name, argcount, &ri.type );
 
-	if(!method) {
+	if( !method ) {
 		stEvalError(target->instance->type->engine, EE_UNKNOWN_METHOD, "object type \"%s\" does not respond to method \"%s\"", target->instance->type->name, name); 
 		return EC_ERROR;
 	}
