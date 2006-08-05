@@ -247,8 +247,8 @@ int stSendXMLString(char *address, int port, char *object, brEval *target, brIns
 	brStringHeader header;
 	int sockfd;
 	struct sockaddr_in saddr;
-	long addr = brAddrFromHostname(address);
-	header.length = strlen(object);
+	long addr = brAddrFromHostname( address );
+	header.length = strlen( object );
 	int returnedValue = 0;
 
 	if(!addr) {
@@ -303,7 +303,8 @@ int stNSendXMLObject(brEval *args, brEval *target, brInstance *i) {
 	buffer = slCloseStringStream(xmlBuffer);
 
 	//target->set( stSendXMLString(addr, port, buffer) );
-	if (stSendXMLString(addr, port, buffer, target, i)) {
+	
+	if ( stSendXMLString(addr, port, buffer, target, i ) ) {
 		// Something went wrong, we are not happy, but returning EC_ERROR
 		// is no good, so lets just print one more message...
 		slMessage(DEBUG_ALL, "ERROR - Sending object over network failed...  Simulation is going on anyway...\n");

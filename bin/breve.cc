@@ -259,7 +259,7 @@ void brGlutMenuUpdate(brInstance *i) {
 
 			glutAddMenuEntry(message, n);
 
-			delete message;
+			delete[] message;
 		}
 
 		else glutAddMenuEntry(" ", n);

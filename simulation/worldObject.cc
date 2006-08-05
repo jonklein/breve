@@ -165,8 +165,12 @@ int slWorldObject::raytrace( slVector *location, slVector* direction, slVector *
 }
 
 void slWorldObject::updateBoundingBox() {
-	if( !_shape ) 
+	if( _shape ) 
 		_shape->bounds( &_position, &_min, &_max );
+	else {
+		slVectorSet( &_min, 0, 0, 0 );
+		slVectorSet( &_max, 0, 0, 0 );
+	}
 }
 
 void slWorldObject::getBounds(slVector *minBounds, slVector *maxBounds) {

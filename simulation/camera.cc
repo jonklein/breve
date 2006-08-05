@@ -70,6 +70,7 @@ slCamera::slCamera(int x, int y) {
 	_drawSmooth = false;
 	_drawLights = false;
 	_drawShadow = false;
+	_drawShadowVolumes = false;
 	_drawOutline = false;
 	_drawReflection = false;
 	_drawText = true;

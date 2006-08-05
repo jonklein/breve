@@ -45,9 +45,9 @@ void slInitBoundSort(slVclipData *d) {
 		for(y=0;y<listSize;y++) d->boundListPointers[x].push_back(&d->boundLists[x][y]);
 	}
 
-	slInitBoundSortList(d->boundListPointers[0], d, BT_XAXIS);
-	slInitBoundSortList(d->boundListPointers[1], d, BT_YAXIS);
-	slInitBoundSortList(d->boundListPointers[2], d, BT_ZAXIS);
+	slInitBoundSortList( d->boundListPointers[0], d, BT_XAXIS );
+	slInitBoundSortList( d->boundListPointers[1], d, BT_YAXIS );
+	slInitBoundSortList( d->boundListPointers[2], d, BT_ZAXIS );
 }
 
 /*!
@@ -80,9 +80,9 @@ void slRemoveCollisionCandidate(slVclipData *vc, int x, int y) {
 }
 
 bool slBoundSortCompare(const slBoundSort *a, const slBoundSort *b) {
-	if(*a->value == *b->value) return (a->number < b->number);
+	if( *a->value == *b->value ) return (a->number < b->number);
 
-	return (*a->value < *b->value);
+	return ( *a->value < *b->value );
 }
 
 int slVclipData::pruneAndSweep() {
