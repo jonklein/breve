@@ -136,9 +136,6 @@ int main(int argc, char **argv) {
 
 	frontend->data = breveFrontendInitData(frontend->engine);
 
-	frontend->engine->argc = argc - 1;
-	frontend->engine->argv = argv + 1;
-
 	frontend->engine->getLoadname = getLoadname;
 	frontend->engine->getSavename = getSavename;
 	frontend->engine->soundCallback = soundCallback;

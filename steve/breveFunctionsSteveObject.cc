@@ -290,7 +290,6 @@ int stNSendXMLObject(brEval *args, brEval *target, brInstance *i) {
 	char *addr = BRSTRING(&args[0]);
 	int port = BRINT(&args[1]);
 	brInstance *archive = BRINSTANCE(&args[2]);
-	int returnedValue = 0;
 
 	// Set target to null instance to avoid problem when it fails...
 	target->set((brInstance *)NULL);

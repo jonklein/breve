@@ -338,7 +338,7 @@ void brPrintVersion(void);
 
 void brFreeObjectSpace(brNamespace *);
 
-void brEngineRenderWorld(brEngine *, int);
+void brEngineRenderWorld(brEngine *, int inCrosshair = 0 );
 
 brInternalFunction *brEngineInternalFunctionLookup(brEngine *, char *);
 
