@@ -4,7 +4,7 @@ Controller ListTest.
 
 Control : ListTest {
 	+ to init:
-		newlist (list).
+		newlist, newlist2 (list).
 		newhash (hash).
 
 		newlist = (self make-list).
@@ -18,6 +18,13 @@ Control : ListTest {
 		if | newlist | != 2: die "Wrong number of elements in $newlist".
 
 		newlist = { 1, 3, 4, -3 }.
+
+		newlist2 = {}.
+
+		pop {}.
+
+		push (pop newlist) onto newlist2.
+		push (pop newlist) onto newlist2.
 
 		sort newlist with sorter.
 

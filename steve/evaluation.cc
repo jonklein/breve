@@ -1378,15 +1378,15 @@ RTC_INLINE int stEvalListRemove(stListRemoveExp *l, stRunInstance *i, brEval *re
 	}
 	if(!BRLIST(&listEval)) return EC_OK;
 
-	if (l->index) {
-		resultCode = stExpEval3(l->index, i, &index);
+	if ( l->index ) {
+		resultCode = stExpEval3( l->index, i, &index );
 		if (resultCode != EC_OK)
 			return resultCode;
 	} else {
 		index.set( (int)BRLIST(&listEval)->_vector.size() - 1 );
 	}
 
-	brEvalListRemove(BRLIST(&listEval), BRINT(&index), result);
+	brEvalListRemove( BRLIST(&listEval), BRINT(&index), result );
 
 	return EC_OK;
 }

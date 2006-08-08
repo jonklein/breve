@@ -82,6 +82,8 @@ int brEvalListInsert( brEvalListHead *head, int index, brEval *value ) {
 }
 
 int brEvalListRemove(brEvalListHead *head, int index, brEval *value) {
+	if( index < 0 || index >= (int)head->_vector.size() ) return index;
+
 	std::vector< brEval* >::iterator i = head->_vector.begin() + index;
 	
 	brEvalCopy( *i, value );
@@ -94,6 +96,8 @@ int brEvalListRemove(brEvalListHead *head, int index, brEval *value) {
 }
 
 brEval *brEvalListIndexLookup( brEvalListHead *head, int index ) {
+	if( index < 0 || index >= (int)head->_vector.size() ) return NULL;
+
 	std::vector< brEval* >::iterator i = head->_vector.begin() + index;
 
 	return *i;
