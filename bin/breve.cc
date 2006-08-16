@@ -415,7 +415,7 @@ void brPrintUsage(const char *name) {
 	fprintf(stderr, "  -f              Start breve in fullscreen mode.\n");
 	fprintf(stderr, "  -u              Unpause: begin running simulation immediately.\n");
 	fprintf(stderr, "  -F              Format the simulation file and quit.\n");
-	fprintf(stderr, "  -w X,Y          Move the window to coordinates (X, Y).\n");
+	fprintf(stderr, "  -p X,Y          Move the window to coordinates (X, Y).\n");
 	fprintf(stderr, "  -s NxM          Create a window of size (N, M).\n");
 	fprintf(stderr, "  -v              Display the current version number.\n");
 	fprintf(stderr, "  -h              Display this information.\n");
@@ -429,11 +429,11 @@ void slInitGlut(int argc, char **argv, char *title) {
 	glutInitWindowSize(width, height);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH|GLUT_STENCIL);
-	glutCreateWindow(title);
 
+	printf(" moving window to %d, %d\n", xpos, ypos );
 	if (xpos || ypos) glutInitWindowPosition(xpos, ypos);
 
-	glutGetWindow();
+	glutCreateWindow(title);
 
 	glutMouseFunc(slDemoMouse);
 	glutMotionFunc(slDemoMotion);
