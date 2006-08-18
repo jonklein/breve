@@ -292,22 +292,24 @@ int stNSendXMLObject(brEval *args, brEval *target, brInstance *i) {
 	brInstance *archive = BRINSTANCE(&args[2]);
 
 	// Set target to null instance to avoid problem when it fails...
-	target->set((brInstance *)NULL);
+	target->set( (brInstance *)NULL );
 
 	slStringStream *xmlBuffer = slOpenStringStream();
 	FILE *file = xmlBuffer->fp;
 	char *buffer;
 
-	stXMLWriteObjectToStream((stInstance*)archive->userData, file, 0);
+	stXMLWriteObjectToStream( (stInstance*)archive->userData, file, 0 );
 	buffer = slCloseStringStream(xmlBuffer);
 
-	//target->set( stSendXMLString(addr, port, buffer) );
-	
+	brEngineUnlock( i->engine );
+
 	if ( stSendXMLString(addr, port, buffer, target, i ) ) {
 		// Something went wrong, we are not happy, but returning EC_ERROR
 		// is no good, so lets just print one more message...
-		slMessage(DEBUG_ALL, "ERROR - Sending object over network failed...  Simulation is going on anyway...\n");
+		slMessage( DEBUG_ALL, "warning: network send of object %p failed\n", i );
 	}
+
+	brEngineLock( i->engine );
 
 	slFree(buffer);
 

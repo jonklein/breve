@@ -237,9 +237,9 @@ void *brListenOnSocket(void *data) {
 			brHandleConnection(&clientData);
 			pthread_mutex_unlock(&clientData.engine->lock);
 #if WINDOWS
-			closesocket(clientData.socket);
+			closesocket( clientData.socket );
 #else
-			close(clientData.socket);
+			close( clientData.socket );
 #endif
 		}
 	}
@@ -283,7 +283,7 @@ int brSendBackXMLObject(int sockfd, brInstance *i) {
 	if (i) {  // If we have an instance, let XML encode it...
 		slStringStream *xmlBuffer = slOpenStringStream();
 		FILE *file = xmlBuffer->fp;
-	        stXMLWriteObjectToStream((stInstance*)i->userData, file, 0);
+        stXMLWriteObjectToStream( (stInstance*)i->userData, file, 0 );
 		buffer = slCloseStringStream(xmlBuffer);
 	}
 
@@ -307,11 +307,11 @@ void *brHandleConnection(void *p) {
 	brMethod *method;
 	brEval eval[2], result, *args[2];
   
-	hostname = brHostnameFromAddr(&data->addr.sin_addr);
+	hostname = brHostnameFromAddr( &data->addr.sin_addr );
 
-	if(hostname) slMessage(DEBUG_ALL, "network connection from %s\n", hostname);
+	if(hostname) slMessage( DEBUG_ALL, "network connection from %s\n", hostname );
 
-	count = recv(data->socket, (char*)&request, sizeof(brNetworkRequest), 0);
+	count = recv( data->socket, (char*)&request, sizeof(brNetworkRequest), 0 );
 
 	if(!strncasecmp((char*)&request, "GET ", 4)) {
 		char *http;
@@ -321,7 +321,7 @@ void *brHandleConnection(void *p) {
 		// already hit the end of the stream.
 
 		if(count == sizeof(brNetworkRequest)) {
-			http = brFinishNetworkRead(data, &request);
+			http = brFinishNetworkRead( data, &request );
 		} else {
 			http = slStrdup((char*)&request);
 		}

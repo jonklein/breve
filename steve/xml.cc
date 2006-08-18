@@ -785,8 +785,6 @@ int stXMLRunDearchiveMethods(stXMLParserState *s) {
 		ri.instance = s->dearchiveOrder[ n ];
 
 		if( ri.instance ) {
-			printf(" Dearchiving instance %p\n", ri.instance );
-
 			ri.type = ri.instance->type;
 
 			r = stCallMethodByName( &ri, "post-dearchive-set-controller", &result );

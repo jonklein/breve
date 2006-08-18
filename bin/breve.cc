@@ -430,7 +430,6 @@ void slInitGlut(int argc, char **argv, char *title) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH|GLUT_STENCIL);
 
-	printf(" moving window to %d, %d\n", xpos, ypos );
 	if (xpos || ypos) glutInitWindowPosition(xpos, ypos);
 
 	glutCreateWindow(title);
