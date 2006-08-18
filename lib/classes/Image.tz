@@ -124,6 +124,12 @@ Abstract : Image (aka Images) [version 2.0] {
 
         return (r, g, b).
 
+    + to get-compression-size:
+	% Compresses the image and returns the compression size.  Useful for 
+	% generating simple complexity measures based on image compression.
+
+	return imageGetCompressionSize( imageData ).
+
   + section "Setting the value of pixels"
 
     + to set-red-pixel to redPixel (float) at-x x (int) at-y y (int):

@@ -22,25 +22,22 @@
 Controller GS.
 
 Control : GS {
-    + variables:
-        U (object).
-        V (object).
-        tempreact, temp, inflow (object).
-        texture (object).
-        cube (object).
+	+ variables:
+		U (object).
+		V (object).
+		tempreact, temp, inflow (object).
+		texture (object).
+		cube (object).
 
-    + to init:
-        m, n (int).
-        
-        # check for --periodic or --not-periodic
-        
+	+ to init:
+		m, n (int).
+		
+		self set-background-color to (1, 1, 1).
 
-        self set-background-color to (1, 1, 1).
+		self set-iteration-step to TIMESTEP.
+		self set-integration-step to TIMESTEP.
 
-        self set-iteration-step to TIMESTEP.
-        self set-integration-step to TIMESTEP.
-
-        self point-camera at (0, 0, 0) from (0, 0, 70).
+		self point-camera at (0, 0, 0) from (0, 0, 70).
 
 		U = new Matrix2D.
 		V = new Matrix2D.
@@ -54,25 +51,25 @@ Control : GS {
 		tempreact set-size x SIZE y SIZE.
 		inflow set-size x SIZE y SIZE.
 
-        texture = new MatrixImage.
-        texture init-with the-matrix U scale 2.0.
-        texture set-red to V.
-        texture set-blue to U.
+		texture = new MatrixImage.
+		texture init-with the-matrix U scale 2.0.
+		texture set-red to V.
+		texture set-blue to U.
 
-        cube = new Mobile.
-        cube set-shape to (new Cube init-with size (400, 400, 1)).
-        cube set-texture-image to texture.
-        cube set-texture-scale to 40.
+		cube = new Mobile.
+		cube set-shape to (new Cube init-with size (400, 400, 1)).
+		cube set-texture-image to texture.
+		cube set-texture-scale to 40.
 
-        for n=0,n<SIZE,n++:
-            for m=0,m<SIZE,m++: {
+		for n=0,n<SIZE,n++:
+			for m=0,m<SIZE,m++: {
 				U set-value to (0.5 + sqrt(|0.25 - F*(1.0 + K/F)*(1.0 + K/F)|) + 0.01*(random[1.0] - 0.5)) at-x m at-y n.
-                V set-value to (1.0 - (U get-value at-x m at-y n))/(1.0 + K/F) + 0.01*(random[1.0] - 0.5) at-x m at-y n.
+				V set-value to (1.0 - (U get-value at-x m at-y n))/(1.0 + K/F) + 0.01*(random[1.0] - 0.5) at-x m at-y n.
 
 				inflow set-value to F at-x n at-y m.
-            }
+			}
 
-    + to iterate:
+	+ to iterate:
 		tempreact copy from U.
 		tempreact multiply-with-values of V.
 		tempreact multiply-with-values of V.
@@ -89,14 +86,6 @@ Control : GS {
 		temp add-values of tempreact.
 		temp add-values of V scaled-by -(K + F).
 		V add-values of temp scaled-by TIMESTEP.
-		
-        super iterate.
-}
 
-Abstract: PeriodicIteration {
-
-}
-
-Abstract: APeriodicIteration {
-
+		super iterate.
 }

@@ -292,6 +292,33 @@ int brIImageDataInit(brEval args[], brEval *result, brInstance *i) {
 	return EC_OK;
 }
 
+int brIImageGetCompressionSize( brEval args[], brEval *result, brInstance *i ) {
+	brImageData *dm = BRIMAGEDATAPOINTER(&args[0]);
+
+	static unsigned char *compressionBuffer = NULL;
+	static int compressionBufferSize = 0;
+
+	// The zlib compression buffer must be larger than the buffer to be compressed
+	// for worst-case-scenario compression.
+
+	int requiredSize = (int)( ( dm->x * dm->y * 4 + 12 ) * 1.1 );
+
+	if( requiredSize > compressionBufferSize ) {
+		if( compressionBuffer ) delete[] compressionBuffer;
+
+		compressionBuffer = new unsigned char[ requiredSize ];
+		compressionBufferSize = requiredSize;
+	}
+
+	int compressionBytes;
+
+	compress( compressionBuffer, &compressionBytes, dm->data, dm->x * dm->y * 4 );
+
+	result->set( compressionBytes );
+
+	return EC_OK;
+}
+
 /*!
 	\brief Frees image data.
 
@@ -315,6 +342,7 @@ void breveInitImageFunctions(brNamespace *n) {
 	brNewBreveCall(n, "imageGetWidth", brIImageGetWidth, AT_INT, AT_POINTER, 0);
 	brNewBreveCall(n, "imageGetHeight", brIImageGetHeight, AT_INT, AT_POINTER, 0);
 	brNewBreveCall(n, "imageGetPixelPointer", brIImageGetPixelPointer, AT_POINTER, AT_POINTER, 0);
+	brNewBreveCall(n, "imageGetCompressionSize", brIImageGetCompressionSize, AT_INT, AT_POINTER, 0);
 	brNewBreveCall(n, "imageGetValueAtCoordinates", brIImageGetValueAtCoordinates, AT_DOUBLE, AT_POINTER, AT_INT, AT_INT, 0);
 	brNewBreveCall(n, "imageSetValueAtCoordinates", brIImageSetValueAtCoordinates, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_DOUBLE, 0);
 	brNewBreveCall(n, "imageLoadFromFile", brIImageLoadFromFile, AT_POINTER, AT_STRING, 0);
