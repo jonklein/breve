@@ -29,25 +29,15 @@
 #define BRLINKPOINTER(p)	((slLink*)BRPOINTER(p))
 
 /*!
-	\brief Applies torque to a joint.
+	\brief Applies torque or force to a joint's DOFs.
 
-	void jointApplyTorque(slJoint pointer joint, vector torque).
-
-	Since the joint may be 1, 2 or 3 DOF, only some elements of 
-	the torque vector may be used.
+	Since the joint may be 1, 2 or 3 DOF, some elements of the force vector may not be used.
 */
 
-int brIJointApplyTorque(brEval args[], brEval *target, brInstance *i) {
+int brIJointApplyForce(brEval args[], brEval *target, brInstance *i) {
 	slJoint *j = BRJOINTPOINTER(&args[0]);
 
-	// I think this is somewhat broken.
-
-	if (!j) {
-		slMessage(DEBUG_ALL, "jointApplyTorque failed\n");
-		return EC_ERROR;
-	}
-
-	j->applyTorque( &BRVECTOR(&args[1]) );
+	j->applyJointForce( &BRVECTOR(&args[1]) );
 
 	return EC_OK;
 }
@@ -447,7 +437,7 @@ int brIJointSetRepositionAll(brEval args[], brEval *target, brInstance *i) {
 /*@}*/
 
 void breveInitJointFunctions(brNamespace *n) {
-	brNewBreveCall(n, "jointApplyTorque", brIJointApplyTorque, AT_NULL, AT_POINTER, AT_VECTOR, 0);
+	brNewBreveCall(n, "jointApplyForce", brIJointApplyForce, AT_NULL, AT_POINTER, AT_VECTOR, 0);
 	brNewBreveCall(n, "jointLinkRevolute", brJointILinkRevolute, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, AT_INT, 0);
 	brNewBreveCall(n, "jointLinkPrismatic", brJointILinkPrismatic, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, AT_INT, 0);
 	brNewBreveCall(n, "jointLinkBall", brJointILinkBall, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, AT_INT, 0);

@@ -2,31 +2,49 @@
 #include "joint.h"
 
 /*!
-	\brief Applies a torque to a rotational joint.
+	\brief Applies a force on a joint's DOFs
 
-	We do this not by setting the torque directly, because it will be cleared
-	after the next physics engine step.  Instead, we compute the values and 
-	store them in the externalForce vectors for each body.
+	This can be either force or torque, depending on the type of joint.
+
+	We do this not by setting the torque and force directly, because it will 
+	be cleared after the next physics engine step.  Instead, we compute the 
+	values and store them in the externalForce vectors for each body.
 */
 
-void slJoint::applyTorque(slVector *torque) {
+void slJoint::applyJointForce( slVector *force ) {
 	const dReal *t;
 
-	if( _type == JT_REVOLUTE ) {
-		dJointAddHingeTorque( _odeJointID, torque->x);
-	} else {
-		dJointAddAMotorTorques( _odeMotorID, torque->x, torque->y, torque->z);
+	switch( _type ) {
+		case JT_REVOLUTE:
+			dJointAddHingeTorque( _odeJointID, force->x );
+			break;
+		case JT_PRISMATIC:
+			dJointAddSliderForce( _odeJointID, force->x );
+			break;
+		default:
+			if( _odeMotorID ) dJointAddAMotorTorques( _odeMotorID, force->x, force->y, force->z );
+			break;
 	}
 
-	t = dBodyGetTorque( _parent->_odeBodyID);
+	t = dBodyGetTorque( _parent->_odeBodyID );
 	_parent->_externalForce.b.x = t[0];
 	_parent->_externalForce.b.y = t[1];
 	_parent->_externalForce.b.z = t[2];
+	t = dBodyGetForce( _parent->_odeBodyID );
+	_parent->_externalForce.a.x = t[0];
+	_parent->_externalForce.a.y = t[1];
+	_parent->_externalForce.a.z = t[2];
 
-	t = dBodyGetTorque( _child->_odeBodyID);
-	_child->_externalForce.b.x = t[0];
-	_child->_externalForce.b.y = t[1];
-	_child->_externalForce.b.z = t[2];
+	if( _child ) {
+		t = dBodyGetTorque( _child->_odeBodyID );
+		_child->_externalForce.b.x = t[0];
+		_child->_externalForce.b.y = t[1];
+		_child->_externalForce.b.z = t[2];
+		t = dBodyGetForce( _child->_odeBodyID );
+		_child->_externalForce.a.x = t[0];
+		_child->_externalForce.a.y = t[1];
+		_child->_externalForce.a.z = t[2];
+	}
 }
 
 void slJoint::setNormal(slVector *normal) {

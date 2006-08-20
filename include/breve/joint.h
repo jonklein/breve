@@ -110,10 +110,11 @@ class slJoint {
 		void breakJoint();
 
 		/*
-		 * Applies torque to the joint.  Depending on the joint type, this may be 1, 2 or 3 values.
+		 * Applies force to the joint's DOFs.  Depending on the joint type, this may be force or torque 
+		 * for 1, 2 or 3 DOFs.
 		 */
 	
-		void applyTorque(slVector *torque);
+		void applyJointForce(slVector *torque);
 
 		/*
 		 * Sets the _repositionAll flag of the joint.

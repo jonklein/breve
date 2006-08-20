@@ -257,7 +257,7 @@ Abstract : GADirectedGraphParameterObject (aka GADirectedGraphParameterObjects) 
 			parameters{ n } = random[2.0] - 1.0.
 		}
 
-	+ to mutate with-variation variation = 0.1 (double) with-replacement-probability replace = 0.1 (int):
+	+ to mutate with-variation variation = 0.1 (double) with-replacement-probability replace = 0.1 (double):
 		% Mutates the list of parameters in the list with a gaussian distribution 
 		% of size variation, and a replace proability chance of total replacement.
 	

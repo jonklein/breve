@@ -343,7 +343,7 @@ double Sensor::sense( slShape *shape, slPosition *shapePos, slPosition *sensorPo
 
 	slVectorSet(&result_point, 0.0, 0.0, 0.0);
 
-	for( fi = ((slShape*)shape)->faces.begin(); fi < ((slShape*)shape)->faces.end(); fi++ ) {
+	for( fi = ((slShape*)shape)->faces.begin(); fi != ((slShape*)shape)->faces.end(); fi++ ) {
 		slFace *f = *fi;
 		planes++;
 		D = slVectorDot(&f->plane.normal, &f->plane.vertex);

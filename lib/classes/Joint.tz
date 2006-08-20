@@ -98,7 +98,7 @@ Abstract : Joint (aka Joints) [version 2.3] {
 		% Applies torque on one or more axes.  This method can be used when setting the torque
 		% of ball or universal joints.
 
-		if jointPointer: jointApplyTorque(jointPointer, torqueVector).
+		if jointPointer: jointApplyForce(jointPointer, torqueVector).
 
 	+ to set-strength-limit to newLimit (float):
 		% Sets the maximum torque to be used by this joint when attempting 
@@ -405,6 +405,11 @@ Joint : PrismaticJoint (aka PrismaticJoints) [version 2.3] {
 
 		return jointGetPosition(jointPointer)::x.
 
+	+ to set-joint-force to forceValue (double): 
+		% Applies a force of forceValue to this joint. 
+
+		jointApplyForce(jointPointer, (forceValue, 0, 0)).
+
 	+ to dearchive:
 		if parent || child: 
 			self link parent parent to-child child with-normal normalVector 
@@ -464,7 +469,7 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 2.3] {
 	+ to set-joint-torque to torqueValue (double): 
 		% Applies a torque of torqueValue to the revolute joint. 
 
-		jointApplyTorque(jointPointer, (torqueValue, 0, 0)).
+		jointApplyForce(jointPointer, (torqueValue, 0, 0)).
 
 	- to get-joint-position:
 		return (self get-joint-angle).
