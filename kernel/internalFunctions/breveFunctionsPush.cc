@@ -79,7 +79,7 @@ int breveFunctionPushRun(brEval arguments[], brEval *result, brInstance *instanc
 int breveFunctionPushInterpreterDone(brEval arguments[], brEval *result, brInstance *instance) {
 	push::Env *env = static_cast< push::Env* >( BRPOINTER(&arguments[0]) );
 
-	result->set( (int)env->done() );
+	result->set( (int)env->next().done() );
 
 	return EC_OK;
 }
