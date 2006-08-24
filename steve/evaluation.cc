@@ -1739,6 +1739,7 @@ RTC_INLINE int stEvalCallFunc(stCCallExp *c, stRunInstance *i, brEval *result) {
 		}
 	} catch(slException &error) {
 		stEvalError( i->instance->type->engine, EE_SIMULATION, "an error occurred executing the internal function \"%s\": %s", c->function->name, error._message.c_str() );
+		stStackTrace( i->instance->type->steveData );
 
 		return EC_ERROR;
 	}
@@ -3101,6 +3102,7 @@ void stEvalError(brEngine *e, int type, char *proto, ...) {
 		// print out all of the information
 
 		error->type = type;
+
 	} else
 		m = localMessage;
 

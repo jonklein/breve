@@ -23,7 +23,7 @@ struct slStack;
 	\brief A type of object, required for each frontend language.
 
 	brObjectType is an interface that allows breve to preform common tasks
-	for a variety of fronten: languages.  It contains function pointers 
+	for a variety of frontend languages.  It contains function pointers 
 	that allow breve to create and destroy instances, call methods, etc.
 
 	If you create a new frontend, you'll need to create a brObjectType and

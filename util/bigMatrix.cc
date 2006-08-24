@@ -297,7 +297,7 @@ slBigMatrix2DGSL& slVectorViewGSL::outerProductInto(const slVectorView& other, s
     }
     else
     {
-        throw slException("slVectorViewGSL::outerProductInto: Dimension Mismatch");
+        throw slException( "slVectorViewGSL::outerProductInto: Dimension Mismatch" );
     }
     return result;
 }
@@ -423,18 +423,18 @@ slBigVectorGSL::~slBigVectorGSL() {}
  *
  */
 //inline 
-float slBigVectorGSL::get(const int x) const
+float slBigVectorGSL::get( const int inX ) const
 {
-	return _vec->data[x];
+	return _vec->data[ inX ];
 }
 
 /**
  *
  */
 //inline 
-void slBigVectorGSL::set(const int x, const float value)
-{
-	_vec->data[x] = value;
+void slBigVectorGSL::set( const int inX, const float value ) {
+	if( inX > _dim ) throw slException( "Vector index out of bounds" );
+	_vec->data[ inX ] = value;
 }
 
 
