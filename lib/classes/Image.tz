@@ -179,9 +179,14 @@ Abstract : Image (aka Images) [version 2.0] {
 
     + to read-pixels at-x x (int) at-y y (int):
         % Reads pixels into this Image from the rendered image on the 
-        % screen.  The resulting image can be written to a file or 
-        % analyzed if desired.  This is only supported in graphical
-        % versions of breve.
+        % screen.  
+		% <p>
+		% The X and Y coordinates specify the starting lower-left pixel
+		% of the screen data to read into this image.
+		% <p>
+		% The resulting image can be written to a file or analyzed as 
+		% desired.  This functionality is only supported in graphical 
+		% versions of breve.
 
         imageReadPixels(imageData, x, y).
 

@@ -33,4 +33,4 @@ SRC	+= kernel/breveEval.cc kernel/breveObjectAPI.cc kernel/callback.cc \
 		kernel/internalFunctions/breveFunctionsTerrain.cc \
 		kernel/internalFunctions/breveFunctionsWorld.cc \
 		kernel/multithread.cc kernel/namespace.cc kernel/network.cc \
-		kernel/plugins.cc kernel/sound.cc kernel/python.cc
+		kernel/plugins.cc kernel/sound.cc 
