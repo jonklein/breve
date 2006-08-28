@@ -119,6 +119,13 @@ double slWorldObject::irSense(slPosition *sensorPos, std::string sensorType){
 	return irSense2(&_neighbors, sensorPos, sensorType);
 }
 
+double slWorldObject::calculateQuality(slPosition* sensorPos, slVector* targetLoc, std::string sensorType, slWorldObject* target=NULL){
+	if(target!=NULL){
+		targetLoc = &target->_position.location;
+	}
+	return calculateQuality2(&_neighbors, sensorPos, targetLoc, sensorType, target);//sensor.cc
+}
+
 int slWorldObject::raytrace( slVector *location, slVector* direction, slVector *erg_dir ) {
 
 	if ( !_shape ) {

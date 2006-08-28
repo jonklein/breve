@@ -38,8 +38,8 @@ class Sensor{
 		double apply_distance_factor(double input, double dist);	
 		double apply_azimut_factor(double input, double angle);
 		double apply_incidence_factor(double input, double angle);
-		double sense( slShape *shape, slPosition *shapePos, slPosition *sensorPos );
-		bool insideSensorBorder( slShape *shape, slPosition *shapePos, slPosition *sensorPos);
+		double sense(const slShape *shape, slPosition *shapePos, slPosition *sensorPos );
+		bool insideSensorBorder(const slShape *shape, slPosition *shapePos, slPosition *sensorPos);
 		slVector baseDirection;
 		slVector baseUpDirection;
 		slVector borderNormal[5];
