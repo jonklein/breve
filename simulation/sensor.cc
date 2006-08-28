@@ -13,9 +13,6 @@ using std::map;
 using std::vector;
 using std::string;
 
-#include <assert.h>
-
-int SensorBuilder::test = 3;
 map <string, UserSensor*> SensorBuilder::sensors = map<string, UserSensor*>();
 
 double distance_plane_point(slVector *normal, slVector *planePoint, slVector *point){
@@ -29,7 +26,7 @@ double distance_plane_point(slVector *normal, slVector *planePoint, slVector *po
    *
    * the result is a vector, normal to from starts somewhere on the vector from and ends in to.
    */
-void inv_perpendicular( slVector *from, slVector *to, slVector *result ){
+void inv_perpendicular( const slVector *from, const slVector *to, slVector *result ){
 	slVector diff;
 	slVector proj;
 	slVector nfrom;
@@ -41,19 +38,9 @@ void inv_perpendicular( slVector *from, slVector *to, slVector *result ){
 	d = d / slVectorLength(from);
 	slVectorMul(&nfrom, d, &proj);
 	slVectorSub(&diff, &proj, result);
-//		slMessage(DEBUG_ALL,"resulting Vector:");
-//	slVectorPrint(result);
-//	slVectorNormalize(result);
 }
 
    
-void testperpendicular(){
-	slVector a,b,c;
-	slVectorSet(&a, 5, 0, 0);
-	slVectorSet(&b, 5, 2.5, 0);
-	inv_perpendicular(&a, &b, &c);
-	slVectorPrint(&c);
-}
 
 /**
   * given an array of input-values and resulting output-values
@@ -82,29 +69,30 @@ double interpolate(pair *pairs, double value, int array_length ){
 	return result;
 }
 
-double Sensor::apply_distance_factor(double input, double dist){
+double Sensor::apply_distance_factor(const double input, const double dist){
 	return input * interpolate(distance, dist, distance_length);
 }
 
-double Sensor::apply_azimut_factor(double input, double angle){
+double Sensor::apply_azimut_factor(const double input, const double angle){
 	return input * interpolate(azimut, angle, azimut_length);
 }
 
-double Sensor::apply_incidence_factor(double input, double angle){
+double Sensor::apply_incidence_factor(const double input, const double angle){
 	// angle is the difference between the normal vector of the face and the 
-	// vector from the sensor to the face angle=0 =^ good reflection
+	// vector from the sensor to the face angle=0 = good reflection
 	return input * interpolate(incidence, angle, incidence_length);
 
 }
 
 Sensor::Sensor(){
-	slMessage(DEBUG_ALL,"Sensor Constructor\n");
+//	slMessage(DEBUG_ALL,"Sensor Constructor\n");
 	slVectorSet(&baseDirection, 0, 0, 1);
 	// generate the normal vectors for the border planes therefore choose the "middle" vector of each side
 	slVectorSet(&borderNormal[0],1,0,0);
 	slVectorSet(&borderNormal[1],-1,0,0);
 	slVectorSet(&borderNormal[2],0,1,0);
 	slVectorSet(&borderNormal[3],0,-1,0);
+	slVectorSet(&borderNormal[4],0,0,-1);
 }
 
 
@@ -120,26 +108,32 @@ Sensor::Sensor(){
 UserSensor* SensorBuilder::createUserSensor(const char* name, const int rows, const int columns, const double max_range, const double max_angle, 
 				const int distance_length, const double* distance, const double* distance_factor,
 				const int azimut_length, const double* azimut, const double* azimut_factor,
-				const int incidence_length, const double* incidence, const double* incidence_factor, int error){
+				const int incidence_length, const double* incidence, const double* incidence_factor){
+	// check if a sensor with this name already exists and delete it
+	map <string, UserSensor*>::iterator iter = sensors.find(name);
+	if(iter != sensors.end()){
+	//if(iter->first == name){
+		slMessage(DEBUG_ALL,"deleting sensor %s \n", name);			
+		UserSensor* d = sensors[iter->first];
+		delete d;
+		sensors.erase(iter);
+	}
 	UserSensor* s = new UserSensor(name, rows, columns, max_range, max_angle, 
 				distance_length, distance, distance_factor,
 				azimut_length, azimut, azimut_factor,
 				incidence_length,  incidence, incidence_factor);
 
 	sensors[name] = s;
-	slMessage(DEBUG_ALL,"Building sensor %s finished\n", name);			
+//	slMessage(DEBUG_ALL,"Building sensor %s finished\n", name);			
 	return sensors[name]; 
 }
 
-//SensorBuilder::~SensorBuilder(){
-//TODO delete all sensors  nee es wird ja nie ein objekt erzeugt
-//}
+
   /*
    * returns the UserSensor with name Name or NULL if no Sensor with that name is found
    */
 UserSensor* SensorBuilder::getUserSensor(const char* name){
 //	slMessage(DEBUG_ALL, "Searching sensor %s...", name);	
-
 	if (sensors.count(name)>=1) {
 		UserSensor* s;
 		s = sensors[name];
@@ -150,23 +144,15 @@ UserSensor* SensorBuilder::getUserSensor(const char* name){
 
 	return NULL;
 }
-/*
-UserSensor::UserSensor(){
-		slMessage(DEBUG_ALL,"Never call this constructor of UserSensor only to make maps work!\n");
-//	assert (1==2);
-	// why do maps create items? This will never be called!
-}
-*/
+
 
 UserSensor::UserSensor(const char* name, const int rows, const int columns, const double max_range, const double max_angle, 
 				const int distance_length, const double* distance, const double* distance_factor,
 				const int azimut_length, const double* azimut, const double* azimut_factor,
 				const int incidence_length, const double* incidence, const double* incidence_factor){
-	slMessage(DEBUG_ALL,"UserSensor Constructor\n");
+//	slMessage(DEBUG_ALL,"UserSensor Constructor\n");
 	this->rows = rows;
 	this->columns = columns;
-	assert(rows%2==1);
-	assert(columns%2==1);
 	this->distance_length = distance_length;
 	this->azimut_length = azimut_length;
 	this->incidence_length = incidence_length;
@@ -181,6 +167,9 @@ UserSensor::UserSensor(const char* name, const int rows, const int columns, cons
 	double y_step = sensor_height/(columns-1.0);
 	double x_start = -sensor_width/2.0;
 	double y_start = -sensor_height/2.0;
+	//We have only one Ray
+	if (rows ==1){ x_start = 0; x_step = 0; }
+	if (columns ==1){ y_start = 0; y_step = 0;}
 
 	//get memory for rayDirection array
 	rayDirections = (slVector**)malloc(rows * sizeof(slVector *));
@@ -205,9 +194,9 @@ UserSensor::UserSensor(const char* name, const int rows, const int columns, cons
 			rayDirections[i][j].x = x_start + x_step * i;
 			rayDirections[i][j].y = y_start + y_step * j;
 			rayDirections[i][j].z = 1;
-		//	slVectorNormalize(&rayDirections[i][j]);
-		//	slMessage(DEBUG_ALL, " ProximitySensor direction[%d][%d]:(%f, %f, %f)\n", i, j, rayDirections[i][j].x, rayDirections[i][j].y, rayDirections[i][j].z);
-
+			slVectorNormalize(&rayDirections[i][j]);
+//			slMessage(DEBUG_ALL, " UserSensor direction[%d][%d]:(%f, %f, %f)\n", i, j, rayDirections[i][j].x, rayDirections[i][j].y, rayDirections[i][j].z);
+			rayValues[i][j].azimut = slVectorAngle(&rayDirections[i][j], &baseDirection);
 			rayValues[i][j].distance = 999999;
 		}		
 	}
@@ -216,7 +205,7 @@ UserSensor::UserSensor(const char* name, const int rows, const int columns, cons
 	inv_perpendicular(&rayDirections[columns-1]     [(rows-1)/2], &baseDirection, &borderNormal[1]);
 	inv_perpendicular(&rayDirections[(columns-1)/2] [0],          &baseDirection, &borderNormal[2]);
 	inv_perpendicular(&rayDirections[(columns-1)/2] [rows-1],     &baseDirection, &borderNormal[3]);
-
+	slVectorSet(&borderNormal[4],0,0,1);
 	// if rows or columns ==1 the rayDirectionsVector is identical with the baseDirection 
 	// but we dont want to have the same vector 4 times
 	if(columns ==1){
@@ -302,12 +291,12 @@ double Sensor::sense(vector<slWorldObject*>* neighbors, slPosition* sensorPos){
 		
 		if(o->getShape() != NULL){
 			slPosition shapePos = o->getPosition();
-			if(!insideSensorBorder(o->getShape(), &shapePos, sensorPos)){
-				slMessage(DEBUG_ALL,"outside!\n");
+			if(insideSensorBorder(o->getShape(), &shapePos, sensorPos)){
+			//	slMessage(DEBUG_ALL,"inside!\n");
+				Sensor::sense(o->getShape(), &shapePos, sensorPos);
 			}
 			else{ 
-				slMessage(DEBUG_ALL,"inside!\n");
-				Sensor::sense(o->getShape(), &shapePos, sensorPos);
+				//	slMessage(DEBUG_ALL,"outside!\n");
 			}
 		}
 	}
@@ -316,84 +305,75 @@ double Sensor::sense(vector<slWorldObject*>* neighbors, slPosition* sensorPos){
 
 
 
+
+
+
 /*
- * this function simulates a sensor located at position pos, facing direction dir, 
- * up is for the orientation
- *
+ * this function simulates a sensor located at sensorPos
+ * shapePos the Position of the shape that will be sensed
  */
-double Sensor::sense( slShape *shape, slPosition *shapePos, slPosition *sensorPos ){
+double Sensor::sense(const slShape *shape, slPosition *shapePos, slPosition *sensorPos){
 	double distance;
-	slVector v1;
-	slVector v2;
-	slVectorSet(&v1, 0.0, 0.0, 0.0);
-	slVectorSet(&v2, 0.0, 0.0, 0.0);
-	std::vector< slFace* >::iterator fi;
-//	slMessage(DEBUG_ALL, " Sensor::sense start:\n");
-	double D, X, Y, Z, k;
+	vector<slFace*>::iterator fi;
 	slVector pointOnPlane;
-	slVector result_point;
 	slVector posToPlane;
-	slVector testV;
 	slVector dir;
+	slVector middleDirection;
+	int middle;
 	int update, result, planes = 0;
-	double best = -10000;
-	double u = 0;
-	double dist = 0;
+	double dist= 0;
 
-
-	slVectorSet(&result_point, 0.0, 0.0, 0.0);
-
-	for( fi = ((slShape*)shape)->faces.begin(); fi != ((slShape*)shape)->faces.end(); fi++ ) {
+	middle = rows/2;
+	slVectorXform(sensorPos->rotation, &rayDirections[middle][middle], &middleDirection);
+	slVectorNormalize(&middleDirection);
+	for(fi = (shape->faces.begin()); fi != (shape->faces.end()); fi++ ) {
 		slFace *f = *fi;
 		planes++;
-		D = slVectorDot(&f->plane.normal, &f->plane.vertex);
 		slPlane wcPlane; //world coordinates
-		slVectorInvXform(shapePos->rotation, &f->plane.normal, &wcPlane.normal);
+		slVectorXform(shapePos->rotation, &f->plane.normal, &wcPlane.normal);
 		slVectorAdd(&f->plane.vertex, &shapePos->location, &wcPlane.vertex);
 
-		for(int i=0; i<columns; i++){
+		for(int i = 0; i<columns; i++){
 			for(int j = 0; j<rows; j++){
 				slVectorXform(sensorPos->rotation, &rayDirections[i][j], &dir);
 				slVectorNormalize(&dir);
 				// P1, P2 points on the line
 				// P3 point on the plane
 				// N normal of the plane
-				// u = (N dot P3-P1) / (N dot P2-P1)
-				// u *(P2-P1) = the vector from P1 to the plane
+				// dist= (N dot P3-P1) / (N dot P2-P1)
+				// dist*(P2-P1) = the vector from P1 to the plane
 
 				// plane.vertex relativ to wo position
 				slVectorSub(&wcPlane.vertex, &sensorPos->location, &posToPlane);
-				u = (slVectorDot(&wcPlane.normal, &posToPlane)/(slVectorDot(&wcPlane.normal, &dir)));
-				dist = u ;
 
-				X = wcPlane.normal.x * dir.x;
-				Y = wcPlane.normal.y * dir.y;
-				Z = wcPlane.normal.z * dir.z;
-				k = D/(X+Y+Z);
-				if((X+Y+Z) != 0.0 && u > 0.0) {
+				// the face is facing the wrong direction
+				if( (M_PI/2) > (slVectorAngle(&dir, &wcPlane.normal)) || (slVectorAngle(&dir, &wcPlane.normal) > M_PI)){continue;}
+			
+				if(fabs(slVectorDot(&wcPlane.normal, &dir))<0.00001){continue;} // the ray is parallel to the plane so it wont hit
+				else{
+					dist = (slVectorDot(&wcPlane.normal, &posToPlane)/(slVectorDot(&wcPlane.normal, &dir)));
+				}
+
+				if(dist > 0.0) {
 					// we have the length of the matching vector on the plane of this face. 
-					slVectorMul(&dir, u, &pointOnPlane);
+					slVectorMul(&dir, dist, &pointOnPlane);
 					slVectorAdd(&pointOnPlane, &sensorPos->location, &pointOnPlane);
 					// now figure out if the point in question is within the face 
 					result = slClipPoint(&pointOnPlane, f->voronoi, shapePos, f->edgeCount, &update, &distance);
 					if(result == 1) { // point inside the face
-						slVectorSub(&pointOnPlane, &sensorPos->location, &testV);
-						dist = slVectorLength(&testV);
-						slVectorCopy(&pointOnPlane, &result_point);
-						if(rayValues [i][j].distance > u){
-							rayValues[i][j].distance = u;
-							rayValues[i][j].azimut = slVectorAngle(&rayDirections[i][j], &baseDirection);
-							rayValues[i][j].incidence = M_PI - slVectorAngle(&dir, &wcPlane.normal);
-						}//we have a better hit
-					} else if(distance < best) {
-						best = distance;
-						slVectorCopy(&pointOnPlane, &result_point);
+						if(rayValues [i][j].distance > dist){//we have a better hit
+							rayValues[i][j].distance = dist;
+							rayValues[i][j].incidence = M_PI- slVectorAngle(&middleDirection, &wcPlane.normal);
+						//	slMessage(DEBUG_ALL, "%f ",rayValues[i][j].incidence*180/M_PI);
+						//slMessage(DEBUG_ALL, " normal: (%f, %f, %f) ",wcPlane.normal.x, wcPlane.normal.y, wcPlane.normal.z );
+						//slMessage(DEBUG_ALL, " middleDir: (%f, %f, %f) ",middleDirection.x, middleDirection.y, middleDirection.z );
+						}
 					}
 				}
 			}
 		}
 	}
-	return 1;
+	return dist;
 }
 
 /* evaluates the sensed values for all rays according
@@ -401,39 +381,67 @@ double Sensor::sense( slShape *shape, slPosition *shapePos, slPosition *sensorPo
  * so new sensing is possible
  */
 double Sensor::evaluate(){
-	double sum, split_factor, result;
-	sum = 0;
-	split_factor = 1.0/(rows*columns);
+	double sumValues, sumFactors, maxValue, result, factor;
+	sumValues = 0;
+	sumFactors = 0;
+	int verbose = 0;
+	double frontDistance = 0;
+	maxValue = 233;
 //slMessage(DEBUG_ALL, "evaluate rows: %d columns%d \n",rows,columns);
 	for(int i=0; i < columns; i++){
 		for(int j=0; j < rows; j++){
-			result = apply_distance_factor(split_factor, rayValues[i][j].distance);
-			result = apply_azimut_factor(result, rayValues[i][j].azimut);
-			result = apply_incidence_factor(result, rayValues[i][j].incidence);
-			if (rayValues[i][j].distance < 999998)
-			slMessage(DEBUG_ALL, "rayValues[%d][%d].dist: %f azimut: %f incid: %f result\n", i, j, rayValues[i][j].distance,rayValues[i][j].azimut / M_PI *180, rayValues[i][j].incidence / M_PI *180);
-//			slMessage(DEBUG_ALL, " %3.8f ", result);
-	//		slMessage(DEBUG_ALL, " %3.8f ", rayValues[i][j].distance);
-			rayValues[i][j].distance = 999999;
-			sum += result;
-		}
-//		slMessage(DEBUG_ALL, "\n", result);
-	}
-//	slMessage(DEBUG_ALL, "sensor::evaluate sum:%f\n", sum);
+			factor = apply_azimut_factor(1, rayValues[i][j].azimut);
+			sumFactors += factor;
+			if (rayValues[i][j].distance > 999998){continue;}
+			result = maxValue;
+			result = factor* maxValue;
+			
+			if((i ==columns/2)&&(j ==rows/2)||rows==1) { 
+				frontDistance = rayValues[i][j].distance;
+			}else{
+				frontDistance = sqrt(pow(rayValues[i][j].distance, 2)-pow(sin(rayValues[i][j].azimut)*rayValues[i][j].distance, 2) );
+			}
+			if(verbose ==2){
+				slMessage(DEBUG_ALL, "rayValues[%d][%d]:\n",i,j);
+				slMessage(DEBUG_ALL, "value: %.3f azimut:%.3f ",maxValue, rayValues[i][j].azimut);
+				
+				slMessage(DEBUG_ALL, "value: %.3f\n",result);
+				slMessage(DEBUG_ALL, "value: %.3f dist:%.3f ", result, frontDistance);
+				//rayValues[i][j].distance);
+			}
+			if(verbose==1)
+				if((i ==columns/2)&&(j ==rows/2)||rows==1)	slMessage(DEBUG_ALL, "%.3f	",rayValues[i][j].distance);
+			//laenge der strahlen auf die laenge des mittleren umrechnen falls es nciht shco nder mittelre ist
 
-	return sum;
+			result = apply_distance_factor(result, frontDistance);
+			if(verbose ==2){
+				slMessage(DEBUG_ALL, "value: %.3f\n",result);
+				slMessage(DEBUG_ALL, "value: %.3f inc:%.3f  ",result, rayValues[i][j].incidence*180/M_PI);
+			}
+			result = apply_incidence_factor(result, rayValues[i][j].incidence);
+			if(verbose ==2){
+				slMessage(DEBUG_ALL, "value: %.3f\n",result);
+			}
+			rayValues[i][j].distance = 999999;
+			sumValues += result;
+			
+		}
+	}
+	if(verbose ==2)
+		slMessage(DEBUG_ALL, "sensor::evaluate sumValues:%f sumFactors:%f sumV/F: %f\n", sumValues, sumFactors, sumValues/sumFactors);
+
+	return sumValues/sumFactors ;
 }
+
   /*
    * this function returns false, if all points of the boundingbox are on the "outside of a
    * borderplane defined in borderNormal[i]. This can happen, even if no point is inside all
    * planes, representing a case, in wich the bounding box is larger than the sensor cone
    * so the bounding box points are outside, but parts of the shape are still inside.
    */
-bool Sensor::insideSensorBorder( slShape *shape, slPosition *shapePos, slPosition *sensorPos){
+bool Sensor::insideSensorBorder(const slShape *shape, slPosition *shapePos, slPosition *sensorPos){
 	slVector min ,max;
 	shape->bounds(shapePos, &min, &max);
-//	slVectorPrint(&min);
-//	slVectorPrint(&max);
 
 	slVector maximumPoints[8];
 
@@ -477,11 +485,201 @@ bool Sensor::insideSensorBorder( slShape *shape, slPosition *shapePos, slPositio
 		}
 		// all points are on the "outside" of this plane
 		if(p==8) return false;
-		
 	}
+	return true;
+}
+
+/*
+ * checks, if the path from sensorpos->Loc  to targetLoc is blocked by the Shape or not
+ * 
+ */
+
+bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, slWorldObject* target = NULL){
+	vector< slWorldObject* >::iterator neigh_iter;
+	bool isTarget = false;
+	double shortestDist = 999999;
+	double targetDist = 999999;
+	double distance;
+	vector<slFace*>::iterator fi;
+	slVector pointOnPlane;
+	slVector posToPlane;
+	slVector dir;
+	slShape const *shape;
+	int update, result = 0;
+	double dist= 0;
+	bool exact = false;
+	if (target!=NULL){
+		exact = true;
+	}
+
+	slVectorSub(targetLoc, &sensorPos->location, &dir);
+
+	for(neigh_iter = neighbors->begin(); neigh_iter != neighbors->end(); neigh_iter++) {
+  		slWorldObject *o = *neigh_iter;
+		shape = o->getShape();
+		if(shape == NULL){continue;}
+		slPosition *shapePos = &o->getPosition();
+		if(!insideSensorBorder(shape, shapePos, sensorPos)){continue;}
+		isTarget = (o==target);
+		for(fi = (shape->faces.begin()); fi != (shape->faces.end()); fi++ ) {
+			slFace *f = *fi;
+			slPlane wcPlane; //world coordinates
+			slPlane wcPlane2; //world coordinates
+
+			slVectorXform(shapePos->rotation, &f->plane.normal, &wcPlane.normal);
+
+			slVectorXform(shapePos->rotation, &f->plane.vertex, &wcPlane.vertex);
+			slVectorAdd(&wcPlane.vertex, &shapePos->location, &wcPlane.vertex);
+
+			slPositionPlane( shapePos, &f->plane, &wcPlane2);
+			/*
+			printf("wcplane.normal:");
+			slVectorPrint(&wcPlane.normal);
+			printf("wcplane.vertex:");
+			slVectorPrint(&wcPlane.vertex);
+			printf("wcplane2.normal:");
+			slVectorPrint(&wcPlane2.normal);
+			printf("wcplane2.vertex:");
+			slVectorPrint(&wcPlane2.vertex);
+*/
+
+			slVectorNormalize(&dir);
+
+//printf(" slVectorAngle(&middleDirection, &wcPlane.normal %f\n",( slVectorAngle(&dir, &wcPlane.normal))*180/M_PI);
+			// the face is facing the wrong direction
+			if( (M_PI/2) > (slVectorAngle(&dir, &wcPlane.normal)) || (slVectorAngle(&dir, &wcPlane.normal) > M_PI)){continue;}
+
+			// P1, P2 points on the line
+			// P3 point on the plane
+			// N normal of the plane
+			// dist= (N dot P3-P1) / (N dot P2-P1)   watch out maybe /~0
+			// dist*(P2-P1) = the vector from P1 to the plane
+
+			// plane.vertex relativ to wo position
+			slVectorSub(&wcPlane.vertex, &sensorPos->location, &posToPlane);
+			if(fabs(slVectorDot(&wcPlane.normal, &dir))<0.00001){continue;} // the ray is parallel to the plane so it wont hit
+			else{
+				//slPlaneDistance
+				dist = (slVectorDot(&wcPlane.normal, &posToPlane)/(slVectorDot(&wcPlane.normal, &dir)));
+			}
+			if(dist < 0.0) {continue;}
+			// we have the length of the matching vector on the plane of this face. 
+			slVectorMul(&dir, dist, &pointOnPlane);
+
+			slVectorAdd(&pointOnPlane, &sensorPos->location, &pointOnPlane);
+			// now figure out if the point in question is within the face 
+			result = slClipPoint(&pointOnPlane, f->voronoi, shapePos, f->edgeCount, &update, &distance);
+			if(result != 1) { continue;}
+
+			// point inside the face
+			if(exact){
+				/*
+				printf("vertex: ");
+				slVectorPrint(&wcPlane.vertex);
+				printf("sensor location: ");
+				slVectorPrint(&sensorPos->location);
+				
+				printf("normal: ");
+				slVectorPrint(&wcPlane.normal);
+				printf("posToPlane: ");
+				slVectorPrint(&posToPlane);
+
+				printf("slVectorDot(&wcPlane.normal, &posToPlane %f\n",slVectorDot(&wcPlane.normal, &posToPlane));
+				printf("slVectorDot(&wcPlane.normal, &dir)%f\n",slVectorDot(&wcPlane.normal, &dir));
+				printf("dist:  %f\n",dist);
+				printf(" slVectorAngle(&middleDirection, &wcPlane.normal %f\n",( slVectorAngle(&dir, &wcPlane.normal))*180/M_PI);
+				printf("point on plane: ");
+				slVectorPrint(&pointOnPlane);
+				printf("dir: ");
+				slVectorPrint(&dir);
+				printf("\n");
+				*/
+				if( dist < shortestDist ){ shortestDist = dist;}
+				if(isTarget){
+					if(dist < targetDist){targetDist = dist;}
+					if(targetDist > shortestDist + 0.1){
+						return false;
+					}
+					//if(targetDist + 0.1 > shortestDist){continue;} use this if you want konvex shapes
+				}
+				if((shortestDist != 999999)&&(targetDist !=999999)){
+					if(targetDist > shortestDist + 0.1){
+						return false;
+					}
+				}
+		//		printf("shortestDist: %f targetDist: %f\n",shortestDist, targetDist);
+			}else{
+				slVector t;
+				slVectorSub(targetLoc, &sensorPos->location, &t);
+//					printf ("ray-lenght: %f distance(obj->obj):%f\n", dist, slVectorLength(&t));
+				if(dist + 2.5 < (slVectorLength(&t))){//2.5 is the robotsize
+					return false;
+				}
+			}
+		}//shapes
+	}//neighbours
 	return true;
 }
 
 
 
+	/*
+   * Returns the quality of the signal snet from sensorPos, received at targetPos
+   * quality is 0 if the distance is too high, the angle too big 
+   */
+double Sensor::calculateQuality(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, slWorldObject* target = NULL){
 
+	/*
+	   map <string, UserSensor*>::iterator iter = sensors.find(name);
+	if(iter == sensors.end()){
+		slMessage(DEBUG_ALL,"Sensor %s not found", sensorType);
+		return -1;
+	}
+	*/
+	double quality = 233;
+	int verbose = 0	;
+	slVector dist;
+	slVector middleDirection;
+	
+	slVectorSub(targetLoc, &sensorPos->location, &dist);
+	double distance = slVectorLength(&dist);
+	quality = apply_distance_factor(quality,  distance);
+	//slMessage(DEBUG_ALL,"distance:%f quality:%f \n", distance, quality);
+	if (fabs(quality)<0.001){
+			if(verbose>1)slMessage(DEBUG_ALL,"distance too big!\n");
+		return 0;
+	}
+	double angle = 0;
+	int middle;
+	middle = rows/2;
+	slVectorXform(sensorPos->rotation, &rayDirections[middle][middle], &middleDirection);
+	angle = slVectorAngle(&middleDirection, &dist);
+	quality = apply_azimut_factor(quality, angle);
+	//slMessage(DEBUG_ALL,"angle:%f quality:%f \n", angle, quality);
+	if (fabs(quality)<0.001){
+			if(verbose>1)slMessage(DEBUG_ALL,"angle does not fit!\n");
+			return 0;
+	}
+	if(freePath(neighbors, sensorPos, targetLoc, target)){
+		if(verbose>0)slMessage(DEBUG_ALL,"quality path free\n");
+
+		return quality;
+	}else {
+		if(verbose>0)slMessage(DEBUG_ALL,"quality path blocked\n");
+		return 0;
+	}
+
+}
+
+double calculateQuality2(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, std::string sensorType, slWorldObject* target = NULL){
+	Sensor* s;
+	s = SensorBuilder::getUserSensor(sensorType.c_str());
+	if(s!=NULL){
+		return s->calculateQuality(neighbors, sensorPos, targetLoc, target);
+	}else{
+		slMessage(DEBUG_ALL, "sensor.cc: Sensor: ");
+		slMessage(DEBUG_ALL, sensorType.c_str());
+		slMessage(DEBUG_ALL, " is not yet created.\n");
+	}
+	return -1;
+}

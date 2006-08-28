@@ -1,0 +1,160 @@
+@define DISABLE 0.
+@define CRUISE 1.
+@define STANDANDSEND 2.
+@define TURNLEFT 3.
+@define TURNRIGHT 4.
+@define STRAIGHT 5.
+@define SOURCE 6.
+@define SINK 7.
+@define TEST 8.
+@define AVOID 9.
+
+@define DISTANCE 20.
+@define AZIMUT 21.
+@define INCIDENCE 22.
+
+@use basicAgent.
+
+basicAgent : testAgent (aka testAgents) {
+	+ variables:
+		df, dlf, drf    (float).
+		draw (object).
+		mode(int).
+		time(float).
+		incidenceRadius(float).
+
+	+ to set-mode mode mod(int):
+		mode = mod.
+
+	+ to set-incidenceRadius radius r(float):
+		incidenceRadius = r.
+
+
+	+ to receiveMessage message message(string) hisSensor hisSensor(int) :
+		mode = DISABLE.
+		self set-color to (0.5, 0.5, 0.5).
+#		i(int).
+#		agents{i} set-color to (i*1.0/10, i*1.0/10, i*1.0/10).
+
+	+ to init:
+		draw = new Drawing.
+		mode = STRAIGHT.
+
+		return self.
+
++ to iterate:
+		dir (vector).
+		vtest (double).
+		draw set-color to (1, 1, 1).
+		vtest = vtest+10.
+		dir = (self get-rotation)*(1,0,0).
+		dir = dir * 30.
+		#draw draw-line from (self get-location)to (self get-location)+dir.
+
+		if(mode == DISABLE):{
+			self set-rotational-velocity to (0, 0, 0).
+			self set-velocity to (0,0,0).		
+			return.
+		}
+		if(mode == STRAIGHT):{
+			self set-rotational-velocity to (0, 0, 0).
+			self set-velocity to (self get-rotation)*(1,0,0).		
+			return.
+		}
+		if(mode == SOURCE):{
+			#send message "source" on-sensor random[6].
+
+			sensors{0} send message "source" on-sensor 0.
+			sensors{1} send message "source" on-sensor 1.
+			sensors{2} send message "source" on-sensor 2.
+			sensors{3} send message "source" on-sensor 3.
+			sensors{4} send message "source" on-sensor 4.
+			sensors{5} send message "source" on-sensor 5.
+			return.
+		}
+		if(mode == SINK):{
+			self set-rotational-velocity to (0, 0, 0).
+			self set-velocity to (0,0,0).		
+			return.
+		}
+
+		if(mode== AVOID):{
+			df  = (sensors{1} get-data).
+			dlf = (sensors{0} get-data).
+			drf = (sensors{2} get-data).
+#			print "avoid: front:", df.
+			if ((df < 40)&&(dlf < 20)&&(drf < 20) ):{
+				self set-rotational-velocity to (0, 0, 0).
+				self set-velocity to (self get-rotation)*(1,0,0).
+				return.
+			}
+			if (dlf > drf) : {
+				mode = TURNRIGHT.
+			} else {
+				mode = TURNLEFT.
+			}
+			return.
+		}
+		
+		if(mode==TURNLEFT):{
+			df  = (sensors{1} get-data).
+			self set-rotational-velocity to (0, 1, 0).
+				self set-velocity to (self get-rotation)*(0.1,0,0).
+			if(df < 15):{mode=AVOID.}
+			return.
+		}
+		
+		if(mode==TURNRIGHT):{
+			df  = (sensors{1} get-data).
+			self set-rotational-velocity to (0, -1, 0).
+				self set-velocity to (self get-rotation)*(0.1,0,0).
+			if(df < 15):{mode=AVOID.}
+			return.
+		}
+
+		if(mode==CRUISE):{
+			self set-rotational-velocity to (0, 0.4-random[0.8], 0).
+			self set-velocity to (self get-rotation)*(1,0,0).		
+		}
+		if(mode==DISTANCE):{
+			df  = (sensors{1} get-data).
+			print df.			
+			self set-rotational-velocity to (0, 0, 0).
+			self set-velocity to (self get-rotation)*(1,0,0).
+		}
+		if(mode==AZIMUT):{
+			time = time +1.
+			printf time.
+			printf " ".
+			df  = (sensors{1} get-data).
+			print df.			
+			self rotate around-axis (0,1,0) by time*(PI/180.0).
+			self set-velocity to (0,0,0).		
+		}
+		if(mode==INCIDENCE):{
+			time = time +1.
+			printf time.
+			printf " ".
+			df  = (sensors{1} get-data).
+			print df.			
+			self move to (incidenceRadius*sin(time*PI/180.0), 1.8, incidenceRadius*cos(time*PI/180.0)).
+			self rotate around-axis (0,1,0) by time*(PI/180.0)+PI/2.
+		}
+		
+#	draw clear.
+#printf "vtest:".
+#print vtest.
+#printf "dir".
+#print dir.
+#		print" ".
+#		printf "left-f :	".
+#		print dlf.
+#		printf "front  :	".
+#		print df.
+#		printf "right-f:	".
+#		print drf.
+
+
+}
+
+

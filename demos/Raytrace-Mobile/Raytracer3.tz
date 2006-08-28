@@ -8,13 +8,17 @@
 
 # include some required breve class files
 
+
 @use Control.
 @use Drawing.
 @use Mobile.
 @use Stationary.
-@define PI 3.141592653.
-@define PI180 0.017453293.
-@define RobotSize 2.5.
+@use IRSensor.
+@use testAgent.
+#@define PI 3.141592653.
+#@define PI180 0.017453293.
+
+
 # First tell the breve engine the name of our controller class
 
 Controller myControl.             
@@ -22,403 +26,132 @@ Controller myControl.
 Control : myControl {
 	+ variables:
 		walkerShape (object).
-		#agents         (object).
+		agent (object).
 		agents (list).
 
 	+ to init:
+		s (object).
 		print "Setting up the simulation.".
-
-		#new TestStage.
-		new DemoStage.
-		self point-camera at (0, 0, 0) from (0, 150, 0).
-    
+		s = new IRSensor.
+		s register-Sensor-TEFT4300.
+		free s.
+		self point-camera at (0, 0, 0) from (0, 100, 0).
 		walkerShape   = (new Cube init-with size (RobotSize, 2.8, RobotSize)).
 
-		agents =  2 new isAgent.
+#		self messageTest-oneSensor.		
+#		self sensorTest-Distance.
+#		self sensorTest-Azimut distance 7.5.
+#		self sensorTest-Incidence distance 12.5.
+		self moveAroundTest.
+
+	+ to moveAroundTest:
+		agentcount(int).
+		i(int).
+		agentcount = 3.
+		agents =  agentcount new testAgent.		
+#		agent = new testAgent.
+#		agent move to (-10,10,-10).
+#		agent set-mode mode AVOID. 421.2 von 756,2 55,7%
+		new DemoStage.
+
+		for i=0, i<agentcount  , i+=1: {
+			agents{i} move to (random[(10, 0, 10)]+(-15, 10, -15)).
+			agents{i} rotate around-axis (0,1,0) by random[360]*PI/360.
+			agents{i} set-mode mode AVOID.
+		}
+		
+	+ to sensorTestInit:
+		new TestStage.
+		agent =  1 new testAgent.
+		self point-camera at (0, 0, 0) from (0, 200, 0).
+
+	+ to sensorTest-Distance:
+		self sensorTestInit.
+		agent set-mode mode DISTANCE.
+		agent move to (0, 10, 50).
+		agent rotate around-axis (0,1,0) by PI/2.
+		agent set-velocity to (agent get-rotation)*(1,0,0).
+
+	+ to sensorTest-Azimut distance dist(float):
+		self sensorTestInit.
+		agent set-mode mode AZIMUT.
+		#-15+robotsize/2 ,0 sind waende
+		agent move to (-40, 10, -dist).
+		
+	+ to sensorTest-Incidence distance dist(float):
+		self sensorTestInit.
+		agent set-mode mode INCIDENCE.
+		agent set-incidenceRadius radius (dist + (1+RobotSize)/2.0). # 1= wanddicke
+
+	+ to messageTest-block:
+		radius(int).
+		i(int).
+		agentcount(int).
+		agentcount = 120.
+		radius = 40.
+		agents =  (agentcount+5) new testAgent.		
+
+		for i=0, i<agentcount  , i+=1: {
+			agents{i} move to (radius*sin((360.0/agentcount)*i*PI/180.0), 0, radius*cos((360.0/agentcount)*i*PI/180.0)).
+			agents{i} rotate around-axis (0,1,0) by ((360.0/agentcount)*i*PI/180.0 + PI/2.0).
+			agents{i} set-mode mode STRAIGHT.
+		}
+		agents{agentcount} move to (0, 0, 0).
+		agents{agentcount} rotate around-axis (0,-1,0) by (PI/2.0).
+		agents{agentcount} set-mode mode SOURCE.
+
+ 		agents{agentcount+1} set-mode mode DISABLE.
+		agents{agentcount+1} move to (3, 0, -6).
+		agents{agentcount+2} set-mode mode DISABLE.
+		agents{agentcount+2} move to (1, 0, -6).
+		agents{agentcount+3} set-mode mode DISABLE.
+		agents{agentcount+3} move to (-1, 0, -6).
+		agents{agentcount+4} set-mode mode DISABLE.
+		agents{agentcount+4} move to (-3, 0, -6).
+
+	+ to messageTest-allSensors:
+		radius(int).
+		i(int).
+		agentcount(int).
+		agentcount = 60.
+		radius = 40.
+		agents =  (agentcount+1) new testAgent.		
+
+		for i=0, i<agentcount  , i+=1: {
+			agents{i} move to (radius*sin((360.0/agentcount)*i*PI/180.0), 0, radius*cos((360.0/agentcount)*i*PI/180.0)).
+			agents{i} rotate around-axis (0,1,0) by ((360.0/agentcount)*i*PI/180.0 + PI/2.0).
+			agents{i} set-mode mode STRAIGHT.
+		}
+		agents{agentcount} move to (0, 0, 0).
+		agents{agentcount} rotate around-axis (0,-1,0) by (PI/2.0).
+		agents{agentcount} set-mode mode SOURCE.
+
+	+ to messageTest-oneSensor:
+		radius(int).
+		i(int).
+		j(int).
+		agentcount(int).
+		agentcount = 40.
+		radius = 40.
+		agents =  (agentcount+1) new testAgent.		
+
+		for i=0, i<agentcount , i+=1: {
+			j= i+20.
+			agents{i} move to (radius*sin((360.0/(agentcount+40))*j*PI/180.0), 0, radius*cos((360.0/(agentcount+40))*j*PI/180.0)).
+			agents{i} rotate around-axis (0,1,0) by ((360.0/(agentcount+40))*j*PI/180.0 + PI/2.0).
+			agents{i} set-mode mode STRAIGHT.
+		}
+		agents{agentcount} move to (0, 0, 10).
+		agents{agentcount} rotate around-axis (0,-1,0) by (PI/2.0).
+		agents{agentcount} set-mode mode SOURCE.
 
 
-	+ to iterate:
++ to iterate:
 		super iterate.
 		self update-neighbors.
 
 	+ to get-walker-shape:
 		return walkerShape.
-}
-
-Mobile : isAgent (aka isAgents) {
-	+ variables:
-		shapee        (object).
-		sensors		(list).
-		sensor_front  (object).
-		sensor_left_fr   (object).
-		sensor_right_fr  (object).
-		hoodSize      (float).
-		df, dlf, drf    (float).
-		test (float).
-		draw (object).
-		mode(int).
-		time(float).
-
-	+ to sensor-for location location(vector):
-		angle (float).
-		i (int).
-		sensor(object).
-		toSensor, transDir (vector).
-		i = 0.
-		foreach sensor in (sensors) : {
-			transDir = (self get-rotation) * (sensor get-direction).
-			toSensor = (location) - (self get-location).
-			angle = angle(toSensor, transDir).
-			if(angle < (sensor get-sensorAngle)):{ return i.}
-			i++.
-		}
-		print "no sensor for this direction".
-		i=0.
-		foreach sensor in (sensors) : {
-			transDir = (self get-rotation) * (sensor get-direction).
-			toSensor = (location) - (self get-location).
-			angle = angle(toSensor, transDir).
-			if(angle < (sensor get-sensorAngle)):{ return i.}
-			i++.
-			print "transdir: $transDir".
-			print "toSensor: $toSensor".
-			print "angle: $angle".
-			
-		}
-		
-		return -1.
-	+ to get-pointer:
-		return realWorldPointer.
-
-	+ to detect-Agent at-Sensor mySensor(int) :
-	
-		agent(object).
-		foreach agent in (all isAgent) : {	
-			if (agent != self):{
-				if (sensors{mySensor} can-see the agent):{
-				
-					draw set-color to (0, 1, 0).
-				#	draw draw-line from (self get-location)to (agent get-location).
-					
-					return (agent sensor-for location (self get-location)).
-				}
-			}
-		}
-		#nobody there
-		return -1.
-		
-		
-	+ to sendMessage message message(string) mySensor mySensor(int):
-	
-	+ to receiveMessage message message(string) mySensor mySensor(int) hisSensor hisSensor(int) :
-	
-	+ to createSensor:
-	  	distance (list).
-		distance_factor (list).
-		distance_length(int).
-		azimut (list).
-		azimut_factor (list).
-		azimut_length(int).
-		incidence (list).
-		incidence_factor (list).
-		incidence_length(int).
-		rows(int).
-		columns(int).
-		maxrange (double).
-		maxangle(double).
-		rows = 5.
-		columns = rows.
-		maxrange = 30.
-		maxangle = 60/3.1415 * 180.
-# * SensorBuilder::createSensor(const char* name, const int rows, const int columns, const double max_range, const double max_angle, 
-#	*			const int distance_length, const double* distance, const double* distance_factor,
-#	*			const int azimut_length, const double* azimut, const double* azimut_factor,
-#	*			const int incidence_length, const double* incidence, const double* incidence_factor){
-		distance =        { 0,    2.5,      5,    7.5,     10,  12.5,     15,   17.5,     20,    22.5,     25,    30,     35, 40, 50, 60 }.
-
-#f(x) = atan(1/x**2) max =233 s=
-distance_factor = {	1.000000000,
-0.525144900,
-0.168223523,
-0.076190356,
-0.042997372,
-0.027543040,
-0.019133291,
-0.014059060,
-0.010764692,
-0.008505740,
-0.006889790,
-0.004784673,
-0.000,
-0.000}.
-
-		distance_length = 16.
-		azimut =		{-65*PI180, -60*PI180,  -30*PI180, -20*PI180,   -10*PI180,    0*PI180,    10*PI180,  20*PI180,   30*PI180, 60*PI180, 65*PI180}.
-		#azimut_factor = {  0,   0, 0.6, 0.8, 0.9, 1, 0.9, 0.8, 0.6,  0, 0 }.
-#		azimut_factor = {  0,   0, 0.6,   0.83, 0.95, 1.0, 0.95,   0.83, 0.6,  0, 0 }.
-#		azimut_factor = {  0,   0, 0.8,   1.03, 1.15, 1.2, 1.15,   1.03, 0.8,  0, 0 }.
-		azimut_factor = {  0,   0, 0.55,   0.80, 0.97, 1.0, 0.97,   0.80, 0.55,  0, 0 }.
-
-		azimut_length = 11. 
-		incidence ={-100*PI180, -90*PI180, -80*PI180, -70*PI180,  -60*PI180, -50*PI180, -40*PI180, -30*PI180, -20*PI180, -10*PI180, 0*PI180, 10*PI180, 20*PI180, 30*PI180, 40*PI180, 50*PI180, 60*PI180, 70*PI180, 80*PI180 ,90*PI180, 100*PI180}.
-
-		incidence_factor = {0.0, 0.0, 0.1143, 0.2857, 0.3571, 0.5000, 0.6429, 0.7143, 0.7857, 0.9286, 1.0, 0.9286, 0.7857, 0.7143, 0.6429, 0.5, 0.3571,0.2857, 0.1143, 0.0, 0.0}.
-		incidence_length = 21.
-
-		print "Raytracer: Creating sensor...".
-		createUserSensor("USERTEST", rows, columns, maxrange, maxangle,
-						distance_length, distance, distance_factor,
-						azimut_length, azimut, azimut_factor,
-						incidence_length, incidence, incidence_factor).
-		print "...sensor created!".
-
-		print "Raytracer: Creating sensor...".
-		createUserSensor("USERTEST", rows, columns, maxrange, maxangle,
-						distance_length, distance, distance_factor,
-						azimut_length, azimut, azimut_factor,
-						incidence_length, incidence, incidence_factor).
-		print "...sensor created!".
-
-	+ to init:
-		self createSensor.
-		draw = new Drawing.
-		shapee = (controller get-walker-shape).
-		self set-shape to shapee.
-		self set-color to (0,1,0.3).
-		self move to random[(15, 0, 15)]+(0,1.8,0). 
-		mode = 5.
-		hoodSize = 50.
-		sensors{0} = (new Sensor init-with id 0 direction (1, 0, 0) max-distance hoodSize and-owner self).
-		sensors{1} = (new Sensor init-with id 1 direction (0.5, 0, 0.87) max-distance hoodSize and-owner self).
-		sensors{2} = (new Sensor init-with id 2 direction (0.5, 0, -0.87) max-distance hoodSize and-owner self).
-		sensors{3} = (new Sensor init-with id 3 direction (-1, 0, 0) max-distance hoodSize and-owner self).
-		sensors{4} = (new Sensor init-with id 4 direction (-0.5, 0, 0.87) max-distance hoodSize and-owner self).
-		sensors{5} = (new Sensor init-with id 5 direction (-0.5, 0, -0.87) max-distance hoodSize and-owner self).
-		
-		sensor_front    = (new Sensor init-with id 0 direction (1, 0, 0) max-distance hoodSize and-owner self).
-		sensor_right_fr = (new Sensor init-with id 1 direction (0.5, 0, 0.87) max-distance hoodSize and-owner self).
-		sensor_left_fr = (new Sensor init-with id 2 direction (0.5, 0, -0.87) max-distance hoodSize and-owner self).
-
-		#self move to (0,-1.8 ,0).
-	#	self rotate around-axis (0,1,0) by random[6.2].
-
-		self set-neighborhood-size to hoodSize.
-
-		#self show-neighbor-lines.
-
-
-
-		return self.
-
-	+ to iterate:
-		s0,s1,s2,s3,s4,s5(int).
-		dir (vector).
-		vtest (double).
-		qtest (double).
-		qtest2(double).
-		robots (list).
-		i(object).
-
-		robots = all isAgent.
-#		vtest = irSense(realWorldPointer, (self get-location), ((self get-rotation)*[(0,0,1),(0,1,0),(1,0,0)]), "RAY").
-#		vtest = irSense(realWorldPointer, (self get-location),((self get-rotation)*[(0,0,1),(0,1,0),(1,0,0)]) , "PROXIMITY").
-#print "Raytracer: start sensing...".
-
-		vtest = irSense(realWorldPointer, (self get-location),((self get-rotation)*[(0,0,1),(0,1,0),(1,0,0)]) , "USERTEST").
-		foreach i in robots: {
-			if(i!=self):{
-			qtest = calculateQualityToLocation(realWorldPointer,	(self get-location),((self get-rotation)*[(0,0,1),(0,1,0),(1,0,0)]) ,(i get-location), "USERTEST").
-			qtest2 = calculateQualityToObject(realWorldPointer,	(self get-location),((self get-rotation)*[(0,0,1),(0,1,0),(1,0,0)]) ,(i get-pointer) , "USERTEST").
-			#draw draw-line from (self get-location)to (i get-location).
-			}
-		}
-
-# print vtest.
-		print "\nq:",qtest.
-		print "q2:",qtest2.
-
-#print "Raytracer: ...sensing done".
-
-#print ((self get-rotation)*(0,1,0)).
-		draw set-color to (1, 1, 1).
-		vtest = vtest+10.
-		dir = (self get-rotation)*(1,0,0).
-		dir = dir * 30.
-	
-#draw draw-line from (self get-location)to (self get-location)+dir.
-
-		dlf = (sensor_left_fr get-data).
-		df = (sensor_front get-data).
-		drf = (sensor_right_fr  get-data).
-
-#printf "vtest:".
-#print vtest.
-#printf "dir".
-#print dir.
-
-		# printf "left-f: ".
-		# print dlf.
-		# printf "front: ".
-		# print df.
-		# printf "right-f: ".
-		# print drf.
-if(mode==0):{
-	self set-rotational-velocity to (0, 0, 0).
-	self set-velocity to (self get-rotation)*(1,0,0).		
-}
-if(mode==1):{
-#-15 ,0 sind waende
-	self move to (-40, 1.8, -7.5).
-	self set-rotational-velocity to (0, 0, 0).
-	self set-velocity to (0,0,0).		
-	mode = 2.
-}
-if(mode==2):{
-	time = time +1.
-	printf time.
-    printf " ".
-	self relative-rotate around-axis (0,1,0) by (PI/180.0).
-	self set-velocity to (0,0,0).		
-}
-if(mode==3):{
-	self relative-rotate around-axis (0,1,0) by (0.5 *PI).
-	mode = 4.
-}
-
-if(mode==4):{
-	time = time +1.
-	printf time.
-    printf " ".
-	self move to ((10.0+RobotSize/2.0)*sin(time*PI/180.0), 1.8, (10.0+RobotSize/2.0)*cos(time*PI/180.0)).
-#	self set-rotation to ()
-	self relative-rotate around-axis (0,1,0) by (PI/180.0).
-
-#	self point vertex (1,0,0) at (10, 10, 0).
-}
-if(mode==5):{
-		if (dlf > 0 && df > 0 && drf > 0) : {
-			self set-rotational-velocity to (0, 0, 0).
-			self set-velocity to (self get-rotation)*(1,0,0).		
-		} else {
-			if (dlf > drf) : {
-				self set-rotational-velocity to (0, 1, 0).
-				self set-velocity to (0,0,0).		
-			} else {
-
-				self set-rotational-velocity to (0, -1, 0).
-				self set-velocity to (0,0,0).		
-			}
-		}  
-	}
-#	draw clear.
-		
-		# eigentlich darf man diese fkt nur einmal aufrufen
-		# es kann immer nur auf einem sensor gesucht werden
-		# sonst sollte man die fkt umschreiben detect-All-Agents
-		
-		s0 = self detect-Agent at-Sensor 0.
-		s1 = self detect-Agent at-Sensor 1.
-		s2 = self detect-Agent at-Sensor 2.
-		s3 = self detect-Agent at-Sensor 3.
-		s4 = self detect-Agent at-Sensor 4.
-		s5 = self detect-Agent at-Sensor 5.
-		
-#		if(-1 != s0):{
-#			print s0.
-#		}
-		
-}
-
-Abstract : Sensor {
-	+ variables:
-		direction (vector).
-		sensorAngle(float).
-		owner     (object).
-		maxDist   (float).
-		draw      (object).	 
-		id        (double).
-
-	+ to init-with id theID (double) direction theDirection (vector) max-distance theMaxDistance (float) and-owner theOwner (object):
-		direction = theDirection/|theDirection|.
-		owner     = theOwner.
-		maxDist   = theMaxDistance.
-		id        = theID.
-		sensorAngle = 60*PI/180.0.
-		draw = new Drawing.
-		return self.
-		
-		
-
-	+ to can-see the item (object):
-		angle (float).
-		bestHit, hit, toItem, transDir (vector).
-		min (float).
-		min = 999999999.
-
-		draw clear.
-		transDir = (owner get-rotation) * direction.
-		toItem = (item get-location) - (owner get-location).
-		angle = angle(toItem, transDir).
-		if angle > sensorAngle: {return 0.}
-		if maxDist < |toItem|: {return 0.}
-		#raytracen um zu sehen ob wir den anderen sehen können
-		
-		foreach item in (owner get-neighbors) : {	
-			hit = (item raytrace from-location (owner get-location) with-direction (toItem)).
-			if ((hit != (0,0,0)) && (|hit| < min)) :  {
-				min = |hit|. 
-				bestHit = hit.
-			}
-		}
-
-	
-		
-		# there must be a obstacle blocking our sensor
-		if(|bestHit - toItem|>3):{
-			draw set-color to (.5, 0, .5).
-			#draw draw-line from (owner get-location) to ((owner get-location) + bestHit).
-			return 0.
-		}
-		
-		return 1.
-		
-	
-	
-	+ to get-data:
-		item (object).
-		world_dir (vector).
-		location  (vector).
-		hit (vector).
-		min (float).
-		mat (matrix).
-		bestHit (vector).
-
-		min = maxDist + 1.
-
-		mat = (owner get-rotation).
-
-		world_dir = mat*direction.
-		location  = (owner get-location).
-
-		foreach item in (owner get-neighbors) : {		 
-			hit = (item raytrace from-location location with-direction world_dir).
-			if ((hit != (0,0,0)) && (|hit| < min)) :  {
-				min = |hit|. 
-				bestHit = hit.
-			}
-		}
-
-		draw clear.
-
-		draw set-color to (1, 0, 0).
-		draw draw-line from location to (location + bestHit).
-
-		return (min + (random[7] - 3.5)).
-		
-	+ to get-direction:
-		return direction.
-	+ to get-sensorAngle:
-		return sensorAngle.
 }
 
 @define FLOOR_Y 0.1.
@@ -1393,12 +1126,12 @@ Object : TestStage {
 		wall-shape-test = (new Cube init-with size (10, 20,  1)).
 
 		wallT = new Stationary.
-		wallT register with-shape wall-shape-test at-location (-40, 10, -15).
+		wallT register with-shape wall-shape-test at-location (-40, 10, -15-(RobotSize+1)/2). # +1 wegen wanddicke
 		wallT set-e to BOUNCE.
 		wallT set-color to COLOR.
 
 		wallT = new Stationary.
-		wallT register with-shape wall-shape-test at-location (-40, 10, 0).
+		wallT register with-shape wall-shape-test at-location (-40, 10, (RobotSize+1)/2). # +1 wegen wanddicke
 		wallT set-e to BOUNCE.
 		wallT set-color to COLOR.
 

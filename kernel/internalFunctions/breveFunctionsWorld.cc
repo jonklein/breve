@@ -869,20 +869,51 @@ int brIRaytrace(brEval args[], brEval *target, brInstance *i) {
 
 */
 int brIIRSense(brEval args[], brEval *target, brInstance *i) {
-//	
 	slPosition sensorPos;
 	slWorldObject *o    = BRWORLDOBJECTPOINTER(&args[0]);
 	sensorPos.location = BRVECTOR(&args[1]); 
 	slMatrixCopy(BRMATRIX(&args[2]), sensorPos.rotation); 
 
-	// Hier Matrix übergeben
 	double result = o->irSense(&sensorPos, BRSTRING(&args[3]));
-
+	if (result == -1){
+		return EC_ERROR;
+	}
 	target->set( result );
-	//TODO exceptions
-	//        slMessage(DEBUG_ALL, "Error!\n");
 
-	//if (error == -2) return EC_ERROR;
+	return EC_OK;
+}
+
+//double slWorldObject::calculateQuality(slPosition* sensorPos, slVector* targetLoc, std::string sensorType){
+int brIcalculateQualityToLoc(brEval args[], brEval *target, brInstance *i) {
+	slVector targetLoc;
+	slPosition sensorPos;
+	slWorldObject *o    = BRWORLDOBJECTPOINTER(&args[0]);
+	sensorPos.location = BRVECTOR(&args[1]); 
+	slMatrixCopy(BRMATRIX(&args[2]), sensorPos.rotation); 
+	targetLoc = BRVECTOR(&args[3]);
+	double result = o->calculateQuality(&sensorPos, &targetLoc, BRSTRING(&args[4]));
+	if (result == -1){
+		return EC_ERROR;
+	}
+	target->set( result );
+
+	return EC_OK;
+}
+
+//double slWorldObject::calculateQualityToObj(slPosition* sensorPos, slVector* targetLoc, std::string sensorType){
+int brIcalculateQualityToObj(brEval args[], brEval *target, brInstance *i) {
+	slWorldObject *targetObj;
+	slVector targetLoc;
+	slPosition sensorPos;
+	slWorldObject *o    = BRWORLDOBJECTPOINTER(&args[0]);
+	sensorPos.location = BRVECTOR(&args[1]); 
+	slMatrixCopy(BRMATRIX(&args[2]), sensorPos.rotation); 
+	targetObj = BRWORLDOBJECTPOINTER(&args[3]);
+	double result = o->calculateQuality(&sensorPos, &targetLoc,  BRSTRING(&args[4]), targetObj);
+	if (result == -1){
+		return EC_ERROR;
+	}
+	target->set( result );
 
 	return EC_OK;
 }
@@ -898,7 +929,6 @@ double* listToDoubleArray(const brEvalListHead* list){
 //	printf("listcount: %d\n", list->count);
 	double* result = (double*)malloc(v.size() * sizeof(double));
 
-//		ew double[list->count];
 	for(unsigned int i=0; i< v.size(); i++){
 		if(v[i]->type() == AT_DOUBLE){
 			result[i] = v[i]->getDouble();
@@ -947,24 +977,16 @@ int brICreateUserSensor(brEval args[], brEval *target, brInstance *i) {
 	list = BRLIST(&args[13]);
 	incidence_factor = listToDoubleArray(list);
 
-	int error = 0;
-
+	//rows = columns and odd
+	if((BRINT(&args[1])!=BRINT(&args[2]))||(BRINT(&args[1])%2!=1)){
+		 slMessage(0, "Error creating a UserSensor: rows!=columns or rows=even");
+		 return EC_ERROR;
+	}
 	SensorBuilder::createUserSensor(BRSTRING(&args[0]), BRINT(&args[1]), BRINT(&args[2]), BRDOUBLE(&args[3]), BRDOUBLE(&args[4]), 
 				BRINT(&args[5]), distance, distance_factor,
 				BRINT(&args[8]), azimut, azimut_factor,
-				BRINT(&args[11]), incidence, incidence_factor, error);
+				BRINT(&args[11]), incidence, incidence_factor);
 
-	if(error != 0){
-		 slMessage(0, "Error creating a UserSensor: ");
-		 if (error == -1){
-
-		 }else if (error ==-2){
-
-		 }else{
-			slMessage(0, "Unknown Error\n");
-		 }
-		 return EC_ERROR;
-	}
 	return EC_OK;
 }
 
@@ -1049,6 +1071,9 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "raytrace", brIRaytrace, AT_VECTOR, AT_POINTER, AT_VECTOR, AT_VECTOR, 0);
 	
 	brNewBreveCall(n, "irSense", brIIRSense, AT_DOUBLE, AT_POINTER, AT_VECTOR, AT_MATRIX, AT_STRING, 0);
+	brNewBreveCall(n, "calculateQualityToLocation", brIcalculateQualityToLoc, AT_DOUBLE, AT_POINTER, AT_VECTOR, AT_MATRIX, AT_VECTOR, AT_STRING,0);
+	brNewBreveCall(n, "calculateQualityToObject", brIcalculateQualityToObj, AT_DOUBLE, AT_POINTER, AT_VECTOR, AT_MATRIX, AT_POINTER, AT_STRING,0);
+
 	brNewBreveCall(n, "createUserSensor", brICreateUserSensor, AT_NULL, AT_STRING, AT_INT, AT_INT, AT_DOUBLE, AT_DOUBLE,
 																 AT_INT, AT_LIST, AT_LIST,
 																 AT_INT, AT_LIST, AT_LIST,

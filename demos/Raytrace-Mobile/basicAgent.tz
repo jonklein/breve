@@ -1,0 +1,66 @@
+@define RobotSize 2.5.
+
+Mobile : basicAgent (aka basicAgents) {
+	+ variables:
+		shapee        (object).
+		sensors		(list).
+		hoodSize      (float).
+		draw (object).
+		
+	+ to get-realWorldPointer:
+		return realWorldPointer.
+
+	+ to send message message(string) on-sensor mySensor(int):
+		sensors{mySensor} send message message.
+
+
+	+ to receiveMessage message message(string) hisSensor hisSensor(int) :
+
+	+ to init:
+		rotation(matrix).
+		right60(matrix).
+		left150(matrix).
+		draw = new Drawing.
+		shapee = (controller get-walker-shape).
+		self set-shape to shapee.
+		self set-color to (0,1,0.3).
+		hoodSize = 50.
+		self set-neighborhood-size to hoodSize.
+		
+		rotation = [(1,0,0),(0,1,0),(0,0,1)].
+		right60 = [(cos(PI/3),0,-sin(PI/3)),(0,1,0),(sin(PI/3),0,cos(PI/3))].
+		left150 = [(cos(-PI*5/6),0,-sin(-PI*5/6)),(0,1,0),(sin(-PI*5/6),0,cos(-PI*5/6))].
+
+		#          \         /
+		#           \   1   /
+		#        0   \     /  2
+		#             \+=+/ 
+		#       -------| |-------
+		# x           /+=+\ 
+		# ^      5   /     \  3
+		# |         /   4   \
+		# |        /         \
+		# |
+		# |
+		# +-------------------> z
+		# the sensors point in z direction
+		
+		rotation = rotation*left150.
+		sensors{0} = (new IRSensor init-with type "TEFT4300" rel-position (RobotSize/2.0, 0,-RobotSize/2.0) rel-rotation rotation owner self).
+		rotation = rotation*right60.
+		sensors{1} = (new IRSensor init-with type "TEFT4300" rel-position (RobotSize/2.0, 0, 0) rel-rotation rotation owner self).
+		rotation = rotation*right60.
+		sensors{2} = (new IRSensor init-with type "TEFT4300" rel-position (RobotSize/2.0, 0, RobotSize/2.0) rel-rotation rotation owner self).
+		rotation = rotation*right60.
+		sensors{3} = (new IRSensor init-with type "TEFT4300" rel-position (-RobotSize/2.0, 0, RobotSize/2.0) rel-rotation rotation owner self).
+		rotation = rotation*right60.
+		sensors{4} = (new IRSensor init-with type "TEFT4300" rel-position (-RobotSize/2.0, 0 ,0) rel-rotation rotation owner self).
+		rotation = rotation*right60.
+		sensors{5} = (new IRSensor init-with type "TEFT4300" rel-position (-RobotSize/2.0, 0, -RobotSize/2.0) rel-rotation rotation owner self).
+
+		return self.
+
+
+}
+
+
