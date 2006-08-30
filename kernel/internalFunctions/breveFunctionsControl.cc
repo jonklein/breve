@@ -368,8 +368,9 @@ int brIGetArgc(brEval args[], brEval *target, brInstance *i) {
 */
 
 int brIGetArgv(brEval args[], brEval *target, brInstance *i) {
-	if(BRINT(&args[0]) < 0 || BRINT(&args[0]) >= i->engine->argc) {
+	if( BRINT(&args[0]) < 0 || BRINT(&args[0]) >= i->engine->argc ) {
 		slMessage(DEBUG_ALL, "Request for command-line input argument %d is out of range\n", i->engine->argc);
+		target->set( "" );
 		return EC_ERROR;
 	}
 

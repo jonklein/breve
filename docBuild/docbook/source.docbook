@@ -84,13 +84,12 @@ or <function>findMethod</function> callbacks.
 <listitem>
 <para>
 <function>findMethod</function>: locate a method for a class by name and argument count.
-	<screen>void *(*findMethod)(brObject *object, char *name, unsigned char *types, int nargs);</screen>
+	<screen>void *(*findMethod)( void *userObjectData, char *name, unsigned char *types, int nargs);</screen>
 </para>
 <para>
-When breve needs to call a method in an object, it will be looke up using this callback.  
+When breve needs to call a method in an object, it will be looked up using this callback.  
 The <function>object</function> argument refers to the object in which the method can
-be found&mdash;it contains the pointer returned by your <function>findObject</function>
-callback in the pointer field.
+be found&mdash;it is the pointer returned by your <function>findObject</function>.
 </para>
 <para>
 The nargs argument gives the number of arguments that will be passed to the method,
@@ -102,7 +101,7 @@ and the types argument contains the argument types.  The types are described in
 <listitem>
 <para>
 <function>callMethod</function>: trigger a method call in the frontend language.
-	<screen>int (*callMethod)(brInstance *instancePointer, brMethod *method, brEval **arguments, brEval *result);</screen>
+	<screen>int (*callMethod)( void *userInstancePointer, brMethod *method, brEval **arguments, brEval *result);</screen>
 </para>
 <para>
 The breve engine will need to trigger method calls in the frontend language for a number
@@ -127,14 +126,23 @@ argumentCount field.
 <listitem>
 <para>
 <function>instantiate</function>: create an instance of an object.
-	<screen>void *(*instantiate)(brObject *object, brEval **constructorArgs, int argCount);</screen>
+	<screen>void *(*instantiate)( void *object, brEval **constructorArgs, int argCount);</screen>
+</para>
+<para>
+This method is used by the breve engine to create new instances of objects in your 
+language frontend when required. 
+</para>
+<para>
+The <function>object</function> argument refers to the object in which the method can
+be found&mdash;it is the pointer returned by your <function>findObject</function>
+callback in the pointer field.
 </para>
 </listitem>
 
 <listitem>
 <para>
 <function>isSubclass</function>: determine whether a class is a subclass of another.
-	<screen>int (*isSubclass)(brObject *class1, brObject *class2);</screen>
+	<screen>int (*isSubclass)( void *userClass1Data, void *userClass2Data );</screen>
 </para>
 <para>
 In order to correctly handle certain interactions like collisions, the breve engine needs to
@@ -150,7 +158,7 @@ This callback is given two breve object pointers, and must return 1 if
 <listitem>
 <para>
 <function>destroyObject:</function> release memory allocated by your <function>findObject</function> callback.
-	<screen>void (*destoryObject)(void *objectData);</screen>
+	<screen>void (*destoryObject)( void *userObjectData );</screen>
 If your <function>findObject</function> callback allocates memory, this callback should release that memory.
 </para>
 </listitem>
@@ -158,7 +166,7 @@ If your <function>findObject</function> callback allocates memory, this callback
 <listitem>
 <para>
 <function>destroyInstance:</function> release memory allocated by your <function>instantiate</function> callback.
-	<screen>void (*destoryInstance)(void *instanceData);</screen>
+	<screen>void (*destoryInstance)( void *userInstanceData );</screen>
 If your <function>instantiate</function> callback allocates memory, this callback should release that memory.
 </para>
 </listitem>
@@ -166,7 +174,7 @@ If your <function>instantiate</function> callback allocates memory, this callbac
 <listitem>
 <para>
 <function>destroyMethod:</function> release memory allocated by your <function>findMethod</function> callback.
-	<screen>void (*destoryMethod)(void *methodData);</screen>
+	<screen>void (*destoryMethod)( void *userMethodData );</screen>
 If your <function>findMetho</function> callback allocates memory, this callback should release that memory.
 </para>
 </listitem>
@@ -198,18 +206,18 @@ a <function>brObjectType</function> structure which contains the proper callback
 The structure is shown below.
 <screen>
 struct brObjectType {
-    void *(*findMethod)(brObject *object, char *name, unsigned char *types, int nargs);
-    void *(*findObject)(brObjectType *type, char *name);
-    void *(*instantiate)(brObject *object, brEval **constructorArgs, int argCount);
+    void *(*findMethod)( void *object, char *name, unsigned char *types, int nargs );
+    void *(*findObject)( brObjectType *type, char *name );
+    void *(*instantiate)( void *object, brEval **constructorArgs, int argCount );
 
-    int (*callMethod)(brInstance *instance, brMethod *method, brEval **arguments, brEval *result);
+    int (*callMethod)( void *instance, brMethod *method, brEval **arguments, brEval *result );
 
-    int (*isSubclass)(brObject *class1, brObject *class2);
+    int (*isSubclass)( void *class1, void *class2 );
 
-    void (*destroyObject)(brObject *object);
-    void (*destoryMethod)(brMethod *method);
-    void (*destroyInstance)(brInstance *instance);
-    void (*destroyObjectType)(brObjectType *objectType);
+    void (*destroyObject)( void *object );
+    void (*destoryMethod)( void *method );
+    void (*destroyInstance)( void *instance );
+    void (*destroyObjectType)( brObjectType *objectType );
 
     void *data;
 };
@@ -220,7 +228,7 @@ Only one <function>brObjectType</function> is required for each language fronten
 Once the language frontend is defined, you can add it to the engine with the following
 function:
 <screen>
-void brEngineRegisterObjectType(brEngine *engine, brObjectType *type);
+void brEngineRegisterObjectType( brEngine *engine, brObjectType *type );
 </screen>
 </para>
 </sect2>

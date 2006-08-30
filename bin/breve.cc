@@ -103,16 +103,18 @@ int main(int argc, char **argv) {
 
 	index = brParseArgs(argc, argv);
 
+	char *execpath = argv[ 0 ];
+
 	// offset argc and argv to account for the options parsed out 
 
 	argc -= index;
 	argv += index;
 
 	if (!gOptionStdin) {
-		if (argc < 2) brPrintUsage(argv[0]);
+		if ( argc < 1 ) brPrintUsage( execpath );
 
-		text = slUtilReadFile(argv[1]);
-		simulationFile = argv[1];
+		text = slUtilReadFile( argv[0] );
+		simulationFile = argv[0];
 	} else {
 		text = slUtilReadStdin();
 		simulationFile = "<stdin>";
@@ -374,7 +376,6 @@ int brParseArgs(int argc, char **argv) {
 			break;
 		case 'u':
 			gPaused = 0;
-			glutIdleFunc(brGlutLoop);
 			break;
 		case 'v':
 			brPrintVersion();
@@ -402,7 +403,7 @@ int brParseArgs(int argc, char **argv) {
 
 	if (error) brPrintUsage(name);
 
-	return optind - 1;
+	return optind;
 }
 
 void brPrintUsage(const char *name) {
@@ -454,6 +455,8 @@ void slInitGlut(int argc, char **argv, char *title) {
 	glutIgnoreKeyRepeat( 1 );
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	if( !gPaused ) glutIdleFunc(brGlutLoop);
 }
 
 void slDemoReshape(int x, int y) {

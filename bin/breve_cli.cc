@@ -85,18 +85,20 @@ int main(int argc, char **argv) {
 
 	index = brParseArgs(argc, argv);
 
+	char *execpath = argv[ 0 ];
+
 	// offset argc and argv to account for the options parsed out.
 
 	argc -= index;
 	argv += index;
 
-	if (argc < 2) brPrintUsage(argv[0]);
+	if ( argc < 1 ) brPrintUsage( execpath );
 
 	//
 	// Initialize the frontend and engine and their associated callbacks.
 	//
 
-	frontend = breveFrontendInit(argc, argv);
+	frontend = breveFrontendInit( argc, argv );
 	frontend->data = breveFrontendInitData(frontend->engine);
 
 	brEngineSetIOPath(frontend->engine, getcwd(wd, MAXPATHLEN));
@@ -104,9 +106,6 @@ int main(int argc, char **argv) {
 	frontend->engine->camera->_activateContextCallback = activateContext;
 
 	frontend->engine->camera->_renderContextCallback = renderContext;
-
-	frontend->engine->argc = argc - 1;
-	frontend->engine->argv = argv + 1;
 
 	frontend->engine->getLoadname = getLoadname;
 	frontend->engine->getSavename = getSavename;
@@ -121,7 +120,7 @@ int main(int argc, char **argv) {
 
 	gOffscreenBuffer = (GLubyte *)slMalloc( OSMESA_WINDOW_SIZE * OSMESA_WINDOW_SIZE * 4 * sizeof(GLubyte));
 
-	if( slLoadOSMesaPlugin( argv[ 0 ] ) ) {
+	if( slLoadOSMesaPlugin( execpath ) ) {
 		slFree( gOffscreenBuffer );
 		gOffscreenBuffer = NULL;
 	}
@@ -132,17 +131,17 @@ int main(int argc, char **argv) {
 	// Load the input file and prepare the simulation.
 	//
 
-	text = slUtilReadFile(argv[1]);
+	text = slUtilReadFile( argv[ 0 ] );
 
 	if (!text) {
-		fprintf(stderr, "Error reading file \"%s\"\n", argv[1]);
+		fprintf( stderr, "Error reading file \"%s\"\n", argv[0] );
 		exit(1);
 	}
 
 	if (gSimFile) {
-		if (breveFrontendLoadSavedSimulation(frontend, text, argv[1], gSimFile) != EC_OK)
+		if ( breveFrontendLoadSavedSimulation( frontend, text, argv[0], gSimFile ) != EC_OK )
 			brQuit(frontend->engine);
-	} else if(breveFrontendLoadSimulation(frontend, text, argv[1]) != EC_OK)
+	} else if( breveFrontendLoadSimulation(frontend, text, argv[0] ) != EC_OK )
 			brQuit(frontend->engine);
 
 	slFree(text);
@@ -281,7 +280,7 @@ int brParseArgs(int argc, char **argv) {
 	if (error)
 		brPrintUsage(argv[0]);
 
-	return optind - 1;
+	return optind;
 }
 
 void brPrintUsage(const char *name) {
