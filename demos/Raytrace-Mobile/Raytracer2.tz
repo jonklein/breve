@@ -234,8 +234,8 @@ distance_factor = {	1.000000000,
 		}
 
 # print vtest.
-		print "\nq:",qtest.
-		print "q2:",qtest2.
+#		print "\nq:",qtest.
+#		print "q2:",qtest2.
 
 #print "Raytracer: ...sensing done".
 

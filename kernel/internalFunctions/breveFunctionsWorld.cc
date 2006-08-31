@@ -923,12 +923,8 @@ int brIcalculateQualityToObj(brEval args[], brEval *target, brInstance *i) {
    * to a double array.
    */
 
-double* listToDoubleArray(const brEvalListHead* list){
+void listToDoubleArray(const brEvalListHead* list, double* result){
 	std::vector< brEval* > v = list->getVector();
-//	brEvalList *start = list->start;
-//	printf("listcount: %d\n", list->count);
-	double* result = (double*)malloc(v.size() * sizeof(double));
-
 	for(unsigned int i=0; i< v.size(); i++){
 		if(v[i]->type() == AT_DOUBLE){
 			result[i] = v[i]->getDouble();
@@ -944,7 +940,6 @@ double* listToDoubleArray(const brEvalListHead* list){
 //			printf("result[%d]= %f\n", i, result[i]);
 
 	}
-	return result;
 }
 
 
@@ -958,24 +953,32 @@ double* listToDoubleArray(const brEvalListHead* list){
 int brICreateUserSensor(brEval args[], brEval *target, brInstance *i) {
 	//*(brEvalListHead **)variable = BRLIST(e);
 	brEvalListHead* list;
-	double* distance = 0		;
-	double* distance_factor = 0	;
-	double* azimut = 0			;
-	double* azimut_factor = 0	;
-	double* incidence = 0		;
-	double* incidence_factor = 0;
+	double* distance;
+	double* distance_factor;
+	double* azimut;
+	double* azimut_factor;
+	double* incidence;
+	double* incidence_factor;
+
 	list = BRLIST(&args[6]);
-	distance = listToDoubleArray(list);
+	distance = new double [list->getVector().size()];
+	listToDoubleArray(list, distance);
+
 	list = BRLIST(&args[7]);
-	distance_factor =  listToDoubleArray(list);
+	distance_factor = new double [list->getVector().size()];
+	listToDoubleArray(list, distance_factor);
 	list = BRLIST(&args[9]);
-	azimut = listToDoubleArray(list);
+	azimut = new double [list->getVector().size()];
+	listToDoubleArray(list, azimut);
 	list = BRLIST(&args[10]);
-	azimut_factor = listToDoubleArray(list);
+	azimut_factor = new double [list->getVector().size()];
+	listToDoubleArray(list, azimut_factor);
 	list = BRLIST(&args[12]);
-	incidence = listToDoubleArray(list);
+	incidence = new double [list->getVector().size()];
+	listToDoubleArray(list, incidence);
 	list = BRLIST(&args[13]);
-	incidence_factor = listToDoubleArray(list);
+	incidence_factor = new double [list->getVector().size()];
+	listToDoubleArray(list, incidence_factor);
 
 	//rows = columns and odd
 	if((BRINT(&args[1])!=BRINT(&args[2]))||(BRINT(&args[1])%2!=1)){
@@ -986,6 +989,12 @@ int brICreateUserSensor(brEval args[], brEval *target, brInstance *i) {
 				BRINT(&args[5]), distance, distance_factor,
 				BRINT(&args[8]), azimut, azimut_factor,
 				BRINT(&args[11]), incidence, incidence_factor);
+	delete[] distance;
+	delete[] distance_factor;
+	delete[] azimut;
+	delete[] azimut_factor;
+	delete[] incidence;
+	delete[] incidence_factor;
 
 	return EC_OK;
 }

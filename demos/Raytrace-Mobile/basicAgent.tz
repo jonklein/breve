@@ -46,17 +46,17 @@ Mobile : basicAgent (aka basicAgents) {
 		# the sensors point in z direction
 		
 		rotation = rotation*left150.
-		sensors{0} = (new IRSensor init-with type "TEFT4300" rel-position (RobotSize/2.0, 0,-RobotSize/2.0) rel-rotation rotation owner self).
+		sensors{0} = (new IRSensor init-with type "TEFT4300" rel-position ((RobotSize+1)/2.0, 0,-(RobotSize+1)/2.0 ) rel-rotation rotation owner self).
 		rotation = rotation*right60.
-		sensors{1} = (new IRSensor init-with type "TEFT4300" rel-position (RobotSize/2.0, 0, 0) rel-rotation rotation owner self).
+		sensors{1} = (new IRSensor init-with type "TEFT4300" rel-position ((RobotSize+1)/2.0, 0, 0) rel-rotation rotation owner self).
 		rotation = rotation*right60.
-		sensors{2} = (new IRSensor init-with type "TEFT4300" rel-position (RobotSize/2.0, 0, RobotSize/2.0) rel-rotation rotation owner self).
+		sensors{2} = (new IRSensor init-with type "TEFT4300" rel-position ((RobotSize+1)/2.0, 0, (RobotSize+1)/2.0) rel-rotation rotation owner self).
 		rotation = rotation*right60.
-		sensors{3} = (new IRSensor init-with type "TEFT4300" rel-position (-RobotSize/2.0, 0, RobotSize/2.0) rel-rotation rotation owner self).
+		sensors{3} = (new IRSensor init-with type "TEFT4300" rel-position (-(RobotSize+1)/2.0, 0, (RobotSize+1)/2.0) rel-rotation rotation owner self).
 		rotation = rotation*right60.
-		sensors{4} = (new IRSensor init-with type "TEFT4300" rel-position (-RobotSize/2.0, 0 ,0) rel-rotation rotation owner self).
+		sensors{4} = (new IRSensor init-with type "TEFT4300" rel-position (-(RobotSize+1)/2.0, 0 ,0) rel-rotation rotation owner self).
 		rotation = rotation*right60.
-		sensors{5} = (new IRSensor init-with type "TEFT4300" rel-position (-RobotSize/2.0, 0, -RobotSize/2.0) rel-rotation rotation owner self).
+		sensors{5} = (new IRSensor init-with type "TEFT4300" rel-position (-(RobotSize+1)/2.0, 0, -(RobotSize+1)/2.0) rel-rotation rotation owner self).
 
 		return self.
 

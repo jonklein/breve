@@ -38,6 +38,8 @@ Control : myControl {
 		self point-camera at (0, 0, 0) from (0, 100, 0).
 		walkerShape   = (new Cube init-with size (RobotSize, 2.8, RobotSize)).
 
+#		self messageTest-block.
+#		self messageTest-allSensors.
 #		self messageTest-oneSensor.		
 #		self sensorTest-Distance.
 #		self sensorTest-Azimut distance 7.5.
@@ -87,7 +89,7 @@ Control : myControl {
 		radius(int).
 		i(int).
 		agentcount(int).
-		agentcount = 120.
+		agentcount = 0.
 		radius = 40.
 		agents =  (agentcount+5) new testAgent.		
 

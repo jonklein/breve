@@ -92,7 +92,7 @@ Sensor::Sensor(){
 	slVectorSet(&borderNormal[1],-1,0,0);
 	slVectorSet(&borderNormal[2],0,1,0);
 	slVectorSet(&borderNormal[3],0,-1,0);
-	slVectorSet(&borderNormal[4],0,0,-1);
+	slVectorSet(&borderNormal[4],0,0,1);
 }
 
 
@@ -134,6 +134,10 @@ UserSensor* SensorBuilder::createUserSensor(const char* name, const int rows, co
    */
 UserSensor* SensorBuilder::getUserSensor(const char* name){
 //	slMessage(DEBUG_ALL, "Searching sensor %s...", name);	
+
+//	if(!sensors.empty())
+//        printf( "MyMap has %d", sensors.size() );
+//xxx vielleicht wird es langsamer, weil neue sensoren erzeugt werden ne
 	if (sensors.count(name)>=1) {
 		UserSensor* s;
 		s = sensors[name];
@@ -312,7 +316,7 @@ double Sensor::sense(vector<slWorldObject*>* neighbors, slPosition* sensorPos){
  * this function simulates a sensor located at sensorPos
  * shapePos the Position of the shape that will be sensed
  */
-double Sensor::sense(const slShape *shape, slPosition *shapePos, slPosition *sensorPos){
+void Sensor::sense(const slShape *shape, slPosition *shapePos, slPosition *sensorPos){
 	double distance;
 	vector<slFace*>::iterator fi;
 	slVector pointOnPlane;
@@ -373,7 +377,6 @@ double Sensor::sense(const slShape *shape, slPosition *shapePos, slPosition *sen
 			}
 		}
 	}
-	return dist;
 }
 
 /* evaluates the sensed values for all rays according
@@ -473,8 +476,9 @@ bool Sensor::insideSensorBorder(const slShape *shape, slPosition *shapePos, slPo
 	slVector n;
 	int p;
 	for(int i=0; i<5; i++){
+		slVectorXform(sensorPos->rotation, &borderNormal[i], &n);
+//		slVectorPrint(&n);
 		for(p=0; p<8; p++){
-			slVectorXform(sensorPos->rotation, &borderNormal[i], &n);
 			d = distance_plane_point(&n, &sensorPos->location, &maximumPoints[p]);
 //				slMessage(DEBUG_ALL,"i:%d p:%d d: %f\n",i,p,d);
 			if (d > 0){ 
@@ -519,7 +523,7 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 		shape = o->getShape();
 		if(shape == NULL){continue;}
 		slPosition *shapePos = &o->getPosition();
-		if(!insideSensorBorder(shape, shapePos, sensorPos)){continue;}
+//if(!insideSensorBorder(shape, shapePos, sensorPos)){continue;} //TODO diese fkt macht nicht was sie sollte
 		isTarget = (o==target);
 		for(fi = (shape->faces.begin()); fi != (shape->faces.end()); fi++ ) {
 			slFace *f = *fi;
@@ -530,9 +534,8 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 
 			slVectorXform(shapePos->rotation, &f->plane.vertex, &wcPlane.vertex);
 			slVectorAdd(&wcPlane.vertex, &shapePos->location, &wcPlane.vertex);
-
+/*
 			slPositionPlane( shapePos, &f->plane, &wcPlane2);
-			/*
 			printf("wcplane.normal:");
 			slVectorPrint(&wcPlane.normal);
 			printf("wcplane.vertex:");
@@ -547,7 +550,7 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 
 //printf(" slVectorAngle(&middleDirection, &wcPlane.normal %f\n",( slVectorAngle(&dir, &wcPlane.normal))*180/M_PI);
 			// the face is facing the wrong direction
-			if( (M_PI/2) > (slVectorAngle(&dir, &wcPlane.normal)) || (slVectorAngle(&dir, &wcPlane.normal) > M_PI)){continue;}
+//		if( (M_PI/2) > (slVectorAngle(&dir, &wcPlane.normal)) || (slVectorAngle(&dir, &wcPlane.normal) > M_PI)){continue;}
 
 			// P1, P2 points on the line
 			// P3 point on the plane
@@ -558,14 +561,11 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 			// plane.vertex relativ to wo position
 			slVectorSub(&wcPlane.vertex, &sensorPos->location, &posToPlane);
 			if(fabs(slVectorDot(&wcPlane.normal, &dir))<0.00001){continue;} // the ray is parallel to the plane so it wont hit
-			else{
-				//slPlaneDistance
-				dist = (slVectorDot(&wcPlane.normal, &posToPlane)/(slVectorDot(&wcPlane.normal, &dir)));
-			}
+			//slPlaneDistance
+			dist = (slVectorDot(&wcPlane.normal, &posToPlane)/(slVectorDot(&wcPlane.normal, &dir)));
 			if(dist < 0.0) {continue;}
 			// we have the length of the matching vector on the plane of this face. 
 			slVectorMul(&dir, dist, &pointOnPlane);
-
 			slVectorAdd(&pointOnPlane, &sensorPos->location, &pointOnPlane);
 			// now figure out if the point in question is within the face 
 			result = slClipPoint(&pointOnPlane, f->voronoi, shapePos, f->edgeCount, &update, &distance);
@@ -598,17 +598,20 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 				if(isTarget){
 					if(dist < targetDist){targetDist = dist;}
 					if(targetDist > shortestDist + 0.1){
+//				printf("shortestDist: %f targetDist: %f\n",shortestDist, targetDist);
 						return false;
 					}
 					//if(targetDist + 0.1 > shortestDist){continue;} use this if you want konvex shapes
-				}
-				if((shortestDist != 999999)&&(targetDist !=999999)){
-					if(targetDist > shortestDist + 0.1){
-						return false;
+				}else{
+					if((shortestDist != 999999)&&(targetDist !=999999)){
+						if(targetDist > shortestDist + 0.1){
+//				printf("shortestDist: %f targetDist: %f\n",shortestDist, targetDist);
+							return false;
+						}
 					}
 				}
-		//		printf("shortestDist: %f targetDist: %f\n",shortestDist, targetDist);
 			}else{
+				printf("not exact!");
 				slVector t;
 				slVectorSub(targetLoc, &sensorPos->location, &t);
 //					printf ("ray-lenght: %f distance(obj->obj):%f\n", dist, slVectorLength(&t));
@@ -618,6 +621,13 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 			}
 		}//shapes
 	}//neighbours
+
+	if((targetDist ==999999)){
+
+	printf("missed the target!\n");
+	printf("shortestDist: %f targetDist: %f\n",shortestDist, targetDist);
+	return false;
+	}
 	return true;
 }
 
@@ -629,13 +639,6 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
    */
 double Sensor::calculateQuality(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, slWorldObject* target = NULL){
 
-	/*
-	   map <string, UserSensor*>::iterator iter = sensors.find(name);
-	if(iter == sensors.end()){
-		slMessage(DEBUG_ALL,"Sensor %s not found", sensorType);
-		return -1;
-	}
-	*/
 	double quality = 233;
 	int verbose = 0	;
 	slVector dist;
@@ -662,7 +665,6 @@ double Sensor::calculateQuality(vector<slWorldObject*>* neighbors, slPosition* s
 	}
 	if(freePath(neighbors, sensorPos, targetLoc, target)){
 		if(verbose>0)slMessage(DEBUG_ALL,"quality path free\n");
-
 		return quality;
 	}else {
 		if(verbose>0)slMessage(DEBUG_ALL,"quality path blocked\n");

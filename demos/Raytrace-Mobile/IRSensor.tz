@@ -39,8 +39,8 @@ Real:IRSensor (aka IRSensors){
 		maxangle(double).
 		rows = 1.
 		columns = rows.
-		maxrange = 30.
-		maxangle = 60/PI * 180.
+		maxrange = 40.
+		maxangle = 80/PI * 180.
 # * SensorBuilder::createSensor(const char* name, const int rows, const int columns, const double max_range, const double max_angle, 
 #	*			const int distance_length, const double* distance, const double* distance_factor,
 #	*			const int azimut_length, const double* azimut, const double* azimut_factor,
@@ -107,7 +107,7 @@ Real:IRSensor (aka IRSensors){
 		col = random[100].
   		self update-pos.
  #		draw clear.
-		agents = all isAgent.
+		agents = all testAgent.
 		draw set-color to (1,0,0).
 		draw draw-line from (self get-location)to (self get-location) + (self get-rotation)*(0,0,27).
 

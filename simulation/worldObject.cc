@@ -119,7 +119,7 @@ double slWorldObject::irSense(slPosition *sensorPos, std::string sensorType){
 	return irSense2(&_neighbors, sensorPos, sensorType);
 }
 
-double slWorldObject::calculateQuality(slPosition* sensorPos, slVector* targetLoc, std::string sensorType, slWorldObject* target=NULL){
+double slWorldObject::calculateQuality(slPosition* sensorPos, slVector* targetLoc, std::string sensorType, slWorldObject* target){
 	if(target!=NULL){
 		targetLoc = &target->_position.location;
 	}
