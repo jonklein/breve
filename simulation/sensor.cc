@@ -31,6 +31,7 @@ void inv_perpendicular( const slVector *from, const slVector *to, slVector *resu
 	slVector proj;
 	slVector nfrom;
 	double d;
+//	slMessage(DEBUG_ALL,"inv_perpendicular\n");
 	slVectorCopy(from, &nfrom);
 	slVectorNormalize(&nfrom);
 	slVectorSub(to, from, &diff);	
@@ -110,6 +111,8 @@ UserSensor* SensorBuilder::createUserSensor(const char* name, const int rows, co
 				const int azimut_length, const double* azimut, const double* azimut_factor,
 				const int incidence_length, const double* incidence, const double* incidence_factor){
 	// check if a sensor with this name already exists and delete it
+//	slMessage(DEBUG_ALL,"UserBuilder createUserSensor\n");
+
 	map <string, UserSensor*>::iterator iter = sensors.find(name);
 	if(iter != sensors.end()){
 	//if(iter->first == name){
@@ -133,6 +136,8 @@ UserSensor* SensorBuilder::createUserSensor(const char* name, const int rows, co
    * returns the UserSensor with name Name or NULL if no Sensor with that name is found
    */
 UserSensor* SensorBuilder::getUserSensor(const char* name){
+//		slMessage(DEBUG_ALL,"UserBuilder getUserSensor\n");
+
 //	slMessage(DEBUG_ALL, "Searching sensor %s...", name);	
 
 //	if(!sensors.empty())
@@ -212,13 +217,23 @@ UserSensor::UserSensor(const char* name, const int rows, const int columns, cons
 	slVectorSet(&borderNormal[4],0,0,1);
 	// if rows or columns ==1 the rayDirectionsVector is identical with the baseDirection 
 	// but we dont want to have the same vector 4 times
+	// to use the optimal vectors use 			insideSensorBorder(o->getShape(), &shapePos, sensorPos, true)
+	// everything not hit by the ray will be discarded
+	slVector tempBorder;
 	if(columns ==1){
-		slVectorSet(&borderNormal[0],1,0,0);
-		slVectorSet(&borderNormal[1],-1,0,0);
-	}
-	if(rows ==1){
-		slVectorSet(&borderNormal[2],0,1,0);
-		slVectorSet(&borderNormal[3],0,-1,0);
+		tempBorder.z = 1;
+		tempBorder.x = sensor_width;
+		tempBorder.y = sensor_height/2.0;
+		inv_perpendicular(&tempBorder, &baseDirection, &borderNormal[0]);
+		tempBorder.x = sensor_width/2.0;
+		tempBorder.y = sensor_height/2.0;
+		inv_perpendicular(&tempBorder, &baseDirection, &borderNormal[1]);
+		tempBorder.x = sensor_width;
+		tempBorder.y = sensor_height;
+		inv_perpendicular(&tempBorder, &baseDirection, &borderNormal[2]);
+		tempBorder.x = sensor_width/2.0;
+		tempBorder.y = sensor_height;
+		inv_perpendicular(&tempBorder, &baseDirection, &borderNormal[3]);
 	}
 
 
@@ -290,17 +305,18 @@ double Sensor::sense(vector<slWorldObject*>* neighbors, slPosition* sensorPos){
 //	slMessage(DEBUG_ALL, " Sensor (wo)*::sense start:\n");
 	// for all shapes do sense()
 	vector< slWorldObject* >::iterator neigh_iter;
+	bool single = (rows ==1);
 	for(neigh_iter = neighbors->begin(); neigh_iter != neighbors->end(); neigh_iter++) {
+
 		slWorldObject *o = *neigh_iter;
-		
 		if(o->getShape() != NULL){
 			slPosition shapePos = o->getPosition();
-			if(insideSensorBorder(o->getShape(), &shapePos, sensorPos)){
+			if(insideSensorBorder(o->getShape(), &shapePos, sensorPos, single)){
 			//	slMessage(DEBUG_ALL,"inside!\n");
 				Sensor::sense(o->getShape(), &shapePos, sensorPos);
 			}
 			else{ 
-				//	slMessage(DEBUG_ALL,"outside!\n");
+			//		slMessage(DEBUG_ALL,"outside!\n");
 			}
 		}
 	}
@@ -336,7 +352,6 @@ void Sensor::sense(const slShape *shape, slPosition *shapePos, slPosition *senso
 		slPlane wcPlane; //world coordinates
 		slVectorXform(shapePos->rotation, &f->plane.normal, &wcPlane.normal);
 		slVectorAdd(&f->plane.vertex, &shapePos->location, &wcPlane.vertex);
-
 		for(int i = 0; i<columns; i++){
 			for(int j = 0; j<rows; j++){
 				slVectorXform(sensorPos->rotation, &rayDirections[i][j], &dir);
@@ -374,9 +389,9 @@ void Sensor::sense(const slShape *shape, slPosition *shapePos, slPosition *senso
 						}
 					}
 				}
-			}
-		}
-	}
+			}//rows
+		}//collumns
+	}//faces
 }
 
 /* evaluates the sensed values for all rays according
@@ -442,7 +457,7 @@ double Sensor::evaluate(){
    * planes, representing a case, in wich the bounding box is larger than the sensor cone
    * so the bounding box points are outside, but parts of the shape are still inside.
    */
-bool Sensor::insideSensorBorder(const slShape *shape, slPosition *shapePos, slPosition *sensorPos){
+bool Sensor::insideSensorBorder(const slShape *shape, slPosition *shapePos, slPosition *sensorPos, bool singleRay){
 	slVector min ,max;
 	shape->bounds(shapePos, &min, &max);
 
@@ -475,21 +490,37 @@ bool Sensor::insideSensorBorder(const slShape *shape, slPosition *shapePos, slPo
 	double d;
 	slVector n;
 	int p;
+		slVector singleBorder[5];
+	if(singleRay){
+		slVectorSet(&singleBorder[0],1,0,0);
+		slVectorSet(&singleBorder[1],-1,0,0);
+		slVectorSet(&singleBorder[2],0,1,0);
+		slVectorSet(&singleBorder[3],0,-1,0);
+		slVectorSet(&singleBorder[4],0,0,1);
+	}
 	for(int i=0; i<5; i++){
-		slVectorXform(sensorPos->rotation, &borderNormal[i], &n);
+		if(singleRay){
+			slVectorXform(sensorPos->rotation, &singleBorder[i], &n);
+		}else{
+			slVectorXform(sensorPos->rotation, &borderNormal[i], &n);
+		}
 //		slVectorPrint(&n);
 		for(p=0; p<8; p++){
 			d = distance_plane_point(&n, &sensorPos->location, &maximumPoints[p]);
 //				slMessage(DEBUG_ALL,"i:%d p:%d d: %f\n",i,p,d);
 			if (d > 0){ 
-				p=0;
+				p = 0;//last point
 				// one Point is inside try next plane
 				break;
 			}
 		}
 		// all points are on the "outside" of this plane
-		if(p==8) return false;
+		if(p==8) {
+//			printf("outside\n");
+			return false;
+		}
 	}
+//	printf("inside\n");
 	return true;
 }
 
@@ -521,10 +552,12 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 	for(neigh_iter = neighbors->begin(); neigh_iter != neighbors->end(); neigh_iter++) {
   		slWorldObject *o = *neigh_iter;
 		shape = o->getShape();
+		isTarget = (o==target);
 		if(shape == NULL){continue;}
 		slPosition *shapePos = &o->getPosition();
-//if(!insideSensorBorder(shape, shapePos, sensorPos)){continue;} //TODO diese fkt macht nicht was sie sollte
-		isTarget = (o==target);
+		if(!insideSensorBorder(shape, shapePos, sensorPos)){//if singleray was true we could only send to agents hit by the ray
+			continue;
+		}	
 		for(fi = (shape->faces.begin()); fi != (shape->faces.end()); fi++ ) {
 			slFace *f = *fi;
 			slPlane wcPlane; //world coordinates
@@ -623,10 +656,10 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 	}//neighbours
 
 	if((targetDist ==999999)){
-
-	printf("missed the target!\n");
-	printf("shortestDist: %f targetDist: %f\n",shortestDist, targetDist);
-	return false;
+//		printf("missed the target!\n");
+//		printf("shortestDist: %f targetDist: %f\n",shortestDist, targetDist);
+		// that happens if the shape is at the very border of the sensor
+		return false;
 	}
 	return true;
 }

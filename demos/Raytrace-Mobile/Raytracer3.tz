@@ -45,6 +45,7 @@ Control : myControl {
 #		self sensorTest-Azimut distance 7.5.
 #		self sensorTest-Incidence distance 12.5.
 		self moveAroundTest.
+#		self testInsideSensor.
 
 	+ to moveAroundTest:
 		agentcount(int).
@@ -89,7 +90,7 @@ Control : myControl {
 		radius(int).
 		i(int).
 		agentcount(int).
-		agentcount = 0.
+		agentcount = 30.
 		radius = 40.
 		agents =  (agentcount+5) new testAgent.		
 
@@ -146,6 +147,19 @@ Control : myControl {
 		agents{agentcount} move to (0, 0, 10).
 		agents{agentcount} rotate around-axis (0,-1,0) by (PI/2.0).
 		agents{agentcount} set-mode mode SOURCE.
+
++ to testInsideSensor:
+		agentcount(int).
+		agentcount = 2.
+		agents =  (agentcount) new testAgent.		
+
+		agents{0} move to (0, 0, 10).
+		agents{0} rotate around-axis (0,1,0) by (PI/2.0).
+		agents{0} set-mode mode DISABLE.
+
+		agents{1} set-mode mode INSIDETEST.
+		agents{1} move to (0, 0, 40).
+		agents{1} rotate around-axis (0,1,0) by (PI/2.0).
 
 
 + to iterate:

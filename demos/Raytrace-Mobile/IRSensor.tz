@@ -40,7 +40,7 @@ Real:IRSensor (aka IRSensors){
 		rows = 1.
 		columns = rows.
 		maxrange = 40.
-		maxangle = 80/PI * 180.
+		maxangle = 60/PI * 180. # maximum 79
 # * SensorBuilder::createSensor(const char* name, const int rows, const int columns, const double max_range, const double max_angle, 
 #	*			const int distance_length, const double* distance, const double* distance_factor,
 #	*			const int azimut_length, const double* azimut, const double* azimut_factor,

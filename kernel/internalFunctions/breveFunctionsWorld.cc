@@ -985,7 +985,13 @@ int brICreateUserSensor(brEval args[], brEval *target, brInstance *i) {
 		 slMessage(0, "Error creating a UserSensor: rows!=columns or rows=even");
 		 return EC_ERROR;
 	}
-	SensorBuilder::createUserSensor(BRSTRING(&args[0]), BRINT(&args[1]), BRINT(&args[2]), BRDOUBLE(&args[3]), BRDOUBLE(&args[4]), 
+	double maxrange = BRDOUBLE(&args[3]);
+	double maxangle = BRDOUBLE(&args[4]);
+	if(maxangle > 79/M_PI*180) {
+		 slMessage(0, "Error creating a UserSensor: maxangle>79");
+		return EC_ERROR;
+	}
+	SensorBuilder::createUserSensor(BRSTRING(&args[0]), BRINT(&args[1]), BRINT(&args[2]),maxrange, maxangle, 
 				BRINT(&args[5]), distance, distance_factor,
 				BRINT(&args[8]), azimut, azimut_factor,
 				BRINT(&args[11]), incidence, incidence_factor);

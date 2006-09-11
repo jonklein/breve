@@ -8,6 +8,7 @@
 @define SINK 7.
 @define TEST 8.
 @define AVOID 9.
+@define INSIDETEST 10.
 
 @define DISTANCE 20.
 @define AZIMUT 21.
@@ -39,13 +40,13 @@ basicAgent : testAgent (aka testAgents) {
 	+ to init:
 		draw = new Drawing.
 		mode = STRAIGHT.
+		draw set-color to (1, 1, 1).
 
 		return self.
 
 + to iterate:
 		dir (vector).
 		vtest (double).
-		draw set-color to (1, 1, 1).
 		vtest = vtest+10.
 		dir = (self get-rotation)*(1,0,0).
 		dir = dir * 30.
@@ -93,6 +94,13 @@ basicAgent : testAgent (aka testAgents) {
 			} else {
 				mode = TURNLEFT.
 			}
+			return.
+		}
+
+		if(mode== INSIDETEST):{
+			df  = (sensors{1} get-data).
+			sensors{1} send message "test" on-sensor 1.
+			self set-velocity to (self get-rotation)*(1,0,0).
 			return.
 		}
 		
