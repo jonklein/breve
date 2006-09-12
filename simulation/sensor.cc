@@ -8,6 +8,7 @@
 #include "vclip.h"
 #include "vclipData.h"
 #include "sensor.h"
+#include "assert.h"
 #include <map>
 using std::map;
 using std::vector;
