@@ -143,7 +143,6 @@ UserSensor* SensorBuilder::getUserSensor(const char* name){
 
 //	if(!sensors.empty())
 //        printf( "MyMap has %d", sensors.size() );
-//xxx vielleicht wird es langsamer, weil neue sensoren erzeugt werden ne
 	if (sensors.count(name)>=1) {
 		UserSensor* s;
 		s = sensors[name];
@@ -680,6 +679,7 @@ double Sensor::calculateQuality(vector<slWorldObject*>* neighbors, slPosition* s
 	
 	slVectorSub(targetLoc, &sensorPos->location, &dist);
 	double distance = slVectorLength(&dist);
+	distance = distance/2.0; //the light must only go half the way (if reflecting it must go back)
 	quality = apply_distance_factor(quality,  distance);
 	//slMessage(DEBUG_ALL,"distance:%f quality:%f \n", distance, quality);
 	if (fabs(quality)<0.001){
@@ -692,6 +692,7 @@ double Sensor::calculateQuality(vector<slWorldObject*>* neighbors, slPosition* s
 	slVectorXform(sensorPos->rotation, &rayDirections[middle][middle], &middleDirection);
 	angle = slVectorAngle(&middleDirection, &dist);
 	quality = apply_azimut_factor(quality, angle);
+
 	//slMessage(DEBUG_ALL,"angle:%f quality:%f \n", angle, quality);
 	if (fabs(quality)<0.001){
 			if(verbose>1)slMessage(DEBUG_ALL,"angle does not fit!\n");
@@ -712,6 +713,55 @@ double calculateQuality2(vector<slWorldObject*>* neighbors, slPosition* sensorPo
 	s = SensorBuilder::getUserSensor(sensorType.c_str());
 	if(s!=NULL){
 		return s->calculateQuality(neighbors, sensorPos, targetLoc, target);
+	}else{
+		slMessage(DEBUG_ALL, "sensor.cc: Sensor: ");
+		slMessage(DEBUG_ALL, sensorType.c_str());
+		slMessage(DEBUG_ALL, " is not yet created.\n");
+	}
+	return -1;
+}
+
+	/*
+   * Returns the quality of the signal snet from sensorPos, received at targetPos
+   * quality is 0 if the distance is too high, the angle too big 
+   */
+double Sensor::calcQualNoRay(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, slWorldObject* target = NULL){
+
+	double quality = 233;
+	int verbose = 0	;
+	slVector dist;
+	slVector middleDirection;
+	
+	slVectorSub(targetLoc, &sensorPos->location, &dist);
+	double distance = slVectorLength(&dist);
+	distance = distance/2.0; //the light must only go half the way (if reflecting it must go back)
+	quality = apply_distance_factor(quality,  distance);
+	//slMessage(DEBUG_ALL,"distance:%f quality:%f \n", distance, quality);
+	if (fabs(quality)<0.001){
+			if(verbose>1)slMessage(DEBUG_ALL,"distance too big!\n");
+		return 0;
+	}
+	double angle = 0;
+	int middle;
+	middle = rows/2;
+	slVectorXform(sensorPos->rotation, &rayDirections[middle][middle], &middleDirection);
+	angle = slVectorAngle(&middleDirection, &dist);
+	quality = apply_azimut_factor(quality, angle);
+
+	//slMessage(DEBUG_ALL,"angle:%f quality:%f \n", angle, quality);
+	if (fabs(quality)<0.001){
+			if(verbose>1)slMessage(DEBUG_ALL,"angle does not fit!\n");
+			return 0;
+	}
+	return quality;
+
+}
+
+double calcQualNoRay2(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, std::string sensorType, slWorldObject* target = NULL){
+	Sensor* s;
+	s = SensorBuilder::getUserSensor(sensorType.c_str());
+	if(s!=NULL){
+		return s->calcQualNoRay(neighbors, sensorPos, targetLoc, target);
 	}else{
 		slMessage(DEBUG_ALL, "sensor.cc: Sensor: ");
 		slMessage(DEBUG_ALL, sensorType.c_str());

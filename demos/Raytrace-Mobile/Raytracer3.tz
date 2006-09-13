@@ -13,7 +13,7 @@
 @use Drawing.
 @use Mobile.
 @use Stationary.
-@use IRSensor.
+@use TEFT4300Sensor.
 @use testAgent.
 #@define PI 3.141592653.
 #@define PI180 0.017453293.
@@ -32,7 +32,7 @@ Control : myControl {
 	+ to init:
 		s (object).
 		print "Setting up the simulation.".
-		s = new IRSensor.
+		s = new TEFT4300Sensor.
 		s register-Sensor-TEFT4300.
 		free s.
 		self point-camera at (0, 0, 0) from (0, 100, 0).
@@ -44,8 +44,9 @@ Control : myControl {
 #		self sensorTest-Distance.
 #		self sensorTest-Azimut distance 7.5.
 #		self sensorTest-Incidence distance 12.5.
-		self moveAroundTest.
+#		self moveAroundTest.
 #		self testInsideSensor.
+		self messageTest-Bidirectional.
 
 	+ to moveAroundTest:
 		agentcount(int).
@@ -66,7 +67,7 @@ Control : myControl {
 	+ to sensorTestInit:
 		new TestStage.
 		agent =  1 new testAgent.
-		self point-camera at (0, 0, 0) from (0, 200, 0).
+		self point-camera at (0, 0, 0) from (0, 250, 0).
 
 	+ to sensorTest-Distance:
 		self sensorTestInit.
@@ -116,7 +117,7 @@ Control : myControl {
 		radius(int).
 		i(int).
 		agentcount(int).
-		agentcount = 60.
+		agentcount = 30.
 		radius = 40.
 		agents =  (agentcount+1) new testAgent.		
 
@@ -160,7 +161,34 @@ Control : myControl {
 		agents{1} set-mode mode INSIDETEST.
 		agents{1} move to (0, 0, 40).
 		agents{1} rotate around-axis (0,1,0) by (PI/2.0).
+		
++ to messageTest-Bidirectional:
+		agentcount(int).
+		agentcount = 3.
+		agents =  (agentcount) new testAgent.		
 
+		agents{0} move to (0, 0, 00).
+		agents{0} rotate around-axis (0,1,0) by (-PI/2.0).
+		agents{0} set-mode mode SOURCE.
+	#	agents{0} set-velocity to(1,0,0). 
+
+		agents{1} set-mode mode 0.
+#		agents{1} set-mode mode SOURCE.
+		agents{1} move to (0, 0, 40).
+		agents{1} rotate around-axis (0,1,0) by (-PI/2.0).
+		agents{1} set-velocity to(0,0,-1). 
+
+		agents{2} set-mode mode 0.
+#		agents{2} set-mode mode SOURCE.
+		agents{2} move to (0, 0, -40).
+		agents{2} rotate around-axis (0,1,0) by (2* PI/2.0).
+		agents{2} set-velocity to(0,0,1). 
+
+#		agents{3} set-mode mode SOURCE.
+#		agents{3} move to (40, 0, 20).
+#		agents{3} rotate around-axis (0,1,0) by (PI/2.0).
+#
+#agents{3} set-velocity to(-1,0,0). 
 
 + to iterate:
 		super iterate.

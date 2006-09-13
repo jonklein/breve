@@ -19,6 +19,8 @@ class Sensor{
 		double sense(std::vector<slWorldObject*>* neighbors, slPosition *sensorPos);
 		double sense(slVector *pos, slVector *dir);
 		double Sensor::calculateQuality(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, slWorldObject* target );
+		double Sensor::calcQualNoRay(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, slWorldObject* target );
+
 		bool Sensor::freePath(const slShape *shape, slPosition *shapePos, slPosition *sensorPos, slVector *targetLoc, bool exact);
 		bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* to, slWorldObject* target );
 		double max_range;
@@ -79,7 +81,8 @@ class UserSensor : public Sensor{
 class SensorBuilder{
 	public:
 		static UserSensor* getUserSensor(const char* name);
-		static UserSensor* createUserSensor(const char* name, const int rows, const int columns, const double max_range, const double max_angle, 
+		static UserSensor* createUserSensor(const char* name, const int rows, const int columns,
+				const double max_range, const double max_angle, 
 				const int distance_length, const double* distance, const double* distance_factor,
 				const int azimut_length, const double* azimut, const double* azimut_factor,
 				const int incidence_length, const double* incidence, const double* incidence_factor);
@@ -97,5 +100,6 @@ double irSense2(std::vector<slWorldObject*>* neighbors,
 		slPosition *sensorPos, std::string sensorType);
 
 double calculateQuality2(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, std::string sensorType, slWorldObject* target);
+double calcQualNoRay2(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, std::string sensorType, slWorldObject* target);
 
 

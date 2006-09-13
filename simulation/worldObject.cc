@@ -126,6 +126,14 @@ double slWorldObject::calculateQuality(slPosition* sensorPos, slVector* targetLo
 	return calculateQuality2(&_neighbors, sensorPos, targetLoc, sensorType, target);//sensor.cc
 }
 
+double slWorldObject::calcQualNoRay(slPosition* sensorPos, slVector* targetLoc, std::string sensorType, slWorldObject* target){
+	if(target!=NULL){
+		targetLoc = &target->_position.location;
+	}
+	return calcQualNoRay2(&_neighbors, sensorPos, targetLoc, sensorType, target);//sensor.cc
+}
+
+
 int slWorldObject::raytrace( slVector *location, slVector* direction, slVector *erg_dir ) {
 
 	if ( !_shape ) {

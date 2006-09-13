@@ -114,7 +114,7 @@ class slWorldObject {
 		int raytrace( slVector *location, slVector* direction, slVector *erg_dir );
 		double irSense(slPosition *sensorPos, std::string sensorType);
 		double calculateQuality(slPosition* sensorPos, slVector* targetLoc, std::string sensorType,slWorldObject* target=NULL);
-
+		double calcQualNoRay(slPosition* sensorPos, slVector* targetLoc, std::string sensorType,slWorldObject* target=NULL);
 		std::vector< void* > &getNeighborData();
 
 		inline const slPosition &getPosition() { return _position; }

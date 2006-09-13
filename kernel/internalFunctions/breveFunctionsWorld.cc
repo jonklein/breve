@@ -917,6 +917,22 @@ int brIcalculateQualityToObj(brEval args[], brEval *target, brInstance *i) {
 
 	return EC_OK;
 }
+//double slWorldObject::calculateQualityToObj(slPosition* sensorPos, slVector* targetLoc, std::string sensorType){
+int brIcalcQualNoRay(brEval args[], brEval *target, brInstance *i) {
+	slVector targetLoc;
+	slPosition sensorPos;
+	slWorldObject *o    = BRWORLDOBJECTPOINTER(&args[0]);
+	sensorPos.location = BRVECTOR(&args[1]); 
+	slMatrixCopy(BRMATRIX(&args[2]), sensorPos.rotation); 
+	targetLoc = BRVECTOR(&args[3]);
+	double result = o->calcQualNoRay(&sensorPos, &targetLoc, BRSTRING(&args[4]));
+	if (result == -1){
+		return EC_ERROR;
+	}
+	target->set( result );
+
+	return EC_OK;
+}
 
 	/*
    * This function convertes a list of double and/or ints
@@ -1088,6 +1104,7 @@ void breveInitWorldFunctions(brNamespace *n) {
 	brNewBreveCall(n, "irSense", brIIRSense, AT_DOUBLE, AT_POINTER, AT_VECTOR, AT_MATRIX, AT_STRING, 0);
 	brNewBreveCall(n, "calculateQualityToLocation", brIcalculateQualityToLoc, AT_DOUBLE, AT_POINTER, AT_VECTOR, AT_MATRIX, AT_VECTOR, AT_STRING,0);
 	brNewBreveCall(n, "calculateQualityToObject", brIcalculateQualityToObj, AT_DOUBLE, AT_POINTER, AT_VECTOR, AT_MATRIX, AT_POINTER, AT_STRING,0);
+	brNewBreveCall(n, "calcQualNoRay", brIcalcQualNoRay, AT_DOUBLE, AT_POINTER, AT_VECTOR, AT_MATRIX, AT_VECTOR, AT_STRING,0);
 
 	brNewBreveCall(n, "createUserSensor", brICreateUserSensor, AT_NULL, AT_STRING, AT_INT, AT_INT, AT_DOUBLE, AT_DOUBLE,
 																 AT_INT, AT_LIST, AT_LIST,
