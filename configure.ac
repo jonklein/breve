@@ -121,6 +121,7 @@ case ${host_os} in
 		EXE_SUFFIX=".exe"
 		PLATFORM="windows"
 		AC_DEFINE([WINDOWS], [1], [Windows])
+		AC_CHECK_LIB([pthread], [main])
 		;;
 
 	linux* | *bsd* )
@@ -199,8 +200,6 @@ AC_CHECK_LIB([m], [isnan])
 
 AC_CHECK_HEADERS(pthread.h)
 
-# AC_CHECK_LIB([pthread], [main])
-
 ol_link_threads=no
 
 if test $ac_cv_header_pthread_h = yes ; then
@@ -265,16 +264,12 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([ftgl], [main])
 	AC_CHECK_LIB([python], [Py_Initialize])
 
-	if test "x$custom_cblas" = x; then
-		AC_CHECK_LIB([gslcblas], [cblas_ccopy])
-	fi
-
 	AC_CHECK_LIB([avutil], [av_crc])
 	AC_CHECK_LIB([avcodec], [avcodec_init])
 	AC_CHECK_LIB([avformat], [av_write_frame])
 
 	AC_CHECK_LIB([push], [pushEnvironmentNew])
-	AC_CHECK_HEADER([qgame++.h])
+	A_CHECK_HEADER([qgame++.h])
 
 	# look for main in the C++ only libraries, since the function names are mangled.
 
@@ -283,9 +278,12 @@ if test "x$engine_only" = "x"; then
 fi
 
 AC_CHECK_LIB([png], [png_create_write_struct])
-AC_CHECK_LIB([gsl], [gsl_rng_alloc],,AC_MSG_FAILURE([Missing GSL library -- see http://www.gnu.org/software/gsl/]))
 
-# AC_CHECK_LIB([OSMesa], [OSMesaCreateContext])
+if test "x$custom_cblas" = x; then
+	AC_CHECK_LIB([gslcblas], [cblas_ccopy])
+fi
+
+AC_CHECK_LIB([gsl], [gsl_rng_alloc],,AC_MSG_FAILURE([Missing GSL library -- see http://www.gnu.org/software/gsl/]))
 
 AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]))
 

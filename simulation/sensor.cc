@@ -181,21 +181,22 @@ UserSensor::UserSensor(const char* name, const int rows, const int columns, cons
 	if (columns ==1){ y_start = 0; y_step = 0;}
 
 	//get memory for rayDirection array
-	rayDirections = (slVector**)malloc(rows * sizeof(slVector *));
-    assert(rayDirections != NULL);
-    /* allocate a: columns*/
+
+	rayDirections = (slVector**)slMalloc(rows * sizeof(slVector *)); 
+
+	/* allocate a: columns*/
+
     for(int i=0; i < columns; i++) {
-		rayDirections[i] = (slVector*)malloc(columns * sizeof(slVector));
-		assert(rayDirections[i] != NULL);
+		rayDirections[i] = (slVector*)slMalloc(columns * sizeof(slVector));
     }
 
 	//get memory for rayValues array
-	rayValues = (rayData**)malloc(rows * sizeof(rayData *));
-    assert(rayValues != NULL);
+	rayValues = (rayData**)slMalloc(rows * sizeof(rayData *));
+
     /* allocate a: columns*/
+
     for(int i=0; i < columns; i++) {
-		rayValues[i] = (rayData*)malloc(columns * sizeof(rayData));
-		assert(rayValues[i] != NULL);
+		rayValues[i] = (rayData*)slMalloc(columns * sizeof(rayData));
     }
 
 	for(int j=0; j<rows; j++){
@@ -334,7 +335,7 @@ double Sensor::sense(vector<slWorldObject*>* neighbors, slPosition* sensorPos){
  */
 void Sensor::sense(const slShape *shape, slPosition *shapePos, slPosition *sensorPos){
 	double distance;
-	vector<slFace*>::iterator fi;
+	vector<slFace*>::const_iterator fi;
 	slVector pointOnPlane;
 	slVector posToPlane;
 	slVector dir;
@@ -346,7 +347,8 @@ void Sensor::sense(const slShape *shape, slPosition *shapePos, slPosition *senso
 	middle = rows/2;
 	slVectorXform(sensorPos->rotation, &rayDirections[middle][middle], &middleDirection);
 	slVectorNormalize(&middleDirection);
-	for(fi = (shape->faces.begin()); fi != (shape->faces.end()); fi++ ) {
+
+	for( fi = shape->faces.begin(); fi != shape->faces.end(); fi++ ) {
 		slFace *f = *fi;
 		planes++;
 		slPlane wcPlane; //world coordinates
@@ -535,7 +537,7 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 	double shortestDist = 999999;
 	double targetDist = 999999;
 	double distance;
-	vector<slFace*>::iterator fi;
+	vector<slFace*>::const_iterator fi;
 	slVector pointOnPlane;
 	slVector posToPlane;
 	slVector dir;
@@ -543,13 +545,12 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 	int update, result = 0;
 	double dist= 0;
 	bool exact = false;
-	if (target!=NULL){
-		exact = true;
-	}
+
+	if ( target != NULL ) exact = true;
 
 	slVectorSub(targetLoc, &sensorPos->location, &dir);
 
-	for(neigh_iter = neighbors->begin(); neigh_iter != neighbors->end(); neigh_iter++) {
+	for( neigh_iter = neighbors->begin(); neigh_iter != neighbors->end(); neigh_iter++ ) {
   		slWorldObject *o = *neigh_iter;
 		shape = o->getShape();
 		isTarget = (o==target);
@@ -558,10 +559,10 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 		if(!insideSensorBorder(shape, shapePos, sensorPos)){//if singleray was true we could only send to agents hit by the ray
 			continue;
 		}	
-		for(fi = (shape->faces.begin()); fi != (shape->faces.end()); fi++ ) {
+
+		for( fi = (shape->faces.begin()); fi != (shape->faces.end()); fi++ ) {
 			slFace *f = *fi;
 			slPlane wcPlane; //world coordinates
-			slPlane wcPlane2; //world coordinates
 
 			slVectorXform(shapePos->rotation, &f->plane.normal, &wcPlane.normal);
 

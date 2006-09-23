@@ -15,8 +15,8 @@ breveFrontend *breveFrontendInit(int argc, char **argv) {
 	breveFrontend *frontend = new breveFrontend;
 
 	frontend->engine = brEngineNew();
-	frontend->engine->argc = argc;
-	frontend->engine->argv = argv;
+	frontend->engine->argc = argc - 1 ;
+	frontend->engine->argv = argv + 1;
 
 	return frontend;
 }

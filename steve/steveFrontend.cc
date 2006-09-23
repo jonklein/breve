@@ -26,7 +26,7 @@ void stCrashCatcher( int s ) {
 	raise( s );
 }
 
-void *breveFrontendInitData(brEngine *engine) {
+void *breveFrontendInitData( brEngine *engine ) {
 #if HAVE_LIBJAVA
 	// brJavaInit(engine);
 #endif

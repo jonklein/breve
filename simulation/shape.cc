@@ -1277,13 +1277,13 @@ void slSphere::bounds(slPosition *position, slVector *min, slVector *max) {
 
 }
 
-void slShape::bounds(slPosition *position, slVector *min, slVector *max) {
-	std::vector<slPoint*>::iterator pi;
+void slShape::bounds(slPosition *position, slVector *min, slVector *max) const {
+	std::vector<slPoint*>::const_iterator pi;
 
 	slVectorSet(max, INT_MIN, INT_MIN, INT_MIN);
 	slVectorSet(min, INT_MAX, INT_MAX, INT_MAX);
 
-    for(pi = points.begin(); pi != points.end(); pi++ ) {
+    for( pi = points.begin(); pi != points.end(); pi++ ) {
         slPoint *p = *pi;
 		slVector loc;
 

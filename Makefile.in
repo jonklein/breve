@@ -9,6 +9,8 @@ YACC		= @YACC@
 
 @SET_MAKE@
 
+LIBS		= @LIBS@
+
 VERSION		= @VERSION@
 
 CFLAGS		= @CFLAGS@
@@ -43,6 +45,7 @@ include steve/Makefile
 include java/Makefile
 include docBuild/Makefile
 include util/Makefile
+include WinSaver/Makefile
 
 DEPS := $(SRC) bin/breve.cc bin/breve_cli.cc
 DEPS := $(DEPS:.cc=.d)
@@ -54,16 +57,16 @@ OBJ	:= $(SRC:.cc=.o)
 OBJ	:= $(OBJ:.c=.o)
 
 bin/breve@EXE_SUFFIX@: bin/breve.o $(OBJ)
-	$(CXX) -o $@ $(CFLAGS) $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@ 
+	$(CXX) -o $@ $(CFLAGS) $(LDFLAGS) $^ @PLUGINIMP@ $(LIBS)
 
 bin/breve_cli@EXE_SUFFIX@: bin/breve_cli.o $(OBJ)
-	$(CXX) -o $@ $(CFLAGS) $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@
+	$(CXX) -o $@ $(CFLAGS) $(LDFLAGS) $^ @PLUGINIMP@ $(LIBS)
 
 bin/osmesaloader.o: bin/osmesaloader.cc
 	-$(CXX) -shared -o $@ $(LDFLAGS) $^ -lOSMesa
 
 breve.dll: $(OBJ)
-	$(CXX) @PLUGINFLAGS@ -o $@ @PLUGINIMP@ $^ @LIBS@
+	$(CXX) @PLUGINFLAGS@ -o $@ @PLUGINIMP@ $^ $(LIBS)
 
 %.o: %.c
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(CPPFLAGS) 
