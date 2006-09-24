@@ -30,62 +30,70 @@
 
 static int gDebugLevel;
 
-static void (*gMessageOutputFunction)(char *) = slStderrMessageCallback;
+static void( *gMessageOutputFunction )( char * ) = slStderrMessageCallback;
 
 
-void slSetDebugLevel(int level) {
-    gDebugLevel = level;
+void slSetDebugLevel( int level ) {
+	gDebugLevel = level;
 }
 
-void slSetMessageCallbackFunction(void (f)(char *)) {
+void slSetMessageCallbackFunction( void( f )( char * ) ) {
+
 	gMessageOutputFunction = f;
 }
 
-void slStderrMessageCallback(char *string) {
-	fprintf(stderr, "%s", string);
-	fflush(stderr);
+void slStderrMessageCallback( char *string ) {
+	fprintf( stderr, "%s", string );
+	fflush( stderr );
 }
 
 /*!
 	\brief Prints a fatal error to stderr and quits.
-    
+
 	slFatal is an exception to the normal error handling rules.
-	Regardless of the message-output callback function, we'll 
+	Regardless of the message-output callback function, we'll
 	print the error to stderr before quitting.
 */
 
-void slFatal(char *format, ...) {
-    va_list vp;
+void slFatal( char *format, ... ) {
+	va_list vp;
 
-    fprintf(stderr, "Fatal error: ");
-    va_start(vp, format);
-    vfprintf(stderr, format, vp);
-    va_end(vp);
+	fprintf( stderr, "Fatal error: " );
+	va_start( vp, format );
+	vfprintf( stderr, format, vp );
+	va_end( vp );
 
-    fprintf(stderr, "[hit enter to exit]\n");
-    getchar();
+	fprintf( stderr, "[hit enter to exit]\n" );
+	getchar();
 
-    exit(0);
+	exit( 0 );
 }
 
-void slMessage(int level, const char *format, ...) {
-	if (level > gDebugLevel || !gMessageOutputFunction)
+void slMessage( int level, const char *format, ... ) {
+	if ( level > gDebugLevel || !gMessageOutputFunction )
 		return;
 
-	va_list vp;   
+	va_list vp;
+
 	char *queueMessage;
 
-	va_start(vp, format);
-#if HAVE_VASPRINTF
-	if (vasprintf(&queueMessage, format, vp) == -1)
-		return;
-#else
-	const size_t len = 1024 + strlen(format) * 10;
-	queueMessage = (char *)malloc(len);
-	vsnprintf(queueMessage, len, format, vp);
-#endif
-	va_end(vp);
+	va_start( vp, format );
 
-	gMessageOutputFunction(queueMessage);
-	free(queueMessage);
+#if HAVE_VASPRINTF
+	if ( vasprintf( &queueMessage, format, vp ) == -1 )
+		return;
+
+#else
+	const size_t len = 1024 + strlen( format ) * 10;
+
+	queueMessage = ( char * )malloc( len );
+
+	vsnprintf( queueMessage, len, format, vp );
+
+#endif
+	va_end( vp );
+
+	gMessageOutputFunction( queueMessage );
+
+	free( queueMessage );
 }

@@ -32,73 +32,67 @@
  * without exiting the program.
  */
 
-void slGSLErrorHandler (const char * reason, const char * file, int line, int gsl_errno) {
+void slGSLErrorHandler( const char * reason, const char * file, int line, int gsl_errno ) {
 	throw slException( std::string( "GSL Error" ) );
 }
 
 /**
  *  slVectorViewGSL vector length constructor.
  *
- * 
  *  @param length the length of the vector.
  */
-slVectorViewGSL::slVectorViewGSL(const int length)
-    :   _vec(gsl_vector_float_alloc (length)),
-        _block(_vec->block),
-        _dim(_vec->size)
-{
-    gsl_vector_float_set_zero(_vec);
+
+slVectorViewGSL::slVectorViewGSL( const int length ) :   _vec( gsl_vector_float_alloc( length ) ) {
+	_block 	= _vec->block;
+	_dim 	= _vec->size;
+
+	gsl_vector_float_set_zero( _vec );
 }
 
 /**
  *  slVectorViewGSL copy constructor.
- * 
+ *
  *  @param other the number of elements in the matrix.
  */
-slVectorViewGSL::slVectorViewGSL(const slVectorViewGSL& other)
-    :   _vec(gsl_vector_float_alloc(other._dim)),
-        _block(_vec->block),
-        _dim(other._dim)
-{
-    gsl_blas_scopy(other._vec, _vec);
+
+slVectorViewGSL::slVectorViewGSL( const slVectorViewGSL& other ) :   _vec( gsl_vector_float_alloc( other._dim ) ) {
+ 	_block = _vec->block;
+	_dim = other._dim;
+
+	gsl_blas_scopy( other._vec, _vec );
 }
 
 /**
  *  slVectorViewGSL sub vector copy constructor.
- * 
+ *
  *  @param other the number of elements in the matrix.
  */
-slVectorViewGSL::slVectorViewGSL(const slVectorViewGSL& other, const int offset,  const int length)
-    :   _vec(gsl_vector_float_alloc(other._dim)),
-        _block(_vec->block),
-        _dim(other._dim)
-{
-    gsl_blas_scopy(other._vec, _vec);
+slVectorViewGSL::slVectorViewGSL( const slVectorViewGSL& other, const int offset,  const int length ) : _vec( gsl_vector_float_alloc( other._dim ) ) {
+	_block = _vec->block;
+	_dim =  other._dim;
+	gsl_blas_scopy( other._vec, _vec );
 }
 
 /**
  *  slVectorViewGSL destructor.
- * 
+ *
  */
-slVectorViewGSL::~slVectorViewGSL()
-{
-    gsl_vector_float_free(_vec);
+slVectorViewGSL::~slVectorViewGSL() {
+	gsl_vector_float_free( _vec );
 }
 
-// inline 
-void slVectorViewGSL::copyData(const slVectorView& other)
-{
-    gsl_blas_scopy(other.getGSLVector(), this->getGSLVector());
+// inline
+void slVectorViewGSL::copyData( const slVectorView& other ) {
+	gsl_blas_scopy( other.getGSLVector(), this->getGSLVector() );
 }
 
 //inline
-void slVectorViewGSL::setAll(const float value)
-{
-	gsl_vector_float_set_all( _vec, value);
+void slVectorViewGSL::setAll( const float value ) {
+	gsl_vector_float_set_all( _vec, value );
 }
 
 /**
- * 
+ *
  * clamp(low, tolerance, high)
  *
  * Clamps the values in the matrix to be between low and high.  If the value
@@ -107,16 +101,16 @@ void slVectorViewGSL::setAll(const float value)
  * and if between low and low+tolerance -> low?
  */
 
-void slVectorViewGSL::clamp(const float low, const float tolerance, const float high) {
+void slVectorViewGSL::clamp( const float low, const float tolerance, const float high ) {
 	unsigned int x;
 
-	for(x = 0; x < static_cast<unsigned int>(_dim); x++ ) {
-        if( _vec->data[x] > high) {
-             _vec->data[x] = high;
-        } else if( _vec->data[x] < tolerance) {
-            _vec->data[x] = low;
-        }
-    }	
+	for ( x = 0; x < static_cast<unsigned int>( _dim ); x++ ) {
+		if ( _vec->data[x] > high ) {
+			_vec->data[x] = high;
+		} else if ( _vec->data[x] < tolerance ) {
+			_vec->data[x] = low;
+		}
+	}
 }
 
 
@@ -124,237 +118,213 @@ void slVectorViewGSL::clamp(const float low, const float tolerance, const float 
  *  Returns the VectorView's vector elements as a gsl_vector
  *
  */
-inline gsl_vector_float* slVectorViewGSL::getGSLVector() const
-{
-    return _vec;
+inline gsl_vector_float* slVectorViewGSL::getGSLVector() const {
+	return _vec;
 }
 
 /**
  *  Returns the dimensionality of the vector.
  *
  */
-inline unsigned int slVectorViewGSL::dim() const
-{
-    return _dim;
+inline unsigned int slVectorViewGSL::dim() const {
+	return _dim;
 }
 
 /**
  *  Returns the sum of the elements in the vector.
  */
-inline float slVectorViewGSL::sum() const
-{
-    float result = 0;
-    int i;
-    for (i = 0; i < _dim; i++)
-    {
-        result += _vec->data[i];
-    }
-    return result;
-    
+inline float slVectorViewGSL::sum() const {
+	float result = 0;
+	int i;
+
+	for ( i = 0; i < _dim; i++ ) {
+		result += _vec->data[i];
+	}
+
+	return result;
+
 }
 
 /**
  *  Returns the absolute sum of the elements in the vector.
  */
-inline float slVectorViewGSL::absoluteSum() const
-{
-    return gsl_blas_sasum(_vec);
+inline float slVectorViewGSL::absoluteSum() const {
+	return gsl_blas_sasum( _vec );
 }
 
 /**
  *  Returns the max of the absolute value of the elements in the vector.
  */
-inline float slVectorViewGSL::maxAbsolute() const
-{
-    return gsl_vector_float_get(_vec, gsl_blas_isamax(_vec));
+inline float slVectorViewGSL::maxAbsolute() const {
+	return gsl_vector_float_get( _vec, gsl_blas_isamax( _vec ) );
 }
 
 /**
  *  Returns the max of the elements in the vector.
  */
-inline float slVectorViewGSL::max() const
-{
-    return gsl_vector_float_max(_vec);
+inline float slVectorViewGSL::max() const {
+	return gsl_vector_float_max( _vec );
 }
 
 /**
  *  Returns the min of the elements in the vector.
  */
-inline float slVectorViewGSL::min() const
-{
-    return gsl_vector_float_min(_vec);
+inline float slVectorViewGSL::min() const {
+	return gsl_vector_float_min( _vec );
 }
 
 /**
  *  Multiples the vector with a scalar in place.
  */
-slVectorViewGSL& slVectorViewGSL::inPlaceMultiply(const float scalar)
-{ 
-    gsl_blas_sscal(scalar, _vec);
-    return *this;
+slVectorViewGSL& slVectorViewGSL::inPlaceMultiply( const float scalar ) {
+	gsl_blas_sscal( scalar, _vec );
+	return *this;
 }
 
 /**
  *  Multiples the vector with a scalar in place.
  */
-slVectorViewGSL& slVectorViewGSL::scale(const float scalar)
-{
-    
-    this->inPlaceMultiply(scalar);
-    return *this;
+slVectorViewGSL& slVectorViewGSL::scale( const float scalar ) {
+
+	this->inPlaceMultiply( scalar );
+	return *this;
 }
 
 /**
  *  Multiples the vector with another vector in place.
  */
-slVectorViewGSL& slVectorViewGSL::inPlaceMultiply(const slVectorView& other)
-{
+slVectorViewGSL& slVectorViewGSL::inPlaceMultiply( const slVectorView& other ) {
 	// error checking needed
-	
-    gsl_vector_float_mul(this->getGSLVector(), other.getGSLVector());
-    return *this;
+
+	gsl_vector_float_mul( this->getGSLVector(), other.getGSLVector() );
+	return *this;
 }
 
 /**
  *  Add a scalar to each elements of a matrix in place.
  */
-slVectorViewGSL& slVectorViewGSL::inPlaceAdd(const float scalar)
-{
-    // is there a BLAS version of this?
-    gsl_vector_float_add_constant(this->getGSLVector(), scalar);
-    return *this;
+slVectorViewGSL& slVectorViewGSL::inPlaceAdd( const float scalar ) {
+	// is there a BLAS version of this?
+	gsl_vector_float_add_constant( this->getGSLVector(), scalar );
+	return *this;
 }
 
 /**
  *  Add two equivilant dimension vectors in place.
  */
-slVectorViewGSL& slVectorViewGSL::inPlaceAdd(const slVectorView& other)
-{
-    gsl_blas_saxpy(1, other.getGSLVector(), this->getGSLVector());
-    return *this;
+slVectorViewGSL& slVectorViewGSL::inPlaceAdd( const slVectorView& other ) {
+	gsl_blas_saxpy( 1, other.getGSLVector(), this->getGSLVector() );
+	return *this;
 }
 
 /**
  *  Add a matrix that has been scaled by a scalar (in-place, same dimensions).
- * 
+ *
  *  @param scalar the value used to scale each element.
  */
-slVectorViewGSL& slVectorViewGSL::inPlaceScaleAndAdd(const float scalar, 
-                                              const slVectorView& other)
-{
-    gsl_blas_saxpy(scalar, other.getGSLVector(), this->getGSLVector());
-    return *this;
+slVectorViewGSL& slVectorViewGSL::inPlaceScaleAndAdd( const float scalar,
+        const slVectorView& other ) {
+	gsl_blas_saxpy( scalar, other.getGSLVector(), this->getGSLVector() );
+	return *this;
 }
 
 /**
  *  dot product
  */
-float slVectorViewGSL::dotProduct(const slVectorView& other) const
-{
-    float result = 0;
-    gsl_blas_sdot(_vec, other.getGSLVector(), &result);
-    return result;
+float slVectorViewGSL::dotProduct( const slVectorView& other ) const {
+	float result = 0;
+	gsl_blas_sdot( _vec, other.getGSLVector(), &result );
+	return result;
 }
 
 /**
  *  outer product
  */
-slBigMatrix2DGSL& slVectorViewGSL::outerProduct(const slVectorView& other) const
-{
-    unsigned int i, j;
-    float  *v = _vec->data;
-    float  *u = other.getGSLVector()->data; 
-    slBigMatrix2DGSL* result = new slBigMatrix2DGSL(_dim, other.dim());
-    
-    for (i = 0; i < _dim; i++)
-    {
-        for (j = 0; j < other.dim(); j++)
-        {
-            result->_matrix->data[i * result->_matrix->tda + j] = (v[i] * u[j]);
-        }
-    }
-    return *result;
+slBigMatrix2DGSL& slVectorViewGSL::outerProduct( const slVectorView& other ) const {
+	unsigned int i, j;
+	float  *v = _vec->data;
+	float  *u = other.getGSLVector()->data;
+	slBigMatrix2DGSL* result = new slBigMatrix2DGSL( _dim, other.dim() );
+
+	for ( i = 0; i < _dim; i++ ) {
+		for ( j = 0; j < other.dim(); j++ ) {
+			result->_matrix->data[i * result->_matrix->tda + j] = ( v[i] * u[j] );
+		}
+	}
+
+	return *result;
 }
 
 /**
  *  outer product
  */
-slBigMatrix2DGSL& slVectorViewGSL::outerProductInto(const slVectorView& other, slBigMatrix2DGSL& result) const
-{
-    unsigned int i, j;
-    float  *v = _vec->data;
-    float  *u = other.getGSLVector()->data; 
-    
-    if (result._xdim == _dim && result._ydim == other.dim())
-    {
-        for (i = 0; i < _dim; i++)
-        {
-            for (j = 0; j < other.dim(); j++)
-            {
-                result._matrix->data[i * result._matrix->tda + j] = (v[i] * u[j]);
-            }
-        }
-    }
-    else
-    {
-        throw slException( "slVectorViewGSL::outerProductInto: Dimension Mismatch" );
-    }
-    return result;
+slBigMatrix2DGSL& slVectorViewGSL::outerProductInto( const slVectorView& other, slBigMatrix2DGSL& result ) const {
+	unsigned int i, j;
+	float  *v = _vec->data;
+	float  *u = other.getGSLVector()->data;
+
+	if ( result._xdim == _dim && result._ydim == other.dim() ) {
+		for ( i = 0; i < _dim; i++ ) {
+			for ( j = 0; j < other.dim(); j++ ) {
+				result._matrix->data[i * result._matrix->tda + j] = ( v[i] * u[j] );
+			}
+		}
+	} else {
+		throw slException( "slVectorViewGSL::outerProductInto: Dimension Mismatch" );
+	}
+
+	return result;
 }
 
-slVectorViewGSL& slVectorViewGSL::inPlaceAddVectorMatrixProduct(const float scalar, const slBigMatrix2DGSL& matrix, const slVectorViewGSL& other)
-{
-    gsl_blas_sgemv(CblasNoTrans, scalar, matrix._matrix, other.getGSLVector(), 1.0, this->getGSLVector());
-    return *this;
+slVectorViewGSL& slVectorViewGSL::inPlaceAddVectorMatrixProduct( const float scalar, const slBigMatrix2DGSL& matrix, const slVectorViewGSL& other ) {
+
+	gsl_blas_sgemv( CblasNoTrans, scalar, matrix._matrix, other.getGSLVector(), 1.0, this->getGSLVector() );
+	return *this;
 
 }
 
 /**
  *  Addition operator (must have common dimensions).
  */
-slVectorViewGSL& slVectorViewGSL::operator+(const slVectorView& other)
-{
-    slVectorViewGSL *tmp = new slVectorViewGSL(*this);
-    gsl_blas_saxpy(1, tmp->getGSLVector(), this->getGSLVector());;
-    return *tmp;
+slVectorViewGSL& slVectorViewGSL::operator+( const slVectorView& other ) {
+	slVectorViewGSL *tmp = new slVectorViewGSL( *this );
+	gsl_blas_saxpy( 1, tmp->getGSLVector(), this->getGSLVector() );
+	;
+	return *tmp;
 }
 
 /**
  *  Addition operator (adds scalar to each element).
  */
-slVectorViewGSL& slVectorViewGSL::operator+(const float scalar)
-{
-    slVectorViewGSL *tmp = new slVectorViewGSL(*this);
-    gsl_vector_float_add_constant(tmp->getGSLVector(), scalar);
-    return *tmp;
+slVectorViewGSL& slVectorViewGSL::operator+( const float scalar ) {
+	slVectorViewGSL *tmp = new slVectorViewGSL( *this );
+	gsl_vector_float_add_constant( tmp->getGSLVector(), scalar );
+	return *tmp;
 }
 
 /**
  *  Vector element multiplication operator (must have identical dimensions).
  */
-slVectorViewGSL& slVectorViewGSL::operator*(const slVectorView& other)
-{
-    slVectorViewGSL *tmp = new slVectorViewGSL(*this);
-    gsl_vector_float_mul(other.getGSLVector(), tmp->getGSLVector());
-    return *tmp;
+slVectorViewGSL& slVectorViewGSL::operator*( const slVectorView& other ) {
+	slVectorViewGSL *tmp = new slVectorViewGSL( *this );
+	gsl_vector_float_mul( other.getGSLVector(), tmp->getGSLVector() );
+	return *tmp;
 }
 
 /**
  *  Vector element in-place multiplication.
  */
-slVectorViewGSL& slVectorViewGSL::operator*(const float scalar)
-{
-    slVectorViewGSL *tmp = new slVectorViewGSL(*this);
-    gsl_blas_sscal(scalar, tmp->getGSLVector());
-    return *tmp;
+slVectorViewGSL& slVectorViewGSL::operator*( const float scalar ) {
+	slVectorViewGSL *tmp = new slVectorViewGSL( *this );
+	gsl_blas_sscal( scalar, tmp->getGSLVector() );
+	return *tmp;
 }
 
 /**
  *  Vector euclidian norm.
  */
-float slVectorViewGSL::magnitude() const
-{
-    return gsl_blas_snrm2(_vec);
+float slVectorViewGSL::magnitude() const {
+	return gsl_blas_snrm2( _vec );
 }
 
 /**
@@ -380,28 +350,22 @@ float slVectorViewGSL::magnitude() const
 /**
  *  Base 1D matrix/vector class using GSL
  */
-slBigVectorGSL::slBigVectorGSL(const int x)
-    : slVectorViewGSL(x)
-{
-
+slBigVectorGSL::slBigVectorGSL( const int x )
+		: slVectorViewGSL( x ) {
 }
 
 /**
  *
  */
-slBigVectorGSL::slBigVectorGSL(const slBigVectorGSL& other)
-    : slVectorViewGSL(static_cast<const slVectorViewGSL&>(other))
-{
-
+slBigVectorGSL::slBigVectorGSL( const slBigVectorGSL& other )
+		: slVectorViewGSL( static_cast<const slVectorViewGSL&>( other ) ) {
 }
 
 /**
  *
  */
-slBigVectorGSL::slBigVectorGSL(const slVectorViewGSL& other, const int offset, const int length)
-    : slVectorViewGSL(other, offset, length)
-{
-
+slBigVectorGSL::slBigVectorGSL( const slVectorViewGSL& other, const int offset, const int length )
+		: slVectorViewGSL( other, offset, length ) {
 }
 
 /**
@@ -422,18 +386,20 @@ slBigVectorGSL::~slBigVectorGSL() {}
 /**
  *
  */
-//inline 
-float slBigVectorGSL::get( const int inX ) const
-{
-	return _vec->data[ inX ];
-}
+//inline
+float slBigVectorGSL::get( const int inX ) const {
+		if( *(unsigned int*)&_vec->data[ inX ] == 0x55555555 )
+			printf(" Got 0x55 in matrix\n" );
+		return _vec->data[ inX ];
+	}
 
 /**
  *
  */
-//inline 
+//inline
 void slBigVectorGSL::set( const int inX, const float value ) {
-	if( inX > _dim ) throw slException( "Vector index out of bounds" );
+	if ( inX > _dim ) throw slException( "Vector index out of bounds" );
+
 	_vec->data[ inX ] = value;
 }
 
@@ -442,38 +408,35 @@ void slBigVectorGSL::set( const int inX, const float value ) {
  *  Base 2D matrix class using GSL
  */
 
-slBigMatrix2DGSL::slBigMatrix2DGSL(const int x, const int y) 
-    : slVectorViewGSL((x * y)),
-    _xdim (x),
-    _ydim (y)
-{
-    _matrix = gsl_matrix_float_alloc_from_block(slVectorViewGSL::_vec->block, 0, _xdim, _ydim, _ydim);
+slBigMatrix2DGSL::slBigMatrix2DGSL( const int x, const int y ) : slVectorViewGSL( x * y ) {
+	_xdim = x;
+	_ydim = y;
+	_matrix = gsl_matrix_float_alloc_from_block( slVectorViewGSL::_vec->block, 0, _xdim, _ydim, _ydim );
+	gsl_matrix_float_set_zero( _matrix );
 }
 
-slBigMatrix2DGSL::slBigMatrix2DGSL(const slBigMatrix2DGSL& other) 
-    : slVectorViewGSL(static_cast<slVectorViewGSL>(other)),
-    _xdim (other._xdim),
-    _ydim (other._ydim)
-{
-    
-    _matrix = gsl_matrix_float_alloc_from_block(slVectorViewGSL::_vec->block, 0, _xdim, _ydim, _ydim);
-    
+slBigMatrix2DGSL::slBigMatrix2DGSL( const slBigMatrix2DGSL& other ) : slVectorViewGSL( static_cast<slVectorViewGSL>( other ) ) {
+	_xdim =  other._xdim;
+	_ydim =  other._ydim;
+
+	_matrix = gsl_matrix_float_alloc_from_block( slVectorViewGSL::_vec->block, 0, _xdim, _ydim, _ydim );
+	gsl_matrix_float_set_zero( _matrix );
+
 }
 
-slBigMatrix2DGSL::~slBigMatrix2DGSL()
-{
-    gsl_matrix_float_free(_matrix);
+slBigMatrix2DGSL::~slBigMatrix2DGSL() {
+
+	gsl_matrix_float_free( _matrix );
 }
 
-inline unsigned int slBigMatrix2DGSL::xDim() const
-{
-    return _xdim;
-} 
+inline unsigned int slBigMatrix2DGSL::xDim() const {
+	return _xdim;
+}
 
-inline unsigned int slBigMatrix2DGSL::yDim() const
-{
-    return _ydim;
-} 
+inline unsigned int slBigMatrix2DGSL::yDim() const {
+
+	return _ydim;
+}
 
 /**
  *  get(x, y) - returns the matrix element at x,y without range checking
@@ -481,12 +444,14 @@ inline unsigned int slBigMatrix2DGSL::yDim() const
  *  The basic slBigMatrix classes do not implement range checking.  When used
  *  in steve code, the range checking should occur there.  In the future a
  *  subclass with range checking can be provided.
- */ 
-// inline 
-float slBigMatrix2DGSL::get(const int x, const int y) const
-{
-    return _matrix->data[x * _matrix->tda + y];
-}
+ */
+// inline
+float slBigMatrix2DGSL::get( const int x, const int y ) const {
+		if( *(unsigned int*)&_matrix->data[x * _matrix->tda + y]  == 0x55555555 ) 
+			printf(" Got 0x55 in matrix\n" );
+
+		return _matrix->data[x * _matrix->tda + y];
+	}
 
 
 /**
@@ -495,36 +460,35 @@ float slBigMatrix2DGSL::get(const int x, const int y) const
  *  The basic slBigMatrix classes do not implement range checking.  When used
  *  in steve code, the range checking should occur there.  In the future a
  *  subclass with range checking can be provided.
- */ 
+ */
 //inline
- void slBigMatrix2DGSL::set(const int x, const int y, const float value)
-{
-    _matrix->data[x * _matrix->tda + y] = value;
+void slBigMatrix2DGSL::set( const int x, const int y, const float value ) {
+	_matrix->data[x * _matrix->tda + y] = value;
 }
 
-slBigVectorGSL& slBigMatrix2DGSL::vectorMultiply(const slVectorViewGSL& vector) const
-{
-    slBigVectorGSL* result = new slBigVectorGSL(vector.dim());
-    gsl_blas_sgemv(CblasNoTrans, 1.0, _matrix, vector.getGSLVector(), 0.0, result->getGSLVector());
-    return *result;
+slBigVectorGSL& slBigMatrix2DGSL::vectorMultiply( const slVectorViewGSL& vector ) const {
+
+	slBigVectorGSL* result = new slBigVectorGSL( vector.dim() );
+	gsl_blas_sgemv( CblasNoTrans, 1.0, _matrix, vector.getGSLVector(), 0.0, result->getGSLVector() );
+	return *result;
 }
 
-slBigMatrix2DGSL& slBigMatrix2DGSL::vectorMultiplyInto(const slVectorViewGSL& sourceVector, slVectorViewGSL& resultVector)
-{
-    gsl_blas_sgemv(CblasNoTrans, 1.0, _matrix, sourceVector.getGSLVector(), 0.0, resultVector.getGSLVector());
-    return *this;
+slBigMatrix2DGSL& slBigMatrix2DGSL::vectorMultiplyInto( const slVectorViewGSL& sourceVector, slVectorViewGSL& resultVector ) {
+
+	gsl_blas_sgemv( CblasNoTrans, 1.0, _matrix, sourceVector.getGSLVector(), 0.0, resultVector.getGSLVector() );
+	return *this;
 }
 
-slBigMatrix2DGSL& slBigMatrix2DGSL::matrixMultiplyInto(const slBigMatrix2DGSL& sourceMatrix, slBigMatrix2DGSL& resultMatrix)
-{
-    gsl_blas_sgemm(CblasNoTrans, CblasNoTrans, 1.0, _matrix, sourceMatrix._matrix, 0.0, resultMatrix._matrix);
-    return *this;
+slBigMatrix2DGSL& slBigMatrix2DGSL::matrixMultiplyInto( const slBigMatrix2DGSL& sourceMatrix, slBigMatrix2DGSL& resultMatrix ) {
+
+	gsl_blas_sgemm( CblasNoTrans, CblasNoTrans, 1.0, _matrix, sourceMatrix._matrix, 0.0, resultMatrix._matrix );
+	return *this;
 }
 
-slBigMatrix2DGSL& slBigMatrix2DGSL::vectorMultiplyInto(const slVectorViewGSL& sourceVector, const float scalar, slVectorViewGSL& resultVector)
-{
-    gsl_blas_sgemv(CblasNoTrans, scalar, _matrix, sourceVector.getGSLVector(), 0.0, resultVector.getGSLVector());
-    return *this;
+slBigMatrix2DGSL& slBigMatrix2DGSL::vectorMultiplyInto( const slVectorViewGSL& sourceVector, const float scalar, slVectorViewGSL& resultVector ) {
+
+	gsl_blas_sgemv( CblasNoTrans, scalar, _matrix, sourceVector.getGSLVector(), 0.0, resultVector.getGSLVector() );
+	return *this;
 }
 
 /*
@@ -534,37 +498,35 @@ slBigVectorGSL& slBigMatrix2DGSL::getRowVector(const int x)
     slBigVectorGSL *result = new slBigVectorGSL((gsl_vector_float *)row);
     return *result;
 }
-*/      
-float slBigMatrix2DGSL::getRowMagnitude(const int x)
-{
-    gsl_vector_float *row = &gsl_matrix_float_row(_matrix, x).vector;
-    return gsl_blas_snrm2(row);
+*/
+float slBigMatrix2DGSL::getRowMagnitude( const int x ) {
+	gsl_vector_float *row = &gsl_matrix_float_row( _matrix, x ).vector;
+	return gsl_blas_snrm2( row );
 }
 
-slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceRowMultiply(const int x, const float scalar)
-{
-    gsl_vector_float *row = &gsl_matrix_float_row(_matrix, x).vector;
-    gsl_blas_sscal(scalar, row);
-    return *this;
+slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceRowMultiply( const int x, const float scalar ) {
+
+	gsl_vector_float *row = &gsl_matrix_float_row( _matrix, x ).vector;
+	gsl_blas_sscal( scalar, row );
+	return *this;
 }
 
-/*        
+/*
 slBigVectorGSL& slBigMatrix2DGSL::getColumnVector(const int y)
 {
     return new slBigVectorGSL(&gsl_matrix_float_column(_matrix, y));
 }
-*/        
-float slBigMatrix2DGSL::getColumnMagnitude(const int y)
-{
-    gsl_vector_float *column = &gsl_matrix_float_column(_matrix, y).vector;
-    return gsl_blas_snrm2(column);
+*/
+float slBigMatrix2DGSL::getColumnMagnitude( const int y ) {
+	gsl_vector_float *column = &gsl_matrix_float_column( _matrix, y ).vector;
+	return gsl_blas_snrm2( column );
 }
 
-slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceColumnMultiply(const int y, const float scalar)
-{
-    gsl_vector_float *column = &gsl_matrix_float_column(_matrix, y).vector;
-    gsl_blas_sscal(scalar, column);
-    return *this;
+slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceColumnMultiply( const int y, const float scalar ) {
+
+	gsl_vector_float *column = &gsl_matrix_float_column( _matrix, y ).vector;
+	gsl_blas_sscal( scalar, column );
+	return *this;
 
 }
 
@@ -581,10 +543,10 @@ slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceConvolve(const slBigMatrix2D& kernel)
 	unsigned int kernelXDim = kernelGSL->xDim();
 	unsigned int kernelYDim = kernelGSL->yDim();
 	unsigned int kernelXCenter = 0, kernelYCenter = 0;
-    unsigned int x, y, xk, yk; 
+    unsigned int x, y, xk, yk;
     float newVal = 0.0f;
     float oldVal = 0.0f;
-    
+
     if ((kernelXDim % 2) > 0 || (kernelXDim % 2) > 0)
     {
         // throw not odd dimension exception
@@ -596,11 +558,11 @@ slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceConvolve(const slBigMatrix2D& kernel)
         kernelYCenter = (kernelYDim / 2) + 1;
         slBigBatrix2DGSL& convolutedGSL = new slBigMatrix2DGSL(this->_xDim, this->_yDim);
     }
-    
+
     /////////// CURRENTLY USING INPLACE--SHOULD IT BE COPY?
-    
+
     /////////// Need to correct multiplication in inner loop
-    
+
     // loop unrolled to reduce tests for bounds
     // lower y
     for (y = 0; y < kernelYCenter - 1; y++)
@@ -614,9 +576,9 @@ slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceConvolve(const slBigMatrix2D& kernel)
                 {
                     newVal += kernelData[xk * kernelTDA + yk] * thisData[(x - xk) * thisTDA + (y - yk)];
                 }
-                
+
             thisData[x*thisTDA + y] = newValue;
-        
+
         }
         // upper x
         for (x = this->xDim - (kernelXCenter - 1); x < this->xDim; x++)
@@ -627,11 +589,11 @@ slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceConvolve(const slBigMatrix2D& kernel)
                 {
                     newVal += kernelData[xk * kernelTDA + yk] * thisData[(x - (kernelXCenter - xk)) * thisTDA + (y - yk)];
                 }
-                
+
             thisData[x*thisTDA + y] = newValue;
         }
     }
-    
+
     // upper y
     for (y = this->yDim - (kernelYcenter - 1); y < this->yDim; y++)
     {
@@ -644,7 +606,7 @@ slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceConvolve(const slBigMatrix2D& kernel)
                 {
                     newVal += kernelData[xk * kernelTDA + yk] * thisData[(x - xk) * thisTDA + (y - (kernelYCenter - yk))];
                 }
-                
+
             thisData[x*thisTDA + y] = newValue;
         }
         // upper x
@@ -657,11 +619,11 @@ slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceConvolve(const slBigMatrix2D& kernel)
                     newVal += kernelData[xk * kernelTDA + yk] * thisData[(x - (kernelXCenter - xk)) * thisTDA + (y - (kernelYCenter - yk))];
 
                 }
-                
+
             thisData[x*thisTDA + y] = newValue;
         }
     }
-        
+
     for (y = kernelYCenter - 1; y < this->xDim - (kernelYCenter - 1); y++)
         for (x = kernelXCenter - 1; x < this->yDim - (kernelXCenter - 1); x++)
         {
@@ -671,10 +633,10 @@ slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceConvolve(const slBigMatrix2D& kernel)
                 {
                     newVal += kernelData[xk * kernelTDA + yk] * thisData[(x - (xk - kernelXCenter)) * thisTDA + (y - (yk - kernelYCenter))];
                 }
-                
+
             thisData[x*thisTDA + y] = newValue;
         }
-    
+
 }
 */
 
@@ -691,65 +653,63 @@ slBigMatrix2DGSL& slBigMatrix2DGSL::convolvePeriodic(const slBigMatrix2D& kernel
  *  Base 3D matrix class using GSL
  */
 
-slBigMatrix3DGSL::slBigMatrix3DGSL(const int x, const int y, const int z) 
-    : slVectorViewGSL((x * y * z)),
-    _xdim (x),
-    _ydim (y),
-    _zdim (z)
-{
-    unsigned int i = 0;
-    
-    _matrix = new gsl_matrix_float*[_zdim];
-    for (i = 0; i < _zdim; i++) {
-        _matrix[i] = gsl_matrix_float_alloc_from_block(slVectorViewGSL::_vec->block, (i * _xdim * _ydim), _xdim, _ydim, _ydim);
-    }
+slBigMatrix3DGSL::slBigMatrix3DGSL( const int x, const int y, const int z )
+		: slVectorViewGSL(( x * y * z ) ),
+		_xdim( x ),
+		_ydim( y ),
+		_zdim( z ) {
+	unsigned int i = 0;
+
+	_matrix = new gsl_matrix_float*[_zdim];
+
+	for ( i = 0; i < _zdim; i++ ) {
+		_matrix[ i ] = gsl_matrix_float_alloc_from_block( slVectorViewGSL::_vec->block, ( i * _xdim * _ydim ), _xdim, _ydim, _ydim );
+		gsl_matrix_float_set_zero( _matrix[ i ] );
+	}
 }
 
-slBigMatrix3DGSL::slBigMatrix3DGSL(const slBigMatrix3DGSL& other) 
-    : slVectorViewGSL(static_cast<slVectorViewGSL>(other)),
-    _xdim (other._xdim),
-    _ydim (other._ydim),
-    _zdim (other._zdim)
-{
-    unsigned int i = 0;
-    
-    _matrix = new gsl_matrix_float*[_zdim];
-    for (i = 0; i < _zdim; i++) {
-        _matrix[i] = gsl_matrix_float_alloc_from_block(slVectorViewGSL::_vec->block, (i * _xdim * _ydim), _ydim, _xdim, _xdim);
-    }
+slBigMatrix3DGSL::slBigMatrix3DGSL( const slBigMatrix3DGSL& other )
+
+		: slVectorViewGSL( static_cast<slVectorViewGSL>( other ) ),
+		_xdim( other._xdim ),
+		_ydim( other._ydim ),
+		_zdim( other._zdim ) {
+	unsigned int i = 0;
+
+	_matrix = new gsl_matrix_float*[_zdim];
+
+	for ( i = 0; i < _zdim; i++ ) {
+		_matrix[i] = gsl_matrix_float_alloc_from_block( slVectorViewGSL::_vec->block, ( i * _xdim * _ydim ), _ydim, _xdim, _xdim );
+		gsl_matrix_float_set_zero( _matrix[ i ] );
+	}
 }
 
-slBigMatrix3DGSL::~slBigMatrix3DGSL()
-{
-    for (unsigned int i = 0; i < _zdim; i++)
-        gsl_matrix_float_free(_matrix[i]);
+slBigMatrix3DGSL::~slBigMatrix3DGSL() {
+	for ( unsigned int i = 0; i < _zdim; i++ ) gsl_matrix_float_free( _matrix[i] );
 }
 
-inline unsigned int slBigMatrix3DGSL::xDim() const
-{
-    return _xdim;
-} 
+inline unsigned int slBigMatrix3DGSL::xDim() const {
+	return _xdim;
+}
 
-inline unsigned int slBigMatrix3DGSL::yDim() const
-{
-    return _ydim;
-} 
+inline unsigned int slBigMatrix3DGSL::yDim() const {
 
-inline unsigned int slBigMatrix3DGSL::zDim() const
-{
-    return _zdim;
-} 
+	return _ydim;
+}
 
-// inline 
-float slBigMatrix3DGSL::get(const int x, const int y, const int z) const
-{
-    return (_matrix[z])->data[x * (_matrix[z])->tda + y];
-} 
+inline unsigned int slBigMatrix3DGSL::zDim() const {
 
-//inline 
-void slBigMatrix3DGSL::set(const int x, const int y, const int z, const float value)
-{
-    (_matrix[z])->data[x * (_matrix[z])->tda + y] = value;
+	return _zdim;
+}
+
+// inline
+float slBigMatrix3DGSL::get( const int x, const int y, const int z ) const {
+		return ( _matrix[z] )->data[x *( _matrix[z] )->tda + y];
+	}
+
+//inline
+void slBigMatrix3DGSL::set( const int x, const int y, const int z, const float value ) {
+	( _matrix[z] )->data[x *( _matrix[z] )->tda + y] = value;
 }
 
 //slBigMatrix3DGSL& slBigMatrix3DGSL::convolve(const slBigMatrix3D& kernel) {}

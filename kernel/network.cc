@@ -13,12 +13,13 @@
 	\brief Get an address from a hostname.
 */
 
-long brAddrFromHostname(char *name) {
+long brAddrFromHostname( char *name ) {
+
 	struct hostent *e;
 
-	e = gethostbyname(name);
+	e = gethostbyname( name );
 
-	if(!e) return 0;
+	if ( !e ) return 0;
 
-	return *(long*)e->h_addr_list[0];
+	return *( long* )e->h_addr_list[0];
 }

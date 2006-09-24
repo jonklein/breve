@@ -24,15 +24,15 @@ brNamespace *brNamespaceNew() {
 	return new brNamespace;
 }
 
-void brNamespaceFree(brNamespace *ns) {
-	brNamespaceFreeWithFunction(ns, NULL);
+void brNamespaceFree( brNamespace *ns ) {
+	brNamespaceFreeWithFunction( ns, NULL );
 }
 
-void brNamespaceFreeWithFunction(brNamespace *ns, void (*symFree)(void *s)) {
+void brNamespaceFreeWithFunction( brNamespace *ns, void( *symFree )( void *s ) ) {
 	std::map< std::string, brNamespaceSymbol*>::iterator mi;
 
-	for(mi = ns->map.begin(); mi != ns->map.end(); mi++) {
-		if(mi->second) brNamespaceSymbolFreeWithFunction(mi->second, symFree);
+	for ( mi = ns->map.begin(); mi != ns->map.end(); mi++ ) {
+		if ( mi->second ) brNamespaceSymbolFreeWithFunction( mi->second, symFree );
 	}
 
 	ns->map.clear();
@@ -44,46 +44,47 @@ void brNamespaceFreeWithFunction(brNamespace *ns, void (*symFree)(void *s)) {
 	\brief Returns a slList of all of the data in the namespace.
 */
 
-slList *brNamespaceSymbolList(brNamespace *space) {
+slList *brNamespaceSymbolList( brNamespace *space ) {
 	slList *list = NULL;
 	std::map< std::string, brNamespaceSymbol*>::iterator mi;
 
-	for(mi = space->map.begin(); mi != space->map.end(); mi++) 
-		if(mi->second) list = slListPrepend(list, mi->second);
+	for ( mi = space->map.begin(); mi != space->map.end(); mi++ )
+		if ( mi->second ) list = slListPrepend( list, mi->second );
 
 	return list;
 }
 
-brNamespaceSymbol *brNamespaceStore(brNamespace *space, char *name, int type, void *data) {
+brNamespaceSymbol *brNamespaceStore( brNamespace *space, char *name, int type, void *data ) {
 	std::string nameS = name;
 
-	if(space->map[ nameS]) return NULL;
+	if ( space->map[ nameS] ) return NULL;
 
-	space->map[ nameS] = brNamespaceSymbolNew(type, data);
+	space->map[ nameS] = brNamespaceSymbolNew( type, data );
 
 	return space->map[ nameS];
 }
 
-brNamespaceSymbol *brNamespaceLookup(brNamespace *space, char *name) {
+brNamespaceSymbol *brNamespaceLookup( brNamespace *space, char *name ) {
 	std::string nameS = name;
 
-	if(!name) return NULL;
+	if ( !name ) return NULL;
 
 	return space->map[ nameS];
 }
 
-brNamespaceSymbol *brNamespaceSymbolNew(int type, void *data) {
+brNamespaceSymbol *brNamespaceSymbolNew( int type, void *data ) {
 	brNamespaceSymbol *s;
-	
+
 	s = new brNamespaceSymbol;
-	
+
 	s->type = type;
 	s->data = data;
-	
+
 	return s;
 }
 
-void brNamespaceSymbolFreeWithFunction(brNamespaceSymbol *s, void (*symFree)(void *s)) {
-	if(symFree && s->data) symFree(s->data);
+void brNamespaceSymbolFreeWithFunction( brNamespaceSymbol *s, void( *symFree )( void *s ) ) {
+	if ( symFree && s->data ) symFree( s->data );
+
 	delete s;
 }

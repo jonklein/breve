@@ -21,61 +21,68 @@
 #include "kernel.h"
 
 #ifdef MINGW
-const char *dlerror(void) {
+
+const char *dlerror( void ) {
 	static char message[256];
 
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL,
-		GetLastError(),
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		message,
-		sizeof(message),
-		NULL);
+	FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+	               NULL,
+	               GetLastError(),
+	               MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
+	               message,
+	               sizeof( message ),
+	               NULL );
 
 	return message;
 }
+
 #endif /* MINGW */
 
 /*!
 	\brief Opens a plugin and loads it into the engine.
 */
 
-int brEngineAddDlPlugin(char *filename, char *func, brEngine *e) {
+int brEngineAddDlPlugin( char *filename, char *func, brEngine *e ) {
 	char *fullpath;
 	void *handle;
 	brDlPlugin *p;
 
-	if (!(fullpath = brFindFile(e, filename, NULL))) {
-		slMessage(DEBUG_ALL, "Cannot find plugin \"%s\"\n", filename);
+	if ( !( fullpath = brFindFile( e, filename, NULL ) ) ) {
+		slMessage( DEBUG_ALL, "Cannot find plugin \"%s\"\n", filename );
 		return -1;
 	}
-	handle = brDlLoadPlugin(fullpath, func, e->internalMethods);
-	slFree(fullpath);
 
-	if (!handle)
+	handle = brDlLoadPlugin( fullpath, func, e->internalMethods );
+
+	slFree( fullpath );
+
+	if ( !handle )
 		return -1;
 
 	p = new brDlPlugin;
-	p->handle = handle;
-	p->name = slStrdup(filename);
-	e->dlPlugins.push_back(p);
 
-	return 0;	
+	p->handle = handle;
+
+	p->name = slStrdup( filename );
+
+	e->dlPlugins.push_back( p );
+
+	return 0;
 }
 
 /*!
 	\brief Frees and unloads all loaded plugins.
 */
 
-void brEngineRemoveDlPlugins(brEngine *e) {
+void brEngineRemoveDlPlugins( brEngine *e ) {
 	brDlPlugin *p;
 	std::vector<brDlPlugin*>::iterator di;
 
-	for (di = e->dlPlugins.begin(); di != e->dlPlugins.end(); di++ ) {
+	for ( di = e->dlPlugins.begin(); di != e->dlPlugins.end(); di++ ) {
 		p = *di;
 
-		dlclose(p->handle);
-		slFree(p->name);
+		dlclose( p->handle );
+		slFree( p->name );
 		delete p;
 	}
 }
@@ -84,23 +91,25 @@ void brEngineRemoveDlPlugins(brEngine *e) {
 	\brief Loads internal functions from a given plugin.
 */
 
-void *brDlLoadPlugin(char *filename, char *symname, brNamespace *n) {
-	void (*f)(brNamespace *);
+void *brDlLoadPlugin( char *filename, char *symname, brNamespace *n ) {
+	void( *f )( brNamespace * );
 	void *handle;
 
-	if (!(handle = dlopen(filename, RTLD_LAZY | RTLD_GLOBAL))) {
-		slMessage(DEBUG_ALL, "error loading plugin %s: %s\n",
-		    filename, dlerror());
-		return NULL;
-	}
-	if (!(f = (void (*)(brNamespace *))dlsym(handle, symname))) {
-		slMessage(DEBUG_ALL, "error resolving %s in %s: %s\n",
-		    symname, filename, dlerror());
+	if ( !( handle = dlopen( filename, RTLD_LAZY | RTLD_GLOBAL ) ) ) {
+		slMessage( DEBUG_ALL, "error loading plugin %s: %s\n",
+		           filename, dlerror() );
 		return NULL;
 	}
 
-	slMessage(DEBUG_INFO, "Calling %s() in %s\n", symname, filename);
-	f(n);
+	if ( !( f = ( void( * )( brNamespace * ) )dlsym( handle, symname ) ) ) {
+		slMessage( DEBUG_ALL, "error resolving %s in %s: %s\n",
+		           symname, filename, dlerror() );
+		return NULL;
+	}
+
+	slMessage( DEBUG_INFO, "Calling %s() in %s\n", symname, filename );
+
+	f( n );
 
 	return handle;
 }
@@ -112,6 +121,6 @@ void *brDlLoadPlugin(char *filename, char *symname, brNamespace *n) {
 	breve engine does.
 */
 
-char *brPluginFindFile(char *name, void *i) {
-	return brFindFile(((brInstance *)i)->engine, name, NULL);
+char *brPluginFindFile( char *name, void *i ) {
+	return brFindFile((( brInstance * )i )->engine, name, NULL );
 }

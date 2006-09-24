@@ -1,7 +1,7 @@
 /*****************************************************************************
  *                                                                           *
  * The breve Simulation Environment                                          *
- * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       * 
+ * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
  *                                                                           *
  * This program is free software; you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -33,124 +33,127 @@
 #include "util.h"
 
 /*!
-	\brief Splits a string into several smaller strings based on a 
+	\brief Splits a string into several smaller strings based on a
 	delimiter substring.
 
-	slSplit works more or less like the perl split function.  it takes 
+	slSplit works more or less like the perl split function.  it takes
 	a query string, a substring and an index N, and returns the Nth
 	element of the query string using the substring as a delimiter.
 
 	The returned string is slMalloc'd, and should be slFree'd after use.
 */
 
-char *slSplit(char *start, char *substr, int n) {
+char *slSplit( char *start, char *substr, int n ) {
 	int count = 0;
 	char *oldstart, *result;
 
 	oldstart = start;
 
-	while(start && count <= n) {
+	while ( start && count <= n ) {
 		oldstart = start;
-		start = strstr(start, substr);
+		start = strstr( start, substr );
 
-		if(start) start += strlen(substr);
+		if ( start ) start += strlen( substr );
 
 		count++;
 	}
 
-	if(count != n + 1) return NULL;
+	if ( count != n + 1 ) return NULL;
 
-	if(start) {
-		start -= strlen(substr);
+	if ( start ) {
+		start -= strlen( substr );
 
-		result = (char*)slMalloc((start - oldstart) + 1);
-		strncpy(result, oldstart, start - oldstart);
+		result = ( char* )slMalloc(( start - oldstart ) + 1 );
+		strncpy( result, oldstart, start - oldstart );
 		result[start - oldstart] = 0;
-	} else result = slStrdup(oldstart);
+	} else result = slStrdup( oldstart );
 
 	return result;
 }
 
 /*!
-	\brief A wrapper around fwrite() that guarantees that all bytes are 
+	\brief A wrapper around fwrite() that guarantees that all bytes are
 	written before returning.
 */
 
-int slUtilFwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream) {
+int slUtilFwrite( const void *ptr, size_t size, size_t nmemb, FILE *stream ) {
 	ssize_t n;
 	size_t written = 0;
 
-	while(written < nmemb) {
-		n = fwrite((char *)ptr + (written * size), size,
-			nmemb - written, stream);
+	while ( written < nmemb ) {
+		n = fwrite(( char * )ptr + ( written * size ), size,
+		           nmemb - written, stream );
 
-		if (n < 1)
+		if ( n < 1 )
 			return -1;
 
 		written += n;
 	}
+
 	return written;
 }
 
 /*!
-	\brief A wrapper around fread() that guarantees that all bytes are read 
+	\brief A wrapper around fread() that guarantees that all bytes are read
 	before returning.
 */
 
-int slUtilFread(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+int slUtilFread( void *ptr, size_t size, size_t nmemb, FILE *stream ) {
 	ssize_t n;
 	size_t readcount = 0;
-  
-	while(readcount < nmemb) {
-		n = fread((char *)ptr + (readcount * size), size,
-			nmemb - readcount, stream);
- 
-		if(n < 1)
+
+	while ( readcount < nmemb ) {
+		n = fread(( char * )ptr + ( readcount * size ), size,
+		          nmemb - readcount, stream );
+
+		if ( n < 1 )
 			return -1;
-  
+
 		readcount += n;
 	}
+
 	return readcount;
-} 
+}
 
 /*!
 	\brief A wrapper around gzread() that guarantees that all bytes are read
 	before returning.
 */
 
-int slUtilGzread(char *ptr, size_t size, gzFile stream) {
+int slUtilGzread( char *ptr, size_t size, gzFile stream ) {
 	ssize_t n;
-	size_t readcount = 0; 
-  
+	size_t readcount = 0;
+
 	do {
-		n = gzread(stream, ptr + readcount, (size - readcount));
- 
-		if (n < 0)
+		n = gzread( stream, ptr + readcount, ( size - readcount ) );
+
+		if ( n < 0 )
 			return -1;
-  
+
 		readcount += n;
-	} while(n && size != readcount);
- 
+	} while ( n && size != readcount );
+
 	return readcount;
-} 
+}
 
 /*!
-	\brief Reads the (text) file at a certain path, returning a pointer to 
+	\brief Reads the (text) file at a certain path, returning a pointer to
 	the data as a slMalloc'd string.
 */
 
-char *slUtilReadFile(char *path) {
+char *slUtilReadFile( char *path ) {
 	char temp[2048];
+
 	struct stat st;
 	char *buffer;
 	gzFile fp;
 	int total = 0, n;
 
-	if (stat(path, &st))
+	if ( stat( path, &st ) )
 		return NULL;
 
-	if(!(fp = gzopen(path, "r"))) {
-		slMessage(DEBUG_ALL, "gzopen %s: %s\n", path, strerror(errno));
+	if ( !( fp = gzopen( path, "r" ) ) ) {
+		slMessage( DEBUG_ALL, "gzopen %s: %s\n", path, strerror( errno ) );
 		return NULL;
 	}
 
@@ -160,41 +163,41 @@ char *slUtilReadFile(char *path) {
 	 * dynamically resized.
 	 */
 
-	buffer = (char *)slMalloc(1);
+	buffer = ( char * )slMalloc( 1 );
 
-	while( ( n = slUtilGzread( temp, sizeof(temp), fp) ) ) {
-		if(n == -1) {
-			slMessage(DEBUG_ALL, "slUtilGzread %s: error)\n", path);
+	while (( n = slUtilGzread( temp, sizeof( temp ), fp ) ) ) {
+		if ( n == -1 ) {
+			slMessage( DEBUG_ALL, "slUtilGzread %s: error)\n", path );
 			return NULL;
 		}
 
-		buffer = (char *)slRealloc(buffer, total + n + 1);
+		buffer = ( char * )slRealloc( buffer, total + n + 1 );
 
-		memcpy( &buffer[total], temp, n);
-		
+		memcpy( &buffer[total], temp, n );
+
 		total += n;
 	}
 
 	buffer[total] = 0;
 
-	gzclose(fp);
-	
+	gzclose( fp );
+
 	return buffer;
-} 
+}
 
 /*!
 	\brief Writes text to a file.
 */
 
-int slUtilWriteFile(char *path, char *text) {
+int slUtilWriteFile( char *path, char *text ) {
 	FILE *f;
 
-	if (!(f = fopen(path, "w")))
+	if ( !( f = fopen( path, "w" ) ) )
 		return -1;
 
-	slUtilFwrite(text, strlen(text), 1, f);
+	slUtilFwrite( text, strlen( text ), 1, f );
 
-	fclose(f);
+	fclose( f );
 
 	return 0;
 }
@@ -204,116 +207,125 @@ int slUtilWriteFile(char *path, char *text) {
 	string.
 */
 
-char *slUtilReadStream(FILE *stream) {
+char *slUtilReadStream( FILE *stream ) {
 	char *buffer;
 	char temp[2048];
 	int total = 0, n;
 
-	buffer = (char *)slMalloc(1);
+	buffer = ( char * )slMalloc( 1 );
 
-	while((n = slUtilFread(temp, sizeof(temp), 1, stream))) {
-		if(n == -1) {
-			slMessage(DEBUG_ALL, "error reading from Stream\n");
+	while (( n = slUtilFread( temp, sizeof( temp ), 1, stream ) ) ) {
+		if ( n == -1 ) {
+			slMessage( DEBUG_ALL, "error reading from Stream\n" );
 			return NULL;
 		}
 
-		buffer = (char *)slRealloc(buffer, total + n + 1);
+		buffer = ( char * )slRealloc( buffer, total + n + 1 );
 
-		memcpy(&buffer[total], temp, n);
-		
+		memcpy( &buffer[total], temp, n );
+
 		total += n;
 	}
+
 	buffer[total] = 0;
-	
+
 	return buffer;
-} 
+}
 
 /*!
 	\brief Strips the quotes off of a string and returns it as a slMalloc'd
 	pointer.
 */
 
-char *slDequote(char *d) {
-	char *n; 
+char *slDequote( char *d ) {
+	char *n;
 	int len;
-	
-	len = strlen(d);  
+
+	len = strlen( d );
 
 	/* there was a time when we would return NULL for an empty quoted */
 	/* string, "".  now we'll return a malloc'd string which is just  */
 	/* a '\0'. */
-			
-	if(len <= 1) return NULL;
-	
-	n = (char*)slMalloc(len - 1);
-		
-	strncpy(n, &d[1], len - 2);
-	n[len - 2] = 0;  
+
+	if ( len <= 1 ) return NULL;
+
+	n = ( char* )slMalloc( len - 1 );
+
+	strncpy( n, &d[1], len - 2 );
+
+	n[len - 2] = 0;
 
 	return n;
 }
 
 /*!
-	\brief A wrapper around read() that guarantees that all bytes are read 
+	\brief A wrapper around read() that guarantees that all bytes are read
 	before returning.
 */
 
-int slUtilRead(int socket, void *buffer, size_t size) {
+int slUtilRead( int socket, void *buffer, size_t size ) {
 	ssize_t n;
-	size_t readcount = 0; 
-  
-	while(readcount < size) {
-		n = read(socket, (char *)buffer + readcount, size - readcount);
-		if(n < 1)
+	size_t readcount = 0;
+
+	while ( readcount < size ) {
+		n = read( socket, ( char * )buffer + readcount, size - readcount );
+
+		if ( n < 1 )
 			break;
+
 		readcount += n;
 	}
+
 	return readcount;
-} 
+}
 
 /*!
 	\brief A wrapper around write() that guarantees that all bytes are
 	written before returning.
 */
 
-int slUtilWrite(int socket, const void *buffer, size_t size) {
-	ssize_t n; 
-	size_t writecount = 0; 
-  
-	while(writecount < size) {
-		n = write(socket, (char *)buffer + writecount, size - writecount);
-		if (n < 1)
+int slUtilWrite( int socket, const void *buffer, size_t size ) {
+	ssize_t n;
+	size_t writecount = 0;
+
+	while ( writecount < size ) {
+		n = write( socket, ( char * )buffer + writecount, size - writecount );
+
+		if ( n < 1 )
 			break;
+
 		writecount += n;
 	}
+
 	return size;
-} 
+}
 
 /*!
 	\brief A homegrown fgets() replacement that deals with CR, NL,
 	CRNL, NLCRLMPQ, WNOC and PBS.
 */
-	
-char *slFgets(char *str, int size, FILE *stream) {
+
+char *slFgets( char *str, int size, FILE *stream ) {
 	int next, s;
 	int n = 0;
 
 	do {
-		str[n++] = s = fgetc(stream);
+		str[n++] = s = fgetc( stream );
 
-		if (s == '\r') {
+		if ( s == '\r' ) {
 			// check for \r\n -- if there is a \n, eat it
 			// otherwise, put it back in the stream
 
-			next = fgetc(stream);
+			next = fgetc( stream );
 
-			if (next != '\n')
-				ungetc(next, stream);
+			if ( next != '\n' )
+				ungetc( next, stream );
 		}
-	} while(s != EOF && s != '\n' && s != '\r');
+	} while ( s != EOF && s != '\n' && s != '\r' );
 
-	if (s == EOF)
+	if ( s == EOF )
 		n--;
+
 	str[n] = 0;
 
 	return str;
@@ -324,16 +336,16 @@ char *slFgets(char *str, int size, FILE *stream) {
 */
 
 char *slUtilReadStdin() {
-	char *data = (char *)slMalloc(4096);
+	char *data = ( char * )slMalloc( 4096 );
 	int n, total = 0;
 
-	while(!feof(stdin)) {
-		n = fread(&data[total], 1, 4095, stdin);
+	while ( !feof( stdin ) ) {
+		n = fread( &data[total], 1, 4095, stdin );
 		total += n;
 
 		data[total] = 0;
 
-		data = (char *)slRealloc(data, total + 4096);
+		data = ( char * )slRealloc( data, total + 4096 );
 	}
 
 	return data;

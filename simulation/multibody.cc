@@ -20,12 +20,12 @@
 
 /*!
 	The multibody is a logical set of links.  It's a slightly different
-	paradigm from the independant body/joint system that ODE uses.  If 
+	paradigm from the independant body/joint system that ODE uses.  If
 	you move/rotate the multibody, for example, all of the links are
-	moved/rotated with it.  
-	
+	moved/rotated with it.
+
 	The only real rule is that there is exactly one "root" link chosen
-	for each multibody.  
+	for each multibody.
 */
 
 #include "simulation.h"
@@ -42,7 +42,7 @@
  * Calling this method does NOT automatically add the multibody to the specified world.
  */
 
-slMultibody::slMultibody(slWorld *w) {
+slMultibody::slMultibody( slWorld *w ) {
 	_world = w;
 	_handleSelfCollisions = 0;
 	_root = NULL;
@@ -52,64 +52,66 @@ slMultibody::slMultibody(slWorld *w) {
 	_erp = _cfm = 0.0;
 }
 
-void slMultibody::initCollisionFlags(slVclipData *cd) {
+void slMultibody::initCollisionFlags( slVclipData *cd ) {
 	slLink *link1, *link2;
 	slPairFlags *flags;
 	std::vector<slLink*>::iterator i1;
 	std::vector<slLink*>::iterator i2;
 
-	for(i1 = _links.begin(); i1 != _links.end(); i1++) {
+	if( !cd->world->_initialized ) return;
+
+	for ( i1 = _links.begin(); i1 != _links.end(); i1++ ) {
 		link1 = *i1;
 
-		// set all check flags on or off, depending on whether 
+		// set all check flags on or off, depending on whether
 		// self collisions are handled or not.
 
-		for(i2 = _links.begin(); i2 != _links.end(); i2++) {
+		for ( i2 = _links.begin(); i2 != _links.end(); i2++ ) {
 			link2 = *i2;
 
-			if(link1 != link2) {
-				flags = slVclipPairFlags(cd, link1->_clipNumber, link2->_clipNumber);
+			if ( link1 != link2 ) {
+				flags = slVclipPairFlags( cd, link1->_clipNumber, link2->_clipNumber );
 
-				if(_handleSelfCollisions) *flags |= BT_CHECK;
-				else if(*flags & BT_CHECK) *flags ^= BT_CHECK;
+				if ( _handleSelfCollisions ) *flags |= BT_CHECK;
+				else if ( *flags & BT_CHECK ) *flags ^= BT_CHECK;
 			}
 		}
 	}
 
-	for(i1 = _links.begin(); i1 != _links.end(); i1++) {
+	for ( i1 = _links.begin(); i1 != _links.end(); i1++ ) {
 		link1 = *i1;
 
 		// then prune out all adjacent pairs.
 
 		std::vector<slJoint*>::iterator ji;
 
-		for(ji = link1->_outJoints.begin(); ji != link1->_outJoints.end(); ji++) {
-			link2 = (*ji)->_child;
+		for ( ji = link1->_outJoints.begin(); ji != link1->_outJoints.end(); ji++ ) {
+			link2 = ( *ji )->_child;
 
-			if(link1 != link2) {
-				flags = slVclipPairFlags(cd, link1->_clipNumber, link2->_clipNumber);
+			if ( link1 != link2 ) {
+				flags = slVclipPairFlags( cd, link1->_clipNumber, link2->_clipNumber );
 
-				if(*flags & BT_CHECK) *flags ^= BT_CHECK;
+				if ( *flags & BT_CHECK ) *flags ^= BT_CHECK;
 			}
 		}
 	}
 }
 
 /*!
-	\brief Sets the rotation of a multibody.  
+	\brief Sets the rotation of a multibody.
 */
 
-void slMultibody::setRotation(double rot[3][3]) {
+void slMultibody::setRotation( double rot[3][3] ) {
 	double invR[3][3], transform[3][3];
 
 	updatePositions();
 
-	// figure out the relative rotation required to get to the new rot 
+	// figure out the relative rotation required to get to the new rot
 
-	slMatrixTranspose(_root->_position.rotation, invR);
-	slMatrixMulMatrix(rot, invR, transform);
+	slMatrixTranspose( _root->_position.rotation, invR );
+	slMatrixMulMatrix( rot, invR, transform );
 
-	rotate(transform);
+	rotate( transform );
 
 	updatePositions();
 }
@@ -118,14 +120,17 @@ void slMultibody::setRotation(double rot[3][3]) {
 	\brief Sets the location of this multibody.
 */
 
-void slMultibody::setLocation(slVector *location) {
+void slMultibody::setLocation( slVector *location ) {
 	slVector offset;
 
-	if( !_root) return;
+	if ( !_root ) return;
 
 	updatePositions();
-	slVectorSub(location, &_root->_position.location, &offset);
-	offsetLocation(&offset);
+
+	slVectorSub( location, &_root->_position.location, &offset );
+
+	offsetLocation( &offset );
+
 	updatePositions();
 }
 
@@ -133,7 +138,7 @@ void slMultibody::setLocation(slVector *location) {
 	\brief Preforms a relative rotation.
 */
 
-void slMultibody::rotate(double rotation[3][3]) {
+void slMultibody::rotate( double rotation[3][3] ) {
 	slLink *link;
 	slVector toLink, newToLink;
 	double newRot[3][3];
@@ -141,33 +146,33 @@ void slMultibody::rotate(double rotation[3][3]) {
 	slQuat q;
 	std::vector<slLink*>::iterator i1;
 
-	for(i1 = _links.begin(); i1 != _links.end(); i1++) {	
+	for ( i1 = _links.begin(); i1 != _links.end(); i1++ ) {
 		link = *i1;
 
-		// first, since the whole body is making this rotation, 
-		// our location will be changed.  we have to compute 
+		// first, since the whole body is making this rotation,
+		// our location will be changed.  we have to compute
 		// the new position based on the rotation angle and our
 		// location relative to the root link.
 
-		slVectorSub(&link->_position.location, &_root->_position.location, &toLink);
-		slVectorXform(rotation, &toLink, &newToLink);
-		slVectorAdd(&newToLink, &_root->_position.location, &newToLink);
-		dBodySetPosition(link->_odeBodyID, newToLink.x, newToLink.y, newToLink.z);
-	
-		slMatrixMulMatrix(rotation, link->_position.rotation, newRot);
+		slVectorSub( &link->_position.location, &_root->_position.location, &toLink );
+		slVectorXform( rotation, &toLink, &newToLink );
+		slVectorAdd( &newToLink, &_root->_position.location, &newToLink );
+		dBodySetPosition( link->_odeBodyID, newToLink.x, newToLink.y, newToLink.z );
 
-		slMatrixCopy(newRot, link->_position.rotation);
+		slMatrixMulMatrix( rotation, link->_position.rotation, newRot );
+
+		slMatrixCopy( newRot, link->_position.rotation );
 
 		// update the ODE state
 
-		slMatrixToQuat(newRot, &q);
+		slMatrixToQuat( newRot, &q );
 
 		Q[0] = q.s;
 		Q[1] = q.x;
 		Q[2] = q.y;
 		Q[3] = q.z;
 
-		if( link->_simulate ) dBodySetQuaternion(link->_odeBodyID, Q);
+		if ( link->_simulate ) dBodySetQuaternion( link->_odeBodyID, Q );
 	}
 }
 
@@ -177,42 +182,45 @@ void slMultibody::rotate(double rotation[3][3]) {
 	Offsets each link in the body individually.
 */
 
-void slMultibody::offsetLocation(slVector *offset) {
+void slMultibody::offsetLocation( slVector *offset ) {
 	slLink *link;
+
 	const dReal *oldP;
+
 	dReal newP[3];
+
 	std::vector<slLink*>::iterator i1;
 
-	for(i1 = _links.begin(); i1 != _links.end(); i1++) {	
+	for ( i1 = _links.begin(); i1 != _links.end(); i1++ ) {
 		link = *i1;
 
-		slVectorAdd(&link->_position.location, offset, &link->_position.location);
+		slVectorAdd( &link->_position.location, offset, &link->_position.location );
 
-		if( link->_simulate ) {
-			oldP = dBodyGetPosition(link->_odeBodyID);
+		if ( link->_simulate ) {
+			oldP = dBodyGetPosition( link->_odeBodyID );
 
 			newP[0] = oldP[0] + offset->x;
 			newP[1] = oldP[1] + offset->y;
 			newP[2] = oldP[2] + offset->z;
-			
-			dBodySetPosition(link->_odeBodyID, newP[0], newP[1], newP[2]);
+
+			dBodySetPosition( link->_odeBodyID, newP[0], newP[1], newP[2] );
 		}
 	}
 }
 
 /*!
-	\brief Sets the linear and/or rotational velocities of all links in 
+	\brief Sets the linear and/or rotational velocities of all links in
 	the multibody.
 */
 
-void slMultibody::setVelocity(slVector *linear, slVector *rotational) {
+void slMultibody::setVelocity( slVector *linear, slVector *rotational ) {
 	slLink *link;
 	std::vector<slLink*>::iterator i;
 
-	for(i=_links.begin(); i != _links.end(); i++) {
+	for ( i = _links.begin(); i != _links.end(); i++ ) {
 		link = *i;
 
-		link->setVelocity(linear, rotational);
+		link->setVelocity( linear, rotational );
 	}
 }
 
@@ -221,14 +229,14 @@ void slMultibody::setVelocity(slVector *linear, slVector *rotational) {
 	in the multibody.
 */
 
-void slMultibody::setAcceleration(slVector *linear, slVector *rotational) {
+void slMultibody::setAcceleration( slVector *linear, slVector *rotational ) {
 	slLink *link;
 	std::vector<slLink*>::iterator i;
 
-	for(i=_links.begin(); i != _links.end(); i++) {
+	for ( i = _links.begin(); i != _links.end(); i++ ) {
 		link = *i;
 
-		link->setAcceleration(linear, rotational);
+		link->setAcceleration( linear, rotational );
 	}
 }
 
@@ -243,12 +251,12 @@ slList *slMultibody::allCallbackData() {
 
 	// printf("%p [root %p] reading callback data for %d links\n", this, _root, _links.size());
 
-	for( li = _links.begin(); li != _links.end(); li++ ) {
+	for ( li = _links.begin(); li != _links.end(); li++ ) {
 		// printf("adding callback data for %p\n", *li);
-		list = slListPrepend(list, (*li)->getCallbackData() );
+		list = slListPrepend( list, ( *li )->getCallbackData() );
 
-		for(ji = (*li)->_inJoints.begin(); ji != (*li)->_inJoints.end(); ji++ ) {
-			list = slListPrepend(list, (*ji)->getCallbackData() );
+		for ( ji = ( *li )->_inJoints.begin(); ji != ( *li )->_inJoints.end(); ji++ ) {
+			list = slListPrepend( list, ( *ji )->getCallbackData() );
 		}
 	}
 
@@ -258,38 +266,38 @@ slList *slMultibody::allCallbackData() {
 /*!
 	\brief Find a multibody that a link is attached to.
 
-	This function is only used when a link must recompute its own 
+	This function is only used when a link must recompute its own
 	multibody, such as after a joint break.
 */
 
-slMultibody *slLinkFindMultibody(slLink *root) {
+slMultibody *slLinkFindMultibody( slLink *root ) {
 	slJoint *joint;
 	std::vector<slJoint*>::iterator ji;
 	std::vector<slLink*> links;
 	std::vector<slLink*>::iterator li;
 
-	root->connectedLinks(&links, 0);
+	root->connectedLinks( &links, 0 );
 
-	for(li = links.begin(); li != links.end(); li++ ) {
+	for ( li = links.begin(); li != links.end(); li++ ) {
 		slLink *link = *li;
 
-		if(link != root && root->_multibody != link->_multibody) {
+		if ( link != root && root->_multibody != link->_multibody ) {
 			/* okay!  link has another mb for us!  we need to find the joint */
 			/* connecting this new multibody to our old one! */
 
-			for( ji = root->_inJoints.begin(); ji != root->_inJoints.end(); ji++ ) {
+			for ( ji = root->_inJoints.begin(); ji != root->_inJoints.end(); ji++ ) {
 				joint = *ji;
 
-				if(joint->_parent && joint->_parent->_multibody == root->_multibody) {
+				if ( joint->_parent && joint->_parent->_multibody == root->_multibody ) {
 					joint->_isMbJoint = 1;
 					return link->_multibody;
 				}
 			}
 
-			for(ji = root->_outJoints.begin(); ji != root->_outJoints.end(); ji++ ) {
+			for ( ji = root->_outJoints.begin(); ji != root->_outJoints.end(); ji++ ) {
 				joint = *ji;
 
-				if(joint->_child->_multibody == root->_multibody) {
+				if ( joint->_child->_multibody == root->_multibody ) {
 					joint->_isMbJoint = 1;
 					return link->_multibody;
 				}
@@ -307,15 +315,15 @@ slMultibody *slLinkFindMultibody(slLink *root) {
 	computed.
 */
 
-void slMultibody::setRoot(slLink *root) {
-	if(root) {
+void slMultibody::setRoot( slLink *root ) {
+	if ( root ) {
 		root->_multibody = NULL;
 		root->nullMultibodiesForConnectedLinks();
 	}
 
 	_root = root;
 
-	if(_root) _root->_multibody = this;
+	if ( _root ) _root->_multibody = this;
 
 	update();
 }
@@ -329,17 +337,17 @@ void slMultibody::update() {
 
 	_links.clear();
 
-	if(!_root) return;
+	if ( !_root ) return;
 
 	// printf("updating %p with root %p [%p]\n", this, _root, _root->_multibody);
 
-	_root->connectedLinks(&_links, 1);
+	_root->connectedLinks( &_links, 1 );
 
-	for(i = _links.begin(); i != _links.end(); i++ ) {
-		(*i)->_multibody = this;
+	for ( i = _links.begin(); i != _links.end(); i++ ) {
+		( *i )->_multibody = this;
 	}
 
-	if( _world->_initialized ) initCollisionFlags( _world->_clipData );
+	if ( _world->_initialized ) initCollisionFlags( _world->_clipData );
 }
 
 /*!
@@ -349,7 +357,7 @@ void slMultibody::update() {
 void slMultibody::updatePositions() {
 	std::vector<slLink*>::iterator i;
 
-	for(i = _links.begin(); i != _links.end(); i++ ) {
+	for ( i = _links.begin(); i != _links.end(); i++ ) {
 		slLink *link = *i;
 
 		link->updatePositionFromODE();
@@ -358,7 +366,7 @@ void slMultibody::updatePositions() {
 }
 
 /*!
-	\brief Checks this multibody's links for collisions with other links in 
+	\brief Checks this multibody's links for collisions with other links in
 	the multibody.
 */
 
@@ -368,24 +376,25 @@ int slMultibody::checkSelfPenetration() {
 	std::vector<slLink*>::iterator i1;
 	std::vector<slLink*>::iterator i2;
 
-	if( !_world->_initialized ) slVclipDataInit( _world );
+	if ( !_world->_initialized ) slVclipDataInit( _world );
+
 	vc = _world->_clipData;
 
-	for(i1 = _links.begin(); i1 != _links.end(); i1++ ) {
+	for ( i1 = _links.begin(); i1 != _links.end(); i1++ ) {
 		slLink *link1 = *i1;
 
-		// start with the next thing in the list.  this way we avoid 
+		// start with the next thing in the list.  this way we avoid
 		// doing repeats like 1st-2nd and 2nd-1st
 
-		for( i2 = i1 ; i2 != _links.end(); i2++ ) {
+		for ( i2 = i1 ; i2 != _links.end(); i2++ ) {
 			slLink *link2 = *i2;
 
-			if(link1 != link2) {
-				slCollisionCandidate c( vc, link1->_clipNumber, link2->_clipNumber);
+			if ( link1 != link2 ) {
+				slCollisionCandidate c( vc, link1->_clipNumber, link2->_clipNumber );
 
-				flags = slVclipPairFlags(vc, link1->_clipNumber, link2->_clipNumber);
+				flags = slVclipPairFlags( vc, link1->_clipNumber, link2->_clipNumber );
 
-				if(slVclipFlagsShouldTest(*flags) && vc->testPair(&c, NULL)) return 1;
+				if ( slVclipFlagsShouldTest( *flags ) && vc->testPair( &c, NULL ) ) return 1;
 			}
 		}
 	}
@@ -395,7 +404,7 @@ int slMultibody::checkSelfPenetration() {
 
 /*!
 	\brief Returns the callback user-data for this multibody object.
-	
+
 	Returns the user-defined data field for this object.  In the context
 	of breve simulations, this data corresponds to the breve instance
 	to which this multibody belongs.
@@ -407,25 +416,25 @@ void *slMultibody::getCallbackData() {
 
 /*!
 	\brief Sets the callback user-data for this multibody object.
-	
+
 	Sets a user-defined data field for this object.  In the context
 	of breve simulations, this data corresponds to the breve instance
 	to which this multibody belongs.
 */
 
-void slMultibody::setCallbackData(void *c) {
+void slMultibody::setCallbackData( void *c ) {
 	_userData = c;
 }
 
 /*!
 	\brief Set self-collision handling for this multibody.
 
-	Specifies whether links in this multibody should be allowed to 
+	Specifies whether links in this multibody should be allowed to
 	collide with themselves.  Calling this function has no effect
 	until the \ref slWorld collision data is reinitialized.
 */
 
-void slMultibody::setHandleSelfCollisions(int n) {
+void slMultibody::setHandleSelfCollisions( int n ) {
 	_handleSelfCollisions = n;
 }
 
@@ -437,7 +446,8 @@ void slMultibody::setHandleSelfCollisions(int n) {
 */
 
 slMultibody::~slMultibody() {
-	if( _root) _root->nullMultibodiesForConnectedLinks();
+	if ( _root ) _root->nullMultibodiesForConnectedLinks();
+
 	_links.empty();
 }
 
@@ -445,7 +455,7 @@ slMultibody::~slMultibody() {
 	\brief Sets the intrabody ERP value for collision contacts.
 */
 
-void slMultibody::setERP(float e) {
+void slMultibody::setERP( float e ) {
 	_erp = e;
 }
 
@@ -453,7 +463,7 @@ void slMultibody::setERP(float e) {
 	\brief Sets the intrabody CFM value for collision contacts.
 */
 
-void slMultibody::setCFM(float c) {
+void slMultibody::setCFM( float c ) {
 	_cfm = c;
 }
 

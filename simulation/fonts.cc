@@ -13,25 +13,27 @@
 
 slFontManager *slFontManager::sharedFontManager() {
 	static slFontManager _sharedFontManager;
+
 	return &_sharedFontManager;
 }
 
-FTFont *slFontManager::getFont(std::string file, int size) {
-	FTFont *font; 
-	
-	std::pair< std::string, int > index(file, size);
+FTFont *slFontManager::getFont( std::string file, int size ) {
+	FTFont *font;
 
-	if( _fonts[ index]) return _fonts[ index];
-	
+	std::pair< std::string, int > index( file, size );
+
+	if ( _fonts[ index] ) return _fonts[ index];
+
 	font = new FTGLTextureFont( file.c_str() );
-	
+
 	// printf("loading font %s [%d]\n", file.c_str(), size);
-	
-	font->FaceSize( size);
-	font->CharMap(ft_encoding_unicode);
+
+	font->FaceSize( size );
+
+	font->CharMap( ft_encoding_unicode );
 
 	_fonts[ index] = font;
-	
+
 	return font;
 }
 

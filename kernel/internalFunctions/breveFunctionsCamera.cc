@@ -34,9 +34,9 @@
 	void cameraSetZClip(slCamera pointer camera, int distance).
 */
 
-int brICameraSetZClip(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->_zClip = abs(BRINT(&args[1]));
+int brICameraSetZClip( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
+	camera->_zClip = abs( BRINT( &args[1] ) );
 	return EC_OK;
 }
 
@@ -46,9 +46,9 @@ int brICameraSetZClip(brEval args[], brEval *target, brInstance *i) {
 	void cameraSetDrawSmooth(int smooth).
 */
 
-int brICameraSetDrawSmooth(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->_drawSmooth = BRINT(&args[1]);
+int brICameraSetDrawSmooth( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
+	camera->_drawSmooth = BRINT( &args[1] );
 	camera->setRecompile();
 	return EC_OK;
 }
@@ -57,14 +57,15 @@ int brICameraSetDrawSmooth(brEval args[], brEval *target, brInstance *i) {
 	\brief Clears the camera with the background color.
 */
 
-int brICameraClear(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
+int brICameraClear( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
 	slWorld *w = i->engine->world;
-	
-	if( camera->_activateContextCallback ) camera->_activateContextCallback();
-	
-	glClearColor(w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+
+	if ( camera->_activateContextCallback ) camera->_activateContextCallback();
+
+	glClearColor( w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 1.0 );
+
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 
 	return EC_OK;
 }
@@ -75,14 +76,17 @@ int brICameraClear(brEval args[], brEval *target, brInstance *i) {
 	void cameraSetDrawBlur(int blur).
 */
 
-int brICameraSetBlur(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
+int brICameraSetBlur( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
 
-	if( camera->_activateContextCallback ) camera->_activateContextCallback();
+	if ( camera->_activateContextCallback ) camera->_activateContextCallback();
+
 	camera->clear( i->engine->world );
 
-	camera->_drawBlur = BRINT(&args[1]);
+	camera->_drawBlur = BRINT( &args[1] );
+
 	camera->setRecompile();
+
 	return EC_OK;
 }
 
@@ -92,9 +96,9 @@ int brICameraSetBlur(brEval args[], brEval *target, brInstance *i) {
 	void cameraSetBlurFactor(double factor).
 */
 
-int brICameraSetBlurFactor(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->_blurFactor = BRDOUBLE(&args[1]);
+int brICameraSetBlurFactor( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
+	camera->_blurFactor = BRDOUBLE( &args[1] );
 	camera->setRecompile();
 	return EC_OK;
 }
@@ -105,22 +109,22 @@ int brICameraSetBlurFactor(brEval args[], brEval *target, brInstance *i) {
 	void cameraSetDrawFog(int fog).
 */
 
-int brICameraSetDrawFog(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->_drawFog = BRINT(&args[1]);
+int brICameraSetDrawFog( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
+	camera->_drawFog = BRINT( &args[1] );
 	camera->setRecompile();
 	return EC_OK;
 }
 
-/*! 
+/*!
 	\brief Set OpenGL fog intensity for a camera.
-    
-	void setFogIntensity(double intensity).
-*/          
 
-int brICameraSetFogIntensity(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->_fogIntensity = BRDOUBLE(&args[1]);
+	void setFogIntensity(double intensity).
+*/
+
+int brICameraSetFogIntensity( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
+	camera->_fogIntensity = BRDOUBLE( &args[1] );
 	return EC_OK;
 }
 
@@ -130,9 +134,9 @@ int brICameraSetFogIntensity(brEval args[], brEval *target, brInstance *i) {
 	void setFogColor(vector color).
 */
 
-int brICameraSetFogColor(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	slVectorCopy(&BRVECTOR(&args[1]), &camera->_fogColor);
+int brICameraSetFogColor( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
+	slVectorCopy( &BRVECTOR( &args[1] ), &camera->_fogColor );
 	return EC_OK;
 }
 
@@ -142,10 +146,10 @@ int brICameraSetFogColor(brEval args[], brEval *target, brInstance *i) {
 	void cameraPositionDisplay(slCamera pointer camera, int x, int y).
 */
 
-int brICameraPositionDisplay(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	int x = BRINT(&args[1]);
-	int y = BRINT(&args[2]);
+int brICameraPositionDisplay( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
+	int x = BRINT( &args[1] );
+	int y = BRINT( &args[2] );
 
 	camera->_originx = x;
 	camera->_originy = y;
@@ -159,10 +163,10 @@ int brICameraPositionDisplay(brEval args[], brEval *target, brInstance *i) {
 	void cameraResizeDisplay(slCamera pointer camera, int x, int y).
 */
 
-int brICameraResizeDisplay(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
+int brICameraResizeDisplay( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
 
-	camera->setBounds( BRINT(&args[1]), BRINT(&args[2]) );
+	camera->setBounds( BRINT( &args[1] ), BRINT( &args[2] ) );
 
 	return EC_OK;
 }
@@ -172,7 +176,7 @@ int brICameraResizeDisplay(brEval args[], brEval *target, brInstance *i) {
  */
 
 int brICameraGetWidth( brEval args[], brEval *target, brInstance *i ) {
-    slCamera *camera = BRCAMERAPOINTER(&args[0]);
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
 
 	target->set( camera->_width );
 
@@ -184,7 +188,7 @@ int brICameraGetWidth( brEval args[], brEval *target, brInstance *i ) {
  */
 
 int brICameraGetHeight( brEval args[], brEval *target, brInstance *i ) {
-    slCamera *camera = BRCAMERAPOINTER(&args[0]);
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
 
 	target->set( camera->_height );
 
@@ -197,7 +201,7 @@ int brICameraGetHeight( brEval args[], brEval *target, brInstance *i ) {
 	slCamera pointer cameraNew().
 */
 
-int brICameraNew(brEval args[], brEval *target, brInstance *i) {
+int brICameraNew( brEval args[], brEval *target, brInstance *i ) {
 	slCamera *camera;
 
 	camera = new slCamera( 0, 0 );
@@ -218,8 +222,8 @@ int brICameraNew(brEval args[], brEval *target, brInstance *i) {
 	void cameraFree(slCamera pointer).
 */
 
-int brICameraFree(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
+int brICameraFree( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
 
 	i->engine->world->removeCamera( camera );
 
@@ -233,17 +237,17 @@ int brICameraFree(brEval args[], brEval *target, brInstance *i) {
 
 	void cameraPosition(slCamera pointer, vector, vector).
 
-	The first vector the the location of the camera, the second is the 
+	The first vector the the location of the camera, the second is the
 	target of the camera.
 */
 
-int brICameraPosition(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	slVector *l = &BRVECTOR(&args[1]);
-	slVector *t = &BRVECTOR(&args[2]);
+int brICameraPosition( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
+	slVector *l = &BRVECTOR( &args[1] );
+	slVector *t = &BRVECTOR( &args[2] );
 
-	slVectorCopy(l, &camera->_location);
-	slVectorCopy(t, &camera->_target);
+	slVectorCopy( l, &camera->_location );
+	slVectorCopy( t, &camera->_target );
 
 	return EC_OK;
 }
@@ -254,7 +258,7 @@ int brICameraPosition(brEval args[], brEval *target, brInstance *i) {
 	void cameraSetEnabled(slCamera pointer, int).
 */
 
-int brICameraSetEnabled(brEval args[], brEval *target, brInstance *i) {
+int brICameraSetEnabled( brEval args[], brEval *target, brInstance *i ) {
 	// slCamera *camera = BRCAMERAPOINTER(&args[0]);
 	// camera->_enabled = BRINT(&args[1]);
 
@@ -267,10 +271,10 @@ int brICameraSetEnabled(brEval args[], brEval *target, brInstance *i) {
 	void cameraSetRotation(slCamera pointer, float, float).
 */
 
-int brICameraSetRotation(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
-	camera->_rx = BRDOUBLE(&args[1]);
-	camera->_ry = BRDOUBLE(&args[2]);
+int brICameraSetRotation( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
+	camera->_rx = BRDOUBLE( &args[1] );
+	camera->_ry = BRDOUBLE( &args[2] );
 
 	camera->update();
 
@@ -283,8 +287,8 @@ int brICameraSetRotation(brEval args[], brEval *target, brInstance *i) {
 	void cameraGetRotation(slCamera pointer, int).
 */
 
-int brICameraGetRotation(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
+int brICameraGetRotation( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
 	slVector v;
 
 	v.x = camera->_rx;
@@ -302,37 +306,37 @@ int brICameraGetRotation(brEval args[], brEval *target, brInstance *i) {
 	void cameraTextSetEnabled(slCamera pointer, int).
 */
 
-int brICameraTextSetEnabled(brEval args[], brEval *target, brInstance *i) {
-	slCamera *camera = BRCAMERAPOINTER(&args[0]);
+int brICameraTextSetEnabled( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
 
-	camera->_drawText = BRINT(&args[1]);
+	camera->_drawText = BRINT( &args[1] );
 
 	return EC_OK;
 }
 
 /*@}*/
 
-void breveInitCameraFunctions(brNamespace *n) {
-	brNewBreveCall(n, "cameraSetZClip", brICameraSetZClip, AT_NULL, AT_POINTER, AT_INT, 0);
-	brNewBreveCall(n, "cameraPositionDisplay", brICameraPositionDisplay, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
-	brNewBreveCall(n, "cameraResizeDisplay", brICameraResizeDisplay, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0);
-	brNewBreveCall(n, "cameraSetRotation", brICameraSetRotation, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0);
-	brNewBreveCall(n, "cameraGetRotation", brICameraGetRotation, AT_VECTOR, AT_POINTER, 0);
-	brNewBreveCall(n, "cameraNew", brICameraNew, AT_POINTER, 0);
-	brNewBreveCall(n, "cameraSetBlur", brICameraSetBlur, AT_NULL, AT_POINTER, AT_INT, 0);
-	brNewBreveCall(n, "cameraClear", brICameraClear, AT_NULL, AT_POINTER, 0);
+void breveInitCameraFunctions( brNamespace *n ) {
+	brNewBreveCall( n, "cameraSetZClip", brICameraSetZClip, AT_NULL, AT_POINTER, AT_INT, 0 );
+	brNewBreveCall( n, "cameraPositionDisplay", brICameraPositionDisplay, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0 );
+	brNewBreveCall( n, "cameraResizeDisplay", brICameraResizeDisplay, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0 );
+	brNewBreveCall( n, "cameraSetRotation", brICameraSetRotation, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "cameraGetRotation", brICameraGetRotation, AT_VECTOR, AT_POINTER, 0 );
+	brNewBreveCall( n, "cameraNew", brICameraNew, AT_POINTER, 0 );
+	brNewBreveCall( n, "cameraSetBlur", brICameraSetBlur, AT_NULL, AT_POINTER, AT_INT, 0 );
+	brNewBreveCall( n, "cameraClear", brICameraClear, AT_NULL, AT_POINTER, 0 );
 
-	brNewBreveCall(n, "cameraGetHeight", brICameraGetHeight, AT_INT, AT_POINTER, 0);
-	brNewBreveCall(n, "cameraGetWidth", brICameraGetWidth, AT_INT, AT_POINTER, 0);
+	brNewBreveCall( n, "cameraGetHeight", brICameraGetHeight, AT_INT, AT_POINTER, 0 );
+	brNewBreveCall( n, "cameraGetWidth", brICameraGetWidth, AT_INT, AT_POINTER, 0 );
 
-	brNewBreveCall(n, "cameraSetDrawSmooth", brICameraSetDrawSmooth, AT_NULL, AT_POINTER, AT_INT, 0);
-	brNewBreveCall(n, "cameraSetDrawFog", brICameraSetDrawFog, AT_NULL, AT_POINTER, AT_INT, 0);
-	brNewBreveCall(n, "cameraSetFogIntensity", brICameraSetDrawFog, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
-	brNewBreveCall(n, "cameraSetFogColor", brICameraSetFogColor, AT_NULL, AT_POINTER, AT_VECTOR, 0);
+	brNewBreveCall( n, "cameraSetDrawSmooth", brICameraSetDrawSmooth, AT_NULL, AT_POINTER, AT_INT, 0 );
+	brNewBreveCall( n, "cameraSetDrawFog", brICameraSetDrawFog, AT_NULL, AT_POINTER, AT_INT, 0 );
+	brNewBreveCall( n, "cameraSetFogIntensity", brICameraSetDrawFog, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "cameraSetFogColor", brICameraSetFogColor, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
 
-	brNewBreveCall(n, "cameraSetBlurFactor", brICameraSetBlurFactor, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
-	brNewBreveCall(n, "cameraFree", brICameraFree, AT_NULL, AT_POINTER, 0);
-	brNewBreveCall(n, "cameraPosition", brICameraPosition, AT_NULL, AT_POINTER, AT_VECTOR, AT_VECTOR, 0);
-	brNewBreveCall(n, "cameraSetEnabled", brICameraSetEnabled, AT_NULL, AT_POINTER, AT_INT, 0);
-	brNewBreveCall(n, "cameraTextSetEnabled", brICameraTextSetEnabled, AT_NULL, AT_POINTER, AT_INT, 0);
+	brNewBreveCall( n, "cameraSetBlurFactor", brICameraSetBlurFactor, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "cameraFree", brICameraFree, AT_NULL, AT_POINTER, 0 );
+	brNewBreveCall( n, "cameraPosition", brICameraPosition, AT_NULL, AT_POINTER, AT_VECTOR, AT_VECTOR, 0 );
+	brNewBreveCall( n, "cameraSetEnabled", brICameraSetEnabled, AT_NULL, AT_POINTER, AT_INT, 0 );
+	brNewBreveCall( n, "cameraTextSetEnabled", brICameraTextSetEnabled, AT_NULL, AT_POINTER, AT_INT, 0 );
 }

@@ -29,139 +29,139 @@
 Controller Gatherers.
 
 Control : Gatherers {
-    # The control object sets up the simulation.  The "init"
-    # method is called automatically when the object is 
-    # created.  
+	# The control object sets up the simulation.  The "init"
+	# method is called automatically when the object is 
+	# created.  
 
-    + variables: 
-        foodList (list).
-        collectorShape, foodShape (Shape object).
-    
-    + to init:
-        collectorShape = (new Sphere) init-with radius 1.
-        foodShape = (new Sphere) init-with radius .5.
-
-        COLLECTOR_COUNT new Collectors.
-        foodList = FOOD_COUNT new Foods.
+	+ variables: 
+		foodList (list).
+		collectorShape, foodShape (Shape object).
 	
-		foodList set-bitmap to 2.
+	+ to init:
+		collectorShape = (new Sphere) init-with radius 1.
+		foodShape = (new Sphere) init-with radius .5.
 
-        # this sim can run a bit slowly, but doesn't need a lot of 
-        # accuracy, so we can set up the integration step a bit.
+		COLLECTOR_COUNT new Collectors.
+		foodList = FOOD_COUNT new Foods.
+	
+	foodList set-bitmap to 2.
 
-        self set-integration-step to 0.05.
+		# this sim can run a bit slowly, but doesn't need a lot of 
+		# accuracy, so we can set up the integration step a bit.
 
-        self add-menu named "Randomize Food" for-method "randomize-food".
+		self set-integration-step to 0.05.
 
-        self point-camera at (0, 0, 0) from (0, 0, -80).
+		self add-menu named "Randomize Food" for-method "randomize-food".
 
-    + to randomize-food:
-        # randomize the location of all of the elements in foodList.
+		self point-camera at (0, 0, 0) from (0, 0, -80).
 
-        foodList randomize-location.
+	+ to randomize-food:
+		# randomize the location of all of the elements in foodList.
+
+		foodList randomize-location.
 
 	+ to get-collector-shape:
-        return collectorShape.
+		return collectorShape.
 
 	+ to get-food-shape:
-        return foodShape.
+		return foodShape.
 }
 
 Wanderer : Collector (aka Collectors) {
-    # In this simulation we make use of the Wanderer class: we want some
-    # arbitrary motion within a certain range, but aren't so picky about
-    # the specifics.  The built-in Wanderer class takes care of this.
+	# In this simulation we make use of the Wanderer class: we want some
+	# arbitrary motion within a certain range, but aren't so picky about
+	# the specifics.  The built-in Wanderer class takes care of this.
 
-    + variables:
-        carrying (object).
-        justCollided (int).
+	+ variables:
+		carrying (object).
+		justCollided (int).
 
-    + to init:
-        # 1) register it in the world 
-        # 2) tell the engine to call its iteration function automatically
-        # 3) set it's color (using a method in the Mobile object)
-        # 4) set the wander range (using a method in Wanderer object)
-        # 5) set up a collision handler
+	+ to init:
+		# 1) register it in the world 
+		# 2) tell the engine to call its iteration function automatically
+		# 3) set it's color (using a method in the Mobile object)
+		# 4) set the wander range (using a method in Wanderer object)
+		# 5) set up a collision handler
 
-        self set-shape to (controller get-collector-shape).
-        self set-color to (1.0, 1.0, 1.0).
+		self set-shape to (controller get-collector-shape).
+		self set-color to (1.0, 1.0, 1.0).
 
-        # to change to a 3D world, change the (20, 20, 0) below 
-        # to (20, 20, 20)... a similar change is required in the 
-        # Food object
+		# to change to a 3D world, change the (20, 20, 0) below 
+		# to (20, 20, 20)... a similar change is required in the 
+		# Food object
 
-        self set-wander-range to WANDER_RANGE.
-        self randomize-location.
-        self handle-collisions with-type "Food" with-method "collide".
+		self set-wander-range to WANDER_RANGE.
+		self randomize-location.
+		self handle-collisions with-type "Food" with-method "collide".
 
-    + to collide with food (object):
-        newLoc (vector).
+	+ to collide with food (object):
+		newLoc (vector).
 
-        # if the food we hit is being dragged by another collector, let it go
+		# if the food we hit is being dragged by another collector, let it go
 
-        if (food get-owner) != 0: return.
+		if (food get-owner) != 0: return.
 
-        # if we have collided too recently, skip this collision, we don't 
-        # want to pick things up and then drop them immediately.
+		# if we have collided too recently, skip this collision, we don't 
+		# want to pick things up and then drop them immediately.
 
-        if (justCollided > 0): {
-            justCollided = 2.
-            return.
-        }
+		if (justCollided > 0): {
+			justCollided = 2.
+			return.
+		}
 
-        justCollided = 2.
+		justCollided = 2.
 
-        # if we're carrying food, drop it
+		# if we're carrying food, drop it
 
-        if carrying: {
-            # this line was added to attempt to favor dropping food in 
-            # piles close to the center.  the further we get from the 
-            # center, the lower the chance that this statement will be 
-            # true.
+		if carrying: {
+			# this line was added to attempt to favor dropping food in 
+			# piles close to the center.  the further we get from the 
+			# center, the lower the chance that this statement will be 
+			# true.
 
-            newLoc = (food get-location).
-            newLoc += random[(2, 2, 2)] - (1, 1, 1).
+			newLoc = (food get-location).
+			newLoc += random[(2, 2, 2)] - (1, 1, 1).
  
-            carrying move to newLoc.
-            carrying set-owner to 0.
-            carrying = 0.
-            return.
-        }
+			carrying move to newLoc.
+			carrying set-owner to 0.
+			carrying = 0.
+			return.
+		}
 
-        # otherwise, pick up the food.
+		# otherwise, pick up the food.
 
-        food set-owner to self.
+		food set-owner to self.
 
-        carrying = food.
+		carrying = food.
 
-    + to iterate:
-        # if we're carrying something, keep it near us
+	+ to iterate:
+		# if we're carrying something, keep it near us
 
-        if carrying: carrying move to (self get-location) - (1, 0, 0).
+		if carrying: carrying move to (self get-location) - (1, 0, 0).
 
-        justCollided -= 1.
+		justCollided -= 1.
 
-        # since we've subclassed Wanderer, it is in charge of our motion,
-        # so we'll ask it to run it's own iteration method.
+		# since we've subclassed Wanderer, it is in charge of our motion,
+		# so we'll ask it to run it's own iteration method.
 
-        super iterate.
+		super iterate.
 }
 
 Mobile : Food (aka Foods) {
-    + variables: 
-        owner (object).
+	+ variables: 
+		owner (object).
 
-    + to init:
-        self set-shape to (controller get-food-shape).
-        self set-color to (.8, .2, .2).
-        self randomize-location.
+	+ to init:
+		self set-shape to (controller get-food-shape).
+		self set-color to (.8, .2, .2).
+		self randomize-location.
 
-    + to randomize-location:
-        self move to random[2 * WANDER_RANGE] - WANDER_RANGE.
+	+ to randomize-location:
+		self move to random[2 * WANDER_RANGE] - WANDER_RANGE.
 
-    + to set-owner to o (object):
-        owner = o.
+	+ to set-owner to o (object):
+		owner = o.
 
-    + to get-owner:
-        return owner.
+	+ to get-owner:
+		return owner.
 }

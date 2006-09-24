@@ -24,9 +24,8 @@
  *  @author Eric DeWitt
  *  Copyright (C) 2005 Eric DeWitt, Jonathan Klein
  */
- 
- #include "kernel.h"
- 
-void breveInitStatisticsFunctions(brNamespace *n) {
 
+#include "kernel.h"
+
+void breveInitStatisticsFunctions( brNamespace *n ) {
 }

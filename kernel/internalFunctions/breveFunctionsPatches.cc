@@ -33,13 +33,14 @@
 
 	void newPatchGrid(vector, vector, int, int, int).
 
-	The first vector is the patch grid's center.  The second is the 
+	The first vector is the patch grid's center.  The second is the
 	size of an individual patch.  The three integers specify the x, y
 	and z sizes of the grid.
 */
 
-int brIPatchGridNew(brEval args[], brEval *target, brInstance *i) {
-	target->set( i->engine->world->addPatchGrid( &BRVECTOR(&args[0]), &BRVECTOR(&args[1]), BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]) ) );
+int brIPatchGridNew( brEval args[], brEval *target, brInstance *i ) {
+
+	target->set( i->engine->world->addPatchGrid( &BRVECTOR( &args[0] ), &BRVECTOR( &args[1] ), BRINT( &args[2] ), BRINT( &args[3] ), BRINT( &args[4] ) ) );
 
 	return EC_OK;
 }
@@ -50,8 +51,8 @@ int brIPatchGridNew(brEval args[], brEval *target, brInstance *i) {
 	void freePatchGrid(slPatchGrid pointer).
 */
 
-int brIPatchGridFree(brEval args[], brEval *target, brInstance *i) {
-	i->engine->world->removePatchGrid( BRPATCHGRIDPOINTER(&args[0]) );
+int brIPatchGridFree( brEval args[], brEval *target, brInstance *i ) {
+	i->engine->world->removePatchGrid( BRPATCHGRIDPOINTER( &args[0] ) );
 
 	return EC_OK;
 }
@@ -61,8 +62,8 @@ int brIPatchGridFree(brEval args[], brEval *target, brInstance *i) {
 	pruning stage.
 */
 
-int brIPatchGridSetClipGrid(brEval args[], brEval *target, brInstance *i) {
-	i->engine->world->_clipGrid = BRPATCHGRIDPOINTER(&args[0]);
+int brIPatchGridSetClipGrid( brEval args[], brEval *target, brInstance *i ) {
+	i->engine->world->_clipGrid = BRPATCHGRIDPOINTER( &args[0] );
 	return EC_OK;
 }
 
@@ -72,8 +73,8 @@ int brIPatchGridSetClipGrid(brEval args[], brEval *target, brInstance *i) {
 	void patchGridSetSmoothDrawing(slPatchGrid pointer).
 */
 
-int brIPatchGridSetSmoothDrawing(brEval args[], brEval *target, brInstance *i) {
-	BRPATCHGRIDPOINTER(&args[0])->setSmoothDrawing(BRINT(&args[1]));
+int brIPatchGridSetSmoothDrawing( brEval args[], brEval *target, brInstance *i ) {
+	BRPATCHGRIDPOINTER( &args[0] )->setSmoothDrawing( BRINT( &args[1] ) );
 	return EC_OK;
 }
 
@@ -81,8 +82,8 @@ int brIPatchGridSetSmoothDrawing(brEval args[], brEval *target, brInstance *i) {
 	\brief Enables/disables textured patchgrid drawing.
 */
 
-int brIPatchGridSetDrawWithTexture(brEval args[], brEval *target, brInstance *i) {
-	BRPATCHGRIDPOINTER(&args[0])->setDrawWithTexture(BRINT(&args[1]));
+int brIPatchGridSetDrawWithTexture( brEval args[], brEval *target, brInstance *i ) {
+	BRPATCHGRIDPOINTER( &args[0] )->setDrawWithTexture( BRINT( &args[1] ) );
 	return EC_OK;
 }
 
@@ -92,15 +93,15 @@ int brIPatchGridSetDrawWithTexture(brEval args[], brEval *target, brInstance *i)
 	slPatch pointer getPatchAtIndex(slPatchGrid pointer).
 */
 
-int brIPatchAtIndex(brEval args[], brEval *target, brInstance *i) {
-	slPatchGrid *grid = BRPATCHGRIDPOINTER(&args[0]);
+int brIPatchAtIndex( brEval args[], brEval *target, brInstance *i ) {
+	slPatchGrid *grid = BRPATCHGRIDPOINTER( &args[0] );
 
-	if (!grid) {
-		brEvalError(i->engine, EE_SIMULATION, "Patch method called with uninitialized patch grid.");
+	if ( !grid ) {
+		brEvalError( i->engine, EE_SIMULATION, "Patch method called with uninitialized patch grid." );
 		return EC_OK;
 	}
 
-	target->set( grid->getPatchAtIndex( BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]) ) );
+	target->set( grid->getPatchAtIndex( BRINT( &args[1] ), BRINT( &args[2] ), BRINT( &args[3] ) ) );
 
 	return EC_OK;
 }
@@ -111,19 +112,19 @@ int brIPatchAtIndex(brEval args[], brEval *target, brInstance *i) {
 	instance objectAtLocation(slPatchGrid pointer, vector).
 */
 
-int brIObjectAtLocation(brEval args[], brEval *target, brInstance *i) {
-	slPatchGrid *grid = BRPATCHGRIDPOINTER(&args[0]);
+int brIObjectAtLocation( brEval args[], brEval *target, brInstance *i ) {
+	slPatchGrid *grid = BRPATCHGRIDPOINTER( &args[0] );
 	slPatch *patch;
 
-	if (!grid) {
-		brEvalError(i->engine, EE_SIMULATION, "Patch method called with uninitialized patch grid.");
+	if ( !grid ) {
+		brEvalError( i->engine, EE_SIMULATION, "Patch method called with uninitialized patch grid." );
 		return EC_OK;
 	}
 
-	patch = grid->getPatchAtLocation(&BRVECTOR(&args[1]));
+	patch = grid->getPatchAtLocation( &BRVECTOR( &args[1] ) );
 
-	if (patch) target->set( (brInstance*)patch->getData() );
-	else target->set( (brInstance*)NULL );
+	if ( patch ) target->set(( brInstance* )patch->getData() );
+	else target->set(( brInstance* )NULL );
 
 	return EC_OK;
 }
@@ -134,19 +135,19 @@ int brIObjectAtLocation(brEval args[], brEval *target, brInstance *i) {
 	instance objectAtIndex(slPatchGrid pointer, int, int, int).
 */
 
-int brIObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
-	slPatchGrid *grid = BRPATCHGRIDPOINTER(&args[0]);
+int brIObjectAtIndex( brEval args[], brEval *target, brInstance *i ) {
+	slPatchGrid *grid = BRPATCHGRIDPOINTER( &args[0] );
 	slPatch *patch;
 
-	if (!grid) {
-		brEvalError(i->engine, EE_SIMULATION, "Patch method called with uninitialized patch grid.");
+	if ( !grid ) {
+		brEvalError( i->engine, EE_SIMULATION, "Patch method called with uninitialized patch grid." );
 		return EC_OK;
 	}
-	
-	patch = grid->getPatchAtIndex(BRINT(&args[1]), BRINT(&args[2]), BRINT(&args[3]));
 
-	if(patch) target->set( (brInstance*)patch->getData() );
-	else target->set( (brInstance*)NULL );
+	patch = grid->getPatchAtIndex( BRINT( &args[1] ), BRINT( &args[2] ), BRINT( &args[3] ) );
+
+	if ( patch ) target->set(( brInstance* )patch->getData() );
+	else target->set(( brInstance* )NULL );
 
 	return EC_OK;
 }
@@ -155,10 +156,10 @@ int brIObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 	\brief Copies the contents of a matrix to a color channel in a patch grid.
 */
 
-int brIPatchGridCopyColorFrom3DMatrix(brEval args[], brEval *target, brInstance *i) {
-	slPatchGrid *g = BRPATCHGRIDPOINTER(&args[0]);
+int brIPatchGridCopyColorFrom3DMatrix( brEval args[], brEval *target, brInstance *i ) {
+	slPatchGrid *g = BRPATCHGRIDPOINTER( &args[0] );
 
-	g->copyColorFrom3DMatrix(static_cast<slBigMatrix3DGSL*>(BRPOINTER(&args[1])), BRINT(&args[2]), BRDOUBLE(&args[3]));
+	g->copyColorFrom3DMatrix( static_cast<slBigMatrix3DGSL*>( BRPOINTER( &args[1] ) ), BRINT( &args[2] ), BRDOUBLE( &args[3] ) );
 
 	return EC_OK;
 }
@@ -170,15 +171,15 @@ int brIPatchGridCopyColorFrom3DMatrix(brEval args[], brEval *target, brInstance 
 	setObjectAtIndex(slPatchGrid pointer, instance, int, int, int).
 */
 
-int brISetObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
-	slPatchGrid *grid = BRPATCHGRIDPOINTER(&args[0]);
+int brISetObjectAtIndex( brEval args[], brEval *target, brInstance *i ) {
+	slPatchGrid *grid = BRPATCHGRIDPOINTER( &args[0] );
 
-	if (!grid) {
-		brEvalError(i->engine, EE_SIMULATION, "Patch method called with uninitialized patch grid.");
+	if ( !grid ) {
+		brEvalError( i->engine, EE_SIMULATION, "Patch method called with uninitialized patch grid." );
 		return EC_OK;
 	}
 
-	grid->setDataAtIndex(BRINT(&args[2]), BRINT(&args[3]), BRINT(&args[4]), BRINSTANCE(&args[1]));
+	grid->setDataAtIndex( BRINT( &args[2] ), BRINT( &args[3] ), BRINT( &args[4] ), BRINSTANCE( &args[1] ) );
 
 	return EC_OK;
 }
@@ -189,8 +190,8 @@ int brISetObjectAtIndex(brEval args[], brEval *target, brInstance *i) {
 	void setPatchColor(slPatch pointer, vector).
 */
 
-int brISetPatchColor(brEval args[], brEval *target, brInstance *i) {
-	BRPATCHPOINTER(&args[0])->setColor(&BRVECTOR(&args[1]));
+int brISetPatchColor( brEval args[], brEval *target, brInstance *i ) {
+	BRPATCHPOINTER( &args[0] )->setColor( &BRVECTOR( &args[1] ) );
 
 	return EC_OK;
 }
@@ -201,7 +202,7 @@ int brISetPatchColor(brEval args[], brEval *target, brInstance *i) {
 	vector getPatchLocation(slPatch pointer).
 */
 
-int brIGetPatchLocation(brEval args[], brEval *target, brInstance *i) {
+int brIGetPatchLocation( brEval args[], brEval *target, brInstance *i ) {
 	slVector v;
 
 	BRPATCHPOINTER( &args[0] )->getLocation( &v );
@@ -217,25 +218,26 @@ int brIGetPatchLocation(brEval args[], brEval *target, brInstance *i) {
 	void setPatchTransparency(slPatch pointer, double).
 */
 
-int brISetPatchTransparency(brEval args[], brEval *target, brInstance *i) {
-	BRPATCHPOINTER(&args[0])->setTransparency(BRDOUBLE(&args[1]));
+int brISetPatchTransparency( brEval args[], brEval *target, brInstance *i ) {
+	BRPATCHPOINTER( &args[0] )->setTransparency( BRDOUBLE( &args[1] ) );
 
 	return EC_OK;
 }
+
 /*@}*/
 
-void breveInitPatchFunctions(brNamespace *n) {
-    brNewBreveCall(n, "patchGridNew", brIPatchGridNew, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_INT, AT_INT, AT_INT, 0);
-    brNewBreveCall(n, "patchGridFree", brIPatchGridFree, AT_NULL, AT_POINTER, 0);
-    brNewBreveCall(n, "patchGridSetClipGrid", brIPatchGridSetClipGrid, AT_NULL, AT_POINTER, 0);
-    brNewBreveCall(n, "patchGridSetSmoothDrawing", brIPatchGridSetSmoothDrawing, AT_NULL, AT_POINTER, AT_INT, 0);
-    brNewBreveCall(n, "patchGridSetDrawWithTexture", brIPatchGridSetDrawWithTexture, AT_NULL, AT_POINTER, AT_INT, 0);
-    brNewBreveCall(n, "setPatchObjectAtIndex", brISetObjectAtIndex, AT_NULL, AT_POINTER, AT_INSTANCE, AT_INT, AT_INT, AT_INT, 0);
-    brNewBreveCall(n, "patchObjectAtIndex", brIObjectAtIndex, AT_INSTANCE, AT_POINTER, AT_INT, AT_INT, AT_INT, 0);
-    brNewBreveCall(n, "objectAtLocation", brIObjectAtLocation, AT_INSTANCE, AT_POINTER, AT_VECTOR, 0);
-    brNewBreveCall(n, "getPatchAtIndex", brIPatchAtIndex, AT_POINTER, AT_POINTER, AT_INT, AT_INT, AT_INT, 0);
-    brNewBreveCall(n, "setPatchColor", brISetPatchColor, AT_NULL, AT_POINTER, AT_VECTOR, 0);
-    brNewBreveCall(n, "setPatchTransparency", brISetPatchTransparency, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
-    brNewBreveCall(n, "patchGridCopyColorFrom3DMatrix", brIPatchGridCopyColorFrom3DMatrix, AT_NULL, AT_POINTER, AT_POINTER, AT_INT, AT_DOUBLE, 0);
-    brNewBreveCall(n, "getPatchLocation", brIGetPatchLocation, AT_VECTOR, AT_POINTER, 0);
+void breveInitPatchFunctions( brNamespace *n ) {
+	brNewBreveCall( n, "patchGridNew", brIPatchGridNew, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_INT, AT_INT, AT_INT, 0 );
+	brNewBreveCall( n, "patchGridFree", brIPatchGridFree, AT_NULL, AT_POINTER, 0 );
+	brNewBreveCall( n, "patchGridSetClipGrid", brIPatchGridSetClipGrid, AT_NULL, AT_POINTER, 0 );
+	brNewBreveCall( n, "patchGridSetSmoothDrawing", brIPatchGridSetSmoothDrawing, AT_NULL, AT_POINTER, AT_INT, 0 );
+	brNewBreveCall( n, "patchGridSetDrawWithTexture", brIPatchGridSetDrawWithTexture, AT_NULL, AT_POINTER, AT_INT, 0 );
+	brNewBreveCall( n, "setPatchObjectAtIndex", brISetObjectAtIndex, AT_NULL, AT_POINTER, AT_INSTANCE, AT_INT, AT_INT, AT_INT, 0 );
+	brNewBreveCall( n, "patchObjectAtIndex", brIObjectAtIndex, AT_INSTANCE, AT_POINTER, AT_INT, AT_INT, AT_INT, 0 );
+	brNewBreveCall( n, "objectAtLocation", brIObjectAtLocation, AT_INSTANCE, AT_POINTER, AT_VECTOR, 0 );
+	brNewBreveCall( n, "getPatchAtIndex", brIPatchAtIndex, AT_POINTER, AT_POINTER, AT_INT, AT_INT, AT_INT, 0 );
+	brNewBreveCall( n, "setPatchColor", brISetPatchColor, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
+	brNewBreveCall( n, "setPatchTransparency", brISetPatchTransparency, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "patchGridCopyColorFrom3DMatrix", brIPatchGridCopyColorFrom3DMatrix, AT_NULL, AT_POINTER, AT_POINTER, AT_INT, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "getPatchLocation", brIGetPatchLocation, AT_VECTOR, AT_POINTER, 0 );
 }

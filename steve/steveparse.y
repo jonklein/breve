@@ -458,18 +458,18 @@ methoddef
 
 		stMethodAlignStack(currentMethod);
 		
-		if(stStoreInstanceMethod(currentObject, $1, currentMethod)) {
-			stParseError(parseEngine, PE_REDEFINITION, "Symbol \"%s\" already defined for class \"%s\"", $1, currentObject->name);
+		if( stStoreInstanceMethod(currentObject, $1, currentMethod) ) {
+			stParseError(parseEngine, PE_REDEFINITION, "Symbol \"%s\" already defined for class \"%s\"", $1, currentObject->name.c_str() );
 			delete currentMethod;
 		}
 
-		slFree($1);
+		slFree( $1 );
 
-		/* if we found an error somewhere and caught it, we continued so */
-		/* that the method would be stored before we stop the parsing... */
-		/* this way we're sure to free the allocated memory.			 */
+		// if we found an error somewhere and caught it, we continued so 
+		// that the method would be stored before we stop the parsing... 
+		// this way we're sure to free the allocated memory.			 
 
-		if(brGetError(parseEngine)) YYABORT;
+		if( brGetError( parseEngine ) ) YYABORT;
 	}
 | method_head variable_list method_code {
 		if($3) currentMethod->code = *$3;
@@ -479,7 +479,7 @@ methoddef
 		stMethodAlignStack(currentMethod);
 
 		if(stStoreInstanceMethod(currentObject, $1, currentMethod)) {
-			stParseError(parseEngine, PE_REDEFINITION, "Symbol \"%s\" already defined for class \"%s\"", $1, currentObject->name);
+			stParseError( parseEngine, PE_REDEFINITION, "Symbol \"%s\" already defined for class \"%s\"", $1, currentObject->name.c_str() );
 			delete currentMethod;
 		}
 
@@ -553,12 +553,12 @@ variable
 
 		if(!currentMethod) {
 			if(!stInstanceNewVar(var, currentObject)) {
-				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in class \"%s\"", var->name, currentObject->name);
+				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in class \"%s\"", var->name.c_str(), currentObject->name.c_str() );
 				delete var;
 			}
 		} else {
 			if(!stMethodAddVar(var, currentMethod)) {
-				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in method \"%s\"", var->name, currentMethod->name);
+				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in method \"%s\"", var->name.c_str(), currentMethod->name.c_str() );
 				delete var;
 			}
 		}
@@ -581,12 +581,12 @@ variable
 
 		if(!currentMethod) {
 			if(!stInstanceNewVar(thisVar, currentObject)) {
-				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in class \"%s\"", thisVar->name, currentObject->name);
+				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in class \"%s\"", thisVar->name.c_str(), currentObject->name.c_str() );
 				delete thisVar;
 			}
 		} else {
 			if(!stMethodAddVar(thisVar, currentMethod)) {
-				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in method \"%s\"", thisVar->name, currentMethod->name);
+				stParseError(parseEngine, PE_REDEFINITION, "Redefinition of symbol \"%s\" in method \"%s\"", thisVar->name.c_str() , currentMethod->name.c_str() );
 				delete thisVar;
 			}
 		}

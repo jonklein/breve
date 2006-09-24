@@ -1,0 +1,1115 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4818570A05CABEEB00C48BE6 /* slBreveSwarm.h in Headers */ = {isa = PBXBuildFile; fileRef = F5175CB90169B958010BE436 /* slBreveSwarm.h */; };
+		4818570B05CABEEB00C48BE6 /* slBreveSaver.h in Headers */ = {isa = PBXBuildFile; fileRef = F5D8673B01169F20010BE436 /* slBreveSaver.h */; };
+		4818570D05CABEEB00C48BE6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
+		4818570F05CABEEB00C48BE6 /* SwarmSaver.tz in Resources */ = {isa = PBXBuildFile; fileRef = F5175CB20169B8F6010BE436 /* SwarmSaver.tz */; };
+		4818571005CABEEB00C48BE6 /* breveSwarm.nib in Resources */ = {isa = PBXBuildFile; fileRef = F5175CD00169E1A5010BE436 /* breveSwarm.nib */; };
+		4818571205CABEEB00C48BE6 /* Simulation.tz in Resources */ = {isa = PBXBuildFile; fileRef = 48941C8F0401A69200000116 /* Simulation.tz */; };
+		4818571405CABEEB00C48BE6 /* slBreveSwarm.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5175CBA0169B958010BE436 /* slBreveSwarm.mm */; };
+		4818571505CABEEB00C48BE6 /* slBreveSaver.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5D8673C01169F20010BE436 /* slBreveSaver.mm */; };
+		4818572E05CABEEB00C48BE6 /* slBreveCreatures.h in Headers */ = {isa = PBXBuildFile; fileRef = F5175CBD0169B97E010BE436 /* slBreveCreatures.h */; };
+		4818572F05CABEEB00C48BE6 /* slBreveSaver.h in Headers */ = {isa = PBXBuildFile; fileRef = F5D8673B01169F20010BE436 /* slBreveSaver.h */; };
+		4818573105CABEEB00C48BE6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
+		4818573205CABEEB00C48BE6 /* WalkerSaver.tz in Resources */ = {isa = PBXBuildFile; fileRef = F50BB16F012BFE5C010BE436 /* WalkerSaver.tz */; };
+		4818573405CABEEB00C48BE6 /* breveWalker.nib in Resources */ = {isa = PBXBuildFile; fileRef = F510412F012D110B010BE436 /* breveWalker.nib */; };
+		4818573605CABEEB00C48BE6 /* Simulation.tz in Resources */ = {isa = PBXBuildFile; fileRef = 48941C8F0401A69200000116 /* Simulation.tz */; };
+		4818573805CABEEB00C48BE6 /* slBreveCreatures.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5175CBE0169B97E010BE436 /* slBreveCreatures.mm */; };
+		4818573905CABEEB00C48BE6 /* slBreveSaver.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5D8673C01169F20010BE436 /* slBreveSaver.mm */; };
+		4818578C05CABFE300C48BE6 /* classes in Resources */ = {isa = PBXBuildFile; fileRef = 4818575605CABFE300C48BE6 /* classes */; };
+		4842D87307F9A72700140407 /* libbreve.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D87207F9A72700140407 /* libbreve.a */; };
+		4842D87407F9A72700140407 /* libbreve.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D87207F9A72700140407 /* libbreve.a */; };
+		4842D87507F9A72700140407 /* libbreve.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D87207F9A72700140407 /* libbreve.a */; };
+		4842D87607F9A72700140407 /* libbreve.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D87207F9A72700140407 /* libbreve.a */; };
+		4842D90007F9CAC100140407 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8F907F9CAC100140407 /* libavcodec.a */; };
+		4842D90107F9CAC100140407 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FA07F9CAC100140407 /* libavformat.a */; };
+		4842D90207F9CAC100140407 /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FB07F9CAC100140407 /* libgsl.a */; };
+		4842D90307F9CAC100140407 /* libgslcblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FC07F9CAC100140407 /* libgslcblas.a */; };
+		4842D90407F9CAC100140407 /* libpush.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FD07F9CAC100140407 /* libpush.a */; };
+		4842D90607F9CAC200140407 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FF07F9CAC100140407 /* libsndfile.a */; };
+		4842D90707F9CAC200140407 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8F907F9CAC100140407 /* libavcodec.a */; };
+		4842D90807F9CAC200140407 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FA07F9CAC100140407 /* libavformat.a */; };
+		4842D90907F9CAC200140407 /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FB07F9CAC100140407 /* libgsl.a */; };
+		4842D90A07F9CAC200140407 /* libgslcblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FC07F9CAC100140407 /* libgslcblas.a */; };
+		4842D90B07F9CAC200140407 /* libpush.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FD07F9CAC100140407 /* libpush.a */; };
+		4842D90D07F9CAC200140407 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FF07F9CAC100140407 /* libsndfile.a */; };
+		4842D91007F9CAC200140407 /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FB07F9CAC100140407 /* libgsl.a */; };
+		4842D91107F9CAC200140407 /* libgslcblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FC07F9CAC100140407 /* libgslcblas.a */; };
+		4842D91507F9CAC200140407 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8F907F9CAC100140407 /* libavcodec.a */; };
+		4842D91607F9CAC200140407 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FA07F9CAC100140407 /* libavformat.a */; };
+		4842D91707F9CAC200140407 /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FB07F9CAC100140407 /* libgsl.a */; };
+		4842D91807F9CAC200140407 /* libgslcblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FC07F9CAC100140407 /* libgslcblas.a */; };
+		4842D91907F9CAC200140407 /* libpush.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FD07F9CAC100140407 /* libpush.a */; };
+		4842D91B07F9CAC200140407 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FF07F9CAC100140407 /* libsndfile.a */; };
+		4842D93A07F9CBC300140407 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D93907F9CBC300140407 /* libportaudio.a */; };
+		4842D93B07F9CBC300140407 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D93907F9CBC300140407 /* libportaudio.a */; };
+		4842D93D07F9CBC300140407 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D93907F9CBC300140407 /* libportaudio.a */; };
+		4842D95C07F9CC0800140407 /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D95B07F9CC0800140407 /* JavaVM.framework */; };
+		4842D95D07F9CC0800140407 /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D95B07F9CC0800140407 /* JavaVM.framework */; };
+		4842D95E07F9CC0800140407 /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D95B07F9CC0800140407 /* JavaVM.framework */; };
+		4842D95F07F9CC0800140407 /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D95B07F9CC0800140407 /* JavaVM.framework */; };
+		485E9248090D1E6F0055AF56 /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8E06B5548600740D0A /* libjpeg.a */; };
+		4868E6F7091423CC0045591F /* simulation.gif in Resources */ = {isa = PBXBuildFile; fileRef = 4868E6F6091423CC0045591F /* simulation.gif */; };
+		4868E6FD091423F80045591F /* app_icon.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 4868E6FC091423F80045591F /* app_icon.tiff */; };
+		489D8B1206B5541200740D0A /* ScreenSaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B1106B5541200740D0A /* ScreenSaver.framework */; };
+		489D8B1306B5541200740D0A /* ScreenSaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B1106B5541200740D0A /* ScreenSaver.framework */; };
+		489D8B3D06B5543800740D0A /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B3B06B5543800740D0A /* GLUT.framework */; };
+		489D8B3E06B5543800740D0A /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B3C06B5543800740D0A /* OpenGL.framework */; };
+		489D8B3F06B5543800740D0A /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B3B06B5543800740D0A /* GLUT.framework */; };
+		489D8B4006B5543800740D0A /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B3C06B5543800740D0A /* OpenGL.framework */; };
+		489D8B9406B5548600740D0A /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8D06B5548600740D0A /* libexpat.a */; };
+		489D8B9506B5548600740D0A /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8E06B5548600740D0A /* libjpeg.a */; };
+		489D8B9606B5548600740D0A /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8F06B5548600740D0A /* libpng.a */; };
+		489D8B9B06B5548600740D0A /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8D06B5548600740D0A /* libexpat.a */; };
+		489D8B9D06B5548600740D0A /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8F06B5548600740D0A /* libpng.a */; };
+		489D8BAC06B554A200740D0A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BAB06B554A200740D0A /* libz.dylib */; };
+		489D8BAD06B554A200740D0A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BAB06B554A200740D0A /* libz.dylib */; };
+		489D8BBC06B554D600740D0A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BBA06B554D600740D0A /* AudioToolbox.framework */; };
+		489D8BBD06B554D600740D0A /* System.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BBB06B554D600740D0A /* System.framework */; };
+		489D8BBE06B554D600740D0A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BBA06B554D600740D0A /* AudioToolbox.framework */; };
+		489D8BBF06B554D600740D0A /* System.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BBB06B554D600740D0A /* System.framework */; };
+		489D8BC006B554D600740D0A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BBA06B554D600740D0A /* AudioToolbox.framework */; };
+		489D8BC106B554D600740D0A /* System.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BBB06B554D600740D0A /* System.framework */; };
+		489D8BFC06B5551B00740D0A /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BFA06B5551B00740D0A /* CoreAudio.framework */; };
+		489D8BFD06B5551B00740D0A /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BFB06B5551B00740D0A /* CoreFoundation.framework */; };
+		489D8BFE06B5551B00740D0A /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BFA06B5551B00740D0A /* CoreAudio.framework */; };
+		489D8BFF06B5551B00740D0A /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BFB06B5551B00740D0A /* CoreFoundation.framework */; };
+		489D8C0006B5551B00740D0A /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BFA06B5551B00740D0A /* CoreAudio.framework */; };
+		489D8C0106B5551B00740D0A /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BFB06B5551B00740D0A /* CoreFoundation.framework */; };
+		489D8C3E06B5553600740D0A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8C3D06B5553600740D0A /* Foundation.framework */; };
+		489D8C3F06B5553600740D0A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8C3D06B5553600740D0A /* Foundation.framework */; };
+		489D8C4006B5553600740D0A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8C3D06B5553600740D0A /* Foundation.framework */; };
+		489D8CB806B5554900740D0A /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8CB706B5554900740D0A /* AppKit.framework */; };
+		489D8CB906B5554900740D0A /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8CB706B5554900740D0A /* AppKit.framework */; };
+		489D8CBA06B5554900740D0A /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8CB706B5554900740D0A /* AppKit.framework */; };
+		489D8D5E06B5558A00740D0A /* libode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8D5D06B5558A00740D0A /* libode.a */; };
+		489D8D5F06B5558A00740D0A /* libode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8D5D06B5558A00740D0A /* libode.a */; };
+		489D8D6006B5558A00740D0A /* libode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8D5D06B5558A00740D0A /* libode.a */; };
+		489DE28006B5591000740D0A /* slBrevePainter.h in Headers */ = {isa = PBXBuildFile; fileRef = 489D8A5B06B5521A00740D0A /* slBrevePainter.h */; };
+		489DE28406B5591000740D0A /* slBrevePainter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 489D8A5C06B5521A00740D0A /* slBrevePainter.mm */; };
+		489DE28906B5591300740D0A /* slBreveSaver.h in Headers */ = {isa = PBXBuildFile; fileRef = F5D8673B01169F20010BE436 /* slBreveSaver.h */; };
+		489DE28E06B5591400740D0A /* slBreveSaver.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5D8673C01169F20010BE436 /* slBreveSaver.mm */; };
+		489DE2B106B5598B00740D0A /* Digitizer.tz in Resources */ = {isa = PBXBuildFile; fileRef = 489DE2B006B5598B00740D0A /* Digitizer.tz */; };
+		489DE2B906B559C100740D0A /* PainterSaver.tz in Resources */ = {isa = PBXBuildFile; fileRef = 489DE2B806B559C100740D0A /* PainterSaver.tz */; };
+		48ADBD1D06CA66E80059C23C /* brevePainter-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 489DE21806B5587400740D0A /* brevePainter-Info.plist */; };
+		48B9BEFB05EA641F002C7A42 /* slBreveSaver.h in Headers */ = {isa = PBXBuildFile; fileRef = F5D8673B01169F20010BE436 /* slBreveSaver.h */; };
+		48B9BF0005EA6420002C7A42 /* slBreveSaver.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5D8673C01169F20010BE436 /* slBreveSaver.mm */; };
+		48B9BF0505EA6422002C7A42 /* slBreveResearcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 48B9BE2D05EA60B4002C7A42 /* slBreveResearcher.h */; };
+		48B9BF0A05EA6422002C7A42 /* slBreveResearcher.mm in Sources */ = {isa = PBXBuildFile; fileRef = 48B9BE2E05EA60B4002C7A42 /* slBreveResearcher.mm */; };
+		48B9BF1405EA6439002C7A42 /* Simulation.tz in Resources */ = {isa = PBXBuildFile; fileRef = 48941C8F0401A69200000116 /* Simulation.tz */; };
+		48B9BF3405EA6451002C7A42 /* classes in Resources */ = {isa = PBXBuildFile; fileRef = 4818575605CABFE300C48BE6 /* classes */; };
+		48D907CA06BFC54300FF529F /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8CB706B5554900740D0A /* AppKit.framework */; };
+		48D907CB06BFC54300FF529F /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BFA06B5551B00740D0A /* CoreAudio.framework */; };
+		48D907CD06BFC54400FF529F /* libode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8D5D06B5558A00740D0A /* libode.a */; };
+		48D907CF06BFC54400FF529F /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B3B06B5543800740D0A /* GLUT.framework */; };
+		48D907D806BFC56000FF529F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BBA06B554D600740D0A /* AudioToolbox.framework */; };
+		48D907DA06BFC56100FF529F /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BFB06B5551B00740D0A /* CoreFoundation.framework */; };
+		48D907DC06BFC56100FF529F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8C3D06B5553600740D0A /* Foundation.framework */; };
+		48D907EA06BFC56800FF529F /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8F06B5548600740D0A /* libpng.a */; };
+		48D907F206BFC56B00FF529F /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BAB06B554A200740D0A /* libz.dylib */; };
+		48D907F406BFC56B00FF529F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B3C06B5543800740D0A /* OpenGL.framework */; };
+		48D907F606BFC56C00FF529F /* ScreenSaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B1106B5541200740D0A /* ScreenSaver.framework */; };
+		48D907F806BFC56D00FF529F /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8E06B5548600740D0A /* libjpeg.a */; };
+		48D907FC06BFC56E00FF529F /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8D06B5548600740D0A /* libexpat.a */; };
+		48D90A3206BFD21D00FF529F /* classes in Resources */ = {isa = PBXBuildFile; fileRef = 4818575605CABFE300C48BE6 /* classes */; };
+		48D90A3406BFD24700FF529F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
+		48D90A3D06BFD26900FF529F /* brevePainter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 48D90A3B06BFD26900FF529F /* brevePainter.nib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4818572A05CABEEB00C48BE6 /* breveSwarm-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "breveSwarm-info.plist"; sourceTree = "<group>"; };
+		4818572B05CABEEB00C48BE6 /* breveSwarm.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = breveSwarm.saver; sourceTree = BUILT_PRODUCTS_DIR; };
+		4818574E05CABEEB00C48BE6 /* breveWalker-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "breveWalker-Info.plist"; sourceTree = "<group>"; };
+		4818574F05CABEEB00C48BE6 /* breveCreatures.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = breveCreatures.saver; sourceTree = BUILT_PRODUCTS_DIR; };
+		4818575605CABFE300C48BE6 /* classes */ = {isa = PBXFileReference; lastKnownFileType = folder; name = classes; path = ../lib/classes; sourceTree = SOURCE_ROOT; };
+		4842D87207F9A72700140407 /* libbreve.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbreve.a; path = breve/lib/libbreve.a; sourceTree = SOURCE_ROOT; };
+		4842D8F907F9CAC100140407 /* libavcodec.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavcodec.a; path = /usr/local/lib/libavcodec.a; sourceTree = "<absolute>"; };
+		4842D8FA07F9CAC100140407 /* libavformat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavformat.a; path = /usr/local/lib/libavformat.a; sourceTree = "<absolute>"; };
+		4842D8FB07F9CAC100140407 /* libgsl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgsl.a; path = /usr/local/lib/libgsl.a; sourceTree = "<absolute>"; };
+		4842D8FC07F9CAC100140407 /* libgslcblas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgslcblas.a; path = /usr/local/lib/libgslcblas.a; sourceTree = "<absolute>"; };
+		4842D8FD07F9CAC100140407 /* libpush.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpush.a; path = /usr/local/lib/libpush.a; sourceTree = "<absolute>"; };
+		4842D8FF07F9CAC100140407 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = /usr/local/lib/libsndfile.a; sourceTree = "<absolute>"; };
+		4842D93907F9CBC300140407 /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libportaudio.a; path = /usr/local/lib/libportaudio.a; sourceTree = "<absolute>"; };
+		4842D95B07F9CC0800140407 /* JavaVM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaVM.framework; path = /System/Library/Frameworks/JavaVM.framework; sourceTree = "<absolute>"; };
+		4868E6F6091423CC0045591F /* simulation.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = simulation.gif; sourceTree = "<group>"; };
+		4868E6FC091423F80045591F /* app_icon.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = app_icon.tiff; sourceTree = "<group>"; };
+		48941C8F0401A69200000116 /* Simulation.tz */ = {isa = PBXFileReference; lastKnownFileType = text; path = Simulation.tz; sourceTree = "<group>"; };
+		489D8A5B06B5521A00740D0A /* slBrevePainter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slBrevePainter.h; sourceTree = "<group>"; };
+		489D8A5C06B5521A00740D0A /* slBrevePainter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = slBrevePainter.mm; sourceTree = "<group>"; };
+		489D8B1106B5541200740D0A /* ScreenSaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScreenSaver.framework; path = /System/Library/Frameworks/ScreenSaver.framework; sourceTree = "<absolute>"; };
+		489D8B3B06B5543800740D0A /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
+		489D8B3C06B5543800740D0A /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		489D8B8D06B5548600740D0A /* libexpat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libexpat.a; path = /usr/local/lib/libexpat.a; sourceTree = "<absolute>"; };
+		489D8B8E06B5548600740D0A /* libjpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjpeg.a; path = /usr/local/lib/libjpeg.a; sourceTree = "<absolute>"; };
+		489D8B8F06B5548600740D0A /* libpng.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng.a; path = /usr/local/lib/libpng.a; sourceTree = "<absolute>"; };
+		489D8BAB06B554A200740D0A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
+		489D8BBA06B554D600740D0A /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
+		489D8BBB06B554D600740D0A /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = /System/Library/Frameworks/System.framework; sourceTree = "<absolute>"; };
+		489D8BFA06B5551B00740D0A /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
+		489D8BFB06B5551B00740D0A /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
+		489D8C3D06B5553600740D0A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		489D8CB706B5554900740D0A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		489D8D5D06B5558A00740D0A /* libode.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libode.a; path = /usr/local/lib/libode.a; sourceTree = "<absolute>"; };
+		489DE21706B5587300740D0A /* brevePainter.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = brevePainter.saver; sourceTree = BUILT_PRODUCTS_DIR; };
+		489DE21806B5587400740D0A /* brevePainter-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "brevePainter-Info.plist"; path = "/Users/jk/dev/breveSaver/brevePainter-Info.plist"; sourceTree = "<absolute>"; };
+		489DE2B006B5598B00740D0A /* Digitizer.tz */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = Digitizer.tz; sourceTree = SOURCE_ROOT; };
+		489DE2B806B559C100740D0A /* PainterSaver.tz */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = PainterSaver.tz; sourceTree = "<group>"; };
+		48B9BDBC05EA6004002C7A42 /* breveResearcher.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = breveResearcher.saver; sourceTree = BUILT_PRODUCTS_DIR; };
+		48B9BDBD05EA6004002C7A42 /* breveResearcher-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "breveResearcher-Info.plist"; path = "/Users/jk/dev/breveSaver/breveResearcher-Info.plist"; sourceTree = "<absolute>"; };
+		48B9BE2D05EA60B4002C7A42 /* slBreveResearcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slBreveResearcher.h; sourceTree = "<group>"; };
+		48B9BE2E05EA60B4002C7A42 /* slBreveResearcher.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreveResearcher.mm; sourceTree = "<group>"; };
+		48D90A3C06BFD26900FF529F /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/brevePainter.nib; sourceTree = "<group>"; };
+		F50BB16F012BFE5C010BE436 /* WalkerSaver.tz */ = {isa = PBXFileReference; lastKnownFileType = text; path = WalkerSaver.tz; sourceTree = SOURCE_ROOT; };
+		F5104130012D110B010BE436 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/breveWalker.nib; sourceTree = "<group>"; };
+		F5175CB20169B8F6010BE436 /* SwarmSaver.tz */ = {isa = PBXFileReference; lastKnownFileType = text; path = SwarmSaver.tz; sourceTree = "<group>"; };
+		F5175CB90169B958010BE436 /* slBreveSwarm.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = slBreveSwarm.h; sourceTree = "<group>"; };
+		F5175CBA0169B958010BE436 /* slBreveSwarm.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreveSwarm.mm; sourceTree = "<group>"; };
+		F5175CBD0169B97E010BE436 /* slBreveCreatures.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = slBreveCreatures.h; sourceTree = "<group>"; };
+		F5175CBE0169B97E010BE436 /* slBreveCreatures.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreveCreatures.mm; sourceTree = "<group>"; };
+		F5175CD10169E1A5010BE436 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/breveSwarm.nib; sourceTree = "<group>"; };
+		F5D8673B01169F20010BE436 /* slBreveSaver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = slBreveSaver.h; sourceTree = "<group>"; };
+		F5D8673C01169F20010BE436 /* slBreveSaver.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreveSaver.mm; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4818571605CABEEB00C48BE6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				489D8B1206B5541200740D0A /* ScreenSaver.framework in Frameworks */,
+				489D8B3D06B5543800740D0A /* GLUT.framework in Frameworks */,
+				489D8B3E06B5543800740D0A /* OpenGL.framework in Frameworks */,
+				489D8B9406B5548600740D0A /* libexpat.a in Frameworks */,
+				489D8B9506B5548600740D0A /* libjpeg.a in Frameworks */,
+				489D8B9606B5548600740D0A /* libpng.a in Frameworks */,
+				489D8BAC06B554A200740D0A /* libz.dylib in Frameworks */,
+				489D8BBC06B554D600740D0A /* AudioToolbox.framework in Frameworks */,
+				489D8BBD06B554D600740D0A /* System.framework in Frameworks */,
+				489D8BFC06B5551B00740D0A /* CoreAudio.framework in Frameworks */,
+				489D8BFD06B5551B00740D0A /* CoreFoundation.framework in Frameworks */,
+				489D8C3E06B5553600740D0A /* Foundation.framework in Frameworks */,
+				489D8CB806B5554900740D0A /* AppKit.framework in Frameworks */,
+				489D8D5E06B5558A00740D0A /* libode.a in Frameworks */,
+				4842D87607F9A72700140407 /* libbreve.a in Frameworks */,
+				4842D91507F9CAC200140407 /* libavcodec.a in Frameworks */,
+				4842D91607F9CAC200140407 /* libavformat.a in Frameworks */,
+				4842D91707F9CAC200140407 /* libgsl.a in Frameworks */,
+				4842D91807F9CAC200140407 /* libgslcblas.a in Frameworks */,
+				4842D91907F9CAC200140407 /* libpush.a in Frameworks */,
+				4842D91B07F9CAC200140407 /* libsndfile.a in Frameworks */,
+				4842D93D07F9CBC300140407 /* libportaudio.a in Frameworks */,
+				4842D95F07F9CC0800140407 /* JavaVM.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4818573A05CABEEB00C48BE6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				489D8B1306B5541200740D0A /* ScreenSaver.framework in Frameworks */,
+				489D8B3F06B5543800740D0A /* GLUT.framework in Frameworks */,
+				489D8B4006B5543800740D0A /* OpenGL.framework in Frameworks */,
+				489D8B9B06B5548600740D0A /* libexpat.a in Frameworks */,
+				489D8B9D06B5548600740D0A /* libpng.a in Frameworks */,
+				489D8BAD06B554A200740D0A /* libz.dylib in Frameworks */,
+				489D8BBE06B554D600740D0A /* AudioToolbox.framework in Frameworks */,
+				489D8BBF06B554D600740D0A /* System.framework in Frameworks */,
+				489D8BFE06B5551B00740D0A /* CoreAudio.framework in Frameworks */,
+				489D8BFF06B5551B00740D0A /* CoreFoundation.framework in Frameworks */,
+				489D8C3F06B5553600740D0A /* Foundation.framework in Frameworks */,
+				4842D87507F9A72700140407 /* libbreve.a in Frameworks */,
+				489D8CB906B5554900740D0A /* AppKit.framework in Frameworks */,
+				489D8D5F06B5558A00740D0A /* libode.a in Frameworks */,
+				4842D91007F9CAC200140407 /* libgsl.a in Frameworks */,
+				4842D91107F9CAC200140407 /* libgslcblas.a in Frameworks */,
+				4842D95E07F9CC0800140407 /* JavaVM.framework in Frameworks */,
+				485E9248090D1E6F0055AF56 /* libjpeg.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		489DE21506B5587300740D0A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				48D907CA06BFC54300FF529F /* AppKit.framework in Frameworks */,
+				48D907CB06BFC54300FF529F /* CoreAudio.framework in Frameworks */,
+				48D907CD06BFC54400FF529F /* libode.a in Frameworks */,
+				48D907CF06BFC54400FF529F /* GLUT.framework in Frameworks */,
+				48D907D806BFC56000FF529F /* AudioToolbox.framework in Frameworks */,
+				48D907DA06BFC56100FF529F /* CoreFoundation.framework in Frameworks */,
+				48D907DC06BFC56100FF529F /* Foundation.framework in Frameworks */,
+				48D907EA06BFC56800FF529F /* libpng.a in Frameworks */,
+				48D907F206BFC56B00FF529F /* libz.dylib in Frameworks */,
+				48D907F406BFC56B00FF529F /* OpenGL.framework in Frameworks */,
+				48D907F606BFC56C00FF529F /* ScreenSaver.framework in Frameworks */,
+				48D907F806BFC56D00FF529F /* libjpeg.a in Frameworks */,
+				48D907FC06BFC56E00FF529F /* libexpat.a in Frameworks */,
+				4842D87307F9A72700140407 /* libbreve.a in Frameworks */,
+				4842D90007F9CAC100140407 /* libavcodec.a in Frameworks */,
+				4842D90107F9CAC100140407 /* libavformat.a in Frameworks */,
+				4842D90207F9CAC100140407 /* libgsl.a in Frameworks */,
+				4842D90307F9CAC100140407 /* libgslcblas.a in Frameworks */,
+				4842D90407F9CAC100140407 /* libpush.a in Frameworks */,
+				4842D90607F9CAC200140407 /* libsndfile.a in Frameworks */,
+				4842D93A07F9CBC300140407 /* libportaudio.a in Frameworks */,
+				4842D95C07F9CC0800140407 /* JavaVM.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		48B9BDBA05EA6004002C7A42 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				489D8BC006B554D600740D0A /* AudioToolbox.framework in Frameworks */,
+				489D8BC106B554D600740D0A /* System.framework in Frameworks */,
+				489D8C0006B5551B00740D0A /* CoreAudio.framework in Frameworks */,
+				489D8C0106B5551B00740D0A /* CoreFoundation.framework in Frameworks */,
+				489D8C4006B5553600740D0A /* Foundation.framework in Frameworks */,
+				489D8CBA06B5554900740D0A /* AppKit.framework in Frameworks */,
+				489D8D6006B5558A00740D0A /* libode.a in Frameworks */,
+				4842D87407F9A72700140407 /* libbreve.a in Frameworks */,
+				4842D90707F9CAC200140407 /* libavcodec.a in Frameworks */,
+				4842D90807F9CAC200140407 /* libavformat.a in Frameworks */,
+				4842D90907F9CAC200140407 /* libgsl.a in Frameworks */,
+				4842D90A07F9CAC200140407 /* libgslcblas.a in Frameworks */,
+				4842D90B07F9CAC200140407 /* libpush.a in Frameworks */,
+				4842D90D07F9CAC200140407 /* libsndfile.a in Frameworks */,
+				4842D93B07F9CBC300140407 /* libportaudio.a in Frameworks */,
+				4842D95D07F9CC0800140407 /* JavaVM.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		089C166AFE841209C02AAC07 /* breveSaver */ = {
+			isa = PBXGroup;
+			children = (
+				08FB77AFFE84173DC02AAC07 /* Classes */,
+				489D8B2206B5541800740D0A /* Libraries */,
+				089C167CFE841241C02AAC07 /* Resources */,
+				19C28FB8FE9D52D311CA2CBB /* Products */,
+				4818572A05CABEEB00C48BE6 /* breveSwarm-info.plist */,
+				4818574E05CABEEB00C48BE6 /* breveWalker-Info.plist */,
+				48B9BDBD05EA6004002C7A42 /* breveResearcher-Info.plist */,
+				489DE21806B5587400740D0A /* brevePainter-Info.plist */,
+			);
+			name = breveSaver;
+			sourceTree = "<group>";
+		};
+		089C167CFE841241C02AAC07 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				489DE2B006B5598B00740D0A /* Digitizer.tz */,
+				489DE2B806B559C100740D0A /* PainterSaver.tz */,
+				4818575605CABFE300C48BE6 /* classes */,
+				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
+				48D90A3B06BFD26900FF529F /* brevePainter.nib */,
+				F5175CD00169E1A5010BE436 /* breveSwarm.nib */,
+				F510412F012D110B010BE436 /* breveWalker.nib */,
+				F5175CB20169B8F6010BE436 /* SwarmSaver.tz */,
+				48941C8F0401A69200000116 /* Simulation.tz */,
+				F50BB16F012BFE5C010BE436 /* WalkerSaver.tz */,
+				4868E6F6091423CC0045591F /* simulation.gif */,
+				4868E6FC091423F80045591F /* app_icon.tiff */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		08FB77AFFE84173DC02AAC07 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				F5175CBA0169B958010BE436 /* slBreveSwarm.mm */,
+				F5175CB90169B958010BE436 /* slBreveSwarm.h */,
+				F5175CBE0169B97E010BE436 /* slBreveCreatures.mm */,
+				489D8A5B06B5521A00740D0A /* slBrevePainter.h */,
+				489D8A5C06B5521A00740D0A /* slBrevePainter.mm */,
+				F5175CBD0169B97E010BE436 /* slBreveCreatures.h */,
+				48B9BE2D05EA60B4002C7A42 /* slBreveResearcher.h */,
+				48B9BE2E05EA60B4002C7A42 /* slBreveResearcher.mm */,
+				F5D8673C01169F20010BE436 /* slBreveSaver.mm */,
+				F5D8673B01169F20010BE436 /* slBreveSaver.h */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		19C28FB8FE9D52D311CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4818572B05CABEEB00C48BE6 /* breveSwarm.saver */,
+				4818574F05CABEEB00C48BE6 /* breveCreatures.saver */,
+				48B9BDBC05EA6004002C7A42 /* breveResearcher.saver */,
+				489DE21706B5587300740D0A /* brevePainter.saver */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		489D8B2206B5541800740D0A /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				489D8C3D06B5553600740D0A /* Foundation.framework */,
+				489D8CB706B5554900740D0A /* AppKit.framework */,
+				489D8BFA06B5551B00740D0A /* CoreAudio.framework */,
+				489D8BFB06B5551B00740D0A /* CoreFoundation.framework */,
+				489D8BBB06B554D600740D0A /* System.framework */,
+				489D8BBA06B554D600740D0A /* AudioToolbox.framework */,
+				489D8B3B06B5543800740D0A /* GLUT.framework */,
+				4842D95B07F9CC0800140407 /* JavaVM.framework */,
+				489D8B3C06B5543800740D0A /* OpenGL.framework */,
+				489D8B1106B5541200740D0A /* ScreenSaver.framework */,
+				489D8B8F06B5548600740D0A /* libpng.a */,
+				4842D93907F9CBC300140407 /* libportaudio.a */,
+				4842D87207F9A72700140407 /* libbreve.a */,
+				4842D8F907F9CAC100140407 /* libavcodec.a */,
+				4842D8FA07F9CAC100140407 /* libavformat.a */,
+				4842D8FB07F9CAC100140407 /* libgsl.a */,
+				4842D8FC07F9CAC100140407 /* libgslcblas.a */,
+				4842D8FD07F9CAC100140407 /* libpush.a */,
+				4842D8FF07F9CAC100140407 /* libsndfile.a */,
+				489D8D5D06B5558A00740D0A /* libode.a */,
+				489D8BAB06B554A200740D0A /* libz.dylib */,
+				489D8B8D06B5548600740D0A /* libexpat.a */,
+				489D8B8E06B5548600740D0A /* libjpeg.a */,
+			);
+			name = Libraries;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		4818570905CABEEB00C48BE6 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4818570A05CABEEB00C48BE6 /* slBreveSwarm.h in Headers */,
+				4818570B05CABEEB00C48BE6 /* slBreveSaver.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4818572D05CABEEB00C48BE6 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4818572E05CABEEB00C48BE6 /* slBreveCreatures.h in Headers */,
+				4818572F05CABEEB00C48BE6 /* slBreveSaver.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		489DE21206B5587300740D0A /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				489DE28006B5591000740D0A /* slBrevePainter.h in Headers */,
+				489DE28906B5591300740D0A /* slBreveSaver.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		48B9BDB705EA6004002C7A42 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				48B9BEFB05EA641F002C7A42 /* slBreveSaver.h in Headers */,
+				48B9BF0505EA6422002C7A42 /* slBreveResearcher.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		4818570805CABEEB00C48BE6 /* breveSwarm */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 489B5EF70AB79D2500244255 /* Build configuration list for PBXNativeTarget "breveSwarm" */;
+			buildPhases = (
+				4818570905CABEEB00C48BE6 /* Headers */,
+				4818570C05CABEEB00C48BE6 /* Resources */,
+				4818571305CABEEB00C48BE6 /* Sources */,
+				4818571605CABEEB00C48BE6 /* Frameworks */,
+				4818572805CABEEB00C48BE6 /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = breveSwarm;
+			productInstallPath = "$(HOME)/Library/Screen Savers";
+			productName = breveSaver;
+			productReference = 4818572B05CABEEB00C48BE6 /* breveSwarm.saver */;
+			productType = "com.apple.product-type.bundle";
+		};
+		4818572C05CABEEB00C48BE6 /* breveCreatures */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 489B5EFB0AB79D2500244255 /* Build configuration list for PBXNativeTarget "breveCreatures" */;
+			buildPhases = (
+				4818572D05CABEEB00C48BE6 /* Headers */,
+				4818573005CABEEB00C48BE6 /* Resources */,
+				4818573705CABEEB00C48BE6 /* Sources */,
+				4818573A05CABEEB00C48BE6 /* Frameworks */,
+				4818574C05CABEEB00C48BE6 /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = breveCreatures;
+			productInstallPath = "$(HOME)/Library/Screen Savers";
+			productName = breveWalker;
+			productReference = 4818574F05CABEEB00C48BE6 /* breveCreatures.saver */;
+			productType = "com.apple.product-type.bundle";
+		};
+		489DE21606B5587300740D0A /* brevePainter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 489B5F030AB79D2500244255 /* Build configuration list for PBXNativeTarget "brevePainter" */;
+			buildPhases = (
+				489DE21206B5587300740D0A /* Headers */,
+				489DE21306B5587300740D0A /* Resources */,
+				489DE21406B5587300740D0A /* Sources */,
+				489DE21506B5587300740D0A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = brevePainter;
+			productName = brevePainter;
+			productReference = 489DE21706B5587300740D0A /* brevePainter.saver */;
+			productType = "com.apple.product-type.bundle";
+		};
+		48B9BDBB05EA6004002C7A42 /* breveResearcher */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 489B5EFF0AB79D2500244255 /* Build configuration list for PBXNativeTarget "breveResearcher" */;
+			buildPhases = (
+				48B9BDB705EA6004002C7A42 /* Headers */,
+				48B9BDB805EA6004002C7A42 /* Resources */,
+				48B9BDB905EA6004002C7A42 /* Sources */,
+				48B9BDBA05EA6004002C7A42 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = breveResearcher;
+			productName = breveResearcher;
+			productReference = 48B9BDBC05EA6004002C7A42 /* breveResearcher.saver */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		089C1669FE841209C02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 489B5F070AB79D2500244255 /* Build configuration list for PBXProject "breveSaver" */;
+			hasScannedForEncodings = 1;
+			mainGroup = 089C166AFE841209C02AAC07 /* breveSaver */;
+			projectDirPath = "";
+			targets = (
+				4818570805CABEEB00C48BE6 /* breveSwarm */,
+				4818572C05CABEEB00C48BE6 /* breveCreatures */,
+				48B9BDBB05EA6004002C7A42 /* breveResearcher */,
+				489DE21606B5587300740D0A /* brevePainter */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4818570C05CABEEB00C48BE6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4818570D05CABEEB00C48BE6 /* InfoPlist.strings in Resources */,
+				4818570F05CABEEB00C48BE6 /* SwarmSaver.tz in Resources */,
+				4818571005CABEEB00C48BE6 /* breveSwarm.nib in Resources */,
+				4818571205CABEEB00C48BE6 /* Simulation.tz in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4818573005CABEEB00C48BE6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4818573105CABEEB00C48BE6 /* InfoPlist.strings in Resources */,
+				4818573205CABEEB00C48BE6 /* WalkerSaver.tz in Resources */,
+				4818573405CABEEB00C48BE6 /* breveWalker.nib in Resources */,
+				4818573605CABEEB00C48BE6 /* Simulation.tz in Resources */,
+				4818578C05CABFE300C48BE6 /* classes in Resources */,
+				4868E6F7091423CC0045591F /* simulation.gif in Resources */,
+				4868E6FD091423F80045591F /* app_icon.tiff in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		489DE21306B5587300740D0A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				489DE2B106B5598B00740D0A /* Digitizer.tz in Resources */,
+				489DE2B906B559C100740D0A /* PainterSaver.tz in Resources */,
+				48D90A3206BFD21D00FF529F /* classes in Resources */,
+				48D90A3406BFD24700FF529F /* InfoPlist.strings in Resources */,
+				48D90A3D06BFD26900FF529F /* brevePainter.nib in Resources */,
+				48ADBD1D06CA66E80059C23C /* brevePainter-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		48B9BDB805EA6004002C7A42 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				48B9BF1405EA6439002C7A42 /* Simulation.tz in Resources */,
+				48B9BF3405EA6451002C7A42 /* classes in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXRezBuildPhase section */
+		4818572805CABEEB00C48BE6 /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4818574C05CABEEB00C48BE6 /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXRezBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4818571305CABEEB00C48BE6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4818571405CABEEB00C48BE6 /* slBreveSwarm.mm in Sources */,
+				4818571505CABEEB00C48BE6 /* slBreveSaver.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4818573705CABEEB00C48BE6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4818573805CABEEB00C48BE6 /* slBreveCreatures.mm in Sources */,
+				4818573905CABEEB00C48BE6 /* slBreveSaver.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		489DE21406B5587300740D0A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				489DE28406B5591000740D0A /* slBrevePainter.mm in Sources */,
+				489DE28E06B5591400740D0A /* slBreveSaver.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		48B9BDB905EA6004002C7A42 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				48B9BF0005EA6420002C7A42 /* slBreveSaver.mm in Sources */,
+				48B9BF0A05EA6422002C7A42 /* slBreveResearcher.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		089C167DFE841241C02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C167EFE841241C02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		48D90A3B06BFD26900FF529F /* brevePainter.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				48D90A3C06BFD26900FF529F /* English */,
+			);
+			name = brevePainter.nib;
+			sourceTree = "<group>";
+		};
+		F510412F012D110B010BE436 /* breveWalker.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F5104130012D110B010BE436 /* English */,
+			);
+			name = breveWalker.nib;
+			sourceTree = "<group>";
+		};
+		F5175CD00169E1A5010BE436 /* breveSwarm.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F5175CD10169E1A5010BE436 /* English */,
+			);
+			name = breveSwarm.nib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		489B5EF80AB79D2500244255 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				COPY_STRIP_PHASE = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				INFOPLIST_FILE = "breveSwarm-info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-bundle",
+					"-read_only_relocs",
+					suppress,
+					"-multiply_defined",
+					suppress,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = breveSwarm;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = saver;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		489B5EF90AB79D2500244255 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				COPY_STRIP_PHASE = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				INFOPLIST_FILE = "breveSwarm-info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				OPTIMIZATION_CFLAGS = "-O4";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-bundle",
+					"-read_only_relocs",
+					suppress,
+					"-multiply_defined",
+					suppress,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = breveSwarm;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = saver;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		489B5EFA0AB79D2500244255 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_STRIP_PHASE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				INFOPLIST_FILE = "breveSwarm-info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-bundle",
+					"-read_only_relocs",
+					suppress,
+					"-multiply_defined",
+					suppress,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = breveSwarm;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = saver;
+			};
+			name = Default;
+		};
+		489B5EFC0AB79D2500244255 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				INFOPLIST_FILE = "breveWalker-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-bundle",
+					"-read_only_relocs",
+					suppress,
+					"-multiply_defined",
+					suppress,
+				);
+				PRODUCT_NAME = breveCreatures;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = saver;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		489B5EFD0AB79D2500244255 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				INFOPLIST_FILE = "breveWalker-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				OPTIMIZATION_CFLAGS = "-O4";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-bundle",
+					"-read_only_relocs",
+					suppress,
+					"-multiply_defined",
+					suppress,
+				);
+				PRODUCT_NAME = breveCreatures;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = saver;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		489B5EFE0AB79D2500244255 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				INFOPLIST_FILE = "breveWalker-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-bundle",
+					"-read_only_relocs",
+					suppress,
+					"-multiply_defined",
+					suppress,
+				);
+				PRODUCT_NAME = breveCreatures;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = saver;
+			};
+			name = Default;
+		};
+		489B5F000AB79D2500244255 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				INFOPLIST_FILE = "breveResearcher-Info.plist";
+				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Screen Savers";
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-bundle",
+					"-read_only_relocs",
+					suppress,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = breveResearcher;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost";
+				WRAPPER_EXTENSION = saver;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		489B5F010AB79D2500244255 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				INFOPLIST_FILE = "breveResearcher-Info.plist";
+				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Screen Savers";
+				OPTIMIZATION_CFLAGS = "-O4";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-bundle",
+					"-read_only_relocs",
+					suppress,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = breveResearcher;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost";
+				WRAPPER_EXTENSION = saver;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		489B5F020AB79D2500244255 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				INFOPLIST_FILE = "breveResearcher-Info.plist";
+				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Screen Savers";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-bundle",
+					"-read_only_relocs",
+					suppress,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = breveResearcher;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost";
+				WRAPPER_EXTENSION = saver;
+			};
+			name = Default;
+		};
+		489B5F040AB79D2500244255 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				INFOPLIST_FILE = "brevePainter-Info.plist";
+				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
+				MACOSX_DEPLOYMENT_TARGET = 10.1;
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-bundle",
+					"-read_only_relocs",
+					suppress,
+					/usr/local/lib/libdl.a,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = brevePainter;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost";
+				WRAPPER_EXTENSION = saver;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		489B5F050AB79D2500244255 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				INFOPLIST_FILE = "brevePainter-Info.plist";
+				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
+				MACOSX_DEPLOYMENT_TARGET = 10.1;
+				OPTIMIZATION_CFLAGS = "-O4";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-bundle",
+					"-read_only_relocs",
+					suppress,
+					/usr/local/lib/libdl.a,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = brevePainter;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost";
+				WRAPPER_EXTENSION = saver;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		489B5F060AB79D2500244255 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				INFOPLIST_FILE = "brevePainter-Info.plist";
+				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
+				MACOSX_DEPLOYMENT_TARGET = 10.1;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-bundle",
+					"-read_only_relocs",
+					suppress,
+					/usr/local/lib/libdl.a,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = brevePainter;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost";
+				WRAPPER_EXTENSION = saver;
+			};
+			name = Default;
+		};
+		489B5F080AB79D2500244255 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				LIBRARY_SEARCH_PATHS = ../lib;
+				USER_HEADER_SEARCH_PATHS = ../include/breve;
+			};
+			name = Development;
+		};
+		489B5F090AB79D2500244255 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				LIBRARY_SEARCH_PATHS = ../lib;
+				USER_HEADER_SEARCH_PATHS = ../include/breve;
+			};
+			name = Deployment;
+		};
+		489B5F0A0AB79D2500244255 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				LIBRARY_SEARCH_PATHS = ../lib;
+				USER_HEADER_SEARCH_PATHS = ../include/breve;
+			};
+			name = Default;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		489B5EF70AB79D2500244255 /* Build configuration list for PBXNativeTarget "breveSwarm" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				489B5EF80AB79D2500244255 /* Development */,
+				489B5EF90AB79D2500244255 /* Deployment */,
+				489B5EFA0AB79D2500244255 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		489B5EFB0AB79D2500244255 /* Build configuration list for PBXNativeTarget "breveCreatures" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				489B5EFC0AB79D2500244255 /* Development */,
+				489B5EFD0AB79D2500244255 /* Deployment */,
+				489B5EFE0AB79D2500244255 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		489B5EFF0AB79D2500244255 /* Build configuration list for PBXNativeTarget "breveResearcher" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				489B5F000AB79D2500244255 /* Development */,
+				489B5F010AB79D2500244255 /* Deployment */,
+				489B5F020AB79D2500244255 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		489B5F030AB79D2500244255 /* Build configuration list for PBXNativeTarget "brevePainter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				489B5F040AB79D2500244255 /* Development */,
+				489B5F050AB79D2500244255 /* Deployment */,
+				489B5F060AB79D2500244255 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		489B5F070AB79D2500244255 /* Build configuration list for PBXProject "breveSaver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				489B5F080AB79D2500244255 /* Development */,
+				489B5F090AB79D2500244255 /* Deployment */,
+				489B5F0A0AB79D2500244255 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 089C1669FE841209C02AAC07 /* Project object */;
+}

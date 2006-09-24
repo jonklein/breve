@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*
-    = list.c -- a set of general purpose linked list functions.  used 
+    = list.c -- a set of general purpose linked list functions.  used
     = quite frequently by many different areas of the project.
 
     = often data sets will be creates as lists (during text parsing,
@@ -29,27 +29,28 @@
 
 #include "util.h"
 
-/* 
+/*
     = slListPrepend prepends an element (of type void*) onto a list.
     = the function returns the NEW list head.  functions using this
     = function should thus reassign the existing list pointer, such as:
     = myList = slListPrepend(myList, newElement);
 
-    = if the list is NULL, then the element returned is the only 
+    = if the list is NULL, then the element returned is the only
     = element of a brand new list.
 */
 
-slList *slListPrepend(slList *l, void *d) {
-    slList *newList;
+slList *slListPrepend( slList *l, void *d ) {
+	slList *newList;
 
-    newList = new slList;
-   
-    if(!newList) return NULL;
+	newList = new slList;
 
-    newList->data = d;
-    newList->next = l;
+	if ( !newList ) return NULL;
 
-    return newList;
+	newList->data = d;
+
+	newList->next = l;
+
+	return newList;
 }
 
 /*
@@ -59,64 +60,65 @@ slList *slListPrepend(slList *l, void *d) {
 
     = the function always returns the head of the list whether
     = it is a new list, or simply the same list head that was
-    = passed in.  
+    = passed in.
 
     = not as efficient as a list prepend because the whole
-    = list must be traversed before the elment is added.  
+    = list must be traversed before the elment is added.
     = consider using a series of slListPrepend()s followed
     = by an slReverseList.
 */
 
-slList *slListAppend(slList *l, void *d) {
-    slList *newEntry;
-    slList *orig = l;
+slList *slListAppend( slList *l, void *d ) {
+	slList *newEntry;
+	slList *orig = l;
 
-    newEntry = slListPrepend(NULL, d);
+	newEntry = slListPrepend( NULL, d );
 
-    if(!newEntry) return NULL;
+	if ( !newEntry ) return NULL;
 
-    if(!l) return newEntry;
+	if ( !l ) return newEntry;
 
-    while(l->next) l = l->next;
+	while ( l->next ) l = l->next;
 
-    l->next = newEntry;
+	l->next = newEntry;
 
-    return orig;
+	return orig;
 }
 
 /*
 	= slListRemoveData removes the element of the list
 	= which has the specified pointer.  note that this
-	= returns a pointer to the "new" list structure.  
+	= returns a pointer to the "new" list structure.
 	= the new list structure may be different than
-	= the old (in the event that the first element is 
+	= the old (in the event that the first element is
 	= removed)!
 */
 
-slList *slListRemoveData(slList *s, void *p) {
+slList *slListRemoveData( slList *s, void *p ) {
 	slList *previous = NULL;
 	slList *list = s;
 
-	while(s && s->data != p) {
+	while ( s && s->data != p ) {
 		previous = s;
 		s = s->next;
 	}
 
-	if(previous) {
-		if(s) previous->next = s->next;
+	if ( previous ) {
+		if ( s ) previous->next = s->next;
 	} else {
-		if(s) list = s->next;
+		if ( s ) list = s->next;
 		else list = NULL;
 	}
 
-	if(s) delete s;
-	
+	if ( s ) delete s;
+
 	return list;
 }
 
-slList *slInList(slList *s, void *p) {
-	while(s) {
-		if(s->data == p) return s;
+slList *slInList( slList *s, void *p ) {
+	while ( s ) {
+		if ( s->data == p ) return s;
+
 		s = s->next;
 	}
 
@@ -125,35 +127,35 @@ slList *slInList(slList *s, void *p) {
 
 /*
     = slListReverse takes a list and reverses its order,
-    = making the first element the last and the last element 
-    = the first.  
+    = making the first element the last and the last element
+    = the first.
 */
 
-slList *slListReverse(slList *s) {
-    slList *previous = NULL, *next;
+slList *slListReverse( slList *s ) {
+	slList *previous = NULL, *next;
 
-    while(s) {
-        next = s->next;
+	while ( s ) {
+		next = s->next;
 
-        s->next = previous;
+		s->next = previous;
 
-        previous = s;
+		previous = s;
 
-        s = next;
-    }
+		s = next;
+	}
 
-    return previous;
+	return previous;
 }
 
 /*!
 	\brief Makes a shalow copy of a list.
 */
 
-slList *slListCopy(slList *s) {
+slList *slListCopy( slList *s ) {
 	slList *result = NULL;
 
-	while( s ) {
-		result = slListAppend(result, s->data);
+	while ( s ) {
+		result = slListAppend( result, s->data );
 		s = s->next;
 	}
 
@@ -164,43 +166,43 @@ slList *slListCopy(slList *s) {
 	\brief Frees a list, but not its contents.
 
 	Since this function does not free the contents of the list,
-	make sure to iterate through the list and free the data pointers 
+	make sure to iterate through the list and free the data pointers
 	first.
 */
 
-void slListFree(slList *l) {
-    slList *next;
+void slListFree( slList *l ) {
+	slList *next;
 
-	if(!l) return;
+	if ( !l ) return;
 
-    while(l) {
-        next = l->next;
-        delete l;
-        l = next;
-    }
+	while ( l ) {
+		next = l->next;
+		delete l;
+		l = next;
+	}
 }
 
 /*!
 	\brief Free a list head.
 */
 
-void slListFreeHead(slList *l) {
-    if(!l) return;
+void slListFreeHead( slList *l ) {
+	if ( !l ) return;
 
-    delete l;
+	delete l;
 }
 
 /*!
     \brief Returns the number of elements in a list.
 */
 
-int slListCount(slList *l) {
-    int n = 0;
+int slListCount( slList *l ) {
+	int n = 0;
 
-    while(l) {
-        n++;
-        l = l->next;
-    }
+	while ( l ) {
+		n++;
+		l = l->next;
+	}
 
-    return n;
+	return n;
 }

@@ -7,16 +7,16 @@
 	This function sets up the breveFrontend structure and creates a
 	brEngine.  If this breve frontend is being run from the command line,
 	the calling function should provide the input argument count (argc) and
-	the input argument pointers (argv).  If this information is not 
+	the input argument pointers (argv).  If this information is not
 	available, argc should be 0, and argv should be NULL.
 */
 
-breveFrontend *breveFrontendInit(int argc, char **argv) {
+breveFrontend *breveFrontendInit( int argc, char **argv ) {
 	breveFrontend *frontend = new breveFrontend;
 
 	frontend->engine = brEngineNew();
-	frontend->engine->argc = argc - 1 ;
-	frontend->engine->argv = argv + 1;
+	frontend->engine->argc = argc;
+	frontend->engine->argv = argv;
 
 	return frontend;
 }
@@ -25,6 +25,6 @@ breveFrontend *breveFrontendInit(int argc, char **argv) {
 	\brief Deletes the breveFrontend.
 */
 
-void breveFrontendDestroy(breveFrontend *frontend) {
+void breveFrontendDestroy( breveFrontend *frontend ) {
 	delete frontend;
 }

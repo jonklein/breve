@@ -394,8 +394,8 @@ Mobile : Bird (aka Birds) {
 
 		if (item == self): return 0.
 		if !(item is a "Bird"): return 0.
-		if (self get-angle to item) > 2.0: return 0.
 		if (item check-landed): return 0.
+		if (self get-angle to item) > 2.0: return 0.
 
 		return 1. 
 

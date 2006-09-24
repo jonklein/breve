@@ -24,17 +24,17 @@
 /*! \addtogroup InternalFunctions */
 /*@{*/
 
-int brIAddStationary(brEval args[], brEval *target, brInstance *i) {
-	slShape *sh = (slShape*)BRPOINTER(&args[0]);
+int brIAddStationary( brEval args[], brEval *target, brInstance *i ) {
+	slShape *sh = ( slShape* )BRPOINTER( &args[0] );
 
-	target->set( i->engine->world->addObject( 
-		new slStationary( sh, &BRVECTOR(&args[1]), BRMATRIX(&args[2] ), i ) ) );
-   
+	target->set( i->engine->world->addObject(
+	                 new slStationary( sh, &BRVECTOR( &args[1] ), BRMATRIX( &args[2] ), i ) ) );
+
 	return EC_OK;
 }
 
 /*@}*/
 
-void breveInitStationaryFunctions(brNamespace *n) {
-	brNewBreveCall(n, "addStationary", brIAddStationary, AT_POINTER, AT_POINTER, AT_VECTOR, AT_MATRIX, 0);
+void breveInitStationaryFunctions( brNamespace *n ) {
+	brNewBreveCall( n, "addStationary", brIAddStationary, AT_POINTER, AT_POINTER, AT_VECTOR, AT_MATRIX, 0 );
 }

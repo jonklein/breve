@@ -29,99 +29,112 @@
 	\brief Draws the spring connecting two objects.
 */
 
-void slSpring::draw(slCamera *camera) {
+void slSpring::draw( slCamera *camera ) {
 	slVector x, y;
 
-	if(!_src || !_dst) return;
-	if(!_stipple) return;
+	if ( !_src || !_dst ) return;
 
-	slPositionVertex(&_src->_position, &_point1, &x);
-	slPositionVertex(&_dst->_position, &_point2, &y);
+	if ( !_stipple ) return;
 
-	glLineStipple(2, _stipple);
-	glEnable(GL_LINE_STIPPLE);
+	slPositionVertex( &_src->_position, &_point1, &x );
 
-	glColor4f(_color.x, _color.y, _color.z, 0.8);
+	slPositionVertex( &_dst->_position, &_point2, &y );
 
-	glBegin(GL_LINES);
+	glLineStipple( 2, _stipple );
 
-	glVertex3f(x.x, x.y, x.z);
-	glVertex3f(y.x, y.y, y.z);
+	glEnable( GL_LINE_STIPPLE );
+
+	glColor4f( _color.x, _color.y, _color.z, 0.8 );
+
+	glBegin( GL_LINES );
+
+	glVertex3f( x.x, x.y, x.z );
+
+	glVertex3f( y.x, y.y, y.z );
 
 	glEnd();
 
-	glDisable(GL_LINE_STIPPLE);
+	glDisable( GL_LINE_STIPPLE );
 }
 
 
 /*!
-	\brief Steps the spring forward in time and applies the spring forces 
+	\brief Steps the spring forward in time and applies the spring forces
 	between the attached bodies.
 */
 
-void slSpring::step(double step) {
+void slSpring::step( double step ) {
 	slVector pos1, pos2, toV1, vel1, vel2, velocity, point, force;
 	double distance, normVelocity, damping;
 	slVector linearVel, angularVel;
 	slLink *l1, *l2;
 
-	if(!_src || !_dst) return;
+	if ( !_src || !_dst ) return;
 
-	l1 = (slLink*)_src;
-	l2 = (slLink*)_dst;
+	l1 = ( slLink* )_src;
 
-	slPositionVertex(&_src->_position, &_point1, &pos1);
-	slPositionVertex(&_dst->_position, &_point2, &pos2);
-	slVectorSub(&pos1, &pos2, &toV1);
-	distance = slVectorLength(&toV1);
+	l2 = ( slLink* )_dst;
+
+	slPositionVertex( &_src->_position, &_point1, &pos1 );
+
+	slPositionVertex( &_dst->_position, &_point2, &pos2 );
+
+	slVectorSub( &pos1, &pos2, &toV1 );
+
+	distance = slVectorLength( &toV1 );
 
 	////////////////////////////////////////////////
 
-	slVectorXform(l1->_position.rotation, &_point1, &point);
-	l1->getVelocity(&linearVel, &angularVel);
-	slVelocityAtPoint(&linearVel, &angularVel, &point, &vel1);
+	slVectorXform( l1->_position.rotation, &_point1, &point );
 
-	slVectorXform(l2->_position.rotation, &_point2, &point);
-	l2->getVelocity(&linearVel, &angularVel);
-	slVelocityAtPoint(&linearVel, &angularVel, &point, &vel2);
+	l1->getVelocity( &linearVel, &angularVel );
 
-	slVectorSub(&vel1, &vel2, &velocity);
+	slVelocityAtPoint( &linearVel, &angularVel, &point, &vel1 );
 
-	normVelocity = slVectorDot(&velocity, &toV1);
+	slVectorXform( l2->_position.rotation, &_point2, &point );
+
+	l2->getVelocity( &linearVel, &angularVel );
+
+	slVelocityAtPoint( &linearVel, &angularVel, &point, &vel2 );
+
+	slVectorSub( &vel1, &vel2, &velocity );
+
+	normVelocity = slVectorDot( &velocity, &toV1 );
 
 	////////////////////////////////////////////////
 
 	distance -= _length;
 
-	if(_mode == SPRING_MODE_CONTRACT_ONLY && distance < 0.0) return;
-	else if(_mode == SPRING_MODE_EXPAND_ONLY && distance > 0.0) return;
+	if ( _mode == SPRING_MODE_CONTRACT_ONLY && distance < 0.0 ) return;
+	else if ( _mode == SPRING_MODE_EXPAND_ONLY && distance > 0.0 ) return;
 
 	damping = _damping * normVelocity;
 
-	_force = (distance * _strength) + damping;
+	_force = ( distance * _strength ) + damping;
 
-	if(_maxForce != 0.0) {
-		 if(_force > _maxForce) _force = _maxForce;
-		else if(_force < -_maxForce) _force = -_maxForce;
+	if ( _maxForce != 0.0 ) {
+		if ( _force > _maxForce ) _force = _maxForce;
+		else if ( _force < -_maxForce ) _force = -_maxForce;
 	}
 
-	slVectorNormalize(&toV1);
-	slVectorMul(&toV1, _force, &force);
+	slVectorNormalize( &toV1 );
+
+	slVectorMul( &toV1, _force, &force );
 
 	////////////////////////////////////////////////
 
-	dBodyAddForceAtPos(l2->_odeBodyID, 
-			force.x, force.y, force.z, pos1.x, pos1.y, pos1.z);
+	dBodyAddForceAtPos( l2->_odeBodyID,
+	                    force.x, force.y, force.z, pos1.x, pos1.y, pos1.z );
 
-	dBodyAddForceAtPos(l1->_odeBodyID, 
-			-force.x, -force.y, -force.z, pos2.x, pos2.y, pos2.z);
+	dBodyAddForceAtPos( l1->_odeBodyID,
+	                    -force.x, -force.y, -force.z, pos2.x, pos2.y, pos2.z );
 }
 
 /*!
 	\brief Sets the strength of this spring.
 */
 
-void slSpring::setStrength(double strength) {
+void slSpring::setStrength( double strength ) {
 	_strength = strength;
 }
 
@@ -129,22 +142,22 @@ void slSpring::setStrength(double strength) {
 	\brief Sets the damping constant for this spring.
 */
 
-void slSpring::setDamping(double damping) {
+void slSpring::setDamping( double damping ) {
 	_damping = damping;
 }
 
 /*!
-	\brief Sets the natural length for this spring.  
+	\brief Sets the natural length for this spring.
 
-	The natural length is the length at which this spring applies no 
+	The natural length is the length at which this spring applies no
 	forces to the objects it is attached to.
 */
 
-void slSpring::setLength(double length) {
+void slSpring::setLength( double length ) {
 	_length = length;
 }
 
-void slSpring::setMode(int mode) {
+void slSpring::setMode( int mode ) {
 	_mode = mode;
 }
 
@@ -152,16 +165,16 @@ void slSpring::setMode(int mode) {
 	\brief Creates a new spring.
 */
 
-slSpring::slSpring(slWorld *w, slLink *l1, slLink *l2, slVector *p1, slVector *p2, double length, double strength, double damping) {
-	slVectorSet(&_color, 0, 0, 0);
+slSpring::slSpring( slWorld *w, slLink *l1, slLink *l2, slVector *p1, slVector *p2, double length, double strength, double damping ) {
+	slVectorSet( &_color, 0, 0, 0 );
 
 	_stipple = 0xaaaa;
 	_maxForce = 0;
 
 	_mode = 0;
 
-	slVectorCopy(p1, &_point1);
-	slVectorCopy(p2, &_point2);
+	slVectorCopy( p1, &_point1 );
+	slVectorCopy( p2, &_point2 );
 
 	_src = l1;
 	_dst = l2;
@@ -177,17 +190,18 @@ slSpring::slSpring(slWorld *w, slLink *l1, slLink *l2, slVector *p1, slVector *p
 double slSpring::getCurrentLength() {
 	slVector pos1, pos2, toV1;
 
-	if(!_src || !_dst) return 0.0;
+	if ( !_src || !_dst ) return 0.0;
 
-	slPositionVertex(&_src->_position, &_point1, &pos1);
-	slPositionVertex(&_dst->_position, &_point2, &pos2);
+	slPositionVertex( &_src->_position, &_point1, &pos1 );
 
-	slVectorSub(&pos1, &pos2, &toV1);
+	slPositionVertex( &_dst->_position, &_point2, &pos2 );
 
-	return slVectorLength(&toV1);
+	slVectorSub( &pos1, &pos2, &toV1 );
+
+	return slVectorLength( &toV1 );
 }
 
-void slSpring::setMaxForce(double f) {
+void slSpring::setMaxForce( double f ) {
 	_maxForce = f;
 }
 

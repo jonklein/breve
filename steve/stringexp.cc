@@ -32,12 +32,12 @@
 /*!
 	\brief Preprocesses a string for runtime formating and printing.
 
-	Allows for $xxx perl-style variables embedded in strings.  Prepares 
+	Allows for $xxx perl-style variables embedded in strings.  Prepares
 	variable offsets so that the string can be quickly assembled later on.
 	Does terrible things to theString.  Too horrible to discuss here.
 */
 
-stStringExp::stStringExp(char *theString, stMethod *m, stObject *o, char *file, int line) : stExp(file, line) {
+stStringExp::stStringExp( char *theString, stMethod *m, stObject *o, char *file, int line ) : stExp( file, line ) {
 	char *s;
 	char sym, prev = 0;
 	char *varstart, *varend, *varname;
@@ -46,77 +46,82 @@ stStringExp::stStringExp(char *theString, stMethod *m, stObject *o, char *file, 
 	s = theString;
 	baseSize = 0;
 
-	while((sym = *s)) {
+	while (( sym = *s ) ) {
 		// if we find a '$' that is NOT preceeded by a '\'
 		// then we're dealing with a variable or expression
 
-		if(sym == '$' && prev != '\\') {
+		if ( sym == '$' && prev != '\\' ) {
 			/* if the next character exists... */
 			int offset;
 
-			if(*(++s)) {
+			if ( *( ++s ) ) {
 				/* mark the start, find the end of the variable */
 
 				varstart = s;
-				while(*s && (isalnum(*s) || *s == '_' || *s == '-')) s++;
+
+				while ( *s && ( isalnum( *s ) || *s == '_' || *s == '-' ) ) s++;
+
 				varend = s;
 
-				varname = new char[(varend - varstart) + 1];
-				strncpy(varname, varstart, (varend - varstart));
+				varname = new char[( varend - varstart ) + 1];
+
+				strncpy( varname, varstart, ( varend - varstart ) );
+
 				varname[varend - varstart] = 0;
 
-				sub = new stSubstringExp(file, line);
-			   	sub->offset = baseSize;
+				sub = new stSubstringExp( file, line );
 
-				// is this an array or list? 
+				sub->offset = baseSize;
 
-				if(*varend == '{' || *varend == '[') {
+				// is this an array or list?
+
+				if ( *varend == '{' || *varend == '[' ) {
 					char *numend = varend + 1;
 					char *number;
 					stExp *index;
 
-					while(*numend == ' ' || *numend == '\t' || isdigit(*numend)) numend++;
+					while ( *numend == ' ' || *numend == '\t' || isdigit( *numend ) ) numend++;
 
-					if((*varend == '{' && *numend == '}') || (*varend == '[' && *numend == ']')) {
+					if (( *varend == '{' && *numend == '}' ) || ( *varend == '[' && *numend == ']' ) ) {
 						/* we have a valid array or list exp */
 
 						number = new char[numend - varend];
-						strncpy(number, varend + 1, numend - (varend + 1));
-						number[numend - (varend + 1)] = 0;
-						offset = atoi(number);
+						strncpy( number, varend + 1, numend - ( varend + 1 ) );
+						number[numend - ( varend + 1 )] = 0;
+						offset = atoi( number );
 
-						index = new stIntExp(offset, file, line);
+						index = new stIntExp( offset, file, line );
 						delete[] number;
 
-						if(*varend == '{') {
-							stExp *listExp = new stLoadExp(m, o, varname, file, line);
+						if ( *varend == '{' ) {
+							stExp *listExp = new stLoadExp( m, o, varname, file, line );
 
-							sub->loadExp = new stListIndexExp(listExp, index, file, line);
+							sub->loadExp = new stListIndexExp( listExp, index, file, line );
 						} else {
-							sub->loadExp = new stArrayIndexExp(m, o, varname, index, file, line);
+							sub->loadExp = new stArrayIndexExp( m, o, varname, index, file, line );
 						}
 
 						s = numend + 1;
 					}
-				} else { 
+				} else {
 					// it's a regular variable.  but is it a special case or self or super?
 
-					if(!strcmp(varname, "super") || !strcmp(varname, "self")) {
-						sub->loadExp = new stSelfExp(file, line);
+					if ( !strcmp( varname, "super" ) || !strcmp( varname, "self" ) ) {
+						sub->loadExp = new stSelfExp( file, line );
 					} else {
-						sub->loadExp = new stLoadExp(m, o, varname, file, line);
+						sub->loadExp = new stLoadExp( m, o, varname, file, line );
 					}
 				}
 
-				substrings.push_back( sub);
-				
-				if(!sub->loadExp) {
-					stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Error locating variable \"%s\" while parsing string", varname);
+				substrings.push_back( sub );
+
+				if ( !sub->loadExp ) {
+					stParseError( o->engine, PE_UNKNOWN_SYMBOL, "Error locating variable \"%s\" while parsing string", varname );
 				}
 
 				delete[] varname;
 			}
-		} else if(sym == 'n' && prev == '\\') {
+		} else if ( sym == 'n' && prev == '\\' ) {
 			/* if we find a \n, then replace the previous char (\) */
 			/* with a newline */
 
@@ -124,7 +129,7 @@ stStringExp::stStringExp(char *theString, stMethod *m, stObject *o, char *file, 
 
 			s++;
 			prev = '\n';
-		} else if(sym == 't' && prev == '\\') {
+		} else if ( sym == 't' && prev == '\\' ) {
 			/* if we find a \t, then replace the previous char (\) */
 			/* with a tab */
 
@@ -132,7 +137,7 @@ stStringExp::stStringExp(char *theString, stMethod *m, stObject *o, char *file, 
 
 			s++;
 			prev = '\t';
-		} else if(sym == '\"' && prev == '\\') {
+		} else if ( sym == '\"' && prev == '\\' ) {
 			/* if we find a \", then replace the previous char (\) */
 			/* with a quote mark */
 
@@ -140,7 +145,7 @@ stStringExp::stStringExp(char *theString, stMethod *m, stObject *o, char *file, 
 
 			s++;
 			prev = '\"';
-		} else if(sym == '\\' && prev == '\\') {
+		} else if ( sym == '\\' && prev == '\\' ) {
 			/* if we find a \\, then leave the first \ in place, skip the second */
 
 			s++;
@@ -159,7 +164,7 @@ stStringExp::stStringExp(char *theString, stMethod *m, stObject *o, char *file, 
 
 	theString[baseSize] = 0;
 
-	string = slStrdup(theString);
+	string = slStrdup( theString );
 
 	type = ET_STRING;
 }
@@ -171,51 +176,53 @@ stStringExp::stStringExp(char *theString, stMethod *m, stObject *o, char *file, 
 	a string for printing (or whatever) in steve.
 */
 
-int stProcessString(stStringExp *s, stRunInstance *i, brEval *target) {
+int stProcessString( stStringExp *s, stRunInstance *i, brEval *target ) {
 	brEval subtar;
 	stSubstringExp *ss;
 	char *newstr;
-	unsigned int n; 
+	unsigned int n;
 	int length, currentPosition;
 
-	if(s->substrings.size() == 0) {
+	if ( s->substrings.size() == 0 ) {
+
 		target->set( s->string );
+
 		return EC_OK;
 	}
 
 	length = s->baseSize + 1;
 
-	for(n=0;n<s->substrings.size();n++) {
+	for ( n = 0;n < s->substrings.size();n++ ) {
 		ss = s->substrings[n];
-		stExpEval(ss->loadExp, i, &subtar, NULL);
+		stExpEval( ss->loadExp, i, &subtar, NULL );
 
-		ss->string = stFormatEvaluation(&subtar, i->instance);
+		ss->string = stFormatEvaluation( &subtar, i->instance );
 
-		length += strlen(ss->string);
+		length += ss->string.size();
 	}
 
-	// the substrings are in descending order--start from the last one 
+	// the substrings are in descending order--start from the last one
 	// to find the first position we need to edit
 
-	newstr = (char*)slMalloc(length);
+	newstr = ( char* )slMalloc( length );
+
 	newstr[0] = 0;
 
-	// currentPosition is the position in the "template" string 
-	// so it doesn't count the length of the variable strings 
+	// currentPosition is the position in the "template" string
+	// so it doesn't count the length of the variable strings
 
 	currentPosition = 0;
 
-	for(n=0; n < s->substrings.size(); n++) {
-		ss = s->substrings[n];
-		strncat(newstr, &s->string[currentPosition], ss->offset - currentPosition);
-		strncat(newstr, ss->string, strlen(ss->string));
+	for ( n = 0; n < s->substrings.size(); n++ ) {
+		ss = s->substrings[ n ];
+		strncat( newstr, &s->string.c_str()[currentPosition], ss->offset - currentPosition );
+		strncat( newstr, ss->string.c_str(), ss->string.size() );
 		currentPosition = ss->offset;
 
-		slFree(ss->string);
-		ss->string = NULL;
+		ss->string = "";
 	}
 
-	strcat(newstr, &s->string[currentPosition]);
+	strcat( newstr, &s->string[currentPosition] );
 
 	target->set( newstr );
 
@@ -232,13 +239,11 @@ stStringExp::~stStringExp() {
 	unsigned int n;
 	stSubstringExp *ss;
 
-	for(n=0;n<substrings.size();n++) {
+	for ( n = 0;n < substrings.size();n++ ) {
 		ss = substrings[n];
 		delete ss->loadExp;
 		delete ss;
 	}
-
-	slFree(string);
 }
 
 /*!
@@ -247,10 +252,10 @@ stStringExp::~stStringExp() {
 	Translates between breve/steve objects.  Returns a slMalloc'd string.
 */
 
-char *stFormatEvaluation(brEval *e, stInstance *i) {
+char *stFormatEvaluation( brEval *e, stInstance *i ) {
 	char *r;
 
-	r = brFormatEvaluation(e, i->breveInstance);
+	r = brFormatEvaluation( e, i->breveInstance );
 
 	return r;
 }

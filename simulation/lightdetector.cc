@@ -31,7 +31,10 @@ void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 	unsigned int n = 0;
 	int x;
 
+	w->removeEmptyObjects();
+
 	static int bufferSize = 0;
+
 	static GLubyte *staticBuffer = NULL;
 
 	GLubyte *expMap;
@@ -39,94 +42,108 @@ void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 	slVector *sun, *target;
 
 	sun = &w->_lightExposureCamera._location;
+
 	target = &w->_lightExposureCamera._target;
 
-	if( _activateContextCallback && _activateContextCallback() != 0) {
-		slMessage(DEBUG_ALL, "Cannot simulate light exposure: no OpenGL context available\n");
+	if ( _activateContextCallback && _activateContextCallback() != 0 ) {
+		slMessage( DEBUG_ALL, "Cannot simulate light exposure: no OpenGL context available\n" );
 		return;
 	}
 
-	if( sun->y < target->y ) {
+	if ( sun->y < target->y ) {
 		// no exposure -- zero out the existing values
-		for( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ )
-			(*wi)->_lightExposure = 0;
+
+		for ( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ )
+			( *wi )->_lightExposure = 0;
 
 		return;
 	}
 
-	if( size * size * 3 > bufferSize ) {
-		if(staticBuffer) delete[] staticBuffer;
+	if ( size * size * 3 > bufferSize ) {
+		if ( staticBuffer ) delete[] staticBuffer;
 
 		staticBuffer = new GLubyte[size * size * 3];
 
 		bufferSize = size * size * 3;
 	}
 
-	if( w->_objects.size() == 0 ) return;
+	if ( w->_objects.size() == 0 ) return;
 
 	glDisable( GL_LIGHTING );
+
 	glDisable( GL_BLEND );
+
 	glDisable( GL_TEXTURE_2D );
+
 	glEnable( GL_DEPTH_TEST );
+
 	glDepthMask( GL_TRUE );
+
 	glDepthFunc( GL_LESS );
+
 	glShadeModel( GL_FLAT );
 
 
-	glEnable(GL_SCISSOR_TEST);
-	glScissor(  _originx, _originy, size, size );
+	glEnable( GL_SCISSOR_TEST );
+
+	glScissor( _originx, _originy, size, size );
+
 	glViewport( _originx, _originy, size, size );
 
 	glMatrixMode( GL_PROJECTION );
+
 	glLoadIdentity();
 
-	glOrtho(-155, 155, -155, 155, 1.0, 1000.0);
+	glOrtho( -155, 155, -155, 155, 1.0, 1000.0 );
 
-    // gluPerspective(90.0, 1.0, 1.0, 1000.0);
+	// gluPerspective(90.0, 1.0, 1.0, 1000.0);
 
 
-	glMatrixMode(GL_MODELVIEW);
+	glMatrixMode( GL_MODELVIEW );
+
 	glPushMatrix();
+
 	glLoadIdentity();
 
-	gluLookAt( sun->x, sun->y, sun->z, 
-		target->x, target->y, target->z, 0.0, 1.0, 0.0 );
+	gluLookAt( sun->x, sun->y, sun->z,
+	           target->x, target->y, target->z, 0.0, 1.0, 0.0 );
 
 	glClearColor( 1, 1, 1, 1 );
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	for(wi = w->_objects.begin(); wi != w->_objects.end(); wi++) {
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+	for ( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ ) {
 		unsigned char br, bg, bb;
 
-		br = n / (256 * 256);
+		br = n / ( 256 * 256 );
 		bg = n / 256;
 		bb = n % 256;
 
-		glColor4ub(br, bg, bb, 0xff);
+		glColor4ub( br, bg, bb, 0xff );
 
 		wo = *wi;
 		wo->_lightExposure = 0;
 
-		if( wo->_shape ) wo->_shape->draw( this, &wo->_position, 0, 0, 0, 0 );
+		if ( wo->_shape ) wo->_shape->draw( this, &wo->_position, 0, 0, 0, 0 );
 
 		n++;
 	}
 
 	glPopMatrix();
 
-	if(!buffer) {
-		glReadPixels( _originx, _originy, size, size, GL_RGB, GL_UNSIGNED_BYTE, staticBuffer);
+	if ( !buffer ) {
+		glReadPixels( _originx, _originy, size, size, GL_RGB, GL_UNSIGNED_BYTE, staticBuffer );
 		expMap = staticBuffer;
 	} else {
 		expMap = buffer;
 	}
 
-	for(x=0;x<bufferSize;x+=3) {
+	for ( x = 0;x < bufferSize;x += 3 ) {
 		unsigned int label;
 
-		label = (expMap[x] << 16) + (expMap[x+1] << 8) + expMap[x+2];
+		label = ( expMap[x] << 16 ) + ( expMap[x+1] << 8 ) + expMap[x+2];
 
-		if( label != WHITE_PIXEL && label < w->_objects.size() ) {
+		if ( label != WHITE_PIXEL && label < w->_objects.size() ) {
 			wo = w->_objects[label];
 			wo->_lightExposure++;
 		}
@@ -134,5 +151,5 @@ void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 
 	glDepthMask( GL_TRUE );
 
-	glDisable(GL_SCISSOR_TEST);
+	glDisable( GL_SCISSOR_TEST );
 }

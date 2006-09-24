@@ -20,26 +20,26 @@
 
 /*
 	"The book of love if long and boring..." - Magnetic Fields
-	
-	This file is long and boring.  
 
-	But it used to be worse.  It now contains C++ constructors and 
+	This file is long and boring.
+
+	But it used to be worse.  It now contains C++ constructors and
 	destructors for all of the steve parse trees.
 */
 
 #include "steve.h"
 #include "expression.h"
 
-stEvalExp::stEvalExp(brEval *e, char *file, int line) : stExp(file, line) {
+stEvalExp::stEvalExp( brEval *e, char *file, int line ) : stExp( file, line ) {
 	eval = e;
 	type = ET_ST_EVAL;
 }
 
 stEvalExp::~stEvalExp() {
-	stGCUnretain(eval);
+	stGCUnretain( eval );
 }
 
-stReturnExp::stReturnExp(stExp *e, char *file, int line) : stExp(file, line) {
+stReturnExp::stReturnExp( stExp *e, char *file, int line ) : stExp( file, line ) {
 	expression = e;
 	type = ET_RETURN;
 }
@@ -48,7 +48,7 @@ stReturnExp::~stReturnExp() {
 	delete expression;
 }
 
-stFreeExp::stFreeExp(stExp *e, char *file, int line) : stExp(file, line) {
+stFreeExp::stFreeExp( stExp *e, char *file, int line ) : stExp( file, line ) {
 	expression = e;
 	type = ET_FREE;
 }
@@ -57,7 +57,7 @@ stFreeExp::~stFreeExp() {
 	delete expression;
 }
 
-stCopyListExp::stCopyListExp(stExp *e, char *file, int line) : stExp(file, line) {
+stCopyListExp::stCopyListExp( stExp *e, char *file, int line ) : stExp( file, line ) {
 	expression = e;
 	type = ET_COPYLIST;
 }
@@ -66,7 +66,7 @@ stCopyListExp::~stCopyListExp() {
 	delete expression;
 }
 
-stLengthExp::stLengthExp(stExp *e, char *file, int line) : stExp(file, line) {
+stLengthExp::stLengthExp( stExp *e, char *file, int line ) : stExp( file, line ) {
 	expression = e;
 	type = ET_LENGTH;
 }
@@ -75,19 +75,19 @@ stLengthExp::~stLengthExp() {
 	delete expression;
 }
 
-stIntExp::stIntExp(int i, char *file, int line) : stExp(file, line) {
+stIntExp::stIntExp( int i, char *file, int line ) : stExp( file, line ) {
 	intValue = i;
 	type = ET_INT;
 }
 
-stDoubleExp::stDoubleExp(double d, char *file, int line) : stExp(file, line) {
+stDoubleExp::stDoubleExp( double d, char *file, int line ) : stExp( file, line ) {
 	doubleValue = d;
 	type = ET_DOUBLE;
 }
 
-stMethodExp::stMethodExp(stExp *o, char *n, std::vector< stKeyword* > *a, char *f, int l) : stExp(f, l) {
+stMethodExp::stMethodExp( stExp *o, char *n, std::vector< stKeyword* > *a, char *f, int l ) : stExp( f, l ) {
 	objectExp = o;
-	methodName = slStrdup(n);
+	methodName = n;
 	arguments = *a;
 	method = NULL;
 	type = ET_METHOD;
@@ -99,43 +99,42 @@ stMethodExp::stMethodExp(stExp *o, char *n, std::vector< stKeyword* > *a, char *
 stMethodExp::~stMethodExp() {
 	std::vector< stKeyword* >::iterator ki;
 
-	slFree(methodName);
-
 	delete objectExp;
 
-	for(ki = arguments.begin(); ki != arguments.end(); ki++ )
+	for ( ki = arguments.begin(); ki != arguments.end(); ki++ )
 		delete *ki;
 }
 
-stArrayIndexExp::stArrayIndexExp(stMethod *m, stObject *o, char *word, stExp *i, char *file, int line) : stExp(file, line) {
+stArrayIndexExp::stArrayIndexExp( stMethod *m, stObject *o, char *word, stExp *i, char *file, int line ) : stExp( file, line ) {
 	stVar *var;
 
 	index = i;
- 
-	// first find out if this is a local variable 
- 
-	if((var = stFindLocal(word, m))) {
+
+	// first find out if this is a local variable
+
+	if (( var = stFindLocal( word, m ) ) ) {
 		local = 1;
 	} else {
-		var = stObjectLookupVariable(o, word);
+		var = stObjectLookupVariable( o, word );
 
-		if(!var) {
-			stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name);
+		if ( !var ) {
+			stParseError( o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name.c_str() );
 			return;
 		}
 
 		local = 0;
 	}
 
-	if(var->type->_type != AT_ARRAY) {
-		stParseError(o->engine, PE_TYPE, "Variable \"%s\" is not an array", word);
+	if ( var->type->_type != AT_ARRAY ) {
+		stParseError( o->engine, PE_TYPE, "Variable \"%s\" is not an array", word );
 		return;
 	}
 
 	offset = var->offset;
+
 	loadType = var->type->_arrayType;
 	maxIndex = var->type->_arrayCount;
-	typeSize = stSizeofAtomic(loadType);
+	typeSize = stSizeofAtomic( loadType );
 	var->used = 1;
 
 	type = ET_ARRAY_INDEX;
@@ -145,36 +144,37 @@ stArrayIndexExp::~stArrayIndexExp() {
 	delete index;
 }
 
-stArrayIndexAssignExp::stArrayIndexAssignExp(stMethod *m, stObject *o, char *word, stExp *i, stExp *rv, char *file, int line) : stExp(file, line) {
+stArrayIndexAssignExp::stArrayIndexAssignExp( stMethod *m, stObject *o, char *word, stExp *i, stExp *rv, char *file, int line ) : stExp( file, line ) {
 	stVar *var;
 
 	index = i;
 	rvalue = rv;
- 
+
 	/* first find out if this is a local variable */
- 
-	if((var = stFindLocal(word, m))) {
+
+	if (( var = stFindLocal( word, m ) ) ) {
 		local = 1;
 	} else {
-		var = stObjectLookupVariable(o, word);
+		var = stObjectLookupVariable( o, word );
 
-		if(!var) {
-			stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name);
+		if ( !var ) {
+			stParseError( o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name.c_str() );
 			return;
 		}
 
 		local = 0;
 	}
 
-	if(var->type->_type != AT_ARRAY) {
-		stParseError(o->engine, PE_TYPE, "Variable \"%s\" is not an array");
+	if ( var->type->_type != AT_ARRAY ) {
+		stParseError( o->engine, PE_TYPE, "Variable \"%s\" is not an array" );
 		return;
 	}
 
 	offset = var->offset;
+
 	assignType = var->type->_arrayType;
 	maxIndex = var->type->_arrayCount;
-	typeSize = stSizeofAtomic(assignType);
+	typeSize = stSizeofAtomic( assignType );
 	var->used = 1;
 
 	type = ET_ARRAY_INDEX_ASSIGN;
@@ -185,18 +185,18 @@ stArrayIndexAssignExp::~stArrayIndexAssignExp() {
 	delete index;
 }
 
-stLoadExp::stLoadExp(stMethod *m, stObject *o, char *word, char *file, int line) : stExp( file, line) {
+stLoadExp::stLoadExp( stMethod *m, stObject *o, char *word, char *file, int line ) : stExp( file, line ) {
 	stVar *var;
- 
-	// we don't know if this variable is local or not 
 
-	if( ( var = stFindLocal( word, m ) ) ) {
+	// we don't know if this variable is local or not
+
+	if (( var = stFindLocal( word, m ) ) ) {
 		local = 1;
 	} else {
-		var = stObjectLookupVariable(o, word);
+		var = stObjectLookupVariable( o, word );
 
-		if(!var) {
-			stParseError(o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name);
+		if ( !var ) {
+			stParseError( o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name.c_str() );
 			return;
 		}
 
@@ -204,13 +204,14 @@ stLoadExp::stLoadExp(stMethod *m, stObject *o, char *word, char *file, int line)
 	}
 
 	offset = var->offset;
+
 	loadType = var->type->_type;
 	var->used = 1;
 
 	type = ET_LOAD;
 }
 
-stBinaryExp::stBinaryExp(unsigned char o, stExp *le, stExp *re, char *f, int l) : stExp(f, l) {
+stBinaryExp::stBinaryExp( unsigned char o, stExp *le, stExp *re, char *f, int l ) : stExp( f, l ) {
 	op = o;
 	left = le;
 	right = re;
@@ -222,21 +223,20 @@ stBinaryExp::~stBinaryExp() {
 	delete right;
 }
 
-stAssignExp::stAssignExp(stMethod *m, stObject *o, char *word, stExp *r, char *file, int line) : stExp(file, line) {
+stAssignExp::stAssignExp( stMethod *m, stObject *o, char *word, stExp *r, char *file, int line ) : stExp( file, line ) {
 	stVar *var;
- 
-	_objectName = NULL;
+
 	_rvalue = NULL;
 
 	// check to see if the variable is local
 
-	if( ( var = stFindLocal( word, m ) ) ) {
+	if (( var = stFindLocal( word, m ) ) ) {
 		_local = 1;
 	} else {
 		var = stObjectLookupVariable( o, word );
 
-		if(!var) {
-			stParseError( o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name );
+		if ( !var ) {
+			stParseError( o->engine, PE_UNKNOWN_SYMBOL, "Unable to locate variable \"%s\" for object \"%s\"", word, o->name.c_str() );
 			return;
 		}
 
@@ -248,7 +248,7 @@ stAssignExp::stAssignExp(stMethod *m, stObject *o, char *word, stExp *r, char *f
 	_offset = var->offset;
 	_assignType = var->type->_type;
 
-	if( var->type->_objectName ) _objectName = slStrdup( var->type->_objectName );
+	_objectName = var->type->_objectName;
 
 	_objectType = NULL;
 
@@ -258,11 +258,10 @@ stAssignExp::stAssignExp(stMethod *m, stObject *o, char *word, stExp *r, char *f
 }
 
 stAssignExp::~stAssignExp() {
-	if( _objectName) slFree(_objectName);
-	if( _rvalue ) delete _rvalue;
+	if ( _rvalue ) delete _rvalue;
 }
 
-stListInsertExp::stListInsertExp(stExp *l, stExp *e, stExp *i, char *file, int lineno) : stExp(file, lineno) {
+stListInsertExp::stListInsertExp( stExp *l, stExp *e, stExp *i, char *file, int lineno ) : stExp( file, lineno ) {
 	listExp = l;
 	exp = e;
 	index = i;
@@ -270,7 +269,7 @@ stListInsertExp::stListInsertExp(stExp *l, stExp *e, stExp *i, char *file, int l
 	type = ET_INSERT;
 }
 
-stListRemoveExp::stListRemoveExp(stExp *l, stExp *i, char *file, int lineno) : stExp(file, lineno) {
+stListRemoveExp::stListRemoveExp( stExp *l, stExp *i, char *file, int lineno ) : stExp( file, lineno ) {
 	listExp = l;
 	index = i;
 
@@ -280,18 +279,18 @@ stListRemoveExp::stListRemoveExp(stExp *l, stExp *i, char *file, int lineno) : s
 stListRemoveExp::~stListRemoveExp() {
 	delete listExp;
 
-	if(index) delete index;
+	if ( index ) delete index;
 }
 
 stListInsertExp::~stListInsertExp() {
 	delete listExp;
 	delete exp;
 
-	if( index ) delete index;
+	if ( index ) delete index;
 }
 
-stSortExp::stSortExp(stExp *list, char *method, char *file, int lineno) : stExp(file, lineno) {
-	methodName = slStrdup(method);
+stSortExp::stSortExp( stExp *list, char *method, char *file, int lineno ) : stExp( file, lineno ) {
+	methodName = method;
 	listExp = list;
 
 	type = ET_SORT;
@@ -299,11 +298,9 @@ stSortExp::stSortExp(stExp *list, char *method, char *file, int lineno) : stExp(
 
 stSortExp::~stSortExp() {
 	delete listExp;
-
-	slFree(methodName);
 }
 
-stListIndexExp::stListIndexExp(stExp *list, stExp *index, char *file, int lineno) : stExp(file, lineno) {
+stListIndexExp::stListIndexExp( stExp *list, stExp *index, char *file, int lineno ) : stExp( file, lineno ) {
 	listExp = list;
 	indexExp = index;
 
@@ -315,7 +312,7 @@ stListIndexExp::~stListIndexExp() {
 	delete indexExp;
 }
 
-stListIndexAssignExp::stListIndexAssignExp(stExp *l, stExp *i, stExp *a, char *file, int lineno) : stExp(file, lineno) {
+stListIndexAssignExp::stListIndexAssignExp( stExp *l, stExp *i, stExp *a, char *file, int lineno ) : stExp( file, lineno ) {
 	listExp = l;
 	indexExp = i;
 	assignment = a;
@@ -329,16 +326,16 @@ stListIndexAssignExp::~stListIndexAssignExp() {
 	delete assignment;
 }
 
-stCCallExp::stCCallExp(brEngine *e, brInternalFunction *s, std::vector< stExp* > *expressions, char *file, int line) : stExp(file, line) {
-	function = s;
+stCCallExp::stCCallExp( brEngine *e, brInternalFunction *inFunc, std::vector< stExp* > *expressions, char *file, int line ) : stExp( file, line ) {
+	_function = inFunc;
 
-	if(expressions) arguments = *expressions;
+	if ( expressions ) _arguments = *expressions;
 
-	// parse time check of the number of args passed in. 
-	// type checking has to be done at run time. 
+	// parse time check of the number of args passed in.
+	// type checking has to be done at run time.
 
-	if(function->nargs != arguments.size()) {
-		stParseError(e, PE_PROTOTYPE, "invalid number of arguments to internal method \"%s\": expected %d, got %d", s->name, function->nargs, arguments.size()); 
+	if ( _function->_argCount != _arguments.size() ) {
+		stParseError( e, PE_PROTOTYPE, "invalid number of arguments to internal method \"%s\": expected %d, got %d", _function->_name.c_str(), _function->_argCount, _arguments.size() );
 		return;
 	}
 
@@ -346,21 +343,20 @@ stCCallExp::stCCallExp(brEngine *e, brInternalFunction *s, std::vector< stExp* >
 }
 
 stCCallExp::~stCCallExp() {
-	for(unsigned int n=0; n < arguments.size(); n++) delete arguments[n];
+	for ( unsigned int n = 0; n < _arguments.size(); n++ ) delete _arguments[n];
 }
 
-stAllExp::stAllExp(char *objectName, char *file, int line) : stExp(file, line) {
-	name = slStrdup(objectName);
+stAllExp::stAllExp( char *objectName, char *file, int line ) : stExp( file, line ) {
+	name = objectName;
 
 	type = ET_ALL;
 	object = NULL;
 }
 
 stAllExp::~stAllExp() {
-	slFree(name);
 }
 
-stWhileExp::stWhileExp(stExp *cn, stExp *cd, char *file, int lineno) : stExp(file, line) {
+stWhileExp::stWhileExp( stExp *cn, stExp *cd, char *file, int lineno ) : stExp( file, line ) {
 	cond = cn;
 	code = cd;
 
@@ -372,7 +368,7 @@ stWhileExp::~stWhileExp() {
 	delete code;
 }
 
-stForeachExp::stForeachExp(stAssignExp *a, stExp *l, stExp *c, char *file, int lineno) : stExp(file, lineno) {
+stForeachExp::stForeachExp( stAssignExp *a, stExp *l, stExp *c, char *file, int lineno ) : stExp( file, lineno ) {
 	assignment = a;
 	list = l;
 	code = c;
@@ -386,7 +382,7 @@ stForeachExp::~stForeachExp() {
 	delete code;
 }
 
-stForExp::stForExp(stExp *a, stExp *cn, stExp *i, stExp *cd, char *file, int lineno) : stExp(file, lineno) {
+stForExp::stForExp( stExp *a, stExp *cn, stExp *i, stExp *cd, char *file, int lineno ) : stExp( file, lineno ) {
 	condition = cn;
 	assignment = a;
 	iteration = i;
@@ -402,7 +398,7 @@ stForExp::~stForExp() {
 	delete code;
 }
 
-stIfExp::stIfExp(stExp *c, stExp *t, stExp *f, char *file, int lineno) : stExp(file, lineno) {
+stIfExp::stIfExp( stExp *c, stExp *t, stExp *f, char *file, int lineno ) : stExp( file, lineno ) {
 	cond = c;
 	trueCode = t;
 	falseCode = f;
@@ -416,7 +412,7 @@ stIfExp::~stIfExp() {
 	delete cond;
 }
 
-stPrintExp::stPrintExp(std::vector< stExp* > *e, int n, char *file, int lineno) : stExp(file, lineno) {
+stPrintExp::stPrintExp( std::vector< stExp* > *e, int n, char *file, int lineno ) : stExp( file, lineno ) {
 	expressions = *e;
 	newline = n;
 
@@ -426,10 +422,10 @@ stPrintExp::stPrintExp(std::vector< stExp* > *e, int n, char *file, int lineno) 
 stPrintExp::~stPrintExp() {
 	unsigned int n;
 
-	for(n=0; n < expressions.size(); n++) delete expressions[n];
+	for ( n = 0; n < expressions.size(); n++ ) delete expressions[n];
 }
 
-stUnaryExp::stUnaryExp(unsigned char o, stExp *e, char *f, int l) : stExp(f, l) {
+stUnaryExp::stUnaryExp( unsigned char o, stExp *e, char *f, int l ) : stExp( f, l ) {
 	expression = e;
 	op = o;
 	type = ET_UNARY;
@@ -439,7 +435,7 @@ stUnaryExp::~stUnaryExp() {
 	delete expression;
 }
 
-stVectorExp::stVectorExp(stExp *x, stExp *y, stExp *z, char *file, int line) : stExp(file, line) {
+stVectorExp::stVectorExp( stExp *x, stExp *y, stExp *z, char *file, int line ) : stExp( file, line ) {
 	_x = x;
 	_y = y;
 	_z = z;
@@ -453,7 +449,7 @@ stVectorExp::~stVectorExp() {
 	delete _z;
 }
 
-stMatrixExp::stMatrixExp(stExp *e00, stExp *e01, stExp *e02, stExp *e10, stExp *e11, stExp *e12, stExp *e20, stExp *e21, stExp *e22, char *file, int line) : stExp(file, line) {
+stMatrixExp::stMatrixExp( stExp *e00, stExp *e01, stExp *e02, stExp *e10, stExp *e11, stExp *e12, stExp *e20, stExp *e21, stExp *e22, char *file, int line ) : stExp( file, line ) {
 	expressions[0] = e00;
 	expressions[1] = e01;
 	expressions[2] = e02;
@@ -470,10 +466,10 @@ stMatrixExp::stMatrixExp(stExp *e00, stExp *e01, stExp *e02, stExp *e10, stExp *
 }
 
 stMatrixExp::~stMatrixExp() {
-	for(unsigned int n=0;n<9;n++) delete (expressions[n]);
+	for ( unsigned int n = 0;n < 9;n++ ) delete( expressions[n] );
 }
 
-stVectorElementExp::stVectorElementExp(stExp *v, char e, char *file, int line) : stExp( file, line) {
+stVectorElementExp::stVectorElementExp( stExp *v, char e, char *file, int line ) : stExp( file, line ) {
 	exp = v;
 	element = e;
 
@@ -484,7 +480,7 @@ stVectorElementExp::~stVectorElementExp() {
 	delete exp;
 }
 
-stVectorElementAssignExp::stVectorElementAssignExp(stExp *v, stExp *r, char e, char *file, int line) : stExp(file, line) {
+stVectorElementAssignExp::stVectorElementAssignExp( stExp *v, stExp *r, char e, char *file, int line ) : stExp( file, line ) {
 	exp = v;
 	assignExp = r;
 	element = e;
@@ -497,55 +493,80 @@ stVectorElementAssignExp::~stVectorElementAssignExp() {
 	delete assignExp;
 }
 
-stDuplicateExp::stDuplicateExp(stExp *e, char *file, int line) : stExp(file, line) {
+stDuplicateExp::stDuplicateExp( stExp *e, char *file, int line ) : stExp( file, line ) {
 	expression = e;
 	type = ET_DUPLICATE;
 }
 
-int stSizeof(stVarType *v) {
-	if(v->_type == AT_ARRAY) 
-		return v->_arrayCount * stSizeofAtomic(v->_arrayType);
+int stSizeof( stVarType *v ) {
+	if ( v->_type == AT_ARRAY )
+		return v->_arrayCount * stSizeofAtomic( v->_arrayType );
 
 	return stSizeofAtomic( v->_type );
 }
 
-int stSizeofAtomic(int type) {
-	switch(type) {
+int stSizeofAtomic( int type ) {
+	switch ( type ) {
+
 		case AT_INT:
-			return sizeof(int);
+			return sizeof( int );
+
 			break;
+
 		case AT_DOUBLE:
-			return sizeof(double);
+			return sizeof( double );
+
 			break;
+
 		case AT_VECTOR:
-			return sizeof(slVector);
+			return sizeof( slVector );
+
 			break;
+
 		case AT_INSTANCE:
-			return sizeof(stObject*);
+			return sizeof( stObject* );
+
 			break;
+
 		case AT_HASH:
-			return sizeof(brEvalHash*);
+			return sizeof( brEvalHash* );
+
 			break;
+
 		case AT_POINTER:
+
 		case AT_DATA:
-			return sizeof(void*);
+			return sizeof( void* );
+
 			break;
+
 		case AT_STRING:
-			return sizeof(char*);
+			return sizeof( char* );
+
 			break;
+
 		case AT_LIST:
-			return sizeof(brEvalList*); 
+			return sizeof( brEvalList* );
+
 			break;
+
 		case AT_MATRIX:
-			return sizeof(double) * 9;
+			return sizeof( double ) * 9;
+
 			break;
+
 		case AT_ARRAY:
-			slMessage(DEBUG_ALL, "INTERNAL ERROR: stSizeof: no atomic size for AT_ARRAY\n", type);
+			slMessage( DEBUG_ALL, "INTERNAL ERROR: stSizeof: no atomic size for AT_ARRAY\n", type );
+
 			return 0;
+
 			break;
+
 		default:
-			slMessage(DEBUG_ALL, "INTERNAL ERROR: stSizeof: unknown type %d\n", type);
+			slMessage( DEBUG_ALL, "INTERNAL ERROR: stSizeof: unknown type %d\n", type );
+
 			return 0;
+
 			break;
 	}
 }

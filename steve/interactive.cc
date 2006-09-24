@@ -2,9 +2,10 @@
 #include "expression.h"
 #include "evaluation.h"
 
-void stSetParseObjectAndMethod(stObject *o, stMethod *m);
+void stSetParseObjectAndMethod( stObject *o, stMethod *m );
 
 extern char *yyfile;
+
 extern int lineno;
 
 /*!
@@ -13,7 +14,7 @@ extern int lineno;
 	This prepares the statement for interactive evaluation.
 */
 
-int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
+int stRunSingleStatement( stSteveData *sd, brEngine *engine, char *statement ) {
 	char *file = "<user input>";
 	int length;
 	brInstance *controller;
@@ -23,47 +24,49 @@ int stRunSingleStatement(stSteveData *sd, brEngine *engine, char *statement) {
 	stRunInstance ri;
 	int r;
 
-	if(!statement) return 0;
+	if ( !statement ) return 0;
 
-	length = strlen(statement) - 1;
+	length = strlen( statement ) - 1;
 
-	if(length < 1) return 0;
+	if ( length < 1 ) return 0;
 
 	// put in the dot to make steve happy!
 
 
-	while(statement[length] == '\n' || statement[length] == ' ' || statement[length] == '\t') length--;
+	while ( statement[length] == '\n' || statement[length] == ' ' || statement[length] == '\t' ) length--;
 
-	if(length > 0 && statement[length] != '.') statement[length + 1] = '.';
+	if ( length > 0 && statement[length] != '.' ) statement[length + 1] = '.';
 
-	fixedStatement = new char[strlen(statement) + 5];
+	fixedStatement = new char[strlen( statement ) + 5];
 
-	sprintf(fixedStatement, "> %s", statement);
+	sprintf( fixedStatement, "> %s", statement );
 
 	yyfile = file;
 
 	sd->singleStatement = NULL;
 
-	stSetParseData(sd, fixedStatement, strlen(fixedStatement));
+	stSetParseData( sd, fixedStatement, strlen( fixedStatement ) );
 
-	controller = brEngineGetController(engine);
+	controller = brEngineGetController( engine );
 
-	stParseSetObjectAndMethod((stObject*)controller->object->userData, sd->singleStatementMethod);
-	stParseSetEngine(engine);
+	stParseSetObjectAndMethod(( stObject* )controller->object->userData, sd->singleStatementMethod );
 
-	brClearError(engine);
+	stParseSetEngine( engine );
 
-	if(yyparse() || brGetError(engine)) {
-		slFree(fixedStatement);
+	brClearError( engine );
+
+	if ( yyparse() || brGetError( engine ) ) {
+		slFree( fixedStatement );
 		sd->singleStatement = NULL;
 		return BPE_SIM_ERROR;
 	}
 
-	i = (stInstance*)controller->userData;
+	i = ( stInstance* )controller->userData;
+
 	ri.instance = i;
 	ri.type = i->type;
 
-	r = stExpEval(sd->singleStatement, &ri, &target, NULL);
+	r = stExpEval( sd->singleStatement, &ri, &target, NULL );
 
 	delete sd->singleStatement;
 	delete[] fixedStatement;

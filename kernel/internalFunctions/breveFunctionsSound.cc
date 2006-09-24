@@ -33,17 +33,20 @@
 */
 
 #if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
-int brILoadSoundData(brEval args[], brEval *target, brInstance *i) {
+int brILoadSoundData( brEval args[], brEval *target, brInstance *i ) {
 	char *path;
 
-	path = brFindFile(i->engine, BRSTRING(&args[0]), NULL);
+	path = brFindFile( i->engine, BRSTRING( &args[0] ), NULL );
 
-	if(path) {
-		target->set( brLoadSound(path) );
-		slFree(path);
+	if ( path ) {
+
+		target->set( brLoadSound( path ) );
+
+		slFree( path );
 	} else {
-		slMessage(DEBUG_ALL, "warning: cannot locate sound file \"%s\"\n", BRSTRING(&args[0]));
-		target->set( (void*)NULL );
+		slMessage( DEBUG_ALL, "warning: cannot locate sound file \"%s\"\n", BRSTRING( &args[0] ) );
+
+		target->set(( void* )NULL );
 	}
 
 	return EC_OK;
@@ -55,8 +58,9 @@ int brILoadSoundData(brEval args[], brEval *target, brInstance *i) {
 	void freeSoundData(brSoundData pointer).
 */
 
-int brIFreeSoundData(brEval args[], brEval *target, brInstance *i) {
-	if(BRSOUNDDATAPOINTER(&args[0])) brFreeSoundData(BRSOUNDDATAPOINTER(&args[0]));
+int brIFreeSoundData( brEval args[], brEval *target, brInstance *i ) {
+	if ( BRSOUNDDATAPOINTER( &args[0] ) ) brFreeSoundData( BRSOUNDDATAPOINTER( &args[0] ) );
+
 	return EC_OK;
 }
 
@@ -66,8 +70,8 @@ int brIFreeSoundData(brEval args[], brEval *target, brInstance *i) {
 	void playSoundData(brSoundData pointer).
 */
 
-int brIPlaySoundData(brEval args[], brEval *target, brInstance *i) {
-	i->engine->soundMixer->NewPlayer( BRSOUNDDATAPOINTER(&args[0]), BRFLOAT(&args[1]) );
+int brIPlaySoundData( brEval args[], brEval *target, brInstance *i ) {
+	i->engine->soundMixer->NewPlayer( BRSOUNDDATAPOINTER( &args[0] ), BRFLOAT( &args[1] ) );
 	return EC_OK;
 }
 
@@ -77,8 +81,10 @@ int brIPlaySoundData(brEval args[], brEval *target, brInstance *i) {
 	brSoundPlayer pointer newSinewave(int).
 */
 
-int brINewSinewave(brEval args[], brEval *target, brInstance *i) {
+int brINewSinewave( brEval args[], brEval *target, brInstance *i ) {
+
 	target->set( i->engine->soundMixer->NewSinewave( BRINT( &args[0] ) ) );
+
 	return EC_OK;
 }
 
@@ -86,12 +92,13 @@ int brINewSinewave(brEval args[], brEval *target, brInstance *i) {
 	\brief Stops a sinewave.
 */
 
-int brIFreeSinewave(brEval args[], brEval *target, brInstance *i) {
-	brSoundPlayer *p = BRSOUNDPLAYERPOINTER(&args[0]);
+int brIFreeSinewave( brEval args[], brEval *target, brInstance *i ) {
+	brSoundPlayer *p = BRSOUNDPLAYERPOINTER( &args[0] );
 
-	if(!p) return EC_OK;
+	if ( !p ) return EC_OK;
 
 	p->finished = 1;
+
 	return EC_OK;
 }
 
@@ -101,12 +108,12 @@ int brIFreeSinewave(brEval args[], brEval *target, brInstance *i) {
 	void (brSoundPlayer pointer, int).
 */
 
-int brISetFrequency(brEval args[], brEval *target, brInstance *i) {
-	brSoundPlayer *p = BRSOUNDPLAYERPOINTER(&args[0]);
+int brISetFrequency( brEval args[], brEval *target, brInstance *i ) {
+	brSoundPlayer *p = BRSOUNDPLAYERPOINTER( &args[0] );
 
-	if(!p) return EC_OK;
+	if ( !p ) return EC_OK;
 
-	p->frequency = BRINT(&args[1]) * 2. * 3.14159265359 / MIXER_SAMPLE_RATE;
+	p->frequency = BRINT( &args[1] ) * 2. * 3.14159265359 / MIXER_SAMPLE_RATE;
 
 	return EC_OK;
 }
@@ -119,11 +126,13 @@ int brISetFrequency(brEval args[], brEval *target, brInstance *i) {
 	Volume is on a scale from 0.0 to 1.0.
 */
 
-int brISetVolume(brEval args[], brEval *target, brInstance *i) {
-	brSoundPlayer *p = BRSOUNDPLAYERPOINTER(&args[0]);
+int brISetVolume( brEval args[], brEval *target, brInstance *i ) {
+	brSoundPlayer *p = BRSOUNDPLAYERPOINTER( &args[0] );
 
-	if(!p) return EC_OK;
-	p->volume = BRDOUBLE(&args[1]);
+	if ( !p ) return EC_OK;
+
+	p->volume = BRDOUBLE( &args[1] );
+
 	return EC_OK;
 }
 
@@ -135,14 +144,17 @@ int brISetVolume(brEval args[], brEval *target, brInstance *i) {
 	Balance is on a scale of 0.0 to 1.0, 0.5 is balanced between left and right.
 */
 
-int brISetBalance(brEval args[], brEval *target, brInstance *i) {
-	brSoundPlayer *p = BRSOUNDPLAYERPOINTER(&args[0]);
+int brISetBalance( brEval args[], brEval *target, brInstance *i ) {
+	brSoundPlayer *p = BRSOUNDPLAYERPOINTER( &args[0] );
 
-	if(!p) return EC_OK;
-	p->balance = BRDOUBLE(&args[1]);
+	if ( !p ) return EC_OK;
+
+	p->balance = BRDOUBLE( &args[1] );
+
 	return EC_OK;
 }
-#endif 
+
+#endif
 
 /*!
 	\brief Prints an error message when sound functions are not available.
@@ -150,29 +162,30 @@ int brISetBalance(brEval args[], brEval *target, brInstance *i) {
 	Used only when breve is compiled without support for sound.
 */
 
-int brISoundUnsupported(brEval args[], brEval *target, brInstance *i) {
-	slMessage(DEBUG_ALL, "this version of breve was built without support for sound\n");
+int brISoundUnsupported( brEval args[], brEval *target, brInstance *i ) {
+	slMessage( DEBUG_ALL, "this version of breve was built without support for sound\n" );
 	return EC_ERROR;
 }
+
 /*@}*/
 
-void breveInitSoundFunctions(brNamespace *n) {
+void breveInitSoundFunctions( brNamespace *n ) {
 #if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
-	brNewBreveCall(n, "loadSoundData", brILoadSoundData, AT_POINTER, AT_STRING, 0);
-	brNewBreveCall(n, "playSoundData", brIPlaySoundData, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
-	brNewBreveCall(n, "freeSoundData", brIFreeSoundData, AT_NULL, AT_POINTER, 0);
-	brNewBreveCall(n, "newSinewave", brINewSinewave, AT_POINTER, AT_INT, 0);
-	brNewBreveCall(n, "freeSinewave", brIFreeSinewave, AT_NULL, AT_POINTER, 0);
-	brNewBreveCall(n, "setFrequency", brISetFrequency, AT_NULL, AT_POINTER, AT_INT, 0);
-	brNewBreveCall(n, "setVolume", brISetVolume, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
-	brNewBreveCall(n, "setBalance", brISetBalance, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
+	brNewBreveCall( n, "loadSoundData", brILoadSoundData, AT_POINTER, AT_STRING, 0 );
+	brNewBreveCall( n, "playSoundData", brIPlaySoundData, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "freeSoundData", brIFreeSoundData, AT_NULL, AT_POINTER, 0 );
+	brNewBreveCall( n, "newSinewave", brINewSinewave, AT_POINTER, AT_INT, 0 );
+	brNewBreveCall( n, "freeSinewave", brIFreeSinewave, AT_NULL, AT_POINTER, 0 );
+	brNewBreveCall( n, "setFrequency", brISetFrequency, AT_NULL, AT_POINTER, AT_INT, 0 );
+	brNewBreveCall( n, "setVolume", brISetVolume, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "setBalance", brISetBalance, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
 #else
-	brNewBreveCall(n, "loadSoundData", brISoundUnsupported, AT_POINTER, AT_STRING, 0);
-	brNewBreveCall(n, "playSoundData", brISoundUnsupported, AT_NULL, AT_POINTER, 0);
-	brNewBreveCall(n, "freeSoundData", brISoundUnsupported, AT_NULL, AT_POINTER, 0);
-	brNewBreveCall(n, "newSinewave", brISoundUnsupported, AT_POINTER, AT_INT, 0);
-	brNewBreveCall(n, "freeSinewave", brISoundUnsupported, AT_NULL, AT_POINTER, 0);
-	brNewBreveCall(n, "setVolume", brISoundUnsupported, AT_NULL, AT_POINTER, AT_INT, 0);
-	brNewBreveCall(n, "setFrequency", brISoundUnsupported, AT_NULL, AT_POINTER, AT_DOUBLE, 0);
+	brNewBreveCall( n, "loadSoundData", brISoundUnsupported, AT_POINTER, AT_STRING, 0 );
+	brNewBreveCall( n, "playSoundData", brISoundUnsupported, AT_NULL, AT_POINTER, 0 );
+	brNewBreveCall( n, "freeSoundData", brISoundUnsupported, AT_NULL, AT_POINTER, 0 );
+	brNewBreveCall( n, "newSinewave", brISoundUnsupported, AT_POINTER, AT_INT, 0 );
+	brNewBreveCall( n, "freeSinewave", brISoundUnsupported, AT_NULL, AT_POINTER, 0 );
+	brNewBreveCall( n, "setVolume", brISoundUnsupported, AT_NULL, AT_POINTER, AT_INT, 0 );
+	brNewBreveCall( n, "setFrequency", brISoundUnsupported, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
 #endif
 }

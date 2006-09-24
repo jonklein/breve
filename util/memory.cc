@@ -30,38 +30,45 @@
 */
 
 #ifdef __cplusplus
+
 extern "C" {
 #endif
 
-DLLEXPORT void *
-slMalloc(size_t n) {
-	return calloc(1, n);
-}
+	DLLEXPORT void *
+	slMalloc( size_t n ) {
+		return calloc( 1, n );
+	}
 
-DLLEXPORT void *
-slRealloc(void *p, size_t n) {
-	return realloc(p, n);
-}
+	DLLEXPORT void *
+	slRealloc( void *p, size_t n ) {
+		return realloc( p, n );
+	}
 
-DLLEXPORT void
-slFree(void *p) {
-	free(p);
-}
+	DLLEXPORT void
+	slFree( void *p ) {
+		free( p );
+	}
 
-DLLEXPORT char *
-slStrdup(const char *s) {
+	DLLEXPORT char *
+
+	slStrdup( const char *s ) {
 #if HAVE_STRDUP
-	return strdup(s);
+		return strdup( s );
 #else
-	if (!s)
-		return s;
 
-	char *t = malloc(strlen(s));
-	strcpy(t, s);
-	return t;
+		if ( !s )
+			return s;
+
+		char *t = malloc( strlen( s ) );
+
+		strcpy( t, s );
+
+		return t;
+
 #endif
-}
+	}
 
 #ifdef __cplusplus
 }
+
 #endif

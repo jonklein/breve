@@ -1,0 +1,33 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = ScreenSaverView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {
+            ACTIONS = {checkZoomBox = id; runOpenSheet = id; updateImageMenu = id; }; 
+            CLASS = slBrevePainter; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                customItem = id; 
+                customString = NSTextField; 
+                filePopup = NSPopUpButton; 
+                zoomCheck = NSButtonCell; 
+            }; 
+            SUPERCLASS = slBreveSaver; 
+        }, 
+        {
+            ACTIONS = {closeSheet = id; openBreveHomepage = id; }; 
+            CLASS = slBreveSaver; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                cloudColor = id; 
+                configWindow = id; 
+                drawClouds = id; 
+                effectsCheckbox = id; 
+                saveBest = id; 
+                skyColor = id; 
+            }; 
+            SUPERCLASS = ScreenSaverView; 
+        }
+    ); 
+    IBVersion = 1; 
+}

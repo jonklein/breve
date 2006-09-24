@@ -24,7 +24,7 @@
 	\brief Creates a new brData struct from a pointer and a data length.
 */
 
-brData::brData(void *inData, int inLen ) : brEvalObject() {
+brData::brData( void *inData, int inLen ) : brEvalObject() {
 	length = inLen;
 	data = new unsigned char[ inLen ];
 	memcpy( data, inData, length );
@@ -42,7 +42,7 @@ brData::~brData() {
     \brief Increments the retain count of a brData struct.
 */
 
-void brDataRetain(brData *d) {
+void brDataRetain( brData *d ) {
 	d->retain();
 }
 
@@ -52,7 +52,7 @@ void brDataRetain(brData *d) {
 	Frees the struct if the retain count hits 0.
 */
 
-void brDataUnretain(brData *d) {
+void brDataUnretain( brData *d ) {
 	d->unretain();
 }
 
@@ -62,8 +62,8 @@ void brDataUnretain(brData *d) {
 	If the retain count is less than 1, the data is freed.
 */
 
-void brDataCollect(brData *d) {
-	if(d->_retainCount < 1) delete d;
+void brDataCollect( brData *d ) {
+	if ( d->_retainCount < 1 ) delete d;
 }
 
 /*!
@@ -72,14 +72,14 @@ void brDataCollect(brData *d) {
 	Used for archiving and XML networking.
 */
 
-char *brDataHexEncode(brData *d) {
-	if (!d || d->length < 1)
-		return slStrdup("");
+char *brDataHexEncode( brData *d ) {
+	if ( !d || d->length < 1 )
+		return slStrdup( "" );
 
-	char *string = (char *)slMalloc((d->length * 2) + 1);
+	char *string = ( char * )slMalloc(( d->length * 2 ) + 1 );
 
-	for (int n = 0; n < d->length; ++n)
-		snprintf(&string[n * 2], 3, "%02x", ((unsigned char *)d->data)[n]);
+	for ( int n = 0; n < d->length; ++n )
+		snprintf( &string[n * 2], 3, "%02x", (( unsigned char * )d->data )[n] );
 
 	return string;
 }
@@ -96,12 +96,12 @@ brData *brDataHexDecode( char *string ) {
 	int n;
 	int l;
 
-	if(!string) return NULL;
+	if ( !string ) return NULL;
 
 	length = strlen( string );
 
-	if( (length % 2) || length < 1 ) {
-		slMessage(DEBUG_ALL, "warning: error decoding hex data string (length = %d)\n", length);
+	if (( length % 2 ) || length < 1 ) {
+		slMessage( DEBUG_ALL, "warning: error decoding hex data string (length = %d)\n", length );
 		return NULL;
 	}
 
@@ -109,8 +109,8 @@ brData *brDataHexDecode( char *string ) {
 
 	tmpData = new unsigned char[ length ];
 
-	for( n = 0; n < length; n++ ) {
-		sscanf(&string[ n * 2 ], "%2x", &l);
+	for ( n = 0; n < length; n++ ) {
+		sscanf( &string[ n * 2 ], "%2x", &l );
 		tmpData[ n ] = l & 0xff;
 	}
 

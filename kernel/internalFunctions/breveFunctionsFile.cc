@@ -44,35 +44,39 @@
 	Truncates existing files to 0.
 */
 
-int brIOpenFileForWriting(brEval args[], brEval *target, brInstance *i) {
+int brIOpenFileForWriting( brEval args[], brEval *target, brInstance *i ) {
 	brFilePointer *p;
 	FILE *fp;
 
 	char *path;
 
-	path = brOutputPath(i->engine, BRSTRING(&args[0]));
+	path = brOutputPath( i->engine, BRSTRING( &args[0] ) );
 
-	fp = fopen(path, "w");
+	fp = fopen( path, "w" );
 
-	if (!fp) {
-		slMessage(DEBUG_ALL, "warning: could not open file %s for writing (%s)\n", path, strerror(errno));
-		target->set( (void*)NULL );
-		slFree(path);
+	if ( !fp ) {
+		slMessage( DEBUG_ALL, "warning: could not open file %s for writing (%s)\n", path, strerror( errno ) );
+
+		target->set(( void* )NULL );
+
+		slFree( path );
+
 		return EC_OK;
 	}
 
-	slFree(path);
+	slFree( path );
 
 	p = new brFilePointer;
 	p->file = fp;
 
-	if (!p->file) {
-		slMessage(DEBUG_ALL, "Could not open file \"%s\" for writing: %s\n", BRSTRING(&args[0]), strerror(errno));
-		target->set( (void*)NULL );
+	if ( !p->file ) {
+		slMessage( DEBUG_ALL, "Could not open file \"%s\" for writing: %s\n", BRSTRING( &args[0] ), strerror( errno ) );
+
+		target->set(( void* )NULL );
 	} else
 		target->set( p );
 
-    return EC_OK;
+	return EC_OK;
 }
 
 /*!
@@ -81,23 +85,25 @@ int brIOpenFileForWriting(brEval args[], brEval *target, brInstance *i) {
 	void openFileForAppending(string).
 */
 
-int brIOpenFileForAppending(brEval args[], brEval *target, brInstance *i) {
+int brIOpenFileForAppending( brEval args[], brEval *target, brInstance *i ) {
 	brFilePointer *p;
 	char *file;
 
-	if (!(file = brFindFile(i->engine, BRSTRING(&args[0]), NULL)))
-		file = brOutputPath(i->engine, BRSTRING(&args[0]));
+	if ( !( file = brFindFile( i->engine, BRSTRING( &args[0] ), NULL ) ) )
+		file = brOutputPath( i->engine, BRSTRING( &args[0] ) );
 
 	p = new brFilePointer;
-	p->file = fopen(file, "a");
 
-	if (!p->file) {
-		slMessage(DEBUG_ALL, "Could not open file \"%s\" for appending: %s\n", BRSTRING(&args[0]), strerror(errno));
-		target->set( (void*)NULL );
+	p->file = fopen( file, "a" );
+
+	if ( !p->file ) {
+		slMessage( DEBUG_ALL, "Could not open file \"%s\" for appending: %s\n", BRSTRING( &args[0] ), strerror( errno ) );
+
+		target->set(( void* )NULL );
 	} else
 		target->set( p );
 
-	slFree(file);
+	slFree( file );
 
 	return EC_OK;
 }
@@ -108,26 +114,30 @@ int brIOpenFileForAppending(brEval args[], brEval *target, brInstance *i) {
 	void openFileForReading(string).
 */
 
-int brIOpenFileForReading(brEval args[], brEval *target, brInstance *i) {
+int brIOpenFileForReading( brEval args[], brEval *target, brInstance *i ) {
 	brFilePointer *p;
 	char *file;
 
-	if (!(file = brFindFile(i->engine, BRSTRING(&args[0]), NULL))) {
-		slMessage(DEBUG_ALL, "Could not locate file \"%s\"\n", BRSTRING(&args[0]));
-		target->set( (void*)NULL );
+	if ( !( file = brFindFile( i->engine, BRSTRING( &args[0] ), NULL ) ) ) {
+		slMessage( DEBUG_ALL, "Could not locate file \"%s\"\n", BRSTRING( &args[0] ) );
+
+		target->set(( void* )NULL );
+
 		return EC_OK;
 	}
 
 	p = new brFilePointer;
-	stat(file, &p->st);
 
-	if (!(p->file = fopen(file, "r"))) {
-		slMessage(DEBUG_ALL, "Could not open file \"%s\" for reading: %s\n", BRSTRING(&args[0]), strerror(errno));
-		target->set( (void*)NULL );
+	stat( file, &p->st );
+
+	if ( !( p->file = fopen( file, "r" ) ) ) {
+		slMessage( DEBUG_ALL, "Could not open file \"%s\" for reading: %s\n", BRSTRING( &args[0] ), strerror( errno ) );
+
+		target->set(( void* )NULL );
 	} else
 		target->set( p );
 
-	slFree(file);
+	slFree( file );
 
 	return EC_OK;
 }
@@ -138,19 +148,19 @@ int brIOpenFileForReading(brEval args[], brEval *target, brInstance *i) {
 	string readFileAsString(brFilePointer pointer).
 */
 
-int brIReadFileAsString(brEval args[], brEval *target, brInstance *i) {
+int brIReadFileAsString( brEval args[], brEval *target, brInstance *i ) {
 	brFilePointer *p;
 
-	p = BRFILEPOINTER(&args[0]);
+	p = BRFILEPOINTER( &args[0] );
 
-	if (!p || !p->file) {
-		slMessage(DEBUG_ALL, "readFileAsString called with uninitialized file\n");
+	if ( !p || !p->file ) {
+		slMessage( DEBUG_ALL, "readFileAsString called with uninitialized file\n" );
 		return EC_ERROR;
 	}
 
 	char *text[ p->st.st_size + 1 ];
 
-	slUtilFread(text, 1, p->st.st_size, p->file);
+	slUtilFread( text, 1, p->st.st_size, p->file );
 
 	target->set( text );
 
@@ -163,55 +173,55 @@ int brIReadFileAsString(brEval args[], brEval *target, brInstance *i) {
 	string readLine(brFilePointer pointer).
 */
 
-int brIReadLine(brEval args[], brEval *target, brInstance *i) {
+int brIReadLine( brEval args[], brEval *target, brInstance *i ) {
 	brFilePointer *p;
 	char line[10240];
 
-	p = BRFILEPOINTER(&args[0]);
+	p = BRFILEPOINTER( &args[0] );
 
-	if (!p || !p->file) {
-		slMessage(DEBUG_ALL, "readLine called with uninitialized file\n");
+	if ( !p || !p->file ) {
+		slMessage( DEBUG_ALL, "readLine called with uninitialized file\n" );
 		return EC_ERROR;
 	}
 
-	slFgets(line, sizeof(line) - 1, p->file);
+	slFgets( line, sizeof( line ) - 1, p->file );
 
 	target->set( line );
 
-    return EC_OK;
+	return EC_OK;
 }
 
 /*!
 	\brief Reads list data delimited with a specified string.
 */
 
-int brIReadDelimitedList(brEval args[], brEval *target, brInstance *i) {
+int brIReadDelimitedList( brEval args[], brEval *target, brInstance *i ) {
 	brEval eval;
 	brEvalListHead *head;
 	brFilePointer *p;
 	int n;
 	char line[10240];
 
-	p = BRFILEPOINTER(&args[0]);
+	p = BRFILEPOINTER( &args[0] );
 
 	head = new brEvalListHead();
 
 	target->set( head );
 
-	if (!p || !p->file) {
-		slMessage(DEBUG_ALL, "readDelimitedList called with uninitialized file\n");
+	if ( !p || !p->file ) {
+		slMessage( DEBUG_ALL, "readDelimitedList called with uninitialized file\n" );
 		return EC_ERROR;
 	}
 
-	slFgets(line, sizeof(line) - 1, p->file);
+	slFgets( line, sizeof( line ) - 1, p->file );
 
 	n = 0;
 
 	char *str;
 
-	while( ( str = slSplit( line, BRSTRING(&args[1]), n++ ) ) ) {
+	while (( str = slSplit( line, BRSTRING( &args[1] ), n++ ) ) ) {
 		eval.set( str );
-		brEvalListInsert( head, head->_vector.size(), &eval);
+		brEvalListInsert( head, head->_vector.size(), &eval );
 		delete[] str;
 	}
 
@@ -223,7 +233,7 @@ int brIReadDelimitedList(brEval args[], brEval *target, brInstance *i) {
 	\brief Reads space delimited data into a list.
 */
 
-int brIReadWhitespaceDelimitedList(brEval args[], brEval *target, brInstance *i) {
+int brIReadWhitespaceDelimitedList( brEval args[], brEval *target, brInstance *i ) {
 	brEval eval;
 	brFilePointer *p;
 	brEvalListHead *head;
@@ -231,38 +241,38 @@ int brIReadWhitespaceDelimitedList(brEval args[], brEval *target, brInstance *i)
 	char line[10240];
 	char field[10240];
 
-	p = BRFILEPOINTER(&args[0]);
+	p = BRFILEPOINTER( &args[0] );
 
 	head = new brEvalListHead();
 
 	target->set( head );
 
-	if (!p || !p->file) {
-		slMessage(DEBUG_ALL, "readWhitespaceDelimitedList called with uninitialized file\n");
+	if ( !p || !p->file ) {
+		slMessage( DEBUG_ALL, "readWhitespaceDelimitedList called with uninitialized file\n" );
 		return EC_ERROR;
 	}
 
-	slFgets(line, sizeof(line) - 1, p->file);
+	slFgets( line, sizeof( line ) - 1, p->file );
 
 	start = 0;
 
 	n = 0;
 
-	while(line[n]) {
-		if(iswspace(line[n])) {
+	while ( line[n] ) {
+		if ( iswspace( line[n] ) ) {
 			// if we're at a space, we've found the end of the field
 
-			strncpy(field, &line[start], n - start);
+			strncpy( field, &line[start], n - start );
 			field[n - start] = 0;
 
 			// continue to the next field data.
 
-			while(line[n] && iswspace(line[n]))
+			while ( line[n] && iswspace( line[n] ) )
 				n++;
 
 			eval.set( field );
 
-			brEvalListInsert(head, head->_vector.size(), &eval);
+			brEvalListInsert( head, head->_vector.size(), &eval );
 
 			start = n;
 		} else
@@ -278,24 +288,24 @@ int brIReadWhitespaceDelimitedList(brEval args[], brEval *target, brInstance *i)
 	data readFileAsData(brFilePointer).
 */
 
-int brIReadFileAsData(brEval args[], brEval *target, brInstance *i) {
+int brIReadFileAsData( brEval args[], brEval *target, brInstance *i ) {
 	char *text;
 	brFilePointer *p;
 
-	p = BRFILEPOINTER(&args[0]);
+	p = BRFILEPOINTER( &args[0] );
 
-	if(!p || !p->file) {
-		slMessage(DEBUG_ALL, "readFileAsString called with uninitialized file\n");
+	if ( !p || !p->file ) {
+		slMessage( DEBUG_ALL, "readFileAsString called with uninitialized file\n" );
 		return EC_ERROR;
 	}
 
 	text = new char[p->st.st_size + 1];
 
-	target->set( new brData(text, p->st.st_size) );
+	target->set( new brData( text, p->st.st_size ) );
 
 	delete text;
 
-    return EC_OK;
+	return EC_OK;
 }
 
 /*!
@@ -304,36 +314,36 @@ int brIReadFileAsData(brEval args[], brEval *target, brInstance *i) {
 	writeString(brFilePointer pointer, string).
 */
 
-int brIWriteString(brEval args[], brEval *target, brInstance *i) {
-	brFilePointer *p = BRFILEPOINTER(&args[0]);
+int brIWriteString( brEval args[], brEval *target, brInstance *i ) {
+	brFilePointer *p = BRFILEPOINTER( &args[0] );
 
-	if(!p || !p->file) {
-		slMessage(DEBUG_ALL, "writeString called with uninitialized file\n");
+	if ( !p || !p->file ) {
+		slMessage( DEBUG_ALL, "writeString called with uninitialized file\n" );
 		return EC_ERROR;
 	}
 
-	fprintf(p->file, "%s", BRSTRING(&args[1]));
+	fprintf( p->file, "%s", BRSTRING( &args[1] ) );
 
-    return EC_OK;
+	return EC_OK;
 }
 
 /*
 	\brief Writes brData information to a file.
-	
+
 	writeData(brFilePointer pointer, data).
 */
 
-int brIWriteData(brEval args[], brEval *target, brInstance *i) {
-	brFilePointer *p = BRFILEPOINTER(&args[0]);
+int brIWriteData( brEval args[], brEval *target, brInstance *i ) {
+	brFilePointer *p = BRFILEPOINTER( &args[0] );
 
-	if(!p || !p->file) {
-		slMessage(DEBUG_ALL, "writeData called with uninitialized file\n");
+	if ( !p || !p->file ) {
+		slMessage( DEBUG_ALL, "writeData called with uninitialized file\n" );
 		return EC_ERROR;
 	}
 
-	fwrite(BRDATA(&args[1])->data, 1, BRDATA(&args[1])->length, p->file);
+	fwrite( BRDATA( &args[1] )->data, 1, BRDATA( &args[1] )->length, p->file );
 
-    return EC_OK;
+	return EC_OK;
 }
 
 /*!
@@ -342,29 +352,30 @@ int brIWriteData(brEval args[], brEval *target, brInstance *i) {
 	void closeFile(brFilePointer pointer).
 */
 
-int brICloseFile(brEval args[], brEval *target, brInstance *i) {
-	brFilePointer *p = BRFILEPOINTER(&args[0]);
+int brICloseFile( brEval args[], brEval *target, brInstance *i ) {
+	brFilePointer *p = BRFILEPOINTER( &args[0] );
 
-	if(!p || !p->file) {
-		slMessage(DEBUG_ALL, "closeFile called with uninitialized file\n");
+	if ( !p || !p->file ) {
+		slMessage( DEBUG_ALL, "closeFile called with uninitialized file\n" );
 		return EC_ERROR;
 	}
 
-	fclose(p->file);
+	fclose( p->file );
+
 	delete p;
 
-    return EC_OK;
+	return EC_OK;
 }
 
 /*!
 	\brief Checks a file for EOF.
 */
 
-int brIFileEOF(brEval args[], brEval *target, brInstance *i) {
-	brFilePointer *p = BRFILEPOINTER(&args[0]);
+int brIFileEOF( brEval args[], brEval *target, brInstance *i ) {
+	brFilePointer *p = BRFILEPOINTER( &args[0] );
 
-	if(!p || !p->file) {
-		slMessage(DEBUG_ALL, "closeFile called with uninitialized file\n");
+	if ( !p || !p->file ) {
+		slMessage( DEBUG_ALL, "closeFile called with uninitialized file\n" );
 		return EC_ERROR;
 	}
 
@@ -372,19 +383,20 @@ int brIFileEOF(brEval args[], brEval *target, brInstance *i) {
 
 	return EC_OK;
 }
+
 /*@}*/
 
-void breveInitFileFunctions(brNamespace *n) {
-    brNewBreveCall(n, "openFileForAppending", brIOpenFileForAppending, AT_POINTER, AT_STRING, 0);
-    brNewBreveCall(n, "openFileForWriting", brIOpenFileForWriting, AT_POINTER, AT_STRING, 0);
-    brNewBreveCall(n, "openFileForReading", brIOpenFileForReading, AT_POINTER, AT_STRING, 0);
-    brNewBreveCall(n, "readLine", brIReadLine, AT_STRING, AT_POINTER, 0);
-    brNewBreveCall(n, "readDelimitedList", brIReadWhitespaceDelimitedList, AT_LIST, AT_POINTER, AT_STRING, 0);
-    brNewBreveCall(n, "readWhitespaceDelimitedList", brIReadWhitespaceDelimitedList, AT_LIST, AT_POINTER, 0);
-    brNewBreveCall(n, "readFileAsString", brIReadFileAsString, AT_STRING, AT_POINTER, 0);
-    brNewBreveCall(n, "readFileAsData", brIReadFileAsData, AT_DATA, AT_POINTER, 0);
-    brNewBreveCall(n, "writeString", brIWriteString, AT_NULL, AT_POINTER, AT_STRING, 0);
-    brNewBreveCall(n, "writeData", brIWriteData, AT_NULL, AT_POINTER, AT_DATA, 0);
-    brNewBreveCall(n, "closeFile", brICloseFile, AT_NULL, AT_POINTER, 0);
-    brNewBreveCall(n, "fileEOF", brIFileEOF, AT_INT, AT_POINTER, 0);
+void breveInitFileFunctions( brNamespace *n ) {
+	brNewBreveCall( n, "openFileForAppending", brIOpenFileForAppending, AT_POINTER, AT_STRING, 0 );
+	brNewBreveCall( n, "openFileForWriting", brIOpenFileForWriting, AT_POINTER, AT_STRING, 0 );
+	brNewBreveCall( n, "openFileForReading", brIOpenFileForReading, AT_POINTER, AT_STRING, 0 );
+	brNewBreveCall( n, "readLine", brIReadLine, AT_STRING, AT_POINTER, 0 );
+	brNewBreveCall( n, "readDelimitedList", brIReadWhitespaceDelimitedList, AT_LIST, AT_POINTER, AT_STRING, 0 );
+	brNewBreveCall( n, "readWhitespaceDelimitedList", brIReadWhitespaceDelimitedList, AT_LIST, AT_POINTER, 0 );
+	brNewBreveCall( n, "readFileAsString", brIReadFileAsString, AT_STRING, AT_POINTER, 0 );
+	brNewBreveCall( n, "readFileAsData", brIReadFileAsData, AT_DATA, AT_POINTER, 0 );
+	brNewBreveCall( n, "writeString", brIWriteString, AT_NULL, AT_POINTER, AT_STRING, 0 );
+	brNewBreveCall( n, "writeData", brIWriteData, AT_NULL, AT_POINTER, AT_DATA, 0 );
+	brNewBreveCall( n, "closeFile", brICloseFile, AT_NULL, AT_POINTER, 0 );
+	brNewBreveCall( n, "fileEOF", brIFileEOF, AT_INT, AT_POINTER, 0 );
 }

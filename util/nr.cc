@@ -25,16 +25,16 @@
 #include "util.h"
 
 /*!
-	\brief Returns the closest power of two which is greater than or equal to 
-	the input.                                                               
- 
+	\brief Returns the closest power of two which is greater than or equal to
+	the input.
+
 	Used to round up for non-power-of-two textures.
-*/ 
- 
-int slNextPowerOfTwo(int n) {
+*/
+
+int slNextPowerOfTwo( int n ) {
 	int power = 1;
 
-	while(power < n) power <<= 1;
+	while ( power < n ) power <<= 1;
 
 	return power;
 }

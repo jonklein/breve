@@ -22,31 +22,31 @@
 
 #include "kernel.h"
 
-int brEngineNextMethodCall(brEngine *e, brInstance **i, brMethod **m) {
-    pthread_mutex_lock(&e->scheduleLock);
+int brEngineNextMethodCall( brEngine *e, brInstance **i, brMethod **m ) {
+	pthread_mutex_lock( &e->scheduleLock );
 
 	*i = NULL;
 	*m = NULL;
 
-	pthread_mutex_unlock(&e->scheduleLock);
+	pthread_mutex_unlock( &e->scheduleLock );
 
 	return 0;
 }
 
-void *brIterationThread(void *data) {
-	stThreadData *threadData = (stThreadData*)data;
+void *brIterationThread( void *data ) {
+	stThreadData *threadData = ( stThreadData* )data;
 	brEngine *e = threadData->engine;
 
-	while(1) {
+	while ( 1 ) {
 		brInstance *i;
 		brMethod *m;
 		int rcode;
 		brEval result;
 
-		if(i && m) brEngineNextMethodCall(e, &i, &m);
+		if ( i && m ) brEngineNextMethodCall( e, &i, &m );
 
-		if(i && m) rcode = brMethodCall(i, m, NULL, &result);
-    }
+		if ( i && m ) rcode = brMethodCall( i, m, NULL, &result );
+	}
 
 	return NULL;
 }

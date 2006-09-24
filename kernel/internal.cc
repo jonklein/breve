@@ -20,8 +20,8 @@
 
 /*! \defgroup InternalFunctions The C-Style Internal Function Simulation API: the simulation API
 
-	The functions outlined in this section comprise the C-Style 
-	Internal Function Simulation API through which all of the 
+	The functions outlined in this section comprise the C-Style
+	Internal Function Simulation API through which all of the
 	breve simulation functionality is accessed.
 
 	The functions here are not simple C-functions as in the other
@@ -29,13 +29,13 @@
 	and other interpreted languages.  This is done by encapsulating
 	the input arguments and return values as \ref brEval structures.
 
-	As a result, all of the simulation API functions have the same 
+	As a result, all of the simulation API functions have the same
 	function definition:
 
 	int simulationFunction(brEval args[], brEval *target, brInstance *i)
 
-	To call the functions in this API, you must encode the inputs in	
-	an array of \ref brEval structures, and decode the output from 
+	To call the functions in this API, you must encode the inputs in
+	an array of \ref brEval structures, and decode the output from
 	a \ref brEval as well.
 */
 
@@ -50,15 +50,15 @@
 	The added function must have the function definition:
 	int function(brEval *inputArgs, brEval *result, brInstance *caller);
 
-	The 4th argument is the steve return type of the function--the 
+	The 4th argument is the steve return type of the function--the
 	type that the function will place into "result".
-	
+
 	Subsequent arguments represent the steve types that the function
 	accepts as arguments, up to 16 currently.  after all the types are
 	given, the final argument must be 0 to signify the end of the argument
 	type list.
-	
-	So, for example, a function called "zorch" which a vector and a double 
+
+	So, for example, a function called "zorch" which a vector and a double
 	and returns a pointer might be defined like this:
 
 	brNewBreveCall(myNamespace, "zorch", zorchPtr, AT_POINTER, AT_VECTOR, AT_DOUBLE, 0);
@@ -66,37 +66,35 @@
 	There are many examples of this in the steveFunctions*.c files.
 */
 
-int brNewBreveCall(brNamespace *n, char *name, int (*f)(brEval *a, brEval *r, brInstance *i), int rtype, ...) {
+int brNewBreveCall( brNamespace *n, char *name, int( *f )( brEval *a, brEval *r, brInstance *i ), int rtype, ... ) {
 	brInternalFunction *c;
 	va_list ap;
 	int value;
 
 	c = new brInternalFunction;
 
-	c->call = f;
-	c->rtype = rtype;
-	c->name = slStrdup(name);
+	c->_call = f;
+	c->_returnType = rtype;
+	c->_name = name;
 
-	va_start(ap, rtype);
+	va_start( ap, rtype );
 
-	c->nargs = 0;
+	c->_argCount = 0;
 
-	while((value = va_arg(ap, int)) != 0) c->argtypes[c->nargs++] = value;
+	while ( ( value = va_arg( ap, int ) ) != 0 ) c->_argTypes[ c->_argCount++ ] = value;
 
-	va_end(ap);
+	va_end( ap );
 
-	if(!brNamespaceStore(n, name, 0, c)) {
-		slMessage(DEBUG_ALL, "Internal error: internal function \"%s\" redefined\n", name);
+	if ( !brNamespaceStore( n, name, 0, c ) ) {
+		slMessage( DEBUG_ALL, "Internal error: internal function \"%s\" redefined\n", name );
 		return -1;
 	}
 
 	return 0;
 }
 
-void brFreeBreveCall(void *d) {
-	brInternalFunction *i = (brInternalFunction*)d;
-
-	slFree(i->name);
+void brFreeBreveCall( void *d ) {
+	brInternalFunction *i = ( brInternalFunction* )d;
 	delete i;
 }
 
@@ -108,7 +106,7 @@ void brFreeBreveCall(void *d) {
 	however, output to this file handle will be routed through slMessage.
 */
 
-FILE *slGetLogFilePointer(brInstance *i) {
+FILE *slGetLogFilePointer( brInstance *i ) {
 	return i->engine->logFile;
 }
 
@@ -118,36 +116,38 @@ FILE *slGetLogFilePointer(brInstance *i) {
 	Calls all of the loader functions for different groups of functions.
 */
 
-void brLoadInternalFunctions(brEngine *e) {
-	breveInitWorldFunctions(e->internalMethods);
-	breveInitStationaryFunctions(e->internalMethods);
-	breveInitObjectFunctions(e->internalMethods);
-	breveInitControlFunctions(e->internalMethods);
-	breveInitMathFunctions(e->internalMethods);
-	breveInitMenuFunctions(e->internalMethods);
-	breveInitPhysicsFunctions(e->internalMethods);
-	breveInitJointFunctions(e->internalMethods);
-	breveInitMultibodyFunctions(e->internalMethods);
-	breveInitShapeFunctions(e->internalMethods);
-	breveInitLinkFunctions(e->internalMethods);
-	breveInitNetworkFunctions(e->internalMethods);
-	breveInitPatchFunctions(e->internalMethods);
-	breveInitNeuralFunctions(e->internalMethods);
-	breveInitNeuralNetworkFunctions(e->internalMethods);
-	breveInitCameraFunctions(e->internalMethods);
-	breveInitFileFunctions(e->internalMethods);
-	breveInitSoundFunctions(e->internalMethods);
-	breveInitGraphFunctions(e->internalMethods);
-	breveInitTerrainFunctions(e->internalMethods);
-	breveInitImageFunctions(e->internalMethods);
-	breveInitMovieFunctions(e->internalMethods);
-	breveInitPushFunctions(e->internalMethods);
-	breveInitSpringFunctions(e->internalMethods);
-	breveInitPushCallbackFunctions(e->internalMethods);
-	breveInitMatrixFunctions(e->internalMethods);
-	breveInitVectorFunctions(e->internalMethods);
-	breveInitStatisticsFunctions(e->internalMethods);
-	breveInitQGAMEFunctions(e->internalMethods);
-	breveInitDrawFunctions(e->internalMethods);
+void brLoadInternalFunctions( brEngine *e ) {
+	breveInitWorldFunctions( e->internalMethods );
+	breveInitStationaryFunctions( e->internalMethods );
+	breveInitObjectFunctions( e->internalMethods );
+	breveInitControlFunctions( e->internalMethods );
+	breveInitMathFunctions( e->internalMethods );
+	breveInitMenuFunctions( e->internalMethods );
+	breveInitPhysicsFunctions( e->internalMethods );
+	breveInitJointFunctions( e->internalMethods );
+	breveInitMultibodyFunctions( e->internalMethods );
+	breveInitShapeFunctions( e->internalMethods );
+	breveInitLinkFunctions( e->internalMethods );
+	breveInitNetworkFunctions( e->internalMethods );
+	breveInitPatchFunctions( e->internalMethods );
+	breveInitNeuralFunctions( e->internalMethods );
+	breveInitNeuralNetworkFunctions( e->internalMethods );
+	breveInitCameraFunctions( e->internalMethods );
+	breveInitFileFunctions( e->internalMethods );
+	breveInitSoundFunctions( e->internalMethods );
+	breveInitGraphFunctions( e->internalMethods );
+	breveInitTerrainFunctions( e->internalMethods );
+	breveInitImageFunctions( e->internalMethods );
+	breveInitMovieFunctions( e->internalMethods );
+	breveInitPushFunctions( e->internalMethods );
+	breveInitSpringFunctions( e->internalMethods );
+	breveInitPushCallbackFunctions( e->internalMethods );
+	breveInitMatrixFunctions( e->internalMethods );
+	breveInitVectorFunctions( e->internalMethods );
+	breveInitStatisticsFunctions( e->internalMethods );
+	breveInitQGAMEFunctions( e->internalMethods );
+	breveInitDrawFunctions( e->internalMethods );
+	breveInitPythonFunctions( e->internalMethods );
 }
+
 /*@}*/

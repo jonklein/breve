@@ -31,22 +31,23 @@ brSoundMixer::brSoundMixer() {
 	int error;
 
 	_streamShouldEnd = false;
+	_stream = NULL;
 
 	error = Pa_OpenDefaultStream( &_stream, 0, 2, paFloat32, MIXER_SAMPLE_RATE, 256, 0, brPASoundCallback, this );
 
-	if(error) {
-		slMessage(DEBUG_ALL, "Error (%d) opening new sound stream!\n", error);
-	}
+	if ( error )
+		slMessage( DEBUG_ALL, "Error (%d) opening new sound stream!\n", error );
 }
 
 brSoundMixer::~brSoundMixer() {
 	_streamShouldEnd = true;
 
 	Pa_StopStream( _stream );
-	while( _stream && Pa_StreamActive( _stream ) );
 
-	if( _stream ) Pa_CloseStream( _stream );
-	
+	while ( _stream && Pa_StreamActive( _stream ) );
+
+	if ( _stream ) Pa_CloseStream( _stream );
+
 	_players.clear();
 }
 
@@ -56,20 +57,20 @@ brSoundPlayer *brSoundMixer::NextPlayer() {
 
 	StartStream();
 
-	for( n=0; n< _players.size(); n++ ) {
-		if( _players[n]->finished ) {
+	for ( n = 0; n < _players.size(); n++ ) {
+		if ( _players[n]->finished ) {
 			player = _players[ n ];
 			break;
 		}
 	}
 
-	if(!player) {
+	if ( !player ) {
 		brSoundPlayer *p = new brSoundPlayer;
 
 		p->finished = 1;
 		p->sound = NULL;
-	
-		_players.push_back(p);
+
+		_players.push_back( p );
 
 		player = p;
 	}
@@ -80,7 +81,7 @@ brSoundPlayer *brSoundMixer::NextPlayer() {
 }
 
 bool brSoundMixer::StartStream() {
-	if( !Pa_StreamActive( _stream ) ) {
+	if ( !Pa_StreamActive( _stream ) ) {
 		Pa_StartStream( _stream );
 #ifdef WINDOWS
 		SetPriorityClass( GetCurrentProcess(), NORMAL_PRIORITY_CLASS );
@@ -93,7 +94,7 @@ bool brSoundMixer::StartStream() {
 
 brSoundPlayer *brSoundMixer::NewSinewave( double frequency ) {
 	brSoundPlayer *player;
-	
+
 	StartStream();
 
 	player = NextPlayer();
@@ -115,13 +116,16 @@ brSoundPlayer *brSoundMixer::NewPlayer( brSoundData *data, float speed ) {
 
 	player = NextPlayer();
 
-	if( speed <= 0.0 ) speed = 1.0;
+	if ( speed <= 0.0 ) speed = 1.0;
 
 	player->speed = speed;
 
 	player->isSinewave = 0;
+
 	player->sound = data;
+
 	player->offset = 0;
+
 	player->finished = 0;
 
 	return player;
@@ -135,19 +139,23 @@ brSoundData *brLoadSound( char *file ) {
 
 	info.format = 0;
 
-	fp = sf_open(file, SFM_READ, &info);
-	if(!fp) return NULL;
+	fp = sf_open( file, SFM_READ, &info );
+
+	if ( !fp ) return NULL;
 
 	data = new brSoundData;
-	data->length = (long)info.frames * info.channels;
+
+	data->length = ( long )info.frames * info.channels;
+
 	data->data = new float[data->length];
 
-	sf_readf_float( fp, data->data, (long)info.frames );
+	sf_readf_float( fp, data->data, ( long )info.frames );
 
 	upsample = MIXER_SAMPLE_RATE / info.samplerate;
-	if(info.channels == 1) upsample *= 2;
 
-	while(upsample != 1) {
+	if ( info.channels == 1 ) upsample *= 2;
+
+	while ( upsample != 1 ) {
 		float *newData;
 
 		newData = brSampleUp( data->data, data->length );
@@ -158,72 +166,74 @@ brSoundData *brLoadSound( char *file ) {
 		upsample /= 2;
 	}
 
-	sf_close(fp);
+	sf_close( fp );
 
 	return data;
 }
 
 float *brSampleUp( float *in, long frames ) {
-	float *out = new float[frames * 2 * sizeof(int)];
+	float *out = new float[frames * 2 * sizeof( int )];
 	int n;
 
-	for(n=0;n<frames;n++) {
+	for ( n = 0;n < frames;n++ ) {
 		out[n*2] = in[n];
-		out[(n*2) + 1] = in[n];
+		out[( n*2 ) + 1] = in[n];
 	}
 
 	return out;
 }
 
-void brFreeSoundData(brSoundData *data) {
+void brFreeSoundData( brSoundData *data ) {
 	delete[] data->data;
 	delete data;
 }
 
 int brPASoundCallback( void *ibuf, void *obuf, unsigned long fbp, PaTimestamp outTime, void *data ) {
-	brSoundMixer *mixer = (brSoundMixer*)data;
+	brSoundMixer *mixer = ( brSoundMixer* )data;
 	brSoundPlayer *player;
 	unsigned int n, p;
-	float *out = (float*)obuf;
+	float *out = ( float* )obuf;
 	float total;
 	int channel;
 	unsigned int size = mixer->_players.size();
 
 	fbp *= 2;
 
-	if( mixer->_streamShouldEnd ) {
+	if ( mixer->_streamShouldEnd ) {
 		mixer->_streamShouldEnd = false;
 		return 1;
 	}
 
-	for(n=0;n<fbp;n++) {
+	for ( n = 0;n < fbp;n++ ) {
 		total = 0;
 
-		channel = (n & 1);
+		channel = ( n & 1 );
 
-		for(p=0;p<mixer->_players.size();p++) {
+		for ( p = 0;p < mixer->_players.size();p++ ) {
 			player = mixer->_players[p];
 
-			if(player->isSinewave) {
-				if(!player->finished) {
-					total += sin(player->phase) * player->volume / (float)size;
+			if ( player->isSinewave ) {
+				if ( !player->finished ) {
+					total += sin( player->phase ) * player->volume / ( float )size;
 
-					// last channel -- update the phase 
-					if(channel) player->phase += player->frequency;
+					// last channel -- update the phase
+
+					if ( channel ) player->phase += player->frequency;
 				}
-			} else { 
-				if(!player->finished) {
-					total += ( player->sound->data[ (int)( player->offset += player->speed ) ] / (float)size );
+			} else {
+				if ( !player->finished ) {
+					total += ( player->sound->data[( int )( player->offset += player->speed )] / ( float )size );
 
-					if(player->offset >= player->sound->length) player->finished = 1;
+					if ( player->offset >= player->sound->length ) player->finished = 1;
 				}
 			}
 
-		} 
+		}
 
 		*out++ = total;
 	}
 
 	return 0;
 }
+
 #endif /* HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE */

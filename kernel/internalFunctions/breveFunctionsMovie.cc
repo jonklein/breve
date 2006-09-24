@@ -28,56 +28,60 @@
 #define BRMOVIEPOINTER(p)  ((slMovie*)BRPOINTER(p))
 #endif
 
-int breveMovieCreate(brEval args[], brEval *result, brInstance *i) {
+int breveMovieCreate( brEval args[], brEval *result, brInstance *i ) {
 #if HAVE_LIBAVFORMAT
 	char *path;
 	slMovie *movie;
 	slCamera *camera = i->engine->camera;
 
-	path = brOutputPath(i->engine, BRSTRING(&args[0]));
+	path = brOutputPath( i->engine, BRSTRING( &args[0] ) );
 
 	movie = slMovieCreate( path, camera->_width, camera->_height );
-	slFree(path);
+	slFree( path );
 
 	result->set( movie );
 
 	return EC_OK;
+
 #else
-	slMessage(DEBUG_ALL, "This version of breve was built without support for movie export\n");
+	slMessage( DEBUG_ALL, "This version of breve was built without support for movie export\n" );
 
 	return EC_ERROR;
+
 #endif
 }
 
-int breveMovieAddWorldFrame(brEval args[], brEval *result, brInstance *i) {
+int breveMovieAddWorldFrame( brEval args[], brEval *result, brInstance *i ) {
 #if HAVE_LIBAVFORMAT
-	slMovie *movie = BRMOVIEPOINTER(&args[0]);
+	slMovie *movie = BRMOVIEPOINTER( &args[0] );
 
-	if (!movie)
-		slMessage(DEBUG_ALL, "warning: attempt to add frame to null movie pointer\n");
+	if ( !movie )
+		slMessage( DEBUG_ALL, "warning: attempt to add frame to null movie pointer\n" );
 	else
-		result->set( slMovieAddWorldFrame(movie, i->engine->world, i->engine->camera) );
+		result->set( slMovieAddWorldFrame( movie, i->engine->world, i->engine->camera ) );
+
 #endif
 
 	return EC_OK;
 }
 
-int breveMovieClose(brEval args[], brEval *result, brInstance *i) {
+int breveMovieClose( brEval args[], brEval *result, brInstance *i ) {
 #if HAVE_LIBAVFORMAT
-	slMovie *movie = BRMOVIEPOINTER(&args[0]);
+	slMovie *movie = BRMOVIEPOINTER( &args[0] );
 
-	if (!movie)
-		slMessage(DEBUG_ALL, "warning: attempt to close null movie pointer\n");
+	if ( !movie )
+		slMessage( DEBUG_ALL, "warning: attempt to close null movie pointer\n" );
 	else
-		slMovieFinish(movie);
+		slMovieFinish( movie );
+
 #endif
 
 	return EC_OK;
 
 }
 
-void breveInitMovieFunctions(brNamespace *n) {
-	brNewBreveCall(n, "movieCreate", breveMovieCreate, AT_POINTER, AT_STRING, 0);
-	brNewBreveCall(n, "movieAddWorldFrame", breveMovieAddWorldFrame, AT_INT, AT_POINTER, 0);
-	brNewBreveCall(n, "movieClose", breveMovieClose, AT_NULL, AT_POINTER, 0);
+void breveInitMovieFunctions( brNamespace *n ) {
+	brNewBreveCall( n, "movieCreate", breveMovieCreate, AT_POINTER, AT_STRING, 0 );
+	brNewBreveCall( n, "movieAddWorldFrame", breveMovieAddWorldFrame, AT_INT, AT_POINTER, 0 );
+	brNewBreveCall( n, "movieClose", breveMovieClose, AT_NULL, AT_POINTER, 0 );
 }

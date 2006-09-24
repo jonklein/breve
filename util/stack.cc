@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*
-	+ stack.c 
+	+ stack.c
 
 	= not (just) a traditional push/pop stack, but can rather be thought
 	= of as an array which dynamically resizes.
@@ -30,7 +30,7 @@
 /*!
 	\brief Creates a new stack with a default size (0).
 
-	Creates an empty stack with the default capacity 0.  Capacity 
+	Creates an empty stack with the default capacity 0.  Capacity
 	is automatically increased to 8 on the first "push".
 */
 
@@ -45,18 +45,21 @@ slStack *slStackNew() {
 }
 
 /*!
-    \brief Creates a new stack with a specified starting size.  
+    \brief Creates a new stack with a specified starting size.
 */
 
-slStack *slStackNewWithSize(unsigned int size) {
+slStack *slStackNewWithSize( unsigned int size ) {
 	slStack *s;
 
-	if(size < 1) size = 1;
+	if ( size < 1 ) size = 1;
 
 	s = new slStack;
+
 	s->count = 0;
+
 	s->maxCount = size;
-	s->data = (void**)slMalloc(sizeof(void*) * s->maxCount);
+
+	s->data = ( void** )slMalloc( sizeof( void* ) * s->maxCount );
 
 	return s;
 }
@@ -65,14 +68,14 @@ slStack *slStackNewWithSize(unsigned int size) {
 	\brief Pushes data onto a stack.
 */
 
-int slStackPush(slStack *s, void *data) {
-	if(s->count == s->maxCount) {
-		if(s->maxCount == 0) {
+int slStackPush( slStack *s, void *data ) {
+	if ( s->count == s->maxCount ) {
+		if ( s->maxCount == 0 ) {
 			s->maxCount = 8;
-			s->data = (void**)slMalloc(sizeof(void*) * s->maxCount);
+			s->data = ( void** )slMalloc( sizeof( void* ) * s->maxCount );
 		} else {
 			s->maxCount *= 2;
-			s->data = (void**)slRealloc(s->data, sizeof(void*) * s->maxCount);
+			s->data = ( void** )slRealloc( s->data, sizeof( void* ) * s->maxCount );
 		}
 	}
 
@@ -87,7 +90,7 @@ int slStackPush(slStack *s, void *data) {
 	\brief Returns an element from the stack.
 */
 
-void *slStackGet(slStack *s, int index) {
+void *slStackGet( slStack *s, int index ) {
 	return s->data[index];
 }
 
@@ -95,6 +98,6 @@ void *slStackGet(slStack *s, int index) {
 	\brief Returns the number of elements in the stack.
 */
 
-unsigned int slStackSize(slStack *s) {
+unsigned int slStackSize( slStack *s ) {
 	return s->count;
 }

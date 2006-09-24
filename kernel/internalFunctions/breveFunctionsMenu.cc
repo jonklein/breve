@@ -31,49 +31,49 @@
 	brMenuItem pointer menuItemNew(object owner, string method, string name)
 
 	The method parameter is the method to be called when the menu
-	item is activated.  The name parameter is the name attached to 
+	item is activated.  The name parameter is the name attached to
 	the menu item.
 */
 
-int brIMenuItemNew(brEval args[], brEval *target, brInstance *i) {
+int brIMenuItemNew( brEval args[], brEval *target, brInstance *i ) {
 	brInstance *m;
 
-	if (!BRINSTANCE(&args[0])) {
-		slMessage(DEBUG_ALL, "addMenuItem called with uninitialized object\n");
+	if ( !BRINSTANCE( &args[0] ) ) {
+		slMessage( DEBUG_ALL, "addMenuItem called with uninitialized object\n" );
 		return EC_ERROR;
 	}
 
-	m = BRINSTANCE(&args[0]);
+	m = BRINSTANCE( &args[0] );
 
-	target->set( brAddMenuItem(m, BRSTRING(&args[1]), BRSTRING(&args[2])) );
-    
-	if (i->engine->updateMenu)
-		i->engine->updateMenu(m);
+	target->set( brAddMenuItem( m, BRSTRING( &args[1] ), BRSTRING( &args[2] ) ) );
+
+	if ( i->engine->updateMenu )
+		i->engine->updateMenu( m );
 
 	return EC_OK;
-}   
+}
 
 /*!
 	\brief Adds or removes a check for a menu item.
 
 	void menuItemSetCheck(brMenuEntry pointer, int).
 
-	The exact effect of adding a check mark to a menu item depends on 
+	The exact effect of adding a check mark to a menu item depends on
 	the frontend implementation.
 */
 
-int brIMenuItemSetCheck(brEval args[], brEval *target, brInstance *i) {
-	brMenuEntry *item = BRMENUENTRYPOINTER(&args[0]);
+int brIMenuItemSetCheck( brEval args[], brEval *target, brInstance *i ) {
+	brMenuEntry *item = BRMENUENTRYPOINTER( &args[0] );
 
-	if (!item) {
-		slMessage(DEBUG_ALL, "menuItemSetCheck called with uninitialized menu item\n");
+	if ( !item ) {
+		slMessage( DEBUG_ALL, "menuItemSetCheck called with uninitialized menu item\n" );
 		return EC_OK;
 	}
 
-	item->checked = BRINT(&args[1]);
+	item->checked = BRINT( &args[1] );
 
-	if (item->instance && i->engine->updateMenu)
-		i->engine->updateMenu(item->instance);
+	if ( item->instance && i->engine->updateMenu )
+		i->engine->updateMenu( item->instance );
 
 	return EC_OK;
 }
@@ -83,31 +83,31 @@ int brIMenuItemSetCheck(brEval args[], brEval *target, brInstance *i) {
 
 	void menuItemSetEnabled(brMenuEntry pointer, int).
 
-	The exact effect of enabled or disabling a menu item depends on the 
+	The exact effect of enabled or disabling a menu item depends on the
 	frontend implementation.  Some implementations may gray out the menu
 	item, while others remove it from the menu completely.
 */
 
-int brIMenuItemSetEnabled(brEval args[], brEval *target, brInstance *i) {
-	brMenuEntry *item = BRMENUENTRYPOINTER(&args[0]);
+int brIMenuItemSetEnabled( brEval args[], brEval *target, brInstance *i ) {
+	brMenuEntry *item = BRMENUENTRYPOINTER( &args[0] );
 
-	if (!item) {
-		slMessage(DEBUG_ALL, "enableMenuItem called with uninitialized menu item\n");
+	if ( !item ) {
+		slMessage( DEBUG_ALL, "enableMenuItem called with uninitialized menu item\n" );
 		return EC_OK;
 	}
 
-	item->enabled = BRINT(&args[1]);
+	item->enabled = BRINT( &args[1] );
 
-	if (item->instance && i->engine->updateMenu)
-		i->engine->updateMenu(item->instance);
+	if ( item->instance && i->engine->updateMenu )
+		i->engine->updateMenu( item->instance );
 
 	return EC_OK;
 }
 
 /*@}*/
 
-void breveInitMenuFunctions(brNamespace *n) {
-    brNewBreveCall(n, "menuItemNew", brIMenuItemNew, AT_POINTER, AT_INSTANCE, AT_STRING, AT_STRING, 0);
-    brNewBreveCall(n, "menuItemSetEnabled", brIMenuItemSetEnabled, AT_NULL, AT_POINTER, AT_INT, 0);
-    brNewBreveCall(n, "menuItemSetCheck", brIMenuItemSetCheck, AT_NULL, AT_POINTER, AT_INT, 0);
+void breveInitMenuFunctions( brNamespace *n ) {
+	brNewBreveCall( n, "menuItemNew", brIMenuItemNew, AT_POINTER, AT_INSTANCE, AT_STRING, AT_STRING, 0 );
+	brNewBreveCall( n, "menuItemSetEnabled", brIMenuItemSetEnabled, AT_NULL, AT_POINTER, AT_INT, 0 );
+	brNewBreveCall( n, "menuItemSetCheck", brIMenuItemSetCheck, AT_NULL, AT_POINTER, AT_INT, 0 );
 }

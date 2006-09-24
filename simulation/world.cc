@@ -20,7 +20,7 @@
 
 int gPhysicsError;
 char *gPhysicsErrorMessage;
- 
+
 #include "simulation.h"
 #include "world.h"
 #include "tiger.h"
@@ -31,34 +31,37 @@ char *gPhysicsErrorMessage;
 #include "vclipData.h"
 #include "gldraw.h"
 
-void *operator new (size_t size) {
-	// void *p = calloc(1, size); 
-	void *p = malloc( size ); 
+void *operator new( size_t size ) {
+	// void *p = calloc(1, size);
+	void *p = malloc( size );
 
- 	if ( p == NULL ) {
+	if ( p == NULL ) {
 		fprintf( stderr, "Error: memory allocation failed.  Catastrophic failure seems inevitable.\n" );
 		slMessage( DEBUG_ALL, "Error: memory allocation failed.  Catastrophic failure seems inevitable.\n" );
-		throw std::bad_alloc(); 
+		throw std::bad_alloc();
 	}
- 
- 	return p;
+
+	memset( p, 0x5f, size );
+
+	return p;
 }
 
-void operator delete (void *p) {
-	free( p ); 
+void operator delete( void *p ) {
+	free( p );
 }
 
-void slODEErrorHandler(int errnum, const char *msg, va_list ap) {
+void slODEErrorHandler( int errnum, const char *msg, va_list ap ) {
 	static char error[2048];
 
-	vsnprintf(error, 2047, msg, ap);
-	gPhysicsErrorMessage = (char*)error;	
+	vsnprintf( error, 2047, msg, ap );
+
+	gPhysicsErrorMessage = ( char* )error;
 
 	slMessage( DEBUG_WARN, "ODE Engine message: %s\n", error );
 }
 
-/*!
-	\brief Creates a new empty world.	
+/**
+	\brief Creates a new empty world.
 */
 
 slWorld::slWorld() {
@@ -71,11 +74,11 @@ slWorld::slWorld() {
 
 	_odeWorldID = dWorldCreate();
 	dWorldSetQuickStepNumIterations( _odeWorldID, 60 );
-	
-	dWorldSetCFM ( _odeWorldID, 1e-6 );
+
+	dWorldSetCFM( _odeWorldID, 1e-6 );
 	dWorldSetERP( _odeWorldID, 0.1 );
-	dSetErrorHandler(slODEErrorHandler);
-	dSetMessageHandler(slODEErrorHandler);
+	dSetErrorHandler( slODEErrorHandler );
+	dSetMessageHandler( slODEErrorHandler );
 
 	_odeCollisionGroupID = dJointGroupCreate( 0 );
 	_odeJointGroupID = dJointGroupCreate( 0 );
@@ -115,18 +118,19 @@ slWorld::slWorld() {
 
 	gisData = NULL;
 
-	slVectorSet(&g, 0.0, -9.81, 0.0);
+	slVectorSet( &g, 0.0, -9.81, 0.0 );
 
 	setGravity( &g );
 }
 
-slGISData *slWorldLoadTigerFile(slWorld *w, char *f, slTerrain *t) {
-	w->gisData = new slGISData(f, t);
+slGISData *slWorldLoadTigerFile( slWorld *w, char *f, slTerrain *t ) {
+
+	w->gisData = new slGISData( f, t );
 
 	return w->gisData;
 }
 
-/*!
+/**
 	\brief Startup a netsim server.
 */
 
@@ -143,13 +147,16 @@ int slWorld::startNetsimServer() {
 		return -1;
 
 	return 0;
-#else 
-	slMessage(DEBUG_ALL, "error: cannot start netsim server -- not compiled with enet support\n");
+
+#else
+	slMessage( DEBUG_ALL, "error: cannot start netsim server -- not compiled with enet support\n" );
+
 	return -1;
+
 #endif
 }
 
-/*!
+/**
 	\brief Startup as a netsim slave.
 */
 
@@ -167,14 +174,16 @@ int slWorld::startNetsimSlave( char *host ) {
 		return -1;
 
 	return 0;
+
 #else
-	slMessage(DEBUG_ALL, "error: cannot start netsim slave -- not compiled with enet support\n");
+	slMessage( DEBUG_ALL, "error: cannot start netsim slave -- not compiled with enet support\n" );
 
 	return -1;
+
 #endif
 }
 
-/*!  
+/**
 	\brief frees an slWorld object, including all of its objects and its clipData.
 */
 
@@ -182,24 +191,29 @@ slWorld::~slWorld() {
 	std::vector<slWorldObject*>::iterator wi;
 	std::vector<slPatchGrid*>::iterator pi;
 
-	for( wi = _objects.begin(); wi != _objects.end(); wi++ ) delete *wi;
-	for( pi = _patches.begin(); pi != _patches.end(); pi++ ) delete *pi;
+	for ( wi = _objects.begin(); wi != _objects.end(); wi++ ) delete *wi;
 
-	if( _clipData ) delete _clipData;
-	if( _proximityData ) delete _proximityData;
+	for ( pi = _patches.begin(); pi != _patches.end(); pi++ ) delete *pi;
+
+	if ( _clipData ) delete _clipData;
+
+	if ( _proximityData ) delete _proximityData;
 
 	dWorldDestroy( _odeWorldID );
+
 	dJointGroupDestroy( _odeCollisionGroupID );
+
 	dJointGroupDestroy( _odeJointGroupID );
 
 #if HAS_LIBENET
 	if ( _netsimData.server ) enet_deinitialize();
+
 #endif
 
 	slFreeIntegrationVectors( this );
 }
 
-/*!
+/**
 	\brief Adds a camera to the world.
 */
 
@@ -207,7 +221,7 @@ void slWorld::addCamera( slCamera *camera ) {
 	_cameras.push_back( camera );
 }
 
-/*!
+/**
 	\brief Removes a camera from the world.
 */
 
@@ -216,33 +230,33 @@ void slWorld::removeCamera( slCamera *camera ) {
 
 	ci = std::find( _cameras.begin(), _cameras.end(), camera );
 
-	_cameras.erase(ci);
+	_cameras.erase( ci );
 }
 
-/*!
+/**
 	\brief Renders all of the cameras in the world .
 */
 
 void slWorld::renderCameras() {
 	std::vector<slCamera*>::iterator ci;
 
-	for( ci = _cameras.begin(); ci != _cameras.end(); ci++ )
+	for ( ci = _cameras.begin(); ci != _cameras.end(); ci++ )
 		( *ci )->renderWorld( this, 0, 1 );
 }
 
-/*!
-	\brief Adds an object to the world.
-*/
+/**
+ * Adds an object to the world.
+ */
 
-slWorldObject *slWorld::addObject( slWorldObject *no ) {
-	_objects.push_back(no);
+slWorldObject *slWorld::addObject( slWorldObject *inObject ) {
+	_objects.push_back( inObject );
 
-	_initialized = 0;
+	_initialized = false;
 
-	return no;
+	return inObject;
 }
 
-/*!
+/**
 	\brief Removes an object from the world.
 */
 
@@ -251,17 +265,26 @@ void slWorld::removeObject( slWorldObject *p ) {
 
 	wi = std::find( _objects.begin(), _objects.end(), p );
 
-	if( wi != _objects.end() ) {
-		_objects.erase( wi );
-		_initialized = 0;
+	if ( wi != _objects.end() ) *wi = NULL;
+}
+
+void slWorld::removeEmptyObjects( ) {
+	for( unsigned int i = 0; i < _objects.size(); i++ ) {
+		// UGLY!
+
+		if( _objects[ i ] == NULL ) {
+			_objects.erase( _objects.begin() + i );
+			_initialized = false;
+			i--;
+		}
 	}
 }
 
 slPatchGrid *slWorld::addPatchGrid( slVector *center, slVector *patchSize, int x, int y, int z ) {
 
 	slPatchGrid *g = new slPatchGrid( center, patchSize, x, y, z );
-    
-	_patches.push_back(g);
+
+	_patches.push_back( g );
 
 	return g;
 }
@@ -271,22 +294,22 @@ void slWorld::removePatchGrid( slPatchGrid *g ) {
 
 	pi = std::find( _patches.begin(), _patches.end(), g );
 
-	if( pi != _patches.end() ) {
-        delete *pi;
-        _patches.erase(pi);
+	if ( pi != _patches.end() ) {
+		delete *pi;
+		_patches.erase( pi );
 		_initialized = 0;
 	}
 }
 
-/*!
+/**
 	\brief Creates a new stationary object.
 */
 
-slStationary::slStationary(slShape *s, slVector *loc, double rot[3][3], void *data) {
+slStationary::slStationary( slShape *s, slVector *loc, double rot[3][3], void *data ) {
 	_type = WO_STATIONARY;
 
 	s->_referenceCount++;
- 
+
 	_shape = s;
 	_userData = data;
 
@@ -294,7 +317,7 @@ slStationary::slStationary(slShape *s, slVector *loc, double rot[3][3], void *da
 	slMatrixCopy( rot,  _position.rotation );
 }
 
-/*!
+/**
 	\brief Runs the world for deltaT seconds, in steps of the given size.
 
 	Makes repeated calls to \ref slWorldStep to step the world forward
@@ -304,21 +327,25 @@ slStationary::slStationary(slShape *s, slVector *loc, double rot[3][3], void *da
 double slWorld::runWorld( double deltaT, double timestep, int *error ) {
 	double total = 0.0;
 #if HAVE_LIBENET
+
 	static int lastSecond = 0;
+
 #endif
+
+	removeEmptyObjects();
 
 	*error = 0;
 
 	if ( !_initialized ) slVclipDataInit( this );
 
-	while ( total < deltaT && !*error ) 
+	while ( total < deltaT && !*error )
 		total += step( timestep, error );
 
 	_age += total;
 
 #if HAVE_LIBENET
-	if ( _netsimData.server && _netsimData.isMaster && (int)_age >= lastSecond) {
-		lastSecond = (int)_age + 1;
+	if ( _netsimData.server && _netsimData.isMaster && ( int )_age >= lastSecond ) {
+		lastSecond = ( int )_age + 1;
 
 		slNetsimBroadcastSyncMessage( _netsimData.server, _age );
 	}
@@ -339,12 +366,13 @@ double slWorld::runWorld( double deltaT, double timestep, int *error ) {
 
 		slNetsimSendBoundsMessage( _netsimClient, &min, &max );
 	}
+
 #endif
 
 	return total;
 }
 
-/*!
+/**
 	\brief Takes a single simulation step.
 */
 
@@ -354,18 +382,18 @@ double slWorld::step( double stepSize, int *error ) {
 	std::vector<slObjectConnection*>::iterator li;
 	int result;
 
-	for( wi = _objects.begin(); wi != _objects.end(); wi++ ) {
+	for ( wi = _objects.begin(); wi != _objects.end(); wi++ ) {
 		simulate += ( *wi )->isSimulated();
 		( *wi )->step( this, stepSize );
 	}
 
-	for(li = _connections.begin(); li != _connections.end(); li++ ) 
-		(*li)->step(stepSize);
+	for ( li = _connections.begin(); li != _connections.end(); li++ )
+		( *li )->step( stepSize );
 
-	if( _detectCollisions ) {
-		if( !_initialized ) slVclipDataInit( this );
+	if ( _detectCollisions ) {
+		if ( !_initialized ) slVclipDataInit( this );
 
-		if( _clipGrid ) {
+		if ( _clipGrid ) {
 			_clipGrid->assignObjectsToPatches( this );
 			result = 0;
 		} else {
@@ -373,50 +401,51 @@ double slWorld::step( double stepSize, int *error ) {
 			result = _clipData->clip( 0.0, 0, _boundingBoxOnlyCollisions );
 		}
 
-		if(result == -1) {
-			slMessage(DEBUG_ALL, "warning: error in vclip\n");
-			(*error)++;
+		if ( result == -1 ) {
+			slMessage( DEBUG_ALL, "warning: error in vclip\n" );
+			( *error )++;
 			return 0;
 		}
-	
-		unsigned int cn;	
 
-		for(cn = 0; cn < _clipData->collisionCount; cn++ ) {
+		unsigned int cn;
+
+		for ( cn = 0; cn < _clipData->collisionCount; cn++ ) {
 			slCollision *c = &_clipData->collisions[ cn];
 			slWorldObject *w1;
 			slWorldObject *w2;
 			slPairFlags *flags;
 			unsigned int x;
 
-			w1 = _objects[c->n1];
-			w2 = _objects[c->n2];
+			w1 = _objects[ c->n1 ];
+			w2 = _objects[ c->n2 ];
 
 			flags = slVclipPairFlags( _clipData, c->n1, c->n2 );
 
-			if(w1 && w2 && (*flags & BT_SIMULATE)) {
+			if ( w1 && w2 && ( *flags & BT_SIMULATE ) ) {
 				dBodyID bodyX = NULL, bodyY = NULL;
 				dJointID id;
 				double mu = 0;
 				double e = 0;
 
-				if( w1->getType() == WO_LINK ) {
-					slLink *l = (slLink*)w1;
+				if ( w1->getType() == WO_LINK ) {
+					slLink *l = ( slLink* )w1;
 					bodyX = l->_odeBodyID;
 				}
-				
-				if( w2->getType() == WO_LINK ) {
-					slLink *l = (slLink*)w2;
+
+				if ( w2->getType() == WO_LINK ) {
+					slLink *l = ( slLink* )w2;
 					bodyY = l->_odeBodyID;
 				}
 
 				mu = 1.0 + ( w1->_mu + w2->_mu ) / 2.0;
+
 				e = ( w1->_e + w2->_e ) / ( 2.0 * c->points.size() );
 
-				for( x = 0; x < c->points.size(); x++ ) {
+				for ( x = 0; x < c->points.size(); x++ ) {
 					dContact contact;
 
-					memset(&contact, 0, sizeof(dContact));
-					contact.surface.mode = dContactSoftERP|dContactApprox1|dContactBounce;
+					memset( &contact, 0, sizeof( dContact ) );
+					contact.surface.mode = dContactSoftERP | dContactApprox1 | dContactBounce;
 
 					// contact.surface.soft_cfm = 0.01;
 					contact.surface.soft_erp = 0.05;
@@ -425,24 +454,25 @@ double slWorld::step( double stepSize, int *error ) {
 					contact.surface.bounce = e;
 					contact.surface.bounce_vel = 0.05;
 
-					if( w1->getType() == WO_LINK && w2->getType() == WO_LINK ) {
-						slMultibody *mb1 = ((slLink*)w1)->getMultibody();
-						slMultibody *mb2 = ((slLink*)w2)->getMultibody();
+					if ( w1->getType() == WO_LINK && w2->getType() == WO_LINK ) {
+						slMultibody *mb1 = (( slLink* )w1 )->getMultibody();
+						slMultibody *mb2 = (( slLink* )w2 )->getMultibody();
 
-						if(mb1 && mb1 == mb2 && mb1->getCFM() != 0.0) {
-							contact.surface.mode = dContactSoftERP|dContactApprox1|dContactBounce|dContactSoftCFM;
+						if ( mb1 && mb1 == mb2 && mb1->getCFM() != 0.0 ) {
+							contact.surface.mode = dContactSoftERP | dContactApprox1 | dContactBounce | dContactSoftCFM;
 							contact.surface.soft_cfm = mb1->getCFM();
 							contact.surface.soft_erp = mb1->getERP();
 						}
 					}
 
-					if(c->depths[x] < -0.5) {
-						// this is a scenerio we might want to look at... it may indicate 
+					if ( c->depths[x] < -0.5 ) {
+						// this is a scenerio we might want to look at... it may indicate
 						// problems with the collision detection code.
-						slMessage(50, "warning: collision depth = %f for pair (%d, %d)\n", c->depths[x], c->n1, c->n2);
+						slMessage( 50, "warning: collision depth = %f for pair (%d, %d)\n", c->depths[x], c->n1, c->n2 );
 					}
 
 					contact.geom.depth = -c->depths[x];
+
 					contact.geom.g1 = NULL;
 					contact.geom.g2 = NULL;
 
@@ -456,12 +486,12 @@ double slWorld::step( double stepSize, int *error ) {
 					contact.geom.pos[1] = v->y;
 					contact.geom.pos[2] = v->z;
 
-					id = dJointCreateContact(_odeWorldID, _odeCollisionGroupID, &contact);
-					dJointAttach(id, bodyY, bodyX);
+					id = dJointCreateContact( _odeWorldID, _odeCollisionGroupID, &contact );
+					dJointAttach( id, bodyY, bodyX );
 				}
-			} 
+			}
 
-			if( (*flags & BT_CALLBACK) && _collisionCallback && w1 && w2 && (&c->points[x] != NULL) ) {
+			if (( *flags & BT_CALLBACK ) && _collisionCallback && w1 && w2 && c->points.size() > 0 ) {
 				slVector pos;
 				slVector face;
 				pos.x = c->points[0].x;
@@ -470,14 +500,14 @@ double slWorld::step( double stepSize, int *error ) {
 				face.x = c->normal.x;
 				face.y = c->normal.y;
 				face.z = c->normal.z;
-				
+
 				_collisionCallback( w1->getCallbackData(), w2->getCallbackData(), CC_NORMAL, &pos, &face );
 			}
 		}
 	}
 
-	if(simulate != 0) {
-		if( _odeStepMode == 0 ) {
+	if ( simulate != 0 ) {
+		if ( _odeStepMode == 0 ) {
 			dWorldStep( _odeWorldID, stepSize );
 		} else {
 			dWorldQuickStep( _odeWorldID, stepSize );
@@ -485,8 +515,10 @@ double slWorld::step( double stepSize, int *error ) {
 
 		dJointGroupEmpty( _odeCollisionGroupID );
 
-		if(gPhysicsError) (*error)++;
+		if ( gPhysicsError )( *error )++;
 	}
+
+	removeEmptyObjects();
 
 	return stepSize;
 }
@@ -497,19 +529,19 @@ void slWorld::updateNeighbors() {
 	slWorldObject *o1, *o2;
 	std::vector<slWorldObject*>::iterator wi;
 
-	if( !_initialized ) slVclipDataInit( this );
+	if ( !_initialized ) slVclipDataInit( this );
 
-	if( !_proximityData ) {
+	if ( !_proximityData ) {
 		_proximityData = new slVclipData();
 		_proximityData->realloc( _objects.size() );
 		slInitProximityData( this );
 		slInitBoundSort( _proximityData );
-		_proximityData->clip(0.0, 1, 0);
+		_proximityData->clip( 0.0, 1, 0 );
 	}
 
-	// update all the bounding boxes first 
+	// update all the bounding boxes first
 
-	for(wi = _objects.begin(); wi != _objects.end(); wi++ ) {
+	for ( wi = _objects.begin(); wi != _objects.end(); wi++ ) {
 		slWorldObject *wo = *wi;
 		location = &wo->_position.location;
 
@@ -523,27 +555,27 @@ void slWorld::updateNeighbors() {
 		wo->_neighborData.clear();
 	}
 
-	// vclip, but stop after the pruning stage 
+	// vclip, but stop after the pruning stage
 
 	_proximityData->pruneAndSweep();
 
 	std::map< slPairFlags* , slCollisionCandidate >::iterator ci;
 
-	for( ci = _proximityData->candidates.begin(); ci != _proximityData->candidates.end(); ci++ ) {
+	for ( ci = _proximityData->candidates.begin(); ci != _proximityData->candidates.end(); ci++ ) {
 		slCollisionCandidate c = ci->second;
 
 		o1 = _objects[c._x];
 		o2 = _objects[c._y];
 
 		slVectorSub( &o1->_position.location, &o2->_position.location, &diff );
-		dist = slVectorLength(&diff);
+		dist = slVectorLength( &diff );
 
-		if( dist < o1->_proximityRadius ) {
+		if ( dist < o1->_proximityRadius ) {
 			o1->_neighbors.push_back( o2 );
 			o1->_neighborData.push_back( o2->getCallbackData() );
 		}
 
-		if( dist < o2->_proximityRadius ) {
+		if ( dist < o2->_proximityRadius ) {
 			o2->_neighbors.push_back( o1 );
 			o2->_neighborData.push_back( o1->getCallbackData() );
 		}
@@ -557,14 +589,17 @@ void slWorld::setGravity( slVector *gravity ) {
 slObjectLine *slWorld::addObjectLine( slWorldObject *src, slWorldObject *dst, int stipple, slVector *color ) {
 	slObjectLine *line;
 
-	if(src == dst) return NULL;
+	if ( src == dst ) return NULL;
 
 	line = new slObjectLine;
 
 	line->_stipple = stipple;
+
 	line->_dst = dst;
+
 	line->_src = src;
-	slVectorCopy(color, &line->_color);
+
+	slVectorCopy( color, &line->_color );
 
 	addConnection( line );
 
@@ -572,34 +607,36 @@ slObjectLine *slWorld::addObjectLine( slWorldObject *src, slWorldObject *dst, in
 }
 
 void slWorld::addConnection( slObjectConnection *c ) {
-	_connections.push_back( c);
-	c->_src->_connections.push_back( c);
-	c->_dst->_connections.push_back( c);
+	_connections.push_back( c );
+	c->_src->_connections.push_back( c );
+	c->_dst->_connections.push_back( c );
 }
 
 void slWorld::removeConnection( slObjectConnection *c ) {
 	std::vector<slObjectConnection*>::iterator li;
 
-	if( !c ) return;
+	if ( !c ) return;
 
-	if( c->_src ) {
+	if ( c->_src ) {
 		li = std::find( c->_src->_connections.begin(), c->_src->_connections.end(), c );
-		if( li != c->_src->_connections.end() ) c->_src->_connections.erase( li );
+
+		if ( li != c->_src->_connections.end() ) c->_src->_connections.erase( li );
 	}
 
-	if( c->_dst ) {
+	if ( c->_dst ) {
 		li = std::find( c->_dst->_connections.begin(), c->_dst->_connections.end(), c );
-		if( li != c->_dst->_connections.end() ) c->_dst->_connections.erase( li );
+
+		if ( li != c->_dst->_connections.end() ) c->_dst->_connections.erase( li );
 	}
 
 	li = std::find( _connections.begin(), _connections.end(), c );
 
-	if( li != _connections.end() ) _connections.erase( li );
+	if ( li != _connections.end() ) _connections.erase( li );
 
 	delete c;
 }
 
-/*!
+/**
 	\brief Returns the age of the world.
 */
 
@@ -607,7 +644,7 @@ double slWorld::getAge() {
 	return _age;
 }
 
-/*!
+/**
 	\brief Sets the age of the world.
 */
 
@@ -615,7 +652,7 @@ void slWorld::setAge( double a ) {
 	_age = a;
 }
 
-/*!
+/**
 	\brief Sets the collision detection structures as uninitialized.
 */
 
@@ -623,7 +660,7 @@ void slWorld::setUninitialized() {
 	_initialized = 0;
 }
 
-/*!
+/**
 	\brief Sets collision resolution on or off.
 */
 
@@ -632,7 +669,7 @@ void slWorld::setCollisionResolution( bool n ) {
 }
 
 void slWorld::setBoundsOnlyCollisionDetection( bool b ) {
-    _boundingBoxOnlyCollisions = b;
+	_boundingBoxOnlyCollisions = b;
 }
 
 void slWorld::setPhysicsMode( int n ) {
@@ -640,11 +677,11 @@ void slWorld::setPhysicsMode( int n ) {
 }
 
 void slWorld::setBackgroundColor( slVector *v ) {
-	slVectorCopy(v, &backgroundColor);
+	slVectorCopy( v, &backgroundColor );
 }
 
 void slWorld::setBackgroundTextureColor( slVector *v ) {
-	slVectorCopy(v, &backgroundTextureColor);
+	slVectorCopy( v, &backgroundTextureColor );
 }
 
 void slWorld::setBackgroundTexture( int n, int mode ) {
@@ -653,13 +690,13 @@ void slWorld::setBackgroundTexture( int n, int mode ) {
 }
 
 
-void slWorld::setCollisionCallbacks( int (*check)(void*, void*, int t), void (*collide)(void*, void*, int t, slVector*, slVector*)) {
+void slWorld::setCollisionCallbacks( int( *check )( void*, void*, int t ), void( *collide )( void*, void*, int t, slVector*, slVector* ) ) {
 	_collisionCallback = collide;
 	_collisionCheckCallback = check;
 }
 
 slWorldObject *slWorld::getObject( unsigned int n ) {
-	if( n > _objects.size() ) return NULL;
+	if ( n > _objects.size() ) return NULL;
 
 	return _objects[n];
 }

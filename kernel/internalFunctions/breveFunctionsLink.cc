@@ -32,7 +32,7 @@
 	slLink pointer linkNew().
 */
 
-int brILinkNew(brEval args[], brEval *target, brInstance *i) {
+int brILinkNew( brEval args[], brEval *target, brInstance *i ) {
 	slLink *l;
 
 	l = new slLink( i->engine->world );
@@ -50,8 +50,9 @@ int brILinkNew(brEval args[], brEval *target, brInstance *i) {
 	slWorldObject pointer linkAddToWorld(slLink pointer).
 */
 
-int brILinkAddToWorld(brEval args[], brEval *target, brInstance *i) {
-	target->set( i->engine->world->addObject( BRLINKPOINTER(&args[0]) ) );
+int brILinkAddToWorld( brEval args[], brEval *target, brInstance *i ) {
+
+	target->set( i->engine->world->addObject( BRLINKPOINTER( &args[0] ) ) );
 
 	return EC_OK;
 }
@@ -62,11 +63,11 @@ int brILinkAddToWorld(brEval args[], brEval *target, brInstance *i) {
 	void linkSetShape(slLink pointer, slShape pointer).
 */
 
-int brILinkSetShape(brEval args[], brEval *target, brInstance *i) {
-	slLink *l = BRLINKPOINTER(&args[0]);
-	slShape *s = (slShape*)BRPOINTER(&args[1]);
+int brILinkSetShape( brEval args[], brEval *target, brInstance *i ) {
+	slLink *l = BRLINKPOINTER( &args[0] );
+	slShape *s = ( slShape* )BRPOINTER( &args[1] );
 
-	l->setShape(s);
+	l->setShape( s );
 
 	return EC_OK;
 }
@@ -77,11 +78,11 @@ int brILinkSetShape(brEval args[], brEval *target, brInstance *i) {
 	void linkSetLocation(slLink pointer, vector).
 */
 
-int brILinkSetLocation(brEval args[], brEval *target, brInstance *i) {
-	slLink *l = BRLINKPOINTER(&args[0]);
-	slVector *v = &BRVECTOR(&args[1]);
+int brILinkSetLocation( brEval args[], brEval *target, brInstance *i ) {
+	slLink *l = BRLINKPOINTER( &args[0] );
+	slVector *v = &BRVECTOR( &args[1] );
 
-	l->setLocation(v);
+	l->setLocation( v );
 
 	return EC_OK;
 }
@@ -92,10 +93,10 @@ int brILinkSetLocation(brEval args[], brEval *target, brInstance *i) {
 	void linkSetRotationMatrix(slLink pointer, matrix).
 */
 
-int brILinkSetRotationMatrix(brEval args[], brEval *target, brInstance *i) {
-	slLink *l = BRLINKPOINTER(&args[0]);
+int brILinkSetRotationMatrix( brEval args[], brEval *target, brInstance *i ) {
+	slLink *l = BRLINKPOINTER( &args[0] );
 
-	l->setRotation( BRMATRIX(&args[1]) );
+	l->setRotation( BRMATRIX( &args[1] ) );
 
 	return EC_OK;
 }
@@ -106,14 +107,14 @@ int brILinkSetRotationMatrix(brEval args[], brEval *target, brInstance *i) {
 	void linkSetRotation(slLink pointer, vector, double).
 */
 
-int brILinkSetRotation(brEval args[], brEval *target, brInstance *i) {
-	slLink *l = BRLINKPOINTER(&args[0]);
-	slVector *v = &BRVECTOR(&args[1]);
-	double len = BRDOUBLE(&args[2]);
+int brILinkSetRotation( brEval args[], brEval *target, brInstance *i ) {
+	slLink *l = BRLINKPOINTER( &args[0] );
+	slVector *v = &BRVECTOR( &args[1] );
+	double len = BRDOUBLE( &args[2] );
 	double m[3][3];
 
-	slRotationMatrix(v, len, m);
-	l->setRotation(m);
+	slRotationMatrix( v, len, m );
+	l->setRotation( m );
 
 	return EC_OK;
 }
@@ -124,10 +125,10 @@ int brILinkSetRotation(brEval args[], brEval *target, brInstance *i) {
 	void linkRotateRelative(slLink pointer, vector, double).
 */
 
-int brILinkRotateRelative(brEval args[], brEval *target, brInstance *i) {
-	slLink *l = BRLINKPOINTER(&args[0]);
-	slVector *v = &BRVECTOR(&args[1]);
-	double len = BRDOUBLE(&args[2]);
+int brILinkRotateRelative( brEval args[], brEval *target, brInstance *i ) {
+	slLink *l = BRLINKPOINTER( &args[0] );
+	slVector *v = &BRVECTOR( &args[1] );
+	double len = BRDOUBLE( &args[2] );
 	double m[3][3], nm[3][3];
 
 	slRotationMatrix( v, len, m );
@@ -145,8 +146,8 @@ int brILinkRotateRelative(brEval args[], brEval *target, brInstance *i) {
 	vector linkGetLocation(slLink pointer).
 */
 
-int brILinkGetLocation(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]); 
+int brILinkGetLocation( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
 
 	target->set( link->getPosition().location );
 
@@ -159,8 +160,8 @@ int brILinkGetLocation(brEval args[], brEval *target, brInstance *i) {
 	matrix linkGetRotation(slLink pointer).
 */
 
-int brILinkGetRotation(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]); 
+int brILinkGetRotation( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
 
 	target->set( link->getPosition().rotation );
 
@@ -173,26 +174,27 @@ int brILinkGetRotation(brEval args[], brEval *target, brInstance *i) {
 	void linkSetVelocity(slLink pointer, vector).
 */
 
-int brILinkSetVelocity(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
-	slVector *vl = &BRVECTOR(&args[1]);
+int brILinkSetVelocity( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
+	slVector *vl = &BRVECTOR( &args[1] );
 
-	link->setVelocity(vl, NULL);
+	link->setVelocity( vl, NULL );
 
 	return EC_OK;
 }
+
 /*!
 	\brief Turns physical simulation on or off for a body.
 
 	void linkSetPhysics(slLink pointer body, int state).
 */
 
-int brILinkSetPhysics(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
-	
-	if (BRINT(&args[1])) link->enableSimulation();
+int brILinkSetPhysics( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
+
+	if ( BRINT( &args[1] ) ) link->enableSimulation();
 	else link->disableSimulation();
-	
+
 	return EC_OK;
 }
 
@@ -202,11 +204,11 @@ int brILinkSetPhysics(brEval args[], brEval *target, brInstance *i) {
 	void linkSetRotationalVelocity(slLink pointer, vector).
 */
 
-int brILinkSetRotationalVelocity(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
-	slVector *vl = &BRVECTOR(&args[1]);
+int brILinkSetRotationalVelocity( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
+	slVector *vl = &BRVECTOR( &args[1] );
 
-	link->setVelocity(NULL, vl);
+	link->setVelocity( NULL, vl );
 
 	return EC_OK;
 }
@@ -217,31 +219,31 @@ int brILinkSetRotationalVelocity(brEval args[], brEval *target, brInstance *i) {
 	void linkSetAcceleration(slLink pointer, vector).
 */
 
-int brILinkSetAcceleration(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
-	slVector *v = &BRVECTOR(&args[1]);
- 
-	link->setAcceleration(v, NULL);
- 
+int brILinkSetAcceleration( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
+	slVector *v = &BRVECTOR( &args[1] );
+
+	link->setAcceleration( v, NULL );
+
 	return EC_OK;
 }
- 
+
 /*!
 	\brief Gets the linear acceleration of a link.
 
 	vector linkGetAcceleration(slLink pointer).
 */
 
-int brILinkGetAcceleration(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
+int brILinkGetAcceleration( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
 	slVector v;
 
-	link->getAcceleration(&v, NULL);
+	link->getAcceleration( &v, NULL );
 
 	target->set( v );
 
 	return EC_OK;
-}   
+}
 
 /*!
 	\brief Sets the rotational acceleration of a link.
@@ -249,12 +251,12 @@ int brILinkGetAcceleration(brEval args[], brEval *target, brInstance *i) {
 	void linkSetRotationalAcceleration(slLink pointer, vector).
 */
 
-int brILinkSetRotationalAcceleration(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
-	slVector *v = &BRVECTOR(&args[1]);
- 
+int brILinkSetRotationalAcceleration( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
+	slVector *v = &BRVECTOR( &args[1] );
+
 	link->setAcceleration( NULL, v );
- 
+
 	return EC_OK;
 }
 
@@ -264,8 +266,8 @@ int brILinkSetRotationalAcceleration(brEval args[], brEval *target, brInstance *
 	void linkGetVelocity(slLink pointer).
 */
 
-int brILinkGetVelocity(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
+int brILinkGetVelocity( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
 	slVector v;
 
 	link->getVelocity( &v, NULL );
@@ -281,10 +283,10 @@ int brILinkGetVelocity(brEval args[], brEval *target, brInstance *i) {
 	void linkGetVelocity(slLink pointer).
 */
 
-int brILinkGetRotationalVelocity(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
+int brILinkGetRotationalVelocity( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
 	slVector v;
-	
+
 	link->getVelocity( NULL, &v );
 
 	target->set( v );
@@ -298,8 +300,8 @@ int brILinkGetRotationalVelocity(brEval args[], brEval *target, brInstance *i) {
 	linkSetForce(slLink pointer, vector).
 */
 
-int brILinkSetForce(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
+int brILinkSetForce( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
 
 	link->setForce( &BRVECTOR( &args[1] ) );
 
@@ -314,12 +316,12 @@ int brILinkSetForce(brEval args[], brEval *target, brInstance *i) {
 	Returns NULL if the link is not connected to a multibody.
 */
 
-int brILinkGetMultibody(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
+int brILinkGetMultibody( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
 	slMultibody *mb;
 
-	if ((mb = link->getMultibody())) target->set( (brInstance*)mb->getCallbackData() );
-	else target->set( (brInstance*)NULL );
+	if (( mb = link->getMultibody() ) ) target->set(( brInstance* )mb->getCallbackData() );
+	else target->set(( brInstance* )NULL );
 
 	return EC_OK;
 }
@@ -330,8 +332,8 @@ int brILinkGetMultibody(brEval args[], brEval *target, brInstance *i) {
 	void linkSetTorque(slLink pointer, vector).
 */
 
-int brILinkSetTorque(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
+int brILinkSetTorque( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
 
 	link->setTorque( &BRVECTOR( &args[1] ) );
 
@@ -344,22 +346,22 @@ int brILinkSetTorque(brEval args[], brEval *target, brInstance *i) {
 	int linkCheckPenetration(slLink pointer body).
 */
 
-int brILinkGetPenetratingObjects(brEval args[], brEval *target, brInstance *i) { 
-	slLink *l = BRLINKPOINTER(&args[0]);
+int brILinkGetPenetratingObjects( brEval args[], brEval *target, brInstance *i ) {
+	slLink *l = BRLINKPOINTER( &args[0] );
 	std::vector< void* > penetrations;
 	brEvalListHead *head;
 	brEval object;
 	unsigned int n;
 
-	head = new brEvalListHead(); 
+	head = new brEvalListHead();
 
-	penetrations = l->userDataForPenetratingObjects(i->engine->world);
+	penetrations = l->userDataForPenetratingObjects( i->engine->world );
 
-	for(n = 0; n < penetrations.size(); n++) {
-		object.set( (brInstance*)penetrations[ n] );
-		brEvalListInsert(head, n, &object);
+	for ( n = 0; n < penetrations.size(); n++ ) {
+		object.set(( brInstance* )penetrations[ n] );
+		brEvalListInsert( head, n, &object );
 	}
-   
+
 	target->set( head );
 
 	return EC_OK;
@@ -371,11 +373,11 @@ int brILinkGetPenetratingObjects(brEval args[], brEval *target, brInstance *i) {
 	int linkCheckSelfPenetration(slLink pointer body).
 */
 
-int brILinkCheckSelfPenetration(brEval args[], brEval *target, brInstance *i) { 
-	slLink *l = BRLINKPOINTER(&args[0]);
+int brILinkCheckSelfPenetration( brEval args[], brEval *target, brInstance *i ) {
+	slLink *l = BRLINKPOINTER( &args[0] );
 
-	target->set( l->checkSelfPenetration(i->engine->world) );
-   
+	target->set( l->checkSelfPenetration( i->engine->world ) );
+
 	return EC_OK;
 }
 
@@ -387,12 +389,12 @@ int brILinkCheckSelfPenetration(brEval args[], brEval *target, brInstance *i) {
 	vector linkGetMax(slLink pointer link).
 */
 
-int brILinkGetMax(brEval args[], brEval *target, brInstance *i) {
-	slLink *l = BRLINKPOINTER(&args[0]);
+int brILinkGetMax( brEval args[], brEval *target, brInstance *i ) {
+	slLink *l = BRLINKPOINTER( &args[0] );
 	slVector v;
 
-	if(!l) {
-		slMessage(DEBUG_ALL, "linkGetMax() called with uninitialized link\n");
+	if ( !l ) {
+		slMessage( DEBUG_ALL, "linkGetMax() called with uninitialized link\n" );
 		return EC_ERROR;
 	}
 
@@ -411,16 +413,16 @@ int brILinkGetMax(brEval args[], brEval *target, brInstance *i) {
 	vector linkGetMin(slLink pointer link).
 */
 
-int brILinkGetMin(brEval args[], brEval *target, brInstance *i) {
-	slLink *l = BRLINKPOINTER(&args[0]);
+int brILinkGetMin( brEval args[], brEval *target, brInstance *i ) {
+	slLink *l = BRLINKPOINTER( &args[0] );
 	slVector v;
 
-	if(!l) {
-		slMessage(DEBUG_ALL, "linkGetMin() called with uninitialized link\n");
+	if ( !l ) {
+		slMessage( DEBUG_ALL, "linkGetMin() called with uninitialized link\n" );
 		return EC_ERROR;
 	}
 
-	l->getBounds( &v, NULL);
+	l->getBounds( &v, NULL );
 
 	target->set( v );
 
@@ -431,12 +433,12 @@ int brILinkGetMin(brEval args[], brEval *target, brInstance *i) {
 	\brief Sets the texture of this link.
 */
 
-int brILinkSetTexture(brEval args[], brEval *target, brInstance *i) {
-	slLink *m = BRLINKPOINTER(&args[0]);
-	int texture = BRINT(&args[1]);
+int brILinkSetTexture( brEval args[], brEval *target, brInstance *i ) {
+	slLink *m = BRLINKPOINTER( &args[0] );
+	int texture = BRINT( &args[1] );
 
-	if(!m) {
-		slMessage(DEBUG_ALL, "null pointer passed to setColor\n");
+	if ( !m ) {
+		slMessage( DEBUG_ALL, "null pointer passed to setColor\n" );
 		return EC_ERROR;
 	}
 
@@ -447,17 +449,17 @@ int brILinkSetTexture(brEval args[], brEval *target, brInstance *i) {
 
 /*!
  	\brief Transforms a vector in world coordinates to a vector in the link's own coordinate system.
- 
+
 	vector vectorFromLinkPerspective(slMbLink pointer link, vector worldVector).
 */
 
-int brIVectorFromLinkPerspective(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
-	slVector *vector = &BRVECTOR(&args[1]);
+int brIVectorFromLinkPerspective( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
+	slVector *vector = &BRVECTOR( &args[1] );
 	slVector result;
 
-	if(!link) {
-		slMessage(DEBUG_ALL, "vectorFromLinkPerspective called with NULL pointer\n");
+	if ( !link ) {
+		slMessage( DEBUG_ALL, "vectorFromLinkPerspective called with NULL pointer\n" );
 		return EC_ERROR;
 	}
 
@@ -466,7 +468,7 @@ int brIVectorFromLinkPerspective(brEval args[], brEval *target, brInstance *i) {
 	target->set( result );
 
 	return EC_OK;
-} 
+}
 
 /*!
 	\brief Sets the text label from a body.
@@ -474,16 +476,16 @@ int brIVectorFromLinkPerspective(brEval args[], brEval *target, brInstance *i) {
 	void setLabel(slWorldObject pointer body, string label).
 */
 
-int brILinkSetLabel(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
-	char *label = BRSTRING(&args[1]);
+int brILinkSetLabel( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
+	char *label = BRSTRING( &args[1] );
 
-	if (!link || !label) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to linkSetLabel\n");
+	if ( !link || !label ) {
+		slMessage( DEBUG_ALL, "NULL pointer passed to linkSetLabel\n" );
 		return EC_OK;
 	}
 
-	link->setLabel(label);
+	link->setLabel( label );
 
 	return EC_OK;
 }
@@ -494,51 +496,51 @@ int brILinkSetLabel(brEval args[], brEval *target, brInstance *i) {
 	void removeLabel(slWorldObject pointer body).
 */
 
-int brILinkRemoveLabel(brEval args[], brEval *target, brInstance *i) {
-	slLink *link = BRLINKPOINTER(&args[0]);
+int brILinkRemoveLabel( brEval args[], brEval *target, brInstance *i ) {
+	slLink *link = BRLINKPOINTER( &args[0] );
 
-	if(!link) {
-		slMessage(DEBUG_ALL, "NULL pointer passed to linkSetLabel\n");
+	if ( !link ) {
+		slMessage( DEBUG_ALL, "NULL pointer passed to linkSetLabel\n" );
 		return EC_OK;
 	}
 
-	link->setLabel("");
+	link->setLabel( "" );
 
 	return EC_OK;
 }
 
 /*@}*/
 
-void breveInitLinkFunctions(brNamespace *n) {
-	brNewBreveCall(n, "linkSetPhysics", brILinkSetPhysics, AT_NULL, AT_POINTER, AT_INT, 0);
-	brNewBreveCall(n, "linkCheckSelfPenetration", brILinkCheckSelfPenetration, AT_INT, AT_POINTER, 0);
-	brNewBreveCall(n, "linkGetPenetratingObjects", brILinkGetPenetratingObjects, AT_LIST, AT_POINTER, 0);
-	brNewBreveCall(n, "linkGetMax", brILinkGetMax, AT_VECTOR, AT_POINTER, 0);
-	brNewBreveCall(n, "linkGetMin", brILinkGetMin, AT_VECTOR, AT_POINTER, 0);
+void breveInitLinkFunctions( brNamespace *n ) {
+	brNewBreveCall( n, "linkSetPhysics", brILinkSetPhysics, AT_NULL, AT_POINTER, AT_INT, 0 );
+	brNewBreveCall( n, "linkCheckSelfPenetration", brILinkCheckSelfPenetration, AT_INT, AT_POINTER, 0 );
+	brNewBreveCall( n, "linkGetPenetratingObjects", brILinkGetPenetratingObjects, AT_LIST, AT_POINTER, 0 );
+	brNewBreveCall( n, "linkGetMax", brILinkGetMax, AT_VECTOR, AT_POINTER, 0 );
+	brNewBreveCall( n, "linkGetMin", brILinkGetMin, AT_VECTOR, AT_POINTER, 0 );
 
-	brNewBreveCall(n, "linkNew", brILinkNew, AT_POINTER, 0);
-	brNewBreveCall(n, "linkSetShape", brILinkSetShape, AT_NULL, AT_POINTER, AT_POINTER, 0);
-	brNewBreveCall(n, "linkSetLocation", brILinkSetLocation, AT_NULL, AT_POINTER, AT_VECTOR, 0);
-	brNewBreveCall(n, "linkSetRotation", brILinkSetRotation, AT_NULL, AT_POINTER, AT_VECTOR, AT_DOUBLE, 0);
-	brNewBreveCall(n, "linkRotateRelative", brILinkRotateRelative, AT_NULL, AT_POINTER, AT_VECTOR, AT_DOUBLE, 0);
-	brNewBreveCall(n, "linkSetRotationMatrix", brILinkSetRotationMatrix, AT_NULL, AT_POINTER, AT_MATRIX, 0);
-	brNewBreveCall(n, "linkAddToWorld", brILinkAddToWorld, AT_POINTER, AT_POINTER, 0);
-	brNewBreveCall(n, "linkSetAcceleration", brILinkSetAcceleration, AT_NULL, AT_POINTER, AT_VECTOR, 0);
-	brNewBreveCall(n, "linkSetRotationalAcceleration", brILinkSetRotationalAcceleration, AT_NULL, AT_POINTER, AT_VECTOR, 0);
-	brNewBreveCall(n, "linkSetVelocity", brILinkSetVelocity, AT_NULL, AT_POINTER, AT_VECTOR, 0);
-	brNewBreveCall(n, "linkSetRotationalVelocity", brILinkSetRotationalVelocity, AT_NULL, AT_POINTER, AT_VECTOR, 0);
-	brNewBreveCall(n, "linkSetForce", brILinkSetForce, AT_NULL, AT_POINTER, AT_VECTOR, 0);
-	brNewBreveCall(n, "linkSetTorque", brILinkSetTorque, AT_NULL, AT_POINTER, AT_VECTOR, 0);
-	brNewBreveCall(n, "linkGetAcceleration", brILinkGetAcceleration, AT_VECTOR, AT_POINTER, 0);
-	brNewBreveCall(n, "linkGetRotationalVelocity", brILinkGetRotationalVelocity, AT_VECTOR, AT_POINTER, 0);
-	brNewBreveCall(n, "linkGetLocation", brILinkGetLocation, AT_VECTOR, AT_POINTER, 0);
-	brNewBreveCall(n, "linkGetRotation", brILinkGetRotation, AT_MATRIX, AT_POINTER, 0);
-	brNewBreveCall(n, "linkGetVelocity", brILinkGetVelocity, AT_VECTOR, AT_POINTER, 0);
-	brNewBreveCall(n, "linkGetMultibody", brILinkGetMultibody, AT_INSTANCE, AT_POINTER, 0);
-	brNewBreveCall(n, "linkSetTexture", brILinkSetTexture, AT_NULL, AT_POINTER, AT_INT, 0);
+	brNewBreveCall( n, "linkNew", brILinkNew, AT_POINTER, 0 );
+	brNewBreveCall( n, "linkSetShape", brILinkSetShape, AT_NULL, AT_POINTER, AT_POINTER, 0 );
+	brNewBreveCall( n, "linkSetLocation", brILinkSetLocation, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
+	brNewBreveCall( n, "linkSetRotation", brILinkSetRotation, AT_NULL, AT_POINTER, AT_VECTOR, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "linkRotateRelative", brILinkRotateRelative, AT_NULL, AT_POINTER, AT_VECTOR, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "linkSetRotationMatrix", brILinkSetRotationMatrix, AT_NULL, AT_POINTER, AT_MATRIX, 0 );
+	brNewBreveCall( n, "linkAddToWorld", brILinkAddToWorld, AT_POINTER, AT_POINTER, 0 );
+	brNewBreveCall( n, "linkSetAcceleration", brILinkSetAcceleration, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
+	brNewBreveCall( n, "linkSetRotationalAcceleration", brILinkSetRotationalAcceleration, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
+	brNewBreveCall( n, "linkSetVelocity", brILinkSetVelocity, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
+	brNewBreveCall( n, "linkSetRotationalVelocity", brILinkSetRotationalVelocity, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
+	brNewBreveCall( n, "linkSetForce", brILinkSetForce, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
+	brNewBreveCall( n, "linkSetTorque", brILinkSetTorque, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
+	brNewBreveCall( n, "linkGetAcceleration", brILinkGetAcceleration, AT_VECTOR, AT_POINTER, 0 );
+	brNewBreveCall( n, "linkGetRotationalVelocity", brILinkGetRotationalVelocity, AT_VECTOR, AT_POINTER, 0 );
+	brNewBreveCall( n, "linkGetLocation", brILinkGetLocation, AT_VECTOR, AT_POINTER, 0 );
+	brNewBreveCall( n, "linkGetRotation", brILinkGetRotation, AT_MATRIX, AT_POINTER, 0 );
+	brNewBreveCall( n, "linkGetVelocity", brILinkGetVelocity, AT_VECTOR, AT_POINTER, 0 );
+	brNewBreveCall( n, "linkGetMultibody", brILinkGetMultibody, AT_INSTANCE, AT_POINTER, 0 );
+	brNewBreveCall( n, "linkSetTexture", brILinkSetTexture, AT_NULL, AT_POINTER, AT_INT, 0 );
 
-	brNewBreveCall(n, "vectorFromLinkPerspective", brIVectorFromLinkPerspective, AT_VECTOR, AT_POINTER, AT_VECTOR, 0);
+	brNewBreveCall( n, "vectorFromLinkPerspective", brIVectorFromLinkPerspective, AT_VECTOR, AT_POINTER, AT_VECTOR, 0 );
 
-	brNewBreveCall(n, "linkSetLabel", brILinkSetLabel, AT_NULL, AT_POINTER, AT_STRING, 0);
-	brNewBreveCall(n, "linkRemoveLabel", brILinkRemoveLabel, AT_NULL, AT_POINTER, 0);
+	brNewBreveCall( n, "linkSetLabel", brILinkSetLabel, AT_NULL, AT_POINTER, AT_STRING, 0 );
+	brNewBreveCall( n, "linkRemoveLabel", brILinkRemoveLabel, AT_NULL, AT_POINTER, 0 );
 }

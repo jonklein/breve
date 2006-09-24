@@ -20,15 +20,15 @@
 
 #include "kernel.h"
 
-/*! 
+/*!
 	+ evalList.c
 	= an brEvalList is a perl style list of brEvals.  this is completely
-	= independent of the "slList" type of the util library.  the point 
+	= independent of the "slList" type of the util library.  the point
 	= here is to have an array of data in which each element can be any
 	= data type.
 	=
-	= unlike the slList type, the brEvalList is referenced by 
-	= a constant "head", a brEvalListHead.  
+	= unlike the slList type, the brEvalList is referenced by
+	= a constant "head", a brEvalListHead.
 	=
 	= evalList.c provides the interface to this data type.
 */
@@ -37,14 +37,13 @@
 	Creates a new brEvalListHead
 */
 
-brEvalListHead::brEvalListHead() : brEvalObject() {
-}
+brEvalListHead::brEvalListHead() : brEvalObject() {}
 
 /*!
 	\brief Frees an eval-list.
 
-	If the eval-list has been retained using \ref brEvalListRetain, 
-	the function has no effect.  If this is the case, then the 
+	If the eval-list has been retained using \ref brEvalListRetain,
+	the function has no effect.  If this is the case, then the
 	eval-list will be freed whenever \ref brEvalListUnretain
 	sets the retain count to 0.
 */
@@ -52,7 +51,7 @@ brEvalListHead::brEvalListHead() : brEvalObject() {
 brEvalListHead::~brEvalListHead() {
 	std::vector< brEval* >::iterator i;
 
-	for( i = _vector.begin(); i != _vector.end(); i++ )
+	for ( i = _vector.begin(); i != _vector.end(); i++ )
 		delete *i;
 }
 
@@ -68,9 +67,9 @@ int brEvalListInsert( brEvalListHead *head, int index, brEval *value ) {
 
 	brEvalCopy( value, newEval );
 
-	if( index > (int)head->_vector.size() ) {
+	if ( index > ( int )head->_vector.size() ) {
 		return EC_ERROR;
-	} else if( index == (int)head->_vector.size() ) {
+	} else if ( index == ( int )head->_vector.size() ) {
 		head->_vector.push_back( newEval );
 	} else {
 		std::vector< brEval* >::iterator i = head->_vector.begin() + index;
@@ -81,11 +80,11 @@ int brEvalListInsert( brEvalListHead *head, int index, brEval *value ) {
 	return EC_OK;
 }
 
-int brEvalListRemove(brEvalListHead *head, int index, brEval *value) {
-	if( index < 0 || index >= (int)head->_vector.size() ) return index;
+int brEvalListRemove( brEvalListHead *head, int index, brEval *value ) {
+	if ( index < 0 || index >= ( int )head->_vector.size() ) return index;
 
 	std::vector< brEval* >::iterator i = head->_vector.begin() + index;
-	
+
 	brEvalCopy( *i, value );
 
 	delete *i;
@@ -96,7 +95,7 @@ int brEvalListRemove(brEvalListHead *head, int index, brEval *value) {
 }
 
 brEval *brEvalListIndexLookup( brEvalListHead *head, int index ) {
-	if( index < 0 || index >= (int)head->_vector.size() ) return NULL;
+	if ( index < 0 || index >= ( int )head->_vector.size() ) return NULL;
 
 	std::vector< brEval* >::iterator i = head->_vector.begin() + index;
 
@@ -109,7 +108,7 @@ brEvalListHead *brEvalListCopy( brEvalListHead *head ) {
 
 	newList = new brEvalListHead();
 
-	for( i = head->_vector.begin(); i != head->_vector.end(); i++ ) {
+	for ( i = head->_vector.begin(); i != head->_vector.end(); i++ ) {
 		brEval *e = new brEval;
 
 		brEvalCopy( *i, e );
@@ -120,42 +119,42 @@ brEvalListHead *brEvalListCopy( brEvalListHead *head ) {
 	return newList;
 }
 
-brEvalListHead *brEvalListDeepCopy(brEvalListHead *l) {
+brEvalListHead *brEvalListDeepCopy( brEvalListHead *l ) {
 	slList *seen = NULL;
 	brEvalListHead *head;
 
-	head = brDoEvalListDeepCopy(l, &seen);
+	head = brDoEvalListDeepCopy( l, &seen );
 
-	if(seen) {
-		brFreeListRecords(seen);
-		slListFree(seen);
+	if ( seen ) {
+		brFreeListRecords( seen );
+		slListFree( seen );
 	}
 
 	return head;
 }
 
-brEvalListHead *brDoEvalListDeepCopy(brEvalListHead *l, slList **s) {
+brEvalListHead *brDoEvalListDeepCopy( brEvalListHead *l, slList **s ) {
 	brEvalListHead *newList;
 	brEval newSubList;
 	std::vector< brEval* >::iterator i;
 
-	// we're now officially copying this list -- all future occurences should 
-	// refer to the copy, so we make a record entry for it 
+	// we're now officially copying this list -- all future occurences should
+	// refer to the copy, so we make a record entry for it
 
 	newList = new brEvalListHead();
 
-	*s = slListPrepend(*s, brMakeListCopyRecord(l, newList));
+	*s = slListPrepend( *s, brMakeListCopyRecord( l, newList ) );
 
-	for( i = l->_vector.begin(); i != l->_vector.end(); i++ ) {
+	for ( i = l->_vector.begin(); i != l->_vector.end(); i++ ) {
 		brEvalListHead *copy;
 
-		// is this a list? have we seen it before? 
+		// is this a list? have we seen it before?
 
-		if( (*i)->type() == AT_LIST ) {
-			copy = brCopyRecordInList(*s, BRLIST( *i ));
+		if (( *i )->type() == AT_LIST ) {
+			copy = brCopyRecordInList( *s, BRLIST( *i ) );
 
-			if(!copy) {
-				newSubList.set( brDoEvalListDeepCopy(BRLIST( *i ), s) );
+			if ( !copy ) {
+				newSubList.set( brDoEvalListDeepCopy( BRLIST( *i ), s ) );
 				brEvalListInsert( newList, newList->_vector.size(), &newSubList );
 			} else {
 				newSubList.set( copy );
@@ -169,7 +168,7 @@ brEvalListHead *brDoEvalListDeepCopy(brEvalListHead *l, slList **s) {
 	return newList;
 }
 
-brEvalListCopyRecord *brMakeListCopyRecord(brEvalListHead *original, brEvalListHead *copy) {
+brEvalListCopyRecord *brMakeListCopyRecord( brEvalListHead *original, brEvalListHead *copy ) {
 	brEvalListCopyRecord *r;
 
 	r = new brEvalListCopyRecord;
@@ -180,13 +179,13 @@ brEvalListCopyRecord *brMakeListCopyRecord(brEvalListHead *original, brEvalListH
 	return r;
 }
 
-brEvalListHead *brCopyRecordInList(slList *recordList, brEvalListHead *search) {
+brEvalListHead *brCopyRecordInList( slList *recordList, brEvalListHead *search ) {
 	brEvalListCopyRecord *r;
 
-	while(recordList) {
-		r = (brEvalListCopyRecord*)recordList->data;
+	while ( recordList ) {
+		r = ( brEvalListCopyRecord* )recordList->data;
 
-		if(r->original == search) return r->copy;
+		if ( r->original == search ) return r->copy;
 
 		recordList = recordList->next;
 	}
@@ -194,9 +193,9 @@ brEvalListHead *brCopyRecordInList(slList *recordList, brEvalListHead *search) {
 	return NULL;
 }
 
-void brFreeListRecords(slList *records) {
-	while(records) {
-		delete (brEvalListCopyRecord*)records->data;
+void brFreeListRecords( slList *records ) {
+	while ( records ) {
+		delete( brEvalListCopyRecord* )records->data;
 		records = records->next;
 	}
 }

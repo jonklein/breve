@@ -30,13 +30,13 @@
 	void setGravity(vector acceleration).
 */
 
-int brIWorldSetGravity(brEval args[], brEval *target, brInstance *i) {
-	slVector *v = &BRVECTOR(&args[0]);
- 
+int brIWorldSetGravity( brEval args[], brEval *target, brInstance *i ) {
+	slVector *v = &BRVECTOR( &args[0] );
+
 	i->engine->world->setGravity( v );
-	
+
 	return EC_OK;
-}   
+}
 
 /*!
 	\brief Generate a rotation matrix from a vector axis and a rotation angle
@@ -45,13 +45,13 @@ int brIWorldSetGravity(brEval args[], brEval *target, brInstance *i) {
 	matrix rotationMatrix(vector axis, double rotation).
 */
 
-int brIRotationMatrix(brEval args[], brEval *target, brInstance *i) {
-	slVector *vector = &BRVECTOR(&args[0]);
-	double rotation = BRDOUBLE(&args[1]);
+int brIRotationMatrix( brEval args[], brEval *target, brInstance *i ) {
+	slVector *vector = &BRVECTOR( &args[0] );
+	double rotation = BRDOUBLE( &args[1] );
 	slMatrix m;
 
 	slRotationMatrix( vector, rotation, m );
-	
+
 	target->set( m );
 
 	return EC_OK;
@@ -63,16 +63,16 @@ int brIRotationMatrix(brEval args[], brEval *target, brInstance *i) {
 	void worldSetCollisionResolution(int state).
 */
 
-int brIWorldSetCollisionResolution(brEval args[], brEval *target, brInstance *i) {
-	i->engine->world->setCollisionResolution( BRINT(&args[0]) );
-	
+int brIWorldSetCollisionResolution( brEval args[], brEval *target, brInstance *i ) {
+	i->engine->world->setCollisionResolution( BRINT( &args[0] ) );
+
 	return EC_OK;
 }
 
 /*@}*/
 
-void breveInitPhysicsFunctions(brNamespace *n) {
-	brNewBreveCall(n, "worldSetCollisionResolution", brIWorldSetCollisionResolution, AT_NULL, AT_INT, 0);
-	brNewBreveCall(n, "worldSetGravity", brIWorldSetGravity, AT_NULL, AT_VECTOR, 0);
-	brNewBreveCall(n, "rotationMatrix", brIRotationMatrix, AT_MATRIX, AT_VECTOR, AT_DOUBLE, 0);
+void breveInitPhysicsFunctions( brNamespace *n ) {
+	brNewBreveCall( n, "worldSetCollisionResolution", brIWorldSetCollisionResolution, AT_NULL, AT_INT, 0 );
+	brNewBreveCall( n, "worldSetGravity", brIWorldSetGravity, AT_NULL, AT_VECTOR, 0 );
+	brNewBreveCall( n, "rotationMatrix", brIRotationMatrix, AT_MATRIX, AT_VECTOR, AT_DOUBLE, 0 );
 }

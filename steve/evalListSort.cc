@@ -22,6 +22,7 @@
 #include "evaluation.h"
 
 class brEvalVectorSorter {
+
 	public:
 		brEvalVectorSorter( stInstance *instance, stMethod *method ) {
 			mInstance = instance;
@@ -31,32 +32,34 @@ class brEvalVectorSorter {
 		bool operator()( const brEval *a, const brEval *b ) {
 			stRunInstance ri;
 			brEval result;
-			brEval *args[ 2 ];
+			const brEval *args[ 2 ];
 			int rcode;
 
 			std::pair< const brEval*, const brEval* > pair( a, b );
 
-			if( mSeenMap.find( pair ) != mSeenMap.end() ) return mSeenMap[ pair ];
+			if ( mSeenMap.find( pair ) != mSeenMap.end() ) return mSeenMap[ pair ];
 
-			args[0] = a;
-			args[1] = b;
+			args[ 0 ] = a;
+			args[ 1 ] = b;
 
 			ri.instance = mInstance;
+
 			ri.type = mInstance->type;
 
 			rcode = stCallMethod( &ri, &ri, mMethod, args, 2, &result );
 
 			if ( result.type() != AT_DOUBLE ) {
-				rcode = stToDouble(&result, &result, &ri);
+				rcode = stToDouble( &result, &result, &ri );
 			}
 
-			mSeenMap[ pair ] = ( BRDOUBLE(&result) < 0.0 );
+			mSeenMap[ pair ] = ( BRDOUBLE( &result ) < 0.0 );
 
 			return mSeenMap[ pair ];
 		};
 
 	private:
 		stInstance *mInstance;
+
 		stMethod *mMethod;
 
 		std::map< std::pair< const brEval*, const brEval* >, bool > mSeenMap;
@@ -74,6 +77,6 @@ int stSortEvalList( brEvalListHead *head, stInstance *caller, stMethod *method )
 	return 1;
 }
 
-int brEvalListCompare(const void *a, const void *b) {
+int brEvalListCompare( const void *a, const void *b ) {
 	return 0;
 }
