@@ -15,7 +15,7 @@ simulation.
 <para> 
 The controller object is the heart and soul of the breve simulation and every 
 object should be able to speak to it.  The class
-<ulink url="../classes/Object.html">Object</ulink>&mdash;and thus all other
+<ulink url="http://www.spiderland.org/documentation/classes/Object.html">Object</ulink>&mdash;and thus all other
 classes ever created in breve&mdash;has a variable called controller which is the 
 simulations controller instance. 
 </para>
@@ -35,8 +35,8 @@ It is frequently desirable to have agents perform some sort of interaction
 when they collide.  The agents might exchange information, fight or 
 reproduce, for example.  In order to specify what happens when a collision
 occurs, use the method 
-<ulink url="../classes/Real.html#handle-collisions">handle-collisions</ulink>
-found in <ulink url="../classes/Real.html">Real.tz</ulink>.  This method
+<ulink url="http://www.spiderland.org/documentation/classes/Real.html#handle-collisions">handle-collisions</ulink>
+found in <ulink url="http://www.spiderland.org/documentation/classes/Real.html">Real.tz</ulink>.  This method
 expects a <function>string</function> method name, which is the method
 that will be invoked when the collision occurs, and a 
 <function>string</function> type, which specifies the class name to set
@@ -107,20 +107,20 @@ case, defined as the distance between the center-points of the objects.
 Setting the neighborhood size is typically done during object 
 initialization, but it may be changed at any time during the simulation.  
 Neighborhood size is set using the method 
-<ulink url="../classes/Real.html#set-neighborhood-size">set-neighborhood-size</ulink> in <ulink url="../classes/Real.html">Real.tz</ulink>.  Real is the parent class of both 
-<ulink url="../classes/Stationary.html">Stationary</ulink> and 
-<ulink url="../classes/Mobile.html">Mobile</ulink> objects, so the method can be used with 
+<ulink url="http://www.spiderland.org/documentation/classes/Real.html#set-neighborhood-size">set-neighborhood-size</ulink> in <ulink url="http://www.spiderland.org/documentation/classes/Real.html">Real.tz</ulink>.  Real is the parent class of both 
+<ulink url="http://www.spiderland.org/documentation/classes/Stationary.html">Stationary</ulink> and 
+<ulink url="http://www.spiderland.org/documentation/classes/Mobile.html">Mobile</ulink> objects, so the method can be used with 
 these classes as well. 
 </para>
 <para>
 The second step, updating the neighbors, is done with a call to the method 
-<ulink url="../classes/Control.html">update-neighbors</ulink> in the iterate method 
+<ulink url="http://www.spiderland.org/documentation/classes/Control.html">update-neighbors</ulink> in the iterate method 
 of your simulations controller object.
 </para>
 <para>
 The final step of retrieving the neighbors is done using the  
-<ulink url="../classes/Real.html#get-neighbors">get-neighbors</ulink> method of 
-<ulink url="../classes/Real.html">Real.tz</ulink>. This method returns the 
+<ulink url="http://www.spiderland.org/documentation/classes/Real.html#get-neighbors">get-neighbors</ulink> method of 
+<ulink url="http://www.spiderland.org/documentation/classes/Real.html">Real.tz</ulink>. This method returns the 
 neighbors as a <function>list</function>.  For example, the following iterate 
 method would print out a list of the agent's neighbors at each time step, 
 assuming that the neighborhood size has been set and that the neighbors are
@@ -157,7 +157,7 @@ agent, the following code should help:
 	foreach i in (self get-neighbors): {
 		distance = | (self get-location) - (i get-location) |.
 
-		if distance < minDistance: {
+		if distance &lt; minDistance: {
 			minDistance = distance.
 			closestNeighbor = i.
 		}
@@ -169,7 +169,7 @@ agent, the following code should help:
 <para>
 If there are no neighbors within the local neighborhood then it is sometimes necessary
 to do a search of all agents in the simulation.  To do this, the code above can be 
-modified by using an <function>all</function> statement (<xref linkend="all">) in place of the "self get-neighbors" expression:
+modified by using an <function>all</function> statement (<xref linkend="all"/>) in place of the "self get-neighbors" expression:
 <screen>
 	foreach i in (all "Reals") {
 		# code to select the closest neighbor
@@ -191,8 +191,8 @@ the announcements.
 </para>
 <para>
 An object may make an announcement at any time by using the method 
-<ulink url="../classes/Object.html#announce">announce</ulink> in the class 
-<ulink url="../classes/Object.html">Object</ulink>.  The announcement may reflect a state 
+<ulink url="http://www.spiderland.org/documentation/classes/Object.html#announce">announce</ulink> in the class 
+<ulink url="http://www.spiderland.org/documentation/classes/Object.html">Object</ulink>.  The announcement may reflect a state 
 change in the object or a reaction to a specific event.  
 </para>
 <para>
@@ -237,8 +237,8 @@ myMobile = all Mobiles
 <para>
 <indexterm><primary>can-respond (method)</primary></indexterm>
 If you need to know whether an item can respond to a certain method call, use the 
-method <ulink url="../classes/Object.html#can-respond">can-respond</ulink> in 
-<ulink url="../classes/Object.html">Object.tz</ulink>.  As with is, this method is 
+method <ulink url="http://www.spiderland.org/documentation/classes/Object.html#can-respond">can-respond</ulink> in 
+<ulink url="http://www.spiderland.org/documentation/classes/Object.html">Object.tz</ulink>.  As with is, this method is 
 used like a statement that returns true or false: 
 <screen>
     if (item can-respond to "sing-and-dance"): item sing-and-dance.
@@ -251,8 +251,8 @@ used like a statement that returns true or false:
 <para>
 <indexterm><primary>is (method)</primary></indexterm>
 If you need to determine whether an object is of a certain type, you can use the 
-method <ulink url="../classes/Object.html#is">is</ulink> from 
-<ulink url="../classes/Object.html">Object.tz</ulink>.  The method takes a single 
+method <ulink url="http://www.spiderland.org/documentation/classes/Object.html#is">is</ulink> from 
+<ulink url="http://www.spiderland.org/documentation/classes/Object.html">Object.tz</ulink>.  The method takes a single 
 keyword, "a", such that the method call can be written: 
 <screen>
     item is a "Dog".

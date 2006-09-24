@@ -25,12 +25,12 @@
 #include <sys/types.h>
 #include <regex.h>
 
-int slRSplit(brEval args[], brEval *output, void *instance);
-int slRRegex(brEval args[], brEval *output, void *instance);
+int slRSplit( brEval args[], brEval *output, void *instance );
+int slRRegex( brEval args[], brEval *output, void *instance );
 
-DLLEXPORT void slInitRegexFuncs(void *n) {
-    brNewBreveCall(n, "split", slRSplit, AT_LIST, AT_STRING, AT_STRING, 0);
-    brNewBreveCall(n, "regex", slRRegex, AT_INT, AT_STRING, AT_STRING, 0);
+DLLEXPORT void slInitRegexFuncs( void *n ) {
+	brNewBreveCall( n, "split", slRSplit, AT_LIST, AT_STRING, AT_STRING, 0 );
+	brNewBreveCall( n, "regex", slRRegex, AT_INT, AT_STRING, AT_STRING, 0 );
 }
 
 /*
@@ -39,109 +39,109 @@ DLLEXPORT void slInitRegexFuncs(void *n) {
     = function.
 */
 
-int slRSplit(brEval args[], brEval *output, void *instance) {
-    regex_t exp;
-    int result;
-    char *expstr = BRSTRING(&args[0]);
-    char *string = BRSTRING(&args[1]);
-    regmatch_t matches[1];
+int slRSplit( brEval args[], brEval *output, void *instance ) {
+	regex_t exp;
+	int result;
+	char *expstr = BRSTRING( &args[0] );
+	char *string = BRSTRING( &args[1] );
+	regmatch_t matches[1];
 
-    brEval stringEval;
+	brEval stringEval;
 
-    brEvalListHead *list;
+	brEvalListHead *list;
 
-    result = regcomp(&exp, expstr, REG_EXTENDED);
+	result = regcomp( &exp, expstr, REG_EXTENDED );
 
-    if(result != 0) {
-        /* couldn't compile regular expression */
+	if ( result != 0 ) {
+		/* couldn't compile regular expression */
 
-        slMessage(DEBUG_ALL, "error compiling regular expression \"%s\"", expstr);
-        BRLIST(output) = NULL;
-        return EC_OK;
-    }
+		slMessage( DEBUG_ALL, "error compiling regular expression \"%s\"", expstr );
+		BRLIST( output ) = NULL;
+		return EC_OK;
+	}
 
-    list = brEvalListNew();
+	list = brEvalListNew();
 
-    /* keep running the regular expression and spliting out new fields */
+	/* keep running the regular expression and spliting out new fields */
 
-    while(*string && regexec(&exp, string, 1, matches, 0) != REG_NOMATCH) {
-        if(matches[0].rm_eo != 0) {
-            // we've found the beginning of the split field... copy from the 
-			// start of the search string, up to the start pointer. 
+	while ( *string && regexec( &exp, string, 1, matches, 0 ) != REG_NOMATCH ) {
+		if ( matches[0].rm_eo != 0 ) {
+			// we've found the beginning of the split field... copy from the
+			// start of the search string, up to the start pointer.
 
 			char *match = new char[ matches[0].rm_so + 1 ];
 
-            strncpy( match, string, matches[0].rm_so );
-            match[ matches[0].rm_so ] = 0;
+			strncpy( match, string, matches[0].rm_so );
+			match[ matches[0].rm_so ] = 0;
 
 			stringEval.set( match );
 
-            brEvalListAppend( list, &stringEval );
+			brEvalListAppend( list, &stringEval );
 
-            // advance the string pointer to the end of the previously matched 
-			// expression 
+			// advance the string pointer to the end of the previously matched
+			// expression
 
-            string += matches[0].rm_eo;
+			string += matches[0].rm_eo;
 
 			delete[] match;
-        } else {
-            /* if we match a zero length regexp, just move one character */
-            /* forward without adding anything */
- 
-            string++;
-        }
-    }
+		} else {
+			/* if we match a zero length regexp, just move one character */
+			/* forward without adding anything */
 
-    if(*string) {
-        // it's possible that we've eaten up the last regexp match, but that 
-		// there is still text left--we want this to be included as well 
+			string++;
+		}
+	}
 
-		char *match = new char[ strlen(string) + 1 ];
-        strcpy( match, string);
+	if ( *string ) {
+		// it's possible that we've eaten up the last regexp match, but that
+		// there is still text left--we want this to be included as well
+
+		char *match = new char[ strlen( string ) + 1 ];
+		strcpy( match, string );
 
 		stringEval.set( match );
 
-        brEvalListAppend(list, &stringEval);
+		brEvalListAppend( list, &stringEval );
 
 		delete[] match;
-    }
-    
-    regfree(&exp);
-    
-    BRLIST(output) = list;
+	}
 
-    return EC_OK;
+	regfree( &exp );
+
+	BRLIST( output ) = list;
+
+	return EC_OK;
 }
 
-int slRRegex(brEval args[], brEval *output, void *instance) {
-    regex_t exp;
-    int result;
-    char *expstr = BRSTRING(&args[0]);
-    char *string = BRSTRING(&args[1]);
-    regmatch_t matches[1];
+int slRRegex( brEval args[], brEval *output, void *instance ) {
+	regex_t exp;
+	int result;
+	char *expstr = BRSTRING( &args[0] );
+	char *string = BRSTRING( &args[1] );
+	regmatch_t matches[1];
 
-    result = regcomp(&exp, expstr, REG_EXTENDED);
+	result = regcomp( &exp, expstr, REG_EXTENDED );
 
-    if(result != 0) {
-        // couldn't compile regular expression 
+	if ( result != 0 ) {
+		// couldn't compile regular expression
 
-        slMessage(DEBUG_ALL, "error compiling regular expression \"%s\"", expstr);
-        BRLIST(output) = NULL;
-        return EC_OK;
-    }
+		slMessage( DEBUG_ALL, "error compiling regular expression \"%s\"", expstr );
+		BRLIST( output ) = NULL;
+		return EC_OK;
+	}
 
-    result = regexec(&exp, string, 1, matches, 0);
+	result = regexec( &exp, string, 1, matches, 0 );
 
-    if(result == 0) {
-        BRINT(output) = 1;
-    } else if(result == REG_NOMATCH) {
-        BRINT(output) = 0;
-    } else {
-        BRINT(output) = 0;
-        slMessage(DEBUG_ALL, "error in regular expression check");
-    }
+	if ( result == 0 ) {
+		BRINT( output ) = 1;
+	} else if ( result == REG_NOMATCH ) {
+		BRINT( output ) = 0;
+	} else {
+		BRINT( output ) = 0;
+		slMessage( DEBUG_ALL, "error in regular expression check" );
+	}
 
-    regfree(&exp);
-    
-    return EC_OK;
+	regfree( &exp );
+
+	return EC_OK;
 }

@@ -48,8 +48,8 @@ the 2.0 header file to ensure continued compatibility.
 <para>
 In order to write plugins for breve, you'll need to follow a few simple steps.
 <orderedlist>
-<listitem><para>compose C wrapper functions around your external code (C or C++), <xref linkend="c-wrappers"></para></listitem>
-<listitem><para>create an "entry point function" in C which will load your functions into the breve engine <xref linkend="entrypoint"></para></listitem>
+<listitem><para>compose C wrapper functions around your external code (C or C++), <xref linkend="c-wrappers"/></para></listitem>
+<listitem><para>create an "entry point function" in C which will load your functions into the breve engine <xref linkend="entrypoint"/></para></listitem>
 <listitem><para>write a class (or classes) to interface with your newly created functions</para></listitem>
 </orderedlist>
 </para>
@@ -115,58 +115,58 @@ with the API.
 <itemizedlist>
 <listitem>
 <para>
-<function>BRINT(&<replaceable>eval</replaceable>)</function>, returns the int (C type int) contained in <replaceable>eval</replaceable>
+<function>BRINT(&amp;<replaceable>eval</replaceable>)</function>, returns the int (C type int) contained in <replaceable>eval</replaceable>
 </para>
 </listitem>
 
 <listitem>
 <para>
-<function>BRDOUBLE(&<replaceable>eval</replaceable>)</function>, returns the float (C type double) contained in <replaceable>eval</replaceable>
+<function>BRDOUBLE(&amp;<replaceable>eval</replaceable>)</function>, returns the float (C type double) contained in <replaceable>eval</replaceable>
 </para>
 </listitem>
 
 <listitem>
 <para>
-<function>BRVECTOR(&<replaceable>eval</replaceable>)</function>, returns the vector (C type slVector struct) contained in <replaceable>eval</replaceable>
+<function>BRVECTOR(&amp;<replaceable>eval</replaceable>)</function>, returns the vector (C type slVector struct) contained in <replaceable>eval</replaceable>
 </para>
 </listitem>
 
 <listitem>
 <para>
-<function>BRMATRIX(&<replaceable>eval</replaceable>)</function>, returns the matrix (C type double [3][3]) contained in <replaceable>eval</replaceable>
+<function>BRMATRIX(&amp;<replaceable>eval</replaceable>)</function>, returns the matrix (C type double [3][3]) contained in <replaceable>eval</replaceable>
 </para>
 </listitem>
 
 <listitem>
 <para>
-<function>BRBRRING(&<replaceable>eval</replaceable>)</function>, returns the string (C type char*) contained in <replaceable>eval</replaceable>
+<function>BRBRRING(&amp;<replaceable>eval</replaceable>)</function>, returns the string (C type char*) contained in <replaceable>eval</replaceable>
 </para>
 </listitem>
 
 <listitem>
 <para>
-<function>BROBJECT(&<replaceable>eval</replaceable>)</function>, returns the object (C type brInstance*) contained in <replaceable>eval</replaceable>
+<function>BROBJECT(&amp;<replaceable>eval</replaceable>)</function>, returns the object (C type brInstance*) contained in <replaceable>eval</replaceable>
 </para>
 </listitem>
 
 <listitem>
 <para>
-<function>BRPOINTER(&<replaceable>eval</replaceable>)</function>, returns the pointer (C type void*) contained in <replaceable>eval</replaceable>
+<function>BRPOINTER(&amp;<replaceable>eval</replaceable>)</function>, returns the pointer (C type void*) contained in <replaceable>eval</replaceable>
 </para>
 </listitem>
 <listitem>
 <para>
-<function>BRDATA(&<replaceable>eval</replaceable>)</function>, returns the data (C type brData*) contained in <replaceable>eval</replaceable>
+<function>BRDATA(&amp;<replaceable>eval</replaceable>)</function>, returns the data (C type brData*) contained in <replaceable>eval</replaceable>
 </para>
 </listitem>
 <listitem>
 <para>
-<function>BRHASH(&<replaceable>eval</replaceable>)</function>, returns the hash (C type brEvalHash*) contained in <replaceable>eval</replaceable>
+<function>BRHASH(&amp;<replaceable>eval</replaceable>)</function>, returns the hash (C type brEvalHash*) contained in <replaceable>eval</replaceable>
 </para>
 </listitem>
 <listitem>
 <para>
-<function>BRLIST(&<replaceable>eval</replaceable>)</function>, returns the list (C type brEvalList*) contained in <replaceable>eval</replaceable>
+<function>BRLIST(&amp;<replaceable>eval</replaceable>)</function>, returns the list (C type brEvalList*) contained in <replaceable>eval</replaceable>
 </para>
 </listitem>
 </itemizedlist>

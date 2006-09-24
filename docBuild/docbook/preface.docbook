@@ -1,3 +1,4 @@
+<?xml version="1.0"  encoding="ISO-8859-1"?>
 <!--
     The breve Simulation Environment documentation
     Copyright (C) 2003 Jonathan Klein
@@ -29,7 +30,7 @@ by collecting it and organizing it into a single document.
 </para>
 <para>
 This document is a work in progress.  See the section on "Getting
-Help With breve" (<xref linkend="getting-help">) if this document fails to 
+Help With breve" (<xref linkend="getting-help"/>) if this document fails to 
 adequately describe any features or techniques.
 </para>
 </sect1>
@@ -38,7 +39,7 @@ adequately describe any features or techniques.
 <title>Getting Help With breve</title>
 <para>There are several ways to get help using breve:
 <itemizedlist>
-<listitem><para>Read the class documentation for more detailed information about each class.  These class files are listed in <xref linkend="classes">.</para></listitem> 
+<listitem><para>Read the class documentation for more detailed information about each class.  These class files are listed in <xref linkend="classes"/>.</para></listitem> 
 <listitem><para>Visit the breve discussion forums at 
 <ulink url="http://www.spiderland.org/forums/">http://www.spiderland.org/forums/</ulink>.</para></listitem>
 <listitem><para>Mail the author at <ulink url="mailto:jk [at] spiderland.org">jk [at] spiderland.org</ulink></para></listitem>

@@ -3,32 +3,32 @@
     Copyright (C) 2003-2006 Jonathan Klein
 -->
 
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V3.1//EN" [
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V3.1//EN" "docbook.dtd" [
+<!ENTITY mdash  "&#x2014;">
 <!ENTITY preface SYSTEM "preface.docbook">
+<!ENTITY version-2.0 SYSTEM "version_2.0.docbook">
 <!ENTITY introduction SYSTEM "introduction.docbook">
 <!ENTITY steve SYSTEM "steve.docbook">
-<!ENTITY physics SYSTEM "physics.docbook">
 <!ENTITY agents SYSTEM "agents.docbook">
-<!ENTITY interactions SYSTEM "interactions.docbook">
 <!ENTITY graphics SYSTEM "graphics.docbook">
+<!ENTITY interactions SYSTEM "interactions.docbook">
+<!ENTITY physics SYSTEM "physics.docbook">
+<!ENTITY movie SYSTEM "movie.docbook">
 <!ENTITY archiving SYSTEM "archiving.docbook">
 <!ENTITY interface SYSTEM "interface.docbook">
 <!ENTITY plugins SYSTEM "plugins.docbook">
-<!ENTITY java SYSTEM "java.docbook">
 <!ENTITY classlist SYSTEM "classlist.docbook">
 <!ENTITY index SYSTEM "index.docbook">
-<!ENTITY movie SYSTEM "movie.docbook">
 <!ENTITY network SYSTEM "network.docbook">
 <!ENTITY push SYSTEM "push.docbook">
 <!ENTITY source SYSTEM "source.docbook">
-<!ENTITY version-2.0 SYSTEM "version_2.0.docbook">
 <!ENTITY version-string SYSTEM "version.txt">
 <!ENTITY date-string SYSTEM "date.txt">
 ]>
 <book>
 <bookinfo>
-<mediaobject role="online">
-<imageobject><imagedata fileref="docs/images/breve_icon.jpg" align="center"></imageobject>
+<mediaobject>
+<imageobject><imagedata fileref="images/breve_icon.jpg" align="center"/></imageobject>
 </mediaobject>
 <date>&date-string;</date>
 <title>breve Documentation</title>
@@ -54,17 +54,7 @@
 &push;
 &plugins;
 &source;
-
-<part id="appendices">
-<title>Appendix</title>
-<appendix id="classes">
-<title>breve Class Documentation</title>
-<para>
 &classlist;
-</para>
-</appendix>
-</part>
-
 &index;
 
 </book>

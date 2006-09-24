@@ -13,7 +13,7 @@
 <indexterm><primary>Link (class)</primary></indexterm>
 
 To create a simple agent in breve, you'll need to subclass one of the basic
-agent classes, all subclasses of <ulink url="../classes/Real.html">Real</ulink>:
+agent classes, all subclasses of <ulink url="http://www.spiderland.org/documentation/classes/Real.html">Real</ulink>:
 <itemizedlist>
 <listitem><para>Stationary, an immobile object in the simulated world.</para></listitem>
 <listitem><para>Mobile, an object which moves around the simulated world.</para></listitem>
@@ -24,16 +24,16 @@ agent classes, all subclasses of <ulink url="../classes/Real.html">Real</ulink>:
 This chapter describes the basics of implementing agents in breve, with a focus
 on Mobile agents.  Stationary objects are even easier to use than Mobile objects,
 and Physically simulated Link objects (and their companion class, MultiBody) 
-are described in the chapter on physical simulation (<xref linkend="physics">).
+are described in the chapter on physical simulation (<xref linkend="physics"/>).
 </para>
 <para>
-The section A Simple Mobile agent (<xref linkend="mobile-agent">) shows a very basic
+The section A Simple Mobile agent (<xref linkend="mobile-agent"/>) shows a very basic
 mobile agent template which can be used to any mobile agent.  The appearance of the 
 agent can be customized in a number of ways&mdash;some basic options are described
-in the section Changing the Appearance of Agents (<xref linkend="agent-appearence">).
+in the section Changing the Appearance of Agents (<xref linkend="agent-appearence"/>).
 Controlling the motion of agents is described in the section Moving Agents Around
-the 3D World (<xref linkend="agent-motion">).  The final section describes how 
-events can be scheduled for specific times (<xref linkend="scheduling-events">).
+the 3D World (<xref linkend="agent-motion"/>).  The final section describes how 
+events can be scheduled for specific times (<xref linkend="scheduling-events"/>).
 </para>
 
 <sect1 id="mobile-agent">
@@ -71,8 +71,8 @@ Mobile : Bird {
 </para>
 <para>
 The shape used need not be a cube&mdash;you can choose from a number of shapes using
-the class <ulink url="../classes/Shape.html">Shape</ulink>.  You can also construct
-your own shapes with the class <ulink url="../classes/CustomShape.html">CustomShape</ulink>.
+the class <ulink url="http://www.spiderland.org/documentation/classes/Shape.html">Shape</ulink>.  You can also construct
+your own shapes with the class <ulink url="http://www.spiderland.org/documentation/classes/CustomShape.html">CustomShape</ulink>.
 </para>
 <para>
 This is only a simple example&mdash;a template for a real agent.  In the rest of the 
@@ -85,14 +85,14 @@ chapter we'll see how to customize the appearance, motion and behavior of an age
 <para>
 There are a number of ways to customize the appearance of an agent.  As mentioned
 in the previous section, you can manipulate the size and shapes of objects using 
-the class <ulink url="../classes/Shape.html">Shape</ulink> and its subclasses.
+the class <ulink url="http://www.spiderland.org/documentation/classes/Shape.html">Shape</ulink> and its subclasses.
 </para>
 <para>
 <indexterm><primary>color</primary></indexterm>
 <indexterm><primary>set-color (method)</primary></indexterm>
 To set the color of an agent, use the method 
-<ulink url="../classes/Real.html#set-color">set-color</ulink> in the class 
-<ulink url="../classes/Real.html">Real</ulink>.  The method expects a vector
+<ulink url="http://www.spiderland.org/documentation/classes/Real.html#set-color">set-color</ulink> in the class 
+<ulink url="http://www.spiderland.org/documentation/classes/Real.html">Real</ulink>.  The method expects a vector
 color where the three values represent red, green and blue intensities on
 a scale from 0.0 to 1.0.  For example:
 <screen>
@@ -104,7 +104,7 @@ self set-color to (0.0, 1.0, 0.0).
 <para>
 Objects can also be textured, represented as images or even as translucent glowing 
 blobs called "lightmaps".  All of these techniques are covered in detail in the 
-chapter on Graphics and Sound (<xref linkend="graphics-and-sound">).
+chapter on Graphics and Sound (<xref linkend="graphics-and-sound"/>).
 </para>
 </sect1>
 
@@ -124,8 +124,8 @@ typically adjusted dynamically over the course of the simulation.
 </para>
 <para>
 Agents can be explicitly moved to a specific location using the method 
-<ulink url="../classes/Real.html#move">move</ulink> in the class 
-<ulink url="../classes/Real.html">Real</ulink>:
+<ulink url="http://www.spiderland.org/documentation/classes/Real.html#move">move</ulink> in the class 
+<ulink url="http://www.spiderland.org/documentation/classes/Real.html">Real</ulink>:
 <screen>
 # move the agent to the location (10, 0, 0) in 3D space...
 
@@ -134,8 +134,8 @@ self move to (10, 0, 0).
 </para>
 <para>
 The speed of an agent can be set using the method
-<ulink url="../classes/Real.html#set-velocity">set-velocity</ulink> in the class 
-<ulink url="../classes/Real.html">Real</ulink>:
+<ulink url="http://www.spiderland.org/documentation/classes/Real.html#set-velocity">set-velocity</ulink> in the class 
+<ulink url="http://www.spiderland.org/documentation/classes/Real.html">Real</ulink>:
 <screen>
 # set the agent's velocity to (0, 0, 10) 
 
@@ -144,8 +144,8 @@ self set-velocity to (0, 0, 10).
 </para>
 <para>
 The acceleration of an agent can be set using the method
-<ulink url="../classes/Real.html#set-acceleration">set-acceleration</ulink> in the class 
-<ulink url="../classes/Real.html">Real</ulink>:
+<ulink url="http://www.spiderland.org/documentation/classes/Real.html#set-acceleration">set-acceleration</ulink> in the class 
+<ulink url="http://www.spiderland.org/documentation/classes/Real.html">Real</ulink>:
 <screen>
 # set the agent's acceleration to (0, -9.8, 0) 
 
@@ -161,8 +161,8 @@ self set-acceleration to (0, -9.8, 0).
 <indexterm><primary>schedule (method)</primary></indexterm>
 <indexterm><primary>events</primary></indexterm>
 Events can be scheduled for a specific time for any object using the method
-<ulink url="../classes/Object.html#schedule">schedule</ulink> in the class 
-<ulink url="../classes/Object.html">Object</ulink>:
+<ulink url="http://www.spiderland.org/documentation/classes/Object.html#schedule">schedule</ulink> in the class 
+<ulink url="http://www.spiderland.org/documentation/classes/Object.html">Object</ulink>:
 <screen>
 # call a method after the simulation clock hits 100.0...
 
@@ -173,8 +173,8 @@ self schedule method-call "sing-and-dance" at-time 100.0.
 It is often desirable to trigger a method call not for a specific simulation
 time, but for an offset relative to the current time (for example, "20 seconds
 from now").  This can be done with the help of the 
-<ulink url="../classes/Control.html#get-time">get-time</ulink> method in the class 
-<ulink url="../classes/Control.html">Control</ulink>:
+<ulink url="http://www.spiderland.org/documentation/classes/Control.html#get-time">get-time</ulink> method in the class 
+<ulink url="http://www.spiderland.org/documentation/classes/Control.html">Control</ulink>:
 <screen>
 # call a method 100.0 seconds from now...
 

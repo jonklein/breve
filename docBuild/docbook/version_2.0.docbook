@@ -38,7 +38,7 @@ for earlier versions of breve will not work with breve 2.4 or later.
 In most cases, plugins simply need to be recompiled, but should generally not require any 
 changes to code.  Additionally, plugins must now be compiled using a C++ compiler (though 
 code written in C will continue to function).  See the updated documentation on Plugins 
-<xref linkend="plugins"> for more information.
+<xref linkend="plugins"/> for more information.
 </para>
 </sect1>
 
@@ -49,11 +49,11 @@ in previous versions of breve (1.x).  These changes and instructions on upgradin
 are discussed below.
 
 <itemizedlist> 
-<listitem><para>MultiBody functionality has been changed <xref linkend="multibody-changes"></para></listitem>
-<listitem><para>Arrays are now deprecated <xref linkend="array-depreciated"></para></listitem> 
-<listitem><para>The Data class has been removed <xref linkend="data-removed"></para></listitem> 
-<listitem><para>The Vision class has been removed <xref linkend="visions-removed"></para></listitem>
-<listitem><para>Texture loading has been changed <xref linkend="texture-changes"></para></listitem> 
+<listitem><para>MultiBody functionality has been changed <xref linkend="multibody-changes"/></para></listitem>
+<listitem><para>Arrays are now deprecated <xref linkend="array-depreciated"/></para></listitem> 
+<listitem><para>The Data class has been removed <xref linkend="data-removed"/></para></listitem> 
+<listitem><para>The Vision class has been removed <xref linkend="visions-removed"/></para></listitem>
+<listitem><para>Texture loading has been changed <xref linkend="texture-changes"/></para></listitem> 
 </itemizedlist> 
 
 </para>

@@ -10,7 +10,7 @@
 
 <para>
 breve allows you to save snapshots of your simulation as PNG
-files (<xref linkend="saving-snapshots">), and movies as MPEG files (<xref linkend="saving-movies">).
+files (<xref linkend="saving-snapshots"/>), and movies as MPEG files (<xref linkend="saving-movies"/>).
 </para>
 
 <note><title>Note Available When Using breve_cli</title>
@@ -23,9 +23,9 @@ of breve, breve_cli.
 <sect1 id="saving-movies"><title>Saving Movies</title>
 <para>
 You can save MPEG movies of <emphasis>breve</emphasis> simulations using the 
-class <ulink url="../classes/Movie.html">Movie.tz</ulink>.  First create an
+class <ulink url="http://www.spiderland.org/documentation/classes/Movie.html">Movie.tz</ulink>.  First create an
 instance of the class, then begin recording a movie by using the method
-<ulink url="../classes/Movie.html#record">record</ulink>.  For your 
+<ulink url="http://www.spiderland.org/documentation/classes/Movie.html#record">record</ulink>.  For your 
 convenience, the standard Control class simulation menu includes an
 option for exporting an MPEG movie.
 </para>
@@ -34,8 +34,8 @@ option for exporting an MPEG movie.
 <sect1 id="saving-snapshots"><title>Saving Snapshots</title>
 <para>
 To save a PNG snapshot of a running <emphasis>breve</emphasis> simulation, use the method 
-<ulink url="../classes/Control.html#save-snapshot">save-snapshot</ulink>
-in the class <ulink url="../classes/Control.html">Control</ulink>.  For your
+<ulink url="http://www.spiderland.org/documentation/classes/Control.html#save-snapshot">save-snapshot</ulink>
+in the class <ulink url="http://www.spiderland.org/documentation/classes/Control.html">Control</ulink>.  For your
 convenience, the standard Control class simulation menu includes an
 option for exporting PNG snapshots.
 </para>

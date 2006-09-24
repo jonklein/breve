@@ -19,8 +19,8 @@ applies to both.
 <para>
 This chapter 
 first describes how individual objects can be archived and dearchived 
-(<xref linkend="object-archiving">) and then how entire simulations can 
-be archived and dearchived (<xref linkend="simulation-archiving">).
+(<xref linkend="object-archiving"/>) and then how entire simulations can 
+be archived and dearchived (<xref linkend="simulation-archiving"/>).
 </para>
 
 <sect1 id="object-archiving">
@@ -39,9 +39,9 @@ be archived and dearchived (<xref linkend="simulation-archiving">).
 This method is used to export and import individual objects or subsets of objects in
 a simulation.  When an object is dearchived with this method, a new instance 
 is created for the saved object and loaded into a running simulation.  
-This technique is in contrast to the method described in <xref linkend="simulation-archiving">, 
+This technique is in contrast to the method described in <xref linkend="simulation-archiving"/>, 
 which creates an entirely new simulation from an archived world.  The steps described here 
-also apply to sending and receiving objects over a network as described in <xref linkend="network-send-receive">.
+also apply to sending and receiving objects over a network as described in <xref linkend="network-send-receive"/>.
 </para>
 
 <sect2 id="archive-methods">
@@ -102,8 +102,8 @@ chain reaction would result every time an instance was saved.
 To avoid this, saving objects does not include an object variable 
 <emphasis>unless</emphasis> the the object being saved has declared it as a 
 dependency, using the 
-<ulink url="../classes/Object.html">Object</ulink> method 
-<ulink url="../classes/Object.html#add-dependency">add-dependency</ulink>.  If you define
+<ulink url="http://www.spiderland.org/documentation/classes/Object.html">Object</ulink> method 
+<ulink url="http://www.spiderland.org/documentation/classes/Object.html#add-dependency">add-dependency</ulink>.  If you define
 an object, Y, as a dependency of X, then saving X will also save Y.  Loading 
 the saved instance X will also recreate the instance Y.
 </para>
@@ -138,13 +138,13 @@ failure and will abort the archive.
 Once dependencies, archive methods and dearchive methods (all of which may 
 prove to be unnecessary for most straightforward classes) are addressed, you 
 may initiate an archive using 
-the <ulink url="../classes/Object.html">Object</ulink> method 
-<ulink url="../classes/Object.html#archive-as-xml">archive-as-xml</ulink>.
+the <ulink url="http://www.spiderland.org/documentation/classes/Object.html">Object</ulink> method 
+<ulink url="http://www.spiderland.org/documentation/classes/Object.html#archive-as-xml">archive-as-xml</ulink>.
 </para>
 <para>
 To dearchive an object previously archived with this technique, use the
-<ulink url="../classes/Control.html">Control</ulink> method 
-<ulink url="../classes/Control.html#dearchive-xml">dearchive-xml</ulink>.  
+<ulink url="http://www.spiderland.org/documentation/classes/Control.html">Control</ulink> method 
+<ulink url="http://www.spiderland.org/documentation/classes/Control.html#dearchive-xml">dearchive-xml</ulink>.  
 Note that this creates new instances of the objects in the archived file,
 instead of "filling" an existing object.
 </para>
@@ -166,7 +166,7 @@ simulation</emphasis>.
 </para>
 <para>
 As with the archiving discussed in the previous section 
-(<xref linkend="object-archiving">, dependencies can also be used when 
+(<xref linkend="object-archiving"/>, dependencies can also be used when 
 archiving entire simulations.  In this case, the dependencies effect only 
 the order in which objects are dearchived, an issue that should not effect 
 most users.
@@ -189,8 +189,8 @@ failure and will abort the archive.
 </para>
 <para>
 To initiate a "whole simulation archive", use the
-<ulink url="../classes/Control.html">Control</ulink> method 
-<ulink url="../classes/Control.html#save-as-xml">save-as-xml</ulink>.
+<ulink url="http://www.spiderland.org/documentation/classes/Control.html">Control</ulink> method 
+<ulink url="http://www.spiderland.org/documentation/classes/Control.html#save-as-xml">save-as-xml</ulink>.
 </para>
 <para>
 An archived world cannot be loaded into a running simulation&mdash;to dearchive a simulation 

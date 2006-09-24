@@ -14,16 +14,16 @@ running breve simulations using a web browser.
 </para>
 <para>
 This chapter starts by describing how to create a NetworkServer object 
-which is used for both of these networking features (<xref linkend="network-server">).
+which is used for both of these networking features (<xref linkend="network-server"/>).
 Next, sending and receiving breve objects over the network is 
-described (<xref linkend="network-send-receive">).  The final
+described (<xref linkend="network-send-receive"/>).  The final
 section describes how to allow the control of a breve simulation
-via a web interface (<xref linkend="network-web">).
+via a web interface (<xref linkend="network-web"/>).
 </para>
 <sect1 id="network-server"><title>Starting a Network Server</title>
 <para>
 To start a network server, make a new instance of the class 
-<ulink url="../classes/NetworkServer.html">NetworkServer</ulink>.
+<ulink url="http://www.spiderland.org/documentation/classes/NetworkServer.html">NetworkServer</ulink>.
 The NetworkServer class is used for both receiving object from
 other breve simulations, and for allowing a web interface to
 your breve simulation.
@@ -31,7 +31,7 @@ your breve simulation.
 <para>
 Once the NetworkServer instance has been created, it should 
 be told to start listening for connections using the method
-<ulink url="../classes/NetworkServer.html#listen">listen</ulink>.
+<ulink url="http://www.spiderland.org/documentation/classes/NetworkServer.html#listen">listen</ulink>.
 The listen method expects a port number which must be greater
 than 1024, but otherwise may be any unused port that both the
 client and the server breve users can agree to.
@@ -42,7 +42,7 @@ client and the server breve users can agree to.
 
 <para>
 In order to send and receive objects over the network, the objects must be prepared
-for archiving and dearchiving as described in <xref linkend="object-archiving">.
+for archiving and dearchiving as described in <xref linkend="object-archiving"/>.
 Read that section first to be certain that your objects can be properly encoded and 
 decoded.
 </para>
@@ -53,12 +53,12 @@ instance on the server machine.  It recreates the object and the
 state of all of its variables, except that variables of type <function>object</function> and
 <function>pointer</function> can not be automatically maintained without
 special treatment.  The reason for this and the solution are described in
-<xref linkend="object-archiving">.
+<xref linkend="object-archiving"/>.
 </para>
 
 <para>
 To send an object over the network, use the Object method 
-<function><ulink url="../classes/Object.html#send-over-network">send-over-network</ulink></function>
+<function><ulink url="http://www.spiderland.org/documentation/classes/Object.html#send-over-network">send-over-network</ulink></function>
 with the server computer's hostname and port:
 <screen>
 	self send-over-network to "myOtherComputer" on 31337.
@@ -85,7 +85,7 @@ in as arguments.
 The NetworkServer object can accept connections from regular web-browsers.  
 After the NetworkServer starts running, you can get the address that clients 
 should connect to by using the method 
-<ulink url="../classes/NetworkServer.html#get-url">get-url</ulink>.  The 
+<ulink url="http://www.spiderland.org/documentation/classes/NetworkServer.html#get-url">get-url</ulink>.  The 
 URL will be the hostname (or IP address) of the server machine, followed 
 by a ":<replaceable>portNumber</replaceable>".
 </para>
@@ -127,14 +127,14 @@ the local disk.  This feature is not typically used to serve
 informational web files as a normal web server might&mdash;instead,
 it should be used to serve files containing "links" that will 
 execute controller commands in the simulation, as described 
-above (<xref linkend="web-method-execution">).
+above (<xref linkend="web-method-execution"/>).
 </para>
 <para>
 Additionally, you can set an "index" page that will be served to
 the web-browser when they send a request to your server without 
 an actual page or method request, for example, http://myserver:33333.
 This index page can be set using the method
-<ulink url="../classes/NetworkServer.html#set-index-page">set-index-page</ulink>.  
+<ulink url="http://www.spiderland.org/documentation/classes/NetworkServer.html#set-index-page">set-index-page</ulink>.  
 </para>
 </sect2>
 </sect1>

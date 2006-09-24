@@ -23,7 +23,7 @@ the excellent ODE physical simulation engine.
 Even though it is incredibly useful, physical simulation can add complexity 
 and potential instabilities to a simulation.  This chapter begins by 
 with the section When to Use Physical Simulation 
-(<xref linkend="physics-vs-pseudo">), which discusses when it is appropriate 
+(<xref linkend="physics-vs-pseudo"/>), which discusses when it is appropriate 
 to use physical simulation and possible alternatives to full physical 
 simulation.  You should read this section first to help you decide whether
 physical simulation is necessary for your simulation.
@@ -52,7 +52,7 @@ deal of complexity can be avoided.
 <para>
 Another example is two objects which stick together and behave as a single 
 entity.  Though this can be simulated as a 
-<ulink url="../classes/MultiBody.html">MultiBody</ulink> object, 
+<ulink url="http://www.spiderland.org/documentation/classes/MultiBody.html">MultiBody</ulink> object, 
 if other aspects of physical simulation are <emphasis>not</emphasis> required, 
 it may be better to enforce the relationship between the objects manually at 
 each time-step by making one of the objects move itself to maintain a certain 
@@ -74,17 +74,17 @@ true physical simulation and consider using your own "pseudo-physics" instead.
 <para>
 To write a simulation with physical simulation, your controller object
 should be a subclass of the class 
-<ulink url="../classes/PhysicalControl.html">PhysicalControl</ulink>.  
+<ulink url="http://www.spiderland.org/documentation/classes/PhysicalControl.html">PhysicalControl</ulink>.  
 This class sets certain simulation parameters to values sensible for 
 physical simulation, such as integration step, gravity, etc.
 </para>
 
 <para>
-Physics must be enabled for <ulink url="../classes/Mobile.html">Mobile</ulink>
+Physics must be enabled for <ulink url="http://www.spiderland.org/documentation/classes/Mobile.html">Mobile</ulink>
 objects on an object by object basis using the method
-<ulink url="../classes/Mobile.html#enable-physics">enable-physics</ulink>.  
+<ulink url="http://www.spiderland.org/documentation/classes/Mobile.html#enable-physics">enable-physics</ulink>.  
 When dealing with physical simulations, however, it is often preferable to 
-use the Mobile subclass <ulink url="../classes/Link.html">Link</ulink> for
+use the Mobile subclass <ulink url="http://www.spiderland.org/documentation/classes/Link.html">Link</ulink> for
 which physical simulation is automatically enabled.
 </para>
 </sect1>
@@ -102,9 +102,9 @@ will become much greater.
 </para>
 <para>
 Fast physics may be enabled using the method
-<ulink url="../classes/PhysicalControl.html#enable-fast-physics">enable-fast-physics</ulink>.  
+<ulink url="http://www.spiderland.org/documentation/classes/PhysicalControl.html#enable-fast-physics">enable-fast-physics</ulink>.  
 An additional iterations parameter can be set using the method 
-<ulink url="../classes/PhysicalControl.html#set-fast-physics-iterations">set-fast-physics-iterations</ulink>.
+<ulink url="http://www.spiderland.org/documentation/classes/PhysicalControl.html#set-fast-physics-iterations">set-fast-physics-iterations</ulink>.
 The default value of 40 should give good results, but the number may be adjusted upwards for more 
 accuracy, or downwards for better performance.
 </para>
@@ -149,9 +149,9 @@ components of physically simulated bodies.  There are three main components used
 physical simulations:
 <itemizedlist>
 <listitem><para>Links, the basic building blocks of physically simulated objects</para></listitem>
-<listitem><para>MultiBodies, physical bodies made up of one or more Link objects (<xref linkend="multibodies">)</para></listitem>
-<listitem><para>Joints, rigid connections between Link objects (<xref linkend="joints">)</para></listitem>
-<listitem><para>Springs, flexible connections between Link objects (<xref linkend="springs">)</para></listitem>
+<listitem><para>MultiBodies, physical bodies made up of one or more Link objects (<xref linkend="multibodies"/>)</para></listitem>
+<listitem><para>Joints, rigid connections between Link objects (<xref linkend="joints"/>)</para></listitem>
+<listitem><para>Springs, flexible connections between Link objects (<xref linkend="springs"/>)</para></listitem>
 </itemizedlist>
 </para>
 
@@ -162,9 +162,9 @@ physical simulations:
 The Link class is the basic building block of physically simulated objects.  A link is 
 simply a rigid body with a particular shape.  Once a Link is created and associated 
 with a shape, it can be attached to other links via Joint objects, covered in the 
-section The Joint Class and its Subclasses (<xref linkend="joints">) or brought into
+section The Joint Class and its Subclasses (<xref linkend="joints"/>) or brought into
 the physical simulation by being associated with a MultiBody, as discussed in the 
-section on using MultiBody objects (<xref linkend="multibodies">).  
+section on using MultiBody objects (<xref linkend="multibodies"/>).  
 </para>
 <para>
 Prior to breve 2.0, Link objects would not appear in the simulated world unless they
@@ -181,19 +181,19 @@ were associated with MultiBody objects (described below).  This is no longer the
 <indexterm><primary>RevoluteJoint class</primary></indexterm>
 <indexterm><primary>UniversalJoint class</primary></indexterm>
 <indexterm><primary>BallJoint class</primary></indexterm>
-As mentioned in the previous section (<xref linkend="multibodies">), 
-<ulink url="../classes/Link.html">Links</ulink> are joined together using 
-<ulink url="../classes/Joint.html">Joint</ulink> objects.  
+As mentioned in the previous section (<xref linkend="multibodies"/>), 
+<ulink url="http://www.spiderland.org/documentation/classes/Link.html">Links</ulink> are joined together using 
+<ulink url="http://www.spiderland.org/documentation/classes/Joint.html">Joint</ulink> objects.  
 </para>
 <para>
 There are several types of joints 
 available&mdash;see each class' documentation for more details:
 <itemizedlist>
-<listitem><para><ulink url="../classes/FixedJoint.html">FixedJoint</ulink></para></listitem>
-<listitem><para><ulink url="../classes/PrismaticJoint.html">PrismaticJoint</ulink></para></listitem>
-<listitem><para><ulink url="../classes/RevoluteJoint.html">RevoluteJoint</ulink></para></listitem>
-<listitem><para><ulink url="../classes/UniversalJoint.html">UniversalJoint</ulink></para></listitem>
-<listitem><para><ulink url="../classes/BallJoint.html">BallJoint</ulink></para></listitem>
+<listitem><para><ulink url="http://www.spiderland.org/documentation/classes/FixedJoint.html">FixedJoint</ulink></para></listitem>
+<listitem><para><ulink url="http://www.spiderland.org/documentation/classes/PrismaticJoint.html">PrismaticJoint</ulink></para></listitem>
+<listitem><para><ulink url="http://www.spiderland.org/documentation/classes/RevoluteJoint.html">RevoluteJoint</ulink></para></listitem>
+<listitem><para><ulink url="http://www.spiderland.org/documentation/classes/UniversalJoint.html">UniversalJoint</ulink></para></listitem>
+<listitem><para><ulink url="http://www.spiderland.org/documentation/classes/BallJoint.html">BallJoint</ulink></para></listitem>
 </itemizedlist>
 </para>
 </sect2>
@@ -219,7 +219,7 @@ Imagine that suddenly your arm was moved across the room without the rest of you
 for the underlying physics engine to move a single link&mdash;confusing and painful things 
 can happen.  By encompassing a set of connected Links within a MultiBody, the user has 
 more logical control over the object.
-<mediaobject><imageobject><imagedata align="center" fileref="images/MultiBody.jpg"></imageobject></mediaobject>
+<mediaobject><imageobject><imagedata align="center" fileref="images/MultiBody.jpg"/></imageobject></mediaobject>
 </para>
 <para>
 To create a MultiBody, you can simply associate it with any existing Link object.
@@ -238,18 +238,18 @@ created and destroyed.
 <para>
 <indexterm><primary>dynamic joints</primary></indexterm>
 <indexterm><primary>breaking joints</primary></indexterm>
-breve allows <ulink url="../classes/Joint.html">Joints</ulink> to 
+breve allows <ulink url="http://www.spiderland.org/documentation/classes/Joint.html">Joints</ulink> to 
 be created and destroyed dynamically over the course of the simulation.  
 </para>
 <para>
-Joining <ulink url="../classes/MultiBody.html">MultiBodies</ulink> dynamically is simple&mdash;you simply
-link them as always using the various <ulink url="../classes/Joint.html">Joint</ulink> subclasses.
+Joining <ulink url="http://www.spiderland.org/documentation/classes/MultiBody.html">MultiBodies</ulink> dynamically is simple&mdash;you simply
+link them as always using the various <ulink url="http://www.spiderland.org/documentation/classes/Joint.html">Joint</ulink> subclasses.
 The joints can be made not only to modify the structure of a single MultiBody, but also
 to join together distinct MultiBodies.
 </para>
 <para>
-Breaking MultiBodies is accomplished using the <ulink url="../classes/Joint.html">Joint</ulink> 
-method <ulink url="../classes/Joint.html#break">break</ulink>.  
+Breaking MultiBodies is accomplished using the <ulink url="http://www.spiderland.org/documentation/classes/Joint.html">Joint</ulink> 
+method <ulink url="http://www.spiderland.org/documentation/classes/Joint.html#break">break</ulink>.  
 </para>
 <para>
 Prior to <emphasis>breve</emphasis> version 2.0, when all Links had to be part of a MultiBody to appear 
@@ -272,13 +272,13 @@ Documentation forthcoming.
 <para>
 <indexterm><primary>terrain</primary></indexterm>
 <indexterm><primary>fractal terrain</primary></indexterm>
-The class <ulink url="../classes/Terrain.html">Terrain</ulink> allows fractal terrains to 
+The class <ulink url="http://www.spiderland.org/documentation/classes/Terrain.html">Terrain</ulink> allows fractal terrains to 
 be created in breve.  These terrains provide a more realistic ground than simply using 
 a flat plane.  The terrains can be automatically generated using the 
-method <ulink url="../classes/Terrain.html#generate">generate</ulink>, or set 
+method <ulink url="http://www.spiderland.org/documentation/classes/Terrain.html#generate">generate</ulink>, or set 
 manually by the user using the method 
-<ulink url="../classes/Terrain.html#set-height">set-height</ulink>.  See 
-the <ulink url="../classes/Terrain.html">Terrain</ulink> class documentation
+<ulink url="http://www.spiderland.org/documentation/classes/Terrain.html#set-height">set-height</ulink>.  See 
+the <ulink url="http://www.spiderland.org/documentation/classes/Terrain.html">Terrain</ulink> class documentation
 for information on using terrains.
 </para>
 </sect1>

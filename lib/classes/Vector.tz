@@ -64,7 +64,7 @@ Object : Vector (aka Vectors) [version 2.3] {
 	+ to get-value at x (int):
 		% Returns the vector value at position (x).
 		
-		return vectorGet(vectorPointer, x).
+		return vectorGet( vectorPointer, x ).
 
 	+ to set-value to value (double) at x (int):
 		% Sets the vector value at position (x, y, z).

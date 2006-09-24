@@ -56,9 +56,9 @@ Abstract : Image (aka Images) [version 2.0] {
 
         if imageData: imageDataFree(imageData).
 
-        imageData = imageDataInit(imageWidth, imageHeight).
+        imageData = imageDataInit( imageWidth, imageHeight ).
 
-        return (self).
+        return self.
         
     - to destroy:
         if imageData: imageDataFree(imageData).
@@ -116,7 +116,7 @@ Abstract : Image (aka Images) [version 2.0] {
 
         r, g, b (double).
 
-		if !imageData: return (0, 0, 0).
+	if !imageData: return (0, 0, 0).
 
         r = imageGetValueAtCoordinates(imageData, x * 4, y).
         g = imageGetValueAtCoordinates(imageData, (x * 4) + 1, y).
@@ -179,14 +179,9 @@ Abstract : Image (aka Images) [version 2.0] {
 
     + to read-pixels at-x x (int) at-y y (int):
         % Reads pixels into this Image from the rendered image on the 
-        % screen.  
-		% <p>
-		% The X and Y coordinates specify the starting lower-left pixel
-		% of the screen data to read into this image.
-		% <p>
-		% The resulting image can be written to a file or analyzed as 
-		% desired.  This functionality is only supported in graphical 
-		% versions of breve.
+        % screen.  The resulting image can be written to a file or 
+        % analyzed if desired.  This is only supported in graphical
+        % versions of breve.
 
         imageReadPixels(imageData, x, y).
 

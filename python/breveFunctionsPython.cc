@@ -1,7 +1,7 @@
 /*****************************************************************************
  *                                                                           *
  * The breve Simulation Environment                                          *
- * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
+ * Copyright (C) 2000-2006 Jonathan Klein                                    *
  *                                                                           *
  * This program is free software; you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -18,63 +18,38 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include <curl/curl.h>
-#include <string.h>
 
-#include "slBrevePluginAPI.h"
 
-struct slURLWriteData {
-	char *string;
-	size_t maxSize, size;
-};
+#include <python2.3/Python.h>
+#include "kernel.h"
 
-static size_t slURLWrite( void *, size_t, size_t, struct slURLWriteData * );
+#ifdef HAVE_LIBPYTHON
 
-static int slUGetURL( brEval [], brEval *, void * );
+int brPythonLoadFile( brEval arguments[], brEval *result, brInstance *instance ) {
+	char *file = brFindFile( instance->engine, BRSTRING( &arguments[ 0 ] ), NULL );
+	char import[ 10240 ];
 
-DLLEXPORT void slInitURLFunctions( void *n ) {
-	brNewBreveCall( n, "getURL", slUGetURL, AT_STRING, AT_STRING, 0 );
-}
+	snprintf( import, 10239, "execfile( '''%s''' )", file );
 
-size_t slURLWrite( void *p, size_t s, size_t n, struct slURLWriteData *data ) {
+	result->set( PyRun_SimpleString( import ) );
 
-	const size_t len = s * n;
+	slFree( file );
 
-	const size_t newSize = data->size + len;
-
-	if ( data->maxSize <= newSize ) {
-		data->maxSize = newSize + 1;
-		data->string = ( char* )slRealloc( data->string, data->maxSize );
-	}
-
-	memcpy( &data->string[data->size], p, len );
-
-	data->size = newSize;
-
-	return len;
-}
-
-int slUGetURL( brEval args[], brEval *target, void *i ) {
-
-	struct slURLWriteData data;
-	CURL *handle;
-
-	data.maxSize = 4096;
-	data.size = 0;
-	data.string = new char[ data.maxSize ];
-
-	handle = curl_easy_init();
-	curl_easy_setopt( handle, CURLOPT_URL, BRSTRING( &args[0] ) );
-	curl_easy_setopt( handle, CURLOPT_WRITEFUNCTION, slURLWrite );
-	curl_easy_setopt( handle, CURLOPT_FILE, &data );
-	curl_easy_perform( handle );
-	curl_easy_cleanup( handle );
-
-	data.string[data.size] = '\0';
-
-	target->set( data.string );
-
-	delete data.string;
 
 	return EC_OK;
+}
+
+int brPythonInternalTest( brEval arguments[], brEval *result, brInstance *instance ) {
+	printf( "Internal test function called\n" );
+
+	return EC_OK;
+}
+
+#endif
+
+void breveInitPythonFunctions( brNamespace *n ) {
+#ifdef HAVE_LIBPYTHON
+	brNewBreveCall( n, "pythonLoadFile", brPythonLoadFile, AT_INT, AT_STRING, 0 );
+	brNewBreveCall( n, "pythonInternalTest", brPythonInternalTest, AT_INT, AT_STRING, 0 );
+#endif
 }

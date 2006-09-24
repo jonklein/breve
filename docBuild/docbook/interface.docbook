@@ -11,9 +11,9 @@
 This chapter describes techniques for specifying how users can interact with
 running simulations via a number of user interface features.  The first 
 section describes the global simulation menu and the per-object contextual
-menus (<xref linkend="menus">).  The next sections describe how to catch keyboard
-events (<xref linkend="keyboard">), and how to display a message using a dialog
-(<xref linkend="dialog">).
+menus (<xref linkend="menus"/>).  The next sections describe how to catch keyboard
+events (<xref linkend="keyboard"/>), and how to display a message using a dialog
+(<xref linkend="dialog"/>).
 </para>
 <para>
 While most aspects of The breve Simulation Environment function the same on 
@@ -26,7 +26,7 @@ The most complete support is the Mac OS X
 breve application.  In addition to the techniques described above, the 
 Mac OS X implementation also allows fully customized user interfaces to
 be loaded into running simulations.  The section on loading "nib" files
-(<xref linkend="nib-files">) describes how this is done.
+(<xref linkend="nib-files"/>) describes how this is done.
 </para>
 
 <sect1 id="menus"><title>The Simulation Menu and Contextual Menus</title>
@@ -42,14 +42,14 @@ the user to trigger actions in individual instances.
 </para>
 <para>
 For the controller object, the methods 
-<ulink url="../classes/Control.html#add-menu">add-menu</ulink>
-<ulink url="../classes/Control.html#add-menu">add-menu-separator</ulink> of
-class <ulink url="../classes/Control.html">Control.tz</ulink> 
+<ulink url="http://www.spiderland.org/documentation/classes/Control.html#add-menu">add-menu</ulink>
+<ulink url="http://www.spiderland.org/documentation/classes/Control.html#add-menu">add-menu-separator</ulink> of
+class <ulink url="http://www.spiderland.org/documentation/classes/Control.html">Control.tz</ulink> 
 are used to configure the menus.
 For the simulation objects, the methods 
-<ulink url="../classes/Real.html#add-menu">add-menu</ulink>
-<ulink url="../classes/Real.html#add-menu">add-menu-separator</ulink>
-class <ulink url="../classes/Real.html">Real.tz</ulink> are used.
+<ulink url="http://www.spiderland.org/documentation/classes/Real.html#add-menu">add-menu</ulink>
+<ulink url="http://www.spiderland.org/documentation/classes/Real.html#add-menu">add-menu-separator</ulink>
+class <ulink url="http://www.spiderland.org/documentation/classes/Real.html">Real.tz</ulink> are used.
 </para>
 </sect1>
 
@@ -113,8 +113,8 @@ continuous event, then use the "up" callback to deactivate the event.
 <para>
 <indexterm><primary>show-dialog (method)</primary></indexterm>
 <indexterm><primary>dialog box</primary></indexterm>
-The <ulink url="../classes/Control.html">Control</ulink> method 
-<ulink url="../classes/Control.html#show-dialog">show-dialog</ulink> will 
+The <ulink url="http://www.spiderland.org/documentation/classes/Control.html">Control</ulink> method 
+<ulink url="http://www.spiderland.org/documentation/classes/Control.html#show-dialog">show-dialog</ulink> will 
 bring up a dialog with the options "yes" and "no".  The arguments passed
 to the method will specify the title, message, and text for both the 
 "yes" and "no" buttons.  The method returns 1 if the "yes" button is 
@@ -168,7 +168,7 @@ method with the corresponding tag number:
 + to catch-interface-id-<replaceable>xxx</replaceable> with-string s (string):  
 </screen>
 You can also set the values of interface with the method 
-<ulink url="../classes/Control.html#set-interface-item">set-interface-item</ulink> in the class <ulink url="../classes/Control.html">Control.tz</ulink>.
+<ulink url="http://www.spiderland.org/documentation/classes/Control.html#set-interface-item">set-interface-item</ulink> in the class <ulink url="http://www.spiderland.org/documentation/classes/Control.html">Control.tz</ulink>.
 In both cases&mdash;for both catching and setting interface values&mdash;note that even though the interface value is expressed as a string, the actual value
 is often a number.  A slider interface element, for example, will actually 
 give (and expect) a number value, but on the breve side, it will be 

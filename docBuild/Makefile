@@ -6,6 +6,7 @@ documentation: docclean docbook
 
 docclean: 
 	rm -rf docs
+	mkdir docs
 
 docBuild/docExtract: docBuild/docExtract.c
 	# g++ chokes here?!
@@ -17,33 +18,34 @@ classes: docBuild/docExtract
 	docBuild/docExtract lib/classes/*.tz | docBuild/docBuild.pl docs/classes
 	cp docBuild/classImages/*.jpg docs/classes/
 
-docbook: classes
-	echo $(VERSION) > docBuild/docbook/version.txt
-	date +'%m-%d-%Y' > docBuild/docbook/date.txt
-
-
-	mkdir -p docBuild/docbook/docs
-	touch docBuild/docbook/index.docbook
-	cd docBuild/docbook; \
-		./makeclasslist.sh ../../docs/classes > classlist.docbook
-	cd docBuild/docbook; \
-		openjade -t sgml -V html-index -d breve.dsl breve.docbook
-	cd docBuild/docbook; \
-		collateindex.pl -g HTML.index > index.docbook
-	cd docBuild/docbook; \
-		openjade -t sgml -d breve.dsl breve.docbook
-	-cd docBuild/docbook; \
-		openjade -t tex -d /opt/fink/share/sgml/dsssl/docbook-dsssl-nwalsh/print/docbook.dsl breve.docbook 
-	cp -R docBuild/docbook/index.html docBuild/docbook/docs docs/
+imagecopy:
 	cp docBuild/docbook/images/breve_icon.jpg docs/
-	mkdir docs/docs/images
+	mkdir -p docs/docs/images
 	cp docBuild/docbook/images/*.jpg docs/docs/images/
 	cp docBuild/docbook/images/*.gif docs/docs/images/
 	cp docBuild/docbook/images/*.eps docs/docs/images/
-	-cd docBuild/docbook; \
-		pdfjadetex breve.docbook.tex
-	-cd docBuild/docbook; \
-		pdfjadetex breve.docbook.tex
+
+docbook-pdf: 
+	cd docBuild/docbook; xsltproc --output breve_documentation.fo --stringparam fop.extensions 1 /usr/local/lib/docbook-xsl-1.70.1/fo/docbook.xsl breve.docbook
+	cd docBuild/docbook; fop -fo breve_documentation.fo -pdf breve_documentation.pdf
+
+docbook: imagecopy classes
+
+	echo "$(VERSION)" > docBuild/docbook/version.txt
+	date +'%m-%d-%Y' > docBuild/docbook/date.txt
+
+	mkdir -p docBuild/docbook/docs
+
+	touch docBuild/docbook/index.docbook
+
+	cd docBuild/docbook; \
+		./makeclasslist.sh ../../docs/classes > classlist.docbook
+
+	cd docBuild/docbook; \
+		xsltproc make-html.xsl breve.docbook
+
+	cp -R docBuild/docbook/index.html docBuild/docbook/docs docs/
+
 
 source:
 	mkdir -p ../docs/source

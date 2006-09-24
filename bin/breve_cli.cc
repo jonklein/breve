@@ -21,7 +21,7 @@
 /*
 	+ breve_cli.cc
 	= this is a hack-ish wrapper around the breve engine for a command line
-	= based GLUT version of breve.  
+	= based GLUT version of breve.
 */
 
 #define OSMESA_WINDOW_SIZE 300
@@ -57,13 +57,15 @@ int gShouldQuit = 0;
 
 breveFrontend *frontend;
 
-static int activateContext(void);
-static void brCatchSignal(int);
-static void renderContext(slWorld *, slCamera *);
+static int activateContext( void );
+
+static void brCatchSignal( int );
+
+static void renderContext( slWorld *, slCamera * );
 
 int slLoadOSMesaPlugin( char *execPath );
 
-int main(int argc, char **argv) {
+int main( int argc, char **argv ) {
 	int index;
 	char *text;
 	double nextNotify;
@@ -73,17 +75,17 @@ int main(int argc, char **argv) {
 	pthread_win32_process_attach_np();
 #endif
 
-	srandom(time(NULL));
+	srandom( time( NULL ) );
 
 	interfaceID = "cli/2.5";
 
 	gSimFile = NULL;
 
 	//
-	// Parse the command line args. 
+	// Parse the command line args.
 	//
 
-	index = brParseArgs(argc, argv);
+	index = brParseArgs( argc, argv );
 
 	char *execpath = argv[ 0 ];
 
@@ -99,28 +101,32 @@ int main(int argc, char **argv) {
 	//
 
 	frontend = breveFrontendInit( argc, argv );
-	frontend->data = breveFrontendInitData(frontend->engine);
 
-	brEngineSetIOPath(frontend->engine, getcwd(wd, MAXPATHLEN));
+	frontend->data = breveFrontendInitData( frontend->engine );
+
+	brEngineSetIOPath( frontend->engine, getcwd( wd, MAXPATHLEN ) );
 
 	frontend->engine->camera->_activateContextCallback = activateContext;
 
 	frontend->engine->camera->_renderContextCallback = renderContext;
 
 	frontend->engine->getLoadname = getLoadname;
+
 	frontend->engine->getSavename = getSavename;
+
 	frontend->engine->dialogCallback = brCLIDialogCallback;
+
 	frontend->engine->interfaceTypeCallback = interfaceVersionCallback;
 
-	signal(SIGINT, brCatchSignal);
+	signal( SIGINT, brCatchSignal );
 
 	//
 	// Attempt to load an offscreen Mesa buffer.
 	//
 
-	gOffscreenBuffer = (GLubyte *)slMalloc( OSMESA_WINDOW_SIZE * OSMESA_WINDOW_SIZE * 4 * sizeof(GLubyte));
+	gOffscreenBuffer = ( GLubyte * )slMalloc( OSMESA_WINDOW_SIZE * OSMESA_WINDOW_SIZE * 4 * sizeof( GLubyte ) );
 
-	if( slLoadOSMesaPlugin( execpath ) ) {
+	if ( slLoadOSMesaPlugin( execpath ) ) {
 		slFree( gOffscreenBuffer );
 		gOffscreenBuffer = NULL;
 	}
@@ -133,215 +139,255 @@ int main(int argc, char **argv) {
 
 	text = slUtilReadFile( argv[ 0 ] );
 
-	if (!text) {
+	if ( !text ) {
 		fprintf( stderr, "Error reading file \"%s\"\n", argv[0] );
-		exit(1);
+		exit( 1 );
 	}
 
-	if (gSimFile) {
+	if ( gSimFile ) {
 		if ( breveFrontendLoadSavedSimulation( frontend, text, argv[0], gSimFile ) != EC_OK )
-			brQuit(frontend->engine);
-	} else if( breveFrontendLoadSimulation(frontend, text, argv[0] ) != EC_OK )
-			brQuit(frontend->engine);
+			brQuit( frontend->engine );
+	} else if ( breveFrontendLoadSimulation( frontend, text, argv[0] ) != EC_OK )
+		brQuit( frontend->engine );
 
-	slFree(text);
+	slFree( text );
 
 	nextNotify = gNotify;
 
-	if (gMaster)
+	if ( gMaster )
 		frontend->engine->world->startNetsimServer();
 
-	if (gSlave) {
+	if ( gSlave ) {
 		frontend->engine->world->startNetsimSlave( gSlaveHost );
 		slFree( gSlaveHost );
 	}
 
-	while (!gShouldQuit && brEngineIterate(frontend->engine) == EC_OK) {
-		if (gNotify &&
-		    frontend->engine->world->getAge() > nextNotify) {
-			printf("%f seconds elapsed\n",
-			    frontend->engine->world->getAge() );
+	while ( !gShouldQuit && brEngineIterate( frontend->engine ) == EC_OK ) {
+		if ( gNotify &&
+		        frontend->engine->world->getAge() > nextNotify ) {
+			printf( "%f seconds elapsed\n",
+			        frontend->engine->world->getAge() );
 			nextNotify += gNotify;
 		}
 
-		if (gSimMax > 0.0 &&
-		    frontend->engine->world->getAge() >= gSimMax) {
-			printf("%f simulation seconds completed\n", gSimMax);
-			brQuit(frontend->engine);
+		if ( gSimMax > 0.0 &&
+		        frontend->engine->world->getAge() >= gSimMax ) {
+			printf( "%f simulation seconds completed\n", gSimMax );
+			brQuit( frontend->engine );
 		}
 
-		if ( frontend->engine->world->detectLightExposure() ) 
-			frontend->engine->camera->detectLightExposure( 
-				frontend->engine->world, OSMESA_WINDOW_SIZE, gOffscreenBuffer );
+		if ( frontend->engine->world->detectLightExposure() )
+			frontend->engine->camera->detectLightExposure(
+			    frontend->engine->world, OSMESA_WINDOW_SIZE, gOffscreenBuffer );
 	}
 
 	brQuit( frontend->engine );
 }
 
-void brCatchSignal(int signal) {
+void brCatchSignal( int signal ) {
+
 	static int waiting = 0;
+
 	char *line, staticLine[10240];
 
-	if (waiting)
+	if ( waiting )
 		return;
 
 	waiting = 1;
 
-	brPauseTimer(frontend->engine);
+	brPauseTimer( frontend->engine );
 
-	printf("\n\nSimulation interupted.  Type a steve command, 'x' to quit, or hit enter to continue\n");
-	fflush(stdout);
+	printf( "\n\nSimulation interupted.  Type a steve command, 'x' to quit, or hit enter to continue\n" );
+
+	fflush( stdout );
 
 #if HAVE_LIBREADLINE && HAVE_LIBHISTORY
-	line = readline("breve> ");
-	if (line && *line)
-		add_history(line);
-#else 
-	printf("breve> ");
-	fflush(stdout);
-	line = fgets(staticLine, sizeof(staticLine), stdin);
+	line = readline( "breve> " );
+
+	if ( line && *line )
+		add_history( line );
+
+#else
+	printf( "breve> " );
+
+	fflush( stdout );
+
+	line = fgets( staticLine, sizeof( staticLine ), stdin );
+
 #endif
 
-	if (!line || *line == 'x') {
-		brUnpauseTimer(frontend->engine);
+	if ( !line || *line == 'x' ) {
+		brUnpauseTimer( frontend->engine );
 		gShouldQuit = 1;
 		waiting = 0;
 		return;
 	}
 
-	if (*line == '\n') {
+	if ( *line == '\n' ) {
 		waiting = 0;
 		return;
 	}
 
-	stRunSingleStatement((stSteveData *)frontend->data, frontend->engine, line);
+	stRunSingleStatement(( stSteveData * )frontend->data, frontend->engine, line );
 
-	if (line != staticLine)
-		free(line);
+	if ( line != staticLine )
+		free( line );
 
-	brUnpauseTimer(frontend->engine);
+	brUnpauseTimer( frontend->engine );
 
 	waiting = 0;
 }
 
-int brParseArgs(int argc, char **argv) {
+int brParseArgs( int argc, char **argv ) {
 	int level, r;
 	int error = 0;
 
 	const char *optstring = "a:d:hn:r:t:vMS:";
 
 #if HAVE_GETOPT_LONG
-	while((r = getopt_long(argc, argv, optstring, gCLIOptions, NULL)) != -1)
-#else 
-	while((r = getopt(argc, argv, optstring)) != -1)
+	while (( r = getopt_long( argc, argv, optstring, gCLIOptions, NULL ) ) != -1 )
+#else
+	while (( r = getopt( argc, argv, optstring ) ) != -1 )
 #endif
 	{
-		switch(r) {
-		case 'a':
-			gSimFile = slStrdup(optarg);
-			break;
-		case 'd':
-			level = atoi(optarg);
-			printf("debug level: %d\n", level);
-			slSetDebugLevel(level);
-			break;
-		case 'n':
-			gNotify = atof(optarg);
-			if (gNotify)
-				printf("Notification every %f seconds\n", gNotify);
-			else
-				printf("Notifications disabled\n");
-			break;
-		case 'r':
-			srandom(atoi(optarg));
-			printf("random seed: %d\n", atoi(optarg));
-			break;
-		case 't':
-			gSimMax = atof(optarg);
-			printf("running for %f seconds\n", gSimMax);
-			break;
-		case 'v':
-			brPrintVersion();
-			break;
-		case 'M':
-			gMaster = 1;
-			break;
-		case 'S':
-			gSlaveHost = slStrdup(optarg);
-			gSlave = 1;
-			break;
-		default:
-			printf("unknown option: '%c'\n", r);
-		case 'h':
-			error++;
+
+		switch ( r ) {
+
+			case 'a':
+				gSimFile = slStrdup( optarg );
+
+				break;
+
+			case 'd':
+				level = atoi( optarg );
+
+				printf( "debug level: %d\n", level );
+
+				slSetDebugLevel( level );
+
+				break;
+
+			case 'n':
+				gNotify = atof( optarg );
+
+				if ( gNotify )
+					printf( "Notification every %f seconds\n", gNotify );
+				else
+					printf( "Notifications disabled\n" );
+
+				break;
+
+			case 'r':
+				srandom( atoi( optarg ) );
+
+				printf( "random seed: %d\n", atoi( optarg ) );
+
+				break;
+
+			case 't':
+				gSimMax = atof( optarg );
+
+				printf( "running for %f seconds\n", gSimMax );
+
+				break;
+
+			case 'v':
+				brPrintVersion();
+
+				break;
+
+			case 'M':
+				gMaster = 1;
+
+				break;
+
+			case 'S':
+				gSlaveHost = slStrdup( optarg );
+
+				gSlave = 1;
+
+				break;
+
+			default:
+				printf( "unknown option: '%c'\n", r );
+
+			case 'h':
+				error++;
 		}
 	}
 
-	if (error)
-		brPrintUsage(argv[0]);
+	if ( error )
+		brPrintUsage( argv[0] );
 
 	return optind;
 }
 
-void brPrintUsage(const char *name) {
-	fprintf(stderr, "usage: %s [options] simulation_file\n", name);
-	fprintf(stderr, "options:\n");
-	fprintf(stderr, "  -t, --terminate <seconds>  Stops the simulation after <seconds>\n");
-	fprintf(stderr, "  -n, --notify <seconds>     Prints a message every time <seconds>\n");
-	fprintf(stderr, "                             have passed\n");
-	fprintf(stderr, "  -r, --random <seed>        Sets the random seed to <seed>.\n");
-	fprintf(stderr, "  -a, --archive <xml_file>   Dearchive simulation from <xml_file>.  <xml_file>\n");
-	fprintf(stderr, "                             should be an archive of the simulation contained \n");
-	fprintf(stderr, "                             in the input file.\n");
-	fprintf(stderr, "  -v, --version              Display the current version number.\n");
-	fprintf(stderr, "  -h, --help                 Display this information.\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "For full documentation, or to submit a bug report, visit the breve homepage:\n");
-	fprintf(stderr, "http://www.spiderland.org/breve\n\n");
-	exit(1);
+void brPrintUsage( const char *name ) {
+	fprintf( stderr, "usage: %s [options] simulation_file\n", name );
+	fprintf( stderr, "options:\n" );
+	fprintf( stderr, "  -t, --terminate <seconds>  Stops the simulation after <seconds>\n" );
+	fprintf( stderr, "  -n, --notify <seconds>     Prints a message every time <seconds>\n" );
+	fprintf( stderr, "                             have passed\n" );
+	fprintf( stderr, "  -r, --random <seed>        Sets the random seed to <seed>.\n" );
+	fprintf( stderr, "  -a, --archive <xml_file>   Dearchive simulation from <xml_file>.  <xml_file>\n" );
+	fprintf( stderr, "                             should be an archive of the simulation contained \n" );
+	fprintf( stderr, "                             in the input file.\n" );
+	fprintf( stderr, "  -v, --version              Display the current version number.\n" );
+	fprintf( stderr, "  -h, --help                 Display this information.\n" );
+	fprintf( stderr, "\n" );
+	fprintf( stderr, "For full documentation, or to submit a bug report, visit the breve homepage:\n" );
+	fprintf( stderr, "http://www.spiderland.org/breve\n\n" );
+	exit( 1 );
 }
 
-void brQuit(brEngine *e) {
+void brQuit( brEngine *e ) {
+
 	double diff, age;
 
-	brPauseTimer(e);
+	brPauseTimer( e );
 
-	diff = e->realTime.tv_sec + (e->realTime.tv_usec / 1000000.0);
+	diff = e->realTime.tv_sec + ( e->realTime.tv_usec / 1000000.0 );
 
 	age = e->world->getAge();
 
-	if (age != 0.0) {
-		printf("%f simulated seconds elapsed\n", age);
-		printf("%f real seconds elapsed\n", diff);
-		printf("%f simulated/real\n", age/diff);
+	if ( age != 0.0 ) {
+		printf( "%f simulated seconds elapsed\n", age );
+		printf( "%f real seconds elapsed\n", diff );
+		printf( "%f simulated/real\n", age / diff );
 	}
 
-	brEngineFree(frontend->engine);
-	breveFrontendCleanupData(frontend->data);
-	breveFrontendDestroy(frontend);
+	brEngineFree( frontend->engine );
 
-	exit(0);
+	breveFrontendCleanupData( frontend->data );
+	breveFrontendDestroy( frontend );
+
+	exit( 0 );
 }
 
-int brCLIDialogCallback(char *title, char *message, char *b1, char *b2) {
+int brCLIDialogCallback( char *title, char *message, char *b1, char *b2 ) {
 	int result;
 
-	for (;;) {
-		printf("%s\n\n%s\n[Y/N]? ", title, message);
+	for ( ;; ) {
+		printf( "%s\n\n%s\n[Y/N]? ", title, message );
 
 		result = getchar();
-		(void)getchar();
+		( void )getchar();
 
-		switch(result) {
-		case EOF:
-		case 'n':
-		case 'N':
-			return 0;
-		case 'y':
-		case 'Y':
-			return 1;
+		switch ( result ) {
+
+			case EOF:
+
+			case 'n':
+
+			case 'N':
+				return 0;
+
+			case 'y':
+
+			case 'Y':
+				return 1;
 		}
-	} 
+	}
 }
 
 char *interfaceVersionCallback() {
@@ -351,32 +397,32 @@ char *interfaceVersionCallback() {
 char *getSavename() {
 	char name[MAXPATHLEN];
 
-	printf("filename to save: ");
-	fgets(name, sizeof(name), stdin);
+	printf( "filename to save: " );
+	fgets( name, sizeof( name ), stdin );
 
-	if (*name)
-		name[strlen(name) - 1] = '\0';
+	if ( *name )
+		name[strlen( name ) - 1] = '\0';
 
-	return slStrdup(name);
+	return slStrdup( name );
 }
 
 char *getLoadname() {
 	char name[MAXPATHLEN];
 
-	printf("filename to load: ");
-	fgets(name, sizeof(name), stdin);
+	printf( "filename to load: " );
+	fgets( name, sizeof( name ), stdin );
 
-	if (*name)
-		name[strlen(name) - 1] = 0;
+	if ( *name )
+		name[strlen( name ) - 1] = 0;
 
-	return slStrdup(name);
+	return slStrdup( name );
 }
 
 int activateContext() {
 	return -1;
 }
 
-void renderContext(slWorld *w, slCamera *c) {
+void renderContext( slWorld *w, slCamera *c ) {
 	c->renderScene( w, 0 );
 }
 
@@ -386,8 +432,8 @@ int slLoadOSMesaPlugin( char *execPath ) {
 	return -1;
 #else
 	void *handle;
-	void (*create)( unsigned char *, int );
-	int (*activate)();
+	void( *create )( unsigned char *, int );
+	int( *activate )();
 
 	std::string path = dirname( execPath );
 
@@ -395,17 +441,17 @@ int slLoadOSMesaPlugin( char *execPath ) {
 
 	handle = dlopen( path.c_str(), RTLD_NOW );
 
-	if( !handle ) return -1;
-        
-	create = (void(*)(unsigned char*,int))dlsym( handle, "slOSMesaCreate" );
+	if ( !handle ) return -1;
 
-        if( !create ) return -1;
+	create = ( void( * )( unsigned char*, int ) )dlsym( handle, "slOSMesaCreate" );
 
-        create ( gOffscreenBuffer, OSMESA_WINDOW_SIZE );
+	if ( !create ) return -1;
 
-        activate = (int(*)())dlsym( handle, "slOSMesaMakeCurrentContext" );
+	create( gOffscreenBuffer, OSMESA_WINDOW_SIZE );
 
-	if( !activate ) return -1;
+	activate = ( int( * )() )dlsym( handle, "slOSMesaMakeCurrentContext" );
+
+	if ( !activate ) return -1;
 
 	frontend->engine->camera->_activateContextCallback = activate;
 
@@ -414,5 +460,6 @@ int slLoadOSMesaPlugin( char *execPath ) {
 	slInitGL( frontend->engine->world, frontend->engine->camera );
 
 	return 0;
+
 #endif
 }

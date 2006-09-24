@@ -45,7 +45,7 @@ an ecosystem simulation: a large number of autonomous agents (animals)
 interacting with each other (eating and breeding) and the environment.
 </para>
 <para>
-<mediaobject><imageobject><imagedata align="center" fileref="images/particle_fountain.jpg"></imageobject>
+<mediaobject><imageobject><imagedata align="center" fileref="images/particle_fountain.jpg"/></imageobject>
 <caption><para>In the <emphasis>ParticleFountain</emphasis> demo, you can see 
 a particle system made up of hundreds of independent agents.</para></caption>
 </mediaobject>
@@ -64,7 +64,7 @@ environments which model space in 2D or which treat "space" only as an
 abstract concept.  
 </para>
 <para>
-<mediaobject><imageobject><imagedata align="center" fileref="images/DLA.jpg"></imageobject>
+<mediaobject><imageobject><imagedata align="center" fileref="images/DLA.jpg"/></imageobject>
 <caption><para>
 In the <emphasis>DLA</emphasis> demo, a fractal structure forms in 3D space.
 </para></caption>
@@ -83,7 +83,7 @@ things, physical simulation can be used for realistic simulation of robots,
 vehicles and animals.
 </para>
 <para>
-<mediaobject><imageobject><imagedata align="center" fileref="images/walker.jpg"></imageobject>
+<mediaobject><imageobject><imagedata align="center" fileref="images/walker.jpg"/></imageobject>
 <caption><para>
 In the <emphasis>Walker</emphasis> demo, a physically simulated creature 
 learns to walk.
@@ -120,7 +120,7 @@ the simulation display.
 <para>
 If multiple code windows are open, you can select the simulation to start
 by using the popup menu located at the bottom of the simulation window.
-<mediaobject><imageobject><imagedata align="center" fileref="images/simulation_popup.jpg"></imageobject></mediaobject>
+<mediaobject><imageobject><imagedata align="center" fileref="images/simulation_popup.jpg"/></imageobject></mediaobject>
 </para>
 
 </sect2>
@@ -133,7 +133,7 @@ by using the popup menu located at the bottom of the simulation window.
 <indexterm><primary>selection-tool</primary></indexterm>
 <indexterm><primary>dragging objects</primary></indexterm>
 On the bottom of the simulation window is a small palette of tools.
-<mediaobject><imageobject><imagedata align="center" fileref="images/tools.jpg"></imageobject></mediaobject>
+<mediaobject><imageobject><imagedata align="center" fileref="images/tools.jpg"/></imageobject></mediaobject>
 </para>
 <para>
 The first tool is the rotation tool.  Use it to rotate the simulation view.
@@ -151,7 +151,7 @@ simulation.
 <para>
 The final tool, the selection and motion tool, is used to select objects in 
 the simulation.  Once selected, an object can be inspected using the 
-selection inspector window (described in <xref linkend="selection-inspector">), 
+selection inspector window (described in <xref linkend="selection-inspector"/>), 
 or dragged around the simulation.
 </para>
 </sect2>
@@ -169,7 +169,7 @@ The inspector automatically updates every few seconds so that the current
 state of simulation variables is always shown.
 </para>
 <para>
-<mediaobject><imageobject><imagedata align="center" fileref="images/selection_inspector.jpg"></imageobject></mediaobject>
+<mediaobject><imageobject><imagedata align="center" fileref="images/selection_inspector.jpg"/></imageobject></mediaobject>
 </para>
 </sect2>
 
@@ -183,8 +183,8 @@ The log window also contains a command-input field.  This field allows you
 to execute commands in running simulations.  "steve" commands can be written
 directly into this field, and will be executed in the simulation's 
 controller object.  The steve language (and the controller object) are 
-described in the next chapter (<xref linkend="steve">).
-<mediaobject><imageobject><imagedata align="center" fileref="images/log_window.jpg"></imageobject></mediaobject>
+described in the next chapter (<xref linkend="steve"/>).
+<mediaobject><imageobject><imagedata align="center" fileref="images/log_window.jpg"/></imageobject></mediaobject>
 </para>
 </sect2>
 
@@ -263,7 +263,7 @@ Once your <function>BREVE_CLASS_PATH</function> environment variable is configur
 running breve with one of the included simulation files.  Assuming that you are in the 
 breve distribution directory, you can try out the "ArrowSwarm" demo by typing:
 <screen>
-# Linux & OSX
+# Linux &amp; OSX
 	% ./bin/breve ./demos/Swarm/ArrowSwarm.tz
 
 # Windows
@@ -295,7 +295,7 @@ alt or shift keys.
 The breve command prompt (which can be accessed using the escape key) can be used to
 execute commands in running simulations.  "steve" commands are typed in at this 
 prompt, and will be executed in the simulation's controller object.  The steve language 
-(and the controller object) are described in the next chapter (<xref linkend="steve">).
+(and the controller object) are described in the next chapter (<xref linkend="steve"/>).
 </para>
 </sect2>
 
@@ -337,7 +337,7 @@ how simulations are written.
 <para>
 If you wish to run a simulation without graphical display, you can use the 
 program <function>breve_cli</function>.  Follow the same setup directions 
-described above (<xref linkend="cli-setup">) in order to setup your environment,
+described above (<xref linkend="cli-setup"/>) in order to setup your environment,
 and then run the simulation:
 <screen>
 % ./bin/breve_cli ./demos/Push/PushRegression.tz

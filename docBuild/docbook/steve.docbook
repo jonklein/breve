@@ -37,8 +37,8 @@ in this chapter.
 </para>
 <para>
 First, the classic "Hello, World" program is constructed in steve 
-(<xref linkend="hello-world">).  Then, a simple multiagent 3D simulation 
-written in steve is presented (<xref linkend="simple-example">).  This 
+(<xref linkend="hello-world"/>).  Then, a simple multiagent 3D simulation 
+written in steve is presented (<xref linkend="simple-example"/>).  This 
 sample should give the basic idea of what a breve simulation looks like.
 </para>
 <para>
@@ -46,13 +46,13 @@ As discussed above, all agents in the simulated world are represented by program
 objects.  These objects are defined in terms of object templates called 
 <firstterm>classes</firstterm>.  The most important object, called the 
 <firstterm>Controller</firstterm> is described in the section The Controller Object 
-(<xref linkend="controller-object">).  The section Building Classes 
-(<xref linkend="building-classes">) describes how to construct basic classes in steve.
+(<xref linkend="controller-object"/>).  The section Building Classes 
+(<xref linkend="building-classes"/>) describes how to construct basic classes in steve.
 </para>
 <para>
 In order to define the data and behaviors of your classes, you'll need to be familiar
-with types (<xref linkend="types">) and expressions (<xref linkend="expressions">).
-The section Program Control Structures (<xref linkend="control-structures">) discusses
+with types (<xref linkend="types"/>) and expressions (<xref linkend="expressions"/>).
+The section Program Control Structures (<xref linkend="control-structures"/>) discusses
 loops and conditional statements.
 </para>
 
@@ -100,7 +100,7 @@ step of the simulation.  Thus, "Hello, World!".  Ad nauseum.
 language.  It does not, however, give any insight into how 3D multiagent simulations 
 are written in steve.  This section shows the code for a simple 3D multiagent 
 simulation.  
-<mediaobject><imageobject><imagedata align="center" fileref="images/random_walker.jpg"></imageobject>
+<mediaobject><imageobject><imagedata align="center" fileref="images/random_walker.jpg"/></imageobject>
 <caption><para>In the <emphasis>RandomWalker</emphasis> demo, you can see 
 a simple simulation containing hundreds of independent agents.</para></caption>
 </mediaobject>
@@ -229,12 +229,12 @@ function.
 <para>
 The first step in writing a <emphasis>breve</emphasis> simulation is to create a controller 
 class which will setup and manage the simulation.  The controller class you create 
-<emphasis>must be a subclass of the class <ulink url="../classes/Control.html">Control</ulink>
+<emphasis>must be a subclass of the class <ulink url="http://www.spiderland.org/documentation/classes/Control.html">Control</ulink>
 or one of its subclasses</emphasis>.  Details on how to do this is described in the rest of 
 this chapter.
 </para>
 <para>
-As shown in the previous section (<xref linkend="simple-example">), the controller object is
+As shown in the previous section (<xref linkend="simple-example"/>), the controller object is
 specified at the top of your simulation file using the word <emphasis>controller</emphasis>:
 <screen>
 Controller <replaceable>myControllerClass</replaceable>.
@@ -252,7 +252,7 @@ between simulation objects, the <emphasis>breve</emphasis> engine and the user. 
 other instances may come and go, the controller object is forever.  The controller class
 contains a great number of methods for controlling the behavior of simulations, the 
 appearance of the graphical display and interactions with the user interface.  See the 
-class documentation on <ulink url="../classes/Control.html">Control</ulink> for more 
+class documentation on <ulink url="http://www.spiderland.org/documentation/classes/Control.html">Control</ulink> for more 
 information.  As with some of the other topics covered in this section, the significance 
 of these concepts will become clearer in the rest of the documentation.
 </para>
@@ -270,7 +270,7 @@ template which defines the agent's behaviors.  This section describes how to
 construct and use these classes.
 </para>
 <para>
-The section Defining Classes (<xref linkend="defining-classes">) describes 
+The section Defining Classes (<xref linkend="defining-classes"/>) describes 
 how to define an empty class.  
 </para>
 <para>
@@ -279,9 +279,9 @@ define a class's behavior and <firstterm>variables</firstterm> which define
 the data that the class can hold.  This data can be used both to store 
 information about the state of the agent, or information required for 
 computation.  The section Defining Instance Variables 
-(<xref linkend="defining-instance-variables">) details how variables
+(<xref linkend="defining-instance-variables"/>) details how variables
 can be added to objects, while the section Defining Class Methods 
-(<xref linkend="defining-methods">) shows how method
+(<xref linkend="defining-methods"/>) shows how method
 are defined.  
 </para>
 <para>
@@ -289,7 +289,7 @@ Two special methods are critical for an agents behavior: one that
 gets called automatically when the agent is created, <function>init</function>, and another which is run automatically at every step of the simulation, 
 <function>iterate</function>.  These methods, and a few other special methods 
 are discussed in the section Special Method 
-Names (<xref linkend="special-method-names">)
+Names (<xref linkend="special-method-names"/>)
 </para>
 <para>
 Even after the class is defined, it will still not be present in the 
@@ -298,7 +298,7 @@ an agent.  In order to bring agents into the simulation, you must use the
 template to create <firstterm>instances</firstterm> 
 <indexterm><primary>instance</primary></indexterm>
 of the class.  The section on Creating and Destroying 
-Instances (<xref linkend="creating-destroying-instances">) describes how 
+Instances (<xref linkend="creating-destroying-instances"/>) describes how 
 instances of classes are created and destroyed.  
 </para>
 <sect2 id="defining-classes"><title>Defining Classes</title>
@@ -318,7 +318,7 @@ behaviors that we need to.
 For example, if we're building an object which will move through the 3D world,
 we'd like to have an object that understands the relationship between 
 position, velocity and acceleration.  Instead of implementing such a class
-ourselves, we can subclass <ulink url="../classes/Mobile.html">Mobile.tz</ulink>
+ourselves, we can subclass <ulink url="http://www.spiderland.org/documentation/classes/Mobile.html">Mobile.tz</ulink>
 which is included with breve.  Our custom subclass will contain the custom
 behaviors we desire, while the parent class takes care of the details.
 </para>
@@ -327,12 +327,12 @@ When building a class, you must first decide the class name and its
 parent class.  The parent class is the class from which the new class will 
 inherit its behaviors.  Classes which are to be used primarily for 
 computation and do not require any special inherited behaviors, will typically 
-use the generic root class <ulink url="../classes/Object.html">Object</ulink>.
+use the generic root class <ulink url="http://www.spiderland.org/documentation/classes/Object.html">Object</ulink>.
 Classes which move around the world will inherit behaviors from 
-<ulink url="../classes/Mobile.html">Mobile</ulink>, while immobile objects
+<ulink url="http://www.spiderland.org/documentation/classes/Mobile.html">Mobile</ulink>, while immobile objects
 in the world will inherit behaviors from 
-<ulink url="../classes/Stationary.html">Stationary</ulink>.  A full list
-of classes is available in the appendix (<xref linkend="classes">).
+<ulink url="http://www.spiderland.org/documentation/classes/Stationary.html">Stationary</ulink>.  A full list
+of classes is available in the appendix (<xref linkend="classes"/>).
 </para>
 <para>
 An empty class is simply defined by the following steve code:
@@ -393,7 +393,7 @@ Multiple variables of the same type can also be declared on the same line:
 <screen>
     <replaceable>variable1</replaceable>, <replaceable>variable2</replaceable>, <replaceable>variable3</replaceable>, ... (<replaceable>variableType</replaceable>). 
 </screen>
-Variable types are covered in detail in the section Types (<xref linkend="types">).
+Variable types are covered in detail in the section Types (<xref linkend="types"/>).
 </para>
 <para>
 As an example, we'll add some variables to the simple class we created in the previous
@@ -480,7 +480,7 @@ For example, here is a simple method which uses local variables:
 	foreach item in creatureList: {
 		distance = |(self get-location) - (item get-location)|.
 
-		if distance < closestDistance: {
+		if distance &lt; closestDistance: {
 			closestItem = item.
 			closestDistance = distance.
 		}
@@ -688,16 +688,16 @@ An <function>object</function> is an <emphasis>instance</emphasis> of a steve cl
 <para>
 <function>objects</function> cannot used in mathematical expressions as some of the other types can.
 Instead, <function>objects</function> are mainly used for one type of expression: method calling.
-Method calling is outlined in the section Method Calls (<xref linkend="method-calls">).
+Method calling is outlined in the section Method Calls (<xref linkend="method-calls"/>).
 </para>
 </sect3>
 <sect3><title>Conversion to Other Types</title>
 <para>
 Objects cannot be explicitly converted to other types.  
 They do, however, have meaning as "boolean" (true or false) expressions in control
-structures (<xref linkend="control-structures">).  If used in the context of a 
+structures (<xref linkend="control-structures"/>).  If used in the context of a 
 boolean expression (like an <function>if</function> statement,
-<xref linkend="if">), the expression is true only if the variable refers to an 
+<xref linkend="if"/>), the expression is true only if the variable refers to an 
 active object.  This means that an object variable which has not yet been 
 associated with an instance in the simulation is false.
 </para>
@@ -743,9 +743,9 @@ myVector::y = 100.
 <para>
 Vectors cannot be converted to any other types.  
 They do, however, have meaning as "boolean" (true or false) expressions in control 
-structures (<xref linkend="control-structures">).  If used in the 
+structures (<xref linkend="control-structures"/>).  If used in the 
 context of a boolean expression (like an <function>if</function> statement,
-<xref linkend="if">), the vector will be true if it's length is greater
+<xref linkend="if"/>), the vector will be true if it's length is greater
 than 0, and false if its length is equal to 0.  This is to say that only 
 the vector (0, 0, 0) is false in a boolean context.
 </para>
@@ -796,9 +796,9 @@ result of this operation is a vector.
 <para>
 Matrices cannot be converted to any other types.
 They do, however, have meaning as "boolean" (true or false) expressions in control 
-structures (<xref linkend="control-structures">).  If used in the 
+structures (<xref linkend="control-structures"/>).  If used in the 
 context of a boolean expression (like an <function>if</function> statement,
-<xref linkend="if">), the expression will be true if there are any non-zero values 
+<xref linkend="if"/>), the expression will be true if there are any non-zero values 
 in the matrix.  This means that a matrix of all zeros will be false, while all 
 other matrices are true.
 </para>
@@ -1070,7 +1070,7 @@ however, pointers can be tested to see if they are NULL (0),
 but cannot be used in mathematical expressions.  That is to say that
 pointers have a meaning in a boolean context of control structures 
 such as <emphasis>if</emphasis> and <emphasis>while</emphasis> (as well as the logical operators
-<emphasis>&&</emphasis> and <emphasis>||</emphasis>).
+<emphasis>&amp;&amp;</emphasis> and <emphasis>||</emphasis>).
 </para>
 <para>
 Copying a pointer (assigning it to another variable), as in C, will not copy the data is points to.
@@ -1104,7 +1104,7 @@ means that <function>data</function> variables can be successfully archived, whi
 cannot.  <emphasis>The only use for <function>data</function> variables is archiving 
 and dearchiving internal data</emphasis>.  For more information on using the 
 <function>data</function> type with plugins, see the section on 
-Archiving Plugin Data With The <function>data</function> Type (<xref linkend="archiving-data">).
+Archiving Plugin Data With The <function>data</function> Type (<xref linkend="archiving-data"/>).
 </para>
 </sect2>
 
@@ -1112,7 +1112,7 @@ Archiving Plugin Data With The <function>data</function> Type (<xref linkend="ar
 <para>
 <indexterm><primary>arrays</primary></indexterm>
 Arrays can be used to group several variables of the same type.  Use of arrays is now 
-deprecated: use lists (<xref linkend="list">) instead.
+deprecated: use lists (<xref linkend="list"/>) instead.
 </para>
 </sect2>
 </sect1>
@@ -1433,7 +1433,7 @@ returns 1 if the input is a float value representing infinity, 0 otherwise.</par
 <para>
 <indexterm><primary>random numbers</primary></indexterm>
 Random numbers are available in steve using the command <function>random</function>. The syntax is <function>random[ <replaceable>expression</replaceable> ]</function>, where expression is an expression of either 
-<function>int</function> (<xref linkend="int">), <function>float</function> (<xref linkend="float">) or <function>vector</function> (<xref linkend="vector">).  The value returned is always the same type as the expression.  In the case of <function>int</function> or <function>float</function>, the returned value is a random value between 0 and the expression.  In the case of a <function>vector</function> expression, the returned value is a <function>vector</function> in which each element is between 0 and the corresponding value of the expression.  For example, a  call to <function>random[(10, 10, 20)]</function> returns a <function>vector</function> with X and Y elements between 0 and 10, and the Z element between 0 and 20. 
+<function>int</function> (<xref linkend="int"/>), <function>float</function> (<xref linkend="float"/>) or <function>vector</function> (<xref linkend="vector"/>).  The value returned is always the same type as the expression.  In the case of <function>int</function> or <function>float</function>, the returned value is a random value between 0 and the expression.  In the case of a <function>vector</function> expression, the returned value is a <function>vector</function> in which each element is between 0 and the corresponding value of the expression.  For example, a  call to <function>random[(10, 10, 20)]</function> returns a <function>vector</function> with X and Y elements between 0 and 10, and the Z element between 0 and 20. 
 </para>
 <para>
 Note that <function>random[<replaceable>intValue</replaceable>]</function> returns a value between 0 and <replaceable>intValue</replaceable>, inclusive, as opposed to the behavior that many C programmers expect in which the  returned value is between 0 and <replaceable>intValue</replaceable> - 1. 
@@ -1449,8 +1449,8 @@ The values are produced using the standard C library <function>random()</functio
 In the event that multiple breve simulations are launched simultaneously (typically only relevant in 
 cluster environments), it may be necessary to pick unique random seeds for each simulation to prevent
 each of the simulations from giving the same results.  Refer to the 
-<ulink url="../classes/Control.html">Controller</ulink> method 
-<ulink url="../classes/Control.html#set-random-seed-from-dev-random">set-random-seed-from-dev-random</ulink>
+<ulink url="http://www.spiderland.org/documentation/classes/Control.html">Controller</ulink> method 
+<ulink url="http://www.spiderland.org/documentation/classes/Control.html#set-random-seed-from-dev-random">set-random-seed-from-dev-random</ulink>
 for more information on automatically picking unique random seeds on systems which support it.
 </para>
 </sect2>
@@ -1537,7 +1537,7 @@ used to print output from a simulation to the output log.  Both of these
 statements accept any type of expression, as well as multiple expressions
 separated by commas.  Also, since <function>strings</function> may contain 
 embedded variables, you can format the output of variables however you'd like.
-See the section on <function>strings</function> (<xref linkend="string">)
+See the section on <function>strings</function> (<xref linkend="string"/>)
 for more information.
 </para>
 <para>
@@ -1650,9 +1650,9 @@ but is followed by a colon (':') character.
 </para>
 <para>
 Control statements evaluate test statements and then execute code according to 
-the result.  In the case of <function>for</function> (<xref linkend="for">),
-<function>foreach</function> (<xref linkend="foreach">) and
-<function>while</function> (<xref linkend="for">), these structures are used
+the result.  In the case of <function>for</function> (<xref linkend="for"/>),
+<function>foreach</function> (<xref linkend="foreach"/>) and
+<function>while</function> (<xref linkend="for"/>), these structures are used
 as loops to repeat execution of a piece of code a certain number of times 
 or while a certain condition is met.  The <function>if</function> statement
 is used to execute a block of code if a certain condition is true and,
@@ -1665,11 +1665,11 @@ The conditional statements are be comprised of C-style comparison operators.  Th
 <itemizedlist>
 <listitem><para><function>==</function>, Equals</para></listitem>
 <listitem><para><function>!=</function>, Not equals</para></listitem>
-<listitem><para><function>\>=</function>, Greater than or Equals</para></listitem>
-<listitem><para><function>\<=</function>, Less than or Equals</para></listitem>
-<listitem><para><function>\></function>, Greater than</para></listitem>
-<listitem><para><function>\<</function>, Less than</para></listitem>
-<listitem><para><function>&&</function>, And (short circuit operator)</para></listitem>
+<listitem><para><function>&gt;=</function>, Greater than or Equals</para></listitem>
+<listitem><para><function>&lt;=</function>, Less than or Equals</para></listitem>
+<listitem><para><function>&gt;</function>, Greater than</para></listitem>
+<listitem><para><function>&lt;</function>, Less than</para></listitem>
+<listitem><para><function>&amp;&amp;</function>, And (short circuit operator)</para></listitem>
 <listitem><para><function>||</function>, Or (short circuit operator)</para></listitem>
 <listitem><para><function>!</function>, Negation</para></listitem>
 </itemizedlist>
@@ -1727,7 +1727,7 @@ Examples of the <function>while</function> loop are shown below.
 <screen>
 # for example...
 
-while x < 10: {
+while x &lt; 10: {
 	print "x = $x".
 	x++.
 }
@@ -1782,14 +1782,14 @@ are shown below.
 # so, for example, if we have a variable called n (int), this loop will
 # print the numbers from 1 to 30.
 
-for n=0, n<30, n+=1: {
+for n=0, n&lt;30, n+=1: {
 	print n.
 }
 
 # we can also use a different increment statement in order to run the 
 # loop a bit differently&mdash;let's print only even numbers between 1 and 30
 
-for n=2, n<30, n+=2: {
+for n=2, n&lt;30, n+=2: {
 	print n.
 }
 </screen>
@@ -1829,7 +1829,7 @@ lists, hashes and data are automatically garbage collected when appropriate.
 <para>
 breve's garbage collection is slightly complicated by the fact that objects 
 do not need to be referenced in memory to be "in use".  An unreferened object
-may, for example, "come back to life" because of an all (<xref linkend="all">) 
+may, for example, "come back to life" because of an all (<xref linkend="all"/>) 
 expression.  Furthermore, objects in the simulated world (members of subclasses 
 of the class "Real") may physically interact even without referencing each other
 in their variables.  Because of these complications, garbage collection cannot be 
@@ -1859,7 +1859,7 @@ memory when there are <emphasis>circular references</emphasis>.  A circular
 reference occurs when two (or more) objects refer to each other in a circular
 fashion.  An example of a circular reference between three objects is shown
 below:
-<mediaobject><imageobject><imagedata align="center" fileref="images/circular_reference.jpg"></imageobject></mediaobject>
+<mediaobject><imageobject><imagedata align="center" fileref="images/circular_reference.jpg"/></imageobject></mediaobject>
 </para>
 <para>
 When a circular reference occurs, the objects are never recognized as "unused"
@@ -1918,7 +1918,7 @@ There is no different between <function>@include</function> and
 <function>@include</function> directives are not only used to include 
 classes which come with the breve distribution, but also potentially classes 
 that you construct yourself.  It is often used in conjunction with the 
-<function>@path</function> directive (<xref linkend="at-path">) to specify 
+<function>@path</function> directive (<xref linkend="at-path"/>) to specify 
 the location of classes before loading them.
 </para>
 </sect2>

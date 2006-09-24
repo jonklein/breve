@@ -126,5 +126,5 @@ Abstract : Camera (aka Cameras) [version 2.4] {
 		cameraSetRotation(cameraPointer, rx, ry).
 
 	- to delete:
-		if !shared: cameraFree(cameraPointer).
+		if cameraPointer && !shared: cameraFree(cameraPointer).
 }

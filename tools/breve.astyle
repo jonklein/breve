@@ -1,0 +1,10 @@
+brackets=attach
+indent=tab
+indent-switches
+indent-classes
+indent-cases
+indent-namespaces
+break-blocks
+unpad=paren
+pad=paren-in
+pad=oper
