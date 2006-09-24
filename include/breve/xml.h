@@ -115,9 +115,9 @@ int stXMLWriteObject(stXMLArchiveRecord *, FILE *, stInstance *, int, int);
 int stXMLSimulationWrite(FILE *, brEngine *, int);
 
 int stXMLVariablePrint(stXMLArchiveRecord *, FILE *, stVar *, stInstance *, int);
-int stXMLPrintEval(stXMLArchiveRecord *, FILE *, char *, brEval *, int);
-int stXMLPrintList(stXMLArchiveRecord *, FILE *, char *, brEvalListHead *, int);
-int stXMLPrintHash(stXMLArchiveRecord *, FILE *, char *, brEvalHash *, int);
+int stXMLPrintEval(stXMLArchiveRecord *, FILE *, const char *, brEval *, int);
+int stXMLPrintList(stXMLArchiveRecord *, FILE *, const char *, brEvalListHead *, int);
+int stXMLPrintHash(stXMLArchiveRecord *, FILE *, const char *, brEvalHash *, int);
 
 int stXMLReadObjectFromFile(stInstance *i, char *);
 int stXMLReadObjectFromStream(stInstance *i, FILE *);

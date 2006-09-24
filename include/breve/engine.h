@@ -169,16 +169,16 @@ class brEngine {
 
 		brInstance *controller;
 
-		std::map<std::string,brObject*> objectAliases;
-		std::map<std::string,brObject*> objects;
+		std::map< std::string, brObject* > objectAliases;
+		std::map< std::string, brObject* > objects;
 		brNamespace *internalMethods;
 
-		std::vector<brInstance*> postIterationInstances;
-		std::vector<brInstance*> iterationInstances;
-		std::vector<brInstance*> instances;
+		std::vector< brInstance* > postIterationInstances;
+		std::vector< brInstance* > iterationInstances;
+		std::vector< brInstance* > instances;
 	
-		std::vector<brInstance*> instancesToAdd;
-		std::vector<brInstance*> instancesToRemove;
+		std::vector< brInstance* > instancesToAdd;
+		std::vector< brInstance* > instancesToRemove;
 
 		std::vector<brEvent*> events;
 
@@ -186,8 +186,8 @@ class brEngine {
 
 		brErrorInfo error;
 
-		std::string outputPath;
-		char *path;
+		std::string _outputPath;
+		std::string _launchDirectory;
 
 		// plugin, plugins, plugins!
 
@@ -214,7 +214,7 @@ class brEngine {
 		int lastScheduled;
 
 		std::vector<void*> windows;
-		std::vector<char*> searchPath;
+		std::vector< std::string > _searchPaths;
 
 		// which keys are pressed?
 
@@ -312,6 +312,10 @@ int brEngineIterate(brEngine *);
 void brEngineSetIOPath(brEngine *, char *);
 char *brOutputPath(brEngine *, char *);
 
+const std::vector< std::string > &brEngineGetSearchPaths( brEngine * );
+
+std::vector< std::string > brEngineGetAllObjectNames( brEngine *e );
+
 brEngine *brEngineNew(void);
 void brEngineFree(brEngine *);
 
@@ -325,7 +329,7 @@ void brRemoveFromInstanceLists(brInstance *);
 
 int brFileLogWrite(void *, const char *, int);
 
-void brAddSearchPath(brEngine *, char *);
+void brAddSearchPath(brEngine *, const char *);
 char *brFindFile(brEngine *, char *, struct stat *);
 void brFreeSearchPath(brEngine *);
 
@@ -351,7 +355,7 @@ int brEngineSetInterface(brEngine *, char *);
 
 brErrorInfo *brEngineGetErrorInfo(brEngine *);
 
-char *brEngineGetPath(brEngine *);
+const char *brEngineGetPath( brEngine* );
 
 brNamespace *brEngineGetInternalMethods(brEngine *);
 

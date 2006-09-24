@@ -129,9 +129,9 @@ inline int stEvalListIndex(stListIndexExp *, stRunInstance *, brEval *);
 inline int stEvalListIndexPointer(stListIndexExp *, stRunInstance *, void **, int *);
 inline int stEvalListIndexAssign(stListIndexAssignExp *, stRunInstance *, brEval *);
 
-extern "C" DLLEXPORT int stCallMethodByNameWithArgs(stRunInstance *, char *, brEval **, int, brEval *);
+int stCallMethod(stRunInstance *, stRunInstance *, stMethod *, const brEval **, int, brEval *);
 int stCallMethodByName(stRunInstance *, char *, brEval *);
-int stCallMethod(stRunInstance *, stRunInstance *, stMethod *, brEval **, int, brEval *);
+extern "C" DLLEXPORT int stCallMethodByNameWithArgs(stRunInstance *, char *, const brEval **, int, brEval *);
 
 int stLoadVariable(void *, unsigned char, brEval *, stRunInstance *);
 int stSetVariable(void *, unsigned char, stObject *, brEval *, stRunInstance *);
@@ -156,7 +156,7 @@ void stConvertBreveInstanceToSteveInstance(brEval *);
 
 int stDoEvalListIndexAssign(brEvalListHead *, int, brEval *, stRunInstance *);
 
-void stEvalError(brEngine *, int, char *, ...);
+void stEvalError( stInstance*, int, char *, ... );
 
 void stConvertSteveInstanceToBreveInstance(brEval *);
 

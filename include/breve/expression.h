@@ -358,7 +358,7 @@ class stStringExp : public stExp {
 		~stStringExp();
 
 		int baseSize;
-		char *string;
+		std::string string;
 
 		std::vector< stSubstringExp* > substrings;
 };
@@ -368,7 +368,7 @@ class stSubstringExp : public stExp {
 		stSubstringExp(char *file, int line) : stExp(file, line) {};
 
 		stExp *loadExp;
-		char *string;
+		std::string string;
 		int offset;
 		unsigned char retain;
 };
@@ -470,7 +470,7 @@ class stSortExp : public stExp {
 		~stSortExp();
 
 		stExp *listExp;
-		char *methodName;
+		std::string methodName;
 };
 
 class stListIndexExp : public stExp {
@@ -500,7 +500,7 @@ class stMethodExp : public stExp {
 
 		stExp *objectExp;
 
-		char *methodName;
+		std::string methodName;
 	
 		std::vector< stKeyword* > arguments;
 		std::vector< stKeyword* > positionedArguments;
@@ -516,10 +516,10 @@ class stAssignExp : public stExp {
 		~stAssignExp();
 
 		int _offset;
-		char _local;
+		bool _local;
 		unsigned char _assignType;
 		stExp *_rvalue;
-		char *_objectName;
+		std::string _objectName;
 		stObject *_objectType;
 };
 
@@ -622,25 +622,24 @@ class stAllExp : public stExp {
 		stAllExp(char *objectName, char *file, int line);
 		~stAllExp();
 
-		char *name;
+		std::string name;
 		stObject *object;
 };
 
 class stInstanceExp : public stExp {
 	public:
 		stInstanceExp(char *n, stExp *c, char *f, int l) : stExp(f, l) {
-			name = strdup(n);
+			name = n;
 			count = c;
 
 			type = ET_INSTANCE;
 		}
 
 		~stInstanceExp() {
-			free(name);
 			delete count;
 		}
 
-		char *name;
+		std::string name;
 		stExp *count;
 };
 
@@ -649,23 +648,22 @@ class stCCallExp : public stExp {
 		stCCallExp(brEngine *e, brInternalFunction *s, std::vector< stExp* > *expressions, char *file, int line);
 		~stCCallExp();
 
-		brInternalFunction *function;
-		std::vector< stExp* > arguments;
+		brInternalFunction *_function;
+		std::vector< stExp* > _arguments;
 };
 
 class stKeyword {
 	public:
 		stKeyword(char *w, stExp *v) {
-			word = strdup(w);
+			word = w;
 			value = v;
 		}
 
 		~stKeyword() {
-			free(word);
 			delete value;
 		}
 
-		char *word;
+		std::string word;
 		stExp *value;
 		int position;
 };

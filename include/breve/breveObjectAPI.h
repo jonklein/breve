@@ -1,6 +1,8 @@
 #ifndef _BREVEOBJECTAPI_H
 #define _BREVEOBJECTAPI_H
 
+#include <vector>
+
 enum allocStatus { 
 	AS_RELEASED = -1,	// still allocated, but ready to be freed
 	AS_FREED,		// all memory freed--don't try to use 
@@ -31,20 +33,37 @@ struct slStack;
 */
 
 struct brObjectType {
-	void *(*findMethod)(void *, char *, unsigned char *, int);
-	void *(*findObject)(void *, char *);
-	void *(*instantiate)(void *, brEval **, int);
+	brObjectType() {
+		findMethod 				= NULL;
+		findObject				= NULL;
+		instantiate				= NULL;
+		callMethod				= NULL;
+		isSubclass				= NULL;
+		destroyObject			= NULL;
+		destroyMethod			= NULL;
+		destroyInstance 		= NULL;
+		destroyObjectType		= NULL;
+		userData				= NULL;
+		_typeSignature 			= 0;
+	}
 
-	int (*callMethod)(void *, void *, brEval **, brEval *);
+	void 			*(*findMethod)( void *, const char *, unsigned char *, int );
+	void 			*(*findObject)( void *, const char * );
 
-	int (*isSubclass)(void *, void *);
+	brInstance		*(*instantiate)( brEngine *, brObject *, const brEval **, int );
 
-	void (*destroyObject)(void *);
-	void (*destoryMethod)(void *);
-	void (*destroyInstance)(void *);
-	void (*destroyObjectType)(void *);
+	int 			(*callMethod)( void *, void *, const brEval **, brEval * );
 
-	void *userData;
+	int 			(*isSubclass)( void *, void * );
+
+	void 			(*destroyObject)( void * );
+	void 			(*destroyMethod)( void * );
+	void 			(*destroyInstance)( void * );
+	void 			(*destroyObjectType)( void * );
+
+	void 			*userData;
+
+	long			_typeSignature;
 };
 
 /*!
@@ -74,6 +93,18 @@ struct brObject {
 */
 
 struct brInstance {
+	brInstance( brEngine *inEngine, brObject *inObject ) {
+		engine = inEngine;
+		object = inObject;
+
+		status = AS_ACTIVE; 
+		
+		iterate = NULL;
+		postIterate = NULL;
+		observers = NULL;
+		observees = NULL;
+	}
+
 	void *userData;
 
 	char status;
@@ -84,7 +115,7 @@ struct brInstance {
 	brObject *object;
 	brEngine *engine;
 
-	slStack *menus;
+	std::vector< brMenuEntry* > _menus;
 
 	slList *observers;
 	slList *observees;
@@ -154,20 +185,20 @@ struct brObserver {
 extern "C" {
 #endif
 
-DLLEXPORT void brEngineLock(brEngine *);
-DLLEXPORT void brEngineUnlock(brEngine *);
+DLLEXPORT void brEngineLock( brEngine * );
+DLLEXPORT void brEngineUnlock( brEngine * );
 
 // registering a new object type
 
-DLLEXPORT void brEngineRegisterObjectType(brEngine *, brObjectType *);
+DLLEXPORT void brEngineRegisterObjectType(brEngine *, brObjectType * );
 
 // locating objects and methods within objects
 
-DLLEXPORT brMethod *brMethodFind(brObject *, char *, unsigned char *, int);
-DLLEXPORT brMethod *brMethodFindWithArgRange(brObject *, char *, unsigned char *, int, int);
+DLLEXPORT brMethod *brMethodFind(brObject *, const char *, unsigned char *, int);
+DLLEXPORT brMethod *brMethodFindWithArgRange(brObject *, const char *, unsigned char *, int, int);
 
-DLLEXPORT brObject *brObjectFind(brEngine *, char *);
-DLLEXPORT brObject *brUnknownObjectFind(brEngine *, char *);
+DLLEXPORT brObject *brObjectFind(brEngine *, const char *);
+DLLEXPORT brObject *brUnknownObjectFind(brEngine *, const char *);
 
 // functions for getting user data
 
@@ -176,16 +207,20 @@ DLLEXPORT void *brObjectGetUserData(brInstance *);
 
 // functions for calling methods with breve instances
 
-DLLEXPORT int brMethodCall(brInstance *, brMethod *, brEval **, brEval *);
-DLLEXPORT int brMethodCallByName(brInstance *, char *, brEval *);
-DLLEXPORT int brMethodCallByNameWithArgs(brInstance *, char *, brEval **, int, brEval *);
+DLLEXPORT int brMethodCall(brInstance *, brMethod *, const brEval **, brEval *);
+DLLEXPORT int brMethodCallByName(brInstance *, const char *, brEval *);
+DLLEXPORT int brMethodCallByNameWithArgs(brInstance *, const char *, const brEval **, int, brEval *);
 
 // functions related to adding and removing classes and instances to the breve engine
 
-DLLEXPORT brObject *brEngineAddObject(brEngine *, brObjectType *, char *, void *);
+DLLEXPORT brObject *brEngineAddObject(brEngine *, brObjectType *, const char *, void *);
 DLLEXPORT void brEngineAddObjectAlias(brEngine *, char *, brObject *);
+
+DLLEXPORT brInstance *brObjectInstantiate(brEngine *, brObject *, const brEval **, int);
+
 DLLEXPORT brInstance *brEngineAddInstance(brEngine *, brObject *, void *);
-DLLEXPORT brInstance *brObjectInstantiate(brEngine *, brObject *, brEval **, int);
+DLLEXPORT brInstance *brEngineAddBreveInstance(brEngine *, brObject *, brInstance * );
+
 DLLEXPORT void brEngineRemoveInstance(brEngine *, brInstance *);
 
 DLLEXPORT int brObjectAddCollisionHandler(brObject *, brObject *, char *);

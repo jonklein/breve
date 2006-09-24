@@ -1,0 +1,42 @@
+# include some frequently used classes and specify common classpaths
+
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use Stationary.
+
+# tell the engine the name of the controller
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+	+ variables:
+		pythonObject (object).
+
+	+ to init:
+		# put initialization code here which creates objects
+		# and sets up the simulation
+
+
+		pythonLoadFile( "tests/PythonTest.py" ).
+		pythonObject = new PythonTestObject.
+
+	+ to iterate:
+		# place code that should be called during every 
+		# iteration here.
+
+		super iterate.
+}
+
+# implement other objects in your simulation here
+
+Mobile : myAgent (aka myAgents) {
+	+ to init:
+
+	+ to iterate:
+
+}

@@ -153,7 +153,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 168109107;
+			PBXPerProjectTemplateStateSaveDate = 179800612;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -710,7 +710,7 @@
 				PBXModuleWindowStatusBarHidden = YES;
 				RubberWindowFrame = "267 380 745 408 0 0 1280 832 ";
 			};
-			PBXWorkspaceStateSaveDate = 168109107;
+			PBXWorkspaceStateSaveDate = 179800612;
 		};
 		sourceControlManager = 48E065B3055C318700C40B45 /* Source Control */;
 		userBuildSettings = {
@@ -765,8 +765,10 @@
 		);
 		executableSystemSymbolLevel = 0;
 		executableUserSymbolLevel = 0;
-		libgmallocEnabled = 0;
+		libgmallocEnabled = 1;
 		name = real_breve.app;
+		savedGlobals = {
+		};
 		sourceDirectories = (
 		);
 	};
@@ -781,9 +783,9 @@
 		delayBeforeContinue = 0;
 		fileReference = F5BD20C70397BFC001980AE4 /* slBreveGLView.mm */;
 		functionName = "-makeImageRep";
-		hitCount = 0;
+		hitCount = 1;
 		lineNumber = 457;
-		modificationTime = 0;
+		modificationTime = 179800937.094526;
 		state = 1;
 	};
 	48BB5D1405C9659B007C7301 /* slBreveSourceDocument.mm:24 */ = {
@@ -793,9 +795,9 @@
 		continueAfterActions = 0;
 		delayBeforeContinue = 0;
 		fileReference = 2A37F4ACFDCFA73011CA2CEA /* slBreveSourceDocument.mm */;
-		hitCount = 0;
+		hitCount = 1;
 		lineNumber = 24;
-		modificationTime = 0;
+		modificationTime = 179800937.094599;
 		state = 1;
 	};
 	48CE1CFB08155B1F0030CBB8 /* DocumentIcons.icns */ = {
@@ -887,10 +889,10 @@
 	};
 	F5BD20AD0397BEC801980AE4 /* slObjectOutlineItem.mm */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {968, 5124}}";
-			sepNavSelRange = "{7464, 40}";
-			sepNavVisRect = "{{0, 3535}, {727, 309}}";
-			sepNavWindowFrame = "{{418, 28}, {750, 558}}";
+			sepNavIntBoundsRect = "{{0, 0}, {968, 5250}}";
+			sepNavSelRange = "{7453, 0}";
+			sepNavVisRect = "{{0, 3483}, {711, 429}}";
+			sepNavWindowFrame = "{{129, 155}, {750, 558}}";
 		};
 	};
 	F5BD20AE0397BEC801980AE4 /* slQuickparser.l */ = {
@@ -919,9 +921,9 @@
 	F5BD20C10397BFC001980AE4 /* slBreve.mm */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {1172, 13762}}";
-			sepNavSelRange = "{3523, 0}";
-			sepNavVisRect = "{{0, 855}, {845, 572}}";
-			sepNavWindowFrame = "{{61, 84}, {884, 701}}";
+			sepNavSelRange = "{20849, 0}";
+			sepNavVisRect = "{{0, 10220}, {845, 572}}";
+			sepNavWindowFrame = "{{369, 190}, {884, 701}}";
 		};
 	};
 	F5BD20C40397BFC001980AE4 /* slBreveEngine.h */ = {
@@ -950,9 +952,9 @@
 	};
 	F5BD20C70397BFC001980AE4 /* slBreveGLView.mm */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1044, 8204}}";
-			sepNavSelRange = "{1745, 0}";
-			sepNavVisRect = "{{0, 0}, {1044, 683}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1044, 8218}}";
+			sepNavSelRange = "{12279, 0}";
+			sepNavVisRect = "{{0, 6887}, {1044, 683}}";
 			sepNavWindowFrame = "{{497, 20}, {1083, 812}}";
 		};
 	};

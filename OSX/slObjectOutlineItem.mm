@@ -259,7 +259,7 @@
 
 		var = vi->second;
 
-		newTitle = [[NSString stringWithCString: var->name] retain];
+		newTitle = [ [ NSString stringWithCString: var->name.c_str() ] retain ];
 
 		if(var->type->_type != AT_ARRAY)
 			stLoadVariable(&evalInstance->variables[var->offset], var->type->_type, &newEval, &ri);

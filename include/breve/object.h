@@ -37,7 +37,7 @@ struct stInstanceCompare {
 };
 
 struct stObject {
-	char *name;
+	std::string name;
 	brEngine *engine;
 	stSteveData *steveData;
 
@@ -85,12 +85,12 @@ class stMethod {
 		stMethod(char *n, std::vector< stKeywordEntry* > *k, char *file, int line);
 		~stMethod();
 
-		char *name;
+		std::string name;
 
 		bool inlined;
 
 		int lineno;
-		char *filename;
+		std::string filename;
 	
 		std::vector< stKeywordEntry* > keywords;
 		std::vector< stExp* > code;
@@ -114,10 +114,10 @@ class stMethod {
 
 class stVarType {
 	public:
-		stVarType(unsigned char type, unsigned char arrayType, int arrayCount, char *objectType);
+		stVarType( unsigned char type, unsigned char arrayType, int arrayCount, const char *objectType );
 		stVarType *copy();
 
-		char *_objectName;
+		std::string _objectName;
 		stObject *_objectType;
 
 		unsigned char _type;
@@ -135,15 +135,15 @@ class stVarType {
 
 class stVar {
 	public:
-		stVar(char *n, stVarType *t);
+		stVar( char *n, stVarType *t );
 		~stVar();
 
-		char *name;
+		std::string name;
 		int offset;
 
 		stVarType *type;
 
-		unsigned char used;
+		bool used;
 };
 
 /*!
@@ -153,7 +153,7 @@ class stVar {
 */
 
 struct stKeywordEntry {
-	char *keyword;
+	std::string keyword;
 	stVar *var;
 	stKeyword *defaultKey;
 };
@@ -197,19 +197,17 @@ void stMethodAlignStack(stMethod *method);
 
 stKeywordEntry *stNewKeywordEntry(char *stKeyword, stVar *v, brEval *defVal);
 
-int findVariableOffset(stObject *o, char *name);
+stVar *stObjectLookupVariable( stObject *ob, const char *word );
 
-stVar *stObjectLookupVariable(stObject *ob, char *word);
-
-stKeywordEntry *stFindKeyword(char *keyword, stMethod *m);
-stVar *stFindLocal(char *name, stMethod *);
+stKeywordEntry *stFindKeyword( const char *keyword, stMethod *m );
+stVar *stFindLocal( const char *name, stMethod * );
 
 int stUnusedInstanceVarWarning(stObject *);
 
-stMethod *stFindInstanceMethodNoSuper(stObject *, char *, unsigned int);
-stMethod *stFindInstanceMethod(stObject *, char *, int, stObject **);
-stMethod *stFindInstanceMethodWithArgRange(stObject *, char *, unsigned int, unsigned int, stObject **);
-stMethod *stFindInstanceMethodWithMinArgs(stObject *, char *, unsigned int, stObject **);
+stMethod *stFindInstanceMethodNoSuper(stObject *, const char *, unsigned int);
+stMethod *stFindInstanceMethod(stObject *, const char *, int, stObject **);
+stMethod *stFindInstanceMethodWithArgRange(stObject *, const char *, unsigned int, unsigned int, stObject **);
+stMethod *stFindInstanceMethodWithMinArgs(stObject *, const char *, unsigned int, stObject **);
 
 int stStoreInstanceMethod(stObject *, char *, stMethod *);
 

@@ -195,7 +195,7 @@ class slShape {
 
 		virtual ~slShape();
 
-		virtual void bounds(slPosition *position, slVector *min, slVector *max) const;
+		virtual void bounds(slPosition *position, slVector *min, slVector *max);
 		virtual int pointOnShape(slVector *dir, slVector *point);
         virtual int rayHitsShape(slVector *dir, slVector *target, slVector *point);
         //virtual int irReflect(slVector *pos, slVector *dir, double maxAngle);

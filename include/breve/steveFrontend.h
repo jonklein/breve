@@ -3,15 +3,16 @@
 #include <vector>
 #include <map>
 
+#define STEVE_TYPE_SIGNATURE		0x73747665
+
 struct stSteveData {
 	stSteveData() {
-		controllerName = NULL;
-		singleStatement = NULL;
-		singleStatementMethod = NULL;
-		stack = NULL;
-		stackRecord = NULL;
-
-		retainFreedInstances = true;
+		controllerName 		= NULL;
+		singleStatement 	= NULL;
+		singleStatementMethod 	= NULL;
+		stack 			= NULL;
+		stackRecord 		= NULL;
+		retainFreedInstances 	= true;
 	}
 
 	brObjectType steveObjectType;
@@ -35,6 +36,7 @@ struct stSteveData {
 	char *stack;
 
 	stStackRecord *stackRecord;
+
 };
 
 struct stVersionRequirement {

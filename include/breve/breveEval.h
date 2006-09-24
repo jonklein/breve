@@ -22,6 +22,7 @@
 #define _BREVEEVAL_H
 
 #include "util.h"
+#include <string>
 
 enum evaluationCodes {
 	EC_ERROR_HANDLED = -2,
@@ -37,7 +38,6 @@ enum atomicTypes {
 	AT_DOUBLE,
 	AT_STRING,
 	AT_INSTANCE,
-	AT_BRIDGE_INSTANCE,
 	AT_POINTER,
 	AT_VECTOR,
 	AT_MATRIX,
@@ -98,23 +98,25 @@ class brEval {
 
 		void clear() { collect(); _type = AT_NULL; }
 
-		inline unsigned char type() { return _type; }
+		inline unsigned char type() { return _type; } 
 
 		inline void set( const double d )    { collect(); _values.doubleValue = d;                _type = AT_DOUBLE;   }
 		inline void set( const int i )       { collect(); _values.intValue = i;                   _type = AT_INT;      }
+		inline void set( const long i )      { collect(); _values.intValue = i;                   _type = AT_INT;      }
 		inline void set( const slVector &v ) { collect(); slVectorCopy(&v, &_values.vectorValue); _type = AT_VECTOR;   }
 		inline void set( const slMatrix &m ) { collect(); slMatrixCopy(m, _values.matrixValue);   _type = AT_MATRIX;   }
-		inline void set( const char *s )     { collect(); _values.stringValue = slStrdup(s);      _type = AT_STRING;   }
+		inline void set( const char *s )     { collect(); _values.stringValue = slStrdup( s );      _type = AT_STRING;   }
+		inline void set( const std::string &s )     { collect(); _values.stringValue = slStrdup( s.c_str() );      _type = AT_STRING;   }
 		inline void set( void *p )           { collect(); _values.pointerValue = p;               _type = AT_POINTER;  retain(); }
 		inline void set( brEvalHash *h )     { collect(); _values.hashValue = h;                  _type = AT_HASH;     retain(); }
 		inline void set( brData *d )         { collect(); _values.dataValue = d;                  _type = AT_DATA;     retain(); }
 		inline void set( brInstance *i )     { collect(); _values.instanceValue = i;              _type = AT_INSTANCE; retain(); }
 		inline void set( brEvalListHead *l ) { collect(); _values.listValue = l;                  _type = AT_LIST;     retain(); }
 
-		inline int             &getInt()      { return _values.intValue;      }
+		inline int             &getInt()      { return _values.intValue;      } 
 		inline double          &getDouble()   { return _values.doubleValue;   }
-		inline slVector       &getVector()   { return _values.vectorValue;  }
-		inline slMatrix       &getMatrix()   { return _values.matrixValue;  }
+		inline slVector       &getVector()    { return _values.vectorValue;  }
+		inline slMatrix       &getMatrix()    { return _values.matrixValue;  }
 		inline void           *&getPointer()  { return _values.pointerValue;  }
 		inline char           *&getString()   { return _values.stringValue;   }
 		inline brEvalHash     *&getHash()     { return _values.hashValue;     }

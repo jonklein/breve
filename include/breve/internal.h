@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#include <string>
+
 #include "kernelTypedefs.h"
 
 #include "breveEval.h"
@@ -42,11 +44,12 @@ void breveInitQGAMEFunctions(brNamespace *);
 void breveInitDrawFunctions(brNamespace *);
 
 DLLEXPORT int brNewBreveCall(brNamespace *, char *, int (*)(brEval *, brEval *, brInstance *), int, ...);
-
 DLLEXPORT FILE *slGetLogFilePointer(brInstance *);
 #ifdef __cplusplus
 }
 #endif
+
+void breveInitPythonFunctions(brNamespace *);
 
 void brLoadInternalFunctions(brEngine *);
 void brFreeBreveCall(void *);
@@ -59,12 +62,12 @@ void brFreeBreveCall(void *);
 #define ST_CMAX_ARGS 16
 
 struct brInternalFunction {
-	unsigned char nargs;
+	unsigned char _argCount;
     
-	unsigned char argtypes[ST_CMAX_ARGS];
-	unsigned char rtype;
+	unsigned char _argTypes[ ST_CMAX_ARGS ];
+	unsigned char _returnType;
     
-	int (*call)(brEval *, brEval *, brInstance *);
+	int (*_call)(brEval *, brEval *, brInstance *);
     
-	char *name;
+	std::string _name;
 };

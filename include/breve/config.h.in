@@ -21,6 +21,9 @@
 /* Define to 1 if you have the `avformat' library (-lavformat). */
 #undef HAVE_LIBAVFORMAT
 
+/* Define to 1 if you have the `avutil' library (-lavutil). */
+#undef HAVE_LIBAVUTIL
+
 /* Define to 1 if you have the `enet' library (-lenet). */
 #undef HAVE_LIBENET
 
@@ -29,6 +32,15 @@
 
 /* Define to 1 if you have the `ftgl' library (-lftgl). */
 #undef HAVE_LIBFTGL
+
+/* Define to 1 if you have the `GL' library (-lGL). */
+#undef HAVE_LIBGL
+
+/* Define to 1 if you have the `GLU' library (-lGLU). */
+#undef HAVE_LIBGLU
+
+/* Define to 1 if you have the `glut' library (-lglut). */
+#undef HAVE_LIBGLUT
 
 /* Define to 1 if you have the `gsl' library (-lgsl). */
 #undef HAVE_LIBGSL
@@ -54,9 +66,6 @@
 /* Define to 1 if you have the `ode' library (-lode). */
 #undef HAVE_LIBODE
 
-/* Define to 1 if you have the `OSMesa' library (-lOSMesa). */
-#undef HAVE_LIBOSMESA
-
 /* Define to 1 if you have the `png' library (-lpng). */
 #undef HAVE_LIBPNG
 
@@ -65,6 +74,12 @@
 
 /* Define to 1 if you have the `push' library (-lpush). */
 #undef HAVE_LIBPUSH
+
+/* Define to 1 if you have the `python' library (-lpython). */
+#undef HAVE_LIBPYTHON
+
+/* Define to 1 if you have the `python2.3' library (-lpython2.3). */
+#undef HAVE_LIBPYTHON2_3
 
 /* Define to 1 if you have the `qgame++' library (-lqgame++). */
 #undef HAVE_LIBQGAME__
@@ -80,6 +95,15 @@
 
 /* Define to 1 if you have the `tiff' library (-ltiff). */
 #undef HAVE_LIBTIFF
+
+/* Define to 1 if you have the `X11' library (-lX11). */
+#undef HAVE_LIBX11
+
+/* Define to 1 if you have the `Xi' library (-lXi). */
+#undef HAVE_LIBXI
+
+/* Define to 1 if you have the `Xmu' library (-lXmu). */
+#undef HAVE_LIBXMU
 
 /* Define to 1 if you have the `z' library (-lz). */
 #undef HAVE_LIBZ
@@ -181,5 +205,5 @@
 #undef inline
 #endif
 
-/* Define to `unsigned' if <sys/types.h> does not define. */
+/* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t

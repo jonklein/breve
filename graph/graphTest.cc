@@ -23,9 +23,9 @@
 #include "util.h"
 #include "graph.h"
 
-void slInitGlut(int, char **, char *);
-void brGlutLoop(void);
-void slDemoDisplay(void);
+void slInitGlut( int, char **, char * );
+void brGlutLoop( void );
+void slDemoDisplay( void );
 
 slGraph *graph;
 int redLine, blueLine;
@@ -33,21 +33,21 @@ int redLine, blueLine;
 int gX = 0;
 int last = 50;
 
-int main(int argc, char **argv) {
+int main( int argc, char **argv ) {
 	slVector v;
 
-	slInitGlut(argc, argv, "graphTest");
+	slInitGlut( argc, argv, "graphTest" );
 
-	slVectorSet(&v, 0.9, 0.9, 0.9);
+	slVectorSet( &v, 0.9, 0.9, 0.9 );
 
-	graph = slGraphNew(&v, 0, 0, 100, 100);
+	graph = slGraphNew( &v, 0, 0, 100, 100 );
 	graph->width = 400;
 	graph->height = 400;
 
-	slVectorSet(&v, 1.0, 0.0, 0.0);
-	redLine = slGraphAddLine(graph, &v);
-	slVectorSet(&v, 0.0, 0.0, 1.0);
-	blueLine = slGraphAddLine(graph, &v);
+	slVectorSet( &v, 1.0, 0.0, 0.0 );
+	redLine = slGraphAddLine( graph, &v );
+	slVectorSet( &v, 0.0, 0.0, 1.0 );
+	blueLine = slGraphAddLine( graph, &v );
 
 	glutMainLoop();
 
@@ -57,42 +57,42 @@ int main(int argc, char **argv) {
 void brGlutLoop() {
 	gX++;
 
-	last += (random() % 31) - 15;
+	last += ( random() % 31 ) - 15;
 
-	slGraphAddLineValue(graph, redLine, gX, last);
-	slGraphAddLineValue(graph, blueLine, gX, 6 * sin(gX / 3.0) + 5);
+	slGraphAddLineValue( graph, redLine, gX, last );
+	slGraphAddLineValue( graph, blueLine, gX, 6 * sin( gX / 3.0 ) + 5 );
 
-	usleep(30000);
+	usleep( 30000 );
 
 	glutPostRedisplay();
 }
 
-void slDemoReshape(int x, int y) {
+void slDemoReshape( int x, int y ) {
 	graph->height = y;
 	graph->width = x;
-	glViewport(0, 0, x, y);
+	glViewport( 0, 0, x, y );
 }
 
-void slInitGlut(int argc, char **argv, char *title) {
-	glutInitWindowSize(400, 400);
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH|GLUT_STENCIL);
-	glutCreateWindow(title);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
- 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+void slInitGlut( int argc, char **argv, char *title ) {
+	glutInitWindowSize( 400, 400 );
+	glutInit( &argc, argv );
+	glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL );
+	glutCreateWindow( title );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-	glutDisplayFunc(slDemoDisplay);
-	glutReshapeFunc(slDemoReshape);
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
-	glutIdleFunc(brGlutLoop);
+	glutDisplayFunc( slDemoDisplay );
+	glutReshapeFunc( slDemoReshape );
 
-	glViewport(0, 0, 400, 400);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glutIdleFunc( brGlutLoop );
+
+	glViewport( 0, 0, 400, 400 );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
 
 void slDemoDisplay() {
-	slDrawGraph(graph);
+	slDrawGraph( graph );
 	glutSwapBuffers();
 }

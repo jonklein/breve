@@ -513,12 +513,12 @@
 	id menuItem;
 	unsigned int n;
 
-	if(slStackSize(i->menus) == 0) return;
+	if( i->_menus.size() == 0) return;
 
 	[selectionMenu addItem: [NSMenuItem separatorItem]];
 
-	for(n=0;n<slStackSize(i->menus);n++) {
-		brMenuEntry *menuEntry = (brMenuEntry*)slStackGet(i->menus, n);
+	for(n=0;n< i->_menus.size(); n++ ) {
+		brMenuEntry *menuEntry = i->_menus[ n ];
 
 		if(!strcmp(menuEntry->title, "")) {
 			[menu addItem: [NSMenuItem separatorItem]];

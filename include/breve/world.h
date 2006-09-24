@@ -172,6 +172,7 @@ class slWorld {
 		double _age;
 	
 		std::vector< slWorldObject* > _objects;
+
 		std::vector< slPatchGrid* > _patches;
 		std::vector< slCamera* > _cameras;
 		std::vector< slObjectConnection* > _connections;
@@ -213,10 +214,9 @@ class slWorld {
 
 		slWorldObject *addObject( slWorldObject* );
 		void removeObject( slWorldObject* );
-
 		void setQuickstepIterations( int );
 
-	    void setAutoDisableFlag( bool f );
+		void setAutoDisableFlag( bool f );
 
 		slWorldObject *getObject( unsigned int );
 
@@ -249,7 +249,10 @@ class slWorld {
 		slNetsimClientData *_netsimClient;
 #endif
 
+		void removeEmptyObjects();
+
 	private:
+
 };
 #endif
 

@@ -27,14 +27,14 @@
 	random-access.  Reference counting enabled.
 */
 
-class DLLEXPORT brEvalListHead: public brEvalObject {
+class brEvalListHead: public brEvalObject {
 	public:
 		brEvalListHead();
 		~brEvalListHead();
 
 		std::vector< brEval* > _vector;
 
-		inline std::vector< brEval* > const &getVector() { return _vector; }
+		inline std::vector< brEval* > const &getVector() const { return _vector; }
 };
 
 /*!

@@ -142,8 +142,8 @@ class slVclipData {
 
 		std::map< slPairFlags* , slCollisionCandidate > candidates;
 
-		unsigned int count;
-		unsigned int maxCount;
+		unsigned int _count;
+		unsigned int _maxCount;
 
 		slPairFlags initPairFlags( int, int );
 

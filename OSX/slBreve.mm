@@ -747,8 +747,8 @@ void updateMenu(brInstance *i) {
 
 	[gSelf clearSimulationMenu];
 
-	for(n=0;n<slStackSize(i->menus);n++) {
-		brMenuEntry *entry = ( brMenuEntry* )slStackGet(i->menus, n);
+	for(n=0;n< i->_menus.size(); n++ ) {
+		brMenuEntry *entry = i->_menus[ n ];
 
 		if(!strcmp(entry->title, "")) {
 			[gSimMenu addItem: [NSMenuItem separatorItem]];
