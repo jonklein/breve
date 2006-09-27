@@ -276,11 +276,11 @@ void BreveCanvas::OnMouseRDown(wxMouseEvent &event)
 	{
 	    brMenuEntry * e;
 
-	    for (i = 0; i < selected->menus->count; i++)
+	    for (i = 0; i < selected->_menus.size(); i++)
 	    {
 		rightmenuinit = 1;
 
-		e = (brMenuEntry*)selected->menus->data[i];
+		e = (brMenuEntry*)selected->_menus[ i ];
 
 		if (e->title[0] == '\0')
 		{
@@ -370,11 +370,11 @@ void BreveCanvas::OnMouseUp(wxMouseEvent &event)
 	{
 	    brMenuEntry * e;
 
-	    for (i = 0; i < selected->menus->count; i++)
+	    for (i = 0; i < selected->_menus.size(); i++)
 	    {
 		rightmenuinit = 1;
 
-		e = (brMenuEntry*)selected->menus->data[i];
+		e = (brMenuEntry*)selected->_menus[ i ];
 
 		if (e->title[0] == '\0')
 		{

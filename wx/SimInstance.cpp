@@ -176,7 +176,7 @@ wxString VarData::String()
 	    if (eval.getInstance() == NULL)
 		str << "(null)";
 	    else
-		str << ((stInstance*)(eval.getInstance()->userData))->type->name;
+		str << ((stInstance*)(eval.getInstance()->userData))->type->name.c_str();
 	    break;
 
 	case AT_DATA:
@@ -367,7 +367,7 @@ VarData * SimInstance::ProcessObject(stInstance * instance, stObject * object, s
 		eval->set( 0 );
 	}
 
-	d = new VarData(eval, var->name, instance, object);
+	d = new VarData( eval, var->name.c_str(), instance, object );
 
 	if ( eval->type() == AT_ARRAY )
 	{
@@ -386,7 +386,7 @@ VarData * SimInstance::ProcessObject(stInstance * instance, stObject * object, s
 
     if (object->super != NULL)
     {
-	d = new VarData(eval, object->super->name, instance, object, 1);
+	d = new VarData( eval, object->super->name.c_str(), instance, object, 1 );
 
 	if (first == NULL)
 	    first = d;

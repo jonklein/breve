@@ -331,9 +331,9 @@ void BreveInterface::menuCallback(brInstance *binterface)
 
 	simmenu = new wxMenu;
 
-	for (i = 0; i < binterface->menus->count; i++)
+	for (i = 0; i < binterface->_menus.size(); i++)
 	{
-	e = (brMenuEntry*)binterface->menus->data[i];
+	e = (brMenuEntry*)binterface->_menus[ i ];
 
 	if (e->title[0] == '\0')
 	{

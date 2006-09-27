@@ -121,6 +121,8 @@ case ${host_os} in
 		EXE_SUFFIX=".exe"
 		PLATFORM="windows"
 		AC_DEFINE([WINDOWS], [1], [Windows])
+		AC_CHECK_LIB([pthread], [main])
+
 		;;
 
 	linux* | *bsd* )
@@ -198,8 +200,6 @@ AC_TYPE_SIZE_T
 AC_CHECK_LIB([m], [isnan])
 
 AC_CHECK_HEADERS(pthread.h)
-
-# AC_CHECK_LIB([pthread], [main])
 
 ol_link_threads=no
 
