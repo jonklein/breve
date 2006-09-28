@@ -18,11 +18,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#include "kernel.h"
+
 #ifdef HAVE_LIBPYTHON
 
 #include <python2.3/Python.h>
 #include "python.h"
-#include "kernel.h"
 
 /**
  * Translation function from a Python object to a breve value.

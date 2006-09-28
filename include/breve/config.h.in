@@ -72,6 +72,9 @@
 /* Define to 1 if you have the `portaudio' library (-lportaudio). */
 #undef HAVE_LIBPORTAUDIO
 
+/* Define to 1 if you have the `pthread' library (-lpthread). */
+#undef HAVE_LIBPTHREAD
+
 /* Define to 1 if you have the `push' library (-lpush). */
 #undef HAVE_LIBPUSH
 

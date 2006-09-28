@@ -1,6 +1,6 @@
 AC_PREREQ(2.57)
 
-AC_INIT([the breve simulation environment], [2.5d1], [jk@spiderland.org])
+AC_INIT([the breve simulation environment], [2.5b1], [jk@spiderland.org])
 AC_CONFIG_HEADER([include/breve/config.h])
 
 VERSION=$PACKAGE_VERSION
@@ -270,7 +270,7 @@ if test "x$engine_only" = "x"; then
 		AC_CHECK_LIB([gslcblas], [cblas_ccopy])
 	fi
 
-	AC_CHECK_LIB([avutil], [av_crc])
+	AC_CHECK_LIB([avutil], [main])
 	AC_CHECK_LIB([avcodec], [avcodec_init])
 	AC_CHECK_LIB([avformat], [av_write_frame])
 
