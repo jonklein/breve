@@ -20,6 +20,22 @@
 
 #include "kernel.h"
 
+char *brAtomicTypeStrings[] = {
+	NULL,
+	"NULL",
+	"int",
+	"double",
+	"string",
+	"object",
+	"pointer",
+	"vector",
+	"matrix",
+	"list",
+	"array",
+	"data",
+	"hash"
+};
+
 int brEvalCopy( brEval *s, brEval *d ) {
 	switch ( s->type() ) {
 

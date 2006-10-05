@@ -49,6 +49,8 @@ enum atomicTypes {
 	AT_UNDEFINED
 };
 
+extern char *brAtomicTypeStrings[];
+
 /*!
 	\brief A typed expression in the breve engine.
 

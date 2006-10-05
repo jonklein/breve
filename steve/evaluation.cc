@@ -23,50 +23,19 @@
 #include "evaluation.h"
 
 /*!
-	+ evaluation.c
-	= is the heart of steve.  it takes parse trees and executes them.
-	= the most basic entity is the stExp which is a wrapper around all
-	= the other expression types such as literal numbers and strings,
-	= binary expressions, method calls, etc.  see expression.c and
-	= steveparse.y which show what these expressions look like and how
-	= the parse trees are created.
-	=
-	= CRITICAL -- memory management of strings and evalLists
-	= the brEval struct holds the values computed and passed around.
-	= ints, doubles and vectors are stored as their actual values,
-	= while objects, pointers, strings and evalLists are stored as
-	= pointers.
-	=
-	= if you receive an brEval through a call to stExp AND if you don't
-	= return it to your calling function, you have to call stUnretainEval
-	= on it.
-*/
+ * This is the heart of steve language evaluation.  it takes parse trees and 
+ * executes them.  The most basic entity is the stExp which is a wrapper 
+ * around all the other expression types such as literal numbers and strings,
+ * binary expressions, method calls, etc.  see expression.c and
+ * steveparse.y which show what these expressions look like and how
+ * the parse trees are created.
+ */
 
 /*
-  ERROR RULES:
-	  * call stEvalError if you originate the error
-		(return EC_ERROR for the first time)
-	  * otherwise call slMessage for a regular debug output
-*/
-
-/* and their human readable string names for printing errors */
-
-char *slAtomicTypeStrings[] = {
-                                  NULL,
-                                  "NULL",
-                                  "int",
-                                  "double",
-                                  "string",
-                                  "object",
-                                  "bridge-object",	// unused
-                                  "pointer",
-                                  "vector",
-                                  "matrix",
-                                  "list",
-                                  "array",
-                                  "data",
-                                  "hash"
-                              };
+ * ERROR REPORTING RULES:
+ * - call stEvalError if you originate the error (return EC_ERROR for the first time)
+ * - otherwise call slMessage for a regular debug output
+ */
 
 #define CODE_BLOCK_SIZE	128
 
@@ -77,11 +46,10 @@ char *slAtomicTypeStrings[] = {
 */
 
 stRtcCodeBlock *stNewRtcBlock() {
-	// stRtcCodeBlock	*block = (stRtcCodeBlock *)malloc(sizeof(CODE_BLOCK_SIZE));
 	stRtcCodeBlock	*block = ( stRtcCodeBlock * )malloc( CODE_BLOCK_SIZE );
 
-	block->length	= CODE_BLOCK_SIZE;
-	block->calls.ptr		= block->code;
+	block->length		= CODE_BLOCK_SIZE;
+	block->calls.ptr	= block->code;
 
 	return block;
 }
@@ -483,7 +451,7 @@ inline int stToType( brEval *e, int type, brEval *t, stRunInstance *i ) {
 			break;
 
 		case AT_VECTOR:
-			stEvalError( i->instance, EE_CONVERT, "cannot convert type \"%s\" to type \"vector\"", slAtomicTypeStrings[( int )e->type()] );
+			stEvalError( i->instance, EE_CONVERT, "cannot convert type \"%s\" to type \"vector\"", brAtomicTypeStrings[( int )e->type()] );
 
 			return EC_ERROR;
 
@@ -499,27 +467,27 @@ inline int stToType( brEval *e, int type, brEval *t, stRunInstance *i ) {
 				return EC_OK;
 			}
 
-			stEvalError( i->instance, EE_CONVERT, "cannot convert type \"%s\" to type \"object\"", slAtomicTypeStrings[( int )e->type()] );
+			stEvalError( i->instance, EE_CONVERT, "cannot convert type \"%s\" to type \"object\"", brAtomicTypeStrings[( int )e->type()] );
 
 			return EC_ERROR;
 			break;
 
 		case AT_LIST:
-			stEvalError( i->instance, EE_CONVERT, "cannot convert type \"%s\" to type \"list\"", slAtomicTypeStrings[( int )e->type()] );
+			stEvalError( i->instance, EE_CONVERT, "cannot convert type \"%s\" to type \"list\"", brAtomicTypeStrings[( int )e->type()] );
 
 			return EC_ERROR;
 
 			break;
 
 		case AT_MATRIX:
-			stEvalError( i->instance, EE_CONVERT, "cannot convert type \"%s\" to type \"matrix\"", slAtomicTypeStrings[( int )e->type()] );
+			stEvalError( i->instance, EE_CONVERT, "cannot convert type \"%s\" to type \"matrix\"", brAtomicTypeStrings[( int )e->type()] );
 
 			return EC_ERROR;
 
 			break;
 
 		case AT_HASH:
-			stEvalError( i->instance, EE_CONVERT, "cannot convert type \"%s\" to type \"hash\"", slAtomicTypeStrings[( int )e->type()] );
+			stEvalError( i->instance, EE_CONVERT, "cannot convert type \"%s\" to type \"hash\"", brAtomicTypeStrings[( int )e->type()] );
 
 			return EC_ERROR;
 
@@ -533,13 +501,13 @@ inline int stToType( brEval *e, int type, brEval *t, stRunInstance *i ) {
 				return EC_OK;
 			}
 
-			stEvalError( i->instance, EE_CONVERT, "cannot convert type \"%s\" to type \"pointer\"", slAtomicTypeStrings[( int )e->type()] );
+			stEvalError( i->instance, EE_CONVERT, "cannot convert type \"%s\" to type \"pointer\"", brAtomicTypeStrings[( int )e->type()] );
 
 			return EC_ERROR;
 			break;
 
 		case AT_DATA:
-			stEvalError( i->instance, EE_CONVERT, "cannot convert type \"%s\" to type \"data\"", slAtomicTypeStrings[( int )e->type()] );
+			stEvalError( i->instance, EE_CONVERT, "cannot convert type \"%s\" to type \"data\"", brAtomicTypeStrings[( int )e->type()] );
 
 			return EC_ERROR;
 
@@ -818,9 +786,12 @@ int stSetVariable( void *variable, unsigned char type, stObject *otype, brEval *
 			break;
 
 		case AT_DOUBLE:
+
+#if 0
 			if( isnan( BRDOUBLE( e ) ) ) {
 				slMessage( DEBUG_ALL, "Warning: NaN value assignment\n" );
 			}
+#endif
 
 
 			*( double * )variable = BRDOUBLE( e );
@@ -1950,7 +1921,7 @@ RTC_INLINE int stEvalCallFunc( stCCallExp *c, stRunInstance *i, brEval *result )
 		}
 
 		if ( resultCode != EC_OK ) {
-			stEvalError( i->instance, EE_TYPE, "expected type \"%s\" for argument #%d to internal method \"%s\", got type \"%s\"", slAtomicTypeStrings[c->_function->_argTypes[n]], n + 1, c->_function->_name.c_str(), slAtomicTypeStrings[( int )e[n].type()] );
+			stEvalError( i->instance, EE_TYPE, "expected type \"%s\" for argument #%d to internal method \"%s\", got type \"%s\"", brAtomicTypeStrings[c->_function->_argTypes[n]], n + 1, c->_function->_name.c_str(), brAtomicTypeStrings[( int )e[n].type()] );
 			return resultCode;
 		}
 	}
@@ -3444,7 +3415,7 @@ int stExpEval( stExp *s, stRunInstance *i, brEval *result, stObject **tClass ) {
 					break;
 
 				default:
-					stEvalError( i->instance, EE_TYPE, "Cannot give magnitude of %s expression", slAtomicTypeStrings[( int )result->type()] );
+					stEvalError( i->instance, EE_TYPE, "Cannot give magnitude of %s expression", brAtomicTypeStrings[( int )result->type()] );
 
 					return EC_ERROR;
 

@@ -158,11 +158,13 @@ int brIReadFileAsString( brEval args[], brEval *target, brInstance *i ) {
 		return EC_ERROR;
 	}
 
-	char *text[ p->st.st_size + 1 ];
+	char *text = new char[ p->st.st_size + 1 ];
 
 	slUtilFread( text, 1, p->st.st_size, p->file );
 
 	target->set( text );
+
+	delete text;
 
 	return EC_OK;
 }
@@ -200,7 +202,7 @@ int brIReadDelimitedList( brEval args[], brEval *target, brInstance *i ) {
 	brEvalListHead *head;
 	brFilePointer *p;
 	int n;
-	char line[10240];
+	char line[ 10240 ];
 
 	p = BRFILEPOINTER( &args[0] );
 
@@ -214,12 +216,13 @@ int brIReadDelimitedList( brEval args[], brEval *target, brInstance *i ) {
 	}
 
 	slFgets( line, sizeof( line ) - 1, p->file );
+	if( line[ strlen( line ) - 1 ] == '\n' ) line[ strlen( line ) - 1 ] = 0;
 
 	n = 0;
 
 	char *str;
 
-	while (( str = slSplit( line, BRSTRING( &args[1] ), n++ ) ) ) {
+	while ( ( str = slSplit( line, BRSTRING( &args[1] ), n++ ) ) ) {
 		eval.set( str );
 		brEvalListInsert( head, head->_vector.size(), &eval );
 		delete[] str;
@@ -391,7 +394,7 @@ void breveInitFileFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "openFileForWriting", brIOpenFileForWriting, AT_POINTER, AT_STRING, 0 );
 	brNewBreveCall( n, "openFileForReading", brIOpenFileForReading, AT_POINTER, AT_STRING, 0 );
 	brNewBreveCall( n, "readLine", brIReadLine, AT_STRING, AT_POINTER, 0 );
-	brNewBreveCall( n, "readDelimitedList", brIReadWhitespaceDelimitedList, AT_LIST, AT_POINTER, AT_STRING, 0 );
+	brNewBreveCall( n, "readDelimitedList", brIReadDelimitedList, AT_LIST, AT_POINTER, AT_STRING, 0 );
 	brNewBreveCall( n, "readWhitespaceDelimitedList", brIReadWhitespaceDelimitedList, AT_LIST, AT_POINTER, 0 );
 	brNewBreveCall( n, "readFileAsString", brIReadFileAsString, AT_STRING, AT_POINTER, 0 );
 	brNewBreveCall( n, "readFileAsData", brIReadFileAsData, AT_DATA, AT_POINTER, 0 );

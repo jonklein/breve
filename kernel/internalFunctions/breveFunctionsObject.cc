@@ -36,6 +36,16 @@ int brIObjectName( brEval args[], brEval *target, brInstance *i ) {
 	return EC_OK;
 }
 
+/*
+*/
+
+int brITypeof( brEval args[], brEval *target, brInstance *i ) {
+
+	target->set( brAtomicTypeStrings[ args[ 0 ].type() ] );
+
+	return EC_OK;
+}
+
 /*!
 	\brief Adds an observer to the calling object's observer list.
 
@@ -176,6 +186,7 @@ int brIGetController( brEval args[], brEval *target, brInstance *i ) {
 /*@}*/
 
 void breveInitObjectFunctions( brNamespace *n ) {
+	brNewBreveCall( n, "typeof", brITypeof, AT_STRING, AT_UNDEFINED, 0 );
 	brNewBreveCall( n, "objectName", brIObjectName, AT_STRING, AT_INSTANCE, 0 );
 	brNewBreveCall( n, "addObserver", brIAddObserver, AT_INT, AT_INSTANCE, AT_STRING, AT_STRING, 0 );
 	brNewBreveCall( n, "removeObserver", brIRemoveObserver, AT_NULL, AT_INSTANCE, AT_STRING, 0 );
