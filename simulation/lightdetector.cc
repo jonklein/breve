@@ -54,7 +54,7 @@ void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 		// no exposure -- zero out the existing values
 
 		for ( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ )
-			( *wi )->_lightExposure = 0;
+			if( *wi ) ( *wi )->_lightExposure = 0;
 
 		return;
 	}
@@ -114,17 +114,19 @@ void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 
 	for ( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ ) {
 		unsigned char br, bg, bb;
-
-		br = n / ( 256 * 256 );
-		bg = n / 256;
-		bb = n % 256;
-
-		glColor4ub( br, bg, bb, 0xff );
-
 		wo = *wi;
-		wo->_lightExposure = 0;
 
-		if ( wo->_shape ) wo->_shape->draw( this, &wo->_position, 0, 0, 0, 0 );
+		if( wo ) {
+			br = n / ( 256 * 256 );
+			bg = n / 256;
+			bb = n % 256;
+
+			glColor4ub( br, bg, bb, 0xff );
+
+			wo->_lightExposure = 0;
+
+			if ( wo->_shape ) wo->_shape->draw( this, &wo->_position, 0, 0, 0, 0 );
+		}
 
 		n++;
 	}

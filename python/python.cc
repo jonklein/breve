@@ -575,6 +575,10 @@ void brPythonInit( brEngine *breveEngine ) {
 	brevePythonType->_typeSignature 	= PYTHON_TYPE_SIGNATURE;
 
 	brEngineRegisterObjectType( breveEngine, brevePythonType );
+
+	// Those meddling Python kids mess with the signal handlers!
+
+	signal( SIGINT, NULL );
 }
 
 #endif

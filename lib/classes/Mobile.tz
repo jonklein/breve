@@ -363,6 +363,11 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 		self set-velocity to archiveVelocity.
 		self set-rotational-velocity to archiveRvelocity.
 		self set-acceleration to archiveAcceleration.
+
+		if physicsEnabled: self enable-physics.
+		else: self disable-physics.
+
+
 		return (super dearchive).
 
   + section "Determining Whether an Object is Colliding"

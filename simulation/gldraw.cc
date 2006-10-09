@@ -894,7 +894,7 @@ void slCamera::renderLabels( slWorld *w ) {
 	for ( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ ) {
 		wo = *wi;
 
-		if ( !wo->_label.empty() ) {
+		if ( wo && !wo->_label.empty() ) {
 			l = &wo->_position.location;
 			glPushMatrix();
 			glTranslatef( l->x, l->y, l->z );
@@ -1148,7 +1148,7 @@ void slCamera::processBillboards( slWorld *w ) {
 	for ( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ ) {
 		slWorldObject *wo = *wi;
 
-		if ( wo->_textureMode != BBT_NONE && wo->_shape && wo->_shape->_type == ST_SPHERE ) {
+		if ( wo && wo->_textureMode != BBT_NONE && wo->_shape && wo->_shape->_type == ST_SPHERE ) {
 			double z = 0;
 
 			ss = static_cast<slSphere*>( wo->_shape );
@@ -1241,7 +1241,7 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 		int skip = 0;
 		wo = w->_objects[n];
 
-		if ( wo->_drawAsPoint ) skip = 0;
+		if ( !wo ) skip = 1;
 		else if ( wo->_drawMode == DM_INVISIBLE ) skip = 1;
 		else if ( doNoAlpha && wo->_alpha != 1.0 ) skip = 1;
 		else if ( doOnlyAlpha && wo->_alpha == 1.0 ) skip = 1;
@@ -1322,7 +1322,7 @@ void slCamera::renderLines( slWorld *w ) {
 
 	for ( n = 0; n < w->_objects.size(); ++n ) {
 		if ( w->_objects[n] && !( w->_objects[n]->_drawMode & DM_INVISIBLE ) ) {
-			if ( w->_objects[n]->_drawMode & DM_NEIGHBOR_LINES ) {
+			if ( w && w->_objects[n]->_drawMode & DM_NEIGHBOR_LINES ) {
 				std::vector<slWorldObject*>::iterator wi;
 
 				glEnable( GL_BLEND );
