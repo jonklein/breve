@@ -1,0 +1,141 @@
+@define RobotSize 2.5.
+
+Mobile : basicAgent (aka basicAgents) {
+	+ variables:
+		shapee        (object).
+		sensors		(list).
+		hoodSize      (float).
+		draw (object).
+		
+	+ to get-realWorldPointer:
+		return realWorldPointer.
+
+	+ to send message message(string) on-sensor mySensor(int):
+		sensors{mySensor} send message message.
+
+# this message is called, if this agent received a message and is able to send an ack
+	+ to receiveMessage message message(string) mySensor mySensor(int) :
+
+
+#	this function is called if somebody sends us a message.
+#	if this agent can send an ack to the sender of the message
+#	self receiveMessage message message mySensor i.
+#  is called so communication is only possible, if the receiving sensor is
+# pointed towards the sender.
+
+	+ to receiveMessage2 message message(string) from sender(object):
+		toSender(vector).
+		toReceiver(vector).
+		SenderPos(vector).
+		n(vector).
+		RAngle1(float).
+		RAngle2(float).
+		RAngle(float).
+		qtest(float).
+		i(int).
+		n = (self get-rotation)* (0,1,0).
+		SenderPos = (sender) get-location.
+		#calculate the receiving sensor here.
+		toSender = SenderPos - (self get-location).
+		toReceiver = (self get-location)- SenderPos .
+		toSender= toSender/|toSender|.
+		toReceiver = toReceiver/|toReceiver|.
+		RAngle1 = dot(((self get-rotation)*(0,0,-1)), toSender).
+		RAngle2 = dot(((self get-rotation)*(1,0,0)), toSender).
+		if (|RAngle1| >= 1):{
+			RAngle1 = 0.
+		}else{
+			RAngle1 = acos(RAngle1)*180/PI.
+		}
+		if (|RAngle2| >= 1):{
+			RAngle2 = 0.
+		}else{
+			RAngle2 = acos(RAngle2)*180/PI.
+		}
+
+#		draw draw-line from (self get-location)to (self get-location) + (self get-rotation)*(0,0,10).
+#		draw draw-line from (self get-location)to (self get-location) + (self get-rotation)*(10,0,0).
+
+# we only get angles 0<angle<180
+#		  ^
+#         |   
+# 0<R1<90 |90<R1<180
+# 0<R2<90 |0<R2<90
+#<--------+---------
+# 0<R1<90 |90<R1<180
+#90<R2<180|90<R2<180
+#         |  
+#         |   
+
+if(RAngle2<=90):{
+	RAngle = RAngle1.
+}else{
+	RAngle = 360-RAngle1.
+}
+
+
+		for i=0, i<= 5, i++:{
+			if((i*60 < RAngle)&&(RAngle <= (i+1)*60)):{ 
+#				print "sending ack on sensor ",i.
+#				print "RAngle: ",RAngle.
+
+				# test if this sensor could send the ack
+				if(sensors{i} can-send-ack to sender):{
+					self receiveMessage message message mySensor i.
+					return.
+				}
+#				print "cant ack!".
+			}
+		}
+		
+	  
+
+
+	+ to init:
+		rotation(matrix).
+		right60(matrix).
+		left150(matrix).
+		draw = new Drawing.
+		shapee = (controller get-walker-shape).
+		self set-shape to shapee.
+		self set-color to (0,1,0.3).
+		hoodSize = 50.
+		self set-neighborhood-size to hoodSize.
+		
+		rotation = [(1,0,0),(0,1,0),(0,0,1)].
+		right60 = [(cos(PI/3),0,-sin(PI/3)),(0,1,0),(sin(PI/3),0,cos(PI/3))].
+		left150 = [(cos(-PI*5/6),0,-sin(-PI*5/6)),(0,1,0),(sin(-PI*5/6),0,cos(-PI*5/6))].
+
+		#          \         /
+		#           \   1   /
+		#        0   \     /  2
+		#             \+=+/ 
+		#       -------| |-------
+		# x           /+=+\ 
+		# ^      5   /     \  3
+		# |         /   4   \
+		# |        /         \
+		# |
+		# |
+		# +-------------------> z
+		# the sensors point in z direction
+		
+		rotation = rotation*left150.
+		sensors{0} = (new IRSensor init-with type "TEFT4300" rel-position ((RobotSize+1)/2.0, 0,-(RobotSize+1)/2.0 ) rel-rotation rotation owner self).
+		rotation = rotation*right60.
+		sensors{1} = (new IRSensor init-with type "TEFT4300" rel-position ((RobotSize+1)/2.0, 0, 0) rel-rotation rotation owner self).
+		rotation = rotation*right60.
+		sensors{2} = (new IRSensor init-with type "TEFT4300" rel-position ((RobotSize+1)/2.0, 0, (RobotSize+1)/2.0) rel-rotation rotation owner self).
+		rotation = rotation*right60.
+		sensors{3} = (new IRSensor init-with type "TEFT4300" rel-position (-(RobotSize+1)/2.0, 0, (RobotSize+1)/2.0) rel-rotation rotation owner self).
+		rotation = rotation*right60.
+		sensors{4} = (new IRSensor init-with type "TEFT4300" rel-position (-(RobotSize+1)/2.0, 0 ,0) rel-rotation rotation owner self).
+		rotation = rotation*right60.
+		sensors{5} = (new IRSensor init-with type "TEFT4300" rel-position (-(RobotSize+1)/2.0, 0, -(RobotSize+1)/2.0) rel-rotation rotation owner self).
+
+		return self.
+
+
+}
+
+

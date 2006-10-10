@@ -116,12 +116,25 @@ void slWorldObject::setColor( slVector *c ) {
 	slVectorCopy( c, &_color );
 }
 
-double slWorldObject::irSense( slPosition *sensorPos, std::string sensorType ) {
+double slWorldObject::irSense(slPosition *sensorPos, std::string sensorType){
 	//ProximitySensor::getProximitySensor();
 //	printf("proximiy Radius%f\n",_proximityRadius);
-	return irSense2( &_neighbors, sensorPos, sensorType );
+	return irSense2(&_neighbors, sensorPos, sensorType);
 }
 
+double slWorldObject::calculateQuality(slPosition* sensorPos, slVector* targetLoc, std::string sensorType, slWorldObject* target){
+	if(target!=NULL){
+		targetLoc = &target->_position.location;
+	}
+	return calculateQuality2(&_neighbors, sensorPos, targetLoc, sensorType, target);//sensor.cc
+}
+
+double slWorldObject::calcQualNoRay(slPosition* sensorPos, slVector* targetLoc, std::string sensorType, slWorldObject* target){
+	if(target!=NULL){
+		targetLoc = &target->_position.location;
+	}
+	return calcQualNoRay2(&_neighbors, sensorPos, targetLoc, sensorType, target);//sensor.cc
+}
 int slWorldObject::raytrace( slVector *location, slVector* direction, slVector *erg_dir ) {
 
 	if ( !_shape ) {
