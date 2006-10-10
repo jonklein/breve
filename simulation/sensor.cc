@@ -8,13 +8,10 @@
 #include "vclip.h"
 #include "vclipData.h"
 #include "sensor.h"
-#include "assert.h"
-#include <map>
-using std::map;
 using std::vector;
 using std::string;
 
-map <string, UserSensor*> SensorBuilder::sensors = map<string, UserSensor*>();
+std::map <string, UserSensor*> SensorBuilder::sensors = std::map<string, UserSensor*>();
 
 double distance_plane_point(slVector *normal, slVector *planePoint, slVector *point){
 	return normal->x * (point->x - planePoint->x) 
@@ -114,7 +111,7 @@ UserSensor* SensorBuilder::createUserSensor(const char* name, const int rows, co
 	// check if a sensor with this name already exists and delete it
 //	slMessage(DEBUG_ALL,"UserBuilder createUserSensor\n");
 
-	map <string, UserSensor*>::iterator iter = sensors.find(name);
+	std::map <string, UserSensor*>::iterator iter = sensors.find(name);
 	if(iter != sensors.end()){
 	//if(iter->first == name){
 		slMessage(DEBUG_ALL,"deleting sensor %s \n", name);			
@@ -182,20 +179,20 @@ UserSensor::UserSensor(const char* name, const int rows, const int columns, cons
 
 	//get memory for rayDirection array
 	rayDirections = (slVector**)malloc(rows * sizeof(slVector *));
-    assert(rayDirections != NULL);
+//    assert(rayDirections != NULL);
     /* allocate a: columns*/
     for(int i=0; i < columns; i++) {
 		rayDirections[i] = (slVector*)malloc(columns * sizeof(slVector));
-		assert(rayDirections[i] != NULL);
+//		assert(rayDirections[i] != NULL);
     }
 
 	//get memory for rayValues array
 	rayValues = (rayData**)malloc(rows * sizeof(rayData *));
-    assert(rayValues != NULL);
+//    assert(rayValues != NULL);
     /* allocate a: columns*/
     for(int i=0; i < columns; i++) {
 		rayValues[i] = (rayData*)malloc(columns * sizeof(rayData));
-		assert(rayValues[i] != NULL);
+//		assert(rayValues[i] != NULL);
     }
 
 	for(int j=0; j<rows; j++){

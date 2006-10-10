@@ -1,5 +1,4 @@
 #include <map>
-using std::map;
 using std::vector;
 using std::string;
 
@@ -90,9 +89,7 @@ class SensorBuilder{
 //	SensorBuilder::~SensorBuilder();
 
 	protected:
-		static map<string, UserSensor*> sensors;
-		static map<int, int> testmap;
-
+		static std::map<string, UserSensor*> sensors;
 };
 
 
