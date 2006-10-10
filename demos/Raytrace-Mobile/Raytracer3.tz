@@ -32,30 +32,31 @@ Control : myControl {
 	+ to init:
 		s (object).
 		print "Setting up the simulation.".
+		# register our sensor-type at breve
 		s = new TEFT4300Sensor.
 		s register-Sensor-TEFT4300.
 		free s.
 		self point-camera at (0, 0, 0) from (0, 100, 0).
 		walkerShape   = (new Cube init-with size (RobotSize, 2.8, RobotSize)).
 
-		self messageTest-block.
-#		self messageTest-allSensors.
-#		self messageTest-oneSensor.		
+# here are the tests, all except one should be commented out
+
 #		self sensorTest-Distance.
 #		self sensorTest-Azimut distance 7.5.
 #		self sensorTest-Incidence distance 12.5.
-#		self moveAroundTest.
 #		self testInsideSensor.
+#		self messageTest-allSensors.
+		self messageTest-block.
 #		self messageTest-Bidirectional.
+#		self moveAroundTest.
 
+
+# just move around and avoid obstacles
 	+ to moveAroundTest:
 		agentcount(int).
 		i(int).
 		agentcount = 3.
 		agents =  agentcount new testAgent.		
-#		agent = new testAgent.
-#		agent move to (-10,10,-10).
-#		agent set-mode mode AVOID. 421.2 von 756,2 55,7%
 		new DemoStage.
 
 		for i=0, i<agentcount  , i+=1: {
@@ -64,11 +65,13 @@ Control : myControl {
 			agents{i} set-mode mode AVOID.
 		}
 		
+# for the sensor tests load the teststage and put the camera high		
 	+ to sensorTestInit:
 		new TestStage.
 		agent =  1 new testAgent.
 		self point-camera at (0, 0, 0) from (0, 250, 0).
-
+		
+# run to a wall and print the values on the console
 	+ to sensorTest-Distance:
 		self sensorTestInit.
 		agent set-mode mode DISTANCE.
@@ -76,17 +79,41 @@ Control : myControl {
 		agent rotate around-axis (0,1,0) by PI/2.
 		agent set-velocity to (agent get-rotation)*(1,0,0).
 
+# turn in place and output
 	+ to sensorTest-Azimut distance dist(float):
 		self sensorTestInit.
 		agent set-mode mode AZIMUT.
 		#-15+robotsize/2 ,0 sind waende
 		agent move to (-40, 10, -dist).
-		
+
+# circle around a wall and print the values
 	+ to sensorTest-Incidence distance dist(float):
 		self sensorTestInit.
 		agent set-mode mode INCIDENCE.
 		agent set-incidenceRadius radius (dist + (1+RobotSize)/2.0). # 1= wanddicke
 
+# one robot in the middle sending messages
+# all other move towards him, if they receive a message they stop
+# notice, the sensor has a stronger signal in his main direction
+	+ to messageTest-allSensors:
+		radius(int).
+		i(int).
+		agentcount(int).
+		agentcount = 30.
+		radius = 40.
+		agents =  (agentcount+1) new testAgent.		
+
+		for i=0, i<agentcount  , i+=1: {
+			agents{i} move to (radius*sin((360.0/agentcount)*i*PI/180.0), 0, radius*cos((360.0/agentcount)*i*PI/180.0)).
+			agents{i} rotate around-axis (0,1,0) by ((360.0/agentcount)*i*PI/180.0 + PI/2.0).
+			agents{i} set-mode mode STRAIGHT.
+		}
+		agents{agentcount} move to (0, 0, 0).
+		agents{agentcount} rotate around-axis (0,-1,0) by (PI/2.0).
+		agents{agentcount} set-mode mode SOURCE.
+
+# same as messageTest-allSesors
+# with some disabled robots to block the signals
 	+ to messageTest-block:
 		radius(int).
 		i(int).
@@ -113,42 +140,6 @@ Control : myControl {
 		agents{agentcount+4} set-mode mode DISABLE.
 		agents{agentcount+4} move to (-3, 0, -6).
 
-	+ to messageTest-allSensors:
-		radius(int).
-		i(int).
-		agentcount(int).
-		agentcount = 30.
-		radius = 40.
-		agents =  (agentcount+1) new testAgent.		
-
-		for i=0, i<agentcount  , i+=1: {
-			agents{i} move to (radius*sin((360.0/agentcount)*i*PI/180.0), 0, radius*cos((360.0/agentcount)*i*PI/180.0)).
-			agents{i} rotate around-axis (0,1,0) by ((360.0/agentcount)*i*PI/180.0 + PI/2.0).
-			agents{i} set-mode mode STRAIGHT.
-		}
-		agents{agentcount} move to (0, 0, 0).
-		agents{agentcount} rotate around-axis (0,-1,0) by (PI/2.0).
-		agents{agentcount} set-mode mode SOURCE.
-
-	+ to messageTest-oneSensor:
-		radius(int).
-		i(int).
-		j(int).
-		agentcount(int).
-		agentcount = 40.
-		radius = 40.
-		agents =  (agentcount+1) new testAgent.		
-
-		for i=0, i<agentcount , i+=1: {
-			j= i+20.
-			agents{i} move to (radius*sin((360.0/(agentcount+40))*j*PI/180.0), 0, radius*cos((360.0/(agentcount+40))*j*PI/180.0)).
-			agents{i} rotate around-axis (0,1,0) by ((360.0/(agentcount+40))*j*PI/180.0 + PI/2.0).
-			agents{i} set-mode mode STRAIGHT.
-		}
-		agents{agentcount} move to (0, 0, 10).
-		agents{agentcount} rotate around-axis (0,-1,0) by (PI/2.0).
-		agents{agentcount} set-mode mode SOURCE.
-
 + to testInsideSensor:
 		agentcount(int).
 		agentcount = 2.
@@ -156,12 +147,16 @@ Control : myControl {
 
 		agents{0} move to (0, 0, 10).
 		agents{0} rotate around-axis (0,1,0) by (PI/2.0).
-		agents{0} set-mode mode DISABLE.
+		agents{0} set-mode mode STAND.
 
 		agents{1} set-mode mode INSIDETEST.
 		agents{1} move to (0, 0, 40).
 		agents{1} rotate around-axis (0,1,0) by (PI/2.0).
-		
+	
+# one robot stands in the middle, two other move towards him
+# one of the movers has a sensor facing towards the standing robot
+# thus can send a ACK the other is rotated and cannot send a ACK
+# so he wont stop		
 + to messageTest-Bidirectional:
 		agentcount(int).
 		agentcount = 3.
@@ -170,25 +165,19 @@ Control : myControl {
 		agents{0} move to (0, 0, 00).
 		agents{0} rotate around-axis (0,1,0) by (-PI/2.0).
 		agents{0} set-mode mode SOURCE.
-	#	agents{0} set-velocity to(1,0,0). 
 
 		agents{1} set-mode mode 0.
-#		agents{1} set-mode mode SOURCE.
+		agents{1} set-mode mode SHOWSENSORS.
 		agents{1} move to (0, 0, 40).
 		agents{1} rotate around-axis (0,1,0) by (-PI/2.0).
 		agents{1} set-velocity to(0,0,-1). 
 
 		agents{2} set-mode mode 0.
-#		agents{2} set-mode mode SOURCE.
+		agents{2} set-mode mode SHOWSENSORS.
 		agents{2} move to (0, 0, -40).
 		agents{2} rotate around-axis (0,1,0) by (2* PI/2.0).
 		agents{2} set-velocity to(0,0,1). 
 
-#		agents{3} set-mode mode SOURCE.
-#		agents{3} move to (40, 0, 20).
-#		agents{3} rotate around-axis (0,1,0) by (PI/2.0).
-#
-#agents{3} set-velocity to(-1,0,0). 
 
 + to iterate:
 		super iterate.

@@ -1,10 +1,16 @@
 @define RobotSize 2.5.
 
+# This is a basicAgent, it extends Mobile
+# has 6 proximity Sensors of the Type TEFT4300
+# and it is capable of receiving messages from other Agents
+# TestAgent inherts from this Agent and has some simple behavior
+
 Mobile : basicAgent (aka basicAgents) {
 	+ variables:
 		shapee        (object).
 		sensors		(list).
 		hoodSize      (float).
+		# hoodSize is important only obstacles in the neightborhood can be detected
 		draw (object).
 		
 	+ to get-realWorldPointer:
@@ -31,7 +37,6 @@ Mobile : basicAgent (aka basicAgents) {
 		RAngle1(float).
 		RAngle2(float).
 		RAngle(float).
-		qtest(float).
 		i(int).
 		n = (self get-rotation)* (0,1,0).
 		SenderPos = (sender) get-location.
@@ -40,14 +45,15 @@ Mobile : basicAgent (aka basicAgents) {
 		toReceiver = (self get-location)- SenderPos .
 		toSender= toSender/|toSender|.
 		toReceiver = toReceiver/|toReceiver|.
+		#FIXME
 		RAngle1 = dot(((self get-rotation)*(0,0,-1)), toSender).
 		RAngle2 = dot(((self get-rotation)*(1,0,0)), toSender).
-		if (|RAngle1| >= 1):{
+		if (|RAngle1| > 1):{
 			RAngle1 = 0.
 		}else{
 			RAngle1 = acos(RAngle1)*180/PI.
 		}
-		if (|RAngle2| >= 1):{
+		if (|RAngle2| > 1):{
 			RAngle2 = 0.
 		}else{
 			RAngle2 = acos(RAngle2)*180/PI.
@@ -67,24 +73,26 @@ Mobile : basicAgent (aka basicAgents) {
 #         |  
 #         |   
 
-if(RAngle2<=90):{
-	RAngle = RAngle1.
-}else{
-	RAngle = 360-RAngle1.
-}
-
+		if(RAngle2<=90):{
+			RAngle = RAngle1.
+		}else{
+			RAngle = 360-RAngle1.
+		}
 
 		for i=0, i<= 5, i++:{
+		#	find the sensor for sending the ACK
 			if((i*60 < RAngle)&&(RAngle <= (i+1)*60)):{ 
 #				print "sending ack on sensor ",i.
 #				print "RAngle: ",RAngle.
 
 				# test if this sensor could send the ack
 				if(sensors{i} can-send-ack to sender):{
+# we could send a ACK so we can continue with this message
 					self receiveMessage message message mySensor i.
 					return.
 				}
 #				print "cant ack!".
+# we could not send a ACK so we cant use the message
 			}
 		}
 		
@@ -120,6 +128,7 @@ if(RAngle2<=90):{
 		# +-------------------> z
 		# the sensors point in z direction
 		
+		# just add the sensors
 		rotation = rotation*left150.
 		sensors{0} = (new IRSensor init-with type "TEFT4300" rel-position ((RobotSize+1)/2.0, 0,-(RobotSize+1)/2.0 ) rel-rotation rotation owner self).
 		rotation = rotation*right60.
@@ -134,8 +143,4 @@ if(RAngle2<=90):{
 		sensors{5} = (new IRSensor init-with type "TEFT4300" rel-position (-(RobotSize+1)/2.0, 0, -(RobotSize+1)/2.0) rel-rotation rotation owner self).
 
 		return self.
-
-
 }
-
-

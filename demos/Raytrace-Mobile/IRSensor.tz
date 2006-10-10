@@ -10,28 +10,20 @@
 Real:IRSensor (aka IRSensors){
 
 	+variables:
-		m_location(vector).
-		m_rotation(matrix).
+		m_location(vector). # location of the sensor
+		m_rotation(matrix). # rotation of the sensor
 		sensorType(string).
 		sensordata(float).
 		owner(object).
 		realWorldPointer_owner(pointer).
 		draw(object).
-		rel_position(vector).
-		rel_rotation(matrix).
-		communicationThreshold(float).
+		rel_position(vector). # position ralativ to the owner
+		rel_rotation(matrix). # rotation relativ to the owner
+		communicationThreshold(float). # if the quality is higher than the threshold we can communicate
 
 
-	+ to set-rel-y-rotation to f(float):
-		self set-rel-rotation to [(cos(f),0,-sin(f)),(0,1,0),(sin(f),0,cos(f))].
-
-	+ to set-rel-rotation to m (matrix):
-	    rel_rotation = m.
-	
-	+to set-rel-position to v (vector):
-		rel_position = v.
-	
-				
+	# init with a specific sensortype and a position and rotation relativ to the owner wich is 
+	# given as last parameter			
 	+to init-with type t(string) rel-position position(vector) rel-rotation rotation(matrix) owner o(object):
 		sensorType = t.
 		self set-rel-position to position.
@@ -44,24 +36,26 @@ Real:IRSensor (aka IRSensors){
 		communicationThreshold = 30.0.
 		return self.
 	
-    + to set-owner to o (object):
-        owner = o.
-		
-    + to get-owner:
-        return owner.
 
-	+ to can-send-ack to agent(object):
-		qtest(float). #hier braucht man nicht nochmal ein komplettes raytrace machen
-#wenn der hinweg frei ist kann das signal auch zurueck nur distanz und azimut beeinflussen den wert evtl anderer sensor
-		qtest = calcQualNoRay(realWorldPointer_owner, (self get-location),
-		(self get-rotation) ,(agent get-location) , sensorType).
-		if (qtest > communicationThreshold):{
-#			print ">!".
-			return 1.
+# this is called if the sensor is used to sense
+# it return a value according to the sensor specifications
+# and the obstacles in his neighbourhood
+	+to get-data:
+		self update-pos.
+		# only make the calculations once per simulation step
+		if (sensordata ==-1 ):{
+			draw clear.
+			draw set-color to (0.1, 0.1, 0.1).
+			draw draw-line from (self get-location)to (self get-location) + (self get-rotation)*(0,0,30).
+#			print "Raytracer: start sensing...".
+			sensordata = irSense(realWorldPointer_owner, (self get-location), (self get-rotation) , sensorType).
+#			print sensordata.
+#			print "Raytracer: ...sensing done".
 		}
-#		print "qtest ack to low!", qtest.
-		return 0.
-
+		return sensordata.
+		
+# we use the sensor to send messages to other agents
+# 
 	+ to send message message(string):
   		qtest (double).
 		agents (list).
@@ -70,7 +64,7 @@ Real:IRSensor (aka IRSensors){
 		col = random[100].
   		self update-pos.
  		draw clear.
-		agents = all testAgent.
+		agents = all basicAgent. # only send to other Agents
 		draw set-color to (1,0,0).
 		draw draw-line from (self get-location)to (self get-location) + (self get-rotation)*(0,0,27).
 
@@ -79,15 +73,50 @@ Real:IRSensor (aka IRSensors){
 				qtest = calculateQualityToObject(realWorldPointer_owner, (self get-location), (self get-rotation) ,(i get-realWorldPointer) , sensorType).
 				draw set-color to (0,0,0).
 #				draw draw-line from (self get-location)to (i get-location).
+# only send the message to him, if the quality is good enough
 				if (qtest > communicationThreshold):{ #3
 #					print "sendquality:",qtest.
 					i receiveMessage2 message message from(self get-owner ).
-
 				}
 			}
 		}
+		
+# this message is called if we receive a message
+# we can only receive a message if we can send a ACK to the sender of the message
+	+ to can-send-ack to agent(object):
+		qtest(float).
+# we dont have to make raytrace, the sender already assured a free path the quality of our 
+# ACK only depends on the distance and the incidence angle
+		qtest = calcQualNoRay(realWorldPointer_owner, (self get-location),
+		(self get-rotation) ,(agent get-location) , sensorType).
+		if (qtest > communicationThreshold):{
+# the quality is good enough we could send a ACK 
+			return 1.
+		}
+#		print "qtest ack to low!", qtest.
+# the quality is not good we could not send an ACK
+		return 0.
 
+# reset the data and update position
+	+to iterate:
+		sensordata = -1.
+		self update-pos.
+		
+	+to update-pos:
+		# move and rotate the sensor, relative to its owner
+		self move to ((owner get-location) +( (owner get-rotation )* rel_position )).
+		self set-rotation to ((owner get-rotation) * rel_rotation).
 
+##############################getters and setters################################
+	+ to set-rel-y-rotation to f(float):
+		self set-rel-rotation to [(cos(f),0,-sin(f)),(0,1,0),(sin(f),0,cos(f))].
+
+	+ to set-rel-rotation to m (matrix):
+	    rel_rotation = m.
+	
+	+to set-rel-position to v (vector):
+		rel_position = v.
+	
 	+ to move to location(vector):
 		m_location = location.
 	
@@ -103,30 +132,10 @@ Real:IRSensor (aka IRSensors){
 	+to get-sensorType:
 	  return sensorType.
 
-	+to get-data:
-		self update-pos.
-		if (sensordata ==-1 ):{
-			draw clear.
-			draw set-color to (0.1, 0.1, 0.1).
-			draw draw-line from (self get-location)to (self get-location) + (self get-rotation)*(0,0,30).
-#
-#			print "Raytracer: start sensing...".
-			sensordata = irSense(realWorldPointer_owner, (self get-location), (self get-rotation) , sensorType).
-#		print realWorldPointer_owner.
-#		print (self get-location).
-#		print (self get-rotation).
-#			print sensordata.
-#			print "Raytracer: ...sensing done".
-		}
-		return sensordata.
+    + to set-owner to o (object):
+        owner = o.
 		
-	+to iterate:
-		sensordata = -1.
-		#print "iterate".
-		self update-pos.
-		
-	+to update-pos:
-		# move and rotate the sensor, relative to its owner
-		self move to ((owner get-location) +( (owner get-rotation )* rel_position )).
-		self set-rotation to ((owner get-rotation) * rel_rotation).
+    + to get-owner:
+        return owner.
+
 }

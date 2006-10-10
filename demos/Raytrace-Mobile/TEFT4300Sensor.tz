@@ -5,6 +5,13 @@
 @use Real.
 @use IRSensor.
 
+# this class represents a combination of the TEFT4300 infrared Sensor
+# and the XXX infrared Diode.
+# the following values are measured with a JASEMINE Robot they will
+# eventually not fit with other robots, even if they use the same 
+# LED and sensor
+# the measuring method is descibed in XXX
+#
 
 IRSensor:TEFT4300Sensor (aka TEFT4300Sensors){
 	
