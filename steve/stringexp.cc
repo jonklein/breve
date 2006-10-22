@@ -43,6 +43,8 @@ stStringExp::stStringExp( char *theString, stMethod *m, stObject *o, char *file,
 	char *varstart, *varend, *varname;
 	stSubstringExp *sub;
 
+	bool matchBrace = 0;
+
 	s = theString;
 	baseSize = 0;
 
@@ -55,7 +57,15 @@ stStringExp::stStringExp( char *theString, stMethod *m, stObject *o, char *file,
 			int offset;
 
 			if ( *( ++s ) ) {
-				/* mark the start, find the end of the variable */
+				// mark the start, find the end of the variable 
+
+				// if the first char is a '{', then they're using braces to separate the variable
+				// skip ahead one character
+
+				if( *s == '{' && *( s + 1 ) ) {
+					matchBrace = 1;
+					s++;
+				}
 
 				varstart = s;
 
@@ -118,6 +128,10 @@ stStringExp::stStringExp( char *theString, stMethod *m, stObject *o, char *file,
 				if ( !sub->loadExp ) {
 					stParseError( o->engine, PE_UNKNOWN_SYMBOL, "Error locating variable \"%s\" while parsing string", varname );
 				}
+
+				// skip past the end brace
+
+				if( matchBrace && *s == '}' ) s++;
 
 				delete[] varname;
 			}

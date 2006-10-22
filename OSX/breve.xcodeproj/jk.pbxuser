@@ -2,7 +2,6 @@
 {
 	2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 		activeBuildConfigurationName = "Deployment-Universal";
-		activeBuildStyle = 4A9504D0FFE6A4CB11CA0CBA /* Development */;
 		activeExecutable = 4802DC7B05616137008198B9 /* real_breve.app */;
 		activeTarget = 480F31AA071472AD00E71420 /* breve.app */;
 		addToTargets = (
@@ -153,7 +152,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 179800612;
+			PBXPerProjectTemplateStateSaveDate = 182830150;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -710,7 +709,7 @@
 				PBXModuleWindowStatusBarHidden = YES;
 				RubberWindowFrame = "267 380 745 408 0 0 1280 832 ";
 			};
-			PBXWorkspaceStateSaveDate = 179800612;
+			PBXWorkspaceStateSaveDate = 182830150;
 		};
 		sourceControlManager = 48E065B3055C318700C40B45 /* Source Control */;
 		userBuildSettings = {
@@ -765,12 +764,14 @@
 		);
 		executableSystemSymbolLevel = 0;
 		executableUserSymbolLevel = 0;
-		libgmallocEnabled = 1;
+		libgmallocEnabled = 0;
 		name = real_breve.app;
 		savedGlobals = {
 		};
 		sourceDirectories = (
 		);
+		variableFormatDictionary = {
+		};
 	};
 	480F31AA071472AD00E71420 /* breve.app */ = {
 		activeExec = 0;
@@ -779,25 +780,29 @@
 		isa = PBXFileBreakpoint;
 		actions = (
 		);
+		breakpointStyle = 0;
 		continueAfterActions = 0;
 		delayBeforeContinue = 0;
 		fileReference = F5BD20C70397BFC001980AE4 /* slBreveGLView.mm */;
 		functionName = "-makeImageRep";
 		hitCount = 1;
 		lineNumber = 457;
-		modificationTime = 179800937.094526;
+		location = breve;
+		modificationTime = 182830212.428238;
 		state = 1;
 	};
 	48BB5D1405C9659B007C7301 /* slBreveSourceDocument.mm:24 */ = {
 		isa = PBXFileBreakpoint;
 		actions = (
 		);
+		breakpointStyle = 0;
 		continueAfterActions = 0;
 		delayBeforeContinue = 0;
 		fileReference = 2A37F4ACFDCFA73011CA2CEA /* slBreveSourceDocument.mm */;
 		hitCount = 1;
 		lineNumber = 24;
-		modificationTime = 179800937.094599;
+		location = breve;
+		modificationTime = 182830212.428212;
 		state = 1;
 	};
 	48CE1CFB08155B1F0030CBB8 /* DocumentIcons.icns */ = {

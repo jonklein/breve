@@ -3152,7 +3152,7 @@ RTC_INLINE int stEvalNewInstance( stInstanceExp *ie, stRunInstance *i, brEval *t
 }
 
 int stExpEval3( stExp *s, stRunInstance *i, brEval *result ) {
-	if ( s->block )
+	if ( s && s->block )
 		return s->block->calls.stRtcEval3( s, i, result );
 	else
 		return stExpEval( s, i, result, NULL );

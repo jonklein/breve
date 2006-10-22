@@ -81,7 +81,7 @@ slMovie *slMovieCreate( char *filename, int width, int height ) {
 #else
 	m->_context->frame_rate = 1000 * m->_context->frame_rate_base;
 #endif
-	m->_context->bit_rate = 800 * 1000;
+	m->_context->bit_rate = 1600 * 1000;
 	m->_context->gop_size = 15;
 	m->_context->max_b_frames = 1;
 

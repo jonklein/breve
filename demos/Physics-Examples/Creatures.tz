@@ -27,20 +27,20 @@
 Controller VirtualCreatures.
 
 PhysicalControl : VirtualCreatures {
-    + variables:
-        running (int).
-        dg (object).
-        body (object).
+	+ variables:
+		running (int).
+		dg (object).
+		body (object).
 		flag (object).
 
-        startlocation (vector).
+		startlocation (vector).
 
-        parser (object).
+		parser (object).
 
-        ga (object).
+		ga (object).
 
-    + to init:
-        new Floor.
+	+ to init:
+		new Floor.
 
 		flag = new Mobile.
 		flag disable-physics.
@@ -50,18 +50,18 @@ PhysicalControl : VirtualCreatures {
 
 		self set-background-texture-image to (new Image load from "images/clouds.png").
 
-        self enable-fast-physics.
+		self enable-fast-physics.
 		self set-fast-physics-iterations to 20.
 
-        parser = new MorphologyParser.
+		parser = new MorphologyParser.
 
 		ga = (controller dearchive-xml file "breveCreatures.xml").	
 
 		if !ga: {
-        	ga = new SimsGA.
+			ga = new SimsGA.
 
-	        ga set-fitness-test-duration to 30.
-	        ga set-individual-class to "SimsGAIndividual".
+			ga set-fitness-test-duration to 30.
+			ga set-individual-class to "SimsGAIndividual".
 			ga set-population-size to 25.
 			ga set-crossover-percent to 30.
 			ga set-mutation-percent to 30.
@@ -84,206 +84,240 @@ PhysicalControl : VirtualCreatures {
 		self set-display-text number 1 to "Generation: $gen ($index/$total)" at-x -.95 at-y -.75.
 		self set-display-text number 2 to "Best distance: $bestDistance" at-x -.95 at-y -.85.
 
-    + to iterate:
-        t (vector).
-        dist (float).
-        link (object).
+	+ to iterate:
+		t (vector).
+		dist (float).
+		link (object).
 
-        foreach link in all Links: {
-            t += (link get-location).
-        }
+		foreach link in all Links: {
+			t += (link get-location).
+		}
 
-        if |all Links|: t /= |all Links|.
+		if |all Links|: t /= |all Links|.
 
-        self point-camera at t.
+		self point-camera at t.
 
-        dist = | t - startlocation |.
-        if running: self set-display-text to "Distance traveled: $dist" at-x -.95 at-y -.95.
+		dist = | t - startlocation |.
+		if running: self set-display-text to "Distance traveled: $dist" at-x -.95 at-y -.95.
 
 		self pivot-camera x 0 y 0.001.
 
-        super iterate.
+		super iterate.
 
-    + to get-current-critter-fitness:
-        t (vector).
-        link (object).
+	+ to get-current-critter-fitness:
+		t (vector).
+		link (object).
 
-        foreach link in all Links: {
-            t += (link get-location).
-        }
+		foreach link in all Links: {
+			t += (link get-location).
+		}
 
-        if |all Links|: t /= |all Links|.
+		if |all Links|: t /= |all Links|.
 
-        return | t - startlocation | .
+		return | t - startlocation | .
 
-    + to setup-test with i (object):
+	+ to setup-test with i (object):
 		l (object).
 		low (vector).
 		lowest (double).
 
 		foreach l in (all Links): free (l get-shape).
 
-        free all Links.
-        free all Joints.
-        if body: free body.
+		free all Links.
+		free all Joints.
+		if body: free body.
 
-        # (i get-genome) print-graph.
+		# (i get-genome) print-graph.
 
 		body = new MultiBody.
 
-        body set-root to (parser parse from ((i get-genome) get-root)).
+		body set-root to (parser parse from ((i get-genome) get-root)).
 
-        body disable-self-collisions.
+		body disable-self-collisions.
 
-        self schedule method-call "check-penetration" at-time (self get-time) + 8.0.
-        self set-display-text to "Preparing to test $i..." at-x -.95 at-y -.95.
+		self schedule method-call "check-penetration" at-time (self get-time) + 8.0.
+		self set-display-text to "Preparing to test $i..." at-x -.95 at-y -.95.
 
 		self update-text.
 
-        running = 0.
+		running = 0.
 
-    + to check-penetration:
-        link (object).
+	+ to check-penetration:
+		link (object).
 
-        running = 1.
-        
-        if (body check-self-penetration): free all Links.
+		running = 1.
+		
+		if (body check-self-penetration): free all Links.
 
-        all SineJoints activate.
+		all SineJoints activate.
 
-        startlocation = (0, 0, 0).
+		startlocation = (0, 0, 0).
 
-        foreach link in all Links: {
-            startlocation += (link get-location).
-        }
+		foreach link in all Links: {
+			startlocation += (link get-location).
+		}
 
-        if |all Links|: startlocation /= |all Links|.
+		if |all Links|: startlocation /= |all Links|.
 		flag move to startlocation - (0, startlocation::y - 2, 0).
 }
 
 GeneticAlgorithm : SimsGA {
-    + to start-fitness-test of o (object):
+	+ to start-fitness-test of o (object):
 		newOffset (vector).
 
 		newOffset = random[(40, 6, 40)] + (-20, 3, -20).
 		if |newOffset| < 20: newOffset = 20 * newOffset/|newOffset|.
 		controller pan-camera-offset by newOffset steps 80.
 
-        controller setup-test with o.
+		controller setup-test with o.
 
-    + to end-fitness-test of o (object):
-        o set-fitness to (controller get-current-critter-fitness).
-        if isnan((o get-fitness)): o set-fitness to 0.
-        print "fitness of $o: ", (o get-fitness).
+	+ to end-fitness-test of o (object):
+		o set-fitness to (controller get-current-critter-fitness).
+		if isnan((o get-fitness)): o set-fitness to 0.
+		print "fitness of $o: ", (o get-fitness).
 
 		(self archive-as-xml file "breveCreatures.xml").
 }
 
 GeneticAlgorithmIndividual : SimsGAIndividual {
-    + variables:
-        genome (object).
+	+ variables:
+		genome (object).
 
-    + to init:
-        genome = new GADirectedGraph.
-        self randomize.
+	+ to init:
+		genome = new GADirectedGraph.
+		self randomize.
 
 		self add-dependency on genome.
 
-    + to copy from other (object):
-        genome copy from (other get-genome).
+	+ to copy from other (object):
+		genome copy from (other get-genome).
 
-    + to crossover from-parent1 p1 (object) from-parent2 p2 (object):
-        genome crossover from-parent1 (p1 get-genome) from-parent2 (p2 get-genome).
+	+ to crossover from-parent1 p1 (object) from-parent2 p2 (object):
+		genome crossover from-parent1 (p1 get-genome) from-parent2 (p2 get-genome).
 
-    + to mutate:
-        genome mutate.
+	+ to mutate:
+		genome mutate.
 
 	+ to randomize:
-        genome randomize with-max-nodes 5 with-node-parameters 10 with-connection-parameters 10.
+		genome randomize with-max-nodes 5 with-node-parameters 10 with-connection-parameters 10.
 
-    + to get-genome:
-        return genome.
+	+ to get-genome:
+		return genome.
 
-    + to destroy:
-        free genome.
+	+ to destroy:
+		free genome.
 }
 
 Object : MorphologyParser {
-    + to parse from root (object):
-        return (self parse from root with-level 1 with-parent-link 0).
 
-    + to parse from root (object) with-level n (int) with-parent-link parentLink (object):
-        connectionParams, nodeParams, connections (list).
-        rootNode, child, childNode, joint (object).
-        cpoint, ppoint, point, size, norm (vector).
+	#
+	# An object used to create morphologies from our DirectedGraph genomes
+	# 
 
-        if n > 3: return 0.
+	+ to parse from root (object):
+		rootNode (object).
+		
+		rootNode = (self create-node from root with-level 1).
+		return (self parse from root with-level 1 with-link rootNode).
 
-        rootNode = new Link.    
-        rootNode move to (0, 15, 0).
-        rootNode set-color to (5 - n) / 4.0 * (1, 1, 1).
+	+ to parse from root (object) with-level n (int) with-link rootNode (object):
+		connectionParams, nodeParams, connections (list).
+		child, childNode, joint (object).
+		cpoint, ppoint, point, size, norm (vector).
 
-        rootNode set-color to random[(1, 1, 1)].
+		if n > 3: return 0.
 
-        nodeParams = (root get-parameters).
-        
-        size = 4 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|).
+		connections = (root get-connections).
 
-        rootNode set-shape to (new Cube init-with size ((8 - n) / 7.0 * size)).
+		nodeParams = (root get-parameters).
+		
+		size = 4 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|).
 
-        connections = (root get-connections).
+		#
+		# This code has been refactored for 2.5 to create the parent link before
+		# parsing the child.  This is because child links will always be positioned
+		# relative to the parent, but not vice-versa.  If we start from the "top-down",
+		# our creatures have limbs more correctly placed upon startup and thus jump
+		# and spin less.
+		#
 
-        foreach child in connections: {
-            childNode = (self parse from (child get-target) with-level n + 1 with-parent-link rootNode).
+		foreach child in connections: {
+			childNode = (self create-node from (child get-target) with-level n + 1).
+			
+			if childNode: {
+				connectionParams = (child get-parameters).
 
-            if childNode: {
-                connectionParams = (child get-parameters).
+				point = (connectionParams{0}, connectionParams{1}, connectionParams{2}).
 
-                point = (connectionParams{0}, connectionParams{1}, connectionParams{2}).
+				point::x *= size::x.
+				point::y *= size::y.
+				point::z *= size::z.
+		 
+				cpoint = (childNode get-shape) get-point-on-shape on-vector point.
+				ppoint = (rootNode get-shape) get-point-on-shape on-vector -point.
 
-                point::x *= size::x.
-                point::y *= size::y.
-                point::z *= size::z.
+				norm = (connectionParams{4}, connectionParams{5}, connectionParams{6}).
+				norm /= | norm |.
 
-                cpoint = (childNode get-shape) get-point-on-shape on-vector point.
-                ppoint = (rootNode get-shape) get-point-on-shape on-vector -point.
+				joint = new SineJoint.
 
-                norm = (connectionParams{4}, connectionParams{5}, connectionParams{6}).
-                norm /= | norm |.
+				# joint set-relative-rotation around-axis norm by connectionParams{3}.
 
-                joint = new SineJoint.
+				joint link parent rootNode to-child childNode
+					with-parent-point ppoint
+					with-child-point cpoint
+					with-normal norm.
 
-                # joint set-relative-rotation around-axis norm by connectionParams{3}.
+				joint set-phaseshift to 3.14 * connectionParams{7}.
+				joint set-double-spring with-strength 600 with-max 2.6 with-min -2.6.
+				joint set-strength-limit to 5000.
+ 
 
-                joint link parent childNode to-child rootNode 
-                    with-parent-point cpoint
-                    with-child-point ppoint
-                    with-normal norm.
+				self parse from (child get-target) with-level n + 1 with-link childNode.
+			}
+		}
 
-                joint set-phaseshift to 3.14 * connectionParams{7}.
-                joint set-double-spring with-strength 600 with-max 2.6 with-min -2.6.
-                joint set-strength-limit to 5000.
-            }
-        }
+		return rootNode.
+		
+	+ to create-node from root (object) with-level n (int):
+		rootNode (object).
+		nodeParams (list).
+		size (vector).
+  
+		if n > 3: return 0.
+  
+		rootNode = new Link.	
+		rootNode move to (0, 15, 0).
+		rootNode set-color to (5 - n) / 4.0 * (1, 1, 1).
 
-        return rootNode.
+		rootNode set-color to random[(1, 1, 1)].
+
+		nodeParams = (root get-parameters).
+		
+		size = 4 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|).
+
+		rootNode set-shape to (new Cube init-with size ((8 - n) / 7.0 * size)).
+
+
+		return rootNode.
 }
 
 RevoluteJoint : SineJoint (aka SineJoints) {
-    % A RevoluteJoint that moves according to a sine function.
+	% A RevoluteJoint that moves according to a sine function.
 
-    + variables:
-        phaseshift (double).
-        active (int).
+	+ variables:
+		phaseshift (double).
+		active (int).
 
-    + to set-phaseshift to p (double):
-        phaseshift = p.
+	+ to set-phaseshift to p (double):
+		phaseshift = p.
 
-    + to iterate:
-        if active: {
-            self set-joint-velocity to 1 * sin((controller get-time) * 2.0 + phaseshift).
-        }
+	+ to iterate:
+		if active: {
+			self set-joint-velocity to 1 * sin((controller get-time) * 2.0 + phaseshift).
+		}
 
-    + to activate:
-        active = 1.
+	+ to activate:
+		active = 1.
 }
+

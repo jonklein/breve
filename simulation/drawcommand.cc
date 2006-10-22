@@ -39,7 +39,9 @@ void slDrawCommandList::draw( slCamera *c ) {
 
 	glTranslatef( _origin.x, _origin.y, _origin.z );
 
-	glEnable( GL_BLEND );
+	// glDisable( GL_BLEND );
+	glDisable( GL_LINE_SMOOTH );
+	glEnable( GL_DEPTH_TEST );
 	glLineWidth( 1.2 );
 	glDisable( GL_CULL_FACE );
 	glColor4f( 0.0, 0.0, 0.0, 0.5 );

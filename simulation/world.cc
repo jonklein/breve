@@ -31,8 +31,8 @@ char *gPhysicsErrorMessage;
 #include "vclipData.h"
 #include "gldraw.h"
 
+/*
 void *operator new( size_t size ) {
-	// void *p = calloc(1, size);
 	void *p = malloc( size );
 
 	if ( p == NULL ) {
@@ -49,6 +49,8 @@ void *operator new( size_t size ) {
 void operator delete( void *p ) {
 	free( p );
 }
+
+*/
 
 void slODEErrorHandler( int errnum, const char *msg, va_list ap ) {
 	static char error[2048];

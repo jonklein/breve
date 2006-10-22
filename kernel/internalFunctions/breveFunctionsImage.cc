@@ -185,7 +185,7 @@ int brIImageLoadFromFile( brEval args[], brEval *result, brInstance *i ) {
 
 	slFree( file );
 
-	result->set(( void* )dm );
+	result->set( ( void* )dm );
 
 	return EC_OK;
 }
