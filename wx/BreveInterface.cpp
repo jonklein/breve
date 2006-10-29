@@ -250,14 +250,18 @@ char * BreveInterface::getSavename()
 
 void BreveInterface::reportError()
 {
-	brErrorInfo * error;
+	brErrorInfo *error;
 
 	if (frontend->engine == NULL)
-	return;
+		return;
 
-	error = brEngineGetErrorInfo(frontend->engine);
+	error = brEngineGetErrorInfo( frontend->engine );
 
-	gBreverender->queMsg(error->message);
+	char errorMessage[ 10240 ];
+
+	snprintf( errorMessage, 10239, "Error at line %d of \"%s\":\n\n%s\n\nSee log window for details", error->line, error->file, error->message );
+
+	gBreverender->queMsg( errorMessage );
 }
 
 void BreveInterface::messageCallback(char *text)
