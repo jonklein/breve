@@ -70,11 +70,15 @@ void slDebugMatrix(int, double [3][3]);
  * output function.
  */
 
-extern "C" {
 
 DLLEXPORT void slMessage(int, const char *, ...);
 
-}
+/**
+ * Outputs a formatted message of a given error level to the active 
+ * output function.
+ */
+
+DLLEXPORT void slFormattedMessage( int level, const char *format );
 
 /**
  * The default output function, prints text to stderr.
@@ -83,7 +87,7 @@ DLLEXPORT void slMessage(int, const char *, ...);
 void slStderrMessageCallback(char *);
 
 /**
- * \brief Set the message-output callback function.
+ * Set the message-output callback function.
  *
  * When output is produced, it will be passed to the message-output
  * callback function.  By default, the data will be printed to
@@ -91,4 +95,4 @@ void slStderrMessageCallback(char *);
  * to a file, etc.
  */
 
-void slSetMessageCallbackFunction(void (*)(char *));
+void slSetMessageCallbackFunction( void (*)(char *) );

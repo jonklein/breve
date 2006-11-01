@@ -4,6 +4,19 @@ import breve
 import sys, os
 
 
+class breveStderrHandler:
+    def write( self, line ):
+        breveInternal.catchOutput( breveInternal, line )
+
+class breveStdoutHandler:
+    def write( self, line ):
+        breveInternal.catchOutput( breveInternal, line )
+
+sys.stderr = breveStderrHandler()
+
+sys.stdout = breveStdoutHandler()
+
+
 class breveInternalFunctions:
 	def __getattr__( self, method ):
 		internalFunction = breveInternal.findInternalFunction( breveInternal.breveEngine, method )

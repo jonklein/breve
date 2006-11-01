@@ -6,7 +6,9 @@ class PythonTestObject( breve.real ):
 
 		print "Creating PythonTest instance ", self
 
-		self.movie = self.controller.make_new_instance( "PushProgram" )
+		self.movie = self.controller.make_new_instance( "Movie" )
+
+		self.movie.record( "sim.mpg" )
 
 	def iterate( self ):
 		if self.controller.get_time() > 8.0:

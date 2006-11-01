@@ -147,7 +147,6 @@ void brLoadInternalFunctions( brEngine *e ) {
 	breveInitStatisticsFunctions( e->internalMethods );
 	breveInitQGAMEFunctions( e->internalMethods );
 	breveInitDrawFunctions( e->internalMethods );
-//	breveInitPythonFunctions( e->internalMethods );
 }
 
 /*@}*/

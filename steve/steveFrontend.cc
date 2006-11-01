@@ -103,6 +103,15 @@ brInstance *stInstanceNewCallback( brEngine *engine, brObject *object, const brE
 */
 
 void *stFindMethodBreveCallback( void *object, char *name, unsigned char *argTypes, int args ) {
+	int min = args, max = args;
+
+	// In some cases, we may not have acurate argument count information
+
+	if( args == -1 ) {
+		min = 0;
+		max = 9999;
+	}
+
 	stMethod *method;
 
 	method = stFindInstanceMethodWithArgRange(( stObject* )object, name, args, args, NULL );

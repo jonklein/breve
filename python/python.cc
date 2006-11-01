@@ -141,6 +141,18 @@ inline PyObject *brPythonTypeFromEval( brEval *inEval, PyObject *inBridgeObject 
 	return result;
 }
 
+PyObject *brPythonCatchOutput( PyObject *inSelf, PyObject *inArgs ) {
+	PyObject *moduleObject;
+	char *message;
+
+	if ( !PyArg_ParseTuple( inArgs, "Os", &moduleObject, &message ) ) return NULL;
+
+	slFormattedMessage( DEBUG_ALL, message );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 /**
  * Python callback to add a Python instance to the breve engine.
  */
@@ -346,7 +358,7 @@ PyObject *brPythonFindBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 	brInstance *breveInstance = (brInstance*)PyCObject_AsVoidPtr( attrObject );
 
 	// if( !PyObject_HasAttrString( object, name ) ) {
-		brMethod *method = brMethodFind( breveInstance->object, name, NULL, 0 );
+		brMethod *method = brMethodFindWithArgRange( breveInstance->object, name, NULL, 0, 9999 );
 
 		if( !method ) {
 			Py_INCREF( Py_None );
@@ -537,6 +549,7 @@ void brPythonInit( brEngine *breveEngine ) {
 		{ "removeInstance", 		brPythonRemoveInstance, 		METH_VARARGS, "" },
 		{ "findBridgeMethod", 		brPythonFindBridgeMethod, 		METH_VARARGS, "" },
 		{ "callBridgeMethod", 		brPythonCallBridgeMethod, 		METH_VARARGS, "" },
+		{ "catchOutput", 			brPythonCatchOutput, 			METH_VARARGS, "" },
 		{ NULL, NULL, 0, NULL }
 	};
 
@@ -575,6 +588,8 @@ void brPythonInit( brEngine *breveEngine ) {
 	brevePythonType->_typeSignature 	= PYTHON_TYPE_SIGNATURE;
 
 	brEngineRegisterObjectType( breveEngine, brevePythonType );
+
+ 	breveInitPythonFunctions( breveEngine->internalMethods );
 
 	// Those meddling Python kids mess with the signal handlers!
 

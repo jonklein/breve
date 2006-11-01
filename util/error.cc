@@ -69,6 +69,13 @@ void slFatal( char *format, ... ) {
 	exit( 0 );
 }
 
+void slFormattedMessage( int level, const char *format ) {
+	if ( level > gDebugLevel || !gMessageOutputFunction )
+		return;
+
+	gMessageOutputFunction( format );
+}
+
 void slMessage( int level, const char *format, ... ) {
 	if ( level > gDebugLevel || !gMessageOutputFunction )
 		return;
