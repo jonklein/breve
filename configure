@@ -4049,6 +4049,7 @@ fi
 done
 test -n "$YACC" || YACC="yacc"
 
+AC_PROG_WINDRES
 
 
 # Check whether --with-wx was given.

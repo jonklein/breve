@@ -1,20 +1,20 @@
 /*****************************************************************************
- *                                                                           *
- * The breve Simulation Environment                                          *
- * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
- *                                                                           *
- * This program is free software; you can redistribute it and/or modify      *
- * it under the terms of the GNU General Public License as published by      *
- * the Free Software Foundation; either version 2 of the License, or         *
- * (at your option) any later version.                                       *
- *                                                                           *
- * This program is distributed in the hope that it will be useful,           *
- * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
- * GNU General Public License for more details.                              *
- *                                                                           *
- * You should have received a copy of the GNU General Public License         *
- * along with this program; if not, write to the Free Software               *
+ *																		   *
+ * The breve Simulation Environment										  *
+ * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein					   *
+ *																		   *
+ * This program is free software; you can redistribute it and/or modify	  *
+ * it under the terms of the GNU General Public License as published by	  *
+ * the Free Software Foundation; either version 2 of the License, or		 *
+ * (at your option) any later version.									   *
+ *																		   *
+ * This program is distributed in the hope that it will be useful,		   *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of			*
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the			 *
+ * GNU General Public License for more details.							  *
+ *																		   *
+ * You should have received a copy of the GNU General Public License		 *
+ * along with this program; if not, write to the Free Software			   *
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
@@ -46,12 +46,11 @@ STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Config dialog"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,129,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,129,24,50,14
-    CONTROL         "Flash screen",IDC_FLASH,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,23,13,56,10
+	DEFPUSHBUTTON   "OK",IDOK,129,7,50,14
+	PUSHBUTTON	  "Cancel",IDCANCEL,129,24,50,14
+	CONTROL		 "Flash screen",IDC_FLASH,"Button",BS_AUTOCHECKBOX | 
+					WS_TABSTOP,23,13,56,10
 END
-
 */
 
 //These forward declarations are just for readability,
@@ -76,7 +75,7 @@ int Width, Height; //globals for size of screen
 
 // Screen Saver Procedure
 LRESULT WINAPI ScreenSaverProc(HWND hWnd, UINT message, 
-                               WPARAM wParam, LPARAM lParam) {
+							   WPARAM wParam, LPARAM lParam) {
   static HDC hDC;
   static HGLRC hRC;
   static RECT rect;
@@ -84,31 +83,31 @@ LRESULT WINAPI ScreenSaverProc(HWND hWnd, UINT message,
   switch ( message ) {
 
   case WM_CREATE: 
-    // get window dimensions
-    GetClientRect( hWnd, &rect );
-    Width = rect.right;		
-    Height = rect.bottom;
-    
+	// get window dimensions
+	GetClientRect( hWnd, &rect );
+	Width = rect.right;		
+	Height = rect.bottom;
+	
 	//get configuration from registry
 	GetConfig();
 
 	// setup OpenGL, then animation
-    InitGL( hWnd, hDC, hRC );
-    SetupAnimation(Width, Height);
+	InitGL( hWnd, hDC, hRC );
+	SetupAnimation(Width, Height);
 
 	//set timer to tick every 10 ms
-    SetTimer( hWnd, TIMER, 10, NULL );
-    return 0;
+	SetTimer( hWnd, TIMER, 10, NULL );
+	return 0;
  
   case WM_DESTROY:
-    KillTimer( hWnd, TIMER );
+	KillTimer( hWnd, TIMER );
 	CleanupAnimation();
-    CloseGL( hWnd, hDC, hRC );
-    return 0;
+	CloseGL( hWnd, hDC, hRC );
+	return 0;
 
   case WM_TIMER:
-    OnTimer( hDC );	//animate!	
-    return 0;				
+	OnTimer( hDC );	//animate!	
+	return 0;				
 
   }
 
@@ -116,11 +115,20 @@ LRESULT WINAPI ScreenSaverProc(HWND hWnd, UINT message,
 
 }
 
-bool bTumble = true;
-
-
 BOOL WINAPI
 ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+	if( message == WM_INITDIALOG  )
+		return TRUE;
+
+	if( message == WM_COMMAND ) {
+		long command = LOWORD( wParam );
+
+		EndDialog( hDlg, command );
+		return TRUE;
+	}
+
+	// 	LoadString( hMainInstance, IDS_DESCRIPTION, szAppName, 40 );
+
 	return FALSE;
 }
 
@@ -130,9 +138,9 @@ BOOL WINAPI RegisterDialogClasses(HANDLE hInst) {
 
 /////////////////////////////////////////////////
 ////   INFRASTRUCTURE ENDS, SPECIFICS BEGIN   ///
-////                                          ///
-////    In a more complex scr, I'd put all    ///
-////     the following into other files.      ///
+////										  ///
+////	In a more complex scr, I'd put all	///
+////	 the following into other files.	  ///
 /////////////////////////////////////////////////
 
 
@@ -142,7 +150,7 @@ void InitGL(HWND hWnd, HDC & hDC, HGLRC & hRC) {
   ZeroMemory( &pfd, sizeof( pfd ) );
   pfd.nSize = sizeof pfd;
   pfd.nVersion = 1;
-  pfd.dwFlags = PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+  pfd.dwFlags = PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_GENERIC_ACCELERATED;
   pfd.iPixelType = PFD_TYPE_RGBA;
   pfd.cColorBits = 24;
   
@@ -179,7 +187,7 @@ void SetupAnimation( int inWidth, int inHeight ) {
 	
 	std::string classPath = std::string( winDir ) + "\\breve\\lib\\classes\\";
 
-    brEngineSetIOPath( gFrontend->engine, classPath.c_str() );
+	brEngineSetIOPath( gFrontend->engine, classPath.c_str() );
 	brAddSearchPath( gFrontend->engine, classPath.c_str() );
 
 	std::string simpath = std::string( winDir ) + "\\breve\\Creatures.tz";
@@ -190,7 +198,7 @@ void SetupAnimation( int inWidth, int inHeight ) {
 	// Hooray!
 
 	gFrontend->engine->camera->setBounds( inWidth, inHeight );
-    slInitGL( gFrontend->engine->world, gFrontend->engine->camera );
+	slInitGL( gFrontend->engine->world, gFrontend->engine->camera );
 }
 
 void OnTimer(HDC hDC) {
@@ -208,4 +216,5 @@ void GetConfig() {
 }
 
 void WriteConfig(HWND hDlg) {
+
 }

@@ -28,6 +28,8 @@ DMG_FILE	= breve_@VERSION@.dmg
 CLI_FOLDER	= breve_@VERSION@
 IDE_FOLDER	= breveIDE_@VERSION@
 
+LIBS		= @LIBS@
+
 prefix		= @prefix@
 exec_prefix	= @exec_prefix@
 
@@ -44,6 +46,7 @@ include java/Makefile
 include python/Makefile
 include docBuild/Makefile
 include util/Makefile
+include WinSaver/Makefile
 
 DEPS := $(SRC) bin/breve.cc bin/breve_cli.cc
 DEPS := $(DEPS:.cc=.d)
@@ -137,7 +140,16 @@ OSX_clean: clean
 	cd OSX; xcodebuild clean
 	rm -rf OSX/build plugins/*/build
 
-OSX_release: OSX_clean
+release: clean OSX_clean
+	make CLI_release
+
+ifeq ($(PLATFORM),darwin)
+	make OSX_release
+else
+	make WX_release
+endif
+
+OSX_release: 
 	$(MAKE) documentation
 	$(MAKE) OSX_build
 	rm -f $(DMG_FILE)

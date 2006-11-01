@@ -331,7 +331,7 @@ double Sensor::sense(vector<slWorldObject*>* neighbors, slPosition* sensorPos){
  */
 void Sensor::sense(const slShape *shape, slPosition *shapePos, slPosition *sensorPos){
 	double distance;
-	vector<slFace*>::iterator fi;
+	vector<slFace*>::const_iterator fi;
 	slVector pointOnPlane;
 	slVector posToPlane;
 	slVector dir;
@@ -343,6 +343,7 @@ void Sensor::sense(const slShape *shape, slPosition *shapePos, slPosition *senso
 	middle = rows/2;
 	slVectorXform(sensorPos->rotation, &rayDirections[middle][middle], &middleDirection);
 	slVectorNormalize(&middleDirection);
+
 	for(fi = (shape->faces.begin()); fi != (shape->faces.end()); fi++ ) {
 		slFace *f = *fi;
 		planes++;
@@ -532,7 +533,7 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 	double shortestDist = 999999;
 	double targetDist = 999999;
 	double distance;
-	vector<slFace*>::iterator fi;
+	vector<slFace*>::const_iterator fi;
 	slVector pointOnPlane;
 	slVector posToPlane;
 	slVector dir;
@@ -556,7 +557,7 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 			continue;
 		}	
 		for(fi = (shape->faces.begin()); fi != (shape->faces.end()); fi++ ) {
-			slFace *f = *fi;
+			const slFace *f = *fi;
 			slPlane wcPlane; //world coordinates
 			slPlane wcPlane2; //world coordinates
 
