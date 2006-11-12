@@ -1,20 +1,20 @@
 /*****************************************************************************
- *																		   *
- * The breve Simulation Environment										  *
- * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein					   *
- *																		   *
- * This program is free software; you can redistribute it and/or modify	  *
- * it under the terms of the GNU General Public License as published by	  *
- * the Free Software Foundation; either version 2 of the License, or		 *
- * (at your option) any later version.									   *
- *																		   *
- * This program is distributed in the hope that it will be useful,		   *
- * but WITHOUT ANY WARRANTY; without even the implied warranty of			*
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the			 *
- * GNU General Public License for more details.							  *
- *																		   *
- * You should have received a copy of the GNU General Public License		 *
- * along with this program; if not, write to the Free Software			   *
+ *                                                                           *
+ * The breve Simulation Environment                                          *
+ * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
+ *                                                                           *
+ * This program is free software; you can redistribute it and/or modify      *
+ * it under the terms of the GNU General Public License as published by      *
+ * the Free Software Foundation; either version 2 of the License, or         *
+ * (at your option) any later version.                                       *
+ *                                                                           *
+ * This program is distributed in the hope that it will be useful,           *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+ * GNU General Public License for more details.                              *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License         *
+ * along with this program; if not, write to the Free Software               *
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
@@ -30,35 +30,21 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#include "WinSaverResource.h"
+
 #include "steve.h"
 #include "kernel.h"
 #include "simulation.h"
 #include "gldraw.h"
 
-//Define a Windows timer
-
 #define TIMER 1
-
-/*
-
-DLG_CONFIG DIALOG DISCARDABLE  0, 0, 186, 95
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Config dialog"
-FONT 8, "MS Sans Serif"
-BEGIN
-	DEFPUSHBUTTON   "OK",IDOK,129,7,50,14
-	PUSHBUTTON	  "Cancel",IDCANCEL,129,24,50,14
-	CONTROL		 "Flash screen",IDC_FLASH,"Button",BS_AUTOCHECKBOX | 
-					WS_TABSTOP,23,13,56,10
-END
-*/
 
 //These forward declarations are just for readability,
 //so the big three functions can come first 
 
 void InitGL(HWND hWnd, HDC & hDC, HGLRC & hRC);
 void CloseGL(HWND hWnd, HDC hDC, HGLRC hRC);
-void GetConfig();		
+void GetConfig();
 void WriteConfig(HWND hDlg);
 void SetupAnimation(int Width, int Height);
 void CleanupAnimation();
@@ -123,8 +109,20 @@ ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
 	if( message == WM_COMMAND ) {
 		long command = LOWORD( wParam );
 
-		EndDialog( hDlg, command );
-		return TRUE;
+		switch( command ) {
+			case IDABOUT:
+				
+				return TRUE;
+				break;
+	
+			case IDRESET:
+				return TRUE;
+				break;
+
+			default:
+				EndDialog( hDlg, command );
+				return TRUE;
+		}
 	}
 
 	// 	LoadString( hMainInstance, IDS_DESCRIPTION, szAppName, 40 );
@@ -146,21 +144,22 @@ BOOL WINAPI RegisterDialogClasses(HANDLE hInst) {
 
 // Initialize OpenGL
 void InitGL(HWND hWnd, HDC & hDC, HGLRC & hRC) {
-  PIXELFORMATDESCRIPTOR pfd;
-  ZeroMemory( &pfd, sizeof( pfd ) );
-  pfd.nSize = sizeof pfd;
-  pfd.nVersion = 1;
-  pfd.dwFlags = PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_GENERIC_ACCELERATED;
-  pfd.iPixelType = PFD_TYPE_RGBA;
-  pfd.cColorBits = 24;
-  
-  hDC = GetDC( hWnd );
-  
-  int i = ChoosePixelFormat( hDC, &pfd );  
-  SetPixelFormat( hDC, i, &pfd );
+	PIXELFORMATDESCRIPTOR pfd;
+	ZeroMemory( &pfd, sizeof( pfd ) );
 
-  hRC = wglCreateContext( hDC );
-  wglMakeCurrent( hDC, hRC );
+	pfd.nSize = sizeof pfd;
+	pfd.nVersion = 1;
+	pfd.dwFlags = PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_GENERIC_ACCELERATED;
+	pfd.iPixelType = PFD_TYPE_RGBA;
+	pfd.cColorBits = 24;
+  
+	hDC = GetDC( hWnd );
+  
+	int i = ChoosePixelFormat( hDC, &pfd );  
+	SetPixelFormat( hDC, i, &pfd );
+
+	hRC = wglCreateContext( hDC );
+	wglMakeCurrent( hDC, hRC );
 }
 
 void CloseGL(HWND hWnd, HDC hDC, HGLRC hRC) {

@@ -309,8 +309,8 @@ slStack *brEngineGetAllInstances(brEngine *);
 
 int brEngineIterate(brEngine *);
 
-void brEngineSetIOPath(brEngine *, char *);
-char *brOutputPath(brEngine *, char *);
+void brEngineSetIOPath(brEngine *, const char *);
+char *brOutputPath(brEngine *, const char *);
 
 const std::vector< std::string > &brEngineGetSearchPaths( brEngine * );
 

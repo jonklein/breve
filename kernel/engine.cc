@@ -340,7 +340,7 @@ slStack *brEngineGetAllInstances( brEngine *e ) {
 	\brief Sets the output path, and adds the path to the search path.
 */
 
-void brEngineSetIOPath( brEngine *e, char *path ) {
+void brEngineSetIOPath( brEngine *e, const char *path ) {
 	e->_outputPath = path;
 	brAddSearchPath( e, path );
 }
@@ -349,7 +349,7 @@ void brEngineSetIOPath( brEngine *e, char *path ) {
 	\brief Takes a filename, and returns a slMalloc'd string with the full output path for that file.
 */
 
-char *brOutputPath( brEngine *e, char *filename ) {
+char *brOutputPath( brEngine *e, const char *filename ) {
 	char *f;
 
 	if ( *filename == '/' )
