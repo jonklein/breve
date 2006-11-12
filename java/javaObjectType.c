@@ -26,7 +26,7 @@
 	\brief the callMethod field of the java brObjectType.
 */
 
-int brJavaMethodCallCallback(void *instanceData, void *methodData, brEval **args, brEval *result) {
+int brJavaMethodCallCallback(void *instanceData, void *methodData, const brEval **args, brEval *result) {
 	brJavaMethod *method = (brJavaMethod *)methodData;
 	brJavaInstance *instance = (brJavaInstance *)instanceData;
 	jvalue jargs[JAVA_MAX_ARGS];
@@ -42,7 +42,7 @@ int brJavaMethodCallCallback(void *instanceData, void *methodData, brEval **args
 	\brief the findMethod field of the java brObjectType.
 */
 
-void *brJavaObjectFindCallback(void *typeData, char *name) {
+void *brJavaObjectFindCallback(void *typeData, const char *name) {
 	brJavaBridgeData *bridge = (brJavaBridgeData *)typeData;
 
 	return (void *)brJavaObjectFind(bridge, name);
@@ -52,7 +52,7 @@ void *brJavaObjectFindCallback(void *typeData, char *name) {
 	\brief the findMethod field of the java brObjectType.
 */
 
-void *brJavaMethodFindCallback(void *objectData, char *name, unsigned char *types, int tCount) {
+void *brJavaMethodFindCallback(void *objectData, const char *name, unsigned char *types, int tCount) {
 	brJavaObject *object = (brJavaObject *)objectData;
 
 	return (void *)brJavaMethodFind(object->bridge, object, name, types, tCount);

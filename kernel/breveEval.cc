@@ -36,9 +36,15 @@ char *brAtomicTypeStrings[] = {
 	"hash"
 };
 
-int brEvalCopy( brEval *s, brEval *d ) {
-	switch ( s->type() ) {
+brEval::brEval( const brEval& inCopy ) {
+	_type = AT_NULL; 
+	_values.pointerValue = NULL;
 
+	brEvalCopy( &inCopy, this );
+}
+
+int brEvalCopy( const brEval *s, brEval *d ) {
+	switch ( s->type() ) {
 		case AT_NULL:
 			break;
 
@@ -130,13 +136,10 @@ char *brObjectDescription( brInstance *i ) {
 */
 
 char *brFormatEvaluation( brEval *e, brInstance *i ) {
-	slList *seen = NULL;
+	std::set< brEvalListHead* > seen;
 	char *result;
 
-	result = brFormatEvaluationWithSeenList( e, i, &seen );
-
-	if ( seen )
-		slListFree( seen );
+	result = brFormatEvaluationWithSeenList( e, i, seen );
 
 	return result;
 }
@@ -148,8 +151,9 @@ char *brFormatEvaluation( brEval *e, brInstance *i ) {
  *\ref stFormatEvaluation and shouldn't be called directly.
  */
 
-char *brFormatEvaluationWithSeenList( brEval *e, brInstance *i, slList **seen ) {
+char *brFormatEvaluationWithSeenList( brEval *e, brInstance *i, std::set< brEvalListHead* >& seen ) {
 	char *result;
+	char tempStr[ 1024 ];
 
 	switch ( e->type() ) {
 
@@ -160,35 +164,27 @@ char *brFormatEvaluationWithSeenList( brEval *e, brInstance *i, slList **seen ) 
 				return slStrdup( "" );
 
 		case AT_INT:
-			result = ( char * )slMalloc( 60 );
+			snprintf( tempStr, 1023, "%d", BRINT( e ) );
 
-			snprintf( result, 60, "%d", BRINT( e ) );
-
-			return result;
+			return slStrdup( tempStr );
 
 		case AT_DOUBLE:
-			result = ( char * )slMalloc( 60 );
+			snprintf( tempStr, 1023, "%f", BRDOUBLE( e ) );
 
-			snprintf( result, 60, "%f", BRDOUBLE( e ) );
-
-			return result;
+			return slStrdup( tempStr );
 
 		case AT_VECTOR:
-			result = ( char * )slMalloc( 180 );
-
 			if ( BRVECTOR( e ).x > 1.0e10 || BRVECTOR( e ).x > 1.0e10 || BRVECTOR( e ).z > 1.0e10 )
-				snprintf( result, 180, "(%.5e, %.5e, %.5e)", BRVECTOR( e ).x, BRVECTOR( e ).y, BRVECTOR( e ).z );
+				snprintf( tempStr, 1023, "(%.5e, %.5e, %.5e)", BRVECTOR( e ).x, BRVECTOR( e ).y, BRVECTOR( e ).z );
 			else
-				snprintf( result, 180, "(%.5f, %.5f, %.5f)", BRVECTOR( e ).x, BRVECTOR( e ).y, BRVECTOR( e ).z );
+				snprintf( tempStr, 1023, "(%.5f, %.5f, %.5f)", BRVECTOR( e ).x, BRVECTOR( e ).y, BRVECTOR( e ).z );
 
-			return result;
+			return slStrdup( tempStr );
 
 		case AT_MATRIX:
-			result = ( char * )slMalloc( 300 );
+			snprintf( tempStr, 1023, "[ (%.5f, %.5f, %.5f), (%.5f, %.5f, %.5f), (%.5f, %.5f, %.5f) ]", BRMATRIX( e )[0][0], BRMATRIX( e )[0][1], BRMATRIX( e )[0][2], BRMATRIX( e )[1][0], BRMATRIX( e )[1][1], BRMATRIX( e )[1][2], BRMATRIX( e )[2][0], BRMATRIX( e )[2][1], BRMATRIX( e )[2][2] );
 
-			snprintf( result, 300, "[ (%.5f, %.5f, %.5f), (%.5f, %.5f, %.5f), (%.5f, %.5f, %.5f) ]", BRMATRIX( e )[0][0], BRMATRIX( e )[0][1], BRMATRIX( e )[0][2], BRMATRIX( e )[1][0], BRMATRIX( e )[1][1], BRMATRIX( e )[1][2], BRMATRIX( e )[2][0], BRMATRIX( e )[2][1], BRMATRIX( e )[2][2] );
-
-			return result;
+			return slStrdup( tempStr );
 
 		case AT_INSTANCE: {
 				brInstance *pi;
@@ -215,16 +211,13 @@ char *brFormatEvaluationWithSeenList( brEval *e, brInstance *i, slList **seen ) 
 
 		case AT_POINTER:
 			if ( BRPOINTER( e ) ) {
-				result = ( char * )slMalloc( 20 );
-				snprintf( result, 20, "%p", BRPOINTER( e ) );
-				return result;
+				snprintf( tempStr, 1023, "%p", BRPOINTER( e ) );
+				return slStrdup( tempStr );
 			} else
 				return slStrdup( "(NULL pointer)" );
 
 		case AT_LIST: {
-				std::vector<char*> textList;
-				std::vector<char*>::iterator ti;
-				std::vector< brEval* >::iterator li;
+				std::vector< brEval >::iterator li;
 				brEvalListHead *listHead;
 				size_t len = 5;
 
@@ -233,43 +226,32 @@ char *brFormatEvaluationWithSeenList( brEval *e, brInstance *i, slList **seen ) 
 				if ( listHead->_vector.size() == 0 )
 					return slStrdup( "{ }" );
 
-				if ( slInList( *seen, listHead ) ) {
-					char text[64];
-					snprintf( text, 64, "[circular list reference %p]", listHead );
-					return slStrdup( text );
+				if( seen.find( listHead ) != seen.end() ) {
+					snprintf( tempStr, 64, "[circular list reference %p]", listHead );
+					return slStrdup( tempStr );
 				}
 
 				// update the list of lists seen so that we don't get all circular
 
-				*seen = slListPrepend( *seen, listHead );
+				seen.insert( listHead );
+
+				std::string rstr = "{ ";
 
 				for ( li = listHead->_vector.begin(); li != listHead->_vector.end(); li++ ) {
 					char *newString;
 
-					newString = brFormatEvaluationWithSeenList( *li, i, seen );
-					textList.push_back( newString );
+					newString = brFormatEvaluationWithSeenList( &(*li), i, seen );
+				
+					rstr += newString;
 
-					len += strlen( newString ) + 2;
+					if( li + 1 != listHead->_vector.end() ) {
+						rstr += ", ";
+					}
 				}
 
-				result = ( char * )slMalloc( len );
+				rstr += " }";
 
-				sprintf( result, "{ " );
-
-				for ( ti = textList.begin(); ti != textList.end(); ti++ ) {
-					char *newString = *ti;
-
-					strcat( result, newString );
-
-					if ( ti + 1 != textList.end() )
-						strcat( result, ", " );
-
-					slFree( newString );
-				}
-
-				strcat( result, " }" );
-
-				return result;
+				return slStrdup( rstr.c_str() );
 			}
 
 		case AT_ARRAY:

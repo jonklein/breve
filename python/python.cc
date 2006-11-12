@@ -36,6 +36,8 @@
 inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 	int result = EC_ERROR;
 
+	if( !inObject ) return result;
+
 	if ( PyInt_Check( inObject ) ) {
 
 		outEval->set( PyInt_AS_LONG( inObject ) );
@@ -56,6 +58,22 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 		outEval->set( PyCObject_AsVoidPtr( inObject ) );
 		result = EC_OK;
 
+	} else if( PySequence_Check( inObject ) ) {
+		
+		brEvalListHead *list = new brEvalListHead;
+
+		int size = PySequence_Size( inObject );
+
+		for( int n = 0; n < size; n++ ) {
+			brEval item;
+
+			brPythonTypeToEval( PySequence_GetItem( inObject, n ), &item );
+
+			brEvalListInsert( list, list->_vector.size(), &item );
+		}
+
+		outEval->set( list );
+		result = EC_OK;
 	}
 
 	return result;
@@ -450,7 +468,7 @@ void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *, i
 		return NULL;
 	}
 
-	Py_INCREF( method );
+	// Py_INCREF( method );
 
 	return method;
 }
@@ -465,7 +483,7 @@ void *brPythonFindObject( void *inData, const char *inName ) {
 		return NULL;
 	}
 
-	Py_INCREF( object );
+	// Py_INCREF( object );
 
 	return object;
 }
@@ -482,15 +500,18 @@ brInstance *brPythonInstantiate( brEngine *inEngine, brObject* inObject, const b
 
     PyObject *breveObject = PyObject_GetAttrString( result, "breveInstance" );
 
-	if( !result ) {
-		slMessage( DEBUG_ALL, "Instantiated object was not added to breve engine" );
+	if( !breveObject ) {
+		slMessage( DEBUG_ALL, "New Python object was not added to breve engine\n" );
+		slMessage( DEBUG_ALL, "breve Python objects must inherit from class breve.object\n" );
 		return NULL;
 	}
+
+	Py_INCREF( result );
 
 	return (brInstance*)PyCObject_AsVoidPtr( breveObject );
 }
 
-int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **, brEval * ) {
+int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **, brEval *outResult ) {
 	PyObject *instance = ( PyObject* )inInstance;
 	PyObject *method = ( PyObject* )inMethod;
 
@@ -505,6 +526,15 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **, brEva
 	PyTuple_SetItem( tuple, 0, instance );
 
 	PyObject *result = PyObject_Call( method, tuple, NULL );
+
+	Py_DECREF( tuple );
+
+	brPythonTypeToEval( result, outResult );
+
+	if( !result ) {
+		PyErr_Print();
+		return EC_ERROR;
+	}
 
 	Py_DECREF( result );
 
@@ -527,6 +557,8 @@ int brPythonIsSubclass( void *, void * ) {
 
 void brPythonDestroyGenericPythonObject( void *inObject ) {
 	if( !inObject ) return;
+
+	// printf(" DECREF %p\n", inObject );
 
 	PyObject *object = ( PyObject* )inObject;
 	Py_DECREF( object );

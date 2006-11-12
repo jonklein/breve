@@ -1033,18 +1033,20 @@ RTC_INLINE int stEvalFree( stFreeExp *s, stRunInstance *i, brEval *t ) {
 		if ( BRINSTANCE( &result )->status == AS_ACTIVE )
 			brInstanceRelease( BRINSTANCE( &result ) );
 	} else if ( result.type() == AT_LIST ) {
-		std::vector< brEval* >::iterator li;
+		std::vector< brEval >::iterator li;
 
 		for ( li = BRLIST( &result )->_vector.begin(); li != BRLIST( &result )->_vector.end(); li++ ) {
-			if (( *li )->type()  == AT_INSTANCE ) {
-				if ( !BRINSTANCE( *li ) )
+			brEval *listeval = &(*li);
+
+			if ( listeval->type()  == AT_INSTANCE ) {
+				if ( !BRINSTANCE( listeval ) )
 					slMessage( DEBUG_ALL, "warning: attempt to free uninitialized object\n" );
 				else {
 					// if we're freeing ourself (the calling instance) then we will return EC_STOP
 
-					if ( BRINSTANCE( *li )->userData == i->instance ) finished = 1;
+					if ( BRINSTANCE( listeval )->userData == i->instance ) finished = 1;
 
-					if ( BRINSTANCE( *li )->status == AS_ACTIVE ) brInstanceRelease( BRINSTANCE( *li ) );
+					if ( BRINSTANCE( listeval )->status == AS_ACTIVE ) brInstanceRelease( BRINSTANCE( listeval ) );
 				}
 			}
 		}
@@ -1173,20 +1175,22 @@ RTC_INLINE int stEvalMethodCall( stMethodExp *mexp, stRunInstance *i, brEval *t 
 	}
 
 	if ( obj.type() == AT_LIST ) {
-		std::vector< brEval* >::iterator li;
+		std::vector< brEval >::iterator li;
 
 		for ( li = BRLIST( &obj )->_vector.begin(); li != BRLIST( &obj )->_vector.end(); li++ ) {
-			if ( !BRINSTANCE( *li ) || BRINSTANCE( *li )->status != AS_ACTIVE ) {
+			brEval *listeval = &(*li);
+
+			if ( !BRINSTANCE( listeval ) || BRINSTANCE( listeval )->status != AS_ACTIVE ) {
 				stEvalError( i->instance, EE_NULL_INSTANCE, "method \"%s\" called with uninitialized object", mexp->methodName.c_str() );
 				return EC_ERROR;
 			}
 
 			// if the new instance is not a steve object, it's a foreign method call
 
-			if ( BRINSTANCE( *li )->object->type->_typeSignature != STEVE_TYPE_SIGNATURE )
-				return stEvalForeignMethodCall( mexp, BRINSTANCE( *li ), i, t );
+			if ( BRINSTANCE( listeval )->object->type->_typeSignature != STEVE_TYPE_SIGNATURE )
+				return stEvalForeignMethodCall( mexp, BRINSTANCE( listeval ), i, t );
 
-			ri.instance = ( stInstance * )BRINSTANCE( *li )->userData;
+			ri.instance = ( stInstance * )BRINSTANCE( listeval )->userData;
 
 			ri.type = ri.instance->type;
 
@@ -1218,7 +1222,10 @@ int stEvalForeignMethodCall( stMethodExp *mexp, brInstance *caller, stRunInstanc
 			return resultCode;
 	}
 
-	brMethodCallByNameWithArgs( caller, mexp->methodName.c_str(), argps, mexp->arguments.size(), t );
+	if( brMethodCallByNameWithArgs( caller, mexp->methodName.c_str(), argps, mexp->arguments.size(), t ) != EC_OK ) {
+		stEvalError( i->instance, EE_UNKNOWN_METHOD, "Error calling method \"%s\" for foreign object %p\n", mexp->methodName.c_str(), caller );
+		return EC_ERROR;
+	}
 
 	return EC_OK;
 }
@@ -1453,7 +1460,7 @@ RTC_INLINE int stEvalForeach( stForeachExp *w, stRunInstance *i, brEval *result 
 	for ( unsigned int n = 0; n < BRLIST( &list )->_vector.size(); n++ ) {
 		brEval eval;
 
-		if (( resultCode = brEvalCopy( BRLIST( &list )->_vector[ n ], &eval ) ) != EC_OK )
+		if (( resultCode = brEvalCopy( &BRLIST( &list )->_vector[ n ], &eval ) ) != EC_OK )
 			return resultCode;
 
 		if ( assignExp->_objectName.size() && !assignExp->_objectType ) {
@@ -1593,12 +1600,14 @@ RTC_INLINE int stEvalAll( stAllExp *e, stRunInstance *i, brEval *result ) {
 
 	result->set( new brEvalListHead() );
 
+	brEvalListHead *listhead = BRLIST( result );
+
 	for ( ii = e->object->allInstances.begin(); ii != e->object->allInstances.end(); ii++ ) {
 		stInstance *i = *ii;
 
 		instance.set( i->breveInstance );
 
-		brEvalListInsert( BRLIST( result ), 0, &instance );
+		brEvalListInsert( listhead, listhead->_vector.size(), &instance );
 	}
 
 	return EC_OK;
@@ -3127,7 +3136,11 @@ RTC_INLINE int stEvalNewInstance( stInstanceExp *ie, stRunInstance *i, brEval *t
 
 		t->set( stInstanceCreateAndRegister( i->instance->type->steveData, i->instance->type->engine, object ) );
 
-		if ( BRINSTANCE( t ) == NULL ) return EC_ERROR_HANDLED;
+		if ( BRINSTANCE( t ) == NULL ) {
+			stEvalError( i->instance, EE_UNKNOWN_OBJECT, "error creating instance of class %s", ie->name.c_str() );
+			return EC_ERROR_HANDLED;
+		}
+
 
 		stInstanceUnretain(( stInstance* )BRINSTANCE( t )->userData );
 
@@ -3137,7 +3150,10 @@ RTC_INLINE int stEvalNewInstance( stInstanceExp *ie, stRunInstance *i, brEval *t
 		for ( n = 0;n < BRINT( &count );n++ ) {
 			listItem.set( stInstanceCreateAndRegister( i->instance->type->steveData, i->instance->type->engine, object ) );
 
-			if ( BRINSTANCE( &listItem ) == NULL ) return EC_ERROR_HANDLED;
+			if ( BRINSTANCE( t ) == NULL ) {
+				stEvalError( i->instance, EE_UNKNOWN_OBJECT, "error creating instance of class %s", ie->name.c_str() );
+				return EC_ERROR_HANDLED;
+			}
 
 			stInstanceUnretain(( stInstance* )BRINSTANCE( &listItem )->userData );
 
@@ -3597,7 +3613,7 @@ int stDoEvalListIndexAssign( brEvalListHead *l, int n, brEval *newVal, stRunInst
 
 RTC_INLINE int stEvalBinaryEvalListExp( char op, brEval *l, brEval *r, brEval *result, stRunInstance *i ) {
 	brEvalListHead *h1, *h2;
-	std::vector< brEval* >::iterator l1, l2;
+	std::vector< brEval >::iterator l1, l2;
 	int same;
 	int ret;
 
@@ -3613,7 +3629,7 @@ RTC_INLINE int stEvalBinaryEvalListExp( char op, brEval *l, brEval *r, brEval *r
 		l2 = h2->_vector.begin();
 
 		while ( l1 != h1->_vector.end() && l2 != h2->_vector.end() && same ) {
-			ret = stEvalBinaryExpWithEvals( i, BT_EQ, *l1, *l2, result );
+			ret = stEvalBinaryExpWithEvals( i, BT_EQ, &(*l1), &(*l2), result );
 
 			if ( ret != EC_OK || !BRINT( result ) )
 				same = 0;

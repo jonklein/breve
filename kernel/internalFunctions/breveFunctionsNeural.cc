@@ -160,7 +160,7 @@ int brIGetValue( brEval args[], brEval *target, brInstance *i ) {
 int brIFeedForward( brEval args[], brEval *target, brInstance *i ) {
 	brEvalListHead *inputs;
 	snFFLayer *outputLayer, *inputLayer;
-	std::vector< brEval* >::iterator li;
+	std::vector< brEval >::iterator li;
 	int n = 0;
 
 	outputLayer = BRFFLAYERPOINTER( &args[0] );
@@ -174,11 +174,11 @@ int brIFeedForward( brEval args[], brEval *target, brInstance *i ) {
 	}
 
 	for ( li = inputs->_vector.begin(); li != inputs->_vector.end(); li++ )
-		inputLayer->values[n++] = BRDOUBLE( *li );
+    	inputLayer->values[n++] = BRDOUBLE( &(*li) );
 
-	snFeedForward( outputLayer );
+    snFeedForward( outputLayer );
 
-	return EC_OK;
+    return EC_OK;
 }
 
 /*@}*/

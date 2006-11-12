@@ -349,15 +349,16 @@ int brIStddev( brEval args[], brEval *target, brInstance *i ) {
 	double sum = 0, sumsq = 0, top;
 	brEvalListHead *list = BRLIST( &args[0] );
 	int n = 0;
-	std::vector< brEval* >::iterator li;
+	std::vector< brEval >::iterator li;
 
 	for ( li = list->_vector.begin(); li != list->_vector.end(); li++ ) {
 		double value;
+		brEval *eval = &(*li);
 
-		if (( *li )->type() == AT_INT ) {
-			value = BRINT( *li );
-		} else if (( *li )->type() == AT_DOUBLE ) {
-			value = BRDOUBLE( *li );
+		if ( eval->type() == AT_INT ) {
+			value = BRINT( eval );
+		} else if ( eval->type() == AT_DOUBLE ) {
+			value = BRDOUBLE( eval );
 		} else {
 			slMessage( DEBUG_ALL, "Internal function stddev expects a list of number values\n" );
 			return EC_ERROR;

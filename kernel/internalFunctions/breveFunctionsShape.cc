@@ -41,7 +41,7 @@ int brIAddShapeFace( brEval args[], brEval *target, brInstance *i ) {
 	slShape *s = BRSHAPEPOINTER( &args[0] );
 	brEvalListHead *list = BRLIST( &args[1] );
 	slVector *face[ list->_vector.size()];
-	std::vector< brEval* >::iterator li;
+	std::vector< brEval >::iterator li;
 	int n = 0;
 
 	if ( !s ) return EC_OK;
@@ -52,13 +52,13 @@ int brIAddShapeFace( brEval args[], brEval *target, brInstance *i ) {
 	}
 
 	for ( li = list->_vector.begin(); li != list->_vector.end(); li++ ) {
-		if (( *li )->type() != AT_VECTOR ) {
+		if ( ( *li ).type() != AT_VECTOR ) {
 			slFree( face );
 			slMessage( DEBUG_ALL, "Adding a face to a shape requires a list of vectors" );
 			return EC_ERROR;
 		}
 
-		face[ n++ ] = &BRVECTOR( *li );
+		face[ n++ ] = &BRVECTOR( &(*li) );
 	}
 
 	slAddFace( s, face, list->_vector.size() );

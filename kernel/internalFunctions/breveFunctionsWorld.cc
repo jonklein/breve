@@ -968,18 +968,19 @@ int brIcalcQualNoRay(brEval args[], brEval *target, brInstance *i) {
    */
 
 void listToDoubleArray(const brEvalListHead* list, double* result){
-	std::vector< brEval* > v = list->getVector();
-	for(unsigned int i=0; i< v.size(); i++){
-		if(v[i]->type() == AT_DOUBLE){
-			result[i] = v[i]->getDouble();
+	std::vector< brEval > v = list->getVector();
+
+	for( unsigned int i=0; i< v.size(); i++ ){
+		if( v[i].type() == AT_DOUBLE ){
+			result[i] = v[i].getDouble();
 		}
-	else if(v[i]->type() == AT_INT){
-			result[i] = v[i]->getInt();
+	else if( v[i].type() == AT_INT ){
+			result[i] = v[i].getInt();
 		}
 	else 
 		{
 			slMessage(DEBUG_ALL, "List of Doubles and/or Ints needed! (function listToDoubleArray)\n");
-			printf("eval.type()= %d \n",v[i]->type());
+			printf("eval.type()= %d \n",v[i].type());
 		}
 //			printf("result[%d]= %f\n", i, result[i]);
 

@@ -103,10 +103,10 @@ brJavaMethod *brJavaMakeMethodData(char *, jmethodID, char, char *, int);
 
 int brJavaMethodCall(brJavaBridgeData *, brJavaInstance *, brJavaMethod *, jvalue *, brEval *);
 
-void *brJavaMethodFindCallback(void *, char *, unsigned char *, int);
-void *brJavaObjectFindCallback(void *, char *);
+void *brJavaMethodFindCallback(void *, const char *, unsigned char *, int);
+void *brJavaObjectFindCallback(void *, const char *);
 void *brJavaInstanceNewCallback(void *, brEval **, int);
-int brJavaMethodCallCallback(void *, void *, brEval **, brEval *);
+int brJavaMethodCallCallback(void *, void *, const brEval **, brEval *);
 int brJavaIsSubclassCallback(void *, void *);
 void brJavaInstanceDestroyCallback(void *);
 

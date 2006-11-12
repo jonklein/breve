@@ -68,8 +68,6 @@ if (_loadExp) { \
 #define RTC_SET_LOAD_ROUTINE(_loadExp, _call, _type, _variable)
 #endif
 
-int brEvalCopy(brEval *, brEval *);
-
 inline int stEvalFree(stFreeExp *, stRunInstance *, brEval *);
 inline int stEvalCodeArray(stCodeArrayExp *a, stRunInstance *, brEval *);
 inline int stEvalExpVector(std::vector< stExp* > *a, stRunInstance *, brEval *);

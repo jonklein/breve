@@ -29,18 +29,18 @@ class brEvalVectorSorter {
 			mMethod = method;
 		};
 
-		bool operator()( const brEval *a, const brEval *b ) {
+		bool operator()( const brEval& a, const brEval& b ) {
 			stRunInstance ri;
 			brEval result;
 			const brEval *args[ 2 ];
 			int rcode;
 
-			std::pair< const brEval*, const brEval* > pair( a, b );
+			std::pair< const brEval*, const brEval* > pair( &a, &b );
 
 			if ( mSeenMap.find( pair ) != mSeenMap.end() ) return mSeenMap[ pair ];
 
-			args[ 0 ] = a;
-			args[ 1 ] = b;
+			args[ 0 ] = &a;
+			args[ 1 ] = &b;
 
 			ri.instance = mInstance;
 
@@ -77,6 +77,6 @@ int stSortEvalList( brEvalListHead *head, stInstance *caller, stMethod *method )
 	return 1;
 }
 
-int brEvalListCompare( const void *a, const void *b ) {
-	return 0;
-}
+// int brEvalListCompare( const void *a, const void *b ) {
+// 	return 0;
+// }

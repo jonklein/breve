@@ -48,6 +48,8 @@ brMethod *brMethodFind( brObject *o, const char *name, unsigned char *types, int
 
 	m->userData = mp;
 
+	m->object = o;
+
 	m->argumentCount = argCount;
 
 	m->name = slStrdup( name );
@@ -173,7 +175,7 @@ int brMethodCallByName( brInstance *i, const char *name, brEval *result ) {
 	int r;
 
 	if ( !m ) {
-		slMessage( DEBUG_ALL, "warning: unknown method \"%s\" called for instance %p of class \"%s\"\n", name, i->userData, i->object->name );
+		slMessage( DEBUG_ALL, "unknown method \"%s\" called for instance %p of class \"%s\"\n", name, i->userData, i->object->name );
 		return EC_ERROR;
 	}
 

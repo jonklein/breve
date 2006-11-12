@@ -146,6 +146,9 @@ struct brMethod {
 	~brMethod() {
 		if( name )
 			slFree( name );
+
+		if( object && object->type->destroyMethod && userData )
+			object->type->destroyMethod( userData );
 	}
 
 	void *userData;

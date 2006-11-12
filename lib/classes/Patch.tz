@@ -131,6 +131,11 @@ Abstract : Patch (aka Patches) [version 2.2] {
     
         setPatchColor(patchPointer, newColor).
 
+	+ to get-color:
+		% Returns the color of the patch.
+
+		return color.
+
     + to set-transparency to alphaValue (float):
         % Sets the transparency of the patch to alphaValue.  alphaValue
 		% is a number between 0.0 (fully transparent) and 1.0 (fully
@@ -144,6 +149,11 @@ Abstract : Patch (aka Patches) [version 2.2] {
 
         transparency = alphaValue.
         setPatchTransparency(patchPointer, alphaValue).
+
+	+ to get-transparency:
+		% Returns the transparency value of the patch.
+
+		return transparency.
 
     + section "Getting Groups of Neighbor Patches"
 

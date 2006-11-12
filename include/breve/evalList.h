@@ -32,9 +32,9 @@ class brEvalListHead: public brEvalObject {
 		brEvalListHead();
 		~brEvalListHead();
 
-		std::vector< brEval* > _vector;
+		std::vector< brEval > _vector;
 
-		inline std::vector< brEval* > const &getVector() const { return _vector; }
+		inline std::vector< brEval > const &getVector() const { return _vector; }
 };
 
 /*!

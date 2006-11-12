@@ -365,10 +365,10 @@ int stXMLPrintList( stXMLArchiveRecord *record, FILE *file, const char *name, br
 	fprintf( file, "<list name=\"%s\">\n", name );
 	spaces += XML_INDENT_SPACES;
 
-	std::vector< brEval* >::iterator li;
+	std::vector< brEval >::iterator li;
 
 	for ( li = theHead->_vector.begin(); li != theHead->_vector.end(); li++ ) {
-		stXMLPrintEval( record, file, "", *li, spaces );
+		stXMLPrintEval( record, file, "", &(*li), spaces );
 	}
 
 	spaces -= XML_INDENT_SPACES;
@@ -388,18 +388,18 @@ int stXMLPrintHash( stXMLArchiveRecord *record, FILE *file, const char *name, br
 	fprintf( file, "<hash name=\"%s\">\n", name );
 	spaces += XML_INDENT_SPACES;
 
-	std::vector< brEval* >::iterator li;
+	std::vector< brEval >::iterator li;
 
 	for ( li = keys->_vector.begin(); li != keys->_vector.end(); li++ ) {
 		brEval newEval, value;
 
-		brEvalHashLookup( hash, *li, &value );
+		brEvalHashLookup( hash, &(*li), &value );
 
 		XMLPutSpaces( spaces, file );
 		fprintf( file, "<key>\n" );
 		spaces += XML_INDENT_SPACES;
 
-		brEvalCopy( *li, &newEval );
+		brEvalCopy( &(*li), &newEval );
 		stXMLPrintEval( record, file, "", &newEval, spaces );
 
 		spaces -= XML_INDENT_SPACES;

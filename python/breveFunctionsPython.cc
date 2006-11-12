@@ -36,6 +36,10 @@ int brPythonLoadFile( brEval arguments[], brEval *result, brInstance *instance )
 
 	slFree( file );
 
+	if( BRINT( result ) != 0 ) {
+		slMessage( "Python load of file \"%s\" failed\n", file );
+		return EC_ERROR;
+	}
 
 	return EC_OK;
 }

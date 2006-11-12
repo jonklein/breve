@@ -49,10 +49,6 @@ brEvalListHead::brEvalListHead() : brEvalObject() {}
 */
 
 brEvalListHead::~brEvalListHead() {
-	std::vector< brEval* >::iterator i;
-
-	for ( i = _vector.begin(); i != _vector.end(); i++ )
-		delete *i;
 }
 
 /*!
@@ -61,20 +57,14 @@ brEvalListHead::~brEvalListHead() {
 */
 
 int brEvalListInsert( brEvalListHead *head, int index, brEval *value ) {
-	brEval *newEval;
-
-	newEval = new brEval;
-
-	brEvalCopy( value, newEval );
-
 	if ( index > ( int )head->_vector.size() ) {
 		return EC_ERROR;
 	} else if ( index == ( int )head->_vector.size() ) {
-		head->_vector.push_back( newEval );
+		head->_vector.push_back( *value );
 	} else {
-		std::vector< brEval* >::iterator i = head->_vector.begin() + index;
+		std::vector< brEval >::iterator i = head->_vector.begin() + index;
 
-		head->_vector.insert( i, 1, newEval );
+		head->_vector.insert( i, 1, *value );
 	}
 
 	return EC_OK;
@@ -83,11 +73,9 @@ int brEvalListInsert( brEvalListHead *head, int index, brEval *value ) {
 int brEvalListRemove( brEvalListHead *head, int index, brEval *value ) {
 	if ( index < 0 || index >= ( int )head->_vector.size() ) return index;
 
-	std::vector< brEval* >::iterator i = head->_vector.begin() + index;
+	std::vector< brEval >::iterator i = head->_vector.begin() + index;
 
-	brEvalCopy( *i, value );
-
-	delete *i;
+	brEvalCopy( &(*i), value );
 
 	head->_vector.erase( i );
 
@@ -97,24 +85,18 @@ int brEvalListRemove( brEvalListHead *head, int index, brEval *value ) {
 brEval *brEvalListIndexLookup( brEvalListHead *head, int index ) {
 	if ( index < 0 || index >= ( int )head->_vector.size() ) return NULL;
 
-	std::vector< brEval* >::iterator i = head->_vector.begin() + index;
+	std::vector< brEval >::iterator i = head->_vector.begin() + index;
 
-	return *i;
+	return &(*i);
 }
 
 brEvalListHead *brEvalListCopy( brEvalListHead *head ) {
 	brEvalListHead *newList;
-	std::vector< brEval* >::iterator i;
+	std::vector< brEval >::iterator i;
 
 	newList = new brEvalListHead();
 
-	for ( i = head->_vector.begin(); i != head->_vector.end(); i++ ) {
-		brEval *e = new brEval;
-
-		brEvalCopy( *i, e );
-
-		newList->_vector.push_back( e );
-	}
+	newList->_vector = head->_vector;
 
 	return newList;
 }
@@ -136,7 +118,7 @@ brEvalListHead *brEvalListDeepCopy( brEvalListHead *l ) {
 brEvalListHead *brDoEvalListDeepCopy( brEvalListHead *l, slList **s ) {
 	brEvalListHead *newList;
 	brEval newSubList;
-	std::vector< brEval* >::iterator i;
+	std::vector< brEval >::iterator i;
 
 	// we're now officially copying this list -- all future occurences should
 	// refer to the copy, so we make a record entry for it
@@ -147,21 +129,22 @@ brEvalListHead *brDoEvalListDeepCopy( brEvalListHead *l, slList **s ) {
 
 	for ( i = l->_vector.begin(); i != l->_vector.end(); i++ ) {
 		brEvalListHead *copy;
+		brEval *eval = &(*i);
 
 		// is this a list? have we seen it before?
 
-		if (( *i )->type() == AT_LIST ) {
-			copy = brCopyRecordInList( *s, BRLIST( *i ) );
+		if ( eval->type() == AT_LIST ) {
+			copy = brCopyRecordInList( *s, BRLIST( eval ) );
 
 			if ( !copy ) {
-				newSubList.set( brDoEvalListDeepCopy( BRLIST( *i ), s ) );
+				newSubList.set( brDoEvalListDeepCopy( BRLIST( eval ), s ) );
 				brEvalListInsert( newList, newList->_vector.size(), &newSubList );
 			} else {
 				newSubList.set( copy );
 				brEvalListInsert( newList, newList->_vector.size(), &newSubList );
 			}
 		} else {
-			brEvalListInsert( newList, newList->_vector.size(), *i );
+			brEvalListInsert( newList, newList->_vector.size(), eval );
 		}
 	}
 

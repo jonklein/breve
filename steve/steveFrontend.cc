@@ -102,7 +102,7 @@ brInstance *stInstanceNewCallback( brEngine *engine, brObject *object, const brE
 	\brief The breve callback to find a method.
 */
 
-void *stFindMethodBreveCallback( void *object, char *name, unsigned char *argTypes, int args ) {
+void *stFindMethodBreveCallback( void *object, const char *name, unsigned char *argTypes, int args ) {
 	int min = args, max = args;
 
 	// In some cases, we may not have acurate argument count information
@@ -597,7 +597,6 @@ void stObjectAllocationReport( stObject *o ) {
 
 void stParseError( brEngine *e, int type, char *proto, ... ) {
 	va_list vp;
-	char localMessage[BR_ERROR_TEXT_SIZE];
 	brErrorInfo *error = brEngineGetErrorInfo( e );
 
 	// if there is no "primary" error defined, then we do the whole process
@@ -614,8 +613,8 @@ void stParseError( brEngine *e, int type, char *proto, ... ) {
 		slMessage( DEBUG_ALL, "%s: %s", gErrorNames[type], error->message );
 		slMessage( DEBUG_ALL, " at line %d of file \"%s\"", lineno, yyfile );
 	} else {
+		// char localMessage[BR_ERROR_TEXT_SIZE];
 		//// Ignore subsequent parse errors... [?]
-
 		// va_start( vp, proto );
 		// vsnprintf( localMessage, BR_ERROR_TEXT_SIZE, proto, vp );
 		// va_end( vp );
