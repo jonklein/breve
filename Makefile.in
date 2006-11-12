@@ -42,7 +42,7 @@ include graph/Makefile
 include neural/Makefile
 include neural/Network/Makefile
 include steve/Makefile
-include java/Makefile
+# include java/Makefile
 include python/Makefile
 include docBuild/Makefile
 include util/Makefile
@@ -78,8 +78,8 @@ breve.dll: $(OBJ)
 %.tab.c: %.y
 	$(YACC) $(YFLAGS) -o $@ $<
 
-%.class: %.java
-	$(JAVAC) $<
+# %.class: %.java
+#	$(JAVAC) $<
 
 %.d: %.cc
 	@echo "Generating dependencies for $<"
@@ -117,7 +117,7 @@ clean:
 	rm -f .depend breve.dll lib/*.a
 	rm -f steve/format.c steve/stevelex.c
 	rm -f steve/steveparse.tab.c steve/steveparse.tab.h
-	rm -f java/*.class lib/classes/*.jar
+	# rm -f java/*.class lib/classes/*.jar
 	rm -rf docBuild/docs OSX/build
 	find . -name 'core' -exec rm -f {} \;
 	find . -name '*.o' -exec rm -f {} \;
