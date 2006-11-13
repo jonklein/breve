@@ -177,16 +177,20 @@ int brIReadFileAsString( brEval args[], brEval *target, brInstance *i ) {
 
 int brIReadLine( brEval args[], brEval *target, brInstance *i ) {
 	brFilePointer *p;
-	char line[10240];
+	char line[ 10240 ];
 
 	p = BRFILEPOINTER( &args[0] );
 
-	if ( !p || !p->file ) {
+	if ( !p->file ) {
 		slMessage( DEBUG_ALL, "readLine called with uninitialized file\n" );
 		return EC_ERROR;
 	}
 
 	slFgets( line, sizeof( line ) - 1, p->file );
+	
+	char *last = &line[ strlen( line ) - 1 ];
+
+	if( *last == '\n' || *last == '\r' ) *last = '\0';
 
 	target->set( line );
 

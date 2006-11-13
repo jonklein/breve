@@ -26,6 +26,18 @@ Object : Line {
 		if start == worldObject || end == worldObject: return 1.
 		return 0.
 
+	+ to set-color to color (vector):
+		% Sets the color of the line.
+
+		if linePointer:
+			objectLineSetColor( linePointer, color ).
+
+	+ to set-transparency to transparency (float):
+		% Sets the transparency of the line.
+
+		if linePointer:
+			objectLineSetTransparency( linePointer, transparency ).
+
 	+ to destroy:
 		if linePointer: removeObjectLine(linePointer).
 }

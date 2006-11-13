@@ -310,7 +310,7 @@ char *slFgets( char *str, int size, FILE *stream ) {
 	int n = 0;
 
 	do {
-		str[n++] = s = fgetc( stream );
+		str[ n++ ] = s = fgetc( stream );
 
 		if ( s == '\r' ) {
 			// check for \r\n -- if there is a \n, eat it
@@ -326,7 +326,7 @@ char *slFgets( char *str, int size, FILE *stream ) {
 	if ( s == EOF )
 		n--;
 
-	str[n] = 0;
+	str[ n ] = 0;
 
 	return str;
 }

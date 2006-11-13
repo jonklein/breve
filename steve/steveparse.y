@@ -972,7 +972,7 @@ unary_expression
 			delete $4;
 			$$ = NULL;
 		} else {
-			$$ = new stListInsertExp($4, $2, new stIntExp(1, yyfile, lineno), yyfile, lineno);
+			$$ = new stListInsertExp($4, $2, new stIntExp( 0, yyfile, lineno ), yyfile, lineno);
 			slFree($3);
 		}
 	}

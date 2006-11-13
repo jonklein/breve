@@ -23,7 +23,7 @@ void slObjectLine::draw( slCamera *camera ) {
 
 	glEnable( GL_LINE_STIPPLE );
 
-	glColor4f( _color.x, _color.y, _color.z, 0.8 );
+	glColor4f( _color.x, _color.y, _color.z, _transparency );
 
 	glBegin( GL_LINES );
 

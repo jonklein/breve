@@ -842,6 +842,24 @@ int brIObjectLineSetStipple( brEval args[], brEval *target, brInstance *i ) {
 	return EC_OK;
 }
 
+int brIObjectLineSetColor( brEval args[], brEval *target, brInstance *i ) {
+	slObjectLine *line = ( slObjectLine* )BRPOINTER( &args[0] );
+	slVector *color = &BRVECTOR( &args[ 1 ] );
+
+	line->setColor( *color );
+
+	return EC_OK;
+}
+
+int brIObjectLineSetTransparency( brEval args[], brEval *target, brInstance *i ) {
+	slObjectLine *line = ( slObjectLine* )BRPOINTER( &args[0] );
+	float transparency = BRDOUBLE( &args[ 1 ] );
+
+	line->setTransparency( transparency );
+
+	return EC_OK;
+}
+
 /*!
 	\brief Removes a specific object line between two objects.
 
@@ -1123,7 +1141,11 @@ void breveInitWorldFunctions( brNamespace *n ) {
 
 	brNewBreveCall( n, "addObjectLine", brIAddObjectLine, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_STRING, 0 );
 	brNewBreveCall( n, "removeObjectLine", brIRemoveObjectLine, AT_NULL, AT_POINTER, 0 );
+
 	brNewBreveCall( n, "objectLineSetStipple", brIObjectLineSetStipple, AT_NULL, AT_POINTER, AT_STRING, 0 );
+	brNewBreveCall( n, "objectLineSetColor", brIObjectLineSetColor, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
+	brNewBreveCall( n, "objectLineSetTransparency", brIObjectLineSetTransparency, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
+
 
 	brNewBreveCall( n, "setBoundsOnlyCollisionDetection", brISetBoundsOnlyCollisionDetection, AT_NULL, AT_INT, 0 );
 

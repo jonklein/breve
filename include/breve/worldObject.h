@@ -27,15 +27,23 @@ class slObjectConnection {
 
 class slObjectLine: public slObjectConnection {
 	public:
-		slObjectLine() { _stipple = 0xffff; }
+		slObjectLine() { 
+			_stipple = 0xffff; 
+			slVectorSet( &_color, 0, 0, 0 ); 
+			_transparency = 1.0; 
+		}
 
 		void draw(slCamera *c);
 		void step(double timestep) {};
 
+		void setColor( slVector &inColor ) { slVectorCopy( &inColor, &_color ); }
+		void setTransparency( float inTransparency ) { _transparency = inTransparency; }
+		void setStipple( int inStipple ) { _stipple = inStipple; }
+
 		slVector _color;
+		float _transparency;
 		int _stipple;
 
-		void setStipple( int s) { _stipple = s; }
 };
 
 class slWorldObject {

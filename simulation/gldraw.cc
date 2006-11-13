@@ -1353,6 +1353,8 @@ void slCamera::renderLines( slWorld *w ) {
 	glDisable( GL_LIGHTING );
 
 	glEnable( GL_BLEND );
+	glDisable( GL_LINE_SMOOTH );
+	glLineWidth( 1.0 );
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 	std::vector<slObjectConnection*>::iterator li;
