@@ -18,8 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-
-
 #include "kernel.h"
 
 #ifdef HAVE_LIBPYTHON
@@ -29,6 +27,10 @@
 int brPythonLoadFile( brEval arguments[], brEval *result, brInstance *instance ) {
 	char *file = brFindFile( instance->engine, BRSTRING( &arguments[ 0 ] ), NULL );
 	char import[ 10240 ];
+
+	if( !file ) {
+		throw slException( "cannot locate file \"" + std::string( BRSTRING( &arguments[ 0 ] ) ) + "\"" );
+	}
 
 	snprintf( import, 10239, "execfile( '''%s''' )", file );
 
