@@ -623,9 +623,11 @@ void brPythonInit( brEngine *breveEngine ) {
 
  	breveInitPythonFunctions( breveEngine->internalMethods );
 
+#ifndef WINDOWS
 	// Those meddling Python kids mess with the signal handlers!
 
 	signal( SIGINT, NULL );
+#endif
 }
 
 #endif

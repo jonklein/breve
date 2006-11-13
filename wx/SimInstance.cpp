@@ -288,7 +288,7 @@ VarData * SimInstance::ProcessList(stInstance * instance, stObject * object, brE
 		str = "Item ";
 		str << count++;
 
-		d = new VarData( head->_vector[ c ], str, instance, object);
+		d = new VarData( &head->_vector[ c ], str, instance, object);
 
 		if (first == NULL) first = d;
 

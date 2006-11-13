@@ -264,7 +264,6 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([3ds], [lib3ds_io_new])
 	AC_CHECK_LIB([ftgl], [main])
 	AC_CHECK_LIB([python], [Py_Initialize])
-	AC_CHECK_LIB([python2.3], [Py_Initialize])
 
 	if test "x$custom_cblas" = x; then
 		AC_CHECK_LIB([gslcblas], [cblas_ccopy])
