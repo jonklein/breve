@@ -37,21 +37,19 @@
 #include "simulation.h"
 #include "gldraw.h"
 
-#define TIMER 1
 
-//These forward declarations are just for readability,
-//so the big three functions can come first 
+#define ABOUT_URL	"http://www.spiderland.org"
 
-void InitGL(HWND hWnd, HDC & hDC, HGLRC & hRC);
-void CloseGL(HWND hWnd, HDC hDC, HGLRC hRC);
+void InitGL( HWND hWnd, HDC & hDC, HGLRC & hRC );
+void CloseGL( HWND hWnd, HDC hDC, HGLRC hRC );
 void GetConfig();
 void WriteConfig(HWND hDlg);
-void SetupAnimation(int Width, int Height);
+void SetupAnimation( int Width, int Height );
 void CleanupAnimation();
-void OnTimer(HDC hDC);
+void OnTimer( HDC hDC );
 
 
-int Width, Height; //globals for size of screen
+int gWidth, gHeight; //globals for size of screen
 
 
 //////////////////////////////////////////////////
@@ -71,15 +69,15 @@ LRESULT WINAPI ScreenSaverProc(HWND hWnd, UINT message,
   case WM_CREATE: 
 	// get window dimensions
 	GetClientRect( hWnd, &rect );
-	Width = rect.right;		
-	Height = rect.bottom;
+	gWidth = rect.right;		
+	gHeight = rect.bottom;
 	
 	//get configuration from registry
 	GetConfig();
 
 	// setup OpenGL, then animation
 	InitGL( hWnd, hDC, hRC );
-	SetupAnimation(Width, Height);
+	SetupAnimation( gWidth, gHeight );
 
 	//set timer to tick every 10 ms
 	SetTimer( hWnd, TIMER, 10, NULL );
@@ -111,7 +109,8 @@ ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
 
 		switch( command ) {
 			case IDABOUT:
-				
+				LONG result = (long) ::ShellExecute( NULL, "open", ABOUT_URL, NULL, NULL, SW_SHOWNORMAL );
+	
 				return TRUE;
 				break;
 	
