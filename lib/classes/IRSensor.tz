@@ -6,9 +6,10 @@
 
 @define PI 3.141592653.
 @define PI180 0.017453293.
+@define MAXVALUE  233.
 
 Real:IRSensor (aka IRSensors){
-
+	%
 	+variables:
 		m_location(vector). # location of the sensor
 		m_rotation(matrix). # rotation of the sensor
@@ -48,7 +49,7 @@ Real:IRSensor (aka IRSensors){
 			draw set-color to (0.1, 0.1, 0.1).
 			draw draw-line from (self get-location)to (self get-location) + (self get-rotation)*(0,0,30).
 #			print "Raytracer: start sensing...".
-			sensordata = irSense(realWorldPointer_owner, (self get-location), (self get-rotation) , sensorType).
+			sensordata = MAXVALUE * irSense(realWorldPointer_owner, (self get-location), (self get-rotation) , sensorType).
 #			print sensordata.
 #			print "Raytracer: ...sensing done".
 		}
@@ -70,7 +71,7 @@ Real:IRSensor (aka IRSensors){
 
 		foreach i in agents: {
 			if(i!= owner):{
-				qtest = calculateQualityToObject(realWorldPointer_owner, (self get-location), (self get-rotation) ,(i get-realWorldPointer) , sensorType).
+				qtest = MAXVALUE * calculateQualityToObject(realWorldPointer_owner, (self get-location), (self get-rotation) ,(i get-realWorldPointer) , sensorType).
 				draw set-color to (0,0,0).
 #				draw draw-line from (self get-location)to (i get-location).
 # only send the message to him, if the quality is good enough
@@ -87,7 +88,7 @@ Real:IRSensor (aka IRSensors){
 		qtest(float).
 # we dont have to make raytrace, the sender already assured a free path the quality of our 
 # ACK only depends on the distance and the incidence angle
-		qtest = calcQualNoRay(realWorldPointer_owner, (self get-location),
+		qtest = MAXVALUE * calcQualNoRay(realWorldPointer_owner, (self get-location),
 		(self get-rotation) ,(agent get-location) , sensorType).
 		if (qtest > communicationThreshold):{
 # the quality is good enough we could send a ACK 

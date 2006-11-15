@@ -402,7 +402,7 @@ double Sensor::evaluate(){
 	sumFactors = 0;
 	int verbose = 0;
 	double frontDistance = 0;
-	maxValue = 233;
+	maxValue = 1;
 //slMessage(DEBUG_ALL, "evaluate rows: %d columns%d \n",rows,columns);
 	for(int i=0; i < columns; i++){
 		for(int j=0; j < rows; j++){
@@ -670,7 +670,7 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
    */
 double Sensor::calculateQuality(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, slWorldObject* target = NULL){
 
-	double quality = 233;
+	double quality = 1;
 	int verbose = 0	;
 	slVector dist;
 	slVector middleDirection;
@@ -680,7 +680,7 @@ double Sensor::calculateQuality(vector<slWorldObject*>* neighbors, slPosition* s
 	distance = distance/2.0; //the light must only go half the way (if reflecting it must go back)
 	quality = apply_distance_factor(quality,  distance);
 	//slMessage(DEBUG_ALL,"distance:%f quality:%f \n", distance, quality);
-	if (fabs(quality)<0.001){
+	if (fabs(quality)<0.00001){
 			if(verbose>1)slMessage(DEBUG_ALL,"distance too big!\n");
 		return 0;
 	}
@@ -692,7 +692,7 @@ double Sensor::calculateQuality(vector<slWorldObject*>* neighbors, slPosition* s
 	quality = apply_azimut_factor(quality, angle);
 
 	//slMessage(DEBUG_ALL,"angle:%f quality:%f \n", angle, quality);
-	if (fabs(quality)<0.001){
+	if (fabs(quality)<0.00001){
 			if(verbose>1)slMessage(DEBUG_ALL,"angle does not fit!\n");
 			return 0;
 	}
@@ -725,7 +725,7 @@ double calculateQuality2(vector<slWorldObject*>* neighbors, slPosition* sensorPo
    */
 double Sensor::calcQualNoRay(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, slWorldObject* target = NULL){
 
-	double quality = 233;
+	double quality = 1;
 	int verbose = 0	;
 	slVector dist;
 	slVector middleDirection;
@@ -735,7 +735,7 @@ double Sensor::calcQualNoRay(vector<slWorldObject*>* neighbors, slPosition* sens
 	distance = distance/2.0; //the light must only go half the way (if reflecting it must go back)
 	quality = apply_distance_factor(quality,  distance);
 	//slMessage(DEBUG_ALL,"distance:%f quality:%f \n", distance, quality);
-	if (fabs(quality)<0.001){
+	if (fabs(quality)<0.00001){
 			if(verbose>1)slMessage(DEBUG_ALL,"distance too big!\n");
 		return 0;
 	}
@@ -747,7 +747,7 @@ double Sensor::calcQualNoRay(vector<slWorldObject*>* neighbors, slPosition* sens
 	quality = apply_azimut_factor(quality, angle);
 
 	//slMessage(DEBUG_ALL,"angle:%f quality:%f \n", angle, quality);
-	if (fabs(quality)<0.001){
+	if (fabs(quality)<0.00001){
 			if(verbose>1)slMessage(DEBUG_ALL,"angle does not fit!\n");
 			return 0;
 	}

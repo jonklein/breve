@@ -48,12 +48,14 @@ basicAgent : testAgent (aka testAgents) {
 	+ to init:
 		draw = new Drawing.
 		mode = STRAIGHT.
+		time = -1.
 		draw set-color to (1, 1, 1).
 		return self.
 		
 # here comes the behaviour
 	+ to iterate:
 		dir (vector).
+		d(float).
 		vtest (double).
 		vtest = vtest+10.
 		dir = (self get-rotation)*(1,0,0).
@@ -146,30 +148,31 @@ basicAgent : testAgent (aka testAgents) {
 		
 		if(mode==DISTANCE):{
 			df  = (sensors{1} get-data).
-			print df.			
+			d = ((sensors{1} get-location)::z) - 0.5. # wall thickness
+			print d ," ",df.			
 			self set-rotational-velocity to (0, 0, 0).
 			self set-velocity to (self get-rotation)*(1,0,0).
 			return.
 		}
 		
 		if(mode==AZIMUT):{
-			time = time +1.
 			printf time.
 			printf " ".
 			df  = (sensors{1} get-data).
 			print df.			
+			time = time +1.
 			self rotate around-axis (0,1,0) by time*(PI/180.0).
 			self set-velocity to (0,0,0).		
 			return.
 		}
 		
 		if(mode==INCIDENCE):{
-			time = time +1.
 			printf time.
 			printf " ".
 			df  = (sensors{1} get-data).
 			print df.			
-			self move to (incidenceRadius*sin(time*PI/180.0), 1.8, incidenceRadius*cos(time*PI/180.0)).
+			time = time +1.
+			self move to (incidenceRadius*sin(time*PI/180.0), 1.4, incidenceRadius*cos(time*PI/180.0)).
 			self rotate around-axis (0,1,0) by time*(PI/180.0)+PI/2.
 			return.
 		}

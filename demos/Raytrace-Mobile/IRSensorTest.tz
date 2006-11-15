@@ -17,6 +17,11 @@
 @use testAgent.
 #@define PI 3.141592653.
 #@define PI180 0.017453293.
+@define FLOOR_Y 0.1.
+@define COLOR (0,0.9,0.1).
+@define WALL_W 1.
+@define WALL_H 10.0.
+@define BOUNCE 0.1.
 
 
 # First tell the breve engine the name of our controller class
@@ -28,6 +33,8 @@ Control : myControl {
 		walkerShape (object).
 		agent (object).
 		agents (list).
+		wall-shape-test (object).
+		wallT (object).
 
 	+ to init:
 		s (object).
@@ -42,8 +49,8 @@ Control : myControl {
 # here are the tests, all except one should be commented out
 
 #		self sensorTest-Distance.
-#		self sensorTest-Azimut distance 7.5.
-#		self sensorTest-Incidence distance 12.5.
+#		self sensorTest-Azimut distance 5.0.
+#		self sensorTest-Incidence distance 10.0.
 #		self testInsideSensor.
 #		self messageTest-allSensors.
 		self messageTest-block.
@@ -60,7 +67,7 @@ Control : myControl {
 		new DemoStage.
 
 		for i=0, i<agentcount  , i+=1: {
-			agents{i} move to (random[(10, 0, 10)]+(-15, 10, -15)).
+			agents{i} move to (random[(10, 1.4, 10)]+(-15, 0, -15)).
 			agents{i} rotate around-axis (0,1,0) by random[360]*PI/360.
 			agents{i} set-mode mode AVOID.
 		}
@@ -74,21 +81,44 @@ Control : myControl {
 # run to a wall and print the values on the console
 	+ to sensorTest-Distance:
 		self sensorTestInit.
+		print "sensorTest-Distance:".
+		wall-shape-test = (new Cube init-with size (20, 10,  1)).
+		wallT = new Stationary.
+		wallT register with-shape wall-shape-test at-location (0, 5, 0).
+		wallT set-e to BOUNCE.
+		wallT set-color to COLOR.
+
 		agent set-mode mode DISTANCE.
-		agent move to (0, 10, 50).
+		agent move to (0, 1.4, 50).
 		agent rotate around-axis (0,1,0) by PI/2.
 		agent set-velocity to (agent get-rotation)*(1,0,0).
 
 # turn in place and output
 	+ to sensorTest-Azimut distance dist(float):
 		self sensorTestInit.
+		print "sensorTest-Azimut distance:", dist.
+		wall-shape-test = (new Cube init-with size (20, 10,  1)).
+		wallT = new Stationary.
+		wallT register with-shape wall-shape-test at-location (-40, 5, (RobotSize+1)/2). # +1 wegen wanddicke
+		wallT set-e to BOUNCE.
+		wallT set-color to COLOR.
+
 		agent set-mode mode AZIMUT.
 		#-15+robotsize/2 ,0 sind waende
-		agent move to (-40, 10, -dist).
+		agent move to (-40, 1.4, -dist).
 
 # circle around a wall and print the values
 	+ to sensorTest-Incidence distance dist(float):
+		print "sensorTest-Incidence distance:" ,dist.
 		self sensorTestInit.
+
+		wall-shape-test = (new Cube init-with size (10, 10,  1)).
+		wallT = new Stationary.
+		wallT register with-shape wall-shape-test at-location (0, 5, 0).
+		wallT set-e to BOUNCE.
+		wallT set-color to COLOR.
+
+
 		agent set-mode mode INCIDENCE.
 		agent set-incidenceRadius radius (dist + (1+RobotSize)/2.0). # 1= wanddicke
 
@@ -102,13 +132,13 @@ Control : myControl {
 		agentcount = 30.
 		radius = 40.
 		agents =  (agentcount+1) new testAgent.		
-
+		print "messageTest-allSensors:".
 		for i=0, i<agentcount  , i+=1: {
-			agents{i} move to (radius*sin((360.0/agentcount)*i*PI/180.0), 0, radius*cos((360.0/agentcount)*i*PI/180.0)).
+			agents{i} move to (radius*sin((360.0/agentcount)*i*PI/180.0), 1.4, radius*cos((360.0/agentcount)*i*PI/180.0)).
 			agents{i} rotate around-axis (0,1,0) by ((360.0/agentcount)*i*PI/180.0 + PI/2.0).
 			agents{i} set-mode mode STRAIGHT.
 		}
-		agents{agentcount} move to (0, 0, 0).
+		agents{agentcount} move to (0, 1.4, 0).
 		agents{agentcount} rotate around-axis (0,-1,0) by (PI/2.0).
 		agents{agentcount} set-mode mode SOURCE.
 
@@ -121,36 +151,41 @@ Control : myControl {
 		agentcount = 30.
 		radius = 40.
 		agents =  (agentcount+5) new testAgent.		
+		print " messageTest-block:".
 
 		for i=0, i<agentcount  , i+=1: {
-			agents{i} move to (radius*sin((360.0/agentcount)*i*PI/180.0), 0, radius*cos((360.0/agentcount)*i*PI/180.0)).
+			agents{i} move to (radius*sin((360.0/agentcount)*i*PI/180.0), 1.4, radius*cos((360.0/agentcount)*i*PI/180.0)).
 			agents{i} rotate around-axis (0,1,0) by ((360.0/agentcount)*i*PI/180.0 + PI/2.0).
 			agents{i} set-mode mode STRAIGHT.
 		}
-		agents{agentcount} move to (0, 0, 0).
+		agents{agentcount} move to (0, 1.4, 0).
 		agents{agentcount} rotate around-axis (0,-1,0) by (PI/2.0).
 		agents{agentcount} set-mode mode SOURCE.
 
  		agents{agentcount+1} set-mode mode DISABLE.
-		agents{agentcount+1} move to (3, 0, -6).
+		agents{agentcount+1} set-color to (0.1, 0.1, 0.1).
+		agents{agentcount+1} move to (3, 1.4, -6).
 		agents{agentcount+2} set-mode mode DISABLE.
-		agents{agentcount+2} move to (1, 0, -6).
+		agents{agentcount+2} set-color to (0.1, 0.1, 0.1).
+		agents{agentcount+2} move to (1, 1.4, -6).
 		agents{agentcount+3} set-mode mode DISABLE.
-		agents{agentcount+3} move to (-1, 0, -6).
+		agents{agentcount+3} set-color to (0.1, 0.1, 0.1).
+		agents{agentcount+3} move to (-1, 1.4, -6).
 		agents{agentcount+4} set-mode mode DISABLE.
-		agents{agentcount+4} move to (-3, 0, -6).
+		agents{agentcount+4} set-color to (0.1, 0.1, 0.1).
+		agents{agentcount+4} move to (-3, 1.4, -6).
 
 + to testInsideSensor:
 		agentcount(int).
 		agentcount = 2.
 		agents =  (agentcount) new testAgent.		
 
-		agents{0} move to (0, 0, 10).
+		agents{0} move to (0, 1.4, 10).
 		agents{0} rotate around-axis (0,1,0) by (PI/2.0).
 		agents{0} set-mode mode STAND.
 
 		agents{1} set-mode mode INSIDETEST.
-		agents{1} move to (0, 0, 40).
+		agents{1} move to (0, 1.4, 40).
 		agents{1} rotate around-axis (0,1,0) by (PI/2.0).
 	
 # one robot stands in the middle, two other move towards him
@@ -162,19 +197,19 @@ Control : myControl {
 		agentcount = 3.
 		agents =  (agentcount) new testAgent.		
 
-		agents{0} move to (0, 0, 00).
+		agents{0} move to (0, 1.4, 00).
 		agents{0} rotate around-axis (0,1,0) by (-PI/2.0).
 		agents{0} set-mode mode SOURCE.
 
 		agents{1} set-mode mode 0.
 		agents{1} set-mode mode SHOWSENSORS.
-		agents{1} move to (0, 0, 40).
+		agents{1} move to (0, 1.4, 40).
 		agents{1} rotate around-axis (0,1,0) by (-PI/2.0).
 		agents{1} set-velocity to(0,0,-1). 
 
 		agents{2} set-mode mode 0.
 		agents{2} set-mode mode SHOWSENSORS.
-		agents{2} move to (0, 0, -40).
+		agents{2} move to (0, 1.4, -40).
 		agents{2} rotate around-axis (0,1,0) by (2* PI/2.0).
 		agents{2} set-velocity to(0,0,1). 
 
@@ -187,11 +222,6 @@ Control : myControl {
 		return walkerShape.
 }
 
-@define FLOOR_Y 0.1.
-@define COLOR (0,0.9,0.1).
-@define WALL_W 1.
-@define WALL_H 20.0.
-@define BOUNCE 0.1.
 
 Object : Stage {
 	+ variables:
@@ -994,9 +1024,9 @@ Object : TestStage {
 	    FLOOR_X = 160.
 		FLOOR_Z = 120.
 		floor-shape = (new Cube init-with size (FLOOR_X, FLOOR_Y, FLOOR_Z)).
-#		floor = new Stationary.
-#		floor register with-shape floor-shape at-location (0, -FLOOR_Y/2, 0).
-#		floor set-e to BOUNCE.
+		floor = new Stationary.
+		floor register with-shape floor-shape at-location (0, -FLOOR_Y/2, 0).
+		floor set-e to BOUNCE.
 
 		wall-shape0 = (new Cube init-with size (20, WALL_H, 1)).
 		wall-shape1 = (new Cube init-with size ( 1, WALL_H, 20)).
@@ -1156,22 +1186,19 @@ Object : TestStage {
 		#end -- outer border 
 
 
-		wall-shape-test = (new Cube init-with size (10, 20,  1)).
 
-		wallT = new Stationary.
-		wallT register with-shape wall-shape-test at-location (-40, 10, -15-(RobotSize+1)/2). # +1 wegen wanddicke
-		wallT set-e to BOUNCE.
-		wallT set-color to COLOR.
 
-		wallT = new Stationary.
-		wallT register with-shape wall-shape-test at-location (-40, 10, (RobotSize+1)/2). # +1 wegen wanddicke
-		wallT set-e to BOUNCE.
-		wallT set-color to COLOR.
-
-		wallT = new Stationary.
-		wallT register with-shape wall-shape-test at-location (0, 10, 0).
-		wallT set-e to BOUNCE.
-		wallT set-color to COLOR.
+#		wall-shape-test = (new Cube init-with size (10, 20,  1)).
+#		wallT = new Stationary.
+#		wallT register with-shape wall-shape-test at-location (-40, 10, (RobotSize+1)/2). # +1 wegen wanddicke
+#		wallT set-e to BOUNCE.
+#		wallT set-color to COLOR.
+#
+#		wall-shape-test = (new Cube init-with size (10, 20,  1)).
+#		wallT = new Stationary.
+#		wallT register with-shape wall-shape-test at-location (0, 10, 0).
+#		wallT set-e to BOUNCE.
+#		wallT set-color to COLOR.
 		
 
 		return self.
