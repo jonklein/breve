@@ -2014,7 +2014,7 @@ RTC_INLINE int stEvalArrayIndexPointer( stArrayIndexExp *a, stRunInstance *i, vo
 }
 
 RTC_INLINE int stEvalArrayIndex( stArrayIndexExp *a, stRunInstance *i, brEval *result ) {
-	void *pointer;
+	void *pointer = NULL;
 	int r, type;
 
 	r = stEvalArrayIndexPointer( a, i, &pointer, &type );
@@ -3151,14 +3151,15 @@ RTC_INLINE int stEvalNewInstance( stInstanceExp *ie, stRunInstance *i, brEval *t
 		list = new brEvalListHead();
 
 		for ( n = 0;n < BRINT( &count );n++ ) {
-			listItem.set( stInstanceCreateAndRegister( i->instance->type->steveData, i->instance->type->engine, object ) );
+			brInstance *instance = stInstanceCreateAndRegister( i->instance->type->steveData, i->instance->type->engine, object );
+			listItem.set( instance );
 
-			if ( BRINSTANCE( t ) == NULL ) {
+			if ( instance == NULL ) {
 				stEvalError( i->instance, EE_UNKNOWN_OBJECT, "error creating instance of class %s", ie->name.c_str() );
 				return EC_ERROR_HANDLED;
 			}
 
-			stInstanceUnretain(( stInstance* )BRINSTANCE( &listItem )->userData );
+			stInstanceUnretain( ( stInstance* )BRINSTANCE( &listItem )->userData );
 
 			brEvalListInsert( list, 0, &listItem );
 		}
