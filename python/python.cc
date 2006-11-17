@@ -83,7 +83,7 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
  * Translation function from a breve value to a Python object.
  * 
  * @param inEval		The breve value to be translated.
- * @return				A newly created Python object translated from the source value.
+ * @return			A newly created Python object translated from the source value.
  */
 
 inline PyObject *brPythonTypeFromEval( brEval *inEval, PyObject *inBridgeObject ) {
@@ -159,6 +159,10 @@ inline PyObject *brPythonTypeFromEval( brEval *inEval, PyObject *inBridgeObject 
 	return result;
 }
 
+/**
+ * Callback to handle stdout/stderr from Python and redirect it to breve output.
+ */
+
 PyObject *brPythonCatchOutput( PyObject *inSelf, PyObject *inArgs ) {
 	PyObject *moduleObject;
 	char *message;
@@ -182,6 +186,8 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 
 	if ( !PyArg_ParseTuple( inArgs, "OOO", &moduleObject, &typeObject, &object ) ) return NULL;
 
+	// Extract the breveEngine from the module data
+
 	PyObject *engineObject = PyObject_GetAttrString( moduleObject, "breveEngine" );
 
 	if( !engineObject ) {
@@ -190,6 +196,9 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 	}
 
 	brEngine *engine = ( brEngine* )PyCObject_AsVoidPtr( engineObject );
+
+	// Adding the instance requires a brObject type.
+	// Figure out the brObject type for this instance.  We may need to create it ourselves.
 
 	if( PyObject_HasAttrString( typeObject, "breveObject" ) ) {
 		// Found an existing brObject type for this Python class
@@ -227,7 +236,9 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 	else
 		result = Py_None;
 
-    PyObject_SetAttrString( object, "breveInstance", result );
+	// Set the breveInstance field for this object to the newly created engine instance
+
+	PyObject_SetAttrString( object, "breveInstance", result );
 
 	Py_INCREF( result );
 
@@ -243,7 +254,7 @@ PyObject *brPythonRemoveInstance( PyObject *inSelf, PyObject *inArgs ) {
 
 	if ( !PyArg_ParseTuple( inArgs, "OO", &engineObject, &object ) ) return NULL;
 
-    PyObject *breveObject = PyObject_GetAttrString( object, "breveInstance" );
+	PyObject *breveObject = PyObject_GetAttrString( object, "breveInstance" );
 
 	brEngine *engine = ( brEngine* )PyCObject_AsVoidPtr( engineObject );
 	brInstance *instance = ( brInstance* )PyCObject_AsVoidPtr( breveObject );
@@ -442,9 +453,12 @@ PyObject *brPythonCallBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 
 
 
-/************************************************************************
- * Python language frontend callbacks for the breveObjectType structure *
- ************************************************************************/
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////                                                
+//  Python language frontend callbacks for the breveObjectType structure           //
+/////////////////////////////////////////////////////////////////////////////////////                                                  
 
 
 /**
@@ -473,6 +487,13 @@ void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *, i
 	return method;
 }
 
+/**
+ * A breveObjectType callback to locate a class in Python.
+ * 
+ * @param inData 	The userdata callback pointer to a __main__ module 
+ * @param inName	The name of the desired object
+ */
+
 void *brPythonFindObject( void *inData, const char *inName ) {
 	PyObject *module = ( PyObject* )inData;
 
@@ -488,7 +509,16 @@ void *brPythonFindObject( void *inData, const char *inName ) {
 	return object;
 }
 
-brInstance *brPythonInstantiate( brEngine *inEngine, brObject* inObject, const brEval **, int ) {
+/**
+ * A breveObjectType callback to instantiate a class in Python
+ * 
+ * @param inEngine	The breve engine creating the instancce.
+ * @param inObject	The object to be instantiated.
+ * @param inArgs	Constructor arguments -- not currently used.
+ * @param inArgCount	Constructor argument count -- not currently used.
+ */
+
+brInstance *brPythonInstantiate( brEngine *inEngine, brObject* inObject, const brEval **inArgs, int inArgCount ) {
 	PyObject *object = ( PyObject* )inObject->userData;
 
 	PyObject *result = PyObject_Call( object, PyTuple_New( 0 ), NULL );
@@ -498,9 +528,12 @@ brInstance *brPythonInstantiate( brEngine *inEngine, brObject* inObject, const b
 		return NULL;
 	}
 
-    PyObject *breveObject = PyObject_GetAttrString( result, "breveInstance" );
+	PyObject *breveObject = PyObject_GetAttrString( result, "breveInstance" );
 
 	if( !breveObject ) {
+		// This is a fundamental rule of the Python frontend: objects must add themselves 
+		// to the breve engine, or else they cannot be used
+
 		slMessage( DEBUG_ALL, "New Python object was not added to breve engine\n" );
 		slMessage( DEBUG_ALL, "breve Python objects must inherit from class breve.object\n" );
 		return NULL;
@@ -508,10 +541,21 @@ brInstance *brPythonInstantiate( brEngine *inEngine, brObject* inObject, const b
 
 	Py_INCREF( result );
 
+	// Note: the brInstance we return will 
+
 	return (brInstance*)PyCObject_AsVoidPtr( breveObject );
 }
 
-int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **, brEval *outResult ) {
+/**
+ * A breveObjectType callback to call a method in Python
+ * 
+ * @param inInstance	The object instance data (as found with \ref brPythonInstantiate)
+ * @param inMethod	The method callback data (as found with \ref brPythonFindMethod )
+ * @param inArguments	NOT CURRENTLY IMPLEMENTED
+ * @param outResult	The brEval result of the method calll
+ */
+
+int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArguments, brEval *outResult ) {
 	PyObject *instance = ( PyObject* )inInstance;
 	PyObject *method = ( PyObject* )inMethod;
 
@@ -542,15 +586,19 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **, brEva
 }
 
 /**
- * A brObjectType callback to determine whether one object is a subclass of another.
+ * A brObjectType callback to determine whether one object is a subclass of another.  Used by 
+ * collision detection to determine if a handler is installed for an object pair.
+ * 
+ * Clearly not implemented at the moment.
  */
 
-int brPythonIsSubclass( void *, void * ) {
+int brPythonIsSubclass( void *inClassA, void *inClassB ) {
 	return 0;
 }
 
 /**
- * A brObjectType callback to clean up a generic Python object.
+ * A brObjectType callback to clean up a generic Python object.  This method is used as the 
+ * destructor for both objects and methods
  *
  * @param inObject		A void pointer to a Python object.
  */

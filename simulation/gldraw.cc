@@ -226,7 +226,7 @@ void slTextureFree( slCamera *c, const unsigned int n ) {
 */
 
 int slUpdateTexture( slCamera *c, GLuint texture, unsigned char *pixels, int width, int height, int format ) {
-	unsigned char *newpixels;
+	unsigned char *newpixels = NULL;
 	int newheight, newwidth;
 
 	if ( !glActive )
@@ -256,16 +256,14 @@ int slUpdateTexture( slCamera *c, GLuint texture, unsigned char *pixels, int wid
 	glTexImage2D( GL_TEXTURE_2D, 0, format, newwidth, newheight, 0, format, GL_UNSIGNED_BYTE, newpixels );
 
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
-	if ( newwidth != width || newheight != height )
+	if ( newpixels != pixels )
 		delete[] newpixels;
 
 	if ( slClearGLErrors( "error adding texture" ) )
