@@ -44,7 +44,7 @@ void *breveFrontendInitData( brEngine *engine ) {
 	// signal( SIGQUIT, stCrashCatcher );
 
 #if HAVE_LIBPYTHON
-//	brPythonInit( engine );
+	brPythonInit( engine );
 #endif
 
 	return stSteveInit( engine );

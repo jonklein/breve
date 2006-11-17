@@ -482,8 +482,6 @@ void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inT
 		return NULL;
 	}
 
-	PyObject_SetAttrString( method, "breveArgumentCount", PyInt_FromLong( inCount ) );
-
 	return method;
 }
 
@@ -564,15 +562,17 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 		return EC_ERROR;
 	}
 
-	PyObject *argumentCount = PyObject_GetAttrString( method, "breveArgumentCount" );
-	int count;
+	PyObject *code = PyObject_GetAttrString( method, "func_code" );
+	PyObject *argumentCount = PyObject_GetAttrString( code, "co_argcount" );
 
 	if( !argumentCount ) {
-		slMessage( DEBUG_ALL, "Warning: cannot find argument count for method\n" );
+		slMessage( DEBUG_ALL, "Warning: cannot find argument count for method %p\n", method );
 		return EC_ERROR;
 	}
 
-	count = PyInt_AS_LONG( argumentCount );
+	// The self argument doesn't count here
+
+	int count = PyInt_AS_LONG( argumentCount ) - 1;
 
 	PyObject *tuple = PyTuple_New( count + 1 );
 

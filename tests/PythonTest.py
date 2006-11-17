@@ -8,7 +8,7 @@ class PythonTestObject( breve.real ):
 
 		self.movie = self.controller.make_new_instance( "Movie" )
 
-		# self.movie.record( "sim.mpg" )
+		self.movie.record( "sim.mpg" )
 
 	def iterate( self ):
 		print self.controller.get_time()
