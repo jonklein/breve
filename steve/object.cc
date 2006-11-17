@@ -792,7 +792,7 @@ stMethod *stFindInstanceMethodWithArgRange( stObject *object, const char *word, 
 	std::vector< stMethod* >::iterator mi;
 
 	do {
-		methodList = object->methods[ word];
+		methodList = object->methods[ word ];
 
 		for ( mi = methodList.begin(); mi != methodList.end(); mi++ ) {
 			method = *mi;

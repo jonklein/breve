@@ -42,7 +42,8 @@ brMethod *brMethodFind( brObject *o, const char *name, unsigned char *types, int
 
 	mp = o->type->findMethod( o->userData, name, types, argCount );
 
-	if ( !mp ) return NULL;
+	if ( !mp ) 
+		return NULL;
 
 	m = new brMethod;
 
@@ -54,7 +55,8 @@ brMethod *brMethodFind( brObject *o, const char *name, unsigned char *types, int
 
 	m->name = slStrdup( name );
 
-	if ( t ) delete[] t;
+	if ( t ) 
+		delete[] t;
 
 	return m;
 }
@@ -77,7 +79,8 @@ brMethod *brMethodFindWithArgRange( brObject *o, const char *name, unsigned char
 	for ( n = max;n >= min;n-- ) {
 		brMethod *m = brMethodFind( o, name, types, n );
 
-		if ( m ) return m;
+		if ( m ) 
+			return m;
 	}
 
 	return NULL;

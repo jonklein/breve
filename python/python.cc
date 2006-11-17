@@ -22,6 +22,7 @@
 
 #ifdef HAVE_LIBPYTHON
 
+#include <signal.h>
 #include <python2.3/Python.h>
 #include "python.h"
 
@@ -317,7 +318,7 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 		return NULL;
 	}
 
-    PyObject *breveObject = PyObject_GetAttrString( callerObject, "breveInstance" );
+	PyObject *breveObject = PyObject_GetAttrString( callerObject, "breveInstance" );
 
 	if( !breveObject ) {
 		PyErr_SetString( PyExc_RuntimeError, "Internal breve function called for Python object not in breve engine (missing call to __init__ for the parent class?)" );
@@ -387,7 +388,7 @@ PyObject *brPythonFindBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 	brInstance *breveInstance = (brInstance*)PyCObject_AsVoidPtr( attrObject );
 
 	// if( !PyObject_HasAttrString( object, name ) ) {
-		brMethod *method = brMethodFindWithArgRange( breveInstance->object, name, NULL, 0, 9999 );
+		brMethod *method = brMethodFindWithArgRange( breveInstance->object, name, NULL, 0, 50 );
 
 		if( !method ) {
 			Py_INCREF( Py_None );
@@ -445,8 +446,7 @@ PyObject *brPythonCallBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 		delete args[ n ];
 	}
 
-	delete args;
-
+	delete[] args;
 
 	return result;
 }
@@ -466,13 +466,13 @@ PyObject *brPythonCallBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
  * 
  * @param inObject 	A void pointer to a Python object.
  * @param inName	The name of the method to locate.
- * 
- * Unused parameters: argument types and argument count.
+ * @param inTypes 	Argument types (currently unused)
+ * @param inCount	The argument count
  * 
  * @return 			A void pointer to a Python method object. 
  */
 
-void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *, int ) {
+void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inTypes, int inCount ) {
 	PyObject *type = ( PyObject* )inObject;
 
 	PyObject *method = PyObject_GetAttrString( type, (char*)inName );
@@ -482,7 +482,7 @@ void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *, i
 		return NULL;
 	}
 
-	// Py_INCREF( method );
+	PyObject_SetAttrString( method, "breveArgumentCount", PyInt_FromLong( inCount ) );
 
 	return method;
 }
@@ -564,10 +564,30 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 		return EC_ERROR;
 	}
 
-	PyObject *tuple = PyTuple_New( 1 );
+	PyObject *argumentCount = PyObject_GetAttrString( method, "breveArgumentCount" );
+	int count;
+
+	if( !argumentCount ) {
+		slMessage( DEBUG_ALL, "Warning: cannot find argument count for method\n" );
+		return EC_ERROR;
+	}
+
+	count = PyInt_AS_LONG( argumentCount );
+
+	PyObject *tuple = PyTuple_New( count + 1 );
+
+	// Set the self argument
 
 	Py_INCREF( instance );
 	PyTuple_SetItem( tuple, 0, instance );
+
+	// Set the rest of the arguments
+
+	for( int n = 0; n < count; n++ ) {
+		// TODO: bridge instance here
+		// brPythonTypeFromEval( inArguments[ n ], PyObject_GetAttrString( moduleObject, "bridgeObject" )  );
+		PyTuple_SetItem( tuple, n + 1, instance );
+	}
 
 	PyObject *result = PyObject_Call( method, tuple, NULL );
 

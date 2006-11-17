@@ -21,6 +21,15 @@
 #include "steve.h"
 #include "evaluation.h"
 
+//
+// So this is progress.  After moving brEvalLists over to std::vectors, I started using
+// std::sort() to do the sorting and didn't need to rely on global variables.  And all
+// was well.  Except that with gcc on Linux, std::sort requires strict weak ordering
+// (which is okay) and will crash if the ordering is not strictly weak (ouch!).  Since
+// the sort predicate is a breve callback, I really cannot control that, so we have 
+// to resort to qsort with globals.  Sorry everybody.  I know I let you all down.
+//
+
 class brEvalVectorSorter {
 
 	public:
@@ -29,7 +38,15 @@ class brEvalVectorSorter {
 			mMethod = method;
 		};
 
+		// std::sort compatible results
+
 		bool operator()( const brEval& a, const brEval& b ) {
+			return qsortCompare( a, b ) < 0.0;
+		}
+
+		// qsort compatible compare
+
+		int qsortCompare( const brEval& a, const brEval& b ) {
 			stRunInstance ri;
 			brEval result;
 			const brEval *args[ 2 ];
@@ -52,7 +69,12 @@ class brEvalVectorSorter {
 				rcode = stToDouble( &result, &result, &ri );
 			}
 
-			mSeenMap[ pair ] = ( BRDOUBLE( &result ) < 0.0 );
+			int iResult = 0;
+
+			if( BRDOUBLE( &result ) < 0.0 ) iResult = -1;
+			else if( BRDOUBLE( &result ) > 0.0 ) iResult = 1;
+
+			mSeenMap[ pair ] = iResult;
 
 			return mSeenMap[ pair ];
 		};
@@ -62,21 +84,32 @@ class brEvalVectorSorter {
 
 		stMethod *mMethod;
 
-		std::map< std::pair< const brEval*, const brEval* >, bool > mSeenMap;
+		std::map< std::pair< const brEval*, const brEval* >, int > mSeenMap;
 
 };
+
+brEvalVectorSorter *gSorter;
+
+int brEvalVectorCompare( void *inA, void *inB ) {
+	const brEval *evalA = (brEval*)inA;
+	const brEval *evalB = (brEval*)inB;
+
+	return gSorter->qsortCompare( *evalA, *evalB );
+}
 
 int stSortEvalList( brEvalListHead *head, stInstance *caller, stMethod *method ) {
 	brEvalVectorSorter sorter( caller, method );
 
 	// So it turns out that std::sort requires strict weak ordering and will crash[!]
 	// if you don't have it!  That is strictly weak!
+	// std::sort( head->_vector.begin(), head->_vector.end(), sorter );
 
-	std::sort( head->_vector.begin(), head->_vector.end(), sorter );
+	// Screw that -- we have to switch back to the old way with qsort and a global variable,
+	// but we'll use the same brEvalVectorSorter for compatibility with either method in
+	// case we figure out a way to someday go back.
+
+	gSorter = &sorter;
+	qsort( &head->_vector[ 0 ], head->_vector.size(), sizeof( brEval ), brEvalVectorCompare );
 
 	return 1;
 }
-
-// int brEvalListCompare( const void *a, const void *b ) {
-// 	return 0;
-// }

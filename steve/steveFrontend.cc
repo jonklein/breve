@@ -44,7 +44,7 @@ void *breveFrontendInitData( brEngine *engine ) {
 	// signal( SIGQUIT, stCrashCatcher );
 
 #if HAVE_LIBPYTHON
-	brPythonInit( engine );
+//	brPythonInit( engine );
 #endif
 
 	return stSteveInit( engine );
@@ -109,7 +109,7 @@ void *stFindMethodBreveCallback( void *object, const char *name, unsigned char *
 
 	if( args == -1 ) {
 		min = 0;
-		max = 9999;
+		max = 100;
 	}
 
 	stMethod *method;

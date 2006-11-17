@@ -43,6 +43,10 @@ brEval::brEval( const brEval& inCopy ) {
 	brEvalCopy( &inCopy, this );
 }
 
+brEval& brEval::operator=( const brEval& inCopy ) {
+	brEvalCopy( &inCopy, this );
+}
+
 int brEvalCopy( const brEval *s, brEval *d ) {
 	switch ( s->type() ) {
 		case AT_NULL:

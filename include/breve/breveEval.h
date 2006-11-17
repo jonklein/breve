@@ -90,6 +90,8 @@ class brEval {
 
 		~brEval() { collect(); }
 
+		brEval &operator=( const brEval &inOther );
+
 		inline void collect() {
 			if ( _type == AT_NULL || _type == AT_INT || _type == AT_MATRIX || _type == AT_VECTOR || _type == AT_DOUBLE ) return;
 			stGCUnretainAndCollectPointer( _values.pointerValue, _type );

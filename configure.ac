@@ -264,6 +264,17 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([3ds], [lib3ds_io_new])
 	AC_CHECK_LIB([ftgl], [main])
 	AC_CHECK_LIB([python], [Py_Initialize])
+	AC_CHECK_LIB([python2.3], [Py_Initialize])
+	AC_CHECK_LIB([python23], [Py_Initialize])
+
+	if test "$ac_cv_lib_python2_3_Py_Initialize" = yes; then
+		AC_DEFINE( [HAVE_LIBPYTHON] )
+	fi
+
+	if test "$ac_cv_lib_python23_Py_Initialize" = yes; then
+		AC_DEFINE( [HAVE_LIBPYTHON] )
+	fi
+
 
 	if test "x$custom_cblas" = x; then
 		AC_CHECK_LIB([gslcblas], [cblas_ccopy])
