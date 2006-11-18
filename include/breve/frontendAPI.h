@@ -58,7 +58,7 @@ void *breveFrontendInitData(brEngine *engine);
 	The code variable contains the text of the file.
 */
 
-int breveFrontendLoadSimulation(breveFrontend *d, char *code, char *file);
+int breveFrontendLoadSimulation( breveFrontend *d, const char *code, const char *file );
 
 /*!
 	\brief [TO BE IMPLEMENTED BY THE LANGUAGE FRONTEND] Load an archived simulation from a given file.
@@ -70,7 +70,7 @@ int breveFrontendLoadSimulation(breveFrontend *d, char *code, char *file);
 	with the text of that file in the code argument.
 */
 
-int breveFrontendLoadSavedSimulation(breveFrontend *d, char *code, char *file, char *xmlFile);
+int breveFrontendLoadSavedSimulation( breveFrontend *d, const char *code, const char *file, const char *xmlFile );
 
 /*!
 	\brief [TO BE IMPLEMENTED BY THE LANGUAGE FRONTEND] Called to destroy the language-frontend data.
@@ -79,7 +79,7 @@ int breveFrontendLoadSavedSimulation(breveFrontend *d, char *code, char *file, c
 	memory that was allocated with \ref breveFrontendInitData.
 */
 
-void breveFrontendCleanupData(void *data);
+void breveFrontendCleanupData( void *data );
 
 #ifdef __cplusplus
 }

@@ -17,11 +17,11 @@ class Sensor{
 	public:
 		double sense(std::vector<slWorldObject*>* neighbors, slPosition *sensorPos);
 		double sense(slVector *pos, slVector *dir);
-		double Sensor::calculateQuality(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, slWorldObject* target );
-		double Sensor::calcQualNoRay(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, slWorldObject* target );
+		double calculateQuality(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, slWorldObject* target );
+		double calcQualNoRay(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* targetLoc, slWorldObject* target );
 
-		bool Sensor::freePath(const slShape *shape, slPosition *shapePos, slPosition *sensorPos, slVector *targetLoc, bool exact);
-		bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* to, slWorldObject* target );
+		bool freePath(const slShape *shape, slPosition *shapePos, slPosition *sensorPos, slVector *targetLoc, bool exact);
+		bool freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, slVector* to, slWorldObject* target );
 		double max_range;
 		double max_angle;
 

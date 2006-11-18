@@ -60,7 +60,7 @@ To build the wxWindows frontend for Linux and Windows:
   configure script.  Building real_breve.app directly will fail, because 
   it is missing these library settings.
 
-* For the record, I am well aware that parts of this source are a bit of a mess.  
+* For the record, I am well aware that parts of this source are a total mess.  
   This project and code, in one form or another has spanned much of my undergraduate 
   education, a Master's degree and several years in research and industry.  
   Parts of this code are now almost 10 years old.  Piece by piece I'm updating

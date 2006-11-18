@@ -54,11 +54,11 @@ void breveFrontendCleanupData( void *data ) {
 	stSteveCleanup(( stSteveData* )data );
 }
 
-int breveFrontendLoadSimulation( breveFrontend *frontend, char *code, char *file ) {
+int breveFrontendLoadSimulation( breveFrontend *frontend, const char *code, const char *file ) {
 	return stLoadSimulation(( stSteveData* )frontend->data, frontend->engine, code, file );
 }
 
-int breveFrontendLoadSavedSimulation( breveFrontend *frontend, char *simcode, char *simfile, char *xmlfile ) {
+int breveFrontendLoadSavedSimulation( breveFrontend *frontend, const char *simcode, const char *simfile, const char *xmlfile ) {
 	return stLoadSavedSimulation(( stSteveData* )frontend->data, frontend->engine, simcode, simfile, xmlfile );
 }
 
@@ -263,7 +263,7 @@ int stLoadFiles( stSteveData *sdata, brEngine *engine, char *code, char *file ) 
 	Parses and loads the specified code.
 */
 
-int stLoadSimulation( stSteveData *d, brEngine *engine, char *code, char *file ) {
+int stLoadSimulation( stSteveData *d, brEngine *engine, const char *code, const char *file ) {
 	brObject *controllerClass;
 	stInstance *controller;
 	int r;
@@ -297,7 +297,7 @@ int stLoadSimulation( stSteveData *d, brEngine *engine, char *code, char *file )
 	simulation from the data stored in the provided XML file.
 */
 
-int stLoadSavedSimulation( stSteveData *sdata, brEngine *engine, char *code, char *file, char *xmlfile ) {
+int stLoadSavedSimulation( stSteveData *sdata, brEngine *engine, const char *code, const char *file, const char *xmlfile ) {
 	char *xmlpath = brFindFile( engine, xmlfile, NULL );
 
 	if ( !xmlpath ) {

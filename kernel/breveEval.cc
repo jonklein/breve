@@ -45,6 +45,7 @@ brEval::brEval( const brEval& inCopy ) {
 
 brEval& brEval::operator=( const brEval& inCopy ) {
 	brEvalCopy( &inCopy, this );
+	return *this;
 }
 
 int brEvalCopy( const brEval *s, brEval *d ) {
@@ -223,7 +224,6 @@ char *brFormatEvaluationWithSeenList( brEval *e, brInstance *i, std::set< brEval
 		case AT_LIST: {
 				std::vector< brEval >::iterator li;
 				brEvalListHead *listHead;
-				size_t len = 5;
 
 				listHead = BRLIST( e );
 

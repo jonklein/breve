@@ -33,8 +33,8 @@ int slUtilRead(int, void *, size_t);
 int slUtilRecv(int, void *, size_t);
 int slUtilWrite(int, const void *, size_t);
 
-char *slUtilReadFile(char *);
-int slUtilWriteFile(char *, char *);
+char *slUtilReadFile( const char * );
+int slUtilWriteFile( const char *, const char * );
 
 char *slUtilReadStream(FILE *);
 

@@ -141,7 +141,7 @@ int slUtilGzread( char *ptr, size_t size, gzFile stream ) {
 	the data as a slMalloc'd string.
 */
 
-char *slUtilReadFile( char *path ) {
+char *slUtilReadFile( const char *path ) {
 	char temp[2048];
 
 	struct stat st;
@@ -189,7 +189,7 @@ char *slUtilReadFile( char *path ) {
 	\brief Writes text to a file.
 */
 
-int slUtilWriteFile( char *path, char *text ) {
+int slUtilWriteFile( const char *path, const char *text ) {
 	FILE *f;
 
 	if ( !( f = fopen( path, "w" ) ) )

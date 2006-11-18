@@ -48,11 +48,11 @@ stSteveData *stSteveInit(brEngine *);
 
 int stSubclassCallback(void *, void *);
 
-int stLoadFiles(stSteveData *, brEngine *, char *, char *);
-int stParseFile(stSteveData *, brEngine *, char *);
+int stLoadFiles( stSteveData *, brEngine *, char *, char * );
+int stParseFile( stSteveData *, brEngine *, char * );
 
-int stLoadSimulation(stSteveData *, brEngine *, char *, char *);
-int stLoadSavedSimulation(stSteveData *, brEngine *, char *, char *, char *);
+int stLoadSimulation( stSteveData *, brEngine *, const char *, const char * );
+int stLoadSavedSimulation(stSteveData *, brEngine *, const char *, const char *, const char *);
 
 int stParseBuffer(stSteveData *, brEngine *, char *, char *);
 char *stNewStParseTrack(stSteveData *, char *);

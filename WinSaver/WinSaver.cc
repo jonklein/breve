@@ -18,11 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-/*
- * Based on code by Rachel Grey, lemming@alum.mit.edu.
- */
-
-
+//
+// Adapted from code by Rachel Grey, lemming@alum.mit.edu.
+//
 
 #include <windows.h>
 #include <winbase.h>
@@ -37,7 +35,6 @@
 #include "simulation.h"
 #include "gldraw.h"
 
-
 #define ABOUT_URL	"http://www.spiderland.org"
 
 void InitGL( HWND hWnd, HDC & hDC, HGLRC & hRC );
@@ -48,59 +45,44 @@ void SetupAnimation( int Width, int Height );
 void CleanupAnimation();
 void OnTimer( HDC hDC );
 
+#define TIMER 1
 
-int gWidth, gHeight; //globals for size of screen
+LRESULT WINAPI ScreenSaverProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam ) {
+	static HDC hDC;
+	static HGLRC hRC;
+	static RECT rect;
 
+	switch ( message ) {
+		case WM_CREATE: 
+			// get window dimensions
+			GetClientRect( hWnd, &rect );
+		
+			//get configuration from registry
+			GetConfig();
 
-//////////////////////////////////////////////////
-////   INFRASTRUCTURE -- THE THREE FUNCTIONS   ///
-//////////////////////////////////////////////////
+			// setup OpenGL, then animation
+			InitGL( hWnd, hDC, hRC );
+			SetupAnimation( rect.right, rect.bottom );
 
-
-// Screen Saver Procedure
-LRESULT WINAPI ScreenSaverProc(HWND hWnd, UINT message, 
-							   WPARAM wParam, LPARAM lParam) {
-  static HDC hDC;
-  static HGLRC hRC;
-  static RECT rect;
-
-  switch ( message ) {
-
-  case WM_CREATE: 
-	// get window dimensions
-	GetClientRect( hWnd, &rect );
-	gWidth = rect.right;		
-	gHeight = rect.bottom;
-	
-	//get configuration from registry
-	GetConfig();
-
-	// setup OpenGL, then animation
-	InitGL( hWnd, hDC, hRC );
-	SetupAnimation( gWidth, gHeight );
-
-	//set timer to tick every 10 ms
-	SetTimer( hWnd, TIMER, 10, NULL );
-	return 0;
+			//set timer to tick every 10 ms
+			SetTimer( hWnd, 1, 10, NULL );
+			return 0;
  
-  case WM_DESTROY:
-	KillTimer( hWnd, TIMER );
-	CleanupAnimation();
-	CloseGL( hWnd, hDC, hRC );
-	return 0;
+		case WM_DESTROY:
+			KillTimer( hWnd, TIMER );
+			CleanupAnimation();
+			CloseGL( hWnd, hDC, hRC );
+			return 0;
 
-  case WM_TIMER:
-	OnTimer( hDC );	//animate!	
-	return 0;				
+		case WM_TIMER:
+			OnTimer( hDC );	//animate!	
+			return 0;				
+	}
 
-  }
-
-  return DefScreenSaverProc( hWnd, message, wParam, lParam );
-
+	return DefScreenSaverProc( hWnd, message, wParam, lParam );
 }
 
-BOOL WINAPI
-ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+BOOL WINAPI ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
 	if( message == WM_INITDIALOG  )
 		return TRUE;
 
@@ -109,8 +91,7 @@ ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
 
 		switch( command ) {
 			case IDABOUT:
-				LONG result = (long) ::ShellExecute( NULL, "open", ABOUT_URL, NULL, NULL, SW_SHOWNORMAL );
-	
+				::ShellExecute( NULL, "open", ABOUT_URL, NULL, NULL, SW_SHOWNORMAL );
 				return TRUE;
 				break;
 	
@@ -124,36 +105,26 @@ ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
 		}
 	}
 
-	// 	LoadString( hMainInstance, IDS_DESCRIPTION, szAppName, 40 );
-
 	return FALSE;
 }
 
 BOOL WINAPI RegisterDialogClasses(HANDLE hInst) {
-  return TRUE;
+	return TRUE;
 }
 
-/////////////////////////////////////////////////
-////   INFRASTRUCTURE ENDS, SPECIFICS BEGIN   ///
-////										  ///
-////	In a more complex scr, I'd put all	///
-////	 the following into other files.	  ///
-/////////////////////////////////////////////////
 
-
-// Initialize OpenGL
 void InitGL(HWND hWnd, HDC & hDC, HGLRC & hRC) {
 	PIXELFORMATDESCRIPTOR pfd;
 	ZeroMemory( &pfd, sizeof( pfd ) );
 
 	pfd.nSize = sizeof pfd;
 	pfd.nVersion = 1;
-	pfd.dwFlags = PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_GENERIC_ACCELERATED;
+	pfd.dwFlags = PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
 	pfd.iPixelType = PFD_TYPE_RGBA;
 	pfd.cColorBits = 24;
-  
+	
 	hDC = GetDC( hWnd );
-  
+	
 	int i = ChoosePixelFormat( hDC, &pfd );  
 	SetPixelFormat( hDC, i, &pfd );
 
@@ -162,15 +133,15 @@ void InitGL(HWND hWnd, HDC & hDC, HGLRC & hRC) {
 }
 
 void CloseGL(HWND hWnd, HDC hDC, HGLRC hRC) {
-  wglMakeCurrent( NULL, NULL );
-  wglDeleteContext( hRC );
-  ReleaseDC( hWnd, hDC );
+	wglMakeCurrent( NULL, NULL );
+	wglDeleteContext( hRC );
+	ReleaseDC( hWnd, hDC );
 }
 
 breveFrontend *gFrontend;
 
 void SetupAnimation( int inWidth, int inHeight ) {
-	glViewport( 0, 0, 300, 300 );
+	glViewport( 0, 0, inWidth, inHeight );
 
 	slSetMessageCallbackFunction( NULL );
 
@@ -199,10 +170,9 @@ void SetupAnimation( int inWidth, int inHeight ) {
 	slInitGL( gFrontend->engine->world, gFrontend->engine->camera );
 }
 
-void OnTimer(HDC hDC) {
+void OnTimer( HDC hDC ) {
 	brEngineIterate( gFrontend->engine );
 	brEngineRenderWorld( gFrontend->engine, 0 );
-
 	SwapBuffers(hDC);
 }
 
