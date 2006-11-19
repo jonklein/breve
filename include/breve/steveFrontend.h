@@ -48,26 +48,26 @@ stSteveData *stSteveInit(brEngine *);
 
 int stSubclassCallback(void *, void *);
 
-int stLoadFiles( stSteveData *, brEngine *, char *, char * );
-int stParseFile( stSteveData *, brEngine *, char * );
+int stLoadFiles( stSteveData *, brEngine *, const char *, const char * );
+int stParseFile( stSteveData *, brEngine *, const char * );
 
 int stLoadSimulation( stSteveData *, brEngine *, const char *, const char * );
 int stLoadSavedSimulation(stSteveData *, brEngine *, const char *, const char *, const char *);
 
-int stParseBuffer(stSteveData *, brEngine *, char *, char *);
-char *stNewStParseTrack(stSteveData *, char *);
-void stFreeParseTrack(stSteveData *);
-char *stFindParseTrack(slList *, char *);
-stVersionRequirement *stMakeVersionRequirement(float, int);
-int stCheckVersionRequirement(float, stVersionRequirement *);
-void stObjectAllocationReport(stObject *);
-void stParseError(brEngine *, int, char *, ...);
+int stParseBuffer( stSteveData *, brEngine *, const char *, const char * );
+char *stNewStParseTrack( stSteveData *, const char * );
+void stFreeParseTrack( stSteveData * );
+char *stFindParseTrack( slList *, const char * );
+stVersionRequirement *stMakeVersionRequirement( float, int );
+int stCheckVersionRequirement( float, stVersionRequirement * );
+void stObjectAllocationReport( stObject * );
+void stParseError( brEngine *, int, char *, ... );
 
-void stSteveCleanup(stSteveData *);
+void stSteveCleanup( stSteveData * );
 
-int stPreprocess(stSteveData *, brEngine *, char *);
+int stPreprocess(stSteveData *, brEngine *, const char *);
 
-int stSetControllerName(stSteveData *, brEngine *, char *);
+int stSetControllerName(stSteveData *, brEngine *, const char *);
 
-void stSetParseData(stSteveData *, char *, int);
+void stSetParseData( stSteveData *, const char *, int );
 

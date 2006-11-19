@@ -41,7 +41,7 @@ stMethod *currentMethod = NULL;
 stSteveData *steveData;
 
 extern int lineno;
-extern char *yyfile;
+extern const char *yyfile;
 
 int gReparse;
 

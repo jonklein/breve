@@ -90,7 +90,7 @@ class brEvalVectorSorter {
 
 brEvalVectorSorter *gSorter;
 
-int brEvalVectorCompare( void *inA, void *inB ) {
+int brEvalVectorCompare( const void *inA, const void *inB ) {
 	const brEval *evalA = (brEval*)inA;
 	const brEval *evalB = (brEval*)inB;
 
@@ -109,6 +109,7 @@ int stSortEvalList( brEvalListHead *head, stInstance *caller, stMethod *method )
 	// case we figure out a way to someday go back.
 
 	gSorter = &sorter;
+
 	qsort( &head->_vector[ 0 ], head->_vector.size(), sizeof( brEval ), brEvalVectorCompare );
 
 	return 1;

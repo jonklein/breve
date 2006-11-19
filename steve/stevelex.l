@@ -28,7 +28,7 @@
 
 #include "steveparse.tab.h"
 
-static char *parseString;
+static const char *parseString;
 static int parseLength;
 static int parseLoc = 0;
 
@@ -225,9 +225,8 @@ void yyerror(char *c) {
     gErrorLine = lineno;
 }
 
-void stSetParseData(stSteveData *d, char *string, int length) {
+void stSetParseData( stSteveData *d, const char *string, int length ) {
     parseString = string;
     parseLength = length;
     parseLoc = 0;
-	// steveData = d;
 }

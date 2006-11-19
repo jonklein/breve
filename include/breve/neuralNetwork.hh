@@ -67,7 +67,7 @@ class slNeuralNetwork {
         
         void setNeuronStateBounds(const float lower, const float upper);
         
-        int getNeuronCount() const;
+        unsigned int getNeuronCount() const;
         float getMaxWeight() const;
         float getMinWeight() const;
         float getMaxNeuralActivity() const;

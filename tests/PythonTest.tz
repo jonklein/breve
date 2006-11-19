@@ -22,8 +22,10 @@ Control : myController {
 		# and sets up the simulation
 
 
-		pythonLoadFile( "tests/PythonTest.py" ).
+		pythonLoadFile( "PythonTest.py" ).
 		pythonObject = new PythonTestObject.
+
+		pythonObject argumentTest i 30 f 200.9 l { "a", 10, 20.0 }.
 
 	+ to iterate:
 		# place code that should be called during every 

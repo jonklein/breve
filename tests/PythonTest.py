@@ -10,6 +10,12 @@ class PythonTestObject( breve.real ):
 
 		self.movie.record( "sim.mpg" )
 
+	def argumentTest( self, i, f, l ):
+		print i
+		print f
+		print l
+		return 3.14
+
 	def iterate( self ):
 		print self.controller.get_time()
 

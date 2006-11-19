@@ -220,10 +220,10 @@ typedef struct stRtcCodeBlock_t {
 
 class stExp {
 	public:
-		stExp(char *f, int l) {
+		stExp( const char *file, int l ) {
 			block = NULL;
 			line = l;
-			file = f;
+			file = file;
 
 			debug = false;
 			block = NULL;
@@ -239,14 +239,14 @@ class stExp {
 		bool debug;
 
 		int line;
-		char *file;
+		const char *file;
 	
 		stRtcCodeBlock	*block;
 };
 
 class stRandomExp : public stExp {
 	public:
-		stRandomExp(stExp *e, char *file, int line) : stExp(file, line) {
+		stRandomExp(stExp *e, const char *file, int line) : stExp(file, line) {
 			expression = e;
 			type = ET_RANDOM;
 		}
@@ -260,7 +260,7 @@ class stRandomExp : public stExp {
 
 class stListExp : public stExp {
 	public:
-		stListExp(std::vector< stExp* > *e, char *file, int line) : stExp(file, line) {
+		stListExp(std::vector< stExp* > *e, const char *file, int line) : stExp(file, line) {
 			if(e) expressions = *e;
 			type = ET_LIST;
 		}
@@ -270,7 +270,7 @@ class stListExp : public stExp {
 
 class stCodeArrayExp : public stExp {
 	public:
-		stCodeArrayExp(std::vector< stExp* > *e, char *file, int line) : stExp(file, line) {
+		stCodeArrayExp(std::vector< stExp* > *e, const char *file, int line) : stExp(file, line) {
 			if(e) expressions = *e;
 			type = ET_CODE_ARRAY;
 		}
@@ -280,7 +280,7 @@ class stCodeArrayExp : public stExp {
 
 class stCopyListExp : public stExp {
 	public:
-		stCopyListExp(stExp *e, char *file, int line);
+		stCopyListExp(stExp *e, const char *file, int line);
 		~stCopyListExp();
 
 		stExp *expression;
@@ -288,7 +288,7 @@ class stCopyListExp : public stExp {
 
 class stDieExp : public stExp {
 	public:
-		stDieExp(stExp *e, char *file, int line) : stExp(file, line) { 
+		stDieExp(stExp *e, const char *file, int line) : stExp(file, line) { 
 			expression = e;
 			type = ET_DIE; 
 		}
@@ -298,17 +298,17 @@ class stDieExp : public stExp {
 
 class stSelfExp : public stExp {
 	public:
-		stSelfExp(char *file, int line) : stExp(file, line) { type = ET_SELF; }
+		stSelfExp(const char *file, int line) : stExp(file, line) { type = ET_SELF; }
 };
 
 class stSuperExp : public stExp {
 	public:
-		stSuperExp(char *file, int line) : stExp(file, line) { type = ET_SUPER; }
+		stSuperExp(const char *file, int line) : stExp(file, line) { type = ET_SUPER; }
 };
 
 class stFreeExp : public stExp {
 	public:
-		stFreeExp(stExp *e, char *file, int line);
+		stFreeExp(stExp *e, const char *file, int line);
 		~stFreeExp();
 
 		stExp *expression;
@@ -316,7 +316,7 @@ class stFreeExp : public stExp {
 
 class stEvalExp : public stExp {
 	public:
-		stEvalExp(brEval *e, char *file, int line);
+		stEvalExp(brEval *e, const char *file, int line);
 		~stEvalExp();
 
 		brEval *eval;
@@ -324,14 +324,14 @@ class stEvalExp : public stExp {
 
 class stIntExp : public stExp {
 	public:
-		stIntExp(int i, char *file, int line);
+		stIntExp(int i, const char *file, int line);
 
 		int intValue;
 };
 
 class stReturnExp : public stExp {
 	public:
-		stReturnExp(stExp *e, char *file, int line);
+		stReturnExp(stExp *e, const char *file, int line);
 		~stReturnExp();
 
 		stExp *expression;
@@ -339,7 +339,7 @@ class stReturnExp : public stExp {
 
 class stLengthExp : public stExp {
 	public:
-		stLengthExp(stExp *e, char *file, int line);
+		stLengthExp(stExp *e, const char *file, int line);
 		~stLengthExp();
 
 		stExp *expression;
@@ -347,14 +347,14 @@ class stLengthExp : public stExp {
 
 class stDoubleExp : public stExp {
 	public:
-		stDoubleExp(double d, char *file, int line);
+		stDoubleExp(double d, const char *file, int line);
 
 		double doubleValue;
 };
 
 class stStringExp : public stExp {
 	public:
-		stStringExp(char *str, stMethod *m, stObject *o, char *file, int line);
+		stStringExp( char *str, stMethod *m, stObject *o, const char *file, int line );
 		~stStringExp();
 
 		int baseSize;
@@ -365,7 +365,7 @@ class stStringExp : public stExp {
 
 class stSubstringExp : public stExp {
 	public:
-		stSubstringExp(char *file, int line) : stExp(file, line) {};
+		stSubstringExp( const char *file, int line ) : stExp(file, line) {};
 
 		stExp *loadExp;
 		std::string string;
@@ -375,7 +375,7 @@ class stSubstringExp : public stExp {
 
 class stBinaryExp : public stExp {
 	public:
-		stBinaryExp(unsigned char o, stExp *le, stExp *re, char *f, int l);
+		stBinaryExp( unsigned char o, stExp *le, stExp *re, const char *file, int line );
 		~stBinaryExp();
 
 		unsigned char op;
@@ -385,7 +385,7 @@ class stBinaryExp : public stExp {
 
 class stUnaryExp : public stExp {
 	public:
-		stUnaryExp(unsigned char o, stExp *e, char *f, int l);
+		stUnaryExp( unsigned char o, stExp *e, const char *file, int line );
 		~stUnaryExp();
 
 		unsigned char op;
@@ -394,7 +394,7 @@ class stUnaryExp : public stExp {
 
 class stVectorExp : public stExp {
 	public:
-		stVectorExp(stExp *x, stExp *y, stExp *z, char *f, int l);
+		stVectorExp( stExp *x, stExp *y, stExp *z, const char *file, int line );
 		~stVectorExp();
 
 		stExp *_x;
@@ -404,7 +404,7 @@ class stVectorExp : public stExp {
 
 class stMatrixExp : public stExp {
 	public:
-		stMatrixExp(stExp *e00, stExp *e01, stExp *e02, stExp *e10, stExp *e11, stExp *e12, stExp *e20, stExp *e21, stExp *e22, char *file, int line);
+		stMatrixExp( stExp *e00, stExp *e01, stExp *e02, stExp *e10, stExp *e11, stExp *e12, stExp *e20, stExp *e21, stExp *e22, const char *file, int line );
 		~stMatrixExp();
 
 		stExp *expressions[9];
@@ -412,7 +412,7 @@ class stMatrixExp : public stExp {
 
 class stPrintExp : public stExp {
 	public:
-		stPrintExp(std::vector< stExp* > *expressions, int newline, char *file, int lineno);
+		stPrintExp(std::vector< stExp* > *expressions, int newline, const char *file, int lineno);
 		~stPrintExp();
 
 		std::vector< stExp* > expressions;
@@ -421,7 +421,7 @@ class stPrintExp : public stExp {
 
 class stVectorElementExp : public stExp {
 	public:
-		stVectorElementExp(stExp *v, char e, char *file, int line);
+		stVectorElementExp(stExp *v, char e, const char *file, int line);
 		~stVectorElementExp();
 
 		stExp *exp;
@@ -430,14 +430,14 @@ class stVectorElementExp : public stExp {
 
 class stDuplicateExp : public stExp {
 	public:
-		stDuplicateExp(stExp *e, char *file, int l);
+		stDuplicateExp(stExp *e, const char *file, int l);
 
 		stExp *expression;
 };
 
 class stVectorElementAssignExp : public stExp {
 	public:
-		stVectorElementAssignExp(stExp *v, stExp *rvalue, char element, char *file, int line);
+		stVectorElementAssignExp(stExp *v, stExp *rvalue, char element, const char *file, int line);
 		~stVectorElementAssignExp();
 
 		stExp *exp;
@@ -447,7 +447,7 @@ class stVectorElementAssignExp : public stExp {
 
 class stListInsertExp : public stExp {
 	public:
-		stListInsertExp(stExp *le, stExp *ee, stExp *ie, char *file, int l);
+		stListInsertExp(stExp *le, stExp *ee, stExp *ie, const char *file, int l);
 		~stListInsertExp();
 
 		stExp *exp;
@@ -457,7 +457,7 @@ class stListInsertExp : public stExp {
 
 class stListRemoveExp : public stExp {
 	public:
-		stListRemoveExp(stExp *list, stExp *index, char *file, int lineno);
+		stListRemoveExp(stExp *list, stExp *index, const char *file, int lineno);
 		~stListRemoveExp();
 
 		stExp *listExp;
@@ -466,7 +466,7 @@ class stListRemoveExp : public stExp {
 
 class stSortExp : public stExp {
 	public:
-		stSortExp(stExp *list, char *method, char *file, int lineno);
+		stSortExp(stExp *list, char *method, const char *file, int lineno);
 		~stSortExp();
 
 		stExp *listExp;
@@ -475,7 +475,7 @@ class stSortExp : public stExp {
 
 class stListIndexExp : public stExp {
 	public:
-		stListIndexExp(stExp *list, stExp *index, char *file, int lineno);
+		stListIndexExp(stExp *list, stExp *index, const char *file, int lineno);
 		~stListIndexExp();
 
 		stExp *listExp;
@@ -484,7 +484,7 @@ class stListIndexExp : public stExp {
 
 class stListIndexAssignExp : public stExp {
 	public:
-		stListIndexAssignExp(stExp *list, stExp *index, stExp *assignment, char *file, int lineno);
+		stListIndexAssignExp(stExp *list, stExp *index, stExp *assignment, const char *file, int lineno);
 		~stListIndexAssignExp();
 
 		stExp *listExp;
@@ -494,7 +494,7 @@ class stListIndexAssignExp : public stExp {
 
 class stMethodExp : public stExp {
 	public:
-		stMethodExp(stExp *o, char *n, std::vector<stKeyword*> *a, char *f, int l);
+		stMethodExp( stExp *o, char *n, std::vector<stKeyword*> *a, const char *file, int line );
 
 		~stMethodExp();
 
@@ -512,7 +512,7 @@ class stMethodExp : public stExp {
 
 class stAssignExp : public stExp {
 	public:
-		stAssignExp(stMethod *m, stObject *o, char *word, stExp *rvalue, char *file, int line);
+		stAssignExp(stMethod *m, stObject *o, char *word, stExp *rvalue, const char *file, int line);
 		~stAssignExp();
 
 		int _offset;
@@ -525,7 +525,7 @@ class stAssignExp : public stExp {
 
 class stLoadExp : public stExp {
 	public:
-		stLoadExp(stMethod *m, stObject *o, char *word, char *f, int l);
+		stLoadExp(stMethod *m, stObject *o, char *word, const char *file, int l);
 
 		int offset;
 		char local;
@@ -534,7 +534,7 @@ class stLoadExp : public stExp {
 
 class stArrayExp : public stExp {
 	public:
-		stArrayExp(std::vector< stExp* > *e, char *f, int l) : stExp(f, l) {
+		stArrayExp( std::vector< stExp* > *e, const char *file, int l ) : stExp( file, l ) {
 			expressions = *e; 
 			type = ET_EXP_ARRAY;
 		}
@@ -551,7 +551,7 @@ class stArrayExp : public stExp {
 
 class stArrayIndexAssignExp : public stExp {
 	public:
-		stArrayIndexAssignExp(stMethod *m, stObject *o, char *word, stExp *i, stExp *rv, char *file, int line);
+		stArrayIndexAssignExp(stMethod *m, stObject *o, char *word, stExp *i, stExp *rv, const char *file, int line);
 		~stArrayIndexAssignExp();
 
 		int offset;
@@ -566,7 +566,7 @@ class stArrayIndexAssignExp : public stExp {
 
 class stArrayIndexExp : public stExp {
 	public:
-		stArrayIndexExp(stMethod *m, stObject *o, char *word, stExp *i, char *file, int line);
+		stArrayIndexExp(stMethod *m, stObject *o, char *word, stExp *i, const char *file, int line);
 		~stArrayIndexExp();
 
 		int offset;
@@ -579,7 +579,7 @@ class stArrayIndexExp : public stExp {
 
 class stWhileExp : public stExp {
 	public:
-		stWhileExp(stExp *cn, stExp *cd, char *file, int lineno);
+		stWhileExp(stExp *cn, stExp *cd, const char *file, int lineno);
 		~stWhileExp();
 
 		stExp *cond;
@@ -588,7 +588,7 @@ class stWhileExp : public stExp {
 
 class stForeachExp : public stExp {
 	public:
-		stForeachExp(stAssignExp *a, stExp *l, stExp *c, char *file, int lineno);
+		stForeachExp(stAssignExp *a, stExp *l, stExp *c, const char *file, int lineno);
 		~stForeachExp();
 
 		stAssignExp *assignment;
@@ -598,7 +598,7 @@ class stForeachExp : public stExp {
 
 class stForExp : public stExp {
 	public:
-		stForExp(stExp *a, stExp *cn, stExp *i, stExp *cd, char *file, int lineno);
+		stForExp(stExp *a, stExp *cn, stExp *i, stExp *cd, const char *file, int lineno);
 		~stForExp();
 
 		stExp *assignment;
@@ -609,7 +609,7 @@ class stForExp : public stExp {
 
 class stIfExp : public stExp {
 	public:
-		stIfExp(stExp *c, stExp *t, stExp *f, char *file, int lineno);
+		stIfExp(stExp *c, stExp *t, stExp *f, const char *file, int lineno);
 		~stIfExp();
 
 		stExp *cond;
@@ -619,7 +619,7 @@ class stIfExp : public stExp {
 
 class stAllExp : public stExp {
 	public:
-		stAllExp(char *objectName, char *file, int line);
+		stAllExp(char *objectName, const char *file, int line);
 		~stAllExp();
 
 		std::string name;
@@ -628,7 +628,7 @@ class stAllExp : public stExp {
 
 class stInstanceExp : public stExp {
 	public:
-		stInstanceExp(char *n, stExp *c, char *f, int l) : stExp(f, l) {
+		stInstanceExp( char *n, stExp *c, const char *file, int line ) : stExp( file, line ) {
 			name = n;
 			count = c;
 
@@ -645,7 +645,7 @@ class stInstanceExp : public stExp {
 
 class stCCallExp : public stExp {
 	public:
-		stCCallExp(brEngine *e, brInternalFunction *s, std::vector< stExp* > *expressions, char *file, int line);
+		stCCallExp(brEngine *e, brInternalFunction *s, std::vector< stExp* > *expressions, const char *file, int line);
 		~stCCallExp();
 
 		brInternalFunction *_function;
@@ -654,7 +654,7 @@ class stCCallExp : public stExp {
 
 class stKeyword {
 	public:
-		stKeyword(char *w, stExp *v) {
+		stKeyword( const char *w, stExp *v ) {
 			word = w;
 			value = v;
 		}

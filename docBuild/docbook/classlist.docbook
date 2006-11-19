@@ -162,6 +162,12 @@ Full API documentation for the class <function>Genome</function> can be found <u
 Full API documentation for the class <function>Graph</function> can be found <ulink url="http://www.spiderland.org/documentation/classes/Graph.html">here</ulink>.
 </para>
 </sect1>
+<sect1 id="IRSensor"><title>IRSensor</title>
+<para>
+<indexterm><primary>IRSensor class</primary></indexterm>
+Full API documentation for the class <function>IRSensor</function> can be found <ulink url="http://www.spiderland.org/documentation/classes/IRSensor.html">here</ulink>.
+</para>
+</sect1>
 <sect1 id="Image"><title>Image</title>
 <para>
 <indexterm><primary>Image class</primary></indexterm>

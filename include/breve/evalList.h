@@ -27,7 +27,7 @@
 	random-access.  Reference counting enabled.
 */
 
-class brEvalListHead: public brEvalObject {
+class DLLEXPORT brEvalListHead: public brEvalObject {
 	public:
 		brEvalListHead();
 		~brEvalListHead();

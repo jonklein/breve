@@ -37,7 +37,7 @@
 	Does terrible things to theString.  Too horrible to discuss here.
 */
 
-stStringExp::stStringExp( char *theString, stMethod *m, stObject *o, char *file, int line ) : stExp( file, line ) {
+stStringExp::stStringExp( char *theString, stMethod *m, stObject *o, const char *file, int line ) : stExp( file, line ) {
 	char *s;
 	char sym, prev = 0;
 	char *varstart, *varend, *varname;

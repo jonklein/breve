@@ -18,19 +18,19 @@ class brEval;
 struct slList;
 struct slStack;
 
-/*! \addtogroup breveObjectAPI */
+/** \addtogroup breveObjectAPI */
 /*@{*/
 
-/*!
-	\brief A type of object, required for each frontend language.
-
-	brObjectType is an interface that allows breve to preform common tasks
-	for a variety of frontend languages.  It contains function pointers 
-	that allow breve to create and destroy instances, call methods, etc.
-
-	If you create a new frontend, you'll need to create a brObjectType and
-	provide it with functions to do the various tasks.
-*/
+/**
+ * \brief A type of object, required for each frontend language.
+ *
+ * brObjectType is an interface that allows breve to preform common tasks
+ * for a variety of frontend languages.  It contains function pointers 
+ * that allow breve to create and destroy instances, call methods, etc.
+ *
+ * If you create a new frontend, you'll need to create a brObjectType and
+ * provide it with functions to do the various tasks.
+ */
 
 struct brObjectType {
 	brObjectType() {
@@ -61,16 +61,32 @@ struct brObjectType {
 	void 			(*destroyInstance)( void * );
 	void 			(*destroyObjectType)( void * );
 
+	/**
+ 	 * A function to execute code in this frontend language.  
+	 */
+
+	int			(*evaluate)( brEngine *, char *inFilename, char *inFiletext );
+
+	/**
+	 * A user-data callback pointer.
+	 */
+
 	void 			*userData;
+
+	/**
+	 * A unique identifier which will be set for all objects of this object type.  This
+	 * identifier can be used to determine whether an instance or object is native to 
+	 * a certain object type.
+	 */
 
 	long			_typeSignature;
 };
 
-/*!
-	\brief An object class.
-
-	An object class, of any language.
-*/
+/**
+ * \brief An object class.
+ *
+ * An object class, of any language.
+ */
 
 struct brObject {
 	void *userData;
@@ -82,15 +98,14 @@ struct brObject {
 	slStack *collisionHandlers;
 };
 
-/*!
-	\brief A breve instance, of any language.
-	
-	brInstance is an object instance in the breve engine, though the 
-	object could be part of any language, steve, java, SmallTalk, etc.
-
-	Note: the "object" field was previously named "class".  This has been
-	changed to avoid conflicts with C++ compilers.
-*/
+/**
+ * \brief A breve instance, of any language.
+ *
+ * brInstance is an object instance in the breve engine, though the 
+ * object could be part of any language, steve, java, SmallTalk, etc.
+ * Note: the "object" field was previously named "class".  This has been
+ * changed to avoid conflicts with C++ compilers.
+ */
 
 struct brInstance {
 	brInstance( brEngine *inEngine, brObject *inObject ) {
@@ -121,26 +136,26 @@ struct brInstance {
 	slList *observees;
 };
 
-/*!
-	\brief A collision handler.
-
-	Keeps track of what methods are used to handle collisions between objects.
-*/
+/**
+ * \brief A collision handler.
+ *
+ * Keeps track of what methods are used to handle collisions between objects.
+ */
 
 struct brCollisionHandler {
-    brObject *object;
-    brMethod *method;
+	brObject *object;
+	brMethod *method;
 	unsigned char ignore;
 };
 
-/*!
-	\brief A reference to a native method.
-
-	A reference to a method of any language.
-
-	Note: the "object" field was previously named "class".  This has been
-	changed to avoid conflicts with C++ compilers.
-*/
+/**
+ * \brief A reference to a native method.
+ * 
+ * A reference to a method of any language.
+ *
+ * Note: the "object" field was previously named "class".  This has been
+ * changed to avoid conflicts with C++ compilers.
+ */
 
 struct brMethod {
 	~brMethod() {
@@ -158,12 +173,12 @@ struct brMethod {
 	int argumentCount;
 };
 
-/*!
-	\brief An observation.
-
-	Contains information about one object watching another, waiting for 
-	a certain announcement.
-*/
+/**
+ * \brief An observer object.
+ *
+ * Contains information about one object watching another, waiting for 
+ * a certain announcement.
+ */
 
 struct brObserver {
 	brObserver( brInstance *obs, brMethod *meth, char *note ) {

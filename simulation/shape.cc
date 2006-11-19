@@ -1319,7 +1319,7 @@ slShape *slDeserializeShape( slSerializedShapeHeader *header, int length ) {
 	return s;
 }
 
-void slSphere::bounds( slPosition *position, slVector *min, slVector *max ) {
+void slSphere::bounds( const slPosition *position, slVector *min, slVector *max ) const {
 	max->x = position->location.x + ( _radius );
 	max->y = position->location.y + ( _radius );
 	max->z = position->location.z + ( _radius );
@@ -1330,8 +1330,8 @@ void slSphere::bounds( slPosition *position, slVector *min, slVector *max ) {
 
 }
 
-void slShape::bounds( slPosition *position, slVector *min, slVector *max ) {
-	std::vector<slPoint*>::iterator pi;
+void slShape::bounds( const slPosition *position, slVector *min, slVector *max ) const {
+	std::vector< slPoint* >::const_iterator pi;
 
 	slVectorSet( max, INT_MIN, INT_MIN, INT_MIN );
 	slVectorSet( min, INT_MAX, INT_MAX, INT_MAX );
@@ -1344,15 +1344,11 @@ void slShape::bounds( slPosition *position, slVector *min, slVector *max ) {
 		slVectorAdd( &loc, &position->location, &loc );
 
 		if ( loc.x > max->x ) max->x = loc.x;
-
 		if ( loc.y > max->y ) max->y = loc.y;
-
 		if ( loc.z > max->z ) max->z = loc.z;
 
 		if ( loc.x < min->x ) min->x = loc.x;
-
 		if ( loc.y < min->y ) min->y = loc.y;
-
 		if ( loc.z < min->z ) min->z = loc.z;
 	}
 }

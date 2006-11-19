@@ -12,8 +12,7 @@
 
 #include "signal.h"
 
-extern char *yyfile;
-
+extern const char *yyfile;
 extern int lineno;
 
 stSteveData *currentData;
@@ -30,18 +29,6 @@ void stCrashCatcher( int s ) {
 }
 
 void *breveFrontendInitData( brEngine *engine ) {
-
-#if HAVE_LIBJAVA
-	// brJavaInit(engine);
-#endif
-
-	// signal( SIGSEGV, stCrashCatcher );
-	// signal( SIGILL, stCrashCatcher );
-	// signal( SIGBUS, stCrashCatcher );
-	// signal( 8 , stCrashCatcher );
-	// signal( SIGABRT, stCrashCatcher );
-	// signal( SIGTRAP, stCrashCatcher );
-	// signal( SIGQUIT, stCrashCatcher );
 
 #if HAVE_LIBPYTHON
 	brPythonInit( engine );
@@ -147,7 +134,7 @@ stSteveData *stSteveInit( brEngine *engine ) {
 	sd->steveObjectType.findMethod 		= stFindMethodBreveCallback;
 	sd->steveObjectType.isSubclass 		= stSubclassCallback;
 	sd->steveObjectType.instantiate 	= stInstanceNewCallback;
-	sd->steveObjectType.destroyInstance = stInstanceFreeCallback;
+	sd->steveObjectType.destroyInstance 	= stInstanceFreeCallback;
 	sd->steveObjectType.userData		= ( void* )sd;
 	sd->steveObjectType._typeSignature 	= STEVE_TYPE_SIGNATURE;
 
@@ -196,7 +183,7 @@ void stSteveCleanup( stSteveData *d ) {
 	is called externally to load in files for a simulation.
 */
 
-int stLoadFiles( stSteveData *sdata, brEngine *engine, char *code, char *file ) {
+int stLoadFiles( stSteveData *sdata, brEngine *engine, const char *code, const char *file ) {
 	int r;
 	brObject *controller;
 	char *path = slStrdup( file );
@@ -327,7 +314,7 @@ int stLoadSavedSimulation( stSteveData *sdata, brEngine *engine, const char *cod
 	stParseBuffer, not typically called manually.
 */
 
-int stParseFile( stSteveData *sdata, brEngine *engine, char *filename ) {
+int stParseFile( stSteveData *sdata, brEngine *engine, const char *filename ) {
 
 	struct stat fs;
 	char *path = NULL;
@@ -369,8 +356,8 @@ int stParseFile( stSteveData *sdata, brEngine *engine, char *filename ) {
 	Typically called by stParseFile, which reads in the file first.
 */
 
-int stParseBuffer( stSteveData *s, brEngine *engine, char *buffer, char *filename ) {
-	char *thisFile;
+int stParseBuffer( stSteveData *s, brEngine *engine, const char *buffer, const char *filename ) {
+	const char *thisFile;
 
 	if ( std::find( s->filesSeen.begin(), s->filesSeen.end(), std::string( filename ) ) != s->filesSeen.end() ) {
 		slMessage( DEBUG_INFO, "skipping \"%s\", already included\n", filename );
@@ -427,13 +414,13 @@ int stParseBuffer( stSteveData *s, brEngine *engine, char *buffer, char *filenam
 	aren't so many.
 */
 
-int stPreprocess( stSteveData *s, brEngine *engine, char *line ) {
-	char *start, *end;
+int stPreprocess( stSteveData *s, brEngine *engine, const char *line ) {
+	const char *start, *end;
 	char *filename;
 	int n;
 	int include = 0, path = 0, use = 0;
 	char useWord[1024];
-	char *oldYyfile = yyfile;
+	const char *oldYyfile = yyfile;
 	int oldLineno = lineno;
 
 	/* i don't wanna comment this */
@@ -629,7 +616,7 @@ void stParseError( brEngine *e, int type, char *proto, ... ) {
 	\brief Set the steve controller object for the simulation.
 */
 
-int stSetControllerName( stSteveData *data, brEngine *engine, char *controller ) {
+int stSetControllerName( stSteveData *data, brEngine *engine, const char *controller ) {
 	if ( data->controllerName ) {
 		stParseError( engine, PE_REDEFINITION, "Redefinition of \"Controller\" object" );
 		return -1;

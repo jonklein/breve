@@ -577,7 +577,7 @@ const std::vector< std::string > &brEngineGetSearchPaths( brEngine *e ) {
 	as an slMalloc'd string which must be freed by the caller.
 */
 
-char *brFindFile( brEngine *e, char *file, struct stat *st ) {
+char *brFindFile( brEngine *e, const char *file, struct stat *st ) {
 	struct stat localStat;
 	std::vector< std::string >::iterator pi;
 	char path[ MAXPATHLEN ];

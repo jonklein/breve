@@ -30,7 +30,7 @@
 #include "steve.h"
 #include "expression.h"
 
-stEvalExp::stEvalExp( brEval *e, char *file, int line ) : stExp( file, line ) {
+stEvalExp::stEvalExp( brEval *e, const char *file, int line ) : stExp( file, line ) {
 	eval = e;
 	type = ET_ST_EVAL;
 }
@@ -39,7 +39,7 @@ stEvalExp::~stEvalExp() {
 	stGCUnretain( eval );
 }
 
-stReturnExp::stReturnExp( stExp *e, char *file, int line ) : stExp( file, line ) {
+stReturnExp::stReturnExp( stExp *e, const char *file, int line ) : stExp( file, line ) {
 	expression = e;
 	type = ET_RETURN;
 }
@@ -48,7 +48,7 @@ stReturnExp::~stReturnExp() {
 	delete expression;
 }
 
-stFreeExp::stFreeExp( stExp *e, char *file, int line ) : stExp( file, line ) {
+stFreeExp::stFreeExp( stExp *e, const char *file, int line ) : stExp( file, line ) {
 	expression = e;
 	type = ET_FREE;
 }
@@ -57,7 +57,7 @@ stFreeExp::~stFreeExp() {
 	delete expression;
 }
 
-stCopyListExp::stCopyListExp( stExp *e, char *file, int line ) : stExp( file, line ) {
+stCopyListExp::stCopyListExp( stExp *e, const char *file, int line ) : stExp( file, line ) {
 	expression = e;
 	type = ET_COPYLIST;
 }
@@ -66,7 +66,7 @@ stCopyListExp::~stCopyListExp() {
 	delete expression;
 }
 
-stLengthExp::stLengthExp( stExp *e, char *file, int line ) : stExp( file, line ) {
+stLengthExp::stLengthExp( stExp *e, const char *file, int line ) : stExp( file, line ) {
 	expression = e;
 	type = ET_LENGTH;
 }
@@ -75,17 +75,17 @@ stLengthExp::~stLengthExp() {
 	delete expression;
 }
 
-stIntExp::stIntExp( int i, char *file, int line ) : stExp( file, line ) {
+stIntExp::stIntExp( int i, const char *file, int line ) : stExp( file, line ) {
 	intValue = i;
 	type = ET_INT;
 }
 
-stDoubleExp::stDoubleExp( double d, char *file, int line ) : stExp( file, line ) {
+stDoubleExp::stDoubleExp( double d, const char *file, int line ) : stExp( file, line ) {
 	doubleValue = d;
 	type = ET_DOUBLE;
 }
 
-stMethodExp::stMethodExp( stExp *o, char *n, std::vector< stKeyword* > *a, char *f, int l ) : stExp( f, l ) {
+stMethodExp::stMethodExp( stExp *o, char *n, std::vector< stKeyword* > *a, const char *file, const int line ) : stExp( file, line ) {
 	objectExp = o;
 	methodName = n;
 	arguments = *a;
@@ -105,7 +105,7 @@ stMethodExp::~stMethodExp() {
 		delete *ki;
 }
 
-stArrayIndexExp::stArrayIndexExp( stMethod *m, stObject *o, char *word, stExp *i, char *file, int line ) : stExp( file, line ) {
+stArrayIndexExp::stArrayIndexExp( stMethod *m, stObject *o, char *word, stExp *i, const char *file, int line ) : stExp( file, line ) {
 	stVar *var;
 
 	index = i;
@@ -144,7 +144,7 @@ stArrayIndexExp::~stArrayIndexExp() {
 	delete index;
 }
 
-stArrayIndexAssignExp::stArrayIndexAssignExp( stMethod *m, stObject *o, char *word, stExp *i, stExp *rv, char *file, int line ) : stExp( file, line ) {
+stArrayIndexAssignExp::stArrayIndexAssignExp( stMethod *m, stObject *o, char *word, stExp *i, stExp *rv, const char *file, int line ) : stExp( file, line ) {
 	stVar *var;
 
 	index = i;
@@ -185,7 +185,7 @@ stArrayIndexAssignExp::~stArrayIndexAssignExp() {
 	delete index;
 }
 
-stLoadExp::stLoadExp( stMethod *m, stObject *o, char *word, char *file, int line ) : stExp( file, line ) {
+stLoadExp::stLoadExp( stMethod *m, stObject *o, char *word, const char *file, int line ) : stExp( file, line ) {
 	stVar *var;
 
 	// we don't know if this variable is local or not
@@ -211,7 +211,7 @@ stLoadExp::stLoadExp( stMethod *m, stObject *o, char *word, char *file, int line
 	type = ET_LOAD;
 }
 
-stBinaryExp::stBinaryExp( unsigned char o, stExp *le, stExp *re, char *f, int l ) : stExp( f, l ) {
+stBinaryExp::stBinaryExp( unsigned char o, stExp *le, stExp *re, const char *file, int line ) : stExp( file, line ) {
 	op = o;
 	left = le;
 	right = re;
@@ -223,7 +223,7 @@ stBinaryExp::~stBinaryExp() {
 	delete right;
 }
 
-stAssignExp::stAssignExp( stMethod *m, stObject *o, char *word, stExp *r, char *file, int line ) : stExp( file, line ) {
+stAssignExp::stAssignExp( stMethod *m, stObject *o, char *word, stExp *r, const char *file, int line ) : stExp( file, line ) {
 	stVar *var;
 
 	_rvalue = NULL;
@@ -261,7 +261,7 @@ stAssignExp::~stAssignExp() {
 	if ( _rvalue ) delete _rvalue;
 }
 
-stListInsertExp::stListInsertExp( stExp *l, stExp *e, stExp *i, char *file, int lineno ) : stExp( file, lineno ) {
+stListInsertExp::stListInsertExp( stExp *l, stExp *e, stExp *i, const char *file, int lineno ) : stExp( file, lineno ) {
 	listExp = l;
 	exp = e;
 	index = i;
@@ -269,7 +269,7 @@ stListInsertExp::stListInsertExp( stExp *l, stExp *e, stExp *i, char *file, int 
 	type = ET_INSERT;
 }
 
-stListRemoveExp::stListRemoveExp( stExp *l, stExp *i, char *file, int lineno ) : stExp( file, lineno ) {
+stListRemoveExp::stListRemoveExp( stExp *l, stExp *i, const char *file, int lineno ) : stExp( file, lineno ) {
 	listExp = l;
 	index = i;
 
@@ -289,7 +289,7 @@ stListInsertExp::~stListInsertExp() {
 	if ( index ) delete index;
 }
 
-stSortExp::stSortExp( stExp *list, char *method, char *file, int lineno ) : stExp( file, lineno ) {
+stSortExp::stSortExp( stExp *list, char *method, const char *file, int lineno ) : stExp( file, lineno ) {
 	methodName = method;
 	listExp = list;
 
@@ -300,7 +300,7 @@ stSortExp::~stSortExp() {
 	delete listExp;
 }
 
-stListIndexExp::stListIndexExp( stExp *list, stExp *index, char *file, int lineno ) : stExp( file, lineno ) {
+stListIndexExp::stListIndexExp( stExp *list, stExp *index, const char *file, int lineno ) : stExp( file, lineno ) {
 	listExp = list;
 	indexExp = index;
 
@@ -312,7 +312,7 @@ stListIndexExp::~stListIndexExp() {
 	delete indexExp;
 }
 
-stListIndexAssignExp::stListIndexAssignExp( stExp *l, stExp *i, stExp *a, char *file, int lineno ) : stExp( file, lineno ) {
+stListIndexAssignExp::stListIndexAssignExp( stExp *l, stExp *i, stExp *a, const char *file, int lineno ) : stExp( file, lineno ) {
 	listExp = l;
 	indexExp = i;
 	assignment = a;
@@ -326,7 +326,7 @@ stListIndexAssignExp::~stListIndexAssignExp() {
 	delete assignment;
 }
 
-stCCallExp::stCCallExp( brEngine *e, brInternalFunction *inFunc, std::vector< stExp* > *expressions, char *file, int line ) : stExp( file, line ) {
+stCCallExp::stCCallExp( brEngine *e, brInternalFunction *inFunc, std::vector< stExp* > *expressions, const char *file, int line ) : stExp( file, line ) {
 	_function = inFunc;
 
 	if ( expressions ) _arguments = *expressions;
@@ -346,7 +346,7 @@ stCCallExp::~stCCallExp() {
 	for ( unsigned int n = 0; n < _arguments.size(); n++ ) delete _arguments[n];
 }
 
-stAllExp::stAllExp( char *objectName, char *file, int line ) : stExp( file, line ) {
+stAllExp::stAllExp( char *objectName, const char *file, int line ) : stExp( file, line ) {
 	name = objectName;
 
 	type = ET_ALL;
@@ -356,7 +356,7 @@ stAllExp::stAllExp( char *objectName, char *file, int line ) : stExp( file, line
 stAllExp::~stAllExp() {
 }
 
-stWhileExp::stWhileExp( stExp *cn, stExp *cd, char *file, int lineno ) : stExp( file, line ) {
+stWhileExp::stWhileExp( stExp *cn, stExp *cd, const char *file, int lineno ) : stExp( file, line ) {
 	cond = cn;
 	code = cd;
 
@@ -368,7 +368,7 @@ stWhileExp::~stWhileExp() {
 	delete code;
 }
 
-stForeachExp::stForeachExp( stAssignExp *a, stExp *l, stExp *c, char *file, int lineno ) : stExp( file, lineno ) {
+stForeachExp::stForeachExp( stAssignExp *a, stExp *l, stExp *c, const char *file, int lineno ) : stExp( file, lineno ) {
 	assignment = a;
 	list = l;
 	code = c;
@@ -382,7 +382,7 @@ stForeachExp::~stForeachExp() {
 	delete code;
 }
 
-stForExp::stForExp( stExp *a, stExp *cn, stExp *i, stExp *cd, char *file, int lineno ) : stExp( file, lineno ) {
+stForExp::stForExp( stExp *a, stExp *cn, stExp *i, stExp *cd, const char *file, int lineno ) : stExp( file, lineno ) {
 	condition = cn;
 	assignment = a;
 	iteration = i;
@@ -398,7 +398,7 @@ stForExp::~stForExp() {
 	delete code;
 }
 
-stIfExp::stIfExp( stExp *c, stExp *t, stExp *f, char *file, int lineno ) : stExp( file, lineno ) {
+stIfExp::stIfExp( stExp *c, stExp *t, stExp *f, const char *file, int lineno ) : stExp( file, lineno ) {
 	cond = c;
 	trueCode = t;
 	falseCode = f;
@@ -412,7 +412,7 @@ stIfExp::~stIfExp() {
 	delete cond;
 }
 
-stPrintExp::stPrintExp( std::vector< stExp* > *e, int n, char *file, int lineno ) : stExp( file, lineno ) {
+stPrintExp::stPrintExp( std::vector< stExp* > *e, int n, const char *file, int lineno ) : stExp( file, lineno ) {
 	expressions = *e;
 	newline = n;
 
@@ -425,7 +425,7 @@ stPrintExp::~stPrintExp() {
 	for ( n = 0; n < expressions.size(); n++ ) delete expressions[n];
 }
 
-stUnaryExp::stUnaryExp( unsigned char o, stExp *e, char *f, int l ) : stExp( f, l ) {
+stUnaryExp::stUnaryExp( unsigned char o, stExp *e, const char *file, int line ) : stExp( file, line ) {
 	expression = e;
 	op = o;
 	type = ET_UNARY;
@@ -435,7 +435,7 @@ stUnaryExp::~stUnaryExp() {
 	delete expression;
 }
 
-stVectorExp::stVectorExp( stExp *x, stExp *y, stExp *z, char *file, int line ) : stExp( file, line ) {
+stVectorExp::stVectorExp( stExp *x, stExp *y, stExp *z, const char *file, int line ) : stExp( file, line ) {
 	_x = x;
 	_y = y;
 	_z = z;
@@ -449,7 +449,7 @@ stVectorExp::~stVectorExp() {
 	delete _z;
 }
 
-stMatrixExp::stMatrixExp( stExp *e00, stExp *e01, stExp *e02, stExp *e10, stExp *e11, stExp *e12, stExp *e20, stExp *e21, stExp *e22, char *file, int line ) : stExp( file, line ) {
+stMatrixExp::stMatrixExp( stExp *e00, stExp *e01, stExp *e02, stExp *e10, stExp *e11, stExp *e12, stExp *e20, stExp *e21, stExp *e22, const char *file, int line ) : stExp( file, line ) {
 	expressions[0] = e00;
 	expressions[1] = e01;
 	expressions[2] = e02;
@@ -469,7 +469,7 @@ stMatrixExp::~stMatrixExp() {
 	for ( unsigned int n = 0;n < 9;n++ ) delete( expressions[n] );
 }
 
-stVectorElementExp::stVectorElementExp( stExp *v, char e, char *file, int line ) : stExp( file, line ) {
+stVectorElementExp::stVectorElementExp( stExp *v, char e, const char *file, int line ) : stExp( file, line ) {
 	exp = v;
 	element = e;
 
@@ -480,7 +480,7 @@ stVectorElementExp::~stVectorElementExp() {
 	delete exp;
 }
 
-stVectorElementAssignExp::stVectorElementAssignExp( stExp *v, stExp *r, char e, char *file, int line ) : stExp( file, line ) {
+stVectorElementAssignExp::stVectorElementAssignExp( stExp *v, stExp *r, char e, const char *file, int line ) : stExp( file, line ) {
 	exp = v;
 	assignExp = r;
 	element = e;
@@ -493,7 +493,7 @@ stVectorElementAssignExp::~stVectorElementAssignExp() {
 	delete assignExp;
 }
 
-stDuplicateExp::stDuplicateExp( stExp *e, char *file, int line ) : stExp( file, line ) {
+stDuplicateExp::stDuplicateExp( stExp *e, const char *file, int line ) : stExp( file, line ) {
 	expression = e;
 	type = ET_DUPLICATE;
 }

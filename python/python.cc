@@ -31,13 +31,17 @@
  * 
  * @param inObject		The Python object to be translated.
  * @param outEval		The breve value output.
- * @return				Either EC_OK or EC_ERROR indicating the success of the translation
+ * @return			Either EC_OK or EC_ERROR indicating the success of the translation
  */
 
 inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 	int result = EC_ERROR;
 
 	if( !inObject ) return result;
+
+	if( inObject == Py_None ) {
+		return EC_OK;
+	}
 
 	if ( PyInt_Check( inObject ) ) {
 
@@ -84,11 +88,12 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
  * Translation function from a breve value to a Python object.
  * 
  * @param inEval		The breve value to be translated.
+ * @param inBridgeObject
  * @return			A newly created Python object translated from the source value.
  */
 
-inline PyObject *brPythonTypeFromEval( brEval *inEval, PyObject *inBridgeObject ) {
-	PyObject *result = NULL;
+inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inBridgeObject ) {
+	PyObject *result = Py_None;
 	brInstance *breveInstance;
 
 	switch ( inEval->type() ) {
@@ -134,6 +139,10 @@ inline PyObject *brPythonTypeFromEval( brEval *inEval, PyObject *inBridgeObject 
 			break;
 
 		case AT_VECTOR:
+			result = PyTuple_New( 3 );
+			PyTuple_SetItem( result, 0, PyFloat_FromDouble( BRVECTOR( inEval ).x ) );
+			PyTuple_SetItem( result, 1, PyFloat_FromDouble( BRVECTOR( inEval ).y ) );
+			PyTuple_SetItem( result, 2, PyFloat_FromDouble( BRVECTOR( inEval ).z ) );
 			break;
 
 		case AT_MATRIX:
@@ -562,6 +571,8 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 		return EC_ERROR;
 	}
 
+	// Get the number of arguments to this method
+
 	PyObject *code = PyObject_GetAttrString( method, "func_code" );
 	PyObject *argumentCount = PyObject_GetAttrString( code, "co_argcount" );
 
@@ -570,11 +581,29 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 		return EC_ERROR;
 	}
 
-	// The self argument doesn't count here
+	// we subtract 1 for the "self" argument
 
 	int count = PyInt_AS_LONG( argumentCount ) - 1;
 
 	PyObject *tuple = PyTuple_New( count + 1 );
+
+	// the instance we're calling the method for has the breveInternal module pointer
+
+	PyObject *module = PyObject_GetAttrString( instance, "breveModule" );
+
+	if( !module ) {
+		PyErr_Print();
+		return EC_ERROR;
+	}
+
+
+	PyObject *internal = PyObject_GetAttrString( module, "bridgeObject" );
+
+	if( !internal ) {
+		PyErr_Print();
+		return EC_ERROR;
+	}
+
 
 	// Set the self argument
 
@@ -584,14 +613,14 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 	// Set the rest of the arguments
 
 	for( int n = 0; n < count; n++ ) {
-		// TODO: bridge instance here
-		// brPythonTypeFromEval( inArguments[ n ], PyObject_GetAttrString( moduleObject, "bridgeObject" )  );
-		PyTuple_SetItem( tuple, n + 1, instance );
+		PyObject *argument = brPythonTypeFromEval( inArguments[ n ], internal );
+		Py_INCREF( argument );
+		PyTuple_SetItem( tuple, n + 1, argument );
 	}
 
 	PyObject *result = PyObject_Call( method, tuple, NULL );
 
-	Py_DECREF( tuple );
+	// Py_DECREF( tuple );
 
 	brPythonTypeToEval( result, outResult );
 

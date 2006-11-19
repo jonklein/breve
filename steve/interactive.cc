@@ -4,8 +4,7 @@
 
 void stSetParseObjectAndMethod( stObject *o, stMethod *m );
 
-extern char *yyfile;
-
+extern const char *yyfile;
 extern int lineno;
 
 /*!

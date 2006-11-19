@@ -74,6 +74,7 @@ class object:
 	def __init__( self ):
 		self.breveInstance = breveInternal.addInstance( breveInternal, self.__class__, self )
 		self.controller = breveInternalFunctionFinder.getController( self )
+		self.breveModule = breveInternal
 
 class control( object ):
 	"A class for implementing the breve controller object"

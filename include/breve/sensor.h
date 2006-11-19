@@ -40,7 +40,7 @@ class Sensor{
 		double apply_azimut_factor(double input, double angle);
 		double apply_incidence_factor(double input, double angle);
 		void sense(const slShape *shape, slPosition *shapePos, slPosition *sensorPos );
-		bool insideSensorBorder(const slShape *shape, slPosition *shapePos, slPosition *sensorPos, bool singleRay=false);
+		bool insideSensorBorder( const slShape *shape, const slPosition *shapePos, const slPosition *sensorPos, bool singleRay=false ) const;
 		slVector baseDirection;
 		slVector baseUpDirection;
 		slVector borderNormal[5];

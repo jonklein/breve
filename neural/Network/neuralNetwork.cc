@@ -100,7 +100,7 @@ void slNeuralNetwork::setNeuronStateBounds( const float lower, const float upper
 	}
 }
 
-int slNeuralNetwork::getNeuronCount() const {
+unsigned int slNeuralNetwork::getNeuronCount() const {
 
 	return _currentNeuronStates.dim();
 }

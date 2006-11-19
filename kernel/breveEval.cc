@@ -89,12 +89,12 @@ int brEvalCopy( const brEval *s, brEval *d ) {
 			break;
 
 		case AT_VECTOR:
-			d->set( s->getVector() );
+			d->set( ( (brEval*)s )->getVector() );
 
 			break;
 
 		case AT_MATRIX:
-			d->set( s->getMatrix() );
+			d->set( ( (brEval*) s )->getMatrix() );
 
 			break;
 

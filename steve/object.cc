@@ -521,7 +521,7 @@ void stFreeKeywordEntry( stKeywordEntry *k ) {
 	be filled in later.
 */
 
-stMethod::stMethod( char *n, std::vector< stKeywordEntry* > *k, char *file, int line ) {
+stMethod::stMethod( const char *n, std::vector< stKeywordEntry* > *k, const char *file, int line ) {
 	unsigned int count;
 	stKeywordEntry *e;
 

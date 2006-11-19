@@ -13,7 +13,7 @@ using std::string;
 
 std::map <string, UserSensor*> SensorBuilder::sensors = std::map<string, UserSensor*>();
 
-double distance_plane_point(slVector *normal, slVector *planePoint, slVector *point){
+double distance_plane_point( const slVector *normal, const slVector *planePoint, const slVector *point ){
 	return normal->x * (point->x - planePoint->x) 
 		 + normal->y * (point->y - planePoint->y) 
 		 + normal->z * (point->z - planePoint->z);
@@ -455,9 +455,10 @@ double Sensor::evaluate(){
    * planes, representing a case, in wich the bounding box is larger than the sensor cone
    * so the bounding box points are outside, but parts of the shape are still inside.
    */
-bool Sensor::insideSensorBorder(const slShape *shape, slPosition *shapePos, slPosition *sensorPos, bool singleRay){
+
+bool Sensor::insideSensorBorder( const slShape *shape, const slPosition *shapePos, const slPosition *sensorPos, bool singleRay ) const {
 	slVector min ,max;
-	shape->bounds(shapePos, &min, &max);
+	shape->bounds( shapePos, &min, &max );
 
 	slVector maximumPoints[8];
 
@@ -504,7 +505,7 @@ bool Sensor::insideSensorBorder(const slShape *shape, slPosition *shapePos, slPo
 		}
 //		slVectorPrint(&n);
 		for(p=0; p<8; p++){
-			d = distance_plane_point(&n, &sensorPos->location, &maximumPoints[p]);
+			d = distance_plane_point( &n, &sensorPos->location, &maximumPoints[p] );
 //				slMessage(DEBUG_ALL,"i:%d p:%d d: %f\n",i,p,d);
 			if (d > 0){ 
 				p = 0;//last point
@@ -552,20 +553,23 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 		shape = o->getShape();
 		isTarget = (o==target);
 		if(shape == NULL){continue;}
-		slPosition *shapePos = &o->getPosition();
-		if(!insideSensorBorder(shape, shapePos, sensorPos)){//if singleray was true we could only send to agents hit by the ray
+		const slPosition *shapePos = &o->getPosition();
+
+		if( !insideSensorBorder( shape, shapePos, sensorPos ) ) {
+			//if singleray was true we could only send to agents hit by the ray
 			continue;
 		}	
-		for(fi = (shape->faces.begin()); fi != (shape->faces.end()); fi++ ) {
+
+		for( fi = ( shape->faces.begin() ); fi != ( shape->faces.end() ); fi++ ) {
 			const slFace *f = *fi;
 			slPlane wcPlane; //world coordinates
-			slPlane wcPlane2; //world coordinates
 
 			slVectorXform(shapePos->rotation, &f->plane.normal, &wcPlane.normal);
 
 			slVectorXform(shapePos->rotation, &f->plane.vertex, &wcPlane.vertex);
 			slVectorAdd(&wcPlane.vertex, &shapePos->location, &wcPlane.vertex);
 /*
+			slPlane wcPlane2; //world coordinates
 			slPositionPlane( shapePos, &f->plane, &wcPlane2);
 			printf("wcplane.normal:");
 			slVectorPrint(&wcPlane.normal);

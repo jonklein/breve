@@ -330,7 +330,7 @@ void brRemoveFromInstanceLists(brInstance *);
 int brFileLogWrite(void *, const char *, int);
 
 void brAddSearchPath(brEngine *, const char *);
-char *brFindFile(brEngine *, char *, struct stat *);
+char *brFindFile(brEngine *, const char *, struct stat *);
 void brFreeSearchPath(brEngine *);
 
 brMenuEntry *brAddMenuItem(brInstance *, char *, char *);

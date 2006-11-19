@@ -52,15 +52,6 @@ enum atomicTypes {
 
 extern char *brAtomicTypeStrings[];
 
-/*!
-	\brief A typed expression in the breve engine.
-
-	The universal currency in the breve engine, this structure
-	holds data of any type.  It is used to pass arguments and 
-	return values, and is also used to hold all expressions in
-	the steve language frontend.
-*/
-
 extern "C" {
 
 DLLEXPORT void stGCUnretainAndCollectPointer(void *pointer, int type);
@@ -68,7 +59,11 @@ DLLEXPORT void stGCRetainPointer(void *pointer, int type);
 
 }
 
-class brEvalObject {
+/**
+ * A simple reference counted base class used for different brEval types.
+ */
+
+class DLLEXPORT brEvalObject {
 	public:
 		brEvalObject() { _retainCount = 0; } ;
 
@@ -82,7 +77,16 @@ class brEvalObject {
 		void collect() { if( _retainCount < 1 ) delete this; }
 };
 
-class brEval {
+/**
+ * A typed expression in the breve engine.
+ *
+ * The universal currency in the breve engine, this structure
+ * holds data of any type.  It is used to pass arguments and 
+ * return values, and is also used to hold all expressions in
+ * the steve language frontend.
+ */
+
+class DLLEXPORT brEval {
 	public:
 		brEval() { _type = AT_NULL; _values.pointerValue = NULL; }
 
@@ -105,7 +109,7 @@ class brEval {
 
 		void clear() { collect(); _type = AT_NULL; }
 
-		inline unsigned char type() { return _type; } 
+		inline unsigned char type() const { return _type; } 
 
 		inline void set( const double d )    { collect(); _values.doubleValue = d;                _type = AT_DOUBLE;   }
 		inline void set( const int i )       { collect(); _values.intValue = i;                   _type = AT_INT;      }
@@ -120,16 +124,16 @@ class brEval {
 		inline void set( brInstance *i )     { collect(); _values.instanceValue = i;              _type = AT_INSTANCE; retain(); }
 		inline void set( brEvalListHead *l ) { collect(); _values.listValue = l;                  _type = AT_LIST;     retain(); }
 
-		inline int             &getInt()      { return _values.intValue;      }
-		inline double          &getDouble()   { return _values.doubleValue;   }
-		inline slVector       &getVector()    { return _values.vectorValue;  }
-		inline slMatrix       &getMatrix()    { return _values.matrixValue;  } 
-		inline void           *&getPointer()  { return _values.pointerValue;  }
-		inline char           *&getString()   { return _values.stringValue;   }
-		inline brEvalHash     *&getHash()     { return _values.hashValue;     }
-		inline brData         *&getData()     { return _values.dataValue;     }
-		inline brInstance     *&getInstance() { return _values.instanceValue; }
-		inline brEvalListHead *&getList()     { return _values.listValue;     } 
+		inline int		getInt()      const { return _values.intValue;      }
+		inline double		getDouble()   const { return _values.doubleValue;   }
+		inline slVector		&getVector()  		{ return _values.vectorValue;  }
+		inline slMatrix		&getMatrix()    	{ return _values.matrixValue;  } 
+		inline void		*getPointer()  const { return _values.pointerValue;  }
+		inline char		*getString()   const { return _values.stringValue;   }
+		inline brEvalHash	*getHash()     const { return _values.hashValue;     }
+		inline brData		*getData()     const { return _values.dataValue;     }
+		inline brInstance	*getInstance() const { return _values.instanceValue; }
+		inline brEvalListHead	*getList()     const { return _values.listValue;     } 
 
 	private:
 		union {
@@ -148,9 +152,6 @@ class brEval {
 		unsigned char _type;
 };
 
-//	bool operator<(brEval*);
-
-
 #define BRINT(e)		( (e)->getInt()      )
 #define BRFLOAT(e)		( (e)->getDouble()   )
 #define BRDOUBLE(e)		( (e)->getDouble()   )
@@ -163,9 +164,9 @@ class brEval {
 #define BRHASH(e)		( (e)->getHash()     )
 #define BRLIST(e)		( (e)->getList()     )
 
-int brEvalCopy( const brEval *source, brEval *dest );
-char *brObjectDescription( brInstance *i );
-char *brFormatEvaluation( brEval *e, brInstance *i );
-char *brFormatEvaluationWithSeenList( brEval *e, brInstance *i, std::set< brEvalListHead* >& seen );
+int brEvalCopy( const brEval *inSrc, brEval *outDst );
+char *brObjectDescription( brInstance *inInstance );
+char *brFormatEvaluation( brEval *inEval, brInstance *inInstance );
+char *brFormatEvaluationWithSeenList( brEval *inEval, brInstance *inInstance, std::set< brEvalListHead* >& inSeen );
 
 #endif /* _BREVEEVAL_H */

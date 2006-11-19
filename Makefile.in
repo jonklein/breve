@@ -58,22 +58,22 @@ OBJ	:= $(SRC:.cc=.o)
 OBJ	:= $(OBJ:.c=.o)
 
 bin/breve@EXE_SUFFIX@: bin/breve.o $(OBJ)
-	$(CXX) -o $@ $(CFLAGS) $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@ 
+	$(CXX) -o $@ $(CFLAGS) $(LDFLAGS) $^ @PLUGINIMP@ $(LIBS)
 
 bin/breve_cli@EXE_SUFFIX@: bin/breve_cli.o $(OBJ)
-	$(CXX) -o $@ $(CFLAGS) $(LDFLAGS) $^ @PLUGINIMP@ @LIBS@
+	$(CXX) -o $@ $(CFLAGS) $(LDFLAGS) $^ @PLUGINIMP@ $(LIBS)
 
 bin/osmesaloader.o: bin/osmesaloader.cc
 	-$(CXX) -shared -o $@ $(LDFLAGS) $^ -lOSMesa
 
 breve.dll: $(OBJ)
-	$(CXX) @PLUGINFLAGS@ -o $@ @PLUGINIMP@ $^ @LIBS@
+	$(CXX) @PLUGINFLAGS@ -o $@ @PLUGINIMP@ $^ $(LIBS)
 
 %.o: %.c
-	$(CXX) $(CXXFLAGS) -c -o $@ $< $(CPPFLAGS) 
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 %.o: %.cc
-	$(CXX) $(CXXFLAGS) -c -o $@ $< $(CPPFLAGS) 
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 %.tab.c: %.y
 	$(YACC) $(YFLAGS) -o $@ $<
@@ -127,12 +127,12 @@ OSX_build: optimize lib/libbreve.a
 	m4 -D_VERSION_=$(VERSION) -D_DATE_=`date +'%m-%d-%y'` OSX/README.html.m4 > OSX/README.html
 	-mkdir docs
 	cd plugins; $(MAKE)
-	cd OSX; xcodebuild -buildstyle Deployment-Universal CC= LIBS='@LDFLAGS@ @LIBS@' BREVE_VERSION=$(VERSION)
+	cd OSX; xcodebuild -buildstyle Deployment-Universal CC= LIBS='@LDFLAGS@ $(LIBS)' BREVE_VERSION=$(VERSION)
 
 OSX_debug: optimize_debug lib/libbreve.a
 	-mkdir docs
 	cd plugins; $(MAKE)
-	cd OSX; xcodebuild -buildstyle Deployment-Universal CC= LIBS='@LDFLAGS@ @LIBS@' BREVE_VERSION=$(VERSION)
+	cd OSX; xcodebuild -buildstyle Deployment-Universal CC= LIBS='@LDFLAGS@ $(LIBS)' BREVE_VERSION=$(VERSION)
 
 OSX_clean: clean
 	rm -f $(DMG_FILE)

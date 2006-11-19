@@ -294,7 +294,7 @@ int brIImageDataInit( brEval args[], brEval *result, brInstance *i ) {
 
 	dm = new brImageData;
 
-	dm->data = slMalloc( width * height * 4 );
+	dm->data = (unsigned char*)slMalloc( width * height * 4 );
 	memset( dm->data, 0xff, width * height * 4 );
 
 	dm->x = width;
