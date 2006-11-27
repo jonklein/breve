@@ -62,12 +62,12 @@ enum slCollisionFlags {
 
 #define slVclipFlagsShouldTest(x)		(((x) & BT_ALL) == BT_ALL)
 
-/*!
-	\brief The minima and maxima of the collision detection pruning stage.
-
-	Hold the maxima or minima data for all the objects in the world.  These 
-	are sorted with an insertion sort in order to locate overlapping pairs.
-*/
+/**
+ * The minima and maxima of the collision detection pruning stage.
+ *
+ * Hold the maxima or minima data for all the objects in the world.  These 
+ * are sorted with an insertion sort in order to locate overlapping pairs.
+ */
 
 struct slBoundSort {
 	unsigned int number;
@@ -79,12 +79,12 @@ struct slBoundSort {
 #include <vector>
 #include <map>
 
-/*!
-	\brief A record of a collision.
-
-	When a collision occurs, one of these entries is created.  It
-	is used to add a contact point for the collision.
-*/
+/**
+ * \brief A record of a collision.
+ * 
+ * When a collision occurs, one of these entries is created.  It
+ * is used to add a contact point for the collision.
+ */
 
 class slCollision {
 	public:
@@ -97,9 +97,9 @@ class slCollision {
 		unsigned int n2;
 };
 
-/*! 
-	\brief Data associated with the v-clip algorithm.
-*/
+/**
+ * \brief Data associated with the v-clip algorithm.
+ */
 
 class slVclipData {
 	public:
@@ -133,8 +133,6 @@ class slVclipData {
 		std::vector<slBoundSort*> boundListPointers[3];
 		std::vector<slBoundSort> boundLists[3];
 
-		std::vector<slWorldObject*> objects;
-
 		std::vector<slCollision> collisions;
 		unsigned int collisionCount;
 
@@ -158,20 +156,22 @@ class slCollisionCandidate {
 
 			_x = o1; _y = o2;
 
-			w1 = vc->objects[ _x ];
-			w2 = vc->objects[ _y ];
+			w1 = vc->world->_objects[ _x ];
+			w2 = vc->world->_objects[ _y ];
 
 			_position1 = &w1->getPosition();	
 			_position2 = &w2->getPosition();	
 
-			_shape1 = w1->getShape();
-			_shape2 = w2->getShape();
+			if( w1 && w2 ) {
+				_shape1 = w1->getShape();
+				_shape2 = w2->getShape();
 
-			if(_shape1 && _shape1->_type == ST_NORMAL) _feature1 = _shape1->features[0];
-			else _feature1 = NULL;
+				if(_shape1 && _shape1->_type == ST_NORMAL) _feature1 = _shape1->features[0];
+				else _feature1 = NULL;
 
-			if(_shape2 && _shape2->_type == ST_NORMAL) _feature2 = _shape2->features[0];
-			else _feature2 = NULL;
+				if(_shape2 && _shape2->_type == ST_NORMAL) _feature2 = _shape2->features[0];
+				else _feature2 = NULL;
+			}
 		}
 
 		slFeature *_feature1;
@@ -187,8 +187,8 @@ class slCollisionCandidate {
 		unsigned int _y;
 };
 
-slCollision *slNextCollision(slVclipData *v);
-slCollision *slNextCollision(slVclipData *v, int x, int y);
+slCollision *slNextCollision( slVclipData *v );
+slCollision *slNextCollision( slVclipData *v, int x, int y );
 
 void slInitBoundSort(slVclipData *v);
 void slIsort(slVclipData *vc, std::vector<slBoundSort*> &list, char boundTypeFlag);

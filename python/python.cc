@@ -146,9 +146,45 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inBridgeO
 			break;
 
 		case AT_MATRIX:
+			{ 
+				slMatrix &m = BRMATRIX( inEval );
+
+				result = PyTuple_New( 3 );
+
+				PyObject *rowx = PyTuple_New( 3 );
+				PyObject *rowy = PyTuple_New( 3 );
+				PyObject *rowz = PyTuple_New( 3 );
+
+				PyTuple_SetItem( rowx, 0, PyFloat_FromDouble( m[ 0 ][ 0 ] ) );
+				PyTuple_SetItem( rowx, 1, PyFloat_FromDouble( m[ 0 ][ 1 ] ) );
+				PyTuple_SetItem( rowx, 2, PyFloat_FromDouble( m[ 0 ][ 2 ] ) );
+				PyTuple_SetItem( rowy, 0, PyFloat_FromDouble( m[ 1 ][ 0 ] ) );
+				PyTuple_SetItem( rowy, 1, PyFloat_FromDouble( m[ 1 ][ 1 ] ) );
+				PyTuple_SetItem( rowy, 2, PyFloat_FromDouble( m[ 1 ][ 2 ] ) );
+				PyTuple_SetItem( rowz, 0, PyFloat_FromDouble( m[ 2 ][ 0 ] ) );
+				PyTuple_SetItem( rowz, 1, PyFloat_FromDouble( m[ 2 ][ 1 ] ) );
+				PyTuple_SetItem( rowz, 2, PyFloat_FromDouble( m[ 2 ][ 2 ] ) );
+
+				PyTuple_SetItem( result, 0, rowx );
+				PyTuple_SetItem( result, 1, rowy );
+				PyTuple_SetItem( result, 2, rowz );
+			}
+
 			break;
 
 		case AT_LIST:
+			{
+				brEvalListHead *list = BRLIST( inEval );
+
+				result = PyList_New( list->_vector.size() );
+
+				for( int n = 0; n < list->_vector.size(); n++ ) {
+					PyObject *element = brPythonTypeFromEval( &list->_vector[ n ], inBridgeObject );
+					PyList_SET_ITEM( result, n, element );
+				}
+			}
+
+
 			break;
 
 		case AT_ARRAY:

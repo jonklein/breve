@@ -101,13 +101,17 @@ void slJoint::breakJoint() {
 	if ( ji != child->_inJoints.end() ) child->_inJoints.erase( ji );
 
 	dJointAttach( _odeJointID, NULL, NULL );
-
 	dJointDestroy( _odeJointID );
+
+	_odeJointID = NULL;
 
 	if ( _odeMotorID ) {
 		dJointAttach( _odeMotorID, NULL, NULL );
 		dJointDestroy( _odeMotorID );
+		_odeMotorID = NULL;
 	}
+
+	bzero( &_feedback, sizeof( dJointFeedback ) );
 
 	_child = NULL;
 
@@ -137,36 +141,28 @@ void slJoint::getPosition( slVector *r ) {
 
 		case JT_REVOLUTE:
 			r->x = dJointGetHingeAngle( _odeJointID );
-
 			r->y = 0;
-
 			r->z = 0;
 
 			break;
 
 		case JT_PRISMATIC:
 			r->x = dJointGetSliderPosition( _odeJointID );
-
 			r->y = 0;
-
 			r->z = 0;
 
 			break;
 
 		case JT_BALL:
 			r->x = dJointGetAMotorAngle( _odeMotorID, 0 );
-
 			r->y = dJointGetAMotorAngle( _odeMotorID, 1 );
-
 			r->z = dJointGetAMotorAngle( _odeMotorID, 2 );
 
 			break;
 
 		case JT_UNIVERSAL:
 			r->x = dJointGetAMotorAngle( _odeMotorID, 0 );
-
 			r->y = dJointGetAMotorAngle( _odeMotorID, 2 );
-
 			r->z = 0;
 
 			break;
@@ -183,21 +179,16 @@ void slJoint::getVelocity( slVector *velocity ) {
 
 		case JT_REVOLUTE:
 			velocity->x = dJointGetHingeAngleRate( _odeJointID );
-
 			break;
 
 		case JT_PRISMATIC:
 			velocity->x = dJointGetSliderPositionRate( _odeJointID );
-
 			break;
 
 		case JT_BALL:
-
 		case JT_UNIVERSAL:
 			velocity->z = 0.0;
-
 			velocity->x = 0.0;
-
 			velocity->y = 0.0;
 
 			break;
@@ -230,21 +221,16 @@ void slJoint::setVelocity( slVector *speed ) {
 
 void slJoint::setLimits( slVector *min, slVector *max ) {
 	switch ( _type ) {
-
 		case JT_PRISMATIC:
 			dJointSetSliderParam( _odeJointID, dParamStopERP, .1 );
-
 			dJointSetSliderParam( _odeJointID, dParamLoStop, min->x );
-
 			dJointSetSliderParam( _odeJointID, dParamHiStop, max->x );
 
 			break;
 
 		case JT_REVOLUTE:
 			dJointSetHingeParam( _odeJointID, dParamStopERP, .1 );
-
 			dJointSetHingeParam( _odeJointID, dParamLoStop, min->x );
-
 			dJointSetHingeParam( _odeJointID, dParamHiStop, max->x );
 
 			break;
@@ -256,42 +242,27 @@ void slJoint::setLimits( slVector *min, slVector *max ) {
 			// oddities even earlier, so we'll stay far away from that area.
 
 			if ( max->y >= ( M_PI / 2.0 ) - 0.35 ) max->y = ( M_PI / 2.0 ) - 0.35;
-
 			if ( min->y <= ( -M_PI / 2.0 ) + 0.35 ) min->y = -( M_PI / 2.0 ) + 0.35;
 
 			dJointSetAMotorParam( _odeMotorID, dParamLoStop, min->x );
-
 			dJointSetAMotorParam( _odeMotorID, dParamLoStop2, min->y );
-
 			dJointSetAMotorParam( _odeMotorID, dParamLoStop3, min->z );
-
 			dJointSetAMotorParam( _odeMotorID, dParamStopERP, .1 );
-
 			dJointSetAMotorParam( _odeMotorID, dParamStopERP2, .1 );
-
 			dJointSetAMotorParam( _odeMotorID, dParamStopERP3, .1 );
-
 			dJointSetAMotorParam( _odeMotorID, dParamHiStop, max->x );
-
 			dJointSetAMotorParam( _odeMotorID, dParamHiStop2, max->y );
-
 			dJointSetAMotorParam( _odeMotorID, dParamHiStop3, max->z );
 
 			break;
 
 		case JT_UNIVERSAL:
 			dJointSetAMotorParam( _odeMotorID, dParamLoStop, min->x );
-
 			dJointSetAMotorParam( _odeMotorID, dParamLoStop3, min->y );
-
 			dJointSetAMotorParam( _odeMotorID, dParamStopERP, .1 );
-
 			dJointSetAMotorParam( _odeMotorID, dParamStopERP3, .1 );
-
 			dJointSetAMotorParam( _odeMotorID, dParamHiStop, max->x );
-
 			dJointSetAMotorParam( _odeMotorID, dParamHiStop3, max->y );
-
 			break;
 	}
 }
@@ -305,28 +276,21 @@ void slJoint::setMaxTorque( double max ) {
 
 		case JT_REVOLUTE:
 			dJointSetHingeParam( _odeJointID, dParamFMax, max );
-
 			break;
 
 		case JT_PRISMATIC:
 			dJointSetSliderParam( _odeJointID, dParamFMax, max );
-
 			break;
 
 		case JT_UNIVERSAL:
 			dJointSetAMotorParam( _odeMotorID, dParamFMax, max );
-
 			dJointSetAMotorParam( _odeMotorID, dParamFMax3, max );
-
 			break;
 
 		case JT_BALL:
 			dJointSetAMotorParam( _odeMotorID, dParamFMax, max );
-
 			dJointSetAMotorParam( _odeMotorID, dParamFMax2, max );
-
 			dJointSetAMotorParam( _odeMotorID, dParamFMax3, max );
-
 			break;
 	}
 }
@@ -337,29 +301,21 @@ void slJoint::setMaxTorque( double max ) {
 
 void slJoint::setLinkPoints( slVector *plinkPoint, slVector *clinkPoint, double rotation[3][3], int first = 0 ) {
 	const double *childR;
-
 	const dReal *childP, *linkP;
-
 	dReal idealR[16];
-
 	dReal savedChildR[16], savedChildP[3], offset[3];
-
 	slVector hingePosition, childPosition;
-
 	double ideal[3][3];
 
 	std::vector< slLink*> childChain;
-
 	std::vector< slLink*>::iterator li;
 
 	if ( !_parent || !_child ) return;
 
 	childP = dBodyGetPosition( _child->_odeBodyID );
-
 	childR = ( double* )dBodyGetRotation( _child->_odeBodyID );
 
 	memcpy( savedChildR, childR, sizeof( savedChildR ) );
-
 	memcpy( savedChildP, childP, sizeof( savedChildP ) );
 
 	_child->connectedLinks( &childChain, 0 );
@@ -405,22 +361,18 @@ void slJoint::setLinkPoints( slVector *plinkPoint, slVector *clinkPoint, double 
 
 		case JT_REVOLUTE:
 			dJointSetHingeAnchor( _odeJointID, hingePosition.x, hingePosition.y, hingePosition.z );
-
 			break;
 
 		case JT_FIX:
 			dJointSetFixed( _odeJointID );
-
 			break;
 
 		case JT_UNIVERSAL:
 			dJointSetUniversalAnchor( _odeJointID, hingePosition.x, hingePosition.y, hingePosition.z );
-
 			break;
 
 		case JT_BALL:
 			dJointSetBallAnchor( _odeJointID, hingePosition.x, hingePosition.y, hingePosition.z );
-
 			break;
 
 		default:
@@ -433,12 +385,10 @@ void slJoint::setLinkPoints( slVector *plinkPoint, slVector *clinkPoint, double 
 
 	slVectorSub( &hingePosition, &childPosition, &childPosition );
 
-	if ( !first ) {
+	if ( !first ) 
 		dBodySetRotation( _child->_odeBodyID, savedChildR );
-	}
 
 	offset[0] = childPosition.x - savedChildP[0];
-
 	offset[1] = childPosition.y - savedChildP[1];
 	offset[2] = childPosition.z - savedChildP[2];
 

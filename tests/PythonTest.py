@@ -11,10 +11,10 @@ class PythonTestObject( breve.real ):
 		self.movie.record( "sim.mpg" )
 
 	def argumentTest( self, i, f, l ):
-		print i
-		print f
-		print l
-		return 3.14
+		print "int %d" % i
+		print "float %f" % f
+		print "list %s" % l
+		return 0.1
 
 	def iterate( self ):
 		print self.controller.get_time()

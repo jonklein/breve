@@ -25,22 +25,22 @@
 Controller GS.
 
 Control : GS {
-    + variables:
-        U (object).
-        V (object).
-        tempreact, temp, inflow (object).
+	+ variables:
+		U (object).
+		V (object).
+		tempreact, temp, inflow (object).
 
 		grid (object).
-        
-    + to init:
-        i, j, k, m, n (int).
+		
+	+ to init:
+		i, j, k, m, n (int).
 
-        self set-background-color to (1, 1, 1).
+		self set-background-color to (1, 1, 1).
 
-        self set-iteration-step to TIMESTEP.
-        self set-integration-step to TIMESTEP.
+		self set-iteration-step to TIMESTEP.
+		self set-integration-step to TIMESTEP.
 
-        self point-camera at (0, 0, 0) from (30, 6, -30).
+		self point-camera at (0, 0, 0) from (30, 6, -30).
 
 		U = new Matrix3D.
 		V = new Matrix3D.
@@ -61,16 +61,16 @@ Control : GS {
 
 		inflow set-all-values to F.
 
-        for i=0,i<ZSIZE,i++:
-            for n=0,n<YSIZE,n++:
-                for m=0,m<XSIZE,m++: {
-                    U set-value to (0.5 + sqrt(|0.25 - F*(1.0 + K/F)*(1.0 + K/F)|) + 0.01*(random[1.0] - 0.5)) at-x m at-y n at-z i.
-                    V set-value to (1.0 - (U get-value at-x m at-y n at-z i))/(1.0 + K/F) + 0.01*(random[1.0] - 0.5) at-x m at-y n at-z i.
-                }
+		for i=0,i<ZSIZE,i++:
+			for n=0,n<YSIZE,n++:
+				for m=0,m<XSIZE,m++: {
+					U set-value to (0.5 + sqrt(|0.25 - F*(1.0 + K/F)*(1.0 + K/F)|) + 0.01*(random[1.0] - 0.5)) at-x m at-y n at-z i.
+					V set-value to (1.0 - (U get-value at-x m at-y n at-z i))/(1.0 + K/F) + 0.01*(random[1.0] - 0.5) at-x m at-y n at-z i.
+				}
 
 		all Patches set-transparency to 0.9.
-        
-    + to iterate:
+		
+	+ to iterate:
 		tempreact copy from U.
 		tempreact multiply-with-values of V.
 		tempreact multiply-with-values of V.
@@ -94,5 +94,5 @@ Control : GS {
 		temp multiply-with-values of V.
 		temp copy-to-alpha-channel of-patch-grid grid with-scale 0.5.
 
-        super iterate.
+		super iterate.
 }

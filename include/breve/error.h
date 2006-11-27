@@ -84,7 +84,7 @@ DLLEXPORT void slFormattedMessage( int level, const char *format );
  * The default output function, prints text to stderr.
  */
 
-void slStderrMessageCallback(char *);
+void slStderrMessageCallback( const char * );
 
 /**
  * Set the message-output callback function.
@@ -95,4 +95,4 @@ void slStderrMessageCallback(char *);
  * to a file, etc.
  */
 
-void slSetMessageCallbackFunction( void (*)(char *) );
+void slSetMessageCallbackFunction( void (*)( const char *) );

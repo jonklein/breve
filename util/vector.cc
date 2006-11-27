@@ -61,6 +61,10 @@ double slVectorAngle( slVector *a, slVector *b ) {
 	double dot = slVectorDot( a, b ), ac;
 
 	dot /= ( slVectorLength( a ) * slVectorLength( b ) );
+
+	if( dot > 1.0 ) 
+		dot = 1.0;
+
 	ac = acos( dot );
 
 	return ac;

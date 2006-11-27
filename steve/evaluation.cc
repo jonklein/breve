@@ -1916,6 +1916,10 @@ RTC_INLINE int stEvalCallFunc( stCCallExp *c, stRunInstance *i, brEval *result )
 	for ( n = 0; n < c->_function->_argCount; ++n ) {
 		resultCode = stExpEval3( c->_arguments[n], i, &e[n] );
 
+		if( e[ n ].checkNaNInf() ) {
+			slMessage( DEBUG_ALL, "warning: NaN/Inf passed into internal function %s as argument %d at line %d of \"%s\"\n", c->_function->_name.c_str(), n , c->line, c->file );
+		}
+
 		if ( resultCode != EC_OK )
 			return resultCode;
 
@@ -1962,8 +1966,8 @@ RTC_INLINE int stEvalCallFunc( stCCallExp *c, stRunInstance *i, brEval *result )
 	pthread_mutex_unlock( &( i->instance->lock ) );
 #endif
 
-	if( result->type() == AT_DOUBLE && isnan( BRDOUBLE( result ) ) ) {
-		slMessage( DEBUG_ALL, "warning: NaN returned from internal function %s\n", c->_function->_name.c_str() );
+	if( result->checkNaNInf() ) {
+		slMessage( DEBUG_ALL, "warning: NaN/Inf returned from internal function %s at line %d of \"%s\"\n", c->_function->_name.c_str(), c->line, c->file );
 	}
 
 	// if( result->getPointer() == (void*)0x5f5f5f5f ) {

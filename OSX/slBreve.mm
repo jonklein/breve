@@ -41,7 +41,7 @@ extern BOOL engineWillPause;
 
 extern char *gErrorNames[];
 
-void slPrintLog(char *text);
+void slPrintLog( const char *text );
 
 /* gSimMenu and gSelf are a bit of a hack--we need to these variables */
 /* from regular C callbacks, so we'll stick the values in global variables */
@@ -92,7 +92,7 @@ static NSRecursiveLock *gLogLock;
 	[[NSNotificationCenter defaultCenter] addObserver: displayView selector: @selector(updateSize:) name: nil object: displayView];
 	[[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(simPopupSetItems:) name: @"NSPopUpButtonWillPopUpNotification" object: simPopup];
 
-	slSetMessageCallbackFunction(slPrintLog);
+	slSetMessageCallbackFunction( slPrintLog );
 
 	logLock = [[NSRecursiveLock alloc] init];
 
@@ -580,12 +580,18 @@ static NSRecursiveLock *gLogLock;
 	[logText setString: @""];
 }
 
-void slPrintLog(char *text) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	[gLogLock lock];
-	[gLogString appendString: [NSString stringWithCString: text]];
-	[gLogLock unlock];
-	[pool release];
+void slPrintLog( const char *text ) {
+	// print-log occurs in its own thread, so we have to have an 
+	// autorelease pool in place.
+
+	static NSAutoreleasePool *pool = NULL;
+
+	if( !pool ) 
+		pool = [ [NSAutoreleasePool alloc] init ];
+
+	[ gLogLock lock];
+	[ gLogString appendString: [NSString stringWithCString: text] ];
+	[ gLogLock unlock ];
 }
 
 - (int)updateLog:sender {

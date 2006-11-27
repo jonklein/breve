@@ -48,6 +48,66 @@ brEval& brEval::operator=( const brEval& inCopy ) {
 	return *this;
 }
 
+bool brEval::checkNaNInf() {
+	int i, j;
+
+	switch( _type ) {
+		case AT_DOUBLE:
+			{ 
+				double f = getDouble();
+
+				if( isnan( f ) || isinf( f ) ) 
+					return true;
+			}
+			break;
+
+		case AT_VECTOR:
+			{ 
+				slVector &v = getVector();
+
+				if( isnan( v.x ) || isinf( v.x ) ) 
+					return true;
+
+				if( isnan( v.y ) || isinf( v.y ) ) 
+					return true;
+
+				if( isnan( v.z ) || isinf( v.z ) ) 
+					return true;
+			}
+			break;
+
+		case AT_MATRIX:
+			{
+				slMatrix &m = getMatrix();
+				for( i = 0; i < 3; i++ ) {
+					for( j = 0; j < 3; j++ ) {
+						double f = m[ i ][ j ];
+	
+						if( isnan( f ) || isinf( f ) ) 
+							return true;
+					}
+				}
+			}
+			break;
+
+		case AT_LIST:
+			{
+				std::vector< brEval > vec = getList()->_vector;
+
+				for( unsigned int i = 0; i < vec.size(); i++) {
+					if( vec[ i ].checkNaNInf() ) 
+						return true;
+				}
+			}
+			break;
+
+		default:
+			break;
+	}
+
+	return false;
+}
+
 int brEvalCopy( const brEval *s, brEval *d ) {
 	switch ( s->type() ) {
 		case AT_NULL:

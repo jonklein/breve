@@ -636,6 +636,10 @@ Mobile : Birds {
 		tempVector (vector).
 
 		tempVector = (otherMobile get-location) - (self get-location).
+
+		if | ( self get-velocity ) | == 0.0 || | tempVector | == 0.0:
+			return 0.0.
+
 		return angle((self get-velocity), tempVector).
 
 	+ to my-point vertex theVertex (vector) at theLocation (vector):

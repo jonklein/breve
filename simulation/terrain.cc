@@ -541,8 +541,8 @@ int slTerrain::areaUnderPoint( slVector *origpoint, int *x, int *z, int *quad ) 
 
 int slTerrainTestPair( slVclipData *vc, int x, int y, slCollision *ce ) {
 	slTerrain *terrain;
-	slWorldObject *w1 = vc->objects[x];
-	slWorldObject *w2 = vc->objects[y];
+	slWorldObject *w1 = vc->world->_objects[x];
+	slWorldObject *w2 = vc->world->_objects[y];
 
 	if ( w1->getType() != WO_TERRAIN ) {
 		const slShape *s = w1->getShape();
@@ -578,8 +578,8 @@ int slTerrain::sphereClip( slVclipData *vc, int obX, int obY, slCollision *ce, i
 	int startX, endX, startZ, endZ, earlyStart, lateEnd, x, z, quad;
 	int collisions = 0;
 
-	slSphere *ss = ( slSphere* )vc->objects[ obX ]->_shape;
-	slPosition *sp = &vc->objects[ obX ]->_position;
+	slSphere *ss = ( slSphere* )vc->world->_objects[ obX ]->_shape;
+	slPosition *sp = &vc->world->_objects[ obX ]->_position;
 
 	if ( ce ) {
 		if ( !flip ) {
@@ -807,8 +807,8 @@ int slTerrain::shapeClip( slVclipData *vc, int obX, int obY, slCollision *ce, in
 	std::vector<slFace*>::iterator fi;
 	int collisions = 0;
 
-	slShape *ss = vc->objects[obX]->_shape;
-	slPosition *sp = &vc->objects[obX]->_position;
+	slShape *ss = vc->world->_objects[obX]->_shape;
+	slPosition *sp = &vc->world->_objects[obX]->_position;
 
 	slVectorSet( &ce->normal, 0, 0, 0 );
 

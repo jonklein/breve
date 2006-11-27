@@ -30,19 +30,18 @@
 
 static int gDebugLevel;
 
-static void( *gMessageOutputFunction )( char * ) = slStderrMessageCallback;
+static void( *gMessageOutputFunction )( const char * ) = slStderrMessageCallback;
 
 
 void slSetDebugLevel( int level ) {
 	gDebugLevel = level;
 }
 
-void slSetMessageCallbackFunction( void( f )( char * ) ) {
-
+void slSetMessageCallbackFunction( void( f )( const char * ) ) {
 	gMessageOutputFunction = f;
 }
 
-void slStderrMessageCallback( char *string ) {
+void slStderrMessageCallback( const char *string ) {
 	fprintf( stderr, "%s", string );
 	fflush( stderr );
 }

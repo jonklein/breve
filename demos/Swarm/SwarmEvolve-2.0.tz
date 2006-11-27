@@ -1142,6 +1142,10 @@ Mobile : Bird (aka Birds) {
         tempVector (vector).
 
         tempVector = (otherMobile get-location) - (self get-location).
+
+	if |tempVector| == 0: 
+		return 0.
+
         return angle((self get-velocity), tempVector).
 
     + to fly:
@@ -1211,8 +1215,15 @@ Mobile : Bird (aka Birds) {
 
 
             controller set-decisions to (controller get-decisions) + 1.
-            dev = angle(topVector, savedToFood).
-            if (isnan(dev) || isinf(dev)): dev = 0.0.
+
+	   if | topVector | != 0.0 && | savedToFood | != 0.0:
+            	dev = angle( topVector, savedToFood ).
+
+            if (isnan(dev) || isinf(dev)): {
+		dev = 0.0.
+		print savedToFood, topVector.
+		}
+
             controller set-foodDeviations to (controller get-foodDeviations) + dev.         
         }   
         newVelocity = (self get-velocity).

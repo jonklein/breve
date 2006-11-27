@@ -267,7 +267,8 @@ void slWorld::removeObject( slWorldObject *p ) {
 
 	wi = std::find( _objects.begin(), _objects.end(), p );
 
-	if ( wi != _objects.end() ) *wi = NULL;
+	if ( wi != _objects.end() ) 
+		*wi = NULL;
 }
 
 void slWorld::removeEmptyObjects( ) {
@@ -545,16 +546,19 @@ void slWorld::updateNeighbors() {
 
 	for ( wi = _objects.begin(); wi != _objects.end(); wi++ ) {
 		slWorldObject *wo = *wi;
-		location = &wo->_position.location;
 
-		wo->_neighborMin.x = location->x - wo->_proximityRadius;
-		wo->_neighborMin.y = location->y - wo->_proximityRadius;
-		wo->_neighborMin.z = location->z - wo->_proximityRadius;
-		wo->_neighborMax.x = location->x + wo->_proximityRadius;
-		wo->_neighborMax.y = location->y + wo->_proximityRadius;
-		wo->_neighborMax.z = location->z + wo->_proximityRadius;
-		wo->_neighbors.clear();
-		wo->_neighborData.clear();
+		if( wo ) {
+			location = &wo->_position.location;
+
+			wo->_neighborMin.x = location->x - wo->_proximityRadius;
+			wo->_neighborMin.y = location->y - wo->_proximityRadius;
+			wo->_neighborMin.z = location->z - wo->_proximityRadius;
+			wo->_neighborMax.x = location->x + wo->_proximityRadius;
+			wo->_neighborMax.y = location->y + wo->_proximityRadius;
+			wo->_neighborMax.z = location->z + wo->_proximityRadius;
+			wo->_neighbors.clear();
+			wo->_neighborData.clear();
+		}
 	}
 
 	// vclip, but stop after the pruning stage
@@ -566,20 +570,22 @@ void slWorld::updateNeighbors() {
 	for ( ci = _proximityData->candidates.begin(); ci != _proximityData->candidates.end(); ci++ ) {
 		slCollisionCandidate c = ci->second;
 
-		o1 = _objects[c._x];
-		o2 = _objects[c._y];
+		o1 = _objects[ c._x ];
+		o2 = _objects[ c._y ];
 
-		slVectorSub( &o1->_position.location, &o2->_position.location, &diff );
-		dist = slVectorLength( &diff );
+		if( o1 && o2 ) {
+			slVectorSub( &o1->_position.location, &o2->_position.location, &diff );
+			dist = slVectorLength( &diff );
 
-		if ( dist < o1->_proximityRadius ) {
-			o1->_neighbors.push_back( o2 );
-			o1->_neighborData.push_back( o2->getCallbackData() );
-		}
+			if ( dist < o1->_proximityRadius ) {
+				o1->_neighbors.push_back( o2 );
+				o1->_neighborData.push_back( o2->getCallbackData() );
+			}
 
-		if ( dist < o2->_proximityRadius ) {
-			o2->_neighbors.push_back( o1 );
-			o2->_neighborData.push_back( o1->getCallbackData() );
+			if ( dist < o2->_proximityRadius ) {
+				o2->_neighbors.push_back( o1 );
+				o2->_neighborData.push_back( o1->getCallbackData() );
+			}
 		}
 	}
 }

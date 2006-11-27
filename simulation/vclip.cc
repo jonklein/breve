@@ -46,7 +46,6 @@ void slInitBoundSort( slVclipData *d ) {
 	}
 
 	slInitBoundSortList( d->boundListPointers[0], d, BT_XAXIS );
-
 	slInitBoundSortList( d->boundListPointers[1], d, BT_YAXIS );
 	slInitBoundSortList( d->boundListPointers[2], d, BT_ZAXIS );
 }
@@ -119,7 +118,7 @@ int slVclipData::clip( double tolerance, int pruneOnly, int boundingBoxOnly ) {
 		slCollisionCandidate c = ci->second;
 
 		if ( boundingBoxOnly ) {
-			if ( objects[c._x] && objects[c._y] && c._x != c._y ) {
+			if ( world->_objects[c._x] && world->_objects[c._y] && c._x != c._y ) {
 				ce->n1 = c._x;
 				ce->n2 = c._y;
 
@@ -169,26 +168,25 @@ slCollision *slNextCollision( slVclipData *v ) {
 }
 
 /*!
-	\brief Insertion-sort one of the dimensions of the sort list.
-
-	As we swap the elements, we set flags indicating whether they are
-	overlapping other objects or not.  When we're done, potential
-	collisions will be overlapping in all 3 dimensions.
-
-	What happens if there's a tie while we're sorting?
-
-	If we stop, then we might miss a case: A and B are equal, C comes along
-	and matches.  If we stop now, then we haven't noticed the potential
-	collision between A + C.  So we'll have to continue through equal
-	scores.
-
-	This doesn't seem like such a big deal, but is a MAJOR slowdown in
-	2-dimensional simulations--when the objects don't leave a certain
-	plane, we do *n^2 iterations*.  So, to break ties, we rely on the
-	number field of the bound entry.
-
-	This function is a major bottleneck for large simulations, and has
-	been optimized accordingly.
+ * \brief Insertion-sort one of the dimensions of the sort list.
+ *
+ * As we swap the elements, we set flags indicating whether they are
+ * overlapping other objects or not.  When we're done, potential
+ * collisions will be overlapping in all 3 dimensions.
+ *
+ * What happens if there's a tie while we're sorting?
+ *
+ * If we stop, then we might miss a case: A and B are equal, C comes along
+ * and matches.  If we stop now, then we haven't noticed the potential
+ * collision between A + C.  So we'll have to continue through equal
+ * scores.
+ *
+ * This doesn't seem like such a big deal, but is a MAJOR slowdown in
+ * 2-dimensional simulations--when the objects don't leave a certain
+ * plane, we do *n^2 iterations*.  So, to break ties, we rely on the
+ * number field of the bound entry.
+ *
+ * This function is a major bottleneck for large simulations, and has been optimized accordingly.
 */
 
 void slIsort( slVclipData *d, std::vector<slBoundSort*> &list, char boundTypeFlag ) {
@@ -275,13 +273,10 @@ void slIsort( slVclipData *d, std::vector<slBoundSort*> &list, char boundTypeFla
 	}
 }
 
-/*
-	+ slInitBoundSortList
-	=
-	= initializes a slBoundSort list by sorting it.  unlike the normal
-	= bound sort, the list has not been previously sorted and the flags
-	= are thus not consistant.
-*/
+/**
+ * Initializes a slBoundSort list by sorting it.  unlike the normal bound sort, the list has not 
+ * been previously sorted and the flags are thus not consistant.
+ */
 
 void slInitBoundSortList( std::vector<slBoundSort*> &list, slVclipData *v, char boundTypeFlag ) {
 	unsigned int n, extend;
@@ -295,7 +290,7 @@ void slInitBoundSortList( std::vector<slBoundSort*> &list, slVclipData *v, char 
 
 	for ( n = 0;n < list.size();n++ ) {
 
-		if ( list[n]->type == BT_MIN ) {
+		if ( list[ n ]->type == BT_MIN ) {
 			extend = n + 1;
 
 			x = list[n]->number;
@@ -338,9 +333,9 @@ void slInitBoundSortList( std::vector<slBoundSort*> &list, slVclipData *v, char 
 	}
 }
 
-/*!
-	\brief transforms p1 with the position p, placing the transformed plane in pt.
-*/
+/**
+ * Transforms p1 with the position p, placing the transformed plane in pt.
+ */
 
 slPlane *slPositionPlane( const slPosition *p, const slPlane *p1, slPlane *pt ) {
 	slVectorXform( p->rotation, &p1->normal, &pt->normal );
@@ -349,9 +344,9 @@ slPlane *slPositionPlane( const slPosition *p, const slPlane *p1, slPlane *pt ) 
 	return pt;
 }
 
-/*!
-	\brief Preforms a second-stage collision check on the specified object pair.
-*/
+/**
+ * Preforms a second-stage collision check on the specified object pair.
+ */
 
 int slVclipData::testPair( slCollisionCandidate *candidate, slCollision *ce ) {
 	int result = 0, iterations = 0;
@@ -375,17 +370,14 @@ int slVclipData::testPair( slCollisionCandidate *candidate, slCollision *ce ) {
 	*/
 
 	s1 = candidate->_shape1;
-
 	s2 = candidate->_shape2;
 
 	p1 = candidate->_position1;
-
 	p2 = candidate->_position2;
 
 	if ( !s1 || !s2 ) return slTerrainTestPair( this, x, y, ce );
 
 	f1 = &candidate->_feature1;
-
 	f2 = &candidate->_feature2;
 
 	if ( s1->_type == ST_SPHERE && s2->_type == ST_SPHERE ) {
@@ -445,17 +437,17 @@ int slVclipData::testPair( slCollisionCandidate *candidate, slCollision *ce ) {
 	return CT_DISJOINT;
 }
 
-/*!
-	\brief A brute-force collision check.
-
-	There appear to be some cases in which the regular feature testing
-	Fails and causes a loop.  this is obviously a bug, and should be
-	fixed.  however, since the simulation must go on, as they say in
-	show business, we'll have a brute force method that checks
-	every feature pair.
-
-	This is only done if a feature loop is detected.
-*/
+/**
+ * A brute-force collision check.
+ * 
+ * There appear to be some cases in which the regular feature testing
+ * Fails and causes a loop.  this is obviously a bug, and should be
+ * fixed.  however, since the simulation must go on, as they say in
+ * show business, we'll have a brute force method that checks
+ * every feature pair.
+ * 
+ * This is only done if a feature loop is detected.
+ */
 
 int slVclipTestPairAllFeatures( slVclipData *vc, slCollisionCandidate *candidate, slCollision *ce ) {
 	int result;
@@ -476,7 +468,7 @@ int slVclipTestPairAllFeatures( slVclipData *vc, slCollisionCandidate *candidate
 
 	y = candidate->_y;
 
-	if ( !vc->objects[x] || !vc->objects[y] ) return 0;
+	if ( !vc->world->_objects[ x ] || !vc->world->_objects[ y ] ) return 0;
 
 	s1 = candidate->_shape1;
 
@@ -595,13 +587,11 @@ int slSphereShapeCheck( slVclipData *vc, slFeature **feat, int x, int y, slColli
 
 	slPlane transformedPlane;
 
-	const slSphere *s1 = ( slSphere* )vc->objects[x]->getShape();
+	const slSphere *s1 = ( slSphere* )vc->world->_objects[x]->getShape();
+	const slShape *s2 = vc->world->_objects[y]->getShape();
 
-	const slShape *s2 = vc->objects[y]->getShape();
-
-	const slPosition *p1 = &vc->objects[x]->getPosition();
-
-	const slPosition *p2 = &vc->objects[y]->getPosition();
+	const slPosition *p1 = &vc->world->_objects[x]->getPosition();
+	const slPosition *p2 = &vc->world->_objects[y]->getPosition();
 
 	if ( !*feat ) *feat = s2->features[0];
 
@@ -759,9 +749,8 @@ int slSphereShapeCheck( slVclipData *vc, slFeature **feat, int x, int y, slColli
 		n++;
 	}
 
-	// oh crap!  we're inside the sphere.  that's not a metaphor
-	// or anything like "in the zone", or something--i mean, we are
-	// inside the sphere, or the sphere is inside us.
+	// oh crap!  we're inside the sphere.  that's not a metaphor or anything like 
+	// "in the zone", or something--i mean, we are inside the sphere, or the sphere is inside us.
 
 	f = ( slFace* )minFeature;
 
@@ -820,13 +809,13 @@ int slEdgeFaceClip( slFeature **nf1, slFeature **nf2, slVclipData *v, int x, int
 	slFace *f;
 	slEdge *e;
 
-	const slPosition *ep = &v->objects[x]->getPosition();
+	const slPosition *ep = &v->world->_objects[x]->getPosition();
 
-	const slPosition *fp = &v->objects[y]->getPosition();
+	const slPosition *fp = &v->world->_objects[y]->getPosition();
 
-	const slShape *s1 = v->objects[x]->getShape();
+	const slShape *s1 = v->world->_objects[x]->getShape();
 
-	const slShape *s2 = v->objects[y]->getShape();
+	const slShape *s2 = v->world->_objects[y]->getShape();
 
 	double maxDist;
 

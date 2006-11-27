@@ -55,7 +55,7 @@ class slPatch {
 		 slPatch( slPatchGrid* theGrid);
 
 		/**
-         *    slPatch full constructor.
+		 *    slPatch full constructor.
 		 *
 		 *    slPatch base constructor requires a parent grid
 		 *    location and color offset
@@ -142,9 +142,11 @@ class slPatchGrid {
 		 */
 		void setDrawWithTexture(bool t);
 
-        // below should be private/protected
+		// below should be private/protected
 
-		unsigned int xSize, ySize, zSize;
+		unsigned int _xSize;
+		unsigned int _ySize;
+		unsigned int _zSize;
 
 		slVector startPosition;
 		slVector patchSize;
@@ -156,7 +158,9 @@ class slPatchGrid {
 
 		unsigned char *colors;
 
-		int textureX, textureY, textureZ;
+		unsigned int _textureX;
+		unsigned int _textureY;
+		unsigned int _textureZ;
 
 		int drawSmooth;
 
@@ -164,6 +168,7 @@ class slPatchGrid {
 		int _cubeDrawList;
 		
 		bool _drawWithTexture;
+		bool _textureNeedsUpdate;
 
 };
 #else 

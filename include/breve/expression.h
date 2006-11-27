@@ -220,10 +220,10 @@ typedef struct stRtcCodeBlock_t {
 
 class stExp {
 	public:
-		stExp( const char *file, int l ) {
+		stExp( const char *f, int l ) {
 			block = NULL;
 			line = l;
-			file = file;
+			file = f;
 
 			debug = false;
 			block = NULL;

@@ -11,21 +11,21 @@
 
 /*@{*/
 
-/*!
-	\brief Registers a new object type with the engine.
-*/
+/**
+ * \brief Registers a new object type with the engine.
+ */
 
 void brEngineRegisterObjectType( brEngine *e, brObjectType *t ) {
 	e->objectTypes.push_back( t );
 }
 
-/*!
-	\brief Finds a method in an object.
-
-	Given an object type, a name, and an argument count, this function
-	finds a method and returns it as a brMethod structure.  This allows
-	a pointer to the method to be cached, to avoid frequent lookups.
-*/
+/**
+ * \brief Finds a method in an object.
+ * 
+ * Given an object type, a name, and an argument count, this function
+ * finds a method and returns it as a brMethod structure.  This allows
+ * a pointer to the method to be cached, to avoid frequent lookups.
+ */
 
 brMethod *brMethodFind( brObject *o, const char *name, unsigned char *types, int argCount ) {
 	brMethod *m;
@@ -61,17 +61,17 @@ brMethod *brMethodFind( brObject *o, const char *name, unsigned char *types, int
 	return m;
 }
 
-/*!
-	\brief Finds a method with a range of argument counts.
-
-	Looks for a method named "name" that accepts between min and max
-	arguments.  Will return the method with the highest number of
-	arguments possible.
-
-	This is used for callbacks which can optionally accept arguments.
-	If the user has specified that the method accepts arguments, they
-	are provided.
-*/
+/**
+ * \brief Finds a method with a range of argument counts.
+ * 
+ * Looks for a method named "name" that accepts between min and max
+ * arguments.  Will return the method with the highest number of
+ * arguments possible.
+ * 
+ * This is used for callbacks which can optionally accept arguments.
+ * If the user has specified that the method accepts arguments, they
+ * are provided.
+ */
 
 brMethod *brMethodFindWithArgRange( brObject *o, const char *name, unsigned char *types, int min, int max ) {
 	int n;
@@ -86,13 +86,13 @@ brMethod *brMethodFindWithArgRange( brObject *o, const char *name, unsigned char
 	return NULL;
 }
 
-/*!
-    \brief Finds an object in the given namespace
-
-	Looks up an object in the engine's table of known objects.  If
-	the object cannot be found, \ref brUnknownObjectFind is called
-	to ask each language frontend to locate the object.
-*/
+/**
+ * \brief Finds an object in the given namespace
+ *
+ * Looks up an object in the engine's table of known objects.  If
+ * the object cannot be found, \ref brUnknownObjectFind is called
+ * to ask each language frontend to locate the object.
+ */
 
 brObject *brObjectFind( brEngine *e, const char *name ) {
 	brObject *object;
@@ -105,12 +105,12 @@ brObject *brObjectFind( brEngine *e, const char *name ) {
 	return brUnknownObjectFind( e, name );
 }
 
-/*!
-	\brief Looks up an unknown object and adds it to the engine.
-
-	Uses the language frontend callbacks to locate and register
-	an object that does not currently exist in the engine.
-*/
+/**
+ * \brief Looks up an unknown object and adds it to the engine.
+ *
+ * Uses the language frontend callbacks to locate and register
+ * an object that does not currently exist in the engine.
+ */
 
 brObject *brUnknownObjectFind( brEngine *e, const char *name ) {
 	std::vector<brObjectType*>::iterator oi;
@@ -129,30 +129,29 @@ brObject *brUnknownObjectFind( brEngine *e, const char *name ) {
 	return NULL;
 }
 
-/*!
-	\brief Returns the userData field of a brInstance.
-*/
+/**
+ * \brief Returns the userData field of a brInstance.
+ */
 
 void *brInstanceGetUserData( brInstance *i ) {
 	return i->userData;
 }
 
-/*!
-	\brief Returns the userData field of a brObject.
-*/
+/**
+ * \brief Returns the userData field of a brObject.
+ */
 
 void *brObjectGetUserData( brObject *o ) {
 	return o->userData;
 }
 
-/*!
-	\brief Calls a method for an instance.
-
-	Executes the callMethod callback for to trigger a method call.
-
-	WARNING: the brEval values stored in args may be changed by the
-	method call, depending on the implementation of the language frontend.
-*/
+/**
+ * \brief Calls a method for an instance.
+ *
+ * Executes the callMethod callback for to trigger a method call.
+ * WARNING: the brEval values stored in args may be changed by the
+ * method call, depending on the implementation of the language frontend.
+ */
 
 int brMethodCall( brInstance *i, brMethod *m, const brEval **args, brEval *result ) {
 	if ( i->status != AS_ACTIVE ) {

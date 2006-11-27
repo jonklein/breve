@@ -141,9 +141,9 @@ int brIImageReadPixels( brEval args[], brEval *result, brInstance *i ) {
 	if( i->engine->camera->_activateContextCallback )
 		i->engine->camera->_activateContextCallback();
 
-	glPixelStoref( GL_ALPHA_BIAS, 1.0 );
+	glPixelTransferf( GL_ALPHA_BIAS, 1.0 );
 	glReadPixels( x, y, dm->x, dm->y, GL_RGBA, GL_UNSIGNED_BYTE, dm->data );
-	glPixelStoref( GL_ALPHA_BIAS, 0.0 );
+	glPixelTransferf( GL_ALPHA_BIAS, 0.0 );
 
 	return EC_OK;
 }

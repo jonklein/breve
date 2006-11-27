@@ -106,8 +106,7 @@ int main( int argc, char **argv ) {
 
 	brEngineSetIOPath( frontend->engine, getcwd( wd, MAXPATHLEN ) );
 
-	frontend->engine->camera->_activateContextCallback = activateContext;
-
+	frontend->engine->camera->setActivateContextCallback( activateContext );
 	frontend->engine->camera->_renderContextCallback = renderContext;
 
 	frontend->engine->getLoadname = getLoadname;
@@ -453,7 +452,7 @@ int slLoadOSMesaPlugin( char *execPath ) {
 
 	if ( !activate ) return -1;
 
-	frontend->engine->camera->_activateContextCallback = activate;
+	frontend->engine->camera->setActivateContextCallback( activate );
 
 	activate();
 

@@ -506,35 +506,25 @@ void slLink::disableSimulation() {
 	_simulate = 0;
 
 	odePos = dBodyGetPosition( _odeBodyID );
-
 	odeRot = dBodyGetRotation( _odeBodyID );
 
 	odeLinear = dBodyGetLinearVel( _odeBodyID );
-
 	odeAngular = dBodyGetAngularVel( _odeBodyID );
 
 	_position.location.x = odePos[0];
-
 	_position.location.y = odePos[1];
-
 	_position.location.z = odePos[2];
 
 	slODEToSlMatrix(( dReal* )odeRot, _position.rotation );
 
 	setLocation( &_position.location );
-
 	setRotation( _position.rotation );
 
 	_velocity.a.x = odeAngular[0];
-
 	_velocity.a.y = odeAngular[1];
-
 	_velocity.a.z = odeAngular[2];
-
 	_velocity.b.x = odeLinear[0];
-
 	_velocity.b.y = odeLinear[1];
-
 	_velocity.b.z = odeLinear[2];
 }
 

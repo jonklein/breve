@@ -25,14 +25,14 @@
 #include "multibody.h"
 #include "joint.h"
 
-/*!
-	\brief Initializes collision data for the world.
-
-	This is called every time an object is added to or removed from the
-	world, which is indicated by the slWorld initialized field being set to 0.
-
-	Sets the slWorld field initialized to 1.
-*/
+/**
+ * \brief Initializes collision data for the world.
+ * 
+ * This is called every time an object is added to or removed from the
+ * world, which is indicated by the slWorld initialized field being set to 0.
+ * 
+ * Sets the slWorld field initialized to 1.
+ */
 
 void slVclipDataInit( slWorld *w ) {
 	unsigned int x;
@@ -48,7 +48,6 @@ void slVclipDataInit( slWorld *w ) {
 
 	w->_clipData->realloc( w->_objects.size() );
 
-	w->_clipData->objects = w->_objects;
 	w->_clipData->world = w;
 	w->_clipData->collisionCount = 0;
 
@@ -97,16 +96,15 @@ void slVclipDataInit( slWorld *w ) {
 	}
 }
 
-/*!
-	\brief Initializes the slPairFlags for an object pair.
-
-	Initializes the data which stores the collision status for
-	a single pair of objects.
-
-	Calls the neccessary callback functions to determine whether
-	collisions should be detected/handled for this object pair or
-	not.
-*/
+/**
+ * \brief Initializes the slPairFlags for an object pair.
+ * 
+ * Initializes the data which stores the collision status for
+ * a single pair of objects.
+ * 
+ * Calls the neccessary callback functions to determine whether collisions should be 
+ * detected/handled for this object pair or not.
+ */
 
 slPairFlags slVclipData::initPairFlags( int x, int y ) {
 	void *c1, *c2;
@@ -267,7 +265,7 @@ void slInitProximityData( slWorld *w ) {
 	w->_proximityData->realloc( w->_objects.size() );
 
 	w->_proximityData->world = w;
-	w->_proximityData->objects = w->_objects;
+	// w->_proximityData->objects = w->_objects;
 
 	w->_proximityData->boundLists[0].clear();
 	w->_proximityData->boundLists[1].clear();

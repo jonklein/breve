@@ -198,6 +198,9 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 		v (vector).
 		a (float).
 
+		if | theVertex | == 0.0 || | theLocation | == 0.0:
+			return.
+
 		v = cross(theVertex, theLocation).
 		a = angle(theVertex, theLocation).
 
