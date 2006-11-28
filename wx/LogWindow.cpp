@@ -143,20 +143,17 @@ void LogWindow::OnClose(wxCloseEvent& event)
     event.Skip();
 }
 
-void LogWindow::Append(const char * text)
-{
+void LogWindow::Append(const char * text) {
     textctrl->AppendText(text);
     textctrl->ShowPosition(textctrl->GetLastPosition() - 1);
     gBreverender->RequestLogWindowReset();
 }
 
-void LogWindow::ResetLog()
-{
+void LogWindow::ResetLog() {
     textctrl->ShowPosition(textctrl->GetLastPosition() - 1);
 }
 
-void LogWindow::RunEvent(wxCommandEvent &event)
-{
+void LogWindow::RunEvent(wxCommandEvent &event) {
     wxString str;
 
     str = cmdinput->GetValue();

@@ -5,6 +5,8 @@
 #pragma interface "BreveInterface.cpp"
 #endif
 
+#include <string>
+
 struct breveFrontend;
 struct brInstance;
 
@@ -28,8 +30,8 @@ class BreveInterface
 	char * getLoadname();
 	char * getSavename();
 	int dialogCallback(char *title, char *message, char *b1, char *b2);
-	void menuCallback(brInstance *i);
-	void messageCallback(char *text);
+	void menuCallback( brInstance *i );
+	void messageCallback( const char *text );
 
 	bool Paused()
 	{
@@ -111,6 +113,8 @@ class BreveInterface
 	breveFrontend *frontend;
 	wxMenu * simmenu;
 
+	std::string mQueuedMessage;
+
 	long mSleepMS;
 };
 
@@ -125,6 +129,6 @@ void graphDisplay();
 void menuCallback(brInstance *i); // brGlutMenuUpdate
 int dialogCallback(char *title, char *message, char *b1, char *b2);
 char *interfaceVersionCallback();
-void messageCallback(char *text);
+void messageCallback( const char *text );
 
 #endif

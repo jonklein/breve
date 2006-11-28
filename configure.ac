@@ -112,7 +112,7 @@ case ${host_os} in
 		;;
 
 	cygwin* | mingw* )
-		LIBS="-lglut32 -lglu32 -lopengl32 -lws2_32 -lwinmm ${LIBS}"
+		LIBS="-lglut32 -lglu32 -lopengl32 -lws2_32 -lwinmm bin/python23.dll ${LIBS}"
 		PLUGINFLAGS="-shared"
 		PLUGINIMP="-Wl,--out-implib -Wl,lib/brevePlugin.a"
 		PLUGINLIB="\$(BREVEDIR)/lib/brevePlugin.a"

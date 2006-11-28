@@ -128,8 +128,8 @@ BreveInterface::~BreveInterface()
 	free(text);
 }
 
-void BreveInterface::Pause( int pause )
-{
+void BreveInterface::Pause( int pause ) {
+
 	if ( pause == paused )
 		return;
 
@@ -141,8 +141,8 @@ void BreveInterface::Pause( int pause )
 		brUnpauseTimer( frontend->engine );
 }
 
-bool BreveInterface::Initialize()
-{
+bool BreveInterface::Initialize() {
+
 	slInitGL( frontend->engine->world, frontend->engine->camera );
 
 	if ( breveFrontendLoadSimulation( frontend, text, simulationfile ) != EC_OK ) {
@@ -150,6 +150,12 @@ bool BreveInterface::Initialize()
 		slFree( text );
 		text = NULL;
 		Abort();
+	
+		if( mQueuedMessage.length() > 0 ) {
+			gBreverender->AppendLog( mQueuedMessage.c_str() );
+			mQueuedMessage = "";
+		}
+
 		return 0;
 	}
 
@@ -163,15 +169,18 @@ bool BreveInterface::Initialize()
 	return 1;
 }
 
-void BreveInterface::ResizeView(int x, int y)
-{
+void BreveInterface::ResizeView(int x, int y) {
 	frontend->engine->camera->setBounds( x, y );
 }
 
-void BreveInterface::Iterate()
-{
+void BreveInterface::Iterate() {
+	if( mQueuedMessage.length() > 0 ) {
+		gBreverender->AppendLog( mQueuedMessage.c_str() );
+		mQueuedMessage = "";
+	}
+
 	if (frontend == NULL || !initialized)
-	return;
+		return;
 
 	if (brEngineIterate(frontend->engine) != EC_OK) {
 		reportError();
@@ -182,8 +191,8 @@ void BreveInterface::Iterate()
 }
 
 void BreveInterface::Render() {
-	if (frontend == NULL || !initialized)
-	return;
+	if ( frontend == NULL || !initialized )
+		return;
 
 	brEngineLock(frontend->engine);
 	brEngineRenderWorld( frontend->engine,gBreverender->MouseDown() );
@@ -264,27 +273,24 @@ void BreveInterface::reportError()
 	gBreverender->queMsg( errorMessage );
 }
 
-void BreveInterface::messageCallback(char *text)
-{
-	gBreverender->AppendLog(text);
+void BreveInterface::messageCallback( const char *text ) {
+	mQueuedMessage += text;
+
 }
 
-void messageCallback(char *text)
-{
+void messageCallback( const char *text ) {
 	if (gBreverender->GetSimulation() == NULL)
 	return;
 
-	gBreverender->GetSimulation()->GetInterface()->messageCallback(text);
+	gBreverender->GetSimulation()->GetInterface()->messageCallback( text );
 }
 
-int soundCallback()
-{
+int soundCallback() {
 	wxBell();
 	return 0;
 }
 
-int pauseCallback()
-{
+int pauseCallback() {
 	if (gBreverender->GetSimulation() == NULL)
 	return 0;
 

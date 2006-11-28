@@ -111,7 +111,7 @@ void slJoint::breakJoint() {
 		_odeMotorID = NULL;
 	}
 
-	bzero( &_feedback, sizeof( dJointFeedback ) );
+	memset( &_feedback, 0, sizeof( dJointFeedback ) );
 
 	_child = NULL;
 

@@ -59,7 +59,6 @@ slMovie *slMovieCreate( char *filename, int width, int height ) {
 	}
 
 	m->_context->codec_id = CODEC_ID_MPEG1VIDEO;
-
 	m->_context->codec_type = CODEC_TYPE_VIDEO;
 
 	if ( !( codec = avcodec_find_encoder( m->_context->codec_id ) ) ) {
@@ -73,22 +72,22 @@ slMovie *slMovieCreate( char *filename, int width, int height ) {
 
 	m->_context->width = width;
 	m->_context->height = height;
-#if (LIBAVCODEC_VERSION_INT>>16)>=51
+#if ( LIBAVCODEC_VERSION_INT >> 16 ) >= 51
 	m->_context->time_base = ( AVRational ) {
-		                         1, 25
-	                         };
-
+		1, 25
+	};
 #else
-	m->_context->frame_rate = 1000 * m->_context->frame_rate_base;
+	m->_context->frame_rate = 25;
 #endif
+	// m->_context->bit_rate = 400000;
 	m->_context->bit_rate = 1600 * 1000;
-	m->_context->gop_size = 15;
+	m->_context->gop_size = 10;
 	m->_context->max_b_frames = 1;
 
 	int err = 0;
 
-	if (( err = avcodec_open( m->_context, codec ) ) < 0 ) {
-		slMessage( DEBUG_ALL, "Error opening video output codec: %d\n", err );
+	if ( ( err = avcodec_open( m->_context, codec ) ) < 0 ) {
+		slMessage( DEBUG_ALL, "Error opening video output codec: %d [size %d x %d]\n", err, width, height );
 		av_free( m->_context );
 		delete m;
 		return NULL;

@@ -68,13 +68,13 @@ brEngine *brEngineNew( void ) {
 
 	char wd[MAXPATHLEN];
 
+#if MINGW
+	pthread_win32_process_attach_np();
+#endif
+
 #if WINDOWS
 	WSADATA wsaData;
 	WSAStartup( 0x0101, &wsaData );
-#endif
-
-#if MINGW
-	pthread_win32_process_attach_np();
 #endif
 
 	// glutInit( &zero, NULL );

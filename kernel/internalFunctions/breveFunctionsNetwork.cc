@@ -160,10 +160,10 @@ void breveInitNetworkFunctions( brNamespace *n ) {
 */
 
 char *brHostnameFromAddr( struct in_addr *addr ) {
-
 	struct hostent *h;
-
 	static char numeric[256];
+
+	return "nothing";
 
 	if ( !( h = gethostbyaddr(( const char* )addr, 4, AF_INET ) ) ) {
 		unsigned char *address = ( unsigned char * )addr;
@@ -239,12 +239,13 @@ void *brListenOnSocket( void *data ) {
 
 		if ( clientData.socket != -1 ) {
 			// fcntl(clientData.socket, F_SETFL, O_NONBLOCK);
+			printf( "about to lock\n" );
 
-			pthread_mutex_lock( &clientData.engine->lock );
+			brEngineLock( clientData.engine );
 
 			brHandleConnection( &clientData );
 
-			pthread_mutex_unlock( &clientData.engine->lock );
+			brEngineUnlock( clientData.engine );
 
 #if WINDOWS
 			closesocket( clientData.socket );
@@ -325,7 +326,9 @@ void *brHandleConnection( void *p ) {
 
 	hostname = brHostnameFromAddr( &data->addr.sin_addr );
 
-	if ( hostname ) slMessage( DEBUG_ALL, "network connection from %s\n", hostname );
+	if ( hostname ) {
+		slMessage( DEBUG_ALL, "network connection from %s\n", hostname );
+	}
 
 	count = recv( data->socket, ( char* ) & request, sizeof( brNetworkRequest ), 0 );
 
@@ -361,7 +364,6 @@ void *brHandleConnection( void *p ) {
 
 			length = header.length;
 
-			// slMessage(DEBUG_ALL, "received XML message of length %d from host %s\n", length, hostname);
 			buffer = new char[length+1];
 
 			count = slUtilRead( data->socket, buffer, length );
