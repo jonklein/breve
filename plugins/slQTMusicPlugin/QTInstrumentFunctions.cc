@@ -88,8 +88,6 @@ slQTInstrumentInfo *slQTNewInstrumentInfo( int instrument ) {
 int brQTInstrumentFree( brEval args[], brEval *result, void *i ) {
 	slQTInstrumentInfo *info = ( slQTInstrumentInfo* )BRPOINTER( &args[0] );
 
-	printf( "freeing %p and %p\n", info->channel, info->allocator );
-
 	if ( info->channel ) NADisposeNoteChannel( info->allocator, info->channel );
 
 	if ( info->allocator ) CloseComponent( info->allocator );
@@ -98,7 +96,7 @@ int brQTInstrumentFree( brEval args[], brEval *result, void *i ) {
 }
 
 int brQTInstrumentNew( brEval args[], brEval *result, void *i ) {
-	BRPOINTER( result ) = slQTNewInstrumentInfo( BRINT( &args[0] ) );
+	result->set( (void*)slQTNewInstrumentInfo( BRINT( &args[0] ) ) );
 
 	return EC_OK;
 }
@@ -121,8 +119,6 @@ int brQTInstrumentSetController( brEval args[], brEval *result, void *i ) {
 	slQTInstrumentInfo *info = ( slQTInstrumentInfo* )BRPOINTER( &args[0] );
 	long number = BRINT( &args[1] );
 	long value = BRINT( &args[2] );
-
-	printf( "setting %d for %d\n", value, number );
 
 	NASetController( info->allocator, info->channel, number, value );
 
@@ -172,6 +168,8 @@ int brQTInstrumentStopNote( brEval args[], brEval *result, void *i ) {
 	return EC_OK;
 }
 
+extern "C" {
+
 void slInitQTInstrumentFuncs( void *n ) {
 	brNewBreveCall( n, "instrumentNew", brQTInstrumentNew, AT_POINTER, AT_INT, 0 );
 	brNewBreveCall( n, "instrumentFree", brQTInstrumentFree, AT_NULL, AT_POINTER, 0 );
@@ -182,3 +180,4 @@ void slInitQTInstrumentFuncs( void *n ) {
 	brNewBreveCall( n, "instrumentSetController", brQTInstrumentSetController, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0 );
 }
 
+}

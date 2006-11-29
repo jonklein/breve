@@ -87,7 +87,6 @@ enum atomicTypes {
     AT_DOUBLE,
     AT_STRING,
     AT_INSTANCE,
-    AT_BRIDGE_INSTANCE,
     AT_POINTER,
     AT_VECTOR,
     AT_MATRIX,

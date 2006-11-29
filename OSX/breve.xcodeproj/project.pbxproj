@@ -87,6 +87,7 @@
 		48619FB8071475A500E0A1B6 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BD20F40397BFE301980AE4 /* QuickTime.framework */; };
 		48619FB9071475A500E0A1B6 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BD20F30397BFE301980AE4 /* OpenGL.framework */; };
 		48620C9207944552009195E5 /* libbreve.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 48620C9107944552009195E5 /* libbreve.a */; };
+		48A2AC000B1BE9410010C477 /* QTInstrumentPlugin.o in Resources */ = {isa = PBXBuildFile; fileRef = 48A2ABFF0B1BE9410010C477 /* QTInstrumentPlugin.o */; };
 		48CE1D0408155BDE0030CBB8 /* DocumentIcons.icns in Resources */ = {isa = PBXBuildFile; fileRef = 48CE1CFB08155B1F0030CBB8 /* DocumentIcons.icns */; };
 		48E1722407AAAF370072492B /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48E1722307AAAF370072492B /* JavaVM.framework */; };
 		48ECC165071C13C100596F93 /* Digitizer.tz in CopyFiles */ = {isa = PBXBuildFile; fileRef = 48ECC163071C13C100596F93 /* Digitizer.tz */; };
@@ -123,6 +124,7 @@
 		48620C9107944552009195E5 /* libbreve.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbreve.a; path = ../lib/libbreve.a; sourceTree = SOURCE_ROOT; };
 		48807AA104DF1DB800A8D232 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
 		48807AB004DF1E2C00A8D232 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
+		48A2ABFF0B1BE9410010C477 /* QTInstrumentPlugin.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = QTInstrumentPlugin.o; path = ../plugins/slQTMusicPlugin/QTInstrumentPlugin.o; sourceTree = SOURCE_ROOT; };
 		48CE1CFB08155B1F0030CBB8 /* DocumentIcons.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = DocumentIcons.icns; sourceTree = SOURCE_ROOT; };
 		48D1C0BC04632D760093F8AA /* slGraphWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slGraphWindowController.h; sourceTree = SOURCE_ROOT; };
 		48D1C0BD04632D760093F8AA /* slGraphWindowController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = slGraphWindowController.mm; sourceTree = "<group>"; };
@@ -132,7 +134,6 @@
 		48ECC163071C13C100596F93 /* Digitizer.tz */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = Digitizer.tz; path = ../plugins/slDigitizerPlugin/Digitizer.tz; sourceTree = SOURCE_ROOT; };
 		48ECC164071C13C100596F93 /* DigitizerPlugin.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = DigitizerPlugin.o; path = ../plugins/slDigitizerPlugin/DigitizerPlugin.o; sourceTree = SOURCE_ROOT; };
 		48ECC16E071C13F400596F93 /* Instrument.tz */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = Instrument.tz; path = ../plugins/slQTMusicPlugin/Instrument.tz; sourceTree = SOURCE_ROOT; };
-		48ECC16F071C13F400596F93 /* QTInstrumentPlugin.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = QTInstrumentPlugin.o; path = ../plugins/slQTMusicPlugin/QTInstrumentPlugin.o; sourceTree = SOURCE_ROOT; };
 		48F0A4F209CCEE1900B52C28 /* libdl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libdl.dylib; path = /usr/lib/libdl.dylib; sourceTree = "<absolute>"; };
 		F569DDB00398039F01B2CBA0 /* Template.tz */ = {isa = PBXFileReference; lastKnownFileType = text; name = Template.tz; path = ../lib/Template.tz; sourceTree = SOURCE_ROOT; };
 		F569DDB303980C9101B2CBA0 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Errors.strings; sourceTree = "<group>"; };
@@ -327,8 +328,8 @@
 		48ECC16B071C13D200596F93 /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
+				48A2ABFF0B1BE9410010C477 /* QTInstrumentPlugin.o */,
 				48ECC16E071C13F400596F93 /* Instrument.tz */,
-				48ECC16F071C13F400596F93 /* QTInstrumentPlugin.o */,
 				48ECC163071C13C100596F93 /* Digitizer.tz */,
 				48ECC164071C13C100596F93 /* DigitizerPlugin.o */,
 			);
@@ -430,6 +431,7 @@
 				4802DC4905616137008198B9 /* breve.scriptSuite in Resources */,
 				4802DC4A05616137008198B9 /* breve.scriptTerminology in Resources */,
 				4832D4A409B9FFC200443499 /* DigitizerPlugin.o in Resources */,
+				48A2AC000B1BE9410010C477 /* QTInstrumentPlugin.o in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

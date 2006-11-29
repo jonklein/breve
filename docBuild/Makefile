@@ -2,7 +2,8 @@ DOCBOOKDIR	= /sw/bin
 
 .PHONY: classes docbook documentation source spell tidy
 
-documentation: docclean docbook
+documentation: docclean 
+	make docbook
 
 docclean: 
 	rm -rf docs
@@ -30,7 +31,6 @@ docbook-pdf:
 	cd docBuild/docbook; fop -fo breve_documentation.fo -pdf breve_documentation.pdf
 
 docbook: imagecopy classes
-
 	echo "$(VERSION)" > docBuild/docbook/version.txt
 	date +'%m-%d-%Y' > docBuild/docbook/date.txt
 
@@ -44,7 +44,7 @@ docbook: imagecopy classes
 	cd docBuild/docbook; \
 		xsltproc make-html.xsl breve.docbook
 
-	cp -R docBuild/docbook/index.html docBuild/docbook/docs docs/
+	cp -R docBuild/docbook/*.html docs/
 
 
 source:
