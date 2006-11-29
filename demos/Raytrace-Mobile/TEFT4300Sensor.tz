@@ -29,7 +29,7 @@ IRSensor:TEFT4300Sensor (aka TEFT4300Sensors){
 		columns(int).
 		maxrange (double).
 		maxangle(double).
-		rows = 3.
+		rows = 7.
 		columns = rows.
 		maxrange = 40.
 		maxangle = 60/PI * 180. # maximum 79

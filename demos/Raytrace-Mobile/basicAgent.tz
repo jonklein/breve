@@ -102,6 +102,7 @@ Mobile : basicAgent (aka basicAgents) {
 		rotation(matrix).
 		right60(matrix).
 		left150(matrix).
+		turn30(matrix).
 		draw = new Drawing.
 		shapee = (controller get-walker-shape).
 		self set-shape to shapee.
@@ -109,9 +110,21 @@ Mobile : basicAgent (aka basicAgents) {
 		hoodSize = 50.
 		self set-neighborhood-size to hoodSize.
 		
-		rotation = [(1,0,0),(0,1,0),(0,0,1)].
-		right60 = [(cos(PI/3),0,-sin(PI/3)),(0,1,0),(sin(PI/3),0,cos(PI/3))].
-		left150 = [(cos(-PI*5/6),0,-sin(-PI*5/6)),(0,1,0),(sin(-PI*5/6),0,cos(-PI*5/6))].
+		rotation = [(1,0,0),
+					(0,1,0),
+					(0,0,1)].
+#		turn30 = [	(cos(PI/6),	-sin(PI/6),	0),
+#					(sin(PI/6),	cos(PI/6),	0),
+#					(0,				0,		1)].
+		turn30 = [	(1,			0,			0),
+					(0,	cos(PI/6),	-sin(PI/6)),
+					(0,	sin(PI/6),	cos(PI/6))].
+		right60 = [	(cos(PI/3),		0,		-sin(PI/3)),
+					(0,				1,		0),
+					(sin(PI/3),		0,		cos(PI/3))].
+		left150 = [	(cos(-PI*5/6),	0,		-sin(-PI*5/6)),
+					(0,				1,		0),
+					(sin(-PI*5/6),	0,		cos(-PI*5/6))].
 
 		#          \         /
 		#           \   1   /
@@ -128,6 +141,7 @@ Mobile : basicAgent (aka basicAgents) {
 		# the sensors point in z direction
 		
 		# just add the sensors
+#		rotation = rotation*turn30.
 		rotation = rotation*left150.
 		sensors{0} = (new IRSensor init-with type "TEFT4300" rel-position ((RobotSize)/2.0, 0,-(RobotSize)/2.0 ) rel-rotation rotation owner self).
 		rotation = rotation*right60.

@@ -48,12 +48,12 @@ Control : myControl {
 
 # here are the tests, all except one should be commented out
 
-#		self sensorTest-Distance.
-#		self sensorTest-Azimut distance 5.0.
-#		self sensorTest-Incidence distance 10.0.
+		self sensorTest-Distance.
+#		self sensorTest-Azimut distance 10.0.
+#		self sensorTest-Incidence distance 12.5.
 #		self testInsideSensor.
 #		self messageTest-allSensors.
-		self messageTest-block.
+#		self messageTest-block.
 #		self messageTest-Bidirectional.
 #		self moveAroundTest.
 
