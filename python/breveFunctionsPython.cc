@@ -36,12 +36,13 @@ int brPythonLoadFile( brEval arguments[], brEval *result, brInstance *instance )
 
 	result->set( PyRun_SimpleString( import ) );
 
-	slFree( file );
-
 	if( BRINT( result ) != 0 ) {
 		slMessage( DEBUG_ALL, "Python load of file \"%s\" failed\n", file );
+		slFree( file );
 		return EC_ERROR;
 	}
+
+	slFree( file );
 
 	return EC_OK;
 }

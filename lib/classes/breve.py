@@ -1,8 +1,7 @@
 import __main__
 import breveInternal
 import breve
-import sys, os
-
+import sys
 
 class breveStderrHandler:
     def write( self, line ):
@@ -13,9 +12,11 @@ class breveStdoutHandler:
         breveInternal.catchOutput( breveInternal, line )
 
 sys.stderr = breveStderrHandler()
-
 sys.stdout = breveStdoutHandler()
 
+
+
+import os
 
 class breveInternalFunctions:
 	def __getattr__( self, method ):

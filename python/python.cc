@@ -731,6 +731,20 @@ void brPythonInit( brEngine *breveEngine ) {
 
 	PyRun_SimpleString( "import sys" );
 
+	std::string setpath, path;
+
+	for( unsigned int n = 0; n < breveEngine->_searchPaths.size(); n++ ) {
+		path = breveEngine->_searchPaths[ n ];
+		setpath = "sys.path.append( '" + path + "' ) ";
+
+		PyRun_SimpleString( setpath.c_str() );
+
+		path += "/PythonLibraries/";
+		setpath = "sys.path.append( '" + path + "' ) ";
+
+		PyRun_SimpleString( setpath.c_str() );
+	}
+
 	const std::vector< std::string > &paths = brEngineGetSearchPaths( breveEngine );
 
 	for( unsigned int n = 0; n < paths.size(); n++ ) {
