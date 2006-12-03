@@ -45,6 +45,8 @@ void SetupAnimation( int Width, int Height );
 void CleanupAnimation();
 void OnTimer( HDC hDC );
 
+breveFrontend *gFrontend;
+
 #define TIMER 1
 
 LRESULT WINAPI ScreenSaverProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam ) {
@@ -88,6 +90,8 @@ BOOL WINAPI ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, L
 
 	if( message == WM_COMMAND ) {
 		long command = LOWORD( wParam );
+		char winDir[ 1024 ];
+		std::string dataFile;
 
 		switch( command ) {
 			case IDABOUT:
@@ -96,12 +100,10 @@ BOOL WINAPI ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, L
 				break;
 	
 			case IDRESET:
-				char *file = brFindFile( gEngine, "breveCreatures.xml" );
+				GetWindowsDirectory( winDir, 1024 );
+				dataFile = std::string( winDir ) + "\\breve\\lib\\classes\\breveCreatures.xml";
 
-				if( file ) {
-					unlink( file );
-					slFree( file );
-				}
+				unlink( dataFile.c_str() );
 
 				return TRUE;
 				break;
@@ -145,8 +147,6 @@ void CloseGL(HWND hWnd, HDC hDC, HGLRC hRC) {
 	ReleaseDC( hWnd, hDC );
 }
 
-breveFrontend *gFrontend;
-
 void SetupAnimation( int inWidth, int inHeight ) {
 	glViewport( 0, 0, inWidth, inHeight );
 
@@ -160,7 +160,6 @@ void SetupAnimation( int inWidth, int inHeight ) {
 	
 	char winDir[ 1024 ];
 	GetWindowsDirectory( winDir, 1024 );
-	
 	std::string classPath = std::string( winDir ) + "\\breve\\lib\\classes\\";
 
 	brEngineSetIOPath( gFrontend->engine, classPath.c_str() );

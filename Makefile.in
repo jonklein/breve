@@ -169,6 +169,7 @@ OSX_release:
 	rm -rf breve_image_folder
 
 CLI_release: clean
+	$(MAKE) documentation
 	$(MAKE) optimize
 	rm -rf $(CLI_FOLDER)
 	mkdir -p $(CLI_FOLDER)/bin
@@ -198,6 +199,7 @@ endif
 	@ARCHIVER@ breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@ $(CLI_FOLDER)
 
 WX_release: clean
+	$(MAKE) documentation
 	$(MAKE) optimize
 	cd wx; make
 	rm -rf $(IDE_FOLDER)

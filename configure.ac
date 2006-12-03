@@ -112,7 +112,7 @@ case ${host_os} in
 		;;
 
 	cygwin* | mingw* )
-		LIBS="-lglut32 -lglu32 -lopengl32 -lws2_32 -lwinmm bin/python23.dll ${LIBS}"
+		LIBS="-lglut32 -lglu32 -lopengl32 -lws2_32 -lwinmm `pwd`/bin/python23.dll ${LIBS}"
 		PLUGINFLAGS="-shared"
 		PLUGINIMP="-Wl,--out-implib -Wl,lib/brevePlugin.a"
 		PLUGINLIB="\$(BREVEDIR)/lib/brevePlugin.a"
@@ -275,11 +275,6 @@ if test "x$engine_only" = "x"; then
 		AC_DEFINE( [HAVE_LIBPYTHON] )
 	fi
 
-
-	if test "x$custom_cblas" = x; then
-		AC_CHECK_LIB([gslcblas], [cblas_ccopy])
-	fi
-
 	AC_CHECK_LIB([avutil], [main])
 	AC_CHECK_LIB([avcodec], [avcodec_init])
 	AC_CHECK_LIB([avformat], [av_write_frame])
@@ -291,6 +286,10 @@ if test "x$engine_only" = "x"; then
 
 	AC_CHECK_LIB([qgame++], [main])
 	AC_CHECK_LIB([ftgl], [main])
+fi
+
+if test "x$custom_cblas" = x; then
+	AC_CHECK_LIB([gslcblas], [cblas_ccopy])
 fi
 
 AC_CHECK_LIB([png], [png_create_write_struct])
