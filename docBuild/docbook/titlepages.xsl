@@ -43,6 +43,9 @@
 </xsl:template>
 
 <xsl:template name="book.titlepage.before.verso">
+<center>
+<img src="images/breve_icon.jpg" />
+</center>
 </xsl:template>
 
 <xsl:template name="book.titlepage">
