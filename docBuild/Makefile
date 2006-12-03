@@ -1,17 +1,17 @@
-DOCBOOKDIR	= /sw/bin
-
 .PHONY: classes docbook documentation source spell tidy
 
-documentation: docclean 
-	make docbook
+all: html pdf
 
-docclean: 
-	rm -rf docs
-	mkdir docs
+docclean: pdf-clean html-clean
+
+pdf-clean:
+	rm -rf pdfdocs
+
+html-clean:
+	rm -rf htmldocs
 
 docBuild/docExtract: docBuild/docExtract.c
 	# g++ chokes here?!
-
 	$(CC) -o docBuild/docExtract docBuild/docExtract.c
 
 classes: docBuild/docExtract
@@ -19,40 +19,25 @@ classes: docBuild/docExtract
 	docBuild/docExtract lib/classes/*.tz | docBuild/docBuild.pl docs/classes
 	cp docBuild/classImages/*.jpg docs/classes/
 
-imagecopy:
-	cp docBuild/docbook/images/breve_icon.jpg docs/
-	mkdir -p docs/docs/images
-	cp docBuild/docbook/images/*.jpg docs/docs/images/
-	cp docBuild/docbook/images/*.gif docs/docs/images/
-	cp docBuild/docbook/images/*.eps docs/docs/images/
+pdf: pdf-clean
+	mkdir -p pdfdocs
+	xsltproc --output breve_documentation.fo --stringparam fop.extensions 1 /usr/local/lib/docbook-xsl-1.71.1/fo/docbook.xsl breve.docbook
+	fop -fo breve_documentation.fo -pdf pdfdocs/breve_documentation.pdf
 
-docbook-pdf: 
-	cd docBuild/docbook; xsltproc --output breve_documentation.fo --stringparam fop.extensions 1 /usr/local/lib/docbook-xsl-1.70.1/fo/docbook.xsl breve.docbook
-	cd docBuild/docbook; fop -fo breve_documentation.fo -pdf breve_documentation.pdf
+html: html-clean
+	mkdir -p htmldocs
+	mkdir -p htmldocs/docs
 
-docbook: imagecopy classes
-	echo "$(VERSION)" > docBuild/docbook/version.txt
-	date +'%m-%d-%Y' > docBuild/docbook/date.txt
+	cp stylesheet.css htmldocs
+	cp stylesheet.css htmldocs/docs
 
-	mkdir -p docBuild/docbook/docs
+	xsltproc make-html.xsl breve.docbook
 
-	touch docBuild/docbook/index.docbook
-
-	cd docBuild/docbook; \
-		./makeclasslist.sh ../../docs/classes > classlist.docbook
-
-	cd docBuild/docbook; \
-		xsltproc make-html.xsl breve.docbook
-
-	cp -R docBuild/docbook/*.html docs/
-
+	mkdir -p htmldocs/images
+	cp images/*.jpg htmldocs/images/
+	cp images/*.gif htmldocs/images/
+	cp images/*.eps htmldocs/images/
 
 source:
 	mkdir -p ../docs/source
 	doxygen breve.doxygen
-
-spell:
-	ispell -H docbook/*.docbook
-
-tidy:
-	cd docbook; tidy -config tidy.cfg -m -i -xml *.docbook
