@@ -169,7 +169,6 @@ int stXMLWriteSimulationToStream( FILE *file, brEngine *e ) {
 }
 
 int stXMLWriteObject( stXMLArchiveRecord *record, FILE *file, stInstance *i, int spaces, int isDataObject ) {
-	slList *list;
 	stObject *o;
 	brEval result;
 	int r;
@@ -223,14 +222,14 @@ int stXMLWriteObject( stXMLArchiveRecord *record, FILE *file, stInstance *i, int
 
 	if ( !isDataObject ) {
 
-		list = i->breveInstance->observers;
+		for( int n = 0; n < i->breveInstance->observers.size(); n++ ) {
+			brObserver *obs = i->breveInstance->observers[ n ];
 
-		while ( list ) {
+
 			XMLPutSpaces( spaces, file );
 			fprintf( file, "<observers>\n" );
 			spaces += XML_INDENT_SPACES;
 
-			brObserver *obs = ( brObserver* )list->data;
 			int index;
 
 			if ( obs->instance && obs->instance->status == AS_ACTIVE ) {
@@ -246,8 +245,6 @@ int stXMLWriteObject( stXMLArchiveRecord *record, FILE *file, stInstance *i, int
 			fprintf( file, "<notification name=\"%s\"/>\n", obs->notification );
 			XMLPutSpaces( spaces, file );
 			fprintf( file, "<method name=\"%s\"/>\n", obs->method->name );
-
-			list = list->next;
 
 			spaces -= XML_INDENT_SPACES;
 			XMLPutSpaces( spaces, file );

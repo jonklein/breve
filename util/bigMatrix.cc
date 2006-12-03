@@ -241,7 +241,7 @@ float slVectorViewGSL::dotProduct( const slVectorView& other ) const {
  *  outer product
  */
 slBigMatrix2DGSL& slVectorViewGSL::outerProduct( const slVectorView& other ) const {
-	unsigned int i, j;
+	int i, j;
 	float  *v = _vec->data;
 	float  *u = other.getGSLVector()->data;
 	slBigMatrix2DGSL* result = new slBigMatrix2DGSL( _dim, other.dim() );
@@ -259,7 +259,7 @@ slBigMatrix2DGSL& slVectorViewGSL::outerProduct( const slVectorView& other ) con
  *  outer product
  */
 slBigMatrix2DGSL& slVectorViewGSL::outerProductInto( const slVectorView& other, slBigMatrix2DGSL& result ) const {
-	unsigned int i, j;
+	int i, j;
 	float  *v = _vec->data;
 	float  *u = other.getGSLVector()->data;
 

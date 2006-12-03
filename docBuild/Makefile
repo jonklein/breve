@@ -2,7 +2,7 @@
 
 all: html pdf
 
-docclean: pdf-clean html-clean
+clean: pdf-clean html-clean
 
 pdf-clean:
 	rm -rf pdfdocs

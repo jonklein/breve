@@ -42,9 +42,7 @@ include graph/Makefile
 include neural/Makefile
 include neural/Network/Makefile
 include steve/Makefile
-# include java/Makefile
 include python/Makefile
-include docBuild/Makefile
 include util/Makefile
 include WinSaver/Makefile
 
@@ -78,9 +76,6 @@ breve.dll: $(OBJ)
 %.tab.c: %.y
 	$(YACC) $(YFLAGS) -o $@ $<
 
-# %.class: %.java
-#	$(JAVAC) $<
-
 %.d: %.cc
 	@echo "Generating dependencies for $<"
 	@echo -n $(@D)/ > $@
@@ -112,16 +107,22 @@ depend:: $(DEPS)
 	m4 -D_VERSION_=$(VERSION) -D_DATE_=`date +'%m-%d-%y'` $< > $@
 
 clean:
+	cd docBuild; make clean
+
 	rm -f README.txt README_SOURCE.txt
 	rm -f bin/breve@EXE_SUFFIX@ bin/breve_cli@EXE_SUFFIX@
 	rm -f .depend breve.dll lib/*.a
 	rm -f steve/format.c steve/stevelex.c
 	rm -f steve/steveparse.tab.c steve/steveparse.tab.h
-	# rm -f java/*.class lib/classes/*.jar
-	rm -rf docBuild/docs OSX/build
 	find . -name 'core' -exec rm -f {} \;
 	find . -name '*.o' -exec rm -f {} \;
 	find . -name '*.d' -exec rm -f {} \;
+
+documentation:
+	cd docBuild; make html
+	rm -rf docs
+	mkdir -p docs
+	cp -r docBuild/htmldocs/* docs
 
 OSX_build: optimize lib/libbreve.a
 	m4 -D_VERSION_=$(VERSION) -D_DATE_=`date +'%m-%d-%y'` OSX/README.html.m4 > OSX/README.html
@@ -157,7 +158,7 @@ OSX_release:
 	mkdir breve_image_folder
 	cp -R OSX/build/Deployment-Universal/breve.app breve_image_folder
 	cp OSX/README.html breve_image_folder
-	cp docBuild/docbook/images/breve_icon.jpg breve_image_folder/breve_icon.jpg
+	cp docBuild/images/breve_icon.jpg breve_image_folder/breve_icon.jpg
 	cp OSX/Documentation.txt breve_image_folder
 	cp Changes.html GPL.txt breve_image_folder
 	mkdir breve_image_folder/plugins

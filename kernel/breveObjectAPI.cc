@@ -237,8 +237,8 @@ int brInstanceAddObserver( brInstance *i, brInstance *observer, char *notificati
 
 	o = new brObserver( observer, method, notification );
 
-	i->observers = slListPrepend( i->observers, o );
-	observer->observees = slListPrepend( observer->observees, i );
+	i->observers.push_back( o );
+	observer->observees.push_back( i );
 
 	return 0;
 }
@@ -251,36 +251,32 @@ int brInstanceAddObserver( brInstance *i, brInstance *observer, char *notificati
 */
 
 void brEngineRemoveInstanceObserver( brInstance *i, brInstance *observerInstance, char *notification ) {
-	slList *observerList, *match, *last;
 	brObserver *observer;
 
-	observerList = i->observers;
+	if ( i->status == AS_FREED || observerInstance->status == AS_FREED ) 
+		return;
 
-	last = NULL;
-
-	if ( i->status == AS_FREED || observerInstance->status == AS_FREED ) return;
-
-	while ( observerList ) {
-		observer = ( brObserver* )observerList->data;
+	for( unsigned int n = 0; n < i->observers.size(); n++ ) {
+		observer = i->observers[ n ];
 
 		if ( observer->instance == observerInstance && ( !notification || !strcmp( notification, observer->notification ) ) ) {
-			match = observerList;
+			std::vector< brObserver* >::iterator observermatch;
 
-			if ( last ) last->next = observerList->next;
-			else i->observers = observerList->next;
+			observermatch = std::find( i->observers.begin(), i->observers.end(), observer );
 
-			observerList = observerList->next;
+			if( observermatch != i->observers.end() ) 
+				i->observers.erase( observermatch );
 
 			delete observer;
-
-			slFree( match );
-		} else {
-			last = observerList;
-			observerList = observerList->next;
-		}
+		} 
 	}
 
-	observerInstance->observees = slListRemoveData( observerInstance->observees, i );
+	std::vector< brInstance* >::iterator observee;
+
+	observee = std::find( observerInstance->observees.begin(), observerInstance->observees.end(), i );
+
+	if( observee != observerInstance->observees.end() ) 
+		observerInstance->observees.erase( observee );
 }
 
 /*!
@@ -300,8 +296,6 @@ brObject *brEngineAddObject( brEngine *e, brObjectType *t, const char *name, voi
 	o->type = t;
 
 	o->userData = pointer;
-
-	o->collisionHandlers = slStackNew();
 
 	e->objects[ names ] = o;
 
@@ -427,15 +421,14 @@ void brMethodFree( brMethod *m ) {
 void brObjectFree( brObject *o ) {
 	unsigned int n;
 
-	for ( n = 0;n < o->collisionHandlers->count;n++ ) {
-		brCollisionHandler *h = ( brCollisionHandler* )o->collisionHandlers->data[n];
+	for ( n = 0; n < o->collisionHandlers.size(); n++ ) {
+		brCollisionHandler *h = o->collisionHandlers[ n ];
 
-		if ( h->method ) brMethodFree( h->method );
+		if ( h->method ) 
+			brMethodFree( h->method );
 
 		delete h;
 	}
-
-	delete o->collisionHandlers;
 
 	slFree( o->name );
 	delete o;
@@ -451,42 +444,25 @@ void brObjectFree( brObject *o ) {
 */
 
 void brInstanceFree( brInstance *i ) {
-	slList *olist;
-	brObserver *observer;
+	if ( i && i->userData ) 
+		i->object->type->destroyInstance( i->userData );
 
-	if ( i && i->userData ) i->object->type->destroyInstance( i->userData );
+	std::vector< brObserver* > observerList = i->observers;
 
-	olist = slListCopy( i->observers );
-
-	while ( olist ) {
-		observer = ( brObserver* )olist->data;
-		delete observer;
-		olist = olist->next;
+	for( unsigned int n = 0; n < observerList.size(); n++ ) {
+		delete observerList[ n ];
 	}
-
-	slListFree( olist );
-
-	slListFree( i->observers );
-
-	i->observers = NULL;
 
 	// removing observers will modify the observee list,
 	// so copy the list first
 
-	olist = slListCopy( i->observees );
+	std::vector< brInstance* > observeeList = i->observees;
 
-	while ( olist ) {
-		brEngineRemoveInstanceObserver(( brInstance* )olist->data, i, NULL );
-		olist = olist->next;
+	for( unsigned int n = 0; n < observeeList.size(); n++ ) {
+		brEngineRemoveInstanceObserver( observeeList[ n ], i, NULL );
 	}
 
-	slListFree( olist );
-
-	slListFree( i->observees );
-
-	unsigned int n;
-
-	for ( n = 0;n < i->_menus.size(); n++ ) {
+	for ( unsigned int n = 0;n < i->_menus.size(); n++ ) {
 		brMenuEntry *menu = i->_menus[ n ];
 
 		slFree( menu->title );
@@ -495,13 +471,14 @@ void brInstanceFree( brInstance *i ) {
 		delete menu;
 	}
 
-	if ( i->iterate ) brMethodFree( i->iterate );
+	if ( i->iterate ) 
+		brMethodFree( i->iterate );
 
-	if ( i->postIterate ) brMethodFree( i->postIterate );
+	if ( i->postIterate ) 
+		brMethodFree( i->postIterate );
 
 	i->userData = NULL;
 
-	// delete i;
 	i->engine->freedInstances.push_back( i );
 }
 
@@ -527,14 +504,14 @@ int brObjectAddCollisionHandler( brObject *handler, brObject *collider, char *na
 
 	for ( int i = 0; i <= maxargs; i++ ) method[i] = NULL;
 
-	//Dont add a second collisionHandler for the same collider?
-	for ( n = 0;n < handler->collisionHandlers->count;n++ ) {
-		ch = ( brCollisionHandler* )handler->collisionHandlers->data[n];
+	// Dont add a second collisionHandler for the same collider?
+	for ( n = 0;n < handler->collisionHandlers.size();n++ ) {
+		ch = handler->collisionHandlers[ n ];
 
 		if ( ch->object == collider ) return EC_STOP;
 	}
 
-	//searching for methods
+	// searching for methods
 	for ( int i = 0; i <= maxargs; i++ ) {
 		method[i] = brMethodFindWithArgRange( handler, name, types, i, i );
 
@@ -554,7 +531,7 @@ int brObjectAddCollisionHandler( brObject *handler, brObject *collider, char *na
 			ch->object = collider;
 			ch->method = method[i];
 			ch->ignore = 0;
-			slStackPush( handler->collisionHandlers, ch );
+			handler->collisionHandlers.push_back( ch );
 		}
 	}
 
@@ -565,8 +542,8 @@ int brObjectSetIgnoreCollisionsWith( brObject *handler, brObject *collider, int 
 	brCollisionHandler *ch;
 	unsigned int n;
 
-	for ( n = 0;n < handler->collisionHandlers->count;n++ ) {
-		ch = ( brCollisionHandler* )handler->collisionHandlers->data[n];
+	for ( n = 0;n < handler->collisionHandlers.size() ;n++ ) {
+		ch = handler->collisionHandlers[ n ];
 
 		if ( ch->object == collider ) {
 			ch->ignore = ignore;
@@ -580,7 +557,7 @@ int brObjectSetIgnoreCollisionsWith( brObject *handler, brObject *collider, int 
 	ch->method = NULL;
 	ch->ignore = ignore;
 
-	slStackPush( handler->collisionHandlers, ch );
+	handler->collisionHandlers.push_back( ch );
 
 	return EC_OK;
 }

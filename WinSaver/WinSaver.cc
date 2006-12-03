@@ -96,6 +96,13 @@ BOOL WINAPI ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, L
 				break;
 	
 			case IDRESET:
+				char *file = brFindFile( gEngine, "breveCreatures.xml" );
+
+				if( file ) {
+					unlink( file );
+					slFree( file );
+				}
+
 				return TRUE;
 				break;
 

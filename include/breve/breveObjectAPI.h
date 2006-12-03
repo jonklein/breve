@@ -47,31 +47,60 @@ struct brObjectType {
 		_typeSignature 			= 0;
 	}
 
-	void 			*(*findMethod)( void *, const char *, unsigned char *, int );
-	void 			*(*findObject)( void *, const char * );
-
-	brInstance		*(*instantiate)( brEngine *, brObject *, const brEval **, int );
-
-	int 			(*callMethod)( void *, void *, const brEval **, brEval * );
-
-	int 			(*isSubclass)( void *, void * );
-
-	void 			(*destroyObject)( void * );
-	void 			(*destroyMethod)( void * );
-	void 			(*destroyInstance)( void * );
-	void 			(*destroyObjectType)( void * );
+	/**
+	 * Finds an object class in the given language frontend
+	 */
+	void					*(*findObject)( void *inObjectTypeUserData, const char *inName );
 
 	/**
- 	 * A function to execute code in this frontend language.  
+	 * Finds a method in a given class
 	 */
+	void					*(*findMethod)( void *inObjectUserData, const char *inName, unsigned char *inTypes, int inTypeCount );
 
-	int			(*evaluate)( brEngine *, char *inFilename, char *inFiletext );
+	/**
+	 * Creates a new instance of the given class.  The constructor arguments are currently unused.
+	 */
+	brInstance			  	*(*instantiate)( brEngine *inEngine, brObject *inObject, const brEval **inArguments, int inArgCount );
+
+	/**
+	 * Calls a method in the language frontend
+	 */
+	int					 (*callMethod)( void *inInstanceUserData, void *inMethodUserData, const brEval **inArguments, brEval *inResult );
+
+	/**
+	 * Returns 1 if parent is a subclass of parent.
+	 */
+	int					 (*isSubclass)( void *inChild, void *inParent );
+
+	/**
+	 * Destroys an instance of a language object previously created with instantiate.
+	 */
+	void					(*destroyObject)( void *inObject );
+
+	/**
+	 * Destroys an instance of a language method previously created with findMethod.
+	 */
+	void					(*destroyMethod)( void *inMethod );
+
+	/**
+	 * Destroys an instance of a language instance previously created with instantiate.
+	 */
+	void					(*destroyInstance)( void *inInstance );
+
+	/**
+	 * Frees any leftover memory associated with the frontend, typically _userData.
+	 */
+	void					(*destroyObjectType)( void *inObjectType );
+
+	/**
+	 * A function to execute code in this frontend language.
+	 */
+	int					 (*evaluate)( brEngine *inEngine, char *inFilename, char *inFiletext );
 
 	/**
 	 * A user-data callback pointer.
 	 */
-
-	void 			*userData;
+	void					*userData;
 
 	/**
 	 * A unique identifier which will be set for all objects of this object type.  This
@@ -79,7 +108,7 @@ struct brObjectType {
 	 * a certain object type.
 	 */
 
-	long			_typeSignature;
+	long					_typeSignature;
 };
 
 /**
@@ -95,7 +124,7 @@ struct brObject {
 
 	char *name;
 
-	slStack *collisionHandlers;
+	std::vector< brCollisionHandler* > collisionHandlers;
 };
 
 /**
@@ -116,8 +145,6 @@ struct brInstance {
 		
 		iterate = NULL;
 		postIterate = NULL;
-		observers = NULL;
-		observees = NULL;
 	}
 
 	void *userData;
@@ -132,8 +159,8 @@ struct brInstance {
 
 	std::vector< brMenuEntry* > _menus;
 
-	slList *observers;
-	slList *observees;
+	std::vector< brObserver* > observers;
+	std::vector< brInstance* > observees;
 };
 
 /**
@@ -192,9 +219,9 @@ struct brObserver {
 		free( notification );
 	}
 
-    brInstance *instance;
-    brMethod *method;
-    char *notification;
+	brInstance *instance;
+	brMethod *method;
+	char *notification;
 };
 
 /*@}*/

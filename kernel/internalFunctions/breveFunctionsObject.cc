@@ -143,9 +143,6 @@ int brINotify( brEval args[], brEval *target, brInstance *i ) {
 	char *notification = BRSTRING( &args[0] );
 	brObserver *observer;
 	int r, count;
-	slList *observers;
-
-	observers = i->observers;
 
 	sEval.set( notification );
 	iEval.set( i );
@@ -155,16 +152,14 @@ int brINotify( brEval args[], brEval *target, brInstance *i ) {
 
 	// for each observer, check to see if what it's observing
 
-	while ( observers ) {
-		observer = ( brObserver* )observers->data;
+	for( unsigned int n = 0; n < i->observers.size(); i++ ) {
+		observer = i->observers[ n ];
 
 		if ( !strcmp( notification, observer->notification ) ) {
 			count = observer->method->argumentCount;
 
 			r = brMethodCall( observer->instance, observer->method, newargs, &t );
 		}
-
-		observers = observers->next;
 	}
 
 	return EC_OK;

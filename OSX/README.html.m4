@@ -46,19 +46,11 @@ This release is version _VERSION_.  Many changes have been made from previous re
 <h4><b>getting started</b></h4>
 <BLOCKQUOTE>
 <P>
-The best way to get started and learn about programming in steve is to examine the demos from the demos menu and watch them run.  The most simple demo showing how objects move around the world are  RandomWalker.  A fun demo showing how collisions can be handled is the DLA demo which shows a decentralized model of fractal growth.  The more complicated Swarm demos show different types of "boids" models of flocking birds.  The Gravity demo is a simple simulation using physical simulation features, while the Walker and SuperWalker demos is a more complicated example in which a simulated creature learns how to walk. 
+The best way to get started and learn about programming in steve is to examine the demos from the demos menu and watch them run.  A very simple demo showing how objects move around the world is "Getting-Started/RandomWalker".  A fun demo showing how collisions can be handled is the "DLA" demo, which shows a decentralized model of fractal growth.  The more complicated "Swarm" demos show different types of models of flocking birds.  The Gravity demo is a simple simulation using physical simulation features, while the Walker and SuperWalker demos is a more complicated example in which a simulated creature learns how to walk. 
 <P>
 To run a demo, simply select the demo from the "Demo" menu, and push the play button.  Make changes in the code window and restart the demo to see how your changes affect the simulation.
 <P>
-After trying the demos, you can consult the <a href="http://www.spiderland.org/breve/breve_docs">breve documentation</a> to learn more about writing simulations in breve.
-</BLOCKQUOTE>
-<P>
-<H4><b>known bugs</b></H4>
-<BLOCKQUOTE>
-<P>
-<ul>
-<li>Fullscreen mode (OS X) does not currently work on all machines with all monitor settings.  Lowering resolution or the number of colors may help.
-</ul>
+After trying the demos, you can consult the breve documentation either <a href="http://www.spiderland.org/breve/documentation.php">online<a> or from the application's help menu to learn more about writing simulations in breve.
 </BLOCKQUOTE>
 <P>
 <H4><b>feedback</b></H4>
@@ -68,7 +60,7 @@ This software is provided with the hope that it will be useful&mdash;the only wa
 <P>
 If you have any cool or useful simulations or classes that should be included with future releases, mail them as well.
 <P>
-If you would like to join the <I>breve</I> users mailing list, you can subscribe at <a href="http://lists.spiderland.org/mailman/listinfo/breve">http://lists.spiderland.org/mailman/listinfo/breve</a>.
+To join in discussions with other <i>breve</i> users, visit the <a href="http://www.spiderland.org/forums">breve discussion forums</a>.
 </BLOCKQUOTE>
 <P>
 <H4><B>license</B></H4>

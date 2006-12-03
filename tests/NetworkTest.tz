@@ -30,7 +30,11 @@ Control : myController {
 		super iterate.
 
 	+ to send:
-		agent send-over-network to "localhost" on 30304.
+		result (object).
+
+		result = ( agent send-over-network to "localhost" on 30304 ).
+
+		print result.
 
 	+ to accept-upload of theObject (object) from host (string):
 		print "received upload of $theObject from $host".
@@ -41,6 +45,8 @@ Control : myController {
 		} else {
 			die "Error dearchiving networked object".
 		}
+
+		return new Object.
 }
 
 Mobile : Agent {

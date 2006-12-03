@@ -548,7 +548,7 @@ int brEngineIterate( brEngine *e ) {
 */
 
 void replace_substring( std::string *inStr, char *sub, char *repl ) { 
-	int pos = 0;
+	unsigned int pos = 0;
 
 	while( 1 ) {
     		pos = inStr->find( sub, pos ); 
