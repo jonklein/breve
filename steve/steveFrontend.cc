@@ -17,6 +17,14 @@ extern int lineno;
 
 stSteveData *currentData;
 
+void *brInitFrontendLanguages( brEngine *engine ) {
+#if HAVE_LIBPYTHON
+        brPythonInit( engine );
+#endif
+
+        return stSteveInit( engine );
+}
+
 void stCrashCatcher( int s ) {
 	signal( s, SIG_DFL );
 
@@ -28,28 +36,7 @@ void stCrashCatcher( int s ) {
 	raise( s );
 }
 
-void *breveFrontendInitData( brEngine *engine ) {
-
-#if HAVE_LIBPYTHON
-	brPythonInit( engine );
-#endif
-
-	return stSteveInit( engine );
-}
-
-void breveFrontendCleanupData( void *data ) {
-	stSteveCleanup(( stSteveData* )data );
-}
-
-int breveFrontendLoadSimulation( breveFrontend *frontend, const char *code, const char *file ) {
-	return stLoadSimulation(( stSteveData* )frontend->data, frontend->engine, code, file );
-}
-
-int breveFrontendLoadSavedSimulation( breveFrontend *frontend, const char *simcode, const char *simfile, const char *xmlfile ) {
-	return stLoadSavedSimulation(( stSteveData* )frontend->data, frontend->engine, simcode, simfile, xmlfile );
-}
-
-/*!
+/**
 	\brief The breve callback to determine if one object is a subclass of another.
 */
 
@@ -57,9 +44,9 @@ int stSubclassCallback( void *c1, void *c2 ) {
 	return stIsSubclassOf(( stObject* )c1, ( stObject* )c2 );
 }
 
-/*!
-	\brief The breve callback to call a method in the steve language.
-*/
+/**
+ * The breve callback to call a method in the steve language.
+ */
 
 int stCallMethodBreveCallback( void *instanceData, void *methodData, const brEval **arguments, brEval *result ) {
 	int r, count = 0;
@@ -77,7 +64,7 @@ int stCallMethodBreveCallback( void *instanceData, void *methodData, const brEva
 	return r;
 }
 
-/*!
+/**
 	\brief The steve callback to create a new instance.
 */
 
@@ -85,7 +72,7 @@ brInstance *stInstanceNewCallback( brEngine *engine, brObject *object, const brE
 	return brEngineAddInstance( engine, object, stInstanceNew( ( stObject* )object->userData ) );
 }
 
-/*!
+/**
 	\brief The breve callback to find a method.
 */
 
@@ -106,53 +93,94 @@ void *stFindMethodBreveCallback( void *object, const char *name, unsigned char *
 	return method;
 }
 
-/*!
+/**
 	\brief The steve language callback to free an instance.
 */
 
 void stInstanceFreeCallback( void *i ) {
-	stInstanceFree(( stInstance* )i );
+	stInstanceFree( (stInstance*)i );
 }
 
-/*!
-	\brief Initializes the steve language and sets up the brObjectType structure.
-*/
+/**
+ * The canLoad callback for the steve language frontend.
+ */
 
-stSteveData *stSteveInit( brEngine *engine ) {
-	brNamespace *internal;
-	stSteveData *sd;
+int stCallbackCanLoad( void *inObjectTypeUserData, const char *inFileExtension ) {
+	// if( !strcasecmp( inFileExtension, "steve" ) ||
+	// 	!strcasecmp( inFileExtension, "breve" ) ||
+	// 	!strcasecmp( inFileExtension, "tz" ) )
+	// 		return 1;
 
-	internal = brEngineGetInternalMethods( engine );
+	// the steve language is the default language of last resort.  Even if we 
+	// don't recognize the file extension, we're going to try to execute the simulation 
 
-	sd = new stSteveData;
-
-	breveInitSteveDataObjectFuncs( internal );
-	breveInitSteveObjectFuncs( internal );
-	breveInitXMLFuncs( internal );
-
-	sd->steveObjectType.callMethod 		= stCallMethodBreveCallback;
-	sd->steveObjectType.findMethod 		= stFindMethodBreveCallback;
-	sd->steveObjectType.isSubclass 		= stSubclassCallback;
-	sd->steveObjectType.instantiate 	= stInstanceNewCallback;
-	sd->steveObjectType.destroyInstance 	= stInstanceFreeCallback;
-	sd->steveObjectType.userData		= ( void* )sd;
-	sd->steveObjectType._typeSignature 	= STEVE_TYPE_SIGNATURE;
-
-	currentData = sd;
-
-	brEngineRegisterObjectType( engine, &sd->steveObjectType );
-
-	return sd;
+	return 1;
 }
 
-/*!
-	\brief Cleanup after steve.
+/**
+ * Loads a steve simulation file 
+ */
 
-	Free all instances, objects, freed instance lists, controller name,
-	defines and the engine.
-*/
+int stCallbackLoad( brEngine *engine, void *inDataPtr, const char *file, const char *code ) {
+	brObject *controllerClass;
+	stSteveData *inData = (stSteveData*)inDataPtr;
+	int r;
 
-void stSteveCleanup( stSteveData *d ) {
+	if ( stLoadFiles( inData, engine, code, file ) != EC_OK ) return EC_ERROR;
+
+	controllerClass = brObjectFind( engine, inData->controllerName );
+
+	if ( !controllerClass ) {
+		stParseError( engine, EE_UNKNOWN_CONTROLLER, "Unknown \"Controller\" object" );
+		return EC_ERROR;
+	}
+
+	/*
+	brInstance *controller = brObjectInstantiate( engine, controllerClass, NULL, NULL );
+
+	if( !controller )
+		return EC_ERROR;
+
+	brEngineSetController( engine, controller );
+	*/
+
+	stInstance *controller;
+	controller = stInstanceNew(( stObject* )controllerClass->userData );
+
+	controller->breveInstance = brEngineAddInstance( engine, controllerClass, controller );
+
+	brEngineSetController( engine, controller->breveInstance );
+
+	r = stInstanceInit( controller );
+
+	if ( r != EC_OK ) 
+		return EC_ERROR;
+
+	return r;
+}
+
+int stCallbackLoadWithArchive( brEngine *engine, void *inDataPtr, const char *file, const char *code, const char *archive ) {
+	stSteveData *inData = (stSteveData*)inDataPtr;
+
+	//
+
+	inData = 0;
+
+	// 
+
+	return EC_OK;
+}
+
+/**
+ * \brief Cleanup after steve.
+ * 
+ * Free all instances, objects, freed instance lists, controller name,
+ * defines and the engine.
+ */
+
+void stSteveCleanup( void *inDataPtr ) {
+	stSteveData *d = (stSteveData*)inDataPtr;
+
 	std::vector< stObject* >::iterator oi;
 	std::vector< stInstance* >::iterator ii;
 
@@ -171,17 +199,54 @@ void stSteveCleanup( stSteveData *d ) {
 
 	if ( d->controllerName ) slFree( d->controllerName );
 
-	// brNamespaceFreeWithFunction(d->defines, (void(*)(void*))stFreeDefine);
+	// brNamespaceFreeWithFunction(d->defines, (void(*)(void*))stFreeDefine );
 
 	delete d;
 }
-
-/*!
-	\brief Loads steve simulation code to prepare to run a simulation.
-
-	This is the top-level file reading function--this is the one that
-	is called externally to load in files for a simulation.
+/**
+	\brief Initializes the steve language and sets up the brObjectType structure.
 */
+
+stSteveData *stSteveInit( brEngine *engine ) {
+	brNamespace *internal;
+	stSteveData *sd;
+
+	brObjectType *breveSteveType = new brObjectType();
+
+	internal = brEngineGetInternalMethods( engine );
+
+	sd = new stSteveData;
+	sd->steveObjectType = breveSteveType;
+
+	breveInitSteveDataObjectFuncs( internal );
+	breveInitSteveObjectFuncs( internal );
+	breveInitXMLFuncs( internal );
+
+	breveSteveType->callMethod 		= stCallMethodBreveCallback;
+	breveSteveType->findMethod 		= stFindMethodBreveCallback;
+	breveSteveType->isSubclass 		= stSubclassCallback;
+	breveSteveType->instantiate 		= stInstanceNewCallback;
+	breveSteveType->destroyInstance 	= stInstanceFreeCallback;
+	breveSteveType->destroyObjectType	= stSteveCleanup;
+	breveSteveType->canLoad			= stCallbackCanLoad;
+	breveSteveType->load			= stCallbackLoad;
+	breveSteveType->loadWithArchive		= stCallbackLoadWithArchive;
+	breveSteveType->userData		= ( void* )sd;
+	breveSteveType->_typeSignature 		= STEVE_TYPE_SIGNATURE;
+
+	currentData = sd;
+
+	brEngineRegisterObjectType( engine, breveSteveType );
+
+	return sd;
+}
+
+
+/**
+ * \brief Loads steve simulation code to prepare to run a simulation.
+ * This is the top-level file reading function--this is the one that
+ * is called externally to load in files for a simulation.
+ */
 
 int stLoadFiles( stSteveData *sdata, brEngine *engine, const char *code, const char *file ) {
 	int r;
@@ -244,40 +309,7 @@ int stLoadFiles( stSteveData *sdata, brEngine *engine, const char *code, const c
 	return EC_OK;
 }
 
-/*!
-	\brief Prepares to run a simulation.
-
-	Parses and loads the specified code.
-*/
-
-int stLoadSimulation( stSteveData *d, brEngine *engine, const char *code, const char *file ) {
-	brObject *controllerClass;
-	stInstance *controller;
-	int r;
-
-	if ( stLoadFiles( d, engine, code, file ) != EC_OK ) return EC_ERROR;
-
-	controllerClass = brObjectFind( engine, d->controllerName );
-
-	if ( !controllerClass ) {
-		stParseError( engine, EE_UNKNOWN_CONTROLLER, "Unknown \"Controller\" object" );
-		return EC_ERROR;
-	}
-
-	controller = stInstanceNew(( stObject* )controllerClass->userData );
-
-	controller->breveInstance = brEngineAddInstance( engine, controllerClass, controller );
-
-	brEngineSetController( engine, controller->breveInstance );
-
-	r = stInstanceInit( controller );
-
-	if ( r != EC_OK ) return EC_ERROR;
-
-	return r;
-}
-
-/*!
+/**
 	\brief Prepares to run a simulation from an XML archive.
 
 	Parses and loads the specified code, then restores the state of the
@@ -307,7 +339,7 @@ int stLoadSavedSimulation( stSteveData *sdata, brEngine *engine, const char *cod
 	return EC_OK;
 }
 
-/*!
+/**
 	\brief Parses a single steve file.
 
 	Given a filename, this function loads and parses the file.  Used by
@@ -346,7 +378,7 @@ int stParseFile( stSteveData *sdata, brEngine *engine, const char *filename ) {
 	return result;
 }
 
-/*!
+/**
 	\brief Parses the text of a steve file.
 
 	stParseBuffer will first pick out included files and recursively parse
@@ -404,7 +436,7 @@ int stParseBuffer( stSteveData *s, brEngine *engine, const char *buffer, const c
 	return BPE_OK;
 }
 
-/*!
+/**
 	\brief Preprocess a steve document.
 
 	Called automatically by stParseBuffer -- not to be called manually.
@@ -497,7 +529,7 @@ int stPreprocess( stSteveData *s, brEngine *engine, const char *line ) {
 	return 0;
 }
 
-/*!
+/**
 	\brief Makes a version requirement.
 */
 
@@ -512,7 +544,7 @@ stVersionRequirement *stMakeVersionRequirement( float version, int operation ) {
 	return b;
 }
 
-/*!
+/**
 	\brief Checks to see whether a version requirement has been fulfilled.
 */
 
@@ -523,46 +555,37 @@ int stCheckVersionRequirement( float version, stVersionRequirement *r ) {
 
 		case VR_GT:
 			return version > r->version;
-
 			break;
 
 		case VR_GE:
 			return version >= r->version;
-
 			break;
 
 		case VR_LT:
 			return version < r->version;
-
 			break;
 
 		case VR_LE:
 			return version <= r->version;
-
 			break;
 
 		case VR_EQ:
 			return version == r->version;
-
 			break;
 
 		case VR_NE:
 			return version != r->version;
-
 			break;
 
 		default:
 			slMessage( DEBUG_ALL, "unknown operator %d in stCheckVersionRequirement\n", r->operation );
-
-			return 0;
-
 			break;
 	}
 
 	return 0;
 }
 
-/*!
+/**
 	\brief Reports on current usage of all steve objects.
 
 	Requires any stObject.
@@ -575,7 +598,7 @@ void stObjectAllocationReport( stObject *o ) {
 		slMessage( DEBUG_ALL, "class %s: %d instances allocated\n", ( *oi )->name.c_str(), ( *oi )->allInstances.size() );
 }
 
-/*!
+/**
 	\brief Trigger a steve-language parse error.
 
 	Called when a parse (or other "parse-time") error occurs.
@@ -612,9 +635,9 @@ void stParseError( brEngine *e, int type, char *proto, ... ) {
 	slMessage( DEBUG_ALL, "\n" );
 }
 
-/*!
-	\brief Set the steve controller object for the simulation.
-*/
+/**
+ * Set the steve controller object for the simulation.
+ */
 
 int stSetControllerName( stSteveData *data, brEngine *engine, const char *controller ) {
 	if ( data->controllerName ) {

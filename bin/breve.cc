@@ -51,13 +51,15 @@ extern int optind;
 
 #endif
 
+static brEngine *engine;
+
 static int contextMenu, mainMenu;
 
 static int height = 400, width = 400;
 
 static int xpos = 0, ypos = 0;
 
-static breveFrontend *frontend;
+static stSteveData *gSteveData;
 
 static char keyDown[256];
 
@@ -151,35 +153,35 @@ int main( int argc, char **argv ) {
 		exit( 0 );
 	}
 
-	frontend = breveFrontendInit( argc, argv );
+	engine = brEngineNewWithArguments( argc, argv );
 
-	brEngineSetIOPath( frontend->engine, getcwd( wd, sizeof( wd ) ) );
+	brEngineSetIOPath( engine, getcwd( wd, sizeof( wd ) ) );
 
-	frontend->data = breveFrontendInitData( frontend->engine );
+	gSteveData = (stSteveData*)brInitFrontendLanguages( engine );
 
-	frontend->engine->getLoadname = getLoadname;
-	frontend->engine->getSavename = getSavename;
-	frontend->engine->soundCallback = soundCallback;
-	frontend->engine->dialogCallback = brCLIDialogCallback;
-	frontend->engine->interfaceTypeCallback = interfaceVersionCallback;
-	frontend->engine->pauseCallback = pauseCallback;
-	frontend->engine->newWindowCallback = newWindowCallback;
-	frontend->engine->freeWindowCallback = freeWindowCallback;
-	frontend->engine->renderWindowCallback = renderWindowCallback;
+	engine->getLoadname = getLoadname;
+	engine->getSavename = getSavename;
+	engine->soundCallback = soundCallback;
+	engine->dialogCallback = brCLIDialogCallback;
+	engine->interfaceTypeCallback = interfaceVersionCallback;
+	engine->pauseCallback = pauseCallback;
+	engine->newWindowCallback = newWindowCallback;
+	engine->freeWindowCallback = freeWindowCallback;
+	engine->renderWindowCallback = renderWindowCallback;
 
 	if ( !gOptionNoGraphics ) slInitGlut( argc, argv, simulationFile );
 
-	frontend->engine->camera->setBounds( width, height );
+	engine->camera->setBounds( width, height );
 
 	if ( gOptionArchiveFile ) {
-		if ( breveFrontendLoadSavedSimulation( frontend, text, simulationFile, gOptionArchiveFile ) != EC_OK )
-			brQuit( frontend->engine );
-	} else if ( breveFrontendLoadSimulation( frontend, text, simulationFile ) != EC_OK )
-		brQuit( frontend->engine );
+		if ( brLoadSavedSimulation( engine, text, simulationFile, gOptionArchiveFile ) != EC_OK )
+			brQuit( engine );
+	} else if ( brLoadSimulation( engine, text, simulationFile ) != EC_OK )
+		brQuit( engine );
 
 	slFree( text );
 
-	brEngineSetUpdateMenuCallback( frontend->engine, brGlutMenuUpdate );
+	brEngineSetUpdateMenuCallback( engine, brGlutMenuUpdate );
 
 	memset( keyDown, 0, sizeof( keyDown ) );
 
@@ -190,10 +192,10 @@ int main( int argc, char **argv ) {
 	pthread_create( &thread, NULL, workerThread, NULL );
 
 	if ( gMaster )
-		frontend->engine->world->startNetsimServer();
+		engine->world->startNetsimServer();
 
 	if ( gSlave ) {
-		frontend->engine->world->startNetsimSlave( gSlaveHost );
+		engine->world->startNetsimSlave( gSlaveHost );
 		slFree( gSlaveHost );
 	}
 
@@ -215,14 +217,14 @@ void *workerThread( void *data ) {
 	for ( ;; ) {
 		pthread_mutex_lock( &gThreadMutex );
 
-		if (( !gPaused && !frontend->engine->drawEveryFrame ) ||
+		if (( !gPaused && !engine->drawEveryFrame ) ||
 		        !pthread_cond_wait( &gThreadPaused, &gThreadMutex ) ) {
 			if ( gThreadShouldExit ) {
 				pthread_mutex_unlock( &gThreadMutex );
 				return NULL;
-			} else if ( brEngineIterate( frontend->engine ) != EC_OK ) {
+			} else if ( brEngineIterate( engine ) != EC_OK ) {
 				pthread_mutex_unlock( &gThreadMutex );
-				brQuit( frontend->engine );
+				brQuit( engine );
 			}
 		}
 
@@ -233,13 +235,13 @@ void *workerThread( void *data ) {
 void brGlutLoop() {
 	static int oldD = 1;
 
-	int newD = frontend->engine->drawEveryFrame;
+	int newD = engine->drawEveryFrame;
 
 	gWaiting = 0;
 
 	if ( !gPaused ) {
-		if ( newD && brEngineIterate( frontend->engine ) != EC_OK )
-			brQuit( frontend->engine );
+		if ( newD && brEngineIterate( engine ) != EC_OK )
+			brQuit( engine );
 
 		if ( !gOptionNoGraphics ) glutPostRedisplay();
 
@@ -258,7 +260,7 @@ void brGlutMenuUpdate( brInstance *i ) {
 	char *message;
 	unsigned int n, total;
 
-	if ( i != frontend->engine->controller )
+	if ( i != engine->controller )
 		return;
 
 	glutSetMenu( mainMenu );
@@ -290,7 +292,7 @@ void brGlutMenuUpdate( brInstance *i ) {
 void brQuit( brEngine *e ) {
 	double diff, age;
 
-	if ( !gPaused && !frontend->engine->drawEveryFrame ) {
+	if ( !gPaused && !engine->drawEveryFrame ) {
 		gThreadShouldExit = 1;
 		pthread_mutex_lock( &gThreadMutex );
 	}
@@ -307,22 +309,19 @@ void brQuit( brEngine *e ) {
 		printf( "%f simulated/real\n", age / diff );
 	}
 
-	brEngineFree( frontend->engine );
-
-	breveFrontendCleanupData( frontend->data );
-	breveFrontendDestroy( frontend );
+	brEngineFree( engine );
 
 	exit( 0 );
 }
 
 void brMainMenu( int n ) {
-	brMenuCallback( frontend->engine, frontend->engine->controller, n );
+	brMenuCallback( engine, engine->controller, n );
 	glutPostRedisplay();
 }
 
 void brContextMenu( int n ) {
 	if ( gSelected )
-		brMenuCallback( frontend->engine, gSelected, n );
+		brMenuCallback( engine, gSelected, n );
 
 	glutPostRedisplay();
 }
@@ -330,7 +329,7 @@ void brContextMenu( int n ) {
 void brClick( int n ) {
 	unsigned int m, total;
 
-	gSelected = brClickCallback( frontend->engine, n );
+	gSelected = brClickCallback( engine, n );
 
 	glutSetMenu( contextMenu );
 
@@ -520,7 +519,7 @@ void slInitGlut( int argc, char **argv, char *title ) {
 
 	glutAttachMenu( GLUT_MIDDLE_BUTTON );
 
-	slInitGL( frontend->engine->world, frontend->engine->camera );
+	slInitGL( engine->world, engine->camera );
 
 	glutIgnoreKeyRepeat( 1 );
 
@@ -530,16 +529,16 @@ void slInitGlut( int argc, char **argv, char *title ) {
 }
 
 void slDemoReshape( int x, int y ) {
-	frontend->engine->camera->setBounds( x, y );
+	engine->camera->setBounds( x, y );
 
 	glViewport( 0, 0, x, y );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
 void slDemoDisplay() {
-	brEngineLock( frontend->engine );
-	brEngineRenderWorld( frontend->engine, gMotionCrosshair );
-	brEngineUnlock( frontend->engine );
+	brEngineLock( engine );
+	brEngineRenderWorld( engine, gMotionCrosshair );
+	brEngineUnlock( engine );
 
 	glutSwapBuffers();
 }
@@ -550,21 +549,19 @@ void slDemoMouse( int button, int state, int x, int y ) {
 	if ( state == GLUT_DOWN ) {
 		gLastX = x;
 		gLastY = y;
-		gStartCamX = frontend->engine->camera->_rx;
+		gStartCamX = engine->camera->_rx;
 
-		brClick( frontend->engine->camera->select( frontend->engine->world, x, y ) );
-		brGlutMenuUpdate( frontend->engine->controller );
+		brClick( engine->camera->select( engine->world, x, y ) );
+		brGlutMenuUpdate( engine->controller );
 
 		gMotionCrosshair = 1;
 
-		// if(gMods & GLUT_ACTIVE_SHIFT) brBeginDrag(frontend->engine, gSelected);
+		// if(gMods & GLUT_ACTIVE_SHIFT) brBeginDrag( engine, gSelected );
 
 	} else {
 		gLastX = 0;
 		gLastY = 0;
 		gMotionCrosshair = 0;
-
-		// brEndDrag(frontend->engine, gSelected);
 	}
 
 
@@ -572,20 +569,20 @@ void slDemoMouse( int button, int state, int x, int y ) {
 }
 
 void slDemoPassiveMotion( int x, int y ) {
-	frontend->engine->mouseX = x;
-	frontend->engine->mouseY = frontend->engine->camera->_height - y;
+	engine->mouseX = x;
+	engine->mouseY = engine->camera->_height - y;
 }
 
 void slDemoMotion( int x, int y ) {
 	if ( gLastX || gLastY ) {
 		if (( gMods & GLUT_ACTIVE_SHIFT ) || ( gSpecial == GLUT_KEY_F4 ) ) {
-			brDragCallback( frontend->engine, x, y );
+			brDragCallback( engine, x, y );
 		} else if (( gMods & GLUT_ACTIVE_ALT ) || ( gSpecial == GLUT_KEY_F2 ) ) {
-			frontend->engine->camera->zoomWithMouseMovement( x - gLastX, y - gLastY );
+			engine->camera->zoomWithMouseMovement( x - gLastX, y - gLastY );
 		} else if (( gMods & GLUT_ACTIVE_CTRL ) || ( gSpecial == GLUT_KEY_F3 ) ) {
-			frontend->engine->camera->moveWithMouseMovement( x - gLastX, y - gLastY );
+			engine->camera->moveWithMouseMovement( x - gLastX, y - gLastY );
 		} else {
-			frontend->engine->camera->rotateWithMouseMovement( x - gLastX, y - gLastY );
+			engine->camera->rotateWithMouseMovement( x - gLastX, y - gLastY );
 		}
 
 		gLastX = x;
@@ -606,28 +603,28 @@ void slDemoSpecial( int key, int x, int y ) {
 	switch ( key ) {
 
 		case GLUT_KEY_F1:
-			if ( brEngineIterate( frontend->engine ) != EC_OK )
-				brQuit( frontend->engine );
+			if ( brEngineIterate( engine ) != EC_OK )
+				brQuit( engine );
 
 			break;
 
 		case GLUT_KEY_UP:
-			brSpecialKeyCallback( frontend->engine, "up", 1 );
+			brSpecialKeyCallback( engine, "up", 1 );
 
 			break;
 
 		case GLUT_KEY_DOWN:
-			brSpecialKeyCallback( frontend->engine, "down", 1 );
+			brSpecialKeyCallback( engine, "down", 1 );
 
 			break;
 
 		case GLUT_KEY_LEFT:
-			brSpecialKeyCallback( frontend->engine, "left", 1 );
+			brSpecialKeyCallback( engine, "left", 1 );
 
 			break;
 
 		case GLUT_KEY_RIGHT:
-			brSpecialKeyCallback( frontend->engine, "right", 1 );
+			brSpecialKeyCallback( engine, "right", 1 );
 
 			break;
 	}
@@ -641,22 +638,22 @@ void slDemoSpecialUp( int key, int x, int y ) {
 	switch ( key ) {
 
 		case GLUT_KEY_UP:
-			brSpecialKeyCallback( frontend->engine, "up", 0 );
+			brSpecialKeyCallback( engine, "up", 0 );
 
 			break;
 
 		case GLUT_KEY_DOWN:
-			brSpecialKeyCallback( frontend->engine, "down", 0 );
+			brSpecialKeyCallback( engine, "down", 0 );
 
 			break;
 
 		case GLUT_KEY_LEFT:
-			brSpecialKeyCallback( frontend->engine, "left", 0 );
+			brSpecialKeyCallback( engine, "left", 0 );
 
 			break;
 
 		case GLUT_KEY_RIGHT:
-			brSpecialKeyCallback( frontend->engine, "right", 0 );
+			brSpecialKeyCallback( engine, "right", 0 );
 
 			break;
 	}
@@ -675,10 +672,10 @@ void slDemoKeyboard( unsigned char key, int x, int y ) {
 			gPaused = !gPaused;
 
 			if ( gPaused ) {
-				brPauseTimer( frontend->engine );
+				brPauseTimer( engine );
 				glutIdleFunc( NULL );
 			} else {
-				brUnpauseTimer( frontend->engine );
+				brUnpauseTimer( engine );
 				pthread_cond_signal( &gThreadPaused );
 				glutIdleFunc( brGlutLoop );
 			}
@@ -687,12 +684,12 @@ void slDemoKeyboard( unsigned char key, int x, int y ) {
 
 		case 0x1b:
 			if ( !gWaiting )
-				brInterrupt( frontend->engine );
+				brInterrupt( engine );
 
 			break;
 
 		default:
-			brKeyCallback( frontend->engine, key, 1 );
+			brKeyCallback( engine, key, 1 );
 
 			break;
 	}
@@ -735,7 +732,7 @@ void brInterrupt( brEngine *engine ) {
 		brQuit( engine );
 
 	if ( *line != '\0' && *line != '\n' )
-		stRunSingleStatement(( stSteveData * )frontend->data, engine, line );
+		stRunSingleStatement( gSteveData, engine, line );
 
 	if ( line != staticLine )
 		free( line );
@@ -751,7 +748,7 @@ void brInterrupt( brEngine *engine ) {
 */
 
 void slDemoKeyboardUp( unsigned char key, int x, int y ) {
-	brKeyCallback( frontend->engine, key, 0 );
+	brKeyCallback( engine, key, 0 );
 	keyDown[key] = 0;
 }
 
@@ -824,7 +821,7 @@ int soundCallback() {
 
 int pauseCallback() {
 	gPaused = 1;
-	brPauseTimer( frontend->engine );
+	brPauseTimer( engine );
 	glutIdleFunc( NULL );
 	return 0;
 }

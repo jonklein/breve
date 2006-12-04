@@ -115,28 +115,6 @@ struct brMenuEntry {
 	bool checked;
 };
 
-
-/*!
-	\brief Visualization data used if this is part of an iTunes plugin.
-*/
-
-struct brVisualData {
-	unsigned char numWaveformChannels;
-	unsigned char waveformData[2][512];
-	unsigned char numSpectrumChannels;
-	unsigned char spectrumData[2][512];
-};
-
-/*!
-	\brief Signal data used if this is part of an iTunes plugin.
-*/
-
-struct briTunesData {
-	struct brVisualData *data;
-	int spectrumEntries;
-	int waveformEntries; 
-};
-
 /*!
 	\brief The main breve engine structure.
 */
@@ -146,12 +124,17 @@ typedef struct brObjectType brObjectType;
 
 class brEngine {
 	public:
+		brEngine() {};
+		brEngine( int inArgc, char **inArgv ) { argc = inArgc; argv = inArgv; }
+
+		~brEngine();
+
 		slWorld *world;
 		slCamera *camera;
 
 		gsl_rng *RNG;
 
-		std::vector<brObjectType*> objectTypes;
+		std::vector< brObjectType* > objectTypes;
 
 		bool simulationWillStop;
 
@@ -219,17 +202,6 @@ class brEngine {
 		// which keys are pressed?
 
 		unsigned char keys[256];
-
-		// evalList sort data... 
-
-		void **sortVector;
-		int sortVectorLength;
-		int evalListSortError;
-		brInstance *sortObject;
-
-		// iTunes plugin data
-
-		briTunesData *iTunesData;
 
 		//
 		// Callback functions to be set by the application frontend
@@ -316,10 +288,10 @@ const std::vector< std::string > &brEngineGetSearchPaths( brEngine * );
 
 std::vector< std::string > brEngineGetAllObjectNames( brEngine *e );
 
-brEngine *brEngineNew(void);
-void brEngineFree(brEngine *);
+brEngine *brEngineNew();
+brEngine *brEngineNewWithArguments( int inArgc, char **inArgv );
 
-void brMakeiTunesData(brEngine *);
+void brEngineFree(brEngine *);
 
 void brPauseTimer(brEngine *);
 void brUnpauseTimer(brEngine *);

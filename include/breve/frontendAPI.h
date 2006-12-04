@@ -15,32 +15,11 @@
 
 /*@{*/
 
-/*!
-	\brief Holds data for a frontend breve interface.
-
-	This structure simply holds a the breve simulation engine 
-	and a custom data pointer that is used for simulation
-	frontends.  It is the data that gets passed to the various 
-	breveFrontend functions which comprise the breveFrontendAPI.
-*/
-
-typedef struct breveFrontend breveFrontend;
-
-struct breveFrontend {
-    brEngine *engine;
-    void *data;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-breveFrontend *breveFrontendInit(int argc, char ** argv);
-void breveFrontendDestroy(breveFrontend *frontend);
-
 /*!
-	\brief [TO BE IMPLEMENTED BY THE LANGUAGE FRONTEND] Create the language-frontend data.
-
 	This function should return a pointer to your language specific 
 	frontend-data.  This pointer is stored in the \ref breveFrontend 
 	field data.  You can use this field later when the \ref 
@@ -48,17 +27,15 @@ void breveFrontendDestroy(breveFrontend *frontend);
 	\ref breveFrontendLoadSavedSimulation or \ref breveFrontendCleanupData.
 */
 
-void *breveFrontendInitData(brEngine *engine);
+void *brInitFrontendLanguages( brEngine *engine );
 
 /*!
-	\brief [TO BE IMPLEMENTED BY THE LANGUAGE FRONTEND] Start a new simulation from a given file.
-
 	This function uses the language frontend data (found in the \ref 
 	breveFrontend field data) to load a simulation from the specified file.
 	The code variable contains the text of the file.
 */
 
-int breveFrontendLoadSimulation( breveFrontend *d, const char *code, const char *file );
+int brLoadSimulation( brEngine *engine, const char *code, const char *file );
 
 /*!
 	\brief [TO BE IMPLEMENTED BY THE LANGUAGE FRONTEND] Load an archived simulation from a given file.
@@ -70,16 +47,7 @@ int breveFrontendLoadSimulation( breveFrontend *d, const char *code, const char 
 	with the text of that file in the code argument.
 */
 
-int breveFrontendLoadSavedSimulation( breveFrontend *d, const char *code, const char *file, const char *xmlFile );
-
-/*!
-	\brief [TO BE IMPLEMENTED BY THE LANGUAGE FRONTEND] Called to destroy the language-frontend data.
-
-	This function should destroy the language-frontend data and all 
-	memory that was allocated with \ref breveFrontendInitData.
-*/
-
-void breveFrontendCleanupData( void *data );
+int brLoadSavedSimulation( brEngine *engine, const char *code, const char *file, const char *xmlFile );
 
 #ifdef __cplusplus
 }

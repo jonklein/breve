@@ -164,13 +164,13 @@ int brMethodCall( brInstance *i, brMethod *m, const brEval **args, brEval *resul
 	return r;
 }
 
-/*!
-	\brief Find and call a method by name.
-
-	Finds and calls a method by name.  This is ineffecient because it looks
-	up the method every time, instead of caching it, so this function should
-	not be used if the method is going to be called frequently.
-*/
+/**
+ * Find and call a method by name.
+ *
+ * Finds and calls a method by name.  This is ineffecient because it looks
+ * up the method every time, instead of caching it, so this function should
+ * not be used if the method is going to be called frequently.
+ */
 
 int brMethodCallByName( brInstance *i, const char *name, brEval *result ) {
 	brMethod *m = brMethodFind( i->object, name, NULL, 0 );
@@ -188,16 +188,15 @@ int brMethodCallByName( brInstance *i, const char *name, brEval *result ) {
 	return r;
 }
 
-/*!
-	\brief Find and call a method by name, with arguments.
-
-	As with \ref brMethodCallByName, this method is inefficient because
-	it has to look up the method being called.  This function should
-	only be used for sporatic method calls.
-
-	WARNING: the brEval values stored in args may be changed by the
-	method call, depending on the implementation of the language frontend.
-*/
+/**
+ * \brief Find and call a method by name, with arguments.
+ * As with \ref brMethodCallByName, this method is inefficient because
+ * it has to look up the method being called.  This function should
+ * only be used for sporatic method calls.
+ *
+ * WARNING: the brEval values stored in args may be changed by the
+ * method call, depending on the implementation of the language frontend.
+ */
 
 int brMethodCallByNameWithArgs( brInstance *i, const char *name, const brEval **args, int count, brEval *result ) {
 	brMethod *m = brMethodFind( i->object, name, NULL, count );
@@ -215,13 +214,13 @@ int brMethodCallByNameWithArgs( brInstance *i, const char *name, const brEval **
 	return r;
 }
 
-/*!
-	\brief Registers an instance as an observer.
-
-	Registers "observer" as an observer of "i", waiting for the specified
-	notification.  When the notificication is announced, the method mname
-	is executed for the observer.
-*/
+/**
+ * \brief Registers an instance as an observer.
+ * 
+ * Registers "observer" as an observer of "i", waiting for the specified
+ * notification.  When the notificication is announced, the method mname
+ * is executed for the observer.
+ */
 
 int brInstanceAddObserver( brInstance *i, brInstance *observer, char *notification, char *mname ) {
 	brObserver *o;
@@ -243,12 +242,12 @@ int brInstanceAddObserver( brInstance *i, brInstance *observer, char *notificati
 	return 0;
 }
 
-/*!
-	\brief Removes an instance from an object's observer list.
-
-	Stops observerInstance from waiting for the specified notification from
-	instance i.
-*/
+/**
+ * \brief Removes an instance from an object's observer list.
+ *
+ * Stops observerInstance from waiting for the specified notification from
+ * instance i.
+ */
 
 void brEngineRemoveInstanceObserver( brInstance *i, brInstance *observerInstance, char *notification ) {
 	brObserver *observer;
@@ -279,9 +278,9 @@ void brEngineRemoveInstanceObserver( brInstance *i, brInstance *observerInstance
 		observerInstance->observees.erase( observee );
 }
 
-/*!
-	\brief Adds an object to the engine.
-*/
+/**
+ * \brief Adds an object to the engine.
+ */
 
 brObject *brEngineAddObject( brEngine *e, brObjectType *t, const char *name, void *pointer ) {
 	brObject *o;
@@ -302,10 +301,10 @@ brObject *brEngineAddObject( brEngine *e, brObjectType *t, const char *name, voi
 	return o;
 }
 
-/*!
-	\brief Adds an alias for an object.
-
-	An object alias is another name for an existing object.
+/**
+ * \brief Adds an alias for an object.
+ *
+ * An object alias is another name for an existing object.
 */
 
 void brEngineAddObjectAlias( brEngine *e, char *name, brObject *o ) {
@@ -314,10 +313,10 @@ void brEngineAddObjectAlias( brEngine *e, char *name, brObject *o ) {
 	e->objectAliases[name] = o;
 }
 
-/*!
-	\brief Adds an instance to the breve engine.
-
-	The instance's iterate method will be called at each iteration.
+/**
+ * \brief Adds an instance to the breve engine.
+ *
+ * The instance's iterate method will be called at each iteration.
 */
 
 brInstance *brEngineAddInstance( brEngine *e, brObject *object, void *pointer ) {
@@ -355,19 +354,16 @@ brInstance *brObjectInstantiate( brEngine *e, brObject *o, const brEval **args, 
 	return o->type->instantiate( e, o, args, argCount );
 }
 
-/*!
-	\brief Marks a \ref brInstance as released, so that it can be removed
-	from the engine.
-
-	The instance will be removed from the engine and freed at the end of
-	the next simulation iteration.  This function should be used instead of
-	\ref brInstanceFree except during simulation deallocation and cleanup.
-*/
+/**
+ * Marks a \ref brInstance as released, so that it can be removed from the engine.
+ *
+ * The instance will be removed from the engine and freed at the end of
+ * the next simulation iteration.  This function should be used instead of
+ * \ref brInstanceFree except during simulation deallocation and cleanup.
+ */
 
 void brInstanceRelease( brInstance *i ) {
 	if ( !i || i->status != AS_ACTIVE ) return;
-
-	// printf("adding %p for removal\n", i);
 
 	i->engine->instancesToRemove.push_back( i );
 
@@ -376,12 +372,12 @@ void brInstanceRelease( brInstance *i ) {
 	i->status = AS_RELEASED;
 }
 
-/*!
-	\brief Removes an object from the engine.
-
-	The object may still exist in the simulation (technically), but it
-	will no longer be iterated by the engine.
-*/
+/**
+ * Removes an object from the engine.
+ * 
+ * The object may still exist in the simulation (technically), but it will 
+ * no longer be iterated by the engine.
+ */
 
 void brEngineRemoveInstance( brEngine *e, brInstance *i ) {
 	// inform the camera of the change
@@ -403,20 +399,20 @@ void brEngineRemoveInstance( brEngine *e, brInstance *i ) {
 	if ( bi != e->instances.end() ) e->instances.erase( bi );
 }
 
-/*!
-	\brief Frees a brMethod structure.
-
-	If you have generated a brMethod structure with \ref brMethodFind,
-	you must free it using this method when you are done with it.
-*/
+/**
+ * Frees a brMethod structure.
+ * 
+ * If you have generated a brMethod structure with \ref brMethodFind,
+ * you must free it using this method when you are done with it.
+ */
 
 void brMethodFree( brMethod *m ) {
 	delete m;
 }
 
-/*!
-	\brief Frees a breve object.
-*/
+/**
+ * Frees a breve object.
+ */
 
 void brObjectFree( brObject *o ) {
 	unsigned int n;
@@ -434,14 +430,14 @@ void brObjectFree( brObject *o ) {
 	delete o;
 }
 
-/*!
-	\brief Destroys a \ref brInstance structure.
-
-	Immediately frees all of the data associated with a \ref brInstance
-	structure.  This function should not be used while a breve engine
-	is being actively iterated.  It may be used for cleanup when the
-	engine isn't running, but otherwise use \ref brInstanceRelease instead.
-*/
+/**
+ * Destroys a \ref brInstance structure.
+ *
+ * Immediately frees all of the data associated with a \ref brInstance
+ * structure.  This function should not be used while a breve engine
+ * is being actively iterated.  It may be used for cleanup when the
+ * engine isn't running, but otherwise use \ref brInstanceRelease instead.
+ */
 
 void brInstanceFree( brInstance *i ) {
 	if ( i && i->userData ) 
@@ -482,13 +478,13 @@ void brInstanceFree( brInstance *i ) {
 	i->engine->freedInstances.push_back( i );
 }
 
-/*!
-	\brief Adds a collision handler to an object.
-
-    Defines a behavior for when object type "handler" collides with "collider".
-    The behavior is to call the specified method in the handler object
-    with the collider instance as an argument.
-*/
+/**
+ * Adds a collision handler to an object.
+ *
+ * Defines a behavior for when object type "handler" collides with "collider".
+ * The behavior is to call the specified method in the handler object
+ * with the collider instance as an argument.
+ */
 
 int brObjectAddCollisionHandler( brObject *handler, brObject *collider, char *name ) {
 	brCollisionHandler *ch;

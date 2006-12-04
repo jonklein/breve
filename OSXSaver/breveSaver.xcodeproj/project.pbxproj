@@ -28,29 +28,17 @@
 		4842D87407F9A72700140407 /* libbreve.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D87207F9A72700140407 /* libbreve.a */; };
 		4842D87507F9A72700140407 /* libbreve.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D87207F9A72700140407 /* libbreve.a */; };
 		4842D87607F9A72700140407 /* libbreve.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D87207F9A72700140407 /* libbreve.a */; };
-		4842D90007F9CAC100140407 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8F907F9CAC100140407 /* libavcodec.a */; };
-		4842D90107F9CAC100140407 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FA07F9CAC100140407 /* libavformat.a */; };
 		4842D90207F9CAC100140407 /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FB07F9CAC100140407 /* libgsl.a */; };
 		4842D90307F9CAC100140407 /* libgslcblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FC07F9CAC100140407 /* libgslcblas.a */; };
-		4842D90407F9CAC100140407 /* libpush.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FD07F9CAC100140407 /* libpush.a */; };
 		4842D90607F9CAC200140407 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FF07F9CAC100140407 /* libsndfile.a */; };
-		4842D90707F9CAC200140407 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8F907F9CAC100140407 /* libavcodec.a */; };
-		4842D90807F9CAC200140407 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FA07F9CAC100140407 /* libavformat.a */; };
 		4842D90907F9CAC200140407 /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FB07F9CAC100140407 /* libgsl.a */; };
 		4842D90A07F9CAC200140407 /* libgslcblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FC07F9CAC100140407 /* libgslcblas.a */; };
-		4842D90B07F9CAC200140407 /* libpush.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FD07F9CAC100140407 /* libpush.a */; };
 		4842D90D07F9CAC200140407 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FF07F9CAC100140407 /* libsndfile.a */; };
 		4842D91007F9CAC200140407 /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FB07F9CAC100140407 /* libgsl.a */; };
 		4842D91107F9CAC200140407 /* libgslcblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FC07F9CAC100140407 /* libgslcblas.a */; };
-		4842D91507F9CAC200140407 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8F907F9CAC100140407 /* libavcodec.a */; };
-		4842D91607F9CAC200140407 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FA07F9CAC100140407 /* libavformat.a */; };
 		4842D91707F9CAC200140407 /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FB07F9CAC100140407 /* libgsl.a */; };
 		4842D91807F9CAC200140407 /* libgslcblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FC07F9CAC100140407 /* libgslcblas.a */; };
-		4842D91907F9CAC200140407 /* libpush.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FD07F9CAC100140407 /* libpush.a */; };
 		4842D91B07F9CAC200140407 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FF07F9CAC100140407 /* libsndfile.a */; };
-		4842D93A07F9CBC300140407 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D93907F9CBC300140407 /* libportaudio.a */; };
-		4842D93B07F9CBC300140407 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D93907F9CBC300140407 /* libportaudio.a */; };
-		4842D93D07F9CBC300140407 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D93907F9CBC300140407 /* libportaudio.a */; };
 		4842D95C07F9CC0800140407 /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D95B07F9CC0800140407 /* JavaVM.framework */; };
 		4842D95D07F9CC0800140407 /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D95B07F9CC0800140407 /* JavaVM.framework */; };
 		4842D95E07F9CC0800140407 /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D95B07F9CC0800140407 /* JavaVM.framework */; };
@@ -105,6 +93,10 @@
 		48B9BF0A05EA6422002C7A42 /* slBreveResearcher.mm in Sources */ = {isa = PBXBuildFile; fileRef = 48B9BE2E05EA60B4002C7A42 /* slBreveResearcher.mm */; };
 		48B9BF1405EA6439002C7A42 /* Simulation.tz in Resources */ = {isa = PBXBuildFile; fileRef = 48941C8F0401A69200000116 /* Simulation.tz */; };
 		48B9BF3405EA6451002C7A42 /* classes in Resources */ = {isa = PBXBuildFile; fileRef = 4818575605CABFE300C48BE6 /* classes */; };
+		48BB26B30B2285DF006FA9E9 /* libpython.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 48BB26B20B2285DF006FA9E9 /* libpython.dylib */; };
+		48BB26B40B2285DF006FA9E9 /* libpython.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 48BB26B20B2285DF006FA9E9 /* libpython.dylib */; };
+		48BB26B50B2285DF006FA9E9 /* libpython.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 48BB26B20B2285DF006FA9E9 /* libpython.dylib */; };
+		48BB26B60B2285DF006FA9E9 /* libpython.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 48BB26B20B2285DF006FA9E9 /* libpython.dylib */; };
 		48D907CA06BFC54300FF529F /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8CB706B5554900740D0A /* AppKit.framework */; };
 		48D907CB06BFC54300FF529F /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BFA06B5551B00740D0A /* CoreAudio.framework */; };
 		48D907CD06BFC54400FF529F /* libode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8D5D06B5558A00740D0A /* libode.a */; };
@@ -130,14 +122,10 @@
 		4818574E05CABEEB00C48BE6 /* breveWalker-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "breveWalker-Info.plist"; sourceTree = "<group>"; };
 		4818574F05CABEEB00C48BE6 /* breveCreatures.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = breveCreatures.saver; sourceTree = BUILT_PRODUCTS_DIR; };
 		4818575605CABFE300C48BE6 /* classes */ = {isa = PBXFileReference; lastKnownFileType = folder; name = classes; path = ../lib/classes; sourceTree = SOURCE_ROOT; };
-		4842D87207F9A72700140407 /* libbreve.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbreve.a; path = breve/lib/libbreve.a; sourceTree = SOURCE_ROOT; };
-		4842D8F907F9CAC100140407 /* libavcodec.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavcodec.a; path = /usr/local/lib/libavcodec.a; sourceTree = "<absolute>"; };
-		4842D8FA07F9CAC100140407 /* libavformat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavformat.a; path = /usr/local/lib/libavformat.a; sourceTree = "<absolute>"; };
+		4842D87207F9A72700140407 /* libbreve.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbreve.a; path = ../lib/libbreve.a; sourceTree = SOURCE_ROOT; };
 		4842D8FB07F9CAC100140407 /* libgsl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgsl.a; path = /usr/local/lib/libgsl.a; sourceTree = "<absolute>"; };
 		4842D8FC07F9CAC100140407 /* libgslcblas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgslcblas.a; path = /usr/local/lib/libgslcblas.a; sourceTree = "<absolute>"; };
-		4842D8FD07F9CAC100140407 /* libpush.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpush.a; path = /usr/local/lib/libpush.a; sourceTree = "<absolute>"; };
 		4842D8FF07F9CAC100140407 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = /usr/local/lib/libsndfile.a; sourceTree = "<absolute>"; };
-		4842D93907F9CBC300140407 /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libportaudio.a; path = /usr/local/lib/libportaudio.a; sourceTree = "<absolute>"; };
 		4842D95B07F9CC0800140407 /* JavaVM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaVM.framework; path = /System/Library/Frameworks/JavaVM.framework; sourceTree = "<absolute>"; };
 		4868E6F6091423CC0045591F /* simulation.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = simulation.gif; sourceTree = "<group>"; };
 		4868E6FC091423F80045591F /* app_icon.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = app_icon.tiff; sourceTree = "<group>"; };
@@ -166,6 +154,7 @@
 		48B9BDBD05EA6004002C7A42 /* breveResearcher-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "breveResearcher-Info.plist"; path = "/Users/jk/dev/breveSaver/breveResearcher-Info.plist"; sourceTree = "<absolute>"; };
 		48B9BE2D05EA60B4002C7A42 /* slBreveResearcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slBreveResearcher.h; sourceTree = "<group>"; };
 		48B9BE2E05EA60B4002C7A42 /* slBreveResearcher.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreveResearcher.mm; sourceTree = "<group>"; };
+		48BB26B20B2285DF006FA9E9 /* libpython.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpython.dylib; path = /usr/lib/libpython.dylib; sourceTree = "<absolute>"; };
 		48D90A3C06BFD26900FF529F /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/brevePainter.nib; sourceTree = "<group>"; };
 		F50BB16F012BFE5C010BE436 /* WalkerSaver.tz */ = {isa = PBXFileReference; lastKnownFileType = text; path = WalkerSaver.tz; sourceTree = SOURCE_ROOT; };
 		F5104130012D110B010BE436 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/breveWalker.nib; sourceTree = "<group>"; };
@@ -199,14 +188,11 @@
 				489D8CB806B5554900740D0A /* AppKit.framework in Frameworks */,
 				489D8D5E06B5558A00740D0A /* libode.a in Frameworks */,
 				4842D87607F9A72700140407 /* libbreve.a in Frameworks */,
-				4842D91507F9CAC200140407 /* libavcodec.a in Frameworks */,
-				4842D91607F9CAC200140407 /* libavformat.a in Frameworks */,
 				4842D91707F9CAC200140407 /* libgsl.a in Frameworks */,
 				4842D91807F9CAC200140407 /* libgslcblas.a in Frameworks */,
-				4842D91907F9CAC200140407 /* libpush.a in Frameworks */,
 				4842D91B07F9CAC200140407 /* libsndfile.a in Frameworks */,
-				4842D93D07F9CBC300140407 /* libportaudio.a in Frameworks */,
 				4842D95F07F9CC0800140407 /* JavaVM.framework in Frameworks */,
+				48BB26B40B2285DF006FA9E9 /* libpython.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,6 +218,7 @@
 				4842D91107F9CAC200140407 /* libgslcblas.a in Frameworks */,
 				4842D95E07F9CC0800140407 /* JavaVM.framework in Frameworks */,
 				485E9248090D1E6F0055AF56 /* libjpeg.a in Frameworks */,
+				48BB26B30B2285DF006FA9E9 /* libpython.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,14 +240,11 @@
 				48D907F806BFC56D00FF529F /* libjpeg.a in Frameworks */,
 				48D907FC06BFC56E00FF529F /* libexpat.a in Frameworks */,
 				4842D87307F9A72700140407 /* libbreve.a in Frameworks */,
-				4842D90007F9CAC100140407 /* libavcodec.a in Frameworks */,
-				4842D90107F9CAC100140407 /* libavformat.a in Frameworks */,
 				4842D90207F9CAC100140407 /* libgsl.a in Frameworks */,
 				4842D90307F9CAC100140407 /* libgslcblas.a in Frameworks */,
-				4842D90407F9CAC100140407 /* libpush.a in Frameworks */,
 				4842D90607F9CAC200140407 /* libsndfile.a in Frameworks */,
-				4842D93A07F9CBC300140407 /* libportaudio.a in Frameworks */,
 				4842D95C07F9CC0800140407 /* JavaVM.framework in Frameworks */,
+				48BB26B60B2285DF006FA9E9 /* libpython.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,14 +260,11 @@
 				489D8CBA06B5554900740D0A /* AppKit.framework in Frameworks */,
 				489D8D6006B5558A00740D0A /* libode.a in Frameworks */,
 				4842D87407F9A72700140407 /* libbreve.a in Frameworks */,
-				4842D90707F9CAC200140407 /* libavcodec.a in Frameworks */,
-				4842D90807F9CAC200140407 /* libavformat.a in Frameworks */,
 				4842D90907F9CAC200140407 /* libgsl.a in Frameworks */,
 				4842D90A07F9CAC200140407 /* libgslcblas.a in Frameworks */,
-				4842D90B07F9CAC200140407 /* libpush.a in Frameworks */,
 				4842D90D07F9CAC200140407 /* libsndfile.a in Frameworks */,
-				4842D93B07F9CBC300140407 /* libportaudio.a in Frameworks */,
 				4842D95D07F9CC0800140407 /* JavaVM.framework in Frameworks */,
+				48BB26B50B2285DF006FA9E9 /* libpython.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -355,6 +336,7 @@
 		489D8B2206B5541800740D0A /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				48BB26B20B2285DF006FA9E9 /* libpython.dylib */,
 				489D8C3D06B5553600740D0A /* Foundation.framework */,
 				489D8CB706B5554900740D0A /* AppKit.framework */,
 				489D8BFA06B5551B00740D0A /* CoreAudio.framework */,
@@ -366,13 +348,9 @@
 				489D8B3C06B5543800740D0A /* OpenGL.framework */,
 				489D8B1106B5541200740D0A /* ScreenSaver.framework */,
 				489D8B8F06B5548600740D0A /* libpng.a */,
-				4842D93907F9CBC300140407 /* libportaudio.a */,
 				4842D87207F9A72700140407 /* libbreve.a */,
-				4842D8F907F9CAC100140407 /* libavcodec.a */,
-				4842D8FA07F9CAC100140407 /* libavformat.a */,
 				4842D8FB07F9CAC100140407 /* libgsl.a */,
 				4842D8FC07F9CAC100140407 /* libgslcblas.a */,
-				4842D8FD07F9CAC100140407 /* libpush.a */,
 				4842D8FF07F9CAC100140407 /* libsndfile.a */,
 				489D8D5D06B5558A00740D0A /* libode.a */,
 				489D8BAB06B554A200740D0A /* libz.dylib */,
@@ -1027,6 +1005,7 @@
 					ppc,
 					i386,
 				);
+				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = ../lib;
 				USER_HEADER_SEARCH_PATHS = ../include/breve;
 			};
@@ -1039,6 +1018,7 @@
 					ppc,
 					i386,
 				);
+				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = ../lib;
 				USER_HEADER_SEARCH_PATHS = ../include/breve;
 			};
@@ -1051,6 +1031,7 @@
 					ppc,
 					i386,
 				);
+				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = ../lib;
 				USER_HEADER_SEARCH_PATHS = ../include/breve;
 			};

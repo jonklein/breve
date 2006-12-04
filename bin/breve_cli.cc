@@ -55,7 +55,8 @@ char *gSlaveHost;
 
 int gShouldQuit = 0;
 
-breveFrontend *frontend;
+brEngine *engine;
+stSteveData *gSteveData;
 
 static int activateContext( void );
 
@@ -97,25 +98,21 @@ int main( int argc, char **argv ) {
 	if ( argc < 1 ) brPrintUsage( execpath );
 
 	//
-	// Initialize the frontend and engine and their associated callbacks.
+	// Initialize the engine and the associated callbacks.
 	//
 
-	frontend = breveFrontendInit( argc, argv );
+	engine = brEngineNewWithArguments( argc, argv );
 
-	frontend->data = breveFrontendInitData( frontend->engine );
+	gSteveData = (stSteveData*)brInitFrontendLanguages( engine );
 
-	brEngineSetIOPath( frontend->engine, getcwd( wd, MAXPATHLEN ) );
+	brEngineSetIOPath( engine, getcwd( wd, MAXPATHLEN ) );
 
-	frontend->engine->camera->setActivateContextCallback( activateContext );
-	frontend->engine->camera->_renderContextCallback = renderContext;
-
-	frontend->engine->getLoadname = getLoadname;
-
-	frontend->engine->getSavename = getSavename;
-
-	frontend->engine->dialogCallback = brCLIDialogCallback;
-
-	frontend->engine->interfaceTypeCallback = interfaceVersionCallback;
+	engine->camera->setActivateContextCallback( activateContext );
+	engine->camera->_renderContextCallback = renderContext;
+	engine->getLoadname = getLoadname;
+	engine->getSavename = getSavename;
+	engine->dialogCallback = brCLIDialogCallback;
+	engine->interfaceTypeCallback = interfaceVersionCallback;
 
 	signal( SIGINT, brCatchSignal );
 
@@ -130,7 +127,7 @@ int main( int argc, char **argv ) {
 		gOffscreenBuffer = NULL;
 	}
 
-	frontend->engine->camera->setBounds( OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE );
+	engine->camera->setBounds( OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE );
 
 	//
 	// Load the input file and prepare the simulation.
@@ -144,43 +141,43 @@ int main( int argc, char **argv ) {
 	}
 
 	if ( gSimFile ) {
-		if ( breveFrontendLoadSavedSimulation( frontend, text, argv[0], gSimFile ) != EC_OK )
-			brQuit( frontend->engine );
-	} else if ( breveFrontendLoadSimulation( frontend, text, argv[0] ) != EC_OK )
-		brQuit( frontend->engine );
+		if ( brLoadSavedSimulation( engine, text, argv[0], gSimFile ) != EC_OK )
+			brQuit( engine );
+	} else if ( brLoadSimulation( engine, text, argv[0] ) != EC_OK )
+		brQuit( engine );
 
 	slFree( text );
 
 	nextNotify = gNotify;
 
 	if ( gMaster )
-		frontend->engine->world->startNetsimServer();
+		engine->world->startNetsimServer();
 
 	if ( gSlave ) {
-		frontend->engine->world->startNetsimSlave( gSlaveHost );
+		engine->world->startNetsimSlave( gSlaveHost );
 		slFree( gSlaveHost );
 	}
 
-	while ( !gShouldQuit && brEngineIterate( frontend->engine ) == EC_OK ) {
+	while ( !gShouldQuit && brEngineIterate( engine ) == EC_OK ) {
 		if ( gNotify &&
-		        frontend->engine->world->getAge() > nextNotify ) {
+		        engine->world->getAge() > nextNotify ) {
 			printf( "%f seconds elapsed\n",
-			        frontend->engine->world->getAge() );
+			        engine->world->getAge() );
 			nextNotify += gNotify;
 		}
 
 		if ( gSimMax > 0.0 &&
-		        frontend->engine->world->getAge() >= gSimMax ) {
+		        engine->world->getAge() >= gSimMax ) {
 			printf( "%f simulation seconds completed\n", gSimMax );
-			brQuit( frontend->engine );
+			brQuit( engine );
 		}
 
-		if ( frontend->engine->world->detectLightExposure() )
-			frontend->engine->camera->detectLightExposure(
-			    frontend->engine->world, OSMESA_WINDOW_SIZE, gOffscreenBuffer );
+		if ( engine->world->detectLightExposure() )
+			engine->camera->detectLightExposure(
+			    engine->world, OSMESA_WINDOW_SIZE, gOffscreenBuffer );
 	}
 
-	brQuit( frontend->engine );
+	brQuit( engine );
 }
 
 void brCatchSignal( int signal ) {
@@ -194,7 +191,7 @@ void brCatchSignal( int signal ) {
 
 	waiting = 1;
 
-	brPauseTimer( frontend->engine );
+	brPauseTimer( engine );
 
 	printf( "\n\nSimulation interupted.  Type a steve command, 'x' to quit, or hit enter to continue\n" );
 
@@ -216,7 +213,7 @@ void brCatchSignal( int signal ) {
 #endif
 
 	if ( !line || *line == 'x' ) {
-		brUnpauseTimer( frontend->engine );
+		brUnpauseTimer( engine );
 		gShouldQuit = 1;
 		waiting = 0;
 		return;
@@ -227,12 +224,12 @@ void brCatchSignal( int signal ) {
 		return;
 	}
 
-	stRunSingleStatement(( stSteveData * )frontend->data, frontend->engine, line );
+	stRunSingleStatement( gSteveData, engine, line );
 
 	if ( line != staticLine )
 		free( line );
 
-	brUnpauseTimer( frontend->engine );
+	brUnpauseTimer( engine );
 
 	waiting = 0;
 }
@@ -355,10 +352,7 @@ void brQuit( brEngine *e ) {
 		printf( "%f simulated/real\n", age / diff );
 	}
 
-	brEngineFree( frontend->engine );
-
-	breveFrontendCleanupData( frontend->data );
-	breveFrontendDestroy( frontend );
+	brEngineFree( engine );
 
 	exit( 0 );
 }
@@ -452,11 +446,11 @@ int slLoadOSMesaPlugin( char *execPath ) {
 
 	if ( !activate ) return -1;
 
-	frontend->engine->camera->setActivateContextCallback( activate );
+	engine->camera->setActivateContextCallback( activate );
 
 	activate();
 
-	slInitGL( frontend->engine->world, frontend->engine->camera );
+	slInitGL( engine->world, engine->camera );
 
 	return 0;
 

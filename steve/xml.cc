@@ -222,7 +222,7 @@ int stXMLWriteObject( stXMLArchiveRecord *record, FILE *file, stInstance *i, int
 
 	if ( !isDataObject ) {
 
-		for( int n = 0; n < i->breveInstance->observers.size(); n++ ) {
+		for( unsigned int n = 0; n < i->breveInstance->observers.size(); n++ ) {
 			brObserver *obs = i->breveInstance->observers[ n ];
 
 

@@ -105,17 +105,14 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inBridgeO
 
 		case AT_INT:
 			result = PyInt_FromLong( BRINT( inEval ) );
-
 			break;
 
 		case AT_DOUBLE:
 			result = PyFloat_FromDouble( BRDOUBLE( inEval ) );
-
 			break;
 
 		case AT_STRING:
 			result = PyString_FromString( BRSTRING( inEval ) );
-
 			break;
 
 		case AT_INSTANCE:
@@ -178,7 +175,7 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inBridgeO
 
 				result = PyList_New( list->_vector.size() );
 
-				for( int n = 0; n < list->_vector.size(); n++ ) {
+				for( unsigned int n = 0; n < list->_vector.size(); n++ ) {
 					PyObject *element = brPythonTypeFromEval( &list->_vector[ n ], inBridgeObject );
 					PyList_SET_ITEM( result, n, element );
 				}
@@ -682,6 +679,29 @@ int brPythonIsSubclass( void *inClassA, void *inClassB ) {
 }
 
 /**
+ * The Python canLoad breve object callback
+ */
+
+int brPythonCanLoad( void *inObjectData, const char *inExtension ) {
+	if( !strcasecmp( inExtension, "py" ) ||
+		!strcasecmp( inExtension, "pybreve" ) )
+			return 1;
+
+	return 0;
+}
+
+/**
+ * The Python load breve object callback
+ */
+
+int brPythonLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext ) {
+	if( PyRun_SimpleString( inFiletext ) )
+		return EC_ERROR;
+
+	return EC_OK;
+}
+
+/**
  * A brObjectType callback to clean up a generic Python object.  This method is used as the 
  * destructor for both objects and methods
  *
@@ -690,8 +710,6 @@ int brPythonIsSubclass( void *inClassA, void *inClassB ) {
 
 void brPythonDestroyGenericPythonObject( void *inObject ) {
 	if( !inObject ) return;
-
-	// printf(" DECREF %p\n", inObject );
 
 	PyObject *object = ( PyObject* )inObject;
 	Py_DECREF( object );
@@ -705,6 +723,8 @@ void brPythonDestroyGenericPythonObject( void *inObject ) {
  */
 
 void brPythonInit( brEngine *breveEngine ) {
+	static int pyInitialized = 0;
+
 	brObjectType *brevePythonType = new brObjectType();
 
 	static PyMethodDef methods[] = {
@@ -718,7 +738,10 @@ void brPythonInit( brEngine *breveEngine ) {
 		{ NULL, NULL, 0, NULL }
 	};
 
-	Py_Initialize();
+	if( !pyInitialized ) {
+		pyInitialized = 1;
+		Py_Initialize();
+	}
 
 	brevePythonType->userData = ( void* )PyImport_ImportModule( "__main__" );
 
@@ -764,6 +787,8 @@ void brPythonInit( brEngine *breveEngine ) {
 	brevePythonType->destroyObject 		= brPythonDestroyGenericPythonObject;
 	brevePythonType->destroyMethod 		= brPythonDestroyGenericPythonObject;
 	brevePythonType->destroyInstance 	= brPythonDestroyGenericPythonObject;
+	brevePythonType->canLoad		= brPythonCanLoad;
+	brevePythonType->load			= brPythonLoad;
 	brevePythonType->_typeSignature 	= PYTHON_TYPE_SIGNATURE;
 
 	brEngineRegisterObjectType( breveEngine, brevePythonType );

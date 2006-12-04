@@ -15,7 +15,7 @@ struct stSteveData {
 		retainFreedInstances 	= true;
 	}
 
-	brObjectType steveObjectType;
+	brObjectType *steveObjectType;
 
 	char *controllerName;
 
@@ -63,7 +63,7 @@ int stCheckVersionRequirement( float, stVersionRequirement * );
 void stObjectAllocationReport( stObject * );
 void stParseError( brEngine *, int, char *, ... );
 
-void stSteveCleanup( stSteveData * );
+void stSteveCleanup( void* );
 
 int stPreprocess(stSteveData *, brEngine *, const char *);
 

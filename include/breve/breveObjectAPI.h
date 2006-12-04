@@ -15,8 +15,6 @@ typedef struct brCollisionHandler brCollisionHandler;
 
 class brEngine;
 class brEval;
-struct slList;
-struct slStack;
 
 /** \addtogroup breveObjectAPI */
 /*@{*/
@@ -34,17 +32,22 @@ struct slStack;
 
 struct brObjectType {
 	brObjectType() {
-		findMethod 				= NULL;
-		findObject				= NULL;
-		instantiate				= NULL;
-		callMethod				= NULL;
-		isSubclass				= NULL;
+		findMethod 			= NULL;
+		findObject			= NULL;
+		instantiate			= NULL;
+		callMethod			= NULL;
+		isSubclass			= NULL;
 		destroyObject			= NULL;
 		destroyMethod			= NULL;
 		destroyInstance 		= NULL;
 		destroyObjectType		= NULL;
-		userData				= NULL;
+		userData			= NULL;
 		_typeSignature 			= 0;
+	}
+
+	~brObjectType() {
+		if( destroyObjectType && userData )
+			destroyObjectType( userData );
 	}
 
 	/**
@@ -93,9 +96,19 @@ struct brObjectType {
 	void					(*destroyObjectType)( void *inObjectType );
 
 	/**
+	 * A function to determine whether or not the given code can be loaded based on the file extension
+	 */
+	int					(*canLoad)( void *inObjectTypeUserData, const char *inFileExtension );
+
+	/**
 	 * A function to execute code in this frontend language.
 	 */
-	int					 (*evaluate)( brEngine *inEngine, char *inFilename, char *inFiletext );
+	int					(*load)( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext );
+
+	/**
+	 * A function to execute code in this frontend language.
+	 */
+	int					(*loadWithArchive)( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext, const char *inArchive );
 
 	/**
 	 * A user-data callback pointer.

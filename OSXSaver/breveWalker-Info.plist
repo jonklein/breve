@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>breveCreatures</string>
 	<key>CFBundleGetInfoString</key>
-	<string>breveCreatures version 1.2</string>
+	<string>breveCreatures version 2.0b2</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -19,11 +19,11 @@
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.2</string>
+	<string>2.0b2</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.2</string>
+	<string>2.0b2</string>
 	<key>NSPrincipalClass</key>
 	<string>slBreveCreatures</string>
 </dict>

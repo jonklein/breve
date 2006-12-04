@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <zlib.h>
 
+char *slFileExtension( const char *inName );
+
 char *slSplit(char *, char *, int);
 
 int slUtilGzread(char *, int, gzFile);

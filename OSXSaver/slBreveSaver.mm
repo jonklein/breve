@@ -28,7 +28,7 @@
 		
 	glInited = YES;
 
-	if(viewEngine) slInitGL( brEngineGetWorld(viewEngine), brEngineGetCamera(viewEngine) );
+	if( viewEngine ) slInitGL( brEngineGetWorld( viewEngine ), brEngineGetCamera( viewEngine ) );
 	
 	simName = [self getSimName];
 
@@ -40,7 +40,7 @@
 	
 	text = slUtilReadFile(simFile);
 
-	result = breveFrontendLoadSimulation(frontend, text, simFile);
+	result = brLoadSimulation( viewEngine, text, simFile);
 
 	free(simFile);
 	slFree(text);
@@ -141,17 +141,17 @@
 
 	path = [NSString stringWithFormat: @"%@/classes", inputDirectory];
 
-	brAddSearchPath(viewEngine, slStrdup((char*)[path cString])); 
+	brAddSearchPath( viewEngine, slStrdup((char*)[path cString]) ); 
 
 	/* set the output path to the resource dir, and add it to the search path */
 
-	brAddSearchPath(viewEngine, slStrdup((char*)[inputDirectory cString])); 
+	brAddSearchPath( viewEngine, slStrdup((char*)[inputDirectory cString]) ); 
 	
 	paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
 
 	if([paths count] > 0) { 
 		outputDirectory = [[[paths objectAtIndex: 0] stringByAppendingString: @"/Preferences/"] retain];
-		brEngineSetIOPath(viewEngine, (char*)[outputDirectory cString]);
+		brEngineSetIOPath( viewEngine, (char*)[outputDirectory cString] );
 	}
 		
 	if([defaults boolForKey: @"initialized"] != YES) [self saveDefaults];
@@ -167,12 +167,9 @@
 }
 
 - (int)initEngineWithFrame:(NSRect)frame {
-    frontend = breveFrontendInit(0, NULL);
-	frontend->data = breveFrontendInitData(frontend->engine);
-
-	viewEngine = frontend->engine;
+	viewEngine = brEngineNew();
 	
-	if(!viewEngine) return -1;
+	if( !viewEngine ) return -1;
 		
 	return 0;
 }
@@ -261,9 +258,9 @@
 	[super setFrameSize:newSize];
 	[theView setFrameSize:newSize];
 
-	if(!viewEngine) return;
+	if( !viewEngine ) return;
 	
-	camera = brEngineGetCamera(viewEngine);
+	camera = brEngineGetCamera( viewEngine );
 
 	camera->setBounds( newSize.width, newSize.height );
 }
@@ -285,7 +282,7 @@
 } 
 
 - (void)animateOneFrame {
-	 brEngineIterate(viewEngine);
+	 brEngineIterate( viewEngine );
 
 	[[theView openGLContext] makeCurrentContext];
 
@@ -300,7 +297,7 @@
 
 	}
 	
-	brEngineRenderWorld(viewEngine, 0);
+	brEngineRenderWorld( viewEngine, 0 );
 	
 	glFlush();
 }
@@ -312,17 +309,15 @@
 - (void)callControllerMethod:(NSString*)method {
 	brEval r;
 	
-	if(!viewEngine) return;
+	if( !viewEngine ) return;
 	
-	brInstance *controller = brEngineGetController(viewEngine);
+	brInstance *controller = brEngineGetController( viewEngine );
 
 	if(controller) brMethodCallByName(controller, (char*)[method cString], &r);
 }
 
 - (void)dealloc {
-	brEngineFree(frontend->engine);
-	breveFrontendCleanupData(frontend->data);
-	breveFrontendDestroy(frontend);
+	brEngineFree( viewEngine );
 
 	[outputDirectory release];
 	[inputDirectory release];

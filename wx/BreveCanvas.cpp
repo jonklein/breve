@@ -259,9 +259,9 @@ void BreveCanvas::OnMouseRDown(wxMouseEvent &event)
 
 	gBreverender->GetSimulation()->GetMutex()->Lock();
 
-	i = gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine->camera->select( gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine->world, x, y );
+	i = gBreverender->GetSimulation()->GetInterface()->GetEngine()->camera->select( gBreverender->GetSimulation()->GetInterface()->GetEngine()->world, x, y );
 
-	selected = brClickCallback(gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine, i);
+	selected = brClickCallback(gBreverender->GetSimulation()->GetInterface()->GetEngine(), i);
 
 	gBreverender->GetSimulation()->GetMutex()->Unlock();
 
@@ -299,11 +299,11 @@ void BreveCanvas::OnMouseRDown(wxMouseEvent &event)
 	}
 
 	//brClickAtLocation(
-	//    gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine,
+	//    gBreverender->GetSimulation()->GetInterface()->GetEngine(),
 	//    x, y);
 
 	gBreverender->GetSimulation()->GetInterface()->menuCallback(
-	    gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine->controller);
+	    gBreverender->GetSimulation()->GetInterface()->GetEngine()->controller);
 
 	Refresh(TRUE, NULL);
 
@@ -353,9 +353,9 @@ void BreveCanvas::OnMouseUp(wxMouseEvent &event)
 
 	gBreverender->GetSimulation()->GetMutex()->Lock();
 
-	i = gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine->camera->select( gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine->world, x, y );
+	i = gBreverender->GetSimulation()->GetInterface()->GetEngine()->camera->select( gBreverender->GetSimulation()->GetInterface()->GetEngine()->world, x, y );
 
-	selected = brClickCallback(gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine, i);
+	selected = brClickCallback(gBreverender->GetSimulation()->GetInterface()->GetEngine(), i);
 
 	gBreverender->GetSimulation()->GetMutex()->Unlock();
 
@@ -393,11 +393,11 @@ void BreveCanvas::OnMouseUp(wxMouseEvent &event)
 	}
 
 	//brClickAtLocation(
-	//    gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine,
+	//    gBreverender->GetSimulation()->GetInterface()->GetEngine(),
 	//    x, y);
 
 	gBreverender->GetSimulation()->GetInterface()->menuCallback(
-	    gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine->controller);
+	    gBreverender->GetSimulation()->GetInterface()->GetEngine()->controller);
 
 	Refresh(TRUE, NULL);
 	return;
@@ -415,7 +415,7 @@ void BreveCanvas::OnMouseMotion(wxMouseEvent &event)
 
     wasdrag = 1;
 
-    engine = gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine;
+    engine = gBreverender->GetSimulation()->GetInterface()->GetEngine();
 
     gBreverender->GetSimulation()->GetMutex()->Lock();
 

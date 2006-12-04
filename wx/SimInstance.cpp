@@ -105,7 +105,7 @@ void SimInstance::SetSelected(brInstance*i, int type)
     selected = i;
 
     if (selected == NULL && gBreverender->GetSimulation() != NULL && gBreverender->GetSimulation()->GetInterface()->Initialized())
-	instance = (stInstance*)gBreverender->GetSimulation()->GetInterface()->GetFrontend()->engine->controller->userData;
+	instance = (stInstance*)gBreverender->GetSimulation()->GetInterface()->GetEngine()->controller->userData;
     else if (selected != NULL)
 	instance = (stInstance*)(selected->userData);
 

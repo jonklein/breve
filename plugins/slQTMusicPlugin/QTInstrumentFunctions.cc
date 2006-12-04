@@ -60,9 +60,9 @@ slQTInstrumentInfo *slQTNewInstrumentInfo( int instrument ) {
 	request.info.midiChannelAssignment = 0;
 
 
-#ifdef TARGET_RT_LITTLE_ENDIAN
-	wtf.bigEndianValue = 3;
-	againwtf.bigEndianValue = 0x00020000;
+#if TARGET_RT_LITTLE_ENDIAN
+ 	wtf.bigEndianValue = 3;
+ 	againwtf.bigEndianValue = 0x00020000;
 #else
 	wtf = 3;
 	againwtf = 0x00020000;

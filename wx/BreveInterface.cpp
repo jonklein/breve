@@ -35,7 +35,6 @@ BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text)
 	this->text = text;
 	this->next = NULL;
 
-	// frontend = breveFrontendInit(0, NULL);
 	// Due to the annoying java error I'm unable to track down, it isn't safe
 	// to call this function.  It calls brJavaInit, which doesn't actually
 	// do anything when using the directory layout of the CVS tree.  However,
@@ -47,16 +46,13 @@ BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text)
 	// crash the client due to some internal error.  I have no idea how to
 	// resolve this.
 
-	frontend = new breveFrontend;
-	frontend->engine = brEngineNew();
-	frontend->engine->argc = 0;
-	frontend->engine->argv = NULL;
+	_engine = brEngineNew();
 
-	frontend->data = breveFrontendInitData(frontend->engine);
+	_steveData = (stSteveData*)brInitFrontendLanguages( _engine );
 
 	strncpy(buf, app->GetLocalDir(), 2047);
 	buf[2047] = '\0';
-	brAddSearchPath(frontend->engine, (char*)&buf);
+	brAddSearchPath(_engine, (char*)&buf);
 
 	this->simmenu = new wxMenu;
 	paused = 1;
@@ -65,16 +61,16 @@ BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text)
 	x = 400;
 	y = 300;
 
-	frontend->engine->getLoadname = ::getLoadname;
-	frontend->engine->getSavename = ::getSavename;
-	frontend->engine->soundCallback = soundCallback;
-	frontend->engine->pauseCallback = pauseCallback;
-	frontend->engine->dialogCallback = ::dialogCallback;
-	frontend->engine->interfaceTypeCallback = interfaceVersionCallback;
-	frontend->engine->newWindowCallback = newWindowCallback;
-	frontend->engine->freeWindowCallback = freeWindowCallback;
-	frontend->engine->renderWindowCallback = renderWindowCallback;
-	brEngineSetUpdateMenuCallback(frontend->engine, ::menuCallback);
+	_engine->getLoadname = ::getLoadname;
+	_engine->getSavename = ::getSavename;
+	_engine->soundCallback = soundCallback;
+	_engine->pauseCallback = pauseCallback;
+	_engine->dialogCallback = ::dialogCallback;
+	_engine->interfaceTypeCallback = interfaceVersionCallback;
+	_engine->newWindowCallback = newWindowCallback;
+	_engine->freeWindowCallback = freeWindowCallback;
+	_engine->renderWindowCallback = renderWindowCallback;
+	brEngineSetUpdateMenuCallback(_engine, ::menuCallback);
 
 	slSetMessageCallbackFunction(::messageCallback);
 
@@ -82,37 +78,34 @@ BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text)
 	{
 	strncpy(buf, app->GetSearchPathArray()->Item(i), 2047);
 	buf[2047] = '\0';
-	brAddSearchPath(frontend->engine, (char*)&buf);
+	brAddSearchPath(_engine, (char*)&buf);
 	}
 
 	if (!simdir.IsEmpty())
 	{
 	strncpy(buf, simdir, 2047);
 	buf[2047] = '\0';
-	brAddSearchPath(frontend->engine, (char*)&buf);
+	brAddSearchPath(_engine, (char*)&buf);
 	}
 
 	strncpy(buf, app->GetBreveDir(), 2047);
 	buf[2047] = '\0';
-	brAddSearchPath(frontend->engine, (char*)&buf);
+	brAddSearchPath(_engine, (char*)&buf);
 
 	strncpy(buf, app->GetBreveDir() + "plugins" + FILE_SEP_PATH, 2047);
 	buf[2047] = '\0';
-	brAddSearchPath(frontend->engine, (char*)&buf);
+	brAddSearchPath(_engine, (char*)&buf);
 
 	strncpy(buf, app->GetBreveDir() + "java" + FILE_SEP_PATH, 2047);
 	buf[2047] = '\0';
-	brAddSearchPath(frontend->engine, (char*)&buf);
+	brAddSearchPath(_engine, (char*)&buf);
 }
 
 BreveInterface::~BreveInterface()
 {
-	if (frontend != NULL) {
-		brEngineFree(frontend->engine);
-		breveFrontendCleanupData(frontend->data);
-		breveFrontendDestroy(frontend);
-
-		frontend = NULL;
+	if ( _engine != NULL ) {
+		brEngineFree(_engine);
+		_engine = NULL;
 	}
 
 	if (simmenu != NULL)
@@ -136,16 +129,16 @@ void BreveInterface::Pause( int pause ) {
 	paused = !paused;
 
 	if ( paused )
-		brPauseTimer( frontend->engine );
+		brPauseTimer( _engine );
 	else
-		brUnpauseTimer( frontend->engine );
+		brUnpauseTimer( _engine );
 }
 
 bool BreveInterface::Initialize() {
 
-	slInitGL( frontend->engine->world, frontend->engine->camera );
+	slInitGL( _engine->world, _engine->camera );
 
-	if ( breveFrontendLoadSimulation( frontend, text, simulationfile ) != EC_OK ) {
+	if ( brLoadSimulation( _engine, text, simulationfile ) != EC_OK ) {
 		reportError();
 		slFree( text );
 		text = NULL;
@@ -170,7 +163,7 @@ bool BreveInterface::Initialize() {
 }
 
 void BreveInterface::ResizeView(int x, int y) {
-	frontend->engine->camera->setBounds( x, y );
+	_engine->camera->setBounds( x, y );
 }
 
 void BreveInterface::Iterate() {
@@ -179,10 +172,10 @@ void BreveInterface::Iterate() {
 		mQueuedMessage = "";
 	}
 
-	if (frontend == NULL || !initialized)
+	if ( _engine == NULL || !initialized )
 		return;
 
-	if (brEngineIterate(frontend->engine) != EC_OK) {
+	if ( brEngineIterate( _engine ) != EC_OK) {
 		reportError();
 		Abort();
 	}
@@ -191,12 +184,12 @@ void BreveInterface::Iterate() {
 }
 
 void BreveInterface::Render() {
-	if ( frontend == NULL || !initialized )
+	if ( _engine == NULL || !initialized )
 		return;
 
-	brEngineLock(frontend->engine);
-	brEngineRenderWorld( frontend->engine,gBreverender->MouseDown() );
-	brEngineUnlock(frontend->engine);
+	brEngineLock(_engine);
+	brEngineRenderWorld( _engine,gBreverender->MouseDown() );
+	brEngineUnlock(_engine);
 }
 
 void BreveInterface::Abort() {
@@ -261,10 +254,10 @@ void BreveInterface::reportError()
 {
 	brErrorInfo *error;
 
-	if (frontend->engine == NULL)
+	if (_engine == NULL)
 		return;
 
-	error = brEngineGetErrorInfo( frontend->engine );
+	error = brEngineGetErrorInfo( _engine );
 
 	char errorMessage[ 10240 ];
 
@@ -383,7 +376,7 @@ char *interfaceVersionCallback()
 void BreveInterface::RunMenu(int id, brInstance *n) {
 	int i;
 
-	if (brMenuCallback(frontend->engine, n, id) != EC_OK) {
+	if (brMenuCallback(_engine, n, id) != EC_OK) {
 		reportError();
 		Abort();
 	}
@@ -400,5 +393,5 @@ void BreveInterface::ExecuteCommand(wxString str) {
 }
 
 void BreveInterface::RunCommand(char * str) {
-	stRunSingleStatement((stSteveData*)frontend->data, frontend->engine, str);
+	stRunSingleStatement( _steveData, _engine, str);
 }

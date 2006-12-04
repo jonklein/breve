@@ -37,7 +37,7 @@ id gDisplayView;
 
 id gInterfaceController;
 
-BOOL engineWillPause;
+BOOL _engineWillPause;
 
 @implementation slBreveEngine
 
@@ -54,14 +54,14 @@ NSString *movieQualityStrings[] = {
 int slMakeCurrentContext();
 
 - init {
-	engineLock = [[NSRecursiveLock alloc] init];
-	threadLock = [[NSRecursiveLock alloc] init];
+	_engineLock = [[NSRecursiveLock alloc] init];
+	_threadLock = [[NSRecursiveLock alloc] init];
 
 	gInterfaceController = interfaceController;
 
 	speedFactor = 1;
 
-	engineWillPause = NO;
+	_engineWillPause = NO;
 
 	runState = BX_STOPPED;
 	mySelf = self;
@@ -85,11 +85,11 @@ int slMakeCurrentContext();
 }
 
 - (void)lock {
-	[engineLock lock];
+	[_engineLock lock];
 }
 
 - (void)unlock {
-	[engineLock unlock];
+	[_engineLock unlock];
 }
 
 - (void)initEngine {
@@ -97,7 +97,8 @@ int slMakeCurrentContext();
 	char *classPath, *pluginPath;
 	slCamera *camera;
 
-	if(frontend) return;
+	if( _engine ) 
+		return;
 
 	mainRunLoop = [NSRunLoop currentRunLoop];
 
@@ -105,55 +106,50 @@ int slMakeCurrentContext();
 	classPath = (char*)[[NSString stringWithFormat: @"%@/classes", bundlePath] cString];
 	pluginPath = (char*)[[NSString stringWithFormat: @"%@/plugins", bundlePath] cString];
 
-	frontend = breveFrontendInit(0, NULL);
+	_engine = brEngineNew();
 
-	brEngineSetSoundCallback(frontend->engine, soundCallback);
-	brEngineSetDialogCallback(frontend->engine, dialogCallback);
+	brEngineSetSoundCallback(_engine, soundCallback);
+	brEngineSetDialogCallback(_engine, dialogCallback);
 
-	camera = brEngineGetCamera(frontend->engine);
+	camera = brEngineGetCamera(_engine);
 	camera->setActivateContextCallback( slMakeCurrentContext );
 
-	if(outputPath) brEngineSetIOPath(frontend->engine, outputPath);
+	if(outputPath) brEngineSetIOPath(_engine, outputPath);
 
 	gDisplayView = displayView;
 
-	brEngineSetInterfaceInterfaceTypeCallback(frontend->engine, interfaceVersionCallback);
-	brEngineSetInterfaceSetStringCallback(frontend->engine, interfaceSetStringCallback);
-	brEngineSetInterfaceSetNibCallback(frontend->engine, setNibCallback);
+	brEngineSetInterfaceInterfaceTypeCallback(_engine, interfaceVersionCallback);
+	brEngineSetInterfaceSetStringCallback(_engine, interfaceSetStringCallback);
+	brEngineSetInterfaceSetNibCallback(_engine, setNibCallback);
 
-	brEngineSetGetSavenameCallback(frontend->engine, getSaveNameCallback);
-	brEngineSetGetLoadnameCallback(frontend->engine, getLoadNameCallback);
-	brEngineSetPauseCallback(frontend->engine, pauseCallback);
-	brEngineSetUnpauseCallback(frontend->engine, unpauseCallback);
-	brEngineSetUpdateMenuCallback(frontend->engine, updateMenu);
+	brEngineSetGetSavenameCallback(_engine, getSaveNameCallback);
+	brEngineSetGetLoadnameCallback(_engine, getLoadNameCallback);
+	brEngineSetPauseCallback(_engine, pauseCallback);
+	brEngineSetUnpauseCallback(_engine, unpauseCallback);
+	brEngineSetUpdateMenuCallback(_engine, updateMenu);
 
-	brAddSearchPath(frontend->engine, classPath);
-	brAddSearchPath(frontend->engine, pluginPath);
-	brAddSearchPath(frontend->engine, (char*)[bundlePath cString]);
-	brAddSearchPath(frontend->engine, (char*)[NSHomeDirectory() cString]);
+	brAddSearchPath(_engine, classPath);
+	brAddSearchPath(_engine, pluginPath);
+	brAddSearchPath(_engine, (char*)[bundlePath cString]);
+	brAddSearchPath(_engine, (char*)[NSHomeDirectory() cString]);
 
-	// Java should get inited automatically when the engine is created, 
-	// but unfortunately, the claspath isn't setup yet at that point...
-
-	frontend->data = breveFrontendInitData(frontend->engine);
+	_steveData = (stSteveData*)brInitFrontendLanguages( _engine );
 }
 
 - (void)freeEngine {
-	[displayView setEngine: NULL fullscreen: NO];
+	[ displayView setEngine: NULL fullscreen: NO ];
 
-	while([displayView drawing]);
+	while( [ displayView drawing ] );
 
-	brEngineFree(frontend->engine);
-	breveFrontendCleanupData(frontend->data);
-	breveFrontendDestroy(frontend);
+	brEngineFree( _engine );
 
-	frontend = NULL;
+	_engine = NULL;
 
 	[interfaceController updateObjectSelection];
 }
 
 - (int)startSimulationWithText:(char*)buffer withFilename:(char*)name withSavedSimulationFile:(char*)saved fullscreen:(BOOL)full {
-	[engineLock lock];
+	[_engineLock lock];
 
 	if(runState != BX_STOPPED) return -1;
 
@@ -163,10 +159,10 @@ int slMakeCurrentContext();
 	else {
 		NSString *inputDir = [[NSString stringWithCString: name] stringByDeletingLastPathComponent];
 
-		if(useSimDirForOutput) brEngineSetIOPath(frontend->engine, (char*)[inputDir cString]);
+		if(useSimDirForOutput) brEngineSetIOPath(_engine, (char*)[inputDir cString]);
 	}
 
-	[displayView setEngine: frontend->engine fullscreen: full];
+	[displayView setEngine: _engine fullscreen: full];
 
 	if(full) {
 		if(![displayView startFullScreen]) {
@@ -177,7 +173,7 @@ int slMakeCurrentContext();
 
 	if([self parseText: buffer withFilename: name withSavedSimulationFile: saved] < 0) {
 		if(full) [displayView stopFullScreen];
-		[engineLock unlock];
+		[_engineLock unlock];
 		return -1;
 	}
 
@@ -190,7 +186,7 @@ int slMakeCurrentContext();
 
 - (void)go {
 	runState = BX_RUN;
-	[engineLock unlock];
+	[_engineLock unlock];
 }
 
 /* step 1 of setting up the simulation, parse the program */
@@ -203,12 +199,12 @@ int slMakeCurrentContext();
 	if(filename) name = slStrdup(filename);
 	else name = slStrdup("<untitled>");
 	
-	if(saved) result = breveFrontendLoadSavedSimulation(frontend, buffer, name, saved);
-	else result = breveFrontendLoadSimulation(frontend, buffer, name);
+	if(saved) result = brLoadSavedSimulation( _engine, buffer, name, saved );
+	else result = brLoadSimulation( _engine, buffer, name );
 
-	controller = brEngineGetController(frontend->engine);
+	controller = brEngineGetController( _engine);
 
-	if(filename) slFree(name);
+	if(filename) slFree( name );
 
 	return result;
 }
@@ -216,10 +212,10 @@ int slMakeCurrentContext();
 
 - (void)pauseSimulation:sender {
 	printf(" Pausing...\n " );
-	[engineLock lock];
+	[_engineLock lock];
 	runState = BX_PAUSE;
 
-	engineWillPause = NO;
+	_engineWillPause = NO;
 
 	if([displayView isFullScreen]) {
 		[displayView pauseFullScreen];
@@ -232,7 +228,7 @@ int slMakeCurrentContext();
 	}
 
 	runState = BX_RUN;
-	[engineLock unlock];
+	[_engineLock unlock];
 }
 
 - (void)stopSimulation {
@@ -249,13 +245,13 @@ int slMakeCurrentContext();
 
 	// is this necessary? 
 
-	[engineLock lock];
-	[engineLock unlock];
+	[_engineLock lock];
+	[_engineLock unlock];
 
 	// wait for the thread to be truely exited before continuing 
 
-	[threadLock lock];
-	[threadLock unlock];
+	[_threadLock lock];
+	[_threadLock unlock];
 
 	[displayView setEngine: NULL fullscreen: NO];
 
@@ -263,12 +259,12 @@ int slMakeCurrentContext();
 }
 
 - (int)runCommand:(char*)command {
-	if(!frontend || runState == BX_STOPPED) return -1;
+	if( !_engine || runState == BX_STOPPED ) return -1;
 
-	if(runState == BX_RUN) [engineLock lock];
+	if(runState == BX_RUN) [_engineLock lock];
 	slMessage(DEBUG_ALL, "> %s\n", command);
-	stRunSingleStatement( (stSteveData*)frontend->data, frontend->engine, command);
-	if(runState == BX_RUN) [engineLock unlock];
+	stRunSingleStatement( _steveData, _engine, command);
+	if(runState == BX_RUN) [_engineLock unlock];
 
 	return 0;
 }
@@ -286,8 +282,8 @@ int slMakeCurrentContext();
 }
 
 - (brEngine*)getEngine {
-	if(!frontend) return NULL;
-	return frontend->engine;
+	if( !_engine ) return NULL;
+	return _engine;
 }
 
 - (int)getRunState {
@@ -302,12 +298,12 @@ int slMakeCurrentContext();
 
 	int result;
 
-	[threadLock lock];
+	[_threadLock lock];
 
 	pool = [[NSAutoreleasePool alloc] init];
 
 	while(runState != BX_STOPPED) {
-		[engineLock lock];
+		[_engineLock lock];
 
 		if(runState == BX_RUN) {
 			if(1) {
@@ -318,11 +314,11 @@ int slMakeCurrentContext();
 					mouse = [[[displayView window] contentView] convertPoint: mouse toView: displayView];
 				}
 
-				brEngineSetMouseLocation(frontend->engine, (int)mouse.x, (int)mouse.y);
+				brEngineSetMouseLocation(_engine, (int)mouse.x, (int)mouse.y);
 			}
 
-			if((result = brEngineIterate(frontend->engine)) != EC_OK) {
-				[engineLock unlock];
+			if((result = brEngineIterate(_engine)) != EC_OK) {
+				[_engineLock unlock];
 
 				if([displayView isFullScreen]) [displayView stopFullScreen];
 
@@ -334,7 +330,7 @@ int slMakeCurrentContext();
 
 				if([displayView isFullScreen]) {
 					[displayView drawFullScreen];
-				} else if(displayMovie || brEngineGetDrawEveryFrame(frontend->engine)) {
+				} else if(displayMovie || brEngineGetDrawEveryFrame(_engine)) {
 					[displayView lockFocus];
 					[displayView drawRect: nothing];
 					[displayView unlockFocus];
@@ -353,7 +349,7 @@ int slMakeCurrentContext();
 			}
 		}
 
-		[engineLock unlock];
+		[_engineLock unlock];
 
 		// A tiny little sleep here will help ensure that other threads get a shot
 		// at taking the lock on a multiprocessor system. 
@@ -361,7 +357,7 @@ int slMakeCurrentContext();
 		if(speedFactor > 1) usleep( (int)( speedFactor * 10000 ) );
 		else usleep( 50 );
 
-		// while(engineWillPause) usleep(10000);
+		// while(_engineWillPause) usleep(10000);
 	}
 
 	[displayView setNeedsDisplay: YES];
@@ -370,8 +366,8 @@ int slMakeCurrentContext();
 
 	[self freeEngine];
 
-	[engineLock unlock];
-	[threadLock unlock];
+	[_engineLock unlock];
+	[_threadLock unlock];
 
 	[pool release];
 
@@ -382,15 +378,15 @@ int slMakeCurrentContext();
 	slCamera *c;
 	unsigned int x, y;
 
-	if(!frontend) return;
+	if( !_engine ) return;
 
-	c = brEngineGetCamera(frontend->engine);
+	c = brEngineGetCamera(_engine);
 
-	if(runState == BX_RUN) [engineLock lock];
+	if(runState == BX_RUN) [_engineLock lock];
 	c->getBounds( &x, &y );
-	brClickAtLocation(frontend->engine, (int)p.x, (int)(y - p.y) );
+	brClickAtLocation(_engine, (int)p.x, (int)(y - p.y) );
 	[interfaceController updateObjectSelection];
-	if(runState == BX_RUN) [engineLock unlock];
+	if(runState == BX_RUN) [_engineLock unlock];
 }
 
 - (BOOL)startMovie {
@@ -401,12 +397,12 @@ int slMakeCurrentContext();
 
 	if(displayMovie) return TRUE;
 
-	if(runState == BX_RUN) [engineLock lock];
+	if(runState == BX_RUN) [_engineLock lock];
 
 	saveName = [interfaceController saveNameForType: @"mov" withAccView: movieSaveAccView];
 
 	if(!saveName) {
-		if(runState == BX_RUN) [engineLock unlock];
+		if(runState == BX_RUN) [_engineLock unlock];
 		return FALSE;
 	}
 
@@ -417,13 +413,13 @@ int slMakeCurrentContext();
 
 	[displayView setMovie: (id)displayMovie];
 
-	if(runState == BX_RUN) [engineLock unlock];
+	if(runState == BX_RUN) [_engineLock unlock];
 
 	return TRUE;
 }
 
 - (void)stopMovie {
-	if(runState == BX_RUN) [engineLock lock];
+	if(runState == BX_RUN) [_engineLock lock];
 
 	[displayView setMovie: NULL];
 	while([displayView drawing]);
@@ -432,7 +428,7 @@ int slMakeCurrentContext();
 	[displayMovie release];
 	displayMovie = NULL;
 
-	if(runState == BX_RUN) [engineLock unlock];
+	if(runState == BX_RUN) [_engineLock unlock];
 }
 
 
@@ -441,9 +437,9 @@ int slMakeCurrentContext();
 	brEval result;
 	brInstance *i, *controller;
 
-	if(!frontend) return NULL;
+	if( !_engine ) return NULL;
 
-	controller = brEngineGetController(frontend->engine);
+	controller = brEngineGetController(_engine);
 
 	method = brMethodFind(controller->object, "get-selection", NULL, 0);
  
@@ -463,10 +459,10 @@ int slMakeCurrentContext();
 }
 
 - (void)interfaceActionTag:(int)tag stringValue:(NSString*)s {
-	if(frontend) {
-		[engineLock lock];
-		brInterfaceCallback(frontend->engine, tag, (char*)[s cString]);
-		[engineLock unlock];
+	if( _engine ) {
+		[_engineLock lock];
+		brInterfaceCallback(_engine, tag, (char*)[s cString]);
+		[_engineLock unlock];
 	}
 }
 

@@ -69,7 +69,7 @@ stObject *stObjectNew( brEngine *engine, stSteveData *sdata, char *name, char *a
 
 	// save this object in the engine's object namespace
 
-	bo = brEngineAddObject( engine, &sdata->steveObjectType, name, o );
+	bo = brEngineAddObject( engine, sdata->steveObjectType, name, o );
 
 	if ( alias ) brEngineAddObjectAlias( engine, alias, bo );
 

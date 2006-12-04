@@ -409,50 +409,6 @@ int brISetInterfaceString( brEval args[], brEval *target, brInstance *i ) {
 }
 
 /*!
-	\brief Returns iTunes waveform data for the specified channel and sample.
-
-	int getWaveformData(int channel, int sample).
-*/
-
-int brIGetWaveformData( brEval args[], brEval *target, brInstance *i ) {
-	int channel = BRINT( &args[0] );
-	int sample = BRINT( &args[1] );
-
-	if ( !i->engine->iTunesData || !i->engine->iTunesData->data || sample < 0 || sample > 511 || channel < 0 || channel > 1 ) {
-
-		target->set( 0 );
-
-		return EC_OK;
-	}
-
-	target->set( i->engine->iTunesData->data->waveformData[channel][sample] );
-
-	return EC_OK;
-}
-
-/*!
-	\brief Returns iTunes spectrum data for the specified channel and sample.
-
-	int getSpectrumData(int channel, int sample).
-*/
-
-int brIGetSpectrumData( brEval args[], brEval *target, brInstance *i ) {
-	int channel = BRINT( &args[0] );
-	int sample = BRINT( &args[1] );
-
-	if ( !i->engine->iTunesData || !i->engine->iTunesData->data || sample < 0 || sample > 511 || channel < 0 || channel > 1 ) {
-
-		target->set( 0 );
-
-		return EC_OK;
-	}
-
-	target->set( i->engine->iTunesData->data->spectrumData[channel][sample] );
-
-	return EC_OK;
-}
-
-/*!
 	\brief Returns a unique color vector for a number.
 
 	vector uniqueColor(int number).
@@ -583,9 +539,6 @@ void breveInitControlFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "playSound", brIPlaySound, AT_NULL, 0 );
 	brNewBreveCall( n, "getArgv", brIGetArgv, AT_STRING, AT_INT, 0 );
 	brNewBreveCall( n, "getArgc", brIGetArgc, AT_INT, 0 );
-
-	brNewBreveCall( n, "getWaveformData", brIGetWaveformData, AT_INT, AT_INT, AT_INT, 0 );
-	brNewBreveCall( n, "getSpectrumData", brIGetSpectrumData, AT_INT, AT_INT, AT_INT, 0 );
 
 	brNewBreveCall( n, "setInterfaceString", brISetInterfaceString, AT_INT, AT_STRING, AT_INT, 0 );
 

@@ -1,30 +1,32 @@
 #include "kernel.h"
-#include "java.h"
 
-/*!
-	\brief Creates a breveFrontend structure containing a valid \ref brEngine.
+int brLoadSimulation( brEngine *engine, const char *code, const char *file ) {
+	char *extension = slFileExtension( file );
 
-	This function sets up the breveFrontend structure and creates a
-	brEngine.  If this breve frontend is being run from the command line,
-	the calling function should provide the input argument count (argc) and
-	the input argument pointers (argv).  If this information is not
-	available, argc should be 0, and argv should be NULL.
-*/
+	for( unsigned int n = 0; n < engine->objectTypes.size(); n++ ) {
+		brObjectType *type = engine->objectTypes[ n ];
 
-breveFrontend *breveFrontendInit( int argc, char **argv ) {
-	breveFrontend *frontend = new breveFrontend;
+		if( type->load && type->canLoad && type->canLoad( type->userData, extension ) ) {
+			int r = type->load( engine, type->userData, file, code );
 
-	frontend->engine = brEngineNew();
-	frontend->engine->argc = argc;
-	frontend->engine->argv = argv;
+			if( r != EC_OK ) 
+				return EC_ERROR;
 
-	return frontend;
+			if( !engine->controller ) {
+				slMessage( DEBUG_ALL, "No controller object has been loaded for file \"%s\"", file );
+				return EC_ERROR;
+			}
+
+			return EC_OK;
+		}		
+
+	}
+
+	slMessage( DEBUG_ALL, "Could not locate breve language frontend which understands \"%s\" files\n", extension );
+
+	return EC_ERROR;
 }
 
-/*!
-	\brief Deletes the breveFrontend.
-*/
-
-void breveFrontendDestroy( breveFrontend *frontend ) {
-	delete frontend;
+int brLoadSavedSimulation( brEngine *engine, const char *simcode, const char *simfile, const char *xmlfile ) {
+	// return stLoadSavedSimulation( NULL, engine, simcode, simfile, xmlfile );
 }

@@ -925,7 +925,7 @@ void BreveRender::OnSimMenu(wxCommandEvent &event)
 
 	GetSimulation()->GetMutex()->Lock();
 
-	GetSimulation()->GetInterface()->RunMenu(event.m_id - BREVE_SIMMENU, GetSimulation()->GetInterface()->GetFrontend()->engine->controller);
+	GetSimulation()->GetInterface()->RunMenu(event.m_id - BREVE_SIMMENU, GetSimulation()->GetInterface()->GetEngine()->controller);
 
 	GetSimulation()->GetMutex()->Unlock();
 }
@@ -986,19 +986,19 @@ void BreveRender::OnKeyUp(wxKeyEvent&event)
 
 		switch(keycode) {
 			case WXK_LEFT:
-				brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "left", 0);
+				brSpecialKeyCallback(GetSimulation()->GetInterface()->GetEngine(), "left", 0);
 				break;
 			case WXK_RIGHT:
-				brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "right", 0);
+				brSpecialKeyCallback(GetSimulation()->GetInterface()->GetEngine(), "right", 0);
 				break;
 			case WXK_UP:
-				brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "up", 0);
+				brSpecialKeyCallback(GetSimulation()->GetInterface()->GetEngine(), "up", 0);
 				break;
 			case WXK_DOWN:
-				brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "down", 0);
+				brSpecialKeyCallback(GetSimulation()->GetInterface()->GetEngine(), "down", 0);
 				break;
 			default:
-				brKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, keycode, 0);
+				brKeyCallback(GetSimulation()->GetInterface()->GetEngine(), keycode, 0);
 				break;
 		}
 
@@ -1034,19 +1034,19 @@ void BreveRender::OnKeyDown(wxKeyEvent&event)
 
 		switch(keycode) {
 		case WXK_LEFT:
-			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "left", 1);
+			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetEngine(), "left", 1);
 			break;
 		case WXK_RIGHT:
-			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "right", 1);
+			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetEngine(), "right", 1);
 			break;
 		case WXK_UP:
-			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "up", 1);
+			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetEngine(), "up", 1);
 			break;
 		case WXK_DOWN:
-			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, "down", 1);
+			brSpecialKeyCallback(GetSimulation()->GetInterface()->GetEngine(), "down", 1);
 			break;
 		default:
-			brKeyCallback(GetSimulation()->GetInterface()->GetFrontend()->engine, keycode, 1);
+			brKeyCallback(GetSimulation()->GetInterface()->GetEngine(), keycode, 1);
 			break;
 		}
 

@@ -403,6 +403,14 @@ Mobile : Bird (aka Birds) {
 		tempVector (vector).
 		
 		tempVector = (otherMobile get-location) - (self get-location).
+
+		if | tempVector | == 0.0: 
+			return 0.
+
+		if | ( self get-velocity ) | == 0.0:
+			return 0.
+ 
+
 		return angle((self get-velocity), tempVector).
 }
  

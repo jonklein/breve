@@ -38,30 +38,33 @@ enum {
     BX_PAUSE
 };
 
+typedef struct stSteveData stSteveData;
+
 @interface slBreveEngine : NSObject {
-	IBOutlet id movieSaveAccView;
-	IBOutlet id movieFrameNumberText;
-	IBOutlet id movieQualityPopup;
-	IBOutlet id movieQualityMessageText;
+	IBOutlet id 		movieSaveAccView;
+	IBOutlet id 		movieFrameNumberText;
+	IBOutlet id 		movieQualityPopup;
+	IBOutlet id 		movieQualityMessageText;
 
-	IBOutlet id displayView;
-	IBOutlet id interfaceController;
+	IBOutlet id 		displayView;
+	IBOutlet id 		interfaceController;
 
-	IBOutlet id oldSpeedMenuItem;
+	IBOutlet id 		oldSpeedMenuItem;
 
-	slMovieRecord *displayMovie;
+	slMovieRecord 		*displayMovie;
     
-	NSRecursiveLock *engineLock;
-	NSRecursiveLock *threadLock;
+	NSRecursiveLock		*_engineLock;
+	NSRecursiveLock		*_threadLock;
     
-	breveFrontend *frontend;
+	brEngine 		*_engine;
+	stSteveData		*_steveData;
 
-	int runState;
+	int 			runState;
 
-	double speedFactor;
+	double 			speedFactor;
 
-	char *outputPath;
-	BOOL useSimDirForOutput;
+	char 			*outputPath;
+	BOOL 			useSimDirForOutput;
 }
 
 - (void)setOutputPath:(char*)path useSimDir:(BOOL)sim;

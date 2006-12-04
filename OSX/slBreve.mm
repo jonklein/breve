@@ -35,7 +35,7 @@
 #import "slBreve.h"
 #import "util.h"
 
-extern BOOL engineWillPause;
+extern BOOL _engineWillPause;
 
 @implementation slBreve
 
@@ -81,7 +81,7 @@ static NSRecursiveLock *gLogLock;
 	
 	NSLog(@ " version = %@\n", [ NSString stringWithFormat: @"version %@", _versionString ]  );
 
-	engineWillPause = NO;
+	_engineWillPause = NO;
 	
 	documents = [[NSMutableArray arrayWithCapacity: 20] retain];
         
@@ -595,7 +595,7 @@ void slPrintLog( const char *text ) {
 }
 
 - (int)updateLog:sender {
-	if(breveEngine && engineWillPause) [breveEngine pauseSimulation: self];
+	if(breveEngine && _engineWillPause) [breveEngine pauseSimulation: self];
 
 	if([gLogString length] == 0) return 0;
 

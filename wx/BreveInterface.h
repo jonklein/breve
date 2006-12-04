@@ -7,8 +7,9 @@
 
 #include <string>
 
-struct breveFrontend;
-struct brInstance;
+class brInstance;
+class brEngine;
+class stSteveData;
 
 class BreveInterface
 {
@@ -94,24 +95,24 @@ class BreveInterface
 	    text = c;
 	}
 
-	breveFrontend * GetFrontend()
-	{
-	    return frontend;
+	brEngine* GetEngine() {
+	    return _engine;
 	}
 
     private:
-	int x, y;
-	int valid;
-	int paused;
+	int 			x, y;
+	int 			valid;
+	int 			paused;
 
-	bool initialized;
+	bool 			initialized;
 
-	char * text;
-	char * simulationfile;
+	char 			*text;
+	char 			*simulationfile;
 
-	BreveInterface * next;
-	breveFrontend *frontend;
-	wxMenu * simmenu;
+	BreveInterface 		*next;
+	brEngine 		*_engine;
+	stSteveData 		*_steveData;
+	wxMenu 			*simmenu;
 
 	std::string mQueuedMessage;
 

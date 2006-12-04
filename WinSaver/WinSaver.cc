@@ -45,7 +45,7 @@ void SetupAnimation( int Width, int Height );
 void CleanupAnimation();
 void OnTimer( HDC hDC );
 
-breveFrontend *gFrontend;
+brEngine *gEngine;
 
 #define TIMER 1
 
@@ -152,9 +152,9 @@ void SetupAnimation( int inWidth, int inHeight ) {
 
 	slSetMessageCallbackFunction( NULL );
 
-	gFrontend = breveFrontendInit( 0, NULL );
+	gEngine = brEngineNew();
 
-	gFrontend->data = breveFrontendInitData( gFrontend->engine );
+	brInitFrontendLanguages( gEngine );
 
 	// Do all the path stuff
 	
@@ -162,28 +162,28 @@ void SetupAnimation( int inWidth, int inHeight ) {
 	GetWindowsDirectory( winDir, 1024 );
 	std::string classPath = std::string( winDir ) + "\\breve\\lib\\classes\\";
 
-	brEngineSetIOPath( gFrontend->engine, classPath.c_str() );
-	brAddSearchPath( gFrontend->engine, classPath.c_str() );
+	brEngineSetIOPath( gEngine, classPath.c_str() );
+	brAddSearchPath( gEngine, classPath.c_str() );
 
 	std::string simpath = std::string( winDir ) + "\\breve\\Creatures.tz";
 
 	char *simulationText = slUtilReadFile( simpath.c_str() );
-	breveFrontendLoadSimulation( gFrontend, simulationText, simpath.c_str() );
+	brLoadSimulation( gEngine, simulationText, simpath.c_str() );
 
 	// Hooray!
 
-	gFrontend->engine->camera->setBounds( inWidth, inHeight );
-	slInitGL( gFrontend->engine->world, gFrontend->engine->camera );
+	gEngine->camera->setBounds( inWidth, inHeight );
+	slInitGL( gEngine->world, gEngine->camera );
 }
 
 void OnTimer( HDC hDC ) {
-	brEngineIterate( gFrontend->engine );
-	brEngineRenderWorld( gFrontend->engine, 0 );
+	brEngineIterate( gEngine );
+	brEngineRenderWorld( gEngine, 0 );
 	SwapBuffers(hDC);
 }
 
 void CleanupAnimation() {
-	delete gFrontend;
+	brEngineFree( gEngine );
 }
 
 void GetConfig() {

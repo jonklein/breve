@@ -34,12 +34,10 @@ char *interfaceID;
 /*@{*/
 
 void brEngineLock( brEngine *e ) {
-
 	( pthread_mutex_lock( &( e )->lock ) );
 }
 
 void brEngineUnlock( brEngine *e ) {
-
 	( pthread_mutex_unlock( &( e )->lock ) );
 }
 
@@ -54,12 +52,26 @@ brEvent::~brEvent() {
 	slFree( _name );
 }
 
-/*!
-    \brief Creates a brEngine structure.
+/**
+ * \brief Creates a brEngine structure with argc and argv values filled in.
+ *
+ * Creates and initializes the bloated brEngine structure.  This is the first step in starting a breve simulation.
+ */
 
-    Creates and initializes the bloated brEngine structure.  This is the
-    first step in starting a breve simulation.
-*/
+brEngine *brEngineNewWithArguments( int inArgc, char **inArgv ) {
+	brEngine *e = brEngineNew();
+
+	e->argc = inArgc;
+	e->argv = inArgv;
+
+	return e;
+}
+
+/**
+ * \brief Creates a brEngine structure.
+ *
+ * Creates and initializes the bloated brEngine structure.  This is the first step in starting a breve simulation.
+ */
 
 brEngine *brEngineNew( void ) {
 	brEngine *e;
@@ -101,9 +113,7 @@ brEngine *brEngineNew( void ) {
 	e->newWindowCallback = NULL;
 	e->freeWindowCallback = NULL;
 	e->renderWindowCallback = NULL;
-
 	e->controller = NULL;
-	e->iTunesData = NULL;
 
 	e->RNG = gsl_rng_alloc( gsl_rng_mt19937 );
 
@@ -243,19 +253,24 @@ brInternalFunction *brEngineInternalFunctionLookup( brEngine *e, char *name ) {
 }
 
 
-/*!
-	\brief Frees a breve engine.
-
-	Frees the engine and everything inside of it--all objects, all instances, everything.
-*/
+/**
+ * \brief Frees a breve engine.
+ * 
+ * Frees the engine and everything inside of it--all objects, all instances, everything.
+ */
 
 void brEngineFree( brEngine *e ) {
+	delete e;
+}
+
+
+brEngine::~brEngine() {
 	std::vector<brInstance*>::iterator bi;
 	std::vector<void*>::iterator wi;
 
 #if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
 
-	if ( e->soundMixer ) delete e->soundMixer;
+	if ( soundMixer ) delete soundMixer;
 
 #endif
 
@@ -264,42 +279,47 @@ void brEngineFree( brEngine *e ) {
 
 #endif
 
-	gsl_rng_free( e->RNG );
+	gsl_rng_free( RNG );
 
-	for ( bi = e->instances.begin(); bi != e->instances.end(); bi++ )
+	for ( bi = instances.begin(); bi != instances.end(); bi++ )
 		brInstanceRelease( *bi );
 
-	for ( bi = e->instancesToAdd.begin(); bi != e->instancesToAdd.end(); bi++ )
+	for ( bi = instancesToAdd.begin(); bi != instancesToAdd.end(); bi++ )
 		brInstanceRelease( *bi );
 
-	brEngineRemoveDlPlugins( e );
+	brEngineRemoveDlPlugins( this );
 
-	if ( e->error.file ) {
-		slFree( e->error.file );
-		e->error.file = NULL;
-		e->error.type = 0;
+	if ( error.file ) {
+		slFree( error.file );
+		error.file = NULL;
+		error.type = 0;
 	}
 
-	if ( e->camera ) delete e->camera;
+	if ( camera ) 
+		delete camera;
 
-	if ( e->world ) delete e->world;
+	if ( world ) 
+		delete world;
 
-	if ( e->iTunesData ) delete e->iTunesData;
+	for ( wi = windows.begin(); wi != windows.end(); wi++ )
+		freeWindowCallback( *wi );
 
-	for ( wi = e->windows.begin(); wi != e->windows.end(); wi++ )
-		e->freeWindowCallback( *wi );
-
-	for ( bi = e->freedInstances.begin(); bi != e->freedInstances.end(); bi++ )
+	for ( bi = freedInstances.begin(); bi != freedInstances.end(); bi++ )
 		delete *bi;
 
-	brNamespaceFreeWithFunction( e->internalMethods, ( void( * )( void* ) )brFreeBreveCall );
+	brNamespaceFreeWithFunction( internalMethods, ( void( * )( void* ) )brFreeBreveCall );
 
 	std::map<std::string, brObject*>::iterator oi;
 
-	for ( oi = e->objects.begin(); oi != e->objects.end(); oi++ )
+	for ( oi = objects.begin(); oi != objects.end(); oi++ )
 		if ( oi->second ) brObjectFree( oi->second );
 
-	delete e;
+	for( unsigned int i = 0; i < objectTypes.size(); i++ ) {
+		brObjectType *t = objectTypes[ i ];
+
+		if( t )
+			delete t;
+	}
 }
 
 /*!
@@ -630,25 +650,13 @@ void brEngineRenderWorld( brEngine *e, int crosshair ) {
 
 /*@}*/
 
-/*!
-	\brief Prints the current version and build timestamp.
-*/
+/**
+ * Prints the current version and build timestamp.
+ */
 
 void brPrintVersion() {
 	fprintf( stderr, "breve version %s (%s)\n", interfaceID, __DATE__ );
 	exit( 1 );
-}
-
-/*!
-	\brief Allocates memory for iTunes plugin data.
-
-	Used only when breve is being built as an iTunes plugin.  Which
-	is to say, not a whole lot.
-*/
-
-void brMakeiTunesData( brEngine *e ) {
-	e->iTunesData = new briTunesData;
-	e->iTunesData->data = NULL;
 }
 
 /*!

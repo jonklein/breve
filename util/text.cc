@@ -43,6 +43,18 @@
 	The returned string is slMalloc'd, and should be slFree'd after use.
 */
 
+char *slFileExtension( const char *inName ) {
+	int n = strlen( inName ) - 1;
+
+	while( n > 0 && inName[ n ] != '.' ) 
+		n--;
+
+	if( n == 0 ) 
+		return slStrdup( "" );
+	else
+		return slStrdup( &inName[ n + 1 ] );
+}
+
 char *slSplit( char *start, char *substr, int n ) {
 	int count = 0;
 	char *oldstart, *result;

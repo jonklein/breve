@@ -1,7 +1,7 @@
 // !$*UTF8*$!
 {
 	089C1669FE841209C02AAC07 /* Project object */ = {
-		activeBuildConfigurationName = Development;
+		activeBuildConfigurationName = Deployment;
 		activeTarget = 4818572C05CABEEB00C48BE6 /* breveCreatures */;
 		addToTargets = (
 			4818572C05CABEEB00C48BE6 /* breveCreatures */,
@@ -45,7 +45,7 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					335,
+					346,
 					20,
 					49,
 					43,
@@ -84,7 +84,7 @@
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
 					210,
-					184,
+					155,
 					20,
 					50,
 					43,
@@ -100,7 +100,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 179843554;
+			PBXPerProjectTemplateStateSaveDate = 186893385;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -601,7 +601,15 @@
 				};
 				RubberWindowFrame = "170 89 962 743 0 0 1280 832 ";
 			};
-			PBXWorkspaceStateSaveDate = 179843554;
+			PBXWorkspaceStateSaveDate = 186893385;
+		};
+		perUserProjectItems = {
+			485352DB0B23C47400729C4B /* PBXTextBookmark */ = 485352DB0B23C47400729C4B /* PBXTextBookmark */;
+			485352DC0B23C47400729C4B /* PBXTextBookmark */ = 485352DC0B23C47400729C4B /* PBXTextBookmark */;
+			485B495B0B228B3700CE9856 /* PBXTextBookmark */ = 485B495B0B228B3700CE9856 /* PBXTextBookmark */;
+			485B495D0B228B3700CE9856 /* PBXTextBookmark */ = 485B495D0B228B3700CE9856 /* PBXTextBookmark */;
+			485B495E0B228B3700CE9856 /* PBXTextBookmark */ = 485B495E0B228B3700CE9856 /* PBXTextBookmark */;
+			485B49610B228B3700CE9856 /* PBXTextBookmark */ = 485B49610B228B3700CE9856 /* PBXTextBookmark */;
 		};
 		sourceControlManager = 4818575205CABF4B00C48BE6 /* Source Control */;
 		userBuildSettings = {
@@ -609,9 +617,9 @@
 	};
 	089C167EFE841241C02AAC07 /* English */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {711, 428}}";
-			sepNavSelRange = "{130, 0}";
-			sepNavVisRect = "{{0, 0}, {711, 428}}";
+			sepNavIntBoundsRect = "{{0, 0}, {711, 429}}";
+			sepNavSelRange = "{208, 0}";
+			sepNavVisRect = "{{0, 0}, {711, 429}}";
 			sepNavWindowFrame = "{{61, 227}, {750, 558}}";
 		};
 	};
@@ -631,9 +639,9 @@
 	};
 	4818574E05CABEEB00C48BE6 /* breveWalker-Info.plist */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {740, 434}}";
-			sepNavSelRange = "{754, 0}";
-			sepNavVisRect = "{{0, 0}, {740, 180}}";
+			sepNavIntBoundsRect = "{{0, 0}, {686, 434}}";
+			sepNavSelRange = "{379, 0}";
+			sepNavVisRect = "{{0, 0}, {545, 314}}";
 			sepNavWindowFrame = "{{502, 84}, {1047, 748}}";
 		};
 	};
@@ -648,6 +656,66 @@
 	4818575305CABF4B00C48BE6 /* Code sense */ = {
 		isa = PBXCodeSenseManager;
 		indexTemplatePath = "";
+	};
+	485352DB0B23C47400729C4B /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 089C167EFE841241C02AAC07 /* English */;
+		name = "English: 4";
+		rLen = 0;
+		rLoc = 130;
+		rType = 0;
+		vrLen = 280;
+		vrLoc = 0;
+	};
+	485352DC0B23C47400729C4B /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 089C167EFE841241C02AAC07 /* English */;
+		name = "English: 5";
+		rLen = 0;
+		rLoc = 208;
+		rType = 0;
+		vrLen = 280;
+		vrLoc = 0;
+	};
+	485B495B0B228B3700CE9856 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 4818574E05CABEEB00C48BE6 /* breveWalker-Info.plist */;
+		name = "breveWalker-Info.plist: 10";
+		rLen = 0;
+		rLoc = 379;
+		rType = 0;
+		vrLen = 798;
+		vrLoc = 0;
+	};
+	485B495D0B228B3700CE9856 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 4818574E05CABEEB00C48BE6 /* breveWalker-Info.plist */;
+		name = "breveWalker-Info.plist: 10";
+		rLen = 0;
+		rLoc = 379;
+		rType = 0;
+		vrLen = 798;
+		vrLoc = 0;
+	};
+	485B495E0B228B3700CE9856 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 089C167EFE841241C02AAC07 /* English */;
+		name = "English: 4";
+		rLen = 0;
+		rLoc = 130;
+		rType = 0;
+		vrLen = 280;
+		vrLoc = 0;
+	};
+	485B49610B228B3700CE9856 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 089C167EFE841241C02AAC07 /* English */;
+		name = "English: 5";
+		rLen = 0;
+		rLoc = 208;
+		rType = 0;
+		vrLen = 280;
+		vrLoc = 0;
 	};
 	48941C8F0401A69200000116 /* Simulation.tz */ = {
 		uiCtxt = {
