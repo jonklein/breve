@@ -288,6 +288,13 @@ Object : PushGP {
 		if currentIndividual >= (populationSize - 100): 
 			controller set-display-message with-number 0 at-x -0.9 at-y -0.8 to "Generation $generation: breeding".
 
+	+ to get-current-individual:
+		% Returns the PushProgram currently being evaluated.
+		if current && currentIndividual < | current |:
+			return current{ currentIndividual }.
+		
+		return 0.
+
 	- to evaluate:
 		fitness (float).
 		n (int).

@@ -241,6 +241,8 @@ int breveFunctionPushCodeGetString( brEval arguments[], brEval *result, brInstan
 
 	result->set( str );
 
+	free( str );
+
 	return EC_OK;
 }
 

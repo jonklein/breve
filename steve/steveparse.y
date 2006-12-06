@@ -1148,10 +1148,10 @@ string
 		char *unquoted = slDequote($1);
 		$$ = new stStringExp(unquoted, currentMethod, currentObject, yyfile, lineno);
 
-		slFree($1);
-		slFree(unquoted);
+		slFree( $1 );
+		slFree( unquoted );
 
-		if(!$$) {
+		if( !$$ ) {
 			// this error is handled by new stStringExp 
 		}
 	}

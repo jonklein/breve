@@ -444,7 +444,7 @@ inline int stToType( brEval *e, int type, brEval *t, stRunInstance *i ) {
 			break;
 
 		case AT_STRING:
-			t->set( stFormatEvaluation( e, i->instance ) );
+			t->set( brFormatEvaluation( e, i->instance->breveInstance ) );
 
 			return EC_OK;
 
@@ -1682,6 +1682,56 @@ RTC_INLINE int stEvalListIndex( stListIndexExp *l, stRunInstance *i, brEval *t )
 			stEvalError( i->instance, EE_BOUNDS, "list index \"%d\" out of bounds", BRINT( &index ) );
 			return EC_ERROR;
 		}
+	} else if ( list.type() == AT_VECTOR ) {
+		if ( index.type() != AT_INT && stToInt( &index, &index, i ) == EC_ERROR ) {
+			stEvalError( i->instance, EE_TYPE, "expected type \"int\" in vector index" );
+			return EC_ERROR;
+		}
+
+		switch( BRINT( &index ) ) {
+			case 0:
+				t->set( BRVECTOR( &list ).x );
+				break;
+			case 1:
+				t->set( BRVECTOR( &list ).y );
+				break;
+			case 2:
+				t->set( BRVECTOR( &list ).z );
+				break;
+
+			default:
+				stEvalError( i->instance, EE_BOUNDS, "vector index \"%d\" out of bounds", BRINT( &index ) );
+				return EC_ERROR;
+		}
+	} else if ( list.type() == AT_MATRIX ) {
+		if ( index.type() != AT_INT && stToInt( &index, &index, i ) == EC_ERROR ) {
+			stEvalError( i->instance, EE_TYPE, "expected type \"int\" in matrix index" );
+			return EC_ERROR;
+		}
+
+		slMatrix &m = BRMATRIX( &list );
+		slVector result;
+
+		switch( BRINT( &index ) ) {
+
+			case 0:
+				slVectorSet( &result, m[ 0 ][ 0 ], m[ 0 ][ 1 ], m[ 0 ][ 2 ] );
+				break;
+			case 1:
+				slVectorSet( &result, m[ 1 ][ 0 ], m[ 1 ][ 1 ], m[ 1 ][ 2 ] );
+				break;
+			case 2:
+				slVectorSet( &result, m[ 2 ][ 0 ], m[ 2 ][ 1 ], m[ 2 ][ 2 ] );
+				break;
+
+			default:
+				stEvalError( i->instance, EE_BOUNDS, "matrix index \"%d\" out of bounds", BRINT( &index ) );
+				return EC_ERROR;
+
+		}
+
+		t->set( result );
+
 	} else if ( list.type() == AT_HASH ) {
 		brEvalHashLookup( BRHASH( &list ), &index, t );
 	} else if ( list.type() == AT_STRING ) {
@@ -1721,7 +1771,7 @@ RTC_INLINE int stEvalListIndexAssign( stListIndexAssignExp *l, stRunInstance *i,
 
 	if ( list.type() == AT_LIST ) {
 		if ( index.type() != AT_INT && stToInt( &index, &index, i ) == EC_ERROR ) {
-			stEvalError( i->instance, EE_TYPE, "expected type \"int\" for list element assignment index" );
+			stEvalError( i->instance, EE_TYPE, "expected type \"int\" for list index" );
 			return EC_ERROR;
 		}
 
@@ -1730,9 +1780,76 @@ RTC_INLINE int stEvalListIndexAssign( stListIndexAssignExp *l, stRunInstance *i,
 			return EC_ERROR;
 		}
 	} else if ( list.type() == AT_HASH ) {
-		brEval old;
 
 		brEvalHashStore( BRHASH( &list ), &index, t );
+	} else if ( list.type() == AT_VECTOR ) {
+		int type;
+		slVector *vec;
+
+		resultCode = stPointerForExp( l->listExp, i, ( void ** ) &vec, &type );
+
+		if ( index.type() != AT_INT && stToInt( &index, &index, i ) == EC_ERROR ) {
+			stEvalError( i->instance, EE_TYPE, "expected type \"int\" in vector index" );
+			return EC_ERROR;
+		}
+		if ( t->type() != AT_DOUBLE && stToDouble( t, t, i ) == EC_ERROR ) {
+			stEvalError( i->instance, EE_TYPE, "expected type \"double\" in vector index assignment" );
+			return EC_ERROR;
+		}
+
+		switch( BRINT( &index ) ) {
+			case 0:
+				vec->x = BRDOUBLE( t );
+				break;
+			case 1:
+				vec->y = BRDOUBLE( t );
+				break;
+			case 2:
+				vec->z = BRDOUBLE( t );
+				break;
+
+			default:
+				stEvalError( i->instance, EE_BOUNDS, "vector index \"%d\" out of bounds", BRINT( &index ) );
+				return EC_ERROR;
+		}
+
+		t->set( *vec );
+
+	} else if ( list.type() == AT_MATRIX ) {
+		int type;
+		slMatrix *mat;
+
+		resultCode = stPointerForExp( l->listExp, i, ( void ** ) &mat, &type );
+
+		if ( index.type() != AT_INT && stToInt( &index, &index, i ) == EC_ERROR ) {
+			stEvalError( i->instance, EE_TYPE, "expected type \"int\" in matrix index" );
+			return EC_ERROR;
+		}
+		if ( t->type() != AT_VECTOR ) {
+			stEvalError( i->instance, EE_TYPE, "expected type \"vector\" in matrix index assignment" );
+			return EC_ERROR;
+		}
+
+		slVector &result = BRVECTOR( t );
+
+		switch( BRINT( &index ) ) {
+
+			case 0:
+				(*mat)[ 0 ][ 0 ] = result.x; (*mat)[ 0 ][ 1 ] = result.y; (*mat)[ 0 ][ 2 ] = result.z;
+				break;
+			case 1:
+				(*mat)[ 1 ][ 0 ] = result.x; (*mat)[ 1 ][ 1 ] = result.y; (*mat)[ 1 ][ 2 ] = result.z;
+				break;
+			case 2:
+				(*mat)[ 2 ][ 0 ] = result.x; (*mat)[ 2 ][ 1 ] = result.y; (*mat)[ 2 ][ 2 ] = result.z;
+				break;
+
+			default:
+				stEvalError( i->instance, EE_BOUNDS, "matrix index \"%d\" out of bounds", BRINT( &index ) );
+				return EC_ERROR;
+
+		}
+
 	} else if ( list.type() == AT_STRING ) {
 		char **stringptr, *newstring, *oldstring, *substring;
 		unsigned int n;
@@ -3104,7 +3221,7 @@ int stStackTraceFrame( stStackRecord *r ) {
 int stPrintEvaluation( brEval *e, stRunInstance *i ) {
 	char *evalString;
 
-	evalString = stFormatEvaluation( e, i->instance );
+	evalString = brFormatEvaluation( e, i->instance->breveInstance );
 
 	slMessage( NORMAL_OUTPUT, "%s", evalString );
 

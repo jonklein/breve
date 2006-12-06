@@ -463,9 +463,12 @@ int brIRGBtoHSV( brEval args[], brEval *target, brInstance *i ) {
 int brIFindFile( brEval args[], brEval *target, brInstance *i ) {
 	char *file = brFindFile( i->engine, BRSTRING( &args[0] ), NULL );
 
-	target->set( file );
-
-	slFree( file );
+	if( file ) {
+		target->set( file );
+		slFree( file );
+	} else {
+		target->set( "" );
+	}
 
 	return EC_OK;
 }

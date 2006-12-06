@@ -210,7 +210,11 @@ int stProcessString( stStringExp *s, stRunInstance *i, brEval *target ) {
 		ss = s->substrings[n];
 		stExpEval( ss->loadExp, i, &subtar, NULL );
 
-		ss->string = stFormatEvaluation( &subtar, i->instance );
+		char *sub = brFormatEvaluation( &subtar, i->instance->breveInstance );
+
+		ss->string = sub;
+
+		slFree( sub );
 
 		length += ss->string.size();
 	}
@@ -258,18 +262,4 @@ stStringExp::~stStringExp() {
 		delete ss->loadExp;
 		delete ss;
 	}
-}
-
-/*!
-	\brief Calls \ref brFormatEvaluation.
-
-	Translates between breve/steve objects.  Returns a slMalloc'd string.
-*/
-
-char *stFormatEvaluation( brEval *e, stInstance *i ) {
-	char *r;
-
-	r = brFormatEvaluation( e, i->breveInstance );
-
-	return r;
 }

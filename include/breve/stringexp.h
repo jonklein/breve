@@ -21,6 +21,3 @@
 int stProcessString(stStringExp *s, stRunInstance *i, brEval *target);
 
 void stFreeStringExp(stStringExp *s);
-
-char *stFormatEvaluation(brEval *e, stInstance *i);
-
