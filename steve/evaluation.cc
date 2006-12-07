@@ -1644,13 +1644,37 @@ RTC_INLINE int stEvalListIndexPointer( stListIndexExp *l, stRunInstance *i, void
 	        ( resultCode = stExpEval3( l->indexExp, i, &index ) ) != EC_OK )
 		return resultCode;
 
-	if ( list.type() != AT_LIST )
-		return EC_ERROR;
-
 	if ( index.type() != AT_INT && stToInt( &index, &index, i ) == EC_ERROR ) {
 		stEvalError( i->instance, EE_TYPE, "expected type \"int\" in list element evaluation (index component)" );
 		return EC_ERROR;
 	}
+
+	if( list.type() == AT_MATRIX ) {
+		stPointerForExp( (stLoadExp*)l->listExp, i, pointer, type );
+
+		*type = AT_VECTOR;
+
+		switch( BRINT( &index ) ) {
+			case 0:
+				return EC_OK;
+				break;
+			case 1:
+				*pointer += sizeof( double ) * 3;
+				return EC_OK;
+				break;
+			case 2:
+				*pointer += 2 * sizeof( double ) * 3;
+				return EC_OK;
+				break;
+			default:
+				stEvalError( i->instance, EE_BOUNDS, "matrix index \"%d\" out of bounds", BRINT( &index ) );
+				return EC_ERROR;
+				break;
+		}
+	}
+
+	if ( list.type() != AT_LIST )
+		return EC_ERROR;
 
 	if ( stDoEvalListIndexPointer( BRLIST( &list ), BRINT( &index ), &result ) ) {
 		stEvalError( i->instance, EE_BOUNDS, "list index \"%d\" out of bounds", BRINT( &index ) );
@@ -1787,6 +1811,11 @@ RTC_INLINE int stEvalListIndexAssign( stListIndexAssignExp *l, stRunInstance *i,
 		slVector *vec;
 
 		resultCode = stPointerForExp( l->listExp, i, ( void ** ) &vec, &type );
+
+		if( !vec || type != AT_VECTOR ) {
+			stEvalError( i->instance, EE_TYPE, "cannot assign value to vector index" );
+			return EC_ERROR;
+		}
 
 		if ( index.type() != AT_INT && stToInt( &index, &index, i ) == EC_ERROR ) {
 			stEvalError( i->instance, EE_TYPE, "expected type \"int\" in vector index" );

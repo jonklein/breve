@@ -466,7 +466,8 @@ stMatrixExp::stMatrixExp( stExp *e00, stExp *e01, stExp *e02, stExp *e10, stExp 
 }
 
 stMatrixExp::~stMatrixExp() {
-	for ( unsigned int n = 0;n < 9;n++ ) delete( expressions[n] );
+	for ( unsigned int n = 0;n < 9;n++ ) 
+		delete( expressions[n] );
 }
 
 stVectorElementExp::stVectorElementExp( stExp *v, char e, const char *file, int line ) : stExp( file, line ) {

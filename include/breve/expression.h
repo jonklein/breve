@@ -261,8 +261,14 @@ class stRandomExp : public stExp {
 class stListExp : public stExp {
 	public:
 		stListExp(std::vector< stExp* > *e, const char *file, int line) : stExp(file, line) {
-			if(e) expressions = *e;
+			if( e ) expressions = *e;
 			type = ET_LIST;
+		}
+
+		~stListExp() { 
+			for( unsigned int n = 0; n < expressions.size(); n++ ) {
+				delete expressions[ n ];
+			}
 		}
 
 		std::vector< stExp* > expressions;
@@ -271,8 +277,14 @@ class stListExp : public stExp {
 class stCodeArrayExp : public stExp {
 	public:
 		stCodeArrayExp(std::vector< stExp* > *e, const char *file, int line) : stExp(file, line) {
-			if(e) expressions = *e;
+			if( e ) expressions = *e;
 			type = ET_CODE_ARRAY;
+		}
+
+		~stCodeArrayExp() { 
+			for( unsigned int n = 0; n < expressions.size(); n++ ) {
+				delete expressions[ n ];
+			}
 		}
 
 		std::vector< stExp* > expressions;
@@ -291,6 +303,10 @@ class stDieExp : public stExp {
 		stDieExp(stExp *e, const char *file, int line) : stExp(file, line) { 
 			expression = e;
 			type = ET_DIE; 
+		}
+
+		~stDieExp() {
+			delete expression;
 		}
 
 		stExp *expression;

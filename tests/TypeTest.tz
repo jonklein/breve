@@ -1,0 +1,46 @@
+# include some frequently used classes and specify common classpaths
+
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use Stationary.
+
+# tell the engine the name of the controller
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+	+ to init:
+		lis (list).
+		mat (matrix).
+		vec (vector).
+
+		vec = ( 1, 2, 3 ).
+
+		mat{ 0 } = ( 20, 30, 40 ).
+		vec{ 1 } = 10.
+
+		print vec.
+		print mat.
+
+		mat{ 0 }{ 0 } = 10.
+		mat{ 1 }{ 1 } = 10.
+		mat{ 2 }{ 2 } = 10.
+
+		print mat.
+
+		lis{ 0 } = mat.
+
+		print lis.
+
+		lis{ 0 }{ 0 } = ( 1, 2, 3 ).
+		lis{ 0 }{ 1 }{ 0 } = 1000.
+
+		print lis.
+
+		self end-simulation.
+}
