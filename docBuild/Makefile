@@ -14,10 +14,10 @@ docBuild/docExtract: docBuild/docExtract.c
 	# g++ chokes here?!
 	$(CC) -o docBuild/docExtract docBuild/docExtract.c
 
-classes: docBuild/docExtract
-	mkdir -p docs/classes
-	docBuild/docExtract lib/classes/*.tz | docBuild/docBuild.pl docs/classes
-	cp docBuild/classImages/*.jpg docs/classes/
+classes: docExtract
+	mkdir -p htmldocs/classes
+	./docExtract ../lib/classes/*.tz | ./docBuild.pl htmldocs/classes
+	cp classImages/*.jpg htmldocs/classes/
 
 pdf: pdf-clean
 	mkdir -p pdfdocs

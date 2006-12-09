@@ -607,7 +607,7 @@ PushGP : PushClusterGP {
 				p2 = (self run-tournament for-index n).
 				next{n} crossover from-parent1 p1 from-parent2 p2 with-interpreter interpreter.     
 			} else if method < (crossoverPercent + mutationPercent + emigrationPercent): {
-				if lastTransfer: p1 = (lastTransfer get-program number index).
+				if lastTransfer: p1 = (lastTransfer get-random-program ).
 				else p1 = (self run-tournament for-index n).
 
 				next{n} copy-from program p1.
@@ -624,7 +624,8 @@ PushGP : PushClusterGP {
 
 		if | emigrationHosts | == 0: return.
 
-		for n=0, n<populationSize * (emigrationPercent / 100.0), n++: transfer add program (self run-tournament).
+		for n = 0, n < populationSize * (emigrationPercent / 100.0), n++: 
+			transfer add program (self run-tournament).
 
 		recipientHost = emigrationHosts{ random[ | emigrationHosts | - 1 ] }.
 		transfer send-over-network to recipientHost on PUSHGP_SERVER_PORT.
@@ -660,7 +661,10 @@ Object : PushProgramTransporter {
 		code (object).
 		code = new PushProgram.
 
-		if n > | programStrings |: return code.
+		if n >= | programStrings |: return code.
 		code parse program programStrings{ n }.
 		return code.
+
+	- to get-random-program:
+		return ( self get-program number random[ | programStrings | - 1 ] ).
 }
