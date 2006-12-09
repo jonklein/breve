@@ -9,7 +9,7 @@
       breve Simulation Envionment</ulink>.
     </para><mediaobject><imageobject><imagedata align="center" fileref="images/breve_icon.jpg"/></imageobject></mediaobject><para>
       You can also <ulink url="http://www.spiderland.org/download/breve_docs.tar.gz">download</ulink> the
-      breve 2.4 documentation in HTML format [808K tar/gz file].
+      breve 2.5 documentation in HTML format [808K tar/gz file].
     </para><para>
       To report bugs in breve, you can either <ulink url="mailto:jk%20[at]%20spiderland.org">email the author</ulink>, or post your
       bug in the <ulink url="http://www.spiderland.org/forums">bugs section of the
@@ -36,9 +36,11 @@
 <chapter id="node-2603"><?dbhtml dir="docs" ?>
 <title>About This Documentation</title>
 <para>
-        The documentation presented here is new as of the release of breve 1.7.
-        This documentation aims to supersede all previous breve documentation
-        by collecting it and organizing it into a single document.
+        As of breve version 2.5, this documentation is generated from the
+        online-edited documentation found on <ulink url="http://www.spiderland.org/breve/documentation.php">the breve web
+        site</ulink>. The copy of this documentation included in the source
+        distribution should not be edited. The documentation can be edited by
+        the breve community online.
       </para><para>
         This document is a work in progress. See the section on "Getting Help
         With breve" (<xref linkend="node-2604"/>) if this document fails to
@@ -88,9 +90,9 @@
       </para>
 </chapter>
 <chapter id="node-2606"><?dbhtml dir="docs" ?>
-<title>What's New in Version 2.4</title>
+<title>What's New in Version 2.5</title>
 <para>
-        breve version 2.4 introduces several new features and changes.
+        breve version 2.5 introduces several new features and changes.
       </para>
 <section id="node-2607">
 <title>New Features in Version 2.5</title>
@@ -1239,12 +1241,19 @@ v = v * 4.      # multiplies the vector by 4
 v = v / |v|.    # normalizes the vector by dividing it by it's own 
                                 # length such that the new length is 1.
 </programlisting><para>
-        Individual vector components can be extracted or set using the
-        following notation:
+        Individual vector components can be extracted or set using the "::"
+        notation:
       </para><programlisting>
 xValue = myVector::x.
 
 myVector::y = 100.
+</programlisting><para>
+        Starting in breve 2.5, the standard list index syntax may also be used
+        with indices 0, 1, and 2:
+      </para><programlisting>
+xValue = myVector{ 0 }.
+
+myVector{ 1 } = 100.
 </programlisting>
 </section>
 <section id="node-2656">
@@ -1261,7 +1270,7 @@ myVector::y = 100.
 </section>
 </section>
 <section id="node-2657">
-<title>matrix</title>
+<title>The matrix type</title>
 <para> A <emphasis>matrix</emphasis> in steve refers to a 3x3 matrix which describes
         a transformation in 3D space. Using transformation matrices is somewhat
         advanced and they are not generally used in most simulations. Still,
@@ -1277,6 +1286,20 @@ myVector::y = 100.
 # [ 7 8 9 ]
 
 m = [ (1, 2, 3), (4, 5, 6), (7, 8, 9) ].
+</programlisting><para>
+        Matrix component can be extracted using the list index syntax. Each row
+        of the matrix is a vector:
+      </para><programlisting>
+myVector = myMatrix{ 0 }.
+
+myMatrix{ 1 } = ( 1, 2, 3 ).
+</programlisting><para>
+        Individual numbers can be extracted by the matrix as a two-dimensional
+        list:
+      </para><programlisting>
+myNumber = myMatrix{ 0 }{ 0 }.
+
+myMatrix{ 1 }{ 1 } = 100.
 </programlisting>
 <section id="node-2658">
 <title>matrix Operators</title>
@@ -1319,7 +1342,12 @@ myList = { 1, 2, 3.0 }.                 # a list of numbers (both int and float)
 myList = { "a", "b", "c" }.             # a list of strings
 myList = { "a", 30, new Mobile }.       # a list of mixed types
 myList = { 1, "a", { "dog", "cow" } }.  # a list with a nested list
-</programlisting>
+</programlisting><para>
+        An important feature of lists in steve is that they are always passed
+        by reference and are not copied. This means that if you pass a list to
+        a function, then any modifications done to the list inside the function
+        will modify the original list.
+      </para>
 <section id="node-2661">
 <title>list Operators</title>
 <para>
@@ -1401,20 +1429,27 @@ print "this is a string".
 </programlisting>
 <section id="node-2664">
 <title>string Operators</title>
-<itemizedlist><listitem><para><literal><emphasis><function>string</function></emphasis>, { <emphasis><function>index</function></emphasis> }</literal>: returns, as a
+<para>
+          The following operations can be done one strings:
+        </para><itemizedlist><listitem><para><literal><emphasis><function>string</function></emphasis> { <emphasis><function>index</function></emphasis> }</literal>: returns, as a
               string, the letter at the specified index.
-            </para></listitem><listitem><para><literal><emphasis><function>string</function></emphasis>, { <emphasis><function>index</function></emphasis>, } = <emphasis><function>otherString</function></emphasis></literal>: replaces the
+            </para></listitem><listitem><para><literal><emphasis><function>string</function></emphasis> { <emphasis><function>index</function></emphasis> } = <emphasis><function>otherString</function></emphasis></literal>: replaces the
               letter at the specified location with the string <emphasis><function>otherString</function></emphasis>.
             </para></listitem><listitem><para><literal>| <emphasis><function>string</function></emphasis> |</literal>: returns the
               length of the string.
             </para></listitem></itemizedlist><para>
-        In addition to the operators listed above, simple variables can be
-        embedded strings so that the strings are interpreted dynamically, as in
-        language like Perl. To indicate a variable embedded in a string, use
-        the "$" character. The following, for example, will use the variable
-        "self" in order to build a string to be printed:
+        In addition to the operators listed above, strings can be formatted
+        using embedded variables. Variables can be embedded in strings so that
+        the strings are interpreted dynamically, as in Perl. To indicate a
+        variable embedded in a string, use the "$" character. The following,
+        for example, will use the variable "self" in order to build a string to
+        be printed:
       </para><programlisting>
 print "my value is $self.".
+</programlisting><para>
+        This technique can be used to performing string concatenations as well:
+      </para><programlisting>
+$longstring = "$string1$string2".
 </programlisting>
 </section>
 <section id="node-2665">
@@ -1479,6 +1514,11 @@ print "the definition of dog is: ", dictionary{ "dog" }.
         themselves), the hash will only return the same value for the same
         exact variable key. This means that two different lists, even if they
         contain "equal" data, will access different values in the hash.
+      </para><para>
+        An important feature of hashes in steve is that they are always passed
+        by reference and are not copied. This means that if you pass a hash to
+        a function, then any modifications done to the hash inside the function
+        will modify the original hash.
       </para>
 <section id="node-2667">
 <title>hash Operators</title>
@@ -1550,13 +1590,6 @@ foreach key in keys( myHash ): {
         <emphasis>The only use for <function>data</function> variables is archiving and dearchiving internal
         data</emphasis>. For more information on using the <literal>data</literal> type with plugins, see the section on Archiving
         Plugin Data With The <literal>data</literal> Type (<xref linkend="node-2778"/>).
-      </para>
-</section>
-<section id="node-2672">
-<title>Arrays of other types</title>
-<para> Arrays can be
-        used to group several variables of the same type. Use of arrays is now
-        deprecated: use lists (<xref linkend="node-2660"/>) instead.
       </para>
 </section>
 </section>
@@ -4136,6 +4169,328 @@ int dearchiveMatrix(brEval arguments[], brEval *result, void *instance) {
       </para>
 </section>
 </chapter>
+<chapter id="node-2780"><?dbhtml dir="docs" ?>
+<title>The breve Source Code</title>
+<para>
+        This chapter describes the breve source implementation, and how it can
+        be extended. This documentation describes only key API features for
+        extending certain aspects of breve functionality. For more detailed
+        documentation of the source code, see the <ulink url="http://www.spiderland.org/breve/docs/source">full breve
+        source code documentation</ulink>.
+      </para><para>
+        This documentation has changed since breve 2.4. breve 2.4 required the
+        use of an additional API, the breve Frontend API, to implement a custom
+        language frontend, but this API is now obsolete.
+      </para>
+<section id="node-2781">
+<title>The basic structure of the breve source code</title>
+<para>
+        The following image shows the basic structure of the breve source code:
+      </para><mediaobject><imageobject><imagedata align="center" fileref="images/breve_structure.jpg"/></imageobject></mediaobject><para>
+        The text in bold for each layer indicates the source code directory
+        where the source code for that layer is found.
+      </para>
+</section>
+<section id="node-2782">
+<title>Adding a frontend language to the breve engine: the breve object API</title>
+<para>
+        This section describes how to incorporate another frontend language
+        with breve. Using this information, you'll be able to use the breve
+        engine from any language which can interface a C library.
+      </para><para>
+        The following steps are required to set up a language frontend in
+        breve.
+      </para><itemizedlist><listitem><para>
+              Write special callbacks for the language frontend (<xref linkend="node-2784"/>).
+            </para></listitem><listitem><para>
+              Construct a new breve object type structure, brObjectType, and
+              add classes to the breve engine (<xref linkend="node-2785"/>).
+            </para></listitem><listitem><para>
+              Test the language frontend using the existing breve program
+              (<xref linkend="node-2786"/>).
+            </para></listitem><listitem><para>
+              If desired, connect the language frontend to an application
+              frontend (<xref linkend="node-2787"/>)
+              or write your own customized frontend (<xref linkend="node-2794"/>).
+            </para></listitem></itemizedlist>
+<section id="node-2783">
+<title>Structures used by the breve Object API</title>
+<para>
+        The following structures are used by the breve Object API. These
+        structures are passed to the frontend language callback functions. See
+        the file <literal>kernel/breveObjectAPI.h</literal> and its
+        documentation for a full description of these structs.
+      </para><itemizedlist><listitem><para><literal>brObjectType</literal>: information and
+              callbacks for a language frontend
+            </para></listitem><listitem><para><literal>brObject</literal>: a class in any frontend
+              language
+            </para></listitem><listitem><para><literal>brInstance</literal>: an instance in any
+              frontend language
+            </para></listitem><listitem><para><literal>brMethod</literal>: information about a
+              method in an object
+            </para></listitem></itemizedlist><para>
+        You should also familiarize yourself with the <literal>brEval</literal> structure and types which are described in
+        <xref linkend="node-2767"/>.
+      </para>
+</section>
+<section id="node-2784">
+<title>Callbacks required to add a new frontend language</title>
+<para>
+        In order to provide a language frontend to breve, a set of callbacks
+        must be defined.
+      </para><itemizedlist><listitem><para><literal>findObject</literal>: locate a class by name.
+            </para><programlisting>
+void *(*findObject)( void *inObjectTypeUserData, char *name );
+</programlisting><para>
+              When breve encounters a class name that it does not recognize, it
+              will use this function to attempt to lookup the object. The
+              pointer that is returned will be placed in the <literal>pointer</literal> field of a <literal>brObject</literal>. This pointer will likely be used
+              later to instantiate objects or locate instance methods by your
+              <literal>instantiate</literal> or <literal>findMethod</literal> callbacks.
+            </para></listitem><listitem><para><literal>findMethod</literal>: locate a method for a
+              class by name and argument count.
+            </para><programlisting>
+void *(*findMethod)( void *inObjectUserData, const char *inName, unsigned char *inTypes, int inTypeCount );
+</programlisting><para>
+              When breve needs to call a method in an object, it will be looked
+              up using this callback. The <literal>inObjectUserData</literal> argument refers to the object
+              in which the method can be found&#x2014;it is the pointer returned
+              by your <literal>findObject</literal> callback. The
+              <literal>inName</literal> argument is the name of the
+              method to look for.
+            </para><para>
+              The <literal>inTypeCount</literal> argument gives the
+              number of arguments that will be passed to the method, and the
+              <literal>inTypes</literal> argument contains the
+              argument types. The types are described in <xref linkend="node-2767"/></para></listitem><listitem><para><literal>instantiate</literal>: create an instance of
+              an object.
+            </para><programlisting>
+brInstance *(*instantiate)( brEngine *inEngine, brObject *inObject, const brEval **inArguments, int inArgCount )
+</programlisting><para>
+              breve calls this function to create a new instance of a class.
+              The <literal>inObject</literal> argument specifes the
+              object to be created and contains the user data found with
+              <literal>findObject</literal> in the <literal>userData</literal> field.
+            </para><para>
+              The function is expected to add the newly created instance to the
+              breve engine by calling <literal>brEngineAddInstance</literal>. <literal>brEngineAddInstance</literal> returns a <literal>brInstance</literal>, which should in turn be returned by
+              <literal>instantiate</literal>. <literal>brEngineAddInstance</literal> is called as follows:
+            </para><programlisting>
+brInstance *brEngineAddInstance( brEngine *inEngine, brObject *inObject, void *inInstanceUserData );
+</programlisting><para>
+              The constructor arguments <literal>inArguments</literal> and count <literal>inArgCount</literal> are currently unused.
+            </para></listitem><listitem><para><literal>callMethod</literal>: trigger a method call
+              in the frontend language.
+            </para><programlisting>
+int (*callMethod)(brInstance *instancePointer, brMethod *method, brEval **arguments, brEval *result);
+</programlisting><para>
+              The breve engine will need to trigger method calls in the
+              frontend language for a number of events such as iteration and
+              collision handling. This callback is used to trigger such events.
+            </para><para>
+              The callback is given the instance to be used, a <literal>brInstance</literal> instance structure (which contains a
+              native language instance pointer in the "pointer" field); the
+              method to be called, a <literal>brMethod</literal>
+              structure (which contains a native language method pointer in the
+              "pointer" field); an array of <literal>brEval</literal> argument pointers, and a pointer to an
+              output <literal>brEval</literal> structure.
+            </para><para>
+              The callback should trigger the method call <emphasis><function>method</function></emphasis> for the instance
+              <emphasis><function>instancePointer</function></emphasis>. It
+              expects that the <emphasis><function>arguments</function></emphasis> array contains the
+              number of items specified by the <literal>brMethod</literal> structure's argumentCount field.
+            </para></listitem><listitem><para><literal>isSubclass</literal>: determine whether a
+              class is a subclass of another.
+            </para><programlisting>
+int (*isSubclass)(brObject *class1, brObject *class2);
+</programlisting><para>
+              In order to correctly handle certain interactions like
+              collisions, the breve engine needs to know whether one class is a
+              subclass of another.
+            </para><para>
+              This callback is given two breve object pointers, and must return
+              1 if <emphasis><function>class1</function></emphasis> is a
+              subclass of <emphasis><function>class2</function></emphasis>, and
+              0 otherwise.
+            </para></listitem><listitem><para><literal>destroyObject:</literal> release memory
+              allocated by your <literal>findObject</literal>
+              callback.
+            </para><programlisting>
+void (*destoryObject)(void *objectData);
+</programlisting><para>
+              If your <literal>findObject</literal> callback
+              allocates memory, this callback should release that memory.
+            </para></listitem><listitem><para><literal>destroyInstance:</literal> release memory
+              allocated by your <literal>instantiate</literal>
+              callback.
+            </para><programlisting>
+void (*destoryInstance)(void *instanceData);
+</programlisting><para>
+              If your <literal>instantiate</literal> callback
+              allocates memory, this callback should release that memory.
+            </para></listitem><listitem><para><literal>destroyMethod:</literal> release memory
+              allocated by your <literal>findMethod</literal>
+              callback.
+            </para><programlisting>
+void (*destoryMethod)(void *methodData);
+</programlisting><para>
+              If your <literal>findMetho</literal> callback
+              allocates memory, this callback should release that memory.
+            </para></listitem><listitem><para><literal>destroyObjectType:</literal> release the
+              memory associated with your <literal>brObjectType</literal>.
+            </para><programlisting>
+void (*destroyData)(void *objectTypeData);
+</programlisting><para>
+              If you have allocate memory to be placed in the <literal>data</literal> field of the <literal>brObjectType</literal>, this callback should release that
+              memory.
+            </para></listitem></itemizedlist>
+</section>
+<section id="node-2785">
+<title>Specifying a new breve object type, and 
+registering objects</title>
+<para>
+        Every object in a frontend language that will have instances in the
+        breve engine must be registered with the breve engine. Moreover, when
+        an object is added to the breve engine, it must also tell the engine
+        what "type" of object it is. Each object "type" corresponds to a
+        different language frontend and a different set of callbacks, so for
+        each language frontend one creates, one must also create a <literal>brObjectType</literal> structure which contains the proper
+        callbacks. The structure is shown below.
+      </para><programlisting>
+struct brObjectType {
+        /**
+         * Finds a method in a given class
+         */
+        void                    *(*findMethod)( void *inObject, const char *inName, unsigned char *inTypes, int inTypeCount );
+
+        /**
+         * Finds an object class in the given language frontend
+         */
+        void                    *(*findObject)( void *inObjectType, const char *inName );
+
+        /**
+         * Creates a new instance of the given class.  The constructor arguments are currently unused.
+         */
+        brInstance              *(*instantiate)( brEngine *inEngine, brObject *inObject, const brEval **inArguments, int inArgCount );
+
+        /**
+         * Calls a method in the language frontend
+         */
+        int                     (*callMethod)( void *inInstance, void *, const brEval **, brEval * );
+
+        /**
+         * Returns 1 if parent is a subclass of parent.
+         */
+        int                     (*isSubclass)( void *inChild, void *inParent );
+
+        /**
+         * Destroys an instance of a language object previously created with instantiate.
+         */
+        void                    (*destroyObject)( void *inObject );
+
+        /**
+         * Destroys an instance of a language method previously created with findMethod.
+         */
+        void                    (*destroyMethod)( void *inMethod );
+
+        /**
+         * Destroys an instance of a language instance previously created with instantiate.
+         */
+        void                    (*destroyInstance)( void *inInstance );
+
+        /**
+         * Frees any leftover memory associated with the frontend, typically _userData.
+         */
+        void                    (*destroyObjectType)( void *inObjectType );
+        
+        /**
+         * A function to execute code in this frontend language.
+         */                     
+        int                     (*evaluate)( brEngine *inEngine, char *inFilename, char *inFiletext );
+
+        /**
+         * A user-data callback pointer.
+         */
+        void                    *_userData;
+        
+        /**
+         * A unique identifier which will be set for all objects of this object type.  This
+         * identifier can be used to determine whether an instance or object is native to
+         * a certain object type.
+         */
+        long                    _typeSignature;
+
+};
+</programlisting><para>
+        Only one <literal>brObjectType</literal> is required for
+        each language frontend.
+      </para><para>
+        Once the language frontend is defined, you can add it to the engine
+        with the following function:
+      </para><programlisting>
+void brEngineRegisterObjectType( brEngine *engine, brObjectType *type );
+</programlisting>
+</section>
+<section id="node-2786">
+<title>Testing and using the object frontend</title>
+<para>
+        Once you have written code to setup and register your new breve object
+        type, you'll want to test that breve can locate objects, instantiate
+        them and call their methods. To do so, you can add your frontend object
+        type to the breve engine, and then instantiate an object from steve
+        code.
+      </para><para>
+        To add your frontend object type to the breve engine, edit the file
+        <literal>kernel/frontendAPI.c</literal>, and look at the
+        function <literal>breveFrontendInit</literal>. The existing
+        breve applications call this function to create a breve engine. At the
+        bottom of this function, you can create and register your custom
+        language frontend.
+      </para><programlisting>
+brEngineRegisterObjectType(frontend-&gt;engine, <emphasis><function>functionToCreateLanguageFrontend</function></emphasis>());
+</programlisting><para>
+        After recompiling breve with this change, it should be possible to
+        instantiate an object from your new language frontend from directly
+        within a steve simulation. See the Java example <literal>java/JavaTest.tz</literal> for more information.
+      </para>
+</section>
+</section>
+<section id="node-2794">
+<title>Embedding breve In Another Program</title>
+<para>
+        To implement a custom application frontend, or to use breve simulations
+        as part of another program, you'll need to familiarize yourself with
+        functions relating to the breve engine structure <literal>brEngine</literal>.
+      </para><itemizedlist><listitem><para>
+              Create and initialize the breve engine (<literal>brEngineNew</literal>)
+            </para><para>
+              Call <literal>brEngineNew()</literal> to get a breve
+              engine. You may optionally pass in command-line arguments using
+              the alternative function <literal>brEngineNewWithArguments( argc, argv )</literal>. After
+              creating the engine, initialize the standard frontend languages
+              using <literal>brInitFrontendLanguages( engine
+              )</literal></para><programlisting>
+engine = brEngineNew();
+brInitFrontendLanguages( engine );
+</programlisting></listitem><listitem><para>
+              Add breve file search paths using <literal>brAddSearchPath( engine, path )</literal>. The search
+              paths must be properly initialized so that breve can locate the
+              standard class files.
+            </para><programlisting>
+brAddSearchPath( engine, "lib/classes/breve" );
+brAddSearchPath( engine, "lib/classes/mybreveclasses" );
+</programlisting></listitem><listitem><para>
+              Start a simulation using <literal>brLoadSimulation</literal>.
+            </para><programlisting>
+brLoadSimulation( engine, simulationText, simulationFilename );
+</programlisting></listitem><listitem><para>
+              Iterate the breve engine (<literal>brEngineIterate</literal>) repeatedly in your program's
+              execution loop.
+            </para><programlisting>
+brEngineIterate( engine );
+</programlisting></listitem></itemizedlist>
+</section>
+</chapter>
 <chapter id="node-2759"><?dbhtml dir="docs" ?>
 <title>The "Push" Language</title>
 <para>
@@ -4876,433 +5231,6 @@ This section lists all of the built-in breve class objects. These objects
         documentation for the class <literal>Wanderer</literal> can
         be found <ulink url="http://www.spiderland.org/documentation/classes/Wanderer.html">here</ulink>.
       </para>
-</section>
-</chapter>
-<chapter id="node-2780"><?dbhtml dir="docs" ?>
-<title>The breve Source Code</title>
-<para>
-        This chapter describes the breve source implementation, and how it can
-        be extended. This documentation describes only key API features for
-        extending certain aspects of breve functionality. For more detailed
-        documentation of the source code, see the <ulink url="http://www.spiderland.org/breve/docs/source">full breve
-        source code documentation</ulink>.
-      </para>
-<section id="node-2781">
-<title>The basic structure of the breve source code</title>
-<para>
-        The following image shows the basic structure of the breve source code:
-      </para><mediaobject><imageobject><imagedata align="center" fileref="images/breve_structure.jpg"/></imageobject></mediaobject><para>
-        The text in bold for each layer indicates the source code directory
-        where the source code for that layer is found.
-      </para>
-</section>
-<section id="node-2782">
-<title>Adding a frontend language to the breve engine: the breve object API</title>
-<para>
-        This section describes how to incorporate another frontend language
-        with breve. Using this information, you'll be able to use the breve
-        engine from any language which can interface a C library.
-      </para><para>
-        The following steps are required to set up a language frontend in
-        breve.
-      </para><itemizedlist><listitem><para>
-              Write special callbacks for the language frontend (<xref linkend="node-2784"/>).
-            </para></listitem><listitem><para>
-              Construct a new breve object type, and add classes to the breve
-              engine (<xref linkend="node-2785"/>).
-            </para></listitem><listitem><para>
-              Test the language frontend using the existing breve program
-              (<xref linkend="node-2786"/>).
-            </para></listitem><listitem><para>
-              If desired, connect the language frontend to an application
-              frontend (<xref linkend="node-2787"/>)
-              or write your own customized frontend (<xref linkend="node-2794"/>).
-            </para></listitem></itemizedlist>
-<section id="node-2783">
-<title>Structures used by the breve Object API</title>
-<para>
-        The following structures are used by the breve Object API. These
-        structures are passed to the frontend language callback functions. See
-        the file <literal>kernel/breveObjectAPI.h</literal> and its
-        documentation for a full description of these structs.
-      </para><itemizedlist><listitem><para><literal>brObjectType</literal>: information and
-              callbacks for a language frontend
-            </para></listitem><listitem><para><literal>brObject</literal>: a class in any frontend
-              language
-            </para></listitem><listitem><para><literal>brInstance</literal>: an instance in any
-              frontend language
-            </para></listitem><listitem><para><literal>brMethod</literal>: information about a
-              method in an object
-            </para></listitem></itemizedlist><para>
-        You should also familiarize yourself with the <literal>brEval</literal> structure and types which are described in
-        <xref linkend="node-2767"/>.
-      </para>
-</section>
-<section id="node-2784">
-<title>Callbacks required to add a new frontend language</title>
-<para>
-        In order to provide a language frontend to breve, a set of callbacks
-        must be defined.
-      </para><itemizedlist><listitem><para><literal>findObject</literal>: locate a class by name.
-            </para><programlisting>
-void *(*findObject)( void *inObjectTypeUserData, char *name );
-</programlisting><para>
-              When breve encounters a class name that it does not recognize, it
-              will use this function to attempt to lookup the object. The
-              pointer that is returned will be placed in the <literal>pointer</literal> field of a <literal>brObject</literal>. This pointer will likely be used
-              later to instantiate objects or locate instance methods by your
-              <literal>instantiate</literal> or <literal>findMethod</literal> callbacks.
-            </para></listitem><listitem><para><literal>findMethod</literal>: locate a method for a
-              class by name and argument count.
-            </para><programlisting>
-void *(*findMethod)( void *inObjectUserData, const char *inName, unsigned char *inTypes, int inTypeCount );
-</programlisting><para>
-              When breve needs to call a method in an object, it will be looked
-              up using this callback. The <literal>inObjectUserData</literal> argument refers to the object
-              in which the method can be found&#x2014;it is the pointer returned
-              by your <literal>findObject</literal> callback. The
-              <literal>inName</literal> argument is the name of the
-              method to look for.
-            </para><para>
-              The <literal>inTypeCount</literal> argument gives the
-              number of arguments that will be passed to the method, and the
-              <literal>inTypes</literal> argument contains the
-              argument types. The types are described in <xref linkend="node-2767"/></para></listitem><listitem><para><literal>instantiate</literal>: create an instance of
-              an object.
-            </para><programlisting>
-brInstance *(*instantiate)( brEngine *inEngine, brObject *inObject, const brEval **inArguments, int inArgCount )
-</programlisting><para>
-              breve calls this function to create a new instance of a class.
-              The <literal>inObject</literal> argument specifes the
-              object to be created and contains the user data found with
-              <literal>findObject</literal> in the <literal>userData</literal> field.
-            </para><para>
-              The function is expected to add the newly created instance to the
-              breve engine by calling <literal>brEngineAddInstance</literal>. <literal>brEngineAddInstance</literal> returns a <literal>brInstance</literal>, which should in turn be returned by
-              <literal>instantiate</literal>. <literal>brEngineAddInstance</literal> is called as follows:
-            </para><programlisting>
-brInstance *brEngineAddInstance( brEngine *inEngine, brObject *inObject, void *inInstanceUserData );
-</programlisting><para>
-              The constructor arguments <literal>inArguments</literal> and count <literal>inArgCount</literal> are currently unused.
-            </para></listitem><listitem><para><literal>callMethod</literal>: trigger a method call
-              in the frontend language.
-            </para><programlisting>
-int (*callMethod)(brInstance *instancePointer, brMethod *method, brEval **arguments, brEval *result);
-</programlisting><para>
-              The breve engine will need to trigger method calls in the
-              frontend language for a number of events such as iteration and
-              collision handling. This callback is used to trigger such events.
-            </para><para>
-              The callback is given the instance to be used, a <literal>brInstance</literal> instance structure (which contains a
-              native language instance pointer in the "pointer" field); the
-              method to be called, a <literal>brMethod</literal>
-              structure (which contains a native language method pointer in the
-              "pointer" field); an array of <literal>brEval</literal> argument pointers, and a pointer to an
-              output <literal>brEval</literal> structure.
-            </para><para>
-              The callback should trigger the method call <emphasis><function>method</function></emphasis> for the instance
-              <emphasis><function>instancePointer</function></emphasis>. It
-              expects that the <emphasis><function>arguments</function></emphasis> array contains the
-              number of items specified by the <literal>brMethod</literal> structure's argumentCount field.
-            </para></listitem><listitem><para><literal>isSubclass</literal>: determine whether a
-              class is a subclass of another.
-            </para><programlisting>
-int (*isSubclass)(brObject *class1, brObject *class2);
-</programlisting><para>
-              In order to correctly handle certain interactions like
-              collisions, the breve engine needs to know whether one class is a
-              subclass of another.
-            </para><para>
-              This callback is given two breve object pointers, and must return
-              1 if <emphasis><function>class1</function></emphasis> is a
-              subclass of <emphasis><function>class2</function></emphasis>, and
-              0 otherwise.
-            </para></listitem><listitem><para><literal>destroyObject:</literal> release memory
-              allocated by your <literal>findObject</literal>
-              callback.
-            </para><programlisting>
-void (*destoryObject)(void *objectData);
-</programlisting><para>
-              If your <literal>findObject</literal> callback
-              allocates memory, this callback should release that memory.
-            </para></listitem><listitem><para><literal>destroyInstance:</literal> release memory
-              allocated by your <literal>instantiate</literal>
-              callback.
-            </para><programlisting>
-void (*destoryInstance)(void *instanceData);
-</programlisting><para>
-              If your <literal>instantiate</literal> callback
-              allocates memory, this callback should release that memory.
-            </para></listitem><listitem><para><literal>destroyMethod:</literal> release memory
-              allocated by your <literal>findMethod</literal>
-              callback.
-            </para><programlisting>
-void (*destoryMethod)(void *methodData);
-</programlisting><para>
-              If your <literal>findMetho</literal> callback
-              allocates memory, this callback should release that memory.
-            </para></listitem><listitem><para><literal>destroyObjectType:</literal> release the
-              memory associated with your <literal>brObjectType</literal>.
-            </para><programlisting>
-void (*destroyData)(void *objectTypeData);
-</programlisting><para>
-              If you have allocate memory to be placed in the <literal>data</literal> field of the <literal>brObjectType</literal>, this callback should release that
-              memory.
-            </para></listitem></itemizedlist>
-</section>
-<section id="node-2785">
-<title>Specifying a new breve object type, and 
-registering objects</title>
-<para>
-        Every object in a frontend language that will have instances in the
-        breve engine must be registered with the breve engine. Moreover, when
-        an object is added to the breve engine, it must also tell the engine
-        what "type" of object it is. Each object "type" corresponds to a
-        different language frontend and a different set of callbacks, so for
-        each language frontend one creates, one must also create a <literal>brObjectType</literal> structure which contains the proper
-        callbacks. The structure is shown below.
-      </para><programlisting>
-struct brObjectType {
-        /**
-         * Finds a method in a given class
-         */
-        void                    *(*findMethod)( void *inObject, const char *inName, unsigned char *inTypes, int inTypeCount );
-
-        /**
-         * Finds an object class in the given language frontend
-         */
-        void                    *(*findObject)( void *inObjectType, const char *inName );
-
-        /**
-         * Creates a new instance of the given class.  The constructor arguments are currently unused.
-         */
-        brInstance              *(*instantiate)( brEngine *inEngine, brObject *inObject, const brEval **inArguments, int inArgCount );
-
-        /**
-         * Calls a method in the language frontend
-         */
-        int                     (*callMethod)( void *inInstance, void *, const brEval **, brEval * );
-
-        /**
-         * Returns 1 if parent is a subclass of parent.
-         */
-        int                     (*isSubclass)( void *inChild, void *inParent );
-
-        /**
-         * Destroys an instance of a language object previously created with instantiate.
-         */
-        void                    (*destroyObject)( void *inObject );
-
-        /**
-         * Destroys an instance of a language method previously created with findMethod.
-         */
-        void                    (*destroyMethod)( void *inMethod );
-
-        /**
-         * Destroys an instance of a language instance previously created with instantiate.
-         */
-        void                    (*destroyInstance)( void *inInstance );
-
-        /**
-         * Frees any leftover memory associated with the frontend, typically _userData.
-         */
-        void                    (*destroyObjectType)( void *inObjectType );
-        
-        /**
-         * A function to execute code in this frontend language.
-         */                     
-        int                     (*evaluate)( brEngine *inEngine, char *inFilename, char *inFiletext );
-
-        /**
-         * A user-data callback pointer.
-         */
-        void                    *_userData;
-        
-        /**
-         * A unique identifier which will be set for all objects of this object type.  This
-         * identifier can be used to determine whether an instance or object is native to
-         * a certain object type.
-         */
-        long                    _typeSignature;
-
-};
-</programlisting><para>
-        Only one <literal>brObjectType</literal> is required for
-        each language frontend.
-      </para><para>
-        Once the language frontend is defined, you can add it to the engine
-        with the following function:
-      </para><programlisting>
-void brEngineRegisterObjectType( brEngine *engine, brObjectType *type );
-</programlisting>
-</section>
-<section id="node-2786">
-<title>Testing and using the object frontend</title>
-<para>
-        Once you have written code to setup and register your new breve object
-        type, you'll want to test that breve can locate objects, instantiate
-        them and call their methods. To do so, you can add your frontend object
-        type to the breve engine, and then instantiate an object from steve
-        code.
-      </para><para>
-        To add your frontend object type to the breve engine, edit the file
-        <literal>kernel/frontendAPI.c</literal>, and look at the
-        function <literal>breveFrontendInit</literal>. The existing
-        breve applications call this function to create a breve engine. At the
-        bottom of this function, you can create and register your custom
-        language frontend.
-      </para><programlisting>
-brEngineRegisterObjectType(frontend-&gt;engine, <emphasis><function>functionToCreateLanguageFrontend</function></emphasis>());
-</programlisting><para>
-        After recompiling breve with this change, it should be possible to
-        instantiate an object from your new language frontend from directly
-        within a steve simulation. See the Java example <literal>java/JavaTest.tz</literal> for more information.
-      </para>
-</section>
-</section>
-<section id="node-2787">
-<title>Linking With the Existing breve Application Frontend</title>
-<para>
-        Once you've written a language frontend to interface with a new
-        programming language, you'll need an <emphasis>application
-        frontend</emphasis>. The application frontend is the program that a user runs
-        to start a breve simulation. It can be either a standalone program,
-        like the existing breve frontends, or it can be any other application
-        which creates and uses a breve engine. This section describes using the
-        existing breve application frontends with your own custom language
-        frontend. If you instead wish to implement your own custom application
-        frontend, you'll need to use the functions described in <xref linkend="node-2794"/>.
-      </para><para>
-        To use the existing breve application frontends, you'll need to
-        implement the functions described below, and then link the breve
-        executables against your own language frontend and application frontend
-        functions.
-      </para>
-<section id="node-2788">
-<title>The brFrontend structure</title>
-<para>
-        The application frontend function you'll need to implement make use of
-        a <literal>brFrontend</literal> structure. You'll use this
-        structure to access the breve engine and to access your own custom data
-        structure.
-      </para><programlisting>
-struct brFrontend {
-        brEngine *engine;
-        void *data;
-};
-</programlisting><para>
-        If you wish to use the existing breve application frontends, you'll
-        need to implement the methods listed below. You'll then need to link
-        breve against your language frontend library.
-      </para>
-</section>
-<section id="node-2789">
-<title>breveFrontendInitData</title>
-<para>
-        The language-frontend must provide a <literal>breveFrontendInitData</literal> function:
-      </para><programlisting>
-void *breveFrontendInitData(brEngine *engine);
-</programlisting><para>
-        This method initializes and returns a structure to be used by your
-        language-frontend. The data returned will be stored in the <literal>brFrontend</literal> field <literal>data</literal>
-        and will be used in the functions below.
-      </para>
-</section>
-<section id="node-2790">
-<title>breveFrontendLoadSimulation</title>
-<para>
-        The language-frontend must provide a <literal>breveFrontendLoadSimulation</literal> function:
-      </para><programlisting>
-int breveFrontendLoadSimulation(brFrontend *d, char *code, char *file);
-</programlisting>
-</section>
-<section id="node-2791">
-<title>breveFrontendLoadSavedSimulation</title>
-<para>
-        The language-frontend must provide a <literal>breveFrontendLoadSavedSimulation</literal> function:
-      </para><programlisting>
-int breveFrontendLoadSavedSimulation(brFrontend *d, char *code, char *file, char *xmlFile);
-</programlisting><para>
-        This function uses the language frontend data (found in the brFrontend
-        field data) to load an archived simulation. The simulation archive is
-        given as the xmlFile. The file containing the original simulation code
-        is provided as the file argument, with the text of that file in the
-        code argument.
-      </para>
-</section>
-<section id="node-2792">
-<title>breveFrontendCleanupData</title>
-<para>
-        The language-frontend must provide a <literal>breveFrontendCleanupData</literal> function:
-      </para><programlisting>
-void breveFrontendCleanupData(void *data);
-</programlisting><para>
-        This function should free all memory associated with the structure that
-        was returned earlier by <literal>breveFrontendInitData</literal>.
-      </para>
-</section>
-<section id="node-2793">
-<title>Linking your language-frontend with the application frontend</title>
-<para>
-        The last step in preparing the breve binaries with a custom language
-        frontend is to link the breve and breve_cli programs against your own
-        language frontend and application frontend functions. To do so, edit
-        the file <literal>bin/Makefile</literal> and change the
-        variable <literal>LANGUAGE_FRONTEND_LIBRARY</literal> to the
-        libraries containing your own frontend functions.
-      </para><programlisting>
-LANGUAGE_FRONTEND_LIBRARY   = -l<emphasis><function>myFrontendLibrary</function></emphasis></programlisting><para>
-        After running <literal>make</literal>, the binaries
-        <literal>bin/breve</literal> and <literal>bin/breve_cli</literal> should run your custom language
-        frontend.
-      </para>
-</section>
-</section>
-<section id="node-2794">
-<title>Implementing a Custom Application Frontend</title>
-<para>
-        To implement a custom application frontend, or to use breve simulations
-        as part of another program, you'll need to familiarize yourself with
-        functions relating to the breve engine structure <literal>brEngine</literal>.
-      </para><itemizedlist><listitem><para>
-              Create the breve engine (<literal>brEngineNew</literal>)
-            </para><para>
-              Simply call <literal>brEngineNew</literal> to get a
-              breve engine.
-            </para></listitem><listitem><para>
-              Setup the language frontend as outlined in <xref linkend="node-2782"/></para></listitem><listitem><para>
-              Locate objects in the breve engine (<literal>brObjectFind</literal>)
-            </para><programlisting>
-brObject *brObjectFind(brEngine *n, char *name);
-</programlisting><para>
-              breve needs to have information about each object type used in a
-              simulation. The function <literal>brObjectFind</literal> uses the language frontends to
-              locate and register objects with the engine. This function
-              returns a <literal>brObject</literal> structure which
-              can be used to create instances or find methods.
-            </para></listitem><listitem><para>
-              Add instances to the breve engine (<literal>brEngineAddInstance</literal> or <literal>brObjectInstantiate</literal>)
-            </para><programlisting>
-brInstance *brEngineAddInstance(brEngine *e, brObject *o, void *userData);
-brInstance *brObjectInstantiate(brEngine *e, brObject *o, brEval **args, int argCount);
-</programlisting><para>
-              There are two ways to add an instance to the breve engine. If the
-              instance already exists, it can be added with <literal>brEngineAddInstance</literal>. This pointer that is
-              passed to this function will become the <literal>userData</literal> of the <literal>brInstance</literal> struct that is returned.
-            </para><para>
-              If the instance does not already exist, it can be instantiated
-              using <literal>brObjectInstantiate</literal>.
-              <literal>brObjectInstantiate</literal> will use the
-              object's <literal>instantiate</literal> callback to
-              create the object and add it to the engine.
-            </para><para>
-              The arguments passed to <literal>brObjectInstantiate</literal> are arguments to be passed
-              to the constructor, though THIS IS NOT CURRENTLY IMPLEMENTED.
-            </para></listitem><listitem><para>
-              Iterate the breve engine (<literal>brEngineIterate</literal>)
-            </para><programlisting>
-int brEngineIterate(brEngine *e);
-</programlisting></listitem></itemizedlist>
 </section>
 </chapter>
 <chapter id="node-2870"><?dbhtml dir="docs" ?>
