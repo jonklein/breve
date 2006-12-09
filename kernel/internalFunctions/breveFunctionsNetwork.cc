@@ -163,8 +163,6 @@ char *brHostnameFromAddr( struct in_addr *addr ) {
 	struct hostent *h;
 	static char numeric[256];
 
-	return "nothing";
-
 	if ( !( h = gethostbyaddr(( const char* )addr, 4, AF_INET ) ) ) {
 		unsigned char *address = ( unsigned char * )addr;
 
@@ -186,7 +184,7 @@ brNetworkServer *brListenOnPort( int port, brEngine *engine ) {
 
 	struct sockaddr_in saddr;
 
-	if (( ssock = socket( AF_INET, SOCK_STREAM, 0 ) ) == -1 ) {
+	if ( ( ssock = socket( AF_INET, SOCK_STREAM, 0 ) ) == -1 ) {
 		perror( "Can't create socket" );
 		return NULL;
 	}
