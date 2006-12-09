@@ -295,7 +295,14 @@ int brIImageDataInit( brEval args[], brEval *result, brInstance *i ) {
 	dm = new brImageData;
 
 	dm->data = (unsigned char*)slMalloc( width * height * 4 );
-	memset( dm->data, 0xff, width * height * 4 );
+	memset( dm->data, 0x0, width * height * 4 );
+
+	// init to black, but alpha channel to white
+
+	for( int n = 0; n < width * height * 4; n++ ) {
+		if( n % 4 == 3 ) 
+			dm->data[ n ] = 0xff;
+	}
 
 	dm->x = width;
 	dm->y = height;

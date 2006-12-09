@@ -195,11 +195,17 @@ Image : VectorImage {
 	- to destroy:
 		super destroy.
 		
-	+ to set-red to m (object): red = m.
+	+ to set-red to redVector (object): 
+		% Sets the red channel of the image to vector redVector.
+		red = redVector.
 
-	+ to set-green to m (object): green = m.
+	+ to set-green to greenVector (object): 
+		% Sets the green channel of the image to vector greenVector.
+		green = greenVector.
 
-	+ to set-blue to m (object): blue = m.
+	+ to set-blue to blueVector (object): 
+		% Sets the blue channel of the image to vector blueVector.
+		blue = blueVector.
 
 	+ to iterate:
 		if red: red copy-to-red-channel of-image self with-scale scale.

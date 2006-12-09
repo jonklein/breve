@@ -580,7 +580,7 @@ Image : MatrixImage {
 		
 	+ to iterate:
 		if red: red copy-to-red-channel of-image self with-scale scale.
-		if green: green copy-to-blue-channel of-image self with-scale scale.
+		if green: green copy-to-green-channel of-image self with-scale scale.
 		if blue: blue copy-to-blue-channel of-image self with-scale scale.
 
 		super iterate.

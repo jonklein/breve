@@ -52,7 +52,7 @@ Control : GS {
 		inflow set-size x SIZE y SIZE.
 
 		texture = new MatrixImage.
-		texture init-with the-matrix U scale 2.0.
+		texture init-with the-matrix U scale 1.0.
 		texture set-red to V.
 		texture set-blue to U.
 

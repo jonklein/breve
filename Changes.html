@@ -3,31 +3,67 @@
 <TITLE>breve : version history</TITLE>
 </HEAD>
 <STYLE TYPE="text/css">
-    BODY, P, LI {
-        color: black;
-        background: white;
-        font-family: Verdana,Arial,Helvetica,Swiss,SunSans-Regular;
-        font-size: 90%;
-    }
-    BODY {
+body {
+	margin: 0px 0px 20px 0px;
+	padding: 0;
+	color: #222222;
+	background-color: #8FABDE;
+	font-size: 9pt;
+	font-family: Verdana, Arial, sans-serif;
         margin-left: 10%;
         margin-right: 10%;
-    }   
-    TT {
-        font-size: 80%;
-    }
-	h5 {
-		font-size: 250%
-	}
-	h5 {
-		font-size: 150%
-	}
+}
+
+TT {
+	font-size: 80%;
+}
+
+h5 {
+	font-size: 150%
+}
+
+h5 {
+	font-size: 120%
+}
+
+
+#container {
+	padding: 10px;
+
+	line-height: 140%;
+	margin-right: auto;
+	margin-left: auto;
+	text-align: left;
+	margin-top: 10px;
+	width: 90%;
+	overflow: visible;
+ 
+	background-color: #FFFFFF;
+	border: 1px solid #FFFFFF;
+}
+
 </STYLE>
 <BODY>
 
+<div id="container">
+
 The <a href="http://www.spiderland.org/breve">breve</a> simulation environment change log.
 
+<h5>version 2.5 [12/11/2006]</h5>
+
+<h5>New Features</h5>
+
+<ul>
+<li>Major optmizations and stability improvements
 <li>Network communication is now a two-way process: objects can be both sent and received in a single network connection call.
+<li>Added easier element access to vectors and matrices.
+<li>For plugin or language frontend developers: exported additional breveEngineAPI.h functions
+<li>Released breveCreatures screensaver for Mac OS X and Windows.
+</ul>
+
+<h5>Bug Fixes</h5>
+
+<ul>
 <li>Remove newline characters from text with File read-line method.
 <li>Physical simulation stability improved.
 <li>Crash fix for very densely packed physical simulations 
@@ -39,8 +75,10 @@ The <a href="http://www.spiderland.org/breve">breve</a> simulation environment c
 <li>Windows and Linux IDE graphics bug fixed: simulations now display properly after a previous runtime error.
 <li>Fixed movie export on some Windows machines 
 <li>Fixed potential Windows and Linux IDE networking deadlock
-<li>For plugin developers: exported additional breveEngineAPI.h functions
+</ul>
 
+
+<hr>
 
 
 <h5>version 2.4 [05/13/2006]</h5>
@@ -834,5 +872,8 @@ Bear in mind when adjusting forces applied to objects and joints that the mass o
 <hr><h5>version 1.0 [05/07/2001]</h5>
 <p>
 Initial release.
+
+</div>
 </BODY>
+
 </HTML>

@@ -24,7 +24,7 @@ pdf: pdf-clean
 	xsltproc --output breve_documentation.fo --stringparam fop.extensions 1 /usr/local/lib/docbook-xsl-1.71.1/fo/docbook.xsl breve.docbook
 	fop -fo breve_documentation.fo -pdf pdfdocs/breve_documentation.pdf
 
-html: html-clean
+html: html-clean classes
 	mkdir -p htmldocs
 	mkdir -p htmldocs/docs
 

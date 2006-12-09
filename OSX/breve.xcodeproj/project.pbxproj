@@ -579,7 +579,6 @@
 		48C93588094B452400B48959 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BREVE_VERSION = 2.4manual;
 				CC_VERSION = 3.x;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = NO;
@@ -594,7 +593,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					MACOSX,
-					"BREVE_VERSION=$(BREVE_VERSION)",
+					"BREVE_VERSION=2.5",
 				);
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_PEDANTIC = NO;
@@ -633,7 +632,6 @@
 		48C93589094B452400B48959 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BREVE_VERSION = 2.4manual;
 				CC_VERSION = 3.x;
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = NO;
@@ -647,7 +645,7 @@
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					MACOSX,
-					"BREVE_VERSION=$(BREVE_VERSION)",
+					"BREVE_VERSION=2.5",
 				);
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_PEDANTIC = NO;
@@ -716,7 +714,6 @@
 		48F0A4DD09CCE98700B52C28 /* Deployment-Universal */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BREVE_VERSION = 2.4manual;
 				CC_VERSION = 3.x;
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = NO;
@@ -730,7 +727,7 @@
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					MACOSX,
-					"BREVE_VERSION=$(BREVE_VERSION)",
+					"BREVE_VERSION=2.5",
 				);
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_PEDANTIC = NO;
