@@ -148,6 +148,23 @@ case ${host_os} in
 esac
 
 #
+# Python wants to be dynamically linked as well
+#
+
+AC_CHECK_LIB([python], [Py_Initialize])
+AC_CHECK_LIB([python2.3], [Py_Initialize])
+AC_CHECK_LIB([python23], [Py_Initialize])
+
+if test "$ac_cv_lib_python2_3_Py_Initialize" = yes; then
+	AC_DEFINE( [HAVE_LIBPYTHON] )
+fi
+
+if test "$ac_cv_lib_python23_Py_Initialize" = yes; then
+	AC_DEFINE( [HAVE_LIBPYTHON] )
+fi
+
+
+#
 # These required system libraries are assumed to require dynamic linking even 
 # when static linking is requested.  Other (optional) libraries may be linked
 # statically if present and if requested with --enable-static
@@ -263,18 +280,6 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([readline], [readline])
 	AC_CHECK_LIB([3ds], [lib3ds_io_new])
 	AC_CHECK_LIB([ftgl], [main])
-	AC_CHECK_LIB([python], [Py_Initialize])
-	AC_CHECK_LIB([python2.3], [Py_Initialize])
-	AC_CHECK_LIB([python23], [Py_Initialize])
-
-	if test "$ac_cv_lib_python2_3_Py_Initialize" = yes; then
-		AC_DEFINE( [HAVE_LIBPYTHON] )
-	fi
-
-	if test "$ac_cv_lib_python23_Py_Initialize" = yes; then
-		AC_DEFINE( [HAVE_LIBPYTHON] )
-	fi
-
 	AC_CHECK_LIB([avutil], [main])
 	AC_CHECK_LIB([avcodec], [avcodec_init])
 	AC_CHECK_LIB([avformat], [av_write_frame])
