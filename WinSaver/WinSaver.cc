@@ -153,7 +153,6 @@ void SetupAnimation( int inWidth, int inHeight ) {
 	slSetMessageCallbackFunction( NULL );
 
 	gEngine = brEngineNew();
-
 	brInitFrontendLanguages( gEngine );
 
 	// Do all the path stuff

@@ -9,7 +9,8 @@ WinSaverLibs:
 	cp -r lib WinSaver/breve
 	rm -f WinSaver/breve/lib/*.a WinSaver/breve/lib/*.lib 
 	find WinSaver/breve/lib -name '.svn*' -prune -exec rm -rf {} \;
-	cp glut32.dll WinSaver
+	cp bin/glut32.dll WinSaver
+	cp bin/python23.dll WinSaver
 	cp WinSaver/Creatures.tz WinSaver/breve
 
 WinSaver/WinSaverResource.o: WinSaver/WinSaverResource.rc
