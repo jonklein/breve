@@ -168,6 +168,7 @@
 
 - (int)initEngineWithFrame:(NSRect)frame {
 	viewEngine = brEngineNew();
+	brInitFrontendLanguages( viewEngine );
 	
 	if( !viewEngine ) return -1;
 		
