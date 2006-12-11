@@ -154,12 +154,22 @@ esac
 AC_CHECK_LIB([python], [Py_Initialize])
 AC_CHECK_LIB([python2.3], [Py_Initialize])
 AC_CHECK_LIB([python23], [Py_Initialize])
+AC_CHECK_LIB([python2.4], [Py_Initialize])
+AC_CHECK_LIB([python24], [Py_Initialize])
 
 if test "$ac_cv_lib_python2_3_Py_Initialize" = yes; then
 	AC_DEFINE( [HAVE_LIBPYTHON] )
 fi
 
 if test "$ac_cv_lib_python23_Py_Initialize" = yes; then
+	AC_DEFINE( [HAVE_LIBPYTHON] )
+fi
+
+if test "$ac_cv_lib_python2.4_Py_Initialize" = yes; then
+	AC_DEFINE( [HAVE_LIBPYTHON] )
+fi
+
+if test "$ac_cv_lib_python24_Py_Initialize" = yes; then
 	AC_DEFINE( [HAVE_LIBPYTHON] )
 fi
 
@@ -273,6 +283,7 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([jpeg], [jpeg_read_header])
 	AC_CHECK_LIB([tiff], [TIFFOpen])
 	AC_CHECK_LIB([portaudio], [Pa_OpenStream])
++       AC_CHECK_LIB([FLAC], [FLAC__seekable_stream_encoder_init])
 	AC_CHECK_LIB([sndfile], [sf_open])
 	AC_CHECK_LIB([termcap], [tputs])
 	AC_CHECK_LIB([ncurses], [tputs])
