@@ -264,9 +264,8 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>18</integer>
-									<integer>17</integer>
-									<integer>13</integer>
+									<integer>10</integer>
+									<integer>1</integer>
 									<integer>0</integer>
 								</array>
 							</array>
@@ -308,7 +307,7 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>1CE0B20306471E060097A5F4</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>InfoPlist.strings</string>
+								<string>slBreveSwarm.h</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -316,19 +315,21 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CE0B20406471E060097A5F4</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>InfoPlist.strings</string>
+										<string>slBreveSwarm.h</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>48B496390B2B98D100FCEABC</string>
+										<string>48B4964A0B2BABE300FCEABC</string>
 										<key>history</key>
 										<array>
 											<string>485B495B0B228B3700CE9856</string>
-											<string>480F0C810B2B983300AD6F19</string>
+											<string>48B496470B2BABE300FCEABC</string>
+											<string>48B496480B2BABE300FCEABC</string>
 										</array>
 										<key>prevStack</key>
 										<array>
 											<string>485B495D0B228B3700CE9856</string>
+											<string>48B496490B2BABE300FCEABC</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>

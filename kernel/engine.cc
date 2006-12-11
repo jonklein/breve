@@ -101,6 +101,9 @@ brEngine *brEngineNew( void ) {
 	gsl_set_error_handler_off();
 #endif
 
+	e->argc = 0;
+	e->argv = NULL;
+
 	e->updateMenu = NULL;
 	e->getSavename = NULL;
 	e->getLoadname = NULL;

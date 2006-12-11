@@ -145,8 +145,8 @@ Object : PushGP {
 
 	+ to init:
 		populationSize = 2000.
-		mutationPercent = 40.
-		crossoverPercent = 40.
+		mutationPercent = 45.
+		crossoverPercent = 45.
 		tournamentSize = 7.
 		generationLimit = 300.
 
@@ -481,7 +481,7 @@ Object : PushGP {
 			if method < mutationPercent: {
 				p1 = (self run-tournament for-index n).
 				next{n} copy-from program p1.
-				next{n} mutate with-max-new-code-size 10 with-interpreter interpreter.
+				next{n} mutate with-max-new-code-size 100 with-interpreter interpreter.
 			} else if method < (crossoverPercent + mutationPercent): {
 				p1 = (self run-tournament for-index n).
 				p2 = (self run-tournament for-index n).
@@ -489,6 +489,8 @@ Object : PushGP {
 			} else {
 				p1 = (self run-tournament for-index n).
 				next{n} copy-from program p1.
+
+				# print "Copying from program with fitness ", ( p1 get-fitness ).
 			}
 
 			n++.

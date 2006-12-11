@@ -744,8 +744,6 @@ Mobile : Bird (aka Birds) {
     + to initialize-randomly:        
         pushCode make-random-code max-length MAX_RANDOM_CODE_SIZE with-interpreter pushInterpreter.
 
-		print (pushCode get-string).
-
         self move to random[(10, 0, 10)] - (5, 3, 5).
         self set-velocity to (0, 0, 0).
         hue = random[1.0].

@@ -57,6 +57,8 @@ PushGP : RegressionGP {
 		# This method is implemented as instructed by the PushGP class.
 		# Push a test case input value (n) onto the float stack.  
 
+		n += 1.
+
 		currentInput = n.
 
 		interpreter push-float value n.
@@ -71,9 +73,12 @@ PushGP : RegressionGP {
 
 		desiredResult (float).
 
-		desiredResult = (n * n * n) + (4 * n * n) - (2 * n).
+		n += 1.
 
-		return | (interpreter get-float-stack-top) - desiredResult |.
+		# desiredResult = (n * n * n) + (4 * n * n) - (2 * n).
+		desiredResult = ( n*n ) + 10.
+
+		return | (interpreter get-float-stack-top) - desiredResult | * | (interpreter get-float-stack-top) - desiredResult |.
 
 	+ to input-callback:
 		# This input instruction just puts the current input value on
