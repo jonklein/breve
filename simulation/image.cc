@@ -315,12 +315,20 @@ void slSGIImageGetRow( slSGIImageRec *image, unsigned char *buf, int y, int z ) 
 
 			if ( pixel & 0x80 ) {
 				while ( count-- ) {
+					if( oPtr - buf >= image->xsize ) {
+						// row overflow?!
+						return;
+					}
 					*oPtr++ = *iPtr++;
 				}
 			} else {
 				pixel = *iPtr++;
 
 				while ( count-- ) {
+					if( oPtr - buf >= image->xsize ) {
+						// row overflow?!
+						return;
+					}
 					*oPtr++ = pixel;
 				}
 			}
@@ -359,6 +367,8 @@ unsigned char *slReadSGIImage( const char *name, int *width, int *height, int *c
 		return NULL;
 
 	lptr = ( unsigned* )base;
+
+	printf(" x-size = %d\n", image->xsize );
 
 	for ( y = 0; y < image->ysize; y++ ) {
 		if ( image->zsize >= 4 ) {
