@@ -412,10 +412,7 @@ Object : PushProgram (aka PushPrograms) {
 		if treeSize == -1: 
 			treeSize = pushEnvironmentGetRandomPointLimit( (interpreter get-interpreter-pointer) ).
 
-		if random[ 1 ] == 1:
-			self set-code-pointer to pushCodeSubtreeMutate((interpreter get-interpreter-pointer), codePointer, treeSize).
-		else
-			self set-code-pointer to pushCodeDeletionMutate(codePointer).
+		self set-code-pointer to pushCodeSubtreeMutate((interpreter get-interpreter-pointer), codePointer, treeSize).
 
 	+ to delete-random-subtree:
 		% Removes a random subtree from the code.

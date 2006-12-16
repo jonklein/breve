@@ -4,6 +4,8 @@
 	This file was generated automatically by the script /Users/jk/dev/breve/tools/apiwrap.pl.
 */
 
+#include <stdexcept>
+
 #include "util.h"
 #include "kernel.h"
 
@@ -224,7 +226,11 @@ int breveFunctionPushEnvironmentSetRandomPointLimit( brEval arguments[], brEval 
 int breveFunctionPushParse( brEval arguments[], brEval *result, brInstance *instance ) {
 	char *string = BRSTRING( &arguments[0] );
 
-	result->set( pushParse( string ) );
+	try {
+		result->set( pushParse( string ) );
+	} catch ( std::runtime_error &e ) {
+		result->set( pushParse( "()" ) );
+	}
 
 	return EC_OK;
 }
