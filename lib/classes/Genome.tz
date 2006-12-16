@@ -1,0 +1,20 @@
+@include "Data.tz"
+
+Data : Genome (aka Genomes) [version 2.0] {
+    % The Genome class is a subclass of OBJECT(Data) which allows its subclasses
+    % to be manipulated with genetic operators such as crossover and mutation.
+    % This class is primarily used in conjunction with genetic algorithms and 
+    % artificial life simulations.
+    % <p>
+    % As with its parent class, Data, the Genome class is incomplete and experimental.  
+    % The API is subject to change in future releases. 
+
+    + to crossover from-parent-1 parent1 (object) from-parent-2 parent2 (object):
+        % Initializes the contents of this object using a 1-point crossover from 
+        % parent1 and parent2.
+
+        if !parent1 || !parent2: 
+            die "Parent object passed to crossover not initialized".
+
+        simpleCrossover(parent1, parent2, self).
+}

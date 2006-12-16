@@ -75,7 +75,7 @@ PushGP : RegressionGP {
 
 		n += 1.
 
-		desiredResult = (n * n * n) + (4 * n * n) - (2 * n).
+		desiredResult = 8 * n * n * n + 3 * n * n + n.
 		# desiredResult = ( n*n ) + 10.
 
 		return | (interpreter get-float-stack-top) - desiredResult | * | (interpreter get-float-stack-top) - desiredResult |.
