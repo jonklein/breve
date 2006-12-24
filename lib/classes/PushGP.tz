@@ -149,8 +149,9 @@ Object : PushGP {
 		
 		fitnessTestDuration = d.
 
-	- to set-spatial-radius to n (int):
-		% Undocumented until that paper is complete ?!
+	+ to set-spatial-radius to n (int):
+		% Sets the spatial radius used for tournament selection during reproduction.  Setting
+		% to 0 disables spatial effects.
 		spatialRadius = n.
 
 	- to get-fitness-test-duration:
@@ -158,9 +159,9 @@ Object : PushGP {
 
 	+ to init:
 		populationSize = 2000.
-		mutationPercent = 45.
+		mutationPercent = 40.
 		deletionPercent = 5.
-		crossoverPercent = 45.
+		crossoverPercent = 40.
 		tournamentSize = 7.
 		generationLimit = 300.
 
@@ -510,7 +511,7 @@ Object : PushGP {
 			if method < mutationPercent: {
 				p1 = (self run-tournament for-index n).
 				next{n} copy-from program p1.
-				next{n} mutate with-max-new-code-size 100 with-interpreter interpreter.
+				next{n} mutate with-interpreter interpreter.
 			} else if method < (crossoverPercent + mutationPercent): {
 				p1 = (self run-tournament for-index n).
 				p2 = (self run-tournament for-index n).
@@ -636,7 +637,7 @@ PushGP : PushClusterGP {
 			if method < mutationPercent: {
 				p1 = (self run-tournament for-index n).
 				next{n} copy-from program p1.
-				next{n} mutate with-max-new-code-size 10 with-interpreter interpreter.
+				next{n} mutate with-interpreter interpreter.
 			} else if method < (crossoverPercent + mutationPercent): {
 				p1 = (self run-tournament for-index n).
 				p2 = (self run-tournament for-index n).

@@ -795,9 +795,10 @@ int breveFunctionPushCodeFlattenMutate( brEval arguments[], brEval *result, brIn
 int breveFunctionPushCodeSubtreeMutate( brEval arguments[], brEval *result, brInstance *instance ) {
 	PushEnvironment *environment = BRPOINTER( &arguments[0] );
 	PushCode *p1 = BRPOINTER( &arguments[1] );
-	int size = BRINT( &arguments[2] );
+	float bias = BRFLOAT( &arguments[2] );
+	float scale = BRFLOAT( &arguments[3] );
 
-	result->set( pushCodeSubtreeMutate( environment, p1, size ) );
+	result->set( pushCodeSubtreeMutate( environment, p1, bias, scale ) );
 
 	return EC_OK;
 }
@@ -992,7 +993,7 @@ void breveInitPushFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "pushVectorStackPush", breveFunctionPushVectorStackPush, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
 	brNewBreveCall( n, "pushCodeDeletionMutate", breveFunctionPushCodeDeletionMutate, AT_POINTER, AT_POINTER, 0 );
 	brNewBreveCall( n, "pushCodeFlattenMutate", breveFunctionPushCodeFlattenMutate, AT_POINTER, AT_POINTER, 0 );
-	brNewBreveCall( n, "pushCodeSubtreeMutate", breveFunctionPushCodeSubtreeMutate, AT_POINTER, AT_POINTER, AT_POINTER, AT_INT, 0 );
+	brNewBreveCall( n, "pushCodeSubtreeMutate", breveFunctionPushCodeSubtreeMutate, AT_POINTER, AT_POINTER, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "pushCodeCrossover", breveFunctionPushCodeCrossover, AT_POINTER, AT_POINTER, AT_POINTER, AT_POINTER, 0 );
 	brNewBreveCall( n, "pushCodeRandom", breveFunctionPushCodeRandom, AT_POINTER, AT_POINTER, AT_INT, 0 );
 

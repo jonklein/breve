@@ -41,17 +41,20 @@ Object : myPushAgent (aka myPushAgents) {
 
 		# code = (new PushProgram parse program "( 1 2 3 4 5 6 CALLBACK2-TEST CALLBACK-TEST CALLBACK2-TEST CALLBACK-TEST ( 0 0 ) )").
 		code = (new PushProgram parse program "( 0 0 INTEGER./ 3.5 3.6 3.7 10.1 POINT.SETZ FLOAT.FROMPOINTZ)").
-		code2 = (new PushProgram parse program "( 1 2 3 4 8 4 CALLBACK-TEST CALLBACK2-TEST )").
+		code2 = (new PushProgram parse program "( 1 ( 3 ) ( 4 5 6 ) 8 4 CALLBACK-TEST CALLBACK2-TEST ( 1 ) ( INTEGER.* ) )").
+		code =  (new PushProgram parse program "((6.0000000000000000 (7.5000000000000000 FLOAT.* FLOAT.*) FLOAT.*) (FLOAT.SWAP (FLOAT.DUP FLOAT.*) (FLOAT.DUP FLOAT.*))) )" ).
+
+		code2 mutate with-interpreter interpreter.
 
 		print "Discrepancy", (code get-discrepancy from code2).
 		print "Top level diff", (code get-top-level-difference from code2).
 
 		interpreter run program code.
+		print "Effort = ", (interpreter get-effort).
 
 		interpreter print-stacks.
 		interpreter print-config.
 
-		print (interpreter get-integer-stack-top).
 		interpreter clear-stacks.
 		print (interpreter get-integer-stack-top).
 

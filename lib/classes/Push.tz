@@ -399,20 +399,24 @@ Object : PushProgram (aka PushPrograms) {
 
 		self set-code-pointer to pushCodeRandom((interpreter get-interpreter-pointer), size).
 
-  + section "Copying and evolving Push programs "
+  + section "Copying and evolving Push programs"
+	- to mutate with-interpreter interpreter (object) with-leaf-bias leafBias = 0.5 (float) with-size-scale sizeScale = 0.3 (float) with-max-new-code-size treeSize (int):
+		% Deprecated.
 
-	+ to mutate with-max-new-code-size treeSize = -1 (int) with-interpreter interpreter (object):
+		self mutate with-interpreter interpreter with-leaf-bias .5 with-size-scale .3.
+
+	+ to mutate with-interpreter interpreter (object) with-leaf-bias leafBias = 0.9 (float) with-size-scale sizeScale = 0.3 (float):
 		% Mutates this code object by adding a new subtree.  The maximum size of the
 		% subtree is specified in the optional argument treeSize, which has a default
-		% value of 50.  The size may also be equal to -1, which indidates that the 
+		% value of 50.  The size may also be equal to -1 (the default), indicating that the 
 		% MAX-POINTS-IN-RANDOM-EXPRESSION value from the Push configuration file 
 		% should be used.  The interpreter argument determines the instruction
 		% set used to generate the random code.  
+		% <P>
+		% Mutation is implemented as "fair" mutation with a range of +/- 30% of the 
+		% mutated subtree.
 
-		if treeSize == -1: 
-			treeSize = pushEnvironmentGetRandomPointLimit( (interpreter get-interpreter-pointer) ).
-
-		self set-code-pointer to pushCodeSubtreeMutate((interpreter get-interpreter-pointer), codePointer, treeSize).
+		self set-code-pointer to pushCodeSubtreeMutate( (interpreter get-interpreter-pointer), codePointer, leafBias, sizeScale ).
 
 	+ to delete-random-subtree:
 		% Removes a random subtree from the code.
