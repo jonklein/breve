@@ -3311,7 +3311,7 @@ RTC_INLINE int stEvalNewInstance( stInstanceExp *ie, stRunInstance *i, brEval *t
 
 			stInstanceUnretain( ( stInstance* )BRINSTANCE( &listItem )->userData );
 
-			brEvalListInsert( list, 0, &listItem );
+			brEvalListInsert( list, list->_vector.size(), &listItem );
 		}
 
 		t->set( list );

@@ -54,7 +54,8 @@ class brEvalVectorSorter {
 
 			std::pair< const brEval*, const brEval* > pair( &a, &b );
 
-			if ( mSeenMap.find( pair ) != mSeenMap.end() ) return mSeenMap[ pair ];
+			// if ( mSeenMap.find( pair ) != mSeenMap.end() ) 
+			// 	return mSeenMap[ pair ];
 
 			args[ 0 ] = &a;
 			args[ 1 ] = &b;
