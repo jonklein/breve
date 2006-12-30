@@ -152,7 +152,7 @@ int brINotify( brEval args[], brEval *target, brInstance *i ) {
 
 	// for each observer, check to see if what it's observing
 
-	for( unsigned int n = 0; n < i->observers.size(); i++ ) {
+	for( unsigned int n = 0; n < i->observers.size(); n++ ) {
 		observer = i->observers[ n ];
 
 		if ( !strcmp( notification, observer->notification ) ) {
