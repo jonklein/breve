@@ -183,7 +183,7 @@ int brMethodCallByName( brInstance *i, const char *name, brEval *result ) {
 
 	r = brMethodCall( i, m, NULL, result );
 
-	brMethodFree( m );
+	delete m;
 
 	return r;
 }
@@ -209,7 +209,7 @@ int brMethodCallByNameWithArgs( brInstance *i, const char *name, const brEval **
 
 	r = brMethodCall( i, m, args, result );
 
-	brMethodFree( m );
+	delete m;
 
 	return r;
 }
@@ -266,6 +266,7 @@ void brEngineRemoveInstanceObserver( brInstance *i, brInstance *observerInstance
 			if( observermatch != i->observers.end() ) 
 				i->observers.erase( observermatch );
 
+			printf(" Deleting %p\n", observer );
 			delete observer;
 		} 
 	}
@@ -421,7 +422,7 @@ void brObjectFree( brObject *o ) {
 		brCollisionHandler *h = o->collisionHandlers[ n ];
 
 		if ( h->method ) 
-			brMethodFree( h->method );
+			delete h->method;
 
 		delete h;
 	}
@@ -468,10 +469,10 @@ void brInstanceFree( brInstance *i ) {
 	}
 
 	if ( i->iterate ) 
-		brMethodFree( i->iterate );
+		delete i->iterate;
 
 	if ( i->postIterate ) 
-		brMethodFree( i->postIterate );
+		delete i->postIterate;
 
 	i->userData = NULL;
 

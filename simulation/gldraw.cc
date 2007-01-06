@@ -1350,8 +1350,10 @@ void slCamera::renderLines( slWorld *w ) {
 
 	glDisable( GL_LIGHTING );
 
+	// glDisable( GL_DEPTH_TEST );
 	glEnable( GL_BLEND );
-	glDisable( GL_LINE_SMOOTH );
+	glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glEnable( GL_LINE_SMOOTH );
 	glLineWidth( 1.0 );
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 

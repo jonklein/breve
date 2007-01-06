@@ -229,7 +229,7 @@ struct brObserver {
 
 	~brObserver() {
 		delete method;
-		free( notification );
+		slFree( notification );
 	}
 
 	brInstance *instance;

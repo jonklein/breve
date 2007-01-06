@@ -515,10 +515,12 @@ void slLink::disableSimulation() {
 	_position.location.y = odePos[1];
 	_position.location.z = odePos[2];
 
-	slODEToSlMatrix(( dReal* )odeRot, _position.rotation );
+	slMatrix newRotation;
+
+	slODEToSlMatrix(( dReal* )odeRot, newRotation );
 
 	setLocation( &_position.location );
-	setRotation( _position.rotation );
+	setRotation( newRotation );
 
 	_velocity.a.x = odeAngular[0];
 	_velocity.a.y = odeAngular[1];

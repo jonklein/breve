@@ -4,6 +4,7 @@ Controller ListTest.
 
 Control : ListTest {
 	+ to init:
+		i (int).
 		newlist, newlist2 (list).
 		newhash (hash).
 
@@ -15,9 +16,15 @@ Control : ListTest {
 
 		print keys( newhash ).
 
+		self sort-list.
+
 		if | newlist | != 2: die "Wrong number of elements in $newlist".
 
 		newlist = { 1, 3, 4, -3 }.
+
+		foreach i in newlist: {
+			print i.
+		}
 
 		newlist2 = {}.
 
@@ -52,7 +59,7 @@ Control : ListTest {
 	+ to sort-list: 
 		l (list).
 
-		l = { 1,3,5,7,2,4,6,8 }. 
+		l = { 1, 2, 4, 5, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 }.
 		sort l with by-val. 
 		print l. 
         

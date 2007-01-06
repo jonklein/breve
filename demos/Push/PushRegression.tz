@@ -36,6 +36,7 @@ PushGP : RegressionGP {
 
 		self read-interpreter-config from-file "PushRegression.config".
 		self set-population-size to 2000.
+		self set-spatial-radius to 10.
 
 		# PushGP regression problems are helped by being able to retrieve 
 		# the input values with an instruction.  Adding this callback is 
@@ -75,7 +76,9 @@ PushGP : RegressionGP {
 
 		n += 1.
 
-		desiredResult = (n * n * n) + (4 * n * n) - (2 * n).
+		
+		# desiredResult = (n * n * n) + (4 * n * n) - (2 * n).
+		desiredResult = (8 * n * n * n) + (3 * n * n) + (n).
 		# desiredResult = ( n*n ) + 10.
 
 		return | (interpreter get-float-stack-top) - desiredResult | * | (interpreter get-float-stack-top) - desiredResult |.
