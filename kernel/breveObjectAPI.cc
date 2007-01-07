@@ -266,7 +266,6 @@ void brEngineRemoveInstanceObserver( brInstance *i, brInstance *observerInstance
 			if( observermatch != i->observers.end() ) 
 				i->observers.erase( observermatch );
 
-			printf(" Deleting %p\n", observer );
 			delete observer;
 		} 
 	}
@@ -449,6 +448,8 @@ void brInstanceFree( brInstance *i ) {
 	for( unsigned int n = 0; n < observerList.size(); n++ ) {
 		delete observerList[ n ];
 	}
+
+	i->observers.clear();
 
 	// removing observers will modify the observee list,
 	// so copy the list first

@@ -138,8 +138,12 @@ int brIImageReadPixels( brEval args[], brEval *result, brInstance *i ) {
 
 	// Alpha channel washed out on Windows?!  Fix it with a 1.0 bias
 
-	if( i->engine->camera->_activateContextCallback )
-		i->engine->camera->_activateContextCallback();
+	if( i->engine->camera->_activateContextCallback ) {
+		if( i->engine->camera->_activateContextCallback() != 0 ) {
+			slMessage( DEBUG_ALL, "warning: could not read pixels, no OpenGL context available\n" );
+			return EC_OK;
+		}
+	}
 
 	glPixelTransferf( GL_ALPHA_BIAS, 1.0 );
 	glReadPixels( x, y, dm->x, dm->y, GL_RGBA, GL_UNSIGNED_BYTE, dm->data );
