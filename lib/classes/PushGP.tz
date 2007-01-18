@@ -39,9 +39,13 @@ Object : PushGP {
 		_abortFitnessTest (int).
 		_abortFitnessValue (float).
 
-		bestOfGen (object).
-		totalSize (int).
-		totalErrors (double).
+		_bestOfGen (object).
+		_totalSize (int).
+		_totalErrors (double).
+
+		_fitnessCaseSolutionRates (list).
+		_lastSolutionRates (list).
+		_useChallenges (int).
 
 		generation (int).
 
@@ -165,9 +169,13 @@ Object : PushGP {
 		tournamentSize = 7.
 		generationLimit = 300.
 
+		_useChallenges = 0.
+
 		interpreter = new PushInterpreter.
 
 	- to create-population:
+		n (int).
+
 		if pop1: free pop1.
 		if pop2: free pop2.
 
@@ -181,6 +189,11 @@ Object : PushGP {
 		next = pop2.
 
 		if seed: (pop1{0} parse program seed).
+
+		for n = 0, n < (self count-fitness-cases), n++: {
+			_fitnessCaseSolutionRates{ n } = 0.
+			_lastSolutionRates{ n } = 0.
+		}
 
 		inited = 1.
 
@@ -332,24 +345,24 @@ Object : PushGP {
 			controller end-simulation.
 		}
 
-		if !bestOfGen || (fitness < (bestOfGen get-fitness)): bestOfGen = current{ currentIndividual }.
+		if !_bestOfGen || (fitness < (_bestOfGen get-fitness)): _bestOfGen = current{ currentIndividual }.
 
-		totalSize += (current{ currentIndividual } get-size).
-		totalErrors += fitness.
+		_totalSize += (current{ currentIndividual } get-size).
+		_totalErrors += fitness.
 
 		current{ currentIndividual } set-fitness to fitness.
 
 		currentIndividual++.
 
 		if currentIndividual == populationSize: {
+			self report with-best _bestOfGen.
 			self reproduce.
-			self report with-best bestOfGen.
 			self swap-current.
 			currentIndividual = 0.
 			generation++.
-			bestOfGen = 0.
-			totalSize = 0.
-			totalErrors = 0.
+			_bestOfGen = 0.
+			_totalSize = 0.
+			_totalErrors = 0.
 
 			if generation > generationLimit: {
 				print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;".
@@ -361,26 +374,41 @@ Object : PushGP {
 	- to compute-zero-duration-fitness for-program p (object):
 		n (int).
 		errors (list).
+		errorValue (float).
 
 		_abortFitnessTest = 0.
 
 		for n=0, n < (self count-fitness-cases), n++: {
+
 			interpreter clear-stacks.
 
 			self setup-fitness-test for-fitness-case n 
 				with-interpreter interpreter.
 
 			if (interpreter run program p): {
-				push (self get-program-limit-penalty) + (self compute-error for-fitness-case n with-interpreter interpreter) onto errors.
+				errorValue = (self get-program-limit-penalty) + (self compute-error for-fitness-case n with-interpreter interpreter).
 			} else {
-				push (self compute-error for-fitness-case n with-interpreter interpreter) onto errors.
+				errorValue = (self compute-error for-fitness-case n with-interpreter interpreter).
 			}
+
+			if _useChallenges: {
+				errorValue *= ( 2.0 - _lastSolutionRates{ n } ).
+				# print errorValue.
+			}
+
+
+			push errorValue onto errors.
 
 			if _abortFitnessTest: {
 				n = (self count-fitness-cases).
 				return _abortFitnessValue.
 			}
+
+			if errors{ | errors | - 1 } == 0: {
+				_fitnessCaseSolutionRates{ n } += 1.0.
+			}
 		}
+
 
 		p set-errors to errors.
 
@@ -479,9 +507,16 @@ Object : PushGP {
 
 		bestFitness (float).
 		errors (list).
+		n (int).
 
-		totalSize /= populationSize.
-		totalErrors /= populationSize.
+		_totalSize /= populationSize.
+		_totalErrors /= populationSize.
+
+		for n = 0, n < | _fitnessCaseSolutionRates |, n++: {
+			_fitnessCaseSolutionRates{ n } /= populationSize.
+		}
+
+		_lastSolutionRates = copylist( _fitnessCaseSolutionRates ).
 
 		bestFitness = (bestIndividual get-fitness).
 		errors = (bestIndividual get-errors).
@@ -491,11 +526,12 @@ Object : PushGP {
 		print ";; Best Individual: ".
 		print (bestIndividual get-string).
 		print ";; Errors for best individual: ", errors.
+		print ";; Problem solution rates: ", _fitnessCaseSolutionRates.
 		print ";; Total errors for best individual: $bestFitness".
 		print ";; Size of best individual (points):", (bestIndividual get-size).
 		print ";;".
-		print ";; Average total errors in population: $totalErrors".
-		print ";; Average program size in population (points): $totalSize".
+		print ";; Average total errors in population: $_totalErrors".
+		print ";; Average program size in population (points): $_totalSize".
 		print "".
 
 		controller set-display-message with-number 2 at-x -0.9 at-y -0.9 to "Best Fitness: $bestFitness".
@@ -505,6 +541,10 @@ Object : PushGP {
 
 		n, method (int).                
 		p1, p2 (object).                
+
+		for n = 0, n < (self count-fitness-cases), n++: {
+			_fitnessCaseSolutionRates{ n } = 0.
+		}
 
 		while n < populationSize: { 
 			method = random[100]. 

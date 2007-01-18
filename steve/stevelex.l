@@ -179,7 +179,9 @@ path					{ return PATH; }
 [-]?[0-9]+			{ yylval.integer = atoi(yytext); return INT_VALUE; }
 \'.\'				{ yylval.number = yytext[1]; return INT_VALUE; }
 
-[-]?[0-9]*\.[0-9]+	{ yylval.number = atof(yytext); return FLOAT_VALUE; }
+[-]?[0-9]*\.[0-9]+	{ yylval.number = atof( yytext ); return FLOAT_VALUE; }
+
+[-]?[0-9]*\.[0-9]+e[0-9]+	{ yylval.number = atof( yytext ); return FLOAT_VALUE; }
 
 
 \"([^\"]|(\\\"))*\"	{ yylval.string = slStrdup(yytext); return STRING_VALUE; }

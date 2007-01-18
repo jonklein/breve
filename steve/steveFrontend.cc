@@ -5,6 +5,7 @@
 #include "java.h"
 
 #include "python.h"
+#include "lisp.h"
 
 #include "breveFunctionsSteveDataObject.h"
 #include "breveFunctionsSteveObject.h"
@@ -18,8 +19,12 @@ extern int lineno;
 stSteveData *currentData;
 
 void *brInitFrontendLanguages( brEngine *engine ) {
-#if HAVE_LIBPYTHON
+#ifdef HAVE_LIBPYTHON
         brPythonInit( engine );
+#endif
+
+#ifdef HAVE_LIBECL
+        brLispInit( engine );
 #endif
 
         return stSteveInit( engine );

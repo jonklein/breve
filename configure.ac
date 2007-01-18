@@ -158,21 +158,35 @@ AC_CHECK_LIB([python2.4], [Py_Initialize])
 AC_CHECK_LIB([python24], [Py_Initialize])
 
 if test "$ac_cv_lib_python2_3_Py_Initialize" = yes; then
-	AC_DEFINE( [HAVE_LIBPYTHON] )
+	AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
 fi
 
 if test "$ac_cv_lib_python23_Py_Initialize" = yes; then
-	AC_DEFINE( [HAVE_LIBPYTHON] )
+	AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
 fi
 
 if test "$ac_cv_lib_python2.4_Py_Initialize" = yes; then
-	AC_DEFINE( [HAVE_LIBPYTHON] )
+	AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
 fi
 
 if test "$ac_cv_lib_python24_Py_Initialize" = yes; then
-	AC_DEFINE( [HAVE_LIBPYTHON] )
+	AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
 fi
 
+
+
+if test "x$engine_only" = "x"; then
+	if test "$ECL_CONFIG" != ""; then
+		LDECL=`$ECL_CONFIG --libs`
+		LDFLAGS="$LDFLAGS $LDECL"
+		CPPECL=`$ECL_CONFIG --cflags`        
+		AC_CHECK_LIB([eclgc], [main])
+		AC_CHECK_LIB([sockets], [main])
+		AC_CHECK_LIB([cmp], [main])
+		AC_CHECK_LIB([eclgmp], [main])
+		AC_CHECK_LIB([ecl], [cl_boot])
+	fi    
+fi
 
 #
 # These required system libraries are assumed to require dynamic linking even 
@@ -302,6 +316,8 @@ if test "x$engine_only" = "x"; then
 
 	AC_CHECK_LIB([qgame++], [main])
 	AC_CHECK_LIB([ftgl], [main])
+
+	AC_CHECK_PROGS(ECL_CONFIG, [ecl-config], [], $PATH:/usr/local/bin:/usr/bin:/usr/local/ecl )
 fi
 
 if test "x$custom_cblas" = x; then
@@ -322,53 +338,6 @@ AC_MSG_CHECKING([for JVM library])
 _old_cppflags=${CPPFLAGS}
 _old_ldflags=${LDFLAGS}
 _old_libs=${LIBS}
-
-case ${host_os} in darwin*)
-CPPFLAGS="-I/System/Library/Frameworks/JavaVM.framework/Headers ${_old_cppflags}"
-LDFLAGS=${_old_ldflags}
-LIBS="${_old_libs} -framework JavaVM"
-AC_LINK_IFELSE([AC_LANG_CALL([],[JNI_CreateJavaVM])],[_have_jvm=yes])
-;; esac
-
-if test "x$_have_jvm" = x ; then
-CPPFLAGS="-I/usr/local/jdk-1.4.2/include -I/usr/local/jdk-1.4.2/include/\$(LPLATFORM) ${_old_cppflags}"
-LDFLAGS="${_old_ldflags} -L/usr/local/jdk-1.4.2/jre/lib/i386 -L/usr/local/jdk-1.4.2/jre/lib/i386/server"
-LIBS="${_old_libs} -ljvm -ljava"
-AC_LINK_IFELSE([AC_LANG_CALL([],[JNI_CreateJavaVM])],[_have_jvm=yes])
-fi
-
-case "${host_os}" in linux*)
-if test "x$_have_jvm" = x ; then
-CPPFLAGS="-I/usr/local/linux-sun-jdk1.4.2/include -I/usr/local/linux-sun-jdk1.4.2/include/linux ${_old_cppflags}"
-LDFLAGS="${_old_ldflags} -L/usr/local/linux-sun-jdk1.4.2/jre/lib/i386 -L/usr/local/linux-sun-jdk1.4.2/jre/lib/i386/server -Wl,-rpath-link -Wl,/usr/local/linux-sun-jdk1.4.2/jre/lib/i386:/compat/linux/lib:/compat/linux/usr/lib"
-LIBS="${_old_libs} -ljvm -lverify -ljava"
-AC_LINK_IFELSE([AC_LANG_CALL([],[JNI_CreateJavaVM])],[_have_jvm=yes])
-fi
-;; esac
-
-if test "x$_have_jvm" = x ; then
-CPPFLAGS=${_old_cppflags}
-LDFLAGS=${_old_ldflags}
-LIBS="-lgcj -liconv ${_old_libs}"
-AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <jni.h>],[void *p = JNI_CreateJavaVM; return 0;])],[_have_jvm=yes])
-fi
-
-if test "x$_have_jvm" = x ; then
-CPPFLAGS=${_old_cppflags}
-LDFLAGS=${_old_ldflags}
-LIBS="-lgcj ${_old_libs}"
-AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <jni.h>],[void *p = JNI_CreateJavaVM; return 0;])],[_have_jvm=yes])
-fi
-
-if test "x$_have_jvm" = x ; then
-AC_MSG_RESULT([no])
-CPPFLAGS=${_old_cppflags}
-LDFLAGS=${_old_ldflags}
-LIBS=${_old_libs}
-else
-AC_MSG_RESULT([yes])
-AC_DEFINE([HAVE_LIBJAVA],[1],[JVM library for JNI])
-fi
 
 #
 # For some reason CXXFLAGS is getting set to -O2 without my express

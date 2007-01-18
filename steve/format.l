@@ -5,7 +5,7 @@
 
 int tlevel = 0;
 char *result = NULL;
-unsigned int length = 0;
+unsigned int formatLength = 0;
 
 void slFormatAppend(char *, int);
 char *slFormatText(void);
@@ -61,8 +61,8 @@ char *slFormatText(char *text) {
 	slFormatParseLength = strlen(text);
 	slFormatParseLocation = 0;
 
-	length = 1024;
-	result = (char*)slMalloc(length);
+	formatLength = 1024;
+	result = (char*)slMalloc(formatLength);
 	result[0] = 0;
 	while(slFormatlex());
 
@@ -70,9 +70,9 @@ char *slFormatText(char *text) {
 }
 
 void slFormatAppend(char *text, int tlevel) {
-	if(strlen(text) + strlen(result) + 2 + tlevel > length) {
-		length *= 2;
-		result = (char*)slRealloc(result, length);
+	if(strlen(text) + strlen(result) + 2 + tlevel > formatLength) {
+		formatLength *= 2;
+		result = (char*)slRealloc(result, formatLength);
 	}
 
 	while(tlevel--) strcat(result, "\t");

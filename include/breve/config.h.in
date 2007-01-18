@@ -24,11 +24,26 @@
 /* Define to 1 if you have the `avutil' library (-lavutil). */
 #undef HAVE_LIBAVUTIL
 
+/* Define to 1 if you have the `cmp' library (-lcmp). */
+#undef HAVE_LIBCMP
+
+/* Define to 1 if you have the `ecl' library (-lecl). */
+#undef HAVE_LIBECL
+
+/* Define to 1 if you have the `eclgc' library (-leclgc). */
+#undef HAVE_LIBECLGC
+
+/* Define to 1 if you have the `eclgmp' library (-leclgmp). */
+#undef HAVE_LIBECLGMP
+
 /* Define to 1 if you have the `enet' library (-lenet). */
 #undef HAVE_LIBENET
 
 /* Define to 1 if you have the `expat' library (-lexpat). */
 #undef HAVE_LIBEXPAT
+
+/* Define to 1 if you have the `FLAC' library (-lFLAC). */
+#undef HAVE_LIBFLAC
 
 /* Define to 1 if you have the `ftgl' library (-lftgl). */
 #undef HAVE_LIBFTGL
@@ -78,11 +93,20 @@
 /* Define to 1 if you have the `push' library (-lpush). */
 #undef HAVE_LIBPUSH
 
-/* Define to 1 if you have the `python' library (-lpython). */
+/* Have the required Python libraries */
 #undef HAVE_LIBPYTHON
+
+/* Define to 1 if you have the `python23' library (-lpython23). */
+#undef HAVE_LIBPYTHON23
+
+/* Define to 1 if you have the `python24' library (-lpython24). */
+#undef HAVE_LIBPYTHON24
 
 /* Define to 1 if you have the `python2.3' library (-lpython2.3). */
 #undef HAVE_LIBPYTHON2_3
+
+/* Define to 1 if you have the `python2.4' library (-lpython2.4). */
+#undef HAVE_LIBPYTHON2_4
 
 /* Define to 1 if you have the `qgame++' library (-lqgame++). */
 #undef HAVE_LIBQGAME__
@@ -92,6 +116,9 @@
 
 /* Define to 1 if you have the `sndfile' library (-lsndfile). */
 #undef HAVE_LIBSNDFILE
+
+/* Define to 1 if you have the `sockets' library (-lsockets). */
+#undef HAVE_LIBSOCKETS
 
 /* Define to 1 if you have the `termcap' library (-ltermcap). */
 #undef HAVE_LIBTERMCAP
@@ -208,5 +235,5 @@
 #undef inline
 #endif
 
-/* Define to `unsigned int' if <sys/types.h> does not define. */
+/* Define to `unsigned' if <sys/types.h> does not define. */
 #undef size_t

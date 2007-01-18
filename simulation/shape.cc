@@ -48,7 +48,8 @@ void slShape::draw( slCamera *c, slPosition *pos, double textureScaleX, double t
 
 	glTranslatef( 0.5, 0.5, 0.0 );
 
-	glScalef( 1.0 / textureScaleX, 1.0 / textureScaleY, 1.0 );
+	if( textureScaleX > 0.0 && textureScaleY > 0.0 )
+		glScalef( 1.0 / textureScaleX, 1.0 / textureScaleY, 1.0 );
 
 	glPopAttrib();
 

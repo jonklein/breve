@@ -62,6 +62,8 @@ PushGP : RegressionGP {
 
 		currentInput = n.
 
+		print "input".
+
 		interpreter push-float value n.
 
 	+ to compute-error for-fitness-case n (int) 
