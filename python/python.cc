@@ -43,7 +43,7 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 		return EC_OK;
 	}
 
-	if( PyObject_GetAttrString( inObject, "isVector" ) != Py_None ) {
+	if( 0 && PyObject_GetAttrString( inObject, "isVector" ) != Py_None ) {
 		slVector v = { 0.0, 0.0, 0.0 };
 
 		PyObject *x = PyObject_GetAttrString( inObject, "x" );

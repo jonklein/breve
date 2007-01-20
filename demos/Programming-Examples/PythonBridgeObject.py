@@ -7,3 +7,8 @@ class PythonBridgeObject( breve.object ):
 
 	def iterate( self ):
 		print "Iterating Python bridge object"
+
+	def square_number( self, number ):
+		"A simple example of a function callable from steve"
+
+		return number * number

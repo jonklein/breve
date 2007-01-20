@@ -5,6 +5,12 @@
 Controller myController.
 
 Control : myController {
+	+ variables:
+		myPythonObject (object).
+
 	+ to init:
-		new PythonBridgeObject.
+		myPythonObject = new PythonBridgeObject.
+
+		print ( myPythonObject square_number number 10 ).
+		print myPythonObject.
 }

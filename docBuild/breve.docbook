@@ -9,7 +9,7 @@
       breve Simulation Envionment</ulink>.
     </para><mediaobject><imageobject><imagedata align="center" fileref="images/breve_icon.jpg"/></imageobject></mediaobject><para>
       You can also <ulink url="http://www.spiderland.org/download/breve_docs.tar.gz">download</ulink> the
-      breve 2.5 documentation in HTML format [808K tar/gz file].
+      breve 2.5.1 documentation in HTML format [808K tar/gz file].
     </para><para>
       To report bugs in breve, you can either <ulink url="mailto:jk%20[at]%20spiderland.org">email the author</ulink>, or post your
       bug in the <ulink url="http://www.spiderland.org/forums">bugs section of the
@@ -90,13 +90,18 @@
       </para>
 </chapter>
 <chapter id="node-2606"><?dbhtml dir="docs" ?>
-<title>What's New in Version 2.5</title>
+<title>What's New in Version 2.5.1</title>
 <para>
-        breve version 2.5 introduces several new features and changes.
+        breve version 2.5.1 introduces several new features and changes.
       </para>
 <section id="node-2607">
-<title>New Features in Version 2.5</title>
+<title>New Features in Version 2.5.1</title>
 <para>
+        breve 2.5.1 is a bug-fix release that introduces one major new feature
+        (currently experimental):
+      </para><itemizedlist><listitem><para>
+              Experimental new <xref linkend="node-3246"/> allows Python code to be called from breve simulations
+            </para></listitem></itemizedlist><para>
         Below are some of the major new features found in breve 2.5 . For a
         full list of new features, see the "Changes" file that is included with
         the breve distribution.
@@ -4489,6 +4494,91 @@ brLoadSimulation( engine, simulationText, simulationFilename );
             </para><programlisting>
 brEngineIterate( engine );
 </programlisting></listitem></itemizedlist>
+</section>
+</chapter>
+<chapter id="node-3246"><?dbhtml dir="docs" ?>
+<title>The Python Bridge</title>
+<para>
+      Starting in version 2.5.1, breve supports an experimental bridge to the
+      Python language. This means that your simulation can execute Python code
+      to preform computation. Communication between the languages is done by
+      creating objects in the other language: Python objects can be created
+      from steve code, and vice versa.
+    </para><para>
+      This feature is in-development and is subject to minor changes.
+    </para>
+<section id="node-3247">
+<title>Writing Python Code for Inclusion in breve</title>
+<para>
+      All Python files to be loaded into breve should import the breve module
+      to gain access to important breve engine functionality. In order for a
+      Python object to be compatible with the breve engine, it must be a
+      subclass of the breve Python module class breve.object. If an object is
+      not a subclass of breve.object, it will not be visible to the breve
+      engine. The <literal>__init__</literal> method of the class must execute the
+      <literal>breve.object.__init__</literal> method before any breve bridge
+      functionality is used.
+    </para><para>
+      The following example illustrates a basic Python file with a simple
+      breve-compatible class defined:
+    </para><programlisting>
+@import breve
+
+
+class PythonBridgeObject( breve.object ):
+        def __init__( self ):
+                breve.object.__init__( self )
+                print "Inited Python bridge object"
+
+
+        def iterate( self ):
+                print "Iterating Python bridge object"</programlisting><para>
+      This simple Python object will be visible to the breve engine and will
+      have its iterate method called at each iteration of the breve engine.
+    </para>
+</section>
+<section id="node-3248">
+<title>Importing and Executing Python Code From Steve</title>
+<para>
+      To include a Python file from a steve simulation file, simply use an
+      <literal>"@include"</literal> statement with the name of the Python file, just
+      as steve files are included.
+    </para><para>
+      To use a Python class from a steve file, simply create a new instance of
+      the class exactly as you would with a steve object. Likewise, methods can
+      be called in the new object exactly as usual. Because of differences
+      between the two languages, there are a few minor differences in calling
+      objects over the bridge:
+    </para><itemizedlist><listitem><para>Keywords are ignored for arugment passing. Instead, arguments are
+      expected in the order they are defined for a method. When calling Python
+      methods from steve, you can use made-up keyword names (to preserve the
+      normal steve syntax), but be sure to match the argument order of the
+      python method.
+      </para></listitem><listitem><para>steve uses the "-" (dash) character in many method names, but Python
+      does not allow this character in method names. If calling a steve method
+      from Python, use the "_" (underscore) character in place of "-". The
+      character will be automatically converted.
+      </para></listitem></itemizedlist>
+</section>
+<section id="node-3249">
+<title>Additional Notes</title>
+<para>
+      Foreign language objects appear to behave exactly as native objects,
+      meaning that methods are called in native syntax. For typical usage, this
+      is the only thing that matters.
+    </para><para>
+      The foreign language objects are not, however, truely native. The objects
+      are actually "bridge objects", which forward method calls to the native
+      object. Practically speaking, this means a couple of things:
+    </para><itemizedlist><listitem><para>Bridge objects always appear to be of the same type, no matter what
+      type they actually represent in their native language.
+      </para></listitem><listitem><para>Functions which inspect internal object state will be inspecting the
+      bridge object, not the object that the bridge represents.
+      </para></listitem></itemizedlist><para>
+      These details are subtle and do not effect most typical object usage.
+      Just remember that bridge objects are "shells" for other objects, and not
+      the actual objects they appear to be.
+    </para>
 </section>
 </chapter>
 <chapter id="node-2759"><?dbhtml dir="docs" ?>
