@@ -22,7 +22,7 @@
 
 #ifdef HAVE_LIBPYTHON
 
-#include <python2.3/Python.h>
+#include "python.h"
 
 int brPythonLoadFile( brEval arguments[], brEval *result, brInstance *instance ) {
 	char *file = brFindFile( instance->engine, BRSTRING( &arguments[ 0 ] ), NULL );

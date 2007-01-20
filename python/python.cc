@@ -22,9 +22,8 @@
 
 #ifdef HAVE_LIBPYTHON
 
-#include <signal.h>
-#include <python2.3/Python.h>
 #include "python.h"
+
 
 /**
  * Translation function from a Python object to a breve value.

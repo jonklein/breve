@@ -165,7 +165,7 @@ if test "$ac_cv_lib_python23_Py_Initialize" = yes; then
 	AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
 fi
 
-if test "$ac_cv_lib_python2.4_Py_Initialize" = yes; then
+if test "$ac_cv_lib_python2_4_Py_Initialize" = yes; then
 	AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
 fi
 

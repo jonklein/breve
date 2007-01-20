@@ -43,7 +43,7 @@ include neural/Makefile
 include neural/Network/Makefile
 include steve/Makefile
 include python/Makefile
-include lisp/Makefile
+# include lisp/Makefile
 include util/Makefile
 include WinSaver/Makefile
 
@@ -177,6 +177,15 @@ CLI_release: clean
 	mkdir $(CLI_FOLDER)/lib
 	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin
 	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin
+
+ifeq ($(PLATFORM),linux-gnu)
+	mv $(CLI_FOLDER)/bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin/breve_ex@EXE_SUFFIX@
+	mv $(CLI_FOLDER)/bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin/breve_cli_ex@EXE_SUFFIX@
+	cp bin/breve.sh $(CLI_FOLDER)/bin/breve@EXE_SUFFIX@
+	cp bin/breve_cli.sh $(CLI_FOLDER)/bin/breve_cli@EXE_SUFFIX@
+	cp bin/libpython2.4.so.1.0 $(CLI_FOLDER)/bin
+endif
+
 	-cp bin/osmesaloader.o $(CLI_FOLDER)/bin
 	cp -R docs $(CLI_FOLDER)
 	cp -R lib $(CLI_FOLDER)
@@ -207,6 +216,13 @@ WX_release: clean
 	mkdir $(IDE_FOLDER)
 	mkdir $(IDE_FOLDER)/lib
 	cp wx/breveIDE@EXE_SUFFIX@ $(IDE_FOLDER)
+
+ifeq ($(PLATFORM),Linux)
+	mv wx/breveIDE@EXE_SUFFIX@ wx/breveIDE_ex@EXE_SUFFIX@
+	cp bin/breveIDE.sh wx/breveIDE@EXE_SUFFIX@
+	cp bin/libpython2.4.so.1.0 wx
+endif
+
 	-mkdir docs
 	cp -R docs $(IDE_FOLDER)
 	cp -R lib/classes $(IDE_FOLDER)/lib

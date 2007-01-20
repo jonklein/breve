@@ -89,5 +89,7 @@ PushGP : RegressionGP {
 		# This input instruction just puts the current input value on
 		# top of the float stack.
 
+		print "calling input".
+
 		(self get-interpreter) push-float value currentInput.
 }
