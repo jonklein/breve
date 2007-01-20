@@ -43,7 +43,21 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 		return EC_OK;
 	}
 
-	if ( PyInt_Check( inObject ) ) {
+	if( PyObject_GetAttrString( inObject, "isVector" ) != Py_None ) {
+		slVector v = { 0.0, 0.0, 0.0 };
+
+		PyObject *x = PyObject_GetAttrString( inObject, "x" );
+		PyObject *y = PyObject_GetAttrString( inObject, "y" );
+		PyObject *z = PyObject_GetAttrString( inObject, "z" );
+
+		if( x ) v.x = PyFloat_AS_DOUBLE( x );
+		if( y ) v.y = PyFloat_AS_DOUBLE( y );
+		if( z ) v.z = PyFloat_AS_DOUBLE( z );
+
+		outEval->set( v );
+		result = EC_OK;
+
+	} else if ( PyInt_Check( inObject ) ) {
 
 		outEval->set( PyInt_AS_LONG( inObject ) );
 		result = EC_OK;
@@ -79,7 +93,7 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 
 		outEval->set( list );
 		result = EC_OK;
-	}
+	} 
 
 	return result;
 }
@@ -120,13 +134,15 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inBridgeO
 
 			// Is this a native type, or should we make a bridge of it?
 
-			if( breveInstance->object->type->_typeSignature == PYTHON_TYPE_SIGNATURE ) {
+			if( breveInstance && breveInstance->object->type->_typeSignature == PYTHON_TYPE_SIGNATURE ) {
 				result = (PyObject*)breveInstance->userData;
-			} else {
+			} else if( breveInstance ) {
 				// Create a bridge object, and set the breveInstance field
 
 				result = PyObject_Call( inBridgeObject, PyTuple_New( 0 ), NULL );
 				PyObject_SetAttrString( result, "breveInstance", PyCObject_FromVoidPtr( breveInstance, NULL ) );
+			} else {
+				result = Py_None;
 			}
 
 			break;
@@ -210,9 +226,30 @@ PyObject *brPythonCatchOutput( PyObject *inSelf, PyObject *inArgs ) {
 	PyObject *moduleObject;
 	char *message;
 
-	if ( !PyArg_ParseTuple( inArgs, "Os", &moduleObject, &message ) ) return NULL;
+	if( !PyArg_ParseTuple( inArgs, "Os", &moduleObject, &message ) ) return NULL;
 
 	slFormattedMessage( DEBUG_ALL, message );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+/**
+ * Callback to set the controller object
+ */
+
+PyObject *brPythonSetController( PyObject *inSelf, PyObject *inArgs ) {
+	PyObject *moduleObject, *pythonInstance;
+
+	if ( !PyArg_ParseTuple( inArgs, "OO", &moduleObject, &pythonInstance) ) return NULL;
+
+	PyObject *engineObject = PyObject_GetAttrString( moduleObject, "breveEngine" );
+	PyObject *instanceObject = PyObject_GetAttrString( pythonInstance, "breveInstance" );
+
+	brEngine *engine = (brEngine*)PyCObject_AsVoidPtr( engineObject );
+	brInstance *instance = (brInstance*)PyCObject_AsVoidPtr( instanceObject );
+
+        brEngineSetController( engine, instance );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -225,7 +262,6 @@ PyObject *brPythonCatchOutput( PyObject *inSelf, PyObject *inArgs ) {
 PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 	PyObject *object, *moduleObject, *typeObject, *result;
 	brObject *breveObject;
-
 
 	if ( !PyArg_ParseTuple( inArgs, "OOO", &moduleObject, &typeObject, &object ) ) return NULL;
 
@@ -274,6 +310,10 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 
 	brInstance *i = brEngineAddInstance( engine, breveObject, object );
 
+	// Now the engine has a copy of object -- increment the reference count!
+	
+	Py_INCREF( object );
+
 	if( i ) 
 		result = PyCObject_FromVoidPtr( i, NULL );
 	else
@@ -284,7 +324,6 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 	PyObject_SetAttrString( object, "breveInstance", result );
 
 	Py_INCREF( result );
-
 	return result;
 }
 
@@ -388,7 +427,7 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 
 		if( args[ n ].type() != function->_argTypes[ n ] ) {
 			char err[ 1024 ];
-			snprintf( err, 1023, "invalid type for argument %d of internal function \"%s\"", n, function->_name.c_str() );
+			snprintf( err, 1023, "invalid type for argument %d of internal function \"%s\" (got \"%s\", expected \"%s\")", n, function->_name.c_str(), brAtomicTypeStrings[ args[ n ].type() ], brAtomicTypeStrings[ function->_argTypes[ n ] ] );
 
 			PyErr_SetString( PyExc_RuntimeError, err );
 			return NULL;
@@ -625,6 +664,7 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 	PyObject *module = PyObject_GetAttrString( instance, "breveModule" );
 
 	if( !module ) {
+		slMessage( DEBUG_ALL, "Could not locate breveModule for %p\n", instance );
 		PyErr_Print();
 		return EC_ERROR;
 	}
@@ -728,6 +768,7 @@ void brPythonInit( brEngine *breveEngine ) {
 	brObjectType *brevePythonType = new brObjectType();
 
 	static PyMethodDef methods[] = {
+		{ "setController", 		brPythonSetController, 	METH_VARARGS, "" }, 
 		{ "findInternalFunction", 	brPythonFindInternalFunction, 	METH_VARARGS, "" }, 
 		{ "callInternalFunction", 	brPythonCallInternalFunction, 	METH_VARARGS, "" },
 		{ "addInstance", 			brPythonAddInstance, 			METH_VARARGS, "" },

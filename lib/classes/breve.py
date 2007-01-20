@@ -1,7 +1,12 @@
-import __main__
+
 import breveInternal
 import breve
 import sys
+import os
+
+#
+# Used internally to redirect Python output to the breve frontend
+#
 
 class breveStderrHandler:
     def write( self, line ):
@@ -16,24 +21,48 @@ sys.stdout = breveStdoutHandler()
 
 
 
-import os
+#
+# Sets the breve controller class
+#
+
+def setController( controller ):
+	controller()
+
+
 
 class breveInternalFunctions:
+	def __init__( self ):
+		self.functionCache = {}
+
 	def __getattr__( self, method ):
+		# if self.functionCache.has_key( method ):
+		#	return self.functionCache[ method ]
+
 		internalFunction = breveInternal.findInternalFunction( breveInternal.breveEngine, method )
 
 		if internalFunction:
 			def execute( object, *tuple ):
 				return breveInternal.callInternalFunction( breveInternal, object, internalFunction, tuple )
 
+			# self.functionCache[ method ] = execute
+
 			return execute
 
 
 class vector:
-	def __init__( self ):
-		self.x = 0
-		self.y = 0
-		self.z = 0
+	def __init__( self, x = 0.0, y = 0.0, z = 0.0 ):
+		self.x = x
+		self.y = y
+		self.z = z
+		self.isVector = 1
+
+	def __sub__( self, other ):
+		self.x -= other.x
+		self.y -= other.y
+		self.z -= other.z
+		return self
+
+	__subb__ = __sub__
 
 	def __add__( self, other ):
 		self.x += other.x
@@ -73,15 +102,51 @@ class object:
 	"The root breve object"
 
 	def __init__( self ):
-		self.breveInstance = breveInternal.addInstance( breveInternal, self.__class__, self )
+		if not ( 'breveInstance' in self.__dict__ ):
+			self.breveInstance = breveInternal.addInstance( breveInternal, self.__class__, self )
+
 		self.controller = breveInternalFunctionFinder.getController( self )
 		self.breveModule = breveInternal
+
+		if self.controller == None:
+			print "No controller has been defined!"
+			raise ValueError
 
 class control( object ):
 	"A class for implementing the breve controller object"
 
 	def __init__( self ):
+		self.breveInstance = breveInternal.addInstance( breveInternal, self.__class__, self )
+
+		breveInternal.setController( breveInternal, self )
+
 		object.__init__( self )
+
+		self.setBackgroundColor( vector( .5, .7, 1.0 ) )
+
+	def iterate( self ):
+		breveInternalFunctionFinder.worldStep( self, 0.1, 0.1 )
+
+	def getRealTime( self ):
+		"Returns the number of seconds since January 1st, 1970 with microsecond precision."
+
+		return breveInternalFunctionFinder.getRealTime( self )
+
+	def getTime( self ):
+		"Returns the simulation time of the world."
+
+		return breveInternalFunctionFinder.getTime( self )
+
+	def endSimulation( self ):
+		"Ends the current simulation"
+
+		return breveInternalFunctionFinder.endSimulation( self )
+
+	def setBackgroundColor( self, vector ):
+		"Sets the background color of the simulation"
+
+		return breveInternalFunctionFinder.setBackgroundColor( self, vector )
+
 
 
 class real( object ):
@@ -124,3 +189,4 @@ class sphere( shape ):
 
 breveInternalFunctionFinder = breveInternalFunctions()
 breveInternal.bridgeObject = bridgeObject
+breveInternal.vectorType = vector

@@ -10,6 +10,10 @@ class PythonTestObject( breve.real ):
 
 		self.movie.record( "sim.mpg" )
 
+		x = breve.vector( 1, 2, 3 ) 
+
+		print x + x
+
 	def argumentTest( self, i, f, l ):
 		print "int %d" % i
 		print "float %f" % f

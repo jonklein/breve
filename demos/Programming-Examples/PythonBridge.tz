@@ -1,0 +1,10 @@
+
+@include "Control.tz"
+@include "PythonBridgeObject.py"
+
+Controller myController.
+
+Control : myController {
+	+ to init:
+		new PythonBridgeObject.
+}

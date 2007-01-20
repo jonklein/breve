@@ -1,6 +1,19 @@
 #include "kernel.h"
 
 int brLoadSimulation( brEngine *engine, const char *code, const char *file ) {
+	int result = EC_OK;
+
+	result = brLoadFile( engine, code, file );
+
+	if( result == EC_OK && !engine->controller ) {
+		slMessage( DEBUG_ALL, "No controller object has been loaded for file \"%s\"\n", file );
+		return EC_ERROR;
+	}
+
+	return result;
+}
+
+int brLoadFile( brEngine *engine, const char *code, const char *file ) {
 	char *extension = slFileExtension( file );
 
 	for( unsigned int n = 0; n < engine->objectTypes.size(); n++ ) {
@@ -11,11 +24,6 @@ int brLoadSimulation( brEngine *engine, const char *code, const char *file ) {
 
 			if( r != EC_OK ) 
 				return EC_ERROR;
-
-			if( !engine->controller ) {
-				slMessage( DEBUG_ALL, "No controller object has been loaded for file \"%s\"", file );
-				return EC_ERROR;
-			}
 
 			return EC_OK;
 		}		

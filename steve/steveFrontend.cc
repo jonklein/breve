@@ -5,7 +5,7 @@
 #include "java.h"
 
 #include "python.h"
-#include "lisp.h"
+// #include "lisp.h"
 
 #include "breveFunctionsSteveDataObject.h"
 #include "breveFunctionsSteveObject.h"
@@ -129,37 +129,42 @@ int stCallbackCanLoad( void *inObjectTypeUserData, const char *inFileExtension )
 int stCallbackLoad( brEngine *engine, void *inDataPtr, const char *file, const char *code ) {
 	brObject *controllerClass;
 	stSteveData *inData = (stSteveData*)inDataPtr;
-	int r;
+	int r = EC_OK;
 
 	if ( stLoadFiles( inData, engine, code, file ) != EC_OK ) return EC_ERROR;
 
-	controllerClass = brObjectFind( engine, inData->controllerName );
+	if( inData->controllerName ) {
+		controllerClass = brObjectFind( engine, inData->controllerName );
 
-	if ( !controllerClass ) {
-		stParseError( engine, EE_UNKNOWN_CONTROLLER, "Unknown \"Controller\" object" );
-		return EC_ERROR;
+		if ( !controllerClass ) {
+			stParseError( engine, EE_UNKNOWN_CONTROLLER, "Unknown \"Controller\" object" );
+			return EC_ERROR;
+		}
+
+		/*
+		brInstance *controller = brObjectInstantiate( engine, controllerClass, NULL, NULL );
+
+		if( !controller )
+			return EC_ERROR;
+
+		brEngineSetController( engine, controller );
+		*/
+
+		stInstance *controller;
+		controller = stInstanceNew(( stObject* )controllerClass->userData );
+
+		controller->breveInstance = brEngineAddInstance( engine, controllerClass, controller );
+
+		brEngineSetController( engine, controller->breveInstance );
+
+		r = stInstanceInit( controller );
+
+		if ( r != EC_OK ) 
+			return EC_ERROR;
+
+		inData->singleStatementMethod = new stMethod( "internal-user-input-method", NULL, "<user-input>", 0 );
+		stStoreInstanceMethod( (stObject*)controllerClass->userData, "internal-user-input-method", inData->singleStatementMethod );
 	}
-
-	/*
-	brInstance *controller = brObjectInstantiate( engine, controllerClass, NULL, NULL );
-
-	if( !controller )
-		return EC_ERROR;
-
-	brEngineSetController( engine, controller );
-	*/
-
-	stInstance *controller;
-	controller = stInstanceNew(( stObject* )controllerClass->userData );
-
-	controller->breveInstance = brEngineAddInstance( engine, controllerClass, controller );
-
-	brEngineSetController( engine, controller->breveInstance );
-
-	r = stInstanceInit( controller );
-
-	if ( r != EC_OK ) 
-		return EC_ERROR;
 
 	return r;
 }
@@ -295,21 +300,20 @@ int stLoadFiles( stSteveData *sdata, brEngine *engine, const char *code, const c
 
 	yyfile = file;
 
-	if ( !sdata->controllerName ) {
-		stParseError( engine, PE_NO_CONTROLLER, "No \"Controller\" object has been defined" );
-		return EC_ERROR;
+	if( sdata->controllerName ) {
+		if ( !sdata->controllerName ) {
+			stParseError( engine, PE_NO_CONTROLLER, "No \"Controller\" object has been defined" );
+			return EC_ERROR;
+		}
+
+		controller = brObjectFind( engine, sdata->controllerName );
+
+		if ( !controller ) {
+			stParseError( engine, EE_UNKNOWN_CONTROLLER, "Unknown \"Controller\" object" );
+			return EC_ERROR;
+		}
+
 	}
-
-	controller = brObjectFind( engine, sdata->controllerName );
-
-	if ( !controller ) {
-		stParseError( engine, EE_UNKNOWN_CONTROLLER, "Unknown \"Controller\" object" );
-		return EC_ERROR;
-	}
-
-	sdata->singleStatementMethod = new stMethod( "internal-user-input-method", NULL, "<user-input>", 0 );
-
-	stStoreInstanceMethod(( stObject* )controller->userData, "internal-user-input-method", sdata->singleStatementMethod );
 
 	return EC_OK;
 }
@@ -442,14 +446,14 @@ int stParseBuffer( stSteveData *s, brEngine *engine, const char *buffer, const c
 }
 
 /**
-	\brief Preprocess a steve document.
-
-	Called automatically by stParseBuffer -- not to be called manually.
-
-	Parse out all of the "@include", or "@path" lines.  by convention
-	all '@' lines are preprocessor directives, but currently there
-	aren't so many.
-*/
+ * \brief Preprocess a steve document.
+ *
+ * Called automatically by stParseBuffer -- not to be called manually.
+ * 
+ * Parse out all of the "@include", or "@path" lines.  by convention
+ * all '@' lines are preprocessor directives, but currently there
+ *aren't so many.
+ */
 
 int stPreprocess( stSteveData *s, brEngine *engine, const char *line ) {
 	const char *start, *end;
@@ -512,7 +516,9 @@ int stPreprocess( stSteveData *s, brEngine *engine, const char *line ) {
 			}
 
 			if ( include || use ) {
-				if ( stParseFile( s, engine, filename ) ) {
+				char *filetext = slUtilReadFile( brFindFile( engine, filename, NULL ) );
+
+				if( brLoadFile( engine, filetext, filename ) != EC_OK ) {
 					yyfile = oldYyfile;
 					lineno = oldLineno;
 					stParseError( engine, EE_FILE_NOT_FOUND, "Error including file \"%s\"", filename );
