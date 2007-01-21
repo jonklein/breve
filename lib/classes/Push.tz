@@ -400,7 +400,7 @@ Object : PushProgram (aka PushPrograms) {
 		self set-code-pointer to pushCodeRandom((interpreter get-interpreter-pointer), size).
 
   + section "Copying and evolving Push programs"
-	- to mutate with-interpreter interpreter (object) with-leaf-bias leafBias = 0.5 (float) with-size-scale sizeScale = 0.3 (float) with-max-new-code-size treeSize (int):
+	- to mutate with-interpreter interpreter (object) with-max-new-code-size treeSize (int):
 		% Deprecated.
 
 		self mutate with-interpreter interpreter with-leaf-bias .5 with-size-scale .3.
