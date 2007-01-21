@@ -42,7 +42,7 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 		return EC_OK;
 	}
 
-	if( 0 && PyObject_GetAttrString( inObject, "isVector" ) != Py_None ) {
+	if( PyObject_HasAttrString( inObject, "isVector" ) ) {
 		slVector v = { 0.0, 0.0, 0.0 };
 
 		PyObject *x = PyObject_GetAttrString( inObject, "x" );
@@ -101,11 +101,11 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
  * Translation function from a breve value to a Python object.
  * 
  * @param inEval		The breve value to be translated.
- * @param inBridgeObject
+ * @param inModuleObject	The Python breveInternal module object
  * @return			A newly created Python object translated from the source value.
  */
 
-inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inBridgeObject ) {
+inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleObject ) {
 	PyObject *result = Py_None;
 	brInstance *breveInstance;
 
@@ -138,7 +138,9 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inBridgeO
 			} else if( breveInstance ) {
 				// Create a bridge object, and set the breveInstance field
 
-				result = PyObject_Call( inBridgeObject, PyTuple_New( 0 ), NULL );
+				PyObject *bridgeObject = PyObject_GetAttrString( inModuleObject, "bridgeObject" );
+
+				result = PyObject_Call( bridgeObject, PyTuple_New( 0 ), NULL );
 				PyObject_SetAttrString( result, "breveInstance", PyCObject_FromVoidPtr( breveInstance, NULL ) );
 			} else {
 				result = Py_None;
@@ -151,10 +153,18 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inBridgeO
 			break;
 
 		case AT_VECTOR:
-			result = PyTuple_New( 3 );
-			PyTuple_SetItem( result, 0, PyFloat_FromDouble( BRVECTOR( inEval ).x ) );
-			PyTuple_SetItem( result, 1, PyFloat_FromDouble( BRVECTOR( inEval ).y ) );
-			PyTuple_SetItem( result, 2, PyFloat_FromDouble( BRVECTOR( inEval ).z ) );
+			{
+				PyObject *vectorObject = PyObject_GetAttrString( inModuleObject, "vectorType" );
+
+				if( vectorObject ) {
+					result = PyObject_Call( vectorObject, PyTuple_New( 0 ), NULL );
+
+					PyObject_SetAttrString( result, "x", PyFloat_FromDouble( BRVECTOR( inEval ).x ) );
+					PyObject_SetAttrString( result, "y", PyFloat_FromDouble( BRVECTOR( inEval ).y ) );
+					PyObject_SetAttrString( result, "z", PyFloat_FromDouble( BRVECTOR( inEval ).z ) );
+				}
+			}
+
 			break;
 
 		case AT_MATRIX:
@@ -191,7 +201,7 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inBridgeO
 				result = PyList_New( list->_vector.size() );
 
 				for( unsigned int n = 0; n < list->_vector.size(); n++ ) {
-					PyObject *element = brPythonTypeFromEval( &list->_vector[ n ], inBridgeObject );
+					PyObject *element = brPythonTypeFromEval( &list->_vector[ n ], inModuleObject );
 					PyList_SET_ITEM( result, n, element );
 				}
 			}
@@ -435,7 +445,7 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 
 	function->_call( args, &resultEval, caller );
 
-	PyObject *result = brPythonTypeFromEval( &resultEval, PyObject_GetAttrString( moduleObject, "bridgeObject" ) );
+	PyObject *result = brPythonTypeFromEval( &resultEval, moduleObject );
 
 	return result;
 }
@@ -520,7 +530,7 @@ PyObject *brPythonCallBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 
 	brMethodCall( breveInstance, breveMethod, args, &resultEval );
 	
-	PyObject *result = brPythonTypeFromEval( &resultEval, PyObject_GetAttrString( module, "bridgeObject" ) );
+	PyObject *result = brPythonTypeFromEval( &resultEval, module );
 
 	for( int n = 0; n < PyTuple_GET_SIZE( arguments ); n++ ) {
 		delete args[ n ];
@@ -669,14 +679,6 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 	}
 
 
-	PyObject *internal = PyObject_GetAttrString( module, "bridgeObject" );
-
-	if( !internal ) {
-		PyErr_Print();
-		return EC_ERROR;
-	}
-
-
 	// Set the self argument
 
 	Py_INCREF( instance );
@@ -685,7 +687,7 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 	// Set the rest of the arguments
 
 	for( int n = 0; n < count; n++ ) {
-		PyObject *argument = brPythonTypeFromEval( inArguments[ n ], internal );
+		PyObject *argument = brPythonTypeFromEval( inArguments[ n ], module );
 		Py_INCREF( argument );
 		PyTuple_SetItem( tuple, n + 1, argument );
 	}

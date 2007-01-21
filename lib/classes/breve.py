@@ -50,28 +50,43 @@ class breveInternalFunctions:
 
 
 class vector:
+	__slots__ = ( 'x', 'y', 'z' )
+
 	def __init__( self, x = 0.0, y = 0.0, z = 0.0 ):
 		self.x = x
 		self.y = y
 		self.z = z
 		self.isVector = 1
 
-	def __sub__( self, other ):
-		self.x -= other.x
-		self.y -= other.y
-		self.z -= other.z
-		return self
+	def __str__( self ):
+		return '(%f, %f, %f)' % ( self.x, self.y, self.z )
 
-	__subb__ = __sub__
+	def __eq__( self, o ):
+		return self.x == o.x and self.y == o.y and self.z == o.z
+
+	def __cmp__( self, o ):
+		return self.__eq__( o )
+
+	def __sub__( self, other ):
+		return vector( self.x - other.x, self.y - other.y, self.z - other.z )
+
+	__rsub__ = __sub__
 
 	def __add__( self, other ):
-		self.x += other.x
-		self.y += other.y
-		self.z += other.z
-		return self
+		return vector( self.x + other.x, self.y + other.y, self.z + other.z )
 
 	__radd__ = __add__
 
+	def __div__( self, other ):
+		return vector( self.x / other, self.y / other, self.z / other )
+
+	def __mul__( self, other ):
+		return vector( self.x * other, self.y * other, self.z * other )
+	
+	__rmul__ = __mul__
+
+	def __neg__( self, other ):
+		return vector( -self.x, -self.y, -self.z )
 
 
 class bridgeObjectMethod:
