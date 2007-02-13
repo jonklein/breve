@@ -12,7 +12,7 @@ Drawing : TurtleDrawing {
 	% implementations.
 
 	+ variables:
-		currentDirection, currentPoint, currentColor (vector).
+		currentDirection, currentColor (vector).
 		turtle (object).
 		penDown (int).
 		states (list).
@@ -44,12 +44,14 @@ Drawing : TurtleDrawing {
 	+ section "Moving the Turtle"
 
 	+ to push-state:
-		% "Pushes" the 
+		% "Pushes" the current direction, color and point onto a stack so that it can
+		% be retrieved later using METHOD(pop-state).  
+
 		push { currentPoint, currentDirection, currentColor, 0, penDown } onto states.
 
 	+ to pop-state:
 		% "Pops" a state from the state stack and makes it current.  This method
-		% reenables the most recen
+		% reenables the most recently "pushed" state (done with METHOD(push-state)).
 
 		state (list).
 

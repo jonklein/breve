@@ -355,6 +355,12 @@ Object : PushGP {
 		currentIndividual++.
 
 		if currentIndividual == populationSize: {
+			for n = 0, n < | _fitnessCaseSolutionRates |, n++: {
+				_fitnessCaseSolutionRates{ n } /= populationSize.
+			}
+
+			_lastSolutionRates = copylist( _fitnessCaseSolutionRates ).
+
 			self report with-best _bestOfGen.
 			self reproduce.
 			self swap-current.
@@ -511,12 +517,6 @@ Object : PushGP {
 
 		_totalSize /= populationSize.
 		_totalErrors /= populationSize.
-
-		for n = 0, n < | _fitnessCaseSolutionRates |, n++: {
-			_fitnessCaseSolutionRates{ n } /= populationSize.
-		}
-
-		_lastSolutionRates = copylist( _fitnessCaseSolutionRates ).
 
 		bestFitness = (bestIndividual get-fitness).
 		errors = (bestIndividual get-errors).

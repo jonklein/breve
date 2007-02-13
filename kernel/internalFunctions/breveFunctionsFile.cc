@@ -161,6 +161,7 @@ int brIReadFileAsString( brEval args[], brEval *target, brInstance *i ) {
 	char *text = new char[ p->st.st_size + 1 ];
 
 	slUtilFread( text, 1, p->st.st_size, p->file );
+	text[ p->st.st_size ] = 0;
 
 	target->set( text );
 
