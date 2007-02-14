@@ -43,7 +43,7 @@ include neural/Makefile
 include neural/Network/Makefile
 include steve/Makefile
 include python/Makefile
-# include lisp/Makefile
+include lisp/Makefile
 include util/Makefile
 include WinSaver/Makefile
 
