@@ -24,6 +24,8 @@
 #include "camera.h"
 #include "movie.h"
 
+#include <libgen.h>
+
 #ifndef WINDOWS
 #include <dlfcn.h>
 #endif
@@ -348,6 +350,7 @@ brInstance *brEngineGetController( brEngine *e ) {
 	return e->controller;
 }
 
+/*
 slStack *brEngineGetAllInstances( brEngine *e ) {
 	std::vector<brInstance*>::iterator ii;
 	slStack *s = slStackNew();
@@ -358,6 +361,7 @@ slStack *brEngineGetAllInstances( brEngine *e ) {
 
 	return s;
 }
+*/
 
 /*!
 	\brief Sets the output path, and adds the path to the search path.

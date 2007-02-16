@@ -6,18 +6,18 @@
 # This is a simple example of a breve compatible Python object. 
 #
 # In order to be breve compatible, we first import the breve module.
-# The breve-compatible object must inherit from the class breve.object
+# The breve-compatible object must inherit from the class breve.Object
 # (or one of its subclasses).
 #
 
 import breve
 
-class PythonBridgeObject( breve.object ):
+class PythonBridgeObject( breve.Object ):
 	def __init__( self ):
-		# We must call the breve.object __init__ method before 
+		# We must call the breve.Object __init__ method before 
 		# accessing any breve functionality
 
-		breve.object.__init__( self )
+		breve.Object.__init__( self )
 		print "Inited Python bridge object"
 
 	def iterate( self ):

@@ -52,6 +52,7 @@ PhysicalControl : VirtualCreatures {
 
 		self enable-fast-physics.
 		self set-fast-physics-iterations to 20.
+		self enable-shadow-volumes.
 
 		parser = new MorphologyParser.
 

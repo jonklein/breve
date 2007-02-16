@@ -62,8 +62,9 @@ slCamera::slCamera( int x, int y ) {
 
 	_drawMode = GL_POLYGON;
 
-	slVectorSet( &_target, 0, 0, 0 );
+	_shadowCatcher = NULL;
 
+	slVectorSet( &_target, 0, 0, 0 );
 	slVectorSet( &_location, 0, 10, 100 );
 
 	_zoom = 10;

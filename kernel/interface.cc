@@ -31,30 +31,30 @@
 
 brMenuEntry *brAddMenuItem( brInstance *i, char *method, char *title ) {
 	brMethod *m;
-	/* rather than using the global engine variable, we extract */
-	/* the value from the brInstance */
+	// extract the engine from the brInstance 
 
 	m = brMethodFind( i->object, method, NULL, 0 );
 
-	if ( strcmp( title, "" ) && !m ) return NULL;
+	if ( strcmp( title, "" ) && !m ) {
+		slMessage( DEBUG_ALL, "Cannot add menu item for method \"%s\"\n", method );
+		return NULL;
+	}
 
 	if ( m ) brMethodFree( m );
 
 	brMenuEntry *entry = new brMenuEntry;
 
 	entry->method = slStrdup( method );
-
 	entry->title = slStrdup( title );
 
 	entry->instance = i;
-
 	entry->checked = 0;
-
 	entry->enabled = 1;
 
 	i->_menus.push_back( entry );
 
-	if ( i->engine->updateMenu ) i->engine->updateMenu( i );
+	if ( i->engine->updateMenu ) 
+		i->engine->updateMenu( i );
 
 	return entry;
 }

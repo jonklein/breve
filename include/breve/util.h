@@ -56,7 +56,6 @@ extern "C" {
 #include "matrix.h"
 #include "memory.h"
 #include "nr.h"
-#include "stack.h"
 #include "stringstream.h"
 #include "text.h"
 

@@ -4,33 +4,26 @@
 #include "sensor.h"
 
 void slWorldObject::draw( slCamera *camera ) {
-	if ( _shape )
-		_shape->draw( camera, &_position, _textureScaleX, _textureScaleY, _drawMode, 0 );
+	if ( _displayShape )
+		_displayShape->draw( camera, &_position, _textureScaleX, _textureScaleY, _drawMode, 0 );
 }
 
 void slObjectLine::draw( slCamera *camera ) {
 	const slVector *x, *y;
 
-	if ( !_src || !_dst ) return;
-
-	if ( !_stipple ) return;
+	if ( !_src || !_dst || !_stipple ) return;
 
 	x = &_src->getPosition().location;
-
 	y = &_dst->getPosition().location;
 
 	glLineStipple( 2, _stipple );
-
 	glEnable( GL_LINE_STIPPLE );
 
 	glColor4f( _color.x, _color.y, _color.z, _transparency );
 
 	glBegin( GL_LINES );
-
 	glVertex3f( x->x, x->y, x->z );
-
 	glVertex3f( y->x, y->y, y->z );
-
 	glEnd();
 
 	glDisable( GL_LINE_STIPPLE );
@@ -84,8 +77,8 @@ void slWorldObject::setTextureScale( double sx, double sy ) {
 	_textureScaleX = sx;
 	_textureScaleY = sy;
 
-	if ( _shape )
-		_shape->recompile();
+	if ( _displayShape )
+		_displayShape->recompile();
 }
 
 void slWorldObject::setBitmapRotation( double rot ) {
@@ -115,6 +108,11 @@ void slWorldObject::setAlpha( double alpha ) {
 void slWorldObject::setColor( slVector *c ) {
 	slVectorCopy( c, &_color );
 }
+
+void slWorldObject::setDrawShadows( bool inDraw ) {
+	_drawShadow = inDraw;
+}
+
 
 double slWorldObject::irSense(slPosition *sensorPos, std::string sensorType){
 	//ProximitySensor::getProximitySensor();
@@ -199,8 +197,31 @@ void slWorldObject::updateBoundingBox() {
 
 void slWorldObject::getBounds( slVector *minBounds, slVector *maxBounds ) {
 	if ( minBounds ) slVectorCopy( &_min, minBounds );
-
 	if ( maxBounds ) slVectorCopy( &_max, maxBounds );
 }
 
+void slWorldObject::setShape( slShape *inShape ) {
+	if( _shape ) 	
+		_shape->release();
 
+	_shape = inShape;
+	_shape->retain();
+}
+
+void slWorldObject::setDisplayShape( slShape *inDisplayShape ) {
+	if( _displayShape ) 	
+		_displayShape->release();
+
+	_displayShape = inDisplayShape;
+	_displayShape->retain();
+}
+
+void slWorldObject::setRotation( double inRotation[ 3 ][ 3 ] ) {
+	slMatrixCopy( inRotation, _position.rotation );
+	updateBoundingBox();
+}
+
+void slWorldObject::setLocation( slVector *inLocation ) {
+	slVectorCopy( inLocation, &_position.location );
+	updateBoundingBox();
+}

@@ -44,9 +44,8 @@ void stCrashCatcher( int s ) {
 /**
 	\brief The breve callback to determine if one object is a subclass of another.
 */
-
-int stSubclassCallback( void *c1, void *c2 ) {
-	return stIsSubclassOf(( stObject* )c1, ( stObject* )c2 );
+int stSubclassCallback( brObjectType *inType, void *c1, void *c2 ) {
+	return stIsSubclassOf( ( stObject* )c1, ( stObject* )c2 );
 }
 
 /**
@@ -363,7 +362,7 @@ int stParseFile( stSteveData *sdata, brEngine *engine, const char *filename ) {
 
 	char *fileString;
 
-	/* try to open the file in the current directory. */
+	// try to open the file in the current directory.
 
 	path = brFindFile( engine, filename, &fs );
 
@@ -412,14 +411,15 @@ int stParseBuffer( stSteveData *s, brEngine *engine, const char *buffer, const c
 		s->filesSeen.push_back( filename );
 	} else thisFile = "<untitled>";
 
-	/* set the global variables for the parser */
-	/* preprocess the buffer--look for other included files */
+	// set the global variables for the parser 
+	// preprocess the buffer--look for other included files 
 
 	yyfile = thisFile;
 
 	lineno = 1;
 
-	if ( stPreprocess( s, engine, buffer ) ) return BPE_LIB_ERROR;
+	if ( stPreprocess( s, engine, filename, buffer ) ) 
+		return BPE_LIB_ERROR;
 
 	// preprocess changes the yyfile and lineno globals -- reset them
 
@@ -429,11 +429,10 @@ int stParseBuffer( stSteveData *s, brEngine *engine, const char *buffer, const c
 
 	stSetParseData( s, buffer, strlen( buffer ) );
 
-	/* the REAL parse--set the parse engine so the parser knows */
-	/* what to do with the info it parses */
+	// the REAL parse--set the parse engine so the parser knows 
+	// what to do with the info it parses 
 
 	stParseSetEngine( engine );
-
 	stParseSetSteveData( s );
 
 	brClearError( engine );
@@ -455,7 +454,7 @@ int stParseBuffer( stSteveData *s, brEngine *engine, const char *buffer, const c
  *aren't so many.
  */
 
-int stPreprocess( stSteveData *s, brEngine *engine, const char *line ) {
+int stPreprocess( stSteveData *s, brEngine *engine, const char *srcFile, const char *line ) {
 	const char *start, *end;
 	char *filename;
 	int n;
@@ -463,6 +462,7 @@ int stPreprocess( stSteveData *s, brEngine *engine, const char *line ) {
 	char useWord[1024];
 	const char *oldYyfile = yyfile;
 	int oldLineno = lineno;
+	std::string current = srcFile;
 
 	/* i don't wanna comment this */
 
@@ -516,7 +516,10 @@ int stPreprocess( stSteveData *s, brEngine *engine, const char *line ) {
 			}
 
 			if ( include || use ) {
-				char *filetext = slUtilReadFile( brFindFile( engine, filename, NULL ) );
+				s->_includes[ current ].push_back( filename );
+
+				char *found = brFindFile( engine, filename, NULL );
+				char *filetext = slUtilReadFile( found );
 
 				if( brLoadFile( engine, filetext, filename ) != EC_OK ) {
 					yyfile = oldYyfile;
@@ -530,6 +533,8 @@ int stPreprocess( stSteveData *s, brEngine *engine, const char *line ) {
 
 				lineno = oldLineno;
 			} else {
+				s->_paths[ current ].push_back( filename );
+
 				brAddSearchPath( engine, filename );
 			}
 

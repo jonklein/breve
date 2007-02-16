@@ -52,6 +52,9 @@ struct stObject {
 	std::map< std::string, std::vector< stMethod* > > methods;
 
 	std::set< stInstance*, stInstanceCompare> allInstances;
+
+	std::string 				_file;
+	std::string 				_comment;
 };
 
 /*!
@@ -99,6 +102,8 @@ class stMethod {
 		// how much space does this method need on the stack for inputs and locals? 
 
 		int stackOffset;
+
+		std::string 				_comment;
 };
 
 /*!
@@ -158,7 +163,7 @@ struct stKeywordEntry {
 	stKeyword *defaultKey;
 };
 
-stObject *stObjectNew(brEngine *e, stSteveData *data, char *name, char *alias, stObject *super, float version);
+stObject *stObjectNew( brEngine *e, stSteveData *data, char *name, char *alias, stObject *super, float version, const char *inFile );
 stObject *stObjectFind(brNamespace *n, char *name);
 
 stInstance *stFindInstanceIndex(stInstance *i, int index);

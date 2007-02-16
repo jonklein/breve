@@ -33,7 +33,7 @@ LIBS		= @LIBS@
 prefix		= @prefix@
 exec_prefix	= @exec_prefix@
 
-all: depend lib/libbreve.a bin/osmesaloader.o bin/breve_cli@EXE_SUFFIX@ bin/breve@EXE_SUFFIX@ \
+all: depend lib/libbreve.a bin/osmesaloader.o bin/breve@EXE_SUFFIX@ \
 	README.txt README_SOURCE.txt
 
 include simulation/Makefile

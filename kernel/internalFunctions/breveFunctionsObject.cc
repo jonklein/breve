@@ -23,11 +23,45 @@
 
 #include "kernel.h"
 
-/*!
-	\brief Returns an instance's class name as a string.
+int brIsa( brEval args[], brEval *target, brInstance *bi ) {
+	brObject *stringType;
 
-	string objectName().
-*/
+	stringType = brObjectFind( bi->engine, BRSTRING( &args[0] ) );
+
+	if( !stringType ) {
+		target->set( 0 );
+		return EC_OK;
+	}
+
+	target->set( brObjectIsSubclass( bi->object, stringType ) );
+
+	return EC_OK;
+}
+
+/**
+ *	\brief Determines whether a certain instance understand a certain method.
+ */
+
+int brORespondsTo( brEval args[], brEval *target, brInstance *i ) {
+	brInstance *instance = BRINSTANCE( &args[0] );
+	char *method = BRSTRING( &args[1] );
+
+	brMethod *m = brMethodFindWithArgRange( instance->object, method, NULL, 0, 99 );
+
+	if ( m ) {
+		target->set( 1 );
+		delete m;
+	} else 
+		target->set( 0 );
+
+	return EC_OK;
+}
+
+/**
+ * \brief Returns an instance's class name as a string.
+ * 
+ *  string objectName().
+ */
 
 int brIObjectName( brEval args[], brEval *target, brInstance *i ) {
 
@@ -182,6 +216,8 @@ int brIGetController( brEval args[], brEval *target, brInstance *i ) {
 
 void breveInitObjectFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "typeof", brITypeof, AT_STRING, AT_UNDEFINED, 0 );
+	brNewBreveCall( n, "isa", brIsa, AT_INT, AT_STRING, 0 );
+	brNewBreveCall( n, "respondsTo", brORespondsTo, AT_INT, AT_INSTANCE, AT_STRING, 0 );
 	brNewBreveCall( n, "objectName", brIObjectName, AT_STRING, AT_INSTANCE, 0 );
 	brNewBreveCall( n, "addObserver", brIAddObserver, AT_INT, AT_INSTANCE, AT_STRING, AT_STRING, 0 );
 	brNewBreveCall( n, "removeObserver", brIRemoveObserver, AT_NULL, AT_INSTANCE, AT_STRING, 0 );

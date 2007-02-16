@@ -26,6 +26,7 @@
 #include "netsim.h"
 #include "patch.h"
 #include "camera.h"
+#include "skybox.h"
 
 #ifdef __cplusplus
 #include <vector>
@@ -82,9 +83,9 @@ enum collisionCallbackTypes {
 
 #ifdef __cplusplus
 
-/*!
-	\brief A stationary object in the simulated world.
-*/
+/**
+ * A stationary object in the simulated world.
+ */
 
 class slStationary: public slWorldObject {
 	public:
@@ -93,165 +94,160 @@ class slStationary: public slWorldObject {
 
 #endif
 
-/*!
-	\brief A structure holding the simulated world.
-*/
+/**
+ * A structure holding the simulated world.
+ */
 
 #ifdef __cplusplus
 class slGISData;
 
 class slWorld {
 	public:
-		slWorld();
-		~slWorld();
+							slWorld();
+							~slWorld();
 
-		dJointGroupID _odeJointGroupID;
-	
 		// sunlight detection
 	
-		bool _detectLightExposure;
-		bool _drawLightExposure;
+		inline bool 				detectLightExposure() { return _detectLightExposure; }
+		inline bool 				drawLightExposure() { return _detectLightExposure; }
 
-		bool detectLightExposure() { return _detectLightExposure; }
-		bool drawLightExposure() { return _detectLightExposure; }
+		void 					setDetectLightExposure( bool d ) { _detectLightExposure = d; }
+		void 					setDrawLightExposure( bool d ) { _drawLightExposure = d; }
 
-		void setDetectLightExposure( bool d ) { _detectLightExposure = d; }
-		void setDrawLightExposure( bool d ) { _drawLightExposure = d; }
+		void 					setLightExposureSource( slVector *src ) { slVectorCopy( src, &_lightExposureCamera._location); }
 
-		void setLightExposureSource( slVector *src ) { slVectorCopy( src, &_lightExposureCamera._location); }
-
-		slCamera *getLightExposureCamera( ) { return &_lightExposureCamera; }
+		slCamera 				*getLightExposureCamera( ) { return &_lightExposureCamera; }
 
 		/**
 		 * Indicates that collision detection structures must be reinitialized.
 		 */
 
-		void setUninitialized();
+		void 					setUninitialized();
 
 		/**
-    	 * Enables/disables collision resolution.  
+		 * Enables/disables collision resolution.  
 		 */
 
-		void setCollisionResolution( bool );
-		void setBoundsOnlyCollisionDetection( bool );
-		void setPhysicsMode( int );
-		void setBackgroundColor( slVector* );
-		void setBackgroundTextureColor( slVector* );
-		void setBackgroundTexture( int, int );
+		void 					setCollisionResolution( bool );
+		void 					setBoundsOnlyCollisionDetection( bool );
+		void 					setPhysicsMode( int );
+		void 					setBackgroundColor( slVector* );
+		void 					setBackgroundTextureColor( slVector* );
+		void 					setBackgroundTexture( int, int );
 
 		// integration vectors -- DV_VECTOR_COUNT depends on the requirements
 		// of the integration algorithm we're using... mbEuler requires only 
 		// a single derivation vector, while RK4 needs about 6.
 	
-		double *dv[DV_VECTOR_COUNT];
+		double 					*dv[ DV_VECTOR_COUNT ];
 	
-		int (*integrator)(slWorld *w, slLink *m, double *dt, int skip);
+		int 					(*integrator)(slWorld *w, slLink *m, double *dt, int skip);
 	
-
 		// the collision callback is called when the collision is detected --
 		// at the estimated time of collision.  
 	
-		void (*_collisionCallback)(void *body1, void *body2, int type, slVector *position, slVector *face);
-		
+		void 					(*_collisionCallback)(void *body1, void *body2, int type, slVector *position, slVector *face);
 	
 		// the collisionCheckCallback is a callback defined by the program
 		// using the physics engine.  it takes two userData (see slWorldObject)
 		// pointers and returns whether collision detection should be preformed
 		// on the objects or not.
 	
-		int (*_collisionCheckCallback)(void *body1, void *body2, int type);
+		int 					(*_collisionCheckCallback)(void *body1, void *body2, int type);
 	
-		slObjectLine *addObjectLine( slWorldObject*, slWorldObject*, int, slVector* );
+		slObjectLine 				*addObjectLine( slWorldObject*, slWorldObject*, int, slVector* );
 
-		slPatchGrid *addPatchGrid( slVector *center, slVector *patchSize, int x, int y, int z );
-		void removePatchGrid( slPatchGrid *g );
-
+		slPatchGrid 				*addPatchGrid( slVector *center, slVector *patchSize, int x, int y, int z );
+		void 					removePatchGrid( slPatchGrid *g );
 
 		// age is the simulation time of the world.
 	
-		double _age;
+		double 					_age;
 	
-		std::vector< slWorldObject* > _objects;
-
-		std::vector< slPatchGrid* > _patches;
-		std::vector< slCamera* > _cameras;
-		std::vector< slObjectConnection* > _connections;
-		std::vector< slDrawCommandList* > _drawings;
+		std::vector< slWorldObject* > 		_objects;
+		std::vector< slPatchGrid* > 		_patches;
+		std::vector< slCamera* > 		_cameras;
+		std::vector< slObjectConnection* > 	_connections;
+		std::vector< slDrawCommandList* > 	_drawings;
 	
 		// we have one slVclipData for the regular collision detection
 		// and one which will be used to answer "proximity" questions:
 		// to allow objects to ask for all objects within a certain radius
 	
-		slPatchGrid *_clipGrid;
-		slVclipData *_clipData;
-		slVclipData *_proximityData;
-	
-		slVector _gravity;
+		slPatchGrid 				*_clipGrid;
+		slVclipData 				*_clipData;
+		slVclipData 				*_proximityData;
+
+		slVector 				_gravity;
 	
 		// drawing the world...
 	
-		slVector backgroundColor;
-		slVector backgroundTextureColor;
-		slVector shadowColor;
+		slVector 				backgroundColor;
+		slVector 				backgroundTextureColor;
+		slVector 				shadowColor;
+
+		slSkybox				_skybox;
 		
-		int backgroundTexture;
-		int isBackgroundImage;
+		int 					backgroundTexture;
+		int 					isBackgroundImage;
 
-		slGISData *gisData;
+		slGISData 				*gisData;
 
-		void updateNeighbors();
+		void 					updateNeighbors();
 
-		double getAge();
-		void setAge( double age );
+		double 					getAge();
+		void 					setAge( double age );
 
-		void removeConnection( slObjectConnection* );
-		void addConnection( slObjectConnection* );
+		void 					addCamera( slCamera* );
+		void 					removeCamera( slCamera* );
 
-		double runWorld( double, double, int* );
-		double step( double, int* );
+		void 					removeConnection( slObjectConnection* );
+		void 					addConnection( slObjectConnection* );
 
-		void setGravity( slVector* );
+		double 					runWorld( double, double, int* );
+		double 					step( double, int* );
 
-		slWorldObject *addObject( slWorldObject* );
-		void removeObject( slWorldObject* );
-		void setQuickstepIterations( int );
+		void					addObject( slWorldObject* );
+		void 					removeObject( slWorldObject* );
+		slWorldObject 				*getObject( unsigned int );
+		void 					removeEmptyObjects();
 
-		void setAutoDisableFlag( bool f );
+		void 					setGravity( slVector* );
+		void 					setQuickstepIterations( int );
+		void 					setAutoDisableFlag( bool f );
 
-		slWorldObject *getObject( unsigned int );
+		void 					setCollisionCallbacks( int (*)(void *, void *, int), void (*)(void *, void *, int, slVector* , slVector* ) );
 
-		void setCollisionCallbacks( int (*)(void *, void *, int), void (*)(void *, void *, int, slVector* , slVector* ) );
+		void 					renderCameras();
 
-		void renderCameras();
+		int 					startNetsimServer();
+		int 					startNetsimSlave( char* );
 
-		int startNetsimServer();
-		int startNetsimSlave( char* );
-		void addCamera( slCamera* );
-		void removeCamera( slCamera* );
+		dWorldID 				_odeWorldID;
+		dJointGroupID 				_odeCollisionGroupID;
+		dJointGroupID 				_odeJointGroupID;
+		unsigned char 				_odeStepMode;
 
-		dWorldID _odeWorldID;
-		dJointGroupID _odeCollisionGroupID;
-
-		bool _detectCollisions;
-		bool _resolveCollisions;
-		bool _boundingBoxOnlyCollisions;
+		bool 					_detectCollisions;
+		bool 					_resolveCollisions;
+		bool 					_boundingBoxOnlyCollisions;
 	
 		// when objects are added or removed from the world, this flag must be 
 		// set to 0 so that vclip structures are reinitialized.
 	
-		bool _initialized;
-		unsigned char _odeStepMode;
+		bool 					_initialized;
 
-		slCamera _lightExposureCamera;
+		slCamera 				_lightExposureCamera;
 
 #if HAVE_LIBENET
-		slNetsimData _netsimData;
-		slNetsimClientData *_netsimClient;
+		slNetsimData 				_netsimData;
+		slNetsimClientData 			*_netsimClient;
 #endif
 
-		void removeEmptyObjects();
-
 	private:
+		bool 					_detectLightExposure;
+		bool 					_drawLightExposure;
+
 
 };
 #endif

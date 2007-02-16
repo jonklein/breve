@@ -42,21 +42,18 @@ brMethod *brMethodFind( brObject *o, const char *name, unsigned char *types, int
 
 	mp = o->type->findMethod( o->userData, name, types, argCount );
 
+	if ( t ) 
+		delete[] t;
+
 	if ( !mp ) 
 		return NULL;
 
 	m = new brMethod;
 
 	m->userData = mp;
-
 	m->object = o;
-
 	m->argumentCount = argCount;
-
 	m->name = slStrdup( name );
-
-	if ( t ) 
-		delete[] t;
 
 	return m;
 }
@@ -99,7 +96,6 @@ brObject *brObjectFind( brEngine *e, const char *name ) {
 	std::string names = name;
 
 	if ( ( object = e->objects[ names] ) ) return object;
-
 	if ( ( object = e->objectAliases[ names ] ) ) return object;
 
 	return brUnknownObjectFind( e, name );
@@ -122,7 +118,8 @@ brObject *brUnknownObjectFind( brEngine *e, const char *name ) {
 		if ( type->findObject ) {
 			pointer = type->findObject( type->userData, name );
 
-			if ( pointer ) return brEngineAddObject( e, type, name, pointer );
+			if ( pointer ) 
+				return brEngineAddObject( e, type, name, pointer );
 		}
 	}
 
@@ -350,6 +347,23 @@ brInstance *brEngineAddBreveInstance( brEngine *e, brObject *object, brInstance 
 	return breveInstance;
 }
 
+/**
+ * Determines whether one object is a subclass of another
+ */
+ 
+bool brObjectIsSubclass( brObject *inA, brObject *inB ) {
+	if( inA->type->_typeSignature != inB->type->_typeSignature )
+		return false;
+
+	return inA->type->isSubclass( inA->type, inA->userData, inB->userData );
+}
+
+/**
+ * Creates an instance of the given brObject class.
+ *
+ * The constructur args and argCount are currently unused.
+ */
+
 brInstance *brObjectInstantiate( brEngine *e, brObject *o, const brEval **args, int argCount ) {
 	return o->type->instantiate( e, o, args, argCount );
 }
@@ -513,7 +527,7 @@ int brObjectAddCollisionHandler( brObject *handler, brObject *collider, char *na
 	for ( int i = 0; i <= maxargs; i++ ) {
 		method[i] = brMethodFindWithArgRange( handler, name, types, i, i );
 
-		if ( method[i] )nomethods = false;
+		if ( method[i] ) nomethods = false;
 	}
 
 

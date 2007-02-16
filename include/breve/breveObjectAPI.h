@@ -71,9 +71,9 @@ struct brObjectType {
 	int					 (*callMethod)( void *inInstanceUserData, void *inMethodUserData, const brEval **inArguments, brEval *inResult );
 
 	/**
-	 * Returns 1 if parent is a subclass of parent.
+	 * Should return 1 if child is a subclass of parent, 0 otherwise
 	 */
-	int					 (*isSubclass)( void *inChild, void *inParent );
+	int					 (*isSubclass)( brObjectType *inType, void *inChild, void *inParent );
 
 	/**
 	 * Destroys an instance of a language object previously created with instantiate.
@@ -252,8 +252,8 @@ DLLEXPORT void brEngineRegisterObjectType(brEngine *, brObjectType * );
 
 // locating objects and methods within objects
 
-DLLEXPORT brMethod *brMethodFind(brObject *, const char *, unsigned char *, int);
-DLLEXPORT brMethod *brMethodFindWithArgRange(brObject *, const char *, unsigned char *, int, int);
+DLLEXPORT brMethod *brMethodFind( brObject *inObject, const char *inName, unsigned char *inTypes, int inArgCount );
+DLLEXPORT brMethod *brMethodFindWithArgRange( brObject *inObject, const char *inName, unsigned char *inTypes, int inMinArgs, int inMaxArgs );
 
 DLLEXPORT brObject *brObjectFind(brEngine *, const char *);
 DLLEXPORT brObject *brUnknownObjectFind(brEngine *, const char *);
@@ -284,11 +284,14 @@ DLLEXPORT void brEngineRemoveInstance(brEngine *, brInstance *);
 DLLEXPORT int brObjectAddCollisionHandler(brObject *, brObject *, char *);
 DLLEXPORT int brObjectSetIgnoreCollisionsWith(brObject *, brObject *, int);
 
+DLLEXPORT bool brObjectIsSubclass( brObject *inA, brObject *inB );
+
 // adding and removing dependencies and observers 
 
 DLLEXPORT int brInstanceAddDependency(brInstance *i, brInstance *dependency);
-DLLEXPORT int brInstanceAddObserver(brInstance *i, brInstance *observer, char *notification, char *mname);
 DLLEXPORT int brEngineRemoveInstanceDependency(brInstance *i, brInstance *dependency);
+
+DLLEXPORT int brInstanceAddObserver(brInstance *i, brInstance *inObserver, char *inNotification, char *inMethod );
 DLLEXPORT void brEngineRemoveInstanceObserver(brInstance *i, brInstance *observerInstance, char *notification);
 
 // cleaning up 

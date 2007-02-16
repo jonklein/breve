@@ -2,114 +2,75 @@
 # @include "MenuItem.tz"
 
 Real : Stationary (aka Stationaries) [version 2.4] {
-    % Stationary objects are objects such as floors and walls that may 
-    % collide with other objects but will never move.  Stationary objects
-    % require much less computation than OBJECT(Mobile) objects, so it is 
-    % always preferable to use a Stationary object when you know that an
-	% object will not need to move during a simulation.
-	% <P>
-	% To setup a stationary object, you'll need to associate it with a
-	% OBJECT(Shape) object using the method METHOD(register).
+	% Stationary objects are objects such as floors and walls that may 
+	% collide with other objects but which do not move in response to 
+	% collisions.  Stationary objects do not have their own velocities
+	% or acceleration.
+	% <p>
+	% Starting in breve 2.6, stationary objects can be moved and 
+	% rotated after being created using methods in OBJECT(Real).  
+	% The shapes can also be changed dynamically using the set-shape 
+	% method in OBJECT(Real).
 
-	# Notes for future implementation: 
-	# Beginning in breve 2.5, Stationary functionality has been enhanced
-	# to allow repositioning at any time.  The distinction between Stationary
-	# and OBJECT(Mobile) objects is that Stationary objects do not react
-	# to physics and thus do not move <i>on their own</i>.  They can be 
-	# repositioned explicitly by simulation code at any time, but do not 
-	# have their own velocities or react to physics in any other way.
-
-    + variables:
-        color (vector).
+	+ variables:
 		shadowCatcher (int).
 
-        objectLocation (vector).
+		objectLocation (vector).
 		shape (object).
 
   + section "Setting Up the Stationary Object"
 
-    + to register with-shape theShape (object) at-location theLocation = (0, 0, 0) (vector) with-rotation theRotation = [ ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) ] (matrix) :
-        % Registers a stationary object using shape theShape at the location
-        % specified by theLocation.
+	- to register with-shape theShape (object) at-location theLocation = (0, 0, 0) (vector) with-rotation theRotation = [ ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) ] (matrix) :
+		% Registers a stationary object using shape theShape at the location
+		% specified by theLocation.
 
-        if !(theShape is a "Shape"):
-            die "method 'register' expects a Shape object ($theShape).".
+		self set-shape to theShape.
+		self move to theLocation.
+		self set-rotation to theRotation.
 
-        if !(theShape get-pointer):
-            die "attempt to register Stationary object with uninitialized Shape.".
+		return self.
 
-	shape = theShape.
-	self add-dependency on shape.
+	+ to init:
+		realWorldPointer = addStationary( ( ( controller get-generic-shape ) get-pointer ), ( 0, 0, 0 ), [ ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) ] ).
+		self set-texture to 0.
 
-        objectLocation = theLocation.
-        realWorldPointer = addStationary( ( theShape get-pointer ), theLocation, theRotation ).
-        self set-texture to 0.
+		return self.
 
-	return self.
+	- to get-world-object:
+		% Used internally to get the pointer to the world.  Do not use this method
+		% in user simulations.
 
-    + to get-location:
-        % Returns the location of the Stationary object.
-
-        return objectLocation.
-
-    - to get-world-object:
-        % Used internally to get the pointer to the world.  Do not use this method
-        % in user simulations.
-
-        return realWorldPointer.
+		return realWorldPointer.
 
   + section "Changing the Appearence of the Object"
 
-    + to catch-shadows:
-        % Informs this object that it should display shadows (and/or reflections) 
-        % of Mobile objects.  The shadows and reflections will always be shown on
-        % the plane of the object pointing upwards on the Y axis--that is to say,
-        % the plane with normal (0, 1, 0).  If the object does not have a plane
-        % with normal (0, 1, 0), the shadows and reflections will not be displayed
-        % correctly.  This method must be used in conjunction with the method 
+	+ to catch-shadows:
+		% Informs this object that it should display shadows (and/or reflections) 
+		% of Mobile objects.  The shadows and reflections will always be shown on
+		% the plane of the object pointing upwards on the Y axis--that is to say,
+		% the plane with normal (0, 1, 0).  If the object does not have a plane
+		% with normal (0, 1, 0), the shadows and reflections will not be displayed
+		% correctly.  This method must be used in conjunction with the method 
 		% OBJECTMETHOD(Control:enable-shadows).
 		% <P>
 		% Before using this method, you should also refer to an improved shadowing
 		% technique outlined in OBJECTMETHOD(Control.tz:enable-shadow-volumes).  
 
-        if !realWorldPointer: 
-            die "method 'catch-shadows' cannot be called before Stationary object is registered.".
+		if !realWorldPointer: 
+			die "method 'catch-shadows' cannot be called before Stationary object is registered.".
 
 		shadowCatcher = 1.
 
-        setShadowCatcher(realWorldPointer, (0, 1, 0)).
-        controller set-floor-defined.
+		setShadowCatcher(realWorldPointer, (0, 1, 0)).
+		controller set-floor-defined.
 
-    + to set-color to newColor (vector):
-        % Sets the color of the Stationary object to newColor.  Textures 
-        % override color settings, so be sure to set the texture to -1 
-        % using the Real.tz method set-texture if you want a flat color 
-        % to be displayed--the texture is on by default for stationary 
-        % objects.
-        % <p>
-        % The vector elements of newColor are interpreted as red, green, 
-        % and blue values, on a scale from 0.0 to 1.0.  
-        % <p>
-        % <b>The Stationary object must be registered in the world before
-        % calling this method.  See METHOD(register).</b>
+	+ to archive:
+		return 1.
 
-        if !realWorldPointer: die "method 'set-color' cannot be called before Stationary object is registered.".
-
-        color = newColor.
-        setColor(realWorldPointer, color).
-
-    + to get-color:
-        % Returns the color of the Stationary object.
-
-        return color.
-
-    + to archive:
-        return 1.
-
-    + to dearchive:
-        self register with-shape shape at-location objectLocation.
-        if shadowCatcher: self catch-shadows.
-        return 1.
+	+ to dearchive:
+		self register with-shape shape at-location objectLocation.
+		if shadowCatcher: self catch-shadows.
+		return 1.
 }
 
 Stationary : Floor {

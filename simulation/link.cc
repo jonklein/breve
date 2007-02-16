@@ -59,17 +59,12 @@ slLink::slLink( slWorld *w ) : slWorldObject() {
 }
 
 slLink::~slLink() {
-	// slLink *r = NULL;
-	// if(multibody) r = multibody->getRoot();
-	// printf("deleting link %p [%p root %p]\n", this, multibody, r);
-
 	if ( _multibody && _multibody->getRoot() == this ) _multibody->setRoot( NULL );
 
 	// This is a bad situation here: slJointBreak modifies the
 	// joint list.  I intend to fix this.
 
 	while ( _inJoints.size() != 0 )( *_inJoints.begin() )->breakJoint();
-
 	while ( _outJoints.size() != 0 )( *_outJoints.begin() )->breakJoint();
 
 	dBodyDestroy( _odeBodyID );
@@ -122,11 +117,7 @@ void slLink::step( slWorld *world, double step ) {
 */
 
 void slLink::setShape( slShape *s ) {
-	if ( _shape ) slShapeFree( _shape );
-
-	_shape = s;
-
-	s->_referenceCount++;
+	slWorldObject::setShape( s );
 
 	// The ODE docs call dMatrix3 a 3x3 matrix.  but it's actually 4x3.
 	// go figure.
@@ -134,37 +125,21 @@ void slLink::setShape( slShape *s ) {
 	dMassSetZero( &_massData );
 
 	_massData.mass = _shape->_mass;
-
 	_massData.c[0] = 0.0;
-
 	_massData.c[1] = 0.0;
-
 	_massData.c[2] = 0.0;
-
 	_massData.c[3] = 0.0;
-
 	_massData.I[0] = s->_inertia[0][0];
-
 	_massData.I[1] = s->_inertia[0][1];
-
 	_massData.I[2] = s->_inertia[0][2];
-
 	_massData.I[3] = 0.0;
-
 	_massData.I[4] = s->_inertia[1][0];
-
 	_massData.I[5] = s->_inertia[1][1];
-
 	_massData.I[6] = s->_inertia[1][2];
-
 	_massData.I[7] = 0.0;
-
 	_massData.I[8] = s->_inertia[2][0];
-
 	_massData.I[9] = s->_inertia[2][1];
-
 	_massData.I[10] = s->_inertia[2][2];
-
 	_massData.I[11] = 0.0;
 
 	dBodySetMass( _odeBodyID, &_massData );
@@ -182,45 +157,41 @@ void slLink::setLabel( char *l ) {
 	\brief Sets the location for a single link.
 */
 
-void slLink::setLocation( slVector *location ) {
+void slLink::setLocation( slVector *inLocation ) {
 	_justMoved = 1;
 
 	if ( _simulate ) {
-		if ( _odeBodyID ) dBodySetPosition( _odeBodyID, location->x, location->y, location->z );
+		if ( _odeBodyID ) dBodySetPosition( _odeBodyID, inLocation->x, inLocation->y, inLocation->z );
 	} else {
-		slVectorCopy( location, &_stateVector[ _currentState].location );
-		slVectorCopy( location, &_stateVector[!_currentState].location );
+		slVectorCopy( inLocation, &_stateVector[ _currentState].location );
+		slVectorCopy( inLocation, &_stateVector[!_currentState].location );
 	}
 
-	slVectorCopy( location, &_position.location );
-
-	updateBoundingBox();
+	slWorldObject::setLocation( inLocation );
 }
 
 /*!
 	\brief Sets the rotation for a single link
 */
 
-void slLink::setRotation( double rotation[3][3] ) {
+void slLink::setRotation( double inRotation[3][3] ) {
 	_justMoved = 1;
 
 	if ( _simulate ) {
 		dReal r[ 16 ];
 
-		slSlToODEMatrix( rotation, r );
+		slSlToODEMatrix( inRotation, r );
 		dBodySetRotation( _odeBodyID, r );
 	} else {
 		slQuat q;
 
-		slMatrixToQuat( rotation, &q );
+		slMatrixToQuat( inRotation, &q );
 
-		slQuatCopy( &q, &_stateVector[ _currentState].rotQuat );
-		slQuatCopy( &q, &_stateVector[!_currentState].rotQuat );
+		slQuatCopy( &q, &_stateVector[  _currentState ].rotQuat );
+		slQuatCopy( &q, &_stateVector[ !_currentState ].rotQuat );
 	}
 
-	slMatrixCopy( rotation, _position.rotation );
-
-	updateBoundingBox();
+	slWorldObject::setRotation( inRotation );
 }
 
 /*!

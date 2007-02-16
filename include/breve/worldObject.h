@@ -62,11 +62,13 @@ class slWorldObject {
 			_textureScaleX = 16;
 			_textureScaleY = 16;
 			_simulate = 0;
-			_drawAsPoint = 0;
+			_drawAsPoint = false;
+			_drawShadow = true;
 
 			_lightExposure = 0;
 
 			_shape = NULL;
+			_displayShape = NULL;
 
 			_proximityRadius = 0.00001;
 
@@ -94,6 +96,7 @@ class slWorldObject {
 			}
 
 			if( _shape ) slShapeFree( _shape );
+			if( _displayShape ) slShapeFree( _displayShape );
 		}
 
 		virtual void draw( slCamera *camera );
@@ -107,6 +110,7 @@ class slWorldObject {
 		void setCollisionMU( double mu );
 		void setNeighborhoodSize( double size );
 		void setColor( slVector *color );
+		void setDrawShadows( bool drawShadows );
 		void setAlpha( double alpha );
 		void setTexture( int texture );
 		void setTextureMode( int mode );
@@ -127,9 +131,17 @@ class slWorldObject {
 		std::vector< void* > &getNeighborData();
 
 		inline const slPosition &getPosition() { return _position; }
+
 		inline slShape *getShape() { return _shape; }
+		inline slShape *getDisplayShape() { return _displayShape; }
 
 		virtual void updateBoundingBox();
+
+		virtual void setShape( slShape *inShape );
+		virtual void setDisplayShape( slShape *inShape );
+
+		virtual void setRotation( double rotation[3][3] );
+		virtual void setLocation( slVector *location );
 
 		inline unsigned char getType() { return _type; }
 
@@ -144,6 +156,7 @@ class slWorldObject {
 
 	protected:
 		slShape *_shape;
+		slShape *_displayShape;
 
 		std::string _label;
 
@@ -162,6 +175,7 @@ class slWorldObject {
 		int _lightExposure;
 
 		bool _drawAsPoint;
+		bool _drawShadow;
 		int _texture;
 		char _textureMode;
 		unsigned char _drawMode;

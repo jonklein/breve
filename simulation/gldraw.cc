@@ -88,19 +88,15 @@ void slMakeLightTexture( GLubyte *lTexture, GLubyte *dlTexture ) {
 			dtemp = temp + slRandomDouble() / 10.0;
 
 			if ( temp > 1.0f ) temp = 1.0f;
-
 			if ( temp < 0.0f ) temp = 0.0f;
 
 			if ( dtemp > 1.0f ) dtemp = 1.0f;
-
 			if ( dtemp < 0.0f ) dtemp = 0.0f;
 
 			lTexture[( i * LIGHTSIZE * 2 ) + j * 2] = ( unsigned char )( 255.0f * temp * temp );
-
 			lTexture[( i * LIGHTSIZE * 2 ) + ( j * 2 ) + 1] = ( unsigned char )( 255.0f * temp * temp );
 
 			dlTexture[( i * LIGHTSIZE * 2 ) + j * 2] = ( unsigned char )( 255.0f * dtemp * dtemp );
-
 			dlTexture[( i * LIGHTSIZE * 2 ) + ( j * 2 ) + 1] = ( unsigned char )( 255.0f * temp * temp );
 		}
 	}
@@ -175,11 +171,10 @@ void slCompileSphereDrawList( int l ) {
 	}
 }
 
-/*!
-	\brief Center the given pixels in a square buffer.
-
-	Used for textures, which must be powers of two.
-*/
+/**
+ * \brief Center the given pixels in a square buffer.
+ * Used for textures, which must be powers of two.
+ */
 
 void slCenterPixelsInSquareBuffer( unsigned char *pixels, int width, int height, unsigned char *buffer, int newwidth, int newheight ) {
 	int xstart, ystart;
@@ -219,11 +214,10 @@ void slTextureFree( slCamera *c, const unsigned int n ) {
 	glDeleteTextures( 1, ( GLuint * )&n );
 }
 
-/*!
-	\brief Adds (or updates) a texture to the camera.
-
-	Returns 0 if there was space, or -1 if all texture positions are used.
-*/
+/**
+ * \brief Adds (or updates) a texture to the camera.
+ * Returns 0 if there was space, or -1 if all texture positions are used.
+ */
 
 int slUpdateTexture( slCamera *c, GLuint texture, unsigned char *pixels, int width, int height, int format ) {
 	unsigned char *newpixels = NULL;
@@ -445,7 +439,7 @@ int slCamera::vectorForDrag( slWorld *w, slVector *dragVertex, int x, int y, slV
 void slCamera::renderScene( slWorld *w, int crosshair ) {
 	std::vector< slCamera* >::iterator ci;
 
-	if ( w->_detectLightExposure && !w->_drawLightExposure )
+	if ( w->detectLightExposure() && !w->drawLightExposure() )
 		detectLightExposure( w, 200, NULL );
 
 	renderWorld( w, crosshair, 0 );
@@ -453,7 +447,7 @@ void slCamera::renderScene( slWorld *w, int crosshair ) {
 	for ( ci = w->_cameras.begin(); ci != w->_cameras.end(); ci++ )
 		if ( *ci != this )( *ci )->renderWorld( w, 0, 1 );
 
-	if ( w->_detectLightExposure && w->_drawLightExposure )
+	if ( w->detectLightExposure() && w->drawLightExposure() )
 		detectLightExposure( w, 200, NULL );
 }
 
@@ -503,16 +497,31 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 
 	updateFrustum();
 
+	// w->_skybox.draw( &cam );
+
 	drawFog();
 
-	// do a pass through to grab all the billboards--we want to sort them
-	// so that they can be rendered back to front and blended correctly
+	//
+	// Lines and draw-commands are special objects which will be rendered before lighting is setup
+	//
+
+	std::vector<slDrawCommandList*>::iterator di;
+	for ( di = w->_drawings.begin(); di != w->_drawings.end(); di++ )( *di )->draw( this );
+
+	renderLines( w );
+
+	//
+	// Setup lighting and effects for the normal objects
+	//
 
 	if ( _drawLights ) {
-		if ( _drawShadowVolumes ) drawLights( 1 );
-		else drawLights( 0 );
+		if ( _drawShadowVolumes ) 
+			drawLights( 1 );
+		else 
+			drawLights( 0 );
 
-		if ( _drawReflection || _drawShadow ) stencilFloor( );
+		if ( _shadowCatcher && ( _drawReflection || _drawShadow ) )
+			stencilFloor();
 
 		if ( _drawReflection && !( flags & DO_OUTLINE ) ) {
 			slVector toCam;
@@ -525,17 +534,14 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 			if ( slVectorDot( &toCam, &_shadowPlane.normal ) > 0.0 ) {
 				reflectionPass( w );
 
-				if ( _drawShadowVolumes ) drawLights( 1 );
+				if ( _drawShadowVolumes ) 
+					drawLights( 1 );
 			}
 		}
 	} else
 		glDisable( GL_LIGHTING );
 
-	// render the mobile objects
-
 	renderObjects( w, flags | DO_NO_ALPHA );
-
-	renderLines( w );
 
 	slClearGLErrors( "drew multibodies and lines" );
 
@@ -557,10 +563,6 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 		else if ( _drawShadow ) shadowPass( w );
 	}
 
-	std::vector<slDrawCommandList*>::iterator di;
-
-	for ( di = w->_drawings.begin(); di != w->_drawings.end(); di++ )( *di )->draw( this );
-
 	glDepthMask( GL_FALSE );
 
 	renderObjects( w, flags | DO_ONLY_ALPHA );
@@ -571,7 +573,6 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 
 #if HAVE_LIBENET
 	slDrawNetsimBounds( w );
-
 #endif
 
 	if ( w->gisData ) w->gisData->draw( this );
@@ -1072,19 +1073,13 @@ void slCamera::drawLights( int noDiffuse ) {
 	else glShadeModel( GL_FLAT );
 
 	glEnable( GL_LIGHTING );
-
 	glEnable( GL_LIGHT0 );
 
 	glLightf( GL_LIGHT0, GL_CONSTANT_ATTENUATION, 1.0 );
-
 	glLightf( GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.00 );
-
 	glLightfv( GL_LIGHT0, GL_DIFFUSE, dif );
-
 	glLightfv( GL_LIGHT0, GL_AMBIENT, amb );
-
 	glLightfv( GL_LIGHT0, GL_POSITION, dir );
-
 	glLightfv( GL_LIGHT0, GL_SPECULAR, amb );
 }
 
@@ -1317,13 +1312,17 @@ void slCamera::renderLines( slWorld *w ) {
 	unsigned int n;
 
 	glLineWidth( 1.2 );
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	glDepthFunc( GL_ALWAYS );
+	glEnable( GL_LINE_SMOOTH );
+	glDepthMask( GL_FALSE );
 
 	for ( n = 0; n < w->_objects.size(); ++n ) {
 		if ( w->_objects[n] && !( w->_objects[n]->_drawMode & DM_INVISIBLE ) ) {
 			if ( w && w->_objects[n]->_drawMode & DM_NEIGHBOR_LINES ) {
 				std::vector<slWorldObject*>::iterator wi;
 
-				glEnable( GL_BLEND );
 				glColor4f( 0.0, 0.0, 0.0, 0.5 );
 
 				x = &w->_objects[n]->_position.location;
@@ -1342,26 +1341,20 @@ void slCamera::renderLines( slWorld *w ) {
 				}
 
 				glEnd();
-
-				glDisable( GL_BLEND );
 			}
 		}
 	}
 
-	glDisable( GL_LIGHTING );
-
-	// glDisable( GL_DEPTH_TEST );
-	glEnable( GL_BLEND );
-	glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glEnable( GL_LINE_SMOOTH );
 	glLineWidth( 1.0 );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-	std::vector<slObjectConnection*>::iterator li;
+	std::vector< slObjectConnection* >::iterator li;
 
 	for ( li = w->_connections.begin(); li != w->_connections.end(); li++ ) {
 		( *li )->draw( this );
 	}
+
+	glDepthFunc( GL_LESS );
+	glDepthMask( GL_TRUE );
 }
 
 /*!

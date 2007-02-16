@@ -5,7 +5,7 @@ Object : Abstract (aka Abstracts) [version 2.0] {
 	% used for objects which have no representation in the simulated 
 	% world.  This is in contrast to OBJECT(Real) objects, which 
 	% do have representations in the simulated world.
-    % Since "abstract" is only a logical distinction, the Abstract class 
+	% Since "abstract" is only a logical distinction, the Abstract class 
 	% currently has no methods implemented.  
 
 	+ to dearchive:

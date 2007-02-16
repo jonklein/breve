@@ -193,6 +193,9 @@ class slShape {
 
 		void recompile() { _recompile = 1; }
 
+		void retain();
+		void release();
+
 		virtual ~slShape();
 
 		virtual void bounds( const slPosition *position, slVector *min, slVector *max ) const;

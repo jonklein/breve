@@ -9,6 +9,7 @@ Object : Real (aka Reals) [version 2.1] {
 	% with any of the child classes.
 
 	+ variables:
+		objectShape (object).
 		realWorldPointer (pointer).
 		collisionHandlerList (list).
 		texture (int).
@@ -37,13 +38,108 @@ Object : Real (aka Reals) [version 2.1] {
 		self add-menu named "Follow With Camera" for-method "watch".
 
 	- to delete:
-		if realWorldPointer: removeObject(realWorldPointer).
+		if realWorldPointer: realRemoveObject(realWorldPointer).
 		free menus.
 
 	- to get-world-object-pointer:
 		% Used internally.
 
 		return realWorldPointer.
+
++ section "Setting and Getting the Position and Rotation of Real Objects"
+
+	+ to move to newLocation (vector):
+		% Moves this object to location newLocation.
+
+		if !realWorldPointer:
+			die "attempt to move uninitialized Mobile object.".
+
+		realSetLocation(realWorldPointer, newLocation).
+
+	+ to set-rotation to theRotation (matrix):
+		% Sets the rotation of this object to the rotation matrix theRotation.
+		% Working with matrices can be complicated, so a more simple
+		% approach is to use METHOD(rotate).
+
+		realSetRotationMatrix(realWorldPointer, theRotation).
+
+	+ to get-location:
+		% Returns the vector location of this object. 
+
+		return realGetLocation( realWorldPointer ).
+
+	+ to get-rotation:
+		% Returns the matrix rotation of this object. 
+
+		return realGetRotation( realWorldPointer ).
+
+	+ to set-rotation around-axis thisAxis (vector) by amount (float):
+		% Sets the rotation of this object around vector axis thisAxis 
+		% by scalar amount (in radians).  This is an "absolute" rotation--the 
+		% current rotation of the object does not affect how the 
+		% object will be rotated.  For a rotation relative to the 
+		% current orientation, set METHOD(relative-rotate).
+		
+		length (float).
+
+		# normalize the axis
+
+		length = |thisAxis|.
+
+		if length == 0.0: return.
+		thisAxis /= length.
+
+		realSetRotation(realWorldPointer, thisAxis, amount).
+
++ section "Setting the Shape of a Real Object"
+	+ to set-shape to theShape (object):
+		% Sets the shape of this object, for both display and collision detection purposes.  To
+		% set the shape for one purpose, but not the other, use the methods METHOD(set-display-shape)
+		% or METHOD(set-collision-shape).
+
+		self set-display-shape to theShape.
+		self set-collision-shape to theShape.
+
+	+ to set-collision-shape to theShape (object):
+		% Associates a OBJECT(Shape) object with this object for collision purposes.  This shape
+		% will not be displayed for this object unless METHOD(set-display-shape) is also called
+		% with this shape.  Returns this object.
+
+		if !(theShape get-pointer): 
+			die "attempt to register Mobile object with uninitialized shape ($theShape)".
+
+		if objectShape: 
+			self remove-dependency on objectShape.
+
+		objectShape = theShape.
+		self add-dependency on objectShape.
+
+		realSetShape( realWorldPointer, (theShape get-pointer) ).
+
+		return self.
+
+	+ to set-display-shape to theShape (object):
+		% Associates a OBJECT(Shape) object with this object for display purposes only.
+		% This shape will not be used for collision detection unless it is passed to 
+		% METHOD(set-collision-shape) as well.  Returns this object.
+
+		if !(theShape get-pointer): 
+			die "attempt to register Mobile object with uninitialized shape ($theShape)".
+
+		if objectShape: 
+			self remove-dependency on objectShape.
+
+		objectShape = theShape.
+		self add-dependency on objectShape.
+
+		realSetDisplayShape( realWorldPointer, (theShape get-pointer) ).
+
+		return self.
+
+	+ to get-shape:
+		% Returns the OBJECT(Shape) associated with this Mobile object.
+
+		return objectShape.
 
 	+ to watch:
 		% Makes the camera follow this object.
@@ -78,7 +174,7 @@ Object : Real (aka Reals) [version 2.1] {
 		% elastic collision (such as a rubber ball).
 
 		e = newE.
-		setCollisionProperties(realWorldPointer, e, eT, mu).
+		realSetCollisionProperties(realWorldPointer, e, eT, mu).
 
 	+ to set-eT to newET (float):
 		% Sets the "tangential coefficient of restitution", a
@@ -88,7 +184,7 @@ Object : Real (aka Reals) [version 2.1] {
 		% friction pushes against the sliding object.
 
 		eT = newET.
-		setCollisionProperties(realWorldPointer, e, eT, mu).
+		realSetCollisionProperties(realWorldPointer, e, eT, mu).
 
 	+ to set-mu to newMu (float):
 		% Sets the coefficient of friction to newMu.  mu is a 
@@ -96,7 +192,7 @@ Object : Real (aka Reals) [version 2.1] {
 		% may be any value between 0 and infinity.
 
 		mu = newMu.
-		setCollisionProperties(realWorldPointer, e, eT, mu).
+		realSetCollisionProperties(realWorldPointer, e, eT, mu).
 
   + section "Using Menus"
 
@@ -138,14 +234,14 @@ Object : Real (aka Reals) [version 2.1] {
 		% Returns a list of all real objects in the simulation that are within
 		% the "neighborhood" range of this object in the world.
 
-		return getNeighbors(realWorldPointer).
+		return realGetNeighbors(realWorldPointer).
 
 	+ to set-neighborhood-size to size (float):
 		% Used in conjunction with METHOD(get-neighbors), this function will set
 		% the neighborhood size for the current object.
 
 		neighborhoodSize = size.
-		setNeighborhoodSize(realWorldPointer, size).
+		realSetNeighborhoodSize(realWorldPointer, size).
 		
 	+ to get-neighborhood-size:
 		% gets the neighborhood size for the current object.
@@ -157,14 +253,14 @@ Object : Real (aka Reals) [version 2.1] {
 	+ to show-bounding-box:
 		% Shows the bounding box for the object.
 
-		setBoundingBox(realWorldPointer, 1).
+		realSetBoundingBox(realWorldPointer, 1).
 
 	+ to hide-bounding-box:
 		% Hides the bounding box for the object.  The bounding box is 
 		% hidden by default, so you'll only need this method if you've 
 		% previously enabled them using METHOD(show-axis).
 
-		setBoundingBox(realWorldPointer, 0).
+		realSetBoundingBox(realWorldPointer, 0).
 
 	+ to add-line to otherObject (object) with-color theColor = (0, 0, 0) (vector) with-style theStyle = "----------------" (string):
 		% Adds a line to be drawn from this object to otherObject.  The line can be removed 
@@ -218,37 +314,37 @@ Object : Real (aka Reals) [version 2.1] {
 	+ to show-axis:
 		% Shows the X and Y axes for the object.
 
-		setDrawAxis(realWorldPointer, 1).
+		realSetDrawAxis(realWorldPointer, 1).
 
 	+ to hide-axis:
 		% Hides the X and Y axes for the object.  The axes are hidden by
 		% default, so you'll only need this method if you've previously
 		% enabled them using METHOD(show-axis).
 
-		setDrawAxis(realWorldPointer, 0).
+		realSetDrawAxis(realWorldPointer, 0).
 
 	+ to show-neighbor-lines:
 		% Draws lines to this objects neighbors (when neighbor checking is
 		% enabled).
 
-		setNeighborLines(realWorldPointer, 1).
+		realSetNeighborLines(realWorldPointer, 1).
 
 	+ to hide-neighbor-lines:
 		% Hides lines to this objects neighbors.
 
-		setNeighborLines(realWorldPointer, 0).
+		realSetNeighborLines(realWorldPointer, 0).
 
 	+ to make-invisible:
 		% Makes the object invisible.  Can be made visible again later
 		% using the method METHOD(make-visible).
 
-		setVisible(realWorldPointer, 0).
+		realSetVisible(realWorldPointer, 0).
 
 	+ to make-visible:
 		% Makes the object visible again (if it has previously been hidden
 		% using METHOD(make-invisible).
 
-		setVisible(realWorldPointer, 1).
+		realSetVisible(realWorldPointer, 1).
 
 	+ to get-color:
 		% Returns the color of the object.
@@ -260,12 +356,24 @@ Object : Real (aka Reals) [version 2.1] {
 
 		color = newColor.
 
-		setColor(realWorldPointer, newColor).
+		realSetColor(realWorldPointer, newColor).
+
+	+ to enable-shadows:
+		% If shadow volumes are enabled (see OBJECT(Control)), enables shadow volumes for this object.
+		% This is the default when shadow volumes have been enabled.
+
+		realSetDrawShadows(realWorldPointer, 1).
+
+	+ to disable-shadows:
+		% If shadow volumes are enabled (see OBJECT(Control)), disables shadow volumes for this object.
+		% This is the default when shadow volumes have been enabled.
+
+		realSetDrawShadows(realWorldPointer, 0).
 
 	- to set-texture to textureNumber (int):
 		% Deprecated -- use METHOD(set-texture-image) instead.
 
-		setTexture(realWorldPointer, textureNumber + 1).
+		realSetTexture(realWorldPointer, textureNumber + 1).
 
 	+ to set-texture-image to textureImage (object):
 		% Changes the texture of this object to textureImage, an instance of 
@@ -275,7 +383,7 @@ Object : Real (aka Reals) [version 2.1] {
 		if !textureImage: texture = -1.
 		else texture = (textureImage get-texture-number).
 
-		setTexture(realWorldPointer, texture).
+		realSetTexture(realWorldPointer, texture).
 
 	+ to draw-as-point:
 		% Draws the object as a single point.  This is by far the fastest way
@@ -283,7 +391,7 @@ Object : Real (aka Reals) [version 2.1] {
 		% agents with a reasonable frame rate, while drawing as many spheres or 
 		% bitmaps would slow down the simulation significantly.
 
-		setDrawAsPoint(realWorldPointer, 1).
+		realSetDrawAsPoint(realWorldPointer, 1).
 
 	+ to set-texture-scale to scaleSize (float):
 		% Changes the "scale" of the texture.  When a texture is applied
@@ -294,20 +402,20 @@ Object : Real (aka Reals) [version 2.1] {
 		% the texture will be too big and will not be visible.
 
 		textureScaleX = scaleSize.
-		setTextureScale(realWorldPointer, scaleSize, scaleSize).
+		realSetTextureScale(realWorldPointer, scaleSize, scaleSize).
 
 	+ to set-texture-scale-x to scaleSize (float):
 		% Sets the texture scale in the X dimension.  The Y texture scale 
 		% value is unchanged.  See METHOD(set-texture-scale) for more information.
 
 		textureScaleX = scaleSize.
-		setTextureScale(realWorldPointer, scaleSize, textureScaleY).
+		realSetTextureScale(realWorldPointer, scaleSize, textureScaleY).
 
 	+ to set-texture-scale-y to scaleSize (float):
 		% Sets the texture scale in the Y dimension.  The X texture scale 
 		% value is unchanged.  See METHOD(set-texture-scale) for more information.
 		textureScaleY = scaleSize.
-		setTextureScale(realWorldPointer, textureScaleX, scaleSize).
+		realSetTextureScale(realWorldPointer, textureScaleX, scaleSize).
 
 	+ to set-bitmap-image to bitmapImage (object):
 		% Changes the bitmap of this object to bitmapImage, an instance of 
@@ -317,37 +425,37 @@ Object : Real (aka Reals) [version 2.1] {
 		if !bitmapImage: bitmap = -1.
 		else bitmap = (bitmapImage get-texture-number).
 
-		setBitmap(realWorldPointer, bitmap).
+		realSetBitmap(realWorldPointer, bitmap).
 		
 	- to set-bitmap to textureNumber (int):
 		% Deprecated.
 
 		bitmap = textureNumber.
-		setBitmap(realWorldPointer, textureNumber + 1).
+		realSetBitmap(realWorldPointer, textureNumber + 1).
 
 	+ to set-bitmap-heading to radianAngle (float):
 		% If this object is in 2d bitmap mode, the rotation of the 
 		% bitmap will be set to radianAngle.
 
-		setBitmapRotation(realWorldPointer, radianAngle).
+		realSetBitmapRotation(realWorldPointer, radianAngle).
 
 	+ to set-bitmap-heading-point towards-vector rotationVector (vector):
 		% If this object is in 2d bitmap mode, the rotation of the 
 		% bitmap will be set to degreeAngle degrees.
 
-		setBitmapRotationTowardsVector(realWorldPointer, rotationVector).
+		realSetBitmapRotationTowardsVector(realWorldPointer, rotationVector).
 
 	- to set-bitmap-transparency to alphaValue (float):
 		% Sets the transparency to alphaValue, a number between 0.0 
 		% (totally transparent) and 1.0 (fully opaque). 
 
-		setAlpha(realWorldPointer, alphaValue).
+		realSetAlpha(realWorldPointer, alphaValue).
 
 	+ to set-transparency to alphaValue (float):
 		% Sets the transparency of this object to alphaValue, a number 
 		% between 1.0 (totally opaque) and 0.0 (fully transparent).
 
-		setAlpha(realWorldPointer, alphaValue).
+		realSetAlpha(realWorldPointer, alphaValue).
 
 	+ to set-lightmap-image to lightmapImage (object):
 		% Sets the object to be displayed using a "lightmap".  A 
@@ -361,14 +469,14 @@ Object : Real (aka Reals) [version 2.1] {
 		if !lightmapImage: lightmap = -1.
 		else lightmap = (lightmapImage get-texture-number).
 
-		setLightmap(realWorldPointer, lightmap).
+		realSetLightmap(realWorldPointer, lightmap).
 
 	- to set-lightmap to textureNumber (int):
 		% Deprecated.
 
 		lightmap = textureNumber.
 
-		setLightmap(realWorldPointer, lightmap + 1).
+		realSetLightmap(realWorldPointer, lightmap + 1).
 
   + section "Getting the Light Exposure of this Mobile Object"
         
@@ -377,7 +485,7 @@ Object : Real (aka Reals) [version 2.1] {
 		% (OBJECTMETHOD(Control:enable-light-exposure-detection)), this
 		% method returns the level of light exposure on this object.
 
-		if realWorldPointer: return worldObjectGetLightExposure(realWorldPointer).
+		if realWorldPointer: return realGetLightExposure(realWorldPointer).
 		else return 0.
 
 	+ section "Handling Collisions"

@@ -39,9 +39,12 @@ void slDrawCommandList::draw( slCamera *c ) {
 
 	glTranslatef( _origin.x, _origin.y, _origin.z );
 
-	// glDisable( GL_BLEND );
-	glDisable( GL_LINE_SMOOTH );
+	glDepthFunc( GL_ALWAYS );
+	glEnable( GL_BLEND );
+	glEnable( GL_LINE_SMOOTH );
 	glEnable( GL_DEPTH_TEST );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
 	glLineWidth( 1.2 );
 	glDisable( GL_CULL_FACE );
 	glColor4f( 0.0, 0.0, 0.0, 0.5 );
@@ -57,4 +60,6 @@ void slDrawCommandList::draw( slCamera *c ) {
 	if ( _drawingPolygon ) glEnd();
 
 	glPopMatrix();
+
+	glDepthFunc( GL_LESS );
 }

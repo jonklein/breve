@@ -350,7 +350,7 @@ Abstract : Control (aka Controls) [version 2.3] {
   + section "Selecting Objects"
 
 	- to get-drag-object:
-		if (selectedObject && ((selectedObject is a "Mobile") || (selectedObject is a "MultiBody"))): return selectedObject.
+		if (selectedObject && ((selectedObject is-a class "Mobile") || (selectedObject is-a class "MultiBody"))): return selectedObject.
 		return 0.
 
 	+ to click on theObject (object):
@@ -380,7 +380,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		selectedObject = theObject.
 
-		if selectedObject && (selectedObject is a "Link") && (selectedObject get-multibody):
+		if selectedObject && (selectedObject is-a class "Link") && (selectedObject get-multibody):
 			selectedObject = (selectedObject get-multibody).
 
 		if !selectedObject || 
@@ -402,7 +402,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 		% Returns the "selected" object--the object which 
 		% has been clicked on in the simulation.
 
-		if selectedObject && (selectedObject is a "Link") && (selectedObject get-multibody):
+		if selectedObject && (selectedObject is-a class "Link") && (selectedObject get-multibody):
 			return (selectedObject get-multibody).
 
 		return selectedObject.
@@ -532,7 +532,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 			self set-camera-offset to offset.
 		} 
 
-	+ to pivot-camera x dx (float) y dy (float):
+	+ to pivot-camera x dx = 0.0 (float) y dy = 0.0 (float):
 		% Rotates the camera (from it's current position) on the x-axis by dx and on the y-axis by dy.
 
 		rot (vector).

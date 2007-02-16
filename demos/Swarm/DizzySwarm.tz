@@ -107,10 +107,7 @@ Control : Swarm {
             location += (item get-location).
         }
 
-        # in the context of a number, the list represents the number of items 
-        # in the list.
-
-        location /= birds.
+        location /= | birds |.
 
         topDiff = 0.0.
 

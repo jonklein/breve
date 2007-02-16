@@ -10,6 +10,7 @@ SRC	+= kernel/breveEval.cc kernel/breveObjectAPI.cc kernel/callback.cc \
 		kernel/internalFunctions/breveFunctionsImage.cc \
 		kernel/internalFunctions/breveFunctionsJoint.cc \
 		kernel/internalFunctions/breveFunctionsLink.cc \
+		kernel/internalFunctions/breveFunctionsReal.cc \
 		kernel/internalFunctions/breveFunctionsMath.cc \
 		kernel/internalFunctions/breveFunctionsMatrix.cc \
 		kernel/internalFunctions/breveFunctionsVector.cc \

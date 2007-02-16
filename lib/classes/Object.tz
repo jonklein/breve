@@ -4,55 +4,52 @@
 NULL : Object (aka Objects) [version 2.1] {
 	% Summary: the top level object class.
 	% <P>
-    % The Object class is the root class.  All classes used in breve have
-    % Object as an ancestor.  The object class implements some basic 
-    % services that all classes will have access to.
-    % <p>
-    % Subclassing Object directly is rare.  The classes OBJECT(Real) and 
+	% The Object class is the root class.  All classes used in breve have
+	% Object as an ancestor.  The object class implements some basic 
+	% services that all classes will have access to.
+	% <p>
+	% Subclassing Object directly is rare.  The classes OBJECT(Real) and 
 	% OBJECT(Abstract) are logical separations of the Object class containing 
 	% "real" objects (which correspond to a physical entity in the simulated 
 	% world) and "abstract" objects which are generally used for computation 
 	% or control of the real objects.  You should consider subclassing  
-    % one of these classes instead.
+	% one of these classes instead.
 
-    + variables:
-        objectReferences (int).
-        controller (object).
+	+ variables:
+		objectReferences (int).
+		controller (object).
 		birthTime (float).
 
-    + to init:
+	+ to init:
 		objectReferences = 1.
-        controller = (self get-controller).
+		controller = (self get-controller).
 
 		birthTime = (controller get-time).
 
-    + to destroy:
-        % Automatically called when this object is freed.  This method
-        % should never be called manually.  If subclasses need to free
-        % objects or data, they should implement their own "destroy" 
-        % methods.
+	+ to destroy:
+		% Automatically called when this object is freed.  This method
+		% should never be called manually.  If subclasses need to free
+		% objects or data, they should implement their own "destroy" 
+		% methods.
 
 	+ section "Garbage Collection and Memory Management"
 
 	+ to enable-auto-free:
-		% Experimental--enables garbage collection on a per-object basis.
+		% Enables garbage collection on a per-object basis.
 
 		setGC(1).
 
 	+ to disable-auto-free:
-		% Experimental--disables garbage collection on a per-object basis.
+		% Disables garbage collection on a per-object basis.
 
 		setGC(0).
 
-	- to get-retain-count:
-		return getRetainCount().
+	- to get-controller:
+		% Returns the controller object that associated with the current 
+		% simulation.  It's preferable to simply reference the variable
+		% "controller".
 
-    - to get-controller:
-        % Returns the controller object that associated with the current 
-        % simulation.  It's preferable to simply reference the variable
-        % "controller".
-
-        return getController().
+		return getController().
 
   + section "Getting Information About an Object"
 
@@ -62,40 +59,46 @@ NULL : Object (aka Objects) [version 2.1] {
 
 		return (controller get-time) - birthTime.
 
-    + to get-type:
-        % Returns as a string the type of this object.
+	+ to get-type:
+		% Returns as a string the type of this object.
 
-        return objectName(self).
+		return objectName(self).
 
-    + to is a className (string):
-        % This method returns true or false (1 or 0) depending on whether
-        % the instance in question belongs to class className.  This 
-        % method checks if className is a superclass of the current 
-        % object as well.
-        % <p>
-        % The declaration of this method looks strange, but it should be 
-        % looked at as a statement about an instance which returns true
-        % or false: object is a "thing".
+	- to is a className (string):
+		% This method returns true or false (1 or 0) depending on whether
+		% the instance in question belongs to class className.  This 
+		% method checks if className is a superclass of the current 
+		% object as well.
+		% <p>
+		% Deprecated because "is" is reserved in Python 
 
-        return isa(className).
+		return isa(className).
 
-    - to is-a-subclass of className (string):
+	+ to is-a class className (string):
+		% This method returns true or false (1 or 0) depending on whether
+		% the instance in question belongs to class className.  This 
+		% method checks if className is a superclass of the current 
+		% object as well.
+
+		return isa( className ).
+
+	- to is-a-subclass of className (string):
 		% Returns 1 if this object is a subclass of the class specified with
 		% className, returns 0 otherwise.
 
-		return (self is a className).
+		return isa( className ).
 
-    + to can-respond to methodName (string):
-        % Returns true or false (1 or 0) depending on whether this instance
-        % can respond to a method called methodName.
-        % <p>
-        % But wow, what an awkward declaration!  Same reason as the 
-        % method METHOD(is).  Again, works like a statement that
-        % replies with true or false: object can-respond to "run".
-        % <p>
-        % It's really not my fault that the infinitive of "can" is "be able".
+	+ to can-respond to methodName (string):
+		% Returns true or false (1 or 0) depending on whether this instance
+		% can respond to a method called methodName.
+		% <p>
+		% But wow, what an awkward declaration!  Same reason as the 
+		% method METHOD(is).  Again, works like a statement that
+		% replies with true or false: object can-respond to "run".
+		% <p>
+		% It's really not my fault that the infinitive of "can" is "be able".
  
-        return respondsTo(self, methodName).
+		return respondsTo(self, methodName).
 
 	+ to get-description:
 		% This method should provide a textual description of an object.
@@ -107,39 +110,39 @@ NULL : Object (aka Objects) [version 2.1] {
 
   + section "Scheduling Events and Notificiations"
 
-    + to schedule method-call theMethod (string) at-time theTime (float):
-        % Schedules a call to theMethod when the simulation time equals
-        % theTime.  The margin of error of the callback time is equal
-        % to iteration step (see METHOD(set-iteration-step)).
-        % <br>
-        % If you want to schedule an event at a time relative to the
-        % current time, use the method METHOD(get-time) to get the
-        % current simulation time and then add the offset you want.
+	+ to schedule method-call theMethod (string) at-time theTime (float):
+		% Schedules a call to theMethod when the simulation time equals
+		% theTime.  The margin of error of the callback time is equal
+		% to iteration step (see METHOD(set-iteration-step)).
+		% <br>
+		% If you want to schedule an event at a time relative to the
+		% current time, use the method METHOD(get-time) to get the
+		% current simulation time and then add the offset you want.
 
-        addEvent(theMethod, theTime, 0).
+		addEvent(theMethod, theTime, 0).
 
 	- to schedule-repeating method-call theMethod (string) with-interval theInterval (double): 
-        addEvent(theMethod, theInterval, theInterval).
+		addEvent(theMethod, theInterval, theInterval).
 
-    + to observe instance theObject (object) for-notification theNotification (string) with-method theMethod (string):
-        % Causes the current object to observe theObject.  By registering as
-        % and observer, the current object will receive a call to theMethod whenever
-        % theObject calls the METHOD(announce) method with notificiation
-        % theNotification.
+	+ to observe instance theObject (object) for-notification theNotification (string) with-method theMethod (string):
+		% Causes the current object to observe theObject.  By registering as
+		% and observer, the current object will receive a call to theMethod whenever
+		% theObject calls the METHOD(announce) method with notificiation
+		% theNotification.
 
-        addObserver(theObject, theNotification, theMethod).
+		addObserver(theObject, theNotification, theMethod).
 
-    + to unobserve instance theObject (object) for-notification theNotification (string):
-        % Unregisters the current object as an observer of theObject with 
-        % notification theNotification.
+	+ to unobserve instance theObject (object) for-notification theNotification (string):
+		% Unregisters the current object as an observer of theObject with 
+		% notification theNotification.
 
-        removeObserver(theObject, theNotification).
+		removeObserver(theObject, theNotification).
 
-    + to announce message theMessage (string):
-        % Sends a notification with the message theMessage to all observer  
-        % objects.  See METHOD(observe) for information on making an object an observer.
+	+ to announce message theMessage (string):
+		% Sends a notification with the message theMessage to all observer  
+		% objects.  See METHOD(observe) for information on making an object an observer.
 
-        notify(theMessage).
+		notify(theMessage).
 
 	+ to call-method named methodName (string):
 		% Calls the method named methodName for this object.  Returns the result of
@@ -172,10 +175,10 @@ NULL : Object (aka Objects) [version 2.1] {
 
   + section "Archiving & Dearchiving"
 
-    + to archive-as-xml file fileName (string):
-        % Writes the current object to the XML file fileName.
+	+ to archive-as-xml file fileName (string):
+		% Writes the current object to the XML file fileName.
 
-        archiveXMLObject(self, fileName).
+		archiveXMLObject(self, fileName).
 
 	+ to send-over-network to hostName (string) on portNumber (int):
 		% Sends this object over the network to a breve server on host hostName

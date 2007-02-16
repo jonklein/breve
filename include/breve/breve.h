@@ -63,13 +63,13 @@ const struct option gCLIOptions[] = {
         { "version",    no_argument,       0, 'v' }, 
         { "format",     no_argument,       0, 'F' },
         { "master",     no_argument,       0, 'M' },
-        { "slave",      required_argument, 0, 'S' }
+        { "slave",      required_argument, 0, 'S' },
+        { "python",	no_argument 	 , 0, 'Y' } 
 };
 
 int brParseArgs(int, char **);
 
 __dead void brPrintUsage(const char *);
-
 __dead void brQuit(brEngine *);
 
 void brClick(int);

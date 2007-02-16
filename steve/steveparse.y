@@ -96,7 +96,7 @@ int stGetTypeForString(char *);
 %type <integer> vector_element math_assign_operator
 %type <number> object_version
 %type <string> object_aka method_head 
-%type <exp> number vector matrix string
+%type <exp> number vector matrix string 
 %type <exp> atomic_expression unary_expression mul_expression add_expression comp_expression
 %type <exp> log_expression land_expression method_call expression
 %type <exp> control_statement simple_statement statement compound_statement
@@ -113,7 +113,7 @@ int stGetTypeForString(char *);
 %type <exp> literal_value
 
 %token <number> FLOAT_VALUE
-%token <string> STRING_VALUE WORD_VALUE
+%token <string> STRING_VALUE WORD_VALUE COMMENT_STRING DOCUMENTATION_COMMENT_STRING
 %token <eval> ST_EVAL 
 %token <integer> INT_VALUE TYPE PLURAL_TYPE
 %token TO_PRIVATE TO_PUBLIC TO_PROTECTED WITH_INTERFACE
@@ -384,7 +384,7 @@ object_aka
 ;
 
 objecttype
-: WORD_VALUE ':' WORD_VALUE	object_aka object_version { 
+: WORD_VALUE ':' WORD_VALUE object_aka object_version { 
 		stObject *parentObject, *akaObject;
 		brObject *o;
 		float version;
@@ -433,7 +433,7 @@ objecttype
 				slFree($3);
 				if($4) slFree($4);
 			} else {
-				currentObject = stObjectNew(parseEngine, steveData, $3, $4, parentObject, version);
+				currentObject = stObjectNew( parseEngine, steveData, $3, $4, parentObject, version, yyfile );
 				currentMethod = NULL;
 
 				slFree($1);
@@ -496,7 +496,7 @@ to
 ;
 
 method_head
-: to WORD_VALUE keyword_and_variables ':' { 
+: to WORD_VALUE keyword_and_variables ':' {
 		currentMethod = new stMethod($2, $3, yyfile, lineno);
 
 		delete $3;
@@ -1226,4 +1226,21 @@ int stGetTypeForString(char *type) {
 	if(!strcmp(type, "data")) return AT_STRING;
 
 	return AT_UNDEFINED;
+}
+
+void stParseAddDocumentingComment( const char *comment ) {
+	while( *comment && ( *comment == '#' || *comment == '%' || isspace( *comment ) ) ) comment++;
+
+	std::string *target = NULL;
+
+	if( currentMethod ) {
+		target = &currentMethod->_comment;
+	} else if( currentObject ) {
+		target = &currentObject->_comment;
+	}
+
+	if( target ) {
+		if( target->size() != 0 ) (*target) += " ";
+		(*target) += comment;
+	}
 }

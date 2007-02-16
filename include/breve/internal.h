@@ -19,6 +19,7 @@ void breveInitFileFunctions(brNamespace *);
 void breveInitGraphFunctions(brNamespace *);
 void breveInitImageFunctions(brNamespace *);
 void breveInitLinkFunctions(brNamespace *);
+void breveInitRealFunctions(brNamespace *);
 void breveInitMathFunctions(brNamespace *);
 void breveInitMenuFunctions(brNamespace *);
 void breveInitMovieFunctions(brNamespace *);

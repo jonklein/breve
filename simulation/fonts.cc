@@ -29,7 +29,6 @@ FTFont *slFontManager::getFont( std::string file, int size ) {
 	// printf("loading font %s [%d]\n", file.c_str(), size);
 
 	font->FaceSize( size );
-
 	font->CharMap( ft_encoding_unicode );
 
 	_fonts[ index] = font;

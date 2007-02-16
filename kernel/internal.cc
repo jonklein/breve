@@ -128,6 +128,7 @@ void brLoadInternalFunctions( brEngine *e ) {
 	breveInitMultibodyFunctions( e->internalMethods );
 	breveInitShapeFunctions( e->internalMethods );
 	breveInitLinkFunctions( e->internalMethods );
+	breveInitRealFunctions( e->internalMethods );
 	breveInitNetworkFunctions( e->internalMethods );
 	breveInitPatchFunctions( e->internalMethods );
 	breveInitNeuralFunctions( e->internalMethods );

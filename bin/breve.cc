@@ -18,12 +18,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-/*!
-	\brief The GLUT-based breve application.
-
-	This is a wrapper around the breve engine for the GLUT-based
-	steve-frontend version of the breve simulation environment.
-*/
+/**
+ * The GLUT-based breve application.
+ * This is a wrapper around the breve gEngine for the GLUT-based
+ * steve-frontend version of the breve simulation environment.
+ */
 
 #include "simulation.h"
 #include "steve.h"
@@ -32,71 +31,48 @@
 #include "movie.h"
 #include "gldraw.h"
 
+#include "pyconvert.h"
+
 static void brInterrupt( brEngine * );
-
-static void graphDisplay( void );
-
 static void *workerThread( void * );
 
-static void *newWindowCallback( char *, void * );
-
-static void freeWindowCallback( void * );
-
-static void renderWindowCallback( void * );
+static void brCatchSignal( int signal );
 
 #if MINGW
 extern char *optarg;
-
 extern int optind;
-
 #endif
 
-static brEngine *engine;
-
+static brEngine *gEngine;
 static int contextMenu, mainMenu;
-
 static int height = 400, width = 400;
-
-static int xpos = 0, ypos = 0;
-
+static int gXpos = 0, gYpos = 0;
 static stSteveData *gSteveData;
-
 static char keyDown[256];
-
 static char specialDown[256];
-
 static int gPaused = 1;
-
 static int gWaiting = 0;
-
 static int gThreadShouldExit = 0;
 
 static pthread_mutex_t gEngineMutex;
-
 static pthread_mutex_t gThreadMutex;
-
 static pthread_cond_t gThreadPaused;
 
 static char *gOptionArchiveFile = NULL;
 
+static int gConvertToPython = 0;
 static int gOptionFormat = 0;
-
 static int gOptionFull = 0;
-
 static int gOptionStdin = 0;
-
 static int gMotionCrosshair = 0;
-
 static int gOptionNoGraphics = 0;
 
 static int gLastX, gLastY, gMods, gSpecial;
-
 static double gStartCamX;
 
 static brInstance *gSelected = NULL;
 
 static int gSlave = 0, gMaster = 0;
-
 static char *gSlaveHost;
 
 static std::map<int, void*> gWindowMap;
@@ -107,7 +83,7 @@ int main( int argc, char **argv ) {
 	int index;
 	char wd[MAXPATHLEN];
 
-	interfaceID = "glut/2.5";
+	interfaceID = "glut/2.6";
 
 	srandom( time( NULL ) );
 
@@ -153,35 +129,69 @@ int main( int argc, char **argv ) {
 		exit( 0 );
 	}
 
-	engine = brEngineNewWithArguments( argc, argv );
+	gEngine = brEngineNewWithArguments( argc, argv );
 
-	brEngineSetIOPath( engine, getcwd( wd, sizeof( wd ) ) );
+	brEngineSetIOPath( gEngine, getcwd( wd, sizeof( wd ) ) );
 
-	gSteveData = (stSteveData*)brInitFrontendLanguages( engine );
+	gSteveData = (stSteveData*)brInitFrontendLanguages( gEngine );
 
-	engine->getLoadname = getLoadname;
-	engine->getSavename = getSavename;
-	engine->soundCallback = soundCallback;
-	engine->dialogCallback = brCLIDialogCallback;
-	engine->interfaceTypeCallback = interfaceVersionCallback;
-	engine->pauseCallback = pauseCallback;
-	engine->newWindowCallback = newWindowCallback;
-	engine->freeWindowCallback = freeWindowCallback;
-	engine->renderWindowCallback = renderWindowCallback;
+	gEngine->getLoadname 		= getLoadname;
+	gEngine->getSavename 		= getSavename;
+	gEngine->soundCallback 		= soundCallback;
+	gEngine->dialogCallback 	= brCLIDialogCallback;
+	gEngine->interfaceTypeCallback	= interfaceVersionCallback;
+	gEngine->pauseCallback 		= pauseCallback;
 
-	if ( !gOptionNoGraphics ) slInitGlut( argc, argv, simulationFile );
+	if ( !gOptionNoGraphics ) 
+		slInitGlut( argc, argv, simulationFile );
 
-	engine->camera->setBounds( width, height );
+
+
+	gEngine->camera->setBounds( width, height );
+
+
+
+	if( gConvertToPython ) {
+		brLoadSimulation( gEngine, text, simulationFile );
+		std::string sim = simulationFile;
+		std::string obj = stPyConvertFile( gSteveData, sim );
+
+		int position = sim.find( ".tz", sim.size() - 3 );
+
+		if( position > 0 ) {
+			sim.replace( position, 3, ".py", 3 );
+		} else {
+			sim += ".py";
+		}
+
+		FILE *fp = fopen( sim.c_str(), "w" );
+
+		if( !fp ) {
+			fprintf( stderr, "Cannot open file \"%s\" for writing\n", sim.c_str() );
+			exit( 1 );
+		}
+
+		fprintf( fp, "%s\n", obj.c_str() );
+
+		fclose( fp );
+
+		exit( 0 );
+	}
+
 
 	if ( gOptionArchiveFile ) {
-		if ( brLoadSavedSimulation( engine, text, simulationFile, gOptionArchiveFile ) != EC_OK )
-			brQuit( engine );
-	} else if ( brLoadSimulation( engine, text, simulationFile ) != EC_OK )
-		brQuit( engine );
+		if ( brLoadSavedSimulation( gEngine, text, simulationFile, gOptionArchiveFile ) != EC_OK )
+			brQuit( gEngine );
+	} else if ( brLoadSimulation( gEngine, text, simulationFile ) != EC_OK )
+		brQuit( gEngine );
+
+
+
+
 
 	slFree( text );
 
-	brEngineSetUpdateMenuCallback( engine, brGlutMenuUpdate );
+	brEngineSetUpdateMenuCallback( gEngine, brGlutMenuUpdate );
 
 	memset( keyDown, 0, sizeof( keyDown ) );
 
@@ -192,19 +202,22 @@ int main( int argc, char **argv ) {
 	pthread_create( &thread, NULL, workerThread, NULL );
 
 	if ( gMaster )
-		engine->world->startNetsimServer();
+		gEngine->world->startNetsimServer();
 
 	if ( gSlave ) {
-		engine->world->startNetsimSlave( gSlaveHost );
+		gEngine->world->startNetsimSlave( gSlaveHost );
 		slFree( gSlaveHost );
 	}
 
 	if ( gOptionFull ) glutFullScreen();
 
 	if ( gOptionNoGraphics ) {
+        	signal( SIGINT, brCatchSignal );
+
 		gPaused = 0;
 
-		while ( 1 ) brGlutLoop();
+		while ( 1 ) 
+			brGlutLoop();
 	}
 
 	glutMainLoop();
@@ -217,14 +230,14 @@ void *workerThread( void *data ) {
 	for ( ;; ) {
 		pthread_mutex_lock( &gThreadMutex );
 
-		if (( !gPaused && !engine->drawEveryFrame ) ||
+		if (( !gPaused && !gEngine->drawEveryFrame ) ||
 		        !pthread_cond_wait( &gThreadPaused, &gThreadMutex ) ) {
 			if ( gThreadShouldExit ) {
 				pthread_mutex_unlock( &gThreadMutex );
 				return NULL;
-			} else if ( brEngineIterate( engine ) != EC_OK ) {
+			} else if ( brEngineIterate( gEngine ) != EC_OK ) {
 				pthread_mutex_unlock( &gThreadMutex );
-				brQuit( engine );
+				brQuit( gEngine );
 			}
 		}
 
@@ -235,21 +248,26 @@ void *workerThread( void *data ) {
 void brGlutLoop() {
 	static int oldD = 1;
 
-	int newD = engine->drawEveryFrame;
+	int newD = gEngine->drawEveryFrame;
 
 	gWaiting = 0;
 
 	if ( !gPaused ) {
-		if ( newD && brEngineIterate( engine ) != EC_OK )
-			brQuit( engine );
+		if ( newD && brEngineIterate( gEngine ) != EC_OK )
+			brQuit( gEngine );
 
-		if ( !gOptionNoGraphics ) glutPostRedisplay();
+		if ( !gOptionNoGraphics ) 
+			glutPostRedisplay();
 
 		if ( !newD && oldD ) {
 			pthread_mutex_unlock( &gThreadMutex );
 			pthread_cond_signal( &gThreadPaused );
 		} else if ( newD && !oldD )
 			pthread_mutex_lock( &gThreadMutex );
+
+//                if ( gEngine->world->detectLightExposure() )
+//			gEngine->camera->detectLightExposure(
+//			gEngine->world, OSMESA_WINDOW_SIZE, gOffscreenBuffer );
 
 		oldD = newD;
 	}
@@ -260,7 +278,7 @@ void brGlutMenuUpdate( brInstance *i ) {
 	char *message;
 	unsigned int n, total;
 
-	if ( i != engine->controller )
+	if ( i != gEngine->controller )
 		return;
 
 	glutSetMenu( mainMenu );
@@ -292,7 +310,7 @@ void brGlutMenuUpdate( brInstance *i ) {
 void brQuit( brEngine *e ) {
 	double diff, age;
 
-	if ( !gPaused && !engine->drawEveryFrame ) {
+	if ( !gPaused && !gEngine->drawEveryFrame ) {
 		gThreadShouldExit = 1;
 		pthread_mutex_lock( &gThreadMutex );
 	}
@@ -309,19 +327,19 @@ void brQuit( brEngine *e ) {
 		printf( "%f simulated/real\n", age / diff );
 	}
 
-	brEngineFree( engine );
+	brEngineFree( gEngine );
 
 	exit( 0 );
 }
 
 void brMainMenu( int n ) {
-	brMenuCallback( engine, engine->controller, n );
+	brMenuCallback( gEngine, gEngine->controller, n );
 	glutPostRedisplay();
 }
 
 void brContextMenu( int n ) {
 	if ( gSelected )
-		brMenuCallback( engine, gSelected, n );
+		brMenuCallback( gEngine, gSelected, n );
 
 	glutPostRedisplay();
 }
@@ -329,7 +347,7 @@ void brContextMenu( int n ) {
 void brClick( int n ) {
 	unsigned int m, total;
 
-	gSelected = brClickCallback( engine, n );
+	gSelected = brClickCallback( gEngine, n );
 
 	glutSetMenu( contextMenu );
 
@@ -356,8 +374,7 @@ int brParseArgs( int argc, char **argv ) {
 	int error = 0;
 
 	const char *name = argv[0];
-
-	const char *optstring = "a:d:fhip:r:s:xuvFMS:";
+	const char *optstring = "a:d:fhip:r:s:xuvFMS:Y";
 
 #if HAVE_GETOPT_LONG
 	while (( r = getopt_long( argc, argv, optstring, gCLIOptions, NULL ) ) != -1 )
@@ -393,7 +410,7 @@ int brParseArgs( int argc, char **argv ) {
 				break;
 
 			case 'p':
-				sscanf( optarg, "%d,%d", &xpos, &ypos );
+				sscanf( optarg, "%d,%d", &gXpos, &gYpos );
 
 				break;
 
@@ -445,7 +462,10 @@ int brParseArgs( int argc, char **argv ) {
 
 			case 'x':
 				gOptionNoGraphics = 1;
+				break;
 
+			case 'Y':	
+				gConvertToPython = 1;
 				break;
 
 			default:
@@ -489,26 +509,18 @@ void slInitGlut( int argc, char **argv, char *title ) {
 	glutInit( &argc, argv );
 	glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL );
 
-	if ( xpos || ypos ) glutInitWindowPosition( xpos, ypos );
+	if ( gXpos || gYpos ) 
+		glutInitWindowPosition( gXpos, gYpos );
 
 	glutCreateWindow( title );
-
 	glutMouseFunc( slDemoMouse );
-
 	glutMotionFunc( slDemoMotion );
-
 	glutPassiveMotionFunc( slDemoPassiveMotion );
-
 	glutDisplayFunc( slDemoDisplay );
-
 	glutSpecialFunc( slDemoSpecial );
-
 	glutSpecialUpFunc( slDemoSpecialUp );
-
 	glutReshapeFunc( slDemoReshape );
-
 	glutKeyboardUpFunc( slDemoKeyboardUp );
-
 	glutKeyboardFunc( slDemoKeyboard );
 
 	mainMenu = glutCreateMenu( brMainMenu );
@@ -519,7 +531,7 @@ void slInitGlut( int argc, char **argv, char *title ) {
 
 	glutAttachMenu( GLUT_MIDDLE_BUTTON );
 
-	slInitGL( engine->world, engine->camera );
+	slInitGL( gEngine->world, gEngine->camera );
 
 	glutIgnoreKeyRepeat( 1 );
 
@@ -529,16 +541,16 @@ void slInitGlut( int argc, char **argv, char *title ) {
 }
 
 void slDemoReshape( int x, int y ) {
-	engine->camera->setBounds( x, y );
+	gEngine->camera->setBounds( x, y );
 
 	glViewport( 0, 0, x, y );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
 void slDemoDisplay() {
-	brEngineLock( engine );
-	brEngineRenderWorld( engine, gMotionCrosshair );
-	brEngineUnlock( engine );
+	brEngineLock( gEngine );
+	brEngineRenderWorld( gEngine, gMotionCrosshair );
+	brEngineUnlock( gEngine );
 
 	glutSwapBuffers();
 }
@@ -549,14 +561,14 @@ void slDemoMouse( int button, int state, int x, int y ) {
 	if ( state == GLUT_DOWN ) {
 		gLastX = x;
 		gLastY = y;
-		gStartCamX = engine->camera->_rx;
+		gStartCamX = gEngine->camera->_rx;
 
-		brClick( engine->camera->select( engine->world, x, y ) );
-		brGlutMenuUpdate( engine->controller );
+		brClick( gEngine->camera->select( gEngine->world, x, y ) );
+		brGlutMenuUpdate( gEngine->controller );
 
 		gMotionCrosshair = 1;
 
-		// if(gMods & GLUT_ACTIVE_SHIFT) brBeginDrag( engine, gSelected );
+		// if(gMods & GLUT_ACTIVE_SHIFT) brBeginDrag( gEngine, gSelected );
 
 	} else {
 		gLastX = 0;
@@ -569,20 +581,20 @@ void slDemoMouse( int button, int state, int x, int y ) {
 }
 
 void slDemoPassiveMotion( int x, int y ) {
-	engine->mouseX = x;
-	engine->mouseY = engine->camera->_height - y;
+	gEngine->mouseX = x;
+	gEngine->mouseY = gEngine->camera->_height - y;
 }
 
 void slDemoMotion( int x, int y ) {
 	if ( gLastX || gLastY ) {
 		if (( gMods & GLUT_ACTIVE_SHIFT ) || ( gSpecial == GLUT_KEY_F4 ) ) {
-			brDragCallback( engine, x, y );
+			brDragCallback( gEngine, x, y );
 		} else if (( gMods & GLUT_ACTIVE_ALT ) || ( gSpecial == GLUT_KEY_F2 ) ) {
-			engine->camera->zoomWithMouseMovement( x - gLastX, y - gLastY );
+			gEngine->camera->zoomWithMouseMovement( x - gLastX, y - gLastY );
 		} else if (( gMods & GLUT_ACTIVE_CTRL ) || ( gSpecial == GLUT_KEY_F3 ) ) {
-			engine->camera->moveWithMouseMovement( x - gLastX, y - gLastY );
+			gEngine->camera->moveWithMouseMovement( x - gLastX, y - gLastY );
 		} else {
-			engine->camera->rotateWithMouseMovement( x - gLastX, y - gLastY );
+			gEngine->camera->rotateWithMouseMovement( x - gLastX, y - gLastY );
 		}
 
 		gLastX = x;
@@ -603,29 +615,25 @@ void slDemoSpecial( int key, int x, int y ) {
 	switch ( key ) {
 
 		case GLUT_KEY_F1:
-			if ( brEngineIterate( engine ) != EC_OK )
-				brQuit( engine );
+			if ( brEngineIterate( gEngine ) != EC_OK )
+				brQuit( gEngine );
 
 			break;
 
 		case GLUT_KEY_UP:
-			brSpecialKeyCallback( engine, "up", 1 );
-
+			brSpecialKeyCallback( gEngine, "up", 1 );
 			break;
 
 		case GLUT_KEY_DOWN:
-			brSpecialKeyCallback( engine, "down", 1 );
-
+			brSpecialKeyCallback( gEngine, "down", 1 );
 			break;
 
 		case GLUT_KEY_LEFT:
-			brSpecialKeyCallback( engine, "left", 1 );
-
+			brSpecialKeyCallback( gEngine, "left", 1 );
 			break;
 
 		case GLUT_KEY_RIGHT:
-			brSpecialKeyCallback( engine, "right", 1 );
-
+			brSpecialKeyCallback( gEngine, "right", 1 );
 			break;
 	}
 
@@ -638,22 +646,22 @@ void slDemoSpecialUp( int key, int x, int y ) {
 	switch ( key ) {
 
 		case GLUT_KEY_UP:
-			brSpecialKeyCallback( engine, "up", 0 );
+			brSpecialKeyCallback( gEngine, "up", 0 );
 
 			break;
 
 		case GLUT_KEY_DOWN:
-			brSpecialKeyCallback( engine, "down", 0 );
+			brSpecialKeyCallback( gEngine, "down", 0 );
 
 			break;
 
 		case GLUT_KEY_LEFT:
-			brSpecialKeyCallback( engine, "left", 0 );
+			brSpecialKeyCallback( gEngine, "left", 0 );
 
 			break;
 
 		case GLUT_KEY_RIGHT:
-			brSpecialKeyCallback( engine, "right", 0 );
+			brSpecialKeyCallback( gEngine, "right", 0 );
 
 			break;
 	}
@@ -672,10 +680,10 @@ void slDemoKeyboard( unsigned char key, int x, int y ) {
 			gPaused = !gPaused;
 
 			if ( gPaused ) {
-				brPauseTimer( engine );
+				brPauseTimer( gEngine );
 				glutIdleFunc( NULL );
 			} else {
-				brUnpauseTimer( engine );
+				brUnpauseTimer( gEngine );
 				pthread_cond_signal( &gThreadPaused );
 				glutIdleFunc( brGlutLoop );
 			}
@@ -684,18 +692,23 @@ void slDemoKeyboard( unsigned char key, int x, int y ) {
 
 		case 0x1b:
 			if ( !gWaiting )
-				brInterrupt( engine );
+				brInterrupt( gEngine );
 
 			break;
 
 		default:
-			brKeyCallback( engine, key, 1 );
+			brKeyCallback( gEngine, key, 1 );
 
 			break;
 	}
 }
 
-void brInterrupt( brEngine *engine ) {
+
+void brCatchSignal( int signal ) {
+	brInterrupt( gEngine );
+}
+
+void brInterrupt( brEngine *gEngine ) {
 	char *line;
 	char staticLine[MAXPATHLEN];
 
@@ -707,7 +720,7 @@ void brInterrupt( brEngine *engine ) {
 		return;
 	}
 
-	brPauseTimer( engine );
+	brPauseTimer( gEngine );
 
 	fflush( stdin );
 	printf( "\n\nSimulation interupted.  Type a steve command, 'x' to quit, or hit enter to continue\n" );
@@ -729,10 +742,10 @@ void brInterrupt( brEngine *engine ) {
 #endif
 
 	if ( !line || *line == 'x' )
-		brQuit( engine );
+		brQuit( gEngine );
 
 	if ( *line != '\0' && *line != '\n' )
-		stRunSingleStatement( gSteveData, engine, line );
+		stRunSingleStatement( gSteveData, gEngine, line );
 
 	if ( line != staticLine )
 		free( line );
@@ -740,7 +753,7 @@ void brInterrupt( brEngine *engine ) {
 	if ( gOptionFull )
 		glutFullScreen();
 
-	brUnpauseTimer( engine );
+	brUnpauseTimer( gEngine );
 }
 
 /*!
@@ -748,7 +761,7 @@ void brInterrupt( brEngine *engine ) {
 */
 
 void slDemoKeyboardUp( unsigned char key, int x, int y ) {
-	brKeyCallback( engine, key, 0 );
+	brKeyCallback( gEngine, key, 0 );
 	keyDown[key] = 0;
 }
 
@@ -769,16 +782,12 @@ int brCLIDialogCallback( char *title, char *message, char *b1, char *b2 ) {
 		( void )getchar();
 
 		switch ( result ) {
-
 			case EOF:
-
 			case 'n':
-
 			case 'N':
 				return 0;
 
 			case 'y':
-
 			case 'Y':
 				return 1;
 		}
@@ -821,48 +830,8 @@ int soundCallback() {
 
 int pauseCallback() {
 	gPaused = 1;
-	brPauseTimer( engine );
+	brPauseTimer( gEngine );
 	glutIdleFunc( NULL );
 	return 0;
 }
 
-void *newWindowCallback( char *name, void *graph ) {
-	slGLUTWindow *w;
-
-	w = new slGLUTWindow;
-	w->id = glutCreateWindow( name );
-	w->graph = ( slGraph * )graph;
-
-	gWindowMap[w->id] = w;
-
-	glutDisplayFunc( graphDisplay );
-
-	return w;
-}
-
-void freeWindowCallback( void *w ) {
-	slGLUTWindow *window = ( slGLUTWindow * )w;
-
-	glutDestroyWindow( window->id );
-	delete window;
-}
-
-void renderWindowCallback( void *w ) {
-	slGLUTWindow *window = ( slGLUTWindow * )w;
-	slDrawGraph( window->graph );
-}
-
-void graphDisplay() {
-	int windowid = glutGetWindow();
-
-	if ( windowid > 1024 )
-		return;
-
-	//printf("displaying window #%d...\n", windowid);
-
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-	renderWindowCallback( gWindowMap[windowid] );
-
-	glutSwapBuffers();
-}

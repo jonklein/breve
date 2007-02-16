@@ -1,3 +1,6 @@
+#ifndef _STEVE_FRONTEND_H
+#define _STEVE_FRONTEND_H
+
 #define ST_STACK_SIZE   0x4000
 
 #include <vector>
@@ -24,6 +27,8 @@ struct stSteveData {
 
 	std::vector< stObject* > objects;
 	std::vector< std::string > filesSeen;
+	std::map< std::string, std::vector< std::string > > 	_includes;
+	std::map< std::string, std::vector< std::string > > 	_paths;
 
 	std::map< std::string, brEval* > defines;
 
@@ -65,9 +70,10 @@ void stParseError( brEngine *, int, char *, ... );
 
 void stSteveCleanup( void* );
 
-int stPreprocess(stSteveData *, brEngine *, const char *);
+int stPreprocess( stSteveData *, brEngine *, const char *, const char * );
 
 int stSetControllerName(stSteveData *, brEngine *, const char *);
 
 void stSetParseData( stSteveData *, const char *, int );
 
+#endif

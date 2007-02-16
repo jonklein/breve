@@ -250,12 +250,9 @@ void slWorld::renderCameras() {
  * Adds an object to the world.
  */
 
-slWorldObject *slWorld::addObject( slWorldObject *inObject ) {
+void slWorld::addObject( slWorldObject *inObject ) {
 	_objects.push_back( inObject );
-
 	_initialized = false;
-
-	return inObject;
 }
 
 /**
@@ -311,9 +308,8 @@ void slWorld::removePatchGrid( slPatchGrid *g ) {
 slStationary::slStationary( slShape *s, slVector *loc, double rot[3][3], void *data ) {
 	_type = WO_STATIONARY;
 
-	s->_referenceCount++;
+	setShape( s );
 
-	_shape = s;
 	_userData = data;
 
 	slVectorCopy( loc, &_position.location );

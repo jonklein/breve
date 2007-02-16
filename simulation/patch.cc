@@ -375,12 +375,12 @@ void slPatchGrid::copyColorFrom3DMatrix( slBigMatrix3DGSL *m, int channel, doubl
 void slPatchGrid::drawWithout3DTexture( slCamera *camera ) {
 	int z, y, x;
 	unsigned int zVal, yVal, xVal;
-	unsigned int zMid = 0, yMid = 0, xMid = 0;
+	int zMid = 0, yMid = 0, xMid = 0;
 	slPatch *patch;
 	slVector translation, origin;
 
 	glDisable( GL_LIGHTING );
-	// glDisable(GL_CULL_FACE);
+	glDisable(GL_CULL_FACE);
 	glDepthMask( GL_FALSE );
 
 	if ( _cubeDrawList == -1 ) this->compileCubeList();
@@ -392,22 +392,16 @@ void slPatchGrid::drawWithout3DTexture( slCamera *camera ) {
 	slVectorAdd( &camera->_location, &camera->_target, &origin );
 
 	xMid = ( int )(( origin.x - startPosition.x ) / patchSize.x );
-
 	if ( xMid < 0 ) xMid = 0;
-
-	if ( xMid > ( unsigned int )_xSize ) xMid = _xSize - 1;
+	if ( xMid >= ( unsigned int )_xSize ) xMid = _xSize - 1;
 
 	yMid = ( int )(( origin.y - startPosition.y ) / patchSize.y );
-
 	if ( yMid < 0 ) yMid = 0;
-
-	if ( yMid > ( unsigned int )_ySize ) yMid = _ySize - 1;
+	if ( yMid >= ( unsigned int )_ySize ) yMid = _ySize - 1;
 
 	zMid = ( int )(( origin.z - startPosition.z ) / patchSize.z );
-
 	if ( zMid < 0 ) zMid = 0;
-
-	if ( zMid > ( unsigned int )_zSize ) zMid = _zSize - 1;
+	if ( zMid >= ( unsigned int )_zSize ) zMid = _zSize - 1;
 
 	glEnable( GL_BLEND );
 
@@ -417,7 +411,7 @@ void slPatchGrid::drawWithout3DTexture( slCamera *camera ) {
 
 		translation.z = startPosition.z + patchSize.z * zVal;
 
-		for ( x = ( _xSize - 1 );x >= 0;x-- ) {
+		for ( x = 0;x < ( int )_xSize ;x++ ) {
 			if ( x < ( int )xMid ) xVal = x;
 			else xVal = ( _xSize - 1 ) - ( x - xMid );
 
@@ -435,9 +429,7 @@ void slPatchGrid::drawWithout3DTexture( slCamera *camera ) {
 					translation.y = startPosition.y + patchSize.y * yVal;
 
 					glColor4ubv( &colors[patch->colorOffset] );
-
 					glTranslatef( translation.x, translation.y, translation.z );
-
 					glScalef( patchSize.x, patchSize.y, patchSize.z );
 
 					glCallList( _cubeDrawList );
@@ -449,6 +441,7 @@ void slPatchGrid::drawWithout3DTexture( slCamera *camera ) {
 	}
 
 	glDepthMask( GL_TRUE );
+	glEnable( GL_CULL_FACE );
 }
 
 
@@ -469,6 +462,8 @@ void slPatchGrid::draw( slCamera *camera ) {
 	slVector origin, diff, adiff, size;
 
 	if ( !_drawWithTexture ) return drawWithout3DTexture( camera );
+
+	glDisable( GL_LIGHTING );
 
 #ifdef WINDOWS
 	if( !wglTexImage3D || !wglTexSubImage3D ) 
@@ -547,6 +542,8 @@ void slPatchGrid::draw( slCamera *camera ) {
 	glEnd();
 
 	glDisable( GL_TEXTURE_3D );
+
+	glDisable( GL_LIGHTING );
 
 	return;
 }

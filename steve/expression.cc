@@ -207,6 +207,7 @@ stLoadExp::stLoadExp( stMethod *m, stObject *o, char *word, const char *file, in
 
 	loadType = var->type->_type;
 	var->used = 1;
+	_word = word;
 
 	type = ET_LOAD;
 }
@@ -251,6 +252,8 @@ stAssignExp::stAssignExp( stMethod *m, stObject *o, char *word, stExp *r, const 
 	_objectName = var->type->_objectName;
 
 	_objectType = NULL;
+
+	_word = word;
 
 	var->used = 1;
 

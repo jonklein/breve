@@ -44,7 +44,6 @@
 // do not change the order of the includes--they depend on eachother
 
 #include "util.h"
-
 #include "simulationTypedefs.h"
 
 #endif /* _SIMULATION_H */

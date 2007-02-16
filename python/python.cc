@@ -36,24 +36,17 @@
 inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 	int result = EC_ERROR;
 
-	if( !inObject ) return result;
+	if( !inObject ) 
+		return result;
 
-	if( inObject == Py_None ) {
+	if( inObject == Py_None )
 		return EC_OK;
-	}
 
-	if( PyObject_HasAttrString( inObject, "isVector" ) ) {
-		slVector v = { 0.0, 0.0, 0.0 };
+	if ( PyObject_HasAttrString( inObject, "breveInstance" ) )  {
 
-		PyObject *x = PyObject_GetAttrString( inObject, "x" );
-		PyObject *y = PyObject_GetAttrString( inObject, "y" );
-		PyObject *z = PyObject_GetAttrString( inObject, "z" );
-
-		if( x ) v.x = PyFloat_AS_DOUBLE( x );
-		if( y ) v.y = PyFloat_AS_DOUBLE( y );
-		if( z ) v.z = PyFloat_AS_DOUBLE( z );
-
-		outEval->set( v );
+		PyObject *breveInstance = PyObject_GetAttrString( inObject, "breveInstance" );
+		outEval->set( (brInstance*)PyCObject_AsVoidPtr( breveInstance ) );
+		Py_DECREF( breveInstance );
 		result = EC_OK;
 
 	} else if ( PyInt_Check( inObject ) ) {
@@ -76,6 +69,59 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 		outEval->set( PyCObject_AsVoidPtr( inObject ) );
 		result = EC_OK;
 
+	} else if( PyObject_HasAttrString( inObject, "isMatrix" ) ) {
+		slMatrix m;
+
+		PyObject *x1 = PyObject_GetAttrString( inObject, "x1" );
+		PyObject *x2 = PyObject_GetAttrString( inObject, "x2" );
+		PyObject *x3 = PyObject_GetAttrString( inObject, "x3" );
+		PyObject *y1 = PyObject_GetAttrString( inObject, "y1" );
+		PyObject *y2 = PyObject_GetAttrString( inObject, "y2" );
+		PyObject *y3 = PyObject_GetAttrString( inObject, "y3" );
+		PyObject *z1 = PyObject_GetAttrString( inObject, "z1" );
+		PyObject *z2 = PyObject_GetAttrString( inObject, "z2" );
+		PyObject *z3 = PyObject_GetAttrString( inObject, "z3" );
+
+		m[ 0 ][ 0 ] = PyFloat_AsDouble( x1 );
+		m[ 0 ][ 1 ] = PyFloat_AsDouble( x2 );
+		m[ 0 ][ 2 ] = PyFloat_AsDouble( x3 );
+		m[ 1 ][ 0 ] = PyFloat_AsDouble( y1 );
+		m[ 1 ][ 1 ] = PyFloat_AsDouble( y2 );
+		m[ 1 ][ 2 ] = PyFloat_AsDouble( y3 );
+		m[ 2 ][ 0 ] = PyFloat_AsDouble( z1 );
+		m[ 2 ][ 1 ] = PyFloat_AsDouble( z2 );
+		m[ 2 ][ 2 ] = PyFloat_AsDouble( z3 );
+
+		Py_DECREF( x1 );
+		Py_DECREF( x2 );
+		Py_DECREF( x3 );
+		Py_DECREF( y1 );
+		Py_DECREF( y2 );
+		Py_DECREF( y3 );
+		Py_DECREF( z1 );
+		Py_DECREF( z2 );
+		Py_DECREF( z3 );
+
+		outEval->set( m );
+		result = EC_OK;
+
+	} else if( PyObject_HasAttrString( inObject, "isVector" ) ) {
+		slVector v = { 0.0, 0.0, 0.0 };
+
+		PyObject *x = PyObject_GetAttrString( inObject, "x" );
+		PyObject *y = PyObject_GetAttrString( inObject, "y" );
+		PyObject *z = PyObject_GetAttrString( inObject, "z" );
+
+		if( x ) v.x = PyFloat_AsDouble( x );
+		if( y ) v.y = PyFloat_AsDouble( y );
+		if( z ) v.z = PyFloat_AsDouble( z );
+
+		Py_DECREF( x );
+		Py_DECREF( y );
+		Py_DECREF( z );
+
+		outEval->set( v );
+		result = EC_OK;
 	} else if( PySequence_Check( inObject ) ) {
 		
 		brEvalListHead *list = new brEvalListHead;
@@ -86,13 +132,12 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 			brEval item;
 
 			brPythonTypeToEval( PySequence_GetItem( inObject, n ), &item );
-
 			brEvalListInsert( list, list->_vector.size(), &item );
 		}
 
 		outEval->set( list );
 		result = EC_OK;
-	} 
+	}
 
 	return result;
 }
@@ -106,7 +151,7 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
  */
 
 inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleObject ) {
-	PyObject *result = Py_None;
+	PyObject *result = NULL;
 	brInstance *breveInstance;
 
 	switch ( inEval->type() ) {
@@ -135,15 +180,20 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 
 			if( breveInstance && breveInstance->object->type->_typeSignature == PYTHON_TYPE_SIGNATURE ) {
 				result = (PyObject*)breveInstance->userData;
+				Py_INCREF( result );
 			} else if( breveInstance ) {
 				// Create a bridge object, and set the breveInstance field
 
 				PyObject *bridgeObject = PyObject_GetAttrString( inModuleObject, "bridgeObject" );
 
-				result = PyObject_Call( bridgeObject, PyTuple_New( 0 ), NULL );
+				PyObject *args = PyTuple_New( 0 );
+				result = PyObject_Call( bridgeObject, args, NULL );
+				Py_DECREF( args );
+
 				PyObject_SetAttrString( result, "breveInstance", PyCObject_FromVoidPtr( breveInstance, NULL ) );
 			} else {
 				result = Py_None;
+				Py_INCREF( result );
 			}
 
 			break;
@@ -154,14 +204,20 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 
 		case AT_VECTOR:
 			{
-				PyObject *vectorObject = PyObject_GetAttrString( inModuleObject, "vectorType" );
+				PyObject *vectorType = PyObject_GetAttrString( inModuleObject, "vectorType" );
+				const slVector &v = BRVECTOR( inEval );
 
-				if( vectorObject ) {
-					result = PyObject_Call( vectorObject, PyTuple_New( 0 ), NULL );
+				if( vectorType ) {
+					PyObject *args = PyTuple_New( 3 );
 
-					PyObject_SetAttrString( result, "x", PyFloat_FromDouble( BRVECTOR( inEval ).x ) );
-					PyObject_SetAttrString( result, "y", PyFloat_FromDouble( BRVECTOR( inEval ).y ) );
-					PyObject_SetAttrString( result, "z", PyFloat_FromDouble( BRVECTOR( inEval ).z ) );
+					PyTuple_SET_ITEM( args, 0, PyFloat_FromDouble( v.x ) );
+					PyTuple_SET_ITEM( args, 1, PyFloat_FromDouble( v.y ) );
+					PyTuple_SET_ITEM( args, 2, PyFloat_FromDouble( v.z ) );
+
+					result = PyObject_Call( vectorType, args, NULL );
+
+					Py_DECREF( args );
+					Py_DECREF( vectorType );
 				}
 			}
 
@@ -169,27 +225,28 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 
 		case AT_MATRIX:
 			{ 
-				slMatrix &m = BRMATRIX( inEval );
+				const slMatrix &m = BRMATRIX( inEval );
 
-				result = PyTuple_New( 3 );
+				PyObject *matrixType = PyObject_GetAttrString( inModuleObject, "matrixType" );
 
-				PyObject *rowx = PyTuple_New( 3 );
-				PyObject *rowy = PyTuple_New( 3 );
-				PyObject *rowz = PyTuple_New( 3 );
+				if( matrixType ) {
+					PyObject *args = PyTuple_New( 9 );
 
-				PyTuple_SetItem( rowx, 0, PyFloat_FromDouble( m[ 0 ][ 0 ] ) );
-				PyTuple_SetItem( rowx, 1, PyFloat_FromDouble( m[ 0 ][ 1 ] ) );
-				PyTuple_SetItem( rowx, 2, PyFloat_FromDouble( m[ 0 ][ 2 ] ) );
-				PyTuple_SetItem( rowy, 0, PyFloat_FromDouble( m[ 1 ][ 0 ] ) );
-				PyTuple_SetItem( rowy, 1, PyFloat_FromDouble( m[ 1 ][ 1 ] ) );
-				PyTuple_SetItem( rowy, 2, PyFloat_FromDouble( m[ 1 ][ 2 ] ) );
-				PyTuple_SetItem( rowz, 0, PyFloat_FromDouble( m[ 2 ][ 0 ] ) );
-				PyTuple_SetItem( rowz, 1, PyFloat_FromDouble( m[ 2 ][ 1 ] ) );
-				PyTuple_SetItem( rowz, 2, PyFloat_FromDouble( m[ 2 ][ 2 ] ) );
+					PyTuple_SET_ITEM( args, 0, PyFloat_FromDouble( m[ 0 ][ 0 ] ) );
+					PyTuple_SET_ITEM( args, 1, PyFloat_FromDouble( m[ 0 ][ 1 ] ) );
+					PyTuple_SET_ITEM( args, 2, PyFloat_FromDouble( m[ 0 ][ 2 ] ) );
+					PyTuple_SET_ITEM( args, 3, PyFloat_FromDouble( m[ 1 ][ 0 ] ) );
+					PyTuple_SET_ITEM( args, 4, PyFloat_FromDouble( m[ 1 ][ 1 ] ) );
+					PyTuple_SET_ITEM( args, 5, PyFloat_FromDouble( m[ 1 ][ 2 ] ) );
+					PyTuple_SET_ITEM( args, 6, PyFloat_FromDouble( m[ 2 ][ 0 ] ) );
+					PyTuple_SET_ITEM( args, 7, PyFloat_FromDouble( m[ 2 ][ 1 ] ) );
+					PyTuple_SET_ITEM( args, 8, PyFloat_FromDouble( m[ 2 ][ 2 ] ) );
 
-				PyTuple_SetItem( result, 0, rowx );
-				PyTuple_SetItem( result, 1, rowy );
-				PyTuple_SetItem( result, 2, rowz );
+					result = PyObject_Call( matrixType, args, NULL );
+
+					Py_DECREF( args );
+					Py_DECREF( matrixType );
+				}
 			}
 
 			break;
@@ -210,14 +267,8 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 			break;
 
 		case AT_ARRAY:
-			break;
-
 		case AT_DATA:
-			break;
-
 		case AT_HASH:
-			break;
-
 		default:
 			slMessage( DEBUG_ALL, "Could not convert breve internal type \"%d\" to a Python type\n", inEval->type() );
 
@@ -260,6 +311,10 @@ PyObject *brPythonSetController( PyObject *inSelf, PyObject *inArgs ) {
 
         brEngineSetController( engine, instance );
 
+
+	Py_DECREF( engineObject );
+	Py_DECREF( instanceObject );
+
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -285,6 +340,8 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 
 	brEngine *engine = ( brEngine* )PyCObject_AsVoidPtr( engineObject );
 
+	Py_DECREF( engineObject );
+
 	// Adding the instance requires a brObject type.
 	// Figure out the brObject type for this instance.  We may need to create it ourselves.
 
@@ -295,6 +352,7 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 
 		breveObject = (brObject*)PyCObject_AsVoidPtr( breveTypeObject );
 
+		Py_DECREF( breveTypeObject );
 	} else {
 		// Clear the missing breveObject error here...
 
@@ -307,6 +365,8 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 
 		char *name = PyString_AsString( nameObject );
 
+		Py_DECREF( nameObject );
+
 		// This object type has not previously been added to the breve engine.
 
 		PyObject *pythonLanguageType = PyObject_GetAttrString( moduleObject, "breveObjectType" );
@@ -315,24 +375,26 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 
 		PyObject_SetAttrString( typeObject, "breveObject", PyCObject_FromVoidPtr( breveObject, NULL ) );
 
+		Py_DECREF( pythonLanguageType );
 	}
 
 	brInstance *i = brEngineAddInstance( engine, breveObject, object );
 
-	// Now the engine has a copy of object -- increment the reference count!
+	// Now the engine has a copy of object -- increment the reference count
 	
 	Py_INCREF( object );
 
-	if( i ) 
+	if( i ) {
 		result = PyCObject_FromVoidPtr( i, NULL );
-	else
+	} else {
 		result = Py_None;
+		Py_INCREF( result );
+	}
 
 	// Set the breveInstance field for this object to the newly created engine instance
 
 	PyObject_SetAttrString( object, "breveInstance", result );
 
-	Py_INCREF( result );
 	return result;
 }
 
@@ -351,6 +413,8 @@ PyObject *brPythonRemoveInstance( PyObject *inSelf, PyObject *inArgs ) {
 	brInstance *instance = ( brInstance* )PyCObject_AsVoidPtr( breveObject );
 
 	brEngineRemoveInstance( engine, instance );
+
+	Py_DECREF( breveObject );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -372,7 +436,6 @@ PyObject *brPythonFindInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 
 	brInternalFunction *function = brEngineInternalFunctionLookup( engine, name );
 
-	PyObject *result = Py_None;
 
 	if ( !function ) {
 		std::string error( "could not locate internal breve method \"" );
@@ -383,7 +446,7 @@ PyObject *brPythonFindInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 		return NULL;
 	}
 
-	result = PyCObject_FromVoidPtr( ( void* )function, NULL );
+	PyObject *result = PyCObject_FromVoidPtr( ( void* )function, NULL );
 
 	return result;
 }
@@ -417,6 +480,8 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 
 	brInstance *caller = ( brInstance* )PyCObject_AsVoidPtr( breveObject );
 
+	Py_DECREF( breveObject );
+
 	if( !PyTuple_Check( arguments ) ) {
 		PyErr_SetString( PyExc_RuntimeError, "Invalid arguments passed to internal breve function" );
 		return NULL;
@@ -445,9 +510,7 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 
 	function->_call( args, &resultEval, caller );
 
-	PyObject *result = brPythonTypeFromEval( &resultEval, moduleObject );
-
-	return result;
+	return brPythonTypeFromEval( &resultEval, moduleObject );
 }
 
 /**
@@ -477,7 +540,11 @@ PyObject *brPythonFindBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 
 	brInstance *breveInstance = (brInstance*)PyCObject_AsVoidPtr( attrObject );
 
-	// if( !PyObject_HasAttrString( object, name ) ) {
+	Py_DECREF( attrObject );
+
+	PyObject *methodObject;
+
+	if( !PyObject_HasAttrString( object, name ) ) {
 		brMethod *method = brMethodFindWithArgRange( breveInstance->object, name, NULL, 0, 50 );
 
 		if( !method ) {
@@ -485,13 +552,13 @@ PyObject *brPythonFindBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 			return Py_None;
 		}
 
-		PyObject *methodObject = PyCObject_FromVoidPtr( method, NULL );
-		// PyObject_SetAttrString( object, name, methodObject );
-	// }
+		methodObject = PyCObject_FromVoidPtr( method, NULL );
+		PyObject_SetAttrString( object, name, methodObject );
+	} else {
+	 	methodObject = PyObject_GetAttrString( object, name );
+	}
 
 	return methodObject;
-
-	// return PyObject_GetAttrString( object, name );
 }
 
 /**
@@ -520,6 +587,8 @@ PyObject *brPythonCallBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 
 	brInstance *breveInstance = (brInstance*)PyCObject_AsVoidPtr( attrObject );
 
+	Py_DECREF( attrObject );
+
 	brMethod *breveMethod = (brMethod*)PyCObject_AsVoidPtr( method );
 
 	for( int n = 0; n < PyTuple_GET_SIZE( arguments ); n++ ) {
@@ -530,15 +599,14 @@ PyObject *brPythonCallBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 
 	brMethodCall( breveInstance, breveMethod, args, &resultEval );
 	
-	PyObject *result = brPythonTypeFromEval( &resultEval, module );
-
 	for( int n = 0; n < PyTuple_GET_SIZE( arguments ); n++ ) {
 		delete args[ n ];
 	}
 
 	delete[] args;
 
-	return result;
+	return brPythonTypeFromEval( &resultEval, module );
+
 }
 
 
@@ -564,13 +632,39 @@ PyObject *brPythonCallBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 
 void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inTypes, int inCount ) {
 	PyObject *type = ( PyObject* )inObject;
+	char *name = strdup( inName );
 
-	PyObject *method = PyObject_GetAttrString( type, (char*)inName );
+	// Translate steve to Python method names
+	for( unsigned int n = 0; n < strlen( name ); n++ ) {
+		if( name[ n ] == '-' ) name[ n ] = '_';
+	}
+
+	PyObject *method = PyObject_GetAttrString( type, name );
+
+	free( name );
 
 	if ( !method ) {
 		PyErr_Clear();
 		return NULL;
 	}
+
+	PyObject *code = PyObject_GetAttrString( method, "func_code" );
+	
+	if( !code ) {
+		PyErr_Clear();
+		return NULL;
+	}
+
+	Py_DECREF( code );
+
+	PyObject *argumentCount = PyObject_GetAttrString( code, "co_argcount" );
+
+	if( !argumentCount || PyInt_AS_LONG( argumentCount ) != ( inCount + 1 ) ) {
+		PyErr_Clear();
+		return NULL;
+	}
+
+	Py_DECREF( argumentCount );
 
 	return method;
 }
@@ -592,8 +686,6 @@ void *brPythonFindObject( void *inData, const char *inName ) {
 		return NULL;
 	}
 
-	// Py_INCREF( object );
-
 	return object;
 }
 
@@ -609,7 +701,10 @@ void *brPythonFindObject( void *inData, const char *inName ) {
 brInstance *brPythonInstantiate( brEngine *inEngine, brObject* inObject, const brEval **inArgs, int inArgCount ) {
 	PyObject *object = ( PyObject* )inObject->userData;
 
-	PyObject *result = PyObject_Call( object, PyTuple_New( 0 ), NULL );
+	PyObject *args = PyTuple_New( 0 );
+	PyObject *result = PyObject_Call( object, args, NULL );
+
+	Py_DECREF( args );
 
 	if ( !result ) {
 		PyErr_Print();
@@ -628,6 +723,7 @@ brInstance *brPythonInstantiate( brEngine *inEngine, brObject* inObject, const b
 	}
 
 	Py_INCREF( result );
+	Py_DECREF( breveObject );
 
 	// Note: the brInstance we return will 
 
@@ -666,6 +762,9 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 
 	int count = PyInt_AS_LONG( argumentCount ) - 1;
 
+	Py_DECREF( code );
+	Py_DECREF( argumentCount );
+
 	PyObject *tuple = PyTuple_New( count + 1 );
 
 	// the instance we're calling the method for has the breveInternal module pointer
@@ -688,22 +787,23 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 
 	for( int n = 0; n < count; n++ ) {
 		PyObject *argument = brPythonTypeFromEval( inArguments[ n ], module );
-		Py_INCREF( argument );
 		PyTuple_SetItem( tuple, n + 1, argument );
 	}
 
+	Py_DECREF( module );
+
 	PyObject *result = PyObject_Call( method, tuple, NULL );
 
-	// Py_DECREF( tuple );
-
-	brPythonTypeToEval( result, outResult );
+	Py_DECREF( tuple );
 
 	if( !result ) {
 		PyErr_Print();
 		return EC_ERROR;
+	} else {
+		Py_INCREF( result );
+		brPythonTypeToEval( result, outResult );
 	}
 
-	Py_DECREF( result );
 
 	return EC_OK;
 }
@@ -715,8 +815,30 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
  * Clearly not implemented at the moment.
  */
 
-int brPythonIsSubclass( void *inClassA, void *inClassB ) {
-	return 0;
+int brPythonIsSubclass( brObjectType *inType, void *inClassA, void *inClassB ) {
+	PyObject *classA = (PyObject*)inClassA;
+	PyObject *classB = (PyObject*)inClassB;
+
+	PyObject *main = (PyObject*)inType->userData;
+	PyObject *breve = PyObject_GetAttrString( main, "breve" );
+	PyObject *isSubclass = PyObject_GetAttrString( breve, "isSubclass" );
+
+	PyObject *tuple = PyTuple_New( 2 );
+
+	// PyTuple_SET_ITEM will steal refs, you bastard!
+
+	Py_INCREF( classA );
+	Py_INCREF( classB );
+	PyTuple_SET_ITEM( tuple, 0, classA );
+	PyTuple_SET_ITEM( tuple, 1, classB );
+
+	Py_DECREF( breve );
+	Py_DECREF( isSubclass );
+
+	PyObject *result = PyObject_Call( isSubclass, tuple, NULL );
+
+	Py_DECREF( tuple );
+	return PyInt_AS_LONG( result );
 }
 
 /**
@@ -769,14 +891,14 @@ void brPythonInit( brEngine *breveEngine ) {
 	brObjectType *brevePythonType = new brObjectType();
 
 	static PyMethodDef methods[] = {
-		{ "setController", 		brPythonSetController, 	METH_VARARGS, "" }, 
-		{ "findInternalFunction", 	brPythonFindInternalFunction, 	METH_VARARGS, "" }, 
-		{ "callInternalFunction", 	brPythonCallInternalFunction, 	METH_VARARGS, "" },
-		{ "addInstance", 			brPythonAddInstance, 			METH_VARARGS, "" },
+		{ "setController", 		brPythonSetController, 			METH_VARARGS, "" }, 
+		{ "findInternalFunction", 	brPythonFindInternalFunction, 		METH_VARARGS, "" }, 
+		{ "callInternalFunction", 	brPythonCallInternalFunction, 		METH_VARARGS, "" },
+		{ "addInstance", 		brPythonAddInstance, 			METH_VARARGS, "" },
 		{ "removeInstance", 		brPythonRemoveInstance, 		METH_VARARGS, "" },
 		{ "findBridgeMethod", 		brPythonFindBridgeMethod, 		METH_VARARGS, "" },
 		{ "callBridgeMethod", 		brPythonCallBridgeMethod, 		METH_VARARGS, "" },
-		{ "catchOutput", 			brPythonCatchOutput, 			METH_VARARGS, "" },
+		{ "catchOutput", 		brPythonCatchOutput, 			METH_VARARGS, "" },
 		{ NULL, NULL, 0, NULL }
 	};
 
@@ -784,10 +906,6 @@ void brPythonInit( brEngine *breveEngine ) {
 		pyInitialized = 1;
 		Py_Initialize();
 	}
-
-	brevePythonType->userData = ( void* )PyImport_ImportModule( "__main__" );
-
-	Py_INCREF( ( PyObject* )brevePythonType->userData );
 
 	PyObject *internal = Py_InitModule( "breveInternal", methods );
 
@@ -815,11 +933,13 @@ void brPythonInit( brEngine *breveEngine ) {
 	for( unsigned int n = 0; n < paths.size(); n++ ) {
 		char path[ MAXPATHLEN + 1024 ];
 		snprintf( path, MAXPATHLEN + 1023, "sys.path.append( '%s' )", paths[ n ].c_str() );
+		// printf( "Appending path '%s'\n", path );
 
 		PyRun_SimpleString( path );
 	}
 
 	PyRun_SimpleString( "import breve" );
+	brevePythonType->userData = ( void* )PyImport_ImportModule( "__main__" );
 
 	brevePythonType->findMethod 		= brPythonFindMethod;
 	brevePythonType->findObject 		= brPythonFindObject;
@@ -839,7 +959,6 @@ void brPythonInit( brEngine *breveEngine ) {
 
 #ifndef WINDOWS
 	// Those meddling Python kids mess with the signal handlers!
-
 	signal( SIGINT, NULL );
 #endif
 }

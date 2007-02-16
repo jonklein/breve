@@ -137,8 +137,8 @@ Control : Swarm {
 			item fly with-flock birds with-feeders feeders.
 			location += (item get-location).
 		}
-		# In a number context, the list represents the number of items in the list.
-		location /= birds.
+
+		location /= | birds |.
 		topDiff = 0.0.
 		foreach item in birds: {
 			if topDiff < |location - (item get-location) |:

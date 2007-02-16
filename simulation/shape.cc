@@ -32,7 +32,8 @@ void slShape::draw( slCamera *c, slPosition *pos, double textureScaleX, double t
 	bound = ( mode & DM_BOUND ) && !( flags & DO_NO_BOUND );
 	axis = ( mode & DM_AXIS ) && !( flags & DO_NO_AXIS );
 
-	if ( _drawList == 0 || _recompile || ( flags & DO_RECOMPILE ) ) slCompileShape( this, c->_drawMode, flags );
+	if ( _drawList == 0 || _recompile || ( flags & DO_RECOMPILE ) ) 
+		slCompileShape( this, c->_drawMode, flags );
 
 	glPushMatrix();
 
@@ -106,9 +107,11 @@ slSphere::slSphere( double radius, double density ) : slShape() {
 
 	_density = density;
 
-	if ( radius <= 0.0 ) throw slException( std::string( "invalid size for new sphere (density <= 0.0)" ) );
+	if ( radius <= 0.0 ) 
+		throw slException( std::string( "invalid size for new sphere (density <= 0.0)" ) );
 
-	if ( density <= 0.0 ) throw slException( std::string( "invalid density for new sphere (radius <= 0.0)" ) );
+	if ( density <= 0.0 ) 
+		throw slException( std::string( "invalid density for new sphere (radius <= 0.0)" ) );
 
 	slVectorSet( &_max, _radius, _radius, _radius );
 
@@ -136,7 +139,7 @@ slShape *slNewCube( slVector *size, double density ) {
 	s = new slShape();
 
 	if ( !slSetCube( s, size, density ) ) {
-		slShapeFree( s );
+		 s->release();
 		return NULL;
 	}
 
@@ -151,7 +154,7 @@ slShape *slNewNGonDisc( int count, double radius, double height, double density 
 	s = new slShape();
 
 	if ( !slSetNGonDisc( s, count, radius, height, density ) ) {
-		slShapeFree( s );
+		s->release();
 		return NULL;
 	}
 
@@ -166,7 +169,7 @@ slShape *slNewNGonCone( int count, double radius, double height, double density 
 	s = new slShape();
 
 	if ( !slSetNGonCone( s, count, radius, height, density ) ) {
-		slShapeFree( s );
+		s->release();
 		return NULL;
 	}
 
@@ -174,9 +177,16 @@ slShape *slNewNGonCone( int count, double radius, double height, double density 
 }
 
 void slShapeFree( slShape *s ) {
-	if ( --s->_referenceCount ) return;
+	s->release();
+}
 
-	delete s;
+void slShape::retain() {
+	_referenceCount++;
+}
+
+void slShape::release() {
+	if ( --_referenceCount ) return;
+	delete this;
 }
 
 slShape::~slShape() {

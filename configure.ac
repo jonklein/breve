@@ -1,6 +1,6 @@
 AC_PREREQ(2.57)
 
-AC_INIT([the breve simulation environment], [2.5.1], [jk@spiderland.org])
+AC_INIT([the breve simulation environment], [2.6b0], [jk@spiderland.org])
 AC_CONFIG_HEADER([include/breve/config.h])
 
 VERSION=$PACKAGE_VERSION
@@ -15,58 +15,10 @@ if test "x$static" != "x"; then
 	BEGIN_DYNAMIC="-Xlinker -Bdynamic"
 fi
 
-
-AC_DEFUN([AC_PROG_JAVAC_WORKS],[
-AC_CACHE_CHECK([if $JAVAC works], ac_cv_prog_javac_works, [
-JAVA_TEST=Test.java
-CLASS_TEST=Test.class
-cat << \EOF > $JAVA_TEST
-/* [#]line __oline__ "configure" */
-public class Test {
-}
-EOF
-if AC_TRY_COMMAND($JAVAC $JAVACFLAGS $JAVA_TEST) >/dev/null 2>&1; then
-  ac_cv_prog_javac_works=yes
-else
-  AC_MSG_ERROR([The Java compiler $JAVAC failed (see config.log, check the CLASSPATH?)])
-  echo "configure: failed program was:" >&AC_FD_CC
-  cat $JAVA_TEST >&AC_FD_CC
-fi
-rm -f $JAVA_TEST $CLASS_TEST
-])
-AC_PROVIDE([$0])
-])
-
-AC_ARG_VAR(JAVAC, [Java bytecode compiler])
-
-AC_DEFUN([AC_PROG_JAVAC],[
-test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, javac "gcj -C" "egcj -C" guavac jikes, :)
-if test "x$JAVAC" = x; then
-	AC_MSG_WARN([no acceptable Java compiler found in \$PATH])
-	JAVAC=":"
-else
-	AC_PROG_JAVAC_WORKS
-fi
-AC_PROVIDE([$0])
-])
-
-AC_ARG_VAR(JAR, [Java archiver])
-
-AC_DEFUN([AC_PROG_JAR],[
-test "x$JAR" = x && AC_CHECK_PROGS(JAR, jar fastjar ejar, :)
-if test "x$JAR" = x; then
-	AC_MSG_WARN([no acceptable jar program found in \$PATH])
-	JAR=":"
-fi
-AC_PROVIDE([$0])
-])
-
 AC_CHECK_TOOL(AR, ar)
 
 AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_JAR
-AC_PROG_JAVAC
 AC_PROG_LEX
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
@@ -381,10 +333,6 @@ fi
 
 if test "$ac_cv_lib_avformat_av_write_frame" != yes; then
 	AC_MSG_WARN([libavformat not found. building without MPEG support.])
-fi
-
-if test "x$_have_jvm" = x ; then
-	AC_MSG_WARN([JVM library not found. building without Java support.])
 fi
 
 AC_OUTPUT

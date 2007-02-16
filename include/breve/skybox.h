@@ -1,7 +1,8 @@
+
 /*****************************************************************************
  *                                                                           *
  * The breve Simulation Environment                                          *
- * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
+ * Copyright (C) 2000-2007 Jonathan Klein                                    *
  *                                                                           *
  * This program is free software; you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -18,5 +19,26 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include "steve.h"
+#include <string>
 
+#include "texture.h"
+
+class slSkybox {
+	public:
+						slSkybox();
+						~slSkybox();
+
+		void 				draw( slVector *inCameraPos );
+
+		int 				loadFrontImage( std::string &inImage );
+		int 				loadBackImage( std::string &inImage );
+		int 				loadRightImage( std::string &inImage );
+		int 				loadLeftImage( std::string &inImage );
+		int 				loadTopImage( std::string &inImage );
+		int 				loadBottomImage( std::string &inImage );
+
+		int 				loadNumberedImages( std::string &inImage );
+
+	private:
+		slTexture2D			_textures[ 6 ];
+};

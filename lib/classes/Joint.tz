@@ -1,4 +1,5 @@
 @use Object.
+@use Abstract.
 
 Abstract : Joint (aka Joints) [version 2.3] {
 	% Joint a is class used to connect two OBJECT(Mobile) objects together.  The

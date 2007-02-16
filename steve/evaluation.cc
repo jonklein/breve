@@ -3168,8 +3168,6 @@ int stCallMethod( stRunInstance *caller, stRunInstance *target, stMethod *method
 	record.previousStackRecord = steveData->stackRecord;
 	steveData->stackRecord = &record;
 
-	slStack newStack;
-
 	// prepare for the actual method call
 
 	steveData->stack = newStStack;
@@ -3683,6 +3681,10 @@ int stExpEval( stExp *s, stRunInstance *i, brEval *result, stObject **tClass ) {
 		case ET_FREE:
 			resultCode = EVAL_RTC_CALL_3( s, stEvalFree, ( stFreeExp * )s, i, result );
 
+			break;
+
+		case ET_COMMENT:
+			return EC_OK;
 			break;
 
 		case ET_DIE:

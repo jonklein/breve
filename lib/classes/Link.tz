@@ -17,13 +17,13 @@ Mobile : Link (aka Links) [version 2.1] {
 	% OBJECT(Real).
 
 	+ to init:
-		setCollisionProperties(realWorldPointer, .2, .5, .2).
+		realSetCollisionProperties(realWorldPointer, .2, .5, .2).
 		self enable-physics.
 
 	+ to get-multibody:
 		% Returns the OBJECT(MultiBody) that this link is a part of, if any.
 
-		return linkGetMultibody(linkPointer).
+		return linkGetMultibody(realWorldPointer).
 
 	+ to dearchive:
 		return (super dearchive).

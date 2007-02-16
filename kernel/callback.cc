@@ -53,7 +53,7 @@ int brCheckCollisionCallback( void *p1, void *p2, int type ) {
 	for ( n = 0;n < o1->object->collisionHandlers.size(); n++ ) {
 		h = ( brCollisionHandler* )o1->object->collisionHandlers[ n ];
 
-		if ( o2->object->type == h->object->type && o2->object->type->isSubclass( h->object->userData, o2->object->userData ) ) {
+		if ( o2->object == h->object && brObjectIsSubclass( h->object, o2->object ) ) {
 			if ( type == CC_CALLBACK ) {
 				if ( h->method ) return 1;
 
@@ -73,7 +73,7 @@ int brCheckCollisionCallback( void *p1, void *p2, int type ) {
 	for ( n = 0;n < o2->object->collisionHandlers.size(); n++ ) {
 		h = ( brCollisionHandler* )o2->object->collisionHandlers[ n ];
 
-		if ( o1->object->type == h->object->type && o1->object->type->isSubclass( h->object->userData, o1->object->userData ) ) {
+		if ( o1->object == h->object && brObjectIsSubclass( h->object, o1->object ) ) {
 			if ( type == CC_CALLBACK ) {
 				if ( h->method ) return 1;
 
@@ -123,7 +123,7 @@ void brCollisionCallback( void *p1, void *p2, int type, slVector *pos, slVector 
 	for ( n = 0;n < o1->object->collisionHandlers.size(); n++ ) {
 		h = ( brCollisionHandler* )o1->object->collisionHandlers[ n ];
 
-		if ( o2->object->type == h->object->type && o2->object->type->isSubclass( o2->object->userData, h->object->userData ) ) {
+		if ( o2->object == h->object && brObjectIsSubclass( o2->object, h->object ) ) {
 			meth = h->method;
 
 			collider.set( o2 );
@@ -134,7 +134,7 @@ void brCollisionCallback( void *p1, void *p2, int type, slVector *pos, slVector 
 			argPtr[ 1 ] = &position;
 			argPtr[ 2 ] = &facing;
 
-			if ( meth->argumentCount < 1 || meth->argumentCount > 3 ) {
+			if ( meth->argumentCount > 3 ) {
 				slMessage( DEBUG_ALL, "Error during collision callback: wrong number of arguments in callback method\n" );
 				return;
 			} else if ( brMethodCall( o1, meth, argPtr, &result ) == EC_ERROR ) {
@@ -146,15 +146,14 @@ void brCollisionCallback( void *p1, void *p2, int type, slVector *pos, slVector 
 		}
 	}
 
-	/* it's possible that one of the objects will be destroyed */
-	/* by the interaction, so check to see if we need to stop  */
+	// it's possible that one of the objects will be destroyed by the interaction, so check to see if we need to stop 
 
 	if ( o1->status != AS_ACTIVE || o2->status != AS_ACTIVE ) return;
 
 	for ( n = 0; n < o2->object->collisionHandlers.size(); n++ ) {
 		h = ( brCollisionHandler* )o2->object->collisionHandlers[ n ];
 
-		if ( o1->object->type == h->object->type && o1->object->type->isSubclass( o1->object->userData, h->object->userData ) ) {
+		if ( o1->object == h->object && brObjectIsSubclass( o1->object, h->object ) ) {
 			meth = h->method;
 
 			// Only call methods with the right count of parameters

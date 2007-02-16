@@ -28,6 +28,8 @@
 
 #include "steveparse.tab.h"
 
+void stParseAddDocumentingComment( const char *comment );
+
 static const char *parseString;
 static int parseLength;
 static int parseLoc = 0;
@@ -68,7 +70,8 @@ WHITESPACE	[\ \t]+
 <COMMENT>.				{ /* block comment */ }
 <COMMENT>!#				{ BEGIN(0); }
 
-#.*						{ /* comment */ };
+^[\ \t]*%.*				{ stParseAddDocumentingComment( yytext ); };
+#.*					{ ; };
 
 \+[\ ]*to/{WORDBREAK}	{ return TO_PUBLIC; }
 \-[\ ]*to/{WORDBREAK}	{ return TO_PRIVATE; }
@@ -137,8 +140,6 @@ for						{ return FOR; }
 if						{ return IF; }
 else					{ return ELSE; }
 
-xxxxin						{ return ST_IN; }
-
 new						{ return NEW; }
 free					{ return FREE; }
 die						{ return DIE; }
@@ -161,7 +162,7 @@ path					{ return PATH; }
 ([a-zA-Z_]|[a-zA-Z_][a-zA-Z0-9\-_]*[a-zA-Z0-9_])	{ 
 		brEval *defineEval;
 
-		defineEval = steveData->defines[ yytext];
+		defineEval = steveData->defines[ yytext ];
 
 		if(defineEval) {
 			brEval *copy = new brEval;
@@ -186,7 +187,6 @@ path					{ return PATH; }
 
 \"([^\"]|(\\\"))*\"	{ yylval.string = slStrdup(yytext); return STRING_VALUE; }
 
-^[\ \t]*%.*			{ /* self documenting comment */ };
 ^[\ \t]*\+[\ ]*section{WORDBREAK}.*	{ /* section */ }
 
 [\t ]				;

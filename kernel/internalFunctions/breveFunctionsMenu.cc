@@ -36,19 +36,14 @@
 */
 
 int brIMenuItemNew( brEval args[], brEval *target, brInstance *i ) {
-	brInstance *m;
+	brInstance *m = BRINSTANCE( &args[0] );
 
-	if ( !BRINSTANCE( &args[0] ) ) {
+	if ( !m ) {
 		slMessage( DEBUG_ALL, "addMenuItem called with uninitialized object\n" );
 		return EC_ERROR;
 	}
 
-	m = BRINSTANCE( &args[0] );
-
 	target->set( brAddMenuItem( m, BRSTRING( &args[1] ), BRSTRING( &args[2] ) ) );
-
-	if ( i->engine->updateMenu )
-		i->engine->updateMenu( m );
 
 	return EC_OK;
 }

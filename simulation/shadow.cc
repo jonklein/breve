@@ -277,7 +277,7 @@ void slCamera::renderObjectShadowVolumes( slWorld *w ) {
 	glColor4f( 0, 0, 0, 1 );
 
 	for ( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ ) {
-		if ( *wi && ( *wi )->_shape && !( *wi )->_drawAsPoint ) {
+		if ( *wi && ( *wi )->_shape && !( *wi )->_drawAsPoint && ( *wi )->_drawShadow ) {
 			( *wi )->_shape->drawShadowVolume( this, &( *wi )->_position );
 		}
 	}

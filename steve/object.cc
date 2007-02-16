@@ -32,25 +32,22 @@
 	 Requires = the engine, the object name and the super object.
 */
 
-stObject *stObjectNew( brEngine *engine, stSteveData *sdata, char *name, char *alias, stObject *super, float version ) {
+stObject *stObjectNew( brEngine *engine, stSteveData *sdata, char *name, char *alias, stObject *super, float version, const char *inFilename ) {
 	stObject *o;
 	brObject *bo;
 
-	/* check to see if the object exists */
+	// check to see if the object exists 
 
-	if ( brObjectFind( engine, name ) ) return NULL;
+	if ( brObjectFind( engine, name ) ) 
+		return NULL;
 
 	o = new stObject;
-
 	o->version = version;
-
 	o->engine = engine;
-
 	o->steveData = sdata;
-
 	o->super = super;
-
 	o->name = name;
+	o->_file = inFilename;
 
 	// before any variables are added here, our variable vector
 	// the size of our parent's variable vector.  our vector
