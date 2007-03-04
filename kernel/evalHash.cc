@@ -28,10 +28,20 @@ bool brEval::operator<(brEval *b) {
 
 	switch(type) {
 		case AT_INT:
-			return BRINT(this) < BRINT(b);
+			return BRINT(this) < BRINT( b );
 			break;
 		case AT_DOUBLE:
-			return BRDOUBLE(this) < BRDOUBLE(b);
+			return BRDOUBLE( this ) < BRDOUBLE( b );
+			break;
+
+		case AT_STRING:
+			return strcmp( BRSTIRNG( this ), BRSTRING( b ) ) < 0;
+			break;
+
+		case AT_VECTOR:
+			break;
+
+		case AT_MATRIX:
 			break;
 
 		case AT_DATA:
@@ -39,7 +49,7 @@ bool brEval::operator<(brEval *b) {
 		case AT_INSTANCE:
 		case AT_HASH:
 		case AT_LIST:
-			return BRPOINTER(this) < BRPOINTER(b);
+			return BRPOINTER( this ) < BRPOINTER( b );
 			break;
 	}
 }
@@ -140,9 +150,9 @@ brEvalListHead *brEvalHashValues( brEvalHash *h ) {
 	return el;
 }
 
-/*!
-	\brief Returns a brEvalList of all of the values in the hash table.
-*/
+/**
+ * Returns a brEvalList of all of the values in the hash table.
+ */
 
 int brEvalHashLookup( brEvalHash *h, brEval *key, brEval *value ) {
 	brEval *v;
@@ -168,66 +178,45 @@ unsigned int brEvalHashFunction( void *e, unsigned int hsize ) {
 	switch ( ee->type() ) {
 
 		case AT_INSTANCE:
-
 		case AT_POINTER:
-
 		case AT_DATA:
-
 		case AT_HASH:
-
 		case AT_LIST:
 			vp = ee->getPointer();
-
 			p = ( unsigned char* ) & vp;
-
 			dataSize = sizeof( void* );
-
 			break;
 
 		case AT_INT:
 			i = ee->getInt();
-
 			p = ( unsigned char* ) & i;
-
 			dataSize = sizeof( int );
-
 			break;
 
 		case AT_DOUBLE:
 			d = ee->getDouble();
-
 			p = ( unsigned char* ) & d;
-
 			dataSize = sizeof( double );
-
 			break;
 
 		case AT_STRING:
 			p = ( unsigned char* )BRSTRING( ee );
-
 			dataSize = strlen( BRSTRING( ee ) );
-
 			break;
 
 		case AT_VECTOR:
 			dataSize = sizeof( slVector );
-
 			p = ( unsigned char* ) & BRVECTOR( ee );
-
 			break;
 
 		case AT_MATRIX:
 			dataSize = sizeof( double ) * 9;
-
 			p = ( unsigned char* ) & BRMATRIX( ee );
-
 			break;
 
 		default:
 			dataSize = 0;
-
 			p = 0x0;
-
 			break;
 
 	}
@@ -245,48 +234,36 @@ unsigned int brEvalHashCompareFunction( void *a, void *b ) {
 	switch ( ae->type() ) {
 
 		case AT_LIST:
-
 		case AT_DATA:
-
 		case AT_POINTER:
-
 		case AT_INSTANCE:
-
 		case AT_HASH:
 			return !( BRPOINTER( ae ) == BRPOINTER( be ) );
-
 			break;
 
 		case AT_INT:
 			return !( BRINT( ae ) == BRINT( be ) );
-
 			break;
 
 		case AT_DOUBLE:
 			return !( BRDOUBLE( ae ) == BRDOUBLE( be ) );
-
 			break;
 
 		case AT_VECTOR:
 			return slVectorCompare( &BRVECTOR( ae ), &BRVECTOR( be ) );
-
 			break;
 
 		case AT_MATRIX:
 			return slMatrixCompare( BRMATRIX( ae ), BRMATRIX( be ) );
-
 			break;
 
 		case AT_STRING:
 			return strcmp( BRSTRING( ae ), BRSTRING( be ) );
-
 			break;
 
 		default:
 			slMessage( 0, "unknown expression type in brEvalCompareFunction: %d\n", ae->type() );
-
 			return 0;
-
 			break;
 	}
 }

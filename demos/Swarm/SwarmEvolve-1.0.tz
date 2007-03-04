@@ -80,7 +80,7 @@ Control : Swarm {
 		skipFramesIfNecessaryMenu uncheck.
 
 		# Set up the background.
-		cloudTexture = (new Image load from "clouds.sgi").
+		cloudTexture = (new Image load from "images/clouds.png").
 		self set-background-texture-image to cloudTexture.
 
 		# Add a huge floor.
@@ -221,7 +221,7 @@ Mobile : Feeders {
 		drifting (int).
 		driftLocation (vector).
 	+ to init:
-		self set-shape to ((new Shape) init-with-polygon-disk radius 1 sides 5 height 0.1).
+		self set-shape to ((new Shape) init-with-polygon-disk radius 1.0 sides 5 height 0.1).
 
 		self move to random[(20, 0, 20)] - (10, 0, 10).
 		self set-velocity to (0, 0, 0).

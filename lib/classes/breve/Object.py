@@ -1,8 +1,10 @@
 
 import breve
 
-class Object:
+class Object( object ):
 	'''Summary: the top level object class. <P> The Object class is the root class.  All classes used in breve have Object as an ancestor.  The object class implements some basic  services that all classes will have access to. <p> Subclassing Object directly is rare.  The classes OBJECT(Real) and  OBJECT(Abstract) are logical separations of the Object class containing  "real" objects (which correspond to a physical entity in the simulated  world) and "abstract" objects which are generally used for computation  or control of the real objects.  You should consider subclassing   one of these classes instead.'''
+
+	slots = [ 'birthTime', 'controller' ]
 
 	def __init__( self ):
 		if not ( 'breveInstance' in self.__dict__ ):
@@ -11,8 +13,8 @@ class Object:
 			self.controller = breve.breveInternalFunctionFinder.getController( self )
 
 			if self.controller == None:
-				print "No controller has been defined!"
-				raise ValueError
+			 	print "No controller has been defined!"
+			 	raise ValueError
 
                 Object.init( self )
 
@@ -70,20 +72,10 @@ class Object:
 		'''Automatically called when this object is freed.  This method should never be called manually.  If subclasses need to free objects or data, they should implement their own "destroy"  methods.'''
 
 
-	def disableAutoFree( self ):
-		'''Disables garbage collection on a per-object basis.'''
-
-		breve.breveInternalFunctionFinder.setGC( self, 0 )
-
-	def enableAutoFree( self ):
-		'''Enables garbage collection on a per-object basis.'''
-
-		breve.breveInternalFunctionFinder.setGC( self, 1 )
-
 	def getAge( self ):
 		'''Returns the number of seconds this object has existed in the  simulation.'''
 
-		return ( self.controller.getTime() - self.birthTime )
+		return ( self.controller.get_time() - self.birthTime )
 
 
 	def getController( self ):
@@ -105,7 +97,6 @@ class Object:
 	def init( self ):
 		''''''
 
-		self.objectReferences = 1
 		self.controller = self.getController()
 		self.birthTime = self.controller.getTime()
 

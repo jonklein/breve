@@ -154,7 +154,7 @@ int main( int argc, char **argv ) {
 	if( gConvertToPython ) {
 		brLoadSimulation( gEngine, text, simulationFile );
 		std::string sim = simulationFile;
-		std::string obj = stPyConvertFile( gSteveData, sim );
+		std::string obj = stPyConvertFile( gEngine, gSteveData, sim );
 
 		int position = sim.find( ".tz", sim.size() - 3 );
 
@@ -576,6 +576,13 @@ void slDemoMouse( int button, int state, int x, int y ) {
 		gMotionCrosshair = 0;
 	}
 
+	if( state == GLUT_UP ) { 
+		// mouse wheel 
+		if ( button == 3 )
+			gEngine->camera->zoomWithMouseMovement( 0, 15 );
+		else if ( button == 4 )
+			gEngine->camera->zoomWithMouseMovement( 0, -15 );
+	}
 
 	slDemoDisplay();
 }

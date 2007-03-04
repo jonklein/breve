@@ -179,7 +179,7 @@ void updateMenu(brInstance *i);
 - (NSString*)saveNameForType:(NSString *)type withAccView:(NSView*)view;
 - (NSString*)loadNameForTypes:(NSArray*)types withAccView:(NSView*)view;
 
-int isTZfile(struct dirent *d);
+int isBreveFile(struct dirent *d);
 int isHTMLfile(struct dirent *d);
 
 - (IBAction)find:sender;

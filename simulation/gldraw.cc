@@ -346,12 +346,12 @@ int slCamera::select( slWorld *w, int x, int y ) {
 	return hit;
 }
 
-/*!
-	\brief Computes the vector corresponding to a drag in the display.
-
-	Computes the location in the same plane as dragVertex that the mouse
-	is being dragged to when the window mouse coordinates are x and y.
-*/
+/**
+ * Computes the vector corresponding to a drag in the display.
+ * 
+ * Computes the location in the same plane as dragVertex that the mouse
+ * is being dragged to when the window mouse coordinates are x and y.
+ */
 
 int slCamera::vectorForDrag( slWorld *w, slVector *dragVertex, int x, int y, slVector *dragVector ) {
 	slPlane plane;
@@ -823,11 +823,8 @@ void slCamera::drawBackground( slWorld *w ) {
 	glColor4f( w->backgroundTextureColor.x, w->backgroundTextureColor.y, w->backgroundTextureColor.z, 1.0 );
 
 	textColor[0] = w->backgroundTextureColor.x;
-
 	textColor[1] = w->backgroundTextureColor.y;
-
 	textColor[2] = w->backgroundTextureColor.z;
-
 	textColor[3] = 1.0;
 
 	glDisable( GL_LIGHTING );
@@ -856,7 +853,6 @@ void slCamera::drawBackground( slWorld *w ) {
 	}
 
 	transX += _backgroundScrollX;
-
 	transY += _backgroundScrollY;
 
 	glTranslated( transX - ( .8 * 2*_ry ), ( .8 * 2*_rx ) - transY, 0 );
@@ -922,6 +918,7 @@ void slCamera::renderBillboards( int flags ) {
 		glPushAttrib( GL_LIGHTING_BIT | GL_TRANSFORM_BIT | GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT );
 		glEnable( GL_TEXTURE_2D );
 		glEnable( GL_BLEND );
+		glDisable( GL_LIGHTING );
 	}
 
 	glPushAttrib( GL_TRANSFORM_BIT );
@@ -937,24 +934,17 @@ void slCamera::renderBillboards( int flags ) {
 
 	glDepthMask( GL_FALSE );
 
-	for ( n = 0; n < _billboardCount; ++n ) {
+	for ( n = 0; n < _billboardCount; n++ ) {
 		slWorldObject *object;
 		int bound;
 
 		glPushMatrix();
 
-		b = _billboards[n];
+		b = _billboards[ n ];
 
 		object = b->object;
 
 		bound = ( object->_drawMode & DM_BOUND );
-
-		if ( object->_textureMode == BBT_LIGHTMAP )
-			glBlendFunc( GL_ONE, GL_ONE );
-		else {
-			glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-		}
 
 		if ( !( flags & DO_NO_COLOR ) )
 			glColor4f( object->_color.x, object->_color.y, object->_color.z, object->_alpha );
@@ -962,40 +952,42 @@ void slCamera::renderBillboards( int flags ) {
 		if ( lastTexture != object->_texture )
 			glBindTexture( GL_TEXTURE_2D, object->_texture );
 
+		if ( object->_textureMode == BBT_LIGHTMAP ) {
+			glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+			glBlendFunc( GL_ONE, GL_ONE );
+		} else {
+			glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		}
+
 		lastTexture = object->_texture;
 
 		glTranslated( object->_position.location.x, object->_position.location.y, object->_position.location.z );
-
 		glRotatef( object->_billboardRotation, normal.x, normal.y, normal.z );
-
 		glScalef( b->size, b->size, b->size );
 
 		glCallList( _billboardDrawList );
 
 		if ( bound && !( flags & DO_NO_BOUND ) ) {
-			if ( !( flags & DO_NO_TEXTURE ) ) glDisable( GL_TEXTURE_2D );
+			if ( !( flags & DO_NO_TEXTURE ) ) 
+				glDisable( GL_TEXTURE_2D );
 
 			glPushMatrix();
 
 			glScalef( 1.1, 1.1, 1.1 );
-
 			glColor4f( 0.0, 0.0, 0.0, 1.0 );
 
 			glBegin( GL_LINE_LOOP );
-
 			glVertex3f( _billboardX.x + _billboardY.x,  _billboardX.y + _billboardY.y,  _billboardX.z + _billboardY.z );
-
 			glVertex3f( -_billboardX.x + _billboardY.x, -_billboardX.y + _billboardY.y, -_billboardX.z + _billboardY.z );
-
 			glVertex3f( -_billboardX.x - _billboardY.x, -_billboardX.y - _billboardY.y, -_billboardX.z - _billboardY.z );
-
 			glVertex3f( _billboardX.x - _billboardY.x,  _billboardX.y - _billboardY.y,  _billboardX.z - _billboardY.z );
-
 			glEnd();
 
 			glPopMatrix();
 
-			if ( !( flags & DO_NO_TEXTURE ) ) glEnable( GL_TEXTURE_2D );
+			if ( !( flags & DO_NO_TEXTURE ) ) 
+				glEnable( GL_TEXTURE_2D );
 		}
 
 		glPopMatrix();
@@ -1031,7 +1023,8 @@ void slText( double x, double y, const char *string, void *font ) {
 
 	glRasterPos2f( x, y );
 
-	while (( c = *( string++ ) ) != 0 ) glutBitmapCharacter( font, c );
+	while (( c = *( string++ ) ) != 0 ) 
+		glutBitmapCharacter( font, c );
 }
 
 /*!
@@ -1064,7 +1057,6 @@ void slCamera::drawLights( int noDiffuse ) {
 	}
 
 	amb[0] = _lights[0].ambient.x;
-
 	amb[1] = _lights[0].ambient.y;
 	amb[2] = _lights[0].ambient.z;
 	amb[3] = 0.0;
@@ -1141,10 +1133,10 @@ void slCamera::processBillboards( slWorld *w ) {
 	for ( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ ) {
 		slWorldObject *wo = *wi;
 
-		if ( wo && wo->_textureMode != BBT_NONE && wo->_shape && wo->_shape->_type == ST_SPHERE ) {
+		if ( wo && wo->_textureMode != BBT_NONE && wo->_displayShape && wo->_displayShape->_type == ST_SPHERE ) {
 			double z = 0;
 
-			ss = static_cast<slSphere*>( wo->_shape );
+			ss = static_cast< slSphere* >( wo->_displayShape );
 
 			z = matrix[2] * wo->_position.location.x + matrix[6] * wo->_position.location.y + matrix[10] * wo->_position.location.z;
 
@@ -1166,29 +1158,23 @@ void slCamera::processBillboards( slWorld *w ) {
 	_billboardZ.y = matrix[6];
 	_billboardZ.z = matrix[10];
 
-	if ( _billboardDrawList == 0 ) _billboardDrawList = glGenLists( 1 );
+	if ( _billboardDrawList == 0 ) 
+		_billboardDrawList = glGenLists( 1 );
 
 	glNewList( _billboardDrawList, GL_COMPILE );
 
 	glBegin( GL_TRIANGLE_STRIP );
-
-	glTexCoord2f( 1.0, 1.0 );
-
-	glVertex3f( _billboardX.x + _billboardY.x,  _billboardX.y + _billboardY.y,  _billboardX.z + _billboardY.z );
-
-	glTexCoord2f( 0.0, 1.0 );
-
-	glVertex3f( -_billboardX.x + _billboardY.x, -_billboardX.y + _billboardY.y, -_billboardX.z + _billboardY.z );
-
-	glTexCoord2f( 1.0, 0.0 );
-
-	glVertex3f( _billboardX.x - _billboardY.x,  _billboardX.y - _billboardY.y,  _billboardX.z - _billboardY.z );
-
-	glTexCoord2f( 0.0, 0.0 );
-
-	glVertex3f( -_billboardX.x - _billboardY.x, -_billboardX.y - _billboardY.y, -_billboardX.z - _billboardY.z );
-
+		glTexCoord2f( 1.0, 1.0 );
+		glVertex3f( _billboardX.x + _billboardY.x,  _billboardX.y + _billboardY.y,  _billboardX.z + _billboardY.z );
+		glTexCoord2f( 0.0, 1.0 );
+		glVertex3f( -_billboardX.x + _billboardY.x, -_billboardX.y + _billboardY.y, -_billboardX.z + _billboardY.z );
+		glTexCoord2f( 1.0, 0.0 );
+		glVertex3f( _billboardX.x - _billboardY.x,  _billboardX.y - _billboardY.y,  _billboardX.z - _billboardY.z );
+		glTexCoord2f( 0.0, 0.0 );
+		glVertex3f( -_billboardX.x - _billboardY.x, -_billboardX.y - _billboardY.y, -_billboardX.z - _billboardY.z );
 	glEnd();
+
+	glNormal3f( _billboardZ.x, _billboardZ.y, _billboardZ.z );
 
 	glEndList();
 }
@@ -1204,15 +1190,10 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 	bool color = 1;
 
 	const int loadNames = ( flags & DO_LOAD_NAMES );
-
 	const int doNoAlpha = ( flags & DO_NO_ALPHA );
-
 	const int doOnlyAlpha = ( flags & DO_ONLY_ALPHA );
-
 	const int doNoStationary = ( flags & DO_NO_STATIONARY );
-
 	const int doNoTerrain = ( flags & DO_NO_TERRAIN );
-
 	const int doNoTexture = ( flags & DO_NO_TEXTURE );
 
 	_points.clear();
@@ -1223,12 +1204,9 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 	}
 
 	if ( flags & ( DO_OUTLINE | DO_NO_COLOR ) ) color = 0;
-
-	if ( flags & DO_OUTLINE ) glColor4f( 1, 1, 1, 0 );
+	if ( flags & DO_OUTLINE ) glColor4f( 1, 1, 1, 1 );
 
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-
-	// glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
 	for ( n = 0; n < w->_objects.size(); ++n ) {
 		int skip = 0;
@@ -1248,7 +1226,7 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 
 			if ( !wo->_drawAsPoint ) {
 				if ( color )
-					glColor4d( wo->_color.x, wo->_color.y, wo->_color.z, wo->_alpha );
+					glColor4f( wo->_color.x, wo->_color.y, wo->_color.z, wo->_alpha );
 
 				if ( wo->_alpha != 1.0 ) {
 					if ( !doNoTexture && wo->_texture > 0 )
@@ -1430,11 +1408,8 @@ void slRenderShape( slShape *s, int drawMode, int flags ) {
 			gluQuadricDrawStyle( quad, GLU_LINE );
 
 		gluQuadricTexture( quad, GL_TRUE );
-
 		gluQuadricOrientation( quad, GLU_OUTSIDE );
-
 		gluSphere( quad, radius, divisions, divisions );
-
 		gluDeleteQuadric( quad );
 	} else {
 		std::vector<slFace*>::iterator fi;
@@ -1581,23 +1556,17 @@ int slBreakdownFace( slFace *f ) {
 		v2 = &p->vertex;
 
 		slVectorSub( v2, v1, &diff );
-
 		slVectorMul( &diff, .5, &diff );
-
 		slVectorAdd( v1, &diff, &middle );
 
 		slVectorCopy( v1, &subv[0] );
-
 		slVectorCopy( &middle, &subv[1] );
-
 		slVectorCopy( &total, &subv[2] );
 
 		slBreakdownTriangle( &subv[0], 0, &xaxis, &yaxis );
 
 		slVectorCopy( &middle, &subv[0] );
-
 		slVectorCopy( v2, &subv[1] );
-
 		slVectorCopy( &total, &subv[2] );
 
 		slBreakdownTriangle( &subv[0], 0, &xaxis, &yaxis );

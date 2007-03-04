@@ -218,8 +218,6 @@
 			<key>Layout</key>
 			<array>
 				<dict>
-					<key>BecomeActive</key>
-					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -265,6 +263,7 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
+									<integer>36</integer>
 									<integer>34</integer>
 								</array>
 							</array>
@@ -333,6 +332,8 @@
 							<string>0pt</string>
 						</dict>
 						<dict>
+							<key>BecomeActive</key>
+							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -369,9 +370,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>4842F92C0B2B63140065C1FB</string>
+				<string>48691D3E0B88A13A007583CB</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>4842F92D0B2B63140065C1FB</string>
+				<string>48691D3F0B88A13A007583CB</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -505,8 +506,8 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>/Users/jk/Development/breve/OSX/breve.xcodeproj</string>
 		<string>487AAB1F084F74BE00633A19</string>
+		<string>/Users/jk/Development/breve/OSX/breve.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
 	<string>31 101 1142 777 0 0 1440 878 </string>
@@ -552,7 +553,7 @@
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXBuildLogShowsTranscriptDefaultKey</key>
-								<string>{{0, 5}, {1002, 443}}</string>
+								<string>{{0, 217}, {1002, 231}}</string>
 								<key>PBXProjectModuleGUID</key>
 								<string>XCMainBuildResultsModuleGUID</string>
 								<key>PBXProjectModuleLabel</key>
@@ -590,7 +591,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>487AAB1F084F74BE00633A19</string>
-				<string>4842F92E0B2B63140065C1FB</string>
+				<string>48691D400B88A13A007583CB</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>
@@ -601,7 +602,7 @@
 			<key>WindowToolGUID</key>
 			<string>487AAB1F084F74BE00633A19</string>
 			<key>WindowToolIsVisible</key>
-			<true/>
+			<false/>
 		</dict>
 		<dict>
 			<key>FirstTimeWindowDisplayed</key>

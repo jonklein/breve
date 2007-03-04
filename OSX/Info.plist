@@ -11,6 +11,8 @@
 			<array>
 				<string>tz</string>
 				<string>breve</string>
+				<string>py</string>
+				<string>bpy</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>DocumentIcons.icns</string>
@@ -41,6 +43,8 @@
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>

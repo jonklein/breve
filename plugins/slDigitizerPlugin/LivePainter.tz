@@ -16,212 +16,213 @@ Controller myController.
 # implment the controller object
 
 Control : myController {
-	+ variables:
-		image, light (object).
-		patches (object).
-		shape (object).
-		zoom (double).
-		blur (double).
-		painters (list).
+    + variables:
+        image, light (object).
+        patches (object).
+        shape (object).
+        zoom (double).
+        blur (double).
+        painters (list).
 
-		vel, acc, radius (double).
+        vel, acc, radius (double).
 
-		average, lastAverage, stability, initialized (int).
-		
-	+ to init:
-		brush (int).
+        average, lastAverage, stability, initialized (int).
+        
+    + to init:
+        brush (int).
 
-		brush = (self load-image from "images/brush.png").
+        brush = (self load-image from "images/brush.png").
 
-		vel = 15.0 + random[9].
-		acc = random[1000].
-		radius = 3.7 + random[1.0].
+        vel = 15.0 + random[9].
+        acc = random[1000].
+        radius = 3.7 + random[1.0].
 
-		self enable-blur.
-		self set-blur-factor to 1.0.
-		self set-background-color to (0, 0, 0).
-		self disable-text.
+        self enable-blur.
+        self set-blur-factor to 1.0.
+        self set-background-color to (0, 0, 0).
+        self disable-text.
 
-		image = (new DigitizerImage).
+        image = (new DigitizerImage).
+        image flip.
 
 
-		radius *= (image get-width) / 300.
-		vel *= (image get-width) / 300.
-		acc *= (image get-width) / 300.
+        radius *= (image get-width) / 300.
+        vel *= (image get-width) / 300.
+        acc *= (image get-width) / 300.
 
-		light = new Mobile.
-		light move to (-(image get-width)/2.0, -(image get-height)/2.0, -5) + (10, 10, 0).
-		
-		shape = new Sphere init-with radius radius.
+        light = new Mobile.
+        light move to (-(image get-width)/2.0, -(image get-height)/2.0, -5) + (10, 10, 0).
+        
+        shape = new Sphere init-with radius radius.
 
-		painters = 200 new Painters.
-		painters set-bitmap to brush.
+        painters = 200 new Painters.
+        painters set-bitmap to brush.
 
-		self offset-camera by (0, 0, -(image get-width) - 10).
-		self set-z-clip to (image get-width) + 100.
+        self offset-camera by (0, 0, -(image get-width) - 10).
+        self set-z-clip to (image get-width) + 100.
 
-	+ to get-patches:
-		return patches.
+    + to get-patches:
+        return patches.
 
-	+ to catch-key-s-down:
-		self save-snapshot to "output.png".
+    + to catch-key-s-down:
+        self save-snapshot to "output.png".
 
-	+ to iterate:
-		image update-frame.
+    + to iterate:
+        image update-frame.
 
-		average = (image get-average-delta).
+        average = (image get-average-delta).
 
-		if average == lastAverage: stability++.
-		else stability = 0.
+        if average == lastAverage: stability++.
+        else stability = 0.
 
-		lastAverage = average.
+        lastAverage = average.
 
-		if (stability == 25 && (average < 50 || !initialized)): {
-			image update-intensity-reference-map.
-			initialized = 1.
+        if (stability == 25 && (average < 50 || !initialized)): {
+            image update-intensity-reference-map.
+            initialized = 1.
 
-			print "** initialization complete. **".
-		} 
+            print "** initialization complete. **".
+        } 
 
-		if !initialized: light set-color to (1, 1, 0).
-		else if average > 50: light set-color to (0, 1, 0).
-		else light set-color to (1, 0, 0).
+        if !initialized: light set-color to (1, 1, 0).
+        else if average > 50: light set-color to (0, 1, 0).
+        else light set-color to (1, 0, 0).
 
-		# print "=> $average".
+        # print "=> $average".
 
-		super iterate.
+        super iterate.
 
-	+ to get-image:
-		return image.        
+    + to get-image:
+        return image.        
 
-	+ to get-shape:
-		return shape. 
+    + to get-shape:
+        return shape. 
 
-	+ to get-random-painter:
-		return painters{ random[ | painters | - 1 ] }.
+    + to get-random-painter:
+        return painters{ random[ | painters | - 1 ] }.
 
-	+ to get-vel:
-		return vel.
+    + to get-vel:
+        return vel.
 
-	+ to get-acc:
-		return acc.
+    + to get-acc:
+        return acc.
 }
 
 Patch : PainterPatch {
-	+ variables:
-		image (object).
-		level (float).
-		neighbors (list).
-		newlevel (float).
+    + variables:
+        image (object).
+        level (float).
+        neighbors (list).
+        newlevel (float).
 
-	+ to init:
-		image = (controller get-image).	
+    + to init:
+        image = (controller get-image).    
 
-	+ to init-patch:
-		self set-transparency to 1.0.
+    + to init-patch:
+        self set-transparency to 1.0.
 
-		neighbors = (self get-von-neumann-neighborhood).
+        neighbors = (self get-von-neumann-neighborhood).
 
-		print neighbors.
+        print neighbors.
 
-	+ to spread level l (float):
-		newlevel += l.
+    + to spread level l (float):
+        newlevel += l.
 
-	+ to iterate:
-		p (object).
+    + to iterate:
+        p (object).
 
-		level *= .8.
-		level += (image get-delta-map-value at-x (19 - xIndex) at-y (19 - yIndex)) / 256.0.
-		neighbors spread level (level / |neighbors|).
-		level = 0.
+        level *= .8.
+        level += (image get-delta-map-value at-x (19 - xIndex) at-y (19 - yIndex)) / 256.0.
+        neighbors spread level (level / |neighbors|).
+        level = 0.
 
-		# if level > 1.5: {
-		#	p = (controller get-random-painter).
-		#	p move to (self get-location) + random[(20, 20, 0)].
-		# }
+        # if level > 1.5: {
+        #    p = (controller get-random-painter).
+        #    p move to (self get-location) + random[(20, 20, 0)].
+        # }
 
-	+ to post-iterate:
-		level = newlevel.
-		newlevel = 0.
+    + to post-iterate:
+        level = newlevel.
+        newlevel = 0.
 
-		self set-transparency to level / 2.0.
-		self set-color to (1, 1, 1) * level.
+        self set-transparency to level / 2.0.
+        self set-color to (1, 1, 1) * level.
 
-	+ to get-level:
-		if level > 1.0: return 1.0.
-		return level.
+    + to get-level:
+        if level > 1.0: return 1.0.
+        return level.
 }
 
 Mobile : Painter (aka Painters) {
-	+ variables:
-		image (object).
-		w, h (int).
-		factor (int).
-		vel, acc (double).
-		patches (object).
+    + variables:
+        image (object).
+        w, h (int).
+        factor (int).
+        vel, acc (double).
+        patches (object).
 
-	+ to init:
-		self set-shape to (controller get-shape).
-		image = (controller get-image).
+    + to init:
+        self set-shape to (controller get-shape).
+        image = (controller get-image).
 
-		patches = (controller get-patches).
+        patches = (controller get-patches).
 
-		w = (image get-width).
-		h = (image get-height).
+        w = (image get-width).
+        h = (image get-height).
 
-		self set-color to (0, 0, 0).
+        self set-color to (0, 0, 0).
 
-		self reset.
+        self reset.
 
-	+ to reset:
-		n (int).
-		level, bestLevel (double).
-		r (vector).
+    + to reset:
+        n (int).
+        level, bestLevel (double).
+        r (vector).
 
-		vel = (controller get-vel).
-		acc = (controller get-acc).
+        vel = (controller get-vel).
+        acc = (controller get-acc).
 
-		self move to random[(w - 1, h - 1, 0)] - (w/2, h/2, 0).
+        self move to random[(w - 1, h - 1, 0)] - (w/2, h/2, 0).
 
-		self set-velocity to random[(vel, vel, 0)] - (vel/2, vel/2, 0).
+        self set-velocity to random[(vel, vel, 0)] - (vel/2, vel/2, 0).
 
-		self set-color.
+        self set-color.
 
-	+ to set-color:
-		x, y, z (int).
-		location, velocity, color (vector).
+    + to set-color:
+        x, y, z (int).
+        location, velocity, color (vector).
 
-		location = (self get-location).
-		x = location::x.
-		y = location::y.
-		z = location::z.
+        location = (self get-location).
+        x = location::x.
+        y = location::y.
+        z = location::z.
 
-		if x > w/2 - 1 || x < -w/2 || y > h/2 - 1 || y < -h/2 || z > 200: {
-			self reset.
-			location = (self get-location).
-			x = location::x.
-			y = location::y.
-		}
+        if x > w/2 - 1 || x < -w/2 || y > h/2 - 1 || y < -h/2 || z > 200: {
+            self reset.
+            location = (self get-location).
+            x = location::x.
+            y = location::y.
+        }
 
-		x += w/2.
-		y += h/2.
+        x += w/2.
+        y += h/2.
 
-		# self set-color to (image get-rgb-pixel at-x x at-y y) / (RADIUS).
-		# self set-color to (image get-rgb-pixel at-x x at-y y) + random[(.1, .1, .1)].
+        # self set-color to (image get-rgb-pixel at-x x at-y y) / (RADIUS).
+        # self set-color to (image get-rgb-pixel at-x x at-y y) + random[(.1, .1, .1)].
 
-		color = (image get-rgb-pixel at-x x at-y y).
+        color = (image get-rgb-pixel at-x x at-y y).
 
-		self set-color to color.
+        self set-color to color.
 
-	+ to iterate:
-		velocity (vector).
+    + to iterate:
+        velocity (vector).
 
-		if random[10] == 0: self reset.
-		self set-color.
+        if random[10] == 0: self reset.
+        self set-color.
 
-		velocity = (self get-velocity).
-		if |velocity|: velocity /= | velocity |.
+        velocity = (self get-velocity).
+        if |velocity|: velocity /= | velocity |.
 
-		self set-velocity to vel * velocity.
-		self set-acceleration to random[(acc, acc, 0)] - (acc/2, acc/2, 0).
+        self set-velocity to vel * velocity.
+        self set-acceleration to random[(acc, acc, 0)] - (acc/2, acc/2, 0).
 }

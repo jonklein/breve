@@ -1546,7 +1546,7 @@ RTC_INLINE int stEvalListRemove( stListRemoveExp *l, stRunInstance *i, brEval *r
 		return resultCode;
 
 	if ( listEval.type() != AT_LIST ) {
-		stEvalError( i->instance, EE_TYPE, "expected type \"list\" during \"pop\" evaluation" );
+		stEvalError( i->instance, EE_TYPE, "expected type \"list\" during list remove evaluation" );
 		return EC_ERROR;
 	}
 

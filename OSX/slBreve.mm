@@ -166,7 +166,7 @@ static NSRecursiveLock *gLogLock;
 	char *fullpath;
 	int n;
 	int menuCount = 0;
-	int demoCount = scandir(directory, &demoArray, isTZfile, alphasort);
+	int demoCount = scandir(directory, &demoArray, isBreveFile, alphasort);
 	NSString *name;
 
 	[menu setPath: [NSString stringWithCString: directory]];
@@ -721,7 +721,7 @@ void slPrintLog( const char *text ) {
 	[[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: @"mailto:jklein@spiderland.org"]];
 }
 
-int isTZfile(struct dirent *d) {
+int isBreveFile(struct dirent *d) {
 	char *filename = d->d_name;
 	int m;
 
@@ -731,7 +731,7 @@ int isTZfile(struct dirent *d) {
    
 	if(m < 4) return 0;
 
-	return !strcmp(&filename[m - 3], ".tz");
+	return !strcmp(&filename[m - 3], ".tz") || !strcmp( &filename[m - 3], ".py" );
 }
 
 int isHTMLfile(struct dirent *d) {

@@ -16,14 +16,11 @@ NULL : Object (aka Objects) [version 2.1] {
 	% one of these classes instead.
 
 	+ variables:
-		objectReferences (int).
 		controller (object).
 		birthTime (float).
 
 	+ to init:
-		objectReferences = 1.
 		controller = (self get-controller).
-
 		birthTime = (controller get-time).
 
 	+ to destroy:

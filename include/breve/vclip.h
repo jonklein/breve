@@ -56,7 +56,7 @@ enum slCollisionFlags {
 	BT_CHECK 	= 0x08, // 0001000 
 	BT_ALL   	= 0x0f, // 0001111 -- x, y, z overlap and checking desired
 	BT_CALLBACK	= 0x10,	// 0010000 -- these objects require a callback
-	BT_SIMULATE = 0x20,	// 0100000 -- these objects require simulation
+	BT_SIMULATE 	= 0x20,	// 0100000 -- these objects require simulation
 	BT_UNKNOWN	= 0x40	// 1000000 -- need to check callback & simulation
 };
 
@@ -149,7 +149,12 @@ class slVclipData {
 
 class slCollisionCandidate {
 	public:
-		slCollisionCandidate() {};
+		slCollisionCandidate() { 
+			_shape1 = NULL; 
+			_shape2 = NULL; 
+			_feature1 = NULL; 
+			_feature2 = NULL; 
+		};
 
 		slCollisionCandidate(slVclipData *vc, int o1, int o2) {
 			slWorldObject *w1, *w2;

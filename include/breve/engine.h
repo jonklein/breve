@@ -277,8 +277,6 @@ int brEngineSetController(brEngine *, brInstance *);
 
 brInstance *brEngineGetController(brEngine *);
 
-slStack *brEngineGetAllInstances(brEngine *);
-
 int brEngineIterate(brEngine *);
 
 void brEngineSetIOPath(brEngine *, const char *);

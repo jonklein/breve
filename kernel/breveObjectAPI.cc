@@ -37,7 +37,7 @@ brMethod *brMethodFind( brObject *o, const char *name, unsigned char *types, int
 		t = new unsigned char[ argCount ];
 		types = t;
 
-		for ( n = 0;n < argCount;n++ ) types[n] = AT_UNDEFINED;
+		for ( n = 0;n < argCount;n++ ) types[ n ] = AT_UNDEFINED;
 	}
 
 	mp = o->type->findMethod( o->userData, name, types, argCount );

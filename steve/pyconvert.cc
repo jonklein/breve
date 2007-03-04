@@ -24,8 +24,8 @@
 
 #include "pyconvert.h"
 
-std::string stPyConvertFile( stSteveData *inSteveData, std::string &inFilename ) {
-	std::string result;
+std::string stPyConvertFile( brEngine *inEngine, stSteveData *inSteveData, std::string &inFilename ) {
+	std::string result, controller, aliases;
 	unsigned int n;
 
 	result += "\nimport breve\n\n";
@@ -43,8 +43,23 @@ std::string stPyConvertFile( stSteveData *inSteveData, std::string &inFilename )
 
 		if( object->_file == inFilename ) {
 			result += stPyConvertObject( object );
+
+			if( inSteveData->controllerName && !strcmp( object->name.c_str(), inSteveData->controllerName ) )
+				controller = object->name + "()\n\n";
+
+			std::map< std::string, brObject* >::iterator mi;
+
+			for( mi = inEngine->objectAliases.begin(); mi != inEngine->objectAliases.end(); mi++ ) {
+				if( mi->second && mi->second->userData == object ) {
+					aliases += "breve." + mi->first + " = " + object->name + "\n";
+				}
+			}
 		}
 	}
+
+
+	result += aliases;
+	result += "\n\n" + controller;
 
 	return result;
 }
@@ -100,6 +115,17 @@ std::string stPyConvertObject( stObject *inObject ) {
 	ADDTABS( &conversionData, result );
 	result += "'''" + inObject->_comment + "'''\n\n";
 
+	ADDTABS( &conversionData, result );
+	result += "__slots__ = [ ";
+
+	for( vi = inObject->variables.begin(); vi != inObject->variables.end(); vi++ ) { 
+		stVar *var = vi->second;
+
+		result += "'" + var->name + "', ";
+	}
+
+	result += "]\n\n";
+
 	if( supername.size() != 0 ) {
 		ADDTABS( &conversionData, result );
 		result += "def __init__( self ):\n";
@@ -134,7 +160,7 @@ std::string stPyConvertObject( stObject *inObject ) {
 
 	conversionData._indents--;
 
-	result += "\nbreve." + stPyConvertSymbol( inObject->name ) + " = " + stPyConvertSymbol( inObject->name ) + "\n\n";
+	result += "\nbreve." + stPyConvertSymbol( inObject->name ) + " = " + stPyConvertSymbol( inObject->name ) + "\n";
 
 	return result;
 }
@@ -166,6 +192,7 @@ std::string stPyConvertVariableDeclaration( stPyConversionData *inData, stVar *i
 		case AT_STRING:
 			result += " = ''\n";
 			break;
+		case AT_ARRAY:
 		case AT_LIST:
 			result += " = []\n";
 			break;
@@ -189,6 +216,10 @@ std::string stPyConvertMethod( stPyConversionData *inData, stObject *inObject, s
 
 	for( unsigned int n = 0; n < inMethod->keywords.size(); n++ ) {
 		result += ", " + stPyConvertSymbol( inMethod->keywords[ n ]->var->name );
+
+		if( inMethod->keywords[ n ]->defaultKey ) {
+			result += " = " + inMethod->keywords[ n ]->defaultKey->value->toPython( inData );
+		}
 	}
 
 	result += " ):\n";
@@ -488,9 +519,9 @@ std::string stForeachExp::toPython( stPyConversionData *inData ) {
 	std::string var;
 
 	if( assignment->_local )
-		var = assignment->_word;
+		var = stPyConvertSymbol( assignment->_word );
 	else 
-		var = "self." + assignment->_word;
+		var = "self." + stPyConvertSymbol( assignment->_word );
 
 	result = "for " + var + " in " + list->toPython( inData ) + ":\n";
 
@@ -505,7 +536,8 @@ std::string stForeachExp::toPython( stPyConversionData *inData ) {
 }
 
 std::string stCopyListExp::toPython( stPyConversionData *inData ) {
-	return std::string( "" );
+	std::string result = "list( " + expression->toPython( inData ) + ") ";
+	return result;
 }
 
 std::string stListIndexExp::toPython( stPyConversionData *inData ) {
@@ -517,7 +549,14 @@ std::string stListIndexExp::toPython( stPyConversionData *inData ) {
 }
 
 std::string stArrayIndexExp::toPython( stPyConversionData *inData ) {
-	return UNIMPLEMENTED;
+	std::string result;
+
+	if( !local )
+		result += "self.";
+
+	result += stPyConvertSymbol( _variableName ) + "[ " + index->toPython( inData ) + " ]";
+
+	return result;
 }
 
 std::string stListInsertExp::toPython( stPyConversionData *inData ) {
@@ -566,7 +605,14 @@ std::string stListIndexAssignExp::toPython( stPyConversionData *inData ) {
 }
 
 std::string stArrayIndexAssignExp::toPython( stPyConversionData *inData ) {
-	return std::string( "UNSUPPORTED" );
+	std::string result;
+
+	if( !local )
+		result += "self.";
+
+	result += stPyConvertSymbol( _variableName ) + "[ " + index->toPython( inData ) + " ] = " + rvalue->toPython( inData );
+
+	return result;
 }
 
 std::string stVectorElementAssignExp::toPython( stPyConversionData *inData ) {
@@ -621,8 +667,6 @@ std::string stIfExp::toPython( stPyConversionData *inData ) {
 std::string stAllExp::toPython( stPyConversionData *inData ) {
 	std::string result;
 
-	ADDTABS( inData, result );
-
 	result += "breve.allInstances( \"breve." + stPyConvertSymbol( name ) + "\" )";
 
 	return result;
@@ -639,13 +683,51 @@ std::string stForExp::toPython( stPyConversionData *inData ) {
 }
 
 std::string stEvalExp::toPython( stPyConversionData *inData ) {
-	return std::string( "" );
+	std::string result;
+	char format[ 1024 ];
+
+	switch( eval->type() ) {
+		case AT_STRING:
+			result += "\"";
+			result +=  BRSTRING( eval );
+			result += "\"";
+			break;
+
+		case AT_VECTOR:
+			sprintf( format, "breve.vector( %f, %f, %f )", BRVECTOR( eval ).x, BRVECTOR( eval ).y, BRVECTOR( eval ).z );
+			result = format;
+			break;
+
+		case AT_MATRIX:
+			sprintf( format, "breve.matrix( %f, %f, %f, %f, %f, %f, %f, %f, %f )", 
+				BRMATRIX( eval )[ 0 ][ 0 ], BRMATRIX( eval )[ 0 ][ 1 ], BRMATRIX( eval )[ 0 ][ 2 ], 
+				BRMATRIX( eval )[ 1 ][ 0 ], BRMATRIX( eval )[ 1 ][ 1 ], BRMATRIX( eval )[ 1 ][ 2 ], 
+				BRMATRIX( eval )[ 2 ][ 0 ], BRMATRIX( eval )[ 2 ][ 1 ], BRMATRIX( eval )[ 2 ][ 2 ] );
+			result = format;
+			break;
+
+		case AT_INT:
+			sprintf( format, "%d", BRINT( eval ) );
+			result = format;
+			break;
+
+		case AT_DOUBLE:
+			sprintf( format, "%f", BRFLOAT( eval ) );
+			result = format;
+			break;
+
+		default:
+			result = UNIMPLEMENTED;
+			break;
+	}
+
+	return result;
 }
 
 std::string stFreeExp::toPython( stPyConversionData *inData ) {
 	std::string result;
 
-	result = "del " + expression->toPython( inData );
+	result = "breve.deleteInstances( " + expression->toPython( inData ) + " )";
 
 	return result;
 }
@@ -682,7 +764,7 @@ std::string stLoadExp::toPython( stPyConversionData *inData ) {
 }
 
 std::string stStringExp::toPython( stPyConversionData *inData ) {
-	std::string result;
+	std::string result, processed;
 
 	if( substrings.size() == 0 ) {
 		if( string.find( " " ) == std::string::npos ) {
@@ -693,9 +775,20 @@ std::string stStringExp::toPython( stPyConversionData *inData ) {
 		return "'''" + string + "'''";
 	}
 
-	result = "'''" + string + "''' % ( ";
+	processed = string;
+	int n;
 
-	for( unsigned int n = 0; n < substrings.size(); n++ ) {
+	// go backwards through the string so that the offsets are maintained
+
+	for( n = substrings.size() - 1; n >= 0; n-- ) {
+		stSubstringExp *substring = substrings[ n ];
+
+		processed.replace( substring->offset, 0, "%s" );
+	}
+
+	result = "'''" + processed + "''' % ( ";
+
+	for( unsigned n = 0; n < substrings.size(); n++ ) {
 		result += " " + substrings[ n ]->toPython( inData );
 
 		if( n < substrings.size() - 1 )

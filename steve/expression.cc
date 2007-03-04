@@ -131,6 +131,7 @@ stArrayIndexExp::stArrayIndexExp( stMethod *m, stObject *o, char *word, stExp *i
 	}
 
 	offset = var->offset;
+	_variableName = word;
 
 	loadType = var->type->_arrayType;
 	maxIndex = var->type->_arrayCount;
@@ -171,6 +172,7 @@ stArrayIndexAssignExp::stArrayIndexAssignExp( stMethod *m, stObject *o, char *wo
 	}
 
 	offset = var->offset;
+	_variableName = word;
 
 	assignType = var->type->_arrayType;
 	maxIndex = var->type->_arrayCount;

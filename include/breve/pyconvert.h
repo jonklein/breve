@@ -13,8 +13,8 @@ struct stPyConversionData {
 	stObject                *_currentObject;
 };
 
-std::string stPyConvertFile( stSteveData *inSteveData, std::string &inFilename );
 std::string stPyConvertObject( stObject *inObject );
+std::string stPyConvertFile( brEngine *inEngine, stSteveData *inSteveData, std::string &inFilename );
 std::string stPyConvertVariableDeclaration( stPyConversionData *inData, stVar *inVar, bool inInstance );
 std::string stPyConvertMethod( stPyConversionData *inData, stObject *inObject, stMethod *inMethod );
 

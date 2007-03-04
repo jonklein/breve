@@ -649,6 +649,8 @@ class stArrayIndexAssignExp : public stExp {
 
 		std::string			toPython( stPyConversionData *inData );
 
+		std::string 			_variableName;
+
 		int offset;
 		int maxIndex;
 		unsigned char local;
@@ -665,6 +667,8 @@ class stArrayIndexExp : public stExp {
 		~stArrayIndexExp();
 
 		std::string			toPython( stPyConversionData *inData );
+
+		std::string 			_variableName;
 
 		int offset;
 		int maxIndex;

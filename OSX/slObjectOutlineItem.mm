@@ -1,20 +1,20 @@
 /*****************************************************************************
- *                                                                           *
- * The breve Simulation Environment                                          *
- * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
- *                                                                           *
- * This program is free software; you can redistribute it and/or modify      *
- * it under the terms of the GNU General Public License as published by      *
- * the Free Software Foundation; either version 2 of the License, or         *
- * (at your option) any later version.                                       *
- *                                                                           *
- * This program is distributed in the hope that it will be useful,           *
- * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
- * GNU General Public License for more details.                              *
- *                                                                           *
- * You should have received a copy of the GNU General Public License         *
- * along with this program; if not, write to the Free Software               *
+ *																		   *
+ * The breve Simulation Environment										  *
+ * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein					   *
+ *																		   *
+ * This program is free software; you can redistribute it and/or modify	  *
+ * it under the terms of the GNU General Public License as published by	  *
+ * the Free Software Foundation; either version 2 of the License, or		 *
+ * (at your option) any later version.									   *
+ *																		   *
+ * This program is distributed in the hope that it will be useful,		   *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of			*
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the			 *
+ * GNU General Public License for more details.							  *
+ *																		   *
+ * You should have received a copy of the GNU General Public License		 *
+ * along with this program; if not, write to the Free Software			   *
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
@@ -29,42 +29,47 @@
 @implementation slObjectOutlineItem;
 
 - (id)initWithEval:(brEval*)e name:(NSString*)n withVar:(stVar*)stv withOffset:(int)off instance:(stInstance*)i {
-    int c;
+	int c;
 
 	mEval = new brEval;
 
-    theEvalList = NULL;
-    theIndex = 0;
+	theEvalList = NULL;
+	theIndex = 0;
 
 	isArray = NO;
 
 	brEvalCopy( e, mEval );
 
-    if(!n) name = [[NSString stringWithCString: "(null)"] retain];
-    else name = n;
+	if(!n) name = [[NSString stringWithCString: "(null)"] retain];
+	else name = n;
 	
-    if(stv && stv->type->_type == AT_ARRAY) {
-        isArray = YES;
-        arrayType = stv->type->_arrayType;
-    } 
+	if(stv && stv->type->_type == AT_ARRAY) {
+		isArray = YES;
+		arrayType = stv->type->_arrayType;
+	} 
 
 	offset = off;
 
-    instance = i;
+	instance = i;
 
-    if( [self getExpandable] && mEval->type() == AT_INSTANCE) {
-    	stInstance *evalInstance;
+	if( [self getExpandable] && mEval->type() == AT_INSTANCE) {
+		stInstance *evalInstance;
 
-		evalInstance = (stInstance*)BRINSTANCE( mEval )->userData;
-		[self setEvalObject: evalInstance->type];
-    } else if([self getExpandable] && mEval->type() == AT_LIST) {
-        childCount = BRLIST( mEval )->_vector.size();
-    } else if([self getExpandable] && isArray) {
-        childCount = stv->type->_arrayCount;
-    } else {
-        childCount = 0;
-        childObjects = NULL;
-    }
+		if( BRINSTANCE( mEval )->object->type->_typeSignature == STEVE_TYPE_SIGNATURE ) {
+			evalInstance = (stInstance*)BRINSTANCE( mEval )->userData;
+			[ self setEvalObject: evalInstance->type ];
+		} else {
+			evalInstance = NULL;
+			[ self setEvalObject: NULL ];
+		}
+	} else if([self getExpandable] && mEval->type() == AT_LIST) {
+		childCount = BRLIST( mEval )->_vector.size();
+	} else if([self getExpandable] && isArray) {
+		childCount = stv->type->_arrayCount;
+	} else {
+		childCount = 0;
+		childObjects = NULL;
+	}
 
 	// childObjects will be expected to be allocated later on...
 
@@ -74,7 +79,7 @@
 
 	for(c=0;c<childCount;c++) childObjects[c] = NULL;
 
-    return self;
+	return self;
 }
 
 - (void)setEvalObject:(stObject*)c {
@@ -98,7 +103,7 @@
 
 	if( mEval->type() == AT_LIST) {
 		for(n=0;n<childCount;n++) 
-	        [childObjects[n] setList: BRLIST( mEval ) index: n];
+			[childObjects[n] setList: BRLIST( mEval ) index: n];
 	}
 
 	childObjects = (id*)realloc(childObjects, sizeof(id) * newChildCount);
@@ -109,23 +114,23 @@
 }
 
 - (void)setList:(brEvalListHead*)e index:(int)index {
-    theEvalList = e;
-    theIndex = index;
+	theEvalList = e;
+	theIndex = index;
 }
 
 - (NSString*)getName {
-    return name;
+	return name;
 }
 
 /* if we have a regular variable, load it and return it.  if we are a list */
 /* element, then load the proper element of the list. */
 
 - (void)getEval {
-    int n;
+	int n;
 
-    if(isArray) {
+	if(isArray) {
 		return;
-    } 
+	} 
 
 	if(instance && instance->status == AS_ACTIVE && offset != -1) {
 		stRunInstance ri;
@@ -134,35 +139,35 @@
 		ri.instance = instance;
 		ri.type = instance->type;
 
-        stLoadVariable( &instance->variables[offset], mEval->type(), mEval, &ri);
+		stLoadVariable( &instance->variables[offset], mEval->type(), mEval, &ri);
 
 		if( mEval->type() == AT_INSTANCE && BRINSTANCE( mEval ) && BRINSTANCE( mEval )->status == AS_ACTIVE) {
 			evalInstance = (stInstance*)BRINSTANCE( mEval )->userData;
 			[self setEvalObject: evalInstance->type];
 		}
-    } else if(theEvalList) {
-        stDoEvalListIndex(theEvalList, theIndex, mEval);
-    } 
+	} else if(theEvalList) {
+		stDoEvalListIndex(theEvalList, theIndex, mEval);
+	} 
 
 	if( mEval->type() == AT_LIST ) {
 		[self updateChildCount: BRLIST( mEval )->getVector().size() ];
 	}
 
-    if(mEval->type() == AT_INSTANCE) {
+	if(mEval->type() == AT_INSTANCE) {
 		if(BRINSTANCE( mEval ) && BRINSTANCE( mEval )->status != AS_ACTIVE) {
 			[self updateChildCount: 0];
 		} 
 
-        for(n=0;n<childCount;n++) if(childObjects[n]) [childObjects[n] setInstance: (stInstance*)BRINSTANCE( mEval )->userData];
-    }
+		for(n=0;n<childCount;n++) if(childObjects[n]) [childObjects[n] setInstance: (stInstance*)BRINSTANCE( mEval )->userData];
+	}
 }
 
 - (void)setInstance:(stInstance*)i {
-    instance = i;
+	instance = i;
 }
 
 - (BOOL)getExpandable {
-    if(isArray) return YES;
+	if(isArray) return YES;
 
 	[self getEval];
 
@@ -173,67 +178,67 @@
 }
 
 /*!
-    \brief Return the child count computed earlier. 
+	\brief Return the child count computed earlier. 
 */
 
 - (int)getChildCount {
-    return childCount;
+	return childCount;
 }
 
 /*!
-    \brief Format this object's eval as a string.
+	\brief Format this object's eval as a string.
 */
 
 
 - (NSString*)getValue {
-    NSString *result;
-    char *cstr;
+	NSString *result;
+	char *cstr;
 
 	[self getEval];
 
-    cstr = brFormatEvaluation( mEval, NULL );
+	cstr = brFormatEvaluation( mEval, NULL );
 
-    result = [NSString stringWithCString: cstr];
+	result = [NSString stringWithCString: cstr];
 
-    slFree(cstr);
+	slFree(cstr);
 
-    return result;
+	return result;
 }
 
 /*
-    + childAtIndex:
-    = because of the issues described at the top of this file, getting the children of 
-    = an object is non-trivial...
+	+ childAtIndex:
+	= because of the issues described at the top of this file, getting the children of 
+	= an object is non-trivial...
 */
 
 - (id)childAtIndex:(int)index {
-    NSString *newTitle;
-    stInstance *evalInstance;
-    brEval newEval;
-    stVar *var;
-    int i, off;
+	NSString *newTitle;
+	stInstance *evalInstance;
+	brEval newEval;
+	stVar *var;
+	int i, off;
 
 	[self getEval];
 
-    // make sure the child request is within the bounds of the number of children 
+	// make sure the child request is within the bounds of the number of children 
 
-    if(index > childCount) return NULL;
+	if(index > childCount) return NULL;
 
-    // if we've found this child previously, we can just return the object.  
-    // of course, we should also update the child's parent object in case       
-    // this instance has been changed.  a change to this object would obviously 
-    // effect the children of this object 
+	// if we've found this child previously, we can just return the object.  
+	// of course, we should also update the child's parent object in case	   
+	// this instance has been changed.  a change to this object would obviously 
+	// effect the children of this object 
 
-    if( childObjects[index] ) {
-        if( mEval->type() == AT_INSTANCE ) [childObjects[index] setInstance: (stInstance*)BRINSTANCE( mEval )->userData];
-        return childObjects[index];
-    }
+	if( childObjects[index] ) {
+		if( mEval->type() == AT_INSTANCE ) [childObjects[index] setInstance: (stInstance*)BRINSTANCE( mEval )->userData];
+		return childObjects[index];
+	}
 
-    i = index;
+	i = index;
 
-    evalInstance = (stInstance*)BRINSTANCE( mEval )->userData;
+	evalInstance = (stInstance*)BRINSTANCE( mEval )->userData;
 
-    if( mEval->type() == AT_INSTANCE ) {
+	if( mEval->type() == AT_INSTANCE ) {
 		stRunInstance ri;
 		ri.instance = instance;
 		ri.type = instance->type;
@@ -246,9 +251,9 @@
 		if( index == (int)object->variables.size() ) {
 			newEval.set( mEval->getInstance() );
 
-            childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: @"super" withVar: NULL withOffset: -1 instance: instance];
+			childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: @"super" withVar: NULL withOffset: -1 instance: instance];
 
-            [childObjects[index] setEvalObject: object->super];
+			[childObjects[index] setEvalObject: object->super];
 
 			return childObjects[index];
 		}
@@ -268,43 +273,43 @@
 
 		childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: newTitle withVar: var withOffset: var->offset instance: evalInstance];
 
-    } else if( mEval->type() == AT_LIST ) {
-        stDoEvalListIndex( BRLIST( mEval ), index, &newEval );
+	} else if( mEval->type() == AT_LIST ) {
+		stDoEvalListIndex( BRLIST( mEval ), index, &newEval );
 
-        newTitle = [[NSString stringWithFormat: @"list index %d", index] retain];
+		newTitle = [[NSString stringWithFormat: @"list index %d", index] retain];
 
-        childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: newTitle withVar: NULL withOffset: -1 instance: instance];
+		childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: newTitle withVar: NULL withOffset: -1 instance: instance];
 
-        [childObjects[index] setList: BRLIST( mEval ) index: index];
-    } else if( mEval->type() == AT_ARRAY ) {
+		[childObjects[index] setList: BRLIST( mEval ) index: index];
+	} else if( mEval->type() == AT_ARRAY ) {
 		stRunInstance ri;
 		ri.instance = instance;
 		ri.type = instance->type;
 
-        off = offset + index * stSizeofAtomic(arrayType);
-    
-        stLoadVariable(&instance->variables[off], arrayType, &newEval, &ri); 
-        
-        newTitle = [[NSString stringWithFormat: @"array index %d", index] retain];
-    
-        childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: newTitle withVar: NULL withOffset: off instance: instance];
-    }
+		off = offset + index * stSizeofAtomic(arrayType);
+	
+		stLoadVariable(&instance->variables[off], arrayType, &newEval, &ri); 
+		
+		newTitle = [[NSString stringWithFormat: @"array index %d", index] retain];
+	
+		childObjects[index] = [[slObjectOutlineItem alloc] initWithEval: &newEval name: newTitle withVar: NULL withOffset: off instance: instance];
+	}
 
-    return childObjects[index];
+	return childObjects[index];
 }
 
 - (void)dealloc {
-    int n;
+	int n;
 
-    if(childObjects) {
-        for(n=0;n<childCount;n++) if(childObjects[n]) [childObjects[n] release];
-        free(childObjects);
-    }
+	if(childObjects) {
+		for(n=0;n<childCount;n++) if(childObjects[n]) [childObjects[n] release];
+		free(childObjects);
+	}
 
 	delete mEval;
 	
-    [name release];
-    [super dealloc];
+	[name release];
+	[super dealloc];
 }
 
 @end

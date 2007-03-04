@@ -37,14 +37,12 @@ void slShape::draw( slCamera *c, slPosition *pos, double textureScaleX, double t
 
 	glPushMatrix();
 
-	glTranslated( pos->location.x, pos->location.y, pos->location.z );
+	glTranslatef( pos->location.x, pos->location.y, pos->location.z );
 
 	slMatrixGLMult( pos->rotation );
 
 	glPushAttrib( GL_TRANSFORM_BIT );
-
 	glMatrixMode( GL_TEXTURE );
-
 	glLoadIdentity();
 
 	glTranslatef( 0.5, 0.5, 0.0 );

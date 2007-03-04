@@ -37,7 +37,7 @@ struct stSteveData {
 
 	// the stack pointer and memory for running steve code
 
-	char stackBase[ST_STACK_SIZE];
+	char stackBase[ ST_STACK_SIZE ];
 	char *stack;
 
 	stStackRecord *stackRecord;

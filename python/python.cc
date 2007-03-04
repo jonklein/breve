@@ -24,6 +24,53 @@
 
 #include "python.h"
 
+std::string brPythonToSteveName( const char *in ) {
+	std::string result;
+
+	for( unsigned int n = 0; n < strlen( in ); n++ ) {
+		if( isupper( in[ n ] ) ) {
+			result += "-";
+			result += tolower( in[ n ] );
+		} else  {
+			result += in[ n ];
+		}
+	}
+
+	return result;
+}
+
+
+/**
+ * Translates a PyInt or PyFloat to a double.  For breve vectors and matrices,
+ * which can come in either as ints or doubles
+ */
+
+double PyNumber_AS_DOUBLE( PyObject *inObject ) {
+
+	if( PyInt_Check( inObject ) ) 
+       		return (double)PyInt_AS_LONG( inObject );
+
+	return PyFloat_AS_DOUBLE( inObject );
+}
+
+/**
+ * Does PyObject_GetAttrString 
+ *
+ * Super-suprising Python optimization note: HasAttrString actually calls GetAttrString.
+ * So when I thought I was being smart by checking for the Attr before getting it, it 
+ * actually was taking up more time!
+ */
+
+inline PyObject *PyObject_GetAttrStringSafe( PyObject *inObject, char *inString  ) {
+	PyObject *result = PyObject_GetAttrString( inObject, inString );
+
+	if( !result )
+		PyErr_Clear();
+
+	return result;
+}
+
+
 
 /**
  * Translation function from a Python object to a breve value.
@@ -35,6 +82,7 @@
 
 inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 	int result = EC_ERROR;
+	PyObject *breveInstance;
 
 	if( !inObject ) 
 		return result;
@@ -42,14 +90,7 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 	if( inObject == Py_None )
 		return EC_OK;
 
-	if ( PyObject_HasAttrString( inObject, "breveInstance" ) )  {
-
-		PyObject *breveInstance = PyObject_GetAttrString( inObject, "breveInstance" );
-		outEval->set( (brInstance*)PyCObject_AsVoidPtr( breveInstance ) );
-		Py_DECREF( breveInstance );
-		result = EC_OK;
-
-	} else if ( PyInt_Check( inObject ) ) {
+	if ( PyInt_Check( inObject ) ) {
 
 		outEval->set( PyInt_AS_LONG( inObject ) );
 		result = EC_OK;
@@ -69,6 +110,30 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 		outEval->set( PyCObject_AsVoidPtr( inObject ) );
 		result = EC_OK;
 
+	} else if( PyObject_HasAttrString( inObject, "isVector" ) ) {
+		slVector v = { 0.0, 0.0, 0.0 };
+
+		PyObject *x = PyObject_GetAttrString( inObject, "x" );
+		PyObject *y = PyObject_GetAttrString( inObject, "y" );
+		PyObject *z = PyObject_GetAttrString( inObject, "z" );
+
+		if( x ) v.x = PyNumber_AS_DOUBLE( x );
+		if( y ) v.y = PyNumber_AS_DOUBLE( y );
+		if( z ) v.z = PyNumber_AS_DOUBLE( z );
+
+		Py_DECREF( x );
+		Py_DECREF( y );
+		Py_DECREF( z );
+
+		outEval->set( v );
+		result = EC_OK;
+
+	} else if ( ( breveInstance = PyObject_GetAttrStringSafe( inObject, "breveInstance" ) ) )  {
+
+		outEval->set( (brInstance*)PyCObject_AsVoidPtr( breveInstance ) );
+		Py_DECREF( breveInstance );
+		result = EC_OK;
+
 	} else if( PyObject_HasAttrString( inObject, "isMatrix" ) ) {
 		slMatrix m;
 
@@ -82,15 +147,15 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 		PyObject *z2 = PyObject_GetAttrString( inObject, "z2" );
 		PyObject *z3 = PyObject_GetAttrString( inObject, "z3" );
 
-		m[ 0 ][ 0 ] = PyFloat_AsDouble( x1 );
-		m[ 0 ][ 1 ] = PyFloat_AsDouble( x2 );
-		m[ 0 ][ 2 ] = PyFloat_AsDouble( x3 );
-		m[ 1 ][ 0 ] = PyFloat_AsDouble( y1 );
-		m[ 1 ][ 1 ] = PyFloat_AsDouble( y2 );
-		m[ 1 ][ 2 ] = PyFloat_AsDouble( y3 );
-		m[ 2 ][ 0 ] = PyFloat_AsDouble( z1 );
-		m[ 2 ][ 1 ] = PyFloat_AsDouble( z2 );
-		m[ 2 ][ 2 ] = PyFloat_AsDouble( z3 );
+		m[ 0 ][ 0 ] = PyNumber_AS_DOUBLE( x1 );
+		m[ 0 ][ 1 ] = PyNumber_AS_DOUBLE( x2 );
+		m[ 0 ][ 2 ] = PyNumber_AS_DOUBLE( x3 );
+		m[ 1 ][ 0 ] = PyNumber_AS_DOUBLE( y1 );
+		m[ 1 ][ 1 ] = PyNumber_AS_DOUBLE( y2 );
+		m[ 1 ][ 2 ] = PyNumber_AS_DOUBLE( y3 );
+		m[ 2 ][ 0 ] = PyNumber_AS_DOUBLE( z1 );
+		m[ 2 ][ 1 ] = PyNumber_AS_DOUBLE( z2 );
+		m[ 2 ][ 2 ] = PyNumber_AS_DOUBLE( z3 );
 
 		Py_DECREF( x1 );
 		Py_DECREF( x2 );
@@ -105,23 +170,6 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 		outEval->set( m );
 		result = EC_OK;
 
-	} else if( PyObject_HasAttrString( inObject, "isVector" ) ) {
-		slVector v = { 0.0, 0.0, 0.0 };
-
-		PyObject *x = PyObject_GetAttrString( inObject, "x" );
-		PyObject *y = PyObject_GetAttrString( inObject, "y" );
-		PyObject *z = PyObject_GetAttrString( inObject, "z" );
-
-		if( x ) v.x = PyFloat_AsDouble( x );
-		if( y ) v.y = PyFloat_AsDouble( y );
-		if( z ) v.z = PyFloat_AsDouble( z );
-
-		Py_DECREF( x );
-		Py_DECREF( y );
-		Py_DECREF( z );
-
-		outEval->set( v );
-		result = EC_OK;
 	} else if( PySequence_Check( inObject ) ) {
 		
 		brEvalListHead *list = new brEvalListHead;
@@ -189,6 +237,13 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 				PyObject *args = PyTuple_New( 0 );
 				result = PyObject_Call( bridgeObject, args, NULL );
 				Py_DECREF( args );
+
+				if( !result ) {
+					PyErr_Print();
+				
+					Py_INCREF( Py_None );
+					return Py_None;
+				}
 
 				PyObject_SetAttrString( result, "breveInstance", PyCObject_FromVoidPtr( breveInstance, NULL ) );
 			} else {
@@ -345,16 +400,11 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 	// Adding the instance requires a brObject type.
 	// Figure out the brObject type for this instance.  We may need to create it ourselves.
 
-	if( PyObject_HasAttrString( typeObject, "breveObject" ) ) {
-		// Found an existing brObject type for this Python class
+	PyObject *breveTypeObject = PyObject_GetAttrString( typeObject, "breveObject" );
 
-		PyObject *breveTypeObject = PyObject_GetAttrString( typeObject, "breveObject" );
-
-		breveObject = (brObject*)PyCObject_AsVoidPtr( breveTypeObject );
-
-		Py_DECREF( breveTypeObject );
-	} else {
-		// Clear the missing breveObject error here...
+	if( !breveTypeObject ) {
+		// Clear the missing attr error 
+		PyErr_Clear();
 
 		PyObject *nameObject = PyObject_GetAttrString( typeObject, "__name__" );
 
@@ -376,6 +426,14 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 		PyObject_SetAttrString( typeObject, "breveObject", PyCObject_FromVoidPtr( breveObject, NULL ) );
 
 		Py_DECREF( pythonLanguageType );
+	} else {
+		// Found an existing brObject type for this Python class
+
+		PyObject *breveTypeObject = PyObject_GetAttrString( typeObject, "breveObject" );
+
+		breveObject = (brObject*)PyCObject_AsVoidPtr( breveTypeObject );
+
+		Py_DECREF( breveTypeObject );
 	}
 
 	brInstance *i = brEngineAddInstance( engine, breveObject, object );
@@ -482,29 +540,41 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 
 	Py_DECREF( breveObject );
 
-	if( !PyTuple_Check( arguments ) ) {
-		PyErr_SetString( PyExc_RuntimeError, "Invalid arguments passed to internal breve function" );
-		return NULL;
-	}
+	if( function->_argCount != 0 ) {
 
-	int argCount = PyTuple_GET_SIZE( arguments );
+		if( !PyTuple_Check( arguments ) ) {
+			PyErr_SetString( PyExc_RuntimeError, "Invalid arguments passed to internal breve function" );
+			return NULL;
+		}
 
-	if( argCount != function->_argCount ) {
-		char err[ 1024 ];
-		snprintf( err, 1023, "internal function \"%s\" given %d arguments, expects %d", function->_name.c_str(), argCount, function->_argCount );
-		PyErr_SetString( PyExc_RuntimeError, err );
-		return NULL;
-	}
+		int argCount = PyTuple_GET_SIZE( arguments );
 
-	for( int n = 0; n < argCount; n++ ) {
-		brPythonTypeToEval( PyTuple_GET_ITEM( arguments, n ), &args[ n ] );
-
-		if( args[ n ].type() != function->_argTypes[ n ] ) {
+		if( argCount != function->_argCount ) {
 			char err[ 1024 ];
-			snprintf( err, 1023, "invalid type for argument %d of internal function \"%s\" (got \"%s\", expected \"%s\")", n, function->_name.c_str(), brAtomicTypeStrings[ args[ n ].type() ], brAtomicTypeStrings[ function->_argTypes[ n ] ] );
-
+			snprintf( err, 1023, "internal function \"%s\" given %d arguments, expects %d", function->_name.c_str(), argCount, function->_argCount );
 			PyErr_SetString( PyExc_RuntimeError, err );
 			return NULL;
+		}
+
+		for( int n = 0; n < argCount; n++ ) {
+			brPythonTypeToEval( PyTuple_GET_ITEM( arguments, n ), &args[ n ] );
+
+			if( args[ n ].type() != function->_argTypes[ n ] ) {
+
+				// int <=> double conversion 
+
+				if( args[ n ].type() == AT_INT && function->_argTypes[ n ] == AT_DOUBLE ) {
+					 args[ n ].set( (double)BRINT( &args[ n ] ) );
+				} else if( args[ n ].type() == AT_DOUBLE && function->_argTypes[ n ] == AT_INT) {
+					 args[ n ].set( (int)BRDOUBLE( &args[ n ] ) );
+				} else {
+					char err[ 1024 ];
+					snprintf( err, 1023, "invalid type for argument %d of internal function \"%s\" (got \"%s\", expected \"%s\")", n, function->_name.c_str(), brAtomicTypeStrings[ args[ n ].type() ], brAtomicTypeStrings[ function->_argTypes[ n ] ] );
+
+					PyErr_SetString( PyExc_RuntimeError, err );
+					return NULL;
+				}
+			}
 		}
 	}
 
@@ -522,6 +592,7 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 PyObject *brPythonFindBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 	PyObject *object, *attrObject;
 	char *name;
+	std::string altname;
 	char err[ 1024 ];
 
 	if ( !PyArg_ParseTuple( inArgs, "Os", &object, &name ) ) return NULL;
@@ -534,31 +605,33 @@ PyObject *brPythonFindBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 		return NULL;
 	}
 
+	altname = brPythonToSteveName( name );
+
 	for( unsigned int n = 0; n < strlen( name ); n++ ) {
-		if( name[ n ] == '_' ) name[ n ] = '-';
+		if( name[ n ] == '_' )
+			name[ n ] = '-';
 	}
 
 	brInstance *breveInstance = (brInstance*)PyCObject_AsVoidPtr( attrObject );
 
 	Py_DECREF( attrObject );
 
-	PyObject *methodObject;
+	brMethod *method;
 
-	if( !PyObject_HasAttrString( object, name ) ) {
-		brMethod *method = brMethodFindWithArgRange( breveInstance->object, name, NULL, 0, 50 );
+	// try the original name
 
-		if( !method ) {
-			Py_INCREF( Py_None );
-			return Py_None;
-		}
+	method = brMethodFindWithArgRange( breveInstance->object, name, NULL, 0, 50 );
+	if( method ) return PyCObject_FromVoidPtr( method, NULL );
 
-		methodObject = PyCObject_FromVoidPtr( method, NULL );
-		PyObject_SetAttrString( object, name, methodObject );
-	} else {
-	 	methodObject = PyObject_GetAttrString( object, name );
-	}
+	// try the alternative name
 
-	return methodObject;
+	method = brMethodFindWithArgRange( breveInstance->object, altname.c_str(), NULL, 0, 50 );
+	if( method ) return PyCObject_FromVoidPtr( method, NULL );
+
+	// nope
+
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 /**
@@ -639,12 +712,11 @@ void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inT
 		if( name[ n ] == '-' ) name[ n ] = '_';
 	}
 
-	PyObject *method = PyObject_GetAttrString( type, name );
+	PyObject *method = PyObject_GetAttrStringSafe( type, name );
 
 	free( name );
 
 	if ( !method ) {
-		PyErr_Clear();
 		return NULL;
 	}
 
@@ -679,14 +751,7 @@ void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inT
 void *brPythonFindObject( void *inData, const char *inName ) {
 	PyObject *module = ( PyObject* )inData;
 
-	PyObject *object = PyObject_GetAttrString( module, (char*)inName );
-
-	if ( !object ) {
-		PyErr_Clear();
-		return NULL;
-	}
-
-	return object;
+	return PyObject_GetAttrStringSafe( module, (char*)inName );
 }
 
 /**
@@ -742,6 +807,7 @@ brInstance *brPythonInstantiate( brEngine *inEngine, brObject* inObject, const b
 int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArguments, brEval *outResult ) {
 	PyObject *instance = ( PyObject* )inInstance;
 	PyObject *method = ( PyObject* )inMethod;
+	static PyObject *tuples[ 5 ] = { PyTuple_New( 1 ), PyTuple_New( 2 ), PyTuple_New( 3 ), PyTuple_New( 4 ), PyTuple_New( 5 ) };
 
 	if ( !PyCallable_Check( method ) ) {
 		slMessage( DEBUG_ALL, "Warning: called method is not callable\n" );
@@ -765,7 +831,13 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 	Py_DECREF( code );
 	Py_DECREF( argumentCount );
 
-	PyObject *tuple = PyTuple_New( count + 1 );
+	PyObject *tuple;
+
+	if( count < 5 ) {
+		tuple = tuples[ count ];
+	} else {
+		tuple = PyTuple_New( count + 1 );
+	}
 
 	// the instance we're calling the method for has the breveInternal module pointer
 
@@ -776,7 +848,6 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 		PyErr_Print();
 		return EC_ERROR;
 	}
-
 
 	// Set the self argument
 
@@ -794,7 +865,10 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 
 	PyObject *result = PyObject_Call( method, tuple, NULL );
 
-	Py_DECREF( tuple );
+
+	if( count > 5 )
+		Py_DECREF( tuple );
+
 
 	if( !result ) {
 		PyErr_Print();
@@ -811,34 +885,10 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 /**
  * A brObjectType callback to determine whether one object is a subclass of another.  Used by 
  * collision detection to determine if a handler is installed for an object pair.
- * 
- * Clearly not implemented at the moment.
  */
 
 int brPythonIsSubclass( brObjectType *inType, void *inClassA, void *inClassB ) {
-	PyObject *classA = (PyObject*)inClassA;
-	PyObject *classB = (PyObject*)inClassB;
-
-	PyObject *main = (PyObject*)inType->userData;
-	PyObject *breve = PyObject_GetAttrString( main, "breve" );
-	PyObject *isSubclass = PyObject_GetAttrString( breve, "isSubclass" );
-
-	PyObject *tuple = PyTuple_New( 2 );
-
-	// PyTuple_SET_ITEM will steal refs, you bastard!
-
-	Py_INCREF( classA );
-	Py_INCREF( classB );
-	PyTuple_SET_ITEM( tuple, 0, classA );
-	PyTuple_SET_ITEM( tuple, 1, classB );
-
-	Py_DECREF( breve );
-	Py_DECREF( isSubclass );
-
-	PyObject *result = PyObject_Call( isSubclass, tuple, NULL );
-
-	Py_DECREF( tuple );
-	return PyInt_AS_LONG( result );
+	return PyObject_IsSubclass( (PyObject*)inClassA, (PyObject*)inClassB );
 }
 
 /**
@@ -858,10 +908,23 @@ int brPythonCanLoad( void *inObjectData, const char *inExtension ) {
  */
 
 int brPythonLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext ) {
-	if( PyRun_SimpleString( inFiletext ) )
-		return EC_ERROR;
+	int result = EC_OK;
+	FILE *fp = fopen( inFilename, "r" );
 
-	return EC_OK;
+	if( fp ) {
+
+		if( PyRun_SimpleFile( fp, inFilename ) )
+			result = EC_ERROR;
+
+		fclose( fp );
+
+	} else {
+
+		if( PyRun_SimpleString( inFiletext ) )
+			result = EC_ERROR;
+	}
+
+	return result;
 }
 
 /**

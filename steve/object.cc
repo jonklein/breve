@@ -328,9 +328,7 @@ void stInstanceFreeInternals( stInstance *i ) {
 */
 
 void stObjectFreeAllInstances( stObject *o ) {
-
 	std::set< stInstance*, stInstanceCompare> all;
-
 	std::set< stInstance*, stInstanceCompare>::iterator ii;
 
 	// it's possible that the allInstances list will change while

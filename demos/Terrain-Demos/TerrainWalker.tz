@@ -32,7 +32,6 @@
 #
 
 @use Link.
-@use Genome.
 @use Terrain.
 
 @use PhysicalControl.
@@ -271,45 +270,70 @@ Object : Monkeys {
         return distanceTraveled.
 }
 
-Genome : MonkeyGenome {
-    + variables:
-        genomeData (9 floats).
+Object : MonkeyGenome {
+	+ variables:
+		genomeData (list).
 
-    + to randomize:
-        genomeData[8] = random[5.0] - 2.5.
+	+ to init:
+		genomeData = { 0, 0, 0, 0, 0, 0, 0, 0, 0 }.
 
-        genomeData[0] = random[2.0] - 1.0.
-        genomeData[1] = random[2.0] - 1.0.
-        genomeData[2] = random[2.0] - 1.0.
-        genomeData[3] = random[2.0] - 1.0.
+	+ to randomize:
+		genomeData{8} = random[5.0] - 2.5.
 
-        genomeData[4] = random[6.3] - 3.15.
-        genomeData[5] = random[6.3] - 3.15.
-        genomeData[6] = random[6.3] - 3.15.
-        genomeData[7] = random[6.3] - 3.15.
+		genomeData{0} = random[2.0] - 1.0.
+		genomeData{1} = random[2.0] - 1.0.
+		genomeData{2} = random[2.0] - 1.0.
+		genomeData{3} = random[2.0] - 1.0.
 
-    + to calculate-torque-0 at time (float):
-        return .5 * (sin(genomeData[8] * (time + genomeData[4])) - (genomeData[0])).
+		genomeData{4} = random[6.3] - 3.15.
+		genomeData{5} = random[6.3] - 3.15.
+		genomeData{6} = random[6.3] - 3.15.
+		genomeData{7} = random[6.3] - 3.15.
 
-    + to calculate-torque-1 at time (float):
-        return .5 * (sin(genomeData[8] * (time + genomeData[5])) - (genomeData[1])).
+	+ to get-value at-index n (int):
+		return genomeData{ n }.
 
-    + to calculate-torque-2 at time (float):
-        return .5 * (sin(genomeData[8] * (time + genomeData[6])) - (genomeData[2])).
+	+ to calculate-torque-0 at time (float):
+		return .5 * ( sin( genomeData{ 8 } * ( time + genomeData{ 4 } ) ) - genomeData{ 0 } ).
 
-    + to calculate-torque-3 at time (float):
-        return .5 * (sin(genomeData[8] * (time + genomeData[7])) - (genomeData[3])). 
+	+ to calculate-torque-1 at time (float):
+		return .5 * ( sin( genomeData{ 8 } * ( time + genomeData{ 5 } ) ) - genomeData{ 1 } ).
 
-    + to mutate:
-        n (int).
+	+ to calculate-torque-2 at time (float):
+		return .5 * ( sin( genomeData{ 8 } * ( time + genomeData{ 6 } ) ) - genomeData{ 2 } ).
 
-        n = random[8].
+	+ to calculate-torque-3 at time (float):
+		return .5 * ( sin( genomeData{ 8 } * ( time + genomeData{ 7 } ) ) - genomeData{ 3 } ). 
 
-        if n < 4: genomeData[n] = random[2.0] - 1.0.
-        else if n < 8: genomeData[n] = random[6.3] - 3.15.
-        else genomeData[n] = random[5.0] - 2.5.
+	+ to crossover from-parent-1 p1 (object) from-parent-2 p2 (object):
+		n, crossoverPoint (int).
+		tmp (object).
 
-        print "mutated item $n of $self".
+		if random[ 1 ]: {
+			tmp = p2.
+			p2 = p1.
+			p1 = tmp.
+		}
+
+		crossoverPoint = random[ | genomeData | - 1 ].
+
+		for n = 0, n < | genomeData |, n++: {
+			if n < crossoverPoint:
+				genomeData{ n } = ( p1 get-value at-index n ).
+			else
+				genomeData{ n } = ( p2 get-value at-index n ).
+		}
+
+	+ to mutate:
+		n (int).
+
+		n = random[8].
+
+		if n < 4: genomeData{n} = random[2.0] - 1.0.
+		else if n < 8: genomeData{n} = random[6.3] - 3.15.
+		else genomeData{n} = random[5.0] - 2.5.
+
+		print "mutated item $n of $self".
 }
 
 MultiBody : Creature {

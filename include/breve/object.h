@@ -51,17 +51,17 @@ struct stObject {
 	std::map< std::string, stVar* > variables;
 	std::map< std::string, std::vector< stMethod* > > methods;
 
-	std::set< stInstance*, stInstanceCompare> allInstances;
+	std::set< stInstance*, stInstanceCompare > allInstances;
 
 	std::string 				_file;
 	std::string 				_comment;
 };
 
-/*!
-	\brief A steve object instance.
-
-	An instance in the steve language.
-*/
+/**
+ * A steve object instance.
+ * 
+ * An instance in the steve language.
+ */
 
 struct stInstance {
 	stObject *type;

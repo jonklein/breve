@@ -4,6 +4,8 @@ import breve
 class IRSensor( breve.Real ):
 	''''''
 
+	__slots__ = [ 'communicationThreshold', 'draw', 'm_location', 'm_rotation', 'owner', 'realWorldPointer_owner', 'rel_position', 'rel_rotation', 'sensorType', 'sensordata', ]
+
 	def __init__( self ):
 		breve.Real.__init__( self )
 		self.communicationThreshold = 0
@@ -20,7 +22,9 @@ class IRSensor( breve.Real ):
 	def canSendAck( self, agent ):
 		''''''
 
-		qtest = (  * breve.breveInternalFunctionFinder.calcQualNoRay( self, self.realWorldPointer_owner, self.getLocation(), self.getRotation(), agent.getLocation(), self.sensorType ) )
+		qtest = 0
+
+		qtest = ( 233 * breve.breveInternalFunctionFinder.calcQualNoRay( self, self.realWorldPointer_owner, self.getLocation(), self.getRotation(), agent.getLocation(), self.sensorType ) )
 		if ( qtest > self.communicationThreshold ):
 			return 1
 
@@ -32,12 +36,13 @@ class IRSensor( breve.Real ):
 	def getData( self ):
 		''''''
 
+
 		self.updatePos()
 		if ( self.sensordata == -1 ):
 			self.draw.clear()
 			self.draw.setColor( breve.vector( 0.100000, 0.100000, 0.100000 ) )
 			self.draw.drawLine( self.getLocation(), ( self.getLocation() + ( self.getRotation() * breve.vector( 0, 0, 30 ) ) ) )
-			self.sensordata = (  * breve.breveInternalFunctionFinder.irSense( self, self.realWorldPointer_owner, self.getLocation(), self.getRotation(), self.sensorType ) )
+			self.sensordata = ( 233 * breve.breveInternalFunctionFinder.irSense( self, self.realWorldPointer_owner, self.getLocation(), self.getRotation(), self.sensorType ) )
 
 
 		return self.sensordata
@@ -46,11 +51,13 @@ class IRSensor( breve.Real ):
 	def getLocation( self ):
 		''''''
 
+
 		return self.m_location
 
 
 	def getOwner( self ):
 		''''''
+
 
 		return self.owner
 
@@ -58,11 +65,13 @@ class IRSensor( breve.Real ):
 	def getRotation( self ):
 		''''''
 
+
 		return self.m_rotation
 
 
 	def getSensorType( self ):
 		''''''
+
 
 		return self.sensorType
 
@@ -70,12 +79,13 @@ class IRSensor( breve.Real ):
 	def initWith( self, t, position, rotation, o ):
 		''''''
 
+
 		self.sensorType = t
 		self.setRelPosition( position )
 		self.setRelRotation( rotation )
 		self.owner = o
 		self.realWorldPointer_owner = o.getRealWorldPointer()
-		self.draw = breve.Drawing()
+		self.draw = breve.createInstances( breve.Drawing, 1 )
 		self.sensordata = 0
 		self.updatePos()
 		self.communicationThreshold = 30.000000
@@ -85,26 +95,33 @@ class IRSensor( breve.Real ):
 	def iterate( self ):
 		''''''
 
+
 		self.sensordata = -1
 		self.updatePos()
 
 	def move( self, location ):
 		''''''
 
+
 		self.m_location = location
 
 	def send( self, message ):
 		''''''
 
-		col = 
+		qtest = 0
+		agents = []
+		i = None
+		col = 0
+
+		col = breve.randomExpression( 100 )
 		self.updatePos()
 		self.draw.clear()
-		agents = 		breve.allInstances( "breve.basicAgent" )
-		self.draw.setColor( breve.vector( 1, 1, 0 ) )
+		agents = breve.allInstances( "breve.basicAgent" )
+		self.draw.setColor( breve.vector( 1, 0, 0 ) )
 		self.draw.drawLine( self.getLocation(), ( self.getLocation() + ( self.getRotation() * breve.vector( 0, 0, 27 ) ) ) )
 		for i in agents:
 			if ( i != self.owner ):
-				qtest = (  * breve.breveInternalFunctionFinder.calculateQualityToObject( self, self.realWorldPointer_owner, self.getLocation(), self.getRotation(), i.getRealWorldPointer(), self.sensorType ) )
+				qtest = ( 233 * breve.breveInternalFunctionFinder.calculateQualityToObject( self, self.realWorldPointer_owner, self.getLocation(), self.getRotation(), i.getRealWorldPointer(), self.sensorType ) )
 				self.draw.setColor( breve.vector( 0, 0, 0 ) )
 				if ( qtest > self.communicationThreshold ):
 					i.receiveMessage2( message, self.getOwner() )
@@ -118,35 +135,43 @@ class IRSensor( breve.Real ):
 	def setOwner( self, o ):
 		''''''
 
+
 		self.owner = o
 
 	def setRelPosition( self, v ):
 		''''''
+
 
 		self.rel_position = v
 
 	def setRelRotation( self, m ):
 		''''''
 
+
 		self.rel_rotation = m
 
 	def setRelYRotation( self, f ):
 		''''''
 
-		self.setRelRotation( matrix(  breve.breveInternalFunctionFinder.cos( self, f ), 0, ( -breve.breveInternalFunctionFinder.sin( self, f ) ), 0, 1, 0, breve.breveInternalFunctionFinder.sin( self, f ), 0, breve.breveInternalFunctionFinder.cos( self, f ) ) )
+
+		self.setRelRotation( breve.matrix(  breve.breveInternalFunctionFinder.cos( self, f ), 0, ( -breve.breveInternalFunctionFinder.sin( self, f ) ), 0, 1, 0, breve.breveInternalFunctionFinder.sin( self, f ), 0, breve.breveInternalFunctionFinder.cos( self, f ) ) )
 
 	def setRotation( self, m ):
 		''''''
+
 
 		self.m_rotation = m
 
 	def updatePos( self ):
 		''''''
 
+
 		self.move( ( self.owner.getLocation() + ( self.owner.getRotation() * self.rel_position ) ) )
 		self.setRotation( ( self.owner.getRotation() * self.rel_rotation ) )
 
 
 breve.IRSensor = IRSensor
+breve.IRSensors = IRSensor
+
 
 

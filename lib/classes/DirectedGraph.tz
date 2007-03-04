@@ -333,9 +333,9 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 
 		h (hash).
 
-		self destroy-connected-objects with-seen h.
+		self internal-destroy-connected-objects with-seen h.
 
-	- to destroy-connected-objects with-seen seenhash (hash):
+	- to internal-destroy-connected-objects with-seen seenhash (hash):
 		connection (object).
 
 		if seenhash{ self }: return.
@@ -376,9 +376,9 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 
 		h (hash).
 
-		return (self get-connected-nodes with-seen h with-list {}).
+		return (self internal-get-connected-nodes with-seen h with-list {}).
 
-	- to get-connected-nodes with-seen seenhash (hash) with-list seenlist (list):
+	- to internal-get-connected-nodes with-seen seenhash (hash) with-list seenlist (list):
 		connection (object).
 		nodelist (list).
 

@@ -350,31 +350,18 @@ brInstance *brEngineGetController( brEngine *e ) {
 	return e->controller;
 }
 
-/*
-slStack *brEngineGetAllInstances( brEngine *e ) {
-	std::vector<brInstance*>::iterator ii;
-	slStack *s = slStackNew();
+/**
+ * \brief Sets the output path, and adds the path to the search path.
+ */
 
-	for ( ii = e->instances.begin(); ii != e->instances.end(); ii++ ) {
-		slStackPush( s, *ii );
-	}
-
-	return s;
-}
-*/
-
-/*!
-	\brief Sets the output path, and adds the path to the search path.
-*/
-
-void brEngineSetIOPath( brEngine *e, const char *path ) {
-	e->_outputPath = path;
-	brAddSearchPath( e, path );
+void brEngineSetIOPath( brEngine *inEngine, const char *inPath ) {
+	inEngine->_outputPath = inPath;
+	brAddSearchPath( inEngine, inPath );
 }
 
-/*!
-	\brief Takes a filename, and returns a slMalloc'd string with the full output path for that file.
-*/
+/** 
+ * Takes a filename, and returns a slMalloc'd string with the full output path for that file.
+ */
 
 char *brOutputPath( brEngine *e, const char *filename ) {
 	char *f;
@@ -389,14 +376,12 @@ char *brOutputPath( brEngine *e, const char *filename ) {
 	return f;
 }
 
-/*!
-	\brief Pause the simulation timer.
-
-    Optional call to be made when the engine is paused,
-    so that information about simulation speed can be measured.
-
-	Used in conjunction with \ref brUnpauseTimer.
-*/
+/**
+ * Pause the simulation timer.
+ * Optional call to be made when the engine is paused,
+ * so that information about simulation speed can be measured.
+ * Used in conjunction with \ref brUnpauseTimer.
+ */
 
 void brPauseTimer( brEngine *e ) {
 
@@ -408,11 +393,9 @@ void brPauseTimer( brEngine *e ) {
 	gettimeofday( &tv, NULL );
 
 	e->realTime.tv_sec += ( tv.tv_sec - e->startTime.tv_sec );
-
 	e->realTime.tv_usec += ( tv.tv_usec - e->startTime.tv_usec );
 
 	e->startTime.tv_sec = 0;
-
 	e->startTime.tv_usec = 0;
 }
 

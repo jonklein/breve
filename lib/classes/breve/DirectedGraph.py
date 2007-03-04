@@ -4,6 +4,8 @@ import breve
 class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 	'''GADirectedGraph is a special subclass of OBJECT(GeneticAlgorithmIndividual)  which maages directed networks of nodes for evolution.  The primary use of these networks is to evolve creature morphologies.  The networks are based on the the directed graphs used by Karl Sims in "Evolving Virtual  Creatures" (1994).  Multiple connections may exist between nodes, and nodes  may have connections back to themselves. <P> GAGraph makes use of a number of other classes.  The GAGraph itself holds  a reference to the graph's root node, which is an object of  OBJECT(GADirectedGraphNode).  This root node may be connected directly or  indirectly to any other number of OBJECT(GADirectedGraphNode) objects, using the connection class OBJECT(GADirectedGraphConnection). <P> Because OBJECT(GADirectedGraphNode) and OBJECT(GADirectedGraphConnection)  are intended to be used as general evolutionary objects, it is often  neccessary to associate a set of parameters with these objects, above  and beyond the information coded in the connected graph.  For this reason, both classes are subclasses of an object which can hold a list of parameters, OBJECT(GADirectedGraphParameterObject). <P> OBJECT(GADirectedGraphParameterObject) holds a list of float values between -1.0 and 1.0.  These parameters can be interpreted in whatever way the  user desires.  In the example of directed graphs being used to specify creature morphologies, the parameters hold information about the size and orientation of limbs relative to one another.'''
 
+	__slots__ = [ 'rootNode', ]
+
 	def __init__( self ):
 		breve.GeneticAlgorithmIndividual.__init__( self )
 		self.rootNode = None
@@ -12,6 +14,7 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 	def copy( self, other ):
 		'''Copies the contents of the directed graph other.'''
 
+
 		self.deleteRootNode()
 		self.rootNode = other.getRoot().duplicate()
 		self.addDependency( self.rootNode )
@@ -19,8 +22,22 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 	def crossover( self, p1, p2 ):
 		'''Sets this child's genome to be a genetic crossover of p1 and p2.'''
 
+		positions = {}
+		keep = {}
+		childnodes = []
+		nodes2 = []
+		nodes1 = []
+		source = None
+		temp = None
+		connection = None
+		index = 0
+		n = 0
+		cross = 0
+		max = 0
+		first = 0
+
 		self.deleteRootNode()
-		if :
+		if breve.randomExpression( 1 ):
 			temp = p1
 			p1 = p2
 			p2 = temp
@@ -30,17 +47,17 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 		nodes2 = p2.getRoot().getConnectedNodes()
 		
 		
-		first = 
-		max = len( nodes2 )
-		cross = 
-		if ( cross >= len( nodes1 ) ):
-			cross = len( nodes1 )
+		first = breve.randomExpression( 1 )
+		max = breve.length( nodes2 )
+		cross = breve.randomExpression( ( max - 1 ) )
+		if ( cross >= breve.length( nodes1 ) ):
+			cross = breve.length( nodes1 )
 
 		if ( max < 2 ):
-			childnodes.append( breve.GADirectedGraphNodes() )
+			childnodes.append( breve.createInstances( breve.GADirectedGraphNodes, 1 ) )
 
 		else:
-			childnodes = breve.GADirectedGraphNodes()
+			childnodes = breve.createInstances( breve.GADirectedGraphNodes, max )
 
 		
 		self.rootNode = self.pickRootNode( childnodes )
@@ -56,7 +73,7 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 		for temp in childnodes:
 			if ( not keep[ temp ] ):
 				print '''freeing ''', temp
-				del temp
+				breve.deleteInstances( temp )
 
 
 
@@ -66,10 +83,11 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 	def deleteRootNode( self ):
 		'''Deletes the root node and all connected objects.  This method "clears" the GADirectedGraph so that it may be reused.'''
 
+
 		if self.rootNode:
 			self.removeDependency( self.rootNode )
 			self.rootNode.destroyConnectedObjects()
-			del self.rootNode
+			breve.deleteInstances( self.rootNode )
 
 
 		self.rootNode = 0
@@ -77,10 +95,12 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 	def destroy( self ):
 		''''''
 
+
 		self.deleteRootNode()
 
 	def getRoot( self ):
 		'''Returns the root node of the directed graph.'''
+
 
 		return self.rootNode
 
@@ -88,19 +108,25 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 	def init( self ):
 		''''''
 
-		self.rootNode = breve.GADirectedGraphNode()
+
+		self.rootNode = breve.createInstances( breve.GADirectedGraphNode, 1 )
 		self.addDependency( self.rootNode )
 
 	def mutate( self ):
 		'''Mutates the directed graph.'''
+
 
 		self.rootNode.mutate()
 
 	def pickRootNode( self, nodes ):
 		''''''
 
+		node = None
+		best = None
+		bestCount = 0
+
 		for node in nodes:
-			if ( len( node.getConnectedNodes() ) > bestCount ):
+			if ( breve.length( node.getConnectedNodes() ) > bestCount ):
 				best = node
 				bestCount = node.getConnectedNodes()
 
@@ -113,23 +139,31 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 	def printGraph( self ):
 		'''Prints out a text representation of the network.'''
 
-		print '''#### Graph ''' % (  self )
+
+		print '''#### Graph %s''' % (  self )
 		self.rootNode.printConnectedObjects()
 
-	def randomize( self, nMax, np, cp, p ):
+	def randomize( self, nMax, np, cp, p = 0.500000 ):
 		'''Randomizes this genome by creating a directed graph containing up to  nMax nodes.  Sets the number of node and connection parameters to np  and cp, respectively.  The optional connection probability, p, specifies the probability that a connection will be made from one node to another.'''
 
+		count = 0
+		nodes = []
+		m = None
+		n = None
+		connection = None
+		keep = {}
+
 		self.deleteRootNode()
-		count = (  + 1 )
+		count = ( breve.randomExpression( ( nMax - 1 ) ) + 1 )
 		if ( count < 2 ):
 			count = ( count + 1 )
 
-		nodes = breve.GADirectedGraphNodes()
+		nodes = breve.createInstances( breve.GADirectedGraphNodes, count )
 		nodes.setParameterLength( np )
 		nodes.randomizeParameters()
 		for n in nodes:
 			for m in nodes:
-				if ( ( n != m ) and (  < p ) ):
+				if ( ( n != m ) and ( breve.randomExpression( 1.000000 ) < p ) ):
 					connection = n.connect( m )
 					connection.setParameterLength( cp )
 					connection.randomizeParameters()
@@ -141,7 +175,7 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 
 		self.rootNode = self.pickRootNode( nodes )
 		if ( not self.rootNode ):
-			self.rootNode = breve.GADirectedGraphNode()
+			self.rootNode = breve.createInstances( breve.GADirectedGraphNode, 1 )
 			self.rootNode.setParameterLength( np )
 			self.rootNode.randomizeParameters()
 
@@ -151,8 +185,8 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 
 
 		for n in nodes:
-			if ( not keep[ n ] ):
-				del n
+			if ( not keep.has_key( n ) ):
+				breve.deleteInstances( n )
 
 
 
@@ -160,9 +194,10 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 
 
 breve.GADirectedGraph = GADirectedGraph
-
 class GADirectedGraphParameterObject( breve.Abstract ):
 	'''A GADirectedGraphParameterObject is a subclass of object which holds a parameter list for use with the OBJECT(GADirectedGraphNode) and OBJECT(GADirectedGraphConnection) objects.  The elements in the parameter list are to be interpreted as evolving genome values which control how the graph nodes and connections are used.'''
+
+	__slots__ = [ 'parameters', ]
 
 	def __init__( self ):
 		breve.Abstract.__init__( self )
@@ -172,6 +207,7 @@ class GADirectedGraphParameterObject( breve.Abstract ):
 	def getParameters( self ):
 		'''Returns the parameter list.'''
 
+
 		return self.parameters
 
 
@@ -179,46 +215,50 @@ class GADirectedGraphParameterObject( breve.Abstract ):
 		''''''
 
 
-	def mutate( self, variation, replace ):
+
+	def mutate( self, variation = 0.100000, replace = 0.100000 ):
 		'''Mutates the list of parameters in the list with a gaussian distribution  of size variation, and a replace proability chance of total replacement.'''
+
+		n = 0
 
 		
 
 	def randomizeParameters( self ):
 		'''Randomizes all of the parameters in the list to values between -1.0 and 1.0.'''
 
+		n = 0
+
 		
 
 	def setParameterLength( self, length ):
 		'''Extends the size of the parameter list include at least length items by adding  zeros to the end of the list.'''
+
 
 		
 
 	def setParameters( self, plist ):
 		'''Sets the parameter list to plist.'''
 
-		self.parameters = 
+
+		self.parameters = list( plist) 
 
 
 breve.GADirectedGraphParameterObject = GADirectedGraphParameterObject
-
 class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 	'''OBJECT(GADirectedGraphNode) is a node in a directed graph.  It is a subclass of  OBJECT(GADirectedGraphParameterObject) which can be used to associate it with  a set of parameters.'''
+
+	__slots__ = [ 'connections', ]
 
 	def __init__( self ):
 		breve.GADirectedGraphParameterObject.__init__( self )
 		self.connections = []
 
-	def connect( self, child ):
-		'''Makes a connection to child with an empty parameter list.'''
-
-		return self.connect( child, [] )
-
-
-	def connect( self, child, plist ):
+	def connect( self, child, plist = {} ):
 		'''Makes a connection to child with the parameter list plist.'''
 
-		connection = breve.GADirectedGraphConnection()
+		connection = None
+
+		connection = breve.createInstances( breve.GADirectedGraphConnection, 1 )
 		connection.setTarget( child )
 		connection.setParameters( plist )
 		self.addDependency( connection )
@@ -229,32 +269,20 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 	def destroy( self ):
 		''''''
 
-		del self.connections
+
+		breve.deleteInstances( self.connections )
 
 	def destroyConnectedObjects( self ):
 		'''Initiates a recursive freeing of this object and all connected objects, both directly and indiretly connected.'''
 
-		self.destroyConnectedObjects( h )
+		h = {}
 
-	def destroyConnectedObjects( self, seenhash ):
-		''''''
-
-		if seenhash[ self ]:
-			return
-
-
-		seenhash[ self ] = 1
-		for connection in self.connections:
-			if connection.getTarget():
-				connection.getTarget().destroyConnectedObjects( seenhash )
-
-			del connection
-
-
-		del self
+		self.internalDestroyConnectedObjects( h )
 
 	def duplicate( self ):
 		'''Duplicates the object, which triggers recursive duplication of all connected objects.  To be used on root nodes only.'''
+
+		h = {}
 
 		return self.duplicate( h )
 
@@ -262,11 +290,14 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 	def duplicate( self, seenhash ):
 		''''''
 
-		if seenhash[ self ]:
+		connection = None
+		newNode = None
+
+		if seenhash.has_key( self ):
 			return seenhash[ self ]
 
 
-		newNode = breve.GADirectedGraphNode()
+		newNode = breve.createInstances( breve.GADirectedGraphNode, 1 )
 		seenhash[ self ] = newNode
 		for connection in self.connections:
 			newNode.connect( connection.getTarget().duplicate( seenhash ), connection.getParameters() )
@@ -279,13 +310,44 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 	def getConnectedNodes( self ):
 		'''Recursively generates a list of all nodes connected to this  root node, both directly and indirectly.'''
 
-		return self.getConnectedNodes( h, [] )
+		h = {}
+
+		return self.internalGetConnectedNodes( h, [] )
 
 
-	def getConnectedNodes( self, seenhash, seenlist ):
+	def getConnections( self ):
+		'''Returns the list of connections from this node.'''
+
+
+		return self.connections
+
+
+	def internalDestroyConnectedObjects( self, seenhash ):
 		''''''
 
-		if seenhash[ self ]:
+		connection = None
+
+		if seenhash.has_key( self ):
+			return
+
+
+		seenhash[ self ] = 1
+		for connection in self.connections:
+			if connection.getTarget():
+				connection.getTarget().destroyConnectedObjects( seenhash )
+
+			breve.deleteInstances( connection )
+
+
+		breve.deleteInstances( self )
+
+	def internalGetConnectedNodes( self, seenhash, seenlist ):
+		''''''
+
+		connection = None
+		nodelist = []
+
+		if seenhash.has_key( self ):
 			return []
 
 
@@ -293,21 +355,17 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 		seenhash[ self ] = 1
 		for connection in self.connections:
 			if connection.getTarget():
-				connection.getTarget().getConnectedNodes( seenhash, seenlist )
+				connection.getTarget().internalGetConnectedNodes( seenhash, seenlist )
 
 
 
 		return seenlist
 
 
-	def getConnections( self ):
-		'''Returns the list of connections from this node.'''
-
-		return self.connections
-
-
 	def mutate( self ):
 		'''Mutates the object, which triggers recursive mutation of all connected objects.  To be used on root nodes only.'''
+
+		h = {}
 
 		return self.mutate( h )
 
@@ -315,12 +373,14 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 	def mutate( self, seenhash ):
 		''''''
 
+		connection = None
+
 		if seenhash[ self ]:
 			return
 
 
 		seenhash[ self ] = 1
-		breve.GADirectedGraphParameterObject.mutate()
+		breve.GADirectedGraphParameterObject.mutate( self,)
 		for connection in self.connections:
 			connection.mutate()
 			connection.getTarget().mutate( seenhash )
@@ -330,28 +390,33 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 	def printConnectedObjects( self ):
 		'''Initiates a recursive printing of all connected objects in the graph.'''
 
+		h = {}
+
 		self.printConnectedObjects( h )
 
 	def printConnectedObjects( self, seenhash ):
 		''''''
+
+		connection = None
 
 		if seenhash[ self ]:
 			return
 
 
 		seenhash[ self ] = 1
-		print '''##  parameters ''' % (  self, self.parameters )
+		print '''## %s parameters %s''' % (  self, self.parameters )
 		for connection in self.connections:
-			print '''##  connected to ''' % (  self ), connection.getTarget(), ''' with parameters: ''', connection.getParameters()
+			print '''## %s connected to ''' % (  self ), connection.getTarget(), ''' with parameters: ''', connection.getParameters()
 			connection.getTarget().printConnectedObjects( seenhash )
 
 
 
 
 breve.GADirectedGraphNode = GADirectedGraphNode
-
 class GADirectedGraphConnection( breve.GADirectedGraphParameterObject ):
 	'''A OBJECT(GADirectedGraphConnection) is a connection from one  OBJECT(GADirectedGraphNode) to another.  As a subclass of  OBJECT(GADirectedGraphParameterObject), it can be associated  with a list of parameters.'''
+
+	__slots__ = [ 'target', ]
 
 	def __init__( self ):
 		breve.GADirectedGraphParameterObject.__init__( self )
@@ -360,16 +425,22 @@ class GADirectedGraphConnection( breve.GADirectedGraphParameterObject ):
 	def getTarget( self ):
 		'''Returns the target of this connection.'''
 
+
 		return self.target
 
 
 	def setTarget( self, t ):
 		'''Sets the target of this connection to t.'''
 
+
 		self.addDependency( t )
 		self.target = t
 
 
 breve.GADirectedGraphConnection = GADirectedGraphConnection
+breve.GADirectedGraphParameterObjects = GADirectedGraphParameterObject
+breve.GADirectedGraphNodes = GADirectedGraphNode
+breve.GADirectedGraphConnections = GADirectedGraphConnection
+
 
 

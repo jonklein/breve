@@ -14,7 +14,6 @@
 
 @use PhysicalControl.
 @use Shape.
-@use Genome.
 @use Link.
 @use Stationary.
 @use MultiBody.
@@ -276,20 +275,23 @@ Object : Monkeys {
 		return distanceTraveled.
 }
 
-Genome : MonkeyGenome {
+Object : MonkeyGenome {
 	+ variables:
 		waveCompression (float).
-		phaseShifts (8 floats).
-		ampShifts (8 floats).
-		limbLengths (8 floats).
+		phaseShifts (list).
+		ampShifts (list).
+		limbLengths (list).
+
+	+ to init: 
+		self randomize.
 
 	+ to randomize:
 		n (int).
 		
 		for n=0, n<8, n++: {
-			phaseShifts[n] = random[6.3] - 3.15.
-			ampShifts[n] = random[1.0] - .5.
-			limbLengths[n] = random[2.0] + .5.
+			phaseShifts{ n } = random[6.3] - 3.15.
+			ampShifts{ n }   = random[1.0] - .5.
+			limbLengths{ n } = random[2.0] + .5.
 
 		}
 
@@ -298,10 +300,10 @@ Genome : MonkeyGenome {
 	+ to calculate-torque number jointNum (int) at time (float):
 		# calculates the torque for a certain joint number.
 
-		return .5 * sin(waveCompression * (time + phaseShifts[jointNum]) ) - (ampShifts[jointNum]).
+		return .5 * sin(waveCompression * (time + phaseShifts{ jointNum }) ) - ( ampShifts{ jointNum } ).
 		
 	+ to get-limb-length number n (int):
-		return limbLengths[n].
+		return limbLengths{ n }.
 
 	+ to mutate:
 		n (int).
@@ -310,9 +312,9 @@ Genome : MonkeyGenome {
 
 		n = random[25].
 
-		if n < 8: ampShifts[n] = random[2.0] - 1.0.
-		else if n < 16: phaseShifts[n - 8] = random[6.3] - 3.15.
-		else if n < 24: limbLengths[n - 16] = random[2.0] + .5.
+		if n < 8: ampShifts{ n } = random[2.0] - 1.0.
+		else if n < 16: phaseShifts{ n - 8 } = random[6.3] - 3.15.
+		else if n < 24: limbLengths{ n - 16 } = random[2.0] + .5.
 		else waveCompression = random[5.0] - 2.5.
 
 		print "mutated item $n of $self".
