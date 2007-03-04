@@ -1,7 +1,5 @@
 #include "kernel.h"
 
-#include <libgen.h>
-
 int brLoadSimulation( brEngine *engine, const char *code, const char *file ) {
 	int result = EC_OK;
 

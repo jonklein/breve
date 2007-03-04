@@ -24,8 +24,6 @@
 #include "camera.h"
 #include "movie.h"
 
-#include <libgen.h>
-
 #ifndef WINDOWS
 #include <dlfcn.h>
 #endif

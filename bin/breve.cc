@@ -212,7 +212,9 @@ int main( int argc, char **argv ) {
 	if ( gOptionFull ) glutFullScreen();
 
 	if ( gOptionNoGraphics ) {
+#ifndef WINDOWS
         	signal( SIGINT, brCatchSignal );
+#endif
 
 		gPaused = 0;
 
