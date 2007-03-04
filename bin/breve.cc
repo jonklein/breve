@@ -24,6 +24,8 @@
  * steve-frontend version of the breve simulation environment.
  */
 
+#include <signal.h>
+
 #include "simulation.h"
 #include "steve.h"
 #include "breve.h"

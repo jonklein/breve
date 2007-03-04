@@ -216,13 +216,11 @@ WX_release: clean
 	mkdir $(IDE_FOLDER)
 	mkdir $(IDE_FOLDER)/lib
 	cp wx/breveIDE@EXE_SUFFIX@ $(IDE_FOLDER)
-
-ifeq ($(PLATFORM),Linux)
-	mv wx/breveIDE@EXE_SUFFIX@ wx/breveIDE_ex@EXE_SUFFIX@
-	cp bin/breveIDE.sh wx/breveIDE@EXE_SUFFIX@
-	cp bin/libpython2.4.so.1.0 wx
+ifeq ($(PLATFORM),linux-gnu)
+	mv $(IDE_FOLDER)/breveIDE@EXE_SUFFIX@ $(IDE_FOLDER)/breveIDE_ex@EXE_SUFFIX@
+	cp bin/breveIDE.sh $(IDE_FOLDER)/breveIDE@EXE_SUFFIX@
+	cp bin/libpython2.4.so.1.0 $(IDE_FOLDER)/lib
 endif
-
 	-mkdir docs
 	cp -R docs $(IDE_FOLDER)
 	cp -R lib/classes $(IDE_FOLDER)/lib

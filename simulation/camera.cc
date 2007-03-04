@@ -46,7 +46,7 @@ slCamera::slCamera( int x, int y ) {
 	_originy = 0;
 
 	_zClip = 500.0;
-	_frontClip = 0.01;
+	_frontClip = 0.1;
 
 	if ( y != 0.0 ) _fov = ( double )x / ( double )y;
 	else _fov = 40;

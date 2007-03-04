@@ -508,7 +508,7 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 	std::vector<slDrawCommandList*>::iterator di;
 	for ( di = w->_drawings.begin(); di != w->_drawings.end(); di++ )( *di )->draw( this );
 
-	renderLines( w );
+	// renderLines( w );
 
 	//
 	// Setup lighting and effects for the normal objects
@@ -563,11 +563,11 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 		else if ( _drawShadow ) shadowPass( w );
 	}
 
-	glDepthMask( GL_FALSE );
+	// glDepthMask( GL_FALSE );
 
-	renderObjects( w, flags | DO_ONLY_ALPHA );
+	// renderObjects( w, flags | DO_ONLY_ALPHA );
 
-	glDepthMask( GL_TRUE );
+	// glDepthMask( GL_TRUE );
 
 	renderLabels( w );
 
@@ -718,7 +718,7 @@ void slCamera::reflectionPass( slWorld *w ) {
 	glStencilOp( GL_KEEP, GL_KEEP, GL_KEEP );
 	renderObjects( w, DO_NO_STATIONARY | DO_NO_BOUND | DO_NO_AXIS | DO_NO_TERRAIN );
 
-	renderBillboards( 0 );
+	// renderBillboards( 0 );
 
 	glDisable( GL_NORMALIZE );
 
@@ -910,6 +910,8 @@ void slCamera::renderBillboards( int flags ) {
 	slBillboardEntry *b;
 	unsigned int n;
 	int lastTexture = -1;
+
+		return;
 
 	slVectorCopy( &_location, &normal );
 	slVectorNormalize( &normal );
@@ -1288,6 +1290,8 @@ void slCamera::renderLines( slWorld *w ) {
 	slWorldObject *neighbor;
 	slVector *x, *y;
 	unsigned int n;
+
+		return;
 
 	glLineWidth( 1.2 );
 	glEnable( GL_BLEND );
