@@ -30,7 +30,7 @@
 #include "world.h"
 #include "lightdetector.h"
 #include "tiger.h"
-#include "shadow.h"
+#include "shadowvolume.h"
 #include "asciiart.h"
 
 #define REFLECTION_ALPHA	.75

@@ -23,7 +23,7 @@
 #include "gldraw.h"
 #include "world.h"
 #include "camera.h"
-#include "shadow.h"
+#include "shadowvolume.h"
 #include "shape.h"
 
 void slShape::drawShadowVolume( slCamera *c, slPosition *p ) {

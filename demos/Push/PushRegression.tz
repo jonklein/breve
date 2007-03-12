@@ -38,6 +38,11 @@ PushGP : RegressionGP {
 		self set-population-size to 2000.
 		self set-spatial-radius to 10.
 
+		self read-interpreter-config from-file "PushRegression.config".
+		
+		interpreter print-config.
+
+
 		# PushGP regression problems are helped by being able to retrieve 
 		# the input values with an instruction.  Adding this callback is 
 		# optional, but does tend to produce better results.

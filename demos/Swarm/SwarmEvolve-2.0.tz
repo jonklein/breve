@@ -946,7 +946,10 @@ Mobile : Bird (aka Birds) {
 
         num-birds = all Birds.
 
+
         if energy > (2 * BIRTH_COST): {
+		
+	print "spawning...".
             controller increment-naturalBirths.
             if num-birds < BOOTSTRAP_LIMIT: {
                 self adjust-energy delta

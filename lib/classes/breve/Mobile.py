@@ -224,7 +224,7 @@ class Mobile( breve.Real ):
 		'''Deprecated.  Renamed to METHOD(set-rotation).'''
 
 
-		self.setRotation( thisAxis, amount )
+		self.setRotationAroundAxis( thisAxis, amount )
 
 	def set( self, theShape ):
 		'''Deprecated.  Don't use.'''

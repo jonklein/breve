@@ -124,8 +124,10 @@ def length( inValue ):
 	if inValue.__class__ == int or inValue.__class__ == float:
 		return abs( inValue )
 
-	if inValue.__class__ == list:
+	if inValue.__class__ == objectList:
 		return len( inValue )
+
+	return 1
 
 
 def randomExpression( inValue ):

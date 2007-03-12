@@ -63,8 +63,10 @@ Object : PushTest {
 	+ to callback:
 		print "$self is calling the breve callback function, pushing 7, ".
 		interpreter push-integer value 7.
+		interpreter print-stacks.
 
 	+ to callback2:
 		print "$self is calling the breve callback2 function, pushing 8, ".
 		interpreter push-integer value 8.
+		interpreter print-stacks.
 }
