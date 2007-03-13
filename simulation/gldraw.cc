@@ -563,11 +563,11 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 		else if ( _drawShadow ) shadowPass( w );
 	}
 
-	// glDepthMask( GL_FALSE );
+	glDepthMask( GL_FALSE );
 
-	// renderObjects( w, flags | DO_ONLY_ALPHA );
+	renderObjects( w, flags | DO_ONLY_ALPHA );
 
-	// glDepthMask( GL_TRUE );
+	glDepthMask( GL_TRUE );
 
 	renderLabels( w );
 

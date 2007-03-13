@@ -79,9 +79,9 @@ int breveFunctionPushRun( brEval arguments[], brEval *result, brInstance *instan
 }
 
 int breveFunctionPushInterpreterDone( brEval arguments[], brEval *result, brInstance *instance ) {
-	push::Env *env = static_cast< push::Env* >( BRPOINTER( &arguments[0] ) );
+	pushlang::Env *env = static_cast< pushlang::Env* >( BRPOINTER( &arguments[0] ) );
 
-	result->set(( int )env->next().done() );
+	result->set( ( int )env->done() );
 
 	return EC_OK;
 }
@@ -170,7 +170,7 @@ int breveFunctionPushClearStacks( brEval arguments[], brEval *result, brInstance
 */
 
 int breveFunctionPushEnvironmentSetListLimit( brEval arguments[], brEval *result, brInstance *instance ) {
-	push::Env &env = static_cast< push::Env* >( BRPOINTER( &arguments[0] ) )->next();
+	pushlang::Env &env = *static_cast< pushlang::Env* >( BRPOINTER( &arguments[0] ) );
 
 	env.parameters.max_points_in_program = BRINT( &arguments[1] );
 
@@ -178,7 +178,7 @@ int breveFunctionPushEnvironmentSetListLimit( brEval arguments[], brEval *result
 }
 
 int breveFunctionPushEnvironmentGetListLimit( brEval arguments[], brEval *result, brInstance *instance ) {
-	push::Env &env = static_cast< push::Env* >( BRPOINTER( &arguments[0] ) )->next();
+	pushlang::Env &env = *static_cast< pushlang::Env* >( BRPOINTER( &arguments[0] ) );
 
 	result->set( env.parameters.max_points_in_program );
 
@@ -186,7 +186,7 @@ int breveFunctionPushEnvironmentGetListLimit( brEval arguments[], brEval *result
 }
 
 int breveFunctionPushEnvironmentGetEvalLimit( brEval arguments[], brEval *result, brInstance *instance ) {
-	push::Env &env = static_cast< push::Env* >( BRPOINTER( &arguments[0] ) )->next();
+	pushlang::Env &env = *static_cast< pushlang::Env* >( BRPOINTER( &arguments[0] ) );
 
 	result->set( env.parameters.evalpush_limit );
 
@@ -194,7 +194,7 @@ int breveFunctionPushEnvironmentGetEvalLimit( brEval arguments[], brEval *result
 }
 
 int breveFunctionPushEnvironmentSetEvalLimit( brEval arguments[], brEval *result, brInstance *instance ) {
-	push::Env &env = static_cast< push::Env* >( BRPOINTER( &arguments[0] ) )->next();
+	pushlang::Env &env = *static_cast< pushlang::Env* >( BRPOINTER( &arguments[0] ) );
 
 	env.parameters.evalpush_limit = BRINT( &arguments[1] );
 
@@ -202,7 +202,7 @@ int breveFunctionPushEnvironmentSetEvalLimit( brEval arguments[], brEval *result
 }
 
 int breveFunctionPushEnvironmentGetRandomPointLimit( brEval arguments[], brEval *result, brInstance *instance ) {
-	push::Env &env = static_cast< push::Env* >( BRPOINTER( &arguments[0] ) )->next();
+	pushlang::Env &env = *static_cast< pushlang::Env* >( BRPOINTER( &arguments[0] ) );
 
 	result->set( env.parameters.max_points_in_random_expression );
 
@@ -210,7 +210,7 @@ int breveFunctionPushEnvironmentGetRandomPointLimit( brEval arguments[], brEval 
 }
 
 int breveFunctionPushEnvironmentSetRandomPointLimit( brEval arguments[], brEval *result, brInstance *instance ) {
-	push::Env &env = static_cast< push::Env* >( BRPOINTER( &arguments[0] ) )->next();
+	pushlang::Env &env = *static_cast< pushlang::Env* >( BRPOINTER( &arguments[0] ) );
 
 	env.parameters.max_points_in_random_expression = BRINT( &arguments[1] );
 
@@ -256,7 +256,7 @@ int breveFunctionPushCodeGetString( brEval arguments[], brEval *result, brInstan
 	\brief A function to convert a push program to a brEvalList, recursively if necessary.
 */
 
-brEvalListHead *brevePushCodeToEvalList( const push::Code *code ) {
+brEvalListHead *brevePushCodeToEvalList( const pushlang::Code *code ) {
 	brEvalListHead *l;
 	brEval e;
 	unsigned int n;
@@ -276,25 +276,25 @@ brEvalListHead *brevePushCodeToEvalList( const push::Code *code ) {
 	return l;
 }
 
-float brevePushCodeFirstFloat( const push::Code *code, bool *found ) {
+float brevePushCodeFirstFloat( const pushlang::Code *code, bool *found ) {
 
 	int n;
 
-	const push::CodeArray &stack = ( *code )->get_stack();
+	const pushlang::CodeArray &stack = ( *code )->get_stack();
 
 	for ( n = ( int )stack.size() - 1; n >= 0; n-- ) {
 		if ( stack[ n ]->get_stack().size() == 0 ) {
-			push::Code c = stack[ n ];
+			pushlang::Code c = stack[ n ];
 
-			if ( typeid( c ) == typeid( push::Literal< double > ) ) {
-				push::Env env;
+			if ( typeid( c ) == typeid( pushlang::Literal< double > ) ) {
+				pushlang::Env env;
 
 				*found = 1;
 				( *c )( env );
-				return push::get_stack<double>( env )[ 0 ];
+				return pushlang::get_stack<double>( env )[ 0 ];
 			}
 
-			//if( push::Literal< double > *d = dynamic_cast< push::Literal< double >* >( c.get() ) ) {
+			//if( pushlang::Literal< double > *d = dynamic_cast< pushlang::Literal< double >* >( c.get() ) ) {
 			//	*found = 1;
 			//	return d->get();
 			//}
@@ -310,7 +310,7 @@ float brevePushCodeFirstFloat( const push::Code *code, bool *found ) {
 
 int breveFunctionPushCodeFirstFloat( brEval arguments[], brEval *result, brInstance *instance ) {
 
-	const push::Code *code = ( push::Code* )BRPOINTER( &arguments[0] );
+	const pushlang::Code *code = ( pushlang::Code* )BRPOINTER( &arguments[0] );
 
 	bool found = false;
 
@@ -324,7 +324,7 @@ int breveFunctionPushCodeFirstFloat( brEval arguments[], brEval *result, brInsta
 */
 
 int breveFunctionPushCodeGetEvalList( brEval arguments[], brEval *result, brInstance *instance ) {
-	push::Code *code = ( push::Code* )BRPOINTER( &arguments[0] );
+	pushlang::Code *code = ( pushlang::Code* )BRPOINTER( &arguments[0] );
 
 	result->set( brevePushCodeToEvalList( code ) );
 
@@ -361,7 +361,7 @@ int breveFunctionPushCodeSize( brEval arguments[], brEval *result, brInstance *i
 }
 
 int breveFunctionPushCodeTopLevelSize( brEval arguments[], brEval *result, brInstance *instance ) {
-	push::Code *p1 = ( push::Code* )BRPOINTER( &arguments[0] );
+	pushlang::Code *p1 = ( pushlang::Code* )BRPOINTER( &arguments[0] );
 
 	result->set(( int )( *p1 )->get_stack().size() );
 
@@ -369,11 +369,11 @@ int breveFunctionPushCodeTopLevelSize( brEval arguments[], brEval *result, brIns
 }
 
 int breveFunctionPushCodeSwapSublists( brEval arguments[], brEval *result, brInstance *instance ) {
-	push::Code *p1 = ( push::Code* )BRPOINTER( &arguments[0] );
+	pushlang::Code *p1 = ( pushlang::Code* )BRPOINTER( &arguments[0] );
 	int x = BRINT( &arguments[1] );
 	int y = BRINT( &arguments[2] );
 
-	push::swap_sublist_position( *p1, x, y );
+	pushlang::swap_sublist_position( *p1, x, y );
 
 	return EC_OK;
 }
@@ -623,7 +623,7 @@ int breveFunctionPushCodeStackSize( brEval arguments[], brEval *result, brInstan
 int breveFunctionPushExecStackSize( brEval arguments[], brEval *result, brInstance *instance ) {
 	PushEnvironment *environment = BRPOINTER( &arguments[0] );
 
-	result->set(( int ) push::get_stack<push::Exec>((( push::Env* )environment )->next() ).size() );
+	result->set(( int ) pushlang::get_stack<pushlang::Exec>( *( pushlang::Env* )environment ).size() );
 
 	return EC_OK;
 }
@@ -645,8 +645,8 @@ int breveFunctionPushCodeStackPop( brEval arguments[], brEval *result, brInstanc
 int breveFunctionPushExecStackPop( brEval arguments[], brEval *result, brInstance *instance ) {
 	PushEnvironment *environment = BRPOINTER( &arguments[0] );
 
-	if ( push::get_stack<push::Exec>((( push::Env* )environment )->next() ).size() > 0 )
-		push::get_stack<push::Exec>((( push::Env* )environment )->next() ).pop_back();
+	if ( pushlang::get_stack<pushlang::Exec>( *( pushlang::Env* )environment ).size() > 0 )
+		pushlang::get_stack<pushlang::Exec>( *( pushlang::Env* )environment ).pop_back();
 
 	return EC_OK;
 }
@@ -668,7 +668,7 @@ int breveFunctionPushCodeStackTop( brEval arguments[], brEval *result, brInstanc
 int breveFunctionPushExecStackTop( brEval arguments[], brEval *result, brInstance *instance ) {
 	PushEnvironment *environment = BRPOINTER( &arguments[0] );
 
-	result->set( new push::Code( push::get_stack<push::Exec>((( push::Env* )environment )->next() ).back() ) );
+	result->set( new pushlang::Code( pushlang::get_stack<pushlang::Exec>( *( pushlang::Env* )environment ).back() ) );
 
 	return EC_OK;
 }
@@ -691,10 +691,10 @@ int breveFunctionPushCodeStackPush( brEval arguments[], brEval *result, brInstan
 int breveFunctionPushExecStackPush( brEval arguments[], brEval *result, brInstance *instance ) {
 	PushEnvironment *environment = BRPOINTER( &arguments[0] );
 	PushCode *value = BRPOINTER( &arguments[1] );
-	// push::Exec *evalu = (push::Exec*)value
+	// pushlang::Exec *evalu = (pushlang::Exec*)value
 
-	// push::get_stack<push::Exec>( ( ( push::Env* )environment )->next() ).push_guarded( push::Exec( *(push::Code*)value ) );
-	(( push::Env* )environment )->next().push_guarded( *( push::Code* )value );
+	// pushlang::get_stack<pushlang::Exec>( *( pushlang::Env* )environment ).push_guarded( pushlang::Exec( *(pushlang::Code*)value ) );
+	( *( pushlang::Env* )environment ).push_guarded( *( pushlang::Code* )value );
 
 	return EC_OK;
 }
@@ -835,27 +835,27 @@ int breveFunctionPushCodeRandom( brEval arguments[], brEval *result, brInstance 
 }
 
 int breveFunctionPushCodeDiscrepancy( brEval arguments[], brEval *result, brInstance *instance ) {
-	push::Code *p1, *p2;
+	pushlang::Code *p1, *p2;
 
-	p1 = ( push::Code* )BRPOINTER( &arguments[0] );
-	p2 = ( push::Code* )BRPOINTER( &arguments[1] );
+	p1 = ( pushlang::Code* )BRPOINTER( &arguments[0] );
+	p2 = ( pushlang::Code* )BRPOINTER( &arguments[1] );
 
-	result->set( push::discrepancy( *p1, *p2 ) );
+	result->set( pushlang::discrepancy( *p1, *p2 ) );
 
 	return EC_OK;
 }
 
 int breveFunctionPushCodeTopLevelDiff( brEval arguments[], brEval *result, brInstance *instance ) {
-	push::Code *p1, *p2;
+	pushlang::Code *p1, *p2;
 	unsigned int length, diff, n;
 	unsigned int s1, s2;
 
-	p1 = ( push::Code* )BRPOINTER( &arguments[0] );
-	p2 = ( push::Code* )BRPOINTER( &arguments[1] );
+	p1 = ( pushlang::Code* )BRPOINTER( &arguments[0] );
+	p2 = ( pushlang::Code* )BRPOINTER( &arguments[1] );
 
-	const push::CodeArray& st1 = ( *p1 )->get_stack();
+	const pushlang::CodeArray& st1 = ( *p1 )->get_stack();
 
-	const push::CodeArray& st2 = ( *p2 )->get_stack();
+	const pushlang::CodeArray& st2 = ( *p2 )->get_stack();
 
 	// get the shortest length
 
@@ -886,32 +886,32 @@ int breveFunctionPushCodeTopLevelDiff( brEval arguments[], brEval *result, brIns
 
 int breveFunctionPushDiversityPoolNew( brEval args[], brEval *result, brInstance *instance ) {
 
-	result->set( new push::DiversityPool( BRINT( &args[0] ) ) );
+	result->set( new pushlang::DiversityPool( BRINT( &args[0] ) ) );
 
 	return EC_OK;
 }
 
 int breveFunctionPushDiversityPoolFree( brEval args[], brEval *result, brInstance *instance ) {
-	push::DiversityPool *pool = ( push::DiversityPool* )BRPOINTER( &args[0] );
+	pushlang::DiversityPool *pool = ( pushlang::DiversityPool* )BRPOINTER( &args[0] );
 	delete pool;
 	return EC_OK;
 }
 
 int breveFunctionPushDiversityPoolAdd( brEval args[], brEval *result, brInstance *instance ) {
-	push::DiversityPool *pool = ( push::DiversityPool* )BRPOINTER( &args[0] );
-	push::Code *code = ( push::Code* )BRPOINTER( &args[1] );
+	pushlang::DiversityPool *pool = ( pushlang::DiversityPool* )BRPOINTER( &args[0] );
+	pushlang::Code *code = ( pushlang::Code* )BRPOINTER( &args[1] );
 	pool->addIndividual( *code );
 	return EC_OK;
 }
 
 int breveFunctionPushDiversityPoolClear( brEval args[], brEval *result, brInstance *instance ) {
-	push::DiversityPool *pool = ( push::DiversityPool* )BRPOINTER( &args[0] );
+	pushlang::DiversityPool *pool = ( pushlang::DiversityPool* )BRPOINTER( &args[0] );
 	pool->clear();
 	return EC_OK;
 }
 
 int breveFunctionPushDiversityPoolGetCount( brEval args[], brEval *result, brInstance *instance ) {
-	push::DiversityPool *pool = ( push::DiversityPool* )BRPOINTER( &args[0] );
+	pushlang::DiversityPool *pool = ( pushlang::DiversityPool* )BRPOINTER( &args[0] );
 
 	result->set( pool->getSize() );
 
@@ -919,7 +919,7 @@ int breveFunctionPushDiversityPoolGetCount( brEval args[], brEval *result, brIns
 }
 
 int breveFunctionPushDiversityPoolSetTolerance( brEval args[], brEval *result, brInstance *instance ) {
-	push::DiversityPool *pool = ( push::DiversityPool* )BRPOINTER( &args[0] );
+	pushlang::DiversityPool *pool = ( pushlang::DiversityPool* )BRPOINTER( &args[0] );
 	pool->setTolerance( BRINT( &args[1] ) );
 
 	return EC_OK;
