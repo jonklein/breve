@@ -768,7 +768,7 @@ int stSetVariable( void *variable, unsigned char type, stObject *otype, brEval *
 		}
 	}
 
-	if (( resultCode = stToType( e, type, e, i ) ) != EC_OK ) {
+	if ( ( resultCode = stToType( e, type, e, i ) ) != EC_OK ) {
 		slMessage( DEBUG_ALL, "error in assignment\n" );
 		return resultCode;
 	}
