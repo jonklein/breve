@@ -235,6 +235,8 @@ class stExp {
 		virtual std::string			toPython( stPyConversionData *inData ) = 0;
 		virtual std::string			toPerl( stPerlConversionData *inData ) = 0;
 
+		virtual	bool				isCompound() { return false; };
+
 		unsigned char 				type;
 
 		bool 					debug;
@@ -720,6 +722,8 @@ class stWhileExp : public stExp {
 		stWhileExp(stExp *cn, stExp *cd, const char *file, int lineno);
 		~stWhileExp();
 
+		virtual	bool			isCompound() { return true; };
+
 		std::string			toPython( stPyConversionData *inData );
 		std::string			toPerl( stPerlConversionData *inData );
 
@@ -731,6 +735,8 @@ class stForeachExp : public stExp {
 	public:
 		stForeachExp(stAssignExp *a, stExp *l, stExp *c, const char *file, int lineno);
 		~stForeachExp();
+
+		virtual	bool			isCompound() { return true; };
 
 		std::string			toPython( stPyConversionData *inData );
 		std::string			toPerl( stPerlConversionData *inData );
@@ -745,6 +751,8 @@ class stForExp : public stExp {
 		stForExp(stExp *a, stExp *cn, stExp *i, stExp *cd, const char *file, int lineno);
 		~stForExp();
 
+		virtual	bool			isCompound() { return true; };
+
 		std::string			toPython( stPyConversionData *inData );
 		std::string			toPerl( stPerlConversionData *inData );
 
@@ -758,6 +766,8 @@ class stIfExp : public stExp {
 	public:
 		stIfExp(stExp *c, stExp *t, stExp *f, const char *file, int lineno);
 		~stIfExp();
+
+		virtual	bool			isCompound() { return true; };
 
 		std::string			toPython( stPyConversionData *inData );
 		std::string			toPerl( stPerlConversionData *inData );

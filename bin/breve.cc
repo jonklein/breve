@@ -155,27 +155,40 @@ int main( int argc, char **argv ) {
 
 	if( gConvertToPython ) {
 		brLoadSimulation( gEngine, text, simulationFile );
-		std::string sim = simulationFile;
-		std::string obj = stPyConvertFile( gEngine, gSteveData, sim );
+		std::string pyf = simulationFile;
+		std::string plf = simulationFile;
+		std::string pyc = stPyConvertFile( gEngine, gSteveData, pyf );
+		std::string plc = stPerlConvertFile( gEngine, gSteveData, plf );
 
-		int position = sim.find( ".tz", sim.size() - 3 );
+		int position = plf.find( ".tz", plf.size() - 3 );
 
 		if( position > 0 ) {
-			sim.replace( position, 3, ".py", 3 );
+			pyf.replace( position, 3, ".py", 3 );
+			plf.replace( position, 3, ".pl", 3 );
 		} else {
-			sim += ".py";
+			pyf += ".py";
+			plf += ".pl";
 		}
 
-		FILE *fp = fopen( sim.c_str(), "w" );
+		FILE *fp = fopen( pyf.c_str(), "w" );
 
 		if( !fp ) {
-			fprintf( stderr, "Cannot open file \"%s\" for writing\n", sim.c_str() );
+			fprintf( stderr, "Cannot open file \"%s\" for writing\n", pyf.c_str() );
 			exit( 1 );
 		}
 
-		fprintf( fp, "%s\n", obj.c_str() );
+		fprintf( fp, "%s\n", pyc.c_str() );
 
 		fclose( fp );
+
+		fp = fopen( plf.c_str(), "w" );
+
+		if( !fp ) {
+			fprintf( stderr, "Cannot open file \"%s\" for writing\n", plf.c_str() );
+			exit( 1 );
+		}
+
+		fprintf( fp, "%s\n", plc.c_str() );
 
 		exit( 0 );
 	}

@@ -480,19 +480,21 @@ std::string stMethodExp::toPython( stPyConversionData *inData ) {
 
 	result = objectExp->toPython( inData ) + "." + stPyConvertSymbol( methodName ) + "(";
 
-	if( objectExp->type == ET_SUPER ) 
-		result += " self,";
+	if( objectExp->type == ET_SUPER ) {
+		result += " self ";
+
+		if( arguments.size() != 0 )
+			result += ",";
+	}
 
 	for( unsigned int n = 0; n < arguments.size(); n++ ) {
 		result += " " + arguments[ n ]->value->toPython( inData );
 
 		if( n < arguments.size() - 1 )
 			result += ",";
-		else
-			result += " ";
 	}
 
-	result += ")";
+	result += " )";
 
 	return result;
 }
@@ -505,8 +507,6 @@ std::string stReturnExp::toPython( stPyConversionData *inData ) {
 	if( expression )
 		result += " " + expression->toPython( inData );
 	
-	result += "\n";
-
 	return result;
 }
 
