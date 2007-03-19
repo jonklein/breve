@@ -4,7 +4,7 @@ import breve
 class Genome( breve.Data ):
 	'''The Genome class is a subclass of OBJECT(Data) which allows its subclasses to be manipulated with genetic operators such as crossover and mutation. This class is primarily used in conjunction with genetic algorithms and  artificial life simulations. <p> As with its parent class, Data, the Genome class is incomplete and experimental.   The API is subject to change in future releases. '''
 
-	slots = [ ]
+	__slots__ = [  ]
 
 	def __init__( self ):
 		breve.Data.__init__( self )

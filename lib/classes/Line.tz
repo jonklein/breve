@@ -1,3 +1,5 @@
+@use Object.
+
 Object : Line {
 	+ variables:
 		start, end (object).

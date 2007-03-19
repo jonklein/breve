@@ -4,7 +4,7 @@ import breve
 class Mobile( breve.Real ):
 	'''Mobile objects are objects in the simulated world which move around 		 and interact with other objects.  This is in contrast to  OBJECT(Stationary) objects which can collide and interact with  other objects but which never move. <P> When a Mobile object is created, it will be by default a simple  sphere.  You can change the appearence of this sphere by using methods in this class, or its parent class OBJECT(Real).  Or  you can change the shape altogether with the method METHOD(set-shape).'''
 
-	__slots__ = [ 'archiveAcceleration', 'archiveLocation', 'archiveRotation', 'archiveRvelocity', 'archiveVelocity', 'linkForce', 'linkTorque', 'physicsEnabled', ]
+	__slots__ = [ 'archiveAcceleration', 'archiveLocation', 'archiveRotation', 'archiveRvelocity', 'archiveVelocity', 'linkForce', 'linkTorque', 'physicsEnabled' ]
 
 	def __init__( self ):
 		breve.Real.__init__( self )
@@ -27,8 +27,7 @@ class Mobile( breve.Real ):
 		self.archiveVelocity = self.getVelocity()
 		self.archiveRvelocity = self.getRotationalVelocity()
 		self.archiveAcceleration = self.getAcceleration()
-		return breve.Real.archive( self,)
-
+		return breve.Real.archive( self )
 
 	def checkForPenetrations( self ):
 		'''Depricated.'''
@@ -36,13 +35,11 @@ class Mobile( breve.Real ):
 
 		return self.getCollidingObjects()
 
-
 	def checkForSelfPenetrations( self ):
 		'''Determines whether this link is currently penetrating with other links in the same multibody.  This is not meant as a general purpose collision detection tool -- it is meant to detect potentially troublesome configurations of links when they are created.'''
 
 
 		return breve.breveInternalFunctionFinder.linkCheckSelfPenetration( self, self.realWorldPointer )
-
 
 	def dearchive( self ):
 		''''''
@@ -50,9 +47,10 @@ class Mobile( breve.Real ):
 
 		self.realWorldPointer = breve.breveInternalFunctionFinder.linkNew( self)
 		self.realWorldPointer = breve.breveInternalFunctionFinder.linkAddToWorld( self, self.realWorldPointer )
-		self.setShape( self.objectShape )
+		self.setCollisionShape( self.collisionShape )
+		self.setDisplayShape( self.displayShape )
 		self.move( self.archiveLocation )
-		self.setRotation( self.archiveRotation )
+		self.setRotationMatrix( self.archiveRotation )
 		self.setVelocity( self.archiveVelocity )
 		self.setRotationalVelocity( self.archiveRvelocity )
 		self.setAcceleration( self.archiveAcceleration )
@@ -61,8 +59,7 @@ class Mobile( breve.Real ):
 		else:
 			self.disablePhysics()
 
-		return breve.Real.dearchive( self,)
-
+		return breve.Real.dearchive( self )
 
 	def disablePhysics( self ):
 		'''Disables the physical simulation for a OBJECT(Mobile) object.'''
@@ -84,13 +81,11 @@ class Mobile( breve.Real ):
 
 		return breve.breveInternalFunctionFinder.linkGetAcceleration( self, self.realWorldPointer )
 
-
 	def getBoundMaximum( self ):
 		'''Returns the vector representing the maximum X, Y and Z locations of points on this link.'''
 
 
 		return breve.breveInternalFunctionFinder.linkGetMax( self, self.realWorldPointer )
-
 
 	def getBoundMinimum( self ):
 		'''Returns the vector representing the minimum X, Y and Z locations of points on this link.'''
@@ -98,13 +93,11 @@ class Mobile( breve.Real ):
 
 		return breve.breveInternalFunctionFinder.linkGetMin( self, self.realWorldPointer )
 
-
 	def getCollidingObjects( self ):
 		'''Returns a list of objects currently colliding with this object. This is not meant as a general purpose collision detection tool -- it is meant to detect potentially troublesome configurations of links when they are created.'''
 
 
 		return breve.breveInternalFunctionFinder.linkGetPenetratingObjects( self, self.realWorldPointer )
-
 
 	def getDistance( self, otherObject ):
 		'''Returns the scalar distance from this object's center to  otherObject.'''
@@ -112,13 +105,11 @@ class Mobile( breve.Real ):
 
 		return breve.length( ( self.getLocation() - otherObject.getLocation() ) )
 
-
 	def getForce( self ):
 		'''Returns the force acting on the object, which was previously  set using METHOD(set-force).  '''
 
 
 		return self.linkForce
-
 
 	def getLinkPointer( self ):
 		'''For internal use only.'''
@@ -126,13 +117,11 @@ class Mobile( breve.Real ):
 
 		return self.realWorldPointer
 
-
 	def getMass( self ):
 		'''Returns the mass of the object.'''
 
 
-		return self.objectShape.getMass()
-
+		return self.collisionShape.getMass()
 
 	def getRotationalVelocity( self ):
 		'''Returns the vector angular velocity of this object.'''
@@ -140,20 +129,17 @@ class Mobile( breve.Real ):
 
 		return breve.breveInternalFunctionFinder.linkGetRotationalVelocity( self, self.realWorldPointer )
 
-
 	def getTorque( self ):
 		'''Returns the torque acting on the object, which was previously  set using METHOD(set-torque).  '''
 
 
 		return self.linkTorque
 
-
 	def getVelocity( self ):
 		'''Returns the vector velocity of this object.'''
 
 
 		return breve.breveInternalFunctionFinder.linkGetVelocity( self, self.realWorldPointer )
-
 
 	def init( self ):
 		''''''
@@ -172,26 +158,6 @@ class Mobile( breve.Real ):
 
 
 		self.move( ( self.getLocation() + amount ) )
-
-	def point( self, theVertex, theLocation ):
-		'''An easier way to rotate an object--this function rotates  an object such that the local point theVertex, points towards the world direction theLocation.  In other words, theLocation is where you want the object to face, and theVertex indicates  which side of the object is to be considered the "front".'''
-
-		v = breve.vector()
-		a = 0
-
-		if ( ( breve.length( theVertex ) == 0.000000 ) or ( breve.length( theLocation ) == 0.000000 ) ):
-			return
-
-
-		v = breve.breveInternalFunctionFinder.cross( self, theVertex, theLocation )
-		a = breve.breveInternalFunctionFinder.angle( self, theVertex, theLocation )
-		if ( breve.length( v ) == 0.000000 ):
-			self.rotate( theVertex, 0.010000 )
-			return
-
-
-
-		self.rotate( v, a )
 
 	def register( self, theShape ):
 		'''Deprecated.  Don't use.'''
@@ -224,7 +190,7 @@ class Mobile( breve.Real ):
 		'''Deprecated.  Renamed to METHOD(set-rotation).'''
 
 
-		self.setRotationAroundAxis( thisAxis, amount )
+		self.setRotation( thisAxis, amount )
 
 	def set( self, theShape ):
 		'''Deprecated.  Don't use.'''
@@ -248,7 +214,6 @@ class Mobile( breve.Real ):
 			return
 
 
-
 		self.linkForce = newForce
 		breve.breveInternalFunctionFinder.linkSetForce( self, self.realWorldPointer, self.linkForce )
 
@@ -257,32 +222,6 @@ class Mobile( breve.Real ):
 
 
 		breve.breveInternalFunctionFinder.linkSetLabel( self, self.realWorldPointer, theLabel )
-
-	def setRotationEulerAngles( self, angles ):
-		'''Sets the rotation of this object to the Euler angles specified  by angles (in radians).'''
-
-		m = breve.matrix()
-		r22 = 0
-		r21 = 0
-		r20 = 0
-		r12 = 0
-		r11 = 0
-		r10 = 0
-		r02 = 0
-		r01 = 0
-		r00 = 0
-
-		r00 = ( ( breve.breveInternalFunctionFinder.cos( self, angles.z ) * breve.breveInternalFunctionFinder.cos( self, angles.x ) ) - ( ( breve.breveInternalFunctionFinder.cos( self, angles.y ) * breve.breveInternalFunctionFinder.sin( self, angles.x ) ) * breve.breveInternalFunctionFinder.sin( self, angles.z ) ) )
-		r01 = ( ( breve.breveInternalFunctionFinder.cos( self, angles.z ) * breve.breveInternalFunctionFinder.sin( self, angles.x ) ) + ( ( breve.breveInternalFunctionFinder.cos( self, angles.y ) * breve.breveInternalFunctionFinder.cos( self, angles.x ) ) * breve.breveInternalFunctionFinder.sin( self, angles.z ) ) )
-		r02 = ( breve.breveInternalFunctionFinder.sin( self, angles.z ) * breve.breveInternalFunctionFinder.cos( self, angles.y ) )
-		r10 = ( ( ( -breve.breveInternalFunctionFinder.sin( self, angles.z ) ) * breve.breveInternalFunctionFinder.cos( self, angles.x ) ) - ( ( breve.breveInternalFunctionFinder.cos( self, angles.y ) * breve.breveInternalFunctionFinder.sin( self, angles.x ) ) * breve.breveInternalFunctionFinder.cos( self, angles.z ) ) )
-		r11 = ( ( ( -breve.breveInternalFunctionFinder.sin( self, angles.z ) ) * breve.breveInternalFunctionFinder.sin( self, angles.x ) ) + ( ( breve.breveInternalFunctionFinder.cos( self, angles.y ) * breve.breveInternalFunctionFinder.cos( self, angles.x ) ) * breve.breveInternalFunctionFinder.cos( self, angles.z ) ) )
-		r12 = ( breve.breveInternalFunctionFinder.cos( self, angles.z ) * breve.breveInternalFunctionFinder.sin( self, angles.y ) )
-		r20 = ( breve.breveInternalFunctionFinder.sin( self, angles.y ) * breve.breveInternalFunctionFinder.sin( self, angles.x ) )
-		r21 = ( ( -breve.breveInternalFunctionFinder.sin( self, angles.y ) ) * breve.breveInternalFunctionFinder.cos( self, angles.x ) )
-		r22 = breve.breveInternalFunctionFinder.cos( self, angles.y )
-		m = breve.matrix(  r00, r01, r02, r10, r11, r12, r20, r21, r22 )
-		self.setRotation( m )
 
 	def setRotationalAcceleration( self, newAcceleration ):
 		'''Sets the rotational acceleration of this object to  newAcceleration.  This method has no effect if physical  simulation is turned on for the object, in which case the  physical simulation engine computes acceleration.'''
@@ -305,7 +244,6 @@ class Mobile( breve.Real ):
 			return
 
 
-
 		self.linkTorque = newTorque
 		breve.breveInternalFunctionFinder.linkSetTorque( self, self.realWorldPointer, self.linkTorque )
 
@@ -316,7 +254,6 @@ class Mobile( breve.Real ):
 		if ( not self.realWorldPointer ):
 			print '''set-velocity called with uninitialized Mobile object'''
 			return
-
 
 
 		breve.breveInternalFunctionFinder.linkSetVelocity( self, self.realWorldPointer, newVelocity )
@@ -332,7 +269,6 @@ class Mobile( breve.Real ):
 
 
 		return breve.breveInternalFunctionFinder.vectorFromLinkPerspective( self, self.realWorldPointer, theVector )
-
 
 
 breve.Mobile = Mobile

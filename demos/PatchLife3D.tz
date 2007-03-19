@@ -10,7 +10,7 @@
 # 
 
 @include "Control.tz"
-@include "PatchToroid.tz"
+@include "PatchGrid.tz"
 @include "Patch.tz"
 @include "Wanderer.tz"
 
@@ -25,7 +25,7 @@ Control : PatchLife {
 		patches (object).
 
 	+ to init:
-		patches = (new PatchToroid init-with x-count X_SIZE y-count Y_SIZE z-count Z_SIZE patch-class "LifePatch").
+		patches = ( new PatchToroid init-with x-count X_SIZE y-count Y_SIZE z-count Z_SIZE location ( 0, 0, 0 ) patch-size ( 1, 1, 1 ) patch-class "LifePatch" ).
 
 		patches disable-volumetric-drawing.
 

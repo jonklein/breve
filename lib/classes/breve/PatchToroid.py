@@ -16,8 +16,8 @@ class PatchToroid( breve.PatchGrid ):
 		chemMatrixPointer = None
 
 		for chem in self.diffusingChemicals:
-			chemMatrixPointer = self.chemicalConcentrationMatrix[ chem ].getMatrixPointer()
-			breve.breveInternalFunctionFinder.matrix3DDiffusePeriodic( self, chemMatrixPointer, self.tempMatrix, chem.getDiffusionRate() )
+			chemMatrixPointer = self.chemicalConcentrationMatrix[ chem ].getMatrixPointer( )
+			breve.breveInternalFunctionFinder.matrix3DDiffusePeriodic( self, chemMatrixPointer, self.tempMatrix, chem.getDiffusionRate( ) )
 			breve.breveInternalFunctionFinder.matrix3DAddScaled( self, chemMatrixPointer, self.tempMatrix, 1.000000 )
 
 
@@ -48,7 +48,6 @@ class PatchToroid( breve.PatchGrid ):
 
 
 		return breve.breveInternalFunctionFinder.patchObjectAtIndex( self, self.gridPointer, xind, yind, zind )
-
 
 
 breve.PatchToroid = PatchToroid

@@ -41,9 +41,9 @@ Control : myController {
 		if blur > .992: blur = .992.
 		blur = 1.0.
 
+		self set-background-color to (0, 0, 0).
 		self enable-blur.
 		self set-blur-factor to blur.
-		self set-background-color to (0, 0, 0).
 
 		radius *= (image get-width) / 300.0.
 		vel *= (image get-width) / 300.0.

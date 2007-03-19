@@ -4,11 +4,11 @@ import breve
 class MultiBody( breve.Object ):
 	'''The MultiBody class is used to manipulate a group of connected OBJECT(Link) objects as a single logical body.  This means that  the entire group of links can be moved or otherwise manipulated using by referring to the MultiBody. <p> After the creating and connecting of the links is complete,  one of the OBJECT(Link) objects must be declared the root of  the MultiBody using the METHOD(set-root) method.  '''
 
-	__slots__ = [ 'menus', 'multibodyPointer', 'rootLink', 'selfCollisions', ]
+	__slots__ = [ 'menus', 'multibodyPointer', 'rootLink', 'selfCollisions' ]
 
 	def __init__( self ):
 		breve.Object.__init__( self )
-		self.menus = []
+		self.menus = breve.objectList()
 		self.multibodyPointer = None
 		self.rootLink = None
 		self.selfCollisions = 0
@@ -24,24 +24,21 @@ class MultiBody( breve.Object ):
 		self.menus.append( newMenu )
 		return newMenu
 
-
 	def addMenuSeparator( self ):
 		'''Adds a separator menu item--really just an empty menu item.'''
 
 		newMenu = None
 
-		newMenu = breve.createInstances( breve.MenuItem, 1 ).createMenu( '''''', self, '''''' )
+		newMenu = breve.createInstances( breve.MenuItem, 1 ).createMenu( '', self, '' )
 		self.addDependency( newMenu )
 		self.menus.append( newMenu )
 		return newMenu
-
 
 	def checkSelfPenetration( self ):
 		'''Checks to see if this MultiBody is colliding with itself.   This method is useful when a MultiBody is first built  to determine whether the "native" configuration of the body  is valid or not.  If the body is in a conflicting configuration  when it's first built, it may lead to unexpected behaviors as the body attempts to correct itself.'''
 
 
 		return breve.breveInternalFunctionFinder.multibodyCheckSelfPenetration( self, self.multibodyPointer )
-
 
 	def dearchive( self ):
 		''''''
@@ -51,7 +48,6 @@ class MultiBody( breve.Object ):
 		self.setRoot( self.rootLink )
 		breve.breveInternalFunctionFinder.multibodySetHandleSelfCollisions( self, self.multibodyPointer, self.selfCollisions )
 		return 1
-
 
 	def destroy( self ):
 		''''''
@@ -84,19 +80,18 @@ class MultiBody( breve.Object ):
 	def getAllConnectedLinks( self ):
 		'''Returns all of the OBJECT(Link) objects which comprise the  MultiBody.'''
 
-		links = []
-		allObjects = []
+		links = breve.objectList()
+		allObjects = breve.objectList()
 		link = None
 
 		allObjects = self.getAllConnectedObjects()
 		for link in allObjects:
-			if link.isA( '''Link''' ):
+			if link.isA( 'Link' ):
 				links.append( link )
 
 
 
 		return links
-
 
 	def getAllConnectedObjects( self ):
 		'''Returns all of the OBJECT(Link) and OBJECT(Joint) objects which comprise this MultiBody.'''
@@ -104,13 +99,11 @@ class MultiBody( breve.Object ):
 
 		return breve.breveInternalFunctionFinder.multibodyAllObjects( self, self.multibodyPointer )
 
-
 	def getLocation( self ):
 		'''Returns the location of the root link of the multibody.'''
 
 
 		return self.rootLink.getLocation()
-
 
 	def getMultibodyPointer( self ):
 		'''Used internally.'''
@@ -118,13 +111,11 @@ class MultiBody( breve.Object ):
 
 		return self.multibodyPointer
 
-
 	def getRoot( self ):
 		'''Returns the root link.'''
 
 
 		return self.rootLink
-
 
 	def hideAxis( self ):
 		'''Disables the axis for all connected links.'''
@@ -170,7 +161,6 @@ class MultiBody( breve.Object ):
 		if ( length == 0.000000 ):
 			return
 
-
 		thisAxis = ( thisAxis / length )
 		breve.breveInternalFunctionFinder.multibodySetRotation( self, self.multibodyPointer, thisAxis, amount )
 
@@ -195,14 +185,12 @@ class MultiBody( breve.Object ):
 			return
 
 
-
 		self.addDependency( self.rootLink )
 		breve.breveInternalFunctionFinder.multibodySetRoot( self, self.multibodyPointer, root.getLinkPointer() )
 		if self.selfCollisions:
 			self.enableSelfCollisions()
 
 		return self
-
 
 	def setSelfCollisionParameters( self, erpValue, cfmValue ):
 		'''Sets two contact parameters which effect the hardness of intra-body contacts. <li> Currently experimental and for advanced users only.  See the ODE  user's manual for a description of these values and how they should be used.'''

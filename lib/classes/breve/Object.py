@@ -8,7 +8,7 @@ class Object( object ):
 
 	def __init__( self ):
 		if not ( 'breveInstance' in self.__dict__ ):
-			self.breveInstance = breve.breveInternal.addInstance( breve.breveInternal, self.__class__, self )
+			self.breveInstance = breve.addInstance( self.__class__, self )
 			self.breveModule = breve.breveInternal
 			self.controller = breve.breveInternalFunctionFinder.getController( self )
 
@@ -71,6 +71,8 @@ class Object( object ):
 	def destroy( self ):
 		'''Automatically called when this object is freed.  This method should never be called manually.  If subclasses need to free objects or data, they should implement their own "destroy"  methods.'''
 
+	def delete( self ):
+		'''Automatically called when this object is freed.  This method should never be called manually.  If subclasses need to free objects or data, they should implement their own "destroy"  methods.'''
 
 	def getAge( self ):
 		'''Returns the number of seconds this object has existed in the  simulation.'''

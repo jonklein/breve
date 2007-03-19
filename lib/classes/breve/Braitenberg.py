@@ -4,7 +4,7 @@ import breve
 class BraitenbergControl( breve.PhysicalControl ):
 	'''This class is used for building simple Braitenberg vehicle  simulations.  To create a Braitenberg vehicle simulation,  subclass BraitenbergControl and use the init method to  create OBJECT(BraitenbergLight) and  OBJECT(BraitenbergVehicle) objects.'''
 
-	__slots__ = [ 'cloudTexture', 'floor', 'floorShape', ]
+	__slots__ = [ 'cloudTexture', 'floor', 'floorShape' ]
 
 	def __init__( self ):
 		breve.PhysicalControl.__init__( self )
@@ -27,7 +27,7 @@ class BraitenbergControl( breve.PhysicalControl ):
 		self.pointCamera( breve.vector( 0, 0, 0 ), breve.vector( 3, 3, 24 ) )
 		self.enableShadows()
 		self.enableReflections()
-		self.cloudTexture = breve.createInstances( breve.Image, 1 ).load( '''images/clouds.png''' )
+		self.cloudTexture = breve.createInstances( breve.Image, 1 ).load( 'images/clouds.png' )
 		self.setBackgroundColor( breve.vector( 0.400000, 0.600000, 0.900000 ) )
 		self.setBackgroundTextureImage( self.cloudTexture )
 
@@ -36,16 +36,16 @@ breve.BraitenbergControl = BraitenbergControl
 class BraitenbergVehicle( breve.MultiBody ):
 	'''This object is used in conjunction with OBJECT(BraitenbergControl) to create simple Braitenberg vehicles.'''
 
-	__slots__ = [ 'bodyLink', 'bodyShape', 'sensorShape', 'sensors', 'wheelShape', 'wheels', ]
+	__slots__ = [ 'bodyLink', 'bodyShape', 'sensorShape', 'sensors', 'wheelShape', 'wheels' ]
 
 	def __init__( self ):
 		breve.MultiBody.__init__( self )
 		self.bodyLink = None
 		self.bodyShape = None
 		self.sensorShape = None
-		self.sensors = []
+		self.sensors = breve.objectList()
 		self.wheelShape = None
-		self.wheels = []
+		self.wheels = breve.objectList()
 		BraitenbergVehicle.init( self )
 
 	def addSensor( self, location ):
@@ -65,7 +65,6 @@ class BraitenbergVehicle( breve.MultiBody ):
 		sensor.setColor( breve.vector( 0, 0, 0 ) )
 		self.sensors.append( sensor )
 		return sensor
-
 
 	def addWheel( self, location ):
 		'''Adds a wheel at location on the vehicle.  This method returns the wheel which is created, a OBJECT(BraitenbergWheel).  You'll use the returned object to connect it to the vehicle's sensors.'''
@@ -89,7 +88,6 @@ class BraitenbergVehicle( breve.MultiBody ):
 		self.wheels.append( wheel )
 		return wheel
 
-
 	def destroy( self ):
 		''''''
 
@@ -97,7 +95,7 @@ class BraitenbergVehicle( breve.MultiBody ):
 		breve.deleteInstances( self.sensorShape )
 		breve.deleteInstances( self.wheelShape )
 		breve.deleteInstances( self.bodyShape )
-		breve.MultiBody.destroy( self,)
+		breve.MultiBody.destroy( self )
 
 	def getDensity( self ):
 		''''''
@@ -105,20 +103,17 @@ class BraitenbergVehicle( breve.MultiBody ):
 
 		return 1.000000
 
-
 	def getWheelRadius( self ):
 		''''''
 
 
 		return 0.600000
 
-
 	def getWheelWidth( self ):
 		''''''
 
 
 		return 0.100000
-
 
 	def init( self ):
 		''''''
@@ -144,7 +139,7 @@ breve.BraitenbergVehicle = BraitenbergVehicle
 class BraitenbergHeavyVehicle( breve.BraitenbergVehicle ):
 	'''A heavy duty version of OBJECT(BraitenbergVehicle), this vehicle is heavier and harder to control, but more stable at higher  speeds.'''
 
-	__slots__ = [ ]
+	__slots__ = [  ]
 
 	def __init__( self ):
 		breve.BraitenbergVehicle.__init__( self )
@@ -155,13 +150,11 @@ class BraitenbergHeavyVehicle( breve.BraitenbergVehicle ):
 
 		return 20.000000
 
-
 	def getWheelRadius( self ):
 		''''''
 
 
 		return 0.800000
-
 
 	def getWheelWidth( self ):
 		''''''
@@ -170,12 +163,11 @@ class BraitenbergHeavyVehicle( breve.BraitenbergVehicle ):
 		return 0.400000
 
 
-
 breve.BraitenbergHeavyVehicle = BraitenbergHeavyVehicle
 class BraitenbergLight( breve.Mobile ):
 	'''A BraitenbergLight is used in conjunction with OBJECT(BraitenbergControl) and OBJECT(BraitenbergVehicle).  It is what the OBJECT(BraitenbergSensor) objects on the BraitenbergVehicle detect. <p> There are no special behaviors associated with the lights--they're  basically just plain OBJECT(Mobile) objects.'''
 
-	__slots__ = [ ]
+	__slots__ = [  ]
 
 	def __init__( self ):
 		breve.Mobile.__init__( self )
@@ -193,7 +185,7 @@ breve.BraitenbergLight = BraitenbergLight
 class BraitenbergWheel( breve.Link ):
 	'''A BraitenbergWheel is used in conjunction with OBJECT(BraitenbergVehicle) to build Braitenberg vehicles.  This class is typically not instantiated manually, since OBJECT(BraitenbergVehicle) creates one for you when you add a wheel to the vehicle. <p> <b>NOTE: this class is included as part of the file "Braitenberg.tz".</b>'''
 
-	__slots__ = [ 'joint', 'naturalVelocity', 'newVelocity', 'oldVelocity', ]
+	__slots__ = [ 'joint', 'naturalVelocity', 'newVelocity', 'oldVelocity' ]
 
 	def __init__( self ):
 		breve.Link.__init__( self )
@@ -251,7 +243,7 @@ breve.BraitenbergWheel = BraitenbergWheel
 class BraitenbergSensor( breve.Link ):
 	'''A BraitenbergSensor is used in conjunction with OBJECT(BraitenbergVehicle) to build Braitenberg vehicles.  This class is typically not instantiated manually, since OBJECT(BraitenbergVehicle) creates one for you when you add a sensor to the vehicle. <p> <b>NOTE: this class is included as part of the file "Braitenberg.tz".</b>'''
 
-	__slots__ = [ 'activationMethod', 'activationObject', 'bias', 'direction', 'sensorAngle', 'wheels', ]
+	__slots__ = [ 'activationMethod', 'activationObject', 'bias', 'direction', 'sensorAngle', 'wheels' ]
 
 	def __init__( self ):
 		breve.Link.__init__( self )
@@ -260,7 +252,7 @@ class BraitenbergSensor( breve.Link ):
 		self.bias = 0
 		self.direction = breve.vector()
 		self.sensorAngle = 0
-		self.wheels = []
+		self.wheels = breve.objectList()
 		BraitenbergSensor.init( self )
 
 	def init( self ):
@@ -283,7 +275,7 @@ class BraitenbergSensor( breve.Link ):
 		toLight = breve.vector()
 
 		transDir = ( self.getRotation() * self.direction )
-		for i in breve.allInstances( "breve.BraitenbergLights" ):
+		for i in breve.allInstances( "BraitenbergLights" ):
 			toLight = ( i.getLocation() - self.getLocation() )
 			angle = breve.breveInternalFunctionFinder.angle( self, toLight, transDir )
 			if ( angle < self.sensorAngle ):

@@ -255,13 +255,14 @@ DLLEXPORT void brEngineRegisterObjectType(brEngine *, brObjectType * );
 DLLEXPORT brMethod *brMethodFind( brObject *inObject, const char *inName, unsigned char *inTypes, int inArgCount );
 DLLEXPORT brMethod *brMethodFindWithArgRange( brObject *inObject, const char *inName, unsigned char *inTypes, int inMinArgs, int inMaxArgs );
 
-DLLEXPORT brObject *brObjectFind(brEngine *, const char *);
-DLLEXPORT brObject *brUnknownObjectFind(brEngine *, const char *);
+DLLEXPORT brObject *brObjectFind( brEngine *inEngine, const char *inType );
+DLLEXPORT brObject *brObjectFindWithTypeSignature( brEngine *inEngine, const char *inType, int inSignature );
+DLLEXPORT brObject *brUnknownObjectFind( brEngine *inEngine, const char *inType );
 
 // functions for getting user data
 
-DLLEXPORT void *brInstanceGetUserData(brInstance *);
-DLLEXPORT void *brObjectGetUserData(brInstance *);
+DLLEXPORT void *brInstanceGetUserData( brInstance *inInstance );
+DLLEXPORT void *brObjectGetUserData( brObject *inObject );
 
 // functions for calling methods with breve instances
 

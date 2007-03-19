@@ -4,7 +4,7 @@ import breve
 class GeneticAlgorithm( breve.Object ):
 	'''The GeneticAlgorithm class allows you to set up a genetic algorithm,  in which strategies can be evolved to solve a wide variety of problems. <P> To run a genetic algorithm, you will need to a create custom subclass of this object, GeneticAlgorithm, and of its companion object  OBJECT(GeneticProgrammingIndividual). <P> Your subclass of GeneticAlgorithm must implement two important methods:	 METHOD(start-fitness-test) and METHOD(end-fitness-test).  These methods are automatically called at the beginning and end of the fitness tests	 respectively.'''
 
-	__slots__ = [ 'bestFitness', 'crossoverPercent', 'currentIndividual', 'currentPopulation', 'generation', 'generationLimit', 'individualClass', 'migrationHosts', 'migrationPercent', 'migrationPort', 'migrationServer', 'mutationPercent', 'populationSize', 'populations', 'randomizePercent', 'seed', 'spatialRadius', 'testDuration', 'tournamentSize', 'transferIn', 'transferOut', ]
+	__slots__ = [ 'bestFitness', 'crossoverPercent', 'currentIndividual', 'currentPopulation', 'generation', 'generationLimit', 'individualClass', 'migrationHosts', 'migrationPercent', 'migrationPort', 'migrationServer', 'mutationPercent', 'populationSize', 'populations', 'randomizePercent', 'seed', 'spatialRadius', 'testDuration', 'tournamentSize', 'transferIn', 'transferOut' ]
 
 	def __init__( self ):
 		breve.Object.__init__( self )
@@ -15,13 +15,13 @@ class GeneticAlgorithm( breve.Object ):
 		self.generation = 0
 		self.generationLimit = 0
 		self.individualClass = ''
-		self.migrationHosts = []
+		self.migrationHosts = breve.objectList()
 		self.migrationPercent = 0
 		self.migrationPort = 0
 		self.migrationServer = None
 		self.mutationPercent = 0
 		self.populationSize = 0
-		self.populations = []
+		self.populations = breve.objectList()
 		self.randomizePercent = 0
 		self.seed = None
 		self.spatialRadius = 0
@@ -46,7 +46,6 @@ class GeneticAlgorithm( breve.Object ):
 		self.switchIndividual()
 		return 1
 
-
 	def endFitnessTest( self, individual ):
 		'''In this method, you should perform any cleanup neccessary when the  fitness test ends.  You should also make sure that the individual's fitness value is set using  OBJECTMETHOD(GeneticAlgorithmIndividual:set-fitness).'''
 
@@ -70,12 +69,22 @@ class GeneticAlgorithm( breve.Object ):
 		if self.populations[ 1 ]:
 			breve.deleteInstances( self.populations[ 1 ] )
 
-		if ( self.individualClass == '''''' ):
+		if ( self.individualClass == '' ):
 			raise Exception( '''A GeneticAlgorithmIndividual subclass must be specified using the method "set-individual-class"''' )
 
 
 		self.populations = [ [], [] ]
-		
+		n = 0
+		while ( n < self.populationSize ):
+			newI = self.controller.makeNewInstance( self.individualClass )
+			self.populations[ 0 ].append( newI )
+			self.addDependency( newI )
+			newI = self.controller.makeNewInstance( self.individualClass )
+			self.populations[ 1 ].append( newI )
+			self.addDependency( newI )
+
+			n = ( n + 1 )
+
 		if self.seed:
 			self.populations[ 0 ][ 0 ].copy( self.seed )
 
@@ -88,13 +97,11 @@ class GeneticAlgorithm( breve.Object ):
 
 		return self.bestFitness
 
-
 	def getCrossoverPercent( self ):
 		'''Returns the probability of crossover during reproduction.'''
 
 
 		return self.crossoverPercent
-
 
 	def getCurrentIndividual( self ):
 		'''Returns the current GeneticAlgorithmIndividual subclass instance being evaluated. See also METHOD(get-current-individual-index).'''
@@ -106,9 +113,7 @@ class GeneticAlgorithm( breve.Object ):
 		if ( self.currentIndividual == -1 ):
 			return 0
 
-
 		return self.populations[ self.currentPopulation ][ self.currentIndividual ]
-
 
 	def getCurrentIndividualIndex( self ):
 		'''Returns the index of the individual currently being tested.  Returns -1 before any fitness tests have been run. See also METHOD(get-current-individual).'''
@@ -116,13 +121,11 @@ class GeneticAlgorithm( breve.Object ):
 
 		return self.currentIndividual
 
-
 	def getFitnessTestDuration( self ):
 		'''Returns the duration of a single fitness test.  This value can be set with the method METHOD(set-test-duration).  The default value is 20.'''
 
 
 		return self.testDuration
-
 
 	def getGeneration( self ):
 		'''Returns the current generation.  The generation count begins at 0.'''
@@ -130,13 +133,11 @@ class GeneticAlgorithm( breve.Object ):
 
 		return self.generation
 
-
 	def getGenerationLimit( self ):
 		'''Returns the generation limit.  See METHOD(get-generation-limit) for  details.'''
 
 
 		return self.generationLimit
-
 
 	def getMigrationPercent( self ):
 		''''''
@@ -144,13 +145,11 @@ class GeneticAlgorithm( breve.Object ):
 
 		return self.migrationPercent
 
-
 	def getMutationPercent( self ):
 		'''Returns the percent probability of mutation during reproduction. The default value is 75%.'''
 
 
 		return self.mutationPercent
-
 
 	def getPopulationSize( self ):
 		'''Returns the size of the population.  The default value is 30, and can be set with METHOD(set-population-size).'''
@@ -158,13 +157,11 @@ class GeneticAlgorithm( breve.Object ):
 
 		return self.populationSize
 
-
 	def getRandomizePercent( self ):
 		'''Returns the percent probability of a new random individual during reproduction. The default value is 5%.'''
 
 
 		return self.randomizePercent
-
 
 	def getSpatialRadius( self ):
 		''''''
@@ -172,13 +169,11 @@ class GeneticAlgorithm( breve.Object ):
 
 		return self.spatialRadius
 
-
 	def getTournamentSize( self ):
 		'''Returns the tournament size.  The tournament size specifies how many individuals are considered in a single selection "tournament". The larger the tournament size, the more competative selection becomes. The tournament size can be set with METHOD(set-tournament-size). The default value is 5.  '''
 
 
 		return self.tournamentSize
-
 
 	def init( self ):
 		''''''
@@ -233,18 +228,71 @@ class GeneticAlgorithm( breve.Object ):
 
 		if ( breve.length( self.populations[ ( not self.currentPopulation ) ] ) != self.populationSize ):
 			breve.deleteInstances( self.populations[ ( not self.currentPopulation ) ] )
-			self.populations[ ( not self.currentPopulation ) ] = breve.createInstances( self.individualClass, self.populationSize )
+			self.populations[ ( not self.currentPopulation ) ] = breve.createInstances( breve.individualClass, self.populationSize )
 
 
 		best = 0
-		
+		i = 0
+		while ( i < breve.length( self.populations[ self.currentPopulation ] ) ):
+			fitness = self.populations[ self.currentPopulation ][ i ].getFitness()
+			if ( fitness > self.populations[ self.currentPopulation ][ best ].getFitness() ):
+				best = i
+
+			totalFitness = ( totalFitness + fitness )
+
+			i = ( i + 1 )
+
 		totalFitness = ( totalFitness / breve.length( self.populations[ self.currentPopulation ] ) )
 		self.generation = ( self.generation + 1 )
 		self.report( self.generation, self.populations[ self.currentPopulation ][ best ], totalFitness )
-		
+		i = 0
+		while ( i < self.populationSize ):
+			r = breve.randomExpression( 100 )
+			if ( r < self.mutationPercent ):
+				self.populations[ ( not self.currentPopulation ) ][ i ].copy( self.tournamentSelect( i ) )
+				self.populations[ ( not self.currentPopulation ) ][ i ].mutate()
+
+			else:
+				if ( r < ( self.mutationPercent + self.crossoverPercent ) ):
+					self.populations[ ( not self.currentPopulation ) ][ i ].crossover( self.tournamentSelect( i ), self.tournamentSelect( i ) )
+
+				else:
+					if ( r < ( ( self.mutationPercent + self.crossoverPercent ) + self.randomizePercent ) ):
+						self.populations[ ( not self.currentPopulation ) ][ i ].randomize()
+
+					else:
+						if ( r < ( ( ( self.mutationPercent + self.crossoverPercent ) + self.randomizePercent ) + self.migrationPercent ) ):
+							if self.transferIn:
+								if self.transferIn.getIndividual( i ):
+									ind = self.transferIn.getIndividual( i )
+								else:
+									ind = self.tournamentSelect( i )
+
+
+							else:
+								ind = self.tournamentSelect( i )
+
+
+							self.populations[ ( not self.currentPopulation ) ][ i ].copy( ind )
+
+						else:
+							ind = self.tournamentSelect( i )
+							self.populations[ ( not self.currentPopulation ) ][ i ].copy( ind )
+
+
+
+
+
+
+			i = ( i + 1 )
+
 		if ( breve.length( self.migrationHosts ) != 0 ):
 			self.transferOut.clear()
-			
+			n = 0
+			while ( n < ( self.populationSize * ( self.migrationPercent / 100.000000 ) ) ):
+				self.transferOut.add( self.tournamentSelect( n ) )
+				n = ( n + 1 )
+
 			recipientHost = self.migrationHosts[ breve.randomExpression( ( breve.length( self.migrationHosts ) - 1 ) ) ]
 			self.transferOut.sendOverNetwork( recipientHost, 59142 )
 
@@ -359,9 +407,23 @@ class GeneticAlgorithm( breve.Object ):
 		if ( best < 0 ):
 			best = ( best + self.populationSize )
 
-		
-		return self.populations[ self.currentPopulation ][ best ]
+		n = 0
+		while ( n < ( self.tournamentSize - 1 ) ):
+			test = ( index + ( breve.randomExpression( ( ( 2 * self.spatialRadius ) - 1 ) ) - self.spatialRadius ) )
+			if ( test >= self.populationSize ):
+				test = ( test - self.populationSize )
 
+			if ( test < 0 ):
+				test = ( test + self.populationSize )
+
+			if ( self.populations[ self.currentPopulation ][ test ].getFitness() > self.populations[ self.currentPopulation ][ best ].getFitness() ):
+				best = test
+
+
+
+			n = ( n + 1 )
+
+		return self.populations[ self.currentPopulation ][ best ]
 
 	def startFitnessTest( self, individual ):
 		'''Implement this method to perform any setup necessary when the  fitness test begins.'''
@@ -386,7 +448,7 @@ class GeneticAlgorithm( breve.Object ):
 
 
 		self.startFitnessTest( self.populations[ self.currentPopulation ][ self.currentIndividual ] )
-		self.schedule( '''switchIndividual''', ( self.controller.getTime() + self.testDuration ) )
+		self.schedule( 'switchIndividual', ( self.controller.getTime() + self.testDuration ) )
 
 	def tournamentSelect( self, i ):
 		''''''
@@ -394,10 +456,8 @@ class GeneticAlgorithm( breve.Object ):
 
 		if ( self.spatialRadius == 0 ):
 			return self.tournamentSelect()
-
 		else:
 			return self.spatialTournamentSelect( i )
-
 
 
 	def tournamentSelect( self ):
@@ -408,16 +468,24 @@ class GeneticAlgorithm( breve.Object ):
 		best = 0
 
 		best = breve.randomExpression( ( breve.length( self.populations[ self.currentPopulation ] ) - 1 ) )
-		
-		return self.populations[ self.currentPopulation ][ best ]
+		n = 0
+		while ( n < ( self.tournamentSize - 1 ) ):
+			test = breve.randomExpression( ( breve.length( self.populations[ self.currentPopulation ] ) - 1 ) )
+			if ( self.populations[ self.currentPopulation ][ test ].getFitness() > self.populations[ self.currentPopulation ][ best ].getFitness() ):
+				best = test
 
+
+
+			n = ( n + 1 )
+
+		return self.populations[ self.currentPopulation ][ best ]
 
 
 breve.GeneticAlgorithm = GeneticAlgorithm
 class GeneticAlgorithmIndividual( breve.Object ):
 	'''This object represents a single individual in a OBJECT(GeneticAlgorithm). To use the class OBJECT(GeneticAlgorithm), you must also implement a  custom subclass of this class.  Your custom subclass should contain the variables which will represent the genes for the genetic algorithm, and must also implement a few methods used for genetic operators. <P> At a very minimum, you must implement your own versions of the methods METHOD(compute-fitness), METHOD(copy) and METHOD(mutate).  If you intend  to use the crossover  genetic operator, you must also implement the method METHOD(crossover). If these methods are not implemented by your subclass, the object will trigger a runtime error.'''
 
-	__slots__ = [ 'fitness', ]
+	__slots__ = [ 'fitness' ]
 
 	def __init__( self ):
 		breve.Object.__init__( self )
@@ -443,7 +511,6 @@ class GeneticAlgorithmIndividual( breve.Object ):
 
 
 		return self.fitness
-
 
 	def init( self ):
 		''''''
@@ -475,11 +542,11 @@ breve.GeneticAlgorithmIndividual = GeneticAlgorithmIndividual
 class GAIndividualTransporter( breve.Object ):
 	''''''
 
-	__slots__ = [ 'individuals', ]
+	__slots__ = [ 'individuals' ]
 
 	def __init__( self ):
 		breve.Object.__init__( self )
-		self.individuals = []
+		self.individuals = breve.objectList()
 
 	def add( self, i ):
 		''''''
@@ -499,7 +566,6 @@ class GAIndividualTransporter( breve.Object ):
 
 		if ( n < breve.length( self.individuals ) ):
 			return self.individuals[ n ]
-
 
 
 

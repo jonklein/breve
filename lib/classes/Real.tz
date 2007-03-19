@@ -9,7 +9,7 @@ Object : Real (aka Reals) [version 2.1] {
 	% with any of the child classes.
 
 	+ variables:
-		objectShape (object).
+		displayShape, collisionShape (object).
 		realWorldPointer (pointer).
 		collisionHandlerList (list).
 		texture (int).
@@ -56,19 +56,46 @@ Object : Real (aka Reals) [version 2.1] {
 
 		realSetLocation(realWorldPointer, newLocation).
 
-	+ to set-rotation to theRotation (matrix):
+	+ to set-rotation-matrix to theRotation (matrix):
 		% Sets the rotation of this object to the rotation matrix theRotation.
 		% Working with matrices can be complicated, so a more simple
 		% approach is to use METHOD(rotate).
 
 		realSetRotationMatrix(realWorldPointer, theRotation).
 
+	+ to set-rotation-euler-angles to angles (vector):
+		% Sets the rotation of this object to the Euler angles specified
+		% by angles (in radians).
+
+		m (matrix).
+		r00, r01, r02, r10, r11, r12, r20, r21, r22 (double).
+
+		r00 = cos(angles::z)*cos(angles::x) - cos(angles::y)*sin(angles::x)*sin(angles::z).
+		r01 = cos(angles::z)*sin(angles::x) + cos(angles::y)*cos(angles::x)*sin(angles::z).
+		r02 = sin(angles::z)*cos(angles::y).
+
+		r10 = -sin(angles::z)*cos(angles::x) - cos(angles::y)*sin(angles::x)*cos(angles::z).
+		r11 = -sin(angles::z)*sin(angles::x) + cos(angles::y)*cos(angles::x)*cos(angles::z).
+		r12 = cos(angles::z)*sin(angles::y).
+
+		r20 = sin(angles::y)*sin(angles::x).
+		r21 = -sin(angles::y)*cos(angles::x).
+		r22 = cos(angles::y).
+
+		m = [ ( r00, r01, r02 ), ( r10, r11, r12 ), ( r20, r21, r22 ) ].
+
+		self set-rotation-matrix to m.
+
 	+ to get-location:
 		% Returns the vector location of this object. 
 
 		return realGetLocation( realWorldPointer ).
 
-	+ to get-rotation:
+	- to get-rotation:
+		% Deprecated
+		return realGetRotation( realWorldPointer ).
+
+	+ to get-rotation-matrix:
 		% Returns the matrix rotation of this object. 
 
 		return realGetRotation( realWorldPointer ).
@@ -91,6 +118,30 @@ Object : Real (aka Reals) [version 2.1] {
 
 		realSetRotation(realWorldPointer, thisAxis, amount).
 
+	+ to point vertex theVertex (vector) at theLocation (vector):
+		% An easier way to rotate an object--this function rotates
+		% an object such that the local point theVertex, points towards
+		% the world direction theLocation.  In other words, theLocation
+		% is where you want the object to face, and theVertex indicates
+		% which side of the object is to be considered the "front".
+
+		v (vector).
+		a (float).
+
+		if | theVertex | == 0.0 || | theLocation | == 0.0:
+			return.
+
+		v = cross(theVertex, theLocation).
+		a = angle(theVertex, theLocation).
+
+		if |v| == 0.0: {
+			self rotate around-axis theVertex by 0.01.
+			return.
+		}
+
+		self rotate around-axis v by a.
+
+
 + section "Setting the Shape of a Real Object"
 	+ to set-shape to theShape (object):
 		% Sets the shape of this object, for both display and collision detection purposes.  To
@@ -105,14 +156,14 @@ Object : Real (aka Reals) [version 2.1] {
 		% will not be displayed for this object unless METHOD(set-display-shape) is also called
 		% with this shape.  Returns this object.
 
-		if !(theShape get-pointer): 
+		if !theShape || !(theShape get-pointer): 
 			die "attempt to register Mobile object with uninitialized shape ($theShape)".
 
-		if objectShape: 
-			self remove-dependency on objectShape.
+		if collisionShape: 
+			self remove-dependency on collisionShape.
 
-		objectShape = theShape.
-		self add-dependency on objectShape.
+		collisionShape = theShape.
+		self add-dependency on collisionShape.
 
 		realSetShape( realWorldPointer, (theShape get-pointer) ).
 
@@ -123,23 +174,32 @@ Object : Real (aka Reals) [version 2.1] {
 		% This shape will not be used for collision detection unless it is passed to 
 		% METHOD(set-collision-shape) as well.  Returns this object.
 
-		if !(theShape get-pointer): 
+		if !theShape || !(theShape get-pointer): 
 			die "attempt to register Mobile object with uninitialized shape ($theShape)".
 
-		if objectShape: 
-			self remove-dependency on objectShape.
+		if displayShape: 
+			self remove-dependency on displayShape.
 
-		objectShape = theShape.
-		self add-dependency on objectShape.
+		displayShape = theShape.
+		self add-dependency on displayShape.
 
 		realSetDisplayShape( realWorldPointer, (theShape get-pointer) ).
 
 		return self.
 
-	+ to get-shape:
-		% Returns the OBJECT(Shape) associated with this Mobile object.
+	- to get-shape:
+		% Deprecated 
+		return collisionShape.
 
-		return objectShape.
+	+ to get-display-shape:
+		% Returns the OBJECT(Shape) used for display associated with this Mobile object.
+
+		return displayShape.
+
+	+ to get-collision-shape:
+		% Returns the OBJECT(Shape) used for collisions associated with this Mobile object.
+
+		return collisionShape.
 
 	+ to watch:
 		% Makes the camera follow this object.
@@ -155,10 +215,10 @@ Object : Real (aka Reals) [version 2.1] {
 		result (int).
 
 		result = (controller show-dialog 
-					 with-title "Really Delete Instance?"
-					 with-message "Deleting this object may cause a fatal error in the simulation.  Really remove it?"
-					 with-yes-button "Okay"
-					 with-no-button "Cancel").
+			 with-title "Really Delete Instance?"
+			 with-message "Deleting this object may cause a fatal error in the simulation.  Really remove it?"
+			 with-yes-button "Okay"
+			 with-no-button "Cancel").
 
 		if result: free self.
 
@@ -272,7 +332,7 @@ Object : Real (aka Reals) [version 2.1] {
 		% The optional argument theStyle specifies a pattern for the line.  theStyle is a 
 		% string of 16 spaces and/or dashes which specify the line pattern to be drawn.
 		% A dotted line, for example, would use the pattern "- - - - - - - - ".  A thickly
-		% dashed line would use the pattern "--------        ".  If no style is given, a 
+		% dashed line would use the pattern "--------		".  If no style is given, a 
 		% solid line is drawn. 
 		% <P>
 		% If a line to otherObject already exists, its color and/or style will be updated.
@@ -479,7 +539,7 @@ Object : Real (aka Reals) [version 2.1] {
 		realSetLightmap(realWorldPointer, lightmap + 1).
 
   + section "Getting the Light Exposure of this Mobile Object"
-        
+		
 	+ to get-light-exposure:
 		% When used in conjunction with light exposure detection
 		% (OBJECTMETHOD(Control:enable-light-exposure-detection)), this

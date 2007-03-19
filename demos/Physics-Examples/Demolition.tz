@@ -76,7 +76,7 @@ BraitenbergControl : BraitenbergDemolition {
 
 		blocks{ 9 } move to ( 65, 3.63,   0 ).
 
-		blocks set-rotation to [ ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) ].
+		blocks set-rotation-matrix to [ ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) ].
 
 		vehicle move to ( 0, .8, 0 ).
 

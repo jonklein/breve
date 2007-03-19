@@ -75,38 +75,22 @@ stObject *stObjectNew( brEngine *engine, stSteveData *sdata, char *name, char *a
 	return o;
 }
 
-/*!
-	\brief Instantiates a steve object and adds it to the breve engine.
-
-	This method also fills in the "breveInstance" pointer in the steve object.
-*/
+/** 
+ * Instantiates a steve object and adds it to the breve engine.
+ * This method also fills in the "breveInstance" pointer in the steve object.
+ */
 
 brInstance *stInstanceCreateAndRegister( stSteveData *sdata, brEngine *e, brObject *object ) {
-	stInstance *newi = NULL;
-	brInstance *bi;
-
-	bi = brObjectInstantiate( e, object, NULL, 0 );
-
-	if ( !bi ) return NULL;
-
-	if ( bi->object->type->_typeSignature == STEVE_TYPE_SIGNATURE ) {
-		newi = ( stInstance* )bi->userData;
-		newi->breveInstance = bi;
-
-		if ( stInstanceInit( newi ) != EC_OK ) return NULL;
-	}
-
-	return bi;
+	return brObjectInstantiate( e, object, NULL, 0 );
 }
 
-/*!
-	\brief Instantiate a steve object, but do NOT call the init methods.
-
-	This creates an sets up an stInstance, but does not call the init
-	method.  There are situations when calling functions need to have
-	a pointer to the instance before init is called, so initialization
-	is a seperate step.
-*/
+/**
+ * Instantiate a steve object, but do NOT call the init methods.
+ * This creates an sets up an stInstance, but does not call the init
+ * method.  There are situations when calling functions need to have
+ * a pointer to the instance before init is called, so initialization
+ * is a seperate step.
+ */
 
 stInstance *stInstanceNew( stObject *o ) {
 	stInstance *i;

@@ -61,7 +61,10 @@ double PyNumber_AS_DOUBLE( PyObject *inObject ) {
  * actually was taking up more time!
  */
 
-inline PyObject *PyObject_GetAttrStringSafe( PyObject *inObject, char *inString  ) {
+inline PyObject *PyObject_GetAttrStringSafe( PyObject *inObject, const char *inString  ) {
+	if( !inObject ) 
+		return NULL;
+
 	PyObject *result = PyObject_GetAttrString( inObject, inString );
 
 	if( !result )
@@ -398,7 +401,7 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 	Py_DECREF( engineObject );
 
 	// Adding the instance requires a brObject type.
-	// Figure out the brObject type for this instance.  We may need to create it ourselves.
+	// We may need to create it ourselves.
 
 	PyObject *breveTypeObject = PyObject_GetAttrString( typeObject, "breveObject" );
 
@@ -421,7 +424,10 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 
 		PyObject *pythonLanguageType = PyObject_GetAttrString( moduleObject, "breveObjectType" );
 
-		breveObject = brEngineAddObject( engine, (brObjectType*)PyCObject_AsVoidPtr( pythonLanguageType ), name, typeObject );
+		breveObject = brObjectFind( engine, name );
+
+		if( !breveObject )
+			breveObject = brEngineAddObject( engine, (brObjectType*)PyCObject_AsVoidPtr( pythonLanguageType ), name, typeObject );
 
 		PyObject_SetAttrString( typeObject, "breveObject", PyCObject_FromVoidPtr( breveObject, NULL ) );
 
@@ -539,6 +545,11 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 	brInstance *caller = ( brInstance* )PyCObject_AsVoidPtr( breveObject );
 
 	Py_DECREF( breveObject );
+
+	if( caller->status != AS_ACTIVE ) {
+		slMessage( DEBUG_ALL, "Warning: internal function called for freed instance %p\n", caller );
+		return NULL;
+	}
 
 	if( function->_argCount != 0 ) {
 
@@ -691,6 +702,38 @@ PyObject *brPythonCallBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 //  Python language frontend callbacks for the breveObjectType structure           //
 /////////////////////////////////////////////////////////////////////////////////////                                                  
 
+std::string brPyConvertSymbol( std::string &inValue ) {
+        std::string result; 
+        unsigned int n = 0, m = 0;
+        bool upper = false;
+        
+        // Hardcode some troublesome symbols -- they're reserved keywords in Python, but not steve
+        
+        if( inValue == "is" )
+                return std::string( "isA" );
+        
+        if( inValue == "break" )
+                return std::string( "snap" ); // hehe, this is fun
+        
+        for( n = 0; n < inValue.size(); n++, m++ ) {
+                if( inValue[ n ] == '-' ) {
+                        m--;
+                        upper = true;
+                } else {
+                        
+                        if( upper ) {
+                                result += toupper( inValue[ n ] );
+                        } else {
+                                result += inValue[ n ];
+                        }
+                        
+                        upper = false;
+                }
+        }
+        
+        return result;
+}
+
 
 /**
  * A breveObjectType callback to locate a method in a Python object.
@@ -705,16 +748,18 @@ PyObject *brPythonCallBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 
 void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inTypes, int inCount ) {
 	PyObject *type = ( PyObject* )inObject;
-	char *name = strdup( inName );
 
+	std::string symbol = std::string( inName );
+	const char *name = brPyConvertSymbol( symbol ).c_str();
+
+	/*
 	// Translate steve to Python method names
 	for( unsigned int n = 0; n < strlen( name ); n++ ) {
 		if( name[ n ] == '-' ) name[ n ] = '_';
 	}
+	*/
 
 	PyObject *method = PyObject_GetAttrStringSafe( type, name );
-
-	free( name );
 
 	if ( !method ) {
 		return NULL;
@@ -749,9 +794,17 @@ void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inT
  */
 
 void *brPythonFindObject( void *inData, const char *inName ) {
-	PyObject *module = ( PyObject* )inData;
+	PyObject *mainModule = ( PyObject* )inData;
 
-	return PyObject_GetAttrStringSafe( module, (char*)inName );
+	PyObject *obj = PyObject_GetAttrStringSafe( mainModule, (char*)inName );
+
+	if( !obj ) {
+		PyObject *breveModule = PyObject_GetAttrString( mainModule, "breve" );
+	
+		obj = PyObject_GetAttrStringSafe( breveModule, (char*)inName );
+	}
+
+	return obj;
 }
 
 /**
@@ -833,7 +886,7 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 
 	PyObject *tuple;
 
-	if( count < 5 ) {
+	if( 0 && count < 5 ) {
 		tuple = tuples[ count ];
 	} else {
 		tuple = PyTuple_New( count + 1 );
@@ -852,7 +905,12 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 	// Set the self argument
 
 	Py_INCREF( instance );
-	PyTuple_SetItem( tuple, 0, instance );
+	int r = PyTuple_SetItem( tuple, 0, instance );
+
+	if( r != 0 ) {
+		PyErr_Print();
+		return EC_ERROR;
+	}
 
 	// Set the rest of the arguments
 
@@ -910,6 +968,8 @@ int brPythonCanLoad( void *inObjectData, const char *inExtension ) {
 int brPythonLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext ) {
 	int result = EC_OK;
 	FILE *fp = fopen( inFilename, "r" );
+
+	PyRun_SimpleString( "import breve" );
 
 	if( fp ) {
 
@@ -975,6 +1035,7 @@ void brPythonInit( brEngine *breveEngine ) {
 	PyObject_SetAttrString( internal, "breveEngine", PyCObject_FromVoidPtr( ( void* )breveEngine, NULL ) );
 	PyObject_SetAttrString( internal, "breveObjectType", PyCObject_FromVoidPtr( ( void* )brevePythonType, NULL ) );
 
+	// PyRun_SimpleString( "globals().clear()" );
 	PyRun_SimpleString( "import sys" );
 
 	std::string setpath, path;
@@ -1001,7 +1062,6 @@ void brPythonInit( brEngine *breveEngine ) {
 		PyRun_SimpleString( path );
 	}
 
-	PyRun_SimpleString( "import breve" );
 	brevePythonType->userData = ( void* )PyImport_ImportModule( "__main__" );
 
 	brevePythonType->findMethod 		= brPythonFindMethod;

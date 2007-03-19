@@ -69,11 +69,13 @@ std::string stPyConvertSymbol( std::string &inValue ) {
 	unsigned int n = 0, m = 0;
 	bool upper = false;
 
-	// Hard code this one troublesome symbol -- it's a reserved 
-	// keyword in Python, but not steve
+	// Hardcode some troublesome symbols -- they're reserved keywords in Python, but not steve
 
 	if( inValue == "is" )
 		return std::string( "isA" );
+
+	if( inValue == "break" )
+		return std::string( "snap" ); // hehe, this is fun
 
 	for( n = 0; n < inValue.size(); n++, m++ ) {
 		if( inValue[ n ] == '-' ) {
@@ -121,10 +123,13 @@ std::string stPyConvertObject( stObject *inObject ) {
 	for( vi = inObject->variables.begin(); vi != inObject->variables.end(); vi++ ) { 
 		stVar *var = vi->second;
 
-		result += "'" + var->name + "', ";
+		if( vi != inObject->variables.begin() )
+			result += ", ";
+
+		result += "'" + stPyConvertSymbol( var->name ) + "'";
 	}
 
-	result += "]\n\n";
+	result += " ]\n\n";
 
 	if( supername.size() != 0 ) {
 		ADDTABS( &conversionData, result );
@@ -194,7 +199,7 @@ std::string stPyConvertVariableDeclaration( stPyConversionData *inData, stVar *i
 			break;
 		case AT_ARRAY:
 		case AT_LIST:
-			result += " = []\n";
+			result += " = breve.objectList()\n";
 			break;
 		case AT_HASH:
 			result += " = {}\n";
@@ -376,7 +381,7 @@ std::string stWhileExp::toPython( stPyConversionData *inData ) {
 	result += code->toPython( inData ) + "\n";
 	inData->_indents--;
 
-	return std::string( "" );
+	return result;
 }
 
 std::string stAssignExp::toPython( stPyConversionData *inData ) {
@@ -476,7 +481,6 @@ std::string stMatrixExp::toPython( stPyConversionData *inData ) {
 
 std::string stMethodExp::toPython( stPyConversionData *inData ) {
 	std::string result;
-	std::vector< stKeyword > positioned;
 
 	result = objectExp->toPython( inData ) + "." + stPyConvertSymbol( methodName ) + "(";
 
@@ -492,9 +496,11 @@ std::string stMethodExp::toPython( stPyConversionData *inData ) {
 
 		if( n < arguments.size() - 1 )
 			result += ",";
+		else
+			result += " ";
 	}
 
-	result += " )";
+	result += ")";
 
 	return result;
 }
@@ -667,19 +673,33 @@ std::string stIfExp::toPython( stPyConversionData *inData ) {
 std::string stAllExp::toPython( stPyConversionData *inData ) {
 	std::string result;
 
-	result += "breve.allInstances( \"breve." + stPyConvertSymbol( name ) + "\" )";
+	result += "breve.allInstances( \"" + stPyConvertSymbol( name ) + "\" )";
 
 	return result;
 }
 
 std::string stForExp::toPython( stPyConversionData *inData ) {
 	std::string result;
+
+	result += assignment->toPython( inData ) + "\n";
+
 	ADDTABS( inData, result );
+	result += "while " + condition->toPython( inData ) + ":\n";
 
-	result = "for __i in range( 10 ):\n";
-	result += code->toPython( inData );
+	inData->_indents++;
 
-	return std::string( "" );
+	if( code->type != ET_CODE_ARRAY )
+		ADDTABS( inData, result );
+
+	result += code->toPython( inData ) + "\n";
+
+	ADDTABS( inData, result );
+	result += iteration->toPython( inData ) + "\n";
+
+	inData->_indents--;
+
+
+	return result;
 }
 
 std::string stEvalExp::toPython( stPyConversionData *inData ) {
@@ -765,18 +785,25 @@ std::string stLoadExp::toPython( stPyConversionData *inData ) {
 
 std::string stStringExp::toPython( stPyConversionData *inData ) {
 	std::string result, processed;
+	int n;
 
 	if( substrings.size() == 0 ) {
-		if( string.find( " " ) == std::string::npos ) {
+		if( string.find( "\'" ) == std::string::npos && string.find( " " ) == std::string::npos ) {
 			// Could it maybe be a method name -- we'll have to guess
-			return "'''" + stPyConvertSymbol( string ) + "'''";
+			return "'" + stPyConvertSymbol( string ) + "'";
 		}
 
 		return "'''" + string + "'''";
 	}
 
 	processed = string;
-	int n;
+
+	for( n = 0; n < processed.size(); n++ ) {
+		if( processed[ n ] == '%' ) {
+			processed.insert( n, std::string( "%" ) );
+			n++;
+		}
+	}
 
 	// go backwards through the string so that the offsets are maintained
 

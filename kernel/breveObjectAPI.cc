@@ -84,6 +84,28 @@ brMethod *brMethodFindWithArgRange( brObject *o, const char *name, unsigned char
 }
 
 /**
+ * \brief Finds an object in the given namespace with a given type signature.
+ */
+
+brObject *brObjectFindWithTypeSignature( brEngine *inEngine, const char *inType, int inSignature ) {
+	std::vector<brObjectType*>::iterator oi;
+
+	for ( oi = inEngine->objectTypes.begin(); oi != inEngine->objectTypes.end(); oi++ ) {
+		brObjectType *type = *oi;
+		void *pointer = NULL;
+
+		if ( type->findObject && type->_typeSignature == inSignature ) {
+			pointer = type->findObject( type->userData, inType );
+
+			if ( pointer ) 
+				return brEngineAddObject( inEngine, type, inType, pointer );
+		}
+	}
+
+	return NULL;
+}
+
+/**
  * \brief Finds an object in the given namespace
  *
  * Looks up an object in the engine's table of known objects.  If
@@ -95,7 +117,7 @@ brObject *brObjectFind( brEngine *e, const char *name ) {
 	brObject *object;
 	std::string names = name;
 
-	if ( ( object = e->objects[ names] ) ) return object;
+	if ( ( object = e->objects[ names ] ) ) return object;
 	if ( ( object = e->objectAliases[ names ] ) ) return object;
 
 	return brUnknownObjectFind( e, name );
@@ -283,7 +305,14 @@ brObject *brEngineAddObject( brEngine *e, brObjectType *t, const char *name, voi
 	brObject *o;
 	std::string names = name;
 
-	if ( !name || !t || !e ) return NULL;
+	if ( !name || !t || !e ) 
+		return NULL;
+
+	if( e->objects[ names ] ) {
+		slMessage( DEBUG_ALL, "Error adding object \"%s\" to engine: object redefined\n", name );
+		return NULL;
+	}
+		
 
 	o = new brObject;
 

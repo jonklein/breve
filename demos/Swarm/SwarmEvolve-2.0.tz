@@ -212,7 +212,7 @@ Control : Swarm {
         foreach feeder in feeders: {
             total = total + (feeder get-energy).
         }
-        total = total / feeders.
+        total = total / |feeders|.
         displayTotal = total * 100.
         self set-interface-item with-id 101 to-string "$displayTotal".
         foodAccum = foodAccum + total.
@@ -282,7 +282,7 @@ Control : Swarm {
         reproMutationRates = 0.0.
         discrepancies = 0.0.
         naturalBirths = 0.
-        corpseShape = (new PolygonCone init-with radius .06 sides 5 height .2).
+        corpseShape = (new PolygonCone init-with sides 5 height .2 radius 0.06).
         servos = 0.
 
         #self disable-freed-instance-protection.
@@ -332,7 +332,7 @@ Control : Swarm {
         numBirds (int).
         i, fCount, oCount (int).
 
-        numBirds = (all Birds).
+        numBirds = | (all Birds) |.
 
         # calculate average food depletion
         avgFood = foodAccum / EPOCH_LENGTH.
@@ -428,7 +428,7 @@ Control : Swarm {
         swarmCenter (vector).
         numBirds (int).
 
-        numBirds = (all Birds).
+        numBirds = | (all Birds) |.
 
         # Keep track of the iteration number.
         iteration = iteration + 1.
@@ -476,7 +476,7 @@ Control : Swarm {
     + to add-random-birds-if-necessary:
         numBirds (int).
 
-        numBirds = (all Birds).
+        numBirds = | (all Birds) |.
         if numBirds < MIN_BIRDS: {
             (new Bird) initialize-randomly.
             randomBirdsAdded += 1.
@@ -676,7 +676,7 @@ Mobile : Bird (aka Birds) {
 
     + to init:
         # register the object, set the initial location, velocity and color.
-        shape = (new PolygonCone init-with radius .1 sides 5 height .2).
+        shape = (new PolygonCone init-with sides 5 height .2 radius .1).
         self set-shape to shape.
 
         self handle-collisions with-type "Stationary" with-method "land".
@@ -696,53 +696,52 @@ Mobile : Bird (aka Birds) {
         pushInterpreter = new PushInterpreter.
         pushInterpreter read-config from-file "SwarmEvolve.config".
 
-        pushInterpreter add-instruction named "mutate" for-instance self for-method "mutate".
-        pushInterpreter add-instruction named "crossover" for-instance self for-method "crossover".
-        pushInterpreter add-instruction named "spawn" for-instance self for-method "spawn".
-        pushInterpreter add-instruction named "randI" for-instance self for-method "randI".
-        pushInterpreter add-instruction named "randF" for-instance self for-method "randF".
-        pushInterpreter add-instruction named "randV" for-instance self for-method "randV".
-        pushInterpreter add-instruction named "randC" for-instance self for-method "randC".
+        pushInterpreter add-instruction for-instance self for-method "mutate".
+        pushInterpreter add-instruction for-instance self for-method "crossover".
+        pushInterpreter add-instruction for-instance self for-method "spawn".
+        pushInterpreter add-instruction for-instance self for-method "randI".
+        pushInterpreter add-instruction for-instance self for-method "randF".
+        pushInterpreter add-instruction for-instance self for-method "randV".
+        pushInterpreter add-instruction for-instance self for-method "randC".
 
-        pushInterpreter add-instruction named "setServoSetpoint" for-instance self for-method "setServoSetpoint".
-        pushInterpreter add-instruction named "setServoGain" for-instance self for-method "setServoGain".
-        pushInterpreter add-instruction named "servo" for-instance self for-method "servo".
+        pushInterpreter add-instruction for-instance self for-method "setServoSetpoint".
+        pushInterpreter add-instruction for-instance self for-method "setServoGain".
+        pushInterpreter add-instruction for-instance self for-method "servo".
 
+        pushInterpreter add-instruction for-instance self for-method "toFood".
+        pushInterpreter add-instruction for-instance self for-method "foodIntensity".
 
-        pushInterpreter add-instruction named "toFood" for-instance self for-method "toFood".
-        pushInterpreter add-instruction named "foodIntensity" for-instance self for-method "foodIntensity".
+        pushInterpreter add-instruction for-instance self for-method "myAge".
+        pushInterpreter add-instruction for-instance self for-method "myEnergy".
+        pushInterpreter add-instruction for-instance self for-method "myHue".
+        pushInterpreter add-instruction for-instance self for-method "myVelocity".
+        pushInterpreter add-instruction for-instance self for-method "myLocation".
+        pushInterpreter add-instruction for-instance self for-method "myProgram".
 
-        pushInterpreter add-instruction named "myAge" for-instance self for-method "myAge".
-        pushInterpreter add-instruction named "myEnergy" for-instance self for-method "myEnergy".
-        pushInterpreter add-instruction named "myHue" for-instance self for-method "myHue".
-        pushInterpreter add-instruction named "myVelocity" for-instance self for-method "myVelocity".
-        pushInterpreter add-instruction named "myLocation" for-instance self for-method "myLocation".
-        pushInterpreter add-instruction named "myProgram" for-instance self for-method "myProgram".
+        pushInterpreter add-instruction for-instance self for-method "toFriend".     
+        pushInterpreter add-instruction for-instance self for-method "friendAge".
+        pushInterpreter add-instruction for-instance self for-method "friendEnergy".
+        pushInterpreter add-instruction for-instance self for-method "friendHue".
+        pushInterpreter add-instruction for-instance self for-method "friendVelocity".
+        pushInterpreter add-instruction for-instance self for-method "friendLocation".
+        pushInterpreter add-instruction for-instance self for-method "friendProgram".
+        pushInterpreter add-instruction for-instance self for-method "feedFriend".
 
-        pushInterpreter add-instruction named "toFriend" for-instance self for-method "toFriend".     
-        pushInterpreter add-instruction named "friendAge" for-instance self for-method "friendAge".
-        pushInterpreter add-instruction named "friendEnergy" for-instance self for-method "friendEnergy".
-        pushInterpreter add-instruction named "friendHue" for-instance self for-method "friendHue".
-        pushInterpreter add-instruction named "friendVelocity" for-instance self for-method "friendVelocity".
-        pushInterpreter add-instruction named "friendLocation" for-instance self for-method "friendLocation".
-        pushInterpreter add-instruction named "friendProgram" for-instance self for-method "friendProgram".
-        pushInterpreter add-instruction named "feedFriend" for-instance self for-method "feedFriend".
-
-        pushInterpreter add-instruction named "toOther" for-instance self for-method "toOther".           
-        pushInterpreter add-instruction named "otherAge" for-instance self for-method "otherAge".
-        pushInterpreter add-instruction named "otherEnergy" for-instance self for-method "otherEnergy".
-        pushInterpreter add-instruction named "otherHue" for-instance self for-method "otherHue".
-        pushInterpreter add-instruction named "otherVelocity" for-instance self for-method "otherVelocity".
-        pushInterpreter add-instruction named "otherLocation" for-instance self for-method "otherLocation".
-        pushInterpreter add-instruction named "otherProgram" for-instance self for-method "otherProgram".
-        pushInterpreter add-instruction named "feedOther" for-instance self for-method "feedOther".
+        pushInterpreter add-instruction for-instance self for-method "toOther".           
+        pushInterpreter add-instruction for-instance self for-method "otherAge".
+        pushInterpreter add-instruction for-instance self for-method "otherEnergy".
+        pushInterpreter add-instruction for-instance self for-method "otherHue".
+        pushInterpreter add-instruction for-instance self for-method "otherVelocity".
+        pushInterpreter add-instruction for-instance self for-method "otherLocation".
+        pushInterpreter add-instruction for-instance self for-method "otherProgram".
+        pushInterpreter add-instruction for-instance self for-method "feedOther".
 
         pushInterpreter set-evaluation-limit to PUSH_EXECUTION_LIMIT.
         pushInterpreter set-list-limit to MAX_CODE_SIZE.
         pushCode = new PushProgram.
 
     + to initialize-randomly:        
-        pushCode make-random-code max-length MAX_RANDOM_CODE_SIZE with-interpreter pushInterpreter.
+        pushCode make-random-code with-interpreter pushInterpreter max-length MAX_RANDOM_CODE_SIZE.
 
         self move to random[(10, 0, 10)] - (5, 3, 5).
         self set-velocity to (0, 0, 0).
@@ -911,7 +910,7 @@ Mobile : Bird (aka Birds) {
         if size > 0: {
             c = new PushProgram.
             pushInterpreter copy-code-stack-top to c.
-            c mutate with-max-new-code-size size with-interpreter pushInterpreter. 
+            c mutate with-interpreter pushInterpreter with-max-new-code-size size.
             pushInterpreter pop-integer-stack.
             pushInterpreter pop-code-stack.
             pushInterpreter push-code value c.
@@ -972,7 +971,7 @@ Mobile : Bird (aka Birds) {
             if mut-rate < 0: mut-rate = (- mut-rate).
             controller increment-reproMutationRates with mut-rate.
             if random[mut-rate] == 0: {
-                temp-code mutate with-max-new-code-size MAX_MUTATION_NEW_CODE_SIZE with-interpreter pushInterpreter.
+                temp-code mutate with-interpreter pushInterpreter with-max-new-code-size MAX_MUTATION_NEW_CODE_SIZE.
                 controller increment-reproMutations.
             }
             # controller increment-discrepancies by (temp-code compute-discrepancy from pushCode).
@@ -991,7 +990,7 @@ Mobile : Bird (aka Birds) {
         c (object).
         c = new PushProgram.
 
-        c make-random-code max-length MAX_RANDOM_CODE_SIZE with-interpreter pushInterpreter.
+        c make-random-code with-interpreter pushInterpreter max-length MAX_RANDOM_CODE_SIZE.
         pushInterpreter push-code value c.
         free(c).
 
@@ -1031,7 +1030,7 @@ Mobile : Bird (aka Birds) {
             }
         }
 
-        if others < 1: {
+        if | others | < 1: {
             closest-other = self.
         } else {
             closest-distance = 1000000.
@@ -1058,7 +1057,7 @@ Mobile : Bird (aka Birds) {
             }
         }
 
-        if friends < 1: {
+        if | friends | < 1: {
             closest-friend = self.
         } else {
             closest-distance = 1000000.

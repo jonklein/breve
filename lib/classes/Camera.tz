@@ -18,7 +18,9 @@ Abstract : Camera (aka Cameras) [version 2.4] {
 	- to set-camera-pointer to p (pointer):
 		% Used internally.
 
-		if !shared: cameraFree(cameraPointer).
+		if !shared: {
+			cameraFree( cameraPointer ).
+		}
 
 		cameraPointer = p.
 		shared = 1.
@@ -40,7 +42,7 @@ Abstract : Camera (aka Cameras) [version 2.4] {
 		% in the scene.  If speed is an issue, it is often best to disable
 		% both lighting and smooth drawing.
             
-        cameraSetDrawSmooth(cameraPointer, 1).
+		cameraSetDrawSmooth(cameraPointer, 1).
 
 	+ to disable-smooth-drawing:
 		% Disable smooth drawing for the main camera.  

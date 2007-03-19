@@ -4,7 +4,7 @@ import breve
 class IRSensor( breve.Real ):
 	''''''
 
-	__slots__ = [ 'communicationThreshold', 'draw', 'm_location', 'm_rotation', 'owner', 'realWorldPointer_owner', 'rel_position', 'rel_rotation', 'sensorType', 'sensordata', ]
+	__slots__ = [ 'communicationThreshold', 'draw', 'm_location', 'm_rotation', 'owner', 'realWorldPointer_owner', 'rel_position', 'rel_rotation', 'sensorType', 'sensordata' ]
 
 	def __init__( self ):
 		breve.Real.__init__( self )
@@ -29,9 +29,7 @@ class IRSensor( breve.Real ):
 			return 1
 
 
-
 		return 0
-
 
 	def getData( self ):
 		''''''
@@ -47,13 +45,11 @@ class IRSensor( breve.Real ):
 
 		return self.sensordata
 
-
 	def getLocation( self ):
 		''''''
 
 
 		return self.m_location
-
 
 	def getOwner( self ):
 		''''''
@@ -61,20 +57,17 @@ class IRSensor( breve.Real ):
 
 		return self.owner
 
-
 	def getRotation( self ):
 		''''''
 
 
 		return self.m_rotation
 
-
 	def getSensorType( self ):
 		''''''
 
 
 		return self.sensorType
-
 
 	def initWith( self, t, position, rotation, o ):
 		''''''
@@ -90,7 +83,6 @@ class IRSensor( breve.Real ):
 		self.updatePos()
 		self.communicationThreshold = 30.000000
 		return self
-
 
 	def iterate( self ):
 		''''''
@@ -109,14 +101,14 @@ class IRSensor( breve.Real ):
 		''''''
 
 		qtest = 0
-		agents = []
+		agents = breve.objectList()
 		i = None
 		col = 0
 
 		col = breve.randomExpression( 100 )
 		self.updatePos()
 		self.draw.clear()
-		agents = breve.allInstances( "breve.basicAgent" )
+		agents = breve.allInstances( "basicAgent" )
 		self.draw.setColor( breve.vector( 1, 0, 0 ) )
 		self.draw.drawLine( self.getLocation(), ( self.getLocation() + ( self.getRotation() * breve.vector( 0, 0, 27 ) ) ) )
 		for i in agents:

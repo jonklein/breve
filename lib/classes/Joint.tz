@@ -268,7 +268,11 @@ Abstract : Joint (aka Joints) [version 2.3] {
 
   + section "Breaking Joints"
 
-	+ to break:
+	- to break:
+		% Deprecated -- use break-joint.
+		self break-joint.
+
+	+ to break-joint:
 		% Breaks this joint--removes the child (and all of the links connected to it)
 		% from the body.  The child link (and its descendents) are therefore removed 
 		% from the world and placed in limbo.  They may be reconnected later by 
@@ -347,7 +351,7 @@ Abstract : Joint (aka Joints) [version 2.3] {
 		return jointPointer.
 
 	- to destroy:
-		self break.
+		self break-joint.
 }
 
 Joint : PrismaticJoint (aka PrismaticJoints) [version 2.3] {
@@ -359,9 +363,10 @@ Joint : PrismaticJoint (aka PrismaticJoints) [version 2.3] {
 	% <P>
 	% <CENTER><IMG SRC="PrismaticJoint.jpg" BORDER=1></CENTER>
 
-	+ to link parent parentLink (object) to-child childLink (object)
-			with-normal theNormal (vector) with-parent-point parentPoint (vector) 
+	+ to link with-normal theNormal (vector) with-parent-point parentPoint (vector) 
 			with-child-point childPoint (vector)
+			to-child childLink (object)
+			parent parentLink = 0 (object) 
 			use-current-relative-rotation currentRotation = 0 (int):
 
 		% Creates a prismatic (sliding) joint between parentLink and childLink.  
@@ -429,9 +434,10 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 2.3] {
 	% <P>
 	% <CENTER><IMG SRC="RevoluteJoint.jpg" BORDER=1></CENTER>
 
-	+ to link parent parentLink (object) to-child childLink (object)
-			with-normal theNormal (vector) with-parent-point parentPoint (vector) 
+	+ to link with-normal theNormal (vector) with-parent-point parentPoint (vector) 
 			with-child-point childPoint (vector)
+			to-child childLink (object)
+			parent parentLink = 0 (object) 
 			use-current-relative-rotation currentRotation = 0 (int):
 
 		% Creates a revolute (rotating) joint between parentLink and childLink.  
@@ -504,8 +510,8 @@ Joint : FixedJoint (aka FixedJoints) [version 2.3] {
 	% <b>Fixed joints do not currently support a relative rotation the way
 	% other joint types do.</b>  I'm so sorry.  
 
-	+ to link parent parentLink = 0 (object) 
-			to-child childLink (object)
+	+ to link to-child childLink (object)
+			parent parentLink = 0 (object) 
 			with-parent-point parentPoint = (0, 0, 0) (vector) 
 			with-child-point childPoint = (0, 0, 0) (vector)
 			use-current-relative-rotation currentRotation = 0 (int):
@@ -563,10 +569,11 @@ Joint : UniversalJoint (aka UniversalJoints) [version 2.3] {
 	% <P>
 	% <CENTER><IMG SRC="UniversalJoint.jpg" BORDER=1></CENTER>
 
-	+ to link parent parentLink (object) to-child childLink (object)
-			with-normal normal (vector)
+	+ to link with-normal normal (vector)
 			with-parent-point parentPoint (vector) 
 			with-child-point childPoint (vector)
+			to-child childLink (object)
+			parent parentLink = 0 (object)
 			use-current-relative-rotation currentRotation = 0 (int):
 
 		% Creates a universal (rotation on two axes) joint between parentLink and childLink.  
@@ -665,9 +672,10 @@ Joint : BallJoint (aka BallJoints) [version 2.3] {
 	% for backwards compatibility <b>only</b>, and should <b>always</b> be specified
 	% when writing new code.
 
-	+ to link parent parentLink (object) to-child childLink (object)
-			with-parent-point parentPoint (vector) 
+	+ to link with-parent-point parentPoint (vector) 
 			with-child-point childPoint (vector)
+			to-child childLink (object)
+			parent parentLink = 0 (object) 
 			with-normal normal = (1, 0, 0) (vector)
 			use-current-relative-rotation currentRotation = 0 (int):
 

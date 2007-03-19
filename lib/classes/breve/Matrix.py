@@ -4,11 +4,11 @@ import breve
 class Matrix( breve.Object ):
 	'''Matrix2D objects store an arbitrary sized 2D grid of arbitrary floating  point data. <P> Several of these matrix operations are built on top of the BLAS library and may be hardware accelerated on certain processors if the platform provides a hardware accelerated BLAS library.  In particular, AltiVec  acceleration is provided on G4 processors with Mac OS X.   <P> Hardware accelerated methods sometimes preform multiple operations  simultaneously for the same computational cost.  The METHOD(add) operation, for example, also scales one of the matrices being added. When using these methods, it is often beneficial to structure code to take advantage of all of the operations preformed.  It is far  more efficient to scale and add a matrix simultaneously using METHOD(add) than to first scale using METHOD(scale) and then add using METHOD(add). <P> Technical note: matrix objects are implemented using single precision  floats, while much of the rest of the breve simulation environment uses  double precision floating point math.'''
 
-	__slots__ = [ 'archiveList', 'matrixPointer', ]
+	__slots__ = [ 'archiveList', 'matrixPointer' ]
 
 	def __init__( self ):
 		breve.Object.__init__( self )
-		self.archiveList = []
+		self.archiveList = breve.objectList()
 		self.matrixPointer = None
 
 	def getMatrixPointer( self ):
@@ -18,12 +18,11 @@ class Matrix( breve.Object ):
 		return self.matrixPointer
 
 
-
 breve.Matrix = Matrix
 class Matrix2D( breve.Matrix ):
 	''''''
 
-	__slots__ = [ 'xDim', 'yDim', ]
+	__slots__ = [ 'xDim', 'yDim' ]
 
 	def __init__( self ):
 		breve.Matrix.__init__( self )
@@ -48,9 +47,19 @@ class Matrix2D( breve.Matrix ):
 		y = 0
 		x = 0
 
-		
-		return breve.Matrix.archive( self,)
+		y = 0
+		while ( y < self.yDim ):
+			self.archiveList[ y ] = []
+			x = 0
+			while ( x < self.xDim ):
+				self.archiveList[ y ][ x ] = self.getValue( x, y )
 
+				x = ( x + 1 )
+
+
+			y = ( y + 1 )
+
+		return breve.Matrix.archive( self )
 
 	def computeDiffusionMatrix( self, chemicalMatrix, scale = 1.000000 ):
 		'''Sets the contents of this matrix to a diffusion rate from the matrix chemicalMatrix.  chemicalMatrix is treated as a matrix of spatial  chemical concentrations, and the resulting diffusion matrix gives the  approximate rates of diffusion of the chemical. <P> This is done by sampling each concentration's local neighborhood  according to the following matrix: <pre> 0 1 0 1 -4 1 0 1 0 </pre> <P> chemicalMatrix is assumed to have real boundary conditions so that	  the chemical will not flow beyond the edges of the matrix. <P> The optional scale argument may be used to scale the resulting scale  matrix.'''
@@ -95,9 +104,18 @@ class Matrix2D( breve.Matrix ):
 		x = 0
 
 		self.setSize( breve.length( self.archiveList ), breve.length( self.archiveList[ 0 ] ) )
-		
-		return breve.Matrix.dearchive( self,)
+		y = 0
+		while ( y < self.yDim ):
+			x = 0
+			while ( x < self.xDim ):
+				self.setValue( x, y, self.archiveList[ y ][ x ] )
 
+				x = ( x + 1 )
+
+
+			y = ( y + 1 )
+
+		return breve.Matrix.dearchive( self )
 
 	def destroy( self ):
 		''''''
@@ -113,13 +131,11 @@ class Matrix2D( breve.Matrix ):
 
 		return breve.breveInternalFunctionFinder.matrix2DGetAbsoluteSum( self, self.matrixPointer )
 
-
 	def getValue( self, x, y ):
 		'''Returns the matrix value at position (x, y).'''
 
 
 		return breve.breveInternalFunctionFinder.matrix2DGet( self, self.matrixPointer, x, y )
-
 
 	def getXDimension( self ):
 		'''Returns the x size of this matrix.'''
@@ -127,13 +143,11 @@ class Matrix2D( breve.Matrix ):
 
 		return self.xDim
 
-
 	def getYDimension( self ):
 		'''Returns the y size of this matrix.'''
 
 
 		return self.yDim
-
 
 	def initWith( self, xSize, ySize ):
 		'''sets the size to of this matrix to (sSize, ySize).'''
@@ -141,7 +155,6 @@ class Matrix2D( breve.Matrix ):
 
 		self.setSize( xSize, ySize )
 		return self
-
 
 	def multiplyWithValues( self, otherMatrix ):
 		'''Multiplies each element in this matrix with the corresponding  element in otherMatrix.  This is not regular matrix multiplication; rather, it is a way to scale each element in otherMatrix.'''
@@ -155,11 +168,31 @@ class Matrix2D( breve.Matrix ):
 		j = 0
 		i = 0
 
-		print '''['''
-		
-		
+		print '['
+		i = 0
+		while ( i < ( self.xDim - 1 ) ):
+			j = 0
+			while ( j < ( self.yDim - 1 ) ):
+				print breve.breveInternalFunctionFinder.matrix2DGet( self, self.matrixPointer, i, j )
+				print ''' '''
+
+				j = ( j + 1 )
+
+			print breve.breveInternalFunctionFinder.matrix2DGet( self, self.matrixPointer, i, j )
+			print ';'
+			print ''' '''
+
+			i = ( i + 1 )
+
+		j = 0
+		while ( j < ( self.yDim - 1 ) ):
+			print breve.breveInternalFunctionFinder.matrix2DGet( self, self.matrixPointer, i, j )
+			print ''' '''
+
+			j = ( j + 1 )
+
 		print breve.breveInternalFunctionFinder.matrix2DGet( self, self.matrixPointer, i, j )
-		print ''']'''
+		print ']'
 
 	def scale( self, scaleValue ):
 		'''Scales all elements in the matrix by scaleValue. <P> This method is hardware accelerated where supported.'''
@@ -201,7 +234,6 @@ class Matrix2D( breve.Matrix ):
 
 		return breve.breveInternalFunctionFinder.matrix2DSet( self, self.matrixPointer, x, y, value )
 
-
 	def subtractValues( self, otherMatrix, scale = 1.000000 ):
 		'''Subtracts this matrix from this otherMatrix, leaving the result in otherMatrix.  This method uses the same mechanism as METHOD(add), but using a negative scale  argument. The optional argument scale allows otherMatrix to be scaled before  subtracting it from this matrix. <P> This method is hardware accelerated where supported.'''
 
@@ -219,7 +251,7 @@ breve.Matrix2D = Matrix2D
 class Matrix3D( breve.Matrix ):
 	'''Matrix3D objects store an arbitrary sized 3D grid of arbitrary floating  point data. <P> Several of these matrix operations are built on top of the BLAS library and may be hardware accelerated on certain processors if the platform provides a hardware accelerated BLAS library.  In particular, AltiVec  acceleration is provided on G4 an G5 processors with Mac OS X.   <P> Hardware accelerated methods sometimes preform multiple operations  simultaneously for the same computational cost.  The METHOD(add) operation, for example, also scales one of the matrices being added. When using these methods, it is often beneficial to structure code to take advantage of all of the operations preformed.  It is far  more efficient to scale and add a matrix simultaneously using METHOD(add) than to first scale using METHOD(scale) and then add using METHOD(add). <P> Technical note: matrix objects are implemented using single precision  floats, while much of the rest of the breve simulation environment uses  double precision floating point math.'''
 
-	__slots__ = [ 'xDim', 'yDim', 'zDim', ]
+	__slots__ = [ 'xDim', 'yDim', 'zDim' ]
 
 	def __init__( self ):
 		breve.Matrix.__init__( self )
@@ -246,9 +278,25 @@ class Matrix3D( breve.Matrix ):
 		y = 0
 		x = 0
 
-		
-		return breve.Matrix.archive( self,)
+		z = 0
+		while ( z < self.zDim ):
+			self.archiveList[ z ] = []
+			y = 0
+			while ( y < self.yDim ):
+				self.archiveList[ z ][ y ] = []
+				x = 0
+				while ( x < self.xDim ):
+					self.archiveList[ z ][ y ][ x ] = self.getValue( x, y, z )
 
+					x = ( x + 1 )
+
+
+				y = ( y + 1 )
+
+
+			z = ( z + 1 )
+
+		return breve.Matrix.archive( self )
 
 	def computeDiffusionMatrix( self, chemicalMatrix, scale = 1.000000 ):
 		'''Sets the contents of this matrix to a diffusion rate from the matrix chemicalMatrix.  chemicalMatrix is treated as a matrix of spatial  chemical concentrations, and the resulting diffusion matrix gives the  approximate rates of diffiusion of the chemical. <P> This is done by sampling each concentration's local neighborhood  according to the following matrix: <pre> 0 0 0  0 1 0  0 0 0 0 1 0  1-6 1  0 1 0 0 0 0  0 1 0  0 0 0 </pre> <P> chemicalMatrix is assumed to have real boundary conditions so that	  the chemical will not flow beyond the edges of the matrix. <P> The optional scale argument may be used to scale the resulting scale  matrix.'''
@@ -324,9 +372,23 @@ class Matrix3D( breve.Matrix ):
 		x = 0
 
 		self.setSize( breve.length( self.archiveList ), breve.length( self.archiveList[ 0 ] ), breve.length( self.archiveList[ 0 ][ 0 ] ) )
-		
-		return breve.Matrix.dearchive( self,)
+		z = 0
+		while ( z < self.zDim ):
+			y = 0
+			while ( y < self.yDim ):
+				x = 0
+				while ( x < self.xDim ):
+					self.setValue( x, y, z, self.archiveList[ z ][ y ][ x ] )
 
+					x = ( x + 1 )
+
+
+				y = ( y + 1 )
+
+
+			z = ( z + 1 )
+
+		return breve.Matrix.dearchive( self )
 
 	def destroy( self ):
 		''''''
@@ -342,13 +404,11 @@ class Matrix3D( breve.Matrix ):
 
 		return breve.breveInternalFunctionFinder.matrix3DGetAbsoluteSum( self, self.matrixPointer )
 
-
 	def getValue( self, x, y, z ):
 		'''Returns the matrix value at position (x, y, z).'''
 
 
 		return breve.breveInternalFunctionFinder.matrix3DGet( self, self.matrixPointer, x, y, z )
-
 
 	def initWith( self, xSize, ySize, zSize ):
 		'''sets the size to of this matrix to (sSize, ySize, zSize).'''
@@ -359,7 +419,6 @@ class Matrix3D( breve.Matrix ):
 		self.yDim = ySize
 		self.zDim = zSize
 		return self
-
 
 	def multiplyWithValues( self, otherMatrix ):
 		'''Multiplies each element in this matrix with the corresponding  element in otherMatrix.  This is not regular matrix multiplication; rather, it is a way to scale each element in otherMatrix.'''
@@ -394,7 +453,6 @@ class Matrix3D( breve.Matrix ):
 
 		return breve.breveInternalFunctionFinder.matrix3DSet( self, self.matrixPointer, x, y, z, value )
 
-
 	def subtractValues( self, otherMatrix, scale = 1.000000 ):
 		'''Subtracts this matrix from this otherMatrix, leaving the result in otherMatrix.  This method uses the same mechanism as METHOD(add), but using a negative scale  argument. The optional argument scale allows otherMatrix to be scaled before  subtracting it from this matrix. <P> This method is hardware accelerated where supported.'''
 
@@ -406,7 +464,7 @@ breve.Matrix3D = Matrix3D
 class MatrixImage( breve.Image ):
 	'''The MatrixImage allows three 2D matrices to be copied into the red, green and blue  channels of an image for efficient display.  The image is automatically updated 	 with new matrix values at each iteration.'''
 
-	__slots__ = [ 'blue', 'green', 'red', 'scale', ]
+	__slots__ = [ 'blue', 'green', 'red', 'scale' ]
 
 	def __init__( self ):
 		breve.Image.__init__( self )
@@ -419,16 +477,15 @@ class MatrixImage( breve.Image ):
 		''''''
 
 
-		breve.Image.destroy( self,)
+		breve.Image.destroy( self )
 
 	def initWith( self, theMatrix, theScale = 1.000000 ):
 		'''Initializes the MatrixImage with sizes taken from theMatrix.'''
 
 
-		breve.Image.initWith( self, theMatrix.getXDimension(), theMatrix.getYDimension() )
+		breve.Image.initWith( self , theMatrix.getXDimension(), theMatrix.getYDimension() )
 		self.scale = theScale
 		return self
-
 
 	def iterate( self ):
 		''''''
@@ -443,7 +500,7 @@ class MatrixImage( breve.Image ):
 		if self.blue:
 			self.blue.copyToBlueChannel( self, self.scale )
 
-		breve.Image.iterate( self,)
+		breve.Image.iterate( self )
 
 	def setBlue( self, m ):
 		'''Sets the green channel to the Matrix m.'''

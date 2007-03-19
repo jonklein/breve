@@ -83,33 +83,9 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 	+ to get-mass: 
 		% Returns the mass of the object.
 
-		return (objectShape get-mass).
+		return (collisionShape get-mass).
 
-  + section "Controlling the Agent's Motion and Position"
-
-	+ to set-rotation-euler-angles to angles (vector):
-		% Sets the rotation of this object to the Euler angles specified 
-		% by angles (in radians).
-		
-		m (matrix).
-		r00, r01, r02, r10, r11, r12, r20, r21, r22 (double).
-
-		r00 = cos(angles::z)*cos(angles::x) - cos(angles::y)*sin(angles::x)*sin(angles::z).
-		r01 = cos(angles::z)*sin(angles::x) + cos(angles::y)*cos(angles::x)*sin(angles::z).
-		r02 = sin(angles::z)*cos(angles::y).
-	
-		r10 = -sin(angles::z)*cos(angles::x) - cos(angles::y)*sin(angles::x)*cos(angles::z).
-		r11 = -sin(angles::z)*sin(angles::x) + cos(angles::y)*cos(angles::x)*cos(angles::z).
-		r12 = cos(angles::z)*sin(angles::y).
-
-		r20 = sin(angles::y)*sin(angles::x).
-		r21 = -sin(angles::y)*cos(angles::x).
-		r22 = cos(angles::y).
-
-		m = [ ( r00, r01, r02 ), ( r10, r11, r12 ), ( r20, r21, r22 ) ].
-
-		self set-rotation to m.
-
+  + section "Controlling the Agent's Motion and Position (see also methods in the parent class, OBJECT(Real))"
 	- to rotate around-axis thisAxis (vector) by amount (float):
 		% Deprecated.  Renamed to METHOD(set-rotation).
 
@@ -127,29 +103,6 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 		length = |thisAxis|.
 
 		linkRotateRelative(realWorldPointer, thisAxis, amount).
-
-	+ to point vertex theVertex (vector) at theLocation (vector):
-		% An easier way to rotate an object--this function rotates 
-		% an object such that the local point theVertex, points towards
-		% the world direction theLocation.  In other words, theLocation
-		% is where you want the object to face, and theVertex indicates 
-		% which side of the object is to be considered the "front".
-
-		v (vector).
-		a (float).
-
-		if | theVertex | == 0.0 || | theLocation | == 0.0:
-			return.
-
-		v = cross(theVertex, theLocation).
-		a = angle(theVertex, theLocation).
-
-		if |v| == 0.0: {
-			self rotate around-axis theVertex by 0.01.
-			return.
-		}
-
-		self rotate around-axis v by a.
 
 	+ to offset by amount (vector):
 		% Moves this object by amount, relative to its current position.
@@ -290,9 +243,10 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 	- to dearchive:
 		realWorldPointer = linkNew().
 		realWorldPointer = linkAddToWorld(realWorldPointer).
-		self set-shape to objectShape.
+		self set-collision-shape to collisionShape.
+		self set-display-shape to displayShape.
 		self move to archiveLocation.
-		self set-rotation to archiveRotation.
+		self set-rotation-matrix to archiveRotation.
 		self set-velocity to archiveVelocity.
 		self set-rotational-velocity to archiveRvelocity.
 		self set-acceleration to archiveAcceleration.

@@ -44,7 +44,7 @@ Control : Gatherers {
 		COLLECTOR_COUNT new Collectors.
 		foodList = FOOD_COUNT new Foods.
 	
-	foodList set-bitmap to 2.
+		foodList set-bitmap to 2.
 
 		# this sim can run a bit slowly, but doesn't need a lot of 
 		# accuracy, so we can set up the integration step a bit.
@@ -99,7 +99,7 @@ Wanderer : Collector (aka Collectors) {
 
 		# if the food we hit is being dragged by another collector, let it go
 
-		if (food get-owner) != 0: return.
+		if ( food get-owner ): return.
 
 		# if we have collided too recently, skip this collision, we don't 
 		# want to pick things up and then drop them immediately.

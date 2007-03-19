@@ -4,7 +4,7 @@ import breve
 class Camera( breve.Abstract ):
 	'''Summary: creates a new rendering perspective in the simulated world. <P> The Camera class is used to set up a viewing perspective in a simulation. Creating a new camera object places a viewing area with the new camera  perspective in the main viewing window. <P> See the OBJECT(Image) class to read data from a Camera (or from the  main simulation window) into a pixel buffer.  This can be useful for implementing vision algorithms.'''
 
-	__slots__ = [ 'cameraPointer', 'shared', ]
+	__slots__ = [ 'cameraPointer', 'shared' ]
 
 	def __init__( self ):
 		breve.Abstract.__init__( self )
@@ -62,20 +62,17 @@ class Camera( breve.Abstract ):
 
 		return breve.breveInternalFunctionFinder.cameraGetHeight( self, self.cameraPointer )
 
-
 	def getRotation( self ):
 		'''Returns a vector containing the rotation of the camera about the X-  and Y-axes return cameraGetRotation(cameraPointer).'''
 
 
 		return breve.breveInternalFunctionFinder.cameraGetRotation( self, self.cameraPointer )
 
-
 	def getWidth( self ):
 		'''Returns the current camera width.'''
 
 
 		return breve.breveInternalFunctionFinder.cameraGetWidth( self, self.cameraPointer )
-
 
 	def init( self ):
 		''''''
@@ -97,6 +94,7 @@ class Camera( breve.Abstract ):
 
 		if ( not self.shared ):
 			breve.breveInternalFunctionFinder.cameraFree( self, self.cameraPointer )
+
 
 		self.cameraPointer = p
 		self.shared = 1

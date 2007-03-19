@@ -33,14 +33,13 @@ void brLispInit( brEngine *breveEngine ) {
 
 	cl_boot( 1, argv );
 
-
 	// HELLO WORLD
 
-	// result = cl_eval( c_string_to_object( "( setf *xyz* '( hello world ) )" ) );
-	// result = cl_eval( c_string_to_object( "( print *xyz* )" ) );
+	result = cl_eval( c_string_to_object( "( setf *xyz* '( hello world ) )" ) );
+	result = cl_eval( c_string_to_object( "( print *xyz* )" ) );
 
-	result = cl_eval( c_string_to_object( "(compile 'foo '(lambda (x) (+ x 1)))" ) );
-	result = cl_eval( c_string_to_object( "(print (foo 1))" ) );
+	// result = cl_eval( c_string_to_object( "(compile 'foo '(lambda (x) (+ x 1)))" ) );
+	// result = cl_eval( c_string_to_object( "(print (foo 1))" ) );
 
 	// Lisp messes with our signal handlers!  We cannot allow that.
 
@@ -61,7 +60,7 @@ void brLispInit( brEngine *breveEngine ) {
 	// breveLispType->destroyInstance 		= brLispDestroyGenericLispObject;
 	// breveLispType->canLoad			= brLispCanLoad;
 	// breveLispType->load			= brLispLoad;
-	// breveLispType->_typeSignature 		= LISP_TYPE_SIGNATURE;
+	breveLispType->_typeSignature 		= LISP_TYPE_SIGNATURE;
 
 	// brEngineRegisterObjectType( breveEngine, breveLispType );
 }
@@ -80,6 +79,7 @@ void brLispInit( brEngine *breveEngine ) {
 
 
 inline int brLispTypeToEval( cl_object *inObject, brEval *outEval ) {
+
 }
 
 /**
@@ -91,6 +91,7 @@ inline int brLispTypeToEval( cl_object *inObject, brEval *outEval ) {
  */
 
 inline cl_object *brLispTypeFromEval( const brEval *inEval, cl_object *inBridgeObject ) {
+
 }
 
 

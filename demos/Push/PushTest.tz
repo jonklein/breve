@@ -31,8 +31,8 @@ Object : PushTest {
 
 		interpreter read-config from-file "PushTest.config".
 
-		interpreter add-instruction named "CALLBACK2-TEST" for-method "callback2" for-instance self.
-		interpreter add-instruction named "CALLBACK-TEST" for-method "callback" for-instance self.
+		interpreter add-instruction for-method "callback2" for-instance self named "CALLBACK-TEST2".
+		interpreter add-instruction for-method "callback" for-instance self named "CALLBACK-TEST".
 
 	+ to go:
 		interpreter push-integer value 100.

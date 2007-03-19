@@ -4,7 +4,7 @@ import breve
 class Image( breve.Abstract ):
 	'''The Image class provides an interface to work with images and  textures.  The individual pixels of the image can be read  or changed by the simulation as desired. <P> The image class can read rendered images from the screen using the  method METHOD(read-pixels), so that agents in the 3D world  can have access to real rendered data.  In addition, the method  METHOD(get-pixel-pointer) can be used to provide a pointer to the  RGBA pixel data so that plugins can access and analyze image data. This could be used, among other things, to implement agent vision.'''
 
-	__slots__ = [ 'currentHeight', 'currentWidth', 'imageData', 'modified', 'textureNumber', ]
+	__slots__ = [ 'currentHeight', 'currentWidth', 'imageData', 'modified', 'textureNumber' ]
 
 	def __init__( self ):
 		breve.Abstract.__init__( self )
@@ -20,16 +20,14 @@ class Image( breve.Abstract ):
 
 
 		self.textureNumber = -1
-		return breve.Abstract.archive( self,)
-
+		return breve.Abstract.archive( self )
 
 	def dearchive( self ):
 		''''''
 
 
 		self.setSize( self.currentWidth, self.currentHeight )
-		return breve.Abstract.dearchive( self,)
-
+		return breve.Abstract.dearchive( self )
 
 	def destroy( self ):
 		''''''
@@ -46,9 +44,7 @@ class Image( breve.Abstract ):
 		if ( not self.imageData ):
 			return 0
 
-
 		return breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 3 ), y )
-
 
 	def getBluePixel( self, x, y ):
 		'''Returns the blue pixel at the image coordinates (x, y). The pixel value is given on a scale from 0.0 to 1.0.'''
@@ -57,16 +53,13 @@ class Image( breve.Abstract ):
 		if ( not self.imageData ):
 			return 0
 
-
 		return breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 2 ), y )
-
 
 	def getCompressionSize( self ):
 		'''Compresses the image and returns the compression size.  Useful for  generating simple complexity measures based on image compression.'''
 
 
 		return breve.breveInternalFunctionFinder.imageGetCompressionSize( self, self.imageData )
-
 
 	def getGreenPixel( self, x, y ):
 		'''Returns the green pixel at the image coordinates (x, y). The pixel value is given on a scale from 0.0 to 1.0.'''
@@ -75,9 +68,7 @@ class Image( breve.Abstract ):
 		if ( not self.imageData ):
 			return 0
 
-
 		return breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 1 ), y )
-
 
 	def getHeight( self ):
 		'''Returns the width of the image.  '''
@@ -86,9 +77,7 @@ class Image( breve.Abstract ):
 		if ( not self.imageData ):
 			return 0
 
-
 		return breve.breveInternalFunctionFinder.imageGetHeight( self, self.imageData )
-
 
 	def getImageData( self ):
 		''''''
@@ -96,13 +85,11 @@ class Image( breve.Abstract ):
 
 		return self.imageData
 
-
 	def getPixelPointer( self ):
 		'''Returns a pointer to the pixels this image is holding in RGBA format.  The size of the buffer is 4 * height * width.  This  data is provided for plugin developers who wish to read or  write pixel data directly.  '''
 
 
 		return breve.breveInternalFunctionFinder.imageGetPixelPointer( self, self.imageData )
-
 
 	def getRedPixel( self, x, y ):
 		'''Returns the red pixel at the image coordinates (x, y). The pixel value is given on a scale from 0.0 to 1.0.'''
@@ -111,9 +98,7 @@ class Image( breve.Abstract ):
 		if ( not self.imageData ):
 			return 0
 
-
 		return breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( x * 4 ), y )
-
 
 	def getRgbPixel( self, x, y ):
 		'''Returns the red, green and blue components of the pixel at image coordinates (x, y) as a vector.'''
@@ -125,12 +110,10 @@ class Image( breve.Abstract ):
 		if ( not self.imageData ):
 			return breve.vector( 0, 0, 0 )
 
-
 		r = breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( x * 4 ), y )
 		g = breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 1 ), y )
 		b = breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 2 ), y )
 		return breve.vector( r, g, b )
-
 
 	def getTextureNumber( self ):
 		'''Internal use only.'''
@@ -141,7 +124,6 @@ class Image( breve.Abstract ):
 
 		return self.textureNumber
 
-
 	def getWidth( self ):
 		'''Returns the width of the image.  '''
 
@@ -149,9 +131,7 @@ class Image( breve.Abstract ):
 		if ( not self.imageData ):
 			return 0
 
-
 		return breve.breveInternalFunctionFinder.imageGetWidth( self, self.imageData )
-
 
 	def init( self ):
 		''''''
@@ -188,12 +168,10 @@ class Image( breve.Abstract ):
 			return 0
 
 
-
 		if ( self.textureNumber != -1 ):
 			self.modified = 1
 
 		return self
-
 
 	def readPixels( self, x, y ):
 		'''Reads pixels into this Image from the rendered image on the  screen.  The resulting image can be written to a file or  analyzed if desired.  This is only supported in graphical versions of breve.'''
@@ -256,7 +234,6 @@ class Image( breve.Abstract ):
 
 		self.imageData = breve.breveInternalFunctionFinder.imageDataInit( self, imageWidth, imageHeight )
 		return self
-
 
 	def write( self, imageFile ):
 		'''Write the image to imageFile.  The image is written as a  PNG file, so imageFile should end with .PNG.'''

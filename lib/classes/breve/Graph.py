@@ -4,7 +4,7 @@ import breve
 class Graph( breve.Abstract ):
 	'''Work in progress--not yet supported.'''
 
-	__slots__ = [ 'graphPointer', ]
+	__slots__ = [ 'graphPointer' ]
 
 	def __init__( self ):
 		breve.Abstract.__init__( self )
@@ -17,7 +17,6 @@ class Graph( breve.Abstract ):
 
 		return breve.breveInternalFunctionFinder.graphAddLine( self, self.graphPointer, lineColor )
 
-
 	def addPoint( self, lineNumber, yValue ):
 		'''Adds a point on the line lineNumber, with the Y-value yValue.'''
 
@@ -28,7 +27,7 @@ class Graph( breve.Abstract ):
 		''''''
 
 
-		self.graphPointer = breve.breveInternalFunctionFinder.graphNew( self, '''Graph''' )
+		self.graphPointer = breve.breveInternalFunctionFinder.graphNew( self, 'Graph' )
 
 	def setTitle( self, title ):
 		'''Sets the title of the graph to title.'''

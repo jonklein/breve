@@ -4,7 +4,7 @@ import breve
 class Terrain( breve.Real ):
 	'''Terrain is an experimental class to add terrains to simulations.  '''
 
-	__slots__ = [ 'location', 'peakColor', 'valleyColor', ]
+	__slots__ = [ 'location', 'peakColor', 'valleyColor' ]
 
 	def __init__( self ):
 		breve.Real.__init__( self )
@@ -19,7 +19,6 @@ class Terrain( breve.Real ):
 
 		return 1
 
-
 	def dearchive( self ):
 		''''''
 
@@ -28,7 +27,6 @@ class Terrain( breve.Real ):
 		self.setPeakColor( self.peakColor )
 		self.setValleyColor( self.valleyColor )
 		return 1
-
 
 	def drawSolid( self ):
 		'''Draws the terrain as solid polygons.  This is the default mode.   Alternatively, the terrain can be drawn as wireframe only using  the method METHOD(draw-wireframe).'''
@@ -60,20 +58,17 @@ class Terrain( breve.Real ):
 
 		return breve.breveInternalFunctionFinder.terrainGetHeight( self, self.realWorldPointer, xCoordinate, yCoordinate )
 
-
 	def getHeightInWorld( self, xCoordinate, zCoordinate ):
 		'''This method returns the height of the terrain at the <b>real world</b>  (xCoordinate, zCoodinate) location.  This is in contrast to the height in terrain grid coordinates given give with METHOD(get-height)'''
 
 
 		return breve.breveInternalFunctionFinder.terrainGetHeightAtLocation( self, self.realWorldPointer, xCoordinate, zCoordinate )
 
-
 	def getLocation( self ):
 		'''Returns the location of this Terrain object.'''
 
 
 		return self.location
-
 
 	def init( self ):
 		''''''
@@ -82,7 +77,7 @@ class Terrain( breve.Real ):
 		self.realWorldPointer = breve.breveInternalFunctionFinder.terrainNew( self, 1 )
 		self.setPeakColor( breve.vector( 1, 1, 1 ) )
 		self.setValleyColor( breve.vector( 0, 0.800000, 0.100000 ) )
-		self.setTextureImage( breve.createInstances( breve.Image, 1 ).load( '''images/grass.jpg''' ) )
+		self.setTextureImage( breve.createInstances( breve.Image, 1 ).load( 'images/grass.jpg' ) )
 
 	def loadGeoTiff( self, geoTIFFFile ):
 		''''''

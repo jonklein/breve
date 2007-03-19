@@ -1,5 +1,7 @@
 #include "kernel.h"
 
+#include "libgen.h"
+
 int brLoadSimulation( brEngine *engine, const char *code, const char *file ) {
 	int result = EC_OK;
 
@@ -16,6 +18,15 @@ int brLoadSimulation( brEngine *engine, const char *code, const char *file ) {
 int brLoadFile( brEngine *engine, const char *code, const char *file ) {
 	char *extension = slFileExtension( file );
 
+
+	// Add a search path for the directory we're loading from, in case this 
+	// file wants to load resources from the same directory.
+	// warning: dirname may modify contents -- jerks
+	char *copy = slStrdup( file );
+	char *dir = dirname( copy );
+	brAddSearchPath( engine, dir );
+	slFree( copy );
+
 	for( unsigned int n = 0; n < engine->objectTypes.size(); n++ ) {
 		brObjectType *type = engine->objectTypes[ n ];
 
@@ -24,11 +35,6 @@ int brLoadFile( brEngine *engine, const char *code, const char *file ) {
 
 			if( r != EC_OK ) 
 				return EC_ERROR;
-
-			// dirname may modify contents?!
-			// char *copy = slStrdup( file );
-			// brAddSearchPath( engine, dirname( copy ) );
-			// slFree( copy );
 
 			return EC_OK;
 		}		

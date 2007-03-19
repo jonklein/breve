@@ -4,7 +4,7 @@ import breve
 class MenuItem( breve.Abstract ):
 	'''The MenuItem class holds menu items associated with objects.  Menus can be associated with Mobile objects, in which case they are shown as contextual menu items, or associated with Control objects in which case they are shown under the global application menu.'''
 
-	__slots__ = [ 'checked', 'enabled', 'menuPointer', 'method', 'name', 'owner', ]
+	__slots__ = [ 'checked', 'enabled', 'menuPointer', 'method', 'name', 'owner' ]
 
 	def __init__( self ):
 		breve.Abstract.__init__( self )
@@ -21,7 +21,6 @@ class MenuItem( breve.Abstract ):
 
 		if ( not self.menuPointer ):
 			return
-
 
 		breve.breveInternalFunctionFinder.menuItemSetCheck( self, self.menuPointer, 1 )
 		self.checked = 1
@@ -42,9 +41,7 @@ class MenuItem( breve.Abstract ):
 			return 0
 
 
-
 		return self
-
 
 	def dearchive( self ):
 		''''''
@@ -63,14 +60,12 @@ class MenuItem( breve.Abstract ):
 
 		return 1
 
-
 	def disable( self ):
 		'''Disables the menu item such that it cannot be selected.'''
 
 
 		if ( not self.menuPointer ):
 			return
-
 
 		breve.breveInternalFunctionFinder.menuItemSetEnabled( self, self.menuPointer, 0 )
 		self.enabled = 0
@@ -82,7 +77,6 @@ class MenuItem( breve.Abstract ):
 		if ( not self.menuPointer ):
 			return
 
-
 		breve.breveInternalFunctionFinder.menuItemSetEnabled( self, self.menuPointer, 1 )
 		self.enabled = 1
 
@@ -92,14 +86,12 @@ class MenuItem( breve.Abstract ):
 
 		return self.name
 
-
 	def uncheck( self ):
 		'''Removes the check mark next to the menu item, if it exists.'''
 
 
 		if ( not self.menuPointer ):
 			return
-
 
 		breve.breveInternalFunctionFinder.menuItemSetCheck( self, self.menuPointer, 0 )
 		self.checked = 0

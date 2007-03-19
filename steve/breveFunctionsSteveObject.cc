@@ -145,7 +145,6 @@ int stCObjectAllocationReport( brEval args[], brEval *target, brInstance *bi ) {
 
 int stNewInstanceForClassString( brEval args[], brEval *target, brInstance *bi ) {
 	brObject *o = brObjectFind( bi->engine, BRSTRING( &args[0] ) );
-	stInstance *i = ( stInstance* )bi->userData;
 
 	if ( !o ) {
 		stEvalError( (stInstance*)bi->userData, EE_SIMULATION, "Unknown class '%s'.", BRSTRING( &args[0] ) );
@@ -153,7 +152,7 @@ int stNewInstanceForClassString( brEval args[], brEval *target, brInstance *bi )
 		return EC_ERROR;
 	}
 
-	target->set( stInstanceCreateAndRegister( i->type->steveData, bi->engine, o ) );
+	target->set( brObjectInstantiate( bi->engine, o, NULL, 0 ) );
 
 	return EC_OK;
 }
@@ -312,7 +311,7 @@ int stCStacktrace( brEval args[], brEval *target, brInstance *i ) {
 	stInstance *si = ( stInstance* )i->userData;
 
 	if( i->object->type->_typeSignature != STEVE_TYPE_SIGNATURE ) {
-		slMessage( DEBUG_ALL, "warning: stCStacktrace called for non-steve instance\n" );
+		// slMessage( DEBUG_ALL, "warning: stCStacktrace called for non-steve instance\n" );
 		return EC_OK;
 	}
 
@@ -330,7 +329,7 @@ int stIAddDependency( brEval args[], brEval *target, brInstance *i ) {
 	if ( !BRINSTANCE( &args[0] ) ) return EC_OK;
 
 	if( i->object->type->_typeSignature != STEVE_TYPE_SIGNATURE ) {
-		slMessage( DEBUG_ALL, "warning: stIAddDependency called for non-steve instance\n" );
+		// slMessage( DEBUG_ALL, "warning: stIAddDependency called for non-steve instance\n" );
 		return EC_OK;
 	}
 
@@ -349,7 +348,7 @@ int stIRemoveDependency( brEval args[], brEval *target, brInstance *i ) {
 	if ( !BRINSTANCE( &args[0] ) ) return EC_OK;
 
 	if( i->object->type->_typeSignature != STEVE_TYPE_SIGNATURE ) {
-		slMessage( DEBUG_ALL, "warning: stIRemoveDependency called for non-steve instance\n" );
+		// slMessage( DEBUG_ALL, "warning: stIRemoveDependency called for non-steve instance\n" );
 		return EC_OK;
 	}
 

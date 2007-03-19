@@ -4,7 +4,7 @@ import breve
 class Spring( breve.Object ):
 	'''A Spring is used to create an elastic connection between two OBJECT(Real)  objects.  Springs define only a connection between objects and are not  physical objects themselves.  Thus, <b>Springs can pass through each other  without colliding</b>.   <P> A number of paramters can be specified for springs.  The length parameter specifies the length of the spring when it is completely relaxed.  The  spring will always apply a force to attempt to expand or contract to the	 specified length.  The strength parameter specifies the amount of force that is applied to try to attain the spring's natural length.  Finally, the damping parameter specifies the friction or damping proportional to the spring's velocity. <P> If physical realism is important, springs should be used with caution. As the strength and damping constants of the spring increase, springs  can generate enormous forces that will cause numerical overflows or  other undesirable behavior.  Keep spring strength and damping constants as low as possible to avoid this behavior. <P> The Spring class is new as of version 2.1.'''
 
-	__slots__ = [ 'damping', 'end', 'length', 'maxForce', 'mode', 'springPointer', 'start', 'strength', ]
+	__slots__ = [ 'damping', 'end', 'length', 'maxForce', 'mode', 'springPointer', 'start', 'strength' ]
 
 	def __init__( self ):
 		breve.Object.__init__( self )
@@ -24,7 +24,6 @@ class Spring( breve.Object ):
 		if ( springLink1 == springLink2 ):
 			return
 
-
 		self.start = springLink1
 		self.end = springLink2
 		self.length = springLength
@@ -34,7 +33,6 @@ class Spring( breve.Object ):
 		self.addDependency( self.start )
 		self.addDependency( self.end )
 		return self.springPointer
-
 
 	def destroy( self ):
 		''''''
@@ -51,9 +49,7 @@ class Spring( breve.Object ):
 		if self.springPointer:
 			return breve.breveInternalFunctionFinder.springGetCurrentLength( self, self.springPointer )
 
-
 		return 0
-
 
 	def getForce( self ):
 		'''Returns the amount of force applied by this spring at the last  timestep.  The returned value is a double representing the  magnitude of the force.  The direction of the force is determined by the locations of the links to which the spring is attached.'''
@@ -62,9 +58,7 @@ class Spring( breve.Object ):
 		if self.springPointer:
 			return breve.breveInternalFunctionFinder.springGetForce( self, self.springPointer )
 
-
 		return 0
-
 
 	def getLength( self ):
 		'''This method returns the natural length of the spring.  See also METHOD(get-current-length) which returns the current (stretched or compressed) length of the spring.'''
@@ -72,13 +66,11 @@ class Spring( breve.Object ):
 
 		return self.length
 
-
 	def getLinks( self ):
 		'''Returns a list with two items, the links which are joined by this spring.'''
 
 
 		return [ self.start, self.end ]
-
 
 	def setContractOnly( self ):
 		'''Setting a spring as "contract only" means that the spring will contract if it is expanded larger than its natural length, but will not expand  if it is pushed to smaller lengths.  This makes the spring behavior  more like a rope.  See also METHOD(set-expand-only) and  METHOD(set-expand-and-contract).'''

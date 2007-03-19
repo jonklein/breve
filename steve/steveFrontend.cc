@@ -73,7 +73,15 @@ int stCallMethodBreveCallback( void *instanceData, void *methodData, const brEva
 */
 
 brInstance *stInstanceNewCallback( brEngine *engine, brObject *object, const brEval **constructorArgs, int argCount ) {
-	return brEngineAddInstance( engine, object, stInstanceNew( ( stObject* )object->userData ) );
+	stInstance *i = stInstanceNew( ( stObject* )object->userData );
+
+	i->breveInstance = brEngineAddInstance( engine, object, i );
+
+	if( stInstanceInit( i ) != EC_OK ) 
+		return NULL;
+
+	return i->breveInstance;
+
 }
 
 /**
@@ -150,7 +158,10 @@ int stCallbackLoad( brEngine *engine, void *inDataPtr, const char *file, const c
 		*/
 
 		stInstance *controller;
-		controller = stInstanceNew(( stObject* )controllerClass->userData );
+		controller = stInstanceNew( ( stObject* )controllerClass->userData );
+
+		if( !controller )
+			return EC_ERROR;
 
 		controller->breveInstance = brEngineAddInstance( engine, controllerClass, controller );
 

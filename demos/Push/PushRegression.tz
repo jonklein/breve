@@ -47,9 +47,9 @@ PushGP : RegressionGP {
 		# the input values with an instruction.  Adding this callback is 
 		# optional, but does tend to produce better results.
 
-		(self get-interpreter) add-instruction named "INPUT" 
+		(self get-interpreter) add-instruction 
 			for-instance self 
-			for-method "input-callback".
+			for-method "input".
 
 	+ to count-fitness-cases:
 		# This method is implemented as instructed by the PushGP class.
@@ -87,7 +87,7 @@ PushGP : RegressionGP {
 
 		return | (interpreter get-float-stack-top) - desiredResult | * | (interpreter get-float-stack-top) - desiredResult |.
 
-	+ to input-callback:
+	+ to input:
 		# This input instruction just puts the current input value on
 		# top of the float stack.
 

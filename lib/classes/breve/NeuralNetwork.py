@@ -4,12 +4,12 @@ import breve
 class NeuralNetwork( breve.Abstract ):
 	'''A new experimental class for simple feed-forward neural networks.'''
 
-	__slots__ = [ 'inputLayer', 'layers', 'outputLayer', ]
+	__slots__ = [ 'inputLayer', 'layers', 'outputLayer' ]
 
 	def __init__( self ):
 		breve.Abstract.__init__( self )
 		self.inputLayer = None
-		self.layers = []
+		self.layers = breve.objectList()
 		self.outputLayer = None
 
 	def addLayer( self, count ):
@@ -21,7 +21,6 @@ class NeuralNetwork( breve.Abstract ):
 			print '''cannot add neural network layer with %s nodes
 ''' % (  count )
 			return
-
 
 
 		newLayer = breve.breveInternalFunctionFinder.newFFLayer( self, count, self.outputLayer )
@@ -43,13 +42,11 @@ class NeuralNetwork( breve.Abstract ):
 
 		return breve.breveInternalFunctionFinder.getValue( self, self.outputLayer, position )
 
-
 	def getWeight( self, theLayer, fn, tn ):
 		'''Sets the input to the node number tn on layer theLayer, coming from node number fn on layer number theLayer - 1 to weight.  Normally you wouldn't need to use this method, since the method  METHOD(get-output) is the preferred way to retrieve network output.'''
 
 
 		return breve.breveInternalFunctionFinder.getWeight( self, self.layers[ theLayer ], tn, fn )
-
 
 	def runWith( self, inputList ):
 		'''Sets the inputs of the neural network to the values in inputList, and runs the network.  Output values can then be retrieved with METHOD(get-output).'''

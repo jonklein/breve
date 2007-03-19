@@ -312,7 +312,7 @@ brEngine::~brEngine() {
 
 	brNamespaceFreeWithFunction( internalMethods, ( void( * )( void* ) )brFreeBreveCall );
 
-	std::map<std::string, brObject*>::iterator oi;
+	std::map< std::string, brObject* >::iterator oi;
 
 	for ( oi = objects.begin(); oi != objects.end(); oi++ )
 		if ( oi->second ) brObjectFree( oi->second );

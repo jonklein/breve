@@ -718,7 +718,7 @@ void slCamera::reflectionPass( slWorld *w ) {
 	glStencilOp( GL_KEEP, GL_KEEP, GL_KEEP );
 	renderObjects( w, DO_NO_STATIONARY | DO_NO_BOUND | DO_NO_AXIS | DO_NO_TERRAIN );
 
-	// renderBillboards( 0 );
+	renderBillboards( 0 );
 
 	glDisable( GL_NORMALIZE );
 
@@ -910,8 +910,6 @@ void slCamera::renderBillboards( int flags ) {
 	slBillboardEntry *b;
 	unsigned int n;
 	int lastTexture = -1;
-
-		return;
 
 	slVectorCopy( &_location, &normal );
 	slVectorNormalize( &normal );

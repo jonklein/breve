@@ -32,9 +32,10 @@ Object : PushInterpreter (aka PushInterpreters) {
 
   + section "Configuring and setting up a Push interpreter"
 
-	+ to add-instruction named instructionName = "" (string) for-instance targetInstance (object) for-method methodName (string):
+	+ to add-instruction for-instance targetInstance (object) for-method methodName (string) named instructionName = "" (string):
 		% Adds a custom callback instruction named instructionName to the push interpreter.  
 		% When instructionName is called, it will trigger the method methodName in targetInstance.
+		% If the instruction name is not specified, methodName will be used.
 
 		if instructionName == "": instructionName = methodName.
 
@@ -386,7 +387,7 @@ Object : PushProgram (aka PushPrograms) {
 		self set-code-pointer to pushParse(codeString).
 		return self.
 
-	+ to make-random-code max-length size = -1 (int) with-interpreter interpreter (object): 
+	+ to make-random-code with-interpreter interpreter (object) max-length size = -1 (int): 
 		% Makes a random push program of length size.  Size is an optional argument
 		% with a default value of 100.  The size may also be equal to -1, which indicates 
 		% that the MAX-POINTS-IN-RANDOM-EXPRESSION value from the Push configuration file

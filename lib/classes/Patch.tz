@@ -1,5 +1,4 @@
 @use Abstract.
-@use PatchGrid.
 
 Abstract : Patch (aka Patches) [version 2.2] {
     % A patch is a non-physical object which is associated with a specific 

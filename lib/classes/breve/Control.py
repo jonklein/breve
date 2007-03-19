@@ -584,6 +584,7 @@ class Control( breve.Abstract ):
 		self.disableLighting()
 		self.addMenuSeparator()
 		self.genericShape = breve.createInstances( breve.Sphere, 1 ).initWith( 1.000000 )
+
 		self.genericLinkShape = breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 0.100000, 1, 0.100000 ) )
 
 	def iterate( self ):
@@ -800,7 +801,7 @@ class Control( breve.Abstract ):
 
 		breve.breveInternalFunctionFinder.cameraSetText( self, theString, messageNumber, xLoc, yLoc, textColor )
 
-	def setDisplayText( self, messageNumber, theString, xLoc = -0.950000, yLoc = -0.950000 ):
+	def setDisplayText( self, theString, xLoc = -0.950000, yLoc = -0.950000, messageNumber = 0 ):
 		'''Sets a text string in the simulation display.  xLoc and yLoc  represent the location of the text.  The coordinate system  used goes from (-1, -1) to (1, 1) with (-1, -1) at the lower  left hand corner, (0, 0) in the center of the window and  (1, 1) in the top right hand corner. <p> The optional argument messageNumber may be used to specify  up to 8 different messages.'''
 
 

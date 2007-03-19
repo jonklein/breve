@@ -27,16 +27,18 @@ def setController( inControllerClass ):
 
 
 def allInstances( inclass ):
-	if not instanceDict.has_key( inclass ):
-		instanceDict[ inclass ] = []
+	cls = globals()[ inclass ]
 
-	return instanceDict[ inclass ]
+	if not instanceDict.has_key( cls ):
+		instanceDict[ cls ] = objectList()
+
+	return instanceDict[ cls ]
 
 def addInstance( inclass, ininstance ):
 	if not instanceDict.has_key( inclass ):
-		instanceDict[ inclass ] = []
+		instanceDict[ inclass ] = objectList()
 
-	instanceDict.append( ininstance )
+	instanceDict[ inclass ].append( ininstance )
 
 	return breveInternal.addInstance( breveInternal, inclass, ininstance )
 
@@ -71,11 +73,26 @@ def createInstances( inClass, inCount ):
 def deleteInstances( inInstances ):
 	"Delete one or more instances of a breve class"
 
-	if type( inInstances ) == list:
+	# print "Deleting %s" % inInstances
+
+	if issubclass( inInstances.__class__, list ):
 		for i in inInstances:
+			i.destroy()
+			i.delete()
+			breveInternal.removeInstance( breveInternal.breveEngine, i )
+			all = allInstances( i.__class__.__name__ )
+			if i in all:
+				all.remove( i )
 			del i
 
 		return
+
+	inInstances.destroy()
+	inInstances.delete()
+	breveInternal.removeInstance( breveInternal.breveEngine, inInstances )
+	all = allInstances( inInstances.__class__.__name__ )
+	if inInstances in all:
+		all.remove( inInstances )
 
 	del inInstances
 
@@ -124,7 +141,7 @@ def length( inValue ):
 	if inValue.__class__ == int or inValue.__class__ == float:
 		return abs( inValue )
 
-	if inValue.__class__ == objectList:
+	if issubclass( inValue.__class__, list ):
 		return len( inValue )
 
 	return 1
@@ -240,26 +257,61 @@ class vector( object ):
 #
 # Import all of the standard breve classes
 #
+# Ordered to respect inter-object dependencies
+#
 
-from Object		import *
+from Object 		import *
 
-from Abstract		import *
-from Real		import *
+from Abstract 		import *
+from Real 		import *
 
-from Stationary		import *
-from Control		import *
-from PhysicalControl	import *
-from Camera		import *
-from MenuItem		import *
-from Shape		import *
-from Mobile		import *
-from Image		import *
+from Mobile 		import *
+from Stationary 	import *
 
-from Joint		import *
-from Patch		import *
+from Link 		import *
 
-from GeneticAlgorithm	import *
-from DirectedGraph	import *
+from Camera 		import *
+from Control 		import *
+from PhysicalControl 	import *
+from Data 		import *
+from MultiBody 		import *
+
+from GeneticAlgorithm 	import *
+
+from PatchGrid 		import *
+from PatchToroid 	import *
+from Patch 		import *
+
+from Braitenberg 	import *
+from DirectedGraph 	import *
+from Drawing 		import *
+from File 		import *
+from Genome 		import *
+from Graph 		import *
+from IRSensor 		import *
+from Image 		import *
+from Joint 		import *
+from Line 		import *
+from Matrix 		import *
+from MenuItem 		import *
+from Movie 		import *
+from NetworkServer 	import *
+from NeuralNetwork 	import *
+from Push 		import *
+from PushGP 		import *
+from SFFNetwork 	import *
+from Shape 		import *
+from Sound 		import *
+from Spring 		import *
+from Terrain 		import *
+from Tone 		import *
+from TurtleDrawing 	import *
+from Vector 		import *
+from Wanderer 		import *
+
+
+
+
 
 class bridgeObjectMethod( Object ):
 	"A callable object used to implement breve bridge method calling"
@@ -279,7 +331,7 @@ class bridgeObject( object ):
 	__slots__ = [ 'functionCache', 'breveModule', 'breveInstance' ]
 
 	def __init__( self ): 
-		self.breveInstance = breveInternal.addInstance( breve.breveInternal, self.__class__, self )
+		self.breveInstance = addInstance( self.__class__, self )
 		self.breveModule = breveInternal
 
 		self.functionCache = {}

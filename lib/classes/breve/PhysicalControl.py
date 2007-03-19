@@ -4,19 +4,18 @@ import breve
 class PhysicalControl( breve.Control ):
 	'''The OBJECT(PhysicalControl) class is a subclass of OBJECT(Control) which  must be used for physical simulations.  It activates a number of  features required for physical simulation and sets a number of  variables to reasonable values.'''
 
-	__slots__ = [ 'gravityMenu', ]
+	__slots__ = [ 'gravityMenu' ]
 
 	def __init__( self ):
 		breve.Control.__init__( self )
-		self.gravityMenu = [ None, None, None, None ]
+		self.gravityMenu = breve.objectList()
 		PhysicalControl.init( self )
 
 	def dearchive( self ):
 		''''''
 
 
-		return breve.Control.dearchive( self,)
-
+		return breve.Control.dearchive( self )
 
 	def disableAutoDisable( self ):
 		''''''
@@ -84,10 +83,10 @@ class PhysicalControl( breve.Control ):
 		self.setIntegrationStep( 0.004000 )
 		self.setIterationStep( 0.050000 )
 		self.setFastPhysicsIterations( 40 )
-		self.gravityMenu[ 0 ] = self.addMenu( '''Zero Gravity''', '''zeroGravity''' )
-		self.gravityMenu[ 1 ] = self.addMenu( '''Half Gravity''', '''halfGravity''' )
-		self.gravityMenu[ 2 ] = self.addMenu( '''Full Gravity''', '''fullGravity''' )
-		self.gravityMenu[ 3 ] = self.addMenu( '''Double Gravity''', '''doubleGravity''' )
+		self.gravityMenu[ 0 ] = self.addMenu( '''Zero Gravity''', 'zeroGravity' )
+		self.gravityMenu[ 1 ] = self.addMenu( '''Half Gravity''', 'halfGravity' )
+		self.gravityMenu[ 2 ] = self.addMenu( '''Full Gravity''', 'fullGravity' )
+		self.gravityMenu[ 3 ] = self.addMenu( '''Double Gravity''', 'doubleGravity' )
 		self.fullGravity()
 		self.enableLighting()
 		self.enableShadowVolumes()

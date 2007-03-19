@@ -191,8 +191,8 @@ Object : PushGP {
 		if seed: (pop1{0} parse program seed).
 
 		for n = 0, n < (self count-fitness-cases), n++: {
-			_fitnessCaseSolutionRates{ n } = 0.
-			_lastSolutionRates{ n } = 0.
+			push 0 onto _fitnessCaseSolutionRates.
+			push 0 onto _lastSolutionRates.
 		}
 
 		inited = 1.
@@ -309,12 +309,12 @@ Object : PushGP {
 
 		percent = (100.0 * currentIndividual / populationSize).
 
-		controller set-display-message with-number 0 at-x -0.9 at-y -0.8 to "Generation $generation: $percent% Complete".
+		controller set-display-text to "Generation $generation: $percent% Complete" at-x -0.9 at-y -0.8.
 
 		# if we're breeding in the next timestep, we'll set the message now...
 
 		if currentIndividual >= (populationSize - 100): 
-			controller set-display-message with-number 0 at-x -0.9 at-y -0.8 to "Generation $generation: breeding".
+			controller set-display-text to "Generation $generation: breeding" at-x -0.9 at-y -0.8.
 
 	+ to get-current-individual:
 		% Returns the PushProgram currently being evaluated.
@@ -534,7 +534,7 @@ Object : PushGP {
 		print ";; Average program size in population (points): $_totalSize".
 		print "".
 
-		controller set-display-message with-number 2 at-x -0.9 at-y -0.9 to "Best Fitness: $bestFitness".
+		controller set-display-text to "Best Fitness: $bestFitness" at-x -0.9 at-y -0.9 number 2.
 
 	+ to reproduce:
 		% Used internally.                
