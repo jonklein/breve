@@ -42,7 +42,6 @@ Controller Swarm.
 Control : Swarm {
 	+ variables:
 		birds (list).
-		item (object).
 		cloudTexture (object).
 		selection (object).
 
@@ -94,6 +93,7 @@ Control : Swarm {
 	self enable-shadows.
 
 	+ to iterate:
+		item (object).
 		location (vector).
 		topDiff (double).
 
@@ -129,21 +129,25 @@ Control : Swarm {
 	# The following methods are the menu items we provide.
 
 	+ to squish:
+		item (object).
 		foreach item in birds: item move to (0, 0, 0).
 	
 	+ to flock-normally:
+		item (object).
 		foreach item in birds: item flock-normally.
 		normalMenu check.
 		obedientMenu uncheck.
 		wackyMenu uncheck.
 
 	+ to flock-obediently:
+		item (object).
 		foreach item in birds: item flock-obediently.
 		normalMenu uncheck.
 		obedientMenu check.
 		wackyMenu uncheck.
 
 	+ to flock-wackily:
+		item (object).
 		foreach item in birds: item flock-wackily.
 		normalMenu uncheck.
 		obedientMenu uncheck.
