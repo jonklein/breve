@@ -3154,7 +3154,7 @@ int stCallMethod( stRunInstance *caller, stRunInstance *target, stMethod *method
 			if ( o ) keyEntry->var->type->_objectType = ( stObject* )o->userData;
 		}
 
-		resultCode = stSetVariable( &newStStack[keyEntry->var->offset], keyEntry->var->type->_type, keyEntry->var->type->_objectType, args[ n ], caller );
+		resultCode = stSetVariable( &newStStack[keyEntry->var->offset], keyEntry->var->type->_type, keyEntry->var->type->_objectType, (brEval*) args[ n ], caller );
 
 		if ( resultCode != EC_OK ) {
 			slMessage( DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", keyEntry->keyword.c_str(), method->name.c_str() );

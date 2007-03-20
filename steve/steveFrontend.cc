@@ -5,6 +5,7 @@
 #include "java.h"
 
 #include "python.h"
+#include "perlInit.h"
 // #include "lisp.h"
 
 #include "breveFunctionsSteveDataObject.h"
@@ -22,7 +23,9 @@ void *brInitFrontendLanguages( brEngine *engine ) {
 #ifdef HAVE_LIBPYTHON
         brPythonInit( engine );
 #endif
-
+#ifdef HAVE_LIBPERL
+		brPerlInit( engine );
+#endif
 #ifdef HAVE_LIBECL
         brLispInit( engine );
 #endif

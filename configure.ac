@@ -125,6 +125,19 @@ if test "$ac_cv_lib_python24_Py_Initialize" = yes; then
 	AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
 fi
 
+#
+# Dyanmically linking in Perl
+#
+AC_CHECK_LIB([perl], [perl_construct])
+
+# dunno why this isn't working
+#AC_PROG_LIBTOOL
+#AC_PROG_SWIG
+#if test "$ac_cv_lib_perl_perl_construct" = yes; then
+#	AC_DEFINE( [HAVE_LIBPERL], [], [Have the required Perl libraries] )
+#fi
+
+
 
 
 if test "x$engine_only" = "x"; then

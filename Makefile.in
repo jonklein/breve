@@ -11,6 +11,8 @@ YACC		= @YACC@
 
 VERSION		= @VERSION@
 
+ACLOCAL_AMFLAGS = -I m4
+
 CFLAGS		= @CFLAGS@
 CPPFLAGS	= @CPPFLAGS@ -Iinclude/breve @DEFS@
 LDFLAGS		= @LDFLAGS@
@@ -43,6 +45,7 @@ include neural/Makefile
 include neural/Network/Makefile
 include steve/Makefile
 include python/Makefile
+include perl/Makefile
 include lisp/Makefile
 include util/Makefile
 include WinSaver/Makefile

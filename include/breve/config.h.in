@@ -66,9 +66,6 @@
 /* Define to 1 if you have the `history' library (-lhistory). */
 #undef HAVE_LIBHISTORY
 
-/* JVM library for JNI */
-#undef HAVE_LIBJAVA
-
 /* Define to 1 if you have the `jpeg' library (-ljpeg). */
 #undef HAVE_LIBJPEG
 
@@ -80,6 +77,9 @@
 
 /* Define to 1 if you have the `ode' library (-lode). */
 #undef HAVE_LIBODE
+
+/* Define to 1 if you have the `perl' library (-lperl). */
+#undef HAVE_LIBPERL
 
 /* Define to 1 if you have the `png' library (-lpng). */
 #undef HAVE_LIBPNG
@@ -235,5 +235,5 @@
 #undef inline
 #endif
 
-/* Define to `unsigned' if <sys/types.h> does not define. */
+/* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t

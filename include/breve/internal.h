@@ -51,6 +51,7 @@ DLLEXPORT FILE *slGetLogFilePointer(brInstance *);
 #endif
 
 void breveInitPythonFunctions(brNamespace *);
+void breveInitPerlFunctions(brNamespace *);
 
 void brLoadInternalFunctions(brEngine *);
 void brFreeBreveCall(void *);

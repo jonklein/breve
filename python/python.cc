@@ -65,7 +65,7 @@ inline PyObject *PyObject_GetAttrStringSafe( PyObject *inObject, const char *inS
 	if( !inObject ) 
 		return NULL;
 
-	PyObject *result = PyObject_GetAttrString( inObject, inString );
+	PyObject *result = PyObject_GetAttrString( inObject, (char*) inString );
 
 	if( !result )
 		PyErr_Clear();
@@ -204,7 +204,6 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleObject ) {
 	PyObject *result = NULL;
 	brInstance *breveInstance;
-
 	switch ( inEval->type() ) {
 
 		case AT_NULL:
@@ -322,7 +321,7 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 			}
 
 
-			break;
+break;
 
 		case AT_ARRAY:
 		case AT_DATA:
@@ -783,6 +782,7 @@ void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inT
 
 	Py_DECREF( argumentCount );
 
+	printf("findMethod returning: %08x\n",(unsigned)method);
 	return method;
 }
 
@@ -861,6 +861,8 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 	PyObject *instance = ( PyObject* )inInstance;
 	PyObject *method = ( PyObject* )inMethod;
 	static PyObject *tuples[ 5 ] = { PyTuple_New( 1 ), PyTuple_New( 2 ), PyTuple_New( 3 ), PyTuple_New( 4 ), PyTuple_New( 5 ) };
+
+	printf("PythonCalMethod inMethod = %08x\n",(unsigned)inMethod);
 
 	if ( !PyCallable_Check( method ) ) {
 		slMessage( DEBUG_ALL, "Warning: called method is not callable\n" );

@@ -1,4 +1,3 @@
-
 /*****************************************************************************
 *                                                                           *
 * The breve Simulation Environment                                          *
@@ -223,10 +222,10 @@ std::string stPerlConvertMethod( stPerlConversionData *inData, stObject *inObjec
 	//
 	// Declare the variables
 	// 
+	ADDTABS( inData, result);
 
 	if( inMethod->keywords.size() > 0 ) {
-		ADDTABS( inData, result );
-		result += "my ( ";
+		result += "my ($self, ";
 
 		for( unsigned int n = 0; n < inMethod->keywords.size(); n++ ) {
 			if( n > 0 ) 
@@ -236,7 +235,10 @@ std::string stPerlConvertMethod( stPerlConversionData *inData, stObject *inObjec
 		}
 
 		result += " );\n";
+	} else {
+		result += "my $self;\n";
 	}
+	
 
 	//
 	// Read in the arguments to local variables from @_
@@ -553,10 +555,9 @@ std::string stVectorExp::toPerl( stPerlConversionData *inData ) {
 std::string stForeachExp::toPerl( stPerlConversionData *inData ) {
 	std::string result;
 	std::string var;
-
+	
 	var = stPerlConvertVariable( assignment->_word, assignment->_local );
-
-	result = "foreach " + var + " " + list->toPerl( inData ) + " {\n";
+	result = "foreach " + var + " " + "(" + list->toPerl( inData ) + ") {\n";
 
 	inData->_indents++;
 
