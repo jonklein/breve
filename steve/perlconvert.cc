@@ -168,7 +168,8 @@ std::string stPerlConvertObject( stObject *inObject ) {
 }
 
 std::string stPerlConvertVariableDeclaration( stPerlConversionData *inData, stVar *inVar, bool inInstance ) {
-	std::string result = stPerlConvertVariable( inVar->name, !inInstance );
+	std::string result = "my ";
+	result += stPerlConvertVariable( inVar->name, !inInstance );
 
 	switch( inVar->type->_type ) {
 		case AT_INT:
