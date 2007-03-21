@@ -4,13 +4,12 @@ import breve
 class Swarm( breve.Control ):
 	''''''
 
-	__slots__ = [ 'birds', 'cloudTexture', 'item', 'normalMenu', 'obedientMenu', 'selection', 'wackyMenu' ]
+	__slots__ = [ 'birds', 'cloudTexture', 'normalMenu', 'obedientMenu', 'selection', 'wackyMenu' ]
 
 	def __init__( self ):
 		breve.Control.__init__( self )
 		self.birds = breve.objectList()
 		self.cloudTexture = None
-		self.item = None
 		self.normalMenu = None
 		self.obedientMenu = None
 		self.selection = None
@@ -33,9 +32,10 @@ class Swarm( breve.Control ):
 	def flockNormally( self ):
 		''''''
 
+		item = None
 
-		for self.item in self.birds:
-			self.item.flockNormally()
+		for item in self.birds:
+			item.flockNormally()
 
 		self.normalMenu.check()
 		self.obedientMenu.uncheck()
@@ -44,9 +44,10 @@ class Swarm( breve.Control ):
 	def flockObediently( self ):
 		''''''
 
+		item = None
 
-		for self.item in self.birds:
-			self.item.flockObediently()
+		for item in self.birds:
+			item.flockObediently()
 
 		self.normalMenu.uncheck()
 		self.obedientMenu.check()
@@ -55,9 +56,10 @@ class Swarm( breve.Control ):
 	def flockWackily( self ):
 		''''''
 
+		item = None
 
-		for self.item in self.birds:
-			self.item.flockWackily()
+		for item in self.birds:
+			item.flockWackily()
 
 		self.normalMenu.uncheck()
 		self.obedientMenu.uncheck()
@@ -92,20 +94,21 @@ class Swarm( breve.Control ):
 	def iterate( self ):
 		''''''
 
+		item = None
 		location = breve.vector()
 		topDiff = 0
 
 		self.updateNeighbors()
-		for self.item in self.birds:
-			self.item.fly()
-			location = ( location + self.item.getLocation() )
+		for item in self.birds:
+			item.fly()
+			location = ( location + item.getLocation() )
 
 
 		location = ( location / breve.length( self.birds ) )
 		topDiff = 0.000000
-		for self.item in self.birds:
-			if ( topDiff < breve.length( ( location - self.item.getLocation() ) ) ):
-				topDiff = breve.length( ( location - self.item.getLocation() ) )
+		for item in self.birds:
+			if ( topDiff < breve.length( ( location - item.getLocation() ) ) ):
+				topDiff = breve.length( ( location - item.getLocation() ) )
 
 
 
@@ -115,9 +118,10 @@ class Swarm( breve.Control ):
 	def squish( self ):
 		''''''
 
+		item = None
 
-		for self.item in self.birds:
-			self.item.move( breve.vector( 0, 0, 0 ) )
+		for item in self.birds:
+			item.move( breve.vector( 0, 0, 0 ) )
 
 
 

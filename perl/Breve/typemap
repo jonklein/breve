@@ -1,3 +1,3 @@
-const char* T_PV
-BREngine* T_SV
-BRInstance* T_SV
+TYPEMAP
+MyClass *         O_OBJECT
+

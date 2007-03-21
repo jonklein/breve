@@ -1,27 +1,29 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-
 #include "ppport.h"
+#ifdef __cplusplus
+}
+#endif
 
-//#include "../../include/breve/engine.h"
-//#include "engine_p.h"
+#include "perlInterface.h"
 
-//int brEngineSetController(BREngine* inEngine, BRInstance* inInstance);
+MODULE = Breve		PACKAGE = Breve	
 
-MODULE = Breve		PACKAGE = Breve		
+void* brPerlSetController(alpha, beta)
+    void* alpha
+    void* beta
 
+void testingfoo()
+	CODE:
+		printf("testingfoo called.\n");
 
-int
-brEngineSetController(inEngine, inInstance)
-		void* inEngine
-		void* inInstance
+void blahblah()
 
-
-
-
-
-
-
+BOOT:
+	printf("Hello from the bootstrap!\n");
 
 

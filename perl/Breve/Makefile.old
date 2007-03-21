@@ -12,13 +12,17 @@
 
 #     ABSTRACT_FROM => q[lib/Breve.pm]
 #     AUTHOR => q[Carson Baker <carson@carsonbaker.org>]
+#     CC => q[g++]
 #     DEFINE => q[]
-#     INC => q[-I.]
+#     INC => q[-I. -I..]
+#     LD => q[$(CC)]
 #     LIBS => [q[]]
-#     MYEXTLIB => q[lib/libbreve$(LIB_EXT)]
+#     MYEXTLIB => q[../../lib/libbreve$(LIB_EXT)]
 #     NAME => q[Breve]
 #     PREREQ_PM => {  }
+#     TYPEMAPS => [q[perlobject.map]]
 #     VERSION_FROM => q[lib/Breve.pm]
+#     XSOPT => q[-C++]
 
 # --- MakeMaker post_initialize section:
 
@@ -29,12 +33,12 @@
 
 # They may have been overridden via Makefile.PL or on the command line
 AR = ar
-CC = cc
+CC = g++
 CCCDLFLAGS = -fPIC
 CCDLFLAGS = -Wl,-E
 DLEXT = so
 DLSRC = dl_dlopen.xs
-LD = cc
+LD = $(CC)
 LDDLFLAGS = -shared -L/usr/local/lib
 LDFLAGS =  -L/usr/local/lib
 LIBC = /lib/libc-2.4.so
@@ -118,7 +122,7 @@ DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)
 PERL_LIB = /usr/share/perl/5.8
 PERL_ARCHLIB = /usr/lib/perl/5.8
 LIBPERL_A = libperl.a
-MYEXTLIB = lib/libbreve$(LIB_EXT)
+MYEXTLIB = ../../lib/libbreve$(LIB_EXT)
 FIRST_MAKEFILE = Makefile
 MAKEFILE_OLD = Makefile.old
 MAKE_APERL_FILE = Makefile.aperl
@@ -150,7 +154,7 @@ BASEEXT = Breve
 PARENT_NAME = 
 DLBASE = $(BASEEXT)
 VERSION_FROM = lib/Breve.pm
-INC = -I.
+INC = -I. -I..
 DEFINE = 
 OBJECT = $(BASEEXT)$(OBJ_EXT)
 LDFROM = $(OBJECT)
@@ -161,7 +165,12 @@ BOOTDEP =
 XS_FILES = Breve.xs
 C_FILES  = Breve.c
 O_FILES  = Breve.o
-H_FILES  = ppport.h
+H_FILES  = engine_p.h \
+	ppport.h \
+	simulationTypedefs_p.h \
+	simulation_p.h \
+	timeval_p.h \
+	util_p.h
 MAN1PODS = 
 MAN3PODS = lib/Breve.pm
 
@@ -185,12 +194,9 @@ PERL_ARCHIVE       =
 PERL_ARCHIVE_AFTER = 
 
 
-TO_INST_PM = lib/Breve.pm \
-	lib/libbreve.a
+TO_INST_PM = lib/Breve.pm
 
-PM_TO_BLIB = lib/libbreve.a \
-	blib/lib/libbreve.a \
-	lib/Breve.pm \
+PM_TO_BLIB = lib/Breve.pm \
 	blib/lib/Breve.pm
 
 
@@ -211,8 +217,8 @@ XSUBPPDIR = /usr/share/perl/5.8/ExtUtils
 XSUBPP = $(XSUBPPDIR)$(DFSEP)xsubpp
 XSUBPPRUN = $(PERLRUN) $(XSUBPP)
 XSPROTOARG = 
-XSUBPPDEPS = /usr/share/perl/5.8/ExtUtils/typemap typemap $(XSUBPP)
-XSUBPPARGS = -typemap /usr/share/perl/5.8/ExtUtils/typemap -typemap typemap
+XSUBPPDEPS = /usr/share/perl/5.8/ExtUtils/typemap perlobject.map typemap $(XSUBPP)
+XSUBPPARGS = -C++ -typemap /usr/share/perl/5.8/ExtUtils/typemap -typemap perlobject.map -typemap typemap
 XSUBPP_EXTRA_ARGS = 
 
 
@@ -882,6 +888,7 @@ test :: $(TEST_TYPE)
 
 test_dynamic :: pure_all
 	PERL_DL_NONLAZY=1 $(FULLPERLRUN) "-MExtUtils::Command::MM" "-e" "test_harness($(TEST_VERBOSE), '$(INST_LIB)', '$(INST_ARCHLIB)')" $(TEST_FILES)
+	PERL_DL_NONLAZY=1 $(FULLPERLRUN) "-I$(INST_LIB)" "-I$(INST_ARCHLIB)" $(TEST_FILE)
 
 testdb_dynamic :: pure_all
 	PERL_DL_NONLAZY=1 $(FULLPERLRUN) $(TESTDB_SW) "-I$(INST_LIB)" "-I$(INST_ARCHLIB)" $(TEST_FILE)
@@ -890,6 +897,7 @@ test_ : test_dynamic
 
 test_static :: pure_all $(MAP_TARGET)
 	PERL_DL_NONLAZY=1 ./$(MAP_TARGET) "-MExtUtils::Command::MM" "-e" "test_harness($(TEST_VERBOSE), '$(INST_LIB)', '$(INST_ARCHLIB)')" $(TEST_FILES)
+	PERL_DL_NONLAZY=1 ./$(MAP_TARGET) "-I$(INST_LIB)" "-I$(INST_ARCHLIB)" $(TEST_FILE)
 
 testdb_static :: pure_all $(MAP_TARGET)
 	PERL_DL_NONLAZY=1 ./$(MAP_TARGET) $(TESTDB_SW) "-I$(INST_LIB)" "-I$(INST_ARCHLIB)" $(TEST_FILE)
@@ -915,7 +923,6 @@ ppd:
 
 pm_to_blib : $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', '\''$(PM_FILTER)'\'')' \
-	  lib/libbreve.a blib/lib/libbreve.a \
 	  lib/Breve.pm blib/lib/Breve.pm 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
