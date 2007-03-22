@@ -19,11 +19,7 @@ static void *breve_engine;
 // static void xs_init (pTHX);
 
 EXTERN_C void boot_DynaLoader (pTHX_ CV* cv);
-
-EXTERN_C void boot_Breve (pTHX_ CV* cv)
-{
-	printf("Booting Breve (C)::\n");
-}
+EXTERN_C void boot_Breve (pTHX_ CV* cv);
 
 EXTERN_C void
 xs_init(pTHX)

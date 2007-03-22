@@ -1,6 +1,0 @@
-Revision history for Perl extension Breve.
-
-0.01  Wed Mar 14 01:36:20 2007
-	- original version; created by h2xs 1.23 with options
-		-A -n Breve
-
