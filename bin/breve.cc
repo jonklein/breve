@@ -164,10 +164,10 @@ int main( int argc, char **argv ) {
 
 		if( position > 0 ) {
 			pyf.replace( position, 3, ".py", 3 );
-			plf.replace( position, 3, ".pl", 3 );
+			plf.replace( position, 3, ".pm", 3 );
 		} else {
 			pyf += ".py";
-			plf += ".pl";
+			plf += ".pm";
 		}
 
 		FILE *fp = fopen( pyf.c_str(), "w" );
