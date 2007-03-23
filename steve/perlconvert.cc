@@ -28,7 +28,7 @@ std::string stPerlConvertFile( brEngine *inEngine, stSteveData *inSteveData, std
 	unsigned int n;
 
 	result += "\nuse strict;\n";
-	result += "use breve;\n\n";
+	result += "use Breve;\n\n";
 
 	for( n = 0; n < inSteveData->_paths[ inFilename ].size(); n++ ) {
 		
@@ -150,6 +150,8 @@ std::string stPerlConvertObject( stObject *inObject ) {
 		ADDTABS( &conversionData, result );
 		result += "init( $self );\n"; 
 	}
+
+	result += "return $self;\n";
 
 	conversionData._indents--;
 
