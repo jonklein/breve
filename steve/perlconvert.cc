@@ -44,8 +44,8 @@ std::string stPerlConvertFile( brEngine *inEngine, stSteveData *inSteveData, std
 		if( object->_file == inFilename ) {
 			result += stPerlConvertObject( object );
 
-			if( inSteveData->controllerName && !strcmp( object->name.c_str(), inSteveData->controllerName ) )
-				controller = object->name + "->new()";
+			//if( inSteveData->controllerName && !strcmp( object->name.c_str(), inSteveData->controllerName ) )
+			//	controller = "package " + object->name + "->control()";
 
 			std::map< std::string, brObject* >::iterator mi;
 
@@ -57,9 +57,9 @@ std::string stPerlConvertFile( brEngine *inEngine, stSteveData *inSteveData, std
 		}
 	}
 
-
-	result += aliases;
-	result += "\n" + controller + ";\n";
+	// i don't know how to do this in Perl -- cb
+	//result += aliases;
+	//result += "\n" + controller + ";\n";
 
 	result += "\n1;\n";
 
@@ -151,6 +151,7 @@ std::string stPerlConvertObject( stObject *inObject ) {
 		result += "init( $self );\n"; 
 	}
 
+	ADDTABS( &conversionData, result );
 	result += "return $self;\n";
 
 	conversionData._indents--;

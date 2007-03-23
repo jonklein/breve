@@ -13,7 +13,8 @@ struct methodpack {
 	int argCount;
 };
 
-static void *breve_engine;
+brEngine *breveEngine;
+brObjectType *brevePerlType;
 
 // for xsub use
 // static void xs_init (pTHX);
@@ -102,10 +103,6 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 	}
 
 	return result;
-}
-
-void brPerlLoadInternal() {
-	
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -268,12 +265,16 @@ int brPerlLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *inFi
 		exitstatus = perl_parse(my_perl, xs_init, 2, embedding, (char**)NULL);
 		if(!exitstatus) {
 			slMessage(DEBUG_INFO,"Successfully loaded Breve Perl file.\n");
-			breve_engine = inEngine; // saving this for later callbacks
+			breveEngine = inEngine; // saving this for later callbacks
 			// TODO do i actually use this anywhere?
 		} else {
 			result = EC_ERROR;
 		}
           
+		// execute the main package code
+		int perl_run_result = perl_run(my_perl);
+		slMessage(DEBUG_INFO, "Result from perl_run() => %d\n", perl_run_result);
+
 		fclose( fp );
 
 	} else {
@@ -309,9 +310,7 @@ void brPerlInit( brEngine *breveEngine ) {
 	perl_construct(my_perl);
 	PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
     
-	brObjectType		*brevePerlType = new brObjectType();
-
-	brPerlLoadInternal();
+	brevePerlType = new brObjectType();
 
 	brevePerlType->userData			= NULL;
 	

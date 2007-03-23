@@ -13,17 +13,16 @@ extern "C" {
 
 MODULE = Breve		PACKAGE = Breve	
 
-void* brPerlSetController(alpha, beta)
-    void* alpha
-    void* beta
+void *
+brPerlSetController(controller)
+	SV* controller
 
-void testingfoo()
-	CODE:
-		printf("testingfoo called.\n");
-
-void blahblah()
-
-BOOT:
-	printf("Hello from the bootstrap!\n");
-
-
+void *
+brPerlFindInternalFunction( inSelf, name )
+	SV *inSelf
+	char *name
+			    
+void *
+brPerlCallInternalFunction( inSelf, inArgs )
+	SV *inSelf
+	void *inArgs
