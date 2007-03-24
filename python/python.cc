@@ -782,7 +782,6 @@ void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inT
 
 	Py_DECREF( argumentCount );
 
-	printf("findMethod returning: %08x\n",(unsigned)method);
 	return method;
 }
 
@@ -862,8 +861,6 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 	PyObject *method = ( PyObject* )inMethod;
 	static PyObject *tuples[ 5 ] = { PyTuple_New( 1 ), PyTuple_New( 2 ), PyTuple_New( 3 ), PyTuple_New( 4 ), PyTuple_New( 5 ) };
 
-	printf("PythonCalMethod inMethod = %08x\n",(unsigned)inMethod);
-
 	if ( !PyCallable_Check( method ) ) {
 		slMessage( DEBUG_ALL, "Warning: called method is not callable\n" );
 		return EC_ERROR;
@@ -888,11 +885,7 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 
 	PyObject *tuple;
 
-	if( 0 && count < 5 ) {
-		tuple = tuples[ count ];
-	} else {
-		tuple = PyTuple_New( count + 1 );
-	}
+	tuple = PyTuple_New( count + 1 );
 
 	// the instance we're calling the method for has the breveInternal module pointer
 
@@ -925,9 +918,7 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 
 	PyObject *result = PyObject_Call( method, tuple, NULL );
 
-
-	if( count > 5 )
-		Py_DECREF( tuple );
+	Py_DECREF( tuple );
 
 
 	if( !result ) {
