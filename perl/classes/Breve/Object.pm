@@ -1,6 +1,5 @@
 
 use strict;
-use Breve;
 
 package Breve::Object;
 
@@ -10,6 +9,7 @@ sub new {
 	my $class = shift;
 	my $self = {};
 	bless $self, $class;
+
 	my $self->{ birthTime } = 0;
 	my $self->{ controller } = undef;
 	init( $self );
@@ -23,9 +23,8 @@ sub addDependency {
 	( $self, $i ) = @_;
 
 	if( $i ) {
-		Breve::addDependency( $self, $i );
+	    Breve::callInternal($self, "addDependency", $i );
 	}
-
 }
 
 sub announce {
@@ -34,7 +33,7 @@ sub announce {
 	my ($self, $theMessage );
 	( $self, $theMessage ) = @_;
 
-	Breve::notify( $self, $theMessage );
+	Breve::callInternal($self, "notify", $theMessage );
 }
 
 sub archive {
@@ -50,7 +49,7 @@ sub archiveAsXml {
 	my ($self, $fileName );
 	( $self, $fileName ) = @_;
 
-	Breve::archiveXMLObject( $self, $fileName );
+	Breve::callInternal($self, "archiveXMLObject", $self, $fileName );
 }
 
 sub callMethod {
@@ -59,7 +58,7 @@ sub callMethod {
 	my ($self, $methodName );
 	( $self, $methodName ) = @_;
 
-	return Breve::callMethodNamed( $self, $methodName, [] );
+	return Breve::callInternal($self, "callMethodNamed", $self, $methodName, [] );
 }
 
 sub callMethod {
@@ -68,7 +67,7 @@ sub callMethod {
 	my ($self, $methodName, $argList );
 	( $self, $methodName, $argList ) = @_;
 
-	return Breve::callMethodNamed( $self, $methodName, $argList );
+	return Breve::callInternal($self, "callMethodNamed", $self, $methodName, $argList );
 }
 
 sub canRespond {
@@ -77,7 +76,7 @@ sub canRespond {
 	my ($self, $methodName );
 	( $self, $methodName ) = @_;
 
-	return Breve::respondsTo( $self, $methodName );
+	return Breve::callInternal($self, "respondsTo", $self, $methodName );
 }
 
 sub dearchive {
@@ -101,7 +100,7 @@ sub disableAutoFree {
 	my $self;
 	( $self ) = @_;
 
-	Breve::setGC( $self, 0 );
+	Breve::callInternal($self, "setGC", 0 );
 }
 
 sub enableAutoFree {
@@ -110,7 +109,7 @@ sub enableAutoFree {
 	my $self;
 	( $self ) = @_;
 
-	Breve::setGC( $self, 1 );
+	Breve::callInternal($self, "setGC", 1 );
 }
 
 sub getAge {
@@ -128,7 +127,7 @@ sub getController {
 	my $self;
 	( $self ) = @_;
 
-	return Breve::getController( $self);
+	return Breve::callInternal($self, "getController");
 }
 
 sub getDescription {
@@ -145,15 +144,20 @@ sub getType {
 	my $self;
 	( $self ) = @_;
 
-	return Breve::objectName( $self );
+	return Breve::callInternal($self, "objectName", $self );
 }
 
 sub init {
 	my $self;
 	( $self ) = @_;
 
-	$self->{ controller } = $self->getController();
+	unless($self->{brInstance}) {
+	    Breve::brPerlAddInstance($self);
+	}
+
+	$self->{ controller } = $self->getController(); 
 	$self->{ birthTime } = $self->{ controller }->getTime();
+
 }
 
 sub isA {
@@ -162,7 +166,7 @@ sub isA {
 	my ($self, $className );
 	( $self, $className ) = @_;
 
-	return Breve::isa( $self, $className );
+	return Breve::callInternal($self, "isa", $className );
 }
 
 sub isA {
@@ -171,7 +175,7 @@ sub isA {
 	my ($self, $className );
 	( $self, $className ) = @_;
 
-	return Breve::isa( $self, $className );
+	return Breve::callInternal($self, "isa", $className );
 }
 
 sub isASubclass {
@@ -180,7 +184,7 @@ sub isASubclass {
 	my ($self, $className );
 	( $self, $className ) = @_;
 
-	return Breve::isa( $self, $className );
+	return Breve::callInternal($self, "isa", $className );
 }
 
 sub observe {
@@ -189,7 +193,7 @@ sub observe {
 	my ($self, $theObject, $theNotification, $theMethod );
 	( $self, $theObject, $theNotification, $theMethod ) = @_;
 
-	Breve::addObserver( $self, $theObject, $theNotification, $theMethod );
+	Breve::callInternal($self, "addObserver", $theObject, $theNotification, $theMethod );
 }
 
 sub postDearchiveSetController {
@@ -207,7 +211,7 @@ sub removeDependency {
 	my ($self, $theObject );
 	( $self, $theObject ) = @_;
 
-	Breve::removeDependency( $self, $theObject );
+	Breve::callInternal($self, "removeDependency", $theObject );
 }
 
 sub schedule {
@@ -216,14 +220,14 @@ sub schedule {
 	my ($self, $theMethod, $theTime );
 	( $self, $theMethod, $theTime ) = @_;
 
-	Breve::addEvent( $self, $theMethod, $theTime, 0 );
+	Breve::callInternal($self, "addEvent", $theMethod, $theTime, 0 );
 }
 
 sub scheduleRepeating {
 	my ($self, $theMethod, $theInterval );
 	( $self, $theMethod, $theInterval ) = @_;
 
-	Breve::addEvent( $self, $theMethod, $theInterval, $theInterval );
+	Breve::callInternal($self, "addEvent", $theMethod, $theInterval, $theInterval );
 }
 
 sub sendOverNetwork {
@@ -232,7 +236,7 @@ sub sendOverNetwork {
 	my ($self, $hostName, $portNumber );
 	( $self, $hostName, $portNumber ) = @_;
 
-	return Breve::sendXMLObject( $self, $hostName, $portNumber, $self );
+	return Breve::callInternal($self, "sendXMLObject", $hostName, $portNumber, $self );
 }
 
 sub unobserve {
@@ -241,11 +245,9 @@ sub unobserve {
 	my ($self, $theObject, $theNotification );
 	( $self, $theObject, $theNotification ) = @_;
 
-	Breve::removeObserver( $self, $theObject, $theNotification );
+	Breve::callInternal($self, "removeObserver", $theObject, $theNotification );
 }
 
-
-;
 
 1;
 

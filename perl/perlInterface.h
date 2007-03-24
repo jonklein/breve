@@ -7,11 +7,16 @@
 extern brEngine         *breveEngine;
 extern brObjectType     *brevePerlType;
 
+extern brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr );
+
+/////////////
+
+void *brPerlSetController( brInstance* controller );
+
+brInternalFunction *brPerlFindInternalFunction( char *name );
+
+SV* brPerlCallInternalFunction( brInternalFunction *inFunc, brInstance *caller, int argCount, void *inArgs);
+
 brInstance *brPerlAddInstance( SV* instance );
-void *brPerlSetController( SV* controller );
-
-brInternalFunction *brPerlFindInternalFunction( SV *inSelf, char *name );
-void *brPerlCallInternalFunction( SV *inSelf, void *inArgs );
-
 
 #endif

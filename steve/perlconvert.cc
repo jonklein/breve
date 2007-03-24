@@ -114,7 +114,7 @@ std::string stPerlConvertObject( stObject *inObject ) {
 
 	std::string supername = "";
 
-	result = "package " + stPerlConvertSymbol( inObject->name ) + ";\n\n";
+	result = "package Breve::" + stPerlConvertSymbol( inObject->name ) + ";\n\n";
 
 	if( inObject->_comment.size() > 0 ) {
 		ADDTABS( &conversionData, result );
@@ -185,10 +185,10 @@ std::string stPerlConvertVariableDeclaration( stPerlConversionData *inData, stVa
 			result += " = undef";
 			break;
 		case AT_VECTOR:
-			result += " = breve->vector()";
+			result += " = ()";
 			break;
 		case AT_MATRIX:
-			result += " = breve->matrix()";
+			result += " = ()";
 			break;
 		case AT_STRING:
 			result += " = \"\"";
@@ -305,7 +305,7 @@ std::string stSuperExp::toPerl( stPerlConversionData *inData ) {
 std::string stRandomExp::toPerl( stPerlConversionData *inData ) {
 	std::string result;
 
-	result = "breve->randomExpression( " + expression->toPerl( inData ) + " )";
+	result = "Breve::randomExpression( " + expression->toPerl( inData ) + " )";
 
 	return result;
 }
@@ -313,7 +313,7 @@ std::string stRandomExp::toPerl( stPerlConversionData *inData ) {
 std::string stInstanceExp::toPerl( stPerlConversionData *inData ) {
 	std::string result;
 
-	result = "breve->createInstances( breve->" + stPerlConvertSymbol( name ) + ", " + count->toPerl( inData ) + " )";
+	result = "Breve::createInstances( breve->" + stPerlConvertSymbol( name ) + ", " + count->toPerl( inData ) + " )";
 
 	return result;
 }
@@ -359,7 +359,7 @@ std::string stSelfExp::toPerl( stPerlConversionData *inData ) {
 std::string stCCallExp::toPerl( stPerlConversionData *inData ) {
 	std::string result;
 
-	result = "breve->breveInternalFunctionFinder." + stPerlConvertSymbol( _function->_name ) + "( self";
+	result = "$self->callInternal(\"" + stPerlConvertSymbol( _function->_name ) + "\"";
 
 	for( unsigned int n = 0; n < _arguments.size(); n++ ) {
 		result += ", " + _arguments[ n ]->toPerl( inData );
@@ -491,7 +491,7 @@ std::string stBinaryExp::toPerl( stPerlConversionData *inData ) {
 std::string stLengthExp::toPerl( stPerlConversionData *inData ) {
 	std::string result;
 
-	result = "breve->length( " + expression->toPerl( inData ) + " )";
+	result = "Breve::length( " + expression->toPerl( inData ) + " )";
 
 	return result;
 }
@@ -499,7 +499,7 @@ std::string stLengthExp::toPerl( stPerlConversionData *inData ) {
 std::string stMatrixExp::toPerl( stPerlConversionData *inData ) {
 	std::string result;
 
-	result = "breve->matrix( " ;
+	result = "Breve::matrix( " ;
 
 	for( unsigned int n = 0; n < 9; n++ ) {
 		result += " " + expressions[ n ]->toPerl( inData );
@@ -553,7 +553,7 @@ std::string stReturnExp::toPerl( stPerlConversionData *inData ) {
 }
 
 std::string stVectorExp::toPerl( stPerlConversionData *inData ) {
-	return "breve->vector( " + _x->toPerl( inData ) + ", " + _y->toPerl( inData ) + ", " + _z->toPerl( inData ) + " )";
+	return "Breve::vector( " + _x->toPerl( inData ) + ", " + _y->toPerl( inData ) + ", " + _z->toPerl( inData ) + " )";
 }
 
 std::string stForeachExp::toPerl( stPerlConversionData *inData ) {
@@ -771,12 +771,12 @@ std::string stEvalExp::toPerl( stPerlConversionData *inData ) {
 			break;
 
 		case AT_VECTOR:
-			sprintf( format, "breve->vector( %f, %f, %f )", BRVECTOR( eval ).x, BRVECTOR( eval ).y, BRVECTOR( eval ).z );
+			sprintf( format, "Breve::vector( %f, %f, %f )", BRVECTOR( eval ).x, BRVECTOR( eval ).y, BRVECTOR( eval ).z );
 			result = format;
 			break;
 
 		case AT_MATRIX:
-			sprintf( format, "breve->matrix( %f, %f, %f, %f, %f, %f, %f, %f, %f )", 
+			sprintf( format, "Breve::matrix( %f, %f, %f, %f, %f, %f, %f, %f, %f )", 
 				BRMATRIX( eval )[ 0 ][ 0 ], BRMATRIX( eval )[ 0 ][ 1 ], BRMATRIX( eval )[ 0 ][ 2 ], 
 				BRMATRIX( eval )[ 1 ][ 0 ], BRMATRIX( eval )[ 1 ][ 1 ], BRMATRIX( eval )[ 1 ][ 2 ], 
 				BRMATRIX( eval )[ 2 ][ 0 ], BRMATRIX( eval )[ 2 ][ 1 ], BRMATRIX( eval )[ 2 ][ 2 ] );

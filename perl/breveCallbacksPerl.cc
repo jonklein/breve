@@ -33,6 +33,7 @@ xs_init(pTHX)
 
 SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 // actually returns an SV*, AV*, or HV* (all sizeof(int) types though)
+	slMessage(DEBUG_INFO, "brPerlTypeFromEval ==> \n");
 
     brEvalListHead *list;
     brInstance *breveInstance;
@@ -41,30 +42,33 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
     
     switch ( inEval->type() ) {
 	case AT_NULL:
+		slMessage(DEBUG_INFO,"Null return, perlType AT_NULL.\n");
 		result = 0;
 		break;
 
 	case AT_INT:
-		printf("Coercing into perlType AT_INT.\n");
-		result = sv_2mortal(newSViv(BRINT(inEval)));
+		slMessage(DEBUG_INFO,"Coercing from perlType AT_INT.\n");
+		result = newSViv(BRINT(inEval));
 		break;
 
 	case AT_DOUBLE:
-		printf("Coercing into perlType AT_DOUBLE.\n");
-		result = sv_2mortal(newSVnv(BRDOUBLE( inEval ) ));
+		slMessage(DEBUG_INFO,"Coercing from perlType AT_DOUBLE.\n");
+		result = newSVnv(BRDOUBLE( inEval ) );
 		break;
 
 	case AT_STRING:   // perl will calculate string length using strlen
-		printf("Coercing into perlType AT_STRING.\n");
-		result = sv_2mortal(newSVpv(BRSTRING(inEval), 0 ) ); 
+		slMessage(DEBUG_INFO,"Coercing from perlType AT_STRING.\n");
+		result = newSVpv(BRSTRING(inEval), 0 );
 		break;
 
 	case AT_LIST:
+		slMessage(DEBUG_INFO, "Coercing from perlType AT_LIST.\n");
 		list = BRLIST( inEval );
 		unsigned int n;
 		SV * ret;
 		for(n = 1; n < list->_vector.size(); n++ ) {
 			ret = brPerlTypeFromEval(&list->_vector[n], &sp);
+			sv_2mortal(ret);
 			XPUSHs(ret);
 		}
 		ret = brPerlTypeFromEval(&list->_vector[2],&sp);
@@ -76,13 +80,19 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 		break;
 			
 	case AT_INSTANCE:
+		slMessage(DEBUG_INFO, "Coercing from PerlType AT_INSTANCE.\n");
 		breveInstance = BRINSTANCE( inEval );// Is this a native type, or should we make a bridge of it?
             
 		if( breveInstance && breveInstance->object->type->_typeSignature == PERL_TYPE_SIGNATURE ) {
-			result = breveInstance->userData; // this is the sv, i don't think it has to be mortalized
-			SvREFCNT_inc((sv*)breveInstance->userData); // TODO not sure if this is necessary.
+			SV *sv_inst = breveInstance->userData;
+			if(SvROK(sv_inst)) {
+				result = sv_inst; // this is the sv (RV), i don't think it has to be mortalized
+				// the xsub bridge takes care of this, probably.
+			} else {
+				slMessage(DEBUG_INFO, "Could not convert breve internal type AT_INSTANCE.\n");
+			}
 		} else if( breveInstance ) {
-
+ 
 		} else {
 			result = NULL;
 		}
@@ -90,11 +100,33 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 		break;
 			
 	case AT_POINTER:
+		slMessage(DEBUG_INFO, "Coercing from PerlType AT_POINTER.\n");
+		result = newSViv(BRPOINTER( inEval ));
+		break;
+
 	case AT_VECTOR:
+
+		slMessage(DEBUG_INFO, "Coercing from PerlType AT_VECTOR.\n");
+		{
+			const slVector &v = BRVECTOR( inEval);
+			XPUSHs(sv_2mortal(newSVnv(v.x)));
+			XPUSHs(sv_2mortal(newSVnv(v.y)));
+			XPUSHs(sv_2mortal(newSVnv(v.z)));
+		}
+		break;
+
 	case AT_MATRIX:
+		slMessage(DEBUG_INFO, "Coercing from PerlType AT_MATRIX.\n");
+		break;
 	case AT_ARRAY:
+		slMessage(DEBUG_INFO, "Coercing from PerlType AT_ARRAY.\n");
+		break;
 	case AT_DATA:
+		slMessage(DEBUG_INFO, "Coercing from PerlType AT_DATA.\n");
+		break;
 	case AT_HASH:
+		slMessage(DEBUG_INFO, "Coercing from PerlType AT_HASH.\n");
+		break;
 	default:
 		slMessage( DEBUG_ALL, "Could not convert breve internal type \"%d\" to a Perl type\n", inEval->type() );
 
@@ -106,10 +138,11 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-
+//////////////////////////////////////////////////////////////////////////////////
 /**
  * A breveObjectType callback to call a method in Perl
  */
+
 int brPerlCallMethod(void *ref, void *mp, const brEval **inArguments, brEval *outResult ) {
 	slMessage(DEBUG_INFO, "brPerlCallMethod() ==> refobj = %08x, mp = %08x, args..result..\n", (unsigned)ref, (unsigned)mp);
 
@@ -125,6 +158,7 @@ int brPerlCallMethod(void *ref, void *mp, const brEval **inArguments, brEval *ou
                 
 	for(int i = 0; i < ((methodpack*)mp)->argCount; i++) {
 		SV *ret = brPerlTypeFromEval(inArguments[i], &SP);	
+		sv_2mortal(ret);
 		XPUSHs(ret);
 	}
 
@@ -170,6 +204,15 @@ brInstance *brPerlInstantiate( brEngine *inEngine, brObject* inObject, const brE
 
     // do i need to decrement the stash? a la python.cc
     brInstance *newInst = brEngineAddInstance( inEngine, inObject, created_sv);
+
+	// store a copy of the instance pointer inside the perl object
+	// for when perl calls internal breve functions it needs to provide
+	// the brInstance* of itself
+	HV* objself = (HV*)SvRV(created_sv); // deference into the HV*
+	const char* key = "brInstance";
+	SV **hv_store_result;
+	hv_store_result = hv_store(objself, key, strlen(key), newSViv(newInst), 0);
+
     slMessage(DEBUG_INFO, "newInst: %08x, created_sv: %08x\n",(unsigned)newInst, (unsigned) created_sv);
 	
     return newInst;

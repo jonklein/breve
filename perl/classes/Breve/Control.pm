@@ -1,8 +1,9 @@
 
 use strict;
-use Breve;
 
 package Breve::Control;
+
+our @ISA = qw(Breve::Abstract);
 
 ###Summary: a parent class for the "controller" object required for all simulations. <P> The Control object sets up and controls simulations.  Every simulation must have one Control subclass.  The user subclass of Control should  set up the simulation in the "init" method. <p> The Control class also acts as the main interaction between the user and the breve environment itself.  It provides access to elements of  the user interface, for example, so that the user can add menus and other interface features from inside simulations. <p> Because the breve engine is designed to run on a variety of systems, there are varying levels of support for some of these features.  In some cases, the features won't be supported at all on a system.  A background daemon written to use the breve engine, for example, will not place a dialog on the screen and wait for user input.
 
@@ -10,6 +11,7 @@ sub new {
 	my $class = shift;
 	my $self = {};
 	bless $self, $class;
+
 	my $self->{ backgroundColor } = breve->vector();
 	my $self->{ backgroundTexture } = 0;
 	my $self->{ blurFactor } = 0;
@@ -52,7 +54,10 @@ sub new {
 	my $self->{ watchObject } = undef;
 	my $self->{ xRot } = 0;
 	my $self->{ yRot } = 0;
-	init( $self );
+
+	$self->SUPER::init();
+	$self->init();
+     
 	return $self;
 }
 
@@ -71,7 +76,9 @@ sub addMenu {
 	my ($self, $menuName, $theMethod );
 	( $self, $menuName, $theMethod ) = @_;
 
-	return Breve::createInstances( breve->MenuItem, 1 )->createMenu( $menuName, $self, $theMethod );
+	#die("NOT IMPLEMENTED IN CONTROL.PM\n");
+
+#	return breve->createInstances( breve->MenuItem, 1 )->createMenu( $menuName, $self, $theMethod );
 }
 
 sub addMenuSeparator {
@@ -80,7 +87,9 @@ sub addMenuSeparator {
 	my $self;
 	( $self ) = @_;
 
-	return Breve::createInstances( breve->MenuItem, 1 )->createMenu( "", $self, "" );
+	#die("NOT IMPLEMENTED IN CONTROL.PM\n");
+
+#	return breve->createInstances( breve->MenuItem, 1 )->createMenu( "", $self, "" );
 }
 
 sub aimCamera {
@@ -96,8 +105,8 @@ sub archive {
 	my $self;
 	( $self ) = @_;
 
-	$self->{ camTarget } = Breve::cameraGetTarget($self);
-	$self->{ camOffset } = Breve::cameraGetOffset($self);
+	$self->{ camTarget } = Breve::callInternal("cameraGetTarget");
+	$self->{ camOffset } = Breve::callInternal($self, "cameraGetOffset");
 	return $self->SUPER::archive();
 }
 
@@ -107,7 +116,7 @@ sub beep {
 	my $self;
 	( $self ) = @_;
 
-	Breve::playSound($self);
+	Breve::callInternal($self, "playSound");
 }
 
 sub bulletPanCameraOffset {
@@ -138,7 +147,7 @@ sub clearScreen {
 	my $self;
 	( $self ) = @_;
 
-	Breve::cameraClear($self, $self->{ cameraPointer } );
+	Breve::callInternal($self, "cameraClear", $self->{ cameraPointer } );
 }
 
 sub click {
@@ -174,17 +183,17 @@ sub dearchive {
 	my $self;
 	( $self ) = @_;
 	my $image = "";
-	my @images;
+	my @images = ();
 
-	$self->{ cameraPointer } = Breve::getMainCameraPointer($self);
+	$self->{ cameraPointer } = Breve::callInternal($self, "getMainCameraPointer");
 	$self->{ camera }->setCameraPointer( $self->{ cameraPointer } );
 	foreach $image ($self->{ loadedImages }) {
-		push @images, $image;
+	    push @images, $image;
 	}
 
 
 	foreach $image (@images) {
-		$self->loadImage( $image );
+	    $self->loadImage( $image );
 	}
 
 
@@ -237,7 +246,7 @@ sub dearchiveXml {
 	my ($self, $filename );
 	( $self, $filename ) = @_;
 
-	return Breve::dearchiveXMLObject($self, $filename );
+	return Breve::callInternal($self, "dearchiveXMLObject", $filename );
 }
 
 sub disableBlur {
@@ -247,7 +256,7 @@ sub disableBlur {
 	( $self ) = @_;
 
 	$self->{ blurFlag } = 0;
-	Breve::cameraSetBlur($self, $self->{ cameraPointer }, 0 );
+	Breve::callInternal($self, "cameraSetBlur", $self->{ cameraPointer }, 0 );
 	$self->{ blurMenu }->uncheck();
 }
 
@@ -258,7 +267,7 @@ sub disableDrawEveryFrame {
 	( $self ) = @_;
 
 	$self->{ drawEveryFrame } = 0;
-	Breve::setDrawEveryFrame($self, 0 );
+	Breve::callInternal($self, "setDrawEveryFrame", 0 );
 }
 
 sub disableFog {
@@ -268,7 +277,7 @@ sub disableFog {
 	( $self ) = @_;
 
 	$self->{ fogFlag } = 0;
-	Breve::cameraSetDrawFog($self, $self->{ cameraPointer }, 0 );
+	Breve::callInternal($self, "cameraSetDrawFog", $self->{ cameraPointer }, 0 );
 	$self->{ fogMenu }->uncheck();
 }
 
@@ -278,7 +287,7 @@ sub disableFreedInstanceProtection {
 	my $self;
 	( $self ) = @_;
 
-	Breve::setFreedInstanceProtection($self, 0 );
+	Breve::callInternal($self, "setFreedInstanceProtection", 0 );
 }
 
 sub disableLightExposureDetection {
@@ -287,7 +296,7 @@ sub disableLightExposureDetection {
 	my $self;
 	( $self ) = @_;
 
-	Breve::setDetectLightExposure($self, 0 );
+	Breve::callInternal($self, "setDetectLightExposure", 0 );
 }
 
 sub disableLightExposureDrawing {
@@ -296,7 +305,7 @@ sub disableLightExposureDrawing {
 	my $self;
 	( $self ) = @_;
 
-	Breve::setDrawLightExposure($self, 0 );
+	Breve::callInternal($self, "setDrawLightExposure", 0 );
 }
 
 sub disableLighting {
@@ -306,7 +315,7 @@ sub disableLighting {
 	( $self ) = @_;
 
 	$self->{ lightFlag } = 0;
-	Breve::setDrawLights($self, $self->{ lightFlag } );
+	Breve::callInternal($self, "setDrawLights", $self->{ lightFlag } );
 	$self->{ lightMenu }->uncheck();
 	$self->{ shadowMenu }->disable();
 	$self->{ reflectMenu }->disable();
@@ -318,7 +327,7 @@ sub disableOutline {
 	my $self;
 	( $self ) = @_;
 
-	Breve::setDrawOutline($self, 0 );
+	Breve::callInternal($self, "setDrawOutline", 0 );
 }
 
 sub disableReflections {
@@ -328,7 +337,7 @@ sub disableReflections {
 	( $self ) = @_;
 
 	$self->{ reflectFlag } = 0;
-	Breve::setDrawReflection($self, $self->{ reflectFlag } );
+	Breve::callInternal($self, "setDrawReflection", $self->{ reflectFlag } );
 	$self->{ reflectMenu }->uncheck();
 }
 
@@ -339,7 +348,7 @@ sub disableShadowVolumes {
 	( $self ) = @_;
 
 	$self->{ shadowVolumeFlag } = 0;
-	Breve::setDrawShadowVolumes($self, $self->{ shadowFlag } );
+	Breve::callInternal($self, "setDrawShadowVolumes", $self->{ shadowFlag } );
 }
 
 sub disableShadows {
@@ -349,7 +358,7 @@ sub disableShadows {
 	( $self ) = @_;
 
 	$self->{ shadowFlag } = 0;
-	Breve::setDrawShadow($self, $self->{ shadowFlag } );
+	Breve::callInternal($self, "setDrawShadow", $self->{ shadowFlag } );
 	$self->{ shadowMenu }->uncheck();
 }
 
@@ -360,7 +369,7 @@ sub disableSmoothDrawing {
 	( $self ) = @_;
 
 	$self->{ smoothFlag } = 0;
-	Breve::cameraSetDrawSmooth($self, $self->{ cameraPointer }, $self->{ smoothFlag } );
+	Breve::callInternal($self, "cameraSetDrawSmooth", $self->{ cameraPointer }, $self->{ smoothFlag } );
 	$self->{ drawMenu }->uncheck();
 }
 
@@ -370,7 +379,7 @@ sub disableText {
 	my $self;
 	( $self ) = @_;
 
-	Breve::setDrawText($self, 0 );
+	Breve::callInternal($self, "setDrawText", 0 );
 }
 
 sub enableBlur {
@@ -380,7 +389,7 @@ sub enableBlur {
 	( $self ) = @_;
 
 	$self->{ blurFlag } = 1;
-	Breve::cameraSetBlur($self, $self->{ cameraPointer }, 1 );
+	Breve::callInternal($self, "cameraSetBlur", $self->{ cameraPointer }, 1 );
 	$self->{ blurMenu }->check();
 	$self->clearScreen();
 }
@@ -392,7 +401,7 @@ sub enableDrawEveryFrame {
 	( $self ) = @_;
 
 	$self->{ drawEveryFrame } = 1;
-	Breve::setDrawEveryFrame($self, 1 );
+	Breve::callInternal($self, "setDrawEveryFrame", 1 );
 }
 
 sub enableFog {
@@ -402,7 +411,7 @@ sub enableFog {
 	( $self ) = @_;
 
 	$self->{ fogFlag } = 1;
-	Breve::cameraSetDrawFog($self, $self->{ cameraPointer }, 1 );
+	Breve::callInternal($self, "cameraSetDrawFog", $self->{ cameraPointer }, 1 );
 	$self->{ fogMenu }->check();
 }
 
@@ -412,7 +421,7 @@ sub enableFreedInstanceProtection {
 	my $self;
 	( $self ) = @_;
 
-	Breve::setFreedInstanceProtection($self, 1 );
+	Breve::callInternal($self, "setFreedInstanceProtection", 1 );
 }
 
 sub enableLightExposureDetection {
@@ -421,7 +430,7 @@ sub enableLightExposureDetection {
 	my $self;
 	( $self ) = @_;
 
-	Breve::setDetectLightExposure($self, 1 );
+	Breve::callInternal($self, "setDetectLightExposure", 1 );
 }
 
 sub enableLightExposureDrawing {
@@ -430,7 +439,7 @@ sub enableLightExposureDrawing {
 	my $self;
 	( $self ) = @_;
 
-	Breve::setDrawLightExposure($self, 1 );
+	Breve::callInternal($self, "setDrawLightExposure", 1 );
 }
 
 sub enableLighting {
@@ -440,8 +449,9 @@ sub enableLighting {
 	( $self ) = @_;
 
 	$self->{ lightFlag } = 1;
-	Breve::setDrawLights($self, $self->{ lightFlag } );
-	$self->{ lightMenu }->check();
+
+	Breve::callInternal($self, "setDrawLights", $self->{ lightFlag } );
+	#$self->{ lightMenu }->check();
 	if( $self->{ floorDefined } ) {
 		$self->{ shadowMenu }->enable();
 		$self->{ reflectMenu }->enable();
@@ -456,7 +466,7 @@ sub enableOutline {
 	my $self;
 	( $self ) = @_;
 
-	Breve::setDrawOutline($self, 1 );
+	Breve::callInternal($self, "setDrawOutline", 1 );
 }
 
 sub enableReflections {
@@ -470,7 +480,7 @@ sub enableReflections {
 	}
 
 	$self->{ reflectFlag } = 1;
-	Breve::setDrawReflection($self, $self->{ reflectFlag } );
+	Breve::callInternal($self, "setDrawReflection", $self->{ reflectFlag } );
 	$self->{ reflectMenu }->check();
 }
 
@@ -481,7 +491,7 @@ sub enableShadowVolumes {
 	( $self ) = @_;
 
 	$self->{ shadowVolumeFlag } = 1;
-	Breve::setDrawShadowVolumes($self, $self->{ shadowVolumeFlag } );
+	Breve::callInternal($self, "setDrawShadowVolumes", $self->{ shadowVolumeFlag } );
 }
 
 sub enableShadows {
@@ -495,7 +505,7 @@ sub enableShadows {
 	}
 
 	$self->{ shadowFlag } = 1;
-	Breve::setDrawShadow($self, $self->{ shadowFlag } );
+	Breve::callInternal($self, "setDrawShadow", $self->{ shadowFlag } );
 	$self->{ shadowMenu }->check();
 }
 
@@ -506,7 +516,7 @@ sub enableSmoothDrawing {
 	( $self ) = @_;
 
 	$self->{ smoothFlag } = 1;
-	Breve::cameraSetDrawSmooth($self, $self->{ cameraPointer }, $self->{ smoothFlag } );
+	Breve::callInternal($self, "cameraSetDrawSmooth", $self->{ cameraPointer }, $self->{ smoothFlag } );
 	$self->{ drawMenu }->check();
 }
 
@@ -516,7 +526,7 @@ sub enableText {
 	my $self;
 	( $self ) = @_;
 
-	Breve::setDrawText($self, 1 );
+	Breve::callInternal($self, "setDrawText", 1 );
 }
 
 sub endSimulation {
@@ -525,7 +535,7 @@ sub endSimulation {
 	my $self;
 	( $self ) = @_;
 
-	Breve::endSimulation($self);
+	Breve::callInternal($self, "endSimulation");
 }
 
 sub execute {
@@ -534,7 +544,7 @@ sub execute {
 	my ($self, $systemCommand );
 	( $self, $systemCommand ) = @_;
 
-	return Breve::system($self, $systemCommand );
+	return Breve::callInternal($self, "system", $systemCommand );
 }
 
 sub getArgument {
@@ -543,7 +553,7 @@ sub getArgument {
 	my ($self, $theIndex );
 	( $self, $theIndex ) = @_;
 
-	return Breve::getArgv($self, $theIndex );
+	return Breve::callInternal($self, "getArgv", $theIndex );
 }
 
 sub getArgumentCount {
@@ -552,7 +562,7 @@ sub getArgumentCount {
 	my $self;
 	( $self ) = @_;
 
-	return Breve::getArgc($self);
+	return Breve::callInternal($self, "getArgc");
 }
 
 sub getCameraOffset {
@@ -561,7 +571,7 @@ sub getCameraOffset {
 	my $self;
 	( $self ) = @_;
 
-	return Breve::cameraGetOffset($self);
+	return Breve::callInternal($self, "cameraGetOffset");
 }
 
 sub getCameraTarget {
@@ -570,7 +580,7 @@ sub getCameraTarget {
 	my $self;
 	( $self ) = @_;
 
-	return Breve::cameraGetTarget($self);
+	return Breve::callInternal($self, "cameraGetTarget");
 }
 
 sub getDragObject {
@@ -608,7 +618,7 @@ sub getHsvColor {
 	my ($self, $rgbColor );
 	( $self, $rgbColor ) = @_;
 
-	return Breve::RGBtoHSV($self, $rgbColor );
+	return Breve::callInternal($self, "RGBtoHSV", $rgbColor );
 }
 
 sub getIntegrationStep {
@@ -626,7 +636,7 @@ sub getInterfaceVersion {
 	my $self;
 	( $self ) = @_;
 
-	return Breve::getInterfaceVersion($self);
+	return Breve::callInternal($self, "getInterfaceVersion");
 }
 
 sub getIterationStep {
@@ -645,7 +655,7 @@ sub getLightExposureCamera {
 	( $self ) = @_;
 
 	$self->{ camera } = breve->createInstances( breve->Camera, 1 );
-	$self->{ camera }->setCameraPointer( Breve::getLightExposureCamera($self) );
+	$self->{ camera }->setCameraPointer( Breve::callInternal($self, "getLightExposureCamera") );
 }
 
 sub getMainCamera {
@@ -663,7 +673,7 @@ sub getMouseXCoordinate {
 	my $self;
 	( $self ) = @_;
 
-	return Breve::getMouseX($self);
+	return Breve::callInternal($self, "getMouseX");
 }
 
 sub getMouseYCoordinate {
@@ -672,7 +682,7 @@ sub getMouseYCoordinate {
 	my $self;
 	( $self ) = @_;
 
-	return Breve::getMouseY($self);
+	return Breve::callInternal($self, "getMouseY");
 }
 
 sub getRealTime {
@@ -681,7 +691,7 @@ sub getRealTime {
 	my $self;
 	( $self ) = @_;
 
-	return Breve::getRealTime($self);
+	return Breve::callInternal($self, "getRealTime");
 }
 
 sub getRgbColor {
@@ -690,7 +700,7 @@ sub getRgbColor {
 	my ($self, $hsvColor );
 	( $self, $hsvColor ) = @_;
 
-	return Breve::HSVtoRGB($self, $hsvColor );
+	return Breve::callInternal($self, "HSVtoRGB", $hsvColor );
 }
 
 sub getSelection {
@@ -712,7 +722,7 @@ sub getTime {
 	my $self;
 	( $self ) = @_;
 
-	return Breve::getTime($self);
+	return Breve::callInternal($self, "getTime");
 }
 
 sub init {
@@ -721,8 +731,13 @@ sub init {
 	my $self;
 	( $self ) = @_;
 
-	$self->{ cameraPointer } = Breve::getMainCameraPointer($self);
-	$self->{ camera } = breve->createInstances( breve->Camera, 1 );
+	Breve::brPerlAddInstance($self);
+	Breve::brPerlSetController($self->{brInstance});
+
+	$self->SUPER::init();
+
+	$self->{ cameraPointer } = Breve::callInternal($self, "getMainCameraPointer");
+	$self->{ camera } = Breve::Camera->new();
 	$self->addDependency( $self->{ camera } );
 	$self->{ camera }->setCameraPointer( $self->{ cameraPointer } );
 	$self->{ floorDefined } = 0;
@@ -763,10 +778,7 @@ sub iterate {
 	}
 
 	if( ( not $self->{ frozen } ) ) {
-      my $funcpointer = Breve::brPerlFindInternalFunction($self, "worldStep");
-      printf( "FUNCPOINTER IS %08x\n\n", $funcpointer);
-      sleep(2);
-      #$result = Breve::worldStep($self, $self->{ simTime }, $self->{ simStep } );
+		$result = $self->Breve::callInternal($self, "worldStep", $self->{ simTime }, $self->{ simStep } );
 	}
 
 	if( ( $result == -1 ) ) {
@@ -823,7 +835,7 @@ sub makeNewInstance {
 	my ($self, $className );
 	( $self, $className ) = @_;
 
-	return Breve::newInstanceForClassString($self, $className );
+	return Breve::callInternal($self, "newInstanceForClassString", $className );
 }
 
 sub moveLight {
@@ -833,7 +845,7 @@ sub moveLight {
 	( $self, $theLocation ) = @_;
 
 	$self->{ lightPosition } = $theLocation;
-	Breve::setLightPosition($self, $theLocation );
+	Breve::callInternal($self, "setLightPosition", $theLocation );
 }
 
 sub offsetCamera {
@@ -881,7 +893,7 @@ sub parseXmlNetworkRequest {
 	my ($self, $s );
 	( $self, $s ) = @_;
 
-	return Breve::dearchiveXMLObjectFromString($self, $s );
+	return Breve::callInternal($self, "dearchiveXMLObjectFromString", $s );
 }
 
 sub pause {
@@ -890,26 +902,28 @@ sub pause {
 	my $self;
 	( $self ) = @_;
 
-	Breve::pauseSimulation($self);
+	Breve::callInternal($self, "pauseSimulation");
 }
 
 sub pivotCamera {
+	###Rotates the camera (from it's current position) on the x-axis by dx and on the y-axis by dy.
 
-   #my ($self, $dx, $dy );
-#	( $self, $dx = 0.000000, $dy = 0.000000 ) = @_;
-#	my $rot = breve->vector();
+	my ($self, $dx, $dy );
+	( $self, $dx = 0.000000, $dy = 0.000000 ) = @_;
+	my $rot = breve->vector();
 
-   #$rot = $self->{ camera }->getRotation();
-   #$rot.x = ( $rot.x + $dx );
-   #$rot.y = ( $rot.y + $dy );
-   #$self->{ camera }->setRotation( $rot.x, $rot.y );
+	$rot = $self->{ camera }->getRotation();
+	die("NOT IMPLEMENTED in Control.pm\n");
+	#$rot.x = ( $rot.x + $dx );
+	#$rot.y = ( $rot.y + $dy );
+	#$self->{ camera }->setRotation( $rot.x, $rot.y );
+	# fix above commented lines
 }
 
 sub pointCamera {
 	###Points the camera at the vector location.  The optional argument offset specifies the offset of the camera relative to the location target.
 
 	my ($self, $location, $offset );
-
 	( $self, $location, $offset = breve->vector( 0.000000, 0.000000, 0.000000 ) ) = @_;
 
 	$self->{ camTarget } = $location;
@@ -928,7 +942,7 @@ sub reportObjectAllocation {
 	my $self;
 	( $self ) = @_;
 
-	Breve::objectAllocationReport($self);
+	Breve::callInternal($self, "objectAllocationReport");
 }
 
 sub saveAsXml {
@@ -937,7 +951,7 @@ sub saveAsXml {
 	my ($self, $filename );
 	( $self, $filename ) = @_;
 
-	Breve::writeXMLEngine($self, $filename );
+	Breve::callInternal($self, "writeXMLEngine", $filename );
 }
 
 sub saveSnapshot {
@@ -946,7 +960,7 @@ sub saveSnapshot {
 	my ($self, $filename );
 	( $self, $filename ) = @_;
 
-	Breve::snapshot($self, $filename );
+	Breve::callInternal($self, "snapshot", $filename );
 }
 
 sub saveSnapshotToFile {
@@ -963,7 +977,7 @@ sub setBackgroundColor {
 	( $self, $newColor ) = @_;
 
 	$self->{ backgroundColor } = $newColor;
-	Breve::setBackgroundColor($self, $newColor );
+	Breve::callInternal($self, "setBackgroundColor", $newColor );
 }
 
 sub setBackgroundScrollRate {
@@ -972,7 +986,7 @@ sub setBackgroundScrollRate {
 	my ($self, $xValue, $yValue );
 	( $self, $xValue, $yValue ) = @_;
 
-	Breve::setBackgroundScroll($self, $xValue, $yValue );
+	Breve::callInternal($self, "setBackgroundScroll", $xValue, $yValue );
 }
 
 sub setBackgroundTexture {
@@ -980,7 +994,7 @@ sub setBackgroundTexture {
 	( $self, $newTexture ) = @_;
 
 	$self->{ backgroundTexture } = ( $newTexture + 1 );
-	Breve::setBackgroundTexture($self, ( $newTexture + 1 ) );
+	Breve::callInternal($self, "setBackgroundTexture", ( $newTexture + 1 ) );
 }
 
 sub setBackgroundTextureImage {
@@ -990,7 +1004,7 @@ sub setBackgroundTextureImage {
 	( $self, $newTextureImage ) = @_;
 
 	$self->{ backgroundTexture } = $newTextureImage->getTextureNumber();
-	Breve::setBackgroundTexture($self, $self->{ backgroundTexture } );
+	Breve::callInternal($self, "setBackgroundTexture", $self->{ backgroundTexture } );
 }
 
 sub setBlurFactor {
@@ -1000,7 +1014,7 @@ sub setBlurFactor {
 	( $self, $factor ) = @_;
 
 	$self->{ blurFactor } = $factor;
-	Breve::cameraSetBlurFactor($self, $self->{ cameraPointer }, $factor );
+	Breve::callInternal($self, "cameraSetBlurFactor", $self->{ cameraPointer }, $factor );
 }
 
 sub setCameraOffset {
@@ -1009,7 +1023,7 @@ sub setCameraOffset {
 	my ($self, $offset );
 	( $self, $offset ) = @_;
 
-	Breve::cameraSetOffset($self, $offset );
+	Breve::callInternal($self, "cameraSetOffset", $offset );
 }
 
 sub setCameraRotation {
@@ -1027,7 +1041,7 @@ sub setCameraTarget {
 	my ($self, $location );
 	( $self, $location ) = @_;
 
-	Breve::cameraSetTarget($self, $location );
+	Breve::callInternal($self, "cameraSetTarget", $location );
 }
 
 sub setDisplayMessage {
@@ -1036,7 +1050,7 @@ sub setDisplayMessage {
 	my ($self, $theString, $messageNumber, $xLoc, $yLoc, $textColor );
 	( $self, $theString, $messageNumber, $xLoc, $yLoc, $textColor = breve->vector( 0.000000, 0.000000, 0.000000 ) ) = @_;
 
-	Breve::cameraSetText($self, $theString, $messageNumber, $xLoc, $yLoc, $textColor );
+	Breve::callInternal($self, "cameraSetText", $theString, $messageNumber, $xLoc, $yLoc, $textColor );
 }
 
 sub setDisplayText {
@@ -1045,7 +1059,7 @@ sub setDisplayText {
 	my ($self, $theString, $xLoc, $yLoc, $messageNumber );
 	( $self, $theString, $xLoc = -0.950000, $yLoc = -0.950000, $messageNumber = 0.000000 ) = @_;
 
-	Breve::cameraSetText($self, $theString, $messageNumber, $xLoc, $yLoc, breve->vector( 0, 0, 0 ) );
+	Breve::callInternal($self, "cameraSetText", $theString, $messageNumber, $xLoc, $yLoc, breve->vector( 0, 0, 0 ) );
 }
 
 sub setDisplayTextScale {
@@ -1054,7 +1068,7 @@ sub setDisplayTextScale {
 	my ($self, $scale );
 	( $self, $scale ) = @_;
 
-	Breve::cameraSetTextScale($self, $scale );
+	Breve::callInternal($self, "cameraSetTextScale", $scale );
 }
 
 sub setFloorDefined {
@@ -1077,7 +1091,7 @@ sub setFogColor {
 	( $self, $newColor ) = @_;
 
 	$self->{ fogColor } = $newColor;
-	Breve::cameraSetFogColor($self, $self->{ cameraPointer }, $newColor );
+	Breve::callInternal($self, "cameraSetFogColor", $self->{ cameraPointer }, $newColor );
 }
 
 sub setFogIntensity {
@@ -1087,7 +1101,7 @@ sub setFogIntensity {
 	( $self, $newIntensity ) = @_;
 
 	$self->{ fogIntensity } = $newIntensity;
-	Breve::cameraSetFogIntensity($self, $self->{ cameraPointer }, $newIntensity );
+	Breve::callInternal($self, "cameraSetFogIntensity", $self->{ cameraPointer }, $newIntensity );
 }
 
 sub setFogLimits {
@@ -1096,7 +1110,7 @@ sub setFogLimits {
 	my ($self, $fogStart, $fogEnd );
 	( $self, $fogStart, $fogEnd ) = @_;
 
-	Breve::setFogDistances($self, $fogStart, $fogEnd );
+	Breve::callInternal($self, "setFogDistances", $fogStart, $fogEnd );
 }
 
 sub setIntegrationStep {
@@ -1114,7 +1128,7 @@ sub setInterfaceItem {
 	my ($self, $tag, $newValue );
 	( $self, $tag, $newValue ) = @_;
 
-	return Breve::setInterfaceString($self, $newValue, $tag );
+	return Breve::callInternal($self, "setInterfaceString", $newValue, $tag );
 }
 
 sub setIterationStep {
@@ -1137,7 +1151,7 @@ sub setLightAmbientColor {
 	( $self, $newColor ) = @_;
 
 	$self->{ lightAmbientColor } = $newColor;
-	Breve::setLightAmbientColor($self, $newColor );
+	Breve::callInternal($self, "setLightAmbientColor", $newColor );
 }
 
 sub setLightColor {
@@ -1157,7 +1171,7 @@ sub setLightDiffuseColor {
 	( $self, $newColor ) = @_;
 
 	$self->{ lightDiffuseColor } = $newColor;
-	Breve::setLightDiffuseColor($self, $newColor );
+	Breve::callInternal($self, "setLightDiffuseColor", $newColor );
 }
 
 sub setLightExposureSource {
@@ -1166,7 +1180,7 @@ sub setLightExposureSource {
 	my ($self, $source );
 	( $self, $source ) = @_;
 
-	Breve::setLightExposureSource($self, $source );
+	Breve::callInternal($self, "setLightExposureSource", $source );
 }
 
 sub setOutputFilter {
@@ -1175,7 +1189,7 @@ sub setOutputFilter {
 	my ($self, $filterLevel );
 	( $self, $filterLevel ) = @_;
 
-	Breve::setOutputFilter($self, $filterLevel );
+	Breve::callInternal($self, "setOutputFilter", $filterLevel );
 }
 
 sub setRandomSeed {
@@ -1184,7 +1198,7 @@ sub setRandomSeed {
 	my ($self, $newSeed );
 	( $self, $newSeed ) = @_;
 
-	Breve::randomSeed($self, $newSeed );
+	Breve::callInternal($self, "randomSeed", $newSeed );
 }
 
 sub setRandomSeedFromDevRandom {
@@ -1193,7 +1207,7 @@ sub setRandomSeedFromDevRandom {
 	my $self;
 	( $self ) = @_;
 
-	Breve::randomSeedFromDevRandom($self);
+	Breve::callInternal($self, "randomSeedFromDevRandom");
 }
 
 sub setZClip {
@@ -1202,7 +1216,7 @@ sub setZClip {
 	my ($self, $theDistance );
 	( $self, $theDistance ) = @_;
 
-	Breve::setZClip($self, $theDistance );
+	Breve::callInternal($self, "setZClip", $theDistance );
 }
 
 sub showDialog {
@@ -1211,7 +1225,7 @@ sub showDialog {
 	my ($self, $title, $message, $yesString, $noString );
 	( $self, $title, $message, $yesString, $noString ) = @_;
 
-	return Breve::dialogBox($self, $title, $message, $yesString, $noString );
+	return Breve::callInternal($self, "dialogBox", $title, $message, $yesString, $noString );
 }
 
 sub sleep {
@@ -1220,7 +1234,7 @@ sub sleep {
 	my ($self, $s );
 	( $self, $s ) = @_;
 
-	Breve::sleep($self, $s );
+	Breve::callInternal($self, "sleep", $s );
 }
 
 sub stacktrace {
@@ -1229,7 +1243,7 @@ sub stacktrace {
 	my $self;
 	( $self ) = @_;
 
-	Breve::stacktrace($self);
+	Breve::callInternal($self, "stacktrace");
 }
 
 sub toggleBlur {
@@ -1344,7 +1358,7 @@ sub uniqueColor {
 	my ($self, $n );
 	( $self, $n ) = @_;
 
-	return Breve::uniqueColor($self, $n );
+	return Breve::callInternal($self, "uniqueColor", $n );
 }
 
 sub unpause {
@@ -1353,7 +1367,7 @@ sub unpause {
 	my $self;
 	( $self ) = @_;
 
-	Breve::unpauseSimulation($self);
+	Breve::callInternal($self, "unpauseSimulation");
 }
 
 sub updateNeighbors {
@@ -1362,7 +1376,7 @@ sub updateNeighbors {
 	my $self;
 	( $self ) = @_;
 
-	Breve::updateNeighbors($self);
+	Breve::callInternal($self, "updateNeighbors");
 }
 
 sub watch {
@@ -1380,10 +1394,9 @@ sub zoomCamera {
 	my ($self, $theDistance );
 	( $self, $theDistance ) = @_;
 
-	Breve::cameraSetZoom($self, $theDistance );
+	Breve::callInternal($self, "cameraSetZoom", $theDistance );
 }
 
-;
 
 1;
 

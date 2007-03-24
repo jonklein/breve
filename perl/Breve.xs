@@ -14,15 +14,20 @@ extern "C" {
 MODULE = Breve		PACKAGE = Breve	
 
 void *
-brPerlSetController(controller)
-	SV* controller
+brPerlAddInstance(instance)
+	SV* instance
 
 void *
-brPerlFindInternalFunction( inSelf, name )
-	SV *inSelf
+brPerlSetController(controller)
+	void* controller
+
+void *
+brPerlFindInternalFunction( name )
 	char *name
 			    
-void *
-brPerlCallInternalFunction( inSelf, inArgs )
-	SV *inSelf
+SV*
+brPerlCallInternalFunction( inFunc, caller, argCount, inArgs )
+	void *inFunc
+	void *caller
+	int argCount
 	void *inArgs

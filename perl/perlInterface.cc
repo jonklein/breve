@@ -4,6 +4,21 @@
 
 #include "perlInterface.h"
 
+static char arbitraryObjectName[8];
+
+char* newArbitraryName() {
+	for(int i = 0; i < 8; i++) {
+		if(arbitraryObjectName[i] < 97) {
+			arbitraryObjectName[i] = 'a';
+		}
+		if(arbitraryObjectName[i] != 'z') {
+			arbitraryObjectName[i]++;
+			break;
+		}
+	}
+	return arbitraryObjectName;
+}
+
 /**
  * Perl callback to add a Perl instance to the breve engine.
  */
@@ -14,14 +29,26 @@ brInstance *brPerlAddInstance( SV* instance ) {
 	slMessage(DEBUG_INFO, "Adding a perl object to Breve engine.\n");
 	
 	if(SvOK(instance)) {
-		slMessage(DEBUG_INFO, "Instance %08x appears to be valid.\n", instance);
+		slMessage(DEBUG_INFO, "Instance %08x (SV*) appears to be valid.\n", instance);
 	}
 
 	HV* package_stash =
 		SvSTASH(SvRV(instance)); // finding the package stash from the blessed ref SV*s
-	
-	brObject *newPerlObj      = brEngineAddObject(breveEngine, brevePerlType, "foobaz", package_stash);
-	brInstance *newPerlInst   = brEngineAddInstance(breveEngine, newPerlObj, (void*) instance );
+
+	char *aname = newArbitraryName();
+
+	brObject *newPerlObj      = brEngineAddObject(breveEngine, brevePerlType, aname, package_stash);
+	brInstance *newPerlInst   = brEngineAddInstance(breveEngine, newPerlObj, instance ); // dereferencing the RV
+
+	// store a copy of the instance pointer inside the perl object
+	// for when perl calls internal breve functions it needs to provide
+	// the brInstance* of itself
+	HV* objself = (HV*)SvRV(instance); // deference into the HV*
+	const char* key = "brInstance";
+	SV **hv_store_result;
+	hv_store_result = hv_store(objself, key, strlen(key), newSViv((IV)newPerlInst), 0);
+
+	slMessage(DEBUG_INFO, "Set $self->{brInstance} = <brInstance>.\n");
 	
 	return newPerlInst;
 }
@@ -29,7 +56,7 @@ brInstance *brPerlAddInstance( SV* instance ) {
 /**
  * Perl callback to find a breve internal function. 
  */
-brInternalFunction *brPerlFindInternalFunction( SV *inSelf, char *name ) {
+brInternalFunction *brPerlFindInternalFunction( char *name ) {
 
 	brInternalFunction *function = brEngineInternalFunctionLookup( breveEngine, name );
 
@@ -38,7 +65,7 @@ brInternalFunction *brPerlFindInternalFunction( SV *inSelf, char *name ) {
 		return NULL;
 	}
 
-	slMessage(DEBUG_INFO, "Found internal method: %s\n\n",name);
+	slMessage(DEBUG_INFO, "Found internal method: %s, brInternalFunction address => %08x\n\n",name,function);
 
 	return function;
 }
@@ -47,86 +74,38 @@ brInternalFunction *brPerlFindInternalFunction( SV *inSelf, char *name ) {
  * Perl callback to call a breve internal function. 
  */
 
-void *brPerlCallInternalFunction( SV *inSelf, void *inArgs ) {
-/*	brEval args[ 128 ], resultEval;
+SV* brPerlCallInternalFunction( brInternalFunction *inFunc, brInstance *caller,
+								int argCount, void *inArgs)
+{
+	brEval resultEval;
+	brEval brArgs[128]; // seems like a bad way to pass arguments.
 
-	PyObject *callerObject, *functionObject, *arguments, *moduleObject;
+	dSP;
 
-	if ( !PyArg_ParseTuple( inArgs, "OOOO", &moduleObject, &callerObject, &functionObject, &arguments ) ) return NULL;
+	int *inArgsArray =(int*) inArgs;
 
-	brInternalFunction *function = ( brInternalFunction* )PyCObject_AsVoidPtr( functionObject );
+	slMessage(DEBUG_INFO, "brPerlCallInternalFunction(), inFunc => %08x, caller => %08x, inArgs => %08x\n", (unsigned*)inFunc, (unsigned*)caller, (unsigned*)inArgs);
 
-	if ( !function ) {
-		PyErr_SetString( PyExc_RuntimeError, "Could not execute internal breve function" );
-		return NULL;
+	if(!inFunc) {
+		slMessage(DEBUG_ALL, "Function invalid in call to brPerlCallInternalFunction()\n");
 	}
 
-	PyObject *breveObject = PyObject_GetAttrString( callerObject, "breveInstance" );
-
-	if( !breveObject ) {
-		PyErr_SetString( PyExc_RuntimeError, "Internal breve function called for Python object not in breve engine (missing call to __init__ for the parent class?)" );
-		return NULL;
+// why am i required to pass the caller?
+  
+	for(int i = 0; i < argCount; i++) {
+		brArgs[i].set( inArgsArray[i] );
 	}
 
-	brInstance *caller = ( brInstance* )PyCObject_AsVoidPtr( breveObject );
-
-	Py_DECREF( breveObject );
-
-	if( caller->status != AS_ACTIVE ) {
-		slMessage( DEBUG_ALL, "Warning: internal function called for freed instance %p\n", caller );
-		return NULL;
-	}
-
-	if( function->_argCount != 0 ) {
-
-		if( !PyTuple_Check( arguments ) ) {
-			PyErr_SetString( PyExc_RuntimeError, "Invalid arguments passed to internal breve function" );
-			return NULL;
-		}
-
-		int argCount = PyTuple_GET_SIZE( arguments );
-
-		if( argCount != function->_argCount ) {
-			char err[ 1024 ];
-			snprintf( err, 1023, "internal function \"%s\" given %d arguments, expects %d", function->_name.c_str(), argCount, function->_argCount );
-			PyErr_SetString( PyExc_RuntimeError, err );
-			return NULL;
-		}
-
-		for( int n = 0; n < argCount; n++ ) {
-			brPythonTypeToEval( PyTuple_GET_ITEM( arguments, n ), &args[ n ] );
-
-			if( args[ n ].type() != function->_argTypes[ n ] ) {
-
-				// int <=> double conversion 
-
-				if( args[ n ].type() == AT_INT && function->_argTypes[ n ] == AT_DOUBLE ) {
-					 args[ n ].set( (double)BRINT( &args[ n ] ) );
-				} else if( args[ n ].type() == AT_DOUBLE && function->_argTypes[ n ] == AT_INT) {
-					 args[ n ].set( (int)BRDOUBLE( &args[ n ] ) );
-				} else {
-					char err[ 1024 ];
-					snprintf( err, 1023, "invalid type for argument %d of internal function \"%s\" (got \"%s\", expected \"%s\")", n, function->_name.c_str(), brAtomicTypeStrings[ args[ n ].type() ], brAtomicTypeStrings[ function->_argTypes[ n ] ] );
-
-					PyErr_SetString( PyExc_RuntimeError, err );
-					return NULL;
-				}
-			}
-		}
-	}
-
-	function->_call( args, &resultEval, caller );
-
-	return brPythonTypeFromEval( &resultEval, moduleObject );*/
-	return NULL;
+	inFunc->_call(brArgs, &resultEval, caller);
+	
+	return brPerlTypeFromEval( &resultEval, &SP );
 }
 
+void *brPerlSetController( brInstance *controller ) {
 
-void *brPerlSetController( SV *controller ) {
 	slMessage(DEBUG_ALL,"brPerlSetController() perl invocation.\n");
 
-   brEngineSetController(breveEngine, brPerlAddInstance(controller));
-
+	brEngineSetController(breveEngine, controller);
 	SvREFCNT_inc(controller);
 
 	return NULL;
