@@ -55,6 +55,24 @@ char *slFileExtension( const char *inName ) {
 		return slStrdup( &inName[ n + 1 ] );
 }
 
+char *slDirname( const char *inName ) {
+	int index = strlen( inName ) - 1;
+	char *dir = slStrdup( inName );
+
+
+	while( index > -1 ) {
+		if( dir[ index ] == '\\' || dir[ index ] == '/' ) {
+			dir[ index + 1 ] = '\0';
+			return dir;
+		}
+			
+
+		index--;
+	}
+
+	return dir;
+}
+
 char *slSplit( char *start, char *substr, int n ) {
 	int count = 0;
 	char *oldstart, *result;

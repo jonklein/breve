@@ -1,7 +1,5 @@
 #include "kernel.h"
 
-#include "libgen.h"
-
 int brLoadSimulation( brEngine *engine, const char *code, const char *file ) {
 	int result = EC_OK;
 
@@ -22,10 +20,9 @@ int brLoadFile( brEngine *engine, const char *code, const char *file ) {
 	// Add a search path for the directory we're loading from, in case this 
 	// file wants to load resources from the same directory.
 	// warning: dirname may modify contents -- jerks
-	char *copy = slStrdup( file );
-	char *dir = dirname( copy );
+	char *dir = slDirname( file );
 	brAddSearchPath( engine, dir );
-	slFree( copy );
+	slFree( dir );
 
 	for( unsigned int n = 0; n < engine->objectTypes.size(); n++ ) {
 		brObjectType *type = engine->objectTypes[ n ];

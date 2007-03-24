@@ -22,6 +22,7 @@
 #include <zlib.h>
 
 char *slFileExtension( const char *inName );
+char *slDirname( const char *inName );
 
 char *slSplit(char *, char *, int);
 
