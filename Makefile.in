@@ -50,7 +50,7 @@ include lisp/Makefile
 include util/Makefile
 include WinSaver/Makefile
 
-DEPS := $(SRC) bin/breve.cc bin/breve_cli.cc
+DEPS := $(SRC) bin/breve.cc 
 DEPS := $(DEPS:.cc=.d)
 DEPS := $(DEPS:.c=.d)
 
@@ -60,9 +60,6 @@ OBJ	:= $(SRC:.cc=.o)
 OBJ	:= $(OBJ:.c=.o)
 
 bin/breve@EXE_SUFFIX@: bin/breve.o $(OBJ)
-	$(CXX) -o $@ $(CFLAGS) $^ $(LDFLAGS) @PLUGINIMP@ $(LIBS)
-
-bin/breve_cli@EXE_SUFFIX@: bin/breve_cli.o $(OBJ)
 	$(CXX) -o $@ $(CFLAGS) $^ $(LDFLAGS) @PLUGINIMP@ $(LIBS)
 
 bin/osmesaloader.o: bin/osmesaloader.cc
@@ -114,7 +111,7 @@ clean:
 	cd docBuild; make clean
 
 	rm -f README.txt README_SOURCE.txt
-	rm -f bin/breve@EXE_SUFFIX@ bin/breve_cli@EXE_SUFFIX@
+	rm -f bin/breve@EXE_SUFFIX@ 
 	rm -f .depend breve.dll lib/*.a
 	rm -f steve/format.c steve/stevelex.c
 	rm -f steve/steveparse.tab.c steve/steveparse.tab.h
@@ -179,11 +176,9 @@ CLI_release: clean
 	mkdir -p $(CLI_FOLDER)/bin
 	mkdir $(CLI_FOLDER)/lib
 	cp bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin
-	cp bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin
 
 ifeq ($(PLATFORM),linux-gnu)
 	mv $(CLI_FOLDER)/bin/breve@EXE_SUFFIX@ $(CLI_FOLDER)/bin/breve_ex@EXE_SUFFIX@
-	mv $(CLI_FOLDER)/bin/breve_cli@EXE_SUFFIX@ $(CLI_FOLDER)/bin/breve_cli_ex@EXE_SUFFIX@
 	cp bin/breve.sh $(CLI_FOLDER)/bin/breve@EXE_SUFFIX@
 	cp bin/breve_cli.sh $(CLI_FOLDER)/bin/breve_cli@EXE_SUFFIX@
 	cp bin/libpython2.4.so.1.0 $(CLI_FOLDER)/bin
@@ -249,7 +244,6 @@ endif
 install: optimize
 	mkdir -p @bindir@
 	cp bin/breve @bindir@
-	cp bin/breve_cli @bindir@
 	mkdir -p @libdir@/breve
 	rm -rf @libdir@/breve/classes
 	cp -R lib/classes @libdir@/breve
