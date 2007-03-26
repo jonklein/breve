@@ -11,6 +11,7 @@ struct methodpack {
 	// that way perl isn't doing strcmp() to lookup methods
 	// alas call_sv isn't working for these invocations
 	int argCount;
+	int retType;
 };
 
 brEngine *breveEngine;
@@ -30,6 +31,7 @@ xs_init(pTHX)
 	newXS("DynaLoader::boot_DynaLoader", boot_DynaLoader, file);
 	newXS("Breve::bootstrap", boot_Breve, file);
 }
+
 
 SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 // actually returns an SV*, AV*, or HV* (all sizeof(int) types though)
@@ -62,7 +64,7 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 		break;
 
 	case AT_LIST:
-		slMessage(DEBUG_INFO, "Coercing from perlType AT_LIST.\n");
+		slMessage(DEBUG_INFO, "Coercing from perlType AT_LIST (!!UNIMPLEMENTED!!).\n");
 		list = BRLIST( inEval );
 		unsigned int n;
 		SV * ret;
@@ -71,8 +73,6 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 			sv_2mortal(ret);
 			XPUSHs(ret);
 		}
-		ret = brPerlTypeFromEval(&list->_vector[2],&sp);
-		XPUSHs(ret);
 		ret = brPerlTypeFromEval(&list->_vector[2],&sp);
 		XPUSHs(ret);   // callMethod pushes the first value
 		result = brPerlTypeFromEval(&list->_vector[0], &sp);
@@ -101,7 +101,9 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 			
 	case AT_POINTER:
 		slMessage(DEBUG_INFO, "Coercing from PerlType AT_POINTER.\n");
+		slMessage(DEBUG_INFO, "Value is 0x%08x.\n", BRPOINTER(inEval));
 		result = newSViv(BRPOINTER( inEval ));
+		//slMessage(DEBUG_INFO,"Result = %08x, value = %08x \n",result, SvPV_nolen(result);
 		break;
 
 	case AT_VECTOR:
@@ -112,6 +114,7 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 			XPUSHs(sv_2mortal(newSVnv(v.x)));
 			XPUSHs(sv_2mortal(newSVnv(v.y)));
 			XPUSHs(sv_2mortal(newSVnv(v.z)));
+			*prevStackPtr = sp;
 		}
 		break;
 
@@ -146,6 +149,8 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 int brPerlCallMethod(void *ref, void *mp, const brEval **inArguments, brEval *outResult ) {
 	slMessage(DEBUG_INFO, "brPerlCallMethod() ==> refobj = %08x, mp = %08x, args..result..\n", (unsigned)ref, (unsigned)mp);
 
+	int count;
+
 	dSP;
     
 	ENTER;
@@ -158,19 +163,47 @@ int brPerlCallMethod(void *ref, void *mp, const brEval **inArguments, brEval *ou
                 
 	for(int i = 0; i < ((methodpack*)mp)->argCount; i++) {
 		SV *ret = brPerlTypeFromEval(inArguments[i], &SP);	
+
 		sv_2mortal(ret);
 		XPUSHs(ret);
 	}
 
 	PUTBACK;
 
-	call_method(((methodpack*)mp)->name, G_DISCARD);
+	count = call_method(((methodpack*)mp)->name, G_SCALAR);
 	// call_sv(GvSV(meth), G_NOARGS|G_DISCARD);
 	// call_method(meth_sv, G_DISCARD|G_NOARGS);
-    
+
+	SPAGAIN;
+
+	SV* returned_sv = POPs;
+	switch(SvTYPE(returned_sv)) {
+
+	case SVt_IV: // integer
+		outResult->set(SvIVX(returned_sv));
+		break;
+
+	case SVt_NV: // double
+		outResult->set(SvNV(returned_sv)); // might be able to change this to SvNVX for less evalutation
+		break;
+
+	case SVt_PV: // pointer (string?)
+		outResult->set(SvPV_nolen(returned_sv));
+		break;
+	
+	case SVt_PVAV: // array
+	case SVt_PVCV: // code ref
+	case SVt_PVHV: // hash
+	case SVt_PVMG: // blessed scalar
+			
+	default:
+		slMessage(DEBUG_ALL, "Can't handle type for returned SV*.\n");
+	}
+
+	PUTBACK;
 	FREETMPS;
 	LEAVE;
-    
+
 	return EC_OK;
 }
 
@@ -243,6 +276,8 @@ void *brPerlFindMethod( void *package_stash, const char *inName, unsigned char *
 		mp->argCount = inCount;
 		//printf("Returning gv = %08x\n",gv);
 		// just gonna let it leak
+		slMessage(0, "         +++++++++++ FOUND METHOD %s\n\n", inName);
+
 		return mp;
     } else {
 		slMessage(DEBUG_INFO, "Method %s not found.\n", inName);
@@ -264,9 +299,6 @@ void *brPerlFindObject( void *inData, const char *inName ) {
 	if(package_stash) { // found the package
 		return package_stash;
 	}
-
-	//if(strcmp(inName, "PerlTestObject") == 0)
-	//	return 0xdeadbeef;
 
 	return NULL;
 }
@@ -334,8 +366,8 @@ int brPerlLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *inFi
  * @param inObject		A void pointer to a Perl object.
  */
 void brPerlDestroyGenericPerlObject( void *inObject ) {
-	slMessage(DEBUG_INFO, "brPerlDestroyGenericPerlObject() ==> inObject = %08x\n",(unsigned)inObject); 
-	SvREFCNT_dec((SV*)inObject);
+	slMessage(DEBUG_INFO, "X brPerlDestroyGenericPerlObject() ==> inObject = %08x\n",(unsigned)inObject); 
+//	SvREFCNT_dec((SV*)inObject);
 }
 
 void brPerlShutdown() {
@@ -348,6 +380,7 @@ void brPerlShutdown() {
 void brPerlInit( brEngine *breveEngine ) {
 	slMessage(DEBUG_INFO, "Initializing Perl frontend.\n");
      
+
 	PERL_SYS_INIT3(NULL,NULL,NULL); //argc, argv, env
 	my_perl = perl_alloc();
 	perl_construct(my_perl);
