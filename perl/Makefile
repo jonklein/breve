@@ -9,3 +9,5 @@ ALL += perlmodule
 perlmodule:
 	@echo Making Perl module.
 	/usr/bin/perl /usr/share/perl/5.8/ExtUtils/xsubpp  -C++ -typemap /usr/share/perl/5.8/ExtUtils/typemap -typemap perlobject.map Breve.xs > Breve.c
+	sed --quiet -e 's/PUTBACK\;//' -e 'w .Breve.c' Breve.c
+	mv .Breve.c Breve.c
