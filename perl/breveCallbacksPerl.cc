@@ -178,6 +178,10 @@ int brPerlCallMethod(void *ref, void *mp, const brEval **inArguments, brEval *ou
 
 	SV* returned_sv = POPs;
 	switch(SvTYPE(returned_sv)) {
+		
+    case SVt_NULL: // null
+		outResult->set(0);
+		break;
 
 	case SVt_IV: // integer
 		outResult->set(SvIVX(returned_sv));
@@ -197,7 +201,7 @@ int brPerlCallMethod(void *ref, void *mp, const brEval **inArguments, brEval *ou
 	case SVt_PVMG: // blessed scalar
 			
 	default:
-		slMessage(DEBUG_ALL, "Can't handle type for returned SV*.\n");
+		slMessage(DEBUG_ALL, "Can't handle type (%d) for returned SV*.\n", SvTYPE(returned_sv));
 	}
 
 	PUTBACK;
@@ -348,8 +352,10 @@ int brPerlLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *inFi
           
 		// execute the main package code
 		int perl_run_result = perl_run(my_perl);
-		slMessage(DEBUG_INFO, "Result from perl_run() => %d\n", perl_run_result);
-
+		if(perl_run_result) {
+			slMessage(0, "Error %d while executing %s.\n", perl_run_result, inFilename);
+			return EC_ERROR;
+		}
 		fclose( fp );
 
 	} else {
@@ -366,7 +372,7 @@ int brPerlLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *inFi
  * @param inObject		A void pointer to a Perl object.
  */
 void brPerlDestroyGenericPerlObject( void *inObject ) {
-	slMessage(DEBUG_INFO, "X brPerlDestroyGenericPerlObject() ==> inObject = %08x\n",(unsigned)inObject); 
+	//slMessage(DEBUG_INFO, "X brPerlDestroyGenericPerlObject() ==> inObject = %08x\n",(unsigned)inObject); 
 //	SvREFCNT_dec((SV*)inObject);
 }
 

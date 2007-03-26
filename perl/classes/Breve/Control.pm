@@ -12,48 +12,48 @@ sub new {
 	my $self = {};
 	bless $self, $class;
 
-	my $self->{ backgroundColor } = breve->vector();
-	my $self->{ backgroundTexture } = 0;
-	my $self->{ blurFactor } = 0;
-	my $self->{ blurFlag } = 0;
-	my $self->{ blurMenu } = undef;
-	my $self->{ camOffset } = breve->vector();
-	my $self->{ camTarget } = breve->vector();
-	my $self->{ camera } = undef;
-	my $self->{ cameraPointer } = undef;
-	my $self->{ deltaOffset } = breve->vector();
-	my $self->{ deltaTarget } = breve->vector();
-	my $self->{ drawEveryFrame } = 0;
-	my $self->{ drawMenu } = undef;
-	my $self->{ floorDefined } = 0;
-	my $self->{ fogColor } = breve->vector();
-	my $self->{ fogFlag } = 0;
-	my $self->{ fogIntensity } = 0;
-	my $self->{ fogMenu } = undef;
-	my $self->{ frozen } = 0;
-	my $self->{ genericLinkShape } = undef;
-	my $self->{ genericShape } = undef;
-	my $self->{ lightAmbientColor } = breve->vector();
-	my $self->{ lightDiffuseColor } = breve->vector();
-	my $self->{ lightFlag } = 0;
-	my $self->{ lightMenu } = undef;
-	my $self->{ lightPosition } = breve->vector();
-	my $self->{ loadedImages } = ();
-	my $self->{ movie } = undef;
-	my $self->{ movieMenu } = undef;
-	my $self->{ offsetting } = 0;
-	my $self->{ reflectFlag } = 0;
-	my $self->{ reflectMenu } = undef;
-	my $self->{ selectedObject } = undef;
-	my $self->{ shadowFlag } = 0;
-	my $self->{ shadowMenu } = undef;
-	my $self->{ shadowVolumeFlag } = 0;
-	my $self->{ simStep } = 0;
-	my $self->{ simTime } = 0;
-	my $self->{ smoothFlag } = 0;
-	my $self->{ watchObject } = undef;
-	my $self->{ xRot } = 0;
-	my $self->{ yRot } = 0;
+	$self->{ backgroundColor } = breve->vector();
+	$self->{ backgroundTexture } = 0;
+	$self->{ blurFactor } = 0;
+	$self->{ blurFlag } = 0;
+	$self->{ blurMenu } = undef;
+	$self->{ camOffset } = breve->vector();
+	$self->{ camTarget } = breve->vector();
+        $self->{ camera } = undef;
+	$self->{ cameraPointer } = undef;
+	$self->{ deltaOffset } = breve->vector();
+	$self->{ deltaTarget } = breve->vector();
+	$self->{ drawEveryFrame } = 0;
+	$self->{ drawMenu } = undef;
+	$self->{ floorDefined } = 0;
+	$self->{ fogColor } = breve->vector();
+	$self->{ fogFlag } = 0;
+	$self->{ fogIntensity } = 0;
+	$self->{ fogMenu } = undef;
+	$self->{ frozen } = 0;
+	$self->{ genericLinkShape } = undef;
+	$self->{ genericShape } = undef;
+	$self->{ lightAmbientColor } = breve->vector();
+	$self->{ lightDiffuseColor } = breve->vector();
+	$self->{ lightFlag } = 0;
+	$self->{ lightMenu } = undef;
+	$self->{ lightPosition } = breve->vector();
+	$self->{ loadedImages } = ();
+	$self->{ movie } = undef;
+	$self->{ movieMenu } = undef;
+	$self->{ offsetting } = 0;
+	$self->{ reflectFlag } = 0;
+	$self->{ reflectMenu } = undef;
+	$self->{ selectedObject } = undef;
+	$self->{ shadowFlag } = 0;
+        $self->{ shadowMenu } = undef;
+	$self->{ shadowVolumeFlag } = 0;
+	$self->{ simStep } = 0;
+	$self->{ simTime } = 0;
+	$self->{ smoothFlag } = 0;
+	$self->{ watchObject } = undef;
+	$self->{ xRot } = 0;
+	$self->{ yRot } = 0;
 
 	$self->SUPER::init();
 	$self->init();
@@ -76,9 +76,10 @@ sub addMenu {
 	my ($self, $menuName, $theMethod );
 	( $self, $menuName, $theMethod ) = @_;
 
-	#die("NOT IMPLEMENTED IN CONTROL.PM\n");
-
-#	return breve->createInstances( breve->MenuItem, 1 )->createMenu( $menuName, $self, $theMethod );
+	my $mitem = Breve::MenuItem->new();
+	Breve::brPerlAddInstance($mitem);
+	$mitem->createMenu( $menuName, $self, $theMethod );
+	return $mitem;
 }
 
 sub addMenuSeparator {
@@ -87,13 +88,14 @@ sub addMenuSeparator {
 	my $self;
 	( $self ) = @_;
 
-	#die("NOT IMPLEMENTED IN CONTROL.PM\n");
-
-#	return breve->createInstances( breve->MenuItem, 1 )->createMenu( "", $self, "" );
+	my $msep = Breve::MenuItem->new();
+	Breve::brPerlAddInstance($msep);
+	$msep->createMenu( "", $self, "" );
+	return $msep;
 }
 
 sub aimCamera {
-	###Depricated.
+	###Deprecated.
 
 	my ($self, $location );
 	( $self, $location ) = @_;
@@ -738,6 +740,7 @@ sub init {
 
 	$self->{ cameraPointer } = Breve::callInternal($self, "getMainCameraPointer");
 	$self->{ camera } = Breve::Camera->new();
+
 	$self->addDependency( $self->{ camera } );
 	$self->{ camera }->setCameraPointer( $self->{ cameraPointer } );
 	$self->{ floorDefined } = 0;
@@ -745,12 +748,12 @@ sub init {
 	$self->setIterationStep( 0.050000 );
 	$self->enableDrawEveryFrame();
 	$self->{ backgroundTexture } = -1;
-	$self->setBackgroundColor( breve->vector( 0.500000, 0.700000, 1.000000 ) );
-	$self->setFogColor( breve->vector( 0.800000, 0.800000, 0.800000 ) );
+	$self->setBackgroundColor( Breve::Vector->new( 0.500000, 0.700000, 1.000000 ) );
+	$self->setFogColor( Breve::Vector->new( 0.800000, 0.800000, 0.800000 ) );
 	$self->{ xRot } = 0.000000;
 	$self->{ yRot } = 0.000000;
-	$self->moveLight( breve->vector( 0, 0, 0 ) );
-	$self->pointCamera( breve->vector( 0, 0, 0 ), breve->vector( 0, 0, 30 ) );
+	$self->moveLight( Breve::Vector->new( 5, 6, 9 ) );
+	$self->pointCamera( Breve::Vector->new( 0, 0, 0 ), Breve::Vector->new( 0, 0, 30 ) );
 	$self->setBackgroundScrollRate( 0.001000, 0.000100 );
 	$self->{ lightMenu } = $self->addMenu( "Use Lighting", "toggleLighting" );
 	$self->{ drawMenu } = $self->addMenu( "Use Smooth Shading", "toggleSmooth" );
@@ -764,8 +767,12 @@ sub init {
 	$self->enableSmoothDrawing();
 	$self->disableLighting();
 	$self->addMenuSeparator();
-	$self->{ genericShape } = breve->createInstances( breve->Sphere, 1 )->initWith( 1.000000 );
-	$self->{ genericLinkShape } = breve->createInstances( breve->Cube, 1 )->initWith( breve->vector( 0.100000, 1, 0.100000 ) );
+	
+	my $sphere = Breve::Sphere->new();
+	my $cube = Breve::Cube->new();
+	
+	$self->{ genericShape } = $sphere->initWith( 1.000000 );
+	$self->{ genericLinkShape } = $cube->initWith( Breve::Vector->new( 0.100000, 1, 0.100000 ) );
 }
 
 sub iterate {
@@ -778,12 +785,11 @@ sub iterate {
 	}
 
 	if( ( not $self->{ frozen } ) ) {
-		$result = $self->Breve::callInternal($self, "worldStep", $self->{ simTime }, $self->{ simStep } );
+		$result = Breve::callInternal($self, "worldStep", $self->{ simTime }, $self->{ simStep } );
 	}
 
 	if( ( $result == -1 ) ) {
-		raise Exception( "An error occurred during world simulation." )
-;
+		raise Exception( "An error occurred during world simulation." );
 	}
 
 	if( $self->{ offsetting } ) {
@@ -793,10 +799,7 @@ sub iterate {
 		if( ( $self->{ offsetting } == 0 ) ) {
 			$self->{ frozen } = 0;
 		}
-;
-
 	}
-
 }
 
 sub loadImage {
@@ -910,7 +913,7 @@ sub pivotCamera {
 
 	my ($self, $dx, $dy );
 	( $self, $dx = 0.000000, $dy = 0.000000 ) = @_;
-	my $rot = breve->vector();
+	my $rot = Breve::Vector->new();
 
 	$rot = $self->{ camera }->getRotation();
 	die("NOT IMPLEMENTED in Control.pm\n");
@@ -924,11 +927,11 @@ sub pointCamera {
 	###Points the camera at the vector location.  The optional argument offset specifies the offset of the camera relative to the location target.
 
 	my ($self, $location, $offset );
-	( $self, $location, $offset = breve->vector( 0.000000, 0.000000, 0.000000 ) ) = @_;
+	( $self, $location, $offset = Breve::Vector->new( 0.000000, 0.000000, 0.000000 ) ) = @_;
 
 	$self->{ camTarget } = $location;
 	$self->setCameraTarget( $location );
-	if( ( breve->length( $offset ) != 0.000000 ) ) {
+	if( ( $offset->length() != 0.000000 ) ) {
 		$self->{ camOffset } = $offset;
 		$self->setCameraOffset( $offset );
 
@@ -1048,7 +1051,7 @@ sub setDisplayMessage {
 	###Sets a text string in the simulation display.  xLoc and yLoc  represent the location of the text.  The coordinate system used goes from (-1, -1) to (1, 1) with (-1, -1) at the lower left hand  corner, (0, 0) in the center of the window and (1, 1) in  the top right hand corner.  The color of the text is set to textColor. <p> Up to 8 messages can be displayed in the simulation window.   messageNumber specifies which message "slot" to modify.   Subsequent calls to this method with the same slot number erase previous entries.
 
 	my ($self, $theString, $messageNumber, $xLoc, $yLoc, $textColor );
-	( $self, $theString, $messageNumber, $xLoc, $yLoc, $textColor = breve->vector( 0.000000, 0.000000, 0.000000 ) ) = @_;
+	( $self, $theString, $messageNumber, $xLoc, $yLoc, $textColor = Breve::Vector->new( 0.000000, 0.000000, 0.000000 ) ) = @_;
 
 	Breve::callInternal($self, "cameraSetText", $theString, $messageNumber, $xLoc, $yLoc, $textColor );
 }
@@ -1059,7 +1062,7 @@ sub setDisplayText {
 	my ($self, $theString, $xLoc, $yLoc, $messageNumber );
 	( $self, $theString, $xLoc = -0.950000, $yLoc = -0.950000, $messageNumber = 0.000000 ) = @_;
 
-	Breve::callInternal($self, "cameraSetText", $theString, $messageNumber, $xLoc, $yLoc, breve->vector( 0, 0, 0 ) );
+	Breve::callInternal($self, "cameraSetText", $theString, $messageNumber, $xLoc, $yLoc, Breve::Vector->new( 0, 0, 0 ) );
 }
 
 sub setDisplayTextScale {

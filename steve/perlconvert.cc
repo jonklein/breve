@@ -312,8 +312,8 @@ std::string stRandomExp::toPerl( stPerlConversionData *inData ) {
 
 std::string stInstanceExp::toPerl( stPerlConversionData *inData ) {
 	std::string result;
-
-	result = "Breve::createInstances( breve->" + stPerlConvertSymbol( name ) + ", " + count->toPerl( inData ) + " )";
+   
+	result = "Breve::" + stPerlConvertSymbol( name ) + "->new(); #### MANUAL: MAKE " + count->toPerl( inData ) + " OF THESE!";
 
 	return result;
 }
@@ -330,7 +330,7 @@ std::string stCodeArrayExp::toPerl( stPerlConversionData *inData ) {
 }
 
 std::string stDieExp::toPerl( stPerlConversionData *inData ) {
-	return "raise Exception( " + expression->toPerl( inData ) + " )\n";
+	return "raise Exception( " + expression->toPerl( inData ) + " )";
 }
 
 std::string stListExp::toPerl( stPerlConversionData *inData ) {
@@ -359,7 +359,7 @@ std::string stSelfExp::toPerl( stPerlConversionData *inData ) {
 std::string stCCallExp::toPerl( stPerlConversionData *inData ) {
 	std::string result;
 
-	result = "$self->callInternal(\"" + stPerlConvertSymbol( _function->_name ) + "\"";
+	result = "Breve::callInternal( $self, \"" + stPerlConvertSymbol( _function->_name ) + "\"";
 
 	for( unsigned int n = 0; n < _arguments.size(); n++ ) {
 		result += ", " + _arguments[ n ]->toPerl( inData );
@@ -553,7 +553,7 @@ std::string stReturnExp::toPerl( stPerlConversionData *inData ) {
 }
 
 std::string stVectorExp::toPerl( stPerlConversionData *inData ) {
-	return "Breve::vector( " + _x->toPerl( inData ) + ", " + _y->toPerl( inData ) + ", " + _z->toPerl( inData ) + " )";
+	return "Breve::Vector->new( " + _x->toPerl( inData ) + ", " + _y->toPerl( inData ) + ", " + _z->toPerl( inData ) + " )";
 }
 
 std::string stForeachExp::toPerl( stPerlConversionData *inData ) {
@@ -771,12 +771,12 @@ std::string stEvalExp::toPerl( stPerlConversionData *inData ) {
 			break;
 
 		case AT_VECTOR:
-			sprintf( format, "Breve::vector( %f, %f, %f )", BRVECTOR( eval ).x, BRVECTOR( eval ).y, BRVECTOR( eval ).z );
+			sprintf( format, "Breve::Vector->new( %f, %f, %f )", BRVECTOR( eval ).x, BRVECTOR( eval ).y, BRVECTOR( eval ).z );
 			result = format;
 			break;
 
 		case AT_MATRIX:
-			sprintf( format, "Breve::matrix( %f, %f, %f, %f, %f, %f, %f, %f, %f )", 
+			sprintf( format, "Breve::Matrix->new( %f, %f, %f, %f, %f, %f, %f, %f, %f )", 
 				BRMATRIX( eval )[ 0 ][ 0 ], BRMATRIX( eval )[ 0 ][ 1 ], BRMATRIX( eval )[ 0 ][ 2 ], 
 				BRMATRIX( eval )[ 1 ][ 0 ], BRMATRIX( eval )[ 1 ][ 1 ], BRMATRIX( eval )[ 1 ][ 2 ], 
 				BRMATRIX( eval )[ 2 ][ 0 ], BRMATRIX( eval )[ 2 ][ 1 ], BRMATRIX( eval )[ 2 ][ 2 ] );

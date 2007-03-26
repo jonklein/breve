@@ -6,18 +6,18 @@ package Swarm;
 our @ISA = qw(Breve::Control);
 
 sub new {
-	my $class = shift;
-	my $self = {};
-	bless $self, $class;
-#  my $self->{ birds } = ();
-#	my $self->{ cloudTexture } = undef;
-#	my $self->{ normalMenu } = undef;
-#	my $self->{ obedientMenu } = undef;
-#	my $self->{ selection } = undef;
-#	my $self->{ wackyMenu } = undef;
-	init( $self );
+    my $class = shift;
+    my $self = {};
+    bless $self, $class;
+    $self->{ birds } = ();
+    $self->{ cloudTexture } = undef;
+    $self->{ normalMenu } = undef;
+    $self->{ obedientMenu } = undef;
+    $self->{ selection } = undef;
+    $self->{ wackyMenu } = undef;
+    init( $self );
    
-   return $self;
+    return $self;
 }
 
 sub click {
@@ -41,10 +41,9 @@ sub flockNormally {
 	( $self ) = @_;
 	my $item = undef;
 
-	foreach $item ($self->{ birds }) {
-		$item->flockNormally();
+	foreach $item (@{$self->{ birds }}) {
+	    $item->flockNormally();
 	}
-
 
 	$self->{ normalMenu }->check();
 	$self->{ obedientMenu }->uncheck();
@@ -82,58 +81,64 @@ sub flockWackily {
 }
 
 sub init {
-	my $self;
-	( $self ) = @_;
-	my $floor = undef;
+    my $self;
+    ( $self ) = @_;
+    my $floor = undef;
+    
+    $self->SUPER::init();
+    
+    $self->addMenu( "Smoosh The Birdies", "squish" );
+    $self->addMenuSeparator();
+    $self->{ obedientMenu } = $self->addMenu( "Flock Obediently", "flockObediently" );
+    $self->{ normalMenu } = $self->addMenu( "Flock Normally", "flockNormally" );
+    $self->{ wackyMenu } = $self->addMenu( "Flock Wackily", "flockWackily" );
+    $self->enableLighting();
+    $self->moveLight( Breve::Vector->new( 0, 20, 20 ) );
 
-	$self->addMenu( "Smoosh The Birdies", "squish" );
-	$self->addMenuSeparator();
-	$self->{ obedientMenu } = $self->addMenu( "Flock Obediently", "flockObediently" );
-	$self->{ normalMenu } = $self->addMenu( "Flock Normally", "flockNormally" );
-	$self->{ wackyMenu } = $self->addMenu( "Flock Wackily", "flockWackily" );
-	$self->enableLighting();
-	$self->moveLight( Breve::vector( 0, 20, 20 ) );
-	$self->{ cloudTexture } = breve->createInstances( breve->Image, 1 )->load( "images/clouds.png" );
-	$floor = breve->createInstances( breve->Floor, 1 );
-	$floor->catchShadows();
-	$self->{ birds } = breve->createInstances( breve->Birds, 60 );
-	$self->flockNormally();
-	$self->setBackgroundTextureImage( $self->{ cloudTexture } );
-	$self->offsetCamera( breve->vector( 5, 1.500000, 6 ) );
-	$self->enableShadows();
+    my $ctex = Breve::Image->new();
+    $ctex->load("images/clouds.png");
+    $self->{ cloudTexture } = $ctex;
+   
+    $floor = Breve::Floor->new();
+    
+    $floor->catchShadows();
+
+    for(0..5) { # 60
+	push @{$self->{ birds }}, Bird->new();
+    }
+
+    #$self->{ birds } = breve->createInstances( breve->Birds, 60 );
+    $self->flockNormally();
+    $self->setBackgroundTextureImage( $self->{ cloudTexture } );
+    $self->offsetCamera( Breve::Vector->new( 5, 1.500000, 6 ) );
+    $self->enableShadows();
 }
 
 sub internalUserInputMethod {
 	my $self;
 	( $self ) = @_;
-
 }
 
 sub iterate {
 	my $self;
 	( $self ) = @_;
 	my $item = undef;
-	my $location = breve->vector();
+	my $location = Breve::Vector->new();
 	my $topDiff = 0;
 
 	$self->updateNeighbors();
-	foreach $item ($self->{ birds }) {
-		$item->fly();
-		$location = ( $location + $item->getLocation() );
-
+	foreach $item (@{$self->{ birds }}) {
+	    $item->fly();
+	    #$location = ( $location + $item->getLocation() ); # MANUAL NEED TO DO +
 	}
 
-
-	$location = ( $location / breve->length( $self->{ birds } ) );
+	#$location = ( $location / breve->length( $self->{ birds } ) );
 	$topDiff = 0.000000;
-	foreach $item ($self->{ birds }) {
-		if( ( $topDiff < breve->length( ( $location - $item->getLocation() ) ) ) ) {
-			$topDiff = breve->length( ( $location - $item->getLocation() ) );
-		}
-;
-
-	}
-
+	#foreach $item ($self->{ birds }) {
+	#	if( ( $topDiff < breve->length( ( $location - $item->getLocation() ) ) ) ) {
+	#		$topDiff = breve->length( ( $location - $item->getLocation() ) );
+	#	}
+	#}
 
 	$self->aimCamera( $location );
 	$self->SUPER::iterate();
@@ -153,21 +158,23 @@ sub squish {
 
 package Bird;
 
+our @ISA = qw(Breve::Mobile);
+
 sub new {
-	my $class = shift;
-	my $self = {};
-	bless $self, $class;
-	my $self->{ centerConstant } = 0;
-	my $self->{ cruiseDistance } = 0;
-	my $self->{ landed } = 0;
-	my $self->{ maxAcceleration } = 0;
-	my $self->{ maxVelocity } = 0;
-	my $self->{ spacingConstant } = 0;
-	my $self->{ velocityConstant } = 0;
-	my $self->{ wanderConstant } = 0;
-	my $self->{ worldCenterConstant } = 0;
-	init( $self );
-	return $self;
+    my $class = shift;
+    my $self = {};
+    bless $self, $class;
+    $self->{ centerConstant } = 0;
+    $self->{ cruiseDistance } = 0;
+    $self->{ landed } = 0;
+    $self->{ maxAcceleration } = 0;
+    $self->{ maxVelocity } = 0;
+    $self->{ spacingConstant } = 0;
+    $self->{ velocityConstant } = 0;
+    $self->{ wanderConstant } = 0;
+    $self->{ worldCenterConstant } = 0;
+    init( $self );
+    return $self;
 }
 
 sub checkLanded {
@@ -398,11 +405,19 @@ sub init {
 	my $self;
 	( $self ) = @_;
 
-	$self->setShape( breve->createInstances( breve->PolygonCone, 1 )->initWith( 3, 0.500000, 0.060000 ) );
-	$self->move( ( breve->randomExpression( breve->vector( 10, 10, 10 ) ) - breve->vector( 5, -5, 5 ) ) );
-	$self->setVelocity( ( breve->randomExpression( breve->vector( 20, 20, 20 ) ) - breve->vector( 10, 10, 10 ) ) );
-	$self->setColor( breve->randomExpression( breve->vector( 1, 1, 1 ) ) );
-	$self->handleCollisions( "Floor", "land" );
+	$self->SUPER::init();
+
+	my $cone = Breve::PolygonCone->new();
+	$cone->initWith(3, 0.5, 0.06);
+	$self->setShape( $cone );
+
+#	my $random_movement = Breve::RandomVector->new(10,10,10); 
+
+#	$self->move( ( breve->randomExpression( breve->vector( 10, 10, 10 ) ) - breve->vector( 5, -5, 5 ) ) );
+#	$self->setVelocity( ( breve->randomExpression( breve->vector( 20, 20, 20 ) ) - breve->vector( 10, 10, 10 ) ) );
+#	$self->setColor( breve->randomExpression( breve->vector( 1, 1, 1 ) ) );
+#	$self->handleCollisions( "Floor", "land" );
+	
 	$self->setNeighborhoodSize( 3.000000 );
 }
 
@@ -419,9 +434,7 @@ sub land {
 package main;
 
 &Breve::bootstrap();
-
 my $SwarmController = Swarm->new();
-Breve::brPerlSetController($SwarmController);
 
 1;
 

@@ -76,7 +76,9 @@ sub canRespond {
 	my ($self, $methodName );
 	( $self, $methodName ) = @_;
 
-	return Breve::callInternal($self, "respondsTo", $self, $methodName );
+	my $result = Breve::callInternal($self, "respondsTo", $self->{brInstance}, $methodName );
+
+	return $result;
 }
 
 sub dearchive {
@@ -127,7 +129,7 @@ sub getController {
 	my $self;
 	( $self ) = @_;
 
-	return Breve::callInternal($self, "getController");
+        return Breve::callInternal($self, "getController");
 }
 
 sub getDescription {

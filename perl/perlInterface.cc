@@ -121,36 +121,37 @@ void brPerlCallInternalFunction( brInternalFunction *inFunc, brInstance *caller,
 	   SVt_PVIO // 15 	  */
 
 		case SVt_NULL: // null
-			slMessage(DEBUG_ALL, "handling NULL.\n");
+			slMessage(DEBUG_INFO, "handling NULL.\n");
 			brArgs[i].set(NULL);
 			break;
 
 		case SVt_IV: // integer
-			slMessage(DEBUG_ALL, "handling integer. (VAL: %08x) \n", SvIVX(arg));
+			slMessage(DEBUG_INFO, "handling integer. (VAL: %08x) \n", SvIVX(arg));
 			brArgs[i].set(SvIVX(arg));
 			break;
 
 		case SVt_NV: // double
-			slMessage(DEBUG_ALL, "handling double (VAL: %.2f) \n", SvNV(arg));
+			slMessage(DEBUG_INFO, "handling double (VAL: %.2f) \n", SvNV(arg));
 			brArgs[i].set(SvNV(arg));
 			break;
 
-		case SVt_PV: // pointer (string?)
-			slMessage(DEBUG_ALL, "handling pointer (char*).\n");
-			brArgs[i].set(SvPV_nolen(arg));
+		case SVt_PV: // string
+			slMessage(DEBUG_INFO, "handling pointer (char*) (VAL: %s).\n", SvPVX(arg));		
+			brArgs[i].set(SvPVX(arg));
 			break;
 			
 		case SVt_PVNV: // pointer (double)
-			slMessage(DEBUG_ALL, "handling pointer (w/ double), (VAL: %.2f).\n", SvNV(arg));
+			slMessage(DEBUG_INFO, "handling pointer (w/ double), (VAL: %.2f).\n", SvNV(arg));
 			brArgs[i].set(SvNV(arg));
 			break;
 
 		case SVt_RV: // a Perl reference
-			slMessage(DEBUG_ALL, "handling reference.\n");
-			// is it a vector?
+			slMessage(DEBUG_INFO, "handling reference.\n");
+
 			if (sv_isobject(arg)) {
+
 				if(sv_derived_from(arg, "Breve::Vector")) {
-					slMessage(DEBUG_ALL, "handling vector type.\n");
+					slMessage(DEBUG_INFO, "handling vector type.\n");
 					slVector v = {0.0, 0.0, 0.0};
 					// dereferencing gives us the SVt_PVHV (pointer to the $self hash)
 					HV* obj_hash = (HV*) SvRV(arg);
@@ -158,9 +159,11 @@ void brPerlCallInternalFunction( brInternalFunction *inFunc, brInstance *caller,
 					SV** obj_yval = hv_fetch(obj_hash, "y", 1, 0);
 					SV** obj_zval = hv_fetch(obj_hash, "z", 1, 0);
 
-					v.x = SvIVX(*obj_xval);
-					v.y = SvIVX(*obj_yval);
-					v.z = SvIVX(*obj_zval);
+					v.x = SvNV(*obj_xval);
+					v.y = SvNV(*obj_yval);
+					v.z = SvNV(*obj_zval);
+
+					//slMessage(0, "PASSING V(%.2f, %.2f, %.2f).\n", v.x, v.y, v.z);
 
 					brArgs[i].set(v);
 
@@ -173,13 +176,39 @@ void brPerlCallInternalFunction( brInternalFunction *inFunc, brInstance *caller,
 						slMessage(DEBUG_ALL,"$self->{brInstance} not found.\n");
 						exit(2);
 					}
+				} else if(sv_derived_from(arg, "Breve::Matrix")) {	
+					slMessage(DEBUG_INFO,"Handling the Matrix.\n");
+					slMatrix m;
+					// dereferencing gives us the SVt_PVHV (pointer to the $self hash)
+					HV* obj_hash = (HV*) SvRV(arg);
+					
+					m[0][0] = SvNV(  *  hv_fetch(obj_hash, "x1", 2, 0)     );
+					m[0][1] = SvNV(  *  hv_fetch(obj_hash, "x2", 2, 0)     );
+					m[0][2] = SvNV(  *  hv_fetch(obj_hash, "x3", 2, 0)     );
+
+					m[1][0] = SvNV(  *  hv_fetch(obj_hash, "y1", 2, 0)     );
+					m[1][1] = SvNV(  *  hv_fetch(obj_hash, "y2", 2, 0)     );
+					m[1][2] = SvNV(  *  hv_fetch(obj_hash, "y3", 2, 0)     );
+
+					m[2][0] = SvNV(  *  hv_fetch(obj_hash, "z1", 2, 0)     );
+					m[2][1] = SvNV(  *  hv_fetch(obj_hash, "z2", 2, 0)     );
+					m[2][2] = SvNV(  *  hv_fetch(obj_hash, "z3", 2, 0)     );
+					
+					brArgs[i].set(m);
+
+					/*slMessage(0, "%f %f %f, %f %f %f, %f %f %f\n",
+							  m[0][0],m[0][1],m[0][2],
+						m[1][0],m[1][1],m[1][2],
+						m[2][0],m[2][1],m[2][2]);*/
+
 				} else {
 					slMessage(DEBUG_ALL,"Don't know how to handle this class type.\n");
 					exit(2);
 				}
 
 			} else {
-				slMessage(DEBUG_ALL, "Not handling unknown reference type.\n");
+				slMessage(0, "What is this reference?: \n");
+				
 				exit(2);
 			}
 			break;
@@ -207,7 +236,7 @@ void brPerlCallInternalFunction( brInternalFunction *inFunc, brInstance *caller,
 	
 
 	if(returned == 0) {
-		slMessage(DEBUG_ALL, "not returning anything.\n");
+		slMessage(DEBUG_INFO, "not returning anything.\n");
 	} else {
 		PUSHs(returned);
 	}
