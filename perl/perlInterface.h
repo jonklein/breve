@@ -15,7 +15,8 @@ void *brPerlSetController( brInstance* controller );
 
 brInternalFunction *brPerlFindInternalFunction( char *name );
 
-SV* brPerlCallInternalFunction( brInternalFunction *inFunc, brInstance *caller, int argCount, void *inArgs);
+void brPerlCallInternalFunction( brInternalFunction *inFunc,
+								brInstance *caller, int argCount, AV* inArgs);
 
 brInstance *brPerlAddInstance( SV* instance );
 
