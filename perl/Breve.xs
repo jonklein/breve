@@ -25,9 +25,12 @@ void *
 brPerlFindInternalFunction( name )
 	char *name
 			    
-SV*
+void
 brPerlCallInternalFunction( inFunc, caller, argCount, inArgs )
 	void *inFunc
 	void *caller
 	int argCount
-	void *inArgs
+	AV *inArgs
+
+   PPCODE:
+   brPerlCallInternalFunction(inFunc, caller, argCount, inArgs);
