@@ -15,6 +15,7 @@ sub new {
     $self->{ obedientMenu } = undef;
     $self->{ selection } = undef;
     $self->{ wackyMenu } = undef;
+    $self->{ floor } = undef;
     init( $self );
    
     return $self;
@@ -83,7 +84,6 @@ sub flockWackily {
 sub init {
     my $self;
     ( $self ) = @_;
-    my $floor = undef;
     
     $self->SUPER::init();
     
@@ -99,15 +99,13 @@ sub init {
     $ctex->load("images/clouds.png");
     $self->{ cloudTexture } = $ctex;
    
-    $floor = Breve::Floor->new();
-    
-    $floor->catchShadows();
+    $self->{floor} = Breve::Floor->new();
+    $self->{floor}->catchShadows();
 
-    for(0..5) { # 60
+    for(0..60) {
 	push @{$self->{ birds }}, Bird->new();
     }
 
-    #$self->{ birds } = breve->createInstances( breve->Birds, 60 );
     $self->flockNormally();
     $self->setBackgroundTextureImage( $self->{ cloudTexture } );
     $self->offsetCamera( Breve::Vector->new( 5, 1.500000, 6 ) );
@@ -140,20 +138,18 @@ sub iterate {
 	#	}
 	#}
 
-	$self->aimCamera( $location );
+	#$self->aimCamera( $location );
 	$self->SUPER::iterate();
 }
 
 sub squish {
-	my $self;
-	( $self ) = @_;
-	my $item = undef;
-
-	foreach $item ($self->{ birds }) {
-		$item->move( breve->vector( 0, 0, 0 ) );
-	}
-
-
+    my $self;
+    ( $self ) = @_;
+    my $item = undef;
+    
+    foreach $item ($self->{ birds }) {
+	$item->move( breve->vector( 0, 0, 0 ) );
+    }
 }
 
 package Bird;
@@ -192,16 +188,16 @@ sub checkVisibility {
 		return 0;
 	}
 
-	if( ( not $item->isA( "Bird" ) ) ) {
-		return 0;
+	if(ref($item) ne "Bird") {
+	    return 0;
 	}
 
 	if( $item->checkLanded() ) {
-		return 0;
+	    return 0;
 	}
 
 	if( ( $self->getAngle( $item ) > 2.000000 ) ) {
-		return 0;
+	    return 0;
 	}
 
 	return 1;
@@ -252,153 +248,165 @@ sub flockWackily {
 sub fly {
 	my $self;
 	( $self ) = @_;
-	my $bird = undef;
-	my $toNeighbor = breve->vector();
-	my $centerUrge = breve->vector();
-	my $worldCenterUrge = breve->vector();
-	my $velocityUrge = breve->vector();
-	my $spacingUrge = breve->vector();
-	my $wanderUrge = breve->vector();
-	my $acceleration = breve->vector();
-	my $newVelocity = breve->vector();
-	my $neighbors = ();
+
+	my $toNeighbor = Breve::Vector->new();
+	my $centerUrge = Breve::Vector->new();
+	my $worldCenterUrge = Breve::Vector->new();
+	my $velocityUrge = Breve::Vector->new();
+	my $spacingUrge = Breve::Vector->new();
+	my $wanderUrge = Breve::Vector->new();
+	my $acceleration = Breve::Vector->new();
+	my $newVelocity = Breve::Vector->new();
+	my @neighbors = ();
 	my $takeOff = 0;
 
-	foreach $bird ($self->getNeighbors()) {
-		if( $self->checkVisibility( $bird ) ) {
-			$neighbors.append( $bird );
-		}
-;
+	foreach my $bird (@{$self->getNeighbors()}) {
 
+	    if( $self->checkVisibility( $bird ) ) {
+		push @neighbors, $bird;
+	    }
 	}
-
 
 	if( $self->{ landed } ) {
-		$takeOff = breve->randomExpression( 40 );
-		if( ( $takeOff == 1 ) ) {
-			$self->{ landed } = 0;
-			$self->setVelocity( ( breve->randomExpression( breve->vector( 0.100000, 1.100000, 0.100000 ) ) - breve->vector( 0.050000, 0, 0.050000 ) ) );
+	    $takeOff = rand 40;
+	    if( ( $takeOff == 1 ) ) {
+		$self->{ landed } = 0;
 
-		}		 else {
-			return;
+		my $randvec = Breve::Vector->newRandom(0.1, 1.1, 0.1);
+		my $const = Breve::Vector->new(0.05, 0, 0.05);
 
-		}
-;
-
+		$self->setVelocity( $randvec->subtract($const) );
+	    } else {
+		return;	
+	    }
 	}
 
-	$centerUrge = $self->getCenterUrge( $neighbors );
-	$velocityUrge = $self->getVelocityUrge( $neighbors );
-	foreach $bird ($neighbors) {
-		$toNeighbor = ( $self->getLocation() - $bird->getLocation() );
-		if( ( breve->length( $toNeighbor ) < $self->{ cruiseDistance } ) ) {
-			$spacingUrge = ( $spacingUrge + $toNeighbor );
-		}
-;
-
+	$centerUrge = $self->getCenterUrge( \@neighbors );
+	$velocityUrge = $self->getVelocityUrge( \@neighbors );
+	foreach my $bird (@neighbors) {
+	    $toNeighbor = ( $self->getLocation()->subtract( $bird->getLocation() ) );
+	    if( $toNeighbor->length() < $self->{ cruiseDistance } ) {
+		$spacingUrge = ( $spacingUrge->add($toNeighbor) );
+	    }
 	}
 
-
-	if( ( breve->length( $self->getLocation() ) > 10 ) ) {
-		$worldCenterUrge = ( -$self->getLocation() );
+	if(  $self->getLocation()->length() > 10  ) {
+		$worldCenterUrge = ( $self->getLocation()->negative() );
 	}
 
-	$wanderUrge = ( breve->randomExpression( breve->vector( 2, 2, 2 ) ) - breve->vector( 1, 1, 1 ) );
-	if( breve->length( $spacingUrge ) ) {
-		$spacingUrge = ( $spacingUrge / breve->length( $spacingUrge ) );
+	$wanderUrge = Breve::Vector->newRandom( 2, 2, 2 )->subtract(Breve::Vector->new( 1, 1, 1 ) );
+
+	if( $spacingUrge->length() ) {
+	    $spacingUrge->normalize_in_place();
 	}
 
-	if( breve->length( $worldCenterUrge ) ) {
-		$worldCenterUrge = ( $worldCenterUrge / breve->length( $worldCenterUrge ) );
+	if( $worldCenterUrge->length() ) {
+	    $worldCenterUrge->normalize_in_place();
 	}
 
-	if( breve->length( $velocityUrge ) ) {
-		$velocityUrge = ( $velocityUrge / breve->length( $velocityUrge ) );
+	if( $velocityUrge->length() ) {
+	    $velocityUrge->normalize_in_place();
 	}
 
-	if( breve->length( $centerUrge ) ) {
-		$centerUrge = ( $centerUrge / breve->length( $centerUrge ) );
+	if( $centerUrge->length() ) {
+	    $centerUrge->normalize_in_place();
 	}
 
-	if( breve->length( $wanderUrge ) ) {
-		$wanderUrge = ( $wanderUrge / breve->length( $wanderUrge ) );
+	if( $wanderUrge->length() ) {
+	    $wanderUrge->normalize_in_place();
 	}
 
-	$wanderUrge = ( $wanderUrge * $self->{ wanderConstant } );
-	$worldCenterUrge = ( $worldCenterUrge * $self->{ worldCenterConstant } );
-	$centerUrge = ( $centerUrge * $self->{ centerConstant } );
-	$velocityUrge = ( $velocityUrge * $self->{ velocityConstant } );
-	$spacingUrge = ( $spacingUrge * $self->{ spacingConstant } );
-	$acceleration = ( ( ( ( $worldCenterUrge + $centerUrge ) + $velocityUrge ) + $spacingUrge ) + $wanderUrge );
-	if( ( breve->length( $acceleration ) != 0 ) ) {
-		$acceleration = ( $acceleration / breve->length( $acceleration ) );
+	$wanderUrge = ( $wanderUrge->multiplyBy( $self->{ wanderConstant } ));
+	
+	$worldCenterUrge = ( $worldCenterUrge->multiplyBy( $self->{ worldCenterConstant }));
+	$centerUrge = ( $centerUrge->multiplyBy( $self->{ centerConstant } ));
+	$velocityUrge = ( $velocityUrge->multiplyBy( $self->{ velocityConstant } ));
+	$spacingUrge = ( $spacingUrge->multiplyBy( $self->{ spacingConstant } ));
+
+	$acceleration = ( ( ( ( $worldCenterUrge
+				->add( $centerUrge ) )
+			      ->add( $velocityUrge) )
+			    ->add( $spacingUrge ) )
+			  ->add( + $wanderUrge) );
+
+	if( $acceleration->length() != 0 ) {
+	    $acceleration->normalize_in_place();
 	}
 
-	$self->setAcceleration( ( $self->{ maxAcceleration } * $acceleration ) );
+	$self->setAcceleration( $acceleration->multiplyBy($self->{ maxAcceleration } ) );
 	$newVelocity = $self->getVelocity();
-	if( ( breve->length( $newVelocity ) > $self->{ maxVelocity } ) ) {
-		$newVelocity = ( ( $self->{ maxVelocity } * $newVelocity ) / breve->length( $newVelocity ) );
+
+	if( $newVelocity->length() > $self->{ maxVelocity } ) {
+	    $newVelocity->multiplyBy($self->{ maxVelocity })->divideBy($newVelocity->length());
 	}
 
 	$self->setVelocity( $newVelocity );
-	$self->point( breve->vector( 0, 1, 0 ), ( $newVelocity / breve->length( $newVelocity ) ) );
+
+	if( $newVelocity->length() != 0 ) {
+	    $newVelocity->normalize_in_place();
+	}
+
+	$self->point( Breve::Vector->new( 0, 1, 0 ), $newVelocity );
+
 }
 
 sub getAngle {
-	my ($self, $otherMobile );
-	( $self, $otherMobile ) = @_;
-	my $tempVector = breve->vector();
+    my ($self, $otherMobile );
+    ( $self, $otherMobile ) = @_;
+    my $tempVector;
 
-	if( ( breve->length( $self->getVelocity() ) == 0 ) ) {
-		return 0;
-	}
+    if( $self->getVelocity()->length() == 0 ) {
+	return 0;
+    }
+    
+    $tempVector = ( $otherMobile->getLocation()->subtract($self->getLocation() ));
 
-	$tempVector = ( $otherMobile->getLocation() - $self->getLocation() );
-   #return Breve::callInternal("angle", $self->getVelocity(), $tempVector );
+    my $velocity = $self->getVelocity();
+
+    return Breve::callInternal($self, "angle", $velocity, $tempVector );
 }
+
 
 sub getCenterUrge {
 	my ($self, $flock );
 	( $self, $flock ) = @_;
 	my $item = undef;
 	my $count = 0;
-	my $center = breve->vector();
+	my $center = Breve::Vector->new(0, 0, 0);
 
-	foreach $item ($flock) {
-		$count = ( $count + 1 );
-		$center = ( $center + $item->getLocation() );
-
+	foreach $item (@{$flock}) {
+	    $count = ( $count + 1 );
+	    $center = ( $center->add( $item->getLocation() ) );
 	}
-
 
 	if( ( $count == 0 ) ) {
-		return breve->vector( 0, 0, 0 );
+	    return Breve::Vector->new( 0, 0, 0 );
 	}
 
-	$center = ( $center / $count );
-	return ( $center - $self->getLocation() );
+	$center = $center->divideBy($count);
+	return ( $center->subtract($self->getLocation()) );
 }
 
 sub getVelocityUrge {
 	my ($self, $flock );
 	( $self, $flock ) = @_;
-	my $item = undef;
-	my $count = 0;
-	my $aveVelocity = breve->vector();
 
-	foreach $item ($flock) {
+	my $count = 0;
+	my $aveVelocity = Breve::Vector->new();
+
+	foreach my $item (@{$flock}) {
 		$count = ( $count + 1 );
-		$aveVelocity = ( $aveVelocity + $item->getVelocity() );
+		$aveVelocity = ( $aveVelocity->add( $item->getVelocity() ) );
 
 	}
 
 
 	if( ( $count == 0 ) ) {
-		return breve->vector( 0, 0, 0 );
+		return Breve::Vector->new( 0, 0, 0 );
 	}
 
-	$aveVelocity = ( $aveVelocity / $count );
-	return ( $aveVelocity - $self->getVelocity() );
+	$aveVelocity = ( $aveVelocity->divideBy( $count ) );
+	return ( $aveVelocity->subtract( $self->getVelocity() ) );
 }
 
 sub init {
@@ -411,12 +419,13 @@ sub init {
 	$cone->initWith(3, 0.5, 0.06);
 	$self->setShape( $cone );
 
-#	my $random_movement = Breve::RandomVector->new(10,10,10); 
+	my $random_place = Breve::Vector->newRandom(10,10,10); 
+	my $random_velocity = Breve::Vector->newRandom(20,20,20); 
 
-#	$self->move( ( breve->randomExpression( breve->vector( 10, 10, 10 ) ) - breve->vector( 5, -5, 5 ) ) );
-#	$self->setVelocity( ( breve->randomExpression( breve->vector( 20, 20, 20 ) ) - breve->vector( 10, 10, 10 ) ) );
-#	$self->setColor( breve->randomExpression( breve->vector( 1, 1, 1 ) ) );
-#	$self->handleCollisions( "Floor", "land" );
+	$self->move( $random_place->subtract( Breve::Vector->new( 5, -5, 5 ) ) );
+	$self->setVelocity( $random_velocity->subtract(Breve::Vector->new(10,10,10)));
+	$self->setColor( Breve::Vector->newRandom( 1, 1, 1 ) );
+	$self->handleCollisions( "Breve::Floor", "land" );
 	
 	$self->setNeighborhoodSize( 3.000000 );
 }
@@ -424,6 +433,8 @@ sub init {
 sub land {
 	my ($self, $ground );
 	( $self, $ground ) = @_;
+
+	die("don't know how to land.");
 
 	$self->setAcceleration( breve->vector( 0, 0, 0 ) );
 	$self->setVelocity( breve->vector( 0, 0, 0 ) );
