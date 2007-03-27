@@ -61,7 +61,7 @@ brInternalFunction *brPerlFindInternalFunction( char *name ) {
 		return NULL;
 	}
 
-	slMessage(DEBUG_INFO, "\nFound internal method: %s, brInternalFunction address => %08x\n",name,function);
+	//slMessage(DEBUG_INFO, "\nFound internal method: %s, brInternalFunction address => %08x\n",name,function);
 
 	return function;
 }
@@ -81,18 +81,20 @@ void brPerlCallInternalFunction( brInternalFunction *inFunc, brInstance *caller,
     //    ENTER;
 	//    SAVETMPS;
 
-	slMessage(DEBUG_INFO, "brPerlCallInternalFunction(), inFunc => %08x, caller => %08x, inArgs => %08x\n", (unsigned*)inFunc, (unsigned*)caller, (unsigned*)inArgs);
+	//slMessage(DEBUG_INFO, "brPerlCallInternalFunction(), inFunc => %08x, caller => %08x, inArgs => %08x\n", (unsigned*)inFunc, (unsigned*)caller, (unsigned*)inArgs);
 
 	if(!inFunc) {
 		slMessage(DEBUG_ALL, "Function invalid in call to brPerlCallInternalFunction()\n");
 	}
 
-	slMessage(DEBUG_INFO, "Passing %d arguments.\n", argCount);
+	//slMessage(DEBUG_INFO, "Passing %d arguments.\n", argCount);
 
 	for(int i = 0; i < argCount; i++) {
 
-		SV* arg = av_shift(inArgs);
-		slMessage(DEBUG_INFO, "arg[%d] is = %08x ::: ", i, *arg);
+		//SV* arg = av_shift(inArgs); // too slow?
+		SV* arg = * av_fetch(inArgs, i, 0); // perhaps faster
+
+		//slMessage(DEBUG_INFO, "arg[%d] is = %08x ::: ", i, *arg);
 		//slMessage(DEBUG_INFO, "ARG[%d] == %08x\n", i, SvIV(arg));
 
 		switch(SvTYPE(arg)) {
@@ -117,37 +119,37 @@ void brPerlCallInternalFunction( brInternalFunction *inFunc, brInstance *caller,
 	   SVt_PVIO // 15 	  */
 
 		case SVt_NULL: // null
-			slMessage(DEBUG_INFO, "handling NULL.\n");
+			//slMessage(DEBUG_INFO, "handling NULL.\n");
 			brArgs[i].set(NULL);
 			break;
 
 		case SVt_IV: // integer
-			slMessage(DEBUG_INFO, "handling integer. (VAL: %08x) \n", SvIVX(arg));
+			//slMessage(DEBUG_INFO, "handling integer. (VAL: %08x) \n", SvIVX(arg));
 			brArgs[i].set(SvIVX(arg));
 			break;
 
 		case SVt_NV: // double
-			slMessage(DEBUG_INFO, "handling double (VAL: %.2f) \n", SvNV(arg));
+			//slMessage(DEBUG_INFO, "handling double (VAL: %.2f) \n", SvNV(arg));
 			brArgs[i].set(SvNV(arg));
 			break;
 
 		case SVt_PV: // string
-			slMessage(DEBUG_INFO, "handling pointer (char*) (VAL: %s).\n", SvPVX(arg));		
+			//slMessage(DEBUG_INFO, "handling pointer (char*) (VAL: %s).\n", SvPVX(arg));		
 			brArgs[i].set(SvPVX(arg));
 			break;
 			
 		case SVt_PVNV: // pointer (double)
-			slMessage(DEBUG_INFO, "handling pointer (w/ double), (VAL: %.2f).\n", SvNV(arg));
+			//slMessage(DEBUG_INFO, "handling pointer (w/ double), (VAL: %.2f).\n", SvNV(arg));
 			brArgs[i].set(SvNV(arg));
 			break;
 
 		case SVt_RV: // a Perl reference
-			slMessage(DEBUG_INFO, "handling reference.\n");
+			//slMessage(DEBUG_INFO, "handling reference.\n");
 
 			if (sv_isobject(arg)) {
 
 				if(sv_derived_from(arg, "Breve::Vector")) {
-					slMessage(DEBUG_INFO, "handling vector type.\n");
+					//slMessage(DEBUG_INFO, "handling vector type.\n");
 					slVector v = {0.0, 0.0, 0.0};
 					AV* obj_array = (AV*) SvRV(arg);
 
@@ -167,7 +169,7 @@ void brPerlCallInternalFunction( brInternalFunction *inFunc, brInstance *caller,
 						exit(2);
 					}
 				} else if(sv_derived_from(arg, "Breve::Matrix")) {	
-					slMessage(DEBUG_INFO,"Handling the Matrix.\n");
+					//slMessage(DEBUG_INFO,"Handling the Matrix.\n");
 					slMatrix m;
 					// dereferencing gives us the SVt_PVHV (pointer to the $self hash)
 					HV* obj_hash = (HV*) SvRV(arg);
