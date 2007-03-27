@@ -181,6 +181,8 @@ sub getCollisionShape {
 	my $self;
 	( $self ) = @_;
 
+	die("getCollisionShape not implemented.\n");
+
 	return $self->{ collisionShape };
 }
 
@@ -267,6 +269,8 @@ sub getShape {
 	my $self;
 	( $self ) = @_;
 
+	die('123');
+
 	return $self->{ collisionShape };
 }
 
@@ -280,13 +284,13 @@ sub getWorldObjectPointer {
 }
 
 sub handleCollisions {
-	###Adds a collision handler for this object.  When a collision occurs between an instance of the this type and theType, the breve engine will automatically call theMethod of the colliding instance.
+    ###Adds a collision handler for this object.  When a collision occurs between an instance of the this type and theType, the breve engine will automatically call theMethod of the colliding instance.
 
-	my ($self, $theType, $theMethod );
-	( $self, $theType, $theMethod ) = @_;
+    my ($self, $theType, $theMethod );
+    ( $self, $theType, $theMethod ) = @_;
 
-	$self->{ collisionHandlerList }.append( [ $theType, $theMethod, 0 ] );
-	Breve::callInternal( $self, "addCollisionHandler", $self, $theType, $theMethod );
+    push @{$self->{ collisionHandlerList }}, ( [ $theType, $theMethod, 0 ] ); #not sure if this is right.
+    Breve::callInternal( $self, "addCollisionHandler", $self, $theType, $theMethod );
 }
 
 sub hideAxis {
@@ -321,6 +325,8 @@ sub ignoreCollisions {
 
 	my ($self, $theType );
 	( $self, $theType ) = @_;
+
+	die("not implemented ignoreCollisions.\n");
 
 	$self->{ collisionHandlerList }.append( [ $theType, 0, 1 ] );
 	Breve::callInternal( $self, "setIgnoreCollisionsWith", $self, $theType, 1 );
@@ -373,26 +379,26 @@ sub move {
 }
 
 sub point {
-	###An easier way to rotate an object--this function rotates an object such that the local point theVertex, points towards the world direction theLocation.  In other words, theLocation is where you want the object to face, and theVertex indicates which side of the object is to be considered the "front".
+    ###An easier way to rotate an object--this function rotates an object such that the local point theVertex, points towards the world direction theLocation.  In other words, theLocation is where you want the object to face, and theVertex indicates which side of the object is to be considered the "front".
 
-	my ($self, $theVertex, $theLocation );
-	( $self, $theVertex, $theLocation ) = @_;
-	my $v = ();
-	my $a = 0;
-
-	if( ( ( Breve::length( $theVertex ) == 0.000000 ) or ( Breve::length( $theLocation ) == 0.000000 ) ) ) {
-		return;
-	}
-
-	$v = Breve::callInternal( $self, "cross", $theVertex, $theLocation );
-	$a = Breve::callInternal( $self, "angle", $theVertex, $theLocation );
-	if( ( Breve::length( $v ) == 0.000000 ) ) {
-		$self->rotate( $theVertex, 0.010000 );
-		return;
-
-	}
-
-	$self->rotate( $v, $a );
+    my ($self, $theVertex, $theLocation );
+    ( $self, $theVertex, $theLocation ) = @_;
+    my $v = ();
+    my $a = 0;
+    
+    if((!$theVertex->length()) or (!$theLocation->length())) {
+	return;
+    }
+    
+    $v = Breve::callInternal( $self, "cross", $theVertex, $theLocation );
+    $a = Breve::callInternal( $self, "angle", $theVertex, $theLocation );
+    if( $v->length() == 0.000000  ) {
+	$self->rotate( $theVertex, 0.010000 );
+	return;
+	
+    }
+    
+    $self->rotate( $v, $a );
 }
 
 sub raytrace {
@@ -492,12 +498,12 @@ sub setCollisionShape {
 	my ($self, $theShape );
 	( $self, $theShape ) = @_;
 
-	if( ( ( not $theShape ) or ( not $theShape->getPointer() ) ) ) {
-		raise Exception( "attempt to register Mobile object with uninitialized shape (%s)" % (  $theShape ) );
+	if( (!$theShape ) or (!$theShape->getPointer() )) {
+	    die( "attempt to register Mobile object with uninitialized shape.");
 	}
 
 	if( $self->{ collisionShape } ) {
-		$self->removeDependency( $self->{ collisionShape } );
+	    $self->removeDependency( $self->{ collisionShape } );
 	}
 
 	$self->{ collisionShape } = $theShape;
@@ -522,12 +528,12 @@ sub setDisplayShape {
 	my ($self, $theShape );
 	( $self, $theShape ) = @_;
 
-	if( ( ( not $theShape ) or ( not $theShape->getPointer() ) ) ) {
-		raise Exception( "attempt to register Mobile object with uninitialized shape (%s)" % (  $theShape ) );
+	if((!$theShape ) or (!$theShape->getPointer())) {
+	    die("attempt to register Mobile object with uninitialized shape (%s)");
 	}
 
 	if( $self->{ displayShape } ) {
-		$self->removeDependency( $self->{ displayShape } );
+	    $self->removeDependency( $self->{ displayShape } );
 	}
 
 	$self->{ displayShape } = $theShape;
@@ -608,12 +614,12 @@ sub setRotation {
 	( $self, $thisAxis, $amount ) = @_;
 	my $length = 0;
 
-	$length = Breve::length( $thisAxis );
+	$length = $thisAxis->length();
 	if( ( $length == 0.000000 ) ) {
 		return;
 	}
 
-	$thisAxis = ( $thisAxis / $length );
+	$thisAxis->normalize_in_place();
 	Breve::callInternal( $self, "realSetRotation", $self->{ realWorldPointer }, $thisAxis, $amount );
 }
 

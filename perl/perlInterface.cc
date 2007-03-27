@@ -4,19 +4,15 @@
 
 #include "perlInterface.h"
 
-static char arbitraryObjectName[8];
+extern PerlInterpreter *my_perl;
+
+static char arbitraryObjectName[9];
+static int namedig = 0;
 
 char* newArbitraryName() {
-	for(int i = 0; i < 8; i++) {
-		if(arbitraryObjectName[i] < 97) {
-			arbitraryObjectName[i] = 'a';
-		}
-		if(arbitraryObjectName[i] != 'z') {
-			arbitraryObjectName[i]++;
-			break;
-		}
-	}
-	return arbitraryObjectName;
+	char name[8];
+	sprintf(name,"%d",namedig++);
+	return name;
 }
 
 /**
@@ -61,7 +57,7 @@ brInternalFunction *brPerlFindInternalFunction( char *name ) {
 	brInternalFunction *function = brEngineInternalFunctionLookup( breveEngine, name );
 
 	if ( !function ) {
-		slMessage(DEBUG_ALL, "Could not locate internal breve method.\n");
+		slMessage(DEBUG_ALL, "Could not locate internal breve method: %s.\n", name);
 		return NULL;
 	}
 
@@ -153,17 +149,11 @@ void brPerlCallInternalFunction( brInternalFunction *inFunc, brInstance *caller,
 				if(sv_derived_from(arg, "Breve::Vector")) {
 					slMessage(DEBUG_INFO, "handling vector type.\n");
 					slVector v = {0.0, 0.0, 0.0};
-					// dereferencing gives us the SVt_PVHV (pointer to the $self hash)
-					HV* obj_hash = (HV*) SvRV(arg);
-					SV** obj_xval = hv_fetch(obj_hash, "x", 1, 0);
-					SV** obj_yval = hv_fetch(obj_hash, "y", 1, 0);
-					SV** obj_zval = hv_fetch(obj_hash, "z", 1, 0);
+					AV* obj_array = (AV*) SvRV(arg);
 
-					v.x = SvNV(*obj_xval);
-					v.y = SvNV(*obj_yval);
-					v.z = SvNV(*obj_zval);
-
-					//slMessage(0, "PASSING V(%.2f, %.2f, %.2f).\n", v.x, v.y, v.z);
+					v.x = SvNV(  *  av_fetch(obj_array, 0, 0));
+					v.y = SvNV(  *  av_fetch(obj_array, 1, 0));
+					v.z = SvNV(  *  av_fetch(obj_array, 2, 0));
 
 					brArgs[i].set(v);
 

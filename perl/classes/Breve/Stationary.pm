@@ -88,9 +88,9 @@ sub register {
 	}
 
 	if(!$theRotation) {
-	    $theRotation = Breve::Matrix->new( 5.000000, 5.000000, 5.000000,
-					       6.000000, 5.000000, 6.000000,
-					       7.000000, 6.000000, 6.000000 );
+	    $theRotation = Breve::Matrix->new( 1.000000, 0.000000, 0.000000,
+					       0.000000, 1.000000, 0.000000,
+					       0.000000, 0.000000, 1.000000 );
 	}
 
 	$self->setShape( $theShape );

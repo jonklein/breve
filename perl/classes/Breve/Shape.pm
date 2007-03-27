@@ -304,9 +304,6 @@ sub initWith {
 }
 
 
-
-
-
 package Breve::PolygonDisk;
 
 our @ISA = qw(Breve::Shape);

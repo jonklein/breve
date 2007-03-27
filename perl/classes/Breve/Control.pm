@@ -772,7 +772,7 @@ sub init {
 	my $cube = Breve::Cube->new();
 	
 	$self->{ genericShape } = $sphere->initWith( 1.000000 );
-	$self->{ genericLinkShape } = $cube->initWith( Breve::Vector->new( 0.100000, 1, 0.100000 ) );
+	$self->{ genericLinkShape } = $cube->initWith(  Breve::Vector->new( 0.100000, 1, 0.100000 ) );
 }
 
 sub iterate {

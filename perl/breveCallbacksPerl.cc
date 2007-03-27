@@ -64,21 +64,27 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 		break;
 
 	case AT_LIST:
-		slMessage(DEBUG_INFO, "Coercing from perlType AT_LIST (!!UNIMPLEMENTED!!).\n");
+	{
+		slMessage(DEBUG_INFO, "Coercing from perlType AT_LIST.\n");
 		list = BRLIST( inEval );
-		unsigned int n;
-		SV * ret;
-		for(n = 1; n < list->_vector.size(); n++ ) {
-			ret = brPerlTypeFromEval(&list->_vector[n], &sp);
-			sv_2mortal(ret);
-			XPUSHs(ret);
+		unsigned int i;
+		const unsigned int num = list->_vector.size();
+		
+		SV * svs[num];
+		AV *arr = newAV();
+
+		for(i = 0; i < num; i++ ) {
+			svs[i] = brPerlTypeFromEval(&list->_vector[i], &sp);
+			av_push(arr, svs[i]);
 		}
-		ret = brPerlTypeFromEval(&list->_vector[2],&sp);
-		XPUSHs(ret);   // callMethod pushes the first value
-		result = brPerlTypeFromEval(&list->_vector[0], &sp);
+
+		//	result =  av_make(num, svs); // makes an AV* from svs
+		result = newRV_inc((SV*)arr);
+
 		*prevStackPtr = sp;
 		break;
 			
+	}
 	case AT_INSTANCE:
 		slMessage(DEBUG_INFO, "Coercing from PerlType AT_INSTANCE.\n");
 		breveInstance = BRINSTANCE( inEval );// Is this a native type, or should we make a bridge of it?
@@ -92,7 +98,7 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 				slMessage(DEBUG_INFO, "Could not convert breve internal type AT_INSTANCE.\n");
 			}
 		} else if( breveInstance ) {
- 
+		   
 		} else {
 			result = NULL;
 		}
@@ -111,9 +117,15 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 		slMessage(DEBUG_INFO, "Coercing from PerlType AT_VECTOR.\n");
 		{
 			const slVector &v = BRVECTOR( inEval);
-			XPUSHs(sv_2mortal(newSVnv(v.x)));
-			XPUSHs(sv_2mortal(newSVnv(v.y)));
-			XPUSHs(sv_2mortal(newSVnv(v.z)));
+			AV *arr = newAV();
+			av_push(arr, newSVnv(v.x));
+			av_push(arr, newSVnv(v.y));
+			av_push(arr, newSVnv(v.z));
+
+			result = newRV_inc((SV*)arr);
+
+			sv_bless(result, gv_stashpv("Breve::Vector", 0));
+
 			*prevStackPtr = sp;
 		}
 		break;
@@ -280,8 +292,6 @@ void *brPerlFindMethod( void *package_stash, const char *inName, unsigned char *
 		mp->argCount = inCount;
 		//printf("Returning gv = %08x\n",gv);
 		// just gonna let it leak
-		slMessage(0, "         +++++++++++ FOUND METHOD %s\n\n", inName);
-
 		return mp;
     } else {
 		slMessage(DEBUG_INFO, "Method %s not found.\n", inName);
