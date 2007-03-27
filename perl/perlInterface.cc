@@ -148,7 +148,7 @@ void brPerlCallInternalFunction( brInternalFunction *inFunc, brInstance *caller,
 
 			if (sv_isobject(arg)) {
 
-				if(sv_derived_from(arg, "Breve::Vector")) {
+				if(sv_isa(arg, "Breve::Vector")) {
 					//slMessage(DEBUG_INFO, "handling vector type.\n");
 					slVector v = {0.0, 0.0, 0.0};
 					AV* obj_array = (AV*) SvRV(arg);
@@ -168,7 +168,7 @@ void brPerlCallInternalFunction( brInternalFunction *inFunc, brInstance *caller,
 						slMessage(DEBUG_ALL,"$self->{brInstance} not found.\n");
 						exit(2);
 					}
-				} else if(sv_derived_from(arg, "Breve::Matrix")) {	
+				} else if(sv_isa(arg, "Breve::Matrix")) {	
 					//slMessage(DEBUG_INFO,"Handling the Matrix.\n");
 					slMatrix m;
 					// dereferencing gives us the SVt_PVHV (pointer to the $self hash)

@@ -337,7 +337,8 @@ sub fly {
 	$newVelocity = $self->getVelocity();
 
 	if( $newVelocity->length() > $self->{ maxVelocity } ) {
-	    $newVelocity->multiplyBy($self->{ maxVelocity })->divideBy($newVelocity->length());
+	    $newVelocity = $newVelocity->multiplyBy($self->{maxVelocity})
+		                       ->divideBy($newVelocity->length());
 	}
 
 	$self->setVelocity( $newVelocity );

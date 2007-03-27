@@ -350,6 +350,7 @@ int brPerlLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *inFi
 	FILE *fp = fopen( inFilename, "r" );
      
 	if( fp ) {
+		//char *embedding[] = {"", "-d:DProf", (char*)inFilename}; // for profiling / debugging
 		char *embedding[] = {"", (char*)inFilename};
 		exitstatus = perl_parse(my_perl, xs_init, 2, embedding, (char**)NULL);
 		if(!exitstatus) {
@@ -396,7 +397,6 @@ void brPerlShutdown() {
 void brPerlInit( brEngine *breveEngine ) {
 	slMessage(DEBUG_INFO, "Initializing Perl frontend.\n");
      
-
 	PERL_SYS_INIT3(NULL,NULL,NULL); //argc, argv, env
 	my_perl = perl_alloc();
 	perl_construct(my_perl);
