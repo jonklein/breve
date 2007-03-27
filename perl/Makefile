@@ -3,11 +3,8 @@ SRC	+= perl/breveCallbacksPerl.cc perl/breveFunctionsPerl.cc perl/perlInterface.
 LDFLAGS += $(shell perl -MExtUtils::Embed -e ldopts)
 CPPFLAGS += $(shell perl -MExtUtils::Embed -e ccopts )
 
-
-ALL += perlmodule
-
-perlmodule:
+perl/Breve.c:
 	@echo Making Perl module.
-	/usr/bin/perl /usr/share/perl/5.8/ExtUtils/xsubpp  -C++ -typemap /usr/share/perl/5.8/ExtUtils/typemap -typemap perlobject.map Breve.xs > Breve.c
-	sed --quiet -e 's/PUTBACK\;//' -e 'w .Breve.c' Breve.c
-	mv .Breve.c Breve.c
+	/usr/bin/perl /usr/share/perl/5.8/ExtUtils/xsubpp  -C++ -typemap /usr/share/perl/5.8/ExtUtils/typemap perl/Breve.xs > perl/Breve.c
+	sed --quiet -e 's/PUTBACK\;//' -e 'w perl/.Breve.c' perl/Breve.c
+	mv perl/.Breve.c perl/Breve.c
