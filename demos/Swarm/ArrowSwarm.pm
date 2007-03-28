@@ -102,7 +102,7 @@ sub init {
     $self->{floor} = Breve::Floor->new();
     $self->{floor}->catchShadows();
 
-    for(0..60) {
+    for(0..50) {
 	push @{$self->{ birds }}, Bird->new();
     }
 
@@ -429,6 +429,7 @@ sub init {
 	$self->handleCollisions( "Breve::Floor", "land" );
 	
 	$self->setNeighborhoodSize( 3.000000 );
+
 }
 
 sub land {

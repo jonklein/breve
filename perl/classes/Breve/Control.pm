@@ -12,32 +12,32 @@ sub new {
 	my $self = {};
 	bless $self, $class;
 
-	$self->{ backgroundColor } = breve->vector();
+	$self->{ backgroundColor } = 0;
 	$self->{ backgroundTexture } = 0;
 	$self->{ blurFactor } = 0;
 	$self->{ blurFlag } = 0;
 	$self->{ blurMenu } = undef;
-	$self->{ camOffset } = breve->vector();
-	$self->{ camTarget } = breve->vector();
-        $self->{ camera } = undef;
+	$self->{ camOffset } = Breve::Vector->new();
+	$self->{ camTarget } = Breve::Vector->new();
+	$self->{ camera } = undef;
 	$self->{ cameraPointer } = undef;
-	$self->{ deltaOffset } = breve->vector();
-	$self->{ deltaTarget } = breve->vector();
+	$self->{ deltaOffset } = Breve::Vector->new();
+	$self->{ deltaTarget } = Breve::Vector->new();
 	$self->{ drawEveryFrame } = 0;
 	$self->{ drawMenu } = undef;
 	$self->{ floorDefined } = 0;
-	$self->{ fogColor } = breve->vector();
+	$self->{ fogColor } = Breve::Vector->new();
 	$self->{ fogFlag } = 0;
 	$self->{ fogIntensity } = 0;
 	$self->{ fogMenu } = undef;
 	$self->{ frozen } = 0;
 	$self->{ genericLinkShape } = undef;
 	$self->{ genericShape } = undef;
-	$self->{ lightAmbientColor } = breve->vector();
-	$self->{ lightDiffuseColor } = breve->vector();
+	$self->{ lightAmbientColor } = Breve::Vector->new();
+	$self->{ lightDiffuseColor } = Breve::Vector->new();
 	$self->{ lightFlag } = 0;
 	$self->{ lightMenu } = undef;
-	$self->{ lightPosition } = breve->vector();
+	$self->{ lightPosition } = Breve::Vector->new();
 	$self->{ loadedImages } = ();
 	$self->{ movie } = undef;
 	$self->{ movieMenu } = undef;
@@ -46,7 +46,7 @@ sub new {
 	$self->{ reflectMenu } = undef;
 	$self->{ selectedObject } = undef;
 	$self->{ shadowFlag } = 0;
-        $self->{ shadowMenu } = undef;
+	$self->{ shadowMenu } = undef;
 	$self->{ shadowVolumeFlag } = 0;
 	$self->{ simStep } = 0;
 	$self->{ simTime } = 0;
@@ -159,13 +159,12 @@ sub click {
 	( $self, $theObject ) = @_;
 
 	if( ( $self->{ selectedObject } == $theObject ) ) {
-		return;
+	    return;
 	}
 
 	if( $self->{ selectedObject } ) {
-		$self->{ selectedObject }->hideBoundingBox();
-		$self->{ selectedObject }->hideAxis();
-
+	    $self->{ selectedObject }->hideBoundingBox();
+	    $self->{ selectedObject }->hideAxis();
 	}
 
 	$self->{ selectedObject } = $theObject;
@@ -173,12 +172,16 @@ sub click {
 		$self->{ selectedObject } = $self->{ selectedObject }->getMultibody();
 	}
 
-	if( ( ( ( not $self->{ selectedObject } ) or ( not $self->{ selectedObject }->canRespond( "showBoundingBox" ) ) ) or ( not $self->{ selectedObject }->canRespond( "showAxis" ) ) ) ) {
+	if( !$self->{ selectedObject } 
+	    or !$self->{ selectedObject }->canRespond( "showBoundingBox" )
+	    or !$self->{ selectedObject }->canRespond( "showAxis" ) ) {
 		return;
 	}
 
 	$self->{ selectedObject }->showBoundingBox();
 	$self->{ selectedObject }->showAxis();
+	
+	return 0;
 }
 
 sub dearchive {
@@ -205,6 +208,7 @@ sub dearchive {
 	$self->setFogColor( $self->{ fogColor } );
 	$self->pointCamera( $self->{ camTarget }, $self->{ camOffset } );
 	$self->setBlurFactor( $self->{ blurFactor } );
+	
 	if( ( $self->{ lightFlag } == 1 ) ) {
 		$self->enableLighting();
 	}
@@ -733,9 +737,6 @@ sub init {
 	my $self;
 	( $self ) = @_;
 
-	Breve::brPerlAddInstance($self);
-	Breve::brPerlSetController($self->{brInstance});
-
 	$self->SUPER::init();
 
 	$self->{ cameraPointer } = Breve::callInternal($self, "getMainCameraPointer");
@@ -913,29 +914,24 @@ sub pivotCamera {
 
 	my ($self, $dx, $dy );
 	( $self, $dx = 0.000000, $dy = 0.000000 ) = @_;
-	my $rot = Breve::Vector->new();
 
-	$rot = $self->{ camera }->getRotation();
-	die("NOT IMPLEMENTED in Control.pm\n");
-	#$rot.x = ( $rot.x + $dx );
-	#$rot.y = ( $rot.y + $dy );
-	#$self->{ camera }->setRotation( $rot.x, $rot.y );
-	# fix above commented lines
+	my $rot = $self->{ camera }->getRotation();
+
+	$self->{ camera }->setRotation( $rot->[0] + $dx, $rot->[1] + $dy );
 }
 
 sub pointCamera {
-	###Points the camera at the vector location.  The optional argument offset specifies the offset of the camera relative to the location target.
+    ###Points the camera at the vector location.  The optional argument offset specifies the offset of the camera relative to the location target.
 
-	my ($self, $location, $offset );
-	( $self, $location, $offset = Breve::Vector->new( 0.000000, 0.000000, 0.000000 ) ) = @_;
+    my ($self, $location, $offset );
+    ( $self, $location, $offset = Breve::Vector->new( 0.000000, 0.000000, 0.000000 ) ) = @_;
 
-	$self->{ camTarget } = $location;
-	$self->setCameraTarget( $location );
-	if( ( $offset->length() != 0.000000 ) ) {
-		$self->{ camOffset } = $offset;
-		$self->setCameraOffset( $offset );
-
-	}
+    $self->{ camTarget } = $location;
+    $self->setCameraTarget( $location );
+    if( ( $offset->length() != 0.000000 ) ) {
+	$self->{ camOffset } = $offset;
+	$self->setCameraOffset( $offset );
+    }
 
 }
 
@@ -974,13 +970,13 @@ sub saveSnapshotToFile {
 }
 
 sub setBackgroundColor {
-	###Sets the background color of the rendered world to newColor.
+    ###Sets the background color of the rendered world to newColor.
 
-	my ($self, $newColor );
-	( $self, $newColor ) = @_;
+    my ($self, $newColor );
+    ( $self, $newColor ) = @_;
 
-	$self->{ backgroundColor } = $newColor;
-	Breve::callInternal($self, "setBackgroundColor", $newColor );
+    $self->{ backgroundColor } = $newColor;
+    Breve::callInternal($self, "setBackgroundColor", $newColor );
 }
 
 sub setBackgroundScrollRate {

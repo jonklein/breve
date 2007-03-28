@@ -264,14 +264,12 @@ sub initWith {
 	$self->SUPER::init();
 
 	$self->{ shapePointer } = Breve::callInternal($self, "newSphere", $theRadius, $self->{ density } );
-	if( ( not $self->{ shapePointer } ) ) {
-		raise Exception( "Could not create Sphere: invalid arguments" );
+	if( !$self->{ shapePointer } ) {
+	    die("Could not create Sphere: invalid arguments" );
 	}
 
 	return $self;
 }
-
-
 
 
 package Breve::Cube;

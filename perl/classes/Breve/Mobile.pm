@@ -290,10 +290,8 @@ sub setForce {
 	my ($self, $newForce );
 	( $self, $newForce ) = @_;
 
-	if( ( not $self->{ realWorldPointer } ) ) {
-		print "set-force called with uninitialized Mobile object";
-		return;
-
+	if( !$self->{ realWorldPointer } ) {
+	    die( "set-force called with uninitialized Mobile object" );  
 	}
 
 	$self->{ linkForce } = $newForce;

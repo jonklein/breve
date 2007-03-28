@@ -124,14 +124,14 @@ sub dearchive {
 }
 
 sub delete {
-	my $self;
-	( $self ) = @_;
-
-	if( $self->{ realWorldPointer } ) {
-		Breve::callInternal( $self, "realRemoveObject", $self->{ realWorldPointer } );
-	}
-
-	breve->deleteInstances( $self->{ menus } );
+    my $self;
+    ( $self ) = @_;
+    
+    if( $self->{ realWorldPointer } ) {
+	Breve::callInternal( $self, "realRemoveObject", $self->{ realWorldPointer } );
+    }
+    
+    breve->deleteInstances( $self->{ menus } );
 }
 
 sub deleteInstance {
@@ -180,8 +180,6 @@ sub getCollisionShape {
 
 	my $self;
 	( $self ) = @_;
-
-	die("getCollisionShape not implemented.\n");
 
 	return $self->{ collisionShape };
 }
@@ -268,8 +266,6 @@ sub getShape {
 
 	my $self;
 	( $self ) = @_;
-
-	die('123');
 
 	return $self->{ collisionShape };
 }
@@ -371,8 +367,8 @@ sub move {
 	my ($self, $newLocation );
 	( $self, $newLocation ) = @_;
 
-	if( ( not $self->{ realWorldPointer } ) ) {
-		raise Exception( "attempt to move uninitialized Mobile object." );
+	if(!$self->{ realWorldPointer }) {
+	    die( "Attempt to move uninitialized Mobile object." );
 	}
 
 	Breve::callInternal( $self, "realSetLocation", $self->{ realWorldPointer }, $newLocation );
@@ -529,7 +525,7 @@ sub setDisplayShape {
 	( $self, $theShape ) = @_;
 
 	if((!$theShape ) or (!$theShape->getPointer())) {
-	    die("attempt to register Mobile object with uninitialized shape (%s)");
+	    die("Attempt to register Mobile object with uninitialized shape.");
 	}
 
 	if( $self->{ displayShape } ) {
@@ -687,9 +683,9 @@ sub setTextureImage {
 	my ($self, $textureImage );
 	( $self, $textureImage ) = @_;
 
-	if( ( not $textureImage ) ) {
+	if(!$textureImage) {
 		$self->{ texture } = -1;
-	}	 else {
+	} else {
 		$self->{ texture } = $textureImage->getTextureNumber();
 	}
 

@@ -32,10 +32,129 @@ xs_init(pTHX)
 	newXS("Breve::bootstrap", boot_Breve, file);
 }
 
+void brPerlTypeToEval( SV* arg, brEval *outEval) {
+	switch(SvTYPE(arg)) {
+
+// see google: "illustrated perlguts" for descriptions
+/*
+			SVt_NULL,   // 0 
+	   SVt_IV,     // 1 
+	   SVt_NV,     // 2 
+	   SVt_RV,     // 3 
+	   SVt_PV,     // 4 
+	   SVt_PVIV,   // 5 
+	   SVt_PVNV,   // 6 
+	   SVt_PVMG,   // 7 
+	   SVt_PVBM,   // 8 
+	   SVt_PVLV,   // 9 
+	   SVt_PVAV,   // 10
+	   SVt_PVHV,   // 11 
+	   SVt_PVCV,   // 12
+	   SVt_PVGV,   //13 
+	   SVt_PVFM,   // 14
+	   SVt_PVIO // 15 	  */
+
+		case SVt_NULL: // null
+			slMessage(DEBUG_INFO, "handling NULL.\n");
+			outEval->set(0);
+			break;
+
+		case SVt_IV: // integer
+			slMessage(DEBUG_INFO, "handling integer. (VAL: %08x) \n", SvIVX(arg));
+			outEval->set(SvIVX(arg));
+			break;
+
+		case SVt_NV: // double
+			slMessage(DEBUG_INFO, "handling double (VAL: %.2f) \n", SvNV(arg));
+			outEval->set(SvNV(arg));
+			break;
+
+		case SVt_PV: // string
+			slMessage(DEBUG_INFO, "handling pointer (char*) (VAL: %s).\n", SvPVX(arg));		
+			outEval->set(SvPVX(arg));
+			break;
+			
+		case SVt_PVNV: // pointer (double)
+			slMessage(DEBUG_INFO, "handling pointer (w/ double), (VAL: %.2f).\n", SvNV(arg));
+			outEval->set(SvNV(arg));
+			break;
+
+		case SVt_RV: // a Perl reference
+			//slMessage(DEBUG_INFO, "handling reference.\n");
+
+			if (sv_isobject(arg)) {
+
+				if(sv_isa(arg, "Breve::Vector")) {
+					//slMessage(DEBUG_INFO, "handling vector type.\n");
+					slVector v = {0.0, 0.0, 0.0};
+					AV* obj_array = (AV*) SvRV(arg);
+
+					v.x = SvNV(  *  av_fetch(obj_array, 0, 0));
+					v.y = SvNV(  *  av_fetch(obj_array, 1, 0));
+					v.z = SvNV(  *  av_fetch(obj_array, 2, 0));
+
+					outEval->set(v);
+
+				} else if(sv_derived_from(arg, "Breve::Object")) {
+					HV* obj_hash = (HV*) SvRV(arg);
+					SV** obj_brInstanceVal = hv_fetch(obj_hash, "brInstance", strlen("brInstance"), 0);
+					if(obj_brInstanceVal) {
+						outEval->set( (brInstance*) SvIVX(*obj_brInstanceVal) );
+					} else {
+						slMessage(DEBUG_ALL,"$self->{brInstance} not found.\n");
+						exit(2);
+					}
+				} else if(sv_isa(arg, "Breve::Matrix")) {	
+					//slMessage(DEBUG_INFO,"Handling the Matrix.\n");
+					slMatrix m;
+					// dereferencing gives us the SVt_PVHV (pointer to the $self hash)
+					HV* obj_hash = (HV*) SvRV(arg);
+					
+					m[0][0] = SvNV(  *  hv_fetch(obj_hash, "x1", 2, 0)     );
+					m[0][1] = SvNV(  *  hv_fetch(obj_hash, "x2", 2, 0)     );
+					m[0][2] = SvNV(  *  hv_fetch(obj_hash, "x3", 2, 0)     );
+
+					m[1][0] = SvNV(  *  hv_fetch(obj_hash, "y1", 2, 0)     );
+					m[1][1] = SvNV(  *  hv_fetch(obj_hash, "y2", 2, 0)     );
+					m[1][2] = SvNV(  *  hv_fetch(obj_hash, "y3", 2, 0)     );
+
+					m[2][0] = SvNV(  *  hv_fetch(obj_hash, "z1", 2, 0)     );
+					m[2][1] = SvNV(  *  hv_fetch(obj_hash, "z2", 2, 0)     );
+					m[2][2] = SvNV(  *  hv_fetch(obj_hash, "z3", 2, 0)     );
+					
+					outEval->set(m);
+
+					/*slMessage(0, "%f %f %f, %f %f %f, %f %f %f\n",
+							  m[0][0],m[0][1],m[0][2],
+						m[1][0],m[1][1],m[1][2],
+						m[2][0],m[2][1],m[2][2]);*/
+
+				} else {
+					slMessage(DEBUG_ALL,"Don't know how to handle class type %s.\n", HvNAME( SvSTASH(SvRV(arg)) ));
+					exit(1);
+				}
+
+			} else {
+				slMessage(0, "What is this perl reference?\n" );
+			}
+			break;
+	
+		case SVt_PVAV: // array
+			slMessage(DEBUG_ALL,"not handling array.\n"); break;
+		case SVt_PVCV: // code ref
+			slMessage(DEBUG_ALL,"not handling code ref.\n"); break;
+		case SVt_PVHV: // hash
+			slMessage(DEBUG_ALL,"not handling hash.\n"); break;
+		case SVt_PVMG: // blessed scalar
+			slMessage(DEBUG_ALL,"not handling blessed-scalar pointer thing.\n"); break;
+		default:
+			slMessage(DEBUG_ALL, "Can't handle SvTYPE (%d) for passed SV*.\n", SvTYPE(arg));
+	}
+}
 
 SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 // actually returns an SV*, AV*, or HV* (all sizeof(int) types though)
-	slMessage(DEBUG_INFO, "brPerlTypeFromEval ==> \n");
+//	slMessage(DEBUG_INFO, "brPerlTypeFromEval ==> \n");
 
     brEvalListHead *list;
     brInstance *breveInstance;
@@ -90,7 +209,7 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 		breveInstance = BRINSTANCE( inEval );// Is this a native type, or should we make a bridge of it?
             
 		if( breveInstance && breveInstance->object->type->_typeSignature == PERL_TYPE_SIGNATURE ) {
-			SV *sv_inst = breveInstance->userData;
+			SV *sv_inst = (SV*)breveInstance->userData;
 			if(SvROK(sv_inst)) {
 				result = sv_inst; // this is the sv (RV), i don't think it has to be mortalized
 				// the xsub bridge takes care of this, probably.
@@ -108,7 +227,7 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 	case AT_POINTER:
 		slMessage(DEBUG_INFO, "Coercing from PerlType AT_POINTER.\n");
 		slMessage(DEBUG_INFO, "Value is 0x%08x.\n", BRPOINTER(inEval));
-		result = newSViv(BRPOINTER( inEval ));
+		result = newSViv((int)BRPOINTER( inEval ));
 		//slMessage(DEBUG_INFO,"Result = %08x, value = %08x \n",result, SvPV_nolen(result);
 		break;
 
@@ -116,7 +235,7 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
 
 		slMessage(DEBUG_INFO, "Coercing from PerlType AT_VECTOR.\n");
 		{
-			const slVector &v = BRVECTOR( inEval);
+			const slVector &v = BRVECTOR( inEval );
 			AV *arr = newAV();
 			av_push(arr, newSVnv(v.x));
 			av_push(arr, newSVnv(v.y));
@@ -159,8 +278,8 @@ SV *brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr ) {
  */
 
 int brPerlCallMethod(void *ref, void *mp, const brEval **inArguments, brEval *outResult ) {
-	slMessage(DEBUG_INFO, "brPerlCallMethod() ==> refobj = %08x, mp = %08x, args..result..\n", (unsigned)ref, (unsigned)mp);
-
+	slMessage(DEBUG_INFO, "brPerlCallMethod() ==> refobj = %08x, mp = %08x, mp->name = %s\n", (unsigned)ref, (unsigned)mp, ((methodpack*)mp)->name);
+	
 	int count;
 
 	dSP;
@@ -189,32 +308,9 @@ int brPerlCallMethod(void *ref, void *mp, const brEval **inArguments, brEval *ou
 	SPAGAIN;
 
 	SV* returned_sv = POPs;
-	switch(SvTYPE(returned_sv)) {
-		
-    case SVt_NULL: // null
-		outResult->set(0);
-		break;
 
-	case SVt_IV: // integer
-		outResult->set(SvIVX(returned_sv));
-		break;
-
-	case SVt_NV: // double
-		outResult->set(SvNV(returned_sv)); // might be able to change this to SvNVX for less evalutation
-		break;
-
-	case SVt_PV: // pointer (string?)
-		outResult->set(SvPV_nolen(returned_sv));
-		break;
-	
-	case SVt_PVAV: // array
-	case SVt_PVCV: // code ref
-	case SVt_PVHV: // hash
-	case SVt_PVMG: // blessed scalar
-			
-	default:
-		slMessage(DEBUG_ALL, "Can't handle type (%d) for returned SV*.\n", SvTYPE(returned_sv));
-	}
+	//slMessage(0, "from called perl method: %s\n",((methodpack*)mp)->name);
+	brPerlTypeToEval(returned_sv, outResult);
 
 	PUTBACK;
 	FREETMPS;

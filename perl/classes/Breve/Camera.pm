@@ -121,6 +121,7 @@ sub init {
 	$self->setPosition( 50, 60 );
 
 	return 0;
+
 }
 
 sub look {

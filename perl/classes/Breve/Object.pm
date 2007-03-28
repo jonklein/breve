@@ -157,6 +157,11 @@ sub init {
 	    Breve::brPerlAddInstance($self);
 	}
 
+	if($self->isa("Breve::Control")) {
+	    die("Only one controller allowed!\n") if($self->{controller});
+	    Breve::brPerlSetController($self->{brInstance});
+	}
+
 	$self->{ controller } = $self->getController(); 
 	$self->{ birthTime } = $self->{ controller }->getTime();
 

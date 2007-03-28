@@ -7,8 +7,8 @@
 extern brEngine         *breveEngine;
 extern brObjectType     *brevePerlType;
 
-
-extern brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr );
+extern void brPerlTypeToEval( SV *arg, brEval *outEval);
+extern SV* brPerlTypeFromEval( const brEval *inEval, SV ***prevStackPtr );
 
 /////////////
 
