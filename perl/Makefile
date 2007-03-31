@@ -1,5 +1,3 @@
-HAVEPERL	= @HAVEPERL@
-
 ifeq ($(HAVEPERL),1)
 SRC	+= perl/breveCallbacksPerl.cc perl/breveFunctionsPerl.cc perl/perlInterface.cc perl/Breve.c
 endif
