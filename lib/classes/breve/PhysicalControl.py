@@ -83,6 +83,7 @@ class PhysicalControl( breve.Control ):
 		self.setIntegrationStep( 0.004000 )
 		self.setIterationStep( 0.050000 )
 		self.setFastPhysicsIterations( 40 )
+		self.gravityMenu = [ 0, 0, 0, 0 ]
 		self.gravityMenu[ 0 ] = self.addMenu( '''Zero Gravity''', 'zeroGravity' )
 		self.gravityMenu[ 1 ] = self.addMenu( '''Half Gravity''', 'halfGravity' )
 		self.gravityMenu[ 2 ] = self.addMenu( '''Full Gravity''', 'fullGravity' )

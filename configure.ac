@@ -142,7 +142,7 @@ AC_CHECK_PROGS(XSUBPP, [xsubpp], [], $PATH )
 # Use Perl if we have the perl libraries, locate xsubpp and if we're not cross-compiling
 #
 
-if test "$ac_cv_lib_perl_perl_construct" = yes && test "x$ac_cv_prog_XSUBPP" != "x" && "$build" = "$host"; then
+if test "$ac_cv_lib_perl_perl_construct" = yes && test "x$ac_cv_prog_XSUBPP" != "x" && test "$build" = "$host"; then
 	LIBS="$OLDLIB $PERLLIB"
 	CPPFLAGS="$OLDCPP $PERLCPP"
 else

@@ -21,7 +21,7 @@
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 
-#import "util.h"
+#import "slutil.h"
 
 @interface slTextView : NSTextView {
     id findText;

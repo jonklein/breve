@@ -1,43 +1,46 @@
 @include "Control.tz"
 
 Control : PhysicalControl [version 1.8] {
-    % The OBJECT(PhysicalControl) class is a subclass of OBJECT(Control) which 
-    % must be used for physical simulations.  It activates a number of 
-    % features required for physical simulation and sets a number of 
-    % variables to reasonable values.
+	% The OBJECT(PhysicalControl) class is a subclass of OBJECT(Control) which 
+	% must be used for physical simulations.  It activates a number of 
+	% features required for physical simulation and sets a number of 
+	% variables to reasonable values.
 
-    + variables:
-        gravityMenu (4 objects).
+	+ variables:
+		gravityMenu (list).
 
-    + to init:
-        self set-integration-step to .004.
-        self set-iteration-step to .05.
+	+ to init:
+		self set-integration-step to .004.
+		self set-iteration-step to .05.
+
 		self set-fast-physics-iterations to 40.
 
-		gravityMenu[0] = (self add-menu named "Zero Gravity" for-method "zero-gravity").
-		gravityMenu[1] = (self add-menu named "Half Gravity" for-method "half-gravity").
-		gravityMenu[2] = (self add-menu named "Full Gravity" for-method "full-gravity").
-		gravityMenu[3] = (self add-menu named "Double Gravity" for-method "double-gravity").
+		gravityMenu = { 0, 0, 0, 0 }.
 
-        self full-gravity.
+		gravityMenu{ 0 } = (self add-menu named "Zero Gravity" for-method "zero-gravity").
+		gravityMenu{ 1 } = (self add-menu named "Half Gravity" for-method "half-gravity").
+		gravityMenu{ 2 } = (self add-menu named "Full Gravity" for-method "full-gravity").
+		gravityMenu{ 3 } = (self add-menu named "Double Gravity" for-method "double-gravity").
 
-        self enable-lighting.
+		self full-gravity.
+
+		self enable-lighting.
 		self enable-shadow-volumes.
 
-        self point-camera at (0, 0, 0) from (0, 10, 30).
-        self move-light to (0, 30, 15).
+		self point-camera at (0, 0, 0) from (0, 10, 30).
+		self move-light to (0, 30, 15).
 
-    - to enable-collision-resolution:
-        % Obsolete.
+	- to enable-collision-resolution:
+		% Obsolete.
 
-    + to enable-fast-physics:
+	+ to enable-fast-physics:
 		% This alternative physical simulation is faster, but less accurate
 		% than the default physical simulation.  Though it will not work
 		% well for all simulations, you can see a large boost in performance
 		% by enabling it.  Fast physics can be turned off using
 		% METHOD(disable-fast-physics).
 
-        setStepFast(1).
+		setStepFast(1).
 
 	+ to set-fast-physics-iterations to iterations (int):
 		% Sets the iterations parameter for the fast physics algorithm.  This
@@ -46,64 +49,64 @@ Control : PhysicalControl [version 1.8] {
 
 		setStepFastIterations(iterations).
 
-    + to disable-fast-physics:
+	+ to disable-fast-physics:
 		% Returns to the default physics simulation.  This is slower, but 
 		% more accurate than fast physics, which are enabled using 
 		% METHOD(enable-fast-physics).
 
-        setStepFast(0).
+		setStepFast(0).
 
 	- to enable-auto-disable:
 		setAutoDisableFlag( 1 ).
 
 	- to disable-auto-disable:
 		setAutoDisableFlag( 0 ).
-    
-    + to set-gravity to newGravity (vector):
-        % Sets the gravity affecting a physical world to newGravity.  If you
-        % simply want a realistic earth-like gravity, use the convenience 
-        % method <a href="#full-gravity">full-gravity</a>.
+	
+	+ to set-gravity to newGravity (vector):
+		% Sets the gravity affecting a physical world to newGravity.  If you
+		% simply want a realistic earth-like gravity, use the convenience 
+		% method <a href="#full-gravity">full-gravity</a>.
 
-        worldSetGravity(newGravity).
+		worldSetGravity(newGravity).
 
    + to zero-gravity:
-        % Turns off gravity in the simulated world.
+		% Turns off gravity in the simulated world.
 
-        self set-gravity to (0.0, -9.8 * 0, 0.0).
-        gravityMenu[0] check.
-        gravityMenu[1] uncheck.
-        gravityMenu[2] uncheck.
-        gravityMenu[3] uncheck.
+		self set-gravity to (0.0, -9.8 * 0, 0.0).
+		gravityMenu{ 0 } check.
+		gravityMenu{ 1 } uncheck.
+		gravityMenu{ 2 } uncheck.
+		gravityMenu{ 3 } uncheck.
 
    + to half-gravity:
-        % Sets gravity in the simulated world to half the regular
-        % gravity of earth.
+		% Sets gravity in the simulated world to half the regular
+		% gravity of earth.
 
-        self set-gravity to (0.0, -9.8 * .5, 0.0).
-        gravityMenu[0] uncheck.
-        gravityMenu[1] check.
-        gravityMenu[2] uncheck.
-        gravityMenu[3] uncheck.
+		self set-gravity to (0.0, -9.8 * .5, 0.0).
+		gravityMenu{ 0 } uncheck.
+		gravityMenu{ 1 } check.
+		gravityMenu{ 2 } uncheck.
+		gravityMenu{ 3 } uncheck.
 
    + to full-gravity: 
-        % Sets gravity in the simulated world to the regular
-        % gravity of earth.
+		% Sets gravity in the simulated world to the regular
+		% gravity of earth.
 
-        self set-gravity to (0.0, -9.8, 0.0).
-        gravityMenu[0] uncheck.
-        gravityMenu[1] uncheck.
-        gravityMenu[2] check.
-        gravityMenu[3] uncheck.
+		self set-gravity to (0.0, -9.8, 0.0).
+		gravityMenu{ 0 } uncheck.
+		gravityMenu{ 1 } uncheck.
+		gravityMenu{ 2 } check.
+		gravityMenu{ 3 } uncheck.
 
    + to double-gravity:
-        % Sets gravity in the simulated world to double the regular
-        % gravity of earth.
+		% Sets gravity in the simulated world to double the regular
+		% gravity of earth.
 
-        self set-gravity to (0.0, -9.8 * 2, 0.0).
-        gravityMenu[0] uncheck.
-        gravityMenu[1] uncheck.
-        gravityMenu[2] uncheck.
-        gravityMenu[3] check.
+		self set-gravity to (0.0, -9.8 * 2, 0.0).
+		gravityMenu{ 0 } uncheck.
+		gravityMenu{ 1 } uncheck.
+		gravityMenu{ 2 } uncheck.
+		gravityMenu{ 3 } check.
 
 	+ to dearchive:
 		return (super dearchive).

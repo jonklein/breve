@@ -2,6 +2,19 @@
 import breveInternal
 import sys, os, math, random
 
+def clear(keep=("__builtins__", "clear")):
+	keeps = {}
+	
+	for name, value in globals().iteritems():
+		if name in keep: keeps[name] = value
+
+		globals().clear()
+
+	for name, value in keeps.iteritems():
+		globals()[name] = value
+
+
+
 #
 # Used internally to redirect Python output to the breve frontend
 #
@@ -45,6 +58,13 @@ def addInstance( inclass, ininstance ):
 class objectList( list ):
 	def __init__( self ):
 		list.__init__( self )
+
+	def __setitem__( self, index, value ):
+		if index == len( self ):
+			self.append( value )
+			return
+
+		list.__setitem__( self, index, value )
 
 	def __getattr__( self, methodName ):
 		def execute( *args ):

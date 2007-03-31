@@ -995,6 +995,14 @@ void brPythonDestroyGenericPythonObject( void *inObject ) {
 }
 
 /**
+ * Destroy the Python interpreter
+ */
+
+void brPythonDestroy( void *inObject ) {
+	Py_Finalize();
+}
+
+/**
  * A function to initialize the Python frontend.  
  * 
  * Creates necessary Python structures and initializes a brObjectType for
@@ -1002,8 +1010,6 @@ void brPythonDestroyGenericPythonObject( void *inObject ) {
  */
 
 void brPythonInit( brEngine *breveEngine ) {
-	static int pyInitialized = 0;
-
 	brObjectType *brevePythonType = new brObjectType();
 
 	static PyMethodDef methods[] = {
@@ -1018,17 +1024,13 @@ void brPythonInit( brEngine *breveEngine ) {
 		{ NULL, NULL, 0, NULL }
 	};
 
-	if( !pyInitialized ) {
-		pyInitialized = 1;
-		Py_Initialize();
-	}
+	Py_Initialize();
 
 	PyObject *internal = Py_InitModule( "breveInternal", methods );
 
 	PyObject_SetAttrString( internal, "breveEngine", PyCObject_FromVoidPtr( ( void* )breveEngine, NULL ) );
 	PyObject_SetAttrString( internal, "breveObjectType", PyCObject_FromVoidPtr( ( void* )brevePythonType, NULL ) );
 
-	// PyRun_SimpleString( "globals().clear()" );
 	PyRun_SimpleString( "import sys" );
 
 	std::string setpath, path;
@@ -1065,6 +1067,7 @@ void brPythonInit( brEngine *breveEngine ) {
 	brevePythonType->destroyObject 		= brPythonDestroyGenericPythonObject;
 	brevePythonType->destroyMethod 		= brPythonDestroyGenericPythonObject;
 	brevePythonType->destroyInstance 	= brPythonDestroyGenericPythonObject;
+	brevePythonType->destroyObjectType	= brPythonDestroy;
 	brevePythonType->canLoad		= brPythonCanLoad;
 	brevePythonType->load			= brPythonLoad;
 	brevePythonType->_typeSignature 	= PYTHON_TYPE_SIGNATURE;

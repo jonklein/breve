@@ -19,6 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _SLUTIL_H
+#define _SLUTIL_H
+
 #include "config.h"
 
 #if WINDOWS
@@ -37,9 +40,6 @@
 #define random rand
 #define srandom srand
 #endif
-
-#ifndef _SLUTIL_H
-#define _SLUTIL_H
 
 #include "slerror.h"
 

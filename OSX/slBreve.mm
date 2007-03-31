@@ -33,7 +33,7 @@
 */
 
 #import "slBreve.h"
-#import "util.h"
+#import "slutil.h"
 
 extern BOOL _engineWillPause;
 

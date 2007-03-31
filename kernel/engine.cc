@@ -647,15 +647,15 @@ void brPrintVersion() {
 	exit( 1 );
 }
 
-/*!
-	\brief Triggers a run-time simulation error.
-
-	Takes an engine, a type (one of the \ref parseErrorMessageCodes), and
-	a set of printf-style arguments (format string and data).
-
-	Exactly how the error is handled depends on the simulation frontend,
-	but this will typically cause a simulation to die.
-*/
+/**
+ * \brief Triggers a run-time simulation error. 
+ * 
+ * Takes an engine, a type (one of the \ref parseErrorMessageCodes), and
+ * a set of printf-style arguments (format string and data).
+ *
+ * Exactly how the error is handled depends on the simulation frontend,
+ * but this will typically cause a simulation to die.
+ */
 
 void brEvalError( brEngine *e, int type, char *proto, ... ) {
 	va_list vp;
