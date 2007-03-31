@@ -733,7 +733,6 @@ sub getTime {
 
 sub init {
 	###Initializes the Control object by setting up default values for  variables such as the size of the integration timestep.  Subclasses of Control may override these defaults in their own init functions.
-
 	my $self;
 	( $self ) = @_;
 

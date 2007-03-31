@@ -158,8 +158,9 @@ sub init {
 	}
 
 	if($self->isa("Breve::Control")) {
-	    die("Only one controller allowed!\n") if($self->{controller});
-	    Breve::brPerlSetController($self->{brInstance});
+	    unless($self->{controller}) {
+		Breve::brPerlSetController($self->{brInstance});
+	    }
 	}
 
 	$self->{ controller } = $self->getController(); 

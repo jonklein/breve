@@ -13,8 +13,8 @@ sub new {
 	my $class = shift;
 	my $self = {};
 	bless $self, $class;
-	my $self->{ objectLocation } = ();
-	my $self->{ shadowCatcher } = 0;
+	$self->{ objectLocation } = ();
+	$self->{ shadowCatcher } = 0;
 	init( $self );
 	return $self;
 }

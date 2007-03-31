@@ -615,7 +615,7 @@ sub setRotation {
 		return;
 	}
 
-	$thisAxis->normalize_in_place();
+	$thisAxis->NORMALIZE();
 	Breve::callInternal( $self, "realSetRotation", $self->{ realWorldPointer }, $thisAxis, $amount );
 }
 

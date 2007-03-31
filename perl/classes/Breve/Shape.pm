@@ -12,10 +12,10 @@ sub new {
 	my $class = shift;
 	my $self = {};
 	bless $self, $class;
-	my $self->{ density } = 0;
-	my $self->{ lastScale } = ();
-	my $self->{ shapeData } = undef;
-	my $self->{ shapePointer } = undef;
+	$self->{ density } = 0;
+        $self->{ lastScale } = ();
+	$self->{ shapeData } = undef;
+	$self->{ shapePointer } = undef;
 	init( $self );
 	return $self;
 }
@@ -357,8 +357,8 @@ sub initWith {
 	$self->SUPER::init();
 
 	$self->{ shapePointer } = Breve::callInternal($self, "newNGonCone", $sideCount, $theRadius, $theHeight, $self->{ density } );
-	if( ( not $self->{ shapePointer } ) ) {
-		raise Exception( "Could not create PolygonCone: invalid arguments" );
+	if( ! $self->{ shapePointer } ) {
+	    die( "Could not create PolygonCone: invalid arguments" );
 	}
 
 	return $self;
