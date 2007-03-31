@@ -1,6 +1,6 @@
 #include <math.h>
 
-#include "util.h"
+#include "slutil.h"
 #include "shape.h"
 #include "volInt.h"
 

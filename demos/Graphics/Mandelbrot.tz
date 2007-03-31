@@ -1,0 +1,78 @@
+#
+# Draws the mandelbrot set, using an algorithm derived from the one at 
+# http://en.wikipedia.org/wiki/Mandelbrot_set with a simple color mapping.
+#
+# by Lee Spector <lspector [at] hampshire.edu >
+#
+
+@use Mobile.
+@use Control.
+
+@define RANGE 2.0.
+@define RADIUS 0.01.
+
+Controller myController.
+
+Control : myController {
+    + variables:
+
+    + to init:
+        brush (object).
+
+        self disable-text.
+        self set-background-color to (0, 0, 0).
+        self enable-blur.
+        self set-blur-factor to 1.0.
+
+        brush = (new Image load from "images/brush.png").
+        100 new Painter set-bitmap-image to brush.
+
+        self offset-camera by (0, 0, 2 * RANGE).
+}
+
+Mobile : Painter (aka Painters) {
+    
+    + to init:
+        self set-shape to (new Sphere init-with radius RADIUS).
+        self set-color to (0, 0, 0).
+
+    + to get-mandelbrot-color for-x x (float) for-y y (double):
+        x0, y0, x2, y2 (float).
+        i, max-i (int).
+        color (vector).
+        
+        x0 = x.
+        y0 = y.
+        x2 = x * x.
+        y2 = y * y.
+        
+        i = 0.
+        max-i = 128.
+        
+        while ((x2 + y2 < 4) && (i < max-i)): {
+            y = 2 * x * y + y0.
+            x = x2 - y2 + x0.
+            
+            x2 = x * x.
+            y2 = y * y.
+            
+            i = i + 1.
+        }
+     
+        if i == max-i: color = (0, 0, 0).
+        else color = ((i/8.0)%1.0, (i/16.0)%1.0, (i/32.0)%1.0).
+        
+        return color.
+
+    + to iterate:
+        x, y (float).
+        color (vector).
+
+        x = random[2.0 * RANGE] - RANGE.
+        y = random[2.0 * RANGE] - RANGE.
+        self move to (x, y, 0).
+        color = (self get-mandelbrot-color for-x x for-y y).
+        self set-color to color.
+        
+        
+}

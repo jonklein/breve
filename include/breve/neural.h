@@ -23,7 +23,7 @@
 #include <strings.h>
 #include <math.h>
 
-#include "util.h"
+#include "slutil.h"
 
 #ifdef __cplusplus
 extern "C" {

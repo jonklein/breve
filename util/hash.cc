@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "util.h"
+#include "slutil.h"
 
 /*
     = slNewHash generates a new hash table, given a size, a function

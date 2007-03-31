@@ -20,7 +20,7 @@
 
 #ifndef _NAMESPACE_H
 #define _NAMESPACE_H
-#include "util.h"
+#include "slutil.h"
 
 enum symbolTypes {
     ST_METHODS = 1,

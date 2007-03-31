@@ -1,3 +1,6 @@
+#ifndef _SLVECTOR_H
+#define _SLVECTOR_H
+
 /*****************************************************************************
  *                                                                           *
  * The breve Simulation Environment                                          *
@@ -68,3 +71,5 @@ void slVectorNormalize(slVector *);
 void slVectorSet(slVector *, double, double, double);
 void slVectorPrint(slVector *);
 int slVectorCompare(slVector *, slVector *);
+
+#endif

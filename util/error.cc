@@ -26,7 +26,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "util.h"
+#include "slutil.h"
 
 static int gDebugLevel;
 

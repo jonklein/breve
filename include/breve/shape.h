@@ -1,3 +1,7 @@
+
+#ifndef _SHAPE_H
+#define _SHAPE_H
+
 /*****************************************************************************
  *                                                                           *
  * The breve Simulation Environment                                          *
@@ -18,9 +22,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#ifndef _SHAPE_H
-#define _SHAPE_H
-
+#include "vector.h"
 #include "mesh.h"
 
 enum shapeTypes {

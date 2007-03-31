@@ -20,7 +20,8 @@
 
 #include <math.h>
 
-#include "util.h"
+#include "slutil.h"
+#include "vector.h"
 
 #define MIN3(x, y, z)	(((x)<(y) && (x)<(z))?(x):((y)<(z)?(y):(z)))
 #define MAX3(x, y, z)	(((x)>(y) && (x)>(z))?(x):((y)>(z)?(y):(z)))

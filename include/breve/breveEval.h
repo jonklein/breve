@@ -21,7 +21,7 @@
 #ifndef _BREVEEVAL_H
 #define _BREVEEVAL_H
 
-#include "util.h"
+#include "slutil.h"
 #include <string>
 #include <set>
 

@@ -24,7 +24,7 @@
  *  Copyright (C) 2005 Eric DeWitt, Jonathan Klein
  */
 
-#include "util.h"
+#include "slutil.h"
 #include "bigMatrix.hh"
 
 /**

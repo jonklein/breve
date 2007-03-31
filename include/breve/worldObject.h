@@ -1,7 +1,7 @@
 #ifndef _WORLDOBJECT_H
 #define _WORLDOBJECT_H
 
-#include "util.h"
+#include "slutil.h"
 #include "shape.h"
 
 #include <vector>

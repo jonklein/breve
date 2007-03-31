@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include "util.h"
+#include "slutil.h"
 #include "shape.h"
 #include "glIncludes.h"
 

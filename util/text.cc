@@ -30,7 +30,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "util.h"
+#include "slutil.h"
 
 /*!
 	\brief Splits a string into several smaller strings based on a

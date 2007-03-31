@@ -78,9 +78,6 @@ case ${host_os} in
 		;;
 
 	linux* | *bsd* )
-###		The old non-checking version of the X libs
-###		LIBS="${X_LIBS} -lXmu -lXi ${X_EXTRA_LIBS} -lX11 ${X_PRE_LIBS} ${LIBS}"
-
 		LIBS="${LIBS} ${X_LIBS}"
 		AC_CHECK_LIB([Xmu], [main],,AC_MSG_FAILURE([Missing Xmu Library]))
 		AC_CHECK_LIB([Xi], [main],,AC_MSG_FAILURE([Missing Xi Library]))
@@ -128,16 +125,30 @@ fi
 #
 # Dyanmically linking in Perl
 #
+
+OLDCPP=$CPPFLAGS
+OLDLIB=$LIBS
+
+PERLCPP=`perl -MExtUtils::Embed -e ccopts`
+PERLLIB=`perl -MExtUtils::Embed -e ldopts`
+
+LIBS="$OLDLIB $PERLLIB"
+CPPFLAGS="$OLDCPP $PERLCPP"
+
 AC_CHECK_LIB([perl], [perl_construct])
+AC_CHECK_PROGS(XSUBPP, [xsubpp], [], $PATH )
 
-# dunno why this isn't working
-#AC_PROG_LIBTOOL
-#AC_PROG_SWIG
-#if test "$ac_cv_lib_perl_perl_construct" = yes; then
-#	AC_DEFINE( [HAVE_LIBPERL], [], [Have the required Perl libraries] )
-#fi
+#
+# Use Perl if we have the perl libraries, locate xsubpp and if we're not cross-compiling
+#
 
-
+if test "$ac_cv_lib_perl_perl_construct" = yes && test "x$ac_cv_prog_XSUBPP" != "x" && "$build" = "$host"; then
+	LIBS="$OLDLIB $PERLLIB"
+	CPPFLAGS="$OLDCPP $PERLCPP"
+else
+	LIBS=$OLDLIB
+	CPPFLAGS=$OLDCPP
+fi
 
 
 if test "x$engine_only" = "x"; then
@@ -262,7 +273,7 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([jpeg], [jpeg_read_header])
 	AC_CHECK_LIB([tiff], [TIFFOpen])
 	AC_CHECK_LIB([portaudio], [Pa_OpenStream])
-+       AC_CHECK_LIB([FLAC], [FLAC__seekable_stream_encoder_init])
+	AC_CHECK_LIB([FLAC], [FLAC__seekable_stream_encoder_init])
 	AC_CHECK_LIB([sndfile], [sf_open])
 	AC_CHECK_LIB([termcap], [tputs])
 	AC_CHECK_LIB([ncurses], [tputs])

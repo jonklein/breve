@@ -20,7 +20,7 @@
 
 #include <math.h>
 
-#include "util.h"
+#include "slutil.h"
 #include "graph.h"
 
 void slInitGlut( int, char **, char * );

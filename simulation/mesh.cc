@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "util.h"
+#include <string>
+
+#include "simulation.h"
 #include "mesh.h"
 #include "glIncludes.h"
 
