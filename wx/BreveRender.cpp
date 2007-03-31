@@ -280,8 +280,14 @@ void BreveRender::CreateControls()
 	
 			cont = scan.GetFirst(&filename, "*.tz", wxDIR_FILES);
 	
-			while (cont)
-			{
+			while (cont) {
+				demomenu->Append(BREVE_BREVEMENU_SIM + count++, filename);
+				cont = scan.GetNext(&filename);
+			}
+
+			cont = scan.GetFirst(&filename, "*.py", wxDIR_FILES);
+	
+			while (cont) {
 				demomenu->Append(BREVE_BREVEMENU_SIM + count++, filename);
 				cont = scan.GetNext(&filename);
 			}
@@ -306,17 +312,28 @@ void BreveRender::CreateControls()
 	
 				cont = lscan.GetFirst(&subfilename, "*.tz", wxDIR_FILES);
 	
-				while (cont)
-				{
-					if (submenu == NULL)
-					{
-					submenu = new wxMenu;
-					reserved = count++;
+				while (cont) {
+					if (submenu == NULL) {
+						submenu = new wxMenu;
+						reserved = count++;
 					}
 	
 					submenu->Append(BREVE_BREVEMENU_SIM + count++, subfilename);
 					cont = lscan.GetNext(&subfilename);
 				}
+
+				/*
+				cont = lscan.GetFirst(&subfilename, "*.py", wxDIR_FILES);
+
+				while (cont) {
+					if (submenu == NULL) {
+						submenu = new wxMenu;
+						reserved = count++;
+					}
+	
+					submenu->Append(BREVE_BREVEMENU_SIM + count++, subfilename);
+				}
+				*/
 	
 				if (submenu)
 					demomenu->Append(BREVE_BREVEMENU_SIM + reserved, filename, submenu);
@@ -717,16 +734,15 @@ void BreveRender::LoadSimFile(wxString ffile)
 
 void BreveRender::OnMenuOpen(wxCommandEvent& event)
 {
-	wxFileDialog d(this, "Please select a simulation", "", "", "*.tz", wxOPEN);
+	wxFileDialog d(this, "Please select a simulation", "", "", "steve files (*.tz)|*.tz|Python files (*.py)|*.py", wxOPEN);
 
-	if (d.ShowModal() == wxID_OK)
-	{
-	wxString filename = d.GetFilename();
-	wxString fileloc = d.GetDirectory();
+	if (d.ShowModal() == wxID_OK) {
+		wxString filename = d.GetFilename();
+		wxString fileloc = d.GetDirectory();
 
-	fileloc += FILE_SEP_PATH;
+		fileloc += FILE_SEP_PATH;
 
-	LoadSimFile(fileloc + filename);
+		LoadSimFile(fileloc + filename);
 	}
 }
 

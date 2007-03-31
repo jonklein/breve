@@ -6,7 +6,7 @@
 
 #include <stdexcept>
 
-#include "util.h"
+#include "slutil.h"
 #include "kernel.h"
 
 void breveInitPushFunctions( brNamespace *n );
