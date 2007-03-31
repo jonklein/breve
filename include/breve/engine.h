@@ -44,12 +44,28 @@ class slCamera;
 */
 
 struct brErrorInfo {
-	brErrorInfo() { file = NULL; }
+	brErrorInfo() { 
+		file = NULL;
+		clear();
+	}
+
+	~brErrorInfo() {
+		clear();
+	}
+
+	void clear() {
+		if( file ) slFree( file );
+
+		type = 0;
+		line = 0;
+		file = slStrdup( "<unknown>" ); 
+		sprintf( message, "An unknown error occurred (see the breve log for more information)\n" );
+	}
 
 	char *file;
 	int line;
 	unsigned char type;
-	char message[BR_ERROR_TEXT_SIZE];
+	char message[ BR_ERROR_TEXT_SIZE ];
 };
 
 /*!
@@ -59,8 +75,9 @@ struct brErrorInfo {
 enum parseErrorMessageCodes {
 	// parse errors 
 
-	PE_OK = 0,
+	PE_UNKNOWN = 0,
 	PE_PARSE,
+	PE_PYTHON,
 	PE_SYNTAX,
 	PE_INTERNAL,
 	PE_UNKNOWN_SYMBOL,

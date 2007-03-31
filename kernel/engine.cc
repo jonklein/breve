@@ -93,6 +93,8 @@ brEngine *brEngineNew( void ) {
 
 	e = new brEngine;
 
+	brClearError( e );
+
 #if HAVE_LIBAVFORMAT
 	av_register_all();
 #endif
@@ -291,12 +293,6 @@ brEngine::~brEngine() {
 		brInstanceRelease( *bi );
 
 	brEngineRemoveDlPlugins( this );
-
-	if ( error.file ) {
-		slFree( error.file );
-		error.file = NULL;
-		error.type = 0;
-	}
 
 	if ( camera ) 
 		delete camera;
@@ -594,13 +590,13 @@ const std::vector< std::string > &brEngineGetSearchPaths( brEngine *e ) {
 	return e->_searchPaths;
 }
 
-/*!
-	\brief Finds a file in the engine's file paths.
-
-	Takes an engine and a relative filename, and looks for the file
-	in the engine's search path.  If the file is found, it is returned
-	as an slMalloc'd string which must be freed by the caller.
-*/
+/**
+ * \brief Finds a file in the engine's file paths.
+ * 
+ * Takes an engine and a relative filename, and looks for the file
+ * in the engine's search path.  If the file is found, it is returned
+ * as an slMalloc'd string which must be freed by the caller.
+ */
 
 char *brFindFile( brEngine *e, const char *file, struct stat *st ) {
 	struct stat localStat;
@@ -626,11 +622,10 @@ char *brFindFile( brEngine *e, const char *file, struct stat *st ) {
 	return NULL;
 }
 
-/*!
-	\brief Render the current simulation world to an active OpenGL context.
-
-	Requires that a valid OpenGL context is active.
-*/
+/**
+ * \brief Render the current simulation world to an active OpenGL context.
+ * Requires that a valid OpenGL context is active.
+ */
 
 void brEngineRenderWorld( brEngine *e, int crosshair ) {
 	e->camera->renderScene( e->world, crosshair );
@@ -659,7 +654,7 @@ void brPrintVersion() {
 
 void brEvalError( brEngine *e, int type, char *proto, ... ) {
 	va_list vp;
-	char localMessage[BR_ERROR_TEXT_SIZE];
+	char localMessage[ BR_ERROR_TEXT_SIZE ];
 
 	if ( e->error.type == 0 ) {
 		e->error.type = type;
@@ -680,23 +675,30 @@ void brEvalError( brEngine *e, int type, char *proto, ... ) {
 	slMessage( DEBUG_ALL, "\n" );
 }
 
+/**
+ * Clears the current error data.
+ */
+
 void brClearError( brEngine *e ) {
-	e->error.type = 0;
+	e->error.clear();
 }
+
+/**
+ * Returns the current error code.
+ */
 
 int brGetError( brEngine *e ) {
 	return e->error.type;
 }
 
 
-/*!
-	\brief A wrapper for slMessage.
-
-	This function is a callback used by funopen() to associate a
-	FILE* pointer with the slMessage logging system.  This allows
-	output written to a file pointer to be directed to the breve
-	log.  This function is not typically called manually.
-*/
+/**
+ * \brief A wrapper for slMessage.
+ * This function is a callback used by funopen() to associate a
+ * FILE* pointer with the slMessage logging system.  This allows
+ * output written to a file pointer to be directed to the breve
+ * log.  This function is not typically called manually.
+ */
 
 int brFileLogWrite( void *m, const char *buffer, int length ) {
 	char *s = ( char* )alloca( length + 1 );
@@ -709,9 +711,9 @@ int brFileLogWrite( void *m, const char *buffer, int length ) {
 	return length;
 }
 
-/*!
-	\brief Calls the interfaceSetCallback.
-*/
+/**
+ * \brief Calls the interfaceSetCallback.
+ */
 
 int brEngineSetInterface( brEngine *e, char *name ) {
 	if ( !e->interfaceSetCallback )
@@ -754,9 +756,9 @@ slWorld *brEngineGetWorld( brEngine *e ) {
 	return e->world;
 }
 
-/*!
-	\brief Returns the internal methods namespace.
-*/
+/**
+ * \brief Returns the internal methods namespace.
+ */
 
 brNamespace *brEngineGetInternalMethods( brEngine *e ) {
 	return e->internalMethods;

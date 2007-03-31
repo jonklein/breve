@@ -4,15 +4,17 @@ import breve
 class Swarm( breve.Control ):
 	''''''
 
-	__slots__ = [ 'birds', 'cloudTexture', 'normalMenu', 'obedientMenu', 'selection', 'wackyMenu' ]
+	__slots__ = [ 'birds', 'cloudTexture', 'dizzyMenu', 'normalMenu', 'obedientMenu', 'selection', 'useDizzyCameraControl', 'wackyMenu' ]
 
 	def __init__( self ):
 		breve.Control.__init__( self )
 		self.birds = breve.objectList()
 		self.cloudTexture = None
+		self.dizzyMenu = None
 		self.normalMenu = None
 		self.obedientMenu = None
 		self.selection = None
+		self.useDizzyCameraControl = 0
 		self.wackyMenu = None
 		Swarm.init( self )
 
@@ -75,6 +77,8 @@ class Swarm( breve.Control ):
 		self.obedientMenu = self.addMenu( '''Flock Obediently''', 'flockObediently' )
 		self.normalMenu = self.addMenu( '''Flock Normally''', 'flockNormally' )
 		self.wackyMenu = self.addMenu( '''Flock Wackily''', 'flockWackily' )
+		self.addMenuSeparator()
+		self.dizzyMenu = self.addMenu( '''Use Dizzy Camera Control''', 'toggleDizzy' )
 		self.enableLighting()
 		self.moveLight( breve.vector( 0, 20, 20 ) )
 		self.cloudTexture = breve.createInstances( breve.Image, 1 ).load( 'images/clouds.png' )
@@ -113,6 +117,9 @@ class Swarm( breve.Control ):
 
 
 		self.aimCamera( location )
+		if self.useDizzyCameraControl:
+			self.setCameraRotation( breve.length( location ), 0.000000 )
+
 		breve.Control.iterate( self )
 
 	def squish( self ):
@@ -122,6 +129,17 @@ class Swarm( breve.Control ):
 
 		for item in self.birds:
 			item.move( breve.vector( 0, 0, 0 ) )
+
+
+	def toggleDizzy( self ):
+		''''''
+
+
+		self.useDizzyCameraControl = ( not self.useDizzyCameraControl )
+		if self.useDizzyCameraControl:
+			self.dizzyMenu.check()
+		else:
+			self.dizzyMenu.uncheck()
 
 
 

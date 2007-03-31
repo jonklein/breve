@@ -2,23 +2,22 @@
 use strict;
 use Breve;
 
-package Swarm;
-our @ISA = qw(Breve::Control);
+package Breve::Swarm;
 
 sub new {
-    my $class = shift;
-    my $self = {};
-    bless $self, $class;
-    $self->{ birds } = ();
-    $self->{ cloudTexture } = undef;
-    $self->{ normalMenu } = undef;
-    $self->{ obedientMenu } = undef;
-    $self->{ selection } = undef;
-    $self->{ wackyMenu } = undef;
-    $self->{ floor } = undef;
-    init( $self );
-   
-    return $self;
+	my $class = shift;
+	my $self = {};
+	bless $self, $class;
+	my $self->{ birds } = ();
+	my $self->{ cloudTexture } = undef;
+	my $self->{ dizzyMenu } = undef;
+	my $self->{ normalMenu } = undef;
+	my $self->{ obedientMenu } = undef;
+	my $self->{ selection } = undef;
+	my $self->{ useDizzyCameraControl } = 0;
+	my $self->{ wackyMenu } = undef;
+	init( $self );
+	return $self;
 }
 
 sub click {
@@ -42,9 +41,10 @@ sub flockNormally {
 	( $self ) = @_;
 	my $item = undef;
 
-	foreach $item (@{$self->{ birds }}) {
-	    $item->flockNormally();
+	foreach $item ($self->{ birds }) {
+		$item->flockNormally();
 	}
+
 
 	$self->{ normalMenu }->check();
 	$self->{ obedientMenu }->uncheck();
@@ -82,95 +82,111 @@ sub flockWackily {
 }
 
 sub init {
-    my $self;
-    ( $self ) = @_;
-    
-    $self->SUPER::init();
-    
-    $self->addMenu( "Smoosh The Birdies", "squish" );
-    $self->addMenuSeparator();
-    $self->{ obedientMenu } = $self->addMenu( "Flock Obediently", "flockObediently" );
-    $self->{ normalMenu } = $self->addMenu( "Flock Normally", "flockNormally" );
-    $self->{ wackyMenu } = $self->addMenu( "Flock Wackily", "flockWackily" );
-    $self->enableLighting();
-    $self->moveLight( Breve::Vector->new( 0, 20, 20 ) );
+	my $self;
+	( $self ) = @_;
+	my $floor = undef;
 
-    my $ctex = Breve::Image->new();
-    $ctex->load("images/clouds.png");
-    $self->{ cloudTexture } = $ctex;
-   
-    $self->{floor} = Breve::Floor->new();
-    $self->{floor}->catchShadows();
-
-    for(0..50) {
-	push @{$self->{ birds }}, Bird->new();
-    }
-
-    $self->flockNormally();
-    $self->setBackgroundTextureImage( $self->{ cloudTexture } );
-    $self->offsetCamera( Breve::Vector->new( 5, 1.500000, 6 ) );
-    $self->enableShadows();
+	$self->addMenu( "Smoosh The Birdies", "squish" );
+	$self->addMenuSeparator();
+	$self->{ obedientMenu } = $self->addMenu( "Flock Obediently", "flockObediently" );
+	$self->{ normalMenu } = $self->addMenu( "Flock Normally", "flockNormally" );
+	$self->{ wackyMenu } = $self->addMenu( "Flock Wackily", "flockWackily" );
+	$self->addMenuSeparator();
+	$self->{ dizzyMenu } = $self->addMenu( "Use Dizzy Camera Control", "toggleDizzy" );
+	$self->enableLighting();
+	$self->moveLight( Breve::Vector->new( 0, 20, 20 ) );
+	$self->{ cloudTexture } = Breve::Image->new(); #### MANUAL: MAKE 1 OF THESE!->load( "images/clouds.png" );
+	$floor = Breve::Floor->new(); #### MANUAL: MAKE 1 OF THESE!;
+	$floor->catchShadows();
+	$self->{ birds } = Breve::Birds->new(); #### MANUAL: MAKE 60 OF THESE!;
+	$self->flockNormally();
+	$self->setBackgroundTextureImage( $self->{ cloudTexture } );
+	$self->offsetCamera( Breve::Vector->new( 5, 1.500000, 6 ) );
+	$self->enableShadows();
 }
 
 sub internalUserInputMethod {
 	my $self;
 	( $self ) = @_;
+
 }
 
 sub iterate {
 	my $self;
 	( $self ) = @_;
 	my $item = undef;
-	my $location = Breve::Vector->new();
+	my $location = ();
 	my $topDiff = 0;
 
 	$self->updateNeighbors();
-	foreach $item (@{$self->{ birds }}) {
-	    $item->fly();
-	    #$location = ( $location + $item->getLocation() ); # MANUAL NEED TO DO +
+	foreach $item ($self->{ birds }) {
+		$item->fly();
+		$location = ( $location + $item->getLocation() );
+
 	}
 
-	#$location = ( $location / breve->length( $self->{ birds } ) );
-	$topDiff = 0.000000;
-	#foreach $item ($self->{ birds }) {
-	#	if( ( $topDiff < breve->length( ( $location - $item->getLocation() ) ) ) ) {
-	#		$topDiff = breve->length( ( $location - $item->getLocation() ) );
-	#	}
-	#}
 
-	#$self->aimCamera( $location );
+	$location = ( $location / Breve::length( $self->{ birds } ) );
+	$topDiff = 0.000000;
+	foreach $item ($self->{ birds }) {
+		if( ( $topDiff < Breve::length( ( $location - $item->getLocation() ) ) ) ) {
+			$topDiff = Breve::length( ( $location - $item->getLocation() ) );
+		}
+;
+
+	}
+
+
+	$self->aimCamera( $location );
+	if( $self->{ useDizzyCameraControl } ) {
+		$self->setCameraRotation( Breve::length( $location ), 0.000000 );
+	}
+
 	$self->SUPER::iterate();
 }
 
 sub squish {
-    my $self;
-    ( $self ) = @_;
-    my $item = undef;
-    
-    foreach $item ($self->{ birds }) {
-	$item->move( breve->vector( 0, 0, 0 ) );
-    }
+	my $self;
+	( $self ) = @_;
+	my $item = undef;
+
+	foreach $item ($self->{ birds }) {
+		$item->move( Breve::Vector->new( 0, 0, 0 ) );
+	}
+
+
 }
 
-package Bird;
+sub toggleDizzy {
+	my $self;
+	( $self ) = @_;
 
-our @ISA = qw(Breve::Mobile);
+	$self->{ useDizzyCameraControl } = ( not $self->{ useDizzyCameraControl } );
+	if( $self->{ useDizzyCameraControl } ) {
+		$self->{ dizzyMenu }->check();
+	}	 else {
+		$self->{ dizzyMenu }->uncheck();
+	}
+
+}
+
+package Breve::Bird;
 
 sub new {
-    my $class = shift;
-    my $self = {};
-    bless $self, $class;
-    $self->{ centerConstant } = 0;
-    $self->{ cruiseDistance } = 0;
-    $self->{ landed } = 0;
-    $self->{ maxAcceleration } = 0;
-    $self->{ maxVelocity } = 0;
-    $self->{ spacingConstant } = 0;
-    $self->{ velocityConstant } = 0;
-    $self->{ wanderConstant } = 0;
-    $self->{ worldCenterConstant } = 0;
-    init( $self );
-    return $self;
+	my $class = shift;
+	my $self = {};
+	bless $self, $class;
+	my $self->{ centerConstant } = 0;
+	my $self->{ cruiseDistance } = 0;
+	my $self->{ landed } = 0;
+	my $self->{ maxAcceleration } = 0;
+	my $self->{ maxVelocity } = 0;
+	my $self->{ spacingConstant } = 0;
+	my $self->{ velocityConstant } = 0;
+	my $self->{ wanderConstant } = 0;
+	my $self->{ worldCenterConstant } = 0;
+	init( $self );
+	return $self;
 }
 
 sub checkLanded {
@@ -188,16 +204,16 @@ sub checkVisibility {
 		return 0;
 	}
 
-	if(ref($item) ne "Bird") {
-	    return 0;
+	if( ( not $item->isA( "Bird" ) ) ) {
+		return 0;
 	}
 
 	if( $item->checkLanded() ) {
-	    return 0;
+		return 0;
 	}
 
 	if( ( $self->getAngle( $item ) > 2.000000 ) ) {
-	    return 0;
+		return 0;
 	}
 
 	return 1;
@@ -248,156 +264,121 @@ sub flockWackily {
 sub fly {
 	my $self;
 	( $self ) = @_;
-
-	my $toNeighbor = Breve::Vector->new();
-	my $centerUrge = Breve::Vector->new();
-	my $worldCenterUrge = Breve::Vector->new();
-	my $velocityUrge = Breve::Vector->new();
-	my $spacingUrge = Breve::Vector->new();
-	my $wanderUrge = Breve::Vector->new();
-	my $acceleration = Breve::Vector->new();
-	my $newVelocity = Breve::Vector->new();
-	my @neighbors = ();
+	my $bird = undef;
+	my $toNeighbor = ();
+	my $centerUrge = ();
+	my $worldCenterUrge = ();
+	my $velocityUrge = ();
+	my $spacingUrge = ();
+	my $wanderUrge = ();
+	my $acceleration = ();
+	my $newVelocity = ();
+	my $neighbors = ();
 	my $takeOff = 0;
 
-	foreach my $bird (@{$self->getNeighbors()}) {
+	foreach $bird ($self->getNeighbors()) {
+		if( $self->checkVisibility( $bird ) ) {
+			$neighbors.append( $bird );
+		}
+;
 
-	    if( $self->checkVisibility( $bird ) ) {
-		push @neighbors, $bird;
-	    }
 	}
+
 
 	if( $self->{ landed } ) {
-	    $takeOff = rand 40;
-	    if( ( $takeOff == 1 ) ) {
-		$self->{ landed } = 0;
+		$takeOff = Breve::randomExpression( 40 );
+		if( ( $takeOff == 1 ) ) {
+			$self->{ landed } = 0;
+			$self->setVelocity( ( Breve::randomExpression( Breve::Vector->new( 0.100000, 1.100000, 0.100000 ) ) - Breve::Vector->new( 0.050000, 0, 0.050000 ) ) );
 
-		my $randvec = Breve::Vector->newRandom(0.1, 1.1, 0.1);
-		my $const = Breve::Vector->new(0.05, 0, 0.05);
+		}		 else {
+			return;
 
-		$self->setVelocity( $randvec->subtract($const) );
-	    } else {
-		return;	
-	    }
+		}
+;
+
 	}
 
-	$centerUrge = $self->getCenterUrge( \@neighbors );
-	$velocityUrge = $self->getVelocityUrge( \@neighbors );
-	foreach my $bird (@neighbors) {
-	    $toNeighbor = ( $self->getLocation()->subtract( $bird->getLocation() ) );
-	    if( $toNeighbor->length() < $self->{ cruiseDistance } ) {
-		$spacingUrge = ( $spacingUrge->add($toNeighbor) );
-	    }
+	$centerUrge = $self->getCenterUrge( $neighbors );
+	$velocityUrge = $self->getVelocityUrge( $neighbors );
+	foreach $bird ($neighbors) {
+		$toNeighbor = ( $self->getLocation() - $bird->getLocation() );
+		if( ( Breve::length( $toNeighbor ) < $self->{ cruiseDistance } ) ) {
+			$spacingUrge = ( $spacingUrge + $toNeighbor );
+		}
+;
+
 	}
 
-	if(  $self->getLocation()->length() > 10  ) {
-		$worldCenterUrge = ( $self->getLocation()->negative() );
+
+	if( ( Breve::length( $self->getLocation() ) > 10 ) ) {
+		$worldCenterUrge = ( -$self->getLocation() );
 	}
 
-	$wanderUrge = Breve::Vector->newRandom( 2, 2, 2 )->subtract(Breve::Vector->new( 1, 1, 1 ) );
-
-	if( $spacingUrge->length() ) {
-	    $spacingUrge->normalize_in_place();
+	$wanderUrge = ( Breve::randomExpression( Breve::Vector->new( 2, 2, 2 ) ) - Breve::Vector->new( 1, 1, 1 ) );
+	if( Breve::length( $spacingUrge ) ) {
+		$spacingUrge = ( $spacingUrge / Breve::length( $spacingUrge ) );
 	}
 
-	if( $worldCenterUrge->length() ) {
-	    $worldCenterUrge->normalize_in_place();
+	if( Breve::length( $worldCenterUrge ) ) {
+		$worldCenterUrge = ( $worldCenterUrge / Breve::length( $worldCenterUrge ) );
 	}
 
-	if( $velocityUrge->length() ) {
-	    $velocityUrge->normalize_in_place();
+	if( Breve::length( $velocityUrge ) ) {
+		$velocityUrge = ( $velocityUrge / Breve::length( $velocityUrge ) );
 	}
 
-	if( $centerUrge->length() ) {
-	    $centerUrge->normalize_in_place();
+	if( Breve::length( $centerUrge ) ) {
+		$centerUrge = ( $centerUrge / Breve::length( $centerUrge ) );
 	}
 
-	if( $wanderUrge->length() ) {
-	    $wanderUrge->normalize_in_place();
+	if( Breve::length( $wanderUrge ) ) {
+		$wanderUrge = ( $wanderUrge / Breve::length( $wanderUrge ) );
 	}
 
-	$wanderUrge = ( $wanderUrge->multiplyBy( $self->{ wanderConstant } ));
-	
-	$worldCenterUrge = ( $worldCenterUrge->multiplyBy( $self->{ worldCenterConstant }));
-	$centerUrge = ( $centerUrge->multiplyBy( $self->{ centerConstant } ));
-	$velocityUrge = ( $velocityUrge->multiplyBy( $self->{ velocityConstant } ));
-	$spacingUrge = ( $spacingUrge->multiplyBy( $self->{ spacingConstant } ));
-
-	$acceleration = ( ( ( ( $worldCenterUrge
-				->add( $centerUrge ) )
-			      ->add( $velocityUrge) )
-			    ->add( $spacingUrge ) )
-			  ->add( + $wanderUrge) );
-
-	if( $acceleration->length() != 0 ) {
-	    $acceleration->normalize_in_place();
+	$wanderUrge = ( $wanderUrge * $self->{ wanderConstant } );
+	$worldCenterUrge = ( $worldCenterUrge * $self->{ worldCenterConstant } );
+	$centerUrge = ( $centerUrge * $self->{ centerConstant } );
+	$velocityUrge = ( $velocityUrge * $self->{ velocityConstant } );
+	$spacingUrge = ( $spacingUrge * $self->{ spacingConstant } );
+	$acceleration = ( ( ( ( $worldCenterUrge + $centerUrge ) + $velocityUrge ) + $spacingUrge ) + $wanderUrge );
+	if( ( Breve::length( $acceleration ) != 0 ) ) {
+		$acceleration = ( $acceleration / Breve::length( $acceleration ) );
 	}
 
-	$self->setAcceleration( $acceleration->multiplyBy($self->{ maxAcceleration } ) );
+	$self->setAcceleration( ( $self->{ maxAcceleration } * $acceleration ) );
 	$newVelocity = $self->getVelocity();
-
-	if( $newVelocity->length() > $self->{ maxVelocity } ) {
-	    $newVelocity = $newVelocity->multiplyBy($self->{maxVelocity})
-		                       ->divideBy($newVelocity->length());
+	if( ( Breve::length( $newVelocity ) > $self->{ maxVelocity } ) ) {
+		$newVelocity = ( ( $self->{ maxVelocity } * $newVelocity ) / Breve::length( $newVelocity ) );
 	}
 
 	$self->setVelocity( $newVelocity );
-
-	if( $newVelocity->length() != 0 ) {
-	    $newVelocity->normalize_in_place();
-	}
-
-	$self->point( Breve::Vector->new( 0, 1, 0 ), $newVelocity );
-
+	$self->point( Breve::Vector->new( 0, 1, 0 ), ( $newVelocity / Breve::length( $newVelocity ) ) );
 }
 
 sub getAngle {
-    my ($self, $otherMobile );
-    ( $self, $otherMobile ) = @_;
-    my $tempVector;
+	my ($self, $otherMobile );
+	( $self, $otherMobile ) = @_;
+	my $tempVector = ();
 
-    if( $self->getVelocity()->length() == 0 ) {
-	return 0;
-    }
-    
-    $tempVector = ( $otherMobile->getLocation()->subtract($self->getLocation() ));
+	if( ( Breve::length( $self->getVelocity() ) == 0 ) ) {
+		return 0;
+	}
 
-    my $velocity = $self->getVelocity();
-
-    return Breve::callInternal($self, "angle", $velocity, $tempVector );
+	$tempVector = ( $otherMobile->getLocation() - $self->getLocation() );
+	return Breve::callInternal( $self, "angle", $self->getVelocity(), $tempVector );
 }
-
 
 sub getCenterUrge {
 	my ($self, $flock );
 	( $self, $flock ) = @_;
 	my $item = undef;
 	my $count = 0;
-	my $center = Breve::Vector->new(0, 0, 0);
+	my $center = ();
 
-	foreach $item (@{$flock}) {
-	    $count = ( $count + 1 );
-	    $center = ( $center->add( $item->getLocation() ) );
-	}
-
-	if( ( $count == 0 ) ) {
-	    return Breve::Vector->new( 0, 0, 0 );
-	}
-
-	$center = $center->divideBy($count);
-	return ( $center->subtract($self->getLocation()) );
-}
-
-sub getVelocityUrge {
-	my ($self, $flock );
-	( $self, $flock ) = @_;
-
-	my $count = 0;
-	my $aveVelocity = Breve::Vector->new();
-
-	foreach my $item (@{$flock}) {
+	foreach $item ($flock) {
 		$count = ( $count + 1 );
-		$aveVelocity = ( $aveVelocity->add( $item->getVelocity() ) );
+		$center = ( $center + $item->getLocation() );
 
 	}
 
@@ -406,48 +387,54 @@ sub getVelocityUrge {
 		return Breve::Vector->new( 0, 0, 0 );
 	}
 
-	$aveVelocity = ( $aveVelocity->divideBy( $count ) );
-	return ( $aveVelocity->subtract( $self->getVelocity() ) );
+	$center = ( $center / $count );
+	return ( $center - $self->getLocation() );
+}
+
+sub getVelocityUrge {
+	my ($self, $flock );
+	( $self, $flock ) = @_;
+	my $item = undef;
+	my $count = 0;
+	my $aveVelocity = ();
+
+	foreach $item ($flock) {
+		$count = ( $count + 1 );
+		$aveVelocity = ( $aveVelocity + $item->getVelocity() );
+
+	}
+
+
+	if( ( $count == 0 ) ) {
+		return Breve::Vector->new( 0, 0, 0 );
+	}
+
+	$aveVelocity = ( $aveVelocity / $count );
+	return ( $aveVelocity - $self->getVelocity() );
 }
 
 sub init {
 	my $self;
 	( $self ) = @_;
 
-	$self->SUPER::init();
-
-	my $cone = Breve::PolygonCone->new();
-	$cone->initWith(3, 0.5, 0.06);
-	$self->setShape( $cone );
-
-	my $random_place = Breve::Vector->newRandom(10,10,10); 
-	my $random_velocity = Breve::Vector->newRandom(20,20,20); 
-
-	$self->move( $random_place->subtract( Breve::Vector->new( 5, -5, 5 ) ) );
-	$self->setVelocity( $random_velocity->subtract(Breve::Vector->new(10,10,10)));
-	$self->setColor( Breve::Vector->newRandom( 1, 1, 1 ) );
-	$self->handleCollisions( "Breve::Floor", "land" );
-	
+	$self->setShape( Breve::PolygonCone->new(); #### MANUAL: MAKE 1 OF THESE!->initWith( 3, 0.500000, 0.060000 ) );
+	$self->move( ( Breve::randomExpression( Breve::Vector->new( 10, 10, 10 ) ) - Breve::Vector->new( 5, -5, 5 ) ) );
+	$self->setVelocity( ( Breve::randomExpression( Breve::Vector->new( 20, 20, 20 ) ) - Breve::Vector->new( 10, 10, 10 ) ) );
+	$self->setColor( Breve::randomExpression( Breve::Vector->new( 1, 1, 1 ) ) );
+	$self->handleCollisions( "Floor", "land" );
 	$self->setNeighborhoodSize( 3.000000 );
-
 }
 
 sub land {
 	my ($self, $ground );
 	( $self, $ground ) = @_;
 
-	die("don't know how to land.");
-
-	$self->setAcceleration( breve->vector( 0, 0, 0 ) );
-	$self->setVelocity( breve->vector( 0, 0, 0 ) );
+	$self->setAcceleration( Breve::Vector->new( 0, 0, 0 ) );
+	$self->setVelocity( Breve::Vector->new( 0, 0, 0 ) );
 	$self->{ landed } = 1;
-	$self->offset( breve->vector( 0, 0.001000, 0 ) );
+	$self->offset( Breve::Vector->new( 0, 0.001000, 0 ) );
 }
 
-package main;
-
-&Breve::bootstrap();
-my $SwarmController = Swarm->new();
 
 1;
 

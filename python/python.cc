@@ -962,19 +962,21 @@ int brPythonLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *in
 	int result = EC_OK;
 	FILE *fp = fopen( inFilename, "r" );
 
-	PyRun_SimpleString( "import breve" );
-
 	if( fp ) {
 
-		if( PyRun_SimpleFile( fp, inFilename ) )
+		if( PyRun_SimpleFile( fp, inFilename ) ) {
+			brEvalError( inEngine, PE_PYTHON, "An error occurred while executing the file \"%s\"\n", inFilename );
 			result = EC_ERROR;
+		}
 
 		fclose( fp );
 
 	} else {
 
-		if( PyRun_SimpleString( inFiletext ) )
+		if( PyRun_SimpleString( inFiletext ) ) {
+			brEvalError( inEngine, PE_PYTHON, "An error occurred while executing the Python code\n", inFilename );
 			result = EC_ERROR;
+		}
 	}
 
 	return result;
@@ -1058,6 +1060,7 @@ void brPythonInit( brEngine *breveEngine ) {
 	}
 
 	brevePythonType->userData = ( void* )PyImport_ImportModule( "__main__" );
+	PyImport_ImportModule( "breve" );
 
 	brevePythonType->findMethod 		= brPythonFindMethod;
 	brevePythonType->findObject 		= brPythonFindObject;

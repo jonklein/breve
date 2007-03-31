@@ -18,20 +18,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-/* 
-    + errorText.h
-    = 
-    = English error titles and strings.
-    =
-    = this is just "fallback" information.  MacOSX breve uses these 
-    = error names as keys to localized strings.
-	= 
-	= I wish.
-*/
+/** 
+ * English error titles and strings.
+ */
 
 char *gErrorNames[] = {
-    "No Error",
+    "Unknown Error",
     "Parse Error",
+    "Python Error",
     "Syntax Error",
     "Internal Error",
     "Unknown Symbol Error",
@@ -43,7 +37,7 @@ char *gErrorNames[] = {
     "No Controller Error",
     "Incompatible File Version",
 
-    /* EVALUATION ERRORS */
+    // EVALUATION ERRORS 
 
     "Unknown Controller Error",
     "Simulation Triggered Error",
@@ -65,8 +59,9 @@ char *gErrorNames[] = {
 };
 
 char *gErrorMessages[] = {
-    "No error occurred.",
+    "An unknown error occurred (see the breve log for more information).",
     "A \"parse error\" is a very general error indicating that the parser encountered unexpected input.\n\nThe error can sometimes be hard to track down, as it does not always appear on the line specified by this error message--it is possible that the error occurs on a preceding line but is not discovered until the line specified.  Check for missing punctuation, misspellings and missing keywords in method calls.",
+    "A \"Python language error\" indicates that an error occurred while executing the Python code for this simulation.  See the breve log for more detailed error information.",
     "A \"syntax error\" indicates that a specific syntax error was encountered while parsing the simulation.\n\nThe error description above should describe the problem and how it can be fixed.",
     "An \"internal error\" indicates that a bug was encountered in this program while parsing the simulation.\n\nPlease file a bug report which includes a copy of the simulation which triggered this bug.",
     "An \"unknown symbol error\" indicates that an unknown variable was referenced.\n\nCheck that the variable is properly declared and that the variable name is spelled correctly.",
@@ -77,7 +72,7 @@ char *gErrorMessages[] = {
     "A \"function prototype error\" indicates the wrong number of arguments were passed to the specified function."
 	"An \"incompatible file version\" error indicates that the simulation could not continue because one of the files required by the simulation is an incompatible version for this simulation.\n\nSee the log window to determine which class file needs to be replaced.",
 
-     /* EVALUATION ERRORS */
+     // EVALUATION ERRORS 
 
     "A \"simulation triggered error\" indicates that this error was triggered manually from within the simulation using the \"die\" command.",
     "An \"internal error\" indicates that a bug was encountered in this program during the simulation.\n\nPlease file a bug report which includes a copy of the simulation which triggered this bug.",

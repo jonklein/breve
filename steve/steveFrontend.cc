@@ -652,13 +652,13 @@ void stParseError( brEngine *e, int type, char *proto, ... ) {
 		slMessage( DEBUG_ALL, "%s: %s", gErrorNames[type], error->message );
 		slMessage( DEBUG_ALL, " at line %d of file \"%s\"", lineno, yyfile );
 	} else {
-		// char localMessage[BR_ERROR_TEXT_SIZE];
+		char localMessage[ BR_ERROR_TEXT_SIZE ];
 		//// Ignore subsequent parse errors... [?]
-		// va_start( vp, proto );
-		// vsnprintf( localMessage, BR_ERROR_TEXT_SIZE, proto, vp );
-		// va_end( vp );
-		// slMessage( DEBUG_ALL, localMessage );
-		// slMessage( DEBUG_ALL, " at line %d of file \"%s\"", lineno, yyfile );
+		va_start( vp, proto );
+		vsnprintf( localMessage, BR_ERROR_TEXT_SIZE, proto, vp );
+		va_end( vp );
+		slMessage( DEBUG_ALL, localMessage );
+		slMessage( DEBUG_ALL, " at line %d of file \"%s\"", lineno, yyfile );
 	}
 
 	slMessage( DEBUG_ALL, "\n" );

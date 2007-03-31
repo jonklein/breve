@@ -1,6 +1,6 @@
 AC_PREREQ(2.57)
 
-AC_INIT([the breve simulation environment], [2.6b0], [jk@spiderland.org])
+AC_INIT([the breve simulation environment], [2.6b1], [jk@spiderland.org])
 AC_CONFIG_HEADER([include/breve/config.h])
 
 VERSION=$PACKAGE_VERSION
@@ -9,6 +9,7 @@ AC_CANONICAL_HOST
 
 AC_ARG_ENABLE([engineonly], [], engine_only=yes)
 AC_ARG_ENABLE([static], [], static=yes)
+AC_ARG_ENABLE([perl], [], perl=yes)
 
 if test "x$static" != "x"; then 
 	BEGIN_STATIC="-Xlinker -Bstatic"
@@ -126,28 +127,33 @@ fi
 # Dyanmically linking in Perl
 #
 
-OLDCPP=$CPPFLAGS
-OLDLIB=$LIBS
+if test "x$perl" != "x"; then 
+	OLDCPP=$CPPFLAGS
+	OLDLIB=$LIBS
 
-PERLCPP=`perl -MExtUtils::Embed -e ccopts`
-PERLLIB=`perl -MExtUtils::Embed -e ldopts`
+	PERLCPP=`perl -MExtUtils::Embed -e ccopts`
+	PERLLIB=`perl -MExtUtils::Embed -e ldopts`
 
-LIBS="$OLDLIB $PERLLIB"
-CPPFLAGS="$OLDCPP $PERLCPP"
-
-AC_CHECK_LIB([perl], [perl_construct])
-AC_CHECK_PROGS(XSUBPP, [xsubpp], [], $PATH )
-
-#
-# Use Perl if we have the perl libraries, locate xsubpp and if we're not cross-compiling
-#
-
-if test "$ac_cv_lib_perl_perl_construct" = yes && test "x$ac_cv_prog_XSUBPP" != "x" && test "$build" = "$host"; then
 	LIBS="$OLDLIB $PERLLIB"
 	CPPFLAGS="$OLDCPP $PERLCPP"
-else
-	LIBS=$OLDLIB
-	CPPFLAGS=$OLDCPP
+
+	AC_CHECK_LIB([perl], [perl_construct])
+	AC_CHECK_PROGS(XSUBPP, [xsubpp], [], $PATH )
+
+	#
+	# Use Perl if we have the perl libraries, locate xsubpp and if we're not cross-compiling
+	#
+
+	if test "$ac_cv_lib_perl_perl_construct" = yes && test "x$ac_cv_prog_XSUBPP" != "x" && test "$build" = "$host"; then
+		# if we do have Perl, we want to clobber the latest addition to $LIBS, because the proper
+		# perl flags will appear in $PERLLIB
+		LIBS="$OLDLIB $PERLLIB"
+		CPPFLAGS="$OLDCPP $PERLCPP"
+	else
+		# perl linking failed -- restore the non-perl libraries 
+		LIBS=$OLDLIB
+		CPPFLAGS=$OLDCPP
+	fi
 fi
 
 

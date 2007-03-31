@@ -731,13 +731,12 @@ void slCamera::reflectionPass( slWorld *w ) {
 	drawLights( 0 );
 }
 
-/*!
-	\brief Shadows multibody objects on to the specified shadow plane, expecting
-	that the stencil buffer has already been set to 3.
-
-	The stencil buffer will be modified to 2 where the shadows are
-	drawn.
-*/
+/**
+ * \brief Shadows multibody objects on to the specified shadow plane, expecting
+ * that the stencil buffer has already been set to 3.
+ *
+ * The stencil buffer will be modified to 2 where the shadows are drawn.
+ */
 
 void slCamera::shadowPass( slWorld *w ) {
 	GLfloat shadowMatrix[4][4];
@@ -761,9 +760,9 @@ void slCamera::shadowPass( slWorld *w ) {
 	glColor4f( 0.0, 0.0, 0.0, 0.3 );
 
 	glPushMatrix();
-	glMultMatrixf(( GLfloat * )shadowMatrix );
-	renderObjects( w, DO_NO_COLOR | DO_NO_TEXTURE | DO_NO_STATIONARY | DO_NO_BOUND | DO_NO_AXIS | DO_NO_TERRAIN );
+	glMultMatrixf( (GLfloat*)shadowMatrix );
 	glDisable( GL_LIGHTING );
+	renderObjects( w, DO_NO_COLOR | DO_NO_TEXTURE | DO_NO_STATIONARY | DO_NO_BOUND | DO_NO_AXIS | DO_NO_TERRAIN );
 
 	renderBillboards( DO_NO_COLOR | DO_NO_BOUND );
 

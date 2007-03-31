@@ -6,7 +6,9 @@
 
 /* EVALUATION ERROR TITLES */
 
-"No Error Title" = "No Error";
+"Unknown Error Title" = "Unknown Error";
+
+"Python Error Title" = "Python Language Error";
 
 "Unknown Controller Error Title" = "Unknown Controller Error";
 
@@ -40,9 +42,11 @@
 
 /* ======= EVALUATION ERROR TEXT ======= */
 
-"No Error Text" = "No error occurred.";
+"Unknown Error Text" = "An unknown error occurred (see the breve log for more information).";
 
-"Unknown Controller Error Title" = "An \"unknown controller error\" indicates that the Controller object specified in this simulation cannot be found.  Check the spelling of the classname and confirm that the class is properly defined.";
+"Unknown Controller Error Text" = "An \"unknown controller error\" indicates that the Controller object specified in this simulation cannot be found.  Check the spelling of the classname and confirm that the class is properly defined.";
+
+"Python Error Text"  = "A \"Python language error\" indicates that an error occurred while executing the Python code for this simulation.  See the breve log for more detailed error information.";
 
 "Simulation Triggered Error Text" = "A \"simulation triggered error\" indicates that this error was triggered manually from within the simulation using the \"die\" command.";
 

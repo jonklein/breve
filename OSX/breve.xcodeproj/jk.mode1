@@ -218,6 +218,8 @@
 			<key>Layout</key>
 			<array>
 				<dict>
+					<key>BecomeActive</key>
+					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -263,7 +265,6 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>36</integer>
 									<integer>34</integer>
 								</array>
 							</array>
@@ -332,8 +333,6 @@
 							<string>0pt</string>
 						</dict>
 						<dict>
-							<key>BecomeActive</key>
-							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -370,9 +369,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>48691D3E0B88A13A007583CB</string>
+				<string>48FAA8D20BBF00080085AF75</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>48691D3F0B88A13A007583CB</string>
+				<string>48FAA8D30BBF00080085AF75</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -506,7 +505,6 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>487AAB1F084F74BE00633A19</string>
 		<string>/Users/jk/Development/breve/OSX/breve.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
@@ -548,12 +546,10 @@
 							<string>244pt</string>
 						</dict>
 						<dict>
-							<key>BecomeActive</key>
-							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXBuildLogShowsTranscriptDefaultKey</key>
-								<string>{{0, 217}, {1002, 231}}</string>
+								<string>{{0, 162}, {1002, 286}}</string>
 								<key>PBXProjectModuleGUID</key>
 								<string>XCMainBuildResultsModuleGUID</string>
 								<key>PBXProjectModuleLabel</key>
@@ -591,7 +587,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>487AAB1F084F74BE00633A19</string>
-				<string>48691D400B88A13A007583CB</string>
+				<string>485E51FD0BBEF7D000E498FA</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>

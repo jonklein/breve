@@ -44,12 +44,14 @@ Control : Swarm {
 		birds (list).
 		cloudTexture (object).
 		selection (object).
+		useDizzyCameraControl (int).
 
 		# the menu items corresponding to different flocking behaviors
 
 		wackyMenu (object).
 		obedientMenu (object).
 		normalMenu (object).
+		dizzyMenu (object).
 
 	+ to click on item (object):
 		if selection: selection hide-neighbor-lines.
@@ -69,6 +71,8 @@ Control : Swarm {
 		obedientMenu = (self add-menu named "Flock Obediently" for-method "flock-obediently").
 		normalMenu = (self add-menu named "Flock Normally" for-method "flock-normally").
 		wackyMenu = (self add-menu named "Flock Wackily" for-method "flock-wackily").
+		self add-menu-separator.
+		dizzyMenu = (self add-menu named "Use Dizzy Camera Control" for-method "toggle-dizzy").
 
 		self enable-lighting.
 		self move-light to (0, 20, 20).
@@ -90,7 +94,7 @@ Control : Swarm {
 
 		self offset-camera by (5, 1.5, 6).
 
-	self enable-shadows.
+		self enable-shadows.
 
 	+ to iterate:
 		item (object).
@@ -122,11 +126,23 @@ Control : Swarm {
 		self aim-camera at location.
 		# self zoom-camera to (.5 * topDiff) + 10.
 
+		if useDizzyCameraControl:
+			self set-camera-rotation y |location| x 0.0.
+
+
 		# call the superclass iterate method to step the simulation forward.
 
 		super iterate.
 
 	# The following methods are the menu items we provide.
+
+	+ to toggle-dizzy:
+		useDizzyCameraControl = !useDizzyCameraControl.
+
+		if useDizzyCameraControl:
+			dizzyMenu check.
+		else
+			dizzyMenu uncheck.
 
 	+ to squish:
 		item (object).
