@@ -1,11 +1,12 @@
-CC			= @CC@
-CXX			= @CXX@
-JAR			= @JAR@
+CC		= @CC@
+CXX		= @CXX@
+JAR		= @JAR@
 JAVAC		= @JAVAC@
-LEX			= @LEX@
+LEX		= @LEX@
 RANLIB		= @RANLIB@
-AR			= @AR@
+AR		= @AR@
 YACC		= @YACC@
+HAVEPERL 	= @HAVEPERL@
 
 @SET_MAKE@
 

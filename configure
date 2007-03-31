@@ -690,6 +690,7 @@ ARCHIVER
 ARCHIVE_SUFFIX
 EXE_SUFFIX
 PLATFORM
+HAVEPERL
 PLUGINFLAGS
 PLUGINIMP
 PLUGINLIB
@@ -6271,9 +6272,13 @@ fi
 # Dyanmically linking in Perl
 #
 
+HAVEPERL=0
+
 if test "x$perl" != "x"; then
 	OLDCPP=$CPPFLAGS
 	OLDLIB=$LIBS
+
+	HAVEPERL=1
 
 	PERLCPP=`perl -MExtUtils::Embed -e ccopts`
 	PERLLIB=`perl -MExtUtils::Embed -e ldopts`
@@ -6778,6 +6783,7 @@ _ACEOF
 
 		;;
 esac
+
 
 
 
@@ -12706,6 +12712,7 @@ ARCHIVER!$ARCHIVER$ac_delim
 ARCHIVE_SUFFIX!$ARCHIVE_SUFFIX$ac_delim
 EXE_SUFFIX!$EXE_SUFFIX$ac_delim
 PLATFORM!$PLATFORM$ac_delim
+HAVEPERL!$HAVEPERL$ac_delim
 PLUGINFLAGS!$PLUGINFLAGS$ac_delim
 PLUGINIMP!$PLUGINIMP$ac_delim
 PLUGINLIB!$PLUGINLIB$ac_delim
@@ -12722,7 +12729,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 90; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 91; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

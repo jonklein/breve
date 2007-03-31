@@ -127,9 +127,13 @@ fi
 # Dyanmically linking in Perl
 #
 
+HAVEPERL=0
+
 if test "x$perl" != "x"; then 
 	OLDCPP=$CPPFLAGS
 	OLDLIB=$LIBS
+
+	HAVEPERL=1
 
 	PERLCPP=`perl -MExtUtils::Embed -e ccopts`
 	PERLLIB=`perl -MExtUtils::Embed -e ldopts`
@@ -203,6 +207,7 @@ AC_SUBST(CXX)
 AC_SUBST(EXE_SUFFIX)
 AC_SUBST(LDFLAGS)
 AC_SUBST(PLATFORM)
+AC_SUBST(HAVEPERL)
 AC_SUBST(PLUGINFLAGS)
 AC_SUBST(PLUGINIMP)
 AC_SUBST(PLUGINLIB)
