@@ -19,7 +19,6 @@
 #include "steve.h"
 #include "camera.h"
 #include "gldraw.h"
-#include "java.h"
 #include "SimInstance.h"
 #include "BDialog.h"
 
