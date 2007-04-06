@@ -524,7 +524,7 @@ sub setDisplayShape {
 	my ($self, $theShape );
 	( $self, $theShape ) = @_;
 
-	if((!$theShape ) or (!$theShape->getPointer())) {
+	if(!$theShape or !$theShape->getPointer()) {
 	    die("Attempt to register Mobile object with uninitialized shape.");
 	}
 

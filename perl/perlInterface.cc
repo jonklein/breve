@@ -122,7 +122,7 @@ void brPerlCallInternalFunction( brInternalFunction *inFunc, brInstance *caller,
 
 void *brPerlSetController( brInstance *controller ) {
 
-	slMessage(DEBUG_ALL,"brPerlSetController() perl invocation.\n");
+//	slMessage(DEBUG_ALL,"brPerlSetController() perl invocation.\n");
 
 	brEngineSetController(breveEngine, controller);
 	//SvREFCNT_inc(controller);

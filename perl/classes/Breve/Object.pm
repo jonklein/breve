@@ -152,14 +152,15 @@ sub getType {
 sub init {
 	my $self;
 	( $self ) = @_;
-
+	
 	unless($self->{brInstance}) {
 	    Breve::brPerlAddInstance($self);
 	}
-
+	
 	if($self->isa("Breve::Control")) {
 	    unless($self->{controller}) {
-		Breve::brPerlSetController($self->{brInstance});
+
+			Breve::brPerlSetController($self->{brInstance});
 	    }
 	}
 

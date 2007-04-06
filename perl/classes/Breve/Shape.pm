@@ -202,6 +202,8 @@ sub setMass {
 
 package Breve::CustomShape;
 
+our @ISA = qw(Breve::Shape);
+
 ###A CustomShape is a subclass of (Shape) which allows the user to  construct an arbitrary convex shape by specifying the faces of  the shape. <P> The shapes must conform to the following rules: <li>The point (0, 0, 0) must be on <b>inside</b> (not outside or  on the surface of) the shape. <li>The shape must be convex. <li>The shape must be solid and sealed by the faces. </ul> <p> If any of these conditions are not met, you will get errors  and/or unexpected results.
 
 sub new {
@@ -227,13 +229,14 @@ sub finishShape {
 	my ($self, $theDensity );
 	( $self, $theDensity ) = @_;
 
+
 	return Breve::callInternal($self, "finishShape", $self->{ shapePointer }, $theDensity );
 }
 
 sub init {
 	my $self;
 	( $self ) = @_;
-
+	
 	$self->SUPER::init();
 
 	$self->{ shapePointer } = Breve::callInternal($self, "newShape");
@@ -252,6 +255,7 @@ sub new {
 	my $class = shift;
 	my $self = {};
 	bless $self, $class;
+	
 	return $self;
 }
 
@@ -260,13 +264,14 @@ sub initWith {
 
 	my ($self, $theRadius );
 	( $self, $theRadius ) = @_;
-
+	
 	$self->SUPER::init();
-
+	
 	$self->{ shapePointer } = Breve::callInternal($self, "newSphere", $theRadius, $self->{ density } );
 	if( !$self->{ shapePointer } ) {
 	    die("Could not create Sphere: invalid arguments" );
 	}
+	
 
 	return $self;
 }

@@ -660,7 +660,7 @@ sub getLightExposureCamera {
 	my $self;
 	( $self ) = @_;
 
-	$self->{ camera } = breve->createInstances( breve->Camera, 1 );
+	$self->{ camera } = Breve::Camera->new();
 	$self->{ camera }->setCameraPointer( Breve::callInternal($self, "getLightExposureCamera") );
 }
 
@@ -770,7 +770,7 @@ sub init {
 	
 	my $sphere = Breve::Sphere->new();
 	my $cube = Breve::Cube->new();
-	
+
 	$self->{ genericShape } = $sphere->initWith( 1.000000 );
 	$self->{ genericLinkShape } = $cube->initWith(  Breve::Vector->new( 0.100000, 1, 0.100000 ) );
 }
@@ -810,7 +810,7 @@ sub loadImage {
 	my $image = undef;
 
 	print "warning: the Control method 'load-image' is now deprecated!";
-	$image = breve->createInstances( breve->Image, 1 );
+	$image = Breve::Image->new();
 	if( $image->load( $file ) ) {
 		$self->{ loadedImages }[ $self->{ loadedImages } ] = $file;
 
@@ -1289,18 +1289,20 @@ sub toggleLighting {
 sub toggleRecordingToMovie {
 	my $self;
 	( $self ) = @_;
+	
+	die("toggleRecordingToMovie not implemented in Perl.\n");
 
-	if( $self->{ movie } ) {
-		$self->{ movieMenu }->uncheck();
-		$self->{ movie }->close();
-		breve->deleteInstances( $self->{ movie } );
-		return;
+#	if( $self->{ movie } ) {
+#		$self->{ movieMenu }->uncheck();
+#		$self->{ movie }->close();
+#		breve->deleteInstances( $self->{ movie } );
+#		return;
+#
+#	}
 
-	}
-
-	$self->{ movie } = breve->createInstances( breve->Movie, 1 );
-	$self->{ movie }->record( "simulation.mpeg" );
-	$self->{ movieMenu }->check();
+#	$self->{ movie } = breve->createInstances( breve->Movie, 1 );
+#	$self->{ movie }->record( "simulation.mpeg" );
+#	$self->{ movieMenu }->check();
 }
 
 sub toggleReflections {

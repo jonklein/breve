@@ -35,25 +35,6 @@ xs_init(pTHX)
 void brPerlTypeToEval( SV* arg, brEval *outEval) {
 	switch(SvTYPE(arg)) {
 
-// see google: "illustrated perlguts" for descriptions
-/*
-			SVt_NULL,   // 0 
-	   SVt_IV,     // 1 
-	   SVt_NV,     // 2 
-	   SVt_RV,     // 3 
-	   SVt_PV,     // 4 
-	   SVt_PVIV,   // 5 
-	   SVt_PVNV,   // 6 
-	   SVt_PVMG,   // 7 
-	   SVt_PVBM,   // 8 
-	   SVt_PVLV,   // 9 
-	   SVt_PVAV,   // 10
-	   SVt_PVHV,   // 11 
-	   SVt_PVCV,   // 12
-	   SVt_PVGV,   //13 
-	   SVt_PVFM,   // 14
-	   SVt_PVIO // 15 	  */
-
 		case SVt_NULL: // null
 			slMessage(DEBUG_INFO, "handling NULL.\n");
 			outEval->set(0);
@@ -124,29 +105,45 @@ void brPerlTypeToEval( SV* arg, brEval *outEval) {
 					
 					outEval->set(m);
 
-					/*slMessage(0, "%f %f %f, %f %f %f, %f %f %f\n",
-							  m[0][0],m[0][1],m[0][2],
-						m[1][0],m[1][1],m[1][2],
-						m[2][0],m[2][1],m[2][2]);*/
-
 				} else {
 					slMessage(DEBUG_ALL,"Don't know how to handle class type %s.\n", HvNAME( SvSTASH(SvRV(arg)) ));
 					exit(1);
 				}
 
 			} else {
-				slMessage(0, "What is this perl reference?\n" );
+				
+				SV* deref = SvRV(arg);
+				
+				switch(SvTYPE(deref)) {
+
+				case SVt_PVAV: // array
+					slMessage(DEBUG_INFO,"handling array.\n");
+					brEvalListHead *list = new brEvalListHead;
+					int length = av_len((AV*)deref);
+					if(length >= 0) {
+						brEval item;
+						for(int i = 0; i <= length; i++) {
+							SV** av_item = av_fetch((AV*)deref, i, 0);
+							if(av_item) {
+								brPerlTypeToEval(*av_item, &item);
+								brEvalListInsert(list, list->_vector.size(), &item);
+							}
+						}
+						outEval->set(list);
+					}
+					break;
+					
+				case SVt_PVCV: // code ref
+					slMessage(DEBUG_ALL,"not handling code ref.\n"); break;
+				case SVt_PVHV: // hash
+					slMessage(DEBUG_ALL,"not handling hash.\n"); break;
+				case SVt_PVMG: // blessed scalar
+					slMessage(DEBUG_ALL,"not handling blessed-scalar pointer thing.\n"); break;
+				
+				}
 			}
 			break;
 	
-		case SVt_PVAV: // array
-			slMessage(DEBUG_ALL,"not handling array.\n"); break;
-		case SVt_PVCV: // code ref
-			slMessage(DEBUG_ALL,"not handling code ref.\n"); break;
-		case SVt_PVHV: // hash
-			slMessage(DEBUG_ALL,"not handling hash.\n"); break;
-		case SVt_PVMG: // blessed scalar
-			slMessage(DEBUG_ALL,"not handling blessed-scalar pointer thing.\n"); break;
 		default:
 			slMessage(DEBUG_ALL, "Can't handle SvTYPE (%d) for passed SV*.\n", SvTYPE(arg));
 	}

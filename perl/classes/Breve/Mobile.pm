@@ -138,7 +138,7 @@ sub getDistance {
 	my ($self, $otherObject );
 	( $self, $otherObject ) = @_;
 
-	return Breve::length( ( $self->getLocation() - $otherObject->getLocation() ) );
+	return	$self->getLocation()->SUBTRACT($otherObject->getLocation() )->length();
 }
 
 sub getForce {
@@ -236,7 +236,7 @@ sub relativeRotate {
 	( $self, $thisAxis, $amount ) = @_;
 	my $length = 0;
 
-	$length = Breve::length( $thisAxis );
+	$length = $thisAxis->length();
 	Breve::callInternal( $self, "linkRotateRelative", $self->{ realWorldPointer }, $thisAxis, $amount );
 }
 
