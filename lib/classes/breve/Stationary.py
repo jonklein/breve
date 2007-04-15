@@ -71,17 +71,30 @@ breve.Stationary = Stationary
 class Floor( breve.Stationary ):
 	'''A floor is a special case of the class OBJECT(Stationary).  It is a box  of size (1000, 5, 1000) with location (0, -2.5, 0), such that the ground  plane is placed at Y = 0.'''
 
-	__slots__ = [  ]
+	__slots__ = [ 'shape' ]
 
 	def __init__( self ):
 		breve.Stationary.__init__( self )
+		self.shape = None
 		Floor.init( self )
 
 	def init( self ):
 		''''''
 
 
-		self.register( breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 1000, 5, 1000 ) ), breve.vector( 0, -2.500000, 0 ) )
+		self.shape = breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 1000, 5, 1000 ) )
+		self.move( breve.vector( 0, -2.500000, 0 ) )
+		self.setShape( self.shape )
+
+	def setSize( self, newSize ):
+		'''Changes the size of the floor to newSize.'''
+
+
+		if self.shape:
+			breve.deleteInstances( self.shape )
+
+		self.shape = breve.createInstances( breve.Cube, 1 ).initWith( newSize )
+		self.setShape( self.shape )
 
 
 breve.Floor = Floor

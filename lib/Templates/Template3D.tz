@@ -1,0 +1,66 @@
+
+# 
+# Template3D.tz 
+# 
+# This is a simple template for creating simulations in which objects interact
+# in a 3D space.
+#
+# <jk [at] spiderland.org >
+# 04/07/2007
+#
+
+@use Mobile.
+@use Control.
+@use Stationary.
+
+# tell the engine the name of the controller
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+	% The controller object is created when the simulation starts.  All initialization code goes here.
+
+	+ to init:
+		# put initialization code here which creates objects and sets up the simulation
+
+		40 new myAgents.
+
+		self point-camera at ( 0, 0, 0 ) from ( 0, 40, 80 ).
+
+	+ to iterate:
+		# place code that should be called during every 
+		# iteration here.
+
+		super iterate.
+}
+
+# implement other objects in your simulation here
+
+Mobile : myAgent (aka myAgents) {
+	+ to init:
+		self move to random[ ( 50, 50, 50 ) ] - ( 25, 25, 25 ).
+		self set-velocity to random[ ( 2, 0, 2 ) ] - ( 1, 0, 1 ).
+		self set-color to random[ ( 1, 1, 1 ) ].
+
+	+ to iterate:
+		position, velocity (vector).
+
+		# keep the object inside the walls.
+
+		position = ( self get-location ).
+		velocity = ( self get-velocity ).
+
+		if ( position::x > 25 && velocity::x > 0 ) || ( position::x < -25 && velocity::x < 0 ):
+			self set-velocity to ( -velocity::x, velocity::y, velocity::z ).
+
+		if ( position::y > 25 && velocity::y > 0 ) || ( position::y < -25 && velocity::y < 0 ):
+			self set-velocity to ( velocity::x, -velocity::y, velocity::z ).
+			
+		if ( position::z > 25 && velocity::z > 0 ) || ( position::z < -25 && velocity::z < 0 ):
+			self set-velocity to ( velocity::x, velocity::y, -velocity::z ).
+
+		super iterate.
+
+}

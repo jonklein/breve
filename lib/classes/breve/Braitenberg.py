@@ -55,7 +55,6 @@ class BraitenbergVehicle( breve.MultiBody ):
 		sensor = None
 
 		sensor = breve.createInstances( breve.BraitenbergSensor, 1 )
-
 		sensor.setShape( self.sensorShape )
 		joint = breve.createInstances( breve.RevoluteJoint, 1 )
 		joint.setRelativeRotation( breve.vector( 0, 0, 1 ), -1.570000 )
@@ -65,7 +64,6 @@ class BraitenbergVehicle( breve.MultiBody ):
 		self.addDependency( sensor )
 		sensor.setColor( breve.vector( 0, 0, 0 ) )
 		self.sensors.append( sensor )
-
 		return sensor
 
 	def addWheel( self, location ):
@@ -300,8 +298,6 @@ class BraitenbergSensor( breve.Link ):
 			total = ( total / lights )
 
 		total = ( ( 50 * total ) * self.bias )
-
-
 		self.wheels.activate( total )
 
 	def link( self, w ):

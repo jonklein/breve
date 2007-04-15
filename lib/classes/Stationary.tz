@@ -82,7 +82,19 @@ Stationary : Floor {
 	% of size (1000, 5, 1000) with location (0, -2.5, 0), such that the ground 
 	% plane is placed at Y = 0.
 
+	+ variables:
+		shape (object).
+
 	+ to init:
-		self register with-shape (new Cube init-with size (1000, 5, 1000)) at-location (0, -2.5, 0).
-			# with-rotation [ ( .707, .707, 0 ), ( -.707, .707, 0 ), ( 0, 0, 1 ) ].
+		shape = ( new Cube init-with size (1000, 5, 1000 )).
+		self move to (0, -2.5, 0).
+		self set-shape to shape.
+
+	+ to set-size to newSize (vector):
+		% Changes the size of the floor to newSize.
+		if shape:
+			free shape.
+
+		shape = ( new Cube init-with size newSize ).
+		self set-shape to shape.
 }

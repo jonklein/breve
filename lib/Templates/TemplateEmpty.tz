@@ -1,0 +1,43 @@
+# include some frequently used classes and specify common classpaths
+@path "classes"
+@path "lib/classes"
+
+@use Mobile.
+@use Control.
+@use Stationary.
+
+# tell the engine the name of the controller
+
+Controller myController.
+
+# implment the controller object
+
+Control : myController {
+	% The controller object is created when the simulation starts.  All initialization code goes here.
+
+	+ to init:
+		# put initialization code here which creates objects
+		# and sets up the simulation
+
+		new Floor move to (0, -10, 0).
+
+		print "simulation started".
+
+
+	+ to iterate:
+		# place code that should be called during every 
+		# iteration here.
+
+		super iterate.
+}
+
+# implement other objects in your simulation here
+
+Mobile : myAgent (aka myAgents) {
+	% myAgent is an empty template for agents in the simulation
+
+	+ to init:
+
+	+ to iterate:
+
+}

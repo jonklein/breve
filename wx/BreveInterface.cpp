@@ -166,17 +166,17 @@ void BreveInterface::ResizeView(int x, int y) {
 }
 
 void BreveInterface::Iterate() {
-	if( mQueuedMessage.length() > 0 ) {
-		gBreverender->AppendLog( mQueuedMessage.c_str() );
-		mQueuedMessage = "";
-	}
-
 	if ( _engine == NULL || !initialized )
 		return;
 
 	if ( brEngineIterate( _engine ) != EC_OK) {
 		reportError();
 		Abort();
+	}
+
+	if( mQueuedMessage.length() > 0 ) {
+		gBreverender->AppendLog( mQueuedMessage.c_str() );
+		mQueuedMessage = "";
 	}
 
 	usleep( gBreverender->GetSleepMS() * 1000 );
@@ -283,10 +283,10 @@ int soundCallback() {
 }
 
 int pauseCallback() {
-	if (gBreverender->GetSimulation() == NULL)
+	if ( gBreverender->GetSimulation() == NULL )
 	return 0;
 
-	if (gBreverender->GetSimulation()->GetInterface()->Paused())
+	if ( gBreverender->GetSimulation()->GetInterface()->Paused() )
 	return 0;
 
 	gBreverender->OnRenderRunClick(*((wxCommandEvent*)NULL));

@@ -134,7 +134,6 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 	} else if ( ( breveInstance = PyObject_GetAttrStringSafe( inObject, "breveInstance" ) ) )  {
 
 		if( breveInstance == Py_None ) {
-			printf( "Null object.\n" );
 			outEval->set( (brInstance*)NULL );
 		} else {
 			outEval->set( (brInstance*)PyCObject_AsVoidPtr( breveInstance ) );
