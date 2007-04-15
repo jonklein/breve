@@ -46,6 +46,16 @@ Abstract : Joint (aka Joints) [version 2.3] {
 
   + section "Setting parameters for joint springs and damping (friction)"
 
+	+ to set-erp to erpValue (double):
+		% Sets the joint's error correction parameter.  See the ODE physics engine documentation for more details.
+		
+		jointSetERP( jointPointer, erpValue ).
+		
+	+ to set-cfm to cfmValue (double):
+		% Sets the joint's constraint force mixing parameter.  See the ODE physics engine documentation for more details.
+
+		jointSetCFM( jointPointer, cfmValue ).
+
 	+ to set-double-spring with-strength theStrength (float) with-max theMax (float) with-min theMin (float):
 		% Enable this joint's spring to take effect when the rotation is above
 		% theMax or below theMin.  When the position of the joint is between

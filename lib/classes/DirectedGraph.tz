@@ -343,7 +343,7 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 		seenhash{ self } = 1.
 
 		foreach connection in connections: {
-			if (connection get-target): (connection get-target) destroy-connected-objects with-seen seenhash.
+			if (connection get-target): (connection get-target) internal-destroy-connected-objects with-seen seenhash.
 			free connection.
 		}
 
@@ -388,7 +388,7 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 		seenhash{ self } = 1.
 
 		foreach connection in connections: {
-			if (connection get-target): (connection get-target) get-connected-nodes with-seen seenhash with-list seenlist.
+			if (connection get-target): (connection get-target) internal-get-connected-nodes with-seen seenhash with-list seenlist.
 		}
 
 		return seenlist.

@@ -54,6 +54,7 @@ class Stationary( breve.Real ):
 
 		self.realWorldPointer = breve.breveInternalFunctionFinder.addStationary( self, self.controller.getGenericShape().getPointer(), breve.vector( 0, 0, 0 ), breve.matrix(  1, 0, 0, 0, 1, 0, 0, 0, 1 ) )
 		self.setTexture( 0 )
+		self.setShape( self.controller.getGenericShape() )
 		return self
 
 	def register( self, theShape, theLocation = breve.vector( 0.000000, 0.000000, 0.000000 ), theRotation = breve.matrix( 1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 1.000000 ) ):

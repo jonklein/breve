@@ -22,7 +22,6 @@ Object : Real (aka Reals) [version 2.1] {
 		textureScaleX, textureScaleY (float).
 		neighborhoodSize (float).
 
-		eT (float).
 		e (float).
 		mu (float).
 
@@ -55,6 +54,9 @@ Object : Real (aka Reals) [version 2.1] {
 			die "attempt to move uninitialized Mobile object.".
 
 		realSetLocation(realWorldPointer, newLocation).
+
+	- to set-rotation to theRotation (matrix):
+		self set-rotation-matrix to theRotation.
 
 	+ to set-rotation-matrix to theRotation (matrix):
 		% Sets the rotation of this object to the rotation matrix theRotation.
@@ -234,17 +236,11 @@ Object : Real (aka Reals) [version 2.1] {
 		% elastic collision (such as a rubber ball).
 
 		e = newE.
-		realSetCollisionProperties(realWorldPointer, e, eT, mu).
+		realSetCollisionProperties(realWorldPointer, e, mu).
 
-	+ to set-eT to newET (float):
-		% Sets the "tangential coefficient of restitution", a
-		% frictional version of the "coefficient of restitution"
-		% described in the documentation for METHOD(set-e).  The
-		% value ranges from -1.0 to 1.0.  Negative values mean that
-		% friction pushes against the sliding object.
-
-		eT = newET.
-		realSetCollisionProperties(realWorldPointer, e, eT, mu).
+	- to set-eT to newET (float):
+		% Deprecated.
+		realSetCollisionProperties(realWorldPointer, e, mu).
 
 	+ to set-mu to newMu (float):
 		% Sets the coefficient of friction to newMu.  mu is a 
@@ -252,7 +248,7 @@ Object : Real (aka Reals) [version 2.1] {
 		% may be any value between 0 and infinity.
 
 		mu = newMu.
-		realSetCollisionProperties(realWorldPointer, e, eT, mu).
+		realSetCollisionProperties(realWorldPointer, e, mu).
 
   + section "Using Menus"
 

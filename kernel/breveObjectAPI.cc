@@ -423,9 +423,9 @@ void brInstanceRelease( brInstance *i ) {
  */
 
 void brEngineRemoveInstance( brEngine *e, brInstance *i ) {
-	// inform the camera of the change
-
 	std::vector<brInstance*>::iterator bi;
+
+	// inform the camera of the change
 
 	if ( e->camera ) e->camera->setRecompile();
 

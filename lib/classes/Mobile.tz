@@ -26,7 +26,6 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 
 	+ to init:
 		e = .2.
-		eT = .5.
 		mu = .2.
 
 		color = (1, 1, 1).

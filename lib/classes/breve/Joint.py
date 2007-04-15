@@ -209,6 +209,12 @@ class Joint( breve.Abstract ):
 		self.plinkPoint.z = ( self.plinkPoint.z * scale.z )
 		self.setParentLinkPoint( self.plinkPoint )
 
+	def setCfm( self, cfmValue ):
+		'''Sets the joint's constraint force mixing parameter.  See the ODE physics engine documentation for more details.'''
+
+
+		breve.breveInternalFunctionFinder.jointSetCFM( self, self.jointPointer, cfmValue )
+
 	def setChildLinkPoint( self, linkPoint ):
 		'''Dynamically sets the child's link point for this joint.  This method can be called over the course of the simulation to change the way the joint works. <p> If the Joint is not linked, this call has no effect.'''
 
@@ -230,6 +236,12 @@ class Joint( breve.Abstract ):
 		self.springMin = theMin
 		self.springStrength = theStrength
 		breve.breveInternalFunctionFinder.jointSetSpring( self, self.jointPointer, theStrength, theMin, theMax )
+
+	def setErp( self, erpValue ):
+		'''Sets the joint's error correction parameter.  See the ODE physics engine documentation for more details.'''
+
+
+		breve.breveInternalFunctionFinder.jointSetERP( self, self.jointPointer, erpValue )
 
 	def setJointDamping( self, dampingValue ):
 		'''Sets the joint damping--the friction of the joint.  '''

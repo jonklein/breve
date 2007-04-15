@@ -25,7 +25,7 @@ Control : GS {
 	+ variables:
 		U (object).
 		V (object).
-		tempreact, temp, inflow (object).
+		deltareact, delta, inflow (object).
 		texture (object).
 		cube (object).
 
@@ -42,13 +42,13 @@ Control : GS {
 		U = new Matrix2D.
 		V = new Matrix2D.
 		inflow = new Matrix2D.
-		temp = new Matrix2D.
-		tempreact = new Matrix2D.
+		delta = new Matrix2D.
+		deltareact = new Matrix2D.
 
 		U set-size x SIZE y SIZE.
 		V set-size x SIZE y SIZE.
-		temp set-size x SIZE y SIZE.
-		tempreact set-size x SIZE y SIZE.
+		delta set-size x SIZE y SIZE.
+		deltareact set-size x SIZE y SIZE.
 		inflow set-size x SIZE y SIZE.
 
 		texture = new MatrixImage.
@@ -63,29 +63,53 @@ Control : GS {
 
 		for n=0,n<SIZE,n++:
 			for m=0,m<SIZE,m++: {
-				U set-value to (0.5 + sqrt(|0.25 - F*(1.0 + K/F)*(1.0 + K/F)|) + 0.01*(random[1.0] - 0.5)) at-x m at-y n.
-				V set-value to (1.0 - (U get-value at-x m at-y n))/(1.0 + K/F) + 0.01*(random[1.0] - 0.5) at-x m at-y n.
+				U set-value to (0.5 + sqrt(|0.25 - F*(1.0 + K/F)*(1.0 + K/F)|) + 0.02*(random[1.0] - 0.5)) at-x m at-y n.
+				V set-value to (1.0 - (U get-value at-x m at-y n))/(1.0 + K/F) + 0.02*(random[1.0] - 0.5) at-x m at-y n.
 
 				inflow set-value to F at-x n at-y m.
 			}
 
 	+ to iterate:
-		tempreact copy from U.
-		tempreact multiply-with-values of V.
-		tempreact multiply-with-values of V.
+		# First compute the reaction delta, which will tell us the gain in V and 
+		# loss of U due to the reaction.
 
-		temp compute-periodic-diffusion-matrix from U with-scale RU.
+		# U + 2V => 3V (V is catalyzed by the presence of 2V)
 
-		temp add-values of tempreact scaled-by -1.0.
-		temp add-values of U scaled-by -F.
-		temp add-values of inflow.
-		U add-values of temp scaled-by TIMESTEP.
+		deltareact copy from U.
+		deltareact multiply-with-values of V.
+		deltareact multiply-with-values of V.
 
-		temp compute-periodic-diffusion-matrix from V with-scale RV.
+		# Compute the diffusion of U (with diffusion constant RU)
 
-		temp add-values of tempreact.
-		temp add-values of V scaled-by -(K + F).
-		V add-values of temp scaled-by TIMESTEP.
+		delta compute-periodic-diffusion-matrix from U with-scale RU.
+
+		# delta contains the diffused values of U.  Now subtract out the reaction values,
+		# subtract the outflow values, and add the inflow rate. 
+
+		delta add-values of deltareact scaled-by -1.0.
+		delta add-values of U scaled-by -F.
+		delta add-values of inflow.
+
+		# Integrate the delta matrix to compute the next value of U
+		U add-values of delta scaled-by TIMESTEP.
+
+
+		### Done with U, now let's do V
+
+		# Set delta to the diffusion of V (with diffusion constant RV)
+
+		delta compute-periodic-diffusion-matrix from V with-scale RV.
+
+		# Add to the delta the previously computed reaction matrix.  Then subtract out
+		# V * -(K + F) which represents chemical decay and outflow.
+
+		delta add-values of deltareact.
+		delta add-values of V scaled-by -(K + F).
+	
+		# Integrate the delta matrix to compute the next value of V
+		V add-values of delta scaled-by TIMESTEP.
+
+		# Done!
 
 		super iterate.
 }

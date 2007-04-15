@@ -133,8 +133,14 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 
 	} else if ( ( breveInstance = PyObject_GetAttrStringSafe( inObject, "breveInstance" ) ) )  {
 
-		outEval->set( (brInstance*)PyCObject_AsVoidPtr( breveInstance ) );
-		Py_DECREF( breveInstance );
+		if( breveInstance == Py_None ) {
+			printf( "Null object.\n" );
+			outEval->set( (brInstance*)NULL );
+		} else {
+			outEval->set( (brInstance*)PyCObject_AsVoidPtr( breveInstance ) );
+			Py_DECREF( breveInstance );
+		}
+
 		result = EC_OK;
 
 	} else if( PyObject_HasAttrString( inObject, "isMatrix" ) ) {
@@ -256,7 +262,10 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 			break;
 
 		case AT_POINTER:
-			result = PyCObject_FromVoidPtr( BRPOINTER( inEval ), NULL );
+			if( BRPOINTER( inEval ) ) 
+				result = PyCObject_FromVoidPtr( BRPOINTER( inEval ), NULL );
+			else 
+				result = Py_None;
 			break;
 
 		case AT_VECTOR:
@@ -403,8 +412,19 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 	// We may need to create it ourselves.
 
 	PyObject *breveTypeObject = PyObject_GetAttrString( typeObject, "breveObject" );
+	PyObject *nameObject = PyObject_GetAttrString( typeObject, "__name__" );
+	char *name = PyString_AsString( nameObject );
 
-	if( !breveTypeObject ) {
+	if( breveTypeObject ) {
+		// Found an existing breve object 
+		breveObject = (brObject*)PyCObject_AsVoidPtr( breveTypeObject );
+		Py_DECREF( breveTypeObject );
+	}
+
+	// If there was no breveObject, or if the name doesn't match, as is the case when a base
+	// class has been added, but not the child
+
+	if( !breveTypeObject || strcmp( name, breveObject->name ) ) {
 		// Clear the missing attr error 
 		PyErr_Clear();
 
@@ -414,8 +434,6 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 			PyErr_SetString( PyExc_RuntimeError, "Internal error while adding breve class type for Python object" );
 			return NULL;
 		}
-
-		char *name = PyString_AsString( nameObject );
 
 		Py_DECREF( nameObject );
 
@@ -431,15 +449,7 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 		PyObject_SetAttrString( typeObject, "breveObject", PyCObject_FromVoidPtr( breveObject, NULL ) );
 
 		Py_DECREF( pythonLanguageType );
-	} else {
-		// Found an existing brObject type for this Python class
-
-		PyObject *breveTypeObject = PyObject_GetAttrString( typeObject, "breveObject" );
-
-		breveObject = (brObject*)PyCObject_AsVoidPtr( breveTypeObject );
-
-		Py_DECREF( breveTypeObject );
-	}
+	} 
 
 	brInstance *i = brEngineAddInstance( engine, breveObject, object );
 
@@ -475,7 +485,7 @@ PyObject *brPythonRemoveInstance( PyObject *inSelf, PyObject *inArgs ) {
 	brEngine *engine = ( brEngine* )PyCObject_AsVoidPtr( engineObject );
 	brInstance *instance = ( brInstance* )PyCObject_AsVoidPtr( breveObject );
 
-	brEngineRemoveInstance( engine, instance );
+	brInstanceRelease( instance );
 
 	Py_DECREF( breveObject );
 
@@ -541,6 +551,11 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 		return NULL;
 	}
 
+	if( breveObject == Py_None ) {
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+
 	brInstance *caller = ( brInstance* )PyCObject_AsVoidPtr( breveObject );
 
 	Py_DECREF( breveObject );
@@ -569,7 +584,7 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 		for( int n = 0; n < argCount; n++ ) {
 			brPythonTypeToEval( PyTuple_GET_ITEM( arguments, n ), &args[ n ] );
 
-			if( args[ n ].type() != function->_argTypes[ n ] ) {
+			if( function->_argTypes[ n ] != AT_UNDEFINED && args[ n ].type() != function->_argTypes[ n ] ) {
 
 				// int <=> double conversion 
 
@@ -579,7 +594,7 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 					 args[ n ].set( (int)BRDOUBLE( &args[ n ] ) );
 				} else {
 					char err[ 1024 ];
-					snprintf( err, 1023, "invalid type for argument %d of internal function \"%s\" (got \"%s\", expected \"%s\")", n, function->_name.c_str(), brAtomicTypeStrings[ args[ n ].type() ], brAtomicTypeStrings[ function->_argTypes[ n ] ] );
+					snprintf( err, 1023, "invalid type for argument %d of internal function \"%s\" (got \"%s\", expected \"%s\" )", n, function->_name.c_str(), brAtomicTypeStrings[ args[ n ].type() ], brAtomicTypeStrings[ function->_argTypes[ n ] ] );
 
 					PyErr_SetString( PyExc_RuntimeError, err );
 					return NULL;
@@ -750,13 +765,6 @@ void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inT
 
 	std::string symbol = std::string( inName );
 	const char *name = brPyConvertSymbol( symbol ).c_str();
-
-	/*
-	// Translate steve to Python method names
-	for( unsigned int n = 0; n < strlen( name ); n++ ) {
-		if( name[ n ] == '-' ) name[ n ] = '_';
-	}
-	*/
 
 	PyObject *method = PyObject_GetAttrStringSafe( type, name );
 

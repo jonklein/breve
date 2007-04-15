@@ -32,7 +32,7 @@ class Link( breve.Mobile ):
 		''''''
 
 
-		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, 0.200000, 0.500000, 0.200000 )
+		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, 0.200000, 0.200000 )
 		self.enablePhysics()
 
 

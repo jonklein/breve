@@ -57,10 +57,10 @@ MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
 		bodyShape init-with-cube size (4.0, .75, 3.0).	
 
 		wheelShape = new Shape.
-		wheelShape init-with-polygon-disk radius ( self get-wheel-radius ) sides 40 height ( self get-wheel-width ).
+		wheelShape init-with-polygon-disk sides 40 height ( self get-wheel-width ) radius ( self get-wheel-radius ).
 
 		sensorShape = new Shape.
-		sensorShape init-with-polygon-cone radius .2 sides 10 height .5.
+		sensorShape init-with-polygon-cone sides 10 height .5 radius .2.
 
 		bodyShape set-density to ( self get-density ).
 		bodyLink = new Link.
@@ -97,8 +97,10 @@ MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
 		joint = new RevoluteJoint.
 
 		joint set-relative-rotation around-axis (1, 0, 0) by 1.5708.
-		joint link parent bodyLink to-child wheel with-normal (0, 0, 1)
-					with-parent-point location with-child-point (0, 0, 0).
+		joint link with-normal (0, 0, 1)
+			with-parent-point location 
+			with-child-point (0, 0, 0) 
+			to-child wheel parent bodyLink.
 
 		wheel set-eT to .8.
 		wheel set-texture to 0.
@@ -127,8 +129,10 @@ MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
 		joint = new RevoluteJoint.
 
 		joint set-relative-rotation around-axis (0, 0, 1) by -1.57.
-		joint link parent bodyLink to-child sensor with-normal (1, 0, 0)
-					with-parent-point location with-child-point (0, 0, 0).
+		joint link with-normal (1, 0, 0)
+			with-parent-point location 
+			with-child-point (0, 0, 0)
+			to-child sensor parent bodyLink.
 
 		joint set-double-spring with-strength 300 with-max 0.01 with-min -0.01.
 

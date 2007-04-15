@@ -1,15 +1,52 @@
 #include "simulation.h"
 #include "joint.h"
 
-/*!
-	\brief Applies a force on a joint's DOFs
+void slJoint::setERP( double inValue ) {
+	switch ( _type ) {
+		case JT_PRISMATIC:
+			if( _odeJointID ) dJointSetSliderParam( _odeJointID, dParamStopERP, inValue );
+			break;
 
-	This can be either force or torque, depending on the type of joint.
+		case JT_REVOLUTE:
+			if( _odeJointID ) dJointSetHingeParam( _odeJointID, dParamStopERP, inValue );
+			break;
 
-	We do this not by setting the torque and force directly, because it will
-	be cleared after the next physics engine step.  Instead, we compute the
-	values and store them in the externalForce vectors for each body.
-*/
+		case JT_UNIVERSAL:
+		case JT_BALL:
+			if( _odeMotorID ) {
+				dJointSetAMotorParam( _odeMotorID, dParamStopERP, inValue );
+				dJointSetAMotorParam( _odeMotorID, dParamStopERP2, inValue );
+				dJointSetAMotorParam( _odeMotorID, dParamStopERP3, inValue );
+			}
+			break;
+	}
+}
+
+void slJoint::setCFM( double inValue ) {
+	switch ( _type ) {
+		case JT_PRISMATIC:
+			if( _odeJointID ) dJointSetSliderParam( _odeJointID, dParamCFM, inValue );
+			break;
+
+		case JT_REVOLUTE:
+			if( _odeJointID ) dJointSetHingeParam( _odeJointID, dParamCFM, inValue );
+			break;
+
+		case JT_UNIVERSAL:
+			if( _odeJointID ) dJointSetUniversalParam( _odeJointID, dParamCFM, inValue );
+		case JT_BALL:
+			if( _odeMotorID ) dJointSetAMotorParam( _odeMotorID, dParamCFM, inValue );
+			break;
+	}
+}
+
+/**
+ * \brief Applies a force on a joint's DOFs
+ * This can be either force or torque, depending on the type of joint.
+ * We do this not by setting the torque and force directly, because it will
+ * be cleared after the next physics engine step.  Instead, we compute the
+ * values and store them in the externalForce vectors for each body.
+ */
 
 void slJoint::applyJointForce( slVector *force ) {
 	const dReal *t;

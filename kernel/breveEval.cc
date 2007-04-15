@@ -21,7 +21,7 @@
 #include "kernel.h"
 
 char *brAtomicTypeStrings[] = {
-	NULL,
+	"<invalid type>",
 	"NULL",
 	"int",
 	"double",

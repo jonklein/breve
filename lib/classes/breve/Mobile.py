@@ -146,7 +146,6 @@ class Mobile( breve.Real ):
 
 
 		self.e = 0.200000
-		self.eT = 0.500000
 		self.mu = 0.200000
 		self.color = breve.vector( 1, 1, 1 )
 		self.realWorldPointer = breve.breveInternalFunctionFinder.linkNew( self)

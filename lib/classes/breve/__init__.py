@@ -85,7 +85,7 @@ def createInstances( inClass, inCount ):
 
 	instances = objectList()
 
-	for i in range( inCount ):
+	for i in range( int( inCount ) ):
 		instances.append( inClass() )
 
 	return instances
@@ -93,28 +93,23 @@ def createInstances( inClass, inCount ):
 def deleteInstances( inInstances ):
 	"Delete one or more instances of a breve class"
 
-	# print "Deleting %s" % inInstances
-
 	if issubclass( inInstances.__class__, list ):
 		for i in inInstances:
-			i.destroy()
-			i.delete()
-			breveInternal.removeInstance( breveInternal.breveEngine, i )
-			all = allInstances( i.__class__.__name__ )
-			if i in all:
-				all.remove( i )
-			del i
+			deleteInstance( i )
+	else:
+		deleteInstance( inInstances )
 
-		return
+def deleteInstance( inInstance ):
+	if inInstance.breveInstance != None:
+		inInstance.destroy()
+		inInstance.delete()
+		breveInternal.removeInstance( breveInternal.breveEngine, inInstance )
+		all = allInstances( inInstance.__class__.__name__ )
+		if inInstance in all:
+			all.remove( inInstance )
 
-	inInstances.destroy()
-	inInstances.delete()
-	breveInternal.removeInstance( breveInternal.breveEngine, inInstances )
-	all = allInstances( inInstances.__class__.__name__ )
-	if inInstances in all:
-		all.remove( inInstances )
-
-	del inInstances
+		inInstance.breveInstance = None;
+		del inInstance
 
 def executeCachedMethod( obj, method ):
 	if not obj.__dict__.has_key( method ):
@@ -174,7 +169,7 @@ def randomExpression( inValue ):
 		raise Exception( "Cannot create random expression" )
 
 	if inValue.__class__ == vector:
-		return vector( random.uniform( 0, abs( inValue.x ) ), random.uniform( 0, abs( inValue.z ) ), random.uniform( 0, abs( inValue.z ) ) )
+		return vector( random.uniform( 0, abs( inValue.x ) ), random.uniform( 0, abs( inValue.y ) ), random.uniform( 0, abs( inValue.z ) ) )
 
 	if inValue.__class__ == int:
 		return random.randint( 0, abs( inValue ) )
@@ -211,6 +206,7 @@ class vector( object ):
 	"A 3D vector class used for breve"
 	__slots__ = ( 'x', 'y', 'z', 'isVector' )
 
+	defaults = { 'x' : 0.0, 'y' : 0.0, 'z' : 0.0, 'isVector' : 1 }
 
 	def __init__( self, x = 0.0, y = 0.0, z = 0.0 ):
 		self.x = x
@@ -241,9 +237,9 @@ class vector( object ):
 
 	def __mul__( self, other ):
 		if hasattr( other, '__class__' ) and other.__class__ == matrix:
-			x = self.x * self.x1 + self.y * self.x2 + self.z * self.x3
-			y = self.x * self.y1 + self.y * self.y2 + self.z * self.y3
-			z = self.x * self.z1 + self.y * self.z2 + self.z * self.z3
+			x = self.x * other.x1 + self.y * other.x2 + self.z * other.x3
+			y = self.x * other.y1 + self.y * other.y2 + self.z * other.y3
+			z = self.x * other.z1 + self.y * other.z2 + self.z * other.z3
 
 			return vector( x, y, z )
 
@@ -272,7 +268,6 @@ class vector( object ):
 			self.x /= len
 			self.y /= len
 			self.z /= len
-
 
 #
 # Import all of the standard breve classes

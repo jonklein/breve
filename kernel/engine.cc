@@ -436,14 +436,13 @@ brEvent *brEngineAddEvent( brEngine *e, brInstance *i, char *methodName, double 
 	return event;
 }
 
-/*!
-	\brief Iterates the breve engine.
-
-	Iterates an engine by:
-		- checking for freed objects
-		- calling the iterate method for all objects in the engine
-		- checking to see if the time has come for an event to be called
-*/
+/**
+ * Iterates the breve engine.
+ * Iterates an engine by:
+ * - checking for freed objects
+ * - calling the iterate method for all objects in the engine
+ * - checking to see if the time has come for an event to be called
+ */
 
 int brEngineIterate( brEngine *e ) {
 	brEval result;

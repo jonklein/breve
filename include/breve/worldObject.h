@@ -78,7 +78,6 @@ class slWorldObject {
 			_userData = NULL;
 
 			_e = 0.4;
-			_eT = 0.2;
 			_mu = 0.15;
 
 			slVectorSet(&_color, 1, 1, 1);
@@ -106,7 +105,6 @@ class slWorldObject {
 		void setCallbackData( void *data );
 		void *getCallbackData();
 		void setCollisionE( double e );
-		void setCollisionET( double eT );
 		void setCollisionMU( double mu );
 		void setNeighborhoodSize( double size );
 		void setColor( slVector *color );
@@ -189,7 +187,6 @@ class slWorldObject {
 		bool _moved;
 	
 		double _e;
-		double _eT;
 		double _mu;
 
 		std::vector<slWorldObject*> _neighbors;

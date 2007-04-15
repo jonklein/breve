@@ -4,7 +4,7 @@ import breve
 class Real( breve.Object ):
 	'''A class which is never instantiated--just used as a logical distinction from the Abstract classes.  See the child classes OBJECT(Mobile), OBJECT(Link) and OBJECT(Stationary) for more information.  The methods documented here may be used  with any of the child classes.'''
 
-	__slots__ = [ 'bitmap', 'collisionHandlerList', 'collisionShape', 'color', 'displayShape', 'e', 'eT', 'lightmap', 'lines', 'menus', 'mu', 'neighborhoodSize', 'realWorldPointer', 'texture', 'textureScaleX', 'textureScaleY' ]
+	__slots__ = [ 'bitmap', 'collisionHandlerList', 'collisionShape', 'color', 'displayShape', 'e', 'lightmap', 'lines', 'menus', 'mu', 'neighborhoodSize', 'realWorldPointer', 'texture', 'textureScaleX', 'textureScaleY' ]
 
 	def __init__( self ):
 		breve.Object.__init__( self )
@@ -14,7 +14,6 @@ class Real( breve.Object ):
 		self.color = breve.vector()
 		self.displayShape = None
 		self.e = 0
-		self.eT = 0
 		self.lightmap = 0
 		self.lines = breve.objectList()
 		self.menus = breve.objectList()
@@ -389,14 +388,13 @@ class Real( breve.Object ):
 
 
 		self.e = newE
-		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, self.e, self.eT, self.mu )
+		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, self.e, self.mu )
 
 	def setET( self, newET ):
-		'''Sets the "tangential coefficient of restitution", a frictional version of the "coefficient of restitution" described in the documentation for METHOD(set-e).  The value ranges from -1.0 to 1.0.  Negative values mean that friction pushes against the sliding object.'''
+		'''Deprecated.'''
 
 
-		self.eT = newET
-		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, self.e, self.eT, self.mu )
+		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, self.e, self.mu )
 
 	def setLightmap( self, textureNumber ):
 		'''Deprecated.'''
@@ -421,7 +419,7 @@ class Real( breve.Object ):
 
 
 		self.mu = newMu
-		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, self.e, self.eT, self.mu )
+		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, self.e, self.mu )
 
 	def setNeighborhoodSize( self, size ):
 		'''Used in conjunction with METHOD(get-neighbors), this function will set the neighborhood size for the current object.'''
@@ -429,6 +427,12 @@ class Real( breve.Object ):
 
 		self.neighborhoodSize = size
 		breve.breveInternalFunctionFinder.realSetNeighborhoodSize( self, self.realWorldPointer, size )
+
+	def setRotation( self, theRotation ):
+		''''''
+
+
+		self.setRotationMatrix( theRotation )
 
 	def setRotation( self, thisAxis, amount ):
 		'''Sets the rotation of this object around vector axis thisAxis  by scalar amount (in radians).  This is an "absolute" rotation--the  current rotation of the object does not affect how the  object will be rotated.  For a rotation relative to the  current orientation, set METHOD(relative-rotate).'''

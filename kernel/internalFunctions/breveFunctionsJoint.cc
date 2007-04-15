@@ -28,11 +28,23 @@
 #define BRJOINTPOINTER(p)	((slJoint*)BRPOINTER(p))
 #define BRLINKPOINTER(p)	((slLink*)BRPOINTER(p))
 
-/*!
-	\brief Applies torque or force to a joint's DOFs.
+int brIJointSetCFM( brEval args[], brEval *target, brInstance *i ) {
+	slJoint *j = BRJOINTPOINTER( &args[0] );
+	j->setCFM( BRDOUBLE( &args[ 1 ] ) );
+	return EC_OK;
+}
 
-	Since the joint may be 1, 2 or 3 DOF, some elements of the force vector may not be used.
-*/
+int brIJointSetERP( brEval args[], brEval *target, brInstance *i ) {
+	slJoint *j = BRJOINTPOINTER( &args[0] );
+	j->setERP( BRDOUBLE( &args[ 1 ] ) );
+	return EC_OK;
+}
+
+/**
+ *	\brief Applies torque or force to a joint's DOFs.
+ *
+ * Since the joint may be 1, 2 or 3 DOF, some elements of the force vector may not be used.
+ */
 
 int brIJointApplyForce( brEval args[], brEval *target, brInstance *i ) {
 	slJoint *j = BRJOINTPOINTER( &args[0] );
@@ -420,11 +432,9 @@ int brIJointSetMaxStrength( brEval args[], brEval *target, brInstance *i ) {
 	return EC_OK;
 }
 
-/*!
-	\brief Sets the repositionAll flag for the joint.
-
-	jointSetMaxStrength(slJoint pointer joint, double max torque).
-*/
+/**
+ * Sets the repositionAll flag for the joint.
+ */
 
 int brIJointSetRepositionAll( brEval args[], brEval *target, brInstance *i ) {
 	slJoint *j = BRJOINTPOINTER( &args[0] );
@@ -437,6 +447,9 @@ int brIJointSetRepositionAll( brEval args[], brEval *target, brInstance *i ) {
 /*@}*/
 
 void breveInitJointFunctions( brNamespace *n ) {
+	brNewBreveCall( n, "jointSetERP", brIJointSetERP, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "jointSetCFM", brIJointSetCFM, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
+
 	brNewBreveCall( n, "jointApplyForce", brIJointApplyForce, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
 	brNewBreveCall( n, "jointLinkRevolute", brJointILinkRevolute, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, AT_INT, 0 );
 	brNewBreveCall( n, "jointLinkPrismatic", brJointILinkPrismatic, AT_POINTER, AT_UNDEFINED, AT_POINTER, AT_VECTOR, AT_VECTOR, AT_VECTOR, AT_MATRIX, AT_INT, 0 );

@@ -68,7 +68,7 @@ void slMatrixGLMult( double m[3][3] ) {
 	d[3][2] = 0;
 	d[3][3] = 1;
 
-	glMultMatrixd(( double * )d );
+	glMultMatrixd( (double*)d );
 }
 
 /*!
@@ -149,9 +149,9 @@ void slInitGL( slWorld *w, slCamera *c ) {
 	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 90 );
 }
 
-/*!
-	\brief Initializes 3 sphere draw lists.
-*/
+/**
+ * Initializes 3 sphere draw lists.
+ */
 
 void slCompileSphereDrawList( int l ) {
 	GLUquadricObj *quad;
@@ -189,9 +189,9 @@ void slCenterPixelsInSquareBuffer( unsigned char *pixels, int width, int height,
 		        width * 4 );
 }
 
-/*!
-	\brief Allocates space for a new texture.
-*/
+/**
+ * Allocates space for a new texture.
+ */
 
 unsigned int slTextureNew( slCamera *c ) {
 	GLuint texture;
@@ -275,10 +275,10 @@ int slCamera::select( slWorld *w, int x, int y ) {
 	unsigned int min, nearest = 0xffffffff;
 	unsigned int hit = w->_objects.size() + 1;
 
-	viewport[0] = _originx;
-	viewport[1] = _originy;
-	viewport[2] = _width;
-	viewport[3] = _height;
+	viewport[ 0 ] = _originx;
+	viewport[ 1 ] = _originy;
+	viewport[ 2 ] = _width;
+	viewport[ 3 ] = _height;
 
 	glSelectBuffer( BUFFER_SIZE, selection_buffer );
 	glRenderMode( GL_SELECT );

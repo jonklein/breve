@@ -19,7 +19,7 @@ class Object( object ):
                 Object.init( self )
 
 	def __del__( self ):
-		print "Deleting ", self
+		pass
 
 	def addDependency( self, i ):
 		'''Makes this instance depend on instance i when archiving and  dearchiving.  This means that if this instance is archived, then i will also have to be archived, and that when this  instance is dearchived, that i will have to be dearchived  first. <p> Dependencies can cause large numbers of instances to be archived in response to a single archiving event (as dependencies of  dependencies, and dependencies of dependencies of dependencies, ad infinitum will also be archived).  This means that you should make dependencies sparingly, only when absolutely required. <p> Circular dependencies are forbidden.'''

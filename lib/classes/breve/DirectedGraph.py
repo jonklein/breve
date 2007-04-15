@@ -378,7 +378,7 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 		seenhash[ self ] = 1
 		for connection in self.connections:
 			if connection.getTarget():
-				connection.getTarget().destroyConnectedObjects( seenhash )
+				connection.getTarget().internalDestroyConnectedObjects( seenhash )
 
 			breve.deleteInstances( connection )
 
@@ -398,7 +398,7 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 		seenhash[ self ] = 1
 		for connection in self.connections:
 			if connection.getTarget():
-				connection.getTarget().getConnectedNodes( seenhash, seenlist )
+				connection.getTarget().internalGetConnectedNodes( seenhash, seenlist )
 
 
 

@@ -94,6 +94,18 @@ class PhysicalControl( breve.Control ):
 		self.pointCamera( breve.vector( 0, 0, 0 ), breve.vector( 0, 10, 30 ) )
 		self.moveLight( breve.vector( 0, 30, 15 ) )
 
+	def setCfm( self, cfmValue ):
+		'''Sets the constraint force mixing paremter for the world.  See the ODE physics engine documentation for more details.'''
+
+
+		breve.breveInternalFunctionFinder.worldSetCFM( self, cfmValue )
+
+	def setErp( self, erpValue ):
+		'''Sets the error correction parameter for the world.  See the ODE physics engine documentation for more details.'''
+
+
+		breve.breveInternalFunctionFinder.worldSetERP( self, erpValue )
+
 	def setFastPhysicsIterations( self, iterations ):
 		'''Sets the iterations parameter for the fast physics algorithm.  This parameter can be tuned to give better speed or better accuracy. The default value is 40.'''
 

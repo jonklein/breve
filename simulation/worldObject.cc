@@ -41,10 +41,6 @@ void slWorldObject::setCollisionE( double e ) {
 	_e = e;
 }
 
-void slWorldObject::setCollisionET( double eT ) {
-	_eT = eT;
-}
-
 void slWorldObject::setCollisionMU( double mu ) {
 	_mu = mu;
 }

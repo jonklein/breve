@@ -56,6 +56,16 @@ Control : PhysicalControl [version 1.8] {
 
 		setStepFast(0).
 
+	+ to set-erp to erpValue (float):
+		% Sets the error correction parameter for the world.  See the ODE physics engine documentation for more details.
+
+		worldSetERP( erpValue ).
+
+	+ to set-cfm to cfmValue (float):
+		% Sets the constraint force mixing paremter for the world.  See the ODE physics engine documentation for more details.
+
+		worldSetCFM( cfmValue ).
+
 	- to enable-auto-disable:
 		setAutoDisableFlag( 1 ).
 
@@ -69,7 +79,7 @@ Control : PhysicalControl [version 1.8] {
 
 		worldSetGravity(newGravity).
 
-   + to zero-gravity:
+	+ to zero-gravity:
 		% Turns off gravity in the simulated world.
 
 		self set-gravity to (0.0, -9.8 * 0, 0.0).

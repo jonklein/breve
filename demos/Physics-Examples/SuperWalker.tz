@@ -434,6 +434,9 @@ MultiBody : Creature {
 		joints set-double-spring with-strength 200 with-max .6 with-min -.6.
 		joints set-strength-limit to 250.
 
+		joints set-cfm to 0.01.
+		controller set-cfm to 0.01.
+
 		self enable-self-collisions.
 
 	# to center the object, we set the X and Z components to 0, but not

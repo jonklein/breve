@@ -149,12 +149,10 @@ int brIRealGetRotation( brEval args[], brEval *target, brInstance *i ) {
 int brIRealSetCollisionProperties( brEval args[], brEval *target, brInstance *i ) {
 	slWorldObject *o = BRWORLDOBJECTPOINTER( &args[0] );
 
-	double e = BRDOUBLE( &args[1] );
-	double eT = BRDOUBLE( &args[2] );
-	double mu = BRDOUBLE( &args[3] );
+	double e = BRDOUBLE( &args[ 1 ] );
+	double mu = BRDOUBLE( &args[ 2 ] );
 
 	o->setCollisionE( e );
-	o->setCollisionET( eT );
 	o->setCollisionMU( mu );
 
 	return EC_OK;
@@ -482,7 +480,7 @@ void breveInitRealFunctions( brNamespace *n ) {
 
 	brNewBreveCall( n, "realGetNeighbors", brIRealGetNeighbors, AT_LIST, AT_POINTER, 0 );
 	brNewBreveCall( n, "realSetNeighborhoodSize", brIRealSetNeighborhoodSize, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
-	brNewBreveCall( n, "realSetCollisionProperties", brIRealSetCollisionProperties, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "realSetCollisionProperties", brIRealSetCollisionProperties, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0 );
 
 	brNewBreveCall( n, "realSetBoundingBox", brIRealSetBoundingBox, AT_NULL, AT_POINTER, AT_INT, 0 );
 	brNewBreveCall( n, "realSetDrawAxis", brIRealSetDrawAxis, AT_NULL, AT_POINTER, AT_INT, 0 );

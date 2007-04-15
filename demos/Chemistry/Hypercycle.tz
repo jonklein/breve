@@ -20,10 +20,10 @@
 Controller GS.
 
 Control : GS {
-    + variables:
-        tempreact, temp, inflow (object).
-        texture (object).
-        cube (object).
+	+ variables:
+		tempreact, temp, inflow (object).
+		texture (object).
+		cube (object).
 
 		reactionRates (list).
 		chemicals (list).
@@ -35,8 +35,8 @@ Control : GS {
 
 		rgb (list).
 		
-    + to init:
-        m, n, c, x (int).
+	+ to init:
+		m, n, c, x (int).
 
 		push (1.0, 0, 0) onto colors.
 		push (.5, 0, .5) onto colors.
@@ -72,12 +72,12 @@ Control : GS {
 		totalConcentration = new Matrix2D.
 		totalConcentration set-size x SIZE y SIZE.
 
-        self set-background-color to (0, 0, 0).
+		self set-background-color to (0, 0, 0).
 
-        self set-iteration-step to TIMESTEP.
-        self set-integration-step to TIMESTEP.
+		self set-iteration-step to TIMESTEP.
+		self set-integration-step to TIMESTEP.
 
-        self point-camera at (0, 0, 0) from (0, 0, 80).
+		self point-camera at (0, 0, 0) from (0, 0, 80).
 
 		# setup some initial random patches of chemicals.
 
@@ -93,35 +93,51 @@ Control : GS {
 			chemicals{ c } set-value at-x n - 1 at-y m to .2.
 		}
 
-        texture = new MatrixTextureImage.
-        texture init-with width SIZE height SIZE.
-        texture set-r to rgb{ 0 }.
-        texture set-g to rgb{ 1 }.
-        texture set-b to rgb{ 2 }.
+		texture = new MatrixTextureImage.
+		texture init-with width SIZE height SIZE.
+		texture set-r to rgb{ 0 }.
+		texture set-g to rgb{ 1 }.
+		texture set-b to rgb{ 2 }.
 
-        cube = new Mobile.
-        cube set-shape to (new Cube init-with size (60, 60, 1)).
-        cube set-texture-image to texture.
-        cube set-texture-scale to 60.
+		cube = new Mobile.
+		cube set-shape to (new Cube init-with size (60, 60, 1)).
+		cube set-texture-image to texture.
+		cube set-texture-scale to 60.
 
-    + to iterate:
+	+ to iterate:
 		n, m (int).
 		sum (double).
 
-		totalConcentration set-all-values to 1.0.
+		#
+		# Compute the reaction matrices for each chemical. 
+		#
+		# For a given chemical pair ( cN, cM ), the change in chemical cN is defined by:
+		# delta cN = cN * cM * reactionRate( cM, cN )
+		# 
+		# To get the total change in cM, we compute this matrix for all chemicals cN.
+		# To save computation, we'll make a matrix of all [ cM * reactionRate( cM, cN ) ]
+		# without the cM term, then introduce the cM term as the last step
+		#
 
-		# compute the reaction matrix for each chemical, as well as the 
-		# total concentration term.
+		#
+		# We also compute a ( 1.0 - totalConcentration ) term.  This will allow us to enforce
+		# the constraint that all chemicals sum to 1.
+		#
+
+		totalConcentration set-all-values to 1.0.
 
 		for n = 0, n < CHEMICAL_COUNT, n++: {
 			totalConcentration subtract-values of chemicals{ n }.
 
-			# self replication rate = 2.0
+			# We use a hardcoded self-replication rate of 2.0.  This represents the chemical's
+			# autocatalysis -- the positive change in the chemical itself in the absense of others
 
 			reactions{ n } set-all-values to 2.0.
 
 			for m = 0, m < CHEMICAL_COUNT, m++: {
 				if reactionRates{ m }{ n } != 0.0: {
+					# Add in the cM * reactionRate( cM, cN ) value for this chemical
+
 					reactions{ n } add-values of chemicals{ m } scaled-by reactionRates{ m }{ n }.
 				}
 			}
@@ -130,16 +146,22 @@ Control : GS {
 		rgb set-all-values to 0.0.
 
 		for n = 0, n < CHEMICAL_COUNT, n++: {
+			# Each reaction matrix computed above must now be multiplied by the chemical itself
+			# to find the actual change in cN at each location.  We also multiply by 
+			# ( 1 - totalConcentration ) to keep the total concentration clamped to 1.
+
 			reactions{ n } multiply-with-values of chemicals{ n }.
 			reactions{ n } multiply-with-values of totalConcentration.
 
-			# decay term (scale by 1)
+			# Decay term -- the decay of the chemical at each location is proportional
+			# to the concentration at that location. 
 			reactions{ n } subtract-values of chemicals{ n } scaled-by 1.0.
 
-			# diffusion rate = 1.0
+			# Add in a term for diffusion
 			diffusion compute-diffusion-matrix from chemicals{ n }.
 			reactions{ n } add-values of diffusion scaled-by D.
 
+			# Integrate the chemical's delta by TIMESTEP
 			chemicals{ n } add-values of reactions{ n } scaled-by TIMESTEP.
 
 			rgb{ 0 } add-values of chemicals{ n } scaled-by colors{ n }::x.
@@ -151,18 +173,18 @@ Control : GS {
 }
 
 Image : MatrixTextureImage {
-    + variables:
-        r, g, b (object).
-        n (int).
+	+ variables:
+		r, g, b (object).
+		n (int).
 
-    + to set-r to m (object): r = m.
-    + to set-g to m (object): g = m.
-    + to set-b to m (object): b = m.
+	+ to set-r to m (object): r = m.
+	+ to set-g to m (object): g = m.
+	+ to set-b to m (object): b = m.
 
-    + to iterate:
+	+ to iterate:
 		r copy-to-red-channel of-image self.
 		g copy-to-green-channel of-image self.
 		b copy-to-blue-channel of-image self.
-        super iterate.
+		super iterate.
 }
 

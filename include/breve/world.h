@@ -109,14 +109,14 @@ class slWorld {
 		// sunlight detection
 	
 		inline bool 				detectLightExposure() { return _detectLightExposure; }
-		inline bool 				drawLightExposure() { return _detectLightExposure; }
+		inline bool 				drawLightExposure() { return _drawLightExposure; }
 
 		void 					setDetectLightExposure( bool d ) { _detectLightExposure = d; }
 		void 					setDrawLightExposure( bool d ) { _drawLightExposure = d; }
 
 		void 					setLightExposureSource( slVector *src ) { slVectorCopy( src, &_lightExposureCamera._location); }
 
-		slCamera 				*getLightExposureCamera( ) { return &_lightExposureCamera; }
+		slCamera 				*getLightExposureCamera() { return &_lightExposureCamera; }
 
 		/**
 		 * Indicates that collision detection structures must be reinitialized.
@@ -134,6 +134,24 @@ class slWorld {
 		void 					setBackgroundColor( slVector* );
 		void 					setBackgroundTextureColor( slVector* );
 		void 					setBackgroundTexture( int, int );
+
+		/**
+		 * Sets the ODE error reduction parameter for the world.
+		 */
+
+		void					setERP( double inERP ) {
+								if( _odeWorldID ) 
+									dWorldSetERP( _odeWorldID, inERP );
+							}
+
+		/**
+		 * Sets the ODE constraint force mixing parameter for the world.
+		 */
+
+		void					setCFM( double inCFM ) {
+								if( _odeWorldID ) 
+									dWorldSetCFM( _odeWorldID, inCFM );
+							}
 
 		// integration vectors -- DV_VECTOR_COUNT depends on the requirements
 		// of the integration algorithm we're using... mbEuler requires only 

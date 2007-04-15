@@ -23,14 +23,25 @@
 #include "gldraw.h"
 #include "image.h"
 #include "sensor.h"
+
 #define BRWORLDOBJECTPOINTER(p)	((slWorldObject*)BRPOINTER(p))
 
 /** \addtogroup InternalFunctions */
 /*@{*/
 
+int brIWorldSetCFM( brEval args[], brEval *target, brInstance *i ) {
+	i->engine->world->setCFM( BRDOUBLE( &args[ 0 ] ) );
+	return EC_OK;
+}
+
+int brIWorldSetERP( brEval args[], brEval *target, brInstance *i ) {
+	i->engine->world->setERP( BRDOUBLE( &args[ 0 ] ) );
+	return EC_OK;
+}
+
 /**
-	\brief Loads a GIS data file.
-*/
+ * \brief Loads a GIS data file.
+ */
 
 int brIWorldLoadTigerFile( brEval args[], brEval *target, brInstance *i ) {
 
@@ -796,6 +807,9 @@ int brICreateUserSensor(brEval args[], brEval *target, brInstance *i) {
 */
 
 void breveInitWorldFunctions( brNamespace *n ) {
+	brNewBreveCall( n, "worldSetERP", brIWorldSetERP, AT_NULL, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "worldSetCFM", brIWorldSetCFM, AT_NULL, AT_DOUBLE, 0 );
+
 	brNewBreveCall( n, "worldLoadTigerFile", brIWorldLoadTigerFile, AT_POINTER, AT_STRING, AT_POINTER, 0 );
 
 	brNewBreveCall( n, "setStepFast", brISetStepFast, AT_NULL, AT_INT, 0 );
