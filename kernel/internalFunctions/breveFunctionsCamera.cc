@@ -300,11 +300,10 @@ int brICameraGetRotation( brEval args[], brEval *target, brInstance *i ) {
 	return EC_OK;
 }
 
-/*!
-	\brief Enables or disables a camera's text display.
-
-	void cameraTextSetEnabled(slCamera pointer, int).
-*/
+/**
+ * Enables or disables a camera's text display.
+ * void cameraTextSetEnabled(slCamera pointer, int).
+ */
 
 int brICameraTextSetEnabled( brEval args[], brEval *target, brInstance *i ) {
 	slCamera *camera = BRCAMERAPOINTER( &args[0] );
@@ -313,6 +312,20 @@ int brICameraTextSetEnabled( brEval args[], brEval *target, brInstance *i ) {
 
 	return EC_OK;
 }
+
+/**
+ * Sets the color of the display text.
+ */
+
+int brICameraSetTextColor( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
+	slVector *color = &BRVECTOR( &args[1] );
+
+	camera->setTextColor( color );
+
+	return EC_OK;
+}
+
 
 /*@}*/
 
@@ -326,6 +339,7 @@ void breveInitCameraFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "cameraSetBlur", brICameraSetBlur, AT_NULL, AT_POINTER, AT_INT, 0 );
 	brNewBreveCall( n, "cameraClear", brICameraClear, AT_NULL, AT_POINTER, 0 );
 
+	brNewBreveCall( n, "cameraSetTextColor", brICameraSetTextColor, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
 	brNewBreveCall( n, "cameraGetHeight", brICameraGetHeight, AT_INT, AT_POINTER, 0 );
 	brNewBreveCall( n, "cameraGetWidth", brICameraGetWidth, AT_INT, AT_POINTER, 0 );
 

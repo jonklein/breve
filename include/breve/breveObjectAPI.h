@@ -256,6 +256,7 @@ DLLEXPORT brMethod *brMethodFind( brObject *inObject, const char *inName, unsign
 DLLEXPORT brMethod *brMethodFindWithArgRange( brObject *inObject, const char *inName, unsigned char *inTypes, int inMinArgs, int inMaxArgs );
 
 DLLEXPORT brObject *brObjectFind( brEngine *inEngine, const char *inType );
+DLLEXPORT brObject *brObjectFindWithPreferredType( brEngine *e, const char *name, int inSignature );
 DLLEXPORT brObject *brObjectFindWithTypeSignature( brEngine *inEngine, const char *inType, int inSignature );
 DLLEXPORT brObject *brUnknownObjectFind( brEngine *inEngine, const char *inType );
 

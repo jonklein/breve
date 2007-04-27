@@ -210,7 +210,7 @@ header
 			brObject *o;
 			stObject *so;
 
-			o = brObjectFind(parseEngine, $3);
+			o = brObjectFindWithPreferredType(parseEngine, $3, STEVE_TYPE_SIGNATURE );
 			so = (stObject*)o->userData;
 
 			if(so) {
@@ -392,13 +392,13 @@ objecttype
 		if($5) version = $5;
 		else version = 1.0;
 
-		o = brObjectFind(parseEngine, $3);
+		o = brObjectFindWithPreferredType(parseEngine, $3, STEVE_TYPE_SIGNATURE);
 
 		if(o) currentObject = (stObject*)o->userData;
 		else currentObject = NULL;
 
 		if($4) {
-			o = brObjectFind(parseEngine, $4);
+			o = brObjectFindWithPreferredType(parseEngine, $4, STEVE_TYPE_SIGNATURE);
 
 			if(o) akaObject = (stObject*)o->userData;
 			else akaObject = NULL;
@@ -422,7 +422,7 @@ objecttype
 			slFree($3);
 			slFree($4);
 		} else {
-			brObject *o = brObjectFind(parseEngine, $1);
+			brObject *o = brObjectFindWithPreferredType(parseEngine, $1, STEVE_TYPE_SIGNATURE );
 
 			if(o) parentObject = (stObject*)o->userData;
 			else parentObject = NULL;

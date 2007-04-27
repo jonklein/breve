@@ -24,6 +24,20 @@
 
 #include "python.h"
 
+struct slPythonData {
+
+	PyObject *_vectorClass;
+	PyObject *_vectorType;
+
+	PyObject *_matrixClass;
+	PyObject *_matrixType;
+
+	PyObject *_breveModule;
+	PyObject *_mainModule;
+};
+
+slPythonData gPythonData;
+
 std::string brPythonToSteveName( const char *in ) {
 	std::string result;
 
@@ -45,12 +59,11 @@ std::string brPythonToSteveName( const char *in ) {
  * which can come in either as ints or doubles
  */
 
-double PyNumber_AS_DOUBLE( PyObject *inObject ) {
+inline double PyNumber_AS_DOUBLE( PyObject *inObject ) {
+	if( PyFloat_Check( inObject ) ) 
+		return PyFloat_AS_DOUBLE( inObject );
 
-	if( PyInt_Check( inObject ) ) 
-       		return (double)PyInt_AS_LONG( inObject );
-
-	return PyFloat_AS_DOUBLE( inObject );
+	return (double)PyInt_AS_LONG( inObject );
 }
 
 /**
@@ -72,7 +85,6 @@ inline PyObject *PyObject_GetAttrStringSafe( PyObject *inObject, const char *inS
 
 	return result;
 }
-
 
 
 /**
@@ -113,20 +125,16 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 		outEval->set( PyCObject_AsVoidPtr( inObject ) );
 		result = EC_OK;
 
-	} else if( PyObject_HasAttrString( inObject, "isVector" ) ) {
+	} else if( PyObject_GetAttrStringSafe( inObject, "isVector" ) ) {
 		slVector v = { 0.0, 0.0, 0.0 };
 
-		PyObject *x = PyObject_GetAttrString( inObject, "x" );
-		PyObject *y = PyObject_GetAttrString( inObject, "y" );
-		PyObject *z = PyObject_GetAttrString( inObject, "z" );
+		PyObject *x = PyList_GET_ITEM( inObject, 0 );
+		PyObject *y = PyList_GET_ITEM( inObject, 1 );
+		PyObject *z = PyList_GET_ITEM( inObject, 2 );
 
 		if( x ) v.x = PyNumber_AS_DOUBLE( x );
 		if( y ) v.y = PyNumber_AS_DOUBLE( y );
 		if( z ) v.z = PyNumber_AS_DOUBLE( z );
-
-		Py_DECREF( x );
-		Py_DECREF( y );
-		Py_DECREF( z );
 
 		outEval->set( v );
 		result = EC_OK;
@@ -142,18 +150,18 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 
 		result = EC_OK;
 
-	} else if( PyObject_HasAttrString( inObject, "isMatrix" ) ) {
+	} else if( PyObject_GetAttrStringSafe( inObject, "isMatrix" ) ) {
 		slMatrix m;
 
-		PyObject *x1 = PyObject_GetAttrString( inObject, "x1" );
-		PyObject *x2 = PyObject_GetAttrString( inObject, "x2" );
-		PyObject *x3 = PyObject_GetAttrString( inObject, "x3" );
-		PyObject *y1 = PyObject_GetAttrString( inObject, "y1" );
-		PyObject *y2 = PyObject_GetAttrString( inObject, "y2" );
-		PyObject *y3 = PyObject_GetAttrString( inObject, "y3" );
-		PyObject *z1 = PyObject_GetAttrString( inObject, "z1" );
-		PyObject *z2 = PyObject_GetAttrString( inObject, "z2" );
-		PyObject *z3 = PyObject_GetAttrString( inObject, "z3" );
+		PyObject *x1 = PyList_GET_ITEM( inObject, 0 );
+		PyObject *y1 = PyList_GET_ITEM( inObject, 1 );
+		PyObject *z1 = PyList_GET_ITEM( inObject, 2 );
+		PyObject *x2 = PyList_GET_ITEM( inObject, 3 );
+		PyObject *y2 = PyList_GET_ITEM( inObject, 4 );
+		PyObject *z2 = PyList_GET_ITEM( inObject, 5 );
+		PyObject *x3 = PyList_GET_ITEM( inObject, 6 );
+		PyObject *y3 = PyList_GET_ITEM( inObject, 7 );
+		PyObject *z3 = PyList_GET_ITEM( inObject, 8 );
 
 		m[ 0 ][ 0 ] = PyNumber_AS_DOUBLE( x1 );
 		m[ 0 ][ 1 ] = PyNumber_AS_DOUBLE( x2 );
@@ -164,16 +172,6 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 		m[ 2 ][ 0 ] = PyNumber_AS_DOUBLE( z1 );
 		m[ 2 ][ 1 ] = PyNumber_AS_DOUBLE( z2 );
 		m[ 2 ][ 2 ] = PyNumber_AS_DOUBLE( z3 );
-
-		Py_DECREF( x1 );
-		Py_DECREF( x2 );
-		Py_DECREF( x3 );
-		Py_DECREF( y1 );
-		Py_DECREF( y2 );
-		Py_DECREF( y3 );
-		Py_DECREF( z1 );
-		Py_DECREF( z2 );
-		Py_DECREF( z3 );
 
 		outEval->set( m );
 		result = EC_OK;
@@ -239,7 +237,7 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 			} else if( breveInstance ) {
 				// Create a bridge object, and set the breveInstance field
 
-				PyObject *bridgeObject = PyObject_GetAttrString( inModuleObject, "bridgeObject" );
+				PyObject *bridgeObject = PyObject_GetAttrStringSafe( inModuleObject, "bridgeObject" );
 
 				PyObject *args = PyTuple_New( 0 );
 				result = PyObject_Call( bridgeObject, args, NULL );
@@ -269,21 +267,17 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 
 		case AT_VECTOR:
 			{
-				PyObject *vectorType = PyObject_GetAttrString( inModuleObject, "vectorType" );
 				const slVector &v = BRVECTOR( inEval );
 
-				if( vectorType ) {
-					PyObject *args = PyTuple_New( 3 );
+				PyObject *args = PyTuple_New( 3 );
 
-					PyTuple_SET_ITEM( args, 0, PyFloat_FromDouble( v.x ) );
-					PyTuple_SET_ITEM( args, 1, PyFloat_FromDouble( v.y ) );
-					PyTuple_SET_ITEM( args, 2, PyFloat_FromDouble( v.z ) );
+				PyTuple_SET_ITEM( args, 0, PyFloat_FromDouble( v.x ) );
+				PyTuple_SET_ITEM( args, 1, PyFloat_FromDouble( v.y ) );
+				PyTuple_SET_ITEM( args, 2, PyFloat_FromDouble( v.z ) );
 
-					result = PyObject_Call( vectorType, args, NULL );
+				result = PyObject_Call( gPythonData._vectorClass, args, NULL );
 
-					Py_DECREF( args );
-					Py_DECREF( vectorType );
-				}
+				Py_DECREF( args );
 			}
 
 			break;
@@ -292,26 +286,21 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 			{ 
 				const slMatrix &m = BRMATRIX( inEval );
 
-				PyObject *matrixType = PyObject_GetAttrString( inModuleObject, "matrixType" );
+				PyObject *args = PyTuple_New( 9 );
 
-				if( matrixType ) {
-					PyObject *args = PyTuple_New( 9 );
+				PyTuple_SET_ITEM( args, 0, PyFloat_FromDouble( m[ 0 ][ 0 ] ) );
+				PyTuple_SET_ITEM( args, 1, PyFloat_FromDouble( m[ 0 ][ 1 ] ) );
+				PyTuple_SET_ITEM( args, 2, PyFloat_FromDouble( m[ 0 ][ 2 ] ) );
+				PyTuple_SET_ITEM( args, 3, PyFloat_FromDouble( m[ 1 ][ 0 ] ) );
+				PyTuple_SET_ITEM( args, 4, PyFloat_FromDouble( m[ 1 ][ 1 ] ) );
+				PyTuple_SET_ITEM( args, 5, PyFloat_FromDouble( m[ 1 ][ 2 ] ) );
+				PyTuple_SET_ITEM( args, 6, PyFloat_FromDouble( m[ 2 ][ 0 ] ) );
+				PyTuple_SET_ITEM( args, 7, PyFloat_FromDouble( m[ 2 ][ 1 ] ) );
+				PyTuple_SET_ITEM( args, 8, PyFloat_FromDouble( m[ 2 ][ 2 ] ) );
 
-					PyTuple_SET_ITEM( args, 0, PyFloat_FromDouble( m[ 0 ][ 0 ] ) );
-					PyTuple_SET_ITEM( args, 1, PyFloat_FromDouble( m[ 0 ][ 1 ] ) );
-					PyTuple_SET_ITEM( args, 2, PyFloat_FromDouble( m[ 0 ][ 2 ] ) );
-					PyTuple_SET_ITEM( args, 3, PyFloat_FromDouble( m[ 1 ][ 0 ] ) );
-					PyTuple_SET_ITEM( args, 4, PyFloat_FromDouble( m[ 1 ][ 1 ] ) );
-					PyTuple_SET_ITEM( args, 5, PyFloat_FromDouble( m[ 1 ][ 2 ] ) );
-					PyTuple_SET_ITEM( args, 6, PyFloat_FromDouble( m[ 2 ][ 0 ] ) );
-					PyTuple_SET_ITEM( args, 7, PyFloat_FromDouble( m[ 2 ][ 1 ] ) );
-					PyTuple_SET_ITEM( args, 8, PyFloat_FromDouble( m[ 2 ][ 2 ] ) );
+				result = PyObject_Call( gPythonData._matrixClass, args, NULL );
 
-					result = PyObject_Call( matrixType, args, NULL );
-
-					Py_DECREF( args );
-					Py_DECREF( matrixType );
-				}
+				Py_DECREF( args );
 			}
 
 			break;
@@ -329,7 +318,7 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 			}
 
 
-break;
+			break;
 
 		case AT_ARRAY:
 		case AT_DATA:
@@ -368,8 +357,8 @@ PyObject *brPythonSetController( PyObject *inSelf, PyObject *inArgs ) {
 
 	if ( !PyArg_ParseTuple( inArgs, "OO", &moduleObject, &pythonInstance) ) return NULL;
 
-	PyObject *engineObject = PyObject_GetAttrString( moduleObject, "breveEngine" );
-	PyObject *instanceObject = PyObject_GetAttrString( pythonInstance, "breveInstance" );
+	PyObject *engineObject = PyObject_GetAttrStringSafe( moduleObject, "breveEngine" );
+	PyObject *instanceObject = PyObject_GetAttrStringSafe( pythonInstance, "breveInstance" );
 
 	brEngine *engine = (brEngine*)PyCObject_AsVoidPtr( engineObject );
 	brInstance *instance = (brInstance*)PyCObject_AsVoidPtr( instanceObject );
@@ -384,6 +373,50 @@ PyObject *brPythonSetController( PyObject *inSelf, PyObject *inArgs ) {
 	return Py_None;
 }
 
+PyObject *brPythonAddVectors( PyObject *inSelf, PyObject *inArgs ) {
+	PyObject *v1, *v2;
+
+        if ( !PyArg_ParseTuple( inArgs, "O!O!", &PyList_Type, &v1, &PyList_Type, &v2 ) ) return NULL;
+
+	double x = PyNumber_AS_DOUBLE( PyList_GET_ITEM( v1, 0 ) ) + PyNumber_AS_DOUBLE( PyList_GET_ITEM( v2, 0 ) );
+	double y = PyNumber_AS_DOUBLE( PyList_GET_ITEM( v1, 1 ) ) + PyNumber_AS_DOUBLE( PyList_GET_ITEM( v2, 1 ) );
+	double z = PyNumber_AS_DOUBLE( PyList_GET_ITEM( v1, 2 ) ) + PyNumber_AS_DOUBLE( PyList_GET_ITEM( v2, 2 ) );
+
+	PyObject *args = PyTuple_New( 3 );
+
+	PyTuple_SET_ITEM( args, 0, PyFloat_FromDouble( x ) );
+	PyTuple_SET_ITEM( args, 1, PyFloat_FromDouble( y ) );
+	PyTuple_SET_ITEM( args, 2, PyFloat_FromDouble( z ) );
+
+	PyObject *result = PyObject_Call( gPythonData._vectorClass, args, NULL );
+
+	Py_DECREF( args );
+
+	return result;
+}
+
+PyObject *brPythonSubVectors( PyObject *inSelf, PyObject *inArgs ) {
+	PyObject *v1, *v2;
+
+        if ( !PyArg_ParseTuple( inArgs, "O!O!", &PyList_Type, &v1, &PyList_Type, &v2 ) ) return NULL;
+
+	double x = PyNumber_AS_DOUBLE( PyList_GET_ITEM( v1, 0 ) ) - PyNumber_AS_DOUBLE( PyList_GET_ITEM( v2, 0 ) );
+	double y = PyNumber_AS_DOUBLE( PyList_GET_ITEM( v1, 1 ) ) - PyNumber_AS_DOUBLE( PyList_GET_ITEM( v2, 1 ) );
+	double z = PyNumber_AS_DOUBLE( PyList_GET_ITEM( v1, 2 ) ) - PyNumber_AS_DOUBLE( PyList_GET_ITEM( v2, 2 ) );
+
+	PyObject *args = PyTuple_New( 3 );
+
+	PyTuple_SET_ITEM( args, 0, PyFloat_FromDouble( x ) );
+	PyTuple_SET_ITEM( args, 1, PyFloat_FromDouble( y ) );
+	PyTuple_SET_ITEM( args, 2, PyFloat_FromDouble( z ) );
+
+	PyObject *result = PyObject_Call( gPythonData._vectorClass, args, NULL );
+
+	Py_DECREF( args );
+
+	return result;
+}
+
 /**
  * Python callback to add a Python instance to the breve engine.
  */
@@ -396,7 +429,7 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 
 	// Extract the breveEngine from the module data
 
-	PyObject *engineObject = PyObject_GetAttrString( moduleObject, "breveEngine" );
+	PyObject *engineObject = PyObject_GetAttrStringSafe( moduleObject, "breveEngine" );
 
 	if( !engineObject ) {
 		PyErr_SetString( PyExc_RuntimeError, "Could not locate breve engine in first internal breve call argument" );
@@ -410,8 +443,8 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 	// Adding the instance requires a brObject type.
 	// We may need to create it ourselves.
 
-	PyObject *breveTypeObject = PyObject_GetAttrString( typeObject, "breveObject" );
-	PyObject *nameObject = PyObject_GetAttrString( typeObject, "__name__" );
+	PyObject *breveTypeObject = PyObject_GetAttrStringSafe( typeObject, "breveObject" );
+	PyObject *nameObject = PyObject_GetAttrStringSafe( typeObject, "__name__" );
 	char *name = PyString_AsString( nameObject );
 
 	if( breveTypeObject ) {
@@ -481,7 +514,6 @@ PyObject *brPythonRemoveInstance( PyObject *inSelf, PyObject *inArgs ) {
 
 	PyObject *breveObject = PyObject_GetAttrString( object, "breveInstance" );
 
-	brEngine *engine = ( brEngine* )PyCObject_AsVoidPtr( engineObject );
 	brInstance *instance = ( brInstance* )PyCObject_AsVoidPtr( breveObject );
 
 	brInstanceRelease( instance );
@@ -534,7 +566,8 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 
 	PyObject *callerObject, *functionObject, *arguments, *moduleObject;
 
-	if ( !PyArg_ParseTuple( inArgs, "OOOO", &moduleObject, &callerObject, &functionObject, &arguments ) ) return NULL;
+	if ( !PyArg_ParseTuple( inArgs, "OOOO", &moduleObject, &callerObject, &functionObject, &arguments ) ) 
+		return NULL;
 
 	brInternalFunction *function = ( brInternalFunction* )PyCObject_AsVoidPtr( functionObject );
 
@@ -804,11 +837,8 @@ void *brPythonFindObject( void *inData, const char *inName ) {
 
 	PyObject *obj = PyObject_GetAttrStringSafe( mainModule, (char*)inName );
 
-	if( !obj ) {
-		PyObject *breveModule = PyObject_GetAttrString( mainModule, "breve" );
-	
-		obj = PyObject_GetAttrStringSafe( breveModule, (char*)inName );
-	}
+	// if( !obj )
+	// 	obj = PyObject_GetAttrStringSafe( gPythonData._breveModule, (char*)inName );
 
 	return obj;
 }
@@ -866,7 +896,7 @@ brInstance *brPythonInstantiate( brEngine *inEngine, brObject* inObject, const b
 int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArguments, brEval *outResult ) {
 	PyObject *instance = ( PyObject* )inInstance;
 	PyObject *method = ( PyObject* )inMethod;
-	static PyObject *tuples[ 5 ] = { PyTuple_New( 1 ), PyTuple_New( 2 ), PyTuple_New( 3 ), PyTuple_New( 4 ), PyTuple_New( 5 ) };
+	// static PyObject *tuples[ 5 ] = { PyTuple_New( 1 ), PyTuple_New( 2 ), PyTuple_New( 3 ), PyTuple_New( 4 ), PyTuple_New( 5 ) };
 
 	if ( !PyCallable_Check( method ) ) {
 		slMessage( DEBUG_ALL, "Warning: called method is not callable\n" );
@@ -1030,6 +1060,8 @@ void brPythonInit( brEngine *breveEngine ) {
 		{ "findBridgeMethod", 		brPythonFindBridgeMethod, 		METH_VARARGS, "" },
 		{ "callBridgeMethod", 		brPythonCallBridgeMethod, 		METH_VARARGS, "" },
 		{ "catchOutput", 		brPythonCatchOutput, 			METH_VARARGS, "" },
+		{ "addVectors", 		brPythonAddVectors, 			METH_VARARGS, "" },
+		{ "subVectors", 		brPythonSubVectors, 			METH_VARARGS, "" },
 		{ NULL, NULL, 0, NULL }
 	};
 
@@ -1066,8 +1098,16 @@ void brPythonInit( brEngine *breveEngine ) {
 		PyRun_SimpleString( path );
 	}
 
-	brevePythonType->userData = ( void* )PyImport_ImportModule( "__main__" );
-	PyImport_ImportModule( "breve" );
+	gPythonData._mainModule  = PyImport_ImportModule( "__main__" );
+	gPythonData._breveModule = PyImport_ImportModule( "breve" );
+
+	gPythonData._vectorClass = PyObject_GetAttrString( gPythonData._breveModule, "vector" );
+	gPythonData._matrixClass = PyObject_GetAttrString( gPythonData._breveModule, "matrix" );
+
+	// gPythonData._vectorType  = PyObject_Type( breve, "vector" );
+	// gPythonData._matrixType  = PyObject_Type( breve, "matrix" );
+
+	brevePythonType->userData = (void*)gPythonData._mainModule;
 
 	brevePythonType->findMethod 		= brPythonFindMethod;
 	brevePythonType->findObject 		= brPythonFindObject;

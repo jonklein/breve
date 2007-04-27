@@ -583,7 +583,8 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 
 	glLoadIdentity();
 
-	if ( _drawText ) renderText( w, crosshair );
+	if ( _drawText ) 
+		renderText( w, crosshair );
 
 	if ( _drawText && crosshair && !scissor ) {
 		glPushMatrix();
@@ -783,7 +784,7 @@ void slCamera::renderText( slWorld *w, int crosshair ) {
 	glDisable( GL_DEPTH_TEST );
 	glDisable( GL_STENCIL_TEST );
 	glDisable( GL_BLEND );
-	glColor4f( 0.0, 0.0, 0.0, 1.0 );
+	glColor4f( _textColor.x, _textColor.y, _textColor.z, 1.0 );
 	snprintf( textStr, sizeof( textStr ), "%.2f", w->_age );
 
 	fromLeft = -1.0 + ( 5.0 / _width );

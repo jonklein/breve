@@ -117,12 +117,27 @@ brObject *brObjectFind( brEngine *e, const char *name ) {
 	brObject *object;
 	std::string names = name;
 
+	// try the known objects
 	if ( ( object = e->objects[ names ] ) ) return object;
+
+	// try the known object aliases
 	if ( ( object = e->objectAliases[ names ] ) ) return object;
 
+	// try the main frontend language
+	if ( e->controller && ( object = brObjectFindWithTypeSignature( e, name, e->controller->object->type->_typeSignature ) ) ) return object;
+
+	// okay, whatever
 	return brUnknownObjectFind( e, name );
 }
 
+brObject *brObjectFindWithPreferredType( brEngine *e, const char *name, int inSignature ) {
+	brObject *object;
+
+	if ( ( object = brObjectFindWithTypeSignature( e, name, inSignature ) ) ) return object;
+
+	return brObjectFind( e, name );
+
+}
 /**
  * \brief Looks up an unknown object and adds it to the engine.
  *

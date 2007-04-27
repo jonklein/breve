@@ -23,13 +23,15 @@ void *brInitFrontendLanguages( brEngine *engine ) {
         brPythonInit( engine );
 #endif
 #ifdef HAVE_LIBPERL
-		brPerlInit( engine );
+	brPerlInit( engine );
 #endif
 #ifdef HAVE_LIBECL
         brLispInit( engine );
 #endif
 
-        return stSteveInit( engine );
+	stSteveData *data = stSteveInit( engine );
+
+        return data;
 }
 
 void stCrashCatcher( int s ) {

@@ -2,30 +2,17 @@
 import breveInternal
 import sys, os, math, random
 
-def clear(keep=("__builtins__", "clear")):
-	keeps = {}
-	
-	for name, value in globals().iteritems():
-		if name in keep: keeps[name] = value
-
-		globals().clear()
-
-	for name, value in keeps.iteritems():
-		globals()[name] = value
-
-
-
 #
 # Used internally to redirect Python output to the breve frontend
 #
 
 class breveStderrHandler:
-    def write( self, line ):
-        breveInternal.catchOutput( breveInternal, line )
+ 	def write( self, line ):
+ 		breveInternal.catchOutput( breveInternal, line )
 
 class breveStdoutHandler:
-    def write( self, line ):
-        breveInternal.catchOutput( breveInternal, line )
+ 	def write( self, line ):
+ 		breveInternal.catchOutput( breveInternal, line )
 
 sys.stderr = breveStderrHandler()
 sys.stdout = breveStdoutHandler()
@@ -37,7 +24,6 @@ sys.stdout = breveStdoutHandler()
 def setController( inControllerClass ):
 	"Creates the breve Controller class.  This method simply instantiates the class which is called.  It is provided for convenience only."
 	return controller()
-
 
 def allInstances( inclass ):
 	cls = globals()[ inclass ]
@@ -111,31 +97,20 @@ def deleteInstance( inInstance ):
 		inInstance.breveInstance = None;
 		del inInstance
 
-def executeCachedMethod( obj, method ):
-	if not obj.__dict__.has_key( method ):
-		obj.__dict__[ method ] = obj.__getattribute__( method.__name__ )
-
-	obj.__dict__[ method ]()
-
-breveInternal.executeCachedMethod = executeCachedMethod
-
 class breveInternalFunctions:
-	def __init__( self ):
-		self.functionCache = {}
 
 	def __getattr__( self, method ):
-		if self.functionCache.has_key( method ):
-			return self.functionCache[ method ]
-
 		internalFunction = breveInternal.findInternalFunction( breveInternal.breveEngine, method )
 
 		if internalFunction:
 			def execute( object, *tuple ):
 				return breveInternal.callInternalFunction( breveInternal, object, internalFunction, tuple )
 
-			self.functionCache[ method ] = execute
+			self.__dict__[ method ] = execute
 
 			return execute
+
+		raise AttributeError
 
 
 
@@ -146,9 +121,6 @@ class breveInternalFunctions:
 
 def length( inValue ):
 	"Returns the length or size of expression inValue. Provided for convenience, and for compatibility with simulations converted from steve."
-
-	if not hasattr( inValue, '__class__' ):
-		raise Exception( "Cannot give length of expression" )
 
 	if inValue.__class__ == vector:
 		return inValue.length()
@@ -165,11 +137,8 @@ def length( inValue ):
 def randomExpression( inValue ):
 	"Returns a random expression with a maximum of inValue, an int, float or vector.  Provided for convenience, and for compatibility with simulations converted from steve."
 
-	if not hasattr( inValue, '__class__' ):
-		raise Exception( "Cannot create random expression" )
-
 	if inValue.__class__ == vector:
-		return vector( random.uniform( 0, abs( inValue.x ) ), random.uniform( 0, abs( inValue.y ) ), random.uniform( 0, abs( inValue.z ) ) )
+		return vector( random.uniform( 0, abs( inValue[ 0 ] ) ), random.uniform( 0, abs( inValue[ 1 ] ) ), random.uniform( 0, abs( inValue[ 2 ] ) ) )
 
 	if inValue.__class__ == int:
 		return random.randint( 0, abs( inValue ) )
@@ -177,48 +146,59 @@ def randomExpression( inValue ):
 	if inValue.__class__ == float:
 		return random.uniform( 0, abs( inValue ) )
 
+	raise Exception( "Cannot create random expression" )
+
 
 #
 # Standard breve matrices and vectors
 #
 
-class matrix( object ):
+class matrix( list ):
 	"A 3x3 matrix class used for breve"
 
-	__slots__ = ( 'x1', 'x2', 'x3', 'y1', 'y2', 'y3', 'z1', 'z2', 'z3', 'isMatrix' )
-
 	def __init__( self, x1 = 1.0, x2 = 0.0, x3 = 0.0, y1 = 0.0, y2 = 1.0, y3 = 0.0, z1 = 0.0, z2 = 0.0, z3 = 1.0 ):
-		self.x1 = x1
-		self.x2 = x2
-		self.x3 = x3
-		self.y1 = y1
-		self.y2 = y2
-		self.y3 = y3
-		self.z1 = z1
-		self.z2 = z2
-		self.z3 = z3
+		list.__init__( self )
+		self.append( x1 )
+		self.append( x2 )
+		self.append( x3 )
+		self.append( y1 )
+		self.append( y2 )
+		self.append( y3 )
+		self.append( z1 )
+		self.append( z2 )
+		self.append( z3 )
 		self.isMatrix = 1
 
 	def __str__( self ):
-		return 'breve.matrix( %f, %f, %f, %f, %f, %f, %f, %f, %f )' % ( self.x1, self.x2, self.x3, self.y1, self.y2, self.y3, self.z1, self.z2, self.z3 )
+		return 'breve.matrix( %f, %f, %f, %f, %f, %f, %f, %f, %f )' % ( self[ 0 ], self[ 1 ], self[ 2 ], self[ 3 ], self[ 4 ], self[ 5 ], self[ 6 ], self[ 7 ], self[ 8 ] )
 
-class vector( object ):
+class vector( list ):
 	"A 3D vector class used for breve"
-	__slots__ = ( 'x', 'y', 'z', 'isVector' )
-
-	defaults = { 'x' : 0.0, 'y' : 0.0, 'z' : 0.0, 'isVector' : 1 }
 
 	def __init__( self, x = 0.0, y = 0.0, z = 0.0 ):
-		self.x = x
-		self.y = y
-		self.z = z
+		list.__init__( self )
+		self.append( x )
+		self.append( y )
+		self.append( z )
 		self.isVector = 1
 
+	def __getattr__( self, symbol ):
+		if symbol == 'x':
+			return self[ 0 ]
+
+		if symbol == 'y':
+			return self[ 1 ]
+
+		if symbol == 'z':
+			return self[ 2 ]
+
+		raise AttributeError
+
 	def __str__( self ):
-		return 'breve.vector( %f, %f, %f )' % ( self.x, self.y, self.z )
+		return 'breve.vector( %f, %f, %f )' % ( self[ 0 ], self[ 1 ], self[ 2 ] )
 
 	def __eq__( self, o ):
-		return self.x == o.x and self.y == o.y and self.z == o.z
+		return self[ 0 ] == o[ 0 ] and self[ 1 ] == o[ 1 ] and self[ 2 ] == o[ 2 ]
 
 	def __cmp__( self, o ):
 		return self.__eq__( o )
@@ -227,47 +207,49 @@ class vector( object ):
 		return not self.__eq__( o )
 
 	def __sub__( self, other ):
-		return vector( self.x - other.x, self.y - other.y, self.z - other.z )
+		# return vector( self[ 0 ] - other[ 0 ], self[ 1 ] - other[ 1 ], self[ 2 ] - other[ 2 ] )
+		return breveInternal.subVectors( self, other )
 
 	def __add__( self, other ):
-		return vector( self.x + other.x, self.y + other.y, self.z + other.z )
+		# return vector( self[ 0 ] + other[ 0 ], self[ 1 ] + other[ 1 ], self[ 2 ] + other[ 2 ] )
+		return breveInternal.addVectors( self, other )
 
 	def __div__( self, other ):
-		return vector( self.x / other, self.y / other, self.z / other )
+		return vector( self[ 0 ] / other, self[ 1 ] / other, self[ 2 ] / other )
 
 	def __mul__( self, other ):
-		if hasattr( other, '__class__' ) and other.__class__ == matrix:
-			x = self.x * other.x1 + self.y * other.x2 + self.z * other.x3
-			y = self.x * other.y1 + self.y * other.y2 + self.z * other.y3
-			z = self.x * other.z1 + self.y * other.z2 + self.z * other.z3
+		if other.__class__ == matrix:
+			x = self[ 0 ] * other[ 0 ] + self[ 1 ] * other[ 1 ] + self[ 2 ] * other[ 2 ]
+			y = self[ 0 ] * other[ 3 ] + self[ 1 ] * other[ 4 ] + self[ 2 ] * other[ 5 ]
+			z = self[ 0 ] * other[ 6 ] + self[ 1 ] * other[ 7 ] + self[ 2 ] * other[ 8 ]
 
 			return vector( x, y, z )
 
-		return vector( self.x * other, self.y * other, self.z * other )
+		return vector( self[ 0 ] * other, self[ 1 ] * other, self[ 2 ] * other )
 	
 	__rmul__ = __mul__
 
 	def __neg__( self ):
-		return vector( -self.x, -self.y, -self.z )
+		return vector( -self[ 0 ], -self[ 1 ], -self[ 2 ] )
 
 	def length( self ):
 		"Gives the length of the vector"
-		return math.sqrt( self.x * self.x + self.y * self.y + self.z * self.z )
+		return math.sqrt( self[ 0 ] * self[ 0 ] + self[ 1 ] * self[ 1 ] + self[ 2 ] * self[ 2 ] )
 
 	def scale( self, other ):
 		"Scales the vector by a scalar"
-		self.x *= other
-		self.y *= other
-		self.z *= other
+		self[ 0 ] *= other
+		self[ 1 ] *= other
+		self[ 2 ] *= other
 
 	def normalize( self ):
 		"Normalizes the vector"
-		len = math.sqrt( self.x * self.x + self.y * self.y + self.z * self.z )
+		len = math.sqrt( self[ 0 ] * self[ 0 ] + self[ 1 ] * self[ 1 ] + self[ 2 ] * self[ 2 ] )
 
 		if len != 0.0:
-			self.x /= len
-			self.y /= len
-			self.z /= len
+			self[ 0 ] /= len
+			self[ 1 ] /= len
+			self[ 2 ] /= len
 
 #
 # Import all of the standard breve classes
@@ -275,60 +257,61 @@ class vector( object ):
 # Ordered to respect inter-object dependencies
 #
 
-from Object 		import *
+if 1:
+	from Object 		import *
 
-from Abstract 		import *
-from Real 		import *
+	from Abstract 		import *
+	from Real 		import *
 
-from Mobile 		import *
-from Stationary 	import *
+	from Mobile 		import *
+	from Stationary 	import *
 
-from Link 		import *
+	from Link 		import *
 
-from Camera 		import *
-from Control 		import *
-from PhysicalControl 	import *
-from Data 		import *
-from MultiBody 		import *
+	from Camera 		import *
+	from Control 		import *
+	from PhysicalControl 	import *
+	from Data 		import *
+	from MultiBody 		import *
 
-from GeneticAlgorithm 	import *
+	from GeneticAlgorithm 	import *
 
-from PatchGrid 		import *
-from PatchToroid 	import *
-from Patch 		import *
+	from PatchGrid 		import *
+	from PatchToroid 	import *
+	from Patch 		import *
 
-from Braitenberg 	import *
-from DirectedGraph 	import *
-from Drawing 		import *
-from File 		import *
-from Genome 		import *
-from Graph 		import *
-from IRSensor 		import *
-from Image 		import *
-from Joint 		import *
-from Line 		import *
-from Matrix 		import *
-from MenuItem 		import *
-from Movie 		import *
-from NetworkServer 	import *
-from NeuralNetwork 	import *
-from Push 		import *
-from PushGP 		import *
-from SFFNetwork 	import *
-from Shape 		import *
-from Sound 		import *
-from Spring 		import *
-from Terrain 		import *
-from Tone 		import *
-from TurtleDrawing 	import *
-from Vector 		import *
-from Wanderer 		import *
-
-
-
+	from Braitenberg 	import *
+	from DirectedGraph 	import *
+	from Drawing 		import *
+	from File 		import *
+	from Genome 		import *
+	from Graph 		import *
+	from IRSensor 		import *
+	from Image 		import *
+	from Joint 		import *
+	from Line 		import *
+	from Matrix 		import *
+	from MenuItem 		import *
+	from Movie 		import *
+	from NetworkServer 	import *
+	from NeuralNetwork 	import *
+	from Push 		import *
+	from PushGP 		import *
+	from SFFNetwork 	import *
+	from Shape 		import *
+	from Sound 		import *
+	from Spring 		import *
+	from Terrain 		import *
+	from Tone 		import *
+	from TurtleDrawing 	import *
+	from Vector 		import *
+	from Wanderer 		import *
 
 
-class bridgeObjectMethod( Object ):
+
+
+
+class bridgeObjectMethod( object ):
 	"A callable object used to implement breve bridge method calling"
 	
 	def __init__( self, caller, method ):
@@ -343,25 +326,20 @@ class bridgeObjectMethod( Object ):
 class bridgeObject( object ):
 	"An object representing a bridge to an object in another breve language frontend"
 
-	__slots__ = [ 'functionCache', 'breveModule', 'breveInstance' ]
+	__slots__ = [ 'breveModule', 'breveInstance' ]
 
 	def __init__( self ): 
 		self.breveInstance = addInstance( self.__class__, self )
 		self.breveModule = breveInternal
 
-		self.functionCache = {}
-
 	def __getattr__( self, method ):
-		if not self.functionCache.has_key( method ):
-			internalMethod = breveInternal.findBridgeMethod( self, method )
+		internalMethod = breveInternal.findBridgeMethod( self, method )
 
-			if internalMethod != None:
-				self.functionCache[ method ] = bridgeObjectMethod( self, internalMethod )
+		if internalMethod != None:
+			self.__dict__[ method ] = bridgeObjectMethod( self, internalMethod )
+			return self.__dict__[ method ]
 
-		if self.functionCache.has_key( method ):
-			return self.functionCache[ method ]
-		else:
-			raise AttributeError( "Cannot locate method '%s'" % method )
+		raise AttributeError( "Cannot locate method '%s'" % method )
 
 
 breveInternalFunctionFinder = breveInternalFunctions()
@@ -370,6 +348,6 @@ breveInternal.bridgeObject = bridgeObject
 breveInternal.vectorType = vector
 breveInternal.matrixType = matrix
 
-__all__ = [ 'Object', 'Abstract', 'Control' ]
+# __all__ = [ 'Object', 'Abstract', 'Control' ]
 
 instanceDict = {}

@@ -39,6 +39,7 @@ slCamera::slCamera( int x, int y ) {
 
 	_text.insert( _text.begin(), 8, t );
 
+	slVectorSet( &_textColor, 0, 0, 0 );
 	_textScale = 1;
 
 	_width = x;

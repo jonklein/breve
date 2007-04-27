@@ -117,6 +117,8 @@ std::string stPyConvertObject( stObject *inObject ) {
 	ADDTABS( &conversionData, result );
 	result += "'''" + inObject->_comment + "'''\n\n";
 
+
+	/*
 	ADDTABS( &conversionData, result );
 	result += "__slots__ = [ ";
 
@@ -130,6 +132,7 @@ std::string stPyConvertObject( stObject *inObject ) {
 	}
 
 	result += " ]\n\n";
+	*/
 
 	if( supername.size() != 0 ) {
 		ADDTABS( &conversionData, result );

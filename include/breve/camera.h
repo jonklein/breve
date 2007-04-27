@@ -160,6 +160,8 @@ class slCamera {
 	
 		unsigned char _recompile;
 	
+		slVector _textColor;
+
 		std::vector<slCameraText> _text;
 	
 		double _textScale;
@@ -223,6 +225,8 @@ class slCamera {
 		void (*_renderContextCallback)(slWorld *w, slCamera *c);
 
 		void clear( slWorld *w );
+
+		void setTextColor( slVector *inColor ) { slVectorCopy( inColor, &_textColor ); }
 
 	private:
 		void stencilFloor();

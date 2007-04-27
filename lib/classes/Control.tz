@@ -908,7 +908,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 		if fogFlag == 1: self disable-fog.
 		else self enable-fog.
 
-	+ to set-display-text to theString (string) at-x xLoc = -.95 (float) at-y yLoc = -.95 (float) number messageNumber = 0 (int):
+	+ to set-display-text to theString (string) at-x xLoc = -.95 (float) at-y yLoc = -.95 (float) number messageNumber = 0 (int) with-color theColor = ( 0, 0, 0 ) (vector):
 		% Sets a text string in the simulation display.  xLoc and yLoc 
 		% represent the location of the text.  The coordinate system 
 		% used goes from (-1, -1) to (1, 1) with (-1, -1) at the lower 
@@ -918,7 +918,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 		% The optional argument messageNumber may be used to specify 
 		% up to 8 different messages.
 
-		cameraSetText(theString, messageNumber, xLoc, yLoc, (0, 0, 0)).
+		cameraSetText( theString, messageNumber, xLoc, yLoc, theColor ).
 
 	+ to set-display-text-scale to scale (double):
 		% Sets the scaling factor for text in the display window.  
@@ -927,6 +927,10 @@ Abstract : Control (aka Controls) [version 2.3] {
 		% window.
 
 		cameraSetTextScale(scale).
+
+	- to set-display-text-color to textColor (vector):
+		% Sets the color to the display text to textColor.
+		cameraSetTextColor(cameraPointer, textColor).
 
 	- to set-display-message to theString (string) with-number messageNumber (int) at-x xLoc (float) at-y yLoc (float) with-color textColor = (0, 0, 0) (vector):
 		% Sets a text string in the simulation display.  xLoc and yLoc 
