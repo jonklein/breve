@@ -28,10 +28,11 @@ def setController( inControllerClass ):
 def allInstances( inclass ):
 	cls = globals()[ inclass ]
 
-	if not instanceDict.has_key( cls ):
+	try
+		return instanceDict[ cls ]
+	except KeyError:
 		instanceDict[ cls ] = objectList()
-
-	return instanceDict[ cls ]
+		return instanceDict[ cls ]
 
 def addInstance( inclass, ininstance ):
 	if not instanceDict.has_key( inclass ):
@@ -54,8 +55,7 @@ class objectList( list ):
 
 	def __getattr__( self, methodName ):
 		def execute( *args ):
-			for i in self:
-				i.__getattribute__( methodName )( *args )
+			[ i.__getattribute__( methodName )( *args ) for i in self ]
 
 		return execute
 
