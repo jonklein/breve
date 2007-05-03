@@ -4,8 +4,6 @@ import breve
 class PhysicalControl( breve.Control ):
 	'''The OBJECT(PhysicalControl) class is a subclass of OBJECT(Control) which  must be used for physical simulations.  It activates a number of  features required for physical simulation and sets a number of  variables to reasonable values.'''
 
-	__slots__ = [ 'gravityMenu' ]
-
 	def __init__( self ):
 		breve.Control.__init__( self )
 		self.gravityMenu = breve.objectList()

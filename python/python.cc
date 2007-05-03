@@ -27,16 +27,20 @@
 struct slPythonData {
 
 	PyObject *_vectorClass;
-	PyObject *_vectorType;
-
 	PyObject *_matrixClass;
-	PyObject *_matrixType;
 
 	PyObject *_breveModule;
 	PyObject *_mainModule;
+	PyObject *_internalModule;
 };
 
-slPythonData gPythonData;
+struct slPythonMethodInfo {
+	PyObject *_method;
+
+	int _argumentCount;
+};
+
+static slPythonData sPythonData;
 
 std::string brPythonToSteveName( const char *in ) {
 	std::string result;
@@ -125,18 +129,23 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 		outEval->set( PyCObject_AsVoidPtr( inObject ) );
 		result = EC_OK;
 
-	} else if( PyObject_GetAttrStringSafe( inObject, "isVector" ) ) {
-		slVector v = { 0.0, 0.0, 0.0 };
+	} else if( inObject->ob_type == (_typeobject*)sPythonData._vectorClass ) {
+		slVector *v = NULL;
 
-		PyObject *x = PyList_GET_ITEM( inObject, 0 );
-		PyObject *y = PyList_GET_ITEM( inObject, 1 );
-		PyObject *z = PyList_GET_ITEM( inObject, 2 );
+		int r = inObject->ob_type->tp_as_buffer->bf_getreadbuffer( inObject, 0, (void**)&v );
 
-		if( x ) v.x = PyNumber_AS_DOUBLE( x );
-		if( y ) v.y = PyNumber_AS_DOUBLE( y );
-		if( z ) v.z = PyNumber_AS_DOUBLE( z );
+		if( r < 0 )
+			PyErr_Print();
 
-		outEval->set( v );
+		// PyObject *x = PyList_GET_ITEM( inObject, 0 );
+		// PyObject *y = PyList_GET_ITEM( inObject, 1 );
+		// PyObject *z = PyList_GET_ITEM( inObject, 2 );
+
+		// if( x ) v.x = PyNumber_AS_DOUBLE( x );
+		// if( y ) v.y = PyNumber_AS_DOUBLE( y );
+		// if( z ) v.z = PyNumber_AS_DOUBLE( z );
+
+		outEval->set( *v );
 		result = EC_OK;
 
 	} else if ( ( breveInstance = PyObject_GetAttrStringSafe( inObject, "breveInstance" ) ) )  {
@@ -150,7 +159,7 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 
 		result = EC_OK;
 
-	} else if( PyObject_GetAttrStringSafe( inObject, "isMatrix" ) ) {
+	} else if( inObject->ob_type == (_typeobject*)sPythonData._matrixClass ) {
 		slMatrix m;
 
 		PyObject *x1 = PyList_GET_ITEM( inObject, 0 );
@@ -267,17 +276,14 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 
 		case AT_VECTOR:
 			{
-				const slVector &v = BRVECTOR( inEval );
+				const slVector &v = BRVECTOR( (brEval*)inEval );
+				slVector *vp;
 
-				PyObject *args = PyTuple_New( 3 );
+				result = PyObject_CallObject( sPythonData._vectorClass, NULL );
 
-				PyTuple_SET_ITEM( args, 0, PyFloat_FromDouble( v.x ) );
-				PyTuple_SET_ITEM( args, 1, PyFloat_FromDouble( v.y ) );
-				PyTuple_SET_ITEM( args, 2, PyFloat_FromDouble( v.z ) );
+				result->ob_type->tp_as_buffer->bf_getwritebuffer( result, 0, (void**)&vp );
 
-				result = PyObject_Call( gPythonData._vectorClass, args, NULL );
-
-				Py_DECREF( args );
+				slVectorCopy( &v, vp );
 			}
 
 			break;
@@ -298,7 +304,7 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 				PyTuple_SET_ITEM( args, 7, PyFloat_FromDouble( m[ 2 ][ 1 ] ) );
 				PyTuple_SET_ITEM( args, 8, PyFloat_FromDouble( m[ 2 ][ 2 ] ) );
 
-				result = PyObject_Call( gPythonData._matrixClass, args, NULL );
+				result = PyObject_Call( sPythonData._matrixClass, args, NULL );
 
 				Py_DECREF( args );
 			}
@@ -365,7 +371,6 @@ PyObject *brPythonSetController( PyObject *inSelf, PyObject *inArgs ) {
 
         brEngineSetController( engine, instance );
 
-
 	Py_DECREF( engineObject );
 	Py_DECREF( instanceObject );
 
@@ -373,47 +378,92 @@ PyObject *brPythonSetController( PyObject *inSelf, PyObject *inArgs ) {
 	return Py_None;
 }
 
+PyObject *brPythonVectorLength( PyObject *inSelf, PyObject *inArgs ) {
+	PyObject *v1;
+	slVector *vec1 = NULL;
+
+        if ( !PyArg_ParseTuple( inArgs, "O", &v1 ) ) return NULL;
+
+	v1->ob_type->tp_as_buffer->bf_getreadbuffer( v1, 0, (void**)&vec1 );
+
+	return PyFloat_FromDouble( slVectorLength( vec1 ) );
+}
+
+PyObject *brPythonSetVector( PyObject *inSelf, PyObject *inArgs ) {
+	PyObject *v1;
+	slVector *vec1 = NULL;
+	float x, y, z;
+
+        if ( !PyArg_ParseTuple( inArgs, "Offf", &v1, &x, &y, &z ) ) return NULL;
+
+	v1->ob_type->tp_as_buffer->bf_getwritebuffer( v1, 0, (void**)&vec1 );
+
+	vec1->x = x;
+	vec1->y = y;
+	vec1->z = z;
+
+	Py_INCREF( v1 );
+	return v1;
+}
+
+
+PyObject *brPythonScaleVector( PyObject *inSelf, PyObject *inArgs ) {
+	slVector *vec1 = NULL, *vec3 = NULL;
+	PyObject *v1;
+	float f;
+
+        if ( !PyArg_ParseTuple( inArgs, "Of", &v1, &f ) ) return NULL;
+
+	v1->ob_type->tp_as_buffer->bf_getreadbuffer( v1, 0, (void**)&vec1 );
+
+	PyObject *result = PyObject_CallObject( sPythonData._vectorClass, NULL );
+	result->ob_type->tp_as_buffer->bf_getwritebuffer( result, 0, (void**)&vec3 );
+
+	vec3->x = vec1->x * f;
+	vec3->y = vec1->y * f;
+	vec3->z = vec1->z * f;
+
+	Py_INCREF( result );
+	return result;
+}
+
 PyObject *brPythonAddVectors( PyObject *inSelf, PyObject *inArgs ) {
+	slVector *vec1 = NULL, *vec2 = NULL, *vec3 = NULL;
 	PyObject *v1, *v2;
 
-        if ( !PyArg_ParseTuple( inArgs, "O!O!", &PyList_Type, &v1, &PyList_Type, &v2 ) ) return NULL;
+        if ( !PyArg_ParseTuple( inArgs, "OO", &v1, &v2 ) ) return NULL;
 
-	double x = PyNumber_AS_DOUBLE( PyList_GET_ITEM( v1, 0 ) ) + PyNumber_AS_DOUBLE( PyList_GET_ITEM( v2, 0 ) );
-	double y = PyNumber_AS_DOUBLE( PyList_GET_ITEM( v1, 1 ) ) + PyNumber_AS_DOUBLE( PyList_GET_ITEM( v2, 1 ) );
-	double z = PyNumber_AS_DOUBLE( PyList_GET_ITEM( v1, 2 ) ) + PyNumber_AS_DOUBLE( PyList_GET_ITEM( v2, 2 ) );
+	v1->ob_type->tp_as_buffer->bf_getwritebuffer( v1, 0, (void**)&vec1 );
+	v2->ob_type->tp_as_buffer->bf_getwritebuffer( v2, 0, (void**)&vec2 );
 
-	PyObject *args = PyTuple_New( 3 );
+	PyObject *result = PyObject_CallObject( sPythonData._vectorClass, NULL );
+	result->ob_type->tp_as_buffer->bf_getwritebuffer( result, 0, (void**)&vec3 );
 
-	PyTuple_SET_ITEM( args, 0, PyFloat_FromDouble( x ) );
-	PyTuple_SET_ITEM( args, 1, PyFloat_FromDouble( y ) );
-	PyTuple_SET_ITEM( args, 2, PyFloat_FromDouble( z ) );
+	vec3->x = vec1->x + vec2->x;
+	vec3->y = vec1->y + vec2->y;
+	vec3->z = vec1->z + vec2->z;
 
-	PyObject *result = PyObject_Call( gPythonData._vectorClass, args, NULL );
-
-	Py_DECREF( args );
-
+	Py_INCREF( result );
 	return result;
 }
 
 PyObject *brPythonSubVectors( PyObject *inSelf, PyObject *inArgs ) {
+	slVector *vec1 = NULL, *vec2 = NULL, *vec3 = NULL;
 	PyObject *v1, *v2;
 
-        if ( !PyArg_ParseTuple( inArgs, "O!O!", &PyList_Type, &v1, &PyList_Type, &v2 ) ) return NULL;
+        if ( !PyArg_ParseTuple( inArgs, "OO", &v1, &v2 ) ) return NULL;
 
-	double x = PyNumber_AS_DOUBLE( PyList_GET_ITEM( v1, 0 ) ) - PyNumber_AS_DOUBLE( PyList_GET_ITEM( v2, 0 ) );
-	double y = PyNumber_AS_DOUBLE( PyList_GET_ITEM( v1, 1 ) ) - PyNumber_AS_DOUBLE( PyList_GET_ITEM( v2, 1 ) );
-	double z = PyNumber_AS_DOUBLE( PyList_GET_ITEM( v1, 2 ) ) - PyNumber_AS_DOUBLE( PyList_GET_ITEM( v2, 2 ) );
+	v1->ob_type->tp_as_buffer->bf_getwritebuffer( v1, 0, (void**)&vec1 );
+	v2->ob_type->tp_as_buffer->bf_getwritebuffer( v2, 0, (void**)&vec2 );
 
-	PyObject *args = PyTuple_New( 3 );
+	PyObject *result = PyObject_CallObject( sPythonData._vectorClass, NULL );
+	result->ob_type->tp_as_buffer->bf_getwritebuffer( result, 0, (void**)&vec3 );
 
-	PyTuple_SET_ITEM( args, 0, PyFloat_FromDouble( x ) );
-	PyTuple_SET_ITEM( args, 1, PyFloat_FromDouble( y ) );
-	PyTuple_SET_ITEM( args, 2, PyFloat_FromDouble( z ) );
+	vec3->x = vec1->x - vec2->x;
+	vec3->y = vec1->y - vec2->y;
+	vec3->z = vec1->z - vec2->z;
 
-	PyObject *result = PyObject_Call( gPythonData._vectorClass, args, NULL );
-
-	Py_DECREF( args );
-
+	Py_INCREF( result );
 	return result;
 }
 
@@ -540,11 +590,9 @@ PyObject *brPythonFindInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 
 	brInternalFunction *function = brEngineInternalFunctionLookup( engine, name );
 
-
 	if ( !function ) {
 		std::string error( "could not locate internal breve method \"" );
-		error += name;
-		error += "\"";
+		error += name + std::string( "\"" );
 
 		PyErr_SetString( PyExc_RuntimeError, error.c_str() );
 		return NULL;
@@ -564,9 +612,9 @@ PyObject *brPythonFindInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 	brEval args[ 128 ], resultEval;
 
-	PyObject *callerObject, *functionObject, *arguments, *moduleObject;
+	PyObject *callerObject, *functionObject, *arguments;
 
-	if ( !PyArg_ParseTuple( inArgs, "OOOO", &moduleObject, &callerObject, &functionObject, &arguments ) ) 
+	if ( !PyArg_ParseTuple( inArgs, "O!O!", &PyCObject_Type, &functionObject, &PyTuple_Type, &arguments ) ) 
 		return NULL;
 
 	brInternalFunction *function = ( brInternalFunction* )PyCObject_AsVoidPtr( functionObject );
@@ -576,16 +624,13 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 		return NULL;
 	}
 
+	callerObject = PyTuple_GET_ITEM( arguments, 0 );
+
 	PyObject *breveObject = PyObject_GetAttrString( callerObject, "breveInstance" );
 
 	if( !breveObject ) {
 		PyErr_SetString( PyExc_RuntimeError, "Internal breve function called for Python object not in breve engine (missing call to __init__ for the parent class?)" );
 		return NULL;
-	}
-
-	if( breveObject == Py_None ) {
-		Py_INCREF( Py_None );
-		return Py_None;
 	}
 
 	brInstance *caller = ( brInstance* )PyCObject_AsVoidPtr( breveObject );
@@ -599,12 +644,7 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 
 	if( function->_argCount != 0 ) {
 
-		if( !PyTuple_Check( arguments ) ) {
-			PyErr_SetString( PyExc_RuntimeError, "Invalid arguments passed to internal breve function" );
-			return NULL;
-		}
-
-		int argCount = PyTuple_GET_SIZE( arguments );
+		int argCount = PyTuple_GET_SIZE( arguments ) - 1;
 
 		if( argCount != function->_argCount ) {
 			char err[ 1024 ];
@@ -614,7 +654,7 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 		}
 
 		for( int n = 0; n < argCount; n++ ) {
-			brPythonTypeToEval( PyTuple_GET_ITEM( arguments, n ), &args[ n ] );
+			brPythonTypeToEval( PyTuple_GET_ITEM( arguments, n + 1 ), &args[ n ] );
 
 			if( function->_argTypes[ n ] != AT_UNDEFINED && args[ n ].type() != function->_argTypes[ n ] ) {
 
@@ -637,7 +677,7 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 
 	function->_call( args, &resultEval, caller );
 
-	return brPythonTypeFromEval( &resultEval, moduleObject );
+	return brPythonTypeFromEval( &resultEval, sPythonData._internalModule );
 }
 
 /**
@@ -798,9 +838,10 @@ void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inT
 	std::string symbol = std::string( inName );
 	const char *name = brPyConvertSymbol( symbol ).c_str();
 
-	PyObject *method = PyObject_GetAttrStringSafe( type, name );
+	PyObject *method = PyObject_GetAttrString( type, (char*)name );
 
-	if ( !method ) {
+	if ( !method || !PyCallable_Check( method ) ) {
+		PyErr_Clear();
 		return NULL;
 	}
 
@@ -822,7 +863,12 @@ void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inT
 
 	Py_DECREF( argumentCount );
 
-	return method;
+	slPythonMethodInfo *info = new slPythonMethodInfo();
+
+	info->_method = method;
+	info->_argumentCount = PyInt_AS_LONG( argumentCount );
+
+	return info;
 }
 
 /**
@@ -838,7 +884,7 @@ void *brPythonFindObject( void *inData, const char *inName ) {
 	PyObject *obj = PyObject_GetAttrStringSafe( mainModule, (char*)inName );
 
 	// if( !obj )
-	// 	obj = PyObject_GetAttrStringSafe( gPythonData._breveModule, (char*)inName );
+	// 	obj = PyObject_GetAttrStringSafe( sPythonData._breveModule, (char*)inName );
 
 	return obj;
 }
@@ -894,45 +940,18 @@ brInstance *brPythonInstantiate( brEngine *inEngine, brObject* inObject, const b
  */
 
 int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArguments, brEval *outResult ) {
+	slPythonMethodInfo *info = (slPythonMethodInfo*)inMethod;
+
 	PyObject *instance = ( PyObject* )inInstance;
-	PyObject *method = ( PyObject* )inMethod;
+	PyObject *method = info->_method;
+
 	// static PyObject *tuples[ 5 ] = { PyTuple_New( 1 ), PyTuple_New( 2 ), PyTuple_New( 3 ), PyTuple_New( 4 ), PyTuple_New( 5 ) };
 
-	if ( !PyCallable_Check( method ) ) {
-		slMessage( DEBUG_ALL, "Warning: called method is not callable\n" );
-		return EC_ERROR;
-	}
 
-	// Get the number of arguments to this method
-
-	PyObject *code = PyObject_GetAttrString( method, "func_code" );
-	PyObject *argumentCount = PyObject_GetAttrString( code, "co_argcount" );
-
-	if( !argumentCount ) {
-		slMessage( DEBUG_ALL, "Warning: cannot find argument count for method %p\n", method );
-		return EC_ERROR;
-	}
-
-	// we subtract 1 for the "self" argument
-
-	int count = PyInt_AS_LONG( argumentCount ) - 1;
-
-	Py_DECREF( code );
-	Py_DECREF( argumentCount );
+	int count = info->_argumentCount - 1;
 
 	PyObject *tuple;
-
 	tuple = PyTuple_New( count + 1 );
-
-	// the instance we're calling the method for has the breveInternal module pointer
-
-	PyObject *module = PyObject_GetAttrString( instance, "breveModule" );
-
-	if( !module ) {
-		slMessage( DEBUG_ALL, "Could not locate breveModule for %p\n", instance );
-		PyErr_Print();
-		return EC_ERROR;
-	}
 
 	// Set the self argument
 
@@ -947,25 +966,20 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
 	// Set the rest of the arguments
 
 	for( int n = 0; n < count; n++ ) {
-		PyObject *argument = brPythonTypeFromEval( inArguments[ n ], module );
+		PyObject *argument = brPythonTypeFromEval( inArguments[ n ], sPythonData._breveModule );
 		PyTuple_SetItem( tuple, n + 1, argument );
 	}
 
-	Py_DECREF( module );
-
-	PyObject *result = PyObject_Call( method, tuple, NULL );
+	PyObject *result = PyObject_CallObject( method, tuple );
 
 	Py_DECREF( tuple );
-
 
 	if( !result ) {
 		PyErr_Print();
 		return EC_ERROR;
 	} else {
-		Py_INCREF( result );
 		brPythonTypeToEval( result, outResult );
 	}
-
 
 	return EC_OK;
 }
@@ -1062,15 +1076,18 @@ void brPythonInit( brEngine *breveEngine ) {
 		{ "catchOutput", 		brPythonCatchOutput, 			METH_VARARGS, "" },
 		{ "addVectors", 		brPythonAddVectors, 			METH_VARARGS, "" },
 		{ "subVectors", 		brPythonSubVectors, 			METH_VARARGS, "" },
+		{ "scaleVector", 		brPythonScaleVector, 			METH_VARARGS, "" },
+		{ "setVector", 			brPythonSetVector, 			METH_VARARGS, "" },
+		{ "vectorLength",		brPythonVectorLength, 			METH_VARARGS, "" },
 		{ NULL, NULL, 0, NULL }
 	};
 
 	Py_Initialize();
 
-	PyObject *internal = Py_InitModule( "breveInternal", methods );
+	sPythonData._internalModule = Py_InitModule( "breveInternal", methods );
 
-	PyObject_SetAttrString( internal, "breveEngine", PyCObject_FromVoidPtr( ( void* )breveEngine, NULL ) );
-	PyObject_SetAttrString( internal, "breveObjectType", PyCObject_FromVoidPtr( ( void* )brevePythonType, NULL ) );
+	PyObject_SetAttrString( sPythonData._internalModule, "breveEngine", PyCObject_FromVoidPtr( ( void* )breveEngine, NULL ) );
+	PyObject_SetAttrString( sPythonData._internalModule, "breveObjectType", PyCObject_FromVoidPtr( ( void* )brevePythonType, NULL ) );
 
 	PyRun_SimpleString( "import sys" );
 
@@ -1098,16 +1115,20 @@ void brPythonInit( brEngine *breveEngine ) {
 		PyRun_SimpleString( path );
 	}
 
-	gPythonData._mainModule  = PyImport_ImportModule( "__main__" );
-	gPythonData._breveModule = PyImport_ImportModule( "breve" );
+	sPythonData._mainModule  = PyImport_ImportModule( "__main__" );
+	sPythonData._breveModule = PyImport_ImportModule( "breve" );
 
-	gPythonData._vectorClass = PyObject_GetAttrString( gPythonData._breveModule, "vector" );
-	gPythonData._matrixClass = PyObject_GetAttrString( gPythonData._breveModule, "matrix" );
+	if( !sPythonData._breveModule ) {
+		PyErr_Print();
+		return;
+	}
 
-	// gPythonData._vectorType  = PyObject_Type( breve, "vector" );
-	// gPythonData._matrixType  = PyObject_Type( breve, "matrix" );
+	sPythonData._vectorClass = PyObject_GetAttrString( sPythonData._breveModule, "vector" );
+	sPythonData._matrixClass = PyObject_GetAttrString( sPythonData._breveModule, "matrix" );
 
-	brevePythonType->userData = (void*)gPythonData._mainModule;
+	// sPythonData._internalMethodDict = PyObject_GetAttrString( sPythonData._breveModule, "internalMethodDict" );
+
+	brevePythonType->userData = (void*)sPythonData._mainModule;
 
 	brevePythonType->findMethod 		= brPythonFindMethod;
 	brevePythonType->findObject 		= brPythonFindObject;

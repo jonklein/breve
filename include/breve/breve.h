@@ -50,6 +50,7 @@ typedef struct slGLUTWindow slGLUTWindow;
 
 const struct option gCLIOptions[] = {
         { "archive",    required_argument, 0, 'a' }, 
+        { "time",       required_argument, 0, 't' },
         { "debug",      required_argument, 0, 'd' },
         { "fullscreen", no_argument,       0, 'f' },
         { "help",       no_argument,       0, 'h' },

@@ -4,8 +4,6 @@ import breve
 class Graph( breve.Abstract ):
 	'''Work in progress--not yet supported.'''
 
-	__slots__ = [ 'graphPointer' ]
-
 	def __init__( self ):
 		breve.Abstract.__init__( self )
 		self.graphPointer = None

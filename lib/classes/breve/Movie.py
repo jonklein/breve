@@ -4,8 +4,6 @@ import breve
 class Movie( breve.Abstract ):
 	'''Records MPEG movies of breve runs. <P> The dimensions of the movie are determined by the size of the simulation viewing area when the movie export begins.  Resizing the viewing area  while the movie is exporting will produce undesirable results. <P> The Movie class does not work when using the non-graphical  ("breve_cli") breve.'''
 
-	__slots__ = [ 'moviePointer' ]
-
 	def __init__( self ):
 		breve.Abstract.__init__( self )
 		self.moviePointer = None

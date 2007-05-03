@@ -4,8 +4,6 @@ import breve
 class Stationary( breve.Real ):
 	'''Stationary objects are objects such as floors and walls that may  collide with other objects but which do not move in response to  collisions.  Stationary objects do not have their own velocities or acceleration. <p> Starting in breve 2.6, stationary objects can be moved and  rotated after being created using methods in OBJECT(Real).   The shapes can also be changed dynamically using the set-shape  method in OBJECT(Real).'''
 
-	__slots__ = [ 'objectLocation', 'shadowCatcher' ]
-
 	def __init__( self ):
 		breve.Real.__init__( self )
 		self.objectLocation = breve.vector()
@@ -70,8 +68,6 @@ class Stationary( breve.Real ):
 breve.Stationary = Stationary
 class Floor( breve.Stationary ):
 	'''A floor is a special case of the class OBJECT(Stationary).  It is a box  of size (1000, 5, 1000) with location (0, -2.5, 0), such that the ground  plane is placed at Y = 0.'''
-
-	__slots__ = [ 'shape' ]
 
 	def __init__( self ):
 		breve.Stationary.__init__( self )

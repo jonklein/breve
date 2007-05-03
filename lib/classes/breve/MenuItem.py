@@ -4,8 +4,6 @@ import breve
 class MenuItem( breve.Abstract ):
 	'''The MenuItem class holds menu items associated with objects.  Menus can be associated with Mobile objects, in which case they are shown as contextual menu items, or associated with Control objects in which case they are shown under the global application menu.'''
 
-	__slots__ = [ 'checked', 'enabled', 'menuPointer', 'method', 'name', 'owner' ]
-
 	def __init__( self ):
 		breve.Abstract.__init__( self )
 		self.checked = 0

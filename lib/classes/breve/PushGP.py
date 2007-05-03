@@ -4,8 +4,6 @@ import breve
 class PushGP( breve.Object ):
 	'''This class is a special control class used to implement  experiments using the Push Genetic Programming (PushGP) system.  PushGP is a system which uses genetic programming and the Push programming language to attempt to evolve  solutions to a wide variety of problems.  For more  information on Push and PushGP, see the class OBJECT(PushInterpreter). <p> This class is appropriate for evolving Push programs which are only run once per fitness case. <p> To implement a PushGP experiment you will need to setup a PushGP object which overrides two methods: METHOD(setup-fitness-test), which sets up a fitness test and METHOD(compute-error), which is used to compute the  fitness of an individual. <p> Additionally, other methods in this class are useful for configuring the genetic programming environment and a  variety of parameters including population size,  mutation rate, crossover rate, and the Push language 	 interpreter set. <p> Finally, you may also wish to add custom instructions  to the Push interpreter objects which manipulate data or trigger actions in the simulated world.  The Push interpreter can be retrieved using the method  METHOD(get-interpreter), and adding instructions is  documented in OBJECT(PushInterpreter).'''
 
-	__slots__ = [ '_abortFitnessTest', '_abortFitnessValue', '_bestOfGen', '_fitnessCaseSolutionRates', '_lastSolutionRates', '_totalErrors', '_totalSize', '_useChallenges', 'crossoverPercent', 'current', 'currentFitnessTest', 'currentIndividual', 'deletionPercent', 'fitnessTestDuration', 'generation', 'generationLimit', 'inited', 'interpreter', 'mutationPercent', 'next', 'pop1', 'pop2', 'populationSize', 'seed', 'spatialRadius', 'tournamentSize' ]
-
 	def __init__( self ):
 		breve.Object.__init__( self )
 		self._abortFitnessTest = 0
@@ -533,8 +531,6 @@ breve.PushGP = PushGP
 class PushGPIndividual( breve.PushProgram ):
 	'''A class used by OBJECT(PushGP), this is a single individual in a PushGP run.  It is not typically used directly by the user.'''
 
-	__slots__ = [ 'errors', 'fitness', 'interpreter' ]
-
 	def __init__( self ):
 		breve.PushProgram.__init__( self )
 		self.errors = breve.objectList()
@@ -576,8 +572,6 @@ class PushGPIndividual( breve.PushProgram ):
 breve.PushGPIndividual = PushGPIndividual
 class PushClusterGP( breve.PushGP ):
 	'''PushClusterGP is a version of OBJECT(PushGP) that allows individual programs in a genetic programming run to migrate to runs on other  networked machines.   <P> Turning a single machine PushGP experiment to a multiple machine  PushClusterGP experiment is simple.  Just provide a list of the  hosts running the simulation to METHOD(set-emigration-hosts). <P> Note: using the PushClusterGP object will open a tcp server on  port 59175.'''
-
-	__slots__ = [ 'emigrationHosts', 'emigrationPercent', 'lastTransfer', 'port', 'server', 'transfer' ]
 
 	def __init__( self ):
 		breve.PushGP.__init__( self )
@@ -691,8 +685,6 @@ class PushClusterGP( breve.PushGP ):
 breve.PushClusterGP = PushClusterGP
 class PushProgramTransporter( breve.Object ):
 	'''Used by OBJECT(PushClusterGP) to send Push programs over the network. No user-level methods are provided for this class.'''
-
-	__slots__ = [ 'programStrings' ]
 
 	def __init__( self ):
 		breve.Object.__init__( self )

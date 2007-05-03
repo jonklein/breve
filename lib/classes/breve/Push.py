@@ -4,8 +4,6 @@ import breve
 class PushInterpreter( breve.Object ):
 	'''Summary: an interface to the Push programming language. <P> The PushInterpreter object is used to setup and run programs in the  Push programming language, a language developed specifically for evolutionary computation. <P> Push is useful in breve for evolving evolved agent behaviors.  The  steve language, in which users write simulations, is a high level language which is not well suited for evolutionary computation.   The Push language, on the other hand, is designed from the ground up for evolutionary computation. <P> More information about Push is available <a href="http://hampshire.edu/lspector/push.html">here</a>.'''
 
-	__slots__ = [ 'effort', 'pushInterpreterPointer' ]
-
 	def __init__( self ):
 		breve.Object.__init__( self )
 		self.effort = 0
@@ -328,8 +326,6 @@ breve.PushInterpreter = PushInterpreter
 class PushProgram( breve.Object ):
 	'''Summary: a single program in the Push programming language. <P> A PushProgram object is a program in the Push programming language.  To  be used in conjunction with the class OBJECT(PushInterpreter).'''
 
-	__slots__ = [ 'codePointer' ]
-
 	def __init__( self ):
 		breve.Object.__init__( self )
 		self.codePointer = None
@@ -489,8 +485,6 @@ class PushProgram( breve.Object ):
 breve.PushProgram = PushProgram
 class PushDiversityPool( breve.Object ):
 	'''Summary: a tool to test diversity in populations of PushProgram objects. <P> The PushDiversityPool allows you to determine the level of genotypic diversity of PushProgram objects, typically individuals in a genetic programming or artificial life experiment. <P> Diversity is detemined as the number of unique species which differ  from one another by at least a certain tolerance value.  "Difference" is defined by the algorithm outlined in  OBJECTMETHOD(PushProgram:get-discrepancy).  No single species will  contain any two individuals which differ by more than the specified tolerance. <P> The tolerance can be set with the method METHOD(set-tolerance).   Programs can then be added using METHOD(add).  The number of species can then be retreived using METHOD(get-size).  The method METHOD(clear) allows the diversity pool to be emptied and reused.'''
-
-	__slots__ = [ 'poolPointer' ]
 
 	def __init__( self ):
 		breve.Object.__init__( self )

@@ -4,8 +4,6 @@ import breve
 class File( breve.Abstract ):
 	'''A File is an object used for creating textual output of your breve  simulation, or for reading in data from text files.   <p> Though some File methods can be used to encode or decode simulation objects, it is not the preferred method for archiving and dearchiving  objects--for a discussion of archiving and dearchiving objects, see the  <a href="http://www.spiderland.org/breve/docs/docs/archiving.html">Archiving and Dearchiving section</a> of the breve documentation.'''
 
-	__slots__ = [ 'filePointer' ]
-
 	def __init__( self ):
 		breve.Abstract.__init__( self )
 		self.filePointer = None

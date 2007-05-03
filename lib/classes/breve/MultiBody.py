@@ -4,8 +4,6 @@ import breve
 class MultiBody( breve.Object ):
 	'''The MultiBody class is used to manipulate a group of connected OBJECT(Link) objects as a single logical body.  This means that  the entire group of links can be moved or otherwise manipulated using by referring to the MultiBody. <p> After the creating and connecting of the links is complete,  one of the OBJECT(Link) objects must be declared the root of  the MultiBody using the METHOD(set-root) method.  '''
 
-	__slots__ = [ 'menus', 'multibodyPointer', 'rootLink', 'selfCollisions' ]
-
 	def __init__( self ):
 		breve.Object.__init__( self )
 		self.menus = breve.objectList()

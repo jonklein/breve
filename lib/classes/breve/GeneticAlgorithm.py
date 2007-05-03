@@ -4,8 +4,6 @@ import breve
 class GeneticAlgorithm( breve.Object ):
 	'''The GeneticAlgorithm class allows you to set up a genetic algorithm,  in which strategies can be evolved to solve a wide variety of problems. <P> To run a genetic algorithm, you will need to a create custom subclass of this object, GeneticAlgorithm, and of its companion object  OBJECT(GeneticProgrammingIndividual). <P> Your subclass of GeneticAlgorithm must implement two important methods:	 METHOD(start-fitness-test) and METHOD(end-fitness-test).  These methods are automatically called at the beginning and end of the fitness tests	 respectively.'''
 
-	__slots__ = [ 'bestFitness', 'crossoverPercent', 'currentIndividual', 'currentPopulation', 'generation', 'generationLimit', 'individualClass', 'migrationHosts', 'migrationPercent', 'migrationPort', 'migrationServer', 'mutationPercent', 'populationSize', 'populations', 'randomizePercent', 'seed', 'spatialRadius', 'testDuration', 'tournamentSize', 'transferIn', 'transferOut' ]
-
 	def __init__( self ):
 		breve.Object.__init__( self )
 		self.bestFitness = 0
@@ -485,8 +483,6 @@ breve.GeneticAlgorithm = GeneticAlgorithm
 class GeneticAlgorithmIndividual( breve.Object ):
 	'''This object represents a single individual in a OBJECT(GeneticAlgorithm). To use the class OBJECT(GeneticAlgorithm), you must also implement a  custom subclass of this class.  Your custom subclass should contain the variables which will represent the genes for the genetic algorithm, and must also implement a few methods used for genetic operators. <P> At a very minimum, you must implement your own versions of the methods METHOD(compute-fitness), METHOD(copy) and METHOD(mutate).  If you intend  to use the crossover  genetic operator, you must also implement the method METHOD(crossover). If these methods are not implemented by your subclass, the object will trigger a runtime error.'''
 
-	__slots__ = [ 'fitness' ]
-
 	def __init__( self ):
 		breve.Object.__init__( self )
 		self.fitness = 0
@@ -541,8 +537,6 @@ class GeneticAlgorithmIndividual( breve.Object ):
 breve.GeneticAlgorithmIndividual = GeneticAlgorithmIndividual
 class GAIndividualTransporter( breve.Object ):
 	''''''
-
-	__slots__ = [ 'individuals' ]
 
 	def __init__( self ):
 		breve.Object.__init__( self )

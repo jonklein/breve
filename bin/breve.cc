@@ -56,6 +56,8 @@ static int gPaused = 1;
 static int gWaiting = 0;
 static int gThreadShouldExit = 0;
 
+static float gSimulationTime = 0.0;
+
 static pthread_mutex_t gEngineMutex;
 static pthread_mutex_t gThreadMutex;
 static pthread_cond_t gThreadPaused;
@@ -259,6 +261,11 @@ void *workerThread( void *data ) {
 		}
 
 		pthread_mutex_unlock( &gThreadMutex );
+
+		if( gSimulationTime > 0.0 && gEngine->world->getAge() >= gSimulationTime ) {
+			brQuit( gEngine );
+		}
+
 	}
 }
 
@@ -271,6 +278,9 @@ void brGlutLoop() {
 
 	if ( !gPaused ) {
 		if ( newD && brEngineIterate( gEngine ) != EC_OK )
+			brQuit( gEngine );
+
+		if( gSimulationTime > 0.0 && gEngine->world->getAge() >= gSimulationTime ) 
 			brQuit( gEngine );
 
 		if ( !gOptionNoGraphics ) 
@@ -391,7 +401,7 @@ int brParseArgs( int argc, char **argv ) {
 	int error = 0;
 
 	const char *name = argv[0];
-	const char *optstring = "a:d:fhip:r:s:xuvFMS:Y";
+	const char *optstring = "t:a:d:fhip:r:s:xuvFMS:Y";
 
 #if HAVE_GETOPT_LONG
 	while (( r = getopt_long( argc, argv, optstring, gCLIOptions, NULL ) ) != -1 )
@@ -418,17 +428,19 @@ int brParseArgs( int argc, char **argv ) {
 
 			case 'f':
 				gOptionFull = 1;
-
 				break;
 
 			case 'i':
 				gOptionStdin = 1;
-
 				break;
 
 			case 'p':
 				sscanf( optarg, "%d,%d", &gXpos, &gYpos );
+				break;
 
+			case 't':
+				gSimulationTime = atof( optarg );
+				slMessage( DEBUG_ALL, "Running simulation for %f seconds\n", gSimulationTime );
 				break;
 
 			case 'r':

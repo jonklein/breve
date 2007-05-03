@@ -4,8 +4,6 @@ import breve
 class Shape( breve.Abstract ):
 	'''The Shape class is a work-in-progress which allows users to create  shapes which will be associated with OBJECT(Mobile), OBJECT(Stationary) or OBJECT(Link) objects and added to the simulated world.  An instance of the class Shape may be shared by several objects simultaneously. <p> Each Shape has it's own local coordinate frame, with the origin at the middle of the shape.'''
 
-	__slots__ = [ 'density', 'lastScale', 'shapeData', 'shapePointer' ]
-
 	def __init__( self ):
 		breve.Abstract.__init__( self )
 		self.density = 0
@@ -146,8 +144,6 @@ breve.Shape = Shape
 class CustomShape( breve.Shape ):
 	'''A CustomShape is a subclass of (Shape) which allows the user to  construct an arbitrary convex shape by specifying the faces of  the shape. <P> The shapes must conform to the following rules: <li>The point (0, 0, 0) must be on <b>inside</b> (not outside or  on the surface of) the shape. <li>The shape must be convex. <li>The shape must be solid and sealed by the faces. </ul> <p> If any of these conditions are not met, you will get errors  and/or unexpected results.'''
 
-	__slots__ = [  ]
-
 	def __init__( self ):
 		breve.Shape.__init__( self )
 		CustomShape.init( self )
@@ -175,8 +171,6 @@ breve.CustomShape = CustomShape
 class Sphere( breve.Shape ):
 	'''This class is used to create a sphere shape.'''
 
-	__slots__ = [  ]
-
 	def __init__( self ):
 		breve.Shape.__init__( self )
 
@@ -195,8 +189,6 @@ class Sphere( breve.Shape ):
 breve.Sphere = Sphere
 class Cube( breve.Shape ):
 	'''This class is used to create an extruded rectangle.  Even though the class is named "Cube", the shapes do not need to be perfect cubes--they can be  rectangular solids of all sizes.'''
-
-	__slots__ = [  ]
 
 	def __init__( self ):
 		breve.Shape.__init__( self )
@@ -217,8 +209,6 @@ breve.Cube = Cube
 class PolygonDisk( breve.Shape ):
 	'''This class is used to create a polygon-disk.  This is a shape which can be  described as an extruded polygon. '''
 
-	__slots__ = [  ]
-
 	def __init__( self ):
 		breve.Shape.__init__( self )
 
@@ -238,8 +228,6 @@ breve.PolygonDisk = PolygonDisk
 class PolygonCone( breve.Shape ):
 	'''This class is used to create a polygon-cone shape.  This is a shape with a polygon base which tapers off to a point.  A pyramid is an example of a polygon-cone with 4 sides.  As the number of sides increases, the base becomes more circular and the resulting shape will more closely resemble a true cone.'''
 
-	__slots__ = [  ]
-
 	def __init__( self ):
 		breve.Shape.__init__( self )
 
@@ -258,8 +246,6 @@ class PolygonCone( breve.Shape ):
 breve.PolygonCone = PolygonCone
 class MeshShape( breve.Shape ):
 	'''An experimental class to load arbitrary 3d mesh shapes.   <p> <b>Full collision detection is not currently supported for MeshShapes</b>. MeshShapes are currently collision detected using spheres, with the radius defined by the maximum reach of the mesh.'''
-
-	__slots__ = [  ]
 
 	def __init__( self ):
 		breve.Shape.__init__( self )

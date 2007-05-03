@@ -245,6 +245,7 @@ int slUpdateTexture( slCamera *c, GLuint texture, unsigned char *pixels, int wid
 
 	glBindTexture( GL_TEXTURE_2D, texture );
 
+	glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
 	glTexImage2D( GL_TEXTURE_2D, 0, format, newwidth, newheight, 0, format, GL_UNSIGNED_BYTE, newpixels );
@@ -1228,28 +1229,21 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 				if ( color )
 					glColor4f( wo->_color.x, wo->_color.y, wo->_color.z, wo->_alpha );
 
-				if ( wo->_alpha != 1.0 ) {
-					if ( !doNoTexture && wo->_texture > 0 )
+				if ( !doNoTexture && wo->_texture > 0 ) {
+					glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+
+					if ( wo->_textureMode == BBT_LIGHTMAP )
 						glBlendFunc( GL_SRC_ALPHA, GL_ONE );
 					else
 						glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-					glDisable( GL_CULL_FACE );
-				}
-
-				// 0 or -1 can be used to indicate no texture
-
-				if ( !doNoTexture && wo->_texture > 0 ) {
-					glBindTexture( GL_TEXTURE_2D, wo->_texture );
 					glEnable( GL_TEXTURE_2D );
+					glBindTexture( GL_TEXTURE_2D, wo->_texture );
 				}
 
 				wo->draw( this );
 
-				if ( wo->_alpha != 1.0 )
-					glEnable( GL_CULL_FACE );
-
-				if ( wo->_texture > 0 )
+				if ( !doNoTexture && wo->_texture > 0 )
 					glDisable( GL_TEXTURE_2D );
 			} else
 				_points.push_back( std::pair< slVector, slVector>( wo->getPosition().location, wo->_color ) );
@@ -1278,6 +1272,11 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 
 	if ( loadNames )
 		glLoadName( w->_objects.size() + 1 );
+
+
+	// Restore the default blend func
+
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 }
 
 /*!

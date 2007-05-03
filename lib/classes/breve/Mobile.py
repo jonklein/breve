@@ -4,8 +4,6 @@ import breve
 class Mobile( breve.Real ):
 	'''Mobile objects are objects in the simulated world which move around 		 and interact with other objects.  This is in contrast to  OBJECT(Stationary) objects which can collide and interact with  other objects but which never move. <P> When a Mobile object is created, it will be by default a simple  sphere.  You can change the appearence of this sphere by using methods in this class, or its parent class OBJECT(Real).  Or  you can change the shape altogether with the method METHOD(set-shape).'''
 
-	__slots__ = [ 'archiveAcceleration', 'archiveLocation', 'archiveRotation', 'archiveRvelocity', 'archiveVelocity', 'linkForce', 'linkTorque', 'physicsEnabled' ]
-
 	def __init__( self ):
 		breve.Real.__init__( self )
 		self.archiveAcceleration = breve.vector()

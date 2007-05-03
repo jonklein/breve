@@ -4,8 +4,6 @@ import breve
 class Joint( breve.Abstract ):
 	'''Joint a is class used to connect two OBJECT(Mobile) objects together.  The Joint class itself is actually never instantiated--instead, one of the following joint subclasses should be used. <ul> <li>OBJECT(PrismaticJoint) for linear sliding joints between links <li>OBJECT(RevoluteJoint) for rotational joints between links <li>OBJECT(FixedJoint) for static joints between links <li>OBJECT(BallJoint) for ball joints between links <li>OBJECT(UniversalJoint) for ball joints between links </ul> <P> Although the class itself is never instantiated, the class methods  described below are often used with the object's subclasses. <P> The joints supported in breve can be 1, 2 or 3 degrees of freedom  (DOF), meaning that they allow motion in 1, 2 or 3 independent  directions.  '''
 
-	__slots__ = [ 'child', 'clinkPoint', 'jointPointer', 'maxVector', 'minVector', 'normalVector', 'parent', 'plinkPoint', 'relativeRotation', 'springMax', 'springMin', 'springStrength', 'strengthLimit' ]
-
 	def __init__( self ):
 		breve.Abstract.__init__( self )
 		self.child = None
@@ -332,8 +330,6 @@ breve.Joint = Joint
 class PrismaticJoint( breve.Joint ):
 	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a sliding linear joint.   <P> A retractable TV antenna is an example of an object that uses multiple prismatic joints. <P> <CENTER><IMG SRC="PrismaticJoint.jpg" BORDER=1></CENTER>'''
 
-	__slots__ = [  ]
-
 	def __init__( self ):
 		breve.Joint.__init__( self )
 
@@ -397,8 +393,6 @@ class PrismaticJoint( breve.Joint ):
 breve.PrismaticJoint = PrismaticJoint
 class RevoluteJoint( breve.Joint ):
 	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a rotating joint.   <P> RevoluteJoints rotate on a single axis, like a hinge.  The knee is another  example of a RevoluteJoint--it can bend back-and-forth, but it cannot twist  or bend side-to-side. <P> <CENTER><IMG SRC="RevoluteJoint.jpg" BORDER=1></CENTER>'''
-
-	__slots__ = [  ]
 
 	def __init__( self ):
 		breve.Joint.__init__( self )
@@ -474,8 +468,6 @@ breve.RevoluteJoint = RevoluteJoint
 class FixedJoint( breve.Joint ):
 	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a static, or fixed, joint. <P> <CENTER><IMG SRC="FixedJoint.jpg" BORDER=1></CENTER> <P> <b>Fixed joints do not currently support a relative rotation the way other joint types do.</b>  I'm so sorry.  '''
 
-	__slots__ = [  ]
-
 	def __init__( self ):
 		breve.Joint.__init__( self )
 
@@ -522,8 +514,6 @@ class FixedJoint( breve.Joint ):
 breve.FixedJoint = FixedJoint
 class UniversalJoint( breve.Joint ):
 	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a universal joint.   <P> A universal joint has two degrees of freedom.  It can rotate "up-and-down" and "side-to-side", but cannot  "twist".  Your wrist is basically a universal joint--your hand cannot rotate without the rest of your arm. <P> <CENTER><IMG SRC="UniversalJoint.jpg" BORDER=1></CENTER>'''
-
-	__slots__ = [  ]
 
 	def __init__( self ):
 		breve.Joint.__init__( self )
@@ -594,8 +584,6 @@ class UniversalJoint( breve.Joint ):
 breve.UniversalJoint = UniversalJoint
 class BallJoint( breve.Joint ):
 	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a ball joint. <p> A universal joint has three degrees of freedom.  It can tilt "up-and-down" and "side-to-side", and can "twist".  Your neck is basically a ball joint--your head tilt  up-and-down, side-to-side, and can twist (although not all the  way around--if your head turns all the way around, please consult  the user manual for repair). <P> <CENTER><IMG SRC="BallJoint.jpg" BORDER=1></CENTER> <P> This joint uses a scheme of 3 Euler angles to represent the  relative rotation between two objects.  The Z-axis of rotation is automatically  derived from the parent link point, meaning that the Z-axis rotation is always  a "twist" relative to the link point.  The X-axis of rotation is specified by  the user with the normal argument.  The Y-axis is automatically derived from the  other two. <P> Because of a limitation of the physics engine, the Y-axis rotation is limited  to a range of approximately +/- 80 degrees of rotation. <P> If versions of breve prior to 2.3, there was no normal argument because the  axes of rotation were automatically defined.  The argument is therefore optional for backwards compatibility <b>only</b>, and should <b>always</b> be specified when writing new code.'''
-
-	__slots__ = [  ]
 
 	def __init__( self ):
 		breve.Joint.__init__( self )

@@ -4,8 +4,6 @@ import breve
 class Spring( breve.Object ):
 	'''A Spring is used to create an elastic connection between two OBJECT(Real)  objects.  Springs define only a connection between objects and are not  physical objects themselves.  Thus, <b>Springs can pass through each other  without colliding</b>.   <P> A number of paramters can be specified for springs.  The length parameter specifies the length of the spring when it is completely relaxed.  The  spring will always apply a force to attempt to expand or contract to the	 specified length.  The strength parameter specifies the amount of force that is applied to try to attain the spring's natural length.  Finally, the damping parameter specifies the friction or damping proportional to the spring's velocity. <P> If physical realism is important, springs should be used with caution. As the strength and damping constants of the spring increase, springs  can generate enormous forces that will cause numerical overflows or  other undesirable behavior.  Keep spring strength and damping constants as low as possible to avoid this behavior. <P> The Spring class is new as of version 2.1.'''
 
-	__slots__ = [ 'damping', 'end', 'length', 'maxForce', 'mode', 'springPointer', 'start', 'strength' ]
-
 	def __init__( self ):
 		breve.Object.__init__( self )
 		self.damping = 0

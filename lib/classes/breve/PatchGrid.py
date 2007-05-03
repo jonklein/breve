@@ -4,8 +4,6 @@ import breve
 class PatchGrid( breve.Abstract ):
 	'''OBJECT(PatchGrid) is a class which allows you to create "patches".   A OBJECT(Patch) is a non-physical object which is associated with  a specific area in the 3D world.  This allows you to associate  information or actions with specific areas in space, such as the  presence of a chemical or nutrient at that area. <p> Use METHOD(init-with) to create a PatchGrid.'''
 
-	__slots__ = [ 'blueChemicalMatrix', 'chemicalConcentrationMatrix', 'chemicals', 'diffusingChemicals', 'exponentiallyDecayingChemicals', 'greenChemicalMatrix', 'gridPointer', 'linearlyDecayingChemicals', 'location', 'patchSize', 'patchVolume', 'patches', 'redChemicalMatrix', 'tempMatrix', 'xSize', 'ySize', 'zSize' ]
-
 	def __init__( self ):
 		breve.Abstract.__init__( self )
 		self.blueChemicalMatrix = None
@@ -417,8 +415,6 @@ class PatchGrid( breve.Abstract ):
 breve.PatchGrid = PatchGrid
 class PatchToroid( breve.PatchGrid ):
 	'''OBJECT(PatchToroid) is a subclass of OBJECT(PatchGrid) in which the  patch neighbors are initialized in a toroidal fashion, such that  patches on the edge of the grid are "connected" (via neighbor  relationships) to patches on the opposite edge. <P> Note that since OBJECT(PatchGrid) objects can already be 3 dimensional, that a 3D toroidal OBJECT(PatchGrid) is actually not the traditional  donut shaped toroidal topology--it's the corresponding topology in  4 dimensions.  Now I don't know about you, but I get a headache thinking about this stuff, so let's just agree that "toroid" is not the totally accurate term, but that it's the easiest way to describe what's going on here.'''
-
-	__slots__ = [  ]
 
 	def __init__( self ):
 		breve.PatchGrid.__init__( self )

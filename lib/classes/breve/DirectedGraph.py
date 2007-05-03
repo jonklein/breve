@@ -4,8 +4,6 @@ import breve
 class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 	'''GADirectedGraph is a special subclass of OBJECT(GeneticAlgorithmIndividual)  which maages directed networks of nodes for evolution.  The primary use of these networks is to evolve creature morphologies.  The networks are based on the the directed graphs used by Karl Sims in "Evolving Virtual  Creatures" (1994).  Multiple connections may exist between nodes, and nodes  may have connections back to themselves. <P> GAGraph makes use of a number of other classes.  The GAGraph itself holds  a reference to the graph's root node, which is an object of  OBJECT(GADirectedGraphNode).  This root node may be connected directly or  indirectly to any other number of OBJECT(GADirectedGraphNode) objects, using the connection class OBJECT(GADirectedGraphConnection). <P> Because OBJECT(GADirectedGraphNode) and OBJECT(GADirectedGraphConnection)  are intended to be used as general evolutionary objects, it is often  neccessary to associate a set of parameters with these objects, above  and beyond the information coded in the connected graph.  For this reason, both classes are subclasses of an object which can hold a list of parameters, OBJECT(GADirectedGraphParameterObject). <P> OBJECT(GADirectedGraphParameterObject) holds a list of float values between -1.0 and 1.0.  These parameters can be interpreted in whatever way the  user desires.  In the example of directed graphs being used to specify creature morphologies, the parameters hold information about the size and orientation of limbs relative to one another.'''
 
-	__slots__ = [ 'rootNode' ]
-
 	def __init__( self ):
 		breve.GeneticAlgorithmIndividual.__init__( self )
 		self.rootNode = None
@@ -222,8 +220,6 @@ breve.GADirectedGraph = GADirectedGraph
 class GADirectedGraphParameterObject( breve.Abstract ):
 	'''A GADirectedGraphParameterObject is a subclass of object which holds a parameter list for use with the OBJECT(GADirectedGraphNode) and OBJECT(GADirectedGraphConnection) objects.  The elements in the parameter list are to be interpreted as evolving genome values which control how the graph nodes and connections are used.'''
 
-	__slots__ = [ 'parameters' ]
-
 	def __init__( self ):
 		breve.Abstract.__init__( self )
 		self.parameters = breve.objectList()
@@ -291,8 +287,6 @@ class GADirectedGraphParameterObject( breve.Abstract ):
 breve.GADirectedGraphParameterObject = GADirectedGraphParameterObject
 class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 	'''OBJECT(GADirectedGraphNode) is a node in a directed graph.  It is a subclass of  OBJECT(GADirectedGraphParameterObject) which can be used to associate it with  a set of parameters.'''
-
-	__slots__ = [ 'connections' ]
 
 	def __init__( self ):
 		breve.GADirectedGraphParameterObject.__init__( self )
@@ -454,8 +448,6 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 breve.GADirectedGraphNode = GADirectedGraphNode
 class GADirectedGraphConnection( breve.GADirectedGraphParameterObject ):
 	'''A OBJECT(GADirectedGraphConnection) is a connection from one  OBJECT(GADirectedGraphNode) to another.  As a subclass of  OBJECT(GADirectedGraphParameterObject), it can be associated  with a list of parameters.'''
-
-	__slots__ = [ 'target' ]
 
 	def __init__( self ):
 		breve.GADirectedGraphParameterObject.__init__( self )

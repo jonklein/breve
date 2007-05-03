@@ -4,8 +4,6 @@ import breve
 class Matrix( breve.Object ):
 	'''Matrix2D objects store an arbitrary sized 2D grid of arbitrary floating  point data. <P> Several of these matrix operations are built on top of the BLAS library and may be hardware accelerated on certain processors if the platform provides a hardware accelerated BLAS library.  In particular, AltiVec  acceleration is provided on G4 processors with Mac OS X.   <P> Hardware accelerated methods sometimes preform multiple operations  simultaneously for the same computational cost.  The METHOD(add) operation, for example, also scales one of the matrices being added. When using these methods, it is often beneficial to structure code to take advantage of all of the operations preformed.  It is far  more efficient to scale and add a matrix simultaneously using METHOD(add) than to first scale using METHOD(scale) and then add using METHOD(add). <P> Technical note: matrix objects are implemented using single precision  floats, while much of the rest of the breve simulation environment uses  double precision floating point math.'''
 
-	__slots__ = [ 'archiveList', 'matrixPointer' ]
-
 	def __init__( self ):
 		breve.Object.__init__( self )
 		self.archiveList = breve.objectList()
@@ -21,8 +19,6 @@ class Matrix( breve.Object ):
 breve.Matrix = Matrix
 class Matrix2D( breve.Matrix ):
 	''''''
-
-	__slots__ = [ 'xDim', 'yDim' ]
 
 	def __init__( self ):
 		breve.Matrix.__init__( self )
@@ -251,8 +247,6 @@ breve.Matrix2D = Matrix2D
 class Matrix3D( breve.Matrix ):
 	'''Matrix3D objects store an arbitrary sized 3D grid of arbitrary floating  point data. <P> Several of these matrix operations are built on top of the BLAS library and may be hardware accelerated on certain processors if the platform provides a hardware accelerated BLAS library.  In particular, AltiVec  acceleration is provided on G4 an G5 processors with Mac OS X.   <P> Hardware accelerated methods sometimes preform multiple operations  simultaneously for the same computational cost.  The METHOD(add) operation, for example, also scales one of the matrices being added. When using these methods, it is often beneficial to structure code to take advantage of all of the operations preformed.  It is far  more efficient to scale and add a matrix simultaneously using METHOD(add) than to first scale using METHOD(scale) and then add using METHOD(add). <P> Technical note: matrix objects are implemented using single precision  floats, while much of the rest of the breve simulation environment uses  double precision floating point math.'''
 
-	__slots__ = [ 'xDim', 'yDim', 'zDim' ]
-
 	def __init__( self ):
 		breve.Matrix.__init__( self )
 		self.xDim = 0
@@ -463,8 +457,6 @@ class Matrix3D( breve.Matrix ):
 breve.Matrix3D = Matrix3D
 class MatrixImage( breve.Image ):
 	'''The MatrixImage allows three 2D matrices to be copied into the red, green and blue  channels of an image for efficient display.  The image is automatically updated 	 with new matrix values at each iteration.'''
-
-	__slots__ = [ 'blue', 'green', 'red', 'scale' ]
 
 	def __init__( self ):
 		breve.Image.__init__( self )

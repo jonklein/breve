@@ -4,8 +4,6 @@ import breve
 class NeuralNetwork( breve.Abstract ):
 	'''A new experimental class for simple feed-forward neural networks.'''
 
-	__slots__ = [ 'inputLayer', 'layers', 'outputLayer' ]
-
 	def __init__( self ):
 		breve.Abstract.__init__( self )
 		self.inputLayer = None

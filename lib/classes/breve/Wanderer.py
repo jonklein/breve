@@ -4,8 +4,6 @@ import breve
 class Wanderer( breve.Mobile ):
 	'''This class is a work-in-progress.  A Wanderer is simply a real object  that wanders randomly around a certain space.  The range of wandering is adjusted with the METHOD(set-wander-range) method. <p> Subclasses of Wanderer should implement their own <b>iterate</b>  method to perform class specific tasks, and then call the method <b>super iterate</b> in order for the Wanderer object to handle the object's motion.'''
 
-	__slots__ = [ 'topVelocity', 'wanderMag', 'wanderVec' ]
-
 	def __init__( self ):
 		breve.Mobile.__init__( self )
 		self.topVelocity = 0

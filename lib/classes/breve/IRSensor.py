@@ -4,8 +4,6 @@ import breve
 class IRSensor( breve.Real ):
 	''''''
 
-	__slots__ = [ 'communicationThreshold', 'draw', 'm_location', 'm_rotation', 'owner', 'realWorldPointer_owner', 'rel_position', 'rel_rotation', 'sensorType', 'sensordata' ]
-
 	def __init__( self ):
 		breve.Real.__init__( self )
 		self.communicationThreshold = 0

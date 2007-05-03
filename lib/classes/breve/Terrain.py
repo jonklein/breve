@@ -4,8 +4,6 @@ import breve
 class Terrain( breve.Real ):
 	'''Terrain is an experimental class to add terrains to simulations.  '''
 
-	__slots__ = [ 'location', 'peakColor', 'valleyColor' ]
-
 	def __init__( self ):
 		breve.Real.__init__( self )
 		self.location = breve.vector()

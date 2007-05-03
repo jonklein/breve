@@ -517,7 +517,7 @@ void slPatchGrid::draw( slCamera *camera ) {
 	wglTexSubImage3D( GL_TEXTURE_3D, 0, 0, 0, 0, _xSize, _ySize, _zSize, GL_RGBA, GL_UNSIGNED_BYTE, colors );
 #else
 	if( _textureNeedsUpdate ) { 
-		glPixelStorei( GL_UNPACK_ROW_LENGTH, _ySize );
+		// glPixelStorei( GL_UNPACK_ROW_LENGTH, _ySize );
 		glPixelTransferf( GL_ALPHA_SCALE, 3.0f );
 		glTexSubImage3D( GL_TEXTURE_3D, 0, 0, 0, 0, _ySize, _xSize, _zSize, GL_RGBA, GL_UNSIGNED_BYTE, colors );
 		glPixelTransferf( GL_ALPHA_SCALE, 1.0f );

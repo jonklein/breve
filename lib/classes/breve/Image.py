@@ -4,8 +4,6 @@ import breve
 class Image( breve.Abstract ):
 	'''The Image class provides an interface to work with images and  textures.  The individual pixels of the image can be read  or changed by the simulation as desired. <P> The image class can read rendered images from the screen using the  method METHOD(read-pixels), so that agents in the 3D world  can have access to real rendered data.  In addition, the method  METHOD(get-pixel-pointer) can be used to provide a pointer to the  RGBA pixel data so that plugins can access and analyze image data. This could be used, among other things, to implement agent vision.'''
 
-	__slots__ = [ 'currentHeight', 'currentWidth', 'imageData', 'modified', 'textureNumber' ]
-
 	def __init__( self ):
 		breve.Abstract.__init__( self )
 		self.currentHeight = 0

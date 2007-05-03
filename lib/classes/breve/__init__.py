@@ -1,6 +1,6 @@
 
 import breveInternal
-import sys, os, math, random
+import sys, os, math, random, array
 
 #
 # Used internally to redirect Python output to the breve frontend
@@ -28,7 +28,7 @@ def setController( inControllerClass ):
 def allInstances( inclass ):
 	cls = globals()[ inclass ]
 
-	try
+	try:
 		return instanceDict[ cls ]
 	except KeyError:
 		instanceDict[ cls ] = objectList()
@@ -97,21 +97,22 @@ def deleteInstance( inInstance ):
 		inInstance.breveInstance = None;
 		del inInstance
 
-class breveInternalFunctions:
+class internalFunction:
+	def __init__( self, function ):
+		self.function = function
 
+	def __call__( self, *args ):
+		return breveInternal.callInternalFunction( self.function, args )
+
+class breveInternalFunctions:
 	def __getattr__( self, method ):
-		internalFunction = breveInternal.findInternalFunction( breveInternal.breveEngine, method )
+		f = breveInternal.findInternalFunction( breveInternal.breveEngine, method )
 
 		if internalFunction:
-			def execute( object, *tuple ):
-				return breveInternal.callInternalFunction( breveInternal, object, internalFunction, tuple )
-
-			self.__dict__[ method ] = execute
-
-			return execute
+			self.__dict__[ method ] = internalFunction( f )
+			return self.__dict__[ method ]
 
 		raise AttributeError
-
 
 
 
@@ -172,15 +173,15 @@ class matrix( list ):
 	def __str__( self ):
 		return 'breve.matrix( %f, %f, %f, %f, %f, %f, %f, %f, %f )' % ( self[ 0 ], self[ 1 ], self[ 2 ], self[ 3 ], self[ 4 ], self[ 5 ], self[ 6 ], self[ 7 ], self[ 8 ] )
 
-class vector( list ):
+
+
+class vector( array.array ):
 	"A 3D vector class used for breve"
 
-	def __init__( self, x = 0.0, y = 0.0, z = 0.0 ):
-		list.__init__( self )
-		self.append( x )
-		self.append( y )
-		self.append( z )
-		self.isVector = 1
+	defaultvector = [ 0.0, 0.0, 0.0 ]
+
+	def __new__( cls, x = 0.0, y = 0.0, z = 0.0 ):
+		return array.array.__new__( cls, 'd', [ x, y, z ] )
 
 	def __getattr__( self, symbol ):
 		if symbol == 'x':
@@ -207,17 +208,20 @@ class vector( list ):
 		return not self.__eq__( o )
 
 	def __sub__( self, other ):
-		# return vector( self[ 0 ] - other[ 0 ], self[ 1 ] - other[ 1 ], self[ 2 ] - other[ 2 ] )
 		return breveInternal.subVectors( self, other )
 
 	def __add__( self, other ):
-		# return vector( self[ 0 ] + other[ 0 ], self[ 1 ] + other[ 1 ], self[ 2 ] + other[ 2 ] )
 		return breveInternal.addVectors( self, other )
 
+	# __add__ = breveInternal.addVectors
+
 	def __div__( self, other ):
-		return vector( self[ 0 ] / other, self[ 1 ] / other, self[ 2 ] / other )
+		return breveInternal.scaleVector( self, 1.0 / other )
 
 	def __mul__( self, other ):
+		if type( other ) == float or type( other ) == int:
+			return breveInternal.scaleVector( self, other )
+
 		if other.__class__ == matrix:
 			x = self[ 0 ] * other[ 0 ] + self[ 1 ] * other[ 1 ] + self[ 2 ] * other[ 2 ]
 			y = self[ 0 ] * other[ 3 ] + self[ 1 ] * other[ 4 ] + self[ 2 ] * other[ 5 ]
@@ -225,31 +229,26 @@ class vector( list ):
 
 			return vector( x, y, z )
 
-		return vector( self[ 0 ] * other, self[ 1 ] * other, self[ 2 ] * other )
-	
 	__rmul__ = __mul__
 
 	def __neg__( self ):
-		return vector( -self[ 0 ], -self[ 1 ], -self[ 2 ] )
+		return breveInternal.scaleVector( self, -1 )
 
 	def length( self ):
 		"Gives the length of the vector"
-		return math.sqrt( self[ 0 ] * self[ 0 ] + self[ 1 ] * self[ 1 ] + self[ 2 ] * self[ 2 ] )
+		return breveInternal.vectorLength( self )
 
 	def scale( self, other ):
 		"Scales the vector by a scalar"
-		self[ 0 ] *= other
-		self[ 1 ] *= other
-		self[ 2 ] *= other
+		return breveInternal.scaleVector( self, -1 )
 
 	def normalize( self ):
 		"Normalizes the vector"
-		len = math.sqrt( self[ 0 ] * self[ 0 ] + self[ 1 ] * self[ 1 ] + self[ 2 ] * self[ 2 ] )
 
-		if len != 0.0:
-			self[ 0 ] /= len
-			self[ 1 ] /= len
-			self[ 2 ] /= len
+		length = breveInternal.vectorLength( self )
+
+		if length != 0.0:
+			return breveInternal.scaleVector( self, 1.0 / length )
 
 #
 # Import all of the standard breve classes
@@ -347,7 +346,5 @@ breveInternalFunctionFinder = breveInternalFunctions()
 breveInternal.bridgeObject = bridgeObject
 breveInternal.vectorType = vector
 breveInternal.matrixType = matrix
-
-# __all__ = [ 'Object', 'Abstract', 'Control' ]
 
 instanceDict = {}

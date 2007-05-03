@@ -4,8 +4,6 @@ import breve
 class Data( breve.Abstract ):
 	'''<b>The use of this class is deprecated and will be removed in a future release.</b>. See the section  <a href="http://www.spiderland.org/breve/docs/docs/archiving.html">Archiving and Dearchiving</a> of  the breve documentation for more details. <p> The now obsolete class description follows. <p> The Data class is a special class that can be saved to disk, loaded in  to simulations and otherwise manipulated in ways that other classes  cannot.  Because of the features of this class, it may only contain  variables of type int, float or vector. <p> Previous versions of breve used a binary format for saving and loading data objects--the current version saves as XML files.  A method for  loading binary objects from previous versions still exists METHOD(load-from-file),  but its use is deprecated.'''
 
-	__slots__ = [  ]
-
 	def __init__( self ):
 		breve.Abstract.__init__( self )
 		Data.init( self )

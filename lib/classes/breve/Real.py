@@ -4,8 +4,6 @@ import breve
 class Real( breve.Object ):
 	'''A class which is never instantiated--just used as a logical distinction from the Abstract classes.  See the child classes OBJECT(Mobile), OBJECT(Link) and OBJECT(Stationary) for more information.  The methods documented here may be used  with any of the child classes.'''
 
-	__slots__ = [ 'bitmap', 'collisionHandlerList', 'collisionShape', 'color', 'displayShape', 'e', 'lightmap', 'lines', 'menus', 'mu', 'neighborhoodSize', 'realWorldPointer', 'texture', 'textureScaleX', 'textureScaleY' ]
-
 	def __init__( self ):
 		breve.Object.__init__( self )
 		self.bitmap = 0

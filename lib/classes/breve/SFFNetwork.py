@@ -4,8 +4,6 @@ import breve
 class FFNetwork( breve.NeuralNetwork ):
 	'''A new experimental class for simple feed-forward neural networks. This class is now derived from NeuralNetwork.tz which is the base of a complete set of neural network classes.'''
 
-	__slots__ = [ 'inputLayer', 'layers', 'outputLayer' ]
-
 	def __init__( self ):
 		breve.NeuralNetwork.__init__( self )
 		self.inputLayer = None

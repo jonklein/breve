@@ -4,8 +4,6 @@ import breve
 class BraitenbergControl( breve.PhysicalControl ):
 	'''This class is used for building simple Braitenberg vehicle  simulations.  To create a Braitenberg vehicle simulation,  subclass BraitenbergControl and use the init method to  create OBJECT(BraitenbergLight) and  OBJECT(BraitenbergVehicle) objects.'''
 
-	__slots__ = [ 'cloudTexture', 'floor', 'floorShape' ]
-
 	def __init__( self ):
 		breve.PhysicalControl.__init__( self )
 		self.cloudTexture = None
@@ -35,8 +33,6 @@ class BraitenbergControl( breve.PhysicalControl ):
 breve.BraitenbergControl = BraitenbergControl
 class BraitenbergVehicle( breve.MultiBody ):
 	'''This object is used in conjunction with OBJECT(BraitenbergControl) to create simple Braitenberg vehicles.'''
-
-	__slots__ = [ 'bodyLink', 'bodyShape', 'sensorShape', 'sensors', 'wheelShape', 'wheels' ]
 
 	def __init__( self ):
 		breve.MultiBody.__init__( self )
@@ -139,8 +135,6 @@ breve.BraitenbergVehicle = BraitenbergVehicle
 class BraitenbergHeavyVehicle( breve.BraitenbergVehicle ):
 	'''A heavy duty version of OBJECT(BraitenbergVehicle), this vehicle is heavier and harder to control, but more stable at higher  speeds.'''
 
-	__slots__ = [  ]
-
 	def __init__( self ):
 		breve.BraitenbergVehicle.__init__( self )
 
@@ -167,8 +161,6 @@ breve.BraitenbergHeavyVehicle = BraitenbergHeavyVehicle
 class BraitenbergLight( breve.Mobile ):
 	'''A BraitenbergLight is used in conjunction with OBJECT(BraitenbergControl) and OBJECT(BraitenbergVehicle).  It is what the OBJECT(BraitenbergSensor) objects on the BraitenbergVehicle detect. <p> There are no special behaviors associated with the lights--they're  basically just plain OBJECT(Mobile) objects.'''
 
-	__slots__ = [  ]
-
 	def __init__( self ):
 		breve.Mobile.__init__( self )
 		BraitenbergLight.init( self )
@@ -184,8 +176,6 @@ class BraitenbergLight( breve.Mobile ):
 breve.BraitenbergLight = BraitenbergLight
 class BraitenbergWheel( breve.Link ):
 	'''A BraitenbergWheel is used in conjunction with OBJECT(BraitenbergVehicle) to build Braitenberg vehicles.  This class is typically not instantiated manually, since OBJECT(BraitenbergVehicle) creates one for you when you add a wheel to the vehicle. <p> <b>NOTE: this class is included as part of the file "Braitenberg.tz".</b>'''
-
-	__slots__ = [ 'joint', 'naturalVelocity', 'newVelocity', 'oldVelocity' ]
 
 	def __init__( self ):
 		breve.Link.__init__( self )
@@ -242,8 +232,6 @@ class BraitenbergWheel( breve.Link ):
 breve.BraitenbergWheel = BraitenbergWheel
 class BraitenbergSensor( breve.Link ):
 	'''A BraitenbergSensor is used in conjunction with OBJECT(BraitenbergVehicle) to build Braitenberg vehicles.  This class is typically not instantiated manually, since OBJECT(BraitenbergVehicle) creates one for you when you add a sensor to the vehicle. <p> <b>NOTE: this class is included as part of the file "Braitenberg.tz".</b>'''
-
-	__slots__ = [ 'activationMethod', 'activationObject', 'bias', 'direction', 'sensorAngle', 'wheels' ]
 
 	def __init__( self ):
 		breve.Link.__init__( self )

@@ -4,8 +4,6 @@ import breve
 class Line( breve.Object ):
 	''''''
 
-	__slots__ = [ 'end', 'linePointer', 'start' ]
-
 	def __init__( self ):
 		breve.Object.__init__( self )
 		self.end = None

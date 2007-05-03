@@ -4,8 +4,6 @@ import breve
 class Camera( breve.Abstract ):
 	'''Summary: creates a new rendering perspective in the simulated world. <P> The Camera class is used to set up a viewing perspective in a simulation. Creating a new camera object places a viewing area with the new camera  perspective in the main viewing window. <P> See the OBJECT(Image) class to read data from a Camera (or from the  main simulation window) into a pixel buffer.  This can be useful for implementing vision algorithms.'''
 
-	__slots__ = [ 'cameraPointer', 'shared' ]
-
 	def __init__( self ):
 		breve.Abstract.__init__( self )
 		self.cameraPointer = None
