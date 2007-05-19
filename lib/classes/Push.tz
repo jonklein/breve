@@ -402,15 +402,16 @@ Object : PushProgram (aka PushPrograms) {
 
   + section "Copying and evolving Push programs"
 	+ to mutate with-interpreter interpreter (object) with-leaf-bias leafBias = 0.9 (float) with-size-scale sizeScale = 0.3 (float) with-max-new-code-size ignored = 0 (int):
-		% Mutates this code object by adding a new subtree.  The maximum size of the
-		% subtree is specified in the optional argument treeSize, which has a default
-		% value of 50.  The size may also be equal to -1 (the default), indicating that the 
-		% MAX-POINTS-IN-RANDOM-EXPRESSION value from the Push configuration file 
-		% should be used.  The interpreter argument determines the instruction
-		% set used to generate the random code.  
+		% Modifies this code object by mutating a subtree of the program.  The leafBias
+		% parameter indicates the probability that a leaf node will be selected (as 
+		% opposed to a non-leaf subtree).
+		% <p>
+		% Mutation is implemented as "fair" mutation, in which the new code size is 
+		% determined by the size of the subtree it is replacing, plus or minus a 
+		% factor of sizeScale.
 		% <P>
-		% Mutation is implemented as "fair" mutation with a range of +/- 30% of the 
-		% mutated subtree.
+		% The interpreter argument determines the instruction
+		% set used to generate the random code.  
 		% <P>
 		% The max-new-code-size argument is ignored, but included for backwards compatibility.
 

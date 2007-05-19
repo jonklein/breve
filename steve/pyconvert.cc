@@ -45,7 +45,7 @@ std::string stPyConvertFile( brEngine *inEngine, stSteveData *inSteveData, std::
 			result += stPyConvertObject( object );
 
 			if( inSteveData->controllerName && !strcmp( object->name.c_str(), inSteveData->controllerName ) )
-				controller = object->name + "()\n\n";
+				controller = "# Create an instance of our controller object to initialize the simulation\n\n" + object->name + "()\n\n";
 
 			std::map< std::string, brObject* >::iterator mi;
 
@@ -57,6 +57,9 @@ std::string stPyConvertFile( brEngine *inEngine, stSteveData *inSteveData, std::
 		}
 	}
 
+
+	if( aliases != "" ) 
+		aliases = "# Add our newly created classes to the breve namespace\n\n" + aliases;
 
 	result += aliases;
 	result += "\n\n" + controller;
@@ -114,8 +117,10 @@ std::string stPyConvertObject( stObject *inObject ) {
 		result = "class " + stPyConvertSymbol( inObject->name ) + ":\n";
 	}
 
-	ADDTABS( &conversionData, result );
-	result += "'''" + inObject->_comment + "'''\n\n";
+	if( inObject->_comment != "" ) {
+		ADDTABS( &conversionData, result );
+		result += "'''" + inObject->_comment + "'''\n\n";
+	}
 
 
 	/*
@@ -218,6 +223,9 @@ std::string stPyConvertVariableDeclaration( stPyConversionData *inData, stVar *i
 std::string stPyConvertMethod( stPyConversionData *inData, stObject *inObject, stMethod *inMethod ) {
 	std::string result;
 
+	if( !strcmp( inMethod->name.c_str(), "internal-user-input-method" ) )
+		return result;
+
 	ADDTABS( inData, result );
 	result += "def " + stPyConvertSymbol( inMethod->name ) + "( self";
 
@@ -234,8 +242,10 @@ std::string stPyConvertMethod( stPyConversionData *inData, stObject *inObject, s
 
 	inData->_indents++;
 
-	ADDTABS( inData, result );
-	result += "'''" + inMethod->_comment + "'''\n\n";
+	if( inMethod->_comment != "" ) {
+		ADDTABS( inData, result );
+		result += "'''" + inMethod->_comment + "'''\n\n";
+	}
 
 	std::vector< stVar* >::iterator vi;
 	for( vi = inMethod->variables.begin(); vi != inMethod->variables.end(); vi++ ) { 
@@ -250,6 +260,11 @@ std::string stPyConvertMethod( stPyConversionData *inData, stObject *inObject, s
 	for( unsigned int c = 0; c < inMethod->code.size(); c++ ) {
 		ADDTABS( inData, result );
 		result += inMethod->code[ c ]->toPython( inData ) + "\n";
+	}
+
+	if( inMethod->code.size() == 0 ) {
+		ADDTABS( inData, result );
+		result += "pass\n";
 	}
 
 	inData->_indents--;
@@ -788,7 +803,7 @@ std::string stLoadExp::toPython( stPyConversionData *inData ) {
 
 std::string stStringExp::toPython( stPyConversionData *inData ) {
 	std::string result, processed;
-	int n;
+	unsigned int n;
 
 	if( substrings.size() == 0 ) {
 		if( string.find( "\'" ) == std::string::npos && string.find( " " ) == std::string::npos ) {
@@ -810,8 +825,10 @@ std::string stStringExp::toPython( stPyConversionData *inData ) {
 
 	// go backwards through the string so that the offsets are maintained
 
-	for( n = substrings.size() - 1; n >= 0; n-- ) {
-		stSubstringExp *substring = substrings[ n ];
+	int m;
+
+	for( m = substrings.size() - 1; m >= 0; m-- ) {
+		stSubstringExp *substring = substrings[ m ];
 
 		processed.replace( substring->offset, 0, "%s" );
 	}

@@ -836,9 +836,14 @@ void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inT
 	PyObject *type = ( PyObject* )inObject;
 
 	std::string symbol = std::string( inName );
-	const char *name = brPyConvertSymbol( symbol ).c_str();
 
-	PyObject *method = PyObject_GetAttrString( type, (char*)name );
+	// Much to my surprise, we're getting a buffer overrun with the GetAttrString
+	// on the c_str() -- make a local copy instead !?
+	char *name = strdup( brPyConvertSymbol( symbol ).c_str() );
+
+	PyObject *method = PyObject_GetAttrString( type, name );
+
+	free( name );
 
 	if ( !method || !PyCallable_Check( method ) ) {
 		PyErr_Clear();

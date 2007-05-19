@@ -2,8 +2,6 @@
 import breve
 
 class Swarm( breve.Control ):
-	''''''
-
 	def __init__( self ):
 		breve.Control.__init__( self )
 		self.birds = breve.objectList()
@@ -17,8 +15,6 @@ class Swarm( breve.Control ):
 		Swarm.init( self )
 
 	def click( self, item ):
-		''''''
-
 
 		if self.selection:
 			self.selection.hideNeighborLines()
@@ -30,8 +26,6 @@ class Swarm( breve.Control ):
 		breve.Control.click( self , item )
 
 	def flockNormally( self ):
-		''''''
-
 		item = None
 
 		for item in self.birds:
@@ -42,8 +36,6 @@ class Swarm( breve.Control ):
 		self.wackyMenu.uncheck()
 
 	def flockObediently( self ):
-		''''''
-
 		item = None
 
 		for item in self.birds:
@@ -54,8 +46,6 @@ class Swarm( breve.Control ):
 		self.wackyMenu.uncheck()
 
 	def flockWackily( self ):
-		''''''
-
 		item = None
 
 		for item in self.birds:
@@ -66,8 +56,6 @@ class Swarm( breve.Control ):
 		self.wackyMenu.check()
 
 	def init( self ):
-		''''''
-
 		floor = None
 
 		self.addMenu( '''Smoosh The Birdies''', 'squish' )
@@ -88,14 +76,7 @@ class Swarm( breve.Control ):
 		self.offsetCamera( breve.vector( 5, 1.500000, 6 ) )
 		self.enableShadows()
 
-	def internalUserInputMethod( self ):
-		''''''
-
-
-
 	def iterate( self ):
-		''''''
-
 		item = None
 		location = breve.vector()
 		topDiff = 0
@@ -121,8 +102,6 @@ class Swarm( breve.Control ):
 		breve.Control.iterate( self )
 
 	def squish( self ):
-		''''''
-
 		item = None
 
 		for item in self.birds:
@@ -130,8 +109,6 @@ class Swarm( breve.Control ):
 
 
 	def toggleDizzy( self ):
-		''''''
-
 
 		self.useDizzyCameraControl = ( not self.useDizzyCameraControl )
 		if self.useDizzyCameraControl:
@@ -143,10 +120,6 @@ class Swarm( breve.Control ):
 
 breve.Swarm = Swarm
 class Bird( breve.Mobile ):
-	''''''
-
-	__slots__ = [ 'centerConstant', 'cruiseDistance', 'landed', 'maxAcceleration', 'maxVelocity', 'spacingConstant', 'velocityConstant', 'wanderConstant', 'worldCenterConstant' ]
-
 	def __init__( self ):
 		breve.Mobile.__init__( self )
 		self.centerConstant = 0
@@ -161,14 +134,10 @@ class Bird( breve.Mobile ):
 		Bird.init( self )
 
 	def checkLanded( self ):
-		''''''
-
 
 		return self.landed
 
 	def checkVisibility( self, item ):
-		''''''
-
 
 		if ( item == self ):
 			return 0
@@ -185,8 +154,6 @@ class Bird( breve.Mobile ):
 		return 1
 
 	def flockNormally( self ):
-		''''''
-
 
 		self.wanderConstant = 4.000000
 		self.worldCenterConstant = 5.000000
@@ -198,8 +165,6 @@ class Bird( breve.Mobile ):
 		self.cruiseDistance = 0.400000
 
 	def flockObediently( self ):
-		''''''
-
 
 		self.wanderConstant = 6.000000
 		self.worldCenterConstant = 6.000000
@@ -211,8 +176,6 @@ class Bird( breve.Mobile ):
 		self.cruiseDistance = 1
 
 	def flockWackily( self ):
-		''''''
-
 
 		self.wanderConstant = 8.000000
 		self.worldCenterConstant = 14.000000
@@ -224,8 +187,6 @@ class Bird( breve.Mobile ):
 		self.cruiseDistance = 0.500000
 
 	def fly( self ):
-		''''''
-
 		bird = None
 		toNeighbor = breve.vector()
 		centerUrge = breve.vector()
@@ -238,12 +199,11 @@ class Bird( breve.Mobile ):
 		neighbors = breve.objectList()
 		takeOff = 0
 
-		self.location = self.getLocation()
-		self.velocity = self.getVelocity()
-
 		for bird in self.getNeighbors():
 			if self.checkVisibility( bird ):
 				neighbors.append( bird )
+
+
 
 		if self.landed:
 			takeOff = breve.randomExpression( 40 )
@@ -260,14 +220,14 @@ class Bird( breve.Mobile ):
 		centerUrge = self.getCenterUrge( neighbors )
 		velocityUrge = self.getVelocityUrge( neighbors )
 		for bird in neighbors:
-			toNeighbor = ( self.location - bird.getLocation() )
+			toNeighbor = ( self.getLocation() - bird.getLocation() )
 			if ( breve.length( toNeighbor ) < self.cruiseDistance ):
 				spacingUrge = ( spacingUrge + toNeighbor )
 
 
 
-		if ( breve.length( self.location ) > 10 ):
-			worldCenterUrge = ( -self.location )
+		if ( breve.length( self.getLocation() ) > 10 ):
+			worldCenterUrge = ( -self.getLocation() )
 
 		wanderUrge = ( breve.randomExpression( breve.vector( 2, 2, 2 ) ) - breve.vector( 1, 1, 1 ) )
 		if breve.length( spacingUrge ):
@@ -295,27 +255,23 @@ class Bird( breve.Mobile ):
 			acceleration = ( acceleration / breve.length( acceleration ) )
 
 		self.setAcceleration( ( self.maxAcceleration * acceleration ) )
-		newVelocity = self.velocity
+		newVelocity = self.getVelocity()
 		if ( breve.length( newVelocity ) > self.maxVelocity ):
 			newVelocity = ( ( self.maxVelocity * newVelocity ) / breve.length( newVelocity ) )
 
 		self.setVelocity( newVelocity )
-
-		if newVelocity.length() > 0:
-			self.point( breve.vector( 0, 1, 0 ), ( newVelocity / breve.length( newVelocity ) ) )
+		self.point( breve.vector( 0, 1, 0 ), ( newVelocity / breve.length( newVelocity ) ) )
 
 	def getAngle( self, otherMobile ):
-		''''''
+		tempVector = breve.vector()
 
-		if ( breve.length( self.velocity ) == 0 ):
+		if ( breve.length( self.getVelocity() ) == 0 ):
 			return 0
 
-		tempVector = ( otherMobile.getLocation() - self.location )
-		return breve.breveInternalFunctionFinder.angle( self, self.velocity, tempVector )
+		tempVector = ( otherMobile.getLocation() - self.getLocation() )
+		return breve.breveInternalFunctionFinder.angle( self, self.getVelocity(), tempVector )
 
 	def getCenterUrge( self, flock ):
-		''''''
-
 		item = None
 		count = 0
 		center = breve.vector()
@@ -329,11 +285,9 @@ class Bird( breve.Mobile ):
 			return breve.vector( 0, 0, 0 )
 
 		center = ( center / count )
-		return ( center - self.location )
+		return ( center - self.getLocation() )
 
 	def getVelocityUrge( self, flock ):
-		''''''
-
 		item = None
 		count = 0
 		aveVelocity = breve.vector()
@@ -347,11 +301,9 @@ class Bird( breve.Mobile ):
 			return breve.vector( 0, 0, 0 )
 
 		aveVelocity = ( aveVelocity / count )
-		return ( aveVelocity - self.velocity )
+		return ( aveVelocity - self.getVelocity() )
 
 	def init( self ):
-		''''''
-
 
 		self.setShape( breve.createInstances( breve.PolygonCone, 1 ).initWith( 3, 0.500000, 0.060000 ) )
 		self.move( ( breve.randomExpression( breve.vector( 10, 10, 10 ) ) - breve.vector( 5, -5, 5 ) ) )
@@ -361,8 +313,6 @@ class Bird( breve.Mobile ):
 		self.setNeighborhoodSize( 3.000000 )
 
 	def land( self, ground ):
-		''''''
-
 
 		self.setAcceleration( breve.vector( 0, 0, 0 ) )
 		self.setVelocity( breve.vector( 0, 0, 0 ) )
@@ -371,8 +321,12 @@ class Bird( breve.Mobile ):
 
 
 breve.Bird = Bird
+# Add our newly created classes to the breve namespace
+
 breve.Birds = Bird
 
+
+# Create an instance of our controller object to initialize the simulation
 
 Swarm()
 

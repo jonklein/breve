@@ -1193,7 +1193,8 @@ number
 
 void stParseSetEngine(brEngine *e) {
 	parseEngine = e;
-	brClearError(e);
+	stParseSetObjectAndMethod( NULL, NULL );
+	brClearError( e );
 }
 
 void stParseSetObjectAndMethod(stObject *o, stMethod *m) {

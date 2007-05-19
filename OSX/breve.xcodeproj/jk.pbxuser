@@ -152,7 +152,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 197066740;
+			PBXPerProjectTemplateStateSaveDate = 200668399;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -709,7 +709,7 @@
 				PBXModuleWindowStatusBarHidden = YES;
 				RubberWindowFrame = "267 380 745 408 0 0 1280 832 ";
 			};
-			PBXWorkspaceStateSaveDate = 197066740;
+			PBXWorkspaceStateSaveDate = 200668399;
 		};
 		sourceControlManager = 48E065B3055C318700C40B45 /* Source Control */;
 		userBuildSettings = {
@@ -764,7 +764,7 @@
 		);
 		executableSystemSymbolLevel = 0;
 		executableUserSymbolLevel = 0;
-		libgmallocEnabled = 0;
+		libgmallocEnabled = 1;
 		name = real_breve.app;
 		savedGlobals = {
 		};
@@ -788,7 +788,7 @@
 		hitCount = 1;
 		lineNumber = 457;
 		location = breve;
-		modificationTime = 182830212.428238;
+		modificationTime = 200672232.824329;
 		state = 1;
 	};
 	48BB5D1405C9659B007C7301 /* slBreveSourceDocument.mm:24 */ = {
@@ -802,7 +802,7 @@
 		hitCount = 1;
 		lineNumber = 24;
 		location = breve;
-		modificationTime = 182830212.428212;
+		modificationTime = 200672232.824343;
 		state = 1;
 	};
 	48CE1CFB08155B1F0030CBB8 /* DocumentIcons.icns */ = {
