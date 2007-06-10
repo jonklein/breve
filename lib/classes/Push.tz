@@ -345,7 +345,8 @@ Object : PushProgram (aka PushPrograms) {
 
 	- to set-code-pointer to newCodePointer (pointer):
 		% Used internally.
-		if codePointer: pushCodeFree(codePointer).
+		if codePointer: 
+			pushCodeFree(codePointer).
 
 		if !newCodePointer: self parse program "()".
 		else codePointer = newCodePointer.		
@@ -467,6 +468,12 @@ Object : PushProgram (aka PushPrograms) {
 		if !codePointer: return { }.
 
 		return pushCodeGetEvalList(codePointer).
+
+	+ to set-from code-list newCodeList (list):
+		% Sets this code's object using the contents of newCodeList.  The list can contain
+		% literals, sublists or subprograms.
+
+		self set-code-pointer to pushListToPushCode( newCodeList ).
 
 	+ to get-discrepancy from otherProgram (object):
 		% Determines the discrepancy between this program and otherProgram.

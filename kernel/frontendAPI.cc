@@ -16,10 +16,10 @@ int brLoadSimulation( brEngine *engine, const char *code, const char *file ) {
 int brLoadFile( brEngine *engine, const char *code, const char *file ) {
 	char *extension = slFileExtension( file );
 
-
 	// Add a search path for the directory we're loading from, in case this 
 	// file wants to load resources from the same directory.
 	// warning: dirname may modify contents -- jerks
+
 	char *dir = slDirname( file );
 	brAddSearchPath( engine, dir );
 	slFree( dir );
@@ -30,6 +30,8 @@ int brLoadFile( brEngine *engine, const char *code, const char *file ) {
 		if( type->load && type->canLoad && type->canLoad( type->userData, extension ) ) {
 			int r = type->load( engine, type->userData, file, code );
 
+			slFree( extension );
+
 			if( r != EC_OK ) 
 				return EC_ERROR;
 
@@ -39,6 +41,8 @@ int brLoadFile( brEngine *engine, const char *code, const char *file ) {
 	}
 
 	slMessage( DEBUG_ALL, "Could not locate breve language frontend which understands \"%s\" files\n", extension );
+
+	slFree( extension );
 
 	return EC_ERROR;
 }

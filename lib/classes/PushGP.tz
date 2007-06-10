@@ -191,8 +191,8 @@ Object : PushGP {
 		if seed: (pop1{0} parse program seed).
 
 		for n = 0, n < (self count-fitness-cases), n++: {
-			push 0 onto _fitnessCaseSolutionRates.
-			push 0 onto _lastSolutionRates.
+			push 0.0 onto _fitnessCaseSolutionRates.
+			push 0.0 onto _lastSolutionRates.
 		}
 
 		inited = 1.
@@ -543,7 +543,7 @@ Object : PushGP {
 		p1, p2 (object).                
 
 		for n = 0, n < (self count-fitness-cases), n++: {
-			_fitnessCaseSolutionRates{ n } = 0.
+			_fitnessCaseSolutionRates{ n } = 0.0.
 		}
 
 		while n < populationSize: { 

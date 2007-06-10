@@ -556,7 +556,7 @@ void replace_substring( std::string *inStr, char *sub, char *repl ) {
 	while( 1 ) {
     		pos = inStr->find( sub, pos ); 
 
-		if ( pos == std::string::npos ) 
+		if ( pos == std::string::npos || pos >=inStr->size() ) 
 			return;
 
 		inStr->replace( pos, strlen( sub ), repl ); 

@@ -202,11 +202,7 @@ char *brObjectDescription( brInstance *i ) {
 
 char *brFormatEvaluation( brEval *e, brInstance *i ) {
 	std::set< brEvalListHead* > seen;
-	char *result;
-
-	result = brFormatEvaluationWithSeenList( e, i, seen );
-
-	return result;
+	return brFormatEvaluationWithSeenList( e, i, seen );
 }
 
 /**
@@ -265,7 +261,7 @@ char *brFormatEvaluationWithSeenList( brEval *e, brInstance *i, std::set< brEval
 
 				len = strlen( pi->object->name ) + strlen( desc ) + ( sizeof( void* ) * 2 + 2 ) + 20;
 
-				result = ( char * )slMalloc( len );
+				result = (char*)slMalloc( len );
 
 				snprintf( result, len, "%s (%p) %s", pi->object->name, pi, desc );
 
@@ -311,6 +307,8 @@ char *brFormatEvaluationWithSeenList( brEval *e, brInstance *i, std::set< brEval
 					if( li + 1 != listHead->_vector.end() ) {
 						rstr += ", ";
 					}
+
+					slFree( newString );
 				}
 
 				rstr += " }";

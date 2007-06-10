@@ -544,6 +544,9 @@ int stPreprocess( stSteveData *s, brEngine *engine, const char *srcFile, const c
 					return -1;
 				}
 
+				slFree( filetext );
+				slFree( found );
+
 				yyfile = oldYyfile;
 
 				lineno = oldLineno;
