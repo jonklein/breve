@@ -183,8 +183,8 @@ ifeq ($(PLATFORM),linux-gnu)
 	cp bin/breve.sh $(CLI_FOLDER)/bin/breve@EXE_SUFFIX@
 	cp bin/breve_cli.sh $(CLI_FOLDER)/bin/breve_cli@EXE_SUFFIX@
 	cp bin/libpython2.4.so.1.0 $(CLI_FOLDER)/bin
+	cp bin/libOSMesa.so $(CLI_FOLDER)/bin
 endif
-
 	-cp bin/osmesaloader.o $(CLI_FOLDER)/bin
 	cp -R docs $(CLI_FOLDER)
 	cp -R lib $(CLI_FOLDER)
@@ -219,6 +219,7 @@ ifeq ($(PLATFORM),linux-gnu)
 	mv $(IDE_FOLDER)/breveIDE@EXE_SUFFIX@ $(IDE_FOLDER)/breveIDE_ex@EXE_SUFFIX@
 	cp bin/breveIDE.sh $(IDE_FOLDER)/breveIDE@EXE_SUFFIX@
 	cp bin/libpython2.4.so.1.0 $(IDE_FOLDER)/lib
+	cp bin/libOSMesa.so $(IDE_FOLDER)/lib
 endif
 	-mkdir docs
 	cp -R docs $(IDE_FOLDER)

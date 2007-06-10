@@ -10,4 +10,4 @@
 DIRECTORY=`dirname $0`
 
 export LD_LIBRARY_PATH=$DIRECTORY:$LD_LIBRARY_PATH
-$DIRECTORY/breve_cli_ex $*
+$DIRECTORY/breve -x $*
