@@ -325,8 +325,6 @@ class bridgeObjectMethod( object ):
 class bridgeObject( object ):
 	"An object representing a bridge to an object in another breve language frontend"
 
-	__slots__ = [ 'breveModule', 'breveInstance' ]
-
 	def __init__( self ): 
 		self.breveInstance = addInstance( self.__class__, self )
 		self.breveModule = breveInternal
