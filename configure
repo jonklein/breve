@@ -1893,6 +1893,11 @@ if test "${enable_perl+set}" = set; then
   enableval=$enable_perl; perl=yes
 fi
 
+# Check whether --enable-python was given.
+if test "${enable_python+set}" = set; then
+  enableval=$enable_python; python=yes
+fi
+
 
 if test "x$static" != "x"; then
 	BEGIN_STATIC="-Xlinker -Bstatic"
@@ -5880,6 +5885,7 @@ esac
 # Python wants to be dynamically linked as well
 #
 
+if test "x$python" != "x"; then
 
 { echo "$as_me:$LINENO: checking for Py_Initialize in -lpython" >&5
 echo $ECHO_N "checking for Py_Initialize in -lpython... $ECHO_C" >&6; }
@@ -6236,36 +6242,37 @@ _ACEOF
 fi
 
 
-if test "$ac_cv_lib_python2_3_Py_Initialize" = yes; then
+	if test "$ac_cv_lib_python2_3_Py_Initialize" = yes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBPYTHON
 _ACEOF
 
-fi
+	fi
 
-if test "$ac_cv_lib_python23_Py_Initialize" = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_LIBPYTHON
-_ACEOF
-
-fi
-
-if test "$ac_cv_lib_python2_4_Py_Initialize" = yes; then
+	if test "$ac_cv_lib_python23_Py_Initialize" = yes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBPYTHON
 _ACEOF
 
-fi
+	fi
 
-if test "$ac_cv_lib_python24_Py_Initialize" = yes; then
+	if test "$ac_cv_lib_python2_4_Py_Initialize" = yes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBPYTHON
 _ACEOF
 
+	fi
+
+	if test "$ac_cv_lib_python24_Py_Initialize" = yes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_LIBPYTHON
+_ACEOF
+
+	fi
 fi
 
 #

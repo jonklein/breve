@@ -36,11 +36,37 @@ char *brAtomicTypeStrings[] = {
 	"hash"
 };
 
+
+brEvalObject::brEvalObject() {
+	_retainCount = 0;
+}
+
+brEvalObject::~brEvalObject() {
+
+}
+
+void brEvalObject::retain() {
+	_retainCount++;
+}
+
+void brEvalObject::unretain() {
+	_retainCount--;
+}
+
+void brEvalObject::collect() {
+	if( _retainCount < 1 ) 
+		delete this;
+}
+
 brEval::brEval( const brEval& inCopy ) {
 	_type = AT_NULL; 
 	_values.pointerValue = NULL;
 
 	brEvalCopy( &inCopy, this );
+}
+
+brEval::~brEval() {
+	collect();
 }
 
 brEval& brEval::operator=( const brEval& inCopy ) {

@@ -27,6 +27,7 @@ class BreveInterface
 	void RunMenu(int id, brInstance*);
 	void ExecuteCommand(wxString str);
 	void RunCommand(char * str);
+	void UpdateLog();
 
 	char * getLoadname();
 	char * getSavename();

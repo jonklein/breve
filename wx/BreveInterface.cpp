@@ -73,18 +73,16 @@ BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text)
 
 	slSetMessageCallbackFunction(::messageCallback);
 
-	for (i = 0; i < app->GetSearchPathArray()->Count(); i++)
-	{
-	strncpy(buf, app->GetSearchPathArray()->Item(i), 2047);
-	buf[2047] = '\0';
-	brAddSearchPath(_engine, (char*)&buf);
+	for (i = 0; i < app->GetSearchPathArray()->Count(); i++) {
+		strncpy(buf, app->GetSearchPathArray()->Item(i), 2047);
+		buf[2047] = '\0';
+		brAddSearchPath(_engine, (char*)&buf);
 	}
 
-	if (!simdir.IsEmpty())
-	{
-	strncpy(buf, simdir, 2047);
-	buf[2047] = '\0';
-	brAddSearchPath(_engine, (char*)&buf);
+	if ( !simdir.IsEmpty() ) {
+		strncpy(buf, simdir, 2047);
+		buf[2047] = '\0';
+		brAddSearchPath(_engine, (char*)&buf);
 	}
 
 	strncpy(buf, app->GetBreveDir(), 2047);
@@ -131,6 +129,8 @@ void BreveInterface::Pause( int pause ) {
 		brPauseTimer( _engine );
 	else
 		brUnpauseTimer( _engine );
+
+	UpdateLog();
 }
 
 bool BreveInterface::Initialize() {
@@ -143,11 +143,6 @@ bool BreveInterface::Initialize() {
 		text = NULL;
 		Abort();
 	
-		if( mQueuedMessage.length() > 0 ) {
-			gBreverender->AppendLog( mQueuedMessage.c_str() );
-			mQueuedMessage = "";
-		}
-
 		return 0;
 	}
 
@@ -174,12 +169,16 @@ void BreveInterface::Iterate() {
 		Abort();
 	}
 
+	UpdateLog();
+
+	usleep( gBreverender->GetSleepMS() * 1000 );
+}
+
+void BreveInterface::UpdateLog() {
 	if( mQueuedMessage.length() > 0 ) {
 		gBreverender->AppendLog( mQueuedMessage.c_str() );
 		mQueuedMessage = "";
 	}
-
-	usleep( gBreverender->GetSleepMS() * 1000 );
 }
 
 void BreveInterface::Render() {
@@ -195,6 +194,7 @@ void BreveInterface::Abort() {
 	if ( valid == 0 ) return;
 
 	gBreverender->ResetSim();
+	UpdateLog();
 
 	valid = 0;
 }

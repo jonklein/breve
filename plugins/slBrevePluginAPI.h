@@ -127,7 +127,6 @@ class brEval {
 			stGCRetainPointer( _values.pointerValue, _type );
 		}
 
-
 		void clear() { collect(); _type = AT_NULL; }
 
 		inline unsigned char type() { return _type; }
@@ -207,17 +206,16 @@ class brData: public brEvalObject {
 brData *brDataNew(void *data, int length);
 void brDataFree(brData *data);
 
-/* 
-	The following functions are used to create & edit evaluation lists.
-	You can create brEvalLists to be returned by your functions.
-	Don't worry about freeing brEvalLists, this is done by the engine.
-*/
+
+//	The following functions are used to create & edit evaluation lists.
+//	You can create brEvalLists to be returned by your functions.
+//	Don't worry about freeing brEvalLists, this is done by the engine.
 
 int brEvalListInsert( brEvalListHead *head, int index, brEval *value );
 
 #define brEvalListAppend( a, eval ) brEvalListInsert( (a), (a)->_vector.size(), (eval) )
 
-/* Use these macros to treat brEval pointers as specific types. */
+//	Use these macros to treat brEval pointers as specific types. 
 
 #define BRINT(e)		( (e)->getInt() )
 #define BRFLOAT(e)		( (e)->getDouble() )

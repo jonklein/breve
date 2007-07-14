@@ -505,6 +505,8 @@ int stPreprocess( stSteveData *s, brEngine *engine, const char *srcFile, const c
 			start = end = NULL;
 			n = 0;
 
+			// If it's a @use or @include, generate the filename to look for
+
 			if ( use ) {
 				n = 4;
 
@@ -534,22 +536,29 @@ int stPreprocess( stSteveData *s, brEngine *engine, const char *srcFile, const c
 				s->_includes[ current ].push_back( filename );
 
 				char *found = brFindFile( engine, filename, NULL );
+
+				if( !found ) {
+					stParseError( engine, EE_FILE_NOT_FOUND, "Could not locate include file \"%s\"", filename );
+					delete[] filename;
+					return -1;
+				}
+
 				char *filetext = slUtilReadFile( found );
 
-				if( brLoadFile( engine, filetext, filename ) != EC_OK ) {
-					yyfile = oldYyfile;
-					lineno = oldLineno;
+				int load = brLoadFile( engine, filetext, filename );
+
+				yyfile = oldYyfile;
+				lineno = oldLineno;
+
+				slFree( filetext );
+				slFree( found );
+
+				if( load != EC_OK ) {
 					stParseError( engine, EE_FILE_NOT_FOUND, "Error including file \"%s\"", filename );
 					delete[] filename;
 					return -1;
 				}
 
-				slFree( filetext );
-				slFree( found );
-
-				yyfile = oldYyfile;
-
-				lineno = oldLineno;
 			} else {
 				s->_paths[ current ].push_back( filename );
 

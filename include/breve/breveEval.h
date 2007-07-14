@@ -65,16 +65,16 @@ DLLEXPORT void stGCRetainPointer(void *pointer, int type);
 
 class DLLEXPORT brEvalObject {
 	public:
-		brEvalObject() { _retainCount = 0; } ;
+		brEvalObject();
 
-		virtual ~brEvalObject() { };
+		virtual ~brEvalObject() = 0;
 
 		int _retainCount;
 
-		void retain() { _retainCount++; }
-		void unretain() { _retainCount--; }
+		void retain();
+		void unretain();
 
-		void collect() { if( _retainCount < 1 ) delete this; }
+		void collect();
 };
 
 /**
@@ -92,7 +92,7 @@ class DLLEXPORT brEval {
 
 		brEval( const brEval& inOther );
 
-		~brEval() { collect(); }
+		~brEval();
 
 		brEval &operator=( const brEval &inOther );
 

@@ -178,6 +178,7 @@ Object : Vector (aka Vectors) [version 2.3] {
 }
 
 Image : VectorImage {
+	% The VectorImage class is a subclass of Image which displays the state of a OBJECT(Vector) object.
 
 	+ variables:
 		red (object).
@@ -186,6 +187,7 @@ Image : VectorImage {
 		scale (float).
 	
 	+ to init-with the-vector theVector (object) scale theScale = 1.0 (float):
+		% Initializes the VectorImage with a OBJECT(Vector) object.
 	
 		super init-with width (theVector get-dimension) height (theVector get-dimension).
 		scale = theScale.

@@ -658,7 +658,7 @@ Joint : BallJoint (aka BallJoints) [version 2.3] {
 	% This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects
 	% together using a ball joint.
 	% <p>
-	% A universal joint has three degrees of
+	% A BallJoint has three degrees of
 	% freedom.  It can tilt "up-and-down" and "side-to-side", and can
 	% "twist".  Your neck is basically a ball joint--your head tilt 
 	% up-and-down, side-to-side, and can twist (although not all the 

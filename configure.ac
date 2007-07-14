@@ -10,6 +10,7 @@ AC_CANONICAL_HOST
 AC_ARG_ENABLE([engineonly], [], engine_only=yes)
 AC_ARG_ENABLE([static], [], static=yes)
 AC_ARG_ENABLE([perl], [], perl=yes)
+AC_ARG_ENABLE([python], [], python=yes)
 
 if test "x$static" != "x"; then 
 	BEGIN_STATIC="-Xlinker -Bstatic"
@@ -101,26 +102,28 @@ esac
 # Python wants to be dynamically linked as well
 #
 
-AC_CHECK_LIB([python], [Py_Initialize])
-AC_CHECK_LIB([python2.3], [Py_Initialize])
-AC_CHECK_LIB([python23], [Py_Initialize])
-AC_CHECK_LIB([python2.4], [Py_Initialize])
-AC_CHECK_LIB([python24], [Py_Initialize])
+if test "x$python" != "x"; then 
+	AC_CHECK_LIB([python], [Py_Initialize])
+	AC_CHECK_LIB([python2.3], [Py_Initialize])
+	AC_CHECK_LIB([python23], [Py_Initialize])
+	AC_CHECK_LIB([python2.4], [Py_Initialize])
+	AC_CHECK_LIB([python24], [Py_Initialize])
 
-if test "$ac_cv_lib_python2_3_Py_Initialize" = yes; then
-	AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
-fi
+	if test "$ac_cv_lib_python2_3_Py_Initialize" = yes; then
+		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
+	fi
 
-if test "$ac_cv_lib_python23_Py_Initialize" = yes; then
-	AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
-fi
+	if test "$ac_cv_lib_python23_Py_Initialize" = yes; then
+		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
+	fi
 
-if test "$ac_cv_lib_python2_4_Py_Initialize" = yes; then
-	AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
-fi
+	if test "$ac_cv_lib_python2_4_Py_Initialize" = yes; then
+		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
+	fi
 
-if test "$ac_cv_lib_python24_Py_Initialize" = yes; then
-	AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
+	if test "$ac_cv_lib_python24_Py_Initialize" = yes; then
+		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
+	fi
 fi
 
 #

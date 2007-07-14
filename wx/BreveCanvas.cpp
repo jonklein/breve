@@ -22,72 +22,70 @@
 #include "SimInstance.h"
 
 BEGIN_EVENT_TABLE(BreveCanvas, wxGLCanvas)
-    EVT_SIZE(BreveCanvas::OnSize)
-    EVT_PAINT(BreveCanvas::OnPaint)
-    EVT_ERASE_BACKGROUND(BreveCanvas::OnEraseBackground)
-    EVT_IDLE(BreveCanvas::OnIdle)
-    EVT_MENU_RANGE(10100, 10200, BreveCanvas::OnRightMenu)
-    EVT_LEFT_DOWN(BreveCanvas::OnMouseLDown)
-    EVT_RIGHT_DOWN(BreveCanvas::OnMouseRDown)
-    EVT_LEFT_UP(BreveCanvas::OnMouseUp)
-    EVT_MOTION(BreveCanvas::OnMouseMotion)
+	EVT_SIZE(BreveCanvas::OnSize)
+	EVT_PAINT(BreveCanvas::OnPaint)
+	EVT_ERASE_BACKGROUND(BreveCanvas::OnEraseBackground)
+	EVT_IDLE(BreveCanvas::OnIdle)
+	EVT_MENU_RANGE(10100, 10200, BreveCanvas::OnRightMenu)
+	EVT_LEFT_DOWN(BreveCanvas::OnMouseLDown)
+	EVT_RIGHT_DOWN(BreveCanvas::OnMouseRDown)
+	EVT_LEFT_UP(BreveCanvas::OnMouseUp)
+	EVT_MOTION(BreveCanvas::OnMouseMotion)
 END_EVENT_TABLE()
 
 int canvas_attrib[] =
 {
-    WX_GL_RGBA,
-    WX_GL_DOUBLEBUFFER,
-    WX_GL_DEPTH_SIZE, 16,
-    WX_GL_STENCIL_SIZE, 2,
-    0
+	WX_GL_RGBA,
+	WX_GL_DOUBLEBUFFER,
+	WX_GL_DEPTH_SIZE, 16,
+	WX_GL_STENCIL_SIZE, 2,
+	0
 };
 
-void BreveCanvas::OnIdle(wxIdleEvent&event)
-{
-    SimInstance * sim = parent->GetSimulation();
+void BreveCanvas::OnIdle(wxIdleEvent&event) {
+	SimInstance * sim = parent->GetSimulation();
 
-    if (!msgque.IsEmpty())
-    {
-	wxString tmp;
+	if ( !msgque.IsEmpty() ) {
+		wxString tmp;
 
-	tmp = msgque;
+		tmp = msgque;
 
-	msgque.Empty();
+		msgque.Empty();
 
-	event.RequestMore(TRUE);
+		event.RequestMore(TRUE);
 
-	wxMessageBox(tmp);
-	return;
-    }
-
-    if (!cmdque.IsEmpty())
-    {
-	char * bstr;
-	wxString tmp;
-
-	tmp = cmdque;
-
-	cmdque.Empty();
-
-	if (sim != NULL && sim->GetInterface()->Initialized())
-	{
-	    bstr = (char*)malloc(sizeof(char) * (tmp.Length() + 2));
-
-	    strcpy(bstr, tmp);
-	    strcat(bstr,"\n");
-
-	    sim->GetInterface()->RunCommand(bstr);
-
-	    free(bstr);
+		wxMessageBox(tmp);
+		return;
 	}
-    }
 
-    if (requestlogreset) {
+	if ( !cmdque.IsEmpty() ) {
+		char * bstr;
+		wxString tmp;
+
+		tmp = cmdque;
+
+		cmdque.Empty();
+
+		if (sim != NULL && sim->GetInterface()->Initialized()) {
+			bstr = (char*)malloc(sizeof(char) * (tmp.Length() + 2));
+
+			strcpy(bstr, tmp);
+			strcat(bstr,"\n");
+
+			sim->GetInterface()->RunCommand(bstr);
+
+			free(bstr);
+		}
+	}
+
+	if (requestlogreset) {
 		requestlogreset = 0;
 		gBreverender->ResetLog();
-    }
+	}
 
-    if (sim != NULL && sim->GetInterface()->Paused() == 0) {
+	SetCurrent();
+
+	if ( sim != NULL && sim->GetInterface()->Paused() == 0 ) {
 		// The wxMutex documentation states that the default mutex behavior is non
 		// recursive, meaning that the same thread cannot lock the mutex twice.  But
 		// sure enough, the same thread is able to lock this mutex twice!  When a 
@@ -100,17 +98,17 @@ void BreveCanvas::OnIdle(wxIdleEvent&event)
 		// thread simultaneously).
 
 		if ( mLocked || sim->GetMutex()->TryLock() != wxMUTEX_NO_ERROR ) {
-			event.RequestMore(TRUE);
-		    return;
+			event.RequestMore( TRUE );
+			return;
 		}
 
 		mLocked = true;
 
-		SetCurrent();
-
-		if (!sim->GetInterface()->Initialized()) {
-		    glViewport(0, 0, sim->GetInterface()->GetX(), sim->GetInterface()->GetY());
-		    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+		if ( !sim->GetInterface()->Initialized() ) {
+			glViewport( 0, 0, sim->GetInterface()->GetX(), sim->GetInterface()->GetY() );
+			glClearColor( 0, 0, 0, 1.0 );
+			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); 
+			Refresh( false );
 
 			return;
 		}
@@ -124,7 +122,17 @@ void BreveCanvas::OnIdle(wxIdleEvent&event)
 		Refresh(false);
 
 		mLocked = false;
-    }
+	} else if( sim != NULL ) {
+		// Try to update the log even for paused simulations
+		sim->GetInterface()->UpdateLog();
+	} else {
+		SetCurrent();
+
+		glClearColor( 0, 0, 0, 1.0 );
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); 
+
+		Refresh( false );
+	}
 }
 
 
@@ -135,54 +143,54 @@ void BreveCanvas::OnIdle(wxIdleEvent&event)
 
 #ifdef __WXCOCOA__
 BreveCanvas::BreveCanvas(BreveRender *parent)
-    : wxGLCanvas(parent, (wxGLCanvas*) NULL, -1, wxDefaultPosition, 
+	: wxGLCanvas(parent, (wxGLCanvas*) NULL, -1, wxDefaultPosition, 
 		wxDefaultSize, 0, "breve canvas" )
 #else 
 BreveCanvas::BreveCanvas(BreveRender*parent)
-    : wxGLCanvas(parent, -1, wxDefaultPosition, wxDefaultSize, 0,
+	: wxGLCanvas(parent, -1, wxDefaultPosition, wxDefaultSize, 0,
 		"breve canvas", (int*)&canvas_attrib, wxNullPalette)
 #endif
 {
-    wxSize size(400,300);
+	wxSize size(400,300);
 
-    this->parent = parent;
+	this->parent = parent;
 
-    rightmenu = new wxMenu("Rightclick menu");
-    rightmenuinit = 0;
-    requestlogreset = 0;
-    mousedown = 0;
-    selected = NULL;
+	rightmenu = new wxMenu("Rightclick menu");
+	rightmenuinit = 0;
+	requestlogreset = 0;
+	mousedown = 0;
+	selected = NULL;
 
 	mLocked = false;
 
-    SetSizeHints(400, 300);
-//    SetMinSize(size);
+	SetSizeHints(400, 300);
+//	SetMinSize(size);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 BreveCanvas::~BreveCanvas()
 {
-    delete rightmenu;
+	delete rightmenu;
 }
 
 void BreveCanvas::Render()
 {
-    static int i = 0;
-    static int init = 0;
+	static int i = 0;
+	static int init = 0;
 
-    wxPaintDC dc(this);
-    
+	wxPaintDC dc(this);
+	
 #ifndef __WXMOTIF__  
-    if (!GetContext()) return;
+	if (!GetContext()) return;
 #endif
 
-    SetCurrent();
+	SetCurrent();
 
-    SimInstance * sim = parent->GetSimulation();
+	SimInstance * sim = parent->GetSimulation();
 
-    if (sim != NULL && sim->GetInterface()->Initialized())
-    {
+	if (sim != NULL && sim->GetInterface()->Initialized())
+	{
 	sim->GetMutex()->Lock();
 
 	sim->GetInterface()->Render();
@@ -191,17 +199,17 @@ void BreveCanvas::Render()
 
 	glFlush();
 	SwapBuffers();
-    }
-    else
-    {
+	}
+	else
+	{
 	dc.SetBackground(*wxBLACK_BRUSH);
 	dc.Clear();
-    }
+	}
 }
 
 void BreveCanvas::OnPaint( wxPaintEvent& WXUNUSED(event) )
 {
-    Render();
+	Render();
 }
 
 void BreveCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
@@ -211,50 +219,47 @@ void BreveCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
 
 void BreveCanvas::OnSize(wxSizeEvent& event)
 {   
-    int w, h;
+	int w, h;
 
-    wxGLCanvas::OnSize(event);
+	wxGLCanvas::OnSize(event);
 
-    GetClientSize(&w, &h);
+	GetClientSize(&w, &h);
 
-    SimInstance * sim = parent->GetSimulation();
+	SimInstance * sim = parent->GetSimulation();
 
-    if (sim == NULL || !sim->GetInterface()->Initialized())
-    {
-	wxClientDC dc(this);
+	if (sim == NULL || !sim->GetInterface()->Initialized()) {
+		wxClientDC dc(this);
 
-	dc.SetBackground(*wxBLACK_BRUSH);
-	dc.Clear();
-    }
+		dc.SetBackground(*wxBLACK_BRUSH);
+		dc.Clear();
+	}
 
-// Possible check needed - see cube
-    SetCurrent();
+	SetCurrent();
 
-    glViewport(0, 0, (GLint) w, (GLint) h);
+	glViewport(0, 0, (GLint) w, (GLint) h);
 
-    if (sim != NULL)
-    {
-	sim->GetInterface()->SetX(w);
-	sim->GetInterface()->SetY(h);
-	sim->GetInterface()->ResizeView(w,h);
-    }
+	if (sim != NULL) {
+		sim->GetInterface()->SetX(w);
+		sim->GetInterface()->SetY(h);
+		sim->GetInterface()->ResizeView(w,h);
+	}
 
-    Refresh(false);
+	Refresh(false);
 }
-       
+	   
 void BreveCanvas::OnMouseRDown(wxMouseEvent &event)
 {
-    int x, y;
+	int x, y;
 
-    event.Skip();
+	event.Skip();
 
-    if (gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized())
+	if (gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized())
 	return;
 
-    x = event.GetX();
-    y = event.GetY();
+	x = event.GetX();
+	y = event.GetY();
 
-    {
+	{
 	int i = 0;
 
 	gBreverender->GetSimulation()->GetMutex()->Lock();
@@ -274,81 +279,81 @@ void BreveCanvas::OnMouseRDown(wxMouseEvent &event)
 
 	if (selected)
 	{
-	    brMenuEntry * e;
+		brMenuEntry * e;
 
-	    for (i = 0; i < selected->_menus.size(); i++)
-	    {
+		for (i = 0; i < selected->_menus.size(); i++)
+		{
 		rightmenuinit = 1;
 
 		e = (brMenuEntry*)selected->_menus[ i ];
 
 		if (e->title[0] == '\0')
 		{
-		    rightmenu->AppendSeparator();
-		    continue;
+			rightmenu->AppendSeparator();
+			continue;
 		}
 
 		rightmenu->Append(10100 + i, e->title, "", wxITEM_NORMAL);
 
 		if (!e->enabled)
-		    rightmenu->Enable(10100 + i, FALSE);
+			rightmenu->Enable(10100 + i, FALSE);
 
 		//if (e->checked)
-		//    rightmenu->Check(10100 + i, TRUE);
-	    }
+		//	rightmenu->Check(10100 + i, TRUE);
+		}
 	}
 
 	//brClickAtLocation(
-	//    gBreverender->GetSimulation()->GetInterface()->GetEngine(),
-	//    x, y);
+	//	gBreverender->GetSimulation()->GetInterface()->GetEngine(),
+	//	x, y);
 
 	gBreverender->GetSimulation()->GetInterface()->menuCallback(
-	    gBreverender->GetSimulation()->GetInterface()->GetEngine()->controller);
+		gBreverender->GetSimulation()->GetInterface()->GetEngine()->controller);
 
 	Refresh(TRUE, NULL);
 
 	if (rightmenuinit)
-	    PopupMenu(rightmenu, event.GetX(), event.GetY());
-    }
+		PopupMenu(rightmenu, event.GetX(), event.GetY());
+	}
 }
 
 void BreveCanvas::OnMouseLDown(wxMouseEvent &event)
 {
-    event.Skip();
+	event.Skip();
 
-    CaptureMouse();
+	CaptureMouse();
 
-    mousedown = 1;
+	mousedown = 1;
 
-    if (gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized())
+	if (gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized())
 	return;
 
-    wasdrag = 0;
+	wasdrag = 0;
 
-    mLastX = event.GetX();
-    mLastY = event.GetY();
+	mLastX = event.GetX();
+	mLastY = event.GetY();
 }
 
 void BreveCanvas::OnMouseUp(wxMouseEvent &event)
 {
-    int x, y;
+	int x, y;
 
-    event.Skip();
+	event.Skip();
 
-    ReleaseMouse();
+	ReleaseMouse();
 
-    mousedown = 0;
+	mousedown = 0;
 
-    Refresh(TRUE, NULL);
+	Refresh(TRUE, NULL);
 
-    if (gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized())
+	if (gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized())
 	return;
 
-    x = event.GetX();
-    y = event.GetY();
+	x = event.GetX();
+	y = event.GetY();
 
-    if (wasdrag == 0 && parent->GetMouseMode() == 3)
-    {
+	if (wasdrag == 0 && parent->GetMouseMode() == 3)
+	{
 	int i = 0;
 
 	gBreverender->GetSimulation()->GetMutex()->Lock();
@@ -368,96 +373,94 @@ void BreveCanvas::OnMouseUp(wxMouseEvent &event)
 
 	if (selected)
 	{
-	    brMenuEntry * e;
+		brMenuEntry * e;
 
-	    for (i = 0; i < selected->_menus.size(); i++)
-	    {
+		for (i = 0; i < selected->_menus.size(); i++)
+		{
 		rightmenuinit = 1;
 
 		e = (brMenuEntry*)selected->_menus[ i ];
 
 		if (e->title[0] == '\0')
 		{
-		    rightmenu->AppendSeparator();
-		    continue;
+			rightmenu->AppendSeparator();
+			continue;
 		}
 
 		rightmenu->Append(10100 + i, e->title, "", wxITEM_NORMAL);
 
 		if (!e->enabled)
-		    rightmenu->Enable(10100 + i, FALSE);
+			rightmenu->Enable(10100 + i, FALSE);
 
 		//if (e->checked)
-		//    rightmenu->Check(10100 + i, TRUE);
-	    }
+		//	rightmenu->Check(10100 + i, TRUE);
+		}
 	}
 
 	//brClickAtLocation(
-	//    gBreverender->GetSimulation()->GetInterface()->GetEngine(),
-	//    x, y);
+	//	gBreverender->GetSimulation()->GetInterface()->GetEngine(),
+	//	x, y);
 
 	gBreverender->GetSimulation()->GetInterface()->menuCallback(
-	    gBreverender->GetSimulation()->GetInterface()->GetEngine()->controller);
+		gBreverender->GetSimulation()->GetInterface()->GetEngine()->controller);
 
 	Refresh(TRUE, NULL);
 	return;
-    }
+	}
 }
 
 void BreveCanvas::OnMouseMotion(wxMouseEvent &event)
 {
-    brEngine * engine;
+	brEngine * engine;
 
-    event.Skip();
+	event.Skip();
 
-    if (!event.Dragging() || gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized())
+	if (!event.Dragging() || gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized())
 	return;
 
-    wasdrag = 1;
+	wasdrag = 1;
 
-    engine = gBreverender->GetSimulation()->GetInterface()->GetEngine();
+	engine = gBreverender->GetSimulation()->GetInterface()->GetEngine();
 
-    gBreverender->GetSimulation()->GetMutex()->Lock();
+	gBreverender->GetSimulation()->GetMutex()->Lock();
 
-    switch (parent->GetMouseMode())
-    {
+	switch (parent->GetMouseMode())
+	{
 	case 0:
-	    engine->camera->rotateWithMouseMovement( event.GetX() - mLastX, event.GetY() - mLastY );
-	    break;
+		engine->camera->rotateWithMouseMovement( event.GetX() - mLastX, event.GetY() - mLastY );
+		break;
 
 	case 1:
-	    engine->camera->zoomWithMouseMovement( event.GetX() - mLastX, event.GetY() - mLastY );
-	    break;
+		engine->camera->zoomWithMouseMovement( event.GetX() - mLastX, event.GetY() - mLastY );
+		break;
 
 	case 2:
-	    engine->camera->moveWithMouseMovement( event.GetX() - mLastX, event.GetY() - mLastY );
-	    break;
+		engine->camera->moveWithMouseMovement( event.GetX() - mLastX, event.GetY() - mLastY );
+		break;
 
 	case 3:
-	    brDragCallback(engine, event.GetX(), event.GetY());
-	    break;
-    }
+		brDragCallback(engine, event.GetX(), event.GetY());
+		break;
+	}
 
-    gBreverender->GetSimulation()->GetMutex()->Unlock();
+	gBreverender->GetSimulation()->GetMutex()->Unlock();
 
-    Refresh(TRUE, NULL);
+	Refresh(TRUE, NULL);
 
-    mLastX = event.GetX();
-    mLastY = event.GetY();
+	mLastX = event.GetX();
+	mLastY = event.GetY();
 }
 
-void BreveCanvas::OnRightMenu(wxCommandEvent &event)
-{
-    if (gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized() || !selected)
-	return;
+void BreveCanvas::OnRightMenu(wxCommandEvent &event) {
+	if (gBreverender->GetSimulation() == NULL || !gBreverender->GetSimulation()->GetInterface()->Initialized() || !selected)
+		return;
 
-    gBreverender->GetSimulation()->GetMutex()->Lock();
-    gBreverender->GetSimulation()->GetInterface()->RunMenu(event.m_id - 10100, selected);
-    gBreverender->GetSimulation()->GetMutex()->Unlock();
+	gBreverender->GetSimulation()->GetMutex()->Lock();
+	gBreverender->GetSimulation()->GetInterface()->RunMenu(event.m_id - 10100, selected);
+	gBreverender->GetSimulation()->GetMutex()->Unlock();
 }
 
-        
-void BreveCanvas::ResetSelection()
-{
-    selected = NULL;
+		
+void BreveCanvas::ResetSelection() {
+	selected = NULL;
 }
