@@ -82,7 +82,7 @@ class Swarm( breve.Control ):
 
 
 
-		location = ( location / self.birds )
+		location = ( location / breve.length( self.birds ) )
 		topDiff = 0.000000
 		for self.item in self.birds:
 			if ( topDiff < breve.length( ( location - self.item.getLocation() ) ) ):
@@ -298,7 +298,7 @@ class Birds( breve.Mobile ):
 
 	def init( self ):
 
-		self.setShape( breve.createInstances( breve.PolygonCone, 1 ).initWith( 0.060000, 3, 0.500000 ) )
+		self.setShape( breve.createInstances( breve.PolygonCone, 1 ).initWith( 3, 0.500000, 0.060000 ) )
 		self.move( ( breve.randomExpression( breve.vector( 10, 10, 10 ) ) - breve.vector( 5, -5, 5 ) ) )
 		self.setVelocity( ( breve.randomExpression( breve.vector( 20, 20, 20 ) ) - breve.vector( 10, 10, 10 ) ) )
 		self.setColor( breve.randomExpression( breve.vector( 1, 1, 1 ) ) )

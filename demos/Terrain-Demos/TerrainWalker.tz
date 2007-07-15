@@ -371,41 +371,54 @@ MultiBody : Creature {
         bodyLink = new Link.
         bodyLink set-shape to bodyShape.
 
-        joints{0} link parent bodyLink to-child links{0}
-                                 with-normal (0, 0, 1) 
-                                 with-parent-point (2.0, -1.5, 0)
-                                 with-child-point (0, .5, 0).
-        joints{1} link parent links{0} to-child links{1}
-                                 with-normal (1, 0, 0) 
-                                 with-parent-point (0, -.5, 0)
-                                 with-child-point (0, .5, 0).
+        joints{0} link with-normal (0, 0, 1) 
+			with-parent-point (2.0, -1.5, 0)
+			with-child-point (0, .5, 0)
+			to-child links{0}
+			parent bodyLink.
 
-        joints{4} link parent bodyLink to-child links{4}
-                                 with-normal (0, 0, 1) 
-                                 with-parent-point (-2.0, -1.5, 0)
-                                 with-child-point (0, .5, 0).
-        joints{5} link parent links{4} to-child links{5}
-                                 with-normal (1, 0, 0) 
-                                 with-parent-point (0, -.5, 0)
-                                 with-child-point (0, .5, 0).
+        joints{1} link with-normal (1, 0, 0) 
+			with-parent-point (0, -.5, 0)
+			with-child-point (0, .5, 0)
+			to-child links{1}
+			parent links{0}.
 
-        joints{2} link parent bodyLink to-child links{2} 
-                                 with-normal (0, 0, 1) 
-                                 with-parent-point (2.0, 1.5, 0)
-                                 with-child-point (0, -.5, 0).
-        joints{3} link parent links{2} to-child links{3} 
-                                 with-normal (1, 0, 0) 
-                                 with-parent-point (0, .5, 0)
-                                 with-child-point (0, -.5, 0).
+        joints{4} link with-normal (0, 0, 1) 
+			with-parent-point (-2.0, -1.5, 0)
+			with-child-point (0, .5, 0)
+			to-child links{4}
+			parent bodyLink.
 
-        joints{6} link parent bodyLink to-child links{6} 
-                                 with-normal (0, 0, 1) 
-                                 with-parent-point (-2.0, 1.5, 0)
-                                 with-child-point (0, -.5, 0).
-        joints{7} link parent links{6} to-child links{7} 
-                                 with-normal (1, 0, 0) 
-                                 with-parent-point (0, .5, 0)
-                                 with-child-point (0, -.5, 0).
+        joints{5} link with-normal (1, 0, 0) 
+			with-parent-point (0, -.5, 0)
+			with-child-point (0, .5, 0)
+			to-child links{5}
+			parent links{4}.
+
+        joints{2} link 
+			with-normal (0, 0, 1) 
+			with-parent-point (2.0, 1.5, 0)
+			with-child-point (0, -.5, 0)
+			to-child links{2} 
+			parent bodyLink.
+
+        joints{3} link with-normal (1, 0, 0) 
+			with-parent-point (0, .5, 0)
+			with-child-point (0, -.5, 0)
+			to-child links{3}
+			parent links{2}.
+
+        joints{6} link with-normal (0, 0, 1) 
+			with-parent-point (-2.0, 1.5, 0)
+			with-child-point (0, -.5, 0)
+			to-child links{6} 
+			parent bodyLink.
+
+        joints{7} link with-normal (1, 0, 0) 
+			with-parent-point (0, .5, 0)
+			with-child-point (0, -.5, 0)
+			to-child links{7} 
+			parent links{6}.
 
         self register with-link bodyLink.
         # rotate the creature and move it to above the origin.

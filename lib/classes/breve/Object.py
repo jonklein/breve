@@ -80,7 +80,7 @@ class Object( object ):
 	def getAge( self ):
 		'''Returns the number of seconds this object has existed in the  simulation.'''
 
-		return ( self.controller.get_time() - self.birthTime )
+		return ( self.controller.getTime() - self.birthTime )
 
 
 	def getController( self ):

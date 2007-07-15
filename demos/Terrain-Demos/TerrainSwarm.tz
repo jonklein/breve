@@ -110,8 +110,7 @@ Control : Swarm {
         # in the context of a number, the list represents the number of items 
         # in the list.
 
-        location /= birds.
-		# print "the highest location is $location".
+        location /= | birds |.
 
         topDiff = 0.0.
 
@@ -176,7 +175,7 @@ Mobile : Birds {
     + to init:
         # register the object, set the initial location, velocity and color.
 
-		self set-shape to (new PolygonCone init-with radius .06 sides 3 height .5).
+		self set-shape to (new PolygonCone init-with sides 3 height .5 radius .06).
         self move to random[(10, 10, 10)] - (5, -5, 5).
         self set-velocity to random[(20, 20, 20)] - (10, 10, 10).
         self set-color to random[(1, 1, 1)].
