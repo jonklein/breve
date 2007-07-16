@@ -58,20 +58,28 @@ WORDBREAK	[^0-9a-zA-Z\-_]
 
 WHITESPACE	[\ \t]+
 
+%x BLOCKCOMMENT
 %x COMMENT
 
 %%
 
-#!						{ BEGIN(COMMENT); }
+#!					{ BEGIN( BLOCKCOMMENT ); }
 
-<COMMENT>\r\n			{ lineno++; }
-<COMMENT>\r				{ lineno++; }
-<COMMENT>\n				{ lineno++; }
-<COMMENT>.				{ /* block comment */ }
-<COMMENT>!#				{ BEGIN(0); }
+<BLOCKCOMMENT>\r\n			{ lineno++; }
+<BLOCKCOMMENT>\r			{ lineno++; }
+<BLOCKCOMMENT>\n			{ lineno++; }
+<BLOCKCOMMENT>.				{ }
+<BLOCKCOMMENT>!#			{ BEGIN(0); }
 
 ^[\ \t]*%.*				{ stParseAddDocumentingComment( yytext ); };
-#.*					{ ; };
+
+// Because COMMENTS begin the same way as BLOCKCOMMENTS, we can't just match the full
+// #.* , which would catch the BLOCKCOMMENT start as well.  Instead, we match the single #.
+
+#					{ BEGIN( COMMENT ); };
+<COMMENT>\r\n				{ BEGIN( 0 ); }
+<COMMENT>\r				{ BEGIN( 0 ); }
+<COMMENT>\n				{ BEGIN( 0 ); }
 
 \+[\ ]*to/{WORDBREAK}	{ return TO_PUBLIC; }
 \-[\ ]*to/{WORDBREAK}	{ return TO_PRIVATE; }
