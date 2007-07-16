@@ -73,9 +73,6 @@ WHITESPACE	[\ \t]+
 
 ^[\ \t]*%.*				{ stParseAddDocumentingComment( yytext ); };
 
-// Because COMMENTS begin the same way as BLOCKCOMMENTS, we can't just match the full
-// #.* , which would catch the BLOCKCOMMENT start as well.  Instead, we match the single #.
-
 #					{ BEGIN( COMMENT ); };
 <COMMENT>\r\n				{ BEGIN( 0 ); }
 <COMMENT>\r				{ BEGIN( 0 ); }
