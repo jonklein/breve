@@ -383,22 +383,24 @@ wxMenu *BreveRender::MakeDocumentationMenu() {
 
 	wxMenu *docs = new wxMenu;
 
-	wxString index   = app->GetBreveDir() << "docs" << FILE_SEP_PATH << "index.html";
-	wxString classes = app->GetBreveDir() << "docs" << FILE_SEP_PATH << "classes";
+	wxString index = app->GetBreveDir() << "docs" << FILE_SEP_PATH << "index.html";
+
+	wxString stclasses = app->GetBreveDir() << "docs" << FILE_SEP_PATH << "steveclasses";
+	wxString pyclasses = app->GetBreveDir() << "docs" << FILE_SEP_PATH << "pythonclasses";
 
 	docs->Append( BREVE_DOCMENU + _docFiles.size(), "breve Documentation" );
 	_docFiles.push_back( index );
 
-	wxMenu *classMenu = new wxMenu;
+	wxMenu *stClassMenu = new wxMenu;
+	wxMenu *pyClassMenu = new wxMenu;
 
-	wxDir lscan( classes );
-	
+	wxDir lscan( stclasses );
 	if ( lscan.IsOpened() ) {
 		wxString filename;
 		bool cont = lscan.GetFirst( &filename, "*.html", wxDIR_FILES );
                         
 		while ( cont ) {
-			wxString path = app->GetBreveDir() << "docs" << FILE_SEP_PATH << "classes" << FILE_SEP_PATH << filename;
+			wxString path = app->GetBreveDir() << "docs" << FILE_SEP_PATH << "steveclasses" << FILE_SEP_PATH << filename;
 
 			classMenu->Append( BREVE_DOCMENU + _docFiles.size(), filename );
 			_docFiles.push_back( path );
@@ -407,7 +409,24 @@ wxMenu *BreveRender::MakeDocumentationMenu() {
 		}
 	}
 
-	docs->Append( BREVE_DOCMENU, "Classes", classMenu );
+	wxDir lscan( pyclasses );
+	if ( lscan.IsOpened() ) {
+		wxString filename;
+		bool cont = lscan.GetFirst( &filename, "*.html", wxDIR_FILES );
+                        
+		while ( cont ) {
+			wxString path = app->GetBreveDir() << "docs" << FILE_SEP_PATH << "pythonclasses" << FILE_SEP_PATH << filename;
+
+			classMenu->Append( BREVE_DOCMENU + _docFiles.size(), filename );
+			_docFiles.push_back( path );
+
+			cont = lscan.GetNext( &filename );
+		}
+	}
+
+
+	docs->Append( BREVE_DOCMENU, "Class Documentation (steve)", stClassMenu );
+	docs->Append( BREVE_DOCMENU, "Class Documentation (Python)", pyClassMenu );
 
 	return docs;
 }

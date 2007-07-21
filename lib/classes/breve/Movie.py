@@ -26,14 +26,10 @@ class Movie( breve.Abstract ):
 		self.moviePointer = 0
 
 	def destroy( self ):
-		''''''
-
 
 		self.close()
 
 	def iterate( self ):
-		''''''
-
 
 		self.addFrameFromDisplay()
 

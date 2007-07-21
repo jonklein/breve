@@ -2,8 +2,6 @@
 import breve
 
 class Line( breve.Object ):
-	''''''
-
 	def __init__( self ):
 		breve.Object.__init__( self )
 		self.end = None
@@ -20,8 +18,6 @@ class Line( breve.Object ):
 		self.linePointer = breve.breveInternalFunctionFinder.addObjectLine( self, start.getWorldObjectPointer(), end.getWorldObjectPointer(), theColor, theStyle )
 
 	def destroy( self ):
-		''''''
-
 
 		if self.linePointer:
 			breve.breveInternalFunctionFinder.removeObjectLine( self, self.linePointer )

@@ -13,22 +13,16 @@ class Shape( breve.Abstract ):
 		Shape.init( self )
 
 	def archive( self ):
-		''''''
-
 
 		self.shapeData = self.getDataForShape()
 		return 1
 
 	def dearchive( self ):
-		''''''
-
 
 		self.shapePointer = breve.breveInternalFunctionFinder.shapeForData( self, self.shapeData )
 		return breve.Abstract.dearchive( self )
 
 	def destroy( self ):
-		''''''
-
 
 		if self.shapePointer:
 			breve.breveInternalFunctionFinder.freeShape( self, self.shapePointer )
@@ -83,8 +77,6 @@ class Shape( breve.Abstract ):
 		return self.shapePointer
 
 	def init( self ):
-		''''''
-
 
 		self.density = 1.000000
 
@@ -161,8 +153,6 @@ class CustomShape( breve.Shape ):
 		return breve.breveInternalFunctionFinder.finishShape( self, self.shapePointer, theDensity )
 
 	def init( self ):
-		''''''
-
 
 		self.shapePointer = breve.breveInternalFunctionFinder.newShape( self)
 
@@ -263,6 +253,8 @@ class MeshShape( breve.Shape ):
 
 
 breve.MeshShape = MeshShape
+# Add our newly created classes to the breve namespace
+
 breve.Shapes = Shape
 breve.CustomShapes = CustomShape
 breve.Spheres = Sphere

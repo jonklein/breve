@@ -10,14 +10,10 @@ class PhysicalControl( breve.Control ):
 		PhysicalControl.init( self )
 
 	def dearchive( self ):
-		''''''
-
 
 		return breve.Control.dearchive( self )
 
 	def disableAutoDisable( self ):
-		''''''
-
 
 		breve.breveInternalFunctionFinder.setAutoDisableFlag( self, 0 )
 
@@ -38,8 +34,6 @@ class PhysicalControl( breve.Control ):
 		self.gravityMenu[ 3 ].check()
 
 	def enableAutoDisable( self ):
-		''''''
-
 
 		breve.breveInternalFunctionFinder.setAutoDisableFlag( self, 1 )
 
@@ -47,6 +41,7 @@ class PhysicalControl( breve.Control ):
 		'''Obsolete.'''
 
 
+		pass
 
 	def enableFastPhysics( self ):
 		'''This alternative physical simulation is faster, but less accurate than the default physical simulation.  Though it will not work well for all simulations, you can see a large boost in performance by enabling it.  Fast physics can be turned off using METHOD(disable-fast-physics).'''
@@ -75,8 +70,6 @@ class PhysicalControl( breve.Control ):
 		self.gravityMenu[ 3 ].uncheck()
 
 	def init( self ):
-		''''''
-
 
 		self.setIntegrationStep( 0.004000 )
 		self.setIterationStep( 0.050000 )

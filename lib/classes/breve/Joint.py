@@ -38,8 +38,6 @@ class Joint( breve.Abstract ):
 		self.jointPointer = 0
 
 	def dearchive( self ):
-		''''''
-
 
 		if self.jointPointer:
 			self.setStrengthLimit( self.strengthLimit )
@@ -49,8 +47,6 @@ class Joint( breve.Abstract ):
 		return 1
 
 	def destroy( self ):
-		''''''
-
 
 		self.breakJoint()
 
@@ -76,8 +72,6 @@ class Joint( breve.Abstract ):
 		self.observe( self.child.getShape(), 'sizeChanged', 'rescaleChildLinkPoint' )
 
 	def enableChildrenReposition( self ):
-		''''''
-
 
 		breve.breveInternalFunctionFinder.jointSetRepositionAll( self, self.jointPointer, 1 )
 
@@ -173,8 +167,6 @@ class Joint( breve.Abstract ):
 
 
 	def init( self ):
-		''''''
-
 
 		self.normalVector
 		self.relativeRotation = breve.matrix(  1, 0, 0, 0, 1, 0, 0, 0, 1 )
@@ -334,8 +326,6 @@ class PrismaticJoint( breve.Joint ):
 		breve.Joint.__init__( self )
 
 	def dearchive( self ):
-		''''''
-
 
 		if ( self.parent or self.child ):
 			self.link( self.parent, self.child, self.normalVector, self.plinkPoint, self.clinkPoint )
@@ -398,8 +388,6 @@ class RevoluteJoint( breve.Joint ):
 		breve.Joint.__init__( self )
 
 	def dearchive( self ):
-		''''''
-
 
 		if ( self.parent or self.child ):
 			self.link( self.parent, self.child, self.normalVector, self.plinkPoint, self.clinkPoint )
@@ -413,8 +401,6 @@ class RevoluteJoint( breve.Joint ):
 		return breve.breveInternalFunctionFinder.jointGetPosition( self, self.jointPointer ).x
 
 	def getJointPosition( self ):
-		''''''
-
 
 		return self.getJointAngle()
 
@@ -472,8 +458,6 @@ class FixedJoint( breve.Joint ):
 		breve.Joint.__init__( self )
 
 	def dearchive( self ):
-		''''''
-
 
 		print '''dearchiving for %s and %s''' % (  self.parent, self.child )
 		if ( self.parent or self.child ):
@@ -519,8 +503,6 @@ class UniversalJoint( breve.Joint ):
 		breve.Joint.__init__( self )
 
 	def dearchive( self ):
-		''''''
-
 
 		if ( self.parent or self.child ):
 			self.link( self.parent, self.child, self.normalVector, self.plinkPoint, self.clinkPoint )
@@ -583,14 +565,12 @@ class UniversalJoint( breve.Joint ):
 
 breve.UniversalJoint = UniversalJoint
 class BallJoint( breve.Joint ):
-	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a ball joint. <p> A universal joint has three degrees of freedom.  It can tilt "up-and-down" and "side-to-side", and can "twist".  Your neck is basically a ball joint--your head tilt  up-and-down, side-to-side, and can twist (although not all the  way around--if your head turns all the way around, please consult  the user manual for repair). <P> <CENTER><IMG SRC="BallJoint.jpg" BORDER=1></CENTER> <P> This joint uses a scheme of 3 Euler angles to represent the  relative rotation between two objects.  The Z-axis of rotation is automatically  derived from the parent link point, meaning that the Z-axis rotation is always  a "twist" relative to the link point.  The X-axis of rotation is specified by  the user with the normal argument.  The Y-axis is automatically derived from the  other two. <P> Because of a limitation of the physics engine, the Y-axis rotation is limited  to a range of approximately +/- 80 degrees of rotation. <P> If versions of breve prior to 2.3, there was no normal argument because the  axes of rotation were automatically defined.  The argument is therefore optional for backwards compatibility <b>only</b>, and should <b>always</b> be specified when writing new code.'''
+	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a ball joint. <p> A BallJoint has three degrees of freedom.  It can tilt "up-and-down" and "side-to-side", and can "twist".  Your neck is basically a ball joint--your head tilt  up-and-down, side-to-side, and can twist (although not all the  way around--if your head turns all the way around, please consult  the user manual for repair). <P> <CENTER><IMG SRC="BallJoint.jpg" BORDER=1></CENTER> <P> This joint uses a scheme of 3 Euler angles to represent the  relative rotation between two objects.  The Z-axis of rotation is automatically  derived from the parent link point, meaning that the Z-axis rotation is always  a "twist" relative to the link point.  The X-axis of rotation is specified by  the user with the normal argument.  The Y-axis is automatically derived from the  other two. <P> Because of a limitation of the physics engine, the Y-axis rotation is limited  to a range of approximately +/- 80 degrees of rotation. <P> If versions of breve prior to 2.3, there was no normal argument because the  axes of rotation were automatically defined.  The argument is therefore optional for backwards compatibility <b>only</b>, and should <b>always</b> be specified when writing new code.'''
 
 	def __init__( self ):
 		breve.Joint.__init__( self )
 
 	def dearchive( self ):
-		''''''
-
 
 		if ( self.parent or self.child ):
 			self.link( self.parent, self.child, self.plinkPoint, self.clinkPoint )
@@ -650,6 +630,8 @@ class BallJoint( breve.Joint ):
 
 
 breve.BallJoint = BallJoint
+# Add our newly created classes to the breve namespace
+
 breve.Joints = Joint
 breve.PrismaticJoints = PrismaticJoint
 breve.RevoluteJoints = RevoluteJoint

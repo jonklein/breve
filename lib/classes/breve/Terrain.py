@@ -12,14 +12,10 @@ class Terrain( breve.Real ):
 		Terrain.init( self )
 
 	def archive( self ):
-		''''''
-
 
 		return 1
 
 	def dearchive( self ):
-		''''''
-
 
 		self.realWorldPointer = breve.breveInternalFunctionFinder.terrainNew( self, 1 )
 		self.setPeakColor( self.peakColor )
@@ -39,8 +35,6 @@ class Terrain( breve.Real ):
 		breve.breveInternalFunctionFinder.terrainSetDrawMode( self, self.realWorldPointer, 0 )
 
 	def generate( self, ruggedness = 0.200000, terrainHeight = 5.000000 ):
-		''''''
-
 
 		self.generateFractalTerrain( ruggedness, terrainHeight )
 
@@ -69,8 +63,6 @@ class Terrain( breve.Real ):
 		return self.location
 
 	def init( self ):
-		''''''
-
 
 		self.realWorldPointer = breve.breveInternalFunctionFinder.terrainNew( self, 1 )
 		self.setPeakColor( breve.vector( 1, 1, 1 ) )
@@ -78,8 +70,6 @@ class Terrain( breve.Real ):
 		self.setTextureImage( breve.createInstances( breve.Image, 1 ).load( 'images/grass.jpg' ) )
 
 	def loadGeoTiff( self, geoTIFFFile ):
-		''''''
-
 
 		if self.realWorldPointer:
 			breve.breveInternalFunctionFinder.terrainLoadGeoTIFF( self, self.realWorldPointer, geoTIFFFile )

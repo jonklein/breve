@@ -30,15 +30,11 @@ class GeneticAlgorithm( breve.Object ):
 		GeneticAlgorithm.init( self )
 
 	def acceptUpload( self, migrants, other ):
-		''''''
-
 
 		breve.deleteInstances( self.transferIn )
 		self.transferIn = migrants
 
 	def dearchive( self ):
-		''''''
-
 
 		self.currentIndividual = ( self.currentIndividual - 1 )
 		self.switchIndividual()
@@ -48,6 +44,7 @@ class GeneticAlgorithm( breve.Object ):
 		'''In this method, you should perform any cleanup neccessary when the  fitness test ends.  You should also make sure that the individual's fitness value is set using  OBJECTMETHOD(GeneticAlgorithmIndividual:set-fitness).'''
 
 
+		pass
 
 	def examine( self, currentIndividual ):
 		'''Called automatically during each generation's report, this method examines and outputs information about an individual in the population.  The default implementation simply prints out the object variable, but you may override  this method to print out more information about the individual.'''
@@ -56,8 +53,6 @@ class GeneticAlgorithm( breve.Object ):
 		print currentIndividual
 
 	def generatePopulation( self ):
-		''''''
-
 		n = 0
 		newI = None
 
@@ -138,8 +133,6 @@ class GeneticAlgorithm( breve.Object ):
 		return self.generationLimit
 
 	def getMigrationPercent( self ):
-		''''''
-
 
 		return self.migrationPercent
 
@@ -162,8 +155,6 @@ class GeneticAlgorithm( breve.Object ):
 		return self.randomizePercent
 
 	def getSpatialRadius( self ):
-		''''''
-
 
 		return self.spatialRadius
 
@@ -174,8 +165,6 @@ class GeneticAlgorithm( breve.Object ):
 		return self.tournamentSize
 
 	def init( self ):
-		''''''
-
 
 		self.testDuration = 20
 		self.populationSize = 30
@@ -191,8 +180,6 @@ class GeneticAlgorithm( breve.Object ):
 		self.prepareForGeneration( 0 )
 
 	def iterate( self ):
-		''''''
-
 
 		if ( breve.length( self.populations[ 0 ] ) == 0 ):
 			self.generatePopulation()
@@ -202,6 +189,7 @@ class GeneticAlgorithm( breve.Object ):
 		'''This method is called when a generation is setup.  The default implementation does nothing, but the method may be overriden in order to carry out any preparations necessary for a new  generation.'''
 
 
+		pass
 
 	def report( self, generation, bestIndividual, fitness ):
 		'''Prints out a report of the progress at each generation, with the most  fit object passed in as bestIndividual.  The default implementation of  this method simply prints out the generation number, best fitness and  calls METHOD(examine) on the best individual, but you may override the  method to print out any other desired information.'''
@@ -213,8 +201,6 @@ class GeneticAlgorithm( breve.Object ):
 		self.examine( bestIndividual )
 
 	def reproduce( self ):
-		''''''
-
 		n = 0
 		best = 0
 		i = 0
@@ -327,8 +313,6 @@ class GeneticAlgorithm( breve.Object ):
 		self.individualClass = className
 
 	def setMigrationHosts( self, hosts ):
-		''''''
-
 
 		self.migrationHosts = list( hosts) 
 
@@ -350,8 +334,6 @@ class GeneticAlgorithm( breve.Object ):
 		self.migrationPercent = percent
 
 	def setMigrationPort( self, port ):
-		''''''
-
 
 		self.migrationPort = port
 
@@ -392,8 +374,6 @@ class GeneticAlgorithm( breve.Object ):
 		self.tournamentSize = tsize
 
 	def spatialTournamentSelect( self, index ):
-		''''''
-
 		n = 0
 		test = 0
 		best = 0
@@ -427,6 +407,7 @@ class GeneticAlgorithm( breve.Object ):
 		'''Implement this method to perform any setup necessary when the  fitness test begins.'''
 
 
+		pass
 
 	def switchIndividual( self ):
 		'''Switches to the next indivisual'''
@@ -449,8 +430,6 @@ class GeneticAlgorithm( breve.Object ):
 		self.schedule( 'switchIndividual', ( self.controller.getTime() + self.testDuration ) )
 
 	def tournamentSelect( self, i ):
-		''''''
-
 
 		if ( self.spatialRadius == 0 ):
 			return self.tournamentSelect()
@@ -509,9 +488,8 @@ class GeneticAlgorithmIndividual( breve.Object ):
 		return self.fitness
 
 	def init( self ):
-		''''''
 
-
+		pass
 
 	def mutate( self ):
 		'''Implement this method to mutate the genes of this object.  This method must be implemented by your subclass.'''
@@ -536,27 +514,19 @@ class GeneticAlgorithmIndividual( breve.Object ):
 
 breve.GeneticAlgorithmIndividual = GeneticAlgorithmIndividual
 class GAIndividualTransporter( breve.Object ):
-	''''''
-
 	def __init__( self ):
 		breve.Object.__init__( self )
 		self.individuals = breve.objectList()
 
 	def add( self, i ):
-		''''''
-
 
 		self.individuals.append( i )
 
 	def clear( self ):
-		''''''
-
 
 		self.individuals = []
 
 	def getIndividual( self, n ):
-		''''''
-
 
 		if ( n < breve.length( self.individuals ) ):
 			return self.individuals[ n ]

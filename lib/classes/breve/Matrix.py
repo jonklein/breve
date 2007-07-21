@@ -10,16 +10,12 @@ class Matrix( breve.Object ):
 		self.matrixPointer = None
 
 	def getMatrixPointer( self ):
-		''''''
-
 
 		return self.matrixPointer
 
 
 breve.Matrix = Matrix
 class Matrix2D( breve.Matrix ):
-	''''''
-
 	def __init__( self ):
 		breve.Matrix.__init__( self )
 		self.xDim = 0
@@ -38,8 +34,6 @@ class Matrix2D( breve.Matrix ):
 		breve.breveInternalFunctionFinder.matrix2DAddScaled( self, self.matrixPointer, otherMatrix.getMatrixPointer(), scale )
 
 	def archive( self ):
-		''''''
-
 		y = 0
 		x = 0
 
@@ -94,8 +88,6 @@ class Matrix2D( breve.Matrix ):
 		breve.breveInternalFunctionFinder.matrix2DCopyToImage( self, self.matrixPointer, theImage.getImageData(), 0, scale )
 
 	def dearchive( self ):
-		''''''
-
 		y = 0
 		x = 0
 
@@ -114,8 +106,6 @@ class Matrix2D( breve.Matrix ):
 		return breve.Matrix.dearchive( self )
 
 	def destroy( self ):
-		''''''
-
 
 		if self.matrixPointer:
 			breve.breveInternalFunctionFinder.matrix2DFree( self, self.matrixPointer )
@@ -203,8 +193,6 @@ class Matrix2D( breve.Matrix ):
 		breve.breveInternalFunctionFinder.matrix2DSetAll( self, self.matrixPointer, value )
 
 	def setMatrixPointer( self, newPointer, xSize, ySize ):
-		''''''
-
 
 		if self.matrixPointer:
 			breve.breveInternalFunctionFinder.matrix2DFree( self, self.matrixPointer )
@@ -266,8 +254,6 @@ class Matrix3D( breve.Matrix ):
 		breve.breveInternalFunctionFinder.matrix3DAddScaled( self, self.matrixPointer, otherMatrix.getMatrixPointer(), scale )
 
 	def archive( self ):
-		''''''
-
 		z = 0
 		y = 0
 		x = 0
@@ -359,8 +345,6 @@ class Matrix3D( breve.Matrix ):
 		breve.breveInternalFunctionFinder.patchGridCopyColorFrom3DMatrix( self, grid.getGridPointer(), self.matrixPointer, 0, scale )
 
 	def dearchive( self ):
-		''''''
-
 		z = 0
 		y = 0
 		x = 0
@@ -385,8 +369,6 @@ class Matrix3D( breve.Matrix ):
 		return breve.Matrix.dearchive( self )
 
 	def destroy( self ):
-		''''''
-
 
 		if self.matrixPointer:
 			breve.breveInternalFunctionFinder.matrix3DFree( self, self.matrixPointer )
@@ -466,8 +448,6 @@ class MatrixImage( breve.Image ):
 		self.scale = 0
 
 	def destroy( self ):
-		''''''
-
 
 		breve.Image.destroy( self )
 
@@ -480,8 +460,6 @@ class MatrixImage( breve.Image ):
 		return self
 
 	def iterate( self ):
-		''''''
-
 
 		if self.red:
 			self.red.copyToRedChannel( self, self.scale )
@@ -520,6 +498,8 @@ class MatrixImage( breve.Image ):
 
 
 breve.MatrixImage = MatrixImage
+# Add our newly created classes to the breve namespace
+
 breve.Matricies = Matrix
 breve.Matrices2D = Matrix2D
 breve.Matrices3D = Matrix3D

@@ -15,16 +15,20 @@ docBuild/docExtract: docBuild/docExtract.c
 	$(CC) -o docBuild/docExtract docBuild/docExtract.c
 
 classes: docExtract
-	mkdir -p htmldocs/classes
-	./docExtract ../lib/classes/*.tz | ./docBuild.pl htmldocs/classes
-	cp classImages/*.jpg htmldocs/classes/
+	mkdir -p htmldocs/steveclasses
+	mkdir -p htmldocs/pythonclasses
+	./docExtract ../lib/classes/*.tz | ./docBuild.pl htmldocs/steveclasses
+	( cd ..; ./bin/breve -x ./docBuild/DocBuild.py docBuild/htmldocs/pythonclasses )
+	cp classImages/*.jpg htmldocs/steveclasses/
+	cp classImages/*.jpg htmldocs/pythonclasses/
 
 pdf: pdf-clean
 	mkdir -p pdfdocs
 	xsltproc --output breve_documentation.fo --stringparam fop.extensions 1 /usr/local/lib/docbook-xsl-1.71.1/fo/docbook.xsl breve.docbook
 	fop -fo breve_documentation.fo -pdf pdfdocs/breve_documentation.pdf
 
-html: html-clean classes
+html: html-clean 
+	make classes
 	mkdir -p htmldocs
 	mkdir -p htmldocs/docs
 

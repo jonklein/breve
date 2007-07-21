@@ -9,14 +9,10 @@ class Link( breve.Mobile ):
 		Link.init( self )
 
 	def dearchive( self ):
-		''''''
-
 
 		return breve.Mobile.dearchive( self )
 
 	def destroy( self ):
-		''''''
-
 
 		breve.Mobile.destroy( self )
 
@@ -27,14 +23,14 @@ class Link( breve.Mobile ):
 		return breve.breveInternalFunctionFinder.linkGetMultibody( self, self.realWorldPointer )
 
 	def init( self ):
-		''''''
-
 
 		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, 0.200000, 0.200000 )
 		self.enablePhysics()
 
 
 breve.Link = Link
+# Add our newly created classes to the breve namespace
+
 breve.Links = Link
 
 

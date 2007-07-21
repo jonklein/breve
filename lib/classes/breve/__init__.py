@@ -149,7 +149,6 @@ def randomExpression( inValue ):
 
 	raise Exception( "Cannot create random expression" )
 
-
 #
 # Standard breve matrices and vectors
 #
@@ -346,3 +345,4 @@ breveInternal.vectorType = vector
 breveInternal.matrixType = matrix
 
 instanceDict = {}
+

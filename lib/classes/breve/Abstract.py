@@ -8,13 +8,13 @@ class Abstract( breve.Object ):
 		breve.Object.__init__( self )
 
 	def dearchive( self ):
-		''''''
-
 
 		return 1
 
 
 breve.Abstract = Abstract
+# Add our newly created classes to the breve namespace
+
 breve.Abstracts = Abstract
 
 

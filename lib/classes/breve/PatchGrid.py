@@ -25,14 +25,10 @@ class PatchGrid( breve.Abstract ):
 		self.zSize = 0
 
 	def archive( self ):
-		''''''
-
 
 		return 1
 
 	def dearchive( self ):
-		''''''
-
 		z = 0
 		y = 0
 		x = 0
@@ -86,8 +82,6 @@ class PatchGrid( breve.Abstract ):
 		self.chemicalConcentrationMatrix[ theDiffusable ].setValue( currentValue, xIndex, yIndex, zIndex )
 
 	def destroy( self ):
-		''''''
-
 		chem = None
 
 		if ( breve.length( self.diffusingChemicals ) > 0 ):
@@ -177,14 +171,10 @@ class PatchGrid( breve.Abstract ):
 		return self.chemicalConcentrationMatrix[ theDiffusable ].getValue( xIndex, yIndex, zIndex )
 
 	def getDescription( self ):
-		''''''
-
 
 		return '''%s x %s x %s''' % (  self.xSize, self.ySize, self.zSize )
 
 	def getGridPointer( self ):
-		''''''
-
 
 		return self.gridPointer
 
@@ -252,8 +242,6 @@ class PatchGrid( breve.Abstract ):
 		self.chemicalConcentrationMatrix[ theDiffusable ].setValue( currentValue, xIndex, yIndex, zIndex )
 
 	def initAt( self, x, y, z, gridCenter = breve.vector( 0.000000, 0.000000, 0.000000 ), pSize = breve.vector( 1.000000, 1.000000, 1.000000 ), patchclass = "Patch" ):
-		''''''
-
 		zCount = 0
 		yCount = 0
 		xCount = 0
@@ -324,8 +312,6 @@ class PatchGrid( breve.Abstract ):
 		self.chemicalConcentrationMatrix[ theDiffusable ].setValue( theValue, xIndex, yIndex, zIndex )
 
 	def setPatchColorsToChemicalConcentrations( self ):
-		''''''
-
 		color = breve.vector()
 
 		color = breve.vector( 0, 0, 0 )
@@ -461,6 +447,8 @@ class PatchToroid( breve.PatchGrid ):
 
 
 breve.PatchToroid = PatchToroid
+# Add our newly created classes to the breve namespace
+
 breve.PatchGrids = PatchGrid
 breve.PatchToroids = PatchToroid
 

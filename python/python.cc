@@ -626,6 +626,11 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 
 	callerObject = PyTuple_GET_ITEM( arguments, 0 );
 
+	if ( !callerObject ) {
+		PyErr_SetString( PyExc_RuntimeError, "Could not execute internal breve function" );
+		return NULL;
+	}
+
 	PyObject *breveObject = PyObject_GetAttrString( callerObject, "breveInstance" );
 
 	if( !breveObject ) {
@@ -1061,6 +1066,22 @@ void brPythonDestroy( void *inObject ) {
 }
 
 /**
+ * Setup the sys.argv variable in Python.
+ */
+
+void brPythonSetArgv( brEngine *inEngine, PyObject *inSysModule ) {
+	PyObject *argv;
+
+	argv = PyList_New( 0 );
+
+	for( int n = 0; n < inEngine->argc; n++ ) {
+		PyList_Append( argv, PyString_FromString( inEngine->argv[ n ] ) );
+	}
+
+	PyObject_SetAttrString( inSysModule, "argv", argv );
+}
+
+/**
  * A function to initialize the Python frontend.  
  * 
  * Creates necessary Python structures and initializes a brObjectType for
@@ -1127,6 +1148,8 @@ void brPythonInit( brEngine *breveEngine ) {
 		PyErr_Print();
 		return;
 	}
+
+	brPythonSetArgv( breveEngine, PyImport_ImportModule( "sys" ) );
 
 	sPythonData._vectorClass = PyObject_GetAttrString( sPythonData._breveModule, "vector" );
 	sPythonData._matrixClass = PyObject_GetAttrString( sPythonData._breveModule, "matrix" );

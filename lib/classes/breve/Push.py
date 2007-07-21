@@ -26,9 +26,8 @@ class PushInterpreter( breve.Object ):
 		breve.breveInternalFunctionFinder.pushMacroNew( self, self.pushInterpreterPointer, instructionName, code.getCodePointer() )
 
 	def archive( self ):
-		''''''
 
-
+		pass
 
 	def clearStacks( self ):
 		'''Clears the stacks of the Push interpreter.'''
@@ -63,13 +62,10 @@ class PushInterpreter( breve.Object ):
 		program.parse( breve.breveInternalFunctionFinder.pushCodeGetString( self, other ) )
 
 	def dearchive( self ):
-		''''''
 
-
+		pass
 
 	def destroy( self ):
-		''''''
-
 
 		breve.breveInternalFunctionFinder.pushEnvironmentFree( self, self.pushInterpreterPointer )
 
@@ -158,8 +154,6 @@ class PushInterpreter( breve.Object ):
 		return breve.breveInternalFunctionFinder.pushVectorStackTop( self, self.pushInterpreterPointer, breve.vector( 0, 0, 0 ) )
 
 	def init( self ):
-		''''''
-
 
 		self.pushInterpreterPointer = breve.breveInternalFunctionFinder.pushEnvironmentNew( self, breve.randomExpression( 2000000000 ) )
 		self.setEvaluationLimit( 200 )
@@ -349,8 +343,6 @@ class PushProgram( breve.Object ):
 		self.setCodePointer( breve.breveInternalFunctionFinder.pushCodeDeletionMutate( self, self.getCodePointer() ) )
 
 	def destroy( self ):
-		''''''
-
 
 		if self.codePointer:
 			breve.breveInternalFunctionFinder.pushCodeFree( self, self.codePointer )
@@ -429,7 +421,7 @@ class PushProgram( breve.Object ):
 		self.setCodePointer( breve.breveInternalFunctionFinder.pushCodeRandom( self, interpreter.getInterpreterPointer(), size ) )
 
 	def mutate( self, interpreter, leafBias = 0.900000, sizeScale = 0.300000, ignored = 0.000000 ):
-		'''Mutates this code object by adding a new subtree.  The maximum size of the subtree is specified in the optional argument treeSize, which has a default value of 50.  The size may also be equal to -1 (the default), indicating that the  MAX-POINTS-IN-RANDOM-EXPRESSION value from the Push configuration file  should be used.  The interpreter argument determines the instruction set used to generate the random code.   <P> Mutation is implemented as "fair" mutation with a range of +/- 30% of the  mutated subtree. <P> The max-new-code-size argument is ignored, but included for backwards compatibility.'''
+		'''Modifies this code object by mutating a subtree of the program.  The leafBias parameter indicates the probability that a leaf node will be selected (as  opposed to a non-leaf subtree). <p> Mutation is implemented as "fair" mutation, in which the new code size is  determined by the size of the subtree it is replacing, plus or minus a  factor of sizeScale. <P> The interpreter argument determines the instruction set used to generate the random code.   <P> The max-new-code-size argument is ignored, but included for backwards compatibility.'''
 
 
 		self.setCodePointer( breve.breveInternalFunctionFinder.pushCodeSubtreeMutate( self, interpreter.getInterpreterPointer(), self.codePointer, leafBias, sizeScale ) )
@@ -464,6 +456,12 @@ class PushProgram( breve.Object ):
 			self.codePointer = newCodePointer
 
 		return self
+
+	def setFrom( self, newCodeList ):
+		'''Sets this code's object using the contents of newCodeList.  The list can contain literals, sublists or subprograms.'''
+
+
+		self.setCodePointer( breve.breveInternalFunctionFinder.pushListToPushCode( self, newCodeList ) )
 
 	def swapSublists( self, x, y ):
 		'''Swaps the positions of the top level sublists x and y.'''
@@ -504,8 +502,6 @@ class PushDiversityPool( breve.Object ):
 		breve.breveInternalFunctionFinder.pushDiversityPoolClear( self, self.poolPointer )
 
 	def destroy( self ):
-		''''''
-
 
 		breve.breveInternalFunctionFinder.pushDiversityPoolFree( self, self.poolPointer )
 
@@ -516,8 +512,6 @@ class PushDiversityPool( breve.Object ):
 		return breve.breveInternalFunctionFinder.pushDiversityPoolGetCount( self, self.poolPointer )
 
 	def init( self ):
-		''''''
-
 
 		self.poolPointer = breve.breveInternalFunctionFinder.pushDiversityPoolNew( self, 10 )
 
@@ -529,6 +523,8 @@ class PushDiversityPool( breve.Object ):
 
 
 breve.PushDiversityPool = PushDiversityPool
+# Add our newly created classes to the breve namespace
+
 breve.PushInterpreters = PushInterpreter
 breve.PushPrograms = PushProgram
 

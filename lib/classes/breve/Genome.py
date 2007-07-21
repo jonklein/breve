@@ -19,6 +19,8 @@ class Genome( breve.Data ):
 
 
 breve.Genome = Genome
+# Add our newly created classes to the breve namespace
+
 breve.Genomes = Genome
 
 

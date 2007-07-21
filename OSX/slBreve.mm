@@ -66,9 +66,6 @@ static NSRecursiveLock *gLogLock;
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification*)note {
-	struct direct **docsArray;
-	int demoCount, n;
-	NSString *name;
 	NSString *bundlePath;
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
@@ -114,25 +111,17 @@ static NSRecursiveLock *gLogLock;
 	demoPath = strdup([[NSString stringWithFormat: @"%@/demos", bundlePath] cString]);
 	classPath = strdup([[NSString stringWithFormat: @"%@/classes", bundlePath] cString]);
 	docsPath = strdup([[NSString stringWithFormat: @"%@/docs", bundlePath] cString]);
-	classDocsPath = strdup([[NSString stringWithFormat: @"%@/docs/classes", bundlePath] cString]);
+
+	_stClassDocsPath = strdup([[NSString stringWithFormat: @"%@/docs/steveclasses", bundlePath] cString]);
+	_pyClassDocsPath = strdup([[NSString stringWithFormat: @"%@/docs/pythonclasses", bundlePath] cString]);
 
 	srand(time(NULL));
 	srandom(time(NULL));
 	
-	[self buildDemoMenuForDir: demoPath forMenu: demoMenu];
+	[ self buildDemoMenuForDir: demoPath forMenu: demoMenu ];
 
-	demoCount = scandir(classDocsPath, &docsArray, isHTMLfile, alphasort);
-
-	if(demoCount > 0) {
-		for(n=0;n<demoCount;n++) {
-			name = [NSString stringWithCString: docsArray[n]->d_name];
-			[docsMenu insertItemWithTitle: name action: @selector(docsMenu:) keyEquivalent: @"" atIndex: n];
-
-			free(docsArray[n]);
-		}
-
-		if(demoCount) free(docsArray);
-	}
+	[ self buildDocsMenuForDir: _stClassDocsPath forMenu: _stDocsMenu ];
+	[ self buildDocsMenuForDir: _pyClassDocsPath forMenu: _pyDocsMenu ];
 
 	[runWindow setFrameAutosaveName: @"runWindow"];
 
@@ -158,6 +147,24 @@ static NSRecursiveLock *gLogLock;
 	[NSTimer scheduledTimerWithTimeInterval: .2 target: self selector: @selector(updateLog:) userInfo: NULL repeats: YES];
 
 	[NSTimer scheduledTimerWithTimeInterval: 1.0 target: self selector: @selector(updateSelectionWindow:) userInfo: NULL repeats: YES];
+}
+
+- (void)buildDocsMenuForDir: (char*)inDirectory forMenu:(id)inMenu {
+	struct direct **docsArray;
+	int n, count;
+
+	count = scandir( inDirectory, &docsArray, isHTMLfile, alphasort );
+
+	if( count > 0 ) {
+		for( n = 0; n< count; n++ ) {
+			NSString *name = [ NSString stringWithCString: docsArray[n]->d_name ];
+			[ inMenu insertItemWithTitle: name action: @selector(docsMenu:) keyEquivalent: @"" atIndex: n ];
+
+			free(docsArray[n]);
+		}
+
+		free( docsArray );
+	}
 }
 
 - (void)buildDemoMenuForDir:(char*)directory forMenu:(slDemoMenu*)menu {
@@ -472,12 +479,19 @@ static NSRecursiveLock *gLogLock;
 - (IBAction)docsMenu:sender {
 	NSString *filePath;
 	NSURL *path;
+	
+	char *dir;
+	
+	if( [ sender menu ] == _stDocsMenu )
+		dir = _stClassDocsPath;
+	else
+		dir = _pyClassDocsPath;
+		
+	filePath = [NSString stringWithFormat: @"%s/%@", dir, [ sender title ] ];
 
-	filePath = [NSString stringWithFormat: @"%s/%@", classDocsPath, [sender title]];
+	path = [ NSURL fileURLWithPath: filePath ];
 
-	path = [NSURL fileURLWithPath: filePath];
-
-	[[NSWorkspace sharedWorkspace] openURL: path];
+	[ [ NSWorkspace sharedWorkspace ] openURL: path ];
 }
 
 - (IBAction)showHTMLHelp:sender {

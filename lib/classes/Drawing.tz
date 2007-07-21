@@ -1,4 +1,4 @@
-@use Object.
+@use Abstract.
 
 Abstract : Drawing {
 	% A basic class to draw custom images using polygons and lines.

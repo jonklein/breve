@@ -112,7 +112,7 @@
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
 					20,
-					505,
+					565,
 					20,
 					80,
 					43,
@@ -152,7 +152,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 200668399;
+			PBXPerProjectTemplateStateSaveDate = 206743258;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -709,7 +709,7 @@
 				PBXModuleWindowStatusBarHidden = YES;
 				RubberWindowFrame = "267 380 745 408 0 0 1280 832 ";
 			};
-			PBXWorkspaceStateSaveDate = 200668399;
+			PBXWorkspaceStateSaveDate = 206743258;
 		};
 		sourceControlManager = 48E065B3055C318700C40B45 /* Source Control */;
 		userBuildSettings = {
@@ -941,10 +941,10 @@
 	};
 	F5BD20C10397BFC001980AE4 /* slBreve.mm */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1172, 13762}}";
-			sepNavSelRange = "{20849, 0}";
-			sepNavVisRect = "{{0, 10220}, {845, 572}}";
-			sepNavWindowFrame = "{{369, 190}, {884, 701}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1172, 14042}}";
+			sepNavSelRange = "{6897, 0}";
+			sepNavVisRect = "{{0, 1961}, {845, 572}}";
+			sepNavWindowFrame = "{{369, 177}, {884, 701}}";
 		};
 	};
 	F5BD20C40397BFC001980AE4 /* slBreveEngine.h */ = {

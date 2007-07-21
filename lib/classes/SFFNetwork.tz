@@ -45,11 +45,7 @@ NeuralNetwork : FFNetwork [version 1.8] {
 
 		if layers == 0: inputLayer = newLayer.
 
-		# what the hell does this do?  it adds newLayer onto the end of 
-		# layers.  because lists give their lengths when interpreted as 
-		# ints.
-
-		layers{ layers } = newLayer.
+		layers{ | layers | } = newLayer.
 
 		outputLayer = newLayer.
 

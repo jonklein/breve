@@ -2,8 +2,6 @@
 import breve
 
 class IRSensor( breve.Real ):
-	''''''
-
 	def __init__( self ):
 		breve.Real.__init__( self )
 		self.communicationThreshold = 0
@@ -18,8 +16,6 @@ class IRSensor( breve.Real ):
 		self.sensordata = 0
 
 	def canSendAck( self, agent ):
-		''''''
-
 		qtest = 0
 
 		qtest = ( 233 * breve.breveInternalFunctionFinder.calcQualNoRay( self, self.realWorldPointer_owner, self.getLocation(), self.getRotation(), agent.getLocation(), self.sensorType ) )
@@ -30,8 +26,6 @@ class IRSensor( breve.Real ):
 		return 0
 
 	def getData( self ):
-		''''''
-
 
 		self.updatePos()
 		if ( self.sensordata == -1 ):
@@ -44,32 +38,22 @@ class IRSensor( breve.Real ):
 		return self.sensordata
 
 	def getLocation( self ):
-		''''''
-
 
 		return self.m_location
 
 	def getOwner( self ):
-		''''''
-
 
 		return self.owner
 
 	def getRotation( self ):
-		''''''
-
 
 		return self.m_rotation
 
 	def getSensorType( self ):
-		''''''
-
 
 		return self.sensorType
 
 	def initWith( self, t, position, rotation, o ):
-		''''''
-
 
 		self.sensorType = t
 		self.setRelPosition( position )
@@ -83,21 +67,15 @@ class IRSensor( breve.Real ):
 		return self
 
 	def iterate( self ):
-		''''''
-
 
 		self.sensordata = -1
 		self.updatePos()
 
 	def move( self, location ):
-		''''''
-
 
 		self.m_location = location
 
 	def send( self, message ):
-		''''''
-
 		qtest = 0
 		agents = breve.objectList()
 		i = None
@@ -123,44 +101,34 @@ class IRSensor( breve.Real ):
 
 
 	def setOwner( self, o ):
-		''''''
-
 
 		self.owner = o
 
 	def setRelPosition( self, v ):
-		''''''
-
 
 		self.rel_position = v
 
 	def setRelRotation( self, m ):
-		''''''
-
 
 		self.rel_rotation = m
 
 	def setRelYRotation( self, f ):
-		''''''
-
 
 		self.setRelRotation( breve.matrix(  breve.breveInternalFunctionFinder.cos( self, f ), 0, ( -breve.breveInternalFunctionFinder.sin( self, f ) ), 0, 1, 0, breve.breveInternalFunctionFinder.sin( self, f ), 0, breve.breveInternalFunctionFinder.cos( self, f ) ) )
 
 	def setRotation( self, m ):
-		''''''
-
 
 		self.m_rotation = m
 
 	def updatePos( self ):
-		''''''
-
 
 		self.move( ( self.owner.getLocation() + ( self.owner.getRotation() * self.rel_position ) ) )
 		self.setRotation( ( self.owner.getRotation() * self.rel_rotation ) )
 
 
 breve.IRSensor = IRSensor
+# Add our newly created classes to the breve namespace
+
 breve.IRSensors = IRSensor
 
 

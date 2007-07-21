@@ -118,8 +118,6 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 		self.rootNode = 0
 
 	def destroy( self ):
-		''''''
-
 
 		self.deleteRootNode()
 
@@ -130,8 +128,6 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 		return self.rootNode
 
 	def init( self ):
-		''''''
-
 
 		self.rootNode = breve.createInstances( breve.GADirectedGraphNode, 1 )
 		self.addDependency( self.rootNode )
@@ -143,8 +139,6 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 		self.rootNode.mutate()
 
 	def pickRootNode( self, nodes ):
-		''''''
-
 		node = None
 		best = None
 		bestCount = 0
@@ -232,9 +226,8 @@ class GADirectedGraphParameterObject( breve.Abstract ):
 		return self.parameters
 
 	def init( self ):
-		''''''
 
-
+		pass
 
 	def mutate( self, variation = 0.100000, replace = 0.100000 ):
 		'''Mutates the list of parameters in the list with a gaussian distribution  of size variation, and a replace proability chance of total replacement.'''
@@ -311,8 +304,6 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 		return connection
 
 	def destroy( self ):
-		''''''
-
 
 		breve.deleteInstances( self.connections )
 
@@ -331,8 +322,6 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 		return self.duplicate( h )
 
 	def duplicate( self, seenhash ):
-		''''''
-
 		connection = None
 		newNode = None
 
@@ -362,8 +351,6 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 		return self.connections
 
 	def internalDestroyConnectedObjects( self, seenhash ):
-		''''''
-
 		connection = None
 
 		if seenhash[ self ]:
@@ -380,8 +367,6 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 		breve.deleteInstances( self )
 
 	def internalGetConnectedNodes( self, seenhash, seenlist ):
-		''''''
-
 		connection = None
 		nodelist = breve.objectList()
 
@@ -406,8 +391,6 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 		return self.mutate( h )
 
 	def mutate( self, seenhash ):
-		''''''
-
 		connection = None
 
 		if seenhash[ self ]:
@@ -429,8 +412,6 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 		self.printConnectedObjects( h )
 
 	def printConnectedObjects( self, seenhash ):
-		''''''
-
 		connection = None
 
 		if seenhash[ self ]:
@@ -468,6 +449,8 @@ class GADirectedGraphConnection( breve.GADirectedGraphParameterObject ):
 
 
 breve.GADirectedGraphConnection = GADirectedGraphConnection
+# Add our newly created classes to the breve namespace
+
 breve.GADirectedGraphParameterObjects = GADirectedGraphParameterObject
 breve.GADirectedGraphNodes = GADirectedGraphNode
 breve.GADirectedGraphConnections = GADirectedGraphConnection

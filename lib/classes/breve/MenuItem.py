@@ -42,8 +42,6 @@ class MenuItem( breve.Abstract ):
 		return self
 
 	def dearchive( self ):
-		''''''
-
 
 		self.menuPointer = breve.breveInternalFunctionFinder.menuItemNew( self, self.owner, self.method, self.name )
 		if self.checked:
@@ -79,8 +77,6 @@ class MenuItem( breve.Abstract ):
 		self.enabled = 1
 
 	def getDescription( self ):
-		''''''
-
 
 		return self.name
 
@@ -96,6 +92,8 @@ class MenuItem( breve.Abstract ):
 
 
 breve.MenuItem = MenuItem
+# Add our newly created classes to the breve namespace
+
 breve.MenuItems = MenuItem
 
 

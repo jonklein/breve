@@ -9,8 +9,6 @@ class NetworkServer( breve.Abstract ):
 		self.serverData = None
 
 	def destroy( self ):
-		''''''
-
 
 		if self.serverData:
 			breve.breveInternalFunctionFinder.closeServer( self, self.serverData )
@@ -48,6 +46,8 @@ class NetworkServer( breve.Abstract ):
 
 
 breve.NetworkServer = NetworkServer
+# Add our newly created classes to the breve namespace
+
 breve.NetworkServers = NetworkServer
 
 

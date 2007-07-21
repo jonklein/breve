@@ -74,7 +74,10 @@ enum {
 	IBOutlet id displayView;
 	
 	IBOutlet id demoMenu;
-	IBOutlet id docsMenu;
+
+	IBOutlet id _stDocsMenu;
+	IBOutlet id _pyDocsMenu;
+
 	IBOutlet id simMenu;
 
 	IBOutlet id runButton;
@@ -106,7 +109,8 @@ enum {
 	char *demoPath;
 	char *classPath;
 	char *docsPath;
-	char *classDocsPath;
+	char *_pyClassDocsPath;
+	char *_stClassDocsPath;
 	
 	IBOutlet id preferences;
 
@@ -142,6 +146,7 @@ enum {
 - (IBAction)newWithTemplate:sender;
 
 - (void)buildDemoMenuForDir:(char*)directory forMenu:(slDemoMenu*)menu;
+- (void)buildDocsMenuForDir:(char*)directory forMenu:(id)menu;
 
 - (IBAction)showHTMLHelp:sender;
 

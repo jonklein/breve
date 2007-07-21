@@ -15,8 +15,6 @@ class Patch( breve.Abstract ):
 		self.zIndex = 0
 
 	def dearchive( self ):
-		''''''
-
 
 		return 1
 
@@ -82,8 +80,6 @@ class Patch( breve.Abstract ):
 		return self.grid.getConcentration( theDiffusable, self.xIndex, self.yIndex, self.zIndex )
 
 	def getDescription( self ):
-		''''''
-
 
 		return '''patch at indices (%s, %s, %s)''' % (  self.xIndex, self.yIndex, self.zIndex )
 
@@ -307,14 +303,14 @@ class Patch( breve.Abstract ):
 		self.grid.increaseConcentration( theDiffusable, theValue, self.xIndex, self.yIndex, self.zIndex )
 
 	def initNeighbors( self ):
-		''''''
 
-
+		pass
 
 	def initPatch( self ):
 		'''This method does nothing in its default implementation.  You can implement your own init-patch method in your patch class in order to perform initialization on  the patch.  This method is called after all the neighbor objects have been  created--if you do initialization in the init method, the neighbors will not  be initialized.'''
 
 
+		pass
 
 	def initWith( self, gp, x, y, z ):
 		'''Used internally by the grid patch system when setting up the  patches.  Do not call this method.  Just don't.  I know it's  tempting, but it's really better for all of us that you don't call it.'''
@@ -373,6 +369,8 @@ class Patch( breve.Abstract ):
 
 
 breve.Patch = Patch
+# Add our newly created classes to the breve namespace
+
 breve.Patches = Patch
 
 

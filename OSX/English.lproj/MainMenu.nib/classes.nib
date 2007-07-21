@@ -37,13 +37,14 @@
             CLASS = slBreve; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                "_pyDocsMenu" = id; 
+                "_stDocsMenu" = id; 
                 "_versionField" = id; 
                 aboutBox = id; 
                 archiveOpenAccView = id; 
                 breveEngine = id; 
                 demoMenu = id; 
                 displayView = id; 
-                docsMenu = id; 
                 errorWindow = id; 
                 errorWindowErrorMessage = id; 
                 fullScreenMenuItem = id; 

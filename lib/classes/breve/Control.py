@@ -10,6 +10,7 @@ class Control( breve.Abstract ):
 		self.breveInstance = breve.breveInternal.addInstance( breve.breveInternal, self.__class__, self )
 		self.breveModule = breve.breveInternal
 		breve.breveInternal.setController( breve.breveInternal, self )
+		breve.initArgv( self )
 
 		breve.Abstract.__init__( self )
 		self.backgroundColor = breve.vector()

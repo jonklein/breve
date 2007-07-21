@@ -12,8 +12,6 @@ class BraitenbergControl( breve.PhysicalControl ):
 		BraitenbergControl.init( self )
 
 	def init( self ):
-		''''''
-
 
 		self.enableLighting()
 		self.enableSmoothDrawing()
@@ -85,8 +83,6 @@ class BraitenbergVehicle( breve.MultiBody ):
 		return wheel
 
 	def destroy( self ):
-		''''''
-
 
 		breve.deleteInstances( self.sensorShape )
 		breve.deleteInstances( self.wheelShape )
@@ -94,26 +90,18 @@ class BraitenbergVehicle( breve.MultiBody ):
 		breve.MultiBody.destroy( self )
 
 	def getDensity( self ):
-		''''''
-
 
 		return 1.000000
 
 	def getWheelRadius( self ):
-		''''''
-
 
 		return 0.600000
 
 	def getWheelWidth( self ):
-		''''''
-
 
 		return 0.100000
 
 	def init( self ):
-		''''''
-
 
 		self.bodyShape = breve.createInstances( breve.Shape, 1 )
 		self.bodyShape.initWithCube( breve.vector( 4.000000, 0.750000, 3.000000 ) )
@@ -139,20 +127,14 @@ class BraitenbergHeavyVehicle( breve.BraitenbergVehicle ):
 		breve.BraitenbergVehicle.__init__( self )
 
 	def getDensity( self ):
-		''''''
-
 
 		return 20.000000
 
 	def getWheelRadius( self ):
-		''''''
-
 
 		return 0.800000
 
 	def getWheelWidth( self ):
-		''''''
-
 
 		return 0.400000
 
@@ -166,8 +148,6 @@ class BraitenbergLight( breve.Mobile ):
 		BraitenbergLight.init( self )
 
 	def init( self ):
-		''''''
-
 
 		self.setShape( breve.createInstances( breve.Shape, 1 ).initWithSphere( 0.300000 ) )
 		self.setColor( breve.vector( 1, 0, 0 ) )
@@ -192,15 +172,11 @@ class BraitenbergWheel( breve.Link ):
 		self.newVelocity = ( self.newVelocity + n )
 
 	def init( self ):
-		''''''
-
 
 		self.naturalVelocity = 0
 		self.newVelocity = 0
 
 	def postIterate( self ):
-		''''''
-
 
 		if ( self.newVelocity > 30 ):
 			self.newVelocity = 30
@@ -244,16 +220,12 @@ class BraitenbergSensor( breve.Link ):
 		BraitenbergSensor.init( self )
 
 	def init( self ):
-		''''''
-
 
 		self.bias = 1.000000
 		self.direction = breve.vector( 0, 1, 0 )
 		self.sensorAngle = 1.600000
 
 	def iterate( self ):
-		''''''
-
 		i = None
 		lights = 0
 		angle = 0
@@ -315,6 +287,8 @@ class BraitenbergSensor( breve.Link ):
 
 
 breve.BraitenbergSensor = BraitenbergSensor
+# Add our newly created classes to the breve namespace
+
 breve.BraitenbergVehicles = BraitenbergVehicle
 breve.BraitenbergHeavyVehicles = BraitenbergHeavyVehicle
 breve.BraitenbergLights = BraitenbergLight

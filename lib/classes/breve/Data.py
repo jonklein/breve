@@ -15,8 +15,6 @@ class Data( breve.Abstract ):
 		breve.breveInternalFunctionFinder.dataCopyObject( self, otherInstance )
 
 	def init( self ):
-		''''''
-
 
 		if ( breve.breveInternalFunctionFinder.dataCheckVariables( self) != 0 ):
 			raise Exception( '''subclasses of class Data may not variables of type object or pointer.''' )
@@ -67,6 +65,8 @@ class Data( breve.Abstract ):
 
 
 breve.Data = Data
+# Add our newly created classes to the breve namespace
+
 breve.Datum = Data
 
 

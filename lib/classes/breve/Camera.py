@@ -11,8 +11,6 @@ class Camera( breve.Abstract ):
 		Camera.init( self )
 
 	def delete( self ):
-		''''''
-
 
 		if ( self.cameraPointer and ( not self.shared ) ):
 			breve.breveInternalFunctionFinder.cameraFree( self, self.cameraPointer )
@@ -73,8 +71,6 @@ class Camera( breve.Abstract ):
 		return breve.breveInternalFunctionFinder.cameraGetWidth( self, self.cameraPointer )
 
 	def init( self ):
-		''''''
-
 
 		self.cameraPointer = breve.breveInternalFunctionFinder.cameraNew( self)
 		self.setSize( 100, 100 )
@@ -123,6 +119,8 @@ class Camera( breve.Abstract ):
 
 
 breve.Camera = Camera
+# Add our newly created classes to the breve namespace
+
 breve.Cameras = Camera
 
 

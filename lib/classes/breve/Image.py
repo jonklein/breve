@@ -14,22 +14,16 @@ class Image( breve.Abstract ):
 		Image.init( self )
 
 	def archive( self ):
-		''''''
-
 
 		self.textureNumber = -1
 		return breve.Abstract.archive( self )
 
 	def dearchive( self ):
-		''''''
-
 
 		self.setSize( self.currentWidth, self.currentHeight )
 		return breve.Abstract.dearchive( self )
 
 	def destroy( self ):
-		''''''
-
 
 		if self.imageData:
 			breve.breveInternalFunctionFinder.imageDataFree( self, self.imageData )
@@ -78,8 +72,6 @@ class Image( breve.Abstract ):
 		return breve.breveInternalFunctionFinder.imageGetHeight( self, self.imageData )
 
 	def getImageData( self ):
-		''''''
-
 
 		return self.imageData
 
@@ -132,20 +124,16 @@ class Image( breve.Abstract ):
 		return breve.breveInternalFunctionFinder.imageGetWidth( self, self.imageData )
 
 	def init( self ):
-		''''''
-
 
 		self.textureNumber = -1
 
 	def initWith( self, imageWidth, imageHeight ):
-		''''''
+		'''Deprecated.'''
 
 
 		self.setSize( imageWidth, imageHeight )
 
 	def iterate( self ):
-		''''''
-
 
 		if self.modified:
 			breve.breveInternalFunctionFinder.imageUpdateTexture( self, self.imageData )
@@ -241,6 +229,8 @@ class Image( breve.Abstract ):
 
 
 breve.Image = Image
+# Add our newly created classes to the breve namespace
+
 breve.Images = Image
 
 

@@ -11,8 +11,6 @@ class Stationary( breve.Real ):
 		Stationary.init( self )
 
 	def archive( self ):
-		''''''
-
 
 		return 1
 
@@ -29,8 +27,6 @@ class Stationary( breve.Real ):
 		self.controller.setFloorDefined()
 
 	def dearchive( self ):
-		''''''
-
 
 		self.move( self.objectLocation )
 		self.setDisplayShape( self.displayShape )
@@ -47,8 +43,6 @@ class Stationary( breve.Real ):
 		return self.realWorldPointer
 
 	def init( self ):
-		''''''
-
 
 		self.realWorldPointer = breve.breveInternalFunctionFinder.addStationary( self, self.controller.getGenericShape().getPointer(), breve.vector( 0, 0, 0 ), breve.matrix(  1, 0, 0, 0, 1, 0, 0, 0, 1 ) )
 		self.setTexture( 0 )
@@ -75,8 +69,6 @@ class Floor( breve.Stationary ):
 		Floor.init( self )
 
 	def init( self ):
-		''''''
-
 
 		self.shape = breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 1000, 5, 1000 ) )
 		self.move( breve.vector( 0, -2.500000, 0 ) )
@@ -94,6 +86,8 @@ class Floor( breve.Stationary ):
 
 
 breve.Floor = Floor
+# Add our newly created classes to the breve namespace
+
 breve.Stationaries = Stationary
 
 

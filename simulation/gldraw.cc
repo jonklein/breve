@@ -128,8 +128,6 @@ void slInitGL( slWorld *w, slCamera *c ) {
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 
-	glEnable( GL_LINE_SMOOTH );
-	glEnable( GL_POINT_SMOOTH );
 	glLineWidth( 2 );
 
 	glPolygonOffset( -4.0f, -1.0f );
@@ -1253,6 +1251,7 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 	if ( !doOnlyAlpha ) {
 		glEnable( GL_BLEND );
 		glPointSize( 2.0 );
+
 		glEnable( GL_POINT_SMOOTH );
 		glBegin( GL_POINTS );
 
@@ -1263,6 +1262,7 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 			glColor4d( c.x, c.y, c.z, 1.0 );
 			glVertex3d( v.x, v.y, v.z );
 		}
+		glDisable( GL_POINT_SMOOTH );
 
 		glEnd();
 	}
@@ -1324,6 +1324,8 @@ void slCamera::renderLines( slWorld *w ) {
 		}
 	}
 
+	glDisable( GL_LINE_SMOOTH );
+
 	glLineWidth( 1.0 );
 
 	std::vector< slObjectConnection* >::iterator li;
@@ -1344,6 +1346,8 @@ void slDrawAxis( double x, double y ) {
 	x += .02;
 	y += .02;
 
+	glEnable( GL_LINE_SMOOTH );
+
 	glBegin( GL_LINES );
 	glVertex3f( 0, 0, 0 );
 	glVertex3f( x, 0, 0 );
@@ -1362,6 +1366,8 @@ void slDrawAxis( double x, double y ) {
 	glScaled( .005, .005, .005 );
 	glutStrokeCharacter( GLUT_STROKE_ROMAN, 'y' );
 	glPopMatrix();
+
+	glDisable( GL_LINE_SMOOTH );
 }
 
 /*!

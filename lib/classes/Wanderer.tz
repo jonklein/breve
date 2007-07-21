@@ -1,7 +1,7 @@
 @include "Mobile.tz"
 
-Mobile : Wanderer [version 2.0] {
-    % This class is a work-in-progress.  A Wanderer is simply a real object 
+Mobile : Wanderer [version 2.6] {
+    % A Wanderer is a subclass of OBJECT(Mobile) 
     % that wanders randomly around a certain space.  The range of wandering
     % is adjusted with the METHOD(set-wander-range) method.
     % <p>

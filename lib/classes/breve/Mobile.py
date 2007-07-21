@@ -17,8 +17,6 @@ class Mobile( breve.Real ):
 		Mobile.init( self )
 
 	def archive( self ):
-		''''''
-
 
 		self.archiveLocation = self.getLocation()
 		self.archiveRotation = self.getRotation()
@@ -40,8 +38,6 @@ class Mobile( breve.Real ):
 		return breve.breveInternalFunctionFinder.linkCheckSelfPenetration( self, self.realWorldPointer )
 
 	def dearchive( self ):
-		''''''
-
 
 		self.realWorldPointer = breve.breveInternalFunctionFinder.linkNew( self)
 		self.realWorldPointer = breve.breveInternalFunctionFinder.linkAddToWorld( self, self.realWorldPointer )
@@ -140,8 +136,6 @@ class Mobile( breve.Real ):
 		return breve.breveInternalFunctionFinder.linkGetVelocity( self, self.realWorldPointer )
 
 	def init( self ):
-		''''''
-
 
 		self.e = 0.200000
 		self.mu = 0.200000
@@ -178,8 +172,6 @@ class Mobile( breve.Real ):
 		breve.breveInternalFunctionFinder.linkRemoveLabel( self, self.realWorldPointer )
 
 	def resumePhysics( self ):
-		''''''
-
 
 		breve.breveInternalFunctionFinder.linkSetPhysics( self, self.realWorldPointer, self.physicsEnabled )
 
@@ -256,8 +248,6 @@ class Mobile( breve.Real ):
 		breve.breveInternalFunctionFinder.linkSetVelocity( self, self.realWorldPointer, newVelocity )
 
 	def suspendPhysics( self ):
-		''''''
-
 
 		breve.breveInternalFunctionFinder.linkSetPhysics( self, self.realWorldPointer, 0 )
 
@@ -269,6 +259,8 @@ class Mobile( breve.Real ):
 
 
 breve.Mobile = Mobile
+# Add our newly created classes to the breve namespace
+
 breve.Mobiles = Mobile
 
 

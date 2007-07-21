@@ -57,9 +57,12 @@ void slDrawCommandList::draw( slCamera *c ) {
 		( *di )->execute( *this );
 	}
 
-	if ( _drawingPolygon ) glEnd();
+	// is there an unterminated polygon in process?
+	if ( _drawingPolygon ) 
+		glEnd();
 
 	glPopMatrix();
 
+	glDisable( GL_LINE_SMOOTH );
 	glDepthFunc( GL_LESS );
 }

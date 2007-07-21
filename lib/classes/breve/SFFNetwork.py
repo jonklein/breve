@@ -29,8 +29,6 @@ class FFNetwork( breve.NeuralNetwork ):
 		self.outputLayer = newLayer
 
 	def destroy( self ):
-		''''''
-
 
 		breve.breveInternalFunctionFinder.freeNetwork( self, self.outputLayer )
 

@@ -99,8 +99,6 @@ class PushGP( breve.Object ):
 		return fitness
 
 	def computeZeroDurationFitness( self, p ):
-		''''''
-
 		n = 0
 		errors = breve.objectList()
 		errorValue = 0
@@ -145,8 +143,6 @@ class PushGP( breve.Object ):
 
 
 	def createPopulation( self ):
-		''''''
-
 		n = 0
 
 		if self.pop1:
@@ -166,16 +162,14 @@ class PushGP( breve.Object ):
 
 		n = 0
 		while ( n < self.countFitnessCases() ):
-			self._fitnessCaseSolutionRates.append( 0 )
-			self._lastSolutionRates.append( 0 )
+			self._fitnessCaseSolutionRates.append( 0.000000 )
+			self._lastSolutionRates.append( 0.000000 )
 
 			n = ( n + 1 )
 
 		self.inited = 1
 
 	def evaluate( self ):
-		''''''
-
 		fitness = 0
 		n = 0
 
@@ -258,8 +252,6 @@ class PushGP( breve.Object ):
 		return self.deletionPercent
 
 	def getFitnessTestDuration( self ):
-		''''''
-
 
 		return self.fitnessTestDuration
 
@@ -300,8 +292,6 @@ class PushGP( breve.Object ):
 		return self.tournamentSize
 
 	def init( self ):
-		''''''
-
 
 		self.populationSize = 2000
 		self.mutationPercent = 40
@@ -313,8 +303,6 @@ class PushGP( breve.Object ):
 		self.interpreter = breve.createInstances( breve.PushInterpreter, 1 )
 
 	def iterate( self ):
-		''''''
-
 		n = 0
 		percent = 0
 
@@ -374,7 +362,7 @@ class PushGP( breve.Object ):
 
 		n = 0
 		while ( n < self.countFitnessCases() ):
-			self._fitnessCaseSolutionRates[ n ] = 0
+			self._fitnessCaseSolutionRates[ n ] = 0.000000
 
 			n = ( n + 1 )
 
@@ -550,8 +538,6 @@ class PushGPIndividual( breve.PushProgram ):
 		return self.fitness
 
 	def setErrors( self, errorList ):
-		''''''
-
 
 		self.errors = errorList
 
@@ -562,8 +548,6 @@ class PushGPIndividual( breve.PushProgram ):
 		self.fitness = newFitness
 
 	def setInterpreter( self, newInterpreter ):
-		''''''
-
 
 		self.interpreter = newInterpreter
 		self.makeRandomCode( self.interpreter )
@@ -584,8 +568,6 @@ class PushClusterGP( breve.PushGP ):
 		PushClusterGP.init( self )
 
 	def acceptUpload( self, immigrants, h ):
-		''''''
-
 
 		breve.deleteInstances( self.lastTransfer )
 		self.lastTransfer = immigrants
@@ -597,8 +579,6 @@ class PushClusterGP( breve.PushGP ):
 		return self.emigrationPercent
 
 	def init( self ):
-		''''''
-
 
 		self.server = breve.createInstances( breve.NetworkServer, 1 )
 		self.server.listen( 59175 )
@@ -691,20 +671,14 @@ class PushProgramTransporter( breve.Object ):
 		self.programStrings = breve.objectList()
 
 	def add( self, p ):
-		''''''
-
 
 		self.programStrings.append( p.getString() )
 
 	def clear( self ):
-		''''''
-
 
 		self.programStrings = []
 
 	def getProgram( self, n ):
-		''''''
-
 		code = None
 
 		code = breve.createInstances( breve.PushProgram, 1 )
@@ -715,14 +689,10 @@ class PushProgramTransporter( breve.Object ):
 		return code
 
 	def getRandomProgram( self ):
-		''''''
-
 
 		return self.getProgram( breve.randomExpression( ( breve.length( self.programStrings ) - 1 ) ) )
 
 	def parsePrograms( self, i ):
-		''''''
-
 		code = ''
 		program = None
 		result = breve.objectList()
@@ -737,6 +707,8 @@ class PushProgramTransporter( breve.Object ):
 
 
 breve.PushProgramTransporter = PushProgramTransporter
+# Add our newly created classes to the breve namespace
+
 breve.PushGPIndividuals = PushGPIndividual
 
 

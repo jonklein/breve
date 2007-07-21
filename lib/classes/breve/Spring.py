@@ -33,8 +33,6 @@ class Spring( breve.Object ):
 		return self.springPointer
 
 	def destroy( self ):
-		''''''
-
 
 		if self.springPointer:
 			breve.breveInternalFunctionFinder.springRemove( self, self.springPointer )
@@ -141,6 +139,8 @@ class Spring( breve.Object ):
 
 
 breve.Spring = Spring
+# Add our newly created classes to the breve namespace
+
 breve.Springs = Spring
 
 

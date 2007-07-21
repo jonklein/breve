@@ -9,8 +9,6 @@ class Sound( breve.Abstract ):
 		self.soundPointer = None
 
 	def destroy( self ):
-		''''''
-
 
 		breve.breveInternalFunctionFinder.freeSoundData( self, self.soundPointer )
 
@@ -34,6 +32,8 @@ class Sound( breve.Abstract ):
 
 
 breve.Sound = Sound
+# Add our newly created classes to the breve namespace
+
 breve.Sounds = Sound
 
 

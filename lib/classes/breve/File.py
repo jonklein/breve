@@ -18,8 +18,6 @@ class File( breve.Abstract ):
 		self.filePointer = 0
 
 	def destroy( self ):
-		''''''
-
 
 		if self.filePointer:
 			self.close()
@@ -106,6 +104,8 @@ class File( breve.Abstract ):
 
 
 breve.File = File
+# Add our newly created classes to the breve namespace
+
 breve.Files = File
 
 

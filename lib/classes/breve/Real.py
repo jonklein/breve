@@ -60,8 +60,6 @@ class Real( breve.Object ):
 		return newMenu
 
 	def dearchive( self ):
-		''''''
-
 		handler = breve.objectList()
 
 		for handler in self.collisionHandlerList:
@@ -89,8 +87,6 @@ class Real( breve.Object ):
 		return breve.Object.dearchive( self )
 
 	def delete( self ):
-		''''''
-
 
 		if self.realWorldPointer:
 			breve.breveInternalFunctionFinder.realRemoveObject( self, self.realWorldPointer )
@@ -228,8 +224,6 @@ class Real( breve.Object ):
 		breve.breveInternalFunctionFinder.setIgnoreCollisionsWith( self, self, theType, 1 )
 
 	def init( self ):
-		''''''
-
 
 		self.texture = -1
 		self.lightmap = -1
@@ -427,8 +421,6 @@ class Real( breve.Object ):
 		breve.breveInternalFunctionFinder.realSetNeighborhoodSize( self, self.realWorldPointer, size )
 
 	def setRotation( self, theRotation ):
-		''''''
-
 
 		self.setRotationMatrix( theRotation )
 
@@ -553,6 +545,8 @@ class Real( breve.Object ):
 
 
 breve.Real = Real
+# Add our newly created classes to the breve namespace
+
 breve.Reals = Real
 
 

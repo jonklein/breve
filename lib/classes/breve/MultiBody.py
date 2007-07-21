@@ -39,8 +39,6 @@ class MultiBody( breve.Object ):
 		return breve.breveInternalFunctionFinder.multibodyCheckSelfPenetration( self, self.multibodyPointer )
 
 	def dearchive( self ):
-		''''''
-
 
 		self.multibodyPointer = breve.breveInternalFunctionFinder.multibodyNew( self)
 		self.setRoot( self.rootLink )
@@ -48,8 +46,6 @@ class MultiBody( breve.Object ):
 		return 1
 
 	def destroy( self ):
-		''''''
-
 
 		breve.deleteInstances( self.getAllConnectedObjects() )
 		breve.breveInternalFunctionFinder.multibodyFree( self, self.multibodyPointer )
@@ -128,8 +124,6 @@ class MultiBody( breve.Object ):
 		self.getAllConnectedLinks().hideBoundingBox()
 
 	def init( self ):
-		''''''
-
 
 		self.multibodyPointer = breve.breveInternalFunctionFinder.multibodyNew( self)
 
@@ -146,9 +140,8 @@ class MultiBody( breve.Object ):
 		self.setRoot( root )
 
 	def resumePhysics( self ):
-		''''''
 
-
+		pass
 
 	def rotate( self, thisAxis, amount ):
 		'''Sets the rotation of this multibody around vector axis thisAxis by scalar amount (in radians).  This is an "absolute" rotation--the current rotation of the object does not affect how the object will be rotated.  For a rotation relative to the current orientation, set METHOD(relative-rotate). <p> This method implicitly changes the rotation and location of all attached link objects.'''
@@ -221,12 +214,13 @@ class MultiBody( breve.Object ):
 		self.getAllConnectedLinks().showBoundingBox()
 
 	def suspendPhysics( self ):
-		''''''
 
-
+		pass
 
 
 breve.MultiBody = MultiBody
+# Add our newly created classes to the breve namespace
+
 breve.MultiBodies = MultiBody
 
 

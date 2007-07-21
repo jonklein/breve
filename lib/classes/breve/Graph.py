@@ -22,8 +22,6 @@ class Graph( breve.Abstract ):
 		breve.breveInternalFunctionFinder.graphAddLineValue( self, self.graphPointer, lineNumber, yValue )
 
 	def init( self ):
-		''''''
-
 
 		self.graphPointer = breve.breveInternalFunctionFinder.graphNew( self, 'Graph' )
 
