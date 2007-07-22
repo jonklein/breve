@@ -394,33 +394,33 @@ wxMenu *BreveRender::MakeDocumentationMenu() {
 	wxMenu *stClassMenu = new wxMenu;
 	wxMenu *pyClassMenu = new wxMenu;
 
-	wxDir lscan( stclasses );
-	if ( lscan.IsOpened() ) {
+	wxDir stscan( stclasses );
+	if ( stscan.IsOpened() ) {
 		wxString filename;
-		bool cont = lscan.GetFirst( &filename, "*.html", wxDIR_FILES );
+		bool cont = stscan.GetFirst( &filename, "*.html", wxDIR_FILES );
                         
 		while ( cont ) {
 			wxString path = app->GetBreveDir() << "docs" << FILE_SEP_PATH << "steveclasses" << FILE_SEP_PATH << filename;
 
-			classMenu->Append( BREVE_DOCMENU + _docFiles.size(), filename );
+			stClassMenu->Append( BREVE_DOCMENU + _docFiles.size(), filename );
 			_docFiles.push_back( path );
 
-			cont = lscan.GetNext( &filename );
+			cont = stscan.GetNext( &filename );
 		}
 	}
 
-	wxDir lscan( pyclasses );
-	if ( lscan.IsOpened() ) {
+	wxDir pyscan( pyclasses );
+	if ( pyscan.IsOpened() ) {
 		wxString filename;
-		bool cont = lscan.GetFirst( &filename, "*.html", wxDIR_FILES );
+		bool cont = pyscan.GetFirst( &filename, "*.html", wxDIR_FILES );
                         
 		while ( cont ) {
 			wxString path = app->GetBreveDir() << "docs" << FILE_SEP_PATH << "pythonclasses" << FILE_SEP_PATH << filename;
 
-			classMenu->Append( BREVE_DOCMENU + _docFiles.size(), filename );
+			pyClassMenu->Append( BREVE_DOCMENU + _docFiles.size(), filename );
 			_docFiles.push_back( path );
 
-			cont = lscan.GetNext( &filename );
+			cont = pyscan.GetNext( &filename );
 		}
 	}
 
