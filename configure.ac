@@ -12,6 +12,8 @@ AC_ARG_ENABLE([static], [], static=yes)
 AC_ARG_ENABLE([perl], [], perl=yes)
 AC_ARG_ENABLE([python], [], python=yes)
 
+python=yes
+
 if test "x$static" != "x"; then 
 	BEGIN_STATIC="-Xlinker -Bstatic"
 	BEGIN_DYNAMIC="-Xlinker -Bdynamic"

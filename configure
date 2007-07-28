@@ -1899,6 +1899,8 @@ if test "${enable_python+set}" = set; then
 fi
 
 
+python=yes
+
 if test "x$static" != "x"; then
 	BEGIN_STATIC="-Xlinker -Bstatic"
 	BEGIN_DYNAMIC="-Xlinker -Bdynamic"
