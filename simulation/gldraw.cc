@@ -507,8 +507,6 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 	std::vector<slDrawCommandList*>::iterator di;
 	for ( di = w->_drawings.begin(); di != w->_drawings.end(); di++ )( *di )->draw( this );
 
-	// renderLines( w );
-
 	//
 	// Setup lighting and effects for the normal objects
 	//
@@ -537,12 +535,14 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 					drawLights( 1 );
 			}
 		}
+
+		slClearGLErrors( "enabled lighting" );
 	} else
 		glDisable( GL_LIGHTING );
 
 	renderObjects( w, flags | DO_NO_ALPHA );
 
-	slClearGLErrors( "drew multibodies and lines" );
+	slClearGLErrors( "drew non-alpha bodies" );
 
 	// now we do transparent objects and billboards.  they have to come last
 	// because they are blended.
@@ -566,9 +566,13 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 
 	renderObjects( w, flags | DO_ONLY_ALPHA );
 
+	slClearGLErrors( "drew alpha bodies" );
+
 	glDepthMask( GL_TRUE );
 
 	renderLabels( w );
+
+	slClearGLErrors( "rendered labels" );
 
 #if HAVE_LIBENET
 	slDrawNetsimBounds( w );
@@ -1178,10 +1182,10 @@ void slCamera::processBillboards( slWorld *w ) {
 	glEndList();
 }
 
-/*!
-	\brief Renders the objects, assuming that all necessary transformations
-	have been set up.
-*/
+/**
+ * \brief Renders the objects, assuming that all necessary transformations
+ * have been set up.
+ */
 
 void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 	slWorldObject *wo;
@@ -1205,7 +1209,7 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 	if ( flags & ( DO_OUTLINE | DO_NO_COLOR ) ) color = 0;
 	if ( flags & DO_OUTLINE ) glColor4f( 1, 1, 1, 1 );
 
-	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	// glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
 	for ( n = 0; n < w->_objects.size(); ++n ) {
 		int skip = 0;
@@ -1248,7 +1252,7 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 		}
 	}
 
-	if ( !doOnlyAlpha ) {
+	if ( !doOnlyAlpha && _points.size() ) {
 		glEnable( GL_BLEND );
 		glPointSize( 2.0 );
 
@@ -1262,9 +1266,9 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 			glColor4d( c.x, c.y, c.z, 1.0 );
 			glVertex3d( v.x, v.y, v.z );
 		}
-		glDisable( GL_POINT_SMOOTH );
 
 		glEnd();
+		glDisable( GL_POINT_SMOOTH );
 	}
 
 	if ( doOnlyAlpha )

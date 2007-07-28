@@ -74,6 +74,7 @@ WHITESPACE	[\ \t]+
 ^[\ \t]*%.*				{ stParseAddDocumentingComment( yytext ); };
 
 #					{ BEGIN( COMMENT ); };
+<COMMENT>.				{ }
 <COMMENT>\r\n				{ BEGIN( 0 ); }
 <COMMENT>\r				{ BEGIN( 0 ); }
 <COMMENT>\n				{ BEGIN( 0 ); }
