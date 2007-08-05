@@ -82,6 +82,10 @@ int brEvalListRemove( brEvalListHead *head, int index, brEval *value ) {
 	return index;
 }
 
+int brEvalListLength( brEvalListHead *inHead ) {
+	return inHead->_vector.size();
+}
+
 brEval *brEvalListIndexLookup( brEvalListHead *head, int index ) {
 	if ( index < 0 || index >= ( int )head->_vector.size() ) return NULL;
 

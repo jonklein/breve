@@ -62,6 +62,8 @@ $(OUTPUTPATH)/$(PROGRAM):	$(OBJECTS)
 	$(CXX) @PLUGINIMP@ -o $@ $(OBJECTS) $(LDFLAGS)
 	$(MACRESOURCECMD)
 
+	-cp lib/brevePlugin.lib ../lib/breveIDEPlugin.lib
+
 # Windows only
 $(OBJECTPATH)/$(RCFILE)_rc.o:	$(RCFILE).rc
 	$(RESCOMP) --use-temp-file -i$< -o$@ $(RESPATH) --include-dir . --define NOPCH

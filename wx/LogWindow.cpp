@@ -185,16 +185,14 @@ void LogWindow::OnSize(wxSizeEvent &event)
 
 void LogWindow::OnMove(wxMoveEvent &event)
 {
-    {
 	wxConfigBase * config = wxConfigBase::Get();
 
-	if (config != NULL)
-	{
-	    config->Write("LogWindowX", event.GetPosition().x);
-	    config->Write("LogWindowY", event.GetPosition().y);
+	if (config != NULL) {
+		wxPoint position = GetPosition();
+		config->Write( "LogWindowX", position.x );
+	    config->Write( "LogWindowY", position.y );
 	}
-    }
     
-    event.Skip();
+	event.Skip();
 }
 

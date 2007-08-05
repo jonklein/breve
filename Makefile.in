@@ -194,7 +194,8 @@ endif
 	cp -R plugins/samples $(CLI_FOLDER)/plugins
 	rm -f $(CLI_FOLDER)/plugins/samples/Makefile.in
 ifeq ($(PLATFORM),windows)
-	cp lib/brevePlugin.a $(CLI_FOLDER)/plugins
+	cp lib/brevePlugin.lib $(CLI_FOLDER)/plugins
+	cp lib/breveIDEPlugin.lib $(CLI_FOLDER)/plugins
 	cp bin/glut32.dll $(CLI_FOLDER)/bin
 	cp bin/python23.dll $(CLI_FOLDER)/bin
 	cp bin/mingwm10.dll $(CLI_FOLDER)/bin
@@ -224,6 +225,7 @@ endif
 	-mkdir docs
 	cp -R docs $(IDE_FOLDER)
 	cp -R lib/classes $(IDE_FOLDER)/lib
+	cp -R lib/Template* $(IDE_FOLDER)/lib
 	cp -R demos $(IDE_FOLDER)
 	rm -rf $(IDE_FOLDER)/demos/Music
 	mkdir $(IDE_FOLDER)/plugins

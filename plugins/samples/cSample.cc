@@ -40,13 +40,13 @@ int cSampleListTest( brEval *args, brEval *result, void *i ) {
 	int numNodes;
 	double input1, input2;
 
-	numNodes = myListHead->_vector.size();
+	numNodes = brEvalListLength( myListHead );
 	printf( "Total number of elements in list = %d.\n", numNodes );
 
-	input1 = BRDOUBLE( myListHead->_vector[ 0 ] );
+	input1 = BRDOUBLE( brEvalListIndexLookup( myListHead, 0 ) );
 	printf( "First Input = %d.\n", input1 );
 
-	input2 = BRDOUBLE( myListHead->_vector[ 1 ] );
+	input2 = BRDOUBLE( brEvalListIndexLookup( myListHead, 1 ) );
 	printf( "Second Input = %d.\n", input2 );
 
 	return EC_OK;

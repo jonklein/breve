@@ -1181,8 +1181,9 @@ void BreveRender::OnMove(wxMoveEvent &event)
 		wxConfigBase * config = wxConfigBase::Get();
 
 		if (config != NULL) {
-			config->Write("BreveRenderX", event.GetPosition().x);
-			config->Write("BreveRenderY", event.GetPosition().y);
+			wxPoint position = GetPosition();
+			config->Write("BreveRenderX", position.x);
+			config->Write("BreveRenderY", position.y);
 		}
 	}
 

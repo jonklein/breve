@@ -70,8 +70,8 @@ case ${host_os} in
 	cygwin* | mingw* )
 		LIBS="-lglut32 -lglu32 -lopengl32 -lws2_32 -lwinmm `pwd`/bin/python23.dll ${LIBS}"
 		PLUGINFLAGS="-shared"
-		PLUGINIMP="-Wl,--out-implib -Wl,lib/brevePlugin.a"
-		PLUGINLIB="\$(BREVEDIR)/lib/brevePlugin.a"
+		PLUGINIMP="-Wl,--out-implib -Wl,lib/brevePlugin.lib"
+		PLUGINLIB="\$(BREVEDIR)/lib/breveIDEPlugin.lib"
 		ARCHIVER="zip -r"
 		ARCHIVE_SUFFIX="zip"
 		EXE_SUFFIX=".exe"

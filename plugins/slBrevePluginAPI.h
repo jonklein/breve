@@ -184,15 +184,18 @@ class brEvalObject {
 		void collect();
 };
 
-class brEvalListHead: public brEvalObject {
-    public:
-        brEvalListHead();
-        ~brEvalListHead();
+//
+// Functions and macros for dealing with the brEvalListHead class
+//
 
-        std::vector< brEval* > _vector;
+class brEvalListHead;
 
-        inline std::vector< brEval* > &getVector() { return _vector; }
-};
+int brEvalListInsert( brEvalListHead *head, int index, brEval *value );
+brEval *brEvalListIndexLookup( brEvalListHead *inList, int inIndex );
+int brEvalListLength( brEvalListHead *inList );
+
+#define brEvalListAppend( a, eval ) brEvalListInsert( (a), (a)->length(), (eval) )
+
 
 class brData: public brEvalObject {
     public:
@@ -206,14 +209,6 @@ class brData: public brEvalObject {
 brData *brDataNew(void *data, int length);
 void brDataFree(brData *data);
 
-
-//	The following functions are used to create & edit evaluation lists.
-//	You can create brEvalLists to be returned by your functions.
-//	Don't worry about freeing brEvalLists, this is done by the engine.
-
-int brEvalListInsert( brEvalListHead *head, int index, brEval *value );
-
-#define brEvalListAppend( a, eval ) brEvalListInsert( (a), (a)->_vector.size(), (eval) )
 
 //	Use these macros to treat brEval pointers as specific types. 
 

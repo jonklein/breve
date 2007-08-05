@@ -32,9 +32,9 @@ class DLLEXPORT brEvalListHead: public brEvalObject {
 		brEvalListHead();
 		~brEvalListHead();
 
-		std::vector< brEval > _vector;
-
 		inline std::vector< brEval > const &getVector() const { return _vector; }
+
+		std::vector< brEval > _vector;
 };
 
 /*!
@@ -66,26 +66,32 @@ brEvalListHead *stDoEvalListDeepCopy(brEvalListHead *, slList **);
 brEvalListHead *brEvalListCopy(brEvalListHead *);
 
 /** 
-    \brief Looks up a lists index, using the index if possible.
-    
-    Updates the index as far as it can as it traverses the list.
-*/  
+ * Returns the length of the list (for use in plugins)
+ */  
 
-brEval *brEvalListIndexLookup( brEvalListHead*, int );
+DLLEXPORT int brEvalListLength( brEvalListHead* );
 
-/*!
-	\brief Inserts an element into the list, with its value taken from
-	the given pointer.
-*/  
+/** 
+ * \brief Looks up a lists index, using the index if possible.
+ *  
+ * Updates the index as far as it can as it traverses the list.
+ */  
+
+DLLEXPORT brEval *brEvalListIndexLookup( brEvalListHead*, int );
+
+/**
+ * \brief Inserts an element into the list, with its value taken from
+ * the given pointer.
+ */  
         
 DLLEXPORT int brEvalListInsert(brEvalListHead *, int, brEval *);
 
-/*!
-	\brief Removes an arbitrary element from the list and places the removed
-	element in the provided brEval.
-*/
+/**
+ * Removes an arbitrary element from the list and places the removed
+ * element in the provided brEval.
+ */
 
-int brEvalListRemove(brEvalListHead *, int, brEval *);
+DLLEXPORT int brEvalListRemove(brEvalListHead *, int, brEval *);
 
 brEvalListHead *brEvalListDeepCopy(brEvalListHead *);
 brEvalListHead *brDoEvalListDeepCopy(brEvalListHead *, slList **);

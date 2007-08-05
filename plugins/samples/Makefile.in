@@ -1,5 +1,7 @@
 BREVEDIR	= ../..
 CPPFLAGS	+= -I..
+CC              = @CC@
+CXX             = @CXX@
 
 all: cSample_plugin.o c++Sample_plugin.o
 
