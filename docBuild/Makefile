@@ -18,7 +18,7 @@ classes: docExtract
 	mkdir -p htmldocs/steveclasses
 	mkdir -p htmldocs/pythonclasses
 	./docExtract ../lib/classes/*.tz | ./docBuild.pl htmldocs/steveclasses
-	-( cd ..; ~/Development/breve/bin/breve -x ./docBuild/DocBuild.py docBuild/htmldocs/pythonclasses )
+	-( cd ..; ./bin/breve -x ./docBuild/DocBuild.py docBuild/htmldocs/pythonclasses )
 	cp classImages/*.jpg htmldocs/steveclasses/
 	cp classImages/*.jpg htmldocs/pythonclasses/
 

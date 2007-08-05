@@ -113,8 +113,7 @@ void CodeCtrl::OnChar(wxStyledTextEvent &event)
 {
     int currentLine = GetCurrentLine();
 
-    if (event.GetKey() == '\n')
-    {
+    if (event.GetKey() == '\n') {
         int lineInd = 0;
 
         if (currentLine > 0)
