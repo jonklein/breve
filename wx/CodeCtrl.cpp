@@ -80,8 +80,8 @@ CodeCtrl::CodeCtrl(CodeWindow * parent) :
     SetFoldFlags (wxSTC_FOLDFLAG_LINEBEFORE_CONTRACTED |
                   wxSTC_FOLDFLAG_LINEAFTER_CONTRACTED);
 
-    SetTabWidth(8);
-    SetUseTabs(false);
+    SetTabWidth(4);
+    SetUseTabs(true);
     SetTabIndents(true);
     SetBackSpaceUnIndents(true);
     SetIndent(4);
