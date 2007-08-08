@@ -1033,8 +1033,14 @@ int brPythonLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *in
 		fclose( fp );
 
 	} else {
+		std::string processed( inFiletext );
 
-		if( PyRun_SimpleString( inFiletext ) ) {
+		for( int n = 0; n < processed.size(); n++ ) 
+			if( processed[ n ] == '\r' )
+				processed[ n ] = '\n';
+
+
+		if( PyRun_SimpleString( processed.c_str() ) ) {
 			brEvalError( inEngine, PE_PYTHON, "An error occurred while executing the Python code\n", inFilename );
 			result = EC_ERROR;
 		}

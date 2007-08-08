@@ -181,7 +181,7 @@ void CodeCtrl::OnMenu(wxCommandEvent &event)
 
 	case 12001: // Save as
 	   {
-	    wxFileDialog d(parent, "Please enter a filename", "", "", "*.tz", wxSAVE | wxOVERWRITE_PROMPT);
+	    wxFileDialog d(parent, "Please enter a filename", "", "", "steve files (*.tz)|*.tz|Python files (*.py)|*.py", wxSAVE | wxOVERWRITE_PROMPT);
 
 	    if (d.ShowModal() == wxID_OK)
 	    {
