@@ -25,6 +25,7 @@
  */
 
 #include <signal.h>
+#include <libgen.h>
 
 #include "simulation.h"
 #include "steve.h"
@@ -44,6 +45,9 @@ static void brCatchSignal( int signal );
 extern char *optarg;
 extern int optind;
 #endif
+
+unsigned char *gOffscreenBuffer;
+#define OSMESA_WINDOW_SIZE 300
 
 static brEngine *gEngine;
 static int contextMenu, mainMenu;
@@ -80,6 +84,8 @@ static int gSlave = 0, gMaster = 0;
 static char *gSlaveHost;
 
 static std::map<int, void*> gWindowMap;
+
+int slLoadOSMesaPlugin( char *execPath );
 
 int main( int argc, char **argv ) {
 	pthread_t thread;
@@ -146,12 +152,25 @@ int main( int argc, char **argv ) {
 	gEngine->interfaceTypeCallback	= interfaceVersionCallback;
 	gEngine->pauseCallback 		= pauseCallback;
 
-	if ( !gOptionNoGraphics ) 
+	if ( !gOptionNoGraphics ) {
 		slInitGlut( argc, argv, simulationFile );
+	
+		gEngine->camera->setBounds( width, height );
+	} else {
+		//
+		// Attempt to load an offscreen Mesa buffer.
+		//
+	
+		gOffscreenBuffer = ( GLubyte * )slMalloc( OSMESA_WINDOW_SIZE * OSMESA_WINDOW_SIZE * 4 * sizeof( GLubyte ) );
 
+		if ( slLoadOSMesaPlugin( execpath ) ) {
+			slFree( gOffscreenBuffer );
+			gOffscreenBuffer = NULL;
+		}
 
+		gEngine->camera->setBounds( OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE );
+	}
 
-	gEngine->camera->setBounds( width, height );
 
 
 
@@ -258,6 +277,10 @@ void *workerThread( void *data ) {
 				pthread_mutex_unlock( &gThreadMutex );
 				brQuit( gEngine );
 			}
+
+			if ( gOffscreenBuffer && gEngine->world->detectLightExposure() )
+				gEngine->camera->detectLightExposure(
+				    gEngine->world, OSMESA_WINDOW_SIZE, gOffscreenBuffer );
 		}
 
 		pthread_mutex_unlock( &gThreadMutex );
@@ -871,3 +894,40 @@ int pauseCallback() {
 	return 0;
 }
 
+int slLoadOSMesaPlugin( char *execPath ) {
+#ifdef MINGW
+	// I'm not even going to try.
+	return -1;
+#else
+	void *handle;
+	void( *create )( unsigned char *, int );
+	int( *activate )();
+
+	std::string path = dirname( execPath );
+
+	path += "/osmesaloader.o";
+
+	handle = dlopen( path.c_str(), RTLD_NOW );
+
+	if ( !handle ) return -1;
+
+	create = ( void( * )( unsigned char*, int ) )dlsym( handle, "slOSMesaCreate" );
+
+	if ( !create ) return -1;
+
+	create( gOffscreenBuffer, OSMESA_WINDOW_SIZE );
+
+	activate = ( int( * )() )dlsym( handle, "slOSMesaMakeCurrentContext" );
+
+	if ( !activate ) return -1;
+
+	gEngine->camera->setActivateContextCallback( activate );
+
+	activate();
+
+	slInitGL( gEngine->world, gEngine->camera );
+
+	return 0;
+
+#endif
+}
