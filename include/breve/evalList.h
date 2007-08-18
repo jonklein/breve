@@ -56,6 +56,8 @@ typedef struct brEvalListCopyRecord brEvalListCopyRecord;
 extern "C" {
 #endif
 
+DLLEXPORT brEvalListHead *brEvalListNew();
+
 int brEvalListCompare(const void *, const void *);
 
 int stDoEvalListIndex(brEvalListHead *, int, brEval *);

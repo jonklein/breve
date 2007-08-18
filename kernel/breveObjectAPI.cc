@@ -87,7 +87,7 @@ brMethod *brMethodFindWithArgRange( brObject *o, const char *name, unsigned char
  * \brief Finds an object in the given namespace with a given type signature.
  */
 
-brObject *brObjectFindWithTypeSignature( brEngine *inEngine, const char *inType, int inSignature ) {
+brObject *brObjectFindWithTypeSignature( brEngine *inEngine, const char *inTypename, int inSignature ) {
 	std::vector<brObjectType*>::iterator oi;
 
 	for ( oi = inEngine->objectTypes.begin(); oi != inEngine->objectTypes.end(); oi++ ) {
@@ -95,10 +95,10 @@ brObject *brObjectFindWithTypeSignature( brEngine *inEngine, const char *inType,
 		void *pointer = NULL;
 
 		if ( type->findObject && type->_typeSignature == inSignature ) {
-			pointer = type->findObject( type->userData, inType );
+			pointer = type->findObject( type->userData, inTypename );
 
 			if ( pointer ) 
-				return brEngineAddObject( inEngine, type, inType, pointer );
+				return brEngineAddObject( inEngine, type, inTypename, pointer );
 		}
 	}
 

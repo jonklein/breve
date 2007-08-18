@@ -37,6 +37,10 @@
 	Creates a new brEvalListHead
 */
 
+brEvalListHead *brEvalListNew() {
+	return new brEvalListHead();
+}
+
 brEvalListHead::brEvalListHead() : brEvalObject() {}
 
 /*!

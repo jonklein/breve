@@ -37,7 +37,6 @@
 #define stEvalList brEvalList
 #define stEvalListHead brEvalListHead
 #define stNewEvalList() 	(new brEvalListHead())
-#define brEvalListNew() 	(new brEvalListHead())
 #define stPluginFindFile brPluginFindFile
 
 #define STINT		BRINT
@@ -193,8 +192,9 @@ class brEvalListHead;
 int brEvalListInsert( brEvalListHead *head, int index, brEval *value );
 brEval *brEvalListIndexLookup( brEvalListHead *inList, int inIndex );
 int brEvalListLength( brEvalListHead *inList );
+brEvalListHead *brEvalListNew();
 
-#define brEvalListAppend( a, eval ) brEvalListInsert( (a), (a)->length(), (eval) )
+#define brEvalListAppend( a, eval ) brEvalListInsert( (a), brEvalListLength( a ), (eval) )
 
 
 class brData: public brEvalObject {

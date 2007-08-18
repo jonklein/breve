@@ -14,10 +14,9 @@ import breve
 
 class PythonBridgeObject( breve.Object ):
 	def __init__( self ):
-		# We must call the breve.Object __init__ method before accessing any breve functionality
+		print "Inited Python bridge object"
 
 		breve.Object.__init__( self )
-		print "Inited Python bridge object"
 
 	def iterate( self ):
 		print "Iterating Python bridge object at time %f" % self.controller.get_time()

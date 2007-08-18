@@ -133,16 +133,16 @@ int brQTInstrumentPlayChord( brEval args[], brEval *result, void *i ) {
 
 	/* push down */
 
-	for ( int n = 0; n < list->_vector.size(); n++ ) {
-		NAPlayNote( info->allocator, info->channel, BRINT( list->_vector[ n ] ), BRINT( &args[2] ) );
+	for ( int n = 0; n < brEvalListLength( list ); n++ ) {
+		NAPlayNote( info->allocator, info->channel, BRINT( brEvalListIndexLookup( list, n ) ), BRINT( &args[2] ) );
 	}
 
 	usleep(( int )( BRDOUBLE( &args[3] ) * 100000 ) );
 
 	/* release */
 
-	for ( int n = 0; n < list->_vector.size(); n++ ) {
-		NAPlayNote( info->allocator, info->channel, BRINT( list->_vector[ n ] ), 0 );
+	for ( int n = 0; n < brEvalListLength( list ); n++ ) {
+		NAPlayNote( info->allocator, info->channel, BRINT( brEvalListIndexLookup( list, n ) ), 0 );
 	}
 
 	return EC_OK;

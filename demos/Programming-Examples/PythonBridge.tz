@@ -9,11 +9,6 @@ Control : myController {
 		myPythonObject (object).
 
 	+ to init:
-		myPythonObject = new PythonBridgeObject.
-
-		print ( myPythonObject test_number value 10 ).
-		print ( myPythonObject test_vector value ( 1, 2, 3 ) ).
-		print ( myPythonObject test_list value { 1, 2, { 3, 4, 5 } } ).
-
-		print myPythonObject.
+		new PythonBridgeObject.
+		new PythonBridgeObject.
 }
