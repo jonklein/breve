@@ -114,6 +114,7 @@ private:
 	bool mKeysDown[ 256 ];
 
 	std::vector< wxString > 		_docFiles;
+	wxString				_docLauncher;
 
 public:
 	BreveRender( );

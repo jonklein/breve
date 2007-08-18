@@ -24,6 +24,8 @@
 #include "wx/wx.h"
 #endif
 
+#include <unistd.h>
+
 #include <wx/file.h>
 #include <wx/filename.h>
 #include <wx/tglbtn.h>
@@ -1003,14 +1005,26 @@ void BreveRender::OnRenderStopClick( wxCommandEvent& event )
 void BreveRender::OnDocMenu( wxCommandEvent &event ) {
 	int index = event.m_id - BREVE_DOCMENU;
 
-	printf(" Doc number %d\n", index );
-
 	wxString &docfile = _docFiles[ index ];
 	wxString url = wxString( "file://" ) << docfile;
 
-	slMessage( 0, " Opening documentation file \"%s\"\n", url.c_str() );
-
+#ifdef WINDOWS
 	::ShellExecute( NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL );
+#else 
+	// wxLaunchDefaultBrowser( docfile );
+	// Oh WxWidgets.  You really do suck.
+	//
+
+	char *browser = getenv( "BROWSER" );
+
+	if( !browser || strlen( browser ) == 0 ) {
+		slMessage( DEBUG_ALL, "Warning: could not open documentation because $BROWSER variable not set\n" );
+	} else {
+		wxString command = wxString( "$BROWSER " ) << url; 
+		system( command.c_str() );
+	}
+
+#endif
 }
 
 void BreveRender::OnSimMenu(wxCommandEvent &event) {

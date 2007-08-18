@@ -46,7 +46,7 @@ include neural/Makefile
 include neural/Network/Makefile
 include steve/Makefile
 include python/Makefile
-include perl/Makefile
+# include perl/Makefile
 include lisp/Makefile
 include util/Makefile
 include WinSaver/Makefile
@@ -171,8 +171,8 @@ OSX_release:
 	rm -rf breve_image_folder
 
 CLI_release: clean
-	$(MAKE) documentation
 	$(MAKE) optimize
+	$(MAKE) documentation
 	rm -rf $(CLI_FOLDER)
 	mkdir -p $(CLI_FOLDER)/bin
 	mkdir $(CLI_FOLDER)/lib
@@ -209,8 +209,8 @@ endif
 	@ARCHIVER@ breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@ $(CLI_FOLDER)
 
 WX_release: clean
-	$(MAKE) documentation
 	$(MAKE) optimize
+	$(MAKE) documentation
 	cd wx; make
 	rm -rf $(IDE_FOLDER)
 	mkdir $(IDE_FOLDER)
