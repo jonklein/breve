@@ -123,9 +123,11 @@ void stGCUnretainPointer( void *pointer, int type ) {
 			bi = ( brInstance* )pointer;
 
 			// needed to protect bridge instances
-			if ( bi->object->type->_typeSignature != STEVE_TYPE_SIGNATURE ) return;
+			if ( bi->object->type->_typeSignature != STEVE_TYPE_SIGNATURE ) 
+				return;
 
-			if ( bi->status != AS_ACTIVE ) return;
+			if ( bi->status != AS_ACTIVE ) 
+				return;
 
 			stInstanceUnretain(( stInstance* )bi->userData );
 

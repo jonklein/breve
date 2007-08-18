@@ -109,6 +109,7 @@ stInstance *stInstanceNew( stObject *o ) {
 
 	i->status = AS_ACTIVE;
 	i->gc = 0;
+
 	i->retainCount = 1;
 
 	// if(pthread_mutex_init(&i->lock, NULL))

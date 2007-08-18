@@ -3292,8 +3292,10 @@ RTC_INLINE int stEvalNewInstance( stInstanceExp *ie, stRunInstance *i, brEval *t
 			return EC_ERROR_HANDLED;
 		}
 
+		// As soon as we have created the object, we've passed ownership onto the 
+		// return eval (t), so we decrement it
 
-		stInstanceUnretain(( stInstance* )BRINSTANCE( t )->userData );
+		stGCUnretain( t );
 
 	} else {
 		list = new brEvalListHead();
@@ -3307,7 +3309,9 @@ RTC_INLINE int stEvalNewInstance( stInstanceExp *ie, stRunInstance *i, brEval *t
 				return EC_ERROR_HANDLED;
 			}
 
-			stInstanceUnretain( ( stInstance* )BRINSTANCE( &listItem )->userData );
+			// Ownership is now listItem (and the list)
+
+			stGCUnretain( &listItem );
 
 			brEvalListInsert( list, list->_vector.size(), &listItem );
 		}
