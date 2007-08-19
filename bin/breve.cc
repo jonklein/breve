@@ -894,6 +894,10 @@ int pauseCallback() {
 	return 0;
 }
 
+void renderContext( slWorld *inWorld, slCamera *inCamera ) {
+	inCamera -> renderScene( inWorld, 0 );
+}
+
 int slLoadOSMesaPlugin( char *execPath ) {
 #ifdef MINGW
 	// I'm not even going to try.
@@ -904,24 +908,35 @@ int slLoadOSMesaPlugin( char *execPath ) {
 	int( *activate )();
 
 	std::string path = dirname( execPath );
+	
 
 	path += "/osmesaloader.o";
 
 	handle = dlopen( path.c_str(), RTLD_NOW );
 
-	if ( !handle ) return -1;
+	if ( !handle ) {
+		slMessage( DEBUG_ALL, "Could not open OSMesa extension, offscreen rendering disabled (%s)\n", dlerror() );
+		return -1;
+	}
 
 	create = ( void( * )( unsigned char*, int ) )dlsym( handle, "slOSMesaCreate" );
 
-	if ( !create ) return -1;
+	if ( !create ) {
+		slMessage( DEBUG_ALL, "Could not load OSMesa extension, offscreen rendering disabled (%s)\n", dlerror() );
+		return -1;
+	}
 
 	create( gOffscreenBuffer, OSMESA_WINDOW_SIZE );
 
 	activate = ( int( * )() )dlsym( handle, "slOSMesaMakeCurrentContext" );
 
-	if ( !activate ) return -1;
+	if ( !activate ) {
+		slMessage( DEBUG_ALL, "Could not load OSMesa extension, offscreen rendering disabled (%s)\n", dlerror() );
+		return -1;
+	}
 
 	gEngine->camera->setActivateContextCallback( activate );
+	gEngine->camera->_renderContextCallback = renderContext;
 
 	activate();
 
