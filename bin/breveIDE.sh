@@ -10,4 +10,6 @@
 DIRECTORY=`dirname $0`
 
 export LD_LIBRARY_PATH=$DIRECTORY/lib:$LD_LIBRARY_PATH
+export PYTHONHOME=$DIRECTORY/lib/classes
+
 $DIRECTORY/breveIDE_ex $*
