@@ -10,5 +10,6 @@ Control : myController {
 
 	+ to init:
 		new PythonBridgeObject.
-		new PythonBridgeObject.
+
+		( new PythonBridgeObject ) archive-as-xml file "python.xml".
 }

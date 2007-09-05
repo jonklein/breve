@@ -29,7 +29,6 @@ Controller VirtualCreatures.
 PhysicalControl : VirtualCreatures {
 	+ variables:
 		running (int).
-		dg (object).
 		body (object).
 		flag (object).
 
@@ -68,7 +67,14 @@ PhysicalControl : VirtualCreatures {
 			ga set-mutation-percent to 30.
 		}
 
+		self add-dependency on ga.
+
 		self update-text.
+
+		self schedule method-call "archive-sim" at-time 10.
+
+	+ to archive-sim:
+		self save-as-xml file "sim.xml".
 
 	+ to update-text:
 		gen, total, index (int).
@@ -126,15 +132,17 @@ PhysicalControl : VirtualCreatures {
 
 		free all Links.
 		free all Joints.
-		if body: free body.
+
+		if body: 
+			free body.
 
 		# (i get-genome) print-graph.
 
 		body = new MultiBody.
-
 		body set-root to (parser parse from ((i get-genome) get-root)).
-
 		body disable-self-collisions.
+
+		self add-dependency on body.
 
 		self schedule method-call "check-penetration" at-time (self get-time) + 8.0.
 		self set-display-text to "Preparing to test $i..." at-x -.95 at-y -.95.

@@ -229,7 +229,7 @@ int stDDataWriteObjectWithDialog( brEval *args, brEval *result, brInstance *bi )
 		return EC_OK;
 	}
 
-	result->set( stXMLWriteObjectToFile( i, filename, 1 ) );
+	result->set( brXMLWriteObjectToFile( bi, filename, 1 ) );
 
 	slFree( filename );
 
@@ -253,7 +253,7 @@ int stDWriteXMLObject( brEval args[], brEval *target, brInstance *bi ) {
 
 	path = brOutputPath( i->type->engine, filename );
 
-	target->set( stXMLWriteObjectToFile( i, path, 1 ) );
+	target->set( brXMLWriteObjectToFile( bi, path, 1 ) );
 
 	slFree( path );
 

@@ -2,6 +2,8 @@
 import breveInternal
 import sys, os, math, random, array
 
+import pickle
+
 #
 # Used internally to redirect Python output to the breve frontend
 #
@@ -20,6 +22,13 @@ sys.stdout = breveStdoutHandler()
 #
 # Sets the breve controller class
 #
+
+def encodeToString( inObject ):
+	return pickle.dumps( inObject )
+
+def decodeFromString( inString ):
+	pass
+
 
 def setController( inControllerClass ):
 	"Creates the breve Controller class.  This method simply instantiates the class which is called.  It is provided for convenience only."

@@ -89,8 +89,6 @@ brEngine *brEngineNew( void ) {
 	WSAStartup( 0x0101, &wsaData );
 #endif
 
-	// glutInit( &zero, NULL );
-
 	e = new brEngine;
 
 	brClearError( e );
@@ -232,12 +230,12 @@ brEngine *brEngineNew( void ) {
 	return e;
 }
 
-/*!
-	\brief Looks up an internal breve function.
-
-	Searches in the engine for a brInternalFunction corresponding with the
-	given name.
-*/
+/**
+ * \brief Looks up an internal breve function.
+ *
+ * Searches in the engine for a brInternalFunction corresponding with the
+ * given name.
+ */
 
 brInternalFunction *brEngineInternalFunctionLookup( brEngine *e, char *name ) {
 	brNamespaceSymbol *s = brNamespaceLookup( e->internalMethods, name );
@@ -321,13 +319,13 @@ brEngine::~brEngine() {
 	}
 }
 
-/*!
-	\brief Set the controller object for the simulation.
-
-	This function should be called as soon as the controller instance
-	is created <b>before the controller's initialization methods are
-	even called</b>.
-*/
+/**
+ * \brief Set the controller object for the simulation.
+ *
+ * This function should be called as soon as the controller instance
+ * is created <b>before the controller's initialization methods are
+ * even called</b>.
+ */
 
 int brEngineSetController( brEngine *e, brInstance *instance ) {
 	if ( e->controller ) {

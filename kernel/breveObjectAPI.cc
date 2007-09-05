@@ -312,6 +312,44 @@ void brEngineRemoveInstanceObserver( brInstance *i, brInstance *observerInstance
 		observerInstance->observees.erase( observee );
 }
 
+
+/*!
+        \brief Adds an instance to another's dependencies list.              
+*/                                                                           
+ 
+int brInstanceAddDependency( brInstance *inInstance, brInstance *inDepencency ) {      
+        if ( inInstance && inDepencency ) {
+        	inInstance->_dependencies.insert( inDepencency );
+        	inDepencency->_dependents.insert( inInstance );
+	}
+
+	return 0;
+}
+
+/*!
+        \brief Removes an instance from another's dependencies list. 
+*/
+
+int brInstanceRemoveDependency( brInstance *inInstance, brInstance *inDependency ) {
+	std::set< brInstance*, brInstanceCompare>::iterator ii;
+         
+        if ( inInstance && inDependency ) {
+	        ii = inInstance->_dependencies.find( inDependency );
+
+		if ( ii != inInstance->_dependencies.end() ) 
+			inInstance->_dependencies.erase( ii );
+
+		ii = inDependency->_dependents.find( inInstance );
+
+		if ( ii != inDependency->_dependents.end() ) 
+			inDependency->_dependents.erase( ii );
+	}
+
+	return 0;
+}
+
+
+
 /**
  * \brief Adds an object to the engine.
  */
@@ -413,6 +451,27 @@ brInstance *brObjectInstantiate( brEngine *e, brObject *o, const brEval **args, 
 }
 
 /**
+ * 
+ */
+
+char *brInstanceEncodeToString( brEngine *inEngine, brInstance *inInstance ) {
+	if( !inInstance->object->type->encodeToString ) 
+		return NULL;
+
+	return inInstance->object->type->encodeToString( inEngine, inInstance->userData );
+}
+
+/**
+ * 
+ */
+
+brInstance *brInstanceDecodeFromString( brEngine *inEngine, int inTypeSignature, char *inData ) {
+	//return breveInstance->object->type->decodeFromString( inEngine, inData );
+
+	return NULL;
+}
+
+/**
  * Marks a \ref brInstance as released, so that it can be removed from the engine.
  *
  * The instance will be removed from the engine and freed at the end of
@@ -506,6 +565,12 @@ void brInstanceFree( brInstance *i ) {
 	for( unsigned int n = 0; n < observerList.size(); n++ ) {
 		delete observerList[ n ];
 	}
+
+	while ( i->_dependencies.size() )
+		brInstanceRemoveDependency( i, *i->_dependencies.begin() );
+
+	while ( i->_dependents.size() )
+		brInstanceRemoveDependency( *i->_dependents.begin(), i );
 
 	i->observers.clear();
 

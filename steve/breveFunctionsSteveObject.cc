@@ -288,7 +288,7 @@ int stNSendXMLObject( brEval *args, brEval *target, brInstance *i ) {
 
 	char *buffer;
 
-	stXMLWriteObjectToStream(( stInstance* )archive->userData, file, 0 );
+	brXMLWriteObjectToStream( archive, file, 0 );
 
 	buffer = slCloseStringStream( xmlBuffer );
 
@@ -326,14 +326,10 @@ int stCStacktrace( brEval args[], brEval *target, brInstance *i ) {
 */
 
 int stIAddDependency( brEval args[], brEval *target, brInstance *i ) {
-	if ( !BRINSTANCE( &args[0] ) ) return EC_OK;
-
-	if( i->object->type->_typeSignature != STEVE_TYPE_SIGNATURE ) {
-		// slMessage( DEBUG_ALL, "warning: stIAddDependency called for non-steve instance\n" );
+	if ( !BRINSTANCE( &args[0] ) ) 
 		return EC_OK;
-	}
 
-	stInstanceAddDependency(( stInstance* )i->userData, ( stInstance* )BRINSTANCE( &args[0] )->userData );
+	brInstanceAddDependency( i, BRINSTANCE( &args[0] ) );
 
 	return EC_OK;
 }
@@ -345,14 +341,10 @@ int stIAddDependency( brEval args[], brEval *target, brInstance *i ) {
 */
 
 int stIRemoveDependency( brEval args[], brEval *target, brInstance *i ) {
-	if ( !BRINSTANCE( &args[0] ) ) return EC_OK;
-
-	if( i->object->type->_typeSignature != STEVE_TYPE_SIGNATURE ) {
-		// slMessage( DEBUG_ALL, "warning: stIRemoveDependency called for non-steve instance\n" );
+	if ( !BRINSTANCE( &args[0] ) ) 
 		return EC_OK;
-	}
 
-	stInstanceRemoveDependency(( stInstance* )i->userData, ( stInstance* )BRINSTANCE( &args[0] )->userData );
+	brInstanceRemoveDependency( i, BRINSTANCE( &args[0] ) );
 
 	return EC_OK;
 }

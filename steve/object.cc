@@ -139,37 +139,6 @@ int stInstanceInit( stInstance *i ) {
 }
 
 /*!
-	\brief Adds an instance to another's dependencies list.
-*/
-
-void stInstanceAddDependency( stInstance *i, stInstance *dependency ) {
-	if ( !i || !dependency ) return;
-
-	i->dependencies.insert( dependency );
-
-	dependency->dependents.insert( i );
-}
-
-/*!
-	\brief Removes an instance from another's dependencies list.
-*/
-
-void stInstanceRemoveDependency( stInstance *i, stInstance *dependency ) {
-
-	std::set< stInstance*, stInstanceCompare>::iterator ii;
-
-	if ( !i || !dependency ) return;
-
-	ii = i->dependencies.find( dependency );
-
-	if ( ii != i->dependencies.end() ) i->dependencies.erase( ii );
-
-	ii = dependency->dependents.find( i );
-
-	if ( ii != dependency->dependents.end() ) dependency->dependents.erase( ii );
-}
-
-/*!
 	\brief Increments the retain count of an object.
 */
 
@@ -216,16 +185,9 @@ void stInstanceCollect( stInstance *i ) {
 */
 
 void stInstanceFree( stInstance *i ) {
-	while ( i->dependencies.size() )
-		stInstanceRemoveDependency( i, *i->dependencies.begin() );
-
-	while ( i->dependents.size() )
-		stInstanceRemoveDependency( *i->dependents.begin(), i );
-
 	stInstanceFreeNoInstanceLists( i );
 
 	stRemoveFromInstanceLists( i );
-
 
 	if ( i->type->steveData->retainFreedInstances )
 		i->type->steveData->freedInstances.push_back( i );

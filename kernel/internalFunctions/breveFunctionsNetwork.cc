@@ -294,16 +294,19 @@ int brSendBackXMLObject( int sockfd, brInstance *i ) {
 	char *buffer = NULL;
 	int returnedValue = 0;
 
-	if ( i ) {  // If we have an instance, let XML encode it...
+	if ( i ) {  
+		// If we have an instance, let XML encode it...
+
 		slStringStream *xmlBuffer = slOpenStringStream();
 		FILE *file = xmlBuffer->fp;
-		stXMLWriteObjectToStream(( stInstance* )i->userData, file, 0 );
+		brXMLWriteObjectToStream( i, file, 0 );
 		buffer = slCloseStringStream( xmlBuffer );
 	}
 
 	returnedValue = brSendBackXMLString( sockfd, buffer );
 
-	if ( buffer ) slFree( buffer );
+	if ( buffer ) 
+		slFree( buffer );
 
 	return returnedValue;
 }

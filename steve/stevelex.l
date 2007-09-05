@@ -41,7 +41,7 @@ int lineno = 1;
 
 int gErrorLine = 0;
 
-/* yylval might not be big enough for a double */
+// yylval might not be big enough for a double 
 
 extern brEngine *parseEngine;
 
@@ -74,9 +74,9 @@ WHITESPACE	[\ \t]+
 ^[\ \t]*%.*				{ stParseAddDocumentingComment( yytext ); };
 
 #					{ BEGIN( COMMENT ); };
-<COMMENT>\r\n				{ BEGIN( 0 ); }
-<COMMENT>\r				{ BEGIN( 0 ); }
-<COMMENT>\n				{ BEGIN( 0 ); }
+<COMMENT>\r\n				{ lineno++; BEGIN( 0 ); }
+<COMMENT>\r				{ lineno++; BEGIN( 0 ); }
+<COMMENT>\n				{ lineno++; BEGIN( 0 ); }
 <COMMENT>.				{ }
 
 \+[\ ]*to/{WORDBREAK}	{ return TO_PUBLIC; }

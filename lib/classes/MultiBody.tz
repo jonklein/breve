@@ -63,7 +63,7 @@ Object : MultiBody (aka MultiBodies) [version 2.0] {
 	+ to move to newLocation (vector):
 		% Moves the entire MultiBody to newLocation.
 
-		multibodySetLocation(multibodyPointer, newLocation).
+		multibodySetLocation( multibodyPointer, newLocation ).
 
 	+ to rotate around-axis thisAxis (vector) by amount (float):
 		% Sets the rotation of this multibody around vector axis thisAxis
@@ -233,7 +233,20 @@ Object : MultiBody (aka MultiBodies) [version 2.0] {
 
 	- to resume-physics:
 
+	+ to archive:
+		links (list).
+		i (object).
+
+		links = ( self get-all-connected-objects ).
+
+		foreach i in links:
+			self add-dependency on i.
+
+		return 1.
+
 	+ to dearchive:
+		print "Dearchiving Multibody".
+
 		multibodyPointer = multibodyNew().
 
 		self set-root to rootLink.

@@ -159,7 +159,7 @@ Object : Real (aka Reals) [version 2.1] {
 		% with this shape.  Returns this object.
 
 		if !theShape || !(theShape get-pointer): 
-			die "attempt to register Mobile object with uninitialized shape ($theShape)".
+			die "attempt to set collision shape of Mobile object with uninitialized shape ($theShape)".
 
 		if collisionShape: 
 			self remove-dependency on collisionShape.
@@ -177,7 +177,7 @@ Object : Real (aka Reals) [version 2.1] {
 		% METHOD(set-collision-shape) as well.  Returns this object.
 
 		if !theShape || !(theShape get-pointer): 
-			die "attempt to register Mobile object with uninitialized shape ($theShape)".
+			die "attempt to set display shape of Mobile object with uninitialized shape ($theShape)".
 
 		if displayShape: 
 			self remove-dependency on displayShape.

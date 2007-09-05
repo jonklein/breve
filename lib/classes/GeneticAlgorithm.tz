@@ -244,8 +244,7 @@ Object : GeneticAlgorithm {
 			self add-dependency on newI.
 		}
 
-        if seed: populations{ 0 }{ 0 } copy from seed.
-		
+	        if seed: populations{ 0 }{ 0 } copy from seed.
         
 		currentIndividual = -1.
 		self switch-individual.

@@ -152,17 +152,7 @@ int stCallbackLoad( brEngine *engine, void *inDataPtr, const char *file, const c
 			return EC_ERROR;
 		}
 
-		/*
-		brInstance *controller = brObjectInstantiate( engine, controllerClass, NULL, NULL );
-
-		if( !controller )
-			return EC_ERROR;
-
-		brEngineSetController( engine, controller );
-		*/
-
-		stInstance *controller;
-		controller = stInstanceNew( ( stObject* )controllerClass->userData );
+		stInstance *controller = stInstanceNew( ( stObject* )controllerClass->userData );
 
 		if( !controller )
 			return EC_ERROR;
@@ -186,13 +176,7 @@ int stCallbackLoad( brEngine *engine, void *inDataPtr, const char *file, const c
 int stCallbackLoadWithArchive( brEngine *engine, void *inDataPtr, const char *file, const char *code, const char *archive ) {
 	stSteveData *inData = (stSteveData*)inDataPtr;
 
-	//
-
-	inData = 0;
-
-	// 
-
-	return EC_OK;
+	return stLoadSavedSimulation( inData, engine, code, file, archive );
 }
 
 /**
@@ -452,7 +436,8 @@ int stParseBuffer( stSteveData *s, brEngine *engine, const char *buffer, const c
 
 	brClearError( engine );
 
-	if ( yyparse() ) return BPE_SIM_ERROR;
+	if ( yyparse() ) 
+		return BPE_SIM_ERROR;
 
 	// free( yyfile );
 

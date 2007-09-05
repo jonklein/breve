@@ -1122,6 +1122,49 @@ void brPythonSetArgv( brEngine *inEngine, PyObject *inSysModule ) {
  	Py_DECREF( argv );
 }
 
+char *brPythonEncodeToString( brEngine *inEngine, void *inData ) {
+	PyObject *obj = (PyObject*)inData;
+
+	PyObject *encoder = PyObject_GetAttrStringSafe( sPythonData._breveModule, "encodeToString" );
+
+	PyObject *args = PyTuple_New( 1 );
+
+	// SetItem steals a reference
+	Py_INCREF( obj );
+	PyTuple_SetItem( args, 0, obj );
+
+	PyObject *result = PyObject_Call( encoder, args, NULL );
+
+	Py_DECREF( args );
+	Py_DECREF( encoder );
+
+	if( !result ) {
+		PyErr_Print();
+		return NULL;
+	}
+
+	char *encoding = slStrdup( PyString_AsString( result ) );
+
+	Py_DECREF( result );
+
+	return encoding;
+}
+
+void *brPythonDecodeFromString( brEngine *inEngine, char *inString ) {
+	PyObject *decoder = PyObject_GetAttrStringSafe( sPythonData._breveModule, "decodeFromString" );
+
+	PyObject *args = PyTuple_New( 1 );
+
+	PyTuple_SetItem( args, 0, PyString_FromString( inString ) );
+
+	PyObject *result = PyObject_Call( decoder, args, NULL );
+
+	Py_DECREF( args );
+	Py_DECREF( decoder );
+
+	return result;
+}
+
 /**
  * A function to initialize the Python frontend.  
  * 
@@ -1163,8 +1206,10 @@ void brPythonInit( brEngine *breveEngine ) {
 
 	std::string setpath, path;
 
-	for( unsigned int n = 0; n < breveEngine->_searchPaths.size(); n++ ) {
-		path = breveEngine->_searchPaths[ n ];
+	const std::vector< std::string > &paths = brEngineGetSearchPaths( breveEngine );
+
+	for( unsigned int n = 0; n < paths.size(); n++ ) {
+		path = paths[ n ];
 		setpath = "import sys\nsys.path.append( '" + path + "' ) ";
 
 		PyRun_SimpleString( setpath.c_str() );
@@ -1175,20 +1220,12 @@ void brPythonInit( brEngine *breveEngine ) {
 		PyRun_SimpleString( setpath.c_str() );
 	}
 
-	const std::vector< std::string > &paths = brEngineGetSearchPaths( breveEngine );
-
-	for( unsigned int n = 0; n < paths.size(); n++ ) {
-		char path[ MAXPATHLEN + 1024 ];
-		snprintf( path, MAXPATHLEN + 1023, "sys.path.append( '%s' )", paths[ n ].c_str() );
-
-		PyRun_SimpleString( path );
-	}
-
 	sPythonData._mainModule  = PyImport_ImportModule( "__main__" );
 	sPythonData._breveModule = PyImport_ImportModule( "breve" );
 
 	if( !sPythonData._breveModule ) {
 		PyErr_Print();
+		slMessage( DEBUG_ALL, "Failed to initialize Python frontend.  breve will not be able to execute Python files.\n" );
 		return;
 	}
 
@@ -1213,6 +1250,8 @@ void brPythonInit( brEngine *breveEngine ) {
 	brevePythonType->destroyObjectType	= brPythonDestroy;
 	brevePythonType->canLoad		= brPythonCanLoad;
 	brevePythonType->load			= brPythonLoad;
+	brevePythonType->encodeToString		= brPythonEncodeToString;
+	brevePythonType->decodeFromString	= brPythonDecodeFromString;
 	brevePythonType->_typeSignature 	= PYTHON_TYPE_SIGNATURE;
 
 	brEngineRegisterObjectType( breveEngine, brevePythonType );

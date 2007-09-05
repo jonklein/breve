@@ -9,7 +9,7 @@ int stCWriteXMLEngine( brEval args[], brEval *target, brInstance *i ) {
 	char *filename = BRSTRING( &args[0] );
 	char *path = brOutputPath( i->engine, filename );
 
-	target->set( stXMLWriteSimulationToFile( path, i->engine ) );
+	target->set( brXMLWriteSimulationToFile( path, i->engine ) );
 
 	slFree( path );
 
@@ -24,7 +24,7 @@ int stCArchiveXMLObject( brEval args[], brEval *target, brInstance *i ) {
 	char *filename = BRSTRING( &args[1] );
 	char *path = brOutputPath( i->engine, filename );
 
-	target->set( stXMLWriteObjectToFile(( stInstance* )( BRINSTANCE( &args[0] )->userData ), path, 0 ) );
+	target->set( brXMLWriteObjectToFile( BRINSTANCE( &args[0] ), path, 0 ) );
 
 	slFree( path );
 

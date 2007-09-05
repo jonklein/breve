@@ -69,11 +69,17 @@ Real : Stationary (aka Stationaries) [version 2.4] {
 		return 1.
 
 	+ to dearchive:
+		realWorldPointer = addStationary( ( ( controller get-generic-shape ) get-pointer ), ( 0, 0, 0 ), [ ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) ] ).
+
+		super dearchive.
+
 		self move to objectLocation.
 		self set-display-shape to displayShape.
 		self set-collision-shape to collisionShape.
 
-		if shadowCatcher: self catch-shadows.
+		if shadowCatcher: 
+			self catch-shadows.
+
 		return 1.
 }
 

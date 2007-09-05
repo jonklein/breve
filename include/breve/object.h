@@ -21,9 +21,9 @@
 #ifndef _OBJECT_H
 #define _OBJECT_H
 
-/*!
-	\brief A steve object type.
-*/
+/**
+ * \brief A steve object type.
+ */
 
 #include <vector>
 #include <set>
@@ -74,14 +74,11 @@ struct stInstance {
 
 	bool gc;
 	int retainCount;
-
-	std::set< stInstance*, stInstanceCompare > dependencies;
-	std::set< stInstance*, stInstanceCompare > dependents;
 };
 
-/*!
-	\brief Holds a steve method.
-*/
+/**
+ * \brief Holds a steve method.
+ */
 
 class stMethod {
 	public:
@@ -151,11 +148,10 @@ class stVar {
 		bool used;
 };
 
-/*!
-	\brief Stores a steve method-keyword.
-
-	A steve method-keyword is a stVar struct and an associated name.
-*/
+/**
+ * \brief Stores a steve method-keyword.
+ * A steve method-keyword is a stVar struct and an associated name.
+ */
 
 struct stKeywordEntry {
 	std::string keyword;
@@ -168,10 +164,6 @@ stObject *stObjectFind(brNamespace *n, char *name);
 
 stInstance *stFindInstanceIndex(stInstance *i, int index);
 int stEnumerateInstance(stInstance *i, int start);
-
-void stInstanceAddDependency(stInstance *i, stInstance *dependency);
-void stInstanceRemoveDependency(stInstance *i, stInstance *dependency);
-
 
 void stObjectFreeSpace(brNamespace *ns);
 void stObjectFree(stObject *o);

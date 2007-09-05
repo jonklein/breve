@@ -146,9 +146,15 @@ sucessful_parse
 		if(brGetError(parseEngine)) YYABORT;
 	}
 | GT { 
-		if(!currentMethod || !currentObject) YYERROR;
+		if( !currentMethod || !currentObject ) {
+			stParseError( parseEngine, PE_INTERNAL, "Could not locate current object or method for statement" );
+			YYERROR;
+		}
+
 	} statement {
-		if(brGetError(parseEngine)) YYABORT;
+		if( brGetError( parseEngine ) ) 
+			YYABORT;
+
 		steveData->singleStatement = $3;
 	}
 ;

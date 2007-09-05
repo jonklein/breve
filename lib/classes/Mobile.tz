@@ -241,7 +241,8 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 
 	- to dearchive:
 		realWorldPointer = linkNew().
-		realWorldPointer = linkAddToWorld(realWorldPointer).
+		linkAddToWorld(realWorldPointer).
+
 		self set-collision-shape to collisionShape.
 		self set-display-shape to displayShape.
 		self move to archiveLocation.

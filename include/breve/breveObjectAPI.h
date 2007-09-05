@@ -42,6 +42,9 @@ struct brObjectType {
 		destroyInstance 		= NULL;
 		destroyObjectType		= NULL;
 		userData			= NULL;
+		userData			= NULL;
+		encodeToString			= NULL;
+		decodeFromString		= NULL;
 		_typeSignature 			= 0;
 	}
 
@@ -53,67 +56,77 @@ struct brObjectType {
 	/**
 	 * Finds an object class in the given language frontend
 	 */
-	void					*(*findObject)( void *inObjectTypeUserData, const char *inName );
+	void			*(*findObject)( void *inObjectTypeUserData, const char *inName );
 
 	/**
 	 * Finds a method in a given class
 	 */
-	void					*(*findMethod)( void *inObjectUserData, const char *inName, unsigned char *inTypes, int inTypeCount );
+	void			*(*findMethod)( void *inObjectUserData, const char *inName, unsigned char *inTypes, int inTypeCount );
 
 	/**
 	 * Creates a new instance of the given class.  The constructor arguments are currently unused.
 	 */
-	brInstance			  	*(*instantiate)( brEngine *inEngine, brObject *inObject, const brEval **inArguments, int inArgCount );
+	brInstance	  	*(*instantiate)( brEngine *inEngine, brObject *inObject, const brEval **inArguments, int inArgCount );
 
 	/**
 	 * Calls a method in the language frontend
 	 */
-	int					 (*callMethod)( void *inInstanceUserData, void *inMethodUserData, const brEval **inArguments, brEval *inResult );
+	int			 (*callMethod)( void *inInstanceUserData, void *inMethodUserData, const brEval **inArguments, brEval *inResult );
 
 	/**
 	 * Should return 1 if child is a subclass of parent, 0 otherwise
 	 */
-	int					 (*isSubclass)( brObjectType *inType, void *inChild, void *inParent );
+	int			 (*isSubclass)( brObjectType *inType, void *inChild, void *inParent );
 
 	/**
 	 * Destroys an instance of a language object previously created with instantiate.
 	 */
-	void					(*destroyObject)( void *inObject );
+	void			(*destroyObject)( void *inObject );
 
 	/**
 	 * Destroys an instance of a language method previously created with findMethod.
 	 */
-	void					(*destroyMethod)( void *inMethod );
+	void			(*destroyMethod)( void *inMethod );
 
 	/**
 	 * Destroys an instance of a language instance previously created with instantiate.
 	 */
-	void					(*destroyInstance)( void *inInstance );
+	void			(*destroyInstance)( void *inInstance );
 
 	/**
 	 * Frees any leftover memory associated with the frontend, typically _userData.
 	 */
-	void					(*destroyObjectType)( void *inObjectType );
+	void			(*destroyObjectType)( void *inObjectType );
 
 	/**
 	 * A function to determine whether or not the given code can be loaded based on the file extension
 	 */
-	int					(*canLoad)( void *inObjectTypeUserData, const char *inFileExtension );
+	int			(*canLoad)( void *inObjectTypeUserData, const char *inFileExtension );
 
 	/**
 	 * A function to execute code in this frontend language.
 	 */
-	int					(*load)( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext );
+	int			(*load)( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext );
 
 	/**
 	 * A function to execute code in this frontend language.
 	 */
-	int					(*loadWithArchive)( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext, const char *inArchive );
+	int			(*loadWithArchive)( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext, const char *inArchive );
+
+	/**
+	 * A function to encode instances of this language to a string
+	 */
+	char*			(*encodeToString)( brEngine *inEngine, void *inInstanceData );
+
+	/**
+	 * A function to encode instances of this language to a string
+	 */
+	brInstance*		(*decodeFromString)( brEngine *inEngine, char *inData );
 
 	/**
 	 * A user-data callback pointer.
 	 */
-	void					*userData;
+	void			*userData;
 
 	/**
 	 * A unique identifier which will be set for all objects of this object type.  This
@@ -121,7 +134,7 @@ struct brObjectType {
 	 * a certain object type.
 	 */
 
-	long					_typeSignature;
+	long			_typeSignature;
 };
 
 /**
@@ -139,6 +152,17 @@ struct brObject {
 
 	std::vector< brCollisionHandler* > collisionHandlers;
 };
+
+/**
+ * Compare two brInstances
+ */
+
+struct brInstanceCompare {
+	bool operator()(const brInstance* s1, const brInstance* s2) const {
+		return s1 < s2;
+	}
+};
+
 
 /**
  * \brief A breve instance, of any language.
@@ -174,6 +198,10 @@ struct brInstance {
 
 	std::vector< brObserver* > observers;
 	std::vector< brInstance* > observees;
+
+	std::set< brInstance*, brInstanceCompare > _dependencies;
+	std::set< brInstance*, brInstanceCompare > _dependents;
+
 };
 
 /**
@@ -278,6 +306,9 @@ DLLEXPORT void brEngineAddObjectAlias(brEngine *, char *, brObject *);
 
 DLLEXPORT brInstance *brObjectInstantiate(brEngine *, brObject *, const brEval **, int);
 
+DLLEXPORT char *brInstanceEncodeToString( brEngine *inEngine, brInstance *inInstance );
+DLLEXPORT brInstance *brInstanceDecodeFromString( brEngine *inEngine, int inTypeSignature, char *inData );
+
 DLLEXPORT brInstance *brEngineAddInstance(brEngine *, brObject *, void *);
 DLLEXPORT brInstance *brEngineAddBreveInstance(brEngine *, brObject *, brInstance * );
 
@@ -290,8 +321,8 @@ DLLEXPORT bool brObjectIsSubclass( brObject *inA, brObject *inB );
 
 // adding and removing dependencies and observers 
 
-DLLEXPORT int brInstanceAddDependency(brInstance *i, brInstance *dependency);
-DLLEXPORT int brEngineRemoveInstanceDependency(brInstance *i, brInstance *dependency);
+DLLEXPORT int brInstanceAddDependency( brInstance *i, brInstance *dependency );
+DLLEXPORT int brInstanceRemoveDependency( brInstance *i, brInstance *dependency );
 
 DLLEXPORT int brInstanceAddObserver(brInstance *i, brInstance *inObserver, char *inNotification, char *inMethod );
 DLLEXPORT void brEngineRemoveInstanceObserver(brInstance *i, brInstance *observerInstance, char *notification);

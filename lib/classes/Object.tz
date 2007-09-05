@@ -173,7 +173,7 @@ NULL : Object (aka Objects) [version 2.1] {
   + section "Archiving & Dearchiving"
 
 	+ to archive-as-xml file fileName (string):
-		% Writes the current object to the XML file fileName.
+		% Writes this object to the XML file fileName.
 
 		archiveXMLObject(self, fileName).
 

@@ -30,7 +30,7 @@ enum states {
     XP_DATA_INSTANCE,
     XP_DATA_INSTANCE_ARCHIVE,
     XP_CLASS,
-    XP_VARIABLES,
+    XP_INSTANCEDATA,
     XP_DEPENDENCIES,
     XP_OBSERVERS,
     XP_NOTIFICATION,
@@ -57,24 +57,26 @@ enum states {
 #define XMLPutSpaces(count, file)	{ int m; for(m=0;m<(count);m++) fputc(' ', (file)); }
 #define XML_INDENT_SPACES	1
 
-/*!
-	\brief Assigns indices to the instances in the engine.
+/**
+ * \brief Assigns indices to the instances in the engine.
+ *
+ * In preparation for an archiving event, this method assigns indices to all instances
+ * in the engine.
+ */
 
-	In preparation for an archiving event, this method assigns indices to all instances
-	in the engine.
-*/
-
-int stXMLAssignIndices( brEngine *e, std::map< stInstance*, int > &instanceToIndexMap ) {
+int brXMLAssignIndices( brEngine *e, std::map< brInstance*, int > &_indexMap ) {
 	unsigned int n;
 
-	for ( n = 0; n < e->instances.size(); n++ ) instanceToIndexMap[( stInstance* )e->instances[n]->userData ] = n;
+	for ( n = 0; n < e->instances.size(); n++ ) 
+		_indexMap[ e->instances[ n ] ] = n;
 
-	for ( n = 0; n < e->instancesToAdd.size(); n++ ) instanceToIndexMap[( stInstance* )e->instancesToAdd[n]->userData ] = n + e->instances.size();
+	for ( n = 0; n < e->instancesToAdd.size(); n++ ) 
+		_indexMap[ e->instancesToAdd[ n ] ] = n + e->instances.size();
 
 	return n;
 }
 
-int stXMLWriteObjectToFile( stInstance *i, char *filename, int isDataObject ) {
+int brXMLWriteObjectToFile( brInstance *i, char *filename, int isDataObject ) {
 	FILE *file;
 	int r;
 
@@ -83,46 +85,50 @@ int stXMLWriteObjectToFile( stInstance *i, char *filename, int isDataObject ) {
 		return -1;
 	}
 
-	r = stXMLWriteObjectToStream( i, file, isDataObject );
+	r = brXMLWriteObjectToStream( i, file, isDataObject );
 
 	fclose( file );
 
 	return r;
 }
 
-/*!
-	\brief Exports an instance to a FILE stream as XML.
-*/
+/**
+ * \brief Exports an instance to a FILE stream as XML.
+ */
 
-int stXMLWriteObjectToStream( stInstance *i, FILE *file, int isDataObject ) {
-	stXMLArchiveRecord record;
+int brXMLWriteObjectToStream( brInstance *inInstance, FILE *file, int isDataObject ) {
+	brXMLArchiveRecord record;
 	int spaces = 0;
 
-	stXMLAssignIndices( i->type->engine, record.instanceToIndexMap );
+	brXMLAssignIndices( inInstance->engine, record._indexMap );
 
 	fprintf( file, "<?xml version=\"1.0\"?>\n" );
 	fprintf( file, "<!DOCTYPE steveObject SYSTEM \"steveObject.dtd\">\n" );
 
-	if ( !isDataObject ) fprintf( file, "<instance_archive archiveIndex=\"%d\">\n", record.instanceToIndexMap[ i] );
-	else fprintf( file, "<data_instance_archive>\n" );
+	if ( !isDataObject ) 
+		fprintf( file, "<instance_archive archiveIndex=\"%d\">\n", record._indexMap[ inInstance ] );
+	else 
+		fprintf( file, "<data_instance_archive>\n" );
 
 	spaces += XML_INDENT_SPACES;
 
-	stXMLWriteObject( &record, file, i, spaces, isDataObject );
+	brXMLWriteObject( &record, file, inInstance, spaces, isDataObject );
 
 	spaces -= XML_INDENT_SPACES;
 
-	if ( !isDataObject ) fprintf( file, "</instance_archive>\n" );
-	else fprintf( file, "</data_instance_archive>\n" );
+	if ( !isDataObject ) 
+		fprintf( file, "</instance_archive>\n" );
+	else 
+		fprintf( file, "</data_instance_archive>\n" );
 
 	return 0;
 }
 
-/*!
-	\brief Writes an XML archive of a simulation to a file.
-*/
+/**
+ * \brief Writes an XML archive of a simulation to a file.
+ */
 
-int stXMLWriteSimulationToFile( char *filename, brEngine *e ) {
+int brXMLWriteSimulationToFile( char *filename, brEngine *e ) {
 	FILE *file;
 
 	if ( !( file = fopen( filename, "w" ) ) ) {
@@ -130,7 +136,7 @@ int stXMLWriteSimulationToFile( char *filename, brEngine *e ) {
 		return -1;
 	}
 
-	stXMLWriteSimulationToStream( file, e );
+	brXMLWriteSimulationToStream( file, e );
 
 	fclose( file );
 
@@ -138,28 +144,26 @@ int stXMLWriteSimulationToFile( char *filename, brEngine *e ) {
 }
 
 /*!
-	\brief Writes an XML archive of a simulation to a FILE stream.
-*/
+ * \brief Writes an XML archive of a simulation to a FILE stream.
+ */
 
-int stXMLWriteSimulationToStream( FILE *file, brEngine *e ) {
+int brXMLWriteSimulationToStream( FILE *file, brEngine *e ) {
 	int spaces = 0;
-	stXMLArchiveRecord record;
-	stInstance *controller;
+	brXMLArchiveRecord record;
 
-	controller = ( stInstance* )brEngineGetController( e )->userData;
-
-	stXMLAssignIndices( e, record.instanceToIndexMap );
+	brXMLAssignIndices( e, record._indexMap );
 
 	fprintf( file, "<?xml version=\"1.0\"?>\n" );
 	fprintf( file, "<!DOCTYPE steveEngine SYSTEM \"steveEngine.dtd\">\n" );
 
-	fprintf( file, "<engine controllerIndex=\"%d\">\n", record.instanceToIndexMap[ controller] );
+	fprintf( file, "<engine controllerIndex=\"%d\">\n", record._indexMap[ brEngineGetController( e ) ] );
+
 	spaces += XML_INDENT_SPACES;
 
-	std::vector<brInstance*>::iterator bi;
+	std::vector< brInstance* >::iterator bi;
 
 	for ( bi = e->instances.begin(); bi != e->instances.end(); bi++ )
-		stXMLWriteObject( &record, file, ( stInstance* )( *bi )->userData, spaces, 0 );
+		brXMLWriteObject( &record, file, *bi, spaces, 0 );
 
 	spaces -= XML_INDENT_SPACES;
 
@@ -168,42 +172,39 @@ int stXMLWriteSimulationToStream( FILE *file, brEngine *e ) {
 	return 0;
 }
 
-int stXMLWriteObject( stXMLArchiveRecord *record, FILE *file, stInstance *i, int spaces, int isDataObject ) {
-	stObject *o;
-	brEval result;
-	int r;
+// Temporary function declaration to assist in conversion of code to breveObjectAPI and away
+// from steve specific code.
 
-	if ( record->written.find( i ) != record->written.end() ) return 0;
+void stXMLWriteObjectVariables( brXMLArchiveRecord *inRecord, FILE *inFile, stInstance *inInstance, int inSpaces );
 
-	if ( i->status != AS_ACTIVE ) {
-		slMessage( DEBUG_ALL, "warning: requested archive of freed instance %p of class %s, skipping...\n", i, i->type->name.c_str() );
+int brXMLWriteObject( brXMLArchiveRecord *record, FILE *file, brInstance *inInstance, int spaces, int isDataObject ) {
+	if ( record->_written.find( inInstance ) != record->_written.end() ) 
+		return 0;
+
+	record->_written.insert( inInstance );
+
+	if ( inInstance->status != AS_ACTIVE ) {
+		slMessage( DEBUG_ALL, "warning: requested archive of freed instance %p of class %s, skipping...\n", inInstance, inInstance->object->name );
 		return -1;
 	}
 
-	o = i->type;
-
-	record->written.insert( i );
-
 	// make sure the dependencies are archived first
 
-	std::set< stInstance*, stInstanceCompare>::iterator ii;
+	std::set< brInstance*, brInstanceCompare>::iterator ii;
 
-	for ( ii = i->dependencies.begin(); ii != i->dependencies.end(); ii++ ) {
-		stXMLWriteObject( record, file, *ii, spaces, isDataObject );
+	for ( ii = inInstance->_dependencies.begin(); ii != inInstance->_dependencies.end(); ii++ ) {
+		brXMLWriteObject( record, file, *ii, spaces, isDataObject );
 	}
 
 	// if we're not writing data only, call the archive method
 
 	if ( !isDataObject ) {
-		stRunInstance ri;
+		brEval result;
 
-		ri.instance = i;
-		ri.type = i->type;
-
-		r = stCallMethodByName( &ri, "archive", &result );
+		int r = brMethodCallByName( inInstance, "archive", &result );
 
 		if ( r != EC_OK || BRINT( &result ) != 1 ) {
-			slMessage( DEBUG_ALL, "archive of instance %p (%s) failed [%d]\n", i, i->type->name.c_str(), BRINT( &result ) );
+			slMessage( DEBUG_ALL, "archive of instance %p (%s) failed [%d]\n", inInstance, inInstance->object->name, BRINT( &result ) );
 			return -1;
 		}
 	}
@@ -211,9 +212,9 @@ int stXMLWriteObject( stXMLArchiveRecord *record, FILE *file, stInstance *i, int
 	XMLPutSpaces( spaces, file );
 
 	if ( isDataObject ) {
-		fprintf( file, "<data_instance class=\"%s\" index=\"%d\">\n", o->name.c_str(), record->instanceToIndexMap[ i] );
+		fprintf( file, "<data_instance class=\"%s\" index=\"%d\" typesignature=\"%ld\">\n", inInstance->object->name, record->_indexMap[ inInstance ], inInstance->object->type->_typeSignature );
 	} else {
-		fprintf( file, "<instance class=\"%s\" index=\"%d\">\n", o->name.c_str(), record->instanceToIndexMap[ i] );
+		fprintf( file, "<instance class=\"%s\" index=\"%d\" typesignature=\"%ld\">\n", inInstance->object->name, record->_indexMap[ inInstance ], inInstance->object->type->_typeSignature );
 	}
 
 	spaces += XML_INDENT_SPACES;
@@ -221,10 +222,8 @@ int stXMLWriteObject( stXMLArchiveRecord *record, FILE *file, stInstance *i, int
 	// write out the observers
 
 	if ( !isDataObject ) {
-
-		for( unsigned int n = 0; n < i->breveInstance->observers.size(); n++ ) {
-			brObserver *obs = i->breveInstance->observers[ n ];
-
+		for( unsigned int n = 0; n < inInstance->observers.size(); n++ ) {
+			brObserver *obs = inInstance->observers[ n ];
 
 			XMLPutSpaces( spaces, file );
 			fprintf( file, "<observers>\n" );
@@ -232,11 +231,10 @@ int stXMLWriteObject( stXMLArchiveRecord *record, FILE *file, stInstance *i, int
 
 			int index;
 
-			if ( obs->instance && obs->instance->status == AS_ACTIVE ) {
-				index = record->instanceToIndexMap[( stInstance* )obs->instance->userData];
-			} else {
+			if ( obs->instance && obs->instance->status == AS_ACTIVE ) 
+				index = record->_indexMap[ obs->instance ];
+			else
 				index = -1;
-			}
 
 			XMLPutSpaces( spaces, file );
 
@@ -259,14 +257,14 @@ int stXMLWriteObject( stXMLArchiveRecord *record, FILE *file, stInstance *i, int
 		fprintf( file, "<dependencies>\n" );
 		spaces += XML_INDENT_SPACES;
 
-		std::set< stInstance*, stInstanceCompare>::iterator ii;
+		std::set< brInstance*, brInstanceCompare>::iterator ii;
 
-		for ( ii = i->dependencies.begin(); ii != i->dependencies.end(); ii++ ) {
-			stInstance *dep = *ii;
-			int index;
+		for ( ii = inInstance->_dependencies.begin(); ii != inInstance->_dependencies.end(); ii++ ) {
+			brInstance *dep = *ii;
+			int index = -1;
 
-			if ( dep && dep->status == AS_ACTIVE ) index = record->instanceToIndexMap[ dep];
-			else index = -1;
+			if ( dep && dep->status == AS_ACTIVE ) 
+				index = record->_indexMap[ dep ];
 
 			XMLPutSpaces( spaces, file );
 
@@ -283,33 +281,25 @@ int stXMLWriteObject( stXMLArchiveRecord *record, FILE *file, stInstance *i, int
 
 	XMLPutSpaces( spaces, file );
 
-	fprintf( file, "<variables>\n" );
+	fprintf( file, "<instancedata>\n" );
 
 	spaces += XML_INDENT_SPACES;
 
-	while ( o ) {
-		std::map< std::string, stVar* >::iterator vi;
+	if( inInstance->object->type->_typeSignature == STEVE_TYPE_SIGNATURE )
+		stXMLWriteObjectVariables( record, file, (stInstance*)inInstance -> userData, spaces );
+	else {
+		char *encoding = brInstanceEncodeToString( inInstance->engine, inInstance );
 
-		XMLPutSpaces( spaces, file );
-		fprintf( file, "<class name=\"%s\" version=\"%f\">\n", o->name.c_str(), o->version );
-		spaces += XML_INDENT_SPACES;
-
-		for ( vi = o->variables.begin(); vi != o->variables.end(); vi++ ) {
-			stXMLVariablePrint( record, file, vi->second, i, spaces );
+		if( encoding ) {
+			fprintf( file, encoding );
+			slFree( encoding );
 		}
-
-		spaces -= XML_INDENT_SPACES;
-
-		XMLPutSpaces( spaces, file );
-		fprintf( file, "</class>\n" );
-
-		o = o->super;
 	}
-
+		
 	spaces -= XML_INDENT_SPACES;
 
 	XMLPutSpaces( spaces, file );
-	fprintf( file, "</variables>\n" );
+	fprintf( file, "</instancedata>\n" );
 
 	spaces -= XML_INDENT_SPACES;
 
@@ -321,7 +311,29 @@ int stXMLWriteObject( stXMLArchiveRecord *record, FILE *file, stInstance *i, int
 	return 0;
 }
 
-int stXMLVariablePrint( stXMLArchiveRecord *record, FILE *file, stVar *variable, stInstance *i, int spaces ) {
+void stXMLWriteObjectVariables( brXMLArchiveRecord *inRecord, FILE *inFP, stInstance *inInstance, int inSpaces ) {
+	stObject *o = inInstance->type;
+
+	while ( o ) {
+		std::map< std::string, stVar* >::iterator vi;
+
+		XMLPutSpaces( inSpaces, inFP );
+		fprintf( inFP, "<class name=\"%s\" version=\"%f\">\n", o->name.c_str(), o->version );
+		inSpaces += XML_INDENT_SPACES;
+
+		for ( vi = o->variables.begin(); vi != o->variables.end(); vi++ ) 
+			stXMLVariablePrint( inRecord, inFP, vi->second, inInstance, inSpaces );
+
+		inSpaces -= XML_INDENT_SPACES;
+
+		XMLPutSpaces( inSpaces, inFP );
+		fprintf( inFP , "</class>\n" );
+
+		o = o->super;
+	}
+
+}
+int stXMLVariablePrint( brXMLArchiveRecord *record, FILE *file, stVar *variable, stInstance *i, int spaces ) {
 	brEval target;
 	stRunInstance ri;
 
@@ -357,7 +369,7 @@ int stXMLVariablePrint( stXMLArchiveRecord *record, FILE *file, stVar *variable,
 	return 0;
 }
 
-int stXMLPrintList( stXMLArchiveRecord *record, FILE *file, const char *name, brEvalListHead *theHead, int spaces ) {
+int stXMLPrintList( brXMLArchiveRecord *record, FILE *file, const char *name, brEvalListHead *theHead, int spaces ) {
 	XMLPutSpaces( spaces, file );
 	fprintf( file, "<list name=\"%s\">\n", name );
 	spaces += XML_INDENT_SPACES;
@@ -376,7 +388,7 @@ int stXMLPrintList( stXMLArchiveRecord *record, FILE *file, const char *name, br
 	return 0;
 }
 
-int stXMLPrintHash( stXMLArchiveRecord *record, FILE *file, const char *name, brEvalHash *hash, int spaces ) {
+int stXMLPrintHash( brXMLArchiveRecord *record, FILE *file, const char *name, brEvalHash *hash, int spaces ) {
 	brEvalListHead *keys;
 
 	keys = brEvalHashKeys( hash );
@@ -423,9 +435,9 @@ int stXMLPrintHash( stXMLArchiveRecord *record, FILE *file, const char *name, br
 	return 0;
 }
 
-int stXMLPrintEval( stXMLArchiveRecord *record, FILE *file, const char *name, brEval *target, int spaces ) {
-	stInstance *i;
-	int index;
+int stXMLPrintEval( brXMLArchiveRecord *record, FILE *file, const char *name, brEval *target, int spaces ) {
+	stInstance *i = NULL;
+	int index = -1;
 	char *data, *encoded;
 
 	switch ( target->type() ) {
@@ -498,11 +510,11 @@ int stXMLPrintEval( stXMLArchiveRecord *record, FILE *file, const char *name, br
 			break;
 
 		case AT_INSTANCE:
-			if ( BRINSTANCE( target ) ) i = ( stInstance* )BRINSTANCE( target )->userData;
-			else i = NULL;
+			if ( BRINSTANCE( target ) ) 
+				i = ( stInstance* )BRINSTANCE( target )->userData;
 
-			if ( i && i->status == AS_ACTIVE ) index = record->instanceToIndexMap[ i] ;
-			else index = -1;
+			if ( i && i->status == AS_ACTIVE ) 
+				index = record->_indexMap[ BRINSTANCE( target ) ] ;
 
 			XMLPutSpaces( spaces, file );
 
@@ -520,6 +532,20 @@ int stXMLPrintEval( stXMLArchiveRecord *record, FILE *file, const char *name, br
 }
 
 #undef XMLPutSpaces
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 int stXMLReadObjectFromFile( stInstance *i, char *filename ) {
 	char *buffer;
@@ -566,39 +592,118 @@ int stXMLReadObjectFromStream( stInstance *i, FILE *file ) {
 	return result;
 }
 
+
+struct brXMLState {
+	std::vector< brXMLDOMElement* >		_stack;
+};
+
+brXMLDOMElement::~brXMLDOMElement() {
+	for( unsigned int n = 0; n < _children.size(); n++ ) 
+		delete _children[ n ];
+}
+
+void brXMLStartElementHandler( void *inUserData, const XML_Char *inName, const XML_Char **inAttrs ) {
+	brXMLState *state = (brXMLState*)inUserData;
+
+	brXMLDOMElement *element = new brXMLDOMElement( (char*)inName );	
+
+	int n = 0;
+
+	while( inAttrs[ n ] ) {
+		std::string attr( inAttrs[ n ] ), value( inAttrs[ n + 1 ] );
+
+		element->_attrs[ attr ] = value;
+		
+		n += 2;
+	}
+
+	state->_stack.push_back( element );
+}
+
+void brXMLEndElementHandler( void *inUserData, const XML_Char *inName ) {
+	brXMLState *state = (brXMLState*)inUserData;
+
+	brXMLDOMElement *element = state->_stack.back();
+
+	if( state->_stack.size() > 1 ) {
+		state->_stack.pop_back();
+		state->_stack.back()->_children.push_back( element );
+	}
+}
+
+void brXMLCharacterDataHandler( void *inUserData, const XML_Char *inData, int inLen ) {
+	brXMLState *state = (brXMLState*)inUserData;
+
+	brXMLDOMElement *element = state->_stack.back();
+
+	for( int n = 0; n < inLen; n++ ) 
+		element->_cdata += inData[ n ];
+}
+
+std::vector< brXMLDOMElement* > brXMLDOMElement::getElementsByName( const char *inName ) {
+	std::vector< brXMLDOMElement* > matches;
+
+	if( _name == inName ) 
+		matches.push_back( this );
+
+	for( unsigned int n = 0; n < _children.size(); n++ ) {
+		std::vector< brXMLDOMElement* > childmatches;
+		childmatches = _children[ n ]->getElementsByName( inName );
+
+		for( unsigned int m = 0; m < childmatches.size(); m++ ) 
+			matches.push_back( childmatches[ m ] );
+	}
+
+	return matches;
+}
+
+brXMLDOMElement *brXMLParse( char *inBuffer ) {
+	XML_Parser parser;
+	brXMLState dom;
+
+	parser = XML_ParserCreate( NULL );
+
+	XML_SetStartElementHandler( parser, brXMLStartElementHandler );
+	XML_SetEndElementHandler( parser, brXMLEndElementHandler );
+	XML_SetCharacterDataHandler( parser, brXMLCharacterDataHandler );
+	XML_SetUserData( parser, &dom );
+
+	if ( !XML_Parse( parser, inBuffer, strlen( inBuffer ), 1 ) ) {
+		slMessage( DEBUG_ALL, "Error loading simulation from buffer:\n" );
+		stPrintXMLError( parser );
+	}
+
+	XML_ParserFree( parser );
+
+	return dom._stack[ 0 ];
+}
+
+void brXMLParseInstance( brXMLDOMElement *inElement, brInstance *outInstance ) {
+
+}
+
+void brXMLParseEval( brXMLDOMElement *inElement, brEval *outEval ) {
+
+}
+
 int stXMLReadObjectFromString( stInstance *i, char *buffer ) {
 	XML_Parser parser;
 	stXMLParserState parserState;
 	int result = 0;
 
-	parser = XML_ParserCreate( NULL );
+	brXMLDOMElement *dom = brXMLParse( buffer );
+	std::vector< brXMLDOMElement* > matches = dom->getElementsByName( "instance" ); 
 
 	parserState.engine = i->type->engine;
-	parserState.currentInstance = i;
 	parserState.mode = PARSE_INSTANCE;
 	parserState.error = 0;
 
-	/* preparse */
+	brXMLPrepareInstanceMap( dom, &parserState );
 
-	XML_SetStartElementHandler( parser, stXMLPreparseStartElementHandler );
-	XML_SetEndElementHandler( parser, NULL );
-	XML_SetCharacterDataHandler( parser, NULL );
-	XML_SetUserData( parser, &parserState );
 
-	if ( parserState.error ) {
-		slMessage( DEBUG_ALL, "Error loading simulation from buffer\n" );
-		result = -1;
-	}
 
-	if ( !XML_Parse( parser, buffer, strlen( buffer ), 1 ) ) {
-		slMessage( DEBUG_ALL, "Error loading simulation from buffer:\n" );
-		stPrintXMLError( parser );
-		result = -1;
-	}
 
-	XML_ParserFree( parser );
-
-	/* do the real parse stage */
+	// do the real parse stage 
 
 	parserState.currentInstance = i;
 	parser = XML_ParserCreate( NULL );
@@ -663,35 +768,19 @@ stInstance *stXMLDearchiveObjectFromString( brEngine *e, char *buffer ) {
 	stInstance *dearchivedInstance;
 	int result = 0;
 
-	parser = XML_ParserCreate( NULL );
+	brXMLDOMElement *dom = brXMLParse( buffer );
+	std::vector< brXMLDOMElement* > matches = dom->getElementsByName( "instance" ); 
 
 	parserState.engine = e;
 	parserState.mode = PARSE_INSTANCE;
 	parserState.error = 0;
 
-	XML_SetParamEntityParsing( parser, XML_PARAM_ENTITY_PARSING_ALWAYS );
-	// XML_SetExternalEntityRefHandler(parser, stExternalEntityParserCreate);
+	brXMLPrepareInstanceMap( dom, &parserState );
 
-	// do the preparse stage
 
-	XML_SetStartElementHandler( parser, stXMLPreparseStartElementHandler );
-	XML_SetEndElementHandler( parser, NULL );
-	XML_SetCharacterDataHandler( parser, NULL );
-	XML_SetUserData( parser, &parserState );
 
-	if ( parserState.error ) {
-		slMessage( DEBUG_ALL, "Error loading simulation from string\n" );
-		result = -1;
-	}
 
-	if ( !XML_Parse( parser, buffer, strlen( buffer ), 1 ) ) {
-		stPrintXMLError( parser );
-		result = -1;
-	}
-
-	XML_ParserFree( parser );
-
-	/* do the real parse stage */
+	// do the real parse stage 
 
 	parser = XML_ParserCreate( NULL );
 	XML_SetStartElementHandler( parser, stXMLObjectStartElementHandler );
@@ -755,38 +844,18 @@ int stXMLInitSimulationFromString( brEngine *e, char *buffer ) {
 	stXMLParserState parserState;
 	int result = 0;
 
-	if ( !buffer ) {
-		slMessage( DEBUG_ALL, "Error loading archived simulation file: could not open buffer\n" );
-		return -1;
-	}
 
-	parser = XML_ParserCreate( NULL );
+	brXMLDOMElement *dom = brXMLParse( buffer );
+	std::vector< brXMLDOMElement* > matches = dom->getElementsByName( "instance" ); 
 
 	parserState.engine = e;
-	parserState.mode = PARSE_ENGINE;
+	parserState.mode = PARSE_INSTANCE;
 	parserState.error = 0;
 
-	/* do the preparse stage */
+	brXMLPrepareInstanceMap( dom, &parserState );
 
-	XML_SetStartElementHandler( parser, stXMLPreparseStartElementHandler );
-	XML_SetEndElementHandler( parser, NULL );
-	XML_SetCharacterDataHandler( parser, NULL );
-	XML_SetUserData( parser, &parserState );
 
-	if ( parserState.error ) {
-		slMessage( DEBUG_ALL, "Error loading archived simulation\n" );
-		result = -1;
-	}
-
-	if ( !XML_Parse( parser, buffer, strlen( buffer ), 1 ) ) {
-		slMessage( DEBUG_ALL, "Error loading archived simulation\n" );
-		stPrintXMLError( parser );
-		result = -1;
-	}
-
-	XML_ParserFree( parser );
-
-	/* do the real parse stage */
+	// do the real parse stage 
 
 	parser = XML_ParserCreate( NULL );
 	XML_SetStartElementHandler( parser, stXMLObjectStartElementHandler );
@@ -815,9 +884,9 @@ int stXMLInitSimulationFromString( brEngine *e, char *buffer ) {
 	return result;
 }
 
-/*!
-	\brief Runs dearchive for the list of instances.
-*/
+/**
+ * \brief Runs dearchive for the list of instances.
+ */
 
 int stXMLRunDearchiveMethods( stXMLParserState *s ) {
 	int r;
@@ -825,18 +894,16 @@ int stXMLRunDearchiveMethods( stXMLParserState *s ) {
 	std::map< int, stInstance* >::iterator ii;
 
 	for ( unsigned int n = 0; n < s->dearchiveOrder.size(); n++ ) {
-		stRunInstance ri;
+		brInstance *instance = s->dearchiveOrder[ n ] -> breveInstance;
 
-		ri.instance = s->dearchiveOrder[ n ];
+		printf( "%s\n", s->dearchiveOrder[ n ] -> type -> name . c_str() );
+		if ( instance ) {
 
-		if ( ri.instance ) {
-			ri.type = ri.instance->type;
-
-			r = stCallMethodByName( &ri, "post-dearchive-set-controller", &result );
-			r = stCallMethodByName( &ri, "dearchive", &result );
+			r = brMethodCallByName( instance, "post-dearchive-set-controller", &result );
+			r = brMethodCallByName( instance, "dearchive", &result );
 
 			if ( r != EC_OK || BRINT( &result ) != 1 ) {
-				slMessage( DEBUG_ALL, "dearchive of instance %p (%s) failed\n", ri.instance, ri.instance->type->name.c_str() );
+				slMessage( DEBUG_ALL, "dearchive of instance %p (%s) failed\n", instance, instance->object->name );
 				return -1;
 			}
 		}
@@ -845,53 +912,42 @@ int stXMLRunDearchiveMethods( stXMLParserState *s ) {
 	return 0;
 }
 
-/*!
-	\brief Preparse stage for XML dearchiving.
+/**
+ * \brief Preparse stage for XML dearchiving.
+ *
+ * In the preparse stage, we go through the archive and create the empty
+ * instances.  We do this first so that we can correctly assign instance
+ * pointers the second time around.
+ */
 
-	In the preparse stage, we go through the archive and create the empty
-	instances.  We do this first so that we can correctly assign instance
-	pointers the second time around.
-*/
+int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, stXMLParserState *inState ) {
+	std::vector< brXMLDOMElement* > instances = inRoot->getElementsByName( "instance" ); 
 
-void stXMLPreparseStartElementHandler( void *data, const XML_Char *attname, const XML_Char **atts ) {
-	int state;
-	int n = 0;
-	int index = -1;
+	stInstance *i;
 
-	const char *objectName = NULL;
+	for( int n = 0; n < instances.size(); n++ ) {
+		std::string objectname = instances[ n ]->_attrs[ "class" ];
+		int instanceindex = atoi( instances[ n ]->_attrs[ "index" ].c_str() );
 
-	stXMLParserState *parserState = ( stXMLParserState* )data;
+		brObject *object = brObjectFind( inState->engine, objectname.c_str() );
 
-	state = stXMLStateForElement(( char* )attname );
+		printf( "=> %s\n", objectname.c_str() );
 
-	while ( atts[n] ) {
-		if ( !strcasecmp( atts[n], "class" ) ) objectName = atts[n + 1];
+		if ( !object ) {
+			slMessage( DEBUG_ALL, "Archive contains an instance of unknown class \"%s\"\n", objectname.c_str() );
+			slMessage( DEBUG_ALL, "mismatch between simulation file and XML archive\n", objectname.c_str() );
+			inState->error++;
+			return -1;
+		}
 
-		if ( !strcasecmp( atts[n], "index" ) ) index = atoi( atts[n + 1] );
+		i = stInstanceNew( (stObject*)object->userData );
 
-		n += 2;
+		i->breveInstance = brEngineAddInstance( inState->engine, object, i );
+
+		inState->indexToInstanceMap[ instanceindex ] = i;
 	}
 
-	if ( state == XP_INSTANCE || state == XP_DATA_INSTANCE ) {
-		stInstance *i;
-
-		if ( parserState->mode != PARSE_DATA_INSTANCE ) {
-			brObject *object = brObjectFind( parserState->engine, ( char* )objectName );
-
-			if ( !object ) {
-				slMessage( DEBUG_ALL, "archive contains an instance of unknown class \"%s\"\n", objectName );
-				slMessage( DEBUG_ALL, "mismatch between simulation file and XML archive\n", objectName );
-				parserState->error++;
-				return;
-			}
-
-			i = stInstanceNew(( stObject* )object->userData );
-
-			i->breveInstance = brEngineAddInstance( parserState->engine, object, i );
-		} else i = parserState->currentInstance;
-
-		parserState->indexToInstanceMap[ index] = i;
-	}
+	return 0;
 }
 
 void stXMLObjectStartElementHandler( void *userData, const XML_Char *name, const XML_Char **atts ) {
@@ -952,7 +1008,8 @@ void stXMLObjectStartElementHandler( void *userData, const XML_Char *name, const
 		case XP_INSTANCE:
 			parserState->currentInstance = parserState->indexToInstanceMap[ index];
 
-			if ( !parserState->currentInstance ) slMessage( DEBUG_ALL, "warning: cannot locate instance #%d\n", index );
+			if ( !parserState->currentInstance ) 
+				slMessage( DEBUG_ALL, "warning: cannot locate instance #%d\n", index );
 
 			parserState->dearchiveOrder.push_back( parserState->currentInstance );
 
@@ -989,7 +1046,7 @@ void stXMLObjectStartElementHandler( void *userData, const XML_Char *name, const
 			if ( steveInstance ) {
 				state->eval.set( steveInstance->breveInstance );
 			} else {
-				state->eval.set(( brInstance* )NULL );
+				state->eval.set( ( brInstance* )NULL );
 			}
 
 			break;
@@ -1058,7 +1115,7 @@ void stXMLObjectCharacterDataHandler( void *userData, const XML_Char *data, int 
 
 	if ( e->state == XP_CLASS ) return;
 
-	if ( e->state == XP_VARIABLES ) return;
+	if ( e->state == XP_INSTANCEDATA ) return;
 
 	if ( e->state == XP_LIST ) return;
 
@@ -1124,7 +1181,7 @@ void stXMLObjectEndElementHandler( void *userData, const XML_Char *name ) {
 				break;
 
 			case XP_POINTER:
-				state->eval.set(( void* )NULL );
+				state->eval.set( ( void* )NULL );
 
 				break;
 
@@ -1181,8 +1238,6 @@ void stXMLObjectEndElementHandler( void *userData, const XML_Char *name ) {
 		switch ( state->state ) {
 
 			case XP_INSTANCE:
-			if ( parserState->mode != PARSE_DATA_INSTANCE ) {}
-
 				break;
 
 			case XP_CLASS:
@@ -1254,7 +1309,8 @@ void stXMLObjectEndElementHandler( void *userData, const XML_Char *name ) {
 				break;
 
 			case XP_DEPENDENCIES:
-				if ( BRINSTANCE( &lastState->eval ) ) stInstanceAddDependency( parserState->currentInstance, ( stInstance* )BRINSTANCE( &lastState->eval )->userData );
+				if ( BRINSTANCE( &lastState->eval ) ) 
+					brInstanceAddDependency( parserState->currentInstance->breveInstance, BRINSTANCE( &lastState->eval ) );
 
 				break;
 		}
@@ -1281,7 +1337,10 @@ int stXMLStateForElement( char *name ) {
 
 	if ( !strcasecmp( name, "class" ) ) return XP_CLASS;
 
-	if ( !strcasecmp( name, "variables" ) ) return XP_VARIABLES;
+	// XP_INSTANCEDATA can also be called variables for legacy support
+
+	if ( !strcasecmp( name, "instancedata" ) ) return XP_INSTANCEDATA;
+	if ( !strcasecmp( name, "variables" ) ) return XP_INSTANCEDATA;
 
 	if ( !strcasecmp( name, "dependencies" ) ) return XP_DEPENDENCIES;
 
@@ -1327,7 +1386,6 @@ XML_Parser stExternalEntityParserCreate( XML_Parser p, const XML_Char *context, 
 }
 
 void stPrintXMLError( XML_Parser p ) {
-
 	int line = XML_GetCurrentLineNumber( p );
 	int col = XML_GetCurrentColumnNumber( p );
 
@@ -1357,22 +1415,17 @@ char *stXMLEncodeString( char *string ) {
 		switch ( string[n] ) {
 
 			case '<':
-
 			case '>':
 				size += 4; /* &lt; and &gt; */
-
 				break;
 
 			case '&':
 				size += 5; /* &amp; */
-
 				break;
 
 			case '\'':
-
 			case '\"':
 				size += 6; /* &apos; and &quot; */
-
 				break;
 
 			default:
@@ -1392,49 +1445,39 @@ char *stXMLEncodeString( char *string ) {
 
 			case '<':
 				strcpy( &result[m], "&lt;" );
-
 				m += 4;
-
 				break;
 
 			case '>':
 				strcpy( &result[m], "&gt;" );
-
 				m += 4;
-
 				break;
 
 			case '&':
 				strcpy( &result[m], "&amps;" );
-
 				m += 5;
-
 				break;
 
 			case '\'':
 				strcpy( &result[m], "&apos;" );
-
 				m += 6;
-
 				break;
 
 			case '\"':
 				strcpy( &result[m], "&quot;" );
-
 				m += 6;
 
 				break;
 
 			default:
 				result[m] = string[n];
-
 				m++;
 		}
 
 		n++;
 	}
 
-	result[m] = 0;
+	result[ m ] = 0;
 
 	return result;
 }
@@ -1490,7 +1533,7 @@ char *stXMLDecodeString( char *string ) {
 		}
 	}
 
-	result[m] = 0;
+	result[ m ] = 0;
 
 	return result;
 }

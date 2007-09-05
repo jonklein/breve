@@ -7,11 +7,10 @@ void stSetParseObjectAndMethod( stObject *o, stMethod *m );
 extern const char *yyfile;
 extern int lineno;
 
-/*!
-	\brief Parse a single steve statement.
-
-	This prepares the statement for interactive evaluation.
-*/
+/**
+ * \brief Parse a single steve statement.
+ * This prepares the statement for interactive evaluation.
+ */
 
 int stRunSingleStatement( stSteveData *sd, brEngine *engine, char *statement ) {
 	char *file = "<user input>";
@@ -31,7 +30,6 @@ int stRunSingleStatement( stSteveData *sd, brEngine *engine, char *statement ) {
 
 	// put in the dot to make steve happy!
 
-
 	while ( statement[length] == '\n' || statement[length] == ' ' || statement[length] == '\t' ) length--;
 
 	if ( length > 0 && statement[length] != '.' ) statement[length + 1] = '.';
@@ -48,9 +46,8 @@ int stRunSingleStatement( stSteveData *sd, brEngine *engine, char *statement ) {
 
 	controller = brEngineGetController( engine );
 
-	stParseSetObjectAndMethod(( stObject* )controller->object->userData, sd->singleStatementMethod );
-
 	stParseSetEngine( engine );
+	stParseSetObjectAndMethod( ( stObject* )controller->object->userData, sd->singleStatementMethod );
 
 	brClearError( engine );
 
