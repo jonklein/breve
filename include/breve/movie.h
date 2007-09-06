@@ -1,4 +1,4 @@
-#if HAVE_LIBAVCODEC
+#if HAVE_LIBAVCODEC && HAVE_LIBAVFORMAT && HAVE_LIBAVUTIL
 
 #include "glIncludes.h"
 #include "camera.h"

@@ -318,24 +318,13 @@ fi
 
 AC_CHECK_LIB([png], [png_create_write_struct])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc],,AC_MSG_FAILURE([Missing GSL library -- see http://www.gnu.org/software/gsl/]))
-
-# AC_CHECK_LIB([OSMesa], [OSMesaCreateContext])
-
 AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]))
 
 AC_CHECK_FUNCS([getopt_long gettimeofday iswspace mkstemp strdup vasprintf])
 
-AC_MSG_CHECKING([for JVM library])
-
 _old_cppflags=${CPPFLAGS}
 _old_ldflags=${LDFLAGS}
 _old_libs=${LIBS}
-
-#
-# For some reason CXXFLAGS is getting set to -O2 without my express
-# written consent.
-#
-
 
 #
 # If static linking is requested, add a flag for all non-system libraries.  The
