@@ -18,6 +18,35 @@ class Object( object ):
 
                 Object.init( self )
 
+	def __getstate__( self ):
+		pickledict = {}
+
+		for key in self.__dict__:
+			value = self.__dict__[ key ]
+
+			try:
+				if key in ( 'breveInstance', 'breveModule' ):
+					value = None
+
+				if str( type( value ) ) == "<type 'PyCObject'>":
+					print str( type( value ) )
+					value = None
+
+				if issubclass( value.__class__, breve.Object ):
+					value = None
+
+				if issubclass( value.__class__, breve.bridgeObject ):
+					value = None
+
+			except Exception, e:
+				pass
+		
+			pickledict[ key ] = value
+
+		return pickledict
+			
+
+
 	def __del__( self ):
 		pass
 

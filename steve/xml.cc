@@ -896,7 +896,7 @@ int stXMLRunDearchiveMethods( stXMLParserState *s ) {
 	for ( unsigned int n = 0; n < s->dearchiveOrder.size(); n++ ) {
 		brInstance *instance = s->dearchiveOrder[ n ] -> breveInstance;
 
-		printf( "%s\n", s->dearchiveOrder[ n ] -> type -> name . c_str() );
+	// 	printf( "%s\n", s->dearchiveOrder[ n ] -> type -> name . c_str() );
 		if ( instance ) {
 
 			r = brMethodCallByName( instance, "post-dearchive-set-controller", &result );
@@ -931,7 +931,7 @@ int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, stXMLParserState *inState 
 
 		brObject *object = brObjectFind( inState->engine, objectname.c_str() );
 
-		printf( "=> %s\n", objectname.c_str() );
+	//	printf( "=> %s\n", objectname.c_str() );
 
 		if ( !object ) {
 			slMessage( DEBUG_ALL, "Archive contains an instance of unknown class \"%s\"\n", objectname.c_str() );
@@ -1392,15 +1392,14 @@ void stPrintXMLError( XML_Parser p ) {
 	slMessage( DEBUG_ALL, "Error at line %d (character %d) of saved simulation file: %s\n", line, col, XML_ErrorString( XML_GetErrorCode( p ) ) );
 }
 
-/*!
-	\brief Encode a string for XML export.
-
-	Both the encode and decode XML string functions use hardcoded values
-	to parse out < > & ' and ".  A more general solution might be nice, but
-	whatever.
-
-	Returns an slMalloc'd string.
-*/
+/**
+ * \brief Encode a string for XML export.
+ *
+ * Both the encode and decode XML string functions use hardcoded values
+ * to parse out < > & ' and ".  A more general solution might be nice, but
+ * whatever.
+ * Returns an slMalloc'd string.
+ */
 
 char *stXMLEncodeString( char *string ) {
 	char *result;
@@ -1482,15 +1481,15 @@ char *stXMLEncodeString( char *string ) {
 	return result;
 }
 
-/*!
-	\brief Decodes a string for XML import.
-
-	Both the encode and decode XML string functions use hardcoded values
-	to parse out < > & ' and ".  A more general solution might be nice, but
-	whatever.
-
-	Returns an slMalloc'd string.
-*/
+/**
+ * \brief Decodes a string for XML import.
+ * 
+ * Both the encode and decode XML string functions use hardcoded values
+ * to parse out < > & ' and ".  A more general solution might be nice, but
+ * whatever.
+ *
+ * Returns an slMalloc'd string.
+ */
 
 char *stXMLDecodeString( char *string ) {
 	char *result;
