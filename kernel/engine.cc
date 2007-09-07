@@ -204,7 +204,7 @@ brEngine *brEngineNew( void ) {
 	// environment variable to see if it adds any more
 
 	brAddSearchPath( e, "lib/classes" );
-	brAddSearchPath( e, "lib/pyclasses" );
+	brAddSearchPath( e, "lib" );
 
 	if ( ( envpath = getenv( "BREVE_CLASS_PATH" ) ) ) {
 		while (( dir = slSplit( envpath, ":", n++ ) ) ) {

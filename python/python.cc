@@ -1213,11 +1213,6 @@ void brPythonInit( brEngine *breveEngine ) {
 		setpath = "import sys\nsys.path.append( '" + path + "' ) ";
 
 		PyRun_SimpleString( setpath.c_str() );
-
-		path += "/PythonLibraries/";
-		setpath = "import sys\nsys.path.append( '" + path + "' ) ";
-
-		PyRun_SimpleString( setpath.c_str() );
 	}
 
 	sPythonData._mainModule  = PyImport_ImportModule( "__main__" );
