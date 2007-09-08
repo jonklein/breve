@@ -249,7 +249,7 @@ struct brMethod {
  */
 
 struct brObserver {
-	brObserver( brInstance *obs, brMethod *meth, char *note ) {
+	brObserver( brInstance *obs, brMethod *meth, const char *note ) {
 		instance = obs;
 		method = meth;
 		notification = slStrdup( note );
@@ -307,7 +307,7 @@ DLLEXPORT void brEngineAddObjectAlias(brEngine *, char *, brObject *);
 DLLEXPORT brInstance *brObjectInstantiate(brEngine *, brObject *, const brEval **, int);
 
 DLLEXPORT char *brInstanceEncodeToString( brEngine *inEngine, brInstance *inInstance );
-DLLEXPORT brInstance *brInstanceDecodeFromString( brEngine *inEngine, int inTypeSignature, char *inData );
+DLLEXPORT brInstance *brInstanceDecodeFromString( brEngine *inEngine, int inTypeSignature, const char *inData );
 
 DLLEXPORT brInstance *brEngineAddInstance(brEngine *, brObject *, void *);
 DLLEXPORT brInstance *brEngineAddBreveInstance(brEngine *, brObject *, brInstance * );
@@ -324,8 +324,8 @@ DLLEXPORT bool brObjectIsSubclass( brObject *inA, brObject *inB );
 DLLEXPORT int brInstanceAddDependency( brInstance *i, brInstance *dependency );
 DLLEXPORT int brInstanceRemoveDependency( brInstance *i, brInstance *dependency );
 
-DLLEXPORT int brInstanceAddObserver(brInstance *i, brInstance *inObserver, char *inNotification, char *inMethod );
-DLLEXPORT void brEngineRemoveInstanceObserver(brInstance *i, brInstance *observerInstance, char *notification);
+DLLEXPORT int brInstanceAddObserver(brInstance *i, brInstance *inObserver, const char *inNotification, const char *inMethod );
+DLLEXPORT void brEngineRemoveInstanceObserver(brInstance *i, brInstance *observerInstance, const char *notification);
 
 // cleaning up 
 

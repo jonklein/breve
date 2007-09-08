@@ -14,8 +14,6 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 	% you can change the shape altogether with the method METHOD(set-shape).
 
 	+ variables:
-		archiveLocation (vector).
-		archiveRotation (matrix).
 		archiveVelocity (vector).
 		archiveRvelocity (vector).
 		archiveAcceleration (vector).
@@ -27,8 +25,6 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 	+ to init:
 		e = .2.
 		mu = .2.
-
-		color = (1, 1, 1).
 
 		realWorldPointer = linkNew().
 		linkAddToWorld( realWorldPointer ).
@@ -232,27 +228,25 @@ Real : Mobile (aka Mobiles) [version 2.2] {
 		linkRemoveLabel(realWorldPointer).
 
 	- to archive:
-		archiveLocation = (self get-location).
-		archiveRotation = (self get-rotation).
 		archiveVelocity = (self get-velocity).
 		archiveRvelocity = (self get-rotational-velocity).
 		archiveAcceleration = (self get-acceleration).
+
 		return (super archive).
 
 	- to dearchive:
 		realWorldPointer = linkNew().
+
 		linkAddToWorld(realWorldPointer).
 
-		self set-collision-shape to collisionShape.
-		self set-display-shape to displayShape.
-		self move to archiveLocation.
-		self set-rotation-matrix to archiveRotation.
 		self set-velocity to archiveVelocity.
 		self set-rotational-velocity to archiveRvelocity.
 		self set-acceleration to archiveAcceleration.
 
-		if physicsEnabled: self enable-physics.
-		else: self disable-physics.
+		if physicsEnabled: 
+			self enable-physics.
+		else: 
+			self disable-physics.
 
 
 		return (super dearchive).

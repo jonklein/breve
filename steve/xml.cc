@@ -23,37 +23,6 @@
 #include "expression.h"
 #include "evaluation.h"
 
-enum states {
-    XP_ENGINE = 1,
-    XP_INSTANCE_ARCHIVE,
-    XP_INSTANCE,
-    XP_DATA_INSTANCE,
-    XP_DATA_INSTANCE_ARCHIVE,
-    XP_CLASS,
-    XP_INSTANCEDATA,
-    XP_DEPENDENCIES,
-    XP_OBSERVERS,
-    XP_NOTIFICATION,
-    XP_METHOD,
-    XP_INDEX,
-
-    XP_ARRAY,
-
-    XP_INT,
-    XP_DOUBLE,
-    XP_LIST,
-    XP_HASH,
-    XP_STRING,
-    XP_VECTOR,
-    XP_POINTER,
-    XP_OBJECT,
-    XP_MATRIX,
-    XP_DATA,
-
-    XP_KEY,
-    XP_VALUE
-};
-
 #define XMLPutSpaces(count, file)	{ int m; for(m=0;m<(count);m++) fputc(' ', (file)); }
 #define XML_INDENT_SPACES	1
 
@@ -480,7 +449,7 @@ int stXMLPrintEval( brXMLArchiveRecord *record, FILE *file, const char *name, br
 		case AT_STRING:
 			XMLPutSpaces( spaces, file );
 
-			encoded = stXMLEncodeString( BRSTRING( target ) );
+			encoded = brXMLEncodeString( BRSTRING( target ) );
 
 			fprintf( file, "<string name=\"%s\">%s</string>\n", name, encoded );
 
@@ -602,6 +571,12 @@ brXMLDOMElement::~brXMLDOMElement() {
 		delete _children[ n ];
 }
 
+const std::string *brXMLDOMElement::getAttr( const char *inAttr ) {
+	std::string key( inAttr );
+	
+	return &_attrs[ key ];
+}
+
 void brXMLStartElementHandler( void *inUserData, const XML_Char *inName, const XML_Char **inAttrs ) {
 	brXMLState *state = (brXMLState*)inUserData;
 
@@ -657,6 +632,15 @@ std::vector< brXMLDOMElement* > brXMLDOMElement::getElementsByName( const char *
 	return matches;
 }
 
+brXMLDOMElement* brXMLDOMElement::getChildByName( const char *inName ) {
+	for( unsigned int n = 0; n < _children.size(); n++ ) {
+		if( _children[ n ]->_name == inName ) 
+			return _children[ n ];
+	}
+
+	return NULL;
+}
+
 brXMLDOMElement *brXMLParse( char *inBuffer ) {
 	XML_Parser parser;
 	brXMLState dom;
@@ -678,57 +662,39 @@ brXMLDOMElement *brXMLParse( char *inBuffer ) {
 	return dom._stack[ 0 ];
 }
 
-void brXMLParseInstance( brXMLDOMElement *inElement, brInstance *outInstance ) {
-
-}
-
-void brXMLParseEval( brXMLDOMElement *inElement, brEval *outEval ) {
-
-}
-
 int stXMLReadObjectFromString( stInstance *i, char *buffer ) {
-	XML_Parser parser;
-	stXMLParserState parserState;
+	brXMLParserState parserState;
 	int result = 0;
 
 	brXMLDOMElement *dom = brXMLParse( buffer );
 	std::vector< brXMLDOMElement* > matches = dom->getElementsByName( "instance" ); 
 
 	parserState.engine = i->type->engine;
-	parserState.mode = PARSE_INSTANCE;
 	parserState.error = 0;
 
-	brXMLPrepareInstanceMap( dom, &parserState );
+	if( brXMLPrepareInstanceMap( dom, &parserState ) != 0 )
+		return EC_ERROR;
 
-
-
-
-	// do the real parse stage 
-
-	parserState.currentInstance = i;
-	parser = XML_ParserCreate( NULL );
-	XML_SetStartElementHandler( parser, stXMLObjectStartElementHandler );
-	XML_SetEndElementHandler( parser, stXMLObjectEndElementHandler );
-	XML_SetCharacterDataHandler( parser, stXMLObjectCharacterDataHandler );
-	XML_SetUserData( parser, &parserState );
-
-	if ( !XML_Parse( parser, buffer, strlen( buffer ), 1 ) ) {
-		stPrintXMLError( parser );
-		result = -1;
+	for( unsigned int n = 0; n < matches.size(); n++ ) {
+		const std::string *instindex = matches[ n ]->getAttr( "index" );
+		
+		if( !instindex ) {
+			slMessage( DEBUG_ALL, "Error decoding XML from string: could not locate instance index\n" );	
+			return NULL;	
+		}
+		
+		int ind = atoi( instindex->c_str() );
+			
+		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState.indexToInstanceMap[ ind ] ) != EC_OK ) 
+			return EC_ERROR;
 	}
-
-	if ( parserState.error ) {
-		result = -1;
-	}
-
-	XML_ParserFree( parser );
 
 	return result;
 }
 
-stInstance *stXMLDearchiveObjectFromFile( brEngine *e, char *filename ) {
+brInstance *brXMLDearchiveObjectFromFile( brEngine *e, char *filename ) {
 	char *buffer;
-	stInstance *i;
+	brInstance *i;
 
 	buffer = slUtilReadFile( filename );
 
@@ -737,16 +703,16 @@ stInstance *stXMLDearchiveObjectFromFile( brEngine *e, char *filename ) {
 		return NULL;
 	}
 
-	i = stXMLDearchiveObjectFromString( e, buffer );
+	i = brXMLDearchiveObjectFromString( e, buffer );
 
 	slFree( buffer );
 
 	return i;
 }
 
-stInstance *stXMLDearchiveObjectFromStream( brEngine *e, FILE *stream ) {
+brInstance *brXMLDearchiveObjectFromStream( brEngine *e, FILE *stream ) {
 	char *buffer;
-	stInstance *i;
+	brInstance *i;
 
 	buffer = slUtilReadStream( stream );
 
@@ -755,57 +721,75 @@ stInstance *stXMLDearchiveObjectFromStream( brEngine *e, FILE *stream ) {
 		return NULL;
 	}
 
-	i = stXMLDearchiveObjectFromString( e, buffer );
+	i = brXMLDearchiveObjectFromString( e, buffer );
 
 	slFree( buffer );
 
 	return i;
 }
 
-stInstance *stXMLDearchiveObjectFromString( brEngine *e, char *buffer ) {
-	XML_Parser parser;
-	stXMLParserState parserState;
-	stInstance *dearchivedInstance;
-	int result = 0;
+
+
+brInstance *brXMLDearchiveObjectFromString( brEngine *e, char *buffer ) {
+	brXMLParserState parserState;
+
+	// Parse the DOM tree
 
 	brXMLDOMElement *dom = brXMLParse( buffer );
+	
+	std::vector< brXMLDOMElement* > archive = dom->getElementsByName( "instance_archive" ); 
+	
+	if( archive.size() != 1 ) {
+		slMessage( DEBUG_ALL, "Error decoding XML from string: expected 1 instance_archive, found %d\n", archive.size() );	
+		return NULL;
+	}
+	
+	const std::string *index = archive[ 0 ]->getAttr( "archiveIndex" );
+	
+	if( !index ) {
+		slMessage( DEBUG_ALL, "Error decoding XML from string: could not locate archived instance index\n" );	
+		return NULL;	
+	}
+	
+	int archivedIndex = atoi( index->c_str() );
+	
+	
+	//
+	// Dearchive the individual elements
+	//
+	
 	std::vector< brXMLDOMElement* > matches = dom->getElementsByName( "instance" ); 
 
 	parserState.engine = e;
-	parserState.mode = PARSE_INSTANCE;
 	parserState.error = 0;
 
-	brXMLPrepareInstanceMap( dom, &parserState );
+	if( brXMLPrepareInstanceMap( dom, &parserState ) != 0 )
+		return NULL;
 
-
-
-
-	// do the real parse stage 
-
-	parser = XML_ParserCreate( NULL );
-	XML_SetStartElementHandler( parser, stXMLObjectStartElementHandler );
-	XML_SetEndElementHandler( parser, stXMLObjectEndElementHandler );
-	XML_SetCharacterDataHandler( parser, stXMLObjectCharacterDataHandler );
-	XML_SetUserData( parser, &parserState );
-
-	if ( !XML_Parse( parser, buffer, strlen( buffer ), 1 ) ) {
-		stPrintXMLError( parser );
-		result = -1;
+	for( unsigned int n = 0; n < matches.size(); n++ ) {
+		const std::string *instindex = matches[ n ]->getAttr( "index" );
+		
+		if( !instindex ) {
+			slMessage( DEBUG_ALL, "Error decoding XML from string: could not locate instance index\n", archive.size() );	
+			return NULL;	
+		}
+		
+		int i = atoi( instindex->c_str() );
+			
+		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState.indexToInstanceMap[ i ] ) != EC_OK ) 
+			return NULL;
 	}
 
-	dearchivedInstance = parserState.indexToInstanceMap[ parserState.archiveIndex];
+	brXMLRunDearchiveMethods( &parserState );
 
-	result = stXMLRunDearchiveMethods( &parserState );
-
-	if ( parserState.error ) result = -1;
-
-	XML_ParserFree( parser );
-
-	if ( result == -1 ) return NULL;
-	else return dearchivedInstance;
+	return parserState.indexToInstanceMap[ archivedIndex ];
 }
 
-int stXMLInitSimulationFromFile( brEngine *e, char *filename ) {
+
+
+
+
+int brXMLInitSimulationFromFile( brEngine *e, char *filename ) {
 	char *buffer;
 	int result = 0;
 
@@ -816,13 +800,13 @@ int stXMLInitSimulationFromFile( brEngine *e, char *filename ) {
 		return -1;
 	}
 
-	result = stXMLInitSimulationFromString( e, buffer );
+	result = brXMLInitSimulationFromString( e, buffer );
 
 	slFree( buffer );
 	return result;
 }
 
-int stXMLInitSimulationFromStream( brEngine *e, FILE *stream ) {
+int brXMLInitSimulationFromStream( brEngine *e, FILE *stream ) {
 	char *buffer;
 	int result = 0;
 
@@ -833,53 +817,59 @@ int stXMLInitSimulationFromStream( brEngine *e, FILE *stream ) {
 		return -1;
 	}
 
-	result = stXMLInitSimulationFromString( e, buffer );
+	result = brXMLInitSimulationFromString( e, buffer );
 
 	slFree( buffer );
 	return result;
 }
 
-int stXMLInitSimulationFromString( brEngine *e, char *buffer ) {
-	XML_Parser parser;
-	stXMLParserState parserState;
+int brXMLInitSimulationFromString( brEngine *e, char *buffer ) {
+	brXMLParserState parserState;
 	int result = 0;
 
-
 	brXMLDOMElement *dom = brXMLParse( buffer );
+
+	std::vector< brXMLDOMElement* > engine = dom->getElementsByName( "engine" ); 
+
+	if( engine.size() != 1 ) {
+		slMessage( DEBUG_ALL, "Error decoding XML simulation: could not locate breve engine object\n" );	
+		return NULL;		
+	}
+
+	int controllerIndex = atoi( engine[ 0 ]->getAttr( "controllerIndex" )->c_str() );
+
+
+
+
 	std::vector< brXMLDOMElement* > matches = dom->getElementsByName( "instance" ); 
 
 	parserState.engine = e;
-	parserState.mode = PARSE_INSTANCE;
 	parserState.error = 0;
 
-	brXMLPrepareInstanceMap( dom, &parserState );
+	if( brXMLPrepareInstanceMap( dom, &parserState ) != 0 )
+		return EC_ERROR;
 
-
-	// do the real parse stage 
-
-	parser = XML_ParserCreate( NULL );
-	XML_SetStartElementHandler( parser, stXMLObjectStartElementHandler );
-	XML_SetEndElementHandler( parser, stXMLObjectEndElementHandler );
-	XML_SetCharacterDataHandler( parser, stXMLObjectCharacterDataHandler );
-	XML_SetUserData( parser, &parserState );
-
-	if ( !XML_Parse( parser, buffer, strlen( buffer ), 1 ) ) {
-		slMessage( DEBUG_ALL, "Error loading archived simulation: parsing failed\n" );
-		stPrintXMLError( parser );
-		result = -1;
+	for( unsigned int n = 0; n < matches.size(); n++ ) {
+		const std::string *instindex = matches[ n ]->getAttr( "index" );
+		
+		if( !instindex ) {
+			slMessage( DEBUG_ALL, "Error decoding XML: could not locate instance index\n" );	
+			return NULL;	
+		}
+		
+		int i = atoi( instindex->c_str() );
+			
+		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState.indexToInstanceMap[ i ] ) != EC_OK ) 
+			return EC_ERROR;
 	}
 
-	if ( stXMLRunDearchiveMethods( &parserState ) ) {
-		slMessage( DEBUG_ALL, "Error loading archived simulation: dearchive commands failed\n" );
+
+	brEngineSetController( e, parserState.indexToInstanceMap[ controllerIndex ] );
+
+	if ( brXMLRunDearchiveMethods( &parserState ) ) {
+		slMessage( DEBUG_ALL, "Error loading archived simulation: dearchive method failed\n" );
 		result = -1;
 	}
-
-	if ( parserState.error ) {
-		slMessage( DEBUG_ALL, "Error loading archived simulation: parsing failed\n" );
-		result = -1;
-	}
-
-	XML_ParserFree( parser );
 
 	return result;
 }
@@ -888,15 +878,13 @@ int stXMLInitSimulationFromString( brEngine *e, char *buffer ) {
  * \brief Runs dearchive for the list of instances.
  */
 
-int stXMLRunDearchiveMethods( stXMLParserState *s ) {
+int brXMLRunDearchiveMethods( brXMLParserState *s ) {
 	int r;
 	brEval result;
-	std::map< int, stInstance* >::iterator ii;
 
 	for ( unsigned int n = 0; n < s->dearchiveOrder.size(); n++ ) {
-		brInstance *instance = s->dearchiveOrder[ n ] -> breveInstance;
+		brInstance *instance = s->dearchiveOrder[ n ];
 
-	// 	printf( "%s\n", s->dearchiveOrder[ n ] -> type -> name . c_str() );
 		if ( instance ) {
 
 			r = brMethodCallByName( instance, "post-dearchive-set-controller", &result );
@@ -920,22 +908,20 @@ int stXMLRunDearchiveMethods( stXMLParserState *s ) {
  * pointers the second time around.
  */
 
-int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, stXMLParserState *inState ) {
+int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, brXMLParserState *inState ) {
 	std::vector< brXMLDOMElement* > instances = inRoot->getElementsByName( "instance" ); 
 
 	stInstance *i;
 
-	for( int n = 0; n < instances.size(); n++ ) {
+	for( unsigned int n = 0; n < instances.size(); n++ ) {
 		std::string objectname = instances[ n ]->_attrs[ "class" ];
 		int instanceindex = atoi( instances[ n ]->_attrs[ "index" ].c_str() );
 
 		brObject *object = brObjectFind( inState->engine, objectname.c_str() );
 
-	//	printf( "=> %s\n", objectname.c_str() );
-
 		if ( !object ) {
-			slMessage( DEBUG_ALL, "Archive contains an instance of unknown class \"%s\"\n", objectname.c_str() );
-			slMessage( DEBUG_ALL, "mismatch between simulation file and XML archive\n", objectname.c_str() );
+			slMessage( DEBUG_ALL, "XML archive contains an instance of unknown class \"%s\"\n", objectname.c_str() );
+			slMessage( DEBUG_ALL, "Cannot decode XML archive: mismatch between simulation file and XML data\n" );
 			inState->error++;
 			return -1;
 		}
@@ -944,452 +930,272 @@ int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, stXMLParserState *inState 
 
 		i->breveInstance = brEngineAddInstance( inState->engine, object, i );
 
-		inState->indexToInstanceMap[ instanceindex ] = i;
+		inState->indexToInstanceMap[ instanceindex ] = i->breveInstance;
+		
+		inState -> dearchiveOrder.push_back( i->breveInstance );
 	}
 
 	return 0;
 }
 
-void stXMLObjectStartElementHandler( void *userData, const XML_Char *name, const XML_Char **atts ) {
+/**
+ * Dearchive a steve instance by filling in its variables.
+ *
+ * This method operates on steve objects only
+ */
 
-	int n = 0;
-	stXMLStackEntry *state;
+int stXMLParseInstanceData( brXMLParserState *inState, brXMLDOMElement *inInstanceData, stInstance *outInstance ) {
 
-	const char *objectName = NULL;
+	std::vector< brXMLDOMElement* > classes   = inInstanceData->getElementsByName( "class" );
 
-	int controllerIndex = 0, index = 0, archiveIndex = 0;
+	// From the base class down to the derived class, we go through and set the variables for each one
 
-	stInstance *steveInstance;
+	for( unsigned int n = 0; n < classes.size(); n++ ) {
+		brXMLDOMElement *cls = classes[ n ];
 
-	brObject *object;
+		stRunInstance ri;
 
-	stXMLParserState *parserState = ( stXMLParserState* )userData;
+		ri.instance = outInstance;
+		ri.type = ( stObject* )( brObjectFind( inState->engine, cls->getAttr( "name" )->c_str() ) ) -> userData;
+			
+		for( unsigned int e = 0; e < cls->_children.size(); e++ ) {
+			brEval eval;
+			brXMLDOMElement *variable = cls->_children[ e ];
+		
+			// Decode the eval and save it to the steve object
+		
+			brXMLParseEval( inState, variable, &eval );
 
-	if ( parserState->error != 0 ) return;
+			stVar *var = stObjectLookupVariable( outInstance->type, variable -> getAttr( "name" ) -> c_str() );
 
-	state = new stXMLStackEntry;
-
-	state->state = stXMLStateForElement(( char* )name );
-
-	state->name = NULL;
-
-	state->string = ( char* )slMalloc( 1 );
-
-	state->string[ 0 ] = 0;
-
-	parserState->stateStack.push_back( state );
-
-	while ( atts[n] ) {
-		if ( !strcasecmp( atts[n], "name" ) ) state->name = slStrdup(( char* )atts[n + 1] );
-
-		if ( !strcasecmp( atts[n], "class" ) ) objectName = atts[n + 1];
-
-		if ( !strcasecmp( atts[n], "controllerIndex" ) ) controllerIndex = atoi( atts[n + 1] );
-
-		if ( !strcasecmp( atts[n], "archiveIndex" ) ) archiveIndex = atoi( atts[n + 1] );
-
-		if ( !strcasecmp( atts[n], "index" ) ) index = atoi( atts[n + 1] );
-
-		n += 2;
+			if( ! var ) {
+				slMessage( DEBUG_ALL, "Could not locate matching class variable for XML data\n" );
+				slMessage( DEBUG_ALL, "Cannot decode XML archive: mismatch between simulation file and XML data\n" );
+				return EC_ERROR;
+			}
+	
+			stSetVariable( &outInstance->variables[ var->offset ], var->type->_type, NULL, &eval, &ri );
+		}
 	}
 
-	switch ( state->state ) {
+	return EC_OK;
+}
 
-		case XP_ENGINE:
-			parserState->controllerIndex = controllerIndex;
 
-			break;
+void brXMLParseList( brXMLParserState *inState, brXMLDOMElement *inListElement, brEvalListHead *ioList ) {
+	// Step through the children of the list element, decoding them and appending them to the list
 
-		case XP_INSTANCE_ARCHIVE:
-			parserState->archiveIndex = archiveIndex;
-
-			break;
-
-		case XP_INSTANCE:
-			parserState->currentInstance = parserState->indexToInstanceMap[ index];
-
-			if ( !parserState->currentInstance ) 
-				slMessage( DEBUG_ALL, "warning: cannot locate instance #%d\n", index );
-
-			parserState->dearchiveOrder.push_back( parserState->currentInstance );
-
-			break;
-
-		case XP_ARRAY:
-			state->variable = stObjectLookupVariable( parserState->currentObject, state->name );
-
-			if ( state->variable ) {
-				state->arrayIndex = 0;
-			} else {
-				slMessage( DEBUG_ALL, "archive contains unknown variable \"%s\" for class \"%s\"\n", state->name, parserState->currentInstance->type->name.c_str() );
-				slMessage( DEBUG_ALL, "mismatch between simulation file and XML archive\n", objectName );
-				parserState->error++;
-			}
-
-			break;
-
-		case XP_LIST:
-			state->eval.set( new brEvalListHead() );
-
-			break;
-
-		case XP_HASH:
-			state->eval.set( new brEvalHash() );
-
-			break;
-
-		case XP_OBJECT:
-			// we don't see the character data for this one
-
-			steveInstance = parserState->indexToInstanceMap[ index];
-
-			if ( steveInstance ) {
-				state->eval.set( steveInstance->breveInstance );
-			} else {
-				state->eval.set( ( brInstance* )NULL );
-			}
-
-			break;
-
-		case XP_POINTER:
-			state->eval.set(( void* )NULL );
-
-			break;
-
-		case XP_CLASS:
-			object = brObjectFind( parserState->engine, state->name );
-
-			if ( object ) parserState->currentObject = ( stObject* )object->userData;
-			else parserState->currentObject = NULL;
-
-			break;
-
-		case XP_NOTIFICATION:
-			state->eval.set( state->name );
-
-			break;
-
-		case XP_METHOD:
-			state->eval.set( state->name );
-
-			break;
-
-		case XP_DEPENDENCIES:
-			state->eval.set(( brInstance* )NULL );
-
-			break;
+	for( unsigned int n = 0; n < inListElement->_children.size(); n++ ) {
+		brEval member;
+		
+		brXMLParseEval( inState, inListElement->_children[ n ], &member );
+		
+		brEvalListInsert( ioList, ioList->_vector.size(), &member );
 	}
 }
 
-/*!
-	\brief Read the character data for a given XML tag.
 
-	Many states do not use this character data.  Since this function
-	may be called multiple times, we have to continually reallocate
-	and append data.
-*/
+void brXMLParseHash( brXMLParserState *inState, brXMLDOMElement *inHashElement, brEvalHash *ioHash ) {
+	// Step through the key/value pairs of the hash element, decoding them and appending them to the list
 
-void stXMLObjectCharacterDataHandler( void *userData, const XML_Char *data, int len ) {
-	stXMLParserState *parserState = ( stXMLParserState* )userData;
+	std::vector< brXMLDOMElement* > keys   = inHashElement->getElementsByName( "key" );
+	std::vector< brXMLDOMElement* > values = inHashElement->getElementsByName( "value" );
+	
+	for( unsigned int n = 0; n < keys.size(); n++ ) {
+		brEval keyEval, valueEval;
+		
+		brXMLParseEval( inState,   keys[ n ]->_children[ 0 ],   &keyEval );
+		brXMLParseEval( inState, values[ n ]->_children[ 0 ], &valueEval );
+	
+		brEvalHashStore( ioHash, &keyEval, &valueEval );
+	}
+}
 
-	stXMLStackEntry *e;
-	int oldLen;
 
-	if ( parserState->error != 0 ) return;
+void brXMLParseEval( brXMLParserState *inState, brXMLDOMElement *inElement, brEval *outEval ) {
+	int type = brXMLEvalTypeForTagName( inElement->_name.c_str() );
 
-	e = parserState->stateStack.back();
+	slMatrix m;
+	slVector v;
+	char *str;
+	int index;
+	
+	switch( type ) {
+		case AT_INSTANCE:
+			index = atoi( inElement->getAttr( "index" )->c_str() );
 
-	// these data do not expect character data
+			outEval->set( inState->indexToInstanceMap[ index ] );
+	
+			break;
 
-	if ( e->state == XP_ENGINE ) return;
+		case AT_ARRAY:
+			slMessage( DEBUG_ALL, "Arrays are deprecated and cannot be dearchived in this version of breve\n" );
+			break;
 
-	if ( e->state == XP_INSTANCE ) return;
+		case AT_LIST:
+			outEval->set( new brEvalListHead() );
+			brXMLParseList( inState, inElement, BRLIST( outEval ) );
 
-	if ( e->state == XP_INSTANCE_ARCHIVE ) return;
+			break;
 
-	if ( e->state == XP_DATA_INSTANCE ) return;
+		case AT_HASH:
+			outEval->set( new brEvalHash() );
+			brXMLParseHash( inState, inElement, BRHASH( outEval ) );
 
-	if ( e->state == XP_DATA_INSTANCE_ARCHIVE ) return;
+			break;
 
-	if ( e->state == XP_OBSERVERS ) return;
+		case AT_DATA:
+			outEval->set( brDataHexDecode( inElement->_cdata.c_str() ) );
 
-	if ( e->state == XP_CLASS ) return;
+			break;
 
-	if ( e->state == XP_INSTANCEDATA ) return;
+		case AT_POINTER:
+			outEval->set( ( void* )NULL );
 
-	if ( e->state == XP_LIST ) return;
+			break;
 
-	if ( e->state == XP_HASH ) return;
+		case AT_INT:
+			outEval->set( atoi( inElement->_cdata.c_str() ) );
 
-	if ( e->state == XP_ARRAY ) return;
+			break;
 
-	if ( e->state == XP_KEY ) return;
+		case AT_DOUBLE:
+			outEval->set( atof( inElement->_cdata.c_str() ) );
 
-	if ( e->state == XP_VALUE ) return;
+			break;
 
-	if ( e->state == XP_DEPENDENCIES ) return;
+		case AT_STRING:
+			str = brXMLDecodeString( inElement->_cdata.c_str() );
+			outEval->set( str );
 
-	// allocate or reallocate the string data.
+			slFree( str );
 
-	oldLen = 0;
+			break;
 
-	if ( !e->string ) {
-		e->string = ( char* )slMalloc( len + 1 );
+		case AT_VECTOR:
+			sscanf( inElement->_cdata.c_str(), "(%lf, %lf, %lf)", &v.x, &v.y, &v.z );
+			outEval->set( v );
+
+			break;
+
+		case AT_MATRIX:
+			sscanf( inElement->_cdata.c_str(), "[ (%lf, %lf, %lf), (%lf, %lf, %lf), (%lf, %lf, %lf) ]", 
+				&m[0][0], &m[0][1], &m[0][2], 
+				&m[1][0], &m[1][1], &m[1][2], 
+				&m[2][0], &m[2][1], &m[2][2] );
+
+			outEval->set( m );
+
+			break;	
+	
+		default:
+			printf( "Warning: could not parse eval for tag \"%s\"\n", inElement->_name.c_str() );
+	}
+}
+
+
+/** 
+ * Decodes a breve instance by decoding common breveInstance variables (dependencies, observers, etc), and 
+ * then passing along the instance data to the appropriate language frontend handler.
+ */
+
+int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceElement, brInstance *outInstance ) {
+	unsigned int i;
+
+	brXMLDOMElement *dependencies = inInstanceElement->getChildByName( "dependencies" ); 
+	
+	if( dependencies ) {
+		std::vector< brXMLDOMElement* > dependencyList = dependencies->getElementsByName( "object" );
+			
+		for( i = 0; i < dependencyList.size(); i++ ) {		
+			int dependencyIndex = atoi( dependencyList[ i ]->getAttr( "index" )->c_str() );
+		
+			brInstance *dependency = inState->indexToInstanceMap[ dependencyIndex ];
+
+			if( dependency )
+				brInstanceAddDependency( outInstance, dependency );
+		}
+	}
+	
+	std::vector< brXMLDOMElement* > observers = inInstanceElement->getElementsByName( "observers" ); 
+
+	for( i = 0; i < observers.size(); i++ )
+		brXMLDecodeObserver( inState, observers[ i ], outInstance );
+
+
+
+
+
+
+	std::vector< brXMLDOMElement* > data = inInstanceElement->getElementsByName( "instancedata" ); 
+
+	// Legacy support for the steve-only "variables" data...
+
+	if( data.size() == 0 ) {
+		data = inInstanceElement->getElementsByName( "variables" ); 
+
 	} else {
-		oldLen = strlen( e->string );
-		e->string = ( char* )slRealloc( e->string, oldLen + len + 1 );
+		
+		int typeSignature = 0xffffffff;
+		brInstanceDecodeFromString( inState->engine, typeSignature, data[ 0 ]->_cdata.c_str() );
+
 	}
 
-	// copy in the new data
-
-	strncpy( &e->string[oldLen], data, len );
-
-	e->string[oldLen + len] = 0;
+	return stXMLParseInstanceData( inState, data[ 0 ], (stInstance*)outInstance -> userData );
 }
 
-void stXMLObjectEndElementHandler( void *userData, const XML_Char *name ) {
+// Decode the "observer" data
 
-	stXMLParserState *parserState = ( stXMLParserState* )userData;
-	stXMLStackEntry *state = NULL, *lastState = NULL;
-	stRunInstance ri;
-	stVar *var;
+void brXMLDecodeObserver( brXMLParserState *inState, brXMLDOMElement *inObserverElement, brInstance *inInstance ) {
+	brInstance *observer = NULL;
+	const char *notification = NULL, *method = NULL;
 
-	if ( parserState->error != 0 ) return;
-
-	lastState = state = parserState->stateStack.back();
-
-	// finish up the current state by parsing the character string
-
-	if ( state->string ) {
-		slVector v;
-		slMatrix m;
-		char *str;
-
-		switch ( state->state ) {
-
-			case XP_INSTANCE:
-				if ( parserState->currentInstance == parserState->indexToInstanceMap[ parserState->controllerIndex ] )
-					brEngineSetController( parserState->engine, parserState->currentInstance->breveInstance );
-
-				state->eval.set( parserState->currentInstance );
-
-				break;
-
-			case XP_DATA:
-				state->eval.set( brDataHexDecode( state->string ) );
-
-				break;
-
-			case XP_POINTER:
-				state->eval.set( ( void* )NULL );
-
-				break;
-
-			case XP_INT:
-				state->eval.set( atoi( state->string ) );
-
-				break;
-
-			case XP_DOUBLE:
-				state->eval.set( atof( state->string ) );
-
-				break;
-
-			case XP_STRING:
-				str = stXMLDecodeString( state->string );
-
-				state->eval.set( str );
-
-				slFree( str );
-
-				break;
-
-			case XP_VECTOR:
-				sscanf( state->string, "(%lf, %lf, %lf)", &v.x, &v.y, &v.z );
-
-				state->eval.set( v );
-
-				break;
-
-			case XP_MATRIX:
-				sscanf( state->string, "[ (%lf, %lf, %lf), (%lf, %lf, %lf), (%lf, %lf, %lf) ]", &m[0][0], &m[0][1], &m[0][2], &m[1][0], &m[1][1], &m[1][2], &m[2][0], &m[2][1], &m[2][2] );
-
-				state->eval.set( m );
-
-				break;
-
-
-			case XP_OBSERVERS:
-				if ( BRINSTANCE( &state->eval ) && BRSTRING( &state->key ) && BRSTRING( &state->value ) )
-					brInstanceAddObserver( parserState->currentInstance->breveInstance, BRINSTANCE( &state->eval ), BRSTRING( &state->key ), BRSTRING( &state->value ) );
-
-				break;
-		}
-
-		slFree( state->string );
+	brXMLDOMElement *observerElement     = inObserverElement->getChildByName( "object" );
+	brXMLDOMElement *methodElement       = inObserverElement->getChildByName( "method" );
+	brXMLDOMElement *notificationElement = inObserverElement->getChildByName( "notification" );
+	
+	if( observerElement ) {
+		int observerIndex = atoi( observerElement->getAttr( "index" )->c_str() );
+		observer = inState->indexToInstanceMap[ observerIndex ];
 	}
 
-	parserState->stateStack.pop_back();
+	if( methodElement )
+		method = methodElement->getAttr( "name" )->c_str();
 
-	if ( parserState->stateStack.size() != 0 ) state = parserState->stateStack.back();
-	else state = NULL;
 
-	if ( state ) {
-		switch ( state->state ) {
+	if( notificationElement )
+		notification = notificationElement->getAttr( "name" )->c_str();
 
-			case XP_INSTANCE:
-				break;
 
-			case XP_CLASS:
-				if ( lastState->state != XP_ARRAY ) {
-					stInstance *i = parserState->currentInstance;
-					stVar *var;
-
-					var = stObjectLookupVariable( i->type, lastState->name );
-
-					if ( var && lastState->eval.type() ) {
-						stRunInstance ri;
-
-						ri.instance = parserState->currentInstance;
-						ri.type = ri.instance->type;
-
-						stSetVariable( &parserState->currentInstance->variables[var->offset], var->type->_type, NULL, &lastState->eval, &ri );
-					}
-				}
-
-				break;
-
-			case XP_KEY:
-
-			case XP_VALUE:
-				brEvalCopy( &lastState->eval, &state->eval );
-
-				break;
-
-			case XP_HASH:
-				if ( lastState->state == XP_KEY ) {
-					brEvalCopy( &lastState->eval, &state->key );
-				} else if ( lastState->state == XP_VALUE ) {
-					brEvalHashStore( BRHASH( &state->eval ), &state->key, &lastState->eval );
-				}
-
-				break;
-
-			case XP_LIST:
-				brEvalListInsert( BRLIST( &state->eval ), BRLIST( &state->eval )->_vector.size(), &lastState->eval );
-
-				break;
-
-			case XP_ARRAY:
-				var = state->variable;
-
-				ri.instance = parserState->currentInstance;
-
-				ri.type = ri.instance->type;
-
-				stSetVariable( &parserState->currentInstance->variables[var->offset + state->arrayIndex * stSizeofAtomic( var->type->_arrayType )], var->type->_arrayType, NULL, &lastState->eval, &ri );
-
-				state->arrayIndex++;
-
-				break;
-
-			case XP_OBSERVERS:
-				if ( lastState->state == XP_NOTIFICATION ) {
-					brEvalCopy( &lastState->eval, &state->key );
-				}
-
-				if ( lastState->state == XP_METHOD ) {
-					brEvalCopy( &lastState->eval, &state->value );
-				}
-
-				if ( lastState->state == XP_OBJECT ) {
-					brEvalCopy( &lastState->eval, &state->eval );
-				}
-
-				break;
-
-			case XP_DEPENDENCIES:
-				if ( BRINSTANCE( &lastState->eval ) ) 
-					brInstanceAddDependency( parserState->currentInstance->breveInstance, BRINSTANCE( &lastState->eval ) );
-
-				break;
-		}
-	}
-
-	if ( lastState->name ) slFree( lastState->name );
-
-	delete lastState;
+	if( observer && notification && method )		
+		brInstanceAddObserver( inInstance, observer, notification, method );
 }
 
-int stXMLStateForElement( char *name ) {
+int brXMLEvalTypeForTagName( const char *name ) {
 
-	if ( !strcasecmp( name, "engine" ) ) return XP_ENGINE;
 
-	if ( !strcasecmp( name, "instance" ) ) return XP_INSTANCE;
-
-	if ( !strcasecmp( name, "instance_archive" ) ) return XP_INSTANCE_ARCHIVE;
-
-	if ( !strcasecmp( name, "data_instance" ) ) return XP_DATA_INSTANCE;
-
-	if ( !strcasecmp( name, "data_instance_archive" ) ) return XP_DATA_INSTANCE_ARCHIVE;
-
-	if ( !strcasecmp( name, "observers" ) ) return XP_OBSERVERS;
-
-	if ( !strcasecmp( name, "class" ) ) return XP_CLASS;
-
-	// XP_INSTANCEDATA can also be called variables for legacy support
-
-	if ( !strcasecmp( name, "instancedata" ) ) return XP_INSTANCEDATA;
-	if ( !strcasecmp( name, "variables" ) ) return XP_INSTANCEDATA;
-
-	if ( !strcasecmp( name, "dependencies" ) ) return XP_DEPENDENCIES;
-
-	if ( !strcasecmp( name, "index" ) ) return XP_INDEX;
-
-	if ( !strcasecmp( name, "notification" ) ) return XP_NOTIFICATION;
-
-	if ( !strcasecmp( name, "method" ) ) return XP_METHOD;
-
-	if ( !strcasecmp( name, "array" ) ) return XP_ARRAY;
-
-	if ( !strcasecmp( name, "int" ) ) return XP_INT;
-
-	if ( !strcasecmp( name, "float" ) ) return XP_DOUBLE;
-
-	if ( !strcasecmp( name, "list" ) ) return XP_LIST;
-
-	if ( !strcasecmp( name, "hash" ) ) return XP_HASH;
-
-	if ( !strcasecmp( name, "string" ) ) return XP_STRING;
-
-	if ( !strcasecmp( name, "vector" ) ) return XP_VECTOR;
-
-	if ( !strcasecmp( name, "pointer" ) ) return XP_POINTER;
-
-	if ( !strcasecmp( name, "object" ) ) return XP_OBJECT;
-
-	if ( !strcasecmp( name, "data" ) ) return XP_DATA;
-
-	if ( !strcasecmp( name, "matrix" ) ) return XP_MATRIX;
-
-	if ( !strcasecmp( name, "key" ) ) return XP_KEY;
-
-	if ( !strcasecmp( name, "value" ) ) return XP_VALUE;
+	if ( !strcasecmp( name, "array" ) ) return AT_ARRAY;
+	if ( !strcasecmp( name, "int" ) ) return AT_INT;
+	if ( !strcasecmp( name, "float" ) ) return AT_DOUBLE;
+	if ( !strcasecmp( name, "list" ) ) return AT_LIST;
+	if ( !strcasecmp( name, "hash" ) ) return AT_HASH;
+	if ( !strcasecmp( name, "string" ) ) return AT_STRING;
+	if ( !strcasecmp( name, "vector" ) ) return AT_VECTOR;
+	if ( !strcasecmp( name, "pointer" ) ) return AT_POINTER;
+	if ( !strcasecmp( name, "object" ) ) return AT_INSTANCE;
+	if ( !strcasecmp( name, "data" ) ) return AT_DATA;
+	if ( !strcasecmp( name, "matrix" ) ) return AT_MATRIX;
 
 	slMessage( DEBUG_ALL, "warning: unknown tag \"%s\" in XML parse\n", name );
 
 	return -1;
 }
 
-XML_Parser stExternalEntityParserCreate( XML_Parser p, const XML_Char *context, const XML_Char *encoding ) {
-	return XML_ParserCreate( NULL );
-}
-
 void stPrintXMLError( XML_Parser p ) {
 	int line = XML_GetCurrentLineNumber( p );
 	int col = XML_GetCurrentColumnNumber( p );
 
-	slMessage( DEBUG_ALL, "Error at line %d (character %d) of saved simulation file: %s\n", line, col, XML_ErrorString( XML_GetErrorCode( p ) ) );
+	slMessage( DEBUG_ALL, "Error at line %d (character %d) of breve XML archive file: %s\n", line, col, XML_ErrorString( XML_GetErrorCode( p ) ) );
 }
 
 /**
@@ -1401,7 +1207,7 @@ void stPrintXMLError( XML_Parser p ) {
  * Returns an slMalloc'd string.
  */
 
-char *stXMLEncodeString( char *string ) {
+char *brXMLEncodeString( const char *string ) {
 	char *result;
 	int n, m;
 	int size = 0;
@@ -1491,7 +1297,7 @@ char *stXMLEncodeString( char *string ) {
  * Returns an slMalloc'd string.
  */
 
-char *stXMLDecodeString( char *string ) {
+char *brXMLDecodeString( const char *string ) {
 	char *result;
 	int n, m;
 

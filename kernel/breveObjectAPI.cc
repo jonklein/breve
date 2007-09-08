@@ -256,7 +256,7 @@ int brMethodCallByNameWithArgs( brInstance *i, const char *name, const brEval **
  * is executed for the observer.
  */
 
-int brInstanceAddObserver( brInstance *i, brInstance *observer, char *notification, char *mname ) {
+int brInstanceAddObserver( brInstance *i, brInstance *observer, const char *notification, const char *mname ) {
 	brObserver *o;
 	brMethod *method;
 	unsigned char types[] = { AT_INSTANCE, AT_STRING };
@@ -283,7 +283,7 @@ int brInstanceAddObserver( brInstance *i, brInstance *observer, char *notificati
  * instance i.
  */
 
-void brEngineRemoveInstanceObserver( brInstance *i, brInstance *observerInstance, char *notification ) {
+void brEngineRemoveInstanceObserver( brInstance *i, brInstance *observerInstance, const char *notification ) {
 	brObserver *observer;
 
 	if ( i->status == AS_FREED || observerInstance->status == AS_FREED ) 
@@ -465,7 +465,8 @@ char *brInstanceEncodeToString( brEngine *inEngine, brInstance *inInstance ) {
  * 
  */
 
-brInstance *brInstanceDecodeFromString( brEngine *inEngine, int inTypeSignature, char *inData ) {
+brInstance *brInstanceDecodeFromString( brEngine *inEngine, int inTypeSignature, const char *inData ) {
+	// for( 
 	//return breveInstance->object->type->decodeFromString( inEngine, inData );
 
 	return NULL;

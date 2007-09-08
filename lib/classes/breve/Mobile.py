@@ -7,8 +7,6 @@ class Mobile( breve.Real ):
 	def __init__( self ):
 		breve.Real.__init__( self )
 		self.archiveAcceleration = breve.vector()
-		self.archiveLocation = breve.vector()
-		self.archiveRotation = breve.matrix()
 		self.archiveRvelocity = breve.vector()
 		self.archiveVelocity = breve.vector()
 		self.linkForce = breve.vector()
@@ -18,8 +16,6 @@ class Mobile( breve.Real ):
 
 	def archive( self ):
 
-		self.archiveLocation = self.getLocation()
-		self.archiveRotation = self.getRotation()
 		self.archiveVelocity = self.getVelocity()
 		self.archiveRvelocity = self.getRotationalVelocity()
 		self.archiveAcceleration = self.getAcceleration()
@@ -40,11 +36,7 @@ class Mobile( breve.Real ):
 	def dearchive( self ):
 
 		self.realWorldPointer = breve.breveInternalFunctionFinder.linkNew( self)
-		self.realWorldPointer = breve.breveInternalFunctionFinder.linkAddToWorld( self, self.realWorldPointer )
-		self.setCollisionShape( self.collisionShape )
-		self.setDisplayShape( self.displayShape )
-		self.move( self.archiveLocation )
-		self.setRotationMatrix( self.archiveRotation )
+		breve.breveInternalFunctionFinder.linkAddToWorld( self, self.realWorldPointer )
 		self.setVelocity( self.archiveVelocity )
 		self.setRotationalVelocity( self.archiveRvelocity )
 		self.setAcceleration( self.archiveAcceleration )
@@ -139,7 +131,6 @@ class Mobile( breve.Real ):
 
 		self.e = 0.200000
 		self.mu = 0.200000
-		self.color = breve.vector( 1, 1, 1 )
 		self.realWorldPointer = breve.breveInternalFunctionFinder.linkNew( self)
 		breve.breveInternalFunctionFinder.linkAddToWorld( self, self.realWorldPointer )
 		self.setShape( self.controller.getGenericShape() )

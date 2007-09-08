@@ -90,7 +90,7 @@ char *brDataHexEncode( brData *d ) {
 	Used for archiving and XML networking.
 */
 
-brData *brDataHexDecode( char *string ) {
+brData *brDataHexDecode( const char *string ) {
 	unsigned char *tmpData;
 	int length;
 	int n;

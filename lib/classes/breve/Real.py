@@ -6,6 +6,8 @@ class Real( breve.Object ):
 
 	def __init__( self ):
 		breve.Object.__init__( self )
+		self.archiveLocation = breve.vector()
+		self.archiveRotation = breve.matrix()
 		self.bitmap = 0
 		self.collisionHandlerList = breve.objectList()
 		self.collisionShape = None
@@ -59,9 +61,19 @@ class Real( breve.Object ):
 		self.menus.append( newMenu )
 		return newMenu
 
+	def archive( self ):
+
+		self.archiveLocation = self.getLocation()
+		self.archiveRotation = self.getRotation()
+		return breve.Object.archive( self )
+
 	def dearchive( self ):
 		handler = breve.objectList()
 
+		self.setCollisionShape( self.collisionShape )
+		self.setDisplayShape( self.displayShape )
+		self.move( self.archiveLocation )
+		self.setRotationMatrix( self.archiveRotation )
 		for handler in self.collisionHandlerList:
 			if handler[ 1 ]:
 				breve.breveInternalFunctionFinder.addCollisionHandler( self, self, handler[ 0 ], handler[ 1 ] )
@@ -84,6 +96,7 @@ class Real( breve.Object ):
 		self.setTextureScaleY( self.textureScaleY )
 		self.setNeighborhoodSize( self.neighborhoodSize )
 		self.setColor( self.color )
+		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, self.e, self.mu )
 		return breve.Object.dearchive( self )
 
 	def delete( self ):
@@ -230,6 +243,7 @@ class Real( breve.Object ):
 		self.bitmap = -1
 		self.textureScaleX = 16
 		self.textureScaleY = 16
+		self.setColor( breve.vector( 1, 1, 1 ) )
 		self.addMenu( '''Delete Instance''', 'deleteInstance' )
 		self.addMenu( '''Follow With Camera''', 'watch' )
 
@@ -341,7 +355,7 @@ class Real( breve.Object ):
 
 
 		if ( ( not theShape ) or ( not theShape.getPointer() ) ):
-			raise Exception( '''attempt to register Mobile object with uninitialized shape (%s)''' % (  theShape ) )
+			raise Exception( '''attempt to set collision shape of Mobile object with uninitialized shape (%s)''' % (  theShape ) )
 
 
 		if self.collisionShape:
@@ -357,14 +371,16 @@ class Real( breve.Object ):
 
 
 		self.color = newColor
-		breve.breveInternalFunctionFinder.realSetColor( self, self.realWorldPointer, newColor )
+		if self.realWorldPointer:
+			breve.breveInternalFunctionFinder.realSetColor( self, self.realWorldPointer, newColor )
+
 
 	def setDisplayShape( self, theShape ):
 		'''Associates a OBJECT(Shape) object with this object for display purposes only. This shape will not be used for collision detection unless it is passed to  METHOD(set-collision-shape) as well.  Returns this object.'''
 
 
 		if ( ( not theShape ) or ( not theShape.getPointer() ) ):
-			raise Exception( '''attempt to register Mobile object with uninitialized shape (%s)''' % (  theShape ) )
+			raise Exception( '''attempt to set display shape of Mobile object with uninitialized shape (%s)''' % (  theShape ) )
 
 
 		if self.displayShape:
@@ -479,6 +495,7 @@ class Real( breve.Object ):
 		'''Deprecated -- use METHOD(set-texture-image) instead.'''
 
 
+		self.texture = textureNumber
 		breve.breveInternalFunctionFinder.realSetTexture( self, self.realWorldPointer, ( textureNumber + 1 ) )
 
 	def setTextureImage( self, textureImage ):

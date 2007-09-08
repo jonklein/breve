@@ -9,6 +9,9 @@ Object : Real (aka Reals) [version 2.1] {
 	% with any of the child classes.
 
 	+ variables:
+		archiveLocation (vector).
+		archiveRotation (matrix).
+  
 		displayShape, collisionShape (object).
 		realWorldPointer (pointer).
 		collisionHandlerList (list).
@@ -32,6 +35,8 @@ Object : Real (aka Reals) [version 2.1] {
 
 		textureScaleX = 16.
 		textureScaleY = 16.
+
+		self set-color to ( 1, 1, 1 ).
 
 		self add-menu named "Delete Instance" for-method "delete-instance".
 		self add-menu named "Follow With Camera" for-method "watch".
@@ -145,6 +150,7 @@ Object : Real (aka Reals) [version 2.1] {
 
 
 + section "Setting the Shape of a Real Object"
+
 	+ to set-shape to theShape (object):
 		% Sets the shape of this object, for both display and collision detection purposes.  To
 		% set the shape for one purpose, but not the other, use the methods METHOD(set-display-shape)
@@ -412,7 +418,8 @@ Object : Real (aka Reals) [version 2.1] {
 
 		color = newColor.
 
-		realSetColor(realWorldPointer, newColor).
+		if realWorldPointer: 
+			realSetColor(realWorldPointer, newColor).
 
 	+ to enable-shadows:
 		% If shadow volumes are enabled (see OBJECT(Control)), enables shadow volumes for this object.
@@ -429,6 +436,7 @@ Object : Real (aka Reals) [version 2.1] {
 	- to set-texture to textureNumber (int):
 		% Deprecated -- use METHOD(set-texture-image) instead.
 
+		texture = textureNumber.
 		realSetTexture(realWorldPointer, textureNumber + 1).
 
 	+ to set-texture-image to textureImage (object):
@@ -436,8 +444,10 @@ Object : Real (aka Reals) [version 2.1] {
 		% class Image.  If textureImage is NULL texturing is turned off for 
 		% the object.
 
-		if !textureImage: texture = -1.
-		else texture = (textureImage get-texture-number).
+		if !textureImage: 
+			texture = -1.
+		else 
+			texture = (textureImage get-texture-number).
 
 		realSetTexture(realWorldPointer, texture).
 
@@ -478,8 +488,10 @@ Object : Real (aka Reals) [version 2.1] {
 		% class image.  If bitmapImage is NULL, bitmapping is turned off
 		% for the object.
 
-		if !bitmapImage: bitmap = -1.
-		else bitmap = (bitmapImage get-texture-number).
+		if !bitmapImage: 
+			bitmap = -1.
+		else 
+			bitmap = (bitmapImage get-texture-number).
 
 		realSetBitmap(realWorldPointer, bitmap).
 		
@@ -544,7 +556,7 @@ Object : Real (aka Reals) [version 2.1] {
 		if realWorldPointer: return realGetLightExposure(realWorldPointer).
 		else return 0.
 
-	+ section "Handling Collisions"
++ section "Handling Collisions"
 
 	+ to handle-collisions with-type theType (string) with-method theMethod (string):
 		% Adds a collision handler for this object.  When a collision
@@ -562,25 +574,45 @@ Object : Real (aka Reals) [version 2.1] {
 		push { theType, 0, 1 } onto collisionHandlerList.
 		setIgnoreCollisionsWith(self, theType, 1).
 
+	+ to archive:
+		archiveLocation = (self get-location).
+		archiveRotation = (self get-rotation).
+
+		return ( super archive ).
+		
+
 	+ to dearchive:
 		handler (list).
+
+ 		self set-collision-shape to collisionShape.
+		self set-display-shape to displayShape.
+		self move to archiveLocation.
+		self set-rotation-matrix to archiveRotation.
 
 		foreach handler in collisionHandlerList: {
 		 	if handler{1}: addCollisionHandler(self, handler{0}, handler{1}).
 			if handler{2}: setIgnoreCollisionsWith(self, handler{0}, 1).
 		}
 
-		if texture > -1: self set-texture to texture.
-		if lightmap > -1: self set-lightmap to lightmap.
-		if bitmap > -1: self set-bitmap to bitmap.
+		if texture > -1: 
+			self set-texture to texture.
+
+		if lightmap > -1: 
+			self set-lightmap to lightmap.
+
+		if bitmap > -1: 
+			self set-bitmap to bitmap.
+
 		self set-texture-scale-x to textureScaleX.
 		self set-texture-scale-y to textureScaleY.
 		self set-neighborhood-size to neighborhoodSize.
 		self set-color to color.
 
+		realSetCollisionProperties( realWorldPointer, e, mu ).
+
 		return (super dearchive).
 
-  + section "Useful Funtions for Sensors"
++ section "Useful Funtions for Sensors"
 
 	+ to raytrace from-location theLocation (vector) with-direction theDirection (vector):
 		% Computes the vector from theLocation towards theDirection

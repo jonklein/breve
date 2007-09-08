@@ -25,7 +25,7 @@ class FFNetwork( breve.NeuralNetwork ):
 		if ( self.layers == 0 ):
 			self.inputLayer = newLayer
 
-		self.layers[ self.layers ] = newLayer
+		self.layers[ breve.length( self.layers ) ] = newLayer
 		self.outputLayer = newLayer
 
 	def destroy( self ):

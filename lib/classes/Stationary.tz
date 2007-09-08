@@ -15,8 +15,6 @@ Real : Stationary (aka Stationaries) [version 2.4] {
 	+ variables:
 		shadowCatcher (int).
 
-		objectLocation (vector).
-
   + section "Setting Up the Stationary Object"
 
 	- to register with-shape theShape (object) at-location theLocation = (0, 0, 0) (vector) with-rotation theRotation = [ ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) ] (matrix) :
@@ -31,8 +29,8 @@ Real : Stationary (aka Stationaries) [version 2.4] {
 
 	+ to init:
 		realWorldPointer = addStationary( ( ( controller get-generic-shape ) get-pointer ), ( 0, 0, 0 ), [ ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) ] ).
-		self set-texture to 0.
 
+		self set-texture to 0.
 		self set-shape to (controller get-generic-shape).
 
 		return self.
@@ -65,22 +63,13 @@ Real : Stationary (aka Stationaries) [version 2.4] {
 		setShadowCatcher(realWorldPointer, (0, 1, 0)).
 		controller set-floor-defined.
 
-	+ to archive:
-		return 1.
-
 	+ to dearchive:
 		realWorldPointer = addStationary( ( ( controller get-generic-shape ) get-pointer ), ( 0, 0, 0 ), [ ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) ] ).
-
-		super dearchive.
-
-		self move to objectLocation.
-		self set-display-shape to displayShape.
-		self set-collision-shape to collisionShape.
 
 		if shadowCatcher: 
 			self catch-shadows.
 
-		return 1.
+		return ( super dearchive ).
 }
 
 Stationary : Floor {

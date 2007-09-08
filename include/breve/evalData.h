@@ -19,8 +19,8 @@
  *****************************************************************************/
 
 /*!
-	\brief Holds arbitrary data of a given length.
-*/
+ * \brief Pointer data with a length value attached
+ */
 
 class brData: public brEvalObject {
 	public:
@@ -38,8 +38,8 @@ void brDataRetain(brData *);
 void brDataUnretain(brData *);
 void brDataCollect(brData *);
 
-char *brDataHexEncode(brData *);
-brData *brDataHexDecode(char *);
+char *brDataHexEncode( brData * );
+brData *brDataHexDecode( const char * );
 #ifdef __cplusplus
 }
 #endif

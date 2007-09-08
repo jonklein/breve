@@ -423,14 +423,17 @@ Abstract : Control (aka Controls) [version 2.3] {
 	+ to set-background-texture-image to newTextureImage (object):
 		% Sets the background color of the rendered world to newTexture.
 		% newTexture must be a texture returned by the method 
-		% METHOD(load-image) or 0 for the default texture.  Setting
-		% the texture to -1 will turn off background texturing.
+		% METHOD(load-image).  Setting the texture to -1 will turn off 
+		% background texturing.
 
-		backgroundTexture = (newTextureImage get-texture-number).
-		setBackgroundTexture(backgroundTexture).
+		# For dumb legacy reasons, we increment the background-texture number by 1 in set-background-texture,
+		# so take away 1 here to componsate during dearchiving.
+
+		backgroundTexture = ( newTextureImage get-texture-number ) - 1.
+		setBackgroundTexture( ( newTextureImage get-texture-number ) ).
 
 	- to set-background-texture to newTexture (int):
-		backgroundTexture = newTexture + 1.
+		backgroundTexture = newTexture.
 		setBackgroundTexture(newTexture + 1).
 
   + section "Camera & Lighting Options"
@@ -1014,7 +1017,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 		image = new Image.
 
 		if (image load from file): {
-			loadedImages{ loadedImages } = file.
+			push file onto loadedImages.
 		} else {
 			free image.
 			return -1.
@@ -1108,6 +1111,8 @@ Abstract : Control (aka Controls) [version 2.3] {
 	+ to archive:
 		camTarget = cameraGetTarget().
 		camOffset = cameraGetOffset().
+		print loadedImages.
+
 		return (super archive).
 
 	+ to dearchive:
@@ -1117,15 +1122,22 @@ Abstract : Control (aka Controls) [version 2.3] {
 		cameraPointer = getMainCameraPointer().
 		camera set-camera-pointer to cameraPointer.
 
-		foreach image in loadedImages: images{ images } = image.
-		foreach image in images: (self load-image from image).
+		images = copylist( loadedImages ).
+
+		loadedImages = {}.
+
+		foreach image in images: 
+			(self load-image from image).
 
 		self move-light to lightPosition.
+
 		self set-background-texture to backgroundTexture.
 		self set-background-color to backgroundColor.
 		self set-fog-color to fogColor.
 		self point-camera at camTarget from camOffset.
 		self set-blur-factor to blurFactor.
+
+		print backgroundColor, fogColor , backgroundTexture.
 
 		if lightFlag == 1: self enable-lighting.
 		if shadowFlag == 1: self enable-shadows.
@@ -1138,7 +1150,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 		if drawEveryFrame: (self enable-draw-every-frame).
 		else (self disable-draw-every-frame).
 
-		return 1.
+		return ( super dearchive ).
 
  	+ to save-as-xml file filename (string):
 		% Writes the entire state of the world to an XML file, filename.  

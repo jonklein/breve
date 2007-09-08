@@ -171,16 +171,16 @@ class brEngine {
 
 		std::map< std::string, brObject* > objectAliases;
 		std::map< std::string, brObject* > objects;
-		brNamespace *internalMethods;
+		brNamespace 			*internalMethods;
 
-		std::vector< brInstance* > postIterationInstances;
-		std::vector< brInstance* > iterationInstances;
-		std::vector< brInstance* > instances;
+		std::vector< brInstance* > 	postIterationInstances;
+		std::vector< brInstance* > 	iterationInstances;
+		std::vector< brInstance* > 	instances;
 	
-		std::vector< brInstance* > instancesToAdd;
-		std::vector< brInstance* > instancesToRemove;
+		std::vector< brInstance* > 	instancesToAdd;
+		std::vector< brInstance* > 	instancesToRemove;
 
-		std::vector<brEvent*> events;
+		std::vector< brEvent* > 	events;
 
 		// runtime error info 
 

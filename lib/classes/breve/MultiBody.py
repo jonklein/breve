@@ -32,6 +32,16 @@ class MultiBody( breve.Object ):
 		self.menus.append( newMenu )
 		return newMenu
 
+	def archive( self ):
+		links = breve.objectList()
+		i = None
+
+		links = self.getAllConnectedObjects()
+		for i in links:
+			self.addDependency( i )
+
+		return 1
+
 	def checkSelfPenetration( self ):
 		'''Checks to see if this MultiBody is colliding with itself.   This method is useful when a MultiBody is first built  to determine whether the "native" configuration of the body  is valid or not.  If the body is in a conflicting configuration  when it's first built, it may lead to unexpected behaviors as the body attempts to correct itself.'''
 

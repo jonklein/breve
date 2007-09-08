@@ -336,7 +336,7 @@ int stLoadSavedSimulation( stSteveData *sdata, brEngine *engine, const char *cod
 		return EC_ERROR;
 	}
 
-	if ( stXMLInitSimulationFromFile( engine, xmlpath ) ) {
+	if ( brXMLInitSimulationFromFile( engine, xmlpath ) ) {
 		slFree( xmlpath );
 		return EC_ERROR;
 	}

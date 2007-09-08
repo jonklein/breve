@@ -71,7 +71,7 @@ PhysicalControl : VirtualCreatures {
 
 		self update-text.
 
-		self schedule method-call "archive-sim" at-time 10.
+		# self schedule method-call "archive-sim" at-time 10.
 
 	+ to archive-sim:
 		self save-as-xml file "sim.xml".
@@ -191,10 +191,16 @@ GeneticAlgorithm : SimsGA {
 GeneticAlgorithmIndividual : SimsGAIndividual {
 	+ variables:
 		genome (object).
+		h (hash).
 
 	+ to init:
 		genome = new GADirectedGraph.
 		self randomize.
+
+		h{ "123" } = new Object.
+		h{ 10 } = 40.
+
+		print h{ 10 }.
 
 		self add-dependency on genome.
 
