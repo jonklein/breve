@@ -282,6 +282,8 @@ int brXMLWriteObject( brXMLArchiveRecord *record, FILE *file, brInstance *inInst
 
 void stXMLWriteObjectVariables( brXMLArchiveRecord *inRecord, FILE *inFP, stInstance *inInstance, int inSpaces ) {
 	stObject *o = inInstance->type;
+	
+	std::string result;
 
 	while ( o ) {
 		std::map< std::string, stVar* >::iterator vi;
@@ -577,6 +579,37 @@ const std::string *brXMLDOMElement::getAttr( const char *inAttr ) {
 	return &_attrs[ key ];
 }
 
+std::string brXMLDOMElement::toXMLString( int inDepth ) {
+	std::string xml;
+	
+	for( int s = 0; s < inDepth * 2; s++ ) xml += " ";
+
+	xml += "<" + _name;
+	
+	std::map< std::string, std::string >::iterator ai;
+	
+	for( ai = _attrs.begin(); ai != _attrs.end(); ai++ ) {
+		xml += " " + ai->first + "=\"" + ai->second + "\"";
+	}
+
+	xml += ">\n";
+
+	if( _cdata.size() > 0 )
+		xml += _cdata + "\n";
+	
+	for( unsigned int n = 0; n < _children.size(); n++ ) {
+		
+		xml += _children[ n ]->toXMLString( inDepth + 1 );
+
+	}
+
+	for( int s = 0; s < inDepth * 2; s++ ) xml += " ";
+	
+	xml += "</" + _name + ">\n";
+	
+	return xml;
+}
+
 void brXMLStartElementHandler( void *inUserData, const XML_Char *inName, const XML_Char **inAttrs ) {
 	brXMLState *state = (brXMLState*)inUserData;
 
@@ -685,7 +718,7 @@ int stXMLReadObjectFromString( stInstance *i, char *buffer ) {
 		
 		int ind = atoi( instindex->c_str() );
 			
-		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState.indexToInstanceMap[ ind ] ) != EC_OK ) 
+		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState._indexToInstanceMap[ ind ] ) != EC_OK ) 
 			return EC_ERROR;
 	}
 
@@ -776,13 +809,13 @@ brInstance *brXMLDearchiveObjectFromString( brEngine *e, char *buffer ) {
 		
 		int i = atoi( instindex->c_str() );
 			
-		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState.indexToInstanceMap[ i ] ) != EC_OK ) 
+		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState._indexToInstanceMap[ i ] ) != EC_OK ) 
 			return NULL;
 	}
 
 	brXMLRunDearchiveMethods( &parserState );
 
-	return parserState.indexToInstanceMap[ archivedIndex ];
+	return parserState._indexToInstanceMap[ archivedIndex ];
 }
 
 
@@ -859,12 +892,12 @@ int brXMLInitSimulationFromString( brEngine *e, char *buffer ) {
 		
 		int i = atoi( instindex->c_str() );
 			
-		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState.indexToInstanceMap[ i ] ) != EC_OK ) 
+		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState._indexToInstanceMap[ i ] ) != EC_OK ) 
 			return EC_ERROR;
 	}
 
 
-	brEngineSetController( e, parserState.indexToInstanceMap[ controllerIndex ] );
+	brEngineSetController( e, parserState._indexToInstanceMap[ controllerIndex ] );
 
 	if ( brXMLRunDearchiveMethods( &parserState ) ) {
 		slMessage( DEBUG_ALL, "Error loading archived simulation: dearchive method failed\n" );
@@ -882,8 +915,8 @@ int brXMLRunDearchiveMethods( brXMLParserState *s ) {
 	int r;
 	brEval result;
 
-	for ( unsigned int n = 0; n < s->dearchiveOrder.size(); n++ ) {
-		brInstance *instance = s->dearchiveOrder[ n ];
+	for ( unsigned int n = 0; n < s->_dearchiveOrder.size(); n++ ) {
+		brInstance *instance = s->_dearchiveOrder[ n ];
 
 		if ( instance ) {
 
@@ -930,55 +963,12 @@ int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, brXMLParserState *inState 
 
 		i->breveInstance = brEngineAddInstance( inState->engine, object, i );
 
-		inState->indexToInstanceMap[ instanceindex ] = i->breveInstance;
+		inState->_indexToInstanceMap[ instanceindex ] = i->breveInstance;
 		
-		inState -> dearchiveOrder.push_back( i->breveInstance );
+		inState->_dearchiveOrder.push_back( i->breveInstance );
 	}
 
 	return 0;
-}
-
-/**
- * Dearchive a steve instance by filling in its variables.
- *
- * This method operates on steve objects only
- */
-
-int stXMLParseInstanceData( brXMLParserState *inState, brXMLDOMElement *inInstanceData, stInstance *outInstance ) {
-
-	std::vector< brXMLDOMElement* > classes   = inInstanceData->getElementsByName( "class" );
-
-	// From the base class down to the derived class, we go through and set the variables for each one
-
-	for( unsigned int n = 0; n < classes.size(); n++ ) {
-		brXMLDOMElement *cls = classes[ n ];
-
-		stRunInstance ri;
-
-		ri.instance = outInstance;
-		ri.type = ( stObject* )( brObjectFind( inState->engine, cls->getAttr( "name" )->c_str() ) ) -> userData;
-			
-		for( unsigned int e = 0; e < cls->_children.size(); e++ ) {
-			brEval eval;
-			brXMLDOMElement *variable = cls->_children[ e ];
-		
-			// Decode the eval and save it to the steve object
-		
-			brXMLParseEval( inState, variable, &eval );
-
-			stVar *var = stObjectLookupVariable( outInstance->type, variable -> getAttr( "name" ) -> c_str() );
-
-			if( ! var ) {
-				slMessage( DEBUG_ALL, "Could not locate matching class variable for XML data\n" );
-				slMessage( DEBUG_ALL, "Cannot decode XML archive: mismatch between simulation file and XML data\n" );
-				return EC_ERROR;
-			}
-	
-			stSetVariable( &outInstance->variables[ var->offset ], var->type->_type, NULL, &eval, &ri );
-		}
-	}
-
-	return EC_OK;
 }
 
 
@@ -1024,7 +1014,7 @@ void brXMLParseEval( brXMLParserState *inState, brXMLDOMElement *inElement, brEv
 		case AT_INSTANCE:
 			index = atoi( inElement->getAttr( "index" )->c_str() );
 
-			outEval->set( inState->indexToInstanceMap[ index ] );
+			outEval->set( inState->_indexToInstanceMap[ index ] );
 	
 			break;
 
@@ -1110,7 +1100,7 @@ int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceE
 		for( i = 0; i < dependencyList.size(); i++ ) {		
 			int dependencyIndex = atoi( dependencyList[ i ]->getAttr( "index" )->c_str() );
 		
-			brInstance *dependency = inState->indexToInstanceMap[ dependencyIndex ];
+			brInstance *dependency = inState->_indexToInstanceMap[ dependencyIndex ];
 
 			if( dependency )
 				brInstanceAddDependency( outInstance, dependency );
@@ -1139,6 +1129,10 @@ int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceE
 		int typeSignature = 0xffffffff;
 		brInstanceDecodeFromString( inState->engine, typeSignature, data[ 0 ]->_cdata.c_str() );
 
+
+//		std::string s = data[ 0 ]->toXMLString();
+//		
+//		printf( s.c_str() );
 	}
 
 	return stXMLParseInstanceData( inState, data[ 0 ], (stInstance*)outInstance -> userData );
@@ -1156,7 +1150,7 @@ void brXMLDecodeObserver( brXMLParserState *inState, brXMLDOMElement *inObserver
 	
 	if( observerElement ) {
 		int observerIndex = atoi( observerElement->getAttr( "index" )->c_str() );
-		observer = inState->indexToInstanceMap[ observerIndex ];
+		observer = inState->_indexToInstanceMap[ observerIndex ];
 	}
 
 	if( methodElement )
@@ -1341,4 +1335,63 @@ char *brXMLDecodeString( const char *string ) {
 	result[ m ] = 0;
 
 	return result;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Dearchive a steve instance by filling in its variables.
+ *
+ * This method operates on steve objects only
+ */
+
+int stXMLParseInstanceData( brXMLParserState *inState, brXMLDOMElement *inInstanceData, stInstance *outInstance ) {
+
+	std::vector< brXMLDOMElement* > classes   = inInstanceData->getElementsByName( "class" );
+
+	// From the base class down to the derived class, we go through and set the variables for each one
+
+	for( unsigned int n = 0; n < classes.size(); n++ ) {
+		brXMLDOMElement *cls = classes[ n ];
+
+		stRunInstance ri;
+
+		ri.instance = outInstance;
+		ri.type = ( stObject* )( brObjectFind( inState->engine, cls->getAttr( "name" )->c_str() ) ) -> userData;
+			
+		for( unsigned int e = 0; e < cls->_children.size(); e++ ) {
+			brEval eval;
+			brXMLDOMElement *variable = cls->_children[ e ];
+		
+			// Decode the eval and save it to the steve object
+		
+			brXMLParseEval( inState, variable, &eval );
+
+			stVar *var = stObjectLookupVariable( outInstance->type, variable -> getAttr( "name" ) -> c_str() );
+
+			if( ! var ) {
+				slMessage( DEBUG_ALL, "Could not locate matching class variable for XML data\n" );
+				slMessage( DEBUG_ALL, "Cannot decode XML archive: mismatch between simulation file and XML data\n" );
+				return EC_ERROR;
+			}
+	
+			stSetVariable( &outInstance->variables[ var->offset ], var->type->_type, NULL, &eval, &ri );
+		}
+	}
+
+	return EC_OK;
 }

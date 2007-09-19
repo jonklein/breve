@@ -51,11 +51,11 @@ struct brXMLParserState {
 		error = 0;
 	}
 
-	int error;
-	brEngine *engine;
+	int 				error;
+	brEngine*			engine;
 
-	std::map< int, brInstance* > indexToInstanceMap;
-	std::vector< brInstance* > dearchiveOrder;
+	std::map< int, brInstance* > 	_indexToInstanceMap;
+	std::vector< brInstance* > 	_dearchiveOrder;
 };
 
 struct brXMLDOMElement {
@@ -74,7 +74,7 @@ struct brXMLDOMElement {
 	brXMLDOMElement*				getChildByName( const char *inStr );
 	const std::string*				getAttr( const char *inAttr );
 
-	std::string					toXMLString();
+	std::string					toXMLString( int inDepth = 0 );
 };
 
 int brXMLAssignIndices( brEngine *, std::map< brInstance*, int>& );

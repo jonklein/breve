@@ -123,17 +123,19 @@ int brIRandomSeedFromDevRandom( brEval args[], brEval *target, brInstance *i ) {
 	f = fopen( "/dev/random", "r" );
 
 	if ( !f || !fread( &seed, sizeof seed, 1, f ) || !seed ) {
-		if ( f ) fclose( f );
+		if ( f ) 
+			fclose( f );
 
 		if (( f = fopen( "/dev/urandom", "r" ) ) )
 			fread( &seed, sizeof seed, 1, f );
 	}
 
-	if ( f ) fclose( f );
+	if ( f ) 
+		fclose( f );
 
 	if ( seed ) {
 
-		target->set( 0 );
+		target->set( (int)seed );
 
 		slMessage( DEBUG_ALL, "read seed %u from random device\n", seed );
 

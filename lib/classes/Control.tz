@@ -314,7 +314,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 		% multiple runs, and this will make you unhappy.  Using this method
 		% will restore happiness and harmony to your life.
 
-		randomSeedFromDevRandom().
+		return randomSeedFromDevRandom().
 
   + section "Creating a New Instance From a Classname String"
 
