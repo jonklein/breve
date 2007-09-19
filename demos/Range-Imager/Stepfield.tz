@@ -1,0 +1,252 @@
+#
+# A demonstration showing the generation and recording of range images. 
+# Based on Jon Klein's demo of things smashing into eachother.
+# Original version: Claude Sammut; 
+# modified for range imaging by Waleed Kadous. 
+# jon klein <jk [at] spiderland.org>
+#
+
+@use Control.
+@use Real.
+@use Braitenberg.
+@use Image. 
+
+@define FRAME_COLOR (0,0.6,0.1).
+@define BLOCK_COLOR (0.3,0.3,0.2). 
+@define BLOCK_SCALE 0.25.
+
+Controller BraitenbergStepfield.
+
+BraitenbergControl : BraitenbergStepfield
+{
+    + variables:
+        vehicle, body (object).
+        wheels, stepfield (list).
+        neighbours (list).
+        left-front-wheel, right-front-wheel, left-rear-wheel, right-rear-wheel (object).
+        left-speed, right-speed (float).
+	frameCount (int). 
+        video (object). 
+	depth (object). 
+
+    + to init:
+        self enable-fast-physics.
+        self set-fast-physics-iterations to 15.
+ 
+        vehicle = new BraitenbergHeavyVehicle.
+        body = vehicle get-root.
+        body set-neighborhood-size to 10.0.
+
+        push (left-front-wheel  = (vehicle add-wheel at ( 1.5, 0, -1.5))) onto wheels.
+        push (right-front-wheel = (vehicle add-wheel at ( 1.5, 0,  1.5))) onto wheels.
+        push (left-rear-wheel   = (vehicle add-wheel at (-1.5, 0, -1.5))) onto wheels.
+        push (right-rear-wheel  = (vehicle add-wheel at (-1.5, 0,  1.5))) onto wheels.
+
+        left-front-wheel  set-neighborhood-size to 3.0.
+        right-front-wheel set-neighborhood-size to 3.0.
+        left-rear-wheel   set-neighborhood-size to 3.0.
+        right-rear-wheel  set-neighborhood-size to 3.0.
+
+        left-speed = 0.0.
+        right-speed = 0.0.
+        wheels set-natural-velocity to 0.0.
+	
+        # It can be tricky getting wheeled vehicles to work at high speeds
+        # without the wheels slipping or becoming unstable.  The friction
+        # settings below help out in this respect.
+
+        all Stationaries set-mu to 40.0.
+        all BraitenbergWheels set-mu to 40.0.
+ 
+        # set up camera
+        self watch item vehicle.
+
+        self set-camera-offset to (-11.0, 10.0, 0).
+        self reset.
+	
+	
+	video = (new Image).
+	# If you were to use the read-pixel and read-depth buffers
+	# directly, you would have to initialise it to the appropriate size. 
+
+	#video set-size width 176 height 144. 
+	#depth = (new Image).  
+	#depth set-size width 176 height 144. 
+	
+
+
+    + to reset:
+        all Mobiles set-velocity to (0, 0, 0).
+        vehicle rotate around-axis (1, 0, 0) by 0.
+        vehicle move to (-10, .8, 0).
+	stepfield = { (new Pallet init-with x 0 z -5) }.
+ 
+    + to catch-key-left-down:
+        self turn-left.
+
+    + to catch-key-right-down:
+        self turn-right.
+
+    + to catch-key-up-down:
+        self go-forward.
+
+    + to catch-key-down-down:
+        self go-backward.
+
+    + to go-forward:
+        left-speed = right-speed = 7.0.
+        wheels set-natural-velocity to 7.0.
+
+    + to go-backward:
+        left-speed = right-speed = -5.0.
+        wheels set-natural-velocity to -5.0.
+
+    + to turn-left:
+        left-speed = -5.0.
+        right-speed = 10.0.
+        left-front-wheel set-natural-velocity to left-speed.
+        left-rear-wheel set-natural-velocity to left-speed.
+        right-front-wheel set-natural-velocity to right-speed.
+        right-rear-wheel set-natural-velocity to right-speed.
+
+    + to turn-right:
+        left-speed = 10.0.
+        right-speed = -5.0.
+        left-front-wheel set-natural-velocity to left-speed.
+        left-rear-wheel set-natural-velocity to left-speed.
+        right-front-wheel set-natural-velocity to right-speed.
+        right-rear-wheel set-natural-velocity to right-speed.
+
+    + to iterate:
+        super iterate.
+        self update-neighbors.
+        neighbours = body get-neighbors.
+
+   + to post-iterate:
+	frameCount = frameCount+1. 
+	video snapshot to "imgs/video-$frameCount.png". 
+	video snapshotDepth to "imgs/depth-$frameCount.png" linearize 1 max-dist 10.
+	# As an alternative to the above, you can use read-pixels and read-depth to
+	# save the files. However, this is much slower than the snapshot above. 
+	#video read-pixels at-x 0 at-y 0.
+	#depth read-depth at-x 0 at-y 0 linearize 1 max-dist 10. 
+	#video write to "imgs/video-$frameCount.png". 
+	#depth writeGray16 to "imgs/depth-$frameCount.png". 
+}
+
+Object : Frame
+{
+    + variables:
+        front, back, left, right (object).
+        height (float).
+
+    + to init-with x xpos (float) z zpos (float):
+        height = 2*BLOCK_SCALE.
+
+        front = new Mobile.
+        front set-shape to (new Cube init-with size (1, height, 11)).
+        front move to (xpos - 1, 0.5*height+0.1, zpos + (11.0/2.0) - 0.5).
+        front set-color to FRAME_COLOR.
+        front enable-physics.
+
+        back = new Mobile.
+        back set-shape to (new Cube init-with size (1, height, 11)).
+        back move to (xpos + 11, 0.5*height+0.1, zpos + (11.0/2.0) - 0.5).
+        back set-color to FRAME_COLOR.
+        back enable-physics.
+
+        left = new Mobile.
+        left set-shape to (new Cube init-with size (11, height, 1)).
+        left move to (xpos + (11.0/2.0 - 0.5), 0.5*height+0.1, zpos - 1).
+        left set-color to FRAME_COLOR.
+        left enable-physics.
+
+        right = new Mobile.
+        right set-shape to (new Cube init-with size (11, height, 1)).
+        right move to (xpos + (11.0/2.0 - 0.5), 0.5*height+0.1, zpos + 11).
+        right set-color to FRAME_COLOR.
+        right enable-physics.
+	return self. 
+
+    + to get-height:
+        return height.
+
+    + to destroy: 
+	free front. 
+	free back. 
+	free left. 
+	free right. 
+}
+
+Object : Pallet
+{
+    +variables:
+        blocks (list).
+	texture (object).
+	outsideFrame (object).  
+
+    +to init-with x xpos(int) z zpos(int):
+        x, z (int).
+        row (list).
+        height (float).
+        outsideFrame = (new Frame init-with x (xpos+0.1) z (zpos+0.1)).
+        for x = 0, x < 11, x++:
+        {
+                row = 11 new Bricks.
+                for z = 0, z < 11, z++:
+                {
+                        height = row {z} get-height.
+                        row {z} move to (xpos+x+0.1, 0.5*height + 0.1, zpos+z+0.1).
+                      	row {z} set-color to BLOCK_COLOR. 
+		}
+                push row onto blocks.
+                row set-rotation to [ (1, 0, 0), (0, 1, 0), (0, 0, 1) ].
+        }
+        return self.
+
+   + to print-blocks expId expId (int):
+
+	row (int).
+	column (int).
+	blockHeight (int).  
+	for row=0, row < 11, row++: {
+	    for column=0, column < 11, column++: {
+		blockHeight = ((blocks {row} {column}) block-height).
+		print "block($expId,$row,$column,$blockHeight).".
+	    }	
+	}
+
+   + to destroy:
+	blockList (list).
+	block (object). 
+	free outsideFrame. 
+	foreach blockList in blocks: {
+	    foreach block in blockList: {
+		free block. 
+	    }
+	}
+
+}
+
+
+    
+Mobile : Brick (aka Bricks)
+{
+    + variables:
+        height (float).
+	blockHeight (int). 
+
+    + to init:
+	blockHeight = (random[3] + 1).
+        height = BLOCK_SCALE * blockHeight. 
+        self set-shape to ( new Cube init-with size (1, height, 1) ).
+	self enable-physics.
+
+    + to get-height:
+        return height.
+
+    + to destroy: 
+	super destroy. 
+    + to block-height:
+	return blockHeight. 
+}

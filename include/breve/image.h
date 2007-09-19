@@ -27,8 +27,9 @@ unsigned char *slReadPNGImage( const char *name, int *width, int *height, int *c
 
 unsigned char *slReadImage( const char *name, int *height, int *width, int *components, int alpha );
 
-int slPNGWrite( const char *name, int w, int h, unsigned char *buffer, int channels, int reversed );
+int slPNGWrite( const char *name, int w, int h, unsigned char *buffer, int channels, int reversed, int bit_depth );
 
 int slPNGSnapshot( slWorld *w, slCamera *c, const char *file );
+int slPNGSnapshotDepth ( slWorld *w, slCamera *c, const char *file, int lin, double maxRange);
 
 void slReversePixelBuffer( const unsigned char *source, unsigned char *dest, int width, int height );

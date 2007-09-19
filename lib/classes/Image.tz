@@ -191,6 +191,20 @@ Abstract : Image (aka Images) [version 2.0] {
 
 		imageReadPixels(imageData, x, y).
 
+	+ to read-depth at-x x (int) at-y y (int) linearize lin (int) max-dist dist (float):
+		% Reads the depth into this Image from the rendered image on the 
+		% screen.  The resulting image can be written to a file or 
+		% analyzed if desired.  This is only supported in graphical
+		% versions of breve.
+		% The linearize option (if true) linearizes the depth buffer to a maximum 
+		% distance so that for each pixel, the value corresponds to the distance from 
+		% the centre of the camera. Values above the maximum distance (max-dist) are 
+		% set to the maximum distance. 
+		% If linearize is false, then this returns the raw depth buffer. 
+		% This is considerably faster, but the values are not linear in the distance. 
+
+		imageReadDepthBuffer(imageData, x, y, lin, dist).
+
   + section "Getting a Pointer to Pixel Data"
 
 	+ to get-pixel-pointer:
@@ -214,7 +228,7 @@ Abstract : Image (aka Images) [version 2.0] {
 		% Write the image to imageFile.  The image is written as a 
 		% PNG file, so imageFile should end with .PNG.
 
-		imageWriteToFile(imageData, imageFile).
+		imageWriteToFile( imageData, imageFile, 4, 8 ).
 
 	+ to archive:
 		textureNumber = -1.
@@ -223,4 +237,19 @@ Abstract : Image (aka Images) [version 2.0] {
 	+ to dearchive:
 		self set-size width currentWidth height currentHeight.
 		return (super dearchive).
+
+	+ to writeGray16 to imageFile (string):
+		% Write the image to imageFile.  The image is written as a 
+		% PNG file, so imageFile should end with .PNG.
+
+		imageWriteToFile( imageData, imageFile, 1, 16 ).
+	
+   + section "Taking snapshots" 
+
+	+ to snapshot to imageFile (string): 
+		snapshot(imageFile).
+	
+	+ to snapshotDepth to imageFile (string) linearize lin (int) max-dist dist (float):
+		snapshotDepth(imageFile,lin,dist). 
+
 }

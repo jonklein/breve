@@ -606,10 +606,12 @@ unsigned char *slReadPNGImage( const char *name, int *width, int *height, int *c
 
 	The number of channels may be 1 (b/w), 2 (b/w + alpha), 3 (rgb) or 4 (rgba).
 	The reversed flag indicates whether the rows should be read top-to-bottom or
-	bottom-to-top.
+	bottom-to-top. The bit depth says how many bits are required to represent each 
+	pixel. This would typically be either 8 or 16 bits (typically for z buffers). 
+
 */
 
-int slPNGWrite( const char *name, int width, int height, unsigned char *buffer, int channels, int reversed ) {
+int slPNGWrite( const char *name, int width, int height, unsigned char *buffer, int channels, int reversed , int bit_depth) {
 	FILE *fp;
 	png_structp png_ptr;
 	png_infop info_ptr;
@@ -645,10 +647,10 @@ int slPNGWrite( const char *name, int width, int height, unsigned char *buffer, 
 
 	if ( !reversed )
 		for ( n = 0; n < height; n++ )
-			rowPtrs[n] = &buffer[n * ( width * channels )];
+			rowPtrs[n] = &buffer[n * ( width * channels * bit_depth/8 )];
 	else
 		for ( n = 0; n < height; n++ )
-			rowPtrs[height - ( n + 1 )] = &buffer[n * ( width * channels )];
+			rowPtrs[height - ( n + 1 )] = &buffer[n * ( width * channels * bit_depth/8)];
 
 	png_init_io( png_ptr, fp );
 
@@ -656,7 +658,10 @@ int slPNGWrite( const char *name, int width, int height, unsigned char *buffer, 
 
 	info_ptr->height = height;
 
-	info_ptr->bit_depth = 8;
+	info_ptr->bit_depth = bit_depth;
+
+
+	// printf("Bit depth: %d\n", bit_depth); 
 
 	switch ( channels ) {
 
@@ -683,8 +688,15 @@ int slPNGWrite( const char *name, int width, int height, unsigned char *buffer, 
 
 	png_set_rows( png_ptr, info_ptr, rowPtrs );
 
-	png_write_png( png_ptr, info_ptr, 0, NULL );
+	if(bit_depth > 8 ){
+	
+	  png_write_png( png_ptr, info_ptr, PNG_TRANSFORM_SWAP_ENDIAN, NULL );
 
+	}
+
+	else {
+	  png_write_png( png_ptr, info_ptr, 0, NULL );
+	}
 	png_destroy_write_struct( &png_ptr, &info_ptr );
 
 	delete[] rowPtrs;
@@ -713,7 +725,65 @@ int slPNGSnapshot( slWorld *w, slCamera *c, const char *file ) {
 
 	glReadPixels( c->_originx, c->_originy, c->_width, c->_height, GL_RGB, GL_UNSIGNED_BYTE, buf );
 
-	r = slPNGWrite( file, c->_width, c->_height, buf, 3, 1 );
+	r = slPNGWrite( file, c->_width, c->_height, buf, 3, 1 , 8 );
+
+	delete[] buf;
+
+	return r;
+}
+
+int slPNGSnapshotDepth( slWorld *w, slCamera *c, const char *file, int lin, double maxRange ) {
+	unsigned char *buf;
+	int r;
+	if ( c->_activateContextCallback && c->_activateContextCallback() ) {
+		slMessage( DEBUG_ALL, "Cannot generate PNG snapshot: no OpenGL context available\n" );
+		return -1;
+	}
+
+	if ( c->_renderContextCallback ) c->_renderContextCallback( w, c );
+
+	buf = new unsigned char[c->_width * c->_height * 2];
+
+	glReadPixels( c->_originx, c->_originy, c->_width, c->_height, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, buf );
+	if(lin){
+	  double objX, objY, objZ;
+	  double model[16] = {1,0,0,0,
+			    0,1,0,0,
+			    0,0,1,0,
+			    0,0,0,1};
+          double proj[16];
+          int view[4];
+	  
+	  // We need to recover the projection matrix so that we can call gluUnProject
+
+	  glMatrixMode( GL_PROJECTION );
+	  glPushMatrix(); 
+	  glLoadIdentity();
+	  gluPerspective( 40.0, c->_fov, c->_frontClip, c->_zClip );
+          glGetDoublev(GL_PROJECTION_MATRIX, proj);
+	  glPopMatrix(); 
+
+
+          glGetIntegerv(GL_VIEWPORT, view);
+
+          for (int y_counter = 0; y_counter < c->_height; y_counter ++){
+            for (int x_counter = 0; x_counter < c->_width; x_counter ++)
+              {
+                gluUnProject((double)x_counter, (double)y_counter, (double)(((unsigned short *) buf)[y_counter*(c->_width)+x_counter])/65535.0, model, proj, view, &objX, &objY, &objZ);
+
+                                        // Compute the actual distance
+                                        double d = sqrt(objX*objX + objY*objY + objZ*objZ);
+
+				        d *= 65535.0/maxRange;
+					// Clip the value. 
+					if(d > 65535.0) d = 65535.0; 
+                                        ((unsigned short *) buf)[y_counter*(c->_width)+x_counter] = (unsigned short) d;
+
+                                }
+                        }
+
+	}
+	r = slPNGWrite( file, c->_width, c->_height, buf, 1, 1 , 16 );
 
 	delete[] buf;
 

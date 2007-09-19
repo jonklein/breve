@@ -152,6 +152,62 @@ int brIImageReadPixels( brEval args[], brEval *result, brInstance *i ) {
 	return EC_OK;
 }
 
+/*! 
+  \brief Reads Depth buffer information from the screen.
+
+*/ 
+int brIImageReadDepthBuffer( brEval args[], brEval *result, brInstance *i ) {
+	brImageData *dm = BRIMAGEDATAPOINTER( &args[0] );
+	int x = BRINT( &args[1] );
+	int y = BRINT( &args[2] );
+	int linearize = BRINT( &args[3]); 
+	float maxRange = BRFLOAT (&args[4]);
+	if( i->engine->camera->_activateContextCallback ) {
+		if( i->engine->camera->_activateContextCallback() != 0 ) {
+			slMessage( DEBUG_ALL, "warning: could not read pixels, no OpenGL context available\n" );
+			return EC_OK;
+		}
+	}
+	glReadPixels( x, y, dm->x, dm->y, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, dm->data );
+	if(linearize){  
+	  double objX, objY, objZ;
+          double proj[16];
+          int view[4];
+          double model[] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+          // We need to recover the projection matrix so that we can call gluUnProject
+	  glMatrixMode( GL_PROJECTION );
+	  glPushMatrix(); 
+	  glLoadIdentity();
+	  gluPerspective( 40.0, i->engine->camera->_fov, i->engine->camera->_frontClip, i->engine->camera->_zClip );
+          glGetDoublev(GL_PROJECTION_MATRIX, proj);
+	  glPopMatrix(); 
+
+          glGetIntegerv(GL_VIEWPORT, view);
+	  
+	  // Loop over all the pixels, linearizing the result. 
+          for (int y_counter = y; y_counter < dm->y; y_counter ++){
+            for (int x_counter = 0; x_counter < dm->x; x_counter ++)
+              {
+                gluUnProject((double)x_counter, (double)y_counter, (double)(((unsigned short *) dm->data)[y_counter*(dm->x)+x_counter])/65535.0, model, proj, view, &objX, &objY, &objZ);
+
+                                        // Compute the actual distance
+                                        double d = sqrt(objX*objX + objY*objY + objZ*objZ);
+				        d *= 65535.0/maxRange;
+					// printf("Value is: %d %f\n",(((unsigned short *) dm->data)[y_counter*(dm->x)+x_counter]), d); 
+
+					// Clip the value. 
+					if(d > 65535.0) d = 65535.0; 
+                                        // Store it. Note that we flip the vertical axis.
+                                        ((unsigned short *) dm->data)[y_counter*(dm->x)+x_counter] = (unsigned short) d;
+
+                                }
+                        }
+
+	}
+	return EC_OK;
+}
+
+
 /*!
 	\brief Loads an image from a file of a given name.
 
@@ -252,7 +308,13 @@ int brIImageWriteToFile( brEval args[], brEval *result, brInstance *i ) {
 
 	file = brOutputPath( i->engine, BRSTRING( &args[1] ) );
 
-	result->set( slPNGWrite( file, dm->x, dm->y, dm->data, 4, 1 ) );
+	int channels = BRINT ( & args[2] ); 
+
+
+	int bit_depth = BRINT( &args[3] );
+
+
+	result->set( slPNGWrite( file, dm->x, dm->y, dm->data, channels, 1, bit_depth ) );
 
 	slFree( file );
 
@@ -284,6 +346,30 @@ int brISnapshot( brEval args[], brEval *result, brInstance *i ) {
 
 #endif
 }
+
+int brISnapshotDepth( brEval args[], brEval *result, brInstance *i ) {
+#if HAVE_LIBPNG
+	char *f;
+	int lin;
+	float maxDist; 
+	f = brOutputPath( i->engine, BRSTRING( &args[0] ) );
+	lin = BRINT(&args[1]); 
+	maxDist = BRFLOAT(&args[2]); 
+	
+	result->set( slPNGSnapshotDepth( i->engine->world, i->engine->camera, f, lin, maxDist ) );
+
+	slFree( f );
+
+	return EC_OK;
+
+#else
+	slMessage( DEBUG_ALL, "This version of breve was built without support for image export\n" );
+
+	return EC_ERROR;
+
+#endif
+}
+
 
 /*!
 	\brief Initializes an empty image buffer of a given size.
@@ -375,10 +461,12 @@ void breveInitImageFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "imageGetValueAtCoordinates", brIImageGetValueAtCoordinates, AT_DOUBLE, AT_POINTER, AT_INT, AT_INT, 0 );
 	brNewBreveCall( n, "imageSetValueAtCoordinates", brIImageSetValueAtCoordinates, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "imageLoadFromFile", brIImageLoadFromFile, AT_POINTER, AT_STRING, 0 );
-	brNewBreveCall( n, "imageWriteToFile", brIImageWriteToFile, AT_INT, AT_POINTER, AT_STRING, 0 );
+	brNewBreveCall( n, "imageWriteToFile", brIImageWriteToFile, AT_INT, AT_POINTER, AT_STRING, AT_INT, AT_INT,  0 );
 	brNewBreveCall( n, "imageDataFree", brIImageDataFree, AT_NULL, AT_POINTER, 0 );
 	brNewBreveCall( n, "imageDataInit", brIImageDataInit, AT_POINTER, AT_INT, AT_INT, 0 );
 	brNewBreveCall( n, "imageUpdateTexture", brIImageUpdateTexture, AT_INT, AT_POINTER, 0 );
 	brNewBreveCall( n, "imageReadPixels", brIImageReadPixels, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0 );
+	brNewBreveCall( n, "imageReadDepthBuffer", brIImageReadDepthBuffer, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_INT, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "snapshot", brISnapshot, AT_INT, AT_STRING, 0 );
+	brNewBreveCall( n, "snapshotDepth", brISnapshotDepth, AT_INT, AT_STRING, AT_INT, AT_DOUBLE,  0 );
 }

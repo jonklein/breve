@@ -292,7 +292,6 @@ int slCamera::select( slWorld *w, int x, int y ) {
 
 	gluPickMatrix(( GLdouble )x, ( GLdouble )( viewport[3] - y ), 5.0, 5.0, viewport );
 	slClearGLErrors( "picked matrix" );
-
 	gluPerspective( 40.0, _fov, _frontClip, _zClip );
 
 	// since the selection buffer uses unsigned ints for names, we can't
