@@ -45,6 +45,7 @@ int breveMovieCreate( brEval args[], brEval *result, brInstance *i ) {
 
 #else
 	slMessage( DEBUG_ALL, "This version of breve was built without support for movie export\n" );
+	result-> set( -1 );
 
 	return EC_ERROR;
 

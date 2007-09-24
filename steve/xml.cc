@@ -173,7 +173,7 @@ int brXMLWriteObject( brXMLArchiveRecord *record, FILE *file, brInstance *inInst
 		int r = brMethodCallByName( inInstance, "archive", &result );
 
 		if ( r != EC_OK || BRINT( &result ) != 1 ) {
-			slMessage( DEBUG_ALL, "archive of instance %p (%s) failed [%d]\n", inInstance, inInstance->object->name, BRINT( &result ) );
+			slMessage( DEBUG_ALL, "archive of \"%s\" instance (%p) failed [%d]: \"archive\" method did not execute successfully\n", inInstance->object->name, inInstance, BRINT( &result ) );
 			return -1;
 		}
 	}
@@ -257,6 +257,8 @@ int brXMLWriteObject( brXMLArchiveRecord *record, FILE *file, brInstance *inInst
 	if( inInstance->object->type->_typeSignature == STEVE_TYPE_SIGNATURE )
 		stXMLWriteObjectVariables( record, file, (stInstance*)inInstance -> userData, spaces );
 	else {
+		slMessage( DEBUG_ALL, "Warning: object encoding and decoding not fully implemented for non-steve objects.  Dearchiving of this object will likely fail\n" );
+
 		char *encoding = brInstanceEncodeToString( inInstance->engine, inInstance );
 
 		if( encoding ) {
@@ -712,8 +714,8 @@ int stXMLReadObjectFromString( stInstance *i, char *buffer ) {
 		const std::string *instindex = matches[ n ]->getAttr( "index" );
 		
 		if( !instindex ) {
-			slMessage( DEBUG_ALL, "Error decoding XML from string: could not locate instance index\n" );	
-			return NULL;	
+			slMessage( DEBUG_ALL, "Error decoding XML object from string: could not locate instance index\n" );	
+			return EC_ERROR;	
 		}
 		
 		int ind = atoi( instindex->c_str() );
@@ -865,8 +867,8 @@ int brXMLInitSimulationFromString( brEngine *e, char *buffer ) {
 	std::vector< brXMLDOMElement* > engine = dom->getElementsByName( "engine" ); 
 
 	if( engine.size() != 1 ) {
-		slMessage( DEBUG_ALL, "Error decoding XML simulation: could not locate breve engine object\n" );	
-		return NULL;		
+		slMessage( DEBUG_ALL, "Error decoding archived XML simulation: could not locate breve engine object\n" );	
+		return EC_ERROR;		
 	}
 
 	int controllerIndex = atoi( engine[ 0 ]->getAttr( "controllerIndex" )->c_str() );
@@ -886,8 +888,8 @@ int brXMLInitSimulationFromString( brEngine *e, char *buffer ) {
 		const std::string *instindex = matches[ n ]->getAttr( "index" );
 		
 		if( !instindex ) {
-			slMessage( DEBUG_ALL, "Error decoding XML: could not locate instance index\n" );	
-			return NULL;	
+			slMessage( DEBUG_ALL, "Error decoding archived XML simulation: could not locate instance index\n" );	
+			return -1;	
 		}
 		
 		int i = atoi( instindex->c_str() );
@@ -900,7 +902,7 @@ int brXMLInitSimulationFromString( brEngine *e, char *buffer ) {
 	brEngineSetController( e, parserState._indexToInstanceMap[ controllerIndex ] );
 
 	if ( brXMLRunDearchiveMethods( &parserState ) ) {
-		slMessage( DEBUG_ALL, "Error loading archived simulation: dearchive method failed\n" );
+		slMessage( DEBUG_ALL, "Error decoding archived XML simulation: dearchive method failed\n" );
 		result = -1;
 	}
 
@@ -924,7 +926,7 @@ int brXMLRunDearchiveMethods( brXMLParserState *s ) {
 			r = brMethodCallByName( instance, "dearchive", &result );
 
 			if ( r != EC_OK || BRINT( &result ) != 1 ) {
-				slMessage( DEBUG_ALL, "dearchive of instance %p (%s) failed\n", instance, instance->object->name );
+				slMessage( DEBUG_ALL, "dearchive of instance %p (%s) failed: \"dearchive\" method did not execute successfully\n", instance, instance->object->name );
 				return -1;
 			}
 		}
@@ -1129,10 +1131,16 @@ int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceE
 		int typeSignature = 0xffffffff;
 		brInstanceDecodeFromString( inState->engine, typeSignature, data[ 0 ]->_cdata.c_str() );
 
+	}
 
-//		std::string s = data[ 0 ]->toXMLString();
-//		
-//		printf( s.c_str() );
+	int typeSignature = atoi( inInstanceElement -> getAttr( "typesignature" )->c_str() );
+	
+	printf( "%x\n", typeSignature );
+
+	if( typeSignature != STEVE_TYPE_SIGNATURE ) {
+		slMessage( DEBUG_ALL, "Warning: object encoding and decoding not fully implemented for non-steve objects\n" );
+
+		return EC_ERROR;
 	}
 
 	return stXMLParseInstanceData( inState, data[ 0 ], (stInstance*)outInstance -> userData );
