@@ -238,18 +238,9 @@ Abstract : Image (aka Images) [version 2.0] {
 		self set-size width currentWidth height currentHeight.
 		return (super dearchive).
 
-	+ to writeGray16 to imageFile (string):
+	+ to write-16-bit-grayscale to imageFile (string):
 		% Write the image to imageFile.  The image is written as a 
 		% PNG file, so imageFile should end with .PNG.
 
 		imageWriteToFile( imageData, imageFile, 1, 16 ).
-	
-   + section "Taking snapshots" 
-
-	+ to snapshot to imageFile (string): 
-		snapshot(imageFile).
-	
-	+ to snapshotDepth to imageFile (string) linearize lin (int) max-dist dist (float):
-		snapshotDepth(imageFile,lin,dist). 
-
 }

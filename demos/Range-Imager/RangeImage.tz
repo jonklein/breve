@@ -74,7 +74,7 @@ BraitenbergControl : AggressorController {
 		video read-pixels at-x 0 at-y 0.
 		depth read-depth at-x 0 at-y 0 linearize 1 max-dist 50. 
 		video write to "imgs/video-$frameCount.png". 
-		depth writeGray16 to "imgs/depth-$frameCount.png". 
+		depth write-16-bit-grayscale to "imgs/depth-$frameCount.png". 
 		# This is equivalent to the above -- but faster. 
 		#video snapshot to "imgs/video-$frameCount.png". 
 		#video snapshotDepth to "imgs/depth-$frameCount.png".

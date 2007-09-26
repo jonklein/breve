@@ -159,6 +159,12 @@ class Image( breve.Abstract ):
 
 		return self
 
+	def readDepth( self, x, y, lin, dist ):
+		'''Reads the depth into this Image from the rendered image on the  screen.  The resulting image can be written to a file or  analyzed if desired.  This is only supported in graphical versions of breve. The linearize option (if true) linearizes the depth buffer to a maximum  distance so that for each pixel, the value corresponds to the distance from  the centre of the camera. Values above the maximum distance (max-dist) are  set to the maximum distance.  If linearize is false, then this returns the raw depth buffer.  This is considerably faster, but the values are not linear in the distance. '''
+
+
+		breve.breveInternalFunctionFinder.imageReadDepthBuffer( self, self.imageData, x, y, lin, dist )
+
 	def readPixels( self, x, y ):
 		'''Reads pixels into this Image from the rendered image on the  screen.  The resulting image can be written to a file or  analyzed if desired.  This is only supported in graphical versions of breve.'''
 
@@ -225,7 +231,13 @@ class Image( breve.Abstract ):
 		'''Write the image to imageFile.  The image is written as a  PNG file, so imageFile should end with .PNG.'''
 
 
-		breve.breveInternalFunctionFinder.imageWriteToFile( self, self.imageData, imageFile )
+		breve.breveInternalFunctionFinder.imageWriteToFile( self, self.imageData, imageFile, 4, 8 )
+
+	def write16BitGrayscale( self, imageFile ):
+		'''Write the image to imageFile.  The image is written as a  PNG file, so imageFile should end with .PNG.'''
+
+
+		breve.breveInternalFunctionFinder.imageWriteToFile( self, self.imageData, imageFile, 1, 16 )
 
 
 breve.Image = Image

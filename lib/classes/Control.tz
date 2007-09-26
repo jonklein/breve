@@ -184,9 +184,16 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 	+ to save-snapshot to filename (string):
 		% Takes a PNG snapshot of the current simulation display and saves 
-		% it to a file named filename.  filename should end with ".png".
+		% it to a file named filename, which should end with ".png".
 
 		snapshot(filename).
+
+	+ to save-depth-snapshot to filename (string) linearize lin (int) max-dist dist (float):
+		% Takes a PNG snapshot of the simulation's depth buffer and saves 
+		% it to a file named filename, which should end with ".png".
+
+		snapshotDepth( filename, lin, dist ).
+ 
 
   + section "Updating neighbors"
 

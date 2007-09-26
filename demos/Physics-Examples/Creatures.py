@@ -5,13 +5,16 @@ class VirtualCreatures( breve.PhysicalControl ):
 	def __init__( self ):
 		breve.PhysicalControl.__init__( self )
 		self.body = None
-		self.dg = None
 		self.flag = None
 		self.ga = None
 		self.parser = None
 		self.running = 0
 		self.startlocation = breve.vector()
 		VirtualCreatures.init( self )
+
+	def archiveSim( self ):
+
+		self.saveAsXml( 'sim.xml' )
 
 	def checkPenetration( self ):
 		link = None
@@ -67,6 +70,7 @@ class VirtualCreatures( breve.PhysicalControl ):
 			self.ga.setMutationPercent( 30 )
 
 
+		self.addDependency( self.ga )
 		self.updateText()
 
 	def iterate( self ):
@@ -105,6 +109,7 @@ class VirtualCreatures( breve.PhysicalControl ):
 		self.body = breve.createInstances( breve.MultiBody, 1 )
 		self.body.setRoot( self.parser.parse( i.getGenome().getRoot() ) )
 		self.body.disableSelfCollisions()
+		self.addDependency( self.body )
 		self.schedule( 'checkPenetration', ( self.getTime() + 8.000000 ) )
 		self.setDisplayText( '''Preparing to test %s...''' % (  i ), -0.950000, -0.950000 )
 		self.updateText()
@@ -157,6 +162,7 @@ class SimsGAIndividual( breve.GeneticAlgorithmIndividual ):
 	def __init__( self ):
 		breve.GeneticAlgorithmIndividual.__init__( self )
 		self.genome = None
+		self.h = {}
 		SimsGAIndividual.init( self )
 
 	def copy( self, other ):
@@ -179,6 +185,9 @@ class SimsGAIndividual( breve.GeneticAlgorithmIndividual ):
 
 		self.genome = breve.createInstances( breve.GADirectedGraph, 1 )
 		self.randomize()
+		self.h[ '123' ] = breve.createInstances( breve.Object, 1 )
+		self.h[ 10 ] = 40
+		print self.h[ 10 ]
 		self.addDependency( self.genome )
 
 	def mutate( self ):

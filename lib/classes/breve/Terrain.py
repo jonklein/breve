@@ -86,8 +86,11 @@ class Terrain( breve.Real ):
 		'''Sets the color of this terrain object.  The peak and valley colors can also be set independently using METHOD(set-peak-color) and METHOD(set-valley-color).'''
 
 
-		self.setPeakColor( color )
-		self.setValleyColor( color )
+		if self.realWorldPointer:
+			self.setPeakColor( color )
+			self.setValleyColor( color )
+
+
 
 	def setHeight( self, xCoordinate, yCoordinate, height ):
 		'''Sets the height of the terrain at (xCoordinate, yCoordinate) to height. The coordinates refer to the polygons on the terrain, not to the real world location of points on the terrain.'''

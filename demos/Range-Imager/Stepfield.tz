@@ -124,8 +124,8 @@ BraitenbergControl : BraitenbergStepfield
 
    + to post-iterate:
 	frameCount = frameCount+1. 
-	video snapshot to "imgs/video-$frameCount.png". 
-	video snapshotDepth to "imgs/depth-$frameCount.png" linearize 1 max-dist 10.
+	controller save-snapshot to "imgs/video-$frameCount.png". 
+	controller save-depth-snapshot to "imgs/depth-$frameCount.png" linearize 1 max-dist 10.
 	# As an alternative to the above, you can use read-pixels and read-depth to
 	# save the files. However, this is much slower than the snapshot above. 
 	#video read-pixels at-x 0 at-y 0.

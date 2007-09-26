@@ -9,6 +9,7 @@ Real : Terrain [version 2.2] {
 
 	+ to init:
 		realWorldPointer = terrainNew(1).
+
 		self set-peak-color to (1, 1, 1).
 		self set-valley-color to (0, .8, .1).
 		self set-texture-image to (new Image load from "images/grass.jpg").
@@ -99,8 +100,10 @@ Real : Terrain [version 2.2] {
 		% can also be set independently using METHOD(set-peak-color) and
 		% METHOD(set-valley-color).
 
-		self set-peak-color to color.
-		self set-valley-color to color.
+		if realWorldPointer: {
+			self set-peak-color to color.
+			self set-valley-color to color.
+		}
 
 	+ to archive:
 		return 1.

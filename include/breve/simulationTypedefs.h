@@ -60,13 +60,6 @@ typedef struct slSpring slSpring;
 typedef struct slBigMatrix3DGSL slBigMatrix3DGSL;
 typedef struct slBigMatrix2DGSL slBigMatrix2DGSL;
 
-// typedef struct slNetsimData slNetsimData;
-// typedef struct slNetsimServerData slNetsimServerData;
-// typedef struct slNetsimClientData slNetsimClientData;
-// typedef struct slNetsimBoundsMessage slNetsimBoundsMessage;
-// typedef struct slNetsimSyncMessage slNetsimSyncMessage;
-// typedef struct slNetsimRemoteHostData slNetsimRemoteHostData;
-
 typedef struct slRoamPatch slRoamPatch;
 typedef struct sl3DSScene sl3DSScene;
 typedef struct slGISData slGISData;
