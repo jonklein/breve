@@ -1192,7 +1192,11 @@ void brPythonInit( brEngine *breveEngine ) {
 		{ NULL, NULL, 0, NULL }
 	};
 
+#ifdef HAVE_LIBPYTHON24
+	Py_InitializeEx( 0 );
+#else
 	Py_Initialize();
+#endif
 
 	sPythonData._internalModule = Py_InitModule( "breveInternal", methods );
 
@@ -1221,6 +1225,8 @@ void brPythonInit( brEngine *breveEngine ) {
 	if( !sPythonData._breveModule ) {
 		PyErr_Print();
 		slMessage( DEBUG_ALL, "Failed to initialize Python frontend.  breve will not be able to execute Python files.\n" );
+
+		Py_Finalize();
 		return;
 	}
 
