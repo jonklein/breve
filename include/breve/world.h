@@ -259,7 +259,7 @@ class slWorld {
 
 #if HAVE_LIBENET
 		slNetsimData 				_netsimData;
-		slNetsimClientData 			*_netsimClient;
+		slNetsimClient	 			*_netsimClient;
 #endif
 
 	private:

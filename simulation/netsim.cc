@@ -13,40 +13,32 @@ enum slNetsimMessageType {
 
 #include <enet/enet.h>
 
-/*!
-	\brief Starts the net simulation server.
-*/
+/**
+ * \brief Starts the net simulation server.
+ */
 
-slNetsimServerData::slNetsimServerData( slWorld *w ) {
-	world = w;
-	host = enet_host_create( NULL, 32, 0, 0 );
-}
-
-slNetsimServerData *slNetsimCreateServer( slWorld *world ) {
-	slNetsimServerData *data;
+slNetsimServer::slNetsimServer( slWorld *inWorld ) {
 	ENetAddress address;
 
-	data = new slNetsimServerData( world );
+	_world = inWorld;
 
 	address.host = ENET_HOST_ANY;
 	address.port = NETSIM_MASTER_PORT;
 
-	data->host = enet_host_create( &address, 32, 0, 0 );
+	_host = enet_host_create( &address, 32, 0, 0 );
 
-	if ( !data->host ) {
+	if ( !_host ) {
 		slMessage( DEBUG_ALL, "netsim: error starting server on port %d\n", NETSIM_MASTER_PORT );
-		delete data;
-		return NULL;
+		_world = NULL;
 	}
 
 	slMessage( DEBUG_ALL, "netsim: server created for port %d\n", NETSIM_MASTER_PORT );
-
-	return data;
+	
 }
 
-void slNetsimStartServer( slNetsimServerData *data ) {
+void slNetsimServer::start() {
 	pthread_t thread;
-	pthread_create( &thread, NULL, slNetsimThread, data );
+	pthread_create( &thread, NULL, slNetsimThread, this );
 }
 
 /*!
@@ -57,14 +49,14 @@ void *slNetsimThread( void *d ) {
 	slNetsimBoundsMessage *bMessage;
 	slNetsimSyncMessage *sMessage;
 
-	slNetsimServerData *serverData = ( slNetsimServerData* )d;
-	slNetsimRemoteHostData *remoteHost;
+	slNetsimServer *serverData = ( slNetsimServer* )d;
+	slNetsimRemoteHost *remoteHost;
 
-	ENetHost *server = serverData->host;
+	ENetHost *server = serverData->_host;
 	ENetEvent event;
 	int r;
 
-	while (( r = enet_host_service( server, &event, 10000 ) ) >= 0 ) {
+	while ( ( r = enet_host_service( server, &event, 10000 ) ) >= 0 ) {
 		switch ( event.type ) {
 
 			case ENET_EVENT_TYPE_CONNECT:
@@ -72,16 +64,16 @@ void *slNetsimThread( void *d ) {
 				           event.peer -> address.host,
 				           event.peer -> address.port );
 
-				remoteHost = new slNetsimRemoteHostData;
+				remoteHost = new slNetsimRemoteHost;
 
 				remoteHost->peer = event.peer;
 
-				serverData->world->_netsimData.remoteHosts.push_back( remoteHost );
+				// serverData->_world->_netsimData._remoteHosts.push_back( remoteHost );
 
 				break;
 
 			case ENET_EVENT_TYPE_RECEIVE:
-				remoteHost = serverData->world->_netsimData.remoteHosts[( int )event.peer->data ];
+				// remoteHost = serverData->_world->_netsimData.remoteHosts[( int )event.peer->data ];
 
 				switch ( event.channelID ) {
 
@@ -115,17 +107,17 @@ void *slNetsimThread( void *d ) {
 	return NULL;
 }
 
-slNetsimClientData *slNetsimClientOpenConnectionToAddress( ENetHost *client, ENetAddress *address ) {
-	slNetsimClientData *data;
+slNetsimClient *slNetsimServer::openConnection( ENetAddress *address ) {
+	slNetsimClient *data;
 	ENetEvent event;
 
-	data = new slNetsimClientData;
+	data = new slNetsimClient;
 
-	data->host = client;
+	data->_host = _host;
 
-	data->peer = enet_host_connect( client, address, 32 );
+	data->_peer = enet_host_connect( _host, address, 32 );
 
-	if ( !( enet_host_service( client, & event, 5000 ) > 0 && event.type == ENET_EVENT_TYPE_CONNECT ) ) {
+	if ( !( enet_host_service( _host, & event, 5000 ) > 0 && event.type == ENET_EVENT_TYPE_CONNECT ) ) {
 		slMessage( DEBUG_ALL, "netsim: error connecting to host %x:%d\n", address->host, address->port );
 		delete data;
 		return NULL;
@@ -133,54 +125,25 @@ slNetsimClientData *slNetsimClientOpenConnectionToAddress( ENetHost *client, ENe
 
 	slMessage( DEBUG_ALL, "netsim: connection to %x:%d successful.\n", address->host, address->port );
 
-	enet_host_flush( client );
+	enet_host_flush( _host );
 
 	return data;
 }
 
 /*!
-	\brief Initiate a connection to another breve host.
-*/
+ * \brief Initiate a connection to another breve host.
+ */
 
-slNetsimClientData *slNetsimOpenConnection( ENetHost *client, char *host, int port ) {
+slNetsimClient *slNetsimServer::openConnection( char *host, int port ) {
 	ENetAddress address;
 
 	enet_address_set_host( &address, host );
 	address.port = port;
 
-	return slNetsimOpenConnectionToAddress( client, &address );
+	return openConnection( &address );
 }
 
-slNetsimClientData *slNetsimOpenConnectionToAddress( ENetHost *client, ENetAddress *address ) {
-	slNetsimClientData *data;
-	ENetEvent event;
-
-	data = new slNetsimClientData;
-
-	data->host = client;
-
-	if ( !client ) {
-		slMessage( DEBUG_ALL, "netsim: error creating client!\n" );
-		delete data;
-		return NULL;
-	}
-
-	data->peer = enet_host_connect( client, address, 32 );
-
-	if ( !( enet_host_service( client, & event, 5000 ) > 0 && event.type == ENET_EVENT_TYPE_CONNECT ) ) {
-		slMessage( DEBUG_ALL, "netsim: error connecting to host %x:%d\n", address->host, address->port );
-		delete data;
-		return NULL;
-	}
-
-	slMessage( DEBUG_ALL, "netsim: connection to %x:%d successful.\n", address->host, address->port );
-
-	enet_host_flush( client );
-
-	return data;
-}
-
-int slNetsimBroadcastSyncMessage( slNetsimServerData *server, double time ) {
+int slNetsimBroadcastSyncMessage( slNetsimServer *server, double time ) {
 	slNetsimSyncMessage message;
 	ENetPacket *packet;
 
@@ -188,14 +151,14 @@ int slNetsimBroadcastSyncMessage( slNetsimServerData *server, double time ) {
 
 	packet = enet_packet_create( &message, sizeof( slNetsimBoundsMessage ), 0 );
 
-	enet_host_broadcast( server->host, MT_SYNC, packet );
+	enet_host_broadcast( server->_host, MT_SYNC, packet );
 
-	enet_host_flush( server->host );
+	enet_host_flush( server->_host );
 
 	return 0;
 }
 
-int slNetsimSendBoundsMessage( slNetsimClientData *client, slVector *min, slVector *max ) {
+int slNetsimSendBoundsMessage( slNetsimClient *client, slVector *min, slVector *max ) {
 	slNetsimBoundsMessage message;
 	ENetPacket *packet;
 
@@ -203,9 +166,9 @@ int slNetsimSendBoundsMessage( slNetsimClientData *client, slVector *min, slVect
 
 	packet = enet_packet_create( &message, sizeof( slNetsimBoundsMessage ), ENET_PACKET_FLAG_RELIABLE );
 
-	enet_peer_send( client->peer, MT_BOUNDS, packet );
+	enet_peer_send( client->_peer, MT_BOUNDS, packet );
 
-	enet_host_flush( client->host );
+	enet_host_flush( client->_host );
 
 	return 0;
 }
@@ -231,10 +194,12 @@ inline void slNetsimVectorsToBoundsMessage( slNetsimBoundsMessage *m, slVector *
 }
 
 void slDrawNetsimBounds( slWorld *w ) {
-	std::vector<slNetsimRemoteHostData*>::iterator hi;
+	std::vector<slNetsimRemoteHost*>::iterator hi;
 
-	for ( hi = w->_netsimData.remoteHosts.begin(); hi != w->_netsimData.remoteHosts.end(); hi++ ) {
-		slNetsimRemoteHostData *data = *hi;
+	/*
+
+	for ( hi = w->_netsimData._remoteHosts.begin(); hi != w->_netsimData._remoteHosts.end(); hi++ ) {
+		slNetsimRemoteHost *data = *hi;
 
 		glEnable( GL_BLEND );
 		glColor4f( 0.4, 0.0, 0.0, .3 );
@@ -267,6 +232,8 @@ void slDrawNetsimBounds( slWorld *w ) {
 		glVertex3f( data->min.x, data->max.y, data->max.z );
 		glEnd();
 	}
+
+	*/
 }
 
 #endif

@@ -140,19 +140,19 @@ int slWorld::startNetsimServer() {
 #if HAVE_LIBENET
 	enet_initialize();
 
-	_netsimData.isMaster = 1;
+	_netsimData._isMaster = 1;
 
-	_netsimData.server = slNetsimCreateServer( this );
-	slNetsimStartServer( _netsimData.server );
+	_netsimData._server = new slNetsimServer( this );
 
-	if ( !_netsimData.server )
+	if ( !_netsimData._server )
 		return -1;
+
+	_netsimData._server->start();
 
 	return 0;
 
 #else
 	slMessage( DEBUG_ALL, "error: cannot start netsim server -- not compiled with enet support\n" );
-
 	return -1;
 
 #endif
@@ -166,28 +166,28 @@ int slWorld::startNetsimSlave( char *host ) {
 #if HAVE_LIBENET
 	enet_initialize();
 
-	_netsimData.isMaster = 0;
+	_netsimData._isMaster = 0;
 
-	_netsimData.server = new slNetsimServerData( this );
-	_netsimClient = slNetsimOpenConnection( _netsimData.server->host, host, NETSIM_MASTER_PORT );
-	slNetsimStartServer( _netsimData.server );
+	_netsimData._server = new slNetsimServer( this );
 
-	if ( !_netsimData.server )
+	_netsimClient = _netsimData._server->openConnection( host, NETSIM_MASTER_PORT );
+
+	if ( !_netsimData._server )
 		return -1;
+
+	_netsimData._server->start();
 
 	return 0;
 
 #else
 	slMessage( DEBUG_ALL, "error: cannot start netsim slave -- not compiled with enet support\n" );
-
 	return -1;
-
 #endif
 }
 
 /**
-	\brief frees an slWorld object, including all of its objects and its clipData.
-*/
+ * \brief frees an slWorld object, including all of its objects and its clipData.
+ */
 
 slWorld::~slWorld() {
 	std::vector<slWorldObject*>::iterator wi;
@@ -208,23 +208,25 @@ slWorld::~slWorld() {
 	dJointGroupDestroy( _odeJointGroupID );
 
 #if HAS_LIBENET
-	if ( _netsimData.server ) enet_deinitialize();
-
+	if ( _netsimData._server ) {
+		delete _netsimData._server;
+		enet_deinitialize();
+	}
 #endif
 
 	slFreeIntegrationVectors( this );
 }
 
 /**
-	\brief Adds a camera to the world.
-*/
+ * \brief Adds a camera to the world.
+ */
 
 void slWorld::addCamera( slCamera *camera ) {
 	_cameras.push_back( camera );
 }
 
 /**
-	\brief Removes a camera from the world.
+ * \brief Removes a camera from the world.
 */
 
 void slWorld::removeCamera( slCamera *camera ) {
@@ -343,17 +345,17 @@ double slWorld::runWorld( double deltaT, double timestep, int *error ) {
 	_age += total;
 
 #if HAVE_LIBENET
-	if ( _netsimData.server && _netsimData.isMaster && ( int )_age >= lastSecond ) {
+	if ( _netsimData._server && _netsimData._isMaster && ( int )_age >= lastSecond ) {
 		lastSecond = ( int )_age + 1;
 
-		slNetsimBroadcastSyncMessage( _netsimData.server, _age );
+		slNetsimBroadcastSyncMessage( _netsimData._server, _age );
 	}
 
-	if ( _netsimData.server && !_netsimData.isMaster && _detectCollisions ) {
+	if ( _netsimData._server && !_netsimData._isMaster && _detectCollisions ) {
 		int maxIndex;
 		slVector max, min;
 
-		maxIndex = ( _clipData->count * 2 ) - 1;
+		maxIndex = ( _clipData->_count * 2 ) - 1;
 
 		min.x = *_clipData->boundListPointers[0][0]->value;
 		min.y = *_clipData->boundListPointers[2][0]->value;

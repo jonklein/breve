@@ -4,55 +4,71 @@
 #if HAVE_LIBENET
 #include <enet/enet.h>
 
+#include <map>
+#include <string>
+
 #define NETSIM_MASTER_PORT	5529
 #define NETSIM_SLAVE_PORT	5732
 
-class slNetsimRemoteHostData {
+struct slNetsimMessage {
+	int 						_messageType;
+	int 						_messageLength;
+	void*						_message;
+};
+
+class slNetsimRemoteHost {
 	public:
-		slNetsimRemoteHostData() {
-			peer = NULL;
-		}
+								slNetsimRemoteHost() {
+									peer = NULL;
+								}
 
 		slVector min, max;
 		double simTime;
 		double syncTime;
 		double speedRatio;
-		ENetPeer *peer;
+		ENetPeer 					*peer;
 };
 
-class slNetsimServerData {
+class slNetsimClient {
 	public:
-		slNetsimServerData(slWorld *w);
+		slNetsimClient() {
+			_host = NULL;
+			_peer = NULL;
+		}
 
-		ENetHost *host;
-		slWorld *world;
-		int terminate;
+		ENetHost*					_host;
+		ENetPeer* 					_peer;
+		int  						_terminate;
+};
+
+class slNetsimServer {
+	public:	
+								slNetsimServer( slWorld *inWorld );
+								
+		slNetsimClient*					openConnection( ENetAddress *inAddress );
+		slNetsimClient*					openConnection( char *inHost, int inPort );
+
+		void						start();
+
+		ENetHost*					_host;
+		slWorld*					_world;
+
+
+	private:
+		std::map< std::string, slNetsimClient* >	_connectedHosts;
+		
+		void										(*_passMessage)( slNetsimMessage *inMessage );
 };
 
 class slNetsimData {
 	public:
 		slNetsimData() {
-			server = NULL;
-			slave = NULL;
+			_server = NULL;
 		}
 
-		int isMaster;
-		slNetsimServerData *server;
-		slNetsimServerData *slave;
+		int 					_isMaster;
+		slNetsimServer*				_server;
 
-		std::vector<slNetsimRemoteHostData*> remoteHosts;
-};
-
-class slNetsimClientData {
-	public:
-		slNetsimClientData() {
-			host = NULL;
-			peer = NULL;
-		}
-
-		ENetHost *host;
-		ENetPeer *peer;
-		int terminate;
 };
 
 struct slNetsimBoundsMessage {
@@ -73,18 +89,11 @@ struct slNetworkHeader {
 
 void *slNetsimThread(void *);
 
-void slNetsimStartServer(slNetsimServerData *);
-slNetsimServerData *slNetsimCreateServer(slWorld *);
-slNetsimServerData *slNetsimCreateClient(slWorld *);
-
-slNetsimClientData *slNetsimOpenConnection(ENetHost *, char *, int);
-slNetsimClientData *slNetsimOpenConnectionToAddress(ENetHost *, ENetAddress *);
-
 inline void slNetsimBoundsMessageToVectors(slNetsimBoundsMessage *, slVector *, slVector *);
 inline void slNetsimVectorsToBoundsMessage(slNetsimBoundsMessage *, slVector *, slVector *);
 
-int slNetsimBroadcastSyncMessage(slNetsimServerData *, double);
-int slNetsimSendBoundsMessage(slNetsimClientData *, slVector *, slVector *);
+int slNetsimBroadcastSyncMessage(slNetsimServer*, double);
+int slNetsimSendBoundsMessage(slNetsimClient*, slVector *, slVector *);
 
 void slDrawNetsimBounds(slWorld *);
 
