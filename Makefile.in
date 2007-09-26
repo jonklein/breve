@@ -232,7 +232,8 @@ endif
 	cp -R plugins/samples $(IDE_FOLDER)/plugins
 	rm -f $(IDE_FOLDER)/plugins/samples/Makefile.in
 ifeq ($(PLATFORM),windows)
-	cp wx/lib/brevePlugin.a $(IDE_FOLDER)/plugins
+	cp lib/brevePlugin.lib $(CLI_FOLDER)/plugins
+	cp lib/breveIDEPlugin.lib $(CLI_FOLDER)/plugins
 	cp bin/glut32.dll $(IDE_FOLDER)
 	cp bin/python23.dll $(IDE_FOLDER)
 	cp bin/mingwm10.dll $(IDE_FOLDER)

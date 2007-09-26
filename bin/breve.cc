@@ -25,7 +25,12 @@
  */
 
 #include <signal.h>
+
+#include "config.h"
+
+#ifndef WINDOWS
 #include <libgen.h>
+#endif
 
 #include "simulation.h"
 #include "steve.h"

@@ -206,10 +206,18 @@ brEngine *brEngineNew( void ) {
 	brAddSearchPath( e, "lib/classes" );
 	brAddSearchPath( e, "lib" );
 
+#if WINDOWS
+	#define PATHSEP	";"
+#else
+	#define PATHSEP ":"
+#endif
+
 	if ( ( envpath = getenv( "BREVE_CLASS_PATH" ) ) ) {
-		while (( dir = slSplit( envpath, ":", n++ ) ) ) {
+
+		while (( dir = slSplit( envpath, PATHSEP, n++ ) ) ) {
 			brAddSearchPath( e, dir );
-			slMessage( DEBUG_INFO, "adding \"%s\" to class path\n", dir );
+			// slMessage( DEBUG_INFO, "adding \"%s\" to class path\n", dir );
+			slMessage( 0, "adding \"%s\" to class path\n", dir );
 			slFree( dir );
 		}
 	}
