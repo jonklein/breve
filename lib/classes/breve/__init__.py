@@ -2,7 +2,7 @@
 import breveInternal
 import sys, os, math, random, array
 
-import pickle
+# import pickle
 
 #
 # Used internally to redirect Python output to the breve frontend
@@ -23,11 +23,11 @@ sys.stdout = breveStdoutHandler()
 # Sets the breve controller class
 #
 
-def encodeToString( inObject ):
-	return pickle.dumps( inObject )
+# def encodeToString( inObject ):
+# 	return pickle.dumps( inObject )
 
-def decodeFromString( inString ):
-	pass
+# def decodeFromString( inString ):
+# 	pass
 
 
 def setController( inControllerClass ):

@@ -22,8 +22,7 @@
 #include "SimInstance.h"
 #include "BDialog.h"
 
-BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text)
-{
+BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text) {
 	char buf[2048];
 	wxString str;
 	int i = 0;
@@ -34,24 +33,31 @@ BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text)
 	this->text = text;
 	this->next = NULL;
 
-	// Due to the annoying java error I'm unable to track down, it isn't safe
-	// to call this function.  It calls brJavaInit, which doesn't actually
-	// do anything when using the directory layout of the CVS tree.  However,
-	// if you happen to have breveIDE living in a directory with lib/classes,
-	// brJavaInit will attempt to create a VM - failing due to searchpaths
-	// not yet being setup.  We don't want that - it'll eventually cause
-	// the client to crash.  Note that even if searchpaths are configured
-	// correctly before brJavaInit is called, java will still eventually
-	// crash the client due to some internal error.  I have no idea how to
-	// resolve this.
+
+
+	slSetMessageCallbackFunction( ::messageCallback );
+
 
 	_engine = brEngineNew();
 
-	_steveData = (stSteveData*)brInitFrontendLanguages( _engine );
+	// Setup file paths & message callback before initing the frontoff language
 
-	strncpy(buf, app->GetLocalDir(), 2047);
-	buf[2047] = '\0';
-	brAddSearchPath(_engine, (char*)&buf);
+#ifdef WINDOWS
+	strncpy( buf, app->GetBreveDir() + "lib" + FILE_SEP_PATH + "python2.3" + FILE_SEP_PATH, 2047 );
+	brAddSearchPath( _engine, buf );
+#endif
+
+	strncpy( buf, app->GetBreveDir(), 2047 );
+	brAddSearchPath( _engine, buf );
+
+	strncpy( buf, app->GetBreveDir() + "plugins" + FILE_SEP_PATH, 2047 );
+	brAddSearchPath( _engine, buf );
+
+	strncpy( buf, app->GetLocalDir(), 2047 );
+	brAddSearchPath( _engine, buf );
+
+
+	_steveData = (stSteveData*)brInitFrontendLanguages( _engine );
 
 	this->simmenu = new wxMenu;
 	paused = 1;
@@ -71,8 +77,6 @@ BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text)
 	_engine->renderWindowCallback = renderWindowCallback;
 	brEngineSetUpdateMenuCallback(_engine, ::menuCallback);
 
-	slSetMessageCallbackFunction(::messageCallback);
-
 	for (i = 0; i < app->GetSearchPathArray()->Count(); i++) {
 		strncpy(buf, app->GetSearchPathArray()->Item(i), 2047);
 		buf[2047] = '\0';
@@ -85,17 +89,7 @@ BreveInterface::BreveInterface(char * simfile, wxString simdir, char * text)
 		brAddSearchPath(_engine, (char*)&buf);
 	}
 
-	strncpy(buf, app->GetBreveDir(), 2047);
-	buf[2047] = '\0';
-	brAddSearchPath(_engine, (char*)&buf);
-
-	strncpy(buf, app->GetBreveDir() + "plugins" + FILE_SEP_PATH, 2047);
-	buf[2047] = '\0';
-	brAddSearchPath(_engine, (char*)&buf);
-
-	strncpy(buf, app->GetBreveDir() + "java" + FILE_SEP_PATH, 2047);
-	buf[2047] = '\0';
-	brAddSearchPath(_engine, (char*)&buf);
+	UpdateLog();
 }
 
 BreveInterface::~BreveInterface()

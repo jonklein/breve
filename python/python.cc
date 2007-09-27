@@ -1208,13 +1208,14 @@ void brPythonInit( brEngine *breveEngine ) {
 	PyObject_SetAttrString( sPythonData._internalModule, "breveObjectType", ptr );
 	Py_DECREF( ptr );
 
-	std::string setpath, path;
+	std::string setpath;
 
 	const std::vector< std::string > &paths = brEngineGetSearchPaths( breveEngine );
 
+	PyRun_SimpleString( "import sys" );
+
 	for( unsigned int n = 0; n < paths.size(); n++ ) {
-		path = paths[ n ];
-		setpath = "import sys\nsys.path.append( '" + path + "' ) ";
+		setpath = "sys.path.append( '" + paths[ n ] + "' ) ";
 
 		PyRun_SimpleString( setpath.c_str() );
 	}

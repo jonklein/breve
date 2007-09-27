@@ -205,6 +205,7 @@ brEngine *brEngineNew( void ) {
 
 	brAddSearchPath( e, "lib/classes" );
 	brAddSearchPath( e, "lib" );
+	brAddSearchPath( e, "." );
 
 #if WINDOWS
 	#define PATHSEP	";"

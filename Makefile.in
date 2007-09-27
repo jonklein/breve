@@ -224,16 +224,15 @@ ifeq ($(PLATFORM),linux-gnu)
 endif
 	-mkdir docs
 	cp -R docs $(IDE_FOLDER)
-	cp -R lib/classes $(IDE_FOLDER)/lib
-	cp -R lib/Template* $(IDE_FOLDER)/lib
+	cp -R lib $(IDE_FOLDER)
 	cp -R demos $(IDE_FOLDER)
 	rm -rf $(IDE_FOLDER)/demos/Music
 	mkdir $(IDE_FOLDER)/plugins
 	cp -R plugins/samples $(IDE_FOLDER)/plugins
 	rm -f $(IDE_FOLDER)/plugins/samples/Makefile.in
 ifeq ($(PLATFORM),windows)
-	cp lib/brevePlugin.lib $(CLI_FOLDER)/plugins
-	cp lib/breveIDEPlugin.lib $(CLI_FOLDER)/plugins
+	cp lib/brevePlugin.lib $(IDE_FOLDER)/plugins
+	cp lib/breveIDEPlugin.lib $(IDE_FOLDER)/plugins
 	cp bin/glut32.dll $(IDE_FOLDER)
 	cp bin/python23.dll $(IDE_FOLDER)
 	cp bin/mingwm10.dll $(IDE_FOLDER)

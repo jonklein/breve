@@ -145,8 +145,11 @@ bool BCTestApp::OnInit()
 	SearchPathArray.Add(AppDir + FILE_SEP_PATH + ".." + FILE_SEP_PATH + "Resources" + FILE_SEP_PATH);
 #endif
 
-	SearchPathArray.Add(AppDir);
-	SearchPathArray.Add(LocalDir);
+        SetEnvironmentVariable( "PYTHONHOME", AppDir.c_str() );
+
+	SearchPathArray.Add( AppDir );
+	SearchPathArray.Add( LocalDir );
+	SearchPathArray.Add( AppDir + FILE_SEP_PATH + "lib" + FILE_SEP_PATH + "python2.3" + FILE_SEP_PATH );
 
 	count = SearchPathArray.GetCount();
 
