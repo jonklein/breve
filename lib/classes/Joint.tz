@@ -371,7 +371,7 @@ Joint : PrismaticJoint (aka PrismaticJoints) [version 2.3] {
 	% A retractable TV antenna is an
 	% example of an object that uses multiple prismatic joints.
 	% <P>
-	% <CENTER><IMG SRC="PrismaticJoint.jpg" BORDER=1></CENTER>
+	% <CENTER><IMG SRC="../images/PrismaticJoint.jpg" BORDER=1></CENTER>
 
 	+ to link with-normal theNormal (vector) with-parent-point parentPoint (vector) 
 			with-child-point childPoint (vector)
@@ -442,7 +442,7 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 2.3] {
 	% example of a RevoluteJoint--it can bend back-and-forth, but it cannot twist 
 	% or bend side-to-side.
 	% <P>
-	% <CENTER><IMG SRC="RevoluteJoint.jpg" BORDER=1></CENTER>
+	% <CENTER><IMG SRC="../images/RevoluteJoint.jpg" BORDER=1></CENTER>
 
 	+ to link with-normal theNormal (vector) with-parent-point parentPoint (vector) 
 			with-child-point childPoint (vector)
@@ -515,7 +515,7 @@ Joint : FixedJoint (aka FixedJoints) [version 2.3] {
 	% This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects
 	% together using a static, or fixed, joint.
 	% <P>
-	% <CENTER><IMG SRC="FixedJoint.jpg" BORDER=1></CENTER>
+	% <CENTER><IMG SRC="../images/FixedJoint.jpg" BORDER=1></CENTER>
 	% <P>
 	% <b>Fixed joints do not currently support a relative rotation the way
 	% other joint types do.</b>  I'm so sorry.  
@@ -577,7 +577,7 @@ Joint : UniversalJoint (aka UniversalJoints) [version 2.3] {
 	% "twist".  Your wrist is basically a universal joint--your hand cannot
 	% rotate without the rest of your arm.
 	% <P>
-	% <CENTER><IMG SRC="UniversalJoint.jpg" BORDER=1></CENTER>
+	% <CENTER><IMG SRC="../images/UniversalJoint.jpg" BORDER=1></CENTER>
 
 	+ to link with-normal normal (vector)
 			with-parent-point parentPoint (vector) 
@@ -665,7 +665,7 @@ Joint : BallJoint (aka BallJoints) [version 2.3] {
 	% way around--if your head turns all the way around, please consult 
 	% the user manual for repair).
 	% <P>
-	% <CENTER><IMG SRC="BallJoint.jpg" BORDER=1></CENTER>
+	% <CENTER><IMG SRC="../images/BallJoint.jpg" BORDER=1></CENTER>
 	% <P>
 	% This joint uses a scheme of 3 Euler angles to represent the 
 	% relative rotation between two objects.  The Z-axis of rotation is automatically 

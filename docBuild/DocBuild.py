@@ -10,6 +10,43 @@ sys.path.append( os.path.dirname( sys.argv[ 0 ] ) )
 
 import DocExtract
 
+def WriteDrupalDocumentationNode( xmlstring ):
+	xmldocs = xml.dom.minidom.parseString( xmlstring )
+
+	name = xmldocs.documentElement.getAttribute( 'name' )
+	parent = xmldocs.documentElement.getAttribute( 'parent' )
+
+	header = ProcessHeader( headertext, name, parent )
+
+	output = file( '%s/%s' % ( drupaldestination, name ), 'w' )
+
+	docstring = ProcessDocstring( xmldocs.documentElement.getElementsByTagName( 'classdocstring' )[ 0 ].childNodes[ 0 ].nodeValue, [], 0 )
+
+	outstring = '''
+<p>
+Description for class <b>%s</b>:
+<blockquote>
+%s
+</blockquote>
+</p>
+<p>
+Inherits from <b>%s</b>
+</p>
+<p>
+Full API documentation for the class <b>%s</b>:
+<ul>
+<li><a href="/documentation/steveclasses/%s.html">steve language documentation</a></li>
+<li><a href="/documentation/pythonclasses/%s.html">Python language documentation</a></li>
+</ul>
+</p>
+''' % ( name, docstring, parent, name, name, name ) 
+
+	output.write( outstring )
+
+	output.close()
+
+
+
 def WriteDocumentation( xmlstring ):
 	xmldocs = xml.dom.minidom.parseString( xmlstring )
 
@@ -24,7 +61,7 @@ def WriteDocumentation( xmlstring ):
 
 	docstring = xmldocs.documentElement.getElementsByTagName( 'classdocstring' )[ 0 ].childNodes[ 0 ].nodeValue
 
-	output.write( '<h3>Class description:</h3><p><blockquote>%s</blockquote>\n' % ProcessDocstring( docstring ) )
+	output.write( '<h3>Class description:</h3><p><blockquote>%s</blockquote>\n' % ProcessDocstring( docstring, [], 1 ) )
 
 	methods = xmldocs.documentElement.getElementsByTagName( 'method' )
 
@@ -69,7 +106,7 @@ def WriteMethod( output, xmlnode ):
 
 	methoddec = '<tt>%s( %s )</tt>' % ( name, argstring )
 
-	docstring = ProcessDocstring( xmlnode.getElementsByTagName( 'docstring' )[ 0 ].childNodes[ 0 ].nodeValue, argnames )
+	docstring = ProcessDocstring( xmlnode.getElementsByTagName( 'docstring' )[ 0 ].childNodes[ 0 ].nodeValue, argnames, 1 )
 
 	return '<hr /><a name="%s">%s\n<blockquote><p>%s</p></blockquote>\n' % ( name, methoddec, docstring )
 
@@ -84,16 +121,25 @@ def ProcessHeader( header, classname, parentname, usage = '' ):
 
 	return header
 
-def ProcessDocstring( docstring, arguments = [] ):
-	for i in arguments:
+def ProcessDocstring( docstring, argnames, useLinks = 1 ):
+	for i in argnames:
 		docstring = re.sub( '(\W)%s(\W)' % i, '\\1<b>%s</b>\\2' % i, docstring )
 
-	docstring = re.sub( 'OBJECT\(([^\)]*)\)', '<a href="\\1.html">\\1</a>', docstring )
-	docstring = re.sub( 'METHOD\(([^\)]*)\)', '<a href="#\\1">\\1</a>', docstring )
+	if useLinks:
+		docstring = re.sub( 'OBJECT\(([^\)]*)\)', '<a href="\\1.html">\\1</a>', docstring )
+		docstring = re.sub( 'METHOD\(([^\)]*)\)', '<a href="#\\1">\\1</a>', docstring )
+	else:
+		docstring = re.sub( 'OBJECT\(([^\)]*)\)', '\\1', docstring )
+		docstring = re.sub( 'METHOD\(([^\)]*)\)', '\\1', docstring )
 
 	return docstring
 
 destination = sys.argv[ 1 ]
+
+drupaldestination = None
+
+if len( sys.argv ) > 1:
+	drupaldestination = sys.argv[ 2 ]
 
 #
 #
@@ -119,6 +165,7 @@ for name in breve.__dict__:
 
 		WriteDocumentation( xmldoc.toprettyxml() )
 
-
+		if drupaldestination:
+			WriteDrupalDocumentationNode( xmldoc.toprettyxml() )
 
 sys.exit( 0 )

@@ -89,6 +89,15 @@ brMethod *brMethodFindWithArgRange( brObject *o, const char *name, unsigned char
 
 brObject *brObjectFindWithTypeSignature( brEngine *inEngine, const char *inTypename, int inSignature ) {
 	std::vector<brObjectType*>::iterator oi;
+	std::string name = inTypename;
+
+	if ( inEngine -> objects[ name ] && inEngine -> objects[ name ] -> type -> _typeSignature == inSignature ) 
+		return inEngine -> objects[ name ];
+
+	if ( inEngine -> objectAliases[ name ] && inEngine -> objectAliases[ name ] -> type -> _typeSignature == inSignature ) 
+		return inEngine -> objectAliases[ name ];
+
+	// try the object finder for this type
 
 	for ( oi = inEngine->objectTypes.begin(); oi != inEngine->objectTypes.end(); oi++ ) {
 		brObjectType *type = *oi;

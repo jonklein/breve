@@ -38,7 +38,7 @@ stObject *stObjectNew( brEngine *engine, stSteveData *sdata, char *name, char *a
 
 	// check to see if the object exists 
 
-	if ( brObjectFind( engine, name ) ) 
+	if ( brObjectFindWithTypeSignature( engine, name, STEVE_TYPE_SIGNATURE ) ) 
 		return NULL;
 
 	o = new stObject;

@@ -133,7 +133,7 @@ int brIAddCollisionHandler( brEval args[], brEval *target, brInstance *i ) {
 
 	handler = caller->object;
 
-	collider = brObjectFind( i->engine, BRSTRING( &args[1] ) );
+	collider = brObjectFindWithPreferredType( i->engine, BRSTRING( &args[1] ), i->object->type->_typeSignature );
 
 	if ( !collider ) {
 		slMessage( DEBUG_ALL, "addCollisionCallback: Cannot locate class \"%s\"\n", BRSTRING( &args[1] ) );

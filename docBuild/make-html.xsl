@@ -11,9 +11,11 @@
 
 <xsl:param name="xref.with.number.and.title" select="0"/>
 
-<xsl:param name="navig.graphics">../images/</xsl:param>
+<xsl:param name="navig.graphics" select="1"/>
 <xsl:param name="navig.graphics.path">../images/</xsl:param>
 <xsl:param name="navig.graphics.extension" select="'.gif'"/>
+
+<!-- <xsl:param name="img.src.path">../images/</xsl:param> -->
 
 <xsl:param name="admon.graphics" select="1"/>
 <xsl:param name="admon.graphics.path">../images/</xsl:param>

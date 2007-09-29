@@ -1,11 +1,13 @@
 
 import breve
+import __main__
 
 class DLA( breve.Control ):
 	def __init__( self ):
 		breve.Control.__init__( self )
 		self.maxLocation = 0
 		self.sphereShape = None
+
 		DLA.init( self )
 
 	def hit( self, location, c, agent ):

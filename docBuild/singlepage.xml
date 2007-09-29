@@ -13,6 +13,8 @@
 <xsl:param name="admon.graphics" select="1"/>
 <xsl:param name="admon.graphics.extension" select="'.gif'"/>
 
+<xsl:param name="admon.graphics.path">../images/</xsl:param>
+
 <xsl:param name="local.l10n.xml" select="document('')" />
 <l:i18n xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0">
 </l:i18n>

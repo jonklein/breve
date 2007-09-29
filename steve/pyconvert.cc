@@ -255,7 +255,8 @@ std::string stPyConvertMethod( stPyConversionData *inData, stObject *inObject, s
 		result += stPyConvertVariableDeclaration( inData, var, 0 );
 	}
 
-	result += "\n";
+	if( inMethod->variables.size() != 0 ) 
+		result += "\n";
 
 	for( unsigned int c = 0; c < inMethod->code.size(); c++ ) {
 		ADDTABS( inData, result );

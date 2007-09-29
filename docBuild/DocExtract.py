@@ -6,8 +6,6 @@ class DocExtract( object ):
 	def Extract( self, c ):
 		'''Extracts docs for a class'''
 
-		methods = inspect.getmembers( c, inspect.ismethod )
-
 		xmlimp = xml.dom.minidom.getDOMImplementation()
 
 		xmldoc = xmlimp.createDocument( None, "class", None )
@@ -25,44 +23,46 @@ class DocExtract( object ):
 		classdoc.appendChild( xmldoc.createTextNode( docstring ) )
 		rootnode.appendChild( classdoc )
 
+		methods = inspect.getmembers( c, inspect.ismethod )
+
 		for i in methods: 
 			method = i[ 1 ]
+			parentmethod = None
 
-			methodnode = xmldoc.createElement( 'method' )
-			methodnode.setAttribute( 'name', i[ 0 ] )
+			try:
+				parentmethod = getattr( c.__base__, i[ 0 ] )
+			except Exception:
+				pass
 
-			docnode = xmldoc.createElement( 'docstring' )
+			if parentmethod == None:
+				methodnode = xmldoc.createElement( 'method' )
+				methodnode.setAttribute( 'name', i[ 0 ] )
 
-			if method.__doc__ != None:
-				docstring = method.__doc__
-			else:
-				docstring = ''
+				docnode = xmldoc.createElement( 'docstring' )
 
-			docnode.appendChild( xmldoc.createTextNode( docstring ) )
+				if method.__doc__ != None:
+					docstring = method.__doc__
+				else:
+					docstring = ''
 
-			methodnode.appendChild( docnode )
+				docnode.appendChild( xmldoc.createTextNode( docstring ) )
 
-			arguments = inspect.getargspec( method )
+				methodnode.appendChild( docnode )
 
-			argsnode = xmldoc.createElement( 'arguments' )
+				arguments = inspect.getargspec( method )
+	
+				argsnode = xmldoc.createElement( 'arguments' )
 
-			
+				for n in xrange( len( arguments[ 0 ] ) ):
+					argumentnode = xmldoc.createElement( 'argument' )
+					argumentnode.setAttribute( 'name', arguments[ 0 ][ n ] )
+					argsnode.appendChild( argumentnode )
 
-			for n in xrange( len( arguments[ 0 ] ) ):
-				argumentnode = xmldoc.createElement( 'argument' )
-				argumentnode.setAttribute( 'name', arguments[ 0 ][ n ] )
-				argsnode.appendChild( argumentnode )
+				methodnode.appendChild( argsnode )
 
-			methodnode.appendChild( argsnode )
-
-			rootnode.appendChild( methodnode )
+				rootnode.appendChild( methodnode )
 			
 		return xmldoc
-
-	def Test( self ):
-			'''Does some stuff'''
-
-			pass
 
 
 # extractor = DocExtract()

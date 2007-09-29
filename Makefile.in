@@ -130,12 +130,12 @@ OSX_build: optimize lib/libbreve.a
 	m4 -D_VERSION_=$(VERSION) -D_DATE_=`date +'%m-%d-%y'` OSX/README.html.m4 > OSX/README.html
 	-mkdir docs
 	cd plugins; $(MAKE)
-	cd OSX; xcodebuild -buildstyle Deployment-Universal CC= LIBS='@LDFLAGS@ $(LIBS)' BREVE_VERSION=$(VERSION)
+	cd OSX; xcodebuild -configuration Deployment-Universal CC= LIBS='@LDFLAGS@ $(LIBS)' BREVE_VERSION=$(VERSION)
 
 OSX_debug: optimize_debug lib/libbreve.a
 	-mkdir docs
 	cd plugins; $(MAKE)
-	cd OSX; xcodebuild -buildstyle Deployment-Universal CC= LIBS='@LDFLAGS@ $(LIBS)' BREVE_VERSION=$(VERSION)
+	cd OSX; xcodebuild -configuration Deployment-Universal CC= LIBS='@LDFLAGS@ $(LIBS)' BREVE_VERSION=$(VERSION)
 
 OSX_clean: clean
 	rm -f $(DMG_FILE)

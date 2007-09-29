@@ -398,13 +398,13 @@ objecttype
 		if($5) version = $5;
 		else version = 1.0;
 
-		o = brObjectFindWithPreferredType(parseEngine, $3, STEVE_TYPE_SIGNATURE);
+		o = brObjectFindWithTypeSignature( parseEngine, $3, STEVE_TYPE_SIGNATURE );
 
 		if(o) currentObject = (stObject*)o->userData;
 		else currentObject = NULL;
 
 		if($4) {
-			o = brObjectFindWithPreferredType(parseEngine, $4, STEVE_TYPE_SIGNATURE);
+			o = brObjectFindWithTypeSignature( parseEngine, $4, STEVE_TYPE_SIGNATURE );
 
 			if(o) akaObject = (stObject*)o->userData;
 			else akaObject = NULL;
@@ -428,7 +428,7 @@ objecttype
 			slFree($3);
 			slFree($4);
 		} else {
-			brObject *o = brObjectFindWithPreferredType(parseEngine, $1, STEVE_TYPE_SIGNATURE );
+			brObject *o = brObjectFindWithTypeSignature( parseEngine, $1, STEVE_TYPE_SIGNATURE );
 
 			if(o) parentObject = (stObject*)o->userData;
 			else parentObject = NULL;

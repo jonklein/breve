@@ -913,6 +913,11 @@ void *brPythonFindObject( void *inData, const char *inName ) {
 	// the breve engine is going to hold on to this pointer and 
 	// will call the destructor when it's done.
 
+	PyObject *o = PyObject_GetAttrStringSafe( sPythonData._breveModule, (char*)inName );
+
+	if( o ) 
+		return o;
+
 	return PyObject_GetAttrStringSafe( mainModule, (char*)inName );
 }
 

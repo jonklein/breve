@@ -765,10 +765,7 @@
 		48F0A4DE09CCE98700B52C28 /* Deployment-Universal */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = i386;
 			};
 			name = "Deployment-Universal";
 		};
