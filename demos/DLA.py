@@ -1,13 +1,16 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
-import __main__
 
 class DLA( breve.Control ):
 	def __init__( self ):
 		breve.Control.__init__( self )
 		self.maxLocation = 0
 		self.sphereShape = None
-
 		DLA.init( self )
 
 	def hit( self, location, c, agent ):
@@ -49,23 +52,19 @@ class Diffuser( breve.Mobile ):
 		self.direction = breve.vector()
 		self.maxDist = 0
 		self.roaming = 0
-		self.sphereShape = None
 		Diffuser.init( self )
 
 	def collide( self, group ):
-
 		if self.roaming:
 			self.getController().hit( self.getLocation(), group.getColor(), self )
 
 		self.roaming = 0
 
 	def init( self ):
-
 		self.handleCollisions( 'Stationary', 'collide' )
 		self.move( ( breve.randomExpression( breve.vector( 10, 10, 10 ) ) - breve.vector( 5, 5, 5 ) ) )
 
 	def iterate( self ):
-
 		if ( breve.length( self.getLocation() ) > ( self.maxDist + 10 ) ):
 			self.offsetFromCenter( ( self.maxDist + 2 ) )
 
@@ -73,13 +72,11 @@ class Diffuser( breve.Mobile ):
 		self.roaming = 1
 
 	def offsetFromCenter( self, offset ):
-
 		self.direction = ( breve.randomExpression( breve.vector( 2, 2, 2 ) ) - breve.vector( 1, 1, 1 ) )
 		self.direction = ( self.direction / breve.length( self.direction ) )
 		self.move( ( self.direction * offset ) )
 
 	def setMaximumDistance( self, max ):
-
 		self.maxDist = max
 
 

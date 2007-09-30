@@ -1132,6 +1132,9 @@ char *brPythonEncodeToString( brEngine *inEngine, void *inData ) {
 
 	PyObject *encoder = PyObject_GetAttrStringSafe( sPythonData._breveModule, "encodeToString" );
 
+	if( !encoder )
+		return NULL;
+
 	PyObject *args = PyTuple_New( 1 );
 
 	// SetItem steals a reference
@@ -1157,6 +1160,9 @@ char *brPythonEncodeToString( brEngine *inEngine, void *inData ) {
 
 void *brPythonDecodeFromString( brEngine *inEngine, char *inString ) {
 	PyObject *decoder = PyObject_GetAttrStringSafe( sPythonData._breveModule, "decodeFromString" );
+
+	if( !decoder )
+		return NULL;
 
 	PyObject *args = PyTuple_New( 1 );
 

@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Fountain( breve.Control ):
@@ -9,11 +14,9 @@ class Fountain( breve.Control ):
 		Fountain.init( self )
 
 	def getLightmapImage( self ):
-
 		return self.lightmap
 
 	def init( self ):
-
 		self.setIntegrationStep( 0.050000 )
 		self.setIterationStep( 0.100000 )
 		self.setBackgroundColor( breve.vector( 0, 0, 0 ) )
@@ -25,7 +28,6 @@ class Fountain( breve.Control ):
 		self.pointCamera( breve.vector( 0, 9, 0 ), breve.vector( 80.000000, 2.100000, 0.000000 ) )
 
 	def iterate( self ):
-
 		self.pivotCamera( 0.001000, 0.001000 )
 		breve.Control.iterate( self )
 
@@ -39,7 +41,6 @@ class Particle( breve.Mobile ):
 		Particle.init( self )
 
 	def init( self ):
-
 		self.shape = breve.createInstances( breve.Sphere, 1 ).initWith( ( breve.randomExpression( 2.000000 ) + 0.100000 ) )
 		self.setShape( self.shape )
 		self.drawAsPoint()
@@ -47,20 +48,17 @@ class Particle( breve.Mobile ):
 		self.reset()
 
 	def iterate( self ):
-
 		if ( self.getLocation().y < -16.000000 ):
 			self.reset()
 
 
 	def reset( self ):
-
 		self.setColor( breve.randomExpression( breve.vector( 1, 1, 1 ) ) )
 		self.move( breve.vector( 0, 0, 0 ) )
 		self.setAcceleration( ( breve.randomExpression( breve.vector( 4, -15, 4 ) ) - breve.vector( 2, 1, 2 ) ) )
 		self.setVelocity( ( breve.randomExpression( breve.vector( ( 2 * self.range ), 20, ( 2 * self.range ) ) ) + breve.vector( ( -self.range ), 4, ( -self.range ) ) ) )
 
 	def setRange( self, n ):
-
 		self.range = n
 
 

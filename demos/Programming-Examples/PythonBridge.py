@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class myController( breve.Control ):
@@ -8,9 +13,8 @@ class myController( breve.Control ):
 		myController.init( self )
 
 	def init( self ):
-
-		breve.createInstances( breve.PythonBridgeObject, 1 )
-		breve.createInstances( breve.PythonBridgeObject, 1 ).archiveAsXml( 'python.xml' )
+		self.myPythonObject = breve.createInstances( breve.PythonBridgeObject, 1 )
+		print self.myPythonObject.testVector( breve.vector( 1, 1, 1 ) )
 
 
 breve.myController = myController

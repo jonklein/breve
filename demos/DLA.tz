@@ -111,7 +111,6 @@ Mobile : Diffuser {
 	+ variables:
 		direction (vector).
 		roaming (int).
-		sphereShape (object).
 		maxDist (double).
 
 	+ to set-maximum-distance to max (double):

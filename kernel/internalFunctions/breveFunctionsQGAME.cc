@@ -81,7 +81,7 @@ int brIQSysTestProgram( brEval args[], brEval *target, brInstance *i ) {
 	qgame::QSys *sys = ( qgame::QSys * )BRPOINTER( &args[0] );
 	qgame::QProgram *prog = ( qgame::QProgram * )BRPOINTER( &args[1] );
 	std::vector< qgame::TestCase > cases;
-	std::vector< brEval* >::iterator li;
+	std::vector< brEval >::iterator li;
 	qgame::QubitList qb;
 
 	// get the final measurement qubits...
@@ -89,7 +89,7 @@ int brIQSysTestProgram( brEval args[], brEval *target, brInstance *i ) {
 	brEvalListHead *list = BRLIST( &args[4] );
 
 	for ( li = list->_vector.begin(); li != list->_vector.end(); li++ ) {
-		qb.append( BRINT( *li ) );
+		qb.append( BRINT( &(*li) ) );
 	}
 
 	list = BRLIST( &args[2] );
@@ -97,7 +97,7 @@ int brIQSysTestProgram( brEval args[], brEval *target, brInstance *i ) {
 	// generate the test cases...
 
 	for ( li = list->_vector.begin(); li != list->_vector.end(); li++ ) {
-		cases.push_back( qgame::TestCase( BRSTRING( *li ) ) );
+		cases.push_back( qgame::TestCase( BRSTRING( &(*li) ) ) );
 	}
 
 	qgame::Result result;

@@ -1,9 +1,4 @@
-#
-#
-#
-
 @use Object.
-@use Vector.
 @use Image.
 
 Object : Vector (aka Vectors) [version 2.3] {

@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class GS( breve.Control ):
@@ -50,11 +55,11 @@ class GS( breve.Control ):
 			c = breve.randomExpression( ( 6 - 1 ) )
 			n = ( 1 + breve.randomExpression( ( 128 - 3 ) ) )
 			m = ( 1 + breve.randomExpression( ( 128 - 3 ) ) )
-			self.chemicals[ c ].setValue( n, m, 0.200000 )
-			self.chemicals[ c ].setValue( n, ( m + 1 ), 0.200000 )
-			self.chemicals[ c ].setValue( n, ( m - 1 ), 0.200000 )
-			self.chemicals[ c ].setValue( ( n + 1 ), m, 0.200000 )
-			self.chemicals[ c ].setValue( ( n - 1 ), m, 0.200000 )
+			self.chemicals[ c ].setValue( 0.200000, n, m )
+			self.chemicals[ c ].setValue( 0.200000, n, ( m + 1 ) )
+			self.chemicals[ c ].setValue( 0.200000, n, ( m - 1 ) )
+			self.chemicals[ c ].setValue( 0.200000, ( n + 1 ), m )
+			self.chemicals[ c ].setValue( 0.200000, ( n - 1 ), m )
 
 			x = ( x + 1 )
 
@@ -69,6 +74,8 @@ class GS( breve.Control ):
 		self.cube.setTextureScale( 60 )
 
 	def iterate( self ):
+		'''Compute the reaction matrices for each chemical.   For a given chemical pair ( cN, cM ), the change in chemical cN is defined by: delta cN = cN * cM * reactionRate( cM, cN )  To get the total change in cM, we compute this matrix for all chemicals cN. To save computation, we'll make a matrix of all [ cM * reactionRate( cM, cN ) ] without the cM term, then introduce the cM term as the last step  We also compute a ( 1.0 - totalConcentration ) term.  This will allow us to enforce the constraint that all chemicals sum to 1.'''
+
 		m = 0
 		n = 0
 		sum = 0
@@ -114,26 +121,21 @@ class MatrixTextureImage( breve.Image ):
 		breve.Image.__init__( self )
 		self.b = None
 		self.g = None
-		self.n = 0
 		self.r = None
 
 	def iterate( self ):
-
 		self.r.copyToRedChannel( self )
 		self.g.copyToGreenChannel( self )
 		self.b.copyToBlueChannel( self )
 		breve.Image.iterate( self )
 
 	def setB( self, m ):
-
 		self.b = m
 
 	def setG( self, m ):
-
 		self.g = m
 
 	def setR( self, m ):
-
 		self.r = m
 
 

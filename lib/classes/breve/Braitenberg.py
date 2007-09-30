@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class BraitenbergControl( breve.PhysicalControl ):
@@ -12,7 +17,6 @@ class BraitenbergControl( breve.PhysicalControl ):
 		BraitenbergControl.init( self )
 
 	def init( self ):
-
 		self.enableLighting()
 		self.enableSmoothDrawing()
 		self.floorShape = breve.createInstances( breve.Shape, 1 )
@@ -83,26 +87,21 @@ class BraitenbergVehicle( breve.MultiBody ):
 		return wheel
 
 	def destroy( self ):
-
 		breve.deleteInstances( self.sensorShape )
 		breve.deleteInstances( self.wheelShape )
 		breve.deleteInstances( self.bodyShape )
 		breve.MultiBody.destroy( self )
 
 	def getDensity( self ):
-
 		return 1.000000
 
 	def getWheelRadius( self ):
-
 		return 0.600000
 
 	def getWheelWidth( self ):
-
 		return 0.100000
 
 	def init( self ):
-
 		self.bodyShape = breve.createInstances( breve.Shape, 1 )
 		self.bodyShape.initWithCube( breve.vector( 4.000000, 0.750000, 3.000000 ) )
 		self.wheelShape = breve.createInstances( breve.Shape, 1 )
@@ -127,15 +126,12 @@ class BraitenbergHeavyVehicle( breve.BraitenbergVehicle ):
 		breve.BraitenbergVehicle.__init__( self )
 
 	def getDensity( self ):
-
 		return 20.000000
 
 	def getWheelRadius( self ):
-
 		return 0.800000
 
 	def getWheelWidth( self ):
-
 		return 0.400000
 
 
@@ -148,7 +144,6 @@ class BraitenbergLight( breve.Mobile ):
 		BraitenbergLight.init( self )
 
 	def init( self ):
-
 		self.setShape( breve.createInstances( breve.Shape, 1 ).initWithSphere( 0.300000 ) )
 		self.setColor( breve.vector( 1, 0, 0 ) )
 
@@ -168,16 +163,13 @@ class BraitenbergWheel( breve.Link ):
 	def activate( self, n ):
 		'''Used internally.'''
 
-
 		self.newVelocity = ( self.newVelocity + n )
 
 	def init( self ):
-
 		self.naturalVelocity = 0
 		self.newVelocity = 0
 
 	def postIterate( self ):
-
 		if ( self.newVelocity > 30 ):
 			self.newVelocity = 30
 
@@ -195,12 +187,10 @@ class BraitenbergWheel( breve.Link ):
 	def setJoint( self, j ):
 		'''Used internally.'''
 
-
 		self.joint = j
 
 	def setNaturalVelocity( self, n ):
 		'''Sets the "natural" velocity of this wheel.  The natural velocity is the speed at which the wheel turns in the absence of sensor input.  '''
-
 
 		self.naturalVelocity = n
 
@@ -220,7 +210,6 @@ class BraitenbergSensor( breve.Link ):
 		BraitenbergSensor.init( self )
 
 	def init( self ):
-
 		self.bias = 1.000000
 		self.direction = breve.vector( 0, 1, 0 )
 		self.sensorAngle = 1.600000
@@ -263,12 +252,10 @@ class BraitenbergSensor( breve.Link ):
 	def link( self, w ):
 		'''Associates this sensor with wheel w.'''
 
-
 		self.wheels.append( w )
 
 	def setActivationMethod( self, m, o ):
 		'''This method specifies an activation method for the sensor.  An activation method is a method which takes as input the strength read by the sensor, and as output returns the strength of the  signal which will travel on to the motor. <p> Your activation function should be defined as: <pre> + to <i>activation-function-name</i> with-sensor-strength s (float): </pre> <p> The default activation method is linear, but more complex vehicles may require non-linear activation functions. '''
-
 
 		self.activationMethod = m
 		self.activationObject = o
@@ -276,12 +263,10 @@ class BraitenbergSensor( breve.Link ):
 	def setBias( self, d ):
 		'''Sets the "bias" of this sensor.  The default bias is 1, meaning that the sensor has a positive influence on associated wheels with strength 1.  You can change this to any magnitude, positive or negative.'''
 
-
 		self.bias = d
 
 	def setSensorAngle( self, n ):
 		'''Sets the angle in which this sensor can detect light.  The default value of 1.5 means that the sensor can see most of everything in front of it.  Setting the value to be any higher leads to general wackiness, so I don't suggest it.'''
-
 
 		self.sensorAngle = n
 

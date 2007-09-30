@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Sound( breve.Abstract ):
@@ -9,12 +14,10 @@ class Sound( breve.Abstract ):
 		self.soundPointer = None
 
 	def destroy( self ):
-
 		breve.breveInternalFunctionFinder.freeSoundData( self, self.soundPointer )
 
 	def load( self, file ):
 		'''Loads the sound-file filename using the current breve search path.  Returns self.'''
-
 
 		if self.soundPointer:
 			breve.breveInternalFunctionFinder.freeSoundData( self, self.soundPointer )
@@ -24,7 +27,6 @@ class Sound( breve.Abstract ):
 
 	def play( self, speed = 1.000000 ):
 		'''Begins playing this sound.  The optional argument speed specifies  the speed (and accompanying frequency change) of the sound. '''
-
 
 		if self.soundPointer:
 			breve.breveInternalFunctionFinder.playSoundData( self, self.soundPointer, speed )

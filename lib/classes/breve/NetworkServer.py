@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class NetworkServer( breve.Abstract ):
@@ -9,7 +14,6 @@ class NetworkServer( breve.Abstract ):
 		self.serverData = None
 
 	def destroy( self ):
-
 		if self.serverData:
 			breve.breveInternalFunctionFinder.closeServer( self, self.serverData )
 
@@ -17,12 +21,10 @@ class NetworkServer( breve.Abstract ):
 	def getUrl( self ):
 		'''Returns the URL for this server.'''
 
-
 		return breve.breveInternalFunctionFinder.getServerURL( self, self.serverData )
 
 	def listen( self, portNumber ):
 		'''Listens for connections from other breve engines on port portNumber.  portNumber must be greater than 1024, but  otherwise can be any unused part that the client and server breve users agree on.'''
-
 
 		self.serverData = breve.breveInternalFunctionFinder.listenOnPort( self, portNumber )
 		if ( not self.serverData ):
@@ -35,12 +37,10 @@ class NetworkServer( breve.Abstract ):
 	def setIndexPage( self, indexPage ):
 		'''Sets the index page to indexPage.  The indexPage is what's  given when a user connects to a running breve simulation without specifying a specific page or command.'''
 
-
 		breve.breveInternalFunctionFinder.setIndexPage( self, self.serverData, indexPage )
 
 	def setUploadRecipient( self, newRecipient ):
 		'''Sets the object which will receive the "accept-upload" message. The default upload recipient is the controller.'''
-
 
 		breve.breveInternalFunctionFinder.networkSetRecipient( self, self.serverData, newRecipient )
 

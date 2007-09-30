@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class myController( breve.Control ):
@@ -7,7 +12,6 @@ class myController( breve.Control ):
 		myController.init( self )
 
 	def init( self ):
-
 		breve.createInstances( breve.PushTest, 1 ).go()
 
 
@@ -21,19 +25,16 @@ class PushTest( breve.Object ):
 		PushTest.init( self )
 
 	def callback( self ):
-
 		print '''%s is calling the breve callback function, pushing 7, ''' % (  self )
 		self.interpreter.pushInteger( 7 )
 		self.interpreter.printStacks()
 
 	def callback2( self ):
-
 		print '''%s is calling the breve callback2 function, pushing 8, ''' % (  self )
 		self.interpreter.pushInteger( 8 )
 		self.interpreter.printStacks()
 
 	def go( self ):
-
 		self.interpreter.pushInteger( 100 )
 		self.interpreter.clearStacks()
 		self.code = breve.createInstances( breve.PushProgram, 1 ).parse( '''( 0 0 INTEGER./ )''' )
@@ -52,7 +53,6 @@ class PushTest( breve.Object ):
 		self.controller.endSimulation()
 
 	def init( self ):
-
 		self.interpreter = breve.createInstances( breve.PushInterpreter, 1 )
 		self.interpreter.clearStacks()
 		self.interpreter.readConfig( 'PushTest.config' )
@@ -60,7 +60,6 @@ class PushTest( breve.Object ):
 		self.interpreter.addInstruction( 'callback', self, 'CALLBACKTEST' )
 
 	def testSetFromList( self ):
-
 		self.code = breve.createInstances( breve.PushProgram, 1 ).parse( '''( INTEGER./ 1 1 1 1 1 1 1 1)''' )
 		self.code2.setFrom( [ 'X', self.code, 'Y', self.code, 'Z', self.code ] )
 		self.code.mutate( self.interpreter )

@@ -302,8 +302,6 @@ if 1:
 	from Movie 		import *
 	from NetworkServer 	import *
 	from NeuralNetwork 	import *
-	from Push 		import *
-	from PushGP 		import *
 	from SFFNetwork 	import *
 	from Shape 		import *
 	from Sound 		import *
@@ -312,10 +310,12 @@ if 1:
 	from Tone 		import *
 	from TurtleDrawing 	import *
 	from Vector 		import *
+	from IRSensor		import *
 	from Wanderer 		import *
 
-
-
+	from QGAME		import *
+	from Push 		import *
+	from PushGP 		import *
 
 
 class bridgeObjectMethod( object ):

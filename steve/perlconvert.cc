@@ -620,7 +620,9 @@ std::string stListInsertExp::toPerl( stPerlConversionData *inData ) {
 
 std::string stListRemoveExp::toPerl( stPerlConversionData *inData ) {
 	std::string result;
-	result = "del " + listExp->toPerl( inData ) + "[ " + index->toPerl( inData ) + " ]";
+
+	if( index )
+		result = "del " + listExp->toPerl( inData ) + "[ " + index->toPerl( inData ) + " ]";
 
 	return result;
 }

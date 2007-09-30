@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class myController( breve.Control ):
@@ -8,12 +13,10 @@ class myController( breve.Control ):
 		myController.init( self )
 
 	def init( self ):
-
 		self.sound = breve.createInstances( breve.Sound, 1 )
 		self.sound.load( 'sounds/cat.wav' )
 
 	def iterate( self ):
-
 		if ( breve.randomExpression( 1000 ) == 0 ):
 			self.sound.play( ( 0.800000 + breve.randomExpression( 1.200000 ) ) )
 

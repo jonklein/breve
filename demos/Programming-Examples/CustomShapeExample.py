@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class myController( breve.Control ):
@@ -7,7 +12,6 @@ class myController( breve.Control ):
 		myController.init( self )
 
 	def init( self ):
-
 		breve.createInstances( breve.CustomShapeAgent, 1 )
 		self.enableLighting()
 
@@ -19,7 +23,6 @@ class CustomShapeAgent( breve.Mobile ):
 		CustomShapeAgent.init( self )
 
 	def init( self ):
-
 		self.setShape( breve.createInstances( breve.myCustomShape, 1 ) )
 		self.setColor( breve.randomExpression( breve.vector( 1, 1, 1 ) ) )
 		self.setRotationalVelocity( breve.vector( 0.010000, 0.050000, 0.010000 ) )
@@ -34,7 +37,6 @@ class myCustomShape( breve.CustomShape ):
 		myCustomShape.init( self )
 
 	def init( self ):
-
 		self.vertices[ 0 ] = breve.vector( -1, 0, 0 )
 		self.vertices[ 1 ] = breve.vector( 1.400000, 0, 1.400000 )
 		self.vertices[ 2 ] = breve.vector( 1.400000, 0, -1.400000 )

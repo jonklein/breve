@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class GS( breve.Control ):
@@ -55,7 +60,6 @@ class GS( breve.Control ):
 		breve.allInstances( "Patches" ).setTransparency( 0.900000 )
 
 	def iterate( self ):
-
 		self.tempreact.copy( self.U )
 		self.tempreact.multiplyWithValues( self.V )
 		self.tempreact.multiplyWithValues( self.V )

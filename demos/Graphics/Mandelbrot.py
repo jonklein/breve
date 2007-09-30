@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class myController( breve.Control ):
@@ -55,7 +60,6 @@ class Painter( breve.Mobile ):
 		return color
 
 	def init( self ):
-
 		self.setShape( breve.createInstances( breve.Sphere, 1 ).initWith( 0.010000 ) )
 		self.setColor( breve.vector( 0, 0, 0 ) )
 

@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Stationary( breve.Real ):
@@ -12,7 +17,6 @@ class Stationary( breve.Real ):
 	def catchShadows( self ):
 		'''Informs this object that it should display shadows (and/or reflections)  of Mobile objects.  The shadows and reflections will always be shown on the plane of the object pointing upwards on the Y axis--that is to say, the plane with normal (0, 1, 0).  If the object does not have a plane with normal (0, 1, 0), the shadows and reflections will not be displayed correctly.  This method must be used in conjunction with the method  OBJECTMETHOD(Control:enable-shadows). <P> Before using this method, you should also refer to an improved shadowing technique outlined in OBJECTMETHOD(Control.tz:enable-shadow-volumes).  '''
 
-
 		if ( not self.realWorldPointer ):
 			raise Exception( '''method 'catch-shadows' cannot be called before Stationary object is registered.''' )
 
@@ -22,7 +26,6 @@ class Stationary( breve.Real ):
 		self.controller.setFloorDefined()
 
 	def dearchive( self ):
-
 		self.realWorldPointer = breve.breveInternalFunctionFinder.addStationary( self, self.controller.getGenericShape().getPointer(), breve.vector( 0, 0, 0 ), breve.matrix(  1, 0, 0, 0, 1, 0, 0, 0, 1 ) )
 		if self.shadowCatcher:
 			self.catchShadows()
@@ -32,11 +35,9 @@ class Stationary( breve.Real ):
 	def getWorldObject( self ):
 		'''Used internally to get the pointer to the world.  Do not use this method in user simulations.'''
 
-
 		return self.realWorldPointer
 
 	def init( self ):
-
 		self.realWorldPointer = breve.breveInternalFunctionFinder.addStationary( self, self.controller.getGenericShape().getPointer(), breve.vector( 0, 0, 0 ), breve.matrix(  1, 0, 0, 0, 1, 0, 0, 0, 1 ) )
 		self.setTexture( 0 )
 		self.setShape( self.controller.getGenericShape() )
@@ -44,7 +45,6 @@ class Stationary( breve.Real ):
 
 	def register( self, theShape, theLocation = breve.vector( 0.000000, 0.000000, 0.000000 ), theRotation = breve.matrix( 1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 1.000000 ) ):
 		'''Registers a stationary object using shape theShape at the location specified by theLocation.'''
-
 
 		self.setShape( theShape )
 		self.move( theLocation )
@@ -62,14 +62,12 @@ class Floor( breve.Stationary ):
 		Floor.init( self )
 
 	def init( self ):
-
 		self.shape = breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 1000, 5, 1000 ) )
 		self.move( breve.vector( 0, -2.500000, 0 ) )
 		self.setShape( self.shape )
 
 	def setSize( self, newSize ):
 		'''Changes the size of the floor to newSize.'''
-
 
 		if self.shape:
 			breve.deleteInstances( self.shape )

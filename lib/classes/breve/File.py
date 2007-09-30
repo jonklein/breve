@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class File( breve.Abstract ):
@@ -11,14 +16,12 @@ class File( breve.Abstract ):
 	def close( self ):
 		'''Closes the file.  This should be done when you're finished reading from or writing to a file.'''
 
-
 		if self.filePointer:
 			breve.breveInternalFunctionFinder.closeFile( self, self.filePointer )
 
 		self.filePointer = 0
 
 	def destroy( self ):
-
 		if self.filePointer:
 			self.close()
 
@@ -26,12 +29,10 @@ class File( breve.Abstract ):
 	def isEndOfFile( self ):
 		'''Returns whether the file pointer is at the end of the file.'''
 
-
 		return breve.breveInternalFunctionFinder.fileEOF( self, self.filePointer )
 
 	def openForAppending( self, fileName ):
 		'''Opens fileName for appending.  If the file already exists, future writes will append text to the end of the file instead of overwriting it. If the file does not exist, it is created. <p> To be used with the methods METHOD(write), METHOD(write-line) and  METHOD(write-data) below.'''
-
 
 		self.filePointer = breve.breveInternalFunctionFinder.openFileForAppending( self, fileName )
 		if ( not self.filePointer ):
@@ -42,7 +43,6 @@ class File( breve.Abstract ):
 	def openForReading( self, fileName ):
 		'''Opens fileName for reading.  To be used with the methods  METHOD(read-as-string), METHOD(read-as-data) and METHOD(read-line) below.'''
 
-
 		self.filePointer = breve.breveInternalFunctionFinder.openFileForReading( self, fileName )
 		if ( not self.filePointer ):
 			return 0
@@ -51,7 +51,6 @@ class File( breve.Abstract ):
 
 	def openForWriting( self, fileName ):
 		'''Opens fileName for writing.  If the file already exists, it is truncated to length zero so that this method effectively overwrites files. If the file does not exist, it is created. <p> To be used with the methods METHOD(write), METHOD(write-line) and  METHOD(write-data) below.'''
-
 
 		self.filePointer = breve.breveInternalFunctionFinder.openFileForWriting( self, fileName )
 		if ( not self.filePointer ):
@@ -62,42 +61,35 @@ class File( breve.Abstract ):
 	def readAsData( self ):
 		'''Reads the entire file as binary data and returns a "data" type (not to be confused with a OBJECT(Data) object).'''
 
-
 		return breve.breveInternalFunctionFinder.readFileAsData( self, self.filePointer )
 
 	def readAsString( self ):
 		'''Reads the entire file and returns it as a string.'''
-
 
 		return breve.breveInternalFunctionFinder.readFileAsString( self, self.filePointer )
 
 	def readLine( self ):
 		'''Reads a single line of text from the file (ending with a newline). The size of the line read is limited to 10239.'''
 
-
 		return breve.breveInternalFunctionFinder.readLine( self, self.filePointer )
 
 	def readLineAsList( self, delimiterString ):
 		'''Reads a line from the file and returns the results as a list of elements delimited by delimiterString. The size of the line read is limited to 10239.'''
-
 
 		return breve.breveInternalFunctionFinder.readDelimitedList( self, self.filePointer, delimiterString )
 
 	def readLineAsWhitespaceDelimitedList( self ):
 		'''Reads a line from the file and returns the results as a list of elements delimited by whitespace. The size of the line read is limited to 10239.'''
 
-
 		return breve.breveInternalFunctionFinder.readWhitespaceDelimitedList( self, self.filePointer )
 
 	def write( self, theText ):
 		'''Writes the string theText to the file.  This method does not write a newline character to the end of the string.  See METHOD(write-line) for writing a string with a newline character.'''
 
-
 		breve.breveInternalFunctionFinder.writeString( self, self.filePointer, theText )
 
 	def writeLine( self, theText ):
 		'''Writes the string theText to the file, with a newline character at  the end.  Like METHOD(write), but includes a newline character.'''
-
 
 		breve.breveInternalFunctionFinder.writeString( self, self.filePointer, '''%s
 ''' % (  theText ) )

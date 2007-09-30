@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Shape( breve.Abstract ):
@@ -13,17 +18,14 @@ class Shape( breve.Abstract ):
 		Shape.init( self )
 
 	def archive( self ):
-
 		self.shapeData = self.getDataForShape()
 		return 1
 
 	def dearchive( self ):
-
 		self.shapePointer = breve.breveInternalFunctionFinder.shapeForData( self, self.shapeData )
 		return breve.Abstract.dearchive( self )
 
 	def destroy( self ):
-
 		if self.shapePointer:
 			breve.breveInternalFunctionFinder.freeShape( self, self.shapePointer )
 
@@ -31,14 +33,12 @@ class Shape( breve.Abstract ):
 	def getDataForShape( self ):
 		'''Returns serialized data for the shape (if the shape object has  been properly initialized).  Used for archiving/dearchiving, should generally not be called manually, unless you <i>really</i> know what you're doing.'''
 
-
 		if self.shapePointer:
 			return breve.breveInternalFunctionFinder.dataForShape( self, self.shapePointer )
 
 
 	def getDensity( self ):
 		'''If the shape is properly initialized, this method returns the  shape's density.'''
-
 
 		if self.shapePointer:
 			return breve.breveInternalFunctionFinder.getDensity( self, self.shapePointer )
@@ -48,12 +48,10 @@ class Shape( breve.Abstract ):
 	def getLastScale( self ):
 		'''Used internally...'''
 
-
 		return self.lastScale
 
 	def getMass( self ):
 		'''If the shape is properly initialized, this method returns the  shape's mass.'''
-
 
 		if self.shapePointer:
 			return breve.breveInternalFunctionFinder.getMass( self, self.shapePointer )
@@ -62,7 +60,6 @@ class Shape( breve.Abstract ):
 
 	def getPointOnShape( self, theVector ):
 		'''This method is experimental. <p> Starting from inside the shape at the center, this function goes in  the direction of theVector until it hits the edge of the shape. The resulting point is returned.   <p> This allows you to compute link points for arbitrary shapes.  For example, if you want to compute a link point for the  "left-most" point on the shape, you can call this method with (-1, 0, 0).   <p> Returns (0, 0, 0) if the shape is not initialized or if an error occurs.'''
-
 
 		if self.shapePointer:
 			return breve.breveInternalFunctionFinder.pointOnShape( self, self.shapePointer, theVector )
@@ -73,16 +70,13 @@ class Shape( breve.Abstract ):
 	def getPointer( self ):
 		'''Returns the shapePointer associated with this Shape object.  This  method is used internally and should not typically be used in  user simulations.'''
 
-
 		return self.shapePointer
 
 	def init( self ):
-
 		self.density = 1.000000
 
 	def initWithCube( self, v ):
 		'''Sets this Shape object to a rectangular solid of size v.  '''
-
 
 		self.shapePointer = breve.breveInternalFunctionFinder.newCube( self, v, self.density )
 		return self
@@ -90,13 +84,11 @@ class Shape( breve.Abstract ):
 	def initWithPolygonCone( self, sideCount, theHeight, theRadius = 1.000000 ):
 		'''Sets this Shape object to a cone-like shape with sideCount sides. <p> The distance from the center of the n-gon faces to the vertices  is theRadius.  sides has a maximum value of 99.  Higher values will cause the shape not to be initialized. <p> The height, or depth of the extrusion, is theHeight. <p> This method is experimental, but seems to work okay.  Go figure.'''
 
-
 		self.shapePointer = breve.breveInternalFunctionFinder.newNGonCone( self, sideCount, theRadius, theHeight, self.density )
 		return self
 
 	def initWithPolygonDisk( self, sideCount, theHeight, theRadius = 1.000000 ):
 		'''Sets this Shape object to an extruded n-gon of sideCount sides, in other words, a disk with sideCount sides. <p> The distance from the center of the n-gon faces to the vertices  is theRadius.  sides has a maximum value of 99.  Higher values will cause the shape not to be initialized. <p> The height, or depth of the extrusion, is theHeight. <p> This method is experimental, but seems to work okay.  Go figure.'''
-
 
 		self.shapePointer = breve.breveInternalFunctionFinder.newNGonDisc( self, sideCount, theRadius, theHeight, self.density )
 		return self
@@ -104,13 +96,11 @@ class Shape( breve.Abstract ):
 	def initWithSphere( self, theRadius = 1.000000 ):
 		'''Sets this Shape object to a sphere with radius theRadius.'''
 
-
 		self.shapePointer = breve.breveInternalFunctionFinder.newSphere( self, theRadius, self.density )
 		return self
 
 	def scale( self, scale ):
 		'''If the shape is <i>not</i> a sphere, scales the shape by the x, y  and z elements of scale.  If the shape <i>is</i> a sphere, scales  the shape by only the x element such that the shape always remains  spherical. <p> After the size has been changed, the instances announces a  "size-changed" notification.'''
-
 
 		breve.breveInternalFunctionFinder.scaleShape( self, self.shapePointer, scale )
 		self.lastScale = scale
@@ -119,13 +109,11 @@ class Shape( breve.Abstract ):
 	def setDensity( self, newDensity ):
 		'''Sets the density for this Shape object.  This implicitly changes the  mass of the object.'''
 
-
 		self.density = newDensity
 		breve.breveInternalFunctionFinder.shapeSetDensity( self, self.shapePointer, self.density )
 
 	def setMass( self, newMass ):
 		'''Sets the mass for this Shape object.  This implicitly changes the  density of the object.'''
-
 
 		if self.shapePointer:
 			breve.breveInternalFunctionFinder.shapeSetMass( self, self.shapePointer, newMass )
@@ -143,17 +131,14 @@ class CustomShape( breve.Shape ):
 	def addFace( self, vertexList ):
 		'''Adds a face defined by the list of vectors in vertextList.'''
 
-
 		breve.breveInternalFunctionFinder.addShapeFace( self, self.shapePointer, vertexList )
 
 	def finishShape( self, theDensity ):
 		'''This method must be called after all of the faces are added  to complete initialization of the shape.  The density given  here will effect the physical properties of the shape if  physical simulation is used.  A value of 1.0 is reasonable. <P> If the shape specified is invalid (according to the constraints listed above), this method will trigger an error.'''
 
-
 		return breve.breveInternalFunctionFinder.finishShape( self, self.shapePointer, theDensity )
 
 	def init( self ):
-
 		self.shapePointer = breve.breveInternalFunctionFinder.newShape( self)
 
 
@@ -166,7 +151,6 @@ class Sphere( breve.Shape ):
 
 	def initWith( self, theRadius ):
 		'''Initializes the sphere with the radius theRadius.'''
-
 
 		self.shapePointer = breve.breveInternalFunctionFinder.newSphere( self, theRadius, self.density )
 		if ( not self.shapePointer ):
@@ -186,7 +170,6 @@ class Cube( breve.Shape ):
 	def initWith( self, cubeSize ):
 		'''Initializes the cube to a rectangular solid with size cubeSize. '''
 
-
 		self.shapePointer = breve.breveInternalFunctionFinder.newCube( self, cubeSize, self.density )
 		if ( not self.shapePointer ):
 			raise Exception( '''Could not create Cube: invalid arguments''' )
@@ -204,7 +187,6 @@ class PolygonDisk( breve.Shape ):
 
 	def initWith( self, sideCount, theHeight, theRadius = 1.000000 ):
 		'''Initializes the polygon-disk. <p> The distance from the center of the n-gon faces to the vertices  is theRadius.  sides has a maximum value of 99.  Higher values will cause the shape not to be initialized. <p> The height, or depth of the extrusion, is theHeight.'''
-
 
 		self.shapePointer = breve.breveInternalFunctionFinder.newNGonDisc( self, sideCount, theRadius, theHeight, self.density )
 		if ( not self.shapePointer ):
@@ -224,7 +206,6 @@ class PolygonCone( breve.Shape ):
 	def initWith( self, sideCount, theHeight, theRadius = 1.000000 ):
 		'''Initializes the polygon-cone. <p> The distance from the center of the n-gon faces to the vertices  is theRadius.  sides has a maximum value of 99.  Higher values will cause the polygon-cone not to be initialized. <p> The height, or depth of the extrusion, is theHeight.'''
 
-
 		self.shapePointer = breve.breveInternalFunctionFinder.newNGonCone( self, sideCount, theRadius, theHeight, self.density )
 		if ( not self.shapePointer ):
 			raise Exception( '''Could not create PolygonCone: invalid arguments''' )
@@ -242,7 +223,6 @@ class MeshShape( breve.Shape ):
 
 	def loadFrom3ds( self, filename, nodename = "" ):
 		'''Attempts to load a mesh from a 3D Studio scene file named filename. The optional argument nodename specifies which mesh in the scene  should be loaded.  If nodename is not provided, the first mesh found   in the scene is loaded.'''
-
 
 		self.shapePointer = breve.breveInternalFunctionFinder.meshShapeNew( self, filename, nodename )
 		if ( not self.shapePointer ):

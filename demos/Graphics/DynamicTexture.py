@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class DynamicTextureExample( breve.Control ):
@@ -7,7 +12,6 @@ class DynamicTextureExample( breve.Control ):
 		DynamicTextureExample.init( self )
 
 	def init( self ):
-
 		breve.createInstances( breve.DynamicCube, 1 )
 		self.setBackgroundColor( breve.vector( 0, 0, 0 ) )
 		self.enableLighting()
@@ -21,7 +25,6 @@ class DynamicCube( breve.Mobile ):
 		DynamicCube.init( self )
 
 	def init( self ):
-
 		self.setShape( breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 8, 8, 8 ) ) )
 		self.setTextureImage( breve.createInstances( breve.DynamicTexture, 1 ) )
 		self.setRotationalVelocity( breve.vector( 0.050000, 0.080000, 0.050000 ) )
@@ -36,7 +39,6 @@ class DynamicTexture( breve.Image ):
 		DynamicTexture.init( self )
 
 	def init( self ):
-
 		self.initWith( 32, 32 )
 
 	def iterate( self ):

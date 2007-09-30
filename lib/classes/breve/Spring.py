@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Spring( breve.Object ):
@@ -18,7 +23,6 @@ class Spring( breve.Object ):
 	def connect( self, springLink1, springLink2, point1 = breve.vector( 0.000000, 0.000000, 0.000000 ), point2 = breve.vector( 0.000000, 0.000000, 0.000000 ), springLength = 0.000000, springStrength = 100.000000, springDamping = 0.200000 ):
 		'''Connects the spring from springLink1 to springLink2.   <p> The optional arguments point1 and point2 specify the locations on the objects to which the springs are attached.  The default values are (0, 0, 0). <p> If the length arugment is omitted, length defaults to 0.'''
 
-
 		if ( springLink1 == springLink2 ):
 			return
 
@@ -33,14 +37,12 @@ class Spring( breve.Object ):
 		return self.springPointer
 
 	def destroy( self ):
-
 		if self.springPointer:
 			breve.breveInternalFunctionFinder.springRemove( self, self.springPointer )
 
 
 	def getCurrentLength( self ):
 		'''This method returns the <i>current</i> (stretched or compressed)  length of the spring, as opposed to the "natural" length.'''
-
 
 		if self.springPointer:
 			return breve.breveInternalFunctionFinder.springGetCurrentLength( self, self.springPointer )
@@ -50,7 +52,6 @@ class Spring( breve.Object ):
 	def getForce( self ):
 		'''Returns the amount of force applied by this spring at the last  timestep.  The returned value is a double representing the  magnitude of the force.  The direction of the force is determined by the locations of the links to which the spring is attached.'''
 
-
 		if self.springPointer:
 			return breve.breveInternalFunctionFinder.springGetForce( self, self.springPointer )
 
@@ -59,18 +60,15 @@ class Spring( breve.Object ):
 	def getLength( self ):
 		'''This method returns the natural length of the spring.  See also METHOD(get-current-length) which returns the current (stretched or compressed) length of the spring.'''
 
-
 		return self.length
 
 	def getLinks( self ):
 		'''Returns a list with two items, the links which are joined by this spring.'''
 
-
 		return [ self.start, self.end ]
 
 	def setContractOnly( self ):
 		'''Setting a spring as "contract only" means that the spring will contract if it is expanded larger than its natural length, but will not expand  if it is pushed to smaller lengths.  This makes the spring behavior  more like a rope.  See also METHOD(set-expand-only) and  METHOD(set-expand-and-contract).'''
-
 
 		self.mode = 2
 		if self.springPointer:
@@ -80,7 +78,6 @@ class Spring( breve.Object ):
 	def setDamping( self, newDamping ):
 		'''Sets the spring's damping to newDamping.'''
 
-
 		self.damping = newDamping
 		if self.springPointer:
 			breve.breveInternalFunctionFinder.springSetDamping( self, self.springPointer, newDamping )
@@ -88,7 +85,6 @@ class Spring( breve.Object ):
 
 	def setExpandAndContract( self ):
 		'''This sets a spring to apply forces to expand when the spring is pushed smaller than the natural length, and contract when the spring is pulled to be larger than the natural length.  This is the default behavior of  a spring.'''
-
 
 		self.mode = 0
 		if self.springPointer:
@@ -98,7 +94,6 @@ class Spring( breve.Object ):
 	def setExpandOnly( self ):
 		'''Setting a spring as "expand only" means that the spring will expand if it is pushed smaller than its natural length, but will not contract if it is stretched to be larger.'''
 
-
 		self.mode = 1
 		if self.springPointer:
 			breve.breveInternalFunctionFinder.springSetMode( self, self.springPointer, 1 )
@@ -106,7 +101,6 @@ class Spring( breve.Object ):
 
 	def setLength( self, newLength ):
 		'''Sets the spring's length to newLength.'''
-
 
 		self.length = newLength
 		if self.springPointer:
@@ -116,7 +110,6 @@ class Spring( breve.Object ):
 	def setMaximumForce( self, newMax ):
 		'''Sets an optional maximum force that the spring can apply.  This can  be used as a safegaurd to prevent unrealistically large forces from causing instability in simulations.  <p> If the maximum force value is set to 0, which is the default, then the springs forces are unlimited.'''
 
-
 		self.maxForce = newMax
 		if self.springPointer:
 			breve.breveInternalFunctionFinder.springSetMaxForce( self, self.springPointer, newMax )
@@ -125,12 +118,10 @@ class Spring( breve.Object ):
 	def setPattern( self, patternString ):
 		'''Sets the drawing style of this spring.  patternString is a string of  16 spaces and/or dashes which specify the line pattern to be drawn. A thickly dashed spring, for example, would use the pattern  "--------        ".  The string " " can be used to make the spring invisible.  If no style is given, a dotted line is drawn.'''
 
-
 		breve.breveInternalFunctionFinder.objectLineSetStipple( self, self.springPointer, patternString )
 
 	def setStrength( self, newStrength ):
 		'''Sets the spring's strength to newStrength.'''
-
 
 		self.strength = newStrength
 		if self.springPointer:

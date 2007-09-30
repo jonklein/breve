@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class myController( breve.Control ):
@@ -8,7 +13,6 @@ class myController( breve.Control ):
 		myController.init( self )
 
 	def fern( self, s ):
-
 		if ( s >= 0.400000 ):
 			self.drawing.pushState()
 			self.drawing.setColor( breve.vector( breve.randomExpression( 1.000000 ), breve.randomExpression( 1.000000 ), breve.randomExpression( 1.000000 ) ) )
@@ -27,7 +31,6 @@ class myController( breve.Control ):
 
 
 	def init( self ):
-
 		self.setBackgroundColor( breve.vector( 1, 1, 1 ) )
 		self.drawing = breve.createInstances( breve.TurtleDrawing, 1 )
 		self.drawing.move( breve.vector( 0, -5, 0 ) )

@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Gatherers( breve.Control ):
@@ -10,15 +15,12 @@ class Gatherers( breve.Control ):
 		Gatherers.init( self )
 
 	def getCollectorShape( self ):
-
 		return self.collectorShape
 
 	def getFoodShape( self ):
-
 		return self.foodShape
 
 	def init( self ):
-
 		self.collectorShape = breve.createInstances( breve.Sphere, 1 ).initWith( 1 )
 		self.foodShape = breve.createInstances( breve.Sphere, 1 ).initWith( 0.500000 )
 		breve.createInstances( breve.Collectors, 50 )
@@ -29,7 +31,6 @@ class Gatherers( breve.Control ):
 		self.pointCamera( breve.vector( 0, 0, 0 ), breve.vector( 0, 0, -80 ) )
 
 	def randomizeFood( self ):
-
 		self.foodList.randomizeLocation()
 
 
@@ -66,7 +67,6 @@ class Collector( breve.Wanderer ):
 		self.carrying = food
 
 	def init( self ):
-
 		self.setShape( self.controller.getCollectorShape() )
 		self.setColor( breve.vector( 1.000000, 1.000000, 1.000000 ) )
 		self.setWanderRange( breve.vector( 20.000000, 20.000000, 20.000000 ) )
@@ -74,7 +74,6 @@ class Collector( breve.Wanderer ):
 		self.handleCollisions( 'Food', 'collide' )
 
 	def iterate( self ):
-
 		if self.carrying:
 			self.carrying.move( ( self.getLocation() - breve.vector( 1, 0, 0 ) ) )
 
@@ -90,21 +89,17 @@ class Food( breve.Mobile ):
 		Food.init( self )
 
 	def getOwner( self ):
-
 		return self.owner
 
 	def init( self ):
-
 		self.setShape( self.controller.getFoodShape() )
 		self.setColor( breve.vector( 0.800000, 0.200000, 0.200000 ) )
 		self.randomizeLocation()
 
 	def randomizeLocation( self ):
-
 		self.move( ( breve.randomExpression( ( 2 * breve.vector( 20.000000, 20.000000, 20.000000 ) ) ) - breve.vector( 20.000000, 20.000000, 20.000000 ) ) )
 
 	def setOwner( self, o ):
-
 		self.owner = o
 
 

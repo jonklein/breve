@@ -86,11 +86,11 @@ Control : GS {
 			n = 1 + random[ SIZE - 3 ].
 			m = 1 + random[ SIZE - 3 ].
 
-			chemicals{ c } set-value at-x n at-y m to 0.2.
-			chemicals{ c } set-value at-x n at-y m + 1 to .2.
-			chemicals{ c } set-value at-x n at-y m - 1 to .2.
-			chemicals{ c } set-value at-x n + 1 at-y m to .2.
-			chemicals{ c } set-value at-x n - 1 at-y m to .2.
+			chemicals{ c } set-value to 0.2 at-x n at-y m.
+			chemicals{ c } set-value to 0.2 at-x n at-y m + 1.
+			chemicals{ c } set-value to 0.2 at-x n at-y m - 1.
+			chemicals{ c } set-value to 0.2 at-x n + 1 at-y m.
+			chemicals{ c } set-value to 0.2 at-x n - 1 at-y m.
 		}
 
 		texture = new MatrixTextureImage.
@@ -99,30 +99,28 @@ Control : GS {
 		texture set-g to rgb{ 1 }.
 		texture set-b to rgb{ 2 }.
 
+		# Create a cube on which to place the image texture
+
 		cube = new Mobile.
 		cube set-shape to (new Cube init-with size (60, 60, 1)).
 		cube set-texture-image to texture.
 		cube set-texture-scale to 60.
 
 	+ to iterate:
+		% Compute the reaction matrices for each chemical. 
+		%
+		% For a given chemical pair ( cN, cM ), the change in chemical cN is defined by:
+		% delta cN = cN * cM * reactionRate( cM, cN )
+		% 
+		% To get the total change in cM, we compute this matrix for all chemicals cN.
+		% To save computation, we'll make a matrix of all [ cM * reactionRate( cM, cN ) ]
+		% without the cM term, then introduce the cM term as the last step
+		%
+		% We also compute a ( 1.0 - totalConcentration ) term.  This will allow us to enforce
+		% the constraint that all chemicals sum to 1.
+
 		n, m (int).
 		sum (double).
-
-		#
-		# Compute the reaction matrices for each chemical. 
-		#
-		# For a given chemical pair ( cN, cM ), the change in chemical cN is defined by:
-		# delta cN = cN * cM * reactionRate( cM, cN )
-		# 
-		# To get the total change in cM, we compute this matrix for all chemicals cN.
-		# To save computation, we'll make a matrix of all [ cM * reactionRate( cM, cN ) ]
-		# without the cM term, then introduce the cM term as the last step
-		#
-
-		#
-		# We also compute a ( 1.0 - totalConcentration ) term.  This will allow us to enforce
-		# the constraint that all chemicals sum to 1.
-		#
 
 		totalConcentration set-all-values to 1.0.
 
@@ -175,7 +173,6 @@ Control : GS {
 Image : MatrixTextureImage {
 	+ variables:
 		r, g, b (object).
-		n (int).
 
 	+ to set-r to m (object): r = m.
 	+ to set-g to m (object): g = m.

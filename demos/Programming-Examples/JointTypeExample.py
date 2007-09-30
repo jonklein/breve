@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class JointTest( breve.PhysicalControl ):
@@ -8,7 +13,6 @@ class JointTest( breve.PhysicalControl ):
 		JointTest.init( self )
 
 	def init( self ):
-
 		self.setBackgroundColor( breve.vector( 0.400000, 0.400000, 0.400000 ) )
 		breve.createInstances( breve.Stationary, 1 ).register( breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 100, 0.100000, 100 ) ), breve.vector( 0, 0, 0 ) )
 		self.body = breve.createInstances( breve.JointTestBody, 1 )
@@ -26,27 +30,22 @@ class JointTest( breve.PhysicalControl ):
 		self.watch( self.body )
 
 	def makeBallJoint( self ):
-
 		self.body.makeBallJoint()
 		self.setDisplayText( '''BallJoints rotate on all axes''', -0.950000, -0.950000 )
 
 	def makeFixedJoint( self ):
-
 		self.body.makeFixedJoint()
 		self.setDisplayText( '''FixedJoints do not move''', -0.950000, -0.950000 )
 
 	def makePrismaticJoint( self ):
-
 		self.body.makePrismaticJoint()
 		self.setDisplayText( '''PrismaticJoints slide along one axis''', -0.950000, -0.950000 )
 
 	def makeRevoluteJoint( self ):
-
 		self.body.makeRevoluteJoint()
 		self.setDisplayText( '''RevoluteJoints rotate around one axis''', -0.950000, -0.950000 )
 
 	def makeUniversalJoint( self ):
-
 		self.body.makeUniversalJoint()
 		self.setDisplayText( '''UniversalJoints rotate on two axes''', -0.950000, -0.950000 )
 
@@ -63,11 +62,9 @@ class JointTestBody( breve.MultiBody ):
 		JointTestBody.init( self )
 
 	def getJoint( self ):
-
 		return self.joint
 
 	def init( self ):
-
 		self.shape = breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 1.100000, 2.000000, 1.100000 ) )
 		self.smallShape = breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 1.000000, 2.000000, 1.000000 ) )
 		self.links = breve.createInstances( breve.Links, 2 )
@@ -84,7 +81,6 @@ class JointTestBody( breve.MultiBody ):
 		return self
 
 	def makeBallJoint( self ):
-
 		if self.joint:
 			breve.deleteInstances( self.joint )
 
@@ -93,7 +89,6 @@ class JointTestBody( breve.MultiBody ):
 		self.joint.setStrengthLimit( 100 )
 
 	def makeFixedJoint( self ):
-
 		if self.joint:
 			breve.deleteInstances( self.joint )
 
@@ -101,7 +96,6 @@ class JointTestBody( breve.MultiBody ):
 		self.joint.link( self.links[ 0 ], self.links[ 1 ], breve.vector( 0, -1.000000, 0 ), breve.vector( 0, 1.000000, 0 ) )
 
 	def makePrismaticJoint( self ):
-
 		if self.joint:
 			breve.deleteInstances( self.joint )
 
@@ -110,7 +104,6 @@ class JointTestBody( breve.MultiBody ):
 		self.joint.setStrengthLimit( 1000 )
 
 	def makeRevoluteJoint( self ):
-
 		if self.joint:
 			breve.deleteInstances( self.joint )
 
@@ -119,7 +112,6 @@ class JointTestBody( breve.MultiBody ):
 		self.joint.setStrengthLimit( 1000 )
 
 	def makeUniversalJoint( self ):
-
 		if self.joint:
 			breve.deleteInstances( self.joint )
 
@@ -134,7 +126,6 @@ class ExampleRevoluteJoint( breve.RevoluteJoint ):
 		breve.RevoluteJoint.__init__( self )
 
 	def iterate( self ):
-
 		self.setJointVelocity( ( breve.breveInternalFunctionFinder.sin( self, ( self.controller.getTime() / 4 ) ) / 2 ) )
 
 
@@ -144,7 +135,6 @@ class ExamplePrismaticJoint( breve.PrismaticJoint ):
 		breve.PrismaticJoint.__init__( self )
 
 	def iterate( self ):
-
 		self.setJointVelocity( ( breve.breveInternalFunctionFinder.sin( self, ( self.controller.getTime() / 4 ) ) / 2 ) )
 
 

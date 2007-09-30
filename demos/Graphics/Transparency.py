@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class TransparencyExample( breve.Control ):
@@ -7,7 +12,6 @@ class TransparencyExample( breve.Control ):
 		TransparencyExample.init( self )
 
 	def init( self ):
-
 		breve.createInstances( breve.TransparentCube, 1 )
 		self.setBackgroundColor( breve.vector( 0, 0, 0 ) )
 		self.enableLighting()
@@ -21,7 +25,6 @@ class TransparentCube( breve.Mobile ):
 		TransparentCube.init( self )
 
 	def init( self ):
-
 		self.setShape( breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 8, 8, 8 ) ) )
 		self.setTextureImage( breve.createInstances( breve.Image, 1 ).load( 'images/water.png' ) )
 		self.setTextureScale( 8 )

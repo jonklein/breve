@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Genome( breve.Data ):
@@ -9,7 +14,6 @@ class Genome( breve.Data ):
 
 	def crossover( self, parent1, parent2 ):
 		'''Initializes the contents of this object using a 1-point crossover from  parent1 and parent2.'''
-
 
 		if ( ( not parent1 ) or ( not parent2 ) ):
 			raise Exception( '''Parent object passed to crossover not initialized''' )

@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Patch( breve.Abstract ):
@@ -15,12 +20,10 @@ class Patch( breve.Abstract ):
 		self.zIndex = 0
 
 	def dearchive( self ):
-
 		return 1
 
 	def decreaseConcentration( self, theDiffusable, theValue ):
 		'''returns the concentration of a OBJECT(PatchChecmical) in this patch.'''
-
 
 		self.grid.decreaseConcentnration( theDiffusable, theValue, self.xIndex, self.yIndex, self.zIndex )
 
@@ -70,28 +73,23 @@ class Patch( breve.Abstract ):
 	def getColor( self ):
 		'''Returns the color of the patch.'''
 
-
 		return self.color
 
 	def getConcentration( self, theDiffusable ):
 		'''returns the concentration of a OBJECT(PatchChecmical) in this patch.'''
 
-
 		return self.grid.getConcentration( theDiffusable, self.xIndex, self.yIndex, self.zIndex )
 
 	def getDescription( self ):
-
 		return '''patch at indices (%s, %s, %s)''' % (  self.xIndex, self.yIndex, self.zIndex )
 
 	def getIndexVector( self ):
 		'''Returns the x, y and z indices of this patch as a vector.'''
 
-
 		return breve.vector( self.xIndex, self.yIndex, self.zIndex )
 
 	def getLocation( self ):
 		'''Returns the location of the patch.'''
-
 
 		return breve.breveInternalFunctionFinder.getPatchLocation( self, self.patchPointer )
 
@@ -118,144 +116,120 @@ class Patch( breve.Abstract ):
 	def getPatchAbove( self ):
 		'''Returns the patch towards (0, 1, 0).'''
 
-
 		return self.grid.getPatchAt( self.xIndex, ( self.yIndex + 1 ), self.zIndex )
 
 	def getPatchBelow( self ):
 		'''Returns the patch towards (0, -1, 0).'''
-
 
 		return self.grid.getPatchAt( self.xIndex, ( self.yIndex - 1 ), self.zIndex )
 
 	def getPatchChemicals( self ):
 		'''returns a list of all patch chemicals in the simulation'''
 
-
 		self.grid.getPatchChemcials()
 
 	def getPatchToEast( self ):
 		'''Assumes that the patches are being observed from an XZ-plane. Returns the patch towards (1, 0, 0). '''
-
 
 		return self.grid.getPatchAt( ( self.xIndex + 1 ), self.yIndex, self.zIndex )
 
 	def getPatchToLeft( self ):
 		'''Returns the patch towards (-1, 0, 0).'''
 
-
 		return self.grid.getPatchAt( ( self.xIndex - 1 ), self.yIndex, self.zIndex )
 
 	def getPatchToLowerLeft( self ):
 		'''Returns the patch towards (-1, -1, 0).'''
-
 
 		return self.grid.getPatchAt( ( self.xIndex - 1 ), ( self.yIndex - 1 ), self.zIndex )
 
 	def getPatchToLowerRight( self ):
 		'''Returns the patch towards (1, -1, 0).'''
 
-
 		return self.grid.getPatchAt( ( self.xIndex + 1 ), ( self.yIndex - 1 ), self.zIndex )
 
 	def getPatchToNorth( self ):
 		'''Assumes that the patches are being observed from an XZ-plane. Returns the patch towards (0, 0, -1). '''
-
 
 		return self.grid.getPatchAt( self.xIndex, self.yIndex, ( self.zIndex - 1 ) )
 
 	def getPatchToRight( self ):
 		'''Returns the patch towards (1, 0, 0).'''
 
-
 		return self.grid.getPatchAt( ( self.xIndex + 1 ), self.yIndex, self.zIndex )
 
 	def getPatchToSouth( self ):
 		'''Assumes that the patches are being observed from an XZ-plane. Returns the patch towards (0, 0, 1). '''
-
 
 		return self.grid.getPatchAt( self.xIndex, self.yIndex, ( self.zIndex + 1 ) )
 
 	def getPatchToUpperLeft( self ):
 		'''Returns the patch towards (-1, 1, 0).'''
 
-
 		return self.grid.getPatchAt( ( self.xIndex - 1 ), ( self.yIndex + 1 ), self.zIndex )
 
 	def getPatchToUpperRight( self ):
 		'''Returns the patch towards (1, 1, 0).'''
-
 
 		return self.grid.getPatchAt( ( self.xIndex + 1 ), ( self.yIndex + 1 ), self.zIndex )
 
 	def getPatchToWest( self ):
 		'''Assumes that the patches are being observed from an XZ-plane. Returns the patch towards (-1, 0, 0). '''
 
-
 		return self.grid.getPatchAt( ( self.xIndex - 1 ), self.yIndex, self.zIndex )
 
 	def getPatchTowardsMinusX( self ):
 		'''Returns the patch towards (-1, 0, 0).'''
-
 
 		return self.grid.getPatchAt( ( self.xIndex - 1 ), self.yIndex, self.zIndex )
 
 	def getPatchTowardsMinusXMinusY( self ):
 		'''returns the patch towards (-1, -1, 0)'''
 
-
 		return self.grid.getPatchAt( ( self.xIndex - 1 ), ( self.yIndex - 1 ), self.zIndex )
 
 	def getPatchTowardsMinusXPlusY( self ):
 		'''returns the patch towards (-1, 1, 0)'''
-
 
 		return self.grid.getPatchAt( ( self.xIndex - 1 ), ( self.yIndex + 1 ), self.zIndex )
 
 	def getPatchTowardsMinusY( self ):
 		'''Returns the patch towards (0, -1, 0).'''
 
-
 		return self.grid.getPatchAt( self.xIndex, ( self.yIndex - 1 ), self.zIndex )
 
 	def getPatchTowardsMinusZ( self ):
 		'''Returns the patch towards (0, 0, -1).'''
-
 
 		return self.grid.getPatchAt( self.xIndex, self.yIndex, ( self.zIndex - 1 ) )
 
 	def getPatchTowardsPlusX( self ):
 		'''Returns the patch towards (1, 0, 0).'''
 
-
 		return self.grid.getPatchAt( ( self.xIndex + 1 ), self.yIndex, self.zIndex )
 
 	def getPatchTowardsPlusXMinusY( self ):
 		'''returns the patch towards (1, -1, 0)'''
-
 
 		return self.grid.getPatchAt( ( self.xIndex + 1 ), ( self.yIndex - 1 ), self.zIndex )
 
 	def getPatchTowardsPlusXPlusY( self ):
 		'''returns the patch towards (1, 1, 0)'''
 
-
 		return self.grid.getPatchAt( ( self.xIndex + 1 ), ( self.yIndex + 1 ), self.zIndex )
 
 	def getPatchTowardsPlusY( self ):
 		'''Returns the patch towards (0, 1, 0).'''
-
 
 		return self.grid.getPatchAt( self.xIndex, ( self.yIndex + 1 ), self.zIndex )
 
 	def getPatchTowardsPlusZ( self ):
 		'''Returns the patch towards (0, 0, 1).'''
 
-
 		return self.grid.getPatchAt( self.xIndex, self.yIndex, ( self.zIndex + 1 ) )
 
 	def getTransparency( self ):
 		'''Returns the transparency value of the patch.'''
-
 
 		return self.transparency
 
@@ -281,40 +255,33 @@ class Patch( breve.Abstract ):
 	def getXIndex( self ):
 		'''Returns the x index of the patch.'''
 
-
 		return self.xIndex
 
 	def getYIndex( self ):
 		'''Returns the y index of the patch.'''
-
 
 		return self.yIndex
 
 	def getZIndex( self ):
 		'''Returns the z index of the patch.'''
 
-
 		return self.zIndex
 
 	def increaseConcentration( self, theDiffusable, theValue ):
 		'''increases the amount of a OBJECT(PatchChecmical) in this patch.'''
 
-
 		self.grid.increaseConcentration( theDiffusable, theValue, self.xIndex, self.yIndex, self.zIndex )
 
 	def initNeighbors( self ):
-
 		pass
 
 	def initPatch( self ):
 		'''This method does nothing in its default implementation.  You can implement your own init-patch method in your patch class in order to perform initialization on  the patch.  This method is called after all the neighbor objects have been  created--if you do initialization in the init method, the neighbors will not  be initialized.'''
 
-
 		pass
 
 	def initWith( self, gp, x, y, z ):
 		'''Used internally by the grid patch system when setting up the  patches.  Do not call this method.  Just don't.  I know it's  tempting, but it's really better for all of us that you don't call it.'''
-
 
 		self.grid = gp
 		self.xIndex = x
@@ -323,7 +290,6 @@ class Patch( breve.Abstract ):
 
 	def setColor( self, newColor ):
 		'''Sets the color of the patch to newColor.  Bear in mind that you'll also  need to set the transparency of the patch if you want the patch to be displayed.  See the method METHOD(set-transparency) for more information.'''
-
 
 		if ( not self.patchPointer ):
 			print '''set-color called for %s before patch was initialized''' % (  self )
@@ -337,19 +303,16 @@ class Patch( breve.Abstract ):
 	def setConcentration( self, theDiffusable, theValue ):
 		'''returns the concentration of a OBJECT(PatchChecmical) in this patch.'''
 
-
 		self.grid.setConcentration( theDiffusable, self.xIndex, self.yIndex, self.zIndex, theValue )
 
 	def setPatchPointer( self, p ):
 		'''Used internally when setting up the patches.  Do not call this method.'''
-
 
 		self.patchPointer = p
 		self.setTransparency( 0.500000 )
 
 	def setTransparency( self, alphaValue ):
 		'''Sets the transparency of the patch to alphaValue.  alphaValue is a number between 0.0 (fully transparent) and 1.0 (fully opaque).  The default value is 0.5, semi-transparent.'''
-
 
 		if ( not self.patchPointer ):
 			print '''set-transparency called for %s before patch was initialized''' % (  self )
@@ -362,7 +325,6 @@ class Patch( breve.Abstract ):
 
 	def updateColors( self ):
 		'''Used internally.  Synchronizes the patch's color with recently  dearchived values. '''
-
 
 		self.setColor( self.color )
 		self.setTransparency( self.transparency )

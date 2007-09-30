@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class myController( breve.Control ):
@@ -15,23 +20,18 @@ class myController( breve.Control ):
 		myController.init( self )
 
 	def catchKeySDown( self ):
-
 		self.saveSnapshotToFile()
 
 	def getAcc( self ):
-
 		return self.acc
 
 	def getImage( self ):
-
 		return self.image
 
 	def getShape( self ):
-
 		return self.shape
 
 	def getVel( self ):
-
 		return self.vel
 
 	def init( self ):
@@ -67,7 +67,6 @@ class myController( breve.Control ):
 		self.setZClip( ( self.zoom + 100 ) )
 
 	def iterate( self ):
-
 		if ( self.zoom < ( self.image.getWidth() + 10 ) ):
 			self.zoom = ( self.zoom + 0.350000 )
 			self.offsetCamera( breve.vector( 0, 0, self.zoom ) )
@@ -89,7 +88,6 @@ class Painter( breve.Mobile ):
 		Painter.init( self )
 
 	def init( self ):
-
 		self.setShape( self.controller.getShape() )
 		self.image = self.controller.getImage()
 		self.w = self.image.getWidth()
@@ -111,7 +109,6 @@ class Painter( breve.Mobile ):
 		self.setAcceleration( ( breve.randomExpression( breve.vector( self.acc, self.acc, 0 ) ) - breve.vector( ( self.acc / 2 ), ( self.acc / 2 ), 0 ) ) )
 
 	def reset( self ):
-
 		self.vel = self.controller.getVel()
 		self.acc = self.controller.getAcc()
 		self.move( ( breve.randomExpression( breve.vector( ( self.w - 1 ), ( self.h - 1 ), 0 ) ) - breve.vector( ( self.w / 2 ), ( self.h / 2 ), 0 ) ) )
@@ -122,7 +119,7 @@ class Painter( breve.Mobile ):
 		z = 0
 		y = 0
 		x = 0
-		color = breve.vector()
+		pixelcolor = breve.vector()
 		location = breve.vector()
 
 		location = self.getLocation()
@@ -138,8 +135,8 @@ class Painter( breve.Mobile ):
 
 		x = ( x + ( self.w / 2 ) )
 		y = ( y + ( self.h / 2 ) )
-		color = self.image.getRgbPixel( x, y )
-		self.setColor( color )
+		pixelcolor = self.image.getRgbPixel( x, y )
+		self.setColor( pixelcolor )
 
 
 breve.Painter = Painter

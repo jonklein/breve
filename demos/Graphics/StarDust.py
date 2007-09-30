@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class StarDust( breve.Control ):
@@ -20,7 +25,6 @@ class StarDust( breve.Control ):
 		self.pointCamera( breve.vector( 0, 0, 0 ), breve.vector( 20.000000, 2.100000, 0.000000 ) )
 
 	def iterate( self ):
-
 		self.pivotCamera( 0.001000, 0.002000 )
 		breve.Control.iterate( self )
 
@@ -36,7 +40,6 @@ class Particle( breve.Mobile ):
 		Particle.init( self )
 
 	def init( self ):
-
 		self.rate = ( breve.randomExpression( 0.080000 ) - 0.040000 )
 		self.offset = breve.randomExpression( 6.280000 )
 		self.rotation = breve.randomExpression( 360 )
@@ -46,7 +49,6 @@ class Particle( breve.Mobile ):
 		self.move( ( breve.randomExpression( breve.vector( 10, 10, 10 ) ) - breve.vector( 5, 5, 5 ) ) )
 
 	def iterate( self ):
-
 		self.rotation = ( self.rotation + self.rate )
 		self.setBitmapHeading( self.rotation )
 		self.setBitmapTransparency( ( ( breve.breveInternalFunctionFinder.sin( self, ( ( self.controller.getTime() / 30.000000 ) + self.offset ) ) + 1.000000 ) / 2.000000 ) )

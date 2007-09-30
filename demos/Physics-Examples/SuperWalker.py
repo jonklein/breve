@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Walker( breve.PhysicalControl ):
@@ -14,7 +19,6 @@ class Walker( breve.PhysicalControl ):
 		Walker.init( self )
 
 	def breedNewMonkeys( self ):
-
 		print '''breeding monkeys...'''
 		
 		print '''driver ''', self.seats[ 0 ].getNumber(), self.seats[ 0 ].getDistance()
@@ -105,7 +109,6 @@ class Walker( breve.PhysicalControl ):
 		self.watch( self.wigglyThing )
 
 	def iterate( self ):
-
 		self.seats[ self.currentSeat ].control( self.wigglyThing, self.getTime() )
 		breve.PhysicalControl.iterate( self )
 
@@ -122,11 +125,9 @@ class Walker( breve.PhysicalControl ):
 		print self.monkeys[ self.currentSeat ]
 
 	def loadIntoCurrentGenome( self ):
-
 		self.seats[ self.currentSeat ].getGenome().loadWithDialog()
 
 	def pickDrivers( self ):
-
 		
 		self.seats[ 0 ] = self.monkeys[ 0 ]
 		self.seats[ 1 ] = self.monkeys[ 1 ]
@@ -135,11 +136,9 @@ class Walker( breve.PhysicalControl ):
 		self.currentSeat = 0
 
 	def randomSort( self, a, b ):
-
 		return ( breve.randomExpression( 2 ) - 1 )
 
 	def saveCurrentGenome( self ):
-
 		self.seats[ self.currentSeat ].getGenome().saveWithDialog()
 
 	def saveDrivers( self ):
@@ -153,7 +152,6 @@ class Walker( breve.PhysicalControl ):
 
 
 	def toggleDriverLock( self ):
-
 		if ( self.locked == 1 ):
 			self.locked = 0
 			self.wigglyThing.center()
@@ -177,7 +175,6 @@ class Monkeys( breve.Object ):
 		Monkeys.init( self )
 
 	def breed( self, otherMonkey, child ):
-
 		child.getGenome().crossover( otherMonkey.getGenome(), self.getGenome() )
 
 	def control( self, theRobot, t ):
@@ -190,29 +187,23 @@ class Monkeys( breve.Object ):
 
 
 	def getDistance( self ):
-
 		return self.distanceTraveled
 
 	def getGenome( self ):
-
 		return self.genome
 
 	def getNumber( self ):
-
 		return self.number
 
 	def init( self ):
-
 		self.genome = breve.createInstances( breve.MonkeyGenome, 1 )
 		self.genome.randomize()
 		self.addDependency( self.genome )
 
 	def setDistance( self, value ):
-
 		self.distanceTraveled = value
 
 	def setNumber( self, n ):
-
 		self.number = n
 
 
@@ -227,15 +218,12 @@ class MonkeyGenome( breve.Object ):
 		MonkeyGenome.init( self )
 
 	def calculateTorque( self, jointNum, time ):
-
 		return ( ( 0.500000 * breve.breveInternalFunctionFinder.sin( self, ( self.waveCompression * ( time + self.phaseShifts[ jointNum ] ) ) ) ) - self.ampShifts[ jointNum ] )
 
 	def getLimbLength( self, n ):
-
 		return self.limbLengths[ n ]
 
 	def init( self ):
-
 		self.randomize()
 
 	def mutate( self ):
@@ -289,7 +277,6 @@ class Creature( breve.MultiBody ):
 		self.move( breve.vector( 0, currentLocation.y, 0 ) )
 
 	def destroy( self ):
-
 		breve.deleteInstances( self.links )
 		breve.deleteInstances( self.joints )
 		breve.deleteInstances( self.bodyLink )
@@ -299,7 +286,6 @@ class Creature( breve.MultiBody ):
 		breve.MultiBody.destroy( self )
 
 	def getRoot( self ):
-
 		return self.bodyLink
 
 	def initWith( self, g ):
@@ -356,7 +342,6 @@ class Creature( breve.MultiBody ):
 		self.enableSelfCollisions()
 
 	def setJointVelocity( self, jointNum, value ):
-
 		self.joints[ jointNum ].setJointVelocity( value )
 
 

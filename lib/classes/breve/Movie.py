@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Movie( breve.Abstract ):
@@ -11,7 +16,6 @@ class Movie( breve.Abstract ):
 	def addFrameFromDisplay( self ):
 		'''Add a frame from the current simulation display.'''
 
-
 		if self.moviePointer:
 			breve.breveInternalFunctionFinder.movieAddWorldFrame( self, self.moviePointer )
 
@@ -19,23 +23,19 @@ class Movie( breve.Abstract ):
 	def close( self ):
 		'''Closes the MPEG file and stops recording.'''
 
-
 		if self.moviePointer:
 			breve.breveInternalFunctionFinder.movieClose( self, self.moviePointer )
 
 		self.moviePointer = 0
 
 	def destroy( self ):
-
 		self.close()
 
 	def iterate( self ):
-
 		self.addFrameFromDisplay()
 
 	def record( self, filename ):
 		'''Create a new MPEG movie file with the name filename. New frames will be automatically added to the movie as the simulation runs until the object is released or METHOD(close) is called.  filename should end with ".mpg" or ".mpeg".'''
-
 
 		self.moviePointer = breve.breveInternalFunctionFinder.movieCreate( self, filename )
 

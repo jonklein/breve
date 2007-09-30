@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Wanderer( breve.Mobile ):
@@ -12,12 +17,10 @@ class Wanderer( breve.Mobile ):
 		Wanderer.init( self )
 
 	def init( self ):
-
 		self.setWanderRange( breve.vector( 15, 15, 15 ) )
 		self.topVelocity = 80
 
 	def iterate( self ):
-
 		if ( breve.length( self.getLocation() ) > self.wanderMag ):
 			self.setAcceleration( ( ( ( 8 * ( -self.topVelocity ) ) * self.getLocation() ) / breve.length( self.getLocation() ) ) )
 			return
@@ -44,12 +47,10 @@ class Wanderer( breve.Mobile ):
 	def setTopVelocity( self, newValue ):
 		'''Sets the top velocity of the wanderer to newValue.'''
 
-
 		self.topVelocity = newValue
 
 	def setWanderRange( self, wanderVector ):
 		'''Sets the range from the origin that the object can wander.  The  distance the object will wander from the center is the length of  wanderVector.  The direction of the wandering is proportional to  the normalized vector--that is to say that if wanderVector is  (100, 100, 0) that motion will be restricted to the X/Y plane.'''
-
 
 		self.wanderMag = breve.length( wanderVector )
 		self.wanderVec = ( wanderVector / self.wanderMag )

@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Tunnel( breve.Control ):
@@ -9,11 +14,9 @@ class Tunnel( breve.Control ):
 		Tunnel.init( self )
 
 	def getLightmap( self ):
-
 		return self.lightmap
 
 	def init( self ):
-
 		self.setIntegrationStep( 0.100000 )
 		self.setIterationStep( 0.200000 )
 		self.setBackgroundColor( breve.vector( 0, 0, 0 ) )
@@ -32,20 +35,17 @@ class Particle( breve.Mobile ):
 		Particle.init( self )
 
 	def init( self ):
-
 		self.shape = breve.createInstances( breve.Sphere, 1 ).initWith( ( 0.300000 + breve.randomExpression( 1.000000 ) ) )
 		self.setShape( self.shape )
 		self.reset()
 		self.setLightmapImage( self.controller.getLightmap() )
 
 	def iterate( self ):
-
 		if ( self.getLocation().z > 100.000000 ):
 			self.reset()
 
 
 	def reset( self ):
-
 		self.setColor( breve.randomExpression( breve.vector( 1, 1, 1 ) ) )
 		self.move( ( breve.randomExpression( breve.vector( 600, 600, 0 ) ) - breve.vector( 300, 300, ( 300 + breve.randomExpression( 1000 ) ) ) ) )
 		self.setVelocity( breve.vector( 0, 0, 200 ) )

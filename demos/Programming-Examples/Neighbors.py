@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class NeighborDemo( breve.Control ):
@@ -28,7 +33,6 @@ class NeighborDemo( breve.Control ):
 		self.updateNeighbors()
 
 	def iterate( self ):
-
 		self.updateNeighbors()
 		breve.Control.iterate( self )
 
@@ -40,7 +44,6 @@ class Thing( breve.Mobile ):
 		Thing.init( self )
 
 	def init( self ):
-
 		self.setShape( breve.createInstances( breve.Sphere, 1 ).initWith( ( 0.300000 + breve.randomExpression( 0.900000 ) ) ) )
 		self.setColor( breve.randomExpression( breve.vector( 1.000000, 1.000000, 1.000000 ) ) )
 		self.move( ( breve.randomExpression( breve.vector( 30, 30, 30 ) ) - breve.vector( 15, 15, 15 ) ) )

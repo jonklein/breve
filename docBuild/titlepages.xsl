@@ -2,6 +2,7 @@
 
 <!-- This stylesheet was created by template/titlepage.xsl; do not edit it by hand. -->
 
+
 <xsl:template name="book.titlepage.recto">
   <xsl:choose>
     <xsl:when test="bookinfo/title">
@@ -49,6 +50,7 @@
 </xsl:template>
 
 <xsl:template name="book.titlepage">
+  <xsl:param name="img.src.path">images/</xsl:param> 
   <div class="titlepage">
     <xsl:variable name="recto.content">
       <xsl:call-template name="book.titlepage.before.recto"/>
@@ -119,5 +121,7 @@
 <xsl:apply-templates select="." mode="book.titlepage.recto.mode"/>
 </div>
 </xsl:template>
+
+<xsl:param name="img.src.path"></xsl:param> 
 
 </xsl:stylesheet>

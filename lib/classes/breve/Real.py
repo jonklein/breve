@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Real( breve.Object ):
@@ -27,7 +32,6 @@ class Real( breve.Object ):
 
 	def addDottedLine( self, otherObject, theColor = breve.vector( 0.000000, 0.000000, 0.000000 ) ):
 		'''Adds a dotted line to otherObject.  See METHOD(add-line) for more information on object lines.'''
-
 
 		self.addLine( otherObject, theColor, '''- - - - - - - - ''' )
 
@@ -62,7 +66,6 @@ class Real( breve.Object ):
 		return newMenu
 
 	def archive( self ):
-
 		self.archiveLocation = self.getLocation()
 		self.archiveRotation = self.getRotation()
 		return breve.Object.archive( self )
@@ -100,7 +103,6 @@ class Real( breve.Object ):
 		return breve.Object.dearchive( self )
 
 	def delete( self ):
-
 		if self.realWorldPointer:
 			breve.breveInternalFunctionFinder.realRemoveObject( self, self.realWorldPointer )
 
@@ -119,42 +121,35 @@ class Real( breve.Object ):
 	def disableShadows( self ):
 		'''If shadow volumes are enabled (see OBJECT(Control)), disables shadow volumes for this object. This is the default when shadow volumes have been enabled.'''
 
-
 		breve.breveInternalFunctionFinder.realSetDrawShadows( self, self.realWorldPointer, 0 )
 
 	def drawAsPoint( self ):
 		'''Draws the object as a single point.  This is by far the fastest way to display an agent.  Points can be used to draw upwards of 20,000 agents with a reasonable frame rate, while drawing as many spheres or  bitmaps would slow down the simulation significantly.'''
-
 
 		breve.breveInternalFunctionFinder.realSetDrawAsPoint( self, self.realWorldPointer, 1 )
 
 	def enableShadows( self ):
 		'''If shadow volumes are enabled (see OBJECT(Control)), enables shadow volumes for this object. This is the default when shadow volumes have been enabled.'''
 
-
 		breve.breveInternalFunctionFinder.realSetDrawShadows( self, self.realWorldPointer, 1 )
 
 	def getCollisionShape( self ):
 		'''Returns the OBJECT(Shape) used for collisions associated with this Mobile object.'''
-
 
 		return self.collisionShape
 
 	def getColor( self ):
 		'''Returns the color of the object.'''
 
-
 		return self.color
 
 	def getDisplayShape( self ):
 		'''Returns the OBJECT(Shape) used for display associated with this Mobile object.'''
 
-
 		return self.displayShape
 
 	def getLightExposure( self ):
 		'''When used in conjunction with light exposure detection (OBJECTMETHOD(Control:enable-light-exposure-detection)), this method returns the level of light exposure on this object.'''
-
 
 		if self.realWorldPointer:
 			return breve.breveInternalFunctionFinder.realGetLightExposure( self, self.realWorldPointer )
@@ -165,48 +160,40 @@ class Real( breve.Object ):
 	def getLocation( self ):
 		'''Returns the vector location of this object. '''
 
-
 		return breve.breveInternalFunctionFinder.realGetLocation( self, self.realWorldPointer )
 
 	def getNeighborhoodSize( self ):
 		'''gets the neighborhood size for the current object.'''
-
 
 		return self.neighborhoodSize
 
 	def getNeighbors( self ):
 		'''Returns a list of all real objects in the simulation that are within the "neighborhood" range of this object in the world.'''
 
-
 		return breve.breveInternalFunctionFinder.realGetNeighbors( self, self.realWorldPointer )
 
 	def getRotation( self ):
 		'''Deprecated'''
-
 
 		return breve.breveInternalFunctionFinder.realGetRotation( self, self.realWorldPointer )
 
 	def getRotationMatrix( self ):
 		'''Returns the matrix rotation of this object. '''
 
-
 		return breve.breveInternalFunctionFinder.realGetRotation( self, self.realWorldPointer )
 
 	def getShape( self ):
 		'''Deprecated '''
-
 
 		return self.collisionShape
 
 	def getWorldObjectPointer( self ):
 		'''Used internally.'''
 
-
 		return self.realWorldPointer
 
 	def handleCollisions( self, theType, theMethod ):
 		'''Adds a collision handler for this object.  When a collision occurs between an instance of the this type and theType, the breve engine will automatically call theMethod of the colliding instance.'''
-
 
 		self.collisionHandlerList.append( [ theType, theMethod, 0 ] )
 		breve.breveInternalFunctionFinder.addCollisionHandler( self, self, theType, theMethod )
@@ -214,30 +201,25 @@ class Real( breve.Object ):
 	def hideAxis( self ):
 		'''Hides the X and Y axes for the object.  The axes are hidden by default, so you'll only need this method if you've previously enabled them using METHOD(show-axis).'''
 
-
 		breve.breveInternalFunctionFinder.realSetDrawAxis( self, self.realWorldPointer, 0 )
 
 	def hideBoundingBox( self ):
 		'''Hides the bounding box for the object.  The bounding box is  hidden by default, so you'll only need this method if you've  previously enabled them using METHOD(show-axis).'''
-
 
 		breve.breveInternalFunctionFinder.realSetBoundingBox( self, self.realWorldPointer, 0 )
 
 	def hideNeighborLines( self ):
 		'''Hides lines to this objects neighbors.'''
 
-
 		breve.breveInternalFunctionFinder.realSetNeighborLines( self, self.realWorldPointer, 0 )
 
 	def ignoreCollisions( self, theType ):
 		'''Instructs the engine to ignore physical collisions with theType objects. This does not affect collision callbacks specified with METHOD(handle-collisions).'''
 
-
 		self.collisionHandlerList.append( [ theType, 0, 1 ] )
 		breve.breveInternalFunctionFinder.setIgnoreCollisionsWith( self, self, theType, 1 )
 
 	def init( self ):
-
 		self.texture = -1
 		self.lightmap = -1
 		self.bitmap = -1
@@ -250,18 +232,15 @@ class Real( breve.Object ):
 	def makeInvisible( self ):
 		'''Makes the object invisible.  Can be made visible again later using the method METHOD(make-visible).'''
 
-
 		breve.breveInternalFunctionFinder.realSetVisible( self, self.realWorldPointer, 0 )
 
 	def makeVisible( self ):
 		'''Makes the object visible again (if it has previously been hidden using METHOD(make-invisible).'''
 
-
 		breve.breveInternalFunctionFinder.realSetVisible( self, self.realWorldPointer, 1 )
 
 	def move( self, newLocation ):
 		'''Moves this object to location newLocation.'''
-
 
 		if ( not self.realWorldPointer ):
 			raise Exception( '''attempt to move uninitialized Mobile object.''' )
@@ -290,12 +269,10 @@ class Real( breve.Object ):
 	def raytrace( self, theLocation, theDirection ):
 		'''Computes the vector from theLocation towards theDirection that hits the shape of this object. <p> If the object was not hit vector (0, 0, 0) will be returned. <p> The location and direction vector must be given relative to the world's coordinate frame. '''
 
-
 		return breve.breveInternalFunctionFinder.raytrace( self, self.realWorldPointer, theLocation, theDirection )
 
 	def removeAllLines( self ):
 		'''Removes all lines connecting this object to other objects.'''
-
 
 		breve.deleteInstances( self.lines )
 		self.lines = []
@@ -317,25 +294,21 @@ class Real( breve.Object ):
 	def setBitmap( self, textureNumber ):
 		'''Deprecated.'''
 
-
 		self.bitmap = textureNumber
 		breve.breveInternalFunctionFinder.realSetBitmap( self, self.realWorldPointer, ( textureNumber + 1 ) )
 
 	def setBitmapHeading( self, radianAngle ):
 		'''If this object is in 2d bitmap mode, the rotation of the  bitmap will be set to radianAngle.'''
 
-
 		breve.breveInternalFunctionFinder.realSetBitmapRotation( self, self.realWorldPointer, radianAngle )
 
 	def setBitmapHeadingPoint( self, rotationVector ):
 		'''If this object is in 2d bitmap mode, the rotation of the  bitmap will be set to degreeAngle degrees.'''
 
-
 		breve.breveInternalFunctionFinder.realSetBitmapRotationTowardsVector( self, self.realWorldPointer, rotationVector )
 
 	def setBitmapImage( self, bitmapImage ):
 		'''Changes the bitmap of this object to bitmapImage, an instance of  class image.  If bitmapImage is NULL, bitmapping is turned off for the object.'''
-
 
 		if ( not bitmapImage ):
 			self.bitmap = -1
@@ -347,12 +320,10 @@ class Real( breve.Object ):
 	def setBitmapTransparency( self, alphaValue ):
 		'''Sets the transparency to alphaValue, a number between 0.0  (totally transparent) and 1.0 (fully opaque). '''
 
-
 		breve.breveInternalFunctionFinder.realSetAlpha( self, self.realWorldPointer, alphaValue )
 
 	def setCollisionShape( self, theShape ):
 		'''Associates a OBJECT(Shape) object with this object for collision purposes.  This shape will not be displayed for this object unless METHOD(set-display-shape) is also called with this shape.  Returns this object.'''
-
 
 		if ( ( not theShape ) or ( not theShape.getPointer() ) ):
 			raise Exception( '''attempt to set collision shape of Mobile object with uninitialized shape (%s)''' % (  theShape ) )
@@ -369,7 +340,6 @@ class Real( breve.Object ):
 	def setColor( self, newColor ):
 		'''Sets the color of this object to newColor.'''
 
-
 		self.color = newColor
 		if self.realWorldPointer:
 			breve.breveInternalFunctionFinder.realSetColor( self, self.realWorldPointer, newColor )
@@ -377,7 +347,6 @@ class Real( breve.Object ):
 
 	def setDisplayShape( self, theShape ):
 		'''Associates a OBJECT(Shape) object with this object for display purposes only. This shape will not be used for collision detection unless it is passed to  METHOD(set-collision-shape) as well.  Returns this object.'''
-
 
 		if ( ( not theShape ) or ( not theShape.getPointer() ) ):
 			raise Exception( '''attempt to set display shape of Mobile object with uninitialized shape (%s)''' % (  theShape ) )
@@ -394,26 +363,22 @@ class Real( breve.Object ):
 	def setE( self, newE ):
 		'''Sets the "coefficient of restitution" a value which determines the elasticity of the object in a collision. Valid values range from 0.0 to 1.0, with 0.0 representing a totally inelastic collision (such as a lump of clay) while 1.0 represents a totally (and unrealistically) elastic collision (such as a rubber ball).'''
 
-
 		self.e = newE
 		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, self.e, self.mu )
 
 	def setET( self, newET ):
 		'''Deprecated.'''
 
-
 		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, self.e, self.mu )
 
 	def setLightmap( self, textureNumber ):
 		'''Deprecated.'''
-
 
 		self.lightmap = textureNumber
 		breve.breveInternalFunctionFinder.realSetLightmap( self, self.realWorldPointer, ( self.lightmap + 1 ) )
 
 	def setLightmapImage( self, lightmapImage ):
 		'''Sets the object to be displayed using a "lightmap".  A  lightmap uses the texture specified and treats it like a light source.  It's hard to explain.  Give it a try for yourself. <p> set-lightmap only has an effect on sphere shapes.  Other  shapes can be textured, but only spheres can be made into  lightmaps.'''
-
 
 		if ( not lightmapImage ):
 			self.lightmap = -1
@@ -425,19 +390,16 @@ class Real( breve.Object ):
 	def setMu( self, newMu ):
 		'''Sets the coefficient of friction to newMu.  mu is a  parameter controlling friction between two bodies and  may be any value between 0 and infinity.'''
 
-
 		self.mu = newMu
 		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, self.e, self.mu )
 
 	def setNeighborhoodSize( self, size ):
 		'''Used in conjunction with METHOD(get-neighbors), this function will set the neighborhood size for the current object.'''
 
-
 		self.neighborhoodSize = size
 		breve.breveInternalFunctionFinder.realSetNeighborhoodSize( self, self.realWorldPointer, size )
 
 	def setRotation( self, theRotation ):
-
 		self.setRotationMatrix( theRotation )
 
 	def setRotation( self, thisAxis, amount ):
@@ -481,12 +443,10 @@ class Real( breve.Object ):
 	def setRotationMatrix( self, theRotation ):
 		'''Sets the rotation of this object to the rotation matrix theRotation. Working with matrices can be complicated, so a more simple approach is to use METHOD(rotate).'''
 
-
 		breve.breveInternalFunctionFinder.realSetRotationMatrix( self, self.realWorldPointer, theRotation )
 
 	def setShape( self, theShape ):
 		'''Sets the shape of this object, for both display and collision detection purposes.  To set the shape for one purpose, but not the other, use the methods METHOD(set-display-shape) or METHOD(set-collision-shape).'''
-
 
 		self.setDisplayShape( theShape )
 		self.setCollisionShape( theShape )
@@ -494,13 +454,11 @@ class Real( breve.Object ):
 	def setTexture( self, textureNumber ):
 		'''Deprecated -- use METHOD(set-texture-image) instead.'''
 
-
 		self.texture = textureNumber
 		breve.breveInternalFunctionFinder.realSetTexture( self, self.realWorldPointer, ( textureNumber + 1 ) )
 
 	def setTextureImage( self, textureImage ):
 		'''Changes the texture of this object to textureImage, an instance of  class Image.  If textureImage is NULL texturing is turned off for  the object.'''
-
 
 		if ( not textureImage ):
 			self.texture = -1
@@ -512,13 +470,11 @@ class Real( breve.Object ):
 	def setTextureScale( self, scaleSize ):
 		'''Changes the "scale" of the texture.  When a texture is applied over a shape, this value is used to decide how large the texture will be in terms of breve-world units.  The default value is 16, meaning that a 16x16 face will have one copy of the textured image. For smaller objects, this number will have to be decreased, or else the texture will be too big and will not be visible.'''
 
-
 		self.textureScaleX = scaleSize
 		breve.breveInternalFunctionFinder.realSetTextureScale( self, self.realWorldPointer, scaleSize, scaleSize )
 
 	def setTextureScaleX( self, scaleSize ):
 		'''Sets the texture scale in the X dimension.  The Y texture scale  value is unchanged.  See METHOD(set-texture-scale) for more information.'''
-
 
 		self.textureScaleX = scaleSize
 		breve.breveInternalFunctionFinder.realSetTextureScale( self, self.realWorldPointer, scaleSize, self.textureScaleY )
@@ -526,37 +482,31 @@ class Real( breve.Object ):
 	def setTextureScaleY( self, scaleSize ):
 		'''Sets the texture scale in the Y dimension.  The X texture scale  value is unchanged.  See METHOD(set-texture-scale) for more information.'''
 
-
 		self.textureScaleY = scaleSize
 		breve.breveInternalFunctionFinder.realSetTextureScale( self, self.realWorldPointer, self.textureScaleX, scaleSize )
 
 	def setTransparency( self, alphaValue ):
 		'''Sets the transparency of this object to alphaValue, a number  between 1.0 (totally opaque) and 0.0 (fully transparent).'''
 
-
 		breve.breveInternalFunctionFinder.realSetAlpha( self, self.realWorldPointer, alphaValue )
 
 	def showAxis( self ):
 		'''Shows the X and Y axes for the object.'''
-
 
 		breve.breveInternalFunctionFinder.realSetDrawAxis( self, self.realWorldPointer, 1 )
 
 	def showBoundingBox( self ):
 		'''Shows the bounding box for the object.'''
 
-
 		breve.breveInternalFunctionFinder.realSetBoundingBox( self, self.realWorldPointer, 1 )
 
 	def showNeighborLines( self ):
 		'''Draws lines to this objects neighbors (when neighbor checking is enabled).'''
 
-
 		breve.breveInternalFunctionFinder.realSetNeighborLines( self, self.realWorldPointer, 1 )
 
 	def watch( self ):
 		'''Makes the camera follow this object.'''
-
 
 		self.controller.watch( self )
 

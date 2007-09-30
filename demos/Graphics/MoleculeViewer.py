@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class PDBViewer( breve.Control ):
@@ -64,7 +69,6 @@ class PDBViewer( breve.Control ):
 		self.pointCamera( average, ( average + breve.vector( 30, 0, 30 ) ) )
 
 	def iterate( self ):
-
 		self.pivotCamera( 0.030000, 0.000000 )
 		breve.Control.iterate( self )
 

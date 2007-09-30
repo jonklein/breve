@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class PatchLife( breve.Control ):
@@ -8,11 +13,9 @@ class PatchLife( breve.Control ):
 		PatchLife.init( self )
 
 	def catchKeyCDown( self ):
-
 		self.clear()
 
 	def catchKeyRDown( self ):
-
 		self.randomize()
 
 	def clear( self ):
@@ -25,7 +28,6 @@ class PatchLife( breve.Control ):
 
 
 	def init( self ):
-
 		self.patches = breve.createInstances( breve.PatchToroid, 1 ).initWith( 20, 20, 20, breve.vector( 0, 0, 0 ), breve.vector( 1, 1, 1 ), 'LifePatch' )
 		self.patches.disableVolumetricDrawing()
 		self.setIntegrationStep( 1.000000 )
@@ -52,15 +54,12 @@ class LifePatch( breve.Patch ):
 		self.state = 0
 
 	def getState( self ):
-
 		return self.state
 
 	def incrementNeighborCount( self ):
-
 		self.liveNeighbors = ( self.liveNeighbors + 1 )
 
 	def initPatch( self ):
-
 		if ( breve.randomExpression( 5 ) == 0 ):
 			self.setState( 1 )
 		else:
@@ -69,13 +68,11 @@ class LifePatch( breve.Patch ):
 		self.neighbors = self.get3dMooreNeighborhood()
 
 	def iterate( self ):
-
 		if self.state:
 			self.neighbors.incrementNeighborCount()
 
 
 	def postIterate( self ):
-
 		if ( ( ( self.state == 0 ) and ( self.liveNeighbors == 4 ) ) or ( ( self.state == 1 ) and ( ( self.liveNeighbors == 4 ) or ( self.liveNeighbors == 6 ) ) ) ):
 			self.setTransparency( 0.200000 )
 			self.state = 1
@@ -91,7 +88,6 @@ class LifePatch( breve.Patch ):
 		self.liveNeighbors = 0
 
 	def setState( self, value ):
-
 		self.setColor( breve.vector( 1.000000, 0, 0 ) )
 		self.state = value
 		if self.state:

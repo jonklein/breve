@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Link( breve.Mobile ):
@@ -9,21 +14,17 @@ class Link( breve.Mobile ):
 		Link.init( self )
 
 	def dearchive( self ):
-
 		return breve.Mobile.dearchive( self )
 
 	def destroy( self ):
-
 		breve.Mobile.destroy( self )
 
 	def getMultibody( self ):
 		'''Returns the OBJECT(MultiBody) that this link is a part of, if any.'''
 
-
 		return breve.breveInternalFunctionFinder.linkGetMultibody( self, self.realWorldPointer )
 
 	def init( self ):
-
 		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, 0.200000, 0.200000 )
 		self.enablePhysics()
 

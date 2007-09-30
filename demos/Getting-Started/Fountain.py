@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Fountain( breve.Control ):
@@ -11,7 +16,6 @@ class Fountain( breve.Control ):
 		Fountain.init( self )
 
 	def init( self ):
-
 		self.setIntegrationStep( 0.050000 )
 		self.setIterationStep( 0.100000 )
 		self.enableLighting()
@@ -25,25 +29,21 @@ class Fountain( breve.Control ):
 		self.setNormalRange()
 
 	def setLargeRange( self ):
-
 		self.m1.uncheck()
 		self.m2.uncheck()
 		self.m3.check()
 		self.setParticleRange( 8 )
 
 	def setNormalRange( self ):
-
 		self.m1.uncheck()
 		self.m2.check()
 		self.m3.uncheck()
 		self.setParticleRange( 3 )
 
 	def setParticleRange( self, n ):
-
 		self.particles.setRange( n )
 
 	def setSmallRange( self ):
-
 		self.m1.check()
 		self.m2.uncheck()
 		self.m3.uncheck()
@@ -58,27 +58,23 @@ class Particle( breve.Mobile ):
 		Particle.init( self )
 
 	def init( self ):
-
 		self.setShape( breve.createInstances( breve.Cube, 1 ).initWith( ( breve.randomExpression( breve.vector( 1.000000, 1.000000, 1.000000 ) ) + breve.vector( 0.100000, 0.100000, 0.100000 ) ) ) )
 		self.setAcceleration( breve.vector( 0, -9.800000, 0.000000 ) )
 		self.range = 5
 		self.reset()
 
 	def iterate( self ):
-
 		if ( self.getLocation().y < -6.000000 ):
 			self.reset()
 
 
 	def reset( self ):
-
 		self.setColor( breve.randomExpression( breve.vector( 0, 1, 1 ) ) )
 		self.move( breve.vector( 0, 0, 0 ) )
 		self.setVelocity( ( breve.randomExpression( breve.vector( ( 2 * self.range ), 20, ( 2 * self.range ) ) ) + breve.vector( ( -self.range ), 4, ( -self.range ) ) ) )
 		self.setRotationalVelocity( breve.randomExpression( breve.vector( 0.600000, 0.600000, 0.600000 ) ) )
 
 	def setRange( self, n ):
-
 		self.range = n
 
 

@@ -1135,8 +1135,6 @@ int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceE
 
 	int typeSignature = atoi( inInstanceElement -> getAttr( "typesignature" )->c_str() );
 	
-	printf( "%x\n", typeSignature );
-
 	if( typeSignature != STEVE_TYPE_SIGNATURE ) {
 		slMessage( DEBUG_ALL, "Warning: object encoding and decoding not fully implemented for non-steve objects\n" );
 

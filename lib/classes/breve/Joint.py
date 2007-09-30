@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Joint( breve.Abstract ):
@@ -24,12 +29,10 @@ class Joint( breve.Abstract ):
 	def snap( self ):
 		'''Deprecated -- use break-joint.'''
 
-
 		self.breakJoint()
 
 	def breakJoint( self ):
 		'''Breaks this joint--removes the child (and all of the links connected to it) from the body.  The child link (and its descendents) are therefore removed  from the world and placed in limbo.  They may be reconnected later by  creating another Joint, or it may be associated with a OBJECT(MultiBody) of  its own. <P> The Joint object is <b>not</b> freed&mdash;this has been changed from breve 1.7.  By calling this method, you break the joint without releasing it such that it can be used again.  If you do not with to use the Joint object again, then simply freeing the Joint object will break the joint and delete the object.'''
-
 
 		self.disableAutomaticJointScaling()
 		if self.jointPointer:
@@ -38,7 +41,6 @@ class Joint( breve.Abstract ):
 		self.jointPointer = 0
 
 	def dearchive( self ):
-
 		if self.jointPointer:
 			self.setStrengthLimit( self.strengthLimit )
 			self.setDoubleSpring( self.springStrength, self.springMax, self.springMin )
@@ -47,12 +49,10 @@ class Joint( breve.Abstract ):
 		return 1
 
 	def destroy( self ):
-
 		self.breakJoint()
 
 	def disableAutomaticJointScaling( self ):
 		'''Disables automatic joint scaling, if it had previously been enabled using METHOD(enable-automatic-joint-scaling).'''
-
 
 		if self.parent:
 			self.unobserve( self.parent.getShape(), 'sizeChanged' )
@@ -64,7 +64,6 @@ class Joint( breve.Abstract ):
 	def enableAutomaticJointScaling( self ):
 		'''Tracks changes to sizes in the link shapes, and automatically "scales" the  joint (more accurately, the link points) such that the resized links will maintain the same relative distance from one another.  This feature is likely to be desirable whenever "growth" of OBJECT(MultiBody) objects is simulated. <P> This can be later disabled using METHOD(disable-automatic-joint-scaling).'''
 
-
 		self.disableAutomaticJointScaling()
 		if self.parent:
 			self.observe( self.parent.getShape(), 'sizeChanged', 'rescaleParentLinkPoint' )
@@ -72,24 +71,20 @@ class Joint( breve.Abstract ):
 		self.observe( self.child.getShape(), 'sizeChanged', 'rescaleChildLinkPoint' )
 
 	def enableChildrenReposition( self ):
-
 		breve.breveInternalFunctionFinder.jointSetRepositionAll( self, self.jointPointer, 1 )
 
 	def getChild( self ):
 		'''Returns the object identified as the "child" ojbect.'''
-
 
 		return self.child
 
 	def getChildLinkPoint( self ):
 		'''Returns the child link point.'''
 
-
 		return self.clinkPoint
 
 	def getForce( self ):
 		'''Returns the force applied by this joint to maintain the desired relationships of the connected bodies.  In other words, the stress  force on the joint.   <P> The forces applied to connected bodies are generally equal and  opposite, so this value is computed as f1 + -f2, where f1 and f2 are the forces acting on the first and second bodies.'''
-
 
 		if self.jointPointer:
 			return breve.breveInternalFunctionFinder.jointGetForce( self, self.jointPointer )
@@ -98,54 +93,45 @@ class Joint( breve.Abstract ):
 	def getJointNormal( self ):
 		'''Returns the joint's normal vector.'''
 
-
 		return self.normalVector
 
 	def getJointPointer( self ):
 		'''Internal use only.'''
-
 
 		return self.jointPointer
 
 	def getJointVelocity( self ):
 		'''Returns the scalar velocity of the joint.  This is only useful for 1-DOF joints (prismatic and revolute).  For higher-DOF joints, use METHOD(get-joint-velocity-vector).'''
 
-
 		return breve.breveInternalFunctionFinder.jointGetVelocity( self, self.jointPointer ).x
 
 	def getJointVelocityVector( self ):
 		'''Returns the vector velocity of the joint.  For 1-DOF joints (prismatic, revolute), only the X-component is valid.  For 2-DOF joints (universal), both the X- and the Y-components are used.  For a ball joint, all three values are provided.'''
-
 
 		return breve.breveInternalFunctionFinder.jointGetVelocity( self, self.jointPointer )
 
 	def getMaxJointLimitVector( self ):
 		'''Returns the maximum joint limit vector, if it has been set.'''
 
-
 		return self.maxVector
 
 	def getMinJointLimitVector( self ):
 		'''Returns the minimum joint limit vector, if it has been set.'''
-
 
 		return self.minVector
 
 	def getParent( self ):
 		'''Returns the object identified as the "parent" ojbect.'''
 
-
 		return self.parent
 
 	def getParentLinkPoint( self ):
 		'''Returns the child link point.'''
 
-
 		return self.plinkPoint
 
 	def getStrengthHardLimit( self ):
 		'''Returns the "hard" limit of the joint--the maximum torque that you are allowed to put on a single joint.'''
-
 
 		if ( not self.child ):
 			return 0
@@ -155,19 +141,16 @@ class Joint( breve.Abstract ):
 	def getStrengthLimit( self ):
 		'''Returns the user set strength limit of the joint.'''
 
-
 		return self.strengthLimit
 
 	def getTorque( self ):
 		'''Returns the torque applied by this joint to maintain the desired relationships of the connected bodies.  In other words, the stress  torque on the joint. <P> The torques applied to connected bodies are generally equal and  opposite, so this value is computed as t1 + -t2, where t1 and t2 are the torques acting on the first and second bodies.'''
-
 
 		if self.jointPointer:
 			return breve.breveInternalFunctionFinder.jointGetTorque( self, self.jointPointer )
 
 
 	def init( self ):
-
 		self.normalVector
 		self.relativeRotation = breve.matrix(  1, 0, 0, 0, 1, 0, 0, 0, 1 )
 
@@ -202,12 +185,10 @@ class Joint( breve.Abstract ):
 	def setCfm( self, cfmValue ):
 		'''Sets the joint's constraint force mixing parameter.  See the ODE physics engine documentation for more details.'''
 
-
 		breve.breveInternalFunctionFinder.jointSetCFM( self, self.jointPointer, cfmValue )
 
 	def setChildLinkPoint( self, linkPoint ):
 		'''Dynamically sets the child's link point for this joint.  This method can be called over the course of the simulation to change the way the joint works. <p> If the Joint is not linked, this call has no effect.'''
-
 
 		self.clinkPoint = linkPoint
 		if self.jointPointer:
@@ -216,7 +197,6 @@ class Joint( breve.Abstract ):
 
 	def setDoubleSpring( self, theStrength, theMax, theMin ):
 		'''Enable this joint's spring to take effect when the rotation is above theMax or below theMin.  When the position of the joint is between theMin and theMax, the spring applies no force to the joint.  When the position goes out of this range a force is applied according to the strength of the joint (theStrength) and distance to the "natural" range. <p> To revert to the default behavior of no spring acting on the joint, use the method METHOD(remove-spring).'''
-
 
 		if ( not self.jointPointer ):
 			raise Exception( '''attempting to set spring of uninitialized Joint object.''' )
@@ -230,18 +210,15 @@ class Joint( breve.Abstract ):
 	def setErp( self, erpValue ):
 		'''Sets the joint's error correction parameter.  See the ODE physics engine documentation for more details.'''
 
-
 		breve.breveInternalFunctionFinder.jointSetERP( self, self.jointPointer, erpValue )
 
 	def setJointDamping( self, dampingValue ):
 		'''Sets the joint damping--the friction of the joint.  '''
 
-
 		breve.breveInternalFunctionFinder.jointSetDamping( self, self.jointPointer, dampingValue )
 
 	def setJointLimitVectors( self, minV, maxV ):
 		'''A convenience method for setting joint limits for any kind of  joint.  For 1-DOF joints (prismatic, revolute) only the X values from the vectors are used.  For 2-DOF joints (universal), both X and Y values are used.  For 3-DOF joints, all the  values are used. <P> Note that this method is just an alternative to the set-joint-limit methods which exist in all of the joints which support limits.'''
-
 
 		self.minVector = minV
 		self.maxVector = maxV
@@ -252,7 +229,6 @@ class Joint( breve.Abstract ):
 	def setJointNormal( self, normal ):
 		'''If this type of joint supports it this method sets the  normal vector for the motion for the joint.  The precise meaning  of the normal vector depends on the exact type of joint.  See each joint's link method documentation for more details.'''
 
-
 		self.normalVector = normal
 		if self.jointPointer:
 			breve.breveInternalFunctionFinder.jointSetNormal( self, self.jointPointer, self.normalVector )
@@ -261,7 +237,6 @@ class Joint( breve.Abstract ):
 	def setJointTorqueVector( self, torqueVector ):
 		'''Applies torque on one or more axes.  This method can be used when setting the torque of ball or universal joints.'''
 
-
 		if self.jointPointer:
 			breve.breveInternalFunctionFinder.jointApplyForce( self, self.jointPointer, torqueVector )
 
@@ -269,14 +244,12 @@ class Joint( breve.Abstract ):
 	def setJointVelocity( self, newVelocity ):
 		'''Sets the joint velocity to newVelocity.'''
 
-
 		if self.jointPointer:
 			breve.breveInternalFunctionFinder.jointSetVelocity( self, self.jointPointer, breve.vector( newVelocity, 0, 0 ) )
 
 
 	def setParentLinkPoint( self, linkPoint ):
 		'''Dynamically sets the parent's link point for this joint.  This method can be called over the course of the simulation to change the way the joint works. <p> If the Joint is not linked, this call has no effect.'''
-
 
 		self.plinkPoint = linkPoint
 		if self.jointPointer:
@@ -286,7 +259,6 @@ class Joint( breve.Abstract ):
 	def setRelativeRotation( self, theAxis, theAngle ):
 		'''To avoid undesirable "jumping" behavior, this method should be called  <b>before</b> linking the joint. <p> Sets the relative rotation between the child and parent OBJECT(Link) to newRotation.  This rotation specifies the rotation of the child link when the joint is "relaxed" or at its natural position. <p> Changing the relative rotation of the joint fundamentally changes the way the joint works, and should not be used as a "normal" joint motion: the relative rotation may be changed dynamically over the course of  the simulation, though it <b>may cause unexpected and unrealistic  behavior</b> if the change is not made gradually, or if the bodies  involved are in contact with other bodies at the time of the change.'''
 
-
 		self.relativeRotation = breve.breveInternalFunctionFinder.rotationMatrix( self, theAxis, theAngle )
 		if self.jointPointer:
 			breve.breveInternalFunctionFinder.jointSetLinkPoints( self, self.jointPointer, self.plinkPoint, self.clinkPoint, self.relativeRotation )
@@ -295,7 +267,6 @@ class Joint( breve.Abstract ):
 	def setRelativeRotationMatrix( self, newRotation ):
 		'''To avoid undesirable "jumping" behavior, this method should be called  <b>before</b> linking the joint. <p> Sets the relative rotation between the child and parent OBJECT(Link) to newRotation.  This rotation specifies the rotation of the child link when the joint is "relaxed" or at its natural position. <p> The method METHOD(set-relative-rotation) is somewhat easier to use, since it does not require the actual rotation matrix. <p> Changing the relative rotation of the joint fundamentally changes the way the joint works, and should not be used as a "normal" joint motion: the relative rotation may be changed dynamically over the course of  the simulation, though it <b>may cause unexpected and unrealistic  behavior</b> if the change is not made gradually, or if the bodies  involved are in contact with other bodies at the time of the change.'''
 
-
 		self.relativeRotation = newRotation
 		if self.jointPointer:
 			breve.breveInternalFunctionFinder.jointSetLinkPoints( self, self.jointPointer, self.plinkPoint, self.clinkPoint, self.relativeRotation )
@@ -303,7 +274,6 @@ class Joint( breve.Abstract ):
 
 	def setStrengthLimit( self, newLimit ):
 		'''Sets the maximum torque to be used by this joint when attempting  to attain the target speed.'''
-
 
 		if ( not self.jointPointer ):
 			return
@@ -320,13 +290,12 @@ class Joint( breve.Abstract ):
 
 breve.Joint = Joint
 class PrismaticJoint( breve.Joint ):
-	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a sliding linear joint.   <P> A retractable TV antenna is an example of an object that uses multiple prismatic joints. <P> <CENTER><IMG SRC="PrismaticJoint.jpg" BORDER=1></CENTER>'''
+	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a sliding linear joint.   <P> A retractable TV antenna is an example of an object that uses multiple prismatic joints. <P> <CENTER><IMG SRC="../images/PrismaticJoint.jpg" BORDER=1></CENTER>'''
 
 	def __init__( self ):
 		breve.Joint.__init__( self )
 
 	def dearchive( self ):
-
 		if ( self.parent or self.child ):
 			self.link( self.parent, self.child, self.normalVector, self.plinkPoint, self.clinkPoint )
 
@@ -334,7 +303,6 @@ class PrismaticJoint( breve.Joint ):
 
 	def getJointPosition( self ):
 		'''Returns a double indicating how far this joint is from its natural position (which corresponds to a value of 0).'''
-
 
 		return breve.breveInternalFunctionFinder.jointGetPosition( self, self.jointPointer ).x
 
@@ -370,25 +338,22 @@ class PrismaticJoint( breve.Joint ):
 	def setJointForce( self, forceValue ):
 		'''Applies a force of forceValue to this joint. '''
 
-
 		breve.breveInternalFunctionFinder.jointApplyForce( self, self.jointPointer, breve.vector( forceValue, 0, 0 ) )
 
 	def setJointLimits( self, min1, max1 ):
 		'''Sets the minimum and maximum allowed positions for this  joint. '''
-
 
 		breve.breveInternalFunctionFinder.jointSetLimits( self, self.jointPointer, breve.vector( min1, 0, 0 ), breve.vector( max1, 0, 0 ) )
 
 
 breve.PrismaticJoint = PrismaticJoint
 class RevoluteJoint( breve.Joint ):
-	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a rotating joint.   <P> RevoluteJoints rotate on a single axis, like a hinge.  The knee is another  example of a RevoluteJoint--it can bend back-and-forth, but it cannot twist  or bend side-to-side. <P> <CENTER><IMG SRC="RevoluteJoint.jpg" BORDER=1></CENTER>'''
+	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a rotating joint.   <P> RevoluteJoints rotate on a single axis, like a hinge.  The knee is another  example of a RevoluteJoint--it can bend back-and-forth, but it cannot twist  or bend side-to-side. <P> <CENTER><IMG SRC="../images/RevoluteJoint.jpg" BORDER=1></CENTER>'''
 
 	def __init__( self ):
 		breve.Joint.__init__( self )
 
 	def dearchive( self ):
-
 		if ( self.parent or self.child ):
 			self.link( self.parent, self.child, self.normalVector, self.plinkPoint, self.clinkPoint )
 
@@ -397,11 +362,9 @@ class RevoluteJoint( breve.Joint ):
 	def getJointAngle( self ):
 		'''Returns a double indicating how the angle of this joint from its natural position (which corresponds to a value of 0).'''
 
-
 		return breve.breveInternalFunctionFinder.jointGetPosition( self, self.jointPointer ).x
 
 	def getJointPosition( self ):
-
 		return self.getJointAngle()
 
 	def link( self, theNormal, parentPoint, childPoint, childLink, parentLink = 0.000000, currentRotation = 0.000000 ):
@@ -440,25 +403,22 @@ class RevoluteJoint( breve.Joint ):
 	def setJointLimits( self, min1, max1 ):
 		'''Sets the minimum and maximum allowed rotations (in radians)  for this joint. '''
 
-
 		breve.breveInternalFunctionFinder.jointSetLimits( self, self.jointPointer, breve.vector( min1, 0, 0 ), breve.vector( max1, 0, 0 ) )
 
 	def setJointTorque( self, torqueValue ):
 		'''Applies a torque of torqueValue to the revolute joint. '''
-
 
 		breve.breveInternalFunctionFinder.jointApplyForce( self, self.jointPointer, breve.vector( torqueValue, 0, 0 ) )
 
 
 breve.RevoluteJoint = RevoluteJoint
 class FixedJoint( breve.Joint ):
-	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a static, or fixed, joint. <P> <CENTER><IMG SRC="FixedJoint.jpg" BORDER=1></CENTER> <P> <b>Fixed joints do not currently support a relative rotation the way other joint types do.</b>  I'm so sorry.  '''
+	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a static, or fixed, joint. <P> <CENTER><IMG SRC="../images/FixedJoint.jpg" BORDER=1></CENTER> <P> <b>Fixed joints do not currently support a relative rotation the way other joint types do.</b>  I'm so sorry.  '''
 
 	def __init__( self ):
 		breve.Joint.__init__( self )
 
 	def dearchive( self ):
-
 		print '''dearchiving for %s and %s''' % (  self.parent, self.child )
 		if ( self.parent or self.child ):
 			self.link( self.parent, self.child, self.plinkPoint, self.clinkPoint )
@@ -497,13 +457,12 @@ class FixedJoint( breve.Joint ):
 
 breve.FixedJoint = FixedJoint
 class UniversalJoint( breve.Joint ):
-	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a universal joint.   <P> A universal joint has two degrees of freedom.  It can rotate "up-and-down" and "side-to-side", but cannot  "twist".  Your wrist is basically a universal joint--your hand cannot rotate without the rest of your arm. <P> <CENTER><IMG SRC="UniversalJoint.jpg" BORDER=1></CENTER>'''
+	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a universal joint.   <P> A universal joint has two degrees of freedom.  It can rotate "up-and-down" and "side-to-side", but cannot  "twist".  Your wrist is basically a universal joint--your hand cannot rotate without the rest of your arm. <P> <CENTER><IMG SRC="../images/UniversalJoint.jpg" BORDER=1></CENTER>'''
 
 	def __init__( self ):
 		breve.Joint.__init__( self )
 
 	def dearchive( self ):
-
 		if ( self.parent or self.child ):
 			self.link( self.parent, self.child, self.normalVector, self.plinkPoint, self.clinkPoint )
 
@@ -511,7 +470,6 @@ class UniversalJoint( breve.Joint ):
 
 	def getJointAngles( self ):
 		'''Returns a vector indicating how the angle of this joint is from its natural position (which corresponds to a values of 0 on both axes).  Only the X- and Y- components of the vector are valid for UniversalJoints.'''
-
 
 		return breve.breveInternalFunctionFinder.jointGetPosition( self, self.jointPointer )
 
@@ -551,12 +509,10 @@ class UniversalJoint( breve.Joint ):
 	def setJointLimits( self, min1, max1, min2, max2 ):
 		'''Sets the minimum and maximum allowed rotations (in radians)  for this joint on both of the joint's axes.  '''
 
-
 		breve.breveInternalFunctionFinder.jointSetLimits( self, self.jointPointer, breve.vector( min1, min2, 0 ), breve.vector( max1, max2, 0 ) )
 
 	def setJointVelocity( self, a1velocity, a2velocity ):
 		'''Sets the desired joint velocity on axis-1 to a1velocity and on axis-2 to a2velocity.'''
-
 
 		if self.jointPointer:
 			breve.breveInternalFunctionFinder.jointSetVelocity( self, self.jointPointer, breve.vector( a1velocity, a2velocity, 0 ) )
@@ -565,13 +521,12 @@ class UniversalJoint( breve.Joint ):
 
 breve.UniversalJoint = UniversalJoint
 class BallJoint( breve.Joint ):
-	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a ball joint. <p> A BallJoint has three degrees of freedom.  It can tilt "up-and-down" and "side-to-side", and can "twist".  Your neck is basically a ball joint--your head tilt  up-and-down, side-to-side, and can twist (although not all the  way around--if your head turns all the way around, please consult  the user manual for repair). <P> <CENTER><IMG SRC="BallJoint.jpg" BORDER=1></CENTER> <P> This joint uses a scheme of 3 Euler angles to represent the  relative rotation between two objects.  The Z-axis of rotation is automatically  derived from the parent link point, meaning that the Z-axis rotation is always  a "twist" relative to the link point.  The X-axis of rotation is specified by  the user with the normal argument.  The Y-axis is automatically derived from the  other two. <P> Because of a limitation of the physics engine, the Y-axis rotation is limited  to a range of approximately +/- 80 degrees of rotation. <P> If versions of breve prior to 2.3, there was no normal argument because the  axes of rotation were automatically defined.  The argument is therefore optional for backwards compatibility <b>only</b>, and should <b>always</b> be specified when writing new code.'''
+	'''This subclass of OBJECT(Joint) is used to link two OBJECT(Link) objects together using a ball joint. <p> A BallJoint has three degrees of freedom.  It can tilt "up-and-down" and "side-to-side", and can "twist".  Your neck is basically a ball joint--your head tilt  up-and-down, side-to-side, and can twist (although not all the  way around--if your head turns all the way around, please consult  the user manual for repair). <P> <CENTER><IMG SRC="../images/BallJoint.jpg" BORDER=1></CENTER> <P> This joint uses a scheme of 3 Euler angles to represent the  relative rotation between two objects.  The Z-axis of rotation is automatically  derived from the parent link point, meaning that the Z-axis rotation is always  a "twist" relative to the link point.  The X-axis of rotation is specified by  the user with the normal argument.  The Y-axis is automatically derived from the  other two. <P> Because of a limitation of the physics engine, the Y-axis rotation is limited  to a range of approximately +/- 80 degrees of rotation. <P> If versions of breve prior to 2.3, there was no normal argument because the  axes of rotation were automatically defined.  The argument is therefore optional for backwards compatibility <b>only</b>, and should <b>always</b> be specified when writing new code.'''
 
 	def __init__( self ):
 		breve.Joint.__init__( self )
 
 	def dearchive( self ):
-
 		if ( self.parent or self.child ):
 			self.link( self.parent, self.child, self.plinkPoint, self.clinkPoint )
 
@@ -579,7 +534,6 @@ class BallJoint( breve.Joint ):
 
 	def getJointAngles( self ):
 		'''Returns a vector indicating how the angle of this joint is from its natural position (which corresponds to a values of 0 on all axes).  '''
-
 
 		return breve.breveInternalFunctionFinder.jointGetPosition( self, self.jointPointer )
 
@@ -615,14 +569,12 @@ class BallJoint( breve.Joint ):
 	def setJointLimits( self, min1, max1, min2, max2, min3, max3 ):
 		'''Sets the minimum and maximum allowed rotations (in radians)  for this joint on all three of the joint's axes.  '''
 
-
 		if self.jointPointer:
 			breve.breveInternalFunctionFinder.jointSetLimits( self, self.jointPointer, breve.vector( min1, min2, min3 ), breve.vector( max1, max2, max3 ) )
 
 
 	def setJointVelocity( self, rotationalVelocity ):
 		'''Sets the desired joint velocity to rotationalVelocity.  As a ball joint allows rotation on three axes, rotationalVelocity is a vector.'''
-
 
 		if self.jointPointer:
 			breve.breveInternalFunctionFinder.jointSetVelocity( self, self.jointPointer, rotationalVelocity )

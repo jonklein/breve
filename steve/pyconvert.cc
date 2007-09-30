@@ -22,11 +22,20 @@
 #define UNIMPLEMENTED			std::string( "*** UNIMPLEMENTED ***" )
 #define ADDTABS( data, string )		for( int __t= 0; __t < (data)->_indents; __t++ ) string += "\t"
 
+#define NOTICE	"\n# Note: this file was automatically converted to Python from the\n\
+# original steve-language source code.  Please see the original\n\
+# file for more detailed comments and documentation.\n\n"
+
+
+
+
 #include "pyconvert.h"
 
 std::string stPyConvertFile( brEngine *inEngine, stSteveData *inSteveData, std::string &inFilename ) {
 	std::string result, controller, aliases;
 	unsigned int n;
+
+	result += NOTICE;
 
 	result += "\nimport breve\n\n";
 
@@ -598,7 +607,13 @@ std::string stListInsertExp::toPython( stPyConversionData *inData ) {
 
 std::string stListRemoveExp::toPython( stPyConversionData *inData ) {
 	std::string result;
-	result = "del " + listExp->toPython( inData ) + "[ " + index->toPython( inData ) + " ]";
+
+	std::string indexStr = "";
+
+	if( index )
+		indexStr = index->toPython( inData );
+
+	result = listExp->toPython( inData ) + ".pop( " + indexStr + " )";
 
 	return result;
 }

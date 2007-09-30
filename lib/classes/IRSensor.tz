@@ -8,8 +8,10 @@
 @define PI180 0.017453293.
 @define MAXVALUE  233.
 
-Real:IRSensor (aka IRSensors){
-	%
+Real : IRSensor (aka IRSensors) {
+	% The IRSensor class simulates a image ranger sensor, which provides a distance value 
+	% for each pixel.
+
 	+variables:
 		m_location(vector). # location of the sensor
 		m_rotation(matrix). # rotation of the sensor

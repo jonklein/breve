@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class PatchGrid( breve.Abstract ):
@@ -25,7 +30,6 @@ class PatchGrid( breve.Abstract ):
 		self.zSize = 0
 
 	def archive( self ):
-
 		return 1
 
 	def dearchive( self ):
@@ -124,18 +128,15 @@ class PatchGrid( breve.Abstract ):
 	def disableSmoothDrawing( self ):
 		'''Disables smooth drawing for this PatchGrid.  This is the default. See METHOD(enable-smooth-drawing) for details on smooth drawing.'''
 
-
 		breve.breveInternalFunctionFinder.patchGridSetSmoothDrawing( self, self.gridPointer, 0 )
 
 	def disableVolumetricDrawing( self ):
 		'''Disables volumetric drawing for this PatchGrid.  The grid is drawn as individual cubes.  This technique may produce better results  visually, but is far slower than the volumetric rendering.  See  METHOD(enable-volumetric-drawing) for more details.'''
 
-
 		breve.breveInternalFunctionFinder.patchGridSetDrawWithTexture( self, self.gridPointer, 0 )
 
 	def displayConcentrationInBlue( self, theDiffusable ):
 		'''Selects the OBJECT(PatchChemical)'s concentration to use as the red channel when METHOD(display-patch-chemical-concentrations) is called.'''
-
 
 		self.blueChemicalMatrix = theDiffusable
 		self.blueChemicalMatrix = self.chemicalConcentrationMatrix[ theDiffusable ]
@@ -143,92 +144,76 @@ class PatchGrid( breve.Abstract ):
 	def displayConcentrationInGreen( self, theDiffusable ):
 		'''Selects the OBJECT(PatchChemical)'s concentration to use as the red channel when METHOD(display-patch-chemical-concentrations) is called.'''
 
-
 		self.greenChemicalMatrix = self.chemicalConcentrationMatrix[ theDiffusable ]
 
 	def displayConcentrationInRed( self, theDiffusable ):
 		'''Selects the OBJECT(PatchChemical)'s concentration to use as the red channel when METHOD(display-patch-chemical-concentrations) is called.'''
-
 
 		self.redChemicalMatrix = self.chemicalConcentrationMatrix[ theDiffusable ]
 
 	def enableSmoothDrawing( self ):
 		'''Enables smooth drawing for this PatchGrid.  When smooth drawing is  enabled, colors are blended smoothly between patches.  Smooth drawing is disabled by default. <P> Smooth drawing is desirable when a PatchGrid's colors display  continuous gradients as with chemicals or temperature, but is  undesirable when dealing with discrete states, as in cellular  automata simulations. <P> The method METHOD(disable-smooth-drawing) can be used to disable smooth drawing.'''
 
-
 		breve.breveInternalFunctionFinder.patchGridSetSmoothDrawing( self, self.gridPointer, 1 )
 
 	def enableVolumetricDrawing( self ):
 		'''Enables texture drawing for this PatchGrid.  This is the default. With volumetric rendering, the grid is drawn as a series of overlapping textured planes.  The rendering is fast, but the overlapping planes may  leave some visual artifacts.  To revert to the older style of cube  rendering, see the method METHOD(disable-volumetric-drawing).'''
-
 
 		breve.breveInternalFunctionFinder.patchGridSetDrawWithTexture( self, self.gridPointer, 1 )
 
 	def getConcentration( self, theDiffusable, xIndex, yIndex, zIndex ):
 		'''Gets the concentration of the chemical in the patch.  Note that this is a normalized concentration.  If you want the total concentration, multiply by the OBJECT(Patch) size. You don't normally call this directly'''
 
-
 		return self.chemicalConcentrationMatrix[ theDiffusable ].getValue( xIndex, yIndex, zIndex )
 
 	def getDescription( self ):
-
 		return '''%s x %s x %s''' % (  self.xSize, self.ySize, self.zSize )
 
 	def getGridPointer( self ):
-
 		return self.gridPointer
 
 	def getLocation( self ):
 		'''returns the center of the grid.'''
-
 
 		return self.location
 
 	def getPatch( self, theLocation ):
 		'''Returns the OBJECT(Patch) in which theLocation resides.  Make sure you test for the validity of the returned object, since it is possible that there is no patch at the specified location.'''
 
-
 		return breve.breveInternalFunctionFinder.objectAtLocation( self, self.gridPointer, theLocation )
 
 	def getPatchAt( self, xind, yind, zind ):
 		'''Returns the patch object associated with the specified indices.  Note that this method may return a NULL object in the case that the  indices given are out of bounds.'''
-
 
 		return breve.breveInternalFunctionFinder.patchObjectAtIndex( self, self.gridPointer, xind, yind, zind )
 
 	def getPatchChemicals( self ):
 		'''Returns all the chemicals currently being tracked in the patch grid.'''
 
-
 		return self.chemicals
 
 	def getPatchSize( self ):
 		'''Returns the vector size of a single patch.'''
-
 
 		return self.patchSize
 
 	def getPatches( self ):
 		'''Returns a list of all patch objects.'''
 
-
 		return self.patches
 
 	def getXCount( self ):
 		'''If the grid is initialized, returns the size of the grid on the X-axis.'''
-
 
 		return self.xSize
 
 	def getYCount( self ):
 		'''If the grid is initialized, returns the size of the grid on the Y-axis.'''
 
-
 		return self.ySize
 
 	def getZCount( self ):
 		'''If the grid is initialized, returns the size of the grid on the Z-axis.'''
-
 
 		return self.zSize
 
@@ -302,12 +287,10 @@ class PatchGrid( breve.Abstract ):
 	def initWith( self, x, y, z, center = breve.vector( 0.000000, 0.000000, 0.000000 ), pSize = breve.vector( 1.000000, 1.000000, 1.000000 ), patchclass = "Patch" ):
 		'''Creates a PatchGrid centered at center, in which each OBJECT(Patch)  is a member of patchclass and is the size pSize and in which the total grid  dimensions are x by y by z.   <p>  Bear in mind that this will create a large number of objects:  x * y * z.  If you have an iterate method in your patch-class,  then this can amount to a great deal of computation which can slow down your simulation.'''
 
-
 		return self.initAt( x, y, z, center, pSize, patchclass )
 
 	def setConcentration( self, theDiffusable, xIndex, yIndex, zIndex, theValue ):
 		'''Sets the concentration of the chemical in the patch.  Note that this is a normalized concentration.  If you want to use total concentration, multiply by the OBJECT(Patch) size first. You don't normally call this directly'''
-
 
 		self.chemicalConcentrationMatrix[ theDiffusable ].setValue( theValue, xIndex, yIndex, zIndex )
 
@@ -335,7 +318,6 @@ class PatchGrid( breve.Abstract ):
 
 	def track( self, theDiffusable ):
 		'''Adds a new OBJECT(PatchChemical) to the patch grid.  This allows the patch grid to track the concentrations of the chemcial in each patch and allow diffusion between the patches.'''
-
 
 		if self.chemicalConcentrationMatrix[ theDiffusable ]:
 			print '''%s is already being tracked by the PatchGrid.''' % (  theDiffusable )
@@ -393,7 +375,6 @@ class PatchGrid( breve.Abstract ):
 	def updateConcentrations( self ):
 		'''Updates the concentrations of each OBJECT(PatchChemical) being tracked in the patch grid.  All chemicals with a diffusion rate greater than 0 diffuse into adjacent patches at their given rate and all chemicals with a decay rate greater than 0 decay.'''
 
-
 		self.diffuseChemicals()
 		self.decayChemicals()
 
@@ -420,7 +401,6 @@ class PatchToroid( breve.PatchGrid ):
 
 	def getPatchAt( self, xind, yind, zind ):
 		'''Returns the patch object associated with the specified indices.   If the indices are out of bounds, they will be "wrapped around" to the other side of the PatchToroid.'''
-
 
 		if ( xind >= self.xSize ):
 			xind = ( xind % self.xSize )

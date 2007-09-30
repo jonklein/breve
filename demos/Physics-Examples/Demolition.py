@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class BraitenbergDemolition( breve.BraitenbergControl ):
@@ -10,7 +15,6 @@ class BraitenbergDemolition( breve.BraitenbergControl ):
 		BraitenbergDemolition.init( self )
 
 	def catchKeyRDown( self ):
-
 		self.reset()
 
 	def init( self ):
@@ -37,7 +41,6 @@ class BraitenbergDemolition( breve.BraitenbergControl ):
 		self.reset()
 
 	def reset( self ):
-
 		breve.allInstances( "Mobiles" ).setVelocity( breve.vector( 0, 0, 0 ) )
 		self.vehicle.rotate( breve.vector( 1, 0, 0 ), 0 )
 		self.blocks[ 0 ].move( breve.vector( 65, 0.600000, -1.650000 ) )
@@ -62,7 +65,6 @@ class Brick( breve.Mobile ):
 		Brick.init( self )
 
 	def init( self ):
-
 		self.setShape( breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 1, 1, 1 ) ) )
 		self.enablePhysics()
 

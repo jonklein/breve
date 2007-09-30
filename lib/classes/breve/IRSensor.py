@@ -1,7 +1,14 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class IRSensor( breve.Real ):
+	'''The IRSensor class simulates a image ranger sensor, which provides a distance value  for each pixel.'''
+
 	def __init__( self ):
 		breve.Real.__init__( self )
 		self.communicationThreshold = 0
@@ -26,7 +33,6 @@ class IRSensor( breve.Real ):
 		return 0
 
 	def getData( self ):
-
 		self.updatePos()
 		if ( self.sensordata == -1 ):
 			self.draw.clear()
@@ -38,23 +44,18 @@ class IRSensor( breve.Real ):
 		return self.sensordata
 
 	def getLocation( self ):
-
 		return self.m_location
 
 	def getOwner( self ):
-
 		return self.owner
 
 	def getRotation( self ):
-
 		return self.m_rotation
 
 	def getSensorType( self ):
-
 		return self.sensorType
 
 	def initWith( self, t, position, rotation, o ):
-
 		self.sensorType = t
 		self.setRelPosition( position )
 		self.setRelRotation( rotation )
@@ -67,12 +68,10 @@ class IRSensor( breve.Real ):
 		return self
 
 	def iterate( self ):
-
 		self.sensordata = -1
 		self.updatePos()
 
 	def move( self, location ):
-
 		self.m_location = location
 
 	def send( self, message ):
@@ -101,27 +100,21 @@ class IRSensor( breve.Real ):
 
 
 	def setOwner( self, o ):
-
 		self.owner = o
 
 	def setRelPosition( self, v ):
-
 		self.rel_position = v
 
 	def setRelRotation( self, m ):
-
 		self.rel_rotation = m
 
 	def setRelYRotation( self, f ):
-
 		self.setRelRotation( breve.matrix(  breve.breveInternalFunctionFinder.cos( self, f ), 0, ( -breve.breveInternalFunctionFinder.sin( self, f ) ), 0, 1, 0, breve.breveInternalFunctionFinder.sin( self, f ), 0, breve.breveInternalFunctionFinder.cos( self, f ) ) )
 
 	def setRotation( self, m ):
-
 		self.m_rotation = m
 
 	def updatePos( self ):
-
 		self.move( ( self.owner.getLocation() + ( self.owner.getRotation() * self.rel_position ) ) )
 		self.setRotation( ( self.owner.getRotation() * self.rel_rotation ) )
 

@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class MenuItem( breve.Abstract ):
@@ -16,7 +21,6 @@ class MenuItem( breve.Abstract ):
 	def check( self ):
 		'''Places a check mark next to the menu item.'''
 
-
 		if ( not self.menuPointer ):
 			return
 
@@ -25,7 +29,6 @@ class MenuItem( breve.Abstract ):
 
 	def createMenu( self, menuName, theObject, methodName ):
 		'''This method initializes a menu item with title menuName for theObject which will call methodName when selected.'''
-
 
 		self.name = menuName
 		self.method = methodName
@@ -42,7 +45,6 @@ class MenuItem( breve.Abstract ):
 		return self
 
 	def dearchive( self ):
-
 		self.menuPointer = breve.breveInternalFunctionFinder.menuItemNew( self, self.owner, self.method, self.name )
 		if self.checked:
 			self.check()
@@ -59,7 +61,6 @@ class MenuItem( breve.Abstract ):
 	def disable( self ):
 		'''Disables the menu item such that it cannot be selected.'''
 
-
 		if ( not self.menuPointer ):
 			return
 
@@ -69,7 +70,6 @@ class MenuItem( breve.Abstract ):
 	def enable( self ):
 		'''Enables a menu item, if it is disabled.'''
 
-
 		if ( not self.menuPointer ):
 			return
 
@@ -77,12 +77,10 @@ class MenuItem( breve.Abstract ):
 		self.enabled = 1
 
 	def getDescription( self ):
-
 		return self.name
 
 	def uncheck( self ):
 		'''Removes the check mark next to the menu item, if it exists.'''
-
 
 		if ( not self.menuPointer ):
 			return

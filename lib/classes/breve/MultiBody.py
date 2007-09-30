@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class MultiBody( breve.Object ):
@@ -45,18 +50,15 @@ class MultiBody( breve.Object ):
 	def checkSelfPenetration( self ):
 		'''Checks to see if this MultiBody is colliding with itself.   This method is useful when a MultiBody is first built  to determine whether the "native" configuration of the body  is valid or not.  If the body is in a conflicting configuration  when it's first built, it may lead to unexpected behaviors as the body attempts to correct itself.'''
 
-
 		return breve.breveInternalFunctionFinder.multibodyCheckSelfPenetration( self, self.multibodyPointer )
 
 	def dearchive( self ):
-
 		self.multibodyPointer = breve.breveInternalFunctionFinder.multibodyNew( self)
 		self.setRoot( self.rootLink )
 		breve.breveInternalFunctionFinder.multibodySetHandleSelfCollisions( self, self.multibodyPointer, self.selfCollisions )
 		return 1
 
 	def destroy( self ):
-
 		breve.deleteInstances( self.getAllConnectedObjects() )
 		breve.breveInternalFunctionFinder.multibodyFree( self, self.multibodyPointer )
 		breve.deleteInstances( self.menus )
@@ -64,20 +66,17 @@ class MultiBody( breve.Object ):
 	def disableSelfCollisions( self ):
 		'''Disables collisions between links within this MultiBody.   See METHOD(enable-self-collisions) for more information.'''
 
-
 		self.selfCollisions = 0
 		breve.breveInternalFunctionFinder.multibodySetHandleSelfCollisions( self, self.multibodyPointer, self.selfCollisions )
 
 	def enableSelfCollisions( self ):
 		'''Enables collisions between objects contained in the same MultiBody.   This option is disabled by default--it can lead to unexpected  behaviors if Links are inadvertantly forced together by the  configuration of the joints.'''
 
-
 		self.selfCollisions = 1
 		breve.breveInternalFunctionFinder.multibodySetHandleSelfCollisions( self, self.multibodyPointer, self.selfCollisions )
 
 	def freeAllConnectedObjects( self ):
 		'''Frees all of the OBJECT(Link) and OBJECT(Joint) objects which comprise this MultiBody.'''
-
 
 		breve.deleteInstances( self.getAllConnectedObjects() )
 
@@ -100,57 +99,47 @@ class MultiBody( breve.Object ):
 	def getAllConnectedObjects( self ):
 		'''Returns all of the OBJECT(Link) and OBJECT(Joint) objects which comprise this MultiBody.'''
 
-
 		return breve.breveInternalFunctionFinder.multibodyAllObjects( self, self.multibodyPointer )
 
 	def getLocation( self ):
 		'''Returns the location of the root link of the multibody.'''
-
 
 		return self.rootLink.getLocation()
 
 	def getMultibodyPointer( self ):
 		'''Used internally.'''
 
-
 		return self.multibodyPointer
 
 	def getRoot( self ):
 		'''Returns the root link.'''
-
 
 		return self.rootLink
 
 	def hideAxis( self ):
 		'''Disables the axis for all connected links.'''
 
-
 		self.getAllConnectedLinks().hideAxis()
 
 	def hideBoundingBox( self ):
 		'''Disables the bounding box for all connected links.'''
 
-
 		self.getAllConnectedLinks().hideBoundingBox()
 
 	def init( self ):
-
 		self.multibodyPointer = breve.breveInternalFunctionFinder.multibodyNew( self)
 
 	def move( self, newLocation ):
 		'''Moves the entire MultiBody to newLocation.'''
-
 
 		breve.breveInternalFunctionFinder.multibodySetLocation( self, self.multibodyPointer, newLocation )
 
 	def register( self, root ):
 		'''Deprecated.  Don't use.'''
 
-
 		self.setRoot( root )
 
 	def resumePhysics( self ):
-
 		pass
 
 	def rotate( self, thisAxis, amount ):
@@ -168,12 +157,10 @@ class MultiBody( breve.Object ):
 	def setColor( self, newColor ):
 		'''Sets the color for all links.'''
 
-
 		self.getAllConnectedLinks().setColor( newColor )
 
 	def setRoot( self, root ):
 		'''Associates a MultiBody with a link root.  All links attached to root, both directly and indirectly, will implicitly be  part of this MultiBody as well.  When joints are created and destroyed, the MultiBody automatically updates.'''
-
 
 		if ( not root.getLinkPointer() ):
 			raise Exception( '''attempting to register MultiBody with uninitialized Link object''' )
@@ -196,35 +183,29 @@ class MultiBody( breve.Object ):
 	def setSelfCollisionParameters( self, erpValue, cfmValue ):
 		'''Sets two contact parameters which effect the hardness of intra-body contacts. <li> Currently experimental and for advanced users only.  See the ODE  user's manual for a description of these values and how they should be used.'''
 
-
 		breve.breveInternalFunctionFinder.multibodySetERPCFM( self, self.multibodyPointer, erpValue, cfmValue )
 
 	def setTextureImage( self, texture ):
 		'''Sets the texture for all links.'''
-
 
 		self.getAllConnectedLinks().setTextureImage( texture )
 
 	def setTextureScale( self, textureScale ):
 		'''Sets the texture scale for all links.'''
 
-
 		self.getAllConnectedLinks().setTextureScale( textureScale )
 
 	def showAxis( self ):
 		'''Enables the axis for all connected links.'''
-
 
 		self.getAllConnectedLinks().showAxis()
 
 	def showBoundingBox( self ):
 		'''Enables the bounding box for all connected links.'''
 
-
 		self.getAllConnectedLinks().showBoundingBox()
 
 	def suspendPhysics( self ):
-
 		pass
 
 

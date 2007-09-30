@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class myControl( breve.Control ):
@@ -12,7 +17,6 @@ class myControl( breve.Control ):
 		myControl.init( self )
 
 	def getWalkerShape( self ):
-
 		return self.walkerShape
 
 	def init( self ):
@@ -27,7 +31,6 @@ class myControl( breve.Control ):
 		self.sensorTestDistance()
 
 	def iterate( self ):
-
 		breve.Control.iterate( self )
 		self.updateNeighbors()
 
@@ -121,7 +124,6 @@ class myControl( breve.Control ):
 
 
 	def sensorTestAzimut( self, dist ):
-
 		self.sensorTestInit()
 		print '''sensorTest-Azimut distance:''', dist
 		self.wallShapeTest = breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 20, 10, 1 ) )
@@ -133,7 +135,6 @@ class myControl( breve.Control ):
 		self.agent.move( breve.vector( -40, 1.400000, ( -dist ) ) )
 
 	def sensorTestDistance( self ):
-
 		self.sensorTestInit()
 		print 'sensorTestDistance:'
 		self.wallShapeTest = breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 20, 10, 1 ) )
@@ -147,7 +148,6 @@ class myControl( breve.Control ):
 		self.agent.setVelocity( ( self.agent.getRotation() * breve.vector( 1, 0, 0 ) ) )
 
 	def sensorTestIncidence( self, dist ):
-
 		print '''sensorTest-Incidence distance:''', dist
 		self.sensorTestInit()
 		self.wallShapeTest = breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 10, 10, 1 ) )
@@ -159,7 +159,6 @@ class myControl( breve.Control ):
 		self.agent.setIncidenceRadius( ( dist + ( ( 1 + 2.500000 ) / 2.000000 ) ) )
 
 	def sensorTestInit( self ):
-
 		breve.createInstances( breve.TestStage, 1 )
 		self.agent = breve.createInstances( breve.testAgent, 1 )
 		self.pointCamera( breve.vector( 0, 0, 0 ), breve.vector( 0, 250, 0 ) )
@@ -189,7 +188,6 @@ class Stage( breve.Object ):
 		self.wallS = None
 
 	def initWith( self, FLOOR_X, FLOOR_Z ):
-
 		self.floorShape = breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( FLOOR_X, 0.100000, FLOOR_Z ) )
 		self.floor = breve.createInstances( breve.Stationary, 1 )
 		self.floor.register( self.floorShape, breve.vector( 0, ( ( -0.100000 ) / 2 ), 0 ) )
@@ -227,7 +225,6 @@ class LabyStage2( breve.Object ):
 		self.wallS = None
 
 	def initWith( self, FLOOR_X, FLOOR_Z ):
-
 		self.floorShape = breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( FLOOR_X, 0.100000, FLOOR_Z ) )
 		self.floor = breve.createInstances( breve.Stationary, 1 )
 		self.floor.register( self.floorShape, breve.vector( 0, ( ( -0.100000 ) / 2 ), 0 ) )
@@ -749,7 +746,6 @@ class DemoStage( breve.Object ):
 		DemoStage.init( self )
 
 	def init( self ):
-
 		self.floorShape = breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 45, 0.100000, 55 ) )
 		self.floor = breve.createInstances( breve.Stationary, 1 )
 		self.floor.register( self.floorShape, breve.vector( 0, ( ( -0.100000 ) / 2 ), 0 ) )

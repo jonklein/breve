@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class RegressionController( breve.Control ):
@@ -7,7 +12,6 @@ class RegressionController( breve.Control ):
 		RegressionController.init( self )
 
 	def init( self ):
-
 		breve.createInstances( breve.RegressionGP, 1 )
 
 
@@ -26,11 +30,9 @@ class RegressionGP( breve.PushGP ):
 		return ( breve.length( ( interpreter.getFloatStackTop() - desiredResult ) ) * breve.length( ( interpreter.getFloatStackTop() - desiredResult ) ) )
 
 	def countFitnessCases( self ):
-
 		return 10
 
 	def init( self ):
-
 		self.readInterpreterConfig( 'PushRegression.config' )
 		self.setPopulationSize( 2000 )
 		self.setSpatialRadius( 10 )
@@ -39,11 +41,9 @@ class RegressionGP( breve.PushGP ):
 		self.getInterpreter().addInstruction( self, 'input' )
 
 	def input( self ):
-
 		self.getInterpreter().pushFloat( self.currentInput )
 
 	def setupFitnessTest( self, n, interpreter ):
-
 		n = ( n + 1 )
 		self.currentInput = n
 		interpreter.pushFloat( n )

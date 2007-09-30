@@ -2,7 +2,10 @@
 
 Object : QSystem {
 	% The main interface to the qgame++ Quantum Gate And Measurement Emulator, 
-	% a quantum computing simulator.
+	% a quantum computing simulator. 
+	% <p><b>Note: the QGAME library is not built-in to the standard breve 
+	% distribution.  Use of this class may require compiling breve from the 
+	% source code with support for QGAME.
 
 	+ variables:
 		systemPointer (pointer).
@@ -34,6 +37,9 @@ Object : QSystem {
 Object : QProgram {
 	% An interface to a quantum program in qgame++ Quantum Gate And Measurement Emulator, 
 	% a quantum computing simulator.  To be used in conjunction with OBJECT(QSystem).
+	% <p><b>Note: the QGAME library is not built-in to the standard breve 
+	% distribution.  Use of this class may require compiling breve from the 
+	% source code with support for QGAME.
 
 	+ variables:
 		programPointer (pointer).

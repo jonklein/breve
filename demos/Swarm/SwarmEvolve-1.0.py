@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Swarm( breve.Control ):
@@ -45,11 +50,9 @@ class Swarm( breve.Control ):
 		return bestBird
 
 	def checkDoMutations( self ):
-
 		return self.doMutations
 
 	def click( self, item ):
-
 		if self.selection:
 			self.selection.hideNeighborLines()
 
@@ -60,18 +63,15 @@ class Swarm( breve.Control ):
 		breve.Control.click( self , item )
 
 	def evolveWithoutRandomizing( self ):
-
 		self.doMutations = 1
 
 	def flockNicely( self ):
-
 		for self.item in self.birds:
 			self.item.flockNicely()
 
 		self.doMutations = 0
 
 	def getBirds( self ):
-
 		return self.birds
 
 	def init( self ):
@@ -151,36 +151,30 @@ class Swarm( breve.Control ):
 		breve.Control.iterate( self )
 
 	def randomizeAndEvolve( self ):
-
 		for self.item in self.birds:
 			self.item.flockRandomly()
 
 		self.doMutations = 1
 
 	def setAutoCameraMode( self ):
-
 		self.autoCameraMode = 1
 		self.autoCameraMenu.check()
 		self.manualCameraMenu.uncheck()
 
 	def setBirds( self, newBirds ):
-
 		self.birds = newBirds
 
 	def setDrawEveryFrame( self ):
-
 		self.drawEveryFrameMenu.check()
 		self.skipFramesIfNecessaryMenu.uncheck()
 		self.enableDrawEveryFrame()
 
 	def setManualCameraMode( self ):
-
 		self.autoCameraMode = 0
 		self.autoCameraMenu.uncheck()
 		self.manualCameraMenu.check()
 
 	def setSkipFramesIfNecessaryMenu( self ):
-
 		self.drawEveryFrameMenu.uncheck()
 		self.skipFramesIfNecessaryMenu.check()
 		self.disableDrawEveryFrame()
@@ -195,19 +189,16 @@ class Feeders( breve.Mobile ):
 		Feeders.init( self )
 
 	def drift( self, location ):
-
 		self.drifting = 1
 		self.driftLocation = location
 
 	def init( self ):
-
 		self.setShape( breve.createInstances( breve.Shape, 1 ).initWithPolygonDisk( 5, 0.100000, 1.000000 ) )
 		self.move( ( breve.randomExpression( breve.vector( 20, 0, 20 ) ) - breve.vector( 10, 0, 10 ) ) )
 		self.setVelocity( breve.vector( 0, 0, 0 ) )
 		self.setColor( breve.vector( 1, 1, 0.300000 ) )
 
 	def iterate( self ):
-
 		if self.drifting:
 			self.offset( ( 0.060000 * ( self.driftLocation - self.getLocation() ) ) )
 			if ( breve.length( ( self.driftLocation - self.getLocation() ) ) < 0.001000 ):
@@ -219,7 +210,6 @@ class Feeders( breve.Mobile ):
 
 
 	def maybeTeleport( self ):
-
 		if ( breve.randomExpression( 250 ) == 0 ):
 			self.drift( ( breve.randomExpression( breve.vector( 20, 0, 20 ) ) - breve.vector( 10, 0, 10 ) ) )
 
@@ -278,15 +268,12 @@ class Birds( breve.Mobile ):
 		self.setColor( breve.vector( newRed, newGreen, newBlue ) )
 
 	def checkLanded( self ):
-
 		return self.landed
 
 	def checkSpecies( self ):
-
 		return self.species
 
 	def checkVisibility( self, item ):
-
 		if ( item == self ):
 			return 0
 
@@ -336,14 +323,12 @@ class Birds( breve.Mobile ):
 		p.adjustColor()
 
 	def eat( self, feeder ):
-
 		self.energy = ( self.energy + 0.020000 )
 		if ( self.energy > 1 ):
 			self.energy = 1
 
 
 	def flockNicely( self ):
-
 		self.wanderConstant = 3.000000
 		self.worldCenterConstant = 4.000000
 		self.centerConstant = 1.000000
@@ -357,7 +342,6 @@ class Birds( breve.Mobile ):
 		self.maxAcceleration = 15
 
 	def flockRandomly( self ):
-
 		self.wanderConstant = ( breve.randomExpression( 14.900000 ) + 0.100000 )
 		self.worldCenterConstant = ( breve.randomExpression( 14.900000 ) + 0.100000 )
 		self.centerConstant = ( breve.randomExpression( 14.900000 ) + 0.100000 )
@@ -505,7 +489,6 @@ class Birds( breve.Mobile ):
 		self.myPoint( breve.vector( 0, 1, 0 ), newVelocity )
 
 	def getAge( self ):
-
 		return self.age
 
 	def getAngle( self, otherMobile ):
@@ -534,15 +517,12 @@ class Birds( breve.Mobile ):
 		return ( center - self.getLocation() )
 
 	def getCenterConstant( self ):
-
 		return self.centerConstant
 
 	def getCruiseDistance( self ):
-
 		return self.cruiseDistance
 
 	def getEnergy( self ):
-
 		return self.energy
 
 	def getFeederUrge( self, feeders ):
@@ -566,19 +546,15 @@ class Birds( breve.Mobile ):
 		return closestFood
 
 	def getFeederConstant( self ):
-
 		return self.feederConstant
 
 	def getMaxAcceleration( self ):
-
 		return self.maxAcceleration
 
 	def getMaxVelocity( self ):
-
 		return self.maxVelocity
 
 	def getSpacingConstant( self ):
-
 		return self.spacingConstant
 
 	def getVelocityUrge( self, flock ):
@@ -598,27 +574,21 @@ class Birds( breve.Mobile ):
 		return ( velocity - self.getVelocity() )
 
 	def getVelocityConstant( self ):
-
 		return self.velocityConstant
 
 	def getWanderConstant( self ):
-
 		return self.wanderConstant
 
 	def getWorldCenterConstant( self ):
-
 		return self.worldCenterConstant
 
 	def getXenoDistance( self ):
-
 		return self.xenoDistance
 
 	def getXenoSpacingConstant( self ):
-
 		return self.xenoSpacingConstant
 
 	def init( self ):
-
 		self.setShape( breve.createInstances( breve.Shape, 1 ).initWithPolygonCone( 5, 0.200000, 0.100000 ) )
 		self.move( ( breve.randomExpression( breve.vector( 10, 10, 10 ) ) - breve.vector( 5, -5, 5 ) ) )
 		self.setVelocity( ( breve.randomExpression( breve.vector( 20, 20, 20 ) ) - breve.vector( 10, 10, 10 ) ) )
@@ -644,7 +614,6 @@ class Birds( breve.Mobile ):
 		self.age = 0
 
 	def land( self, ground ):
-
 		self.setAcceleration( breve.vector( 0, 0, 0 ) )
 		self.setVelocity( breve.vector( 0, 0, 0 ) )
 		self.myPoint( breve.vector( 0, 1, 0 ), breve.vector( 0, 1, 0 ) )
@@ -652,7 +621,6 @@ class Birds( breve.Mobile ):
 		self.offset( breve.vector( 0, 0.100000, 0 ) )
 
 	def max( self, num1, num2 ):
-
 		if ( num1 < num2 ):
 			return num2
 
@@ -662,7 +630,6 @@ class Birds( breve.Mobile ):
 
 
 	def min( self, num1, num2 ):
-
 		if ( num1 < num2 ):
 			return num1
 
@@ -703,11 +670,9 @@ class Birds( breve.Mobile ):
 		self.rotate( v, a )
 
 	def scaleColor( self, c, m ):
-
 		return ( m + ( c * ( 1.000000 - m ) ) )
 
 	def setEnergy( self, e ):
-
 		self.energy = e
 
 

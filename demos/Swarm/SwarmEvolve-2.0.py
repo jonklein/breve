@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Swarm( breve.Control ):
@@ -103,17 +108,14 @@ class Swarm( breve.Control ):
 
 
 	def catchInterfaceId100( self, s ):
-
 		self.controller.setStability( s )
 		self.setInterfaceItem( 102, s )
 
 	def catchInterfaceId102( self, s ):
-
 		self.controller.setStability( s )
 		self.setInterfaceItem( 100, s )
 
 	def catchInterfaceId300( self, s ):
-
 		if ( s == 1 ):
 			self.setAutoCameraMode()
 		else:
@@ -123,11 +125,9 @@ class Swarm( breve.Control ):
 
 
 	def catchInterfaceId600( self, s ):
-
 		self.controller.setUnitDriftMode( s )
 
 	def click( self, item ):
-
 		self.selection = item
 		if ( item and item.isA( 'Bird' ) ):
 			print item.getPushCode().getString()
@@ -150,7 +150,6 @@ class Swarm( breve.Control ):
 		self.foodAccum = ( self.foodAccum + total )
 
 	def displayIteration( self ):
-
 		self.setInterfaceItem( 124, '''%s''' % (  self.iteration ) )
 
 	def displayPopulation( self ):
@@ -160,11 +159,9 @@ class Swarm( breve.Control ):
 		self.setInterfaceItem( 123, '''%s''' % (  popsize ) )
 
 	def doPrintVelocities( self ):
-
 		self.printVelocitiesVar = 1
 
 	def dontPrintVelocities( self ):
-
 		self.printVelocitiesVar = 0
 
 	def dumpPrograms( self ):
@@ -175,87 +172,66 @@ class Swarm( breve.Control ):
 
 
 	def getCorpseShape( self ):
-
 		return self.corpseShape
 
 	def getDecisions( self ):
-
 		return self.decisions
 
 	def getFeeders( self ):
-
 		return self.feeders
 
 	def getFoodDeviations( self ):
-
 		return self.foodDeviations
 
 	def getNextID( self ):
-
 		return self.nextID
 
 	def getShareMode( self ):
-
 		return self.shareMode
 
 	def getStability( self ):
-
 		return self.stability
 
 	def getUnitDriftMode( self ):
-
 		return self.unitDriftMode
 
 	def incrementBirths( self ):
-
 		self.births = ( self.births + 1 )
 
 	def incrementDeaths( self ):
-
 		self.deaths = ( self.deaths + 1 )
 
 	def incrementDiscrepancies( self, d ):
-
 		self.discrepancies = ( self.discrepancies + d )
 
 	def incrementFriendExploits( self ):
-
 		self.friendExploits = ( self.friendExploits + 1 )
 
 	def incrementFriendFeedings( self ):
-
 		self.friendFeedings = ( self.friendFeedings + 1 )
 
 	def incrementNaturalBirths( self ):
-
 		self.naturalBirths = ( self.naturalBirths + 1 )
 
 	def incrementNextID( self ):
-
 		self.nextID = ( self.nextID + 1 )
 
 	def incrementOtherExploits( self ):
-
 		self.otherExploits = ( self.otherExploits + 1 )
 
 	def incrementOtherFeedings( self ):
-
 		self.otherFeedings = ( self.otherFeedings + 1 )
 
 	def incrementReproMutationRates( self, r ):
-
 		self.reproMutationRates = ( self.reproMutationRates + r )
 
 	def incrementReproMutations( self ):
-
 		self.reproMutations = ( self.reproMutations + 1 )
 
 	def incrementReproductiveDiscounts( self ):
-
 		self.reproductiveDiscounts = ( self.reproductiveDiscounts + 1 )
 
 	def incrementServos( self ):
-
 		self.servos = ( self.servos + 1 )
 
 	def init( self ):
@@ -359,11 +335,9 @@ class Swarm( breve.Control ):
 		breve.Control.iterate( self )
 
 	def printVelocities( self ):
-
 		return self.printVelocitiesVar
 
 	def randomFeeder( self ):
-
 		return self.feeders[ breve.randomExpression( ( self.feeders - 1 ) ) ]
 
 	def report( self ):
@@ -465,47 +439,38 @@ class Swarm( breve.Control ):
 		self.servos = 0
 
 	def scode( self ):
-
 		self.controller.getSelection().getPushCode().dump()
 
 	def setAutoCameraMode( self ):
-
 		self.autoCameraMode = 1
 		self.autoCameraMenu.check()
 		self.manualCameraMenu.uncheck()
 
 	def setDecisions( self, d ):
-
 		self.decisions = d
 
 	def setDrawEveryFrame( self ):
-
 		self.drawEveryFrameMenu.check()
 		self.skipFramesIfNecessaryMenu.uncheck()
 		self.enableDrawEveryFrame()
 
 	def setFoodDeviations( self, d ):
-
 		self.foodDeviations = d
 
 	def setManualCameraMode( self ):
-
 		self.autoCameraMode = 0
 		self.autoCameraMenu.uncheck()
 		self.manualCameraMenu.check()
 
 	def setSkipFramesIfNecessaryMenu( self ):
-
 		self.drawEveryFrameMenu.uncheck()
 		self.skipFramesIfNecessaryMenu.check()
 		self.disableDrawEveryFrame()
 
 	def setStability( self, value ):
-
 		self.stability = value
 
 	def setUnitDriftMode( self, m ):
-
 		self.unitDriftMode = m
 
 
@@ -521,7 +486,6 @@ class Feeders( breve.Mobile ):
 		Feeders.init( self )
 
 	def adjustEnergy( self, d ):
-
 		self.energy = ( self.energy + d )
 		if ( self.energy < 0 ):
 			self.energy = 0
@@ -531,16 +495,13 @@ class Feeders( breve.Mobile ):
 
 
 	def drift( self, location ):
-
 		self.drifting = 1
 		self.driftLocation = location
 
 	def getEnergy( self ):
-
 		return self.energy
 
 	def init( self ):
-
 		self.shape = breve.createInstances( breve.Sphere, 1 ).initWith( 0.300000 )
 		self.setShape( self.shape )
 		self.move( ( breve.randomExpression( breve.vector( 30, 0, 30 ) ) - breve.vector( 15, 0, 15 ) ) )
@@ -606,7 +567,6 @@ class Corpse( breve.Mobile ):
 		Corpse.init( self )
 
 	def init( self ):
-
 		self.setShape( self.controller.getCorpseShape() )
 		self.handleCollisions( 'Stationary', 'land' )
 		self.setColor( breve.vector( 0.200000, 0.200000, 0.200000 ) )
@@ -614,7 +574,6 @@ class Corpse( breve.Mobile ):
 		self.landed = 0
 
 	def iterate( self ):
-
 		self.age = ( self.age + 1 )
 		if ( self.landed == 0 ):
 			self.setAcceleration( breve.vector( 0, -10, 0 ) )
@@ -624,7 +583,6 @@ class Corpse( breve.Mobile ):
 
 
 	def land( self, ground ):
-
 		self.setAcceleration( breve.vector( 0, 0, 0 ) )
 		self.setVelocity( breve.vector( 0, 0, 0 ) )
 		self.landed = 1
@@ -651,7 +609,6 @@ class Bird( breve.Mobile ):
 		Bird.init( self )
 
 	def adjustEnergy( self, d ):
-
 		self.energy = ( self.energy + d )
 		if ( self.energy < 0 ):
 			self.energy = 0
@@ -668,20 +625,16 @@ class Bird( breve.Mobile ):
 		self.lastScale = newScale
 
 	def askIfFriendFeeder( self ):
-
 		return self.friendFeeder
 
 	def askIfOtherFeeder( self ):
-
 		return self.otherFeeder
 
 	def bump( self, bird ):
-
 		self.adjustEnergy( ( 0 - 0.010000 ) )
 		bird.adjustEnergy( ( 0 - 0.010000 ) )
 
 	def checkLanded( self ):
-
 		return self.landed
 
 	def closestFriend( self ):
@@ -792,7 +745,6 @@ class Bird( breve.Mobile ):
 		breve.deleteInstances( self )
 
 	def eat( self, feeder ):
-
 		if ( feeder.getEnergy() > 0.050000 ):
 			self.adjustEnergy( ( 0.050000 * 10 ) )
 			feeder.adjustEnergy( ( 0 - 0.050000 ) )
@@ -919,19 +871,15 @@ class Bird( breve.Mobile ):
 		self.pushInterpreter.pushFloat( highestStrength )
 
 	def friendAge( self ):
-
 		self.pushInterpreter.pushInteger( self.closestFriend().getAge() )
 
 	def friendEnergy( self ):
-
 		self.pushInterpreter.pushInteger( self.closestFriend().getEnergy() )
 
 	def friendHue( self ):
-
 		self.pushInterpreter.pushInteger( self.closestFriend().getHue() )
 
 	def friendLocation( self ):
-
 		self.pushInterpreter.pushVector( self.closestFriend().getLocation() )
 
 	def friendProgram( self ):
@@ -943,15 +891,12 @@ class Bird( breve.Mobile ):
 		breve.deleteInstances( c )
 
 	def friendVelocity( self ):
-
 		self.pushInterpreter.pushVector( self.closestFriend().getVelocity() )
 
 	def getID( self ):
-
 		return self.ID
 
 	def getAge( self ):
-
 		return self.age
 
 	def getAngle( self, otherMobile ):
@@ -964,31 +909,25 @@ class Bird( breve.Mobile ):
 		return breve.breveInternalFunctionFinder.angle( self, self.getVelocity(), tempVector )
 
 	def getEnergy( self ):
-
 		return self.energy
 
 	def getFedByFriend( self ):
-
 		if ( not self.friendFeeder ):
 			self.controller.incrementFriendExploits()
 
 
 	def getFedByOther( self ):
-
 		if ( not self.otherFeeder ):
 			self.controller.incrementOtherExploits()
 
 
 	def getHue( self ):
-
 		return self.hue
 
 	def getPushCode( self ):
-
 		return self.pushCode
 
 	def getPushInterpreter( self ):
-
 		return self.pushInterpreter
 
 	def hueDiff( self, bird ):
@@ -998,7 +937,6 @@ class Bird( breve.Mobile ):
 		return breve.breveInternalFunctionFinder.min( self, ( breve.breveInternalFunctionFinder.max( self, self.hue, otherHue ) - breve.breveInternalFunctionFinder.min( self, self.hue, otherHue ) ), ( breve.breveInternalFunctionFinder.min( self, self.hue, otherHue ) + ( 1 - breve.breveInternalFunctionFinder.max( self, self.hue, otherHue ) ) ) )
 
 	def init( self ):
-
 		self.shape = breve.createInstances( breve.PolygonCone, 1 ).initWith( 5, 0.200000, 0.100000 )
 		self.setShape( self.shape )
 		self.handleCollisions( 'Stationary', 'land' )
@@ -1053,7 +991,6 @@ class Bird( breve.Mobile ):
 		self.pushCode = breve.createInstances( breve.PushProgram, 1 )
 
 	def initializeRandomly( self ):
-
 		self.pushCode.makeRandomCode( self.pushInterpreter, 80 )
 		self.move( ( breve.randomExpression( breve.vector( 10, 0, 10 ) ) - breve.vector( 5, 3, 5 ) ) )
 		self.setVelocity( breve.vector( 0, 0, 0 ) )
@@ -1062,7 +999,6 @@ class Bird( breve.Mobile ):
 		self.energy = ( 0.800000 + breve.randomExpression( 0.200000 ) )
 
 	def isFriend( self, bird ):
-
 		if ( self.hueDiff( bird ) <= 0.100000 ):
 			return 1
 		else:
@@ -1070,7 +1006,6 @@ class Bird( breve.Mobile ):
 
 
 	def isOther( self, bird ):
-
 		if ( self.hueDiff( bird ) > 0.100000 ):
 			return 1
 		else:
@@ -1078,7 +1013,6 @@ class Bird( breve.Mobile ):
 
 
 	def land( self, ground ):
-
 		self.setAcceleration( breve.vector( 0, 0, 0 ) )
 		self.setVelocity( breve.vector( 0, 0, 0 ) )
 		self.point( breve.vector( 0, 1, 0 ), breve.vector( 0, 1, 0 ) )
@@ -1102,19 +1036,15 @@ class Bird( breve.Mobile ):
 
 
 	def myAge( self ):
-
 		self.pushInterpreter.pushInteger( self.age )
 
 	def myEnergy( self ):
-
 		self.pushInterpreter.pushFloat( self.energy )
 
 	def myHue( self ):
-
 		self.pushInterpreter.pushFloat( self.hue )
 
 	def myLocation( self ):
-
 		self.pushInterpreter.pushVector( self.getLocation() )
 
 	def myProgram( self ):
@@ -1126,23 +1056,18 @@ class Bird( breve.Mobile ):
 		breve.deleteInstances( c )
 
 	def myVelocity( self ):
-
 		self.pushInterpreter.pushVector( self.getVelocity() )
 
 	def otherAge( self ):
-
 		self.pushInterpreter.pushInteger( self.closestOther().getAge() )
 
 	def otherEnergy( self ):
-
 		self.pushInterpreter.pushInteger( self.closestOther().getEnergy() )
 
 	def otherHue( self ):
-
 		self.pushInterpreter.pushInteger( self.closestOther().getHue() )
 
 	def otherLocation( self ):
-
 		self.pushInterpreter.pushVector( self.closestOther().getLocation() )
 
 	def otherProgram( self ):
@@ -1154,7 +1079,6 @@ class Bird( breve.Mobile ):
 		breve.deleteInstances( c )
 
 	def otherVelocity( self ):
-
 		self.pushInterpreter.pushVector( self.closestOther().getVelocity() )
 
 	def randC( self ):
@@ -1166,19 +1090,15 @@ class Bird( breve.Mobile ):
 		breve.deleteInstances( c )
 
 	def randF( self ):
-
 		self.pushInterpreter.pushFloat( ( breve.randomExpression( ( 2 * 1.000000 ) ) - 1.000000 ) )
 
 	def randI( self ):
-
 		self.pushInterpreter.pushInteger( ( breve.randomExpression( ( 2 * 100 ) ) - 100 ) )
 
 	def randV( self ):
-
 		self.pushInterpreter.pushVector( ( breve.randomExpression( ( 2 * breve.vector( 1.000000, 1.000000, 1.000000 ) ) ) - breve.vector( 1.000000, 1.000000, 1.000000 ) ) )
 
 	def scaleColor( self, c, m ):
-
 		return ( m + ( c * ( 1.000000 - m ) ) )
 
 	def servo( self ):
@@ -1192,15 +1112,12 @@ class Bird( breve.Mobile ):
 		self.controller.incrementServos()
 
 	def setEnergy( self, e ):
-
 		self.energy = e
 
 	def setHue( self, h ):
-
 		self.hue = h
 
 	def setPushCode( self, c ):
-
 		self.pushCode = c
 
 	def setServoGain( self ):
@@ -1213,7 +1130,6 @@ class Bird( breve.Mobile ):
 		self.pushInterpreter.popFloatStack()
 
 	def setServoSetpoint( self ):
-
 		self.servoSetpoint = self.pushInterpreter.getFloatStackTop()
 		self.pushInterpreter.popFloatStack()
 
@@ -1279,11 +1195,9 @@ class Bird( breve.Mobile ):
 		self.pushInterpreter.pushVector( toClosestFood )
 
 	def toFriend( self ):
-
 		self.pushInterpreter.pushVector( ( self.closestFriend().getLocation() - self.getLocation() ) )
 
 	def toOther( self ):
-
 		self.pushInterpreter.pushVector( ( self.closestOther().getLocation() - self.getLocation() ) )
 
 

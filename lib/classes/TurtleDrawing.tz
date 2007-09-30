@@ -22,7 +22,7 @@ Drawing : TurtleDrawing {
 		currentDirection = (0, 1, 0).
 		currentPoint = (0, 0, 0).
 
-		turtle = (new Mobile set-shape to (new PolygonCone init-with radius .2 sides 5 height .8)).
+		turtle = ( new Mobile set-shape to (new PolygonCone init-with sides 5 height .8 radius .2 ) ).
 		turtle set-color to (.5, .5, .5).
 
 	+ section "Manipulating the Turtle Avatar"

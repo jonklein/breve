@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class PhysicalControl( breve.Control ):
@@ -10,22 +15,18 @@ class PhysicalControl( breve.Control ):
 		PhysicalControl.init( self )
 
 	def dearchive( self ):
-
 		return breve.Control.dearchive( self )
 
 	def disableAutoDisable( self ):
-
 		breve.breveInternalFunctionFinder.setAutoDisableFlag( self, 0 )
 
 	def disableFastPhysics( self ):
 		'''Returns to the default physics simulation.  This is slower, but  more accurate than fast physics, which are enabled using  METHOD(enable-fast-physics).'''
 
-
 		breve.breveInternalFunctionFinder.setStepFast( self, 0 )
 
 	def doubleGravity( self ):
 		'''Sets gravity in the simulated world to double the regular gravity of earth.'''
-
 
 		self.setGravity( breve.vector( 0.000000, ( -9.800000 * 2 ), 0.000000 ) )
 		self.gravityMenu[ 0 ].uncheck()
@@ -34,24 +35,20 @@ class PhysicalControl( breve.Control ):
 		self.gravityMenu[ 3 ].check()
 
 	def enableAutoDisable( self ):
-
 		breve.breveInternalFunctionFinder.setAutoDisableFlag( self, 1 )
 
 	def enableCollisionResolution( self ):
 		'''Obsolete.'''
-
 
 		pass
 
 	def enableFastPhysics( self ):
 		'''This alternative physical simulation is faster, but less accurate than the default physical simulation.  Though it will not work well for all simulations, you can see a large boost in performance by enabling it.  Fast physics can be turned off using METHOD(disable-fast-physics).'''
 
-
 		breve.breveInternalFunctionFinder.setStepFast( self, 1 )
 
 	def fullGravity( self ):
 		'''Sets gravity in the simulated world to the regular gravity of earth.'''
-
 
 		self.setGravity( breve.vector( 0.000000, -9.800000, 0.000000 ) )
 		self.gravityMenu[ 0 ].uncheck()
@@ -62,7 +59,6 @@ class PhysicalControl( breve.Control ):
 	def halfGravity( self ):
 		'''Sets gravity in the simulated world to half the regular gravity of earth.'''
 
-
 		self.setGravity( breve.vector( 0.000000, ( -9.800000 * 0.500000 ), 0.000000 ) )
 		self.gravityMenu[ 0 ].uncheck()
 		self.gravityMenu[ 1 ].check()
@@ -70,7 +66,6 @@ class PhysicalControl( breve.Control ):
 		self.gravityMenu[ 3 ].uncheck()
 
 	def init( self ):
-
 		self.setIntegrationStep( 0.004000 )
 		self.setIterationStep( 0.050000 )
 		self.setFastPhysicsIterations( 40 )
@@ -88,30 +83,25 @@ class PhysicalControl( breve.Control ):
 	def setCfm( self, cfmValue ):
 		'''Sets the constraint force mixing paremter for the world.  See the ODE physics engine documentation for more details.'''
 
-
 		breve.breveInternalFunctionFinder.worldSetCFM( self, cfmValue )
 
 	def setErp( self, erpValue ):
 		'''Sets the error correction parameter for the world.  See the ODE physics engine documentation for more details.'''
-
 
 		breve.breveInternalFunctionFinder.worldSetERP( self, erpValue )
 
 	def setFastPhysicsIterations( self, iterations ):
 		'''Sets the iterations parameter for the fast physics algorithm.  This parameter can be tuned to give better speed or better accuracy. The default value is 40.'''
 
-
 		breve.breveInternalFunctionFinder.setStepFastIterations( self, iterations )
 
 	def setGravity( self, newGravity ):
 		'''Sets the gravity affecting a physical world to newGravity.  If you simply want a realistic earth-like gravity, use the convenience  method <a href="#full-gravity">full-gravity</a>.'''
 
-
 		breve.breveInternalFunctionFinder.worldSetGravity( self, newGravity )
 
 	def zeroGravity( self ):
 		'''Turns off gravity in the simulated world.'''
-
 
 		self.setGravity( breve.vector( 0.000000, ( -9.800000 * 0 ), 0.000000 ) )
 		self.gravityMenu[ 0 ].check()

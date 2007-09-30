@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class VirtualCreatures( breve.PhysicalControl ):
@@ -13,7 +18,6 @@ class VirtualCreatures( breve.PhysicalControl ):
 		VirtualCreatures.init( self )
 
 	def archiveSim( self ):
-
 		self.saveAsXml( 'sim.xml' )
 
 	def checkPenetration( self ):
@@ -48,7 +52,6 @@ class VirtualCreatures( breve.PhysicalControl ):
 		return breve.length( ( t - self.startlocation ) )
 
 	def init( self ):
-
 		breve.createInstances( breve.Floor, 1 )
 		self.flag = breve.createInstances( breve.Mobile, 1 )
 		self.flag.disablePhysics()
@@ -138,7 +141,6 @@ class SimsGA( breve.GeneticAlgorithm ):
 		breve.GeneticAlgorithm.__init__( self )
 
 	def endFitnessTest( self, o ):
-
 		o.setFitness( self.controller.getCurrentCritterFitness() )
 		if breve.breveInternalFunctionFinder.isnan( self, o.getFitness() ):
 			o.setFitness( 0 )
@@ -166,23 +168,18 @@ class SimsGAIndividual( breve.GeneticAlgorithmIndividual ):
 		SimsGAIndividual.init( self )
 
 	def copy( self, other ):
-
 		self.genome.copy( other.getGenome() )
 
 	def crossover( self, p1, p2 ):
-
 		self.genome.crossover( p1.getGenome(), p2.getGenome() )
 
 	def destroy( self ):
-
 		breve.deleteInstances( self.genome )
 
 	def getGenome( self ):
-
 		return self.genome
 
 	def init( self ):
-
 		self.genome = breve.createInstances( breve.GADirectedGraph, 1 )
 		self.randomize()
 		self.h[ '123' ] = breve.createInstances( breve.Object, 1 )
@@ -191,11 +188,9 @@ class SimsGAIndividual( breve.GeneticAlgorithmIndividual ):
 		self.addDependency( self.genome )
 
 	def mutate( self ):
-
 		self.genome.mutate()
 
 	def randomize( self ):
-
 		self.genome.randomize( 5, 10, 10 )
 
 
@@ -281,18 +276,15 @@ class SineJoint( breve.RevoluteJoint ):
 		self.phaseshift = 0
 
 	def activate( self ):
-
 		self.active = 1
 
 	def iterate( self ):
-
 		if self.active:
 			self.setJointVelocity( ( 1 * breve.breveInternalFunctionFinder.sin( self, ( ( self.controller.getTime() * 2.000000 ) + self.phaseshift ) ) ) )
 
 
 
 	def setPhaseshift( self, p ):
-
 		self.phaseshift = p
 
 

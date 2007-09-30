@@ -112,7 +112,7 @@ Mobile : Painter (aka Painters) {
 
 	+ to set-color:
 		x, y, z (int).
-		location, color (vector).
+		location, pixelcolor (vector).
 
 		location = (self get-location).
 		x = location::x.
@@ -129,8 +129,8 @@ Mobile : Painter (aka Painters) {
 		x += w/2.
 		y += h/2.
 
-		color = (image get-rgb-pixel at-x x at-y y).
-		self set-color to color.
+		pixelcolor = (image get-rgb-pixel at-x x at-y y).
+		self set-color to pixelcolor.
 
 	+ to iterate:
 		velocity (vector).

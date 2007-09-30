@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class SpringController( breve.PhysicalControl ):
@@ -115,11 +120,9 @@ class Node( breve.Link ):
 		Node.init( self )
 
 	def init( self ):
-
 		self.setShape( breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 0.500000, 0.500000, 0.500000 ) ) )
 
 	def iterate( self ):
-
 		self.setRotationalVelocity( ( 0.950000 * self.getRotationalVelocity() ) )
 
 

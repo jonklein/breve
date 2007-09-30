@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class TerrainWave( breve.PhysicalControl ):
@@ -8,7 +13,6 @@ class TerrainWave( breve.PhysicalControl ):
 		TerrainWave.init( self )
 
 	def dropBall( self ):
-
 		breve.createInstances( breve.Ball, 1 )
 
 	def init( self ):
@@ -33,7 +37,6 @@ class TerrainWave( breve.PhysicalControl ):
 		self.moveLight( breve.vector( 0, 30, 0 ) )
 
 	def iterate( self ):
-
 		if ( breve.randomExpression( 50 ) == 0 ):
 			self.dropBall()
 
@@ -47,14 +50,12 @@ class Ball( breve.Mobile ):
 		Ball.init( self )
 
 	def init( self ):
-
 		self.setShape( breve.createInstances( breve.Sphere, 1 ).initWith( breve.randomExpression( 1.000000 ) ) )
 		self.setColor( breve.randomExpression( breve.vector( 1, 1, 1 ) ) )
 		self.move( ( breve.randomExpression( breve.vector( 10, 0, 10 ) ) + breve.vector( -5, 15, -5 ) ) )
 		self.enablePhysics()
 
 	def iterate( self ):
-
 		if ( self.getAge() > 15 ):
 			breve.deleteInstances( self )
 

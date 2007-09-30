@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class AggressorController( breve.BraitenbergControl ):
@@ -13,7 +18,6 @@ class AggressorController( breve.BraitenbergControl ):
 		AggressorController.init( self )
 
 	def init( self ):
-
 		self.n = 0
 		while ( self.n < 10 ):
 			breve.createInstances( breve.BraitenbergLight, 1 ).move( breve.vector( ( 20 * breve.breveInternalFunctionFinder.sin( self, ( ( self.n * 6.280000 ) / 10 ) ) ), 1, ( 20 * breve.breveInternalFunctionFinder.cos( self, ( ( self.n * 6.280000 ) / 10 ) ) ) ) )

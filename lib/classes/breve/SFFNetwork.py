@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class FFNetwork( breve.NeuralNetwork ):
@@ -29,30 +34,25 @@ class FFNetwork( breve.NeuralNetwork ):
 		self.outputLayer = newLayer
 
 	def destroy( self ):
-
 		breve.breveInternalFunctionFinder.freeNetwork( self, self.outputLayer )
 
 	def getOutput( self, position ):
 		'''Returns the value at index position of the output layer.  This  assumes that METHOD(run-with) has already been called to actually run the neural network.'''
-
 
 		return breve.breveInternalFunctionFinder.getValue( self, self.outputLayer, position )
 
 	def getWeight( self, theLayer, fn, tn ):
 		'''Sets the input to the node number tn on layer theLayer, coming from node number fn on layer number theLayer - 1 to weight.  Normally you wouldn't need to use this method, since the method  METHOD(get-output) is the preferred way to retrieve network output.'''
 
-
 		return breve.breveInternalFunctionFinder.getWeight( self, self.layers[ theLayer ], tn, fn )
 
 	def runWith( self, inputList ):
 		'''Sets the inputs of the neural network to the values in inputList, and runs the network.  Output values can then be retrieved with METHOD(get-output).'''
 
-
 		breve.breveInternalFunctionFinder.feedForward( self, self.outputLayer, inputList )
 
 	def setWeight( self, theLayer, fn, tn, weight ):
 		'''Sets the input to the node number tn on layer theLayer, coming from node number fn on layer number theLayer - 1 to weight.'''
-
 
 		breve.breveInternalFunctionFinder.setWeight( self, self.layers[ theLayer ], tn, fn, weight )
 

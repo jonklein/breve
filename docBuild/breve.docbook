@@ -2,8 +2,8 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD Docbook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
 <book id="node-2601">
 <title>The breve Simulation Environment Documentation</title>
-<preface>
-<title>Preface</title>
+<preface><?dbhtml dir="docs" ?>
+<title>Notes on this documentation</title>
 <para>
       This is the documentation for <ulink url="http://www.spiderland.org">The
       breve Simulation Envionment</ulink>.
@@ -119,10 +119,10 @@
         simulation and an easy-to-use scripting language.
       </para><para>
         Starting in breve 2.6, breve simulations can be written in breve's
-        custom <ulink url="http://test.spiderland.org/node/2632">"steve"</ulink>
-        language, or with the popular open-source <ulink url="http://test.spiderland.org/node/1504">Python</ulink> language. Both of
-        these languages, along with their strengths and weaknesses are
-        described later in this documentation.
+        custom <xref linkend="node-2632"/> language, or with the popular
+        open-source <xref linkend="node-1504"/> language. Both of these
+        languages, along with their strengths and weaknesses are described
+        later in this documentation.
       </para><para>
         breve can be used as a tool to explore any type of simulated world.
         breve has been used for a wide variety of simulation applications:
@@ -6636,6 +6636,39 @@ This section lists all of the built-in breve class objects. These objects
         language documentation</ulink></para></listitem><listitem><para><ulink url="../pythonclasses/PushProgramTransporter.html">Python
         language documentation</ulink></para></listitem></itemizedlist>
 </section>
+<section id="node-2853">
+<title>QProgram</title>
+<para>
+      Description for class <emphasis role="bold">QProgram</emphasis>:
+    </para><blockquote><para>
+      An interface to a quantum program in qgame++ Quantum Gate And Measurement
+      Emulator, a quantum computing simulator. To be used in conjunction with
+      QSystem.
+      <para><emphasis role="bold">Note: the QGAME library is not built-in to the standard breve
+        distribution. Use of this class may require compiling breve from the
+        source code with support for QGAME.</emphasis></para></para></blockquote><para>
+      Inherits from <emphasis role="bold">Object</emphasis></para><para>
+      Full API documentation for the class <emphasis role="bold">QProgram</emphasis>:
+    </para><itemizedlist><listitem><para><ulink url="../steveclasses/QProgram.html">steve language
+        documentation</ulink></para></listitem><listitem><para><ulink url="../pythonclasses/QProgram.html">Python language
+        documentation</ulink></para></listitem></itemizedlist>
+</section>
+<section id="node-2854">
+<title>QSystem</title>
+<para>
+      Description for class <emphasis role="bold">QSystem</emphasis>:
+    </para><blockquote><para>
+      The main interface to the qgame++ Quantum Gate And Measurement Emulator,
+      a quantum computing simulator.
+      <para><emphasis role="bold">Note: the QGAME library is not built-in to the standard breve
+        distribution. Use of this class may require compiling breve from the
+        source code with support for QGAME.</emphasis></para></para></blockquote><para>
+      Inherits from <emphasis role="bold">Object</emphasis></para><para>
+      Full API documentation for the class <emphasis role="bold">QSystem</emphasis>:
+    </para><itemizedlist><listitem><para><ulink url="../steveclasses/QSystem.html">steve language
+        documentation</ulink></para></listitem><listitem><para><ulink url="../pythonclasses/QSystem.html">Python language
+        documentation</ulink></para></listitem></itemizedlist>
+</section>
 <section id="node-2855">
 <title>Real</title>
 <para>
@@ -6817,6 +6850,27 @@ This section lists all of the built-in breve class objects. These objects
         documentation</ulink></para></listitem><listitem><para><ulink url="../pythonclasses/Tracer.html">Python language
         documentation</ulink></para></listitem></itemizedlist>
 </section>
+<section id="node-2865">
+<title>TurtleDrawing</title>
+<para>
+      Description for class <emphasis role="bold">TurtleDrawing</emphasis>:
+    </para><blockquote><para>
+      The TurtleDrawing class is a subclass of Drawing which allows drawing via
+      a series of "logo turtle"-like commands. Drawing is accomplished by
+      giving commands to a turtle moving around in 3D space. All commands are
+      interpreted from the turtle's perspective, taking into account its
+      current position and orientation.
+      <para>
+        Unlike other angles used by breve, this class refers to angles as
+        degrees and not radians to more closely match the behavior of
+        traditional Logo implementations.
+      </para></para></blockquote><para>
+      Inherits from <emphasis role="bold">Drawing</emphasis></para><para>
+      Full API documentation for the class <emphasis role="bold">TurtleDrawing</emphasis>:
+    </para><itemizedlist><listitem><para><ulink url="../steveclasses/TurtleDrawing.html">steve language
+        documentation</ulink></para></listitem><listitem><para><ulink url="../pythonclasses/TurtleDrawing.html">Python
+        language documentation</ulink></para></listitem></itemizedlist>
+</section>
 <section id="node-2866">
 <title>UniversalJoint</title>
 <para>
@@ -6835,6 +6889,31 @@ This section lists all of the built-in breve class objects. These objects
     </para><itemizedlist><listitem><para><ulink url="../steveclasses/UniversalJoint.html">steve
         language documentation</ulink></para></listitem><listitem><para><ulink url="../pythonclasses/UniversalJoint.html">Python
         language documentation</ulink></para></listitem></itemizedlist>
+</section>
+<section id="node-2867">
+<title>Vector</title>
+<para>
+      Description for class <emphasis role="bold">Vector</emphasis>:
+    </para><para>
+      Inherits from <emphasis role="bold">Object</emphasis></para><para>
+      Full API documentation for the class <emphasis role="bold">Vector</emphasis>:
+    </para><itemizedlist><listitem><para><ulink url="../steveclasses/Vector.html">steve language
+        documentation</ulink></para></listitem><listitem><para><ulink url="../pythonclasses/Vector.html">Python language
+        documentation</ulink></para></listitem></itemizedlist>
+</section>
+<section id="node-2868">
+<title>VectorImage</title>
+<para>
+      Description for class <emphasis role="bold">VectorImage</emphasis>:
+    </para><blockquote><para>
+      The VectorImage class is a subclass of Image which displays the state of
+      a Vector object.
+    </para></blockquote><para>
+      Inherits from <emphasis role="bold">Image</emphasis></para><para>
+      Full API documentation for the class <emphasis role="bold">VectorImage</emphasis>:
+    </para><itemizedlist><listitem><para><ulink url="../steveclasses/VectorImage.html">steve language
+        documentation</ulink></para></listitem><listitem><para><ulink url="../pythonclasses/VectorImage.html">Python language
+        documentation</ulink></para></listitem></itemizedlist>
 </section>
 <section id="node-2869">
 <title>Wanderer</title>
@@ -6861,47 +6940,15 @@ This section lists all of the built-in breve class objects. These objects
 <para>
       Description for class IRSensor:
     </para><para>
+      The IRSensor class simulates a image ranger sensor, which provides a
+      distance value for each pixel.
+    </para><para>
       Inherits from Real
     </para><para>
       Full API documentation for the class IRSensor:
     </para><itemizedlist><listitem><para><ulink url="../steveclasses/IRSensor.html">steve language
         documentation</ulink></para></listitem><listitem><para><ulink url="../pythonclasses/IRSensor.html">Python language
         documentation</ulink></para></listitem></itemizedlist>
-</section>
-<section id="node-2853">
-<title>QProgram</title>
-blah
-  
-
-
-</section>
-<section id="node-2854">
-<title>QSystem</title>
-blah
-  
-
-
-</section>
-<section id="node-2865">
-<title>TurtleDrawing</title>
-blah
-  
-
-
-</section>
-<section id="node-2867">
-<title>Vector</title>
-blah
-  
-
-
-</section>
-<section id="node-2868">
-<title>VectorImage</title>
-blah
-  
-
-
 </section>
 </chapter>
 </book>

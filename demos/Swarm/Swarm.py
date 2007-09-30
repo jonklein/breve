@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class Swarm( breve.Control ):
@@ -15,7 +20,6 @@ class Swarm( breve.Control ):
 		Swarm.init( self )
 
 	def click( self, item ):
-
 		if self.selection:
 			self.selection.hideNeighborLines()
 
@@ -26,21 +30,18 @@ class Swarm( breve.Control ):
 		breve.Control.click( self , item )
 
 	def flockNormally( self ):
-
 		self.birds.flockNormally()
 		self.normalMenu.check()
 		self.obedientMenu.uncheck()
 		self.wackyMenu.uncheck()
 
 	def flockObediently( self ):
-
 		self.birds.flockObediently()
 		self.normalMenu.uncheck()
 		self.obedientMenu.check()
 		self.wackyMenu.uncheck()
 
 	def flockWackily( self ):
-
 		self.birds.flockWackily()
 		self.normalMenu.uncheck()
 		self.obedientMenu.uncheck()
@@ -91,7 +92,6 @@ class Swarm( breve.Control ):
 		breve.Control.iterate( self )
 
 	def squish( self ):
-
 		self.birds.move( breve.vector( 0, 0, 0 ) )
 
 
@@ -111,11 +111,9 @@ class Bird( breve.Mobile ):
 		Bird.init( self )
 
 	def checkLanded( self ):
-
 		return self.landed
 
 	def checkVisibility( self, item ):
-
 		if ( item == self ):
 			return 0
 
@@ -131,7 +129,6 @@ class Bird( breve.Mobile ):
 		return 1
 
 	def flockNormally( self ):
-
 		self.wanderConstant = 4.000000
 		self.worldCenterConstant = 5.000000
 		self.centerConstant = 2.000000
@@ -142,7 +139,6 @@ class Bird( breve.Mobile ):
 		self.cruiseDistance = 0.400000
 
 	def flockObediently( self ):
-
 		self.wanderConstant = 6.000000
 		self.worldCenterConstant = 6.000000
 		self.centerConstant = 2.000000
@@ -153,7 +149,6 @@ class Bird( breve.Mobile ):
 		self.cruiseDistance = 1
 
 	def flockWackily( self ):
-
 		self.wanderConstant = 8.000000
 		self.worldCenterConstant = 14.000000
 		self.centerConstant = 1.000000
@@ -281,7 +276,6 @@ class Bird( breve.Mobile ):
 		return ( aveVelocity - self.getVelocity() )
 
 	def init( self ):
-
 		self.setShape( breve.createInstances( breve.Sphere, 1 ).initWith( 0.250000 ) )
 		self.move( ( breve.randomExpression( breve.vector( 10, 10, 10 ) ) - breve.vector( 5, -5, 5 ) ) )
 		self.setVelocity( ( breve.randomExpression( breve.vector( 20, 20, 20 ) ) - breve.vector( 10, 10, 10 ) ) )
@@ -289,7 +283,6 @@ class Bird( breve.Mobile ):
 		self.setNeighborhoodSize( 2.000000 )
 
 	def land( self, ground ):
-
 		self.setAcceleration( breve.vector( 0, 0, 0 ) )
 		self.setVelocity( breve.vector( 0, 0, 0 ) )
 		self.landed = 1

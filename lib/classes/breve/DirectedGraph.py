@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
@@ -11,7 +16,6 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 
 	def copy( self, other ):
 		'''Copies the contents of the directed graph other.'''
-
 
 		self.deleteRootNode()
 		self.rootNode = other.getRoot().duplicate()
@@ -108,7 +112,6 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 	def deleteRootNode( self ):
 		'''Deletes the root node and all connected objects.  This method "clears" the GADirectedGraph so that it may be reused.'''
 
-
 		if self.rootNode:
 			self.removeDependency( self.rootNode )
 			self.rootNode.destroyConnectedObjects()
@@ -118,23 +121,19 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 		self.rootNode = 0
 
 	def destroy( self ):
-
 		self.deleteRootNode()
 
 	def getRoot( self ):
 		'''Returns the root node of the directed graph.'''
 
-
 		return self.rootNode
 
 	def init( self ):
-
 		self.rootNode = breve.createInstances( breve.GADirectedGraphNode, 1 )
 		self.addDependency( self.rootNode )
 
 	def mutate( self ):
 		'''Mutates the directed graph.'''
-
 
 		self.rootNode.mutate()
 
@@ -155,7 +154,6 @@ class GADirectedGraph( breve.GeneticAlgorithmIndividual ):
 
 	def printGraph( self ):
 		'''Prints out a text representation of the network.'''
-
 
 		print '''#### Graph %s''' % (  self )
 		self.rootNode.printConnectedObjects()
@@ -222,11 +220,9 @@ class GADirectedGraphParameterObject( breve.Abstract ):
 	def getParameters( self ):
 		'''Returns the parameter list.'''
 
-
 		return self.parameters
 
 	def init( self ):
-
 		pass
 
 	def mutate( self, variation = 0.100000, replace = 0.100000 ):
@@ -265,14 +261,12 @@ class GADirectedGraphParameterObject( breve.Abstract ):
 	def setParameterLength( self, length ):
 		'''Extends the size of the parameter list include at least length items by adding  zeros to the end of the list.'''
 
-
 		while ( breve.length( self.parameters ) < length ):
 			self.parameters.append( 0 )
 
 
 	def setParameters( self, plist ):
 		'''Sets the parameter list to plist.'''
-
 
 		self.parameters = list( plist) 
 
@@ -287,7 +281,6 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 
 	def connect( self, child ):
 		'''Makes a connection to child with an empty parameter list.'''
-
 
 		return self.connect( child, [] )
 
@@ -304,7 +297,6 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 		return connection
 
 	def destroy( self ):
-
 		breve.deleteInstances( self.connections )
 
 	def destroyConnectedObjects( self ):
@@ -346,7 +338,6 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 
 	def getConnections( self ):
 		'''Returns the list of connections from this node.'''
-
 
 		return self.connections
 
@@ -437,12 +428,10 @@ class GADirectedGraphConnection( breve.GADirectedGraphParameterObject ):
 	def getTarget( self ):
 		'''Returns the target of this connection.'''
 
-
 		return self.target
 
 	def setTarget( self, t ):
 		'''Sets the target of this connection to t.'''
-
 
 		self.addDependency( t )
 		self.target = t
