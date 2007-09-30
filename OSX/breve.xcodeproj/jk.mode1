@@ -367,9 +367,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>48F89C840CAB4237003A105A</string>
+				<string>48F89F920CB04F9D003A105A</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>48F89C850CAB4237003A105A</string>
+				<string>48F89F930CB04F9D003A105A</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -503,7 +503,6 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>487AAB1F084F74BE00633A19</string>
 		<string>1C0AD2B3069F1EA900FABCE6</string>
 		<string>/Users/jk/Development/breve/OSX/breve.xcodeproj</string>
 	</array>
@@ -951,9 +950,9 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1C0AD2B3069F1EA900FABCE6</string>
-				<string>48F89C6A0CAB4209003A105A</string>
+				<string>48F89F940CB04F9D003A105A</string>
 				<string>1CD0528B0623707200166675</string>
-				<string>48F89C6B0CAB4209003A105A</string>
+				<string>48F89F950CB04F9D003A105A</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.run</string>
