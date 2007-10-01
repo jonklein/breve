@@ -41,9 +41,9 @@ void slNetsimServer::start() {
 	pthread_create( &thread, NULL, slNetsimThread, this );
 }
 
-/*!
-	\brief The entry-point for the server listening thread.
-*/
+/**
+ * \brief The entry-point for the server listening thread.
+ */
 
 void *slNetsimThread( void *d ) {
 	slNetsimBoundsMessage *bMessage;

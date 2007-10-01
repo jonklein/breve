@@ -151,6 +151,7 @@ brEngine *brEngineNew( void ) {
 	e->world = new slWorld();
 
 	e->world->setCollisionCallbacks( brCheckCollisionCallback, brCollisionCallback );
+	//  e->world->setNetworkHandler();
 
 	gettimeofday( &e->startTime, NULL );
 
@@ -249,7 +250,8 @@ brEngine *brEngineNew( void ) {
 brInternalFunction *brEngineInternalFunctionLookup( brEngine *e, char *name ) {
 	brNamespaceSymbol *s = brNamespaceLookup( e->internalMethods, name );
 
-	if ( s ) return ( brInternalFunction * )s->data;
+	if ( s ) 
+		return ( brInternalFunction * )s->data;
 
 	// The following could be a way for us to try to load functions without the
 	// prototypes.  Not sure it's a good idea.

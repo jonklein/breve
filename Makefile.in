@@ -161,7 +161,7 @@ OSX_release:
 	cp -R OSX/build/Deployment-Universal/breve.app breve_image_folder
 	cp OSX/README.html breve_image_folder
 	cp docBuild/images/breve_icon.jpg breve_image_folder/breve_icon.jpg
-	cp OSX/Documentation.txt breve_image_folder
+	cp -R docs breve_image_folder/Documentation
 	cp Changes.html GPL.txt breve_image_folder
 	mkdir breve_image_folder/plugins
 	cp -R plugins/samples breve_image_folder/plugins

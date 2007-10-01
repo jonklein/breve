@@ -3,7 +3,7 @@
                       http://www.spiderland.org/breve
                         release _VERSION_ - _DATE_
              command line version for Mac OS X, Linux and Windows
-                         jklein@spiderland.org 
+                         jk [at] spiderland.org 
 
                            -= INTRODUCTION =-
 
@@ -14,10 +14,10 @@ such as Swarm and StarLogo, but simulates objects in a continuous 3D world
 with continuous time.  breve thus allows simulation involving realistic 
 collision detection and physics.   
 
-Agent behaviors are written in a simple object oriented language called 
-"steve".  Users define an agent's behavior by specifying how the agent 
-interacts with the world at each timestep and how the agent interacts when 
-it collides with other agents. 
+Agent behaviors are written in Python or in a simple scripting language called
+"steve".  Users can define an agent's behavior by specifying how the agent 
+interacts with the world at each timestep and how the agent reacts to events 
+like collisions.
 
 breve includes full collision detection and physical simulation of rigid 
 bodies.  See the Walker and Gravity demo simulations for examples.   
@@ -72,7 +72,7 @@ the file.
 
 This software is provided with the hope that it will be useful--the only way 
 for me to make the software more useful is to hear your feedback.  You can 
-send me mail directly at jk@spiderland.org.  Please let me know how you 
+send me mail directly at jk [at] spiderland.org.  Please let me know how you 
 use the software and how it could be improved. 
 
 If you have any cool or useful simulations or classes that should be included 
@@ -84,7 +84,7 @@ http://lists.spiderland.org/mailman/listinfo/breve .
                                  -= LICENSE =-
 
 The breve Simulation Environment                                           
-Copyright (C) 2003, 2004 Jonathan Klein                        
+Copyright (C) 2000-2007 Jonathan Klein                        
 
 This program is free software; you can redistribute it and/or modify       
 it under the terms of the GNU General Public License as published by       

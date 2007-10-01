@@ -88,8 +88,8 @@ PhysicalControl : VirtualCreatures {
 			index = (ga get-current-individual-index) + 1.
 		}
 
-		self set-display-text number 1 to "Generation: $gen ($index/$total)" at-x -.95 at-y -.75.
-		self set-display-text number 2 to "Best distance: $bestDistance" at-x -.95 at-y -.85.
+		self set-display-text to "Generation: $gen ($index/$total)"at-x -.95 at-y -.75 number 1.
+		self set-display-text to "Best distance: $bestDistance" at-x -.95 at-y -.85 number 2.
 
 	+ to iterate:
 		t (vector).
@@ -105,7 +105,9 @@ PhysicalControl : VirtualCreatures {
 		self point-camera at t.
 
 		dist = | t - startlocation |.
-		if running: self set-display-text to "Distance traveled: $dist" at-x -.95 at-y -.95.
+
+		if running: 
+			self set-display-text to "Distance traveled: $dist" at-x -.95 at-y -.95.
 
 		self pivot-camera x 0 y 0.001.
 

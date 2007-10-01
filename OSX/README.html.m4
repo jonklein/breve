@@ -25,7 +25,7 @@
 <h4>
 <a href="http://www.spiderland.org/breve">http://www.spiderland.org/breve</a><br>
 OSX release _VERSION_ - _DATE_<br>
-<a href="jk@spiderland.org">jk@spiderland.org</a>
+<a href="mailto:jk [at] spiderland.org">jk [at] spiderland.org</a>
 </h4>
 </CENTER>
 <P>
@@ -34,7 +34,7 @@ OSX release _VERSION_ - _DATE_<br>
 <P>
 <I>breve</I> is a simulation environment which allows users to define the behaviors and interactions of different types of agents in a simulated 3D world and observe the emergent behaviors.  <I>breve</I> is conceptually similar to packages such as Swarm and StarLogo, but simulates objects in a continuous 3D world with continuous time.  <I>breve</I> thus allows simulation involving realistic collision detection and physics.  
 <P>
-Agent behaviors are written in a simple object oriented language called "steve".  Users define an agent's behavior by specifying how the agent interacts with the world at each timestep and how the agent interacts when it collides with other agents.
+Agent behaviors are written in Python or in a simple scripting language called "steve".  Users can define an agent's behavior by specifying how the agent interacts with the world at each timestep and how the agent reacts to events like collisions.
 <P>
 <I>breve</I> includes full collision detection and physical simulation of rigid bodies.  See the Walker and Gravity simulations for examples.  
 <P>
@@ -56,7 +56,7 @@ After trying the demos, you can consult the breve documentation either <a href="
 <H4><b>feedback</b></H4>
 <BLOCKQUOTE>
 <P>
-This software is provided with the hope that it will be useful&mdash;the only way for me to make the software more useful is to hear your feedback.  You can send me mail directly at <A HREF="mailto:jk@spiderland.org">jk@spiderland.org</A>.  Please let me know how you use the software and how it could be improved.
+This software is provided with the hope that it will be useful&mdash;the only way for me to make the software more useful is to hear your feedback.  You can send me mail directly at <A HREF="mailto:jk [at] spiderland.org">jk [at] spiderland.org</A>.  Please let me know how you use the software and how it could be improved.
 <P>
 If you have any cool or useful simulations or classes that should be included with future releases, mail them as well.
 <P>
