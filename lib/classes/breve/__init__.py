@@ -68,6 +68,15 @@ class objectList( list ):
 
 		return execute
 
+class hash( dict ):
+	def __init__( self ):
+		dict.__init__( self )
+
+	def __getitem__( self, name ):
+		try:
+			return dict.__getitem__( self, name )
+		except Exception:
+			return None
 
 def createInstances( inClass, inCount ):
 	"Creates one or more instances of a breve class"
@@ -143,6 +152,11 @@ def length( inValue ):
 
 	return 1
 
+def dictLookup( inDict, inKey ):
+	try:
+		return inDict[ inKey ]
+	except Exception:
+		return None
 
 def randomExpression( inValue ):
 	"Returns a random expression with a maximum of inValue, an int, float or vector.  Provided for convenience, and for compatibility with simulations converted from steve."

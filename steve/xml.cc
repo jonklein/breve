@@ -257,7 +257,7 @@ int brXMLWriteObject( brXMLArchiveRecord *record, FILE *file, brInstance *inInst
 	if( inInstance->object->type->_typeSignature == STEVE_TYPE_SIGNATURE )
 		stXMLWriteObjectVariables( record, file, (stInstance*)inInstance -> userData, spaces );
 	else {
-		slMessage( DEBUG_ALL, "Warning: object encoding and decoding not fully implemented for non-steve objects.  Dearchiving of this object will likely fail\n" );
+		slMessage( DEBUG_ALL, "Warning: object encoding and decoding not fully implemented for non-steve objects.  Dearchiving of this object will likely fail.\n" );
 
 		char *encoding = brInstanceEncodeToString( inInstance->engine, inInstance );
 
@@ -951,6 +951,8 @@ int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, brXMLParserState *inState 
 	for( unsigned int n = 0; n < instances.size(); n++ ) {
 		std::string objectname = instances[ n ]->_attrs[ "class" ];
 		int instanceindex = atoi( instances[ n ]->_attrs[ "index" ].c_str() );
+		int typeSignature = atoi( instances[ n ]->_attrs[ "typesignature" ].c_str() );
+
 
 		brObject *object = brObjectFind( inState->engine, objectname.c_str() );
 
@@ -960,6 +962,9 @@ int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, brXMLParserState *inState 
 			inState->error++;
 			return -1;
 		}
+
+		if( typeSignature != STEVE_TYPE_SIGNATURE ) 
+			return EC_ERROR;
 
 		i = stInstanceNew( (stObject*)object->userData );
 

@@ -141,7 +141,7 @@ PhysicalControl : VirtualCreatures {
 		# (i get-genome) print-graph.
 
 		body = new MultiBody.
-		body set-root to (parser parse from ((i get-genome) get-root)).
+		body set-root to (parser parse-top-level from ((i get-genome) get-root)).
 		body disable-self-collisions.
 
 		self add-dependency on body.
@@ -199,11 +199,6 @@ GeneticAlgorithmIndividual : SimsGAIndividual {
 		genome = new GADirectedGraph.
 		self randomize.
 
-		h{ "123" } = new Object.
-		h{ 10 } = 40.
-
-		print h{ 10 }.
-
 		self add-dependency on genome.
 
 	+ to copy from other (object):
@@ -231,7 +226,7 @@ Object : MorphologyParser {
 	# An object used to create morphologies from our DirectedGraph genomes
 	# 
 
-	+ to parse from root (object):
+	+ to parse-top-level from root (object):
 		rootNode (object).
 		
 		rootNode = (self create-node from root with-level 1).
@@ -280,10 +275,11 @@ Object : MorphologyParser {
 
 				# joint set-relative-rotation around-axis norm by connectionParams{3}.
 
-				joint link parent rootNode to-child childNode
-					with-parent-point ppoint
+				joint link with-parent-point ppoint
 					with-child-point cpoint
-					with-normal norm.
+					with-normal norm 
+					to-child childNode 
+					parent rootNode.
 
 				joint set-phaseshift to 3.14 * connectionParams{7}.
 				joint set-double-spring with-strength 600 with-max 2.6 with-min -2.6.

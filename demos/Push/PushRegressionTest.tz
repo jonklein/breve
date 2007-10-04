@@ -1,0 +1,51 @@
+#
+# PushRegressionTest.tz 20060501 
+# Lee Spector, lspector@hampshire.edu
+# 
+# This is a simple breve program to test the results of PushGP symbolic regression
+# runs, like the one that runs by default in breve's PushRegression.tz demo.
+#
+# To use: Paste the program that you want to test and the input that you want to test
+# it on in the indicated places below. As currently written this provides only one
+# floating-point input to the program, which is placed on the float stack AND provided
+# to a Push function called INPUT which, when called, simply pushes the same value
+# on the float stack. The single output is taken from the float stack and printed
+# after the program is run. The Push interpreter configuration is taken from the file
+# "PushConfiguration.config", which should be in the same directory as this file.
+
+@use Push.
+@use Control.
+
+Controller PushRegressionTest.
+
+Control : PushRegressionTest {
+    + variables:
+        program, interpreter (object).
+        currentInput (float).
+        
+    + to init:
+        interpreter = new PushInterpreter.
+        interpreter read-config from-file "PushRegression.config".
+        interpreter clear-stacks.
+        interpreter add-instruction named "INPUT" for-instance self for-method "input-callback".
+        
+        # SET THE PROGRAM HERE
+        program = (new PushProgram parse program 
+        "( INPUT -2 FLOAT.DUP FLOAT.* INPUT INPUT FLOAT.+ FLOAT.+ FLOAT.FROMINTEGER FLOAT.+ INPUT INPUT FLOAT.+ FLOAT.+ FLOAT.* ) ").
+
+        # SET THE INPUT HERE
+        currentInput = 1.23.
+        
+        interpreter push-float value currentInput.
+        interpreter run program program.
+        print "Output = ",  (interpreter get-float-stack-top).
+        
+        free interpreter.
+        self end-simulation.
+
+    + to input-callback:
+        # This input instruction just puts the current input value on
+        # top of the float stack.
+        interpreter push-float value currentInput.
+
+}

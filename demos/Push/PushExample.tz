@@ -1,0 +1,74 @@
+#
+# PushTest.tz 9/24/2004 
+# jon klein <jk@spiderland.org>
+# 
+# This simulation shows some simple examples of Push functionality in breve
+# 
+
+@path "classes"
+@path "lib/classes"
+
+@use Push.
+@use Control.
+
+Controller myController.
+
+Control : myController {
+    
+    + variables:
+        interpreter (object).
+        code, code2, code3 (object).
+
+    + to init:
+        ##### create a Push interpreter
+        interpreter = new PushInterpreter.
+        
+        ##### create a config file but printing a full one, saving as a file, and editing
+        #interpreter print-config.
+        ##### configure, if you want, from an existing config file
+        #interpreter read-config from-file "PushTest.config".
+        
+        ##### define a "callback" Push instruction that executes in the breve environment
+        interpreter add-instruction for-method "myCallback" for-instance self named "HOWDY".
+
+        ##### parse, execute, and display results of a simple Push program
+        code = ( new PushProgram parse program "(  23 1 2 INTEGER.+ )" ).
+        print "code: ", (code get-string).
+        interpreter clear-stacks.
+        interpreter run program code.
+        print "result: ".
+        interpreter print-stacks.
+        print "Effort = ", (interpreter get-effort).
+
+        ##### programs can also be read from lists containing strings and existing Push programs
+        code2 = ( new PushProgram ).
+        code2 set-from code-list { "1.0", code, "2.0", code, "FLOAT.+", code }.
+        print "code2: ", (code2 get-string).
+        
+        ##### and code can be mutated
+        code2 mutate with-interpreter interpreter.
+        print "mutated code2: ", (code2 get-string).
+
+        ##### some measures of code difference
+        print "Discrepancy: ", (code get-discrepancy from code2).
+        print "Top level diff: ", (code get-top-level-difference from code2).
+
+        ##### demonstrate the use of a callback instruction
+        code3 = ( new PushProgram parse program "( 1 HOWDY 2 HOWDY INTEGER.+ )" ).
+        interpreter clear-stacks.
+        interpreter run program code3.
+        print "result: ".
+        interpreter print-stacks.
+        
+        ##### clean up and quit
+        free interpreter.
+        controller end-simulation.
+
+    + to myCallback:
+        print "Calling the breve callback function myCallback. ".
+        print "    The current top integer is: ", (interpreter get-integer-stack-top).
+        print "    myCallback is popping it and pushing 23.".
+        interpreter pop-integer-stack.
+        interpreter push-integer value 23.
+        
+}

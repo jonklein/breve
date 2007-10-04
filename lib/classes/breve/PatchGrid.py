@@ -12,7 +12,7 @@ class PatchGrid( breve.Abstract ):
 	def __init__( self ):
 		breve.Abstract.__init__( self )
 		self.blueChemicalMatrix = None
-		self.chemicalConcentrationMatrix = {}
+		self.chemicalConcentrationMatrix = breve.hash()
 		self.chemicals = breve.objectList()
 		self.diffusingChemicals = breve.objectList()
 		self.exponentiallyDecayingChemicals = breve.objectList()

@@ -171,6 +171,26 @@ class GeneticAlgorithm( breve.Object ):
 			self.generatePopulation()
 
 
+	def nonSpatialTournamentSelect( self ):
+		'''This method performs a tournament selection for reproduction.  It  is used internally and typically not called by any other object.  '''
+
+		n = 0
+		test = 0
+		best = 0
+
+		best = breve.randomExpression( ( breve.length( self.populations[ self.currentPopulation ] ) - 1 ) )
+		n = 0
+		while ( n < ( self.tournamentSize - 1 ) ):
+			test = breve.randomExpression( ( breve.length( self.populations[ self.currentPopulation ] ) - 1 ) )
+			if ( self.populations[ self.currentPopulation ][ test ].getFitness() > self.populations[ self.currentPopulation ][ best ].getFitness() ):
+				best = test
+
+
+
+			n = ( n + 1 )
+
+		return self.populations[ self.currentPopulation ][ best ]
+
 	def prepareForGeneration( self, n ):
 		'''This method is called when a generation is setup.  The default implementation does nothing, but the method may be overriden in order to carry out any preparations necessary for a new  generation.'''
 
@@ -401,30 +421,10 @@ class GeneticAlgorithm( breve.Object ):
 
 	def tournamentSelect( self, i ):
 		if ( self.spatialRadius == 0 ):
-			return self.tournamentSelect()
+			return self.nonSpatialTournamentSelect()
 		else:
 			return self.spatialTournamentSelect( i )
 
-
-	def tournamentSelect( self ):
-		'''This method performs a tournament selection for reproduction.  It  is used internally and typically not called by any other object.  '''
-
-		n = 0
-		test = 0
-		best = 0
-
-		best = breve.randomExpression( ( breve.length( self.populations[ self.currentPopulation ] ) - 1 ) )
-		n = 0
-		while ( n < ( self.tournamentSize - 1 ) ):
-			test = breve.randomExpression( ( breve.length( self.populations[ self.currentPopulation ] ) - 1 ) )
-			if ( self.populations[ self.currentPopulation ][ test ].getFitness() > self.populations[ self.currentPopulation ][ best ].getFitness() ):
-				best = test
-
-
-
-			n = ( n + 1 )
-
-		return self.populations[ self.currentPopulation ][ best ]
 
 
 breve.GeneticAlgorithm = GeneticAlgorithm

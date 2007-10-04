@@ -353,7 +353,7 @@ Object : GeneticAlgorithm {
 		self prepare-for-generation number generation.
 
 	- to tournament-select for-index i (int):
-		if spatialRadius == 0: return (self tournament-select).
+		if spatialRadius == 0: return (self non-spatial-tournament-select).
 		else return (self spatial-tournament-select with-index i).
 
 	- to spatial-tournament-select with-index index (int): 
@@ -377,7 +377,7 @@ Object : GeneticAlgorithm {
 
 		return populations{ currentPopulation }{ best }.
 
-	+ to tournament-select:
+	+ to non-spatial-tournament-select:
 		% This method performs a tournament selection for reproduction.  It 
 		% is used internally and typically not called by any other object.  
 

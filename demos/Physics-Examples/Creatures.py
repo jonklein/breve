@@ -1,4 +1,9 @@
 
+# Note: this file was automatically converted to Python from the
+# original steve-language source code.  Please see the original
+# file for more detailed comments and documentation.
+
+
 import breve
 
 class VirtualCreatures( breve.PhysicalControl ):
@@ -13,7 +18,6 @@ class VirtualCreatures( breve.PhysicalControl ):
 		VirtualCreatures.init( self )
 
 	def archiveSim( self ):
-
 		self.saveAsXml( 'sim.xml' )
 
 	def checkPenetration( self ):
@@ -48,7 +52,6 @@ class VirtualCreatures( breve.PhysicalControl ):
 		return breve.length( ( t - self.startlocation ) )
 
 	def init( self ):
-
 		breve.createInstances( breve.Floor, 1 )
 		self.flag = breve.createInstances( breve.Mobile, 1 )
 		self.flag.disablePhysics()
@@ -107,7 +110,7 @@ class VirtualCreatures( breve.PhysicalControl ):
 			breve.deleteInstances( self.body )
 
 		self.body = breve.createInstances( breve.MultiBody, 1 )
-		self.body.setRoot( self.parser.parse( i.getGenome().getRoot() ) )
+		self.body.setRoot( self.parser.parseTopLevel( i.getGenome().getRoot() ) )
 		self.body.disableSelfCollisions()
 		self.addDependency( self.body )
 		self.schedule( 'checkPenetration', ( self.getTime() + 8.000000 ) )
@@ -138,7 +141,6 @@ class SimsGA( breve.GeneticAlgorithm ):
 		breve.GeneticAlgorithm.__init__( self )
 
 	def endFitnessTest( self, o ):
-
 		o.setFitness( self.controller.getCurrentCritterFitness() )
 		if breve.breveInternalFunctionFinder.isnan( self, o.getFitness() ):
 			o.setFitness( 0 )
@@ -162,40 +164,30 @@ class SimsGAIndividual( breve.GeneticAlgorithmIndividual ):
 	def __init__( self ):
 		breve.GeneticAlgorithmIndividual.__init__( self )
 		self.genome = None
-		self.h = {}
+		self.h = breve.hash()
 		SimsGAIndividual.init( self )
 
 	def copy( self, other ):
-
 		self.genome.copy( other.getGenome() )
 
 	def crossover( self, p1, p2 ):
-
 		self.genome.crossover( p1.getGenome(), p2.getGenome() )
 
 	def destroy( self ):
-
 		breve.deleteInstances( self.genome )
 
 	def getGenome( self ):
-
 		return self.genome
 
 	def init( self ):
-
 		self.genome = breve.createInstances( breve.GADirectedGraph, 1 )
 		self.randomize()
-		self.h[ '123' ] = breve.createInstances( breve.Object, 1 )
-		self.h[ 10 ] = 40
-		print self.h[ 10 ]
 		self.addDependency( self.genome )
 
 	def mutate( self ):
-
 		self.genome.mutate()
 
 	def randomize( self ):
-
 		self.genome.randomize( 5, 10, 10 )
 
 
@@ -220,12 +212,6 @@ class MorphologyParser( breve.Object ):
 		size = ( 4 * breve.vector( breve.length( nodeParams[ 0 ] ), breve.length( nodeParams[ 1 ] ), breve.length( nodeParams[ 2 ] ) ) )
 		rootNode.setShape( breve.createInstances( breve.Cube, 1 ).initWith( ( ( ( 8 - n ) / 7.000000 ) * size ) ) )
 		return rootNode
-
-	def parse( self, root ):
-		rootNode = None
-
-		rootNode = self.createNode( root, 1 )
-		return self.parse( root, 1, rootNode )
 
 	def parse( self, root, n, rootNode ):
 		connections = breve.objectList()
@@ -259,7 +245,7 @@ class MorphologyParser( breve.Object ):
 				norm = breve.vector( connectionParams[ 4 ], connectionParams[ 5 ], connectionParams[ 6 ] )
 				norm = ( norm / breve.length( norm ) )
 				joint = breve.createInstances( breve.SineJoint, 1 )
-				joint.link( rootNode, childNode, ppoint, cpoint, norm )
+				joint.link( ppoint, cpoint, norm, childNode, rootNode )
 				joint.setPhaseshift( ( 3.140000 * connectionParams[ 7 ] ) )
 				joint.setDoubleSpring( 600, 2.600000, -2.600000 )
 				joint.setStrengthLimit( 5000 )
@@ -269,6 +255,12 @@ class MorphologyParser( breve.Object ):
 
 
 		return rootNode
+
+	def parseTopLevel( self, root ):
+		rootNode = None
+
+		rootNode = self.createNode( root, 1 )
+		return self.parse( root, 1, rootNode )
 
 
 breve.MorphologyParser = MorphologyParser
@@ -281,18 +273,15 @@ class SineJoint( breve.RevoluteJoint ):
 		self.phaseshift = 0
 
 	def activate( self ):
-
 		self.active = 1
 
 	def iterate( self ):
-
 		if self.active:
 			self.setJointVelocity( ( 1 * breve.breveInternalFunctionFinder.sin( self, ( ( self.controller.getTime() * 2.000000 ) + self.phaseshift ) ) ) )
 
 
 
 	def setPhaseshift( self, p ):
-
 		self.phaseshift = p
 
 

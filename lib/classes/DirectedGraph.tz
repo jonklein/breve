@@ -178,7 +178,7 @@ GeneticAlgorithmIndividual : GADirectedGraph {
 		foreach n in nodes: {
 			foreach m in nodes: {
 				if n != m && random[1.0] < p: {
-					connection = (n connect to m).
+					connection = (n connect to m with-parameters {}).
 					connection set-parameter-length to cp.
 					connection randomize-parameters.
 				}
@@ -393,7 +393,7 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 
 		return seenlist.
 
-	+ to connect to child (object):
+	- to xconnect to child (object):
 		% Makes a connection to child with an empty parameter list.
 
 		return (self connect to child with-parameters {}).

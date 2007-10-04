@@ -219,7 +219,7 @@ std::string stPyConvertVariableDeclaration( stPyConversionData *inData, stVar *i
 			result += " = breve.objectList()\n";
 			break;
 		case AT_HASH:
-			result += " = {}\n";
+			result += " = breve.hash()\n";
 			break;
 		default:
 			return UNIMPLEMENTED;
