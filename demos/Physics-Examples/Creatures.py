@@ -245,7 +245,7 @@ class MorphologyParser( breve.Object ):
 				norm = breve.vector( connectionParams[ 4 ], connectionParams[ 5 ], connectionParams[ 6 ] )
 				norm = ( norm / breve.length( norm ) )
 				joint = breve.createInstances( breve.SineJoint, 1 )
-				joint.link( ppoint, cpoint, norm, childNode, rootNode )
+				joint.link( norm, ppoint, cpoint, childNode, rootNode )
 				joint.setPhaseshift( ( 3.140000 * connectionParams[ 7 ] ) )
 				joint.setDoubleSpring( 600, 2.600000, -2.600000 )
 				joint.setStrengthLimit( 5000 )

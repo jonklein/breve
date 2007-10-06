@@ -823,7 +823,7 @@ void stAddToInstanceLists( stInstance *i ) {
 	stObject *type = i->type;
 
 	while ( type ) {
-		type->allInstances.insert( i );
+		type -> allInstances.insert( i );
 		type = type->super;
 	}
 }

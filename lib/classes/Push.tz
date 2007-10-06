@@ -15,7 +15,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 	% up for evolutionary computation.
 	% <P>
 	% More information about Push is available
-	% <a href="http://hampshire.edu/lspector/push.html">here</a>.
+	% <a href="http://hampshire.edu/lspector/push.html">on the Push project page</a>.
 
 	+ variables:
 		pushInterpreterPointer (pointer).
@@ -41,18 +41,18 @@ Object : PushInterpreter (aka PushInterpreters) {
 
 		pushCallbackNew(pushInterpreterPointer, instructionName, methodName, targetInstance).
 
-	+ to add-macro named instructionName (string) for-code code (object):
-		% Adds a new instruction named instructionName, which has the effect of calling 
-		% the instructions in code.
+	+ to add-macro named instructionName (string) for-code macroCode (object):
+		% Adds a new instruction named instructionName.  When the instructionName instruction
+		% is executed, it has the effect of executing the code contained in macroCode.
 
-		pushMacroNew(pushInterpreterPointer, instructionName, (code get-code-pointer)).
+		pushMacroNew(pushInterpreterPointer, instructionName, (macroCode get-code-pointer)).
 
 	+ to read-config from-file configFile (string):
 		% Reads the push configuration file configFile.
 
 		if !findFile(configFile): {
-				print "Could not locate Push configuration file $configFile".
-				return.
+			print "Could not locate Push configuration file $configFile".
+			return.
 		}
 
 		pushEnvironmentReadConfigFile(pushInterpreterPointer, findFile(configFile)).

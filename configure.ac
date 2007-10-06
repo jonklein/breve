@@ -1,6 +1,6 @@
 AC_PREREQ(2.57)
 
-AC_INIT([the breve simulation environment], [2.6b3], [jk@spiderland.org])
+AC_INIT([the breve simulation environment], [2.6], [jk@spiderland.org])
 AC_CONFIG_HEADER([include/breve/config.h])
 
 VERSION=$PACKAGE_VERSION

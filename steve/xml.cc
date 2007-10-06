@@ -257,7 +257,7 @@ int brXMLWriteObject( brXMLArchiveRecord *record, FILE *file, brInstance *inInst
 	if( inInstance->object->type->_typeSignature == STEVE_TYPE_SIGNATURE )
 		stXMLWriteObjectVariables( record, file, (stInstance*)inInstance -> userData, spaces );
 	else {
-		slMessage( DEBUG_ALL, "Warning: object encoding and decoding not fully implemented for non-steve objects.  Dearchiving of this object will likely fail.\n" );
+		slMessage( DEBUG_ALL, "Warning: object encoding and decoding not implemented for this language frontend.\nDearchiving of this object will fail.\n" );
 
 		char *encoding = brInstanceEncodeToString( inInstance->engine, inInstance );
 
@@ -963,8 +963,10 @@ int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, brXMLParserState *inState 
 			return -1;
 		}
 
-		if( typeSignature != STEVE_TYPE_SIGNATURE ) 
+		if( typeSignature != object -> type -> _typeSignature ) {
+			slMessage( DEBUG_ALL, "XML archive contains an instance of an object from a different language frontend.\nThis object cannot be dearchived in this simulation.\n" );
 			return EC_ERROR;
+		}
 
 		i = stInstanceNew( (stObject*)object->userData );
 

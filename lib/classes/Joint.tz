@@ -505,8 +505,8 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 2.3] {
 
 	+ to dearchive:
 		if parent || child: 
-			self link parent parent to-child child with-normal normalVector 
-					with-parent-point plinkPoint with-child-point clinkPoint.
+			self link with-normal normalVector 
+				with-parent-point plinkPoint with-child-point clinkPoint to-child child parent parent.
 
 		return (super dearchive).
 }
@@ -520,10 +520,10 @@ Joint : FixedJoint (aka FixedJoints) [version 2.3] {
 	% <b>Fixed joints do not currently support a relative rotation the way
 	% other joint types do.</b>  I'm so sorry.  
 
-	+ to link to-child childLink (object)
-			parent parentLink = 0 (object) 
-			with-parent-point parentPoint = (0, 0, 0) (vector) 
+	+ to link with-parent-point parentPoint = (0, 0, 0) (vector) 
 			with-child-point childPoint = (0, 0, 0) (vector)
+			to-child childLink (object)
+			parent parentLink = 0 (object) 
 			use-current-relative-rotation currentRotation = 0 (int):
 
 		% Creates a fixed joint between parentLink and childLink.  
@@ -563,7 +563,7 @@ Joint : FixedJoint (aka FixedJoints) [version 2.3] {
 		print "dearchiving for $parent and $child".
 
 		if parent || child: 
-			self link parent parent to-child child with-parent-point plinkPoint with-child-point clinkPoint.
+			self link with-parent-point plinkPoint with-child-point clinkPoint to-child child parent parent.
 
 		return (super dearchive).
 }

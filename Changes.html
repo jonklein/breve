@@ -49,22 +49,22 @@ h5 {
 
 The <a href="http://www.spiderland.org/breve">breve</a> simulation environment change log.
 
-<h5>version 2.6 -- beta [XX/XX/2007]</h5>
+<h5>version 2.6 [10/08/2007]</h5>
 
 <h5>New Features</h5>
 <ul>
-<li>Fixed missing collision callbacks for "fully embedded objects"
+<li><b>Added full Python language frontend support</b>
 <li>Python demos added
+<li>Added new IRSensor classes
 <li>Objects now have a "display" shape and a "collision" shape, which can be set separately.
 <li>Stationary objects can now be positioned and rotated dynamically during a simulation.
-<li>Shapes can now be set for stationary objects during a simulation.
+<li>Shapes can now be changed dynamically for stationary objects during a simulation.
 <li>Shadow drawing can be disabled on a per-object basis
 <li>Drawing quality of lines improved
 <li>Removed long-deprecated Data and Genome classes, updated demos
-<li>Fixed Windows breveIDE plugins 
-<li>Fixed Windows breveIDE window positions
 <li>Added breveIDE intergrated documentation
 <li>Modified plugin API for list access
+<li>Removed separate "breve_cli" program, use "breve -x" to run a simulation with no graphics
 </ul>
 
 <h5>Changes to Accomodate New Python Frontend</h5>
@@ -75,6 +75,16 @@ In rare cases they may require minor changes to existing simulations written in 
 <li>Some method arguments have been reordered.
 <li>Many methods have been moved from Stationary or Mobile to their parent class Real
 <li>One of the "set-rotation" methods has been renamed to "set-rotation-matrix" 
+</ul>
+
+<h5>Bug Fixes</h5>
+
+<ul>
+<li>Fixed Windows breveIDE plugins 
+<li>Fixed Windows breveIDE window positions
+<li>Improved Windows/Linux breveIDE stability
+<li>Fixed missing collision callbacks for "fully embedded objects"
+<li>Fixed archiving/dearchiving problems for some classes.
 </ul>
 
 <hr>

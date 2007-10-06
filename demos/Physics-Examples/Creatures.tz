@@ -275,9 +275,9 @@ Object : MorphologyParser {
 
 				# joint set-relative-rotation around-axis norm by connectionParams{3}.
 
-				joint link with-parent-point ppoint
+				joint link with-normal norm 
+					with-parent-point ppoint
 					with-child-point cpoint
-					with-normal norm 
 					to-child childNode 
 					parent rootNode.
 

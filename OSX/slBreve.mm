@@ -361,10 +361,16 @@ static NSRecursiveLock *gLogLock;
 		return;
 	}
 
-	buffer = slStrdup((char*)[[(slBreveSourceDocument*)currentDocument documentText] cString]);
+	NSData *data = [ [ (slBreveSourceDocument*)currentDocument documentText] dataUsingEncoding: NSASCIIStringEncoding allowLossyConversion: YES ];
+
+	buffer = (char*)slMalloc( [ data length ] + 1 );
+	strncpy( buffer, (char*)[ data bytes ], [ data length ] );
+	buffer[ [ data length ] ] = 0;
 
 	file = [currentDocument fileName];
-	if(!file) file = [currentDocument displayName];
+
+	if( !file ) 	
+		file = [currentDocument displayName];
 
 	name = slStrdup((char*)[file cString]);
 

@@ -75,6 +75,6 @@ void brPushFreeData( void *d ) {
 void breveInitPushCallbackFunctions( brNamespace *names ) {
 #if HAVE_LIBPUSH
 	brNewBreveCall( names, "pushCallbackNew", breveFunctionPushCallbackNew, AT_POINTER, AT_POINTER, AT_STRING, AT_STRING, AT_INSTANCE, 0 );
-	brNewBreveCall( names, "pushMacroNew", breveFunctionPushMacroNew, AT_POINTER, AT_POINTER, AT_STRING, AT_POINTER, 0 );
+	brNewBreveCall( names, "pushMacroNew", breveFunctionPushMacroNew, AT_NULL, AT_POINTER, AT_STRING, AT_POINTER, 0 );
 #endif
 }
