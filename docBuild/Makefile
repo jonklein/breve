@@ -19,7 +19,7 @@ classes: docExtract
 	mkdir -p htmldocs/pythonclasses
 	mkdir -p htmldocs/images
 	./docExtract ../lib/classes/*.tz | ./docBuild.pl htmldocs/steveclasses
-	-( cd ..; ./bin/breve -x ./docBuild/DocBuild.py docBuild/htmldocs/pythonclasses drupaldocs )
+	-( cd ..; ./bin/breve -x ./docBuild/DocBuild.py docBuild/htmldocs/pythonclasses )
 	cp classImages/*.jpg htmldocs/images/
 
 pdf: pdf-clean
