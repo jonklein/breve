@@ -443,7 +443,14 @@
 <para>
         breve 2.6 introduces several major new features and improvements:
       </para><itemizedlist><listitem><para>
-              Experimental new <xref linkend="node-3246"/> allows Python code to be called from breve simulations
+              Full support for <xref linkend="node-1504"/></para></listitem><listitem><para>
+              Ported all breve demos and classes to Python frontend
+            </para></listitem><listitem><para>
+              The "breve_cli" program has been removed. Use "breve -x" to run a
+              command-line simulation without graphics.
+            </para></listitem><listitem><para>
+              Integrated documentation and stability fixes in breveIDE for
+              Linux and Windows.
             </para></listitem></itemizedlist>
 </section>
 <section id="node-2608">

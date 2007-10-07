@@ -138,7 +138,7 @@ destination = sys.argv[ 1 ]
 
 drupaldestination = None
 
-if len( sys.argv ) > 1:
+if len( sys.argv ) > 2:
 	drupaldestination = sys.argv[ 2 ]
 
 #
