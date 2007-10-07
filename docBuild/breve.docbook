@@ -683,7 +683,7 @@
       is used with Python. You can also begin looking at the included demos for
       real-world examples of how Python is used to write simulations.
     </para><para>
-      Finally, you'll want to explore <xref linkend="node-1508"/> to learn how to use the features of the breve engine in your
+      Finally, you'll want to explore <xref linkend="node-2795"/> to learn how to use the features of the breve engine in your
       simulations.
     </para>
 <section id="node-3247">
@@ -756,12 +756,6 @@ myController()
 
 </programlisting>
 </section>
-<section id="node-1508">
-<title>breve Class APIs [Python]</title>
-<para>
-      This section describes the built-in breve Python API and classes.
-    </para>
-</section>
 </section>
 <section id="node-2632">
 <title>Writing breve Simulations With "steve"</title>
@@ -806,6 +800,10 @@ myController()
         to be familiar with types (<xref linkend="node-2644"/>) and expressions (<xref linkend="node-2673"/>). The section Program
         Control Structures (<xref linkend="node-2685"/>) discusses loops and
         conditional statements.
+      </para><para>
+        Finally, after learning how to program with steve, you'll want to
+        explore the <xref linkend="node-2795"/> to learn how
+        to use the features of the breve engine in your simulations.
       </para>
 <section id="node-2633">
 <title>Hello, World</title>
