@@ -963,7 +963,7 @@ int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, brXMLParserState *inState 
 			return -1;
 		}
 
-		if( typeSignature != object -> type -> _typeSignature ) {
+		if( typeSignature && typeSignature != object -> type -> _typeSignature ) {
 			slMessage( DEBUG_ALL, "XML archive contains an instance of an object from a different language frontend.\nThis object cannot be dearchived in this simulation.\n" );
 			return EC_ERROR;
 		}
@@ -1128,20 +1128,20 @@ int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceE
 
 	std::vector< brXMLDOMElement* > data = inInstanceElement->getElementsByName( "instancedata" ); 
 
-	// Legacy support for the steve-only "variables" data...
+	int typeSignature = atoi( inInstanceElement -> getAttr( "typesignature" )->c_str() );
+	
 
 	if( data.size() == 0 ) {
-		data = inInstanceElement->getElementsByName( "variables" ); 
+		// Legacy support for 2.5 archived steve archives
 
+		data = inInstanceElement->getElementsByName( "variables" ); 
+		typeSignature = STEVE_TYPE_SIGNATURE;
 	} else {
 		
-		int typeSignature = 0xffffffff;
 		brInstanceDecodeFromString( inState->engine, typeSignature, data[ 0 ]->_cdata.c_str() );
 
 	}
 
-	int typeSignature = atoi( inInstanceElement -> getAttr( "typesignature" )->c_str() );
-	
 	if( typeSignature != STEVE_TYPE_SIGNATURE ) {
 		slMessage( DEBUG_ALL, "Warning: object encoding and decoding not fully implemented for non-steve objects\n" );
 
