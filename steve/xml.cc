@@ -405,6 +405,8 @@ int stXMLPrintHash( brXMLArchiveRecord *record, FILE *file, const char *name, br
 	XMLPutSpaces( spaces, file );
 	fprintf( file, "</hash>\n" );
 
+	delete keys;
+
 	return 0;
 }
 
@@ -798,24 +800,31 @@ brInstance *brXMLDearchiveObjectFromString( brEngine *e, char *buffer ) {
 	parserState.engine = e;
 	parserState.error = 0;
 
-	if( brXMLPrepareInstanceMap( dom, &parserState ) != 0 )
+	if( brXMLPrepareInstanceMap( dom, &parserState ) != 0 ) {
+		delete dom;
 		return NULL;
+	}
 
 	for( unsigned int n = 0; n < matches.size(); n++ ) {
 		const std::string *instindex = matches[ n ]->getAttr( "index" );
 		
 		if( !instindex ) {
 			slMessage( DEBUG_ALL, "Error decoding XML from string: could not locate instance index\n", archive.size() );	
+			delete dom;
 			return NULL;	
 		}
 		
 		int i = atoi( instindex->c_str() );
 			
-		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState._indexToInstanceMap[ i ] ) != EC_OK ) 
+		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState._indexToInstanceMap[ i ] ) != EC_OK ) {
+			delete dom;
 			return NULL;
+		}
 	}
 
 	brXMLRunDearchiveMethods( &parserState );
+
+	delete dom;
 
 	return parserState._indexToInstanceMap[ archivedIndex ];
 }
@@ -868,6 +877,7 @@ int brXMLInitSimulationFromString( brEngine *e, char *buffer ) {
 
 	if( engine.size() != 1 ) {
 		slMessage( DEBUG_ALL, "Error decoding archived XML simulation: could not locate breve engine object\n" );	
+		delete dom;
 		return EC_ERROR;		
 	}
 
@@ -881,21 +891,26 @@ int brXMLInitSimulationFromString( brEngine *e, char *buffer ) {
 	parserState.engine = e;
 	parserState.error = 0;
 
-	if( brXMLPrepareInstanceMap( dom, &parserState ) != 0 )
+	if( brXMLPrepareInstanceMap( dom, &parserState ) != 0 ) {
+		delete dom;
 		return EC_ERROR;
+	}
 
 	for( unsigned int n = 0; n < matches.size(); n++ ) {
 		const std::string *instindex = matches[ n ]->getAttr( "index" );
 		
 		if( !instindex ) {
 			slMessage( DEBUG_ALL, "Error decoding archived XML simulation: could not locate instance index\n" );	
-			return -1;	
+			delete dom;
+			return EC_ERROR;
 		}
 		
 		int i = atoi( instindex->c_str() );
 			
-		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState._indexToInstanceMap[ i ] ) != EC_OK ) 
+		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState._indexToInstanceMap[ i ] ) != EC_OK ) {
+			delete dom;
 			return EC_ERROR;
+		}
 	}
 
 
@@ -903,8 +918,11 @@ int brXMLInitSimulationFromString( brEngine *e, char *buffer ) {
 
 	if ( brXMLRunDearchiveMethods( &parserState ) ) {
 		slMessage( DEBUG_ALL, "Error decoding archived XML simulation: dearchive method failed\n" );
-		result = -1;
+		delete dom;
+		return EC_ERROR;
 	}
+
+	delete dom;
 
 	return result;
 }

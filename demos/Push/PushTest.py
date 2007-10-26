@@ -56,8 +56,8 @@ class PushTest( breve.Object ):
 		self.interpreter = breve.createInstances( breve.PushInterpreter, 1 )
 		self.interpreter.clearStacks()
 		self.interpreter.readConfig( 'PushTest.config' )
-		self.interpreter.addInstruction( 'callback2', self, 'CALLBACKTEST2' )
-		self.interpreter.addInstruction( 'callback', self, 'CALLBACKTEST' )
+		self.interpreter.addInstruction( self, 'callback2', 'CALLBACKTEST2' )
+		self.interpreter.addInstruction( self, 'callback', 'CALLBACKTEST' )
 
 	def testSetFromList( self ):
 		self.code = breve.createInstances( breve.PushProgram, 1 ).parse( '''( INTEGER./ 1 1 1 1 1 1 1 1)''' )

@@ -32,7 +32,7 @@ int breveFunctionPushCallbackNew( brEval arguments[], brEval *result, brInstance
 	data->method = brMethodFind( callbackInstance->object, methodName, NULL, 0 );
 
 	if ( !data->method ) {
-		slMessage( DEBUG_ALL, "Cannot locate method \"%s\" for class \"%s\" for push callback instruction\n", methodName, callbackInstance->object->name );
+		slMessage( DEBUG_ALL, "Cannot locate method \"%s\" with 0 arguments for class \"%s\" for push callback instruction\n", methodName, callbackInstance->object->name );
 		return EC_ERROR;
 	}
 

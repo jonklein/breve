@@ -31,8 +31,8 @@ Object : PushTest {
 
 		interpreter read-config from-file "PushTest.config".
 
-		interpreter add-instruction for-method "callback2" for-instance self named "CALLBACK-TEST2".
-		interpreter add-instruction for-method "callback" for-instance self named "CALLBACK-TEST".
+		interpreter add-instruction for-instance self for-method "callback2" named "CALLBACK-TEST2".
+		interpreter add-instruction for-instance self for-method "callback" named "CALLBACK-TEST".
 
 	+ to test-set-from-list:
 		code = ( new PushProgram parse program "( INTEGER./ 1 1 1 1 1 1 1 1)" ).

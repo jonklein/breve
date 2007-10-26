@@ -2096,11 +2096,12 @@ RTC_INLINE int stEvalCallFunc( stCCallExp *c, stRunInstance *i, brEval *result )
 	try {
 		resultCode = c->_function->_call( e, result, i->instance->breveInstance );
 
+		if( resultCode != EC_OK ) 
+			throw slException( "unknown error" );
+
 		if ( c->_function->_returnType != AT_UNDEFINED && c->_function->_returnType != result->type() ) {
 			slMessage( DEBUG_ALL, "Warning: internal function \"%s\" does not correctly set an output value.  If this is a plugin function, see the updated documentation on plugins for more details.\n", c->_function->_name.c_str() );
 		}
-
-		if( resultCode != EC_OK ) throw slException( "unknown error" );
 
 	} catch ( slException &error ) {
 		stEvalError( i->instance, EE_INTERNAL, "an error occurred executing the internal function \"%s\": %s", c->_function->_name.c_str(), error._message.c_str() );

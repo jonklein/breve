@@ -71,11 +71,6 @@ PhysicalControl : VirtualCreatures {
 
 		self update-text.
 
-		# self schedule method-call "archive-sim" at-time 10.
-
-	+ to archive-sim:
-		self save-as-xml file "sim.xml".
-
 	+ to update-text:
 		gen, total, index (int).
 		bestDistance (float).
@@ -187,7 +182,9 @@ GeneticAlgorithm : SimsGA {
 		if isnan((o get-fitness)): o set-fitness to 0.
 		print "fitness of $o: ", (o get-fitness).
 
-		(self archive-as-xml file "breveCreatures.xml").
+		self archive-as-xml file "breveCreatures.xml".
+
+		print | all Objects |.
 }
 
 GeneticAlgorithmIndividual : SimsGAIndividual {
