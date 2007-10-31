@@ -30,15 +30,16 @@ class slSkybox {
 
 		void 				draw( slVector *inCameraPos );
 
-		int 				loadFrontImage( std::string &inImage );
-		int 				loadBackImage( std::string &inImage );
-		int 				loadRightImage( std::string &inImage );
-		int 				loadLeftImage( std::string &inImage );
-		int 				loadTopImage( std::string &inImage );
-		int 				loadBottomImage( std::string &inImage );
+		int 				loadImage( const char *inImage, int inN ) {
+							std::string s( inImage );
+							return loadImage( s, inN );
+						}
+
+		int 				loadImage( std::string &inImage, int inN );
 
 		int 				loadNumberedImages( std::string &inImage );
 
 	private:
 		slTexture2D			_textures[ 6 ];
+		bool				_loaded;
 };

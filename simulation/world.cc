@@ -83,7 +83,6 @@ slWorld::slWorld() {
 	dSetMessageHandler( slODEErrorHandler );
 
 	_odeCollisionGroupID = dJointGroupCreate( 0 );
-	_odeJointGroupID = dJointGroupCreate( 0 );
 
 	_resolveCollisions = 0;
 	_detectCollisions = 0;
@@ -204,8 +203,6 @@ slWorld::~slWorld() {
 	dWorldDestroy( _odeWorldID );
 
 	dJointGroupDestroy( _odeCollisionGroupID );
-
-	dJointGroupDestroy( _odeJointGroupID );
 
 #if HAS_LIBENET
 	if ( _netsimData._server ) {

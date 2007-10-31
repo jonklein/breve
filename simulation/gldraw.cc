@@ -495,7 +495,7 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 
 	updateFrustum();
 
-	// w->_skybox.draw( &cam );
+	w->_skybox.draw( &cam );
 
 	drawFog();
 

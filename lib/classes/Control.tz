@@ -416,6 +416,15 @@ Abstract : Control (aka Controls) [version 2.3] {
 
   + section "Background Appearance Options"
 
+	+ to set-skybox-images to imageList (list):
+		% Sets a skybox background from a list of images.
+		% imageList must contains 6 strings specifying image files corresponding to 
+		% the front, back, left, right, top and bottom skybox images respectively.
+		% The skybox will not be drawn unless all images load successfully.
+
+		setSkyboxImages( imageList ).
+
+
 	+ to set-background-scroll-rate x xValue (float) y yValue (float):
 		% Sets the rate of the background image scrolling.  Purely cosmetic.
 

@@ -393,11 +393,6 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 
 		return seenlist.
 
-	- to xconnect to child (object):
-		% Makes a connection to child with an empty parameter list.
-
-		return (self connect to child with-parameters {}).
-
 	+ to connect to child (object) with-parameters plist (list):
 		% Makes a connection to child with the parameter list plist.
 		connection (object).

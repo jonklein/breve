@@ -3,40 +3,34 @@
 #include "glIncludes.h"
 
 slSkybox::slSkybox() {
+	_loaded = false;
 }
 
 slSkybox::~slSkybox() {
 }
 
-int slSkybox::loadFrontImage( std::string &inPath ) {
-	return _textures[ 0 ].loadImage( inPath );
-}
+int slSkybox::loadImage( std::string &inPath, int inN ) {
+	int result = _textures[ inN ].loadImage( inPath );
 
-int slSkybox::loadBackImage( std::string &inPath ) {
-	return _textures[ 1 ].loadImage( inPath );
-}
+	// check and update the _loaded state
 
-int slSkybox::loadRightImage( std::string &inPath ) {
-	return _textures[ 2 ].loadImage( inPath );
-}
+	_loaded = true;
 
-int slSkybox::loadLeftImage( std::string &inPath ) {
-	return _textures[ 3 ].loadImage( inPath );
-}
+	for( int n = 0; n < 6; n++ ) {
+		if( !_textures[ n ].isLoaded() ) {
+			_loaded = false;
+		}
+	}
 
-int slSkybox::loadTopImage( std::string &inPath ) {
-	return _textures[ 4 ].loadImage( inPath );
-}
-
-int slSkybox::loadBottomImage( std::string &inPath ) {
-	return _textures[ 5 ].loadImage( inPath );
-}
-
-int slSkybox::loadNumberedImages( std::string &inPath ) {
-	return -1;	
+	return result;
 }
 
 void slSkybox::draw( slVector *inCameraPos ) {
+
+	if( ! _loaded ) 
+		return;
+	
+
 	glDisable( GL_CULL_FACE );
 	glDisable( GL_BLEND );
 
@@ -50,20 +44,23 @@ void slSkybox::draw( slVector *inCameraPos ) {
 	glPushMatrix();
 	glTranslatef( inCameraPos->x, inCameraPos->y, inCameraPos->z );
 	glScalef( 5, 5, 5 );
-	// glLoadIdentity();
-
 	if( !_textures[ 0 ].isLoaded() ) 
-		_textures[ 0 ].loadImage( "BoxFront.png" );
+		loadImage( "BoxFront.png", 0 );
+
 	if( !_textures[ 1 ].isLoaded() ) 
-		_textures[ 1 ].loadImage( "BoxBack.png" );
+		loadImage( "BoxBack.png", 1 );
+
 	if( !_textures[ 2 ].isLoaded() ) 
-		_textures[ 2 ].loadImage( "BoxLeft.png" );
+		loadImage( "BoxLeft.png", 2 );
+
 	if( !_textures[ 3 ].isLoaded() ) 
-		_textures[ 3 ].loadImage( "BoxRight.png" );
+		loadImage( "BoxRight.png", 3 );
+
 	if( !_textures[ 4 ].isLoaded() ) 
-		_textures[ 4 ].loadImage( "BoxTop.png" );
+		loadImage( "BoxTop.png", 4  );
+
 	if( !_textures[ 5 ].isLoaded() ) 
-		_textures[ 5 ].loadImage( "BoxBottom.png" );
+		loadImage( "BoxBottom.png", 5 );
  
 	glColor4f( 0.0, 1.0, 0.0, 1.0f);
  

@@ -38,16 +38,34 @@ PhysicalControl : VirtualCreatures {
 
 		ga (object).
 
+		blockTexture, startTexture, floor (object).
+
+	+ to get-block-texture:
+		return blockTexture.
+
+
 	+ to init:
-		new Floor.
+		startTexture = (new Image load from "images/star.png").
 
 		flag = new Mobile.
 		flag disable-physics.
-		flag set-shape to (new Sphere init-with radius .2).
-		flag set-color to (1, 0, 0).
+		flag set-bitmap-image to startTexture.
+		flag set-color to (1, 1, 0).
 		flag set-label to "Start".
+		flag disable-shadows.
 
 		self set-background-texture-image to (new Image load from "images/clouds.png").
+
+		blockTexture = ( new Image load from "images/noise.png" ).
+
+		floor = new Floor.
+		floor set-texture-image to ( new Image load from "images/ground.png" ).
+		floor set-color to ( .4, .3, .3 ).
+
+		self set-skybox-images to { 
+			"lib/classes/images/MountainBoxFront.png", "lib/classes/images/MountainBoxBack.png", 
+			"lib/classes/images/MountainBoxLeft.png", "lib/classes/images/MountainBoxRight.png", 
+			"lib/classes/images/MountainBoxTop.png", "lib/classes/images/MountainBoxBottom.png" }.
 
 		self enable-fast-physics.
 		self set-fast-physics-iterations to 20.
@@ -65,6 +83,7 @@ PhysicalControl : VirtualCreatures {
 			ga set-population-size to 25.
 			ga set-crossover-percent to 30.
 			ga set-mutation-percent to 30.
+			ga set-spatial-radius to 4.
 		}
 
 		self add-dependency on ga.
@@ -104,7 +123,7 @@ PhysicalControl : VirtualCreatures {
 		if running: 
 			self set-display-text to "Distance traveled: $dist" at-x -.95 at-y -.95.
 
-		self pivot-camera x 0 y 0.001.
+		self pivot-camera x 0 y 0.0001.
 
 		super iterate.
 
@@ -171,9 +190,10 @@ GeneticAlgorithm : SimsGA {
 	+ to start-fitness-test of o (object):
 		newOffset (vector).
 
-		newOffset = random[(40, 6, 40)] + (-20, 3, -20).
+		newOffset = random[(40, 2, 40)] + (-20, .15, -20).
+
 		if |newOffset| < 20: newOffset = 20 * newOffset/|newOffset|.
-		controller pan-camera-offset by newOffset steps 80.
+		controller pan-camera-offset by newOffset steps 200.
 
 		controller setup-test with o.
 
@@ -183,8 +203,6 @@ GeneticAlgorithm : SimsGA {
 		print "fitness of $o: ", (o get-fitness).
 
 		self archive-as-xml file "breveCreatures.xml".
-
-		print | all Objects |.
 }
 
 GeneticAlgorithmIndividual : SimsGAIndividual {
@@ -217,6 +235,8 @@ GeneticAlgorithmIndividual : SimsGAIndividual {
 		free genome.
 }
 
+@define MAXDEPTH 3.
+
 Object : MorphologyParser {
 
 	#
@@ -227,20 +247,27 @@ Object : MorphologyParser {
 		rootNode (object).
 		
 		rootNode = (self create-node from root with-level 1).
-		return (self parse from root with-level 1 with-link rootNode).
 
-	+ to parse from root (object) with-level n (int) with-link rootNode (object):
+		(self parse from root with-level 1 with-link rootNode).
+		# (self parse from root with-level 1 with-link rootNode flip 1).
+
+		return rootNode.
+
+	+ to parse from root (object) with-level n (int) with-link rootNode (object) flip f = 0 (int):
 		connectionParams, nodeParams, connections (list).
 		child, childNode, joint (object).
 		cpoint, ppoint, point, size, norm (vector).
-
-		if n > 3: return 0.
+		jointRange (float).
 
 		connections = (root get-connections).
 
 		nodeParams = (root get-parameters).
 		
 		size = 4 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|).
+
+		# Don't recurse more than 3 levels deep, and don't recurse if the node-parameter doesn't tell us to.
+
+		if n > MAXDEPTH || ( n > 1 && nodeParams{ 9 } < 0.0 ): return 0.
 
 		#
 		# This code has been refactored for 2.5 to create the parent link before
@@ -258,6 +285,9 @@ Object : MorphologyParser {
 
 				point = (connectionParams{0}, connectionParams{1}, connectionParams{2}).
 
+				if f:
+					point::x *= -1.
+
 				point::x *= size::x.
 				point::y *= size::y.
 				point::z *= size::z.
@@ -267,6 +297,9 @@ Object : MorphologyParser {
 
 				norm = (connectionParams{4}, connectionParams{5}, connectionParams{6}).
 				norm /= | norm |.
+
+				if f:
+					norm::x *= -1.
 
 				joint = new SineJoint.
 
@@ -279,11 +312,15 @@ Object : MorphologyParser {
 					parent rootNode.
 
 				joint set-phaseshift to 3.14 * connectionParams{7}.
-				joint set-double-spring with-strength 600 with-max 2.6 with-min -2.6.
-				joint set-strength-limit to 5000.
- 
+				joint set-frequency to 1 + connectionParams{8}.
+
+				jointRange = 0.7 + 2 * | connectionParams{ 9 } |.
+
+				joint set-double-spring with-strength 1000 with-max jointRange with-min -jointRange.
+				joint set-strength-limit to 4000.
 
 				self parse from (child get-target) with-level n + 1 with-link childNode.
+				# self parse from (child get-target) with-level n + 1 with-link childNode flip 1.
 			}
 		}
 
@@ -294,20 +331,22 @@ Object : MorphologyParser {
 		nodeParams (list).
 		size (vector).
   
-		if n > 3: return 0.
+		if n > MAXDEPTH: 
+			return 0.
   
 		rootNode = new Link.	
 		rootNode move to (0, 15, 0).
 		rootNode set-color to (5 - n) / 4.0 * (1, 1, 1).
 
-		rootNode set-color to random[(1, 1, 1)].
-
 		nodeParams = (root get-parameters).
 		
-		size = 4 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|).
+		size = 6 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|).
 
-		rootNode set-shape to (new Cube init-with size ((8 - n) / 7.0 * size)).
+		rootNode set-color to (|nodeParams{3}|, |nodeParams{4}|, |nodeParams{5}|).
 
+		rootNode set-shape to (new Cube init-with size ( (4 - n) / 3.0 * size) ).
+
+		rootNode set-texture-image to ( controller get-block-texture ).
 
 		return rootNode.
 }
@@ -317,14 +356,22 @@ RevoluteJoint : SineJoint (aka SineJoints) {
 
 	+ variables:
 		phaseshift (double).
+		frequency (double).
 		active (int).
+
+	+ to init:
+		phaseshift = 0.
+		frequency = 2.0.
 
 	+ to set-phaseshift to p (double):
 		phaseshift = p.
 
+	+ to set-frequency to f (double):
+		frequency = f.
+
 	+ to iterate:
 		if active: {
-			self set-joint-velocity to 1 * sin((controller get-time) * 2.0 + phaseshift).
+			self set-joint-velocity to sin( (controller get-time) * frequency + phaseshift ).
 		}
 
 	+ to activate:

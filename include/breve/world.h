@@ -243,7 +243,6 @@ class slWorld {
 
 		dWorldID 				_odeWorldID;
 		dJointGroupID 				_odeCollisionGroupID;
-		dJointGroupID 				_odeJointGroupID;
 		unsigned char 				_odeStepMode;
 
 		bool 					_detectCollisions;

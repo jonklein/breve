@@ -64,7 +64,8 @@ void slJoint::applyJointForce( slVector *force ) {
 			break;
 
 		default:
-			if ( _odeMotorID ) dJointAddAMotorTorques( _odeMotorID, force->x, force->y, force->z );
+			if ( _odeMotorID ) 
+				dJointAddAMotorTorques( _odeMotorID, force->x, force->y, force->z );
 
 			break;
 	}
@@ -121,7 +122,8 @@ void slJoint::breakJoint() {
 	slMultibody *parentBody = NULL, *childBody, *newMb;
 	std::vector<slJoint*>::iterator ji;
 
-	if ( !parent && !child ) return;
+	if ( !parent && !child ) 
+		return;
 
 	childBody = _child->_multibody;
 
@@ -130,12 +132,14 @@ void slJoint::breakJoint() {
 	if ( parent ) {
 		ji = std::find( parent->_outJoints.begin(), parent->_outJoints.end(), this );
 
-		if ( ji != parent->_outJoints.end() ) parent->_outJoints.erase( ji );
+		if ( ji != parent->_outJoints.end() ) 
+			parent->_outJoints.erase( ji );
 	}
 
 	ji = std::find( child->_inJoints.begin(), child->_inJoints.end(), this );
 
-	if ( ji != child->_inJoints.end() ) child->_inJoints.erase( ji );
+	if ( ji != child->_inJoints.end() ) 
+		child->_inJoints.erase( ji );
 
 	dJointAttach( _odeJointID, NULL, NULL );
 	dJointDestroy( _odeJointID );
@@ -151,7 +155,6 @@ void slJoint::breakJoint() {
 	memset( &_feedback, 0, sizeof( dJointFeedback ) );
 
 	_child = NULL;
-
 	_parent = NULL;
 
 	if ( parentBody ) parentBody->update();

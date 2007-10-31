@@ -51,10 +51,10 @@ int brIWorldLoadTigerFile( brEval args[], brEval *target, brInstance *i ) {
 }
 
 /**
-	\brief Enables or disables fast-physics.
-
-	setStepFast(int).
-*/
+ * \brief Enables or disables fast-physics.
+ *
+ * setStepFast(int).
+ */
 
 int brISetStepFast( brEval args[], brEval *target, brInstance *i ) {
 	i->engine->world->setPhysicsMode( BRINT( &args[0] ) );
@@ -389,10 +389,43 @@ int brICameraGetTarget( brEval args[], brEval *target, brInstance *i ) {
 }
 
 /**
-	\brief Sets the background color of the display.
+ * \brief Sets the skybox images.
+ * 
+ * vector setSkyboxImages().
+ */
 
-	vector setBackgroundColor().
-*/
+int brISetSkyboxImages( brEval args[], brEval *target, brInstance *i ) {
+	brEvalListHead *head = BRLIST( &args[ 0 ] );
+
+	std::vector< char* > paths;
+	const std::vector< brEval > &l = head -> getVector();
+
+	if( l.size() != 6 ) {
+		slMessage( DEBUG_ALL, "setSkyboxImages requires a list of six strings\n" );
+		return EC_ERROR;
+	}
+
+	for( unsigned int n = 0; n < l.size(); n++ ) {
+		const brEval *e = &l[ n ];
+
+		if( e -> type() != AT_STRING ) {
+			slMessage( DEBUG_ALL, "setSkyboxImages requires a list of six strings\n" );
+			return EC_ERROR;
+		}
+
+		char *image = brFindFile( i -> engine, BRSTRING( e ), NULL );
+
+		i -> engine -> world -> _skybox.loadImage( image, n );
+	}
+
+	return EC_OK;
+}
+
+/**
+ * \brief Sets the background color of the display.
+ * 
+ * vector setBackgroundColor().
+ */
 
 int brISetBackgroundColor( brEval args[], brEval *target, brInstance *i ) {
 	i->engine->world->setBackgroundColor( &BRVECTOR( &args[0] ) );
@@ -848,6 +881,7 @@ void breveInitWorldFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "setBackgroundTexture", brISetBackgroundTexture, AT_NULL, AT_INT, 0 );
 	brNewBreveCall( n, "setBackgroundImage", brISetBackgroundImage, AT_NULL, AT_INT, 0 );
 	brNewBreveCall( n, "setBackgroundTextureColor", brISetBackgroundTextureColor, AT_NULL, AT_VECTOR, 0 );
+	brNewBreveCall( n, "setSkyboxImages", brISetSkyboxImages, AT_NULL, AT_LIST, 0 );
 
 	brNewBreveCall( n, "setShadowCatcher", brISetShadowCatcher, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
 

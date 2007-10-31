@@ -59,7 +59,8 @@ slLink::slLink( slWorld *w ) : slWorldObject() {
 }
 
 slLink::~slLink() {
-	if ( _multibody && _multibody->getRoot() == this ) _multibody->setRoot( NULL );
+	if ( _multibody && _multibody->getRoot() == this ) 
+		_multibody->setRoot( NULL );
 
 	// This is a bad situation here: slJointBreak modifies the
 	// joint list.  I intend to fix this.
@@ -554,18 +555,18 @@ slJoint *slLink::link( slWorld *world, slLink *parent, int jointType, slVector *
 	switch ( jointType ) {
 
 		case JT_BALL:
-			joint->_odeJointID = dJointCreateBall( world->_odeWorldID, world->_odeJointGroupID );
+			joint->_odeJointID = dJointCreateBall( world->_odeWorldID, NULL );
 
-			joint->_odeMotorID = dJointCreateAMotor( world->_odeWorldID, world->_odeJointGroupID );
+			joint->_odeMotorID = dJointCreateAMotor( world->_odeWorldID, NULL );
 
 			dJointAttach( joint->_odeMotorID, cBodyID, pBodyID );
 
 			break;
 
 		case JT_UNIVERSAL:
-			joint->_odeJointID = dJointCreateUniversal( world->_odeWorldID, world->_odeJointGroupID );
+			joint->_odeJointID = dJointCreateUniversal( world->_odeWorldID, NULL );
 
-			joint->_odeMotorID = dJointCreateAMotor( world->_odeWorldID, world->_odeJointGroupID );
+			joint->_odeMotorID = dJointCreateAMotor( world->_odeWorldID, NULL );
 
 			dJointSetAMotorMode( joint->_odeMotorID, dAMotorEuler );
 
@@ -574,12 +575,12 @@ slJoint *slLink::link( slWorld *world, slLink *parent, int jointType, slVector *
 			break;
 
 		case JT_REVOLUTE:
-			joint->_odeJointID = dJointCreateHinge( world->_odeWorldID, world->_odeJointGroupID );
+			joint->_odeJointID = dJointCreateHinge( world->_odeWorldID, NULL );
 
 			break;
 
 		case JT_PRISMATIC:
-			joint->_odeJointID = dJointCreateSlider( world->_odeWorldID, world->_odeJointGroupID );
+			joint->_odeJointID = dJointCreateSlider( world->_odeWorldID, NULL );
 
 			dJointSetSliderParam( joint->_odeJointID, dParamHiStop, 2.0 );
 
@@ -588,7 +589,7 @@ slJoint *slLink::link( slWorld *world, slLink *parent, int jointType, slVector *
 			break;
 
 		case JT_FIX:
-			joint->_odeJointID = dJointCreateFixed( world->_odeWorldID, world->_odeJointGroupID );
+			joint->_odeJointID = dJointCreateFixed( world->_odeWorldID, NULL );
 
 			break;
 	}
