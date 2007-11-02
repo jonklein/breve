@@ -63,9 +63,9 @@ PhysicalControl : VirtualCreatures {
 		floor set-color to ( .4, .3, .3 ).
 
 		self set-skybox-images to { 
-			"lib/classes/images/MountainBoxFront.png", "lib/classes/images/MountainBoxBack.png", 
-			"lib/classes/images/MountainBoxLeft.png", "lib/classes/images/MountainBoxRight.png", 
-			"lib/classes/images/MountainBoxTop.png", "lib/classes/images/MountainBoxBottom.png" }.
+			"images/MountainBoxFront.png", "images/MountainBoxBack.png", 
+			"images/MountainBoxLeft.png", "images/MountainBoxRight.png", 
+			"images/MountainBoxTop.png", "images/MountainBoxBottom.png" }.
 
 		self enable-fast-physics.
 		self set-fast-physics-iterations to 20.
