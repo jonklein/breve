@@ -110,21 +110,37 @@ if test "x$python" != "x"; then
 	AC_CHECK_LIB([python23], [Py_Initialize])
 	AC_CHECK_LIB([python2.4], [Py_Initialize])
 	AC_CHECK_LIB([python24], [Py_Initialize])
+	AC_CHECK_LIB([python2.5], [Py_Initialize])
+	AC_CHECK_LIB([python25], [Py_Initialize])
 
 	if test "$ac_cv_lib_python2_3_Py_Initialize" = yes; then
 		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
+		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.3 -I/usr/include/python"
 	fi
 
 	if test "$ac_cv_lib_python23_Py_Initialize" = yes; then
 		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
+		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.3 -I/usr/include/python"
 	fi
 
 	if test "$ac_cv_lib_python2_4_Py_Initialize" = yes; then
 		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
+		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.4 -I/usr/include/python"
 	fi
 
 	if test "$ac_cv_lib_python24_Py_Initialize" = yes; then
 		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
+		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.4 -I/usr/include/python"
+	fi
+
+	if test "$ac_cv_lib_python2_5_Py_Initialize" = yes; then
+		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
+		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.5 -I/usr/include/python"
+	fi
+
+	if test "$ac_cv_lib_python25_Py_Initialize" = yes; then
+		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
+		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.5 -I/usr/include/python"
 	fi
 fi
 
@@ -319,6 +335,7 @@ fi
 AC_CHECK_LIB([png], [png_create_write_struct])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc],,AC_MSG_FAILURE([Missing GSL library -- see http://www.gnu.org/software/gsl/]))
 AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]))
+AC_CHECK_LIB([curl], [curl_easy_init])
 
 AC_CHECK_FUNCS([getopt_long gettimeofday iswspace mkstemp strdup vasprintf])
 
