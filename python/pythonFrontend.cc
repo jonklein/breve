@@ -22,7 +22,7 @@
 
 #ifdef HAVE_LIBPYTHON
 
-#include "python.h"
+#include "pythonFrontend.h"
 
 struct slPythonData {
 	PyObject *_vectorClass;
