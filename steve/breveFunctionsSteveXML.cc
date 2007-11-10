@@ -1,9 +1,9 @@
 #include "steve.h"
 #include "xml.h"
 
-/*!
-	\brief Archives an entire simulation to a file.
-*/
+/**
+ * \brief Archives an entire simulation to a file.
+ */
 
 int stCWriteXMLEngine( brEval args[], brEval *target, brInstance *i ) {
 	char *filename = BRSTRING( &args[0] );
@@ -16,11 +16,11 @@ int stCWriteXMLEngine( brEval args[], brEval *target, brInstance *i ) {
 	return EC_OK;
 }
 
-/*!
-	\brief Archives an instance to a string.
-*/
+/**
+ * \brief Archives an instance to a string.
+ */
 
-int stCArchiveXMLObject( brEval args[], brEval *target, brInstance *i ) {
+int brIXMLArchiveObjectToFile( brEval args[], brEval *target, brInstance *i ) {
 	char *filename = BRSTRING( &args[1] );
 	char *path = brOutputPath( i->engine, filename );
 
@@ -32,8 +32,23 @@ int stCArchiveXMLObject( brEval args[], brEval *target, brInstance *i ) {
 }
 
 /*!
-	\brief Dearchives and returns an instance from a file.
-*/
+ * \brief Archives an instance to a string.
+ */
+
+int brIXMLArchiveObjectToString( brEval args[], brEval *target, brInstance *i ) {
+	slStringStream *stream = slOpenStringStream();
+
+	brXMLWriteObjectToStream( BRINSTANCE( &args[0] ), stream -> fp, 0 );
+
+	target->set( slCloseStringStream( stream ) );
+
+	return EC_OK;
+}
+
+
+/**
+ * \brief Dearchives and returns an instance from a file.
+ */
 
 int stCDearchiveXMLObject( brEval args[], brEval *target, brInstance *i ) {
 	char *filename = brFindFile( i->engine, BRSTRING( &args[0] ), NULL );
@@ -64,9 +79,9 @@ int stCDearchiveXMLObject( brEval args[], brEval *target, brInstance *i ) {
 	return EC_OK;
 }
 
-/*!
-	\brief Dearchives and returns an instance from an XML string.
-*/
+/**
+ * \brief Dearchives and returns an instance from an XML string.
+ */
 
 int stCDearchiveXMLObjectFromString( brEval args[], brEval *target, brInstance *i ) {
 	brInstance *instance = brXMLDearchiveObjectFromString( i->engine, BRSTRING( &args[0] ) );
@@ -85,8 +100,10 @@ int stCDearchiveXMLObjectFromString( brEval args[], brEval *target, brInstance *
 }
 
 void breveInitXMLFuncs( brNamespace *n ) {
+	BRBREVECALL( n, brIXMLArchiveObjectToFile, AT_INT, AT_INSTANCE, AT_STRING );
+	BRBREVECALL( n, brIXMLArchiveObjectToString, AT_STRING, AT_INSTANCE );
+
 	brNewBreveCall( n, "writeXMLEngine", stCWriteXMLEngine, AT_INT, AT_STRING, 0 );
-	brNewBreveCall( n, "archiveXMLObject", stCArchiveXMLObject, AT_INT, AT_INSTANCE, AT_STRING, 0 );
 	brNewBreveCall( n, "dearchiveXMLObject", stCDearchiveXMLObject, AT_INSTANCE, AT_STRING, 0 );
 	brNewBreveCall( n, "dearchiveXMLObjectFromString", stCDearchiveXMLObjectFromString, AT_INSTANCE, AT_STRING, 0 );
 }

@@ -27,6 +27,9 @@
 /* Define to 1 if you have the `cmp' library (-lcmp). */
 #undef HAVE_LIBCMP
 
+/* Define to 1 if you have the `curl' library (-lcurl). */
+#undef HAVE_LIBCURL
+
 /* Define to 1 if you have the `ecl' library (-lecl). */
 #undef HAVE_LIBECL
 
@@ -102,11 +105,17 @@
 /* Define to 1 if you have the `python24' library (-lpython24). */
 #undef HAVE_LIBPYTHON24
 
+/* Define to 1 if you have the `python25' library (-lpython25). */
+#undef HAVE_LIBPYTHON25
+
 /* Define to 1 if you have the `python2.3' library (-lpython2.3). */
 #undef HAVE_LIBPYTHON2_3
 
 /* Define to 1 if you have the `python2.4' library (-lpython2.4). */
 #undef HAVE_LIBPYTHON2_4
+
+/* Define to 1 if you have the `python2.5' library (-lpython2.5). */
+#undef HAVE_LIBPYTHON2_5
 
 /* Define to 1 if you have the `qgame++' library (-lqgame++). */
 #undef HAVE_LIBQGAME__

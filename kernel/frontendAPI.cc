@@ -24,8 +24,8 @@ int brLoadFile( brEngine *engine, const char *code, const char *file ) {
 	brAddSearchPath( engine, dir );
 	slFree( dir );
 
-	for( unsigned int n = 0; n < engine->objectTypes.size(); n++ ) {
-		brObjectType *type = engine->objectTypes[ n ];
+	for( unsigned int n = 0; n < engine->_objectTypes.size(); n++ ) {
+		brObjectType *type = engine->_objectTypes[ n ];
 
 		if( type->load && type->canLoad && type->canLoad( type->userData, extension ) ) {
 			int r = type->load( engine, type->userData, file, code );
@@ -50,8 +50,8 @@ int brLoadFile( brEngine *engine, const char *code, const char *file ) {
 int brLoadSavedSimulation( brEngine *engine, const char *code, const char *file, const char *xmlfile ) {
 	char *extension = slFileExtension( file );
 
-	for( unsigned int n = 0; n < engine->objectTypes.size(); n++ ) {
-		brObjectType *type = engine->objectTypes[ n ];
+	for( unsigned int n = 0; n < engine->_objectTypes.size(); n++ ) {
+		brObjectType *type = engine->_objectTypes[ n ];
 
 		if( type->load && type->canLoad && type->canLoad( type->userData, extension ) ) {
 			int r = type->loadWithArchive( engine, type->userData, file, code, xmlfile );

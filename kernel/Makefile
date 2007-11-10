@@ -2,7 +2,9 @@ SRC	+= kernel/breveEval.cc kernel/breveObjectAPI.cc kernel/callback.cc \
 		kernel/color.cc kernel/engine.cc kernel/evalData.cc \
 		kernel/evalHash.cc kernel/evalList.cc kernel/frontendAPI.cc \
 		kernel/interface.cc kernel/internal.cc \
+		kernel/plugins.cc kernel/sound.cc kernel/url.cc \
 		kernel/internalFunctions/breveFunctionsCamera.cc \
+		kernel/internalFunctions/breveFunctionsURL.cc \
 		kernel/internalFunctions/breveFunctionsControl.cc \
 		kernel/internalFunctions/breveFunctionsDrawing.cc \
 		kernel/internalFunctions/breveFunctionsFile.cc \
@@ -33,5 +35,4 @@ SRC	+= kernel/breveEval.cc kernel/breveObjectAPI.cc kernel/callback.cc \
 		kernel/internalFunctions/breveFunctionsStationary.cc \
 		kernel/internalFunctions/breveFunctionsTerrain.cc \
 		kernel/internalFunctions/breveFunctionsWorld.cc \
-		kernel/multithread.cc kernel/namespace.cc kernel/network.cc \
-		kernel/plugins.cc kernel/sound.cc 
+		kernel/multithread.cc kernel/namespace.cc kernel/network.cc

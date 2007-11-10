@@ -71,7 +71,7 @@ int brIFreeSoundData( brEval args[], brEval *target, brInstance *i ) {
 */
 
 int brIPlaySoundData( brEval args[], brEval *target, brInstance *i ) {
-	i->engine->soundMixer->NewPlayer( BRSOUNDDATAPOINTER( &args[0] ), BRFLOAT( &args[1] ) );
+	i->engine->_soundMixer.NewPlayer( BRSOUNDDATAPOINTER( &args[0] ), BRFLOAT( &args[1] ) );
 	return EC_OK;
 }
 
@@ -83,7 +83,7 @@ int brIPlaySoundData( brEval args[], brEval *target, brInstance *i ) {
 
 int brINewSinewave( brEval args[], brEval *target, brInstance *i ) {
 
-	target->set( i->engine->soundMixer->NewSinewave( BRINT( &args[0] ) ) );
+	target->set( i->engine->_soundMixer.NewSinewave( BRINT( &args[0] ) ) );
 
 	return EC_OK;
 }

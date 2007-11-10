@@ -366,9 +366,9 @@ int breveFunctionPushCodeFirstFloat( brEval arguments[], brEval *result, brInsta
 */
 
 int breveFunctionPushSetNth( brEval arguments[], brEval *result, brInstance *instance ) {
-	pushlang::Code *dst = ( pushlang::Code* )BRPOINTER( &arguments[ 0 ] );
-	pushlang::Code *src = ( pushlang::Code* )BRPOINTER( &arguments[ 1 ] );
-	int nth = BRINT( &arguments[ 2 ] );
+	// pushlang::Code *dst = ( pushlang::Code* )BRPOINTER( &arguments[ 0 ] );
+	// pushlang::Code *src = ( pushlang::Code* )BRPOINTER( &arguments[ 1 ] );
+	// int nth = BRINT( &arguments[ 2 ] );
 
 	// const pushlang::CodeArray& dststack = dst->get_stack();
 	// dststack[ nth ] = src;
@@ -383,9 +383,9 @@ int breveFunctionPushSetNth( brEval arguments[], brEval *result, brInstance *ins
 */
 
 int breveFunctionPushSetFromNth( brEval arguments[], brEval *result, brInstance *instance ) {
-	pushlang::Code *dst = ( pushlang::Code* )BRPOINTER( &arguments[ 0 ] );
-	pushlang::Code *src = ( pushlang::Code* )BRPOINTER( &arguments[ 1 ] );
-	int nth = BRINT( &arguments[ 2 ] );
+	// pushlang::Code *dst = ( pushlang::Code* )BRPOINTER( &arguments[ 0 ] );
+	// pushlang::Code *src = ( pushlang::Code* )BRPOINTER( &arguments[ 1 ] );
+	// int nth = BRINT( &arguments[ 2 ] );
 
 	// const CodeArray& dststack = src->get_stack();
 	// dststack[ nth ] = src;

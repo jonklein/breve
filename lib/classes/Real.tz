@@ -11,30 +11,28 @@ Object : Real (aka Reals) [version 2.1] {
 	+ variables:
 		archiveLocation (vector).
 		archiveRotation (matrix).
+
+		archiveTextureImage (object).
+		archiveLightmapImage (object).
+		archiveBitmapImage (object).
+		archiveTextureScaleX, archiveTextureScaleY (float).
   
 		displayShape, collisionShape (object).
 		realWorldPointer (pointer).
 		collisionHandlerList (list).
-		texture (int).
-		lightmap (int).
-		bitmap (int).
+
 		menus (list).
 		color (vector).
 		lines (list).
 
-		textureScaleX, textureScaleY (float).
 		neighborhoodSize (float).
 
 		e (float).
 		mu (float).
 
 	+ to init:
-		texture = -1.
-		lightmap = -1.
-		bitmap = -1.
-
-		textureScaleX = 16.
-		textureScaleY = 16.
+		archiveTextureScaleX = 16.
+		archiveTextureScaleY = 16.
 
 		self set-color to ( 1, 1, 1 ).
 
@@ -436,20 +434,24 @@ Object : Real (aka Reals) [version 2.1] {
 	- to set-texture to textureNumber (int):
 		% Deprecated -- use METHOD(set-texture-image) instead.
 
-		texture = textureNumber.
-		realSetTexture(realWorldPointer, textureNumber + 1).
+		print "set-texture is deprecated: use set-texture-image instead".
+
+		realSetTexture( realWorldPointer, textureNumber ).
 
 	+ to set-texture-image to textureImage (object):
 		% Changes the texture of this object to textureImage, an instance of 
 		% class Image.  If textureImage is NULL texturing is turned off for 
 		% the object.
 
-		if !textureImage: 
-			texture = -1.
-		else 
-			texture = (textureImage get-texture-number).
-
-		realSetTexture(realWorldPointer, texture).
+		if archiveTextureImage:
+			self remove-dependency on archiveTextureImage.
+		
+		if textureImage: {
+			archiveTextureImage = textureImage.
+			self add-dependency on textureImage.
+			realSetTexture( realWorldPointer, (textureImage get-texture-number) ).
+		} else:
+			realSetTexture( realWorldPointer, 0 ).
 
 	+ to draw-as-point:
 		% Draws the object as a single point.  This is by far the fastest way
@@ -467,39 +469,41 @@ Object : Real (aka Reals) [version 2.1] {
 		% For smaller objects, this number will have to be decreased, or else
 		% the texture will be too big and will not be visible.
 
-		textureScaleX = scaleSize.
+		archiveTextureScaleX = scaleSize.
 		realSetTextureScale(realWorldPointer, scaleSize, scaleSize).
 
 	+ to set-texture-scale-x to scaleSize (float):
 		% Sets the texture scale in the X dimension.  The Y texture scale 
 		% value is unchanged.  See METHOD(set-texture-scale) for more information.
 
-		textureScaleX = scaleSize.
-		realSetTextureScale(realWorldPointer, scaleSize, textureScaleY).
+		archiveTextureScaleX = scaleSize.
+		realSetTextureScale(realWorldPointer, scaleSize, archiveTextureScaleY).
 
 	+ to set-texture-scale-y to scaleSize (float):
 		% Sets the texture scale in the Y dimension.  The X texture scale 
 		% value is unchanged.  See METHOD(set-texture-scale) for more information.
-		textureScaleY = scaleSize.
-		realSetTextureScale(realWorldPointer, textureScaleX, scaleSize).
+		archiveTextureScaleY = scaleSize.
+		realSetTextureScale(realWorldPointer, archiveTextureScaleX, scaleSize).
 
 	+ to set-bitmap-image to bitmapImage (object):
 		% Changes the bitmap of this object to bitmapImage, an instance of 
 		% class image.  If bitmapImage is NULL, bitmapping is turned off
 		% for the object.
 
-		if !bitmapImage: 
-			bitmap = -1.
-		else 
-			bitmap = (bitmapImage get-texture-number).
+		if archiveBitmapImage:
+			self remove-dependency on archiveBitmapImage.
 
-		realSetBitmap(realWorldPointer, bitmap).
-		
+		if bitmapImage: {
+			archiveBitmapImage = bitmapImage.
+			self add-dependency on bitmapImage.
+			realSetBitmap(realWorldPointer, (bitmapImage get-texture-number) ).
+		} else:
+			realSetBitmap(realWorldPointer, 0 ).
+
 	- to set-bitmap to textureNumber (int):
 		% Deprecated.
 
-		bitmap = textureNumber.
-		realSetBitmap(realWorldPointer, textureNumber + 1).
+		realSetBitmap(realWorldPointer, textureNumber ).
 
 	+ to set-bitmap-heading to radianAngle (float):
 		% If this object is in 2d bitmap mode, the rotation of the 
@@ -534,17 +538,20 @@ Object : Real (aka Reals) [version 2.1] {
 		% shapes can be textured, but only spheres can be made into 
 		% lightmaps.
 
-		if !lightmapImage: lightmap = -1.
-		else lightmap = (lightmapImage get-texture-number).
+		if archiveLightmapImage:
+			self remove-dependency on archiveLightmapImage.
 
-		realSetLightmap(realWorldPointer, lightmap).
+		if lightmapImage: {
+			archiveLightmapImage = lightmapImage.
+			self add-dependency on lightmapImage.
+			realSetLightmap(realWorldPointer, ( lightmapImage get-texture-number ) ).
+		} else: 
+			realSetLightmap(realWorldPointer, 0 ).
 
 	- to set-lightmap to textureNumber (int):
 		% Deprecated.
 
-		lightmap = textureNumber.
-
-		realSetLightmap(realWorldPointer, lightmap + 1).
+		realSetLightmap( realWorldPointer, textureNumber ).
 
   + section "Getting the Light Exposure of this Mobile Object"
 		
@@ -594,17 +601,17 @@ Object : Real (aka Reals) [version 2.1] {
 			if handler{2}: setIgnoreCollisionsWith(self, handler{0}, 1).
 		}
 
-		if texture > -1: 
-			self set-texture to texture.
+		if archiveTextureImage:
+			self set-texture-image to archiveTextureImage.
 
-		if lightmap > -1: 
-			self set-lightmap to lightmap.
+		if archiveLightmapImage: 
+			self set-lightmap to archiveLightmapImage.
 
-		if bitmap > -1: 
-			self set-bitmap to bitmap.
+		if archiveBitmapImage: 
+			self set-bitmap-image to archiveBitmapImage.
 
-		self set-texture-scale-x to textureScaleX.
-		self set-texture-scale-y to textureScaleY.
+		self set-texture-scale-x to archiveTextureScaleX.
+		self set-texture-scale-y to archiveTextureScaleY.
 		self set-neighborhood-size to neighborhoodSize.
 		self set-color to color.
 

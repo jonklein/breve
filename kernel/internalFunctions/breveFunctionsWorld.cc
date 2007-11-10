@@ -220,7 +220,7 @@ int brIWorldStep( brEval args[], brEval *target, brInstance *i ) {
 	double stepSize = BRDOUBLE( &args[1] );
 	int error;
 
-	i->engine->iterationStepSize = totalTime;
+	i->engine->_iterationStepSize = totalTime;
 
 	target->set( i->engine->world->runWorld( totalTime, stepSize, &error ) );
 

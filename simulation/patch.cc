@@ -393,15 +393,15 @@ void slPatchGrid::drawWithout3DTexture( slCamera *camera ) {
 
 	xMid = ( int )(( origin.x - startPosition.x ) / patchSize.x );
 	if ( xMid < 0 ) xMid = 0;
-	if ( xMid >= ( unsigned int )_xSize ) xMid = _xSize - 1;
+	if ( xMid >= (int)_xSize ) xMid = _xSize - 1;
 
 	yMid = ( int )(( origin.y - startPosition.y ) / patchSize.y );
 	if ( yMid < 0 ) yMid = 0;
-	if ( yMid >= ( unsigned int )_ySize ) yMid = _ySize - 1;
+	if ( yMid >= (int)_ySize ) yMid = _ySize - 1;
 
 	zMid = ( int )(( origin.z - startPosition.z ) / patchSize.z );
 	if ( zMid < 0 ) zMid = 0;
-	if ( zMid >= ( unsigned int )_zSize ) zMid = _zSize - 1;
+	if ( zMid >= (int)_zSize ) zMid = _zSize - 1;
 
 	glEnable( GL_BLEND );
 

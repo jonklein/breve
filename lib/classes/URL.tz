@@ -1,0 +1,18 @@
+
+@use Abstract.
+
+Abstract : URL {
+	% URL is a class used for sending and receiving data with URLs.  To fetch
+	% data from an http:// of ftp:// URL, use METHOD(get).  To put data to 
+	% a web server via the HTTP PUT protocol, use METHOD(put).
+
+	+ to put put-data dataString (string) to urlString (string):
+		% Puts data to a URL using the HTTP PUT protocol.  Returns any data sent from the server, or an
+		% empty string if there was no data or an error occurred.
+		return brIURLPut( urlString, dataString ).
+
+	+ to get url urlString (string):
+		% Fetches a URL using the HTTP GET protocol.  Returns any data sent from the server, or an
+		% empty string if there was no data or an error occurred.
+		return brIURLGet( urlString ).
+}

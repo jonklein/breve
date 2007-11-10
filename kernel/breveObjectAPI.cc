@@ -16,7 +16,7 @@
  */
 
 void brEngineRegisterObjectType( brEngine *e, brObjectType *t ) {
-	e->objectTypes.push_back( t );
+	e->_objectTypes.push_back( t );
 }
 
 /**
@@ -99,7 +99,7 @@ brObject *brObjectFindWithTypeSignature( brEngine *inEngine, const char *inTypen
 
 	// try the object finder for this type
 
-	for ( oi = inEngine->objectTypes.begin(); oi != inEngine->objectTypes.end(); oi++ ) {
+	for ( oi = inEngine->_objectTypes.begin(); oi != inEngine->_objectTypes.end(); oi++ ) {
 		brObjectType *type = *oi;
 		void *pointer = NULL;
 
@@ -157,7 +157,7 @@ brObject *brObjectFindWithPreferredType( brEngine *e, const char *name, int inSi
 brObject *brUnknownObjectFind( brEngine *e, const char *name ) {
 	std::vector<brObjectType*>::iterator oi;
 
-	for ( oi = e->objectTypes.begin(); oi != e->objectTypes.end(); oi++ ) {
+	for ( oi = e->_objectTypes.begin(); oi != e->_objectTypes.end(); oi++ ) {
 		brObjectType *type = *oi;
 		void *pointer = NULL;
 
@@ -610,7 +610,7 @@ void brInstanceFree( brInstance *i ) {
 
 	i->userData = NULL;
 
-	i->engine->freedInstances.push_back( i );
+	i->engine->_freedInstances.push_back( i );
 }
 
 /**

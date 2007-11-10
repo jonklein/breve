@@ -45,11 +45,10 @@ Abstract : Control (aka Controls) [version 2.3] {
 		fogColor (vector).
 		lightAmbientColor, lightDiffuseColor (vector).
 
-		backgroundTexture (int).
+		archivedSkyboxImageList (list).
+		archivedBackgroundTextureImage (object).
 
 		fogIntensity (float).
-
-		loadedImages (list).
 
 		# we need to know when shadows and reflections are legal...
 
@@ -82,6 +81,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		genericShape (object).	
 		genericLinkShape (object).
+		stationaryTexture (object).
 
 		movie (object).
 		movieMenu (object).
@@ -96,6 +96,9 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		cameraPointer = getMainCameraPointer().
 
+		stationaryTexture = new Image.
+		stationaryTexture load from "lib/classes/images/noise.png".
+
 		camera = new Camera.
 		self add-dependency on camera.
 		camera set-camera-pointer to cameraPointer.
@@ -105,8 +108,6 @@ Abstract : Control (aka Controls) [version 2.3] {
 		self set-integration-step to .005.
 		self set-iteration-step to .05.
 		self enable-draw-every-frame.
-
-		backgroundTexture = -1.
 
 		self set-background-color to (.5, .7, 1.0).
 		self set-fog-color to (.8, .8, .8).
@@ -159,6 +160,9 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 	- to parse-xml-network-request from-string s (string):
 		return dearchiveXMLObjectFromString(s).
+
+	- to get-stationary-texture:
+		return stationaryTexture.
 
 	- to get-generic-shape:
 		% Returns a "generic" shape for agents, a sphere of radius 1.0.
@@ -422,8 +426,9 @@ Abstract : Control (aka Controls) [version 2.3] {
 		% the front, back, left, right, top and bottom skybox images respectively.
 		% The skybox will not be drawn unless all images load successfully.
 
-		setSkyboxImages( imageList ).
+		archivedSkyboxImageList = imageList.
 
+		setSkyboxImages( imageList ).
 
 	+ to set-background-scroll-rate x xValue (float) y yValue (float):
 		% Sets the rate of the background image scrolling.  Purely cosmetic.
@@ -442,15 +447,19 @@ Abstract : Control (aka Controls) [version 2.3] {
 		% METHOD(load-image).  Setting the texture to -1 will turn off 
 		% background texturing.
 
-		# For dumb legacy reasons, we increment the background-texture number by 1 in set-background-texture,
-		# so take away 1 here to componsate during dearchiving.
+		if archivedBackgroundTextureImage:
+			self remove-dependency on archivedBackgroundTextureImage.
 
-		backgroundTexture = ( newTextureImage get-texture-number ) - 1.
+		archivedBackgroundTextureImage = newTextureImage.
+
+		self add-dependency on archivedBackgroundTextureImage.
+
 		setBackgroundTexture( ( newTextureImage get-texture-number ) ).
 
 	- to set-background-texture to newTexture (int):
-		backgroundTexture = newTexture.
-		setBackgroundTexture(newTexture + 1).
+		print "set-background-texture is deprecated, use set-background-texture-image instead".
+
+		setBackgroundTexture( newTexture ).
 
   + section "Camera & Lighting Options"
 
@@ -1033,13 +1042,13 @@ Abstract : Control (aka Controls) [version 2.3] {
 		image = new Image.
 
 		if (image load from file): {
-			push file onto loadedImages.
+			self add-dependency on image.
 		} else {
 			free image.
 			return -1.
 		}
 
-		return (image get-texture-number) - 1.
+		return (image get-texture-number).
 
 	- to load-image-without-alpha from file (string):
 		% Deprecated.
@@ -1127,33 +1136,25 @@ Abstract : Control (aka Controls) [version 2.3] {
 	+ to archive:
 		camTarget = cameraGetTarget().
 		camOffset = cameraGetOffset().
-		print loadedImages.
 
 		return (super archive).
 
 	+ to dearchive:
-		image (string).
-		images (list).
-
 		cameraPointer = getMainCameraPointer().
 		camera set-camera-pointer to cameraPointer.
 
-		images = copylist( loadedImages ).
+		if | archivedSkyboxImageList | == 6:
+			self set-skybox-images to archivedSkyboxImageList.
 
-		loadedImages = {}.
-
-		foreach image in images: 
-			(self load-image from image).
+		if archivedBackgroundTextureImage:
+			self set-background-texture-image to archivedBackgroundTextureImage.
 
 		self move-light to lightPosition.
 
-		self set-background-texture to backgroundTexture.
 		self set-background-color to backgroundColor.
 		self set-fog-color to fogColor.
 		self point-camera at camTarget from camOffset.
 		self set-blur-factor to blurFactor.
-
-		print backgroundColor, fogColor , backgroundTexture.
 
 		if lightFlag == 1: self enable-lighting.
 		if shadowFlag == 1: self enable-shadows.

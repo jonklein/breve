@@ -250,9 +250,8 @@ class slBigVector {
     public:
 		virtual ~slBigVector() { };
     
-        virtual float get(const int x) const = 0;
-
-        virtual void set(const int x, const float value) = 0;
+        virtual float get( const unsigned int x ) const = 0;
+        virtual void  set( const unsigned int x, const float value ) = 0;
 
 };
 
@@ -282,9 +281,9 @@ class slBigMatrix2D : public slBigMatrix {
 /*
  *  virtual is apparently not supported by gcc 3.2 or 3.3
  */    
-        virtual float get(const int x, const int y) const = 0;
+        virtual float get( const unsigned int x, const unsigned int y ) const = 0;
 
-        virtual void set(const int x, const int y, const float value) = 0;
+        virtual void set( const unsigned int x, const unsigned int y, const float value ) = 0;
 
         virtual slBigVectorGSL& vectorMultiply(const slVectorViewGSL& vector) const = 0;
         
@@ -324,9 +323,8 @@ class slBigMatrix3D : public slBigMatrix {
 /*
  *  virtual is apparently not supported by gcc 3.2 or 3.3
  */
-        virtual float get(int x, int y, int z) const = 0;
-
-        virtual void set(int x, int y, int z, float value) = 0;
+        virtual float get( const unsigned int x, const unsigned int y, const unsigned int z ) const = 0;
+        virtual void  set( const unsigned int x, const unsigned int y, const unsigned int z, float value ) = 0;
                 
 /*
 */
@@ -360,7 +358,7 @@ class slVectorViewGSL : public slVectorView {
 		/**
 		 *    Vector length constructor.
 		 */
-		slVectorViewGSL(const int length);
+		slVectorViewGSL( const unsigned int length );
 		
 		/**
 		 *    Copy constructor
@@ -371,18 +369,8 @@ class slVectorViewGSL : public slVectorView {
 		/**
 		 *    Sub-Vector Copy constructor
 		 */
-        slVectorViewGSL(const slVectorViewGSL& other, const int offset, const int length);     
+        slVectorViewGSL( const slVectorViewGSL& other, const int offset, const unsigned int length );
 
-		/**
-		 *    Vector View constructor
-		 */
-        //slVectorViewGSL(gsl_vector_float* other);     
-
-		/**
-		 *    Sub-Vector View constructor
-		 */
-        //slVectorViewGSL(gsl_vector_float* other, const int offset, const int stride, const int length);     
-        
         /**
          *  Destructor
          */
@@ -540,35 +528,31 @@ class slVectorViewGSL : public slVectorView {
 		gsl_vector_float* _vec;
 		gsl_block_float* _block;
 		bool _view;
-		int _dim;
+		unsigned int _dim;
         
 };
 
 class slBigVectorGSL : public slBigVector, public slVectorViewGSL {
     public:
     
-        slBigVectorGSL(const int x);
+        slBigVectorGSL( const unsigned int x );
         
         slBigVectorGSL(const slBigVectorGSL& other);
         
         // TODO: this is a vew constructor--needs to be changed **********
-        slBigVectorGSL(const slVectorViewGSL& other, const int offset, const int length);
-        //slBigVectorGSL(gsl_vector_float* other);
-        
-        //slBigVectorGSL(gsl_vector_float* other, const int offset, const int stride, const int length);
+        slBigVectorGSL(const slVectorViewGSL& other, const int offset, const unsigned int length );
 
         ~slBigVectorGSL();
         
-        float get(const int x) const;
-        
-        void set(const int x, const float value);
+        float get( const unsigned int x ) const;
+        void  set( const unsigned int x, const float value );
 
 };
 
 class slBigMatrix2DGSL : public slBigMatrix2D, public slVectorViewGSL {
     public:
         
-        slBigMatrix2DGSL(const int x, const int y);
+        slBigMatrix2DGSL( const unsigned int x, const unsigned int y );
                 
 		slBigMatrix2DGSL(const slBigMatrix2DGSL& other);
 
@@ -578,21 +562,16 @@ class slBigMatrix2DGSL : public slBigMatrix2D, public slVectorViewGSL {
         
         unsigned int yDim() const;
 
-        float get(const int x, const int y) const;
-
-        void set(const int x, const int y, const float value);
+        float get( const unsigned int x, const unsigned int y ) const;
+        void  set( const unsigned int x, const unsigned int y, const float value );
         
-        //slBigVectorGSL& getRowVector(const int x);
+        float getRowMagnitude( const unsigned int x );
         
-        float getRowMagnitude(const int x);
+        slBigMatrix2DGSL& inPlaceRowMultiply( const unsigned int x, const float scalar );
         
-        slBigMatrix2DGSL& inPlaceRowMultiply(const int x, const float scalar);
+        float getColumnMagnitude( const unsigned int y );
         
-        //slBigVectorGSL& getColumnVector(const int y);
-        
-        float getColumnMagnitude(const int y);
-        
-        slBigMatrix2DGSL& inPlaceColumnMultiply(const int y, const float scalar);
+        slBigMatrix2DGSL& inPlaceColumnMultiply( const unsigned int y, const float scalar );
         
         slBigVectorGSL& vectorMultiply(const slVectorViewGSL& vector) const;
 
@@ -602,13 +581,6 @@ class slBigMatrix2DGSL : public slBigMatrix2D, public slVectorViewGSL {
         
         slBigMatrix2DGSL& vectorMultiplyInto(const slVectorViewGSL& sourceVector, const float scalar, slVectorViewGSL& resultVector);
 
-/*        
-        slBigMatrix2DGSL& inPlaceConvolve(const slBigMatrix2D& kernel);
-
-        slBigMatrix2DGSL& convolvePeriodic(const slBigMatrix2D& kernel);
-
-        slBigMatrix2DGSL& convolve3x3(const slBigMatrix2D& kernel);
-*/       
     protected:
     
         unsigned int _xdim, _ydim;
@@ -623,7 +595,7 @@ class slBigMatrix2DGSL : public slBigMatrix2D, public slVectorViewGSL {
 class slBigMatrix3DGSL : public slBigMatrix3D, public slVectorViewGSL {
     public:
 	
-		slBigMatrix3DGSL(const int x, const int y, const int z);
+		slBigMatrix3DGSL( const unsigned int x, const unsigned int y, const unsigned int z );
 		
 		slBigMatrix3DGSL(const slBigMatrix3DGSL& other);
 		
@@ -635,15 +607,9 @@ class slBigMatrix3DGSL : public slBigMatrix3D, public slVectorViewGSL {
         
         unsigned int zDim() const;
 
-        float get(const int x, const int y, const int z) const;
+        float get( const unsigned int x, const unsigned int y, const unsigned int z ) const;
+        void  set( const unsigned int x, const unsigned int y, const unsigned int z, const float value );
 
-        void set(const int x, const int y, const int z, const float value);
-
-/*        
-        slBigMatrix3DGSL& convolve(const slBigMatrix3D& kernel);
-
-        slBigMatrix3DGSL& convolvePeriodic(const slBigMatrix3D& kernel);
-*/    
     protected:
 
 		unsigned int _xdim, _ydim, _zdim;

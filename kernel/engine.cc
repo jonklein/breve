@@ -53,16 +53,16 @@ brEvent::~brEvent() {
 }
 
 /**
- * \brief Creates a brEngine structure with argc and argv values filled in.
+ * \brief Creates a brEngine structure with _argc and _argv values filled in.
  *
  * Creates and initializes the bloated brEngine structure.  This is the first step in starting a breve simulation.
  */
 
-brEngine *brEngineNewWithArguments( int inArgc, char **inArgv ) {
+brEngine *brEngineNewWithArguments( int inArgc, const char **inArgv ) {
 	brEngine *e = brEngineNew();
 
-	e->argc = inArgc;
-	e->argv = inArgv;
+	e->_argc = inArgc;
+	e->_argv = inArgv;
 
 	return e;
 }
@@ -101,8 +101,8 @@ brEngine *brEngineNew( void ) {
 	gsl_set_error_handler_off();
 #endif
 
-	e->argc = 0;
-	e->argv = NULL;
+	e->_argc = 0;
+	e->_argv = NULL;
 
 	e->updateMenu = NULL;
 	e->getSavename = NULL;
@@ -120,14 +120,9 @@ brEngine *brEngineNew( void ) {
 
 	e->RNG = gsl_rng_alloc( gsl_rng_mt19937 );
 
-	e->simulationWillStop = 0;
+	e->_simulationWillStop = 0;
 
 	e->camera = new slCamera( 400, 400 );
-
-#if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
-	Pa_Initialize();
-	e->soundMixer = new brSoundMixer();
-#endif
 
 	e->nThreads = 1;
 
@@ -137,9 +132,9 @@ brEngine *brEngineNew( void ) {
 	// can just use stderr.
 
 #if MACOSX
-	e->logFile = funopen( e, NULL, brFileLogWrite, NULL, NULL );
+	e->_logFile = funopen( e, NULL, brFileLogWrite, NULL, NULL );
 #else
-	e->logFile = stderr;
+	e->_logFile = stderr;
 #endif
 
 	e->drawEveryFrame = 1;
@@ -282,17 +277,6 @@ brEngine::~brEngine() {
 	std::vector<brInstance*>::iterator bi;
 	std::vector<void*>::iterator wi;
 
-#if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
-
-	if ( soundMixer ) delete soundMixer;
-
-#endif
-
-#if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
-	Pa_Terminate();
-
-#endif
-
 	gsl_rng_free( RNG );
 
 	for ( bi = instances.begin(); bi != instances.end(); bi++ )
@@ -312,7 +296,7 @@ brEngine::~brEngine() {
 	for ( wi = windows.begin(); wi != windows.end(); wi++ )
 		freeWindowCallback( *wi );
 
-	for ( bi = freedInstances.begin(); bi != freedInstances.end(); bi++ )
+	for ( bi = _freedInstances.begin(); bi != _freedInstances.end(); bi++ )
 		delete *bi;
 
 	brNamespaceFreeWithFunction( internalMethods, ( void( * )( void* ) )brFreeBreveCall );
@@ -322,8 +306,8 @@ brEngine::~brEngine() {
 	for ( oi = objects.begin(); oi != objects.end(); oi++ )
 		if ( oi->second ) brObjectFree( oi->second );
 
-	for( unsigned int i = 0; i < objectTypes.size(); i++ ) {
-		brObjectType *t = objectTypes[ i ];
+	for( unsigned int i = 0; i < _objectTypes.size(); i++ ) {
+		brObjectType *t = _objectTypes[ i ];
 
 		if( t )
 			delete t;
@@ -515,7 +499,7 @@ int brEngineIterate( brEngine *e ) {
 
 	double oldAge = e->world->getAge();
 
-	while ( !e->events.empty() && ( oldAge + e->iterationStepSize ) >= e->events.back()->_time ) {
+	while ( !e->events.empty() && ( oldAge + e->_iterationStepSize ) >= e->events.back()->_time ) {
 		event = e->events.back();
 
 		if ( event->_instance->status == AS_ACTIVE ) {
@@ -545,9 +529,10 @@ int brEngineIterate( brEngine *e ) {
 
 	pthread_mutex_unlock( &e->lock );
 
-	fflush( e->logFile );
+	fflush( e->_logFile );
 
-	if ( e->simulationWillStop ) return EC_STOP;
+	if ( e->_simulationWillStop ) 
+		return EC_STOP;
 
 	return EC_OK;
 }

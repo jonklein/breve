@@ -30,6 +30,8 @@
 brSoundMixer::brSoundMixer() {
 	int error;
 
+	Pa_Initialize();
+
 	_streamShouldEnd = false;
 	_stream = NULL;
 
@@ -49,6 +51,8 @@ brSoundMixer::~brSoundMixer() {
 	if ( _stream ) Pa_CloseStream( _stream );
 
 	_players.clear();
+
+	Pa_Terminate();
 }
 
 brSoundPlayer *brSoundMixer::NextPlayer() {

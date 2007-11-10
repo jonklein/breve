@@ -42,7 +42,7 @@ void slGSLErrorHandler( const char * reason, const char * file, int line, int gs
  *  @param length the length of the vector.
  */
 
-slVectorViewGSL::slVectorViewGSL( const int length ) :   _vec( gsl_vector_float_alloc( length ) ) {
+slVectorViewGSL::slVectorViewGSL( const unsigned int length ) :   _vec( gsl_vector_float_alloc( length ) ) {
 	_block 	= _vec->block;
 	_dim 	= _vec->size;
 
@@ -67,7 +67,7 @@ slVectorViewGSL::slVectorViewGSL( const slVectorViewGSL& other ) :   _vec( gsl_v
  *
  *  @param other the number of elements in the matrix.
  */
-slVectorViewGSL::slVectorViewGSL( const slVectorViewGSL& other, const int offset,  const int length ) : _vec( gsl_vector_float_alloc( other._dim ) ) {
+slVectorViewGSL::slVectorViewGSL( const slVectorViewGSL& other, const int offset,  const unsigned int length ) : _vec( gsl_vector_float_alloc( other._dim ) ) {
 	_block = _vec->block;
 	_dim =  other._dim;
 	gsl_blas_scopy( other._vec, _vec );
@@ -135,7 +135,7 @@ inline unsigned int slVectorViewGSL::dim() const {
  */
 inline float slVectorViewGSL::sum() const {
 	float result = 0;
-	int i;
+	unsigned int i;
 
 	for ( i = 0; i < _dim; i++ ) {
 		result += _vec->data[i];
@@ -241,7 +241,7 @@ float slVectorViewGSL::dotProduct( const slVectorView& other ) const {
  *  outer product
  */
 slBigMatrix2DGSL& slVectorViewGSL::outerProduct( const slVectorView& other ) const {
-	int i, j;
+	unsigned int i, j;
 	float  *v = _vec->data;
 	float  *u = other.getGSLVector()->data;
 	slBigMatrix2DGSL* result = new slBigMatrix2DGSL( _dim, other.dim() );
@@ -259,7 +259,7 @@ slBigMatrix2DGSL& slVectorViewGSL::outerProduct( const slVectorView& other ) con
  *  outer product
  */
 slBigMatrix2DGSL& slVectorViewGSL::outerProductInto( const slVectorView& other, slBigMatrix2DGSL& result ) const {
-	int i, j;
+	unsigned int i, j;
 	float  *v = _vec->data;
 	float  *u = other.getGSLVector()->data;
 
@@ -350,7 +350,7 @@ float slVectorViewGSL::magnitude() const {
 /**
  *  Base 1D matrix/vector class using GSL
  */
-slBigVectorGSL::slBigVectorGSL( const int x )
+slBigVectorGSL::slBigVectorGSL( const unsigned int x )
 		: slVectorViewGSL( x ) {
 }
 
@@ -364,7 +364,7 @@ slBigVectorGSL::slBigVectorGSL( const slBigVectorGSL& other )
 /**
  *
  */
-slBigVectorGSL::slBigVectorGSL( const slVectorViewGSL& other, const int offset, const int length )
+slBigVectorGSL::slBigVectorGSL( const slVectorViewGSL& other, const int offset, const unsigned int length )
 		: slVectorViewGSL( other, offset, length ) {
 }
 
@@ -387,9 +387,10 @@ slBigVectorGSL::~slBigVectorGSL() {}
  *
  */
 //inline
-float slBigVectorGSL::get( const int inX ) const {
-		if( *(unsigned int*)&_vec->data[ inX ] == 0x55555555 )
-			printf(" Got 0x55 in matrix\n" );
+float slBigVectorGSL::get( const unsigned int inX ) const {
+		// if( *(unsigned int*)&_vec->data[ inX ] == 0x55555555 )
+		// 	printf(" Got 0x55 in matrix\n" );
+
 		return _vec->data[ inX ];
 	}
 
@@ -397,8 +398,9 @@ float slBigVectorGSL::get( const int inX ) const {
  *
  */
 //inline
-void slBigVectorGSL::set( const int inX, const float value ) {
-	if ( inX > _dim ) throw slException( "Vector index out of bounds" );
+void slBigVectorGSL::set( const unsigned int inX, const float value ) {
+	if ( inX > _dim ) 
+		throw slException( "Vector index out of bounds" );
 
 	_vec->data[ inX ] = value;
 }
@@ -408,7 +410,7 @@ void slBigVectorGSL::set( const int inX, const float value ) {
  *  Base 2D matrix class using GSL
  */
 
-slBigMatrix2DGSL::slBigMatrix2DGSL( const int x, const int y ) : slVectorViewGSL( x * y ) {
+slBigMatrix2DGSL::slBigMatrix2DGSL( const unsigned int x, const unsigned int y ) : slVectorViewGSL( x * y ) {
 	_xdim = x;
 	_ydim = y;
 	_matrix = gsl_matrix_float_alloc_from_block( slVectorViewGSL::_vec->block, 0, _xdim, _ydim, _ydim );
@@ -446,9 +448,9 @@ inline unsigned int slBigMatrix2DGSL::yDim() const {
  *  subclass with range checking can be provided.
  */
 // inline
-float slBigMatrix2DGSL::get( const int x, const int y ) const {
-		if( *(unsigned int*)&_matrix->data[x * _matrix->tda + y]  == 0x55555555 ) 
-			printf(" Got 0x55 in matrix\n" );
+float slBigMatrix2DGSL::get( const unsigned int x, const unsigned int y ) const {
+	//	if( *(unsigned int*)&_matrix->data[x * _matrix->tda + y]  == 0x55555555 ) 
+	//		printf(" Got 0x55 in matrix\n" );
 
 		return _matrix->data[x * _matrix->tda + y];
 	}
@@ -462,7 +464,7 @@ float slBigMatrix2DGSL::get( const int x, const int y ) const {
  *  subclass with range checking can be provided.
  */
 //inline
-void slBigMatrix2DGSL::set( const int x, const int y, const float value ) {
+void slBigMatrix2DGSL::set( const unsigned int x, const unsigned int y, const float value ) {
 	_matrix->data[x * _matrix->tda + y] = value;
 }
 
@@ -491,20 +493,12 @@ slBigMatrix2DGSL& slBigMatrix2DGSL::vectorMultiplyInto( const slVectorViewGSL& s
 	return *this;
 }
 
-/*
-slBigVectorGSL& slBigMatrix2DGSL::getRowVector(const int x)
-{
-    _gsl_vector_float_view *row = &gsl_matrix_float_row(_matrix, x);
-    slBigVectorGSL *result = new slBigVectorGSL((gsl_vector_float *)row);
-    return *result;
-}
-*/
-float slBigMatrix2DGSL::getRowMagnitude( const int x ) {
+float slBigMatrix2DGSL::getRowMagnitude( const unsigned int x ) {
 	gsl_vector_float *row = &gsl_matrix_float_row( _matrix, x ).vector;
 	return gsl_blas_snrm2( row );
 }
 
-slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceRowMultiply( const int x, const float scalar ) {
+slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceRowMultiply( const unsigned int x, const float scalar ) {
 
 	gsl_vector_float *row = &gsl_matrix_float_row( _matrix, x ).vector;
 	gsl_blas_sscal( scalar, row );
@@ -512,17 +506,17 @@ slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceRowMultiply( const int x, const float
 }
 
 /*
-slBigVectorGSL& slBigMatrix2DGSL::getColumnVector(const int y)
+slBigVectorGSL& slBigMatrix2DGSL::getColumnVector(const unsigned int y)
 {
     return new slBigVectorGSL(&gsl_matrix_float_column(_matrix, y));
 }
 */
-float slBigMatrix2DGSL::getColumnMagnitude( const int y ) {
+float slBigMatrix2DGSL::getColumnMagnitude( const unsigned int y ) {
 	gsl_vector_float *column = &gsl_matrix_float_column( _matrix, y ).vector;
 	return gsl_blas_snrm2( column );
 }
 
-slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceColumnMultiply( const int y, const float scalar ) {
+slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceColumnMultiply( const unsigned int y, const float scalar ) {
 
 	gsl_vector_float *column = &gsl_matrix_float_column( _matrix, y ).vector;
 	gsl_blas_sscal( scalar, column );
@@ -653,7 +647,7 @@ slBigMatrix2DGSL& slBigMatrix2DGSL::convolvePeriodic(const slBigMatrix2D& kernel
  *  Base 3D matrix class using GSL
  */
 
-slBigMatrix3DGSL::slBigMatrix3DGSL( const int x, const int y, const int z )
+slBigMatrix3DGSL::slBigMatrix3DGSL( const unsigned int x, const unsigned int y, const unsigned int z )
 		: slVectorViewGSL(( x * y * z ) ),
 		_xdim( x ),
 		_ydim( y ),
@@ -703,12 +697,12 @@ inline unsigned int slBigMatrix3DGSL::zDim() const {
 }
 
 // inline
-float slBigMatrix3DGSL::get( const int x, const int y, const int z ) const {
+float slBigMatrix3DGSL::get( const unsigned int x, const unsigned int y, const unsigned int z ) const {
 		return ( _matrix[z] )->data[x *( _matrix[z] )->tda + y];
 	}
 
 //inline
-void slBigMatrix3DGSL::set( const int x, const int y, const int z, const float value ) {
+void slBigMatrix3DGSL::set( const unsigned int x, const unsigned int y, const unsigned int z, const float value ) {
 	( _matrix[z] )->data[x *( _matrix[z] )->tda + y] = value;
 }
 

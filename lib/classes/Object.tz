@@ -173,9 +173,14 @@ NULL : Object (aka Objects) [version 2.1] {
   + section "Archiving & Dearchiving"
 
 	+ to archive-as-xml file fileName (string):
-		% Writes this object to the XML file fileName.
+		% XML encodes this object, and writes the encoded string to the file fileName.
 
-		archiveXMLObject(self, fileName).
+		brIXMLArchiveObjectToFile( self, fileName ).
+
+	+ to archive-as-xml-string:
+		% XML encodes this object, and returns the encoded string.
+
+		return brIXMLArchiveObjectToString( self ).
 
 	+ to send-over-network to hostName (string) on portNumber (int):
 		% Sends this object over the network to a breve server on host hostName

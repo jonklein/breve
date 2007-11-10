@@ -1,7 +1,7 @@
+
 /*****************************************************************************
- *                                                                           *
  * The breve Simulation Environment                                          *
- * Copyright (C) 2000, 2001, 2002, 2003 Jonathan Klein                       *
+ * Copyright (C) 2000-2004 Jonathan Klein                                    *
  *                                                                           *
  * This program is free software; you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
@@ -18,60 +18,65 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#ifndef _SOUND_H
-#define _SOUND_H
+#include "kernel.h"
 
-#if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
+/*! \addtogroup InternalFunctions */
+/*@{*/
 
-#include <portaudio.h>
-#include <sndfile.h>
+/**
+ * brIURLGet( char *url )
+ */
 
-#define MIXER_SAMPLE_RATE 44100
+int brIURLGet( brEval args[], brEval *target, brInstance *i ) {
+	int result = EC_ERROR;
 
-class brSoundMixer {
-	public:
-						brSoundMixer();
-						~brSoundMixer();
+#ifdef HAVE_LIBCURL
+	brEngine *e = i -> engine;
+	char *data;
+	int dataSize;
 
-		bool 				StartStream();
+	e -> _url.get( BRSTRING( &args[ 0 ] ), &data, &dataSize );
 
-		brSoundPlayer*			NextPlayer();
-		brSoundPlayer*			NewSinewave( double frequency );
-		brSoundPlayer*			NewPlayer( brSoundData *data, float speed );
+	if( data ) {
+		target -> set( data );
+		slFree( data );
+	
+		result = EC_OK;
+	}
+#endif
+
+	return result;
+}
+
+int brIURLPut( brEval args[], brEval *target, brInstance *i ) {
+	int result = EC_ERROR;
+
+#ifdef HAVE_LIBCURL
+	brEngine *e = i -> engine;
+	char *data;
+	int dataSize;
+
+	char *putData = BRSTRING( &args[ 1 ] );
+
+	e -> _url.put( BRSTRING( &args[ 0 ] ), putData, strlen( putData ), &data, &dataSize );
+
+	if( data ) {
+		target -> set( data );
+		slFree( data );
+	
+		result = EC_OK;
+	}
+#endif
+
+	return result;
+}
+
+/*@}*/
 
 
-		std::vector< brSoundPlayer* > 	_players;
-		PortAudioStream 		*_stream;
-		bool 				_streamShouldEnd;
-
-	private:
-};
-
-struct brSoundData {
-	float *data;
-	unsigned long length;
-};
-
-struct brSoundPlayer {
-	brSoundData *sound;
-	float offset;
-	float speed;
-	char finished;
-	char isSinewave;
-	double frequency;
-	double phase;
-	float volume;
-	float balance;
-};
-
-float *brSampleUp( float *in, long frames );
-
-brSoundData *brLoadSound(char *file);
-void brFreeSoundData(brSoundData *data);
-
-int brPASoundCallback(void *ibuf, void *obuf, unsigned long fbp, PaTimestamp outTime, void *data);
 
 
-
-#endif // defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
-#endif // _SOUND_H
+void breveInitURLFunctions( brNamespace *n ) {
+	brNewBreveCall( n, "brIURLGet", brIURLGet, AT_STRING, AT_STRING, 0 );
+	brNewBreveCall( n, "brIURLPut", brIURLPut, AT_STRING, AT_STRING, AT_STRING, 0 );
+}

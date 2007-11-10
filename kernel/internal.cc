@@ -98,25 +98,25 @@ void brFreeBreveCall( void *d ) {
 	delete i;
 }
 
-/*!
-	\brief Returns a FILE pointer associated with the output log.
-
-	Returns a FILE pointer referring to the output log.  Under command-line
-	based breve implementations, this is typically stderr.  Under Mac OS X,
-	however, output to this file handle will be routed through slMessage.
-*/
+/**
+ * \brief Returns a FILE pointer associated with the output log.
+ *
+ * Returns a FILE pointer referring to the output log.  Under command-line
+ * based breve implementations, this is typically stderr.  Under Mac OS X,
+ * however, output to this file handle will be routed through slMessage.
+ */
 
 FILE *slGetLogFilePointer( brInstance *i ) {
-	return i->engine->logFile;
+	return i->engine->_logFile;
 }
 
-/*!
-	\brief Loads internal functions into the breve engine.
-
-	Calls all of the loader functions for different groups of functions.
-*/
+/**
+ * \brief Loads internal functions into the breve engine.
+ * Calls all of the loader functions for different groups of functions.
+ */
 
 void brLoadInternalFunctions( brEngine *e ) {
+	breveInitURLFunctions( e->internalMethods );
 	breveInitWorldFunctions( e->internalMethods );
 	breveInitStationaryFunctions( e->internalMethods );
 	breveInitObjectFunctions( e->internalMethods );

@@ -43,7 +43,9 @@ Object : GeneticAlgorithm {
 		# we'll need to retest the current individual.
 		currentIndividual--.
 
-		self switch-individual.
+		# reschedule a switch, but don't do it now -- we will need to be fully dearchived.
+
+		self schedule method-call "switch-individual" at-time (controller get-time) + 0.1.
 
 		return 1.
         
@@ -202,6 +204,23 @@ Object : GeneticAlgorithm {
 		% Returns the best fitness seen so far.
 		return bestFitness.
 
+	+ to get-best-individual:
+		% Returns the best active individual.  Note that at the end of each generation
+		% any individual, including the best, may be deleted and replaced with a new 
+		% one, so be careful when this method is called and how it is used.  
+
+		i (object).
+		best (object).
+
+		foreach i in populations{ currentPopulation }: {
+			if !best || ( best get-fitness ) < ( i get-fitness ):
+				best = i.
+		}
+
+		print best.
+
+		return best.
+
 	+ to get-current-individual-index:
 		% Returns the index of the individual currently being tested.  Returns -1
 		% before any fitness tests have been run.
@@ -263,7 +282,9 @@ Object : GeneticAlgorithm {
 		currentIndividual++.
 
 		if currentIndividual >= | populations{ currentPopulation } |: {
+			self end-generation number generation.
 			self reproduce.
+			self prepare-for-generation number generation.
 		}
 
 		self start-fitness-test of populations{ currentPopulation }{ currentIndividual }.
@@ -350,8 +371,6 @@ Object : GeneticAlgorithm {
 
 		if generationLimit && generation >= generationLimit: controller end-simulation.
 
-		self prepare-for-generation number generation.
-
 	- to tournament-select for-index i (int):
 		if spatialRadius == 0: return (self non-spatial-tournament-select).
 		else return (self spatial-tournament-select with-index i).
@@ -435,6 +454,13 @@ Object : GeneticAlgorithm {
 		% fitness test ends.  You should also make sure that the individual's
 		% fitness value is set using 
 		% OBJECTMETHOD(GeneticAlgorithmIndividual:set-fitness).
+
+	+ to end-generation number n (int):
+		% This method is called right when the generation is finished, 
+		% before any of the reproduction takes place.  This method provides
+		% an opportunity to examine the entire population of the generation
+		% after all fitness tests are run, and before the individuals are 
+		% possibly destroyed through reproduction.
 
 	+ to prepare-for-generation number n (int):
 		% This method is called when a generation is setup.  The default

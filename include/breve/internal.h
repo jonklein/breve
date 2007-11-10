@@ -9,9 +9,7 @@
 #include "engine.h"
 #include "namespace.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+void breveInitURLFunctions(brNamespace *);
 void breveInitCameraFunctions(brNamespace *);
 void breveInitJointFunctions(brNamespace *);
 void breveInitControlFunctions(brNamespace *);
@@ -44,11 +42,9 @@ void breveInitStatisticsFunctions(brNamespace *n);
 void breveInitQGAMEFunctions(brNamespace *);
 void breveInitDrawFunctions(brNamespace *);
 
+#define BRBREVECALL( n, name, rvalue, ... )		brNewBreveCall( n, "" #name "", name, rvalue, __VA_ARGS__, 0 ) 
 DLLEXPORT int brNewBreveCall(brNamespace *, char *, int (*)(brEval *, brEval *, brInstance *), int, ...);
 DLLEXPORT FILE *slGetLogFilePointer(brInstance *);
-#ifdef __cplusplus
-}
-#endif
 
 void breveInitPythonFunctions(brNamespace *);
 void breveInitPerlFunctions(brNamespace *);
@@ -57,9 +53,9 @@ void brLoadInternalFunctions(brEngine *);
 void brFreeBreveCall(void *);
 
 
-/*!
-	\brief An internal function provided by breve.
-*/
+/**
+ * \brief An internal function provided by breve.
+ */
 
 #define ST_CMAX_ARGS 16
 

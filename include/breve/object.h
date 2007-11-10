@@ -85,22 +85,22 @@ class stMethod {
 		stMethod( const char *n, std::vector< stKeywordEntry* > *k, const char *file, int line );
 		~stMethod();
 
-		std::string name;
+		std::string 					name;
 
-		bool inlined;
+		bool 							inlined;
 
-		int lineno;
-		std::string filename;
+		int 							lineno;
+		std::string 					filename;
 	
-		std::vector< stKeywordEntry* > keywords;
-		std::vector< stExp* > code;
-		std::vector< stVar* > variables;
+		std::vector< stKeywordEntry* > 	keywords;
+		std::vector< stExp* > 			code;
+		std::vector< stVar* > 			variables;
 
 		// how much space does this method need on the stack for inputs and locals? 
 
-		int stackOffset;
+		int 							stackOffset;
 
-		std::string 				_comment;
+		std::string 					_comment;
 };
 
 /*!

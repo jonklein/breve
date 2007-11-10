@@ -366,7 +366,8 @@ int brInterfaceCallback( brEngine *e, int interfaceID, char *string ) {
 */
 
 char *brEngineRunSaveDialog( brEngine *e ) {
-	if ( !e->getSavename ) return NULL;
+	if ( !e->getSavename ) 
+		return NULL;
 
 	return e->getSavename();
 }
@@ -376,12 +377,13 @@ char *brEngineRunSaveDialog( brEngine *e ) {
 */
 
 char *brEngineRunLoadDialog( brEngine *e ) {
-	if ( !e->getLoadname ) return NULL;
+	if ( !e->getLoadname ) 
+		return NULL;
 
 	return e->getLoadname();
 }
 
 void brEngineSetMouseLocation( brEngine *e, int x, int y ) {
-	e->mouseX = x;
-	e->mouseY = y;
+	e->_mouseX = x;
+	e->_mouseY = y;
 }

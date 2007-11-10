@@ -110,7 +110,13 @@ brData *brDataHexDecode( const char *string ) {
 	tmpData = new unsigned char[ length ];
 
 	for ( n = 0; n < length; n++ ) {
-		sscanf( &string[ n * 2 ], "%2x", &l );
+		char hex[ 3 ];
+
+		hex[ 0 ] = string[ n * 2 ];
+		hex[ 1 ] = string[ n * 2 + 1 ];
+		hex[ 2 ] = 0;
+
+		sscanf( hex, "%2x", &l );
 		tmpData[ n ] = l & 0xff;
 	}
 

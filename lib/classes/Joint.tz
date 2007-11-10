@@ -504,7 +504,7 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 2.3] {
 		jointSetLimits(jointPointer, (min1, 0, 0), (max1, 0, 0)).
 
 	+ to dearchive:
-		if parent || child: 
+		if parent || child:
 			self link with-normal normalVector 
 				with-parent-point plinkPoint with-child-point clinkPoint to-child child parent parent.
 
@@ -560,8 +560,6 @@ Joint : FixedJoint (aka FixedJoints) [version 2.3] {
 		self add-dependency on parent.
 
 	+ to dearchive:
-		print "dearchiving for $parent and $child".
-
 		if parent || child: 
 			self link with-parent-point plinkPoint with-child-point clinkPoint to-child child parent parent.
 

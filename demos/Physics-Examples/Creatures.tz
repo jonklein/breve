@@ -23,6 +23,7 @@
 @use Stationary.
 @use MultiBody.
 @use GeneticAlgorithm.
+@use URL.
 
 Controller VirtualCreatures.
 
@@ -152,8 +153,6 @@ PhysicalControl : VirtualCreatures {
 		if body: 
 			free body.
 
-		# (i get-genome) print-graph.
-
 		body = new MultiBody.
 		body set-root to (parser parse-top-level from ((i get-genome) get-root)).
 		body disable-self-collisions.
@@ -187,6 +186,13 @@ PhysicalControl : VirtualCreatures {
 }
 
 GeneticAlgorithm : SimsGA {
+	+ variables:
+		url (object).
+
+	+ to init:
+		url = new URL.
+		self add-dependency on url.
+
 	+ to start-fitness-test of o (object):
 		newOffset (vector).
 
@@ -196,6 +202,9 @@ GeneticAlgorithm : SimsGA {
 		controller pan-camera-offset by newOffset steps 200.
 
 		controller setup-test with o.
+
+	+ to end-generation number n (int):
+		print ( url put put-data ( ( self get-best-individual ) archive-as-xml-string ) to "http://www.deskworld.org/original/dw-critter-upload.php" ).
 
 	+ to end-fitness-test of o (object):
 		o set-fitness to (controller get-current-critter-fitness).

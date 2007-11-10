@@ -18,6 +18,13 @@ extern int lineno;
 
 stSteveData *currentData;
 
+
+struct stFoundMethod {
+	stMethod 					*_method;
+	stObject					*_object;
+};
+
+
 void *brInitFrontendLanguages( brEngine *engine ) {
 #ifdef HAVE_LIBPYTHON
         brPythonInit( engine );
@@ -58,16 +65,16 @@ int stSubclassCallback( brObjectType *inType, void *c1, void *c2 ) {
 
 int stCallMethodBreveCallback( void *instanceData, void *methodData, const brEval **arguments, brEval *result ) {
 	int r, count = 0;
-	stMethod *method = ( stMethod* )methodData;
+	stFoundMethod *method = ( stFoundMethod* )methodData;
 	stRunInstance ri;
 
 	ri.instance = ( stInstance* )instanceData;
 
-	count = method->keywords.size();
+	count = method -> _method -> keywords.size();
 
-	ri.type = ri.instance->type;
+	ri.type = method -> _object;
 
-	r = stCallMethod( &ri, &ri, method, arguments, count, result );
+	r = stCallMethod( &ri, &ri, method -> _method, arguments, count, result );
 
 	return r;
 }
@@ -92,7 +99,7 @@ brInstance *stInstanceNewCallback( brEngine *engine, brObject *object, const brE
 	\brief The breve callback to find a method.
 */
 
-void *stFindMethodBreveCallback( void *object, const char *name, unsigned char *argTypes, int args ) {
+void *stFindMethodBreveCallback( void *inObject, const char *name, unsigned char *argTypes, int args ) {
 	int min = args, max = args;
 
 	// In some cases, we may not have acurate argument count information
@@ -102,11 +109,21 @@ void *stFindMethodBreveCallback( void *object, const char *name, unsigned char *
 		max = 100;
 	}
 
+	stObject *foundObject;
 	stMethod *method;
 
-	method = stFindInstanceMethodWithArgRange(( stObject* )object, name, args, args, NULL );
+	method = stFindInstanceMethodWithArgRange( ( stObject* )inObject, name, args, args, &foundObject );
 
-	return method;
+	if( method ) {
+		stFoundMethod *foundMethod = new stFoundMethod;
+
+		foundMethod -> _method = method;
+		foundMethod -> _object = foundObject;
+
+		return foundMethod;
+	}
+
+	return NULL;
 }
 
 /**
@@ -230,16 +247,16 @@ stSteveData *stSteveInit( brEngine *engine ) {
 	breveInitSteveObjectFuncs( internal );
 	breveInitXMLFuncs( internal );
 
-	breveSteveType->callMethod 		= stCallMethodBreveCallback;
-	breveSteveType->findMethod 		= stFindMethodBreveCallback;
-	breveSteveType->isSubclass 		= stSubclassCallback;
+	breveSteveType->callMethod 			= stCallMethodBreveCallback;
+	breveSteveType->findMethod 			= stFindMethodBreveCallback;
+	breveSteveType->isSubclass 			= stSubclassCallback;
 	breveSteveType->instantiate 		= stInstanceNewCallback;
 	breveSteveType->destroyInstance 	= stInstanceFreeCallback;
 	breveSteveType->destroyObjectType	= stSteveCleanup;
-	breveSteveType->canLoad			= stCallbackCanLoad;
-	breveSteveType->load			= stCallbackLoad;
+	breveSteveType->canLoad				= stCallbackCanLoad;
+	breveSteveType->load				= stCallbackLoad;
 	breveSteveType->loadWithArchive		= stCallbackLoadWithArchive;
-	breveSteveType->userData		= ( void* )sd;
+	breveSteveType->userData			= ( void* )sd;
 	breveSteveType->_typeSignature 		= STEVE_TYPE_SIGNATURE;
 
 	currentData = sd;

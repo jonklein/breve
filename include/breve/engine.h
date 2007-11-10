@@ -32,6 +32,8 @@
 
 #include "simulation.h"
 #include "timeval.h"
+#include "url.h"
+#include "sound.h"
 
 class slCamera;
 
@@ -39,9 +41,9 @@ class slCamera;
 
 #define BR_ERROR_TEXT_SIZE 4096
 
-/*!
-	\brief A structure to hold information about errors during parsing/execution.
-*/
+/**
+ * \brief A structure to hold information about errors during parsing/execution.
+ */
 
 struct brErrorInfo {
 	brErrorInfo() { 
@@ -68,9 +70,9 @@ struct brErrorInfo {
 	char message[ BR_ERROR_TEXT_SIZE ];
 };
 
-/*!
-	\brief Parse error and evaluation codes used by \ref brEvalError.	
-*/
+/**
+ * \brief Parse error and evaluation codes used by \ref brEvalError.	
+ */
 
 enum parseErrorMessageCodes {
 	// parse errors 
@@ -119,9 +121,9 @@ enum parseErrorCodes {
 	BPE_LIB_ERROR
 };
 
-/*!
-	\brief A single menu item.
-*/
+/**
+ * \brief A single menu item.
+ */
 
 struct brMenuEntry {
 	brInstance *instance;
@@ -141,53 +143,61 @@ typedef struct brObjectType brObjectType;
 
 class brEngine {
 	public:
-		brEngine() {};
-		brEngine( int inArgc, char **inArgv ) { argc = inArgc; argv = inArgv; }
+													brEngine() {};
+													brEngine( int inArgc, const char **inArgv ) { 
+														_argc = inArgc; 
+														_argv = inArgv; 
+													}
 
 		~brEngine();
 
-		slWorld *world;
-		slCamera *camera;
+		std::vector< brObjectType* > 				_objectTypes;
+		std::vector< brInstance* > 					_freedInstances;
 
-		gsl_rng *RNG;
+#ifdef HAVE_LIBCURL
+		brURLFetcher								_url;
+#endif
 
-		std::vector< brObjectType* > objectTypes;
+#if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
+		brSoundMixer								_soundMixer;
+#endif
 
-		bool simulationWillStop;
+		slWorld* 									world;
+		slCamera*									camera;
 
-		brSoundMixer *soundMixer;
+		gsl_rng*									RNG;
 
-		std::vector<brInstance*> freedInstances;
+		bool 										_simulationWillStop;
 
-		int useMouse;
-		int mouseX;
-		int mouseY;
+		int 										_useMouse;
+		int 										_mouseX;
+		int 										_mouseY;
 
-		double iterationStepSize;
+		double 										_iterationStepSize;
 
-		FILE *logFile;
+		FILE*										_logFile;
 
-		brInstance *controller;
+		brInstance*									controller;
 
-		std::map< std::string, brObject* > objectAliases;
-		std::map< std::string, brObject* > objects;
-		brNamespace 			*internalMethods;
+		std::map< std::string, brObject* > 			objectAliases;
+		std::map< std::string, brObject* > 			objects;
+		brNamespace*								internalMethods;
 
-		std::vector< brInstance* > 	postIterationInstances;
-		std::vector< brInstance* > 	iterationInstances;
-		std::vector< brInstance* > 	instances;
+		std::vector< brInstance* > 					postIterationInstances;
+		std::vector< brInstance* > 					iterationInstances;
+		std::vector< brInstance* > 					instances;
 	
-		std::vector< brInstance* > 	instancesToAdd;
-		std::vector< brInstance* > 	instancesToRemove;
+		std::vector< brInstance* > 					instancesToAdd;
+		std::vector< brInstance* > 					instancesToRemove;
 
-		std::vector< brEvent* > 	events;
+		std::vector< brEvent* > 					events;
 
 		// runtime error info 
 
-		brErrorInfo error;
+		brErrorInfo 								error;
 
-		std::string _outputPath;
-		std::string _launchDirectory;
+		std::string 								_outputPath;
+		std::string 								_launchDirectory;
 
 		// plugin, plugins, plugins!
 
@@ -202,8 +212,8 @@ class brEngine {
 		struct timeval startTime;
 		struct timeval realTime;
 
-		int argc;
-		char **argv;
+		int 										_argc;
+		const char**								_argv;
 
 		int nThreads;
 		pthread_mutex_t lock;
@@ -218,7 +228,7 @@ class brEngine {
 
 		// which keys are pressed?
 
-		unsigned char keys[256];
+		unsigned char 								keys[ 256 ];
 
 		//
 		// Callback functions to be set by the application frontend
@@ -304,7 +314,7 @@ const std::vector< std::string > &brEngineGetSearchPaths( brEngine * );
 std::vector< std::string > brEngineGetAllObjectNames( brEngine *e );
 
 brEngine *brEngineNew();
-brEngine *brEngineNewWithArguments( int inArgc, char **inArgv );
+brEngine *brEngineNewWithArguments( int inArgc, const char **inArgv );
 
 void brEngineFree(brEngine *);
 

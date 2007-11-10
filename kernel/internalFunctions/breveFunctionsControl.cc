@@ -57,7 +57,7 @@ int brIGetAllPressedKeys( brEval args[], brEval *target, brInstance *i ) {
 
 int brIGetMouseX( brEval args[], brEval *target, brInstance *i ) {
 
-	target->set( i->engine->mouseX );
+	target->set( i->engine->_mouseX );
 
 	return EC_OK;
 }
@@ -68,7 +68,7 @@ int brIGetMouseX( brEval args[], brEval *target, brInstance *i ) {
 
 int brIGetMouseY( brEval args[], brEval *target, brInstance *i ) {
 
-	target->set( i->engine->mouseY );
+	target->set( i->engine->_mouseY );
 
 	return EC_OK;
 }
@@ -81,7 +81,7 @@ int brIGetMouseY( brEval args[], brEval *target, brInstance *i ) {
 */
 
 int brIEndSimulation( brEval args[], brEval *target, brInstance *i ) {
-	i->engine->simulationWillStop = 1;
+	i->engine->_simulationWillStop = 1;
 	return EC_OK;
 }
 
@@ -368,7 +368,7 @@ int brIPlaySound( brEval args[], brEval *target, brInstance *i ) {
 
 int brIGetArgc( brEval args[], brEval *target, brInstance *i ) {
 
-	target->set( i->engine->argc );
+	target->set( i->engine->_argc );
 
 	return EC_OK;
 }
@@ -380,12 +380,12 @@ int brIGetArgc( brEval args[], brEval *target, brInstance *i ) {
 */
 
 int brIGetArgv( brEval args[], brEval *target, brInstance *i ) {
-	if ( BRINT( &args[0] ) < 0 || BRINT( &args[0] ) >= i->engine->argc ) {
-		slMessage( DEBUG_ALL, "Request for command-line input argument %d is out of range\n", i->engine->argc );
+	if ( BRINT( &args[0] ) < 0 || BRINT( &args[0] ) >= i->engine->_argc ) {
+		slMessage( DEBUG_ALL, "Request for command-line input argument %d is out of range\n", i->engine->_argc );
 		return EC_ERROR;
 	}
 
-	target->set( i->engine->argv[BRINT( &args[0] )] );
+	target->set( i->engine->_argv[BRINT( &args[0] )] );
 
 	return EC_OK;
 }

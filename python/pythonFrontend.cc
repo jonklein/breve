@@ -1114,8 +1114,8 @@ void brPythonSetArgv( brEngine *inEngine, PyObject *inSysModule ) {
 
 	argv = PyList_New( 0 );
 
-	for( int n = 0; n < inEngine->argc; n++ ) {
-		PyObject *str = PyString_FromString( inEngine->argv[ n ] );
+	for( int n = 0; n < inEngine->_argc; n++ ) {
+		PyObject *str = PyString_FromString( inEngine->_argv[ n ] );
 
 		PyList_Append( argv, str );
 

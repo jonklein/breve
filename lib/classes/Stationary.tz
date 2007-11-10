@@ -30,7 +30,7 @@ Real : Stationary (aka Stationaries) [version 2.4] {
 	+ to init:
 		realWorldPointer = addStationary( ( ( controller get-generic-shape ) get-pointer ), ( 0, 0, 0 ), [ ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) ] ).
 
-		self set-texture to 0.
+		self set-texture-image to (controller get-stationary-texture).
 		self set-shape to (controller get-generic-shape).
 
 		return self.
@@ -64,7 +64,8 @@ Real : Stationary (aka Stationaries) [version 2.4] {
 		controller set-floor-defined.
 
 	+ to dearchive:
-		realWorldPointer = addStationary( ( ( controller get-generic-shape ) get-pointer ), ( 0, 0, 0 ), [ ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) ] ).
+		if !realWorldPointer:
+			realWorldPointer = addStationary( ( ( controller get-generic-shape ) get-pointer ), ( 0, 0, 0 ), [ ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) ] ).
 
 		if shadowCatcher: 
 			self catch-shadows.

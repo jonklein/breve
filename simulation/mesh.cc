@@ -63,7 +63,8 @@ double slMesh::maxReach() {
 			d.y = _mesh->pointL[f->points[m]].pos[1];
 			d.z = _mesh->pointL[f->points[m]].pos[2];
 
-			if ( slVectorLength( &d ) > maxD ) maxD = slVectorLength( &d );
+			if ( slVectorLength( &d ) > maxD ) 
+				maxD = slVectorLength( &d );
 		}
 	}
 

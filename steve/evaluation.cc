@@ -1655,15 +1655,17 @@ RTC_INLINE int stEvalListIndexPointer( stListIndexExp *l, stRunInstance *i, void
 		*type = AT_VECTOR;
 
 		switch( BRINT( &index ) ) {
+			
+
 			case 0:
 				return EC_OK;
 				break;
 			case 1:
-				*pointer += sizeof( double ) * 3;
+				*pointer = ( ( double* )*pointer ) + 3;
 				return EC_OK;
 				break;
 			case 2:
-				*pointer += 2 * sizeof( double ) * 3;
+				*pointer = ( ( double* )*pointer ) + 6;
 				return EC_OK;
 				break;
 			default:

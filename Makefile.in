@@ -36,8 +36,7 @@ LIBS		= @LIBS@
 prefix		= @prefix@
 exec_prefix	= @exec_prefix@
 
-all: depend lib/libbreve.a bin/osmesaloader.o bin/breve@EXE_SUFFIX@ \
-	README.txt README_SOURCE.txt
+all: depend lib/libbreve.a bin/osmesaloader.o bin/breve@EXE_SUFFIX@ README.txt README_SOURCE.txt
 
 include simulation/Makefile
 include kernel/Makefile
@@ -78,13 +77,16 @@ breve.dll: $(OBJ)
 %.tab.c: %.y
 	$(YACC) $(YFLAGS) -o $@ $<
 
-%.d: %.cc
-	@echo "Generating dependencies for $<"
-	@mkdep -f $@ $(CPPFLAGS) -x c++ $<
 
+%.d: %.cc 
+	@echo "Generating dependencies for $<"
+	@/bin/echo -n $(@D)/ > $@
+	@$(CXX) -MM $(CPPFLAGS) $< >> $@
+     
 %.d: %.c
 	@echo "Generating dependencies for $<"
-	@mkdep -f $@ $(CPPFLAGS) -x c++ $<
+	@/bin/echo -n $(@D)/ > $@  
+	@$(CXX) -MM $(CPPFLAGS) $< >> $@
 
 
 debug: all
@@ -99,8 +101,6 @@ lib/libbreve.a: $(OBJ)
 	-rm $@
 	$(AR) -cr $@ $(OBJ)
 	$(RANLIB) $@
-
-depend:: $(DEPS)
 
 .PHONY: clean OSX_build OSX_clean OSX_release CLI_release install
 
@@ -118,6 +118,8 @@ clean:
 	find . -name 'core' -exec rm -f {} \;
 	find . -name '*.o' -exec rm -f {} \;
 	find . -name '*.d' -exec rm -f {} \;
+
+depend:: $(DEPS)
 
 documentation:
 	cd docBuild; make html

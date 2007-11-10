@@ -646,8 +646,8 @@ void slDemoMouse( int button, int state, int x, int y ) {
 }
 
 void slDemoPassiveMotion( int x, int y ) {
-	gEngine->mouseX = x;
-	gEngine->mouseY = gEngine->camera->_height - y;
+	gEngine->_mouseX = x;
+	gEngine->_mouseY = gEngine->camera->_height - y;
 }
 
 void slDemoMotion( int x, int y ) {

@@ -291,7 +291,7 @@ void stXMLWriteObjectVariables( brXMLArchiveRecord *inRecord, FILE *inFP, stInst
 		std::map< std::string, stVar* >::iterator vi;
 
 		XMLPutSpaces( inSpaces, inFP );
-		fprintf( inFP, "<class name=\"%s\" version=\"%f\">\n", o->name.c_str(), o->version );
+		fprintf( inFP, "<class name=\"%s\" version=\"%.2f\">\n", o->name.c_str(), o->version );
 		inSpaces += XML_INDENT_SPACES;
 
 		for ( vi = o->variables.begin(); vi != o->variables.end(); vi++ ) 
@@ -415,6 +415,11 @@ int stXMLPrintEval( brXMLArchiveRecord *record, FILE *file, const char *name, br
 	int index = -1;
 	char *data, *encoded;
 
+	char namestring[ 1024 ] = "";
+
+	if( strcmp( name, "" ) )
+		sprintf( namestring, " name=\"%s\"", name );
+
 	switch ( target->type() ) {
 
 		case AT_LIST:
@@ -432,7 +437,7 @@ int stXMLPrintEval( brXMLArchiveRecord *record, FILE *file, const char *name, br
 
 			XMLPutSpaces( spaces, file );
 
-			fprintf( file, "<data name=\"%s\">%s</data>\n", name, data );
+			fprintf( file, "<data%s>%s</data>\n", namestring, data );
 
 			slFree( data );
 
@@ -441,14 +446,14 @@ int stXMLPrintEval( brXMLArchiveRecord *record, FILE *file, const char *name, br
 		case AT_INT:
 			XMLPutSpaces( spaces, file );
 
-			fprintf( file, "<int name=\"%s\">%d</int>\n", name, BRINT( target ) );
+			fprintf( file, "<int%s>%d</int>\n", namestring, BRINT( target ) );
 
 			break;
 
 		case AT_DOUBLE:
 			XMLPutSpaces( spaces, file );
 
-			fprintf( file, "<float name=\"%s\">%.16g</float>\n", name, BRDOUBLE( target ) );
+			fprintf( file, "<flt%s>%.16g</flt>\n", namestring, BRDOUBLE( target ) );
 
 			break;
 
@@ -457,7 +462,7 @@ int stXMLPrintEval( brXMLArchiveRecord *record, FILE *file, const char *name, br
 
 			encoded = brXMLEncodeString( BRSTRING( target ) );
 
-			fprintf( file, "<string name=\"%s\">%s</string>\n", name, encoded );
+			fprintf( file, "<str%s>%s</str>\n", namestring, encoded );
 
 			delete[] encoded;
 
@@ -466,21 +471,21 @@ int stXMLPrintEval( brXMLArchiveRecord *record, FILE *file, const char *name, br
 		case AT_VECTOR:
 			XMLPutSpaces( spaces, file );
 
-			fprintf( file, "<vector name=\"%s\">(%.16g, %.16g, %.16g)</vector>\n", name, BRVECTOR( target ).x, BRVECTOR( target ).y, BRVECTOR( target ).z );
+			fprintf( file, "<vec%s>(%.16g, %.16g, %.16g)</vec>\n", namestring, BRVECTOR( target ).x, BRVECTOR( target ).y, BRVECTOR( target ).z );
 
 			break;
 
 		case AT_MATRIX:
 			XMLPutSpaces( spaces, file );
 
-			fprintf( file, "<matrix name=\"%s\">[ (%.16g, %.16g, %.16g), (%.16g, %.16g, %.16g), (%.16g, %.16g, %.16g) ]</matrix>\n", name, BRMATRIX( target )[0][0], BRMATRIX( target )[0][1], BRMATRIX( target )[0][2], BRMATRIX( target )[1][0], BRMATRIX( target )[1][1], BRMATRIX( target )[1][2], BRMATRIX( target )[2][0], BRMATRIX( target )[2][1], BRMATRIX( target )[2][2] );
+			fprintf( file, "<matrix%s>[ (%.16g, %.16g, %.16g), (%.16g, %.16g, %.16g), (%.16g, %.16g, %.16g) ]</matrix>\n", namestring, BRMATRIX( target )[0][0], BRMATRIX( target )[0][1], BRMATRIX( target )[0][2], BRMATRIX( target )[1][0], BRMATRIX( target )[1][1], BRMATRIX( target )[1][2], BRMATRIX( target )[2][0], BRMATRIX( target )[2][1], BRMATRIX( target )[2][2] );
 
 			break;
 
 		case AT_POINTER:
 			XMLPutSpaces( spaces, file );
 
-			fprintf( file, "<pointer name=\"%s\"/>\n", name );
+			fprintf( file, "<pointer%s />\n", namestring );
 
 			break;
 
@@ -493,13 +498,12 @@ int stXMLPrintEval( brXMLArchiveRecord *record, FILE *file, const char *name, br
 
 			XMLPutSpaces( spaces, file );
 
-			fprintf( file, "<object name=\"%s\" index=\"%d\"/>\n", name, index );
+			fprintf( file, "<obj%s index=\"%d\" />\n", namestring, index );
 
 			break;
 
 		default:
 			slMessage( DEBUG_ALL, "warning: unknown atomic type (%d) while writing XML object\n", target->type() );
-
 			break;
 	}
 
@@ -1201,13 +1205,25 @@ int brXMLEvalTypeForTagName( const char *name ) {
 
 	if ( !strcasecmp( name, "array" ) ) return AT_ARRAY;
 	if ( !strcasecmp( name, "int" ) ) return AT_INT;
+
+	if ( !strcasecmp( name, "flt" ) ) return AT_DOUBLE;
 	if ( !strcasecmp( name, "float" ) ) return AT_DOUBLE;
+
 	if ( !strcasecmp( name, "list" ) ) return AT_LIST;
 	if ( !strcasecmp( name, "hash" ) ) return AT_HASH;
+
+	if ( !strcasecmp( name, "str" ) ) return AT_STRING;
 	if ( !strcasecmp( name, "string" ) ) return AT_STRING;
+
+	if ( !strcasecmp( name, "vec" ) ) return AT_VECTOR;
 	if ( !strcasecmp( name, "vector" ) ) return AT_VECTOR;
+
+	if ( !strcasecmp( name, "ptr" ) ) return AT_POINTER;
 	if ( !strcasecmp( name, "pointer" ) ) return AT_POINTER;
+
+	if ( !strcasecmp( name, "obj" ) ) return AT_INSTANCE;
 	if ( !strcasecmp( name, "object" ) ) return AT_INSTANCE;
+
 	if ( !strcasecmp( name, "data" ) ) return AT_DATA;
 	if ( !strcasecmp( name, "matrix" ) ) return AT_MATRIX;
 

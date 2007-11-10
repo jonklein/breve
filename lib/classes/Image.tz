@@ -16,14 +16,19 @@ Abstract : Image (aka Images) [version 2.0] {
 		imageData (pointer).
 		textureNumber (int).
 		modified (int).
+		currentHeight, currentWidth (int).
 
-	currentHeight, currentWidth (int).
+		archiveImageData (data).
+		archiveFile (string).
 
 	+ to init:
 		textureNumber = -1.
 
 	+ to iterate:
 		if modified: {
+			# If the image is modified, the archiveFile is no longer valid.
+
+			archiveFile = "".
 			imageUpdateTexture(imageData).
 			modified = 0.
 		}
@@ -34,14 +39,16 @@ Abstract : Image (aka Images) [version 2.0] {
 		% Loads an image from the file imageFile.
 
 		if imageData: 
-		imageDataFree(imageData).
+			imageDataFree(imageData).
 
-		imageData = imageLoadFromFile(imageFile).
+		imageData = imageLoadFromFile( imageFile ).
 
 		if !imageData: {
-		print "Error loading image $imageFile!".
-		return 0.
-	}
+			print "Error loading image $imageFile!".
+			return 0.
+		}
+
+		archiveFile = imageFile.
 
 		if textureNumber != -1: modified = 1.
 
@@ -218,7 +225,8 @@ Abstract : Image (aka Images) [version 2.0] {
 	- to get-texture-number:
 		% Internal use only.
 
-		if textureNumber == -1: textureNumber = imageUpdateTexture(imageData).
+		if imageData && textureNumber == -1: 
+			textureNumber = imageUpdateTexture(imageData).
 
 		return textureNumber.
 
@@ -231,11 +239,20 @@ Abstract : Image (aka Images) [version 2.0] {
 		imageWriteToFile( imageData, imageFile, 4, 8 ).
 
 	+ to archive:
-		textureNumber = -1.
+		if !archiveFile:
+			archiveImageData = brIImageArchive( imageData ).
+
 		return (super archive).
 
 	+ to dearchive:
-		self set-size width currentWidth height currentHeight.
+
+		if archiveFile:
+			self load from archiveFile.
+		else:
+			imageData = brIImageDearchive( archiveImageData ).
+
+		textureNumber = -1.
+
 		return (super dearchive).
 
 	+ to write-16-bit-grayscale to imageFile (string):
