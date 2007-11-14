@@ -68,7 +68,7 @@ void slPatch::setColor( slVector *color ) {
 	else if ( color->x < 0.0 ) color->x = 0.0;
 
 	if ( color->y > 1.0 ) color->y = 1.0;
-	else if ( color->x < 0.0 ) color->x = 0.0;
+	else if ( color->y < 0.0 ) color->y = 0.0;
 
 	if ( color->z > 1.0 ) color->z = 1.0;
 	else if ( color->z < 0.0 ) color->z = 0.0;
