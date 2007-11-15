@@ -371,7 +371,7 @@ Object : GeneticAlgorithm {
 
 		if generationLimit && generation >= generationLimit: controller end-simulation.
 
-	- to tournament-select for-index i (int):
+	+ to tournament-select for-index i (int):
 		if spatialRadius == 0: return (self non-spatial-tournament-select).
 		else return (self spatial-tournament-select with-index i).
 
@@ -396,7 +396,7 @@ Object : GeneticAlgorithm {
 
 		return populations{ currentPopulation }{ best }.
 
-	+ to non-spatial-tournament-select:
+	- to non-spatial-tournament-select:
 		% This method performs a tournament selection for reproduction.  It 
 		% is used internally and typically not called by any other object.  
 

@@ -205,8 +205,12 @@ Optional:
   Provides support for exporting MPEG movies of simulations.  This library
   is optional.  If it is not available, movie export will not be supported.
 
-  Use most recent CVS source for ffmpeg.  As of the breve 2.4 release, breve 
-  will not compile with the most recent official ffmpeg release.
+  The ffmpeg maintainers do not typically make official release versions, 
+  and the ffmpeg APIs do change from time to time.  Because of this, it can
+  sometimes be difficult to get ffmpeg working with breve.
+
+  Version 2.6 of breve is reported to compile correctly with ffmpeg subversion 
+  revision 4709.
 
 + [optional] libpush, push language libary 
   http://push-evolve.sourceforge.net
