@@ -11,64 +11,111 @@
 
 #ifdef HAVE_LIB3DS
 
-slMesh::slMesh( char *filename, char *meshname ) {
+slMesh::slMesh( char *filename, char *meshname, float inSize ) {
 	Lib3dsFile *file;
 
 	file = lib3ds_file_load( filename );
 
-	if ( !file ) throw slException( std::string( "cannot open file \"" ) + meshname + "\"" );
+	if ( !file ) 
+		throw slException( std::string( "cannot open file \"" ) + filename + "\"" );
 
-	meshname = "faucet";
-
-	if ( ! meshname ) meshname = file->nodes->name;
-
+	if ( !strcmp( meshname, "" ) ) {
+		if( file -> meshes ) 
+			meshname = file-> meshes -> name;
+		else if( file -> nodes ) 
+			meshname = file-> nodes -> name;
+	}
+	
 	_mesh = lib3ds_file_mesh_by_name( file, meshname );
 
-	if ( !_mesh ) meshname = file->nodes->name;
-
-	_mesh = lib3ds_file_mesh_by_name( file, meshname );
-
-	if ( ! _mesh ) throw slException( std::string( "cannot locate mesh in file \"" ) + meshname + "\"" );
+	if ( ! _mesh ) 
+		throw slException( std::string( "cannot locate mesh in file \"" ) + meshname + "\"" );
 
 	if ( _mesh ) {
 		unsigned int n;
 
-		// printf("found node %s, %ld faces\n", meshname, _mesh->faces);
-		// printf("at: %f, %f, %f\n", _mesh->matrix[3][0], _mesh->matrix[3][1], _mesh->matrix[3][2]);
+		_vertexCount = _mesh->points;
+		_vertices = new float[ 3 * _vertexCount ];
+		_normals = new float[ 3 * _vertexCount ];
 
-		// translate the mesh to the origin
+		_maxReach = 0.0;
+
+		// First pass through the data, translate to the origin and get the length
 
 		for ( n = 0; n < _mesh->points; n++ ) {
 			_mesh->pointL[n].pos[0] -= _mesh->matrix[3][0];
 			_mesh->pointL[n].pos[1] -= _mesh->matrix[3][1];
 			_mesh->pointL[n].pos[2] -= _mesh->matrix[3][2];
+
+			slVector v;
+
+			v.x = _mesh->pointL[ n ].pos[ 0 ];
+			v.y = _mesh->pointL[ n ].pos[ 1 ];
+			v.z = _mesh->pointL[ n ].pos[ 2 ];
+
+			float size = slVectorLength( &v );
+
+			if( size > _maxReach )
+				_maxReach = size;
 		}
+
+		// Second pass, normalize by the size and note the vertices
+
+		for ( n = 0; n < _mesh->points; n++ ) {
+			_mesh->pointL[ n ].pos[ 0 ] /= ( _maxReach / inSize );
+			_mesh->pointL[ n ].pos[ 1 ] /= ( _maxReach / inSize );
+			_mesh->pointL[ n ].pos[ 2 ] /= ( _maxReach / inSize );
+
+			_vertices[ n * 3     ] = _mesh->pointL[ n ].pos[ 0 ];
+			_vertices[ n * 3 + 1 ] = _mesh->pointL[ n ].pos[ 1 ];
+			_vertices[ n * 3 + 2 ] = _mesh->pointL[ n ].pos[ 2 ];
+		}
+
+		_maxReach = inSize;
+
+		_indexCount = _mesh->faces * 3;
+
+		_indices = new int[ _indexCount ];
+		_normals = new float[ _indexCount ];
+
+		for ( n = 0; n < _mesh -> faces; n++ ) {
+			Lib3dsFace *f = &_mesh -> faceL[ n ];
+			slVector points[ 3 ], vectors[ 3 ];
+
+			for ( int m = 0; m < 3; m++ ) {
+				_indices[ n * 3 + m ] = f -> points[ m ];
+
+				slVectorSet( &points[ m ], 
+					_vertices[ f -> points[ m ] * 3     ],
+					_vertices[ f -> points[ m ] * 3 + 1 ],
+					_vertices[ f -> points[ m ] * 3 + 2 ]
+				);
+			}
+
+			slVectorSub( &points[ 1 ], &points[ 0 ], &vectors[ 0 ] );
+			slVectorSub( &points[ 2 ], &points[ 0 ], &vectors[ 1 ] );
+
+			slVectorCross( &vectors[ 0 ], &vectors[ 1 ], &vectors[ 2 ] );
+
+			slVectorNormalize( &vectors[ 2 ] );
+
+			_normals[ n * 3     ] = vectors[ 2 ].x;
+			_normals[ n * 3 + 1 ] = vectors[ 2 ].y;
+			_normals[ n * 3 + 2 ] = vectors[ 2 ].z;
+    	}
 	}
+
+	_lastPositionIndex = 0;
+
 }
 
-slMesh::~slMesh() {}
+slMesh::~slMesh() {
+	delete[] _indices;
+	delete[] _vertices;
+}
 
 double slMesh::maxReach() {
-	Lib3dsFace *f;
-	double maxD = 0;
-	unsigned int n, m;
-
-	for ( n = 0; n < _mesh->faces; n++ ) {
-		slVector d;
-
-		f = &_mesh->faceL[n];
-
-		for ( m = 0; m < 3; m++ ) {
-			d.x = _mesh->pointL[f->points[m]].pos[0];
-			d.y = _mesh->pointL[f->points[m]].pos[1];
-			d.z = _mesh->pointL[f->points[m]].pos[2];
-
-			if ( slVectorLength( &d ) > maxD ) 
-				maxD = slVectorLength( &d );
-		}
-	}
-
-	return maxD;
+	return _maxReach;
 }
 
 void slMesh::draw() {
@@ -79,17 +126,16 @@ void slMesh::draw() {
 	glBegin( GL_TRIANGLES );
 
 	for ( n = 0; n < _mesh->faces; n++ ) {
-		f = &_mesh->faceL[n];
+		f = &_mesh->faceL[ n ];
 
-		glVertex3fv( _mesh->pointL[f->points[0]].pos );
-		glVertex3fv( _mesh->pointL[f->points[1]].pos );
-		glVertex3fv( _mesh->pointL[f->points[2]].pos );
-	}
+		glNormal3fv( &_normals[ n * 3 ] );
+
+		glVertex3fv( _mesh->pointL[ f->points[ 0 ] ].pos );
+		glVertex3fv( _mesh->pointL[ f->points[ 1 ] ].pos );
+		glVertex3fv( _mesh->pointL[ f->points[ 2 ] ].pos );
+	 }
 
 	glEnd();
-
-	// printf("drew %d faces\n", _mesh->faces);
-	// printf("last at %f, %f, %f\n", _mesh->pointL[f->points[2]].pos[0], _mesh->pointL[f->points[2]].pos[1], _mesh->pointL[f->points[2]].pos[2]);
 }
 
 #endif

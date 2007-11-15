@@ -11810,6 +11810,97 @@ _ACEOF
 fi
 
 
+
+{ echo "$as_me:$LINENO: checking for sf_open in -lsndfile" >&5
+echo $ECHO_N "checking for sf_open in -lsndfile... $ECHO_C" >&6; }
+if test "${ac_cv_lib_sndfile_sf_open+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lsndfile  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char sf_open ();
+int
+main ()
+{
+return sf_open ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag" || test ! -s conftest.err'
+  { (case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_sndfile_sf_open=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_sndfile_sf_open=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_sndfile_sf_open" >&5
+echo "${ECHO_T}$ac_cv_lib_sndfile_sf_open" >&6; }
+if test $ac_cv_lib_sndfile_sf_open = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBSNDFILE 1
+_ACEOF
+
+  LIBS="-lsndfile $LIBS"
+
+fi
+
+
+	if test "$ac_cv_lib_sndfile_sf_open" = yes; then
+		# only consider portaudio if we have libsndfile
+
 { echo "$as_me:$LINENO: checking for Pa_OpenStream in -lportaudio" >&5
 echo $ECHO_N "checking for Pa_OpenStream in -lportaudio... $ECHO_C" >&6; }
 if test "${ac_cv_lib_portaudio_Pa_OpenStream+set}" = set; then
@@ -11983,92 +12074,7 @@ _ACEOF
 
 fi
 
-
-{ echo "$as_me:$LINENO: checking for sf_open in -lsndfile" >&5
-echo $ECHO_N "checking for sf_open in -lsndfile... $ECHO_C" >&6; }
-if test "${ac_cv_lib_sndfile_sf_open+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lsndfile  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char sf_open ();
-int
-main ()
-{
-return sf_open ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_cxx_werror_flag" || test ! -s conftest.err'
-  { (case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_lib_sndfile_sf_open=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_lib_sndfile_sf_open=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ echo "$as_me:$LINENO: result: $ac_cv_lib_sndfile_sf_open" >&5
-echo "${ECHO_T}$ac_cv_lib_sndfile_sf_open" >&6; }
-if test $ac_cv_lib_sndfile_sf_open = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBSNDFILE 1
-_ACEOF
-
-  LIBS="-lsndfile $LIBS"
-
-fi
+	fi
 
 
 { echo "$as_me:$LINENO: checking for tputs in -ltermcap" >&5
@@ -12506,6 +12512,97 @@ _ACEOF
 fi
 
 
+
+{ echo "$as_me:$LINENO: checking for FT_Init_FreeType in -lfreetype" >&5
+echo $ECHO_N "checking for FT_Init_FreeType in -lfreetype... $ECHO_C" >&6; }
+if test "${ac_cv_lib_freetype_FT_Init_FreeType+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lfreetype  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char FT_Init_FreeType ();
+int
+main ()
+{
+return FT_Init_FreeType ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag" || test ! -s conftest.err'
+  { (case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_freetype_FT_Init_FreeType=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_freetype_FT_Init_FreeType=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_freetype_FT_Init_FreeType" >&5
+echo "${ECHO_T}$ac_cv_lib_freetype_FT_Init_FreeType" >&6; }
+if test $ac_cv_lib_freetype_FT_Init_FreeType = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBFREETYPE 1
+_ACEOF
+
+  LIBS="-lfreetype $LIBS"
+
+fi
+
+
+	if test "$ac_cv_lib_freetype_FT_Init_FreeType" = yes; then
+		# only consider ftgl if we have freetype
+
 { echo "$as_me:$LINENO: checking for main in -lftgl" >&5
 echo $ECHO_N "checking for main in -lftgl... $ECHO_C" >&6; }
 if test "${ac_cv_lib_ftgl_main+set}" = set; then
@@ -12585,6 +12682,8 @@ _ACEOF
   LIBS="-lftgl $LIBS"
 
 fi
+
+	fi
 
 
 { echo "$as_me:$LINENO: checking for main in -lavutil" >&5
@@ -13166,87 +13265,6 @@ if test $ac_cv_lib_qgamepp_main = yes; then
 _ACEOF
 
   LIBS="-lqgame++ $LIBS"
-
-fi
-
-
-{ echo "$as_me:$LINENO: checking for main in -lftgl" >&5
-echo $ECHO_N "checking for main in -lftgl... $ECHO_C" >&6; }
-if test "${ac_cv_lib_ftgl_main+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lftgl  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_cxx_werror_flag" || test ! -s conftest.err'
-  { (case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_lib_ftgl_main=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_lib_ftgl_main=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ echo "$as_me:$LINENO: result: $ac_cv_lib_ftgl_main" >&5
-echo "${ECHO_T}$ac_cv_lib_ftgl_main" >&6; }
-if test $ac_cv_lib_ftgl_main = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBFTGL 1
-_ACEOF
-
-  LIBS="-lftgl $LIBS"
 
 fi
 
@@ -13874,7 +13892,7 @@ _old_libs=${LIBS}
 
 LIBS="$BEGIN_STATIC $LIBS"
 
-ac_config_files="$ac_config_files Makefile plugins/slDigitizerPlugin/Makefile plugins/slQTMusicPlugin/Makefile plugins/slRegexPlugin/Makefile plugins/slURLPlugin/Makefile plugins/samples/Makefile OSX/ConfigureLibraryList Qt/breve.pro wx/Makefile"
+ac_config_files="$ac_config_files Makefile plugins/slDigitizerPlugin/Makefile plugins/slQTMusicPlugin/Makefile plugins/slRegexPlugin/Makefile plugins/samples/Makefile OSX/ConfigureLibraryList Qt/breve.pro wx/Makefile"
 
 
 if test "$ac_cv_lib_png_png_create_write_struct" != yes; then
@@ -14446,7 +14464,6 @@ do
     "plugins/slDigitizerPlugin/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/slDigitizerPlugin/Makefile" ;;
     "plugins/slQTMusicPlugin/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/slQTMusicPlugin/Makefile" ;;
     "plugins/slRegexPlugin/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/slRegexPlugin/Makefile" ;;
-    "plugins/slURLPlugin/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/slURLPlugin/Makefile" ;;
     "plugins/samples/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/samples/Makefile" ;;
     "OSX/ConfigureLibraryList") CONFIG_FILES="$CONFIG_FILES OSX/ConfigureLibraryList" ;;
     "Qt/breve.pro") CONFIG_FILES="$CONFIG_FILES Qt/breve.pro" ;;

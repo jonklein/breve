@@ -128,7 +128,7 @@
 		};
 
 		CGLPixelFormatObj pix;
-		long numPixFormats;
+		GLint numPixFormats;
 
 		//This finds the pixel format that best matches our attributes.
 		err = CGLChoosePixelFormat(attrs, &pix, &numPixFormats);

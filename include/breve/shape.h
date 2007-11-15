@@ -22,6 +22,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#include <ode/ode.h>
+
 #include "vector.h"
 #include "mesh.h"
 
@@ -46,7 +48,7 @@ enum shapeDraw {
 */
 
 struct slPosition {
-	double rotation[3][3];
+	double rotation[ 3 ][ 3 ];
 	slVector location;
 };
 
@@ -185,13 +187,24 @@ class slFace : public slFeature {
 */
 
 class slShape {
+	friend class 					slWorldObject;
+	friend class 					slVclipData;
+
 	public:
 		slShape() {
 			_drawList = 0;
 			_type = ST_NORMAL;
-			_density = 1.0;
-			_referenceCount = 1;
+			_density 						= 1.0;
+			_referenceCount 				= 1;
+
+			_odeGeomID						= 0;
 		}
+
+		dMatrix4 							lastTransform;
+
+		static void 						slMatrixToODEMatrix( const double inM[ 3 ][ 3 ], dMatrix3 outM );
+
+		virtual bool 						isMesh() { return false; }
 
 		void recompile() { _recompile = 1; }
 
@@ -241,6 +254,14 @@ class slShape {
 		std::vector< slFace* > faces;
 		std::vector< slEdge* > edges;
 		std::vector< slPoint* > points;
+
+	protected:
+		dGeomID								_odeGeomID;
+};
+
+class slBox : public slShape {
+	public:	
+											slBox( slVector *inSize, double inDensity );
 };
 
 class slSphere : public slShape {
@@ -266,11 +287,12 @@ class slSphere : public slShape {
 
 class slMeshShape : public slSphere {
 	public:
-		slMeshShape(char *filename, char *name);
+		slMeshShape( char *filename, char *name, float inSize = 1.0 );
 
 		~slMeshShape();
 	
-		void draw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags);
+		void 								draw( slCamera *inCamera, slPosition *inPos, double inTScaleX, double inTScaleY, int inMode, int inFlags);
+		virtual bool 						isMesh() { return true; }
 
 #ifdef HAVE_LIB3DS
 		slMesh *_mesh;

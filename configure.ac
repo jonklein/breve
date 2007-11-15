@@ -304,15 +304,28 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([enet], [enet_initialize])
 	AC_CHECK_LIB([jpeg], [jpeg_read_header])
 	AC_CHECK_LIB([tiff], [TIFFOpen])
-	AC_CHECK_LIB([portaudio], [Pa_OpenStream])
-	AC_CHECK_LIB([FLAC], [FLAC__seekable_stream_encoder_init])
+
 	AC_CHECK_LIB([sndfile], [sf_open])
+
+	if test "$ac_cv_lib_sndfile_sf_open" = yes; then 
+		# only consider portaudio if we have libsndfile
+		AC_CHECK_LIB([portaudio], [Pa_OpenStream])
+		AC_CHECK_LIB([FLAC], [FLAC__seekable_stream_encoder_init])
+	fi
+
 	AC_CHECK_LIB([termcap], [tputs])
 	AC_CHECK_LIB([ncurses], [tputs])
 	AC_CHECK_LIB([history], [add_history])
 	AC_CHECK_LIB([readline], [readline])
 	AC_CHECK_LIB([3ds], [lib3ds_io_new])
-	AC_CHECK_LIB([ftgl], [main])
+
+	AC_CHECK_LIB([freetype], [FT_Init_FreeType])
+
+	if test "$ac_cv_lib_freetype_FT_Init_FreeType" = yes; then 
+		# only consider ftgl if we have freetype
+		AC_CHECK_LIB([ftgl], [main])
+	fi
+
 	AC_CHECK_LIB([avutil], [main])
 	AC_CHECK_LIB([avcodec], [avcodec_init])
 	AC_CHECK_LIB([avformat], [av_write_frame])
@@ -323,7 +336,6 @@ if test "x$engine_only" = "x"; then
 	# look for main in the C++ only libraries, since the function names are mangled.
 
 	AC_CHECK_LIB([qgame++], [main])
-	AC_CHECK_LIB([ftgl], [main])
 
 	AC_CHECK_PROGS(ECL_CONFIG, [ecl-config], [], $PATH:/usr/local/bin:/usr/bin:/usr/local/ecl )
 fi
@@ -354,7 +366,6 @@ AC_CONFIG_FILES([Makefile
 		 plugins/slDigitizerPlugin/Makefile
 		 plugins/slQTMusicPlugin/Makefile
 		 plugins/slRegexPlugin/Makefile
-		 plugins/slURLPlugin/Makefile
 		 plugins/samples/Makefile
 		 OSX/ConfigureLibraryList
 		 Qt/breve.pro

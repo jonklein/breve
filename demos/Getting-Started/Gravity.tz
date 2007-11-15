@@ -31,7 +31,7 @@ PhysicalControl : Gravity {
 		new Step create at (1.0, -1.0, 0) size (.2, .02, 1).
 		new Step create at (2.0, -1.2, 0) size (2, .02, 1).
 
-		30 new Balls.
+		5 new Balls.
 
 		self point-camera at (1.0, -.8, -.6) from (3.5, 1.1, 5.0).
 
@@ -70,6 +70,6 @@ Mobile : Ball (aka Balls) {
 		# vary initial conditions slightly each time
 
 		self set-color to random[(1, 1, 1)].
-		self move to ( -.8, .5, -.3 ) + random[ ( .5, .8, .6 ) ].
+		self move to ( -.9, .5, -1 ) + random[ ( 1.5, .8, 2 ) ].
 		self set-velocity to (1 + random[1.0], 1.0 + random[1.0], 0).
 }

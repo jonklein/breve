@@ -86,8 +86,13 @@ struct slBoundSort {
  * is used to add a contact point for the collision.
  */
 
+#define MAX_ODE_CONTACTS	128
+
 class slCollision {
 	public:
+									slCollision() {
+										_contactPoints = 0;
+									}
 		slVector normal;
 
 		std::vector<slVector> points;
@@ -95,6 +100,9 @@ class slCollision {
 
 		unsigned int n1; 
 		unsigned int n2;
+
+		dContactGeom 				_contactGeoms[ MAX_ODE_CONTACTS ];
+		int							_contactPoints;
 };
 
 /**

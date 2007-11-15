@@ -12,7 +12,8 @@ Real : Terrain [version 2.2] {
 
 		self set-peak-color to (1, 1, 1).
 		self set-valley-color to (0, .8, .1).
-		self set-texture-image to (new Image load from "images/grass.jpg").
+        self set-texture-image to (controller get-stationary-texture).
+
 
 	- to load-geo-tiff from geoTIFFFile (string):
 		if realWorldPointer: terrainLoadGeoTIFF(realWorldPointer, geoTIFFFile).

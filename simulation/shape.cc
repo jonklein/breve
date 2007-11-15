@@ -99,6 +99,22 @@ void slShape::draw( slCamera *c, slPosition *pos, double textureScaleX, double t
 	glPopMatrix();
 }
 
+void slShape::slMatrixToODEMatrix( const double inM[ 3 ][ 3 ], dMatrix3 outM ) {
+    outM[ 0 ]  = inM[ 0 ][ 0 ];
+    outM[ 1 ]  = inM[ 0 ][ 1 ];
+    outM[ 2 ]  = inM[ 0 ][ 2 ];
+    outM[ 3 ]  = 0.0;
+    outM[ 4 ]  = inM[ 1 ][ 0 ];
+    outM[ 5 ]  = inM[ 1 ][ 1 ];
+    outM[ 6 ]  = inM[ 1 ][ 2 ];
+    outM[ 7 ]  = 0.0;
+    outM[ 8 ]  = inM[ 2 ][ 0 ];
+    outM[ 9 ]  = inM[ 2 ][ 1 ];
+    outM[ 10 ] = inM[ 2 ][ 2 ];
+    outM[ 11 ] = 0.0;
+}
+
+
 slSphere::slSphere( double radius, double density ) : slShape() {
 	_type = ST_SPHERE;
 	_radius = radius;
@@ -116,32 +132,23 @@ slSphere::slSphere( double radius, double density ) : slShape() {
 	_mass = _density * M_PI * _radius * _radius * _radius * 4.0 / 3.0;
 
 	slSphereInertiaMatrix( _radius, _mass, _inertia );
+
+	_odeGeomID = dCreateSphere( 0, _radius );
 }
 
-/*!
-	\brief TO BE DEPRECATED Creates a cube.
-
-	This method will be removed once a suitable handling system is in
-	place to allow for an error from the constructor.
-*/
-
-slShape *slNewCube( slVector *size, double density ) {
-	slShape *s;
-
-	if ( density < 0.0 )
+slBox::slBox( slVector *inSize, double inDensity ) {
+	if ( inDensity < 0.0 )
 		throw slException( std::string( "invalid density for new cube (density <= 0.0)" ) );
 
-	if ( size->x <= 0.0 || size->y <= 0.0 || size->z <= 0 )
+	if ( inSize->x <= 0.0 || inSize->y <= 0.0 || inSize->z <= 0 )
 		throw slException( std::string( "invalid size for new sphere (side <= 0.0)" ) );
 
-	s = new slShape();
-
-	if ( !slSetCube( s, size, density ) ) {
-		 s->release();
-		return NULL;
+	if ( !slSetCube( this, inSize, inDensity ) ) {
+		 release();
+		throw slException( std::string( "could not create a cube with the specified parameters" ) );
 	}
 
-	return s;
+	_odeGeomID = dCreateBox( 0, inSize -> x, inSize -> y, inSize -> z );
 }
 
 slShape *slNewNGonDisc( int count, double radius, double height, double density ) {
@@ -192,7 +199,11 @@ slShape::~slShape() {
 
 	for ( fi = features.begin() ; fi != features.end(); fi++ ) delete *fi;
 
-	if ( _drawList ) glDeleteLists( _drawList, 1 );
+	if ( _drawList ) 
+		glDeleteLists( _drawList, 1 );
+
+	if( _odeGeomID ) 
+		dGeomDestroy( _odeGeomID );
 }
 
 slShape *slShapeInitNeighbors( slShape *s, double density ) {
@@ -935,12 +946,13 @@ int slShape::pointOnShape( slVector *dir, slVector *point ) {
 	return -1;
 }
 
-/*!
-	\brief Returns the point where a ray send from location with direction hit the shape.
-        The location and the direction must be given int the frame of the shape. But the returned
-        point is relative to the location. This function should only be use by the slWorldObjectRaytrace
-        function.
-*/
+/**
+ * \brief Returns the point where a ray send from location with direction hit the shape.
+ * The location and the direction must be given int the frame of the shape. But the returned
+ * point is relative to the location. This function should only be use by the slWorldObjectRaytrace
+ * function.
+ */
+
 int slRayHitsShape( slShape *s, slVector *dir, slVector *target, slVector *point ) {
 	slVector invert;
 	slVectorMul( dir, -1, &invert );
@@ -994,12 +1006,8 @@ int slShape::rayHitsShape( slVector *dir, slVector *target, slVector *point ) {
 	double minDistance = 1.0e10;
 	bool isFirst = true;
 	std::vector<slFace*>::iterator fi;
-	//printf("xxx");
-//	 irReflect(target, dir, 0.5);
-//       slMessage(DEBUG_ALL, " [ %f, %f, %f ] %f", dir->x, dir->y, dir->z, atan2(dir->z, dir->x)*180/M_PI);
-//        slMessage(DEBUG_ALL, " [ %f, %f, %f ] ", target->x, target->y, target->z );
 
-	// point = (0,0,0)'
+
 	slVectorSet( point, 0.0, 0.0, 0.0 );
 
 	slVectorSet( &pos.location, 0.0, 0.0, 0.0 );
@@ -1069,86 +1077,6 @@ int slShape::rayHitsShape( slVector *dir, slVector *target, slVector *point ) {
 
 	return -1;
 }
-
-/*
-float calculateArea(slFace *face){
-	for(int i=0; i< face->edgeCount-1; i++){
-
-		//slMessage(DEBUG_ALL, "normal(%f|%f|%f)\n",i,
-		//		f->plane.normal.x, f->plane.normal.y, f->plane.normal.z, area);
-		//slMessage(DEBUG_ALL, "i:%d edgeCount:%d area:%f\n",i, f->edgeCount,area);
-		slMessage(DEBUG_ALL, "p%d(%f|%f|%f)\n",i, face->points[i]->vertex.x ,
-				face->points[i]->vertex.y,face->points[i]->vertex.z);
-	}
-	slMessage(DEBUG_ALL, "p%d(%f|%f|%f)\n",i, face->points[i]->vertex.x ,
-			face->points[i]->vertex.y,face->points[i]->vertex.z);
-	return 5;
-}
-*/
-/*
-int slShape::irReflect(slVector *pos, slVector *dir, double maxAngle){
-
-
-	double angle, area, sum_area = 0;
-	slVector face_normal;
-	slVector v1;
-	slVector v2;
-	slPoint p1;
-	area = 0;
-	slVectorSet(&v1, 0.0, 0.0, 0.0);
-	slVectorSet(&v2, 0.0, 0.0, 0.0);
-	std::vector<slFace*>::iterator fi;
-//	slMessage(DEBUG_ALL, " irReflect start:\n");
-
-	for(fi = faces.begin(); fi != faces.end(); fi++ ) {
-		area = 0;
-		slFace *f = *fi;
-	//	p1 = f->points[0];
-	//	v1 = &f->points[0]->vertex;
-
-		slVectorSub(&f->points[0]->vertex, &f->points[1]->vertex, &v1);
-		slVectorSub(&f->points[2]->vertex, &f->points[1]->vertex, &v2);
-
-		slVectorCross(&v1, &v2, &face_normal);
-		angle = slVectorAngle(&face_normal, dir);//evtl einen Vector invertieren
-
-		//slVectorPrint(&f->points[0]->vertex);
-		//slVectorPrint(&f->points[1]->vertex);
-
-		//slVectorPrint(&v1);
-		//slVectorPrint(&v2);
-		//slVectorPrint(&face_normal);
-		slVectorNormalize(&face_normal);
-		slVectorPrint(&face_normal);
-		slVectorPrint(dir);
-		slMessage(DEBUG_ALL, " irReflect angle: %f\n",angle);
-	//	slMessage(DEBUG_ALL, " irReflect maxangle: %f\n",maxAngle);
-
-	//	if(angle < maxAngle){
-			//Fläche des Polygons berechnen
-		area = calculateArea(f);
-
-			//slMessage(DEBUG_ALL, "abc");
-		slMessage(DEBUG_ALL, "area:%f\n",area);
-
-			//Projektionsfläche auf Sichtebene
-			area *= cos(angle);
-			// Reflektion abhängig von Winkel
-
-			//Reflektion abhängig von Abstand zur Sensorachse/SensorHauptrichtung
-
-			sum_area += area;
-	//	}
-	//	  slMessage(DEBUG_ALL, " irReflect sum_area: %f\n",sum_area);
-
-	}
-
-	return 0;
-}
-
-
-*/
-
 
 void slSphere::scale( slVector *scale ) {
 	_recompile = 1;
@@ -1370,14 +1298,30 @@ double slShape::getDensity() {
 	return _density;
 }
 
-slMeshShape::slMeshShape( char *filename, char *name ) : slSphere( 1, 1 ) {
+slMeshShape::slMeshShape( char *filename, char *name, float inSize ) : slSphere( 1, 1 ) {
 #ifdef HAVE_LIB3DS
-	_mesh = new slMesh( filename, name );
+
+	if( !filename ) 
+		throw slException( "Cannot locate mesh file" );
+
+	_mesh = new slMesh( filename, name, inSize );
 
 	// get the new radius, and force the mass to update
 
 	_radius = _mesh->maxReach();
 	setDensity( 1.0 );
+
+	dTriMeshDataID triMeshID = dGeomTriMeshDataCreate();
+	
+	dGeomTriMeshDataBuildSingle( triMeshID, 
+		_mesh -> _vertices, 3 * sizeof( float ), _mesh -> _vertexCount,
+		_mesh -> _indices, _mesh -> _indexCount, 3 * sizeof( int ) );
+
+  	_odeGeomID = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
+
+	dGeomSetData( _odeGeomID, triMeshID );
+
+
 #else
 	throw "this software was compiled without lib3ds mesh support";
 #endif
@@ -1390,9 +1334,9 @@ slMeshShape::~slMeshShape() {
 #endif
 }
 
-void slMeshShape::draw( slCamera *c, slPosition *pos, double textureScale, int mode, int flags ) {
-#ifdef _HAVE_LIB3DS
-	float scale[4] = { 1.0 / textureScale, 1.0 / textureScale, 1.0 / textureScale, 1.0 / textureScale };
+void slMeshShape::draw( slCamera *c, slPosition *pos, double textureScaleX, double textureScaleY, int mode, int flags ) {
+#ifdef HAVE_LIB3DS
+	float scale[4] = { 1.0 / textureScaleX, 1.0 / textureScaleY, 1.0, 1.0 };
 
 	glPushMatrix();
 	glTranslated( pos->location.x, pos->location.y, pos->location.z );
@@ -1407,7 +1351,8 @@ void slMeshShape::draw( slCamera *c, slPosition *pos, double textureScale, int m
 	glEnable( GL_TEXTURE_GEN_T );
 
 	if ( _drawList == 0 || _recompile ) {
-		if ( _drawList == 0 ) _drawList = glGenLists( 1 );
+		if ( _drawList == 0 ) 
+			_drawList = glGenLists( 1 );
 
 		glNewList( _drawList, GL_COMPILE );
 
@@ -1422,6 +1367,22 @@ void slMeshShape::draw( slCamera *c, slPosition *pos, double textureScale, int m
 	glDisable( GL_TEXTURE_GEN_T );
 
 	glPopMatrix();
+
+
+
+	dMatrix4 transform = {
+		pos -> rotation[0][0], pos -> rotation[0][1], pos -> rotation[0][2], 0,
+		pos -> rotation[1][0], pos -> rotation[1][1], pos -> rotation[1][2], 0,
+		pos -> rotation[2][0], pos -> rotation[2][1], pos -> rotation[2][2], 0,
+		pos -> location.x, pos -> location.y, pos -> location.z,  1
+	};
+
+	memcpy( _mesh -> _lastPositions[ _mesh -> _lastPositionIndex ], transform, sizeof( dMatrix4 ) );
+
+	dGeomTriMeshSetLastTransform( _odeGeomID, _mesh -> _lastPositions[ _mesh -> _lastPositionIndex ] );
+
+	_mesh -> _lastPositionIndex = !_mesh -> _lastPositionIndex;
+
 #endif
 }
 

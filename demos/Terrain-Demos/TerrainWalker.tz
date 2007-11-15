@@ -73,9 +73,8 @@ PhysicalControl : Walker {
 
         self enable-lighting.
         self enable-smooth-drawing.
-        # self set-gravity to (0, 0, 0).
 
-        self move-light to (0, 40, 0).
+        self move-light to (0, 30, 0).
 
         self enable-shadow-volumes.
 
@@ -86,6 +85,9 @@ PhysicalControl : Walker {
         terrain generate with-ruggedness .4 with-height 15.
 		terrain set-scale to 3.
 		terrain set-eT to .9.
+
+		terrain set-peak-color to ( .4, .2, .1 ).
+		terrain set-valley-color to ( .2, .8, .3 ).
 
         # Create the Creature.
 

@@ -80,9 +80,6 @@ slTerrain::slTerrain( int res, double scale, void *data ) : slWorldObject() {
 
 	_xscale = scale;
 
-	_textureScaleX = _side;
-	_textureScaleY = _side;
-
 	_initialized = 0;
 
 	slVectorSet( &location, 0, 0, 0 );
@@ -128,8 +125,6 @@ void slTerrain::resize( int s ) {
 	delete _roam;
 
 	_side = slNextPowerOfTwo( s ) + 1;
-	_textureScaleX = _side;
-	_textureScaleY = _side;
 
 	_matrix = new float*[_side];
 	fnormals[0] = new slVector*[_side - 1];
@@ -342,6 +337,14 @@ void slTerrain::makeNormals() {
 	}
 
 	_heightDelta = max - _heightMin;
+}
+
+void slTerrain::colorForHeight( double inHeight, slVector *outColor ) {
+	float t = inHeight / _heightDelta;
+
+	outColor -> x = ( 1.0 - t ) * _bottomColor.x + t * _topColor.x;
+	outColor -> y = ( 1.0 - t ) * _bottomColor.y + t * _topColor.y;
+	outColor -> z = ( 1.0 - t ) * _bottomColor.z + t * _topColor.z;
 }
 
 void slNormalForFace( slVector *a, slVector *b, slVector *c, slVector *n ) {

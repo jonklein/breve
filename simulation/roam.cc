@@ -157,6 +157,7 @@ slRoamTriangle *slRoamPatch::nextTriangle() {
 	t = &_triangles[ _triangleCount++ ];
 
 	t->reset();
+	t->_terrain = _terrain;
 
 	return t;
 }
@@ -369,27 +370,24 @@ int slRoamPatch::render( slCamera *c, int mode ) {
 */
 
 int slRoamPatch::render( slRoamTriangle *triangle, slCamera *c ) {
-	double color;
-
 	if ( triangle->_leftChild )
 		return render( triangle->_leftChild, c ) + render( triangle->_rightChild, c );
 
-	color = ( triangle->_points[0].y ) / 100;
+	slVector color;
 
-	glColor3f( 1.0 - color, 1.0, 1.0 - color );
-
-	// if( triangle->_clipped) return 0;
-
+	_terrain -> colorForHeight( triangle->_points[0].y, &color );
+	glColor3f( color.x, color.y, color.z );
 	glTexCoord3f( triangle->_leftX / _terrain->_textureScaleX,  triangle->_leftY / _terrain->_textureScaleY, 0 );
-
 	glVertex3f( triangle->_points[0].x, triangle->_points[0].y, triangle->_points[0].z );
 
+	_terrain -> colorForHeight( triangle->_points[1].y, &color );
+	glColor3f( color.x, color.y, color.z );
 	glTexCoord3f( triangle->_apexX / _terrain->_textureScaleX, triangle->_apexY / _terrain->_textureScaleY, 0 );
-
 	glVertex3f( triangle->_points[1].x, triangle->_points[1].y, triangle->_points[1].z );
 
+	_terrain -> colorForHeight( triangle->_points[2].y, &color );
+	glColor3f( color.x, color.y, color.z );
 	glTexCoord3f( triangle->_rightX / _terrain->_textureScaleX, triangle->_rightY / _terrain->_textureScaleY, 0 );
-
 	glVertex3f( triangle->_points[2].x, triangle->_points[2].y, triangle->_points[2].z );
 
 	return 1;

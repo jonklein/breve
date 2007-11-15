@@ -52,7 +52,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		# we need to know when shadows and reflections are legal...
 
-		floorDefined (int).
+		shadowCatcherDefined (int).
 
 		shadowMenu (object).
 		shadowFlag (int).
@@ -103,7 +103,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 		self add-dependency on camera.
 		camera set-camera-pointer to cameraPointer.
 
-		floorDefined = 0.
+		shadowCatcherDefined = 0.
 
 		self set-integration-step to .005.
 		self set-iteration-step to .05.
@@ -616,13 +616,12 @@ Abstract : Control (aka Controls) [version 2.3] {
 
   + section "Rendering Options"
 
-	- to set-floor-defined:
+	- to set-shadow-catcher:
 		if lightFlag: {
-			shadowMenu enable.
 			reflectMenu enable.
 		}
 
-		floorDefined = 1.
+		shadowCatcherDefined = 1.
 
 	+ to enable-draw-every-frame:
 		% If the method METHOD(disable-draw-every-frame) has been called previously,	
@@ -690,8 +689,9 @@ Abstract : Control (aka Controls) [version 2.3] {
 		setDrawLights(lightFlag).
 		lightMenu check.
 
-		if floorDefined: {
-			shadowMenu enable.
+		shadowMenu enable.
+
+		if shadowCatcherDefined: {
 			reflectMenu enable.
 		}
 		 
@@ -739,11 +739,13 @@ Abstract : Control (aka Controls) [version 2.3] {
 		drawMenu uncheck.
 
 	+ to toggle-shadows:
-		% Toggle shadows for the main camera.  See METHOD(enable-shadows) and 
-		% METHOD(disable-shadows) for more information on shadows.  
+		% Toggle shadows for the main camera.  See METHOD(enable-shadow-volumes) and 
+		% METHOD(disable-shadow-volumes) for more information on shadows.  
 
-		if shadowFlag == 1: self disable-shadows.
-		else self enable-shadows.
+		if shadowVolumeFlag == 1: 
+			self disable-shadow-volumes.
+		else 
+			self enable-shadow-volumes.
 
 	+ to enable-shadows:
 		% Enable shadows for the main camera.  Shadows use the current 
@@ -756,11 +758,10 @@ Abstract : Control (aka Controls) [version 2.3] {
 		% <P>
 		% For an improved shadowing algorithm, see METHOD(enable-shadow-volumes).
 
-		if !floorDefined: return.
+		if !shadowCatcherDefined: return.
 
 		shadowFlag = 1.
 		setDrawShadow(shadowFlag).
-		shadowMenu check.
 
 	+ to disable-shadows:
 		% Disable "flat" shadows for the main camera.  See 
@@ -768,7 +769,6 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		shadowFlag = 0.
 		setDrawShadow(shadowFlag).
-		shadowMenu uncheck.
 
 	+ to enable-shadow-volumes:
 		% Enables shadows drawn using a "shadow volume" algorithm.  This
@@ -785,19 +785,21 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		shadowVolumeFlag = 1.
 		setDrawShadowVolumes(shadowVolumeFlag).
+		shadowMenu check.
 
 	+ to disable-shadow-volumes:
 		% Disable shadow volumes for the main camera.  See 
 		% METHOD(enable-shadow-volumes) for more information on shadows.
 
 		shadowVolumeFlag = 0.
-		setDrawShadowVolumes(shadowFlag).
+		setDrawShadowVolumes(shadowVolumeFlag).
+		shadowMenu uncheck.
 
 	+ to toggle-reflections:
 		% Toggle reflections for the main camera.  See METHOD(enable-reflections) for 
 		% more information on reflections.
 
-		if !floorDefined: return.
+		if !shadowCatcherDefined: return.
 
 		shadowFlag = 1.
 
@@ -812,7 +814,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 		% for more information.  The reflection-catching object must already be defined in
 		% order for this method to take effect.
 
-		if !floorDefined: return.
+		if !shadowCatcherDefined: return.
 
 		reflectFlag = 1.
 		setDrawReflection(reflectFlag).

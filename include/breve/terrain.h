@@ -23,9 +23,9 @@
 
 #include "worldObject.h"
 
-/*!
-	\brief Serialized \ref slTerrain data.
-*/
+/**
+ *	\brief Serialized \ref slTerrain data.
+ */
 
 struct slSerializedTerrain {
 	int side;
@@ -36,11 +36,9 @@ struct slSerializedTerrain {
 	float *values;
 };
 
-/*!
-	\brief Terrain data.
-*/
-
-#ifdef __cplusplus
+/**
+ * \brief Terrain data.
+ */
 
 void slNormalForFace(slVector *a, slVector *b, slVector *c, slVector *n);
 
@@ -75,6 +73,8 @@ class slTerrain: public slWorldObject {
 		void generateFractalTerrain(double h, double height);
 		float averageDiamondValues(int x, int y, int jump);
 
+		void colorForHeight( double inHeight, slVector *outColor );
+	
 		int loadGeoTIFF(char *file);
 
 		float **_matrix;
@@ -124,12 +124,6 @@ class slTerrain: public slWorldObject {
 		int areaUnderPoint( slVector *origpoint, int *x, int *z, int *quad );
 };
 
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 int slTerrainTestPair(slVclipData *vc, int x, int y, slCollision *ce);
 
 int slTerrainPlaneUnderPoint(slTerrain *l, slVector *point, slPlane *plane);
@@ -143,8 +137,4 @@ slSerializedTerrain *slSerializeTerrain(slTerrain *t, int *size);
 
 void slTerrainGetSlope(slTerrain *t, double x1, double z1, double x2, double z2, slVector *result);
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* _TERRAIN_H */
+#endif // _TERRAIN_H 

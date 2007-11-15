@@ -103,7 +103,6 @@ MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
 			to-child wheel parent bodyLink.
 
 		wheel set-eT to .8.
-		wheel set-texture to 0.
 		wheel set-joint to joint.
 		joint set-strength-limit to (joint get-strength-hard-limit) / 2.
 		wheel set-color to (.6, .6, .6).

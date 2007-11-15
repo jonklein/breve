@@ -12,7 +12,8 @@
 #include <lib3ds/vector.h>
 #include <lib3ds/light.h>
 
-#ifdef __cplusplus
+
+#include <ode/ode.h>
 
 class sl3DSScene {
 	
@@ -20,7 +21,7 @@ class sl3DSScene {
 
 class slMesh {
 	public:
-		slMesh(char *, char *);
+		slMesh( char *, char *, float inSize = 1.0 );
 		~slMesh();
 
 		double maxReach();
@@ -28,8 +29,19 @@ class slMesh {
 		void draw();
 
 		Lib3dsMesh *_mesh;
+
+		float*						_vertices;
+		float*						_normals;
+		int							_vertexCount;
+
+		int* 						_indices;
+		int							_indexCount;
+
+		float						_maxReach;
+
+
+		dMatrix4					_lastPositions[ 2 ];
+		int 						_lastPositionIndex;
 };
 
-#endif /* __cplusplus */
-
-#endif /* HAVE_LIB3DS */
+#endif // HAVE_LIB3DS

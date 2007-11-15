@@ -95,8 +95,9 @@ int brIShapeSetMass( brEval args[], brEval *target, brInstance *i ) {
 }
 
 int brIMeshShapeNew( brEval args[], brEval *target, brInstance *i ) {
+	char *path = brFindFile( i -> engine, BRSTRING( &args[ 0 ] ), NULL );
 
-	target->set( new slMeshShape( BRSTRING( &args[0] ), BRSTRING( &args[1] ) ) );
+	target->set( new slMeshShape( path, BRSTRING( &args[1] ), BRDOUBLE( &args[ 2 ] ) ) );
 
 	return EC_OK;
 }
@@ -110,7 +111,7 @@ int brISphereNew( brEval args[], brEval *target, brInstance *i ) {
 
 int brICubeNew( brEval args[], brEval *target, brInstance *i ) {
 
-	target->set( slNewCube( &BRVECTOR( &args[0] ), BRDOUBLE( &args[1] ) ) );
+	target->set( new slBox( &BRVECTOR( &args[0] ), BRDOUBLE( &args[1] ) ) );
 
 	return EC_OK;
 }
@@ -215,7 +216,7 @@ void breveInitShapeFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "shapeSetMass", brIShapeSetMass, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "scaleShape", brIScaleShape, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
 	brNewBreveCall( n, "newSphere", brISphereNew, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0 );
-	brNewBreveCall( n, "meshShapeNew", brIMeshShapeNew, AT_POINTER, AT_STRING, AT_STRING, 0 );
+	brNewBreveCall( n, "meshShapeNew", brIMeshShapeNew, AT_POINTER, AT_STRING, AT_STRING, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "newCube", brICubeNew, AT_POINTER, AT_VECTOR, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "newNGonDisc", brINGonDiscNew, AT_POINTER, AT_INT, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "newNGonCone", brINGonConeNew, AT_POINTER, AT_INT, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0 );

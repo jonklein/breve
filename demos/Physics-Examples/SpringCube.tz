@@ -69,7 +69,7 @@ PhysicalControl : SpringController {
 
         self set-gravity to (0, -9.8, 0).
 
-        new Stationary register with-shape (new Cube init-with size (1200, 1, 1200)).
+        new Floor.
 
         for x=0,x< NUMEDGESONSIDE,x++: {
             for y = 0, y< NUMEDGESONSIDE, y++:{

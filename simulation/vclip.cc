@@ -375,7 +375,36 @@ int slVclipData::testPair( slCollisionCandidate *candidate, slCollision *ce ) {
 	p1 = candidate->_position1;
 	p2 = candidate->_position2;
 
-	if ( !s1 || !s2 ) return slTerrainTestPair( this, x, y, ce );
+	if( s1 && s2 && s1 -> _odeGeomID != 0 && s2 -> _odeGeomID != 0 ) {
+		dMatrix3 m1, m2;
+
+		ce -> points.clear();
+		ce -> depths.clear();
+
+		slShape::slMatrixToODEMatrix( p1 -> rotation, m1 );
+		slShape::slMatrixToODEMatrix( p2 -> rotation, m2 );
+
+		dGeomSetPosition( s1 -> _odeGeomID, p1 -> location.x, p1 -> location.y, p1 -> location.z );
+		dGeomSetPosition( s2 -> _odeGeomID, p2 -> location.x, p2 -> location.y, p2 -> location.z );
+
+		dGeomSetRotation( s1 -> _odeGeomID, m1 );
+		dGeomSetRotation( s2 -> _odeGeomID, m2 );
+
+		ce -> _contactPoints = dCollide( s1 -> _odeGeomID, s2 -> _odeGeomID, MAX_ODE_CONTACTS, ce -> _contactGeoms, sizeof( dContactGeom ) );
+
+		if( ce -> _contactPoints > 0 ) {
+			ce->n1 = x;
+			ce->n2 = y;
+			return CT_PENETRATE;
+		}
+
+		return CT_DISJOINT;
+	}
+
+	ce -> _contactPoints = 0;
+
+	if ( !s1 || !s2 ) 
+		return slTerrainTestPair( this, x, y, ce );
 
 	f1 = &candidate->_feature1;
 	f2 = &candidate->_feature2;

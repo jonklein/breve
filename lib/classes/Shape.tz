@@ -275,19 +275,19 @@ Shape : PolygonCone (aka PolygonCones) {
 }
 
 Shape : MeshShape {
-	% An experimental class to load arbitrary 3d mesh shapes.  
-	% <p>
-	% <b>Full collision detection is not currently supported for MeshShapes</b>.
-	% MeshShapes are currently collision detected using spheres, with the radius
-	% defined by the maximum reach of the mesh.
+	% A class to load arbitrary 3d mesh shapes.  
 
-	+ to load-from-3ds file filename (string) with-node nodename = "" (string): 
+	+ to load-from-3ds file filename (string) with-node nodename = "" (string) with-size size = 1.0 (float):
 		% Attempts to load a mesh from a 3D Studio scene file named filename.
 		% The optional argument nodename specifies which mesh in the scene 
 		% should be loaded.  If nodename is not provided, the first mesh found  
 		% in the scene is loaded.
+		% <p>
+		% The size argument specifies the maximum size for the imported shape.  
+		% Because sizes may vary between different models, shapes are normalized
+		% to the size specified, which is 1.0 by default.
 
-		shapePointer = meshShapeNew(filename, nodename).
+		shapePointer = meshShapeNew(filename, nodename, size ).
 
 		if !shapePointer:
 			die "Could not create MeshShape: invalid arguments".

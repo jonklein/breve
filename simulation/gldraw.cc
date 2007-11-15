@@ -103,7 +103,7 @@ void slMakeLightTexture( GLubyte *lTexture, GLubyte *dlTexture ) {
 }
 
 void slInitGL( slWorld *w, slCamera *c ) {
-	GLfloat specularColor[4] = { 0.2, 0.2, 0.2, 0.0 };
+	GLfloat specularColor[4] = { 0.9, 0.9, 0.9, 0.0 };
 	GLubyte lt[LIGHTSIZE * LIGHTSIZE * 2];
 	GLubyte glt[LIGHTSIZE * LIGHTSIZE * 2];
 
@@ -510,27 +510,32 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 	// Setup lighting and effects for the normal objects
 	//
 
+	bool volumeShadows = _drawShadowVolumes;
+	bool flatShadows = !volumeShadows && _drawShadow && _shadowCatcher;
+
 	if ( _drawLights ) {
-		if ( _drawShadowVolumes ) 
+		if ( volumeShadows ) 
 			drawLights( 1 );
 		else 
 			drawLights( 0 );
 
-		if ( _shadowCatcher && ( _drawReflection || _drawShadow ) )
+		if ( _drawReflection || flatShadows )
 			stencilFloor();
 
 		if ( _drawReflection && !( flags & DO_OUTLINE ) ) {
 			slVector toCam;
 
-			if ( !_drawShadowVolumes ) gReflectionAlpha = REFLECTION_ALPHA;
-			else gReflectionAlpha = REFLECTION_ALPHA - 0.1;
+			if ( !volumeShadows ) 
+				gReflectionAlpha = REFLECTION_ALPHA;
+			else 
+				gReflectionAlpha = REFLECTION_ALPHA - 0.1;
 
 			slVectorSub( &cam, &_shadowPlane.vertex, &toCam );
 
 			if ( slVectorDot( &toCam, &_shadowPlane.normal ) > 0.0 ) {
 				reflectionPass( w );
 
-				if ( _drawShadowVolumes ) 
+				if ( volumeShadows ) 
 					drawLights( 1 );
 			}
 		}
@@ -557,8 +562,10 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 		( *pi )->draw( this );
 
 	if ( _drawLights ) {
-		if ( _drawShadowVolumes ) renderShadowVolume( w );
-		else if ( _drawShadow ) shadowPass( w );
+		if ( volumeShadows ) 
+			renderShadowVolume( w );
+		else if ( flatShadows ) 
+			shadowPass( w );
 	}
 
 	glDepthMask( GL_FALSE );
@@ -1063,8 +1070,10 @@ void slCamera::drawLights( int noDiffuse ) {
 	amb[2] = _lights[0].ambient.z;
 	amb[3] = 0.0;
 
-	if ( _drawSmooth ) glShadeModel( GL_SMOOTH );
-	else glShadeModel( GL_FLAT );
+	if ( _drawSmooth ) 
+		glShadeModel( GL_SMOOTH );
+	else 	
+		glShadeModel( GL_FLAT );
 
 	glEnable( GL_LIGHTING );
 	glEnable( GL_LIGHT0 );

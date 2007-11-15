@@ -7,11 +7,9 @@
 
 #define TRIANGLE_COUNT 50000
 
-/*!
-	\brief A class used for recursive subdivisions of a \ref slTerrain.
-*/
-
-#ifdef __cplusplus
+/**
+ * A class used for recursive subdivisions of a \ref slTerrain.
+ */
 
 class slRoamTriangle {
 	public:
@@ -27,6 +25,7 @@ class slRoamTriangle {
 			_baseNeighbor = NULL;
 
 			_clipped = false;
+			_terrain = NULL;
 		};
 
 		slRoamTriangle *_leftChild;	
@@ -43,7 +42,8 @@ class slRoamTriangle {
 		slVector _points[3];
 		slVector _normal;
 
-		bool _clipped;
+		slTerrain*							_terrain;
+		bool 								_clipped;
 };
 
 /*!
@@ -52,7 +52,7 @@ class slRoamTriangle {
 
 class slRoamPatch {
 	public:
-		slRoamPatch(slTerrain *t);
+		slRoamPatch( slTerrain *t );
 
 		void reset();
 
@@ -78,24 +78,22 @@ class slRoamPatch {
 
 		slRoamTriangle *nextTriangle();
 
-		slRoamTriangle _triangles[ 50000];
-		int _triangleCount;
+		slRoamTriangle 					_triangles[ 50000];
+		int 							_triangleCount;
 
-		slTerrain *_terrain;
+		slTerrain*						_terrain;
 
-		float *_height;
+		float*							_height;
 
-		float _varianceLeft[1 << VARIANCE_DEPTH];
-		float _varianceRight[1 << VARIANCE_DEPTH];
+		float 							_varianceLeft[1 << VARIANCE_DEPTH];
+		float 							_varianceRight[1 << VARIANCE_DEPTH];
 
-		float *_currentVariance;
+		float*							_currentVariance;
 
-		slRoamTriangle _baseLeft;
-		slRoamTriangle _baseRight;
+		slRoamTriangle 					_baseLeft;
+		slRoamTriangle 					_baseRight;
 
-		double _frameVariance;
+		double 							_frameVariance;
 };
 
-#endif /* __cplusplus */
-
-#endif /* _ROAM_H */
+#endif // _ROAM_H 

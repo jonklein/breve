@@ -389,7 +389,9 @@ double slWorld::step( double stepSize, int *error ) {
 		( *li )->step( stepSize );
 
 	if ( _detectCollisions ) {
-		if ( !_initialized ) slVclipDataInit( this );
+		
+		if ( !_initialized ) 
+			slVclipDataInit( this );
 
 		if ( _clipGrid ) {
 			_clipGrid->assignObjectsToPatches( this );
@@ -424,6 +426,8 @@ double slWorld::step( double stepSize, int *error ) {
 				dJointID id;
 				double mu = 0;
 				double e = 0;
+				double erp = 0;
+				double cfm = 0;
 
 				if ( w1->getType() == WO_LINK ) {
 					slLink *l = ( slLink* )w1;
@@ -435,9 +439,42 @@ double slWorld::step( double stepSize, int *error ) {
 					bodyY = l->_odeBodyID;
 				}
 
+				if ( w1->getType() == WO_LINK && w2->getType() == WO_LINK ) {
+					slMultibody *mb1 = (( slLink* )w1 )->getMultibody();
+					slMultibody *mb2 = (( slLink* )w2 )->getMultibody();
+
+					if ( mb1 && mb1 == mb2 && mb1->getCFM() != 0.0 ) {
+						cfm = mb1->getCFM();
+						erp = mb1->getERP();
+					}
+				}
+
 				mu = 1.0 + ( w1->_mu + w2->_mu ) / 2.0;
 
 				e = ( w1->_e + w2->_e ) / ( 2.0 * c->points.size() );
+
+				for ( int n = 0; n < c -> _contactPoints; n++ ) {
+					dContact contact;
+
+					memset( &contact, 0, sizeof( dContact ) );
+					memcpy( &contact.geom, &c -> _contactGeoms[ n ], sizeof( dContactGeom ) );
+
+					contact.surface.mode = dContactSoftERP | dContactApprox1 | dContactBounce;
+					contact.surface.soft_erp = 0.05;
+					contact.surface.mu = mu;
+					contact.surface.mu2 = 0;
+					contact.surface.bounce = e;
+					contact.surface.bounce_vel = -0.05;
+
+					if( cfm != 0.0 || erp != 0.0 ) {
+						contact.surface.mode = dContactSoftERP | dContactApprox1 | dContactBounce | dContactSoftCFM;
+						contact.surface.soft_cfm = cfm;
+						contact.surface.soft_erp = erp;
+					}
+
+					id = dJointCreateContact( _odeWorldID, _odeCollisionGroupID, &contact );
+					dJointAttach( id, bodyX, bodyY );
+				}
 
 				for ( x = 0; x < c->points.size(); x++ ) {
 					dContact contact;
@@ -452,15 +489,10 @@ double slWorld::step( double stepSize, int *error ) {
 					contact.surface.bounce = e;
 					contact.surface.bounce_vel = 0.05;
 
-					if ( w1->getType() == WO_LINK && w2->getType() == WO_LINK ) {
-						slMultibody *mb1 = (( slLink* )w1 )->getMultibody();
-						slMultibody *mb2 = (( slLink* )w2 )->getMultibody();
-
-						if ( mb1 && mb1 == mb2 && mb1->getCFM() != 0.0 ) {
-							contact.surface.mode = dContactSoftERP | dContactApprox1 | dContactBounce | dContactSoftCFM;
-							contact.surface.soft_cfm = mb1->getCFM();
-							contact.surface.soft_erp = mb1->getERP();
-						}
+					if( cfm != 0.0 || erp != 0.0 ) {
+						contact.surface.mode = dContactSoftERP | dContactApprox1 | dContactBounce | dContactSoftCFM;
+						contact.surface.soft_cfm = cfm;
+						contact.surface.soft_erp = erp;
 					}
 
 					if ( c->depths[x] < -0.5 ) {
@@ -469,14 +501,14 @@ double slWorld::step( double stepSize, int *error ) {
 						slMessage( 50, "warning: collision depth = %f for pair (%d, %d)\n", c->depths[x], c->n1, c->n2 );
 					}
 
-					contact.geom.depth = -c->depths[x];
 
 					contact.geom.g1 = NULL;
 					contact.geom.g2 = NULL;
 
-					contact.geom.normal[0] = -c->normal.x;
-					contact.geom.normal[1] = -c->normal.y;
-					contact.geom.normal[2] = -c->normal.z;
+					contact.geom.depth = c->depths[x];
+					contact.geom.normal[0] = c->normal.x;
+					contact.geom.normal[1] = c->normal.y;
+					contact.geom.normal[2] = c->normal.z;
 
 					slVector *v = &c->points[x];
 
@@ -485,7 +517,7 @@ double slWorld::step( double stepSize, int *error ) {
 					contact.geom.pos[2] = v->z;
 
 					id = dJointCreateContact( _odeWorldID, _odeCollisionGroupID, &contact );
-					dJointAttach( id, bodyY, bodyX );
+					dJointAttach( id, bodyX, bodyY );
 				}
 			}
 

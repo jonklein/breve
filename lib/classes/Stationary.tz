@@ -61,7 +61,7 @@ Real : Stationary (aka Stationaries) [version 2.4] {
 		shadowCatcher = 1.
 
 		setShadowCatcher(realWorldPointer, (0, 1, 0)).
-		controller set-floor-defined.
+		controller set-shadow-catcher.
 
 	+ to dearchive:
 		if !realWorldPointer:
@@ -85,6 +85,7 @@ Stationary : Floor {
 		shape = ( new Cube init-with size (1000, 5, 1000 )).
 		self move to (0, -2.5, 0).
 		self set-shape to shape.
+		self set-color to ( .2, .8, .6 ).
 
 	+ to set-size to newSize (vector):
 		% Changes the size of the floor to newSize.

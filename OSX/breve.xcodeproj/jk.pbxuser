@@ -1,6 +1,7 @@
 // !$*UTF8*$!
 {
 	2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
+		activeArchitecture = i386;
 		activeBuildConfigurationName = "Deployment-Universal";
 		activeExecutable = 4802DC7B05616137008198B9 /* real_breve.app */;
 		activeTarget = 480F31AA071472AD00E71420 /* breve.app */;
@@ -12,7 +13,6 @@
 			48BB5D1405C9659B007C7301 /* slBreveSourceDocument.mm:24 */,
 			480F31B80714755300E71420 /* slBreveGLView.mm:457 */,
 		);
-		breakpointsGroup = 48F0FA4B094B46E100FC8A16 /* XCBreakpointsBucket */;
 		codeSenseManager = 48E065B4055C318700C40B45 /* Code sense */;
 		executables = (
 			4802DC7B05616137008198B9 /* real_breve.app */,
@@ -152,7 +152,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 212881277;
+			PBXPerProjectTemplateStateSaveDate = 216482869;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -709,7 +709,7 @@
 				PBXModuleWindowStatusBarHidden = YES;
 				RubberWindowFrame = "267 380 745 408 0 0 1280 832 ";
 			};
-			PBXWorkspaceStateSaveDate = 212881277;
+			PBXWorkspaceStateSaveDate = 216482869;
 		};
 		sourceControlManager = 48E065B3055C318700C40B45 /* Source Control */;
 		userBuildSettings = {
@@ -747,12 +747,12 @@
 	};
 	4802DC7B05616137008198B9 /* real_breve.app */ = {
 		isa = PBXExecutable;
-		activeArgIndex = 2147483647;
 		activeArgIndices = (
 		);
 		argumentStrings = (
 		);
 		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
 		configStateDict = {
 		};
 		customDataFormattersEnabled = 1;
@@ -782,10 +782,12 @@
 		);
 		breakpointStyle = 0;
 		continueAfterActions = 0;
+		countType = 0;
 		delayBeforeContinue = 0;
 		fileReference = F5BD20C70397BFC001980AE4 /* slBreveGLView.mm */;
 		functionName = "-makeImageRep";
 		hitCount = 1;
+		ignoreCount = 0;
 		lineNumber = 457;
 		location = breve;
 		modificationTime = 200672232.824329;
@@ -797,9 +799,11 @@
 		);
 		breakpointStyle = 0;
 		continueAfterActions = 0;
+		countType = 0;
 		delayBeforeContinue = 0;
 		fileReference = 2A37F4ACFDCFA73011CA2CEA /* slBreveSourceDocument.mm */;
 		hitCount = 1;
+		ignoreCount = 0;
 		lineNumber = 24;
 		location = breve;
 		modificationTime = 200672232.824343;
@@ -837,14 +841,6 @@
 			sepNavVisRect = "{{0, 0}, {711, 429}}";
 			sepNavWindowFrame = "{{15, 315}, {750, 558}}";
 		};
-	};
-	48F0FA4B094B46E100FC8A16 /* XCBreakpointsBucket */ = {
-		isa = XCBreakpointsBucket;
-		name = "Project Breakpoints";
-		objects = (
-			48BB5D1405C9659B007C7301 /* slBreveSourceDocument.mm:24 */,
-			480F31B80714755300E71420 /* slBreveGLView.mm:457 */,
-		);
 	};
 	F569DDB00398039F01B2CBA0 /* Template.tz */ = {
 		uiCtxt = {
@@ -981,10 +977,11 @@
 	};
 	F5BD20D80397BFC001980AE4 /* slFullScreen.mm */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {922, 5250}}";
-			sepNavSelRange = "{3885, 0}";
+			sepNavIntBoundsRect = "{{0, 0}, {902, 4634}}";
+			sepNavSelRange = "{5404, 0}";
+			sepNavVisRange = "{4103, 1598}";
 			sepNavVisRect = "{{0, 1118}, {922, 690}}";
-			sepNavWindowFrame = "{{340, 13}, {961, 819}}";
+			sepNavWindowFrame = "{{295, 209}, {961, 819}}";
 		};
 	};
 	F5BD22640397C69401980AE4 /* AppIcon.icns */ = {

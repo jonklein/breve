@@ -44,7 +44,6 @@ Control : Swarm {
     + variables:
         birds (list).
         item (object).
-        cloudTexture (object).
         selection (object).
 
         # the menu items corresponding to different flocking behaviors
@@ -64,6 +63,7 @@ Control : Swarm {
     + to init:
         # Set up menus to modify the type of movement allowed.
 
+
         self add-menu named "Smoosh The Birdies" for-method "squish".
         self add-menu-separator.
         obedientMenu = (self add-menu named "Flock Obediently" for-method "flock-obediently").
@@ -71,9 +71,7 @@ Control : Swarm {
         wackyMenu = (self add-menu named "Flock Wackily" for-method "flock-wackily").
 
         self enable-lighting.
-        self move-light to (0, 20, 20).
-
-        cloudTexture = (new Image load from "images/clouds.png").
+        self move-light to (0, 30, 0 ).
 
         # Add a terrain.
 
@@ -85,7 +83,8 @@ Control : Swarm {
 
         self flock-normally.
 
-        self set-background-texture-image to cloudTexture.
+        self set-background-texture-image to (new Image load from "images/clouds.png").
+
 
         self offset-camera by (5, 1.5, 6).
 
