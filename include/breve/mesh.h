@@ -1,5 +1,6 @@
 
 #include "config.h"
+#include "shape.h"
 
 #ifdef HAVE_LIB3DS
 
@@ -15,33 +16,21 @@
 
 #include <ode/ode.h>
 
-class sl3DSScene {
-	
-};
-
-class slMesh {
+class sl3DSShape : public slMeshShape {
 	public:
-		slMesh( char *, char *, float inSize = 1.0 );
-		~slMesh();
+		sl3DSShape( char *, char *, float inSize = 1.0 );
+		~sl3DSShape();
 
-		double maxReach();
+		double 						maxReach();
 
-		void draw();
+		void 						draw();
+		void						draw( slCamera *c, slPosition *pos, double textureScaleX, double textureScaleY, int mode, int flags );
 
-		Lib3dsMesh *_mesh;
+		void 						calculateSizes( Lib3dsNode *inNode );
 
-		float*						_vertices;
+		Lib3dsMesh*					_mesh;
+
 		float*						_normals;
-		int							_vertexCount;
-
-		int* 						_indices;
-		int							_indexCount;
-
-		float						_maxReach;
-
-
-		dMatrix4					_lastPositions[ 2 ];
-		int 						_lastPositionIndex;
 };
 
 #endif // HAVE_LIB3DS

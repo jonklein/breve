@@ -360,14 +360,7 @@ int slVclipData::testPair( slCollisionCandidate *candidate, slCollision *ce ) {
 	slFeature **f1, **f2;
 
 	x = candidate->_x;
-
 	y = candidate->_y;
-
-	/*
-		this here is dirty, because we're not supposed to expect the object
-		fields to necessarily be slWorldObjects, but that's what the terrain
-		checker is expecting.
-	*/
 
 	s1 = candidate->_shape1;
 	s2 = candidate->_shape2;
@@ -400,6 +393,9 @@ int slVclipData::testPair( slCollisionCandidate *candidate, slCollision *ce ) {
 
 		return CT_DISJOINT;
 	}
+
+
+	printf( "WARNING: using deprecated collision detection\n" );
 
 	ce -> _contactPoints = 0;
 

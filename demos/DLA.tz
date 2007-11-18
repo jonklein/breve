@@ -92,9 +92,8 @@ Control : DLA {
 
 		newParticle = new Stationary.
 		newParticle register with-shape sphereShape at-location location.
-
 		newParticle set-color to c + (random[(.2, .2, .2)] - (.1, .1, .1)).
-		newParticle set-texture to -1.
+		newParticle set-texture-image to 0.
 
 		# move the Diffuser agent to a random location in space, but not 
 		# too close to an existing object.

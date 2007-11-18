@@ -20,7 +20,11 @@ PhysicalControl : TerrainWave {
 
 		self set-background-texture-image to (new Image load from "images/clouds.png").
 
+		self set-integration-step to 0.001.
+		self set-iteration-step to 0.01.
+
 		self enable-shadow-volumes.
+		self enable-fast-physics.
 
 		terrain = new Terrain.
 
@@ -48,6 +52,7 @@ PhysicalControl : TerrainWave {
 Mobile : Ball {
 	+ to init:
 		self set-shape to (new Sphere init-with radius random[1.0]).
+		# self set-shape to ( new MeshShape load-from-3ds file "knot.3ds" with-size 2.0 ).
 
 		self set-color to random[(1, 1, 1)].
 

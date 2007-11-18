@@ -24,8 +24,9 @@
 
 #include <ode/ode.h>
 
+#include <vector>
+
 #include "vector.h"
-#include "mesh.h"
 
 enum shapeTypes {
 	ST_NORMAL,
@@ -84,9 +85,6 @@ struct slSerializedShapeHeader {
 };  
 
 typedef struct slSerializedShapeHeader slSerializedShapeHeader;
-
-#ifdef __cplusplus
-#include <vector>
 
 class slCamera;
 
@@ -166,6 +164,9 @@ class slFace : public slFeature {
 	public:
 		int edgeCount;
 
+
+		int						_pointCount;
+
 		slPlane plane;
 
 		slEdge **neighbors;		// neighbor edges
@@ -182,9 +183,9 @@ class slFace : public slFeature {
 };
 
 
-/*!
-	\brief A shape in the simulated world.
-*/
+/**
+ * A shape in the simulated world.
+ */
 
 class slShape {
 	friend class 					slWorldObject;
@@ -200,11 +201,9 @@ class slShape {
 			_odeGeomID						= 0;
 		}
 
-		dMatrix4 							lastTransform;
+		int									findPointIndex( slVector *inVertex );
 
 		static void 						slMatrixToODEMatrix( const double inM[ 3 ][ 3 ], dMatrix3 outM );
-
-		virtual bool 						isMesh() { return false; }
 
 		void recompile() { _recompile = 1; }
 
@@ -242,18 +241,18 @@ class slShape {
 
 		// the max reach on each axis 
 
-		slVector _max;
+		slVector 							_max;
 
 		// add support for this shape to be a sphere, in which case the 
 		// normal features below are ignored 
 
 		int _type;
 
-		std::vector< slFeature* > features;
+		std::vector< slFeature* > 			features;
 
-		std::vector< slFace* > faces;
-		std::vector< slEdge* > edges;
-		std::vector< slPoint* > points;
+		std::vector< slFace* > 				faces;
+		std::vector< slEdge* > 				edges;
+		std::vector< slPoint* > 			points;
 
 	protected:
 		dGeomID								_odeGeomID;
@@ -285,36 +284,41 @@ class slSphere : public slShape {
 		double _radius;
 };
 
-class slMeshShape : public slSphere {
+class slMeshShape : public slShape {
 	public:
-		slMeshShape( char *filename, char *name, float inSize = 1.0 );
-
+		slMeshShape();
 		~slMeshShape();
-	
-		void 								draw( slCamera *inCamera, slPosition *inPos, double inTScaleX, double inTScaleY, int inMode, int inFlags);
-		virtual bool 						isMesh() { return true; }
 
-#ifdef HAVE_LIB3DS
-		slMesh *_mesh;
-#endif
+		void 						bounds( const slPosition *position, slVector *min, slVector *max ) const;
+
+		void						finishShape( double inDensity );
+
+	protected:
+		int							createODEGeom();
+	
+		float*						_vertices;
+		int*						_indices;
+
+		int 						_vertexCount;
+		int 						_indexCount;
+
+		dMatrix4                    _lastPositions[ 2 ];
+		int                         _lastPositionIndex;
+
+		float						_maxReach;
 };
-#endif
+
 
 /*!
-	\brief A header used when serializing face data.  
-
-	It's only contains an integer at the moment.
-*/
+ * A header used when serializing face data.  
+ * It's only contains an integer at the moment.
+ */
 
 struct slSerializedFaceHeader {
 	int vertexCount;
 };
 
 typedef struct slSerializedFaceHeader slSerializedFaceHeader;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*!
  * \brief Transforms a vector with the given position.
@@ -335,15 +339,15 @@ slPoint *slAddPoint(slShape *v, slVector *start);
 void slShapeFree(slShape *s);
 
 slShape *slSetCube(slShape *s, slVector *a, double density);
-slShape *slSetPyramid(slShape *s, double len, double density);
-slShape *slSetNGonDisc(slShape *s, int sideCount, double radius, double height, double density);
-slShape *slSetNGonCone(slShape *s, int sideCount, double radius, double height, double density);
+
+slShape *slSetNGonDisc( slMeshShape *s, int sideCount, double radius, double height, double density);
+slShape *slSetNGonCone( slMeshShape *s, int sideCount, double radius, double height, double density);
 
 slPlane *slSetPlane(slPlane *p, slVector *normal, slVector *vertex);
 
 int slFeatureSort(const void *a, const void *b);
 
-slShape *slShapeInitNeighbors(slShape *s, double density);
+slShape *slFinishShape(slShape *s, double density);
 
 void slDumpEdgeVoronoi(slShape *s);
 
@@ -358,8 +362,4 @@ slSerializedShapeHeader *slSerializeShape(slShape *s, int *length);
 slShape *slDeserializeShape(slSerializedShapeHeader *header, int length);
 void slShapeBounds(slShape *shape, slPosition *position, slVector *min, slVector *max);
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* _SHAPE_H */
+#endif // SHAPE_H

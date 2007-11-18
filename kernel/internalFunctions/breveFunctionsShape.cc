@@ -24,6 +24,7 @@
 #include "evaluation.h"
 #include "world.h"
 #include "shape.h"
+#include "mesh.h"
 
 #define BRSHAPEPOINTER(p)	((slShape*)BRPOINTER(p))
 
@@ -70,7 +71,7 @@ int brIFinishShape( brEval args[], brEval *target, brInstance *i ) {
 	slShape *s = BRSHAPEPOINTER( &args[0] );
 	double density = BRDOUBLE( &args[1] );
 
-	if ( !slShapeInitNeighbors( s, density ) ) 
+	if ( !slFinishShape( s, density ) ) 
 		return EC_ERROR;
 
 	return EC_OK;
@@ -97,7 +98,17 @@ int brIShapeSetMass( brEval args[], brEval *target, brInstance *i ) {
 int brIMeshShapeNew( brEval args[], brEval *target, brInstance *i ) {
 	char *path = brFindFile( i -> engine, BRSTRING( &args[ 0 ] ), NULL );
 
-	target->set( new slMeshShape( path, BRSTRING( &args[1] ), BRDOUBLE( &args[ 2 ] ) ) );
+	if( !path ) {
+		slMessage( DEBUG_ALL, "Could not locate mesh file \"%s\"", BRSTRING( &args[ 0 ] ) );
+		return EC_ERROR;
+	}
+
+#ifdef HAVE_LIB3DS
+	target->set( new sl3DSShape( path, BRSTRING( &args[1] ), BRDOUBLE( &args[ 2 ] ) ) );
+#else
+	slMessage( DEBUG_ALL, "Cannot load mesh shape -- this binary was built without lib3ds" );
+	return EC_ERROR;
+#endif
 
 	return EC_OK;
 }

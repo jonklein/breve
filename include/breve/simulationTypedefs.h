@@ -44,7 +44,6 @@ typedef struct slPlane slPlane;
 typedef struct slPosition slPosition;
 typedef struct slShape slShape;
 typedef struct slSphere slSphere;
-typedef struct slMeshShape slMeshShape;
 typedef struct slCollisionHeap slCollisionHeap;
 typedef struct slBoundSort slBoundSort;
 typedef struct slCollision slCollision;

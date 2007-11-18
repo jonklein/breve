@@ -26,7 +26,7 @@
 #include "vclip.h"
 #include "vclipData.h"
 
-void slShape::draw( slCamera *c, slPosition *pos, double textureScaleX, double textureScaleY, int mode, int flags ) {
+void slShape::draw( slCamera *c, slPosition *pos, double inTScaleX, double inTScaleY, int mode, int flags ) {
 	unsigned char bound, axis;
 
 	bound = ( mode & DM_BOUND ) && !( flags & DO_NO_BOUND );
@@ -47,8 +47,8 @@ void slShape::draw( slCamera *c, slPosition *pos, double textureScaleX, double t
 
 	glTranslatef( 0.5, 0.5, 0.0 );
 
-	if( textureScaleX > 0.0 && textureScaleY > 0.0 )
-		glScalef( 1.0 / textureScaleX, 1.0 / textureScaleY, 1.0 );
+	if( inTScaleX > 0.0 && inTScaleY > 0.0 )
+		glScalef( 1.0 / inTScaleX, 1.0 / inTScaleY, 1.0 );
 
 	glPopAttrib();
 
@@ -152,11 +152,9 @@ slBox::slBox( slVector *inSize, double inDensity ) {
 }
 
 slShape *slNewNGonDisc( int count, double radius, double height, double density ) {
-	slShape *s;
-
 	if ( radius <= 0.0 || height <= 0.0 || density <= 0.0 || count < 3 ) return NULL;
 
-	s = new slShape();
+	slMeshShape *s = new slMeshShape();
 
 	if ( !slSetNGonDisc( s, count, radius, height, density ) ) {
 		s->release();
@@ -167,11 +165,9 @@ slShape *slNewNGonDisc( int count, double radius, double height, double density 
 }
 
 slShape *slNewNGonCone( int count, double radius, double height, double density ) {
-	slShape *s;
-
 	if ( radius <= 0.0 || height <= 0.0 || density <= 0.0 || count < 3 ) return NULL;
 
-	s = new slShape();
+	slMeshShape *s = new slMeshShape();
 
 	if ( !slSetNGonCone( s, count, radius, height, density ) ) {
 		s->release();
@@ -206,7 +202,61 @@ slShape::~slShape() {
 		dGeomDestroy( _odeGeomID );
 }
 
-slShape *slShapeInitNeighbors( slShape *s, double density ) {
+
+int slShape::findPointIndex( slVector *inVertex ) {
+   for ( unsigned int n = 0; n < points.size(); n++ ) {
+        if ( !slVectorCompare( inVertex, &points[ n ]->vertex ) ) 
+			return n;
+    }
+
+	return -1;
+}
+
+void slMeshShape::finishShape( double density ) {
+	int triCount = 0;
+
+	for( unsigned int n = 0; n < faces.size(); n++ ) {
+		triCount += faces[ n ] -> _pointCount - 2;
+	}
+
+	_vertexCount = points.size();
+	_indexCount = 3 * triCount;
+
+	_indices = new int[ _indexCount ];
+	_vertices = new float[ _vertexCount * 3 ];
+
+	for( unsigned int n = 0; n < points.size(); n++ ) {
+		slPoint *p = points[ n ];
+
+		_vertices[ n * 3     ] = p -> vertex.x;
+		_vertices[ n * 3 + 1 ] = p -> vertex.y;
+		_vertices[ n * 3 + 2 ] = p -> vertex.z;
+	}
+
+	int tri = 0;
+
+	for( unsigned int n = 0; n < faces.size(); n++ ) {
+		slFace *f = faces[ n ];	
+
+		int i1 = findPointIndex( &f -> points[ 0 ] -> vertex );
+
+		for( int m = 1; m < f -> _pointCount - 1; m++ ) {
+			int i2 = findPointIndex( &f -> points[ m ] -> vertex );
+			int i3 = findPointIndex( &f -> points[ m + 1 ] -> vertex );
+
+			_indices[ tri * 3     ] = i1;
+			_indices[ tri * 3 + 1 ] = i2;
+			_indices[ tri * 3 + 2 ] = i3;
+
+			tri++;
+		}
+	}
+
+	createODEGeom();
+}
+
+slShape *slFinishShape( slShape *s, double density ) {
+
 	int m, o, faceCount;
 	slPoint *p, *start, *end;
 	slEdge *e;
@@ -413,11 +463,15 @@ slFace *slAddFace( slShape *s, slVector **points, int nPoints ) {
 	slFace *f;
 	slVector **rpoints = NULL;
 
-	if ( nPoints < 3 ) return NULL;
+
+	if ( nPoints < 3 ) 
+		return NULL;
 
 	f = new slFace;
 
 	f->type = FT_FACE;
+
+	f -> _pointCount = nPoints;
 
 	f->edgeCount = 0;
 
@@ -724,14 +778,14 @@ slShape *slSetCube( slShape *s, slVector *size, double density ) {
 
 	slAddFace( s, face, 4 );
 
-	return slShapeInitNeighbors( s, density );
+	return slFinishShape( s, density );
 }
 
 /*!
 	\brief Sets a shape to be an extruded polygon.
 */
 
-slShape *slSetNGonDisc( slShape *s, int sideCount, double radius, double height, double density ) {
+slShape *slSetNGonDisc( slMeshShape *s, int sideCount, double radius, double height, double density ) {
 	int n;
 	slVector *tops, *bottoms, sides[4];
 	slVector **topP, **bottomP, *sideP[4];
@@ -761,7 +815,6 @@ slShape *slSetNGonDisc( slShape *s, int sideCount, double radius, double height,
 	}
 
 	slVectorCopy( &tops[0], &tops[n] );
-
 	slVectorCopy( &bottoms[0], &bottoms[n] );
 
 	slAddFace( s, topP, sideCount );
@@ -787,14 +840,16 @@ slShape *slSetNGonDisc( slShape *s, int sideCount, double radius, double height,
 	delete[] topP;
 	delete[] bottomP;
 
-	return slShapeInitNeighbors( s, density );
+	s -> finishShape( density );
+
+	return slFinishShape( s, density );
 }
 
 /*!
 	\brief Sets a shape to be a cone with a polygon base.
 */
 
-slShape *slSetNGonCone( slShape *s, int sideCount, double radius, double height, double density ) {
+slShape *slSetNGonCone( slMeshShape *s, int sideCount, double radius, double height, double density ) {
 	int n;
 	slVector top;
 	slVector *bottoms, sides[3];
@@ -837,7 +892,9 @@ slShape *slSetNGonCone( slShape *s, int sideCount, double radius, double height,
 
 	delete[] bottomP;
 
-	return slShapeInitNeighbors( s, density );
+	s -> finishShape( density );
+
+	return slFinishShape( s, density );
 }
 
 void slCubeInertiaMatrix( slVector *c, double mass, double i[3][3] ) {
@@ -1081,7 +1138,7 @@ int slShape::rayHitsShape( slVector *dir, slVector *target, slVector *point ) {
 void slSphere::scale( slVector *scale ) {
 	_recompile = 1;
 	_radius *= scale->x;
-	slShapeInitNeighbors( this, this->_density );
+	slFinishShape( this, this->_density );
 }
 
 void slShape::scale( slVector *scale ) {
@@ -1117,7 +1174,7 @@ void slShape::scale( slVector *scale ) {
 		slVectorNormalize( &f->plane.normal );
 	}
 
-	slShapeInitNeighbors( this, _density );
+	slFinishShape( this, _density );
 }
 
 /*!
@@ -1251,7 +1308,7 @@ slShape *slDeserializeShape( slSerializedShapeHeader *header, int length ) {
 		delete[] vectorp;
 	}
 
-	slShapeInitNeighbors( s, header->density );
+	slFinishShape( s, header->density );
 
 	return s;
 }
@@ -1298,93 +1355,80 @@ double slShape::getDensity() {
 	return _density;
 }
 
-slMeshShape::slMeshShape( char *filename, char *name, float inSize ) : slSphere( 1, 1 ) {
-#ifdef HAVE_LIB3DS
+slMeshShape::slMeshShape() : slShape() {
+	_vertices = NULL;
+	_indices  = NULL;
 
-	if( !filename ) 
-		throw slException( "Cannot locate mesh file" );
+	_indexCount  = 0;
+	_vertexCount = 0;
 
-	_mesh = new slMesh( filename, name, inSize );
+	_lastPositionIndex = 0;
 
-	// get the new radius, and force the mass to update
+	_maxReach = 0.0;
 
-	_radius = _mesh->maxReach();
 	setDensity( 1.0 );
+}
+
+
+int slMeshShape::createODEGeom() {
+	if( !_indices || !_vertices ) 
+		return -1;
+
+	if( _odeGeomID )
+		dGeomDestroy( _odeGeomID );
 
 	dTriMeshDataID triMeshID = dGeomTriMeshDataCreate();
 	
 	dGeomTriMeshDataBuildSingle( triMeshID, 
-		_mesh -> _vertices, 3 * sizeof( float ), _mesh -> _vertexCount,
-		_mesh -> _indices, _mesh -> _indexCount, 3 * sizeof( int ) );
+		_vertices, 3 * sizeof( float ), _vertexCount,
+		_indices, _indexCount, 3 * sizeof( int ) );
 
   	_odeGeomID = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
 
 	dGeomSetData( _odeGeomID, triMeshID );
 
+	dMass m;
+	dMassSetTrimesh( &m, _density, _odeGeomID );
 
-#else
-	throw "this software was compiled without lib3ds mesh support";
-#endif
+    _inertia[ 0 ][ 0 ] = m.I[ 0 ];
+    _inertia[ 0 ][ 1 ] = m.I[ 1 ];
+    _inertia[ 0 ][ 2 ] = m.I[ 2 ];
+
+    _inertia[ 1 ][ 0 ] = m.I[ 4 ];
+    _inertia[ 1 ][ 1 ] = m.I[ 5 ];
+    _inertia[ 1 ][ 2 ] = m.I[ 6 ];
+
+    _inertia[ 2 ][ 0 ] = m.I[ 8 ];
+    _inertia[ 2 ][ 1 ] = m.I[ 9 ];
+    _inertia[ 2 ][ 2 ] = m.I[ 10 ];
+
+	_mass = m.mass;
+
+	return 0;
 }
+
+
+void slMeshShape::bounds( const slPosition *position, slVector *min, slVector *max ) const {
+	max->x = position->location.x + _maxReach;
+	max->y = position->location.y + _maxReach;
+	max->z = position->location.z + _maxReach;
+
+	min->x = position->location.x - _maxReach;
+	min->y = position->location.y - _maxReach;
+	min->z = position->location.z - _maxReach;
+}
+
+
 
 
 slMeshShape::~slMeshShape() {
-#ifdef _HAVE_LIB3DS
-	delete _mesh;
-#endif
+	if( _vertices )
+		delete[] _vertices;
+
+	if( _indices )
+		delete[] _indices;
 }
 
-void slMeshShape::draw( slCamera *c, slPosition *pos, double textureScaleX, double textureScaleY, int mode, int flags ) {
-#ifdef HAVE_LIB3DS
-	float scale[4] = { 1.0 / textureScaleX, 1.0 / textureScaleY, 1.0, 1.0 };
-
-	glPushMatrix();
-	glTranslated( pos->location.x, pos->location.y, pos->location.z );
-	slMatrixGLMult( pos->rotation );
-
-	glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-	glTexGenfv( GL_S, GL_OBJECT_PLANE, scale );
-	glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-	glTexGenfv( GL_T, GL_OBJECT_PLANE, scale );
-
-	glEnable( GL_TEXTURE_GEN_S );
-	glEnable( GL_TEXTURE_GEN_T );
-
-	if ( _drawList == 0 || _recompile ) {
-		if ( _drawList == 0 ) 
-			_drawList = glGenLists( 1 );
-
-		glNewList( _drawList, GL_COMPILE );
-
-		_mesh->draw();
-
-		glEndList();
-	}
-
-	glCallList( _drawList );
-
-	glDisable( GL_TEXTURE_GEN_S );
-	glDisable( GL_TEXTURE_GEN_T );
-
-	glPopMatrix();
-
-
-
-	dMatrix4 transform = {
-		pos -> rotation[0][0], pos -> rotation[0][1], pos -> rotation[0][2], 0,
-		pos -> rotation[1][0], pos -> rotation[1][1], pos -> rotation[1][2], 0,
-		pos -> rotation[2][0], pos -> rotation[2][1], pos -> rotation[2][2], 0,
-		pos -> location.x, pos -> location.y, pos -> location.z,  1
-	};
-
-	memcpy( _mesh -> _lastPositions[ _mesh -> _lastPositionIndex ], transform, sizeof( dMatrix4 ) );
-
-	dGeomTriMeshSetLastTransform( _odeGeomID, _mesh -> _lastPositions[ _mesh -> _lastPositionIndex ] );
-
-	_mesh -> _lastPositionIndex = !_mesh -> _lastPositionIndex;
-
-#endif
-}
 
 slVector *slPositionVertex( const slPosition *p, const slVector *v, slVector *o ) {
 	slVectorXform( p->rotation, v, o );

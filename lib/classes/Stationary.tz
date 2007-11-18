@@ -85,7 +85,7 @@ Stationary : Floor {
 		shape = ( new Cube init-with size (1000, 5, 1000 )).
 		self move to (0, -2.5, 0).
 		self set-shape to shape.
-		self set-color to ( .2, .8, .6 ).
+		self set-color to ( .35, .8, .45 ).
 
 	+ to set-size to newSize (vector):
 		% Changes the size of the floor to newSize.

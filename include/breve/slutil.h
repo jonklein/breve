@@ -43,10 +43,6 @@
 
 #include "slerror.h"
 
-#ifdef __cplusplus
-// extern "C" {
-#endif
-
 #include "utilTypedefs.h"
 
 #include "hash.h"
@@ -56,11 +52,6 @@
 #include "nr.h"
 #include "stringstream.h"
 #include "text.h"
-
-#ifdef __cplusplus
-// }
-#endif
-
 #include "quat.h"
 #include "vector.h"
 

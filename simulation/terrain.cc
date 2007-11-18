@@ -53,6 +53,8 @@ slTerrain::slTerrain( int res, double scale, void *data ) : slWorldObject() {
 
 	_type = WO_TERRAIN;
 
+	_shape = new slTerrainShape();
+
 	_userData = data;
 
 	_side = ( int )pow( 2, res ) + 1;
@@ -98,6 +100,68 @@ slTerrain::slTerrain( int res, double scale, void *data ) : slWorldObject() {
 
 void slTerrain::setDrawMode( int m ) {
 	_drawMode = m;
+}
+
+void slTerrainShape::updateGeom( slTerrain *inTerrain ) {
+
+	if( _indices )
+		delete[] _indices;
+
+	if( _vertices )
+		delete[] _vertices;
+
+	_vertexCount = inTerrain -> _side * inTerrain -> _side;
+
+	// In each row, we do ( side - 1 ) triangles, with 3 indices per triangle
+
+	int indicesPerRow = ( 2 * 3 * ( inTerrain -> _side - 1 ) );
+
+	_indexCount = indicesPerRow * ( inTerrain -> _side - 1 );
+
+	_vertices = new float[ _vertexCount * 3 ];
+	_indices  = new int[ _indexCount ];
+
+	for( int n = 0; n < inTerrain -> _side; n++ ) {
+		for( int m = 0; m < inTerrain -> _side; m++ ) {
+			slVector v;
+			int vIndex = ( inTerrain -> _side * n + m ); 
+
+			inTerrain -> terrainPoint( n, m, &v );
+
+			_vertices[ vIndex * 3     ] = v.x;
+			_vertices[ vIndex * 3 + 1 ] = v.y;
+			_vertices[ vIndex * 3 + 2 ] = v.z;
+
+			if( n < inTerrain -> _side - 1 && m < inTerrain -> _side - 1 ) {
+				int iIndex = indicesPerRow * n + ( m * 6 );
+
+				_indices[ iIndex     ] = vIndex;
+				_indices[ iIndex + 1 ] = vIndex + 1; 
+				_indices[ iIndex + 2 ] = vIndex + inTerrain -> _side;
+
+				_indices[ iIndex + 3 ] = vIndex + 1;
+				_indices[ iIndex + 4 ] = vIndex + inTerrain -> _side + 1;
+				_indices[ iIndex + 5 ] = vIndex + inTerrain -> _side;
+			}
+		}
+	}
+
+	createODEGeom();
+
+
+/*
+	dTriMeshDataID triMeshID = dGeomTriMeshDataCreate();
+   
+	dGeomTriMeshDataBuildSingle( triMeshID,
+	 	vertices, 3 * sizeof( float ), vertexCount,
+	 	indices, indexCount, 3 * sizeof( int ) );
+
+	_odeGeomID = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
+
+	dGeomSetData( _odeGeomID, triMeshID );
+
+*/
+	// Do not delete the vertices -- ODE won't copy them...
 }
 
 /*!
@@ -190,6 +254,8 @@ void slTerrain::initialize() {
 
 	_initialized = 1;
 	_repeating = 0;
+
+	( ( slTerrainShape *)_shape ) -> updateGeom( this );
 }
 
 void slTerrain::updateBoundingBox() {
@@ -282,6 +348,8 @@ void slTerrain::generateFractalTerrain( double h, double height ) {
 			_matrix[x][y] *= height;
 
 	_initialized = 0;
+
+	initialize();
 }
 
 /*
@@ -399,7 +467,8 @@ slTerrain::~slTerrain() {
 }
 
 void slTerrain::draw( slCamera *camera ) {
-	if ( !_initialized ) initialize();
+	if ( !_initialized ) 
+		initialize();
 
 	glPushAttrib( GL_ENABLE_BIT );
 
@@ -552,7 +621,8 @@ int slTerrainTestPair( slVclipData *vc, int x, int y, slCollision *ce ) {
 
 		terrain = ( slTerrain* )w2;
 
-		if ( !terrain->_initialized ) terrain->initialize();
+		if ( !terrain->_initialized ) 
+			terrain->initialize();
 
 		if ( s->_type == ST_SPHERE ) return terrain->sphereClip( vc, x, y, ce, 0 );
 		else return terrain->shapeClip( vc, x, y, ce, 0 );
@@ -1168,7 +1238,8 @@ double slTerrain::getHeightAtLocation( double x, double z ) {
 
 	areaUnderPoint( &point, &xoff, &zoff, &quad );
 
-	if ( xoff < 0 || xoff >= _side || zoff < 0 || zoff >= _side ) return 0.0;
+	if ( xoff < 0 || xoff >= _side || zoff < 0 || zoff >= _side ) 
+		return 0.0;
 
 	return _matrix[xoff][zoff] + _position.location.y;
 }

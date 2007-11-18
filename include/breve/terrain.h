@@ -48,14 +48,15 @@ class slRoamPatch;
 class slTerrain: public slWorldObject {
 	public:
 		friend class slRoamPatch;
+		friend class slTerrainShape;
 
 		slTerrain(int res, double scale, void *data);
 		~slTerrain();
 
 		inline void terrainPoint(int x, int z, slVector *point) {
-			point->x =   x * _xscale + _position.location.x;
-			point->y = _matrix[x][z] + _position.location.y;
-			point->z =   z * _xscale + _position.location.z;
+			point->x =   x * _xscale;
+			point->y = _matrix[x][z];
+			point->z =   z * _xscale;
 		}
 
 		void setLocation(slVector *location);
@@ -122,6 +123,11 @@ class slTerrain: public slWorldObject {
 		double getHeight( int x, int y );
 
 		int areaUnderPoint( slVector *origpoint, int *x, int *z, int *quad );
+};
+
+class slTerrainShape : public slMeshShape {
+	public:
+		void						updateGeom( slTerrain* );
 };
 
 int slTerrainTestPair(slVclipData *vc, int x, int y, slCollision *ce);

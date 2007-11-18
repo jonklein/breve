@@ -44,8 +44,6 @@ Control : Gatherers {
 		COLLECTOR_COUNT new Collectors.
 		foodList = FOOD_COUNT new Foods.
 	
-		foodList set-bitmap to 2.
-
 		# this sim can run a bit slowly, but doesn't need a lot of 
 		# accuracy, so we can set up the integration step a bit.
 
