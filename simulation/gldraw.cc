@@ -696,7 +696,8 @@ void slCamera::stencilFloor() {
 	glStencilFunc( GL_ALWAYS, 1, 0xffffffff );
 	glStencilOp( GL_ZERO, GL_ZERO, GL_REPLACE );
 
-	_shadowCatcher->draw( this );
+	if( _shadowCatcher )
+		_shadowCatcher->draw( this );
 
 	glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
 	glEnable( GL_DEPTH_TEST );
@@ -1473,7 +1474,7 @@ void slDrawFace( slFace *f, int drawMode, int flags ) {
 	slVector xaxis, yaxis;
 	slVector *norm, *v;
 	slPoint *p;
-	int edgeCount;
+	int pointCount;
 
 	norm = &f->plane.normal;
 
@@ -1498,8 +1499,8 @@ void slDrawFace( slFace *f, int drawMode, int flags ) {
 	if ( drawMode == GL_LINE_LOOP || !slBreakdownFace( f ) ) {
 		glBegin( drawMode );
 
-		for ( edgeCount = 0;edgeCount < f->edgeCount;edgeCount++ ) {
-			p = ( slPoint * )f->points[edgeCount];
+		for ( pointCount = 0;pointCount < f-> _pointCount ;pointCount++ ) {
+			p = ( slPoint * )f->points[pointCount];
 
 			v = &(( slPoint * )p )->vertex;
 
@@ -1533,10 +1534,10 @@ int slBreakdownFace( slFace *f ) {
 
 	slVectorZero( &total );
 
-	for ( n = 0; n < f->edgeCount; ++n ) {
+	for ( n = 0; n < f-> _pointCount; ++n ) {
 		n2 = n + 1;
 
-		if ( n2 == f->edgeCount )
+		if ( n2 == f-> _pointCount )
 			n2 = 0;
 
 		p = f->points[n];
@@ -1554,16 +1555,16 @@ int slBreakdownFace( slFace *f ) {
 		length += slVectorLength( &diff );
 	}
 
-	slVectorMul( &total, 1.0 / f->edgeCount, &total );
+	slVectorMul( &total, 1.0 / f-> _pointCount, &total );
 
 	if ( length < 30 ) return 0;
 
 	glBegin( GL_TRIANGLES );
 
-	for ( n = 0; n < f->edgeCount; ++n ) {
+	for ( n = 0; n < f-> _pointCount; ++n ) {
 		n2 = n + 1;
 
-		if ( n2 == f->edgeCount )
+		if ( n2 == f -> _pointCount )
 			n2 = 0;
 
 		p = f->points[n];

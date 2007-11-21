@@ -198,7 +198,8 @@ class slShape {
 			_density 						= 1.0;
 			_referenceCount 				= 1;
 
-			_odeGeomID						= 0;
+			_odeGeomID[ 0 ]					= 0;
+			_odeGeomID[ 1 ]					= 0;
 		}
 
 		int									findPointIndex( slVector *inVertex );
@@ -255,7 +256,7 @@ class slShape {
 		std::vector< slPoint* > 			points;
 
 	protected:
-		dGeomID								_odeGeomID;
+		dGeomID								_odeGeomID[ 2 ];
 };
 
 class slBox : public slShape {
@@ -289,11 +290,14 @@ class slMeshShape : public slShape {
 		slMeshShape();
 		~slMeshShape();
 
+		void 						draw( slCamera *c, slPosition *pos, double tscaleX, double tscaleY, int mode, int flags);
+
 		void 						bounds( const slPosition *position, slVector *min, slVector *max ) const;
 
 		void						finishShape( double inDensity );
 
 	protected:
+		void						updateLastPosition( slPosition *inPosition );
 		int							createODEGeom();
 	
 		float*						_vertices;

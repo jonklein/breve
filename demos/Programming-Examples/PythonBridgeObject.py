@@ -21,15 +21,15 @@ class PythonBridgeObject( breve.Object ):
 	def iterate( self ):
 		print "Iterating Python bridge object at time %f" % self.controller.get_time()
 
-	def test_number( self, number ):
+	def testNumber( self, number ):
 		"A simple example of a number passing function callable from steve"
 		return number * 2
 
-	def test_vector( self, vector ):
+	def testVector( self, vector ):
 		"A simple example of a vector passing function callable from steve"
 		return vector * 2
 
-	def test_list( self, list ):
+	def testList( self, list ):
 		"A simple example of a list passing function callable from steve"
 		list.reverse()
 		return list

@@ -24,8 +24,8 @@ Control : myController {
 		myPythonObject = new PythonBridgeObject.
 
 		# Call a test method which should double the vector we pass it.  Note that the method name
-		# "test-vector" is automatically converted to "test_vector" in Python to avoid using the "-" 
+		# "test-vector" is automatically converted to "testVector" in Python to avoid using the "-" 
 		# character, which is valid in steve method names, but not in Python.
 
-		print ( myPythonObject test-vector v ( 1, 1, 1 ) ).
+		print ( myPythonObject testVector v ( 1, 1, 1 ) ).
 }

@@ -93,10 +93,9 @@ class slCollision {
 									slCollision() {
 										_contactPoints = 0;
 									}
-		slVector normal;
-
-		std::vector<slVector> points;
-		std::vector<double> depths;
+		// slVector normal;
+		// std::vector<slVector> points;
+		// std::vector<double> depths;
 
 		unsigned int n1; 
 		unsigned int n2;
@@ -235,8 +234,6 @@ int slEdgePointClip(slFeature **nf1, const slPosition *ep, const slShape *s1, sl
 int slEdgeEdgeClip(slFeature **nf1, const slPosition *p1, const slShape *s1, slFeature **nf2, const slPosition *p2, const slShape *s2, slCollision *ce);
 int slEdgeFaceClip(slFeature **nf1, slFeature **nf2, slVclipData *v, int x, int y, slCollision *ce);
 int slFaceFaceClip(slFeature **nf1, const slPosition *f1p, const slShape *s1, slFeature **nf2, const slPosition *f2p, const slShape *s2, slVclipData *v, int x, int y);
-
-double signEdgePlaneDistanceDeriv(slPlane *p, slVector *edgeVector, slVector *lambda);
 
 int slCountFaceCollisionPoints(slCollision *c, slFeature *f1, slFeature *f2, const slPosition *p1, const slPosition *p2, const slShape *s1, const slShape *s2);
 

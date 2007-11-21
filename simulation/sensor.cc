@@ -608,27 +608,6 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 
 			// point inside the face
 			if(exact){
-				/*
-				printf("vertex: ");
-				slVectorPrint(&wcPlane.vertex);
-				printf("sensor location: ");
-				slVectorPrint(&sensorPos->location);
-				
-				printf("normal: ");
-				slVectorPrint(&wcPlane.normal);
-				printf("posToPlane: ");
-				slVectorPrint(&posToPlane);
-
-				printf("slVectorDot(&wcPlane.normal, &posToPlane %f\n",slVectorDot(&wcPlane.normal, &posToPlane));
-				printf("slVectorDot(&wcPlane.normal, &dir)%f\n",slVectorDot(&wcPlane.normal, &dir));
-				printf("dist:  %f\n",dist);
-				printf(" slVectorAngle(&middleDirection, &wcPlane.normal %f\n",( slVectorAngle(&dir, &wcPlane.normal))*180/M_PI);
-				printf("point on plane: ");
-				slVectorPrint(&pointOnPlane);
-				printf("dir: ");
-				slVectorPrint(&dir);
-				printf("\n");
-				*/
 				if( dist < shortestDist ){ shortestDist = dist;}
 				if(isTarget){
 					if(dist < targetDist){targetDist = dist;}

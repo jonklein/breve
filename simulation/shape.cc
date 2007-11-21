@@ -133,7 +133,8 @@ slSphere::slSphere( double radius, double density ) : slShape() {
 
 	slSphereInertiaMatrix( _radius, _mass, _inertia );
 
-	_odeGeomID = dCreateSphere( 0, _radius );
+	_odeGeomID[ 0 ] = dCreateSphere( 0, _radius );
+	_odeGeomID[ 1 ] = dCreateSphere( 0, _radius );
 }
 
 slBox::slBox( slVector *inSize, double inDensity ) {
@@ -148,7 +149,8 @@ slBox::slBox( slVector *inSize, double inDensity ) {
 		throw slException( std::string( "could not create a cube with the specified parameters" ) );
 	}
 
-	_odeGeomID = dCreateBox( 0, inSize -> x, inSize -> y, inSize -> z );
+	_odeGeomID[ 0 ] = dCreateBox( 0, inSize -> x, inSize -> y, inSize -> z );
+	_odeGeomID[ 1 ] = dCreateBox( 0, inSize -> x, inSize -> y, inSize -> z );
 }
 
 slShape *slNewNGonDisc( int count, double radius, double height, double density ) {
@@ -156,10 +158,16 @@ slShape *slNewNGonDisc( int count, double radius, double height, double density 
 
 	slMeshShape *s = new slMeshShape();
 
-	if ( !slSetNGonDisc( s, count, radius, height, density ) ) {
+	// if ( !slSetNGonDisc( s, count, radius, height, density ) ) {
+	slVector v;
+
+	slVectorSet( &v, height, radius, radius );
+	if ( !slSetCube( s, &v, density ) ) {
 		s->release();
 		return NULL;
 	}
+
+	s -> finishShape( density );
 
 	return s;
 }
@@ -198,8 +206,10 @@ slShape::~slShape() {
 	if ( _drawList ) 
 		glDeleteLists( _drawList, 1 );
 
-	if( _odeGeomID ) 
-		dGeomDestroy( _odeGeomID );
+	if( _odeGeomID[ 0 ] ) 
+		dGeomDestroy( _odeGeomID[ 0 ] );
+	if( _odeGeomID[ 1 ] ) 
+		dGeomDestroy( _odeGeomID[ 1 ] );
 }
 
 
@@ -212,6 +222,30 @@ int slShape::findPointIndex( slVector *inVertex ) {
 	return -1;
 }
 
+void slMeshShape::draw( slCamera *c, slPosition *pos, double inTScaleX, double inTScaleY, int mode, int flags ) {
+	slShape::draw( c, pos, inTScaleX, inTScaleY, mode, flags );
+
+	updateLastPosition( pos );
+}
+
+
+void slMeshShape::updateLastPosition( slPosition *inPosition ) {
+	dMatrix4 transform = {
+		inPosition -> rotation[0][0], inPosition -> rotation[0][1], inPosition -> rotation[0][2], 0,
+		inPosition -> rotation[1][0], inPosition -> rotation[1][1], inPosition -> rotation[1][2], 0,
+		inPosition -> rotation[2][0], inPosition -> rotation[2][1], inPosition -> rotation[2][2], 0,
+		inPosition -> location.x, inPosition -> location.y, inPosition -> location.z,  1
+	};
+
+	memcpy( _lastPositions[ _lastPositionIndex ], transform, sizeof( dMatrix4 ) );
+
+	dGeomTriMeshSetLastTransform( _odeGeomID[ 0 ], _lastPositions[ _lastPositionIndex ] );
+	dGeomTriMeshSetLastTransform( _odeGeomID[ 1 ], _lastPositions[ _lastPositionIndex ] );
+
+	_lastPositionIndex = !_lastPositionIndex;
+}
+
+
 void slMeshShape::finishShape( double density ) {
 	int triCount = 0;
 
@@ -222,10 +256,10 @@ void slMeshShape::finishShape( double density ) {
 	_vertexCount = points.size();
 	_indexCount = 3 * triCount;
 
-	_indices = new int[ _indexCount ];
 	_vertices = new float[ _vertexCount * 3 ];
+	_indices = new int[ _indexCount ];
 
-	for( unsigned int n = 0; n < points.size(); n++ ) {
+	for( int n = 0; n < _vertexCount; n++ ) {
 		slPoint *p = points[ n ];
 
 		_vertices[ n * 3     ] = p -> vertex.x;
@@ -238,6 +272,8 @@ void slMeshShape::finishShape( double density ) {
 	for( unsigned int n = 0; n < faces.size(); n++ ) {
 		slFace *f = faces[ n ];	
 
+		// printf( "FACE %d\n", n );
+
 		int i1 = findPointIndex( &f -> points[ 0 ] -> vertex );
 
 		for( int m = 1; m < f -> _pointCount - 1; m++ ) {
@@ -248,31 +284,50 @@ void slMeshShape::finishShape( double density ) {
 			_indices[ tri * 3 + 1 ] = i2;
 			_indices[ tri * 3 + 2 ] = i3;
 
+			slVector v1, v2, normal;
+
+			v1.x = _vertices[ i2 * 3 ] - _vertices[ i1 * 3 ];
+			v1.y = _vertices[ i2 * 3 + 1 ] - _vertices[ i1 * 3 + 1 ];
+			v1.z = _vertices[ i2 * 3 + 2 ] - _vertices[ i1 * 3 + 2 ];
+
+			v2.x = _vertices[ i3 * 3 ] - _vertices[ i1 * 3 ];
+			v2.y = _vertices[ i3 * 3 + 1 ] - _vertices[ i1 * 3 + 1 ];
+			v2.z = _vertices[ i3 * 3 + 2 ] - _vertices[ i1 * 3 + 2 ];
+
+			slVectorCross( &v1, &v2, &normal );
+
+			// printf( "tri %d (%f %f %f) (%f %f %f) (%f %f %f)\n", tri,
+			// 	points[ i1 ] -> vertex.x, points[ i1 ] -> vertex.y, points[ i1 ] -> vertex.z,
+			// 	points[ i2 ] -> vertex.x, points[ i2 ] -> vertex.y, points[ i2 ] -> vertex.z,
+			// 	points[ i3 ] -> vertex.x, points[ i3 ] -> vertex.y, points[ i3 ] -> vertex.z );
+			// printf("NORMAL: %f %f %f\n", normal.x, normal.y, normal.z );
+
+
 			tri++;
 		}
 	}
 
+	for( int n = 0; n < _vertexCount; n++ ) {
+		//printf( "\t%f, %f, %f\n", _vertices[ n * 3 ], _vertices[ n * 3 + 1 ], _vertices[ n * 3 + 2 ] );
+	}
+
+	for( int n = 0; n < _indexCount; n += 3 ) {
+		// printf( "\t%d, %d, %d\n", _indices[ n ], _indices[ n + 1 ], _indices[ n + 2 ] );
+	}
+
+	_maxReach = 30;
+	_density = density;
 	createODEGeom();
 }
 
 slShape *slFinishShape( slShape *s, double density ) {
 
-	int m, o, faceCount;
-	slPoint *p, *start, *end;
-	slEdge *e;
-	slFace *face;
-	slVector normal;	// for the voronoi not the normal of the face
-	int edges = 0, en;
-	std::vector<slEdge*>::iterator ei;
-	std::vector<slPoint*>::iterator pi;
-	std::vector<slFace*>::iterator fi;
-
 	s->_density = density;
 
 	slVectorZero( &s->_max );
 
-	for ( pi = s->points.begin(); pi != s->points.end(); pi++ ) {
-		p = *pi;
+	for( unsigned int i = 0; i < s -> points.size(); i++ ) {
+		slPoint *p = s -> points[ i ];
 
 		if ( ! p->neighbors ) p->neighbors = new slEdge*[p->edgeCount];
 
@@ -283,121 +338,8 @@ slShape *slFinishShape( slShape *s, double density ) {
 		// now check to see if it's a maximum for the shape
 
 		if ( p->vertex.x > s->_max.x ) s->_max.x = p->vertex.x;
-
 		if ( p->vertex.y > s->_max.y ) s->_max.y = p->vertex.y;
-
 		if ( p->vertex.z > s->_max.z ) s->_max.z = p->vertex.z;
-
-		// reset edgeCount to 0 so it can act as a counter
-		// as the actual edges are added below
-
-		p->edgeCount = 0;
-	}
-
-	/* for each edge, add the edge as a neighbor to the point on each side */
-
-	for ( ei = s->edges.begin(); ei != s->edges.end(); ei++ ) {
-		e = *ei;
-
-		// left point...
-
-		start = e->points[0];
-		end = e->points[1];
-
-		start->neighbors[start->edgeCount] = e;
-		end->neighbors[end->edgeCount] = e;
-
-		// update the voronoi planes for the points and edges
-
-		slVectorSub( &start->vertex, &end->vertex, &normal );
-		slVectorNormalize( &normal );
-		slSetPlane( &start->voronoi[start->edgeCount], &normal, &start->vertex );
-
-		slSetPlane( &e->voronoi[1], &normal, &end->vertex );
-
-		slVectorMul( &normal, -1, &normal );
-		slSetPlane( &end->voronoi[end->edgeCount], &normal, &end->vertex );
-
-		slSetPlane( &e->voronoi[0], &normal, &start->vertex );
-
-		start->edgeCount++;
-		end->edgeCount++;
-
-		edges++;
-
-		for ( en = 0;en < 4;en++ ) {
-			if ( !e->neighbors[en] ) {
-				slMessage( DEBUG_ALL, "error initializing shape neighbors: edge %p is missing adjacent features\n", e );
-				return NULL;
-			}
-		}
-	}
-
-	// add the face neighbors for the all the faces
-
-	for ( fi = s->faces.begin(); fi != s->faces.end(); fi++ ) {
-		slVector normal;
-
-		face = *fi;
-
-		for ( m = 0;m < face->edgeCount;m++ ) {
-			slVector *eStart, *eFinish, edgeVector;
-			int edgeNeighborIndex;
-
-			// grab the edge's vertices
-
-			e = face->neighbors[m];
-			eStart = &(( slPoint* )e->neighbors[0] )->vertex;
-			eFinish = &(( slPoint* )e->neighbors[1] )->vertex;
-
-			if ( e->neighbors[2] == face ) {
-				face->faces[m] = e->faces[1];
-				edgeNeighborIndex = 2;
-			} else {
-				face->faces[m] = e->faces[0];
-				edgeNeighborIndex = 3;
-			}
-
-			// set the voronoi plane for this edge
-
-			slVectorSub( eStart, eFinish, &edgeVector );
-
-			slVectorCross( &face->plane.normal, &edgeVector, &normal );
-
-			if ( slVectorDot( &normal, eStart ) > 0.0 ) slVectorMul( &normal, -1, &normal );
-
-			slSetPlane( &face->voronoi[m], &normal, eFinish );
-
-			slVectorMul( &normal, -1, &normal );
-
-			slSetPlane( &e->voronoi[edgeNeighborIndex], &normal, eFinish );
-		}
-
-		face->faces[face->edgeCount] = *fi;
-	}
-
-	// update the neighbors for the points
-
-	for ( pi = s->points.begin(); pi != s->points.end(); pi++ ) {
-		p = *pi;
-
-		faceCount = 0;
-
-		for ( m = 0;m < p->edgeCount;m++ ) {
-			int found2 = 0, found3 = 0;
-			e = p->neighbors[m];
-
-			// if one of the faces on this edge has not already
-			// been added to this point, add it
-
-			for ( o = 0;o < faceCount;o++ ) if ( p->faces[o] == e->neighbors[2] ) found2 = 1;
-
-			for ( o = 0;o < faceCount;o++ ) if ( p->faces[o] == e->neighbors[3] ) found3 = 1;
-
-			if ( !found2 ) p->faces[faceCount++] = e->faces[0];
-
-			if ( !found3 ) p->faces[faceCount++] = e->faces[1];
-		}
 	}
 
 	if ( slSetMassProperties( s, density ) ) return NULL;
@@ -486,13 +428,9 @@ slFace *slAddFace( slShape *s, slVector **points, int nPoints ) {
 	f->drawFlags = 0;
 
 	slVectorSub( points[1], points[0], &x );
-
 	slVectorSub( points[2], points[1], &y );
-
 	slVectorCross( &x, &y, &f->plane.normal );
-
 	slVectorNormalize( &f->plane.normal );
-
 	slVectorCopy( points[1], &f->plane.vertex );
 
 	slVectorSet( &origin, 0, 0, 0 );
@@ -503,46 +441,38 @@ slFace *slAddFace( slShape *s, slVector **points, int nPoints ) {
 		rpoints = new slVector*[nPoints];
 
 		for ( n = 0;n < nPoints;n++ ) rpoints[n] = points[( nPoints - 1 ) - n];
-
 		for ( n = 0;n < nPoints;n++ ) points[n] = rpoints[n];
 
 		delete[] rpoints;
 
+		slVectorSub( points[1], points[0], &x );
+		slVectorSub( points[2], points[1], &y );
+		slVectorCross( &x, &y, &f->plane.normal );
+		slVectorNormalize( &f->plane.normal );
 		slVectorCopy( points[1], &f->plane.vertex );
 
-		slVectorSub( points[1], points[0], &x );
-
-		slVectorSub( points[2], points[1], &y );
-
-		slVectorCross( &x, &y, &f->plane.normal );
-
-		slVectorNormalize( &f->plane.normal );
+		printf( "new dist %f\n", slPlaneDistance( &f->plane, &origin )  );
 	}
 
-	for ( n = 0;n < nPoints;n++ ) f->points[n] = slAddPoint( s, points[n] );
+	for ( n = 0;n < nPoints;n++ ) 
+		f->points[n] = slAddPoint( s, points[ n ] );
 
 	f->edgeCount = nPoints;
 
-	for ( n = 0;n < nPoints - 1;n++ ) {
-		f->neighbors[n] = slAddEdge( s, f, points[n], points[n + 1] );
+	for ( n = 0;n < nPoints; n++ ) {
+		int nextIndex = ( n + 1 ) % nPoints;
+
+		f->neighbors[n] = slAddEdge( s, f, points[n], points[ nextIndex ] );
 
 		// z is normal to the voronoi slPlane--that means it's parallel to the
 		// slFace of the slPlane and perpendicular to the edge we're looking at
 
-		slVectorSub( points[n + 1], points[n], &x );
+		slVectorSub( points[ nextIndex ], points[n], &x );
 		slVectorCross( &f->plane.normal, &x, &y );
 
 		slVectorNormalize( &y );
 		slSetPlane( &f->voronoi[n], &y, points[n] );
 	}
-
-	f->neighbors[n] = slAddEdge( s, f, points[n], points[0] );
-
-	slVectorSub( points[0], points[nPoints - 1], &x );
-	slVectorCross( &f->plane.normal, &x, &y );
-
-	slVectorNormalize( &y );
-	slSetPlane( &f->voronoi[nPoints - 1], &y, points[nPoints - 1] );
 
 	s->faces.push_back( f );
 	s->features.push_back( f );
@@ -800,6 +730,8 @@ slShape *slSetNGonDisc( slMeshShape *s, int sideCount, double radius, double hei
 
 	bottomP = new slVector*[sideCount + 1];
 
+	float angleStart = .5 * 2.0 * M_PI / sideCount;
+
 	for ( n = 0;n < sideCount;n++ ) {
 		topP[sideCount - ( n + 1 )] = &tops[n];
 		bottomP[n] = &bottoms[n];
@@ -807,11 +739,11 @@ slShape *slSetNGonDisc( slMeshShape *s, int sideCount, double radius, double hei
 		tops[n].y = ( height / 2 );
 		bottoms[n].y = -( height / 2 );
 
-		tops[n].x = radius * cos( n * ( 2 * M_PI / sideCount ) );
-		tops[n].z = radius * sin( n * ( 2 * M_PI / sideCount ) );
+		tops[n].x = radius * cos( angleStart + n * ( 2 * M_PI / sideCount ) );
+		tops[n].z = radius * sin( angleStart + n * ( 2 * M_PI / sideCount ) );
 
-		bottoms[n].x = radius * cos( n * ( 2 * M_PI / sideCount ) );
-		bottoms[n].z = radius * sin( n * ( 2 * M_PI / sideCount ) );
+		bottoms[n].x = radius * cos( angleStart + n * ( 2 * M_PI / sideCount ) );
+		bottoms[n].z = radius * sin( angleStart + n * ( 2 * M_PI / sideCount ) );
 	}
 
 	slVectorCopy( &tops[0], &tops[n] );
@@ -1374,8 +1306,10 @@ int slMeshShape::createODEGeom() {
 	if( !_indices || !_vertices ) 
 		return -1;
 
-	if( _odeGeomID )
-		dGeomDestroy( _odeGeomID );
+	if( _odeGeomID[ 0 ] )
+		dGeomDestroy( _odeGeomID[ 0 ] );
+	if( _odeGeomID[ 1 ] ) 
+		dGeomDestroy( _odeGeomID[ 1 ] );
 
 	dTriMeshDataID triMeshID = dGeomTriMeshDataCreate();
 	
@@ -1383,12 +1317,16 @@ int slMeshShape::createODEGeom() {
 		_vertices, 3 * sizeof( float ), _vertexCount,
 		_indices, _indexCount, 3 * sizeof( int ) );
 
-  	_odeGeomID = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
+  	_odeGeomID[ 0 ] = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
+//  	_odeGeomID[ 1 ] = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
 
-	dGeomSetData( _odeGeomID, triMeshID );
+	_odeGeomID[ 1 ] = _odeGeomID[ 0 ];
+
+	dGeomSetData( _odeGeomID[ 0 ], triMeshID );
+//	dGeomSetData( _odeGeomID[ 1 ], triMeshID );
 
 	dMass m;
-	dMassSetTrimesh( &m, _density, _odeGeomID );
+	dMassSetTrimesh( &m, _density, _odeGeomID[ 0 ] );
 
     _inertia[ 0 ][ 0 ] = m.I[ 0 ];
     _inertia[ 0 ][ 1 ] = m.I[ 1 ];
@@ -1409,6 +1347,15 @@ int slMeshShape::createODEGeom() {
 
 
 void slMeshShape::bounds( const slPosition *position, slVector *min, slVector *max ) const {
+	/*
+	if( points.size() > 0 ) {
+		slShape::bounds( position, min, max );
+
+
+		return;
+	}
+	*/
+
 	max->x = position->location.x + _maxReach;
 	max->y = position->location.y + _maxReach;
 	max->z = position->location.z + _maxReach;

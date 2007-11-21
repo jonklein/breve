@@ -103,11 +103,7 @@ sl3DSShape::sl3DSShape( char *inFilename, char *inMeshname, float inSize ) : slM
 	createODEGeom();
 }
 
-
-
 sl3DSShape::~sl3DSShape() {
-	delete[] _indices;
-	delete[] _vertices;
 }
 
 void sl3DSShape::calculateSizes( Lib3dsNode *inNode ) {
@@ -183,20 +179,7 @@ void sl3DSShape::draw( slCamera *c, slPosition *pos, double textureScaleX, doubl
 
 	glPopMatrix();
 
-
-
-	dMatrix4 transform = {
-		pos -> rotation[0][0], pos -> rotation[0][1], pos -> rotation[0][2], 0,
-		pos -> rotation[1][0], pos -> rotation[1][1], pos -> rotation[1][2], 0,
-		pos -> rotation[2][0], pos -> rotation[2][1], pos -> rotation[2][2], 0,
-		pos -> location.x, pos -> location.y, pos -> location.z,  1
-	};
-
-	memcpy( _lastPositions[ _lastPositionIndex ], transform, sizeof( dMatrix4 ) );
-
-	dGeomTriMeshSetLastTransform( _odeGeomID, _lastPositions[ _lastPositionIndex ] );
-
-	_lastPositionIndex = !_lastPositionIndex;
+	updateLastPosition( pos );
 }
 
 #endif
