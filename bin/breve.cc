@@ -52,11 +52,10 @@ extern int optind;
 #endif
 
 unsigned char *gOffscreenBuffer;
-#define OSMESA_WINDOW_SIZE 300
 
 static brEngine *gEngine;
 static int contextMenu, mainMenu;
-static int height = 400, width = 400;
+static int gHeight = 400, gWidth = 400;
 static int gXpos = 0, gYpos = 0;
 static stSteveData *gSteveData;
 static char keyDown[256];
@@ -160,20 +159,20 @@ int main( int argc, char **argv ) {
 	if ( !gOptionNoGraphics ) {
 		slInitGlut( argc, argv, simulationFile );
 	
-		gEngine->camera->setBounds( width, height );
+		gEngine->camera->setBounds( gWidth, gHeight );
 	} else {
 		//
 		// Attempt to load an offscreen Mesa buffer.
 		//
 	
-		gOffscreenBuffer = ( GLubyte * )slMalloc( OSMESA_WINDOW_SIZE * OSMESA_WINDOW_SIZE * 4 * sizeof( GLubyte ) );
+		gOffscreenBuffer = ( GLubyte * )slMalloc( gWidth * gHeight * 4 * sizeof( GLubyte ) );
 
 		if ( slLoadOSMesaPlugin( execpath ) ) {
 			slFree( gOffscreenBuffer );
 			gOffscreenBuffer = NULL;
 		}
 
-		gEngine->camera->setBounds( OSMESA_WINDOW_SIZE, OSMESA_WINDOW_SIZE );
+		gEngine->camera->setBounds( gWidth, gHeight );
 	}
 
 
@@ -285,7 +284,7 @@ void *workerThread( void *data ) {
 
 			if ( gOffscreenBuffer && gEngine->world->detectLightExposure() )
 				gEngine->camera->detectLightExposure(
-				    gEngine->world, OSMESA_WINDOW_SIZE, gOffscreenBuffer );
+				    gEngine->world, gWidth, gOffscreenBuffer );
 		}
 
 		pthread_mutex_unlock( &gThreadMutex );
@@ -322,7 +321,7 @@ void brGlutLoop() {
 
 //                if ( gEngine->world->detectLightExposure() )
 //			gEngine->camera->detectLightExposure(
-//			gEngine->world, OSMESA_WINDOW_SIZE, gOffscreenBuffer );
+//			gEngine->world, gWidth, gOffscreenBuffer );
 
 		oldD = newD;
 	}
@@ -479,10 +478,9 @@ int brParseArgs( int argc, char **argv ) {
 				break;
 
 			case 's':
-				sscanf( optarg, "%dx%d\n", &width, &height );
+				sscanf( optarg, "%dx%d\n", &gWidth, &gHeight );
 
-				if ( width <= 0 || width > 1000 ||
-				        height <= 0 || height > 1000 ) {
+				if ( gWidth <= 0 || gWidth > 1000 || gHeight <= 0 || gHeight > 1000 ) {
 					printf( "-s size flag must be in the form NxM, \
 					        where N and M are from 1 to 1000\n" );
 					error++;
@@ -563,8 +561,9 @@ void brPrintUsage( const char *name ) {
 
 void slInitGlut( int argc, char **argv, char *title ) {
 
-	glutInitWindowSize( width, height );
+	glutInitWindowSize( gWidth, gHeight );
 	glutInit( &argc, argv );
+
 	glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL );
 
 	if ( gXpos || gYpos ) 
@@ -910,7 +909,7 @@ int slLoadOSMesaPlugin( char *execPath ) {
 	return -1;
 #else
 	void *handle;
-	void( *create )( unsigned char *, int );
+	void( *create )( unsigned char *, int, int );
 	int( *activate )();
 
 	std::string path = dirname( execPath );
@@ -925,14 +924,14 @@ int slLoadOSMesaPlugin( char *execPath ) {
 		return -1;
 	}
 
-	create = ( void( * )( unsigned char*, int ) )dlsym( handle, "slOSMesaCreate" );
+	create = ( void( * )( unsigned char*, int, int ) )dlsym( handle, "slOSMesaCreate" );
 
 	if ( !create ) {
 		slMessage( DEBUG_ALL, "Could not load OSMesa extension, offscreen rendering disabled (%s)\n", dlerror() );
 		return -1;
 	}
 
-	create( gOffscreenBuffer, OSMESA_WINDOW_SIZE );
+	create( gOffscreenBuffer, gWidth, gHeight );
 
 	activate = ( int( * )() )dlsym( handle, "slOSMesaMakeCurrentContext" );
 

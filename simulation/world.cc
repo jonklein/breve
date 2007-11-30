@@ -468,7 +468,7 @@ double slWorld::step( double stepSize, int *error ) {
 					contact.surface.bounce_vel = -0.05;
 
 					if( fabs( contact.geom.depth ) > 0.04 ) {
-						printf( "depth = %f\n", contact.geom.depth );
+						// printf( "depth = %f\n", contact.geom.depth );
 					}
 				
 

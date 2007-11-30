@@ -4,6 +4,7 @@
 #include <math.h>
 
 #include <string>
+#include <map>
 
 #include "simulation.h"
 #include "mesh.h"
@@ -13,6 +14,9 @@
 
 sl3DSShape::sl3DSShape( char *inFilename, char *inMeshname, float inSize ) : slMeshShape() {
 	
+	_normals = NULL;
+	_materials = NULL;
+
 	if( !inFilename ) 
 		throw slException( std::string( "Cannot locate 3DS Mesh file" ) );
 
@@ -21,99 +25,183 @@ sl3DSShape::sl3DSShape( char *inFilename, char *inMeshname, float inSize ) : slM
 	if ( !file ) 
 		throw slException( std::string( "Cannot open file \"" ) + inFilename + "\"" );
 
-	calculateSizes( file -> nodes );
+	_directory = dirname( inFilename );
+	
+	_vertexCount = 0;
+	_indexCount = 0;
 
-	if ( !strcmp( inMeshname, "" ) ) {
-		if( file -> meshes ) 
-			inMeshname = file-> meshes -> name;
-	}
+	calculateSizes( file, file -> nodes, &_vertexCount, &_indexCount );
 
-	_mesh = lib3ds_file_mesh_by_name( file, inMeshname );
-
-	if ( ! _mesh ) 
-		throw slException( std::string( "cannot locate mesh in file \"" ) + inMeshname + "\"" );
-
-	unsigned int n;
-
-	_vertexCount = _mesh->points;
-	_indexCount = _mesh->faces * 3;
+	printf( "%d points, %d faces\n", _vertexCount, _indexCount );
 
 	_vertices = new float[ 3 * _vertexCount ];
+	_texcoords = new float[ 2 * _vertexCount ];
 	_indices = new int[ _indexCount ];
-	_normals = new float[ _mesh -> faces * 3 * 3 ];
+	_normals = new float[ _indexCount * 3 ];
+	_materials = new int[ _indexCount ];
 
 	_maxReach = 0.0;
 
 	// First pass through the data, translate to the origin and get the length
 
-	// slMatrix transform = { 
-	//	_mesh->matrix[ 0 ][ 0 ], _mesh->matrix[ 1 ][ 0 ], _mesh->matrix[ 2 ][ 0 ],
-	//	_mesh->matrix[ 0 ][ 1 ], _mesh->matrix[ 1 ][ 1 ], _mesh->matrix[ 2 ][ 1 ],
-	//	_mesh->matrix[ 0 ][ 2 ], _mesh->matrix[ 1 ][ 2 ], _mesh->matrix[ 2 ][ 2 ] };
+	int pointStart = 0, indexStart = 0;
+	processNodes( file, file -> nodes, &pointStart, &indexStart );
 
-	slVector translate = { -_mesh->matrix[ 3 ][ 0 ], -_mesh->matrix[ 3 ][ 1 ], -_mesh->matrix[ 3 ][ 2 ] };
+	printf( "%d points and %d indices processed, max reach = %f\n", pointStart, indexStart, _maxReach );
 
-	for ( n = 0; n < _mesh->points; n++ ) {
-		_mesh->pointL[ n ].pos[ 0 ] += translate.x;
-		_mesh->pointL[ n ].pos[ 1 ] += translate.y;
-		_mesh->pointL[ n ].pos[ 2 ] += translate.z;
-
-		slVector v;
-
-		v.x = _mesh->pointL[ n ].pos[ 0 ];
-		v.y = _mesh->pointL[ n ].pos[ 1 ];
-		v.z = _mesh->pointL[ n ].pos[ 2 ];
-
-		float size = slVectorLength( &v );
-
-		if( size > _maxReach )
-			_maxReach = size;
-	}
-
-	// Second pass, normalize by the size and note the vertices
-
-	for ( n = 0; n < _mesh->points; n++ ) {
-		_mesh->pointL[ n ].pos[ 0 ] /= ( _maxReach / inSize );
-		_mesh->pointL[ n ].pos[ 1 ] /= ( _maxReach / inSize );
-		_mesh->pointL[ n ].pos[ 2 ] /= ( _maxReach / inSize );
-
-		_vertices[ n * 3     ] = _mesh->pointL[ n ].pos[ 0 ];
-		_vertices[ n * 3 + 1 ] = _mesh->pointL[ n ].pos[ 1 ];
-		_vertices[ n * 3 + 2 ] = _mesh->pointL[ n ].pos[ 2 ];
-	}
-
-	_maxReach = inSize;
-
-	Lib3dsVector *normals = new Lib3dsVector[ _indexCount ];
-	lib3ds_mesh_calculate_normals( _mesh, normals );
-
-	for ( n = 0; n < _mesh -> faces; n++ ) {
-		Lib3dsFace *f = &_mesh -> faceL[ n ];
-
-		for ( int m = 0; m < 3; m++ ) {
-			_indices[ n * 3 + m ] = f -> points[ m ];
-
-			_normals[ ( n * 3 + m ) * 3     ] = normals[ n * 3 + m ][ 0 ];
-			_normals[ ( n * 3 + m ) * 3 + 1 ] = normals[ n * 3 + m ][ 1 ];
-			_normals[ ( n * 3 + m ) * 3 + 2 ] = normals[ n * 3 + m ][ 2 ];
+	if( inSize > 0 ) {
+		for( int n = 0; n < 3 * _vertexCount; n++ ) {
+			_vertices[ n ] *= ( inSize / _maxReach );
 		}
-   	}
+
+		_maxReach = inSize;
+	}
+
 
 	setDensity( 1 );
 	createODEGeom();
 }
 
-sl3DSShape::~sl3DSShape() {
+int sl3DSShape::processNodes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPointStart, int *ioIndexStart ) {
+	unsigned int n;
+
+        while( inNode ) {
+                processNodes( inFile, inNode -> childs, ioPointStart, ioIndexStart );
+
+                if( inNode -> type == LIB3DS_OBJECT_NODE ) {
+			if( !strcmp( inNode -> name, "$$$DUMMY" ) )
+				return;
+
+                        Lib3dsMesh *mesh = lib3ds_file_mesh_by_name( inFile, inNode->name );
+
+			// slMatrix transform = { 
+			//	_mesh->matrix[ 0 ][ 0 ], _mesh->matrix[ 1 ][ 0 ], _mesh->matrix[ 2 ][ 0 ],
+			//	_mesh->matrix[ 0 ][ 1 ], _mesh->matrix[ 1 ][ 1 ], _mesh->matrix[ 2 ][ 1 ],
+			//	_mesh->matrix[ 0 ][ 2 ], _mesh->matrix[ 1 ][ 2 ], _mesh->matrix[ 2 ][ 2 ] };
+			// slVector translate = { -mesh->matrix[ 3 ][ 0 ], -mesh->matrix[ 3 ][ 1 ], -mesh->matrix[ 3 ][ 2 ] };
+
+			for ( n = 0; n < mesh -> points; n++ ) {
+				_vertices[ ( *ioPointStart + n ) * 3     ] = mesh->pointL[ n ].pos[ 0 ];
+				_vertices[ ( *ioPointStart + n ) * 3 + 1 ] = mesh->pointL[ n ].pos[ 1 ];
+				_vertices[ ( *ioPointStart + n ) * 3 + 2 ] = mesh->pointL[ n ].pos[ 2 ];
+
+				float tx = 0, ty = 0;
+
+				if( mesh->texelL ) {
+					tx = mesh->texelL[ n ][ 0 ];
+					ty = 1.0 - mesh->texelL[ n ][ 1 ];
+				}
+
+				_texcoords[ ( *ioPointStart + n ) * 2     ] = tx;
+				_texcoords[ ( *ioPointStart + n ) * 2 + 1 ] = ty;
+
+				slVector v = { mesh->pointL[ n ].pos[ 0 ], mesh->pointL[ n ].pos[ 1 ], mesh->pointL[ n ].pos[ 2 ] };
+
+				if( slVectorLength( &v ) > _maxReach )
+					_maxReach = slVectorLength( &v );
+			}
+
+			Lib3dsVector *normals = new Lib3dsVector[ _indexCount ];
+			lib3ds_mesh_calculate_normals( mesh, normals );
+
+			for( int n = 0; n < mesh -> faces; n++ ) {
+				Lib3dsFace *f = &mesh -> faceL[ n ];
+
+				for ( int m = 0; m < 3; m++ ) {
+					_indices[ *ioIndexStart + n * 3 + m ] = f -> points[ m ] + *ioPointStart;
+
+					_normals[ ( *ioIndexStart + n * 3 + m ) * 3     ] = normals[ n * 3 + m ][ 0 ];
+					_normals[ ( *ioIndexStart + n * 3 + m ) * 3 + 1 ] = normals[ n * 3 + m ][ 1 ];
+					_normals[ ( *ioIndexStart + n * 3 + m ) * 3 + 2 ] = normals[ n * 3 + m ][ 2 ];
+				}
+
+				// check for the material
+
+				if( f -> material && strlen( f -> material ) ) {
+					std::string materialName = std::string( f -> material );
+
+					if( !_materialIndices[ materialName ] ) {
+						Lib3dsMaterial *faceMaterial = lib3ds_file_material_by_name( inFile, f -> material );
+						_materialIndices[ materialName ] = addMaterial( materialName, faceMaterial );
+
+					}
+				
+					_materials[ *ioIndexStart / 3 + n ] = _materialIndices[ materialName ] - 1;
+
+					if( _materialList[ _materialIndices[ materialName ] - 1 ]._texturePath.size() > 0 && !mesh -> texelL ) 
+						printf( "found a texture for the face, but no tex coords\n" );
+				}
+
+			}
+
+			*ioPointStart += mesh->points;
+
+			*ioIndexStart += mesh->faces * 3;
+   		}
+
+
+                inNode = inNode -> next;
+        }
 }
 
-void sl3DSShape::calculateSizes( Lib3dsNode *inNode ) {
+int sl3DSShape::addMaterial( std::string &inMaterialName, Lib3dsMaterial *inMaterial ) {
+
+	if( !inMaterial ) 
+		return 0;
+
+	slMaterial material;
+
+	printf( "Found material: %s\n", inMaterialName.c_str() );
+	memcpy( material._specular, inMaterial -> specular, sizeof( float ) * 4 );
+	memcpy( material._diffuse, inMaterial -> diffuse, sizeof( float ) * 4 );
+	memcpy( material._ambient, inMaterial -> ambient, sizeof( float ) * 4 );
+
+	material._ambient[ 3 ] = 1.0;
+	material._diffuse[ 3 ] = 1.0;
+	material._specular[ 3 ] = 1.0;
+
+	material._shininess = inMaterial -> shininess;
+
+	if( inMaterial -> texture1_map.name && strlen( inMaterial -> texture1_map.name ) ) {
+		material._texturePath = _directory + "/";
+		material._texturePath += inMaterial -> texture1_map.name;
+
+		printf( "Texture name = %s\n", material._texturePath.c_str() );
+	}
+
+	_materialList.push_back( material );
+
+	return _materialList.size();
+
+}
+
+sl3DSShape::~sl3DSShape() {
+	if( _normals )
+		delete[] _normals;
+
+	if( _texcoords )
+		delete[] _texcoords ;
+
+	if( _materials )
+		delete[] _materials;
+}
+
+void sl3DSShape::calculateSizes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *outPoints, int *outIndices ) {
+
 	while( inNode ) {
-		
-		calculateSizes( inNode -> childs );
+		calculateSizes( inFile, inNode -> childs, outPoints, outIndices );
 
 		if( inNode -> type == LIB3DS_OBJECT_NODE ) {
-			// printf( "Node name = %s, %s\n", inNode -> name, inNode -> data.object.morph  );
-			// Lib3dsMesh *mesh = lib3ds_file_mesh_by_name(file, node->name);
+			if( !strcmp( inNode -> name, "$$$DUMMY" ) )
+				return;
+
+			printf( "Node name = %s [ %s ]\n", inNode -> name, inNode -> data.object.morph  );
+			Lib3dsMesh *mesh = lib3ds_file_mesh_by_name( inFile, inNode->name );
+
+			if( mesh ) {
+				*outPoints += mesh->points;
+				*outIndices += mesh->faces * 3;
+			}
 		}
 
 		inNode = inNode -> next;
@@ -125,25 +213,77 @@ double sl3DSShape::maxReach() {
 }
 
 void sl3DSShape::draw() {
-	unsigned int n;
-	Lib3dsFace *f;
+	glDisable( GL_COLOR_MATERIAL );
 
-	// glNormalPointer( GL_FLOAT, 0, _normals );
+	slMaterial *material = NULL;
 
-	glBegin( GL_TRIANGLES );
+	for ( int n = 0; n < _indexCount; n += 3 ) {
+		int materialIndex = n / 3;
 
-	for ( n = 0; n < _mesh->faces; n++ ) {
-		f = &_mesh->faceL[ n ];
+		if( _materials[ materialIndex ] > -1 && &_materialList[ _materials[ materialIndex ] ] != material ) {
+			material = &_materialList[ _materials[ materialIndex ] ];
+		
+			glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, material -> _ambient );
+			glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, material -> _diffuse );
+			glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, material -> _specular );
 
-		glNormal3fv( &_normals[ n * 3 * 3     ] );
-		glVertex3fv( _mesh->pointL[ f->points[ 0 ] ].pos );
-		glNormal3fv( &_normals[ n * 3 * 3 + 3 ] );
-		glVertex3fv( _mesh->pointL[ f->points[ 1 ] ].pos );
-		glNormal3fv( &_normals[ n * 3 * 3 + 6 ] );
-		glVertex3fv( _mesh->pointL[ f->points[ 2 ] ].pos );
+
+			float shine = pow( 2.0, 10.0 * material -> _shininess );
+
+			if( shine > 128.0 )
+				shine = 128.0;
+
+			glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, shine ); 
+
+			glColor4fv( material -> _ambient );
+			
+			// I CAN HAZ TEXTURING?
+
+			if( !material -> _texture && material -> _texturePath.size() > 0 )
+				material -> _texture = new slTexture2D( material -> _texturePath );
+
+			if( material -> _texture ) {
+			 	material -> _texture -> bind();
+				glMatrixMode( GL_TEXTURE );
+				glLoadIdentity();
+				glScalef( material -> _texture -> _unitX, material -> _texture -> _unitY, 1 );
+			}
+			else 
+				glDisable( GL_TEXTURE_2D );
+
+			glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE  );
+
+		}
+
+		int i1 = _indices[ n ];
+		int i2 = _indices[ n + 1 ];
+		int i3 = _indices[ n + 2 ];
+
+		if( 1 || material -> _texture ) {
+		glBegin( GL_TRIANGLES );
+
+		glNormal3fv( &_normals[ n * 3 ] );
+		glTexCoord2fv( &_texcoords[ i1 * 2 ] );
+		glVertex3fv( &_vertices[ i1 * 3 ] );
+
+		glNormal3fv( &_normals[ n * 3 + 3 ] );
+		glTexCoord2fv( &_texcoords[ i2 * 2 ] );
+		glVertex3fv( &_vertices[ i2 * 3 ] );
+
+		glNormal3fv( &_normals[ n * 3 + 6 ] );
+		glTexCoord2fv( &_texcoords[ i3 * 2 ] );
+		glVertex3fv( &_vertices[ i3 * 3 ] );
+
+		glEnd();
+		}
 	 }
 
-	glEnd();
+	// glDrawElements( GL_TRIANGLES, _indexCount, GL_UNSIGNED_INT _indices );
+
+	glEnable( GL_COLOR_MATERIAL );
+
+
+	glMatrixMode( GL_MODELVIEW );
 }
 
 void sl3DSShape::draw( slCamera *c, slPosition *pos, double textureScaleX, double textureScaleY, int mode, int flags ) {

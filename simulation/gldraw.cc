@@ -148,28 +148,6 @@ void slInitGL( slWorld *w, slCamera *c ) {
 }
 
 /**
- * Initializes 3 sphere draw lists.
- */
-
-void slCompileSphereDrawList( int l ) {
-	GLUquadricObj *quad;
-
-	for ( int n = 0; n < SPHERE_RESOLUTIONS; ++n ) {
-		glNewList( l + n, GL_COMPILE );
-
-		quad = gluNewQuadric();
-
-		gluQuadricTexture( quad, GL_TRUE );
-		gluQuadricOrientation( quad, GLU_OUTSIDE );
-		gluSphere( quad, 100.0, 6 + n * 3, 6 + n * 3 );
-
-		gluDeleteQuadric( quad );
-
-		glEndList();
-	}
-}
-
-/**
  * \brief Center the given pixels in a square buffer.
  * Used for textures, which must be powers of two.
  */
@@ -752,7 +730,7 @@ void slCamera::reflectionPass( slWorld *w ) {
 void slCamera::shadowPass( slWorld *w ) {
 	GLfloat shadowMatrix[4][4];
 
-	slShadowMatrix( shadowMatrix, &_shadowPlane, &_lights[0].location );
+	slShadowMatrix( shadowMatrix, &_shadowPlane, &_lights[ 0 ]._location );
 
 	glPushAttrib( GL_ENABLE_BIT );
 
@@ -815,9 +793,9 @@ void slCamera::renderText( slWorld *w, int crosshair ) {
 	}
 }
 
-/*!
-	\brief Draw a texture as a background.
-*/
+/**
+ * \brief Draw a texture as a background.
+ */
 
 void slCamera::drawBackground( slWorld *w ) {
 	static float transX = 0.0, transY = 0.0;
@@ -1049,44 +1027,53 @@ void slCamera::drawLights( int noDiffuse ) {
 	GLfloat dir[4];
 	GLfloat amb[4];
 
-	dir[0] = _lights[0].location.x;
-	dir[1] = _lights[0].location.y;
-	dir[2] = _lights[0].location.z;
-	dir[3] = 1.0;
-
-	if ( noDiffuse ) {
-		dif[0] = 0.0;
-		dif[1] = 0.0;
-		dif[2] = 0.0;
-		dif[3] = 0.0;
-	} else {
-		dif[0] = _lights[0].diffuse.x;
-		dif[1] = _lights[0].diffuse.y;
-		dif[2] = _lights[0].diffuse.z;
-		dif[3] = 0.0;
-	}
-
-	amb[0] = _lights[0].ambient.x;
-	amb[1] = _lights[0].ambient.y;
-	amb[2] = _lights[0].ambient.z;
-	amb[3] = 0.0;
-
 	if ( _drawSmooth ) 
 		glShadeModel( GL_SMOOTH );
 	else 	
 		glShadeModel( GL_FLAT );
 
 	glEnable( GL_LIGHTING );
-	glEnable( GL_LIGHT0 );
 
-	glLightf( GL_LIGHT0, GL_CONSTANT_ATTENUATION, 1.0 );
-	glLightf( GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.00 );
-	glLightfv( GL_LIGHT0, GL_DIFFUSE, dif );
-	glLightfv( GL_LIGHT0, GL_AMBIENT, amb );
-	glLightfv( GL_LIGHT0, GL_POSITION, dir );
-	glLightfv( GL_LIGHT0, GL_SPECULAR, amb );
+	for( int n = 0; n < MAX_LIGHTS; n++ ) { 
+		slLight *light = &_lights[ n ];
+
+		if( light -> _type ) {
+			dir[0] = light -> _location.x;
+			dir[1] = light -> _location.y;
+			dir[2] = light -> _location.z;
+			dir[3] = 1.0;
+	
+			if ( noDiffuse ) {
+				dif[0] = 0.0;
+				dif[1] = 0.0;
+				dif[2] = 0.0;
+				dif[3] = 0.0;
+			} else {
+				dif[0] = light -> _diffuse.x;
+				dif[1] = light -> _diffuse.y;
+				dif[2] = light -> _diffuse.z;
+				dif[3] = 0.0;
+			}
+		
+			amb[0] = light -> _ambient.x;
+			amb[1] = light -> _ambient.y;
+			amb[2] = light -> _ambient.z;
+			amb[3] = 0.0;
+		
+			GLenum lightID = GL_LIGHT0 + n;
+		
+			glEnable( lightID );
+		
+			glLightf( lightID, GL_CONSTANT_ATTENUATION, light -> _constantAttenuation );
+			glLightf( lightID, GL_LINEAR_ATTENUATION, light -> _linearAttenuation );
+			glLightfv( lightID, GL_DIFFUSE, dif );
+			glLightfv( lightID, GL_AMBIENT, amb );
+			glLightfv( lightID, GL_POSITION, dir );
+			glLightfv( lightID, GL_SPECULAR, amb );
+		}
+	}
 }
-
+	
 /*!
 	\brief Set up the rendering matrix for flat shadows on a given plane.
 */
@@ -1618,7 +1605,7 @@ void slBreakdownTriangle( slVector *v, int level, slVector *xaxis, slVector *yax
 		slVectorAdd( &v[n], &diff, &mids[n] );
 	}
 
-	if ( length < 200 || level > 3 ) {
+	if ( length < 100 || level > 4 ) {
 		for ( n = 0; n < 3; ++n ) {
 			glTexCoord2f( slVectorDot( &v[n], xaxis ), slVectorDot( &v[n], yaxis ) );
 			glVertex3f( v[n].x, v[n].y, v[n].z );

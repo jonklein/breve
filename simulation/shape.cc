@@ -1318,12 +1318,12 @@ int slMeshShape::createODEGeom() {
 		_indices, _indexCount, 3 * sizeof( int ) );
 
   	_odeGeomID[ 0 ] = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
-//  	_odeGeomID[ 1 ] = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
+  	_odeGeomID[ 1 ] = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
 
-	_odeGeomID[ 1 ] = _odeGeomID[ 0 ];
+//	_odeGeomID[ 1 ] = _odeGeomID[ 0 ];
 
 	dGeomSetData( _odeGeomID[ 0 ], triMeshID );
-//	dGeomSetData( _odeGeomID[ 1 ], triMeshID );
+	dGeomSetData( _odeGeomID[ 1 ], triMeshID );
 
 	dMass m;
 	dMassSetTrimesh( &m, _density, _odeGeomID[ 0 ] );

@@ -43,7 +43,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		backgroundColor (vector).
 		fogColor (vector).
-		lightAmbientColor, lightDiffuseColor (vector).
+		lightAmbientColor, lightDiffuseColor, lightSpecularColor (vector).
 
 		archivedSkyboxImageList (list).
 		archivedBackgroundTextureImage (object).
@@ -584,12 +584,12 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		cameraSetZoom(theDistance).
 
-	+ to move-light to theLocation (vector):
+	+ to move-light to theLocation (vector) for-light n = 0 (int):
 		% Moves the source light to theLocation.  The default position is 
 		% (0, 0, 0) which is the origin of the world.  
 
 		lightPosition = theLocation.
-		setLightPosition(theLocation).
+		brISetLightPosition( theLocation, n ).
 
 	+ to iterate:
 		result (float).
@@ -1065,7 +1065,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		return system(systemCommand).
 
-	+ to set-light-color to newColor (vector):
+	+ to set-light-color to newColor (vector) for-light n = 0 (int):
 		% Sets the color of the light to newColor.  Only has an effect on the
 		% rendering when lighting has been turned on using 
 		% METHOD(enable-lighting).
@@ -1076,16 +1076,25 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		self set-light-ambient-color to newColor.
 		self set-light-diffuse-color to newColor.
+		self set-light-specular-color to newColor.
 	
-	+ to set-light-ambient-color to newColor (vector):
+	+ to set-light-ambient-color to newColor (vector) for-light n = 0 (int):
 		% Sets the ambient, or background, color of the light to newColor.  
 		% Only has an effect on the rendering when lighting has been turned 
 		% on using METHOD(enable-lighting).
 		
 		lightAmbientColor = newColor.
-		setLightAmbientColor(newColor).
+		brISetLightAmbientColor( newColor, n ).
 
-	+ to set-light-diffuse-color to newColor (vector):
+	+ to set-light-specular-color to newColor (vector) for-light n = 0 (int):
+		% Sets the specular, or "shine", color of the light to newColor.  
+		% Only has an effect on the rendering when lighting has been turned 
+		% on using METHOD(enable-lighting).
+		
+		lightSpecularColor = newColor.
+		brISetLightSpecularColor( newColor, n ).
+
+	+ to set-light-diffuse-color to newColor (vector) for-light n = 0 (int):
 		% Sets the diffuse, or foreground, color of the light to newColor.  
 		% Only has an effect on the rendering when lighting has been turned 
 		% on using METHOD(enable-lighting).
@@ -1094,7 +1103,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 		% as opposed to the "ambient" light that is also generated.
 
 		lightDiffuseColor = newColor.
-		setLightDiffuseColor(newColor).
+		brISetLightDiffuseColor( newColor, n ).
 
 	+ to set-interface-item with-id tag (int) to-string newValue (string):
 		% This method will set the interface item tag to newValue.  This

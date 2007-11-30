@@ -107,13 +107,10 @@ slCamera::slCamera( int x, int y ) {
 
 	for ( n = 0; n < _maxBillboards; n++ ) _billboards[n] = new slBillboardEntry;
 
-	_nLights = 1;
-
-	slVectorSet( &_lights[0].location, 0, 0, 0 );
-
-	slVectorSet( &_lights[0].ambient, .6, .6, .6 );
-
-	slVectorSet( &_lights[0].diffuse, .6, .9, .9 );
+	_lights[ 0 ]._type = LightInfinite;
+	slVectorSet( &_lights[0]._location, 0, 0, 0 );
+	slVectorSet( &_lights[0]._ambient, .6, .6, .6 );
+	slVectorSet( &_lights[0]._diffuse, .6, .9, .9 );
 }
 
 void slCamera::updateFrustum() {

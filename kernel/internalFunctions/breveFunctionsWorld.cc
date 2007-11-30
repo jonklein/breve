@@ -461,27 +461,14 @@ int brISetBackgroundImage( brEval args[], brEval *target, brInstance *i ) {
 }
 
 /**
-	\brief Gets the position of the main light.
-
-	vector getLightPosition().
-*/
-
-int brIGetLightPosition( brEval args[], brEval *target, brInstance *i ) {
-
-	target->set( i->engine->camera->_lights[0].location );
-
-	return EC_OK;
-}
-
-/**
-	\brief Sets a the position of the main light.
-
-	setLightPosition(vector position).
-*/
+ * \brief Sets a the position of the main light.
+ * 
+ * setLightPosition(vector position).
+ */
 
 int brISetLightPosition( brEval args[], brEval *target, brInstance *i ) {
-	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->camera->_lights[0].location );
-	i->engine->camera->_lights[0].changed = 1;
+	int n = BRINT( &args[ 1 ] );
+	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->camera->_lights[ n ]._location );
 	return EC_OK;
 }
 
@@ -496,8 +483,7 @@ int brISetDrawLightExposure( brEval args[], brEval *target, brInstance *i ) {
 }
 
 int brIGetLightExposureCamera( brEval args[], brEval *target, brInstance *i ) {
-
-	target->set( i->engine->world->getLightExposureCamera( ) );
+	target->set( i->engine->world->getLightExposureCamera() );
 
 	return EC_OK;
 }
@@ -520,8 +506,9 @@ int brISetLightExposureSource( brEval args[], brEval *target, brInstance *i ) {
 */
 
 int brISetLightAmbientColor( brEval args[], brEval *target, brInstance *i ) {
-	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->camera->_lights[0].ambient );
-	i->engine->camera->_lights[0].changed = 1;
+	int n = BRINT( &args[ 1 ] );
+	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->camera->_lights[ n ]._ambient );
+
 	return EC_OK;
 }
 
@@ -531,8 +518,21 @@ int brISetLightAmbientColor( brEval args[], brEval *target, brInstance *i ) {
  */
 
 int brISetLightDiffuseColor( brEval args[], brEval *target, brInstance *i ) {
-	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->camera->_lights[0].diffuse );
-	i->engine->camera->_lights[0].changed = 1;
+	int n = BRINT( &args[ 1 ] );
+	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->camera->_lights[ n ]._diffuse );
+
+	return EC_OK;
+}
+
+/**
+ *	\brief Sets a the specular color for the light.
+ *	setLightSpecularColor(vector color).
+ */
+
+int brISetLightSpecularColor( brEval args[], brEval *target, brInstance *i ) {
+	int n = BRINT( &args[ 1 ] );
+	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->camera->_lights[ n ]._specular );
+
 	return EC_OK;
 }
 
@@ -871,8 +871,6 @@ void breveInitWorldFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "cameraSetText", brICameraSetText, AT_NULL, AT_STRING, AT_INT, AT_DOUBLE, AT_DOUBLE, AT_VECTOR, 0 );
 	brNewBreveCall( n, "cameraSetTextScale", brICameraSetTextScale, AT_NULL, AT_DOUBLE, 0 );
 
-	brNewBreveCall( n, "getLightPosition", brIGetLightPosition, AT_VECTOR, 0 );
-	brNewBreveCall( n, "setLightPosition", brISetLightPosition, AT_NULL, AT_VECTOR, 0 );
 	brNewBreveCall( n, "setDetectLightExposure", brISetDetectLightExposure, AT_NULL, AT_INT, 0 );
 	brNewBreveCall( n, "setDrawLightExposure", brISetDrawLightExposure, AT_NULL, AT_INT, 0 );
 	brNewBreveCall( n, "setLightExposureSource", brISetLightExposureSource, AT_NULL, AT_VECTOR, 0 );
@@ -886,8 +884,10 @@ void breveInitWorldFunctions( brNamespace *n ) {
 
 	brNewBreveCall( n, "setShadowCatcher", brISetShadowCatcher, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
 
-	brNewBreveCall( n, "setLightAmbientColor", brISetLightAmbientColor, AT_NULL, AT_VECTOR, 0 );
-	brNewBreveCall( n, "setLightDiffuseColor", brISetLightDiffuseColor, AT_NULL, AT_VECTOR, 0 );
+	BRBREVECALL( n, brISetLightPosition, AT_NULL, AT_VECTOR, AT_INT, 0 );
+	BRBREVECALL( n, brISetLightAmbientColor, AT_NULL, AT_VECTOR, AT_INT, 0 );
+	BRBREVECALL( n, brISetLightDiffuseColor, AT_NULL, AT_VECTOR, AT_INT, 0 );
+	BRBREVECALL( n, brISetLightSpecularColor, AT_NULL, AT_VECTOR, AT_INT, 0 );
 
 	brNewBreveCall( n, "addObjectLine", brIAddObjectLine, AT_POINTER, AT_POINTER, AT_POINTER, AT_VECTOR, AT_STRING, 0 );
 	brNewBreveCall( n, "removeObjectLine", brIRemoveObjectLine, AT_NULL, AT_POINTER, 0 );

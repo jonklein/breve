@@ -67,6 +67,7 @@ void slTexture2D::loadPixels( unsigned char *pixels, int width, int height ) {
 	newwidth = newheight = MAX( newwidth, newheight );
 
 	bind();
+
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -80,17 +81,24 @@ void slTexture2D::loadPixels( unsigned char *pixels, int width, int height ) {
 
 		memset( newpixels, 0, newwidth * newheight * 4 );
 
-		xstart = ( newwidth - width ) / 2;
-		ystart = ( newheight - height ) / 2;
+		xstart = 0;
+		ystart = 0;
 
 		for ( int y = 0; y < height; y++ )
-			memcpy( &pixels[( y + ystart ) *( newwidth * 4 ) + ( xstart * 4 )], &pixels[y * width * 4], width * 4 );
+			memcpy( &newpixels[( y + ystart ) *( newwidth * 4 ) + ( xstart * 4 )], &pixels[y * width * 4], width * 4 );
 
-		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, newpixels );
+		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, newwidth, newheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, newpixels );
+		// glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, newwidth, newheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
+		// glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+
+		_unitX = width / (float)newwidth;
+		_unitY = height / (float)newheight;
 
 		delete[] newpixels;
 	} else {
 		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+
+		_unitX = _unitY = 1.0;
 	}
 }
 

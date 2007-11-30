@@ -1,3 +1,5 @@
+#ifndef _TEXTURE_H
+#define _TEXTURE_H
 
 /*****************************************************************************
  *                                                                           *
@@ -51,6 +53,12 @@ class slTexture2D {
 
 		void 			loadPixels( unsigned char *pixels, int width, int height );
 
+		float			_unitX;
+		float			_unitY;
+
+
 	private:
 		GLuint 			_textureID;
 };
+
+#endif // _TEXTURE_H

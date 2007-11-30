@@ -37,16 +37,36 @@ enum billboardType {
 	BBT_LIGHTMAP
 };
 
-/*!
-	\brief Holds location and color information for a light.
-*/
+/**
+ * \brief Holds location and color information for a light.
+ */
+
+#define MAX_LIGHTS 8
+
+enum slLightTypes {
+	LightDisabled			= 0,
+	LightPoint,
+	LightSpot,
+	LightInfinite
+};
 
 struct slLight {
-	slVector location;
-	slVector diffuse;
-	slVector ambient;
+	slLight() {
+		_constantAttenuation = 1.0;
+		_linearAttenuation = 0.0;
 
-	unsigned char changed;
+		_type = LightDisabled;
+	}
+
+	slVector 		_location;
+	slVector 		_diffuse;
+	slVector 		_ambient;
+	slVector 		_specular;
+
+	float			_constantAttenuation;
+	float			_linearAttenuation;
+
+	int			_type;
 };
 
 /*!
@@ -186,8 +206,7 @@ class slCamera {
 		double _fogEnd;
 	
 		slPlane _shadowPlane;
-		slLight _lights[8];
-		int _nLights;
+		slLight _lights[ MAX_LIGHTS ];
 	
 		// offset & target of camera
 	

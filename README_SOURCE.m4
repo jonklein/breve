@@ -129,12 +129,21 @@ Optional:
 + [required] ODE, physical simulation library 
   http://www.ode.org
 
+  Use version 0.9 or later and run configure with the following flags:
+
+  --enable 
+
+
+
+
   Be sure to compile with "dReal" as "double", as opposed to "float".
 
   Some versions of ODE make liberal use of alloca() to allocate memory 
-  on the stack during a function call.  This can cause crashes if the 
-  simulation becomes too complex and causes a stack overflow.  For this 
-  reason, official builds of breve use a modified version of the ODE source.
+  on the stack during simulation.  This can cause crashes if the simulation 
+  becomes too complex and causes a stack overflow.  For this reason, official 
+  builds of breve use a modified version of the ODE source.
+
+
 
 + [required for breveIDE build] wxwidgets, wx Interface Library
   http://www.wxwidgets.org

@@ -31,7 +31,7 @@ void slShape::drawShadowVolume( slCamera *c, slPosition *p ) {
 	slVector light;
 	slVector lNormal;
 
-	slVectorCopy( &c->_lights[ 0 ].location, &light );
+	slVectorCopy( &c->_lights[ 0 ]._location, &light );
 	slVectorCopy( &light, &lNormal );
 	slVectorNormalize( &lNormal );
 	slVectorMul( &light, 5, &light );
@@ -119,9 +119,9 @@ void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
 
 	static float sineTable[361], cosineTable[361];
 
-	slVectorSub( &c->_lights[0].location, &p->location, &light );
+	slVectorSub( &c->_lights[0]._location, &p->location, &light );
 
-	// slVectorCopy(&c->_lights[0].location, &light);
+	// slVectorCopy(&c->_lights[0]._location, &light);
 
 	slVectorCopy( &light, &lNormal );
 

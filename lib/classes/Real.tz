@@ -440,7 +440,7 @@ Object : Real (aka Reals) [version 2.1] {
 
 	+ to set-texture-image to textureImage (object):
 		% Changes the texture of this object to textureImage, an instance of 
-		% class Image.  If textureImage is NULL texturing is turned off for 
+		% class OBJECT(Image).  If textureImage is NULL texturing is turned off for 
 		% the object.
 
 		if archiveTextureImage:

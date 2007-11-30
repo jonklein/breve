@@ -14,7 +14,7 @@
 extern "C" {
 
 	OSMesaContext osContext;
-	int osSize;
+	int osWidth, osHeight;
 	unsigned char *osBuffer;
 
 	/**
@@ -23,10 +23,11 @@ extern "C" {
 	 * @param[in] size     The size of one side of the rendering window.
 	 */
 
-	void slOSMesaCreate( unsigned char *buffer, int size ) {
+	void slOSMesaCreate( unsigned char *buffer, int inWidth, int inHeight ) {
 		osContext = OSMesaCreateContext( OSMESA_RGBA, NULL );
 		osBuffer = buffer;
-		osSize = size;
+		osWidth = inWidth;
+		osHeight = inHeight;
 		printf( "OSMesa extension loaded: offscreen rendering enabled\n" );
 	}
 
@@ -37,7 +38,7 @@ extern "C" {
 	 */
 
 	int slOSMesaMakeCurrentContext( ) {
-		if ( !OSMesaMakeCurrent( osContext, osBuffer, GL_UNSIGNED_BYTE, osSize, osSize ) ) {
+		if ( !OSMesaMakeCurrent( osContext, osBuffer, GL_UNSIGNED_BYTE, osWidth, osHeight ) ) {
 			return -1;
 		}
 
