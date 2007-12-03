@@ -743,7 +743,7 @@ void slCamera::drawFlatShadows( slWorld *w ) {
 	glEnable( GL_DEPTH_TEST );
 
 	glStencilFunc( GL_LESS, 0, 0xffffffff );
-	glStencilOp( GL_KEEP, GL_KEEP, GL_KEEP );
+	glStencilOp( GL_REPLACE, GL_REPLACE, GL_REPLACE );
 
 	glEnable( GL_POLYGON_OFFSET_FILL );
 

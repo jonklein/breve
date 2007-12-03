@@ -318,6 +318,31 @@ Object : MonkeyGenome {
 		else waveCompression = random[5.0] - 2.5.
 
 		print "mutated item $n of $self".
+
+	+ to crossover from-parent-1 p1 (object) from-parent-2 p2 (object):
+		self crossover-data genome-list phaseShifts from-parent-1 p1 from-parent-2 p2.
+		self crossover-data genome-list ampShifts   from-parent-1 p1 from-parent-2 p2.
+		self crossover-data genome-list limbLengths from-parent-1 p1 from-parent-2 p2.
+
+	+ to crossover-data genome-list l (list) from-parent-1 p1 (object) from-parent-2 p2 (object):
+		n, crossoverPoint (int).
+		tmp (object).
+	
+		if random[ 1 ]: {
+			tmp = p2.
+			p2 = p1.
+			p1 = tmp.
+		}
+		
+		crossoverPoint = random[ | l | - 1 ].
+
+		for n = 0, n < | l |, n++: {
+			if n < crossoverPoint:
+				l{ n } = ( p1 get-value at-index n ).
+			else
+				l{ n } = ( p2 get-value at-index n ).
+		}
+
 }
 
 MultiBody : Creature {

@@ -109,6 +109,7 @@
 		NSOpenGLPFAAccelerated,
 		NSOpenGLPFAWindow,
 		NSOpenGLPFADepthSize, (NSOpenGLPixelFormatAttribute)24,
+		NSOpenGLPFASampleBuffers, (NSOpenGLPixelFormatAttribute)4,
 		NSOpenGLPFAAlphaSize, (NSOpenGLPixelFormatAttribute)8,
 		NSOpenGLPFAStencilSize, (NSOpenGLPixelFormatAttribute)8,
 		(NSOpenGLPixelFormatAttribute)0, (NSOpenGLPixelFormatAttribute)0
