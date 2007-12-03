@@ -204,12 +204,14 @@ class slShape {
 
 		int									findPointIndex( slVector *inVertex );
 
-		static void 						slMatrixToODEMatrix( const double inM[ 3 ][ 3 ], dMatrix3 outM );
+		static void 						slMatrixToODEMatrix( const double inM[ 3 ][ 3 ], dReal *outM );
 
 		void recompile() { _recompile = 1; }
 
 		void retain();
 		void release();
+
+		virtual void 						updateLastPosition( slPosition *inPosition ) {}
 
 		virtual ~slShape();
 
@@ -222,7 +224,8 @@ class slShape {
 
 		virtual void drawShadowVolume(slCamera *camera, slPosition *position);
 
-		virtual void draw(slCamera *c, slPosition *pos, double textureScaleX, double textureScaleY, int mode, int flags);
+		virtual void draw( slCamera *c, double textureScaleX, double textureScaleY, int mode, int flags );
+		virtual void drawBounds( slCamera *c );
 
 		virtual void setMass(double mass);
 		virtual void setDensity(double density);
@@ -255,8 +258,10 @@ class slShape {
 		std::vector< slEdge* > 				edges;
 		std::vector< slPoint* > 			points;
 
-	protected:
 		dGeomID								_odeGeomID[ 2 ];
+
+
+	protected:
 };
 
 class slBox : public slShape {
@@ -268,8 +273,6 @@ class slSphere : public slShape {
 	public:
 		/*! \brief Creates a new sphere of a given radius and density.  */
 		slSphere(double radius, double density);
-
-		void xdraw(slCamera *c, slPosition *pos, double textureScale, int mode, int flags);
 
 		void bounds( const slPosition *position, slVector *min, slVector *max ) const;
 		int pointOnShape(slVector *dir, slVector *point);
@@ -290,14 +293,17 @@ class slMeshShape : public slShape {
 		slMeshShape();
 		~slMeshShape();
 
-		void 						draw( slCamera *c, slPosition *pos, double tscaleX, double tscaleY, int mode, int flags);
+		void 						draw( slCamera *c, double tscaleX, double tscaleY, int mode, int flags);
+		void 						drawBounds( slCamera *inCamera );
 
 		void 						bounds( const slPosition *position, slVector *min, slVector *max ) const;
 
 		void						finishShape( double inDensity );
 
+		virtual void				updateLastPosition( slPosition *inPosition );
+
+
 	protected:
-		void						updateLastPosition( slPosition *inPosition );
 		int							createODEGeom();
 	
 		float*						_vertices;
@@ -310,6 +316,8 @@ class slMeshShape : public slShape {
 		int                         _lastPositionIndex;
 
 		float						_maxReach;
+
+		slVector					_max, _min;
 };
 
 

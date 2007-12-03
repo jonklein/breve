@@ -3,9 +3,31 @@
 #include "glIncludes.h"
 #include "sensor.h"
 
-void slWorldObject::draw( slCamera *camera ) {
-	if ( _displayShape )
-		_displayShape->draw( camera, &_position, _textureScaleX, _textureScaleY, _drawMode, 0 );
+#include "gldraw.h"
+#include "world.h"
+
+void slWorldObject::draw( slCamera *camera, bool inUseDrawMode ) {
+	if ( _displayShape ) {
+		glPushMatrix();
+
+		glTranslatef( _position.location.x, _position.location.y, _position.location.z );
+
+		slMatrixGLMult( _position.rotation );
+
+		if( !inUseDrawMode )
+			_displayShape->draw( camera, 0, 0, 0, 0 );
+		else
+			_displayShape->draw( camera, _textureScaleX, _textureScaleY, _drawMode, 0 );
+
+		if( ( _drawMode & DM_BOUND ) ) {
+			glPushAttrib( GL_ENABLE_BIT );
+			glDisable( GL_LIGHTING );
+			_displayShape -> drawBounds( camera );
+			glPopAttrib();
+		}
+
+		glPopMatrix();
+	}
 }
 
 void slObjectLine::draw( slCamera *camera ) {

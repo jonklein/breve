@@ -109,8 +109,9 @@ slCamera::slCamera( int x, int y ) {
 
 	_lights[ 0 ]._type = LightInfinite;
 	slVectorSet( &_lights[0]._location, 0, 0, 0 );
-	slVectorSet( &_lights[0]._ambient, .6, .6, .6 );
+	slVectorSet( &_lights[0]._ambient, .2, .2, .2 );
 	slVectorSet( &_lights[0]._diffuse, .6, .9, .9 );
+	slVectorSet( &_lights[0]._specular, 1, 1, 1 );
 }
 
 void slCamera::updateFrustum() {

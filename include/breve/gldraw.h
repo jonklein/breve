@@ -34,10 +34,11 @@ typedef float slColor[4];
 enum drawOptions {
     // control what types of objects are drawn 
 
-    DO_NO_STATIONARY			= 0x000001,
+    DO_NO_SHADOWCATCHER 		= 0x000001,
     DO_NO_LINK					= 0x000002,
     DO_NO_TERRAIN				= 0x000004,
 
+    DO_ONLY_SHADOWCATCHER		= 0x010000,
     // effects 
 
     DO_NO_TEXTURE 				= 0x000008,

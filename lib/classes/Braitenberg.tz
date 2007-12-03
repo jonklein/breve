@@ -65,6 +65,8 @@ MultiBody : BraitenbergVehicle (aka BraitenbergVehicles) {
 		bodyShape set-density to ( self get-density ).
 		bodyLink = new Link.
 		bodyLink set-shape to bodyShape.	
+		# bodyLink set-display-shape to ( new MeshShape load-from-3ds file "car.3ds" with-size 3 ).	
+
 		bodyLink set-mu to -1.0.
 		bodyLink set-eT to .8.
 

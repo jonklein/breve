@@ -277,7 +277,7 @@ Shape : PolygonCone (aka PolygonCones) {
 Shape : MeshShape {
 	% A class to load arbitrary 3d mesh shapes.  
 
-	+ to load-from-3ds file filename (string) with-node nodename = "" (string) with-size size = 1.0 (float):
+	+ to load-from-3ds file filename (string) with-size size = 1.0 (float):
 		% Attempts to load a mesh from a 3D Studio scene file named filename.
 		% The optional argument nodename specifies which mesh in the scene 
 		% should be loaded.  If nodename is not provided, the first mesh found  
@@ -287,7 +287,7 @@ Shape : MeshShape {
 		% Because sizes may vary between different models, shapes are normalized
 		% to the size specified, which is 1.0 by default.
 
-		shapePointer = meshShapeNew(filename, nodename, size ).
+		shapePointer = meshShapeNew(filename, "", size ).
 
 		if !shapePointer:
 			die "Could not create MeshShape: invalid arguments".

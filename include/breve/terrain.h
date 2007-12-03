@@ -69,7 +69,7 @@ class slTerrain: public slWorldObject {
 
 		void resize(int side);
 
-		void draw(slCamera *camera);
+		void draw( slCamera *camera, bool );
 
 		void generateFractalTerrain(double h, double height);
 		float averageDiamondValues(int x, int y, int jump);

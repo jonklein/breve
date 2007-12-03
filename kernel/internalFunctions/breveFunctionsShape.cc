@@ -32,8 +32,7 @@
 /*@{*/
 
 int brIShapeNew( brEval args[], brEval *target, brInstance *i ) {
-
-	target->set( new slShape() );
+	target->set( new slMeshShape() );
 
 	return EC_OK;
 }
@@ -68,8 +67,10 @@ int brIAddShapeFace( brEval args[], brEval *target, brInstance *i ) {
 }
 
 int brIFinishShape( brEval args[], brEval *target, brInstance *i ) {
-	slShape *s = BRSHAPEPOINTER( &args[0] );
+	slMeshShape *s = BRSHAPEPOINTER( &args[0] );
 	double density = BRDOUBLE( &args[1] );
+
+	s -> finishShape( density );
 
 	if ( !slFinishShape( s, density ) ) 
 		return EC_ERROR;

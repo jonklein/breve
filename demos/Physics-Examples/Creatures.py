@@ -146,7 +146,7 @@ class SimsGA( breve.GeneticAlgorithm ):
 			o.setFitness( 0 )
 
 		print '''fitness of %s: ''' % (  o ), o.getFitness()
-		self.archiveAsXml( 'breveCreatures.xml' )
+		# self.archiveAsXml( 'breveCreatures.xml' )
 
 	def startFitnessTest( self, o ):
 		newOffset = breve.vector()

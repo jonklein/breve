@@ -465,8 +465,8 @@ unsigned char *slReadJPEGImage( const char *name, int *width, int *height, int *
 		for ( n = 0;n < 4 * cinfo.output_width;n++ ) {
 			if (( n + 1 ) % 4 ) image[( 4 * cinfo.output_width * row ) + n] = buffer[0][m++];
 			else {
-				int total = ( int )(( buffer[0][m - 1] + buffer[0][m - 2] + buffer[0][m - 3] ) / 3.0 );
-				image[( 4 * cinfo.output_width * row ) + n] = buffer[0][m - 1] = 0xff - total;
+				// int total = ( int )(( buffer[0][m - 1] + buffer[0][m - 2] + buffer[0][m - 3] ) / 3.0 );
+				image[( 4 * cinfo.output_width * row ) + n] = buffer[0][m - 1] = 0xff;
 			}
 		}
 	}

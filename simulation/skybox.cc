@@ -25,25 +25,20 @@ int slSkybox::loadImage( std::string &inPath, int inN ) {
 	return result;
 }
 
-void slSkybox::draw( slVector *inCameraPos ) {
+void slSkybox::draw( slVector *inCameraPos, float inZFar ) {
 
 	if( ! _loaded ) 
 		return;
-	
 
 	glDisable( GL_CULL_FACE );
 	glDisable( GL_BLEND );
 
 	glDepthMask( GL_FALSE );
-	glMatrixMode( GL_PROJECTION );
-	glPushMatrix();
-	// glLoadIdentity();
-	// glFrustum( 1, -1, -1, 1, .9, 3.0 );
 
 	glMatrixMode( GL_MODELVIEW );
 	glPushMatrix();
 	glTranslatef( inCameraPos->x, inCameraPos->y, inCameraPos->z );
-	glScalef( 5, 5, 5 );
+	glScalef( 0.3f * inZFar, 0.3f * inZFar, 0.3f * inZFar );
 	if( !_textures[ 0 ].isLoaded() ) 
 		loadImage( "BoxFront.png", 0 );
 
@@ -62,12 +57,12 @@ void slSkybox::draw( slVector *inCameraPos ) {
 	if( !_textures[ 5 ].isLoaded() ) 
 		loadImage( "BoxBottom.png", 5 );
  
-	glColor4f( 0.0, 1.0, 0.0, 1.0f);
+	glColor4f( 1.0, 1.0, 1.0, 1.0f);
  
 	float r = 1.0001f;
 
 	_textures[ 0 ].bind();
-	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 	glBegin(GL_QUADS);		
 		glTexCoord2f( 0.0, 0.0 ); glVertex3f(  r, -r, -1.0f );
 		glTexCoord2f( 0.0, 1.0 ); glVertex3f(  r,  r, -1.0f ); 
@@ -76,7 +71,7 @@ void slSkybox::draw( slVector *inCameraPos ) {
 	glEnd();
  
 	_textures[ 1 ].bind();
-	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 	glBegin(GL_QUADS);		
 		glTexCoord2f( 1.0, 0.0 ); glVertex3f(  r, -r, 1.0f );
 		glTexCoord2f( 1.0, 1.0 ); glVertex3f(  r,  r, 1.0f ); 
@@ -85,7 +80,7 @@ void slSkybox::draw( slVector *inCameraPos ) {
 	glEnd();
  
 	_textures[ 2 ].bind();
-	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 	glBegin(GL_QUADS);		
 		glTexCoord2f( 0.0, 0.0 ); glVertex3f( 1.0f, -r, r );	
 		glTexCoord2f( 0.0, 1.0 ); glVertex3f( 1.0f,  r, r ); 
@@ -94,7 +89,7 @@ void slSkybox::draw( slVector *inCameraPos ) {
 	glEnd();
  
 	_textures[ 3 ].bind();
-	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 	glBegin(GL_QUADS);		
 		glTexCoord2f( 1.0, 0.0 ); glVertex3f( -1.0f, -r,  r );	
 		glTexCoord2f( 1.0, 1.0 ); glVertex3f( -1.0f,  r,  r ); 
@@ -103,7 +98,7 @@ void slSkybox::draw( slVector *inCameraPos ) {
 	glEnd();
  
 	_textures[ 4 ].bind();
-	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 	glBegin(GL_QUADS);	
 		glTexCoord2f( 1.0, 1.0 ); glVertex3f( -r, 1.0f, -r);
 		glTexCoord2f( 0.0, 1.0 ); glVertex3f( -r, 1.0f,  r);
@@ -112,7 +107,7 @@ void slSkybox::draw( slVector *inCameraPos ) {
 	glEnd();
  
 	_textures[ 5 ].bind();
-	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 	glBegin(GL_QUADS);		
 		glTexCoord2f( 1.0, 0.0 );  glVertex3f( -r, -1.0f, -r );
 		glTexCoord2f( 0.0, 0.0 );  glVertex3f( -r, -1.0f,  r );
@@ -122,11 +117,7 @@ void slSkybox::draw( slVector *inCameraPos ) {
  
 	glPopMatrix();
 
-	glMatrixMode( GL_PROJECTION );
-	glPopMatrix();
-
 	glColor4f( 1.0, 1.0, 1.0, 1.0 );
-	glMatrixMode( GL_MODELVIEW );
 
 	glDepthMask( GL_TRUE );
 	glEnable( GL_CULL_FACE );

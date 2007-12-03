@@ -137,6 +137,7 @@ void slInitGL( slWorld *w, slCamera *c ) {
 	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 	glEnable( GL_COLOR_MATERIAL );
 	glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE );
+	glEnable( GL_NORMALIZE );
 
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
@@ -454,6 +455,8 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
 
+	drawFog();
+
 	if ( w->backgroundTexture > 0 && !( flags & DO_OUTLINE ) )
 		drawBackground( w );
 
@@ -473,9 +476,7 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 
 	updateFrustum();
 
-	w->_skybox.draw( &cam );
-
-	drawFog();
+	w->_skybox.draw( &cam, _zClip );
 
 	//
 	// Lines and draw-commands are special objects which will be rendered before lighting is setup
@@ -491,14 +492,13 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 	bool volumeShadows = _drawShadowVolumes;
 	bool flatShadows = !volumeShadows && _drawShadow && _shadowCatcher;
 
-	if ( _drawLights ) {
-		if ( volumeShadows ) 
-			drawLights( 1 );
-		else 
-			drawLights( 0 );
+	setupLights( volumeShadows );
 
+	int reflectionFlags = 0;
+
+	if ( _drawLights ) {
 		if ( _drawReflection || flatShadows )
-			stencilFloor();
+			stencilFloor( w );
 
 		if ( _drawReflection && !( flags & DO_OUTLINE ) ) {
 			slVector toCam;
@@ -511,18 +511,13 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 			slVectorSub( &cam, &_shadowPlane.vertex, &toCam );
 
 			if ( slVectorDot( &toCam, &_shadowPlane.normal ) > 0.0 ) {
-				reflectionPass( w );
-
-				if ( volumeShadows ) 
-					drawLights( 1 );
+				reflectionPass( w, volumeShadows );
+				reflectionFlags = DO_NO_SHADOWCATCHER;
 			}
 		}
+	} 
 
-		slClearGLErrors( "enabled lighting" );
-	} else
-		glDisable( GL_LIGHTING );
-
-	renderObjects( w, flags | DO_NO_ALPHA );
+	renderObjects( w, flags | reflectionFlags | DO_NO_ALPHA );
 
 	slClearGLErrors( "drew non-alpha bodies" );
 
@@ -543,8 +538,10 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 		if ( volumeShadows ) 
 			renderShadowVolume( w );
 		else if ( flatShadows ) 
-			shadowPass( w );
+			drawFlatShadows( w );
 	}
+
+    glDisable( GL_BLEND );
 
 	glDepthMask( GL_FALSE );
 
@@ -644,12 +641,7 @@ void slCamera::clear( slWorld *w ) {
 
 void slCamera::drawFog() {
 	if ( _drawFog ) {
-		GLfloat color[4];
-
-		color[0] = _fogColor.x;
-		color[1] = _fogColor.y;
-		color[2] = _fogColor.z;
-		color[3] = 1.0;
+		GLfloat color[4] = { _fogColor.x, _fogColor.y, _fogColor.z, 1.0 };
 
 		glEnable( GL_FOG );
 		glFogf( GL_FOG_DENSITY, _fogIntensity );
@@ -667,18 +659,22 @@ void slCamera::drawFog() {
 	\brief Puts 1 into the stencil buffer where the shadows and reflections should fall.
 */
 
-void slCamera::stencilFloor() {
+void slCamera::stencilFloor( slWorld *inWorld ) {
 	glEnable( GL_STENCIL_TEST );
 	glDisable( GL_DEPTH_TEST );
+	glDepthMask( GL_FALSE );
+
+	// glDepthFunc( GL_ALWAYS );
 	glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
 	glStencilFunc( GL_ALWAYS, 1, 0xffffffff );
-	glStencilOp( GL_ZERO, GL_ZERO, GL_REPLACE );
+	glStencilOp( GL_REPLACE, GL_REPLACE, GL_REPLACE );
 
-	if( _shadowCatcher )
-		_shadowCatcher->draw( this );
+	renderObjects( inWorld, DO_ONLY_SHADOWCATCHER );
 
 	glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
 	glEnable( GL_DEPTH_TEST );
+	// glDepthFunc( GL_LESS );
+	glDepthMask( GL_TRUE );
 	glDisable( GL_STENCIL_TEST );
 }
 
@@ -686,38 +682,47 @@ void slCamera::stencilFloor() {
 	\brief Draws a reflection of all multibody objects whereever the stencil buffer is equal to 1.
 */
 
-void slCamera::reflectionPass( slWorld *w ) {
+void slCamera::reflectionPass( slWorld *w, bool inWillDoShadowVolumes ) {
 	glPushMatrix();
 
 	glScalef( 1.0, -1.0, 1.0 );
 	glTranslatef( 0.0, -2 * _shadowPlane.vertex.y, 0.0 );
-	drawLights( 0 );
 
+	glEnable( GL_CULL_FACE );
 	glCullFace( GL_FRONT );
 
 	// render whereever the buffer is 1, but don't change the values
 
 	glEnable( GL_DEPTH_TEST );
-	glEnable( GL_NORMALIZE );
 	glEnable( GL_STENCIL_TEST );
 	glEnable( GL_BLEND );
 
-	glStencilFunc( GL_EQUAL, 1, 0xffffffff );
+	glStencilFunc( GL_LESS, 0, 0xffffffff );
 
-	glStencilOp( GL_KEEP, GL_KEEP, GL_KEEP );
-	renderObjects( w, DO_NO_STATIONARY | DO_NO_BOUND | DO_NO_AXIS | DO_NO_TERRAIN );
+	GLdouble plane[] = { 0, 1, 0, -2 * _shadowPlane.vertex.y };
+	glEnable( GL_CLIP_PLANE0 );						
+	glClipPlane( GL_CLIP_PLANE0, plane );	
 
+	glStencilOp( GL_INCR, GL_INCR, GL_INCR );
+	renderObjects( w, DO_NO_SHADOWCATCHER | DO_NO_BOUND | DO_NO_AXIS | DO_NO_TERRAIN );
 	renderBillboards( 0 );
-
-	glDisable( GL_NORMALIZE );
-
-	glCullFace( GL_BACK );
-	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_BLEND );
 
 	glPopMatrix();
 
-	drawLights( 0 );
+	glCullFace( GL_BACK );
+	glDisable( GL_CLIP_PLANE0 );
+
+	glStencilFunc( GL_EQUAL, 1, 0xffffffff );
+	glStencilOp( GL_DECR, GL_DECR, GL_KEEP );
+	renderObjects( w, DO_ONLY_SHADOWCATCHER );
+
+	glDisable( GL_STENCIL_TEST );
+
+
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+	renderObjects( w, DO_ONLY_SHADOWCATCHER, inWillDoShadowVolumes ? REFLECTION_ALPHA / 2.0 : REFLECTION_ALPHA );
 }
 
 /**
@@ -727,7 +732,7 @@ void slCamera::reflectionPass( slWorld *w ) {
  * The stencil buffer will be modified to 2 where the shadows are drawn.
  */
 
-void slCamera::shadowPass( slWorld *w ) {
+void slCamera::drawFlatShadows( slWorld *w ) {
 	GLfloat shadowMatrix[4][4];
 
 	slShadowMatrix( shadowMatrix, &_shadowPlane, &_lights[ 0 ]._location );
@@ -736,10 +741,9 @@ void slCamera::shadowPass( slWorld *w ) {
 
 	glEnable( GL_STENCIL_TEST );
 	glEnable( GL_DEPTH_TEST );
-	glStencilFunc( GL_LESS, 0, 0xffffffff );
-	glStencilOp( GL_ZERO, GL_ZERO, GL_REPLACE );
 
-	slClearGLErrors( "about to enable polygon" );
+	glStencilFunc( GL_LESS, 0, 0xffffffff );
+	glStencilOp( GL_KEEP, GL_KEEP, GL_KEEP );
 
 	glEnable( GL_POLYGON_OFFSET_FILL );
 
@@ -751,8 +755,8 @@ void slCamera::shadowPass( slWorld *w ) {
 	glPushMatrix();
 	glMultMatrixf( (GLfloat*)shadowMatrix );
 	glDisable( GL_LIGHTING );
-	renderObjects( w, DO_NO_COLOR | DO_NO_TEXTURE | DO_NO_STATIONARY | DO_NO_BOUND | DO_NO_AXIS | DO_NO_TERRAIN );
 
+	renderObjects( w, DO_NO_COLOR | DO_NO_TEXTURE | DO_NO_SHADOWCATCHER | DO_NO_BOUND | DO_NO_AXIS | DO_NO_TERRAIN );
 	renderBillboards( DO_NO_COLOR | DO_NO_BOUND );
 
 	glPopMatrix();
@@ -767,11 +771,11 @@ void slCamera::shadowPass( slWorld *w ) {
 void slCamera::renderText( slWorld *w, int crosshair ) {
 	double fromLeft;
 	unsigned int n;
-	char textStr[128];
+	char textStr[ 128 ];
 
 	glDisable( GL_DEPTH_TEST );
-	glDisable( GL_STENCIL_TEST );
 	glDisable( GL_BLEND );
+	glDisable( GL_TEXTURE_2D );
 	glColor4f( _textColor.x, _textColor.y, _textColor.z, 1.0 );
 	snprintf( textStr, sizeof( textStr ), "%.2f", w->_age );
 
@@ -1022,17 +1026,23 @@ void slText( double x, double y, const char *string, void *font ) {
 	drawing the shadowed pass of a shadow volume algorithm.
 */
 
-void slCamera::drawLights( int noDiffuse ) {
-	GLfloat dif[4];
+void slCamera::setupLights( int inAmbientOnly ) {
 	GLfloat dir[4];
 	GLfloat amb[4];
+	GLfloat spec[4] = { 0, 0, 0, 0 };
+	GLfloat dif[4] = { 0, 0, 0, 0 };
+
+	if( !_drawLights ) {
+		glDisable( GL_LIGHTING );
+		return;
+	}
+
+	glEnable( GL_LIGHTING );
 
 	if ( _drawSmooth ) 
 		glShadeModel( GL_SMOOTH );
 	else 	
 		glShadeModel( GL_FLAT );
-
-	glEnable( GL_LIGHTING );
 
 	for( int n = 0; n < MAX_LIGHTS; n++ ) { 
 		slLight *light = &_lights[ n ];
@@ -1043,16 +1053,15 @@ void slCamera::drawLights( int noDiffuse ) {
 			dir[2] = light -> _location.z;
 			dir[3] = 1.0;
 	
-			if ( noDiffuse ) {
-				dif[0] = 0.0;
-				dif[1] = 0.0;
-				dif[2] = 0.0;
-				dif[3] = 0.0;
-			} else {
+			if ( !inAmbientOnly ) {
 				dif[0] = light -> _diffuse.x;
 				dif[1] = light -> _diffuse.y;
 				dif[2] = light -> _diffuse.z;
 				dif[3] = 0.0;
+				spec[0] = light -> _specular.x;
+				spec[1] = light -> _specular.y;
+				spec[2] = light -> _specular.z;
+				spec[3] = 0.0;
 			}
 		
 			amb[0] = light -> _ambient.x;
@@ -1069,7 +1078,7 @@ void slCamera::drawLights( int noDiffuse ) {
 			glLightfv( lightID, GL_DIFFUSE, dif );
 			glLightfv( lightID, GL_AMBIENT, amb );
 			glLightfv( lightID, GL_POSITION, dir );
-			glLightfv( lightID, GL_SPECULAR, amb );
+			glLightfv( lightID, GL_SPECULAR, spec );
 		}
 	}
 }
@@ -1183,7 +1192,7 @@ void slCamera::processBillboards( slWorld *w ) {
  * have been set up.
  */
 
-void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
+void slCamera::renderObjects( slWorld *w, unsigned int flags, float inAlphaScale ) {
 	slWorldObject *wo;
 	unsigned int n;
 	bool color = 1;
@@ -1191,7 +1200,8 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 	const int loadNames = ( flags & DO_LOAD_NAMES );
 	const int doNoAlpha = ( flags & DO_NO_ALPHA );
 	const int doOnlyAlpha = ( flags & DO_ONLY_ALPHA );
-	const int doNoStationary = ( flags & DO_NO_STATIONARY );
+	const int doNoShadowCatcher = ( flags & DO_NO_SHADOWCATCHER );
+	const int doOnlyShadowCatcher = ( flags & DO_ONLY_SHADOWCATCHER );
 	const int doNoTerrain = ( flags & DO_NO_TERRAIN );
 	const int doNoTexture = ( flags & DO_NO_TEXTURE );
 
@@ -1215,7 +1225,8 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 		else if ( wo->_drawMode == DM_INVISIBLE ) skip = 1;
 		else if ( doNoAlpha && wo->_alpha != 1.0 ) skip = 1;
 		else if ( doOnlyAlpha && wo->_alpha == 1.0 ) skip = 1;
-		else if ( doNoStationary && wo->_type == WO_STATIONARY ) skip = 1;
+		else if ( doNoShadowCatcher && wo == _shadowCatcher ) skip = 1;
+		else if ( doOnlyShadowCatcher && wo != _shadowCatcher ) skip = 1;
 		else if ( doNoTerrain && wo->_type == WO_TERRAIN ) skip = 1;
 		else if ( wo->_textureMode != BBT_NONE && !( flags & DO_BILLBOARDS_AS_SPHERES ) ) skip = 1;
 
@@ -1225,10 +1236,9 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 
 			if ( !wo->_drawAsPoint ) {
 				if ( color )
-					glColor4f( wo->_color.x, wo->_color.y, wo->_color.z, wo->_alpha );
+					glColor4f( wo->_color.x, wo->_color.y, wo->_color.z, wo->_alpha * inAlphaScale );
 
 				if ( !doNoTexture && wo->_texture > 0 ) {
-					glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
 					if ( wo->_textureMode == BBT_LIGHTMAP )
 						glBlendFunc( GL_SRC_ALPHA, GL_ONE );
@@ -1237,6 +1247,7 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags ) {
 
 					glEnable( GL_TEXTURE_2D );
 					glBindTexture( GL_TEXTURE_2D, wo->_texture );
+					glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 				}
 
 				wo->draw( this );
@@ -1377,7 +1388,8 @@ void slDrawAxis( double x, double y ) {
 */
 
 int slCompileShape( slShape *s, int drawMode, int flags ) {
-	if ( !s->_drawList ) s->_drawList = glGenLists( 1 );
+	if ( !s->_drawList ) 
+		s->_drawList = glGenLists( 1 );
 
 	s->_recompile = 0;
 
@@ -1469,17 +1481,6 @@ void slDrawFace( slFace *f, int drawMode, int flags ) {
 
 	glNormal3f( norm->x, norm->y, norm->z );
 
-	if ( f->drawFlags & SD_REFLECT ) {
-		GLfloat v[4];
-
-		glPushAttrib( GL_ENABLE_BIT );
-
-		glGetFloatv( GL_CURRENT_COLOR, v );
-		v[3] = gReflectionAlpha;
-		glColor4fv( v );
-		glEnable( GL_BLEND );
-	}
-
 	// if they're drawing lines, or if the face
 	// isn't broken down, do a normal polygon
 
@@ -1498,9 +1499,6 @@ void slDrawFace( slFace *f, int drawMode, int flags ) {
 
 		glEnd();
 	}
-
-	if ( f->drawFlags & SD_REFLECT )
-		glPopAttrib();
 }
 
 /*!
@@ -1605,7 +1603,7 @@ void slBreakdownTriangle( slVector *v, int level, slVector *xaxis, slVector *yax
 		slVectorAdd( &v[n], &diff, &mids[n] );
 	}
 
-	if ( length < 100 || level > 4 ) {
+	if ( length < 80.0f || level > 5 ) {
 		for ( n = 0; n < 3; ++n ) {
 			glTexCoord2f( slVectorDot( &v[n], xaxis ), slVectorDot( &v[n], yaxis ) );
 			glVertex3f( v[n].x, v[n].y, v[n].z );

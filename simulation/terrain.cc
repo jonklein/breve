@@ -450,19 +450,13 @@ slTerrain::~slTerrain() {
 	delete[] _matrix;
 }
 
-void slTerrain::draw( slCamera *camera ) {
+void slTerrain::draw( slCamera *camera, bool inUseDrawModes ) {
 	if ( !_initialized ) 
 		initialize();
-
-	glPushAttrib( GL_ENABLE_BIT );
-
-	glEnable( GL_LIGHTING );
 
 	_roam->tessellate( camera );
 
 	_polygonsDrawn = _roam->render( camera, _drawMode );
-
-	glPopAttrib();
 }
 
 /*!

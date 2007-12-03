@@ -123,9 +123,8 @@ void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 
 			glColor4ub( br, bg, bb, 0xff );
 
-			wo->_lightExposure = 0;
-
-			if ( wo->_shape ) wo->_shape->draw( this, &wo->_position, 0, 0, 0, 0 );
+			wo -> _lightExposure = 0;
+			wo -> draw( this, false );
 		}
 
 		n++;

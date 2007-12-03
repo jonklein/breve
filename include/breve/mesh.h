@@ -42,31 +42,34 @@ class sl3DSShape : public slMeshShape {
 		sl3DSShape( char *, char *, float inSize = 1.0 );
 		~sl3DSShape();
 
-		double 						maxReach();
+		double 							maxReach();
 
-		void 						draw();
-		void						draw( slCamera *c, slPosition *pos, double textureScaleX, double textureScaleY, int mode, int flags );
+		void 							draw();
+		void							draw( slCamera *c, double textureScaleX, double textureScaleY, int mode, int flags );
 
-		void 						calculateSizes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPointStart, int *ioFaceStart );
-		int 						processNodes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPointStart, int *ioIndexStart );
+		void 							calculateSizes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPointStart, int *ioFaceStart );
+		void							processNodes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPointStart, int *ioIndexStart );
 
-		Lib3dsMesh*					_mesh;
+		Lib3dsMesh*						_mesh;
 
-		int*						_materials;
+		int*							_materials;
+		Lib3dsMatrix*					_transforms;
 
-		std::vector< slMaterial >			_materialList;
+		std::vector< slMaterial >		_materialList;
+
+		slVector						_center;
+		slVector						_max;
 
 
 	protected:
-		int						addMaterial( std::string &inMaterialName, Lib3dsMaterial *inMaterial );
+		int								addMaterial( std::string &inMaterialName, Lib3dsMaterial *inMaterial );
 
 
-		float*						_normals;
-		float*						_texcoords;
+		float*							_normals;
+		float*							_texcoords;
 
-		std::map< std::string, int > 			_materialIndices;
-		std::string					_directory;
-
+		std::map< std::string, int > 	_materialIndices;
+		std::string						_directory;
 };
 
 

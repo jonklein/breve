@@ -26,20 +26,13 @@
 #include "vclip.h"
 #include "vclipData.h"
 
-void slShape::draw( slCamera *c, slPosition *pos, double inTScaleX, double inTScaleY, int mode, int flags ) {
-	unsigned char bound, axis;
+void slShape::draw( slCamera *c, double inTScaleX, double inTScaleY, int mode, int flags ) {
+	bool axis;
 
-	bound = ( mode & DM_BOUND ) && !( flags & DO_NO_BOUND );
 	axis = ( mode & DM_AXIS ) && !( flags & DO_NO_AXIS );
 
 	if ( _drawList == 0 || _recompile || ( flags & DO_RECOMPILE ) ) 
 		slCompileShape( this, c->_drawMode, flags );
-
-	glPushMatrix();
-
-	glTranslatef( pos->location.x, pos->location.y, pos->location.z );
-
-	slMatrixGLMult( pos->rotation );
 
 	glPushAttrib( GL_TRANSFORM_BIT );
 	glMatrixMode( GL_TEXTURE );
@@ -82,7 +75,7 @@ void slShape::draw( slCamera *c, slPosition *pos, double inTScaleX, double inTSc
 		glCallList( _drawList );
 	}
 
-	if ( bound || axis ) {
+	if ( axis ) {
 		glPushAttrib( GL_COLOR_BUFFER_BIT );
 		glEnable( GL_BLEND );
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
@@ -91,15 +84,23 @@ void slShape::draw( slCamera *c, slPosition *pos, double inTScaleX, double inTSc
 
 		if ( axis ) slDrawAxis( _max.x, _max.y );
 
-		if ( bound ) slRenderShape( this, GL_LINE_LOOP, 0 );
-
 		glPopAttrib();
 	}
-
-	glPopMatrix();
 }
 
-void slShape::slMatrixToODEMatrix( const double inM[ 3 ][ 3 ], dMatrix3 outM ) {
+void slShape::drawBounds( slCamera *inCamera ) {
+	glPushAttrib( GL_COLOR_BUFFER_BIT );
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	glColor4f( 0.0, 0.0, 0.0, 0.5 );
+	glScalef( 1.1, 1.1, 1.1 );
+
+	slRenderShape( this, GL_LINE_LOOP, 0 );
+
+	glPopAttrib();
+}
+
+void slShape::slMatrixToODEMatrix( const double inM[ 3 ][ 3 ], dReal *outM ) {
     outM[ 0 ]  = inM[ 0 ][ 0 ];
     outM[ 1 ]  = inM[ 0 ][ 1 ];
     outM[ 2 ]  = inM[ 0 ][ 2 ];
@@ -114,6 +115,35 @@ void slShape::slMatrixToODEMatrix( const double inM[ 3 ][ 3 ], dMatrix3 outM ) {
     outM[ 11 ] = 0.0;
 }
 
+
+void slMeshShape::drawBounds( slCamera *inCamera ) {
+	glColor4f( 0, 0, 0, 0.7 );
+
+	glBegin( GL_LINE_LOOP );
+	glVertex3f( _min.x, _min.y, _min.z );
+	glVertex3f( _max.x, _min.y, _min.z );
+	glVertex3f( _max.x, _max.y, _min.z );
+	glVertex3f( _min.x, _max.y, _min.z );
+
+	glVertex3f( _min.x, _max.y, _max.z );
+	glVertex3f( _max.x, _max.y, _max.z );
+	glVertex3f( _max.x, _max.y, _min.z );
+	glVertex3f( _min.x, _max.y, _min.z );
+	glEnd();
+
+	glBegin( GL_LINE_LOOP );
+	glVertex3f( _min.x, _min.y, _max.z );
+	glVertex3f( _max.x, _min.y, _max.z );
+	glVertex3f( _max.x, _min.y, _min.z );
+	glVertex3f( _min.x, _min.y, _min.z );
+
+	glVertex3f( _min.x, _min.y, _max.z );
+	glVertex3f( _max.x, _min.y, _max.z );
+	glVertex3f( _max.x, _max.y, _max.z );
+	glVertex3f( _min.x, _max.y, _max.z );
+	glEnd();
+
+}
 
 slSphere::slSphere( double radius, double density ) : slShape() {
 	_type = ST_SPHERE;
@@ -158,16 +188,10 @@ slShape *slNewNGonDisc( int count, double radius, double height, double density 
 
 	slMeshShape *s = new slMeshShape();
 
-	// if ( !slSetNGonDisc( s, count, radius, height, density ) ) {
-	slVector v;
-
-	slVectorSet( &v, height, radius, radius );
-	if ( !slSetCube( s, &v, density ) ) {
+	if ( !slSetNGonDisc( s, count, radius, height, density ) ) {
 		s->release();
 		return NULL;
 	}
-
-	s -> finishShape( density );
 
 	return s;
 }
@@ -222,20 +246,20 @@ int slShape::findPointIndex( slVector *inVertex ) {
 	return -1;
 }
 
-void slMeshShape::draw( slCamera *c, slPosition *pos, double inTScaleX, double inTScaleY, int mode, int flags ) {
-	slShape::draw( c, pos, inTScaleX, inTScaleY, mode, flags );
-
-	updateLastPosition( pos );
+void slMeshShape::draw( slCamera *c, double inTScaleX, double inTScaleY, int mode, int flags ) {
+	slShape::draw( c, inTScaleX, inTScaleY, mode, flags );
 }
 
 
 void slMeshShape::updateLastPosition( slPosition *inPosition ) {
-	dMatrix4 transform = {
-		inPosition -> rotation[0][0], inPosition -> rotation[0][1], inPosition -> rotation[0][2], 0,
-		inPosition -> rotation[1][0], inPosition -> rotation[1][1], inPosition -> rotation[1][2], 0,
-		inPosition -> rotation[2][0], inPosition -> rotation[2][1], inPosition -> rotation[2][2], 0,
-		inPosition -> location.x, inPosition -> location.y, inPosition -> location.z,  1
-	};
+	dMatrix4 transform;
+
+	slMatrixToODEMatrix( inPosition -> rotation, &transform[ 0 ] );
+
+	transform[ 12 ] = inPosition -> location.x;
+	transform[ 13 ] = inPosition -> location.y;
+	transform[ 14 ] = inPosition -> location.z;
+	transform[ 15 ] = 1.0;
 
 	memcpy( _lastPositions[ _lastPositionIndex ], transform, sizeof( dMatrix4 ) );
 
@@ -249,17 +273,19 @@ void slMeshShape::updateLastPosition( slPosition *inPosition ) {
 void slMeshShape::finishShape( double density ) {
 	int triCount = 0;
 
+	_maxReach = 30;
+
 	for( unsigned int n = 0; n < faces.size(); n++ ) {
-		triCount += faces[ n ] -> _pointCount - 2;
+		triCount += faces[ n ] -> _pointCount;
 	}
 
-	_vertexCount = points.size();
+	_vertexCount = points.size() + faces.size();
 	_indexCount = 3 * triCount;
 
 	_vertices = new float[ _vertexCount * 3 ];
 	_indices = new int[ _indexCount ];
 
-	for( int n = 0; n < _vertexCount; n++ ) {
+	for( int n = 0; n < points.size(); n++ ) {
 		slPoint *p = points[ n ];
 
 		_vertices[ n * 3     ] = p -> vertex.x;
@@ -267,55 +293,46 @@ void slMeshShape::finishShape( double density ) {
 		_vertices[ n * 3 + 2 ] = p -> vertex.z;
 	}
 
+	for( int n = 0; n < faces.size(); n++ ) {
+		slFace *f = faces[ n ];
+		slVector total;
+
+		slVectorSet( &total, 0, 0, 0 );
+
+		for( int m = 0; m < f -> _pointCount; m++ ) {
+			slVectorAdd( &total, &f -> points[ m ] -> vertex, &total );
+		}
+
+		slVectorMul( &total, 1.0 / f -> _pointCount, &total );
+
+		int vstart = ( points.size() * 3 ) + n * 3;
+
+		_vertices[ vstart     ] = total.x;
+		_vertices[ vstart + 1 ] = total.y;
+		_vertices[ vstart + 2 ] = total.z;
+	}
+
 	int tri = 0;
 
 	for( unsigned int n = 0; n < faces.size(); n++ ) {
 		slFace *f = faces[ n ];	
 
-		// printf( "FACE %d\n", n );
+		int i1 = points.size() + n;
 
-		int i1 = findPointIndex( &f -> points[ 0 ] -> vertex );
+		for( int m = 0; m < f -> _pointCount; m++ ) {
+			int mplus = ( m + 1 )  % f -> _pointCount;
 
-		for( int m = 1; m < f -> _pointCount - 1; m++ ) {
-			int i2 = findPointIndex( &f -> points[ m ] -> vertex );
-			int i3 = findPointIndex( &f -> points[ m + 1 ] -> vertex );
+			int i2 = findPointIndex( &f -> points[ m     ] -> vertex );
+			int i3 = findPointIndex( &f -> points[ mplus ] -> vertex );
 
 			_indices[ tri * 3     ] = i1;
 			_indices[ tri * 3 + 1 ] = i2;
 			_indices[ tri * 3 + 2 ] = i3;
 
-			slVector v1, v2, normal;
-
-			v1.x = _vertices[ i2 * 3 ] - _vertices[ i1 * 3 ];
-			v1.y = _vertices[ i2 * 3 + 1 ] - _vertices[ i1 * 3 + 1 ];
-			v1.z = _vertices[ i2 * 3 + 2 ] - _vertices[ i1 * 3 + 2 ];
-
-			v2.x = _vertices[ i3 * 3 ] - _vertices[ i1 * 3 ];
-			v2.y = _vertices[ i3 * 3 + 1 ] - _vertices[ i1 * 3 + 1 ];
-			v2.z = _vertices[ i3 * 3 + 2 ] - _vertices[ i1 * 3 + 2 ];
-
-			slVectorCross( &v1, &v2, &normal );
-
-			// printf( "tri %d (%f %f %f) (%f %f %f) (%f %f %f)\n", tri,
-			// 	points[ i1 ] -> vertex.x, points[ i1 ] -> vertex.y, points[ i1 ] -> vertex.z,
-			// 	points[ i2 ] -> vertex.x, points[ i2 ] -> vertex.y, points[ i2 ] -> vertex.z,
-			// 	points[ i3 ] -> vertex.x, points[ i3 ] -> vertex.y, points[ i3 ] -> vertex.z );
-			// printf("NORMAL: %f %f %f\n", normal.x, normal.y, normal.z );
-
-
 			tri++;
 		}
 	}
 
-	for( int n = 0; n < _vertexCount; n++ ) {
-		//printf( "\t%f, %f, %f\n", _vertices[ n * 3 ], _vertices[ n * 3 + 1 ], _vertices[ n * 3 + 2 ] );
-	}
-
-	for( int n = 0; n < _indexCount; n += 3 ) {
-		// printf( "\t%d, %d, %d\n", _indices[ n ], _indices[ n + 1 ], _indices[ n + 2 ] );
-	}
-
-	_maxReach = 30;
 	_density = density;
 	createODEGeom();
 }
@@ -329,11 +346,9 @@ slShape *slFinishShape( slShape *s, double density ) {
 	for( unsigned int i = 0; i < s -> points.size(); i++ ) {
 		slPoint *p = s -> points[ i ];
 
-		if ( ! p->neighbors ) p->neighbors = new slEdge*[p->edgeCount];
-
-		if ( ! p->faces ) p->faces = new slFace*[p->edgeCount];
-
-		if ( ! p->voronoi ) p->voronoi = new slPlane[p->edgeCount];
+		if ( ! p->neighbors ) p->neighbors = new slEdge*[ p->edgeCount ];
+		if ( ! p->faces ) p->faces = new slFace*[ p->edgeCount ];
+		if ( ! p->voronoi ) p->voronoi = new slPlane[ p->edgeCount ];
 
 		// now check to see if it's a maximum for the shape
 
@@ -624,9 +639,9 @@ slPoint *slAddPoint( slShape *s, slVector *vertex ) {
 	return p;
 }
 
-/*!
-	\brief Fills in an slPlane struct.
-*/
+/**
+ * \brief Fills in an slPlane struct.
+ */
 
 slPlane *slSetPlane( slPlane *p, slVector *normal, slVector *vertex ) {
 	slVectorCopy( normal, &p->normal );
@@ -772,14 +787,16 @@ slShape *slSetNGonDisc( slMeshShape *s, int sideCount, double radius, double hei
 	delete[] topP;
 	delete[] bottomP;
 
+
+	slFinishShape( s, density );
 	s -> finishShape( density );
 
-	return slFinishShape( s, density );
+	return s;
 }
 
-/*!
-	\brief Sets a shape to be a cone with a polygon base.
-*/
+/**
+ * \brief Sets a shape to be a cone with a polygon base.
+ */
 
 slShape *slSetNGonCone( slMeshShape *s, int sideCount, double radius, double height, double density ) {
 	int n;
@@ -1306,6 +1323,33 @@ int slMeshShape::createODEGeom() {
 	if( !_indices || !_vertices ) 
 		return -1;
 
+	slVectorSet( &_max, 0, 0, 0 );
+	slVectorSet( &_min, 0, 0, 0 );
+
+	for( int n = 0; n < _vertexCount; n++ ) {
+		float x = _vertices[ n * 3 ];
+		float y = _vertices[ n * 3 + 1 ];
+		float z = _vertices[ n * 3 + 2 ];
+
+		if( x > _max.x )
+			_max.x = x;
+		
+		if( x < _min.x )
+			_min.x = x;
+
+		if( y > _max.y )
+			_max.y = y;
+		
+		if( y < _min.y )
+			_min.y = y;
+
+		if( z > _max.z )
+			_max.z = z;
+		
+		if( z < _min.z )
+			_min.z = z;
+	}
+
 	if( _odeGeomID[ 0 ] )
 		dGeomDestroy( _odeGeomID[ 0 ] );
 	if( _odeGeomID[ 1 ] ) 
@@ -1319,8 +1363,6 @@ int slMeshShape::createODEGeom() {
 
   	_odeGeomID[ 0 ] = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
   	_odeGeomID[ 1 ] = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
-
-//	_odeGeomID[ 1 ] = _odeGeomID[ 0 ];
 
 	dGeomSetData( _odeGeomID[ 0 ], triMeshID );
 	dGeomSetData( _odeGeomID[ 1 ], triMeshID );
@@ -1347,14 +1389,10 @@ int slMeshShape::createODEGeom() {
 
 
 void slMeshShape::bounds( const slPosition *position, slVector *min, slVector *max ) const {
-	/*
-	if( points.size() > 0 ) {
-		slShape::bounds( position, min, max );
-
-
-		return;
-	}
-	*/
+//	if( points.size() > 0 ) {
+//		slShape::bounds( position, min, max );
+//		return;
+//	}
 
 	max->x = position->location.x + _maxReach;
 	max->y = position->location.y + _maxReach;

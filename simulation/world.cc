@@ -31,27 +31,6 @@ char *gPhysicsErrorMessage;
 #include "vclipData.h"
 #include "gldraw.h"
 
-/*
-void *operator new( size_t size ) {
-	void *p = malloc( size );
-
-	if ( p == NULL ) {
-		fprintf( stderr, "Error: memory allocation failed.  Catastrophic failure seems inevitable.\n" );
-		slMessage( DEBUG_ALL, "Error: memory allocation failed.  Catastrophic failure seems inevitable.\n" );
-		throw std::bad_alloc();
-	}
-
-	memset( p, 0x5f, size );
-
-	return p;
-}
-
-void operator delete( void *p ) {
-	free( p );
-}
-
-*/
-
 void slODEErrorHandler( int errnum, const char *msg, va_list ap ) {
 	static char error[2048];
 
@@ -336,8 +315,9 @@ double slWorld::runWorld( double deltaT, double timestep, int *error ) {
 
 	if ( !_initialized ) slVclipDataInit( this );
 
-	while ( total < deltaT && !*error )
+	while ( total < deltaT && !*error ) {
 		total += step( timestep, error );
+	}
 
 	_age += total;
 
@@ -449,10 +429,7 @@ double slWorld::step( double stepSize, int *error ) {
 
 				mu = 1.0 + ( w1->_mu + w2->_mu ) / 2.0;
 
-				e = ( w1->_e + w2->_e ) / 2.0; // ( 2.0 * c -> _contactPoints );
-
-				cfm = 0.1;
-				erp = 0.2;
+				e = ( w1->_e + w2->_e ) / 2.0;
 
 				for ( int n = 0; n < c -> _contactPoints; n++ ) {
 					dContact contact;
@@ -460,20 +437,19 @@ double slWorld::step( double stepSize, int *error ) {
 					memset( &contact, 0, sizeof( dContact ) );
 					memcpy( &contact.geom, &c -> _contactGeoms[ n ], sizeof( dContactGeom ) );
 
-					contact.surface.mode = dContactSoftERP | dContactApprox1 | dContactBounce;
+					contact.surface.mode = dContactBounce | dContactApprox1 | dContactSoftERP;
 					contact.surface.soft_erp = 0.05;
 					contact.surface.mu = mu;
 					contact.surface.mu2 = 0;
 					contact.surface.bounce = e;
 					contact.surface.bounce_vel = -0.05;
 
-					if( fabs( contact.geom.depth ) > 0.04 ) {
+					if( fabs( contact.geom.depth ) > 0.4 ) {
 						// printf( "depth = %f\n", contact.geom.depth );
 					}
 				
-
 					if( cfm != 0.0 || erp != 0.0 ) {
-						contact.surface.mode = dContactSoftERP | dContactApprox1 | dContactBounce | dContactSoftCFM;
+						contact.surface.mode |= dContactSoftCFM;
 						contact.surface.soft_cfm = cfm;
 						contact.surface.soft_erp = erp;
 					}
@@ -491,6 +467,13 @@ double slWorld::step( double stepSize, int *error ) {
 				_collisionCallback( w1->getCallbackData(), w2->getCallbackData(), CC_NORMAL, &pos, &normal );
 			}
 		}
+	}
+
+	for ( wi = _objects.begin(); wi != _objects.end(); wi++ ) {
+		slWorldObject *w = *wi;
+
+		if( w -> _shape )
+			w -> _shape -> updateLastPosition( &w -> _position );
 	}
 
 	if ( simulate != 0 ) {

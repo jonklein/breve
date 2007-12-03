@@ -86,6 +86,7 @@ Stationary : Floor {
 		self move to (0, -2.5, 0).
 		self set-shape to shape.
 		self set-color to ( .35, .8, .45 ).
+		self catch-shadows.
 
 	+ to set-size to newSize (vector):
 		% Changes the size of the floor to newSize.

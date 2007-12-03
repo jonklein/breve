@@ -100,6 +100,7 @@ char *getSavename(void);
 char *getLoadname(void);
 int soundCallback(void);
 int pauseCallback(void);
+int unpauseCallback(void);
 
 extern char **gErrorNames;
 extern char *interfaceID;

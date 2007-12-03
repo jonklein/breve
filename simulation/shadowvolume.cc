@@ -209,6 +209,8 @@ void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
 }
 
 void slCamera::renderShadowVolume( slWorld *w ) {
+	setupLights( 0 );
+
 	glClear( GL_STENCIL_BUFFER_BIT );
 
 	glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
@@ -229,10 +231,6 @@ void slCamera::renderShadowVolume( slWorld *w ) {
 	glCullFace( GL_FRONT );
 	renderObjectShadowVolumes( w );
 
-	// glClear(GL_DEPTH_BUFFER_BIT);
-
-	drawLights( 0 );
-
 	glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
 	glDepthMask( GL_TRUE );
 	glCullFace( GL_BACK );
@@ -244,7 +242,9 @@ void slCamera::renderShadowVolume( slWorld *w ) {
 	// draw the scene again, with lighting, only where the value is 0
 
 	// glColor3f(1, 0, 0);
-	renderObjects( w, DO_NO_ALPHA );
+	renderObjects( w, DO_NO_ALPHA | DO_NO_SHADOWCATCHER );
+	glEnable( GL_BLEND );
+	renderObjects( w, DO_ONLY_SHADOWCATCHER, .65 );
 
 	// transparent objects cause problems, since they cannot simply
 	// be "drawn over" the way we do with the rest of the scene.
@@ -255,19 +255,10 @@ void slCamera::renderShadowVolume( slWorld *w ) {
 
 	renderObjects( w, DO_ONLY_ALPHA );
 
-	if ( _billboardCount ) renderBillboards( 0 );
-
-	glStencilFunc( GL_NOTEQUAL, 0, 0xffffffff );
-
-	if ( _billboardCount ) renderBillboards( 0 );
-
-	drawLights( 1 );
-
-	renderObjects( w, DO_ONLY_ALPHA );
+	if ( _billboardCount ) 
+		renderBillboards( 0 );
 
 	glDisable( GL_STENCIL_TEST );
-
-	glDisable( GL_LIGHTING );
 }
 
 void slCamera::renderObjectShadowVolumes( slWorld *w ) {

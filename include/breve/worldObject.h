@@ -98,7 +98,7 @@ class slWorldObject {
 			if( _displayShape ) slShapeFree( _displayShape );
 		}
 
-		virtual void draw( slCamera *camera );
+		virtual void draw( slCamera *camera, bool inUseDrawMode = true );
 
 		virtual void step( slWorld *world, double step ) {};
 

@@ -248,14 +248,14 @@ class slCamera {
 		void setTextColor( slVector *inColor ) { slVectorCopy( inColor, &_textColor ); }
 
 	private:
-		void stencilFloor();
-		void reflectionPass( slWorld *w );
-		void shadowPass( slWorld *w );
-		void renderObjects( slWorld *w, unsigned int flags );
+		void stencilFloor( slWorld *w );
+		void reflectionPass( slWorld *w, bool inWillDoVolumeShadow );
+		void drawFlatShadows( slWorld *w );
+		void renderObjects( slWorld *w, unsigned int flags, float inAlphaScale = 1.0f );
 		void renderText( slWorld *w, int crosshair );
 		void renderLabels( slWorld *w );
 		void renderLines( slWorld *w );
-		void drawLights( int noDiffuse );
+		void setupLights( int inAmbientOnly = 0 );
 		void drawBackground( slWorld *w );
 		void drawFog();
 

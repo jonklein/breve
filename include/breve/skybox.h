@@ -28,7 +28,7 @@ class slSkybox {
 						slSkybox();
 						~slSkybox();
 
-		void 				draw( slVector *inCameraPos );
+		void 				draw( slVector *inCameraPos, float inZFar );
 
 		int 				loadImage( const char *inImage, int inN ) {
 							std::string s( inImage );

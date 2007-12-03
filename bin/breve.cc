@@ -155,6 +155,7 @@ int main( int argc, char **argv ) {
 	gEngine->dialogCallback 	= brCLIDialogCallback;
 	gEngine->interfaceTypeCallback	= interfaceVersionCallback;
 	gEngine->pauseCallback 		= pauseCallback;
+	gEngine->unpauseCallback 	= unpauseCallback;
 
 	if ( !gOptionNoGraphics ) {
 		slInitGlut( argc, argv, simulationFile );
@@ -564,7 +565,7 @@ void slInitGlut( int argc, char **argv, char *title ) {
 	glutInitWindowSize( gWidth, gHeight );
 	glutInit( &argc, argv );
 
-	glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL );
+	glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE );
 
 	if ( gXpos || gYpos ) 
 		glutInitWindowPosition( gXpos, gYpos );
@@ -896,6 +897,14 @@ int pauseCallback() {
 	gPaused = 1;
 	brPauseTimer( gEngine );
 	glutIdleFunc( NULL );
+	return 0;
+}
+
+int unpauseCallback() {
+	gPaused = 0;
+	brUnpauseTimer( gEngine );
+	glutIdleFunc( brGlutLoop );
+	pthread_cond_signal( &gThreadPaused );
 	return 0;
 }
 

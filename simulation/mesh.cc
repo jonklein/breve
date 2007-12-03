@@ -13,17 +13,20 @@
 #ifdef HAVE_LIB3DS
 
 sl3DSShape::sl3DSShape( char *inFilename, char *inMeshname, float inSize ) : slMeshShape() {
-	
 	_normals = NULL;
 	_materials = NULL;
 
 	if( !inFilename ) 
 		throw slException( std::string( "Cannot locate 3DS Mesh file" ) );
 
+	slMessage( 20, "Reading 3DS file \"%s\"\n", inFilename );
+
 	Lib3dsFile *file = lib3ds_file_load( inFilename );
 
 	if ( !file ) 
 		throw slException( std::string( "Cannot open file \"" ) + inFilename + "\"" );
+
+	lib3ds_file_eval( file, 0.0 );
 
 	_directory = dirname( inFilename );
 	
@@ -31,8 +34,6 @@ sl3DSShape::sl3DSShape( char *inFilename, char *inMeshname, float inSize ) : slM
 	_indexCount = 0;
 
 	calculateSizes( file, file -> nodes, &_vertexCount, &_indexCount );
-
-	printf( "%d points, %d faces\n", _vertexCount, _indexCount );
 
 	_vertices = new float[ 3 * _vertexCount ];
 	_texcoords = new float[ 2 * _vertexCount ];
@@ -45,66 +46,111 @@ sl3DSShape::sl3DSShape( char *inFilename, char *inMeshname, float inSize ) : slM
 	// First pass through the data, translate to the origin and get the length
 
 	int pointStart = 0, indexStart = 0;
+
+	slVectorSet( &_max, 0, 0, 0 );
+	slVectorSet( &_center, 0, 0, 0 );
+
 	processNodes( file, file -> nodes, &pointStart, &indexStart );
 
-	printf( "%d points and %d indices processed, max reach = %f\n", pointStart, indexStart, _maxReach );
+	// slVectorMul( &_center, 1.0 / _vertexCount, &_center );
+	slVectorSub( &_max, &_center, &_max );
+	_maxReach = slVectorLength( &_max );
 
-	if( inSize > 0 ) {
-		for( int n = 0; n < 3 * _vertexCount; n++ ) {
-			_vertices[ n ] *= ( inSize / _maxReach );
+	for( int n = 0; n < _vertexCount; n++ ) {
+		_vertices[ n * 3     ] -= _center.x;
+		_vertices[ n * 3 + 1 ] -= _center.y;
+		_vertices[ n * 3 + 2 ] -= _center.z;
+
+		if( inSize > 0.0f ) {
+			_vertices[ n * 3     ] *= ( inSize / _maxReach );
+			_vertices[ n * 3 + 1 ] *= ( inSize / _maxReach );
+			_vertices[ n * 3 + 2 ] *= ( inSize / _maxReach );
 		}
-
-		_maxReach = inSize;
 	}
 
+	if( inSize > 0.0f )
+		_maxReach = 1.2 * inSize;
+
+	_maxReach = 100;
+
+	slMessage( 20, "%d points and %d indices processed, max reach = %f\n", pointStart, indexStart, _maxReach );
 
 	setDensity( 1 );
 	createODEGeom();
 }
 
-int sl3DSShape::processNodes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPointStart, int *ioIndexStart ) {
+void sl3DSShape::processNodes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPointStart, int *ioIndexStart ) {
 	unsigned int n;
 
-        while( inNode ) {
-                processNodes( inFile, inNode -> childs, ioPointStart, ioIndexStart );
+	while( inNode ) {
+		processNodes( inFile, inNode -> childs, ioPointStart, ioIndexStart );
 
-                if( inNode -> type == LIB3DS_OBJECT_NODE ) {
+		if( inNode -> type == LIB3DS_OBJECT_NODE ) {
 			if( !strcmp( inNode -> name, "$$$DUMMY" ) )
 				return;
 
-                        Lib3dsMesh *mesh = lib3ds_file_mesh_by_name( inFile, inNode->name );
+			Lib3dsMesh *mesh = lib3ds_file_mesh_by_name( inFile, inNode->name );
 
-			// slMatrix transform = { 
-			//	_mesh->matrix[ 0 ][ 0 ], _mesh->matrix[ 1 ][ 0 ], _mesh->matrix[ 2 ][ 0 ],
-			//	_mesh->matrix[ 0 ][ 1 ], _mesh->matrix[ 1 ][ 1 ], _mesh->matrix[ 2 ][ 1 ],
-			//	_mesh->matrix[ 0 ][ 2 ], _mesh->matrix[ 1 ][ 2 ], _mesh->matrix[ 2 ][ 2 ] };
-			// slVector translate = { -mesh->matrix[ 3 ][ 0 ], -mesh->matrix[ 3 ][ 1 ], -mesh->matrix[ 3 ][ 2 ] };
+			Lib3dsMatrix M, N;
+			lib3ds_matrix_copy( M, mesh->matrix );
+			lib3ds_matrix_inv( M );
+			lib3ds_matrix_copy( N, inNode->matrix );
+
+			slMessage( 20, "Node %s\n", inNode -> name );
+			slMessage( 20, "Node translation: %f, %f, %f\n", inNode->matrix[ 3 ][ 0 ],  inNode->matrix[ 3 ][ 1 ], inNode->matrix[ 3 ][ 2 ] );
+			slMessage( 20, "Mesh translation: %f, %f, %f\n", M[ 3 ][ 0 ],  M[ 3 ][ 1 ], M[ 3 ][ 2 ] );
+			slMessage( 20, "Pivot translation: %f, %f, %f\n", inNode->data.object.pivot[ 0 ], inNode->data.object.pivot[ 1 ], inNode->data.object.pivot[ 2 ] );
+
+			slMatrix trans = { 
+				{ 0, -1, 0 },
+				{ 0, 0, 1 },
+				{ 1, 0, 0 } };
 
 			for ( n = 0; n < mesh -> points; n++ ) {
-				_vertices[ ( *ioPointStart + n ) * 3     ] = mesh->pointL[ n ].pos[ 0 ];
-				_vertices[ ( *ioPointStart + n ) * 3 + 1 ] = mesh->pointL[ n ].pos[ 1 ];
-				_vertices[ ( *ioPointStart + n ) * 3 + 2 ] = mesh->pointL[ n ].pos[ 2 ];
+				slVector v1, v2;
+
+				v1.x = mesh->pointL[ n ].pos[ 0 ];
+				v1.y = mesh->pointL[ n ].pos[ 1 ];
+				v1.z = mesh->pointL[ n ].pos[ 2 ];
+
+				v2.x = M[ 0 ][ 0 ] * v1.x + M[ 1 ][ 0 ] * v1.y + M[ 2 ][ 0 ] * v1.z + M[ 3 ][ 0 ];
+				v2.y = M[ 0 ][ 1 ] * v1.x + M[ 1 ][ 1 ] * v1.y + M[ 2 ][ 1 ] * v1.z + M[ 3 ][ 1 ];
+				v2.z = M[ 0 ][ 2 ] * v1.x + M[ 1 ][ 2 ] * v1.y + M[ 2 ][ 2 ] * v1.z + M[ 3 ][ 2 ];
+
+				slVectorCopy( &v2, &v1 );
+
+				v2.x = N[ 0 ][ 0 ] * v1.x + N[ 1 ][ 0 ] * v1.y + N[ 2 ][ 0 ] * v1.z + N[ 3 ][ 0 ];
+				v2.y = N[ 0 ][ 1 ] * v1.x + N[ 1 ][ 1 ] * v1.y + N[ 2 ][ 1 ] * v1.z + N[ 3 ][ 1 ];
+				v2.z = N[ 0 ][ 2 ] * v1.x + N[ 1 ][ 2 ] * v1.y + N[ 2 ][ 2 ] * v1.z + N[ 3 ][ 2 ];
+
+				// slVectorCopy( &v2, &v1 );
+				// slVectorXform( trans, &v1, &v2 );
+
+				_vertices[ ( *ioPointStart + n ) * 3     ] = v2.x;
+				_vertices[ ( *ioPointStart + n ) * 3 + 1 ] = v2.y;
+				_vertices[ ( *ioPointStart + n ) * 3 + 2 ] = v2.z;
 
 				float tx = 0, ty = 0;
 
 				if( mesh->texelL ) {
 					tx = mesh->texelL[ n ][ 0 ];
-					ty = 1.0 - mesh->texelL[ n ][ 1 ];
+					ty = mesh->texelL[ n ][ 1 ];
 				}
 
 				_texcoords[ ( *ioPointStart + n ) * 2     ] = tx;
 				_texcoords[ ( *ioPointStart + n ) * 2 + 1 ] = ty;
 
-				slVector v = { mesh->pointL[ n ].pos[ 0 ], mesh->pointL[ n ].pos[ 1 ], mesh->pointL[ n ].pos[ 2 ] };
+				if( slVectorLength( &v2 ) > slVectorLength( &_max ) )
+					slVectorCopy( &v2, &_max );
 
-				if( slVectorLength( &v ) > _maxReach )
-					_maxReach = slVectorLength( &v );
+				slVectorMul( &v2, 1.0 / _vertexCount, &v2 );
+				slVectorAdd( &_center, &v2, &_center );
 			}
 
 			Lib3dsVector *normals = new Lib3dsVector[ _indexCount ];
 			lib3ds_mesh_calculate_normals( mesh, normals );
 
-			for( int n = 0; n < mesh -> faces; n++ ) {
+			for( unsigned int n = 0; n < mesh -> faces; n++ ) {
 				Lib3dsFace *f = &mesh -> faceL[ n ];
 
 				for ( int m = 0; m < 3; m++ ) {
@@ -139,9 +185,8 @@ int sl3DSShape::processNodes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPoi
 			*ioIndexStart += mesh->faces * 3;
    		}
 
-
-                inNode = inNode -> next;
-        }
+		inNode = inNode -> next;
+	}
 }
 
 int sl3DSShape::addMaterial( std::string &inMaterialName, Lib3dsMaterial *inMaterial ) {
@@ -151,7 +196,7 @@ int sl3DSShape::addMaterial( std::string &inMaterialName, Lib3dsMaterial *inMate
 
 	slMaterial material;
 
-	printf( "Found material: %s\n", inMaterialName.c_str() );
+	slMessage( 20, "Found material: %s\n", inMaterialName.c_str() );
 	memcpy( material._specular, inMaterial -> specular, sizeof( float ) * 4 );
 	memcpy( material._diffuse, inMaterial -> diffuse, sizeof( float ) * 4 );
 	memcpy( material._ambient, inMaterial -> ambient, sizeof( float ) * 4 );
@@ -195,7 +240,6 @@ void sl3DSShape::calculateSizes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ou
 			if( !strcmp( inNode -> name, "$$$DUMMY" ) )
 				return;
 
-			printf( "Node name = %s [ %s ]\n", inNode -> name, inNode -> data.object.morph  );
 			Lib3dsMesh *mesh = lib3ds_file_mesh_by_name( inFile, inNode->name );
 
 			if( mesh ) {
@@ -213,9 +257,9 @@ double sl3DSShape::maxReach() {
 }
 
 void sl3DSShape::draw() {
-	glDisable( GL_COLOR_MATERIAL );
-
 	slMaterial *material = NULL;
+
+	glPushAttrib( GL_TRANSFORM_BIT );
 
 	for ( int n = 0; n < _indexCount; n += 3 ) {
 		int materialIndex = n / 3;
@@ -227,7 +271,6 @@ void sl3DSShape::draw() {
 			glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, material -> _diffuse );
 			glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, material -> _specular );
 
-
 			float shine = pow( 2.0, 10.0 * material -> _shininess );
 
 			if( shine > 128.0 )
@@ -235,33 +278,27 @@ void sl3DSShape::draw() {
 
 			glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, shine ); 
 
-			glColor4fv( material -> _ambient );
-			
-			// I CAN HAZ TEXTURING?
+			// glColor4fv( material -> _diffuse );
 
-			if( !material -> _texture && material -> _texturePath.size() > 0 )
-				material -> _texture = new slTexture2D( material -> _texturePath );
+			// I CAN HAZ TEXTURZ?
 
 			if( material -> _texture ) {
 			 	material -> _texture -> bind();
 				glMatrixMode( GL_TEXTURE );
 				glLoadIdentity();
 				glScalef( material -> _texture -> _unitX, material -> _texture -> _unitY, 1 );
-			}
-			else 
+			} else 
 				glDisable( GL_TEXTURE_2D );
 
-			glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE  );
-
+			glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 		}
 
 		int i1 = _indices[ n ];
 		int i2 = _indices[ n + 1 ];
 		int i3 = _indices[ n + 2 ];
 
-		if( 1 || material -> _texture ) {
-		glBegin( GL_TRIANGLES );
 
+		glBegin( GL_TRIANGLES );
 		glNormal3fv( &_normals[ n * 3 ] );
 		glTexCoord2fv( &_texcoords[ i1 * 2 ] );
 		glVertex3fv( &_vertices[ i1 * 3 ] );
@@ -273,33 +310,21 @@ void sl3DSShape::draw() {
 		glNormal3fv( &_normals[ n * 3 + 6 ] );
 		glTexCoord2fv( &_texcoords[ i3 * 2 ] );
 		glVertex3fv( &_vertices[ i3 * 3 ] );
-
 		glEnd();
-		}
 	 }
 
-	// glDrawElements( GL_TRIANGLES, _indexCount, GL_UNSIGNED_INT _indices );
-
-	glEnable( GL_COLOR_MATERIAL );
-
-
-	glMatrixMode( GL_MODELVIEW );
+	glPopAttrib();
 }
 
-void sl3DSShape::draw( slCamera *c, slPosition *pos, double textureScaleX, double textureScaleY, int mode, int flags ) {
-	float scale[4] = { 1.0 / textureScaleX, 1.0 / textureScaleY, 1.0, 1.0 };
+void sl3DSShape::draw( slCamera *c, double textureScaleX, double textureScaleY, int mode, int flags ) {
+	for( int n = 0; n < _materialList.size(); n++ ) {
+		slMaterial *material = &_materialList[ n ];
 
-	glPushMatrix();
-	glTranslated( pos->location.x, pos->location.y, pos->location.z );
-	slMatrixGLMult( pos->rotation );
+		if( !material -> _texture && material -> _texturePath.size() > 0 )
+			material -> _texture = new slTexture2D( material -> _texturePath );
+	}
 
-	glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-	glTexGenfv( GL_S, GL_OBJECT_PLANE, scale );
-	glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-	glTexGenfv( GL_T, GL_OBJECT_PLANE, scale );
-
-	glEnable( GL_TEXTURE_GEN_S );
-	glEnable( GL_TEXTURE_GEN_T );
+	glDisable( GL_CULL_FACE );
 
 	if ( _drawList == 0 || _recompile ) {
 		if ( _drawList == 0 ) 
@@ -310,16 +335,16 @@ void sl3DSShape::draw( slCamera *c, slPosition *pos, double textureScaleX, doubl
 		draw();
 
 		glEndList();
+
+		_recompile = 0;
 	}
+
+	if( !( flags & DO_NO_COLOR ) ) 
+		glDisable( GL_COLOR_MATERIAL );
 
 	glCallList( _drawList );
 
-	glDisable( GL_TEXTURE_GEN_S );
-	glDisable( GL_TEXTURE_GEN_T );
-
-	glPopMatrix();
-
-	updateLastPosition( pos );
+	glEnable( GL_COLOR_MATERIAL );
 }
 
 #endif
