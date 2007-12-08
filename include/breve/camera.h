@@ -19,7 +19,6 @@
  *****************************************************************************/
 
 #include "slutil.h"
-#include "shape.h"
 #include "glIncludes.h"
 
 #ifndef _CAMERA_H
@@ -202,50 +201,50 @@ class slCamera {
 		slVector _fogColor;
 	
 		double _fogIntensity;
-		double _fogStart;
-		double _fogEnd;
+		double						_fogStart;
+		double						_fogEnd;
 	
-		slPlane _shadowPlane;
-		slLight _lights[ MAX_LIGHTS ];
+		slPlane						_shadowPlane;
+		slLight						_lights[ MAX_LIGHTS ];
 	
 		// offset & target of camera
 	
-		slVector _location;
-		slVector _target; 
-		double _rotation[3][3];
+		slVector					_location;
+		slVector					_target; 
+		double						_rotation[3][3];
 	
 		// rotation & zoom 
 
-		double _rx, _ry;
-		double _zoom;
+		double						_rx, _ry;
+		double						_zoom;
 	
-		double _backgroundScrollX, _backgroundScrollY;
+		double						_backgroundScrollX, _backgroundScrollY;
 	
 		// the window's perspective of x and y axis at the current rotation 
 	
-		slVector _xAxis;
-		slVector _yAxis;
+		slVector					_xAxis;
+		slVector					_yAxis;
 	
-		slPlane _frustumPlanes[6];
+		slPlane						_frustumPlanes[ 6 ];
 	
 		// camera size 
 		
-		int _width;
-		int _height;
+		int							_width;
+		int							_height;
 	
 		// camera origin on screen view coords 
 	
-		int _originx;
-		int _originy;
+		int							_originx;
+		int							_originy;
 	
-		double _fov;
+		double						_fov;
 
-		int  (*_activateContextCallback)();
-		void (*_renderContextCallback)(slWorld *w, slCamera *c);
+		int							(*_activateContextCallback)();
+		void						(*_renderContextCallback)(slWorld *w, slCamera *c);
 
-		void clear( slWorld *w );
+		void						clear( slWorld *w );
 
-		void setTextColor( slVector *inColor ) { slVectorCopy( inColor, &_textColor ); }
+		void						setTextColor( slVector *inColor ) { slVectorCopy( inColor, &_textColor ); }
 
 	private:
 		void stencilFloor( slWorld *w );

@@ -568,8 +568,6 @@ slJoint *slLink::link( slWorld *world, slLink *parent, int jointType, slVector *
 
 			joint->_odeMotorID = dJointCreateAMotor( world->_odeWorldID, NULL );
 
-			dJointSetAMotorMode( joint->_odeMotorID, dAMotorEuler );
-
 			dJointAttach( joint->_odeMotorID, cBodyID, pBodyID );
 
 			break;
@@ -619,21 +617,14 @@ slJoint *slLink::link( slWorld *world, slLink *parent, int jointType, slVector *
 			slVectorNormalize( &tp );
 
 			dJointSetAMotorNumAxes( joint->_odeMotorID, 3 );
-
-			dJointSetAMotorMode( joint->_odeMotorID, dAMotorEuler );
-
 			dJointSetAMotorAxis( joint->_odeMotorID, 0, 1, tn.x, tn.y, tn.z );
-
 			dJointSetAMotorAxis( joint->_odeMotorID, 1, 0, 0, 0, 0 );
-
 			dJointSetAMotorAxis( joint->_odeMotorID, 2, 2, tp.x, tp.y, tp.z );
-
 			dJointSetAMotorMode( joint->_odeMotorID, dAMotorEuler );
 
 			// See the note in \ref slJoint::setLimits.  These odd stops are required for stability.
 
 			dJointSetAMotorParam( joint->_odeMotorID, dParamLoStop2, -( M_PI / 2.0 ) + 0.35 );
-
 			dJointSetAMotorParam( joint->_odeMotorID, dParamHiStop2, ( M_PI / 2.0 ) - 0.35 );
 
 			break;
@@ -644,12 +635,10 @@ slJoint *slLink::link( slWorld *world, slLink *parent, int jointType, slVector *
 			slVectorNormalize( &axis2 );
 
 			dJointSetUniversalAxis1( joint->_odeJointID, tn.x, tn.y, tn.z );
-
 			dJointSetUniversalAxis2( joint->_odeJointID, axis2.x, axis2.y, axis2.z );
-
 			dJointSetAMotorAxis( joint->_odeMotorID, 0, 2, tn.x, tn.y, tn.z );
-
 			dJointSetAMotorAxis( joint->_odeMotorID, 2, 2, axis2.x, axis2.y, axis2.z );
+			dJointSetAMotorMode( joint->_odeMotorID, dAMotorEuler );
 
 			break;
 

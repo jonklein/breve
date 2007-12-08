@@ -22,6 +22,7 @@
 #include "simulation.h"
 #include "camera.h"
 #include "world.h"
+#include "shape.h"
 #include "gldraw.h"
 
 /*!
@@ -349,8 +350,6 @@ void slCamera::setShadowCatcher( slStationary *s, slVector *normal ) {
 
 	_recompile = 1;
 	_shadowCatcher = s;
-
-	bestFace->drawFlags |= SD_STENCIL | SD_REFLECT;
 }
 
 /*!

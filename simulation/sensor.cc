@@ -376,7 +376,7 @@ void Sensor::sense(const slShape *shape, slPosition *shapePos, slPosition *senso
 					slVectorMul(&dir, dist, &pointOnPlane);
 					slVectorAdd(&pointOnPlane, &sensorPos->location, &pointOnPlane);
 					// now figure out if the point in question is within the face 
-					result = slClipPoint(&pointOnPlane, f->voronoi, shapePos, f->edgeCount, &update, &distance);
+					result = slClipPoint(&pointOnPlane, f->voronoi, shapePos, f-> _pointCount, &update, &distance);
 					if(result == 1) { // point inside the face
 						if(rayValues [i][j].distance > dist){//we have a better hit
 							rayValues[i][j].distance = dist;
@@ -603,7 +603,7 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 			slVectorMul(&dir, dist, &pointOnPlane);
 			slVectorAdd(&pointOnPlane, &sensorPos->location, &pointOnPlane);
 			// now figure out if the point in question is within the face 
-			result = slClipPoint(&pointOnPlane, f->voronoi, shapePos, f->edgeCount, &update, &distance);
+			result = slClipPoint(&pointOnPlane, f->voronoi, shapePos, f-> _pointCount, &update, &distance);
 			if(result != 1) { continue;}
 
 			// point inside the face

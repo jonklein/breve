@@ -52,6 +52,7 @@ Control : Gatherers {
 		self add-menu named "Randomize Food" for-method "randomize-food".
 
 		self point-camera at (0, 0, 0) from (0, 0, -80).
+		self enable-lighting.
 
 	+ to randomize-food:
 		# randomize the location of all of the elements in foodList.

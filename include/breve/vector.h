@@ -45,6 +45,15 @@ struct slsVector {
     slVector b;
 };
 
+/**
+ * \brief A plane, specified by a normal and a vertex.
+ */
+
+struct slPlane {
+	slVector normal;
+	slVector vertex;
+};
+
 #define slVectorLength(V)		(sqrt((V)->x * (V)->x + (V)->y * (V)->y + (V)->z * (V)->z))
 #define slVectorIsZero(V)		((V)->x == 0.0 && (V)->y == 0.0 && (V)->z == 0.0)
 

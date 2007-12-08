@@ -392,7 +392,6 @@ double slWorld::step( double stepSize, int *error ) {
 			slWorldObject *w1;
 			slWorldObject *w2;
 			slPairFlags *flags;
-			unsigned int x;
 
 			w1 = _objects[ c->n1 ];
 			w2 = _objects[ c->n2 ];
@@ -463,6 +462,9 @@ double slWorld::step( double stepSize, int *error ) {
 				slVector pos, normal;
 
 				dContactGeom *geom = &c -> _contactGeoms[ 0 ];
+
+				slVectorSet( &pos,    geom -> pos[ 0 ],    geom -> pos[ 1 ],    geom -> pos[ 2 ] );
+				slVectorSet( &normal, geom -> normal[ 0 ], geom -> normal[ 1 ], geom -> normal[ 2 ] );
 
 				_collisionCallback( w1->getCallbackData(), w2->getCallbackData(), CC_NORMAL, &pos, &normal );
 			}

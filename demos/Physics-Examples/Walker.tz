@@ -50,7 +50,7 @@ PhysicalControl : Walker {
 
 		currentSeat (int).
 
-		wigglyThing (object).
+		walker (object).
 
 		# the following are flags that can be controlled by the user
 		# via the simulation menu
@@ -84,8 +84,6 @@ PhysicalControl : Walker {
 
 		floor = new Floor.
 		floor catch-shadows.
-		floor set-color to (1.0, 1.0, 1.0).
-		floor set-eT to .9.
 
 		cloudTexture = (new Image load from "images/clouds.png").
 
@@ -97,10 +95,10 @@ PhysicalControl : Walker {
 
 		# Create the Creature.
 
-		wigglyThing = new Creature.
-		wigglyThing move to (0, 6, 0).
+		walker = new Creature.
+		walker move to (0, 6, 0).
 		self offset-camera by (3, 13, -13).
-		self watch item wigglyThing.
+		self watch item walker.
 
 		# The "Monkeys" are the individuals that will control the Creature.
 		# Create the Monkeys and assign them numbers.
@@ -137,7 +135,7 @@ PhysicalControl : Walker {
 		self set-display-text to "Driver #$currentNumber" at-x -.95 at-y -.9.
 
 	+ to iterate:
-		seats{currentSeat} control robot wigglyThing at-time (self get-time).
+		seats{currentSeat} control robot walker at-time (self get-time).
 
 		super iterate.
 
@@ -174,8 +172,8 @@ PhysicalControl : Walker {
 		# we change the drivers every time a monkey is finished it's 
 		# turn.  if we have seen the last monkey, breed them together.
 
-		seats{currentSeat} set-distance to |(wigglyThing get-location)|.
-		wigglyThing center.
+		seats{currentSeat} set-distance to |(walker get-location)|.
+		walker center.
 
 		currentSeat += 1.
 
@@ -224,7 +222,7 @@ PhysicalControl : Walker {
 	+ to toggle-driver-lock:
 		if locked == 1: {
 			locked = 0.
-			wigglyThing center.
+			walker center.
 			self schedule method-call "change-drivers" at-time (self get-time) + 20.0.
 			lockMenu uncheck.
 		} else {

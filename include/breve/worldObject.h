@@ -94,8 +94,11 @@ class slWorldObject {
 				(*ci)->_dst = NULL;
 			}
 
-			if( _shape ) slShapeFree( _shape );
-			if( _displayShape ) slShapeFree( _displayShape );
+			if( _shape ) 
+				_shape -> release();
+
+			if( _displayShape ) 
+				_displayShape -> release();
 		}
 
 		virtual void draw( slCamera *camera, bool inUseDrawMode = true );

@@ -519,6 +519,8 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 
 	renderObjects( w, flags | reflectionFlags | DO_NO_ALPHA );
 
+	renderLines( w );
+
 	slClearGLErrors( "drew non-alpha bodies" );
 
 	// now we do transparent objects and billboards.  they have to come last
@@ -1290,16 +1292,14 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags, float inAlphaScale
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 }
 
-/*!
-	\brief Renders object neighbor lines.
-*/
+/**
+ * \brief Renders object neighbor lines.
+ */
 
 void slCamera::renderLines( slWorld *w ) {
 	slWorldObject *neighbor;
 	slVector *x, *y;
 	unsigned int n;
-
-		return;
 
 	glLineWidth( 1.2 );
 	glEnable( GL_BLEND );

@@ -96,11 +96,17 @@ brData *brDataHexDecode( const char *string ) {
 	int n;
 	int l;
 
-	if ( !string ) return NULL;
+	if ( !string ) 
+		return NULL;
 
 	length = strlen( string );
 
-	if (( length % 2 ) || length < 1 ) {
+	// a zero-length decode is valid
+
+	if( length < 1 )
+		return new brData( "", 0 );
+
+	if ( length % 2 ) {
 		slMessage( DEBUG_ALL, "warning: error decoding hex data string (length = %d)\n", length );
 		return NULL;
 	}

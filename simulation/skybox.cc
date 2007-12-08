@@ -34,6 +34,7 @@ void slSkybox::draw( slVector *inCameraPos, float inZFar ) {
 	glDisable( GL_BLEND );
 
 	glDepthMask( GL_FALSE );
+	glDisable( GL_LIGHTING );
 
 	glMatrixMode( GL_MODELVIEW );
 	glPushMatrix();
@@ -60,6 +61,10 @@ void slSkybox::draw( slVector *inCameraPos, float inZFar ) {
 	glColor4f( 1.0, 1.0, 1.0, 1.0f);
  
 	float r = 1.0001f;
+
+	glMatrixMode( GL_TEXTURE );
+	glLoadIdentity();
+	glMatrixMode( GL_MODELVIEW );
 
 	_textures[ 0 ].bind();
 	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );

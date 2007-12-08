@@ -27,13 +27,14 @@ struct slMaterial {
 						delete _texture;
 	}
 
-	float 				_specular[ 4 ];
-	float 				_ambient[ 4 ];
-	float				_diffuse[ 4 ];
+	float 					_specular[ 4 ];
+	float 					_ambient[ 4 ];
+	float					_diffuse[ 4 ];
+	float					_shininess;
 
-	float				_shininess;
+	bool					_twosided;
 
-	std::string			_texturePath;
+	std::string				_texturePath;
 	slTexture2D*			_texture;
 };
 

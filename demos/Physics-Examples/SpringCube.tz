@@ -15,10 +15,10 @@
 @use Spring.
 @use Stationary.
 
-@define STRENGTH 5.
+@define STRENGTH 40.
 @define LENGTH 9.
 @define NUMPOINTSONSIDE 3.
-@define HEIGHTTODROP 60.
+@define HEIGHTTODROP 20.
 
 Controller SpringController.
 
@@ -52,8 +52,8 @@ PhysicalControl : SpringController {
 
         self set-background-color to (.7, .7, .7).
         self point-camera at (0, 10, 0) from (70, 20, 70).
-		self enable-fast-physics.
-		self set-fast-physics-iterations to 5.
+		#self enable-fast-physics.
+		#self set-fast-physics-iterations to 5.
 
         nodes = (NODES new Nodes).
         nodes enable-physics.

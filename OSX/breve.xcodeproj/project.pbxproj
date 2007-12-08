@@ -90,6 +90,7 @@
 		48A2AC000B1BE9410010C477 /* QTInstrumentPlugin.o in Resources */ = {isa = PBXBuildFile; fileRef = 48A2ABFF0B1BE9410010C477 /* QTInstrumentPlugin.o */; };
 		48CE1D0408155BDE0030CBB8 /* DocumentIcons.icns in Resources */ = {isa = PBXBuildFile; fileRef = 48CE1CFB08155B1F0030CBB8 /* DocumentIcons.icns */; };
 		48E1722407AAAF370072492B /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48E1722307AAAF370072492B /* JavaVM.framework */; };
+		48E5F2E40D04F73B006E36B8 /* images in Resources */ = {isa = PBXBuildFile; fileRef = 48E5F2E30D04F73B006E36B8 /* images */; };
 		48ECC165071C13C100596F93 /* Digitizer.tz in CopyFiles */ = {isa = PBXBuildFile; fileRef = 48ECC163071C13C100596F93 /* Digitizer.tz */; };
 		48ECC170071C13F400596F93 /* Instrument.tz in CopyFiles */ = {isa = PBXBuildFile; fileRef = 48ECC16E071C13F400596F93 /* Instrument.tz */; };
 		48F0A4F309CCEE1900B52C28 /* libdl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 48F0A4F209CCEE1900B52C28 /* libdl.dylib */; };
@@ -131,6 +132,7 @@
 		48D1C0D4046331F80093F8AA /* slGraphWindowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slGraphWindowView.h; sourceTree = SOURCE_ROOT; };
 		48D1C0D5046331F80093F8AA /* slGraphWindowView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = slGraphWindowView.mm; sourceTree = "<group>"; };
 		48E1722307AAAF370072492B /* JavaVM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaVM.framework; path = /System/Library/Frameworks/JavaVM.framework; sourceTree = "<absolute>"; };
+		48E5F2E30D04F73B006E36B8 /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; name = images; path = ../lib/classes/images; sourceTree = SOURCE_ROOT; };
 		48ECC163071C13C100596F93 /* Digitizer.tz */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = Digitizer.tz; path = ../plugins/slDigitizerPlugin/Digitizer.tz; sourceTree = SOURCE_ROOT; };
 		48ECC164071C13C100596F93 /* DigitizerPlugin.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = DigitizerPlugin.o; path = ../plugins/slDigitizerPlugin/DigitizerPlugin.o; sourceTree = SOURCE_ROOT; };
 		48ECC16E071C13F400596F93 /* Instrument.tz */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = Instrument.tz; path = ../plugins/slQTMusicPlugin/Instrument.tz; sourceTree = SOURCE_ROOT; };
@@ -309,6 +311,7 @@
 				F5BD220A0397C57D01980AE4 /* docs */,
 				F5BD223E0397C59E01980AE4 /* demos */,
 				F5F64877039868A20154B402 /* classes */,
+				48E5F2E30D04F73B006E36B8 /* images */,
 				F569DDB203980C9101B2CBA0 /* Errors.strings */,
 				F569DDB403980C9101B2CBA0 /* General.strings */,
 				485C2C350559830F005859E4 /* breve.scriptSuite */,
@@ -434,6 +437,7 @@
 				4802DC4A05616137008198B9 /* breve.scriptTerminology in Resources */,
 				4832D4A409B9FFC200443499 /* DigitizerPlugin.o in Resources */,
 				48A2AC000B1BE9410010C477 /* QTInstrumentPlugin.o in Resources */,
+				48E5F2E40D04F73B006E36B8 /* images in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

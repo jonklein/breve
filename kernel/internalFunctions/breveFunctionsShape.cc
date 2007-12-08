@@ -72,9 +72,6 @@ int brIFinishShape( brEval args[], brEval *target, brInstance *i ) {
 
 	s -> finishShape( density );
 
-	if ( !slFinishShape( s, density ) ) 
-		return EC_ERROR;
-
 	return EC_OK;
 }
 
@@ -143,7 +140,9 @@ int brINGonConeNew( brEval args[], brEval *target, brInstance *i ) {
 }
 
 int brIFreeShape( brEval args[], brEval *target, brInstance *i ) {
-	slShapeFree( BRSHAPEPOINTER( &args[0] ) );
+	slShape *s = BRSHAPEPOINTER( &args[0] );
+	
+	s -> release();
 
 	return EC_OK;
 }
@@ -151,10 +150,10 @@ int brIFreeShape( brEval args[], brEval *target, brInstance *i ) {
 int brIDataForShape( brEval args[], brEval *target, brInstance *i ) {
 	void *serialShape;
 	int length;
+	slShape *s = BRSHAPEPOINTER( &args[0] );
 
-	serialShape = slSerializeShape( BRSHAPEPOINTER( &args[0] ), &length );
-
-	target->set( new brData( serialShape, length ) );
+	serialShape = s -> serialize( &length );
+	target -> set( new brData( serialShape, length ) );
 
 	slFree( serialShape );
 
@@ -165,13 +164,11 @@ int brIShapeForData( brEval args[], brEval *target, brInstance *i ) {
 	brData *d = BRDATA( &args[0] );
 
 	if ( !d ) {
-
-		target->set(( void* )NULL );
-
+		target->set( (void*)NULL );
 		return EC_OK;
 	}
 
-	target->set( slDeserializeShape(( slSerializedShapeHeader* )d->data, d->length ) );
+	target->set( slShape::deserialize(( slSerializedShapeHeader* )d->data ) );
 
 	return EC_OK;
 }

@@ -10,6 +10,240 @@
 #include "mesh.h"
 #include "gldraw.h"
 
+
+slMeshShape::slMeshShape() : slShape() {
+	_vertices = NULL;
+	_indices  = NULL;
+
+	_indexCount  = 0;
+	_vertexCount = 0;
+
+	_lastPositionIndex = 0;
+
+	_maxReach = 0.0;
+
+	setDensity( 1.0 );
+}
+
+int slMeshShape::createODEGeom() {
+	if( !_indices || !_vertices ) 
+		return -1;
+
+	slVectorSet( &_max, 0, 0, 0 );
+	slVectorSet( &_min, 0, 0, 0 );
+
+	for( int n = 0; n < _vertexCount; n++ ) {
+		float x = _vertices[ n * 3 ];
+		float y = _vertices[ n * 3 + 1 ];
+		float z = _vertices[ n * 3 + 2 ];
+
+		if( x > _max.x )
+			_max.x = x;
+		
+		if( x < _min.x )
+			_min.x = x;
+
+		if( y > _max.y )
+			_max.y = y;
+		
+		if( y < _min.y )
+			_min.y = y;
+
+		if( z > _max.z )
+			_max.z = z;
+		
+		if( z < _min.z )
+			_min.z = z;
+	}
+
+	if( _odeGeomID[ 0 ] )
+		dGeomDestroy( _odeGeomID[ 0 ] );
+	if( _odeGeomID[ 1 ] ) 
+		dGeomDestroy( _odeGeomID[ 1 ] );
+
+	dTriMeshDataID triMeshID = dGeomTriMeshDataCreate();
+	
+	dGeomTriMeshDataBuildSingle( triMeshID, 
+		_vertices, 3 * sizeof( float ), _vertexCount,
+		_indices, _indexCount, 3 * sizeof( int ) );
+
+  	_odeGeomID[ 0 ] = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
+  	_odeGeomID[ 1 ] = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
+
+	dGeomSetData( _odeGeomID[ 0 ], triMeshID );
+	dGeomSetData( _odeGeomID[ 1 ], triMeshID );
+
+	dMass m;
+	dMassSetTrimesh( &m, _density, _odeGeomID[ 0 ] );
+
+    _inertia[ 0 ][ 0 ] = m.I[ 0 ];
+    _inertia[ 0 ][ 1 ] = m.I[ 1 ];
+    _inertia[ 0 ][ 2 ] = m.I[ 2 ];
+
+    _inertia[ 1 ][ 0 ] = m.I[ 4 ];
+    _inertia[ 1 ][ 1 ] = m.I[ 5 ];
+    _inertia[ 1 ][ 2 ] = m.I[ 6 ];
+
+    _inertia[ 2 ][ 0 ] = m.I[ 8 ];
+    _inertia[ 2 ][ 1 ] = m.I[ 9 ];
+    _inertia[ 2 ][ 2 ] = m.I[ 10 ];
+
+	_mass = m.mass;
+
+	return 0;
+}
+
+
+void slMeshShape::bounds( const slPosition *position, slVector *min, slVector *max ) const {
+	max->x = position->location.x + _maxReach;
+	max->y = position->location.y + _maxReach;
+	max->z = position->location.z + _maxReach;
+
+	min->x = position->location.x - _maxReach;
+	min->y = position->location.y - _maxReach;
+	min->z = position->location.z - _maxReach;
+}
+
+slMeshShape::~slMeshShape() {
+	if( _vertices )
+		delete[] _vertices;
+
+	if( _indices )
+		delete[] _indices;
+}
+
+
+
+void slMeshShape::draw( slCamera *c, double inTScaleX, double inTScaleY, int mode, int flags ) {
+	slShape::draw( c, inTScaleX, inTScaleY, mode, flags );
+}
+
+
+void slMeshShape::updateLastPosition( slPosition *inPosition ) {
+	dMatrix4 transform;
+
+	slMatrixToODEMatrix( inPosition -> rotation, &transform[ 0 ] );
+
+	transform[ 12 ] = inPosition -> location.x;
+	transform[ 13 ] = inPosition -> location.y;
+	transform[ 14 ] = inPosition -> location.z;
+	transform[ 15 ] = 1.0;
+
+	memcpy( _lastPositions[ _lastPositionIndex ], transform, sizeof( dMatrix4 ) );
+
+	dGeomTriMeshSetLastTransform( _odeGeomID[ 0 ], _lastPositions[ _lastPositionIndex ] );
+	dGeomTriMeshSetLastTransform( _odeGeomID[ 1 ], _lastPositions[ _lastPositionIndex ] );
+
+	_lastPositionIndex = !_lastPositionIndex;
+}
+
+// void slMeshShape::finishShapeWithMaxLength( double inDensity, float inMaxSize ) {
+// 
+// }
+
+void slMeshShape::finishShape( double density ) {
+	int triCount = 0;
+
+	_maxReach = 0.0;
+
+	for( unsigned int n = 0; n < faces.size(); n++ )
+		triCount += faces[ n ] -> _pointCount;
+
+	_vertexCount = points.size() + faces.size();
+	_indexCount = 3 * triCount;
+
+	_vertices = new float[ _vertexCount * 3 ];
+	_indices = new int[ _indexCount ];
+
+	for( unsigned int n = 0; n < points.size(); n++ ) {
+		slPoint *p = points[ n ];
+
+		_vertices[ n * 3     ] = p -> vertex.x;
+		_vertices[ n * 3 + 1 ] = p -> vertex.y;
+		_vertices[ n * 3 + 2 ] = p -> vertex.z;
+
+		if( slVectorLength( &p -> vertex ) > _maxReach )
+			_maxReach = slVectorLength( &p -> vertex );
+	}
+
+	for( unsigned int n = 0; n < faces.size(); n++ ) {
+		slFace *f = faces[ n ];
+		slVector total;
+
+		slVectorSet( &total, 0, 0, 0 );
+
+		for( int m = 0; m < f -> _pointCount; m++ )
+			slVectorAdd( &total, &f -> points[ m ] -> vertex, &total );
+
+		slVectorMul( &total, 1.0 / f -> _pointCount, &total );
+
+		int vstart = ( points.size() * 3 ) + n * 3;
+
+		_vertices[ vstart     ] = total.x;
+		_vertices[ vstart + 1 ] = total.y;
+		_vertices[ vstart + 2 ] = total.z;
+	}
+
+	int tri = 0;
+
+	for( unsigned int n = 0; n < faces.size(); n++ ) {
+		slFace *f = faces[ n ];	
+
+		int i1 = points.size() + n;
+
+		for( int m = 0; m < f -> _pointCount; m++ ) {
+			int mplus = ( m + 1 )  % f -> _pointCount;
+
+			int i2 = findPointIndex( &f -> points[ m     ] -> vertex );
+			int i3 = findPointIndex( &f -> points[ mplus ] -> vertex );
+
+			_indices[ tri * 3     ] = i1;
+			_indices[ tri * 3 + 1 ] = i2;
+			_indices[ tri * 3 + 2 ] = i3;
+
+			tri++;
+		}
+	}
+
+	_density = density;
+	createODEGeom();
+
+	slShape::finishShape( density );
+}
+
+
+
+void slMeshShape::drawBounds( slCamera *inCamera ) {
+	glColor4f( 0, 0, 0, 0.7 );
+
+	glBegin( GL_LINE_LOOP );
+	glVertex3f( _min.x, _min.y, _min.z );
+	glVertex3f( _max.x, _min.y, _min.z );
+	glVertex3f( _max.x, _max.y, _min.z );
+	glVertex3f( _min.x, _max.y, _min.z );
+
+	glVertex3f( _min.x, _max.y, _max.z );
+	glVertex3f( _max.x, _max.y, _max.z );
+	glVertex3f( _max.x, _max.y, _min.z );
+	glVertex3f( _min.x, _max.y, _min.z );
+	glEnd();
+
+	glBegin( GL_LINE_LOOP );
+	glVertex3f( _min.x, _min.y, _max.z );
+	glVertex3f( _max.x, _min.y, _max.z );
+	glVertex3f( _max.x, _min.y, _min.z );
+	glVertex3f( _min.x, _min.y, _min.z );
+
+	glVertex3f( _min.x, _min.y, _max.z );
+	glVertex3f( _max.x, _min.y, _max.z );
+	glVertex3f( _max.x, _max.y, _max.z );
+	glVertex3f( _min.x, _max.y, _max.z );
+	glEnd();
+
+}
+
+
+
 #ifdef HAVE_LIB3DS
 
 sl3DSShape::sl3DSShape( char *inFilename, char *inMeshname, float inSize ) : slMeshShape() {
@@ -181,7 +415,6 @@ void sl3DSShape::processNodes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPo
 			}
 
 			*ioPointStart += mesh->points;
-
 			*ioIndexStart += mesh->faces * 3;
    		}
 
@@ -201,9 +434,12 @@ int sl3DSShape::addMaterial( std::string &inMaterialName, Lib3dsMaterial *inMate
 	memcpy( material._diffuse, inMaterial -> diffuse, sizeof( float ) * 4 );
 	memcpy( material._ambient, inMaterial -> ambient, sizeof( float ) * 4 );
 
-	material._ambient[ 3 ] = 1.0;
-	material._diffuse[ 3 ] = 1.0;
-	material._specular[ 3 ] = 1.0;
+	material._ambient[ 3 ]  = inMaterial -> transparency;
+	material._diffuse[ 3 ]  = inMaterial -> transparency;
+	material._specular[ 3 ] = inMaterial -> transparency;
+	material._twosided = inMaterial -> two_sided;
+
+	// printf( "material transparency: %f\n", inMaterial -> transparency );
 
 	material._shininess = inMaterial -> shininess;
 
@@ -217,7 +453,6 @@ int sl3DSShape::addMaterial( std::string &inMaterialName, Lib3dsMaterial *inMate
 	_materialList.push_back( material );
 
 	return _materialList.size();
-
 }
 
 sl3DSShape::~sl3DSShape() {
@@ -317,7 +552,7 @@ void sl3DSShape::draw() {
 }
 
 void sl3DSShape::draw( slCamera *c, double textureScaleX, double textureScaleY, int mode, int flags ) {
-	for( int n = 0; n < _materialList.size(); n++ ) {
+	for( unsigned int n = 0; n < _materialList.size(); n++ ) {
 		slMaterial *material = &_materialList[ n ];
 
 		if( !material -> _texture && material -> _texturePath.size() > 0 )
