@@ -2058,32 +2058,35 @@ RTC_INLINE int stEvalVectorElementAssignExp( stVectorElementAssignExp *s, stRunI
 */
 
 RTC_INLINE int stEvalCallFunc( stCCallExp *c, stRunInstance *i, brEval *result ) {
-	brEval e[ST_CMAX_ARGS];
+	brEval evals[ ST_CMAX_ARGS ];
+
 	int n, resultCode;
 
 	for ( n = 0; n < c->_function->_argCount; ++n ) {
-		resultCode = stExpEval3( c->_arguments[n], i, &e[n] );
+		resultCode = stExpEval3( c->_arguments[n], i, &evals[ n ] );
 
-		if( e[ n ].checkNaNInf() ) {
+		if ( resultCode != EC_OK )
+			goto cleanup;
+
+		if( evals[ n ].checkNaNInf() ) {
 			slMessage( DEBUG_ALL, "warning: NaN/Inf passed into internal function %s as argument %d at line %d of \"%s\"\n", c->_function->_name.c_str(), n , c->line, c->file );
 		}
 
-		if ( resultCode != EC_OK )
-			return resultCode;
+		// if the types don't match, try to convert them 
 
-		/* if the types don't match, try to convert them */
-
-		if ( e[n].type() != c->_function->_argTypes[n] && c->_function->_argTypes[n] != AT_UNDEFINED )
-			resultCode = stToType( &e[n], c->_function->_argTypes[n], &e[n], i );
-
-		if ( c->_function->_argTypes[n] == AT_POINTER && BRPOINTER( &e[n] ) == NULL ) {
-			stEvalError( i->instance, EE_TYPE, "NULL pointer passed as argument %d to internal function %s", n, c->_function->_name.c_str() );
-			return EC_ERROR;
+		if ( evals[n].type() != c->_function->_argTypes[n] && c->_function->_argTypes[n] != AT_UNDEFINED ) {
+			resultCode = stToType( &evals[n], c->_function->_argTypes[n], &evals[n], i );
+		
+			if ( resultCode != EC_OK ) {
+				stEvalError( i->instance, EE_TYPE, "expected type \"%s\" for argument #%d to internal method \"%s\", got type \"%s\"", brAtomicTypeStrings[c->_function->_argTypes[n]], n + 1, c->_function->_name.c_str(), brAtomicTypeStrings[( int )evals[n].type()] );
+				goto cleanup;
+			}
 		}
 
-		if ( resultCode != EC_OK ) {
-			stEvalError( i->instance, EE_TYPE, "expected type \"%s\" for argument #%d to internal method \"%s\", got type \"%s\"", brAtomicTypeStrings[c->_function->_argTypes[n]], n + 1, c->_function->_name.c_str(), brAtomicTypeStrings[( int )e[n].type()] );
-			return resultCode;
+		if ( c->_function->_argTypes[n] == AT_POINTER && BRPOINTER( &evals[n] ) == NULL ) {
+			stEvalError( i->instance, EE_TYPE, "NULL pointer passed as argument %d to internal function %s", n, c->_function->_name.c_str() );
+			resultCode = EC_ERROR;
+			goto cleanup;
 		}
 	}
 
@@ -2096,7 +2099,7 @@ RTC_INLINE int stEvalCallFunc( stCCallExp *c, stRunInstance *i, brEval *result )
 #endif
 
 	try {
-		resultCode = c->_function->_call( e, result, i->instance->breveInstance );
+		resultCode = c->_function->_call( evals, result, i->instance->breveInstance );
 
 		if( resultCode != EC_OK ) 
 			throw slException( "unknown error" );
@@ -2108,7 +2111,8 @@ RTC_INLINE int stEvalCallFunc( stCCallExp *c, stRunInstance *i, brEval *result )
 	} catch ( slException &error ) {
 		stEvalError( i->instance, EE_INTERNAL, "an error occurred executing the internal function \"%s\": %s", c->_function->_name.c_str(), error._message.c_str() );
 
-		return EC_ERROR;
+		resultCode = EC_ERROR;
+		goto cleanup;
 	}
 
 #ifdef MULTITHREAD
@@ -2119,9 +2123,9 @@ RTC_INLINE int stEvalCallFunc( stCCallExp *c, stRunInstance *i, brEval *result )
 		slMessage( DEBUG_ALL, "warning: NaN/Inf returned from internal function %s at line %d of \"%s\"\n", c->_function->_name.c_str(), c->line, c->file );
 	}
 
-	// if( result->getPointer() == (void*)0x5f5f5f5f ) {
-	// 	slMessage( DEBUG_ALL, "warning: possible uninitialized memory returned from internal function %s\n", c->_function->_name.c_str() );
-	// }
+cleanup:
+	// for( int n = 0; n < ST_CMAX_ARGS; n++ ) 
+	// 	evals[ n ].clear();
 
 	return resultCode;
 }

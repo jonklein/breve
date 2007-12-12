@@ -24,7 +24,7 @@
 	\brief Creates a new brData struct from a pointer and a data length.
 */
 
-brData::brData( void *inData, int inLen ) : brEvalObject() {
+brData::brData( const void *inData, int inLen ) : brEvalObject() {
 	length = inLen;
 	data = new unsigned char[ inLen ];
 	memcpy( data, inData, length );
@@ -36,24 +36,6 @@ brData::brData( void *inData, int inLen ) : brEvalObject() {
 
 brData::~brData() {
 	delete[] data;
-}
-
-/*!
-    \brief Increments the retain count of a brData struct.
-*/
-
-void brDataRetain( brData *d ) {
-	d->retain();
-}
-
-/*!
-	\brief Decrements the retain count of a brData struct.
-
-	Frees the struct if the retain count hits 0.
-*/
-
-void brDataUnretain( brData *d ) {
-	d->unretain();
 }
 
 /*!

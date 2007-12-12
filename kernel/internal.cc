@@ -83,6 +83,11 @@ int brNewBreveCall( brNamespace *n, char *name, int( *f )( brEval *a, brEval *r,
 
 	while ( ( value = va_arg( ap, int ) ) != 0 ) c->_argTypes[ c->_argCount++ ] = value;
 
+	if( c -> _argCount > ST_CMAX_ARGS ) {
+		slMessage( DEBUG_ALL, "Internal error: internal function \"%s\" exceeds allowed argument count\n", name );
+		return -1;
+	}
+
 	va_end( ap );
 
 	if ( !brNamespaceStore( n, name, 0, c ) ) {

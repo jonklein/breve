@@ -275,6 +275,8 @@ class slMeshShape : public slShape {
 		void 						bounds( const slPosition *position, slVector *min, slVector *max ) const;
 
 		virtual void				finishShape( double inDensity );
+		virtual void				finishShapeWithMaxLength( double inDensity, float inMaxLength );
+
 		virtual void				updateLastPosition( slPosition *inPosition );
 
 	protected:

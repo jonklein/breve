@@ -18,29 +18,20 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-extern "C" {
-
-void stGCRetain(brEval *eval);
 void stGCRetainPointer(void *pointer, int type);
-
-void stGCUnretain(brEval *eval);
 void stGCUnretainPointer(void *pointer, int type);
-
-void stGCCollect(brEval *eval);
 void stGCCollectPointer(void *pointer, int type);
 
 void stGCUnretainAndCollect(brEval *eval);
 DLLEXPORT void stGCUnretainAndCollectPointer(void *pointer, int type);
 
-void brEvalListRetain(brEvalListHead *h);
-void brEvalListUnretain(brEvalListHead *h);
 void brEvalListCollect(brEvalListHead *h);
-
-void brEvalHashRetain(brEvalHash *h);
-void brEvalHashUnretain(brEvalHash *h);
 void brEvalHashCollect(brEvalHash *h);
 
 void brEvalHashFreeGC(brEvalHash *h);
 void brEvalListFreeGC(brEvalListHead *h);
 
-}
+#define stGCRetain( e )		stGCRetainPointer( ( e ) -> getPointer(), ( e ) -> type() )
+#define stGCUnretain( e )	stGCUnretainAndCollectPointer( ( e )->getPointer(), ( e )->type() );
+#define stGCCollect( e )	stGCCollectPointer( ( e )->getPointer(), ( e )->type() );
+

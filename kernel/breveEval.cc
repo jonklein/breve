@@ -66,7 +66,8 @@ brEval::brEval( const brEval& inCopy ) {
 }
 
 brEval::~brEval() {
-	collect();
+	if( _needsCollect )
+		stGCUnretainAndCollectPointer( _values.pointerValue, _type );
 }
 
 brEval& brEval::operator=( const brEval& inCopy ) {

@@ -24,7 +24,7 @@
 
 class brData: public brEvalObject {
 	public:
-		brData( void *inData, int inLength );
+		brData( const void *inData, int inLength );
 		~brData();
 
 		unsigned char *data;
@@ -34,8 +34,6 @@ class brData: public brEvalObject {
 #ifdef __cplusplus
 extern "C" {
 #endif
-void brDataRetain(brData *);
-void brDataUnretain(brData *);
 void brDataCollect(brData *);
 
 char *brDataHexEncode( brData * );

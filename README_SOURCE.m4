@@ -131,10 +131,7 @@ Optional:
 
   Use version 0.9 or later and run configure with the following flags:
 
-  --enable 
-
-
-
+  --enable-double-precision --enable-release
 
   Be sure to compile with "dReal" as "double", as opposed to "float".
 

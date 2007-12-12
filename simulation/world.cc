@@ -438,6 +438,9 @@ double slWorld::step( double stepSize, int *error ) {
 					memset( &contact, 0, sizeof( dContact ) );
 					memcpy( &contact.geom, &c -> _contactGeoms[ n ], sizeof( dContactGeom ) );
 
+					contact.geom.g1 = NULL;
+					contact.geom.g2 = NULL;
+
 					contact.surface.mode = dContactBounce | dContactApprox1 | dContactSoftERP;
 					contact.surface.soft_erp = 0.05;
 					contact.surface.mu = mu;

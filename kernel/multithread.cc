@@ -38,8 +38,8 @@ void *brIterationThread( void *data ) {
 	brEngine *e = threadData->engine;
 
 	while ( 1 ) {
-		brInstance *i;
-		brMethod *m;
+		brInstance *i = NULL;
+		brMethod *m = NULL;
 		int rcode;
 		brEval result;
 

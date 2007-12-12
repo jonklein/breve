@@ -76,6 +76,7 @@ void slVectorCross(slVector *, slVector *, slVector *);
 double slVectorAngle(slVector *, slVector *);
 
 void slVectorNormalize(slVector *);
+float slVectorDist( slVector *inA, slVector *inB );
 
 void slVectorSet(slVector *, double, double, double);
 void slVectorPrint(slVector *);

@@ -1,6 +1,6 @@
 AC_PREREQ(2.57)
 
-AC_INIT([the breve simulation environment], [2.6.1], [jk@spiderland.org])
+AC_INIT([the breve simulation environment], [2.7d], [jk@spiderland.org])
 AC_CONFIG_HEADER([include/breve/config.h])
 
 VERSION=$PACKAGE_VERSION
@@ -314,7 +314,6 @@ if test "x$engine_only" = "x"; then
 	fi
 
 	AC_CHECK_LIB([termcap], [tputs])
-	// AC_CHECK_LIB([ncurses], [tputs])
 	AC_CHECK_LIB([history], [add_history])
 	AC_CHECK_LIB([readline], [readline])
 	AC_CHECK_LIB([3ds], [lib3ds_io_new])

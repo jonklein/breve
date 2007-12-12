@@ -102,3 +102,9 @@ int slVectorCompare( slVector *a, slVector *b ) {
 
 	return 0;
 }
+
+float slVectorDist( slVector *inA, slVector *inB ) {
+	slVector dest;
+	slVectorSub( inA, inB, &dest );
+	return slVectorLength( &dest );
+}

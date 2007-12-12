@@ -33,7 +33,8 @@ class brEvalHash : public brEvalObject {
 		~brEvalHash();
 
 		slHash *table;
-		int retainCount;
+
+		// int retainCount;
 };
 
 brEvalHash *brEvalHashNew(void);

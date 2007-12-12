@@ -1,0 +1,31 @@
+@use Mobile.
+@use PhysicalControl.
+@use Stationary.
+@use Link.
+@use Shape.
+@use Terrain.
+
+Controller MeshTest.
+
+PhysicalControl : MeshTest {
+
+	+ to init:
+		self enable-smooth-drawing.
+		self enable-fast-physics.
+
+		new Floor.
+
+		self make-shape with-name "car.3ds".
+		self make-shape with-name "knot.3ds".
+		self make-shape with-name "teddy.3ds".
+
+	+ to make-shape with-name name (string):
+		l (object).
+
+		l = new Mobile.
+		l enable-physics.
+		l set-shape to ( new MeshShape load-from-3ds file name with-size 2.5 ).
+		l move to random[ ( 8, 8, 8 ) ] - ( 4, -4, 4 ).
+
+		return l.
+}

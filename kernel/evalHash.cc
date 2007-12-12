@@ -20,44 +20,8 @@
 
 #include "kernel.h"
 
-/*
-bool brEval::operator<(brEval *b) {
-	if(type < b->type) return true;
-
-	if(type > b->type) return false;
-
-	switch(type) {
-		case AT_INT:
-			return BRINT(this) < BRINT( b );
-			break;
-		case AT_DOUBLE:
-			return BRDOUBLE( this ) < BRDOUBLE( b );
-			break;
-
-		case AT_STRING:
-			return strcmp( BRSTIRNG( this ), BRSTRING( b ) ) < 0;
-			break;
-
-		case AT_VECTOR:
-			break;
-
-		case AT_MATRIX:
-			break;
-
-		case AT_DATA:
-		case AT_POINTER:
-		case AT_INSTANCE:
-		case AT_HASH:
-		case AT_LIST:
-			return BRPOINTER( this ) < BRPOINTER( b );
-			break;
-	}
-}
-*/
-
 brEvalHash::brEvalHash() : brEvalObject() {
 	table = slNewHash( 1024, brEvalHashFunction, brEvalHashCompareFunction );
-	retainCount = 0;
 }
 
 /*!
