@@ -120,8 +120,7 @@ void slLink::step( slWorld *world, double step ) {
 void slLink::setShape( slShape *s ) {
 	slWorldObject::setShape( s );
 
-	// The ODE docs call dMatrix3 a 3x3 matrix.  but it's actually 4x3.
-	// go figure.
+	// dMatrix3 is actually 4x3.
 
 	dMassSetZero( &_massData );
 

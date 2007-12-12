@@ -61,6 +61,8 @@ slWorld::slWorld() {
 	dSetErrorHandler( slODEErrorHandler );
 	dSetMessageHandler( slODEErrorHandler );
 
+	dInitODE();
+
 	_odeCollisionGroupID = dJointGroupCreate( 0 );
 
 	_resolveCollisions = 0;
@@ -428,7 +430,7 @@ double slWorld::step( double stepSize, int *error ) {
 
 				mu = 1.0 + ( w1->_mu + w2->_mu ) / 2.0;
 
-				e = ( w1->_e + w2->_e ) / 2.0;
+				e = ( w1->_e + w2->_e ) / ( 2.0 * ( c -> _contactPoints ) );
 
 				for ( int n = 0; n < c -> _contactPoints; n++ ) {
 					dContact contact;
@@ -444,8 +446,10 @@ double slWorld::step( double stepSize, int *error ) {
 					contact.surface.bounce_vel = -0.05;
 
 					if( fabs( contact.geom.depth ) > 0.4 ) {
-						// printf( "depth = %f\n", contact.geom.depth );
+					//	printf( "depth = %f, e = %f\n", contact.geom.depth, e );
+					//	printf( "normal: ( %f, %f, %f )\n", contact.geom.normal[ 0 ], contact.geom.normal[ 1 ], contact.geom.normal[ 2 ] );
 					}
+
 				
 					if( cfm != 0.0 || erp != 0.0 ) {
 						contact.surface.mode |= dContactSoftCFM;
@@ -474,12 +478,12 @@ double slWorld::step( double stepSize, int *error ) {
 	for ( wi = _objects.begin(); wi != _objects.end(); wi++ ) {
 		slWorldObject *w = *wi;
 
-		if( w -> _shape )
+		if( w && w -> _shape )
 			w -> _shape -> updateLastPosition( &w -> _position );
 	}
 
 	if ( simulate != 0 ) {
-		if ( _odeStepMode == 0 )
+		if ( _odeStepMode == 0 ) 
 			dWorldStep( _odeWorldID, stepSize );
 		else
 			dWorldQuickStep( _odeWorldID, stepSize );

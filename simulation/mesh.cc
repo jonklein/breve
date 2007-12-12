@@ -29,6 +29,8 @@ int slMeshShape::createODEGeom() {
 	if( !_indices || !_vertices ) 
 		return -1;
 
+//	finishShapeWithMaxLength( 0, .4 );
+
 	slVectorSet( &_max, 0, 0, 0 );
 	slVectorSet( &_min, 0, 0, 0 );
 
@@ -61,17 +63,22 @@ int slMeshShape::createODEGeom() {
 	if( _odeGeomID[ 1 ] ) 
 		dGeomDestroy( _odeGeomID[ 1 ] );
 
-	dTriMeshDataID triMeshID = dGeomTriMeshDataCreate();
+	dTriMeshDataID triMeshID1 = dGeomTriMeshDataCreate();
+	dTriMeshDataID triMeshID2 = dGeomTriMeshDataCreate();
 	
-	dGeomTriMeshDataBuildSingle( triMeshID, 
+	dGeomTriMeshDataBuildSingle( triMeshID1, 
 		_vertices, 3 * sizeof( float ), _vertexCount,
 		_indices, _indexCount, 3 * sizeof( int ) );
 
-  	_odeGeomID[ 0 ] = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
-  	_odeGeomID[ 1 ] = dCreateTriMesh( 0, triMeshID, 0, 0, 0);
+	dGeomTriMeshDataBuildSingle( triMeshID2, 
+		_vertices, 3 * sizeof( float ), _vertexCount,
+		_indices, _indexCount, 3 * sizeof( int ) );
 
-	dGeomSetData( _odeGeomID[ 0 ], triMeshID );
-	dGeomSetData( _odeGeomID[ 1 ], triMeshID );
+  	_odeGeomID[ 0 ] = dCreateTriMesh( 0, triMeshID1, 0, 0, 0);
+  	_odeGeomID[ 1 ] = dCreateTriMesh( 0, triMeshID2, 0, 0, 0);
+
+	dGeomSetData( _odeGeomID[ 0 ], triMeshID1 );
+	dGeomSetData( _odeGeomID[ 1 ], triMeshID2 );
 
 	dMass m;
 	dMassSetTrimesh( &m, _density, _odeGeomID[ 0 ] );
@@ -118,7 +125,6 @@ void slMeshShape::draw( slCamera *c, double inTScaleX, double inTScaleY, int mod
 	slShape::draw( c, inTScaleX, inTScaleY, mode, flags );
 }
 
-
 void slMeshShape::updateLastPosition( slPosition *inPosition ) {
 	dMatrix4 transform;
 
@@ -137,9 +143,130 @@ void slMeshShape::updateLastPosition( slPosition *inPosition ) {
 	_lastPositionIndex = !_lastPositionIndex;
 }
 
-// void slMeshShape::finishShapeWithMaxLength( double inDensity, float inMaxSize ) {
-// 
-// }
+struct slTriangleIndex {
+	int _i1, _i2, _i3;
+};
+
+struct slTriangleBreakdownData {
+	std::vector< slVector > 			_vertices;
+	std::vector< slTriangleIndex > 		_indices;
+
+	void 								breakdown( int inA, int inB, int inStart );
+};
+
+#define TRYSPLIT( I1, I2 ) \
+	if( ( _indices[ n ].I1 == inA && _indices[ n ].I2 == inB ) || ( _indices[ n ].I1 == inB && _indices[ n ].I2 == inA ) ) {	\
+		newtri.I2 = newindex;					\
+		_indices[ n ].I1 = newindex;			\
+		_indices.push_back( newtri );			\
+		count++; \
+	} 
+
+
+void slTriangleBreakdownData::breakdown( int inA, int inB, int inStart ) {
+	slVector newpt;
+	slVectorAdd( &_vertices[ inA ], &_vertices[ inB ], &newpt );
+	slVectorMul( &newpt, .5, &newpt );
+	_vertices.push_back( newpt );
+	int newindex = _vertices.size() - 1;
+	int count = 0;
+
+	for( unsigned int n = inStart; n < _indices.size(); n++ ) {
+		slTriangleIndex newtri = _indices[ n ];
+
+		TRYSPLIT( _i1, _i2 )
+		TRYSPLIT( _i1, _i3 )
+		TRYSPLIT( _i2, _i3 )
+	}
+}
+
+void slMeshShape::finishShapeWithMaxLength( double inDensity, float inMaxSize ) {
+	slTriangleBreakdownData d;
+
+	for( int i = 0; i < _vertexCount * 3; i += 3 ) { 
+		slVector v;
+
+		slVectorSet( &v, _vertices[ i ], _vertices[ i + 1 ], _vertices[ i + 2 ] );
+		d._vertices.push_back( v );
+	}
+
+	for( int i = 0; i < _indexCount; i += 3 ) { 
+		slTriangleIndex t;
+
+		t._i1 = _indices[ i ];
+		t._i2 = _indices[ i + 1 ];
+		t._i3 = _indices[ i + 2 ];
+
+		d._indices.push_back( t );
+	}
+
+	unsigned int n = 0;
+	unsigned int origsize = d._indices.size();
+
+//	while( n < d._indices.size() ) {
+	int breakdowns = 0;
+
+	do {
+		breakdowns = 0;
+		
+		for( int n = 0; n < d._indices.size(); n++ ) {
+			slTriangleIndex *triangle = &d._indices[ n ];
+			int maxIndex = -1;
+			float size, maxSize = inMaxSize;
+
+			if( ( size = slVectorDist( &d._vertices[ triangle -> _i1 ], &d._vertices[ triangle -> _i2 ] ) ) > maxSize ) {
+				maxSize = size;
+				maxIndex = 0;
+			}
+
+			if( ( size = slVectorDist( &d._vertices[ triangle -> _i2 ], &d._vertices[ triangle -> _i3 ] ) ) > maxSize ) {
+				maxSize = size;
+				maxIndex = 1;
+			}
+
+			if( ( size = slVectorDist( &d._vertices[ triangle -> _i1 ], &d._vertices[ triangle -> _i3 ] ) ) > maxSize ) {
+				maxSize = size;
+				maxIndex = 2;
+			}
+
+			switch( maxIndex )  {
+				case 0:
+					breakdowns++;
+					d.breakdown( triangle -> _i1, triangle -> _i2, n );
+					break;
+				case 1:
+					breakdowns++;
+					d.breakdown( triangle -> _i2, triangle -> _i3, n );
+					break;
+				case 2:
+					breakdowns++;
+					d.breakdown( triangle -> _i1, triangle -> _i3, n );
+					break;
+			}
+		}
+
+	} while( breakdowns > 0 );
+
+	_vertexCount = d._vertices.size();	
+	_indexCount = d._indices.size() * 3;
+	delete[] _vertices;
+	delete[] _indices;
+
+	_vertices = new float[ _vertexCount * 3 ];
+	_indices  = new int[ _indexCount ];
+
+	for( int n = 0; n < _vertexCount; n++ ) {
+		_vertices[ n * 3     ] = d._vertices[ n ].x;
+		_vertices[ n * 3 + 1 ] = d._vertices[ n ].y;
+		_vertices[ n * 3 + 2 ] = d._vertices[ n ].z;
+	}
+
+	for( int n = 0; n < d._indices.size(); n++ ) {
+		_indices[ n * 3     ] = d._indices[ n ]._i1;
+		_indices[ n * 3 + 1 ] = d._indices[ n ]._i2;
+		_indices[ n * 3 + 2 ] = d._indices[ n ]._i3;
+	}
+}
 
 void slMeshShape::finishShape( double density ) {
 	int triCount = 0;
@@ -434,9 +561,9 @@ int sl3DSShape::addMaterial( std::string &inMaterialName, Lib3dsMaterial *inMate
 	memcpy( material._diffuse, inMaterial -> diffuse, sizeof( float ) * 4 );
 	memcpy( material._ambient, inMaterial -> ambient, sizeof( float ) * 4 );
 
-	material._ambient[ 3 ]  = inMaterial -> transparency;
-	material._diffuse[ 3 ]  = inMaterial -> transparency;
-	material._specular[ 3 ] = inMaterial -> transparency;
+	material._ambient[ 3 ]  = 1.0 - inMaterial -> transparency;
+	material._diffuse[ 3 ]  = 1.0 - inMaterial -> transparency;
+	material._specular[ 3 ] = 1.0 - inMaterial -> transparency;
 	material._twosided = inMaterial -> two_sided;
 
 	// printf( "material transparency: %f\n", inMaterial -> transparency );
@@ -513,7 +640,7 @@ void sl3DSShape::draw() {
 
 			glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, shine ); 
 
-			// glColor4fv( material -> _diffuse );
+			glColor4fv( material -> _diffuse );
 
 			// I CAN HAZ TEXTURZ?
 

@@ -360,9 +360,22 @@ int slVclipData::testPair( slCollisionCandidate *candidate, slCollision *ce ) {
 	dGeomSetRotation( s1 -> _odeGeomID[ 0 ], m1 );
 	dGeomSetRotation( s2 -> _odeGeomID[ 1 ], m2 );
 
+	dGeomMoved( s1 -> _odeGeomID[ 0 ] );
+	dGeomMoved( s2 -> _odeGeomID[ 1 ] );
+
+	if( !ce ) {
+		dContactGeom geom;
+
+		if( dCollide( s1 -> _odeGeomID[ 0 ], s2 -> _odeGeomID[ 1 ], 1, &geom, sizeof( dContactGeom ) ) ) 
+			return CT_PENETRATE;
+
+		return CT_DISJOINT;
+	}
+
 	ce -> _contactPoints = dCollide( s1 -> _odeGeomID[ 0 ], s2 -> _odeGeomID[ 1 ], MAX_ODE_CONTACTS, ce -> _contactGeoms, sizeof( dContactGeom ) );
 
 	if( ce -> _contactPoints > 0 ) {
+		// printf( "got %d contact points\n", ce -> _contactPoints );
 		ce->n1 = candidate -> _x;
 		ce->n2 = candidate -> _y;
 		return CT_PENETRATE;
