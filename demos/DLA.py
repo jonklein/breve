@@ -19,7 +19,7 @@ class DLA( breve.Control ):
 		newParticle = breve.createInstances( breve.Stationary, 1 )
 		newParticle.register( self.sphereShape, location )
 		newParticle.setColor( ( c + ( breve.randomExpression( breve.vector( 0.200000, 0.200000, 0.200000 ) ) - breve.vector( 0.100000, 0.100000, 0.100000 ) ) ) )
-		newParticle.setTexture( -1 )
+		newParticle.setTextureImage( 0 )
 		if ( breve.length( location ) > self.maxLocation ):
 			self.maxLocation = breve.length( location )
 

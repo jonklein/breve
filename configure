@@ -1284,7 +1284,11 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-
+--enable-engineonly	Eliminate as many optional libraries from build as possible
+--enable-static		Link staticly for as many libraries as possible
+--enable-perl			Build with support for Perl (not yet fully supported)
+--enable-python		Build with support for Python
+--enable-osxcompat104	Build on Mac OS X 10.5 to produce 10.4 compatible build
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1861,6 +1865,8 @@ case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
 
 
 
+python=yes
+
 # Check whether --enable-engineonly was given.
 if test "${enable_engineonly+set}" = set; then
   enableval=$enable_engineonly; engine_only=yes
@@ -1881,8 +1887,13 @@ if test "${enable_python+set}" = set; then
   enableval=$enable_python; python=yes
 fi
 
+# Check whether --enable-osxcompat104 was given.
+if test "${enable_osxcompat104+set}" = set; then
+  enableval=$enable_osxcompat104; osxcompat104=yes
+fi
 
-python=yes
+
+PYTHONROOT="/usr"
 
 if test "x$static" != "x"; then
 	BEGIN_STATIC="-Xlinker -Bstatic"
@@ -5891,6 +5902,13 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 		EXTRAOPTFLAGS="-mdynamic-no-pic -falign-loops=16 -ftree-vectorize -funroll-loops"
+
+		if test "x$osxcompat104"; then
+			CPPFLAGS="$CPPFLAGS -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"
+			LDFLAGS="$LDFLAGS -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
+			PYTHONROOT="/Developer/SDKs/MacOSX10.4u.sdk/usr"
+		fi
+
 		;;
 
 	cygwin* | mingw* )
@@ -6550,8 +6568,11 @@ esac
 #
 
 if test "x$python" != "x"; then
+	PYTHONINCLUDE=""
 
-{ echo "$as_me:$LINENO: checking for Py_Initialize in -lpython" >&5
+	# Python can come in so many exciting flavors, with different library names!
+
+	{ echo "$as_me:$LINENO: checking for Py_Initialize in -lpython" >&5
 echo $ECHO_N "checking for Py_Initialize in -lpython... $ECHO_C" >&6; }
 if test "${ac_cv_lib_python_Py_Initialize+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -6629,16 +6650,10 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_lib_python_Py_Initialize" >&5
 echo "${ECHO_T}$ac_cv_lib_python_Py_Initialize" >&6; }
 if test $ac_cv_lib_python_Py_Initialize = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBPYTHON 1
-_ACEOF
-
-  LIBS="-lpython $LIBS"
-
+  LIBS="$LIBS -lpython"    PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python"
 fi
 
-
-{ echo "$as_me:$LINENO: checking for Py_Initialize in -lpython2.3" >&5
+	{ echo "$as_me:$LINENO: checking for Py_Initialize in -lpython2.3" >&5
 echo $ECHO_N "checking for Py_Initialize in -lpython2.3... $ECHO_C" >&6; }
 if test "${ac_cv_lib_python2_3_Py_Initialize+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -6716,16 +6731,10 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_lib_python2_3_Py_Initialize" >&5
 echo "${ECHO_T}$ac_cv_lib_python2_3_Py_Initialize" >&6; }
 if test $ac_cv_lib_python2_3_Py_Initialize = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBPYTHON2_3 1
-_ACEOF
-
-  LIBS="-lpython2.3 $LIBS"
-
+  LIBS="$LIBS -lpython2.3" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.3"
 fi
 
-
-{ echo "$as_me:$LINENO: checking for Py_Initialize in -lpython23" >&5
+	{ echo "$as_me:$LINENO: checking for Py_Initialize in -lpython23" >&5
 echo $ECHO_N "checking for Py_Initialize in -lpython23... $ECHO_C" >&6; }
 if test "${ac_cv_lib_python23_Py_Initialize+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -6803,16 +6812,10 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_lib_python23_Py_Initialize" >&5
 echo "${ECHO_T}$ac_cv_lib_python23_Py_Initialize" >&6; }
 if test $ac_cv_lib_python23_Py_Initialize = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBPYTHON23 1
-_ACEOF
-
-  LIBS="-lpython23 $LIBS"
-
+  LIBS="$LIBS -lpython2.3" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.3"
 fi
 
-
-{ echo "$as_me:$LINENO: checking for Py_Initialize in -lpython2.4" >&5
+	{ echo "$as_me:$LINENO: checking for Py_Initialize in -lpython2.4" >&5
 echo $ECHO_N "checking for Py_Initialize in -lpython2.4... $ECHO_C" >&6; }
 if test "${ac_cv_lib_python2_4_Py_Initialize+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -6890,16 +6893,10 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_lib_python2_4_Py_Initialize" >&5
 echo "${ECHO_T}$ac_cv_lib_python2_4_Py_Initialize" >&6; }
 if test $ac_cv_lib_python2_4_Py_Initialize = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBPYTHON2_4 1
-_ACEOF
-
-  LIBS="-lpython2.4 $LIBS"
-
+  LIBS="$LIBS -lpython2.4" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.4"
 fi
 
-
-{ echo "$as_me:$LINENO: checking for Py_Initialize in -lpython24" >&5
+	{ echo "$as_me:$LINENO: checking for Py_Initialize in -lpython24" >&5
 echo $ECHO_N "checking for Py_Initialize in -lpython24... $ECHO_C" >&6; }
 if test "${ac_cv_lib_python24_Py_Initialize+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -6977,16 +6974,10 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_lib_python24_Py_Initialize" >&5
 echo "${ECHO_T}$ac_cv_lib_python24_Py_Initialize" >&6; }
 if test $ac_cv_lib_python24_Py_Initialize = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBPYTHON24 1
-_ACEOF
-
-  LIBS="-lpython24 $LIBS"
-
+  LIBS="$LIBS -lpython2.4" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.4"
 fi
 
-
-{ echo "$as_me:$LINENO: checking for Py_Initialize in -lpython2.5" >&5
+	{ echo "$as_me:$LINENO: checking for Py_Initialize in -lpython2.5" >&5
 echo $ECHO_N "checking for Py_Initialize in -lpython2.5... $ECHO_C" >&6; }
 if test "${ac_cv_lib_python2_5_Py_Initialize+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -7064,16 +7055,10 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_lib_python2_5_Py_Initialize" >&5
 echo "${ECHO_T}$ac_cv_lib_python2_5_Py_Initialize" >&6; }
 if test $ac_cv_lib_python2_5_Py_Initialize = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBPYTHON2_5 1
-_ACEOF
-
-  LIBS="-lpython2.5 $LIBS"
-
+  LIBS="$LIBS -lpython2.5" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.5"
 fi
 
-
-{ echo "$as_me:$LINENO: checking for Py_Initialize in -lpython25" >&5
+	{ echo "$as_me:$LINENO: checking for Py_Initialize in -lpython25" >&5
 echo $ECHO_N "checking for Py_Initialize in -lpython25... $ECHO_C" >&6; }
 if test "${ac_cv_lib_python25_Py_Initialize+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -7151,67 +7136,17 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_lib_python25_Py_Initialize" >&5
 echo "${ECHO_T}$ac_cv_lib_python25_Py_Initialize" >&6; }
 if test $ac_cv_lib_python25_Py_Initialize = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBPYTHON25 1
-_ACEOF
-
-  LIBS="-lpython25 $LIBS"
-
+  LIBS="$LIBS -lpython2.5" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.5"
 fi
 
 
-	if test "$ac_cv_lib_python2_3_Py_Initialize" = yes; then
+	if test "x$PYTHONINCLUDE" != ""; then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBPYTHON
 _ACEOF
 
-		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.3 -I/usr/include/python"
-	fi
-
-	if test "$ac_cv_lib_python23_Py_Initialize" = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_LIBPYTHON
-_ACEOF
-
-		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.3 -I/usr/include/python"
-	fi
-
-	if test "$ac_cv_lib_python2_4_Py_Initialize" = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_LIBPYTHON
-_ACEOF
-
-		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.4 -I/usr/include/python"
-	fi
-
-	if test "$ac_cv_lib_python24_Py_Initialize" = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_LIBPYTHON
-_ACEOF
-
-		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.4 -I/usr/include/python"
-	fi
-
-	if test "$ac_cv_lib_python2_5_Py_Initialize" = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_LIBPYTHON
-_ACEOF
-
-		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.5 -I/usr/include/python"
-	fi
-
-	if test "$ac_cv_lib_python25_Py_Initialize" = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_LIBPYTHON
-_ACEOF
-
-		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.5 -I/usr/include/python"
+		CPPFLAGS="${CPPFLAGS} ${PYTHONINCLUDE}"
 	fi
 fi
 
@@ -11811,6 +11746,93 @@ fi
 
 
 
+{ echo "$as_me:$LINENO: checking for FLAC__seekable_stream_encoder_init in -lFLAC" >&5
+echo $ECHO_N "checking for FLAC__seekable_stream_encoder_init in -lFLAC... $ECHO_C" >&6; }
+if test "${ac_cv_lib_FLAC_FLAC__seekable_stream_encoder_init+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lFLAC  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char FLAC__seekable_stream_encoder_init ();
+int
+main ()
+{
+return FLAC__seekable_stream_encoder_init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag" || test ! -s conftest.err'
+  { (case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_FLAC_FLAC__seekable_stream_encoder_init=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_FLAC_FLAC__seekable_stream_encoder_init=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_FLAC_FLAC__seekable_stream_encoder_init" >&5
+echo "${ECHO_T}$ac_cv_lib_FLAC_FLAC__seekable_stream_encoder_init" >&6; }
+if test $ac_cv_lib_FLAC_FLAC__seekable_stream_encoder_init = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBFLAC 1
+_ACEOF
+
+  LIBS="-lFLAC $LIBS"
+
+fi
+
+
 { echo "$as_me:$LINENO: checking for sf_open in -lsndfile" >&5
 echo $ECHO_N "checking for sf_open in -lsndfile... $ECHO_C" >&6; }
 if test "${ac_cv_lib_sndfile_sf_open+set}" = set; then
@@ -11984,93 +12006,6 @@ if test $ac_cv_lib_portaudio_Pa_OpenStream = yes; then
 _ACEOF
 
   LIBS="-lportaudio $LIBS"
-
-fi
-
-
-{ echo "$as_me:$LINENO: checking for FLAC__seekable_stream_encoder_init in -lFLAC" >&5
-echo $ECHO_N "checking for FLAC__seekable_stream_encoder_init in -lFLAC... $ECHO_C" >&6; }
-if test "${ac_cv_lib_FLAC_FLAC__seekable_stream_encoder_init+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lFLAC  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char FLAC__seekable_stream_encoder_init ();
-int
-main ()
-{
-return FLAC__seekable_stream_encoder_init ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_cxx_werror_flag" || test ! -s conftest.err'
-  { (case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_lib_FLAC_FLAC__seekable_stream_encoder_init=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_lib_FLAC_FLAC__seekable_stream_encoder_init=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ echo "$as_me:$LINENO: result: $ac_cv_lib_FLAC_FLAC__seekable_stream_encoder_init" >&5
-echo "${ECHO_T}$ac_cv_lib_FLAC_FLAC__seekable_stream_encoder_init" >&6; }
-if test $ac_cv_lib_FLAC_FLAC__seekable_stream_encoder_init = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBFLAC 1
-_ACEOF
-
-  LIBS="-lFLAC $LIBS"
 
 fi
 

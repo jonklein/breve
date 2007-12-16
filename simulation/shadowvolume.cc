@@ -51,8 +51,12 @@ void slShape::drawShadowVolume( slCamera *c, slPosition *p ) {
 		// look at this edge's faces, and calculate the dot product
 		// with the light's vector.
 
-		slVectorXform( p->rotation, &f1->plane.normal, &n1 );
-		slVectorXform( p->rotation, &f2->plane.normal, &n2 );
+		slMatrix t;
+
+		slMatrixMulMatrix( p -> rotation, _transform, t );
+
+		slVectorXform( t, &f1->plane.normal, &n1 );
+		slVectorXform( t, &f2->plane.normal, &n2 );
 
 		d1 = slVectorDot( &n1, &lNormal );
 		d2 = slVectorDot( &n2, &lNormal );
@@ -61,7 +65,7 @@ void slShape::drawShadowVolume( slCamera *c, slPosition *p ) {
 		// towards the light, and the other is facing away?
 
 		if ( d1 * d2 < 0.0 || ( d1 * d2 == 0.0 && ( d1 + d2 ) > 0.0 ) ) {
-			slVector *v, ts, te, sBottom, eBottom;
+			slVector ts, te, sBottom, eBottom;
 			slFace *topFace;
 			int n;
 			int flip = 0;
@@ -77,23 +81,24 @@ void slShape::drawShadowVolume( slCamera *c, slPosition *p ) {
 				}
 			}
 
-			if ( !flip ) {
-				slVector tv;
+			slVector *v1, *v2;
 
-				v = &(( slPoint* )e->neighbors[0] )->vertex;
-				slVectorMul( v, 1.01, &tv );
-				slPositionVertex( p, &tv, &ts );
-				v = &(( slPoint* )e->neighbors[1] )->vertex;
-				slVectorMul( v, 1.01, &tv );
-				slPositionVertex( p, &tv, &te );
+			if ( !flip ) {
+				v1 = &(( slPoint* )e->neighbors[0] )->vertex;
+				v2 = &(( slPoint* )e->neighbors[1] )->vertex;
 			} else {
-				v = &(( slPoint* )e->neighbors[1] )->vertex;
-				slVectorMul( v, 1.01, &tv );
-				slPositionVertex( p, &tv, &ts );
-				v = &(( slPoint* )e->neighbors[0] )->vertex;
-				slVectorMul( v, 1.01, &tv );
-				slPositionVertex( p, &tv, &te );
+				v1 = &(( slPoint* )e->neighbors[1] )->vertex;
+				v2 = &(( slPoint* )e->neighbors[0] )->vertex;
 			}
+
+			slVectorMul( v1, 1.01, &ts );
+			slVectorXform( _transform, &ts, &tv );
+			slPositionVertex( p, &tv, &ts );
+
+			slVectorMul( v2, 1.01, &te );
+			slVectorXform( _transform, &te, &tv );
+			slPositionVertex( p, &tv, &te );
+
 
 			slVectorSub( &ts, &light, &sBottom );
 
@@ -136,26 +141,25 @@ void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
 	else slVectorSet( &x2, lNormal.x, lNormal.z, lNormal.y );
 
 	slVectorCross( &lNormal, &x2, &x1 );
-
 	slVectorCross( &lNormal, &x1, &x2 );
 
 	slVectorNormalize( &x1 );
-
 	slVectorNormalize( &x2 );
 
 	glBegin( GL_QUADS );
 
 	divisions = ( int )( _radius * 5.0 );
 
-	if ( divisions < MIN_SPHERE_VOLUME_DIVISIONS ) divisions = MIN_SPHERE_VOLUME_DIVISIONS;
-	else if ( divisions > MAX_SPHERE_VOLUME_DIVISIONS ) divisions = MAX_SPHERE_VOLUME_DIVISIONS;
+	if ( divisions < MIN_SPHERE_VOLUME_DIVISIONS ) 
+		divisions = MIN_SPHERE_VOLUME_DIVISIONS;
+	else if ( divisions > MAX_SPHERE_VOLUME_DIVISIONS ) 
+		divisions = MAX_SPHERE_VOLUME_DIVISIONS;
 
 	if ( !inited ) {
 		double step = ( 2.0 * M_PI / 360.0 );
 		inited = 1;
 
 		for ( n = 0; n < 361;n++ ) {
-
 			sineTable[ n] = sin( step * n ) * 1.05;
 			cosineTable[ n] = cos( step * n ) * 1.05;
 		}
@@ -265,7 +269,8 @@ void slCamera::renderObjectShadowVolumes( slWorld *w ) {
 	std::vector<slWorldObject*>::iterator wi;
 
 	glDisable( GL_BLEND );
-	glColor4f( 0, 0, 0, 1 );
+	// glColor4f( 0, 0, 0, ( *wi ) -> _transparency );
+	glColor4f( 0, 0, 0, 1.0 );
 
 	for ( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ ) {
 		if ( *wi && ( *wi )->_shape && !( *wi )->_drawAsPoint && ( *wi )->_drawShadow ) {

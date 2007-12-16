@@ -740,33 +740,33 @@ std::string stEvalExp::toPython( stPyConversionData *inData ) {
 	std::string result;
 	char format[ 1024 ];
 
-	switch( eval->type() ) {
+	switch( _eval.type() ) {
 		case AT_STRING:
 			result += "\"";
-			result +=  BRSTRING( eval );
+			result +=  BRSTRING( &_eval );
 			result += "\"";
 			break;
 
 		case AT_VECTOR:
-			sprintf( format, "breve.vector( %f, %f, %f )", BRVECTOR( eval ).x, BRVECTOR( eval ).y, BRVECTOR( eval ).z );
+			sprintf( format, "breve.vector( %f, %f, %f )", BRVECTOR( &_eval ).x, BRVECTOR( &_eval ).y, BRVECTOR( &_eval ).z );
 			result = format;
 			break;
 
 		case AT_MATRIX:
 			sprintf( format, "breve.matrix( %f, %f, %f, %f, %f, %f, %f, %f, %f )", 
-				BRMATRIX( eval )[ 0 ][ 0 ], BRMATRIX( eval )[ 0 ][ 1 ], BRMATRIX( eval )[ 0 ][ 2 ], 
-				BRMATRIX( eval )[ 1 ][ 0 ], BRMATRIX( eval )[ 1 ][ 1 ], BRMATRIX( eval )[ 1 ][ 2 ], 
-				BRMATRIX( eval )[ 2 ][ 0 ], BRMATRIX( eval )[ 2 ][ 1 ], BRMATRIX( eval )[ 2 ][ 2 ] );
+				BRMATRIX( &_eval )[ 0 ][ 0 ], BRMATRIX( &_eval )[ 0 ][ 1 ], BRMATRIX( &_eval )[ 0 ][ 2 ], 
+				BRMATRIX( &_eval )[ 1 ][ 0 ], BRMATRIX( &_eval )[ 1 ][ 1 ], BRMATRIX( &_eval )[ 1 ][ 2 ], 
+				BRMATRIX( &_eval )[ 2 ][ 0 ], BRMATRIX( &_eval )[ 2 ][ 1 ], BRMATRIX( &_eval )[ 2 ][ 2 ] );
 			result = format;
 			break;
 
 		case AT_INT:
-			sprintf( format, "%d", BRINT( eval ) );
+			sprintf( format, "%d", BRINT( &_eval ) );
 			result = format;
 			break;
 
 		case AT_DOUBLE:
-			sprintf( format, "%f", BRFLOAT( eval ) );
+			sprintf( format, "%f", BRFLOAT( &_eval ) );
 			result = format;
 			break;
 
@@ -790,22 +790,8 @@ std::string stSortExp::toPython( stPyConversionData *inData ) {
 	return std::string( "" );
 }
 
-std::string stDoubleExp::toPython( stPyConversionData *inData ) {
-	char numstr[ 1024 ];
-	sprintf( numstr, "%f", doubleValue );
-	std::string result = numstr;
-	return result;
-}
-
 std::string stDuplicateExp::toPython( stPyConversionData *inData ) {
 	return expression->toPython( inData );
-}
-
-std::string stIntExp::toPython( stPyConversionData *inData ) {
-	char numstr[ 1024 ];
-	sprintf( numstr, "%i", intValue );
-	std::string result = numstr;
-	return result;
 }
 
 std::string stLoadExp::toPython( stPyConversionData *inData ) {

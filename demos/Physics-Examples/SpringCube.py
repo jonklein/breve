@@ -35,8 +35,6 @@ class SpringController( breve.PhysicalControl ):
 		self.NODES = ( ( 3 * 3 ) * 3 )
 		self.setBackgroundColor( breve.vector( 0.700000, 0.700000, 0.700000 ) )
 		self.pointCamera( breve.vector( 0, 10, 0 ), breve.vector( 70, 20, 70 ) )
-		self.enableFastPhysics()
-		self.setFastPhysicsIterations( 5 )
 		self.nodes = breve.createInstances( breve.Nodes, self.NODES )
 		self.nodes.enablePhysics()
 		x = 0
@@ -46,7 +44,7 @@ class SpringController( breve.PhysicalControl ):
 				z = 0
 				while ( z < 3 ):
 					startblock = ( ( x + ( y * 3 ) ) + ( ( z * 3 ) * 3 ) )
-					self.nodes[ startblock ].move( breve.vector( ( ( x * 9 ) - ( ( 3 / 2 ) * 9 ) ), ( ( y * 9 ) + 60 ), ( ( z * 9 ) - ( ( 3 / 2 ) * 9 ) ) ) )
+					self.nodes[ startblock ].move( breve.vector( ( ( x * 9 ) - ( ( 3 / 2 ) * 9 ) ), ( ( y * 9 ) + 20 ), ( ( z * 9 ) - ( ( 3 / 2 ) * 9 ) ) ) )
 
 					z = ( z + 1 )
 
@@ -57,7 +55,7 @@ class SpringController( breve.PhysicalControl ):
 			x = ( x + 1 )
 
 		self.setGravity( breve.vector( 0, -9.800000, 0 ) )
-		breve.createInstances( breve.Stationary, 1 ).register( breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 1200, 1, 1200 ) ) )
+		breve.createInstances( breve.Floor, 1 )
 		x = 0
 		while ( x < NUMEDGESONSIDE ):
 			y = 0
@@ -90,7 +88,7 @@ class SpringController( breve.PhysicalControl ):
 							if ( complength > 0 ):
 								startblock = ( ( ( x + xoff1 ) + ( ( y + yoff1 ) * 3 ) ) + ( ( ( z + zoff1 ) * 3 ) * 3 ) )
 								endblock = ( ( ( x + xoff2 ) + ( ( y + yoff2 ) * 3 ) ) + ( ( ( z + zoff2 ) * 3 ) * 3 ) )
-								breve.createInstances( breve.Spring, 1 ).connect( self.nodes[ startblock ], self.nodes[ endblock ], breve.vector( 0, 0, 0 ), breve.vector( 0, 0, 0 ), complength, 5 )
+								breve.createInstances( breve.Spring, 1 ).connect( self.nodes[ startblock ], self.nodes[ endblock ], breve.vector( 0, 0, 0 ), breve.vector( 0, 0, 0 ), complength, 0 )
 								numsprings = ( numsprings + 1 )
 
 
@@ -109,7 +107,6 @@ class SpringController( breve.PhysicalControl ):
 
 			x = ( x + 1 )
 
-		self.nodes[ 0 ].setVelocity( breve.vector( 100, 0, 0 ) )
 		print '''NumSprings = %s''' % (  numsprings )
 
 

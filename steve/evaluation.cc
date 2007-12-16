@@ -22,6 +22,16 @@
 #include "expression.h"
 #include "evaluation.h"
 
+// The only eval-exp that requires the 4th argument is a method call object lookup,
+// which could potentially be a 'self' or 'super'.  Those two expressions will never
+// have the RTC block created, so it's safe to ignore the argument if there's a block
+
+#define stExpEval4( s, i, r, t ) \
+    ( ( ( s ) && ( s )->block ) ? ( s )->block->calls.stRtcEval3( ( s ), ( i ), ( r ) ) : stExpEval( ( s ), ( i ), ( r ), ( t ) ) )
+
+#define stExpEval3( s, i, r ) \
+    ( ( ( s ) && ( s )->block ) ?  ( s )->block->calls.stRtcEval3( ( s ), ( i ), ( r ) ) : stExpEval( ( s ), ( i ), ( r ), NULL ) )
+
 /*!
  * This is the heart of steve language evaluation.  it takes parse trees and 
  * executes them.  The most basic entity is the stExp which is a wrapper 
@@ -157,7 +167,7 @@ void stRtcInitVar( stRtcVar *var ) {
 	var->next			= NULL;
 }
 
-void stRtcInitFunc( stRtcFunc *func ) {
+void stRtcInitFuncXXX( stRtcFunc *func ) {
 	unsigned int	i;
 
 	func->gp_mask = 0;
@@ -177,7 +187,7 @@ void stRtcInitFunc( stRtcFunc *func ) {
 	func->vp_reg_list = 0;
 }
 
-void stRtcAllocGPReg( stRtcCodeBlock *bloc, stRtcFunc *func, stRtcVar *var ) {
+void stRtcAllocGPRegXXX( stRtcCodeBlock *bloc, stRtcFunc *func, stRtcVar *var ) {
 	unsigned int	i, bit;
 	stRtcVar		*temp;
 
@@ -211,7 +221,7 @@ void stRtcAllocGPReg( stRtcCodeBlock *bloc, stRtcFunc *func, stRtcVar *var ) {
 	// move reg to head
 }
 
-void stLoadGPReg( stRtcCodeBlock *block, stRtcFunc *func, stRtcVar *var ) {
+void stLoadGPRegXXX( stRtcCodeBlock *block, stRtcFunc *func, stRtcVar *var ) {
 	if ( var->reg != 0xff )
 		return;
 
@@ -219,7 +229,7 @@ void stLoadGPReg( stRtcCodeBlock *block, stRtcFunc *func, stRtcVar *var ) {
 	// move reg to head
 }
 
-void stRtcAllocFPReg( stRtcCodeBlock *bloc, stRtcFunc *func, stRtcVar *var ) {
+void stRtcAllocFPRegXXX( stRtcCodeBlock *bloc, stRtcFunc *func, stRtcVar *var ) {
 	unsigned int	i, bit;
 	stRtcVar		*temp;
 
@@ -1135,20 +1145,20 @@ inline int brEvalListExp( stListExp *le, stRunInstance *i, brEval *result ) {
 	return EC_OK;
 }
 
-/*!
-	\brief Initiates evaluation of a method call expression in steve.
-
-	This function doesn't do the actual method calling--it evaluates the
-	calling object or object-list, and then calls \ref stRealEvalMethodCall
-	for each object.
-*/
+/**
+ * \brief Initiates evaluation of a method call expression in steve.
+ * This function doesn't do the actual method calling--it evaluates the
+ * calling object or object-list, and then calls \ref stRealEvalMethodCall
+ * for each object.
+ */
 
 RTC_INLINE int stEvalMethodCall( stMethodExp *mexp, stRunInstance *i, brEval *t ) {
 	stRunInstance ri;
 	brEval obj;
 	int r;
 
-	r = stExpEval( mexp->objectExp, i, &obj, &ri.type );
+	ri.type = NULL;
+	r = stExpEval4( mexp->objectExp, i, &obj, &ri.type );
 
 	if ( r != EC_OK )
 		return r;
@@ -1176,8 +1186,9 @@ RTC_INLINE int stEvalMethodCall( stMethodExp *mexp, stRunInstance *i, brEval *t 
 
 	if ( obj.type() == AT_LIST ) {
 		std::vector< brEval >::iterator li;
+		brEvalListHead *l = BRLIST( &obj );
 
-		for ( li = BRLIST( &obj )->_vector.begin(); li != BRLIST( &obj )->_vector.end(); li++ ) {
+		for ( li = l->_vector.begin(); li != l->_vector.end(); li++ ) {
 			brEval *listeval = &(*li);
 
 			if ( !BRINSTANCE( listeval ) || BRINSTANCE( listeval )->status != AS_ACTIVE ) {
@@ -1216,7 +1227,7 @@ int stEvalForeignMethodCall( stMethodExp *mexp, brInstance *caller, stRunInstanc
 
 		argps[n] = &args[n];
 
-		resultCode = stExpEval( k->value, i, &args[ n ], NULL );
+		resultCode = stExpEval3( k->value, i, &args[ n ] );
 
 		if ( resultCode != EC_OK )
 			return resultCode;
@@ -1250,22 +1261,21 @@ inline int stRealEvalMethodCall( stMethodExp *mexp, stRunInstance *target, stRun
 		return EC_ERROR;
 	}
 
-	// when we look up a method, we can remember its address for next time
-	// if the same object type is being used.  otherwise, we need to look
-	// it up again.  there is a fair amount of computation here looking up
-	// the method and argument order, so caching it is good.
+	// When we look up a method, we can remember its address and argument ordering for next time.
+	// We'll keep method cache data for each individual object type we come across.
 
-	if ( mexp->objectCache != target->type ) {
-		stMethod *method;
+	stMethodExpCache *cachedata = &mexp -> _cache[ target->type ];
+
+	if ( cachedata -> _method == NULL ) { 
 		stObject *newType;
 
-		method = stFindInstanceMethodWithMinArgs( target->type, mexp->methodName.c_str(), mexp->arguments.size(), &newType );
+		cachedata -> _method = stFindInstanceMethodWithMinArgs( target->type, mexp->methodName.c_str(), mexp->arguments.size(), &newType );
 
-		if ( !method ) {
-			// for backwards compatibility, we'll make missing iterate methods be a no-op
-			// instead of an error.
+		if ( !cachedata -> _method ) {
+			// for backwards compatibility, we'll make missing iterate methods be a no-op instead of an error.
 
-			if( mexp->methodName == "iterate" ) return EC_OK;
+			if( mexp->methodName == "iterate" ) 
+				return EC_OK;
 
 			// can't find the method!
 
@@ -1278,19 +1288,10 @@ inline int stRealEvalMethodCall( stMethodExp *mexp, stRunInstance *target, stRun
 
 			stEvalError( target->instance, EE_UNKNOWN_METHOD, "object type \"%s\" does not respond to method \"%s\" with %d %s", target->type->name.c_str(), mexp->methodName.c_str(), mexp->arguments.size(), kstring );
 
-			mexp->objectCache = NULL;
-
 			return EC_ERROR;
 		}
 
-		// target->type = newType;
-		// target->type = newType;
-
-		mexp->method = method;
-
-		mexp->objectCache = target->instance->type;
-
-		mexp->objectTypeCache = target->type;
+		cachedata -> _baseObjectCache = target -> type;
 
 		argCount = mexp->arguments.size();
 
@@ -1299,24 +1300,21 @@ inline int stRealEvalMethodCall( stMethodExp *mexp, stRunInstance *target, stRun
 		for ( n = 0; n < argCount; ++n )
 			mexp->arguments[n]->position = -1;
 
-		mexp->positionedArguments.clear();
-
-		mexp->positionedArguments.reserve( mexp->method->keywords.size() );
-
-		for ( n = 0; n < mexp->method->keywords.size(); ++n ) {
+		for ( n = 0; n < cachedata -> _method -> keywords.size(); ++n ) {
 			// look for the method's Nth keyword
 
 			key = NULL;
-			keyEntry = mexp->method->keywords[n];
+			keyEntry = cachedata -> _method -> keywords[ n ];
 
-			for ( m = 0; m < argCount; ++m ) {
+			for ( m = 0; m < argCount; m++ ) {
 				// go through all the arguments, checking what was passed in.
 
-				tmpkey = mexp->arguments[m];
+				tmpkey = mexp -> arguments[ m ];
 
 				if ( tmpkey->position == -1 && tmpkey->word == keyEntry->keyword ) {
 					tmpkey->position = n;
 					key = tmpkey;
+					m = argCount;
 				}
 			}
 
@@ -1324,53 +1322,53 @@ inline int stRealEvalMethodCall( stMethodExp *mexp, stRunInstance *target, stRun
 				key = keyEntry->defaultKey;
 
 			if ( !key ) {
-				stEvalError( target->instance, EE_MISSING_KEYWORD, "Call to method %s of class %s missing keyword \"%s\"", mexp->method->name.c_str(), target->type->name.c_str(), keyEntry->keyword.c_str() );
-				mexp->objectCache = NULL;
+				stEvalError( target->instance, EE_MISSING_KEYWORD, "Call to method %s of class %s missing keyword \"%s\"", cachedata -> _method -> name.c_str(), target->type->name.c_str(), keyEntry->keyword.c_str() );
+				cachedata -> _method = NULL;
 				return EC_ERROR;
 			}
 
-			mexp->positionedArguments.push_back( key );
+			cachedata -> _positionedArguments.push_back( key );
 		}
 
 		for ( n = 0; n < argCount; ++n ) {
 			if ( mexp->arguments[n]->position == -1 ) {
 				tmpkey = mexp->arguments[n];
 
-				stEvalError( target->instance, EE_UNKNOWN_KEYWORD, "Unknown keyword \"%s\" in call to method \"%s\"", tmpkey->word.c_str(), mexp->method->name.c_str() );
-				mexp->objectCache = NULL;
+				stEvalError( target->instance, EE_UNKNOWN_KEYWORD, "Unknown keyword \"%s\" in call to method \"%s\"", tmpkey->word.c_str(), cachedata -> _method -> name.c_str() );
+				cachedata -> _method = NULL;
 				return EC_ERROR;
 			}
 		}
-	} else
-		target->type = mexp->objectTypeCache;
 
-	if ( mexp->method->inlined ) {
+	} 
+
+	target -> type = cachedata -> _baseObjectCache;
+
+	if ( cachedata -> _method -> inlined ) {
 		// The method is inlined if it has no local variables, and no arguments
 
-		int resultCode;
+		int resultCode = stEvalExpVector( &cachedata -> _method -> code, target, t );
 
-		resultCode = stEvalExpVector( &mexp->method->code, target, t );
-
-		if ( resultCode == EC_STOP ) return EC_OK;
+		if ( resultCode == EC_STOP ) 
+			return EC_OK;
 
 		return resultCode;
 	}
 
-	// we don't want to reuse the same argps in the case of a recursive function
-	// so we create some local storage for them.
+	// we don't want to reuse the same argps in the case of a 
+	// recursive function so we create some local storage for them.
 
-	brEval args[ mexp->method->keywords.size() ];
+	brEval args[ cachedata -> _method -> keywords.size() ];
 
-	const brEval *argps[ mexp->method->keywords.size() ];
+	const brEval *argps[ cachedata -> _method -> keywords.size() ];
 
-	for ( n = 0; n < mexp->method->keywords.size(); ++n )
+	for ( n = 0; n < cachedata -> _method -> keywords.size(); ++n ) {
 		argps[n] = &args[n];
 
-	for ( n = 0; n < mexp->method->keywords.size(); ++n ) {
-		key = mexp->positionedArguments[n];
+		key = cachedata -> _positionedArguments[ n ];
 
 		if ( !key ) {
-			slMessage( DEBUG_ALL, "Missing keyword for method \"%s\"\n", mexp->method->name.c_str() );
+			slMessage( DEBUG_ALL, "Missing keyword for method \"%s\"\n", cachedata -> _method -> name.c_str() );
 			return EC_ERROR;
 		}
 
@@ -1379,18 +1377,14 @@ inline int stRealEvalMethodCall( stMethodExp *mexp, stRunInstance *target, stRun
 		resultCode = stExpEval3( key->value, caller, &args[ n ] );
 
 		if ( resultCode != EC_OK ) {
-			if ( resultCode != EC_ERROR_HANDLED ) slMessage( DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", key->word.c_str(), mexp->method->name.c_str() );
+			if ( resultCode != EC_ERROR_HANDLED ) 
+				slMessage( DEBUG_ALL, "Error evaluating keyword \"%s\" for method \"%s\"\n", key->word.c_str(), cachedata -> _method -> name.c_str() );
 
 			return resultCode;
 		}
 	}
 
-	if ( !mexp->method )
-		return EC_OK;
-
-	resultCode = stCallMethod( caller, target, mexp->method, argps, mexp->method->keywords.size(), t );
-
-	return resultCode;
+	return stCallMethod( caller, target, cachedata -> _method, argps, cachedata -> _method -> keywords.size(), t );
 }
 
 /*!
@@ -2058,7 +2052,7 @@ RTC_INLINE int stEvalVectorElementAssignExp( stVectorElementAssignExp *s, stRunI
 */
 
 RTC_INLINE int stEvalCallFunc( stCCallExp *c, stRunInstance *i, brEval *result ) {
-	brEval evals[ ST_CMAX_ARGS ];
+	brEval evals[ c->_function->_argCount ];
 
 	int n, resultCode;
 
@@ -2124,9 +2118,6 @@ RTC_INLINE int stEvalCallFunc( stCCallExp *c, stRunInstance *i, brEval *result )
 	}
 
 cleanup:
-	// for( int n = 0; n < ST_CMAX_ARGS; n++ ) 
-	// 	evals[ n ].clear();
-
 	return resultCode;
 }
 
@@ -2973,45 +2964,40 @@ RTC_INLINE int stEvalBinaryExp( stBinaryExp *b, stRunInstance *i, brEval *result
 RTC_INLINE int stEvalBinaryExpWithEvals( stRunInstance *i, unsigned char op, brEval *tl, brEval *tr, brEval *result ) {
 	int c;
 
-	if ( tl->type() == AT_INT && tr->type() == AT_INT ) {
+	int t1 = tl -> type();
+	int t2 = tr -> type();
+
+	if ( t1 == AT_INT && t2 == AT_INT ) 
 		return stEvalBinaryIntExp( op, tl, tr, result, i );
-	}
 
-	/* if either expression is a matrix... */
+	// if either expression is a matrix... 
 
-	if ( tl->type() == AT_MATRIX || tr->type() == AT_MATRIX ) {
+	if ( t1 == AT_MATRIX || t2 == AT_MATRIX ) 
 		return stEvalBinaryMatrixExp( op, tl, tr, result, i );
-	}
 
-	/* if either expression is a vector... */
+	// if either expression is a vector... 
 
-	if ( tl->type() == AT_VECTOR || tr->type() == AT_VECTOR ) {
+	if ( t1 == AT_VECTOR || t2 == AT_VECTOR ) 
 		return stEvalBinaryVectorExp( op, tl, tr, result, i );
-	}
 
-	/* if we have two strings and they're testing for equality or inequality */
-	/* we do a string compare--otherwise we'll convert to doubles and handle */
-	/* the expression that way */
+	// if we have two strings and they're testing for equality or inequality 
+	// we do a string compare--otherwise we'll convert to doubles and handle 
+	// the expression that way 
 
-	if ( tr->type() == AT_STRING && tl->type() == AT_STRING && ( op == BT_EQ || op == BT_NE ) ) {
+	if ( t2 == AT_STRING && t1 == AT_STRING && ( op == BT_EQ || op == BT_NE ) )
 		return stEvalBinaryStringExp( op, tl, tr, result, i );
-	}
 
-	if ( tr->type() == AT_LIST && tl->type() == AT_LIST && ( op == BT_EQ || op == BT_NE ) ) {
+	if ( t2 == AT_LIST && t1 == AT_LIST && ( op == BT_EQ || op == BT_NE ) )
 		return stEvalBinaryEvalListExp( op, tl, tr, result, i );
-	}
 
-	if ( tr->type() == AT_STRING ) if (( c = stToDouble( tr, tr, i ) ) != EC_OK ) return c;
+	if ( t2 == AT_STRING ) if (( c = stToDouble( tr, tr, i ) ) != EC_OK ) return c;
+	else if ( t2 == AT_LIST ) if (( c = stToInt( tr, tr, i ) ) != EC_OK ) return c;
 
-	if ( tl->type() == AT_STRING ) if (( c = stToDouble( tl, tl, i ) ) != EC_OK ) return c;
+	if ( t1 == AT_STRING ) if (( c = stToDouble( tl, tl, i ) ) != EC_OK ) return c;
+	else if ( t1 == AT_LIST ) if (( c = stToInt( tl, tl, i ) ) != EC_OK ) return c;
 
-	if ( tr->type() == AT_LIST ) if (( c = stToInt( tr, tr, i ) ) != EC_OK ) return c;
-
-	if ( tl->type() == AT_LIST ) if (( c = stToInt( tl, tl, i ) ) != EC_OK ) return c;
-
-	if ( tl->type() == AT_DOUBLE || tr->type() == AT_DOUBLE ) {
+	if ( t1 == AT_DOUBLE || t2 == AT_DOUBLE ) 
 		return stEvalBinaryDoubleExp( op, tl, tr, result, i );
-	}
 
 	return stEvalBinaryIntExp( op, tl, tr, result, i );
 }
@@ -3137,7 +3123,8 @@ int stCallMethod( stRunInstance *caller, stRunInstance *target, stMethod *method
 
 	// if there is no current stackpointer (outermost frame), start at the end of the stack
 
-	if ( savedStackPointer == NULL ) steveData->stack = &steveData->stackBase[ST_STACK_SIZE];
+	if ( savedStackPointer == NULL ) 
+		steveData->stack = &steveData->stackBase[ ST_STACK_SIZE ];
 
 	// step down the stack enough to make room for the current calling method
 
@@ -3181,6 +3168,11 @@ int stCallMethod( stRunInstance *caller, stRunInstance *target, stMethod *method
 
 	resultCode = stEvalExpVector( &method->code, target, result );
 
+	if ( resultCode == EC_STOP ) 
+		resultCode = EC_OK;
+
+
+
 	// unretain the local variables
 
 	std::vector< stVar* >::iterator vi;
@@ -3188,24 +3180,25 @@ int stCallMethod( stRunInstance *caller, stRunInstance *target, stMethod *method
 	for ( vi = method->variables.begin(); vi != method->variables.end(); vi++ ) {
 		brEval e;
 
-		if (( *vi )->type->_type != AT_STRING || *( void** )&newStStack[( *vi )->offset] != BRSTRING( result ) )
+		if ( stGCNEEDSCOLLECT( ( *vi )->type->_type ) && (
+				( *vi )->type->_type != AT_STRING || *( void** )&newStStack[( *vi )->offset] != BRSTRING( result ) ) )
 			stGCUnretainAndCollectPointer( *( void** )&newStStack[( *vi )->offset], ( *vi )->type->_type );
 	}
-
-	if ( resultCode == EC_STOP ) resultCode = EC_OK;
 
 	// unretain the input arguments
 
 	std::vector< stKeywordEntry* >::iterator ki;
 
 	for ( ki = method->keywords.begin(); ki != method->keywords.end(); ki++ ) {
-		stGCUnretainAndCollectPointer( *( void** )&newStStack[( *ki )->var->offset ], ( *ki )->var->type->_type );
+		if( stGCNEEDSCOLLECT( ( *ki )->var->type->_type ) ) 
+			stGCUnretainAndCollectPointer( *( void** )&newStStack[( *ki )->var->offset ], ( *ki )->var->type->_type );
 	}
+
+
 
 	// restore the previous stack and stack records
 
-	steveData->stack = savedStackPointer;
-
+	steveData->stack       = savedStackPointer;
 	steveData->stackRecord = record.previousStackRecord;
 
 	return resultCode;
@@ -3330,32 +3323,25 @@ RTC_INLINE int stEvalNewInstance( stInstanceExp *ie, stRunInstance *i, brEval *t
 	return EC_OK;
 }
 
-int stExpEval3( stExp *s, stRunInstance *i, brEval *result ) {
-	if ( s && s->block )
-		return s->block->calls.stRtcEval3( s, i, result );
-	else
-		return stExpEval( s, i, result, NULL );
-}
-
 int stExpEval( stExp *s, stRunInstance *i, brEval *result, stObject **tClass ) {
 	brEval t;
 	int resultCode = EC_OK;
 
-	if ( tClass ) *tClass = NULL;
+	if ( tClass ) 
+		*tClass = NULL;
 
 	if ( !i ) {
 		stEvalError( i->instance, EE_INTERNAL, "Expression evaluated with uninitialized instance" );
 		return EC_ERROR;
 	}
 
-	// check active instance status here rather than burden stExpEval3 with a test every time
+	if ( !s )
+		return EC_OK;
+
+	if ( s->debug == 1 )
+		slDebug( "debug called from within steve evaluation\n" );
+
 	if ( i->instance->status == AS_ACTIVE ) {
-		if ( !s )
-			return EC_OK;
-
-		if ( s->debug == 1 )
-			slDebug( "debug called from within steve evaluation\n" );
-
 		if ( s->block )
 			return s->block->calls.stRtcEval3( s, i, result );
 	} else {
@@ -3364,7 +3350,6 @@ int stExpEval( stExp *s, stRunInstance *i, brEval *result, stObject **tClass ) {
 
 		if ( s->type == ET_RETURN ) {
 			resultCode = stExpEval3( s, i, result );
-
 			resultCode = EC_STOP;
 		}
 
@@ -3373,13 +3358,27 @@ int stExpEval( stExp *s, stRunInstance *i, brEval *result, stObject **tClass ) {
 		return EC_ERROR;
 	}
 
-	if ( s->debug == 1 )
-		slDebug( "debug called from within steve evaluation\n" );
-
-	if ( s->block )
-		return s->block->calls.stRtcEval3( s, i, result );
-
 	switch ( s->type ) {
+		case ET_SUPER:
+			if ( i->type->super ) {
+
+				result->set( i->instance->breveInstance );
+
+				if ( tClass ) 
+					*tClass = i->type->super;
+			} else {
+				result->set( ( brInstance* )NULL );
+			}
+
+			break;
+
+		case ET_SELF:
+			result->set( i->instance->breveInstance );
+			break;
+
+		case ET_ST_EVAL:
+			resultCode = EVAL_RTC_CALL_3( s, stEvalEvalExp, ( stEvalExp*)s, i, result );
+			break;
 
 		case ET_LOAD: {
 				stLoadExp *e = ( stLoadExp * )s;
@@ -3397,9 +3396,7 @@ int stExpEval( stExp *s, stRunInstance *i, brEval *result, stObject **tClass ) {
 						break;
 
 					case AT_POINTER:
-
 					case AT_INSTANCE:
-
 					case AT_DATA:
 						resultCode = EVAL_RTC_CALL_3( s, stEvalLoadIndirect, e, i, result );
 
@@ -3490,34 +3487,6 @@ int stExpEval( stExp *s, stRunInstance *i, brEval *result, stObject **tClass ) {
 
 			break;
 
-		case ET_INT:
-			result->set((( stIntExp * )s )->intValue );
-
-			break;
-
-		case ET_DOUBLE:
-			result->set((( stDoubleExp * )s )->doubleValue );
-
-			break;
-
-		case ET_SUPER:
-			if ( i->type->super ) {
-
-				result->set( i->instance->breveInstance );
-
-				if ( tClass ) *tClass = i->type->super;
-			} else {
-
-				result->set(( brInstance* )NULL );
-			}
-
-			break;
-
-		case ET_SELF:
-			result->set( i->instance->breveInstance );
-
-			break;
-
 		case ET_IF:
 			resultCode = EVAL_RTC_CALL_3( s, stEvalIf, ( stIfExp * )s, i, result );
 
@@ -3535,12 +3504,6 @@ int stExpEval( stExp *s, stRunInstance *i, brEval *result, stObject **tClass ) {
 
 		case ET_UNARY:
 			resultCode = EVAL_RTC_CALL_3( s, stEvalUnaryExp, ( stUnaryExp * )s, i, result );
-
-			break;
-
-		case ET_ST_EVAL:
-			// memcpy(result, ((stEvalExp *)s)->eval, sizeof(brEval));
-			brEvalCopy((( stEvalExp * )s )->eval, result );
 
 			break;
 
@@ -3685,7 +3648,7 @@ int stExpEval( stExp *s, stRunInstance *i, brEval *result, stObject **tClass ) {
 
 		case ET_DUPLICATE:
 			// resultCode = EVAL_RTC_CALL_3(s, stExpEval3, ((stDuplicateExp *)s)->expression, i, result);
-			resultCode = stExpEval((( stDuplicateExp * )s )->expression, i, result, NULL );
+			resultCode = stExpEval3((( stDuplicateExp * )s )->expression, i, result );
 
 			break;
 
@@ -3716,6 +3679,11 @@ int stExpEval( stExp *s, stRunInstance *i, brEval *result, stObject **tClass ) {
 	}
 
 	return resultCode;
+}
+
+int stEvalEvalExp( stEvalExp *inEval, stRunInstance *inInstance, brEval *outResult ) {
+	*outResult = inEval -> _eval;
+	return EC_OK;
 }
 
 /*!

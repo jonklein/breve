@@ -110,7 +110,8 @@ void stGCUnretainPointer( void *pointer, int type ) {
  */
 
 void stGCCollectPointer( void *pointer, int type ) {
-	if ( type == AT_NULL || type == AT_INT || type == AT_DOUBLE || type == AT_MATRIX || type == AT_VECTOR || !pointer ) return;
+	if( !stGCNEEDSCOLLECT( type ) || !pointer )
+		return;
 
 	brInstance *bi;
 

@@ -20,7 +20,6 @@
 
 #include <gsl/gsl_randist.h>
 
-double stEmRandomGauss();
 double stEmRandomExponential();
 double stEmRandomGamma( int ithEvent );
 
@@ -36,6 +35,15 @@ int brIKeys( brEval arguments[], brEval *result, brInstance *instance ) {
 	return EC_OK;
 }
 
+/**
+ *
+ */
+
+int brIRandom( brEval arguments[], brEval *result, brInstance *instance ) {
+	*result = arguments[ 0 ];
+
+	return EC_OK;
+}
 
 /*!
 	\brief Returns a Gaussian random number.
@@ -404,6 +412,7 @@ void breveInitMathFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "min", brIMin, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "transpose", brITranspose, AT_MATRIX, AT_MATRIX, 0 );
 
+	brNewBreveCall( n, "random2", brIRandom, AT_UNDEFINED, AT_UNDEFINED, AT_UNDEFINED, 0 );
 	brNewBreveCall( n, "randomGauss", brIRandomGauss, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "randomExponential", brIRandomExponential, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "randomGamma", brIRandomGamma, AT_DOUBLE, AT_INT, 0 );
@@ -417,54 +426,6 @@ void breveInitMathFunctions( brNamespace *n ) {
 */
 
 #define drand() (((double) random()) / 0x7fffffff)
-
-/*!
-	\brief Draw from Gaussian/Normal distribution.
-
-	One may use the routine for non-standard Gauss distributions by
-	simply multiplying the result by the standard deviation you would
-	like and adding the mean.  This assumes the mean is 0.0 and the
-	standard deviation is 1.0, of course.
-*/
-
-double stEmRandomGauss() {
-	static int bIsExtra = 0;
-
-	static double extraDev;
-
-	double transFactor, radius, x1, x2;
-
-	if ( bIsExtra == 0 )   /* If we don't have an extra deviate... */
-	{
-
-		do { /* Keep drawing until we have a point in the unit disc */
-			x1 = 2.0 * drand() - 1.0;
-			x2 = 2.0 * drand() - 1.0;
-			radius = x1 * x1 + x2 * x2;
-		}  while ( radius >= 1.0 );
-
-		/* Such redrawing is reasonable.  The expected number of loop
-		   steps is constant (roughly 5).  The probability of a
-		   a non-constant number approaches 0 exponentially fast.
-		   We could choose to use the true BM transform, but the
-		   sinusoidal functions actually COST more than this.  We
-		   do it this way to avoid the sinusoidals in the transform.  */
-
-		/* Box-Muller Transform*/
-
-		transFactor = sqrt( -2.0 * log( radius ) / radius );
-
-		extraDev = x1 * transFactor;
-
-		bIsExtra = 1;
-
-		return ( x2 * transFactor );
-	} else  {
-		/* we DO have an extra deviate... */
-		bIsExtra = 0;
-		return ( extraDev );
-	}
-}
 
 /*!
 	\brief Draw from exponential distribution with an assumed mean of 1.0.

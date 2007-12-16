@@ -13,17 +13,12 @@ class BraitenbergControl( breve.PhysicalControl ):
 		breve.PhysicalControl.__init__( self )
 		self.cloudTexture = None
 		self.floor = None
-		self.floorShape = None
 		BraitenbergControl.init( self )
 
 	def init( self ):
 		self.enableLighting()
 		self.enableSmoothDrawing()
-		self.floorShape = breve.createInstances( breve.Shape, 1 )
-		self.floorShape.initWithCube( breve.vector( 200, 0.200000, 200 ) )
-		self.floor = breve.createInstances( breve.Stationary, 1 )
-		self.floor.register( self.floorShape, breve.vector( 0, 0, 0 ) )
-		self.floor.catchShadows()
+		self.floor = breve.createInstances( breve.Floor, 1 )
 		self.pointCamera( breve.vector( 0, 0, 0 ), breve.vector( 3, 3, 24 ) )
 		self.enableShadows()
 		self.enableReflections()
@@ -76,7 +71,6 @@ class BraitenbergVehicle( breve.MultiBody ):
 		joint.setRelativeRotation( breve.vector( 1, 0, 0 ), 1.570800 )
 		joint.link( breve.vector( 0, 0, 1 ), location, breve.vector( 0, 0, 0 ), wheel, self.bodyLink )
 		wheel.setET( 0.800000 )
-		wheel.setTexture( 0 )
 		wheel.setJoint( joint )
 		joint.setStrengthLimit( ( joint.getStrengthHardLimit() / 2 ) )
 		wheel.setColor( breve.vector( 0.600000, 0.600000, 0.600000 ) )

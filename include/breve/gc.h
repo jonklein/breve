@@ -31,6 +31,11 @@ void brEvalHashCollect(brEvalHash *h);
 void brEvalHashFreeGC(brEvalHash *h);
 void brEvalListFreeGC(brEvalListHead *h);
 
+
+#define AT_MIN_NEEDS_COLLECTION AT_ARRAY
+
+#define stGCNEEDSCOLLECT( type ) ( ( type ) > AT_MIN_NEEDS_COLLECTION )
+
 #define stGCRetain( e )		stGCRetainPointer( ( e ) -> getPointer(), ( e ) -> type() )
 #define stGCUnretain( e )	stGCUnretainAndCollectPointer( ( e )->getPointer(), ( e )->type() );
 #define stGCCollect( e )	stGCCollectPointer( ( e )->getPointer(), ( e )->type() );

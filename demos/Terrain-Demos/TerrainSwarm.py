@@ -10,7 +10,6 @@ class Swarm( breve.Control ):
 	def __init__( self ):
 		breve.Control.__init__( self )
 		self.birds = breve.objectList()
-		self.cloudTexture = None
 		self.item = None
 		self.normalMenu = None
 		self.obedientMenu = None
@@ -59,12 +58,11 @@ class Swarm( breve.Control ):
 		self.normalMenu = self.addMenu( '''Flock Normally''', 'flockNormally' )
 		self.wackyMenu = self.addMenu( '''Flock Wackily''', 'flockWackily' )
 		self.enableLighting()
-		self.moveLight( breve.vector( 0, 20, 20 ) )
-		self.cloudTexture = breve.createInstances( breve.Image, 1 ).load( 'images/clouds.png' )
+		self.moveLight( breve.vector( 0, 30, 0 ) )
 		breve.createInstances( breve.Terrain, 1 ).generate( 0.150000, 15.300000 )
 		self.birds = breve.createInstances( breve.Birds, 60 )
 		self.flockNormally()
-		self.setBackgroundTextureImage( self.cloudTexture )
+		self.setBackgroundTextureImage( breve.createInstances( breve.Image, 1 ).load( 'images/clouds.png' ) )
 		self.offsetCamera( breve.vector( 5, 1.500000, 6 ) )
 		self.enableShadowVolumes()
 

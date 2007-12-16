@@ -143,7 +143,7 @@ class MultiBody( breve.Object ):
 		pass
 
 	def rotate( self, thisAxis, amount ):
-		'''Sets the rotation of this multibody around vector axis thisAxis by scalar amount (in radians).  This is an "absolute" rotation--the current rotation of the object does not affect how the object will be rotated.  For a rotation relative to the current orientation, set METHOD(relative-rotate). <p> This method implicitly changes the rotation and location of all attached link objects.'''
+		'''Sets the rotation of this multibody around vector axis thisAxis by scalar amount (in radians).  This is an "absolute" rotation--the current rotation of the object does not affect how the object will be rotated.   <p> This method implicitly changes the rotation and location of all attached link objects.'''
 
 		length = 0
 

@@ -7,12 +7,20 @@ VERSION=$PACKAGE_VERSION
 
 AC_CANONICAL_HOST
 
-AC_ARG_ENABLE([engineonly], [], engine_only=yes)
-AC_ARG_ENABLE([static], [], static=yes)
-AC_ARG_ENABLE([perl], [], perl=yes)
-AC_ARG_ENABLE([python], [], python=yes)
-
 python=yes
+
+AC_ARG_ENABLE([engineonly],	
+		[--enable-engineonly	Eliminate as many optional libraries from build as possible], engine_only=yes)
+AC_ARG_ENABLE([static], 	
+		[--enable-static		Link staticly for as many libraries as possible], static=yes)
+AC_ARG_ENABLE([perl], 		
+		[--enable-perl			Build with support for Perl (not yet fully supported)], perl=yes)
+AC_ARG_ENABLE([python], 	
+		[--enable-python		Build with support for Python], python=yes)
+AC_ARG_ENABLE([osxcompat104], 
+		[--enable-osxcompat104	Build on Mac OS X 10.5 to produce 10.4 compatible build], osxcompat104=yes)
+
+PYTHONROOT="/usr"
 
 if test "x$static" != "x"; then 
 	BEGIN_STATIC="-Xlinker -Bstatic"
@@ -65,6 +73,13 @@ case ${host_os} in
 		PLATFORM="macosx"
 		AC_DEFINE([MACOSX], [1], [Mac OS X])
 		EXTRAOPTFLAGS="-mdynamic-no-pic -falign-loops=16 -ftree-vectorize -funroll-loops"
+
+		if test "x$osxcompat104"; then 
+			CPPFLAGS="$CPPFLAGS -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"
+			LDFLAGS="$LDFLAGS -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
+			PYTHONROOT="/Developer/SDKs/MacOSX10.4u.sdk/usr"
+		fi
+
 		;;
 
 	cygwin* | mingw* )
@@ -105,42 +120,21 @@ esac
 #
 
 if test "x$python" != "x"; then 
-	AC_CHECK_LIB([python], [Py_Initialize])
-	AC_CHECK_LIB([python2.3], [Py_Initialize])
-	AC_CHECK_LIB([python23], [Py_Initialize])
-	AC_CHECK_LIB([python2.4], [Py_Initialize])
-	AC_CHECK_LIB([python24], [Py_Initialize])
-	AC_CHECK_LIB([python2.5], [Py_Initialize])
-	AC_CHECK_LIB([python25], [Py_Initialize])
+	PYTHONINCLUDE=""
 
-	if test "$ac_cv_lib_python2_3_Py_Initialize" = yes; then
-		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
-		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.3 -I/usr/include/python"
-	fi
+	# Python can come in so many exciting flavors, with different library names!
 
-	if test "$ac_cv_lib_python23_Py_Initialize" = yes; then
-		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
-		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.3 -I/usr/include/python"
-	fi
+	AC_CHECK_LIB([python],    [Py_Initialize], [LIBS="$LIBS -lpython"    PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python"])
+	AC_CHECK_LIB([python2.3], [Py_Initialize], [LIBS="$LIBS -lpython2.3" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.3"])
+	AC_CHECK_LIB([python23],  [Py_Initialize], [LIBS="$LIBS -lpython2.3" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.3"])
+	AC_CHECK_LIB([python2.4], [Py_Initialize], [LIBS="$LIBS -lpython2.4" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.4"])
+	AC_CHECK_LIB([python24],  [Py_Initialize], [LIBS="$LIBS -lpython2.4" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.4"])
+	AC_CHECK_LIB([python2.5], [Py_Initialize], [LIBS="$LIBS -lpython2.5" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.5"])
+	AC_CHECK_LIB([python25],  [Py_Initialize], [LIBS="$LIBS -lpython2.5" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.5"])
 
-	if test "$ac_cv_lib_python2_4_Py_Initialize" = yes; then
+	if test "x$PYTHONINCLUDE" != ""; then
 		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
-		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.4 -I/usr/include/python"
-	fi
-
-	if test "$ac_cv_lib_python24_Py_Initialize" = yes; then
-		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
-		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.4 -I/usr/include/python"
-	fi
-
-	if test "$ac_cv_lib_python2_5_Py_Initialize" = yes; then
-		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
-		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.5 -I/usr/include/python"
-	fi
-
-	if test "$ac_cv_lib_python25_Py_Initialize" = yes; then
-		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
-		CPPFLAGS="${CPPFLAGS} -I/usr/include/python2.5 -I/usr/include/python"
+		CPPFLAGS="${CPPFLAGS} ${PYTHONINCLUDE}"
 	fi
 fi
 

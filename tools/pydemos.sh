@@ -2,6 +2,6 @@
 
 foreach i ( `find demos -name '*.tz'`) 
 
-	./bin/breve -Y $i
+	./bin/breve -x -Y $i
 
 end

@@ -16,7 +16,7 @@ class Walker( breve.PhysicalControl ):
 		self.monkeys = breve.objectList()
 		self.seats = breve.objectList()
 		self.symMenu = None
-		self.wigglyThing = None
+		self.walker = None
 		Walker.init( self )
 
 	def breedNewMonkeys( self ):
@@ -43,8 +43,8 @@ class Walker( breve.PhysicalControl ):
 			newOffset = ( ( 14 * newOffset ) / breve.length( newOffset ) )
 
 		self.panCameraOffset( newOffset, 30 )
-		self.seats[ self.currentSeat ].setDistance( breve.length( self.wigglyThing.getLocation() ) )
-		self.wigglyThing.center()
+		self.seats[ self.currentSeat ].setDistance( breve.length( self.walker.getLocation() ) )
+		self.walker.center()
 		self.currentSeat = ( self.currentSeat + 1 )
 		if ( self.currentSeat > 3 ):
 			self.breedNewMonkeys()
@@ -81,17 +81,15 @@ class Walker( breve.PhysicalControl ):
 		self.moveLight( breve.vector( 0, 20, 0 ) )
 		floor = breve.createInstances( breve.Floor, 1 )
 		floor.catchShadows()
-		floor.setColor( breve.vector( 1.000000, 1.000000, 1.000000 ) )
-		floor.setET( 0.900000 )
 		self.cloudTexture = breve.createInstances( breve.Image, 1 ).load( 'images/clouds.png' )
 		self.enableShadowVolumes()
 		self.enableReflections()
 		self.setBackgroundColor( breve.vector( 0.400000, 0.600000, 0.900000 ) )
 		self.setBackgroundTextureImage( self.cloudTexture )
-		self.wigglyThing = breve.createInstances( breve.Creature, 1 )
-		self.wigglyThing.move( breve.vector( 0, 6, 0 ) )
+		self.walker = breve.createInstances( breve.Creature, 1 )
+		self.walker.move( breve.vector( 0, 6, 0 ) )
 		self.offsetCamera( breve.vector( 3, 13, -13 ) )
-		self.watch( self.wigglyThing )
+		self.watch( self.walker )
 		self.monkeys = breve.createInstances( breve.Monkeys, 15 )
 		for item in self.monkeys:
 			item.setNumber( number )
@@ -107,7 +105,7 @@ class Walker( breve.PhysicalControl ):
 		self.displayCurrentDriver()
 
 	def iterate( self ):
-		self.seats[ self.currentSeat ].control( self.wigglyThing, self.getTime() )
+		self.seats[ self.currentSeat ].control( self.walker, self.getTime() )
 		breve.PhysicalControl.iterate( self )
 
 	def loadIntoCurrentGenome( self ):
@@ -130,7 +128,7 @@ class Walker( breve.PhysicalControl ):
 	def toggleDriverLock( self ):
 		if ( self.locked == 1 ):
 			self.locked = 0
-			self.wigglyThing.center()
+			self.walker.center()
 			self.schedule( 'changeDrivers', ( self.getTime() + 20.000000 ) )
 			self.lockMenu.uncheck()
 

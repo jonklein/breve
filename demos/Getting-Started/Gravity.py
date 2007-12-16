@@ -21,7 +21,7 @@ class Gravity( breve.PhysicalControl ):
 		breve.createInstances( breve.Step, 1 ).create( breve.vector( 0.800000, -0.800000, 0 ), breve.vector( 0.200000, 0.020000, 1 ) )
 		breve.createInstances( breve.Step, 1 ).create( breve.vector( 1.000000, -1.000000, 0 ), breve.vector( 0.200000, 0.020000, 1 ) )
 		breve.createInstances( breve.Step, 1 ).create( breve.vector( 2.000000, -1.200000, 0 ), breve.vector( 2, 0.020000, 1 ) )
-		breve.createInstances( breve.Balls, 30 )
+		breve.createInstances( breve.Balls, 5 )
 		self.pointCamera( breve.vector( 1.000000, -0.800000, -0.600000 ), breve.vector( 3.500000, 1.100000, 5.000000 ) )
 		self.enableShadowVolumes()
 		self.addMenu( '''Reset Ball''', 'resetBall' )
@@ -61,7 +61,7 @@ class Ball( breve.Mobile ):
 
 	def reset( self ):
 		self.setColor( breve.randomExpression( breve.vector( 1, 1, 1 ) ) )
-		self.move( ( breve.vector( -0.800000, 0.500000, -0.300000 ) + breve.randomExpression( breve.vector( 0.500000, 0.800000, 0.600000 ) ) ) )
+		self.move( ( breve.vector( -0.900000, 0.500000, -1 ) + breve.randomExpression( breve.vector( 1.500000, 0.800000, 2 ) ) ) )
 		self.setVelocity( breve.vector( ( 1 + breve.randomExpression( 1.000000 ) ), ( 1.000000 + breve.randomExpression( 1.000000 ) ), 0 ) )
 
 

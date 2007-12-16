@@ -7,7 +7,7 @@
 import breve
 
 class PushInterpreter( breve.Object ):
-	'''Summary: an interface to the Push programming language. <P> The PushInterpreter object is used to setup and run programs in the  Push programming language, a language developed specifically for evolutionary computation. <P> Push is useful in breve for evolving evolved agent behaviors.  The  steve language, in which users write simulations, is a high level language which is not well suited for evolutionary computation.   The Push language, on the other hand, is designed from the ground up for evolutionary computation. <P> More information about Push is available <a href="http://hampshire.edu/lspector/push.html">here</a>.'''
+	'''Summary: an interface to the Push programming language. <P> The PushInterpreter object is used to setup and run programs in the  Push programming language, a language developed specifically for evolutionary computation. <P> Push is useful in breve for evolving evolved agent behaviors.  The  steve language, in which users write simulations, is a high level language which is not well suited for evolutionary computation.   The Push language, on the other hand, is designed from the ground up for evolutionary computation. <P> More information about Push is available <a href="http://hampshire.edu/lspector/push.html">on the Push project page</a>.'''
 
 	def __init__( self ):
 		breve.Object.__init__( self )
@@ -23,10 +23,10 @@ class PushInterpreter( breve.Object ):
 
 		breve.breveInternalFunctionFinder.pushCallbackNew( self, self.pushInterpreterPointer, instructionName, methodName, targetInstance )
 
-	def addMacro( self, instructionName, code ):
-		'''Adds a new instruction named instructionName, which has the effect of calling  the instructions in code.'''
+	def addMacro( self, instructionName, macroCode ):
+		'''Adds a new instruction named instructionName.  When the instructionName instruction is executed, it has the effect of executing the code contained in macroCode.'''
 
-		breve.breveInternalFunctionFinder.pushMacroNew( self, self.pushInterpreterPointer, instructionName, code.getCodePointer() )
+		breve.breveInternalFunctionFinder.pushMacroNew( self, self.pushInterpreterPointer, instructionName, macroCode.getCodePointer() )
 
 	def archive( self ):
 		pass

@@ -40,11 +40,16 @@ class GeneticAlgorithm( breve.Object ):
 
 	def dearchive( self ):
 		self.currentIndividual = ( self.currentIndividual - 1 )
-		self.switchIndividual()
+		self.schedule( 'switchIndividual', ( self.controller.getTime() + 0.100000 ) )
 		return 1
 
 	def endFitnessTest( self, individual ):
 		'''In this method, you should perform any cleanup neccessary when the  fitness test ends.  You should also make sure that the individual's fitness value is set using  OBJECTMETHOD(GeneticAlgorithmIndividual:set-fitness).'''
+
+		pass
+
+	def endGeneration( self, n ):
+		'''This method is called right when the generation is finished,  before any of the reproduction takes place.  This method provides an opportunity to examine the entire population of the generation after all fitness tests are run, and before the individuals are  possibly destroyed through reproduction.'''
 
 		pass
 
@@ -89,6 +94,21 @@ class GeneticAlgorithm( breve.Object ):
 		'''Returns the best fitness seen so far.'''
 
 		return self.bestFitness
+
+	def getBestIndividual( self ):
+		'''Returns the best active individual.  Note that at the end of each generation any individual, including the best, may be deleted and replaced with a new  one, so be careful when this method is called and how it is used.  '''
+
+		i = None
+		best = None
+
+		for i in self.populations[ self.currentPopulation ]:
+			if ( ( not best ) or ( best.getFitness() < i.getFitness() ) ):
+				best = i
+
+
+
+		print best
+		return best
 
 	def getCrossoverPercent( self ):
 		'''Returns the probability of crossover during reproduction.'''
@@ -291,7 +311,6 @@ class GeneticAlgorithm( breve.Object ):
 		if ( self.generationLimit and ( self.generation >= self.generationLimit ) ):
 			self.controller.endSimulation()
 
-		self.prepareForGeneration( self.generation )
 
 	def setCrossoverPercent( self, percent ):
 		'''Sets the probability of crossover to percent%.  This specifies the  approximate percentage of agents to be generated through crossover during reproduction.  Crossover is not enabled by default, so the  default value is 0%.'''
@@ -314,10 +333,12 @@ class GeneticAlgorithm( breve.Object ):
 		self.individualClass = className
 
 	def setMigrationHosts( self, hosts ):
+		'''Sets a list of migration hosts for this object.  This should be a list of strings  containing hostnames of other machines running a genetic algorithm with the same simulation.'''
+
 		self.migrationHosts = list( hosts) 
 
 	def setMigrationPercent( self, percent ):
-		'''Sets the probability of migration to percent%.  This specifies the  approximate percentage that individuals will migrate to another host during reproduction, if migration is enabled.'''
+		'''Sets the probability of migration to percent%.  This specifies the  approximate percentage that individuals will migrate to another host during reproduction, if migration is enabled and migration hosts are specified using METHOD(set-migration-hosts).'''
 
 		if ( percent == 0 ):
 			breve.deleteInstances( self.migrationServer )
@@ -333,6 +354,8 @@ class GeneticAlgorithm( breve.Object ):
 		self.migrationPercent = percent
 
 	def setMigrationPort( self, port ):
+		'''Sets the port on which migration should occur.  The default value of  59142 typically does not need to be changed.'''
+
 		self.migrationPort = port
 
 	def setMutationPercent( self, percent ):
@@ -413,7 +436,9 @@ class GeneticAlgorithm( breve.Object ):
 
 		self.currentIndividual = ( self.currentIndividual + 1 )
 		if ( self.currentIndividual >= breve.length( self.populations[ self.currentPopulation ] ) ):
+			self.endGeneration( self.generation )
 			self.reproduce()
+			self.prepareForGeneration( self.generation )
 
 
 		self.startFitnessTest( self.populations[ self.currentPopulation ][ self.currentIndividual ] )

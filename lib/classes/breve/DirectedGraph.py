@@ -411,11 +411,6 @@ class GADirectedGraphNode( breve.GADirectedGraphParameterObject ):
 
 
 
-	def xconnect( self, child ):
-		'''Makes a connection to child with an empty parameter list.'''
-
-		return self.connect( child, [] )
-
 
 breve.GADirectedGraphNode = GADirectedGraphNode
 class GADirectedGraphConnection( breve.GADirectedGraphParameterObject ):

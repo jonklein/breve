@@ -355,7 +355,7 @@ class RevoluteJoint( breve.Joint ):
 
 	def dearchive( self ):
 		if ( self.parent or self.child ):
-			self.link( self.parent, self.child, self.normalVector, self.plinkPoint, self.clinkPoint )
+			self.link( self.normalVector, self.plinkPoint, self.clinkPoint, self.child, self.parent )
 
 		return breve.Joint.dearchive( self )
 
@@ -419,13 +419,12 @@ class FixedJoint( breve.Joint ):
 		breve.Joint.__init__( self )
 
 	def dearchive( self ):
-		print '''dearchiving for %s and %s''' % (  self.parent, self.child )
 		if ( self.parent or self.child ):
-			self.link( self.parent, self.child, self.plinkPoint, self.clinkPoint )
+			self.link( self.plinkPoint, self.clinkPoint, self.child, self.parent )
 
 		return breve.Joint.dearchive( self )
 
-	def link( self, childLink, parentLink = 0.000000, parentPoint = breve.vector( 0.000000, 0.000000, 0.000000 ), childPoint = breve.vector( 0.000000, 0.000000, 0.000000 ), currentRotation = 0.000000 ):
+	def link( self, parentPoint, childPoint, childLink, parentLink = 0.000000, currentRotation = 0.000000 ):
 		'''Creates a fixed joint between parentLink and childLink.   The joint will be located at parentPoint on the parent's body, and at childPoint on the child's body.   <P> Unfortunately, FixedJoints do not use the relative joint orientation that can be set in OBJECT(Joint).  This means that the rotation of the  child is always the same as the rotation of the parent. <P> If parentLink is the value 0, then the joint will be attached to a  fixed point in the world, specified with parentPoint.'''
 
 		cpointer = None

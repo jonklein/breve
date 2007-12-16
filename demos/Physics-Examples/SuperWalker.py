@@ -220,6 +220,34 @@ class MonkeyGenome( breve.Object ):
 	def calculateTorque( self, jointNum, time ):
 		return ( ( 0.500000 * breve.breveInternalFunctionFinder.sin( self, ( self.waveCompression * ( time + self.phaseShifts[ jointNum ] ) ) ) ) - self.ampShifts[ jointNum ] )
 
+	def crossover( self, p1, p2 ):
+		self.crossoverData( self.phaseShifts, p1, p2 )
+		self.crossoverData( self.ampShifts, p1, p2 )
+		self.crossoverData( self.limbLengths, p1, p2 )
+
+	def crossoverData( self, l, p1, p2 ):
+		crossoverPoint = 0
+		n = 0
+		tmp = None
+
+		if breve.randomExpression( 1 ):
+			tmp = p2
+			p2 = p1
+			p1 = tmp
+
+
+		crossoverPoint = breve.randomExpression( ( breve.length( l ) - 1 ) )
+		n = 0
+		while ( n < breve.length( l ) ):
+			if ( n < crossoverPoint ):
+				l[ n ] = p1.getValue( n )
+			else:
+				l[ n ] = p2.getValue( n )
+
+
+			n = ( n + 1 )
+
+
 	def getLimbLength( self, n ):
 		return self.limbLengths[ n ]
 

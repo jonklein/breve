@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 44;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -543,11 +543,13 @@
 		48C93583094B452400B48959 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ADDITIONAL_SDKS = /Developer/SDKs/MacOSX10.4u.sdk/;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OPTIMIZATION_CFLAGS = "-O0 -g";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
@@ -566,8 +568,10 @@
 		48C93584094B452400B48959 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ADDITIONAL_SDKS = /Developer/SDKs/MacOSX10.4u.sdk/;
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -622,11 +626,12 @@
 					/Users/jk/dev/breve/lib,
 					/usr/lib/gcc/darwin/3.3,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.1;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OPTIMIZATION_CFLAGS = "-O0 -g";
 				OTHER_CFLAGS = "$(CPPFLAGS)";
 				OTHER_LDFLAGS = "$(LIBS)";
 				PRODUCT_NAME = breve;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				SECTORDER_FLAGS = "";
 				UNSTRIPPED_PRODUCT = YES;
 				WARNING_CFLAGS = "-Wmost";
@@ -674,10 +679,11 @@
 					/Users/jk/dev/breve/lib,
 					/usr/lib/gcc/darwin/3.3,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.1;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "$(CPPFLAGS)";
 				OTHER_LDFLAGS = "$(LIBS)";
 				PRODUCT_NAME = breve;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				SECTORDER_FLAGS = "";
 				UNSTRIPPED_PRODUCT = YES;
 				WARNING_CFLAGS = "-Wmost";
@@ -701,8 +707,10 @@
 		48F0A4DC09CCE98700B52C28 /* Deployment-Universal */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ADDITIONAL_SDKS = "";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -720,6 +728,7 @@
 		48F0A4DD09CCE98700B52C28 /* Deployment-Universal */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ADDITIONAL_SDKS = "";
 				CC_VERSION = 3.x;
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = NO;
@@ -756,10 +765,11 @@
 					/Users/jk/dev/breve/lib,
 					/usr/lib/gcc/darwin/3.3,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.1;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "$(CPPFLAGS)";
 				OTHER_LDFLAGS = "$(LIBS)";
 				PRODUCT_NAME = breve;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				SECTORDER_FLAGS = "";
 				UNSTRIPPED_PRODUCT = YES;
 				WARNING_CFLAGS = "-Wmost";

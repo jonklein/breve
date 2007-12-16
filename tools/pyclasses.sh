@@ -2,7 +2,7 @@
 
 foreach i ( `ls lib/classes/*.tz`) 
 
-	./bin/breve -Y $i
+	./bin/breve -x -Y $i
 
 end
 

@@ -15,7 +15,7 @@
 @use Spring.
 @use Stationary.
 
-@define STRENGTH 40.
+@define STRENGTH 5.
 @define LENGTH 9.
 @define NUMPOINTSONSIDE 3.
 @define HEIGHTTODROP 20.

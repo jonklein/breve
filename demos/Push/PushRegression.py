@@ -22,6 +22,9 @@ class RegressionGP( breve.PushGP ):
 		self.currentInput = 0
 		RegressionGP.init( self )
 
+	def INPUT( self ):
+		self.getInterpreter().pushFloat( self.currentInput )
+
 	def computeError( self, n, interpreter ):
 		desiredResult = 0
 
@@ -38,10 +41,7 @@ class RegressionGP( breve.PushGP ):
 		self.setSpatialRadius( 10 )
 		self.readInterpreterConfig( 'PushRegression.config' )
 		self.interpreter.printConfig()
-		self.getInterpreter().addInstruction( self, 'input' )
-
-	def input( self ):
-		self.getInterpreter().pushFloat( self.currentInput )
+		self.getInterpreter().addInstruction( self, 'INPUT' )
 
 	def setupFitnessTest( self, n, interpreter ):
 		n = ( n + 1 )

@@ -25,10 +25,10 @@ class Gatherers( breve.Control ):
 		self.foodShape = breve.createInstances( breve.Sphere, 1 ).initWith( 0.500000 )
 		breve.createInstances( breve.Collectors, 50 )
 		self.foodList = breve.createInstances( breve.Foods, 400 )
-		self.foodList.setBitmap( 2 )
 		self.setIntegrationStep( 0.050000 )
 		self.addMenu( '''Randomize Food''', 'randomizeFood' )
 		self.pointCamera( breve.vector( 0, 0, 0 ), breve.vector( 0, 0, -80 ) )
+		self.enableLighting()
 
 	def randomizeFood( self ):
 		self.foodList.randomizeLocation()

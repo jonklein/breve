@@ -11,23 +11,23 @@ class Real( breve.Object ):
 
 	def __init__( self ):
 		breve.Object.__init__( self )
+		self.archiveBitmapImage = None
+		self.archiveLightmapImage = None
 		self.archiveLocation = breve.vector()
 		self.archiveRotation = breve.matrix()
-		self.bitmap = 0
+		self.archiveTextureImage = None
+		self.archiveTextureScaleX = 0
+		self.archiveTextureScaleY = 0
 		self.collisionHandlerList = breve.objectList()
 		self.collisionShape = None
 		self.color = breve.vector()
 		self.displayShape = None
 		self.e = 0
-		self.lightmap = 0
 		self.lines = breve.objectList()
 		self.menus = breve.objectList()
 		self.mu = 0
 		self.neighborhoodSize = 0
 		self.realWorldPointer = None
-		self.texture = 0
-		self.textureScaleX = 0
-		self.textureScaleY = 0
 		Real.init( self )
 
 	def addDottedLine( self, otherObject, theColor = breve.vector( 0.000000, 0.000000, 0.000000 ) ):
@@ -86,17 +86,17 @@ class Real( breve.Object ):
 
 
 
-		if ( self.texture > -1 ):
-			self.setTexture( self.texture )
+		if self.archiveTextureImage:
+			self.setTextureImage( self.archiveTextureImage )
 
-		if ( self.lightmap > -1 ):
-			self.setLightmap( self.lightmap )
+		if self.archiveLightmapImage:
+			self.setLightmap( self.archiveLightmapImage )
 
-		if ( self.bitmap > -1 ):
-			self.setBitmap( self.bitmap )
+		if self.archiveBitmapImage:
+			self.setBitmapImage( self.archiveBitmapImage )
 
-		self.setTextureScaleX( self.textureScaleX )
-		self.setTextureScaleY( self.textureScaleY )
+		self.setTextureScaleX( self.archiveTextureScaleX )
+		self.setTextureScaleY( self.archiveTextureScaleY )
 		self.setNeighborhoodSize( self.neighborhoodSize )
 		self.setColor( self.color )
 		breve.breveInternalFunctionFinder.realSetCollisionProperties( self, self.realWorldPointer, self.e, self.mu )
@@ -220,11 +220,8 @@ class Real( breve.Object ):
 		breve.breveInternalFunctionFinder.setIgnoreCollisionsWith( self, self, theType, 1 )
 
 	def init( self ):
-		self.texture = -1
-		self.lightmap = -1
-		self.bitmap = -1
-		self.textureScaleX = 16
-		self.textureScaleY = 16
+		self.archiveTextureScaleX = 16
+		self.archiveTextureScaleY = 16
 		self.setColor( breve.vector( 1, 1, 1 ) )
 		self.addMenu( '''Delete Instance''', 'deleteInstance' )
 		self.addMenu( '''Follow With Camera''', 'watch' )
@@ -294,8 +291,7 @@ class Real( breve.Object ):
 	def setBitmap( self, textureNumber ):
 		'''Deprecated.'''
 
-		self.bitmap = textureNumber
-		breve.breveInternalFunctionFinder.realSetBitmap( self, self.realWorldPointer, ( textureNumber + 1 ) )
+		breve.breveInternalFunctionFinder.realSetBitmap( self, self.realWorldPointer, textureNumber )
 
 	def setBitmapHeading( self, radianAngle ):
 		'''If this object is in 2d bitmap mode, the rotation of the  bitmap will be set to radianAngle.'''
@@ -310,12 +306,17 @@ class Real( breve.Object ):
 	def setBitmapImage( self, bitmapImage ):
 		'''Changes the bitmap of this object to bitmapImage, an instance of  class image.  If bitmapImage is NULL, bitmapping is turned off for the object.'''
 
-		if ( not bitmapImage ):
-			self.bitmap = -1
-		else:
-			self.bitmap = bitmapImage.getTextureNumber()
+		if self.archiveBitmapImage:
+			self.removeDependency( self.archiveBitmapImage )
 
-		breve.breveInternalFunctionFinder.realSetBitmap( self, self.realWorldPointer, self.bitmap )
+		if bitmapImage:
+			self.archiveBitmapImage = bitmapImage
+			self.addDependency( bitmapImage )
+			breve.breveInternalFunctionFinder.realSetBitmap( self, self.realWorldPointer, bitmapImage.getTextureNumber() )
+
+		else:
+			breve.breveInternalFunctionFinder.realSetBitmap( self, self.realWorldPointer, 0 )
+
 
 	def setBitmapTransparency( self, alphaValue ):
 		'''Sets the transparency to alphaValue, a number between 0.0  (totally transparent) and 1.0 (fully opaque). '''
@@ -374,18 +375,22 @@ class Real( breve.Object ):
 	def setLightmap( self, textureNumber ):
 		'''Deprecated.'''
 
-		self.lightmap = textureNumber
-		breve.breveInternalFunctionFinder.realSetLightmap( self, self.realWorldPointer, ( self.lightmap + 1 ) )
+		breve.breveInternalFunctionFinder.realSetLightmap( self, self.realWorldPointer, textureNumber )
 
 	def setLightmapImage( self, lightmapImage ):
 		'''Sets the object to be displayed using a "lightmap".  A  lightmap uses the texture specified and treats it like a light source.  It's hard to explain.  Give it a try for yourself. <p> set-lightmap only has an effect on sphere shapes.  Other  shapes can be textured, but only spheres can be made into  lightmaps.'''
 
-		if ( not lightmapImage ):
-			self.lightmap = -1
-		else:
-			self.lightmap = lightmapImage.getTextureNumber()
+		if self.archiveLightmapImage:
+			self.removeDependency( self.archiveLightmapImage )
 
-		breve.breveInternalFunctionFinder.realSetLightmap( self, self.realWorldPointer, self.lightmap )
+		if lightmapImage:
+			self.archiveLightmapImage = lightmapImage
+			self.addDependency( lightmapImage )
+			breve.breveInternalFunctionFinder.realSetLightmap( self, self.realWorldPointer, lightmapImage.getTextureNumber() )
+
+		else:
+			breve.breveInternalFunctionFinder.realSetLightmap( self, self.realWorldPointer, 0 )
+
 
 	def setMu( self, newMu ):
 		'''Sets the coefficient of friction to newMu.  mu is a  parameter controlling friction between two bodies and  may be any value between 0 and infinity.'''
@@ -454,36 +459,41 @@ class Real( breve.Object ):
 	def setTexture( self, textureNumber ):
 		'''Deprecated -- use METHOD(set-texture-image) instead.'''
 
-		self.texture = textureNumber
-		breve.breveInternalFunctionFinder.realSetTexture( self, self.realWorldPointer, ( textureNumber + 1 ) )
+		print '''set-texture is deprecated: use set-texture-image instead'''
+		breve.breveInternalFunctionFinder.realSetTexture( self, self.realWorldPointer, textureNumber )
 
 	def setTextureImage( self, textureImage ):
-		'''Changes the texture of this object to textureImage, an instance of  class Image.  If textureImage is NULL texturing is turned off for  the object.'''
+		'''Changes the texture of this object to textureImage, an instance of  class OBJECT(Image).  If textureImage is NULL texturing is turned off for  the object.'''
 
-		if ( not textureImage ):
-			self.texture = -1
+		if self.archiveTextureImage:
+			self.removeDependency( self.archiveTextureImage )
+
+		if textureImage:
+			self.archiveTextureImage = textureImage
+			self.addDependency( textureImage )
+			breve.breveInternalFunctionFinder.realSetTexture( self, self.realWorldPointer, textureImage.getTextureNumber() )
+
 		else:
-			self.texture = textureImage.getTextureNumber()
+			breve.breveInternalFunctionFinder.realSetTexture( self, self.realWorldPointer, 0 )
 
-		breve.breveInternalFunctionFinder.realSetTexture( self, self.realWorldPointer, self.texture )
 
 	def setTextureScale( self, scaleSize ):
 		'''Changes the "scale" of the texture.  When a texture is applied over a shape, this value is used to decide how large the texture will be in terms of breve-world units.  The default value is 16, meaning that a 16x16 face will have one copy of the textured image. For smaller objects, this number will have to be decreased, or else the texture will be too big and will not be visible.'''
 
-		self.textureScaleX = scaleSize
+		self.archiveTextureScaleX = scaleSize
 		breve.breveInternalFunctionFinder.realSetTextureScale( self, self.realWorldPointer, scaleSize, scaleSize )
 
 	def setTextureScaleX( self, scaleSize ):
 		'''Sets the texture scale in the X dimension.  The Y texture scale  value is unchanged.  See METHOD(set-texture-scale) for more information.'''
 
-		self.textureScaleX = scaleSize
-		breve.breveInternalFunctionFinder.realSetTextureScale( self, self.realWorldPointer, scaleSize, self.textureScaleY )
+		self.archiveTextureScaleX = scaleSize
+		breve.breveInternalFunctionFinder.realSetTextureScale( self, self.realWorldPointer, scaleSize, self.archiveTextureScaleY )
 
 	def setTextureScaleY( self, scaleSize ):
 		'''Sets the texture scale in the Y dimension.  The X texture scale  value is unchanged.  See METHOD(set-texture-scale) for more information.'''
 
-		self.textureScaleY = scaleSize
-		breve.breveInternalFunctionFinder.realSetTextureScale( self, self.realWorldPointer, self.textureScaleX, scaleSize )
+		self.archiveTextureScaleY = scaleSize
+		breve.breveInternalFunctionFinder.realSetTextureScale( self, self.realWorldPointer, self.archiveTextureScaleX, scaleSize )
 
 	def setTransparency( self, alphaValue ):
 		'''Sets the transparency of this object to alphaValue, a number  between 1.0 (totally opaque) and 0.0 (fully transparent).'''

@@ -127,6 +127,8 @@ inline int stEvalListIndex(stListIndexExp *, stRunInstance *, brEval *);
 inline int stEvalListIndexPointer(stListIndexExp *, stRunInstance *, void **, int *);
 inline int stEvalListIndexAssign(stListIndexAssignExp *, stRunInstance *, brEval *);
 
+inline int stEvalEvalExp( stEvalExp *inEval, stRunInstance *inInstance, brEval *outResult );
+
 int stCallMethod(stRunInstance *, stRunInstance *, stMethod *, const brEval **, int, brEval *);
 int stCallMethodByName(stRunInstance *, char *, brEval *);
 extern "C" DLLEXPORT int stCallMethodByNameWithArgs(stRunInstance *, char *, const brEval **, int, brEval *);
@@ -146,7 +148,7 @@ int stPrintEvaluation(brEval *, stRunInstance *);
 int stEvalBinaryEvalListExp(char, brEval *, brEval *, brEval *, stRunInstance *);
 //brEvalList* stEvalListIndexLookup(brEvalListHead *, int);
 
-int stExpEval3(stExp *, stRunInstance *, brEval *);
+// int stExpEval3(stExp *, stRunInstance *, brEval *);
 
 int stExpEval(stExp *, stRunInstance *, brEval *, stObject **);
 

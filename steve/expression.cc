@@ -31,12 +31,11 @@
 #include "expression.h"
 
 stEvalExp::stEvalExp( brEval *e, const char *file, int line ) : stExp( file, line ) {
-	eval = e;
+	_eval = *e;
 	type = ET_ST_EVAL;
 }
 
 stEvalExp::~stEvalExp() {
-	stGCUnretain( eval );
 }
 
 stReturnExp::stReturnExp( stExp *e, const char *file, int line ) : stExp( file, line ) {
@@ -75,25 +74,23 @@ stLengthExp::~stLengthExp() {
 	delete expression;
 }
 
-stIntExp::stIntExp( int i, const char *file, int line ) : stExp( file, line ) {
-	intValue = i;
-	type = ET_INT;
+stEvalExp *stDoubleExp( double inValue, const char *file, int line ) {
+	brEval e;
+	e.set( inValue );
+	return new stEvalExp( &e, file, line );
 }
 
-stDoubleExp::stDoubleExp( double d, const char *file, int line ) : stExp( file, line ) {
-	doubleValue = d;
-	type = ET_DOUBLE;
+stEvalExp *stIntExp( int inValue, const char *file, int line ) {
+	brEval e;
+	e.set( inValue );
+	return new stEvalExp( &e, file, line );
 }
 
 stMethodExp::stMethodExp( stExp *o, char *n, std::vector< stKeyword* > *a, const char *file, const int line ) : stExp( file, line ) {
 	objectExp = o;
 	methodName = n;
 	arguments = *a;
-	method = NULL;
 	type = ET_METHOD;
-
-	objectCache = NULL;
-	objectTypeCache = NULL;
 }
 
 stMethodExp::~stMethodExp() {

@@ -20,7 +20,10 @@ class TerrainWave( breve.PhysicalControl ):
 		x = 0
 
 		self.setBackgroundTextureImage( breve.createInstances( breve.Image, 1 ).load( 'images/clouds.png' ) )
+		self.setIntegrationStep( 0.001000 )
+		self.setIterationStep( 0.010000 )
 		self.enableShadowVolumes()
+		self.enableFastPhysics()
 		self.terrain = breve.createInstances( breve.Terrain, 1 )
 		x = 0
 		while ( x < 100 ):

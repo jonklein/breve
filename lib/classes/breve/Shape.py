@@ -216,15 +216,15 @@ class PolygonCone( breve.Shape ):
 
 breve.PolygonCone = PolygonCone
 class MeshShape( breve.Shape ):
-	'''An experimental class to load arbitrary 3d mesh shapes.   <p> <b>Full collision detection is not currently supported for MeshShapes</b>. MeshShapes are currently collision detected using spheres, with the radius defined by the maximum reach of the mesh.'''
+	'''A class to load arbitrary 3d mesh shapes.  '''
 
 	def __init__( self ):
 		breve.Shape.__init__( self )
 
-	def loadFrom3ds( self, filename, nodename = "" ):
-		'''Attempts to load a mesh from a 3D Studio scene file named filename. The optional argument nodename specifies which mesh in the scene  should be loaded.  If nodename is not provided, the first mesh found   in the scene is loaded.'''
+	def loadFrom3ds( self, filename, size = 1.000000 ):
+		'''Attempts to load a mesh from a 3D Studio scene file named filename. The optional argument nodename specifies which mesh in the scene  should be loaded.  If nodename is not provided, the first mesh found   in the scene is loaded. <p> The size argument specifies the maximum size for the imported shape.   Because sizes may vary between different models, shapes are normalized to the size specified, which is 1.0 by default.'''
 
-		self.shapePointer = breve.breveInternalFunctionFinder.meshShapeNew( self, filename, nodename )
+		self.shapePointer = breve.breveInternalFunctionFinder.meshShapeNew( self, filename, '', size )
 		if ( not self.shapePointer ):
 			raise Exception( '''Could not create MeshShape: invalid arguments''' )
 

@@ -13,11 +13,12 @@ void slWorldObject::draw( slCamera *camera, bool inUseDrawMode ) {
 		glTranslatef( _position.location.x, _position.location.y, _position.location.z );
 
 		slMatrixGLMult( _position.rotation );
+		slMatrixGLMult( _displayShape -> _transform );
 
 		if( !inUseDrawMode )
-			_displayShape->draw( camera, 0, 0, 0, 0 );
+			_displayShape -> draw( camera, 0, 0, 0, 0 );
 		else
-			_displayShape->draw( camera, _textureScaleX, _textureScaleY, _drawMode, 0 );
+			_displayShape -> draw( camera, _textureScaleX, _textureScaleY, _drawMode, 0 );
 
 		if( ( _drawMode & DM_BOUND ) ) {
 			glPushAttrib( GL_ENABLE_BIT );
@@ -214,8 +215,11 @@ void slWorldObject::updateBoundingBox() {
 }
 
 void slWorldObject::getBounds( slVector *minBounds, slVector *maxBounds ) {
-	if ( minBounds ) slVectorCopy( &_min, minBounds );
-	if ( maxBounds ) slVectorCopy( &_max, maxBounds );
+	if ( minBounds ) 
+		slVectorCopy( &_min, minBounds );
+
+	if ( maxBounds ) 
+		slVectorCopy( &_max, maxBounds );
 }
 
 void slWorldObject::setShape( slShape *inShape ) {

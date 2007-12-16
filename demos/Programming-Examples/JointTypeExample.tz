@@ -173,8 +173,6 @@ BallJoint : ExampleBallJoint {
 		x = sin((controller get-time) / 15) / 2.
 
 		self set-joint-velocity to (0.0, 0, x).
-
-		print ( self get-joint-velocity ).
 }
 
 UniversalJoint : ExampleUniversalJoint {

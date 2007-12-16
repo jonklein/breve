@@ -81,12 +81,12 @@ breve.dll: $(OBJ)
 %.d: %.cc 
 	@echo "Generating dependencies for $<"
 	@/bin/echo -n $(@D)/ > $@
-	@$(CXX) -MM $(CPPFLAGS) $< >> $@
+	@$(CXX) -MM $(CPPFLAGS) $< >> $@ || rm $@
      
 %.d: %.c
 	@echo "Generating dependencies for $<"
 	@/bin/echo -n $(@D)/ > $@  
-	@$(CXX) -MM $(CPPFLAGS) $< >> $@
+	@$(CXX) -MM $(CPPFLAGS) $< >> $@ || rm $@
 
 
 debug: all

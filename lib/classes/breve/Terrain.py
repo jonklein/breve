@@ -62,7 +62,7 @@ class Terrain( breve.Real ):
 		self.realWorldPointer = breve.breveInternalFunctionFinder.terrainNew( self, 1 )
 		self.setPeakColor( breve.vector( 1, 1, 1 ) )
 		self.setValleyColor( breve.vector( 0, 0.800000, 0.100000 ) )
-		self.setTextureImage( breve.createInstances( breve.Image, 1 ).load( 'images/grass.jpg' ) )
+		self.setTextureImage( self.controller.getStationaryTexture() )
 
 	def loadGeoTiff( self, geoTIFFFile ):
 		if self.realWorldPointer:

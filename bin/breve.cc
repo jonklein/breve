@@ -91,6 +91,10 @@ static std::map<int, void*> gWindowMap;
 
 int slLoadOSMesaPlugin( char *execPath );
 
+int noContextActivate() {
+	return -1;
+}
+
 int main( int argc, char **argv ) {
 	pthread_t thread;
 	char *text, *simulationFile;
@@ -174,6 +178,7 @@ int main( int argc, char **argv ) {
 		}
 
 		gEngine->camera->setBounds( gWidth, gHeight );
+		gEngine->camera->setActivateContextCallback( noContextActivate );
 	}
 
 

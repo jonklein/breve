@@ -823,7 +823,7 @@ expression
 	}
 | WORD_VALUE PLUSPLUS {
 		stExp *var = new stLoadExp(currentMethod, currentObject, $1, yyfile, lineno);
-		stExp *one = new stIntExp(1, yyfile, lineno);
+		stExp *one = stIntExp(1, yyfile, lineno);
 		stExp *newExp = new stBinaryExp(BT_ADD, var, one, yyfile, lineno); 
 
 		$$ = new stAssignExp(currentMethod, currentObject, $1, newExp, yyfile, lineno);
@@ -832,7 +832,7 @@ expression
 	}
 | WORD_VALUE MINUSMINUS {
 		stExp *var = new stLoadExp(currentMethod, currentObject, $1, yyfile, lineno);
-		stExp *one = new stIntExp(1, yyfile, lineno);
+		stExp *one = stIntExp(1, yyfile, lineno);
 		stExp *newExp = new stBinaryExp(BT_SUB, var, one, yyfile, lineno); 
 
 		$$ = new stAssignExp(currentMethod, currentObject, $1, newExp, yyfile, lineno);
@@ -956,7 +956,7 @@ unary_expression
 		$$ = new stListRemoveExp($2, NULL, yyfile, lineno);
 	}
 | UNPREPEND atomic_expression {
-		$$ = new stListRemoveExp($2, new stIntExp(0, yyfile, lineno), yyfile, lineno);
+		$$ = new stListRemoveExp($2, stIntExp(0, yyfile, lineno), yyfile, lineno);
 	}
 | PUSH expression WORD_VALUE atomic_expression {
 		if(strcmp($3, "onto")) {
@@ -978,7 +978,7 @@ unary_expression
 			delete $4;
 			$$ = NULL;
 		} else {
-			$$ = new stListInsertExp($4, $2, new stIntExp( 0, yyfile, lineno ), yyfile, lineno);
+			$$ = new stListInsertExp($4, $2, stIntExp( 0, yyfile, lineno ), yyfile, lineno);
 			slFree($3);
 		}
 	}
@@ -1048,12 +1048,12 @@ atomic_expression
 		$$ = new stSelfExp(yyfile, lineno);
 	}
 | NEW WORD_VALUE { 
-		$$ = new stInstanceExp($2, new stIntExp(1, yyfile, lineno), yyfile, lineno); 
+		$$ = new stInstanceExp($2, stIntExp(1, yyfile, lineno), yyfile, lineno); 
 		slFree($2);
 	}
 | NEW STRING_VALUE { 
 		char *unquoted = slDequote($2);;
-		$$ = new stInstanceExp(unquoted, new stIntExp(1, yyfile, lineno), yyfile, lineno); 
+		$$ = new stInstanceExp(unquoted, stIntExp(1, yyfile, lineno), yyfile, lineno); 
 		slFree($2);
 		slFree(unquoted);
 	}
@@ -1191,8 +1191,8 @@ type
 ;
 
 number
-: INT_VALUE	 		{ $$ = new stIntExp($1, yyfile, lineno); }
-| FLOAT_VALUE	   		{ $$ = new stDoubleExp($1, yyfile, lineno); }
+: INT_VALUE	 		{ $$ = stIntExp($1, yyfile, lineno); }
+| FLOAT_VALUE	   		{ $$ = stDoubleExp($1, yyfile, lineno); }
 ;
 
 %%
@@ -1212,9 +1212,11 @@ void stParseSetSteveData(stSteveData *data) {
 	steveData = data;
 }
 
-double stDoubleFromIntOrDoubleExp(stExp *e) {
-	if(e->type == ET_DOUBLE) return ((stDoubleExp*)e)->doubleValue;
-	if(e->type == ET_INT) return (double)((stIntExp*)e)->intValue;
+double stDoubleFromIntOrDoubleExp( stExp *inExp ) {
+	brEval *e = &( ( stEvalExp* )inExp ) -> _eval;
+
+	if( e->type() == AT_DOUBLE ) return BRDOUBLE( e );
+	if( e->type() == AT_INT ) return (double)BRINT( e );
 
 	return 0.0;
 }

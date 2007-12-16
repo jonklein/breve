@@ -11,6 +11,8 @@ class Image( breve.Abstract ):
 
 	def __init__( self ):
 		breve.Abstract.__init__( self )
+		self.archiveFile = ''
+		self.archiveImageData = None
 		self.currentHeight = 0
 		self.currentWidth = 0
 		self.imageData = None
@@ -19,11 +21,18 @@ class Image( breve.Abstract ):
 		Image.init( self )
 
 	def archive( self ):
-		self.textureNumber = -1
+		if ( not self.archiveFile ):
+			self.archiveImageData = breve.breveInternalFunctionFinder.brIImageArchive( self, self.imageData )
+
 		return breve.Abstract.archive( self )
 
 	def dearchive( self ):
-		self.setSize( self.currentWidth, self.currentHeight )
+		if self.archiveFile:
+			self.load( self.archiveFile )
+		else:
+			self.imageData = breve.breveInternalFunctionFinder.brIImageDearchive( self, self.archiveImageData )
+
+		self.textureNumber = -1
 		return breve.Abstract.dearchive( self )
 
 	def destroy( self ):
@@ -102,7 +111,7 @@ class Image( breve.Abstract ):
 	def getTextureNumber( self ):
 		'''Internal use only.'''
 
-		if ( self.textureNumber == -1 ):
+		if ( self.imageData and ( self.textureNumber == -1 ) ):
 			self.textureNumber = breve.breveInternalFunctionFinder.imageUpdateTexture( self, self.imageData )
 
 		return self.textureNumber
@@ -125,6 +134,7 @@ class Image( breve.Abstract ):
 
 	def iterate( self ):
 		if self.modified:
+			self.archiveFile = ''
 			breve.breveInternalFunctionFinder.imageUpdateTexture( self, self.imageData )
 			self.modified = 0
 
@@ -142,6 +152,7 @@ class Image( breve.Abstract ):
 			return 0
 
 
+		self.archiveFile = imageFile
 		if ( self.textureNumber != -1 ):
 			self.modified = 1
 

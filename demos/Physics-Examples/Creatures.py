@@ -9,16 +9,16 @@ import breve
 class VirtualCreatures( breve.PhysicalControl ):
 	def __init__( self ):
 		breve.PhysicalControl.__init__( self )
+		self.blockTexture = None
 		self.body = None
 		self.flag = None
+		self.floor = None
 		self.ga = None
 		self.parser = None
 		self.running = 0
+		self.startTexture = None
 		self.startlocation = breve.vector()
 		VirtualCreatures.init( self )
-
-	def archiveSim( self ):
-		self.saveAsXml( 'sim.xml' )
 
 	def checkPenetration( self ):
 		link = None
@@ -38,6 +38,9 @@ class VirtualCreatures( breve.PhysicalControl ):
 
 		self.flag.move( ( self.startlocation - breve.vector( 0, ( self.startlocation.y - 2 ), 0 ) ) )
 
+	def getBlockTexture( self ):
+		return self.blockTexture
+
 	def getCurrentCritterFitness( self ):
 		t = breve.vector()
 		link = None
@@ -52,13 +55,19 @@ class VirtualCreatures( breve.PhysicalControl ):
 		return breve.length( ( t - self.startlocation ) )
 
 	def init( self ):
-		breve.createInstances( breve.Floor, 1 )
+		self.startTexture = breve.createInstances( breve.Image, 1 ).load( 'images/star.png' )
 		self.flag = breve.createInstances( breve.Mobile, 1 )
 		self.flag.disablePhysics()
-		self.flag.setShape( breve.createInstances( breve.Sphere, 1 ).initWith( 0.200000 ) )
-		self.flag.setColor( breve.vector( 1, 0, 0 ) )
+		self.flag.setBitmapImage( self.startTexture )
+		self.flag.setColor( breve.vector( 1, 1, 0 ) )
 		self.flag.setLabel( 'Start' )
+		self.flag.disableShadows()
 		self.setBackgroundTextureImage( breve.createInstances( breve.Image, 1 ).load( 'images/clouds.png' ) )
+		self.blockTexture = breve.createInstances( breve.Image, 1 ).load( 'images/noise.png' )
+		self.floor = breve.createInstances( breve.Floor, 1 )
+		self.floor.setTextureImage( breve.createInstances( breve.Image, 1 ).load( 'images/ground.png' ) )
+		self.floor.setColor( breve.vector( 0.400000, 0.300000, 0.300000 ) )
+		self.setSkyboxImages( [ 'images/MountainBoxFront.png', 'images/MountainBoxBack.png', 'images/MountainBoxLeft.png', 'images/MountainBoxRight.png', 'images/MountainBoxTop.png', 'images/MountainBoxBottom.png' ] )
 		self.enableFastPhysics()
 		self.setFastPhysicsIterations( 20 )
 		self.enableShadowVolumes()
@@ -71,6 +80,7 @@ class VirtualCreatures( breve.PhysicalControl ):
 			self.ga.setPopulationSize( 25 )
 			self.ga.setCrossoverPercent( 30 )
 			self.ga.setMutationPercent( 30 )
+			self.ga.setSpatialRadius( 4 )
 
 
 		self.addDependency( self.ga )
@@ -93,7 +103,7 @@ class VirtualCreatures( breve.PhysicalControl ):
 		if self.running:
 			self.setDisplayText( '''Distance traveled: %s''' % (  dist ), -0.950000, -0.950000 )
 
-		self.pivotCamera( 0, 0.001000 )
+		self.pivotCamera( 0, 0.000100 )
 		breve.PhysicalControl.iterate( self )
 
 	def setupTest( self, i ):
@@ -139,6 +149,8 @@ breve.VirtualCreatures = VirtualCreatures
 class SimsGA( breve.GeneticAlgorithm ):
 	def __init__( self ):
 		breve.GeneticAlgorithm.__init__( self )
+		self.url = None
+		SimsGA.init( self )
 
 	def endFitnessTest( self, o ):
 		o.setFitness( self.controller.getCurrentCritterFitness() )
@@ -146,16 +158,23 @@ class SimsGA( breve.GeneticAlgorithm ):
 			o.setFitness( 0 )
 
 		print '''fitness of %s: ''' % (  o ), o.getFitness()
-		# self.archiveAsXml( 'breveCreatures.xml' )
+		self.archiveAsXml( 'breveCreatures.xml' )
+
+	def endGeneration( self, n ):
+		print self.url.put( self.getBestIndividual().archiveAsXmlString(), 'http://www.deskworld.org/original/dwCritterUpload.php' )
+
+	def init( self ):
+		self.url = breve.createInstances( breve.URL, 1 )
+		self.addDependency( self.url )
 
 	def startFitnessTest( self, o ):
 		newOffset = breve.vector()
 
-		newOffset = ( breve.randomExpression( breve.vector( 40, 6, 40 ) ) + breve.vector( -20, 3, -20 ) )
+		newOffset = ( breve.randomExpression( breve.vector( 40, 2, 40 ) ) + breve.vector( -20, 0.150000, -20 ) )
 		if ( breve.length( newOffset ) < 20 ):
 			newOffset = ( ( 20 * newOffset ) / breve.length( newOffset ) )
 
-		self.controller.panCameraOffset( newOffset, 80 )
+		self.controller.panCameraOffset( newOffset, 200 )
 		self.controller.setupTest( o )
 
 
@@ -207,13 +226,14 @@ class MorphologyParser( breve.Object ):
 		rootNode = breve.createInstances( breve.Link, 1 )
 		rootNode.move( breve.vector( 0, 15, 0 ) )
 		rootNode.setColor( ( ( ( 5 - n ) / 4.000000 ) * breve.vector( 1, 1, 1 ) ) )
-		rootNode.setColor( breve.randomExpression( breve.vector( 1, 1, 1 ) ) )
 		nodeParams = root.getParameters()
-		size = ( 4 * breve.vector( breve.length( nodeParams[ 0 ] ), breve.length( nodeParams[ 1 ] ), breve.length( nodeParams[ 2 ] ) ) )
-		rootNode.setShape( breve.createInstances( breve.Cube, 1 ).initWith( ( ( ( 8 - n ) / 7.000000 ) * size ) ) )
+		size = ( 6 * breve.vector( breve.length( nodeParams[ 0 ] ), breve.length( nodeParams[ 1 ] ), breve.length( nodeParams[ 2 ] ) ) )
+		rootNode.setColor( breve.vector( breve.length( nodeParams[ 3 ] ), breve.length( nodeParams[ 4 ] ), breve.length( nodeParams[ 5 ] ) ) )
+		rootNode.setShape( breve.createInstances( breve.Cube, 1 ).initWith( ( ( ( 4 - n ) / 3.000000 ) * size ) ) )
+		rootNode.setTextureImage( self.controller.getBlockTexture() )
 		return rootNode
 
-	def parse( self, root, n, rootNode ):
+	def parse( self, root, n, rootNode, f = 0.000000 ):
 		connections = breve.objectList()
 		nodeParams = breve.objectList()
 		connectionParams = breve.objectList()
@@ -225,18 +245,22 @@ class MorphologyParser( breve.Object ):
 		point = breve.vector()
 		ppoint = breve.vector()
 		cpoint = breve.vector()
-
-		if ( n > 3 ):
-			return 0
+		jointRange = 0
 
 		connections = root.getConnections()
 		nodeParams = root.getParameters()
 		size = ( 4 * breve.vector( breve.length( nodeParams[ 0 ] ), breve.length( nodeParams[ 1 ] ), breve.length( nodeParams[ 2 ] ) ) )
+		if ( ( n > 3 ) or ( ( n > 1 ) and ( nodeParams[ 9 ] < 0.000000 ) ) ):
+			return 0
+
 		for child in connections:
 			childNode = self.createNode( child.getTarget(), ( n + 1 ) )
 			if childNode:
 				connectionParams = child.getParameters()
 				point = breve.vector( connectionParams[ 0 ], connectionParams[ 1 ], connectionParams[ 2 ] )
+				if f:
+					point.x = ( point.x * -1 )
+
 				point.x = ( point.x * size.x )
 				point.y = ( point.y * size.y )
 				point.z = ( point.z * size.z )
@@ -244,11 +268,16 @@ class MorphologyParser( breve.Object ):
 				ppoint = rootNode.getShape().getPointOnShape( ( -point ) )
 				norm = breve.vector( connectionParams[ 4 ], connectionParams[ 5 ], connectionParams[ 6 ] )
 				norm = ( norm / breve.length( norm ) )
+				if f:
+					norm.x = ( norm.x * -1 )
+
 				joint = breve.createInstances( breve.SineJoint, 1 )
 				joint.link( norm, ppoint, cpoint, childNode, rootNode )
 				joint.setPhaseshift( ( 3.140000 * connectionParams[ 7 ] ) )
-				joint.setDoubleSpring( 600, 2.600000, -2.600000 )
-				joint.setStrengthLimit( 5000 )
+				joint.setFrequency( ( 1 + connectionParams[ 8 ] ) )
+				jointRange = ( 0.700000 + ( 2 * breve.length( connectionParams[ 9 ] ) ) )
+				joint.setDoubleSpring( 1000, jointRange, ( -jointRange ) )
+				joint.setStrengthLimit( 4000 )
 				self.parse( child.getTarget(), ( n + 1 ), childNode )
 
 
@@ -260,7 +289,8 @@ class MorphologyParser( breve.Object ):
 		rootNode = None
 
 		rootNode = self.createNode( root, 1 )
-		return self.parse( root, 1, rootNode )
+		self.parse( root, 1, rootNode )
+		return rootNode
 
 
 breve.MorphologyParser = MorphologyParser
@@ -270,16 +300,25 @@ class SineJoint( breve.RevoluteJoint ):
 	def __init__( self ):
 		breve.RevoluteJoint.__init__( self )
 		self.active = 0
+		self.frequency = 0
 		self.phaseshift = 0
+		SineJoint.init( self )
 
 	def activate( self ):
 		self.active = 1
 
+	def init( self ):
+		self.phaseshift = 0
+		self.frequency = 2.000000
+
 	def iterate( self ):
 		if self.active:
-			self.setJointVelocity( ( 1 * breve.breveInternalFunctionFinder.sin( self, ( ( self.controller.getTime() * 2.000000 ) + self.phaseshift ) ) ) )
+			self.setJointVelocity( breve.breveInternalFunctionFinder.sin( self, ( ( self.controller.getTime() * self.frequency ) + self.phaseshift ) ) )
 
 
+
+	def setFrequency( self, f ):
+		self.frequency = f
 
 	def setPhaseshift( self, p ):
 		self.phaseshift = p

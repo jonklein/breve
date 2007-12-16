@@ -252,10 +252,15 @@ class Bird( breve.Mobile ):
 		self.setVelocity( newVelocity )
 
 	def getAngle( self, otherMobile ):
+		velocity = breve.vector()
 		tempVector = breve.vector()
 
 		tempVector = ( otherMobile.getLocation() - self.getLocation() )
-		return breve.breveInternalFunctionFinder.angle( self, self.getVelocity(), tempVector )
+		velocity = self.getVelocity()
+		if ( ( breve.length( tempVector ) < 0.010000 ) or ( breve.length( velocity ) < 0.010000 ) ):
+			return 0
+
+		return breve.breveInternalFunctionFinder.angle( self, velocity, tempVector )
 
 	def getCenterUrge( self, flock ):
 		item = None

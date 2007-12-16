@@ -70,12 +70,13 @@ BraitenbergControl : AggressorController {
 		frameCount = frameCount+1. 
 		simSpeed = (self get-time)/((self get-real-time) - startTime). 
 		print "Simulation speed = $simSpeed". 
-		# This is the old fashioned way, but this is very slow. 
+
 		video read-pixels at-x 0 at-y 0.
 		depth read-depth at-x 0 at-y 0 linearize 1 max-dist 50. 
-		video write to "imgs/video-$frameCount.png". 
-		depth write-16-bit-grayscale to "imgs/depth-$frameCount.png". 
-		# This is equivalent to the above -- but faster. 
-		#video snapshot to "imgs/video-$frameCount.png". 
-		#video snapshotDepth to "imgs/depth-$frameCount.png".
+
+		# for the benefit of the demo, we'll just write images for the first 10 frames
+
+		if frameCount < 10:
+			video write to "imgs/video-$frameCount.png". 
+			depth write-16-bit-grayscale to "imgs/depth-$frameCount.png". 
 }

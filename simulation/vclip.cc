@@ -63,9 +63,11 @@ void slAddCollisionCandidate( slVclipData *vc, slPairFlags flags, int x, int y )
 	// the UNKNOWN flag indicates that we have not yet preformed a callback to
 	// determine whether further collision detection is necessary.
 
-	if ( flags & BT_UNKNOWN ) flags = vc->initPairFlags( x, y );
+	if ( flags & BT_UNKNOWN ) 
+		flags = vc->initPairFlags( x, y );
 
-	if ( !( flags & BT_CHECK ) ) return;
+	if ( !( flags & BT_CHECK ) ) 
+		return;
 
 	vc->candidates[ slVclipPairFlags( vc, x, y )] = c;
 }
@@ -350,6 +352,10 @@ int slVclipData::testPair( slCollisionCandidate *candidate, slCollision *ce ) {
 	const slPosition *p2 = candidate->_position2;
 
 	dMatrix3 m1, m2;
+	slMatrix r1, r2;
+
+	slMatrixMulMatrix( p1 -> rotation, s1 -> _transform, r1 );
+	slMatrixMulMatrix( p2 -> rotation, s2 -> _transform, r2 );
 
 	slShape::slMatrixToODEMatrix( p1 -> rotation, m1 );
 	slShape::slMatrixToODEMatrix( p2 -> rotation, m2 );

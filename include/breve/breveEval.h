@@ -34,20 +34,21 @@ enum evaluationCodes {
 
 enum atomicTypes {
 	AT_INVALID = 0,
+	AT_UNDEFINED,
 	AT_NULL,
 	AT_INT,
-	AT_DOUBLE,
-	AT_STRING,
-	AT_INSTANCE,
 	AT_POINTER,
+	AT_TYPE,
+	AT_DOUBLE,
 	AT_VECTOR,
 	AT_MATRIX,
-	AT_LIST,
 	AT_ARRAY,
+
+	AT_STRING,
+	AT_INSTANCE,
+	AT_LIST,
 	AT_DATA,
-	AT_HASH,
-	AT_TYPE,
-	AT_UNDEFINED
+	AT_HASH
 };
 
 extern char *brAtomicTypeStrings[];
@@ -99,8 +100,10 @@ class DLLEXPORT brEval {
 		bool checkNaNInf();
 
 		inline void collect() {
-			if( _needsCollect )
+			if( _needsCollect ) {
 				stGCUnretainAndCollectPointer( _values.pointerValue, _type );
+				_needsCollect = false;
+			}
 		}
 
 		inline void retain() {
@@ -110,7 +113,7 @@ class DLLEXPORT brEval {
 		}
 
 
-		void clear() { collect(); _type = AT_NULL; }
+		void clear() { collect(); _type = AT_NULL; _values.pointerValue = 0; }
 
 		inline unsigned char type() const { return _type; } 
 

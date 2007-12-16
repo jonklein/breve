@@ -752,7 +752,7 @@ int slPNGSnapshotDepth( slWorld *w, slCamera *c, const char *file, int lin, doub
 			    0,0,1,0,
 			    0,0,0,1};
           double proj[16];
-          int view[4];
+          GLint view[4];
 	  
 	  // We need to recover the projection matrix so that we can call gluUnProject
 

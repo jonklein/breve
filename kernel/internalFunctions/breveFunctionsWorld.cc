@@ -400,6 +400,9 @@ int brISetSkyboxImages( brEval args[], brEval *target, brInstance *i ) {
 	std::vector< char* > paths;
 	const std::vector< brEval > &l = head -> getVector();
 
+	if( i->engine->camera->_activateContextCallback && i->engine->camera->_activateContextCallback() != 0 )
+		return EC_OK;
+
 	if( l.size() != 6 ) {
 		slMessage( DEBUG_ALL, "setSkyboxImages requires a list of six strings\n" );
 		return EC_ERROR;

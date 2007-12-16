@@ -520,8 +520,8 @@ Joint : FixedJoint (aka FixedJoints) [version 2.3] {
 	% <b>Fixed joints do not currently support a relative rotation the way
 	% other joint types do.</b>  I'm so sorry.  
 
-	+ to link with-parent-point parentPoint = (0, 0, 0) (vector) 
-			with-child-point childPoint = (0, 0, 0) (vector)
+	+ to link with-parent-point parentPoint (vector) 
+			with-child-point childPoint (vector)
 			to-child childLink (object)
 			parent parentLink = 0 (object) 
 			use-current-relative-rotation currentRotation = 0 (int):

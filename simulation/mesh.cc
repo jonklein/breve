@@ -101,14 +101,20 @@ int slMeshShape::createODEGeom() {
 }
 
 
-void slMeshShape::bounds( const slPosition *position, slVector *min, slVector *max ) const {
-	max->x = position->location.x + _maxReach;
-	max->y = position->location.y + _maxReach;
-	max->z = position->location.z + _maxReach;
+#define MAX( a, b ) ( ( a ) > ( b ) ? ( a ) : ( b ) )
 
-	min->x = position->location.x - _maxReach;
-	min->y = position->location.y - _maxReach;
-	min->z = position->location.z - _maxReach;
+void slMeshShape::bounds( const slPosition *position, slVector *min, slVector *max ) {
+	float scale = MAX( _transform[ 0 ][ 0 ], MAX( _transform[ 1 ][ 1 ], _transform[ 2 ][ 2 ] ) );
+
+	float reach = _maxReach * scale;
+
+	max->x = position->location.x + reach;
+	max->y = position->location.y + reach;
+	max->z = position->location.z + reach;
+
+	min->x = position->location.x - reach;
+	min->y = position->location.y - reach;
+	min->z = position->location.z - reach;
 }
 
 slMeshShape::~slMeshShape() {
@@ -200,16 +206,12 @@ void slMeshShape::finishShapeWithMaxLength( double inDensity, float inMaxSize ) 
 		d._indices.push_back( t );
 	}
 
-	unsigned int n = 0;
-	unsigned int origsize = d._indices.size();
-
-//	while( n < d._indices.size() ) {
 	int breakdowns = 0;
 
 	do {
 		breakdowns = 0;
 		
-		for( int n = 0; n < d._indices.size(); n++ ) {
+		for( unsigned int n = 0; n < d._indices.size(); n++ ) {
 			slTriangleIndex *triangle = &d._indices[ n ];
 			int maxIndex = -1;
 			float size, maxSize = inMaxSize;
@@ -402,6 +404,9 @@ sl3DSShape::sl3DSShape( char *inFilename, char *inMeshname, float inSize ) : slM
 	_normals = new float[ _indexCount * 3 ];
 	_materials = new int[ _indexCount ];
 
+	bzero( _materials, sizeof( int ) * _indexCount );
+	bzero( _normals,   sizeof( float ) * _indexCount * 3 );
+
 	_maxReach = 0.0;
 
 	// First pass through the data, translate to the origin and get the length
@@ -461,11 +466,6 @@ void sl3DSShape::processNodes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPo
 			slMessage( 20, "Node translation: %f, %f, %f\n", inNode->matrix[ 3 ][ 0 ],  inNode->matrix[ 3 ][ 1 ], inNode->matrix[ 3 ][ 2 ] );
 			slMessage( 20, "Mesh translation: %f, %f, %f\n", M[ 3 ][ 0 ],  M[ 3 ][ 1 ], M[ 3 ][ 2 ] );
 			slMessage( 20, "Pivot translation: %f, %f, %f\n", inNode->data.object.pivot[ 0 ], inNode->data.object.pivot[ 1 ], inNode->data.object.pivot[ 2 ] );
-
-			slMatrix trans = { 
-				{ 0, -1, 0 },
-				{ 0, 0, 1 },
-				{ 1, 0, 0 } };
 
 			for ( n = 0; n < mesh -> points; n++ ) {
 				slVector v1, v2;

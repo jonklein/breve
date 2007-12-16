@@ -148,7 +148,6 @@ class ExampleBallJoint( breve.BallJoint ):
 
 		x = ( breve.breveInternalFunctionFinder.sin( self, ( self.controller.getTime() / 15 ) ) / 2 )
 		self.setJointVelocity( breve.vector( 0.000000, 0, x ) )
-		print self.getJointVelocity()
 
 
 breve.ExampleBallJoint = ExampleBallJoint

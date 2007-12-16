@@ -765,33 +765,33 @@ std::string stEvalExp::toPerl( stPerlConversionData *inData ) {
 	std::string result;
 	char format[ 1024 ];
 
-	switch( eval->type() ) {
+	switch( _eval.type() ) {
 		case AT_STRING:
 			result += "\"";
-			result +=  BRSTRING( eval );
+			result +=  BRSTRING( &_eval );
 			result += "\"";
 			break;
 
 		case AT_VECTOR:
-			sprintf( format, "Breve::Vector->new( %f, %f, %f )", BRVECTOR( eval ).x, BRVECTOR( eval ).y, BRVECTOR( eval ).z );
+			sprintf( format, "Breve::Vector->new( %f, %f, %f )", BRVECTOR( &_eval ).x, BRVECTOR( &_eval ).y, BRVECTOR( &_eval ).z );
 			result = format;
 			break;
 
 		case AT_MATRIX:
 			sprintf( format, "Breve::Matrix->new( %f, %f, %f, %f, %f, %f, %f, %f, %f )", 
-				BRMATRIX( eval )[ 0 ][ 0 ], BRMATRIX( eval )[ 0 ][ 1 ], BRMATRIX( eval )[ 0 ][ 2 ], 
-				BRMATRIX( eval )[ 1 ][ 0 ], BRMATRIX( eval )[ 1 ][ 1 ], BRMATRIX( eval )[ 1 ][ 2 ], 
-				BRMATRIX( eval )[ 2 ][ 0 ], BRMATRIX( eval )[ 2 ][ 1 ], BRMATRIX( eval )[ 2 ][ 2 ] );
+				BRMATRIX( &_eval )[ 0 ][ 0 ], BRMATRIX( &_eval )[ 0 ][ 1 ], BRMATRIX( &_eval )[ 0 ][ 2 ], 
+				BRMATRIX( &_eval )[ 1 ][ 0 ], BRMATRIX( &_eval )[ 1 ][ 1 ], BRMATRIX( &_eval )[ 1 ][ 2 ], 
+				BRMATRIX( &_eval )[ 2 ][ 0 ], BRMATRIX( &_eval )[ 2 ][ 1 ], BRMATRIX( &_eval )[ 2 ][ 2 ] );
 			result = format;
 			break;
 
 		case AT_INT:
-			sprintf( format, "%d", BRINT( eval ) );
+			sprintf( format, "%d", BRINT( &_eval ) );
 			result = format;
 			break;
 
 		case AT_DOUBLE:
-			sprintf( format, "%f", BRFLOAT( eval ) );
+			sprintf( format, "%f", BRFLOAT( &_eval ) );
 			result = format;
 			break;
 
@@ -815,22 +815,8 @@ std::string stSortExp::toPerl( stPerlConversionData *inData ) {
 	return std::string( "" );
 }
 
-std::string stDoubleExp::toPerl( stPerlConversionData *inData ) {
-	char numstr[ 1024 ];
-	sprintf( numstr, "%f", doubleValue );
-	std::string result = numstr;
-	return result;
-}
-
 std::string stDuplicateExp::toPerl( stPerlConversionData *inData ) {
 	return expression->toPerl( inData );
-}
-
-std::string stIntExp::toPerl( stPerlConversionData *inData ) {
-	char numstr[ 1024 ];
-	sprintf( numstr, "%i", intValue );
-	std::string result = numstr;
-	return result;
 }
 
 std::string stLoadExp::toPerl( stPerlConversionData *inData ) {

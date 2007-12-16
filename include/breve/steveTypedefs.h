@@ -39,6 +39,7 @@ typedef struct stMethodExp stMethodExp;
 typedef struct stAssignExp stAssignExp;
 typedef struct stLoadExp stLoadExp;
 typedef struct stRandomExp stRandomExp;
+typedef struct stEvalExp stEvalExp;
 typedef struct stArrayIndexExp stArrayIndexExp;
 typedef struct stArrayIndexAssignExp stArrayIndexAssignExp;
 typedef struct stCCallExp stCCallExp;

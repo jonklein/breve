@@ -23,10 +23,12 @@ class Stationary( breve.Real ):
 
 		self.shadowCatcher = 1
 		breve.breveInternalFunctionFinder.setShadowCatcher( self, self.realWorldPointer, breve.vector( 0, 1, 0 ) )
-		self.controller.setFloorDefined()
+		self.controller.setShadowCatcher()
 
 	def dearchive( self ):
-		self.realWorldPointer = breve.breveInternalFunctionFinder.addStationary( self, self.controller.getGenericShape().getPointer(), breve.vector( 0, 0, 0 ), breve.matrix(  1, 0, 0, 0, 1, 0, 0, 0, 1 ) )
+		if ( not self.realWorldPointer ):
+			self.realWorldPointer = breve.breveInternalFunctionFinder.addStationary( self, self.controller.getGenericShape().getPointer(), breve.vector( 0, 0, 0 ), breve.matrix(  1, 0, 0, 0, 1, 0, 0, 0, 1 ) )
+
 		if self.shadowCatcher:
 			self.catchShadows()
 
@@ -39,7 +41,7 @@ class Stationary( breve.Real ):
 
 	def init( self ):
 		self.realWorldPointer = breve.breveInternalFunctionFinder.addStationary( self, self.controller.getGenericShape().getPointer(), breve.vector( 0, 0, 0 ), breve.matrix(  1, 0, 0, 0, 1, 0, 0, 0, 1 ) )
-		self.setTexture( 0 )
+		self.setTextureImage( self.controller.getStationaryTexture() )
 		self.setShape( self.controller.getGenericShape() )
 		return self
 
@@ -65,6 +67,8 @@ class Floor( breve.Stationary ):
 		self.shape = breve.createInstances( breve.Cube, 1 ).initWith( breve.vector( 1000, 5, 1000 ) )
 		self.move( breve.vector( 0, -2.500000, 0 ) )
 		self.setShape( self.shape )
+		self.setColor( breve.vector( 0.350000, 0.800000, 0.450000 ) )
+		self.catchShadows()
 
 	def setSize( self, newSize ):
 		'''Changes the size of the floor to newSize.'''

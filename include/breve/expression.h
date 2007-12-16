@@ -31,9 +31,7 @@
 enum stExpTypes {
 	// basic expression types 
 
-	ET_INT = 1,
 	ET_ST_EVAL,
-	ET_DOUBLE,
 	ET_VECTOR,
 	ET_VECTOR_ELEMENT,
 	ET_VECTOR_ELEMENT_ASSIGN,
@@ -164,6 +162,8 @@ typedef struct stRtcCodeBlock_t {
 		int (*stRtcEval4)(void *, void *, void *, void *);
 		int (*stExpEval3)(stExp *, stRunInstance *, brEval *);
 		int (*stExpEval)(stExp *, stRunInstance *, brEval *, stObject **);
+
+		int (*stEvalEvalExp)(stEvalExp*, stRunInstance *, brEval *);
 		int (*stEvalLoadPointer)(stLoadExp *, stRunInstance *, void **, int *);
 		int (*stEvalTruth)(brEval *, brEval *, stRunInstance *);
 		int (*stEvalFree)(stFreeExp *, stRunInstance *, brEval *);
@@ -222,9 +222,7 @@ class stExp {
 			block = NULL;
 			line = l;
 			file = f;
-
 			debug = false;
-			block = NULL;
 		}
 
 		virtual ~stExp() { 
@@ -239,10 +237,10 @@ class stExp {
 
 		unsigned char 				type;
 
-		bool 					debug;
+		bool 						debug;
 
-		int 					line;
-		const char 				*file;
+		int 						line;
+		const char 					*file;
 	
 		stRtcCodeBlock				*block;
 };
@@ -379,17 +377,7 @@ class stEvalExp : public stExp {
 		std::string			toPython( stPyConversionData *inData );
 		std::string			toPerl( stPerlConversionData *inData );
 
-		brEval *eval;
-};
-
-class stIntExp : public stExp {
-	public:
-		stIntExp(int i, const char *file, int line);
-
-		std::string			toPython( stPyConversionData *inData );
-		std::string			toPerl( stPerlConversionData *inData );
-
-		int intValue;
+		brEval 				_eval;
 };
 
 class stReturnExp : public stExp {
@@ -414,15 +402,8 @@ class stLengthExp : public stExp {
 		stExp *expression;
 };
 
-class stDoubleExp : public stExp {
-	public:
-		stDoubleExp(double d, const char *file, int line);
-
-		std::string			toPython( stPyConversionData *inData );
-		std::string			toPerl( stPerlConversionData *inData );
-
-		double doubleValue;
-};
+stEvalExp *stDoubleExp( double inValue, const char *inFile, int inLine );
+stEvalExp *stIntExp( int inValue, const char *inFile, int inLine );
 
 class stStringExp : public stExp {
 	public:
@@ -609,6 +590,18 @@ class stListIndexAssignExp : public stExp {
 		stExp *assignment;
 };
 
+
+struct stMethodExpCache {
+	stMethodExpCache() { 
+		_method = NULL;
+		_baseObjectCache = NULL;
+	}
+
+	stMethod*					_method;
+	stObject* 					_baseObjectCache;
+	std::vector< stKeyword* > 	_positionedArguments;
+};
+
 class stMethodExp : public stExp {
 	public:
 		stMethodExp( stExp *o, char *n, std::vector<stKeyword*> *a, const char *file, int line );
@@ -617,16 +610,13 @@ class stMethodExp : public stExp {
 		std::string			toPython( stPyConversionData *inData );
 		std::string			toPerl( stPerlConversionData *inData );
 
-		stExp *objectExp;
+		stExp*											objectExp;
 
-		std::string methodName;
+		std::string 									methodName;
 	
-		std::vector< stKeyword* > arguments;
-		std::vector< stKeyword* > positionedArguments;
+		std::vector< stKeyword* > 						arguments;
 
-		stMethod *method;
-		stObject *objectCache;
-		stObject *objectTypeCache;
+		std::map< stObject*, stMethodExpCache >			_cache;
 };
 
 class stAssignExp : public stExp {
