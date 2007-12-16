@@ -145,7 +145,9 @@ bool BCTestApp::OnInit()
 	SearchPathArray.Add(AppDir + FILE_SEP_PATH + ".." + FILE_SEP_PATH + "Resources" + FILE_SEP_PATH);
 #endif
 
+#ifdef WINDOWS
         SetEnvironmentVariable( "PYTHONHOME", AppDir.c_str() );
+#endif
 
 	SearchPathArray.Add( AppDir );
 	SearchPathArray.Add( LocalDir );

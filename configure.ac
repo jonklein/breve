@@ -305,12 +305,12 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([jpeg], [jpeg_read_header])
 	AC_CHECK_LIB([tiff], [TIFFOpen])
 
+	AC_CHECK_LIB([FLAC], [FLAC__seekable_stream_encoder_init])
 	AC_CHECK_LIB([sndfile], [sf_open])
 
 	if test "$ac_cv_lib_sndfile_sf_open" = yes; then 
 		# only consider portaudio if we have libsndfile
 		AC_CHECK_LIB([portaudio], [Pa_OpenStream])
-		AC_CHECK_LIB([FLAC], [FLAC__seekable_stream_encoder_init])
 	fi
 
 	AC_CHECK_LIB([termcap], [tputs])
