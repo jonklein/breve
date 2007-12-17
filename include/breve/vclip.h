@@ -133,7 +133,7 @@ class slVclipData {
 		 * Tests a single pair stored in a \ref slCollisionCandidate.
 		 */
 
-		int testPair(slCollisionCandidate *e, slCollision *ce);
+		int testPair(slCollisionCandidate *e, slCollision *ce, slPairFlags inFlags );
 
 		slWorld *world;
 
@@ -145,7 +145,7 @@ class slVclipData {
 
 		slPairFlags **pairArray;
 
-		std::map< slPairFlags* , slCollisionCandidate > candidates;
+		std::map< slPairFlags* , slCollisionCandidate > 			_candidates;
 
 		unsigned int _count;
 		unsigned int _maxCount;

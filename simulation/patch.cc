@@ -315,7 +315,8 @@ void slPatchGrid::assignObjectsToPatches( slWorld *w ) {
 					if ( flags & BT_CHECK ) {
 						slCollisionCandidate c( vc, x, y );
 
-						if ( vc->testPair( &c, ce ) == CT_PENETRATE ) ce = slNextCollision( vc );
+						if ( vc->testPair( &c, ce, 0 ) == CT_PENETRATE ) 
+							ce = slNextCollision( vc );
 					}
 				}
 			}

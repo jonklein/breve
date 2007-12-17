@@ -11,9 +11,9 @@ Control : PhysicalControl [version 1.8] {
 
 	+ to init:
 		self set-skybox-images to {
-			"images/SnowBoxFront.jpg", "images/SnowBoxBack.jpg",
-			"images/SnowBoxLeft.jpg", "images/SnowBoxRight.jpg",
-			"images/SnowBoxTop.jpg", "images/grass.jpg" }.
+			"images/MountainBoxFront.png", "images/MountainBoxBack.png",
+			"images/MountainBoxLeft.png", "images/MountainBoxRight.png",
+			"images/MountainBoxTop.png", "images/MountainBoxBottom.png" }.
 
 		self set-integration-step to .008.
 		self set-iteration-step to .05.

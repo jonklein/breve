@@ -394,7 +394,7 @@ int slMultibody::checkSelfPenetration() {
 
 				flags = slVclipPairFlags( vc, link1->_clipNumber, link2->_clipNumber );
 
-				if ( slVclipFlagsShouldTest( *flags ) && vc->testPair( &c, NULL ) ) return 1;
+				if ( slVclipFlagsShouldTest( *flags ) && vc->testPair( &c, NULL, 0 ) ) return 1;
 			}
 		}
 	}

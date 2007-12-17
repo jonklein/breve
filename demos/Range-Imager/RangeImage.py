@@ -53,7 +53,9 @@ class AggressorController( breve.BraitenbergControl ):
 		print '''Simulation speed = %s''' % (  self.simSpeed )
 		self.video.readPixels( 0, 0 )
 		self.depth.readDepth( 0, 0, 1, 50 )
-		self.video.write( '''imgs/video-%s.png''' % (  self.frameCount ) )
+		if ( self.frameCount < 10 ):
+			self.video.write( '''imgs/video-%s.png''' % (  self.frameCount ) )
+
 		self.depth.write16BitGrayscale( '''imgs/depth-%s.png''' % (  self.frameCount ) )
 
 

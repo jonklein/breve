@@ -88,7 +88,7 @@ class SpringController( breve.PhysicalControl ):
 							if ( complength > 0 ):
 								startblock = ( ( ( x + xoff1 ) + ( ( y + yoff1 ) * 3 ) ) + ( ( ( z + zoff1 ) * 3 ) * 3 ) )
 								endblock = ( ( ( x + xoff2 ) + ( ( y + yoff2 ) * 3 ) ) + ( ( ( z + zoff2 ) * 3 ) * 3 ) )
-								breve.createInstances( breve.Spring, 1 ).connect( self.nodes[ startblock ], self.nodes[ endblock ], breve.vector( 0, 0, 0 ), breve.vector( 0, 0, 0 ), complength, 0 )
+								breve.createInstances( breve.Spring, 1 ).connect( self.nodes[ startblock ], self.nodes[ endblock ], breve.vector( 0, 0, 0 ), breve.vector( 0, 0, 0 ), complength, 5 )
 								numsprings = ( numsprings + 1 )
 
 
@@ -107,6 +107,7 @@ class SpringController( breve.PhysicalControl ):
 
 			x = ( x + 1 )
 
+		self.nodes[ 0 ].setVelocity( breve.vector( 100, 0, 0 ) )
 		print '''NumSprings = %s''' % (  numsprings )
 
 

@@ -42,8 +42,8 @@ void slODEErrorHandler( int errnum, const char *msg, va_list ap ) {
 }
 
 /**
-	\brief Creates a new empty world.
-*/
+ * Creates a new empty world.
+ */
 
 slWorld::slWorld() {
 	slVector g;
@@ -113,8 +113,8 @@ slGISData *slWorldLoadTigerFile( slWorld *w, char *f, slTerrain *t ) {
 }
 
 /**
-	\brief Startup a netsim server.
-*/
+ *	Startup a netsim server.
+ */
 
 int slWorld::startNetsimServer() {
 #if HAVE_LIBENET
@@ -542,7 +542,7 @@ void slWorld::updateNeighbors() {
 
 	std::map< slPairFlags* , slCollisionCandidate >::iterator ci;
 
-	for ( ci = _proximityData->candidates.begin(); ci != _proximityData->candidates.end(); ci++ ) {
+	for ( ci = _proximityData->_candidates.begin(); ci != _proximityData->_candidates.end(); ci++ ) {
 		slCollisionCandidate c = ci->second;
 
 		o1 = _objects[ c._x ];

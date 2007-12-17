@@ -1089,8 +1089,6 @@ void slSphere::bounds( const slPosition *position, slVector *min, slVector *max 
 	slVectorSet( &_max, r, r, r );
 	slVectorSet( &_min, -r, -r, -r );
 
-	_min.z = position->location.z - ( _radius * _transform[ 0 ][ 0 ] );
-
 	slVectorAdd( &_max, &position -> location, max );
 	slVectorAdd( &_min, &position -> location, min );
 }

@@ -20,7 +20,7 @@ class Spring( breve.Object ):
 		self.start = None
 		self.strength = 0
 
-	def connect( self, springLink1, springLink2, point1 = breve.vector( 0.000000, 0.000000, 0.000000 ), point2 = breve.vector( 0.000000, 0.000000, 0.000000 ), springLength = 0.000000, springStrength = 100.000000, springDamping = 0.200000 ):
+	def connect( self, springLink1, springLink2, point1 = breve.vector( 0.000000, 0.000000, 0.000000 ), point2 = breve.vector( 0.000000, 0.000000, 0.000000 ), springLength = 0.000000, springStrength = 100.000000, springDamping = 0.010000 ):
 		'''Connects the spring from springLink1 to springLink2.   <p> The optional arguments point1 and point2 specify the locations on the objects to which the springs are attached.  The default values are (0, 0, 0). <p> If the length arugment is omitted, length defaults to 0.'''
 
 		if ( springLink1 == springLink2 ):

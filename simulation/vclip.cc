@@ -33,7 +33,7 @@ void slInitBoundSort( slVclipData *d ) {
 	unsigned int listSize = d->_count * 2;
 	unsigned int x, y;
 
-	d->candidates.clear();
+	d->_candidates.clear();
 
 	for ( x = 0;x < 3;x++ ) {
 		d->boundListPointers[x].clear();
@@ -69,7 +69,7 @@ void slAddCollisionCandidate( slVclipData *vc, slPairFlags flags, int x, int y )
 	if ( !( flags & BT_CHECK ) ) 
 		return;
 
-	vc->candidates[ slVclipPairFlags( vc, x, y )] = c;
+	vc->_candidates[ slVclipPairFlags( vc, x, y )] = c;
 }
 
 /*!
@@ -77,7 +77,7 @@ void slAddCollisionCandidate( slVclipData *vc, slPairFlags flags, int x, int y )
 */
 
 void slRemoveCollisionCandidate( slVclipData *vc, int x, int y ) {
-	vc->candidates.erase( slVclipPairFlags( vc, x, y ) );
+	vc->_candidates.erase( slVclipPairFlags( vc, x, y ) );
 }
 
 bool slBoundSortCompare( const slBoundSort *a, const slBoundSort *b ) {
@@ -115,7 +115,7 @@ int slVclipData::clip( double tolerance, int pruneOnly, int boundingBoxOnly ) {
 
 	ce = slNextCollision( this );
 
-	for ( ci = candidates.begin(); ci != candidates.end(); ci++ ) {
+	for ( ci = _candidates.begin(); ci != _candidates.end(); ci++ ) {
 		slCollisionCandidate c = ci->second;
 
 		if ( boundingBoxOnly ) {
@@ -126,7 +126,7 @@ int slVclipData::clip( double tolerance, int pruneOnly, int boundingBoxOnly ) {
 				ce = slNextCollision( this );
 			}
 		} else {
-			result = testPair( &c, ce );
+			result = testPair( &c, ce, *( ci-> first ) );
 
 			if ( result == CT_ERROR ) return -1;
 
@@ -344,7 +344,7 @@ slPlane *slPositionPlane( const slPosition *p, const slPlane *p1, slPlane *pt ) 
  * Preforms a second-stage collision check on the specified object pair.
  */
 
-int slVclipData::testPair( slCollisionCandidate *candidate, slCollision *ce ) {
+int slVclipData::testPair( slCollisionCandidate *candidate, slCollision *ce, slPairFlags inFlags ) {
 	const slShape *s1 = candidate->_shape1;
 	const slShape *s2 = candidate->_shape2;
 
@@ -378,10 +378,12 @@ int slVclipData::testPair( slCollisionCandidate *candidate, slCollision *ce ) {
 		return CT_DISJOINT;
 	}
 
-	ce -> _contactPoints = dCollide( s1 -> _odeGeomID[ 0 ], s2 -> _odeGeomID[ 1 ], MAX_ODE_CONTACTS, ce -> _contactGeoms, sizeof( dContactGeom ) );
+
+ 	int contactCount = ( inFlags & BT_SIMULATE ) ? MAX_ODE_CONTACTS : 1;
+
+	ce -> _contactPoints = dCollide( s1 -> _odeGeomID[ 0 ], s2 -> _odeGeomID[ 1 ], contactCount, ce -> _contactGeoms, sizeof( dContactGeom ) );
 
 	if( ce -> _contactPoints > 0 ) {
-		// printf( "got %d contact points\n", ce -> _contactPoints );
 		ce->n1 = candidate -> _x;
 		ce->n2 = candidate -> _y;
 		return CT_PENETRATE;

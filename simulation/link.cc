@@ -352,7 +352,7 @@ int slLink::checkSelfPenetration( slWorld *world ) {
 
 			slPairFlags *flags = slVclipPairFlags( vc, _clipNumber, link2->_clipNumber );
 
-			if (( slVclipFlagsShouldTest( *flags ) ) && vc->testPair( &c, NULL ) ) {
+			if (( slVclipFlagsShouldTest( *flags ) ) && vc->testPair( &c, NULL, 0 ) ) {
 				return 1;
 			}
 		}
@@ -384,7 +384,7 @@ std::vector< void* > slLink::userDataForPenetratingObjects( slWorld *w ) {
 			slCollisionCandidate c( vc, ln, n );
 			slPairFlags *flags = slVclipPairFlags( vc, ln, n );
 
-			if (( slVclipFlagsShouldTest( *flags ) && *flags & BT_SIMULATE ) && vc->testPair( &c, NULL ) ) {
+			if (( slVclipFlagsShouldTest( *flags ) && *flags & BT_SIMULATE ) && vc->testPair( &c, NULL, 0 ) ) {
 				penetrations.push_back( w->_objects[ n ]->getCallbackData() );
 			}
 		}

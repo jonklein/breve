@@ -66,7 +66,7 @@ class PhysicalControl( breve.Control ):
 		self.gravityMenu[ 3 ].uncheck()
 
 	def init( self ):
-		self.setSkyboxImages( [ 'images/SnowBoxFront.jpg', 'images/SnowBoxBack.jpg', 'images/SnowBoxLeft.jpg', 'images/SnowBoxRight.jpg', 'images/SnowBoxTop.jpg', 'images/grass.jpg' ] )
+		self.setSkyboxImages( [ 'images/MountainBoxFront.png', 'images/MountainBoxBack.png', 'images/MountainBoxLeft.png', 'images/MountainBoxRight.png', 'images/MountainBoxTop.png', 'images/MountainBoxBottom.png' ] )
 		self.setIntegrationStep( 0.008000 )
 		self.setIterationStep( 0.050000 )
 		self.setFastPhysicsIterations( 40 )
