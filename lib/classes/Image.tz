@@ -55,16 +55,16 @@ Abstract : Image (aka Images) [version 2.0] {
 		return self.
 
 	- to init-with width imageWidth (int) height imageHeight (int):
-	% Deprecated.
+		% Deprecated.
 
-	self set-size width imageWidth height imageHeight.
+		self set-size width imageWidth height imageHeight.
 
 	+ to set-size width imageWidth (int) height imageHeight (int):
 		% Creates an empty image buffer with width imageWidth
 		% and length imageLength.
 
-	currentHeight = imageHeight.
-	currentWidth = imageWidth.
+		currentHeight = imageHeight.
+		currentWidth = imageWidth.
 
 		if imageData: 
 		imageDataFree(imageData).
@@ -129,7 +129,7 @@ Abstract : Image (aka Images) [version 2.0] {
 
 		r, g, b (double).
 
-	if !imageData: return (0, 0, 0).
+		if !imageData: return (0, 0, 0).
 
 		r = imageGetValueAtCoordinates(imageData, x * 4, y).
 		g = imageGetValueAtCoordinates(imageData, (x * 4) + 1, y).
@@ -201,12 +201,14 @@ Abstract : Image (aka Images) [version 2.0] {
 	+ to read-depth at-x x (int) at-y y (int) linearize lin (int) max-dist dist (float):
 		% Reads the depth into this Image from the rendered image on the 
 		% screen.  The resulting image can be written to a file or 
-		% analyzed if desired.  This is only supported in graphical
-		% versions of breve.
+		% analyzed if desired.  This is only supported when breve is being run
+		% with graphical display (or with offscreen-rendering enabled).
+		% <P>
 		% The linearize option (if true) linearizes the depth buffer to a maximum 
 		% distance so that for each pixel, the value corresponds to the distance from 
 		% the centre of the camera. Values above the maximum distance (max-dist) are 
 		% set to the maximum distance. 
+		% <P>
 		% If linearize is false, then this returns the raw depth buffer. 
 		% This is considerably faster, but the values are not linear in the distance. 
 

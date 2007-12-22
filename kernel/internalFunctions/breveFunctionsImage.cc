@@ -91,16 +91,21 @@ int brIImageGetHeight( brEval args[], brEval *result, brInstance *i ) {
 
 int brIImageGetValueAtCoordinates( brEval args[], brEval *result, brInstance *i ) {
 	brImageData *dm = BRIMAGEDATAPOINTER( &args[0] );
-	int x = BRINT( &args[1] );
-	int y = BRINT( &args[2] );
+	int x = BRINT( &args[ 1 ] );
+	int y = BRINT( &args[ 2 ] );
 
-	if ( x < 0 || x >= ( dm -> _width * 4 ) || y < 0 || y >= dm -> _height ) {
+	int bpp = BRINT( &args[ 3 ] );
+	int bps = 2;
+
+	if ( x < 0 || x >= ( dm -> _width * bpp ) || y < 0 || y >= dm -> _height ) {
 		slMessage( DEBUG_ALL, "Image access (%d, %d) out of bounds (%d, %d)\n", x, y, dm -> _width, dm -> _height );
 		result->set( 0.0 );
 		return EC_OK;
 	}
+	
+	int offset = y * ( dm -> _width * bpp ) + x;
 
-	result->set( dm ->_data[ y * ( dm -> _width * 4 ) + x ] / 255.0 );
+	result->set( *( dm ->_data + offset ) / 255.0 );
 
 	return EC_OK;
 }

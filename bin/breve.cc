@@ -309,7 +309,8 @@ void brGlutLoop() {
 
 	gWaiting = 0;
 
-	if ( !gPaused ) {
+	pthread_mutex_lock( &gThreadMutex );
+	if ( !gPaused && !gThreadShouldExit ) {
 		if ( newD && brEngineIterate( gEngine ) != EC_OK )
 			brQuit( gEngine );
 
@@ -331,6 +332,7 @@ void brGlutLoop() {
 
 		oldD = newD;
 	}
+	pthread_mutex_unlock( &gThreadMutex );
 }
 
 void brGlutMenuUpdate( brInstance *i ) {

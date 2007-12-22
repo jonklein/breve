@@ -59,9 +59,7 @@ void brEvalObject::collect() {
 }
 
 brEval::brEval( const brEval& inCopy ) {
-	_type = AT_NULL; 
-	_values.pointerValue = NULL;
-
+	_needsCollect = false;
 	brEvalCopy( &inCopy, this );
 }
 
