@@ -445,7 +445,7 @@ int brEngineIterate( brEngine *e ) {
 
 	brInstance *i;
 
-	pthread_mutex_lock( &e->lock );
+	brEngineLock( e );
 
 	e->lastScheduled = -1;
 
@@ -527,7 +527,7 @@ int brEngineIterate( brEngine *e ) {
 		e->events.pop_back();
 	}
 
-	pthread_mutex_unlock( &e->lock );
+	brEngineUnlock( e );
 
 	fflush( e->_logFile );
 

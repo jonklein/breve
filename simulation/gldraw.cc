@@ -122,12 +122,6 @@ void slInitGL( slWorld *w, slCamera *c ) {
 
 	glEnable( GL_DEPTH_TEST );
 
-	glEnable( GL_CULL_FACE );
-	glCullFace( GL_BACK );
-
-	glMatrixMode( GL_MODELVIEW );
-	glLoadIdentity();
-
 	glLineWidth( 2 );
 
 	glPolygonOffset( -4.0f, -1.0f );
@@ -354,7 +348,7 @@ int slCamera::vectorForDrag( slWorld *w, slVector *dragVertex, int x, int y, slV
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
 
-	gluPerspective( 40.0, _fov, _frontClip, _zClip );
+	gluPerspective( 80.0, _fov, _frontClip, _zClip );
 
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
@@ -489,10 +483,9 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 	// Setup lighting and effects for the normal objects
 	//
 
-	bool volumeShadows = _drawShadowVolumes;
-	bool flatShadows = !volumeShadows && _drawShadow && _shadowCatcher;
+	bool flatShadows = !_drawShadowVolumes && _drawShadow && _shadowCatcher;
 
-	setupLights( volumeShadows );
+	setupLights( _drawShadowVolumes );
 
 	int reflectionFlags = 0;
 
@@ -503,7 +496,7 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 		if ( _drawReflection && !( flags & DO_OUTLINE ) ) {
 			slVector toCam;
 
-			if ( !volumeShadows ) 
+			if ( !_drawShadowVolumes ) 
 				gReflectionAlpha = REFLECTION_ALPHA;
 			else 
 				gReflectionAlpha = REFLECTION_ALPHA - 0.1;
@@ -511,7 +504,7 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 			slVectorSub( &cam, &_shadowPlane.vertex, &toCam );
 
 			if ( slVectorDot( &toCam, &_shadowPlane.normal ) > 0.0 ) {
-				reflectionPass( w, volumeShadows );
+				reflectionPass( w, _drawShadowVolumes );
 				reflectionFlags = DO_NO_SHADOWCATCHER;
 			}
 		}
@@ -537,7 +530,7 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 		( *pi )->draw( this );
 
 	if ( _drawLights ) {
-		if ( volumeShadows ) 
+		if ( _drawShadowVolumes ) 
 			renderShadowVolume( w );
 		else if ( flatShadows ) 
 			drawFlatShadows( w );
@@ -946,13 +939,12 @@ void slCamera::renderBillboards( int flags ) {
 		if ( lastTexture != object->_texture )
 			glBindTexture( GL_TEXTURE_2D, object->_texture );
 
-		if ( object->_textureMode == BBT_LIGHTMAP ) {
-			glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+		if ( object->_textureMode == BBT_LIGHTMAP )
 			glBlendFunc( GL_ONE, GL_ONE );
-		} else {
-			glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+		else
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-		}
+
+		glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
 		lastTexture = object->_texture;
 

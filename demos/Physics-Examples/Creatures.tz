@@ -55,7 +55,7 @@ PhysicalControl : VirtualCreatures {
 		flag set-label to "Start".
 		flag disable-shadows.
 
-		self set-background-texture-image to (new Image load from "images/clouds.png").
+		self set-mountain-skybox.
 
 		blockTexture = ( new Image load from "images/noise.png" ).
 

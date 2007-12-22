@@ -65,7 +65,7 @@ const struct option gCLIOptions[] = {
         { "format",     no_argument,       0, 'F' },
         { "master",     no_argument,       0, 'M' },
         { "slave",      required_argument, 0, 'S' },
-        { "python",	no_argument 	 , 0, 'Y' } 
+        { "python",		no_argument 	 , 0, 'Y' } 
 };
 
 int brParseArgs(int, char **);
@@ -94,13 +94,13 @@ void slDemoSpecialUp(int, int, int);
 void slDemoKeyboard(unsigned char, int, int);
 void slDemoKeyboardUp(unsigned char, int, int);
 
-int brCLIDialogCallback(char *, char *, char *, char *);
-char *interfaceVersionCallback(void);
-char *getSavename(void);
-char *getLoadname(void);
-int soundCallback(void);
-int pauseCallback(void);
-int unpauseCallback(void);
+int brGLUTDialogCallback(char *, char *, char *, char *);
+char *brGLUTInterfaceVersionCallback(void);
+char *brGLUTGetSavename(void);
+char *brGLUTGetLoadname(void);
+int brGLUTSoundCallback(void);
+int brGLUTPauseCallback(void);
+int brGLUTUnpauseCallback(void);
 
-extern char **gErrorNames;
+// extern char **gErrorNames;
 extern char *interfaceID;

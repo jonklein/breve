@@ -10,11 +10,6 @@ Control : PhysicalControl [version 1.8] {
 		gravityMenu (list).
 
 	+ to init:
-		self set-skybox-images to {
-			"images/MountainBoxFront.png", "images/MountainBoxBack.png",
-			"images/MountainBoxLeft.png", "images/MountainBoxRight.png",
-			"images/MountainBoxTop.png", "images/MountainBoxBottom.png" }.
-
 		self set-integration-step to .008.
 		self set-iteration-step to .05.
 

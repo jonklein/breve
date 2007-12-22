@@ -42,7 +42,6 @@
 #include "pyconvert.h"
 
 static void brInterrupt( brEngine * );
-static void *workerThread( void * );
 
 static void brCatchSignal( int signal );
 
@@ -51,7 +50,7 @@ extern char *optarg;
 extern int optind;
 #endif
 
-unsigned char *gOffscreenBuffer;
+unsigned char *gOffscreenBuffer = NULL;
 
 static brEngine *gEngine;
 static int contextMenu, mainMenu;
@@ -67,8 +66,6 @@ static int gThreadShouldExit = 0;
 static float gSimulationTime = 0.0;
 
 static pthread_mutex_t gEngineMutex;
-static pthread_mutex_t gThreadMutex;
-static pthread_cond_t gThreadPaused;
 
 static char *gOptionArchiveFile = NULL;
 
@@ -84,19 +81,39 @@ static double gStartCamX;
 
 static brInstance *gSelected = NULL;
 
-static int gSlave = 0, gMaster = 0;
-static char *gSlaveHost;
+static int gMaster = 0;
+static std::string gSlaveHost;
 
 static std::map<int, void*> gWindowMap;
 
 int slLoadOSMesaPlugin( char *execPath );
 
-int noContextActivate() {
+int brGLUTNoContextActivate() {
 	return -1;
 }
 
+int brGLUTSoundCallback() {
+ 	putchar( 0x07 );
+	fflush( stdout );
+	return 0;
+}
+
+int brGLUTPause() {
+	gPaused = 1;
+	brPauseTimer( gEngine );
+	glutIdleFunc( NULL );
+	return 0;
+}
+
+int brGLUTUnpause() {
+	gPaused = 0;
+	brUnpauseTimer( gEngine );
+	glutIdleFunc( brGlutLoop );
+	return 0;
+}
+
+
 int main( int argc, char **argv ) {
-	pthread_t thread;
 	char *text, *simulationFile;
 	int index;
 	char wd[MAXPATHLEN];
@@ -110,8 +127,6 @@ int main( int argc, char **argv ) {
 #endif
 
 	pthread_mutex_init( &gEngineMutex, NULL );
-	pthread_mutex_init( &gThreadMutex, NULL );
-	pthread_cond_init( &gThreadPaused, NULL );
 
 	/* parse the command line args. */
 
@@ -125,7 +140,8 @@ int main( int argc, char **argv ) {
 	argv += index;
 
 	if ( !gOptionStdin ) {
-		if ( argc < 1 ) brPrintUsage( execpath );
+		if ( argc < 1 ) 
+			brPrintUsage( execpath );
 
 		text = slUtilReadFile( argv[0] );
 
@@ -153,35 +169,23 @@ int main( int argc, char **argv ) {
 
 	gSteveData = (stSteveData*)brInitFrontendLanguages( gEngine );
 
-	gEngine->getLoadname 		= getLoadname;
-	gEngine->getSavename 		= getSavename;
-	gEngine->soundCallback 		= soundCallback;
-	gEngine->dialogCallback 	= brCLIDialogCallback;
-	gEngine->interfaceTypeCallback	= interfaceVersionCallback;
-	gEngine->pauseCallback 		= pauseCallback;
-	gEngine->unpauseCallback 	= unpauseCallback;
+	gEngine->getLoadname 			= brGLUTGetLoadname;
+	gEngine->getSavename 			= brGLUTGetSavename;
+	gEngine->soundCallback			= brGLUTSoundCallback;
+	gEngine->dialogCallback 		= brGLUTDialogCallback;
+	gEngine->interfaceTypeCallback	= brGLUTInterfaceVersionCallback;
+	gEngine->pauseCallback			= brGLUTPause;
+	gEngine->unpauseCallback 		= brGLUTUnpause;
 
-	if ( !gOptionNoGraphics ) {
+
+	gEngine->camera->setBounds( gWidth, gHeight );
+
+	if ( !gOptionNoGraphics )
 		slInitGlut( argc, argv, simulationFile );
-	
-		gEngine->camera->setBounds( gWidth, gHeight );
-	} else {
-		//
-		// Attempt to load an offscreen Mesa buffer.
-		//
-	
-		gOffscreenBuffer = ( GLubyte * )slMalloc( gWidth * gHeight * 4 * sizeof( GLubyte ) );
-
-		if ( slLoadOSMesaPlugin( execpath ) ) {
-			slFree( gOffscreenBuffer );
-			gOffscreenBuffer = NULL;
-		}
-
-		gEngine->camera->setBounds( gWidth, gHeight );
-		gEngine->camera->setActivateContextCallback( noContextActivate );
+	else {
+		if( slLoadOSMesaPlugin( execpath ) != 0 ) 
+			gEngine->camera->setActivateContextCallback( brGLUTNoContextActivate );
 	}
-
-
 
 
 	if( gConvertToPython ) {
@@ -225,41 +229,35 @@ int main( int argc, char **argv ) {
 	}
 
 
-	if ( gOptionArchiveFile ) {
-		if ( brLoadSavedSimulation( gEngine, text, simulationFile, gOptionArchiveFile ) != EC_OK )
-			brQuit( gEngine );
-	} else if ( brLoadSimulation( gEngine, text, simulationFile ) != EC_OK )
-		brQuit( gEngine );
+	int loadresult = 0;
 
-
-
-
+	if ( gOptionArchiveFile ) 
+		loadresult = brLoadSavedSimulation( gEngine, text, simulationFile, gOptionArchiveFile );
+	else 
+		loadresult = brLoadSimulation( gEngine, text, simulationFile );
 
 	slFree( text );
 
+	if( loadresult != EC_OK ) 
+		brQuit( gEngine );
+
+
 	brEngineSetUpdateMenuCallback( gEngine, brGlutMenuUpdate );
 
-	memset( keyDown, 0, sizeof( keyDown ) );
-
+	memset( keyDown,     0, sizeof( keyDown ) );
 	memset( specialDown, 0, sizeof( specialDown ) );
-
-	pthread_mutex_lock( &gThreadMutex );
-
-	pthread_create( &thread, NULL, workerThread, NULL );
 
 	if ( gMaster )
 		gEngine->world->startNetsimServer();
 
-	if ( gSlave ) {
-		gEngine->world->startNetsimSlave( gSlaveHost );
-		slFree( gSlaveHost );
-	}
+	if ( gSlaveHost.length() != 0 )
+		gEngine->world->startNetsimSlave( gSlaveHost.c_str() );
 
 	if ( gOptionFull ) glutFullScreen();
 
 	if ( gOptionNoGraphics ) {
 #ifndef WINDOWS
-        	signal( SIGINT, brCatchSignal );
+       	signal( SIGINT, brCatchSignal );
 #endif
 
 		gPaused = 0;
@@ -273,66 +271,23 @@ int main( int argc, char **argv ) {
 	return 0;
 }
 
-void *workerThread( void *data ) {
-
-	for ( ;; ) {
-		pthread_mutex_lock( &gThreadMutex );
-
-		if (( !gPaused && !gEngine->drawEveryFrame ) ||
-		        !pthread_cond_wait( &gThreadPaused, &gThreadMutex ) ) {
-			if ( gThreadShouldExit ) {
-				pthread_mutex_unlock( &gThreadMutex );
-				return NULL;
-			} else if ( brEngineIterate( gEngine ) != EC_OK ) {
-				pthread_mutex_unlock( &gThreadMutex );
-				brQuit( gEngine );
-			}
-
-			if ( gOffscreenBuffer && gEngine->world->detectLightExposure() )
-				gEngine->camera->detectLightExposure(
-				    gEngine->world, gWidth, gOffscreenBuffer );
-		}
-
-		pthread_mutex_unlock( &gThreadMutex );
-
-		if( gSimulationTime > 0.0 && gEngine->world->getAge() >= gSimulationTime ) {
-			brQuit( gEngine );
-		}
-
-	}
-}
-
 void brGlutLoop() {
-	static int oldD = 1;
-
-	int newD = gEngine->drawEveryFrame;
-
 	gWaiting = 0;
 
-	pthread_mutex_lock( &gThreadMutex );
 	if ( !gPaused && !gThreadShouldExit ) {
-		if ( newD && brEngineIterate( gEngine ) != EC_OK )
+		if ( brEngineIterate( gEngine ) != EC_OK )
 			brQuit( gEngine );
+
+		if ( !gOptionNoGraphics )  {
+			if( gEngine->drawEveryFrame )
+				slDemoDisplay();
+			else
+				glutPostRedisplay();
+		}
 
 		if( gSimulationTime > 0.0 && gEngine->world->getAge() >= gSimulationTime ) 
 			brQuit( gEngine );
-
-		if ( !gOptionNoGraphics ) 
-			glutPostRedisplay();
-
-		if ( !newD && oldD ) {
-			pthread_mutex_unlock( &gThreadMutex );
-			pthread_cond_signal( &gThreadPaused );
-		} else if ( newD && !oldD )
-			pthread_mutex_lock( &gThreadMutex );
-
-//                if ( gEngine->world->detectLightExposure() )
-//			gEngine->camera->detectLightExposure(
-//			gEngine->world, gWidth, gOffscreenBuffer );
-
-		oldD = newD;
 	}
-	pthread_mutex_unlock( &gThreadMutex );
 }
 
 void brGlutMenuUpdate( brInstance *i ) {
@@ -374,7 +329,8 @@ void brQuit( brEngine *e ) {
 
 	if ( !gPaused && !gEngine->drawEveryFrame ) {
 		gThreadShouldExit = 1;
-		pthread_mutex_lock( &gThreadMutex );
+		brEngineLock( gEngine );
+		brEngineUnlock( gEngine );
 	}
 
 	brPauseTimer( e );
@@ -498,7 +454,6 @@ int brParseArgs( int argc, char **argv ) {
 
 			case 'u':
 				gPaused = 0;
-
 				break;
 
 			case 'v':
@@ -517,9 +472,7 @@ int brParseArgs( int argc, char **argv ) {
 				break;
 
 			case 'S':
-				gSlaveHost = slStrdup( optarg );
-
-				gSlave = 1;
+				gSlaveHost = optarg;
 
 				break;
 
@@ -749,16 +702,10 @@ void slDemoKeyboard( unsigned char key, int x, int y ) {
 	switch ( key ) {
 
 		case ' ':
-			gPaused = !gPaused;
-
-			if ( gPaused ) {
-				brPauseTimer( gEngine );
-				glutIdleFunc( NULL );
-			} else {
-				brUnpauseTimer( gEngine );
-				pthread_cond_signal( &gThreadPaused );
-				glutIdleFunc( brGlutLoop );
-			}
+			if ( !gPaused )
+				brGLUTPause();
+			else
+				brGLUTUnpause();
 
 			break;
 
@@ -828,13 +775,13 @@ void brInterrupt( brEngine *gEngine ) {
 	brUnpauseTimer( gEngine );
 }
 
-/*!
-	\brief The GLUT key-up callback.  Calls \ref brKeyCallback.
-*/
+/**
+ * \brief The GLUT key-up callback.  Calls \ref brKeyCallback.
+ */
 
 void slDemoKeyboardUp( unsigned char key, int x, int y ) {
 	brKeyCallback( gEngine, key, 0 );
-	keyDown[key] = 0;
+	keyDown[ key ] = 0;
 }
 
 /*!
@@ -844,7 +791,7 @@ void slDemoKeyboardUp( unsigned char key, int x, int y ) {
 	this is GLUT and we don't have one...
 */
 
-int brCLIDialogCallback( char *title, char *message, char *b1, char *b2 ) {
+int brGLUTDialogCallback( char *title, char *message, char *b1, char *b2 ) {
 	int result;
 
 	for ( ;; ) {
@@ -866,14 +813,14 @@ int brCLIDialogCallback( char *title, char *message, char *b1, char *b2 ) {
 	}
 }
 
-char *interfaceVersionCallback() {
+char *brGLUTInterfaceVersionCallback() {
 	return interfaceID;
 }
 
-char *getSavename() {
-	char name[MAXPATHLEN];
+char *brGLUTPrompt( const char *inString ) {
+	char name[ MAXPATHLEN ];
+	printf( "%s", inString );
 
-	printf( "filename to save: " );
 	fgets( name, sizeof( name ), stdin );
 
 	if ( *name )
@@ -882,37 +829,12 @@ char *getSavename() {
 	return slStrdup( name );
 }
 
-char *getLoadname() {
-	char name[MAXPATHLEN];
-
-	printf( "filename to load: " );
-	fgets( name, sizeof( name ), stdin );
-
-	if ( *name )
-		name[strlen( name ) - 1] = '\0';
-
-	return slStrdup( name );
+char *brGLUTGetSavename() {
+	return brGLUTPrompt( "filename to save: " );
 }
 
-int soundCallback() {
-	putchar( 0x07 );
-	fflush( stdout );
-	return 0;
-}
-
-int pauseCallback() {
-	gPaused = 1;
-	brPauseTimer( gEngine );
-	glutIdleFunc( NULL );
-	return 0;
-}
-
-int unpauseCallback() {
-	gPaused = 0;
-	brUnpauseTimer( gEngine );
-	glutIdleFunc( brGlutLoop );
-	pthread_cond_signal( &gThreadPaused );
-	return 0;
+char *brGLUTGetLoadname() {
+	return brGLUTPrompt( "filename to load: " );
 }
 
 void renderContext( slWorld *inWorld, slCamera *inCamera ) {
@@ -946,6 +868,8 @@ int slLoadOSMesaPlugin( char *execPath ) {
 		slMessage( DEBUG_ALL, "Could not load OSMesa extension, offscreen rendering disabled (%s)\n", dlerror() );
 		return -1;
 	}
+
+	gOffscreenBuffer = ( GLubyte * )slMalloc( gWidth * gHeight * 4 * sizeof( GLubyte ) );
 
 	create( gOffscreenBuffer, gWidth, gHeight );
 

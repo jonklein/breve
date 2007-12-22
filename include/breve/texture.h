@@ -26,39 +26,38 @@
 
 class slTexture2D {
 	public:
-					slTexture2D( std::string &inImage );
+					slTexture2D( std::string &inImage, bool inRepeat = true );
 					slTexture2D();
 
 					~slTexture2D();
 
-		int			loadImage( char *inImage ) {
+		int			loadImage( char *inImage, bool inRepeat = true ) {
 						std::string image = inImage;
-						return loadImage( image );
+						return loadImage( image, inRepeat );
 					}
 
-		int			loadImage( std::string &inImage );
+		int			loadImage( std::string &inImage, bool inRepeat = true );
 
-		void 			bind() { 
+		void 		bind() { 
 						if( _textureID != 0 ) {
 							glEnable( GL_TEXTURE_2D ); 
 							glBindTexture( GL_TEXTURE_2D, _textureID ); 
 						}
 					}
 
-		void			unbind() {
-							glDisable( GL_TEXTURE_2D );
+		void		unbind() {
+						glDisable( GL_TEXTURE_2D );
 					}
 
-		bool			isLoaded() { return _textureID != 0; }
+		bool		isLoaded() { return _textureID != 0; }
 
-		void 			loadPixels( unsigned char *pixels, int width, int height );
+		void 		loadPixels( unsigned char *pixels, int width, int height, bool inRepeat = true );
 
-		float			_unitX;
-		float			_unitY;
-
+		float		_unitX;
+		float		_unitY;
 
 	private:
-		GLuint 			_textureID;
+		GLuint 		_textureID;
 };
 
 #endif // _TEXTURE_H

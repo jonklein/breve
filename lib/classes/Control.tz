@@ -430,6 +430,16 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		setSkyboxImages( imageList ).
 
+	+ to set-mountain-skybox:
+		% A simple shortcut to setup one of the default skyboxes included with
+		% breve, used to quickly add a skybox background to a scene.  See
+		% METHOD(set-skybox-images) for information on setting custom skyboxes.
+
+		self set-skybox-images to {
+			"images/MountainBoxFront.png", "images/MountainBoxBack.png",
+			"images/MountainBoxLeft.png", "images/MountainBoxRight.png",
+			"images/MountainBoxTop.png", "images/MountainBoxBottom.png" }.
+
 	+ to set-background-scroll-rate x xValue (float) y yValue (float):
 		% Sets the rate of the background image scrolling.  Purely cosmetic.
 

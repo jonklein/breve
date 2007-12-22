@@ -13,19 +13,21 @@ PhysicalControl : MeshTest {
 		self enable-smooth-drawing.
 		self enable-fast-physics.
 
+		self set-mountain-skybox.
+
 		new Floor.
 
-		self make-shape with-name "car.3ds".
-		self make-shape with-name "knot.3ds".
-		self make-shape with-name "teddy.3ds".
+		self make-body with-filename "car.3ds".
+		self make-body with-filename "knot.3ds".
+		self make-body with-filename "teddy.3ds".
 
-	+ to make-shape with-name name (string):
-		l (object).
+	+ to make-body with-filename name (string):
+		link (object).
 
-		l = new Mobile.
-		l enable-physics.
-		l set-shape to ( new MeshShape load-from-3ds file name with-size 2.5 ).
-		l move to random[ ( 8, 8, 8 ) ] - ( 4, -4, 4 ).
+		link = new Mobile.
+		link enable-physics.
+		link set-shape to ( new MeshShape load-from-3ds file name with-size 2.5 ).
+		link move to random[ ( 8, 8, 8 ) ] - ( 4, -4, 4 ).
 
-		return l.
+		return link.
 }

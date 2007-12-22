@@ -223,6 +223,8 @@ void slCamera::renderShadowVolume( slWorld *w ) {
 	// glEnable(GL_POLYGON_OFFSET_FILL);
 
 	glEnable( GL_STENCIL_TEST );
+	glEnable( GL_CULL_FACE );
+	glCullFace( GL_BACK );
 	glStencilFunc( GL_ALWAYS, 1, 0xffffffff );
 	glStencilOp( GL_KEEP, GL_KEEP, GL_INCR );
 

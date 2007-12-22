@@ -392,7 +392,7 @@ void slTerrain::makeNormals() {
 }
 
 void slTerrain::colorForHeight( double inHeight, slVector *outColor ) {
-	float t = inHeight / _heightDelta;
+	float t = ( inHeight - _heightMin ) / _heightDelta;
 
 	outColor -> x = ( 1.0 - t ) * _bottomColor.x + t * _topColor.x;
 	outColor -> y = ( 1.0 - t ) * _bottomColor.y + t * _topColor.y;

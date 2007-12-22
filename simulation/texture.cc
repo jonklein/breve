@@ -23,16 +23,16 @@
 
 #define MAX( x, y ) ( (x)>(y)?(x):(y) )
 
-slTexture2D::slTexture2D( std::string &inFile ) {
+slTexture2D::slTexture2D( std::string &inFile, bool inRepeat ) {
 	_textureID = 0;
-	loadImage( inFile );
+	loadImage( inFile, inRepeat );
 }
 
 slTexture2D::slTexture2D() {
 	_textureID = 0;
 }
 
-int slTexture2D::loadImage( std::string &inFile ) {
+int slTexture2D::loadImage( std::string &inFile, bool inRepeat ) {
 	unsigned char *pixels;
 	int height, width, components;
 
@@ -42,7 +42,7 @@ int slTexture2D::loadImage( std::string &inFile ) {
 		return -1;
 		// throw slException( std::string( "Could not read image file " ) + inFile );
 
-	loadPixels( pixels, width, height );
+	loadPixels( pixels, width, height, inRepeat );
 
 	delete[] pixels;
 
@@ -57,9 +57,9 @@ slTexture2D::~slTexture2D() {
 		glDeleteTextures( 1, &_textureID );
 }
 
-void slTexture2D::loadPixels( unsigned char *pixels, int width, int height ) {
-	int newwidth = slNextPowerOfTwo( width );
-	int newheight = slNextPowerOfTwo( height );
+void slTexture2D::loadPixels( unsigned char *pixels, int inWidth, int inHeight, bool inRepeat ) {
+	int newwidth = slNextPowerOfTwo( inWidth );
+	int newheight = slNextPowerOfTwo( inHeight );
 
 	if( _textureID == 0 )
 		glGenTextures( 1, &_textureID );
@@ -70,11 +70,14 @@ void slTexture2D::loadPixels( unsigned char *pixels, int width, int height ) {
 
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+
+	GLenum edge = inRepeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
+
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, edge );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, edge );
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
-	if ( newwidth != width || newheight != height ) {
+	if ( newwidth != inWidth || newheight != inHeight ) {
 		int xstart, ystart;
 
 		unsigned char *newpixels = new unsigned char[newwidth * newheight * 4];
@@ -84,21 +87,21 @@ void slTexture2D::loadPixels( unsigned char *pixels, int width, int height ) {
 		xstart = 0;
 		ystart = 0;
 
-		for ( int y = 0; y < height; y++ )
-			memcpy( &newpixels[( y + ystart ) *( newwidth * 4 ) + ( xstart * 4 )], &pixels[y * width * 4], width * 4 );
+		for ( int y = 0; y < inHeight; y++ )
+			memcpy( &newpixels[( y + ystart ) *( newwidth * 4 ) + ( xstart * 4 )], &pixels[y * inWidth * 4], inWidth * 4 );
 
 		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, newwidth, newheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, newpixels );
 		// glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, newwidth, newheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
 		// glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
 
-		_unitX = width / (float)newwidth;
-		_unitY = height / (float)newheight;
+		_unitX = ( inWidth - 0.5 )  / (float)newwidth;
+		_unitY = ( inHeight - 0.5 ) / (float)newheight;
 
 		delete[] newpixels;
 	} else {
-		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
-
-		_unitX = _unitY = 1.0;
+		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, inWidth, inHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+		_unitX = 1.0;
+		_unitY = 1.0;
 	}
 }
 
