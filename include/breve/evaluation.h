@@ -123,9 +123,10 @@ inline int stEvalIf(stIfExp *, stRunInstance *, brEval *);
 inline int stEvalListInsert(stListInsertExp *, stRunInstance *, brEval *);
 inline int stEvalListRemove(stListRemoveExp *, stRunInstance *, brEval *);
 inline int stEvalSort(stSortExp *, stRunInstance *, brEval *);
-inline int stEvalListIndex(stListIndexExp *, stRunInstance *, brEval *);
 inline int stEvalListIndexPointer(stListIndexExp *, stRunInstance *, void **, int *);
-inline int stEvalListIndexAssign(stListIndexAssignExp *, stRunInstance *, brEval *);
+
+inline int stEvalIndexAssign(stListIndexAssignExp *, stRunInstance *, brEval *);
+inline int stEvalIndexLookup(stListIndexExp *, stRunInstance *, brEval *);
 
 inline int stEvalEvalExp( stEvalExp *inEval, stRunInstance *inInstance, brEval *outResult );
 
@@ -154,7 +155,7 @@ int stExpEval(stExp *, stRunInstance *, brEval *, stObject **);
 
 void stConvertBreveInstanceToSteveInstance(brEval *);
 
-int stDoEvalListIndexAssign(brEvalListHead *, int, brEval *, stRunInstance *);
+int stEvalListIndexAssign(brEvalListHead *, int, brEval *, stRunInstance *);
 
 void stEvalError( stInstance*, int, char *, ... );
 

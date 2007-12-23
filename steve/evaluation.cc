@@ -1684,7 +1684,7 @@ RTC_INLINE int stEvalListIndexPointer( stListIndexExp *l, stRunInstance *i, void
 	return EC_OK;
 }
 
-RTC_INLINE int stEvalListIndex( stListIndexExp *l, stRunInstance *i, brEval *t ) {
+RTC_INLINE int stEvalIndexLookup( stListIndexExp *l, stRunInstance *i, brEval *t ) {
 	brEval list, index;
 	int resultCode;
 
@@ -1780,29 +1780,29 @@ RTC_INLINE int stEvalListIndex( stListIndexExp *l, stRunInstance *i, brEval *t )
 	return EC_OK;
 }
 
-RTC_INLINE int stEvalListIndexAssign( stListIndexAssignExp *l, stRunInstance *i, brEval *t ) {
-	brEval list, index;
+RTC_INLINE int stEvalIndexAssign( stListIndexAssignExp *l, stRunInstance *i, brEval *t ) {
+	brEval expression, index;
 	int resultCode;
 
-	if (( resultCode = stExpEval3( l->listExp, i, &list ) ) != EC_OK ||
+	if (( resultCode = stExpEval3( l->listExp, i, &expression ) ) != EC_OK ||
 	        ( resultCode = stExpEval3( l->indexExp, i, &index ) ) != EC_OK ||
 	        ( resultCode = stExpEval3( l->assignment, i, t ) ) != EC_OK )
 		return resultCode;
 
-	if ( list.type() == AT_LIST ) {
+	if ( expression.type() == AT_LIST ) {
 		if ( index.type() != AT_INT && stToInt( &index, &index, i ) == EC_ERROR ) {
 			stEvalError( i->instance, EE_TYPE, "expected type \"int\" for list index" );
 			return EC_ERROR;
 		}
 
-		if ( stDoEvalListIndexAssign( BRLIST( &list ), BRINT( &index ), t, i ) ) {
+		if ( stEvalListIndexAssign( BRLIST( &expression ), BRINT( &index ), t, i ) ) {
 			stEvalError( i->instance, EE_BOUNDS, "list index \"%d\" out of bounds", BRINT( &index ) );
 			return EC_ERROR;
 		}
-	} else if ( list.type() == AT_HASH ) {
+	} else if ( expression.type() == AT_HASH ) {
 
-		brEvalHashStore( BRHASH( &list ), &index, t );
-	} else if ( list.type() == AT_VECTOR ) {
+		brEvalHashStore( BRHASH( &expression ), &index, t );
+	} else if ( expression.type() == AT_VECTOR ) {
 		int type;
 		slVector *vec;
 
@@ -1840,7 +1840,7 @@ RTC_INLINE int stEvalListIndexAssign( stListIndexAssignExp *l, stRunInstance *i,
 
 		t->set( *vec );
 
-	} else if ( list.type() == AT_MATRIX ) {
+	} else if ( expression.type() == AT_MATRIX ) {
 		int type;
 		slMatrix *mat;
 
@@ -1875,7 +1875,7 @@ RTC_INLINE int stEvalListIndexAssign( stListIndexAssignExp *l, stRunInstance *i,
 
 		}
 
-	} else if ( list.type() == AT_STRING ) {
+	} else if ( expression.type() == AT_STRING ) {
 		char **stringptr, *newstring, *oldstring, *substring;
 		unsigned int n;
 		int type;
@@ -1917,22 +1917,34 @@ RTC_INLINE int stEvalListIndexAssign( stListIndexAssignExp *l, stRunInstance *i,
 		*stringptr = newstring;
 
 		t->set( slStrdup( newstring ) );
-	} else if ( list.type() == AT_INSTANCE ) {
-		int type;
-		stObject *obj;
-		
-		if(stPointerForExp( l->listExp, i, ( void * ) &obj, &type )==EC_ERROR) {
-			stEvalError( i->instance, EE_TYPE, "error getting pointer to stObject");
+	} else if ( expression.type() == AT_INSTANCE ) {
+		// If the index isn't a string, we can't lookup the instance variable
+        
+		if( index.type() != AT_STRING ) {
+			stEvalError( i->instance, EE_TYPE, "Instance index value must be a string" );
 			return EC_ERROR;
 		}
-
-		stVar *theVariable = stObjectLookupVariable(obj, BRSTRING(&index));
-		if(theVariable!=NULL) {
-			stEvalAssignment( l->assignment, i, t );
-		} else {
-			stEvalError( i->instance, EE_TYPE, "variable named \"%s\" is not a member of class \"%s\"",BRSTRING(&index),type);
+        
+		// Get the steve instance for the expression they're indexxing
+        
+		stInstance *assignInstance = ( stInstance * )BRINSTANCE( &expression )->userData;
+        
+		// Find the variable for this instance
+        
+		stVar *theVariable = stObjectLookupVariable( assignInstance -> type, BRSTRING( &index ) );
+        
+		if( !theVariable ) {
+			stEvalError( i->instance, EE_TYPE, "Cannot locate variable \"%s\" for object", BRSTRING( &index ) );
 			return EC_ERROR;
 		}
+        
+		// Make a pointer to the variable by looking inside the instance by the proper offset
+        
+		void *pointer = &i->instance->variables[ theVariable -> offset ];
+        
+		// Assign the variable
+        
+		resultCode = stSetVariable( pointer, theVariable->type->_type, assignInstance->type, t, i );
 	} else {
 		stEvalError( i->instance, EE_TYPE, "expected type \"list\" or \"hash\" in index assignment" );
 		return EC_ERROR;
@@ -3623,12 +3635,12 @@ int stExpEval( stExp *s, stRunInstance *i, brEval *result, stObject **tClass ) {
 			break;
 
 		case ET_LIST_INDEX:
-			resultCode = EVAL_RTC_CALL_3( s, stEvalListIndex, ( stListIndexExp * )s, i, result );
+			resultCode = EVAL_RTC_CALL_3( s, stEvalIndexLookup, ( stListIndexExp * )s, i, result );
 
 			break;
 
 		case ET_LIST_INDEX_ASSIGN:
-			resultCode = EVAL_RTC_CALL_3( s, stEvalListIndexAssign, ( stListIndexAssignExp * )s, i, result );
+			resultCode = EVAL_RTC_CALL_3( s, stEvalIndexAssign, ( stListIndexAssignExp * )s, i, result );
 
 			break;
 
@@ -3740,7 +3752,7 @@ int stDoEvalListIndex( brEvalListHead *l, int n, brEval *newLoc ) {
 	return 0;
 }
 
-int stDoEvalListIndexAssign( brEvalListHead *l, int n, brEval *newVal, stRunInstance *ri ) {
+int stEvalListIndexAssign( brEvalListHead *l, int n, brEval *newVal, stRunInstance *ri ) {
 	brEval *eval;
 
 	if ( n > ( int )l->_vector.size() || n < 0 )

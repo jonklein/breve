@@ -178,8 +178,8 @@ typedef struct stRtcCodeBlock_t {
 		int (*stEvalAll)(stAllExp *, stRunInstance *, brEval *);
 		int (*stEvalSort)(stSortExp *, stRunInstance *, brEval *);
 		int (*stEvalListIndexPointer)(stListIndexExp *, stRunInstance *, void **, int *);
-		int (*stEvalListIndex)(stListIndexExp *, stRunInstance *, brEval *);
-		int (*stEvalListIndexAssign)(stListIndexAssignExp *, stRunInstance *, brEval *);
+		int (*stEvalIndexLookup)(stListIndexExp *, stRunInstance *, brEval *);
+		int (*stEvalIndexAssign)(stListIndexAssignExp *, stRunInstance *, brEval *);
 		int (*stEvalPrint)(stPrintExp *, stRunInstance *, brEval *);
 		int (*stEvalCopyList)(stCopyListExp *, stRunInstance *, brEval *);
 		int (*stEvalVectorElementExp)(stVectorElementExp *, stRunInstance *, brEval *);
