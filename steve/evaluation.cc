@@ -1918,12 +1918,20 @@ RTC_INLINE int stEvalListIndexAssign( stListIndexAssignExp *l, stRunInstance *i,
 
 		t->set( slStrdup( newstring ) );
 	} else if ( list.type() == AT_INSTANCE ) {
-		stEvalError( i->instance, EE_TYPE, "variable named \"%s\" is not a member of class \"%s\"",l->indexExp->type,l->listExp->type);
-		stVar *theVariable = stObjectLookupVariable(l->listExp->type, l->indexExp->type);
-		if(theVariable) {
+		int type;
+		stObject *obj;
+		
+		if(stPointerForExp( l->listExp, i, ( void * ) &obj, &type )==EC_ERROR) {
+			stEvalError( i->instance, EE_TYPE, "error getting pointer to stObject");
+			return EC_ERROR;
+		}
+
+		stVar *theVariable = stObjectLookupVariable(obj, BRSTRING(&index));
+		if(theVariable!=NULL) {
 			stEvalAssignment( l->assignment, i, t );
 		} else {
-			stEvalError( i->instance, EE_TYPE, "variable named \"%s\" is not a member of class \"%s\"",l->indexExp,l->listExp->type);
+			stEvalError( i->instance, EE_TYPE, "variable named \"%s\" is not a member of class \"%s\"",BRSTRING(&index),type);
+			return EC_ERROR;
 		}
 	} else {
 		stEvalError( i->instance, EE_TYPE, "expected type \"list\" or \"hash\" in index assignment" );
