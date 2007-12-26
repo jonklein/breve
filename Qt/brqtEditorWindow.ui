@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>542</width>
-    <height>610</height>
+    <width>626</width>
+    <height>647</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -27,11 +27,11 @@
    </size>
   </property>
   <property name="windowTitle" >
-   <string>Form1</string>
+   <string>Untitled Document</string>
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
-    <number>3</number>
+    <number>1</number>
    </property>
    <property name="spacing" >
     <number>2</number>

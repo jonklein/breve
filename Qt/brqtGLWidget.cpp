@@ -6,6 +6,8 @@
 
 brqtGLWidget::brqtGLWidget( QWidget* parent ) : QGLWidget( parent ) {
    _engine = NULL;
+
+	setSizePolicy( QSizePolicy( QSizePolicy::Maximum, QSizePolicy::Maximum ) );
 }
 
 brqtGLWidget::~brqtGLWidget() { 
@@ -18,7 +20,7 @@ void brqtGLWidget::paintGL()
 		brEngineRenderWorld(_engine, 0);
 		brEngineUnlock(_engine);
 	} else {
-		glClearColor( .3, .15, .8, 1.0 );
+		glClearColor( .8, .15, .8, 1.0 );
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	}
 }

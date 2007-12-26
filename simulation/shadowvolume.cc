@@ -271,12 +271,11 @@ void slCamera::renderObjectShadowVolumes( slWorld *w ) {
 	std::vector<slWorldObject*>::iterator wi;
 
 	glDisable( GL_BLEND );
-	// glColor4f( 0, 0, 0, ( *wi ) -> _transparency );
 	glColor4f( 0, 0, 0, 1.0 );
 
 	for ( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ ) {
-		if ( *wi && ( *wi )->_shape && !( *wi )->_drawAsPoint && ( *wi )->_drawShadow ) {
-			( *wi )->_shape->drawShadowVolume( this, &( *wi )->_position );
+		if ( *wi && ( *wi )->_displayShape && !( *wi )->_drawAsPoint && ( *wi )->_drawShadow ) {
+			( *wi )->_displayShape->drawShadowVolume( this, &( *wi )->_position );
 		}
 	}
 }

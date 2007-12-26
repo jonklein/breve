@@ -7,8 +7,6 @@ QT		+= opengl
 
 LIBS    += -L../lib -lbreve @LIBS@ 
 
-mac:LIBS        += -framework OpenGL
-
 INCLUDEPATH     += ../include/breve
 
 HEADERS += brqtGLWidget.h \
@@ -38,7 +36,15 @@ RESOURCES = breve.qrc
 LEXSOURCES      += brqtQuickparser.l
 
 unix {
-  UI_DIR = .ui
-  MOC_DIR = .moc
-  OBJECTS_DIR = .obj
+	UI_DIR = .ui
+	MOC_DIR = .moc
+	OBJECTS_DIR = .obj
 }
+
+mac {
+	LIBS        	+= -framework OpenGL
+	CONFIG 			+= x86 ppc
+}
+
+QMAKE_CXXFLAGS  += @CPPFLAGS@
+QMAKE_LFLAGS	+= @LDFLAGS@
