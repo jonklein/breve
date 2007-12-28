@@ -507,7 +507,7 @@ void breveInitImageFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "imageGetHeight", brIImageGetHeight, AT_INT, AT_POINTER, 0 );
 	brNewBreveCall( n, "imageGetPixelPointer", brIImageGetPixelPointer, AT_POINTER, AT_POINTER, 0 );
 	brNewBreveCall( n, "imageGetCompressionSize", brIImageGetCompressionSize, AT_INT, AT_POINTER, 0 );
-	brNewBreveCall( n, "imageGetValueAtCoordinates", brIImageGetValueAtCoordinates, AT_DOUBLE, AT_POINTER, AT_INT, AT_INT, 0 );
+	brNewBreveCall( n, "imageGetValueAtCoordinates", brIImageGetValueAtCoordinates, AT_DOUBLE, AT_POINTER, AT_INT, AT_INT, AT_INT, 0 );
 	brNewBreveCall( n, "imageSetValueAtCoordinates", brIImageSetValueAtCoordinates, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "imageLoadFromFile", brIImageLoadFromFile, AT_POINTER, AT_STRING, 0 );
 	brNewBreveCall( n, "imageWriteToFile", brIImageWriteToFile, AT_INT, AT_POINTER, AT_STRING, AT_INT, AT_INT,  0 );

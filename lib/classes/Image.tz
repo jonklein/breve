@@ -100,28 +100,28 @@ Abstract : Image (aka Images) [version 2.0] {
 		% The pixel value is given on a scale from 0.0 to 1.0.
 
 		if !imageData: return 0.
-		return imageGetValueAtCoordinates(imageData, x * 4, y).
+		return imageGetValueAtCoordinates(imageData, x * 4, y, 4).
 
 	+ to get-green-pixel at-x x (int) at-y y (int):
 		% Returns the green pixel at the image coordinates (x, y).
 		% The pixel value is given on a scale from 0.0 to 1.0.
 
 		if !imageData: return 0.
-		return imageGetValueAtCoordinates(imageData, (x * 4) + 1, y).
+		return imageGetValueAtCoordinates(imageData, (x * 4) + 1, y, 4).
 
 	+ to get-blue-pixel at-x x (int) at-y y (int):
 		% Returns the blue pixel at the image coordinates (x, y).
 		% The pixel value is given on a scale from 0.0 to 1.0.
 
 		if !imageData: return 0.
-		return imageGetValueAtCoordinates(imageData, (x * 4) + 2, y).
+		return imageGetValueAtCoordinates(imageData, (x * 4) + 2, y, 4).
 
 	+ to get-alpha-pixel at-x x (int) at-y y (int):
 		% Returns the alpha channel pixel at the image coordinates (x, y).
 		% The pixel value is given on a scale from 0.0 to 1.0.
 
 		if !imageData: return 0.
-		return imageGetValueAtCoordinates(imageData, (x * 4) + 3, y).
+		return imageGetValueAtCoordinates(imageData, (x * 4) + 3, y, 4).
 
 	+ to get-rgb-pixel at-x x (int) at-y y (int):
 		% Returns the red, green and blue components of the pixel
@@ -131,9 +131,9 @@ Abstract : Image (aka Images) [version 2.0] {
 
 		if !imageData: return (0, 0, 0).
 
-		r = imageGetValueAtCoordinates(imageData, x * 4, y).
-		g = imageGetValueAtCoordinates(imageData, (x * 4) + 1, y).
-		b = imageGetValueAtCoordinates(imageData, (x * 4) + 2, y).
+		r = imageGetValueAtCoordinates(imageData, x * 4, y, 4).
+		g = imageGetValueAtCoordinates(imageData, (x * 4) + 1, y, 4).
+		b = imageGetValueAtCoordinates(imageData, (x * 4) + 2, y, 4).
 
 		return (r, g, b).
 
