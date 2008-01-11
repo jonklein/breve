@@ -22,6 +22,10 @@ AC_ARG_ENABLE([osxcompat104],
 
 PYTHONROOT="/usr"
 
+if test "$prefix" != "NONE"; then
+	PYTHONROOT="$prefix"
+fi
+
 if test "x$static" != "x"; then 
 	BEGIN_STATIC="-Xlinker -Bstatic"
 	BEGIN_DYNAMIC="-Xlinker -Bdynamic"

@@ -10,7 +10,6 @@
 #include "mesh.h"
 #include "gldraw.h"
 
-
 slMeshShape::slMeshShape() : slShape() {
 	_vertices = NULL;
 	_indices  = NULL;
@@ -263,10 +262,10 @@ void slMeshShape::finishShapeWithMaxLength( double inDensity, float inMaxSize ) 
 		_vertices[ n * 3 + 2 ] = d._vertices[ n ].z;
 	}
 
-	for( int n = 0; n < d._indices.size(); n++ ) {
-		_indices[ n * 3     ] = d._indices[ n ]._i1;
-		_indices[ n * 3 + 1 ] = d._indices[ n ]._i2;
-		_indices[ n * 3 + 2 ] = d._indices[ n ]._i3;
+	for( unsigned int i = 0; i < d._indices.size(); i++ ) {
+		_indices[ i * 3     ] = d._indices[ i ]._i1;
+		_indices[ i * 3 + 1 ] = d._indices[ i ]._i2;
+		_indices[ i * 3 + 2 ] = d._indices[ i ]._i3;
 	}
 }
 
@@ -391,7 +390,7 @@ sl3DSShape::sl3DSShape( char *inFilename, char *inMeshname, float inSize ) : slM
 
 	lib3ds_file_eval( file, 0.0 );
 
-	_directory = dirname( inFilename );
+	_directory = slDirname( inFilename );
 	
 	_vertexCount = 0;
 	_indexCount = 0;
@@ -404,8 +403,8 @@ sl3DSShape::sl3DSShape( char *inFilename, char *inMeshname, float inSize ) : slM
 	_normals = new float[ _indexCount * 3 ];
 	_materials = new int[ _indexCount ];
 
-	bzero( _materials, sizeof( int ) * _indexCount );
-	bzero( _normals,   sizeof( float ) * _indexCount * 3 );
+	memset( _materials, 0, sizeof( int ) * _indexCount );
+	memset( _normals,   0, sizeof( float ) * _indexCount * 3 );
 
 	_maxReach = 0.0;
 

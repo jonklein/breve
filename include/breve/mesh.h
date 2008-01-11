@@ -15,7 +15,9 @@
 
 #include "texture.h"
 
+#ifndef WINDOWS
 #include <libgen.h>
+#endif
 
 struct slMaterial {
 	slMaterial() {
