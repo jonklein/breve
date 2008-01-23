@@ -20,30 +20,30 @@ class brqtGLWidget : public QGLWidget {
 			_engine = e; 
 
 			if(_engine) {
-				slInitGL(_engine->world, _engine->camera);
+				slInitGL( _engine->world, _engine->camera );
 				_engine->camera->setBounds( width(), height() );
 			} 
 
 			updateGL();
 		}
 
-		public slots: 
-			virtual void setButtonMode(int mode) {
-				_buttonMode = mode;
+	public slots: 
+		virtual void 	setButtonMode(int mode) {
+			_buttonMode = mode;
 		}
   
 	protected:
-		void initializeGL();
-		void paintGL();
-		void resizeGL( int w, int h );
+		void 			initializeGL();
+		void 			paintGL();
+		void 			resizeGL( int w, int h );
 
-		void mousePressEvent ( QMouseEvent *e);
-		void mouseMoveEvent ( QMouseEvent *e );
+		void 			mousePressEvent( QMouseEvent *e);
+		void 			mouseMoveEvent( QMouseEvent *e );
 
 	private:
-		brEngine *_engine;    
-		int _buttonMode;
-		QPoint _lastPosition;
+		brEngine*		_engine;    
+		int 			_buttonMode;
+		QPoint 			_lastPosition;
 };
 
 #endif // BRQTGLWIDGET_H

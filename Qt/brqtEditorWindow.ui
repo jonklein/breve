@@ -1,65 +1,32 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>brqtEditorWindow</class>
  <widget class="QWidget" name="brqtEditorWindow" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>626</width>
-    <height>647</height>
+    <width>789</width>
+    <height>954</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy>
-    <hsizetype>5</hsizetype>
-    <vsizetype>5</vsizetype>
-    <horstretch>1</horstretch>
-    <verstretch>1</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="sizeIncrement" >
-   <size>
-    <width>1</width>
-    <height>1</height>
-   </size>
-  </property>
   <property name="windowTitle" >
-   <string>Untitled Document</string>
+   <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
+   <property name="leftMargin" >
     <number>1</number>
    </property>
-   <property name="spacing" >
-    <number>2</number>
+   <property name="topMargin" >
+    <number>1</number>
+   </property>
+   <property name="rightMargin" >
+    <number>1</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>1</number>
    </property>
    <item>
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType" >
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>520</width>
-       <height>2</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
     <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>1</number>
-     </property>
-     <property name="spacing" >
-      <number>6</number>
-     </property>
      <item>
       <spacer>
        <property name="orientation" >
@@ -79,9 +46,7 @@
      <item>
       <widget class="QLabel" name="textLabel1" >
        <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>0</hsizetype>
-         <vsizetype>0</vsizetype>
+        <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -94,9 +59,7 @@
      <item>
       <widget class="QLineEdit" name="lineBox" >
        <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>0</hsizetype>
-         <vsizetype>0</vsizetype>
+        <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -146,56 +109,158 @@
     </layout>
    </item>
    <item>
-    <widget class="QTextEdit" name="textEdit" >
-     <property name="font" >
-      <font>
-       <family>Monaco</family>
-       <pointsize>9</pointsize>
-       <weight>50</weight>
-       <italic>false</italic>
-       <bold>false</bold>
-       <underline>false</underline>
-       <strikeout>false</strikeout>
-      </font>
+    <widget class="QSplitter" name="splitter" >
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
      </property>
-     <property name="midLineWidth" >
-      <number>-5</number>
-     </property>
-     <property name="verticalScrollBarPolicy" >
-      <enum>Qt::ScrollBarAlwaysOn</enum>
-     </property>
-     <property name="horizontalScrollBarPolicy" >
-      <enum>Qt::ScrollBarAlwaysOn</enum>
-     </property>
-     <property name="lineWrapMode" >
-      <enum>QTextEdit::NoWrap</enum>
-     </property>
-     <property name="lineWrapColumnOrWidth" >
-      <number>0</number>
-     </property>
-     <property name="html" >
-      <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Monaco; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Courier; font-size:12pt;">&lt;/p>&lt;/body>&lt;/html></string>
-     </property>
-     <property name="tabStopWidth" >
-      <number>15</number>
-     </property>
-     <property name="acceptRichText" >
-      <bool>false</bool>
-     </property>
+     <widget class="brqtTextEdit" name="textEdit" >
+      <property name="sizePolicy" >
+       <sizepolicy vsizetype="MinimumExpanding" hsizetype="MinimumExpanding" >
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="sizeIncrement" >
+       <size>
+        <width>0</width>
+        <height>2</height>
+       </size>
+      </property>
+      <property name="font" >
+       <font>
+        <family>Monaco</family>
+        <pointsize>9</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+       </font>
+      </property>
+      <property name="midLineWidth" >
+       <number>-5</number>
+      </property>
+      <property name="verticalScrollBarPolicy" >
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy" >
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="lineWrapMode" >
+       <enum>QTextEdit::NoWrap</enum>
+      </property>
+      <property name="lineWrapColumnOrWidth" >
+       <number>0</number>
+      </property>
+      <property name="html" >
+       <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Monaco'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Courier'; font-size:12pt;">&lt;/p>&lt;/body>&lt;/html></string>
+      </property>
+      <property name="tabStopWidth" >
+       <number>15</number>
+      </property>
+      <property name="acceptRichText" >
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QWidget" name="layoutWidget" >
+      <layout class="QVBoxLayout" >
+       <item>
+        <widget class="QTreeWidget" name="parameters" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="sizeIncrement" >
+          <size>
+           <width>0</width>
+           <height>1</height>
+          </size>
+         </property>
+         <property name="autoExpandDelay" >
+          <number>0</number>
+         </property>
+         <property name="columnCount" >
+          <number>2</number>
+         </property>
+         <column>
+          <property name="text" >
+           <string>Name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Value</string>
+          </property>
+         </column>
+         <item>
+          <property name="text" >
+           <string>Simulation Parameters</string>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" >
+         <item>
+          <spacer>
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" >
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="addChildParameter" >
+           <property name="text" >
+            <string>Add Child</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="removeParameter" >
+           <property name="text" >
+            <string>Remove Item</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="loadParameters" >
+           <property name="text" >
+            <string>Load Parameters...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="0" margin="0" />
- <layoutfunction spacing="0" margin="0" />
- <pixmapfunction></pixmapfunction>
  <customwidgets>
   <customwidget>
    <class>brqtMethodPopup</class>
    <extends>QComboBox</extends>
    <header>brqtMethodPopup.h</header>
-   <container>0</container>
-   <pixmap></pixmap>
+  </customwidget>
+  <customwidget>
+   <class>brqtTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>brqtTextEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

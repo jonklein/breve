@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>brqtMainWindow</class>
  <widget class="QMainWindow" name="brqtMainWindow" >
   <property name="geometry" >
@@ -17,43 +14,83 @@
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QVBoxLayout" >
-    <property name="margin" >
-     <number>9</number>
-    </property>
     <property name="spacing" >
      <number>6</number>
+    </property>
+    <property name="leftMargin" >
+     <number>9</number>
+    </property>
+    <property name="topMargin" >
+     <number>9</number>
+    </property>
+    <property name="rightMargin" >
+     <number>9</number>
+    </property>
+    <property name="bottomMargin" >
+     <number>9</number>
     </property>
     <item>
      <widget class="QFrame" name="displayFrame" >
       <property name="frameShape" >
-       <enum>QFrame::StyledPanel</enum>
+       <enum>QFrame::Box</enum>
       </property>
       <property name="frameShadow" >
-       <enum>QFrame::Raised</enum>
+       <enum>QFrame::Sunken</enum>
       </property>
+      <layout class="QVBoxLayout" >
+       <property name="leftMargin" >
+        <number>2</number>
+       </property>
+       <property name="topMargin" >
+        <number>2</number>
+       </property>
+       <property name="rightMargin" >
+        <number>2</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>2</number>
+       </property>
+       <item>
+        <widget class="brqtGLWidget" native="1" name="glWidget" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
     <item>
      <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>0</number>
-      </property>
       <property name="spacing" >
        <number>6</number>
+      </property>
+      <property name="leftMargin" >
+       <number>0</number>
+      </property>
+      <property name="topMargin" >
+       <number>0</number>
+      </property>
+      <property name="rightMargin" >
+       <number>0</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>0</number>
       </property>
       <item>
        <widget class="QGroupBox" name="groupBox" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>0</hsizetype>
-          <vsizetype>0</vsizetype>
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize" >
          <size>
-          <width>210</width>
+          <width>176</width>
           <height>59</height>
          </size>
         </property>
@@ -63,7 +100,7 @@
         <widget class="QToolButton" name="toolButton" >
          <property name="geometry" >
           <rect>
-           <x>60</x>
+           <x>47</x>
            <y>30</y>
            <width>41</width>
            <height>24</height>
@@ -82,7 +119,7 @@
         <widget class="QToolButton" name="toolButton_4" >
          <property name="geometry" >
           <rect>
-           <x>160</x>
+           <x>131</x>
            <y>30</y>
            <width>41</width>
            <height>24</height>
@@ -101,7 +138,7 @@
         <widget class="QToolButton" name="toolButton_2" >
          <property name="geometry" >
           <rect>
-           <x>10</x>
+           <x>5</x>
            <y>30</y>
            <width>41</width>
            <height>24</height>
@@ -120,7 +157,7 @@
         <widget class="QToolButton" name="toolButton_3" >
          <property name="geometry" >
           <rect>
-           <x>110</x>
+           <x>89</x>
            <y>30</y>
            <width>41</width>
            <height>24</height>
@@ -157,9 +194,7 @@
       <item>
        <widget class="QPushButton" name="stopSimulationButton" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>0</hsizetype>
-          <vsizetype>0</vsizetype>
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -168,16 +203,14 @@
          <string/>
         </property>
         <property name="icon" >
-         <iconset>play.png</iconset>
+         <iconset>stop.png</iconset>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="toggleSimulationButton" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>0</hsizetype>
-          <vsizetype>0</vsizetype>
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -206,9 +239,7 @@
       <item>
        <widget class="QComboBox" name="comboBox" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>7</hsizetype>
-          <vsizetype>0</vsizetype>
+         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -234,104 +265,336 @@
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>Edit</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuHelp_2" >
-    <property name="title" >
-     <string>Help</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuHelp" >
     <property name="title" >
      <string>Help</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
-     <string>File</string>
-    </property>
-    <addaction name="actionOpen" />
-    <addaction name="actionSave" />
-    <addaction name="actionNew" />
-   </widget>
-   <widget class="QMenu" name="menuWindow" >
-    <property name="title" >
-     <string>Window</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuDemos" >
-    <property name="title" >
-     <string>Demos</string>
-    </property>
+    <widget class="QMenu" name="menuPythonClasses" >
+     <property name="title" >
+      <string>Python Classes</string>
+     </property>
+     <addaction name="actionNone" />
+    </widget>
+    <widget class="QMenu" name="menuSteveClasses" >
+     <property name="title" >
+      <string>steve Classes</string>
+     </property>
+     <addaction name="actionNone_2" />
+    </widget>
+    <addaction name="actionDocumentation_Index_2" />
+    <addaction name="menuSteveClasses" />
+    <addaction name="menuPythonClasses" />
    </widget>
    <widget class="QMenu" name="menuSimulation" >
     <property name="title" >
      <string>Simulation</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuHelp" >
+   <widget class="QMenu" name="menuWindow" >
     <property name="title" >
-     <string>Help</string>
+     <string>Window</string>
     </property>
-    <addaction name="menuSteveHelp" />
-    <addaction name="menuPythonHelp" />
+    <addaction name="actionSimulation_Window" />
+    <addaction name="actionLog_Window" />
+    <addaction name="actionObject_Inspector" />
+    <addaction name="actionSimulation_Parameters" />
+    <addaction name="separator" />
+   </widget>
+   <widget class="QMenu" name="menuDemos" >
+    <property name="title" >
+     <string>Demos</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>Edit</string>
+    </property>
+    <widget class="QMenu" name="menuFind" >
+     <property name="title" >
+      <string>Find</string>
+     </property>
+     <addaction name="actionFind" />
+     <addaction name="actionFind_Next" />
+     <addaction name="actionFind_Previous" />
+    </widget>
+    <addaction name="actionUndo" />
+    <addaction name="actionRedo" />
+    <addaction name="separator" />
+    <addaction name="actionCopy" />
+    <addaction name="actionPaste" />
+    <addaction name="actionCut" />
+    <addaction name="actionSelect_All" />
+    <addaction name="separator" />
+    <addaction name="actionClear_Log" />
+    <addaction name="menuFind" />
+   </widget>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>File</string>
+    </property>
+    <widget class="QMenu" name="menuNew_From_Template" >
+     <property name="title" >
+      <string>New From Template</string>
+     </property>
+     <addaction name="actionTemplates" />
+    </widget>
+    <addaction name="actionNew" />
+    <addaction name="menuNew_From_Template" />
+    <addaction name="actionOpen" />
+    <addaction name="actionSave" />
+    <addaction name="separator" />
+    <addaction name="actionClose" />
+    <addaction name="separator" />
+    <addaction name="actionStart_Simulation" />
+    <addaction name="actionStart_Archive_Simulation" />
+    <addaction name="actionSave_Simulation_State" />
+    <addaction name="separator" />
+    <addaction name="actionSave_Snapshot" />
+    <addaction name="actionSave_Movie" />
+    <addaction name="actionSave_Simulation_Log" />
+    <addaction name="separator" />
+    <addaction name="actionPrint" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
    <addaction name="menuDemos" />
    <addaction name="menuSimulation" />
-   <addaction name="menuHelp" />
    <addaction name="menuWindow" />
+   <addaction name="menuHelp" />
   </widget>
-  <widget class="QStatusBar" name="statusbar" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>514</y>
-     <width>580</width>
-     <height>22</height>
-    </rect>
-   </property>
-  </widget>
+  <widget class="QStatusBar" name="statusbar" />
   <action name="actionSave" >
    <property name="text" >
     <string>&amp;Save</string>
    </property>
    <property name="shortcut" >
-    <string/>
+    <string>Ctrl+S</string>
+   </property>
+   <property name="shortcutContext" >
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionOpen" >
    <property name="text" >
-    <string>&amp;Open</string>
+    <string>Open...</string>
    </property>
    <property name="shortcut" >
-    <string/>
+    <string>Ctrl+O</string>
+   </property>
+   <property name="shortcutContext" >
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionNew" >
    <property name="text" >
     <string>&amp;New</string>
    </property>
+   <property name="iconText" >
+    <string>New document</string>
+   </property>
    <property name="shortcut" >
-    <string/>
+    <string>Ctrl+N</string>
+   </property>
+   <property name="shortcutContext" >
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
-  <action name="menuSteveHelp" >
+  <action name="actionDocumentation_Index" >
    <property name="text" >
-    <string>steve Classes</string>
+    <string>Documentation Index</string>
    </property>
   </action>
-  <action name="menuPythonHelp" >
+  <action name="actionEmpty" >
    <property name="text" >
-    <string>Python Classes</string>
+    <string>Empty</string>
+   </property>
+  </action>
+  <action name="actionEmpty_2" >
+   <property name="text" >
+    <string>Empty</string>
+   </property>
+  </action>
+  <action name="actionDocumentation_Index_2" >
+   <property name="text" >
+    <string>Documentation Index</string>
+   </property>
+  </action>
+  <action name="actionNone" >
+   <property name="text" >
+    <string>none</string>
+   </property>
+  </action>
+  <action name="actionNone_2" >
+   <property name="text" >
+    <string>none</string>
+   </property>
+  </action>
+  <action name="actionCopy" >
+   <property name="text" >
+    <string>Copy</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+C</string>
+   </property>
+   <property name="shortcutContext" >
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionPaste" >
+   <property name="text" >
+    <string>Paste</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionCut" >
+   <property name="text" >
+    <string>Cut</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="actionUndo" >
+   <property name="text" >
+    <string>Undo</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionRedo" >
+   <property name="text" >
+    <string>Redo</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Shift+Z</string>
+   </property>
+  </action>
+  <action name="actionSelect_All" >
+   <property name="text" >
+    <string>Select All</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionTemplates" >
+   <property name="text" >
+    <string>Templates</string>
+   </property>
+  </action>
+  <action name="actionClose" >
+   <property name="text" >
+    <string>Close</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+W</string>
+   </property>
+   <property name="shortcutContext" >
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionStart_Simulation" >
+   <property name="text" >
+    <string>Start Simulation</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+R</string>
+   </property>
+   <property name="shortcutContext" >
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionPrint" >
+   <property name="text" >
+    <string>Print</string>
+   </property>
+  </action>
+  <action name="actionStart_Archive_Simulation" >
+   <property name="text" >
+    <string>Start Saved Simulation State...</string>
+   </property>
+  </action>
+  <action name="actionSave_Simulation_State" >
+   <property name="text" >
+    <string>Save Simulation State...</string>
+   </property>
+  </action>
+  <action name="actionSave_Snapshot" >
+   <property name="text" >
+    <string>Save Snapshot...</string>
+   </property>
+  </action>
+  <action name="actionSave_Movie" >
+   <property name="text" >
+    <string>Save Movie...</string>
+   </property>
+  </action>
+  <action name="actionSave_Simulation_Log" >
+   <property name="text" >
+    <string>Save Simulation Log...</string>
+   </property>
+  </action>
+  <action name="actionClear_Log" >
+   <property name="text" >
+    <string>Clear Log</string>
+   </property>
+  </action>
+  <action name="actionFind_Next" >
+   <property name="text" >
+    <string>Find Next</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+G</string>
+   </property>
+  </action>
+  <action name="actionFind_Previous" >
+   <property name="text" >
+    <string>Find Previous</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Shift+G</string>
+   </property>
+  </action>
+  <action name="actionFind" >
+   <property name="text" >
+    <string>Find...</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionSimulation_Window" >
+   <property name="text" >
+    <string>Simulation Window</string>
+   </property>
+  </action>
+  <action name="actionLog_Window" >
+   <property name="text" >
+    <string>Log Window</string>
+   </property>
+  </action>
+  <action name="actionObject_Inspector" >
+   <property name="text" >
+    <string>Object Inspector</string>
+   </property>
+  </action>
+  <action name="actionSimulation_Parameters" >
+   <property name="text" >
+    <string>Simulation Parameters</string>
    </property>
   </action>
  </widget>
- <pixmapfunction></pixmapfunction>
+ <customwidgets>
+  <customwidget>
+   <class>brqtGLWidget</class>
+   <extends>QWidget</extends>
+   <header location="global" >brqtGLWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

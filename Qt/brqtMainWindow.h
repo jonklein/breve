@@ -10,8 +10,13 @@
 #include <QGLWidget>
 #include <QFileDialog>
 #include <QVariant>
+#include <QUrl>
+#include <QDesktopServices>
+#include <QTextEdit>
 
 #include "ui_brqtMainWindow.h"
+
+#include "brqtFindDialog.h"
 #include "brqtWidgetPalette.h"
 #include "brqtEngine.h"
 #include "brqtGLWidget.h"
@@ -34,7 +39,7 @@ class brqtMainWindow : public QMainWindow {
 			_editing = e; 
 		}
 
-		void closeDocument();
+		void					closeDocument();
 
 	public slots:
 		void 					toggleEditing();
@@ -42,29 +47,100 @@ class brqtMainWindow : public QMainWindow {
 		void 					newDocument();
 		void 					toggleSimulation();
 
+
+		void 					copy() {
+			QTextEdit *editor = focusedTextEdit();
+			if( editor )
+				editor -> copy();
+		}
+
+		void 					paste() {
+			QTextEdit *editor = focusedTextEdit();
+			if( editor )
+				editor -> paste();
+		}
+
+		void 					cut() {
+			QTextEdit *editor = focusedTextEdit();
+			if( editor )
+				editor -> cut();
+		}
+
+		void 					undo() {
+			QTextEdit *editor = focusedTextEdit();
+			if( editor )
+				editor -> undo();
+		}
+
+		void 					redo() {
+			QTextEdit *editor = focusedTextEdit();
+			if( editor )
+				editor -> undo();
+		}
+
+		void 					selectAll() {
+			QTextEdit *editor = focusedTextEdit();
+			if( editor )
+				editor -> selectAll();
+		}
+
+
+		void 					close() {
+			QWidget *w = QApplication::activeWindow();
+
+			if( w ) 
+				w -> close();
+		}
+
+
+
+
+
+
+
+
+
 		void 					openDemo( QAction *inAction ) {
-			QString path = inAction -> data().toString();
-			printf( "%s\n", path.toAscii().constData() );
+			QString s = inAction -> data().toString();
+			openDocument( s );
 		}
 
 		void 					openHTML( QAction *inAction ) {
-			QString path = inAction -> data().toString();
-			printf( "%s\n", path.toAscii().constData() );
+			QString s = QString( "file://" ) + inAction -> data().toString();
+			QUrl url( s );
+			QDesktopServices::openUrl( url );
+		}
+		
+		
+		
+		void					find() {
+			_findDialog.show();
 		}
 
 	private:
-		QMenu*									buildMenuFromDirectory( const char *inDirectory, QMenu *inParent, QStringList *inFilters, const char *inSlot );
+		int 					openDocument( QString &inDocument );
 
-		bool 									_editing;
+		QMenu*					buildMenuFromDirectory( const char *inDirectory, QMenu *inParent, QStringList *inFilters, const char *inSlot );
 
-		brqtWidgetPalette 						_palette;
+		QTextEdit*				focusedTextEdit() {
+									QWidget *w = QApplication::focusWidget();
 
-		brqtEngine*								_engine;
-		brqtGLWidget*							_glview;
+									if( w && w->inherits( "QTextEdit" ) ) 
+										return (QTextEdit*)w;
 
-		std::vector< brqtEditorWindow* >		_documents;
+									return NULL;
+								}
 
-		Ui::brqtMainWindow						_ui;
+		bool 								_editing;
+
+		brqtWidgetPalette 					_palette;
+		brqtFindDialog						_findDialog;
+		
+		brqtEngine*							_engine;
+		
+		std::vector< brqtEditorWindow* >	_documents;
+
+		Ui::brqtMainWindow					_ui;
 };
 
 #endif // _BRQTMAINWINDOW_H

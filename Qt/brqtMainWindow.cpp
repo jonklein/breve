@@ -17,6 +17,15 @@ brqtMainWindow::brqtMainWindow() {
 	connect( _ui.actionOpen, SIGNAL( triggered() ), this, SLOT( openDocument() ) );
 	connect( _ui.actionNew, SIGNAL( triggered() ), this, SLOT( newDocument() ) );
 
+	connect( _ui.actionCut, SIGNAL( triggered() ), this, SLOT( cut() ) );
+	connect( _ui.actionCopy, SIGNAL( triggered() ), this, SLOT( copy() ) );
+	connect( _ui.actionPaste, SIGNAL( triggered() ), this, SLOT( paste() ) );
+	connect( _ui.actionUndo, SIGNAL( triggered() ), this, SLOT( undo() ) );
+	connect( _ui.actionRedo, SIGNAL( triggered() ), this, SLOT( redo() ) );
+	connect( _ui.actionClose, SIGNAL( triggered() ), this, SLOT( close() ) );
+
+	connect( _ui.actionFind, SIGNAL( triggered() ), this, SLOT( find() ) );
+
 	connect( _ui.toggleSimulationButton, SIGNAL( pressed() ), this, SLOT( toggleSimulation() ) );
 
 	setAcceptDrops( true );
@@ -31,10 +40,9 @@ brqtMainWindow::brqtMainWindow() {
 	buildMenuFromDirectory( "../demos",             _ui.menuDemos, &demoFilters, SLOT( openDemo(QAction*) ) );
 
 	QStringList docFilters( "*.html" );
-	buildMenuFromDirectory( "../docs/steveclasses",  _ui.menuHelp,  &docFilters,  SLOT( openHTML(QAction*) ) );
-	buildMenuFromDirectory( "../docs/pythonclasses", _ui.menuHelp, &docFilters,  SLOT( openHTML(QAction*) ) );
+	buildMenuFromDirectory( "../docs/steveclasses",  _ui.menuSteveClasses,  &docFilters,  SLOT( openHTML(QAction*) ) );
+	buildMenuFromDirectory( "../docs/pythonclasses", _ui.menuPythonClasses, &docFilters,  SLOT( openHTML(QAction*) ) );
 
-	_glview = new brqtGLWidget( _ui.displayFrame );
 
 	newDocument();
 }
@@ -96,16 +104,9 @@ void brqtMainWindow::toggleEditing() {
 }
 
 void brqtMainWindow::openDocument() { 
-	QString fileName = QFileDialog::getOpenFileName( this );
+	QString s = QFileDialog::getOpenFileName( this );
 
-	std::string file = fileName.toStdString();
-
-	brqtEditorWindow *editor = new brqtEditorWindow( this );
-
-	editor -> show();
-	editor -> loadFile( file );
-
-	_documents.push_back( editor );
+	openDocument( s );
 }
 
 void brqtMainWindow::newDocument() { 
@@ -119,12 +120,32 @@ void brqtMainWindow::closeDocument() {
 
 }
 
+
+
+int brqtMainWindow::openDocument( QString &inDocument ) {
+	std::string file = inDocument.toStdString();
+
+	brqtEditorWindow *editor = new brqtEditorWindow( this );
+
+	editor -> show();
+	editor -> loadFile( file );
+
+	_documents.push_back( editor );
+
+	return 0;
+}
+
+
 void brqtMainWindow::toggleSimulation() { 
 	if( !_engine ) {
-		const QString qstr = _documents.back() -> getText();
-		const char *str = qstr.toAscii();
+		brqtEditorWindow *window = _documents.back();
 
-		_engine = new brqtEngine( str, "untitled.tz", _glview );
+		const QString qstr = window -> getText();
+		char *str = slStrdup( qstr.toAscii().constData() );
+
+		_engine = new brqtEngine( str, "untitled.tz", _ui.glWidget );
+
+		slFree( str );
 	} else {
 		delete _engine;
 	}
@@ -132,7 +153,6 @@ void brqtMainWindow::toggleSimulation() {
 
 QMenu *brqtMainWindow::buildMenuFromDirectory( const char *inDirectory, QMenu *inParent, QStringList *inFilters, const char *inSlot ) {
 	QDir dir( inDirectory );
-
 	QFileInfoList files = dir.entryInfoList( *inFilters, QDir::Files | QDir::AllDirs, QDir::Name );
 
     for ( int i = 0; i < files.size(); i++ ) {
@@ -150,10 +170,11 @@ QMenu *brqtMainWindow::buildMenuFromDirectory( const char *inDirectory, QMenu *i
 				QAction *action = inParent -> addAction( file.fileName().toAscii() );
 
 				action -> setData( QVariant( fullpath.c_str() ) );
-				connect( inParent, SIGNAL( triggered(QAction*) ), this, inSlot );
 			}
 		}
 	}
+
+	connect( inParent, SIGNAL( triggered(QAction*) ), this, inSlot );
 
 	return inParent;
 }

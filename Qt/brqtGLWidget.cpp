@@ -5,9 +5,8 @@
 #include "glIncludes.h"
 
 brqtGLWidget::brqtGLWidget( QWidget* parent ) : QGLWidget( parent ) {
-   _engine = NULL;
-
-	setSizePolicy( QSizePolicy( QSizePolicy::Maximum, QSizePolicy::Maximum ) );
+	_engine = NULL;
+	_buttonMode = 0;
 }
 
 brqtGLWidget::~brqtGLWidget() { 
@@ -30,11 +29,13 @@ void brqtGLWidget::initializeGL() {
 }
 
 void brqtGLWidget::resizeGL( int w, int h ) {
-  if( _engine ) _engine->camera->setBounds( w, h );
+  if( _engine ) 
+		_engine->camera->setBounds( w, h );
 }
 
 void brqtGLWidget::mousePressEvent ( QMouseEvent *e) {
-	if(!_engine) return;
+	if( !_engine ) 
+		return;
 	
 	_lastPosition = e->pos();
 	
@@ -50,7 +51,8 @@ void brqtGLWidget::mouseMoveEvent ( QMouseEvent *e ) {
 	
 	_lastPosition = pos;
 		
-	if(!_engine) return;
+	if(!_engine) 
+		return;
 
 	switch( _buttonMode) {
 		case 0:

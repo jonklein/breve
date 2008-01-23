@@ -1,0 +1,119 @@
+<ui version="4.0" >
+ <class>brqtFindDialog</class>
+ <widget class="QDialog" name="brqtFindDialog" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>297</width>
+    <height>138</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Dialog</string>
+  </property>
+  <widget class="QLabel" name="label_2" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>40</y>
+     <width>52</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Replace:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label" >
+   <property name="geometry" >
+    <rect>
+     <x>30</x>
+     <y>10</y>
+     <width>31</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Find:</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="ignoreCase" >
+   <property name="geometry" >
+    <rect>
+     <x>20</x>
+     <y>70</y>
+     <width>161</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Ignore Case</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="findNext" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>100</y>
+     <width>91</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Next</string>
+   </property>
+   <property name="default" >
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="findPrev" >
+   <property name="geometry" >
+    <rect>
+     <x>100</x>
+     <y>100</y>
+     <width>91</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Previous</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="findReplace" >
+   <property name="geometry" >
+    <rect>
+     <x>190</x>
+     <y>100</y>
+     <width>91</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Replace</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="findText" >
+   <property name="geometry" >
+    <rect>
+     <x>70</x>
+     <y>10</y>
+     <width>211</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="replaceText" >
+   <property name="geometry" >
+    <rect>
+     <x>70</x>
+     <y>40</y>
+     <width>211</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
