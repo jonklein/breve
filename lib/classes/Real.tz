@@ -503,6 +503,8 @@ Object : Real (aka Reals) [version 2.1] {
 	- to set-bitmap to textureNumber (int):
 		% Deprecated.
 
+		print "set-bitmap is deprecated: use set-bitmap-image instead".
+
 		realSetBitmap(realWorldPointer, textureNumber ).
 
 	+ to set-bitmap-heading to radianAngle (float):
@@ -550,6 +552,8 @@ Object : Real (aka Reals) [version 2.1] {
 
 	- to set-lightmap to textureNumber (int):
 		% Deprecated.
+
+		print "set-lightmap is deprecated: use set-lightmap-image instead".
 
 		realSetLightmap( realWorldPointer, textureNumber ).
 

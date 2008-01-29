@@ -42,6 +42,8 @@ PushGP : RegressionGP {
 		
 		interpreter print-config.
 
+		_useChallenges = 1.
+
 
 		# PushGP regression problems are helped by being able to retrieve 
 		# the input values with an instruction.  Adding this callback is 

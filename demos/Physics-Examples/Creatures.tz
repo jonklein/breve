@@ -61,7 +61,7 @@ PhysicalControl : VirtualCreatures {
 
 		floor = new Floor.
 		floor set-texture-image to ( new Image load from "images/ground.png" ).
-		floor set-color to ( .4, .3, .3 ).
+		floor set-color to ( .8, .8, .8 ).
 
 		self set-skybox-images to { 
 			"images/MountainBoxFront.png", "images/MountainBoxBack.png", 

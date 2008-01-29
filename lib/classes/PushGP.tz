@@ -43,8 +43,12 @@ Object : PushGP {
 		_totalSize (int).
 		_totalErrors (double).
 
-		_fitnessCaseSolutionRates (list).
-		_lastSolutionRates (list).
+		_solutionCountsGeneration (list).
+		_solutionCountsTotal (list).
+
+		_solutionRatesGeneration (list).
+		_solutionRatesTotal (list).
+
 		_useChallenges (int).
 
 		generation (int).
@@ -191,8 +195,10 @@ Object : PushGP {
 		if seed: (pop1{0} parse program seed).
 
 		for n = 0, n < (self count-fitness-cases), n++: {
-			push 0.0 onto _fitnessCaseSolutionRates.
-			push 0.0 onto _lastSolutionRates.
+			push 0.0 onto _solutionCountsGeneration.
+			push 0.0 onto _solutionCountsTotal.
+			push 0.0 onto _solutionRatesGeneration.
+			push 0.0 onto _solutionRatesTotal.
 		}
 
 		inited = 1.
@@ -355,11 +361,10 @@ Object : PushGP {
 		currentIndividual++.
 
 		if currentIndividual == populationSize: {
-			for n = 0, n < | _fitnessCaseSolutionRates |, n++: {
-				_fitnessCaseSolutionRates{ n } /= populationSize.
+			for n = 0, n < | _solutionCountsGeneration |, n++: {
+				_solutionRatesGeneration{ n } = _solutionCountsGeneration{ n } / populationSize.
+				_solutionRatesTotal{ n }      = _solutionCountsTotal{ n }     / ( populationSize * ( generation + 1 ) ).
 			}
-
-			_lastSolutionRates = copylist( _fitnessCaseSolutionRates ).
 
 			self report with-best _bestOfGen.
 			self reproduce.
@@ -398,7 +403,8 @@ Object : PushGP {
 			}
 
 			if _useChallenges: {
-				errorValue *= ( 2.0 - _lastSolutionRates{ n } ).
+				errorValue *= ( 1.1 - _solutionRatesGeneration{ n } ).
+				# errorValue *= ( 1.1 - _solutionRatesTotal{ n } ).
 				# print errorValue.
 			}
 
@@ -410,8 +416,9 @@ Object : PushGP {
 				return _abortFitnessValue.
 			}
 
-			if errors{ | errors | - 1 } == 0: {
-				_fitnessCaseSolutionRates{ n } += 1.0.
+			if errors{ | errors | - 1 } == 0.0: {
+				_solutionCountsGeneration{ n } += 1.0.
+				_solutionCountsTotal{ n }      += 1.0.
 			}
 		}
 
@@ -526,7 +533,8 @@ Object : PushGP {
 		print ";; Best Individual: ".
 		print (bestIndividual get-string).
 		print ";; Errors for best individual: ", errors.
-		print ";; Problem solution rates: ", _fitnessCaseSolutionRates.
+		print ";; Problem solution rates this generation: ", _solutionRatesGeneration.
+		print ";; Problem solution rates all generations: ", _solutionRatesTotal.
 		print ";; Total errors for best individual: $bestFitness".
 		print ";; Size of best individual (points):", (bestIndividual get-size).
 		print ";;".
@@ -543,7 +551,7 @@ Object : PushGP {
 		p1, p2 (object).                
 
 		for n = 0, n < (self count-fitness-cases), n++: {
-			_fitnessCaseSolutionRates{ n } = 0.0.
+			_solutionCountsGeneration{ n } = 0.0.
 		}
 
 		while n < populationSize: { 
