@@ -430,7 +430,8 @@ double slWorld::step( double stepSize, int *error ) {
 
 				mu = 1.0 + ( w1->_mu + w2->_mu ) / 2.0;
 
-				e = ( w1->_e + w2->_e ) / ( 2.0 * ( c -> _contactPoints ) );
+				// e = ( w1->_e + w2->_e ) / ( 2.0 * ( c -> _contactPoints ) );
+				e = ( w1->_e + w2->_e ) / 2.0;
 
 				for ( int n = 0; n < c -> _contactPoints; n++ ) {
 					dContact contact;
@@ -446,7 +447,7 @@ double slWorld::step( double stepSize, int *error ) {
 					contact.surface.mu = mu;
 					contact.surface.mu2 = 0;
 					contact.surface.bounce = e;
-					contact.surface.bounce_vel = -0.05;
+					contact.surface.bounce_vel = 0.05;
 
 					if( fabs( contact.geom.depth ) > 0.4 ) {
 					//	printf( "depth = %f, e = %f\n", contact.geom.depth, e );

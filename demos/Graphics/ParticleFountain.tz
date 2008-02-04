@@ -49,14 +49,13 @@ Mobile : Particle (aka Particles) {
 		if (self get-location)::y < -16.0: self reset.
 
 	+ to init:
-		shape = (new Sphere init-with radius random[2.0] + .1).
+		shape = (new Sphere init-with radius random[3.0] + 1).
 		self set-shape to shape.
 
 		# texture #3 happens to be a built-in texture which nicely illustrates the 
 		# lightmap effect.
 
-		# self set-lightmap-image to (controller get-lightmap-image).
-		self draw-as-point.
+		self set-lightmap-image to (controller get-lightmap-image).
 		range = 5.
 		self reset.
 

@@ -15,7 +15,7 @@ class Walker( breve.PhysicalControl ):
 		self.monkeys = breve.objectList()
 		self.seats = breve.objectList()
 		self.terrain = None
-		self.wigglyThing = None
+		self.walker = None
 		Walker.init( self )
 
 	def breedNewMonkeys( self ):
@@ -42,8 +42,8 @@ class Walker( breve.PhysicalControl ):
 			newOffset = ( ( 14 * newOffset ) / breve.length( newOffset ) )
 
 		self.panCameraOffset( newOffset, 30 )
-		self.seats[ self.currentSeat ].setDistance( breve.length( self.wigglyThing.getLocation() ) )
-		self.wigglyThing.center()
+		self.seats[ self.currentSeat ].setDistance( breve.length( self.walker.getLocation() ) )
+		self.walker.center()
 		self.currentSeat = ( self.currentSeat + 1 )
 		if ( self.currentSeat > 3 ):
 			self.breedNewMonkeys()
@@ -73,23 +73,21 @@ class Walker( breve.PhysicalControl ):
 		self.locked = 0
 		self.setRandomSeedFromDevRandom()
 		self.enableFastPhysics()
-		self.setFastPhysicsIterations( 5 )
+		self.setIntegrationStep( 0.004000 )
 		self.enableLighting()
-		self.enableSmoothDrawing()
-		self.moveLight( breve.vector( 0, 30, 0 ) )
-		self.enableShadowVolumes()
+		self.moveLight( breve.vector( 0, 10, 0 ) )
 		self.setBackgroundColor( breve.vector( 0.400000, 0.600000, 0.900000 ) )
-		self.setBackgroundTextureImage( breve.createInstances( breve.Image, 1 ).load( 'images/clouds.png' ) )
+		self.setMountainSkybox()
 		self.terrain = breve.createInstances( breve.Terrain, 1 )
-		self.terrain.generate( 0.400000, 15 )
-		self.terrain.setScale( 3 )
-		self.terrain.setET( 0.900000 )
-		self.terrain.setPeakColor( breve.vector( 0.400000, 0.200000, 0.100000 ) )
-		self.terrain.setValleyColor( breve.vector( 0.200000, 0.800000, 0.300000 ) )
-		self.wigglyThing = breve.createInstances( breve.Creature, 1 )
-		self.wigglyThing.move( breve.vector( 0, 6, 0 ) )
+		self.terrain.generate( 0.340000, 40 )
+		self.terrain.setScale( 6 )
+		self.terrain.setValleyColor( breve.vector( 0.350000, 0.800000, 0.450000 ) )
+		self.terrain.setPeakColor( breve.vector( 1.000000, 1.000000, 1.000000 ) )
+		self.enableShadowVolumes()
+		self.walker = breve.createInstances( breve.Creature, 1 )
+		self.walker.move( breve.vector( 0, 6, 0 ) )
 		self.offsetCamera( breve.vector( 3, 13, -13 ) )
-		self.watch( self.wigglyThing )
+		self.watch( self.walker )
 		self.monkeys = breve.createInstances( breve.Monkeys, 15 )
 		for item in self.monkeys:
 			item.setNumber( number )
@@ -105,7 +103,7 @@ class Walker( breve.PhysicalControl ):
 		self.displayCurrentDriver()
 
 	def iterate( self ):
-		self.seats[ self.currentSeat ].control( self.wigglyThing, self.getTime() )
+		self.seats[ self.currentSeat ].control( self.walker, self.getTime() )
 		breve.PhysicalControl.iterate( self )
 
 	def loadIntoCurrentGenome( self ):
@@ -128,7 +126,7 @@ class Walker( breve.PhysicalControl ):
 	def toggleDriverLock( self ):
 		if ( self.locked == 1 ):
 			self.locked = 0
-			self.wigglyThing.center()
+			self.walker.center()
 			self.schedule( 'changeDrivers', ( self.getTime() + 20.000000 ) )
 			self.lockMenu.uncheck()
 

@@ -238,8 +238,13 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 			// Is this a native type, or should we make a bridge of it?
 
 			if( breveInstance && breveInstance->object->type->_typeSignature == PYTHON_TYPE_SIGNATURE ) {
-				result = (PyObject*)breveInstance->userData;
+				if( breveInstance->userData )
+					result = (PyObject*)breveInstance->userData;
+				else
+					result = Py_None;
+
 				Py_INCREF( result );
+
 			} else if( breveInstance ) {
 
 				// Create a bridge object, and set the breveInstance field
@@ -374,10 +379,13 @@ PyObject *brPythonSetController( PyObject *inSelf, PyObject *inArgs ) {
 	brEngine *engine = (brEngine*)PyCObject_AsVoidPtr( engineObject );
 	brInstance *instance = (brInstance*)PyCObject_AsVoidPtr( instanceObject );
 
-        brEngineSetController( engine, instance );
-
 	Py_DECREF( engineObject );
 	Py_DECREF( instanceObject );
+
+	if( brEngineSetController( engine, instance ) ) {
+		PyErr_SetString( PyExc_RuntimeError, "Could not set controller object for breve simulation" );
+		return NULL;
+	}
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -387,7 +395,7 @@ PyObject *brPythonVectorLength( PyObject *inSelf, PyObject *inArgs ) {
 	PyObject *v1;
 	slVector *vec1 = NULL;
 
-        if ( !PyArg_ParseTuple( inArgs, "O", &v1 ) ) 
+		if ( !PyArg_ParseTuple( inArgs, "O", &v1 ) ) 
 		return NULL;
 
 	v1->ob_type->tp_as_buffer->bf_getreadbuffer( v1, 0, (void**)&vec1 );
@@ -400,7 +408,7 @@ PyObject *brPythonSetVector( PyObject *inSelf, PyObject *inArgs ) {
 	slVector *vec1 = NULL;
 	float x, y, z;
 
-        if ( !PyArg_ParseTuple( inArgs, "Offf", &v1, &x, &y, &z ) ) return NULL;
+		if ( !PyArg_ParseTuple( inArgs, "Offf", &v1, &x, &y, &z ) ) return NULL;
 
 	v1->ob_type->tp_as_buffer->bf_getwritebuffer( v1, 0, (void**)&vec1 );
 
@@ -418,7 +426,7 @@ PyObject *brPythonScaleVector( PyObject *inSelf, PyObject *inArgs ) {
 	PyObject *v1;
 	float f;
 
-        if ( !PyArg_ParseTuple( inArgs, "Of", &v1, &f ) ) return NULL;
+		if ( !PyArg_ParseTuple( inArgs, "Of", &v1, &f ) ) return NULL;
 
 	v1->ob_type->tp_as_buffer->bf_getreadbuffer( v1, 0, (void**)&vec1 );
 
@@ -436,7 +444,7 @@ PyObject *brPythonAddVectors( PyObject *inSelf, PyObject *inArgs ) {
 	slVector *vec1 = NULL, *vec2 = NULL, *vec3 = NULL;
 	PyObject *v1, *v2;
 
-        if ( !PyArg_ParseTuple( inArgs, "OO", &v1, &v2 ) ) return NULL;
+		if ( !PyArg_ParseTuple( inArgs, "OO", &v1, &v2 ) ) return NULL;
 
 	v1->ob_type->tp_as_buffer->bf_getwritebuffer( v1, 0, (void**)&vec1 );
 	v2->ob_type->tp_as_buffer->bf_getwritebuffer( v2, 0, (void**)&vec2 );
@@ -455,7 +463,7 @@ PyObject *brPythonSubVectors( PyObject *inSelf, PyObject *inArgs ) {
 	slVector *vec1 = NULL, *vec2 = NULL, *vec3 = NULL;
 	PyObject *v1, *v2;
 
-        if ( !PyArg_ParseTuple( inArgs, "OO", &v1, &v2 ) ) return NULL;
+		if ( !PyArg_ParseTuple( inArgs, "OO", &v1, &v2 ) ) return NULL;
 
 	v1->ob_type->tp_as_buffer->bf_getwritebuffer( v1, 0, (void**)&vec1 );
 	v2->ob_type->tp_as_buffer->bf_getwritebuffer( v2, 0, (void**)&vec2 );
@@ -799,40 +807,40 @@ PyObject *brPythonCallBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////                                                
-//  Python language frontend callbacks for the breveObjectType structure           //
-/////////////////////////////////////////////////////////////////////////////////////                                                  
+/////////////////////////////////////////////////////////////////////////////////////												
+//  Python language frontend callbacks for the breveObjectType structure		   //
+/////////////////////////////////////////////////////////////////////////////////////												  
 
 std::string brPyConvertSymbol( std::string &inValue ) {
-        std::string result; 
-        unsigned int n = 0, m = 0;
-        bool upper = false;
-        
-        // Hardcode some troublesome symbols -- they're reserved keywords in Python, but not steve
-        
-        if( inValue == "is" )
-                return std::string( "isA" );
-        
-        if( inValue == "break" )
-                return std::string( "snap" ); // hehe, this is fun
-        
-        for( n = 0; n < inValue.size(); n++, m++ ) {
-                if( inValue[ n ] == '-' ) {
-                        m--;
-                        upper = true;
-                } else {
-                        
-                        if( upper ) {
-                                result += toupper( inValue[ n ] );
-                        } else {
-                                result += inValue[ n ];
-                        }
-                        
-                        upper = false;
-                }
-        }
-        
-        return result;
+		std::string result; 
+		unsigned int n = 0, m = 0;
+		bool upper = false;
+		
+		// Hardcode some troublesome symbols -- they're reserved keywords in Python, but not steve
+		
+		if( inValue == "is" )
+				return std::string( "isA" );
+		
+		if( inValue == "break" )
+				return std::string( "snap" ); // hehe, this is fun
+		
+		for( n = 0; n < inValue.size(); n++, m++ ) {
+				if( inValue[ n ] == '-' ) {
+						m--;
+						upper = true;
+				} else {
+						
+						if( upper ) {
+								result += toupper( inValue[ n ] );
+						} else {
+								result += inValue[ n ];
+						}
+						
+						upper = false;
+				}
+		}
+		
+		return result;
 }
 
 

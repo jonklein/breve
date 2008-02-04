@@ -14,8 +14,10 @@ class PushGP( breve.Object ):
 		self._abortFitnessTest = 0
 		self._abortFitnessValue = 0
 		self._bestOfGen = None
-		self._fitnessCaseSolutionRates = breve.objectList()
-		self._lastSolutionRates = breve.objectList()
+		self._solutionCountsGeneration = breve.objectList()
+		self._solutionCountsTotal = breve.objectList()
+		self._solutionRatesGeneration = breve.objectList()
+		self._solutionRatesTotal = breve.objectList()
 		self._totalErrors = 0
 		self._totalSize = 0
 		self._useChallenges = 0
@@ -119,7 +121,7 @@ class PushGP( breve.Object ):
 
 
 			if self._useChallenges:
-				errorValue = ( errorValue * ( 2.000000 - self._lastSolutionRates[ n ] ) )
+				errorValue = ( errorValue * ( 1.100000 - self._solutionRatesGeneration[ n ] ) )
 
 
 			errors.append( errorValue )
@@ -128,8 +130,9 @@ class PushGP( breve.Object ):
 				return self._abortFitnessValue
 
 
-			if ( errors[ ( breve.length( errors ) - 1 ) ] == 0 ):
-				self._fitnessCaseSolutionRates[ n ] = ( self._fitnessCaseSolutionRates[ n ] + 1.000000 )
+			if ( errors[ ( breve.length( errors ) - 1 ) ] == 0.000000 ):
+				self._solutionCountsGeneration[ n ] = ( self._solutionCountsGeneration[ n ] + 1.000000 )
+				self._solutionCountsTotal[ n ] = ( self._solutionCountsTotal[ n ] + 1.000000 )
 
 
 
@@ -164,8 +167,10 @@ class PushGP( breve.Object ):
 
 		n = 0
 		while ( n < self.countFitnessCases() ):
-			self._fitnessCaseSolutionRates.append( 0.000000 )
-			self._lastSolutionRates.append( 0.000000 )
+			self._solutionCountsGeneration.append( 0.000000 )
+			self._solutionCountsTotal.append( 0.000000 )
+			self._solutionRatesGeneration.append( 0.000000 )
+			self._solutionRatesTotal.append( 0.000000 )
 
 			n = ( n + 1 )
 
@@ -197,12 +202,12 @@ class PushGP( breve.Object ):
 		self.currentIndividual = ( self.currentIndividual + 1 )
 		if ( self.currentIndividual == self.populationSize ):
 			n = 0
-			while ( n < breve.length( self._fitnessCaseSolutionRates ) ):
-				self._fitnessCaseSolutionRates[ n ] = ( self._fitnessCaseSolutionRates[ n ] / self.populationSize )
+			while ( n < breve.length( self._solutionCountsGeneration ) ):
+				self._solutionRatesGeneration[ n ] = ( self._solutionCountsGeneration[ n ] / self.populationSize )
+				self._solutionRatesTotal[ n ] = ( self._solutionCountsTotal[ n ] / ( self.populationSize * ( self.generation + 1 ) ) )
 
 				n = ( n + 1 )
 
-			self._lastSolutionRates = list( self._fitnessCaseSolutionRates) 
 			self.report( self._bestOfGen )
 			self.reproduce()
 			self.swapCurrent()
@@ -333,7 +338,8 @@ class PushGP( breve.Object ):
 		print ''';; Best Individual: '''
 		print bestIndividual.getString()
 		print ''';; Errors for best individual: ''', errors
-		print ''';; Problem solution rates: ''', self._fitnessCaseSolutionRates
+		print ''';; Problem solution rates this generation: ''', self._solutionRatesGeneration
+		print ''';; Problem solution rates all generations: ''', self._solutionRatesTotal
 		print ''';; Total errors for best individual: %s''' % (  bestFitness )
 		print ''';; Size of best individual (points):''', bestIndividual.getSize()
 		print ';;'
@@ -352,7 +358,7 @@ class PushGP( breve.Object ):
 
 		n = 0
 		while ( n < self.countFitnessCases() ):
-			self._fitnessCaseSolutionRates[ n ] = 0.000000
+			self._solutionCountsGeneration[ n ] = 0.000000
 
 			n = ( n + 1 )
 

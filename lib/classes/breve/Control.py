@@ -10,11 +10,6 @@ class Control( breve.Abstract ):
 	'''Summary: a parent class for the "controller" object required for all simulations. <P> The Control object sets up and controls simulations.  Every simulation must have one Control subclass.  The user subclass of Control should  set up the simulation in the "init" method. <p> The Control class also acts as the main interaction between the user and the breve environment itself.  It provides access to elements of  the user interface, for example, so that the user can add menus and other interface features from inside simulations. <p> Because the breve engine is designed to run on a variety of systems, there are varying levels of support for some of these features.  In some cases, the features won't be supported at all on a system.  A background daemon written to use the breve engine, for example, will not place a dialog on the screen and wait for user input.'''
 
 	def __init__( self ):
-		self.breveInstance = breve.breveInternal.addInstance( breve.breveInternal, self.__class__, self )
-		self.breveModule = breve.breveInternal
-		breve.breveInternal.setController( breve.breveInternal, self )
-
-
 		breve.Abstract.__init__( self )
 		self.archivedBackgroundTextureImage = None
 		self.archivedSkyboxImageList = breve.objectList()
@@ -468,7 +463,7 @@ class Control( breve.Abstract ):
 
 		self.cameraPointer = breve.breveInternalFunctionFinder.getMainCameraPointer( self)
 		self.stationaryTexture = breve.createInstances( breve.Image, 1 )
-		self.stationaryTexture.load( 'images/noise.png' )
+		self.stationaryTexture.load( 'images/checkerpink.png' )
 		self.camera = breve.createInstances( breve.Camera, 1 )
 		self.addDependency( self.camera )
 		self.camera.setCameraPointer( self.cameraPointer )
@@ -763,6 +758,11 @@ class Control( breve.Abstract ):
 
 		self.lightSpecularColor = newColor
 		breve.breveInternalFunctionFinder.brISetLightSpecularColor( self, newColor, n )
+
+	def setMountainSkybox( self ):
+		'''A simple shortcut to setup one of the default skyboxes included with breve, used to quickly add a skybox background to a scene.  See METHOD(set-skybox-images) for information on setting custom skyboxes.'''
+
+		self.setSkyboxImages( [ 'images/MountainBoxFront.png', 'images/MountainBoxBack.png', 'images/MountainBoxLeft.png', 'images/MountainBoxRight.png', 'images/MountainBoxTop.png', 'images/MountainBoxBottom.png' ] )
 
 	def setOutputFilter( self, filterLevel ):
 		'''Sets the output filter level.  This value determines the level of  detail used in printing simulation engine errors and messages. The default value, 0, prints only regular output.  An output filter of 50 will print out all normal output as well as some warnings and  other information useful mostly to breve developers.  Other values may be added in the future to allow for more granularity of error  detail.'''

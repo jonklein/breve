@@ -10,7 +10,6 @@ end
 # Control & Object have some custom code which does not convert automatically
 # 
 
-rm lib/classes/Control.py
 rm lib/classes/Object.py
 
 mv lib/classes/*.py lib/classes/breve

@@ -46,7 +46,7 @@ class Image( breve.Abstract ):
 		if ( not self.imageData ):
 			return 0
 
-		return breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 3 ), y )
+		return breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 3 ), y, 4 )
 
 	def getBluePixel( self, x, y ):
 		'''Returns the blue pixel at the image coordinates (x, y). The pixel value is given on a scale from 0.0 to 1.0.'''
@@ -54,7 +54,7 @@ class Image( breve.Abstract ):
 		if ( not self.imageData ):
 			return 0
 
-		return breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 2 ), y )
+		return breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 2 ), y, 4 )
 
 	def getCompressionSize( self ):
 		'''Compresses the image and returns the compression size.  Useful for  generating simple complexity measures based on image compression.'''
@@ -67,7 +67,7 @@ class Image( breve.Abstract ):
 		if ( not self.imageData ):
 			return 0
 
-		return breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 1 ), y )
+		return breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 1 ), y, 4 )
 
 	def getHeight( self ):
 		'''Returns the width of the image.  '''
@@ -91,7 +91,7 @@ class Image( breve.Abstract ):
 		if ( not self.imageData ):
 			return 0
 
-		return breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( x * 4 ), y )
+		return breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( x * 4 ), y, 4 )
 
 	def getRgbPixel( self, x, y ):
 		'''Returns the red, green and blue components of the pixel at image coordinates (x, y) as a vector.'''
@@ -103,9 +103,9 @@ class Image( breve.Abstract ):
 		if ( not self.imageData ):
 			return breve.vector( 0, 0, 0 )
 
-		r = breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( x * 4 ), y )
-		g = breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 1 ), y )
-		b = breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 2 ), y )
+		r = breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( x * 4 ), y, 4 )
+		g = breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 1 ), y, 4 )
+		b = breve.breveInternalFunctionFinder.imageGetValueAtCoordinates( self, self.imageData, ( ( x * 4 ) + 2 ), y, 4 )
 		return breve.vector( r, g, b )
 
 	def getTextureNumber( self ):
@@ -159,7 +159,7 @@ class Image( breve.Abstract ):
 		return self
 
 	def readDepth( self, x, y, lin, dist ):
-		'''Reads the depth into this Image from the rendered image on the  screen.  The resulting image can be written to a file or  analyzed if desired.  This is only supported in graphical versions of breve. The linearize option (if true) linearizes the depth buffer to a maximum  distance so that for each pixel, the value corresponds to the distance from  the centre of the camera. Values above the maximum distance (max-dist) are  set to the maximum distance.  If linearize is false, then this returns the raw depth buffer.  This is considerably faster, but the values are not linear in the distance. '''
+		'''Reads the depth into this Image from the rendered image on the  screen.  The resulting image can be written to a file or  analyzed if desired.  This is only supported when breve is being run with graphical display (or with offscreen-rendering enabled). <P> The linearize option (if true) linearizes the depth buffer to a maximum  distance so that for each pixel, the value corresponds to the distance from  the centre of the camera. Values above the maximum distance (max-dist) are  set to the maximum distance.  <P> If linearize is false, then this returns the raw depth buffer.  This is considerably faster, but the values are not linear in the distance. '''
 
 		breve.breveInternalFunctionFinder.imageReadDepthBuffer( self, self.imageData, x, y, lin, dist )
 

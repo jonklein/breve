@@ -41,6 +41,7 @@ class RegressionGP( breve.PushGP ):
 		self.setSpatialRadius( 10 )
 		self.readInterpreterConfig( 'PushRegression.config' )
 		self.interpreter.printConfig()
+		self._useChallenges = 1
 		self.getInterpreter().addInstruction( self, 'INPUT' )
 
 	def setupFitnessTest( self, n, interpreter ):

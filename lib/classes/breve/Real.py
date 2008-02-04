@@ -291,6 +291,7 @@ class Real( breve.Object ):
 	def setBitmap( self, textureNumber ):
 		'''Deprecated.'''
 
+		print '''set-bitmap is deprecated: use set-bitmap-image instead'''
 		breve.breveInternalFunctionFinder.realSetBitmap( self, self.realWorldPointer, textureNumber )
 
 	def setBitmapHeading( self, radianAngle ):
@@ -375,6 +376,7 @@ class Real( breve.Object ):
 	def setLightmap( self, textureNumber ):
 		'''Deprecated.'''
 
+		print '''set-lightmap is deprecated: use set-lightmap-image instead'''
 		breve.breveInternalFunctionFinder.realSetLightmap( self, self.realWorldPointer, textureNumber )
 
 	def setLightmapImage( self, lightmapImage ):

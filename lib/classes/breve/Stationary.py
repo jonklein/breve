@@ -69,6 +69,7 @@ class Floor( breve.Stationary ):
 		self.setShape( self.shape )
 		self.setColor( breve.vector( 0.350000, 0.800000, 0.450000 ) )
 		self.catchShadows()
+		self.setTextureImage( breve.createInstances( breve.Image, 1 ).load( 'images/noise.png' ) )
 
 	def setSize( self, newSize ):
 		'''Changes the size of the floor to newSize.'''

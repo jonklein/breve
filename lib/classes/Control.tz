@@ -97,7 +97,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 		cameraPointer = getMainCameraPointer().
 
 		stationaryTexture = new Image.
-		stationaryTexture load from "images/noise.png".
+		stationaryTexture load from "images/checkerpink.png".
 
 		camera = new Camera.
 		self add-dependency on camera.

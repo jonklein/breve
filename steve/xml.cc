@@ -45,6 +45,13 @@ int brXMLAssignIndices( brEngine *e, std::map< brInstance*, int > &_indexMap ) {
 	return n;
 }
 
+int brXMLCleanupFailedImport( brXMLParserState *inState ) {
+
+		// brInstance *instance = inState -> _indexToInstanceMap[ n ] -> second;
+
+	return 0;
+}
+
 int brXMLWriteObjectToFile( brInstance *i, char *filename, int isDataObject ) {
 	FILE *file;
 	int r;
@@ -968,8 +975,6 @@ int brXMLRunDearchiveMethods( brXMLParserState *s ) {
 int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, brXMLParserState *inState ) {
 	std::vector< brXMLDOMElement* > instances = inRoot->getElementsByName( "instance" ); 
 
-	stInstance *i;
-
 	for( unsigned int n = 0; n < instances.size(); n++ ) {
 		std::string objectname = instances[ n ]->_attrs[ "class" ];
 		int instanceindex = atoi( instances[ n ]->_attrs[ "index" ].c_str() );
@@ -990,13 +995,17 @@ int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, brXMLParserState *inState 
 			return EC_ERROR;
 		}
 
-		i = stInstanceNew( (stObject*)object->userData );
+		if( typeSignature != STEVE_TYPE_SIGNATURE ) {
+			slMessage( DEBUG_ALL, "Warning: object encoding and decoding not implemented for non-steve objects\n" );
+			brXMLCleanupFailedImport( inState );
+			return EC_ERROR;
+		}
 
-		i->breveInstance = brEngineAddInstance( inState->engine, object, i );
+		brInstance *instance = brObjectInstantiate( inState->engine, object, NULL, 0 );
 
-		inState->_indexToInstanceMap[ instanceindex ] = i->breveInstance;
+		inState->_indexToInstanceMap[ instanceindex ] = instance;
 		
-		inState->_dearchiveOrder.push_back( i->breveInstance );
+		inState->_dearchiveOrder.push_back( instance );
 	}
 
 	return 0;
@@ -1153,6 +1162,16 @@ int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceE
 	int typeSignature = atoi( inInstanceElement -> getAttr( "typesignature" )->c_str() );
 	
 
+	if( typeSignature != STEVE_TYPE_SIGNATURE ) {
+		slMessage( DEBUG_ALL, "Warning: object encoding and decoding not implemented for non-steve objects\n" );
+		brXMLCleanupFailedImport( inState );
+		return EC_ERROR;
+	}
+
+	int xml = atoi( data[ 0 ] -> getAttr( "xml" ) -> c_str() );
+
+	printf( "%d\n", xml );
+
 	if( data.size() == 0 ) {
 		// Legacy support for 2.5 archived steve archives
 
@@ -1162,12 +1181,6 @@ int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceE
 		
 		brInstanceDecodeFromString( inState->engine, typeSignature, data[ 0 ]->_cdata.c_str() );
 
-	}
-
-	if( typeSignature != STEVE_TYPE_SIGNATURE ) {
-		slMessage( DEBUG_ALL, "Warning: object encoding and decoding not fully implemented for non-steve objects\n" );
-
-		return EC_ERROR;
 	}
 
 	return stXMLParseInstanceData( inState, data[ 0 ], (stInstance*)outInstance -> userData );

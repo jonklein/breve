@@ -1,18 +1,17 @@
 // !$*UTF8*$!
 {
 	089C1669FE841209C02AAC07 /* Project object */ = {
+		activeArchitecture = i386;
 		activeBuildConfigurationName = Deployment;
 		activeTarget = 4818572C05CABEEB00C48BE6 /* breveCreatures */;
 		addToTargets = (
 			4818572C05CABEEB00C48BE6 /* breveCreatures */,
-			4818570805CABEEB00C48BE6 /* breveSwarm */,
 			48B9BDBB05EA6004002C7A42 /* breveResearcher */,
 			489DE21606B5587300740D0A /* brevePainter */,
 		);
 		breakpoints = (
 			48D9077C06BFBA7800FF529F /* slBrevePainter.h:18 */,
 		);
-		breakpointsGroup = 48ED502E0B6B9A0000E99116 /* XCBreakpointsBucket */;
 		codeSenseManager = 4818575305CABF4B00C48BE6 /* Code sense */;
 		perUserDictionary = {
 			PBXConfiguration.PBXFileTableDataSource3.PBXErrorsWarningsDataSource = {
@@ -84,8 +83,8 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_FiletypeID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					210,
-					155,
+					305,
+					60,
 					20,
 					50,
 					43,
@@ -101,7 +100,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 192330496;
+			PBXPerProjectTemplateStateSaveDate = 223745127;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -602,15 +601,17 @@
 				};
 				RubberWindowFrame = "170 89 962 743 0 0 1280 832 ";
 			};
-			PBXWorkspaceStateSaveDate = 192330496;
+			PBXWorkspaceStateSaveDate = 223745127;
 		};
 		perUserProjectItems = {
+			485345610D56150100902599 /* PBXTextBookmark */ = 485345610D56150100902599 /* PBXTextBookmark */;
+			485345640D56151A00902599 /* PBXTextBookmark */ = 485345640D56151A00902599 /* PBXTextBookmark */;
+			485345650D56151A00902599 /* PBXTextBookmark */ = 485345650D56151A00902599 /* PBXTextBookmark */;
+			485345670D56151E00902599 /* PBXTextBookmark */ = 485345670D56151E00902599 /* PBXTextBookmark */;
 			485B495B0B228B3700CE9856 /* PBXTextBookmark */ = 485B495B0B228B3700CE9856 /* PBXTextBookmark */;
 			485B495D0B228B3700CE9856 /* PBXTextBookmark */ = 485B495D0B228B3700CE9856 /* PBXTextBookmark */;
-			48839FE30B76BB960072D060 /* PBXTextBookmark */ = 48839FE30B76BB960072D060 /* PBXTextBookmark */;
 			48B496470B2BABE300FCEABC /* PBXTextBookmark */ = 48B496470B2BABE300FCEABC /* PBXTextBookmark */;
 			48B496490B2BABE300FCEABC /* PBXTextBookmark */ = 48B496490B2BABE300FCEABC /* PBXTextBookmark */;
-			48ED50D00B6B9B3100E99116 /* PBXTextBookmark */ = 48ED50D00B6B9B3100E99116 /* PBXTextBookmark */;
 		};
 		sourceControlManager = 4818575205CABF4B00C48BE6 /* Source Control */;
 		userBuildSettings = {
@@ -623,9 +624,6 @@
 			sepNavVisRect = "{{0, 0}, {545, 314}}";
 			sepNavWindowFrame = "{{61, 227}, {750, 558}}";
 		};
-	};
-	4818570805CABEEB00C48BE6 /* breveSwarm */ = {
-		activeExec = 0;
 	};
 	4818572A05CABEEB00C48BE6 /* breveSwarm-info.plist */ = {
 		uiCtxt = {
@@ -658,6 +656,44 @@
 		isa = PBXCodeSenseManager;
 		indexTemplatePath = "";
 	};
+	485345610D56150100902599 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		comments = "warning: unused variable ‘controller’";
+		fRef = F5175CBE0169B97E010BE436 /* slBreveCreatures.mm */;
+		rLen = 1;
+		rLoc = 30;
+		rType = 1;
+	};
+	485345640D56151A00902599 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F5175CB90169B958010BE436 /* slBreveSwarm.h */;
+		name = "slBreveSwarm.h: 21";
+		rLen = 0;
+		rLoc = 1526;
+		rType = 0;
+		vrLen = 1107;
+		vrLoc = 553;
+	};
+	485345650D56151A00902599 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F5175CB90169B958010BE436 /* slBreveSwarm.h */;
+		name = "slBreveSwarm.h: 21";
+		rLen = 0;
+		rLoc = 1526;
+		rType = 0;
+		vrLen = 1107;
+		vrLoc = 553;
+	};
+	485345670D56151E00902599 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F5175CBE0169B97E010BE436 /* slBreveCreatures.mm */;
+		name = "slBreveCreatures.mm: 28";
+		rLen = 0;
+		rLoc = 1626;
+		rType = 0;
+		vrLen = 464;
+		vrLoc = 2339;
+	};
 	485B495B0B228B3700CE9856 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
 		fRef = 4818574E05CABEEB00C48BE6 /* breveWalker-Info.plist */;
@@ -678,17 +714,7 @@
 		vrLen = 798;
 		vrLoc = 0;
 	};
-	48839FE30B76BB960072D060 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = F5175CB90169B958010BE436 /* slBreveSwarm.h */;
-		name = "slBreveSwarm.h: 21";
-		rLen = 0;
-		rLoc = 1526;
-		rType = 0;
-		vrLen = 1107;
-		vrLoc = 553;
-	};
-	48941C8F0401A69200000116 /* Simulation.tz */ = {
+	48941C8F0401A69200000116 /* Creatures.tz */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {1099, 703}}";
 			sepNavSelRange = "{0, 0}";
@@ -789,30 +815,15 @@
 		);
 		breakpointStyle = 0;
 		continueAfterActions = 0;
+		countType = 0;
 		delayBeforeContinue = 0;
 		fileReference = 489D8A5B06B5521A00740D0A /* slBrevePainter.h */;
 		hitCount = 1;
+		ignoreCount = 0;
 		lineNumber = 18;
 		location = brevePainter;
 		modificationTime = 191601216.180279;
 		state = 1;
-	};
-	48ED502E0B6B9A0000E99116 /* XCBreakpointsBucket */ = {
-		isa = XCBreakpointsBucket;
-		name = breveSaver;
-		objects = (
-			48D9077C06BFBA7800FF529F /* slBrevePainter.h:18 */,
-		);
-	};
-	48ED50D00B6B9B3100E99116 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = F5175CB90169B958010BE436 /* slBreveSwarm.h */;
-		name = "slBreveSwarm.h: 21";
-		rLen = 0;
-		rLoc = 1526;
-		rType = 0;
-		vrLen = 1107;
-		vrLoc = 553;
 	};
 	F50BB16F012BFE5C010BE436 /* WalkerSaver.tz */ = {
 		uiCtxt = {
@@ -832,8 +843,9 @@
 	};
 	F5175CB90169B958010BE436 /* slBreveSwarm.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {545, 434}}";
+			sepNavIntBoundsRect = "{{0, 0}, {525, 434}}";
 			sepNavSelRange = "{1526, 0}";
+			sepNavVisRange = "{553, 1107}";
 			sepNavVisRect = "{{0, 98}, {545, 314}}";
 			sepNavWindowFrame = "{{38, 248}, {750, 558}}";
 		};
@@ -855,8 +867,9 @@
 	};
 	F5175CBE0169B97E010BE436 /* slBreveCreatures.mm */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {922, 1246}}";
-			sepNavSelRange = "{1625, 0}";
+			sepNavIntBoundsRect = "{{0, 0}, {1348, 1008}}";
+			sepNavSelRange = "{1720, 0}";
+			sepNavVisRange = "{1502, 244}";
 			sepNavVisRect = "{{0, 400}, {922, 690}}";
 			sepNavWindowFrame = "{{211, 4}, {961, 819}}";
 		};

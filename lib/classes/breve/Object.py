@@ -10,16 +10,8 @@ class Object( object ):
 	'''Summary: the top level object class. <P> The Object class is the root class.  All classes used in breve have Object as an ancestor.  The object class implements some basic  services that all classes will have access to. <p> Subclassing Object directly is rare.  The classes OBJECT(Real) and  OBJECT(Abstract) are logical separations of the Object class containing  "real" objects (which correspond to a physical entity in the simulated  world) and "abstract" objects which are generally used for computation  or control of the real objects.  You should consider subclassing   one of these classes instead.'''
 
 	def __init__( self ):
-		if not ( 'breveInstance' in self.__dict__ ):
-			self.breveInstance = breve.addInstance( self.__class__, self )
-			self.breveModule = breve.breveInternal
-			self.controller = breve.breveInternalFunctionFinder.getController( self )
-
-			if self.controller == None:
-				print "No controller has been defined!"
-				raise ValueError
-
-			Object.init( self )
+		breve.breveObjectInit( self )
+		Object.init( self )
 
 		object.__init__( self )
 

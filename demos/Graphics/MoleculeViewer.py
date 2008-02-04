@@ -21,7 +21,8 @@ class PDBViewer( breve.Control ):
 		atomString = ''
 
 		self.setBackgroundColor( breve.vector( 0.600000, 0.600000, 0.600000 ) )
-		self.hShape = breve.createInstances( breve.Sphere, 1 ).initWith( 0.300000 )
+		self.enableLighting()
+		self.hShape = breve.createInstances( breve.Sphere, 1 ).initWith( 0.200000 )
 		self.file = breve.createInstances( breve.File, 1 )
 		if ( self.getArgumentCount() > 1 ):
 			self.file.openForReading( self.getArgument( 1 ) )
@@ -65,7 +66,6 @@ class PDBViewer( breve.Control ):
 
 		average = ( average / breve.length( breve.allInstances( "Mobiles" ) ) )
 		print breve.length( breve.allInstances( "Mobiles" ) ), ''' atoms'''
-		breve.allInstances( "Mobiles" ).setBitmap( 2 )
 		self.pointCamera( average, ( average + breve.vector( 30, 0, 30 ) ) )
 
 	def iterate( self ):

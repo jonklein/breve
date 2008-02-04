@@ -29,7 +29,6 @@ sys.stdout = breveStdoutHandler()
 # def decodeFromString( inString ):
 # 	pass
 
-
 def setController( inControllerClass ):
 	"Creates the breve Controller class.  This method simply instantiates the class which is called.  It is provided for convenience only."
 	return controller()
@@ -104,9 +103,8 @@ def deleteInstances( inInstances ):
 		deleteInstance( inInstances )
 
 def deleteInstance( inInstance ):
-	if inInstance.breveInstance != None:
+	if inInstance and inInstance.breveInstance != None:
 		inInstance.destroy()
-		inInstance.delete()
 		breveInternal.removeInstance( breveInternal.breveEngine, inInstance )
 		all = allInstances( inInstance.__class__.__name__ )
 		if inInstance in all:
@@ -327,9 +325,26 @@ if 1:
 	from IRSensor		import *
 	from Wanderer 		import *
 
+	from URL			import *
 	from QGAME		import *
 	from Push 		import *
 	from PushGP 		import *
+
+
+
+def breveObjectInit( inObj ):
+	if not ( 'breveInstance' in inObj.__dict__ ):
+		inObj.breveInstance = breve.addInstance( inObj.__class__, inObj )
+		inObj.breveModule = breve.breveInternal
+
+		if isinstance( inObj, breve.Control ):
+			breve.breveInternal.setController( breve.breveInternal, inObj )
+
+		inObj.controller = breve.breveInternalFunctionFinder.getController( inObj )
+
+		if inObj.controller == None:
+			raise ValueError( "Cannot locate breve controller object (no controller has been defined)" )
+	
 
 
 class bridgeObjectMethod( object ):

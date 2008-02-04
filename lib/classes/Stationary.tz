@@ -87,6 +87,7 @@ Stationary : Floor {
 		self set-shape to shape.
 		self set-color to ( .35, .8, .45 ).
 		self catch-shadows.
+		self set-texture-image to (new Image load from "images/noise.png").
 
 	+ to set-size to newSize (vector):
 		% Changes the size of the floor to newSize.
