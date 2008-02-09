@@ -282,30 +282,30 @@ RTC_INLINE int stEvalLoadPointer( stLoadExp *e, stRunInstance *i, void **pointer
 
 inline int stToInt( brEval *e, brEval *t, stRunInstance *i ) {
 	char *str;
-	int resultCode;
+	int result = 0;
 
 	switch ( e->type() ) {
 
 		case AT_INT:
-			resultCode = BRINT( e );
+			result = BRINT( e );
 
 			break;
 
 		case AT_DOUBLE:
-			resultCode = ( int )BRDOUBLE( e );
+			result = ( int )BRDOUBLE( e );
 
 			break;
 
 		case AT_STRING:
 			str = BRSTRING( e );
 
-			if ( str ) resultCode = atoi( BRSTRING( e ) );
-			else resultCode = 0;
+			if ( str ) result = atoi( str );
+			else result = 0;
 
 			break;
 
 		case AT_LIST:
-			resultCode = BRLIST( e )->_vector.size();
+			result = BRLIST( e )->_vector.size();
 
 			break;
 
@@ -352,7 +352,7 @@ inline int stToInt( brEval *e, brEval *t, stRunInstance *i ) {
 			break;
 	}
 
-	t->set( resultCode );
+	t->set( result );
 
 	return EC_OK;
 }
@@ -2709,7 +2709,6 @@ RTC_INLINE int stEvalBinaryDoubleExp( char op, brEval *l, brEval *r, brEval *t, 
 	int c;
 
 	if ( l->type() != AT_DOUBLE ) if (( c = stToDouble( l, l, i ) ) != EC_OK ) return c;
-
 	if ( r->type() != AT_DOUBLE ) if (( c = stToDouble( r, r, i ) ) != EC_OK ) return c;
 
 	switch ( op ) {
@@ -2818,6 +2817,11 @@ RTC_INLINE int stEvalBinaryDoubleExp( char op, brEval *l, brEval *r, brEval *t, 
 }
 
 RTC_INLINE int stEvalBinaryIntExp( char op, brEval *l, brEval *r, brEval *t, stRunInstance *i ) {
+	int c;
+
+	if ( l->type() != AT_INT ) if ( ( c = stToInt( l, l, i ) ) != EC_OK ) return c;
+	if ( r->type() != AT_INT ) if ( ( c = stToInt( r, r, i ) ) != EC_OK ) return c;
+
 	switch ( op ) {
 
 		case BT_ADD:
