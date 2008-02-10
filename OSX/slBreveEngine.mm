@@ -211,7 +211,6 @@ int slMakeCurrentContext();
 
 
 - (void)pauseSimulation:sender {
-	printf(" Pausing...\n " );
 	[_engineLock lock];
 	runState = BX_PAUSE;
 
@@ -362,11 +361,10 @@ int slMakeCurrentContext();
 
 	[displayView setNeedsDisplay: YES];
 
-	while([displayView drawing]);
+	while( [displayView drawing] );
 
 	[self freeEngine];
 
-	[_engineLock unlock];
 	[_threadLock unlock];
 
 	[pool release];

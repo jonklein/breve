@@ -29,8 +29,8 @@
 */
 
 /*
-	aim:goim?screenname=rockstjaerna@mac.com
-*/
+ * aim:goim?screenname=rockstjaerna@mac.com
+ */
 
 #import "slBreve.h"
 #import "slutil.h"
@@ -73,10 +73,9 @@ static NSRecursiveLock *gLogLock;
 #define expand_macro_stringify(x) stringify(x)
 
 	_versionString = [ [ NSString stringWithCString: expand_macro_stringify( BREVE_VERSION ) ] retain ];
-
 	[_versionField setStringValue: [ NSString stringWithFormat: @"version %@", _versionString ] ];
 	
-	NSLog(@ " version = %@\n", [ NSString stringWithFormat: @"version %@", _versionString ]  );
+	// NSLog(@ "version = %@\n", [ NSString stringWithFormat: @"version %@", _versionString ]  );
 
 	_engineWillPause = NO;
 	
