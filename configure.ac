@@ -1,4 +1,4 @@
-AC_PREREQ(2.57)
+lC_PREREQ(2.57)
 
 AC_INIT([the breve simulation environment], [2.7b2], [jk@spiderland.org])
 AC_CONFIG_HEADER([include/breve/config.h])
@@ -334,6 +334,8 @@ if test "x$engine_only" = "x"; then
 
 	AC_CHECK_LIB([qgame++], [main])
 
+	AC_CHECK_LIB([curl], [curl_easy_init])
+
 	AC_CHECK_PROGS(ECL_CONFIG, [ecl-config], [], $PATH:/usr/local/bin:/usr/bin:/usr/local/ecl )
 fi
 
@@ -344,7 +346,6 @@ fi
 AC_CHECK_LIB([png], [png_create_write_struct])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc],,AC_MSG_FAILURE([Missing GSL library -- see http://www.gnu.org/software/gsl/]))
 AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]))
-AC_CHECK_LIB([curl], [curl_easy_init])
 
 AC_CHECK_FUNCS([getopt_long gettimeofday iswspace mkstemp strdup vasprintf])
 

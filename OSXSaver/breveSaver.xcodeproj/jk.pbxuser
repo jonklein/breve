@@ -100,7 +100,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 223745127;
+			PBXPerProjectTemplateStateSaveDate = 224371476;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -601,13 +601,9 @@
 				};
 				RubberWindowFrame = "170 89 962 743 0 0 1280 832 ";
 			};
-			PBXWorkspaceStateSaveDate = 223745127;
+			PBXWorkspaceStateSaveDate = 224371476;
 		};
 		perUserProjectItems = {
-			485345610D56150100902599 /* PBXTextBookmark */ = 485345610D56150100902599 /* PBXTextBookmark */;
-			485345640D56151A00902599 /* PBXTextBookmark */ = 485345640D56151A00902599 /* PBXTextBookmark */;
-			485345650D56151A00902599 /* PBXTextBookmark */ = 485345650D56151A00902599 /* PBXTextBookmark */;
-			485345670D56151E00902599 /* PBXTextBookmark */ = 485345670D56151E00902599 /* PBXTextBookmark */;
 			485B495B0B228B3700CE9856 /* PBXTextBookmark */ = 485B495B0B228B3700CE9856 /* PBXTextBookmark */;
 			485B495D0B228B3700CE9856 /* PBXTextBookmark */ = 485B495D0B228B3700CE9856 /* PBXTextBookmark */;
 			48B496470B2BABE300FCEABC /* PBXTextBookmark */ = 48B496470B2BABE300FCEABC /* PBXTextBookmark */;
@@ -655,44 +651,6 @@
 	4818575305CABF4B00C48BE6 /* Code sense */ = {
 		isa = PBXCodeSenseManager;
 		indexTemplatePath = "";
-	};
-	485345610D56150100902599 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		comments = "warning: unused variable ‘controller’";
-		fRef = F5175CBE0169B97E010BE436 /* slBreveCreatures.mm */;
-		rLen = 1;
-		rLoc = 30;
-		rType = 1;
-	};
-	485345640D56151A00902599 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = F5175CB90169B958010BE436 /* slBreveSwarm.h */;
-		name = "slBreveSwarm.h: 21";
-		rLen = 0;
-		rLoc = 1526;
-		rType = 0;
-		vrLen = 1107;
-		vrLoc = 553;
-	};
-	485345650D56151A00902599 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = F5175CB90169B958010BE436 /* slBreveSwarm.h */;
-		name = "slBreveSwarm.h: 21";
-		rLen = 0;
-		rLoc = 1526;
-		rType = 0;
-		vrLen = 1107;
-		vrLoc = 553;
-	};
-	485345670D56151E00902599 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = F5175CBE0169B97E010BE436 /* slBreveCreatures.mm */;
-		name = "slBreveCreatures.mm: 28";
-		rLen = 0;
-		rLoc = 1626;
-		rType = 0;
-		vrLen = 464;
-		vrLoc = 2339;
 	};
 	485B495B0B228B3700CE9856 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;

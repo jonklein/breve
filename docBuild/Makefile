@@ -1,5 +1,7 @@
 .PHONY: classes docbook documentation source spell tidy
 
+DOCBOOK=/usr/local/lib/docbook-xsl-1.71.1
+
 all: html pdf
 
 clean: pdf-clean html-clean
@@ -25,7 +27,7 @@ classes: docExtract
 
 pdf: pdf-clean
 	mkdir -p pdfdocs
-	xsltproc --output breve_documentation.fo --stringparam fop.extensions 1 /usr/local/lib/docbook-xsl-1.71.1/fo/docbook.xsl breve.docbook
+	xsltproc --output breve_documentation.fo --stringparam fop.extensions 1 $(DOCBOOK)/fo/docbook.xsl breve.docbook
 	fop -fo breve_documentation.fo -pdf pdfdocs/breve_documentation.pdf
 
 html: html-clean 
@@ -36,7 +38,7 @@ html: html-clean
 	cp stylesheet.css htmldocs
 	cp stylesheet.css htmldocs/docs
 
-	xsltproc make-html.xsl breve.docbook
+	xsltproc --path $(DOCBOOK)/html/ make-html.xsl breve.docbook
 
 	mkdir -p htmldocs/images
 	cp images/*.jpg htmldocs/images/

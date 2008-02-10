@@ -9,7 +9,7 @@
       breve Simulation Envionment</ulink>.
     </para><mediaobject><imageobject><imagedata align="center" fileref="../images/breve_icon.jpg"/></imageobject></mediaobject><para>
       You can also <ulink url="http://www.spiderland.org/download/breve_docs.tar.gz">download</ulink> the
-      breve 2.6 documentation in HTML format [808K tar/gz file].
+      breve 2.7 documentation in HTML format [808K tar/gz file].
     </para><para>
       To report bugs in breve, you can either <ulink url="mailto:jk%20[at]%20spiderland.org">email the author</ulink>, or post your
       bug in the <ulink url="http://www.spiderland.org/forums">bugs section of the
@@ -433,25 +433,27 @@
 </section>
 </chapter>
 <chapter id="node-2606"><?dbhtml dir="docs" ?>
-<title>What's New in Version 2.6</title>
+<title>What's New in Version 2.7</title>
 <para>
-        breve version 2.6 introduces several new features and changes. These
-        changes are outlined in the sections below.
+        breve version 2.7 introduces several new features and changes.
       </para>
 <section id="node-2607">
-<title>New Features in Version 2.6</title>
+<title>New Features in Version 2.7</title>
 <para>
-        breve 2.6 introduces several major new features and improvements:
-      </para><itemizedlist><listitem><para>
-              Full support for <xref linkend="node-1504"/></para></listitem><listitem><para>
-              Ported all breve demos and classes to Python frontend
-            </para></listitem><listitem><para>
-              The "breve_cli" program has been removed. Use "breve -x" to run a
-              command-line simulation without graphics.
-            </para></listitem><listitem><para>
-              Integrated documentation and stability fixes in breveIDE for
-              Linux and Windows.
-            </para></listitem></itemizedlist>
+        breve 2.7 introduces several major new features and improvements:
+      </para><itemizedlist><listitem><para>Added URL class for downloading data from and uploading data URLs
+          </para></listitem><listitem><para>Major improvements and performance updates for physical
+          simulation
+          </para></listitem><listitem><para>Added support for loading mesh objects from 3DS files (both as
+          display and collision shapes)
+          </para></listitem><listitem><para>Added support for non-convex shapes
+          </para></listitem><listitem><para>Shadows now correctly rendered for display shape instead of
+          collision shape
+          </para></listitem><listitem><para>Added abililty to load and display "skybox" images for realistic
+          3D simulation backgrounds
+          </para></listitem><listitem><para>Major fixes and improvements to simulation archiving and
+          dearchiving
+          </para></listitem></itemizedlist>
 </section>
 <section id="node-2608">
 <title>Important Notes on Plugins in Version 2.6</title>
@@ -590,8 +592,8 @@
 </section>
 </section>
 </chapter>
-<chapter id="node-3350"><?dbhtml dir="docs" ?>
-<title>Writing Simulations in breve</title>
+<chapter id="node-3420"><?dbhtml dir="docs" ?>
+<title>Writing breve Simulations with "steve" or Python</title>
 <para>
       As of breve release 2.6, breve offers two choices of scripting languages
       for writing simulations:<xref linkend="node-2632"/> and <xref linkend="node-1504"/>. Python support
@@ -610,6 +612,7 @@
       </para></listitem><listitem><para>Supports breve object archiving and networking, a feature which has
       not yet been integrated into Python.
       </para></listitem><listitem><para>Full support for all breve classes and demos.
+      </para></listitem><listitem><para>The primary language used in this documentation.
       </para></listitem></itemizedlist><para>
       Advantages of Python:
     </para><itemizedlist><listitem><para>Huge amounts of existing code and modules that can be integrated into
@@ -634,11 +637,11 @@
         that the agents are continuously reacting to their environment. In
         addition to behaviors at each time-step, behaviors can be specified to
         correspond to other events as well. The most notably of these other
-        events is object initialization&#xA0;each agent has a set of behaviors
+        events is object initialization&#x2014;each agent has a set of behaviors
         that are executed when the agent is created.
       </para><para>
         Writing simulations in breve is thus nothing more than specifying the
-        behavior of agents&#xA0;there is no code written that does not
+        behavior of agents&#x2014;there is no code written that does not
         correspond to an agent. In order to specify agent behaviors, breve uses
         object-oriented languages, either the breve-specific steve language, or
         the popular (and externally developed) scripting language Python. In
@@ -659,7 +662,13 @@
       at each time-step, the agent uses its iterate method to perform a series
       of tasks: obtain information about the world via sensors, perform
       computation on the information, and finally change its behavior or state
-      based on the computed information.
+      based on the computed information. <emphasis role="bold">The only way to make agents with
+      custom behaviors is to subclass an existing agent class</emphasis>. breve
+      includes built-in classes, such as Mobile and Stationary, which serve as
+      agent templates for more sophisticated agent behaviors. To implement a
+      more sophisticated agent behavior, create a subclass of one of breve's
+      built-in classes and override the init and iterate methods to behave
+      however you want them to.
     </para>
 </section>
 <section id="node-1504">
@@ -675,16 +684,19 @@
       Python, you may wish to consult <ulink url="http://www.python.org/doc/">the
       official Python documentation</ulink></para><para>
       The first step in writing breve simulations with Python is to familiarize
-      yourself with the<xref linkend="node-3297"/>, which describes general
-      information about how simulations are structured, for all frontend
-      languages.
+      yourself with the <xref linkend="node-3297"/>, which
+      describes general information about how simulations are structured, for
+      all frontend languages.
     </para><para>
       Next, you can take a look at a <xref linkend="node-1507"/>, in order to see how the breve simulation structure
       is used with Python. You can also begin looking at the included demos for
       real-world examples of how Python is used to write simulations.
     </para><para>
       Finally, you'll want to explore <xref linkend="node-2795"/> to learn how to use the features of the breve engine in your
-      simulations.
+      simulations. Note that much of the breve documentation is written for the
+      steve language, but that all methods and classes available in steve are
+      also available in Python (with slightly different names). So all steve
+      language examples in this documentation can be applied to Python as well.
     </para>
 <section id="node-3247">
 <title>Writing breve-Complient Python Objects</title>
@@ -695,16 +707,18 @@
       All Python files to be loaded into breve should import the breve module
       to gain access to important breve engine functionality. In order for a
       Python object to be compatible with the breve engine, it must be a
-      subclass of the breve Python module class breve.object. If an object is
-      not a subclass of breve.object, it will not be visible to the breve
+      subclass of the breve Python module class <literal>breve.Object</literal>. If
+      an object is not a subclass of breve.Object (either directly, or via any
+      of the other built-in breve classes), it will not be visible to the breve
       engine. The <literal>__init__</literal> method of the class must execute the
-      <literal>breve.object.__init__</literal> method before any breve bridge
+      superclass <literal>__init__</literal> method
+      (<literal>breve.Object.__init__</literal> in this case) before any breve bridge
       functionality is used.
     </para><para>
       The following example illustrates a basic Python file with a simple
       breve-compatible class defined:
     </para><programlisting>
-@import breve
+import breve
 
 class PythonBridgeObject( breve.Object ):
         def __init__( self ):
@@ -713,6 +727,8 @@ class PythonBridgeObject( breve.Object ):
 
         def iterate( self ):
                 print "Iterating Python bridge object"
+                breve.Object.iterate( self )
+
 </programlisting><para>
       This simple Python object will be visible to the breve engine and will
       have its iterate method called at each iteration of the breve engine.
@@ -755,6 +771,13 @@ class myAgent( breve.Mobile ):
 myController()
 
 </programlisting>
+</section>
+<section id="node-1508">
+<title>breve Class APIs [Python]</title>
+<para>
+      The full list of breve class APIs, including documentation for both
+      Python and steve is available <xref linkend="node-2795"/>.
+    </para>
 </section>
 </section>
 <section id="node-2632">
@@ -2528,102 +2551,9 @@ for n=2, n&lt;=28, n+=2: {
 </section>
 </section>
 </section>
-<section id="node-3246">
-<title>Bridging Code Between steve and Python</title>
-<para>
-      Communication between the languages is done by creating objects in the
-      other language: Python objects can be created from steve code, and vice
-      versa.
-    </para>
-<section id="node-3248">
-<title>Importing and Executing Python Code From Steve</title>
-<para>
-      To include a Python file from a steve simulation file, simply use an
-      <literal>"@include"</literal> statement with the name of the Python file, just
-      as steve files are included.
-    </para><para>
-      To use a Python class from a steve file, simply create a new instance of
-      the class exactly as you would with a steve object. Likewise, methods can
-      be called in the new object exactly as usual. Because of differences
-      between the two languages, there are a few minor differences in calling
-      objects over the bridge:
-    </para><itemizedlist><listitem><para>Keywords are ignored for arugment passing. Instead, arguments are
-      expected in the order they are defined for a method. When calling Python
-      methods from steve, you can use made-up keyword names (to preserve the
-      normal steve syntax), but be sure to match the argument order of the
-      python method.
-      </para></listitem><listitem><para>steve uses the "-" (dash) character in many method names, but Python
-      does not allow this character in method names. If calling a steve method
-      from Python, use the "_" (underscore) character in place of "-". The
-      character will be converted automatically.
-      </para></listitem></itemizedlist>
-</section>
-<section id="node-3249">
-<title>Additional Notes</title>
-<para>
-      Foreign language objects appear to behave exactly as native objects,
-      meaning that methods are called in native syntax. For typical usage, this
-      is the only thing that matters.
-    </para><para>
-      The foreign language objects are not, however, truely native. The objects
-      are actually "bridge objects", which forward method calls to the native
-      object. Practically speaking, this means a couple of things:
-    </para><itemizedlist><listitem><para>Bridge objects always appear to be of the same type, no matter what
-      type they actually represent in their native language.
-      </para></listitem><listitem><para>Functions that inspect internal object state will be inspecting the
-      bridge object, not the object that the bridge represents.
-      </para></listitem><listitem><para>Duplicate object names between steve and Python are not strictly
-      prohibited, but will cause difficulties so be sure to
-        give objects unique name. When mixing objects of the case of built-in
-        breve classes (such as Stationary or Real), it may be necessary to
-        create object subclasses with unique names to resolve ambiguities. This
-        situation may arise, for example, when adding a collision handler for a
-        standard object.
-      </para></listitem></itemizedlist><para>
-      These details are subtle and do not effect most typical object usage.
-      Just remember that bridge objects are "shells" for other objects, and not
-      the actual objects they appear to be.
-    </para>
-</section>
-<section id="node-1505">
-<title>Bridges between Python and "steve"</title>
-<para>
-      breve allows communication between the different language frontends via
-      special "bridge" objects. A bridge object is an object in one language
-      which acts as a proxy for an object in another language frontend. This
-      allows a user to create and use simulation objects written with one
-      language in another language. Practically speaking, this means that users
-      writing simulations in steve can take advantage of Python's rich
-      libraries and 3rd party code, and that users writing simulations in
-      Python can make use of existing code written in steve without needing to
-      rewrite it.
-    </para><para>
-      For the most part, bridge objects appear to be just like every other
-      object in the simulation. Users can call methods in the objects and they
-      can be passed around as arguments to other methods. There are a few
-      important notes, however, to consider when using bridge instances:
-    </para><itemizedlist><listitem><para>The Python language does not allow the "-" (dash) character in method
-      names, while the steve language uses this character liberally. This
-      character gets mapped to the "_" (underscore) character when interacting
-      with Python objects. This means that to call the method "get-time" for a
-      steve object, you should use the method name "get_time" in Python.
-      Likewise, if a method "export-data" is called from steve on a Python
-      object, Python will execute the method "export_data"
-      </para></listitem><listitem><para>There is no specific type information for bridge objects. Though
-      bridge objects behave like a specific class in another language, they
-      always "appear" to be of the same type. In Python, for example, a bridge
-      object to any steve class will always appear as a "bridgeObject" instead
-      of the actual steve class name it represents.
-      </para></listitem><listitem><para>Inspecting the internals of the object will not give accurate
-      information. The <literal>dir</literal> function in Python, for example, will
-      reveal the contents of the bridge object, and not the underlying steve
-      object.
-      </para></listitem></itemizedlist>
-</section>
-</section>
 </chapter>
 <chapter id="node-2698"><?dbhtml dir="docs" ?>
-<title>Basic Agent Behaviors</title>
+<title>Basic Agent Behaviors: Motion, Appearance and Communication</title>
 <para> To create a simple agent in breve, you'll need to
         subclass one of the basic agent classes, all subclasses of <ulink url="http://www.spiderland.org/documentation/classes/Real.html">Real</ulink>:
       </para><itemizedlist><listitem><para>
@@ -2654,9 +2584,10 @@ for n=2, n&lt;=28, n+=2: {
 <para>
         The majority of agents created in breve are simple mobile agents.
       </para><para>
-        Here's a simple mobile agent. It inherits most of its behaviors from
-        the class Mobile, but we'll customize it with our own <literal>init</literal> and <literal>iterate</literal>
-        methods.
+        Here's the code for a very simple mobile agent (in the steve language).
+        It inherits most of its behaviors from the class Mobile, but we'll
+        customize it with our own <literal>init</literal> and
+        <literal>iterate</literal> methods.
       </para><programlisting>
 Mobile : Bird {
         + variables:
@@ -2885,23 +2816,18 @@ self schedule method-call "sing-and-dance" at-time ((controller get-time) + 100.
         display objects as bitmaps, texture objects, and to display objects as
         lightmaps. These techniques are described later in the chapter. This
         section describes how image files can be loaded into breve.
-      </para><para><emphasis>breve</emphasis> supports three image file
-        formats: 1) SGI, 2) JPEG, 3) PNG. Though JPEG is the most common, most
-        graphics programs can output images in all three formats. Specifically,
-        the shareware program Graphic Converter can convert between the three
-        formats.
-      </para><para><emphasis>PNG is the preferred image format&#x2014;it
-        allows more control over how the image is loaded into a
-        texture</emphasis>. Support for the SGI format is provided for
-        backward compatibility. Support for the JPEG format is provided because
-        it is somewhat more common than PNG.
+      </para><para><emphasis>breve</emphasis> supports loading images in
+        PNG, JPEG or SGI format. PNG is the preferred file format because it
+        supports transparency, which is useful for image textures and bitmaps.
       </para><para>
         Prior to version 2.0, breve required all images loaded into breve to be
-        square, and for the length of the sides of the images must be a power
-        of two (for example, 256x256 or 128x128). This is no longer strictly
-        required, though it may still be preferable. breve will automatically
-        surround the image with a transparent border in order to fulfill the
-        size requirements.
+        square, and for the dimensions of the images to be a power-of-two (for
+        example, 256x256 or 128x128 pixels). This is no longer strictly
+        required, though it is still preferable when using images as object
+        textures. breve will automatically surround the image with a
+        transparent border in order to fulfill the power-of-two size
+        requirements, so images that are not powers of two may not appear as
+        intended.
       </para><para>
         Images are loaded using the class Image. To load an image file, create
         a new instance of the class Image, and load a file with the load
@@ -3807,7 +3733,7 @@ catch-key-down-up
 + to dearchive:
         print "Dearchiving $self...".
 
-        return (super archive).
+        return (super dearchive).
 </programlisting>
 </section>
 <section id="node-2748">
@@ -5445,7 +5371,10 @@ brEngineIterate( engine );
 <chapter id="node-2795"><?dbhtml dir="docs" ?>
 <title>The Built-In breve Class APIs</title>
 This section lists all of the built-in breve class objects. These objects
-      are used to interact with specific features in the breve engine.
+      are used to interact with specific features in the breve engine. Each
+      page includes a short description of the object along with links to more
+      detailed method documentation for both the steve and Python frontend
+      languages.
     
 <section id="node-2796">
 <title>Abstract</title>
@@ -6154,11 +6083,8 @@ This section lists all of the built-in breve class objects. These objects
 <para>
       Description for class <emphasis role="bold">MeshShape</emphasis>:
     </para><blockquote><para>
-      An experimental class to load arbitrary 3d mesh shapes.
-      <para><emphasis role="bold">Full collision detection is not currently supported for
-        MeshShapes</emphasis>. MeshShapes are currently collision detected using
-        spheres, with the radius defined by the maximum reach of the mesh.
-      </para></para></blockquote><para>
+      A class to load arbitrary 3d mesh shapes.
+    </para></blockquote><para>
       Inherits from <emphasis role="bold">Shape</emphasis></para><para>
       Full API documentation for the class <emphasis role="bold">MeshShape</emphasis>:
     </para><itemizedlist><listitem><para><ulink url="../steveclasses/MeshShape.html">steve language
@@ -6603,7 +6529,7 @@ This section lists all of the built-in breve class objects. These objects
         language, on the other hand, is designed from the ground up for
         evolutionary computation.
       </para><para>
-        More information about Push is available <ulink url="http://hampshire.edu/lspector/push.html">here</ulink>.
+        More information about Push is available <ulink url="http://hampshire.edu/lspector/push.html">on the Push project page</ulink>.
       </para></para></blockquote><para>
       Inherits from <emphasis role="bold">Object</emphasis></para><para>
       Full API documentation for the class <emphasis role="bold">PushInterpreter</emphasis>:
@@ -6940,7 +6866,7 @@ This section lists all of the built-in breve class objects. These objects
         documentation</ulink></para></listitem><listitem><para><ulink url="../pythonclasses/Wanderer.html">Python language
         documentation</ulink></para></listitem></itemizedlist>
 </section>
-<section id="node-3354">
+<section id="node-3366">
 <title>IRSensor</title>
 <para>
       Description for class IRSensor:
