@@ -22,8 +22,6 @@
 
 #define MAX(x, y) ((x)>(y)?(x):(y))
 
-#define BUFFER_SIZE 512
-
 #include "simulation.h"
 #include "gldraw.h"
 #include "drawcommand.h"
@@ -201,7 +199,6 @@ int slUpdateTexture( slCamera *c, GLuint texture, unsigned char *pixels, int wid
 		c->_activateContextCallback();
 
 	newwidth = slNextPowerOfTwo( width );
-
 	newheight = slNextPowerOfTwo( height );
 
 	newwidth = newheight = MAX( newwidth, newheight );
@@ -238,11 +235,13 @@ int slUpdateTexture( slCamera *c, GLuint texture, unsigned char *pixels, int wid
 	return texture;
 }
 
+#define SELECTION_BUFFER_SIZE 512
+
 int slCamera::select( slWorld *w, int x, int y ) {
 
 	slVector cam;
 	GLuint *selections;
-	GLuint namesInHit, selection_buffer[ BUFFER_SIZE ];
+	GLuint namesInHit, selection_buffer[ SELECTION_BUFFER_SIZE ];
 	GLint hits, viewport[4];
 	unsigned int min, nearest = 0xffffffff;
 	unsigned int hit = w->_objects.size() + 1;
@@ -252,7 +251,7 @@ int slCamera::select( slWorld *w, int x, int y ) {
 	viewport[ 2 ] = _width;
 	viewport[ 3 ] = _height;
 
-	glSelectBuffer( BUFFER_SIZE, selection_buffer );
+	glSelectBuffer( SELECTION_BUFFER_SIZE, selection_buffer );
 	glRenderMode( GL_SELECT );
 	slClearGLErrors( "selected buffer" );
 
@@ -470,7 +469,7 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 
 	updateFrustum();
 
-	w->_skybox.draw( &cam, _zClip );
+	w -> _skybox.draw( &cam, _zClip );
 
 	//
 	// Lines and draw-commands are special objects which will be rendered before lighting is setup
@@ -602,6 +601,9 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 
 		glDisable( GL_SCISSOR_TEST );
 	}
+
+	if( _drawBlur ) 
+		readbackToTexture();
 }
 
 void slCamera::clear( slWorld *w ) {
@@ -610,27 +612,53 @@ void slCamera::clear( slWorld *w ) {
 	else
 		glClearColor( w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 1.0 );
 
-	if ( !_drawBlur )
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
-	else {
-		glEnable( GL_BLEND );
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 
-		glColor4f( w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 0.5f - ( _blurFactor / 2.0 ) );
+	if( _drawBlur ) { 
+		glEnable( GL_BLEND );
+		glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
+		glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+
+		glColor4f( 1.0f, 1.0f, 1.0f, _blurFactor );
 
 		glMatrixMode( GL_PROJECTION );
 		glPushMatrix();
 		glLoadIdentity();
-		gluPerspective( 40.0, _fov, _frontClip, _zClip );
-		glBegin( GL_TRIANGLE_STRIP );
-		glVertex3f( -5, -4, -3 );
-		glVertex3f( 5, -4, -3 );
-		glVertex3f( -5, 4, -3 );
-		glVertex3f( 5, 4, -3 );
-		glEnd();
+		glOrtho( -1, 1, -1, 1, -1, 1 );
+
+		glDepthMask( GL_FALSE );
+
+		glEnable( GL_TEXTURE_2D );
+		_readbackTexture -> bind();
+
+		GLenum mode = GL_NEAREST;
+
+		if( _readbackTexture -> _texX != _width || _readbackTexture -> _texY != _height )
+			mode = GL_LINEAR;
+
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mode );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mode );
+
+		if( _readbackTexture -> _texX != 0 && _readbackTexture -> _texY != 0 ) {
+			glBegin( GL_TRIANGLE_STRIP );
+
+			glTexCoord2f( 0, 0 );
+			glVertex2f( -1, -1 );
+			glTexCoord2f( _readbackTexture -> _unitX, 0 );
+			glVertex2f(  1, -1 );
+			glTexCoord2f( 0, _readbackTexture -> _unitY );
+			glVertex2f( -1,  1 );
+			glTexCoord2f( _readbackTexture -> _unitX, _readbackTexture -> _unitY );
+			glVertex2f(  1,  1 );
+
+			glEnd();
+		}
+
+		_readbackTexture -> unbind();
+
 		glPopMatrix();
 		glDisable( GL_BLEND );
-		glClear( GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
+		glDepthMask( GL_TRUE );
 	}
 }
 
@@ -1246,8 +1274,10 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags, float inAlphaScale
 
 				wo->draw( this );
 
-				if ( !doNoTexture && wo->_texture > 0 )
+				if ( !doNoTexture && wo->_texture > 0 ) {
+					glBindTexture( GL_TEXTURE_2D, 0 );
 					glDisable( GL_TEXTURE_2D );
+				}
 			} else
 				_points.push_back( std::pair< slVector, slVector>( wo->getPosition().location, wo->_color ) );
 		}

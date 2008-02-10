@@ -20,6 +20,7 @@
 
 #include "slutil.h"
 #include "glIncludes.h"
+#include "texture.h"
 
 #ifndef _CAMERA_H
 #define _CAMERA_H
@@ -246,17 +247,23 @@ class slCamera {
 
 		void						setTextColor( slVector *inColor ) { slVectorCopy( inColor, &_textColor ); }
 
+		void						readbackToTexture();
+
 	private:
-		void stencilFloor( slWorld *w );
-		void reflectionPass( slWorld *w, bool inWillDoVolumeShadow );
-		void drawFlatShadows( slWorld *w );
-		void renderObjects( slWorld *w, unsigned int flags, float inAlphaScale = 1.0f );
-		void renderText( slWorld *w, int crosshair );
-		void renderLabels( slWorld *w );
-		void renderLines( slWorld *w );
-		void setupLights( int inAmbientOnly = 0 );
-		void drawBackground( slWorld *w );
-		void drawFog();
+		slTexture2D*					_readbackTexture;
+		int						_readbackX;
+		int						_readbackY;
+
+		void 						stencilFloor( slWorld *w );
+		void 						reflectionPass( slWorld *w, bool inWillDoVolumeShadow );
+		void 						drawFlatShadows( slWorld *w );
+		void 						renderObjects( slWorld *w, unsigned int flags, float inAlphaScale = 1.0f );
+		void 						renderText( slWorld *w, int crosshair );
+		void 						renderLabels( slWorld *w );
+		void 						renderLines( slWorld *w );
+		void 						setupLights( int inAmbientOnly = 0 );
+		void 						drawBackground( slWorld *w );
+		void 						drawFog();
 
 
 };

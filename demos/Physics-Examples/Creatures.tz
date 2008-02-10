@@ -55,6 +55,9 @@ PhysicalControl : VirtualCreatures {
 		flag set-label to "Start".
 		flag disable-shadows.
 
+		self enable-blur.
+		self set-blur-factor to 1.0.
+
 		self set-mountain-skybox.
 
 		blockTexture = ( new Image load from "images/noise.png" ).

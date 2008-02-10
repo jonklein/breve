@@ -2819,9 +2819,6 @@ RTC_INLINE int stEvalBinaryDoubleExp( char op, brEval *l, brEval *r, brEval *t, 
 RTC_INLINE int stEvalBinaryIntExp( char op, brEval *l, brEval *r, brEval *t, stRunInstance *i ) {
 	int c;
 
-	if ( l->type() != AT_INT ) if ( ( c = stToInt( l, l, i ) ) != EC_OK ) return c;
-	if ( r->type() != AT_INT ) if ( ( c = stToInt( r, r, i ) ) != EC_OK ) return c;
-
 	switch ( op ) {
 
 		case BT_ADD:
@@ -3022,11 +3019,17 @@ RTC_INLINE int stEvalBinaryExpWithEvals( stRunInstance *i, unsigned char op, brE
 	if ( t2 == AT_LIST && t1 == AT_LIST && ( op == BT_EQ || op == BT_NE ) )
 		return stEvalBinaryEvalListExp( op, tl, tr, result, i );
 
-	if ( t2 == AT_STRING ) if (( c = stToDouble( tr, tr, i ) ) != EC_OK ) return c;
-	else if ( t2 == AT_LIST ) if (( c = stToInt( tr, tr, i ) ) != EC_OK ) return c;
+	if ( t2 == AT_STRING ) {
+		if (( c = stToDouble( tr, tr, i ) ) != EC_OK ) return c;
+	} else if ( t2 == AT_LIST ) {
+		if (( c = stToInt( tr, tr, i ) ) != EC_OK ) return c;
+	}
 
-	if ( t1 == AT_STRING ) if (( c = stToDouble( tl, tl, i ) ) != EC_OK ) return c;
-	else if ( t1 == AT_LIST ) if (( c = stToInt( tl, tl, i ) ) != EC_OK ) return c;
+	if ( t1 == AT_STRING ) {
+		if (( c = stToDouble( tl, tl, i ) ) != EC_OK ) return c;
+	} else if ( t1 == AT_LIST ) {
+		if (( c = stToInt( tl, tl, i ) ) != EC_OK ) return c;
+	}
 
 	if ( t1 == AT_DOUBLE || t2 == AT_DOUBLE ) 
 		return stEvalBinaryDoubleExp( op, tl, tr, result, i );
@@ -3051,16 +3054,13 @@ RTC_INLINE int stEvalRandExp( stRandomExp *r, stRunInstance *i, brEval *result )
 
 		case AT_DOUBLE:
 			result->set( slRandomDouble() * BRDOUBLE( result ) );
-
 			return EC_OK;
 
 			break;
 
 		case AT_VECTOR:
 			v.x = slRandomDouble() * BRVECTOR( result ).x;
-
 			v.y = slRandomDouble() * BRVECTOR( result ).y;
-
 			v.z = slRandomDouble() * BRVECTOR( result ).z;
 
 			result->set( v );
@@ -3071,7 +3071,6 @@ RTC_INLINE int stEvalRandExp( stRandomExp *r, stRunInstance *i, brEval *result )
 
 		default:
 			stEvalError( i->instance, EE_TYPE, "expected type \"int\", \"double\" or \"vector\" in evaluation of \"random\"" );
-
 			return EC_ERROR;
 	}
 

@@ -42,17 +42,6 @@ void slShape::draw( slCamera *c, double inTScaleX, double inTScaleY, int mode, i
 	if ( _drawList == 0 || _recompile || ( flags & DO_RECOMPILE ) ) 
 		slCompileShape( this, c->_drawMode, flags );
 
-	glPushAttrib( GL_TRANSFORM_BIT );
-	glMatrixMode( GL_TEXTURE );
-	glLoadIdentity();
-
-	glTranslatef( 0.5, 0.5, 0.0 );
-
-	if( inTScaleX > 0.0 && inTScaleY > 0.0 )
-		glScalef( 1.0 / inTScaleX, 1.0 / inTScaleY, 1.0 );
-
-	glPopAttrib();
-
 	if ( flags & DO_OUTLINE ) {
 		glPushAttrib( GL_ENABLE_BIT );
 		glDisable( GL_LIGHTING );
@@ -80,7 +69,21 @@ void slShape::draw( slCamera *c, double inTScaleX, double inTScaleY, int mode, i
 
 		glPopAttrib();
 	} else {
+		glPushAttrib( GL_TRANSFORM_BIT );
+
+		glMatrixMode( GL_TEXTURE );
+		glPushMatrix();
+		glLoadIdentity();
+
+		glTranslatef( 0.5, 0.5, 0.0 );
+
+		if( inTScaleX > 0.0 && inTScaleY > 0.0 )
+			glScalef( 1.0 / inTScaleX, 1.0 / inTScaleY, 1.0 );
+
 		glCallList( _drawList );
+
+		glPopMatrix();
+		glPopAttrib();
 	}
 
 	if ( axis ) {

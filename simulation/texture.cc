@@ -25,10 +25,22 @@
 
 slTexture2D::slTexture2D( std::string &inFile, bool inRepeat ) {
 	_textureID = 0;
+	_sizeX = 0;
+	_sizeY = 0;
+	_texX = 0;
+	_texY = 0;
+	_unitX = 0;
+	_unitY = 0;
 	loadImage( inFile, inRepeat );
 }
 
 slTexture2D::slTexture2D() {
+	_sizeX = 0;
+	_sizeY = 0;
+	_texX = 0;
+	_texY = 0;
+	_unitX = 0;
+	_unitY = 0;
 	_textureID = 0;
 }
 
@@ -58,15 +70,12 @@ slTexture2D::~slTexture2D() {
 }
 
 void slTexture2D::loadPixels( unsigned char *pixels, int inWidth, int inHeight, bool inRepeat ) {
-	int newwidth = slNextPowerOfTwo( inWidth );
-	int newheight = slNextPowerOfTwo( inHeight );
-
 	if( _textureID == 0 )
 		glGenTextures( 1, &_textureID );
 
-	newwidth = newheight = MAX( newwidth, newheight );
-
 	bind();
+
+	resize( inWidth, inHeight );
 
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -77,32 +86,47 @@ void slTexture2D::loadPixels( unsigned char *pixels, int inWidth, int inHeight, 
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, edge );
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
-	if ( newwidth != inWidth || newheight != inHeight ) {
+	if ( _sizeX != inWidth || _sizeY != inHeight ) {
 		int xstart, ystart;
 
-		unsigned char *newpixels = new unsigned char[newwidth * newheight * 4];
+		unsigned char *newpixels = new unsigned char[_sizeX * _sizeY * 4];
 
-		memset( newpixels, 0, newwidth * newheight * 4 );
+		memset( newpixels, 0, _sizeX * _sizeY * 4 );
 
 		xstart = 0;
 		ystart = 0;
 
 		for ( int y = 0; y < inHeight; y++ )
-			memcpy( &newpixels[( y + ystart ) *( newwidth * 4 ) + ( xstart * 4 )], &pixels[y * inWidth * 4], inWidth * 4 );
+			memcpy( &newpixels[( y + ystart ) *( _sizeX * 4 ) + ( xstart * 4 )], &pixels[y * inWidth * 4], inWidth * 4 );
 
-		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, newwidth, newheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, newpixels );
-		// glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, newwidth, newheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
-		// glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
-
-		_unitX = ( inWidth - 0.5 )  / (float)newwidth;
-		_unitY = ( inHeight - 0.5 ) / (float)newheight;
+		glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, _sizeX, _sizeY, GL_RGBA, GL_UNSIGNED_BYTE, newpixels );
 
 		delete[] newpixels;
 	} else {
-		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, inWidth, inHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
-		_unitX = 1.0;
-		_unitY = 1.0;
+		glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, inWidth, inHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
 	}
+}
+
+void slTexture2D::resize( int inWidth, int inHeight, bool inHasAlpha ) {
+	bind();
+
+	if( inWidth == _texX && inHeight == _texY ) 
+		return;
+
+	_texX = inWidth;
+	_texY = inHeight;
+
+	_sizeX = slNextPowerOfTwo( inWidth );
+	_sizeY = slNextPowerOfTwo( inHeight );
+
+	_sizeX = _sizeY = MAX( _sizeX, _sizeY );
+
+	_unitX = ( inWidth - 0.0f )  / (float)_sizeX;
+	_unitY = ( inHeight - 0.0f ) / (float)_sizeY;
+
+	GLenum format = inHasAlpha ? GL_RGBA : GL_RGB;
+
+	glTexImage2D( GL_TEXTURE_2D, 0, format, _sizeX, _sizeY, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
 }
 
 #undef MAX

@@ -106,6 +106,8 @@ slCamera::slCamera( int x, int y ) {
 
 	_fogEnd = 40;
 
+	_readbackTexture = new slTexture2D();
+
 	for ( n = 0; n < _maxBillboards; n++ ) _billboards[n] = new slBillboardEntry;
 
 	_lights[ 0 ]._type = LightInfinite;
@@ -113,6 +115,23 @@ slCamera::slCamera( int x, int y ) {
 	slVectorSet( &_lights[0]._ambient, .2, .2, .2 );
 	slVectorSet( &_lights[0]._diffuse, .6, .9, .9 );
 	slVectorSet( &_lights[0]._specular, 1, 1, 1 );
+}
+
+void slCamera::readbackToTexture() {
+	// During a live-resize drag, the texture is going to be continually resized and 
+	// will be degraded as a result.  Therefore, we'll only do the resize if we
+	// get the same size request twice in a row indicating that the redraw is 
+	// not occurring during a window resize.
+
+	if( _width != _readbackX || _height != _readbackY ) {
+		_readbackX = _width;
+		_readbackY = _height;
+		return;
+	}
+
+	_readbackTexture -> resize( _width, _height, false );
+	glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, _width, _height );
+	_readbackTexture -> unbind();
 }
 
 void slCamera::updateFrustum() {
@@ -292,9 +311,9 @@ void slCamera::update() {
 	slVectorMul( &_location, _zoom, &_location );
 }
 
-/*!
-	\brief Adds a string of text to the camera's output display.
-*/
+/**
+ * \brief Adds a string of text to the camera's output display.
+ */
 
 void slCamera::setCameraText( int n, char *string, float x, float y, slVector *v ) {
 	if (( unsigned int )n >= _text.size() || n < 0 ) {

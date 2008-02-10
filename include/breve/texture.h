@@ -46,16 +46,23 @@ class slTexture2D {
 					}
 
 		void		unbind() {
+						glBindTexture( GL_TEXTURE_2D, 0 ); 
 						glDisable( GL_TEXTURE_2D );
 					}
 
 		bool		isLoaded() { return _textureID != 0; }
 
 		void 		loadPixels( unsigned char *pixels, int width, int height, bool inRepeat = true );
+		void 		resize( int inWidth, int inHeight, bool inHasAlpha = true );
 
 		float		_unitX;
 		float		_unitY;
 
+		int		_sizeX;
+		int		_sizeY;
+
+		int		_texX;
+		int		_texY;
 	private:
 		GLuint 		_textureID;
 };
