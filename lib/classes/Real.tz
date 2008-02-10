@@ -533,8 +533,8 @@ Object : Real (aka Reals) [version 2.1] {
 
 	+ to set-lightmap-image to lightmapImage (object):
 		% Sets the object to be displayed using a "lightmap".  A 
-		% lightmap uses the texture specified and treats it like a light
-		% source.  It's hard to explain.  Give it a try for yourself.
+		% lightmap uses the texture specified for an "additive blending"	
+		% effect which yields a lighting effect.
 		% <p>
 		% set-lightmap only has an effect on sphere shapes.  Other 
 		% shapes can be textured, but only spheres can be made into 
@@ -555,7 +555,12 @@ Object : Real (aka Reals) [version 2.1] {
 
 		print "set-lightmap is deprecated: use set-lightmap-image instead".
 
-		realSetLightmap( realWorldPointer, textureNumber ).
+		if textureNumber == 2:
+			self set-lightmap-image to ( new Image load from "images/lightmap.png" ).
+
+		if textureNumber == 3:
+			self set-lightmap-image to ( new Image load from "images/dirtylightmap.png" ).
+
 
   + section "Getting the Light Exposure of this Mobile Object"
 		

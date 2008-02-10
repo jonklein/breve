@@ -17,9 +17,10 @@ docBuild/docExtract: docBuild/docExtract.c
 classes: docExtract
 	mkdir -p htmldocs/steveclasses
 	mkdir -p htmldocs/pythonclasses
+	mkdir -p htmldocs/sitehtml
 	mkdir -p htmldocs/images
 	./docExtract ../lib/classes/*.tz | ./docBuild.pl htmldocs/steveclasses
-	-( cd ..; ./bin/breve -x ./docBuild/DocBuild.py docBuild/htmldocs/pythonclasses )
+	-( cd ..; ./bin/breve -x ./docBuild/DocBuild.py docBuild/htmldocs/pythonclasses docBuild/htmldocs/sitehtml )
 	cp classImages/*.jpg htmldocs/images/
 
 pdf: pdf-clean
