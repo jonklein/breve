@@ -118,6 +118,9 @@ Abstract : Control (aka Controls) [version 2.3] {
 		self move-light to (0, 0, 0).		
 		self point-camera at (0, 0, 0) from (0, 0, 30).
 
+		self set-light-ambient-color to ( .1, .1, .1 ).
+		self set-light-diffuse-color to ( .9, .9, .9 ).
+
 		self set-background-scroll-rate x 0.001 y 0.0001.
 
 		lightMenu = (self add-menu named "Use Lighting" for-method "toggle-lighting").
