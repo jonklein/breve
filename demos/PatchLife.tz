@@ -16,7 +16,7 @@
 # 
 
 @include "Control.tz"
-@include "PatchToroid.tz"
+@include "PatchGrid.tz"
 @include "Patch.tz"
 @include "Wanderer.tz"
 
