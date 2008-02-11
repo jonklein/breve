@@ -402,12 +402,13 @@ Object : PushGP {
 				errorValue = (self compute-error for-fitness-case n with-interpreter interpreter).
 			}
 
-			if _useChallenges: {
-				errorValue *= ( 1.1 - _solutionRatesGeneration{ n } ).
-				# errorValue *= ( 1.1 - _solutionRatesTotal{ n } ).
-				# print errorValue.
+			if _useChallenges == 1: {
+				errorValue *= ( 2.0 - _solutionRatesGeneration{ n } ).
 			}
 
+			if _useChallenges == 2: {
+				errorValue *= ( 2.0 - _solutionRatesTotal{ n } ).
+			}
 
 			push errorValue onto errors.
 

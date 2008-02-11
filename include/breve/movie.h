@@ -3,7 +3,9 @@
 #include "glIncludes.h"
 #include "camera.h"
 
-#include <ffmpeg/avformat.h>
+#extern "C" {
+	#include <ffmpeg/avformat.h>
+}
 
 /*!
 	\brief A class used to export breve movie.
