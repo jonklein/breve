@@ -703,6 +703,8 @@ brXMLDOMElement *brXMLParse( char *inBuffer ) {
 	if ( !XML_Parse( parser, inBuffer, strlen( inBuffer ), 1 ) ) {
 		slMessage( DEBUG_ALL, "Error loading simulation from buffer:\n" );
 		stPrintXMLError( parser );
+		XML_ParserFree( parser );
+		return NULL;
 	}
 
 	XML_ParserFree( parser );
@@ -784,6 +786,11 @@ brInstance *brXMLDearchiveObjectFromString( brEngine *e, char *buffer ) {
 	// Parse the DOM tree
 
 	brXMLDOMElement *dom = brXMLParse( buffer );
+
+	if( !dom ) {
+		slMessage( DEBUG_ALL, "Error parsing XML string\n" );
+		return NULL;
+	}
 	
 	std::vector< brXMLDOMElement* > archive = dom->getElementsByName( "instance_archive" ); 
 	

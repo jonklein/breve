@@ -1302,8 +1302,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
 --enable-engineonly	Eliminate as many optional libraries from build as possible
 --enable-static		Link staticly for as many libraries as possible
---enable-perl			Build with support for Perl (not yet fully supported)
---enable-python		Build with support for Python
+--enable-nopython		Build without support for Python
 --enable-osxcompat104	Build on Mac OS X 10.5 to produce 10.4 compatible build
 
 Optional Packages:
@@ -1894,14 +1893,9 @@ if test "${enable_static+set}" = set; then
   enableval=$enable_static; static=yes
 fi
 
-# Check whether --enable-perl was given.
-if test "${enable_perl+set}" = set; then
-  enableval=$enable_perl; perl=yes
-fi
-
-# Check whether --enable-python was given.
-if test "${enable_python+set}" = set; then
-  enableval=$enable_python; python=yes
+# Check whether --enable-nopython was given.
+if test "${enable_nopython+set}" = set; then
+  enableval=$enable_nopython; python=no
 fi
 
 # Check whether --enable-osxcompat104 was given.
@@ -5355,7 +5349,7 @@ cat >>confdefs.h <<\_ACEOF
 #define MACOSX 1
 _ACEOF
 
-		EXTRAOPTFLAGS="-mdynamic-no-pic -falign-loops=16 -ftree-vectorize -funroll-loops"
+		EXTRAOPTFLAGS="-falign-loops=16 -ftree-vectorize -funroll-loops"
 
 		if test "x$osxcompat104"; then
 			CPPFLAGS="$CPPFLAGS -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"
@@ -5909,7 +5903,8 @@ esac
 # Python wants to be dynamically linked as well
 #
 
-if test "x$python" != "x"; then
+if test "x$python" != "xno"; then
+	echo $python
 	PYTHONINCLUDE=""
 
 	# Python can come in so many exciting flavors, with different library names!

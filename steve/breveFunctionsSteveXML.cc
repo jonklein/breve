@@ -58,7 +58,6 @@ int stCDearchiveXMLObject( brEval args[], brEval *target, brInstance *i ) {
 		slMessage( DEBUG_ALL, "Cannot locate file \"%s\" for object dearchive\n", BRSTRING( &args[0] ) );
 
 		target->set( (brInstance*)NULL );
-
 		return EC_OK;
 	}
 
@@ -68,8 +67,7 @@ int stCDearchiveXMLObject( brEval args[], brEval *target, brInstance *i ) {
 		slMessage( DEBUG_ALL, "error decoding XML message from file\n" );
 
 		target->set( (brInstance*)NULL );
-
-		return EC_ERROR;
+		return EC_OK;
 	}
 
 	target->set( instance );
@@ -90,8 +88,7 @@ int stCDearchiveXMLObjectFromString( brEval args[], brEval *target, brInstance *
 		slMessage( DEBUG_ALL, "error decoding XML message from string\n" );
 
 		target->set( (brInstance*)NULL );
-
-		return EC_ERROR;
+		return EC_OK;
 	}
 
 	target->set( instance );

@@ -72,8 +72,6 @@
 
 	CGGetDisplaysWithPoint(point, 1, &displayID, &count);
 
-	NSLog(@"display: %d, %p\n", count, displayID);
-
 	defaultsName = [NSString stringWithFormat: @"org.spiderland.%s", [self getDefaultsName]];
 
 	defaults = [ScreenSaverDefaults defaultsForModuleWithName: defaultsName];

@@ -1,4 +1,7 @@
 
+#include "config.h"
+#ifdef HAVE_LIBPYTHON
+
 #include <signal.h>
 
 #include "kernel.h"
@@ -8,3 +11,5 @@
 #define PYTHON_TYPE_SIGNATURE	0x7079746f
 
 void brPythonInit( brEngine *breveEngine );
+
+#endif

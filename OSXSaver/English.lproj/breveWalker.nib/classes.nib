@@ -1,34 +1,77 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = ScreenSaverView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
-        {
-            ACTIONS = {closeSheet = id; openBreveHomepage = id; }; 
-            CLASS = slBreveSaver; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                cloudColor = id; 
-                configWindow = id; 
-                drawClouds = id; 
-                effectsCheckbox = id; 
-                saveBest = id; 
-                skyColor = id; 
-            }; 
-            SUPERCLASS = ScreenSaverView; 
-        }, 
-        {
-            CLASS = slBreveSwarmSaver; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {flockBehaviorPopup = id; }; 
-            SUPERCLASS = slBreveSaver; 
-        }, 
-        {
-            ACTIONS = {resetEvolution = id; }; 
-            CLASS = slBreveWalkerSaver; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {kentBreed = id; moonGravity = id; }; 
-            SUPERCLASS = slBreveSaver; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>ScreenSaverView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>closeSheet</key>
+				<string>id</string>
+				<key>openBreveHomepage</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>slBreveSaver</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>cloudColor</key>
+				<string>id</string>
+				<key>configWindow</key>
+				<string>id</string>
+				<key>drawClouds</key>
+				<string>id</string>
+				<key>effectsCheckbox</key>
+				<string>id</string>
+				<key>saveBest</key>
+				<string>id</string>
+				<key>skyColor</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>ScreenSaverView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>resetEvolution</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>slBreveWalkerSaver</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>kentBreed</key>
+				<string>id</string>
+				<key>moonGravity</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>slBreveSaver</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

@@ -27,7 +27,6 @@
 		4842D90D07F9CAC200140407 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FF07F9CAC100140407 /* libsndfile.a */; };
 		4842D91007F9CAC200140407 /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FB07F9CAC100140407 /* libgsl.a */; };
 		4842D91107F9CAC200140407 /* libgslcblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FC07F9CAC100140407 /* libgslcblas.a */; };
-		4842D95C07F9CC0800140407 /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D95B07F9CC0800140407 /* JavaVM.framework */; };
 		4842D95D07F9CC0800140407 /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D95B07F9CC0800140407 /* JavaVM.framework */; };
 		4842D95E07F9CC0800140407 /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D95B07F9CC0800140407 /* JavaVM.framework */; };
 		485E9248090D1E6F0055AF56 /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8E06B5548600740D0A /* libjpeg.a */; };
@@ -187,7 +186,6 @@
 				4842D90207F9CAC100140407 /* libgsl.a in Frameworks */,
 				4842D90307F9CAC100140407 /* libgslcblas.a in Frameworks */,
 				4842D90607F9CAC200140407 /* libsndfile.a in Frameworks */,
-				4842D95C07F9CC0800140407 /* JavaVM.framework in Frameworks */,
 				48BB26B60B2285DF006FA9E9 /* libpython.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

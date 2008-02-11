@@ -13,10 +13,8 @@ AC_ARG_ENABLE([engineonly],
 		[--enable-engineonly	Eliminate as many optional libraries from build as possible], engine_only=yes)
 AC_ARG_ENABLE([static], 	
 		[--enable-static		Link staticly for as many libraries as possible], static=yes)
-AC_ARG_ENABLE([perl], 		
-		[--enable-perl			Build with support for Perl (not yet fully supported)], perl=yes)
-AC_ARG_ENABLE([python], 	
-		[--enable-python		Build with support for Python], python=yes)
+AC_ARG_ENABLE([nopython], 	
+		[--enable-nopython		Build without support for Python], python=no)
 AC_ARG_ENABLE([osxcompat104], 
 		[--enable-osxcompat104	Build on Mac OS X 10.5 to produce 10.4 compatible build], osxcompat104=yes)
 
@@ -76,7 +74,7 @@ case ${host_os} in
 		ARCHIVE_SUFFIX="tar.gz"
 		PLATFORM="macosx"
 		AC_DEFINE([MACOSX], [1], [Mac OS X])
-		EXTRAOPTFLAGS="-mdynamic-no-pic -falign-loops=16 -ftree-vectorize -funroll-loops"
+		EXTRAOPTFLAGS="-falign-loops=16 -ftree-vectorize -funroll-loops"
 
 		if test "x$osxcompat104"; then 
 			CPPFLAGS="$CPPFLAGS -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"
@@ -123,7 +121,8 @@ esac
 # Python wants to be dynamically linked as well
 #
 
-if test "x$python" != "x"; then 
+if test "x$python" != "xno"; then 
+	echo $python
 	PYTHONINCLUDE=""
 
 	# Python can come in so many exciting flavors, with different library names!
