@@ -694,7 +694,12 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 		}
 	}
 
-	function->_call( args, &resultEval, caller );
+	try {
+		function->_call( args, &resultEval, caller );
+	} catch( slException &error ) {
+		PyErr_SetString( PyExc_RuntimeError, error._message.c_str() ); 
+                return NULL;
+	}
 
 	PyObject *result = brPythonTypeFromEval( &resultEval, sPythonData._internalModule );
 
@@ -1059,6 +1064,19 @@ int brPythonCanLoad( void *inObjectData, const char *inExtension ) {
 
 int brPythonLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext ) {
 	int result = EC_OK;
+
+
+	const std::vector< std::string > &paths = brEngineGetSearchPaths( inEngine );
+
+	PyRun_SimpleString( "import breve" );
+
+	for( unsigned int n = 0; n < paths.size(); n++ ) {
+		std::string setpath = "breve.usepath( '" + paths[ n ] + "' ) ";
+		PyRun_SimpleString( setpath.c_str() );
+	}
+
+
+
 	FILE *fp = fopen( inFilename, "r" );
 
 	if( fp ) {
@@ -1227,15 +1245,12 @@ void brPythonInit( brEngine *breveEngine ) {
 	PyObject_SetAttrString( sPythonData._internalModule, "breveObjectType", ptr );
 	Py_DECREF( ptr );
 
-	std::string setpath;
-
 	const std::vector< std::string > &paths = brEngineGetSearchPaths( breveEngine );
 
 	PyRun_SimpleString( "import sys" );
 
 	for( unsigned int n = 0; n < paths.size(); n++ ) {
-		setpath = "sys.path.append( '" + paths[ n ] + "' ) ";
-
+		std::string setpath = "sys.path.append( '" + paths[ n ] + "' ) ";
 		PyRun_SimpleString( setpath.c_str() );
 	}
 

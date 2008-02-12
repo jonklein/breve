@@ -145,6 +145,10 @@ class Object( object ):
 
 		breve.breveInternalFunctionFinder.removeObserver( self, theObject, theNotification )
 
+	def iterate( self ):
+		pass
+		
+
 
 breve.Object = Object
 # Add our newly created classes to the breve namespace

@@ -130,7 +130,9 @@ class breveInternalFunctions:
 
 		raise AttributeError
 
-
+def usepath( inPath ):
+	if not inPath in sys.path:
+		sys.path.append( inPath )
 
 #
 # Utility functions for easy steve conversion
@@ -214,6 +216,22 @@ class vector( array.array ):
 			return self[ 2 ]
 
 		raise AttributeError
+
+	def __setattr__( self, symbol, value ):
+		if symbol == 'x':
+			self[ 0 ] = value
+			return
+
+		if symbol == 'y':
+			self[ 1 ] = value
+			return
+
+		if symbol == 'z':
+			self[ 2 ] = value
+			return
+
+		raise AttributeError
+
 
 	def __str__( self ):
 		return 'breve.vector( %f, %f, %f )' % ( self[ 0 ], self[ 1 ], self[ 2 ] )
