@@ -3,7 +3,7 @@
 #include "glIncludes.h"
 #include "camera.h"
 
-#extern "C" {
+extern "C" {
 	#include <ffmpeg/avformat.h>
 }
 
