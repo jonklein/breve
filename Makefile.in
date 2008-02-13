@@ -206,6 +206,7 @@ endif
 	find $(CLI_FOLDER) -name '.svn' -prune -exec rm -rf {} \;
 	rm -f breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@
 	@ARCHIVER@ breve_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@ $(CLI_FOLDER)
+	rm -rf $(CLI_FOLDER)
 
 WX_release: clean
 	$(MAKE) optimize
@@ -243,6 +244,7 @@ endif
 	find $(IDE_FOLDER) -name '.svn' -prune -exec rm -rf {} \;
 	rm -f breveIDE_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@
 	@ARCHIVER@ breveIDE_$(LPLATFORM)_@VERSION@.@ARCHIVE_SUFFIX@ $(IDE_FOLDER)
+	rm -rf $(IDE_FOLDER)
 
 install: optimize
 	mkdir -p @bindir@
