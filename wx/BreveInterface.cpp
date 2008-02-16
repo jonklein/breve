@@ -129,7 +129,7 @@ void BreveInterface::Pause( int pause ) {
 
 bool BreveInterface::Initialize() {
 
-	slInitGL( _engine->world, _engine->camera );
+	_engine -> camera -> initGL();
 
 	if ( brLoadSimulation( _engine, text, simulationfile ) != EC_OK ) {
 		reportError();

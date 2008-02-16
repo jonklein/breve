@@ -100,7 +100,7 @@ void slMakeLightTexture( GLubyte *lTexture, GLubyte *dlTexture ) {
 	}
 }
 
-void slInitGL( slWorld *w, slCamera *c ) {
+void slCamera::initGL() {
 	GLfloat specularColor[4] = { 0.9, 0.9, 0.9, 0.0 };
 	GLubyte lt[LIGHTSIZE * LIGHTSIZE * 2];
 	GLubyte glt[LIGHTSIZE * LIGHTSIZE * 2];
@@ -111,10 +111,10 @@ void slInitGL( slWorld *w, slCamera *c ) {
 
 	slMakeLightTexture( &lt[0], &glt[0] );
 
-	slUpdateTexture( c, slTextureNew( c ), gBrickImage, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA );
-	slUpdateTexture( c, slTextureNew( c ), gPlaid, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA );
-	slUpdateTexture( c, slTextureNew( c ), lt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA );
-	slUpdateTexture( c, slTextureNew( c ), glt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA );
+	slUpdateTexture( this, slTextureNew( this ), gBrickImage, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA );
+	slUpdateTexture( this, slTextureNew( this ), gPlaid, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA );
+	slUpdateTexture( this, slTextureNew( this ), lt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA );
+	slUpdateTexture( this, slTextureNew( this ), glt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA );
 
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 

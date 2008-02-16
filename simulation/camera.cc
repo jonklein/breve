@@ -73,21 +73,13 @@ slCamera::slCamera( int x, int y ) {
 	_zoom = 10;
 
 	_drawFog = false;
-
 	_drawSmooth = false;
-
 	_drawLights = false;
-
 	_drawShadow = false;
-
 	_drawShadowVolumes = false;
-
 	_drawOutline = false;
-
 	_drawReflection = false;
-
 	_drawText = true;
-
 	_drawBlur = false;
 
 	_blurFactor = 0.1;

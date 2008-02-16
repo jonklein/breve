@@ -130,7 +130,9 @@ void InitGL(HWND hWnd, HDC & hDC, HGLRC & hRC) {
 	pfd.nVersion = 1;
 	pfd.dwFlags = PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
 	pfd.iPixelType = PFD_TYPE_RGBA;
-	pfd.cColorBits = 24;
+	pfd.cColorBits = 32;
+	pfd.cDepthBits = 16;
+	pfd.cStencilBits= 2;
 	
 	hDC = GetDC( hWnd );
 	
@@ -165,14 +167,14 @@ void SetupAnimation( int inWidth, int inHeight ) {
 	brAddSearchPath( gEngine, classPath.c_str() );
 
 	std::string simpath = std::string( winDir ) + "\\breve\\Creatures.tz";
+	gEngine -> camera -> setBounds( inWidth, inHeight );
+	gEngine -> camera -> initGL();
 
 	char *simulationText = slUtilReadFile( simpath.c_str() );
 	brLoadSimulation( gEngine, simulationText, simpath.c_str() );
 
 	// Hooray!
 
-	gEngine->camera->setBounds( inWidth, inHeight );
-	slInitGL( gEngine->world, gEngine->camera );
 }
 
 void OnTimer( HDC hDC ) {

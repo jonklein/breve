@@ -177,7 +177,6 @@ int main( int argc, char **argv ) {
 	gEngine->pauseCallback			= brGLUTPause;
 	gEngine->unpauseCallback 		= brGLUTUnpause;
 
-
 	gEngine->camera->setBounds( gWidth, gHeight );
 
 	if ( !gOptionNoGraphics )
@@ -549,7 +548,7 @@ void slInitGlut( int argc, char **argv, char *title ) {
 
 	glutAttachMenu( GLUT_MIDDLE_BUTTON );
 
-	slInitGL( gEngine->world, gEngine->camera );
+	gEngine -> camera -> initGL();
 
 	glutIgnoreKeyRepeat( 1 );
 

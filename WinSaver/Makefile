@@ -5,9 +5,9 @@ WinSaver: WinSaverLibs breve.scr
 
 WinSaverLibs:
 	rm -rf WinSaver/breve
-	mkdir WinSaver/breve
-	cp -r lib WinSaver/breve
-	rm -f WinSaver/breve/lib/*.a WinSaver/breve/lib/*.lib 
+	mkdir -p WinSaver/breve/lib
+	cp -r lib/classes WinSaver/breve/lib
+	touch WinSaver/breve/lib/classes/breveCreatures.xml
 	find WinSaver/breve/lib -name '.svn*' -prune -exec rm -rf {} \;
 	cp bin/glut32.dll WinSaver
 	cp bin/python23.dll WinSaver

@@ -37,9 +37,10 @@
 }
 
 - (void)initGL {
-	if(viewEngine) slInitGL(world, camera);
+	if( camera ) 
+		camera -> initGL();
 
-	/* no padding when we get gl pixels */
+	// no padding when we get gl pixels 
 
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 }

@@ -28,7 +28,8 @@
 		
 	glInited = YES;
 
-	if( viewEngine ) slInitGL( brEngineGetWorld( viewEngine ), brEngineGetCamera( viewEngine ) );
+	if( viewEngine ) 
+		brEngineGetCamera( viewEngine ) -> initGL();
 	
 	simName = [self getSimName];
 
@@ -152,14 +153,15 @@
 		brEngineSetIOPath( viewEngine, (char*)[outputDirectory cString] );
 	}
 		
-	if([defaults boolForKey: @"initialized"] != YES) [self saveDefaults];
+	if( [defaults boolForKey: @"initialized"] != YES) 
+		[self saveDefaults];
 
 	myNib = [self getNibName];
 	if(myNib) [NSBundle loadNibNamed: myNib owner:self];
 
 	// no output.
 
-	slSetMessageCallbackFunction(NULL);
+	slSetMessageCallbackFunction( NULL );
 
 	return self;
 }

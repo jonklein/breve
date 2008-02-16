@@ -37,7 +37,5 @@ Section "" ;No components page, name is not important
   ; Put file there
   File /r breve  
   File breve.scr
-  File glut32.dll 
-  File python23.dll
-  
+  File glut32.dll  
 SectionEnd ; end the section

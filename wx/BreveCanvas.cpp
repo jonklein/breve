@@ -43,7 +43,7 @@ int canvas_attrib[] =
 };
 
 void BreveCanvas::OnIdle(wxIdleEvent&event) {
-	SimInstance * sim = parent->GetSimulation();
+	SimInstance* sim = parent->GetSimulation();
 
 	if ( !msgque.IsEmpty() ) {
 		wxString tmp;

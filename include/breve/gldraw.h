@@ -62,7 +62,6 @@ enum drawOptions {
     DO_RECOMPILE				= 0x008000
 };
 
-void slInitGL(slWorld *, slCamera *);
 unsigned int slTextureNew(slCamera *);
 void slTextureFree(slCamera *, unsigned int);
 int slUpdateTexture(slCamera *, GLuint, unsigned char *, int, int, int);

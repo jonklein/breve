@@ -537,6 +537,7 @@ int stXMLReadObjectFromFile( stInstance *i, char *filename ) {
 	char *buffer;
 	int result = 0;
 
+	slMessage( DEBUG_INFO, "reading XML object from file \"%s\"\n", filename );
 	buffer = slUtilReadFile( filename );
 
 	if ( !buffer ) {
@@ -746,6 +747,7 @@ brInstance *brXMLDearchiveObjectFromFile( brEngine *e, char *filename ) {
 	char *buffer;
 	brInstance *i;
 
+	slMessage( DEBUG_INFO, "reading XML object from file \"%s\"\n", filename );
 	buffer = slUtilReadFile( filename );
 
 	if ( !buffer ) {
