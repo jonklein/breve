@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 <!-- <xsl:import href="/usr/local/lib/docbook-xsl-1.71.1/html/chunk.xsl"/>  -->
-<xsl:import href="http://docbook.sourceforge.net/release/xsl/1.73.2/html/chunk.xsl"/>
+<xsl:import href="chunk.xsl"/>
 <xsl:include href="titlepages.xsl"/>
 
 <xsl:param name="base.dir" select="'htmldocs/'"/>
