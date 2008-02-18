@@ -884,7 +884,7 @@ int slLoadOSMesaPlugin( char *execPath ) {
 
 	activate();
 
-	slInitGL( gEngine->world, gEngine->camera );
+	gEngine -> camera -> initGL();
 
 	return 0;
 

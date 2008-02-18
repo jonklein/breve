@@ -239,7 +239,7 @@ class slWorld {
 		void 					renderCameras();
 
 		int 					startNetsimServer();
-		int 					startNetsimSlave( char* );
+		int 					startNetsimSlave( const char* );
 
 		dWorldID 				_odeWorldID;
 		dJointGroupID 				_odeCollisionGroupID;

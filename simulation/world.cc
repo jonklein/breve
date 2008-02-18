@@ -142,7 +142,7 @@ int slWorld::startNetsimServer() {
 	\brief Startup as a netsim slave.
 */
 
-int slWorld::startNetsimSlave( char *host ) {
+int slWorld::startNetsimSlave( const char *host ) {
 #if HAVE_LIBENET
 	enet_initialize();
 

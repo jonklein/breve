@@ -535,6 +535,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
 				INFOPLIST_FILE = "breveWalker-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				MACOSX_DEPLOYMENT_TARGET = 10.3;
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -570,6 +571,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
 				INFOPLIST_FILE = "breveWalker-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				MACOSX_DEPLOYMENT_TARGET = 10.3;
 				OPTIMIZATION_CFLAGS = "-O4";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -590,34 +592,6 @@
 				ZERO_LINK = NO;
 			};
 			name = Deployment;
-		};
-		489B5EFE0AB79D2500244255 /* Default */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
-				INFOPLIST_FILE = "breveWalker-Info.plist";
-				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = (
-					"-bundle",
-					"-read_only_relocs",
-					suppress,
-					"-multiply_defined",
-					suppress,
-				);
-				PRODUCT_NAME = breveCreatures;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = saver;
-			};
-			name = Default;
 		};
 		489B5F000AB79D2500244255 /* Development */ = {
 			isa = XCBuildConfiguration;
@@ -677,30 +651,6 @@
 				ZERO_LINK = NO;
 			};
 			name = Deployment;
-		};
-		489B5F020AB79D2500244255 /* Default */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
-				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
-				GCC_WARN_UNKNOWN_PRAGMAS = NO;
-				INFOPLIST_FILE = "breveResearcher-Info.plist";
-				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Screen Savers";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = (
-					"-bundle",
-					"-read_only_relocs",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = breveResearcher;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost";
-				WRAPPER_EXTENSION = saver;
-			};
-			name = Default;
 		};
 		489B5F040AB79D2500244255 /* Development */ = {
 			isa = XCBuildConfiguration;
@@ -763,31 +713,6 @@
 			};
 			name = Deployment;
 		};
-		489B5F060AB79D2500244255 /* Default */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
-				GCC_WARN_UNKNOWN_PRAGMAS = NO;
-				INFOPLIST_FILE = "brevePainter-Info.plist";
-				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
-				MACOSX_DEPLOYMENT_TARGET = 10.1;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = (
-					"-bundle",
-					"-read_only_relocs",
-					suppress,
-					/usr/local/lib/libdl.a,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = brevePainter;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost";
-				WRAPPER_EXTENSION = saver;
-			};
-			name = Default;
-		};
 		489B5F080AB79D2500244255 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -814,19 +739,6 @@
 			};
 			name = Deployment;
 		};
-		489B5F0A0AB79D2500244255 /* Default */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
-				INFOPLIST_PREPROCESS = YES;
-				LIBRARY_SEARCH_PATHS = ../lib;
-				USER_HEADER_SEARCH_PATHS = ../include/breve;
-			};
-			name = Default;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -835,40 +747,36 @@
 			buildConfigurations = (
 				489B5EFC0AB79D2500244255 /* Development */,
 				489B5EFD0AB79D2500244255 /* Deployment */,
-				489B5EFE0AB79D2500244255 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Default;
+			defaultConfigurationName = Development;
 		};
 		489B5EFF0AB79D2500244255 /* Build configuration list for PBXNativeTarget "breveResearcher" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				489B5F000AB79D2500244255 /* Development */,
 				489B5F010AB79D2500244255 /* Deployment */,
-				489B5F020AB79D2500244255 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Default;
+			defaultConfigurationName = Development;
 		};
 		489B5F030AB79D2500244255 /* Build configuration list for PBXNativeTarget "brevePainter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				489B5F040AB79D2500244255 /* Development */,
 				489B5F050AB79D2500244255 /* Deployment */,
-				489B5F060AB79D2500244255 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Default;
+			defaultConfigurationName = Development;
 		};
 		489B5F070AB79D2500244255 /* Build configuration list for PBXProject "breveSaver" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				489B5F080AB79D2500244255 /* Development */,
 				489B5F090AB79D2500244255 /* Deployment */,
-				489B5F0A0AB79D2500244255 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Default;
+			defaultConfigurationName = Development;
 		};
 /* End XCConfigurationList section */
 	};

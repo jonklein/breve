@@ -1118,9 +1118,6 @@ void slShape::bounds( const slPosition *position, slVector *min, slVector *max )
 		if ( loc.z < _min.z ) _min.z = loc.z;
 	}
 
-	// slVectorMul( &_max, 1.1, &_max );
-	// slVectorMul( &_min, 1.1, &_min );
-
 	slVectorAdd( &_min, &position->location, min );
 	slVectorAdd( &_max, &position->location, max );
 }
