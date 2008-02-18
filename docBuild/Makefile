@@ -1,6 +1,6 @@
 .PHONY: classes docbook documentation source spell tidy
 
-DOCBOOK=http://docbook.sourceforge.net/release/xsl/current
+DOCBOOK=http://docbook.sourceforge.net/release/xsl/1.73.2
 
 all: html pdf
 
