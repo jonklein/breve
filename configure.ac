@@ -1,6 +1,6 @@
 lC_PREREQ(2.57)
 
-AC_INIT([the breve simulation environment], [2.7.1], [jk@spiderland.org])
+AC_INIT([the breve simulation environment], [2.7.2], [jk@spiderland.org])
 AC_CONFIG_HEADER([include/breve/config.h])
 
 VERSION=$PACKAGE_VERSION
@@ -301,6 +301,7 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([enet], [enet_initialize])
 	AC_CHECK_LIB([jpeg], [jpeg_read_header])
 	AC_CHECK_LIB([tiff], [TIFFOpen])
+	AC_CHECK_LIB([OSMesa], [OSMesaCreateContext])
 
 	AC_CHECK_LIB([FLAC], [FLAC__seekable_stream_encoder_init])
 	AC_CHECK_LIB([sndfile], [sf_open])

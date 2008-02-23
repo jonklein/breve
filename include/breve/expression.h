@@ -825,9 +825,9 @@ class stKeyword {
 		std::string			toPython( stPyConversionData *inData );
 		std::string			toPerl( stPerlConversionData *inData );
 
-		std::string word;
-		stExp *value;
-		int position;
+		std::string 			word;
+		stExp* 				value;
+		int 				position;
 };
 
 char *dequote(char *c);

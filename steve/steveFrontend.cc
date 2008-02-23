@@ -134,6 +134,11 @@ void stInstanceFreeCallback( void *i ) {
 	stInstanceFree( (stInstance*)i );
 }
 
+void stMethodFreeCallback( void *inMethod ) {
+	stFoundMethod *m = (stFoundMethod*)inMethod;
+	delete m;
+}
+
 /**
  * The canLoad callback for the steve language frontend.
  */
@@ -252,6 +257,7 @@ stSteveData *stSteveInit( brEngine *engine ) {
 	breveSteveType->isSubclass 			= stSubclassCallback;
 	breveSteveType->instantiate 		= stInstanceNewCallback;
 	breveSteveType->destroyInstance 	= stInstanceFreeCallback;
+	breveSteveType->destroyMethod		= stMethodFreeCallback;
 	breveSteveType->destroyObjectType	= stSteveCleanup;
 	breveSteveType->canLoad				= stCallbackCanLoad;
 	breveSteveType->load				= stCallbackLoad;

@@ -78,11 +78,11 @@
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
-/* Define to 1 if you have the `ncurses' library (-lncurses). */
-#undef HAVE_LIBNCURSES
-
 /* Define to 1 if you have the `ode' library (-lode). */
 #undef HAVE_LIBODE
+
+/* Define to 1 if you have the `OSMesa' library (-lOSMesa). */
+#undef HAVE_LIBOSMESA
 
 /* Define to 1 if you have the `perl' library (-lperl). */
 #undef HAVE_LIBPERL
@@ -101,24 +101,6 @@
 
 /* Have the required Python libraries */
 #undef HAVE_LIBPYTHON
-
-/* Define to 1 if you have the `python23' library (-lpython23). */
-#undef HAVE_LIBPYTHON23
-
-/* Define to 1 if you have the `python24' library (-lpython24). */
-#undef HAVE_LIBPYTHON24
-
-/* Define to 1 if you have the `python25' library (-lpython25). */
-#undef HAVE_LIBPYTHON25
-
-/* Define to 1 if you have the `python2.3' library (-lpython2.3). */
-#undef HAVE_LIBPYTHON2_3
-
-/* Define to 1 if you have the `python2.4' library (-lpython2.4). */
-#undef HAVE_LIBPYTHON2_4
-
-/* Define to 1 if you have the `python2.5' library (-lpython2.5). */
-#undef HAVE_LIBPYTHON2_5
 
 /* Define to 1 if you have the `qgame++' library (-lqgame++). */
 #undef HAVE_LIBQGAME__

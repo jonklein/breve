@@ -154,6 +154,8 @@ class stVar {
  */
 
 struct stKeywordEntry {
+	~stKeywordEntry();
+
 	std::string keyword;
 	stVar *var;
 	stKeyword *defaultKey;
@@ -181,8 +183,6 @@ void stInstanceFreeNoInstanceLists(stInstance *i);
 void stInstanceFreeInternals(stInstance *i);
 
 void stFreeStVar(stVar *v);
-
-void stFreeKeywordEntry(stKeywordEntry *e);
 
 stVar *stInstanceNewVar(stVar *var, stObject *object);
 

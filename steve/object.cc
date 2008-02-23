@@ -417,40 +417,19 @@ stVar *stFindLocal( const char *name, stMethod *m ) {
 */
 
 stKeywordEntry *stNewKeywordEntry( char *keyword, stVar *v, brEval *defValue ) {
-	stKeywordEntry *e;
-	brEval *copy;
+	if ( !v || !keyword ) 
+		return NULL;
 
-	e = new stKeywordEntry;
-
-	if ( !e || !v || !keyword ) return NULL;
-
+	stKeywordEntry *e = new stKeywordEntry;
 
 	e->keyword = keyword;
-
 	e->var = v;
-
 	e->defaultKey = NULL;
 
-	if ( defValue ) {
-		copy = new brEval;
-		brEvalCopy( defValue, copy );
-
-		e->defaultKey = new stKeyword( keyword, new stEvalExp( copy, NULL, 0 ) );
-	}
+	if ( defValue )
+		e->defaultKey = new stKeyword( keyword, new stEvalExp( defValue, NULL, 0 ) );
 
 	return e;
-}
-
-/*!
-	\brief Frees a stKeywordEntry.
-*/
-
-void stFreeKeywordEntry( stKeywordEntry *k ) {
-	delete k->var;
-
-	if ( k->defaultKey ) delete k->defaultKey;
-
-	delete k;
 }
 
 /*!
@@ -505,9 +484,17 @@ stMethod::~stMethod() {
 
 	for ( n = 0;n < code.size();n++ ) delete code[n];
 
-	for ( n = 0;n < keywords.size();n++ ) stFreeKeywordEntry( keywords[n] );
+	for ( n = 0;n < keywords.size();n++ ) 
+		delete keywords[ n ];
 
 	for ( vi = variables.begin(); vi != variables.end(); vi++ ) delete *vi;
+}
+
+stKeywordEntry::~stKeywordEntry() {
+	delete var;
+
+	if ( defaultKey ) 
+		delete defaultKey;
 }
 
 /*!

@@ -62,6 +62,7 @@ int stCDearchiveXMLObject( brEval args[], brEval *target, brInstance *i ) {
 	}
 
 	instance = brXMLDearchiveObjectFromFile( i->engine, filename );
+	slFree( filename );
 
 	if ( !instance ) {
 		slMessage( DEBUG_ALL, "error decoding XML message from file\n" );
@@ -71,8 +72,6 @@ int stCDearchiveXMLObject( brEval args[], brEval *target, brInstance *i ) {
 	}
 
 	target->set( instance );
-
-	slFree( filename );
 
 	return EC_OK;
 }

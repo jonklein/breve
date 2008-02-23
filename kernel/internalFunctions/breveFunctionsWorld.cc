@@ -418,8 +418,10 @@ int brISetSkyboxImages( brEval args[], brEval *target, brInstance *i ) {
 
 		char *image = brFindFile( i -> engine, BRSTRING( e ), NULL );
 
-		if( image )
+		if( image ) {
 			i -> engine -> world -> _skybox.loadImage( image, n );
+			slFree( image );
+		}
 	}
 
 	return EC_OK;

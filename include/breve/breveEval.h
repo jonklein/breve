@@ -122,7 +122,7 @@ class DLLEXPORT brEval {
 		inline void set( const long i )      { collect(); _values.intValue = i;                   _type = AT_INT; _needsCollect = false;      }
 		inline void set( const slVector &v ) { collect(); slVectorCopy(&v, &_values.vectorValue); _type = AT_VECTOR; _needsCollect = false;   }
 		inline void set( const slMatrix &m ) { collect(); slMatrixCopy(m, _values.matrixValue);   _type = AT_MATRIX; _needsCollect = false;   }
-		inline void set( const char *s )     { collect(); _values.stringValue = slStrdup( s );      _type = AT_STRING; _needsCollect = false; }
+		inline void set( const char *s )     { collect(); _values.stringValue = slStrdup( s );      _type = AT_STRING; _needsCollect = true; }
 		inline void set( const std::string &s )     { collect(); _values.stringValue = slStrdup( s.c_str() );      _type = AT_STRING; _needsCollect = true; }
 		inline void set( void *p )           { collect(); _values.pointerValue = p;               _type = AT_POINTER;  retain(); }
 		inline void set( brEvalHash *h )     { collect(); _values.hashValue = h;                  _type = AT_HASH;     retain(); }
