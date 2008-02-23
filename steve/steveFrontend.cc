@@ -364,53 +364,12 @@ int stLoadSavedSimulation( stSteveData *sdata, brEngine *engine, const char *cod
 }
 
 /**
-	\brief Parses a single steve file.
-
-	Given a filename, this function loads and parses the file.  Used by
-	stParseBuffer, not typically called manually.
-*/
-
-int stParseFile( stSteveData *sdata, brEngine *engine, const char *filename ) {
-
-	struct stat fs;
-	char *path = NULL;
-	int result;
-
-	char *fileString;
-
-	// try to open the file in the current directory.
-
-	path = brFindFile( engine, filename, &fs );
-
-	if ( !path ) {
-		slMessage( DEBUG_ALL, "could not locate file %s\n", filename );
-		return EC_ERROR;
-	}
-
-	fileString = slUtilReadFile( path );
-
-	if ( !fileString ) {
-		slMessage( DEBUG_ALL, "error reading file %s\n", path );
-		return EC_ERROR;
-	}
-
-	result = stParseBuffer( sdata, engine, fileString, filename );
-
-	slFree( fileString );
-	slFree( path );
-
-	return result;
-}
-
-/**
-	\brief Parses the text of a steve file.
-
-	stParseBuffer will first pick out included files and recursively parse
-	them.  the engine keeps track of what files it's seen, however, so there
-	should be no real danger of including the same file twice.
-
-	Typically called by stParseFile, which reads in the file first.
-*/
+ * \brief Parses the text of a steve file.
+ * 
+ *  stParseBuffer will first pick out included files and recursively parse
+ * them.  the engine keeps track of what files it's seen, however, so there
+ * should be no real danger of including the same file twice.
+ */
 
 int stParseBuffer( stSteveData *s, brEngine *engine, const char *buffer, const char *filename ) {
 	const char *thisFile;
@@ -481,11 +440,12 @@ int stPreprocess( stSteveData *s, brEngine *engine, const char *srcFile, const c
 	int oldLineno = lineno;
 	std::string current = srcFile;
 
-	/* i don't wanna comment this */
+	// i don't wanna comment this 
 
-	if ( !line ) return -1;
+	if ( !line ) 
+		return -1;
 
-	/* damn this is ugly */
+	// damn this is ugly 
 
 	do {
 		while ( *line == '\n' ) {
@@ -575,8 +535,8 @@ int stPreprocess( stSteveData *s, brEngine *engine, const char *srcFile, const c
 }
 
 /**
-	\brief Makes a version requirement.
-*/
+ * \brief Makes a version requirement.
+ */
 
 stVersionRequirement *stMakeVersionRequirement( float version, int operation ) {
 	stVersionRequirement *b;
@@ -631,10 +591,10 @@ int stCheckVersionRequirement( float version, stVersionRequirement *r ) {
 }
 
 /**
-	\brief Reports on current usage of all steve objects.
-
-	Requires any stObject.
-*/
+ * \brief Reports on current usage of all steve objects.
+ *
+ * Requires any stObject.
+ */
 
 void stObjectAllocationReport( stObject *o ) {
 	std::vector< stObject* >::iterator oi;

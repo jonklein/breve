@@ -80,14 +80,15 @@ brEngine *brEngineNew( void ) {
 
 	char wd[MAXPATHLEN];
 
-#if MINGW
-	pthread_win32_process_attach_np();
-#endif
-
 #if WINDOWS
+	pthread_win32_process_attach_np();
 	WSADATA wsaData;
 	WSAStartup( 0x0101, &wsaData );
 #endif
+
+	// wxWindows change change the locale -- I'm not cool with that
+
+	setlocale( LC_ALL, "C" );
 
 	e = new brEngine;
 

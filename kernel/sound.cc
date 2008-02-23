@@ -30,7 +30,12 @@
 brSoundMixer::brSoundMixer() {
 	int error;
 
-	Pa_Initialize();
+	error = Pa_Initialize();
+
+	if ( error ) {
+		slMessage( DEBUG_ALL, "warning: could not initialize sound stream, audio will not be enabled (%s)\n", Pa_GetErrorText( error ) );
+		return;
+	}
 
 	_streamShouldEnd = false;
 	_stream = NULL;
@@ -38,7 +43,7 @@ brSoundMixer::brSoundMixer() {
 	error = Pa_OpenDefaultStream( &_stream, 0, 2, paFloat32, MIXER_SAMPLE_RATE, 256, 0, brPASoundCallback, this );
 
 	if ( error )
-		slMessage( DEBUG_ALL, "warning: could not new open sound stream -- audio will not be enabled (%d)\n", error );
+		slMessage( DEBUG_ALL, "warning: could not new open sound stream, audio will not be enabled (%s)\n", Pa_GetErrorText( error ) );
 }
 
 brSoundMixer::~brSoundMixer() {
