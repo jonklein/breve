@@ -66,20 +66,16 @@ PhysicalControl : VirtualCreatures {
 		floor set-texture-image to ( new Image load from "images/ground.png" ).
 		floor set-color to ( .8, .8, .8 ).
 
-		self set-skybox-images to { 
-			"images/MountainBoxFront.png", "images/MountainBoxBack.png", 
-			"images/MountainBoxLeft.png", "images/MountainBoxRight.png", 
-			"images/MountainBoxTop.png", "images/MountainBoxBottom.png" }.
-
 		self enable-fast-physics.
 		self set-fast-physics-iterations to 20.
 		self enable-shadow-volumes.
 
 		parser = new MorphologyParser.
 
-		ga = (controller dearchive-xml file "breveCreatures27.xml").	
+		ga = (controller dearchive-xml file "breveCreatures271.xml").	
 
 		if !ga: {
+			print "Making new GA".
 			ga = new SimsGA.
 
 			ga set-fitness-test-duration to 30.
@@ -189,13 +185,6 @@ PhysicalControl : VirtualCreatures {
 }
 
 GeneticAlgorithm : SimsGA {
-	+ variables:
-		url (object).
-
-	+ to init:
-		url = new URL.
-		self add-dependency on url.
-
 	+ to start-fitness-test of o (object):
 		newOffset (vector).
 
@@ -206,15 +195,12 @@ GeneticAlgorithm : SimsGA {
 
 		controller setup-test with o.
 
-	+ to end-generation number n (int):
-		print ( url put put-data ( ( self get-best-individual ) archive-as-xml-string ) to "http://www.deskworld.org/original/dw-critter-upload.php" ).
-
 	+ to end-fitness-test of o (object):
 		o set-fitness to (controller get-current-critter-fitness).
 		if isnan((o get-fitness)): o set-fitness to 0.
 		print "fitness of $o: ", (o get-fitness).
 
-		self archive-as-xml file "breveCreatures27.xml".
+		self archive-as-xml file "breveCreatures271.xml".
 }
 
 GeneticAlgorithmIndividual : SimsGAIndividual {

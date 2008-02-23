@@ -173,7 +173,7 @@ Object : PushGP {
 		tournamentSize = 7.
 		generationLimit = 300.
 
-		_useChallenges = 0.
+		_useChallenges = 1.
 
 		interpreter = new PushInterpreter.
 
@@ -417,7 +417,7 @@ Object : PushGP {
 				return _abortFitnessValue.
 			}
 
-			if errors{ | errors | - 1 } == 0.0: {
+			if errorValue == 0.0: {
 				_solutionCountsGeneration{ n } += 1.0.
 				_solutionCountsTotal{ n }      += 1.0.
 			}

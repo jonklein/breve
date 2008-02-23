@@ -1,6 +1,8 @@
 .PHONY: classes docbook documentation source spell tidy
 
 # DOCBOOK=http://docbook.sourceforge.net/release/xsl/1.73.2
+# DOCBOOK=/usr/share/xml/docbook/stylesheet/nwalsh
+# DOCBOOK=/usr/local/lib/docbook-xsl-1.73.2
 DOCBOOK=/usr/local/lib/docbook-xsl-1.71.1
 
 all: html pdf
