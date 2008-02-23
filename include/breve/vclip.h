@@ -159,6 +159,8 @@ class slCollisionCandidate {
 		slCollisionCandidate() { 
 			_shape1 = NULL; 
 			_shape2 = NULL; 
+			_position1 = NULL; 
+			_position2 = NULL; 
 		};
 
 		slCollisionCandidate(slVclipData *vc, int o1, int o2) {
@@ -169,12 +171,20 @@ class slCollisionCandidate {
 			w1 = vc->world->_objects[ _x ];
 			w2 = vc->world->_objects[ _y ];
 
-			_position1 = &w1->getPosition();	
-			_position2 = &w2->getPosition();	
+			if( w1 ) {
+				_position1 = &w1->getPosition();	
+				_shape1 = w1 -> getShape();
+			} else {
+				_position1 = NULL;
+				_shape1 = NULL;
+			}
 
-			if( w1 && w2 ) {
-				_shape1 = w1->getShape();
-				_shape2 = w2->getShape();
+			if( w2 ) {
+				_position2 = &w2->getPosition();	
+				_shape2 = w2 -> getShape();
+			} else {
+				_position2 = NULL;
+				_shape2 = NULL;
 			}
 		}
 

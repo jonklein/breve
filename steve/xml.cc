@@ -1177,7 +1177,7 @@ int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceE
 		return EC_ERROR;
 	}
 
-	int isXml = atoi( data[ 0 ] -> getAttr( "xml" ) -> c_str() );
+	// int isXml = atoi( data[ 0 ] -> getAttr( "xml" ) -> c_str() );
 
 	if( data.size() == 0 ) {
 		// Legacy support for 2.5 archived steve archives

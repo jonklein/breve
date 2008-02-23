@@ -2817,8 +2817,6 @@ RTC_INLINE int stEvalBinaryDoubleExp( char op, brEval *l, brEval *r, brEval *t, 
 }
 
 RTC_INLINE int stEvalBinaryIntExp( char op, brEval *l, brEval *r, brEval *t, stRunInstance *i ) {
-	int c;
-
 	switch ( op ) {
 
 		case BT_ADD:

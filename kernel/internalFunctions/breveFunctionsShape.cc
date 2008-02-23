@@ -67,7 +67,7 @@ int brIAddShapeFace( brEval args[], brEval *target, brInstance *i ) {
 }
 
 int brIFinishShape( brEval args[], brEval *target, brInstance *i ) {
-	slMeshShape *s = BRSHAPEPOINTER( &args[0] );
+	slMeshShape *s = (slMeshShape*)BRSHAPEPOINTER( &args[0] );
 	double density = BRDOUBLE( &args[1] );
 
 	s -> finishShape( density );
