@@ -64,7 +64,7 @@ BEGIN_EVENT_TABLE( BreveRender, wxFrame )
 	EVT_IDLE(BreveRender::OnIdle)
 	EVT_MENU( BREVE_WINDOWMENU_LOG, BreveRender::OnMenuLogWindow )
 	EVT_MENU( BREVE_WINDOWMENU_INSPECTOR, BreveRender::OnMenuInspector )
-	EVT_MENU( BREVE_BREVEMENU_FULLSCREEN, BreveRender::OnFullScreen )
+	EVT_MENU( BREVE_WINDOWMENU_FULLSCREEN, BreveRender::OnFullScreen )
 	EVT_MENU( BREVE_FULLSPEED, BreveRender::OnMenuSpeed )
 	EVT_MENU( BREVE_MEDIUMSPEED, BreveRender::OnMenuSpeed )
 	EVT_MENU( BREVE_SLOWSPEED, BreveRender::OnMenuSpeed )
@@ -263,6 +263,7 @@ void BreveRender::CreateControls()
 	
 		windowmenu->Append(BREVE_WINDOWMENU_LOG, "Log Window");
 		windowmenu->Append(BREVE_WINDOWMENU_INSPECTOR, "Object Inspector");
+		windowmenu->Append(BREVE_WINDOWMENU_FULLSCREEN, "Fullscreen");
 	
 		wxMenu * demomenu = new wxMenu;
 	
@@ -344,15 +345,10 @@ void BreveRender::CreateControls()
 			}
 		}
 	
-		wxMenu * brevemenu = new wxMenu;
-	
-		brevemenu->Append(BREVE_BREVEMENU_FULLSCREEN, "Fullscreen");
-	
 		defsimmenu = new wxMenu;
 	
 		menubar->Append(filemenu, "&File");
 		menubar->Append(windowmenu, "&Window");
-		menubar->Append(brevemenu, "&breve");
 		menubar->Append(demomenu, "&Demos");
 
 		wxMenu * simspeed = new wxMenu;

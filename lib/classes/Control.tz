@@ -123,6 +123,9 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		self set-background-scroll-rate x 0.001 y 0.0001.
 
+		(self add-menu named "End Simulation" for-method "end-simulation").
+
+		self add-menu-separator.
 		lightMenu = (self add-menu named "Use Lighting" for-method "toggle-lighting").
 		drawMenu = (self add-menu named "Use Smooth Shading" for-method "toggle-smooth").
 		shadowMenu = (self add-menu named "Draw Shadows" for-method "toggle-shadows").

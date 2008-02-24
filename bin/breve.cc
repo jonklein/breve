@@ -366,24 +366,29 @@ void brClick( int n ) {
 
 	gSelected = brClickCallback( gEngine, n );
 
-	glutSetMenu( contextMenu );
-
-	total = glutGet( GLUT_MENU_NUM_ITEMS );
-
-	for ( m = 0; m < total; ++m )
-		glutRemoveMenuItem( 1 );
-
 	if ( gSelected ) {
+		glutSetMenu( contextMenu );
+
+		total = glutGet( GLUT_MENU_NUM_ITEMS );
+
+		for ( m = 0; m < total; ++m )
+			glutRemoveMenuItem( 1 );
+
 		brMenuEntry *menu;
 
 		for ( m = 0; m < gSelected->_menus.size(); ++m ) {
 			menu = gSelected->_menus[ m ];
 			glutAddMenuEntry( menu->title, m );
 		}
-	} else
+				
+	} else {
 		glutSetMenu( mainMenu );
+	}
 
 	glutAttachMenu( GLUT_RIGHT_BUTTON );
+
+	glutSetMenu( mainMenu );
+	glutAttachMenu( GLUT_MIDDLE_BUTTON );
 }
 
 int brParseArgs( int argc, char **argv ) {
@@ -520,16 +525,16 @@ void brPrintUsage( const char *name ) {
 }
 
 void slInitGlut( int argc, char **argv, char *title ) {
-
-	glutInitWindowSize( gWidth, gHeight );
 	glutInit( &argc, argv );
 
+	glutInitWindowSize( gWidth, gHeight );
 	glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE );
 
 	if ( gXpos || gYpos ) 
 		glutInitWindowPosition( gXpos, gYpos );
 
-	glutCreateWindow( title );
+	int w = glutCreateWindow( title );
+	glutSetWindow( w );
 	glutMouseFunc( slDemoMouse );
 	glutMotionFunc( slDemoMotion );
 	glutPassiveMotionFunc( slDemoPassiveMotion );
@@ -542,11 +547,13 @@ void slInitGlut( int argc, char **argv, char *title ) {
 
 	mainMenu = glutCreateMenu( brMainMenu );
 
-	glutAttachMenu( GLUT_RIGHT_BUTTON );
+	glutSetMenu( mainMenu );
+	// glutAttachMenu( GLUT_RIGHT_BUTTON );
 
 	contextMenu = glutCreateMenu( brContextMenu );
 
-	glutAttachMenu( GLUT_MIDDLE_BUTTON );
+	glutSetMenu( contextMenu );
+	// glutAttachMenu( GLUT_MIDDLE_BUTTON );
 
 	gEngine -> camera -> initGL();
 
@@ -554,7 +561,8 @@ void slInitGlut( int argc, char **argv, char *title ) {
 
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-	if ( !gPaused ) glutIdleFunc( brGlutLoop );
+	if ( !gPaused ) 
+		glutIdleFunc( brGlutLoop );
 }
 
 void slDemoReshape( int x, int y ) {
