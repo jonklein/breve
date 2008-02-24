@@ -309,36 +309,22 @@ void BreveRender::CreateControls()
 						bool cont;
 						int reserved = 0;
 		
-						wxMenu * submenu = NULL;
+						wxMenu * submenu = new wxMenu;
+						reserved = count++;
 		
-						cont = lscan.GetFirst(&subfilename, "*.tz", wxDIR_FILES);
+						cont = lscan.GetFirst(&subfilename, "", wxDIR_FILES);
 		
 						while (cont) {
-							if (submenu == NULL) {
-								submenu = new wxMenu;
-								reserved = count++;
+							wxFileName f = wxFileName( subfilename );
+
+							if( f.GetExt().Cmp( "py" ) || f.GetExt().Cmp( "tz" ) ) {
+								submenu->Append(BREVE_DEMOMENU + count++, subfilename);
+								cont = lscan.GetNext(&subfilename);
 							}
-			
-							submenu->Append(BREVE_DEMOMENU + count++, subfilename);
-							cont = lscan.GetNext(&subfilename);
 						}
-	
-						/*
-						cont = lscan.GetFirst(&subfilename, "*.py", wxDIR_FILES);
-	
-						while (cont) {
-							if (submenu == NULL) {
-								submenu = new wxMenu;
-								reserved = count++;
-							}
 		
-							submenu->Append(BREVE_DEMOMENU + count++, subfilename);
-						}
-						*/
-		
-					if (submenu)
 						demomenu->Append(BREVE_DEMOMENU + reserved, filename, submenu);
-				}
+					}
 	
 				cont = scan.GetNext(&filename);
 				}

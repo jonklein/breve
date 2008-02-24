@@ -11,7 +11,7 @@ WinSaverLibs:
 	find WinSaver/breve/lib -name '.svn*' -prune -exec rm -rf {} \;
 	cp bin/glut32.dll WinSaver
 	cp bin/python23.dll WinSaver
-	cp WinSaver/Creatures.tz WinSaver/breve
+	cp demos/Physics-Examples/Creatures.tz WinSaver/breve
 
 WinSaver/WinSaverResource.o: WinSaver/WinSaverResource.rc
 	i686-pc-mingw32-windres -o WinSaver/WinSaverResource.o WinSaver/WinSaverResource.rc
