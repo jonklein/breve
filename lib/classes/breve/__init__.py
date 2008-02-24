@@ -102,9 +102,27 @@ def deleteInstances( inInstances ):
 	else:
 		deleteInstance( inInstances )
 
+def traceDelete( inInstance, inCls = None ):
+	# The breve "delete" method is special in that it is automatically
+	# traced back to the parent classes, even without a "super delete"
+
+	if inCls == None:
+		inCls = inInstance.__class__
+
+	# Only do a delete for the class itself, don't let it be passed to the 
+	# superclass, because we'll trace-back manually to the superclass.
+
+	if "delete" in inCls.__dict__:
+		inCls.delete( inInstance )
+
+	for i in inCls.__bases__:
+		traceDelete( inInstance, i )
+
 def deleteInstance( inInstance ):
 	if inInstance and inInstance.breveInstance != None:
 		inInstance.destroy()
+		traceDelete( inInstance )
+
 		breveInternal.removeInstance( breveInternal.breveEngine, inInstance )
 		all = allInstances( inInstance.__class__.__name__ )
 		if inInstance in all:
