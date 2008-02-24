@@ -516,8 +516,7 @@ void BreveRender::KillSimulation(int num)
 	}
 }
 
-void BreveRender::ResetSim( int sim )
-{
+void BreveRender::ResetSim( int sim ) {
 	SimInstance * s = NULL;
 
 	if (sim != -2)
@@ -532,19 +531,7 @@ void BreveRender::ResetSim( int sim )
 			cursim = -1;
 	}
 
-	if (cursim == -1) {
-		menubar->Append(defsimmenu, "Simulation");
-	} else {
-		int w, h;
-
-		menubar->Append(s->GetInterface()->GetMenu(), "Simulation");
-
-		canvas->GetClientSize(&w, &h);
-
-		s->GetInterface()->SetX(w);
-		s->GetInterface()->SetY(h);
-		s->GetInterface()->ResizeView(w, h);
-	}
+	menubar->Append(defsimmenu, "Simulation");
 
 	simselect->SetSelection(cursim);
 
@@ -554,21 +541,15 @@ void BreveRender::ResetSim( int sim )
 	canvas->ResetSelection();
 }
 
-void BreveRender::SetMenu(int mode)
-{
-	SimInstance * s = NULL;
-
+void BreveRender::SetMenu( int mode ) {
 	menubar->Remove( menubar->FindMenu( "Simulation" ) );
 
-	s = GetSimulation();
+	SimInstance *s = GetSimulation();
 
-	if (s == NULL)
-	mode = 0;
-
-	if (mode == 0)
-	menubar->Append(defsimmenu, "Simulation");
+	if ( !s || mode == 0 )
+		menubar->Append(defsimmenu, "Simulation");
 	else
-	menubar->Append(s->GetInterface()->GetMenu(), "Simulation");
+		menubar->Append(s->GetInterface()->GetMenu(), "Simulation");
 }
 
 void BreveRender::NewSimulation()
@@ -943,25 +924,31 @@ void BreveRender::OnSimSelect(wxCommandEvent& event)
 	}
 }
 
-void BreveRender::OnRenderRunClick( wxCommandEvent& event )
-{
-	SimInstance * sim;
+void BreveRender::OnRenderRunClick( wxCommandEvent& event ) {
+	SimInstance *sim = GetSimulation();
 
-	sim = GetSimulation();
-
-	if (sim == NULL) return;
+	if ( sim == NULL ) return;
 
 	if( !sim->GetInterface()->Initialized() ) {
 		sim->UpdateSimCode();
-		if( !sim->GetInterface()->Initialize() ) return;
+
+		if( !sim->GetInterface()->Initialize() ) 
+			return;
+
+		int w, h;
+
+		SetMenu( 1 );
+
+		canvas->GetClientSize(&w, &h);
+		sim->GetInterface()->ResizeView(w, h);
 	}
 
 	sim->GetInterface()->Pause(3);
 
 	if (sim->GetInterface()->Paused())
-		runbutton->SetBitmapLabel(playbitmap);
+		runbutton->SetBitmapLabel( playbitmap );
 	else
-		runbutton->SetBitmapLabel(pausebitmap);
+		runbutton->SetBitmapLabel( pausebitmap );
 
 	runbutton->Refresh(TRUE, NULL);
 }

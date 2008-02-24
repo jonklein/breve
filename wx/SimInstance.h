@@ -133,15 +133,12 @@ class SimInstance
 	//    const char * name, stInstance * instance, stRunInstance * ri, brEval * eval);
 	    
 	void SetSelected(brInstance * selected, int type = 0);
-	void tempfunc(VarData *, int level);
 
-	wxMutex * GetMutex()
-	{
+	wxMutex * GetMutex() {
 	    return &mutex;
 	}
 
-	SimInstance * GetNext()
-	{
+	SimInstance * GetNext() {
 	    return next;
 	}
 
@@ -152,7 +149,7 @@ class SimInstance
 
 	BreveInterface * GetInterface()
 	{
-	    if (!binterface->IsValid())
+	    if ( !binterface->IsValid() )
 		RegenSim();
 
 	    return binterface;

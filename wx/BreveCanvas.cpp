@@ -108,14 +108,10 @@ void BreveCanvas::OnIdle(wxIdleEvent&event) {
 			glViewport( 0, 0, sim->GetInterface()->GetX(), sim->GetInterface()->GetY() );
 			glClearColor( 0, 0, 0, 1.0 );
 			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); 
-			Refresh( false );
-
-			return;
+		} else {
+			event.RequestMore( TRUE );
+			sim->GetInterface()->Iterate();
 		}
-
-		event.RequestMore(TRUE);
-
-		sim->GetInterface()->Iterate();
 
 		sim->GetMutex()->Unlock();
 
@@ -124,7 +120,8 @@ void BreveCanvas::OnIdle(wxIdleEvent&event) {
 		mLocked = false;
 	} else if( sim != NULL ) {
 		// Try to update the log even for paused simulations
-		sim->GetInterface()->UpdateLog();
+		//
+		sim -> GetInterface() -> UpdateLog();
 	} else {
 		SetCurrent();
 
@@ -164,22 +161,16 @@ BreveCanvas::BreveCanvas(BreveRender*parent)
 	mLocked = false;
 
 	SetSizeHints(400, 300);
-//	SetMinSize(size);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-BreveCanvas::~BreveCanvas()
-{
+BreveCanvas::~BreveCanvas() {
 	delete rightmenu;
 }
 
-void BreveCanvas::Render()
-{
-	static int i = 0;
-	static int init = 0;
-
-	wxPaintDC dc(this);
+void BreveCanvas::Render() {
+	wxPaintDC dc( this );
 	
 #ifndef __WXMOTIF__  
 	if (!GetContext()) return;
@@ -189,36 +180,28 @@ void BreveCanvas::Render()
 
 	SimInstance * sim = parent->GetSimulation();
 
-	if (sim != NULL && sim->GetInterface()->Initialized())
-	{
-	sim->GetMutex()->Lock();
+	if (sim != NULL && sim->GetInterface()->Initialized()) {
+		sim->GetMutex()->Lock();
+		sim->GetInterface()->Render();
+		sim->GetMutex()->Unlock();
 
-	sim->GetInterface()->Render();
-
-	sim->GetMutex()->Unlock();
-
-	glFlush();
-	SwapBuffers();
-	}
-	else
-	{
-	dc.SetBackground(*wxBLACK_BRUSH);
-	dc.Clear();
+		glFlush();
+		SwapBuffers();
+	} else {
+		dc.SetBackground(*wxBLACK_BRUSH);
+		dc.Clear();
 	}
 }
 
-void BreveCanvas::OnPaint( wxPaintEvent& WXUNUSED(event) )
-{
+void BreveCanvas::OnPaint( wxPaintEvent& WXUNUSED(event) ) {
 	Render();
 }
 
-void BreveCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
-{
+void BreveCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event)) {
   // Do nothing, to avoid flashing.
 }
 
-void BreveCanvas::OnSize(wxSizeEvent& event)
-{   
+void BreveCanvas::OnSize(wxSizeEvent& event) {   
 	int w, h;
 
 	wxGLCanvas::OnSize(event);
@@ -236,13 +219,10 @@ void BreveCanvas::OnSize(wxSizeEvent& event)
 
 	SetCurrent();
 
-	glViewport(0, 0, (GLint) w, (GLint) h);
+	glViewport( 0, 0, (GLint) w, (GLint) h );
 
-	if (sim != NULL) {
-		sim->GetInterface()->SetX(w);
-		sim->GetInterface()->SetY(h);
+	if ( sim != NULL )
 		sim->GetInterface()->ResizeView(w,h);
-	}
 
 	Refresh(false);
 }
@@ -302,10 +282,6 @@ void BreveCanvas::OnMouseRDown(wxMouseEvent &event)
 		//	rightmenu->Check(10100 + i, TRUE);
 		}
 	}
-
-	//brClickAtLocation(
-	//	gBreverender->GetSimulation()->GetInterface()->GetEngine(),
-	//	x, y);
 
 	gBreverender->GetSimulation()->GetInterface()->menuCallback(
 		gBreverender->GetSimulation()->GetInterface()->GetEngine()->controller);
@@ -397,10 +373,6 @@ void BreveCanvas::OnMouseUp(wxMouseEvent &event)
 		}
 	}
 
-	//brClickAtLocation(
-	//	gBreverender->GetSimulation()->GetInterface()->GetEngine(),
-	//	x, y);
-
 	gBreverender->GetSimulation()->GetInterface()->menuCallback(
 		gBreverender->GetSimulation()->GetInterface()->GetEngine()->controller);
 
@@ -421,6 +393,9 @@ void BreveCanvas::OnMouseMotion(wxMouseEvent &event)
 	wasdrag = 1;
 
 	engine = gBreverender->GetSimulation()->GetInterface()->GetEngine();
+
+	if( !engine )
+		return;
 
 	gBreverender->GetSimulation()->GetMutex()->Lock();
 

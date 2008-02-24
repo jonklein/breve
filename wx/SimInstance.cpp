@@ -118,36 +118,10 @@ void SimInstance::SetSelected(brInstance*i, int type)
 	ri.type = instance->type;
 
 	iroot = ProcessObject(instance, instance->type, &ri, &eval);
-
-	//if (iroot != NULL)
-	//    tempfunc(iroot, 0);
     }
 
     if (gBreverender->GetInspector() != NULL)
 	gBreverender->GetInspector()->SetRoot(iroot, type);
-}
-
-void SimInstance::tempfunc(VarData * d, int level)
-{
-    if (level > 10)
-	return;
-
-    for (; d != NULL; d = d->GetNext())
-    {
-	if (!d->IsSuper())
-	{
-	    printf("%*c%-10s - %s\n\r", level * 2, ' ', d->GetName().c_str(), d->String().c_str());
-
-	    if (d->IsExpandable())
-		tempfunc(ExpandChild(d, d->GetName().c_str()), level + 1);
-	}
-	else
-	{
-	    printf("%*c%-10s - %s\n\r", level * 2, ' ', "super", d->GetName().c_str());
-
-	    tempfunc(ExpandChild(d, ""), level + 1);
-	}
-    }
 }
 
 wxString VarData::String()

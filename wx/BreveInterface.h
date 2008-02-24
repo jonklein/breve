@@ -35,59 +35,40 @@ class BreveInterface
 	void menuCallback( brInstance *i );
 	void messageCallback( const char *text );
 
-	bool Paused()
-	{
+	bool Paused() {
 	    return paused;
 	}
 
-	bool Initialized()
-	{
-	    return initialized;
+	bool Initialized() {
+	    return _engine != NULL;
 	}
 
-	int GetX()
-	{
+	int GetX() {
 	    return x;
 	}
 
-	int GetY()
-	{
+	int GetY() {
 	    return y;
 	}
 
-	void SetX(int x)
-	{
-	    this->x = x;
-	}
-	void SetY(int y)
-	{
-	    this->y = y;
-	}
-
-	BreveInterface * GetNext()
-	{
+	BreveInterface *GetNext() {
 	    return next;
 	}
 
-	BreveInterface * Rechain(BreveInterface * n)
-	{
+	BreveInterface * Rechain(BreveInterface * n) {
 	    next = n;
 	}
 
-	wxMenu * GetMenu()
-	{
-	    return simmenu;
+	wxMenu * GetMenu() {
+	    return _simmenu;
 	}
 
-	bool IsValid()
-	{
+	bool IsValid() {
 	    return valid;
 	}
 
-	void UpdateCode(char * c)
-	{
-	    if (initialized)
-	    {
+	void UpdateCode( char * c ) {
+	    if ( Initialized() ) {
 		free(c);
 		return;
 	    }
@@ -101,23 +82,23 @@ class BreveInterface
 	}
 
     private:
+	void			GenerateEngine();
+
 	int 			x, y;
 	int 			valid;
 	int 			paused;
-
-	bool 			initialized;
 
 	char 			*text;
 	char 			*simulationfile;
 
 	BreveInterface 		*next;
-	brEngine 		*_engine;
-	stSteveData 		*_steveData;
-	wxMenu 			*simmenu;
+	brEngine*		_engine;
+	stSteveData*		_steveData;
+	wxMenu*			_simmenu;
 
-	std::string mQueuedMessage;
+	wxString		_simdir;
 
-	long mSleepMS;
+	std::string 		mQueuedMessage;
 };
 
 char * getLoadname();
