@@ -252,7 +252,7 @@ int slCamera::polygonInFrustum( slVector *test, int n ) {
 slCamera::~slCamera() {
 	delete _readbackTexture;
 
-	for ( int n = 0; n < _maxBillboards; n++ ) 
+	for ( unsigned int n = 0; n < _maxBillboards; n++ ) 
 		delete _billboards[ n ];
 
 	slFree( _billboards );

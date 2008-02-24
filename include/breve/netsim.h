@@ -46,7 +46,7 @@ class slNetsimServer {
 								slNetsimServer( slWorld *inWorld );
 								
 		slNetsimClient*					openConnection( ENetAddress *inAddress );
-		slNetsimClient*					openConnection( char *inHost, int inPort );
+		slNetsimClient*					openConnection( const char *inHost, int inPort );
 
 		void						start();
 

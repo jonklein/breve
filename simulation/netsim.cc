@@ -134,7 +134,7 @@ slNetsimClient *slNetsimServer::openConnection( ENetAddress *address ) {
  * \brief Initiate a connection to another breve host.
  */
 
-slNetsimClient *slNetsimServer::openConnection( char *host, int port ) {
+slNetsimClient *slNetsimServer::openConnection( const char *host, int port ) {
 	ENetAddress address;
 
 	enet_address_set_host( &address, host );
