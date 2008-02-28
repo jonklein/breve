@@ -247,7 +247,7 @@ Object : MorphologyParser {
 		rootNode = (self create-node from root with-level 1).
 
 		(self parse from root with-level 1 with-link rootNode).
-		# (self parse from root with-level 1 with-link rootNode flip 1).
+		(self parse from root with-level 1 with-link rootNode flip 1).
 
 		return rootNode.
 
@@ -261,7 +261,7 @@ Object : MorphologyParser {
 
 		nodeParams = (root get-parameters).
 		
-		size = 4 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|).
+		size = 4 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .5, .5, .5 ).
 
 		# Don't recurse more than 3 levels deep, and don't recurse if the node-parameter doesn't tell us to.
 
@@ -318,7 +318,7 @@ Object : MorphologyParser {
 				joint set-strength-limit to 4000.
 
 				self parse from (child get-target) with-level n + 1 with-link childNode.
-				# self parse from (child get-target) with-level n + 1 with-link childNode flip 1.
+				self parse from (child get-target) with-level n + 1 with-link childNode flip 1.
 			}
 		}
 
@@ -338,7 +338,7 @@ Object : MorphologyParser {
 
 		nodeParams = (root get-parameters).
 		
-		size = 6 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|).
+		size = 6 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .3, .3, .3 ).
 
 		rootNode set-color to (|nodeParams{3}|, |nodeParams{4}|, |nodeParams{5}|).
 

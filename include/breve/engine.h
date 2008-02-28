@@ -143,92 +143,91 @@ typedef struct brObjectType brObjectType;
 
 class brEngine {
 	public:
-													brEngine() {};
-													brEngine( int inArgc, const char **inArgv ) { 
-														_argc = inArgc; 
-														_argv = inArgv; 
-													}
+		brEngine() {};
+
+		brEngine( int inArgc, char **inArgv ) { 
+				_argc = inArgc; 
+				_argv = inArgv; 
+			}
 
 		~brEngine();
 
-		std::vector< brObjectType* > 				_objectTypes;
-		std::vector< brInstance* > 					_freedInstances;
+		std::vector< brObjectType* > 		_objectTypes;
+		std::vector< brInstance* > 		_freedInstances;
 
 #ifdef HAVE_LIBCURL
-		brURLFetcher								_url;
+		brURLFetcher				_url;
 #endif
 
 #if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
-		brSoundMixer								_soundMixer;
+		brSoundMixer				_soundMixer;
 #endif
 
-		slWorld* 									world;
-		slCamera*									camera;
+		slWorld* 				world;
+		slCamera*				camera;
 
-		gsl_rng*									RNG;
+		gsl_rng*				RNG;
 
-		bool 										_simulationWillStop;
+		bool 					_simulationWillStop;
 
-		int 										_useMouse;
-		int 										_mouseX;
-		int 										_mouseY;
+		int 					_useMouse;
+		int 					_mouseX;
+		int 					_mouseY;
 
-		double 										_iterationStepSize;
+		double 					_iterationStepSize;
 
-		FILE*										_logFile;
+		FILE*					_logFile;
 
-		brInstance*									controller;
+		brInstance*				controller;
 
-		std::map< std::string, brObject* > 			objectAliases;
-		std::map< std::string, brObject* > 			objects;
-		brNamespace*								internalMethods;
+		std::map< std::string, brObject* > 	objectAliases;
+		std::map< std::string, brObject* > 	objects;
+		brNamespace*				internalMethods;
 
-		std::vector< brInstance* > 					postIterationInstances;
-		std::vector< brInstance* > 					iterationInstances;
-		std::vector< brInstance* > 					instances;
+		std::vector< brInstance* > 		postIterationInstances;
+		std::vector< brInstance* > 		iterationInstances;
+		std::vector< brInstance* > 		instances;
 	
-		std::vector< brInstance* > 					instancesToAdd;
-		std::vector< brInstance* > 					instancesToRemove;
+		std::vector< brInstance* > 		instancesToAdd;
+		std::vector< brInstance* > 		instancesToRemove;
 
-		std::vector< brEvent* > 					events;
+		std::vector< brEvent* > 		events;
 
 		// runtime error info 
 
-		brErrorInfo 								error;
+		brErrorInfo 				error;
 
-		std::string 								_outputPath;
-		std::string 								_launchDirectory;
+		std::string 				_outputPath;
+		std::string 				_launchDirectory;
 
-		// plugin, plugins, plugins!
-
-		std::vector<brDlPlugin*> dlPlugins;
+		std::vector<brDlPlugin*> 		dlPlugins;
 
 		// the drawEveryFrame flag is a hint to the display engine
 		// if set, the application attempts to draw a frame with every
 		// iteration of the breve engine. 
 
-		unsigned char drawEveryFrame;
+		unsigned char 				drawEveryFrame;
 
-		struct timeval startTime;
-		struct timeval realTime;
+		struct timeval 				startTime;
+		struct timeval 				realTime;
 
-		int 										_argc;
-		const char**								_argv;
+		int 					_argc;
+		char**					_argv;
 
-		int nThreads;
-		pthread_mutex_t lock;
-		pthread_mutex_t scheduleLock;
-		pthread_mutex_t conditionLock;
-		pthread_cond_t condition;
+		int 					nThreads;
+		pthread_mutex_t 			lock;
+		pthread_mutex_t 			scheduleLock;
+		pthread_mutex_t 			conditionLock;
+		pthread_cond_t 				condition;
 
-		int lastScheduled;
+		int 					lastScheduled;
 
-		std::vector<void*> windows;
-		std::vector< std::string > _searchPaths;
+		std::vector<void*> 			windows;
+		std::vector< std::string > 		_searchPaths;
 
 		// which keys are pressed?
 
-		unsigned char 								keys[ 256 ];
+		unsigned char 				keys[ 256 ];
 
 		//
 		// Callback functions to be set by the application frontend
@@ -314,7 +313,7 @@ const std::vector< std::string > &brEngineGetSearchPaths( brEngine * );
 std::vector< std::string > brEngineGetAllObjectNames( brEngine *e );
 
 brEngine *brEngineNew();
-brEngine *brEngineNewWithArguments( int inArgc, const char **inArgv );
+brEngine *brEngineNewWithArguments( int inArgc, char **inArgv );
 
 void brEngineFree(brEngine *);
 

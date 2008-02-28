@@ -58,7 +58,7 @@ brEvent::~brEvent() {
  * Creates and initializes the bloated brEngine structure.  This is the first step in starting a breve simulation.
  */
 
-brEngine *brEngineNewWithArguments( int inArgc, const char **inArgv ) {
+brEngine *brEngineNewWithArguments( int inArgc, char **inArgv ) {
 	brEngine *e = brEngineNew();
 
 	e->_argc = inArgc;
