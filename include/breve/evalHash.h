@@ -49,5 +49,5 @@ void stRetainEvalHash(brEvalHash *);
 unsigned int brEvalHashFunction(void *, unsigned int);
 unsigned int brEvalHashCompareFunction(void *, void *);
 
-int brEvalHashLookup(brEvalHash *, brEval *, brEval *);
+int brEvalHashLookup(brEvalHash *, brEval *, brEval *, bool inRemove = false );
 void brEvalHashStore(brEvalHash *, brEval *, brEval *);

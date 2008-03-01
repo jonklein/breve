@@ -39,13 +39,13 @@ struct slHashEntry {
     void *key;
 };
 
-#define slDehashData(h, k) slDehashDataAndKey((h), (k), NULL)
+#define slDehashData(h, k) slDehashDataAndKey( (h), (k), NULL, 0 )
 
 slHash *slNewHash(unsigned int, unsigned int (*)(void *, unsigned int), unsigned int (*)(void *, void *));
 void slFreeHash(slHash *);
 
 void *slHashData(slHash *, void *, void *);
-void *slDehashDataAndKey(slHash *, void *, void **);
+void *slDehashDataAndKey(slHash *, void *, void **, int inRemove );
 
 slList *slHashKeys(slHash *);
 slList *slHashValues(slHash *);

@@ -1539,8 +1539,10 @@ RTC_INLINE int stEvalListRemove( stListRemoveExp *l, stRunInstance *i, brEval *r
 	if ( resultCode != EC_OK )
 		return resultCode;
 
-	if ( listEval.type() != AT_LIST ) {
-		stEvalError( i->instance, EE_TYPE, "expected type \"list\" during list remove evaluation" );
+	int type = listEval.type();
+
+	if ( type != AT_LIST && type != AT_HASH ) {
+		stEvalError( i->instance, EE_TYPE, "expected type \"list\" or \"hash\" during list remove evaluation" );
 		return EC_ERROR;
 	}
 
@@ -1555,7 +1557,10 @@ RTC_INLINE int stEvalListRemove( stListRemoveExp *l, stRunInstance *i, brEval *r
 		index.set(( int )BRLIST( &listEval )->_vector.size() - 1 );
 	}
 
-	brEvalListRemove( BRLIST( &listEval ), BRINT( &index ), result );
+	if( type == AT_LIST ) 
+		brEvalListRemove( BRLIST( &listEval ), BRINT( &index ), result );
+	else if( type == AT_HASH )
+		brEvalHashLookup( BRHASH( &listEval ), &index, result, true );
 
 	return EC_OK;
 }

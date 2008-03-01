@@ -137,14 +137,14 @@ void *slHashData( slHash *h, void *key, void *data ) {
 	return data;
 }
 
-/*!
-	\brief Looks up an element in a hash table.
+/**
+ * \brief Looks up an element in a hash table.
+ *
+ *   Takes a hash and a key, and returns the data associated with the key.
+ * If the data cannot be found, NULL is returned.
+ */
 
-    Takes a hash and a key, and returns the data associated with the key.
-	If the data cannot be found, NULL is returned.
-*/
-
-void *slDehashDataAndKey( slHash *h, void *key, void **outkey ) {
+void *slDehashDataAndKey( slHash *h, void *key, void **outkey, int inRemove ) {
 	slList *activeList;
 	int number;
 
@@ -152,13 +152,20 @@ void *slDehashDataAndKey( slHash *h, void *key, void **outkey ) {
 
 	number = h->hashFunc( key, h->size );
 
-	activeList = h->buckets[number];
+	activeList = h -> buckets[ number ];
 
 	while ( activeList ) {
 		if ( !h->compFunc( key, (( slHashEntry* )activeList->data )->key ) ) {
-			if ( outkey ) *outkey = (( slHashEntry* )activeList->data )->key;
+			slHashEntry *entry = (( slHashEntry* )activeList->data );
+			void *result = entry -> data;
 
-			return (( slHashEntry* )activeList->data )->data;
+			if ( outkey ) 
+				*outkey = entry->key;
+
+			if( inRemove ) 
+				h -> buckets[ number ] = slListRemoveData( h -> buckets[ number ], entry );
+
+			return result;
 		}
 
 		activeList = activeList->next;
@@ -168,6 +175,7 @@ void *slDehashDataAndKey( slHash *h, void *key, void **outkey ) {
 
 	return NULL;
 }
+
 
 /*!
 	\brief Returns a list of pointers to all the values in a hash-table.

@@ -38,7 +38,7 @@ brEvalHash::~brEvalHash() {
 	start = all = slHashValues( table );
 
 	while ( all ) {
-		delete( brEval* )all->data;
+		delete ( brEval* )all->data;
 		all = all->next;
 	}
 
@@ -47,7 +47,7 @@ brEvalHash::~brEvalHash() {
 	start = all = slHashKeys( table );
 
 	while ( all ) {
-		delete( brEval* )all->data;
+		delete ( brEval* )all->data;
 		all = all->next;
 	}
 
@@ -63,7 +63,7 @@ brEvalHash::~brEvalHash() {
 void brEvalHashStore( brEvalHash *h, brEval *key, brEval *value ) {
 	brEval *v, *k;
 
-	v = ( brEval* )slDehashDataAndKey( h->table, key, ( void** ) & k );
+	v = ( brEval* )slDehashDataAndKey( h->table, key, ( void** ) &k, 0 );
 
 	if ( !v ) {
 		v = new brEval;
@@ -118,14 +118,20 @@ brEvalListHead *brEvalHashValues( brEvalHash *h ) {
  * Returns a brEvalList of all of the values in the hash table.
  */
 
-int brEvalHashLookup( brEvalHash *h, brEval *key, brEval *value ) {
-	brEval *v;
+int brEvalHashLookup( brEvalHash *h, brEval *key, brEval *value, bool inRemove ) {
+	brEval *v, *k;
 
-	v = ( brEval* )slDehashData( h->table, key );
+	v = ( brEval* )slDehashDataAndKey( h->table, key, &k, inRemove );
 
-	if ( !v ) return -1;
+	if ( !v ) 
+		return -1;
 
 	brEvalCopy( v, value );
+
+	if( inRemove ) {
+		delete (brEval*)v;
+		delete (brEval*)k;
+	}
 
 	return 0;
 }

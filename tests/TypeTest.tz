@@ -19,7 +19,17 @@ Control : myController {
 	+ to init:
 		lis (list).
 		mat (matrix).
+		has (hash).
 		vec (vector).
+
+		has{ 1 } = "xx".
+		has{ "fork" } = "spoon".
+
+		print has.
+		print keys( has ).
+		remove has{ 1 }.
+		print has{ "fork" }.
+		print keys( has ).
 
 		# print 0 / 0.
 		print 6.02e23.
