@@ -90,8 +90,6 @@ slCamera::slCamera( int x, int y ) {
 
 	_billboards = ( slBillboardEntry** )slMalloc( sizeof( slBillboardEntry* ) * _maxBillboards );
 
-	_billboardDrawList = 0;
-
 	_fogIntensity = .1;
 
 	_fogStart = 10;
@@ -384,7 +382,6 @@ void slCamera::addBillboard( slWorldObject *object, float size, float z ) {
 	}
 
 	_billboards[ _billboardCount ]->z = z;
-
 	_billboards[ _billboardCount ]->size = size;
 	_billboards[ _billboardCount ]->object = object;
 

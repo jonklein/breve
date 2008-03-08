@@ -116,20 +116,17 @@ void slCamera::initGL() {
 	slUpdateTexture( this, slTextureNew( this ), lt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA );
 	slUpdateTexture( this, slTextureNew( this ), glt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA );
 
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-	glEnable( GL_DEPTH_TEST );
-
 	glLineWidth( 2 );
 
 	glPolygonOffset( -4.0f, -1.0f );
 
 	glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
-	glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST );
-	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
+	glHint( GL_POLYGON_SMOOTH_HINT, GL_FASTEST );
+	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST );
+	glHint( GL_FOG_HINT, GL_NICEST );
+
 	glEnable( GL_COLOR_MATERIAL );
 	glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE );
-	glEnable( GL_NORMALIZE );
 
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
@@ -137,7 +134,7 @@ void slCamera::initGL() {
 	slClearGLErrors( "init" );
 
 	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, specularColor );
-	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 90 );
+	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 30 );
 }
 
 /**
@@ -368,7 +365,7 @@ int slCamera::vectorForDrag( slWorld *w, slVector *dragVertex, int x, int y, slV
 	// use gluUnProject to get the point in object space where we are clicking
 	// (and at the far reach of our zClip variable).
 
-	( void )gluUnProject( wx, wy, 1.0, model, proj, view, &oxf, &oyf, &ozf );
+	gluUnProject( wx, wy, 1.0, model, proj, view, &oxf, &oyf, &ozf );
 
 	end.x = oxf;
 	end.y = oyf;
@@ -425,7 +422,8 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 	slVector cam;
 	int flags = 0;
 
-	if ( !w ) return;
+	if ( !w ) 
+		return;
 
 	glViewport( _originx, _originy, _width, _height );
 
@@ -612,7 +610,7 @@ void slCamera::clear( slWorld *w ) {
 	else
 		glClearColor( w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 1.0 );
 
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 	if( _drawBlur ) { 
 		glEnable( GL_BLEND );
@@ -668,7 +666,6 @@ void slCamera::drawFog() {
 
 		glEnable( GL_FOG );
 		glFogf( GL_FOG_DENSITY, _fogIntensity );
-		glHint( GL_FOG_HINT, GL_NICEST );
 		glFogi( GL_FOG_MODE, GL_LINEAR );
 		glFogf( GL_FOG_START, _fogStart ) ;
 		glFogf( GL_FOG_END, _fogEnd );
@@ -926,6 +923,9 @@ void slCamera::renderBillboards( int flags ) {
 	unsigned int n;
 	int lastTexture = -1;
 
+	if( _billboardCount == 0 )
+		return;
+
 	slVectorCopy( &_location, &normal );
 	slVectorNormalize( &normal );
 
@@ -948,6 +948,14 @@ void slCamera::renderBillboards( int flags ) {
 	// writing so that no new info goes there.
 
 	glDepthMask( GL_FALSE );
+
+	glVertexPointer( 3, GL_FLOAT, 0, _billboardVertices );
+	glTexCoordPointer( 2, GL_FLOAT, 0, _billboardTexCoords );
+
+	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+	glEnableClientState( GL_VERTEX_ARRAY );
+
+	glNormal3f( _billboardZ.x, _billboardZ.y, _billboardZ.z );
 
 	for ( n = 0; n < _billboardCount; n++ ) {
 		slWorldObject *object;
@@ -980,7 +988,7 @@ void slCamera::renderBillboards( int flags ) {
 		glRotatef( object->_billboardRotation, normal.x, normal.y, normal.z );
 		glScalef( b->size, b->size, b->size );
 
-		glCallList( _billboardDrawList );
+		glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 
 		if ( bound && !( flags & DO_NO_BOUND ) ) {
 			if ( !( flags & DO_NO_TEXTURE ) ) 
@@ -1010,6 +1018,9 @@ void slCamera::renderBillboards( int flags ) {
 	glDepthMask( GL_TRUE );
 
 	if ( !( flags & DO_NO_TEXTURE ) ) glPopAttrib();
+
+	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	glDisableClientState( GL_VERTEX_ARRAY );
 }
 
 void slStrokeText( double x, double y, const char *string, double scale, void *font ) {
@@ -1174,6 +1185,9 @@ void slCamera::processBillboards( slWorld *w ) {
 		}
 	}
 
+	if( _billboardCount == 0 ) 
+		return;
+
 	sortBillboards();
 
 	_billboardX.x = matrix[0];
@@ -1188,25 +1202,28 @@ void slCamera::processBillboards( slWorld *w ) {
 	_billboardZ.y = matrix[6];
 	_billboardZ.z = matrix[10];
 
-	if ( _billboardDrawList == 0 ) 
-		_billboardDrawList = glGenLists( 1 );
+	_billboardTexCoords[ 0 ] = 1.0;
+	_billboardTexCoords[ 1 ] = 1.0;
+	_billboardTexCoords[ 2 ] = 0.0;
+	_billboardTexCoords[ 3 ] = 1.0;
+	_billboardTexCoords[ 4 ] = 1.0;
+	_billboardTexCoords[ 5 ] = 0.0;
+	_billboardTexCoords[ 6 ] = 0.0;
+	_billboardTexCoords[ 7 ] = 0.0;
 
-	glNewList( _billboardDrawList, GL_COMPILE );
+	_billboardVertices[ 0 ] =  _billboardX.x + _billboardY.x;  
+	_billboardVertices[ 1 ] =  _billboardX.y + _billboardY.y;
+	_billboardVertices[ 2 ] =  _billboardX.z + _billboardY.z;
+	_billboardVertices[ 3 ] = -_billboardX.x + _billboardY.x;
+	_billboardVertices[ 4 ] = -_billboardX.y + _billboardY.y;
+	_billboardVertices[ 5 ] = -_billboardX.z + _billboardY.z;
+	_billboardVertices[ 6 ] =  _billboardX.x - _billboardY.x;
+	_billboardVertices[ 7 ] =  _billboardX.y - _billboardY.y;
+	_billboardVertices[ 8 ] =  _billboardX.z - _billboardY.z;
+	_billboardVertices[ 9 ] = -_billboardX.x - _billboardY.x;
+	_billboardVertices[ 10 ] = -_billboardX.y - _billboardY.y;
+	_billboardVertices[ 11 ] = -_billboardX.z - _billboardY.z;
 
-	glBegin( GL_TRIANGLE_STRIP );
-		glTexCoord2f( 1.0, 1.0 );
-		glVertex3f( _billboardX.x + _billboardY.x,  _billboardX.y + _billboardY.y,  _billboardX.z + _billboardY.z );
-		glTexCoord2f( 0.0, 1.0 );
-		glVertex3f( -_billboardX.x + _billboardY.x, -_billboardX.y + _billboardY.y, -_billboardX.z + _billboardY.z );
-		glTexCoord2f( 1.0, 0.0 );
-		glVertex3f( _billboardX.x - _billboardY.x,  _billboardX.y - _billboardY.y,  _billboardX.z - _billboardY.z );
-		glTexCoord2f( 0.0, 0.0 );
-		glVertex3f( -_billboardX.x - _billboardY.x, -_billboardX.y - _billboardY.y, -_billboardX.z - _billboardY.z );
-	glEnd();
-
-	glNormal3f( _billboardZ.x, _billboardZ.y, _billboardZ.z );
-
-	glEndList();
 }
 
 /**
@@ -1260,7 +1277,7 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags, float inAlphaScale
 				if ( color )
 					glColor4f( wo->_color.x, wo->_color.y, wo->_color.z, wo->_alpha * inAlphaScale );
 
-				if ( !doNoTexture && wo->_texture > 0 ) {
+				if ( !doNoTexture && wo->_texture ) {
 
 					if ( wo->_textureMode == BBT_LIGHTMAP )
 						glBlendFunc( GL_SRC_ALPHA, GL_ONE );
@@ -1274,7 +1291,7 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags, float inAlphaScale
 
 				wo->draw( this );
 
-				if ( !doNoTexture && wo->_texture > 0 ) {
+				if ( !doNoTexture && wo->_texture ) {
 					glBindTexture( GL_TEXTURE_2D, 0 );
 					glDisable( GL_TEXTURE_2D );
 				}
@@ -1307,7 +1324,6 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags, float inAlphaScale
 
 	if ( loadNames )
 		glLoadName( w->_objects.size() + 1 );
-
 
 	// Restore the default blend func
 
@@ -1403,11 +1419,10 @@ void slDrawAxis( double x, double y ) {
 	glDisable( GL_LINE_SMOOTH );
 }
 
-/*!
-	\brief Compiles a shape into a draw list.
-
-	The draw list is generated or updated as needed.
-*/
+/**
+ * \brief Compiles a shape into a draw list.
+ * The draw list is generated or updated as needed.
+ */
 
 int slCompileShape( slShape *s, int drawMode, int flags ) {
 	if ( !s->_drawList ) 
@@ -1424,12 +1439,12 @@ int slCompileShape( slShape *s, int drawMode, int flags ) {
 	return s->_drawList;
 }
 
-/*!
-	\brief Render a shape.
-
-	Typically only called when compiling a drawlist for a shape, this does
-	the actual rendering.
-*/
+/**
+ * \brief Render a shape.
+ * 
+ * Typically only called when compiling a drawlist for a shape, this does
+ * the actual rendering.
+ */
 
 void slRenderShape( slShape *s, int drawMode, int flags ) {
 	GLUquadricObj *quad;
@@ -1487,9 +1502,9 @@ void slPerpendicularVectors( slVector *v, slVector *p1, slVector *p2 ) {
 	slVectorNormalize( p2 );
 }
 
-/*!
-	\brief Draws a face, breaking it down into smaller triangles if necessary.
-*/
+/**
+ * \brief Draws a face, breaking it down into smaller triangles if necessary.
+ */
 
 void slDrawFace( slFace *f, int drawMode, int flags ) {
 	slVector xaxis, yaxis;
@@ -1625,7 +1640,7 @@ void slBreakdownTriangle( slVector *v, int level, slVector *xaxis, slVector *yax
 		slVectorAdd( &v[n], &diff, &mids[n] );
 	}
 
-	if ( length < 80.0f || level > 5 ) {
+	if ( length < 120.0f || level > 4 ) {
 		for ( n = 0; n < 3; ++n ) {
 			glTexCoord2f( slVectorDot( &v[n], xaxis ), slVectorDot( &v[n], yaxis ) );
 			glVertex3f( v[n].x, v[n].y, v[n].z );

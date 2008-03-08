@@ -169,7 +169,6 @@ class slCamera {
 		slBillboardEntry **_billboards;
 		unsigned int _billboardCount;
 		unsigned int _maxBillboards;
-		GLuint _billboardDrawList;
 	
 		slVector _billboardX;
 		slVector _billboardY;
@@ -268,7 +267,9 @@ class slCamera {
 		void 						drawBackground( slWorld *w );
 		void 						drawFog();
 
-
+		// 4 vertices of 3 floats, 2 tex coords
+		float						_billboardVertices[ 12 ];
+		float						_billboardTexCoords[ 8 ];
 };
 
 int slBillboardSortFunc(const void *, const void *);

@@ -23,7 +23,6 @@
 @use Stationary.
 @use MultiBody.
 @use GeneticAlgorithm.
-@use URL.
 
 Controller VirtualCreatures.
 
@@ -48,15 +47,14 @@ PhysicalControl : VirtualCreatures {
 	+ to init:
 		startTexture = (new Image load from "images/star.png").
 
+		self set-iteration-step to 0.08.
+
 		flag = new Mobile.
 		flag disable-physics.
 		flag set-bitmap-image to startTexture.
 		flag set-color to (1, 1, 0).
 		flag set-label to "Start".
 		flag disable-shadows.
-
-		self enable-blur.
-		self set-blur-factor to 1.0.
 
 		self set-mountain-skybox.
 
@@ -67,12 +65,12 @@ PhysicalControl : VirtualCreatures {
 		floor set-color to ( .8, .8, .8 ).
 
 		self enable-fast-physics.
-		self set-fast-physics-iterations to 20.
+		self set-fast-physics-iterations to 30.
 		self enable-shadow-volumes.
 
 		parser = new MorphologyParser.
 
-		ga = (controller dearchive-xml file "breveCreatures271.xml").	
+		ga = (controller dearchive-xml file "breveCreatures273.xml").	
 
 		if !ga: {
 			print "Making new GA".
@@ -200,7 +198,7 @@ GeneticAlgorithm : SimsGA {
 		if isnan((o get-fitness)): o set-fitness to 0.
 		print "fitness of $o: ", (o get-fitness).
 
-		self archive-as-xml file "breveCreatures271.xml".
+		self archive-as-xml file "breveCreatures273.xml".
 }
 
 GeneticAlgorithmIndividual : SimsGAIndividual {
@@ -261,7 +259,7 @@ Object : MorphologyParser {
 
 		nodeParams = (root get-parameters).
 		
-		size = 4 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|).
+		size = 4 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .5, .5, .5 ).
 
 		# Don't recurse more than 3 levels deep, and don't recurse if the node-parameter doesn't tell us to.
 
@@ -338,7 +336,7 @@ Object : MorphologyParser {
 
 		nodeParams = (root get-parameters).
 		
-		size = 6 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|).
+		size = 6 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .3, .3, .3 ).
 
 		rootNode set-color to (|nodeParams{3}|, |nodeParams{4}|, |nodeParams{5}|).
 

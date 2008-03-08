@@ -48,15 +48,14 @@ PhysicalControl : VirtualCreatures {
 	+ to init:
 		startTexture = (new Image load from "images/star.png").
 
+		self set-iteration-step to 0.08.
+
 		flag = new Mobile.
 		flag disable-physics.
 		flag set-bitmap-image to startTexture.
 		flag set-color to (1, 1, 0).
 		flag set-label to "Start".
 		flag disable-shadows.
-
-		self enable-blur.
-		self set-blur-factor to 1.0.
 
 		self set-mountain-skybox.
 
@@ -67,7 +66,7 @@ PhysicalControl : VirtualCreatures {
 		floor set-color to ( .8, .8, .8 ).
 
 		self enable-fast-physics.
-		self set-fast-physics-iterations to 20.
+		self set-fast-physics-iterations to 30.
 		self enable-shadow-volumes.
 
 		parser = new MorphologyParser.
@@ -247,7 +246,7 @@ Object : MorphologyParser {
 		rootNode = (self create-node from root with-level 1).
 
 		(self parse from root with-level 1 with-link rootNode).
-		(self parse from root with-level 1 with-link rootNode flip 1).
+		# (self parse from root with-level 1 with-link rootNode flip 1).
 
 		return rootNode.
 
@@ -318,7 +317,7 @@ Object : MorphologyParser {
 				joint set-strength-limit to 4000.
 
 				self parse from (child get-target) with-level n + 1 with-link childNode.
-				self parse from (child get-target) with-level n + 1 with-link childNode flip 1.
+				# self parse from (child get-target) with-level n + 1 with-link childNode flip 1.
 			}
 		}
 
