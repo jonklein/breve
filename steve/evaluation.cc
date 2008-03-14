@@ -3024,14 +3024,18 @@ RTC_INLINE int stEvalBinaryExpWithEvals( stRunInstance *i, unsigned char op, brE
 
 	if ( t2 == AT_STRING ) {
 		if (( c = stToDouble( tr, tr, i ) ) != EC_OK ) return c;
+		t2 = AT_DOUBLE;
 	} else if ( t2 == AT_LIST ) {
 		if (( c = stToInt( tr, tr, i ) ) != EC_OK ) return c;
+		t2 = AT_INT;
 	}
 
 	if ( t1 == AT_STRING ) {
 		if (( c = stToDouble( tl, tl, i ) ) != EC_OK ) return c;
+		t1 = AT_DOUBLE;
 	} else if ( t1 == AT_LIST ) {
 		if (( c = stToInt( tl, tl, i ) ) != EC_OK ) return c;
+		t1 = AT_INT;
 	}
 
 	if ( t1 == AT_DOUBLE || t2 == AT_DOUBLE ) 
