@@ -26,12 +26,6 @@ extern "C" {
 }
 #endif
 
-enum parserModes {
-	PARSE_INSTANCE,
-	PARSE_DATA_INSTANCE,
-	PARSE_ENGINE
-};
-
 /**
  * \brief Data used when preforming an archive.
  */
@@ -107,9 +101,9 @@ int brXMLInitSimulationFromStream(brEngine *, FILE *);
 int brXMLInitSimulationFromString(brEngine *, char *);
 
 int stXMLVariablePrint(brXMLArchiveRecord *, FILE *, stVar *, stInstance *, int);
-int stXMLPrintEval(brXMLArchiveRecord *, FILE *, const char *, brEval *, int);
-int stXMLPrintList(brXMLArchiveRecord *, FILE *, const char *, brEvalListHead *, int);
-int stXMLPrintHash(brXMLArchiveRecord *, FILE *, const char *, brEvalHash *, int);
+int brXMLPrintEval(brXMLArchiveRecord *, FILE *, const char *, brEval *, int);
+int brXMLPrintList(brXMLArchiveRecord *, FILE *, const char *, brEvalListHead *, int);
+int brXMLPrintHash(brXMLArchiveRecord *, FILE *, const char *, brEvalHash *, int);
 
 int brXMLEvalTypeForTagName( const char * );
 
