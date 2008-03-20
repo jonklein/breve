@@ -79,10 +79,10 @@ int brXMLWriteObjectToStream( brInstance *inInstance, FILE *file, int isDataObje
 	brXMLAssignIndices( inInstance->engine, record._indexMap );
 
 	fprintf( file, "<?xml version=\"1.0\"?>\n" );
-	fprintf( file, "<!DOCTYPE steveObject SYSTEM \"steveObject.dtd\">\n" );
+	fprintf( file, "<!DOCTYPE instance_archive SYSTEM \"breveInstance.dtd\">\n" );
 
 	if ( !isDataObject ) 
-		fprintf( file, "<instance_archive archiveIndex=\"%d\">\n", record._indexMap[ inInstance ] );
+		fprintf( file, "<instance_archive index=\"%d\">\n", record._indexMap[ inInstance ] );
 	else 
 		fprintf( file, "<data_instance_archive>\n" );
 
@@ -130,7 +130,7 @@ int brXMLWriteSimulationToStream( FILE *file, brEngine *e ) {
 	brXMLAssignIndices( e, record._indexMap );
 
 	fprintf( file, "<?xml version=\"1.0\"?>\n" );
-	fprintf( file, "<!DOCTYPE steveEngine SYSTEM \"steveEngine.dtd\">\n" );
+	fprintf( file, "<!DOCTYPE engine SYSTEM \"breveInstance.dtd\">\n" );
 
 	fprintf( file, "<engine controllerIndex=\"%d\">\n", record._indexMap[ brEngineGetController( e ) ] );
 
@@ -214,7 +214,7 @@ int brXMLWriteObject( brXMLArchiveRecord *record, FILE *file, brInstance *inInst
 
 			XMLPutSpaces( spaces, file );
 
-			fprintf( file, "<object index=\"%d\"/>\n", index );
+			fprintf( file, "<obj index=\"%d\"/>\n", index );
 			XMLPutSpaces( spaces, file );
 			fprintf( file, "<notification name=\"%s\"/>\n", obs->notification );
 			XMLPutSpaces( spaces, file );
@@ -244,7 +244,7 @@ int brXMLWriteObject( brXMLArchiveRecord *record, FILE *file, brInstance *inInst
 
 			XMLPutSpaces( spaces, file );
 
-			fprintf( file, "<object index=\"%d\"/>\n", index );
+			fprintf( file, "<obj index=\"%d\"/>\n", index );
 		}
 
 		spaces -= XML_INDENT_SPACES;
@@ -331,7 +331,7 @@ int stXMLVariablePrint( brXMLArchiveRecord *record, FILE *file, stVar *variable,
 
 		for ( n = 0;n < variable->type->_arrayCount;n++ ) {
 			stLoadVariable( &i->variables[variable->offset + n * typeSize], variable->type->_arrayType, &target, &ri );
-			stXMLPrintEval( record, file, "", &target, spaces );
+			brXMLPrintEval( record, file, "", &target, spaces );
 		}
 
 		spaces -= XML_INDENT_SPACES;
@@ -344,12 +344,12 @@ int stXMLVariablePrint( brXMLArchiveRecord *record, FILE *file, stVar *variable,
 
 	stLoadVariable( &i->variables[variable->offset], variable->type->_type, &target, &ri );
 
-	stXMLPrintEval( record, file, variable->name.c_str(), &target, spaces );
+	brXMLPrintEval( record, file, variable->name.c_str(), &target, spaces );
 
 	return 0;
 }
 
-int stXMLPrintList( brXMLArchiveRecord *record, FILE *file, const char *name, brEvalListHead *theHead, int spaces ) {
+int brXMLPrintList( brXMLArchiveRecord *record, FILE *file, const char *name, brEvalListHead *theHead, int spaces ) {
 	XMLPutSpaces( spaces, file );
 	fprintf( file, "<list name=\"%s\">\n", name );
 	spaces += XML_INDENT_SPACES;
@@ -357,7 +357,7 @@ int stXMLPrintList( brXMLArchiveRecord *record, FILE *file, const char *name, br
 	std::vector< brEval >::iterator li;
 
 	for ( li = theHead->_vector.begin(); li != theHead->_vector.end(); li++ ) {
-		stXMLPrintEval( record, file, "", &(*li), spaces );
+		brXMLPrintEval( record, file, "", &(*li), spaces );
 	}
 
 	spaces -= XML_INDENT_SPACES;
@@ -368,7 +368,7 @@ int stXMLPrintList( brXMLArchiveRecord *record, FILE *file, const char *name, br
 	return 0;
 }
 
-int stXMLPrintHash( brXMLArchiveRecord *record, FILE *file, const char *name, brEvalHash *hash, int spaces ) {
+int brXMLPrintHash( brXMLArchiveRecord *record, FILE *file, const char *name, brEvalHash *hash, int spaces ) {
 	brEvalListHead *keys;
 
 	keys = brEvalHashKeys( hash );
@@ -389,7 +389,7 @@ int stXMLPrintHash( brXMLArchiveRecord *record, FILE *file, const char *name, br
 		spaces += XML_INDENT_SPACES;
 
 		brEvalCopy( &(*li), &newEval );
-		stXMLPrintEval( record, file, "", &newEval, spaces );
+		brXMLPrintEval( record, file, "", &newEval, spaces );
 
 		spaces -= XML_INDENT_SPACES;
 		XMLPutSpaces( spaces, file );
@@ -400,7 +400,7 @@ int stXMLPrintHash( brXMLArchiveRecord *record, FILE *file, const char *name, br
 		spaces += XML_INDENT_SPACES;
 
 		brEvalCopy( &value, &newEval );
-		stXMLPrintEval( record, file, "", &newEval, spaces );
+		brXMLPrintEval( record, file, "", &newEval, spaces );
 
 		spaces -= XML_INDENT_SPACES;
 		XMLPutSpaces( spaces, file );
@@ -417,7 +417,7 @@ int stXMLPrintHash( brXMLArchiveRecord *record, FILE *file, const char *name, br
 	return 0;
 }
 
-int stXMLPrintEval( brXMLArchiveRecord *record, FILE *file, const char *name, brEval *target, int spaces ) {
+int brXMLPrintEval( brXMLArchiveRecord *record, FILE *file, const char *name, brEval *target, int spaces ) {
 	stInstance *i = NULL;
 	int index = -1;
 	char *data, *encoded;
@@ -430,12 +430,12 @@ int stXMLPrintEval( brXMLArchiveRecord *record, FILE *file, const char *name, br
 	switch ( target->type() ) {
 
 		case AT_LIST:
-			return stXMLPrintList( record, file, name, BRLIST( target ), spaces );
+			return brXMLPrintList( record, file, name, BRLIST( target ), spaces );
 
 			break;
 
 		case AT_HASH:
-			return stXMLPrintHash( record, file, name, BRHASH( target ), spaces );
+			return brXMLPrintHash( record, file, name, BRHASH( target ), spaces );
 
 			break;
 
@@ -801,7 +801,11 @@ brInstance *brXMLDearchiveObjectFromString( brEngine *e, char *buffer ) {
 		return NULL;
 	}
 	
-	const std::string *index = archive[ 0 ]->getAttr( "archiveIndex" );
+	const std::string *index = archive[ 0 ]->getAttr( "index" );
+
+	// backwards compatibility...
+	if( !index )
+		index = archive[ 0 ]->getAttr( "archiveIndex" );
 	
 	if( !index ) {
 		slMessage( DEBUG_ALL, "Error decoding XML from string: could not locate archived instance index\n" );	
@@ -933,6 +937,12 @@ int brXMLInitSimulationFromString( brEngine *e, char *buffer ) {
 		}
 	}
 
+
+	if( !parserState._indexToInstanceMap[ controllerIndex ] ) {
+		slMessage( DEBUG_ALL, "Error decoding archived XML simulation: could not locate controller instance\n" );
+		delete dom;
+		return EC_ERROR;
+	}
 
 	brEngineSetController( e, parserState._indexToInstanceMap[ controllerIndex ] );
 
@@ -1144,7 +1154,12 @@ int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceE
 	brXMLDOMElement *dependencies = inInstanceElement->getChildByName( "dependencies" ); 
 	
 	if( dependencies ) {
-		std::vector< brXMLDOMElement* > dependencyList = dependencies->getElementsByName( "object" );
+		std::vector< brXMLDOMElement* > dependencyList = dependencies->getElementsByName( "obj" );
+
+		// Backwards compatibility..
+
+		if( dependencyList.size() == 0 )
+			dependencyList = dependencies->getElementsByName( "object" );
 			
 		for( i = 0; i < dependencyList.size(); i++ ) {		
 			int dependencyIndex = atoi( dependencyList[ i ]->getAttr( "index" )->c_str() );
@@ -1199,9 +1214,13 @@ void brXMLDecodeObserver( brXMLParserState *inState, brXMLDOMElement *inObserver
 	brInstance *observer = NULL;
 	const char *notification = NULL, *method = NULL;
 
-	brXMLDOMElement *observerElement     = inObserverElement->getChildByName( "object" );
+	brXMLDOMElement *observerElement     = inObserverElement->getChildByName( "obj" );
 	brXMLDOMElement *methodElement       = inObserverElement->getChildByName( "method" );
 	brXMLDOMElement *notificationElement = inObserverElement->getChildByName( "notification" );
+
+	// backwards compatibility...
+	if( !observerElement ) 
+		observerElement = inObserverElement->getChildByName( "object" );
 	
 	if( observerElement ) {
 		int observerIndex = atoi( observerElement->getAttr( "index" )->c_str() );
