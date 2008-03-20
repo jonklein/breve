@@ -156,13 +156,13 @@ inline int brPythonTypeToEval( PyObject *inObject, brEval *outEval ) {
 		slMatrix m;
 
 		PyObject *x1 = PyList_GET_ITEM( inObject, 0 );
-		PyObject *y1 = PyList_GET_ITEM( inObject, 1 );
-		PyObject *z1 = PyList_GET_ITEM( inObject, 2 );
-		PyObject *x2 = PyList_GET_ITEM( inObject, 3 );
+		PyObject *x2 = PyList_GET_ITEM( inObject, 1 );
+		PyObject *x3 = PyList_GET_ITEM( inObject, 2 );
+		PyObject *y1 = PyList_GET_ITEM( inObject, 3 );
 		PyObject *y2 = PyList_GET_ITEM( inObject, 4 );
-		PyObject *z2 = PyList_GET_ITEM( inObject, 5 );
-		PyObject *x3 = PyList_GET_ITEM( inObject, 6 );
-		PyObject *y3 = PyList_GET_ITEM( inObject, 7 );
+		PyObject *y3 = PyList_GET_ITEM( inObject, 5 );
+		PyObject *z1 = PyList_GET_ITEM( inObject, 6 );
+		PyObject *z2 = PyList_GET_ITEM( inObject, 7 );
 		PyObject *z3 = PyList_GET_ITEM( inObject, 8 );
 
 		m[ 0 ][ 0 ] = PyNumber_AS_DOUBLE( x1 );
