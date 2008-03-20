@@ -1707,6 +1707,23 @@ RTC_INLINE int stEvalIndexLookup( stListIndexExp *l, stRunInstance *i, brEval *t
 			stEvalError( i->instance, EE_BOUNDS, "list index \"%d\" out of bounds", BRINT( &index ) );
 			return EC_ERROR;
 		}
+	} else if( list.type() == AT_INSTANCE ) {
+		stInstance *lookupInstance = ( stInstance * )BRINSTANCE( &list )->userData;
+        
+		// Find the variable for this instance
+        
+		stVar *var = stObjectLookupVariable( lookupInstance -> type, BRSTRING( &index ) );
+        
+		if( !var ) {
+			stEvalError( i->instance, EE_TYPE, "Cannot locate variable \"%s\" for object", BRSTRING( &index ) );
+			return EC_ERROR;
+		}
+        
+		// Make a pointer to the variable by looking inside the instance by the proper offset
+        
+		void *pointer = &lookupInstance->variables[ var -> offset ];
+        
+		return stLoadVariable( pointer, var -> type -> _type, t, i );
 	} else if ( list.type() == AT_VECTOR ) {
 		if ( index.type() != AT_INT && stToInt( &index, &index, i ) == EC_ERROR ) {
 			stEvalError( i->instance, EE_TYPE, "expected type \"int\" in vector index" );
