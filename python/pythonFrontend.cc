@@ -348,6 +348,22 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 }
 
 /**
+ * Callback to determine whether an object is PyCObject type or not.
+ */
+
+PyObject *brPythonIsCObject( PyObject *inSelf, PyObject *inArgs ) {
+	PyObject *pyobject;
+
+	if( !PyArg_ParseTuple( inArgs, "O", &pyobject ) ) 
+		return NULL;
+
+	if( PyCObject_Check( pyobject ) ) 
+		return PyInt_FromLong( 1 );
+	else
+		return PyInt_FromLong( 0 );
+}
+
+/**
  * Callback to handle stdout/stderr from Python and redirect it to breve output.
  */
 
@@ -395,7 +411,7 @@ PyObject *brPythonVectorLength( PyObject *inSelf, PyObject *inArgs ) {
 	PyObject *v1;
 	slVector *vec1 = NULL;
 
-		if ( !PyArg_ParseTuple( inArgs, "O", &v1 ) ) 
+	if ( !PyArg_ParseTuple( inArgs, "O", &v1 ) ) 
 		return NULL;
 
 	v1->ob_type->tp_as_buffer->bf_getreadbuffer( v1, 0, (void**)&vec1 );
@@ -408,7 +424,7 @@ PyObject *brPythonSetVector( PyObject *inSelf, PyObject *inArgs ) {
 	slVector *vec1 = NULL;
 	float x, y, z;
 
-		if ( !PyArg_ParseTuple( inArgs, "Offf", &v1, &x, &y, &z ) ) return NULL;
+	if ( !PyArg_ParseTuple( inArgs, "Offf", &v1, &x, &y, &z ) ) return NULL;
 
 	v1->ob_type->tp_as_buffer->bf_getwritebuffer( v1, 0, (void**)&vec1 );
 
@@ -426,7 +442,7 @@ PyObject *brPythonScaleVector( PyObject *inSelf, PyObject *inArgs ) {
 	PyObject *v1;
 	float f;
 
-		if ( !PyArg_ParseTuple( inArgs, "Of", &v1, &f ) ) return NULL;
+	if ( !PyArg_ParseTuple( inArgs, "Of", &v1, &f ) ) return NULL;
 
 	v1->ob_type->tp_as_buffer->bf_getreadbuffer( v1, 0, (void**)&vec1 );
 
@@ -444,7 +460,7 @@ PyObject *brPythonAddVectors( PyObject *inSelf, PyObject *inArgs ) {
 	slVector *vec1 = NULL, *vec2 = NULL, *vec3 = NULL;
 	PyObject *v1, *v2;
 
-		if ( !PyArg_ParseTuple( inArgs, "OO", &v1, &v2 ) ) return NULL;
+	if ( !PyArg_ParseTuple( inArgs, "OO", &v1, &v2 ) ) return NULL;
 
 	v1->ob_type->tp_as_buffer->bf_getwritebuffer( v1, 0, (void**)&vec1 );
 	v2->ob_type->tp_as_buffer->bf_getwritebuffer( v2, 0, (void**)&vec2 );
@@ -646,9 +662,8 @@ PyObject *brPythonCallInternalFunction( PyObject *inSelf, PyObject *inArgs ) {
 	}
 
 	if( breveObject == Py_None ) {
-		slMessage( DEBUG_ALL, "Warning: internal function called for invalid instance %p\n" );
-		Py_INCREF( Py_None );
-		return Py_None;
+		PyErr_SetString( PyExc_RuntimeError, "internal function called for invalid instance" );
+		return NULL;
 	}
 
 	brInstance *caller = ( brInstance* )PyCObject_AsVoidPtr( breveObject );
@@ -1226,6 +1241,7 @@ void brPythonInit( brEngine *breveEngine ) {
 		{ "scaleVector", 		brPythonScaleVector, 			METH_VARARGS, "" },
 		{ "setVector", 			brPythonSetVector, 			METH_VARARGS, "" },
 		{ "vectorLength",		brPythonVectorLength, 			METH_VARARGS, "" },
+		{ "isCObject",			brPythonIsCObject, 			METH_VARARGS, "" },
 		{ NULL, NULL, 0, NULL }
 	};
 
