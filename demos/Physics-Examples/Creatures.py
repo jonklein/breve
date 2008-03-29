@@ -25,11 +25,12 @@ class VirtualCreatures( breve.PhysicalControl ):
 
 		self.running = 1
 		if self.body.checkSelfPenetration():
-			breve.deleteInstances( breve.allInstances( "Links" ) )
+			breve.deleteInstances( breve.allInstances( "breve.Links" ) )
 
 		breve.allInstances( "SineJoints" ).activate()
 		self.startlocation = breve.vector( 0, 0, 0 )
 		for link in breve.allInstances( "Links" ):
+			link.setStartLocation()
 			self.startlocation = ( self.startlocation + link.getLocation() )
 
 
@@ -42,17 +43,20 @@ class VirtualCreatures( breve.PhysicalControl ):
 		return self.blockTexture
 
 	def getCurrentCritterFitness( self ):
-		t = breve.vector()
 		link = None
+		mindist = 0
 
+		if ( breve.length( breve.allInstances( "Links" ) ) == 0 ):
+			return 0.000000
+
+		mindist = 10000
 		for link in breve.allInstances( "Links" ):
-			t = ( t + link.getLocation() )
+			if ( breve.length( ( link.getLocation() - link._startLocation ) ) < mindist ):
+				mindist = breve.length( ( link.getLocation() - link._startLocation ) )
 
 
-		if breve.length( breve.allInstances( "Links" ) ):
-			t = ( t / breve.length( breve.allInstances( "Links" ) ) )
 
-		return breve.length( ( t - self.startlocation ) )
+		return mindist
 
 	def init( self ):
 		self.startTexture = breve.createInstances( breve.Image, 1 ).load( 'images/star.png' )
@@ -67,21 +71,19 @@ class VirtualCreatures( breve.PhysicalControl ):
 		self.floor = breve.createInstances( breve.Floor, 1 )
 		self.floor.setTextureImage( breve.createInstances( breve.Image, 1 ).load( 'images/ground.png' ) )
 		self.floor.setColor( breve.vector( 0.800000, 0.800000, 0.800000 ) )
-		self.setSkyboxImages( [ 'images/MountainBoxFront.png', 'images/MountainBoxBack.png', 'images/MountainBoxLeft.png', 'images/MountainBoxRight.png', 'images/MountainBoxTop.png', 'images/MountainBoxBottom.png' ] )
 		self.enableFastPhysics()
-		self.setFastPhysicsIterations( 20 )
+		self.setFastPhysicsIterations( 30 )
 		self.enableShadowVolumes()
 		self.parser = breve.createInstances( breve.MorphologyParser, 1 )
 		self.ga = self.controller.dearchiveXml( 'breveCreatures.xml' )
-
 		if ( not self.ga ):
+			print '''Making new GA'''
 			self.ga = breve.createInstances( breve.SimsGA, 1 )
-			self.ga.setFitnessTestDuration( 30 )
+			self.ga.setFitnessTestDuration( 45 )
 			self.ga.setIndividualClass( 'SimsGAIndividual' )
 			self.ga.setPopulationSize( 25 )
 			self.ga.setCrossoverPercent( 30 )
 			self.ga.setMutationPercent( 30 )
-			self.ga.setSpatialRadius( 4 )
 
 
 		self.addDependency( self.ga )
@@ -100,11 +102,11 @@ class VirtualCreatures( breve.PhysicalControl ):
 			t = ( t / breve.length( breve.allInstances( "Links" ) ) )
 
 		self.pointCamera( t )
-		dist = breve.length( ( t - self.startlocation ) )
+		dist = self.getCurrentCritterFitness()
 		if self.running:
 			self.setDisplayText( '''Distance traveled: %s''' % (  dist ), -0.950000, -0.950000 )
 
-		self.pivotCamera( 0, 0.000100 )
+		self.pivotCamera( 0.000000, 0.000200 )
 		breve.PhysicalControl.iterate( self )
 
 	def setupTest( self, i ):
@@ -117,6 +119,7 @@ class VirtualCreatures( breve.PhysicalControl ):
 
 		breve.deleteInstances( breve.allInstances( "Links" ) )
 		breve.deleteInstances( breve.allInstances( "Joints" ) )
+
 		if self.body:
 			breve.deleteInstances( self.body )
 
@@ -150,7 +153,7 @@ breve.VirtualCreatures = VirtualCreatures
 class SimsGA( breve.GeneticAlgorithm ):
 	def __init__( self ):
 		breve.GeneticAlgorithm.__init__( self )
-		self.url = None
+		self.h = breve.hash()
 		SimsGA.init( self )
 
 	def endFitnessTest( self, o ):
@@ -161,13 +164,6 @@ class SimsGA( breve.GeneticAlgorithm ):
 		print '''fitness of %s: ''' % (  o ), o.getFitness()
 		self.archiveAsXml( 'breveCreatures.xml' )
 
-	def endGeneration( self, n ):
-		print self.url.put( self.getBestIndividual().archiveAsXmlString(), 'http://www.deskworld.org/original/dwCritterUpload.php' )
-
-	def init( self ):
-		self.url = breve.createInstances( breve.URL, 1 )
-		self.addDependency( self.url )
-
 	def startFitnessTest( self, o ):
 		newOffset = breve.vector()
 
@@ -175,7 +171,7 @@ class SimsGA( breve.GeneticAlgorithm ):
 		if ( breve.length( newOffset ) < 20 ):
 			newOffset = ( ( 20 * newOffset ) / breve.length( newOffset ) )
 
-		self.controller.panCameraOffset( newOffset, 200 )
+		self.controller.panCameraOffset( newOffset, 600 )
 		self.controller.setupTest( o )
 
 
@@ -208,29 +204,33 @@ class SimsGAIndividual( breve.GeneticAlgorithmIndividual ):
 		self.genome.mutate()
 
 	def randomize( self ):
-		self.genome.randomize( 5, 10, 10 )
+		self.genome.randomize( 4, 12, 12 )
 
 
 breve.SimsGAIndividual = SimsGAIndividual
 class MorphologyParser( breve.Object ):
 	def __init__( self ):
 		breve.Object.__init__( self )
+		self._linkCount = 0
 
 	def createNode( self, root, n ):
 		rootNode = None
 		nodeParams = breve.objectList()
 		size = breve.vector()
+		scaleFactor = 0
 
-		if ( n > 3 ):
+		self._linkCount = ( self._linkCount + 1 )
+		if ( ( n > 6 ) or ( self._linkCount > 20 ) ):
 			return 0
 
-		rootNode = breve.createInstances( breve.Link, 1 )
-		rootNode.move( breve.vector( 0, 15, 0 ) )
-		rootNode.setColor( ( ( ( 5 - n ) / 4.000000 ) * breve.vector( 1, 1, 1 ) ) )
 		nodeParams = root.getParameters()
-		size = ( 6 * breve.vector( breve.length( nodeParams[ 0 ] ), breve.length( nodeParams[ 1 ] ), breve.length( nodeParams[ 2 ] ) ) )
+		scaleFactor = ( ( ( 6 + 1 ) - ( ( 0.500000 + ( 0.450000 * breve.length( nodeParams[ 10 ] ) ) ) * n ) ) / ( 6 + 1 ) )
+		rootNode = breve.createInstances( breve.CreaturesLink, 1 )
+		rootNode.move( breve.vector( 0, 15, 0 ) )
+		rootNode.setColor( ( scaleFactor * breve.vector( 1, 1, 1 ) ) )
+		size = ( ( 6 * breve.vector( breve.length( nodeParams[ 0 ] ), breve.length( nodeParams[ 1 ] ), breve.length( nodeParams[ 2 ] ) ) ) + breve.vector( 0.300000, 0.300000, 0.300000 ) )
 		rootNode.setColor( breve.vector( breve.length( nodeParams[ 3 ] ), breve.length( nodeParams[ 4 ] ), breve.length( nodeParams[ 5 ] ) ) )
-		rootNode.setShape( breve.createInstances( breve.Cube, 1 ).initWith( ( ( ( 4 - n ) / 3.000000 ) * size ) ) )
+		rootNode.setShape( breve.createInstances( breve.Cube, 1 ).initWith( ( scaleFactor * size ) ) )
 		rootNode.setTextureImage( self.controller.getBlockTexture() )
 		return rootNode
 
@@ -250,8 +250,8 @@ class MorphologyParser( breve.Object ):
 
 		connections = root.getConnections()
 		nodeParams = root.getParameters()
-		size = ( 4 * breve.vector( breve.length( nodeParams[ 0 ] ), breve.length( nodeParams[ 1 ] ), breve.length( nodeParams[ 2 ] ) ) )
-		if ( ( n > 3 ) or ( ( n > 1 ) and ( nodeParams[ 9 ] < 0.000000 ) ) ):
+		size = ( ( 3.000000 * breve.vector( breve.length( nodeParams[ 0 ] ), breve.length( nodeParams[ 1 ] ), breve.length( nodeParams[ 2 ] ) ) ) + breve.vector( 0.500000, 0.500000, 0.500000 ) )
+		if ( ( ( self._linkCount > 20 ) or ( n > 6 ) ) or ( ( n > 1 ) and ( nodeParams[ 9 ] < 0.000000 ) ) ):
 			return 0
 
 		for child in connections:
@@ -274,11 +274,11 @@ class MorphologyParser( breve.Object ):
 
 				joint = breve.createInstances( breve.SineJoint, 1 )
 				joint.link( norm, ppoint, cpoint, childNode, rootNode )
-				joint.setPhaseshift( ( 3.140000 * connectionParams[ 7 ] ) )
-				joint.setFrequency( ( 1 + connectionParams[ 8 ] ) )
-				jointRange = ( 0.700000 + ( 2 * breve.length( connectionParams[ 9 ] ) ) )
-				joint.setDoubleSpring( 1000, jointRange, ( -jointRange ) )
-				joint.setStrengthLimit( 4000 )
+				joint.setPhaseshift( ( ( n * 3.140000 ) * connectionParams[ 7 ] ) )
+				joint.setFrequency( ( 0.100000 + connectionParams[ 8 ] ) )
+				jointRange = ( 0.500000 + ( 1 * breve.length( connectionParams[ 9 ] ) ) )
+				joint.setDoubleSpring( jointRange, ( -jointRange ), 1 )
+				joint.setStrengthLimit( 1000 )
 				self.parse( child.getTarget(), ( n + 1 ), childNode )
 
 
@@ -289,12 +289,27 @@ class MorphologyParser( breve.Object ):
 	def parseTopLevel( self, root ):
 		rootNode = None
 
+		self._linkCount = 0
 		rootNode = self.createNode( root, 1 )
 		self.parse( root, 1, rootNode )
 		return rootNode
 
 
 breve.MorphologyParser = MorphologyParser
+class CreaturesLink( breve.Link ):
+	def __init__( self ):
+		breve.Link.__init__( self )
+		self._startLocation = breve.vector()
+		CreaturesLink.init( self )
+
+	def init( self ):
+		self.setMu( 3.000000 )
+
+	def setStartLocation( self ):
+		self._startLocation = self.getLocation()
+
+
+breve.CreaturesLink = CreaturesLink
 class SineJoint( breve.RevoluteJoint ):
 	'''A RevoluteJoint that moves according to a sine function.'''
 
@@ -328,6 +343,7 @@ class SineJoint( breve.RevoluteJoint ):
 breve.SineJoint = SineJoint
 # Add our newly created classes to the breve namespace
 
+breve.CreaturesLinks = CreaturesLink
 breve.SineJoints = SineJoint
 
 

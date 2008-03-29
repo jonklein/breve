@@ -29,6 +29,7 @@ GeneticAlgorithmIndividual : GADirectedGraph {
 
 	+ variables:
 		rootNode (object).
+		_connParamCount, _nodeParamCount (int).
 
 	+ to init:
 		rootNode = new GADirectedGraphNode.
@@ -37,14 +38,52 @@ GeneticAlgorithmIndividual : GADirectedGraph {
 	+ to copy from other (object):
 		% Copies the contents of the directed graph other.
 
+		_connParamCount = other{ "_connParamCount" }.
+		_nodeParamCount = other{ "_nodeParamCount" }.
+
 		self delete-root-node.
 		rootNode = ((other get-root) duplicate).
 		self add-dependency on rootNode.
 
 	+ to mutate:
-		% Mutates the directed graph.
+		% Mutates the directed graph.  The mutation adds a random connection,
+		% removes a random connection, and mutates the parameters of a random
+		% connection and node.
 
-		rootNode mutate.
+		nodes, connections (list).
+		n, m (int).
+		connection (object).
+
+		# Add a random connection
+
+		nodes = (rootNode get-connected-nodes).
+		n = random[ | nodes | - 1 ].
+		m = random[ | nodes | - 1 ].
+		connection = ( nodes{ n } connect to nodes{ m } with-parameters {} ).
+		connection set-parameter-length to _connParamCount.
+		connection randomize-parameters.
+
+		# Remove a random connection
+
+		m = random[ | nodes | - 1 ].
+		connections = ( nodes{ m } get-connections ).
+
+		if | connections | > 1: {
+ 			remove connections{ random[ | connections | - 1 ] }.
+		}
+
+		# Mutate a random connection
+
+		m = random[ | nodes | - 1 ].
+		connections = ( nodes{ m } get-connections ).
+
+		if | connections |:
+			connections{ random[ | connections | - 1 ] } mutate.
+
+		# Mutate a random node.
+
+		m = random[ | nodes | - 1 ].
+		nodes{ m } mutate.
 
 	+ to crossover from-parent1 p1 (object) from-parent2 p2 (object):
 		% Sets this child's genome to be a genetic crossover of p1 and p2.
@@ -53,8 +92,10 @@ GeneticAlgorithmIndividual : GADirectedGraph {
 		nodes1, nodes2, childnodes (list).
 		connection, temp, source (object).
 		n, index (int).
-
 		first, max, cross (int).
+
+		_connParamCount = p1{ "_connParamCount" }.
+		_nodeParamCount = p1{ "_nodeParamCount" }.
 
 		self delete-root-node.
 
@@ -166,6 +207,9 @@ GeneticAlgorithmIndividual : GADirectedGraph {
 		connection, n, m (object).
 		keep (hash).
 
+		_nodeParamCount = np.
+		_connParamCount = cp.
+
 		self delete-root-node.
 
 		count = random[nMax - 1] + 1.
@@ -257,7 +301,7 @@ Abstract : GADirectedGraphParameterObject (aka GADirectedGraphParameterObjects) 
 			parameters{ n } = random[2.0] - 1.0.
 		}
 
-	+ to mutate with-variation variation = 0.1 (double) with-replacement-probability replace = 0.1 (double):
+	+ to mutate with-variation variation = 0.1 (double) with-replacement-probability replace = 0.01 (double):
 		% Mutates the list of parameters in the list with a gaussian distribution 
 		% of size variation, and a replace proability chance of total replacement.
 	
@@ -287,9 +331,9 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 
 		h (hash).
 
-		return (self duplicate with-seen h).
+		return (self duplicate-internal with-seen h).
 
-	- to duplicate with-seen seenhash (hash): 
+	- to duplicate-internal with-seen seenhash (hash): 
 		newNode, connection (object).
 
 		if seenhash{ self }: return seenhash{ self }.
@@ -299,7 +343,7 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 		seenhash{ self } = newNode.
 
 		foreach connection in connections: {
-			newNode connect to ((connection get-target) duplicate with-seen seenhash) with-parameters (connection get-parameters).
+			newNode connect to ((connection get-target) duplicate-internal with-seen seenhash) with-parameters (connection get-parameters).
 		}
 
 		newNode set-parameters to (self get-parameters).
@@ -311,9 +355,9 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 		% objects.  To be used on root nodes only.
 		h (hash).
 	
-		return (self mutate with-seen h).
+		return (self mutate-internal with-seen h).
 
-	- to mutate with-seen seenhash (hash): 
+	- to mutate-internal with-seen seenhash (hash): 
 		connection (object).
 
 		if seenhash{ self }: return.
@@ -333,9 +377,9 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 
 		h (hash).
 
-		self internal-destroy-connected-objects with-seen h.
+		self destroy-connected-objects-internal with-seen h.
 
-	- to internal-destroy-connected-objects with-seen seenhash (hash):
+	- to destroy-connected-objects-internal with-seen seenhash (hash):
 		connection (object).
 
 		if seenhash{ self }: return.
@@ -343,7 +387,7 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 		seenhash{ self } = 1.
 
 		foreach connection in connections: {
-			if (connection get-target): (connection get-target) internal-destroy-connected-objects with-seen seenhash.
+			if (connection get-target): (connection get-target) destroy-connected-objects-internal with-seen seenhash.
 			free connection.
 		}
 
@@ -354,9 +398,9 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 
 		h (hash).
 	
-		self print-connected-objects with-seen h.
+		self print-connected-objects-internal with-seen h.
 
-	- to print-connected-objects with-seen seenhash (hash):
+	- to print-connected-objects-internal with-seen seenhash (hash):
 		connection (object).
 
 		if seenhash{ self }: return.
@@ -367,7 +411,7 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 
 		foreach connection in connections: {
 			print "## $self connected to ", (connection get-target), " with parameters: ", (connection get-parameters).
-			(connection get-target) print-connected-objects with-seen seenhash.
+			(connection get-target) print-connected-objects-internal with-seen seenhash.
 		}
 
 	+ to get-connected-nodes:
@@ -376,9 +420,9 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 
 		h (hash).
 
-		return (self internal-get-connected-nodes with-seen h with-list {}).
+		return (self get-connected-nodes-internal with-seen h with-list {}).
 
-	- to internal-get-connected-nodes with-seen seenhash (hash) with-list seenlist (list):
+	- to get-connected-nodes-internal with-seen seenhash (hash) with-list seenlist (list):
 		connection (object).
 		nodelist (list).
 
@@ -388,7 +432,7 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 		seenhash{ self } = 1.
 
 		foreach connection in connections: {
-			if (connection get-target): (connection get-target) internal-get-connected-nodes with-seen seenhash with-list seenlist.
+			if (connection get-target): (connection get-target) get-connected-nodes-internal with-seen seenhash with-list seenlist.
 		}
 
 		return seenlist.

@@ -475,8 +475,15 @@ char *brInstanceEncodeToString( brEngine *inEngine, brInstance *inInstance ) {
  */
 
 brInstance *brInstanceDecodeFromString( brEngine *inEngine, int inTypeSignature, const char *inData ) {
-	// for( 
-	//return breveInstance->object->type->decodeFromString( inEngine, inData );
+	std::vector<brObjectType*>::iterator oi;
+
+	for ( oi = inEngine->_objectTypes.begin(); oi != inEngine->_objectTypes.end(); oi++ ) {
+		brObjectType *type = *oi;
+
+		if( type -> _typeSignature == inTypeSignature && type -> decodeFromString ) 
+			return type -> decodeFromString( inEngine, inData );
+
+	}
 
 	return NULL;
 }

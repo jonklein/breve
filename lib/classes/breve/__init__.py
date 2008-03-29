@@ -2,7 +2,7 @@
 import breveInternal
 import sys, os, math, random, array
 
-# import pickle
+import cPickle
 
 #
 # Used internally to redirect Python output to the breve frontend
@@ -23,11 +23,15 @@ sys.stdout = breveStdoutHandler()
 # Sets the breve controller class
 #
 
-# def encodeToString( inObject ):
-# 	return pickle.dumps( inObject )
+def encodeToString( inObject ):
+ 	return cPickle.dumps( inObject )
 
-# def decodeFromString( inString ):
-# 	pass
+def decodeFromString( inString ):
+	obj = cPickle.loads( inString )
+
+	print obj.__class__
+
+	return obj
 
 def setController( inControllerClass ):
 	"Creates the breve Controller class.  This method simply instantiates the class which is called.  It is provided for convenience only."
@@ -42,11 +46,26 @@ def allInstances( inclass ):
 		instanceDict[ cls ] = objectList()
 		return instanceDict[ cls ]
 
-def addInstance( inclass, ininstance ):
-	if not instanceDict.has_key( inclass ):
-		instanceDict[ inclass ] = objectList()
+def addToInstanceLists( inCls, ininstance ):
+	for i in inCls.__bases__:
+		addToInstanceLists( i, ininstance )
 
-	instanceDict[ inclass ].append( ininstance )
+	if not instanceDict.has_key( inCls ):
+		instanceDict[ inCls ] = objectList()
+
+	instanceDict[ inCls ].append( ininstance )
+
+def removeFromInstanceLists( inCls, ininstance ):
+	for i in inCls.__bases__:
+		removeFromInstanceLists( i, ininstance )
+
+	if not instanceDict.has_key( inCls ):
+		instanceDict[ inCls ] = objectList()
+
+	instanceDict[ inCls ].remove( ininstance )
+
+def addInstance( inclass, ininstance ):
+	addToInstanceLists( inclass, ininstance )
 
 	return breveInternal.addInstance( breveInternal, inclass, ininstance )
 
@@ -62,6 +81,9 @@ class objectList( list ):
 		list.__setitem__( self, index, value )
 
 	def __getattr__( self, methodName ):
+		if methodName.startswith( '__' ):
+			return list.__getattr__( methodName )
+
 		def execute( *args ):
 			[ i.__getattribute__( methodName )( *args ) for i in self ]
 
@@ -97,7 +119,11 @@ def deleteInstances( inInstances ):
 	"Delete one or more instances of a breve class"
 
 	if issubclass( inInstances.__class__, list ):
-		for i in inInstances:
+		# the inInstances could be the "all" list -- copy it so that
+		# we're not modifying the list as we traverse it!
+
+		l = list( inInstances )
+		for i in l:
 			deleteInstance( i )
 	else:
 		deleteInstance( inInstances )
@@ -122,11 +148,10 @@ def deleteInstance( inInstance ):
 	if inInstance and inInstance.breveInstance != None:
 		inInstance.destroy()
 		traceDelete( inInstance )
-
+	
 		breveInternal.removeInstance( breveInternal.breveEngine, inInstance )
-		all = allInstances( inInstance.__class__.__name__ )
-		if inInstance in all:
-			all.remove( inInstance )
+
+		removeFromInstanceLists( inInstance.__class__, inInstance )
 
 		inInstance.breveInstance = None;
 		del inInstance
@@ -218,10 +243,8 @@ class matrix( list ):
 class vector( array.array ):
 	"A 3D vector class used for breve"
 
-	defaultvector = [ 0.0, 0.0, 0.0 ]
-
 	def __new__( cls, x = 0.0, y = 0.0, z = 0.0 ):
-		return array.array.__new__( cls, 'd', [ x, y, z ] )
+		return array.array.__new__( vector, 'd', [ x, y, z ] )
 
 	def __getattr__( self, symbol ):
 		if symbol == 'x':
@@ -268,8 +291,6 @@ class vector( array.array ):
 
 	def __add__( self, other ):
 		return breveInternal.addVectors( self, other )
-
-	# __add__ = breveInternal.addVectors
 
 	def __div__( self, other ):
 		return breveInternal.scaleVector( self, 1.0 / other )
@@ -361,7 +382,7 @@ if 1:
 	from IRSensor		import *
 	from Wanderer 		import *
 
-	from URL			import *
+	from URL		import *
 	from QGAME		import *
 	from Push 		import *
 	from PushGP 		import *

@@ -120,8 +120,12 @@ class PushGP( breve.Object ):
 				errorValue = self.computeError( n, self.interpreter )
 
 
-			if self._useChallenges:
-				errorValue = ( errorValue * ( 1.100000 - self._solutionRatesGeneration[ n ] ) )
+			if ( self._useChallenges == 1 ):
+				errorValue = ( errorValue * ( 2.000000 - self._solutionRatesGeneration[ n ] ) )
+
+
+			if ( self._useChallenges == 2 ):
+				errorValue = ( errorValue * ( 2.000000 - self._solutionRatesTotal[ n ] ) )
 
 
 			errors.append( errorValue )
@@ -130,7 +134,7 @@ class PushGP( breve.Object ):
 				return self._abortFitnessValue
 
 
-			if ( errors[ ( breve.length( errors ) - 1 ) ] == 0.000000 ):
+			if ( errorValue == 0.000000 ):
 				self._solutionCountsGeneration[ n ] = ( self._solutionCountsGeneration[ n ] + 1.000000 )
 				self._solutionCountsTotal[ n ] = ( self._solutionCountsTotal[ n ] + 1.000000 )
 
@@ -295,7 +299,7 @@ class PushGP( breve.Object ):
 		self.crossoverPercent = 40
 		self.tournamentSize = 7
 		self.generationLimit = 300
-		self._useChallenges = 0
+		self._useChallenges = 1
 		self.interpreter = breve.createInstances( breve.PushInterpreter, 1 )
 
 	def iterate( self ):

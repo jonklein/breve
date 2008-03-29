@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!ELEMENT engine (instance*)>
+<!ATTLIST engine controllerIndex CDATA #REQUIRED>
+<!ELEMENT instance_archive (instance*)>
+<!ATTLIST instance_archive index CDATA #REQUIRED>
+<!ELEMENT instance (dependencies,instancedata)>
+<!ATTLIST instance 
+	class CDATA #REQUIRED
+	index CDATA #REQUIRED
+	typesignature CDATA #REQUIRED>
+<!ELEMENT dependencies (obj*)>
+<!ELEMENT instancedata (class*)>
+<!ELEMENT class ((list|flt|obj|int|matrix|str|hash|vec|pointer|data)*)>
+<!ELEMENT list  ((list|flt|obj|int|matrix|str|hash|vec|pointer|data)*)>
+<!ELEMENT key   ((list|flt|obj|int|matrix|str|hash|vec|pointer|data))>
+<!ELEMENT value ((list|flt|obj|int|matrix|str|hash|vec|pointer|data))>
+<!ELEMENT hash ((key,value)*)>
+<!ATTLIST class 
+	name    CDATA #REQUIRED
+	version CDATA #REQUIRED>
+<!ATTLIST obj 
+	index   CDATA #REQUIRED
+	name    CDATA #IMPLIED>
+<!ELEMENT flt     (#PCDATA)>
+<!ELEMENT int     (#PCDATA)>
+<!ELEMENT obj     (#PCDATA)>
+<!ELEMENT str     (#PCDATA)>
+<!ELEMENT matrix  (#PCDATA)>
+<!ELEMENT pointer (#PCDATA)>
+<!ELEMENT data    (#PCDATA)>
+<!ELEMENT vec     (#PCDATA)>
+<!ATTLIST flt     name CDATA #IMPLIED>
+<!ATTLIST int     name CDATA #IMPLIED>
+<!ATTLIST str     name CDATA #IMPLIED>
+<!ATTLIST matrix  name CDATA #IMPLIED>
+<!ATTLIST pointer name CDATA #IMPLIED>
+<!ATTLIST data    name CDATA #IMPLIED>
+<!ATTLIST vec     name CDATA #IMPLIED>
+<!ATTLIST list    name CDATA #IMPLIED>
+<!ATTLIST hash    name CDATA #IMPLIED>

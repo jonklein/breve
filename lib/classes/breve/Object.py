@@ -9,6 +9,24 @@ import breve
 class Object( object ):
 	'''Summary: the top level object class. <P> The Object class is the root class.  All classes used in breve have Object as an ancestor.  The object class implements some basic  services that all classes will have access to. <p> Subclassing Object directly is rare.  The classes OBJECT(Real) and  OBJECT(Abstract) are logical separations of the Object class containing  "real" objects (which correspond to a physical entity in the simulated  world) and "abstract" objects which are generally used for computation  or control of the real objects.  You should consider subclassing   one of these classes instead.'''
 
+	def __getstate__( self ):
+		newdict = dict( self.__dict__ )
+
+		newdict[ "breveModule"   ] = None
+		newdict[ "breveInstance" ] = None
+
+		for i in newdict:
+			if breve.breveInternal.isCObject( newdict[ i ] ):
+				newdict[ i ] = None
+
+			if type( newdict[ i ] ) == breve.vector:
+				newdict[ i ] = None
+
+			if issubclass( newdict[ i ].__class__, breve.Object ):
+				newdict[ i ] = None
+
+		return newdict
+
 	def __init__( self ):
 		breve.breveObjectInit( self )
 		Object.init( self )

@@ -477,7 +477,11 @@ class Control( breve.Abstract ):
 		self.yRot = 0.000000
 		self.moveLight( breve.vector( 0, 0, 0 ) )
 		self.pointCamera( breve.vector( 0, 0, 0 ), breve.vector( 0, 0, 30 ) )
+		self.setLightAmbientColor( breve.vector( 0.100000, 0.100000, 0.100000 ) )
+		self.setLightDiffuseColor( breve.vector( 0.900000, 0.900000, 0.900000 ) )
 		self.setBackgroundScrollRate( 0.001000, 0.000100 )
+		self.addMenu( '''End Simulation''', 'endSimulation' )
+		self.addMenuSeparator()
 		self.lightMenu = self.addMenu( '''Use Lighting''', 'toggleLighting' )
 		self.drawMenu = self.addMenu( '''Use Smooth Shading''', 'toggleSmooth' )
 		self.shadowMenu = self.addMenu( '''Draw Shadows''', 'toggleShadows' )

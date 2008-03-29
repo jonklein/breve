@@ -377,10 +377,15 @@ class Real( breve.Object ):
 		'''Deprecated.'''
 
 		print '''set-lightmap is deprecated: use set-lightmap-image instead'''
-		breve.breveInternalFunctionFinder.realSetLightmap( self, self.realWorldPointer, textureNumber )
+		if ( textureNumber == 2 ):
+			self.setLightmapImage( breve.createInstances( breve.Image, 1 ).load( 'images/lightmap.png' ) )
+
+		if ( textureNumber == 3 ):
+			self.setLightmapImage( breve.createInstances( breve.Image, 1 ).load( 'images/dirtylightmap.png' ) )
+
 
 	def setLightmapImage( self, lightmapImage ):
-		'''Sets the object to be displayed using a "lightmap".  A  lightmap uses the texture specified and treats it like a light source.  It's hard to explain.  Give it a try for yourself. <p> set-lightmap only has an effect on sphere shapes.  Other  shapes can be textured, but only spheres can be made into  lightmaps.'''
+		'''Sets the object to be displayed using a "lightmap".  A  lightmap uses the texture specified for an "additive blending"	 effect which yields a lighting effect. <p> set-lightmap only has an effect on sphere shapes.  Other  shapes can be textured, but only spheres can be made into  lightmaps.'''
 
 		if self.archiveLightmapImage:
 			self.removeDependency( self.archiveLightmapImage )

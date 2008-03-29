@@ -37,7 +37,10 @@ extern "C" {
 void brDataCollect(brData *);
 
 char *brDataHexEncode( brData * );
+char *brHexEncode( const char *inStr, int inLength );
+
 brData *brDataHexDecode( const char * );
+
 #ifdef __cplusplus
 }
 #endif

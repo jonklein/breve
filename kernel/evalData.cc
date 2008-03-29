@@ -58,10 +58,14 @@ char *brDataHexEncode( brData *d ) {
 	if ( !d || d->length < 1 )
 		return slStrdup( "" );
 
-	char *string = ( char * )slMalloc(( d->length * 2 ) + 1 );
+	return brHexEncode( d -> data, d -> length );
+}
 
-	for ( int n = 0; n < d->length; ++n )
-		snprintf( &string[n * 2], 3, "%02x", (( unsigned char * )d->data )[n] );
+char *brHexEncode( const char *inStr, int inLength ) {
+	char *string = ( char * )slMalloc( ( inLength * 2 ) + 1 );
+
+	for ( int n = 0; n < inLength; ++n )
+		snprintf( &string[n * 2], 3, "%02x", ( (unsigned char *)inStr)[ n ] );
 
 	return string;
 }
