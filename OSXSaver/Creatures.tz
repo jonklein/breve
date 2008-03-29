@@ -23,6 +23,7 @@
 @use Stationary.
 @use MultiBody.
 @use GeneticAlgorithm.
+@use URL.
 
 Controller VirtualCreatures.
 
@@ -47,8 +48,6 @@ PhysicalControl : VirtualCreatures {
 	+ to init:
 		startTexture = (new Image load from "images/star.png").
 
-		self set-iteration-step to 0.08.
-
 		flag = new Mobile.
 		flag disable-physics.
 		flag set-bitmap-image to startTexture.
@@ -70,18 +69,17 @@ PhysicalControl : VirtualCreatures {
 
 		parser = new MorphologyParser.
 
-		ga = (controller dearchive-xml file "breveCreatures273.xml").	
+		ga = (controller dearchive-xml file "breveCreatures275.xml").	
 
 		if !ga: {
 			print "Making new GA".
 			ga = new SimsGA.
 
-			ga set-fitness-test-duration to 30.
+			ga set-fitness-test-duration to 45.
 			ga set-individual-class to "SimsGAIndividual".
 			ga set-population-size to 25.
 			ga set-crossover-percent to 30.
 			ga set-mutation-percent to 30.
-			ga set-spatial-radius to 4.
 		}
 
 		self add-dependency on ga.
@@ -116,26 +114,30 @@ PhysicalControl : VirtualCreatures {
 
 		self point-camera at t.
 
-		dist = | t - startlocation |.
+		dist = ( self get-current-critter-fitness ).
 
 		if running: 
 			self set-display-text to "Distance traveled: $dist" at-x -.95 at-y -.95.
 
-		self pivot-camera x 0 y 0.0001.
+		self pivot-camera x 0.0 y 0.0002.
 
 		super iterate.
 
 	+ to get-current-critter-fitness:
-		t (vector).
 		link (object).
+		mindist (float).
 
+		if | all Links | == 0:
+			return 0.0.
+                
+		mindist = 10000.
+                
 		foreach link in all Links: {
-			t += (link get-location).
+			if | ( link get-location ) - link{ "_startLocation" } | < mindist:
+				mindist = | ( link get-location ) - link{ "_startLocation" } |.
 		}
-
-		if |all Links|: t /= |all Links|.
-
-		return | t - startlocation | .
+                
+		return mindist.
 
 	+ to setup-test with i (object):
 		l (object).
@@ -175,6 +177,7 @@ PhysicalControl : VirtualCreatures {
 		startlocation = (0, 0, 0).
 
 		foreach link in all Links: {
+			link set-start-location.
 			startlocation += (link get-location).
 		}
 
@@ -183,13 +186,19 @@ PhysicalControl : VirtualCreatures {
 }
 
 GeneticAlgorithm : SimsGA {
+	+ variables:
+		h (hash).
+
+	+ to init:
+		h{ 10 } = ( 1, 2, 3 ).
+		
 	+ to start-fitness-test of o (object):
 		newOffset (vector).
 
 		newOffset = random[(40, 2, 40)] + (-20, .15, -20).
 
 		if |newOffset| < 20: newOffset = 20 * newOffset/|newOffset|.
-		controller pan-camera-offset by newOffset steps 200.
+		controller pan-camera-offset by newOffset steps 600.
 
 		controller setup-test with o.
 
@@ -198,7 +207,7 @@ GeneticAlgorithm : SimsGA {
 		if isnan((o get-fitness)): o set-fitness to 0.
 		print "fitness of $o: ", (o get-fitness).
 
-		self archive-as-xml file "breveCreatures273.xml".
+		self archive-as-xml file "breveCreatures275.xml".
 }
 
 GeneticAlgorithmIndividual : SimsGAIndividual {
@@ -222,7 +231,7 @@ GeneticAlgorithmIndividual : SimsGAIndividual {
 		genome mutate.
 
 	+ to randomize:
-		genome randomize with-max-nodes 5 with-node-parameters 10 with-connection-parameters 10.
+		genome randomize with-max-nodes 4 with-node-parameters 12 with-connection-parameters 12.
 
 	+ to get-genome:
 		return genome.
@@ -231,9 +240,12 @@ GeneticAlgorithmIndividual : SimsGAIndividual {
 		free genome.
 }
 
-@define MAXDEPTH 3.
+@define MAXDEPTH 6.
+@define MAXLINKS 20.
 
 Object : MorphologyParser {
+	+ variables:
+		_linkCount (int).
 
 	#
 	# An object used to create morphologies from our DirectedGraph genomes
@@ -241,6 +253,8 @@ Object : MorphologyParser {
 
 	+ to parse-top-level from root (object):
 		rootNode (object).
+
+		_linkCount = 0.
 		
 		rootNode = (self create-node from root with-level 1).
 
@@ -259,11 +273,11 @@ Object : MorphologyParser {
 
 		nodeParams = (root get-parameters).
 		
-		size = 4 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .5, .5, .5 ).
+		size = 3.0 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .5, .5, .5 ).
 
 		# Don't recurse more than 3 levels deep, and don't recurse if the node-parameter doesn't tell us to.
 
-		if n > MAXDEPTH || ( n > 1 && nodeParams{ 9 } < 0.0 ): return 0.
+		if _linkCount > MAXLINKS || n > MAXDEPTH || ( n > 1 && nodeParams{ 9 } < 0.0 ): return 0.
 
 		#
 		# This code has been refactored for 2.5 to create the parent link before
@@ -307,13 +321,13 @@ Object : MorphologyParser {
 					to-child childNode 
 					parent rootNode.
 
-				joint set-phaseshift to 3.14 * connectionParams{7}.
-				joint set-frequency to 1 + connectionParams{8}.
+				joint set-phaseshift to n * 3.14 * connectionParams{7}.
+				joint set-frequency to .1 + connectionParams{8}.
 
-				jointRange = 0.7 + 2 * | connectionParams{ 9 } |.
+				jointRange = 0.5 + 1 * | connectionParams{ 9 } |.
 
-				joint set-double-spring with-strength 1000 with-max jointRange with-min -jointRange.
-				joint set-strength-limit to 4000.
+				joint set-double-spring with-max jointRange with-min -jointRange with-strength 1.
+				joint set-strength-limit to 1000.
 
 				self parse from (child get-target) with-level n + 1 with-link childNode.
 				# self parse from (child get-target) with-level n + 1 with-link childNode flip 1.
@@ -326,25 +340,42 @@ Object : MorphologyParser {
 		rootNode (object).
 		nodeParams (list).
 		size (vector).
+		scaleFactor (float).
+
+		_linkCount += 1.
   
-		if n > MAXDEPTH: 
+		if n > MAXDEPTH || _linkCount > MAXLINKS: 
 			return 0.
   
-		rootNode = new Link.	
-		rootNode move to (0, 15, 0).
-		rootNode set-color to (5 - n) / 4.0 * (1, 1, 1).
-
 		nodeParams = (root get-parameters).
+
+		scaleFactor = ( ( MAXDEPTH + 1 ) - ( ( .5 + .45 * |nodeParams{10}| ) * n ) ) / ( MAXDEPTH + 1 ).
 		
+		rootNode = new CreaturesLink.	
+		rootNode move to (0, 15, 0).
+		rootNode set-color to scaleFactor * (1, 1, 1).
+
 		size = 6 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .3, .3, .3 ).
 
 		rootNode set-color to (|nodeParams{3}|, |nodeParams{4}|, |nodeParams{5}|).
 
-		rootNode set-shape to (new Cube init-with size ( (4 - n) / 3.0 * size) ).
+		rootNode set-shape to (new Cube init-with size ( scaleFactor * size) ).
 
 		rootNode set-texture-image to ( controller get-block-texture ).
 
 		return rootNode.
+}
+
+
+Link : CreaturesLink (aka CreaturesLinks) {
+	+ variables: 
+		_startLocation (vector).
+
+	+ to init:
+		self set-mu to 3.0.
+                
+	+ to set-start-location:
+		_startLocation = ( self get-location ).
 }
 
 RevoluteJoint : SineJoint (aka SineJoints) {

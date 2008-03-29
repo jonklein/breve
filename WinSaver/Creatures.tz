@@ -1,0 +1,407 @@
+#
+# Creatures.tz
+# jon klein <jk@spiderland.org>
+# 
+# A simulation demonstrating the use of a genetic algorithm to evolve the 
+# morphology and behavior of simulated creatures.  This is a simplified 
+# version of the virtual creatures described in Sims (1994) "Evolving 3D 
+# Morphology and Behavior by Competition". 
+# 
+# As in the Sims' original work, the creature morphology is specified using 
+# an evolvable directed graph genome (functionality provided by the breve class
+# DirectedGraph).  Unlike Sims' creatures, however, the creatures do not use 
+# neural network control.  Instead, they use simple sine-based controller
+# equations with evolved parameters embedded in the directed graphs.
+#
+# As with the Walker simulations, this simulation may need to run for several
+# hours before locomotion behaviors can be observed.
+# 
+
+@use PhysicalControl.  
+@use DirectedGraph.
+@use Link.
+@use Stationary.
+@use MultiBody.
+@use GeneticAlgorithm.
+@use URL.
+
+Controller VirtualCreatures.
+
+PhysicalControl : VirtualCreatures {
+	+ variables:
+		running (int).
+		body (object).
+		flag (object).
+
+		startlocation (vector).
+
+		parser (object).
+
+		ga (object).
+
+		blockTexture, startTexture, floor (object).
+
+	+ to get-block-texture:
+		return blockTexture.
+
+
+	+ to init:
+		startTexture = (new Image load from "images/star.png").
+
+		flag = new Mobile.
+		flag disable-physics.
+		flag set-bitmap-image to startTexture.
+		flag set-color to (1, 1, 0).
+		flag set-label to "Start".
+		flag disable-shadows.
+
+		self set-mountain-skybox.
+
+		blockTexture = ( new Image load from "images/noise.png" ).
+
+		floor = new Floor.
+		floor set-texture-image to ( new Image load from "images/ground.png" ).
+		floor set-color to ( .8, .8, .8 ).
+
+		self enable-fast-physics.
+		self set-fast-physics-iterations to 30.
+		self enable-shadow-volumes.
+
+		parser = new MorphologyParser.
+
+		ga = (controller dearchive-xml file "breveCreatures275.xml").	
+
+		if !ga: {
+			print "Making new GA".
+			ga = new SimsGA.
+
+			ga set-fitness-test-duration to 45.
+			ga set-individual-class to "SimsGAIndividual".
+			ga set-population-size to 25.
+			ga set-crossover-percent to 30.
+			ga set-mutation-percent to 30.
+		}
+
+		self add-dependency on ga.
+
+		self update-text.
+
+	+ to update-text:
+		gen, total, index (int).
+		bestDistance (float).
+
+		if ga: {
+			gen = (ga get-generation) + 1.
+			bestDistance = (ga get-best-fitness).
+
+			total = (ga get-population-size).
+			index = (ga get-current-individual-index) + 1.
+		}
+
+		self set-display-text to "Generation: $gen ($index/$total)"at-x -.95 at-y -.75 number 1.
+		self set-display-text to "Best distance: $bestDistance" at-x -.95 at-y -.85 number 2.
+
+	+ to iterate:
+		t (vector).
+		dist (float).
+		link (object).
+
+		foreach link in all Links: {
+			t += (link get-location).
+		}
+
+		if |all Links|: t /= |all Links|.
+
+		self point-camera at t.
+
+		dist = ( self get-current-critter-fitness ).
+
+		if running: 
+			self set-display-text to "Distance traveled: $dist" at-x -.95 at-y -.95.
+
+		self pivot-camera x 0.0 y 0.0002.
+
+		super iterate.
+
+	+ to get-current-critter-fitness:
+		link (object).
+		mindist (float).
+
+		if | all Links | == 0:
+			return 0.0.
+                
+		mindist = 10000.
+                
+		foreach link in all Links: {
+			if | ( link get-location ) - link{ "_startLocation" } | < mindist:
+				mindist = | ( link get-location ) - link{ "_startLocation" } |.
+		}
+                
+		return mindist.
+
+	+ to setup-test with i (object):
+		l (object).
+		low (vector).
+		lowest (double).
+
+		foreach l in (all Links): free (l get-shape).
+
+		free all Links.
+		free all Joints.
+
+		if body: 
+			free body.
+
+		body = new MultiBody.
+		body set-root to (parser parse-top-level from ((i get-genome) get-root)).
+		body disable-self-collisions.
+
+		self add-dependency on body.
+
+		self schedule method-call "check-penetration" at-time (self get-time) + 8.0.
+		self set-display-text to "Preparing to test $i..." at-x -.95 at-y -.95.
+
+		self update-text.
+
+		running = 0.
+
+	+ to check-penetration:
+		link (object).
+
+		running = 1.
+		
+		if (body check-self-penetration): free all Links.
+
+		all SineJoints activate.
+
+		startlocation = (0, 0, 0).
+
+		foreach link in all Links: {
+			link set-start-location.
+			startlocation += (link get-location).
+		}
+
+		if |all Links|: startlocation /= |all Links|.
+		flag move to startlocation - (0, startlocation::y - 2, 0).
+}
+
+GeneticAlgorithm : SimsGA {
+	+ variables:
+		h (hash).
+
+	+ to init:
+		h{ 10 } = ( 1, 2, 3 ).
+		
+	+ to start-fitness-test of o (object):
+		newOffset (vector).
+
+		newOffset = random[(40, 2, 40)] + (-20, .15, -20).
+
+		if |newOffset| < 20: newOffset = 20 * newOffset/|newOffset|.
+		controller pan-camera-offset by newOffset steps 600.
+
+		controller setup-test with o.
+
+	+ to end-fitness-test of o (object):
+		o set-fitness to (controller get-current-critter-fitness).
+		if isnan((o get-fitness)): o set-fitness to 0.
+		print "fitness of $o: ", (o get-fitness).
+
+		self archive-as-xml file "breveCreatures275.xml".
+}
+
+GeneticAlgorithmIndividual : SimsGAIndividual {
+	+ variables:
+		genome (object).
+		h (hash).
+
+	+ to init:
+		genome = new GADirectedGraph.
+		self randomize.
+
+		self add-dependency on genome.
+
+	+ to copy from other (object):
+		genome copy from (other get-genome).
+
+	+ to crossover from-parent1 p1 (object) from-parent2 p2 (object):
+		genome crossover from-parent1 (p1 get-genome) from-parent2 (p2 get-genome).
+
+	+ to mutate:
+		genome mutate.
+
+	+ to randomize:
+		genome randomize with-max-nodes 4 with-node-parameters 12 with-connection-parameters 12.
+
+	+ to get-genome:
+		return genome.
+
+	+ to destroy:
+		free genome.
+}
+
+@define MAXDEPTH 6.
+@define MAXLINKS 20.
+
+Object : MorphologyParser {
+	+ variables:
+		_linkCount (int).
+
+	#
+	# An object used to create morphologies from our DirectedGraph genomes
+	# 
+
+	+ to parse-top-level from root (object):
+		rootNode (object).
+
+		_linkCount = 0.
+		
+		rootNode = (self create-node from root with-level 1).
+
+		(self parse from root with-level 1 with-link rootNode).
+		# (self parse from root with-level 1 with-link rootNode flip 1).
+
+		return rootNode.
+
+	+ to parse from root (object) with-level n (int) with-link rootNode (object) flip f = 0 (int):
+		connectionParams, nodeParams, connections (list).
+		child, childNode, joint (object).
+		cpoint, ppoint, point, size, norm (vector).
+		jointRange (float).
+
+		connections = (root get-connections).
+
+		nodeParams = (root get-parameters).
+		
+		size = 3.0 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .5, .5, .5 ).
+
+		# Don't recurse more than 3 levels deep, and don't recurse if the node-parameter doesn't tell us to.
+
+		if _linkCount > MAXLINKS || n > MAXDEPTH || ( n > 1 && nodeParams{ 9 } < 0.0 ): return 0.
+
+		#
+		# This code has been refactored for 2.5 to create the parent link before
+		# parsing the child.  This is because child links will always be positioned
+		# relative to the parent, but not vice-versa.  If we start from the "top-down",
+		# our creatures have limbs more correctly placed upon startup and thus jump
+		# and spin less.
+		#
+
+		foreach child in connections: {
+			childNode = (self create-node from (child get-target) with-level n + 1).
+			
+			if childNode: {
+				connectionParams = (child get-parameters).
+
+				point = (connectionParams{0}, connectionParams{1}, connectionParams{2}).
+
+				if f:
+					point::x *= -1.
+
+				point::x *= size::x.
+				point::y *= size::y.
+				point::z *= size::z.
+		 
+				cpoint = (childNode get-shape) get-point-on-shape on-vector point.
+				ppoint = (rootNode get-shape) get-point-on-shape on-vector -point.
+
+				norm = (connectionParams{4}, connectionParams{5}, connectionParams{6}).
+				norm /= | norm |.
+
+				if f:
+					norm::x *= -1.
+
+				joint = new SineJoint.
+
+				# joint set-relative-rotation around-axis norm by connectionParams{3}.
+
+				joint link with-normal norm 
+					with-parent-point ppoint
+					with-child-point cpoint
+					to-child childNode 
+					parent rootNode.
+
+				joint set-phaseshift to n * 3.14 * connectionParams{7}.
+				joint set-frequency to .1 + connectionParams{8}.
+
+				jointRange = 0.5 + 1 * | connectionParams{ 9 } |.
+
+				joint set-double-spring with-max jointRange with-min -jointRange with-strength 1.
+				joint set-strength-limit to 1000.
+
+				self parse from (child get-target) with-level n + 1 with-link childNode.
+				# self parse from (child get-target) with-level n + 1 with-link childNode flip 1.
+			}
+		}
+
+		return rootNode.
+		
+	+ to create-node from root (object) with-level n (int):
+		rootNode (object).
+		nodeParams (list).
+		size (vector).
+		scaleFactor (float).
+
+		_linkCount += 1.
+  
+		if n > MAXDEPTH || _linkCount > MAXLINKS: 
+			return 0.
+  
+		nodeParams = (root get-parameters).
+
+		scaleFactor = ( ( MAXDEPTH + 1 ) - ( ( .5 + .45 * |nodeParams{10}| ) * n ) ) / ( MAXDEPTH + 1 ).
+		
+		rootNode = new CreaturesLink.	
+		rootNode move to (0, 15, 0).
+		rootNode set-color to scaleFactor * (1, 1, 1).
+
+		size = 6 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .3, .3, .3 ).
+
+		rootNode set-color to (|nodeParams{3}|, |nodeParams{4}|, |nodeParams{5}|).
+
+		rootNode set-shape to (new Cube init-with size ( scaleFactor * size) ).
+
+		rootNode set-texture-image to ( controller get-block-texture ).
+
+		return rootNode.
+}
+
+
+Link : CreaturesLink (aka CreaturesLinks) {
+	+ variables: 
+		_startLocation (vector).
+
+	+ to init:
+		self set-mu to 3.0.
+                
+	+ to set-start-location:
+		_startLocation = ( self get-location ).
+}
+
+RevoluteJoint : SineJoint (aka SineJoints) {
+	% A RevoluteJoint that moves according to a sine function.
+
+	+ variables:
+		phaseshift (double).
+		frequency (double).
+		active (int).
+
+	+ to init:
+		phaseshift = 0.
+		frequency = 2.0.
+
+	+ to set-phaseshift to p (double):
+		phaseshift = p.
+
+	+ to set-frequency to f (double):
+		frequency = f.
+
+	+ to iterate:
+		if active: {
+			self set-joint-velocity to sin( (controller get-time) * frequency + phaseshift ).
+		}
+
+	+ to activate:
+		active = 1.
+}
+

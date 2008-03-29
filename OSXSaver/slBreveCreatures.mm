@@ -61,11 +61,11 @@
 }
 
 - (char*)getSimName {
-    return "WalkerSaver.tz";
+    return "Creatures.tz";
 }   
 
 - (char*)getDefaultsName {
-	return "breveWalker";
+	return "breveCreatures";
 }
 
 
