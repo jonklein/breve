@@ -1191,7 +1191,12 @@ RTC_INLINE int stEvalMethodCall( stMethodExp *mexp, stRunInstance *i, brEval *t 
 		for ( li = l->_vector.begin(); li != l->_vector.end(); li++ ) {
 			brEval *listeval = &(*li);
 
-			if ( !BRINSTANCE( listeval ) || BRINSTANCE( listeval )->status != AS_ACTIVE ) {
+			if ( listeval -> type() != AT_INSTANCE ) {
+				stEvalError( i->instance, EE_NULL_INSTANCE, "method \"%s\" called with list containing non-instance value", mexp->methodName.c_str() );
+				return EC_ERROR;
+			}
+
+			if( !BRINSTANCE( listeval ) || BRINSTANCE( listeval )->status != AS_ACTIVE ) {
 				stEvalError( i->instance, EE_NULL_INSTANCE, "method \"%s\" called with uninitialized object", mexp->methodName.c_str() );
 				return EC_ERROR;
 			}
@@ -1211,7 +1216,7 @@ RTC_INLINE int stEvalMethodCall( stMethodExp *mexp, stRunInstance *i, brEval *t 
 		return r;
 	}
 
-	stEvalError( i->instance, EE_TYPE, "Method \"%s\" called for an expression that is neither an object nor a list", mexp->methodName.c_str() );
+	stEvalError( i->instance, EE_TYPE, "method \"%s\" called for an expression that is neither an object nor a list", mexp->methodName.c_str() );
 
 	return EC_ERROR;
 }
