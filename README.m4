@@ -28,8 +28,8 @@ documentation in the "docs" directory.
                              -= GETTING STARTED =- 
 
 NOTE FOR WINDOWS USERS: You'll need to download the GLUT library in order
-to run breve.  One source for this is: 
-http://www.xmission.com/~nate/glut.html
+to run breve.  One source for this is http://www.xmission.com/~nate/glut.html .
+The GLUT DLL may be placed in the same directory with the breve executable.
 
 The best way to get started with breve is to run some of the included demo 
 simulations, which are found in the "demos" directory.  More complete 
@@ -37,7 +37,7 @@ information on programming and running simulations with breve is available
 in the documentation, which is found in the "docs" directory.
 
 These are the directions to get started quickly with the command-line 
-version of breve 2.4.
+version of breve _VERSION_.
 
 1) set the environment variable BREVE_CLASS_PATH to the full path of the
    included "lib/classes" directory.  For example, using the bash shell
