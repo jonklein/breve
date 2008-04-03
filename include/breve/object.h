@@ -217,8 +217,6 @@ int stIsSubclassOf(stObject *a, stObject *);
 void stAddToInstanceLists(stInstance *);
 void stRemoveFromInstanceLists(stInstance *);
 
-brInstance *stInstanceCreateAndRegister(stSteveData *d, brEngine *, brObject *);
-
 void stObjectFreeAllInstances(stObject *);
 
 #endif /* _OBJECT_H */

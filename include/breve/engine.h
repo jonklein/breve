@@ -52,11 +52,13 @@ struct brErrorInfo {
 	}
 
 	~brErrorInfo() {
-		clear();
+		if( file )
+			slFree( file );
 	}
 
 	void clear() {
-		if( file ) slFree( file );
+		if( file ) 
+			slFree( file );
 
 		type = 0;
 		line = 0;
