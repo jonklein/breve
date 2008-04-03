@@ -92,6 +92,8 @@ brEvalListHead *brEvalHashKeys( brEvalHash *h ) {
 		l = l->next;
 	}
 
+	slListFree( l );
+
 	return el;
 }
 
