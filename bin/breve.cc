@@ -346,6 +346,9 @@ void brQuit( brEngine *e ) {
 
 	brEngineFree( gEngine );
 
+	if( gOffscreenBuffer )
+		slFree( gOffscreenBuffer );
+
 	exit( 0 );
 }
 
