@@ -230,15 +230,17 @@ endif
 	mkdir $(IDE_FOLDER)/plugins
 	cp -R plugins/samples $(IDE_FOLDER)/plugins
 	rm -f $(IDE_FOLDER)/plugins/samples/Makefile.in
+	cp plugins/slBrevePluginAPI.h plugins/README.txt $(IDE_FOLDER)/plugins
+	cp Changes.html GPL.txt README.txt $(IDE_FOLDER)
 ifeq ($(PLATFORM),windows)
 	cp lib/brevePlugin.lib $(IDE_FOLDER)/plugins
 	cp lib/breveIDEPlugin.lib $(IDE_FOLDER)/plugins
 	cp bin/glut32.dll $(IDE_FOLDER)
 	cp bin/python23.dll $(IDE_FOLDER)
 	cp bin/mingwm10.dll $(IDE_FOLDER)
+	unix2dos $(IDE_FOLDER)/README.txt
+	unix2dos $(IDE_FOLDER)/GPL.txt
 endif
-	cp plugins/slBrevePluginAPI.h plugins/README.txt $(IDE_FOLDER)/plugins
-	cp Changes.html GPL.txt README.txt $(IDE_FOLDER)
 	find $(IDE_FOLDER) -name CVS -prune -exec rm -rf {} \;
 	find $(IDE_FOLDER) -name '.cvsignore' -prune -exec rm -rf {} \;
 	find $(IDE_FOLDER) -name '.svn' -prune -exec rm -rf {} \;
