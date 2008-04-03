@@ -542,7 +542,7 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 
 		PyObject *pythonLanguageType = PyObject_GetAttrString( moduleObject, "breveObjectType" );
 
-		breveObject = brObjectFind( engine, name );
+		breveObject = brObjectFindWithPreferredType( engine, name, PYTHON_TYPE_SIGNATURE );
 
 		if( !breveObject ) {
 			// The engine will hold a copy of typeObject, so we INCREF
@@ -557,6 +557,11 @@ PyObject *brPythonAddInstance( PyObject *inSelf, PyObject *inArgs ) {
 		Py_DECREF( pythonLanguageType );
 
 	} 
+
+	if( !breveObject || breveObject -> type -> _typeSignature != PYTHON_TYPE_SIGNATURE ) {
+		PyErr_SetString( PyExc_RuntimeError, "Could not add Python instance to breve engine" );
+		return NULL;
+	}
 
 	// Now the engine has a copy of object -- increment the reference count
 	
