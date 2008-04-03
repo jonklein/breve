@@ -3329,11 +3329,16 @@ RTC_INLINE int stEvalNewInstance( stInstanceExp *ie, stRunInstance *i, brEval *t
 	brEval listItem, count;
 	int n;
 
-	object = brObjectFind( i->instance->type->engine, ie->name.c_str() );
+	object = brObjectFindWithPreferredType( i->instance->type->engine, ie->name.c_str(), STEVE_TYPE_SIGNATURE );
 
 	if ( !object ) {
 		stEvalError( i->instance, EE_UNKNOWN_OBJECT, "unknown object type \"%s\" during new instance evaluation", ie->name.c_str() );
 		return EC_ERROR;
+	}
+
+	if( object -> type -> _typeSignature != STEVE_TYPE_SIGNATURE ) {
+		// Warn the user in case this happens unexpectedly.
+		slMessage( DEBUG_ALL, "Could not locate steve object \"%s\", creating bridge instance to other frontend language\n", ie->name.c_str() );
 	}
 
 	stExpEval3( ie->count, i, &count );
@@ -3345,7 +3350,7 @@ RTC_INLINE int stEvalNewInstance( stInstanceExp *ie, stRunInstance *i, brEval *t
 
 	if ( BRINT( &count ) == 1 ) {
 
-		t->set( stInstanceCreateAndRegister( i->instance->type->steveData, i->instance->type->engine, object ) );
+		t->set( brObjectInstantiate( i->instance->type->engine, object, NULL, 0 ) );
 
 		if ( BRINSTANCE( t ) == NULL ) {
 			stEvalError( i->instance, EE_UNKNOWN_OBJECT, "error creating instance of class %s", ie->name.c_str() );
@@ -3361,7 +3366,7 @@ RTC_INLINE int stEvalNewInstance( stInstanceExp *ie, stRunInstance *i, brEval *t
 		list = new brEvalListHead();
 
 		for ( n = 0;n < BRINT( &count );n++ ) {
-			brInstance *instance = stInstanceCreateAndRegister( i->instance->type->steveData, i->instance->type->engine, object );
+			brInstance *instance = brObjectInstantiate( i->instance->type->engine, object, NULL, 0 );
 			listItem.set( instance );
 
 			if ( instance == NULL ) {

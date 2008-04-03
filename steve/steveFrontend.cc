@@ -229,7 +229,13 @@ void stSteveCleanup( void *inDataPtr ) {
 
 	if ( d->controllerName ) slFree( d->controllerName );
 
-	// brNamespaceFreeWithFunction(d->defines, (void(*)(void*))stFreeDefine );
+	std::map< std::string, brEval* >::iterator di;
+
+	for ( di = d->defines.begin(); di != d->defines.end(); di++ ) {
+		delete di -> second;
+		di -> second = NULL;
+	}
+		
 
 	delete d;
 }

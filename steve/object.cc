@@ -75,15 +75,6 @@ stObject *stObjectNew( brEngine *engine, stSteveData *sdata, char *name, char *a
 	return o;
 }
 
-/** 
- * Instantiates a steve object and adds it to the breve engine.
- * This method also fills in the "breveInstance" pointer in the steve object.
- */
-
-brInstance *stInstanceCreateAndRegister( stSteveData *sdata, brEngine *e, brObject *object ) {
-	return brObjectInstantiate( e, object, NULL, 0 );
-}
-
 /**
  * Instantiate a steve object, but do NOT call the init methods.
  * This creates an sets up an stInstance, but does not call the init
