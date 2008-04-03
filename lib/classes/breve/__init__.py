@@ -420,7 +420,6 @@ class bridgeObject( object ):
 	"An object representing a bridge to an object in another breve language frontend"
 
 	def __init__( self ): 
-		self.breveInstance = addInstance( self.__class__, self )
 		self.breveModule = breveInternal
 
 	def __getattr__( self, method ):
