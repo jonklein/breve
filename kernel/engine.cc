@@ -312,6 +312,11 @@ brEngine::~brEngine() {
 		if( t )
 			delete t;
 	}
+
+	for( unsigned int e = 0; e < events.size(); e++ ) {
+		delete events[ e ];
+		events[ e ] = NULL;
+	}
 }
 
 /**
