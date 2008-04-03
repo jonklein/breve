@@ -56,7 +56,7 @@ int slTexture2D::loadImage( std::string &inFile, bool inRepeat ) {
 
 	loadPixels( pixels, width, height, inRepeat );
 
-	delete[] pixels;
+	slFree( pixels );
 
 	if( !_textureID )
 		return -1;
