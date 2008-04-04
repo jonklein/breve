@@ -114,6 +114,7 @@ Optional:
   libpush
   libenet
   libqgame++
+  lib3ds
 
                     --- EXTERNAL LIBRARIES: DETAILS ---
 
@@ -234,6 +235,11 @@ Optional:
   http://hampshire.edu/lspector/qgame++
 
   Very optional.  A library for simulating quantum computing.
+  
++ [optional] lib3ds, lib3ds , for loading 3d model files
+  http://lib3ds.sourceforge.net/
+
+  A free and open source library that support loading 3DS files (aka 3d loading 3d models). (GNU GPL)
 
                                 -- License --
 
