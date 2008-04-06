@@ -45,6 +45,7 @@ struct brObjectType {
 		userData			= NULL;
 		encodeToString			= NULL;
 		decodeFromString		= NULL;
+		finishDearchive			= NULL;
 		_typeSignature 			= 0;
 	}
 
@@ -116,12 +117,17 @@ struct brObjectType {
 	/**
 	 * A function to encode instances of this language to a string
 	 */
-	char*			(*encodeToString)( brEngine *inEngine, void *inInstanceData );
+	char*			(*encodeToString)( brEngine *inEngine, void *inInstanceData, brEvalHash *inInstanceToIndexMapping );
 
 	/**
-	 * A function to encode instances of this language to a string
+	 * A function to decode instances of this language from a string.
 	 */
-	brInstance*		(*decodeFromString)( brEngine *inEngine, char *inData );
+	brInstance*		(*decodeFromString)( brEngine *inEngine, const char *inData );
+
+	/**
+	 * A function to finish dearchiving when all objects have been created.
+	 */
+	int			(*finishDearchive)( brEngine *inEngine, brEvalHash *inIndexToInstanceMapping );
 
 	/**
 	 * A user-data callback pointer.
@@ -306,8 +312,9 @@ DLLEXPORT void brEngineAddObjectAlias(brEngine *, char *, brObject *);
 
 DLLEXPORT brInstance *brObjectInstantiate(brEngine *, brObject *, const brEval **, int);
 
-DLLEXPORT char *brInstanceEncodeToString( brEngine *inEngine, brInstance *inInstance );
+DLLEXPORT char *brInstanceEncodeToString( brEngine *inEngine, brInstance *inInstance, brEvalHash *inInstanceToIndexMapping );
 DLLEXPORT brInstance *brInstanceDecodeFromString( brEngine *inEngine, int inTypeSignature, const char *inData );
+DLLEXPORT int brFinishDearchive( brEngine *inEngine, int inTypeSignature, brEvalHash *inIndexToInstanceMapping );
 
 DLLEXPORT brInstance *brEngineAddInstance(brEngine *, brObject *, void *);
 DLLEXPORT brInstance *brEngineAddBreveInstance(brEngine *, brObject *, brInstance * );

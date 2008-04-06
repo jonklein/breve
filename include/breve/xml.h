@@ -31,8 +31,8 @@ extern "C" {
  */
 
 struct brXMLArchiveRecord {
-	std::map< brInstance*, int > 			_indexMap;
 	std::set< brInstance*, brInstanceCompare > 	_written;
+	brEvalHash					_instanceToIndexMap;
 };
 
 /**
@@ -48,8 +48,7 @@ struct brXMLParserState {
 	int 				error;
 	brEngine*			engine;
 
-	std::map< int, brInstance* > 	_indexToInstanceMap;
-	std::vector< brInstance* > 	_dearchiveOrder;
+	brEvalHash			_indexToInstanceMap;
 };
 
 struct brXMLDOMElement {
@@ -71,7 +70,7 @@ struct brXMLDOMElement {
 	std::string					toXMLString( int inDepth = 0 );
 };
 
-int brXMLAssignIndices( brEngine *, std::map< brInstance*, int>& );
+int brXMLAssignIndices( brEngine *, std::map< brInstance*, int>&, brEvalHash *inMap );
 
 int brXMLWriteObjectToFile( brInstance *, char *, int );
 int brXMLWriteObject( brXMLArchiveRecord *, FILE *, brInstance *, int, int );
@@ -80,8 +79,7 @@ int brXMLWriteObjectToStream( brInstance *, FILE *, int );
 int brXMLWriteSimulationToFile(char *, brEngine *);
 int brXMLWriteSimulationToStream(FILE *, brEngine *);
 
-int brXMLRunDearchiveMethods(brXMLParserState *);
-
+int brXMLRunDearchiveMethods( brXMLDOMElement *inRoot, brXMLParserState *inState );
 int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, brXMLParserState *inState );
 
 int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceElement, brInstance *inInstance );

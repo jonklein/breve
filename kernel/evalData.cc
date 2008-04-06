@@ -58,7 +58,7 @@ char *brDataHexEncode( brData *d ) {
 	if ( !d || d->length < 1 )
 		return slStrdup( "" );
 
-	return brHexEncode( d -> data, d -> length );
+	return brHexEncode( (char*)d -> data, d -> length );
 }
 
 char *brHexEncode( const char *inStr, int inLength ) {

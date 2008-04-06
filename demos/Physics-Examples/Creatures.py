@@ -76,6 +76,7 @@ class VirtualCreatures( breve.PhysicalControl ):
 		self.enableShadowVolumes()
 		self.parser = breve.createInstances( breve.MorphologyParser, 1 )
 		self.ga = self.controller.dearchiveXml( 'breveCreatures.xml' )
+
 		if ( not self.ga ):
 			print '''Making new GA'''
 			self.ga = breve.createInstances( breve.SimsGA, 1 )
@@ -155,6 +156,9 @@ class SimsGA( breve.GeneticAlgorithm ):
 		breve.GeneticAlgorithm.__init__( self )
 		self.h = breve.hash()
 		SimsGA.init( self )
+
+	def dearchive( self ):
+		print self.populations
 
 	def endFitnessTest( self, o ):
 		o.setFitness( self.controller.getCurrentCritterFitness() )

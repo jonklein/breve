@@ -19,19 +19,109 @@ class breveStdoutHandler:
 sys.stderr = breveStderrHandler()
 sys.stdout = breveStdoutHandler()
 
+
+#
+# Methods to implement breve engine archiving and dearchiving
+#
+
+class archiveObjectProxy( object ):
+	def __init__( self, inObj ):
+		try: 
+			self.index = breve._archiveIndexMapping[ inObj ]
+		except Exception, e:
+			self.index = -1
+
+		object.__init__( self )
+
+def encodeToString( inObject, inMapping ):
+	raise Exception( "Python instance archiving not supported" )
+
+
+	breve._archiveIndexMapping = inMapping
+	breve._currentArchive = inObject
+ 	result = cPickle.dumps( inObject )
+	breve._archiveIndexMapping = None
+	breve._currentArchive = None
+
+	return result
+
+def decodeFromString( inString ):
+	raise Exception( "Python instance dearchiving not supported" )
+
+	obj = cPickle.loads( inString )
+
+	breveObjectInit( obj )
+
+	return obj
+
+import itertools
+
+def traversePickleObject( inObj, inMapping, inFunction, seen = [] ):
+	# 
+	# Traverses an entire object including dicts, lists and sub-objects,
+	# 
+
+	if inObj in seen:
+		return
+
+	if hasattr( inObj, 'breveInstance' ):
+		return
+
+	seen.append( inObj )
+
+	keys = None
+
+	if hasattr( inObj, '__dict__' ):
+		inObj = inObj.__dict__
+
+	if issubclass( inObj.__class__, list ):
+		keys = range( len( inObj ) )
+	elif issubclass( inObj.__class__, dict ):
+		keys = inObj.keys()
+
+	for i in keys:
+		inFunction( inObj, i, inMapping )
+
+		if issubclass( inObj[ i ].__class__, list ) or issubclass( inObj[ i ].__class__, dict ) or hasattr( inObj[ i ], '__dict__' ):
+			traversePickleObject( inObj[ i ], inMapping, inFunction, seen )
+
+def replaceProxyWithInstance( inObject, inKey, inMapping ):
+	if type( inObject[ inKey ]  ) == archiveObjectProxy:
+		try:
+			instance = inIndexToInstanceMapping[ inObject[ inKey ].index ]
+		except:
+			instance = None
+
+		print "Replacing %s with %s [%d]" % ( inKey, instance, inObj[ inKey ].index )
+
+		inObject[ inKey ] = instance
+
+def replaceInstanceWithProxy( inObject, inKey, inMapping ):
+	if issubclass( inObject[ inKey ].__class__, breve.Object ):
+		inObject[ inKey ] = breve.archiveObjectProxy( inMapping[ inObject[ inKey ] ] )
+
+	if breve.breveInternal.isCObject( inObject[ inKey ] ):
+		inObject[ inKey ] = None
+
+	if type( inObject[ inKey ] ) == breve.vector:
+		inObject[ inKey ] = None
+
+
+def finishDearchive( inIndexToInstanceMapping ):
+	# The dearchive is now complete, but we need to fill in the instance pointers
+
+	for key in inIndexToInstanceMapping:
+		obj = inIndexToInstanceMapping[ key ]
+
+		traversePickleObject( obj._archivedStateCache, inIndexToInstanceMapping, replaceProxyWithInstance )
+
+		obj.__dict__.update( obj._archivedStateCache )
+
+		print obj
+
 #
 # Sets the breve controller class
 #
-
-def encodeToString( inObject ):
- 	return cPickle.dumps( inObject )
-
-def decodeFromString( inString ):
-	obj = cPickle.loads( inString )
-
-	print obj.__class__
-
-	return obj
 
 def setController( inControllerClass ):
 	"Creates the breve Controller class.  This method simply instantiates the class which is called.  It is provided for convenience only."
@@ -329,7 +419,6 @@ class vector( array.array ):
 
 #
 # Import all of the standard breve classes
-#
 # Ordered to respect inter-object dependencies
 #
 

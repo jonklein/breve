@@ -702,6 +702,7 @@ WXCONFIG
 CXXCPP
 GREP
 EGREP
+OSMesa
 ECL_CONFIG
 LIBOBJS
 LTLIBOBJS'
@@ -10519,6 +10520,7 @@ fi
 
 
 
+
 { echo "$as_me:$LINENO: checking for FLAC__seekable_stream_encoder_init in -lFLAC" >&5
 echo $ECHO_N "checking for FLAC__seekable_stream_encoder_init in -lFLAC... $ECHO_C" >&6; }
 if test "${ac_cv_lib_FLAC_FLAC__seekable_stream_encoder_init+set}" = set; then
@@ -12908,12 +12910,13 @@ WXCONFIG!$WXCONFIG$ac_delim
 CXXCPP!$CXXCPP$ac_delim
 GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
+OSMesa!$OSMesa$ac_delim
 ECL_CONFIG!$ECL_CONFIG$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 91; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 92; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

@@ -463,11 +463,11 @@ brInstance *brObjectInstantiate( brEngine *e, brObject *o, const brEval **args, 
  * 
  */
 
-char *brInstanceEncodeToString( brEngine *inEngine, brInstance *inInstance ) {
+char *brInstanceEncodeToString( brEngine *inEngine, brInstance *inInstance, brEvalHash *inInstanceToIndexMapping ) {
 	if( !inInstance->object->type->encodeToString ) 
 		return NULL;
 
-	return inInstance->object->type->encodeToString( inEngine, inInstance->userData );
+	return inInstance->object->type->encodeToString( inEngine, inInstance->userData, inInstanceToIndexMapping );
 }
 
 /**
@@ -486,6 +486,23 @@ brInstance *brInstanceDecodeFromString( brEngine *inEngine, int inTypeSignature,
 	}
 
 	return NULL;
+}
+
+/**
+ * 
+ */
+
+int brFinishDearchive( brEngine *inEngine, int inTypeSignature, brEvalHash *inIndexToInstanceMapping ) {
+	std::vector<brObjectType*>::iterator oi;
+
+	for ( oi = inEngine->_objectTypes.begin(); oi != inEngine->_objectTypes.end(); oi++ ) {
+		brObjectType *type = *oi;
+
+		if( type -> _typeSignature == inTypeSignature && type -> finishDearchive ) 
+			return type -> finishDearchive( inEngine, inIndexToInstanceMapping );
+	}
+
+	return -1;
 }
 
 /**

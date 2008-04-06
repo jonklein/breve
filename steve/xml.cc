@@ -33,22 +33,48 @@
  * in the engine.
  */
 
-int brXMLAssignIndices( brEngine *e, std::map< brInstance*, int > &_indexMap ) {
+int brXMLAssignIndices( brEngine *e, brEvalHash *inMap ) {
 	unsigned int n;
+	brEval key, value;
 
-	for ( n = 0; n < e->instances.size(); n++ ) 
-		_indexMap[ e->instances[ n ] ] = n;
+	for ( n = 0; n < e->instances.size(); n++ ) {
+		key.set( e->instances[ n ] );
+		value.set( (int)n );
 
-	for ( n = 0; n < e->instancesToAdd.size(); n++ ) 
-		_indexMap[ e->instancesToAdd[ n ] ] = n + e->instances.size();
+		brEvalHashStore( inMap, &key, &value );
+	}
+
+	for ( n = 0; n < e->instancesToAdd.size(); n++ ) {
+		key.set( e->instancesToAdd[ n ] );
+		value.set( (int)( n + e->instances.size() ) );
+
+		brEvalHashStore( inMap, &key, &value );
+	}
 
 	return n;
 }
 
+int brXMLGetIndex( brEvalHash *inMap, brInstance *inInstance ) {
+	brEval instance, value;
+
+	instance.set( inInstance );
+
+	brEvalHashLookup( inMap, &instance, &value );
+
+	return BRINT( &value );
+}
+
+brInstance *brXMLGetInstance( brEvalHash *inMap, int inIndex ) {
+	brEval index, value;
+
+	index.set( inIndex );
+
+	brEvalHashLookup( inMap, &index, &value );
+
+	return BRINSTANCE( &value );
+}
+
 int brXMLCleanupFailedImport( brXMLParserState *inState ) {
-
-		// brInstance *instance = inState -> _indexToInstanceMap[ n ] -> second;
-
 	return 0;
 }
 
@@ -76,19 +102,22 @@ int brXMLWriteObjectToStream( brInstance *inInstance, FILE *file, int isDataObje
 	brXMLArchiveRecord record;
 	int spaces = 0;
 
-	brXMLAssignIndices( inInstance->engine, record._indexMap );
+	brXMLAssignIndices( inInstance->engine, &record._instanceToIndexMap );
 
 	fprintf( file, "<?xml version=\"1.0\"?>\n" );
 	fprintf( file, "<!DOCTYPE instance_archive SYSTEM \"breveInstance.dtd\">\n" );
 
 	if ( !isDataObject ) 
-		fprintf( file, "<instance_archive index=\"%d\">\n", record._indexMap[ inInstance ] );
+		fprintf( file, "<instance_archive index=\"%d\">\n", brXMLGetIndex( &record._instanceToIndexMap, inInstance ) );
 	else 
 		fprintf( file, "<data_instance_archive>\n" );
 
 	spaces += XML_INDENT_SPACES;
 
-	brXMLWriteObject( &record, file, inInstance, spaces, isDataObject );
+	int err = brXMLWriteObject( &record, file, inInstance, spaces, isDataObject );
+
+	if( err ) 
+		return err;
 
 	spaces -= XML_INDENT_SPACES;
 
@@ -127,19 +156,23 @@ int brXMLWriteSimulationToStream( FILE *file, brEngine *e ) {
 	int spaces = 0;
 	brXMLArchiveRecord record;
 
-	brXMLAssignIndices( e, record._indexMap );
+	brXMLAssignIndices( e, &record._instanceToIndexMap );
 
 	fprintf( file, "<?xml version=\"1.0\"?>\n" );
 	fprintf( file, "<!DOCTYPE engine SYSTEM \"breveInstance.dtd\">\n" );
 
-	fprintf( file, "<engine controllerIndex=\"%d\">\n", record._indexMap[ brEngineGetController( e ) ] );
+	fprintf( file, "<engine controllerIndex=\"%d\">\n", brXMLGetIndex( &record._instanceToIndexMap, brEngineGetController( e ) ) );
 
 	spaces += XML_INDENT_SPACES;
 
 	std::vector< brInstance* >::iterator bi;
 
-	for ( bi = e->instances.begin(); bi != e->instances.end(); bi++ )
-		brXMLWriteObject( &record, file, *bi, spaces, 0 );
+	for ( bi = e->instances.begin(); bi != e->instances.end(); bi++ ) {
+		int err = brXMLWriteObject( &record, file, *bi, spaces, 0 );
+
+		if( err )
+			return err;
+	}
 
 	spaces -= XML_INDENT_SPACES;
 
@@ -169,7 +202,10 @@ int brXMLWriteObject( brXMLArchiveRecord *record, FILE *file, brInstance *inInst
 	std::set< brInstance*, brInstanceCompare>::iterator ii;
 
 	for ( ii = inInstance->_dependencies.begin(); ii != inInstance->_dependencies.end(); ii++ ) {
-		brXMLWriteObject( record, file, *ii, spaces, isDataObject );
+		int err = brXMLWriteObject( record, file, *ii, spaces, isDataObject );
+
+		if( err ) 
+			return err;
 	}
 
 	// if we're not writing data only, call the archive method
@@ -188,9 +224,9 @@ int brXMLWriteObject( brXMLArchiveRecord *record, FILE *file, brInstance *inInst
 	XMLPutSpaces( spaces, file );
 
 	if ( isDataObject ) {
-		fprintf( file, "<data_instance class=\"%s\" index=\"%d\" typesignature=\"%ld\">\n", inInstance->object->name, record->_indexMap[ inInstance ], inInstance->object->type->_typeSignature );
+		fprintf( file, "<data_instance class=\"%s\" index=\"%d\" typesignature=\"%ld\">\n", inInstance->object->name, brXMLGetIndex( &record->_instanceToIndexMap, inInstance ), inInstance->object->type->_typeSignature );
 	} else {
-		fprintf( file, "<instance class=\"%s\" index=\"%d\" typesignature=\"%ld\">\n", inInstance->object->name, record->_indexMap[ inInstance ], inInstance->object->type->_typeSignature );
+		fprintf( file, "<instance class=\"%s\" index=\"%d\" typesignature=\"%ld\">\n", inInstance->object->name, brXMLGetIndex( &record->_instanceToIndexMap, inInstance ), inInstance->object->type->_typeSignature );
 	}
 
 	spaces += XML_INDENT_SPACES;
@@ -208,7 +244,7 @@ int brXMLWriteObject( brXMLArchiveRecord *record, FILE *file, brInstance *inInst
 			int index;
 
 			if ( obs->instance && obs->instance->status == AS_ACTIVE ) 
-				index = record->_indexMap[ obs->instance ];
+				index = brXMLGetIndex( &record->_instanceToIndexMap, obs->instance );
 			else
 				index = -1;
 
@@ -240,7 +276,7 @@ int brXMLWriteObject( brXMLArchiveRecord *record, FILE *file, brInstance *inInst
 			int index = -1;
 
 			if ( dep && dep->status == AS_ACTIVE ) 
-				index = record->_indexMap[ dep ];
+				index = brXMLGetIndex( &record->_instanceToIndexMap, dep );
 
 			XMLPutSpaces( spaces, file );
 
@@ -257,20 +293,20 @@ int brXMLWriteObject( brXMLArchiveRecord *record, FILE *file, brInstance *inInst
 
 	XMLPutSpaces( spaces, file );
 
-	fprintf( file, "<instancedata>\n" );
+	fprintf( file, "<instancedata>" );
 
 	spaces += XML_INDENT_SPACES;
 
 	if( inInstance->object->type->_typeSignature == STEVE_TYPE_SIGNATURE )
 		stXMLWriteObjectVariables( record, file, (stInstance*)inInstance -> userData, spaces );
 	else {
-		slMessage( DEBUG_ALL, "Warning: object encoding and decoding not implemented for this language frontend.\nDearchiving of this object will fail.\n" );
-
-		char *encoding = brInstanceEncodeToString( inInstance->engine, inInstance );
+		char *encoding = brInstanceEncodeToString( inInstance->engine, inInstance, &record -> _instanceToIndexMap );
 
 		if( encoding ) {
 			fprintf( file, encoding );
 			slFree( encoding );
+		} else {
+			return -1;
 		}
 	}
 		
@@ -293,6 +329,8 @@ void stXMLWriteObjectVariables( brXMLArchiveRecord *inRecord, FILE *inFP, stInst
 	stObject *o = inInstance->type;
 	
 	std::string result;
+
+	fprintf( inFP, "\n" );
 
 	while ( o ) {
 		std::map< std::string, stVar* >::iterator vi;
@@ -501,7 +539,7 @@ int brXMLPrintEval( brXMLArchiveRecord *record, FILE *file, const char *name, br
 				i = ( stInstance* )BRINSTANCE( target )->userData;
 
 			if ( i && i->status == AS_ACTIVE ) 
-				index = record->_indexMap[ BRINSTANCE( target ) ] ;
+				index = brXMLGetIndex( &record->_instanceToIndexMap, BRINSTANCE( target ) );
 
 			XMLPutSpaces( spaces, file );
 
@@ -736,7 +774,7 @@ int stXMLReadObjectFromString( stInstance *i, char *buffer ) {
 		
 		int ind = atoi( instindex->c_str() );
 			
-		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState._indexToInstanceMap[ ind ] ) != EC_OK ) 
+		if( brXMLDecodeInstance( &parserState, matches[ n ], brXMLGetInstance( &parserState._indexToInstanceMap, ind ) ) != EC_OK ) 
 			return EC_ERROR;
 	}
 
@@ -840,17 +878,28 @@ brInstance *brXMLDearchiveObjectFromString( brEngine *e, char *buffer ) {
 		
 		int i = atoi( instindex->c_str() );
 			
-		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState._indexToInstanceMap[ i ] ) != EC_OK ) {
+		if( brXMLDecodeInstance( &parserState, matches[ n ], brXMLGetInstance( &parserState._indexToInstanceMap, i ) ) != EC_OK ) {
 			delete dom;
 			return NULL;
 		}
 	}
 
-	brXMLRunDearchiveMethods( &parserState );
+
+
+	int signature = brXMLGetInstance( &parserState._indexToInstanceMap, archivedIndex ) -> object -> type -> _typeSignature;
+	brFinishDearchive( e, signature, &parserState._indexToInstanceMap );
+
+
+
+	if( brXMLRunDearchiveMethods( dom, &parserState ) ) {
+		slMessage( DEBUG_ALL, "Error decoding archived XML instance: dearchive method failed\n" );
+		delete dom;
+		return NULL;
+	}
 
 	delete dom;
 
-	return parserState._indexToInstanceMap[ archivedIndex ];
+	return brXMLGetInstance( &parserState._indexToInstanceMap, archivedIndex );
 }
 
 
@@ -931,22 +980,22 @@ int brXMLInitSimulationFromString( brEngine *e, char *buffer ) {
 		
 		int i = atoi( instindex->c_str() );
 			
-		if( brXMLDecodeInstance( &parserState, matches[ n ], parserState._indexToInstanceMap[ i ] ) != EC_OK ) {
+		if( brXMLDecodeInstance( &parserState, matches[ n ], brXMLGetInstance( &parserState._indexToInstanceMap, i ) ) != EC_OK ) {
 			delete dom;
 			return EC_ERROR;
 		}
 	}
 
 
-	if( !parserState._indexToInstanceMap[ controllerIndex ] ) {
+	if( !brXMLGetInstance( &parserState._indexToInstanceMap, controllerIndex ) ) {
 		slMessage( DEBUG_ALL, "Error decoding archived XML simulation: could not locate controller instance\n" );
 		delete dom;
 		return EC_ERROR;
 	}
 
-	brEngineSetController( e, parserState._indexToInstanceMap[ controllerIndex ] );
+	brEngineSetController( e, brXMLGetInstance( &parserState._indexToInstanceMap, controllerIndex ) );
 
-	if ( brXMLRunDearchiveMethods( &parserState ) ) {
+	if ( brXMLRunDearchiveMethods( dom, &parserState ) ) {
 		slMessage( DEBUG_ALL, "Error decoding archived XML simulation: dearchive method failed\n" );
 		delete dom;
 		return EC_ERROR;
@@ -961,12 +1010,16 @@ int brXMLInitSimulationFromString( brEngine *e, char *buffer ) {
  * \brief Runs dearchive for the list of instances.
  */
 
-int brXMLRunDearchiveMethods( brXMLParserState *s ) {
+int brXMLRunDearchiveMethods( brXMLDOMElement *inRoot, brXMLParserState *s ) {
 	int r;
 	brEval result;
 
-	for ( unsigned int n = 0; n < s->_dearchiveOrder.size(); n++ ) {
-		brInstance *instance = s->_dearchiveOrder[ n ];
+	std::vector< brXMLDOMElement* > instances = inRoot->getElementsByName( "instance" ); 
+
+	for( unsigned int n = 0; n < instances.size(); n++ ) {
+		int instanceindex = atoi( instances[ n ]->_attrs[ "index" ].c_str() );
+
+		brInstance *instance = brXMLGetInstance( &s -> _indexToInstanceMap, instanceindex );
 
 		if ( instance ) {
 
@@ -999,7 +1052,6 @@ int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, brXMLParserState *inState 
 		int instanceindex = atoi( instances[ n ]->_attrs[ "index" ].c_str() );
 		int typeSignature = atoi( instances[ n ]->_attrs[ "typesignature" ].c_str() );
 
-
 		brObject *object = brObjectFind( inState->engine, objectname.c_str() );
 
 		if ( !object ) {
@@ -1010,21 +1062,21 @@ int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, brXMLParserState *inState 
 		}
 
 		if( typeSignature && typeSignature != object -> type -> _typeSignature ) {
-			slMessage( DEBUG_ALL, "XML archive contains an instance of an object from a different language frontend.\nThis object cannot be dearchived in this simulation.\n" );
+			slMessage( DEBUG_ALL, "XML archive contains an instance of an object from a different language frontend.\n" );
+			slMessage( DEBUG_ALL, "Cannot decode XML archive: mismatch between simulation file and XML data\n" );
 			return EC_ERROR;
 		}
 
-		if( typeSignature != STEVE_TYPE_SIGNATURE ) {
-			slMessage( DEBUG_ALL, "Warning: object encoding and decoding not implemented for non-steve objects\n" );
-			brXMLCleanupFailedImport( inState );
-			return EC_ERROR;
-		}
-
-		brInstance *instance = brObjectInstantiate( inState->engine, object, NULL, 0 );
-
-		inState->_indexToInstanceMap[ instanceindex ] = instance;
+		if( typeSignature == STEVE_TYPE_SIGNATURE ) {
+			brInstance *instance = brObjectInstantiate( inState->engine, object, NULL, 0 );
 		
-		inState->_dearchiveOrder.push_back( instance );
+			brEval key, value;
+	
+			key.set( instanceindex );
+			value.set( instance );
+
+			brEvalHashStore( &inState -> _indexToInstanceMap, &key, &value );
+		}		
 	}
 
 	return 0;
@@ -1073,7 +1125,7 @@ void brXMLParseEval( brXMLParserState *inState, brXMLDOMElement *inElement, brEv
 		case AT_INSTANCE:
 			index = atoi( inElement->getAttr( "index" )->c_str() );
 
-			outEval->set( inState->_indexToInstanceMap[ index ] );
+			outEval->set( brXMLGetInstance( &inState->_indexToInstanceMap, index ) );
 	
 			break;
 
@@ -1164,7 +1216,7 @@ int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceE
 		for( i = 0; i < dependencyList.size(); i++ ) {		
 			int dependencyIndex = atoi( dependencyList[ i ]->getAttr( "index" )->c_str() );
 		
-			brInstance *dependency = inState->_indexToInstanceMap[ dependencyIndex ];
+			brInstance *dependency = brXMLGetInstance( &inState->_indexToInstanceMap, dependencyIndex );
 
 			if( dependency )
 				brInstanceAddDependency( outInstance, dependency );
@@ -1180,17 +1232,13 @@ int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceE
 
 
 
-
 	std::vector< brXMLDOMElement* > data = inInstanceElement->getElementsByName( "instancedata" ); 
 
 	int typeSignature = atoi( inInstanceElement -> getAttr( "typesignature" )->c_str() );
-	
+	int index = atoi( inInstanceElement -> getAttr( "index" ) -> c_str() );
 
-	if( typeSignature != STEVE_TYPE_SIGNATURE ) {
-		slMessage( DEBUG_ALL, "Warning: object encoding and decoding not implemented for non-steve objects\n" );
-		brXMLCleanupFailedImport( inState );
-		return EC_ERROR;
-	}
+	if( typeSignature != STEVE_TYPE_SIGNATURE )
+	 	slMessage( DEBUG_ALL, "Warning: object encoding and decoding not implemented for non-steve objects\n" );
 
 	// int isXml = atoi( data[ 0 ] -> getAttr( "xml" ) -> c_str() );
 
@@ -1199,14 +1247,28 @@ int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceE
 
 		data = inInstanceElement->getElementsByName( "variables" ); 
 		typeSignature = STEVE_TYPE_SIGNATURE;
+	} 
+
+	if( typeSignature == STEVE_TYPE_SIGNATURE ) {
+		return stXMLParseInstanceData( inState, data[ 0 ], (stInstance*)outInstance -> userData );
 	} else {
-		
-		brInstanceDecodeFromString( inState->engine, typeSignature, data[ 0 ]->_cdata.c_str() );
+		brInstance *newInstance = brInstanceDecodeFromString( inState->engine, typeSignature, data[ 0 ]->_cdata.c_str() );
 
+		if( newInstance ) {
+			brEval key, value;
+
+			value.set( newInstance );
+			key.set( index );
+
+			brEvalHashStore( &inState -> _indexToInstanceMap, &key, &value );
+
+			return EC_OK;
+		} else {
+			return EC_ERROR;
+		}
 	}
-
-	return stXMLParseInstanceData( inState, data[ 0 ], (stInstance*)outInstance -> userData );
 }
+
 
 // Decode the "observer" data
 
@@ -1224,7 +1286,7 @@ void brXMLDecodeObserver( brXMLParserState *inState, brXMLDOMElement *inObserver
 	
 	if( observerElement ) {
 		int observerIndex = atoi( observerElement->getAttr( "index" )->c_str() );
-		observer = inState->_indexToInstanceMap[ observerIndex ];
+		observer = brXMLGetInstance( &inState -> _indexToInstanceMap, observerIndex );
 	}
 
 	if( methodElement )

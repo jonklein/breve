@@ -40,6 +40,8 @@ struct slPythonMethodInfo {
 	int _argumentCount;
 };
 
+PyObject *brPythonDictFromHash( brEvalHash *inHash, PyObject *inModuleObject );
+
 static slPythonData sPythonData;
 
 std::string brPythonToSteveName( const char *in ) {
@@ -89,6 +91,7 @@ inline PyObject *PyObject_GetAttrStringSafe( PyObject *inObject, const char *inS
 
 	return result;
 }
+
 
 
 /**
@@ -335,9 +338,11 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 
 			break;
 
+		case AT_HASH:
+			result = brPythonDictFromHash( BRHASH( (brEval*)inEval ), inModuleObject );
+			break;
 		case AT_ARRAY:
 		case AT_DATA:
-		case AT_HASH:
 		default:
 			slMessage( DEBUG_ALL, "Could not convert breve internal type \"%d\" to a Python type\n", inEval->type() );
 
@@ -345,6 +350,26 @@ inline PyObject *brPythonTypeFromEval( const brEval *inEval, PyObject *inModuleO
 	}
 
 	return result;
+}
+
+PyObject *brPythonDictFromHash( brEvalHash *inHash, PyObject *inModuleObject ) {
+	PyObject *dict = PyDict_New();
+	brEvalListHead *keys = brEvalHashKeys( inHash );
+
+	for( unsigned int i = 0; i < keys -> _vector.size(); i++ ) {
+		brEval valueEval;
+
+		brEvalHashLookup( inHash, &keys -> _vector[ i ], &valueEval );
+
+		PyObject *key = brPythonTypeFromEval( &keys -> _vector[ i ], inModuleObject );
+		PyObject *value = brPythonTypeFromEval( &valueEval, inModuleObject );
+
+		if( PyDict_SetItem( dict, key, value ) != 0 ) {
+			slMessage( DEBUG_ALL, "Warning: error setting Python dictionary value" );
+		}
+	}
+
+	return dict;
 }
 
 /**
@@ -1173,19 +1198,24 @@ void brPythonSetArgv( brEngine *inEngine, PyObject *inSysModule ) {
  	Py_DECREF( argv );
 }
 
-char *brPythonEncodeToString( brEngine *inEngine, void *inData ) {
+char *brPythonEncodeToString( brEngine *inEngine, void *inData, brEvalHash *inInstanceToIndexMapping ) {
 	PyObject *obj = (PyObject*)inData;
+
+	PyObject *dict = brPythonDictFromHash( inInstanceToIndexMapping, sPythonData._breveModule );
 
 	PyObject *encoder = PyObject_GetAttrStringSafe( sPythonData._breveModule, "encodeToString" );
 
-	if( !encoder )
+	if( !encoder ) {
+		PyErr_Print();
 		return NULL;
+	}
 
-	PyObject *args = PyTuple_New( 1 );
+	PyObject *args = PyTuple_New( 2 );
 
 	// SetItem steals a reference
 	Py_INCREF( obj );
 	PyTuple_SetItem( args, 0, obj );
+	PyTuple_SetItem( args, 1, dict );
 
 	PyObject *result = PyObject_Call( encoder, args, NULL );
 
@@ -1204,7 +1234,7 @@ char *brPythonEncodeToString( brEngine *inEngine, void *inData ) {
 	return encoding;
 }
 
-void *brPythonDecodeFromString( brEngine *inEngine, char *inString ) {
+brInstance *brPythonDecodeFromString( brEngine *inEngine, const char *inString ) {
 	PyObject *decoder = PyObject_GetAttrStringSafe( sPythonData._breveModule, "decodeFromString" );
 
 	if( !decoder )
@@ -1216,10 +1246,48 @@ void *brPythonDecodeFromString( brEngine *inEngine, char *inString ) {
 
 	PyObject *result = PyObject_Call( decoder, args, NULL );
 
+	if( !result ) {
+		PyErr_Print();
+		return NULL;
+	}
+
+	PyObject *instanceObject = PyObject_GetAttrStringSafe( result, "breveInstance" );
+
 	Py_DECREF( args );
 	Py_DECREF( decoder );
+	Py_DECREF( result );
 
-	return result;
+	brInstance *i = NULL;
+
+	if( instanceObject )
+		i = (brInstance*)PyCObject_AsVoidPtr( instanceObject );
+
+	return i;
+}
+
+int brPythonFinishDearchive( brEngine *inEngine, brEvalHash *inIndexToInstanceMapping ) {
+	PyObject *dict = brPythonDictFromHash( inIndexToInstanceMapping, sPythonData._breveModule );
+	PyObject *finish = PyObject_GetAttrStringSafe( sPythonData._breveModule, "finishDearchive" );
+
+	if( !finish )
+		return -1;
+
+	PyObject *args = PyTuple_New( 1 );
+
+	PyTuple_SetItem( args, 0, dict );
+
+	PyObject *result = PyObject_Call( finish, args, NULL );
+
+	Py_DECREF( args );
+	Py_DECREF( finish );
+
+	if( result ) {
+		Py_DECREF( result );
+		return 0;
+	} else {
+		PyErr_Print();
+		return -1;
+	}
 }
 
 /**
@@ -1309,6 +1377,7 @@ void brPythonInit( brEngine *breveEngine ) {
 	brevePythonType->load			= brPythonLoad;
 	brevePythonType->encodeToString		= brPythonEncodeToString;
 	brevePythonType->decodeFromString	= brPythonDecodeFromString;
+	brevePythonType->finishDearchive	= brPythonFinishDearchive;
 	brevePythonType->_typeSignature 	= PYTHON_TYPE_SIGNATURE;
 
 	brEngineRegisterObjectType( breveEngine, brevePythonType );

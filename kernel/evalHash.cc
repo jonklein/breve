@@ -123,7 +123,7 @@ brEvalListHead *brEvalHashValues( brEvalHash *h ) {
 int brEvalHashLookup( brEvalHash *h, brEval *key, brEval *value, bool inRemove ) {
 	brEval *v, *k;
 
-	v = ( brEval* )slDehashDataAndKey( h->table, key, &k, inRemove );
+	v = ( brEval* )slDehashDataAndKey( h->table, key, (void**)&k, inRemove );
 
 	if ( !v ) 
 		return -1;
