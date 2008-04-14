@@ -170,9 +170,9 @@ PrismaticJoint : ExamplePrismaticJoint {
 BallJoint : ExampleBallJoint {
     + to iterate:
 		x (double).
-		x = sin((controller get-time) / 15) / 2.
+		x = .2 * sin((controller get-time) / 15) / 2.
 
-		self set-joint-velocity to (0.0, 0, x).
+		self set-joint-velocity to (0.01, .02, x).
 }
 
 UniversalJoint : ExampleUniversalJoint {
@@ -180,5 +180,6 @@ UniversalJoint : ExampleUniversalJoint {
 		x (double).
 		x = sin((controller get-time) / 15) / 2.
 
-        self set-joint-velocity axis-1 x axis-2 0.01.
+	        self set-joint-velocity axis-1 x axis-2 0.01.
+		print ( self get-joint-velocity-vector ).
 }

@@ -226,11 +226,22 @@ void slJoint::getVelocity( slVector *velocity ) {
 			break;
 
 		case JT_BALL:
-		case JT_UNIVERSAL:
-			velocity->z = 0.0;
-			velocity->x = 0.0;
-			velocity->y = 0.0;
+			// dJointGetAMotorAngleRate not yet implemented !?
 
+			// velocity->x = dJointGetAMotorAngleRate( _odeMotorID, 0 );
+			// velocity->y = dJointGetAMotorAngleRate( _odeMotorID, 1 );
+			// velocity->z = dJointGetAMotorAngleRate( _odeMotorID, 2 );
+
+			break;
+
+		case JT_UNIVERSAL:
+			// velocity->x = dJointGetAMotorAngleRate( _odeMotorID, 0 );
+			// velocity->y = dJointGetAMotorAngleRate( _odeMotorID, 2 );
+			velocity->z = 0;
+
+			break;
+
+		default:
 			break;
 	}
 }

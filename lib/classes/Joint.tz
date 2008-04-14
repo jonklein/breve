@@ -93,6 +93,9 @@ Abstract : Joint (aka Joints) [version 2.3] {
 		% revolute), only the X-component is valid.  For 2-DOF joints (universal),
 		% both the X- and the Y-components are used.  For a ball joint, all three
 		% values are provided.
+		% <P>
+		% Note: due to a limitation of the physical simulation engine, this method
+		% is not currently implemented for ball or universal joints.
 
 		return jointGetVelocity(jointPointer).
 

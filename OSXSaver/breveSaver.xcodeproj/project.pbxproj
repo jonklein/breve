@@ -10,7 +10,6 @@
 		4818572E05CABEEB00C48BE6 /* slBreveCreatures.h in Headers */ = {isa = PBXBuildFile; fileRef = F5175CBD0169B97E010BE436 /* slBreveCreatures.h */; };
 		4818572F05CABEEB00C48BE6 /* slBreveSaver.h in Headers */ = {isa = PBXBuildFile; fileRef = F5D8673B01169F20010BE436 /* slBreveSaver.h */; };
 		4818573105CABEEB00C48BE6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
-		4818573205CABEEB00C48BE6 /* WalkerSaver.tz in Resources */ = {isa = PBXBuildFile; fileRef = F50BB16F012BFE5C010BE436 /* WalkerSaver.tz */; };
 		4818573405CABEEB00C48BE6 /* breveWalker.nib in Resources */ = {isa = PBXBuildFile; fileRef = F510412F012D110B010BE436 /* breveWalker.nib */; };
 		4818573605CABEEB00C48BE6 /* Creatures.tz in Resources */ = {isa = PBXBuildFile; fileRef = 48941C8F0401A69200000116 /* Creatures.tz */; };
 		4818573805CABEEB00C48BE6 /* slBreveCreatures.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5175CBE0169B97E010BE436 /* slBreveCreatures.mm */; };
@@ -126,7 +125,6 @@
 		48B9BE2E05EA60B4002C7A42 /* slBreveResearcher.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreveResearcher.mm; sourceTree = "<group>"; };
 		48BB26B20B2285DF006FA9E9 /* libpython.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpython.dylib; path = /usr/lib/libpython.dylib; sourceTree = "<absolute>"; };
 		48D90A3C06BFD26900FF529F /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/brevePainter.nib; sourceTree = "<group>"; };
-		F50BB16F012BFE5C010BE436 /* WalkerSaver.tz */ = {isa = PBXFileReference; lastKnownFileType = text; path = WalkerSaver.tz; sourceTree = SOURCE_ROOT; };
 		F5104130012D110B010BE436 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/breveWalker.nib; sourceTree = "<group>"; };
 		F5175CB20169B8F6010BE436 /* SwarmSaver.tz */ = {isa = PBXFileReference; lastKnownFileType = text; path = SwarmSaver.tz; sourceTree = "<group>"; };
 		F5175CB90169B958010BE436 /* slBreveSwarm.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = slBreveSwarm.h; sourceTree = "<group>"; };
@@ -240,7 +238,6 @@
 				F510412F012D110B010BE436 /* breveWalker.nib */,
 				F5175CB20169B8F6010BE436 /* SwarmSaver.tz */,
 				48941C8F0401A69200000116 /* Creatures.tz */,
-				F50BB16F012BFE5C010BE436 /* WalkerSaver.tz */,
 				4868E6F6091423CC0045591F /* simulation.gif */,
 				4868E6FC091423F80045591F /* app_icon.tiff */,
 			);
@@ -415,7 +412,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4818573105CABEEB00C48BE6 /* InfoPlist.strings in Resources */,
-				4818573205CABEEB00C48BE6 /* WalkerSaver.tz in Resources */,
 				4818573405CABEEB00C48BE6 /* breveWalker.nib in Resources */,
 				4818573605CABEEB00C48BE6 /* Creatures.tz in Resources */,
 				4818578C05CABFE300C48BE6 /* classes in Resources */,
