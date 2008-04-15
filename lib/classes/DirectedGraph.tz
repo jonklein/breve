@@ -368,7 +368,7 @@ GADirectedGraphParameterObject : GADirectedGraphNode (aka GADirectedGraphNodes) 
 
 		foreach connection in connections: {
 			connection mutate.
-			(connection get-target) mutate with-seen seenhash.
+			(connection get-target) mutate-internal with-seen seenhash.
 		}
 	
 	+ to destroy-connected-objects:
