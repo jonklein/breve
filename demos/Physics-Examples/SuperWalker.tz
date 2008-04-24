@@ -301,6 +301,15 @@ Object : MonkeyGenome {
 		# calculates the torque for a certain joint number.
 
 		return .5 * sin(waveCompression * (time + phaseShifts{ jointNum }) ) - ( ampShifts{ jointNum } ).
+
+	+ to get-limb-lengths:
+		return limbLengths.
+
+	+ to get-amp-shifts:
+		return ampShifts.
+
+	+ to get-phase-shifts:
+		return phaseShifts.
 		
 	+ to get-limb-length number n (int):
 		return limbLengths{ n }.
@@ -320,13 +329,13 @@ Object : MonkeyGenome {
 		print "mutated item $n of $self".
 
 	+ to crossover from-parent-1 p1 (object) from-parent-2 p2 (object):
-		self crossover-data genome-list phaseShifts from-parent-1 p1 from-parent-2 p2.
-		self crossover-data genome-list ampShifts   from-parent-1 p1 from-parent-2 p2.
-		self crossover-data genome-list limbLengths from-parent-1 p1 from-parent-2 p2.
+		self crossover-data genome-list phaseShifts from-parent-1 ( p1 get-phase-shifts ) from-parent-2 ( p2 get-phase-shifts ).
+		self crossover-data genome-list ampShifts   from-parent-1 ( p1 get-amp-shifts )   from-parent-2 ( p2 get-amp-shifts ).
+		self crossover-data genome-list limbLengths from-parent-1 ( p1 get-limb-lengths ) from-parent-2 ( p2 get-limb-lengths ).
 
-	+ to crossover-data genome-list l (list) from-parent-1 p1 (object) from-parent-2 p2 (object):
+	+ to crossover-data genome-list l (list) from-parent-1 p1 (list) from-parent-2 p2 (list):
 		n, crossoverPoint (int).
-		tmp (object).
+		tmp (list).
 	
 		if random[ 1 ]: {
 			tmp = p2.
@@ -338,9 +347,9 @@ Object : MonkeyGenome {
 
 		for n = 0, n < | l |, n++: {
 			if n < crossoverPoint:
-				l{ n } = ( p1 get-value at-index n ).
+				l{ n } = p1{ n }.
 			else
-				l{ n } = ( p2 get-value at-index n ).
+				l{ n } = p2{ n }.
 		}
 
 }
