@@ -1974,8 +1974,8 @@ RTC_INLINE int stEvalIndexAssign( stListIndexAssignExp *l, stRunInstance *i, brE
 		}
         
 		// Make a pointer to the variable by looking inside the instance by the proper offset
-        
-		void *pointer = &i->instance->variables[ theVariable -> offset ];
+
+		void *pointer = &assignInstance -> variables[ theVariable -> offset ];
         
 		// Assign the variable
         
