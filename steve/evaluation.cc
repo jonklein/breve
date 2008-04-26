@@ -1211,6 +1211,9 @@ RTC_INLINE int stEvalMethodCall( stMethodExp *mexp, stRunInstance *i, brEval *t 
 			ri.type = ri.instance->type;
 
 			r = stRealEvalMethodCall( mexp, &ri, i, t );
+
+			if( r != EC_OK ) 
+				return r;
 		}
 
 		return r;
@@ -1716,6 +1719,11 @@ RTC_INLINE int stEvalIndexLookup( stListIndexExp *l, stRunInstance *i, brEval *t
 		stInstance *lookupInstance = ( stInstance * )BRINSTANCE( &list )->userData;
         
 		// Find the variable for this instance
+
+		if( index.type() != AT_STRING ) {
+			stEvalError( i -> instance, EE_TYPE, "expected type \"string\" in instance lookup" );
+			return EC_ERROR;
+		}
         
 		stVar *var = stObjectLookupVariable( lookupInstance -> type, BRSTRING( &index ) );
         

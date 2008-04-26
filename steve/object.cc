@@ -657,6 +657,9 @@ int stUnusedInstanceVarWarning( stObject *o ) {
 */
 
 stVar *stObjectLookupVariable( stObject *ob, const char *word ) {
+	if( !word )
+		return NULL;
+
 	do {
 		std::map< std::string, stVar* >::iterator vi;
 

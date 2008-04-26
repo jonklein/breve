@@ -30,6 +30,10 @@
 
 PFNGLTEXIMAGE3DPROC wglTexImage3D = NULL;
 PFNGLTEXSUBIMAGE3DPROC wglTexSubImage3D = NULL;
+
+#define glTexImage3D     wglTexImage3D
+#define glTexSubImage3D  wglTexSubImage3D
+
 #endif
 
 /**
@@ -467,7 +471,7 @@ void slPatchGrid::draw( slCamera *camera ) {
 	glDisable( GL_LIGHTING );
 
 #ifdef WINDOWS
-	if( !wglTexImage3D || !wglTexSubImage3D ) 
+	if( !glTexImage3D || !glTexSubImage3D ) 
 		return drawWithout3DTexture( camera );
 #endif
 
@@ -475,11 +479,7 @@ void slPatchGrid::draw( slCamera *camera ) {
 		_texture = slTextureNew( camera );
 		glEnable( GL_TEXTURE_3D );
 		glBindTexture( GL_TEXTURE_3D, _texture );
-#ifdef WINDOWS
-		wglTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, _textureX, _textureY, _textureZ, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
-#else
 		glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, _textureX, _textureY, _textureZ, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
-#endif
 	}
 
 
@@ -514,9 +514,6 @@ void slPatchGrid::draw( slCamera *camera ) {
 
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
-#ifdef WINDOWS
-	wglTexSubImage3D( GL_TEXTURE_3D, 0, 0, 0, 0, _xSize, _ySize, _zSize, GL_RGBA, GL_UNSIGNED_BYTE, colors );
-#else
 	if( _textureNeedsUpdate ) { 
 		// glPixelStorei( GL_UNPACK_ROW_LENGTH, _ySize );
 		glPixelTransferf( GL_ALPHA_SCALE, 3.0f );
@@ -525,7 +522,6 @@ void slPatchGrid::draw( slCamera *camera ) {
 
 		_textureNeedsUpdate = false;
 	}
-#endif
 
 	glBegin( GL_QUADS );
 

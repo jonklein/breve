@@ -117,7 +117,6 @@ Abstract : PatchGrid (aka PatchGrids) [version 2.2] {
 				zCount = 0.
 
 				while zCount < z: {
-					patchObjectAtIndex(gridPointer, xCount, yCount, zCount) init-neighbors.
 					patchObjectAtIndex(gridPointer, xCount, yCount, zCount) init-patch.
 					zCount += 1.
 				}
@@ -450,13 +449,13 @@ PatchGrid : PatchToroid (aka PatchToroids) [version 2.2] {
 		% to the other side of the PatchToroid.
 
 		if xind >= xSize: xind %= xSize.
-		else if xind < 0: xind = xSize + (xind % xSize).
+		else if xind < 0: xind = xSize + min( (xind % xSize), -1 ).
 
 		if yind >= ySize: yind %= ySize.
-		else if yind < 0: yind = ySize + (yind % ySize).
+		else if yind < 0: yind = ySize + min( (yind % ySize), -1 ).
 
 		if zind >= zSize: zind %= zSize.
-		else if zind < 0: zind = zSize + (zind % zSize).
+		else if zind < 0: zind = zSize + min( (zind % zSize), - 1 ).
 
 		return patchObjectAtIndex(gridPointer, xind, yind, zind).
 		
