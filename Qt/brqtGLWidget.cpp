@@ -19,7 +19,7 @@ void brqtGLWidget::paintGL()
 		brEngineRenderWorld(_engine, 0);
 		brEngineUnlock(_engine);
 	} else {
-		glClearColor( .8, .15, .8, 1.0 );
+		glClearColor( 0, 0, 0, 1 );
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	}
 }

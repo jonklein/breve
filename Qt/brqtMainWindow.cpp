@@ -2,14 +2,18 @@
 #include "brqtEditorWindow.h"
 #include "brqtMoveableWidgets.h"
 
+#include <QVariant>
+
 #import <sys/types.h>
 #import <sys/dir.h>
 
-brqtMainWindow::brqtMainWindow() {
+brqtMainWindow::brqtMainWindow() : QMainWindow( NULL, Qt::WindowTitleHint ) {
 	_engine = NULL;
 
 	_editing = 0;
 	_ui.setupUi( this );
+
+	setWindowFlags(Qt::WindowTitleHint);
 
 	_palette.hide();
 
@@ -22,16 +26,17 @@ brqtMainWindow::brqtMainWindow() {
 	connect( _ui.actionPaste, SIGNAL( triggered() ), this, SLOT( paste() ) );
 	connect( _ui.actionUndo, SIGNAL( triggered() ), this, SLOT( undo() ) );
 	connect( _ui.actionRedo, SIGNAL( triggered() ), this, SLOT( redo() ) );
-	connect( _ui.actionClose, SIGNAL( triggered() ), this, SLOT( close() ) );
+	connect( _ui.actionClose, SIGNAL( triggered() ), this, SLOT( closeWindow() ) );
 
 	connect( _ui.actionFind, SIGNAL( triggered() ), this, SLOT( find() ) );
+	connect( _ui.actionLog_Window, SIGNAL( triggered() ), this, SLOT( activateLogWindow() ) );
 
 	connect( _ui.toggleSimulationButton, SIGNAL( pressed() ), this, SLOT( toggleSimulation() ) );
+	connect( _ui.stopSimulationButton, SIGNAL( pressed() ), this, SLOT( stopSimulation() ) );
 
 	setAcceptDrops( true );
 
-	QPoint position( 0, 0 );
-
+	QPoint position( 0, 30 );
 	move( position );
 
 	QStringList demoFilters;
@@ -43,6 +48,14 @@ brqtMainWindow::brqtMainWindow() {
 	buildMenuFromDirectory( "../docs/steveclasses",  _ui.menuSteveClasses,  &docFilters,  SLOT( openHTML(QAction*) ) );
 	buildMenuFromDirectory( "../docs/pythonclasses", _ui.menuPythonClasses, &docFilters,  SLOT( openHTML(QAction*) ) );
 
+	QRect bounds = rect();
+
+	_documentLocation.setX( bounds.right() + 2 );
+	_documentLocation.setY( bounds.top() );
+
+	_logWindow = new brqtLogWindow( this );
+	_logWindow -> move( 0, bounds.bottom() );
+	_logWindow -> show();
 
 	newDocument();
 }
@@ -80,14 +93,16 @@ void brqtMainWindow::dropEvent( QDropEvent *event ) {
 	if( !widget ) 
 		return;
 
-	// widget ...
-	
 	widget->move( event->pos().x(), event->pos().y() );
 
 	widget->show();
 
    	event->acceptProposedAction();
  }
+
+void brqtMainWindow::setButtonMode() {
+	_ui.glWidget -> setButtonMode( 1 );
+}
 
 void brqtMainWindow::toggleEditing() {
 	_editing = !_editing;
@@ -109,32 +124,61 @@ void brqtMainWindow::openDocument() {
 	openDocument( s );
 }
 
+#define DOCUMENT_OFFSET 20
+
 void brqtMainWindow::newDocument() { 
 	brqtEditorWindow *editor = new brqtEditorWindow( this );
-	editor -> show();
 
 	_documents.push_back( editor );
+
+	int x = _documentLocation.x() + ( _documents.size() - 1 ) * DOCUMENT_OFFSET;
+	int y = _documentLocation.y() + ( _documents.size() - 1 ) * DOCUMENT_OFFSET;
+	editor -> move( x, y );
+
+	editor -> show();
+	
+	updateSimulationPopup();
 }
 
-void brqtMainWindow::closeDocument() {
-
+void brqtMainWindow::activateLogWindow() {
+	_logWindow -> raise();
+	_logWindow -> show();
 }
 
+void brqtMainWindow::closeDocument( brqtEditorWindow *inDocument ) {
+	int index = _documents.indexOf( inDocument );
 
+	if( index >= 0 )
+		_documents.removeAt( index );
 
-int brqtMainWindow::openDocument( QString &inDocument ) {
+	updateSimulationPopup();
+}
+
+brqtEditorWindow *brqtMainWindow::openDocument( QString &inDocument ) {
 	std::string file = inDocument.toStdString();
 
 	brqtEditorWindow *editor = new brqtEditorWindow( this );
 
-	editor -> show();
 	editor -> loadFile( file );
+
+	int x = _documentLocation.x() + ( _documents.size() - 1 ) * DOCUMENT_OFFSET;
+	int y = _documentLocation.y() + ( _documents.size() - 1 ) * DOCUMENT_OFFSET;
+	editor -> move( x, y );
+	editor -> show();
 
 	_documents.push_back( editor );
 
-	return 0;
+	updateSimulationPopup();
+
+	return editor;
 }
 
+void brqtMainWindow::stopSimulation() { 
+	if( _engine ) {
+		delete _engine;
+		_engine = NULL;
+	}
+}
 
 void brqtMainWindow::toggleSimulation() { 
 	if( !_engine ) {
@@ -143,11 +187,11 @@ void brqtMainWindow::toggleSimulation() {
 		const QString qstr = window -> getText();
 		char *str = slStrdup( qstr.toAscii().constData() );
 
-		_engine = new brqtEngine( str, "untitled.tz", _ui.glWidget );
+		_engine = new brqtEngine( str, window -> windowTitle().toAscii().constData(), _ui.glWidget );
 
 		slFree( str );
 	} else {
-		delete _engine;
+		_engine -> togglePaused();
 	}
 }
 
@@ -155,7 +199,7 @@ QMenu *brqtMainWindow::buildMenuFromDirectory( const char *inDirectory, QMenu *i
 	QDir dir( inDirectory );
 	QFileInfoList files = dir.entryInfoList( *inFilters, QDir::Files | QDir::AllDirs, QDir::Name );
 
-    for ( int i = 0; i < files.size(); i++ ) {
+	for ( int i = 0; i < files.size(); i++ ) {
 		const QFileInfo &file = files.at( i );
 
 		if( !file.isHidden() ) {
@@ -177,4 +221,11 @@ QMenu *brqtMainWindow::buildMenuFromDirectory( const char *inDirectory, QMenu *i
 	connect( inParent, SIGNAL( triggered(QAction*) ), this, inSlot );
 
 	return inParent;
+}
+
+void brqtMainWindow::updateSimulationPopup() {
+	_ui.simulationPopup -> clear();
+
+	for( int n = 0; n < _documents.size(); n++ ) 
+		_ui.simulationPopup -> addItem( _documents[ n ] -> windowTitle(), QVariant( NULL ) );
 }

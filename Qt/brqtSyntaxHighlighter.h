@@ -1,36 +1,55 @@
 #include <qsyntaxhighlighter.h>
 #include <vector>
 
+struct brqtSyntaxFeature {
+	brqtSyntaxFeature( char *inRegex, const QColor& inColor ) {
+		_regex.setPattern( inRegex );	
+		_color = inColor;
+	}
+
+	QColor		_color;
+	QRegExp		_regex;
+};
+
 class brqtSyntaxHighlighter : public QSyntaxHighlighter {
 	public:
 		brqtSyntaxHighlighter( QTextEdit *textEdit) : QSyntaxHighlighter( textEdit ) {
-			_typeColor.setRgb(255, 0, 0);
-			_commentColor.setRgb(100, 100, 100);
-			_numberColor.setRgb(0, 0, 255);
-			_stringColor.setRgb(0, 255, 0);
+			QColor stringColor, numberColor, typeColor, commentColor;
+
+			typeColor.setRgb( 255, 0, 0 );
+			commentColor.setRgb( 130, 130, 130 );
+			numberColor.setRgb( 0, 0, 255 );
+			stringColor.setRgb( 0, 255, 0 );
 	
-		_types.push_back("int");
-			_types.push_back("string");
-			_types.push_back("matrix");
-			_types.push_back("vector");
-			_types.push_back("double");
-			_types.push_back("float");
-			_types.push_back("hash");
-			_types.push_back("list");
-			_types.push_back("object");
+			_features.push_back( brqtSyntaxFeature( "[^\\w]int[^\\w]"   , typeColor ) );
+			_features.push_back( brqtSyntaxFeature( "[^\\w]string[^\\w]", typeColor ) );
+			_features.push_back( brqtSyntaxFeature( "[^\\w]matrix[^\\w]", typeColor ) );
+			_features.push_back( brqtSyntaxFeature( "[^\\w]vector[^\\w]", typeColor ) );
+			_features.push_back( brqtSyntaxFeature( "[^\\w]double[^\\w]", typeColor ) );
+			_features.push_back( brqtSyntaxFeature( "[^\\w]float[^\\w]" , typeColor ) );
+			_features.push_back( brqtSyntaxFeature( "[^\\w]hash[^\\w]"  , typeColor ) );
+			_features.push_back( brqtSyntaxFeature( "[^\\w]list[^\\w]"  , typeColor ) );
+			_features.push_back( brqtSyntaxFeature( "[^\\w]object[^\\w]", typeColor ) );
+
+			_features.push_back( brqtSyntaxFeature( "\"[^\"]*\"", stringColor ) );
+			_features.push_back( brqtSyntaxFeature( "\'[^\']*\'", stringColor ) );
+			_features.push_back( brqtSyntaxFeature( "'''.*'''",   stringColor ) );
+
+			_features.push_back( brqtSyntaxFeature( "[0-9]*\\.?[0-9]*", numberColor ) );
+
+			_features.push_back( brqtSyntaxFeature( "#.*", commentColor ) );
 		};
 	
 		void highlightBlock(const QString &text ) {
 	
-			for(unsigned int n=0;n<_types.size();n++) { 
+			for( unsigned int n = 0; n < _features.size(); n++ ) { 
 				int pos = 0;
 		
-				while( ( pos = text.indexOf( _types[n], pos) ) != -1) 
-					setFormat(pos++, strlen( _types[n] ), _typeColor );	
+				while( ( pos = text.indexOf( _features[ n ]._regex, pos) ) != -1) 
+					setFormat( pos++, _features[ n ]._regex.matchedLength(), _features[ n ]._color );
 			}	
 		}
 	
 	public:
-		QColor _stringColor, _numberColor, _typeColor, _commentColor;
-		std::vector< char* > _types;
+		QList< brqtSyntaxFeature > _features;
 };

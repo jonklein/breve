@@ -1,39 +1,44 @@
 TEMPLATE        = app
 LANGUAGE        = C++
 
-CONFIG  += qt warn_on release opengl thread opengl
+CONFIG  += qt release thread opengl
 
-QT		+= opengl
+QT	+= opengl
 
 LIBS    += -L../lib -lbreve @LIBS@ 
 
-INCLUDEPATH     += ../include/breve
+INCLUDEPATH += ../include/breve
 
-HEADERS += brqtGLWidget.h \
-        brqtEngine.h \
-        brqtMethodPopup.h \
-        brqtMainWindow.h \
-        brqtEditorWindow.h \
-        brqtSteveSyntaxHighlighter.h
+HEADERS += brqtGLWidget.h 	\
+        brqtEngine.h 		\
+        brqtMethodPopup.h 	\
+        brqtLogWindow.h 	\
+        brqtMainWindow.h 	\
+        brqtEditorWindow.h 	\
+	brqtFindDialog.h	\
+        brqtSyntaxHighlighter.h
 
-SOURCES += brqtGLWidget.cpp \
-        main.cpp \
-        brqtEngine.cpp \
-        brqtMainWindow.cpp \
-		brqtMoveableWidgets.cpp \
-		brqtEditorWindow.cpp \
+SOURCES += brqtGLWidget.cpp 	\
+        main.cpp 		\
+        brqtEngine.cpp 		\
+        brqtLogWindow.cpp 	\
+        brqtMainWindow.cpp 	\
+	brqtMoveableWidgets.cpp	\
+	brqtEditorWindow.cpp 	\
+	brqtFindDialog.cpp	\
         brqtMethodPopup.cpp
 
-FORMS   = brqtMainWindow.ui \
-        brqtLogWindow.ui \
-        brqtObjectInspector.ui \
-        brqtEditorWindow.ui \
-        brqtErrorWindow.ui \
-		brqtWidgetPalette.ui
+FORMS =	brqtMainWindow.ui 	\
+        brqtLogWindow.ui 	\
+        brqtObjectInspector.ui 	\
+        brqtEditorWindow.ui 	\
+        brqtErrorWindow.ui 	\
+	brqtWidgetPalette.ui 	\
+	brqtFindDialog.ui
 
 RESOURCES = breve.qrc
 
-LEXSOURCES      += brqtQuickparser.l
+LEXSOURCES += brqtQuickparser.l
 
 unix {
 	UI_DIR = .ui
@@ -42,8 +47,8 @@ unix {
 }
 
 mac {
-	LIBS        	+= -framework OpenGL
-	CONFIG 			+= x86 ppc
+	LIBS	+= -framework OpenGL
+	CONFIG 	+= x86 ppc
 }
 
 QMAKE_CXXFLAGS  += @CPPFLAGS@

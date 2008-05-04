@@ -3,6 +3,8 @@
 brqtEngine::brqtEngine( const char *inSimulationText, const char *inSimulationName, brqtGLWidget *inGLView ) {
 	_glwidget = inGLView;
 
+	_timerDelay = 5;
+
 	_engine = brEngineNew();
 	_glwidget -> setEngine( _engine );
 
@@ -11,7 +13,7 @@ brqtEngine::brqtEngine( const char *inSimulationText, const char *inSimulationNa
 	brInitFrontendLanguages( _engine );
 
 	if( brLoadSimulation( _engine, inSimulationText, inSimulationName ) == EC_OK ) {
-		_timerID = startTimer( 10 );
+		_timerID = startTimer( _timerDelay );
 	}
 }
 

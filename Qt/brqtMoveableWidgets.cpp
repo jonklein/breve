@@ -91,16 +91,15 @@ brqtMoveable< QGroupBox > *brqtMoveableGLWidget( brqtMainWindow *w ) {
 
 	glwidget = new brqtGLWidget( frame );
 
-	glwidget->setEnabled( false );
+	glwidget -> setEnabled( false );
 
-	layout->setMargin( 2 );
-	layout->addWidget( glwidget );
+	layout -> setMargin( 2 );
+	layout -> addWidget( glwidget );
 
 	return frame;
 }
 
 brqtMoveable< QGroupBox > *brqtMoveableRadioButtonGroup( brqtMainWindow *w ) {
-	brqtGLWidget *glwidget;
 	brqtMoveable< QGroupBox > *frame;
 	QVBoxLayout *layout = new QVBoxLayout;
 

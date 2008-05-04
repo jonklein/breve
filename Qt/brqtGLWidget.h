@@ -20,8 +20,8 @@ class brqtGLWidget : public QGLWidget {
 			_engine = e; 
 
 			if(_engine) {
-				slInitGL( _engine->world, _engine->camera );
-				_engine->camera->setBounds( width(), height() );
+				_engine -> camera -> initGL();
+				_engine -> camera -> setBounds( width(), height() );
 			} 
 
 			updateGL();

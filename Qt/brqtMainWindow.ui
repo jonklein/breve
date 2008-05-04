@@ -237,7 +237,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QComboBox" name="comboBox" >
+       <widget class="QComboBox" name="simulationPopup" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
           <horstretch>0</horstretch>

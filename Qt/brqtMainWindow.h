@@ -16,6 +16,7 @@
 
 #include "ui_brqtMainWindow.h"
 
+#include "brqtLogWindow.h"
 #include "brqtFindDialog.h"
 #include "brqtWidgetPalette.h"
 #include "brqtEngine.h"
@@ -39,13 +40,17 @@ class brqtMainWindow : public QMainWindow {
 			_editing = e; 
 		}
 
-		void					closeDocument();
+		void					closeDocument( brqtEditorWindow *inWidget );
 
 	public slots:
 		void 					toggleEditing();
 		void 					openDocument();
 		void 					newDocument();
 		void 					toggleSimulation();
+		void 					stopSimulation();
+		void 					setButtonMode();
+
+		void 					activateLogWindow();
 
 
 		void 					copy() {
@@ -85,14 +90,16 @@ class brqtMainWindow : public QMainWindow {
 		}
 
 
-		void 					close() {
+		void					closeWindow() {
 			QWidget *w = QApplication::activeWindow();
 
-			if( w ) 
+			if( w && w != this ) 
 				w -> close();
 		}
 
-
+		bool 					close() {
+			return false;
+		}
 
 
 
@@ -118,7 +125,9 @@ class brqtMainWindow : public QMainWindow {
 		}
 
 	private:
-		int 					openDocument( QString &inDocument );
+		brqtEditorWindow*			openDocument( QString &inDocument );
+
+		void					updateSimulationPopup();
 
 		QMenu*					buildMenuFromDirectory( const char *inDirectory, QMenu *inParent, QStringList *inFilters, const char *inSlot );
 
@@ -131,16 +140,19 @@ class brqtMainWindow : public QMainWindow {
 									return NULL;
 								}
 
-		bool 								_editing;
+		bool 					_editing;
 
-		brqtWidgetPalette 					_palette;
-		brqtFindDialog						_findDialog;
+		brqtWidgetPalette 			_palette;
+		brqtFindDialog				_findDialog;
 		
-		brqtEngine*							_engine;
+		brqtEngine*				_engine;
+		brqtLogWindow*				_logWindow;
 		
-		std::vector< brqtEditorWindow* >	_documents;
+		QList< brqtEditorWindow* >		_documents;
 
-		Ui::brqtMainWindow					_ui;
+		QPoint					_documentLocation;
+
+		Ui::brqtMainWindow			_ui;
 };
 
 #endif // _BRQTMAINWINDOW_H
