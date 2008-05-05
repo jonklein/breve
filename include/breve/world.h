@@ -21,7 +21,8 @@
 #ifndef _WORLD_H
 #define _WORLD_H
 
-#include "ode/ode.h"
+#include <ode/ode.h>
+
 #include "worldObject.h"
 #include "netsim.h"
 #include "patch.h"

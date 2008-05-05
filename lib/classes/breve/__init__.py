@@ -10,11 +10,11 @@ import cPickle
 
 class breveStderrHandler:
  	def write( self, line ):
- 		breveInternal.catchOutput( breveInternal, line )
+ 		breveInternal.catchOutput( breveInternal, line, 1 )
 
 class breveStdoutHandler:
  	def write( self, line ):
- 		breveInternal.catchOutput( breveInternal, line )
+ 		breveInternal.catchOutput( breveInternal, line, 0 )
 
 sys.stderr = breveStderrHandler()
 sys.stdout = breveStdoutHandler()

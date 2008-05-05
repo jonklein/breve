@@ -43,12 +43,12 @@ class slException {
 */
 
 enum slDebugLevels {
-    NORMAL_OUTPUT = 0,  /*! normal output */
-    DEBUG_ALL   = 0,
-    DEBUG_ERROR = 10,   /*! major errors */
-    DEBUG_WARN  = 25,   /*! warnings */
-    DEBUG_INFO  = 50,   /*! developer information */
-    DEBUG_GEN   = 100   /*! all output information */
+    NORMAL_OUTPUT 	= -1,  /*! normal output */
+    DEBUG_ALL   	= 0,
+    DEBUG_ERROR 	= 10,   /*! major errors */
+    DEBUG_WARN  	= 25,   /*! warnings */
+    DEBUG_INFO  	= 50,   /*! developer information */
+    DEBUG_GEN   	= 100   /*! all output information */
 };
 
 #define slDebug(format, args...)	{ slMessage(0, "Error at source file \"%s\", line %d:\n", __FILE__, __LINE__); slMessage(0, format, ##args ); }
@@ -81,10 +81,11 @@ DLLEXPORT void slMessage(int, const char *, ...);
 DLLEXPORT void slFormattedMessage( int level, const char *format );
 
 /**
- * The default output function, prints text to stderr.
+ * The default output functions, prints text to stderr/stdout.
  */
 
 void slStderrMessageCallback( const char * );
+void slStdoutMessageCallback( const char * );
 
 /**
  * Set the message-output callback function.
@@ -93,6 +94,10 @@ void slStderrMessageCallback( const char * );
  * callback function.  By default, the data will be printed to
  * stderr, but the callback function could ignore it, print it
  * to a file, etc.
+ *
+ * If slSetMessageCallbackFunctions is used, a separate handler
+ * may be used for errors and for normal output.
  */
 
 void slSetMessageCallbackFunction( void (*)( const char *) );
+void slSetMessageCallbackFunctions( void (*)( const char *), void (*)( const char *) );

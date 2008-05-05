@@ -3296,7 +3296,7 @@ int stCallMethodByNameWithArgs( stRunInstance *target, char *name, const brEval 
 void stStackTrace( stSteveData *d ) {
 	stStackRecord *r = d->stackRecord;
 
-	slMessage( NORMAL_OUTPUT, "breve engine tack trace:\n" );
+	slMessage( DEBUG_ALL, "breve engine tack trace:\n" );
 
 	stStackTraceFrame( r );
 }
@@ -3308,7 +3308,7 @@ int stStackTraceFrame( stStackRecord *r ) {
 
 	n = stStackTraceFrame( r->previousStackRecord );
 
-	slMessage( NORMAL_OUTPUT, "%d) %s (%p) %s (line %d of \"%s\")\n", n, r->instance->type->name.c_str(), r->instance, r->method->name.c_str(), r->method->lineno, r->method->filename.c_str() );
+	slMessage( DEBUG_ALL, "%d) %s (%p) %s (line %d of \"%s\")\n", n, r->instance->type->name.c_str(), r->instance, r->method->name.c_str(), r->method->lineno, r->method->filename.c_str() );
 
 	return n + 1;
 }

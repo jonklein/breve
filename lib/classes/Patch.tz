@@ -235,7 +235,7 @@ Abstract : Patch (aka Patches) [version 2.2] {
 		% frequently, you should call this method once and keep a copy of the list.
 
 		result (list).
-		x, y, z (int).
+		x, y (int).
 		patch (object).
 		seen (hash).
 
@@ -261,7 +261,7 @@ Abstract : Patch (aka Patches) [version 2.2] {
 		% frequently, you should call this method once and keep a copy of the list.
 
 		result (list).
-		x, y, z (int).
+		x, y (int).
 		patch (object).
 		seen (hash).
 

@@ -551,12 +551,10 @@ void slInitGlut( int argc, char **argv, char *title ) {
 	mainMenu = glutCreateMenu( brMainMenu );
 
 	glutSetMenu( mainMenu );
-	// glutAttachMenu( GLUT_RIGHT_BUTTON );
 
 	contextMenu = glutCreateMenu( brContextMenu );
 
 	glutSetMenu( contextMenu );
-	// glutAttachMenu( GLUT_MIDDLE_BUTTON );
 
 	gEngine -> camera -> initGL();
 
@@ -890,8 +888,8 @@ int slLoadOSMesaPlugin( char *execPath ) {
 		return -1;
 	}
 
-	gEngine->camera->setActivateContextCallback( activate );
-	gEngine->camera->_renderContextCallback = renderContext;
+	gEngine -> camera -> setActivateContextCallback( activate );
+	gEngine -> camera -> _renderContextCallback = renderContext;
 
 	activate();
 

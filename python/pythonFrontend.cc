@@ -395,11 +395,12 @@ PyObject *brPythonIsCObject( PyObject *inSelf, PyObject *inArgs ) {
 PyObject *brPythonCatchOutput( PyObject *inSelf, PyObject *inArgs ) {
 	PyObject *moduleObject;
 	char *message;
+	int isErr;
 
-	if( !PyArg_ParseTuple( inArgs, "Os", &moduleObject, &message ) ) 
+	if( !PyArg_ParseTuple( inArgs, "Osi", &moduleObject, &message, &isErr ) ) 
 		return NULL;
 
-	slFormattedMessage( DEBUG_ALL, message );
+	slFormattedMessage( isErr ? DEBUG_ALL : NORMAL_OUTPUT, message );
 
 	Py_INCREF( Py_None );
 	return Py_None;
