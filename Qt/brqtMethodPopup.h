@@ -14,9 +14,7 @@ class brqtMethodPopup : public QComboBox {
 		_updating = false;
 	}
 		
-	void setTextArea( QTextEdit *e ) {
-		_textArea = e;
-	}
+	void 			setTextArea( QTextEdit *e ) { _textArea = e; }
 
   public slots:
 	virtual void go( int );

@@ -14,9 +14,11 @@ class brqtEngine : public QObject {
 			_stop = 1;
 
 			if( _glwidget )
-			_glwidget->setEngine( NULL );
+				_glwidget->setEngine( NULL );
 
-			killTimer( _timerID );
+			if( _timerID != -1 )
+				killTimer( _timerID );
+
 			brEngineFree( _engine );
 		}
 
@@ -27,6 +29,8 @@ class brqtEngine : public QObject {
 
 		brEngine 		*_engine;
 		brqtGLWidget 		*_glwidget;
+
+		bool error() { return _error; }
 		
 		bool togglePaused() {
 			if(_paused) {
@@ -35,6 +39,7 @@ class brqtEngine : public QObject {
 			} else {
 				_paused = 1;
 				killTimer( _timerID );
+				_timerID = -1;
 			}
 
 			return _paused;
@@ -50,12 +55,15 @@ class brqtEngine : public QObject {
 				togglePaused();
 			}
 		}
-	
+
+	private:
 		int 			_timerID;
 		bool 			_stop;
 		bool 			_paused;
 
 		int 			_timerDelay;
+
+		bool			_error;
 };
 
 #endif

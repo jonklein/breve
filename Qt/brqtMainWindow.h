@@ -45,6 +45,7 @@ class brqtMainWindow : public QMainWindow {
 	public slots:
 		void 					toggleEditing();
 		void 					openDocument();
+		void 					saveDocument();
 		void 					newDocument();
 		void 					toggleSimulation();
 		void 					stopSimulation();
@@ -80,7 +81,7 @@ class brqtMainWindow : public QMainWindow {
 		void 					redo() {
 			QTextEdit *editor = focusedTextEdit();
 			if( editor )
-				editor -> undo();
+				editor -> redo();
 		}
 
 		void 					selectAll() {
@@ -96,16 +97,6 @@ class brqtMainWindow : public QMainWindow {
 			if( w && w != this ) 
 				w -> close();
 		}
-
-		bool 					close() {
-			return false;
-		}
-
-
-
-
-
-
 
 		void 					openDemo( QAction *inAction ) {
 			QString s = inAction -> data().toString();

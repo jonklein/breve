@@ -13,12 +13,15 @@ brqtMainWindow::brqtMainWindow() : QMainWindow( NULL, Qt::WindowTitleHint ) {
 	_editing = 0;
 	_ui.setupUi( this );
 
-	setWindowFlags(Qt::WindowTitleHint);
+	setAttribute( Qt::WA_MacBrushedMetal );
+
+	setStatusBar( NULL );
 
 	_palette.hide();
 
 	// connect( _ui.editButton, SIGNAL( pressed() ), this, SLOT( toggleEditing() ) );
 	connect( _ui.actionOpen, SIGNAL( triggered() ), this, SLOT( openDocument() ) );
+	connect( _ui.actionSave, SIGNAL( triggered() ), this, SLOT( saveDocument() ) );
 	connect( _ui.actionNew, SIGNAL( triggered() ), this, SLOT( newDocument() ) );
 
 	connect( _ui.actionCut, SIGNAL( triggered() ), this, SLOT( cut() ) );
@@ -26,6 +29,7 @@ brqtMainWindow::brqtMainWindow() : QMainWindow( NULL, Qt::WindowTitleHint ) {
 	connect( _ui.actionPaste, SIGNAL( triggered() ), this, SLOT( paste() ) );
 	connect( _ui.actionUndo, SIGNAL( triggered() ), this, SLOT( undo() ) );
 	connect( _ui.actionRedo, SIGNAL( triggered() ), this, SLOT( redo() ) );
+	connect( _ui.actionSelectAll, SIGNAL( triggered() ), this, SLOT( selectAll() ) );
 	connect( _ui.actionClose, SIGNAL( triggered() ), this, SLOT( closeWindow() ) );
 
 	connect( _ui.actionFind, SIGNAL( triggered() ), this, SLOT( find() ) );
@@ -36,7 +40,7 @@ brqtMainWindow::brqtMainWindow() : QMainWindow( NULL, Qt::WindowTitleHint ) {
 
 	setAcceptDrops( true );
 
-	QPoint position( 0, 30 );
+	QPoint position( 1, 1 );
 	move( position );
 
 	QStringList demoFilters;
@@ -54,8 +58,10 @@ brqtMainWindow::brqtMainWindow() : QMainWindow( NULL, Qt::WindowTitleHint ) {
 	_documentLocation.setY( bounds.top() );
 
 	_logWindow = new brqtLogWindow( this );
-	_logWindow -> move( 0, bounds.bottom() );
+	_logWindow -> move( 0, bounds.bottom() + 2 );
 	_logWindow -> show();
+
+	slSetMessageCallbackFunctions( brqtLogWindow::logout, brqtLogWindow::logerr );
 
 	newDocument();
 }
@@ -118,10 +124,18 @@ void brqtMainWindow::toggleEditing() {
 	repaint();
 }
 
+void brqtMainWindow::saveDocument() { 
+	brqtEditorWindow *w = (brqtEditorWindow*)QApplication::activeWindow();
+
+	if( _documents.contains( w ) ) 
+		w -> save();
+}
+
 void brqtMainWindow::openDocument() { 
 	QString s = QFileDialog::getOpenFileName( this );
 
-	openDocument( s );
+	if( s != "" )
+		openDocument( s );
 }
 
 #define DOCUMENT_OFFSET 20
@@ -134,7 +148,6 @@ void brqtMainWindow::newDocument() {
 	int x = _documentLocation.x() + ( _documents.size() - 1 ) * DOCUMENT_OFFSET;
 	int y = _documentLocation.y() + ( _documents.size() - 1 ) * DOCUMENT_OFFSET;
 	editor -> move( x, y );
-
 	editor -> show();
 	
 	updateSimulationPopup();
@@ -155,18 +168,16 @@ void brqtMainWindow::closeDocument( brqtEditorWindow *inDocument ) {
 }
 
 brqtEditorWindow *brqtMainWindow::openDocument( QString &inDocument ) {
-	std::string file = inDocument.toStdString();
-
 	brqtEditorWindow *editor = new brqtEditorWindow( this );
 
-	editor -> loadFile( file );
+	_documents.push_back( editor );
+
+	editor -> loadFile( inDocument );
 
 	int x = _documentLocation.x() + ( _documents.size() - 1 ) * DOCUMENT_OFFSET;
 	int y = _documentLocation.y() + ( _documents.size() - 1 ) * DOCUMENT_OFFSET;
 	editor -> move( x, y );
 	editor -> show();
-
-	_documents.push_back( editor );
 
 	updateSimulationPopup();
 
@@ -182,7 +193,9 @@ void brqtMainWindow::stopSimulation() {
 
 void brqtMainWindow::toggleSimulation() { 
 	if( !_engine ) {
-		brqtEditorWindow *window = _documents.back();
+		int index = _ui.simulationPopup -> currentIndex();
+
+		brqtEditorWindow *window = _documents[ index ];
 
 		const QString qstr = window -> getText();
 		char *str = slStrdup( qstr.toAscii().constData() );
@@ -190,6 +203,9 @@ void brqtMainWindow::toggleSimulation() {
 		_engine = new brqtEngine( str, window -> windowTitle().toAscii().constData(), _ui.glWidget );
 
 		slFree( str );
+
+		if( _engine -> error() ) 
+			stopSimulation();
 	} else {
 		_engine -> togglePaused();
 	}
@@ -226,6 +242,7 @@ QMenu *brqtMainWindow::buildMenuFromDirectory( const char *inDirectory, QMenu *i
 void brqtMainWindow::updateSimulationPopup() {
 	_ui.simulationPopup -> clear();
 
-	for( int n = 0; n < _documents.size(); n++ ) 
-		_ui.simulationPopup -> addItem( _documents[ n ] -> windowTitle(), QVariant( NULL ) );
+	for( int n = 0; n < _documents.size(); n++ ) {
+		_ui.simulationPopup -> addItem( _documents[ n ] -> windowTitle(), QVariant( _documents[ n ] ) );
+	}
 }

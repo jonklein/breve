@@ -42,7 +42,7 @@ class brqtSyntaxHighlighter : public QSyntaxHighlighter {
 	
 		void highlightBlock(const QString &text ) {
 	
-			for( unsigned int n = 0; n < _features.size(); n++ ) { 
+			for( int n = 0; n < _features.size(); n++ ) { 
 				int pos = 0;
 		
 				while( ( pos = text.indexOf( _features[ n ]._regex, pos) ) != -1) 

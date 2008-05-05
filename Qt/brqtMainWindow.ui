@@ -1,255 +1,338 @@
 <ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
  <class>brqtMainWindow</class>
  <widget class="QMainWindow" name="brqtMainWindow" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>580</width>
-    <height>536</height>
+    <width>543</width>
+    <height>487</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>breve</string>
   </property>
   <widget class="QWidget" name="centralwidget" >
-   <layout class="QVBoxLayout" >
+   <layout class="QGridLayout" >
+    <property name="margin" >
+     <number>0</number>
+    </property>
     <property name="spacing" >
-     <number>6</number>
+     <number>0</number>
     </property>
-    <property name="leftMargin" >
-     <number>9</number>
-    </property>
-    <property name="topMargin" >
-     <number>9</number>
-    </property>
-    <property name="rightMargin" >
-     <number>9</number>
-    </property>
-    <property name="bottomMargin" >
-     <number>9</number>
-    </property>
-    <item>
-     <widget class="QFrame" name="displayFrame" >
-      <property name="frameShape" >
-       <enum>QFrame::Box</enum>
+    <item row="0" column="1" >
+     <layout class="QVBoxLayout" >
+      <property name="margin" >
+       <number>0</number>
       </property>
-      <property name="frameShadow" >
-       <enum>QFrame::Sunken</enum>
-      </property>
-      <layout class="QVBoxLayout" >
-       <property name="leftMargin" >
-        <number>2</number>
-       </property>
-       <property name="topMargin" >
-        <number>2</number>
-       </property>
-       <property name="rightMargin" >
-        <number>2</number>
-       </property>
-       <property name="bottomMargin" >
-        <number>2</number>
-       </property>
-       <item>
-        <widget class="brqtGLWidget" native="1" name="glWidget" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" >
       <property name="spacing" >
        <number>6</number>
       </property>
-      <property name="leftMargin" >
-       <number>0</number>
-      </property>
-      <property name="topMargin" >
-       <number>0</number>
-      </property>
-      <property name="rightMargin" >
-       <number>0</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>0</number>
-      </property>
       <item>
-       <widget class="QGroupBox" name="groupBox" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <widget class="QFrame" name="displayFrame" >
+        <property name="frameShape" >
+         <enum>QFrame::NoFrame</enum>
         </property>
-        <property name="minimumSize" >
-         <size>
-          <width>176</width>
-          <height>59</height>
-         </size>
+        <property name="frameShadow" >
+         <enum>QFrame::Plain</enum>
         </property>
-        <property name="title" >
-         <string>Cursor Mode</string>
-        </property>
-        <widget class="QToolButton" name="toolButton" >
-         <property name="geometry" >
-          <rect>
-           <x>47</x>
-           <y>30</y>
-           <width>41</width>
-           <height>24</height>
-          </rect>
+        <layout class="QVBoxLayout" >
+         <property name="margin" >
+          <number>2</number>
          </property>
-         <property name="text" >
-          <string>zoom</string>
+         <property name="spacing" >
+          <number>2</number>
          </property>
-         <property name="checkable" >
-          <bool>true</bool>
-         </property>
-         <property name="autoExclusive" >
-          <bool>true</bool>
-         </property>
-        </widget>
-        <widget class="QToolButton" name="toolButton_4" >
-         <property name="geometry" >
-          <rect>
-           <x>131</x>
-           <y>30</y>
-           <width>41</width>
-           <height>24</height>
-          </rect>
-         </property>
-         <property name="text" >
-          <string>move</string>
-         </property>
-         <property name="checkable" >
-          <bool>true</bool>
-         </property>
-         <property name="autoExclusive" >
-          <bool>true</bool>
-         </property>
-        </widget>
-        <widget class="QToolButton" name="toolButton_2" >
-         <property name="geometry" >
-          <rect>
-           <x>5</x>
-           <y>30</y>
-           <width>41</width>
-           <height>24</height>
-          </rect>
-         </property>
-         <property name="text" >
-          <string>rotate</string>
-         </property>
-         <property name="checkable" >
-          <bool>true</bool>
-         </property>
-         <property name="autoExclusive" >
-          <bool>true</bool>
-         </property>
-        </widget>
-        <widget class="QToolButton" name="toolButton_3" >
-         <property name="geometry" >
-          <rect>
-           <x>89</x>
-           <y>30</y>
-           <width>41</width>
-           <height>24</height>
-          </rect>
-         </property>
-         <property name="text" >
-          <string>select</string>
-         </property>
-         <property name="checkable" >
-          <bool>true</bool>
-         </property>
-         <property name="autoExclusive" >
-          <bool>true</bool>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item>
-       <spacer>
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType" >
-         <enum>QSizePolicy::Expanding</enum>
-        </property>
-        <property name="sizeHint" >
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="stopSimulationButton" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text" >
-         <string/>
-        </property>
-        <property name="icon" >
-         <iconset>stop.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="toggleSimulationButton" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text" >
-         <string/>
-        </property>
-        <property name="icon" >
-         <iconset>play.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer>
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" >
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QComboBox" name="simulationPopup" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize" >
-         <size>
-          <width>100</width>
-          <height>0</height>
-         </size>
-        </property>
+         <item>
+          <widget class="brqtGLWidget" name="glWidget" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>13</hsizetype>
+             <vsizetype>13</vsizetype>
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QGroupBox" name="groupBox_2" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>0</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize" >
+              <size>
+               <width>183</width>
+               <height>49</height>
+              </size>
+             </property>
+             <property name="font" >
+              <font>
+               <family>Lucida Grande</family>
+               <pointsize>11</pointsize>
+               <weight>50</weight>
+               <italic>false</italic>
+               <bold>false</bold>
+               <underline>false</underline>
+               <strikeout>false</strikeout>
+              </font>
+             </property>
+             <property name="title" >
+              <string>Cursor Mode</string>
+             </property>
+             <widget class="QToolButton" name="toolButton_24" >
+              <property name="geometry" >
+               <rect>
+                <x>137</x>
+                <y>24</y>
+                <width>40</width>
+                <height>22</height>
+               </rect>
+              </property>
+              <property name="font" >
+               <font>
+                <family>Lucida Grande</family>
+                <pointsize>9</pointsize>
+                <weight>50</weight>
+                <italic>false</italic>
+                <bold>false</bold>
+                <underline>false</underline>
+                <strikeout>false</strikeout>
+               </font>
+              </property>
+              <property name="focusPolicy" >
+               <enum>Qt::NoFocus</enum>
+              </property>
+              <property name="text" >
+               <string>Move</string>
+              </property>
+              <property name="checkable" >
+               <bool>true</bool>
+              </property>
+              <property name="autoExclusive" >
+               <bool>true</bool>
+              </property>
+             </widget>
+             <widget class="QToolButton" name="toolButton_22" >
+              <property name="geometry" >
+               <rect>
+                <x>51</x>
+                <y>24</y>
+                <width>42</width>
+                <height>22</height>
+               </rect>
+              </property>
+              <property name="font" >
+               <font>
+                <family>Lucida Grande</family>
+                <pointsize>9</pointsize>
+                <weight>50</weight>
+                <italic>false</italic>
+                <bold>false</bold>
+                <underline>false</underline>
+                <strikeout>false</strikeout>
+               </font>
+              </property>
+              <property name="focusPolicy" >
+               <enum>Qt::NoFocus</enum>
+              </property>
+              <property name="text" >
+               <string>Zoom</string>
+              </property>
+              <property name="checkable" >
+               <bool>true</bool>
+              </property>
+              <property name="autoExclusive" >
+               <bool>true</bool>
+              </property>
+             </widget>
+             <widget class="QToolButton" name="toolButton_23" >
+              <property name="geometry" >
+               <rect>
+                <x>94</x>
+                <y>24</y>
+                <width>42</width>
+                <height>22</height>
+               </rect>
+              </property>
+              <property name="font" >
+               <font>
+                <family>Lucida Grande</family>
+                <pointsize>9</pointsize>
+                <weight>50</weight>
+                <italic>false</italic>
+                <bold>false</bold>
+                <underline>false</underline>
+                <strikeout>false</strikeout>
+               </font>
+              </property>
+              <property name="focusPolicy" >
+               <enum>Qt::NoFocus</enum>
+              </property>
+              <property name="text" >
+               <string>Select</string>
+              </property>
+              <property name="checkable" >
+               <bool>true</bool>
+              </property>
+              <property name="autoExclusive" >
+               <bool>true</bool>
+              </property>
+             </widget>
+             <widget class="QToolButton" name="toolButton_21" >
+              <property name="geometry" >
+               <rect>
+                <x>6</x>
+                <y>24</y>
+                <width>44</width>
+                <height>22</height>
+               </rect>
+              </property>
+              <property name="font" >
+               <font>
+                <family>Lucida Grande</family>
+                <pointsize>9</pointsize>
+                <weight>50</weight>
+                <italic>false</italic>
+                <bold>false</bold>
+                <underline>false</underline>
+                <strikeout>false</strikeout>
+               </font>
+              </property>
+              <property name="focusPolicy" >
+               <enum>Qt::NoFocus</enum>
+              </property>
+              <property name="text" >
+               <string>Rotate</string>
+              </property>
+              <property name="checkable" >
+               <bool>true</bool>
+              </property>
+              <property name="checked" >
+               <bool>true</bool>
+              </property>
+              <property name="autoExclusive" >
+               <bool>true</bool>
+              </property>
+             </widget>
+            </widget>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType" >
+              <enum>QSizePolicy::Minimum</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="stopSimulationButton" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>0</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text" >
+              <string/>
+             </property>
+             <property name="icon" >
+              <iconset>stop.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="toggleSimulationButton" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>0</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text" >
+              <string/>
+             </property>
+             <property name="icon" >
+              <iconset>play.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType" >
+              <enum>QSizePolicy::Minimum</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>30</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QComboBox" name="simulationPopup" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>3</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize" >
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="font" >
+              <font>
+               <family>Lucida Grande</family>
+               <pointsize>10</pointsize>
+               <weight>50</weight>
+               <italic>false</italic>
+               <bold>false</bold>
+               <underline>false</underline>
+               <strikeout>false</strikeout>
+              </font>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -261,7 +344,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>580</width>
+     <width>543</width>
      <height>22</height>
     </rect>
    </property>
@@ -323,7 +406,7 @@
     <addaction name="actionCopy" />
     <addaction name="actionPaste" />
     <addaction name="actionCut" />
-    <addaction name="actionSelect_All" />
+    <addaction name="actionSelectAll" />
     <addaction name="separator" />
     <addaction name="actionClear_Log" />
     <addaction name="menuFind" />
@@ -362,16 +445,22 @@
    <addaction name="menuWindow" />
    <addaction name="menuHelp" />
   </widget>
-  <widget class="QStatusBar" name="statusbar" />
+  <widget class="QStatusBar" name="statusbar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>465</y>
+     <width>543</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
   <action name="actionSave" >
    <property name="text" >
     <string>&amp;Save</string>
    </property>
    <property name="shortcut" >
     <string>Ctrl+S</string>
-   </property>
-   <property name="shortcutContext" >
-    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionOpen" >
@@ -380,9 +469,6 @@
    </property>
    <property name="shortcut" >
     <string>Ctrl+O</string>
-   </property>
-   <property name="shortcutContext" >
-    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionNew" >
@@ -394,9 +480,6 @@
    </property>
    <property name="shortcut" >
     <string>Ctrl+N</string>
-   </property>
-   <property name="shortcutContext" >
-    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionDocumentation_Index" >
@@ -436,9 +519,6 @@
    <property name="shortcut" >
     <string>Ctrl+C</string>
    </property>
-   <property name="shortcutContext" >
-    <enum>Qt::ApplicationShortcut</enum>
-   </property>
   </action>
   <action name="actionPaste" >
    <property name="text" >
@@ -472,7 +552,7 @@
     <string>Ctrl+Shift+Z</string>
    </property>
   </action>
-  <action name="actionSelect_All" >
+  <action name="actionSelectAll" >
    <property name="text" >
     <string>Select All</string>
    </property>
@@ -492,9 +572,6 @@
    <property name="shortcut" >
     <string>Ctrl+W</string>
    </property>
-   <property name="shortcutContext" >
-    <enum>Qt::ApplicationShortcut</enum>
-   </property>
   </action>
   <action name="actionStart_Simulation" >
    <property name="text" >
@@ -502,9 +579,6 @@
    </property>
    <property name="shortcut" >
     <string>Ctrl+R</string>
-   </property>
-   <property name="shortcutContext" >
-    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionPrint" >
@@ -587,12 +661,14 @@
    </property>
   </action>
  </widget>
+ <pixmapfunction></pixmapfunction>
  <customwidgets>
   <customwidget>
    <class>brqtGLWidget</class>
    <extends>QWidget</extends>
-   <header location="global" >brqtGLWidget.h</header>
+   <header>brqtGLWidget.h</header>
    <container>1</container>
+   <pixmap></pixmap>
   </customwidget>
  </customwidgets>
  <resources/>

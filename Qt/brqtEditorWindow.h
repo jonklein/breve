@@ -1,6 +1,11 @@
 #include <QApplication>
 #include <QList>
 #include <QDialog>
+#include <QFileSystemWatcher>
+#include <QFileInfo>
+#include <QMessageBox>
+
+
 #include "ui_brqtEditorWindow.h"
 
 #include <string>
@@ -9,37 +14,44 @@ class brqtEditorWindow : public QDialog {
 	Q_OBJECT
 
 	public:
-						brqtEditorWindow( QWidget *parent ) ;
+						brqtEditorWindow( QWidget *parent );
 
-		int				loadFile( std::string &inPath );
+		bool				loadFile( const QString &inPath );
 
-		bool				close();
+		QString				getText() const;
 
-		const QString			getText();
+		bool				save();
+		void				closeEvent( QCloseEvent* inEvent );
 
-		void 				setDocumentTitle( const QString &inName );
+		void				timerEvent( QTimerEvent* );
 
 	public slots:
-		void on_textEdit_cursorPositionChanged() {
-			int line = _ui.textEdit -> textCursor().blockNumber() + 1;
-			QString str;
 
-			str.setNum( line );
+		void 				fileChanged();
 
-			_ui.lineBox -> setText( str );
-		}
+		void 				setModified() {
+						     setWindowModified( _ui.textEdit -> document() -> isModified() );
+						}
 
-		void on_lineBox_lostFocus() {
-			int line = _ui.lineBox -> text().toInt();
+		void 				on_textEdit_cursorPositionChanged() {
+							int line = _ui.textEdit -> textCursor().blockNumber() + 1;
+							QString str;
 
-			goToLine( line );
-		}
+							str.setNum( line );
+
+							_ui.lineBox -> setText( str );
+						}
+
+		void 				on_lineBox_lostFocus() {
+							goToLine( _ui.lineBox -> text().toInt() );
+						}
 
 		void				addChildParameter();
 		void				removeParameter();
 		void				loadParameters();
 
 	private:
+		void 				setDocumentPath( const QString &inPath );
 
 		void 				goToLine( int inLine ) {
 
@@ -51,7 +63,7 @@ class brqtEditorWindow : public QDialog {
 			int pos = 0;
 			inLine--;
 
-		        while( inLine-- )
+		        while( inLine-- && pos >= 0 )
 				pos = str.indexOf( "\n", pos ) + 1;
 
 			cursor.setPosition( pos, QTextCursor::MoveAnchor );
@@ -62,6 +74,12 @@ class brqtEditorWindow : public QDialog {
 			_ui.textEdit -> setTextCursor( cursor );
 		}
 
-		void				closeDocument() { printf( "close document\n" ); }
 		Ui::brqtEditorWindow 		_ui;
+
+		bool				_hasPath;
+		bool				_lostFileWatch;
+
+		QFileSystemWatcher		_fileWatcher;
+
+		QFileInfo			_fileInfo;
 };

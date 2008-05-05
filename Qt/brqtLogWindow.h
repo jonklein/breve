@@ -10,7 +10,17 @@ class brqtLogWindow : public QDialog {
 
 	public:
 						brqtLogWindow( QWidget *parent = NULL );
+						~brqtLogWindow();
 
-	private:
+		void				log( const char *inText, bool inErr );
+
+		static void			logout( const char *inText );
+		static void			logerr( const char *inText );
+
+		static brqtLogWindow*		_logWindow;
+
 		Ui::brqtLogWindow 		_ui;
+
+		QColor				_stdoutColor;
+		QColor				_stderrColor;
 };
