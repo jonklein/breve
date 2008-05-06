@@ -17,6 +17,10 @@ brqtMainWindow::brqtMainWindow() : QMainWindow( NULL, Qt::WindowTitleHint ) {
 
 	setStatusBar( NULL );
 
+	char *argv[] = { "none" };
+	int argc = 1;
+	glutInit( &argc, argv );
+
 	_palette.hide();
 
 	// connect( _ui.editButton, SIGNAL( pressed() ), this, SLOT( toggleEditing() ) );
