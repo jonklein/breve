@@ -348,26 +348,6 @@
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuHelp" >
-    <property name="title" >
-     <string>Help</string>
-    </property>
-    <widget class="QMenu" name="menuPythonClasses" >
-     <property name="title" >
-      <string>Python Classes</string>
-     </property>
-     <addaction name="actionNone" />
-    </widget>
-    <widget class="QMenu" name="menuSteveClasses" >
-     <property name="title" >
-      <string>steve Classes</string>
-     </property>
-     <addaction name="actionNone_2" />
-    </widget>
-    <addaction name="actionDocumentation_Index_2" />
-    <addaction name="menuSteveClasses" />
-    <addaction name="menuPythonClasses" />
-   </widget>
    <widget class="QMenu" name="menuSimulation" >
     <property name="title" >
      <string>Simulation</string>
@@ -437,6 +417,24 @@
     <addaction name="actionSave_Simulation_Log" />
     <addaction name="separator" />
     <addaction name="actionPrint" />
+   </widget>
+   <widget class="QMenu" name="menuHelp" >
+    <property name="title" >
+     <string>Help</string>
+    </property>
+    <widget class="QMenu" name="menuSteveClasses" >
+     <property name="title" >
+      <string>steve Classes</string>
+     </property>
+    </widget>
+    <widget class="QMenu" name="menuPythonClasses" >
+     <property name="title" >
+      <string>Python Classes</string>
+     </property>
+    </widget>
+    <addaction name="actionDocumentation_Index_2" />
+    <addaction name="menuSteveClasses" />
+    <addaction name="menuPythonClasses" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />

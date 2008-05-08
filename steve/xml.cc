@@ -728,6 +728,19 @@ brXMLDOMElement* brXMLDOMElement::getChildByName( const char *inName ) {
 	return NULL;
 }
 
+brXMLDOMElement *brXMLParseFile( char *inPath ) {
+	char *text = slUtilReadFile( inPath );
+
+	if( !text )
+		return NULL;
+
+	brXMLDOMElement *element = brXMLParse( text );
+
+	slFree( text );
+
+	return element;
+}
+
 brXMLDOMElement *brXMLParse( char *inBuffer ) {
 	XML_Parser parser;
 	brXMLState dom;

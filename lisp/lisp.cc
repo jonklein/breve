@@ -170,7 +170,7 @@ int brLispIsSubclass( void *inClassA, void *inClassB ) {
 int brLispCanLoad( void *inObjectData, const char *inExtension ) {
 	if( !strcasecmp( inExtension, "l" ) 
 		|| !strcasecmp( inExtension, "lisp" ) 
-		|| !strcasecmp( inExtension, "lbreve" ) )
+		|| !strcasecmp( inExtension, "brevel" ) )
 			return 1;
 
 	return 0;

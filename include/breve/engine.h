@@ -202,7 +202,7 @@ class brEngine {
 		std::string 				_outputPath;
 		std::string 				_launchDirectory;
 
-		std::vector<brDlPlugin*> 		dlPlugins;
+		std::vector< brDlPlugin* > 		dlPlugins;
 
 		// the drawEveryFrame flag is a hint to the display engine
 		// if set, the application attempts to draw a frame with every

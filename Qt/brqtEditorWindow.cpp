@@ -48,7 +48,7 @@ brqtEditorWindow::brqtEditorWindow( QWidget *parent ) : QDialog( parent ) {
 void brqtEditorWindow::fileChanged() {
 	if( _fileInfo.exists() ) {
 		if( isWindowModified() ) {
-			QMessageBox box( QMessageBox::Question, "", "This document has changed externally!  Do you want to reload the document from disk and discard your changes?", 0, this, Qt::Sheet );
+			QMessageBox box( QMessageBox::Question, "breve", tr( "This document has changed externally!  Do you want to reload the document from disk and discard your changes?" ), 0, this, Qt::Sheet );
 
 			QPushButton* keep   = box.addButton( tr( "Keep Changes" ), QMessageBox::RejectRole );
 			QPushButton* reload = box.addButton( tr( "Reload From Disk" ), QMessageBox::AcceptRole );
@@ -148,7 +148,7 @@ bool brqtEditorWindow::save() {
 	}
 
 	if (!success ) {
-		QMessageBox box( QMessageBox::Warning, "", QString( "Error Writing File" ).arg( file.errorString() ), 0, this, Qt::Sheet );
+		QMessageBox box( QMessageBox::Warning, "breve", QString( tr( "Error Writing File: $1" ) ).arg( file.errorString() ), 0, this, Qt::Sheet );
 		box.setDefaultButton( box.addButton( tr( "OK" ), QMessageBox::AcceptRole ) );
 		box.exec();
 
@@ -164,7 +164,7 @@ bool brqtEditorWindow::save() {
 void brqtEditorWindow::closeEvent( QCloseEvent* inEvent ) {
 	if( isWindowModified() ) {
 
-		QMessageBox box( QMessageBox::Question, "", "Do you want to save the changes you made in this document?", 0, this, Qt::Sheet );
+		QMessageBox box( QMessageBox::Question, "breve", tr( "Do you want to save the changes you made in this document?" ), 0, this, Qt::Sheet );
 
 		QPushButton *bsave   = box.addButton( tr( "Save" ), QMessageBox::AcceptRole );
 		QPushButton *bcancel = box.addButton( tr( "Cancel" ), QMessageBox::RejectRole );

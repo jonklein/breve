@@ -40,6 +40,9 @@ RESOURCES = breve.qrc
 
 LEXSOURCES += brqtQuickparser.l
 
+ICON	= breve.icns
+RC_FILE	= breve.rc
+
 unix {
 	UI_DIR = .ui
 	MOC_DIR = .moc
@@ -49,6 +52,12 @@ unix {
 mac {
 	LIBS	+= -framework OpenGL
 	CONFIG 	+= x86 ppc
+
+	DEMOS.files = ../demos
+	DEMOS.path  = Contents/Resources
+	DOCS.files = ../docs
+	DOCS.path  = Contents/Resources
+	QMAKE_BUNDLE_DATA 	+= DEMOS DOCS
 }
 
 QMAKE_CXXFLAGS  += @CPPFLAGS@

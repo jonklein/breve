@@ -42,19 +42,13 @@ brqtMainWindow::brqtMainWindow() : QMainWindow( NULL, Qt::WindowTitleHint ) {
 	connect( _ui.toggleSimulationButton, SIGNAL( pressed() ), this, SLOT( toggleSimulation() ) );
 	connect( _ui.stopSimulationButton, SIGNAL( pressed() ), this, SLOT( stopSimulation() ) );
 
+	buildMenus();
+
 	setAcceptDrops( true );
 
 	QPoint position( 1, 1 );
 	move( position );
 
-	QStringList demoFilters;
-	demoFilters.append( "*.tz" );
-	demoFilters.append( "*.py" );
-	buildMenuFromDirectory( "../demos",             _ui.menuDemos, &demoFilters, SLOT( openDemo(QAction*) ) );
-
-	QStringList docFilters( "*.html" );
-	buildMenuFromDirectory( "../docs/steveclasses",  _ui.menuSteveClasses,  &docFilters,  SLOT( openHTML(QAction*) ) );
-	buildMenuFromDirectory( "../docs/pythonclasses", _ui.menuPythonClasses, &docFilters,  SLOT( openHTML(QAction*) ) );
 
 	QRect bounds = rect();
 
@@ -70,6 +64,55 @@ brqtMainWindow::brqtMainWindow() : QMainWindow( NULL, Qt::WindowTitleHint ) {
 	newDocument();
 }
 
+void brqtMainWindow::buildMenus() {
+	QString demoPath, docsPath;
+
+	#ifdef Q_WS_MAC
+
+	demoPath = QApplication::applicationDirPath() + "/../Resources/demos";
+	docsPath = QApplication::applicationDirPath() + "/../Resources/docs";
+
+	#else 
+
+	demoPath = QApplication::applicationDirPath() + "/demos";
+	docsPath = QApplication::applicationDirPath() + "/docs";
+
+	#endif
+
+
+	char *docsRootEnv = getenv( "BREVE_DOCS_PATH" );
+	char *demoRootEnv = getenv( "BREVE_DEMO_PATH" );
+
+	if( docsRootEnv && strlen( docsRootEnv ) != 0 )
+		docsPath = docsRootEnv;
+
+	if( demoRootEnv && strlen( demoRootEnv ) != 0 )
+		demoPath = demoRootEnv;
+
+
+
+	QStringList demoFilters;
+	demoFilters.append( "*.tz" );
+	demoFilters.append( "*.py" );
+	buildMenuFromDirectory( demoPath, _ui.menuDemos, &demoFilters, SLOT( openDemo(QAction*) ) );
+
+	QStringList docFilters( "*.html" );
+	buildMenuFromDirectory( docsPath + "/steveclasses",  _ui.menuSteveClasses,  &docFilters,  SLOT( openHTML(QAction*) ) );
+	buildMenuFromDirectory( docsPath + "/pythonclasses", _ui.menuPythonClasses, &docFilters,  SLOT( openHTML(QAction*) ) );
+
+
+	if( _ui.menuSteveClasses -> isEmpty() || _ui.menuPythonClasses -> isEmpty() ) {
+		QMessageBox::warning( this, tr( "breve" ), tr( "Could not locate documentation files.  The breve docs directory should be in the same directory as the breve executable, or may be specified using the BREVE_DOCS_PATH environment variable." ), QMessageBox::Ok );
+	}
+
+	if( _ui.menuDemos -> isEmpty() ) {
+		QMessageBox::warning( this, tr( "breve" ), tr( "Could not locate demo files.  The breve demos directory should be in the same directory as the breve executable, or may be specified using the BREVE_DEMO_PATH environment variable." ), QMessageBox::Ok );
+	}
+
+
+}
+
+
 void brqtMainWindow::dragEnterEvent( QDragEnterEvent *event ) {
 	if ( event->mimeData()->hasFormat("text/plain") ) 
 		event->acceptProposedAction();
@@ -80,7 +123,7 @@ void brqtMainWindow::dropEvent( QDropEvent *event ) {
 	QWidget *widget = NULL;
 	QString string = event->mimeData()->text();
 
-	printf(" Got drop: %s\n", string.toAscii().constData() );
+	// printf(" Got drop: %s\n", string.toAscii().constData() );
 
 	if( !string.compare( "button" ) ) {
 		widget = brqtMoveablePushButton( this );
@@ -136,7 +179,7 @@ void brqtMainWindow::saveDocument() {
 }
 
 void brqtMainWindow::openDocument() { 
-	QString s = QFileDialog::getOpenFileName( this );
+	QString s = QFileDialog::getOpenFileName( this, tr( "breve simulation files (*.tz *.py *.brevepy *.l *.brevel)" ) );
 
 	if( s != "" )
 		openDocument( s );
@@ -215,7 +258,7 @@ void brqtMainWindow::toggleSimulation() {
 	}
 }
 
-QMenu *brqtMainWindow::buildMenuFromDirectory( const char *inDirectory, QMenu *inParent, QStringList *inFilters, const char *inSlot ) {
+QMenu *brqtMainWindow::buildMenuFromDirectory( const QString& inDirectory, QMenu *inParent, QStringList *inFilters, const char *inSlot ) {
 	QDir dir( inDirectory );
 	QFileInfoList files = dir.entryInfoList( *inFilters, QDir::Files | QDir::AllDirs, QDir::Name );
 
@@ -246,7 +289,8 @@ QMenu *brqtMainWindow::buildMenuFromDirectory( const char *inDirectory, QMenu *i
 void brqtMainWindow::updateSimulationPopup() {
 	_ui.simulationPopup -> clear();
 
-	for( int n = 0; n < _documents.size(); n++ ) {
+	for( int n = 0; n < _documents.size(); n++ ) 
 		_ui.simulationPopup -> addItem( _documents[ n ] -> windowTitle(), QVariant( _documents[ n ] ) );
-	}
+
+	// _ui.simulationPopup -> activated( _documents.size() - 1 );
 }

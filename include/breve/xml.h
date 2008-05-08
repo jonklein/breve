@@ -118,6 +118,9 @@ char *brXMLDecodeString( const char * );
 
 int stXMLParseInstanceData( brXMLParserState *inState, brXMLDOMElement *inInstanceData, stInstance *outInstance );
 
-
 void brXMLParseEval( brXMLParserState *inState, brXMLDOMElement *inElement, brEval *outEval );
+
+brXMLDOMElement *brXMLParse( char *inText );
+brXMLDOMElement *brXMLParseFile( char *inPath );
+
 

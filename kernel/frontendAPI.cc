@@ -47,14 +47,14 @@ int brLoadFile( brEngine *engine, const char *code, const char *file ) {
 	return EC_ERROR;
 }
 
-int brLoadSavedSimulation( brEngine *engine, const char *code, const char *file, const char *xmlfile ) {
+int brLoadSavedSimulation( brEngine *inEngine, const char *code, const char *file, const char *inArchive ) {
 	char *extension = slFileExtension( file );
 
-	for( unsigned int n = 0; n < engine->_objectTypes.size(); n++ ) {
-		brObjectType *type = engine->_objectTypes[ n ];
+	for( unsigned int n = 0; n < inEngine->_objectTypes.size(); n++ ) {
+		brObjectType *type = inEngine->_objectTypes[ n ];
 
 		if( type->load && type->canLoad && type->canLoad( type->userData, extension ) ) {
-			int r = type->loadWithArchive( engine, type->userData, file, code, xmlfile );
+			int r = type->loadWithArchive( inEngine, type->userData, file, code, inArchive );
 
 			if( r != EC_OK ) 
 				return EC_ERROR;

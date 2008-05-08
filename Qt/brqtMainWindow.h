@@ -119,8 +119,9 @@ class brqtMainWindow : public QMainWindow {
 		brqtEditorWindow*			openDocument( QString &inDocument );
 
 		void					updateSimulationPopup();
+		void					buildMenus();
 
-		QMenu*					buildMenuFromDirectory( const char *inDirectory, QMenu *inParent, QStringList *inFilters, const char *inSlot );
+		QMenu*					buildMenuFromDirectory( const QString& inDirectory, QMenu *inParent, QStringList *inFilters, const char *inSlot );
 
 		QTextEdit*				focusedTextEdit() {
 									QWidget *w = QApplication::focusWidget();

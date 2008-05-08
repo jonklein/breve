@@ -95,7 +95,6 @@ int brIImageGetValueAtCoordinates( brEval args[], brEval *result, brInstance *i 
 	int y = BRINT( &args[ 2 ] );
 
 	int bpp = BRINT( &args[ 3 ] );
-	int bps = 2;
 
 	if ( x < 0 || x >= ( dm -> _width * bpp ) || y < 0 || y >= dm -> _height ) {
 		slMessage( DEBUG_ALL, "Image access (%d, %d) out of bounds (%d, %d)\n", x, y, dm -> _width, dm -> _height );
@@ -187,7 +186,7 @@ int brIImageReadDepthBuffer( brEval args[], brEval *result, brInstance *i ) {
 	if(linearize){  
 	  double objX, objY, objZ;
           double proj[16];
-          int view[4];
+          GLint view[4];
           double model[] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
           // We need to recover the projection matrix so that we can call gluUnProject
 	  glMatrixMode( GL_PROJECTION );
