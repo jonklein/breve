@@ -193,6 +193,8 @@ slWorld::~slWorld() {
 #endif
 
 	slFreeIntegrationVectors( this );
+
+	dCloseODE();
 }
 
 /**
