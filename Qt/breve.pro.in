@@ -12,6 +12,7 @@ INCLUDEPATH += ../include/breve
 HEADERS += brqtGLWidget.h 	\
         brqtEngine.h 		\
         brqtMethodPopup.h 	\
+        brqtInterfaceWindow.h	\
         brqtLogWindow.h 	\
         brqtMainWindow.h 	\
         brqtEditorWindow.h 	\
@@ -21,6 +22,7 @@ HEADERS += brqtGLWidget.h 	\
 SOURCES += brqtGLWidget.cpp 	\
         main.cpp 		\
         brqtEngine.cpp 		\
+        brqtInterfaceWindow.cpp	\
         brqtLogWindow.cpp 	\
         brqtMainWindow.cpp 	\
 	brqtMoveableWidgets.cpp	\
@@ -30,6 +32,7 @@ SOURCES += brqtGLWidget.cpp 	\
 
 FORMS =	brqtMainWindow.ui 	\
         brqtLogWindow.ui 	\
+        brqtInterfaceWindow.ui 	\
         brqtObjectInspector.ui 	\
         brqtEditorWindow.ui 	\
         brqtErrorWindow.ui 	\

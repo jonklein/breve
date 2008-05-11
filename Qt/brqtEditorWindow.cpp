@@ -173,7 +173,7 @@ void brqtEditorWindow::closeEvent( QCloseEvent* inEvent ) {
 		box.setEscapeButton( bcancel );
 		box.setDefaultButton( bsave );
 
-		int result = box.exec();
+		box.exec();
 
 		if( box.clickedButton() == bcancel ) {
 			inEvent -> ignore();
@@ -201,10 +201,13 @@ void brqtEditorWindow::addChildParameter() {
 	if( selection ) {
 		QTreeWidgetItem *child = new QTreeWidgetItem( selection );
 		selection -> addChild( child );
+		selection -> setText( 1, "" );
+		selection -> setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
 
 		child -> setText( 0, "Untitled" );
 		child -> setText( 1, "0" );
 		child -> setFlags( Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable );
+
 		_ui.parameters -> expandItem( child );
 	}
 }
@@ -212,10 +215,53 @@ void brqtEditorWindow::addChildParameter() {
 void brqtEditorWindow::removeParameter() {
 	QTreeWidgetItem *selection = _ui.parameters -> currentItem();
 
+	QTreeWidgetItem *parent = selection -> parent();
+
 	delete selection;
+
+	if( parent -> childCount() == 0 ) {
+		parent -> setText( 1, "0" );
+		parent -> setFlags( Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable );
+	}
 }
 
 void brqtEditorWindow::loadParameters() {
 	QString s = QFileDialog::getOpenFileName( this, tr( "Open Simulation Parameters" ), tr( "breve parameter files (*.xml *.brxml)" ) );
 
+}
+
+QString brqtEditorWindow::getXMLParameters() const { 
+	QTreeWidget *root = _ui.parameters;
+	QString str;
+
+	for( int n = 0; n < root -> topLevelItemCount(); n++  ) {
+		QString child = getXMLParameters( *root -> topLevelItem( n ) );
+		str += child;
+	}
+
+	return str;
+}
+
+QString brqtEditorWindow::getXMLParameters( const QTreeWidgetItem& inItem, int inDepth ) const { 
+	QString str;
+	QString tabs;
+
+	for( int t = 0; t < inDepth; t++ )
+		tabs += "\t";
+
+
+	if( inItem.childCount() == 0 ) {
+		str += QString( "%1<parameter>%2</parameter>\n%1<value>%3</value>\n" ).arg( tabs, inItem.text( 0 ), inItem.text( 1 ) );
+	} else {
+		str += tabs;
+		str += "<list>\n";
+		for( int n = 0; n < inItem.childCount(); n++ ) {
+			QString child = getXMLParameters( *inItem.child( n ), inDepth + 1 );
+			str += child;
+		}
+		str += tabs;
+		str += "</list>\n";
+	}
+
+	return str;
 }

@@ -50,7 +50,11 @@ class brqtEditorWindow : public QDialog {
 		void				removeParameter();
 		void				loadParameters();
 
+		QString				getXMLParameters() const;
+
 	private:
+		QString 			getXMLParameters( const QTreeWidgetItem& inItem, int inDepth = 0 ) const;
+
 		void 				setDocumentPath( const QString &inPath );
 
 		void 				goToLine( int inLine ) {

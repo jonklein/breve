@@ -244,8 +244,13 @@ void brqtMainWindow::toggleSimulation() {
 
 		brqtEditorWindow *window = _documents[ index ];
 
-		const QString qstr = window -> getText();
-		char *str = slStrdup( qstr.toAscii().constData() );
+		const QString simtext = window -> getText();
+		char *str = slStrdup( simtext.toAscii().constData() );
+
+		const QString paramtext = window -> getXMLParameters ();
+		char *params = slStrdup( paramtext.toAscii().constData() );
+
+		printf( "%s\n", params );
 
 		_engine = new brqtEngine( str, window -> windowTitle().toAscii().constData(), _ui.glWidget );
 
