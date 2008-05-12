@@ -5,7 +5,7 @@
 
 #include "pythonFrontend.h"
 #include "perlInit.h"
-// #include "lisp.h"
+#include "lisp.h"
 
 #include "breveFunctionsSteveDataObject.h"
 #include "breveFunctionsSteveObject.h"

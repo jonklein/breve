@@ -10,13 +10,15 @@ AC_CANONICAL_HOST
 python=yes
 
 AC_ARG_ENABLE([engineonly],	
-		[--enable-engineonly	Eliminate as many optional libraries from build as possible], engine_only=yes)
+		[--enable-engineonly	Eliminate as many optional libraries from build as possible], engine_only="$enableval")
 AC_ARG_ENABLE([static], 	
-		[--enable-static		Link staticly for as many libraries as possible], static=yes)
-AC_ARG_ENABLE([nopython], 	
-		[--enable-nopython		Build without support for Python], python=no)
+		[--enable-static		Link staticly for as many libraries as possible], static="$enableval")
+AC_ARG_ENABLE([lisp], 	
+		[--enable-lisp		Link against ECL Lisp library (for development only)], lisp="$enableval")
+AC_ARG_ENABLE([python], 	
+		[--enable-python		Build without support for Python], python="$enableval")
 AC_ARG_ENABLE([osxcompat104], 
-		[--enable-osxcompat104	Build on Mac OS X 10.5 to produce 10.4 compatible build], osxcompat104=yes)
+		[--enable-osxcompat104	Build on Mac OS X 10.5 to produce 10.4 compatible build], osxcompat104="$enableval")
 
 PYTHONROOT="/usr"
 
@@ -76,9 +78,9 @@ case ${host_os} in
 		AC_DEFINE([MACOSX], [1], [Mac OS X])
 		EXTRAOPTFLAGS="-falign-loops=16 -ftree-vectorize -funroll-loops"
 
-		if test "x$osxcompat104"; then 
-			CPPFLAGS="$CPPFLAGS -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"
-			LDFLAGS="$LDFLAGS -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
+		if test "x$osxcompat104" = "xyes"; then 
+			CPPFLAGS="${CPPFLAGS} -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"
+			LDFLAGS="${LDFLAGS} -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
 			PYTHONROOT="/Developer/SDKs/MacOSX10.4u.sdk/usr"
 		fi
 
@@ -121,7 +123,7 @@ esac
 # Python wants to be dynamically linked as well
 #
 
-if test "x$python" != "xno"; then 
+if test "x$python" = "xyes"; then 
 	echo $python
 	PYTHONINCLUDE=""
 
@@ -179,15 +181,20 @@ if test "x$perl" != "x"; then
 fi
 
 
-if test "x$engine_only" = "x"; then
+#
+# ECL Support (currently for development only)
+#
+
+AC_CHECK_PROGS(ECL_CONFIG, [ecl-config], [], $PATH:/usr/local/bin:/usr/bin:/usr/local/ecl )
+
+if test "x$engine_only" = "x" && test "x$lisp" != "x"; then
 	if test "$ECL_CONFIG" != ""; then
 		LDECL=`$ECL_CONFIG --libs`
-		LDFLAGS="$LDFLAGS $LDECL"
 		CPPECL=`$ECL_CONFIG --cflags`        
-		AC_CHECK_LIB([eclgc], [main])
-		AC_CHECK_LIB([sockets], [main])
-		AC_CHECK_LIB([cmp], [main])
-		AC_CHECK_LIB([eclgmp], [main])
+
+		LIBS="$LIBS $LDECL"
+		CPPFLAGS="$CPPFLAGS $CPPECL"
+
 		AC_CHECK_LIB([ecl], [cl_boot])
 	fi    
 fi
@@ -231,7 +238,7 @@ AC_SUBST(PLUGINIMP)
 AC_SUBST(PLUGINLIB)
 AC_SUBST(QUICKTIMEFLAGS)
 AC_SUBST(RANLIB)
-AC_SUBST(REGEXLIB)
+# AC_SUBST(REGEXLIB)
 AC_SUBST(VERSION)
 AC_SUBST(EXTRAOPTFLAGS)
 AC_SUBST(WXCONFIG)
@@ -292,10 +299,11 @@ if test $ac_cv_header_pthread_h = yes ; then
 fi
 
 AC_CHECK_LIB([z], [gzopen],,AC_MSG_FAILURE([Missing zlib library -- see http://www.zlib.org]))
-AC_CHECK_LIB([regex], [regcomp], [REGEXLIB=-lregex])
 AC_CHECK_LIB([expat], [XML_ParserCreate],,AC_MSG_FAILURE([Missing expat library -- see http://www.jclark.com/xml/expat.html]))
 
-# the engine_only flag means to ignore all of the extra libraries.
+#
+# engine_only flag means doing a minimal breve build, without support for many optional features
+#
 
 if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([enet], [enet_initialize])
@@ -336,7 +344,6 @@ if test "x$engine_only" = "x"; then
 
 	AC_CHECK_LIB([curl], [curl_easy_init])
 
-	AC_CHECK_PROGS(ECL_CONFIG, [ecl-config], [], $PATH:/usr/local/bin:/usr/bin:/usr/local/ecl )
 fi
 
 if test "x$custom_cblas" = x; then

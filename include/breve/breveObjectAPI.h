@@ -42,7 +42,8 @@ struct brObjectType {
 		destroyInstance 		= NULL;
 		destroyObjectType		= NULL;
 		userData			= NULL;
-		userData			= NULL;
+		load				= NULL;
+		canLoad				= NULL;
 		encodeToString			= NULL;
 		decodeFromString		= NULL;
 		finishDearchive			= NULL;

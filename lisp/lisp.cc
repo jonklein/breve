@@ -19,67 +19,49 @@
  *****************************************************************************/
 
 #include "kernel.h"
+#include "lisp.h"
 
-#ifdef _HAVE_LIBECL
+#ifdef HAVE_LIBECL
 
 #include <ecl/ecl.h>
 #include <signal.h>
 
-void brLispInit( brEngine *breveEngine ) {
-	// Boot up the lisp interpreter 
-
-	char *argv[ 1 ] = { "breve" };
-	cl_object result;
-
-	cl_boot( 1, argv );
-
-	// HELLO WORLD
-
-	result = cl_eval( c_string_to_object( "( setf *xyz* '( hello world ) )" ) );
-	result = cl_eval( c_string_to_object( "( print *xyz* )" ) );
-
-	// result = cl_eval( c_string_to_object( "(compile 'foo '(lambda (x) (+ x 1)))" ) );
-	// result = cl_eval( c_string_to_object( "(print (foo 1))" ) );
-
-	// Lisp messes with our signal handlers!  We cannot allow that.
-
-	signal( SIGFPE, NULL );
-	signal( SIGSEGV, NULL );
-
-	// Register the lisp object type
-
-	brObjectType *breveLispType = new brObjectType();
-
-	// breveLispType->findMethod 		= brLispFindMethod;
-	// breveLispType->findObject 		= brLispFindObject;
-	// breveLispType->instantiate 		= brLispInstantiate;
-	// breveLispType->callMethod 		= brLispCallMethod;
-	// breveLispType->isSubclass 		= brLispIsSubclass;
-	// breveLispType->destroyObject 		= brLispDestroyGenericLispObject;
-	// breveLispType->destroyMethod 		= brLispDestroyGenericLispObject;
-	// breveLispType->destroyInstance 		= brLispDestroyGenericLispObject;
-	// breveLispType->canLoad			= brLispCanLoad;
-	// breveLispType->load			= brLispLoad;
-	breveLispType->_typeSignature 		= LISP_TYPE_SIGNATURE;
-
-	// brEngineRegisterObjectType( breveEngine, breveLispType );
-}
 
 
 
+/**
+ * Translation function from a Lisp object to a breve value.
+ * 
+ * @param inLispVal		The lisp value to be translated
+ * @param inEval		The lisp value to be translated.
+ * @return			EC_ERROR or EC_OK
+ */
 
 
+inline int brLispTypeToEval( cl_object inObject, brEval *outEval ) {
+	switch( type_of( inObject ) ) {
+		case t_cons:
+			break;
 
+		case t_base_string:
+			outEval -> set( inObject -> base_string.self );
+			break;
 
+		case t_doublefloat:
+			outEval -> set( inObject -> DF.DFVAL );
+			break;
 
+		case t_singlefloat:
+			outEval -> set( inObject -> SF.SFVAL );
+			break;
 
+		case t_fixnum:
+			outEval -> set( fix( inObject ) );
+			break;
 
-
-
-
-
-inline int brLispTypeToEval( cl_object *inObject, brEval *outEval ) {
-
+		default:
+			return EC_ERROR;
+	}
 }
 
 /**
@@ -90,8 +72,17 @@ inline int brLispTypeToEval( cl_object *inObject, brEval *outEval ) {
  * @return			A newly created Lisp object translated from the source value.
  */
 
-inline cl_object *brLispTypeFromEval( const brEval *inEval, cl_object *inBridgeObject ) {
+inline cl_object brLispTypeFromEval( const brEval *inEval, cl_object inBridgeObject ) {
+	switch( inEval -> type() ) {
+		case AT_INT:
+		case AT_DOUBLE:
+		case AT_INSTANCE:
+		case AT_VECTOR:
+		default:
+			break;
+	}
 
+	return NULL;
 }
 
 
@@ -117,6 +108,7 @@ inline cl_object *brLispTypeFromEval( const brEval *inEval, cl_object *inBridgeO
  */
 
 void *brLispFindMethod( void *inObject, const char *inName, unsigned char *inTypes, int inCount ) {
+	return NULL;
 }
 
 /**
@@ -127,6 +119,16 @@ void *brLispFindMethod( void *inObject, const char *inName, unsigned char *inTyp
  */
 
 void *brLispFindObject( void *inData, const char *inName ) {
+	std::string command;
+
+	command = std::string( "( find-class '" ) + inName + ")";
+
+	printf( "cmd: %s\n", command.c_str() );
+	cl_object result = cl_eval( c_string_to_object( command.c_str() ) );
+
+	printf( "%s: %p [%d]\n", inName, result, type_of( result ) );
+
+	return result;
 }
 
 /**
@@ -139,6 +141,14 @@ void *brLispFindObject( void *inData, const char *inName ) {
  */
 
 brInstance *brLispInstantiate( brEngine *inEngine, brObject* inObject, const brEval **inArgs, int inArgCount ) {
+	std::string command( "( make-instance '" );
+
+	command += ")";
+
+	cl_object result = cl_eval( c_string_to_object( command.c_str() ) );
+	printf( "%p [%d]\n", result, type_of( result ) );
+
+	return NULL;
 }
 
 /**
@@ -151,6 +161,7 @@ brInstance *brLispInstantiate( brEngine *inEngine, brObject* inObject, const brE
  */
 
 int brLispCallMethod( void *inInstance, void *inMethod, const brEval **inArguments, brEval *outResult ) {
+	return EC_ERROR;
 }
 
 /**
@@ -160,7 +171,8 @@ int brLispCallMethod( void *inInstance, void *inMethod, const brEval **inArgumen
  * Clearly not implemented at the moment.
  */
 
-int brLispIsSubclass( void *inClassA, void *inClassB ) {
+int brLispIsSubclass( brObjectType *inObjectType,  void *inClassA, void *inClassB ) {
+	return 0;
 }
 
 /**
@@ -181,7 +193,7 @@ int brLispCanLoad( void *inObjectData, const char *inExtension ) {
  */
 
 int brLispLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext ) {
-	return EC_OK;
+	return EC_ERROR;
 }
 
 /**
@@ -192,6 +204,51 @@ int brLispLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *inFi
  */
 
 void brLispDestroyGenericLispObject( void *inObject ) {
+
 }
+
+
+
+
+
+
+int brLispInit( brEngine *breveEngine ) {
+	// Boot up the lisp interpreter 
+
+	char *argv[ 1 ] = { "breve" };
+	cl_object result;
+
+	cl_boot( 1, argv );
+
+	// HELLO WORLD
+
+	// Lisp messes with our signal handlers!  We cannot allow that.
+
+	signal( SIGFPE,  NULL );
+	signal( SIGSEGV, NULL );
+	signal( SIGINT,  NULL );
+
+	// Register the lisp object type
+
+	brObjectType *breveLispType = new brObjectType();
+
+	breveLispType -> findMethod 		= brLispFindMethod;
+	breveLispType -> findObject 		= brLispFindObject;
+	breveLispType -> instantiate 		= brLispInstantiate;
+	breveLispType -> callMethod 		= brLispCallMethod;
+	breveLispType -> isSubclass 		= brLispIsSubclass;
+	breveLispType -> destroyObject 		= brLispDestroyGenericLispObject;
+	breveLispType -> destroyMethod 		= brLispDestroyGenericLispObject;
+	breveLispType -> destroyInstance 	= brLispDestroyGenericLispObject;
+	breveLispType -> canLoad		= brLispCanLoad;
+	breveLispType -> load			= brLispLoad;
+	breveLispType -> _typeSignature 	= LISP_TYPE_SIGNATURE;
+
+	brEngineRegisterObjectType( breveEngine, breveLispType );
+
+	return EC_OK;
+}
+
+
 
 #endif
