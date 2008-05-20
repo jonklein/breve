@@ -269,14 +269,22 @@ void slShape::setMass( double newMass ) {
 	setDensity( _density );
 }
 
-/*!
-	\brief Sets the density of the shape.
-
-	Sets the density of the change, which modifies the mass.
-*/
+/**
+ * \brief Sets the density of the shape.
+ * 
+ * Sets the density of the change, which modifies the mass.
+ */
 
 void slShape::setDensity( double newDensity ) {
 	slSetMassProperties( this, newDensity );
+}
+
+/**
+ * Sets the inertia matrix of the shape.
+ */
+
+void slShape::setInertiaMatrix( slMatrix inInertia ) {
+	slMatrixCopy( inInertia, _inertia );
 }
 
 /**

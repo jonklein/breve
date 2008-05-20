@@ -192,6 +192,7 @@ class slShape {
 
 		virtual void 						setMass(double mass);
 		virtual void 						setDensity(double density);
+		virtual void 						setInertiaMatrix( slMatrix inInertia );
 		virtual void						finishShape( double inDensity );
 
 		double 								getMass();

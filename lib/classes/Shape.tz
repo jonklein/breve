@@ -47,6 +47,17 @@ Abstract : Shape (aka Shapes) [version 2.0] {
 		density = newDensity.
 		shapeSetDensity(shapePointer, density).
 
+	+ to set-inertia-matrix to newInertia (matrix):
+		% Sets the 3x3 matrix representing the shape's inertia.  Appropriate
+		% intertia matrices are automatically computed for all shapes, so this 
+		% method is for advanced customization only.
+		% 
+		% Any calls that change the shape's density, mass or structure will 
+		% recompute the inertia matrix, so this method should be called only 
+		% after the final structure, mass and density of the shape have been set.
+
+		shapeSetInertiaMatrix( shapePointer, newInertia ).
+
   + section "Dynamically Changing the Size of a Shape"
 
 	+ to scale by scale (vector):

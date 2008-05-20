@@ -93,6 +93,13 @@ int brIShapeSetMass( brEval args[], brEval *target, brInstance *i ) {
 	return EC_OK;
 }
 
+int brIShapeSetInertiaMatrix( brEval args[], brEval *target, brInstance *i ) {
+	slShape *s = BRSHAPEPOINTER( &args[ 0 ] );
+	s -> setInertiaMatrix( BRMATRIX( &args[ 1 ] ) );
+
+	return EC_OK;
+}
+
 int brIMeshShapeNew( brEval args[], brEval *target, brInstance *i ) {
 	char *path = brFindFile( i -> engine, BRSTRING( &args[ 0 ] ), NULL );
 
@@ -223,6 +230,7 @@ void breveInitShapeFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "finishShape", brIFinishShape, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "shapeSetDensity", brIShapeSetDensity, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "shapeSetMass", brIShapeSetMass, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "shapeSetInertiaMatrix", brIShapeSetInertiaMatrix, AT_NULL, AT_POINTER, AT_MATRIX, 0 );
 	brNewBreveCall( n, "scaleShape", brIScaleShape, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
 	brNewBreveCall( n, "newSphere", brISphereNew, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "meshShapeNew", brIMeshShapeNew, AT_POINTER, AT_STRING, AT_STRING, AT_DOUBLE, 0 );
