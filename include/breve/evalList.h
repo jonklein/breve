@@ -88,6 +88,12 @@ DLLEXPORT brEval *brEvalListIndexLookup( brEvalListHead*, int );
         
 DLLEXPORT int brEvalListInsert(brEvalListHead *, int, brEval *);
 
+/** 
+ * Returns the length of the list (for use in plugins)
+ */  
+
+DLLEXPORT int brEvalListAppend( brEvalListHead *inList, brEval *inEval );
+
 /**
  * Removes an arbitrary element from the list and places the removed
  * element in the provided brEval.

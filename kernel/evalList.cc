@@ -60,19 +60,27 @@ brEvalListHead::~brEvalListHead() {
 	the given pointer.
 */
 
-int brEvalListInsert( brEvalListHead *head, int index, brEval *value ) {
-	if ( index > ( int )head->_vector.size() ) {
+int brEvalListInsert( brEvalListHead *head, int index, brEval *inEval ) {
+	int size = (int)head->_vector.size();
+
+	if ( index > size ) {
 		return EC_ERROR;
-	} else if ( index == ( int )head->_vector.size() ) {
-		head->_vector.push_back( *value );
+	} else if ( index == size ) {
+		head->_vector.push_back( *inEval );
 	} else {
 		std::vector< brEval >::iterator i = head->_vector.begin() + index;
 
-		head->_vector.insert( i, 1, *value );
+		head->_vector.insert( i, 1, *inEval );
 	}
 
 	return EC_OK;
 }
+
+int brEvalListAppend( brEvalListHead *inList, brEval *inEval ) {
+	inList -> _vector.push_back( *inEval );
+	return EC_OK;
+}
+
 
 int brEvalListRemove( brEvalListHead *head, int index, brEval *value ) {
 	if ( index < 0 || index >= ( int )head->_vector.size() ) return index;
