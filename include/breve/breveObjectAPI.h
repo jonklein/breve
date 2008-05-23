@@ -30,8 +30,19 @@ class brEval;
  * provide it with functions to do the various tasks.
  */
 
+/**
+ * The following types are accessed as opaque void data pointers and 
+ * may be used in any way your language frontend needs to.
+ */
+
+typedef void	brMethodCallbackData;
+typedef void	brObjectCallbackData;
+typedef void	brInstanceCallbackData;
+typedef void	brFrontendCallbackData;
+
 struct brObjectType {
 	brObjectType() {
+		runCommand			= NULL;
 		findMethod 			= NULL;
 		findObject			= NULL;
 		instantiate			= NULL;
@@ -56,14 +67,20 @@ struct brObjectType {
 	}
 
 	/**
+ 	 *  
+	 */
+
+	int			(*runCommand)( void *inObjectTypeUserData, brEngine *inEngine, const char *inCommand );
+
+	/**
 	 * Finds an object class in the given language frontend
 	 */
-	void			*(*findObject)( void *inObjectTypeUserData, const char *inName );
+	brObjectCallbackData	*(*findObject)( void *inObjectTypeUserData, const char *inName );
 
 	/**
 	 * Finds a method in a given class
 	 */
-	void			*(*findMethod)( void *inObjectUserData, const char *inName, unsigned char *inTypes, int inTypeCount );
+	brMethodCallbackData	*(*findMethod)( void *inObjectUserData, const char *inName, unsigned char *inTypes, int inTypeCount );
 
 	/**
 	 * Creates a new instance of the given class.  The constructor arguments are currently unused.
@@ -73,7 +90,7 @@ struct brObjectType {
 	/**
 	 * Calls a method in the language frontend
 	 */
-	int			 (*callMethod)( void *inInstanceUserData, void *inMethodUserData, const brEval **inArguments, brEval *inResult );
+	int			 (*callMethod)( brInstanceCallbackData *inInstanceUserData, brMethodCallbackData *inMethodUserData, const brEval **inArguments, brEval *inResult );
 
 	/**
 	 * Should return 1 if child is a subclass of parent, 0 otherwise
@@ -83,42 +100,42 @@ struct brObjectType {
 	/**
 	 * Destroys an instance of a language object previously created with instantiate.
 	 */
-	void			(*destroyObject)( void *inObject );
+	void			(*destroyObject)( brObjectCallbackData *inObject );
 
 	/**
 	 * Destroys an instance of a language method previously created with findMethod.
 	 */
-	void			(*destroyMethod)( void *inMethod );
+	void			(*destroyMethod)( brMethodCallbackData *inMethod );
 
 	/**
 	 * Destroys an instance of a language instance previously created with instantiate.
 	 */
-	void			(*destroyInstance)( void *inInstance );
+	void			(*destroyInstance)( brInstanceCallbackData *inInstance );
 
 	/**
 	 * Frees any leftover memory associated with the frontend, typically _userData.
 	 */
-	void			(*destroyObjectType)( void *inObjectType );
+	void			(*destroyObjectType)( brObjectCallbackData *inObjectType );
 
 	/**
 	 * A function to determine whether or not the given code can be loaded based on the file extension
 	 */
-	int			(*canLoad)( void *inObjectTypeUserData, const char *inFileExtension );
+	int			(*canLoad)( brFrontendCallbackData *inFrontendData, const char *inFileExtension );
 
 	/**
 	 * A function to execute code in this frontend language.
 	 */
-	int			(*load)( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext );
+	int			(*load)( brEngine *inEngine, brFrontendCallbackData *inFrontendData, const char *inFilename, const char *inFiletext );
 
 	/**
 	 * A function to execute code in this frontend language.
 	 */
-	int			(*loadWithArchive)( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext, const char *inArchive );
+	int			(*loadWithArchive)( brEngine *inEngine, brFrontendCallbackData *inFrontendData, const char *inFilename, const char *inFiletext, const char *inArchive );
 
 	/**
 	 * A function to encode instances of this language to a string
 	 */
-	char*			(*encodeToString)( brEngine *inEngine, void *inInstanceData, brEvalHash *inInstanceToIndexMapping );
+	char*			(*encodeToString)( brEngine *inEngine, brInstanceCallbackData *inInstanceData, brEvalHash *inInstanceToIndexMapping );
 
 	/**
 	 * A function to decode instances of this language from a string.
@@ -133,7 +150,7 @@ struct brObjectType {
 	/**
 	 * A user-data callback pointer.
 	 */
-	void			*userData;
+	brFrontendCallbackData	*userData;
 
 	/**
 	 * A unique identifier which will be set for all objects of this object type.  This
@@ -284,6 +301,10 @@ DLLEXPORT void brEngineUnlock( brEngine * );
 // registering a new object type
 
 DLLEXPORT void brEngineRegisterObjectType(brEngine *, brObjectType * );
+
+// Run a command in the controller's frontend language
+
+DLLEXPORT int brRunCommand( brEngine *inEngine, const char *inCommand );
 
 // locating objects and methods within objects
 

@@ -53,8 +53,9 @@ void stCrashCatcher( int s ) {
 }
 
 /**
-	\brief The breve callback to determine if one object is a subclass of another.
-*/
+ * 	\brief The breve callback to determine if one object is a subclass of another.
+ */
+
 int stSubclassCallback( brObjectType *inType, void *c1, void *c2 ) {
 	return stIsSubclassOf( ( stObject* )c1, ( stObject* )c2 );
 }
@@ -80,8 +81,8 @@ int stCallMethodBreveCallback( void *instanceData, void *methodData, const brEva
 }
 
 /**
-	\brief The steve callback to create a new instance.
-*/
+ * \brief The steve callback to create a new instance.
+ */
 
 brInstance *stInstanceNewCallback( brEngine *engine, brObject *object, const brEval **constructorArgs, int argCount ) {
 	stInstance *i = stInstanceNew( ( stObject* )object->userData );
@@ -239,6 +240,11 @@ void stSteveCleanup( void *inDataPtr ) {
 
 	delete d;
 }
+
+int stRunCommand( void *inObjectTypeUserData, brEngine *inEngine, const char *inCommand ) {
+	return stRunSingleStatement( (stSteveData*)inObjectTypeUserData, inEngine, inCommand );
+}
+
 /**
 	\brief Initializes the steve language and sets up the brObjectType structure.
 */
@@ -258,6 +264,7 @@ stSteveData *stSteveInit( brEngine *engine ) {
 	breveInitSteveObjectFuncs( internal );
 	breveInitXMLFuncs( internal );
 
+	breveSteveType->runCommand 			= stRunCommand;
 	breveSteveType->callMethod 			= stCallMethodBreveCallback;
 	breveSteveType->findMethod 			= stFindMethodBreveCallback;
 	breveSteveType->isSubclass 			= stSubclassCallback;
@@ -528,7 +535,7 @@ int stPreprocess( stSteveData *s, brEngine *engine, const char *srcFile, const c
 				slFree( found );
 
 				if( load != EC_OK ) {
-					stParseError( engine, EE_FILE_NOT_FOUND, "Error including file \"%s\"", filename );
+					stParseError( engine, EE_SIMULATION, "Error loading file \"%s\"", filename );
 					delete[] filename;
 					return -1;
 				}

@@ -26,7 +26,76 @@
 #include <ecl/ecl.h>
 #include <signal.h>
 
+//
+// TODO: ECL garbage collection is completely undocumented at present!
+//
 
+
+//
+// The brLispData class is a simple class we use for keeping track
+// of method and object lookups.  It's subclasses will be the void 
+// data ptr that is returned to the breve engine.
+//
+
+class brLispData {
+	public:
+		virtual		~brLispData() {}
+};
+
+class brLispMethodData : public brLispData {
+	public:
+			brLispMethodData( cl_object inObj, int inArgCount ) { _method = inObj; _argcount = inArgCount; }
+
+	cl_object	_method;
+	int		_argcount;
+};
+
+class brLispObjectData : public brLispData {
+	public:
+			brLispObjectData( cl_object inObj ) { _object = inObj; }
+
+	cl_object	_object;
+};
+
+class brLispInstanceData : public brLispData {
+	public:
+			brLispInstanceData( cl_object inInstance ) { _instance = inInstance; }
+
+	cl_object	_instance;
+};
+inline cl_object brLispObjectFromEval( const brEval *inEval, cl_object inBridgeObject );
+inline int brLispObjectToEval( cl_object inObject, brEval *outEval );
+
+brEvalListHead *brLispToBreveListConvert( cl_object inObject ) {
+	brEvalListHead *list = new brEvalListHead;
+
+	brEval eval;
+
+	while( type_of( inObject ) == t_cons ) {
+		brLispObjectToEval( inObject -> cons.car, &eval );
+		
+		if( brEvalListAppend( list, &eval ) != EC_OK ) {
+			delete list;
+			return NULL;
+		}
+
+		inObject = inObject -> cons.cdr;
+	}
+
+	return list;
+
+}
+
+cl_object brLispFromBreveListConvert( brEvalListHead *inList, int inStartIndex = 0 ) {
+	cl_object list = cl_list( 0 );
+
+	for( int n = inList -> _vector.size() - 1; n > -1; n-- ) {
+		cl_object l = brLispObjectFromEval( &inList -> _vector[ n ], NULL );
+		list = cl_cons( l, list );
+	}
+
+	return list;
+}
 
 
 /**
@@ -38,12 +107,14 @@
  */
 
 
-inline int brLispTypeToEval( cl_object inObject, brEval *outEval ) {
+inline int brLispObjectToEval( cl_object inObject, brEval *outEval ) {
 	switch( type_of( inObject ) ) {
 		case t_cons:
+			outEval -> set( brLispToBreveListConvert( inObject ) );
 			break;
 
 		case t_base_string:
+		case t_symbol:
 			outEval -> set( inObject -> base_string.self );
 			break;
 
@@ -59,9 +130,16 @@ inline int brLispTypeToEval( cl_object inObject, brEval *outEval ) {
 			outEval -> set( fix( inObject ) );
 			break;
 
+		// case t_character:
+		// 	outEval -> set( 0 );
+		// 	break;
+
 		default:
+			slMessage( DEBUG_ALL, "Error lisp type %d conversion to breve not imeplemented\n", type_of( inObject ) );
 			return EC_ERROR;
 	}
+
+	return EC_OK;
 }
 
 /**
@@ -72,13 +150,27 @@ inline int brLispTypeToEval( cl_object inObject, brEval *outEval ) {
  * @return			A newly created Lisp object translated from the source value.
  */
 
-inline cl_object brLispTypeFromEval( const brEval *inEval, cl_object inBridgeObject ) {
+inline cl_object brLispObjectFromEval( const brEval *inEval, cl_object inBridgeObject ) {
 	switch( inEval -> type() ) {
 		case AT_INT:
+			return ecl_make_integer( BRINT( inEval ) );
+			break;
 		case AT_DOUBLE:
-		case AT_INSTANCE:
+			return ecl_make_doublefloat( BRDOUBLE( inEval ) );
+			break;
 		case AT_VECTOR:
+			{
+				slVector *v = &BRVECTOR( inEval );
+				return cl_list( 3, 
+					ecl_make_doublefloat( v -> x ),
+					ecl_make_doublefloat( v -> y ),
+					ecl_make_doublefloat( v -> z ) );
+			}
+		case AT_LIST:
+			return brLispFromBreveListConvert( BRLIST( inEval ) );
+			break;
 		default:
+			slMessage( DEBUG_ALL, "Error: breve type %d conversion to Lisp not implemented\n", inEval -> type() );
 			break;
 	}
 
@@ -107,8 +199,13 @@ inline cl_object brLispTypeFromEval( const brEval *inEval, cl_object inBridgeObj
  * @return 			A void pointer to a Lisp method object. 
  */
 
-void *brLispFindMethod( void *inObject, const char *inName, unsigned char *inTypes, int inCount ) {
-	return NULL;
+brMethodCallbackData *brLispFindMethod( brObjectCallbackData* inObject, const char *inName, unsigned char *inTypes, int inCount ) {
+	// No actual method lookup here -- just turn the name into a symbol and let 
+	// the runtime handle any errors.
+
+	cl_object cmd = c_string_to_object( inName );
+
+	return new brLispMethodData( cmd, inCount );
 }
 
 /**
@@ -118,17 +215,13 @@ void *brLispFindMethod( void *inObject, const char *inName, unsigned char *inTyp
  * @param inName	The name of the desired object
  */
 
-void *brLispFindObject( void *inData, const char *inName ) {
+brObjectCallbackData *brLispFindObject( brFrontendCallbackData *inData, const char *inName ) {
 	std::string command;
-
 	command = std::string( "( find-class '" ) + inName + ")";
 
-	printf( "cmd: %s\n", command.c_str() );
-	cl_object result = cl_eval( c_string_to_object( command.c_str() ) );
+	cl_object result = cl_safe_eval( c_string_to_object( command.c_str() ), Cnil, OBJNULL );
 
-	printf( "%s: %p [%d]\n", inName, result, type_of( result ) );
-
-	return result;
+	return ( result != NULL ) ? (void*)( new brLispObjectData( result ) ) : NULL;
 }
 
 /**
@@ -142,13 +235,17 @@ void *brLispFindObject( void *inData, const char *inName ) {
 
 brInstance *brLispInstantiate( brEngine *inEngine, brObject* inObject, const brEval **inArgs, int inArgCount ) {
 	std::string command( "( make-instance '" );
-
+	command += inObject -> name;
 	command += ")";
 
-	cl_object result = cl_eval( c_string_to_object( command.c_str() ) );
-	printf( "%p [%d]\n", result, type_of( result ) );
+	cl_object result = cl_safe_eval( c_string_to_object( command.c_str() ), Cnil, OBJNULL );
 
-	return NULL;
+	brInstance *instance = NULL;
+	
+	if( result ) 
+		instance = brEngineAddInstance( inEngine, inObject, new brLispInstanceData( result ) );
+
+	return instance;
 }
 
 /**
@@ -156,11 +253,43 @@ brInstance *brLispInstantiate( brEngine *inEngine, brObject* inObject, const brE
  * 
  * @param inInstance	The object instance data (as found with \ref brLispInstantiate)
  * @param inMethod	The method callback data (as found with \ref brLispFindMethod )
- * @param inArguments	NOT CURRENTLY IMPLEMENTED
  * @param outResult	The brEval result of the method calll
  */
 
-int brLispCallMethod( void *inInstance, void *inMethod, const brEval **inArguments, brEval *outResult ) {
+int brLispCallMethod( brInstanceCallbackData *inInstance, brMethodCallbackData *inMethod, const brEval **inArguments, brEval *outResult ) {
+	brLispMethodData *methodData = (brLispMethodData*)inMethod;
+	brLispInstanceData *instanceData = (brLispInstanceData*)inInstance;
+
+	cl_object instance = instanceData -> _instance;
+	cl_object method = methodData -> _method;
+	cl_object list = cl_list( 0 );
+
+	for( int i = methodData -> _argcount - 1; i >= 0; i-- ) {
+		// go backwards, cons each argument onto the method execution list
+		cl_object arg = brLispObjectFromEval( inArguments[ i ], NULL );
+
+		if( !arg ) {
+			slMessage( DEBUG_ALL, "An error occurred converting the method arguments to Lisp\n" );
+			return EC_ERROR;
+		}
+
+		list = cl_cons( brLispObjectFromEval( inArguments[ i ], NULL ), list );
+	}
+
+	// cons on the instance as the first argument, and then the method symbol
+
+	list = cl_cons( instance, list );
+	list = cl_cons( method,   list );
+
+	cl_object result = cl_safe_eval( list, Cnil, OBJNULL );
+
+	if( result != NULL ) {
+		brLispObjectToEval( result, outResult );
+		return EC_OK;
+	} else {
+		slMessage( DEBUG_ALL, "An error occurred executing the Lisp method \"%s\"\n", method -> symbol.name -> base_string.self );
+	}
+
 	return EC_ERROR;
 }
 
@@ -171,7 +300,7 @@ int brLispCallMethod( void *inInstance, void *inMethod, const brEval **inArgumen
  * Clearly not implemented at the moment.
  */
 
-int brLispIsSubclass( brObjectType *inObjectType,  void *inClassA, void *inClassB ) {
+int brLispIsSubclass( brObjectType *inObjectType,  brObjectCallbackData *inClassA, brObjectCallbackData *inClassB ) {
 	return 0;
 }
 
@@ -179,7 +308,9 @@ int brLispIsSubclass( brObjectType *inObjectType,  void *inClassA, void *inClass
  * The Lisp canLoad breve object callback
  */
 
-int brLispCanLoad( void *inObjectData, const char *inExtension ) {
+int brLispCanLoad( brFrontendCallbackData *inData, const char *inExtension ) {
+	// check the file extension
+
 	if( !strcasecmp( inExtension, "l" ) 
 		|| !strcasecmp( inExtension, "lisp" ) 
 		|| !strcasecmp( inExtension, "brevel" ) )
@@ -192,8 +323,13 @@ int brLispCanLoad( void *inObjectData, const char *inExtension ) {
  * The Lisp load breve object callback
  */
 
-int brLispLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext ) {
-	return EC_ERROR;
+int brLispLoad( brEngine *inEngine, brFrontendCallbackData *inData, const char *inFilename, const char *inFiletext ) {
+	std::string command = "( PROGN ";
+	command += inFiletext;
+	command += " ) ";
+
+	cl_object result = cl_safe_eval( c_string_to_object( command.c_str() ), Cnil, OBJNULL );
+	return result == NULL ? EC_ERROR : EC_OK;
 }
 
 /**
@@ -204,7 +340,8 @@ int brLispLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *inFi
  */
 
 void brLispDestroyGenericLispObject( void *inObject ) {
-
+	if( inObject ) 
+		delete (brLispData*)inObject;
 }
 
 
@@ -212,15 +349,18 @@ void brLispDestroyGenericLispObject( void *inObject ) {
 
 
 
+extern int cl_boot( int, char** ) __attribute__((weak_import));
+
 int brLispInit( brEngine *breveEngine ) {
+	// On OS X we weaklink libecl
+
+	if( cl_boot == NULL )
+		return EC_ERROR;
+
 	// Boot up the lisp interpreter 
 
 	char *argv[ 1 ] = { "breve" };
-	cl_object result;
-
 	cl_boot( 1, argv );
-
-	// HELLO WORLD
 
 	// Lisp messes with our signal handlers!  We cannot allow that.
 

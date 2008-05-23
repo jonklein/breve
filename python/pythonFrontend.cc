@@ -917,7 +917,7 @@ int brPythonRunCommand( void *inObject, brEngine *inEngine, const char *inComman
  * @return 			A void pointer to a Python method object. 
  */
 
-void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inTypes, int inCount ) {
+brMethodCallbackData *brPythonFindMethod( brObjectCallbackData *inObject, const char *inName, unsigned char *inTypes, int inCount ) {
 	PyObject *type = ( PyObject* )inObject;
 
 	std::string symbol = std::string( inName );
@@ -976,7 +976,7 @@ void *brPythonFindMethod( void *inObject, const char *inName, unsigned char *inT
  * @param inName	The name of the desired object
  */
 
-void *brPythonFindObject( void *inData, const char *inName ) {
+brObjectCallbackData *brPythonFindObject( brFrontendCallbackData *inData, const char *inName ) {
 	PyObject *mainModule = ( PyObject* )inData;
 
 	// Note that we are letting a reference escape here, because
@@ -1046,7 +1046,7 @@ brInstance *brPythonInstantiate( brEngine *inEngine, brObject* inObject, const b
  * @param outResult	The brEval result of the method call
  */
 
-int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArguments, brEval *outResult ) {
+int brPythonCallMethod( brInstanceCallbackData *inInstance, brMethodCallbackData *inMethod, const brEval **inArguments, brEval *outResult ) {
 	slPythonMethodInfo *info = (slPythonMethodInfo*)inMethod;
 
 	PyObject *instance = ( PyObject* )inInstance;
@@ -1095,7 +1095,7 @@ int brPythonCallMethod( void *inInstance, void *inMethod, const brEval **inArgum
  * collision detection to determine if a handler is installed for an object pair.
  */
 
-int brPythonIsSubclass( brObjectType *inType, void *inClassA, void *inClassB ) {
+int brPythonIsSubclass( brObjectType *inType, brObjectCallbackData *inClassA, brObjectCallbackData *inClassB ) {
 	return PyObject_IsSubclass( (PyObject*)inClassA, (PyObject*)inClassB );
 }
 
@@ -1103,7 +1103,7 @@ int brPythonIsSubclass( brObjectType *inType, void *inClassA, void *inClassB ) {
  * The Python canLoad breve object callback
  */
 
-int brPythonCanLoad( void *inObjectData, const char *inExtension ) {
+int brPythonCanLoad( brFrontendCallbackData *inData, const char *inExtension ) {
 	if( !strcasecmp( inExtension, "py" ) ||
 		!strcasecmp( inExtension, "pybreve" ) )
 			return 1;
@@ -1115,7 +1115,7 @@ int brPythonCanLoad( void *inObjectData, const char *inExtension ) {
  * The Python load breve object callback
  */
 
-int brPythonLoad( brEngine *inEngine, void *inObjectTypeUserData, const char *inFilename, const char *inFiletext ) {
+int brPythonLoad( brEngine *inEngine, brFrontendCallbackData *inObjectTypeUserData, const char *inFilename, const char *inFiletext ) {
 	int result = EC_OK;
 
 
@@ -1206,7 +1206,7 @@ void brPythonSetArgv( brEngine *inEngine, PyObject *inSysModule ) {
  	Py_DECREF( argv );
 }
 
-char *brPythonEncodeToString( brEngine *inEngine, void *inData, brEvalHash *inInstanceToIndexMapping ) {
+char *brPythonEncodeToString( brEngine *inEngine, brInstanceCallbackData *inData, brEvalHash *inInstanceToIndexMapping ) {
 	PyObject *obj = (PyObject*)inData;
 
 	PyObject *dict = brPythonDictFromHash( inInstanceToIndexMapping, sPythonData._breveModule );
