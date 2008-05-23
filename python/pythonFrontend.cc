@@ -858,8 +858,8 @@ PyObject *brPythonCallBridgeMethod( PyObject *inSelf, PyObject *inArgs ) {
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////												
-//  Python language frontend callbacks for the breveObjectType structure		   //
+/////////////////////////////////////////////////////////////////////////////////////
+//  Python language frontend callbacks for the breveObjectType structure	   //
 /////////////////////////////////////////////////////////////////////////////////////												  
 
 std::string brPyConvertSymbol( std::string &inValue ) {
@@ -895,6 +895,17 @@ std::string brPyConvertSymbol( std::string &inValue ) {
 }
 
 
+int brPythonRunCommand( void *inObject, brEngine *inEngine, const char *inCommand ) {
+	int result = PyRun_SimpleString( inCommand );
+
+	if( result == 0 ) {
+		return 0;
+	} else {
+		PyErr_Print();
+		return -1;
+	}
+}
+	
 /**
  * A breveObjectType callback to locate a method in a Python object.
  * 
@@ -991,10 +1002,6 @@ void *brPythonFindObject( void *inData, const char *inName ) {
 
 
 brInstance *brPythonInstantiate( brEngine *inEngine, brObject* inObject, const brEval **inArgs, int inArgCount ) {
-	static int icount = 0;
-
-	icount++;
-
 	PyObject *object = ( PyObject* )inObject->userData;
 
 	PyObject *args = PyTuple_New( 0 );
@@ -1365,6 +1372,7 @@ void brPythonInit( brEngine *breveEngine ) {
 
 	brevePythonType->userData 		= (void*)sPythonData._mainModule;
 
+	brevePythonType->runCommand		= brPythonRunCommand;
 	brevePythonType->findMethod 		= brPythonFindMethod;
 	brevePythonType->findObject 		= brPythonFindObject;
 	brevePythonType->instantiate 		= brPythonInstantiate;
