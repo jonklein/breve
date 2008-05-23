@@ -471,6 +471,23 @@ char *brInstanceEncodeToString( brEngine *inEngine, brInstance *inInstance, brEv
 }
 
 /**
+ * Runs a text command in the simulation's controller language
+ */
+
+int brRunCommand( brEngine *inEngine, const char *inCommand ) {
+	std::vector<brObjectType*>::iterator oi;
+
+	for ( oi = inEngine->_objectTypes.begin(); oi != inEngine->_objectTypes.end(); oi++ ) {
+		brObjectType *type = *oi;
+
+		if( type == inEngine -> controller -> object -> type && type -> runCommand )
+			return type -> runCommand( type -> userData, inEngine, inCommand );
+	}
+
+	return -1;
+}
+
+/**
  * 
  */
 
