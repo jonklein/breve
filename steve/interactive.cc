@@ -12,17 +12,20 @@ extern int lineno;
  * This prepares the statement for interactive evaluation.
  */
 
-int stRunSingleStatement( stSteveData *sd, brEngine *engine, char *statement ) {
+int stRunSingleStatement( stSteveData *inSteveData, brEngine *inEngine, const char *inStatement ) {
 	char *file = "<user input>";
-	int length;
+	int length, r;
 	brInstance *controller;
 	char *fixedStatement;
 	brEval target;
 	stInstance *i;
 	stRunInstance ri;
-	int r;
 
-	if ( !statement ) return 0;
+	if ( !inStatement ) 
+		return 0;
+
+	char *statement = slStrdup( inStatement );
+
 
 	length = strlen( statement ) - 1;
 
@@ -30,30 +33,35 @@ int stRunSingleStatement( stSteveData *sd, brEngine *engine, char *statement ) {
 
 	// put in the dot to make steve happy!
 
-	while ( statement[length] == '\n' || statement[length] == ' ' || statement[length] == '\t' ) length--;
+	while ( statement[length] == '\n' || statement[length] == ' ' || statement[length] == '\t' ) 
+		length--;
 
-	if ( length > 0 && statement[length] != '.' ) statement[length + 1] = '.';
+	if ( length > 0 && statement[length] != '.' ) 
+		statement[length + 1] = '.';
 
 	fixedStatement = new char[strlen( statement ) + 5];
+
+	// std::string fixedStatement = "> ";
+	// fixedStatement += statement;
 
 	sprintf( fixedStatement, "> %s", statement );
 
 	yyfile = file;
 
-	sd->singleStatement = NULL;
+	inSteveData -> singleStatement = NULL;
 
-	stSetParseData( sd, fixedStatement, strlen( fixedStatement ) );
+	stSetParseData( inSteveData, fixedStatement, strlen( fixedStatement ) );
 
-	controller = brEngineGetController( engine );
+	controller = brEngineGetController( inEngine );
 
-	stParseSetEngine( engine );
-	stParseSetObjectAndMethod( ( stObject* )controller->object->userData, sd->singleStatementMethod );
+	stParseSetEngine( inEngine );
+	stParseSetObjectAndMethod( ( stObject* )controller->object->userData, inSteveData -> singleStatementMethod );
 
-	brClearError( engine );
+	brClearError( inEngine );
 
-	if ( yyparse() || brGetError( engine ) ) {
+	if ( yyparse() || brGetError( inEngine ) ) {
 		slFree( fixedStatement );
-		sd->singleStatement = NULL;
+		inSteveData -> singleStatement = NULL;
 		return BPE_SIM_ERROR;
 	}
 
@@ -62,10 +70,12 @@ int stRunSingleStatement( stSteveData *sd, brEngine *engine, char *statement ) {
 	ri.instance = i;
 	ri.type = i->type;
 
-	r = stExpEval( sd->singleStatement, &ri, &target, NULL );
+	r = stExpEval( inSteveData -> singleStatement, &ri, &target, NULL );
 
-	delete sd->singleStatement;
+	delete inSteveData -> singleStatement;
 	delete[] fixedStatement;
+
+	slFree( statement );
 
 	return r;
 }
