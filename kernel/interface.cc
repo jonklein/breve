@@ -330,12 +330,12 @@ int brSpecialKeyCallback( brEngine *e, char *name, int isDown ) {
 	return r;
 }
 
-/*!
-	\brief Handles a miscellaneous interface event.
-
-	If the frontend supports it, this is used to interface with arbitrary
-	interface elements.  Currently only available under Mac OS X.
-*/
+/**
+ * \brief Handles a miscellaneous interface event.
+ * 
+ * If the frontend supports it, this is used to interface with arbitrary
+ * interface elements.  Currently only available under Mac OS X.
+ */
 
 int brInterfaceCallback( brEngine *e, int interfaceID, char *string ) {
 	brEval eval, a;
