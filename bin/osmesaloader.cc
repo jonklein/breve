@@ -1,4 +1,7 @@
 #include <stdio.h>
+
+#ifdef HAVE_LIBOSMESA
+
 #define GLAPI extern
 #define GLAPIENTRY
 
@@ -46,3 +49,5 @@ extern "C" {
 	}
 
 }
+
+#endif
