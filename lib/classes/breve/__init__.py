@@ -442,7 +442,6 @@ if 1:
 	from GeneticAlgorithm 	import *
 
 	from PatchGrid 		import *
-	from PatchToroid 	import *
 	from Patch 		import *
 
 	from Braitenberg 	import *

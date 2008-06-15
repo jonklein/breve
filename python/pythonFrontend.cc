@@ -1129,16 +1129,29 @@ int brPythonLoad( brEngine *inEngine, brFrontendCallbackData *inObjectTypeUserDa
 	}
 
 
+// TEMPORARY WORKAROUND FOR BROKEN PYRUN_SIMPLEFILE -- the FILE struct
+// is aparrently different between compilers and as of Python 2.5, won't
+// work with our MinGW based compiler and causes a crash.  Execute as a string.
 
-	FILE *fp = fopen( inFilename, "r" );
+#ifdef WINDOWS
+	char *f = slUtilReadFile( inFilename );
+#else
+	FILE *f = fopen( inFilename, "r" );
+#endif
 
-	if( fp ) {
-		if( PyRun_SimpleFile( fp, inFilename ) ) {
+	if( f ) {
+#ifdef WINDOWS
+		if( PyRun_SimpleString( f ) ) {
+#else
+		if( PyRun_SimpleFile( f, inFilename ) ) {
+#endif
 			brEvalError( inEngine, PE_PYTHON, "An error occurred while executing the file \"%s\"\n", inFilename );
 			result = EC_ERROR;
 		}
 
-		fclose( fp );
+#ifndef WINDOWS
+		fclose( f );
+#endif 
 
 	} else {
 		std::string processed( inFiletext );
