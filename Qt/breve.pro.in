@@ -60,8 +60,10 @@ mac {
 	DEMOS.path  = Contents/Resources
 	DOCS.files = ../docs
 	DOCS.path  = Contents/Resources
-	QMAKE_BUNDLE_DATA 	+= DEMOS DOCS
+	LIBS.files = ../bin/libecl.dylib
+	LIBS.path  = Contents/MacOS
+	QMAKE_BUNDLE_DATA 	+= DEMOS DOCS LIBS
 }
 
 QMAKE_CXXFLAGS  += @CPPFLAGS@
-QMAKE_LFLAGS	+= @LDFLAGS@
+QMAKE_LFLAGS	+= @LDFLAGS@ -L../bin

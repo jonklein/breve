@@ -8,13 +8,13 @@
 #include "brqtMoveableWidgets.h"
 
 int main( int argc, char ** argv ) {
-    QApplication a( argc, argv );
+	QApplication a( argc, argv );
 
-	brqtMainWindow *window = new brqtMainWindow;
+	brqtMainWindow window;
 
-	window->show();
+	window.show();
 
-    a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
+	a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
 
-    return a.exec();
+	return a.exec();
 }

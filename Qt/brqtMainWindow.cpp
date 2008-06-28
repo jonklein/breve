@@ -17,11 +17,13 @@ brqtMainWindow::brqtMainWindow() : QMainWindow( NULL, Qt::WindowTitleHint ) {
 
 	setStatusBar( NULL );
 
+	_palette.show();
+
 	char *argv[] = { "none" };
 	int argc = 1;
-	glutInit( &argc, argv );
 
-	_palette.hide();
+	// glutInit( &argc, argv );
+
 
 	// connect( _ui.editButton, SIGNAL( pressed() ), this, SLOT( toggleEditing() ) );
 	connect( _ui.actionOpen, SIGNAL( triggered() ), this, SLOT( openDocument() ) );
@@ -42,13 +44,10 @@ brqtMainWindow::brqtMainWindow() : QMainWindow( NULL, Qt::WindowTitleHint ) {
 	connect( _ui.toggleSimulationButton, SIGNAL( pressed() ), this, SLOT( toggleSimulation() ) );
 	connect( _ui.stopSimulationButton, SIGNAL( pressed() ), this, SLOT( stopSimulation() ) );
 
-	buildMenus();
-
 	setAcceptDrops( true );
 
-	QPoint position( 1, 1 );
+	QPoint position( 10, 25 );
 	move( position );
-
 
 	QRect bounds = rect();
 
@@ -56,10 +55,12 @@ brqtMainWindow::brqtMainWindow() : QMainWindow( NULL, Qt::WindowTitleHint ) {
 	_documentLocation.setY( bounds.top() );
 
 	_logWindow = new brqtLogWindow( this );
-	_logWindow -> move( 0, bounds.bottom() + 2 );
+	_logWindow -> move( 0, 30 + bounds.bottom() + 2 );
 	_logWindow -> show();
 
 	slSetMessageCallbackFunctions( brqtLogWindow::logout, brqtLogWindow::logerr );
+
+	buildMenus();
 
 	newDocument();
 }

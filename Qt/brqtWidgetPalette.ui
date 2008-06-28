@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>brqtWidgetPalette</class>
  <widget class="QDialog" name="brqtWidgetPalette" >
   <property name="geometry" >
@@ -147,14 +144,11 @@
    </property>
   </widget>
  </widget>
- <pixmapfunction></pixmapfunction>
  <customwidgets>
   <customwidget>
    <class>brqtDragableLabel</class>
    <extends>QLabel</extends>
    <header>brqtDragableLabel.h</header>
-   <container>0</container>
-   <pixmap></pixmap>
   </customwidget>
  </customwidgets>
  <resources/>
