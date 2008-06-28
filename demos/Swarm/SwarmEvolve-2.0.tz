@@ -649,6 +649,8 @@ Mobile : Bird (aka Birds) {
         friendFeeder (int).
         otherFeeder (int).
 
+	running (int).
+
         # access
     + to get-pushCode: return pushCode.
     + to get-ID: return ID.
@@ -812,7 +814,8 @@ Mobile : Bird (aka Birds) {
         c (object).
         c = new PushProgram.
 
-        c parse program (pushCode get-string).
+        # c parse program (pushCode get-string).
+	c copy-from program pushCode.
         pushInterpreter push-code value c. 
         free(c).       
 
@@ -838,7 +841,8 @@ Mobile : Bird (aka Birds) {
         c (object).
         c = new PushProgram.
 
-        c parse program (((self closest-friend) get-pushCode) get-string).
+        # c parse program (((self closest-friend) get-pushCode) get-string).
+	c copy-from program ((self closest-friend) get-pushCode).
         pushInterpreter push-code value c. 
         free(c).
 
@@ -882,7 +886,8 @@ Mobile : Bird (aka Birds) {
         c (object).
         c = new PushProgram.
 
-        c parse program (((self closest-other) get-pushCode) get-string).
+        # c parse program (((self closest-other) get-pushCode) get-string).
+	c copy-from program ((self closest-other) get-pushCode).
         pushInterpreter push-code value c. 
         free(c).
 
@@ -975,7 +980,9 @@ Mobile : Bird (aka Birds) {
                 controller increment-reproMutations.
             }
             # controller increment-discrepancies by (temp-code compute-discrepancy from pushCode).
-            (child get-pushCode) parse program (temp-code get-string).
+		( child get-pushCode) copy-from program temp-code.
+            # (child get-pushCode) parse program (temp-code get-string).
+	#	print ( (child get-pushCode) get-size ).
             free(temp-code). 
         }
 
