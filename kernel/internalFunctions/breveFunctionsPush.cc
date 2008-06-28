@@ -232,14 +232,17 @@ int breveFunctionPushParse( brEval arguments[], brEval *result, brInstance *inst
 		result->set( pushParse( "()" ) );
 	}
 
+	PushCode *cc = BRPOINTER( result );
+	pushlang::Code code = *(pushlang::Code*)cc;
+
 	return EC_OK;
 }
 
-/*!
-	\brief A breve API function wrapper for the C-function \ref pushCodeGetString.
-
-	See the documentation for \ref pushCodeGetString for more details.
-*/
+/**
+ * \brief A breve API function wrapper for the C-function \ref pushCodeGetString.
+ *
+ * See the documentation for \ref pushCodeGetString for more details.
+ */
 
 int breveFunctionPushCodeGetString( brEval arguments[], brEval *result, brInstance *instance ) {
 	PushCode *code = BRPOINTER( &arguments[0] );
@@ -248,6 +251,14 @@ int breveFunctionPushCodeGetString( brEval arguments[], brEval *result, brInstan
 	result->set( str );
 
 	free( str );
+
+	return EC_OK;
+}
+
+int breveFunctionPushCodeCopy( brEval arguments[], brEval *result, brInstance *instance ) {
+	pushlang::Code code = *(pushlang::Code*)BRPOINTER( &arguments[0] );
+
+	result -> set( (void*)new pushlang::Code( code ) );
 
 	return EC_OK;
 }
@@ -1039,6 +1050,7 @@ void breveInitPushFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "pushCodeSize", breveFunctionPushCodeSize, AT_INT, AT_POINTER, 0 );
 	brNewBreveCall( n, "pushCodeTopLevelSize", breveFunctionPushCodeTopLevelSize, AT_INT, AT_POINTER, 0 );
 	brNewBreveCall( n, "pushCodeSwapSublists", breveFunctionPushCodeSwapSublists, AT_INT, AT_POINTER, AT_INT, AT_INT, 0 );
+	brNewBreveCall( n, "pushCodeCopy", breveFunctionPushCodeCopy, AT_POINTER, AT_POINTER, 0 );
 
 	brNewBreveCall( n, "pushIntStackSize", breveFunctionPushIntStackSize, AT_INT, AT_POINTER, 0 );
 	brNewBreveCall( n, "pushIntStackPop", breveFunctionPushIntStackPop, AT_NULL, AT_POINTER, 0 );

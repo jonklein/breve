@@ -173,7 +173,7 @@ Object : PushGP {
 		tournamentSize = 7.
 		generationLimit = 300.
 
-		_useChallenges = 1.
+		_useChallenges = 0.
 
 		interpreter = new PushInterpreter.
 

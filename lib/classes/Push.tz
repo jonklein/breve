@@ -264,7 +264,8 @@ Object : PushInterpreter (aka PushInterpreters) {
 			return.
 		}
 
-		program parse program pushCodeGetString(other).
+		# program parse program pushCodeGetString(other).
+		program set-code-pointer to other.
 
 	+ to copy-exec-stack-top to program (object):
 		% Copies the top of the code stack to an existing program.
@@ -280,7 +281,8 @@ Object : PushInterpreter (aka PushInterpreters) {
 			return.
 		}
 
-		program parse program pushCodeGetString( other ).
+		# program parse program pushCodeGetString( other ).
+		program set-code-pointer to other.
 
   + section "Popping the Push Stacks"
 
@@ -434,7 +436,8 @@ Object : PushProgram (aka PushPrograms) {
 	+ to copy-from program otherProgram (object):
 		% Copies the contents of otherProgram to this object.
 
-		self parse program (otherProgram get-string).
+		# self parse program (otherProgram get-string).
+		self set-code-pointer to pushCodeCopy( ( otherProgram get-code-pointer ) ).
 
   + section "Getting information about a Push program"
 
