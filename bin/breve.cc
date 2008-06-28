@@ -772,7 +772,7 @@ void brInterrupt( brEngine *gEngine ) {
 		brQuit( gEngine );
 
 	if ( *line != '\0' && *line != '\n' )
-		stRunSingleStatement( gSteveData, gEngine, line );
+		brRunCommand( gEngine, line );
 
 	if ( line != staticLine )
 		free( line );
