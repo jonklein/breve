@@ -22,16 +22,18 @@
 
 char *brAtomicTypeStrings[] = {
 	"<invalid type>",
+	"undefined",
 	"NULL",
 	"int",
-	"double",
-	"string",
-	"object",
 	"pointer",
+	"type",
+	"double",
 	"vector",
 	"matrix",
-	"list",
 	"array",
+	"string",
+	"object",
+	"list",
 	"data",
 	"hash"
 };
