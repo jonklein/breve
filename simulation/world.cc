@@ -48,6 +48,8 @@ void slODEErrorHandler( int errnum, const char *msg, va_list ap ) {
 slWorld::slWorld() {
 	slVector g;
 
+	glutInited=false;
+
 	gPhysicsError = 0;
 	gPhysicsErrorMessage = NULL;
 

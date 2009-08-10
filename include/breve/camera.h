@@ -252,6 +252,7 @@ class slCamera {
 
 	private:
 
+
 		slTexture2D*					_readbackTexture;
 		int						_readbackX;
 		int						_readbackY;

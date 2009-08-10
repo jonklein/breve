@@ -105,6 +105,8 @@ void slCamera::initGL() {
 	GLubyte lt[LIGHTSIZE * LIGHTSIZE * 2];
 	GLubyte glt[LIGHTSIZE * LIGHTSIZE * 2];
 
+
+
 	glActive = 1;
 
 	gReflectionAlpha = REFLECTION_ALPHA;
@@ -424,6 +426,13 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 
 	if ( !w ) 
 		return;
+
+	if( !w->glutInited ) {
+	  int zero = 1;
+	  char *argv[] = {"breve"};
+	  glutInit(&zero,argv);
+	  w->glutInited=true;
+	}
 
 	glViewport( _originx, _originy, _width, _height );
 

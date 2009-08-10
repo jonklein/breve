@@ -183,6 +183,8 @@ class slWorld {
 	
 		double 					_age;
 	
+		bool glutInited;
+
 		std::vector< slWorldObject* > 		_objects;
 		std::vector< slPatchGrid* > 		_patches;
 		std::vector< slCamera* > 		_cameras;
