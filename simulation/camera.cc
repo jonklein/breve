@@ -34,8 +34,6 @@ slCamera::slCamera( int x, int y ) {
 	slCameraText &t = tx;
 
 	unsigned int n;
-	
-
 
 	_activateContextCallback = NULL;
 	_renderContextCallback = NULL;

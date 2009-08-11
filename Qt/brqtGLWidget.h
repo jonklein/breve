@@ -19,18 +19,12 @@ class brqtGLWidget : public QGLWidget {
 		void setEngine(brEngine *e) { 
 			_engine = e; 
 
-
 			if(_engine) {
-
 				_engine -> camera -> initGL();
 				_engine -> camera -> setBounds( width(), height() );
-				int zero = 1;
-				char *argv[] = {"breve"};
-				glutInit(&zero,argv);
-			}
+			} 
 
 			updateGL();
-
 		}
 
 	public slots: 

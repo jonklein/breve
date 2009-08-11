@@ -22,7 +22,7 @@ brqtMainWindow::brqtMainWindow() : QMainWindow( NULL, Qt::WindowTitleHint ) {
 	char *argv[] = { "none" };
 	int argc = 1;
 
-	//glutInit( &argc, argv );
+	// glutInit( &argc, argv );
 
 
 	// connect( _ui.editButton, SIGNAL( pressed() ), this, SLOT( toggleEditing() ) );
@@ -252,7 +252,6 @@ void brqtMainWindow::toggleSimulation() {
 		char *params = slStrdup( paramtext.toAscii().constData() );
 
 		printf( "%s\n", params );
-		
 
 		_engine = new brqtEngine( str, window -> windowTitle().toAscii().constData(), _ui.glWidget );
 
