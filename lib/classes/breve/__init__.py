@@ -407,7 +407,7 @@ class vector( array.array ):
 
 	def scale( self, other ):
 		"Scales the vector by a scalar"
-		return breveInternal.scaleVector( self, -1 )
+		return breveInternal.scaleVector( self, other )
 
 	def normalize( self ):
 		"Normalizes the vector"
