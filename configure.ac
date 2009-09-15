@@ -334,6 +334,7 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([avutil], [main])
 	AC_CHECK_LIB([avcodec], [avcodec_init])
 	AC_CHECK_LIB([avformat], [av_write_frame])
+	AC_CHECK_LIB([swscale], [sws_scale])
 
 	AC_CHECK_LIB([push], [pushEnvironmentNew])
 	AC_CHECK_HEADER([qgame++.h])

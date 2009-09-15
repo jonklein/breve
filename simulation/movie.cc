@@ -148,10 +148,18 @@ int slMovieEncodeFrame( slMovie *m ) {
 	/*
 	 * Colorspace conversion from RGB to codec's format (likely YUV420P).
 	 * OpenGL's RGB pixel format is RGB24 in lavc.
-	 */
-
+	 
+	 Old code:
 	img_convert(( AVPicture * )m->_yuv_pic, c->pix_fmt,
 	            ( AVPicture * )m->_rgb_pic, PIX_FMT_RGB24, c->width, c->height );
+	 */
+
+	static SwsContext *sws_context = NULL;
+	sws_context = sws_getCachedContext(sws_context, c->width, c->height, c->pix_fmt, c->width, c->height, PIX_FMT_RGB24, 0, NULL, NULL, NULL);
+	if(!sws_context)
+	  slMessage( DEBUG_ALL, "Error opening sws_context for encoding movie [size %d x %d]\n", c->width, c->height );
+	else if(sws_scale(sws_context, (( AVPicture * )m->_rgb_pic)->data, (( AVPicture * )m->_rgb_pic)->linesize, 0, c->height, (( AVPicture * )m->_yuv_pic)->data, (( AVPicture * )m->_yuv_pic)->linesize)<0)
+	  slMessage( DEBUG_ALL, "Encoding movie failed: [size %d x %d]\n", c->width, c->height );
 
 	/* Encode the frame yuv_pic storing the output in enc_buf. */
 

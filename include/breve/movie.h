@@ -4,7 +4,8 @@
 #include "camera.h"
 
 extern "C" {
-	#include <ffmpeg/avformat.h>
+#include <ffmpeg/avformat.h>
+#include <libswscale/swscale.h>  
 }
 
 /*!
