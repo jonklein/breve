@@ -22,7 +22,7 @@
  * English error titles and strings.
  */
 
-char *gErrorNames[] = {
+const char *gErrorNames[] = {
     "Unknown Error",
     "Parse Error",
     "Python Error",
@@ -58,7 +58,7 @@ char *gErrorNames[] = {
     NULL
 };
 
-char *gErrorMessages[] = {
+const char *gErrorMessages[] = {
     "An unknown error occurred (see the breve log for more information).",
     "A \"parse error\" is a very general error indicating that the parser encountered unexpected input.\n\nThe error can sometimes be hard to track down, as it does not always appear on the line specified by this error message--it is possible that the error occurs on a preceding line but is not discovered until the line specified.  Check for missing punctuation, misspellings and missing keywords in method calls.",
     "A \"Python language error\" indicates that an error occurred while executing the Python code for this simulation.  See the breve log for more detailed error information.",

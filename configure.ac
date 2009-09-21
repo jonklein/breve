@@ -67,15 +67,29 @@ AC_LANG(C++)
 
 case ${host_os} in
 	darwin* )
-		custom_cblas="-framework vecLib"
+		AC_DEFINE([DARWIN], [1], [Darwin])
 
-		LIBS="-framework OpenGL -framework GLUT -framework AppKit -framework vecLib -framework CoreAudio -framework AudioToolbox ${LIBS}"
+		case ${host_cpu} in
+			arm* )
+				AC_DEFINE([IPHONE], [1], [iPhone])
+				AC_DEFINE([OPENGLES], [1], [OpenGL ES])
+				LIBS="-framework Foundation -framework UIKit -framework OpenGLES -framework AudioToolbox ${LIBS}"
+			;;
+
+			i386* )
+				AC_DEFINE([MACOSX], [1], [Mac OS X])
+				custom_cblas="-framework vecLib"
+				LIBS="-framework Foundation -framework vecLib -framework OpenGL -framework GLUT"
+			;;
+		esac
+
+		AC_DEFINE([MACOSX], [1], [Mac OS X])
+
 		PLUGINFLAGS="-bundle -undefined suppress -flat_namespace"
 		QUICKTIMEFLAGS="-framework QuickTime -framework Carbon"
 		ARCHIVER="tar czf"
 		ARCHIVE_SUFFIX="tar.gz"
 		PLATFORM="macosx"
-		AC_DEFINE([MACOSX], [1], [Mac OS X])
 		EXTRAOPTFLAGS="-falign-loops=16 -ftree-vectorize -funroll-loops"
 
 		if test "x$osxcompat104" = "xyes"; then 
@@ -124,7 +138,6 @@ esac
 #
 
 if test "x$python" = "xyes"; then 
-	echo $python
 	PYTHONINCLUDE=""
 
 	# Python can come in so many exciting flavors, with different library names!
@@ -137,7 +150,7 @@ if test "x$python" = "xyes"; then
 	AC_CHECK_LIB([python2.5], [Py_Initialize], [LIBS="$LIBS -lpython2.5" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.5"])
 	AC_CHECK_LIB([python25],  [Py_Initialize], [LIBS="$LIBS -lpython2.5" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.5"])
 
-	if test "x$PYTHONINCLUDE" != ""; then
+	if test "x$PYTHONINCLUDE" != "x"; then
 		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
 		CPPFLAGS="${CPPFLAGS} ${PYTHONINCLUDE}"
 	fi
@@ -353,6 +366,8 @@ fi
 
 AC_CHECK_LIB([png], [png_create_write_struct])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc],,AC_MSG_FAILURE([Missing GSL library -- see http://www.gnu.org/software/gsl/]))
+AC_CHECK_LIB([GIMPACT], [main],,AC_MSG_FAILURE([Missing GIMPACT library -- see http://opende.sourceforge.net]))
+# AC_CHECK_LIB([fast], [main],,AC_MSG_FAILURE([Missing ODE fast library -- see http://opende.sourceforge.net]))
 AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]))
 
 AC_CHECK_FUNCS([getopt_long gettimeofday iswspace mkstemp strdup vasprintf])

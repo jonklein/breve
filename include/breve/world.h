@@ -134,7 +134,7 @@ class slWorld {
 		void 					setPhysicsMode( int );
 		void 					setBackgroundColor( slVector* );
 		void 					setBackgroundTextureColor( slVector* );
-		void 					setBackgroundTexture( int, int );
+		void 					setBackgroundTexture( slTexture2D* );
 
 		/**
 		 * Sets the ODE error reduction parameter for the world.
@@ -207,8 +207,7 @@ class slWorld {
 
 		slSkybox				_skybox;
 		
-		int 					backgroundTexture;
-		int 					isBackgroundImage;
+		slTexture2D*			backgroundTexture;
 
 		slGISData 				*gisData;
 

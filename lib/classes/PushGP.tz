@@ -1,6 +1,7 @@
 @use Push.
 @use Control.
 @use NetworkServer.
+@use File.
 
 Object : PushGP {
 	% This class is a special control class used to implement 
@@ -38,6 +39,8 @@ Object : PushGP {
 		current, next (list).
 		_abortFitnessTest (int).
 		_abortFitnessValue (float).
+
+		_history (hash).
 
 		_bestOfGen (object).
 		_totalSize (int).
@@ -222,6 +225,9 @@ Object : PushGP {
 		}
 
 	+ to run-tournament for-index index = -1 (int):
+		return current{ ( self run-index-tournament for-index index ) }.
+
+	+ to run-index-tournament for-index index = -1 (int):
 		% Runs a tournament selection from the population.  Used internally during
 		% reproduction uses the tournament size set with 
 		% METHOD(set-tournament-size).
@@ -230,16 +236,19 @@ Object : PushGP {
 		% if desired, though the default implementation should suffice in most 
 		% situations.
 
-		n, test (int).
+		n, test, bestindex (int).
 		best (object).
 
-		if spatialRadius == 0: best = current{ random[populationSize - 1] }.
-		else {
+		if spatialRadius == 0: {
+			bestindex = random[populationSize - 1].
+			best = current{ bestindex }.
+		} else {
 			test = (index + (random[2 * spatialRadius - 1] - spatialRadius)).
 			if test >= populationSize: test -= populationSize.
 			if test < 0: test += populationSize.
 
-			best = current{ test }.
+			bestindex = test.
+			best = current{ bestindex }.
 		}
 
 		for n = 0, n < tournamentSize - 1, n++: {
@@ -250,10 +259,13 @@ Object : PushGP {
 				if test < 0: test += populationSize.
 			}
 
-			if (current{test} get-fitness) < (best get-fitness): best = current{test}.
+			if (current{test} get-fitness) < (best get-fitness): {
+				bestindex = test.
+				best = current{ bestindex }.
+			}
 		}
 
-		return best.
+		return bestindex.
 
 	+ to auto-simplify program p (object):
 		% Programs generated through genetic programming are often complicated and 
@@ -341,7 +353,7 @@ Object : PushGP {
 			fitness = 100000000.
 		}
 
-		if fitness < 0.001: {
+		if fitness < 0.0001: {
 			print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;".
 			print ";; Solution found at generation $generation:", 
 					(current{ currentIndividual }  get-string).
@@ -349,6 +361,8 @@ Object : PushGP {
 			self examine program current{ currentIndividual }.
 
 			controller end-simulation.
+
+			self write-graphviz-trace for-index currentIndividual to-file "/Users/jk/dot".
 		}
 
 		if !_bestOfGen || (fitness < (_bestOfGen get-fitness)): _bestOfGen = current{ currentIndividual }.
@@ -378,9 +392,54 @@ Object : PushGP {
 			if generation > generationLimit: {
 				print ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;".
 				print ";; FAILURE: no solution found after $generation generations".
+
 				controller end-simulation.
+
 			}
 		}
+
+	+ to write-graphviz-trace for-index index (int) to-file filename (string):
+		n, g (int).
+		seen (hash).
+		file (object).
+		rankline (string).
+
+		file = new File.
+		file open-for-writing with-file filename.
+
+		file write-line text "digraph g {".
+		file write-line text "\tratio=1.0;".
+
+#		for n = 0, n < populationSize, n++: {
+#			self print-graphviz-trace for-individual "g${generation}n$n" with-seen seen to-file file.
+#		}
+		self print-graphviz-trace for-individual "g${generation}n$index" with-seen seen to-file file.
+
+		file write-line text "}".
+		file close.
+
+	- to print-graphviz-trace for-individual name (string) with-seen seen (hash) to-file f (object):
+		parent (list).
+		style (string).
+
+		if !_history{ name }: {
+			return.
+		}
+
+		for each parent in _history{ name }: {
+			style = "".
+
+			if parent{ 1 } == 1:
+				style = " [style=dotted]".
+
+			f write-line text "\t$parent{ 0 } -> $name$style;".
+
+			if !seen{ parent{ 0 } }: {
+				seen{ parent{ 0 } } = 1.
+				self print-graphviz-trace for-individual parent{ 0 } with-seen seen to-file f.
+			}
+		}
+		
 
 	- to compute-zero-duration-fitness for-program p (object):
 		n (int).
@@ -549,31 +608,43 @@ Object : PushGP {
 		% Used internally.                
 
 		n, method (int).                
-		p1, p2 (object).                
+		p1, p2 (int).                
+		g1, g2 (int).                
+
+		g1 = generation.
+		g2 = generation + 1.
 
 		for n = 0, n < (self count-fitness-cases), n++: {
 			_solutionCountsGeneration{ n } = 0.0.
 		}
 
+		n = 0.
+
 		while n < populationSize: { 
 			method = random[100]. 
 			if method < mutationPercent: {
-				p1 = (self run-tournament for-index n).
-				next{n} copy-from program p1.
+				p1 = (self run-index-tournament for-index n).
+				next{n} copy-from program current{ p1 }.
 				next{n} mutate with-interpreter interpreter.
-			} else if method < (crossoverPercent + mutationPercent): {
-				p1 = (self run-tournament for-index n).
-				p2 = (self run-tournament for-index n).
-				next{n} crossover from-parent1 p1 from-parent2 p2 with-interpreter interpreter.     
-			} else if method < (crossoverPercent + mutationPercent + deletionPercent): {
-				p1 = (self run-tournament for-index n).
-				next{n} copy-from program p1.
-				next{n} delete-random-subtree.
-			} else {
-				p1 = (self run-tournament for-index n).
-				next{n} copy-from program p1.
 
-				# print "Copying from program with fitness ", ( p1 get-fitness ).
+				_history{ "g${g2}n$n" } = { { "g${g1}n$p1", 1 } }.
+			} else if method < (crossoverPercent + mutationPercent): {
+				p1 = (self run-index-tournament for-index n).
+				p2 = (self run-index-tournament for-index n).
+				next{n} crossover from-parent1 current{ p1 } from-parent2 current{ p2 } with-interpreter interpreter.     
+
+				_history{ "g${g2}n$n" } = { { "g${g1}n$p1", 0 }, { "g${g1}n$p2", 0 } }.
+			} else if method < (crossoverPercent + mutationPercent + deletionPercent): {
+				p1 = (self run-index-tournament for-index n).
+				next{n} copy-from program current{ p1 }.
+				next{n} delete-random-subtree.
+
+				_history{ "g${g2}n$n" } = { { "g${g1}n$p1", 1 } }.
+			} else {
+				p1 = (self run-index-tournament for-index n).
+				next{n} copy-from program current{ p1 }.
+
+				_history{ "g${g2}n$n" } = { { "g${g1}n$p1", 0 } }.
 			}
 
 			n++.
@@ -684,26 +755,26 @@ PushGP : PushClusterGP {
 		while n < populationSize: { 
 			method = random[100]. 
 			if method < mutationPercent: {
-				p1 = (self run-tournament for-index n).
-				next{n} copy-from program p1.
+				p1 = (self run-index-tournament for-index n).
+				next{n} copy-from program current{ p1 }.
 				next{n} mutate with-interpreter interpreter.
 			} else if method < (crossoverPercent + mutationPercent): {
-				p1 = (self run-tournament for-index n).
-				p2 = (self run-tournament for-index n).
-				next{n} crossover from-parent1 p1 from-parent2 p2 with-interpreter interpreter.     
+				p1 = (self run-index-tournament for-index n).
+				p2 = (self run-index-tournament for-index n).
+				next{n} crossover from-parent1 current{ p1 } from-parent2 current{ p2 } with-interpreter interpreter.     
 			} else if method < (crossoverPercent + mutationPercent + deletionPercent): {
-				p1 = (self run-tournament for-index n).
-				next{n} copy-from program p1.
+				p1 = (self run-index-tournament for-index n).
+				next{n} copy-from program current{ p1 }.
 				next{n} delete-random-subtree.
 			} else if method < (crossoverPercent + mutationPercent + deletionPercent + emigrationPercent): {
 				if lastTransfer: p1 = (lastTransfer get-random-program ).
-				else p1 = (self run-tournament for-index n).
+				else p1 = (self run-index-tournament for-index n).
 
-				next{n} copy-from program p1.
+				next{n} copy-from program current{ p1 }.
 				index++.
 			} else {
-				p1 = (self run-tournament for-index n).
-				next{n} copy-from program p1.
+				p1 = (self run-index-tournament for-index n).
+				next{n} copy-from program current{ p1 }.
 			}
 
 			n++.

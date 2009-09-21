@@ -629,7 +629,7 @@ void stObjectAllocationReport( stObject *o ) {
 	Prints out error messages and stops the simulation.
 */
 
-void stParseError( brEngine *e, int type, char *proto, ... ) {
+void stParseError( brEngine *e, int type, const char *proto, ... ) {
 	va_list vp;
 	brErrorInfo *error = brEngineGetErrorInfo( e );
 

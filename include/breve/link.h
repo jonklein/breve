@@ -118,7 +118,7 @@ class slLink: public slWorldObject {
 		 * Sets a label to be drawn with this link.
 		 */
 
-		void setLabel(char *label);
+		void setLabel( const char *label );
 
 		/**
 		 * Recursively builds a list of all directly and indirectly 

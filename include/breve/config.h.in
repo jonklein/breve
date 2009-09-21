@@ -1,5 +1,8 @@
 /* include/breve/config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Darwin */
+#undef DARWIN
+
 /* Define to 1 if you have the `getopt_long' function. */
 #undef HAVE_GETOPT_LONG
 
@@ -24,20 +27,11 @@
 /* Define to 1 if you have the `avutil' library (-lavutil). */
 #undef HAVE_LIBAVUTIL
 
-/* Define to 1 if you have the `cmp' library (-lcmp). */
-#undef HAVE_LIBCMP
-
 /* Define to 1 if you have the `curl' library (-lcurl). */
 #undef HAVE_LIBCURL
 
 /* Define to 1 if you have the `ecl' library (-lecl). */
 #undef HAVE_LIBECL
-
-/* Define to 1 if you have the `eclgc' library (-leclgc). */
-#undef HAVE_LIBECLGC
-
-/* Define to 1 if you have the `eclgmp' library (-leclgmp). */
-#undef HAVE_LIBECLGMP
 
 /* Define to 1 if you have the `enet' library (-lenet). */
 #undef HAVE_LIBENET
@@ -53,6 +47,9 @@
 
 /* Define to 1 if you have the `ftgl' library (-lftgl). */
 #undef HAVE_LIBFTGL
+
+/* Define to 1 if you have the `GIMPACT' library (-lGIMPACT). */
+#undef HAVE_LIBGIMPACT
 
 /* Define to 1 if you have the `GL' library (-lGL). */
 #undef HAVE_LIBGL
@@ -110,9 +107,6 @@
 
 /* Define to 1 if you have the `sndfile' library (-lsndfile). */
 #undef HAVE_LIBSNDFILE
-
-/* Define to 1 if you have the `sockets' library (-lsockets). */
-#undef HAVE_LIBSOCKETS
 
 /* Define to 1 if you have the `termcap' library (-ltermcap). */
 #undef HAVE_LIBTERMCAP
@@ -183,11 +177,17 @@
 /* Define to 1 if you have the <wctype.h> header file. */
 #undef HAVE_WCTYPE_H
 
+/* iPhone */
+#undef IPHONE
+
 /* Mac OS X */
 #undef MACOSX
 
 /* MinGW */
 #undef MINGW
+
+/* OpenGL ES */
+#undef OPENGLES
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT

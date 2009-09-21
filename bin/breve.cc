@@ -114,9 +114,8 @@ int brGLUTUnpause() {
 
 
 int main( int argc, char **argv ) {
-	char *text, *simulationFile;
-	int index;
-	char wd[MAXPATHLEN];
+	char *text;
+	const char *simulationFile;
 
 	interfaceID = "glut/2.6";
 
@@ -130,7 +129,7 @@ int main( int argc, char **argv ) {
 
 	/* parse the command line args. */
 
-	index = brParseArgs( argc, argv );
+	int index = brParseArgs( argc, argv );
 
 	char *execpath = argv[ 0 ];
 
@@ -165,7 +164,8 @@ int main( int argc, char **argv ) {
 
 	gEngine = brEngineNewWithArguments( argc, argv );
 
-	brEngineSetIOPath( gEngine, getcwd( wd, sizeof( wd ) ) );
+	char currentDir[ MAXPATHLEN ];
+	brEngineSetIOPath( gEngine, getcwd( currentDir, sizeof( currentDir ) ) );
 
 	gSteveData = (stSteveData*)brInitFrontendLanguages( gEngine );
 
@@ -527,7 +527,7 @@ void brPrintUsage( const char *name ) {
 	exit( 1 );
 }
 
-void slInitGlut( int argc, char **argv, char *title ) {
+void slInitGlut( int argc, char **argv, const char *title ) {
 	glutInit( &argc, argv );
 
 	glutInitWindowSize( gWidth, gHeight );
@@ -821,7 +821,7 @@ int brGLUTDialogCallback( char *title, char *message, char *b1, char *b2 ) {
 	}
 }
 
-char *brGLUTInterfaceVersionCallback() {
+const char *brGLUTInterfaceVersionCallback() {
 	return interfaceID;
 }
 
@@ -837,11 +837,11 @@ char *brGLUTPrompt( const char *inString ) {
 	return slStrdup( name );
 }
 
-char *brGLUTGetSavename() {
+const char *brGLUTGetSavename() {
 	return brGLUTPrompt( "filename to save: " );
 }
 
-char *brGLUTGetLoadname() {
+const char *brGLUTGetLoadname() {
 	return brGLUTPrompt( "filename to load: " );
 }
 

@@ -549,7 +549,7 @@ int brEngineIterate( brEngine *e ) {
 	simulation file or resource.
 */
 
-void replace_substring( std::string *inStr, char *sub, char *repl ) { 
+void brReplaceSubstring( std::string *inStr, const char *sub, const char *repl ) { 
 	unsigned int pos = 0;
 
 	while( 1 ) {
@@ -567,21 +567,9 @@ void replace_substring( std::string *inStr, char *sub, char *repl ) {
 void brAddSearchPath( brEngine *e, const char *path ) {
 	std::string newPath( path );
 
-	replace_substring( &newPath, "\\", "\\\\" );
+	brReplaceSubstring( &newPath, "\\", "\\\\" );
 	slMessage( DEBUG_INFO, "adding search path %s\n", path );
 	e->_searchPaths.push_back( newPath );
-}
-
-std::vector< std::string > brEngineGetAllObjectNames( brEngine *e ) {
-	std::vector< std::string > names;
-
-	std::map< std::string, brObject >::iterator oi;
-
-	// for( oi = e->objects.begin(); oi != e->objects.end(); oi++ ) {
-	// 
-	// }
-
-	return names;
 }
 
 const std::vector< std::string > &brEngineGetSearchPaths( brEngine *e ) {
@@ -650,7 +638,7 @@ void brPrintVersion() {
  * but this will typically cause a simulation to die.
  */
 
-void brEvalError( brEngine *e, int type, char *proto, ... ) {
+void brEvalError( brEngine *e, int type, const char *proto, ... ) {
 	va_list vp;
 	char localMessage[ BR_ERROR_TEXT_SIZE ];
 
@@ -770,11 +758,11 @@ void brEngineSetDialogCallback( brEngine *e, int( *callback )( char *, char *, c
 	e->dialogCallback = callback;
 }
 
-void brEngineSetGetSavenameCallback( brEngine *e, char *( *callback )( void ) ) {
+void brEngineSetGetSavenameCallback( brEngine *e, const char *( *callback )( void ) ) {
 	e->getSavename = callback;
 }
 
-void brEngineSetGetLoadnameCallback( brEngine *e, char *( *callback )( void ) ) {
+void brEngineSetGetLoadnameCallback( brEngine *e, const char *( *callback )( void ) ) {
 	e->getLoadname = callback;
 }
 
@@ -786,7 +774,7 @@ void brEngineSetUnpauseCallback( brEngine *e, int( callback )( void ) ) {
 	e->unpauseCallback = callback;
 }
 
-void brEngineSetInterfaceInterfaceTypeCallback( brEngine *e, char *( *callback )( void ) ) {
+void brEngineSetInterfaceInterfaceTypeCallback( brEngine *e, const char *( *callback )( void ) ) {
 	e->interfaceTypeCallback = callback;
 }
 

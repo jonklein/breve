@@ -23,6 +23,8 @@
 
 #include <string.h>
 
+#define MAX(x, y) ((x)>(y)?(x):(y))
+
 /*!
     \brief a 3x1 vector
 */

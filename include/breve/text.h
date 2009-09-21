@@ -24,10 +24,9 @@
 char *slFileExtension( const char *inName );
 char *slDirname( const char *inName );
 
-char *slSplit(char *, char *, int);
+char *slSplit( const char* inText,  const char* inSeparator, int inField );
 
 int slUtilGzread(char *, int, gzFile);
-int slUtilGzwrite(void *, size_t, size_t, gzFile);
 
 int slUtilFread(void *, size_t, size_t, FILE *);
 int slUtilFwrite(const void *, size_t, size_t, FILE *);

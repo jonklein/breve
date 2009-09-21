@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "kernel.h"
+#include "breveFunctionsImage.h"
 #include "world.h"
 
 /*! \addtogroup InternalFunctions */
@@ -290,10 +291,10 @@ int brIRealSetVisible( brEval args[], brEval *target, brInstance *i ) {
  */
 
 int brIRealSetTexture( brEval args[], brEval *target, brInstance *i ) {
-	slWorldObject *o = BRWORLDOBJECTPOINTER( &args[0] );
-	int value = BRINT( &args[1] );
+	slWorldObject *o = BRWORLDOBJECTPOINTER( &args[ 0 ] );
+	slTexture2D *t = ( (brImageData*)BRPOINTER( &args[ 1 ] ) ) -> _texture;
 
-	o->setTexture( value );
+	o->setTexture( t );
 	o->setTextureMode( BBT_NONE );
 
 	return EC_OK;
@@ -330,10 +331,10 @@ int brIRealSetTextureScale( brEval args[], brEval *target, brInstance *i ) {
  */
 
 int brIRealSetBitmap( brEval args[], brEval *target, brInstance *i ) {
-	slWorldObject *o = BRWORLDOBJECTPOINTER( &args[0] );
-	int texture = BRINT( &args[1] );
+	slWorldObject *o = BRWORLDOBJECTPOINTER( &args[ 0 ] );
+	slTexture2D *t = ( (brImageData*)BRPOINTER( &args[ 1 ] ) ) -> _texture;
 
-	o->setTexture( texture );
+	o->setTexture( t );
 	o->setTextureMode( BBT_BITMAP );
 
 	return EC_OK;
@@ -415,10 +416,10 @@ int brIRealSetAlpha( brEval args[], brEval *target, brInstance *i ) {
  */
  
 int brIRealSetLightmap( brEval args[], brEval *target, brInstance *i ) {
-	slWorldObject *o = BRWORLDOBJECTPOINTER( &args[0] );
-	int value = BRINT( &args[1] );
+	slWorldObject *o = BRWORLDOBJECTPOINTER( &args[ 0 ] );
+	slTexture2D *t = ( (brImageData*)BRPOINTER( &args[ 1 ] ) ) -> _texture;
 
-	o->setTexture( value );
+	o->setTexture( t );
 	o->setTextureMode( BBT_LIGHTMAP );
 
 	return EC_OK;
@@ -486,13 +487,15 @@ void breveInitRealFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "realSetDrawAxis", brIRealSetDrawAxis, AT_NULL, AT_POINTER, AT_INT, 0 );
 	brNewBreveCall( n, "realSetNeighborLines", brIRealSetNeighborLines, AT_NULL, AT_POINTER, AT_INT, 0 );
 	brNewBreveCall( n, "realSetVisible", brIRealSetVisible, AT_NULL, AT_POINTER, AT_INT, 0 );
-	brNewBreveCall( n, "realSetTexture", brIRealSetTexture, AT_NULL, AT_POINTER, AT_INT, 0 );
 	brNewBreveCall( n, "realSetTextureScale", brIRealSetTextureScale, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0 );
-	brNewBreveCall( n, "realSetBitmap", brIRealSetBitmap, AT_NULL, AT_POINTER, AT_INT, 0 );
+
+	brNewBreveCall( n, "realSetTexture", brIRealSetTexture, AT_NULL, AT_POINTER, AT_POINTER, 0 );
+	brNewBreveCall( n, "realSetLightmap", brIRealSetLightmap, AT_NULL, AT_POINTER, AT_POINTER, 0 );
+	brNewBreveCall( n, "realSetBitmap", brIRealSetBitmap, AT_NULL, AT_POINTER, AT_POINTER, 0 );
+
 	brNewBreveCall( n, "realSetBitmapRotation", brIRealSetBitmapRotation, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "realSetBitmapRotationTowardsVector", brIRealSetBitmapRotationTowardsVector, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
 	brNewBreveCall( n, "realSetAlpha", brIRealSetAlpha, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
-	brNewBreveCall( n, "realSetLightmap", brIRealSetLightmap, AT_NULL, AT_POINTER, AT_INT, 0 );
 	brNewBreveCall( n, "realSetColor", brIRealSetColor, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
 	brNewBreveCall( n, "realSetDrawShadows", brIRealSetDrawShadows, AT_NULL, AT_POINTER, AT_INT, 0 );
 	brNewBreveCall( n, "realSetDrawAsPoint", brIRealSetDrawAsPoint, AT_NULL, AT_POINTER, AT_INT, 0 );

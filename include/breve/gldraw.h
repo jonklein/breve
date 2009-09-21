@@ -24,6 +24,17 @@
 #include "glIncludes.h"
 #include "camera.h"
 
+class slRender {
+
+};
+
+class slRenderGL : public slRender {
+	public:
+		
+
+
+};
+
 class slWorld;
 class slStationary;
 
@@ -111,7 +122,7 @@ void slBreakdownTriangle(slVector *vertices, int depth, slVector *xaxis, slVecto
 
 void slGlError(void);
 
-int slClearGLErrors(char *);
+int slClearGLErrors( const char * );
 
 void slFreeGL(slWorld *, slCamera *);
 

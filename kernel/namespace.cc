@@ -32,7 +32,8 @@ void brNamespaceFreeWithFunction( brNamespace *ns, void( *symFree )( void *s ) )
 	std::map< std::string, brNamespaceSymbol*>::iterator mi;
 
 	for ( mi = ns->map.begin(); mi != ns->map.end(); mi++ ) {
-		if ( mi->second ) brNamespaceSymbolFreeWithFunction( mi->second, symFree );
+		if ( mi -> second ) 
+				brNamespaceSymbolFreeWithFunction( mi->second, symFree );
 	}
 
 	ns->map.clear();
@@ -54,22 +55,18 @@ slList *brNamespaceSymbolList( brNamespace *space ) {
 	return list;
 }
 
-brNamespaceSymbol *brNamespaceStore( brNamespace *space, char *name, int type, void *data ) {
+brNamespaceSymbol *brNamespaceStore( brNamespace *space, const char *name, int type, void *data ) {
 	std::string nameS = name;
 
-	if ( space->map[ nameS] ) return NULL;
+	if ( space->map[ nameS ] ) return NULL;
 
-	space->map[ nameS] = brNamespaceSymbolNew( type, data );
+	space->map[ nameS ] = brNamespaceSymbolNew( type, data );
 
-	return space->map[ nameS];
+	return space->map[ nameS ];
 }
 
-brNamespaceSymbol *brNamespaceLookup( brNamespace *space, char *name ) {
-	std::string nameS = name;
-
-	if ( !name ) return NULL;
-
-	return space->map[ nameS];
+brNamespaceSymbol *brNamespaceLookup( brNamespace *space, const char *name ) {
+	return space->map[ name ];
 }
 
 brNamespaceSymbol *brNamespaceSymbolNew( int type, void *data ) {
@@ -77,14 +74,15 @@ brNamespaceSymbol *brNamespaceSymbolNew( int type, void *data ) {
 
 	s = new brNamespaceSymbol;
 
-	s->type = type;
-	s->data = data;
+	s -> type = type;
+	s -> data = data;
 
 	return s;
 }
 
 void brNamespaceSymbolFreeWithFunction( brNamespaceSymbol *s, void( *symFree )( void *s ) ) {
-	if ( symFree && s->data ) symFree( s->data );
+	if ( symFree && s->data ) 
+		symFree( s->data );
 
 	delete s;
 }

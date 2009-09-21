@@ -48,13 +48,14 @@ class slDrawCommandPoint : slDrawCommand {
 		slDrawCommandPoint(slVector *p) : _point(*p) {}
 
 		void execute(slDrawCommandList &list) {
+			#ifndef OPENGLES
 			if(!list._drawingPolygon) {
 				glBegin(GL_POLYGON);
-				// glBegin(GL_TRIANGLE_FAN);
 				list._drawingPolygon = 1;
 			}
 
 			glVertex3f(_point.x, _point.y, _point.z);
+			#endif
 		}
 
 	private:
@@ -66,7 +67,9 @@ class slDrawSetLineStyle : slDrawCommand {
 		slDrawSetLineStyle(unsigned int s) : _style(s) {}
 
 		void execute(slDrawCommandList &list) {
+			#ifndef OPENGLES
 			glLineStipple(1, _style);
+			#endif
 		}
 
 	private:
@@ -78,7 +81,9 @@ class slDrawSetLineWidth : slDrawCommand {
 		slDrawSetLineWidth(double w) : _width(w) {}
 
 		void execute(slDrawCommandList &list) {
+			#ifndef OPENGLES
 			glLineWidth(_width);
+			#endif
 		}
 
 	private:
@@ -89,8 +94,10 @@ class slDrawEndPolygon : slDrawCommand {
 	public:
 		void execute(slDrawCommandList &list) {
 			if(list._drawingPolygon) {
+				#ifndef OPENGLES
 				glEnd();
 				list._drawingPolygon = 0;
+				#endif
 			}
 
 		}
@@ -104,6 +111,7 @@ class slDrawCommandLine : slDrawCommand {
 		slDrawCommandLine(slVector *s, slVector *e) : _start(*s), _end(*e) {}
 
 		void execute(slDrawCommandList &list) {
+			#ifndef OPENGLES
 			if(list._drawingPolygon) {
 				list._drawingPolygon = 0;
 				glEnd();
@@ -113,6 +121,7 @@ class slDrawCommandLine : slDrawCommand {
 			glVertex3f(_start.x, _start.y, _start.z);
 			glVertex3f(_end.x, _end.y, _end.z);
 			glEnd();
+			#endif
 		}
 };
 

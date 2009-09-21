@@ -21,40 +21,26 @@
 /*! \addtogroup InternalFunctions */
 /*@{*/
 
+#include "breveFunctionsImage.h"
+
 #include "kernel.h"
 #include "gldraw.h"
 #include "image.h"
 
-/*!
-    \brief Holds image _data used by the breve image class.
-*/
+void brImageData::updateTexture() {
+	if( !_texture )
+		_texture = new slTexture2D;
 
-struct brImageData {
-							brImageData() {
-								_data = NULL;
-								_width = 0;
-								_height = 0;
-								_textureNumber = -1;
-							}
-
-							~brImageData() {
-								if( _data )	
-									slFree( _data );
-							}
-
-	unsigned char* 			_data;
-	int 					_width;
-	int 					_height;
-	int 					_textureNumber;
-};
+	_texture -> loadPixels( _data, _width, _height, 4 );
+}
 
 #define BRIMAGEDATAPOINTER(p)	((brImageData*)BRPOINTER(p))
 
-/*!
-	\brief Retuns the width of an image.
-
-	int imageGetWidth(brImageData pointer).
-*/
+/**
+ * \brief Retuns the width of an image.
+ * 
+ * int imageGetWidth(brImageData pointer).
+ */
 
 int brIImageGetWidth( brEval args[], brEval *result, brInstance *i ) {
 	brImageData *dm = BRIMAGEDATAPOINTER( &args[0] );
@@ -150,8 +136,6 @@ int brIImageReadPixels( brEval args[], brEval *result, brInstance *i ) {
 	int x = BRINT( &args[1] );
 	int y = BRINT( &args[2] );
 
-	// Alpha channel washed out on Windows?!  Fix it with a 1.0 bias
-
 	if( i->engine->camera->_activateContextCallback ) {
 		if( i->engine->camera->_activateContextCallback() != 0 ) {
 			slMessage( DEBUG_ALL, "warning: could not read pixels, no OpenGL context available\n" );
@@ -159,9 +143,16 @@ int brIImageReadPixels( brEval args[], brEval *result, brInstance *i ) {
 		}
 	}
 
+#ifdef WINDOWS
+	// Alpha channel washed out on Windows?!  Fix it with a 1.0 bias
 	glPixelTransferf( GL_ALPHA_BIAS, 1.0 );
+#endif
+
 	glReadPixels( x, y, dm -> _width, dm -> _height, GL_RGBA, GL_UNSIGNED_BYTE, dm ->_data );
+
+#ifdef WINDOWS
 	glPixelTransferf( GL_ALPHA_BIAS, 0.0 );
+#endif
 
 	return EC_OK;
 }
@@ -171,6 +162,7 @@ int brIImageReadPixels( brEval args[], brEval *result, brInstance *i ) {
 
 */ 
 int brIImageReadDepthBuffer( brEval args[], brEval *result, brInstance *i ) {
+#ifndef OPENGLES
 	brImageData *dm = BRIMAGEDATAPOINTER( &args[0] );
 	int x = BRINT( &args[1] );
 	int y = BRINT( &args[2] );
@@ -219,6 +211,8 @@ int brIImageReadDepthBuffer( brEval args[], brEval *result, brInstance *i ) {
 
 	}
 	return EC_OK;
+
+#endif
 }
 
 
@@ -255,6 +249,8 @@ int brIImageLoadFromFile( brEval args[], brEval *result, brInstance *i ) {
 		return EC_OK;
 	}
 
+	dm -> updateTexture();
+
 	slFree( file );
 
 	result->set( ( void* )dm );
@@ -274,12 +270,10 @@ int brIImageUpdateTexture( brEval args[], brEval *result, brInstance *i ) {
 		return EC_OK;
 	}
 
-	if ( image->_textureNumber == -1 )
-		image->_textureNumber = slTextureNew( i->engine->camera );
+	if( i -> engine -> camera -> _activateContextCallback )
+		i -> engine -> camera -> _activateContextCallback();
 
-	slUpdateTexture( i->engine->camera, image->_textureNumber, image->_data, image-> _width, image-> _height, GL_RGBA );
-
-	result->set( image->_textureNumber );
+	image -> updateTexture();
 
 	return EC_OK;
 }
@@ -393,7 +387,7 @@ int brIImageDataInit( brEval args[], brEval *result, brInstance *i ) {
 	int height = BRINT( &args[1] );
 
 	dm = new brImageData;
-	dm ->_data = (unsigned char*)slMalloc( width * height * 4 );
+	dm ->_data = new unsigned char[ width * height * 4 ];
 
 	memset( dm ->_data, 0x0, width * height * 4 );
 
@@ -447,13 +441,7 @@ int brIImageGetCompressionSize( brEval args[], brEval *result, brInstance *i ) {
  */
 
 int brIImageDataFree( brEval args[], brEval *result, brInstance *i ) {
-	brImageData *dm = BRIMAGEDATAPOINTER( &args[0] );
-
-	if ( dm ->_textureNumber != -1 )
-		slTextureFree( i->engine->camera, dm ->_textureNumber );
-
-	delete dm;
-
+	delete BRIMAGEDATAPOINTER( &args[0] );
 	return EC_OK;
 }
 
@@ -489,7 +477,7 @@ int brIImageDearchive( brEval args[], brEval *result, brInstance *i ) {
 
 	dm -> _width  = ( (int*)data -> data )[ 0 ];
 	dm -> _height = ( (int*)data -> data )[ 1 ];
-    dm -> _data = (unsigned char*)slMalloc( dm -> _width * dm -> _height * 4 );
+    dm -> _data = new unsigned char[ dm -> _width * dm -> _height * 4 ];
 
 	memcpy( (char*)dm -> _data, (int*)data -> data + 2 , dm -> _height * dm -> _width * 4 );
 

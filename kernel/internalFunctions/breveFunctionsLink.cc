@@ -18,6 +18,7 @@
  *****************************************************************************/
 
 #include "kernel.h"
+#include "breveFunctionsImage.h"
 #include "link.h"
 #include "world.h"
 
@@ -346,14 +347,14 @@ int brILinkGetMin( brEval args[], brEval *target, brInstance *i ) {
 
 int brILinkSetTexture( brEval args[], brEval *target, brInstance *i ) {
 	slLink *m = BRLINKPOINTER( &args[0] );
-	int texture = BRINT( &args[1] );
+	brImageData *image = (brImageData*)BRPOINTER( &args[1] );
 
 	if ( !m ) {
 		slMessage( DEBUG_ALL, "null pointer passed to setTexture\n" );
 		return EC_ERROR;
 	}
 
-	m->setTexture( texture );
+	m->setTexture( image -> _texture );
 
 	return EC_OK;
 }
@@ -415,7 +416,7 @@ int brILinkRemoveLabel( brEval args[], brEval *target, brInstance *i ) {
 		return EC_OK;
 	}
 
-	link->setLabel( "" );
+	link -> setLabel( "" );
 
 	return EC_OK;
 }

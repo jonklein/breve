@@ -67,7 +67,7 @@ Abstract : Image (aka Images) [version 2.0] {
 		currentWidth = imageWidth.
 
 		if imageData: 
-		imageDataFree(imageData).
+			imageDataFree(imageData).
 
 		imageData = imageDataInit( imageWidth, imageHeight ).
 
@@ -78,6 +78,10 @@ Abstract : Image (aka Images) [version 2.0] {
 
 	- to get-image-data:
 		return imageData.
+
+	- to get-texture-number:
+		print "Texture number is deprecated and does not work, clearly.".
+		return -1.
 
   + section "Getting information about the size and format of an image"
 
@@ -223,14 +227,6 @@ Abstract : Image (aka Images) [version 2.0] {
 		% write pixel data directly.  
 
 		return imageGetPixelPointer(imageData).
-
-	- to get-texture-number:
-		% Internal use only.
-
-		if imageData && textureNumber == -1: 
-			textureNumber = imageUpdateTexture(imageData).
-
-		return textureNumber.
 
   + section "Writing an image to a file"
 

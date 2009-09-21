@@ -27,16 +27,15 @@ enum symbolTypes {
     ST_VAR
 };
 
-/*!
-	\brief A hashtable for holding symbols of different types.
+/**
+ * \brief A hashtable for holding symbols of different types.
+ * 
+ * Used by the steve language as a generic hash table.
+ * 
+ * This used to be a homegrown hash-table in C, now it's a wrapper
+ * around an STL map.
+ */
 
-	Used by the steve language as a generic hash table.
-
-	This used to be a homegrown hash-table in C, now it's a wrapper
-	around an STL map.
-*/
-
-#ifdef __cplusplus
 #include <map>
 #include <string>
 
@@ -44,27 +43,22 @@ class brNamespace {
 	public:
 		std::map<std::string,brNamespaceSymbol*> map;
 };
-#endif
 
-/*!
-	\brief A symbol in a brNamespace.
-*/
+/**
+ * \brief A symbol in a brNamespace.
+ */
 
 struct brNamespaceSymbol {
     int type;
     void *data;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 brNamespace *brNamespaceNew(void);
 void brNamespaceFree(brNamespace *);
 void brNamespaceFreeWithFunction(brNamespace *, void (*)(void *));
 
-brNamespaceSymbol *brNamespaceStore(brNamespace *, char *, int, void *);
-brNamespaceSymbol *brNamespaceLookup(brNamespace *, char *);
+brNamespaceSymbol *brNamespaceStore(brNamespace *, const char *, int, void *);
+brNamespaceSymbol *brNamespaceLookup(brNamespace *, const char *);
 
 brNamespaceSymbol *brNamespaceSymbolNew(int, void *);
 
@@ -72,9 +66,5 @@ void brNamespaceSymbolFree(brNamespaceSymbol *);
 void brNamespaceSymbolFreeWithFunction(brNamespaceSymbol *s, void (*)(void *s));
 
 slList *brNamespaceSymbolList(brNamespace *);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

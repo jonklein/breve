@@ -28,8 +28,6 @@ int slMeshShape::createODEGeom() {
 	if( !_indices || !_vertices ) 
 		return -1;
 
-//	finishShapeWithMaxLength( 0, .4 );
-
 	slVectorSet( &_max, 0, 0, 0 );
 	slVectorSet( &_min, 0, 0, 0 );
 
@@ -99,21 +97,17 @@ int slMeshShape::createODEGeom() {
 	return 0;
 }
 
-
-#define MAX( a, b ) ( ( a ) > ( b ) ? ( a ) : ( b ) )
-
-void slMeshShape::bounds( const slPosition *position, slVector *min, slVector *max ) {
+void slMeshShape::bounds( const slPosition *position, slVector *outMin, slVector *outMax ) const {
 	float scale = MAX( _transform[ 0 ][ 0 ], MAX( _transform[ 1 ][ 1 ], _transform[ 2 ][ 2 ] ) );
-
 	float reach = _maxReach * scale;
 
-	max->x = position->location.x + reach;
-	max->y = position->location.y + reach;
-	max->z = position->location.z + reach;
+	outMax->x = position->location.x + reach;
+	outMax->y = position->location.y + reach;
+	outMax->z = position->location.z + reach;
 
-	min->x = position->location.x - reach;
-	min->y = position->location.y - reach;
-	min->z = position->location.z - reach;
+	outMin->x = position->location.x - reach;
+	outMin->y = position->location.y - reach;
+	outMin->z = position->location.z - reach;
 }
 
 slMeshShape::~slMeshShape() {
@@ -339,11 +333,10 @@ void slMeshShape::finishShape( double density ) {
 	slShape::finishShape( density );
 }
 
-
-
 void slMeshShape::drawBounds( slCamera *inCamera ) {
 	glColor4f( 0, 0, 0, 0.7 );
 
+#ifndef OPENGLES
 	glBegin( GL_LINE_LOOP );
 	glVertex3f( _min.x, _min.y, _min.z );
 	glVertex3f( _max.x, _min.y, _min.z );
@@ -367,9 +360,8 @@ void slMeshShape::drawBounds( slCamera *inCamera ) {
 	glVertex3f( _max.x, _max.y, _max.z );
 	glVertex3f( _min.x, _max.y, _max.z );
 	glEnd();
-
+#endif
 }
-
 
 
 #ifdef HAVE_LIB3DS
@@ -549,7 +541,6 @@ void sl3DSShape::processNodes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPo
 }
 
 int sl3DSShape::addMaterial( std::string &inMaterialName, Lib3dsMaterial *inMaterial ) {
-
 	if( !inMaterial ) 
 		return 0;
 
@@ -682,7 +673,7 @@ void sl3DSShape::draw( slCamera *c, double textureScaleX, double textureScaleY, 
 		slMaterial *material = &_materialList[ n ];
 
 		if( !material -> _texture && material -> _texturePath.size() > 0 )
-			material -> _texture = new slTexture2D( material -> _texturePath );
+			material -> _texture = new slTexture2D( &material -> _texturePath );
 	}
 
 	glDisable( GL_CULL_FACE );

@@ -8,7 +8,6 @@ SRC	+= kernel/breveEval.cc kernel/breveObjectAPI.cc kernel/callback.cc \
 		kernel/internalFunctions/breveFunctionsControl.cc \
 		kernel/internalFunctions/breveFunctionsDrawing.cc \
 		kernel/internalFunctions/breveFunctionsFile.cc \
-		kernel/internalFunctions/breveFunctionsGraph.cc \
 		kernel/internalFunctions/breveFunctionsImage.cc \
 		kernel/internalFunctions/breveFunctionsJoint.cc \
 		kernel/internalFunctions/breveFunctionsLink.cc \

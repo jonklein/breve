@@ -330,6 +330,7 @@ void slRoamPatch::tessellate( slCamera *c, slRoamTriangle *t, int node ) {
 int slRoamPatch::render( slCamera *c, int mode ) {
 	int n;
 
+#ifndef OPENGLES
 	glDisable( GL_CULL_FACE );
 	//glDisable(GL_LIGHTING);
 
@@ -354,6 +355,7 @@ int slRoamPatch::render( slCamera *c, int mode ) {
 	glEnd();
 
 	if ( !mode ) glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+#endif
 
 	return n;
 }
@@ -375,6 +377,7 @@ int slRoamPatch::render( slRoamTriangle *triangle, slCamera *c ) {
 
 	slVector color;
 
+#ifndef OPENGLES
 	_terrain -> colorForHeight( triangle->_points[0].y, &color );
 	glColor3f( color.x, color.y, color.z );
 	glTexCoord3f( triangle->_leftX / _terrain->_textureScaleX,  triangle->_leftY / _terrain->_textureScaleY, 0 );
@@ -389,6 +392,7 @@ int slRoamPatch::render( slRoamTriangle *triangle, slCamera *c ) {
 	glColor3f( color.x, color.y, color.z );
 	glTexCoord3f( triangle->_rightX / _terrain->_textureScaleX, triangle->_rightY / _terrain->_textureScaleY, 0 );
 	glVertex3f( triangle->_points[2].x, triangle->_points[2].y, triangle->_points[2].z );
+#endif
 
 	return 1;
 }

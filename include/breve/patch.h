@@ -21,15 +21,14 @@
 #ifndef _PATCH_H
 #define _PATCH_H
 
-#ifdef __cplusplus
-/*!
-	\brief Data associated with a certain region of 3D space.
-*/
+/**
+ * \brief Data associated with a certain region of 3D space.
+ */
 
 #include "bigMatrix.hh"
 #include "glIncludes.h"
+#include "texture.h"
 
-/* Forward declaration */
 class slPatchGrid;
 
 /**
@@ -164,16 +163,12 @@ class slPatchGrid {
 
 		int drawSmooth;
 
-		int _texture;
-		int _cubeDrawList;
+		slTexture2D*			_texture;
+		int 					_cubeDrawList;
 		
-		bool _drawWithTexture;
-		bool _textureNeedsUpdate;
+		bool 					_drawWithTexture;
+		bool 					_textureNeedsUpdate;
 
 };
-#else 
-typedef struct slPatchGrid slPatchGrid;
-typedef struct slPatch slPatch;
-#endif /* __cplusplus */
 
 #endif /* _PATCH_H */

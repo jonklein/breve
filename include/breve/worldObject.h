@@ -3,9 +3,7 @@
 
 #include "slutil.h"
 #include "shape.h"
-
-#include <vector>
-#include <string>
+#include "texture.h"
 
 class slWorld;
 class slWorldObject;
@@ -57,7 +55,7 @@ class slWorldObject {
 
 		slWorldObject() {
 			_drawMode = 0;
-			_texture = 0;
+			_texture = NULL;
 			_textureMode = 0;
 			_textureScaleX = 16;
 			_textureScaleY = 16;
@@ -113,7 +111,7 @@ class slWorldObject {
 		void setColor( slVector *color );
 		void setDrawShadows( bool drawShadows );
 		void setAlpha( double alpha );
-		void setTexture( int texture );
+		void setTexture( slTexture2D *inTexture );
 		void setTextureMode( int mode );
 		void setTextureScale( double scaleX, double scaleY );
 		void setBitmapRotation( double rot );
@@ -156,15 +154,15 @@ class slWorldObject {
 		slVector _min;
 
 	protected:
-		slShape *_shape;
-		slShape *_displayShape;
+		slShape*					_shape;
+		slShape*					_displayShape;
 
-		std::string _label;
+		std::string 				_label;
 
-		bool _simulate;
-		bool _update;
+		bool 						_simulate;
+		bool 						_update;
 
-		slPosition _position;
+		slPosition 					_position;
 
 		// type is one of the slWorldObjectTypes -- a stationary or a multibody
 		// the data pointer is thus a pointer to the corresponding structure.
@@ -177,7 +175,7 @@ class slWorldObject {
 
 		bool _drawAsPoint;
 		bool _drawShadow;
-		int _texture;
+		slTexture2D*				_texture;
 		char _textureMode;
 		unsigned char _drawMode;
 		float _billboardRotation;
@@ -187,7 +185,7 @@ class slWorldObject {
 
 		// bounding box information here is used for "proximity" data
 	
-		bool _moved;
+		bool 						_moved;
 	
 		double _e;
 		double _mu;
@@ -199,7 +197,7 @@ class slWorldObject {
 
 		std::vector<slObjectConnection*> _connections;
 
-		void *_userData;
+		void*						_userData;
 };
 
 #endif /* _WORLDOBJECT_H */

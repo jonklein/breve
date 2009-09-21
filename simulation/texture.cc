@@ -21,9 +21,7 @@
 #include "texture.h"
 #include "image.h"
 
-#define MAX( x, y ) ( (x)>(y)?(x):(y) )
-
-slTexture2D::slTexture2D( std::string &inFile, bool inRepeat ) {
+slTexture2D::slTexture2D( const std::string *inFile, bool inRepeat ) {
 	_textureID = 0;
 	_sizeX = 0;
 	_sizeY = 0;
@@ -31,32 +29,23 @@ slTexture2D::slTexture2D( std::string &inFile, bool inRepeat ) {
 	_texY = 0;
 	_unitX = 0;
 	_unitY = 0;
-	loadImage( inFile, inRepeat );
+	
+	if( inFile )
+		loadImage( *inFile, inRepeat );
 }
 
-slTexture2D::slTexture2D() {
-	_sizeX = 0;
-	_sizeY = 0;
-	_texX = 0;
-	_texY = 0;
-	_unitX = 0;
-	_unitY = 0;
-	_textureID = 0;
-}
-
-int slTexture2D::loadImage( std::string &inFile, bool inRepeat ) {
+int slTexture2D::loadImage( const std::string &inFile, bool inRepeat ) {
 	unsigned char *pixels;
 	int height, width, components;
 
 	pixels = slReadImage( inFile.c_str(), &width, &height, &components, 1 );
 
 	if ( !pixels ) 
-		return -1;
-		// throw slException( std::string( "Could not read image file " ) + inFile );
+		throw slException( std::string( "Could not read image file " ) + inFile );
 
 	loadPixels( pixels, width, height, inRepeat );
 
-	slFree( pixels );
+	delete pixels;
 
 	if( !_textureID )
 		return -1;
@@ -69,10 +58,14 @@ slTexture2D::~slTexture2D() {
 		glDeleteTextures( 1, &_textureID );
 }
 
-void slTexture2D::loadPixels( unsigned char *pixels, int inWidth, int inHeight, bool inRepeat ) {
+void slTexture2D::createTextureID() {
 	if( _textureID == 0 )
 		glGenTextures( 1, &_textureID );
+}
 
+void slTexture2D::loadPixels( const unsigned char *pixels, int inWidth, int inHeight, int inChannels, bool inRepeat ) {
+	createTextureID();
+	
 	bind();
 
 	resize( inWidth, inHeight );
@@ -129,4 +122,71 @@ void slTexture2D::resize( int inWidth, int inHeight, bool inHasAlpha ) {
 	glTexImage2D( GL_TEXTURE_2D, 0, format, _sizeX, _sizeY, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
 }
 
-#undef MAX
+
+
+slVertexBufferGL::slVertexBufferGL( int inVertexCount, int inPixelFormat ) {
+	_vertexSize = 0;
+	_vertexCount = 0;
+	_vertexFormat = 0;
+	
+	if( inVertexCount && inPixelFormat )
+		resize( inVertexCount, inPixelFormat );
+}
+
+void slVertexBufferGL::bind() {
+	if( _vertexFormat & VB_XY ) {
+		glVertexPointer( 2, GL_FLOAT, _vertexSize, _data.data() + _vertexOffset );
+		glEnableClientState( GL_VERTEX_ARRAY );
+	} else if( _vertexFormat & VB_XYZ ) {
+		glVertexPointer( 3, GL_FLOAT, _vertexSize, _data.data() + _vertexOffset );
+		glEnableClientState( GL_VERTEX_ARRAY );
+	}
+
+	if( _vertexFormat & VB_UV ) {
+		glTexCoordPointer( 2, GL_FLOAT, _vertexSize, _data.data() + _texOffset );
+		glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+	} else if( _vertexFormat & VB_UVW ) {
+		glTexCoordPointer( 3, GL_FLOAT, _vertexSize, _data.data() + _texOffset );
+		glEnableClientState( GL_TEXTURE_COORD_ARRAY );		
+	}
+	
+	if( _vertexFormat & VB_NORMAL ) {
+		glNormalPointer( GL_FLOAT, _vertexSize, _data.data() + _normalOffset );
+		glEnableClientState( GL_NORMAL_ARRAY );
+	}
+}
+
+void slVertexBufferGL::unbind() {
+	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	glDisableClientState( GL_NORMAL_ARRAY );
+	glDisableClientState( GL_VERTEX_ARRAY );
+}
+
+void slVertexBufferGL::resize( int inVertexCount, int inPixelFormat ) {
+	_vertexSize = 0;
+	_vertexCount = inVertexCount;
+	_vertexFormat = inPixelFormat;
+	
+	if( inPixelFormat & VB_XY ) {
+		_vertexOffset = _vertexSize;
+		_vertexSize += sizeof( float ) * 2;
+	} else if( inPixelFormat & VB_XYZ ) {
+		_vertexOffset = _vertexSize;
+		_vertexSize += sizeof( float ) * 3;
+	}
+	
+	if( inPixelFormat & VB_UV ) {
+		_texOffset = _vertexSize;
+		_vertexSize += sizeof( float ) * 2;
+	} else if( inPixelFormat & VB_UVW ) {
+		_texOffset = _vertexSize;
+		_vertexSize += sizeof( float ) * 3;
+	}
+
+	if( inPixelFormat & VB_NORMAL ) {
+		_normalOffset = _vertexSize;
+		_vertexSize += sizeof( float ) * 3;
+	}
+	
+	_data.resize( _vertexSize * _vertexCount );
+}

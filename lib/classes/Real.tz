@@ -431,13 +431,6 @@ Object : Real (aka Reals) [version 2.1] {
 
 		realSetDrawShadows(realWorldPointer, 0).
 
-	- to set-texture to textureNumber (int):
-		% Deprecated -- use METHOD(set-texture-image) instead.
-
-		print "set-texture is deprecated: use set-texture-image instead".
-
-		realSetTexture( realWorldPointer, textureNumber ).
-
 	+ to set-texture-image to textureImage (object):
 		% Changes the texture of this object to textureImage, an instance of 
 		% class OBJECT(Image).  If textureImage is NULL texturing is turned off for 
@@ -449,7 +442,7 @@ Object : Real (aka Reals) [version 2.1] {
 		if textureImage: {
 			archiveTextureImage = textureImage.
 			self add-dependency on textureImage.
-			realSetTexture( realWorldPointer, (textureImage get-texture-number) ).
+			realSetTexture( realWorldPointer, ( textureImage get-image-data ) ).
 		} else:
 			realSetTexture( realWorldPointer, 0 ).
 
@@ -496,16 +489,9 @@ Object : Real (aka Reals) [version 2.1] {
 		if bitmapImage: {
 			archiveBitmapImage = bitmapImage.
 			self add-dependency on bitmapImage.
-			realSetBitmap(realWorldPointer, (bitmapImage get-texture-number) ).
+			realSetBitmap( realWorldPointer, ( bitmapImage get-image-data ) ).
 		} else:
 			realSetBitmap(realWorldPointer, 0 ).
-
-	- to set-bitmap to textureNumber (int):
-		% Deprecated.
-
-		print "set-bitmap is deprecated: use set-bitmap-image instead".
-
-		realSetBitmap(realWorldPointer, textureNumber ).
 
 	+ to set-bitmap-heading to radianAngle (float):
 		% If this object is in 2d bitmap mode, the rotation of the 
@@ -546,9 +532,9 @@ Object : Real (aka Reals) [version 2.1] {
 		if lightmapImage: {
 			archiveLightmapImage = lightmapImage.
 			self add-dependency on lightmapImage.
-			realSetLightmap(realWorldPointer, ( lightmapImage get-texture-number ) ).
+			realSetLightmap( realWorldPointer, ( lightmapImage get-image-data ) ).
 		} else: 
-			realSetLightmap(realWorldPointer, 0 ).
+			realSetLightmap( realWorldPointer, 0 ).
 
 	- to set-lightmap to textureNumber (int):
 		% Deprecated.

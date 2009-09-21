@@ -198,6 +198,7 @@ int slGISData::parseRT2File( std::string rt2 ) {
 }
 
 void slGISData::draw( slCamera *c ) {
+	#ifndef OPENGLES
 	int n;
 
 	std::map<int, slGISChain>::iterator ci;
@@ -286,4 +287,6 @@ void slGISData::draw( slCamera *c ) {
 			}
 		}
 	}
+
+	#endif
 }

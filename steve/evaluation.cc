@@ -967,42 +967,30 @@ RTC_INLINE int stEvalTruth( brEval *e, brEval *t, stRunInstance *i ) {
 			break;
 
 		case AT_POINTER:
-
 		case AT_HASH:
-
 		case AT_DATA:
 			t->set( BRPOINTER( e ) != NULL );
-
 			return EC_OK;
-
 			break;
 
 		case AT_LIST:
 			t->set(( BRPOINTER( e ) != NULL && ( BRLIST( e ) )->_vector.size() != 0 ) );
-
 			return EC_OK;
-
 			break;
 
 		case AT_VECTOR:
 			t->set( !( slVectorIsZero( &BRVECTOR( e ) ) ) );
-
 			return EC_OK;
-
 			break;
 
 		case AT_MATRIX:
 			slMatrixZero( zero );
-
 			t->set( !slMatrixCompare( BRMATRIX( e ), zero ) );
-
 			break;
 
 		case AT_NULL:
 			t->set( 0 );
-
 			return EC_OK;
-
 			break;
 
 		default:
@@ -2448,6 +2436,12 @@ RTC_INLINE int stEvalBinaryStringExp( char op, brEval *l, brEval *r, brEval *res
 	sr = BRSTRING( r );
 
 	switch ( op ) {
+		case BT_ADD:
+			{
+				std::string r = std::string( sl ) + std::string( sr );
+				result->set( r.c_str() );
+			}
+			break;
 
 		case BT_EQ:
 			result->set( !strcmp( sl, sr ) );
@@ -3046,7 +3040,7 @@ RTC_INLINE int stEvalBinaryExpWithEvals( stRunInstance *i, unsigned char op, brE
 	// we do a string compare--otherwise we'll convert to doubles and handle 
 	// the expression that way 
 
-	if ( t2 == AT_STRING && t1 == AT_STRING && ( op == BT_EQ || op == BT_NE ) )
+	if ( t2 == AT_STRING && t1 == AT_STRING && ( op == BT_EQ || op == BT_NE || op == BT_ADD ) )
 		return stEvalBinaryStringExp( op, tl, tr, result, i );
 
 	if ( t2 == AT_LIST && t1 == AT_LIST && ( op == BT_EQ || op == BT_NE ) )
@@ -3881,7 +3875,7 @@ RTC_INLINE int stEvalBinaryEvalListExp( char op, brEval *l, brEval *r, brEval *r
 	but this will typically cause a simulation to die.
 */
 
-void stEvalError( stInstance *inInstance, int type, char *proto, ... ) {
+void stEvalError( stInstance *inInstance, int type, const char *proto, ... ) {
 	va_list vp;
 	brEngine *e = inInstance->type->engine;
 
@@ -3918,7 +3912,7 @@ void stEvalError( stInstance *inInstance, int type, char *proto, ... ) {
 	\brief Prints an evaluation warning.
 */
 
-void stEvalWarn( stExp *exp, char *proto, ... ) {
+void stEvalWarn( stExp *exp, const char *proto, ... ) {
 	va_list vp;
 	char localMessage[BR_ERROR_TEXT_SIZE];
 

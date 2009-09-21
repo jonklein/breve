@@ -898,11 +898,16 @@ brInstance *brXMLDearchiveObjectFromString( brEngine *e, char *buffer ) {
 	}
 
 
+	brInstance *i = brXMLGetInstance( &parserState._indexToInstanceMap, archivedIndex );
 
-	int signature = brXMLGetInstance( &parserState._indexToInstanceMap, archivedIndex ) -> object -> type -> _typeSignature;
+	if( !i ) {
+		slMessage( DEBUG_ALL, "Error decoding archived XML instance: instance with index not found\n" );
+		delete dom;
+		return NULL;
+	}
+
+	int signature = i -> object -> type -> _typeSignature;
 	brFinishDearchive( e, signature, &parserState._indexToInstanceMap );
-
-
 
 	if( brXMLRunDearchiveMethods( dom, &parserState ) ) {
 		slMessage( DEBUG_ALL, "Error decoding archived XML instance: dearchive method failed\n" );

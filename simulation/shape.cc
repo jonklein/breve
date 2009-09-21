@@ -39,6 +39,7 @@ void slShape::draw( slCamera *c, double inTScaleX, double inTScaleY, int mode, i
 
 	axis = ( mode & DM_AXIS ) && !( flags & DO_NO_AXIS );
 
+#ifndef OPENGLES
 	if ( _drawList == 0 || _recompile || ( flags & DO_RECOMPILE ) ) 
 		slCompileShape( this, c->_drawMode, flags );
 
@@ -97,9 +98,12 @@ void slShape::draw( slCamera *c, double inTScaleX, double inTScaleY, int mode, i
 
 		glPopAttrib();
 	}
+	
+#endif
 }
 
 void slShape::drawBounds( slCamera *inCamera ) {
+#ifndef OPENGLES
 	glPushAttrib( GL_COLOR_BUFFER_BIT );
 	glEnable( GL_BLEND );
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
@@ -109,6 +113,8 @@ void slShape::drawBounds( slCamera *inCamera ) {
 	slRenderShape( this, GL_LINE_LOOP, 0 );
 
 	glPopAttrib();
+	
+#endif
 }
 
 void slShape::slMatrixToODEMatrix( const double inM[ 3 ][ 3 ], dReal *outM ) {
@@ -221,8 +227,10 @@ slShape::~slShape() {
 
 	for ( fi = features.begin() ; fi != features.end(); fi++ ) delete *fi;
 
+#ifndef OPENGLES
 	if ( _drawList ) 
 		glDeleteLists( _drawList, 1 );
+#endif
 
 	if( _odeGeomID[ 0 ] ) 
 		dGeomDestroy( _odeGeomID[ 0 ] );
@@ -1094,21 +1102,25 @@ slShape *slShape::deserialize( slSerializedShapeHeader *header ) {
 	return s;
 }
 
-void slSphere::bounds( const slPosition *position, slVector *min, slVector *max ) {
+void slSphere::bounds( const slPosition *position, slVector *outMin, slVector *outMax ) const {
 	float r = _radius * _transform[ 0 ][ 0 ];
 
-	slVectorSet( &_max, r, r, r );
-	slVectorSet( &_min, -r, -r, -r );
+	slVector min, max;
 
-	slVectorAdd( &_max, &position -> location, max );
-	slVectorAdd( &_min, &position -> location, min );
+	slVectorSet( &max, r, r, r );
+	slVectorSet( &min, -r, -r, -r );
+
+	slVectorAdd( &max, &position -> location, outMin );
+	slVectorAdd( &min, &position -> location, outMax );
 }
 
-void slShape::bounds( const slPosition *position, slVector *min, slVector *max ) {
+void slShape::bounds( const slPosition *position, slVector *outMin, slVector *outMax ) const {
 	std::vector< slPoint* >::const_iterator pi;
 
-	slVectorSet( &_max, INT_MIN, INT_MIN, INT_MIN );
-	slVectorSet( &_min, INT_MAX, INT_MAX, INT_MAX );
+	slVector min, max;
+
+	slVectorSet( &max, INT_MIN, INT_MIN, INT_MIN );
+	slVectorSet( &min, INT_MAX, INT_MAX, INT_MAX );
 
 	for ( pi = points.begin(); pi != points.end(); pi++ ) {
 		slPoint *p = *pi;
@@ -1117,17 +1129,17 @@ void slShape::bounds( const slPosition *position, slVector *min, slVector *max )
 		slVectorXform( _transform, &p->vertex, &tloc );
 		slVectorXform( position->rotation, &tloc, &loc );
 
-		if ( loc.x > _max.x ) _max.x = loc.x;
-		if ( loc.y > _max.y ) _max.y = loc.y;
-		if ( loc.z > _max.z ) _max.z = loc.z;
+		if ( loc.x > max.x ) max.x = loc.x;
+		if ( loc.y > max.y ) max.y = loc.y;
+		if ( loc.z > max.z ) max.z = loc.z;
 
-		if ( loc.x < _min.x ) _min.x = loc.x;
-		if ( loc.y < _min.y ) _min.y = loc.y;
-		if ( loc.z < _min.z ) _min.z = loc.z;
+		if ( loc.x < min.x ) min.x = loc.x;
+		if ( loc.y < min.y ) min.y = loc.y;
+		if ( loc.z < min.z ) min.z = loc.z;
 	}
 
-	slVectorAdd( &_min, &position->location, min );
-	slVectorAdd( &_max, &position->location, max );
+	slVectorAdd( &min, &position->location, outMin );
+	slVectorAdd( &max, &position->location, outMax );
 }
 
 double slShape::getMass() {

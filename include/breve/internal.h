@@ -43,7 +43,7 @@ void breveInitQGAMEFunctions(brNamespace *);
 void breveInitDrawFunctions(brNamespace *);
 
 #define BRBREVECALL( n, name, rvalue, ... )		brNewBreveCall( n, "" #name "", name, rvalue, __VA_ARGS__, 0 ) 
-DLLEXPORT int brNewBreveCall(brNamespace *, char *, int (*)(brEval *, brEval *, brInstance *), int, ...);
+DLLEXPORT int brNewBreveCall(brNamespace *, const char *, int (*)(brEval *, brEval *, brInstance *), int, ...);
 DLLEXPORT FILE *slGetLogFilePointer(brInstance *);
 
 void breveInitPythonFunctions(brNamespace *);

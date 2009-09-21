@@ -20,7 +20,7 @@
 
 #include "kernel.h"
 
-char *brAtomicTypeStrings[] = {
+const char *brAtomicTypeStrings[] = {
 	"<invalid type>",
 	"undefined",
 	"NULL",

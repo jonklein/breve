@@ -18,24 +18,31 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#include "config.h"
+
 #if MACOSX
-#include <GLUT/glut.h>
-#import <OpenGL/gl.h>
-#import <OpenGL/glu.h>
-#import <OpenGL/glext.h>
+	#if IPHONE
+        #include <OpenGLES/ES1/gl.h>
+        #include <OpenGLES/ES1/glext.h>
+	#else
+		#include <GLUT/glut.h>
+		#include <OpenGL/gl.h>
+		#include <OpenGL/glu.h>
+		#include <OpenGL/glext.h>
+	#endif
 #else
-#define GL_GLEXT_PROTOTYPES
-#include <GL/gl.h>
-// #include <GL/glu.h>
-#include <GL/glut.h>
-#if WINDOWS
-#include <GL/glext.h>
-#else
-#include <GL/glx.h>
-#include <GL/glext.h>
-#endif
+	#define GL_GLEXT_PROTOTYPES
+	#include <GL/gl.h>
+	#include <GL/glut.h>
+
+	#if WINDOWS
+		#include <GL/glext.h>
+	#else
+		#include <GL/glx.h>
+		#include <GL/glext.h>
+	#endif
 #endif
 
 #if HAVE_LIBOSMESA
-#include <GL/osmesa.h>
+	#include <GL/osmesa.h>
 #endif

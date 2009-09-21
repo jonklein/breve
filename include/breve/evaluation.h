@@ -157,8 +157,8 @@ void stConvertBreveInstanceToSteveInstance(brEval *);
 
 int stEvalListIndexAssign(brEvalListHead *, int, brEval *, stRunInstance *);
 
-void stEvalError( stInstance*, int, char *, ... );
+void stEvalError( stInstance*, int, const char *, ... );
 
 void stConvertSteveInstanceToBreveInstance(brEval *);
 
-void stEvalWarn(stExp *, char *, ...);
+void stEvalWarn(stExp *, const char *, ...);

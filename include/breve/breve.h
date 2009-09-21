@@ -80,9 +80,9 @@ void brMainMenu(int);
 
 void brGlutMenuUpdate(brInstance *);
 
-void brGlutLoop(void);
+void brGlutLoop();
 
-void slInitGlut(int, char **, char *);
+void slInitGlut( int inArgc, char **inArgv, const char *);
 
 void slDemoReshape(int, int);
 void slDemoDisplay(void);
@@ -95,12 +95,11 @@ void slDemoKeyboard(unsigned char, int, int);
 void slDemoKeyboardUp(unsigned char, int, int);
 
 int brGLUTDialogCallback(char *, char *, char *, char *);
-char *brGLUTInterfaceVersionCallback(void);
-char *brGLUTGetSavename(void);
-char *brGLUTGetLoadname(void);
+const char *brGLUTInterfaceVersionCallback(void);
+const char *brGLUTGetSavename(void);
+const char *brGLUTGetLoadname(void);
 int brGLUTSoundCallback(void);
 int brGLUTPauseCallback(void);
 int brGLUTUnpauseCallback(void);
 
-// extern char **gErrorNames;
-extern char *interfaceID;
+extern const char *interfaceID;

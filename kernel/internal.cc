@@ -66,7 +66,7 @@
 	There are many examples of this in the steveFunctions*.c files.
 */
 
-int brNewBreveCall( brNamespace *n, char *name, int( *f )( brEval *a, brEval *r, brInstance *i ), int rtype, ... ) {
+int brNewBreveCall( brNamespace *n, const char *name, int( *f )( brEval *a, brEval *r, brInstance *i ), int rtype, ... ) {
 	brInternalFunction *c;
 	va_list ap;
 	int value;
@@ -141,7 +141,6 @@ void brLoadInternalFunctions( brEngine *e ) {
 	breveInitCameraFunctions( e->internalMethods );
 	breveInitFileFunctions( e->internalMethods );
 	breveInitSoundFunctions( e->internalMethods );
-	breveInitGraphFunctions( e->internalMethods );
 	breveInitTerrainFunctions( e->internalMethods );
 	breveInitImageFunctions( e->internalMethods );
 	breveInitMovieFunctions( e->internalMethods );

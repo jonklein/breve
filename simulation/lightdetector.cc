@@ -26,6 +26,7 @@
 #define WHITE_PIXEL	0x00ffffff
 
 void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
+#ifndef OPENGLES
 	slWorldObject *wo;
 	std::vector< slWorldObject* >::iterator wi;
 	unsigned int n = 0;
@@ -153,4 +154,5 @@ void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 	glDepthMask( GL_TRUE );
 
 	glDisable( GL_SCISSOR_TEST );
+#endif
 }

@@ -51,7 +51,7 @@ enum atomicTypes {
 	AT_HASH
 };
 
-extern char *brAtomicTypeStrings[];
+extern const char *brAtomicTypeStrings[];
 
 extern "C" {
 

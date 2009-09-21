@@ -222,7 +222,7 @@ int stDDataWriteObjectWithDialog( brEval *args, brEval *result, brInstance *bi )
 
 	result->set( 1 );
 
-	filename = brEngineRunSaveDialog( i->type->engine );
+	filename = i -> type -> engine -> runSaveDialog();
 
 	if ( !filename ) {
 		slMessage( DEBUG_ALL, "Could not retreive filename from user dialog: write cancelled.\n" );
@@ -283,7 +283,7 @@ int stDDataReadObjectWithDialog( brEval *args, brEval *result, brInstance *bi ) 
 
 	result->set( 1 );
 
-	filename = brEngineRunLoadDialog( i->type->engine );
+	filename = i->type->engine -> runLoadDialog();
 
 	if ( !filename ) {
 		slMessage( DEBUG_ALL, "Could not retrieve filename from load dialog: load cancelled.\n" );

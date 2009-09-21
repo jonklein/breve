@@ -29,7 +29,7 @@
 	trigger the given method when selected.
 */
 
-brMenuEntry *brAddMenuItem( brInstance *i, char *method, char *title ) {
+brMenuEntry *brAddMenuItem( brInstance *i, const char *method, const char *title ) {
 	brMethod *m;
 	// extract the engine from the brInstance 
 
@@ -307,7 +307,7 @@ int brKeyCallback( brEngine *e, unsigned char keyCode, int isDown ) {
 	simulation.
 */
 
-int brSpecialKeyCallback( brEngine *e, char *name, int isDown ) {
+int brSpecialKeyCallback( brEngine *e, const char *name, int isDown ) {
 	brEval eval;
 	brMethod *method;
 	int r;
@@ -337,7 +337,7 @@ int brSpecialKeyCallback( brEngine *e, char *name, int isDown ) {
  * interface elements.  Currently only available under Mac OS X.
  */
 
-int brInterfaceCallback( brEngine *e, int interfaceID, char *string ) {
+int brInterfaceCallback( brEngine *e, int interfaceID, const char *string ) {
 	brEval eval, a;
 	const brEval *args;
 	brMethod *method;
@@ -361,29 +361,15 @@ int brInterfaceCallback( brEngine *e, int interfaceID, char *string ) {
 	return r;
 }
 
-/*!
-	\brief Calls the getSavename callback.
-*/
-
-char *brEngineRunSaveDialog( brEngine *e ) {
-	if ( !e->getSavename ) 
-		return NULL;
-
-	return e->getSavename();
+const char *brEngine::runSaveDialog() {
+	return getSavename ? getSavename() : NULL;
 }
 
-/*!
-	\brief Calls the getLoad callback.
-*/
-
-char *brEngineRunLoadDialog( brEngine *e ) {
-	if ( !e->getLoadname ) 
-		return NULL;
-
-	return e->getLoadname();
+const char *brEngine::runLoadDialog() {
+	return getLoadname ? getLoadname() : NULL;
 }
 
-void brEngineSetMouseLocation( brEngine *e, int x, int y ) {
-	e->_mouseX = x;
-	e->_mouseY = y;
+void brEngine::setMouseLocation( int inX, int inY ) {
+	_mouseX = inX;
+	_mouseY = inY;
 }

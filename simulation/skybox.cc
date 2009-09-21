@@ -52,6 +52,8 @@ void slSkybox::draw( slVector *inCameraPos, float inZFar ) {
 	float ux = 0;
 	float uy = 0;
 
+#ifndef OPENGLES
+
 	_textures[ 0 ].bind();
 	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 	ux = _textures[ 0 ]._unitX;
@@ -130,4 +132,6 @@ void slSkybox::draw( slVector *inCameraPos, float inZFar ) {
 	glEnable( GL_BLEND );
 //	glEnable( GL_LIGHTING );
 	_textures[ 5 ].unbind();
+
+#endif
 }

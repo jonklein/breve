@@ -63,7 +63,9 @@ slCamera::slCamera( int x, int y ) {
 
 	_ry = 0.001;
 
+	#ifndef OPENGLES
 	_drawMode = GL_POLYGON;
+	#endif
 
 	_shadowCatcher = NULL;
 
@@ -98,13 +100,16 @@ slCamera::slCamera( int x, int y ) {
 
 	_readbackTexture = new slTexture2D();
 
-	for ( n = 0; n < _maxBillboards; n++ ) _billboards[n] = new slBillboardEntry;
+	for ( n = 0; n < _maxBillboards; n++ ) 
+		_billboards[n] = new slBillboardEntry;
 
 	_lights[ 0 ]._type = LightInfinite;
 	slVectorSet( &_lights[0]._location, 0, 0, 0 );
 	slVectorSet( &_lights[0]._ambient, .2, .2, .2 );
 	slVectorSet( &_lights[0]._diffuse, .6, .9, .9 );
 	slVectorSet( &_lights[0]._specular, 1, 1, 1 );
+	
+	_billboardBuffer.resize( 4, VB_XYZ | VB_UV );
 }
 
 void slCamera::readbackToTexture() {

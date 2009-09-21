@@ -35,6 +35,7 @@ void slDrawCommandList::addCommand( slDrawCommand *command ) {
 void slDrawCommandList::draw( slCamera *c ) {
 	std::list<slDrawCommand*>::iterator di;
 
+	#ifndef OPENGLES
 	glPushMatrix();
 
 	glTranslatef( _origin.x, _origin.y, _origin.z );
@@ -65,4 +66,5 @@ void slDrawCommandList::draw( slCamera *c ) {
 
 	glDisable( GL_LINE_SMOOTH );
 	glDepthFunc( GL_LESS );
+	#endif
 }

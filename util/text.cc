@@ -73,29 +73,29 @@ char *slDirname( const char *inName ) {
 	return dir;
 }
 
-char *slSplit( char *start, char *substr, int n ) {
+char *slSplit( const char *inSource, const char *substr, int n ) {
 	int count = 0;
-	char *oldstart, *result;
+	const char *oldstart = inSource;
+	char *result = NULL;
 
-	oldstart = start;
+	while ( inSource && count <= n ) {
+		oldstart = inSource;
+		inSource = strstr( inSource, substr );
 
-	while ( start && count <= n ) {
-		oldstart = start;
-		start = strstr( start, substr );
-
-		if ( start ) start += strlen( substr );
+		if ( inSource ) 
+			inSource += strlen( substr );
 
 		count++;
 	}
 
 	if ( count != n + 1 ) return NULL;
 
-	if ( start ) {
-		start -= strlen( substr );
+	if ( inSource ) {
+		inSource -= strlen( substr );
 
-		result = ( char* )slMalloc(( start - oldstart ) + 1 );
-		strncpy( result, oldstart, start - oldstart );
-		result[start - oldstart] = 0;
+		result = ( char* )slMalloc(( inSource - oldstart ) + 1 );
+		strncpy( result, oldstart, inSource - oldstart );
+		result[ inSource - oldstart ] = 0;
 	} else result = slStrdup( oldstart );
 
 	return result;

@@ -54,5 +54,6 @@
 #include "text.h"
 #include "quat.h"
 #include "vector.h"
+#include "buffer.h"
 
 #endif

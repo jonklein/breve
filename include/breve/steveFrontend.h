@@ -66,7 +66,7 @@ char *stFindParseTrack( slList *, const char * );
 stVersionRequirement *stMakeVersionRequirement( float, int );
 int stCheckVersionRequirement( float, stVersionRequirement * );
 void stObjectAllocationReport( stObject * );
-void stParseError( brEngine *, int, char *, ... );
+void stParseError( brEngine *, int, const char *, ... );
 
 void stSteveCleanup( void* );
 

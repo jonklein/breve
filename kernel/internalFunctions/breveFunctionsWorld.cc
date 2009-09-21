@@ -20,6 +20,7 @@
 
 #include "kernel.h"
 #include "world.h"
+#include "breveFunctionsImage.h"
 #include "gldraw.h"
 #include "image.h"
 #include "sensor.h"
@@ -158,50 +159,6 @@ int brIRandomSeedFromDevRandom( brEval args[], brEval *target, brInstance *i ) {
 int brIGetTime( brEval args[], brEval *target, brInstance *i ) {
 
 	target->set( i->engine->world->getAge( ) );
-
-	return EC_OK;
-}
-
-/**
-	\brief Loads a texture from an image file [deprecated].
-
-	USE OF THIS FUNCTION IS DEPRECATED.  The image loading methods from
-	breveFunctionsImage.c are now used instead.
-*/
-
-int brILoadTexture( brEval args[], brEval *target, brInstance *i ) {
-	unsigned char *pixels = NULL;
-	char *path;
-	int w, h, c;
-	int useAlpha = BRINT( &args[1] );
-
-	path = brFindFile( i->engine, BRSTRING( &args[0] ), NULL );
-
-	if ( !path ) {
-		slMessage( DEBUG_ALL, "Cannot locate image file for \"%s\"\n", BRSTRING( &args[0] ) );
-
-		target->set( -1 );
-
-		return EC_OK;
-	}
-
-	pixels = slReadImage( path, &w, &h, &c, useAlpha );
-
-	slFree( path );
-
-	if ( !pixels ) {
-		slMessage( DEBUG_ALL, "Unrecognized image format in file \"%s\"\n", BRSTRING( &args[0] ) );
-
-		target->set( -1 );
-
-		return EC_OK;
-	}
-
-	target->set(( int )slTextureNew( i->engine->camera ) );
-
-	slUpdateTexture( i->engine->camera, BRINT( target ), pixels, w, h, GL_RGBA );
-
-	slFree( pixels );
 
 	return EC_OK;
 }
@@ -450,18 +407,7 @@ int brISetBackgroundTextureColor( brEval args[], brEval *target, brInstance *i )
 */
 
 int brISetBackgroundTexture( brEval args[], brEval *target, brInstance *i ) {
-	i->engine->world->setBackgroundTexture( BRINT( &args[0] ), 0 );
-	return EC_OK;
-}
-
-/**
-	\brief Sets the background image.
-
-	void setBackgroundImage(image number).
-*/
-
-int brISetBackgroundImage( brEval args[], brEval *target, brInstance *i ) {
-	i->engine->world->setBackgroundTexture( BRINT( &args[0] ), 1 );
+	i->engine->world->setBackgroundTexture( ( (brImageData*)BRPOINTER( &args[0] ) ) -> _texture );
 	return EC_OK;
 }
 
@@ -493,22 +439,10 @@ int brIGetLightExposureCamera( brEval args[], brEval *target, brInstance *i ) {
 	return EC_OK;
 }
 
-/**
-	\brief Sets a the light exposure detection source.
-
-	setLightExposureSource(vector color).
-*/
-
 int brISetLightExposureSource( brEval args[], brEval *target, brInstance *i ) {
 	i->engine->world->setLightExposureSource( &BRVECTOR( &args[0] ) );
 	return EC_OK;
 }
-
-/**
-	\brief Sets a the ambient color for the light.
-
-	setLightAmbientColor(vector color).
-*/
 
 int brISetLightAmbientColor( brEval args[], brEval *target, brInstance *i ) {
 	int n = BRINT( &args[ 1 ] );
@@ -863,8 +797,6 @@ void breveInitWorldFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "worldStep", brIWorldStep, AT_DOUBLE, AT_DOUBLE, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "updateNeighbors", brIUpdateNeighbors, AT_NULL, 0 );
 
-	brNewBreveCall( n, "loadTexture", brILoadTexture, AT_INT, AT_STRING, AT_INT, 0 );
-
 	brNewBreveCall( n, "getMainCameraPointer", brIGetMainCameraPointer, AT_POINTER, 0 );
 	brNewBreveCall( n, "cameraSetOffset", brICameraSetOffset, AT_NULL, AT_VECTOR, 0 );
 	brNewBreveCall( n, "cameraSetTarget", brICameraSetTarget, AT_NULL, AT_VECTOR, 0 );
@@ -882,8 +814,7 @@ void breveInitWorldFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "getLightExposureCamera", brIGetLightExposureCamera, AT_POINTER, 0 );
 
 	brNewBreveCall( n, "setBackgroundColor", brISetBackgroundColor, AT_NULL, AT_VECTOR, 0 );
-	brNewBreveCall( n, "setBackgroundTexture", brISetBackgroundTexture, AT_NULL, AT_INT, 0 );
-	brNewBreveCall( n, "setBackgroundImage", brISetBackgroundImage, AT_NULL, AT_INT, 0 );
+	brNewBreveCall( n, "setBackgroundTexture", brISetBackgroundTexture, AT_NULL, AT_POINTER, 0 );
 	brNewBreveCall( n, "setBackgroundTextureColor", brISetBackgroundTextureColor, AT_NULL, AT_VECTOR, 0 );
 	brNewBreveCall( n, "setSkyboxImages", brISetSkyboxImages, AT_NULL, AT_LIST, 0 );
 

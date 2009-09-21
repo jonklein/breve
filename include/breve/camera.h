@@ -37,6 +37,11 @@ enum billboardType {
 	BBT_LIGHTMAP
 };
 
+enum slRenderBlendMode {
+	SR_ALPHABLEND = 1,
+	SR_LIGHTBLEND
+};
+
 /**
  * \brief Holds location and color information for a light.
  */
@@ -139,6 +144,7 @@ class slCamera {
 		void sortBillboards();	
 	
 		void update();
+		void 			setBlendMode( slRenderBlendMode inBlendMode );
 
 		void rotateWithMouseMovement( double, double );
 		void moveWithMouseMovement( double, double );
@@ -252,9 +258,9 @@ class slCamera {
 
 	private:
 
-		slTexture2D*					_readbackTexture;
-		int						_readbackX;
-		int						_readbackY;
+		slTexture2D*				_readbackTexture;
+		int							_readbackX;
+		int							_readbackY;
 
 		void 						stencilFloor( slWorld *w );
 		void 						reflectionPass( slWorld *w, bool inWillDoVolumeShadow );
@@ -267,9 +273,7 @@ class slCamera {
 		void 						drawBackground( slWorld *w );
 		void 						drawFog();
 
-		// 4 vertices of 3 floats, 2 tex coords
-		float						_billboardVertices[ 12 ];
-		float						_billboardTexCoords[ 8 ];
+		slVertexBufferGL			_billboardBuffer;
 };
 
 int slBillboardSortFunc(const void *, const void *);

@@ -470,7 +470,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		self add-dependency on archivedBackgroundTextureImage.
 
-		setBackgroundTexture( ( newTextureImage get-texture-number ) ).
+		setBackgroundTexture( ( newTextureImage get-image-data) ).
 
 	- to set-background-texture to newTexture (int):
 		print "set-background-texture is deprecated, use set-background-texture-image instead".
@@ -1045,33 +1045,6 @@ Abstract : Control (aka Controls) [version 2.3] {
 		% Plays the system beep sound, if supported by the implementation.
 
 		playSound().
-
-	- to load-image from file (string):
-		% Loads an image from a file, returning an OBJECT(Image) object.
-		% <P>
-		% This method is provided for backwards compatability only.
-		% The p
-		% <p>
-
-		image (object).
-
-		print "warning: the Control method \"load-image\" is now deprecated!".
-
-		image = new Image.
-
-		if (image load from file): {
-			self add-dependency on image.
-		} else {
-			free image.
-			return -1.
-		}
-
-		return (image get-texture-number).
-
-	- to load-image-without-alpha from file (string):
-		% Deprecated.
-
-		return (self load-image from file).
 
 	+ to execute command systemCommand (string):
 		% Executes the shell command systemCommand using /bin/sh.  

@@ -88,7 +88,7 @@ slWorld::slWorld() {
 
 	_odeStepMode = 0;
 
-	backgroundTexture = 0;
+	backgroundTexture = NULL;
 
 	slVectorSet( &backgroundTextureColor, 1, 1, 1 );
 
@@ -670,9 +670,8 @@ void slWorld::setBackgroundTextureColor( slVector *v ) {
 	slVectorCopy( v, &backgroundTextureColor );
 }
 
-void slWorld::setBackgroundTexture( int n, int mode ) {
-	backgroundTexture = n;
-	isBackgroundImage = mode;
+void slWorld::setBackgroundTexture( slTexture2D *inTexture ) {
+	backgroundTexture = inTexture;
 }
 
 

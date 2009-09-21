@@ -157,12 +157,17 @@ class brEngine {
 		std::vector< brObjectType* > 		_objectTypes;
 		std::vector< brInstance* > 		_freedInstances;
 
+		const char 				*runSaveDialog();
+		const char 				*runLoadDialog();
+		void					setMouseLocation( int inX, int inY );
+
+
 #ifdef HAVE_LIBCURL
-		brURLFetcher				_url;
+		brURLFetcher			_url;
 #endif
 
 #if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
-		brSoundMixer				_soundMixer;
+		brSoundMixer			_soundMixer;
 #endif
 
 		slWorld* 				world;
@@ -241,8 +246,8 @@ class brEngine {
 
 		// callback to run save and load dialogs 
 
-		char *(*getSavename)(void);
-		char *(*getLoadname)(void);
+		const char *(*getSavename)(void);
+		const char *(*getLoadname)(void);
 
 		// callback to show a generic dialog
 
@@ -254,7 +259,7 @@ class brEngine {
 	
 		// returns the string identifying the implementation
 	
-		char *(*interfaceTypeCallback)(void);
+		const char *(*interfaceTypeCallback)(void);
 	
 		// callback to setup and use the OS X interface features
 	
@@ -331,7 +336,7 @@ void brAddSearchPath(brEngine *, const char *);
 char *brFindFile(brEngine *, const char *, struct stat *);
 void brFreeSearchPath(brEngine *);
 
-brMenuEntry *brAddMenuItem(brInstance *, char *, char *);
+brMenuEntry *brAddMenuItem( brInstance *, const char *, const char * );
 brMenuEntry *brAddContextualMenuItem(brObject *, char *, char *);
 
 void stSetParseEngine(brEngine *);
@@ -344,7 +349,7 @@ void brEngineRenderWorld(brEngine *, int inCrosshair = 0 );
 
 brInternalFunction *brEngineInternalFunctionLookup(brEngine *, char *);
 
-void brEvalError(brEngine *, int, char *, ...);
+void brEvalError(brEngine *, int, const char *, ...);
 
 void brClearError(brEngine *);
 int brGetError(brEngine *);

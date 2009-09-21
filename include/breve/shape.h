@@ -176,7 +176,7 @@ class slShape {
 
 		virtual ~slShape();
 
-		virtual void 						bounds( const slPosition *position, slVector *min, slVector *max );
+		virtual void 						bounds( const slPosition *position, slVector *min, slVector *max ) const;
 		virtual int 						pointOnShape(slVector *dir, slVector *point);
 		virtual int 						rayHitsShape(slVector *dir, slVector *target, slVector *point);
 
@@ -199,9 +199,7 @@ class slShape {
 		double 								getDensity();
 
 		int 								_drawList;
-
 		bool 								_recompile;
-
 		slMatrix							_transform;
 
 		double 								_inertia[3][3];
@@ -209,8 +207,6 @@ class slShape {
 		double 								_density;
 
 		// the max reach on each axis 
-
-		slVector 							_max, _min;
 
 		int 								_type;
 
@@ -222,8 +218,8 @@ class slShape {
 
 		dGeomID								_odeGeomID[ 2 ];
 
-
 	protected:
+		slVector 							_max, _min;
 		int 								_referenceCount;
 
 };
@@ -245,7 +241,7 @@ class slSphere : public slShape {
 		/** \brief Creates a new sphere of a given radius and density. */
 		slSphere(double radius, double density);
 
-		void 						bounds( const slPosition *position, slVector *min, slVector *max );
+		void 						bounds( const slPosition *position, slVector *min, slVector *max ) const;
 		int 						pointOnShape(slVector *dir, slVector *point);
 		int 						rayHitsShape(slVector *dir, slVector *target, slVector *point);
 		void 						scale(slVector *point);
@@ -266,7 +262,7 @@ class slMeshShape : public slShape {
 		void 						draw( slCamera *c, double tscaleX, double tscaleY, int mode, int flags);
 		void 						drawBounds( slCamera *inCamera );
 
-		void 						bounds( const slPosition *position, slVector *min, slVector *max );
+		void 						bounds( const slPosition *position, slVector *min, slVector *max ) const;
 
 		virtual void				finishShape( double inDensity );
 		virtual void				finishShapeWithMaxLength( double inDensity, float inMaxLength );

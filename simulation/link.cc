@@ -145,17 +145,9 @@ void slLink::setShape( slShape *s ) {
 	dBodySetMass( _odeBodyID, &_massData );
 }
 
-/*
-	\brief Sets the label associated with this link.
-*/
-
-void slLink::setLabel( char *l ) {
-	_label = l;
+void slLink::setLabel( const char *inLabel ) {
+	_label = inLabel;
 }
-
-/*!
-	\brief Sets the location for a single link.
-*/
 
 void slLink::setLocation( slVector *inLocation ) {
 	_justMoved = 1;
@@ -169,10 +161,6 @@ void slLink::setLocation( slVector *inLocation ) {
 
 	slWorldObject::setLocation( inLocation );
 }
-
-/*!
-	\brief Sets the rotation for a single link
-*/
 
 void slLink::setRotation( double inRotation[3][3] ) {
 	_justMoved = 1;
@@ -194,10 +182,6 @@ void slLink::setRotation( double inRotation[3][3] ) {
 	slWorldObject::setRotation( inRotation );
 }
 
-/*!
-	\brief Gets the rotational and/or linear velocity of a link.
-*/
-
 void slLink::getVelocity( slVector *linear, slVector *rotational ) {
 	slLinkIntegrationPosition *config;
 
@@ -212,9 +196,7 @@ void slLink::getVelocity( slVector *linear, slVector *rotational ) {
 			const dReal *v = dBodyGetLinearVel( _odeBodyID );
 
 			linear->x = v[0];
-
 			linear->y = v[1];
-
 			linear->z = v[2];
 		}
 
@@ -222,17 +204,11 @@ void slLink::getVelocity( slVector *linear, slVector *rotational ) {
 			const dReal *v = dBodyGetAngularVel( _odeBodyID );
 
 			rotational->x = v[0];
-
 			rotational->y = v[1];
-
 			rotational->z = v[2];
 		}
 	}
 }
-
-/*!
-	\brief Gets the rotation of this link.
-*/
 
 void slLink::getRotation( double m[3][3] ) {
 	const dReal *rotation;
@@ -244,10 +220,6 @@ void slLink::getRotation( double m[3][3] ) {
 		slODEToSlMatrix(( dReal* )rotation, m );
 	}
 }
-
-/*!
-	\brief Sets the linear and/or rotational velocity of a link.
-*/
 
 void slLink::setVelocity( slVector *velocity, slVector *rotational ) {
 	slLinkIntegrationPosition *config;
@@ -274,10 +246,6 @@ void slLink::setVelocity( slVector *velocity, slVector *rotational ) {
 	}
 }
 
-/*!
-	\brief Sets the linear and/or rotational acceleration of a link.
-*/
-
 void slLink::setAcceleration( slVector *linear, slVector *rotational ) {
 	if ( linear ) {
 		slVectorCopy( linear, &_acceleration.b );
@@ -292,19 +260,13 @@ void slLink::setAcceleration( slVector *linear, slVector *rotational ) {
 	}
 }
 
-/*!
-	\brief Apply a linear/rotational force to a link.
-*/
-
 void slLink::applyForce( slVector *f, slVector *t ) {
-	if ( f ) dBodySetForce( _odeBodyID, f->x, f->y, f->z );
+	if ( f ) 
+		dBodySetForce( _odeBodyID, f->x, f->y, f->z );
 
-	if ( t ) dBodySetTorque( _odeBodyID, t->x, t->y, t->z );
+	if ( t ) 
+		dBodySetTorque( _odeBodyID, t->x, t->y, t->z );
 }
-
-/*!
-	\brief Updates the link positions from the ODE positions.
-*/
 
 void slLink::updatePositionFromODE() {
 	const dReal *positionV;
@@ -314,16 +276,13 @@ void slLink::updatePositionFromODE() {
 	if ( !_simulate || !_odeBodyID ) return;
 
 	positionV = dBodyGetPosition( _odeBodyID );
-
 	rotationV = dBodyGetRotation( _odeBodyID );
 
 	_position.location.x = positionV[0];
-
 	_position.location.y = positionV[1];
-
 	_position.location.z = positionV[2];
 
-	slODEToSlMatrix(( dReal* )rotationV, _position.rotation );
+	slODEToSlMatrix( ( dReal* )rotationV, _position.rotation );
 }
 
 /*!

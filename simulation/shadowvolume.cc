@@ -36,6 +36,7 @@ void slShape::drawShadowVolume( slCamera *c, slPosition *p ) {
 	slVectorNormalize( &lNormal );
 	slVectorMul( &light, 5, &light );
 
+#ifndef OPENGLES
 	glBegin( GL_QUADS );
 
 	for ( ei = edges.begin(); ei != edges.end(); ei++ ) {
@@ -112,9 +113,12 @@ void slShape::drawShadowVolume( slCamera *c, slPosition *p ) {
 	}
 
 	glEnd();
+#endif
 }
 
 void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
+
+#ifndef OPENGLES
 	slVector light, lNormal, x1, x2, lastV;
 	int n, first = 1;
 	double diff;
@@ -210,9 +214,12 @@ void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
 	}
 
 	glEnd();
+	
+#endif
 }
 
 void slCamera::renderShadowVolume( slWorld *w ) {
+#ifndef OPENGLES
 	setupLights( 0 );
 
 	glClear( GL_STENCIL_BUFFER_BIT );
@@ -265,6 +272,8 @@ void slCamera::renderShadowVolume( slWorld *w ) {
 		renderBillboards( 0 );
 
 	glDisable( GL_STENCIL_TEST );
+	
+#endif
 }
 
 void slCamera::renderObjectShadowVolumes( slWorld *w ) {

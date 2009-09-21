@@ -134,39 +134,25 @@ int brIVectorCopyToImage( brEval args[], brEval *result, brInstance *i ) {
 	int offset = BRINT( &args[2] );
 	int r;
 	int x, y, xmax, ymax;
-	// int yStride = d->x * 4;
-	// int xStride = d->y * 4;
 
-	xmax = sourceVector->dim();
-	ymax = d->y;
+	xmax = sourceVector -> dim();
+	ymax = d-> _height;
 
-	if ( xmax > d->x )
-		xmax = d->x;
+	if ( xmax > d -> _width )
+		xmax = d -> _width;
 
-	if ( ymax > d->y )
-		ymax = d->y;
-
-//	pdata = d->data;
-	pdata = d->data + offset;
+	pdata = d -> _data + offset;
 
 	for ( y = 0; y < ymax; y++ )
 		for ( x = 0; x < xmax; x++ ) {
 			r = ( int )( sourceData[x] * scale );
 
-			if ( r > 255 )
-//				pdata[(y * yStride) + (y << 2) + offset] = 255;
-				*pdata = 255;
-			else
-//				pdata[(y * yStride) + (y << 2) + offset] = r;
-				*pdata = r;
+			*pdata = r > 255 ? 255 : r;
 
 			pdata += 4;
 		}
 
-	if ( d->textureNumber == -1 )
-		d->textureNumber = slTextureNew( i->engine->camera );
-
-	slUpdateTexture( i->engine->camera, d->textureNumber, d->data, d->x, d->y, GL_RGBA );
+	d -> updateTexture();
 
 	return EC_OK;
 }

@@ -21,10 +21,12 @@ void slWorldObject::draw( slCamera *camera, bool inUseDrawMode ) {
 			_displayShape -> draw( camera, _textureScaleX, _textureScaleY, _drawMode, 0 );
 
 		if( ( _drawMode & DM_BOUND ) ) {
+			#ifndef OPENGLES
 			glPushAttrib( GL_ENABLE_BIT );
 			glDisable( GL_LIGHTING );
 			_displayShape -> drawBounds( camera );
 			glPopAttrib();
+			#endif
 		}
 
 		glPopMatrix();
@@ -38,7 +40,7 @@ void slObjectLine::draw( slCamera *camera ) {
 
 	x = &_src->getPosition().location;
 	y = &_dst->getPosition().location;
-
+#ifndef OPENGLES
 	glLineStipple( 2, _stipple );
 	glEnable( GL_LINE_STIPPLE );
 
@@ -50,6 +52,7 @@ void slObjectLine::draw( slCamera *camera ) {
 	glEnd();
 
 	glDisable( GL_LINE_STIPPLE );
+#endif
 }
 
 void slWorldObject::setCallbackData( void *data ) {
@@ -72,16 +75,8 @@ void slWorldObject::setNeighborhoodSize( double size ) {
 	_proximityRadius = size;
 }
 
-/*!
-	\brief Sets the texture number for this object.
-
-	Previous versions of this library used -1 to indicate no texture,
-	while the current version uses 0.  This function recognizes negative
-	numbers for backward compatability.
-*/
-
-void slWorldObject::setTexture( int t ) {
-	_texture = ( t > 0 ) ? t : 0;
+void slWorldObject::setTexture( slTexture2D *inTexture ) {
+	_texture = inTexture;
 }
 
 void slWorldObject::setTextureMode( int m ) {

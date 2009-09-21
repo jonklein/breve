@@ -20,8 +20,6 @@
 
 #include <vector>
 
-#define MAX(x, y) ((x)>(y)?(x):(y))
-
 #include "simulation.h"
 #include "gldraw.h"
 #include "drawcommand.h"
@@ -29,15 +27,12 @@
 #include "lightdetector.h"
 #include "tiger.h"
 #include "shadowvolume.h"
-#include "asciiart.h"
 
 #define REFLECTION_ALPHA	.75
 
 #define LIGHTSIZE 64
 
 double gReflectionAlpha;
-
-int glActive = 0;
 
 /*!
 	\brief Calls glMultMatrix with 3x3 orientation slMatrix.
@@ -47,7 +42,7 @@ int glActive = 0;
 */
 
 void slMatrixGLMult( double m[3][3] ) {
-	double d[4][4];
+	float d[4][4];
 
 	d[0][0] = m[0][0];
 	d[0][1] = m[1][0];
@@ -66,64 +61,24 @@ void slMatrixGLMult( double m[3][3] ) {
 	d[3][2] = 0;
 	d[3][3] = 1;
 
-	glMultMatrixd( (double*)d );
-}
-
-/*!
-	\brief Creates the texture used for the "lightmaps".
-*/
-
-void slMakeLightTexture( GLubyte *lTexture, GLubyte *dlTexture ) {
-	double x, y, temp, dtemp;
-	int i, j;
-
-	for ( i = 0; i < LIGHTSIZE; i++ ) {
-		for ( j = 0; j < LIGHTSIZE; j++ ) {
-			x = ( float )( i - LIGHTSIZE / 2.0 ) / ( float )( LIGHTSIZE / 2.0 );
-			y = ( float )( j - LIGHTSIZE / 2.0 ) / ( float )( LIGHTSIZE / 2.0 );
-
-			temp = ( 1.0f - ( float )( sqrt(( x * x ) + ( y * y ) ) ) ) * 1.2;
-			dtemp = temp + slRandomDouble() / 10.0;
-
-			if ( temp > 1.0f ) temp = 1.0f;
-			if ( temp < 0.0f ) temp = 0.0f;
-
-			if ( dtemp > 1.0f ) dtemp = 1.0f;
-			if ( dtemp < 0.0f ) dtemp = 0.0f;
-
-			lTexture[( i * LIGHTSIZE * 2 ) + j * 2] = ( unsigned char )( 255.0f * temp * temp );
-			lTexture[( i * LIGHTSIZE * 2 ) + ( j * 2 ) + 1] = ( unsigned char )( 255.0f * temp * temp );
-
-			dlTexture[( i * LIGHTSIZE * 2 ) + j * 2] = ( unsigned char )( 255.0f * dtemp * dtemp );
-			dlTexture[( i * LIGHTSIZE * 2 ) + ( j * 2 ) + 1] = ( unsigned char )( 255.0f * temp * temp );
-		}
-	}
+	glMultMatrixf( (float*)d );
 }
 
 void slCamera::initGL() {
 	GLfloat specularColor[4] = { 0.9, 0.9, 0.9, 0.0 };
-	GLubyte lt[LIGHTSIZE * LIGHTSIZE * 2];
-	GLubyte glt[LIGHTSIZE * LIGHTSIZE * 2];
-
-	glActive = 1;
 
 	gReflectionAlpha = REFLECTION_ALPHA;
-
-	slMakeLightTexture( &lt[0], &glt[0] );
-
-	slUpdateTexture( this, slTextureNew( this ), gBrickImage, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA );
-	slUpdateTexture( this, slTextureNew( this ), gPlaid, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA );
-	slUpdateTexture( this, slTextureNew( this ), lt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA );
-	slUpdateTexture( this, slTextureNew( this ), glt, LIGHTSIZE, LIGHTSIZE, GL_LUMINANCE_ALPHA );
 
 	glLineWidth( 2 );
 
 	glPolygonOffset( -4.0f, -1.0f );
 
+#ifndef OPENGLES
 	glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
 	glHint( GL_POLYGON_SMOOTH_HINT, GL_FASTEST );
 	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST );
 	glHint( GL_FOG_HINT, GL_NICEST );
+#endif
 
 	glEnable( GL_COLOR_MATERIAL );
 	glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE );
@@ -137,105 +92,9 @@ void slCamera::initGL() {
 	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 30 );
 }
 
-/**
- * \brief Center the given pixels in a square buffer.
- * Used for textures, which must be powers of two.
- */
-
-void slCenterPixelsInSquareBuffer( unsigned char *pixels, int width, int height, unsigned char *buffer, int newwidth, int newheight ) {
-	int xstart, ystart;
-	int y;
-
-	xstart = ( newwidth - width ) / 2;
-	ystart = ( newheight - height ) / 2;
-
-	for ( y = 0; y < height; y++ )
-		memcpy( &buffer[( y + ystart ) *( newwidth * 4 ) + ( xstart * 4 )],
-		        &pixels[y * width * 4],
-		        width * 4 );
-}
-
-/**
- * Allocates space for a new texture.
- */
-
-unsigned int slTextureNew( slCamera *c ) {
-	GLuint texture;
-
-	if ( !glActive ) return 0;
-
-	if ( c->_activateContextCallback ) c->_activateContextCallback();
-
-	glGenTextures( 1, &texture );
-
-	return texture;
-}
-
-void slTextureFree( slCamera *c, const unsigned int n ) {
-	if ( !glActive )
-		return;
-
-	if ( c->_activateContextCallback ) c->_activateContextCallback();
-
-	glDeleteTextures( 1, ( GLuint * )&n );
-}
-
-/**
- * \brief Adds (or updates) a texture to the camera.
- * Returns 0 if there was space, or -1 if all texture positions are used.
- */
-
-int slUpdateTexture( slCamera *c, GLuint texture, unsigned char *pixels, int width, int height, int format ) {
-	unsigned char *newpixels = NULL;
-	int newheight, newwidth;
-
-	if ( !glActive )
-		return -1;
-
-	if ( c->_activateContextCallback )
-		c->_activateContextCallback();
-
-	newwidth = slNextPowerOfTwo( width );
-	newheight = slNextPowerOfTwo( height );
-
-	newwidth = newheight = MAX( newwidth, newheight );
-
-	if ( newwidth != width || newheight != height ) {
-		newpixels = new unsigned char[newwidth * newheight * 4];
-		memset( newpixels, 0, newwidth * newheight * 4 );
-
-		slCenterPixelsInSquareBuffer( pixels, width, height, newpixels, newwidth, newheight );
-	} else
-		newpixels = pixels;
-
-	glBindTexture( GL_TEXTURE_2D, texture );
-
-	glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
-	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-
-	glTexImage2D( GL_TEXTURE_2D, 0, format, newwidth, newheight, 0, format, GL_UNSIGNED_BYTE, newpixels );
-
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-
-	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-
-	if ( newpixels != pixels )
-		delete[] newpixels;
-
-	if ( slClearGLErrors( "error adding texture" ) )
-		return -1;
-
-	return texture;
-}
-
 #define SELECTION_BUFFER_SIZE 512
 
 int slCamera::select( slWorld *w, int x, int y ) {
-
 	slVector cam;
 	GLuint *selections;
 	GLuint namesInHit, selection_buffer[ SELECTION_BUFFER_SIZE ];
@@ -427,6 +286,8 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 
 	glViewport( _originx, _originy, _width, _height );
 
+	glEnable( GL_BLEND );
+
 	if ( scissor ) {
 		flags |= DO_NO_AXIS | DO_NO_BOUND;
 		glEnable( GL_SCISSOR_TEST );
@@ -451,6 +312,9 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 	if ( w->backgroundTexture > 0 && !( flags & DO_OUTLINE ) )
 		drawBackground( w );
 
+	glEnable( GL_LIGHTING );
+
+	glMatrixMode( GL_PROJECTION );
 	gluPerspective( 40.0, _fov, _frontClip, _zClip );
 
 	glEnable( GL_DEPTH_TEST );
@@ -521,7 +385,7 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 		renderBillboards( flags );
 	}
 
-	std::vector<slPatchGrid*>::iterator pi;
+	std::vector< slPatchGrid* >::iterator pi;
 
 	for ( pi = w->_patches.begin(); pi != w->_patches.end(); pi++ )
 		( *pi )->draw( this );
@@ -532,8 +396,6 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 		else if ( flatShadows ) 
 			drawFlatShadows( w );
 	}
-
-    glDisable( GL_BLEND );
 
 	glDepthMask( GL_FALSE );
 
@@ -613,9 +475,7 @@ void slCamera::clear( slWorld *w ) {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 	if( _drawBlur ) { 
-		glEnable( GL_BLEND );
-		glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
-		glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+		setBlendMode( SR_ALPHABLEND );
 
 		glColor4f( 1.0f, 1.0f, 1.0f, _blurFactor );
 
@@ -655,7 +515,6 @@ void slCamera::clear( slWorld *w ) {
 		_readbackTexture -> unbind();
 
 		glPopMatrix();
-		glDisable( GL_BLEND );
 		glDepthMask( GL_TRUE );
 	}
 }
@@ -715,7 +574,6 @@ void slCamera::reflectionPass( slWorld *w, bool inWillDoShadowVolumes ) {
 
 	glEnable( GL_DEPTH_TEST );
 	glEnable( GL_STENCIL_TEST );
-	glEnable( GL_BLEND );
 
 	glStencilFunc( GL_LESS, 0, 0xffffffff );
 
@@ -739,8 +597,7 @@ void slCamera::reflectionPass( slWorld *w, bool inWillDoShadowVolumes ) {
 	glDisable( GL_STENCIL_TEST );
 
 
-	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	setBlendMode( SR_ALPHABLEND );
 
 	renderObjects( w, DO_ONLY_SHADOWCATCHER, inWillDoShadowVolumes ? REFLECTION_ALPHA / 2.0 : REFLECTION_ALPHA );
 }
@@ -767,8 +624,7 @@ void slCamera::drawFlatShadows( slWorld *w ) {
 
 	glEnable( GL_POLYGON_OFFSET_FILL );
 
-	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	setBlendMode( SR_ALPHABLEND );
 
 	glColor4f( 0.0, 0.0, 0.0, 0.3 );
 
@@ -794,9 +650,9 @@ void slCamera::renderText( slWorld *w, int crosshair ) {
 	char textStr[ 128 ];
 
 	glDisable( GL_DEPTH_TEST );
-	glDisable( GL_BLEND );
 	glDisable( GL_TEXTURE_2D );
 	glColor4f( _textColor.x, _textColor.y, _textColor.z, 1.0 );
+
 	snprintf( textStr, sizeof( textStr ), "%.2f", w->_age );
 
 	fromLeft = -1.0 + ( 5.0 / _width );
@@ -824,53 +680,22 @@ void slCamera::renderText( slWorld *w, int crosshair ) {
 void slCamera::drawBackground( slWorld *w ) {
 	static float transX = 0.0, transY = 0.0;
 
-	GLfloat textColor[4];
-
 	glDisable( GL_DEPTH_TEST );
-
-	glPushAttrib( GL_LIGHTING_BIT | GL_TRANSFORM_BIT | GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT );
-
-	glEnable( GL_BLEND );
+	glDepthMask( GL_FALSE );
 
 	glColor4f( w->backgroundTextureColor.x, w->backgroundTextureColor.y, w->backgroundTextureColor.z, 1.0 );
 
-	textColor[0] = w->backgroundTextureColor.x;
-	textColor[1] = w->backgroundTextureColor.y;
-	textColor[2] = w->backgroundTextureColor.z;
-	textColor[3] = 1.0;
-
 	glDisable( GL_LIGHTING );
-
-	glMatrixMode( GL_TEXTURE );
-
-	glLoadIdentity();
-
-	glPushMatrix();
-
-	// this is likely an Apple driver bug, but on my machine it's
-	// taking the color from the glColor, while on Nils' machine it's
-	// taking in the color from the GL_TEXTURE_ENV_COLOR--we'll just
-	// set both.
-
-	if ( w->isBackgroundImage ) {
-		textColor[0] = 1.0;
-		textColor[1] = 1.0;
-		textColor[2] = 1.0;
-		glEnable( GL_TEXTURE_2D );
-		glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-		glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, textColor );
-	} else {
-		glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, textColor );
-		glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND );
-	}
 
 	transX += _backgroundScrollX;
 	transY += _backgroundScrollY;
 
-	glTranslated( transX - ( .8 * 2*_ry ), ( .8 * 2*_rx ) - transY, 0 );
-	glDepthRange( 1, .9 );
-	glEnable( GL_TEXTURE_2D );
-	glBindTexture( GL_TEXTURE_2D, w->backgroundTexture );
+	glMatrixMode( GL_TEXTURE );
+	glPushMatrix();
+	glTranslatef( transX, transY, 0 );
+	
+	w -> backgroundTexture -> bind();
+	
 	glBegin( GL_QUADS );
 	glTexCoord2f( .0, .0 );
 	glVertex3f( -1, -1, -.1 );
@@ -881,11 +706,12 @@ void slCamera::drawBackground( slWorld *w ) {
 	glTexCoord2f( .0, 1.0 );
 	glVertex3f( -1, 1, -.1 );
 	glEnd();
-	glDepthRange( 0, 1 );
+	
+	w -> backgroundTexture -> unbind();
 
-	glDisable( GL_BLEND );
 	glPopMatrix();
-	glPopAttrib();
+
+	glDepthMask( GL_TRUE  );
 	glEnable( GL_DEPTH_TEST );
 }
 
@@ -913,6 +739,17 @@ void slCamera::renderLabels( slWorld *w ) {
 	glEnable( GL_DEPTH_TEST );
 }
 
+void slCamera::setBlendMode( slRenderBlendMode inBlendMode ) {
+	switch( inBlendMode ) {
+		case SR_ALPHABLEND:
+			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+			break;
+		case SR_LIGHTBLEND:
+			glBlendFunc( GL_ONE, GL_ONE );
+			break;
+	}
+}
+
 /*!
 	\brief Renders preprocessed billboards.
 */
@@ -921,7 +758,7 @@ void slCamera::renderBillboards( int flags ) {
 	slVector normal;
 	slBillboardEntry *b;
 	unsigned int n;
-	int lastTexture = -1;
+	slTexture2D *lastTexture = NULL;
 
 	if( _billboardCount == 0 )
 		return;
@@ -932,7 +769,6 @@ void slCamera::renderBillboards( int flags ) {
 	if ( !( flags & DO_NO_TEXTURE ) ) {
 		glPushAttrib( GL_LIGHTING_BIT | GL_TRANSFORM_BIT | GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT );
 		glEnable( GL_TEXTURE_2D );
-		glEnable( GL_BLEND );
 		glDisable( GL_LIGHTING );
 	}
 
@@ -947,13 +783,11 @@ void slCamera::renderBillboards( int flags ) {
 	// them fighting in the depth buffer.  so we'll disable depth-buffer
 	// writing so that no new info goes there.
 
+	slVertexBufferGL buffer;
+
 	glDepthMask( GL_FALSE );
-
-	glVertexPointer( 3, GL_FLOAT, 0, _billboardVertices );
-	glTexCoordPointer( 2, GL_FLOAT, 0, _billboardTexCoords );
-
-	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	glEnableClientState( GL_VERTEX_ARRAY );
+	
+	_billboardBuffer.bind();
 
 	glNormal3f( _billboardZ.x, _billboardZ.y, _billboardZ.z );
 
@@ -973,63 +807,39 @@ void slCamera::renderBillboards( int flags ) {
 			glColor4f( object->_color.x, object->_color.y, object->_color.z, object->_alpha );
 
 		if ( lastTexture != object->_texture )
-			glBindTexture( GL_TEXTURE_2D, object->_texture );
-
+			object-> _texture -> bind();
+			
 		if ( object->_textureMode == BBT_LIGHTMAP )
-			glBlendFunc( GL_ONE, GL_ONE );
+			setBlendMode( SR_LIGHTBLEND );
 		else
-			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-		glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+			setBlendMode( SR_ALPHABLEND );
 
 		lastTexture = object->_texture;
 
 		glTranslated( object->_position.location.x, object->_position.location.y, object->_position.location.z );
 		glRotatef( object->_billboardRotation, normal.x, normal.y, normal.z );
-		glScalef( b->size, b->size, b->size );
-
-		glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+		glScalef( b -> size, b -> size, b -> size );
+		
+		_billboardBuffer.draw( VB_TRIANGLE_STRIP );
 
 		if ( bound && !( flags & DO_NO_BOUND ) ) {
-			if ( !( flags & DO_NO_TEXTURE ) ) 
-				glDisable( GL_TEXTURE_2D );
-
-			glPushMatrix();
-
-			glScalef( 1.1, 1.1, 1.1 );
-			glColor4f( 0.0, 0.0, 0.0, 1.0 );
-
-			glBegin( GL_LINE_LOOP );
-			glVertex3f( _billboardX.x + _billboardY.x,  _billboardX.y + _billboardY.y,  _billboardX.z + _billboardY.z );
-			glVertex3f( -_billboardX.x + _billboardY.x, -_billboardX.y + _billboardY.y, -_billboardX.z + _billboardY.z );
-			glVertex3f( -_billboardX.x - _billboardY.x, -_billboardX.y - _billboardY.y, -_billboardX.z - _billboardY.z );
-			glVertex3f( _billboardX.x - _billboardY.x,  _billboardX.y - _billboardY.y,  _billboardX.z - _billboardY.z );
-			glEnd();
-
-			glPopMatrix();
-
-			if ( !( flags & DO_NO_TEXTURE ) ) 
-				glEnable( GL_TEXTURE_2D );
+			slMessage( DEBUG_ALL, "Somebody should fix this" );
 		}
 
 		glPopMatrix();
 	}
 
+	_billboardBuffer.unbind();
+
 	glDepthMask( GL_TRUE );
 
 	if ( !( flags & DO_NO_TEXTURE ) ) glPopAttrib();
-
-	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-	glDisableClientState( GL_VERTEX_ARRAY );
 }
 
 void slStrokeText( double x, double y, const char *string, double scale, void *font ) {
 	int c;
 
 	glPushMatrix();
-
-	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 	glLineWidth( 1.0 );
 	glTranslatef( x, y, 0 );
@@ -1162,22 +972,21 @@ void slShadowMatrix( GLfloat matrix[4][4], slPlane *p, slVector *light ) {
 	\brief Renders a stationary object.
 */
 
-void slCamera::processBillboards( slWorld *w ) {
-	GLfloat matrix[16];
+void slCamera::processBillboards( slWorld *inWorld ) {
+	GLfloat matrix[ 16 ];
 	std::vector<slWorldObject*>::iterator wi;
-	slSphere *ss;
 
 	glGetFloatv( GL_MODELVIEW_MATRIX, matrix );
 
 	_billboardCount = 0;
 
-	for ( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ ) {
+	for ( wi = inWorld->_objects.begin(); wi != inWorld->_objects.end(); wi++ ) {
 		slWorldObject *wo = *wi;
 
 		if ( wo && wo->_textureMode != BBT_NONE && wo->_displayShape && wo->_displayShape->_type == ST_SPHERE ) {
 			double z = 0;
 
-			ss = static_cast< slSphere* >( wo->_displayShape );
+			slSphere *ss = static_cast< slSphere* >( wo->_displayShape );
 
 			z = matrix[2] * wo->_position.location.x + matrix[6] * wo->_position.location.y + matrix[10] * wo->_position.location.z;
 
@@ -1201,28 +1010,45 @@ void slCamera::processBillboards( slWorld *w ) {
 	_billboardZ.x = matrix[2];
 	_billboardZ.y = matrix[6];
 	_billboardZ.z = matrix[10];
+	
+	
+	float *v;
+	
+	v = _billboardBuffer.texcoord( 0 );
+	v[ 0 ] = 1.0;
+	v[ 1 ] = 1.0;
 
-	_billboardTexCoords[ 0 ] = 1.0;
-	_billboardTexCoords[ 1 ] = 1.0;
-	_billboardTexCoords[ 2 ] = 0.0;
-	_billboardTexCoords[ 3 ] = 1.0;
-	_billboardTexCoords[ 4 ] = 1.0;
-	_billboardTexCoords[ 5 ] = 0.0;
-	_billboardTexCoords[ 6 ] = 0.0;
-	_billboardTexCoords[ 7 ] = 0.0;
+	v = _billboardBuffer.texcoord( 1 );
+	v[ 0 ] = 0.0;	
+	v[ 1 ] = 1.0;
+	
+	v = _billboardBuffer.texcoord( 2 );
+	v[ 0 ] = 1.0;
+	v[ 1 ] = 0.0;
+	
+	v = _billboardBuffer.texcoord( 3 );
+	v[ 0 ] = 0.0;
+	v[ 1 ] = 0.0;
 
-	_billboardVertices[ 0 ] =  _billboardX.x + _billboardY.x;  
-	_billboardVertices[ 1 ] =  _billboardX.y + _billboardY.y;
-	_billboardVertices[ 2 ] =  _billboardX.z + _billboardY.z;
-	_billboardVertices[ 3 ] = -_billboardX.x + _billboardY.x;
-	_billboardVertices[ 4 ] = -_billboardX.y + _billboardY.y;
-	_billboardVertices[ 5 ] = -_billboardX.z + _billboardY.z;
-	_billboardVertices[ 6 ] =  _billboardX.x - _billboardY.x;
-	_billboardVertices[ 7 ] =  _billboardX.y - _billboardY.y;
-	_billboardVertices[ 8 ] =  _billboardX.z - _billboardY.z;
-	_billboardVertices[ 9 ] = -_billboardX.x - _billboardY.x;
-	_billboardVertices[ 10 ] = -_billboardX.y - _billboardY.y;
-	_billboardVertices[ 11 ] = -_billboardX.z - _billboardY.z;
+	v = _billboardBuffer.vertex( 0 );
+	v[ 0 ] =  _billboardX.x + _billboardY.x;  
+	v[ 1 ] =  _billboardX.y + _billboardY.y;
+	v[ 2 ] =  _billboardX.z + _billboardY.z;
+
+	v = _billboardBuffer.vertex( 1 );
+	v[ 0 ] = -_billboardX.x + _billboardY.x;
+	v[ 1 ] = -_billboardX.y + _billboardY.y;
+	v[ 2 ] = -_billboardX.z + _billboardY.z;
+
+	v = _billboardBuffer.vertex( 2 );
+	v[ 0 ] =  _billboardX.x - _billboardY.x;
+	v[ 1 ] =  _billboardX.y - _billboardY.y;
+	v[ 2 ] =  _billboardX.z - _billboardY.z;
+
+	v = _billboardBuffer.vertex( 3 );
+	v[ 0 ] = -_billboardX.x - _billboardY.x;
+	v[ 1 ] = -_billboardX.y - _billboardY.y;
+	v[ 2 ] = -_billboardX.z - _billboardY.z;
 
 }
 
@@ -1234,7 +1060,7 @@ void slCamera::processBillboards( slWorld *w ) {
 void slCamera::renderObjects( slWorld *w, unsigned int flags, float inAlphaScale ) {
 	slWorldObject *wo;
 	unsigned int n;
-	bool color = 1;
+	bool color = true;
 
 	const int loadNames = ( flags & DO_LOAD_NAMES );
 	const int doNoAlpha = ( flags & DO_NO_ALPHA );
@@ -1246,15 +1072,14 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags, float inAlphaScale
 
 	_points.clear();
 
-	if ( doOnlyAlpha ) {
-		glEnable( GL_BLEND );
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	}
+	if ( doOnlyAlpha ) 
+		setBlendMode( SR_ALPHABLEND );
 
-	if ( flags & ( DO_OUTLINE | DO_NO_COLOR ) ) color = 0;
-	if ( flags & DO_OUTLINE ) glColor4f( 1, 1, 1, 1 );
+	if ( flags & ( DO_OUTLINE | DO_NO_COLOR ) ) 
+		color = 0;
 
-	// glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	if ( flags & DO_OUTLINE ) 
+		glColor4f( 1, 1, 1, 1 );
 
 	for ( n = 0; n < w->_objects.size(); ++n ) {
 		int skip = 0;
@@ -1280,28 +1105,24 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags, float inAlphaScale
 				if ( !doNoTexture && wo->_texture ) {
 
 					if ( wo->_textureMode == BBT_LIGHTMAP )
-						glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+						setBlendMode( SR_LIGHTBLEND );
 					else
-						glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+						setBlendMode( SR_ALPHABLEND );
 
-					glEnable( GL_TEXTURE_2D );
-					glBindTexture( GL_TEXTURE_2D, wo->_texture );
-					glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+					wo -> _texture -> bind();
 				}
 
 				wo->draw( this );
 
-				if ( !doNoTexture && wo->_texture ) {
-					glBindTexture( GL_TEXTURE_2D, 0 );
-					glDisable( GL_TEXTURE_2D );
-				}
+				if ( !doNoTexture && wo -> _texture )
+					wo -> _texture -> unbind();
+
 			} else
 				_points.push_back( std::pair< slVector, slVector>( wo->getPosition().location, wo->_color ) );
 		}
 	}
 
 	if ( !doOnlyAlpha && _points.size() ) {
-		glEnable( GL_BLEND );
 		glPointSize( 2.0 );
 
 		glEnable( GL_POINT_SMOOTH );
@@ -1319,15 +1140,12 @@ void slCamera::renderObjects( slWorld *w, unsigned int flags, float inAlphaScale
 		glDisable( GL_POINT_SMOOTH );
 	}
 
-	if ( doOnlyAlpha )
-		glDisable( GL_BLEND );
-
 	if ( loadNames )
 		glLoadName( w->_objects.size() + 1 );
 
 	// Restore the default blend func
 
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	setBlendMode( SR_ALPHABLEND );
 }
 
 /**
@@ -1340,8 +1158,7 @@ void slCamera::renderLines( slWorld *w ) {
 	unsigned int n;
 
 	glLineWidth( 1.2 );
-	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	setBlendMode( SR_ALPHABLEND );
 	glDepthFunc( GL_ALWAYS );
 	glEnable( GL_LINE_SMOOTH );
 	glDepthMask( GL_FALSE );
@@ -1538,12 +1355,11 @@ void slDrawFace( slFace *f, int drawMode, int flags ) {
 	}
 }
 
-/*!
-	\brief Recursively break down and draw a face.
-
-	Breaks down faces into smaller polygons in order to improve
-	the quality of lighting and other effects.
-*/
+/**
+ * \brief Recursively break down and draw a face.
+ *
+ * Breaks down faces into smaller polygons in order to improve the quality of lighting and other effects.
+ */
 
 int slBreakdownFace( slFace *f ) {
 	slVector diff, middle, subv[3], total, xaxis, yaxis;
@@ -1674,16 +1490,21 @@ void slBreakdownTriangle( slVector *v, int level, slVector *xaxis, slVector *yax
 	}
 }
 
-/*!
-	\brief Prints out and clears OpenGL errors.
-*/
+/**
+ * \brief Prints out and clears OpenGL errors.
+ */
 
-inline int slClearGLErrors( char *id ) {
+inline int slClearGLErrors( const char *inID ) {
 	unsigned int n;
 	int c = 0;
 
-	while (( n = glGetError() ) ) {
-		slMessage( DEBUG_ALL, "%s: OpenGL error %s\n", id, gluErrorString( n ) );
+	while ( ( n = glGetError() ) ) {
+		#ifdef OPENGLES
+			slMessage( DEBUG_ALL, "%s: OpenGL error %d\n", inID, n );
+		#else
+			slMessage( DEBUG_ALL, "%s: OpenGL error %s\n", inID, gluErrorString( n ) );		
+		#endif
+		
 		c++;
 	}
 
