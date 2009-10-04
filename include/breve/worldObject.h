@@ -3,46 +3,10 @@
 
 #include "slutil.h"
 #include "shape.h"
-#include "texture.h"
 
 class slWorld;
-class slWorldObject;
-
-/*!
-	\brief A line drawn from one object to another.
-*/
-
-class slObjectConnection {
-	public:
-		virtual ~slObjectConnection() { };
-
-		virtual void draw(slCamera *c) = 0;
-		virtual void step(double timestep) = 0;
-
-		slWorldObject *_src;
-		slWorldObject *_dst;
-};
-
-class slObjectLine: public slObjectConnection {
-	public:
-		slObjectLine() { 
-			_stipple = 0xffff; 
-			slVectorSet( &_color, 0, 0, 0 ); 
-			_transparency = 1.0; 
-		}
-
-		void draw(slCamera *c);
-		void step(double timestep) {};
-
-		void setColor( slVector &inColor ) { slVectorCopy( &inColor, &_color ); }
-		void setTransparency( float inTransparency ) { _transparency = inTransparency; }
-		void setStipple( int inStipple ) { _stipple = inStipple; }
-
-		slVector _color;
-		float _transparency;
-		int _stipple;
-
-};
+class slRenderGL;
+class slVertexBufferGL;
 
 class slWorldObject {
 	public:
@@ -53,54 +17,10 @@ class slWorldObject {
 		friend class slTerrain;
 		friend class slVclipData;
 
-		slWorldObject() {
-			_drawMode = 0;
-			_texture = NULL;
-			_textureMode = 0;
-			_textureScaleX = 16;
-			_textureScaleY = 16;
-			_simulate = 0;
-			_drawAsPoint = false;
-			_drawShadow = true;
-
-			_lightExposure = 0;
-
-			_shape = NULL;
-			_displayShape = NULL;
-
-			_proximityRadius = 0.00001;
-
-			_billboardRotation = 0;
-			_alpha = 1.0;
-
-			_userData = NULL;
-
-			_e = 0.4;
-			_mu = 0.15;
-
-			slVectorSet(&_color, 1, 1, 1);
-
-			slMatrixIdentity(_position.rotation);
-			slVectorSet(&_position.location, 0, 0, 0);
-		}
-
-		virtual ~slWorldObject() {
-			std::vector<slObjectConnection*>::iterator ci;
-
-			for(ci = _connections.begin(); ci != _connections.end(); ci++ ) {
-				(*ci)->_src = NULL;
-				(*ci)->_dst = NULL;
-			}
-
-			if( _shape ) 
-				_shape -> release();
-
-			if( _displayShape ) 
-				_displayShape -> release();
-		}
-
-		virtual void draw( slCamera *camera, bool inUseDrawMode = true );
-
+		slWorldObject();
+		virtual ~slWorldObject();
+		
+		virtual void draw( const slRenderGL& inRenderer );
 		virtual void step( slWorld *world, double step ) {};
 
 		void setCallbackData( void *data );
@@ -198,6 +118,42 @@ class slWorldObject {
 		std::vector<slObjectConnection*> _connections;
 
 		void*						_userData;
+};
+
+/**
+ * \brief A line drawn from one object to another.
+ */
+
+class slObjectConnection {
+	public:
+		virtual ~slObjectConnection() { };
+
+		virtual void draw(slCamera *c) = 0;
+		virtual void step(double timestep) = 0;
+
+		slWorldObject *_src;
+		slWorldObject *_dst;
+};
+
+class slObjectLine: public slObjectConnection {
+	public:
+		slObjectLine() { 
+			_stipple = 0xffff; 
+			slVectorSet( &_color, 0, 0, 0 ); 
+			_transparency = 1.0; 
+		}
+
+		void draw(slCamera *c);
+		void step(double timestep) {};
+
+		void setColor( slVector &inColor ) { slVectorCopy( &inColor, &_color ); }
+		void setTransparency( float inTransparency ) { _transparency = inTransparency; }
+		void setStipple( int inStipple ) { _stipple = inStipple; }
+
+		slVector _color;
+		float _transparency;
+		int _stipple;
+
 };
 
 #endif /* _WORLDOBJECT_H */

@@ -292,10 +292,15 @@ int brIRealSetVisible( brEval args[], brEval *target, brInstance *i ) {
 
 int brIRealSetTexture( brEval args[], brEval *target, brInstance *i ) {
 	slWorldObject *o = BRWORLDOBJECTPOINTER( &args[ 0 ] );
-	slTexture2D *t = ( (brImageData*)BRPOINTER( &args[ 1 ] ) ) -> _texture;
 
-	o->setTexture( t );
-	o->setTextureMode( BBT_NONE );
+	if( BRPOINTER( &args[ 1 ] ) ) {
+		slTexture2D *t = ( (brImageData*)BRPOINTER( &args[ 1 ] ) ) -> _texture;
+
+		o -> setTexture( t );
+		o -> setTextureMode( BBT_NONE );
+	} else {
+		o -> setTexture( NULL );
+	}
 
 	return EC_OK;
 }

@@ -204,7 +204,7 @@ int stWaitForServerReply( int sockfd, brEval *target, brInstance *i ) {
 				args[0] = &eval[0];
 				args[1] = &eval[1];
 
-				brMethodCallByNameWithArgs( i->engine->controller, "parse-xml-network-request", args, 1, target );
+				brMethodCallByNameWithArgs( i->engine-> getController(), "parse-xml-network-request", args, 1, target );
 				delete[] buffer;
 			} else {  // Empty request, Server did not send object...
 				// Do nothing, brEval is set to AT_NULL by default...

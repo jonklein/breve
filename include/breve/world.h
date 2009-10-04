@@ -104,13 +104,13 @@ class slGISData;
 
 class slWorld {
 	public:
-							slWorld();
-							~slWorld();
+								slWorld();
+								~slWorld();
 
 		// sunlight detection
 	
-		inline bool 				detectLightExposure() { return _detectLightExposure; }
-		inline bool 				drawLightExposure() { return _drawLightExposure; }
+		inline bool 			detectLightExposure() { return _detectLightExposure; }
+		inline bool 			drawLightExposure() { return _drawLightExposure; }
 
 		void 					setDetectLightExposure( bool d ) { _detectLightExposure = d; }
 		void 					setDrawLightExposure( bool d ) { _drawLightExposure = d; }
@@ -118,6 +118,8 @@ class slWorld {
 		void 					setLightExposureSource( slVector *src ) { slVectorCopy( src, &_lightExposureCamera._location); }
 
 		slCamera 				*getLightExposureCamera() { return &_lightExposureCamera; }
+		
+		void					draw( const slRenderGL& inRenderer );
 
 		/**
 		 * Indicates that collision detection structures must be reinitialized.
@@ -179,6 +181,7 @@ class slWorld {
 		slPatchGrid 				*addPatchGrid( slVector *center, slVector *patchSize, int x, int y, int z );
 		void 					removePatchGrid( slPatchGrid *g );
 
+		slGISData*				loadTigerFile( char *, slTerrain * );
 		// age is the simulation time of the world.
 	
 		double 					_age;
@@ -193,12 +196,10 @@ class slWorld {
 		// and one which will be used to answer "proximity" questions:
 		// to allow objects to ask for all objects within a certain radius
 	
-		slPatchGrid 				*_clipGrid;
-		slVclipData 				*_clipData;
-		slVclipData 				*_proximityData;
+		slPatchGrid 			*_clipGrid;
+		slVclipData 			*_clipData;
+		slVclipData 			*_proximityData;
 
-		slVector 				_gravity;
-	
 		// drawing the world...
 	
 		slVector 				backgroundColor;
@@ -235,8 +236,6 @@ class slWorld {
 		void 					setAutoDisableFlag( bool f );
 
 		void 					setCollisionCallbacks( int (*)(void *, void *, int), void (*)(void *, void *, int, slVector* , slVector* ) );
-
-		void 					renderCameras();
 
 		int 					startNetsimServer();
 		int 					startNetsimSlave( const char* );
@@ -275,7 +274,6 @@ extern "C"{
 
 void slInitProximityData(slWorld *);
 
-slGISData *slWorldLoadTigerFile(slWorld *, char *, slTerrain *);
 #ifdef __cplusplus
 }
 #endif

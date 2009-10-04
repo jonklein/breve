@@ -27,7 +27,7 @@
 #include "shape.h"
 
 void slShape::drawShadowVolume( slCamera *c, slPosition *p ) {
-	std::vector<slEdge*>::iterator ei;
+	std::vector< slEdge* >::iterator ei;
 	slVector light;
 	slVector lNormal;
 

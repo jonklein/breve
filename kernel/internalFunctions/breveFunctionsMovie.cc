@@ -24,12 +24,12 @@
 /*! \addtogroup InternalFunctions */
 /*@{*/
 
-#if HAVE_LIBAVFORMAT
+#ifdef HAVE_MOVIE_EXPORT
 #define BRMOVIEPOINTER(p)  ((slMovie*)BRPOINTER(p))
 #endif
 
 int breveMovieCreate( brEval args[], brEval *result, brInstance *i ) {
-#if HAVE_LIBAVFORMAT
+#ifdef HAVE_MOVIE_EXPORT
 	char *path;
 	slMovie *movie;
 	slCamera *camera = i->engine->camera;
@@ -53,7 +53,7 @@ int breveMovieCreate( brEval args[], brEval *result, brInstance *i ) {
 }
 
 int breveMovieAddWorldFrame( brEval args[], brEval *result, brInstance *i ) {
-#if HAVE_LIBAVFORMAT
+#ifdef HAVE_MOVIE_EXPORT
 	slMovie *movie = BRMOVIEPOINTER( &args[0] );
 
 	if ( !movie )
@@ -67,7 +67,7 @@ int breveMovieAddWorldFrame( brEval args[], brEval *result, brInstance *i ) {
 }
 
 int breveMovieClose( brEval args[], brEval *result, brInstance *i ) {
-#if HAVE_LIBAVFORMAT
+#ifdef HAVE_MOVIE_EXPORT
 	slMovie *movie = BRMOVIEPOINTER( &args[0] );
 
 	if ( !movie )

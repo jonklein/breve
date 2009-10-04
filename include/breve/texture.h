@@ -87,7 +87,8 @@ enum slVertexBufferType {
 
 enum slVertexBufferDrawType {
 	VB_TRIANGLES 		= 1 << 0,
-	VB_TRIANGLE_STRIP	= 1 << 1
+	VB_TRIANGLE_STRIP	= 1 << 1,
+	VB_LINE_STRIP		= 1 << 2
 };
 
 class slVertexBufferGL {
@@ -98,12 +99,15 @@ class slVertexBufferGL {
 		void				resize( int inVertexCount, int inPixelFormat );
 
 		inline float*		vertex( int inN ) const { return (float*)( &_data.data()[ _vertexSize * inN + _vertexOffset ] ); }
+		inline float*		normal( int inN ) const { return (float*)( &_data.data()[ _vertexSize * inN + _normalOffset ] ); }
 		inline float*		texcoord( int inN ) const { return (float*)( &_data.data()[ _vertexSize * inN + _texOffset ] ); }
 		
-		void 				draw( slVertexBufferDrawType inType = VB_TRIANGLES ) const { glDrawArrays( inType == VB_TRIANGLE_STRIP ? GL_TRIANGLE_STRIP : GL_TRIANGLES, 0, _vertexCount ); };
+		void 				draw( slVertexBufferDrawType inType = VB_TRIANGLES ) const;
 		
 		void				bind();
 		void				unbind();
+		
+		unsigned int		size() const { return _vertexCount; }
 		
 	private:
 		slBuffer			_data;
@@ -115,6 +119,5 @@ class slVertexBufferGL {
 		unsigned int		_normalOffset;
 		unsigned int		_texOffset;
 };
-
 
 #endif // _TEXTURE_H

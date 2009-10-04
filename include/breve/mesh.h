@@ -16,7 +16,7 @@
 #include "texture.h"
 
 #ifndef WINDOWS
-#include <libgen.h>
+	#include <libgen.h>
 #endif
 
 struct slMaterial {
@@ -47,11 +47,7 @@ class sl3DSShape : public slMeshShape {
 
 		double 							maxReach();
 
-		void 							draw();
-		void							draw( slCamera *c, double textureScaleX, double textureScaleY, int mode, int flags );
-
-		void 							calculateSizes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPointStart, int *ioFaceStart );
-		void							processNodes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPointStart, int *ioIndexStart );
+		virtual void 					draw( const slRenderGL& inRender );
 
 		Lib3dsMesh*						_mesh;
 
@@ -65,8 +61,10 @@ class sl3DSShape : public slMeshShape {
 
 
 	protected:
-		int								addMaterial( std::string &inMaterialName, Lib3dsMaterial *inMaterial );
+		void 							calculateSizes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPointStart, int *ioFaceStart );
+		void							processNodes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPointStart, int *ioIndexStart );
 
+		int								addMaterial( std::string &inMaterialName, Lib3dsMaterial *inMaterial );
 
 		float*							_normals;
 		float*							_texcoords;

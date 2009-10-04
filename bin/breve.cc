@@ -274,7 +274,7 @@ void brGlutLoop() {
 	gWaiting = 0;
 
 	if ( !gPaused && !gThreadShouldExit ) {
-		if ( brEngineIterate( gEngine ) != EC_OK )
+		if ( gEngine -> iterate() != EC_OK )
 			brQuit( gEngine );
 
 		if ( !gOptionNoGraphics )  {
@@ -294,7 +294,7 @@ void brGlutMenuUpdate( brInstance *i ) {
 	char *message;
 	unsigned int n, total;
 
-	if ( i != gEngine->controller )
+	if ( i != gEngine -> getController() )
 		return;
 
 	glutSetMenu( mainMenu );
@@ -353,7 +353,7 @@ void brQuit( brEngine *e ) {
 }
 
 void brMainMenu( int n ) {
-	brMenuCallback( gEngine, gEngine->controller, n );
+	brMenuCallback( gEngine, gEngine -> getController(), n );
 	glutPostRedisplay();
 }
 
@@ -575,7 +575,7 @@ void slDemoReshape( int x, int y ) {
 
 void slDemoDisplay() {
 	brEngineLock( gEngine );
-	brEngineRenderWorld( gEngine, gMotionCrosshair );
+	gEngine -> draw();
 	brEngineUnlock( gEngine );
 
 	glutSwapBuffers();
@@ -590,7 +590,7 @@ void slDemoMouse( int button, int state, int x, int y ) {
 		gStartCamX = gEngine->camera->_rx;
 
 		brClick( gEngine->camera->select( gEngine->world, x, y ) );
-		brGlutMenuUpdate( gEngine->controller );
+		brGlutMenuUpdate( gEngine -> getController() );
 
 		gMotionCrosshair = 1;
 
@@ -648,7 +648,7 @@ void slDemoSpecial( int key, int x, int y ) {
 	switch ( key ) {
 
 		case GLUT_KEY_F1:
-			if ( brEngineIterate( gEngine ) != EC_OK )
+			if ( gEngine -> iterate() != EC_OK )
 				brQuit( gEngine );
 
 			break;
@@ -846,7 +846,7 @@ const char *brGLUTGetLoadname() {
 }
 
 void renderContext( slWorld *inWorld, slCamera *inCamera ) {
-	inCamera -> renderScene( inWorld, 0 );
+	gEngine -> draw();
 }
 
 int slLoadOSMesaPlugin( char *execPath ) {

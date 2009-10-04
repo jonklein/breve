@@ -209,7 +209,7 @@ int brINotify( brEval args[], brEval *target, brInstance *i ) {
 
 int brIGetController( brEval args[], brEval *target, brInstance *i ) {
 
-	target->set( i->engine->controller );
+	target->set( i->engine-> getController() );
 
 	return EC_OK;
 }

@@ -73,10 +73,29 @@ brEngine *brEngineNewWithArguments( int inArgc, char **inArgv ) {
  * Creates and initializes the bloated brEngine structure.  This is the first step in starting a breve simulation.
  */
 
-brEngine *brEngineNew( void ) {
+brEngine::brEngine() {
+	_argc = 0;
+	_argv = NULL;
+
+	updateMenu = NULL;
+	getSavename = NULL;
+	getLoadname = NULL;
+	dialogCallback = NULL;
+	soundCallback = NULL;
+	interfaceTypeCallback = NULL;
+	interfaceSetStringCallback = NULL;
+	interfaceSetCallback = NULL;
+	pauseCallback = NULL;
+	newWindowCallback = NULL;
+	freeWindowCallback = NULL;
+	renderWindowCallback = NULL;
+
+	_controller = NULL;
+}
+
+brEngine *brEngineNew() {
 	brEngine *e;
 	char *envpath, *dir;
-	int n = 0;
 
 	char wd[MAXPATHLEN];
 
@@ -94,30 +113,13 @@ brEngine *brEngineNew( void ) {
 
 	brClearError( e );
 
-#if HAVE_LIBAVFORMAT
+#if HAVE_LIBAVCODEC && HAVE_LIBAVFORMAT && HAVE_LIBAVUTIL && HAVE_LIBSWSCALE
 	av_register_all();
 #endif
 
 #ifdef HAVE_LIBGSL
 	gsl_set_error_handler_off();
 #endif
-
-	e->_argc = 0;
-	e->_argv = NULL;
-
-	e->updateMenu = NULL;
-	e->getSavename = NULL;
-	e->getLoadname = NULL;
-	e->dialogCallback = NULL;
-	e->soundCallback = NULL;
-	e->interfaceTypeCallback = NULL;
-	e->interfaceSetStringCallback = NULL;
-	e->interfaceSetCallback = NULL;
-	e->pauseCallback = NULL;
-	e->newWindowCallback = NULL;
-	e->freeWindowCallback = NULL;
-	e->renderWindowCallback = NULL;
-	e->controller = NULL;
 
 	e->RNG = gsl_rng_alloc( gsl_rng_mt19937 );
 
@@ -210,9 +212,11 @@ brEngine *brEngineNew( void ) {
 	#define PATHSEP ":"
 #endif
 
+	int n = 0;
+
 	if ( ( envpath = getenv( "BREVE_CLASS_PATH" ) ) ) {
 
-		while (( dir = slSplit( envpath, PATHSEP, n++ ) ) ) {
+		while ( ( dir = slSplit( envpath, PATHSEP, n++ ) ) ) {
 			brAddSearchPath( e, dir );
 			slMessage( DEBUG_INFO, "adding \"%s\" to class path\n", dir );
 			slFree( dir );
@@ -223,12 +227,12 @@ brEngine *brEngineNew( void ) {
 
 	memset( e->keys, 0, sizeof( e->keys ) );
 
-	for ( n = 1;n < e->nThreads;n++ ) {
+	for ( int t = 1; t < e -> nThreads; t++ ) {
 		stThreadData *data;
 
 		data = new stThreadData;
 		data->engine = e;
-		data->number = n;
+		data->number = t;
 		pthread_create( &data->thread, NULL, brIterationThread, data );
 	}
 
@@ -271,7 +275,6 @@ brInternalFunction *brEngineInternalFunctionLookup( brEngine *e, char *name ) {
 void brEngineFree( brEngine *e ) {
 	delete e;
 }
-
 
 brEngine::~brEngine() {
 	std::vector<brInstance*>::iterator bi;
@@ -326,20 +329,15 @@ brEngine::~brEngine() {
  * is created <b>before the controller's initialization methods are
  * even called</b>.
  */
-
-int brEngineSetController( brEngine *e, brInstance *instance ) {
-	if ( e->controller ) {
+int brEngine::setController( brInstance *instance ) {
+	if ( _controller ) {
 		slMessage( DEBUG_ALL, "Error: redefinition of \"Controller\" object\n" );
 		return -1;
 	}
 
-	e->controller = instance;
+	_controller = instance;
 
 	return 0;
-}
-
-brInstance *brEngineGetController( brEngine *e ) {
-	return e->controller;
 }
 
 /**
@@ -442,7 +440,7 @@ brEvent *brEngineAddEvent( brEngine *e, brInstance *i, char *methodName, double 
  * - checking to see if the time has come for an event to be called
  */
 
-int brEngineIterate( brEngine *e ) {
+int brEngine::iterate() {
 	brEval result;
 	brEvent *event;
 	std::vector<brInstance*>::iterator bi;
@@ -450,31 +448,31 @@ int brEngineIterate( brEngine *e ) {
 
 	brInstance *i;
 
-	brEngineLock( e );
+	brEngineLock( this );
 
-	e->lastScheduled = -1;
+	lastScheduled = -1;
 
-	for ( bi = e->instancesToAdd.begin(); bi != e->instancesToAdd.end(); bi++ ) {
+	for ( bi = instancesToAdd.begin(); bi != instancesToAdd.end(); bi++ ) {
 		i = *bi;
 
-		e->instances.push_back( i );
+		instances.push_back( i );
 
-		if ( i->iterate ) e->iterationInstances.push_back( i );
+		if ( i->iterate ) iterationInstances.push_back( i );
 
-		if ( i->postIterate ) e->postIterationInstances.push_back( i );
+		if ( i->postIterate ) postIterationInstances.push_back( i );
 	}
 
-	e->instancesToAdd.clear();
+	instancesToAdd.clear();
 
-	for ( bi = e->instancesToRemove.begin(); bi != e->instancesToRemove.end(); bi++ ) {
+	for ( bi = instancesToRemove.begin(); bi != instancesToRemove.end(); bi++ ) {
 		i = *bi;
 
-		brEngineRemoveInstance( e, i );
+		brEngineRemoveInstance( this, i );
 	}
 
-	e->instancesToRemove.clear();
+	instancesToRemove.clear();
 
-	for ( bi = e->iterationInstances.begin(); bi != e->iterationInstances.end(); bi++ ) {
+	for ( bi = iterationInstances.begin(); bi != iterationInstances.end(); bi++ ) {
 		i = *bi;
 
 		n++;
@@ -482,41 +480,41 @@ int brEngineIterate( brEngine *e ) {
 		if ( i->status == AS_ACTIVE ) {
 			if ( brMethodCall( i, i->iterate, NULL, &result ) != EC_OK ) {
 
-				pthread_mutex_unlock( &e->lock );
+				pthread_mutex_unlock( &lock );
 
 				return EC_ERROR;
 			}
 		}
 	}
 
-	for ( bi = e->postIterationInstances.begin(); bi != e->postIterationInstances.end(); bi++ ) {
+	for ( bi = postIterationInstances.begin(); bi != postIterationInstances.end(); bi++ ) {
 		i = *bi;
 
 		if ( i->status == AS_ACTIVE ) {
 			if ( brMethodCall( i, i->postIterate, NULL, &result ) != EC_OK ) {
 
-				pthread_mutex_unlock( &e->lock );
+				pthread_mutex_unlock( &lock );
 
 				return EC_ERROR;
 			}
 		}
 	}
 
-	double oldAge = e->world->getAge();
+	double oldAge = world->getAge();
 
-	while ( !e->events.empty() && ( oldAge + e->_iterationStepSize ) >= e->events.back()->_time ) {
-		event = e->events.back();
+	while ( !events.empty() && ( oldAge + _iterationStepSize ) >= events.back()->_time ) {
+		event = events.back();
 
 		if ( event->_instance->status == AS_ACTIVE ) {
-			e->world->setAge( event->_time );
+			world -> setAge( event->_time );
 
 			int rcode = brMethodCallByName( event->_instance, event->_name, &result );
 
-			e->world->setAge( oldAge );
+			world->setAge( oldAge );
 
 			if ( rcode != EC_OK ) {
 
-				pthread_mutex_unlock( &e->lock );
+				pthread_mutex_unlock( &lock );
 
 				return rcode;
 			}
@@ -524,19 +522,19 @@ int brEngineIterate( brEngine *e ) {
 		}
 
 		if ( event->_interval != 0.0 ) {
-			brEngineAddEvent( e, event->_instance, event->_name, event->_time + event->_interval, event->_interval );
+			brEngineAddEvent( this, event->_instance, event->_name, event->_time + event->_interval, event->_interval );
 		}
 
 		delete event;
 
-		e->events.pop_back();
+		events.pop_back();
 	}
 
-	brEngineUnlock( e );
+	brEngineUnlock( this );
 
-	fflush( e->_logFile );
+	fflush( _logFile );
 
-	if ( e->_simulationWillStop ) 
+	if ( _simulationWillStop ) 
 		return EC_STOP;
 
 	return EC_OK;
@@ -613,8 +611,9 @@ char *brFindFile( brEngine *e, const char *file, struct stat *st ) {
  * Requires that a valid OpenGL context is active.
  */
 
-void brEngineRenderWorld( brEngine *e, int crosshair ) {
-	e->camera->renderScene( e->world, crosshair );
+void brEngine::draw() {
+	_renderer.ApplyCamera( camera );
+	world -> draw( _renderer );
 }
 
 /*@}*/

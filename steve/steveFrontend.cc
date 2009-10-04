@@ -182,7 +182,7 @@ int stCallbackLoad( brEngine *engine, void *inDataPtr, const char *file, const c
 
 		controller->breveInstance = brEngineAddInstance( engine, controllerClass, controller );
 
-		brEngineSetController( engine, controller->breveInstance );
+		engine -> setController( controller->breveInstance );
 
 		r = stInstanceInit( controller );
 

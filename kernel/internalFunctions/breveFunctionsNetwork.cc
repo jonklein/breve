@@ -208,7 +208,7 @@ brNetworkServer *brListenOnPort( int port, brEngine *engine ) {
 	serverData->index = NULL;
 
 	serverData->engine = engine;
-	serverData->recipient = engine->controller;
+	serverData->recipient = engine-> getController();
 	serverData->port = port;
 	serverData->socket = ssock;
 	serverData->terminate = 0;
@@ -382,7 +382,7 @@ void *brHandleConnection( void *p ) {
 
 			eval[0].set( buffer );
 
-			brMethodCallByNameWithArgs( data->engine->controller, "parse-xml-network-request", args, 1, &result );
+			brMethodCallByNameWithArgs( data->engine-> getController(), "parse-xml-network-request", args, 1, &result );
 
 			args[0] = &result;
 
@@ -512,7 +512,7 @@ int brHandleHTTPConnection( brNetworkClientData *data, char *request ) {
 		slFree( str );
 	}
 
-	result = brMethodCallByNameWithArgs( data->engine->controller, method, evalPtrs, count, &target );
+	result = brMethodCallByNameWithArgs( data->engine-> getController(), method, evalPtrs, count, &target );
 
 	for ( n = 0;n < count;n++ ) {
 		delete evalPtrs[ n ];
@@ -532,7 +532,7 @@ int brHandleHTTPConnection( brNetworkClientData *data, char *request ) {
 		return 0;
 	}
 
-	string = brFormatEvaluation( &target, data->engine->controller );
+	string = brFormatEvaluation( &target, data->engine -> getController() );
 
 	if ( strstr( string, ".html" ) ) {
 		brSendPage( data, string );

@@ -2128,11 +2128,11 @@ RTC_INLINE int stEvalCallFunc( stCCallExp *c, stRunInstance *i, brEval *result )
 			}
 		}
 
-		if ( c->_function->_argTypes[n] == AT_POINTER && BRPOINTER( &evals[n] ) == NULL ) {
-			stEvalError( i->instance, EE_TYPE, "NULL pointer passed as argument %d to internal function %s", n, c->_function->_name.c_str() );
-			resultCode = EC_ERROR;
-			goto cleanup;
-		}
+		// if ( c->_function->_argTypes[n] == AT_POINTER && BRPOINTER( &evals[n] ) == NULL ) {
+		// 	stEvalError( i->instance, EE_TYPE, "NULL pointer passed as argument %d to internal function %s", n, c->_function->_name.c_str() );
+		// 	resultCode = EC_ERROR;
+		//	goto cleanup;
+		//}
 	}
 
 	result->clear();

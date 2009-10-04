@@ -71,7 +71,7 @@ brMenuEntry *brAddMenuItem( brInstance *i, const char *method, const char *title
 int brMenuCallback( brEngine *e, brInstance *i, unsigned int n ) {
 	brEval eval;
 
-	if ( !i ) i = e->controller;
+	if ( !i ) i = e-> getController() ;
 
 	if ( i->status != AS_ACTIVE ) return EC_OK;
 
@@ -122,7 +122,7 @@ brInstance *brClickCallback( brEngine *e, int n ) {
 	if ( n == -1 ) o = NULL;
 	else o = e->world->getObject( n );
 
-	method = brMethodFind( e->controller->object, "click", types, 1 );
+	method = brMethodFind( e-> getController() ->object, "click", types, 1 );
 
 	if ( !method ) return NULL;
 
@@ -133,7 +133,7 @@ brInstance *brClickCallback( brEngine *e, int n ) {
 
 	brEngineLock( e );
 
-	brMethodCall( e->controller, method, argPtr, &eval );
+	brMethodCall( e-> getController() , method, argPtr, &eval );
 
 	brEngineUnlock( e );
 
@@ -146,7 +146,7 @@ brInstance *brClickCallback( brEngine *e, int n ) {
 
 void brBeginDrag( brEngine *e, brInstance *i ) {
 	brEval result;
-	brMethodCallByName( e->controller, "get-drag-object", &result );
+	brMethodCallByName( e-> getController() , "get-drag-object", &result );
 
 	if ( !BRINSTANCE( &result ) ) return;
 
@@ -155,7 +155,7 @@ void brBeginDrag( brEngine *e, brInstance *i ) {
 
 void brEndDrag( brEngine *e, brInstance *i ) {
 	brEval result;
-	brMethodCallByName( e->controller, "get-drag-object", &result );
+	brMethodCallByName( e-> getController() , "get-drag-object", &result );
 
 	if ( !BRINSTANCE( &result ) ) return;
 
@@ -181,11 +181,11 @@ int brDragCallback( brEngine *e, int x, int y ) {
 
 	pthread_mutex_lock( &e->lock );
 
-	method = brMethodFind( e->controller->object, "get-drag-object", NULL, 0 );
+	method = brMethodFind( e-> getController() ->object, "get-drag-object", NULL, 0 );
 
 	if ( !method ) return EC_ERROR;
 
-	n = brMethodCall( e->controller, method, NULL, &eval );
+	n = brMethodCall( e-> getController() , method, NULL, &eval );
 
 	brMethodFree( method );
 
@@ -220,7 +220,7 @@ int brDragCallback( brEngine *e, int x, int y ) {
 		return n;
 	}
 
-	e->camera->vectorForDrag( e->world, &BRVECTOR( &eval ), x, y, &v );
+	e-> camera -> vectorForDrag( e->world, &BRVECTOR( &eval ), x, y, &v );
 
 	theArg.set( v );
 
@@ -269,27 +269,27 @@ int brKeyCallback( brEngine *e, unsigned char keyCode, int isDown ) {
 
 	if ( isDown ) {
 		snprintf( mname, sizeof( mname ), "catch-key-%c-down", keyCode );
-		method = brMethodFind( e->controller->object, mname, NULL, 0 );
+		method = brMethodFind( e-> getController() ->object, mname, NULL, 0 );
 
 		if ( !method ) {
 			snprintf( mname, sizeof( mname ), "catch-key-0x%X-down", keyCode );
-			method = brMethodFind( e->controller->object, mname, NULL, 0 );
+			method = brMethodFind( e-> getController() ->object, mname, NULL, 0 );
 		}
 	} else {
 		snprintf( mname, sizeof( mname ), "catch-key-%c-up", keyCode );
 
-		method = brMethodFind( e->controller->object, mname, NULL, 0 );
+		method = brMethodFind( e-> getController() ->object, mname, NULL, 0 );
 
 		if ( !method ) {
 			snprintf( mname, sizeof( mname ), "catch-key-0x%X-up", keyCode );
-			method = brMethodFind( e->controller->object, mname, NULL, 0 );
+			method = brMethodFind( e-> getController() ->object, mname, NULL, 0 );
 		}
 	}
 
 	if ( !method )
 		return EC_OK;
 
-	r = brMethodCall( e->controller, method, NULL, &eval );
+	r = brMethodCall( e-> getController() , method, NULL, &eval );
 
 	brMethodFree( method );
 
@@ -315,15 +315,15 @@ int brSpecialKeyCallback( brEngine *e, const char *name, int isDown ) {
 
 	if ( isDown ) {
 		snprintf( mname, sizeof( mname ), "catch-key-%s-down", name );
-		method = brMethodFind( e->controller->object, mname, NULL, 0 );
+		method = brMethodFind( e-> getController() ->object, mname, NULL, 0 );
 	} else {
 		snprintf( mname, sizeof( mname ), "catch-key-%s-up", name );
-		method = brMethodFind( e->controller->object, mname, NULL, 0 );
+		method = brMethodFind( e-> getController() ->object, mname, NULL, 0 );
 	}
 
 	if ( !method ) return EC_OK;
 
-	r = brMethodCall( e->controller, method, NULL, &eval );
+	r = brMethodCall( e-> getController() , method, NULL, &eval );
 
 	brMethodFree( method );
 
@@ -350,11 +350,11 @@ int brInterfaceCallback( brEngine *e, int interfaceID, const char *string ) {
 
 	snprintf( mname, sizeof( mname ), "catch-interface-id-%d", interfaceID );
 
-	method = brMethodFind( e->controller->object, mname, types, 1 );
+	method = brMethodFind( e-> getController() ->object, mname, types, 1 );
 
 	if ( !method ) return EC_OK;
 
-	r = brMethodCall( e->controller, method, &args, &eval );
+	r = brMethodCall( e-> getController() , method, &args, &eval );
 
 	brMethodFree( method );
 

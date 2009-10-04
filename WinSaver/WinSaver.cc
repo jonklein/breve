@@ -178,8 +178,9 @@ void SetupAnimation( int inWidth, int inHeight ) {
 }
 
 void OnTimer( HDC hDC ) {
-	brEngineIterate( gEngine );
-	brEngineRenderWorld( gEngine, 0 );
+	gEngine -> iterate();
+	gEngine -> draw( 0 );
+
 	SwapBuffers(hDC);
 }
 

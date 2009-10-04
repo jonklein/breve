@@ -51,8 +51,7 @@ slCamera::slCamera( int x, int y ) {
 	_zClip = 500.0;
 	_frontClip = 0.1;
 
-	if ( y != 0.0 ) _fov = ( double )x / ( double )y;
-	else _fov = 40;
+	_fov = 40;
 
 	// billboarding works poorly when all the billboards
 	// are on the same plane, so we'll offset the camera
@@ -261,12 +260,12 @@ slCamera::~slCamera() {
 	slFree( _billboards );
 }
 
-/*!
-	\brief Updates the camera's internal state after changes have been made.
-
-	Used to update the camera's internal state after changes have been made
-	to the rotation or zoom settings.
-*/
+/**
+ * \brief Updates the camera's internal state after changes have been made.
+ * 
+ * Used to update the camera's internal state after changes have been made
+ * to the rotation or zoom settings.
+ */
 
 void slCamera::update() {
 	double m[3][3], n[3][3];

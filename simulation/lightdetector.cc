@@ -18,6 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#include "render.h"
 #include "simulation.h"
 #include "glIncludes.h"
 #include "world.h"
@@ -26,7 +27,6 @@
 #define WHITE_PIXEL	0x00ffffff
 
 void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
-#ifndef OPENGLES
 	slWorldObject *wo;
 	std::vector< slWorldObject* >::iterator wi;
 	unsigned int n = 0;
@@ -69,6 +69,8 @@ void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 	}
 
 	if ( w->_objects.size() == 0 ) return;
+
+#ifndef OPENGLES
 
 	glDisable( GL_LIGHTING );
 
@@ -113,6 +115,8 @@ void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+	slRenderGL r;
+
 	for ( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ ) {
 		unsigned char br, bg, bb;
 		wo = *wi;
@@ -125,7 +129,7 @@ void slCamera::detectLightExposure( slWorld *w, int size, GLubyte *buffer ) {
 			glColor4ub( br, bg, bb, 0xff );
 
 			wo -> _lightExposure = 0;
-			wo -> draw( this, false );
+			wo -> draw( r );
 		}
 
 		n++;

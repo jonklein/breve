@@ -5,7 +5,7 @@ int brLoadSimulation( brEngine *engine, const char *code, const char *file ) {
 
 	result = brLoadFile( engine, code, file );
 
-	if( result == EC_OK && !engine->controller ) {
+	if( result == EC_OK && !engine -> getController() ) {
 		brEvalError( engine, PE_NO_CONTROLLER, "No controller object has been define for simulation \"%s\"\n", file );
 		return EC_ERROR;
 	}

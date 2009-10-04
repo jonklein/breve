@@ -61,11 +61,10 @@ int brICameraClear( brEval args[], brEval *target, brInstance *i ) {
 	slCamera *camera = BRCAMERAPOINTER( &args[0] );
 	slWorld *w = i->engine->world;
 
-	if ( camera->_activateContextCallback ) camera->_activateContextCallback();
+	if ( camera->_activateContextCallback ) 
+		camera -> _activateContextCallback();
 
-	glClearColor( w->backgroundColor.x, w->backgroundColor.y, w->backgroundColor.z, 1.0 );
-
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
+    slMessage( DEBUG_ALL, "cameraClear not implemented\n" );
 
 	return EC_OK;
 }
@@ -79,13 +78,11 @@ int brICameraClear( brEval args[], brEval *target, brInstance *i ) {
 int brICameraSetBlur( brEval args[], brEval *target, brInstance *i ) {
 	slCamera *camera = BRCAMERAPOINTER( &args[0] );
 
-	if ( camera->_activateContextCallback ) camera->_activateContextCallback();
+	if( camera -> _activateContextCallback ) 
+		camera -> _activateContextCallback();
 
-	camera->clear( i->engine->world );
-
-	camera->_drawBlur = BRINT( &args[1] );
-
-	camera->setRecompile();
+	camera -> _drawBlur = BRINT( &args[1] );
+	camera -> setRecompile();
 
 	return EC_OK;
 }

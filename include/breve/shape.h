@@ -26,6 +26,10 @@
 #include <vector>
 
 #include "vector.h"
+#include "texture.h"
+
+class slRenderGL;
+class slVertexBufferGL;
 
 enum shapeTypes {
 	ST_MESH,
@@ -187,8 +191,7 @@ class slShape {
 
 		virtual void 						drawShadowVolume(slCamera *camera, slPosition *position);
 
-		virtual void 						draw( slCamera *c, double textureScaleX, double textureScaleY, int mode, int flags );
-		virtual void 						drawBounds( slCamera *c );
+		virtual void 						draw( const slRenderGL& inRender );
 
 		virtual void 						setMass(double mass);
 		virtual void 						setDensity(double density);
@@ -197,6 +200,7 @@ class slShape {
 
 		double 								getMass();
 		double 								getDensity();
+		void 								fillVertexBuffer();
 
 		int 								_drawList;
 		bool 								_recompile;
@@ -221,6 +225,7 @@ class slShape {
 	protected:
 		slVector 							_max, _min;
 		int 								_referenceCount;
+		slVertexBufferGL					_vertexBuffer;
 
 };
 
@@ -258,10 +263,7 @@ class slMeshShape : public slShape {
 	public:
 		slMeshShape();
 		~slMeshShape();
-
-		void 						draw( slCamera *c, double tscaleX, double tscaleY, int mode, int flags);
-		void 						drawBounds( slCamera *inCamera );
-
+		
 		void 						bounds( const slPosition *position, slVector *min, slVector *max ) const;
 
 		virtual void				finishShape( double inDensity );

@@ -64,34 +64,6 @@ void slMatrixGLMult( double m[3][3] ) {
 	glMultMatrixf( (float*)d );
 }
 
-void slCamera::initGL() {
-	GLfloat specularColor[4] = { 0.9, 0.9, 0.9, 0.0 };
-
-	gReflectionAlpha = REFLECTION_ALPHA;
-
-	glLineWidth( 2 );
-
-	glPolygonOffset( -4.0f, -1.0f );
-
-#ifndef OPENGLES
-	glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
-	glHint( GL_POLYGON_SMOOTH_HINT, GL_FASTEST );
-	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST );
-	glHint( GL_FOG_HINT, GL_NICEST );
-#endif
-
-	glEnable( GL_COLOR_MATERIAL );
-	glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE );
-
-	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
-
-	slClearGLErrors( "init" );
-
-	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, specularColor );
-	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 30 );
-}
-
 #define SELECTION_BUFFER_SIZE 512
 
 int slCamera::select( slWorld *w, int x, int y ) {
@@ -201,6 +173,9 @@ int slCamera::vectorForDrag( slWorld *w, slVector *dragVertex, int x, int y, slV
 
 	glViewport( _originx, _originy, _width, _height );
 	glMatrixMode( GL_PROJECTION );
+
+	glPushMatrix();
+
 	glLoadIdentity();
 
 	gluPerspective( 80.0, _fov, _frontClip, _zClip );
@@ -1292,33 +1267,6 @@ void slRenderShape( slShape *s, int drawMode, int flags ) {
 	}
 }
 
-/*!
-	\brief Gives vectors perpendicular to v.
-
-	Uses cross-products to find two vectors perpendicular to v.
-	Uses either (0, 1, 0) or (1, 0, 0) as the first cross product
-	vector (depending on whether v is already set to one of these).
-*/
-
-void slPerpendicularVectors( slVector *v, slVector *p1, slVector *p2 ) {
-	slVector neg;
-
-	slVectorSet( p1, 0, 1, 0 );
-
-	slVectorMul( v, -1, &neg );
-
-	if ( !slVectorCompare( p1, v ) || !slVectorCompare( &neg, p1 ) )
-		slVectorSet( p1, 1, 0, 0 );
-
-	slVectorCross( p1, v, p2 );
-
-	slVectorCross( p2, v, p1 );
-
-	slVectorNormalize( p1 );
-
-	slVectorNormalize( p2 );
-}
-
 /**
  * \brief Draws a face, breaking it down into smaller triangles if necessary.
  */
@@ -1326,7 +1274,6 @@ void slPerpendicularVectors( slVector *v, slVector *p1, slVector *p2 ) {
 void slDrawFace( slFace *f, int drawMode, int flags ) {
 	slVector xaxis, yaxis;
 	slVector *norm, *v;
-	slPoint *p;
 	int pointCount;
 
 	norm = &f->plane.normal;
@@ -1335,16 +1282,15 @@ void slDrawFace( slFace *f, int drawMode, int flags ) {
 
 	glNormal3f( norm->x, norm->y, norm->z );
 
-	// if they're drawing lines, or if the face
-	// isn't broken down, do a normal polygon
+	// if they're drawing lines, or if the face isn't broken down, do a normal polygon
 
 	if ( drawMode == GL_LINE_LOOP || !slBreakdownFace( f ) ) {
 		glBegin( drawMode );
 
 		for ( pointCount = 0;pointCount < f-> _pointCount ;pointCount++ ) {
-			p = ( slPoint * )f->points[pointCount];
+			slPoint *p = ( slPoint * )f->points[pointCount];
 
-			v = &(( slPoint * )p )->vertex;
+			v = &p->vertex;
 
 			glTexCoord2f( slVectorDot( v, &xaxis ), slVectorDot( v, &yaxis ) );
 

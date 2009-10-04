@@ -155,8 +155,8 @@ class slCamera {
 		void setActivateContextCallback( int (*f)() );
 		void setCameraText( int n, char *string, float x, float y, slVector *v );
 	
-		int select( slWorld *w, int x, int y );
-		int vectorForDrag( slWorld *w, slVector *dragVertex, int x, int y, slVector *dragVector );
+		int select( slWorld *w, int x, int y ) const { slMessage( DEBUG_ALL, "Vector for drag not implemented." ); return 0; }
+		int vectorForDrag( slWorld *w, slVector *dragVertex, int x, int y, slVector *dragVector ) const { slMessage( DEBUG_ALL, "Vector for drag not implemented." ); return 0; }
 
 		void renderShadowVolume( slWorld *w );
 		void renderObjectShadowVolumes( slWorld *w );

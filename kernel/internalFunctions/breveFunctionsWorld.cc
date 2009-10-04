@@ -46,7 +46,7 @@ int brIWorldSetERP( brEval args[], brEval *target, brInstance *i ) {
 
 int brIWorldLoadTigerFile( brEval args[], brEval *target, brInstance *i ) {
 
-	target->set( slWorldLoadTigerFile( i->engine->world, BRSTRING( &args[0] ), ( slTerrain* )BRPOINTER( &args[1] ) ) );
+	target->set( i->engine->world -> loadTigerFile( BRSTRING( &args[0] ), ( slTerrain* )BRPOINTER( &args[1] ) ) );
 
 	return EC_OK;
 }

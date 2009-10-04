@@ -133,7 +133,7 @@ brObject *brObjectFind( brEngine *e, const char *name ) {
 	if ( ( object = e->objectAliases[ names ] ) ) return object;
 
 	// try the main frontend language
-	if ( e->controller && ( object = brObjectFindWithTypeSignature( e, name, e->controller->object->type->_typeSignature ) ) ) return object;
+	if ( e -> getController() && ( object = brObjectFindWithTypeSignature( e, name, e-> getController() ->object->type->_typeSignature ) ) ) return object;
 
 	// okay, whatever
 	return brUnknownObjectFind( e, name );
@@ -480,7 +480,7 @@ int brRunCommand( brEngine *inEngine, const char *inCommand ) {
 	for ( oi = inEngine->_objectTypes.begin(); oi != inEngine->_objectTypes.end(); oi++ ) {
 		brObjectType *type = *oi;
 
-		if( type == inEngine -> controller -> object -> type && type -> runCommand )
+		if( type == inEngine -> getController() -> object -> type && type -> runCommand )
 			return type -> runCommand( type -> userData, inEngine, inCommand );
 	}
 

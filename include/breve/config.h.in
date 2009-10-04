@@ -24,6 +24,9 @@
 /* Define to 1 if you have the `avformat' library (-lavformat). */
 #undef HAVE_LIBAVFORMAT
 
+/* Define to 1 if you have the `swscale' library (-lswscale). */
+#undef HAVE_LIBSWSCALE
+
 /* Define to 1 if you have the `avutil' library (-lavutil). */
 #undef HAVE_LIBAVUTIL
 

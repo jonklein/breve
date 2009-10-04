@@ -25,22 +25,22 @@
 
 #define MAX(x, y) ((x)>(y)?(x):(y))
 
-/*!
-    \brief a 3x1 vector
-*/
- 
-struct slVector {
-    double x;
-    double y;
-    double z;
+/** 
+ * \brief a 3x1 vector 
+ */
+class slVector {
+    public:
+        double x;
+        double y;
+        double z;
 };
 
-/*!
-    \brief a 6x1 spatial vector, frequently manipulated as 2 3x1 vectors.
-
-	Used during integration, and to hold linear/angular acceleration or 
-	velocity information.
-*/
+/**
+ * \brief a 6x1 spatial vector, frequently manipulated as 2 3x1 vectors.
+ * 
+ * Used during integration, and to hold linear/angular acceleration or 
+ * velocity information.
+ */
 
 struct slsVector {
     slVector a;
@@ -50,19 +50,13 @@ struct slsVector {
 /**
  * \brief A plane, specified by a normal and a vertex.
  */
-
 struct slPlane {
 	slVector normal;
 	slVector vertex;
 };
 
-#define slVectorLength(V)		(sqrt((V)->x * (V)->x + (V)->y * (V)->y + (V)->z * (V)->z))
-#define slVectorIsZero(V)		((V)->x == 0.0 && (V)->y == 0.0 && (V)->z == 0.0)
-
-/*
-    = VECTOR_FUNCTIONS are no longer supported, so the inline macros below are
-    = now the default.
-*/
+#define slVectorLength( V )		(sqrt((V)->x * (V)->x + (V)->y * (V)->y + (V)->z * (V)->z))
+#define slVectorIsZero( V )		((V)->x == 0.0 && (V)->y == 0.0 && (V)->z == 0.0)
 
 #define slVectorAdd(a,b,c) ((c)->x=(a)->x+(b)->x,(c)->y=(a)->y+(b)->y,(c)->z=(a)->z+(b)->z)
 #define slVectorSub(a,b,c) ((c)->x=(a)->x-(b)->x,(c)->y=(a)->y-(b)->y,(c)->z=(a)->z-(b)->z)
@@ -74,14 +68,23 @@ struct slPlane {
 #define slsVectorZero(a) (memset((a), 0, sizeof(slsVector)))
 #define slVectorZero(a) (memset((a), 0, sizeof(slVector)))
 
-void slVectorCross(slVector *, slVector *, slVector *);
-double slVectorAngle(slVector *, slVector *);
+void slVectorCross( const slVector *,  const slVector *, slVector *);
+double slVectorAngle( const slVector *,  const slVector *);
 
-void slVectorNormalize(slVector *);
-float slVectorDist( slVector *inA, slVector *inB );
+void slVectorNormalize( slVector* ioVector );
+float slVectorDist( const slVector *inA, const slVector *inB );
 
-void slVectorSet(slVector *, double, double, double);
-void slVectorPrint(slVector *);
-int slVectorCompare(slVector *, slVector *);
+void slVectorSet( slVector*, double, double, double);
+void slVectorPrint(const slVector*);
+int slVectorCompare(const slVector *, const slVector *);
+
+/**
+ * \brief Gives vectors perpendicular to v.
+ *
+ * Uses cross-products to find two vectors perpendicular to v.
+ * Uses either (0, 1, 0) or (1, 0, 0) as the first cross product
+ * vector (depending on whether v is already set to one of these).
+ */
+void slPerpendicularVectors( const slVector *v, slVector *p1, slVector *p2 );
 
 #endif

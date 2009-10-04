@@ -24,17 +24,6 @@
 #include "glIncludes.h"
 #include "camera.h"
 
-class slRender {
-
-};
-
-class slRenderGL : public slRender {
-	public:
-		
-
-
-};
-
 class slWorld;
 class slStationary;
 

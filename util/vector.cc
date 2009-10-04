@@ -28,7 +28,7 @@
 	output in 3x1 vector d.
 */
 
-void slVectorCross( slVector *s1, slVector *s2, slVector *d ) {
+void slVectorCross( const slVector *s1, const slVector *s2, slVector *d ) {
 	d->x = ( s1->y * s2->z ) - ( s1->z * s2->y );
 	d->y = ( s1->z * s2->x ) - ( s1->x * s2->z );
 	d->z = ( s1->x * s2->y ) - ( s1->y * s2->x );
@@ -57,7 +57,7 @@ void slVectorNormalize( slVector *v ) {
 	\brief Returns the angle, in radians, between two vectors.
 */
 
-double slVectorAngle( slVector *a, slVector *b ) {
+double slVectorAngle( const slVector *a, const slVector *b ) {
 	double dot = slVectorDot( a, b ), ac;
 
 	dot /= ( slVectorLength( a ) * slVectorLength( b ) );
@@ -87,7 +87,7 @@ void slVectorSet( slVector *v, double x, double y, double z ) {
 	development debugging.
 */
 
-void slVectorPrint( slVector *v ) {
+void slVectorPrint( const slVector *v ) {
 	printf( "(%.20f, %.20f, %.20f)\n", v->x, v->y, v->z );
 }
 
@@ -95,18 +95,33 @@ void slVectorPrint( slVector *v ) {
 	\brief returns 1 if vectors a and b differ, otherwise 0.
 */
 
-int slVectorCompare( slVector *a, slVector *b ) {
+int slVectorCompare( const slVector *a, const slVector *b ) {
 	if ( a->x != b->x ) return 1;
-
 	if ( a->y != b->y ) return 1;
-
 	if ( a->z != b->z ) return 1;
 
 	return 0;
 }
 
-float slVectorDist( slVector *inA, slVector *inB ) {
+float slVectorDist( const slVector *inA, const slVector *inB ) {
 	slVector dest;
 	slVectorSub( inA, inB, &dest );
 	return slVectorLength( &dest );
 }
+
+void slPerpendicularVectors( const slVector *v, slVector *p1, slVector *p2 ) {
+	slVector neg;
+
+	slVectorSet( p1, 0, 1, 0 );
+	slVectorMul( v, -1, &neg );
+
+	if ( !slVectorCompare( p1, v ) || !slVectorCompare( &neg, p1 ) )
+		slVectorSet( p1, 1, 0, 0 );
+
+	slVectorCross( p1, v, p2 );
+	slVectorCross( p2, v, p1 );
+
+	slVectorNormalize( p1 );
+	slVectorNormalize( p2 );
+}
+

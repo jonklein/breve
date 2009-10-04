@@ -52,7 +52,7 @@ int stRunSingleStatement( stSteveData *inSteveData, brEngine *inEngine, const ch
 
 	stSetParseData( inSteveData, fixedStatement, strlen( fixedStatement ) );
 
-	controller = brEngineGetController( inEngine );
+	controller = inEngine -> getController();
 
 	stParseSetEngine( inEngine );
 	stParseSetObjectAndMethod( ( stObject* )controller->object->userData, inSteveData -> singleStatementMethod );

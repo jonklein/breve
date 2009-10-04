@@ -161,7 +161,7 @@ int brXMLWriteSimulationToStream( FILE *file, brEngine *e ) {
 	fprintf( file, "<?xml version=\"1.0\"?>\n" );
 	fprintf( file, "<!DOCTYPE engine SYSTEM \"breveInstance.dtd\">\n" );
 
-	fprintf( file, "<engine controllerIndex=\"%d\">\n", brXMLGetIndex( &record._instanceToIndexMap, brEngineGetController( e ) ) );
+	fprintf( file, "<engine controllerIndex=\"%d\">\n", brXMLGetIndex( &record._instanceToIndexMap, e -> getController() ) );
 
 	spaces += XML_INDENT_SPACES;
 
@@ -1011,7 +1011,7 @@ int brXMLInitSimulationFromString( brEngine *e, char *buffer ) {
 		return EC_ERROR;
 	}
 
-	brEngineSetController( e, brXMLGetInstance( &parserState._indexToInstanceMap, controllerIndex ) );
+	e -> setController( brXMLGetInstance( &parserState._indexToInstanceMap, controllerIndex ) );
 
 	if ( brXMLRunDearchiveMethods( dom, &parserState ) ) {
 		slMessage( DEBUG_ALL, "Error decoding archived XML simulation: dearchive method failed\n" );

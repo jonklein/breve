@@ -264,6 +264,7 @@ AC_C_INLINE
 AC_TYPE_SIZE_T
 
 AC_CHECK_LIB([m], [isnan])
+AC_CHECK_LIB([bz2], [BZ2_bzDecompress])
 
 AC_CHECK_HEADERS(pthread.h)
 
@@ -367,7 +368,6 @@ fi
 AC_CHECK_LIB([png], [png_create_write_struct])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc],,AC_MSG_FAILURE([Missing GSL library -- see http://www.gnu.org/software/gsl/]))
 AC_CHECK_LIB([GIMPACT], [main],,AC_MSG_FAILURE([Missing GIMPACT library -- see http://opende.sourceforge.net]))
-# AC_CHECK_LIB([fast], [main],,AC_MSG_FAILURE([Missing ODE fast library -- see http://opende.sourceforge.net]))
 AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]))
 
 AC_CHECK_FUNCS([getopt_long gettimeofday iswspace mkstemp strdup vasprintf])

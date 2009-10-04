@@ -438,7 +438,7 @@ Object : Real (aka Reals) [version 2.1] {
 
 		if archiveTextureImage:
 			self remove-dependency on archiveTextureImage.
-		
+
 		if textureImage: {
 			archiveTextureImage = textureImage.
 			self add-dependency on textureImage.

@@ -34,87 +34,102 @@ slVector *slPositionVertex( const slPosition *p, const slVector *v, slVector *o 
 	return o;
 }
 
-void slShape::draw( slCamera *c, double inTScaleX, double inTScaleY, int mode, int flags ) {
-	bool axis;
+void slShape::draw( const slRenderGL& inRender ) {
+	if( _vertexBuffer.size() == 0 )
+		fillVertexBuffer();
 
-	axis = ( mode & DM_AXIS ) && !( flags & DO_NO_AXIS );
-
-#ifndef OPENGLES
-	if ( _drawList == 0 || _recompile || ( flags & DO_RECOMPILE ) ) 
-		slCompileShape( this, c->_drawMode, flags );
-
-	if ( flags & DO_OUTLINE ) {
-		glPushAttrib( GL_ENABLE_BIT );
-		glDisable( GL_LIGHTING );
-		glPushMatrix();
-		glScalef( .99, .99, .99 );
-		glPolygonOffset( 1, 2 );
-		glEnable( GL_POLYGON_OFFSET_FILL );
-		glCallList( _drawList );
-		glPopMatrix();
-		glEnable( GL_BLEND );
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-		glColor4f( 0, 0, 0, .5 );
-		glDepthMask( GL_FALSE );
-		slRenderShape( this, GL_LINE_LOOP, 0 );
-		glDepthMask( GL_FALSE );
-		glDisable( GL_POLYGON_OFFSET_FILL );
-
-		if ( _type == ST_SPHERE ) {
-			glColor4f( 1, 1, 1, 0 );
-			glDisable( GL_DEPTH_TEST );
-			glScalef( .96, .96, .96 );
-			glCallList( _drawList );
-			glEnable( GL_DEPTH_TEST );
-		}
-
-		glPopAttrib();
-	} else {
-		glPushAttrib( GL_TRANSFORM_BIT );
-
-		glMatrixMode( GL_TEXTURE );
-		glPushMatrix();
-		glLoadIdentity();
-
-		glTranslatef( 0.5, 0.5, 0.0 );
-
-		if( inTScaleX > 0.0 && inTScaleY > 0.0 )
-			glScalef( 1.0 / inTScaleX, 1.0 / inTScaleY, 1.0 );
-
-		glCallList( _drawList );
-
-		glPopMatrix();
-		glPopAttrib();
-	}
-
-	if ( axis ) {
-		glPushAttrib( GL_COLOR_BUFFER_BIT );
-		glEnable( GL_BLEND );
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-		glColor4f( 0.0, 0.0, 0.0, 0.5 );
-		glScalef( 1.1, 1.1, 1.1 );
-
-		if ( axis ) slDrawAxis( _max.x, _max.y );
-
-		glPopAttrib();
-	}
-	
-#endif
+	_vertexBuffer.bind();
+	_vertexBuffer.draw();
+	_vertexBuffer.unbind();
 }
 
-void slShape::drawBounds( slCamera *inCamera ) {
-#ifndef OPENGLES
-	glPushAttrib( GL_COLOR_BUFFER_BIT );
-	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	glColor4f( 0.0, 0.0, 0.0, 0.5 );
-	glScalef( 1.1, 1.1, 1.1 );
+void slShape::fillVertexBuffer() {
 
-	slRenderShape( this, GL_LINE_LOOP, 0 );
+ 	int polys = 0;
+ 	std::vector<slFace*>::iterator fi;
 
-	glPopAttrib();
-	
-#endif
+ 	for ( fi = faces.begin(); fi != faces.end(); fi++ ) {
+ 		slFace *f = *fi;
+ 		polys += f -> _pointCount;
+ 	}
+
+ 	_vertexBuffer.resize( polys * 3, VB_XYZ | VB_UV | VB_NORMAL );
+
+// a wrap-around point indexer
+#define POINT_INDEX( f, n ) ( ( f ) -> points[ ( n ) < ( f ) -> _pointCount ? ( n ) : ( n ) - ( f ) -> _pointCount ] )
+
+	int pointIndex = 0;
+
+	for ( fi = faces.begin(); fi != faces.end(); fi++ ) {
+		slFace *f = *fi;
+		slVector center;
+
+
+		slVectorSet( &center, 0, 0, 0 );
+
+		for( int i = 0; i < f -> _pointCount; i++ ) {
+			slPoint *p = f -> points[ i ];
+			slVectorAdd( &p -> vertex, &center, &center );
+		}
+
+		slVectorMul( &center, 1.0 / f -> _pointCount, &center );
+
+		slVector *norm = &f -> plane.normal;
+		slVector xAxis, yAxis;
+		slPerpendicularVectors( norm, &xAxis, &yAxis );
+
+		for( int p = 0; p < f -> _pointCount; p++ ) {
+			slPoint *p1 = POINT_INDEX( f, p     );
+			slPoint *p2 = POINT_INDEX( f, p + 1 );
+
+			float *f;
+			f = _vertexBuffer.vertex( pointIndex     );
+			f[ 0 ] = p1 -> vertex.x;
+			f[ 1 ] = p1 -> vertex.y;
+			f[ 2 ] = p1 -> vertex.z;
+			f = _vertexBuffer.vertex( pointIndex + 1 );
+			f[ 0 ] = p2 -> vertex.x;
+			f[ 1 ] = p2 -> vertex.y;
+			f[ 2 ] = p2 -> vertex.z;
+			f = _vertexBuffer.vertex( pointIndex + 2 );
+			f[ 0 ] = center.x;
+			f[ 1 ] = center.y;
+			f[ 2 ] = center.z;
+
+			f = _vertexBuffer.texcoord( pointIndex     );
+			f[ 0 ] = slVectorDot( &p1 -> vertex, &xAxis );
+			f[ 1 ] = slVectorDot( &p1 -> vertex, &yAxis );
+
+			f = _vertexBuffer.texcoord( pointIndex + 1 );
+			f[ 0 ] = slVectorDot( &p2 -> vertex, &xAxis );
+			f[ 1 ] = slVectorDot( &p2 -> vertex, &yAxis );
+
+			f = _vertexBuffer.texcoord( pointIndex + 2 );
+			f[ 0 ] = slVectorDot( &center, &xAxis );
+			f[ 1 ] = slVectorDot( &center, &yAxis );
+			
+			f = _vertexBuffer.normal( pointIndex     );
+			f[ 0 ] = norm -> x;
+			f[ 1 ] = norm -> y;
+			f[ 2 ] = norm -> z;
+
+			f = _vertexBuffer.normal( pointIndex + 1 );
+			f[ 0 ] = norm -> x;
+			f[ 1 ] = norm -> y;
+			f[ 2 ] = norm -> z;
+
+			f = _vertexBuffer.normal( pointIndex + 2 );
+			f[ 0 ] = norm -> x;
+			f[ 1 ] = norm -> y;
+			f[ 2 ] = norm -> z;
+
+			pointIndex += 3;
+		}
+	}
+
+	_vertexBuffer.bind();
+	_vertexBuffer.draw( VB_TRIANGLES );
+	_vertexBuffer.unbind();
 }
 
 void slShape::slMatrixToODEMatrix( const double inM[ 3 ][ 3 ], dReal *outM ) {
@@ -218,22 +233,21 @@ void slShape::retain() {
 }
 
 void slShape::release() {
-	if ( --_referenceCount ) return;
+	if ( --_referenceCount ) 
+		return;
+		
 	delete this;
 }
 
 slShape::~slShape() {
 	std::vector< slFeature* >::iterator fi;
 
-	for ( fi = features.begin() ; fi != features.end(); fi++ ) delete *fi;
-
-#ifndef OPENGLES
-	if ( _drawList ) 
-		glDeleteLists( _drawList, 1 );
-#endif
+	for ( fi = features.begin() ; fi != features.end(); fi++ ) 
+		delete *fi;
 
 	if( _odeGeomID[ 0 ] ) 
 		dGeomDestroy( _odeGeomID[ 0 ] );
+
 	if( _odeGeomID[ 1 ] ) 
 		dGeomDestroy( _odeGeomID[ 1 ] );
 }
@@ -256,13 +270,12 @@ void slShape::finishShape( double density ) {
 		throw slException( "an error occurred computing the mass for this shape" );
 }
 
-/*!
-	\brief Sets the mass of the shape.
-
-	Using the shape's volume, sets the density of the shape so that
-	the desired mass is achived.
-*/
-
+/**
+ * \brief Sets the mass of the shape.
+ * 
+ * Using the shape's volume, sets the density of the shape so that
+ * the desired mass is achived.
+ */
 void slShape::setMass( double newMass ) {
 	double volume;
 

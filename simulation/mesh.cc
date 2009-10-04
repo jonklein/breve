@@ -118,12 +118,6 @@ slMeshShape::~slMeshShape() {
 		delete[] _indices;
 }
 
-
-
-void slMeshShape::draw( slCamera *c, double inTScaleX, double inTScaleY, int mode, int flags ) {
-	slShape::draw( c, inTScaleX, inTScaleY, mode, flags );
-}
-
 void slMeshShape::updateLastPosition( slPosition *inPosition ) {
 	dMatrix4 transform;
 
@@ -332,37 +326,6 @@ void slMeshShape::finishShape( double density ) {
 
 	slShape::finishShape( density );
 }
-
-void slMeshShape::drawBounds( slCamera *inCamera ) {
-	glColor4f( 0, 0, 0, 0.7 );
-
-#ifndef OPENGLES
-	glBegin( GL_LINE_LOOP );
-	glVertex3f( _min.x, _min.y, _min.z );
-	glVertex3f( _max.x, _min.y, _min.z );
-	glVertex3f( _max.x, _max.y, _min.z );
-	glVertex3f( _min.x, _max.y, _min.z );
-
-	glVertex3f( _min.x, _max.y, _max.z );
-	glVertex3f( _max.x, _max.y, _max.z );
-	glVertex3f( _max.x, _max.y, _min.z );
-	glVertex3f( _min.x, _max.y, _min.z );
-	glEnd();
-
-	glBegin( GL_LINE_LOOP );
-	glVertex3f( _min.x, _min.y, _max.z );
-	glVertex3f( _max.x, _min.y, _max.z );
-	glVertex3f( _max.x, _min.y, _min.z );
-	glVertex3f( _min.x, _min.y, _min.z );
-
-	glVertex3f( _min.x, _min.y, _max.z );
-	glVertex3f( _max.x, _min.y, _max.z );
-	glVertex3f( _max.x, _max.y, _max.z );
-	glVertex3f( _min.x, _max.y, _max.z );
-	glEnd();
-#endif
-}
-
 
 #ifdef HAVE_LIB3DS
 
@@ -608,7 +571,15 @@ double sl3DSShape::maxReach() {
 	return _maxReach;
 }
 
-void sl3DSShape::draw() {
+void sl3DSShape::draw( const slRenderGL& inRenderer ) {
+	for( unsigned int n = 0; n < _materialList.size(); n++ ) {
+		slMaterial *material = &_materialList[ n ];
+
+		if( !material -> _texture && material -> _texturePath.size() > 0 )
+			material -> _texture = new slTexture2D( &material -> _texturePath );
+	}
+
+
 	slMaterial *material = NULL;
 
 	glPushAttrib( GL_TRANSFORM_BIT );
@@ -666,37 +637,6 @@ void sl3DSShape::draw() {
 	 }
 
 	glPopAttrib();
-}
-
-void sl3DSShape::draw( slCamera *c, double textureScaleX, double textureScaleY, int mode, int flags ) {
-	for( unsigned int n = 0; n < _materialList.size(); n++ ) {
-		slMaterial *material = &_materialList[ n ];
-
-		if( !material -> _texture && material -> _texturePath.size() > 0 )
-			material -> _texture = new slTexture2D( &material -> _texturePath );
-	}
-
-	glDisable( GL_CULL_FACE );
-
-	if ( _drawList == 0 || _recompile ) {
-		if ( _drawList == 0 ) 
-			_drawList = glGenLists( 1 );
-
-		glNewList( _drawList, GL_COMPILE );
-
-		draw();
-
-		glEndList();
-
-		_recompile = 0;
-	}
-
-	if( !( flags & DO_NO_COLOR ) ) 
-		glDisable( GL_COLOR_MATERIAL );
-
-	glCallList( _drawList );
-
-	glEnable( GL_COLOR_MATERIAL );
 }
 
 #endif

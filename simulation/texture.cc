@@ -77,7 +77,6 @@ void slTexture2D::loadPixels( const unsigned char *pixels, int inWidth, int inHe
 
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, edge );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, edge );
-	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
 	if ( _sizeX != inWidth || _sizeY != inHeight ) {
 		int xstart, ystart;
@@ -131,6 +130,24 @@ slVertexBufferGL::slVertexBufferGL( int inVertexCount, int inPixelFormat ) {
 	
 	if( inVertexCount && inPixelFormat )
 		resize( inVertexCount, inPixelFormat );
+}
+
+void slVertexBufferGL::draw( slVertexBufferDrawType inType ) const { 
+	GLenum drawType = 0;
+	
+	switch( inType ) {
+		case VB_TRIANGLE_STRIP:
+			drawType = GL_TRIANGLE_STRIP;
+			break;
+		case VB_TRIANGLES:
+			drawType = GL_TRIANGLES;
+			break;
+		case VB_LINE_STRIP:
+			drawType = GL_LINE_STRIP;
+			break;
+	}
+	
+	glDrawArrays( drawType, 0, _vertexCount ); 
 }
 
 void slVertexBufferGL::bind() {

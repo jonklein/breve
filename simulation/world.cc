@@ -19,8 +19,9 @@
  *****************************************************************************/
 
 int gPhysicsError;
-char *gPhysicsErrorMessage;
+const char *gPhysicsErrorMessage;
 
+#include "render.h"
 #include "simulation.h"
 #include "world.h"
 #include "tiger.h"
@@ -32,13 +33,13 @@ char *gPhysicsErrorMessage;
 #include "gldraw.h"
 
 void slODEErrorHandler( int errnum, const char *msg, va_list ap ) {
-	static char error[2048];
+	static char error[ 2048 ];
 
 	vsnprintf( error, 2047, msg, ap );
 
-	gPhysicsErrorMessage = ( char* )error;
+	gPhysicsErrorMessage = error;
 
-	slMessage( DEBUG_WARN, "ODE Engine message: %s\n", error );
+	slMessage( DEBUG_WARN, "ODE physics engine message: %s\n", error );
 }
 
 /**
@@ -46,8 +47,6 @@ void slODEErrorHandler( int errnum, const char *msg, va_list ap ) {
  */
 
 slWorld::slWorld() {
-	slVector g;
-
 	gPhysicsError = 0;
 	gPhysicsErrorMessage = NULL;
 
@@ -100,16 +99,15 @@ slWorld::slWorld() {
 
 	gisData = NULL;
 
+	slVector g;
 	slVectorSet( &g, 0.0, -9.81, 0.0 );
 
 	setGravity( &g );
 }
 
-slGISData *slWorldLoadTigerFile( slWorld *w, char *f, slTerrain *t ) {
-
-	w->gisData = new slGISData( f, t );
-
-	return w->gisData;
+slGISData *slWorld::loadTigerFile( char *f, slTerrain *t ) {
+	gisData = new slGISData( f, t );
+	return gisData;
 }
 
 /**
@@ -139,8 +137,8 @@ int slWorld::startNetsimServer() {
 }
 
 /**
-	\brief Startup as a netsim slave.
-*/
+ * \brief Startup as a netsim slave.
+ */
 
 int slWorld::startNetsimSlave( const char *host ) {
 #if HAVE_LIBENET
@@ -197,6 +195,19 @@ slWorld::~slWorld() {
 	dCloseODE();
 }
 
+
+void slWorld::draw( const slRenderGL& inRenderer ) {
+	inRenderer.Clear();
+	
+	for ( unsigned int n = 0; n < _objects.size(); n++ ) {
+		slWorldObject *wo = _objects[ n ];
+		
+		if( wo )
+			wo -> draw( inRenderer );
+	}
+}
+
+
 /**
  * \brief Adds a camera to the world.
  */
@@ -207,7 +218,7 @@ void slWorld::addCamera( slCamera *camera ) {
 
 /**
  * \brief Removes a camera from the world.
-*/
+ */
 
 void slWorld::removeCamera( slCamera *camera ) {
 	std::vector<slCamera*>::iterator ci;
@@ -218,15 +229,15 @@ void slWorld::removeCamera( slCamera *camera ) {
 }
 
 /**
-	\brief Renders all of the cameras in the world .
-*/
+ * \brief Renders all of the cameras in the world .
+ */
 
-void slWorld::renderCameras() {
-	std::vector<slCamera*>::iterator ci;
-
-	for ( ci = _cameras.begin(); ci != _cameras.end(); ci++ )
-		( *ci )->renderWorld( this, 0, 1 );
-}
+//void slWorld::renderCameras() {
+//	std::vector<slCamera*>::iterator ci;
+//
+//	for ( ci = _cameras.begin(); ci != _cameras.end(); ci++ )
+//		( *ci )->renderWorld( this, 0, 1 );
+//}
 
 /**
  * Adds an object to the world.
@@ -568,8 +579,8 @@ void slWorld::updateNeighbors() {
 	}
 }
 
-void slWorld::setGravity( slVector *gravity ) {
-	dWorldSetGravity( _odeWorldID, gravity->x, gravity->y, gravity->z );
+void slWorld::setGravity( slVector *inG ) {
+	dWorldSetGravity( _odeWorldID, inG -> x, inG -> y, inG -> z );
 }
 
 slObjectLine *slWorld::addObjectLine( slWorldObject *src, slWorldObject *dst, int stipple, slVector *color ) {

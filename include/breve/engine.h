@@ -30,7 +30,7 @@
 #include <string>
 #include <algorithm>
 
-#include "simulation.h"
+#include "render.h"
 #include "timeval.h"
 #include "url.h"
 #include "sound.h"
@@ -145,7 +145,7 @@ typedef struct brObjectType brObjectType;
 
 class brEngine {
 	public:
-		brEngine() {};
+		brEngine();
 
 		brEngine( int inArgc, char **inArgv ) { 
 				_argc = inArgc; 
@@ -157,10 +157,15 @@ class brEngine {
 		std::vector< brObjectType* > 		_objectTypes;
 		std::vector< brInstance* > 		_freedInstances;
 
+		int 					iterate();
+		void					draw();
+
+		brInstance*				getController() const { return _controller; }
+		int						setController( brInstance *inController );
+
 		const char 				*runSaveDialog();
 		const char 				*runLoadDialog();
 		void					setMouseLocation( int inX, int inY );
-
 
 #ifdef HAVE_LIBCURL
 		brURLFetcher			_url;
@@ -172,6 +177,8 @@ class brEngine {
 
 		slWorld* 				world;
 		slCamera*				camera;
+
+		slRenderGL				_renderer;
 
 		gsl_rng*				RNG;
 
@@ -185,8 +192,10 @@ class brEngine {
 
 		FILE*					_logFile;
 
-		brInstance*				controller;
+private:
+		brInstance*				_controller;
 
+public:
 		std::map< std::string, brObject* > 	objectAliases;
 		std::map< std::string, brObject* > 	objects;
 		brNamespace*				internalMethods;
@@ -305,12 +314,6 @@ extern "C" {
 
 brEvent *brEngineAddEvent(brEngine *, brInstance *, char *, double, double);
 void brEventFree(brEvent *);
-
-int brEngineSetController(brEngine *, brInstance *);
-
-brInstance *brEngineGetController(brEngine *);
-
-int brEngineIterate(brEngine *);
 
 void brEngineSetIOPath(brEngine *, const char *);
 char *brOutputPath(brEngine *, const char *);

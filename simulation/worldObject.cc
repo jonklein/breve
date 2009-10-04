@@ -3,56 +3,114 @@
 #include "glIncludes.h"
 #include "sensor.h"
 
-#include "gldraw.h"
+#include "render.h"
 #include "world.h"
 
-void slWorldObject::draw( slCamera *camera, bool inUseDrawMode ) {
+slWorldObject::slWorldObject() {
+	_drawMode = 0;
+	_texture = NULL;
+	_textureMode = 0;
+	_textureScaleX = 16;
+	_textureScaleY = 16;
+	_simulate = 0;
+	_drawAsPoint = false;
+	_drawShadow = true;
+
+	_lightExposure = 0;
+
+	_shape = NULL;
+	_displayShape = NULL;
+
+	_proximityRadius = 0.00001;
+
+	_billboardRotation = 0;
+	_alpha = 1.0;
+
+	_userData = NULL;
+
+	_e = 0.4;
+	_mu = 0.15;
+
+	slVectorSet(&_color, 1, 1, 1);
+
+	slMatrixIdentity(_position.rotation);
+	slVectorSet(&_position.location, 0, 0, 0);
+}
+
+slWorldObject::~slWorldObject() {
+	std::vector<slObjectConnection*>::iterator ci;
+
+	for(ci = _connections.begin(); ci != _connections.end(); ci++ ) {
+		(*ci)->_src = NULL;
+		(*ci)->_dst = NULL;
+	}
+
+	if( _shape ) 
+		_shape -> release();
+
+	if( _displayShape ) 
+		_displayShape -> release();
+
+}
+
+void slWorldObject::draw( const slRenderGL& inRenderer ) {
 	if ( _displayShape ) {
-		glPushMatrix();
+	
+		inRenderer.pushMatrix( slMatrixGeometry );
+		inRenderer.translate( slMatrixGeometry, _position.location.x, _position.location.y, _position.location.z );
 
-		glTranslatef( _position.location.x, _position.location.y, _position.location.z );
+		inRenderer.mulMatrix( slMatrixGeometry, _position.rotation );
+		inRenderer.mulMatrix( slMatrixGeometry, _displayShape -> _transform );
 
-		slMatrixGLMult( _position.rotation );
-		slMatrixGLMult( _displayShape -> _transform );
+		inRenderer.pushMatrix( slMatrixTexture );
 
-		if( !inUseDrawMode )
-			_displayShape -> draw( camera, 0, 0, 0, 0 );
-		else
-			_displayShape -> draw( camera, _textureScaleX, _textureScaleY, _drawMode, 0 );
+		inRenderer.translate( slMatrixTexture, 0.5, 0.5, 0.0 );
+		
+		float c[] = { _color.x, _color.y, _color.z, _alpha };
+		inRenderer.SetBlendColor( c );
 
-		if( ( _drawMode & DM_BOUND ) ) {
-			#ifndef OPENGLES
-			glPushAttrib( GL_ENABLE_BIT );
-			glDisable( GL_LIGHTING );
-			_displayShape -> drawBounds( camera );
-			glPopAttrib();
-			#endif
-		}
+		if( _textureScaleX > 0.0 && _textureScaleY > 0.0 )
+			inRenderer.scale( slMatrixTexture, 1.0 / _textureScaleX, 1.0 / _textureScaleY, 1.0 );
 
-		glPopMatrix();
+		_displayShape -> draw( inRenderer );
+
+		inRenderer.popMatrix( slMatrixTexture );
+		inRenderer.popMatrix( slMatrixGeometry );
 	}
 }
 
-void slObjectLine::draw( slCamera *camera ) {
-	const slVector *x, *y;
+void slObjectLine::draw( slCamera *camera ) {	
+	if( _src && _dst && _stipple ) {
+		const slVector *v1 = &_src->getPosition().location;
+		const slVector *v2 = &_dst->getPosition().location;
 
-	if ( !_src || !_dst || !_stipple ) return;
-
-	x = &_src->getPosition().location;
-	y = &_dst->getPosition().location;
 #ifndef OPENGLES
-	glLineStipple( 2, _stipple );
-	glEnable( GL_LINE_STIPPLE );
-
-	glColor4f( _color.x, _color.y, _color.z, _transparency );
-
-	glBegin( GL_LINES );
-	glVertex3f( x->x, x->y, x->z );
-	glVertex3f( y->x, y->y, y->z );
-	glEnd();
-
-	glDisable( GL_LINE_STIPPLE );
+		glLineStipple( 2, _stipple );
+		glEnable( GL_LINE_STIPPLE );
 #endif
+
+		slVertexBufferGL buffer;
+		buffer.resize( 2, VB_XYZ );
+
+		float *v;
+
+		glColor4f( _color.x, _color.y, _color.z, _transparency );
+
+		v = buffer.vertex( 0 );
+		v[ 0 ] = v1 -> x;
+		v[ 1 ] = v1 -> y;
+		v[ 2 ] = v1 -> z;
+		v = buffer.vertex( 1 );
+		v[ 0 ] = v2 -> x;
+		v[ 1 ] = v2 -> y;
+		v[ 2 ] = v2 -> z;
+
+		buffer.draw( VB_LINE_STRIP );
+
+#ifndef OPENGLES
+		glDisable( GL_LINE_STIPPLE );
+#endif
+	}
 }
 
 void slWorldObject::setCallbackData( void *data ) {
@@ -181,9 +239,6 @@ int slWorldObject::raytrace( slVector *location, slVector* direction, slVector *
 
 	slVectorInvXform( _position.rotation, &loc_wo_help, &loc_wo );
 
-//   slMessage(DEBUG_ALL, " [ %f, %f, %f ] %f %f ", dir_wo.x, dir_wo.y, dir_wo.z, atan2(dir_wo.z, dir_wo.x)*180/M_PI, atan2(direction->z, direction->x)*180/M_PI );
-//   slMessage(DEBUG_ALL, " [ %f, %f, %f ] ", loc_wo.x, loc_wo.y, loc_wo.z );
-
 	slVector point;
 
 	if ( _shape->rayHitsShape( &dir_wo, &loc_wo, &point ) < 0 ) {
@@ -194,8 +249,6 @@ int slWorldObject::raytrace( slVector *location, slVector* direction, slVector *
 	double d = slVectorLength( &point );
 
 	slVectorMul( &direction_norm, d, erg_dir );
-
-//	slMessage(DEBUG_ALL, "wo: erg_dir: [ %f, %f, %f ] distance:%f \n", erg_dir->x, erg_dir->y, erg_dir->z ,slVectorLength(erg_dir));
 
 	return 0;
 }

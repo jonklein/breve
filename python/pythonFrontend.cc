@@ -424,7 +424,7 @@ PyObject *brPythonSetController( PyObject *inSelf, PyObject *inArgs ) {
 	Py_DECREF( engineObject );
 	Py_DECREF( instanceObject );
 
-	if( brEngineSetController( engine, instance ) ) {
+	if( engine -> setController( instance ) ) {
 		PyErr_SetString( PyExc_RuntimeError, "Could not set controller object for breve simulation" );
 		return NULL;
 	}
