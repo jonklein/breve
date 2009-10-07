@@ -22,6 +22,7 @@
 #define _VCLIP_H
 
 typedef unsigned char slPairFlags;
+class slCollisionCandidate;
 
 #include "vclipData.h"
 #include "world.h"

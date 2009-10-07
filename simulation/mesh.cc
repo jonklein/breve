@@ -8,7 +8,6 @@
 
 #include "simulation.h"
 #include "mesh.h"
-#include "gldraw.h"
 
 slMeshShape::slMeshShape() : slShape() {
 	_vertices = NULL;
@@ -98,7 +97,7 @@ int slMeshShape::createODEGeom() {
 }
 
 void slMeshShape::bounds( const slPosition *position, slVector *outMin, slVector *outMax ) const {
-	float scale = MAX( _transform[ 0 ][ 0 ], MAX( _transform[ 1 ][ 1 ], _transform[ 2 ][ 2 ] ) );
+	float scale = slMAX( _transform[ 0 ][ 0 ], slMAX( _transform[ 1 ][ 1 ], _transform[ 2 ][ 2 ] ) );
 	float reach = _maxReach * scale;
 
 	outMax->x = position->location.x + reach;

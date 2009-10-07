@@ -20,7 +20,7 @@
 
 #include "simulation.h"
 #include "glIncludes.h"
-#include "gldraw.h"
+
 #include "world.h"
 #include "camera.h"
 #include "shadowvolume.h"
@@ -31,12 +31,12 @@ void slShape::drawShadowVolume( slCamera *c, slPosition *p ) {
 	slVector light;
 	slVector lNormal;
 
+#if 0
 	slVectorCopy( &c->_lights[ 0 ]._location, &light );
 	slVectorCopy( &light, &lNormal );
 	slVectorNormalize( &lNormal );
 	slVectorMul( &light, 5, &light );
 
-#ifndef OPENGLES
 	glBegin( GL_QUADS );
 
 	for ( ei = edges.begin(); ei != edges.end(); ei++ ) {
@@ -118,7 +118,7 @@ void slShape::drawShadowVolume( slCamera *c, slPosition *p ) {
 
 void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
 
-#ifndef OPENGLES
+#if 0
 	slVector light, lNormal, x1, x2, lastV;
 	int n, first = 1;
 	double diff;
@@ -219,7 +219,7 @@ void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
 }
 
 void slCamera::renderShadowVolume( slWorld *w ) {
-#ifndef OPENGLES
+#if 0
 	setupLights( 0 );
 
 	glClear( GL_STENCIL_BUFFER_BIT );

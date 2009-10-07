@@ -20,9 +20,9 @@
 
 #include "kernel.h"
 #include "world.h"
-#include "gldraw.h"
 #include "camera.h"
 #include "movie.h"
+#include "render.h"
 
 #ifndef WINDOWS
 #include <dlfcn.h>
@@ -612,8 +612,7 @@ char *brFindFile( brEngine *e, const char *file, struct stat *st ) {
  */
 
 void brEngine::draw() {
-	_renderer.ApplyCamera( camera );
-	world -> draw( _renderer );
+	world -> draw( _renderer, camera );
 }
 
 /*@}*/

@@ -26,6 +26,8 @@
 #include "worldObject.h"
 #include "multibody.h"
 
+class slJoint;
+
 /*!
 	\brief Holds link state data in an integratable structure.
 

@@ -123,7 +123,7 @@ class slPatchGrid {
 		void draw(slCamera *camera);
 		void drawWithout3DTexture(slCamera *camera);
 
-		void setSmoothDrawing(int d) { drawSmooth = d; }
+		void setSmoothDrawing( bool inSmooth ) { drawSmooth = inSmooth; }
 
 		void textureDrawXPass( slVector &size, int dir );
 		void textureDrawYPass( slVector &size, int dir );
@@ -161,7 +161,7 @@ class slPatchGrid {
 		unsigned int _textureY;
 		unsigned int _textureZ;
 
-		int drawSmooth;
+		bool drawSmooth;
 
 		slTexture2D*			_texture;
 		int 					_cubeDrawList;

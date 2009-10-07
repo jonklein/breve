@@ -40,26 +40,13 @@ int brICameraSetZClip( brEval args[], brEval *target, brInstance *i ) {
 	return EC_OK;
 }
 
-/*!
-	\brief Sets OpenGL smoothing for a camera.
-
-	void cameraSetDrawSmooth(int smooth).
-*/
-
-int brICameraSetDrawSmooth( brEval args[], brEval *target, brInstance *i ) {
-	slCamera *camera = BRCAMERAPOINTER( &args[0] );
-	camera->_drawSmooth = BRINT( &args[1] );
-	camera->setRecompile();
-	return EC_OK;
-}
-
-/*!
-	\brief Clears the camera with the background color.
-*/
+/**
+ * \brief Clears the camera with the background color.
+ */
 
 int brICameraClear( brEval args[], brEval *target, brInstance *i ) {
 	slCamera *camera = BRCAMERAPOINTER( &args[0] );
-	slWorld *w = i->engine->world;
+	slWorld *w = i -> engine-> world;
 
 	if ( camera->_activateContextCallback ) 
 		camera -> _activateContextCallback();
@@ -340,7 +327,6 @@ void breveInitCameraFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "cameraGetHeight", brICameraGetHeight, AT_INT, AT_POINTER, 0 );
 	brNewBreveCall( n, "cameraGetWidth", brICameraGetWidth, AT_INT, AT_POINTER, 0 );
 
-	brNewBreveCall( n, "cameraSetDrawSmooth", brICameraSetDrawSmooth, AT_NULL, AT_POINTER, AT_INT, 0 );
 	brNewBreveCall( n, "cameraSetDrawFog", brICameraSetDrawFog, AT_NULL, AT_POINTER, AT_INT, 0 );
 	brNewBreveCall( n, "cameraSetFogIntensity", brICameraSetDrawFog, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "cameraSetFogColor", brICameraSetFogColor, AT_NULL, AT_POINTER, AT_VECTOR, 0 );

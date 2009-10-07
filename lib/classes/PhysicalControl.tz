@@ -10,8 +10,8 @@ Control : PhysicalControl [version 1.8] {
 		gravityMenu (list).
 
 	+ to init:
-		self set-integration-step to .008.
-		self set-iteration-step to .05.
+		self set-integration-step to .0125.
+		self set-iteration-step to .025.
 
 		self set-fast-physics-iterations to 40.
 

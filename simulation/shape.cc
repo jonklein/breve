@@ -20,7 +20,6 @@
 
 #include "simulation.h"
 #include "glIncludes.h"
-#include "gldraw.h"
 #include "camera.h"
 #include "volInt.h"
 #include "vclip.h"

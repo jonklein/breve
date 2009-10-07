@@ -1275,10 +1275,7 @@ inline int stRealEvalMethodCall( stMethodExp *mexp, stRunInstance *target, stRun
 
 			// can't find the method!
 
-			char *kstring = "keywords";
-
-			if ( mexp->arguments.size() == 1 )
-				kstring = "keyword";
+			const char *kstring = mexp -> arguments.size() == 1 ? "keyword" : "keywords";
 
 			target->type = target->instance->type;
 

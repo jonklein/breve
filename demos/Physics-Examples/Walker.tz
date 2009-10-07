@@ -3,9 +3,9 @@
 # jon klein <jk@spiderland.org>
 # 
 # Walker is an attempt to evolve locomotion behavior for a simple 
-# creature using a genetic algorithm.  THIS DEMO MAY REQUIRE AT
-# LEAST 30 MINUTES BEFORE WALKING BEHAVIORS ARE OBSERVED.  
-# It may be best to run this demo overnight.  Additionally, it 
+# creature using a genetic algorithm.  THIS DEMO MAY REQUIRE MANY
+# GENERATIONS BEFORE WALKING BEHAVIORS ARE OBSERVED, so it may 
+# be best to run this demo overnight.  Additionally, it 
 # is possible that no evolution will occur during the course of 
 # a simulation, so if you don't see results after an hour or two, 
 # start the simulation over again so that a new random population 
@@ -42,12 +42,11 @@
 
 @define SPEED_K 10.
 
-Controller Walker.
+Controller WalkerSim.
 
-PhysicalControl : Walker {
+PhysicalControl : WalkerSim {
 	+ variables:
-		seats, monkeys (list).
-
+		seats, walkerControllers (list).
 		currentSeat (int).
 
 		walker (object).
@@ -59,19 +58,24 @@ PhysicalControl : Walker {
 
 		lockMenu, symMenu (object).
 
-		cloudTexture (object).
-
 	+ to init:
 		floor (object).
 		number (int).
 		item (object).
+		outline (object).
 
 		locked = 0.
 
 		self set-random-seed-from-dev-random.
 
-		self enable-fast-physics.
-		self set-fast-physics-iterations to 5.
+		# self set-mountain-skybox.
+
+        self set-skybox-images to {
+            "images/MountainBoxFrontSm.png", "images/MountainBoxBackSm.png",
+            "images/MountainBoxLeftSm.png", "images/MountainBoxRightSm.png",
+            "images/MountainBoxTopSm.png", "images/MountainBoxBottomSm.png" }.
+
+		self set-fast-physics-iterations to 10.
 	
 		# these are the default values anyway...
 
@@ -85,27 +89,27 @@ PhysicalControl : Walker {
 		floor = new Floor.
 		floor catch-shadows.
 
-		cloudTexture = (new Image load from "images/clouds.png").
+		# outline = new Stationary.
+		# outline set-shape to ( new PolygonDisk init-with sides 20 height 1 radius 30.0 ).
+		# outline move to (0, 0, 0).
+		# outline set-transparency to 0.8.
 
 		self enable-shadow-volumes.
 		self enable-reflections.
 
-		self set-background-color to (.4, .6, .9).
-		self set-background-texture-image to cloudTexture.
+		# Create the Walker.
 
-		# Create the Creature.
-
-		walker = new Creature.
+		walker = new Walker.
 		walker move to (0, 6, 0).
-		self offset-camera by (3, 13, -13).
+		self offset-camera by (13, 3, -13).
 		self watch item walker.
 
-		# The "Monkeys" are the individuals that will control the Creature.
-		# Create the Monkeys and assign them numbers.
+		# The "WalkerController" are the individuals that will control the Walker.
+		# Create the WalkerController and assign them numbers.
 
-		monkeys = 15 new Monkeys.
+		walkerControllers = 15 new WalkerController.
 
-		foreach item in monkeys: {
+		foreach item in walkerControllers: {
 			(item set-number to number).
 			number += 1.
 		}
@@ -135,7 +139,7 @@ PhysicalControl : Walker {
 		self set-display-text to "Driver #$currentNumber" at-x -.95 at-y -.9.
 
 	+ to iterate:
-		seats{currentSeat} control robot walker at-time (self get-time).
+		seats{ currentSeat } control robot walker at-time (self get-time).
 
 		super iterate.
 
@@ -143,12 +147,12 @@ PhysicalControl : Walker {
 		# pick 4 new drivers at random.  we do this by sorting the 
 		# list randomly and picking the first 4 items.
 
-		sort monkeys with random-sort.
+		sort walkerControllers with random-sort.
 
-		seats{0} = monkeys{0}.
-		seats{1} = monkeys{1}.
-		seats{2} = monkeys{2}.
-		seats{3} = monkeys{3}.
+		seats{0} = walkerControllers{0}.
+		seats{1} = walkerControllers{1}.
+		seats{2} = walkerControllers{2}.
+		seats{3} = walkerControllers{3}.
 
 		currentSeat = 0.
 
@@ -157,6 +161,7 @@ PhysicalControl : Walker {
 
 	+ to change-drivers:
 		newDriver (int).
+		newDist (double).
 		newOffset (vector).
 
 		# if they have locked the current driver, do nothing.
@@ -165,12 +170,19 @@ PhysicalControl : Walker {
 
 		# pick a new camera angle and pan...
 
-		newOffset = random[(30, 6, 30)] + (-15, 1, -15).
-		if |newOffset| < 14: newOffset = 14 * newOffset/|newOffset|.
+		newDist = random[ 12 ] + 10.
+
+		newOffset = random[ ( 2, 0, 2 ) ] - ( 1, 0, 1 ).
+		newOffset /= | newOffset |.
+		newOffset::x *= newDist.
+		newOffset::y = 3.
+		newOffset::z *= newDist.
+
+		print newOffset.
 		self pan-camera-offset by newOffset steps 30.
 
-		# we change the drivers every time a monkey is finished it's 
-		# turn.  if we have seen the last monkey, breed them together.
+		# we change the drivers every time a controller is finished it's 
+		# turn.  if we have seen the last controller , breed them together.
 
 		seats{currentSeat} set-distance to |(walker get-location)|.
 		walker center.
@@ -178,7 +190,7 @@ PhysicalControl : Walker {
 		currentSeat += 1.
 
 		if currentSeat > 3: {
-			self breed-new-monkeys.
+			self breed-new-controllers.
 			self pick-drivers.
 		}
 
@@ -189,8 +201,8 @@ PhysicalControl : Walker {
 		self schedule method-call "change-drivers" at-time (self get-time) + 20.0.
 		self display-current-driver.
 
-	+ to breed-new-monkeys:
-		print "breeding monkeys...".
+	+ to breed-new-controllers:
+		print "Breeding controllers...".
 
 		sort seats with compare-distance.
 
@@ -237,7 +249,7 @@ PhysicalControl : Walker {
 		(seats{currentSeat} get-genome) load-with-dialog.
 }
 
-Object : Monkeys {
+Object : WalkerController {
 	+ variables:
 		distanceTraveled (float).
 		genome (object).
@@ -251,7 +263,7 @@ Object : Monkeys {
 		return number.
 	
 	+ to init:
-		genome = new MonkeyGenome.
+		genome = new WalkerGenome.
 		self randomize.
 
 	+ to randomize:
@@ -276,7 +288,7 @@ Object : Monkeys {
 		return distanceTraveled.
 }
 
-Object : MonkeyGenome {
+Object : WalkerGenome {
 	+ variables:
 		genomeData (list).
 
@@ -284,7 +296,7 @@ Object : MonkeyGenome {
 		genomeData = { 0, 0, 0, 0, 0, 0, 0, 0, 0 }.
 
 	+ to randomize:
-		genomeData{8} = random[5.0] - 2.5.
+		genomeData{8} = 1 + random[ 7.0 ].
 
 		genomeData{0} = random[2.0] - 1.0.
 		genomeData{1} = random[2.0] - 1.0.
@@ -337,12 +349,12 @@ Object : MonkeyGenome {
 
 		if n < 4: genomeData{n} = random[2.0] - 1.0.
 		else if n < 8: genomeData{n} = random[6.3] - 3.15.
-		else genomeData{n} = random[5.0] - 2.5.
+		else genomeData{n} = 1 + random[ 7.0 ].
 
 		print "mutated item $n of $self".
 }
 
-MultiBody : Creature {
+MultiBody : Walker {
 	+ variables:
 		bodyLink (object).
 		links (list).
@@ -353,6 +365,7 @@ MultiBody : Creature {
 
 	+ to init:
 		counter (int).
+		gray (double).
 		linkShape, lowerLinkShape, bodyShape (object).
 
 		self add-menu named "Send to Center" for-method "center".
@@ -373,6 +386,8 @@ MultiBody : Creature {
 		links{5} set-shape to lowerLinkShape.
 		links{7} set-shape to lowerLinkShape.
 
+		links set-mu to .8.
+
 		self add-dependency on joints{0}.
 		self add-dependency on joints{1}.
 		self add-dependency on joints{2}.
@@ -382,7 +397,16 @@ MultiBody : Creature {
 		self add-dependency on joints{6}.
 		self add-dependency on joints{7}.
 
-		links set-color to random[(1.0, 1.0, 1.0)].
+		gray = random[ .7 ].
+		links{ 0 } set-color to ( gray, gray, gray ).
+		links{ 2 } set-color to ( gray, gray, gray ).
+		links{ 4 } set-color to ( gray, gray, gray ).
+		links{ 6 } set-color to ( gray, gray, gray ).
+		gray = random[ .5 ].
+		links{ 1 } set-color to ( gray, gray, gray ).
+		links{ 3 } set-color to ( gray, gray, gray ).
+		links{ 5 } set-color to ( gray, gray, gray ).
+		links{ 7 } set-color to ( gray, gray, gray ).
 
 		bodyLink = new Link.
 		bodyLink set-shape to bodyShape.
@@ -449,8 +473,8 @@ MultiBody : Creature {
 		
 		self rotate around-axis (1, 0, 0) by 1.57.
 
-		joints set-double-spring with-strength 400 with-max .8 with-min -.8.
-		joints set-strength-limit to 300.
+		joints set-double-spring with-strength 150 with-max .8 with-min -.8.
+		joints set-strength-limit to 200.
 
 	+ to center:
 		# to center the object, we set the X and Z components to 0, but not

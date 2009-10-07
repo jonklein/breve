@@ -7,6 +7,7 @@
 class slWorld;
 class slRenderGL;
 class slVertexBufferGL;
+class slObjectConnection;
 
 class slWorldObject {
 	public:

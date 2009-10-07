@@ -23,7 +23,6 @@
 
 #include "simulation.h"
 #include "glIncludes.h"
-#include <string>
 
 class slTexture {
 
@@ -33,7 +32,7 @@ class slTexture2D : public slTexture {
 	friend class slPatchGrid;
 
 	public:
-					slTexture2D( const std::string *inImage = NULL, bool inRepeat = false );
+					slTexture2D( const std::string *inImage = NULL, bool inRepeat = true );
 
 					~slTexture2D();
 
@@ -44,10 +43,7 @@ class slTexture2D : public slTexture {
 
 		int			loadImage( const std::string &inImage, bool inRepeat = true );
 
-
-		void		createTextureID();
-
-		void 		bind() { 
+		void 		bind() const { 
 						if( _textureID != 0 ) {
 							glEnable( GL_TEXTURE_2D ); 
 							glBindTexture( GL_TEXTURE_2D, _textureID ); 
@@ -55,7 +51,7 @@ class slTexture2D : public slTexture {
 						}
 					}
 
-		void		unbind() {
+		void		unbind() const {
 						glBindTexture( GL_TEXTURE_2D, 0 ); 
 						glDisable( GL_TEXTURE_2D );
 					}
@@ -68,12 +64,15 @@ class slTexture2D : public slTexture {
 		float		_unitX;
 		float		_unitY;
 
+	protected:
+		void		createTextureID();
+
 		int			_sizeX;
 		int			_sizeY;
 
 		int			_texX;
 		int			_texY;
-	private:
+		
 		GLuint 		_textureID;
 };
 

@@ -62,10 +62,6 @@ slCamera::slCamera( int x, int y ) {
 
 	_ry = 0.001;
 
-	#ifndef OPENGLES
-	_drawMode = GL_POLYGON;
-	#endif
-
 	_shadowCatcher = NULL;
 
 	slVectorSet( &_target, 0, 0, 0 );
@@ -74,7 +70,6 @@ slCamera::slCamera( int x, int y ) {
 	_zoom = 10;
 
 	_drawFog = false;
-	_drawSmooth = false;
 	_drawLights = false;
 	_drawShadow = false;
 	_drawShadowVolumes = false;
@@ -92,9 +87,7 @@ slCamera::slCamera( int x, int y ) {
 	_billboards = ( slBillboardEntry** )slMalloc( sizeof( slBillboardEntry* ) * _maxBillboards );
 
 	_fogIntensity = .1;
-
 	_fogStart = 10;
-
 	_fogEnd = 40;
 
 	_readbackTexture = new slTexture2D();
@@ -102,12 +95,6 @@ slCamera::slCamera( int x, int y ) {
 	for ( n = 0; n < _maxBillboards; n++ ) 
 		_billboards[n] = new slBillboardEntry;
 
-	_lights[ 0 ]._type = LightInfinite;
-	slVectorSet( &_lights[0]._location, 0, 0, 0 );
-	slVectorSet( &_lights[0]._ambient, .2, .2, .2 );
-	slVectorSet( &_lights[0]._diffuse, .6, .9, .9 );
-	slVectorSet( &_lights[0]._specular, 1, 1, 1 );
-	
 	_billboardBuffer.resize( 4, VB_XYZ | VB_UV );
 }
 

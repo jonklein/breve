@@ -1,13 +1,9 @@
-#include <stdio.h>
-#include <math.h>
+
 #include "simulation.h"
-#include "glIncludes.h"
-#include "gldraw.h"
-#include "camera.h"
-#include "volInt.h"
-#include "vclip.h"
-#include "vclipData.h"
+#include "worldObject.h"
 #include "sensor.h"
+#include "vclip.h"
+
 using std::vector;
 using std::string;
 

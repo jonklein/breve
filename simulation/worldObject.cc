@@ -56,26 +56,33 @@ slWorldObject::~slWorldObject() {
 void slWorldObject::draw( const slRenderGL& inRenderer ) {
 	if ( _displayShape ) {
 	
-		inRenderer.pushMatrix( slMatrixGeometry );
-		inRenderer.translate( slMatrixGeometry, _position.location.x, _position.location.y, _position.location.z );
+		inRenderer.PushMatrix( slMatrixGeometry );
+		inRenderer.Translate( slMatrixGeometry, _position.location.x, _position.location.y, _position.location.z );
 
-		inRenderer.mulMatrix( slMatrixGeometry, _position.rotation );
-		inRenderer.mulMatrix( slMatrixGeometry, _displayShape -> _transform );
+		inRenderer.MulMatrix( slMatrixGeometry, _position.rotation );
+		inRenderer.MulMatrix( slMatrixGeometry, _displayShape -> _transform );
 
-		inRenderer.pushMatrix( slMatrixTexture );
+		if( _texture ) {	
+			inRenderer.PushMatrix( slMatrixTexture );
+			inRenderer.Translate( slMatrixTexture, 0.5, 0.5, 0.0 );
 
-		inRenderer.translate( slMatrixTexture, 0.5, 0.5, 0.0 );
+			if( _textureScaleX > 0.0 && _textureScaleY > 0.0 )
+				inRenderer.Scale( slMatrixTexture, 1.0 / _textureScaleX, 1.0 / _textureScaleY, 1.0 );
+
+			_texture -> bind();
+		}
 		
 		float c[] = { _color.x, _color.y, _color.z, _alpha };
 		inRenderer.SetBlendColor( c );
 
-		if( _textureScaleX > 0.0 && _textureScaleY > 0.0 )
-			inRenderer.scale( slMatrixTexture, 1.0 / _textureScaleX, 1.0 / _textureScaleY, 1.0 );
-
 		_displayShape -> draw( inRenderer );
 
-		inRenderer.popMatrix( slMatrixTexture );
-		inRenderer.popMatrix( slMatrixGeometry );
+		if( _texture ) {
+			inRenderer.PopMatrix( slMatrixTexture );
+			_texture -> unbind();
+		}
+		
+		inRenderer.PopMatrix( slMatrixGeometry );
 	}
 }
 
@@ -94,7 +101,8 @@ void slObjectLine::draw( slCamera *camera ) {
 
 		float *v;
 
-		glColor4f( _color.x, _color.y, _color.z, _transparency );
+		// float c[] = { _color.x, _color.y, _color.z, _transparency };
+		// inRenderer.SetBlendColor( c );
 
 		v = buffer.vertex( 0 );
 		v[ 0 ] = v1 -> x;
@@ -145,12 +153,9 @@ void slWorldObject::setDrawAsPoint( bool p ) {
 	_drawAsPoint = p;
 }
 
-void slWorldObject::setTextureScale( double sx, double sy ) {
-	_textureScaleX = sx;
-	_textureScaleY = sy;
-
-	if ( _displayShape )
-		_displayShape->recompile();
+void slWorldObject::setTextureScale( double inTX, double inTY ) {
+	_textureScaleX = inTX;
+	_textureScaleY = inTY;
 }
 
 void slWorldObject::setBitmapRotation( double rot ) {

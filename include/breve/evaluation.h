@@ -42,10 +42,9 @@ struct stRunInstance {
 */
 
 struct stStackRecord {
-	stInstance *instance;
-	stMethod *method;
-	stStackRecord *previousStackRecord;
-	slStack *gcStack;
+	stInstance*		instance;
+	stMethod*		method;
+	stStackRecord*	previousStackRecord;
 };
 
 #define USE_RTC 1

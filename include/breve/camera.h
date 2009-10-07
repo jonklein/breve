@@ -30,6 +30,7 @@
 class slWorldObject;
 class slWorld;
 class slStationary;
+class slRenderGL;
 
 enum billboardType {
 	BBT_NONE = 0,
@@ -37,42 +38,6 @@ enum billboardType {
 	BBT_LIGHTMAP
 };
 
-enum slRenderBlendMode {
-	SR_ALPHABLEND = 1,
-	SR_LIGHTBLEND
-};
-
-/**
- * \brief Holds location and color information for a light.
- */
-
-#define MAX_LIGHTS 8
-
-enum slLightTypes {
-	LightDisabled			= 0,
-	LightPoint,
-	LightSpot,
-	LightInfinite
-};
-
-struct slLight {
-	slLight() {
-		_constantAttenuation = 1.0;
-		_linearAttenuation = 0.0;
-
-		_type = LightDisabled;
-	}
-
-	slVector 		_location;
-	slVector 		_diffuse;
-	slVector 		_ambient;
-	slVector 		_specular;
-
-	float			_constantAttenuation;
-	float			_linearAttenuation;
-
-	int			_type;
-};
 
 /*!
 	\brief A string of text printed to the GL view.
@@ -144,7 +109,6 @@ class slCamera {
 		void sortBillboards();	
 	
 		void update();
-		void 			setBlendMode( slRenderBlendMode inBlendMode );
 
 		void rotateWithMouseMovement( double, double );
 		void moveWithMouseMovement( double, double );
@@ -155,7 +119,7 @@ class slCamera {
 		void setActivateContextCallback( int (*f)() );
 		void setCameraText( int n, char *string, float x, float y, slVector *v );
 	
-		int select( slWorld *w, int x, int y ) const { slMessage( DEBUG_ALL, "Vector for drag not implemented." ); return 0; }
+		int select( slWorld *inWorld, int inScreenX, int inScreenY ) const { slMessage( DEBUG_ALL, "Selection not implemented." ); return 0; }
 		int vectorForDrag( slWorld *w, slVector *dragVertex, int x, int y, slVector *dragVector ) const { slMessage( DEBUG_ALL, "Vector for drag not implemented." ); return 0; }
 
 		void renderShadowVolume( slWorld *w );
@@ -191,10 +155,8 @@ class slCamera {
 	
 		double _textScale;
 	
-		unsigned char _drawMode;
 		bool _drawLights;
 		bool _drawFog;
-		bool _drawSmooth;
 		bool _drawShadow;
 		bool _drawShadowVolumes;
 		bool _drawOutline;
@@ -211,7 +173,6 @@ class slCamera {
 		double						_fogEnd;
 	
 		slPlane						_shadowPlane;
-		slLight						_lights[ MAX_LIGHTS ];
 	
 		// offset & target of camera
 	
@@ -269,13 +230,10 @@ class slCamera {
 		void 						renderText( slWorld *w, int crosshair );
 		void 						renderLabels( slWorld *w );
 		void 						renderLines( slWorld *w );
-		void 						setupLights( int inAmbientOnly = 0 );
 		void 						drawBackground( slWorld *w );
 		void 						drawFog();
 
 		slVertexBufferGL			_billboardBuffer;
 };
-
-int slBillboardSortFunc(const void *, const void *);
 
 #endif /* _CAMERA_H */

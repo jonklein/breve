@@ -45,7 +45,7 @@ int gErrorLine = 0;
 
 extern brEngine *parseEngine;
 
-void yyerror(char *);
+void yyerror( const char* );
 
 FILE *docHandle = NULL;
 
@@ -218,7 +218,7 @@ path					{ return PATH; }
 
 .					{ return yytext[0]; }
 
-\"[^\"\n]*			{ yyerror("unterminated string constant"); }
+\"[^\"\n]*			{ yyerror( "unterminated string constant" ); }
 
 %%
 
@@ -226,10 +226,8 @@ int yywrap() {
     return 1;
 }
 
-void yyerror(char *c) {
+void yyerror( const char *c ) {
     stParseError(parseEngine, PE_PARSE, "%s in file \"%s\" at line %d near \"%s\"", c, yyfile, lineno, yytext);
-    // YY_FLUSH_BUFFER;
-
     gErrorLine = lineno;
 }
 

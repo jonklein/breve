@@ -25,26 +25,24 @@
 #include "config.h"
 
 #if WINDOWS
-#include <malloc.h>
-#define DLLEXPORT __declspec(dllexport)
-#elif defined(__GNUC__) && (__GNUC__ >= 4)
-#define DLLEXPORT __attribute__ ((visibility("default")))
+	#include <malloc.h>
+	#define DLLEXPORT __declspec(dllexport)
+#elif defined( __GNUC__ ) && ( __GNUC__ >= 4 )
+	#define DLLEXPORT __attribute__ ((visibility("default")))
 #else
-#define DLLEXPORT
-
-#include <malloc.h>
+	#define DLLEXPORT
+	#include <malloc.h>
 #endif
 
 #if MINGW
-#define usleep(x) _sleep((unsigned int)((x) / 1000.0))
-#define random rand
-#define srandom srand
+	#define usleep(x) _sleep((unsigned int)((x) / 1000.0))
+	#define random rand
+	#define srandom srand
 #endif
 
 #include "slerror.h"
 
-#include "utilTypedefs.h"
-
+#include "vector.h"
 #include "hash.h"
 #include "sllist.h"
 #include "matrix.h"
@@ -53,7 +51,6 @@
 #include "stringstream.h"
 #include "text.h"
 #include "quat.h"
-#include "vector.h"
 #include "buffer.h"
 
 #endif

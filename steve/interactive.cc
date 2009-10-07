@@ -13,7 +13,7 @@ extern int lineno;
  */
 
 int stRunSingleStatement( stSteveData *inSteveData, brEngine *inEngine, const char *inStatement ) {
-	char *file = "<user input>";
+	const char *file = "<user input>";
 	int length, r;
 	brInstance *controller;
 	char *fixedStatement;
@@ -36,7 +36,7 @@ int stRunSingleStatement( stSteveData *inSteveData, brEngine *inEngine, const ch
 	while ( statement[length] == '\n' || statement[length] == ' ' || statement[length] == '\t' ) 
 		length--;
 
-	if ( length > 0 && statement[length] != '.' ) 
+	if ( length > 0 && statement[length	] != '.' ) 
 		statement[length + 1] = '.';
 
 	fixedStatement = new char[strlen( statement ) + 5];

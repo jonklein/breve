@@ -31,8 +31,6 @@ enum jointTypes {
 	JT_FIX
 };
 
-class slLink;
-
 /*!
 	\brief A joint connecting two links.
 */

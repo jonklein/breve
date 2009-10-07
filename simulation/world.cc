@@ -75,9 +75,6 @@ slWorld::slWorld() {
 	_detectLightExposure = 0;
 	_drawLightExposure = 0;
 
-	_drawLightExposure = 0;
-	_detectLightExposure = 0;
-
 	_collisionCallback = NULL;
 	_collisionCheckCallback = NULL;
 
@@ -103,6 +100,16 @@ slWorld::slWorld() {
 	slVectorSet( &g, 0.0, -9.81, 0.0 );
 
 	setGravity( &g );
+
+
+
+	_lights[ 0 ]._type = LightInfinite;
+	slVectorSet( &_lights[0]._location, 0, 0, 0 );
+	slVectorSet( &_lights[0]._ambient, .2, .2, .2 );
+	slVectorSet( &_lights[0]._diffuse, .6, .9, .9 );
+	slVectorSet( &_lights[0]._specular, 1, 1, 1 );
+	
+
 }
 
 slGISData *slWorld::loadTigerFile( char *f, slTerrain *t ) {
@@ -196,16 +203,44 @@ slWorld::~slWorld() {
 }
 
 
-void slWorld::draw( const slRenderGL& inRenderer ) {
-	inRenderer.Clear();
+void slWorld::draw( slRenderGL& inRenderer, slCamera *inCamera ) {
+	float c[] = { backgroundColor.x, backgroundColor.y, backgroundColor.z, 1.0 };
+	inRenderer.Clear( c );
 	
+	inRenderer.ApplyCamera( inCamera );
+	inRenderer.SetBlendMode( slBlendAlpha );
+
+	_skybox.draw( inRenderer, inCamera );
+	
+
+	if( inCamera -> _drawLights ) {
+		for( int n = 0; n < MAX_LIGHTS; n++ ) { 
+			if( _lights[ n ]._type ) 
+				inRenderer.PushLight( &_lights[ n ] );
+		}
+	}
+
 	for ( unsigned int n = 0; n < _objects.size(); n++ ) {
 		slWorldObject *wo = _objects[ n ];
 		
 		if( wo )
 			wo -> draw( inRenderer );
 	}
+
+	if( inCamera -> _drawLights ) {
+		for( int n = 0; n < MAX_LIGHTS; n++ ) { 
+			if( _lights[ n ]._type ) 
+				inRenderer.PopLight();
+		}
+	}
 }
+
+
+
+
+
+
+
 
 
 /**

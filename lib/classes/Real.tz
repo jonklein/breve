@@ -505,12 +505,6 @@ Object : Real (aka Reals) [version 2.1] {
 
 		realSetBitmapRotationTowardsVector(realWorldPointer, rotationVector).
 
-	- to set-bitmap-transparency to alphaValue (float):
-		% Sets the transparency to alphaValue, a number between 0.0 
-		% (totally transparent) and 1.0 (fully opaque). 
-
-		realSetAlpha(realWorldPointer, alphaValue).
-
 	+ to set-transparency to alphaValue (float):
 		% Sets the transparency of this object to alphaValue, a number 
 		% between 1.0 (totally opaque) and 0.0 (fully transparent).

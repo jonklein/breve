@@ -105,8 +105,8 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		shadowCatcherDefined = 0.
 
-		self set-integration-step to .005.
-		self set-iteration-step to .05.
+		self set-integration-step to .02.
+		self set-iteration-step to .06.
 		self enable-draw-every-frame.
 
 		self set-background-color to (.5, .7, 1.0).
@@ -721,38 +721,17 @@ Abstract : Control (aka Controls) [version 2.3] {
 		shadowMenu disable.
 		reflectMenu disable.
 
-	+ to toggle-smooth:
-		% Toggle smooth drawing for the main camera.  See METHOD(enable-smooth-drawing) and 
-		% METHOD(disable-smooth-drawing) for more information.
+	- to toggle-smooth:
+		% Deprecated.
+		return.
 
-		if smoothFlag == 1: self disable-smooth-drawing.
-		else self enable-smooth-drawing.
-
-	+ to enable-smooth-drawing:
-		% Enable smooth drawing for the main camera.  Smooth drawing enables 
-		% a smoother blending of colors, textures and lighting.  This feature
-		% is especially noticeable when dealing with spheres or large objects.
-		% <p>
-		% It is strongly recommended that smooth drawing be enabled whenever 
-		% lighting is enabled (see METHOD(enable-lighting)).  Otherwise,
-		% major artifacts may be visible, especially on larger polygons.
-		% <p>
-		% The disadvantage of smooth drawing is a potential performance hit.
-		% The degree of this performance hit depends on the number of polygons
-		% in the scene.  If speed is an issue, it is often best to disable 
-		% both lighting and smooth drawing.
-
-		smoothFlag = 1.
-		cameraSetDrawSmooth(cameraPointer, smoothFlag).
-		drawMenu check.
+	- to enable-smooth-drawing:
+		% Deprecated.
+		return.
 		 
-	+ to disable-smooth-drawing:
-		% Disable smooth drawing for the main camera.  See METHOD(enable-smooth-drawing)
-		% for more information.
-
-		smoothFlag = 0.
-		cameraSetDrawSmooth(cameraPointer, smoothFlag).
-		drawMenu uncheck.
+	- to disable-smooth-drawing:
+		% Deprecated.
+		return.
 
 	+ to toggle-shadows:
 		% Toggle shadows for the main camera.  See METHOD(enable-shadow-volumes) and 

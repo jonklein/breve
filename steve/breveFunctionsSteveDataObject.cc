@@ -217,7 +217,7 @@ int stUnpackObject( stInstance *i, char *buffer, int length ) {
 }
 
 int stDDataWriteObjectWithDialog( brEval *args, brEval *result, brInstance *bi ) {
-	char *filename = NULL;
+	const char *filename = NULL;
 	stInstance *i = ( stInstance* )bi->userData;
 
 	result->set( 1 );
@@ -278,7 +278,7 @@ int stDDataReadObject( brEval *args, brEval *result, brInstance *bi ) {
 }
 
 int stDDataReadObjectWithDialog( brEval *args, brEval *result, brInstance *bi ) {
-	char *filename = NULL;
+	const char *filename = NULL;
 	stInstance *i = ( stInstance* )bi->userData;
 
 	result->set( 1 );

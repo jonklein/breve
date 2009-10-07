@@ -176,7 +176,7 @@ stInstance *stNewControllerInstance(stObject *o, brEngine *e);
 stInstance *stInstanceNew(stObject *o);
 int stInstanceInit(stInstance *i);
 
-int stMethodTrace(stRunInstance *i, char *name);
+int stMethodTrace(stRunInstance *i, const char *name);
 
 void stInstanceFree(stInstance *i);
 void stInstanceFreeNoInstanceLists(stInstance *i);
@@ -206,7 +206,7 @@ stMethod *stFindInstanceMethod(stObject *, const char *, int, stObject **);
 stMethod *stFindInstanceMethodWithArgRange(stObject *, const char *, unsigned int, unsigned int, stObject **);
 stMethod *stFindInstanceMethodWithMinArgs(stObject *, const char *, unsigned int, stObject **);
 
-int stStoreInstanceMethod(stObject *, char *, stMethod *);
+int stStoreInstanceMethod(stObject *, const char *, stMethod *);
 
 void stInstanceRetain(stInstance *);
 void stInstanceUnretain(stInstance *);

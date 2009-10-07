@@ -22,6 +22,8 @@
 #define _TERRAIN_H
 
 #include "worldObject.h"
+#include "vclip.h"
+#include "vclipData.h"
 
 /**
  *	\brief Serialized \ref slTerrain data.

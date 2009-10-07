@@ -26,7 +26,9 @@
 
 #include "ode/ode.h"
 
-#include <vector>
+class slVclipData;
+class slJoint;
+class slLink;
 
 /*!
 	\brief A logical collection of attached links.

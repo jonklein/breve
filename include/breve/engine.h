@@ -30,12 +30,14 @@
 #include <string>
 #include <algorithm>
 
-#include "render.h"
 #include "timeval.h"
 #include "url.h"
 #include "sound.h"
+#include "render.h"
 
 class slCamera;
+class slWorld;
+class slRenderGL;
 
 // the maximum error size 
 
@@ -129,7 +131,6 @@ enum parseErrorCodes {
 
 struct brMenuEntry {
 	brInstance *instance;
-	slStack *submenus;
 	char *method;
 	char *title;
 	bool enabled;
@@ -308,10 +309,6 @@ enum versionRequiermentOperators {
 	VR_NE
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 brEvent *brEngineAddEvent(brEngine *, brInstance *, char *, double, double);
 void brEventFree(brEvent *);
 
@@ -382,9 +379,5 @@ void brEngineSetUpdateMenuCallback(brEngine *, void (*)(brInstance *));
 
 slCamera *brEngineGetCamera(brEngine *);
 slWorld *brEngineGetWorld(brEngine *);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

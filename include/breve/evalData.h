@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-/*!
+/**
  * \brief Pointer data with a length value attached
  */
 
@@ -31,16 +31,9 @@ class brData: public brEvalObject {
 		int length;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 void brDataCollect(brData *);
 
 char *brDataHexEncode( brData * );
 char *brHexEncode( const char *inStr, int inLength );
 
 brData *brDataHexDecode( const char * );
-
-#ifdef __cplusplus
-}
-#endif

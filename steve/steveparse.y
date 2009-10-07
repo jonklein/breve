@@ -50,13 +50,13 @@ void stParseSetEngine(brEngine *);
 void stParseSetObject(stObject *);
 void stParseSetObjectAndMethod(stObject *, stMethod *);
 
-void yyerror(char *);
+void yyerror( const char * );
 
 int yylex(void);
 
 double stDoubleFromIntOrDoubleExp(stExp *);
 
-int stGetTypeForString(char *);
+int stGetTypeForString( char* );
 
 %}
 
@@ -1221,7 +1221,7 @@ double stDoubleFromIntOrDoubleExp( stExp *inExp ) {
 	return 0.0;
 }
 
-int stGetTypeForString(char *type) {
+int stGetTypeForString( const char *type ) {
 	if(!strcmp(type, "int")) return AT_INT;
 	if(!strcmp(type, "double")) return AT_DOUBLE;
 	if(!strcmp(type, "float")) return AT_DOUBLE;

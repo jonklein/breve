@@ -327,7 +327,7 @@ void stObjectFree( stObject *o ) {
 	called for an entire instance hierarchy.
 */
 
-int stMethodTrace( stRunInstance *i, char *name ) {
+int stMethodTrace( stRunInstance *i, const char *name ) {
 	brEval e;
 	stMethod *meth;
 	stRunInstance ri;
@@ -770,7 +770,7 @@ stMethod *stFindInstanceMethodWithMinArgs( stObject *object, const char *word, u
 	\brief Stores an instance method in an object.
 */
 
-int stStoreInstanceMethod( stObject *o, char *word, stMethod *method ) {
+int stStoreInstanceMethod( stObject *o, const char *word, stMethod *method ) {
 	unsigned int n;
 	std::vector< stMethod* > &mlist = o->methods[ word];
 

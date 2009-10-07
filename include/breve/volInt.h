@@ -1,6 +1,9 @@
 #ifndef _VOLINT_H
 #define _VOLINT_H
 
+class slShape;
+class slPoint;
+
 /*
    ============================================================================
    constants

@@ -306,7 +306,7 @@ void slCamera::renderWorld( slWorld *w, int crosshair, int scissor ) {
 
 	updateFrustum();
 
-	w -> _skybox.draw( &cam, _zClip );
+	w -> _skybox.draw( &this );
 
 	//
 	// Lines and draw-commands are special objects which will be rendered before lighting is setup
@@ -835,70 +835,6 @@ void slText( double x, double y, const char *string, void *font ) {
 
 	while (( c = *( string++ ) ) != 0 ) 
 		glutBitmapCharacter( font, c );
-}
-
-/*!
-	\brief Sets up lighting for a scene.
-
-	If noDiff is set, no diffusion color is used.  This is used for
-	drawing the shadowed pass of a shadow volume algorithm.
-*/
-
-void slCamera::setupLights( int inAmbientOnly ) {
-	GLfloat dir[4];
-	GLfloat amb[4];
-	GLfloat spec[4] = { 0, 0, 0, 0 };
-	GLfloat dif[4] = { 0, 0, 0, 0 };
-
-	if( !_drawLights ) {
-		glDisable( GL_LIGHTING );
-		return;
-	}
-
-	glEnable( GL_LIGHTING );
-
-	if ( _drawSmooth ) 
-		glShadeModel( GL_SMOOTH );
-	else 	
-		glShadeModel( GL_FLAT );
-
-	for( int n = 0; n < MAX_LIGHTS; n++ ) { 
-		slLight *light = &_lights[ n ];
-
-		if( light -> _type ) {
-			dir[0] = light -> _location.x;
-			dir[1] = light -> _location.y;
-			dir[2] = light -> _location.z;
-			dir[3] = 1.0;
-	
-			if ( !inAmbientOnly ) {
-				dif[0] = light -> _diffuse.x;
-				dif[1] = light -> _diffuse.y;
-				dif[2] = light -> _diffuse.z;
-				dif[3] = 0.0;
-				spec[0] = light -> _specular.x;
-				spec[1] = light -> _specular.y;
-				spec[2] = light -> _specular.z;
-				spec[3] = 0.0;
-			}
-		
-			amb[0] = light -> _ambient.x;
-			amb[1] = light -> _ambient.y;
-			amb[2] = light -> _ambient.z;
-			amb[3] = 0.0;
-		
-			GLenum lightID = GL_LIGHT0 + n;
-		
-			glEnable( lightID );
-		
-			glLightf( lightID, GL_CONSTANT_ATTENUATION, light -> _constantAttenuation );
-			glLightf( lightID, GL_LINEAR_ATTENUATION, light -> _linearAttenuation );
-			glLightfv( lightID, GL_DIFFUSE, dif );
-			glLightfv( lightID, GL_AMBIENT, amb );
-			glLightfv( lightID, GL_POSITION, dir );
-			glLightfv( lightID, GL_SPECULAR, spec );
-		}
-	}
 }
 	
 /*!

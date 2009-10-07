@@ -419,7 +419,7 @@ int brISetBackgroundTexture( brEval args[], brEval *target, brInstance *i ) {
 
 int brISetLightPosition( brEval args[], brEval *target, brInstance *i ) {
 	int n = BRINT( &args[ 1 ] );
-	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->camera->_lights[ n ]._location );
+	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->world->_lights[ n ]._location );
 	return EC_OK;
 }
 
@@ -446,7 +446,7 @@ int brISetLightExposureSource( brEval args[], brEval *target, brInstance *i ) {
 
 int brISetLightAmbientColor( brEval args[], brEval *target, brInstance *i ) {
 	int n = BRINT( &args[ 1 ] );
-	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->camera->_lights[ n ]._ambient );
+	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->world->_lights[ n ]._ambient );
 
 	return EC_OK;
 }
@@ -458,7 +458,7 @@ int brISetLightAmbientColor( brEval args[], brEval *target, brInstance *i ) {
 
 int brISetLightDiffuseColor( brEval args[], brEval *target, brInstance *i ) {
 	int n = BRINT( &args[ 1 ] );
-	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->camera->_lights[ n ]._diffuse );
+	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->world->_lights[ n ]._diffuse );
 
 	return EC_OK;
 }
@@ -470,7 +470,7 @@ int brISetLightDiffuseColor( brEval args[], brEval *target, brInstance *i ) {
 
 int brISetLightSpecularColor( brEval args[], brEval *target, brInstance *i ) {
 	int n = BRINT( &args[ 1 ] );
-	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->camera->_lights[ n ]._specular );
+	slVectorCopy( &BRVECTOR( &args[0] ), &i->engine->world->_lights[ n ]._specular );
 
 	return EC_OK;
 }

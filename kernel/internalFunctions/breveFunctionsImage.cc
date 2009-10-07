@@ -24,8 +24,8 @@
 #include "breveFunctionsImage.h"
 
 #include "kernel.h"
-#include "gldraw.h"
 #include "image.h"
+#include "camera.h"
 
 void brImageData::updateTexture() {
 	if( !_texture )
@@ -352,7 +352,7 @@ int brISnapshot( brEval args[], brEval *result, brInstance *i ) {
 }
 
 int brISnapshotDepth( brEval args[], brEval *result, brInstance *i ) {
-#if HAVE_LIBPNG
+#if 0
 	char *f;
 	int lin;
 	float maxDist; 

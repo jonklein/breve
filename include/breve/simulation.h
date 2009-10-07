@@ -32,8 +32,9 @@
 #include <time.h>
 #include <unistd.h>
 #include <errno.h>
-
 #include <vector>
+#include <algorithm>
+#include <string>
 
 // M_PI not defined on some platforms?  bastards.
 
@@ -44,6 +45,5 @@
 // do not change the order of the includes--they depend on eachother
 
 #include "slutil.h"
-#include "simulationTypedefs.h"
 
 #endif /* _SIMULATION_H */

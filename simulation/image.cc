@@ -408,6 +408,8 @@ int slPNGSnapshot( slWorld *w, slCamera *c, const char *file ) {
 	return r;
 }
 
+#if 0
+
 int slPNGSnapshotDepth( slWorld *w, slCamera *c, const char *file, int lin, double maxRange ) {
 	unsigned char *buf;
 	int r;
@@ -465,6 +467,8 @@ int slPNGSnapshotDepth( slWorld *w, slCamera *c, const char *file, int lin, doub
 
 	return r;
 }
+
+#endif
 
 #endif
 

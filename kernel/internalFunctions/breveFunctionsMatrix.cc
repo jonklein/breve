@@ -35,7 +35,6 @@
 #include "kernel.h"
 #include "breveFunctionsImage.h"
 #include "bigMatrix.hh"
-#include "gldraw.h"
 
 #ifdef HAVE_LIBGSL
 typedef slBigMatrix2DGSL brMatrix2D;

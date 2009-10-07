@@ -303,7 +303,7 @@ int brXMLWriteObject( brXMLArchiveRecord *record, FILE *file, brInstance *inInst
 		char *encoding = brInstanceEncodeToString( inInstance->engine, inInstance, &record -> _instanceToIndexMap );
 
 		if( encoding ) {
-			fprintf( file, encoding );
+			fprintf( file, "%s", encoding );
 			slFree( encoding );
 		} else {
 			return -1;
@@ -571,7 +571,7 @@ int brXMLPrintEval( brXMLArchiveRecord *record, FILE *file, const char *name, br
 
 
 
-int stXMLReadObjectFromFile( stInstance *i, char *filename ) {
+int stXMLReadObjectFromFile( stInstance *i, const char *filename ) {
 	char *buffer;
 	int result = 0;
 
@@ -728,7 +728,7 @@ brXMLDOMElement* brXMLDOMElement::getChildByName( const char *inName ) {
 	return NULL;
 }
 
-brXMLDOMElement *brXMLParseFile( char *inPath ) {
+brXMLDOMElement *brXMLParseFile( const char *inPath ) {
 	char *text = slUtilReadFile( inPath );
 
 	if( !text )
@@ -741,7 +741,7 @@ brXMLDOMElement *brXMLParseFile( char *inPath ) {
 	return element;
 }
 
-brXMLDOMElement *brXMLParse( char *inBuffer ) {
+brXMLDOMElement *brXMLParse( const char *inBuffer ) {
 	XML_Parser parser;
 	brXMLState dom;
 
@@ -764,7 +764,7 @@ brXMLDOMElement *brXMLParse( char *inBuffer ) {
 	return dom._stack[ 0 ];
 }
 
-int stXMLReadObjectFromString( stInstance *i, char *buffer ) {
+int stXMLReadObjectFromString( stInstance *i, const char *buffer ) {
 	brXMLParserState parserState;
 	int result = 0;
 
@@ -794,7 +794,7 @@ int stXMLReadObjectFromString( stInstance *i, char *buffer ) {
 	return result;
 }
 
-brInstance *brXMLDearchiveObjectFromFile( brEngine *e, char *filename ) {
+brInstance *brXMLDearchiveObjectFromFile( brEngine *e, const char *filename ) {
 	char *buffer;
 	brInstance *i;
 
@@ -833,7 +833,7 @@ brInstance *brXMLDearchiveObjectFromStream( brEngine *e, FILE *stream ) {
 
 
 
-brInstance *brXMLDearchiveObjectFromString( brEngine *e, char *buffer ) {
+brInstance *brXMLDearchiveObjectFromString( brEngine *e, const char *buffer ) {
 	brXMLParserState parserState;
 
 	// Parse the DOM tree
@@ -924,7 +924,7 @@ brInstance *brXMLDearchiveObjectFromString( brEngine *e, char *buffer ) {
 
 
 
-int brXMLInitSimulationFromFile( brEngine *e, char *filename ) {
+int brXMLInitSimulationFromFile( brEngine *e, const char *filename ) {
 	char *buffer;
 	int result = 0;
 
@@ -958,7 +958,7 @@ int brXMLInitSimulationFromStream( brEngine *e, FILE *stream ) {
 	return result;
 }
 
-int brXMLInitSimulationFromString( brEngine *e, char *buffer ) {
+int brXMLInitSimulationFromString( brEngine *e, const char *buffer ) {
 	brXMLParserState parserState;
 	int result = 0;
 

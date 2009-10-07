@@ -156,7 +156,6 @@ class slShape {
 
 	public:
 		slShape() {
-			_drawList = 0;
 			_type 							= ST_MESH;
 			_density 						= 1.0;
 			_referenceCount 				= 1;
@@ -170,8 +169,6 @@ class slShape {
 		int									findPointIndex( slVector *inVertex );
 
 		static void 						slMatrixToODEMatrix( const double inM[ 3 ][ 3 ], dReal *outM );
-
-		void 								recompile() { _recompile = 1; }
 
 		void 								retain();
 		void 								release();
@@ -202,8 +199,6 @@ class slShape {
 		double 								getDensity();
 		void 								fillVertexBuffer();
 
-		int 								_drawList;
-		bool 								_recompile;
 		slMatrix							_transform;
 
 		double 								_inertia[3][3];

@@ -75,6 +75,38 @@ enum collisionCallbackTypes {
 	CC_DEEP				= 1
 };
 
+#define MAX_LIGHTS 8
+
+enum slLightTypes {
+	LightDisabled			= 0,
+	LightPoint,
+	LightSpot,
+	LightInfinite
+};
+
+/**
+ * \brief Holds location and color information for a light.
+ */
+
+struct slLight {
+	slLight() {
+		_constantAttenuation = 1.0;
+		_linearAttenuation = 0.0;
+
+		_type = LightDisabled;
+	}
+
+	slVector 		_location;
+	slVector 		_diffuse;
+	slVector 		_ambient;
+	slVector 		_specular;
+
+	float			_constantAttenuation;
+	float			_linearAttenuation;
+
+	int				_type;
+};
+
 /*!
 	\brief An object in the simulated world.
 
@@ -119,7 +151,7 @@ class slWorld {
 
 		slCamera 				*getLightExposureCamera() { return &_lightExposureCamera; }
 		
-		void					draw( const slRenderGL& inRenderer );
+		void					draw( slRenderGL& inRenderer, slCamera *inCamera );
 
 		/**
 		 * Indicates that collision detection structures must be reinitialized.
@@ -207,6 +239,7 @@ class slWorld {
 		slVector 				shadowColor;
 
 		slSkybox				_skybox;
+		slLight					_lights[ 8 ];
 		
 		slTexture2D*			backgroundTexture;
 
@@ -228,7 +261,7 @@ class slWorld {
 
 		void					addObject( slWorldObject* );
 		void 					removeObject( slWorldObject* );
-		slWorldObject 				*getObject( unsigned int );
+		slWorldObject 			*getObject( unsigned int );
 		void 					removeEmptyObjects();
 
 		void 					setGravity( slVector* );
@@ -268,14 +301,6 @@ class slWorld {
 };
 #endif
 
-#ifdef __cplusplus
-extern "C"{
-#endif
-
 void slInitProximityData(slWorld *);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _WORLD_H */

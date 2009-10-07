@@ -23,20 +23,22 @@
 
 #include "texture.h"
 
+class slRenderGL;
+class slCamera;
+
 class slSkybox {
 	public:
-						slSkybox();
-						~slSkybox();
+							slSkybox();
+							~slSkybox();
 
-		void 				draw( slVector *inCameraPos, float inZFar );
+		void 				draw( slRenderGL& inRenderer, slCamera *inCamera );
 
 		int 				loadImage( const char *inImage, int inN ) {
-							std::string s( inImage );
-							return loadImage( s, inN );
-						}
+								std::string s( inImage );
+								return loadImage( s, inN );
+							}
 
 		int 				loadImage( std::string &inImage, int inN );
-
 		int 				loadNumberedImages( std::string &inImage );
 
 	private:

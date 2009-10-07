@@ -1,6 +1,8 @@
 #include "skybox.h"
 #include "simulation.h"
 #include "glIncludes.h"
+#include "camera.h"
+#include "render.h"
 
 slSkybox::slSkybox() {
 	_loaded = false;
@@ -17,121 +19,63 @@ int slSkybox::loadImage( std::string &inPath, int inN ) {
 	_loaded = true;
 
 	for( int n = 0; n < 6; n++ ) {
-		if( !_textures[ n ].isLoaded() ) {
+		if( !_textures[ n ].isLoaded() )
 			_loaded = false;
-		}
 	}
 
 	return result;
 }
 
-void slSkybox::draw( slVector *inCameraPos, float inZFar ) {
-
+void slSkybox::draw( slRenderGL& inRenderer, slCamera *inCamera ) {
 	if( ! _loaded ) 
 		return;
-
-	glDisable( GL_CULL_FACE );
-	glDisable( GL_BLEND );
+		
+	slVector position;
+		
+	slVectorAdd( &inCamera -> _location, &inCamera -> _target, &position );
 
 	glDepthMask( GL_FALSE );
-//	glDisable( GL_LIGHTING );
 
-	glMatrixMode( GL_MODELVIEW );
-	glPushMatrix();
-	glTranslatef( inCameraPos->x, inCameraPos->y, inCameraPos->z );
-	glScalef( 0.3f * inZFar, 0.3f * inZFar, 0.3f * inZFar );
+	inRenderer.PushMatrix( slMatrixGeometry );
+	inRenderer.Translate( slMatrixGeometry, position.x, position.y, position.z );
+	inRenderer.Scale( slMatrixGeometry, 0.3f * inCamera -> _zClip, 0.3f * inCamera -> _zClip, 0.3f * inCamera -> _zClip );
  
-	glMatrixMode( GL_TEXTURE );
-	glPushMatrix();
-	glLoadIdentity();
+ 	// we go a little past the edge of the cube to ensure no gaps...
+	float r = 1.005f;
 
+	float f[] = { 1, 1, 1, 1 };
+	inRenderer.SetBlendColor( f );
 
-	glColor4f( 1.0, 1.0, 1.0, 1.0f);
- 
-	float r = 1.0001f;
-	float ux = 0;
-	float uy = 0;
+	slVector c, x, y;
+	
+	slVectorSet( &c, 0, 0, -1 );
+	slVectorSet( &x, -r, 0, 0 );
+	slVectorSet( &y, 0, r, 0 );
+	inRenderer.DrawQuad( _textures[ 0 ], c, x, y );
 
-#ifndef OPENGLES
+	slVectorSet( &c, 0, 0, 1 );
+	slVectorSet( &x, r, 0, 0 );
+	inRenderer.DrawQuad( _textures[ 1 ], c, x, y );
 
-	_textures[ 0 ].bind();
-	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-	ux = _textures[ 0 ]._unitX;
-	uy = _textures[ 0 ]._unitY;
-	glBegin(GL_QUADS);		
-		glTexCoord2f( 0.0, 0.0 ); glVertex3f(  r, -r, -1.0f );
-		glTexCoord2f( 0.0, uy  ); glVertex3f(  r,  r, -1.0f ); 
-		glTexCoord2f( ux,  uy  ); glVertex3f( -r,  r, -1.0f );
-		glTexCoord2f( ux,  0.0 ); glVertex3f( -r, -r, -1.0f );
-	glEnd();
- 
-	_textures[ 1 ].bind();
-	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-	ux = _textures[ 1 ]._unitX;
-	uy = _textures[ 1 ]._unitY;
-	glBegin(GL_QUADS);		
-		glTexCoord2f( ux,  0.0 ); glVertex3f(  r, -r, 1.0f );
-		glTexCoord2f( ux,  uy  ); glVertex3f(  r,  r, 1.0f ); 
-		glTexCoord2f( 0.0, uy  ); glVertex3f( -r,  r, 1.0f );
-		glTexCoord2f( 0.0, 0.0 ); glVertex3f( -r, -r, 1.0f );
-	glEnd();
- 
-	_textures[ 2 ].bind();
-	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-	ux = _textures[ 2 ]._unitX;
-	uy = _textures[ 2 ]._unitY;
-	glBegin(GL_QUADS);		
-		glTexCoord2f( 0.0, 0.0 ); glVertex3f( 1.0f, -r, r );	
-		glTexCoord2f( 0.0, uy  ); glVertex3f( 1.0f,  r, r ); 
-		glTexCoord2f( ux,  uy  ); glVertex3f( 1.0f,  r,-r );
-		glTexCoord2f( ux,  0.0 ); glVertex3f( 1.0f, -r,-r );		
-	glEnd();
- 
-	_textures[ 3 ].bind();
-	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-	ux = _textures[ 3 ]._unitX;
-	uy = _textures[ 3 ]._unitY;
-	glBegin(GL_QUADS);		
-		glTexCoord2f( ux,  0.0 ); glVertex3f( -1.0f, -r,  r );	
-		glTexCoord2f( ux,  uy  ); glVertex3f( -1.0f,  r,  r ); 
-		glTexCoord2f( 0.0, uy  ); glVertex3f( -1.0f,  r, -r );
-		glTexCoord2f( 0.0, 0.0 ); glVertex3f( -1.0f, -r, -r );
-	glEnd();
- 
-	_textures[ 4 ].bind();
-	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-	ux = _textures[ 4 ]._unitX;
-	uy = _textures[ 4 ]._unitY;
-	glBegin(GL_QUADS);	
-		glTexCoord2f( ux,  uy  ); glVertex3f( -r, 1.0f, -r);
-		glTexCoord2f( 0.0, uy  ); glVertex3f( -r, 1.0f,  r);
-		glTexCoord2f( 0.0, 0.0 ); glVertex3f(  r, 1.0f,  r); 
-		glTexCoord2f( ux,  0.0 ); glVertex3f(  r, 1.0f, -r);
-	glEnd();
- 
-	_textures[ 5 ].bind();
-	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-	ux = _textures[ 5 ]._unitX;
-	uy = _textures[ 5 ]._unitY;
-	glBegin(GL_QUADS);		
-		glTexCoord2f( ux,  0.0 );  glVertex3f( -r, -1.0f, -r );
-		glTexCoord2f( 0.0, 0.0 );  glVertex3f( -r, -1.0f,  r );
-		glTexCoord2f( 0.0, uy  );  glVertex3f(  r, -1.0f,  r ); 
-		glTexCoord2f( ux,  uy  );  glVertex3f(  r, -1.0f, -r );
-	glEnd();
+	slVectorSet( &c, 1, 0, 0 );
+	slVectorSet( &x, 0, 0, -r );
+	slVectorSet( &y, 0, r, 0 );
+	inRenderer.DrawQuad( _textures[ 2 ], c, x, y );
 
-	glPopMatrix();
+	slVectorSet( &c, -1, 0, 0 );
+	slVectorSet( &x, 0, 0, r );
+	inRenderer.DrawQuad( _textures[ 3 ], c, x, y );
 
-	glMatrixMode( GL_MODELVIEW );
-	glPopMatrix();
+	slVectorSet( &c, 0, 1, 0 );
+	slVectorSet( &x, 0, 0, -r );
+	slVectorSet( &y, -r, 0, 0 );
+	inRenderer.DrawQuad( _textures[ 4 ], c, x, y );
 
-	// restore states as best we can
+	slVectorSet( &c, 0, -1, 0 );
+	slVectorSet( &x, 0, 0, r );
+	inRenderer.DrawQuad( _textures[ 5 ], c, x, y );
+
+	inRenderer.PopMatrix( slMatrixGeometry );
 
 	glDepthMask( GL_TRUE );
-	glEnable( GL_CULL_FACE );
-	glEnable( GL_BLEND );
-//	glEnable( GL_LIGHTING );
-	_textures[ 5 ].unbind();
-
-#endif
 }

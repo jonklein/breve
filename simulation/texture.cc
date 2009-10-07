@@ -43,7 +43,7 @@ int slTexture2D::loadImage( const std::string &inFile, bool inRepeat ) {
 	if ( !pixels ) 
 		throw slException( std::string( "Could not read image file " ) + inFile );
 
-	loadPixels( pixels, width, height, inRepeat );
+	loadPixels( pixels, width, height, components, inRepeat );
 
 	delete pixels;
 
@@ -111,10 +111,10 @@ void slTexture2D::resize( int inWidth, int inHeight, bool inHasAlpha ) {
 	_sizeX = slNextPowerOfTwo( inWidth );
 	_sizeY = slNextPowerOfTwo( inHeight );
 
-	_sizeX = _sizeY = MAX( _sizeX, _sizeY );
+	_sizeX = _sizeY = slMAX( _sizeX, _sizeY );
 
-	_unitX = ( inWidth - 0.0f )  / (float)_sizeX;
-	_unitY = ( inHeight - 0.0f ) / (float)_sizeY;
+	_unitX = ( inWidth - 0.5f )  / (float)_sizeX;
+	_unitY = ( inHeight - 0.5f ) / (float)_sizeY;
 
 	GLenum format = inHasAlpha ? GL_RGBA : GL_RGB;
 

@@ -18,13 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#ifdef __cplusplus
 extern "C" {
-#endif
-#include <expat.h>
-#ifdef __cplusplus
+	#include <expat.h>
 }
-#endif
 
 /**
  * \brief Data used when preforming an archive.
@@ -86,17 +82,17 @@ int brXMLDecodeInstance( brXMLParserState *inState, brXMLDOMElement *inInstanceE
 
 void brXMLDecodeObserver( brXMLParserState *inState, brXMLDOMElement *inObserverElement, brInstance *inInstance );
 
-int stXMLReadObjectFromFile(stInstance *i, char *);
+int stXMLReadObjectFromFile(stInstance *i, const char *);
 int stXMLReadObjectFromStream(stInstance *i, FILE *);
-int stXMLReadObjectFromString(stInstance *i, char *);
+int stXMLReadObjectFromString(stInstance *i, const char *);
 
-brInstance *brXMLDearchiveObjectFromFile(brEngine *, char *);
+brInstance *brXMLDearchiveObjectFromFile(brEngine *, const char *);
 brInstance *brXMLDearchiveObjectFromStream(brEngine *, FILE *);
-brInstance *brXMLDearchiveObjectFromString(brEngine *, char *);
+brInstance *brXMLDearchiveObjectFromString(brEngine *, const char *);
 
-int brXMLInitSimulationFromFile(brEngine *, char *);
+int brXMLInitSimulationFromFile(brEngine *, const char *);
 int brXMLInitSimulationFromStream(brEngine *, FILE *);
-int brXMLInitSimulationFromString(brEngine *, char *);
+int brXMLInitSimulationFromString(brEngine *, const char *);
 
 int stXMLVariablePrint(brXMLArchiveRecord *, FILE *, stVar *, stInstance *, int);
 int brXMLPrintEval(brXMLArchiveRecord *, FILE *, const char *, brEval *, int);
@@ -120,7 +116,5 @@ int stXMLParseInstanceData( brXMLParserState *inState, brXMLDOMElement *inInstan
 
 void brXMLParseEval( brXMLParserState *inState, brXMLDOMElement *inElement, brEval *outEval );
 
-brXMLDOMElement *brXMLParse( char *inText );
-brXMLDOMElement *brXMLParseFile( char *inPath );
-
-
+brXMLDOMElement *brXMLParse( const char *inText );
+brXMLDOMElement *brXMLParseFile( const char *inPath );
