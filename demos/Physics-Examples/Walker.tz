@@ -88,14 +88,7 @@ PhysicalControl : WalkerSim {
 
 		floor = new Floor.
 		floor catch-shadows.
-
-		# outline = new Stationary.
-		# outline set-shape to ( new PolygonDisk init-with sides 20 height 1 radius 30.0 ).
-		# outline move to (0, 0, 0).
-		# outline set-transparency to 0.8.
-
-		self enable-shadow-volumes.
-		self enable-reflections.
+		self enable-shadows.
 
 		# Create the Walker.
 

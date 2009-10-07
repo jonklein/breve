@@ -31,6 +31,8 @@ Object : Real (aka Reals) [version 2.1] {
 		mu (float).
 
 	+ to init:
+		menus = {}.
+
 		archiveTextureScaleX = 16.
 		archiveTextureScaleY = 16.
 

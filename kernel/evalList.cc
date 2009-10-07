@@ -81,7 +81,6 @@ int brEvalListAppend( brEvalListHead *inList, brEval *inEval ) {
 	return EC_OK;
 }
 
-
 int brEvalListRemove( brEvalListHead *head, int index, brEval *value ) {
 	if ( index < 0 || index >= ( int )head->_vector.size() ) return index;
 

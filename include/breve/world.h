@@ -151,6 +151,7 @@ class slWorld {
 
 		slCamera 				*getLightExposureCamera() { return &_lightExposureCamera; }
 		
+		void					drawObjects( slRenderGL& inRenderer );
 		void					draw( slRenderGL& inRenderer, slCamera *inCamera );
 
 		/**

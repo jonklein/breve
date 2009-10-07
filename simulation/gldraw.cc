@@ -41,27 +41,25 @@ double gReflectionAlpha;
 	are the opposite of SL matrices).
 */
 
-void slMatrixGLMult( double m[3][3] ) {
-	float d[4][4];
+void slMatrixToGLMatrix( double inSLMatrix[ 3 ][ 3 ], float outGLMatrix[ 4 ][ 4 ] ) {
+	float outGLMatrix[4][4];
 
-	d[0][0] = m[0][0];
-	d[0][1] = m[1][0];
-	d[0][2] = m[2][0];
-	d[0][3] = 0;
-	d[1][0] = m[0][1];
-	d[1][1] = m[1][1];
-	d[1][2] = m[2][1];
-	d[1][3] = 0;
-	d[2][0] = m[0][2];
-	d[2][1] = m[1][2];
-	d[2][2] = m[2][2];
-	d[2][3] = 0;
-	d[3][0] = 0;
-	d[3][1] = 0;
-	d[3][2] = 0;
-	d[3][3] = 1;
-
-	glMultMatrixf( (float*)d );
+	outGLMatrix[0][0] = inSLMatrix[0][0];
+	outGLMatrix[0][1] = inSLMatrix[1][0];
+	outGLMatrix[0][2] = inSLMatrix[2][0];
+	outGLMatrix[0][3] = 0;
+	outGLMatrix[1][0] = inSLMatrix[0][1];
+	outGLMatrix[1][1] = inSLMatrix[1][1];
+	outGLMatrix[1][2] = inSLMatrix[2][1];
+	outGLMatrix[1][3] = 0;
+	outGLMatrix[2][0] = inSLMatrix[0][2];
+	outGLMatrix[2][1] = inSLMatrix[1][2];
+	outGLMatrix[2][2] = inSLMatrix[2][2];
+	outGLMatrix[2][3] = 0;
+	outGLMatrix[3][0] = 0;
+	outGLMatrix[3][1] = 0;
+	outGLMatrix[3][2] = 0;
+	outGLMatrix[3][3] = 1;
 }
 
 #define SELECTION_BUFFER_SIZE 512
@@ -586,7 +584,6 @@ void slCamera::reflectionPass( slWorld *w, bool inWillDoShadowVolumes ) {
 
 void slCamera::drawFlatShadows( slWorld *w ) {
 	GLfloat shadowMatrix[4][4];
-
 	slShadowMatrix( shadowMatrix, &_shadowPlane, &_lights[ 0 ]._location );
 
 	glPushAttrib( GL_ENABLE_BIT );
@@ -837,48 +834,6 @@ void slText( double x, double y, const char *string, void *font ) {
 		glutBitmapCharacter( font, c );
 }
 	
-/*!
-	\brief Set up the rendering matrix for flat shadows on a given plane.
-*/
-
-void slShadowMatrix( GLfloat matrix[4][4], slPlane *p, slVector *light ) {
-	GLfloat dot, groundplane[4], lightpos[4];
-
-	lightpos[0] = light->x;
-	lightpos[1] = light->y;
-	lightpos[2] = light->z;
-	lightpos[3] = 0.0;
-
-	groundplane[0] = p->normal.x;
-	groundplane[1] = p->normal.y;
-	groundplane[2] = p->normal.z;
-	groundplane[3] = -slVectorDot( &p->normal, &p->vertex );
-
-	// Find dot product between light position vector and ground plane normal.
-
-	dot = groundplane[0] * lightpos[0] + groundplane[1] * lightpos[1] + groundplane[2] * lightpos[2] + groundplane[3] * lightpos[3];
-
-	matrix[0][0] = dot - lightpos[0] * groundplane[0];
-	matrix[1][0] = 0.f - lightpos[0] * groundplane[1];
-	matrix[2][0] = 0.f - lightpos[0] * groundplane[2];
-	matrix[3][0] = 0.f - lightpos[0] * groundplane[3];
-
-	matrix[0][1] = 0.f - lightpos[1] * groundplane[0];
-	matrix[1][1] = dot - lightpos[1] * groundplane[1];
-	matrix[2][1] = 0.f - lightpos[1] * groundplane[2];
-	matrix[3][1] = 0.f - lightpos[1] * groundplane[3];
-
-	matrix[0][2] = 0.f - lightpos[2] * groundplane[0];
-	matrix[1][2] = 0.f - lightpos[2] * groundplane[1];
-	matrix[2][2] = dot - lightpos[2] * groundplane[2];
-	matrix[3][2] = 0.f - lightpos[2] * groundplane[3];
-
-	matrix[0][3] = 0.f - lightpos[3] * groundplane[0];
-	matrix[1][3] = 0.f - lightpos[3] * groundplane[1];
-	matrix[2][3] = 0.f - lightpos[3] * groundplane[2];
-	matrix[3][3] = dot - lightpos[3] * groundplane[3];
-}
-
 /*!
 	\brief Renders a stationary object.
 */

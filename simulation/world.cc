@@ -220,12 +220,7 @@ void slWorld::draw( slRenderGL& inRenderer, slCamera *inCamera ) {
 		}
 	}
 
-	for ( unsigned int n = 0; n < _objects.size(); n++ ) {
-		slWorldObject *wo = _objects[ n ];
-		
-		if( wo )
-			wo -> draw( inRenderer );
-	}
+	drawObjects( inRenderer );
 
 	if( inCamera -> _drawLights ) {
 		for( int n = 0; n < MAX_LIGHTS; n++ ) { 
@@ -233,10 +228,42 @@ void slWorld::draw( slRenderGL& inRenderer, slCamera *inCamera ) {
 				inRenderer.PopLight();
 		}
 	}
+	
+	
+	if( inCamera -> _drawShadow && inCamera -> _shadowCatcher ) {
+		float shadowMatrix[ 4 ][ 4 ];
+		float color[] = { 0.0, 0.0, 0.0, 0.5 };
+		 
+		glEnable( GL_POLYGON_OFFSET_FILL );
+		 
+		slShadowMatrix( shadowMatrix, &inCamera -> _shadowPlane, &_lights[ 0 ]._location );
+		inRenderer.PushMatrix( slMatrixGeometry );
+		inRenderer.MulMatrix4( slMatrixGeometry, shadowMatrix );
+		inRenderer.SetBlendColor( color );
+		inRenderer.SetColorTransformsEnabled( false );
+
+		for ( unsigned int n = 0; n < _objects.size(); n++ ) {
+			slWorldObject *wo = _objects[ n ];
+			
+			if( wo && wo != inCamera -> _shadowCatcher )
+				wo -> draw( inRenderer );
+		}
+		inRenderer.SetColorTransformsEnabled( true );
+		inRenderer.PopMatrix( slMatrixGeometry );
+		glDisable( GL_POLYGON_OFFSET_FILL );
+		
+	}
 }
 
 
-
+void slWorld::drawObjects( slRenderGL& inRenderer ) {
+	for ( unsigned int n = 0; n < _objects.size(); n++ ) {
+		slWorldObject *wo = _objects[ n ];
+		
+		if( wo )
+			wo -> draw( inRenderer );
+	}
+}
 
 
 
