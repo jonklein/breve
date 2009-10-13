@@ -164,6 +164,8 @@ class brEngine {
 		brInstance*				getController() const { return _controller; }
 		int						setController( brInstance *inController );
 
+		slCamera*				getCamera() const { return camera; }
+
 		const char 				*runSaveDialog();
 		const char 				*runLoadDialog();
 		void					setMouseLocation( int inX, int inY );

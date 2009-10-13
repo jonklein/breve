@@ -46,10 +46,10 @@ Controller WalkerSim.
 
 PhysicalControl : WalkerSim {
 	+ variables:
-		seats, walkerControllers (list).
+		seats (list).
 		currentSeat (int).
 
-		walker (object).
+		walker, state (object).
 
 		# the following are flags that can be controlled by the user
 		# via the simulation menu
@@ -64,6 +64,8 @@ PhysicalControl : WalkerSim {
 		item (object).
 		outline (object).
 
+		state = new WalkerState.
+
 		locked = 0.
 
 		self set-random-seed-from-dev-random.
@@ -71,9 +73,9 @@ PhysicalControl : WalkerSim {
 		# self set-mountain-skybox.
 
         self set-skybox-images to {
-            "images/MountainBoxFrontSm.png", "images/MountainBoxBackSm.png",
-            "images/MountainBoxLeftSm.png", "images/MountainBoxRightSm.png",
-            "images/MountainBoxTopSm.png", "images/MountainBoxBottomSm.png" }.
+            "images/MountainBoxFront.png", "images/MountainBoxBack.png",
+            "images/MountainBoxLeft.png", "images/MountainBoxRight.png",
+            "images/MountainBoxTop.png", "images/MountainBoxBottom.png" }.
 
 		self set-fast-physics-iterations to 10.
 	
@@ -100,9 +102,12 @@ PhysicalControl : WalkerSim {
 		# The "WalkerController" are the individuals that will control the Walker.
 		# Create the WalkerController and assign them numbers.
 
-		walkerControllers = 15 new WalkerController.
+		state::controllers = 15 new WalkerController.
+		state::controllers = state::controllers.
+		state save.
 
-		foreach item in walkerControllers: {
+		foreach item in state::controllers: {
+			state add-dependency on item.
 			(item set-number to number).
 			number += 1.
 		}
@@ -131,21 +136,32 @@ PhysicalControl : WalkerSim {
 
 		self set-display-text to "Driver #$currentNumber" at-x -.95 at-y -.9.
 
+	+ to get-best-distance:
+		return state::bestDistance.
+
+	+ to get-current-distance:
+		return |(walker get-location)|.
+
 	+ to iterate:
 		seats{ currentSeat } control robot walker at-time (self get-time).
 
+		state::runningTime = ( self get-time ).
+
 		super iterate.
+
+	+ to get-running-time:
+		return state::runningTime.
 
 	+ to pick-drivers:
 		# pick 4 new drivers at random.  we do this by sorting the 
 		# list randomly and picking the first 4 items.
 
-		sort walkerControllers with random-sort.
+		sort state::controllers with random-sort.
 
-		seats{0} = walkerControllers{0}.
-		seats{1} = walkerControllers{1}.
-		seats{2} = walkerControllers{2}.
-		seats{3} = walkerControllers{3}.
+		seats{0} = state::controllers{0}.
+		seats{1} = state::controllers{1}.
+		seats{2} = state::controllers{2}.
+		seats{3} = state::controllers{3}.
 
 		currentSeat = 0.
 
@@ -153,7 +169,6 @@ PhysicalControl : WalkerSim {
 		return random[3] - 1.
 
 	+ to change-drivers:
-		newDriver (int).
 		newDist (double).
 		newOffset (vector).
 
@@ -171,13 +186,17 @@ PhysicalControl : WalkerSim {
 		newOffset::y = 3.
 		newOffset::z *= newDist.
 
-		print newOffset.
 		self pan-camera-offset by newOffset steps 30.
 
 		# we change the drivers every time a controller is finished it's 
 		# turn.  if we have seen the last controller , breed them together.
 
 		seats{currentSeat} set-distance to |(walker get-location)|.
+
+		if |(walker get-location)| > state::bestDistance: {
+			state::bestDistance = |(walker get-location)|.
+		}
+
 		walker center.
 
 		currentSeat += 1.
@@ -187,12 +206,13 @@ PhysicalControl : WalkerSim {
 			self pick-drivers.
 		}
 
-		newDriver = (seats{currentSeat} get-number).
 
 		# schedule a new driver change in 20 seconds.
 
 		self schedule method-call "change-drivers" at-time (self get-time) + 20.0.
 		self display-current-driver.
+
+		state save.
 
 	+ to breed-new-controllers:
 		print "Breeding controllers...".
@@ -242,11 +262,23 @@ PhysicalControl : WalkerSim {
 		(seats{currentSeat} get-genome) load-with-dialog.
 }
 
+Object : WalkerState {
+	+ variables:
+		controllers (list).
+		bestDistance (float).
+		runningTime (float).
+
+	+ to save:
+		self archive-as-xml file "WalkerState.xml".
+
+	+ to restore:	
+		self dearchive-xml file "WalkerState.xml".
+}
+
 Object : WalkerController {
 	+ variables:
 		distanceTraveled (float).
 		genome (object).
-
 		number (int).
 
 	+ to set-number to n (int):
@@ -257,6 +289,7 @@ Object : WalkerController {
 	
 	+ to init:
 		genome = new WalkerGenome.
+		self add-dependency on genome.
 		self randomize.
 
 	+ to randomize:

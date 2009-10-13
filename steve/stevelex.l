@@ -201,6 +201,8 @@ path					{ return PATH; }
 ::[yY]				{ return Y_ELEMENT; }
 ::[zZ]				{ return Z_ELEMENT; }
 
+::([a-zA-Z_]|[a-zA-Z_][a-zA-Z0-9\-_]*[a-zA-Z0-9_])			{ yylval.string = slStrdup( yytext + 2 ); return DOT_NOTATOR; }
+
 "=="				{ return EQ; }
 "!="				{ return NE; }
 ">="				{ return GE; }

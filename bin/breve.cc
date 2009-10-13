@@ -36,8 +36,8 @@
 #include "steve.h"
 #include "breve.h"
 #include "world.h"
-#include "movie.h"
-#include "gldraw.h"
+// #include "gldraw.h"
+#include "format.h"
 
 #include "pyconvert.h"
 
@@ -614,8 +614,7 @@ void slDemoMouse( int button, int state, int x, int y ) {
 }
 
 void slDemoPassiveMotion( int x, int y ) {
-	gEngine->_mouseX = x;
-	gEngine->_mouseY = gEngine->camera->_height - y;
+	gEngine -> setMouseLocation( x, gEngine->camera->_height - y );
 }
 
 void slDemoMotion( int x, int y ) {
@@ -623,15 +622,14 @@ void slDemoMotion( int x, int y ) {
 		if (( gMods & GLUT_ACTIVE_SHIFT ) || ( gSpecial == GLUT_KEY_F4 ) ) {
 			brDragCallback( gEngine, x, y );
 		} else if (( gMods & GLUT_ACTIVE_ALT ) || ( gSpecial == GLUT_KEY_F2 ) ) {
-			gEngine->camera->zoomWithMouseMovement( x - gLastX, y - gLastY );
+			gEngine -> camera -> zoomWithMouseMovement( x - gLastX, y - gLastY );
 		} else if (( gMods & GLUT_ACTIVE_CTRL ) || ( gSpecial == GLUT_KEY_F3 ) ) {
-			gEngine->camera->moveWithMouseMovement( x - gLastX, y - gLastY );
+			gEngine -> camera -> moveWithMouseMovement( x - gLastX, y - gLastY );
 		} else {
-			gEngine->camera->rotateWithMouseMovement( x - gLastX, y - gLastY );
+			gEngine-> camera -> rotateWithMouseMovement( x - gLastX, y - gLastY );
 		}
 
 		gLastX = x;
-
 		gLastY = y;
 	}
 

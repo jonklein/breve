@@ -113,7 +113,7 @@ int stGetTypeForString( char* );
 %type <exp> literal_value
 
 %token <number> FLOAT_VALUE
-%token <string> STRING_VALUE WORD_VALUE COMMENT_STRING DOCUMENTATION_COMMENT_STRING
+%token <string> STRING_VALUE WORD_VALUE DOT_NOTATOR COMMENT_STRING DOCUMENTATION_COMMENT_STRING
 %token <eval> ST_EVAL 
 %token <integer> INT_VALUE TYPE PLURAL_TYPE
 %token TO_PRIVATE TO_PUBLIC TO_PROTECTED WITH_INTERFACE
@@ -851,6 +851,9 @@ expression
 | atomic_expression '{' expression'}' '=' expression {
 		$$ = new stListIndexAssignExp($1, $3, $6, yyfile, lineno);
 	}
+| atomic_expression DOT_NOTATOR '=' expression {
+		$$ = new stListIndexAssignExp($1, new stStringExp( $2, currentMethod, currentObject, yyfile, lineno ) , $4, yyfile, lineno);
+	}
 | atomic_expression '{' expression'}' math_assign_operator expression {
 		stExp *loadExp, *binExp;
 
@@ -1024,6 +1027,9 @@ atomic_expression
 | ST_EVAL		{ $$ = new stEvalExp($1, yyfile, lineno); }
 | atomic_expression '{' expression '}' { 
 		$$ = new stListIndexExp($1, $3, yyfile, lineno); 
+	}
+| atomic_expression DOT_NOTATOR { 
+		$$ = new stListIndexExp($1, new stStringExp( $2, currentMethod, currentObject, yyfile, lineno ), yyfile, lineno); 
 	}
 | WORD_VALUE '[' expression ']' {
 		$$ = new stArrayIndexExp(currentMethod, currentObject, $1, $3, yyfile, lineno);

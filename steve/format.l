@@ -7,10 +7,10 @@ int tlevel = 0;
 char *result = NULL;
 unsigned int formatLength = 0;
 
-void slFormatAppend(char *, int);
-char *slFormatText(void);
+void slFormatAppend( const char *, int);
+char *slFormatText(const char *);
 
-char *slFormatParseBuffer;
+const char *slFormatParseBuffer;
 int slFormatParseLength;
 int slFormatParseLocation;
 int midline = 0;
@@ -56,7 +56,7 @@ int midline = 0;
 
 %%
 
-char *slFormatText(char *text) {
+char *slFormatText( const char *text ) {
 	slFormatParseBuffer = text;
 	slFormatParseLength = strlen(text);
 	slFormatParseLocation = 0;
@@ -69,7 +69,7 @@ char *slFormatText(char *text) {
 	return result;
 }
 
-void slFormatAppend(char *text, int tlevel) {
+void slFormatAppend( const char *text, int tlevel ) {
 	if(strlen(text) + strlen(result) + 2 + tlevel > formatLength) {
 		formatLength *= 2;
 		result = (char*)slRealloc(result, formatLength);
